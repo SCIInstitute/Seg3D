@@ -26,19 +26,24 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef SEG3D_CONFIGURATION_H
-#define SEG3D_CONFIGURATION_H
+#include <Interface/AppInterface/ViewerInterface.h>
 
-// These values are set in the CMakeLists.txt file
+namespace Seg3D {
 
-// Set the version numbers of the Seg3D application
+ViewerInterface::ViewerInterface(QWidget* parent) :
+  QWidget(parent)
+{
+//  mainlayout_ = new QVBoxLayout(this);
+//  mainlayout_->setContentsMargins(0,0,0,0);
+//  mainlayout_->setSpacing(0);
+//  mainlayout_->addWidget(topmenubar_);
+//  mainlayout_->addWidget(maincanvasframe_);
+//  mainlayout_->setStretch(0,0);
+//  mainlayout_->setStretch(1,10);
+}
 
-#define SEG3D_VERSION "@SEG3D_MAJOR_VERSION@.@SEG3D_MINOR_VERSION@"
-#define SEG3D_MAJOR_VERSION @SEG3D_MAJOR_VERSION@
-#define SEG3D_MINOR_VERSION @SEG3D_MINOR_VERSION@
+ViewerInterface::~ViewerInterface()
+{
+}
 
-// Set the type of the build
-
-#define SEG3D_BITS "@SEG3D_BITS@"
-
-#endif
+} // end namespace

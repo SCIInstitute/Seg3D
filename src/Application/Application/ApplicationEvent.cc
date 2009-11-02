@@ -26,19 +26,31 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef SEG3D_CONFIGURATION_H
-#define SEG3D_CONFIGURATION_H
+#include <Application/Application/ApplicationEvent.h>
 
-// These values are set in the CMakeLists.txt file
+namespace Seg3D {
 
-// Set the version numbers of the Seg3D application
+ApplicationEvent::ApplicationEvent()
+{
+}
 
-#define SEG3D_VERSION "@SEG3D_MAJOR_VERSION@.@SEG3D_MINOR_VERSION@"
-#define SEG3D_MAJOR_VERSION @SEG3D_MAJOR_VERSION@
-#define SEG3D_MINOR_VERSION @SEG3D_MINOR_VERSION@
 
-// Set the type of the build
+ApplicationEvent::~ApplicationEvent()
+{
+}
 
-#define SEG3D_BITS "@SEG3D_BITS@"
+void
+ApplicationEvent::handle_event()
+{
+  // run the code
+  run();
 
-#endif
+  // if it has a synchronizer just finish up the hand shaking
+  if (sync_handle().get())
+  {
+    boost::unique_lock<boost::mutex> lock(sync_handle()->lock_);
+    sync_handle()->condition_.notify_one();
+  }  
+}
+
+} // end namespace Seg3D

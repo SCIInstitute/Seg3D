@@ -136,7 +136,10 @@ INCLUDE_DIRECTORIES(${SCI_TEEM_INCLUDE})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 
 ###########################################
-# GUI Layer of the application
+# Application layers
 ###########################################
 
 ADD_SUBDIRECTORY(Core)
+ADD_SUBDIRECTORY(Application)
+ADD_SUBDIRECTORY(Interface)
+

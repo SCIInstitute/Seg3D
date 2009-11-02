@@ -26,19 +26,30 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef SEG3D_CONFIGURATION_H
-#define SEG3D_CONFIGURATION_H
+#ifndef INTERFACE_APPINTERFACE_VIEWERINTERFACE_H
+#define INTERFACE_APPINTERFACE_VIEWERINTERFACE_H
 
-// These values are set in the CMakeLists.txt file
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+# pragma once
+#endif 
 
-// Set the version numbers of the Seg3D application
+#include <QtGui>
+#include <QMainWindow>
 
-#define SEG3D_VERSION "@SEG3D_MAJOR_VERSION@.@SEG3D_MINOR_VERSION@"
-#define SEG3D_MAJOR_VERSION @SEG3D_MAJOR_VERSION@
-#define SEG3D_MINOR_VERSION @SEG3D_MINOR_VERSION@
+namespace Seg3D {
 
-// Set the type of the build
+class ViewerInterface : public QWidget
+{
+  Q_OBJECT
 
-#define SEG3D_BITS "@SEG3D_BITS@"
+// -- constructor / destructor --    
+  public:
+    ViewerInterface(QWidget* parent = 0);
+    virtual ~ViewerInterface();
+  
+};
+
+} // end namespace
 
 #endif
+

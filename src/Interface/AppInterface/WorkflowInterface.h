@@ -26,19 +26,44 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef SEG3D_CONFIGURATION_H
-#define SEG3D_CONFIGURATION_H
+#ifndef INTERFACE_APPINTERFACE_WORKFLOWINTERFACE_H
+#define INTERFACE_APPINTERFACE_WORKFLOWINTERFACE_H
 
-// These values are set in the CMakeLists.txt file
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+# pragma once
+#endif 
 
-// Set the version numbers of the Seg3D application
+// Qt includes
+#include <QtGui>
+#include <QMainWindow>
+#include <QDockWidget>
 
-#define SEG3D_VERSION "@SEG3D_MAJOR_VERSION@.@SEG3D_MINOR_VERSION@"
-#define SEG3D_MAJOR_VERSION @SEG3D_MAJOR_VERSION@
-#define SEG3D_MINOR_VERSION @SEG3D_MINOR_VERSION@
+// Boost includes
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/thread.hpp>
+#include <boost/shared_ptr.hpp>
 
-// Set the type of the build
+namespace Seg3D {
 
-#define SEG3D_BITS "@SEG3D_BITS@"
+// Forward declaration
+class WorkflowInterfacePrivate;
+
+class WorkflowInterface : public QDockWidget
+{
+  Q_OBJECT
+  
+// -- constructor / destructor --  
+  public:
+    WorkflowInterface(QWidget* parent = 0);
+    virtual ~WorkflowInterface();
+
+// -- internals --    
+  private:
+    // Internals of the LayerManagerInterface
+    boost::shared_ptr<WorkflowInterfacePrivate> private_;
+};
+
+} // end namespace
 
 #endif
+

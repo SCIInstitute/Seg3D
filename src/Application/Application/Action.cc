@@ -26,19 +26,30 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef SEG3D_CONFIGURATION_H
-#define SEG3D_CONFIGURATION_H
+#include <Application/Application/Action.h>
 
-// These values are set in the CMakeLists.txt file
+namespace Seg3D {
 
-// Set the version numbers of the Seg3D application
+Action::Action(kind_type kind, flags_type flags) :
+  kind_(kind),
+  flags_(flags)
+{
+}
 
-#define SEG3D_VERSION "@SEG3D_MAJOR_VERSION@.@SEG3D_MINOR_VERSION@"
-#define SEG3D_MAJOR_VERSION @SEG3D_MAJOR_VERSION@
-#define SEG3D_MINOR_VERSION @SEG3D_MINOR_VERSION@
+Action::~Action()
+{
+}
 
-// Set the type of the build
+bool
+Action::validate(std::string& error)
+{
+  return true;
+}
 
-#define SEG3D_BITS "@SEG3D_BITS@"
+bool
+Action::needs_queue(std::string& error)
+{
+  return true;
+}
 
-#endif
+}

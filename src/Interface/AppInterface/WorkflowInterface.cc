@@ -26,19 +26,39 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef SEG3D_CONFIGURATION_H
-#define SEG3D_CONFIGURATION_H
+#include <Interface/AppInterface/WorkflowInterface.h>
 
-// These values are set in the CMakeLists.txt file
+namespace Seg3D {
 
-// Set the version numbers of the Seg3D application
+// Internals of class
+class WorkflowInterfacePrivate {
+  public:
+    // Main interface widget
+    QWidget*                  interface_;
+    
+};
 
-#define SEG3D_VERSION "@SEG3D_MAJOR_VERSION@.@SEG3D_MINOR_VERSION@"
-#define SEG3D_MAJOR_VERSION @SEG3D_MAJOR_VERSION@
-#define SEG3D_MINOR_VERSION @SEG3D_MINOR_VERSION@
+WorkflowInterface::WorkflowInterface(QWidget* parent) :
+  QDockWidget("WorkflowManager",parent),
+  private_(new WorkflowInterfacePrivate)
+{
+  // Set the areas in which we can dock this window
+  setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea );   
+  setFeatures( DockWidgetFloatable | DockWidgetMovable );
 
-// Set the type of the build
+  // Set up the private internals of the WorkflowInterface class
+  if (private_) 
+  {
+    // Main widget that goes into the dock
+    private_->interface_ = new QWidget;
 
-#define SEG3D_BITS "@SEG3D_BITS@"
+    // Import the widget
+    setWidget(private_->interface_);
+  }  
+}
 
-#endif
+WorkflowInterface::~WorkflowInterface()
+{
+}
+
+} // end namespace

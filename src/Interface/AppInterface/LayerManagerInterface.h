@@ -26,19 +26,50 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef SEG3D_CONFIGURATION_H
-#define SEG3D_CONFIGURATION_H
+#ifndef INTERFACE_APPINTERFACE_LAYERMANAGERINTERFACE_H
+#define INTERFACE_APPINTERFACE_LAYERMANAGERINTERFACE_H
 
-// These values are set in the CMakeLists.txt file
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+# pragma once
+#endif 
 
-// Set the version numbers of the Seg3D application
+// QT includes
+#include <QtGui>
+#include <QDockWidget>
 
-#define SEG3D_VERSION "@SEG3D_MAJOR_VERSION@.@SEG3D_MINOR_VERSION@"
-#define SEG3D_MAJOR_VERSION @SEG3D_MAJOR_VERSION@
-#define SEG3D_MINOR_VERSION @SEG3D_MINOR_VERSION@
+// STL includes
+#include <string>
 
-// Set the type of the build
+// Boost includes
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/thread.hpp>
+#include <boost/shared_ptr.hpp>
 
-#define SEG3D_BITS "@SEG3D_BITS@"
+namespace Seg3D {
+
+// Forward declaration
+class LayerManagerInterfacePrivate;
+
+// -- LayerManagerWindow --
+// This is the main class for the layer manager window
+
+class LayerManagerInterface : public QDockWidget
+{
+  Q_OBJECT
+  
+// -- constructor / destructor --  
+  public:
+
+    LayerManagerInterface(QWidget* parent = 0);
+    virtual ~LayerManagerInterface();   
+
+// -- internals --    
+  private:
+    // Internals of the LayerManagerInterface
+    boost::shared_ptr<LayerManagerInterfacePrivate> private_;
+};
+
+} // end namespace
 
 #endif
+
