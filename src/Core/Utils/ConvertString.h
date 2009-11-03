@@ -45,6 +45,7 @@
 #include <vector>
 #include <sstream>
 #include <fstream>
+#include <limits>
 
 namespace Core {
 
