@@ -64,6 +64,10 @@ class LayerManagerInterface : public QDockWidget
     virtual ~LayerManagerInterface();   
 
 // -- internals --    
+  private slots:
+    void worldCoordsChanged();
+    void indexCoordsChanged();
+
   private:
     // Internals of the LayerManagerInterface
     boost::shared_ptr<LayerManagerInterfacePrivate> private_;

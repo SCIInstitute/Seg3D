@@ -25,6 +25,10 @@
    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
    DEALINGS IN THE SOFTWARE.
 */
+#include <sstream>
+#include <iostream>
+
+#include <Core/Utils/Log.h>
 
 #include <Interface/AppInterface/LayerManagerInterface.h>
 
@@ -66,11 +70,84 @@ LayerManagerInterface::LayerManagerInterface(QWidget* parent) :
   
     // Import the widget
     setWidget(private_->interface_);
+
+    // Setup validators on text entry widgets
+    private_->ui_.worldXEdit->setValidator(
+             new QIntValidator(private_->ui_.worldXEdit));
+    private_->ui_.worldYEdit->setValidator(
+             new QIntValidator(private_->ui_.worldYEdit));
+    private_->ui_.worldZEdit->setValidator(
+             new QIntValidator(private_->ui_.worldZEdit));
+    private_->ui_.indexXEdit->setValidator(
+             new QIntValidator(private_->ui_.indexXEdit));
+    private_->ui_.indexYEdit->setValidator(
+             new QIntValidator(private_->ui_.indexYEdit));
+    private_->ui_.indexZEdit->setValidator(
+             new QIntValidator(private_->ui_.indexZEdit));
+
+    // Connect signals to slots
+    connect(private_->ui_.worldXEdit, SIGNAL(editingFinished()),
+      this, SLOT(worldCoordsChanged()));
+    connect(private_->ui_.worldYEdit, SIGNAL(editingFinished()),
+      this, SLOT(worldCoordsChanged()));
+    connect(private_->ui_.worldZEdit, SIGNAL(editingFinished()),
+      this, SLOT(worldCoordsChanged()));
+    connect(private_->ui_.indexXEdit, SIGNAL(editingFinished()),
+      this, SLOT(indexCoordsChanged()));
+    connect(private_->ui_.indexYEdit, SIGNAL(editingFinished()),
+      this, SLOT(indexCoordsChanged()));
+    connect(private_->ui_.indexZEdit, SIGNAL(editingFinished()),
+      this, SLOT(indexCoordsChanged()));
+
   }  
 }
 
 LayerManagerInterface::~LayerManagerInterface()
 {
+}
+
+void LayerManagerInterface::worldCoordsChanged()
+{
+  // extract all the coordinates and create an action
+  // since we provided an int validator, it should be safe
+  // to read the values directly into ints
+
+  // TODO: The signal will be sent even if the user just selects
+  // the text box and then the box loses focus.  To avoid
+  // unnecessary work, may want to check if the values have
+  // actually changed before creating an action.
+  int wx, wy, wz;
+  wx = private_->ui_.worldXEdit->text().toInt();
+  wy = private_->ui_.worldYEdit->text().toInt();
+  wz = private_->ui_.worldZEdit->text().toInt();
+  {
+    std::ostringstream ss;
+    ss << "Extracted World Coords, x: " << wx << ", y: " << wy 
+       << ", z: " << wz;
+    LOG_DEBUG(ss.str());
+  }
+}
+
+void LayerManagerInterface::indexCoordsChanged()
+{
+  // extract all the coordinates and create an action
+  // since we provided an int validator, it should be safe
+  // to read the values directly into ints
+
+  // TODO: The signal will be sent even if the user just selects
+  // the text box and then the box loses focus.  To avoid
+  // unnecessary work, may want to check if the values have
+  // actually changed before creating an action.
+  int ix, iy, iz;
+  ix = private_->ui_.indexXEdit->text().toInt();
+  iy = private_->ui_.indexYEdit->text().toInt();
+  iz = private_->ui_.indexZEdit->text().toInt();
+  {
+    std::ostringstream ss;
+    ss << "Extracted Index Coords, x: " << ix << ", y: " << iy 
+       << ", z: " << iz;
+    LOG_DEBUG(ss.str());
+  }
 }
 
 } // end namespace

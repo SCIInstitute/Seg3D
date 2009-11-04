@@ -80,6 +80,15 @@ ADD_DEFINITIONS(-DTEEM_STATIC)
 ADD_DEFINITIONS(-DLIBXML_STATIC)
 ADD_DEFINITIONS(-DBOOST_ALL_NO_LIB)
 
+###########################################
+# SETUP FOR DEBUG BUILDS
+# enable any extra compile warnings and 
+# set any debug-specific variables
+###########################################
+
+IF(CMAKE_BUILD_TYPE MATCHES "Debug")
+  ADD_DEFINITIONS(-DDEBUG)
+ENDIF(CMAKE_BUILD_TYPE MATCHES "Debug")
 
 ###########################################
 # Build Seg3DConfiguration.h
