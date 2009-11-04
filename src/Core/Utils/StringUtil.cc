@@ -26,9 +26,10 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#include <Core/Utils/ConvertString.h>
+#include <Core/Utils/StringUtil.h>
 
 #include <stdlib.h>
+#include <limits>
 
 namespace Core {
 

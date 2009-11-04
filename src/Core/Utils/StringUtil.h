@@ -26,8 +26,8 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef CORE_UTILS_CONVERTSTRING_H
-#define CORE_UTILS_CONVERTSTRING_H
+#ifndef CORE_UTILS_STRINGUTIL_H
+#define CORE_UTILS_STRINGUTIL_H
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
@@ -45,7 +45,6 @@
 #include <vector>
 #include <sstream>
 #include <fstream>
-#include <limits>
 
 namespace Core {
 

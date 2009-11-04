@@ -32,10 +32,12 @@
 ##################################################
 
 SET(CORE_UTILS_SRCS
+  Exception.h
+  Exception.cc
   Log.h
   Log.cc
-  ConvertString.h
-  ConvertString.cc
+  StringUtil.h
+  StringUtil.cc
 )
 
 ##################################################
