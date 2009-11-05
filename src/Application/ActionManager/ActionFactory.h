@@ -26,12 +26,18 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_APPLICATION_ACTIONFACTORY_H
-#define APPLICATION_APPLICATION_ACTIONFACTORY_H
+#ifndef APPLICATION_ACTIONMANAGER_ACTIONFACTORY_H
+#define APPLICATION_ACTIONMANAGER_ACTIONFACTORY_H
 
-#include <Application/Application/Action.h>
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+# pragma once
+#endif 
+
+#include <Application/ActionManager/Action.h>
+
 
 // Boost includes
+#include <boost/serialization/force_include.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/shared_ptr.hpp>
@@ -69,8 +75,9 @@ class ActionBuilderT: public ActionBuilder {
     virtual ActionHandle build() { return ActionHandle(new ACTION); }
 };
 
-// ------------------------------
 
+
+// ------------------------------
 
 // ACTIONFACTORY:
 // The factory object that instantiates the actions for the scripting and 
@@ -78,11 +85,10 @@ class ActionBuilderT: public ActionBuilder {
 
 class ActionFactory : public boost::noncopyable  {
 
-// -- Constructor/ Destructor --
+// -- Constructor --
 
   public:
     ActionFactory();
-    virtual ~ActionFactory(); 
 
 // -- Action registration --
 
@@ -92,12 +98,12 @@ class ActionFactory : public boost::noncopyable  {
     // factory.
   
     template <class ACTION>
-    void register_action()
+    void register_action(std::string action_name)
     {
       // Lock the factory
-      boost::unique_lock<boost::mutex> lock(action_factory_mutex_);
+      boost::unique_lock<boost::mutex> lock(instance_mutex_);
       // Register the action
-      action_builders_[ACTION::get_classname()] = new ActionBuilderT<ACTION>;
+      action_builders_[action_name] = new ActionBuilderT<ACTION>;
     }
 
   private:
@@ -108,14 +114,14 @@ class ActionFactory : public boost::noncopyable  {
     action_map_type  action_builders_;
 
 // -- Instantiate actions --
-
   public:
     
     // CREATE_ACTION:
     // Generate an action from an iostream object that contains the XML
     // specification of the action.
-    
-    // ActionHandle create_action(IOStream* iostream);
+
+    // TODO: Need to get this off an std::istream
+    ActionHandle create_action(std::string action_string);
 
 // -- Singleton interface --
   public:
@@ -128,13 +134,29 @@ class ActionFactory : public boost::noncopyable  {
   private:
   
     // Mutex protecting the singleton interface
-    static boost::mutex     action_factory_mutex_;
+    static boost::mutex     instance_mutex_;
     // Initialized or not?
-    static bool initialized_;
+    static bool             initialized_;
     // Pointer that contains the singleton interface to this class
-    static ActionFactory*   action_factory_;
+    static ActionFactory*   instance_;
 };
 
+
+// CLASS REGISTER ACTION:
+// Register an action through a static constructor
+
+template <class ACTION>
+class RegisterAction {
+  public:
+    RegisterAction(std::string classname)
+    {
+      ActionFactory::instance()->register_action<ACTION>(classname);
+    }
+};
+
+// MACRO FOR ADDING AN ACTION TO THE ACTION FACTORY
+#define SCI_REGISTER_ACTION(name) \
+BOOST_USED static RegisterAction<name> register_##name(name)
 
 } // end namespace seg3D
 

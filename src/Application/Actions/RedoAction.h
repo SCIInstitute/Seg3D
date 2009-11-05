@@ -26,78 +26,36 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef INTERFACE_QTINTERFACE_QTINTERFACE_H
-#define INTERFACE_QTINTERFACE_QTINTERFACE_H
+#ifndef APPLICATION_ACTIONS_REDOACTION_H
+#define APPLICATION_ACTIONS_REDOACTION_H
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
 #endif 
 
-// Qt includes
-#include <QApplication>
-
-// Boost includes
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/thread.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/utility.hpp>
+#include <Application/ActionManager/Action.h>
 
 namespace Seg3D {
 
-using namespace Core;
+class RedoAction : public Action {
 
-// -- QtInterface class (singleton) --
+  // --Constructor/Destructor
+  public:
+ 
+    RedoAction();
+    virtual ~RedoAction();
 
-// This class is a wrapper around the QApplication class
-
-class QtInterface : public boost::noncopyable {
-
-// -- constuctor --
+  // -- Functions that need to be overloaded for this action --
   public:
   
-    QtInterface();
+    // Name of the action always needs to be present
+    virtual std::string type_name() const;
 
-// -- entry point --
-
-  public:
-  
-    // SETUP:
-    // Setup the interface context
-    bool setup(int argc, char **argv);
-
-    // EXEC:
-    // Start the interface execution
-    bool exec();
-
-
-// -- accessors --
-
-    // GET_QAPPLICATION:
-    // Get the pointer to the main qt application
-    QApplication* get_qt_application() { return qt_application_; }
-
-  private:  
-    // main QT application class
-    QApplication* qt_application_;
-
-
-// -- Singleton interface --
-  public:
-  
-    // INSTANCE:
-    // Get the singleton pointer to the application
-    static QtInterface* instance();
-
-  private:
-  
-    // Mutex protecting the singleton interface
-    static boost::mutex   instance_mutex_;
-    // Initialized or not?
-    static bool           initialized_;
-    // Pointer that contains the singleton interface to this class
-    static QtInterface*   instance_;
+    // The actual function that executes the action
+    // always needs to be written.
+    virtual void do_action();
 };
 
-} // end namespace Seg3D
+} //end namespace Seg3D
 
 #endif

@@ -1,3 +1,4 @@
+
 #
 #  For more information, please see: http://software.sci.utah.edu
 # 
@@ -26,6 +27,22 @@
 #  DEALINGS IN THE SOFTWARE.
 #
 
-ADD_SUBDIRECTORY(Application)
-ADD_SUBDIRECTORY(ActionManager)
-ADD_SUBDIRECTORY(Actions)
+##################################################
+# Set sources
+##################################################
+
+SET(CORE_STATE_SRCS
+  State.h
+  State.cc
+)
+
+##################################################
+# Build static library
+##################################################
+
+ADD_LIBRARY(Core_State STATIC ${CORE_STATE_SRCS})
+
+TARGET_LINK_LIBRARIES(Core_State 
+                      Core_Utils
+                      ${SCI_BOOST_LIBRARY})
+

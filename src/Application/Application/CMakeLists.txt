@@ -31,24 +31,19 @@
 # Set sources
 ##################################################
 
-SET(APPLICATION_SRCS
-  Action.cc
-  Action.h
-  ActionFactory.cc
-  ActionFactory.h
-  Application.cc
-  ApplicationEvent.cc
-  DefaultApplicationContext.cc
+SET(APPLICATION_APPLICATION_SRCS
   Application.h
+  Application.cc
   ApplicationEvent.h
+  ApplicationEvent.cc
   DefaultApplicationContext.h
+  DefaultApplicationContext.cc
   ApplicationContext.h
   )
 
 
 ADD_LIBRARY(Application_Application STATIC 
-            ${APPLICATION_SRCS} )
-            
+            ${APPLICATION_APPLICATION_SRCS} )
             
 TARGET_LINK_LIBRARIES(Application_Application
                       Core_Utils

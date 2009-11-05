@@ -51,24 +51,24 @@ int main(int argc, char **argv)
   // -- Setup error logging --
   Core::LogStreamer error_log(Core::Log::ALL_E,&(std::cerr));
 
-  LOG_MESSAGE(std::string("--- Starting Seg3D ")+SEG3D_VERSION+" ---");
+  SCI_LOG_MESSAGE(std::string("--- Starting Seg3D ")+SEG3D_VERSION+" ---");
   
   // -- Setup the QT Interface Layer --
   
-  LOG_DEBUG("Setup QT Interface");
+  SCI_LOG_DEBUG("Setup QT Interface");
   if (!(QtInterface::instance()->setup(argc,argv))) return (-1);
 
   // -- Setup Application Interface Window --
 
-  LOG_DEBUG("Setup Application Interface");
+  SCI_LOG_DEBUG("Setup Application Interface");
   AppInterface* app_interface = new AppInterface(QtInterface::instance()->get_qt_application());
   app_interface->show();
 
   // -- Run QT event loop --
-  LOG_DEBUG("Start the main QT event loop");
+  SCI_LOG_DEBUG("Start the main QT event loop");
   if (!(QtInterface::instance()->exec())) return (-1);
   
-  LOG_MESSAGE("--- Finished ---");
+  SCI_LOG_MESSAGE("--- Finished ---");
   
   // Indicate success
   return (0);

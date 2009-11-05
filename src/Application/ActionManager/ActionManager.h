@@ -26,78 +26,58 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef INTERFACE_QTINTERFACE_QTINTERFACE_H
-#define INTERFACE_QTINTERFACE_QTINTERFACE_H
+#ifndef APPLICATION_ACTIONMANAGER_ACTIONMANAGER_H
+#define APPLICATION_ACTIONMANAGER_ACTIONMANAGER_H
 
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
-# pragma once
-#endif 
-
-// Qt includes
-#include <QApplication>
-
-// Boost includes
+// Boost includes for singleton
 #include <boost/thread/mutex.hpp>
-#include <boost/thread/thread.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
 
 namespace Seg3D {
 
-using namespace Core;
+// Forward declarations
+class ActionManagerDispatcher;
+class ActionManagerState;
+class ActionManagerHandler;
+class ActionManager;
 
-// -- QtInterface class (singleton) --
+class ActionManager : public boost::noncopyable {
 
-// This class is a wrapper around the QApplication class
+// -- Constructor
+  public:
+    ActionManager();
 
-class QtInterface : public boost::noncopyable {
-
-// -- constuctor --
+// -- Dispatcher/State/Handler interface
   public:
   
-    QtInterface();
-
-// -- entry point --
-
-  public:
-  
-    // SETUP:
-    // Setup the interface context
-    bool setup(int argc, char **argv);
-
-    // EXEC:
-    // Start the interface execution
-    bool exec();
-
-
-// -- accessors --
-
-    // GET_QAPPLICATION:
-    // Get the pointer to the main qt application
-    QApplication* get_qt_application() { return qt_application_; }
-
-  private:  
-    // main QT application class
-    QApplication* qt_application_;
-
+    ActionManagerDispatcher* dispatcher_;
+    ActionManagerState*      state_;
+    ActionManagerHandler*    handler_;
 
 // -- Singleton interface --
   public:
   
     // INSTANCE:
     // Get the singleton pointer to the application
-    static QtInterface* instance();
+    
+    static ActionManager* instance();
 
   private:
   
     // Mutex protecting the singleton interface
-    static boost::mutex   instance_mutex_;
+    static boost::mutex     instance_mutex_;
     // Initialized or not?
-    static bool           initialized_;
+    static bool             initialized_;
     // Pointer that contains the singleton interface to this class
-    static QtInterface*   instance_;
+    static ActionManager*   instance_;
 };
 
-} // end namespace Seg3D
+} // namespace Seg3D
+
+// Include these here to prevent circular includes
+
+#include <Application/ActionManager/ActionManagerDispatcher.h>
+#include <Application/ActionManager/ActionManagerState.h>
+#include <Application/ActionManager/ActionManagerHandler.h>
 
 #endif

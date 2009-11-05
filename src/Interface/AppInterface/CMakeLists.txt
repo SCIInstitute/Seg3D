@@ -31,7 +31,7 @@
 # Set sources
 ##################################################
 
-SET(APPINTERFACE_SRCS
+SET(INTERFACE_APPINTERFACE_SRCS
   AppInterface.cc
   LayerManagerInterface.cc
   ToolManagerInterface.cc
@@ -39,7 +39,7 @@ SET(APPINTERFACE_SRCS
   WorkflowInterface.cc
 )
 
-SET(APPINTERFACE_MOC_SRCS
+SET(INTERFACE_APPINTERFACE_MOC_SRCS
   AppInterface.h
   LayerManagerInterface.h
   ToolManagerInterface.h
@@ -47,10 +47,10 @@ SET(APPINTERFACE_MOC_SRCS
   WorkflowInterface.h
 )
 
-SET(APPINTERFACE_NO_MOC_SRCS
+SET(INTERFACE_APPINTERFACE_NO_MOC_SRCS
 )
 
-SET(APPINTERFACE_UI_SRCS
+SET(INTERFACE_APPINTERFACE_UI_SRCS
   LayerManagerInterface.ui
 )
 
@@ -58,20 +58,20 @@ SET(APPINTERFACE_UI_SRCS
 # Get Icon files
 ##################################################
 
-#QT4_ADD_RESOURCES(APPINTERFACE_QT_RCC_SRCS Resources.qrc)
+#QT4_ADD_RESOURCES(INTERFACE_APPINTERFACE_QT_RCC_SRCS Resources.qrc)
 
 ##################################################
 # Generate header out of UI code
 ##################################################
 
-QT4_WRAP_UI(APPINTERFACE_QT_UI_SRCS ${APPINTERFACE_UI_SRCS})
+QT4_WRAP_UI(INTERFACE_APPINTERFACE_QT_UI_SRCS ${INTERFACE_APPINTERFACE_UI_SRCS})
 
 
 ##################################################
 # Wrap QT code to expand all the moc code
 ##################################################
 
-QT4_WRAP_CPP(APPINTERFACE_QT_MOC_SRCS ${APPINTERFACE_MOC_SRCS})
+QT4_WRAP_CPP(INTERFACE_APPINTERFACE_QT_MOC_SRCS ${INTERFACE_APPINTERFACE_MOC_SRCS})
 
 ##################################################
 # Ensure that we can find the files generated
@@ -85,10 +85,10 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 ##################################################
 
 ADD_LIBRARY(Interface_AppInterface STATIC 
-            ${APPINTERFACE_SRCS} 
-            ${APPINTERFACE_QT_UI_SRCS}
-            ${APPINTERFACE_QT_MOC_SRCS}
-            ${APPINTERFACE_NO_MOC_SRCS} )
+            ${INTERFACE_APPINTERFACE_SRCS} 
+            ${INTERFACE_APPINTERFACE_QT_UI_SRCS}
+            ${INTERFACE_APPINTERFACE_QT_MOC_SRCS}
+            ${INTERFACE_APPINTERFACE_NO_MOC_SRCS} )
             
             
 TARGET_LINK_LIBRARIES(Interface_AppInterface

@@ -40,8 +40,6 @@ Log::post_error(std::string message, const int line, const char* file)
 {
   std::string str = std::string("[")+file+std::string(":")+to_string(line)+
     std::string("] ERROR: ")+message;
-  
-  boost::unique_lock<boost::mutex> lock(log_mutex_);
   post_log_signal_(ERROR_E, str);
 }  
 
@@ -50,8 +48,6 @@ Log::post_warning(std::string message, const int line, const char* file)
 {
   std::string str = std::string("[")+file+std::string(":")+to_string(line)+
     std::string("] WARNING: ")+message;
-  
-  boost::unique_lock<boost::mutex> lock(log_mutex_);
   post_log_signal_(WARNING_E, str);
 }  
 
@@ -60,8 +56,6 @@ Log::post_message(std::string message, const int line, const char* file)
 {
   std::string str = std::string("[")+file+std::string(":")+to_string(line)+
     std::string("] MESSAGE: ")+message;
-  
-  boost::unique_lock<boost::mutex> lock(log_mutex_);
   post_log_signal_(MESSAGE_E, str);
 }  
 
@@ -70,8 +64,6 @@ Log::post_debug(std::string message, const int line, const char* file)
 {
   std::string str = std::string("[")+file+std::string(":")+to_string(line)+
     std::string("] DEBUG: ")+message;
-  
-  boost::unique_lock<boost::mutex> lock(log_mutex_);
   post_log_signal_(DEBUG_E, str);
 }  
 
@@ -83,28 +75,28 @@ Log::instance()
   {
     //in case multiple threads try to allocate this one at once.
     {
-      boost::unique_lock<boost::mutex> lock(log_mutex_);
+      boost::unique_lock<boost::mutex> lock(instance_mutex_);
       // The first test was not locked and hence not thread safe
       // This one will do a thread-safe allocation of the interface
       // class
-      if (log_ == 0) log_ = new Log();
+      if (instance_ == 0) instance_ = new Log();
     }
     
     {
       // Enforce memory synchronization so the singleton is initialized
       // before we set initialized to true
-      boost::unique_lock<boost::mutex> lock(log_mutex_);
+      boost::unique_lock<boost::mutex> lock(instance_mutex_);
       initialized_ = true;
     }
   }
-  return (log_);
+  return (instance_);
 }
 
 // Static variables that are located in Application and that need to be
 // allocated here
-boost::mutex Log::log_mutex_;
+boost::mutex Log::instance_mutex_;
 bool         Log::initialized_ = false;
-Log*         Log::log_ = 0;
+Log*         Log::instance_ = 0;
 
 
 class LogStreamerInternal {

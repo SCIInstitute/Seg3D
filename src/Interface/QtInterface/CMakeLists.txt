@@ -31,40 +31,34 @@
 # Set sources
 ##################################################
 
-SET(QTINTERFACE_SRCS
+SET(INTERFACE_QTINTERFACE_SRCS
   QtInterface.cc
   QtInterfaceInternal.cc
 )
 
-SET(QTINTERFACE_MOC_SRCS
+SET(INTERFACE_QTINTERFACE_MOC_SRCS
   QtInterfaceInternal.h
 )
 
-SET(QTINTERFACE_NO_MOC_SRCS
+SET(INTERFACE_QTINTERFACE_NO_MOC_SRCS
   QtInterface.h
 )
 
-SET(QTINTERFACE_UI_SRCS
+SET(INTERFACE_QTINTERFACE_UI_SRCS
 )
-
-##################################################
-# Get Icon files
-##################################################
-
-#QT4_ADD_RESOURCES(APPINTERFACE_QT_RCC_SRCS Resources.qrc)
 
 ##################################################
 # Generate header out of UI code
 ##################################################
 
-QT4_WRAP_UI(QTINTERFACE_QT_UI_SRCS ${QTINTERFACE_UI_SRCS})
+QT4_WRAP_UI(INTERFACE_QTINTERFACE_QT_UI_SRCS ${INTERFACE_QTINTERFACE_UI_SRCS})
 
 
 ##################################################
 # Wrap QT code to expand all the moc code
 ##################################################
 
-QT4_WRAP_CPP(QTINTERFACE_QT_MOC_SRCS ${QTINTERFACE_MOC_SRCS})
+QT4_WRAP_CPP(INTERFACE_QTINTERFACE_QT_MOC_SRCS ${INTERFACE_QTINTERFACE_MOC_SRCS})
 
 ##################################################
 # Ensure that we can find the files generated
@@ -78,10 +72,10 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 ##################################################
 
 ADD_LIBRARY(Interface_QtInterface STATIC 
-            ${QTINTERFACE_SRCS} 
-            ${QTINTERFACE_QT_UI_SRCS}
-            ${QTINTERFACE_QT_MOC_SRCS}
-            ${QTINTERFACE_NO_MOC_SRCS} )
+            ${INTERFACE_QTINTERFACE_SRCS} 
+            ${INTERFACE_QTINTERFACE_QT_UI_SRCS}
+            ${INTERFACE_QTINTERFACE_QT_MOC_SRCS}
+            ${INTERFACE_QTINTERFACE_NO_MOC_SRCS} )
             
             
 TARGET_LINK_LIBRARIES(Interface_QtInterface 

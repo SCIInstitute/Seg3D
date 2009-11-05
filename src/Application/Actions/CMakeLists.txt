@@ -1,3 +1,4 @@
+
 #
 #  For more information, please see: http://software.sci.utah.edu
 # 
@@ -26,6 +27,23 @@
 #  DEALINGS IN THE SOFTWARE.
 #
 
-ADD_SUBDIRECTORY(Application)
-ADD_SUBDIRECTORY(ActionManager)
-ADD_SUBDIRECTORY(Actions)
+##################################################
+# Set sources
+##################################################
+
+SET(APPLICATION_ACTIONS_SRCS
+  RedoAction.h
+  RedoAction.cc
+  UndoAction.h
+  UndoAction.cc
+  )
+
+ADD_LIBRARY(Application_Actions STATIC 
+            ${APPLICATION_ACTIONS_SRCS} )
+            
+TARGET_LINK_LIBRARIES(Application_Actions
+                      Application_Application
+                      Application_ActionManager
+                      Core_Utils
+                      Core_State
+                      ${SCI_BOOST_LIBRARY})

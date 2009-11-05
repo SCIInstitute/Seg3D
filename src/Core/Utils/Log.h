@@ -97,30 +97,30 @@ class Log : public boost::noncopyable {
   private:
   
     // Mutex protecting the singleton interface
-    static boost::mutex   log_mutex_;
+    static boost::mutex   instance_mutex_;
     // Initialized or not?
-    static bool initialized_;
+    static bool           initialized_;
     // Pointer that contains the singleton interface to this class
-    static Log*   log_;
+    static Log*           instance_;
 };
 
 // MACROS FOR AUTOMATICALLY INCLUDING LINE NUMBER AND FILE IN THE
 // LOG FILE 
 
-#define LOG_ERROR(message)\
+#define SCI_LOG_ERROR(message)\
 Core::Log::instance()->post_error(message,__LINE__,__FILE__)
 
-#define LOG_WARNING(message)\
+#define SCI_LOG_WARNING(message)\
 Core::Log::instance()->post_warning(message,__LINE__,__FILE__)
 
-#define LOG_MESSAGE(message)\
+#define SCI_LOG_MESSAGE(message)\
 Core::Log::instance()->post_message(message,__LINE__,__FILE__)
 
 #ifdef DEBUG
-#define LOG_DEBUG(message)\
+#define SCI_LOG_DEBUG(message)\
 Core::Log::instance()->post_debug(message,__LINE__,__FILE__)
 #else
-#define LOG_DEBUG(message)
+#define SCI_LOG_DEBUG(message)
 #endif
 
 // CLASS LOGSTREAMER:

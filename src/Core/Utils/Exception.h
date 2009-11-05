@@ -148,22 +148,22 @@ class OutOfRange : public LogicError {
 // MACROS FOR AUTOMATICALLY INCLUDING LINE NUMBER AND FILE IN THE
 // EXCEPTION THAT WAS THROWN
 
-#define CORE_THROW_EXCEPTION(message)\
+#define SCI_THROW_EXCEPTION(message)\
 throw Core::Exception(message,__LINE__,__FILE__)
 
-#define CORE_THROW_LOGICERROR(message)\
+#define SCI_THROW_LOGICERROR(message)\
 throw Core::LogicError(message,__LINE__,__FILE__)
 
-#define CORE_THROW_RUNTIMEERROR(message)\
+#define SCI_THROW_RUNTIMEERROR(message)\
 throw Core::RunTimeError(message,__LINE__,__FILE__)
 
-#define CORE_THROW_INVALIDARGUMENT(message)\
+#define SCI_THROW_INVALIDARGUMENT(message)\
 throw Core::InvalidArgument(message,__LINE__,__FILE__)
 
-#define CORE_THROW_LENGTHERROR(message)\
+#define SCI_THROW_LENGTHERROR(message)\
 throw Core::LengthError(message,__LINE__,__FILE__)
 
-#define CORE_THROW_OUTOFRANGE(message)\
+#define SCI_THROW_OUTOFRANGE(message)\
 throw Core::OutOfRange(message,__LINE__,__FILE__)
 
 } // end namespace

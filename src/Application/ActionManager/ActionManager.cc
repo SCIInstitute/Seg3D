@@ -26,64 +26,53 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#include <Application/Application/ActionFactory.h>
+
+#include <Application/ActionManager/ActionManager.h>
+
+#include <boost/signals2.hpp>
 
 namespace Seg3D {
 
-ActionFactory::ActionFactory()
+ActionManager::ActionManager() :
+  dispatcher_(new ActionManagerDispatcher),
+  state_(new ActionManagerState),
+  handler_(new ActionManagerHandler)
 {
+  // Connect the dispatcher to the handler
+  // This is the main connection that separates the input from the output part
+  // of the application. 
+  
+  // This one needs to be disconnected to reroute all the action handling through
+  // a different class. Hence at some point this connection should go to the 
+  // handler.
+  
+  dispatcher_->post_action_signal_.connect(
+    boost::bind(&ActionManagerHandler::handle_action_slot,handler_,_1));
 }
 
-ActionFactory::~ActionFactory()
-{
-}
-
-/*
-ActionHandle
-ActionFactory::create_action(IOStream* iostream)
-{
-  // lock the factory map
-  boost::unique_lock<boost::mutex> lock(action_factory_mutex_);
-  
-  std::string class_name = iostream->get_node_name();
-  
-  action_map_type::iterator it = action_builders_.find(class_name);
-  if ( it == action_builders_.end()) return (0);
-  
-  ActionHandle action = (*it).second->build();
-  action->io(iostream);
-}
-*/
-
-ActionFactory*
-ActionFactory::instance()
+ActionManager*
+ActionManager::instance()
 {
   // if no singleton was allocated, allocate it now
   if (!initialized_)   
   {
     //in case multiple threads try to allocate this one at once.
     {
-      boost::unique_lock<boost::mutex> lock(action_factory_mutex_);
+      boost::unique_lock<boost::mutex> lock(instance_mutex_);
       // The first test was not locked and hence not thread safe
       // This one will do a thread-safe allocation of the interface
       // class
-      if (action_factory_ == 0) action_factory_ = new ActionFactory();
+      if (instance_ == 0) instance_ = new ActionManager();
     }
     
     {
       // Enforce memory synchronization so the singleton is initialized
       // before we set initialized to true
-      boost::unique_lock<boost::mutex> lock(action_factory_mutex_);
+      boost::unique_lock<boost::mutex> lock(instance_mutex_);
       initialized_ = true;
     }
   }
-  return (action_factory_);
+  return (instance_);
 }
 
-// Static variables that are located in Application and that need to be
-// allocated here
-boost::mutex   ActionFactory::action_factory_mutex_;
-bool           ActionFactory::initialized_ = false;
-ActionFactory* ActionFactory::action_factory_ = 0;
-
-} // end namespace seg3D
+}

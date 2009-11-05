@@ -26,41 +26,33 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#include <Application/Application/Application.h>
-#include <Application/Application/DefaultApplicationContext.h>
+#include <Application/ActionManager/ActionFactory.h>
 
 namespace Seg3D {
 
-Application::Application()
+ActionFactory::ActionFactory()
 {
-  // Code for installing a default message handling queue
-  application_context_ = ApplicationContextHandle(new DefaultApplicationContext);
-  application_context_->obtain();
 }
 
-void
-Application::process_events()
+/*
+ActionHandle
+ActionFactory::create_action(IOStream* iostream)
 {
-  // use the implementation of the application context
-  application_context_->process_events();
-}
-
-void
-Application::install_context(ApplicationContextHandle& context)
-{
-  // initialize the new context
-  context->obtain();
+  // lock the factory map
+  boost::unique_lock<boost::mutex> lock(action_factory_mutex_);
   
-  // install the new context atomically
-  ApplicationContextHandle old_context = application_context_;
-  application_context_ = context;
+  std::string class_name = iostream->get_node_name();
   
-  // tell the old context that it is being released
-  old_context->release();
+  action_map_type::iterator it = action_builders_.find(class_name);
+  if ( it == action_builders_.end()) return (0);
+  
+  ActionHandle action = (*it).second->build();
+  action->io(iostream);
 }
+*/
 
-Application*
-Application::instance()
+ActionFactory*
+ActionFactory::instance()
 {
   // if no singleton was allocated, allocate it now
   if (!initialized_)   
@@ -71,7 +63,7 @@ Application::instance()
       // The first test was not locked and hence not thread safe
       // This one will do a thread-safe allocation of the interface
       // class
-      if (instance_ == 0) instance_ = new Application();
+      if (instance_ == 0) instance_ = new ActionFactory();
     }
     
     {
@@ -86,8 +78,8 @@ Application::instance()
 
 // Static variables that are located in Application and that need to be
 // allocated here
-boost::mutex    Application::instance_mutex_;
-bool            Application::initialized_ = false;
-Application*    Application::instance_ = 0;
+boost::mutex   ActionFactory::instance_mutex_;
+bool           ActionFactory::initialized_ = false;
+ActionFactory* ActionFactory::instance_ = 0;
 
-} // end namespace Seg3D
+} // end namespace seg3D

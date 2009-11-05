@@ -55,32 +55,32 @@ QtInterface::setup(int argc, char **argv)
 {
   try
   {
-    LOG_DEBUG("Creating QApplication");
+    SCI_LOG_DEBUG("Creating QApplication");
     // Main application class
     qt_application_ = new QApplication(argc,argv);
 
-    LOG_DEBUG("Creating QtInterface Context");
+    SCI_LOG_DEBUG("Creating QtInterface Context");
     // Interface class to the main class of the Application layer
     ApplicationContextHandle qt_interface_context = 
               ApplicationContextHandle(new QtInterfaceContext(qt_application_));
 
-    LOG_DEBUG("Creating QtInterface EventFilter");
+    SCI_LOG_DEBUG("Creating QtInterface EventFilter");
     // Filter needed to extract user events inserted in main Qt event loop
     QtInterfaceUserEventFilter* qt_interface_filter = 
                                     new QtInterfaceUserEventFilter(qt_application_);
 
-    LOG_DEBUG("Install the QtInterface EventFilter");
+    SCI_LOG_DEBUG("Install the QtInterface EventFilter");
     // Install the event filter that handles callbacks from other threads
     qt_application_->installEventFilter(qt_interface_filter);
 
-    LOG_DEBUG("Install the QtInterface Context into the Application layer");
+    SCI_LOG_DEBUG("Install the QtInterface Context into the Application layer");
     // Insert the event handler into the application layer
     Application::instance()->install_context(qt_interface_context);    
 
   }
   catch(...)
   {
-    LOG_ERROR("Qt Interface failed to initialize");
+    SCI_LOG_ERROR("Qt Interface failed to initialize");
     return (false);
   }
   
@@ -93,12 +93,12 @@ QtInterface::exec()
 {
   try
   {
-    LOG_DEBUG("Starting Qt main event loop");
+    SCI_LOG_DEBUG("Starting Qt main event loop");
     qt_application_->exec();
   }
   catch(...)
   {
-    LOG_ERROR("Main Qt event loop crashed by throwing an exception");
+    SCI_LOG_ERROR("Main Qt event loop crashed by throwing an exception");
     return (false);
   }
   
@@ -114,28 +114,28 @@ QtInterface::instance()
   {
     //in case multiple threads try to allocate this one at once.
     {
-      boost::unique_lock<boost::mutex> lock(qt_interface_mutex_);
+      boost::unique_lock<boost::mutex> lock(instance_mutex_);
       // The first test was not locked and hence not thread safe
       // This one will do a thread-safe allocation of the interface
       // class
-      if (qt_interface_ == 0) qt_interface_ = new QtInterface();
+      if (instance_ == 0) instance_ = new QtInterface();
     }
     
     {
       // Enforce memory synchronization so the singleton is initialized
       // before we set initialized to true
-      boost::unique_lock<boost::mutex> lock(qt_interface_mutex_);
+      boost::unique_lock<boost::mutex> lock(instance_mutex_);
       initialized_ = true;
     }
   }
-  return (qt_interface_);
+  return (instance_);
 }
 
 // Static variables that are located in Application and that need to be
 // allocated here
-boost::mutex QtInterface::qt_interface_mutex_;
+boost::mutex QtInterface::instance_mutex_;
 bool         QtInterface::initialized_ = false;
-QtInterface* QtInterface::qt_interface_ = 0;
+QtInterface* QtInterface::instance_ = 0;
 
 
 

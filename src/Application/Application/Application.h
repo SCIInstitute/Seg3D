@@ -42,9 +42,6 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
 
-// For action handling
-#include <Application/Application/Action.h>
-
 // For event handling
 #include <Application/Application/ApplicationEvent.h>
 #include <Application/Application/ApplicationContext.h>
@@ -64,42 +61,6 @@ class Application : public boost::noncopyable  {
 // -- Constructor/Destructor --
   public:
     Application();
-  
-// -- Action handling --
-  public:
-    // TYPEDEFS 
-    // The type of the main action signal
-
-    typedef boost::signals2::signal<void (ActionHandle)> post_action_signal_type;
-
-    // POST_ACTION:
-    // Post an action into the main signal stack of the application
-    // All actions in the program are funneled through this signal stack
-    // Allow queue determines whether actions that have to be post poned
-    // because they cannot be executed at the time of issuing are allowed
-    // to pass through the action post_signal. Generally interface posts
-    // will set this flag to false, so issuing a filter before a layer is
-    // ready will nullify the action, as it cannot be executed at that time
-    // Script playbacks will allow queueing and hence they will need to have
-    // allow_queue = true.
-
-    bool post_action(ActionHandle action, bool allow_queue = false);        
-
-    // POST_ACTION_SIGNAL:
-    // This is the main signal stack for actions that are posted inside the
-    // application. Any observer that wants to listen into the actions that
-    // are being issued by th program needs to connect to this signal as all
-    // GUI events, Application events, and Layer Data events are passed through
-    // this single application signal.
-    
-    post_action_signal_type post_action_signal_;
-    
-    // DISPATCH_ACTION_SLOT:
-    // This is the main action dispatcher. This function runs the actions and
-    // cleans up the actions when they are done. It also invokes the provenance
-    // recording.
-    
-    void dispatch_action_slot(ActionHandle action);
 
 // -- Event handling --
   public:
@@ -223,11 +184,11 @@ class Application : public boost::noncopyable  {
   private:
   
     // Mutex protecting the singleton interface
-    static boost::mutex   application_mutex_;
+    static boost::mutex   instance_mutex_;
     // Initialized or not?
-    static bool initialized_;
+    static bool           initialized_;
     // Pointer that contains the singleton interface to this class
-    static Application*   application_;
+    static Application*   instance_;
     
 };
 

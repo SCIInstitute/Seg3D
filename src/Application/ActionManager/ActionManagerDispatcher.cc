@@ -26,30 +26,44 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#include <Application/Application/Action.h>
+// Core includes
+#include <Core/Utils/Log.h>
+
+#include <Application/Application/Application.h>
+
+#include <Application/ActionManager/Action.h>
+#include <Application/ActionManager/ActionManagerDispatcher.h>
+
 
 namespace Seg3D {
 
-Action::Action(kind_type kind, flags_type flags) :
-  kind_(kind),
-  flags_(flags)
-{
-}
-
-Action::~Action()
+ActionManagerDispatcher::ActionManagerDispatcher()
 {
 }
 
 bool
-Action::validate(std::string& error)
-{
-  return true;
+ActionManagerDispatcher::post_action(ActionHandle action)
+{ 
+  // If it is not on the application thread, relay the function call
+  // to the application thread
+  if (!(Application::instance()->is_application_thread()))
+  {
+    return Application::instance()->post_event_and_get_result(
+      boost::bind(&ActionManagerDispatcher::post_action,this,action));
+  }
+  
+  // Validate the action
+  if (!(action->validate()))
+  {
+    return (false);
+  }
+
+  SCI_LOG_DEBUG("Posting message on action signal");
+
+  // Trigger a signal
+  post_action_signal_(action);
+  
+  return (true);
 }
 
-bool
-Action::needs_queue(std::string& error)
-{
-  return true;
-}
-
-}
+} // namespace Seg3D
