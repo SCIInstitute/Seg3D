@@ -124,7 +124,7 @@ void LayerManagerInterface::worldCoordsChanged()
     std::ostringstream ss;
     ss << "Extracted World Coords, x: " << wx << ", y: " << wy 
        << ", z: " << wz;
-    LOG_DEBUG(ss.str());
+    SCI_LOG_DEBUG(ss.str());
   }
 }
 
@@ -146,7 +146,7 @@ void LayerManagerInterface::indexCoordsChanged()
     std::ostringstream ss;
     ss << "Extracted Index Coords, x: " << ix << ", y: " << iy 
        << ", z: " << iz;
-    LOG_DEBUG(ss.str());
+    SCI_LOG_DEBUG(ss.str());
   }
 }
 
