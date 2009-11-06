@@ -27,7 +27,7 @@
 */
 
 #ifndef CORE_STATE_STATE_H
-#define CORE_STATE_STATE_H 1
+#define CORE_STATE_STATE_H
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once

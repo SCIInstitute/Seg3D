@@ -47,9 +47,15 @@ class ActionManager : public boost::noncopyable {
   public:
     ActionManager();
 
+
 // -- Dispatcher/State/Handler interface
   public:
-  
+
+    ActionManagerDispatcher* dispatcher() const { return dispatcher_; }
+    ActionManagerState*      state() const      { return state_; }
+    ActionManagerHandler*    handler() const    { return handler_; }
+
+  private:
     ActionManagerDispatcher* dispatcher_;
     ActionManagerState*      state_;
     ActionManagerHandler*    handler_;

@@ -78,7 +78,7 @@ class ActionManagerDispatcher : public boost::noncopyable {
  
 inline bool PostAction(ActionHandle action)
 {
-  return (ActionManager::instance()->dispatcher_->post_action(action));
+  return (ActionManager::instance()->dispatcher()->post_action(action));
 }
 
 } // namespace Seg3D

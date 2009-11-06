@@ -157,7 +157,7 @@ class Action {
   private:
   
     // State variable for storing information for the forward action
-    Core::State do_state_;
+    Core::State update_state_;
 
 // -- Undo interface --
 
@@ -177,7 +177,7 @@ class Action {
   private:
   
     // State variable for storing information for the backward action
-    Core::State undo_state_;
+    Core::State rollback_state_;
 
 
 // -- Update facility --

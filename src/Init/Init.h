@@ -26,33 +26,30 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#include <Application/Actions/UndoAction.h>
-#include <Application/ActionManager/ActionManager.h>
-#include <Application/ActionManager/ActionFactory.h>
+#ifndef INIT_INIT_H
+#define INIT_INIT_H
 
 namespace Seg3D {
 
-SCI_REGISTER_ACTION(UndoAction);
+// INIT PLUGINS:
+// This function serves only one purpose: to link in calls to all the plugin
+// classes. This function will populate all the object factories with the 
+// actions, tools, and UI pieces that can be configured on the fly.
 
-UndoAction::UndoAction() :
-  Action(Action::APPLICATION_E,Action::NONE_E)
-{
-}
+// As the program is statically linked, plugins are optimized out of the program
+// if they are not mentioned from any where in the main program. Hence this
+// class will touch them all and will ensure that these plugins are available
+// in the base classes. 
 
-UndoAction::~UndoAction()
-{
-}
+// The internals of the InitPlugins function are generated automatically by the
+// make system. And hence to create a new plugin just add a registration tag
+// inside the action/tool implementation class and use the right macro to build
+// the library. This will then generate all the code needed to ensure these
+// pieces are not optimized out of the code and that these pieces are part of
+// of the main executable 
 
-std::string
-UndoAction::type_name() const
-{
-  return "UndoAction";
-}
-
-void
-UndoAction::do_action()
-{
-  ActionManager::instance()->handler()->undo_action();
-}
+void InitPlugins();
 
 }
+
+#endif

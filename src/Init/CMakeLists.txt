@@ -1,3 +1,4 @@
+
 #
 #  For more information, please see: http://software.sci.utah.edu
 # 
@@ -26,34 +27,24 @@
 #  DEALINGS IN THE SOFTWARE.
 #
 
-###########################################
-# Set Seg3D main sources
-###########################################
+##################################################
+# Set sources
+##################################################
 
-SET(MAIN_SRCS
-  main.cc
+SET(INIT_INIT_SRCS
+  Init.h
+  Init.cc
 )
 
-###########################################
-# Build the Seg3D executable
-###########################################
+##################################################
+# Build static library
+##################################################
 
-SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SEG3D_OUTPUT_DIRECTORY})
+ADD_LIBRARY(Init_Init STATIC ${INIT_INIT_SRCS})
 
-ADD_EXECUTABLE(Seg3D ${MAIN_SRCS})
+MESSAGE(STATUS "ACTION_LIBRARY_LIST=${ACTION_LIBRARY_LIST}")
 
-TARGET_LINK_LIBRARIES(Seg3D 
-  ${QT_LIBRARIES}
-  ${SCI_BOOST_LIBRARY}
-  Core_Utils
-  Application_Application
-  Application_ActionManager
-  Application_Actions
-  Interface_AppInterface
-  Interface_QtInterface
-  Init_Init
+TARGET_LINK_LIBRARIES(Init_Init 
+  ${ACTION_LIBRARY_LIST}
 )
 
-IF(WIN32)
-  TARGET_LINK_LIBRARIES(Seg3D ${QT_QTMAIN_LIBRARY} )
-ENDIF(WIN32)

@@ -81,16 +81,6 @@ ADD_DEFINITIONS(-DLIBXML_STATIC)
 ADD_DEFINITIONS(-DBOOST_ALL_NO_LIB)
 
 ###########################################
-# SETUP FOR DEBUG BUILDS
-# enable any extra compile warnings and 
-# set any debug-specific variables
-###########################################
-
-IF(CMAKE_BUILD_TYPE MATCHES "Debug")
-  ADD_DEFINITIONS(-DDEBUG)
-ENDIF(CMAKE_BUILD_TYPE MATCHES "Debug")
-
-###########################################
 # Build Seg3DConfiguration.h
 # this file contains information such as
 # version numbers and architecture
@@ -136,6 +126,22 @@ ENDIF (QT_FOUND)
 ADD_SUBDIRECTORY(Externals)
 
 ###########################################
+# SETUP FOR DEBUG BUILDS
+# enable any extra compile warnings and 
+# set any debug-specific variables
+# NOTE: This needs to be here as ITK does
+#  *NOT* compile with the DEBUG flag set.
+#  It looks like ITK's vnl library is missing
+#  includes that would allow it to compile
+#  with this flag. Hence we only enable it
+#  for our code.
+###########################################
+
+IF(CMAKE_BUILD_TYPE MATCHES "Debug")
+  ADD_DEFINITIONS(-DDEBUG)
+ENDIF(CMAKE_BUILD_TYPE MATCHES "Debug")
+
+###########################################
 # Set the include paths
 ###########################################
 
@@ -147,10 +153,52 @@ INCLUDE_DIRECTORIES(${SCI_TEEM_INCLUDE})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 
 ###########################################
-# Application layers
+# Generate a variable for registering all
+# the plugins
+###########################################
+
+INCLUDE(CMake/ActionLibrary.cmake)
+
+
+###########################################
+# Application layers:
+#  Core
+#  DataVolume
+#  Application
+#  Interface
 ###########################################
 
 ADD_SUBDIRECTORY(Core)
 ADD_SUBDIRECTORY(Application)
 ADD_SUBDIRECTORY(Interface)
+
+###########################################
+# Plugins:
+# Plugin libraries need be generated before
+# we build the registration objects as they
+# may contain as well pieces that need to
+# be registered in the main object 
+# factories.
+###########################################
+
+
+###########################################
+# Build the plugin generator files
+# This code will automatically register all
+# the components with the proper object
+# factories
+###########################################
+
+BUILD_REGISTER_ACTIONS_LIBRARY()
+
+###########################################
+# Init:
+# This builds the function that glues all
+# the plugins together for use in a static
+# application. This mechanism ensures every
+# action and tool is registered and 
+# mentioned 
+###########################################
+
+ADD_SUBDIRECTORY(Init)
 

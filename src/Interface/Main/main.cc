@@ -38,7 +38,12 @@
 // Interface includes
 #include <Interface/QtInterface/QtInterface.h>
 #include <Interface/AppInterface/AppInterface.h>
-//#include <Interface/ControllerInterface/ConrtollerInterface.h>
+#include <Application/ActionManager/ActionFactory.h>
+
+// Init Plugins functionality
+#include <Init/Init.h>
+
+//#include <Interface/ControllerInterface/ControllerInterface.h>
 
 ///////////////////////////////////////////////////////////
 // Main Seg3D entry point
@@ -49,23 +54,26 @@ using namespace Seg3D;
 int main(int argc, char **argv)
 {
   // -- Setup error logging --
-  Core::LogStreamer error_log(Core::Log::ALL_E,&(std::cerr));
-
+  Core::LogStreamer error_log(Core::Log::ALL_E,&(std::cout));
   SCI_LOG_MESSAGE(std::string("--- Starting Seg3D ")+SEG3D_VERSION+" ---");
+
+  // -- Add plugins into the architecture  
+  SCI_LOG_DEBUG("Setup and register all the plugins");
+  Seg3D::InitPlugins();
+  
   
   // -- Setup the QT Interface Layer --
-  
   SCI_LOG_DEBUG("Setup QT Interface");
   if (!(QtInterface::instance()->setup(argc,argv))) return (-1);
 
   // -- Setup Application Interface Window --
-
   SCI_LOG_DEBUG("Setup Application Interface");
   AppInterface* app_interface = new AppInterface(QtInterface::instance()->get_qt_application());
   app_interface->show();
 
   // -- Run QT event loop --
   SCI_LOG_DEBUG("Start the main QT event loop");
+  
   if (!(QtInterface::instance()->exec())) return (-1);
   
   SCI_LOG_MESSAGE("--- Finished ---");

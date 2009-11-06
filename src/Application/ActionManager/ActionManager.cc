@@ -46,8 +46,8 @@ ActionManager::ActionManager() :
   // a different class. Hence at some point this connection should go to the 
   // handler.
   
-  dispatcher_->post_action_signal_.connect(
-    boost::bind(&ActionManagerHandler::handle_action_slot,handler_,_1));
+  dispatcher()->post_action_signal_.connect(
+    boost::bind(&ActionManagerHandler::handle_action_slot,handler(),_1));
 }
 
 ActionManager*
@@ -74,5 +74,11 @@ ActionManager::instance()
   }
   return (instance_);
 }
+
+// Static variables that are located in Application and that need to be
+// allocated here
+boost::mutex   ActionManager::instance_mutex_;
+bool           ActionManager::initialized_ = false;
+ActionManager* ActionManager::instance_ = 0;
 
 }

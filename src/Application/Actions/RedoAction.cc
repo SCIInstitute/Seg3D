@@ -52,7 +52,7 @@ RedoAction::type_name() const
 void
 RedoAction::do_action()
 {
-  ActionManager::instance()->handler_->redo_action();
+  ActionManager::instance()->handler()->redo_action();
 }
 
 }

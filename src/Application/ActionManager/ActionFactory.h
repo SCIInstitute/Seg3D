@@ -45,6 +45,7 @@
 
 // STL includes
 #include <map>
+#include <iostream>
 
 namespace Seg3D {
 
@@ -104,6 +105,7 @@ class ActionFactory : public boost::noncopyable  {
       boost::unique_lock<boost::mutex> lock(instance_mutex_);
       // Register the action
       action_builders_[action_name] = new ActionBuilderT<ACTION>;
+      SCI_LOG_DEBUG(std::string("Registering aaction : ") + action_name);
     }
 
   private:
@@ -123,6 +125,7 @@ class ActionFactory : public boost::noncopyable  {
     // TODO: Need to get this off an std::istream
     ActionHandle create_action(std::string action_string);
 
+    
 // -- Singleton interface --
   public:
   
@@ -142,21 +145,15 @@ class ActionFactory : public boost::noncopyable  {
 };
 
 
-// CLASS REGISTER ACTION:
-// Register an action through a static constructor
-
-template <class ACTION>
-class RegisterAction {
-  public:
-    RegisterAction(std::string classname)
-    {
-      ActionFactory::instance()->register_action<ACTION>(classname);
-    }
-};
-
-// MACRO FOR ADDING AN ACTION TO THE ACTION FACTORY
-#define SCI_REGISTER_ACTION(name) \
-BOOST_USED static RegisterAction<name> register_##name(name)
+// Macro for adding function for registering action
+// Note these functions will be called in the init
+// call of the program.
+ 
+#define SCI_REGISTER_ACTION(name)\
+void register_##name()\
+{\
+  ActionFactory::instance()->register_action<name>(#name);\
+} 
 
 } // end namespace seg3D
 

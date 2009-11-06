@@ -38,8 +38,8 @@ SET(APPLICATION_ACTIONS_SRCS
   UndoAction.cc
   )
 
-ADD_LIBRARY(Application_Actions STATIC 
-            ${APPLICATION_ACTIONS_SRCS} )
+ADD_ACTIONS_LIBRARY(Application_Actions
+                    ${APPLICATION_ACTIONS_SRCS} )
             
 TARGET_LINK_LIBRARIES(Application_Actions
                       Application_Application
