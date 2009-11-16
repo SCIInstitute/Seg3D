@@ -32,26 +32,31 @@
 ##################################################
 
 SET(APPLICATION_ACTIONMANAGER_SRCS
-  Action.h
-  Action.cc
-  ActionFactory.h
-  ActionFactory.cc
   ActionManager.h
   ActionManager.cc
-  ActionManagerDispatcher.h
-  ActionManagerDispatcher.cc
-  ActionManagerState.h
-  ActionManagerState.cc
-  ActionManagerHandler.h
-  ActionManagerHandler.cc
-  )
+)
+
+SET(APPLICATION_ACTIONMANAGER_ACTION_SRCS
+  Actions/UndoAction.h
+  Actions/UndoAction.cc
+  Actions/RedoAction.h
+  Actions/RedoAction.cc
+)
 
 
 ADD_LIBRARY(Application_ActionManager STATIC 
-            ${APPLICATION_ACTIONMANAGER_SRCS} )
+            ${APPLICATION_ACTIONMANAGER_SRCS}
+            ${APPLICATION_ACTIONMANAGER_ACTION_SRCS} )
+
+# Add code to register the actions to the ActionFactory
+ADD_LIBRARY_ACTIONS(Application_ActionManager
+            ${APPLICATION_ACTIONMANAGER_ACTION_SRCS}
+            )
             
-TARGET_LINK_LIBRARIES(Application_ActionManager
-                      Application_Application
+TARGET_LINK_LIBRARIES(Application_Application
+                      Application_Action
+                      Application_State
+                      Application_Component
                       Core_Utils
                       Core_State
                       ${SCI_BOOST_LIBRARY})

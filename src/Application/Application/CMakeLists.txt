@@ -34,11 +34,6 @@
 SET(APPLICATION_APPLICATION_SRCS
   Application.h
   Application.cc
-  ApplicationEvent.h
-  ApplicationEvent.cc
-  DefaultApplicationContext.h
-  DefaultApplicationContext.cc
-  ApplicationContext.h
   )
 
 
@@ -46,6 +41,7 @@ ADD_LIBRARY(Application_Application STATIC
             ${APPLICATION_APPLICATION_SRCS} )
             
 TARGET_LINK_LIBRARIES(Application_Application
-                      Core_Utils
+                      Utils_Core
+                      Utils_EventHandler
                       ${SCI_BOOST_LIBRARY})
 

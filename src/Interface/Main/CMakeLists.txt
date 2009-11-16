@@ -45,10 +45,12 @@ ADD_EXECUTABLE(Seg3D ${MAIN_SRCS})
 TARGET_LINK_LIBRARIES(Seg3D 
   ${QT_LIBRARIES}
   ${SCI_BOOST_LIBRARY}
-  Core_Utils
+  Utils_Core
+  Utils_Converter
+  Utils_EventHandler
   Application_Application
-  Application_ActionManager
-  Application_Actions
+  Application_Interface
+  Application_Action
   Interface_AppInterface
   Interface_QtInterface
   Init_Init

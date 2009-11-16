@@ -26,21 +26,34 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#include <Application/Application/Application.h>
+#include <Application/Action/ActionFactory.h>
+
+#include <Application/ActionManager/ActionManager.h>
+#include <Application/ActionManager/Actions/RedoAction.h>
 
 namespace Seg3D {
 
-Application::Application()
-{
-  // The event handler needs to be started manually
-  // This event handler will execute all the functions
-  // that are send to it on the main application thread.
-  start_eventhandler();
+SCI_REGISTER_ACTION(RedoAction);
 
-  SCI_LOG_DEBUG("Created Application Thread");
+RedoAction::RedoAction() :
+  Action(Action::APPLICATION_E,Action::NONE_E)
+{
 }
 
-// Singleton instance
-Utils::Singleton<Application> Application::instance_;
+RedoAction::~RedoAction()
+{
+}
 
-} // end namespace Seg3D
+std::string
+RedoAction::type_name() const
+{
+  return "RedoAction";
+}
+
+void
+RedoAction::do_action()
+{
+  ActionManager::instance()->handler()->redo_action();
+}
+
+}

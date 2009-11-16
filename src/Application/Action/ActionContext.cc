@@ -26,21 +26,60 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#include <Application/Application/Application.h>
+#include <Utils/Core/Log.h>
+
+#include <Application/Action/ActionContext.h>
 
 namespace Seg3D {
 
-Application::Application()
+ActionContext::ActionContext(ActionHandle& action) :
+  action_(action)
 {
-  // The event handler needs to be started manually
-  // This event handler will execute all the functions
-  // that are send to it on the main application thread.
-  start_eventhandler();
-
-  SCI_LOG_DEBUG("Created Application Thread");
 }
 
-// Singleton instance
-Utils::Singleton<Application> Application::instance_;
+ActionContext::~ActionContext()
+{
+}
+
+void
+ActionContext::report_error(std::string& error)
+{
+  SCI_LOG_ERROR(error);
+}
+
+void
+ActionContext::report_warning(std::string& warning)
+{
+  SCI_LOG_WARNING(warning);
+}
+
+void
+ActionContext::report_message(std::string& message)
+{
+  SCI_LOG_MESSAGE(message);
+}
+
+void
+ActionContext::report_progress(double progress)
+{
+}
+
+void
+ActionContext::report_done(bool success)
+{
+  SCI_LOG_DEBUG(std::string("ACTION DONE: ")+action_->type_name());
+}
+
+bool
+ActionContext::from_script() const
+{
+  return (false);
+}
+
+bool
+ActionContext::from_interface() const
+{
+  return (false);
+}
 
 } // end namespace Seg3D

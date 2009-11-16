@@ -75,7 +75,6 @@ ENDIF (CMAKE_SIZEOF_VOID_P MATCHES 8)
 ###########################################
 
 ADD_DEFINITIONS(-DGLEW_STATIC)
-ADD_DEFINITIONS(-DGLEW_MX)
 ADD_DEFINITIONS(-DTEEM_STATIC)
 ADD_DEFINITIONS(-DLIBXML_STATIC)
 ADD_DEFINITIONS(-DBOOST_ALL_NO_LIB)
@@ -168,7 +167,7 @@ INCLUDE(CMake/ActionLibrary.cmake)
 #  Interface
 ###########################################
 
-ADD_SUBDIRECTORY(Core)
+ADD_SUBDIRECTORY(Utils)
 ADD_SUBDIRECTORY(Application)
 ADD_SUBDIRECTORY(Interface)
 

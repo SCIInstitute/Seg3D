@@ -27,10 +27,11 @@
 */
 
 // Core includes
-#include <Core/Utils/Log.h>
+#include <Utils/Core/Log.h>
 
 // Application Layer includes
 #include <Application/Application/Application.h>
+#include <Application/Interface/Interface.h>
 
 // Interface includes
 #include <Interface/QtInterface/QtInterface.h>
@@ -45,7 +46,7 @@
 namespace Seg3D {
 
 QtInterface::QtInterface() :
-  qt_application_(0)
+  qapplication_(0)
 {
 }
 
@@ -55,32 +56,25 @@ QtInterface::setup(int argc, char **argv)
 {
   try
   {
-    SCI_LOG_DEBUG("Creating QApplication");
     // Main application class
-    qt_application_ = new QApplication(argc,argv);
+    SCI_LOG_DEBUG("Creating QApplication");
+    qapplication_ = new QApplication(argc,argv);
 
-    SCI_LOG_DEBUG("Creating QtInterface Context");
-    // Interface class to the main class of the Application layer
-    ApplicationContextHandle qt_interface_context = 
-              ApplicationContextHandle(new QtInterfaceContext(qt_application_));
+    
+    // Interface class to the main class of the event handler layer
+    SCI_LOG_DEBUG("Creating QtEventHandlerContext");
+    Utils::EventHandlerContextHandle qt_eventhandler_context = 
+        Utils::EventHandlerContextHandle(new QtEventHandlerContext(qapplication_));
 
-    SCI_LOG_DEBUG("Creating QtInterface EventFilter");
-    // Filter needed to extract user events inserted in main Qt event loop
-    QtInterfaceUserEventFilter* qt_interface_filter = 
-                                    new QtInterfaceUserEventFilter(qt_application_);
 
-    SCI_LOG_DEBUG("Install the QtInterface EventFilter");
-    // Install the event filter that handles callbacks from other threads
-    qt_application_->installEventFilter(qt_interface_filter);
-
-    SCI_LOG_DEBUG("Install the QtInterface Context into the Application layer");
     // Insert the event handler into the application layer
-    Application::instance()->install_context(qt_interface_context);    
-
+    SCI_LOG_DEBUG("Install the QtEventHandlerContext into the Interface layer");
+    Interface::instance()->install_eventhandler_context(qt_eventhandler_context);   
+    Interface::instance()->start_eventhandler(); 
   }
   catch(...)
   {
-    SCI_LOG_ERROR("Qt Interface failed to initialize");
+    SCI_LOG_ERROR("QtInterface failed to initialize");
     return (false);
   }
   
@@ -94,7 +88,7 @@ QtInterface::exec()
   try
   {
     SCI_LOG_DEBUG("Starting Qt main event loop");
-    qt_application_->exec();
+    qapplication_->exec();
   }
   catch(...)
   {
@@ -105,38 +99,7 @@ QtInterface::exec()
   return (true);
 }
 
-
-QtInterface*
-QtInterface::instance()
-{
-  // if no singleton was allocated, allocate it now
-  if (!initialized_)   
-  {
-    //in case multiple threads try to allocate this one at once.
-    {
-      boost::unique_lock<boost::mutex> lock(instance_mutex_);
-      // The first test was not locked and hence not thread safe
-      // This one will do a thread-safe allocation of the interface
-      // class
-      if (instance_ == 0) instance_ = new QtInterface();
-    }
-    
-    {
-      // Enforce memory synchronization so the singleton is initialized
-      // before we set initialized to true
-      boost::unique_lock<boost::mutex> lock(instance_mutex_);
-      initialized_ = true;
-    }
-  }
-  return (instance_);
-}
-
-// Static variables that are located in Application and that need to be
-// allocated here
-boost::mutex QtInterface::instance_mutex_;
-bool         QtInterface::initialized_ = false;
-QtInterface* QtInterface::instance_ = 0;
-
-
+// Singleton instantiation
+Utils::Singleton<QtInterface> QtInterface::instance_;
 
 } // end namespace Seg3D

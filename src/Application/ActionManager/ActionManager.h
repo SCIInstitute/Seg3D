@@ -33,57 +33,79 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/utility.hpp>
 
+#include <Application/Component/Component.h>
+
 namespace Seg3D {
 
-// Forward declarations
-class ActionManagerDispatcher;
-class ActionManagerState;
-class ActionManagerHandler;
 class ActionManager;
 
-class ActionManager : public boost::noncopyable {
 
-// -- Constructor
+// -- STATE --
+
+class ActionManagerState : public StateBase {
+
+// -- Constructor / Destructor --
   public:
-    ActionManager();
+    ActionManagerState(const std::string key) :
+      StateBase(key) {}
+
+};
 
 
-// -- Dispatcher/State/Handler interface
+// -- DISPATCHER --
+
+class ActionManagerDispatcher : public DispatcherBase {
+
+// -- Constructor / Destructor --
   public:
+    ActionManagerDispatcher(ActionManager* component) : component_(component) {}
+      
+  private:
+    ActionManager* component_;
+};
 
-    ActionManagerDispatcher* dispatcher() const { return dispatcher_; }
-    ActionManagerState*      state() const      { return state_; }
-    ActionManagerHandler*    handler() const    { return handler_; }
+
+
+
+// -- HANDLER --
+
+class ActionManagerHandler : public HandlerBase {
+
+// -- Constructor / Destructor --
+  public:
+    ActionManagerHandler(ActionManager* component) : component_(component) {}
 
   private:
-    ActionManagerDispatcher* dispatcher_;
-    ActionManagerState*      state_;
-    ActionManagerHandler*    handler_;
+    ActionManager* component_;
+
+
+// -- Undo/Redo functions --
+
+    void undo_action();
+    
+    void redo_action();
+
+};
+
+
+
+
+class ActionManager : public Component<DispatcherBase,StateBase,HandlerBase>
+{
+
+// -- Constructor / Destructor --
+  public:
+    ActionManager() : 
+      Component<DispatcherBase,StateBase,HandlerBase("ActionManager") {}
+
 
 // -- Singleton interface --
   public:
-  
-    // INSTANCE:
-    // Get the singleton pointer to the application
     
-    static ActionManager* instance();
-
-  private:
-  
-    // Mutex protecting the singleton interface
-    static boost::mutex     instance_mutex_;
-    // Initialized or not?
-    static bool             initialized_;
-    // Pointer that contains the singleton interface to this class
-    static ActionManager*   instance_;
+    static ActionManager* instance() { instance_.instance(); }
+    static Singleton<ActionManager> instance_;
 };
 
 } // namespace Seg3D
-
-// Include these here to prevent circular includes
-
-#include <Application/ActionManager/ActionManagerDispatcher.h>
-#include <Application/ActionManager/ActionManagerState.h>
-#include <Application/ActionManager/ActionManagerHandler.h>
 
 #endif

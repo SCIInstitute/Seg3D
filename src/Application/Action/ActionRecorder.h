@@ -26,21 +26,52 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#include <Application/Application/Application.h>
+#ifndef APPLICATION_ACTION_ACTIONRECORDER_H
+#define APPLICATION_ACTION_ACTIONRECORDER_H
+
+// STL includes
+#include <iostream>
+
+// Boost includes
+#include <boost/shared_ptr.hpp>
+#include <boost/signals2/signal.hpp>
+
+#include <Utils/EventHandler/EventHandler.h>
+
+#include <Application/Action/Action.h>
+#include <Application/Action/ActionDispatcher.h>
 
 namespace Seg3D {
 
-Application::Application()
-{
-  // The event handler needs to be started manually
-  // This event handler will execute all the functions
-  // that are send to it on the main application thread.
-  start_eventhandler();
+class ActionRecorder : public Utils::EventHandler  {
 
-  SCI_LOG_DEBUG("Created Application Thread");
-}
+// -- Constructor/Destructor --
+  public:
+    ActionRecorder(std::ostream* stream);
+  
+    ~ActionRecorder();
+  
+// -- Start/Stop recording --
 
-// Singleton instance
-Utils::Singleton<Application> Application::instance_;
+  public:
+    
+    // START:
+    // Start recording actions
+    void start();
+
+    // Stop recording actions
+    void stop();
+  
+  private:
+    // RECORD:
+    // Record the action
+    
+    void record(ActionHandle action);
+    
+    std::ostream*               action_stream_;
+    boost::signals2::connection connection_;
+};
 
 } // end namespace Seg3D
+
+#endif

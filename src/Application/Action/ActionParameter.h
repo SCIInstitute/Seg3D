@@ -26,69 +26,74 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef INTERFACE_QTINTERFACE_QTINTERFACE_H
-#define INTERFACE_QTINTERFACE_QTINTERFACE_H
+#ifndef APPLICATION_ACTION_ACTIONPARAMETER_H
+#define APPLICATION_ACTION_ACTIONPARAMETER_H
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
 #endif 
 
-// Qt includes
-#include <QApplication>
-
 // Boost includes
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/thread.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
 
-#include <Utils/Singleton/Singleton.h>
+// Utils includes
+#include <Utils/Converter/StringConverter.h>
 
 namespace Seg3D {
 
-// -- QtInterface class (singleton) --
+// CLASS ACTIONPARAMETER:
+// Auxilary class for adding parameters into an action.
 
-// This class is a wrapper around the QApplication class
+// ACTIONPARAMETERBASE:
+// Base class needed for uniform access to import and export the value
+// in a uniform way.
 
-class QtInterface : public boost::noncopyable {
-
-// -- constuctor --
-  public:
-  
-    QtInterface();
-
-// -- entry point --
+class ActionParameterBase {
 
   public:
-    // SETUP:
-    // Setup the interface context
-    bool setup(int argc, char **argv);
-
-    // EXEC:
-    // Start the interface execution
-    bool exec();
-
-// -- accessors --
-
-    // GET_QAPPLICATION:
-    // Get the pointer to the main qt application
-    QApplication* get_qapplication() { return qapplication_; }
-
-  private:  
-    // main QT application class
-    QApplication* qapplication_;
-
-
-// -- Singleton interface --
-  public:
+    virtual ~ActionParameterBase();
     
-    // INSTANCE:
-    static QtInterface* instance() { instance_.instance(); }
-    
-  private:  
-    static Utils::Singleton<QtInterface> instance_;
+    virtual std::string export_to_string() const = 0;
+    virtual bool import_from_string(const std::string& str) = 0;
+
 };
 
-} // end namespace Seg3D
+// ACTIONPARAMETER:
+// Parameter for an action.
+
+template<class T>
+class ActionParameter : public ActionParameterBase {
+
+  public:
+    ActionParameter(const T& default_value) :
+      value_(default_value)
+    {}
+  
+    virtual ~ActionParameter()
+    {}
+
+    // General access to the parameter value
+    T& value() { return value_; } 
+
+    // export the value to a string
+    virtual std::string export_to_string() const
+    {
+      return Utils::export_to_string<T>(value_);
+    }
+
+    // import the value from a string
+    virtual bool import_from_string(const std::string& str)
+    {
+      return Utils::import_from_string<T>(str,value_);
+    }
+        
+  private:
+    // The actual value
+    T value_;
+};
+
+} // namespace Seg3D
+
 
 #endif

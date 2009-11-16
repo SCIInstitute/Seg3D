@@ -39,8 +39,9 @@
 #include <QApplication>
 
 // Includes from application layer
-#include <Application/Application/ApplicationEvent.h>
-#include <Application/Application/ApplicationContext.h>
+#include <Utils/EventHandler/EventHandlerContext.h>
+#include <Utils/EventHandler/EventHandler.h>
+#include <Utils/EventHandler/Event.h>
 
 // Boost includes
 #include <boost/shared_ptr.hpp>
@@ -62,30 +63,30 @@ namespace Seg3D {
 // ApplicationEvent class, and thence only needs a handle to that
 // class.
 
-class QtInterfaceUserQEvent : public QEvent {
+class QtUserEvent : public QEvent {
 
   public:
     // constructor for a wrapper around the ApplicationEvent class
-    QtInterfaceUserQEvent(ApplicationEventHandle& application_event_handle);
+    QtUserEvent(Utils::EventHandle& event_handle);
  
-    virtual ~QtInterfaceUserQEvent();
+    virtual ~QtUserEvent();
 
     // As QT takes on ownership of the QEvent, we use smart
     // pointers to share resources between the different threads
     // As long as one of the threads has a handle the object will
     // persist.
-    ApplicationEventHandle  application_event_handle_;
+    Utils::EventHandle  event_handle_;
 };
 
-// CLASS QtInterfaceUserEventFilter:
+// CLASS QtEventFilter:
 // This class is the filter that needs to be installed into the main QT
 // event handler. 
 
-class QtInterfaceUserEventFilter : public QObject {
+class QtEventFilter : public QObject {
     Q_OBJECT
   
   public:
-    QtInterfaceUserEventFilter(QObject* parent = 0) :
+    QtEventFilter(QObject* parent = 0) :
       QObject(parent) {}
       
   protected:
@@ -98,59 +99,56 @@ class QtInterfaceUserEventFilter : public QObject {
 // object, so there is a clean interface between Interface and Application
 // layer.
 
-class QtInterfaceContext : public ApplicationContext {
+class QtEventHandlerContext : public Utils::EventHandlerContext {
 
  public:
     
     // Constuctor and destructor
-    QtInterfaceContext(QApplication* qt_application);
-    virtual ~QtInterfaceContext();
-
-    // OBTAIN:
-    // This function is called when the context is installed
-    
-    virtual void obtain();
-    
-    // RELEASE:
-    // This function is called when the application is destroyed or
-    // another context is installed
-        
-    virtual void release();
+    QtEventHandlerContext(QApplication* qt_application);
+    virtual ~QtEventHandlerContext();
   
-    // POST_APPLICATION_EVENT:
-    // Post an application event onto the application event stack. This one
-    // returns immediately after posting the event, and does not wait for the
-    // process to finish the event.
-            
-    virtual void post_application_event(ApplicationEventHandle& event);
+    // POST_EVENT:
+    // Post an event onto the event handler stack. This one
+    // returns immediately after posting the event, and does 
+    // not wait for the process to finish the event.            
+    virtual void post_event(Utils::EventHandle& event);
 
-    // POST_AND_WAIT_APPLICATION_EVENT:
-    // Post an application event onto the application event stack. This one
-    // returns after the application thread signals that the event has been
-    // executed. The function does the full hand shaking for the synchronization.
-    
-    virtual void post_and_wait_application_event(ApplicationEventHandle& event);
+    // POST_AND_WAIT_EVENT:
+    // Post an event onto the event handler stack. This one
+    // returns after the thread signals that the event has been
+    // executed. The function does the full hand shaking for 
+    // the synchronization.
+    virtual void post_and_wait_event(Utils::EventHandle& event);
 
     // PROCESS_EVENT:
-    // process the events that are queued in the application mailbox
-    
-    virtual void process_events();
-    
-    // IS_APPLICATION_THREAD:
-    // Check whether we are running on the therad that handles the events
-    // This function is needed to avoid to post and execute things in an infinite
-    // loop.
+    // process the events that are queued in the event handler stack.
+    virtual bool process_events();
+
+    // WAIT_AND_PROCESS_EVENTS:
+    // process the events that are queued in the event handler mailbox.   
+    virtual bool wait_and_process_events();
         
-    virtual bool is_application_thread() const;
+    // IS_EVENTHANDLER_THREAD:
+    // Check whether we are running on the thread that handles the events
+    // This function is needed to avoid to post and execute things in an 
+    // infinite loop.
+    virtual bool is_eventhandler_thread() const;
     
+    // START_EVENTHANDLER:
+    // Start the eventhandler thread and start processing events
+    virtual bool start_eventhandler(Utils::EventHandler* eventhandler);
+
+    // TERMINATE_EVENTHANDLER:
+    // Terminate the eventhandler
+    virtual void terminate_eventhandler();
+            
   private:
     
     // A pointer to the main Qt application class
-    QApplication*           qt_application_;
+    QApplication*           qapplication_;
     
     // Thread id from the thead that is running Qt
-    boost::thread::id       application_thread_id_;
-    
+    boost::thread::id       interface_thread_id_;
 };
 
 } // end namespace Seg3D

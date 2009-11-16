@@ -26,21 +26,50 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#include <Application/Application/Application.h>
+#include <Utils/Core/Log.h>
 
-namespace Seg3D {
+#include <Utils/EventHandler/EventHandler.h>
+#include <Utils/EventHandler/DefaultEventHandlerContext.h>
 
-Application::Application()
+namespace Utils {
+
+EventHandler::EventHandler() 
 {
-  // The event handler needs to be started manually
-  // This event handler will execute all the functions
-  // that are send to it on the main application thread.
-  start_eventhandler();
-
-  SCI_LOG_DEBUG("Created Application Thread");
+  // Code for installing a default message handling queue
+  eventhandler_context_ = EventHandlerContextHandle(new DefaultEventHandlerContext);
 }
 
-// Singleton instance
-Utils::Singleton<Application> Application::instance_;
+EventHandler::~EventHandler()
+{
+  eventhandler_context_->terminate_eventhandler();
+}
 
-} // end namespace Seg3D
+void
+EventHandler::run_eventhandler()
+{
+  while (!(wait_and_process_events()));
+}
+
+void
+EventHandler::install_eventhandler_context(EventHandlerContextHandle& context)
+{  
+  // install the new context atomically
+  eventhandler_context_ = context;
+}
+
+// TERMINATE_EVENTHANDLER
+
+void TerminateEventHandlerThread(EventHandlerHandle handle)
+{
+  handle->terminate_eventhandler();
+}
+
+void 
+TerminateEventHandler(EventHandlerHandle& handle)
+{
+  boost::thread termination_thread(&TerminateEventHandlerThread,handle);
+  handle.reset(); 
+}
+
+
+} // end namespace Core

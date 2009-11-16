@@ -1,3 +1,4 @@
+
 #
 #  For more information, please see: http://software.sci.utah.edu
 # 
@@ -26,6 +27,25 @@
 #  DEALINGS IN THE SOFTWARE.
 #
 
-ADD_SUBDIRECTORY(Application)
-ADD_SUBDIRECTORY(Interface)
-ADD_SUBDIRECTORY(Action)
+##################################################
+# Set sources
+##################################################
+
+SET(UTILS_EVENTHANDLER_SRCS
+  Event.h
+  Event.cc
+  EventHandler.h
+  EventHandler.cc
+  DefaultEventHandlerContext.h
+  DefaultEventHandlerContext.cc
+  EventHandlerContext.h
+  )
+
+
+ADD_LIBRARY(Utils_EventHandler STATIC 
+            ${UTILS_EVENTHANDLER_SRCS} )
+            
+TARGET_LINK_LIBRARIES(Utils_EventHandler
+                      Utils_Core
+                      ${SCI_BOOST_LIBRARY})
+

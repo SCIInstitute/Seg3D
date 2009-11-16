@@ -26,21 +26,30 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#include <Application/Application/Application.h>
+#include <Utils/EventHandler/EventHandler.h>
 
-namespace Seg3D {
+namespace Utils {
 
-Application::Application()
+Event::Event()
 {
-  // The event handler needs to be started manually
-  // This event handler will execute all the functions
-  // that are send to it on the main application thread.
-  start_eventhandler();
-
-  SCI_LOG_DEBUG("Created Application Thread");
 }
 
-// Singleton instance
-Utils::Singleton<Application> Application::instance_;
+Event::~Event()
+{
+}
 
-} // end namespace Seg3D
+void
+Event::handle_event()
+{
+  // run the code
+  run();
+
+  // if it has a synchronizer just finish up the hand shaking
+  if (sync_handle().get())
+  {
+    boost::unique_lock<boost::mutex> lock(sync_handle()->lock_);
+    sync_handle()->condition_.notify_one();
+  }  
+}
+
+} // end namespace Utils

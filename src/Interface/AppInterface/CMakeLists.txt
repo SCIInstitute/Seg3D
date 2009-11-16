@@ -92,7 +92,8 @@ ADD_LIBRARY(Interface_AppInterface STATIC
             
             
 TARGET_LINK_LIBRARIES(Interface_AppInterface
-                      Core_Utils
+                      Utils_Core
+                      Utils_EventHandler
                       Interface_QtInterface
                       ${QT_LIBRARIES} 
                       ${SCI_BOOST_LIBRARY})

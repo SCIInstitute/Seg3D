@@ -26,21 +26,36 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#include <Application/Application/Application.h>
+#ifndef APPLICATION_ACTIONMANAGER_REDOACTION_H
+#define APPLICATION_ACTIONMANAGER_REDOACTION_H
+
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+# pragma once
+#endif 
+
+#include <Application/Action/Action.h>
 
 namespace Seg3D {
 
-Application::Application()
-{
-  // The event handler needs to be started manually
-  // This event handler will execute all the functions
-  // that are send to it on the main application thread.
-  start_eventhandler();
+class RedoAction : public Action {
 
-  SCI_LOG_DEBUG("Created Application Thread");
-}
+  // --Constructor/Destructor
+  public:
+ 
+    RedoAction();
+    virtual ~RedoAction();
 
-// Singleton instance
-Utils::Singleton<Application> Application::instance_;
+  // -- Functions that need to be overloaded for this action --
+  public:
+  
+    // Name of the action always needs to be present
+    virtual std::string type_name() const;
 
-} // end namespace Seg3D
+    // The actual function that executes the action
+    // always needs to be written.
+    virtual void do_action();
+};
+
+} //end namespace Seg3D
+
+#endif

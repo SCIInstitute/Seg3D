@@ -33,52 +33,19 @@
 
 namespace Seg3D {
 
-ActionManager::ActionManager() :
-  dispatcher_(new ActionManagerDispatcher),
-  state_(new ActionManagerState),
-  handler_(new ActionManagerHandler)
-{
-  // Connect the dispatcher to the handler
-  // This is the main connection that separates the input from the output part
-  // of the application. 
-  
-  // This one needs to be disconnected to reroute all the action handling through
-  // a different class. Hence at some point this connection should go to the 
-  // handler.
-  
-  dispatcher()->post_action_signal_.connect(
-    boost::bind(&ActionManagerHandler::handle_action_slot,handler(),_1));
-}
+ActionManagerDispatcher::ActionManagerDispatcher(ActionManager* manager) :
+  manager_(manager)
+{}
 
-ActionManager*
-ActionManager::instance()
-{
-  // if no singleton was allocated, allocate it now
-  if (!initialized_)   
-  {
-    //in case multiple threads try to allocate this one at once.
-    {
-      boost::unique_lock<boost::mutex> lock(instance_mutex_);
-      // The first test was not locked and hence not thread safe
-      // This one will do a thread-safe allocation of the interface
-      // class
-      if (instance_ == 0) instance_ = new ActionManager();
-    }
-    
-    {
-      // Enforce memory synchronization so the singleton is initialized
-      // before we set initialized to true
-      boost::unique_lock<boost::mutex> lock(instance_mutex_);
-      initialized_ = true;
-    }
-  }
-  return (instance_);
-}
+ActionManagerState::ActionManagerState(ActionManager* manager) :
+  manager_(manager)
+{}
 
-// Static variables that are located in Application and that need to be
-// allocated here
-boost::mutex   ActionManager::instance_mutex_;
-bool           ActionManager::initialized_ = false;
-ActionManager* ActionManager::instance_ = 0;
+ActionManagerHandler::ActionManagerHandler(ActionManager* manager) :
+  manager_(manager)
+{}
 
-}
+// Singleton interface needs to be defined somewhere
+Singleton<ActionManager> ActionManager::instance_;
+
+} // end namespace Seg3D

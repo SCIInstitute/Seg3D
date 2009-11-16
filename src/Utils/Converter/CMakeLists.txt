@@ -1,3 +1,4 @@
+
 #
 #  For more information, please see: http://software.sci.utah.edu
 # 
@@ -26,6 +27,23 @@
 #  DEALINGS IN THE SOFTWARE.
 #
 
-ADD_SUBDIRECTORY(Application)
-ADD_SUBDIRECTORY(Interface)
-ADD_SUBDIRECTORY(Action)
+##################################################
+# Set sources
+##################################################
+
+SET(UTILS_CONVERTER_SRCS
+  StringConverter.h
+  StringConverter.cc
+  StringParser.h
+  StringParser.cc
+)
+
+##################################################
+# Build static library
+##################################################
+
+ADD_LIBRARY(Utils_Converter STATIC ${UTILS_CONVERTER_SRCS})
+TARGET_LINK_LIBRARIES(Utils_Converter 
+                      Utils_Core
+                      ${SCI_BOOST_LIBRARY})
+

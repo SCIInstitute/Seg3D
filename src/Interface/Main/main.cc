@@ -33,12 +33,16 @@
 #include <Seg3DConfiguration.h>
 
 // Core includes
-#include <Core/Utils/Log.h>
+#include <Utils/Core/Log.h>
+
+// Application includes
+#include <Application/Application/Application.h>
+#include <Application/Interface/Interface.h>
+#include <Application/Action/ActionRecorder.h>
 
 // Interface includes
 #include <Interface/QtInterface/QtInterface.h>
 #include <Interface/AppInterface/AppInterface.h>
-#include <Application/ActionManager/ActionFactory.h>
 
 // Init Plugins functionality
 #include <Init/Init.h>
@@ -54,31 +58,44 @@ using namespace Seg3D;
 int main(int argc, char **argv)
 {
   // -- Setup error logging --
-  Core::LogStreamer error_log(Core::Log::ALL_E,&(std::cout));
+  Utils::LogStreamer error_log(Utils::Log::ALL_E,&(std::cout));
+
   SCI_LOG_MESSAGE(std::string("--- Starting Seg3D ")+SEG3D_VERSION+" ---");
+
+  // -- Setup action recording --
+  SCI_LOG_DEBUG("Setup action recorder");
+  Seg3D::ActionRecorder action_recorder(&(std::cout));
+  action_recorder.start();
 
   // -- Add plugins into the architecture  
   SCI_LOG_DEBUG("Setup and register all the plugins");
   Seg3D::InitPlugins();
   
-  
   // -- Setup the QT Interface Layer --
   SCI_LOG_DEBUG("Setup QT Interface");
-  if (!(QtInterface::instance()->setup(argc,argv))) return (-1);
-
+  if (!(QtInterface::instance()->setup(argc,argv))) 
+  {
+    SCI_LOG_ERROR("Could not setup QT Interface");  
+    return (-1);
+  }
+  
   // -- Setup Application Interface Window --
   SCI_LOG_DEBUG("Setup Application Interface");
-  AppInterface* app_interface = new AppInterface(QtInterface::instance()->get_qt_application());
+  AppInterface* app_interface = 
+    new AppInterface(QtInterface::instance()->get_qapplication());
   app_interface->show();
 
   // -- Run QT event loop --
   SCI_LOG_DEBUG("Start the main QT event loop");
   
-  if (!(QtInterface::instance()->exec())) return (-1);
-  
-  SCI_LOG_MESSAGE("--- Finished ---");
-  
+  if (!(QtInterface::instance()->exec()))
+  {
+    SCI_LOG_ERROR("Interface thread crashed");  
+    return (-1);
+  }
+    
   // Indicate success
+  SCI_LOG_MESSAGE("--- Finished ---");
   return (0);
 }
 

@@ -26,21 +26,44 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#include <Application/Application/Application.h>
+#include <Application/Action/ActionDispatcher.h>
+#include <Application/Action/ActionRecorder.h>
 
 namespace Seg3D {
 
-Application::Application()
+ActionRecorder::ActionRecorder(std::ostream* stream) :
+  action_stream_(stream)
 {
-  // The event handler needs to be started manually
-  // This event handler will execute all the functions
-  // that are send to it on the main application thread.
-  start_eventhandler();
-
-  SCI_LOG_DEBUG("Created Application Thread");
 }
 
-// Singleton instance
-Utils::Singleton<Application> Application::instance_;
+ActionRecorder::~ActionRecorder()
+{
+}
+
+void
+ActionRecorder::start()
+{
+  if (!(connection_.connected()))
+  {
+    connection_ = ActionDispatcher::instance()->connect_observer(
+      boost::bind(&ActionRecorder::record,this,_1));
+  }
+}
+
+void 
+ActionRecorder::stop()
+{
+  if (connection_.connected())
+  {
+    connection_.disconnect();
+  }
+}
+
+void
+ActionRecorder::record(ActionHandle action)
+{
+  (*action_stream_) << "ACTION: " << action->export_to_string() << std::endl;
+}
 
 } // end namespace Seg3D
+

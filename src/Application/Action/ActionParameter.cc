@@ -26,21 +26,12 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#include <Application/Application/Application.h>
+#include <Application/Action/ActionParameter.h>
 
 namespace Seg3D {
 
-Application::Application()
+ActionParameterBase::~ActionParameterBase()
 {
-  // The event handler needs to be started manually
-  // This event handler will execute all the functions
-  // that are send to it on the main application thread.
-  start_eventhandler();
-
-  SCI_LOG_DEBUG("Created Application Thread");
 }
-
-// Singleton instance
-Utils::Singleton<Application> Application::instance_;
-
-} // end namespace Seg3D
+    
+} // namespace Seg3D
