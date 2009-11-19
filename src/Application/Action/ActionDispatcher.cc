@@ -39,7 +39,7 @@ ActionDispatcher::ActionDispatcher()
 }
 
 void
-ActionDispatcher::run_action(ActionContextHandle action_context)
+ActionDispatcher::run_action(ActionHandle action, ActionContextHandle action_context)
 { 
   // THREAD SAFETY:
   // If it is not on the application thread, relay the function call
@@ -51,19 +51,19 @@ ActionDispatcher::run_action(ActionContextHandle action_context)
   if (!(Application::instance()->is_eventhandler_thread()))
   {
     Application::instance()->post_event(boost::bind
-      (&ActionDispatcher::run_action,this,action_context));
+      (&ActionDispatcher::run_action,this,action,action_context));
     return;
   }
 
-  SCI_LOG_DEBUG(std::string("Processing Action: ")+action_context->action()->type_name());  
+  SCI_LOG_DEBUG(std::string("Processing Action: ")+action()->type_name());  
 
   
   // Step (1): An action needs to be validated before it can be executed. 
   // The validation is a separate step as invalid actions should nor be 
   // posted to the observers recording what the program does
 
-  SCI_LOG_DEBUG(std::string("Validating Action"));  
-  if(!(action_context->action()->validate(action_context))) 
+  SCI_LOG_DEBUG("Validating Action");  
+  if(!(action()->validate(action_context))) 
   {
     action_context->report_done(false);
     return;
@@ -73,16 +73,16 @@ ActionDispatcher::run_action(ActionContextHandle action_context)
   // the program as that may invalidate actions that were just tested.
 
   // Step (2): Tell observers what action is about to be executed
-  SCI_LOG_DEBUG(std::string("Posting Action"));  
-  post_action_signal_(action_context->action());
+  SCI_LOG_DEBUG("Posting Action");  
+  post_action_signal_(action());
   
   // Step (3): Run action from the context that was provided. And if the action
   // was synchronous a done signal is triggered in the context, to inform the
   // program whether the action succeeded.
-  SCI_LOG_DEBUG(std::string("Running Action"));    
-  bool success = action_context->action()->run(action_context);
+  SCI_LOG_DEBUG("Running Action");    
+  bool success = action()->run(action_context);
   
-  if (!(action_context->action()->properties() & Action::ASYNCHRONOUS_E))
+  if (!(action()->properties() & Action::ASYNCHRONOUS_E))
   {
     // Ignore asynchronous actions, they will do their own reporting
     action_context->report_done(success);
@@ -91,9 +91,8 @@ ActionDispatcher::run_action(ActionContextHandle action_context)
   return;
 }
 
-
 void
-ActionDispatcher::run_actions(std::vector<ActionContextHandle> action_contexts)
+ActionDispatcher::run_actions(std::vector<ActionHandle> actions, ActionContextHandle action_context)
 { 
   // THREAD SAFETY:
   // If it is not on the application thread, relay the function call
@@ -105,15 +104,47 @@ ActionDispatcher::run_actions(std::vector<ActionContextHandle> action_contexts)
   if (!(Application::instance()->is_eventhandler_thread()))
   {
     Application::instance()->post_event(boost::bind
-      (&ActionDispatcher::run_actions,this,action_contexts));
+      (&ActionDispatcher::run_actions,this,actions,action_context));
     return;
   }
   
   // Now that we are on the application thread
   // Run the actions one by one.
-  for (size_t j=0; j<action_contexts.size(); j++)
+  for (size_t j=0; j<actions.size(); j++)
   {
-    run_action(action_contexts[j]);
+    run_action(actions[j],action_context);
+  }
+}
+
+
+void
+ActionDispatcher::run_actions(std::vector<ActionHandle> actions, 
+                              std::vector<ActionContextHandle> action_contexts)
+{ 
+  // THREAD SAFETY:
+  // If it is not on the application thread, relay the function call
+  // to the application thread
+  
+  // Synchronization of actions is done by forcing all actions that change the
+  // state of the program to run to an dedicated thread: the application thread.
+  
+  if (!(Application::instance()->is_eventhandler_thread()))
+  {
+    Application::instance()->post_event(boost::bind
+      (&ActionDispatcher::run_actions,this,actions,action_contexts));
+    return;
+  }
+  
+  if (actions.size() != action_contexts.size())
+  {
+    SCI_THROW_LOGICERROR("Number of actions does not match number of contexts");
+  }
+  
+  // Now that we are on the application thread
+  // Run the actions one by one.
+  for (size_t j=0; j<actions.size(); j++)
+  {
+    run_action(actions[j],action_contexts[j]);
   }
 }
 

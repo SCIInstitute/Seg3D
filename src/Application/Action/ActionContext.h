@@ -42,12 +42,7 @@
 
 namespace Seg3D {
 
-// Need to generate forward declarations for these classes
-// As they depend on eachother.
-class Action;
 class ActionContext;
-
-typedef boost::shared_ptr<Action>        ActionHandle;
 typedef boost::shared_ptr<ActionContext> ActionContextHandle;
 
 // CLASS ACTIONCONTEXT:
@@ -67,7 +62,7 @@ class ActionContext : public boost::noncopyable {
 // -- Constructor/destructor --
   public:
     // Wrap a context around an action
-    ActionContext(ActionHandle& action);
+    ActionContext();
  
     // Virtual destructor for memory management
     virtual ~ActionContext();
@@ -86,11 +81,6 @@ class ActionContext : public boost::noncopyable {
     virtual bool from_script() const;
     virtual bool from_interface() const;
     
-// -- Access to the action --    
-    const ActionHandle& action() { return action_; } 
-    
-  private:
-    ActionHandle action_;
 };
 
 } // end namespace Seg3D

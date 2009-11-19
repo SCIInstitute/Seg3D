@@ -39,13 +39,11 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
 
-// STL includes
-#include <iostream>
-
 // Core includes
 #include <Utils/Core/StringUtil.h>
 #include <Utils/Singleton/Singleton.h>
 
+// Application includes
 #include <Application/Action/Action.h>
 
 namespace Seg3D {
@@ -117,7 +115,7 @@ class ActionFactory : public boost::noncopyable  {
 
       // Register the action
       action_builders_[action_name] = new ActionBuilder<ACTION>;
-      SCI_LOG_DEBUG(std::string("Registering aaction : ") + action_name);
+      SCI_LOG_DEBUG(std::string("Registering action : ") + action_name);
     }
 
   private:
@@ -155,9 +153,9 @@ class ActionFactory : public boost::noncopyable  {
 // call of the program.
  
 #define SCI_REGISTER_ACTION(name)\
-void register_##name()\
+void register_action_##name()\
 {\
-  ActionFactory::instance()->register_action<name>(#name);\
+  ActionFactory::instance()->register_action<Action##name>(#name);\
 } 
 
 } // end namespace seg3D

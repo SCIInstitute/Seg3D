@@ -26,59 +26,41 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#include <Utils/Core/Log.h>
+#ifndef APPLICATION_TOOLS_PAINTTOOL_H
+#define APPLICATION_TOOLS_PAINTTOOL_H
 
-#include <Application/Action/ActionContext.h>
+#include <Application/Tool/Tool.h>
 
 namespace Seg3D {
 
-ActionContext::ActionContext()
-{
+class PaintTool : public Tool {
+
+// -- constructor/destructor --
+  public:
+    PaintTool();
+    virtual ~PaintTool();
+    
+// -- dispatcher --
+  public:
+    void dispatch_paint();
+
+
+// -- state --
+  public:
+    // Layerid of the Mask that we are drawing on
+    State<std::string>  mask_layerid_;
+    // Radius of the brush
+    State<double>       brush_radius_;
+
+    // Layerid of the Data
+    State<std::string>  data_layerid_;
+    // Upper threshold for painting
+    State<double>       upper_threshold_;
+    // Lower threshold for painting
+    State<double>       lower_threshold_;
+};
+
+
 }
 
-ActionContext::~ActionContext()
-{
-}
-
-void
-ActionContext::report_error(std::string& error)
-{
-  SCI_LOG_ERROR(error);
-}
-
-void
-ActionContext::report_warning(std::string& warning)
-{
-  SCI_LOG_WARNING(warning);
-}
-
-void
-ActionContext::report_message(std::string& message)
-{
-  SCI_LOG_MESSAGE(message);
-}
-
-void
-ActionContext::report_progress(double progress)
-{
-}
-
-void
-ActionContext::report_done(bool success)
-{
-  SCI_LOG_DEBUG(std::string("ACTION DONE: ")+action_->type_name());
-}
-
-bool
-ActionContext::from_script() const
-{
-  return (false);
-}
-
-bool
-ActionContext::from_interface() const
-{
-  return (false);
-}
-
-} // end namespace Seg3D
+#endif

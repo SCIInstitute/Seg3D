@@ -26,59 +26,38 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#include <Utils/Core/Log.h>
+#ifndef APPLICATION_TOOL_TOOLINTERFACE_H
+#define APPLICATION_TOOL_TOOLINTERFACE_H
 
-#include <Application/Action/ActionContext.h>
+#include <Application/Tool/Tool.h>
 
 namespace Seg3D {
 
-ActionContext::ActionContext()
-{
+// CLASS TOOLINTERFACE:
+// Base class of each tool interface. These are not included inside the tool
+// to ensure that the GUI is propery separated from the application.
+
+class ToolInterface;
+typedef boost::shared_ptr<Tool> ToolInterfaceHandle;
+
+class ToolInterface : public boost::noncopyable {
+
+// -- constructor/destructor --
+  public:
+    ToolInterface();
+    
+    virtual ~ToolInterface();
+
+// Store the parent tool this interface is intended for.
+  public:
+  
+    void set_tool(ToolHandle tool) { tool_ = tool; }
+    ToolHandle get_tool() const { return tool_; }
+  
+  private:
+    ToolHandle tool_;
+};
+
 }
 
-ActionContext::~ActionContext()
-{
-}
-
-void
-ActionContext::report_error(std::string& error)
-{
-  SCI_LOG_ERROR(error);
-}
-
-void
-ActionContext::report_warning(std::string& warning)
-{
-  SCI_LOG_WARNING(warning);
-}
-
-void
-ActionContext::report_message(std::string& message)
-{
-  SCI_LOG_MESSAGE(message);
-}
-
-void
-ActionContext::report_progress(double progress)
-{
-}
-
-void
-ActionContext::report_done(bool success)
-{
-  SCI_LOG_DEBUG(std::string("ACTION DONE: ")+action_->type_name());
-}
-
-bool
-ActionContext::from_script() const
-{
-  return (false);
-}
-
-bool
-ActionContext::from_interface() const
-{
-  return (false);
-}
-
-} // end namespace Seg3D
+#endif

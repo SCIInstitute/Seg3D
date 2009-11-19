@@ -84,7 +84,7 @@ int main(int argc, char **argv)
   AppInterface* app_interface = 
     new AppInterface(QtInterface::instance()->get_qapplication());
   app_interface->show();
-
+    
   // -- Run QT event loop --
   SCI_LOG_DEBUG("Start the main QT event loop");
   

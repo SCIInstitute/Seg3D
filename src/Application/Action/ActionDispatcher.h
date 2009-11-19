@@ -61,12 +61,16 @@ class ActionDispatcher : public boost::noncopyable {
     // with describes whether feedback from the action needs to posted.
     // The action context needs to be created before posting the action
     
-    void run_action(ActionContextHandle action_context); // << THREAD-SAFE SLOT       
+    void run_action(ActionHandle action, ActionContextHandle action_context); // << THREAD-SAFE SLOT       
 
     // RUN_ACTIONS:
     // Run multiple actions in specified order
-    
-    void run_actions(std::vector<ActionContextHandle> action_contexts);
+
+    void run_actions(std::vector<ActionHandle>& actions, ActionContextHandle action_context); // << THREAD-SAFE SLOT   
+
+    // RUN_ACTIONS:
+    // Run multiple actions in specified order with a context for each action
+    void run_actions(std::vector<ActionHandle>& actions, std::vector<ActionContextHandle>& action_context); // << THREAD-SAFE SLOT   
 
 // -- Action monitoring --
 
@@ -109,9 +113,9 @@ class ActionDispatcher : public boost::noncopyable {
 // FUNCTION RunAction:
 // This function is a short cut to posting an action using the dispatcher
  
-inline void RunAction(ActionContextHandle action_context)
+inline void RunAction(ActionHandle action, ActionContextHandle action_context)
 {
-  ActionDispatcher::instance()->run_action(action_context);
+  ActionDispatcher::instance()->run_action(action, action_context);
 }
 
 } // namespace Seg3D

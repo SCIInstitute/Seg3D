@@ -34,7 +34,7 @@
 
 namespace Seg3D {
 
-Action::Action(const char* type_name, unsigned int properties) :
+Action::Action(std::string type_name, unsigned int properties) :
   type_name_(type_name),
   properties_(properties)
 {
@@ -51,13 +51,13 @@ Action::validate(ActionContextHandle& context)
 }
 
 void
-Action::add_argument(ActionParameterBase* param)
+Action::add_argument_ptr(ActionParameterBase* param)
 {
   arguments_.push_back(param);
 }
 
 void
-Action::add_parameter(const char *key,ActionParameterBase* param)
+Action::add_parameter_ptr(const char *key,ActionParameterBase* param)
 {
   // TODO: make the map use the pointer to the constant name.
   // This will save memory as the key names are constants
@@ -98,9 +98,10 @@ Action::import_from_string(const std::string& action, std::string& error)
   std::string value;
 
   // First part of the string is the command
-  if (!(Utils::scan_command(action,pos,command,error)))
+  if (!(Utils::scan_com mand(action,pos,command,error)))
   {
     error = std::string("SYNTAX ERROR: ") + error;
+    return (false);
   }
   
   for (size_t j=0; j<arguments_.size(); j++)

@@ -66,6 +66,9 @@ template<class T>
 class ActionParameter : public ActionParameterBase {
 
   public:
+    ActionParameter()
+    {}
+    
     ActionParameter(const T& default_value) :
       value_(default_value)
     {}

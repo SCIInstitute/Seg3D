@@ -50,6 +50,9 @@
 
 namespace Seg3D {
 
+class Action;
+typedef boost::shared_ptr<Action>        ActionHandle;
+
 // CLASS ACTION:
 // Main class that defines an action in the program
 // An action is not copyable as that would invalidate 
@@ -57,17 +60,9 @@ namespace Seg3D {
 
 class Action : public boost::noncopyable {
 
-// -- Constructor/Destructor --
-  public:    
-    // Construct an action of a certain type and with certain properties
-    Action(const char* type_name, unsigned int properties);
-
-    // Virtual destructor for memory management of derived classes  
-    virtual ~Action(); // << NEEDS TO BE REIMPLEMENTED
-
 // -- Action types/properties --
   public:
-    enum {
+    enum action_properties_type {
       // APPLICATION ACTION - For now all actions that are no layer actions are
       // classified as application actions.
       APPLICATION_E = 0x0001,
@@ -84,13 +79,21 @@ class Action : public boost::noncopyable {
       // application thread and run while new actions can be issued
       ASYNCHRONOUS_E =0x20000
     };
-    
-    unsigned int properties() const { return properties_; }
-    const char*  type_name() const { return type_name_; }
+
+// -- Constructor/Destructor --
+  public:    
+    // Construct an action of a certain type and with certain properties
+    Action(const std::string& type_name, action_properties_type properties);
+
+    // Virtual destructor for memory management of derived classes  
+    virtual ~Action(); // << NEEDS TO BE REIMPLEMENTED
+
+    action_properties_type  properties() const { return properties_; }
+    std::string             type_name() const { return type_name_; }
 
   private:
-    unsigned int properties_;    
-    const char*  type_name_;
+    action_properties_type  properties_;    
+    std::string             type_name_;
     
 // -- Run/Validate interface --
 
@@ -127,14 +130,16 @@ class Action : public boost::noncopyable {
     // class so we can import and export the arguments to a string.
     // This function links the arguments of the action to an internal
     // record of all the arguments
-    void add_argument(ActionParameterBase* param);
+    template<class ARGUMENT>
+    void add_argument(ARGUMENT& argument) { add_argument_ptr(&argument); }
     
     // ADD_PARAMETER:
     // A parameter needs to be registered with the base class
     // so we can import and export the parameters to a string.
     // This function links the parameters of the action to an internal
     // key value pair system to records all the parameters
-    void add_parameter(const char *key,ActionParameterBase* param);
+    template<class PARAMETER>
+    void add_parameter(const char *key,PARAMETER& param) {add_parameter_ptr(key,param); }
 
     // EXPORT_TO_STRING:
     // Export the action command into a string, so it can stored
@@ -147,6 +152,13 @@ class Action : public boost::noncopyable {
     bool import_from_string(const std::string& action, std::string& error);
 
   private:
+
+    // IMPLEMENTATION OF ADD_PARAMETER ADN ADD_ARGUMENT
+    // These take pointers to the base class, the ones defined above work
+    // with references of the parameters for more convenience.
+    void add_argument_ptr(ActionParameterBase* param);
+    void add_parameter_ptr(const char *key,ActionParameterBase* param);
+
     // Typedefs
     typedef std::vector<ActionParameterBase*>          argument_vector_type;
     typedef std::map<std::string,ActionParameterBase*> parameter_map_type;

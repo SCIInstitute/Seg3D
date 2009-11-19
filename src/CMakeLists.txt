@@ -157,6 +157,7 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 ###########################################
 
 INCLUDE(CMake/ActionLibrary.cmake)
+INCLUDE(CMake/ToolLibrary.cmake)
 
 
 ###########################################
@@ -189,6 +190,7 @@ ADD_SUBDIRECTORY(Interface)
 ###########################################
 
 BUILD_REGISTER_ACTIONS_LIBRARY()
+BUILD_REGISTER_TOOLS_LIBRARY()
 
 ###########################################
 # Init:

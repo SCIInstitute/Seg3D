@@ -26,59 +26,21 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#include <Utils/Core/Log.h>
-
-#include <Application/Action/ActionContext.h>
+#include <Application/Interface/Interface.h>
 
 namespace Seg3D {
 
-ActionContext::ActionContext()
+Interface::Interface()
 {
 }
 
-ActionContext::~ActionContext()
+ActionContextHandle
+create_action_context()
 {
+  return (ActionContextHandle(new ActionContext));
 }
 
-void
-ActionContext::report_error(std::string& error)
-{
-  SCI_LOG_ERROR(error);
-}
-
-void
-ActionContext::report_warning(std::string& warning)
-{
-  SCI_LOG_WARNING(warning);
-}
-
-void
-ActionContext::report_message(std::string& message)
-{
-  SCI_LOG_MESSAGE(message);
-}
-
-void
-ActionContext::report_progress(double progress)
-{
-}
-
-void
-ActionContext::report_done(bool success)
-{
-  SCI_LOG_DEBUG(std::string("ACTION DONE: ")+action_->type_name());
-}
-
-bool
-ActionContext::from_script() const
-{
-  return (false);
-}
-
-bool
-ActionContext::from_interface() const
-{
-  return (false);
-}
+// Singleton instance
+Utils::Singleton<Interface> Interface::instance_;
 
 } // end namespace Seg3D

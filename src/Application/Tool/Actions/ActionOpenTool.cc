@@ -26,59 +26,50 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#include <Utils/Core/Log.h>
-
-#include <Application/Action/ActionContext.h>
+#include <Application/Tool/ToolManager.h>
+#include <Application/Tool/Actions/ActionOpenTool.h>
 
 namespace Seg3D {
 
-ActionContext::ActionContext()
-{
-}
+// REGISTER ACTION:
+// Define a function that registers the action. The action also needs to be
+// registered in the CMake file.
+REGISTER_ACTION(OpenTool);
 
-ActionContext::~ActionContext()
-{
-}
-
-void
-ActionContext::report_error(std::string& error)
-{
-  SCI_LOG_ERROR(error);
-}
-
-void
-ActionContext::report_warning(std::string& warning)
-{
-  SCI_LOG_WARNING(warning);
-}
-
-void
-ActionContext::report_message(std::string& message)
-{
-  SCI_LOG_MESSAGE(message);
-}
-
-void
-ActionContext::report_progress(double progress)
-{
-}
-
-void
-ActionContext::report_done(bool success)
-{
-  SCI_LOG_DEBUG(std::string("ACTION DONE: ")+action_->type_name());
-}
+// VALIDATE:
+// As the action could be user input, we need to validate whether the action
+// is valid and can be executed.
 
 bool
-ActionContext::from_script() const
+ActionOpenTool::validate(ActionContextHandle& context)
 {
-  return (false);
+  // Check whether the tool has a valid type
+  if (!(ToolFactory->is_tool(tool_.value()))
+  {
+    context->report_error(std::string("No tool available of type '")+tool_.value()+"'");
+    return (false);
+  }
+
+  // Check whether name does not exist, if it exists we have to report an
+  // error.
+  if (toolid_.value() != "")
+  {
+    if (ToolManager::instance()->is_toolid(toolid_.value())
+    {
+      context->report_error(std::string("ToolID '")+toolid_.value()+"' is already in use");
+      return (false);
+    }
+  }
+  return (true); // validated
 }
 
-bool
-ActionContext::from_interface() const
+// RUN:
+// The code that runs the actual action
+bool 
+ActionOpenTool::run(ActionContextHandle& context) const
 {
-  return (false);
+  ToolManager::instance()->open_tool(tool_.value(),toolid_.value());
+  return (true); // success
 }
 
 } // end namespace Seg3D

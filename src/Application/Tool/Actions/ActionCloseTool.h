@@ -26,59 +26,37 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#include <Utils/Core/Log.h>
+#ifndef APPLICATION_TOOL_ACTIONS_ACTIONCLOSETOOL_H
+#define APPLICATION_TOOL_ACTIONS_ACTIONCLOSETOOL_H
 
-#include <Application/Action/ActionContext.h>
+#include <Application/Action/Action.h>
+#include <Application/Action/ActionFactory.h>
 
 namespace Seg3D {
 
-ActionContext::ActionContext()
-{
+class ActionCloseTool : public Action {
+
+// -- Constructor/Destructor --
+  public:
+    ActionCloseTool() :
+      Action("CloseTool",Action::APPLICATION_E)
+    {
+      add_argument("id",toolid_);
+    }
+    
+    virtual ~ActionCloseTool() 
+    {}
+
+// -- Functions that describe action --
+    virtual bool validate(ActionContextHandle& context);
+    virtual bool run(ActionContextHandle& context) const;
+    
+// -- Action parameters --
+    ActionParameter<std::string> toolid_;
+};
+
+typedef boost::shared_ptr<ActionCloseTool> ActionCloseToolHandle;
+
 }
 
-ActionContext::~ActionContext()
-{
-}
-
-void
-ActionContext::report_error(std::string& error)
-{
-  SCI_LOG_ERROR(error);
-}
-
-void
-ActionContext::report_warning(std::string& warning)
-{
-  SCI_LOG_WARNING(warning);
-}
-
-void
-ActionContext::report_message(std::string& message)
-{
-  SCI_LOG_MESSAGE(message);
-}
-
-void
-ActionContext::report_progress(double progress)
-{
-}
-
-void
-ActionContext::report_done(bool success)
-{
-  SCI_LOG_DEBUG(std::string("ACTION DONE: ")+action_->type_name());
-}
-
-bool
-ActionContext::from_script() const
-{
-  return (false);
-}
-
-bool
-ActionContext::from_interface() const
-{
-  return (false);
-}
-
-} // end namespace Seg3D
+#endif
