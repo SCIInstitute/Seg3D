@@ -31,33 +31,33 @@
 # Set sources
 ##################################################
 
-SET(APPLICATION_ACTIONMANAGER_SRCS
-  ActionManager.h
-  ActionManager.cc
-)
+SET(APPLICATION_STATE_SRCS
+  StateBase.h
+  State.h
+  StateManager.h
+  StateManager.cc
+  )
 
-SET(APPLICATION_ACTIONMANAGER_ACTION_SRCS
-  Actions/UndoAction.h
-  Actions/UndoAction.cc
-  Actions/RedoAction.h
-  Actions/RedoAction.cc
-)
+SET(APPLICATION_STATE_ACTIONS_SRCS
+  Actions/ActionSet.h
+  Actions/ActionSet.cc
+  Actions/ActionGet.h
+  Actions/ActionGet.cc
+  )
 
-
-ADD_LIBRARY(Application_ActionManager STATIC 
-            ${APPLICATION_ACTIONMANAGER_SRCS}
-            ${APPLICATION_ACTIONMANAGER_ACTION_SRCS} )
-
-# Add code to register the actions to the ActionFactory
-ADD_LIBRARY_ACTIONS(Application_ActionManager
-            ${APPLICATION_ACTIONMANAGER_ACTION_SRCS}
-            )
+ADD_LIBRARY(Application_State STATIC 
+            ${APPLICATION_STATE_SRCS}
+            ${APPLICATION_STATE_ACTIONS_SRCS} )
             
-TARGET_LINK_LIBRARIES(Application_Application
+TARGET_LINK_LIBRARIES(Application_State
+                      Utils_Converter
+                      Utils_Core
+                      Application_Application
+                      Application_Interface
                       Application_Action
-                      Application_State
-                      Application_Component
-                      Core_Utils
-                      Core_State
                       ${SCI_BOOST_LIBRARY})
 
+# Register actions
+ADD_LIBRARY_ACTIONS(Application_State
+                    ${APPLICATION_STATE_ACTIONS_SRCS})
+                    

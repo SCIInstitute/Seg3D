@@ -39,17 +39,22 @@ class ActionCloseTool : public Action {
 // -- Constructor/Destructor --
   public:
     ActionCloseTool() :
-      Action("CloseTool",Action::APPLICATION_E)
+      Action("CloseTool",APPLICATION_E)
     {
-      add_argument("id",toolid_);
+      add_argument(toolid_);
     }
     
     virtual ~ActionCloseTool() 
     {}
 
+    void set(const std::string& toolid)
+    {
+      toolid_.value() = toolid;
+    }
+
 // -- Functions that describe action --
     virtual bool validate(ActionContextHandle& context);
-    virtual bool run(ActionContextHandle& context) const;
+    virtual bool run(ActionContextHandle& context);
     
 // -- Action parameters --
     ActionParameter<std::string> toolid_;
@@ -57,6 +62,6 @@ class ActionCloseTool : public Action {
 
 typedef boost::shared_ptr<ActionCloseTool> ActionCloseToolHandle;
 
-}
+} // end namespace Seg3D
 
 #endif

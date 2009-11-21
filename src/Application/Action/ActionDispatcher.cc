@@ -29,7 +29,6 @@
 // Need instance of main application for inserting events into main application
 // thread.
 #include <Application/Application/Application.h>
-
 #include <Application/Action/ActionDispatcher.h>
 
 namespace Seg3D {
@@ -55,7 +54,7 @@ ActionDispatcher::run_action(ActionHandle action, ActionContextHandle action_con
     return;
   }
 
-  SCI_LOG_DEBUG(std::string("Processing Action: ")+action()->type_name());  
+  SCI_LOG_DEBUG(std::string("Processing Action: ")+action->action_type());  
 
   
   // Step (1): An action needs to be validated before it can be executed. 
@@ -63,7 +62,7 @@ ActionDispatcher::run_action(ActionHandle action, ActionContextHandle action_con
   // posted to the observers recording what the program does
 
   SCI_LOG_DEBUG("Validating Action");  
-  if(!(action()->validate(action_context))) 
+  if(!(action->validate(action_context))) 
   {
     action_context->report_done(false);
     return;
@@ -74,15 +73,15 @@ ActionDispatcher::run_action(ActionHandle action, ActionContextHandle action_con
 
   // Step (2): Tell observers what action is about to be executed
   SCI_LOG_DEBUG("Posting Action");  
-  post_action_signal_(action());
+  post_action_signal_(action);
   
   // Step (3): Run action from the context that was provided. And if the action
   // was synchronous a done signal is triggered in the context, to inform the
   // program whether the action succeeded.
   SCI_LOG_DEBUG("Running Action");    
-  bool success = action()->run(action_context);
+  bool success = action->run(action_context);
   
-  if (!(action()->properties() & Action::ASYNCHRONOUS_E))
+  if (!(action->properties() & Action::ASYNCHRONOUS_E))
   {
     // Ignore asynchronous actions, they will do their own reporting
     action_context->report_done(success);
@@ -116,37 +115,6 @@ ActionDispatcher::run_actions(std::vector<ActionHandle> actions, ActionContextHa
   }
 }
 
-
-void
-ActionDispatcher::run_actions(std::vector<ActionHandle> actions, 
-                              std::vector<ActionContextHandle> action_contexts)
-{ 
-  // THREAD SAFETY:
-  // If it is not on the application thread, relay the function call
-  // to the application thread
-  
-  // Synchronization of actions is done by forcing all actions that change the
-  // state of the program to run to an dedicated thread: the application thread.
-  
-  if (!(Application::instance()->is_eventhandler_thread()))
-  {
-    Application::instance()->post_event(boost::bind
-      (&ActionDispatcher::run_actions,this,actions,action_contexts));
-    return;
-  }
-  
-  if (actions.size() != action_contexts.size())
-  {
-    SCI_THROW_LOGICERROR("Number of actions does not match number of contexts");
-  }
-  
-  // Now that we are on the application thread
-  // Run the actions one by one.
-  for (size_t j=0; j<actions.size(); j++)
-  {
-    run_action(actions[j],action_contexts[j]);
-  }
-}
 
 // Singleton interface needs to be defined somewhere
 Utils::Singleton<ActionDispatcher> ActionDispatcher::instance_;

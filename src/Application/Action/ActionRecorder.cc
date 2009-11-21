@@ -62,7 +62,7 @@ ActionRecorder::stop()
 void
 ActionRecorder::record(ActionHandle action)
 {
-  (*action_stream_) << "ACTION: " << action->export_to_string() << std::endl;
+  (*action_stream_) << "ACTION: " << action->export_action_to_string() << std::endl;
 }
 
 } // end namespace Seg3D

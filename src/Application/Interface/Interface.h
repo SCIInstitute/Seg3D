@@ -38,6 +38,7 @@
 #include <Utils/Singleton/Singleton.h>
 #include <Utils/EventHandler/EventHandler.h>
 
+// Action includes
 #include <Application/Action/ActionContext.h>
 #include <Application/Action/ActionDispatcher.h>
 
@@ -84,11 +85,7 @@ class Interface : public Utils::EventHandler {
 // RUNACTIONFROMINTERFACE:
 // Function that runs an action with the interface context
 
-void RunActionFromInterface(ActionHandle action)
-{
-  ActionDispatcher::instance()->run_action(action,
-                              Interface::instance()->create_action_context());
-}
+void RunActionFromInterface(ActionHandle action);
 
 } // end namespace Seg3D
 

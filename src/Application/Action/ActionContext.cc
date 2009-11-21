@@ -41,19 +41,19 @@ ActionContext::~ActionContext()
 }
 
 void
-ActionContext::report_error(std::string& error)
+ActionContext::report_error(const std::string& error)
 {
   SCI_LOG_ERROR(error);
 }
 
 void
-ActionContext::report_warning(std::string& warning)
+ActionContext::report_warning(const std::string& warning)
 {
   SCI_LOG_WARNING(warning);
 }
 
 void
-ActionContext::report_message(std::string& message)
+ActionContext::report_message(const std::string& message)
 {
   SCI_LOG_MESSAGE(message);
 }

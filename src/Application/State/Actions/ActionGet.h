@@ -26,26 +26,55 @@
    DEALINGS IN THE SOFTWARE.
 */
 
+#ifndef APPLICATION_STATE_ACTIONS_ACTIONGET_H
+#define APPLICATION_STATE_ACTIONS_ACTIONGET_H
 
-#include <Application/ActionManager/ActionManager.h>
-
-#include <boost/signals2.hpp>
+#include <Application/Action/Action.h>
+#include <Application/Action/ActionFactory.h>
+#include <Application/Action/ActionVariantParameter.h>
 
 namespace Seg3D {
 
-ActionManagerDispatcher::ActionManagerDispatcher(ActionManager* manager) :
-  manager_(manager)
-{}
+class ActionGet : public Action {
 
-ActionManagerState::ActionManagerState(ActionManager* manager) :
-  manager_(manager)
-{}
+// -- Constructor/Destructor --
+  public:
+    ActionGet() :
+      Action("Get",APPLICATION_E|QUERY_E)
+    {
+      add_argument(stateid_);
+      add_result(stateresult_);
+    }
+    
+    virtual ~ActionGet() 
+    {
+    }
+    
+// -- Function for setting the parameters --
 
-ActionManagerHandler::ActionManagerHandler(ActionManager* manager) :
-  manager_(manager)
-{}
+    template<class T>
+    void set(const std::string& stateid)
+    {
+      stateid_.value() = stateid;
+    }
 
-// Singleton interface needs to be defined somewhere
-Singleton<ActionManager> ActionManager::instance_;
+// -- Functions that describe action --
+    virtual bool validate(ActionContextHandle& context);
+    virtual bool run(ActionContextHandle& context);
+
+// -- Action parameters --
+  private:
+    // This one describes where the state is located
+    ActionParameter<std::string> stateid_;
+
+    // This one describes the value of the state variable
+    ActionVariantParameter stateresult_;
+
+};
+
+typedef boost::shared_ptr<ActionGet> ActionGetHandle;
 
 } // end namespace Seg3D
+
+#endif
+

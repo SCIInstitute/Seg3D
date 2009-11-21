@@ -36,10 +36,13 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
 
-// Core includes
+// Utils includes
 #include <Utils/Core/Log.h>
 #include <Utils/Core/Exception.h>
 
+// Application includes
+#include <Application/State/StateManager.h>
+#include <Application/State/State.h>
 
 namespace Seg3D {
 
@@ -48,6 +51,7 @@ namespace Seg3D {
 
 class Tool;
 typedef boost::shared_ptr<Tool> ToolHandle;
+
 
 class Tool {
 // -- definition of tool types --
@@ -76,38 +80,50 @@ class Tool {
 
 // -- constructor/destructor --
   public:
-    Tool();
-    
+    Tool(const std::string& toolid);
     virtual ~Tool();
 
-    tool_properties_type  properties() const { return properties_; }
-    std::string           type_name() const  { return type_name_; }
+// -- tool_type/toolid --
 
- protected:
+    int         properties() const { return properties_; }
+    std::string tool_type() const  { return tool_type_; }
+    std::string toolid() const     { return toolid_; }
+
+  protected:
     friend class ToolFactory;
-    // As each tool is created through the factory the properties are set
-    // in the factory so it only needs to be set once
-    void set_properties(tool_properties_type properties) { properties_ = properties; }
-    void set_type_name(const std::string& type_name)     { type_name_ = type_name; }
+    // As each tool is created through the factory the properties and the 
+    // type name are set through the factory so it only needs to be set once.
+    
+    // The detailed reason for not including these in the constructor is that
+    // the ToolFactory will not know about them until the object has been
+    // instantiated. In the current design it is recorded separately in the
+    // factory and then inserted into the Tool object upon creation. This
+    // avoids duplicating the properties and typename registration.
+    
+    void set_properties(int properties)              { properties_ = properties; }
+    void set_tool_type(const std::string& tool_type) { tool_type_ = tool_type; }
 
   private:
-    tool_properties_type  properties_;    
-    std::string           type_name_;
+    std::string           toolid_;
+    int                   properties_;    
+    std::string           tool_type_;
 
-// -- unique tool id --
+// -- close tool --
+  protected:
+    friend class ToolManager;
+    
+    // CLOSE_TOOL:
+    // Function for cleaning up the application part of the tool
+    // This one needs to cleanup the state variables.
+    virtual void close_tool();
+
+// -- state variables --
+  protected:
   
-  public:
-    // SET_TOOLID:
-    // Copy the ID the ToolManager uses into the tool class
-    void set_toolid(const std::string& toolid) { toolid_ = toolid; }
+    // ADD_STATE:
+    // Add a local state variable to the Tool.
+    bool add_state(const std::string& key, StateBase* state) const;
     
-    // GET_TOOLID:
-    // Retrieve the ID the ToolManager inserter
-    std::string get_toolid()  { return toolid_; }
-    
-  private:
-    std::string toolid_;
-
 };
 
 } // end namespace Seg3D

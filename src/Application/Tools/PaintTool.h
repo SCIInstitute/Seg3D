@@ -44,11 +44,10 @@ class PaintTool : public Tool {
   public:
     void dispatch_paint();
 
-
 // -- state --
   public:
-    // Layerid of the Mask that we are drawing on
-    State<std::string>  mask_layerid_;
+    // Layerid of the Destination that we are drawing on
+    State<std::string>  dst_layerid_;
     // Radius of the brush
     State<double>       brush_radius_;
 
@@ -60,7 +59,6 @@ class PaintTool : public Tool {
     State<double>       lower_threshold_;
 };
 
-
-}
+} // end namespace
 
 #endif

@@ -26,6 +26,8 @@
    DEALINGS IN THE SOFTWARE.
 */
 
+#include <boost/algorithm/string.hpp>
+
 // For the conversion code
 #include <Utils/Converter/StringParser.h>
 
@@ -34,9 +36,10 @@
 
 namespace Seg3D {
 
-Action::Action(std::string type_name, unsigned int properties) :
-  type_name_(type_name),
-  properties_(properties)
+Action::Action(const std::string& action_type, int properties) :
+  action_type_(action_type),
+  properties_(properties),
+  result_(0)
 {
 }
 
@@ -57,19 +60,22 @@ Action::add_argument_ptr(ActionParameterBase* param)
 }
 
 void
-Action::add_parameter_ptr(const char *key,ActionParameterBase* param)
+Action::add_parameter_ptr(const std::string& key,ActionParameterBase* param)
 {
-  // TODO: make the map use the pointer to the constant name.
-  // This will save memory as the key names are constants
-  // throughout the program.
-  parameters_[std::string(key)] = param;
+  parameters_[boost::to_lower_copy(key)] = param;
+}
+
+void
+Action::add_result_ptr(ActionParameterBase* param)
+{
+  result_ = param;
 }
 
 std::string 
-Action::export_to_string() const
+Action::export_action_to_string() const
 {
   // Add action name to string
-  std::string command = std::string(type_name()) + " ";
+  std::string command = std::string(action_type()) + " ";
 
   // Loop through all the arguments and add them
   for (size_t j=0; j<arguments_.size(); j++)
@@ -90,15 +96,21 @@ Action::export_to_string() const
   return command;
 }
 
+std::string 
+Action::export_result_to_string() const
+{
+  return ( result_->export_to_string());
+}
+
 bool
-Action::import_from_string(const std::string& action, std::string& error)
+Action::import_action_from_string(const std::string& action, std::string& error)
 {
   std::string::size_type pos = 0;
   std::string command;
   std::string value;
 
   // First part of the string is the command
-  if (!(Utils::scan_com mand(action,pos,command,error)))
+  if (!(Utils::scan_command(action,pos,command,error)))
   {
     error = std::string("SYNTAX ERROR: ") + error;
     return (false);
@@ -130,6 +142,8 @@ Action::import_from_string(const std::string& action, std::string& error)
     }
     if (key.empty()) break;
 
+     boost::to_lower(key);
+     
      parameter_map_type::iterator it = parameters_.find(key);
      if (it != parameters_.end()) 
      {

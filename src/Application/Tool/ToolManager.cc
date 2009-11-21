@@ -30,23 +30,20 @@
 #include <Application/Interface/Interface.h>
 
 #include <Application/Tool/ToolManager.h>
+#include <Application/Tool/ToolFactory.h>
 
 #include <Application/Tool/Actions/ActionOpenTool.h>
 #include <Application/Tool/Actions/ActionCloseTool.h>
 
 namespace Seg3D {
 
-ToolManager::ToolManager()
-{
-}
-
-ToolManager::~ToolManager()
+ToolManager::ToolManager() 
 {
 }
 
 // THREAD-SAFETY:
 // The RunActionFromInterface function will migrate the function call to the
-// application thread. Hence there is no need to safe guard this action.
+// application thread. Hence there is no need to safe guard this function.
 // This code can be run directly form the interface thread.
 
 void
@@ -76,27 +73,32 @@ ToolManager::dispatch_closetool(const std::string& toolid) const
 // Only ActionOpenTool calls this function and this action is only run on the
 // application thread. Hence the function is always executed by the same thread.
 
-void
-ToolManager::open_tool(const std::string& toolname, const std::string& toolid)
+bool
+ToolManager::open_tool(const std::string& tool_type, std::string toolid)
 {
   // Step (1): If no tool id was supplied, create a new unique one
-  if (toolid == "") toolid = create_new_tool_id(toolname);
-  
+  if (toolid == "") toolid = create_toolid(tool_type);
+    
   // Step (2): Build the tool using the factory. This will generate the default
   // settings.
   ToolHandle tool;
-  if (!(ToolFactory::instance()->create_tool(toolname,tool)))
+  
+  if (!(ToolFactory::instance()->create_tool(tool_type,toolid,tool)))
   {
-    SCI_LOG_ERROR(std::string("Could not create tool: '")+toolname+"'");
-    return;
+    SCI_LOG_ERROR(std::string("Could not create tool of type: '")+tool_type+"'");
+    return (false);
   }
   
   // Step (3): Add the tool id to the tool and add the tool to the list
-  tool->set_toolid(toolid);
-  tool_list_[toolid] = tool;
-    
+  {
+    boost::unique_lock<boost::mutex> lock(tool_list_lock_);
+    tool_list_[toolid] = tool;
+  }
+  
   // Step (4): Signal any observers (UIs) that the tool has been opened  
   open_tool_signal_(tool);
+
+  return (true);
 }
 
 void
@@ -104,24 +106,70 @@ ToolManager::close_tool(const std::string& toolid)
 {
   ToolHandle tool;
  
-  // Step (1): Find the tool in the list
-  tool_list_type::iterator it = tool_list_.find(toolid);
-  if (it == tool_list_.end()) 
   {
-    SCI_LOG_ERROR(std::string("Toolid '"+toolid+"' does not exist"));
-    return;
+   // Step (1): Find the tool in the list.
+
+    boost::unique_lock<boost::mutex> lock(tool_list_lock_);
+    tool_list_type::iterator it = tool_list_.find(toolid);
+    if (it == tool_list_.end()) 
+    {
+      SCI_LOG_ERROR(std::string("Toolid '"+toolid+"' does not exist"));
+      return;
+    }
+    
+    // Step (2): Move the tool from the list. The tool handle still persists
+    // and will be removed after the signal has been posted.
+    tool = (*it).second;
+    tool_list_.erase(it);
   }
+  // Step (3): Remove the links to the StateManager.
+  
+  tool->close_tool();  
     
-  // Step (2): Reset the toolid so it is marked as a tool that is no longer
-  // available.
-   
-  tool->set_toolid("");  
-    
-  // Step (3): Signal that the tool will be closed.   
+  // Step (4): Signal that the tool will be closed.   
   close_tool_signal_(tool);
   
-  // Step (4): Remove the tool from the current list
-  tool_list_.remove(toolid);
 }
 
+void
+ToolManager::add_toolid(const std::string& toolid)
+{
+  boost::unique_lock<boost::mutex> lock(tool_list_lock_);
+  toolid_list_.insert(toolid);
+}        
+
+void
+ToolManager::remove_toolid(const std::string& toolid)
+{
+  boost::unique_lock<boost::mutex> lock(tool_list_lock_);
+  toolid_list_.erase(toolid);
+}
+
+bool
+ToolManager::is_toolid(const std::string& toolid)
+{
+  if(toolid_list_.find(toolid) != toolid_list_.end()) return (true);
+  return (false);
+}
+
+std::string 
+ToolManager::create_toolid(const std::string& tool_type)
+{
+  boost::unique_lock<boost::mutex> lock(tool_list_lock_);
+  std::string toolid_base = std::string("ToolManager::")+tool_type; 
+  int num = 0;
+
+  std::string toolid;
+  do 
+  {
+    toolid = toolid_base+Utils::to_string(num++);
+  } 
+  while(toolid_list_.find(toolid) != toolid_list_.end());
+  
+  return (toolid);
+}
+
+// Singleton interface needs to be defined somewhere
+Utils::Singleton<ToolManager> ToolManager::instance_;
+  
 } // end namespace Seg3D

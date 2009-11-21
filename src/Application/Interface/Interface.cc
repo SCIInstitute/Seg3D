@@ -35,12 +35,19 @@ Interface::Interface()
 }
 
 ActionContextHandle
-create_action_context()
+Interface::create_action_context()
 {
   return (ActionContextHandle(new ActionContext));
 }
 
 // Singleton instance
 Utils::Singleton<Interface> Interface::instance_;
+
+void RunActionFromInterface(ActionHandle action)
+{
+  ActionDispatcher::instance()->run_action(action,
+                              Interface::instance()->create_action_context());
+}
+
 
 } // end namespace Seg3D

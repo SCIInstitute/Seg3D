@@ -42,6 +42,7 @@
 #include <Utils/Singleton/Singleton.h>
 
 #include <Application/Action/Action.h>
+#include <Application/Action/ActionContext.h>
 
 namespace Seg3D {
 
@@ -66,11 +67,7 @@ class ActionDispatcher : public boost::noncopyable {
     // RUN_ACTIONS:
     // Run multiple actions in specified order
 
-    void run_actions(std::vector<ActionHandle>& actions, ActionContextHandle action_context); // << THREAD-SAFE SLOT   
-
-    // RUN_ACTIONS:
-    // Run multiple actions in specified order with a context for each action
-    void run_actions(std::vector<ActionHandle>& actions, std::vector<ActionContextHandle>& action_context); // << THREAD-SAFE SLOT   
+    void run_actions(std::vector<ActionHandle> actions, ActionContextHandle action_context); // << THREAD-SAFE SLOT   
 
 // -- Action monitoring --
 

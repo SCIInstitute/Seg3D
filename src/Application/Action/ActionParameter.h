@@ -79,6 +79,9 @@ class ActionParameter : public ActionParameterBase {
     // General access to the parameter value
     T& value() { return value_; } 
 
+    // For run when running with constness
+    const T& value() const { return value_; } 
+
     // export the value to a string
     virtual std::string export_to_string() const
     {

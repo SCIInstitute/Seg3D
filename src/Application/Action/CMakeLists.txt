@@ -1,3 +1,4 @@
+
 #
 #  For more information, please see: http://software.sci.utah.edu
 # 
@@ -26,8 +27,35 @@
 #  DEALINGS IN THE SOFTWARE.
 #
 
-ADD_SUBDIRECTORY(Application)
-ADD_SUBDIRECTORY(Interface)
-ADD_SUBDIRECTORY(Action)
-ADD_SUBDIRECTORY(State)
-ADD_SUBDIRECTORY(Tool)
+##################################################
+# Set sources
+##################################################
+
+SET(APPLICATION_ACTION_SRCS
+  Action.h
+  Action.cc
+  ActionContext.h
+  ActionContext.cc
+  ActionParameter.h
+  ActionParameter.cc
+  ActionVariantParameter.h
+  ActionVariantParameter.cc
+  ActionDispatcher.h
+  ActionDispatcher.cc
+  ActionFactory.h
+  ActionFactory.cc
+  ActionRecorder.h
+  ActionRecorder.cc
+  )
+
+
+ADD_LIBRARY(Application_Action STATIC 
+            ${APPLICATION_ACTION_SRCS} )
+            
+TARGET_LINK_LIBRARIES(Application_Action
+                      Utils_Converter
+                      Utils_Core
+                      Utils_EventHandler
+                      Application_Application
+                      ${SCI_BOOST_LIBRARY})
+

@@ -75,25 +75,29 @@ class Action : public boost::noncopyable {
       // stack. 
       UNDOABLE_E = 0x10000, 
       
-      // ASYNCHRONOUS ACTIONS - These action do not complete on the main
+      // ASYNCHRONOUS ACTIONS - These actions do not complete on the main
       // application thread and run while new actions can be issued
-      ASYNCHRONOUS_E =0x20000
+      ASYNCHRONOUS_E = 0x20000,
+      
+      // QUERY ACTIONS - These actions do not alter the state of the program
+      // but query state. They do not need to be recorded in a playback script.
+      QUERY_E = 0x40000
     };
 
 // -- Constructor/Destructor --
   public:    
     // Construct an action of a certain type and with certain properties
-    Action(const std::string& type_name, action_properties_type properties);
+    Action(const std::string& action_type, int properties);
 
     // Virtual destructor for memory management of derived classes  
     virtual ~Action(); // << NEEDS TO BE REIMPLEMENTED
 
-    action_properties_type  properties() const { return properties_; }
-    std::string             type_name() const { return type_name_; }
+    int         properties() const { return properties_; }
+    std::string action_type() const { return action_type_; }
 
   private:
-    action_properties_type  properties_;    
-    std::string             type_name_;
+    int         properties_;    
+    std::string action_type_;
     
 // -- Run/Validate interface --
 
@@ -117,9 +121,8 @@ class Action : public boost::noncopyable {
     // program relies on report_done() from the context to be triggered when
     // the asynchronous part has finished. In any other case the ActionDispatcher
     // will issue the report_done() when run returns.
-    // NOTE: This function is defined as *const* as parameters cannot be changed
-    //       and the action needs to be executed as is, or fail.
-    virtual bool run(ActionContextHandle& context) const = 0;
+
+    virtual bool run(ActionContextHandle& context) = 0;
 
 // -- Action parameters --
 
@@ -139,35 +142,49 @@ class Action : public boost::noncopyable {
     // This function links the parameters of the action to an internal
     // key value pair system to records all the parameters
     template<class PARAMETER>
-    void add_parameter(const char *key,PARAMETER& param) {add_parameter_ptr(key,param); }
+    void add_parameter(const std::string& key,PARAMETER& param) {add_parameter_ptr(key,&param); }
 
-    // EXPORT_TO_STRING:
+    // ADD_RESULT:
+    // Describe where the result is stored
+    template<class PARAMETER>
+    void add_result(PARAMETER& param) { add_result_ptr(&param); }
+
+    // EXPORT_ACTION_TO_STRING:
     // Export the action command into a string, so it can stored
     // The action factory can recreate the action from this string
-    std::string export_to_string() const;
+    std::string export_action_to_string() const;
 
-    // IMPORT_FROM_STRING:
+    // EXPORT_RESULT_TO_STRING:
+    // Export the result into a string, so it can be send back to the user
+    std::string export_result_to_string() const;
+
+    // IMPORT_ACTION_FROM_STRING:
     // Import an action command from astring. This function is used by the
     // ActionFactory.
-    bool import_from_string(const std::string& action, std::string& error);
+    bool import_action_from_string(const std::string& action, std::string& error);
 
   private:
 
-    // IMPLEMENTATION OF ADD_PARAMETER ADN ADD_ARGUMENT
+    // IMPLEMENTATION OF ADD_PARAMETER, ADD_ARGUMENT AND ADD_RESULT
     // These take pointers to the base class, the ones defined above work
     // with references of the parameters for more convenience.
     void add_argument_ptr(ActionParameterBase* param);
-    void add_parameter_ptr(const char *key,ActionParameterBase* param);
+    void add_parameter_ptr(const std::string& key,ActionParameterBase* param);
+    void add_result_ptr(ActionParameterBase* param);
 
     // Typedefs
     typedef std::vector<ActionParameterBase*>          argument_vector_type;
     typedef std::map<std::string,ActionParameterBase*> parameter_map_type;
+    typedef ActionParameterBase*                       result_type;
     
     // Vector that stores the required arguments of the action.
     argument_vector_type arguments_;
     
     // Map that stores the location of the parameters in the action.
     parameter_map_type parameters_;
+    
+    // Pointer for where the result is stored
+    result_type result_;
     
 };
 

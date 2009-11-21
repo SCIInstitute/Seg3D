@@ -37,9 +37,8 @@ ActionFactory::ActionFactory()
 {
 }
 
-
 bool
-ActionFactory::create_action(const std::string& actionstring,
+ActionFactory::create_action(const std::string& action_string,
                              ActionHandle& action,
                              std::string& error) const
 {
@@ -47,15 +46,16 @@ ActionFactory::create_action(const std::string& actionstring,
   std::string::size_type pos;
   
   // Scan for the command that needs to be instanted.
-  if(!(Utils::scan_command(actionstring,pos,command,error)))
+  if(!(Utils::scan_command(action_string,pos,command,error)))
   {
     error = std::string("SYNTAX ERROR: ") + error;
     return (false);
   }
 
+  boost::to_lower(command);
   // NOTE: Factory is not locked as we assume that all actions are already
   // inserted.
-  action_map_type::const_iterator it = action_builders_.find(Utils::string_to_lower(command));
+  action_map_type::const_iterator it = action_builders_.find(command);
 
   // If we cannot find the maker report error.
   if (it == action_builders_.end())
@@ -67,9 +67,9 @@ ActionFactory::create_action(const std::string& actionstring,
   // Build the action of the right type
   action = (*it).second->build();
   
-  if(!(action->import_from_string(actionstring,error)))
+  if(!(action->import_action_from_string(action_string,error)))
   {
-    // the import_from_string function reports the error and hence
+    // the import_action_from_string function reports the error and hence
     // we do not need to set it here.
     return (false);
   }

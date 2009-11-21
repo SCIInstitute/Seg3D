@@ -26,33 +26,44 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#include <Application/Actions/UndoAction.h>
-#include <Application/ActionManager/ActionManager.h>
-#include <Application/ActionManager/ActionFactory.h>
+#include <Application/State/StateManager.h>
+#include <Application/State/Actions/ActionGet.h>
 
 namespace Seg3D {
 
-SCI_REGISTER_ACTION(UndoAction);
+// REGISTER ACTION:
+// Define a function that registers the action. The action also needs to be
+// registered in the CMake file.
+SCI_REGISTER_ACTION(Get);
 
-UndoAction::UndoAction() :
-  Action(Action::APPLICATION_E,Action::NONE_E)
+bool 
+ActionGet::validate(ActionContextHandle& context)
 {
+  // Check whether the state exists
+  StateBase* state = StateManager::instance()->get_state(stateid_.value());
+  // If not this action is invalid
+  if (state == 0) 
+  {
+    context->report_error(
+      std::string("Unknown state variable '")+stateid_.value()+"'");
+    return (false);
+  }
+  
+  // The action should be able to run 
+  return (true);
 }
 
-UndoAction::~UndoAction()
+bool 
+ActionGet::run(ActionContextHandle& context)
 {
+  // Get the state
+  StateBase* state = StateManager::instance()->get_state(stateid_.value());
+
+  // Retrieve the current state
+  state->export_to_variant(stateresult_);
+  
+  // Signal action is done
+  return (true);
 }
 
-std::string
-UndoAction::type_name() const
-{
-  return "UndoAction";
-}
-
-void
-UndoAction::do_action()
-{
-  ActionManager::instance()->handler()->undo_action();
-}
-
-}
+} // end namespace Seg3D

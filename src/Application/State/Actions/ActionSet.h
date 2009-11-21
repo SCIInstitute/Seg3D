@@ -26,34 +26,57 @@
    DEALINGS IN THE SOFTWARE.
 */
 
+#ifndef APPLICATION_STATE_ACTIONS_ACTIONSET_H
+#define APPLICATION_STATE_ACTIONS_ACTIONSET_H
+
+#include <Application/Action/Action.h>
 #include <Application/Action/ActionFactory.h>
 
-#include <Application/ActionManager/ActionManager.h>
-#include <Application/ActionManager/Actions/RedoAction.h>
+#include <Application/Action/ActionVariantParameter.h>
 
 namespace Seg3D {
 
-SCI_REGISTER_ACTION(RedoAction);
+class ActionSet : public Action {
 
-RedoAction::RedoAction() :
-  Action(Action::APPLICATION_E,Action::NONE_E)
-{
-}
+// -- Constructor/Destructor --
+  public:
+    ActionSet() :
+      Action("Set",APPLICATION_E)
+    {
+      add_argument(stateid_);
+      add_argument(statevalue_);
+    }
+    
+    virtual ~ActionSet() 
+    {
+    }
+    
+// -- Function for setting the parameters --
 
-RedoAction::~RedoAction()
-{
-}
+    template<class T>
+    void set(const std::string& stateid, const T& statevalue)
+    {
+      stateid_.value() = stateid;
+      statevalue_.set_value(statevalue);
+    }
 
-std::string
-RedoAction::type_name() const
-{
-  return "RedoAction";
-}
+// -- Functions that describe action --
+    virtual bool validate(ActionContextHandle& context);
+    virtual bool run(ActionContextHandle& context);
 
-void
-RedoAction::do_action()
-{
-  ActionManager::instance()->handler()->redo_action();
-}
+// -- Action parameters --
+  private:
+    // This one describes where the state is located
+    ActionParameter<std::string> stateid_;
 
-}
+    // This one describes the value of the state variable
+    ActionVariantParameter statevalue_;
+
+};
+
+typedef boost::shared_ptr<ActionSet> ActionSetHandle;
+
+} // end namespace Seg3D
+
+#endif
+

@@ -69,9 +69,9 @@ class ActionContext : public boost::noncopyable {
 
 // -- Reporting functions --
 
-    virtual void report_error(std::string& error);
-    virtual void report_warning(std::string& warning);
-    virtual void report_message(std::string& message);
+    virtual void report_error(const std::string& error);
+    virtual void report_warning(const std::string& warning);
+    virtual void report_message(const std::string& message);
 
     virtual void report_progress(double progress);
     virtual void report_done(bool success);

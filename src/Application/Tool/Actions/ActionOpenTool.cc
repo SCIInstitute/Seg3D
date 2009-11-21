@@ -27,6 +27,7 @@
 */
 
 #include <Application/Tool/ToolManager.h>
+#include <Application/Tool/ToolFactory.h>
 #include <Application/Tool/Actions/ActionOpenTool.h>
 
 namespace Seg3D {
@@ -34,7 +35,7 @@ namespace Seg3D {
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
-REGISTER_ACTION(OpenTool);
+SCI_REGISTER_ACTION(OpenTool);
 
 // VALIDATE:
 // As the action could be user input, we need to validate whether the action
@@ -44,9 +45,9 @@ bool
 ActionOpenTool::validate(ActionContextHandle& context)
 {
   // Check whether the tool has a valid type
-  if (!(ToolFactory->is_tool(tool_.value()))
+  if (!(ToolFactory::instance()->is_tool_type(tool_type_.value())))
   {
-    context->report_error(std::string("No tool available of type '")+tool_.value()+"'");
+    context->report_error(std::string("No tool available of type '")+tool_type_.value()+"'");
     return (false);
   }
 
@@ -54,7 +55,7 @@ ActionOpenTool::validate(ActionContextHandle& context)
   // error.
   if (toolid_.value() != "")
   {
-    if (ToolManager::instance()->is_toolid(toolid_.value())
+    if (ToolManager::instance()->is_toolid(toolid_.value()))
     {
       context->report_error(std::string("ToolID '")+toolid_.value()+"' is already in use");
       return (false);
@@ -65,10 +66,11 @@ ActionOpenTool::validate(ActionContextHandle& context)
 
 // RUN:
 // The code that runs the actual action
+
 bool 
-ActionOpenTool::run(ActionContextHandle& context) const
+ActionOpenTool::run(ActionContextHandle& context)
 {
-  ToolManager::instance()->open_tool(tool_.value(),toolid_.value());
+  ToolManager::instance()->open_tool(tool_type_.value(),toolid_.value());
   return (true); // success
 }
 

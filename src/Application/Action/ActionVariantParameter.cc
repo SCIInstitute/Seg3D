@@ -26,36 +26,36 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_ACTIONMANAGER_REDOACTION_H
-#define APPLICATION_ACTIONMANAGER_REDOACTION_H
-
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
-# pragma once
-#endif 
-
-#include <Application/Action/Action.h>
+#include <Application/Action/ActionVariantParameter.h>
 
 namespace Seg3D {
 
-class RedoAction : public Action {
+ActionVariantParameter::~ActionVariantParameter()
+{
+}
 
-  // --Constructor/Destructor
-  public:
- 
-    RedoAction();
-    virtual ~RedoAction();
+std::string
+ActionVariantParameter::export_to_string() const
+{
+  // Export a value that is still typed or has been convereted to a string
+  // if typed_value exist, we need to convert it
+  if (typed_value_.get())
+  {
+    return (typed_value_->export_to_string());
+  }
+  else
+  {
+    // in case typed_value does not exist it must be recorded as a string
+    return (string_value_);
+  }
+}
 
-  // -- Functions that need to be overloaded for this action --
-  public:
-  
-    // Name of the action always needs to be present
-    virtual std::string type_name() const;
+bool
+ActionVariantParameter::import_from_string(const std::string& str)
+{
+  // As we do not know the implied type. It can only be recorded as a string
+  typed_value_.reset();
+  string_value_ = str;
+}
 
-    // The actual function that executes the action
-    // always needs to be written.
-    virtual void do_action();
-};
-
-} //end namespace Seg3D
-
-#endif
+} // end namespace Seg3D

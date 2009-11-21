@@ -26,39 +26,54 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#include <Application/Tool/ToolManager.h>
-#include <Application/Tool/Actions/ActionCloseTool.h>
+#include <Application/State/StateManager.h>
+#include <Application/State/Actions/ActionSet.h>
 
 namespace Seg3D {
 
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
-SCI_REGISTER_ACTION(CloseTool);
+SCI_REGISTER_ACTION(Set);
 
-// VALIDATE:
-// As the action could be user input, we need to validate whether the action
-// is valid and can be executed.
-
-bool
-ActionCloseTool::validate(ActionContextHandle& context)
+bool 
+ActionSet::validate(ActionContextHandle& context)
 {
-  if (!(ToolManager::instance()->is_toolid(toolid_.value())))
+  // Check whether the state exists
+  StateBase* state = StateManager::instance()->get_state(stateid_.value());
+  // If not this action is invalid
+  if (state == 0) 
   {
-    context->report_error(std::string("ToolID '")+toolid_.value()+"' is invalid");
+    context->report_error(
+      std::string("Unknown state variable '")+stateid_.value()+"'");
     return (false);
   }
   
-  return (true); // validated
+  // The Variant parameter can contain both the value send from the State in
+  // its right format or a string in case it is send from a script.
+  // In any case we need to validate whether the value can be transcribed into
+  // the type we want.
+  bool changed = false;
+  if(!(state->validate_and_compare_variant(statevalue_,changed)))
+  {
+    context->report_error("The state value cannot be converted into the right type");
+    return (false);
+  }
+  
+  // No error to report, but this action does not need to be executed.
+  if (changed == false) return (false);
+  
+  return (true);
 }
 
-// RUN:
-// The code that runs the actual action
 bool 
-ActionCloseTool::run(ActionContextHandle& context)
+ActionSet::run(ActionContextHandle& context)
 {
-  ToolManager::instance()->close_tool(toolid_.value());
-  return (true); // success
+  // Get the state
+  StateBase* state = StateManager::instance()->get_state(stateid_.value());
+  // Set the value
+  state->import_from_variant(statevalue_);
+  return (true);
 }
 
 } // end namespace Seg3D

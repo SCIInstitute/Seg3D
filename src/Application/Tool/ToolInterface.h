@@ -45,7 +45,6 @@ class ToolInterface : public boost::noncopyable {
 // -- constructor/destructor --
   public:
     ToolInterface();
-    
     virtual ~ToolInterface();
 
 // Store the parent tool this interface is intended for.

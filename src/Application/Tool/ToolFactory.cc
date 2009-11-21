@@ -35,9 +35,9 @@ ToolFactory::ToolFactory()
 }
 
 bool 
-ToolFactory::is_tool(const std::string& tool_name) const
+ToolFactory::is_tool_type(const std::string& tool_type) const
 {
-  tool_map_type::const_iterator it = tool_builders_.find(tool_name);
+  tool_map_type::const_iterator it = tool_builders_.find(tool_type);
   if (it == tool_builders_.end()) return (false);
   return (true);
 }
@@ -76,7 +76,7 @@ ToolFactory::list_tools_with_interface(tool_properties_list_type& tool_list) con
       make_pair((*it).first,(*it).second);
     ++it;
     // check whether the interface exists
-    if (toolinterface_builders_.find((*it).first))
+    if (toolinterface_builders_.find((*it).first) == toolinterface_builders_.end())
     {
       tool_list.push_back(properties_pair);
     }
@@ -86,25 +86,27 @@ ToolFactory::list_tools_with_interface(tool_properties_list_type& tool_list) con
 }
 
 bool 
-ToolFactory::create_tool(const std::string& tool_name,
+ToolFactory::create_tool(const std::string& tool_type,
+                         const std::string& toolid,
                          ToolHandle& tool) const
 {
   // Step (1): find the tool
-  tool_map_type::const_iterator it = tool_builders_.find(tool_name);
+  tool_map_type::const_iterator it = tool_builders_.find(tool_type);
 
   // Step (2): check its existence
   if (it == tool_builders_.end())
   {
     SCI_THROW_LOGICERROR(std::string("Trying to instantiate tool '")
-                                    +tool_name +"'that does not exist");
+                                    +tool_type +"'that does not exist");
   }
 
   // Step (3): build the tool
-  tool = (*it).second->build();
+  tool = (*it).second->build(toolid);
   
   // Step (4): insert the type_name and the properties into the tool
-  tool->set_type_name(tool_name);
-  tool->set_properties(tool_properties_[tool_name]);
+  tool->set_tool_type(tool_type);
+  properties_map_type::const_iterator prop_it = tool_properties_.find(tool_type);
+  tool->set_properties((*prop_it).second);
   
   return (true);
 }
@@ -134,5 +136,3 @@ ToolFactory::create_toolinterface(const std::string& toolinterface_name,
 Utils::Singleton<ToolFactory> ToolFactory::instance_;
 
 } // end namespace seg3D
-
-#endif

@@ -41,6 +41,8 @@ ADD_LIBRARY(Application_Interface STATIC
             ${APPLICATION_INTERFACE_SRCS} )
             
 TARGET_LINK_LIBRARIES(Application_Interface
+                      Application_Application
+                      Application_Action
                       Utils_Core
                       Utils_EventHandler
                       ${SCI_BOOST_LIBRARY})

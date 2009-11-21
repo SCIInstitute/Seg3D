@@ -63,7 +63,7 @@ class ToolBuilderBase {
     // ensure we can delete the builder correctly
     virtual ~ToolBuilderBase() {}
     // the functor call to build the object
-    virtual ToolHandle build() = 0;
+    virtual ToolHandle build(const std::string& toolid) = 0;
 };
 
 // TOOLBUILDERT:
@@ -77,7 +77,7 @@ class ToolBuilder: public ToolBuilderBase {
     // ensure we can delete the builder correctly 
     virtual ~ToolBuilder<TOOL>() {}
     // The actual builder call
-    virtual ToolHandle build() { return ToolHandle(new TOOL); }
+    virtual ToolHandle build(const std::string& toolid) { return ToolHandle(new TOOL(toolid)); }
 };
 
 
@@ -94,8 +94,8 @@ class ToolInterfaceBuilderBase {
 };
 
 // TOOLINTERFACEBUILDERT:
-// The actual instantiation that builds the tool of type TOOLINTERFACE. This class
-// is loaded on top of the base functor and creates the action
+// The actual instantiation that builds the tool of type TOOLINTERFACE. This 
+// class is loaded on top of the base functor and creates the action
 
 template <class TOOLINTERFACE>
 class ToolInterfaceBuilder: public ToolInterfaceBuilderBase {
@@ -104,7 +104,8 @@ class ToolInterfaceBuilder: public ToolInterfaceBuilderBase {
     // ensure we can delete the builder correctly 
     virtual ~ToolInterfaceBuilder<TOOLINTERFACE>() {}
     // The actual builder call
-    virtual ToolInterfaceHandle build() { return ToolInterfaceHandle(new TOOL); }
+    virtual ToolInterfaceHandle build() 
+      { return ToolInterfaceHandle(new TOOLINTERFACE); }
 };
 
 
@@ -129,7 +130,7 @@ class ToolFactory : public boost::noncopyable  {
     // factory.
   
     template <class TOOL>
-    void register_tool(std::string tool_name, Tool::properties_type properties)
+    void register_tool(std::string tool_name, int properties)
     {
       tool_name = Utils::string_to_lower(tool_name);
       // Lock the factory
@@ -155,8 +156,8 @@ class ToolFactory : public boost::noncopyable  {
   private:
   
     // Mutex protecting the singleton interface  
-    typedef boost::unordered_map<std::string,ToolBuilderBase*>        tool_map_type;
-    typedef boost::unordered_map<std::string,Tool::properties_type>   properties_map_type;
+    typedef boost::unordered_map<std::string,ToolBuilderBase*>  tool_map_type;
+    typedef boost::unordered_map<std::string,int>               properties_map_type;
     
     // List with builders that can be called to generate a new object
     tool_map_type         tool_builders_;
@@ -209,7 +210,8 @@ class ToolFactory : public boost::noncopyable  {
     // CREATE_TOOL:
     // Generate an tool from an iostream object that contains the XML
     // specification of the action.
-    bool create_tool(const std::string& tool_name,
+    bool create_tool(const std::string& tool_type,
+                     const std::string& toolid,
                      ToolHandle& tool) const;
 
     // CREATE_TOOLINTERFACE:
@@ -220,12 +222,12 @@ class ToolFactory : public boost::noncopyable  {
 
 // -- List of tools and interfaces --
   public:
-    typedef std::pair<std::string,Tool::properties_type> tool_properties_pair_type;
+    typedef std::pair<std::string,int>             tool_properties_pair_type;
     typedef std::vector<tool_properties_pair_type> tool_properties_list_type;
 
-    // IS_TOOL:
+    // IS_TOOL_TYPE:
     // Check whether a tool with a specified name is available
-    bool is_tool(const std::string& tool_name) const;
+    bool is_tool_type(const std::string& tool_type) const;
 
     // LIST_TOOLS:
     // List the tools with the properties associated with them
@@ -244,6 +246,8 @@ class ToolFactory : public boost::noncopyable  {
     static Utils::Singleton<ToolFactory> instance_;
 };
 
+} // end namespace seg3D
+
 #define SCI_REGISTER_TOOL(name,properties)\
 void register_tool_##name()\
 {\
@@ -255,11 +259,5 @@ void register_toolinterface_##name()\
 {\
   ToolFactory::instance()->register_toolinterface<name>(#name);\
 } 
-
-
-
-
-
-} // end namespace seg3D
 
 #endif

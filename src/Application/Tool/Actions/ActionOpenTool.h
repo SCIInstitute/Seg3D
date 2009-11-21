@@ -41,26 +41,26 @@ class ActionOpenTool : public Action {
     ActionOpenTool() :
       Action("OpenTool",Action::APPLICATION_E)
     {
-      add_argument(tool_);
+      add_argument(tool_type_);
       add_parameter("id",toolid_);
     }
     
     virtual ~ActionOpenTool() 
     {}
 
-    void set(const std::string& tool,const std::string& toolid)
+    void set(const std::string& tool_type,const std::string& toolid)
     {
-      tool_.value() = tool;
+      tool_type_.value() = tool_type;
       toolid_.value() = toolid;
     }
 
 // -- Functions that describe action --
     virtual bool validate(ActionContextHandle& context);
-    virtual bool run(ActionContextHandle& context) const;
+    virtual bool run(ActionContextHandle& context);
     
 // -- Action parameters --
   protected:
-    ActionParameter<std::string> tool_;
+    ActionParameter<std::string> tool_type_;
     ActionParameter<std::string> toolid_;
 };
 

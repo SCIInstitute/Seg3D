@@ -34,6 +34,7 @@
 #endif 
 
 // Boost includes
+#include <boost/algorithm/string.hpp>
 #include <boost/unordered_map.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/shared_ptr.hpp>
@@ -99,7 +100,8 @@ class ActionFactory : public boost::noncopyable  {
     template <class ACTION>
     void register_action(std::string action_name)
     {
-      action_name = Utils::string_to_lower(action_name);
+      // ensure name is unique
+      boost::to_lower(action_name);
       // Lock the factory
       boost::unique_lock<boost::mutex> lock(action_builders_mutex_);
 
@@ -110,7 +112,7 @@ class ActionFactory : public boost::noncopyable  {
         // Hence the program will throw an exception.
         // As registration is done on startup, this will cause a
         // faulty program to fail always on startup.
-        SCI_THROW_LOGICERROR(std::string("Action '")+action_name+"' is registered twice");
+        SCI_THROW_LOGICERROR(std::string("Action '")+action_name+"' was registered twice");
       }
 
       // Register the action
@@ -153,7 +155,7 @@ class ActionFactory : public boost::noncopyable  {
 // call of the program.
  
 #define SCI_REGISTER_ACTION(name)\
-void register_action_##name()\
+void register_Action##name()\
 {\
   ActionFactory::instance()->register_action<Action##name>(#name);\
 } 
