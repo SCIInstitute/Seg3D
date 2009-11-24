@@ -34,9 +34,7 @@
 #endif 
 
 // Qt includes
-#include <QEvent>
-#include <QObject>
-#include <QApplication>
+#include <QtGui>
 
 // Includes from application layer
 #include <Utils/EventHandler/EventHandlerContext.h>
@@ -49,6 +47,8 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition_variable.hpp>
 
+// Application includes
+#include <Application/State/State.h>
 
 namespace Seg3D {
 
@@ -150,6 +150,35 @@ class QtEventHandlerContext : public Utils::EventHandlerContext {
     // Thread id from the thead that is running Qt
     boost::thread::id       interface_thread_id_;
 };
+
+
+// QObjects for linking QT signals to state variables
+// QT does *not* support templated classes (the moc does not process it), hence
+// for each signal type, we need to have a dedicated slot and we cannot template
+// this unfortunately. Hence we have helper classes that are inserted in between. 
+
+class QtCheckBoxSlot : public QObject {
+  Q_OBJECT
+  public:
+    QtCheckBoxSlot(QCheckBox* parent, State<bool>::Handle& state_handle) :
+      QObject(parent),
+      state_handle_(state_handle) 
+    {
+      connect(parent,SIGNAL(stateChanged),this,SLOT(slot));
+    }
+    virtual ~QtCheckBoxSlot() {}
+    
+  public Q_SLOTS:
+    void slot(int state)
+    {
+      state_handle_->dispatch(static_cast<bool>(state));
+    }
+    
+  private:
+    State<bool>::Handle state_handle_;
+};
+
+
 
 } // end namespace Seg3D
 

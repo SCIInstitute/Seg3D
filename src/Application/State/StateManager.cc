@@ -35,7 +35,7 @@ StateManager::StateManager()
 }
   
 bool
-StateManager::add_state(const std::string& state_id, StateBase* state)
+StateManager::add_state(const std::string& state_id, StateBaseHandle& state)
 {
   boost::unique_lock<boost::mutex> lock(state_map_lock_);
   
@@ -47,16 +47,23 @@ StateManager::add_state(const std::string& state_id, StateBase* state)
   }
 
   state_map_[state_id] = state;
+  return (true);
 }
 
-StateBase* 
-StateManager::get_state(const std::string& state_id)
+bool 
+StateManager::get_state(const std::string& state_id, StateBaseHandle& state)
 {
   boost::unique_lock<boost::mutex> lock(state_map_lock_);
   
   state_map_type::const_iterator it = state_map_.find(state_id);
-  if (it == state_map_.end()) return (0);
-  return ((*it).second);
+  if (it == state_map_.end())
+  {
+    state.reset();
+    return (false);
+  }
+  
+  state = StateBaseHandle((*it).second);
+  return (true);
 }
 
 void
@@ -91,6 +98,7 @@ StateManager::remove_state(const std::string& state_id)
     ++it;
   }
 }
+
 
 // Singleton interface needs to be defined somewhere
 Utils::Singleton<StateManager> StateManager::instance_;

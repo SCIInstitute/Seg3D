@@ -46,17 +46,26 @@ class PaintTool : public Tool {
 
 // -- state --
   public:
-    // Layerid of the Destination that we are drawing on
-    State<std::string>  dst_layerid_;
+    // Layerid of the target layer
+    State<std::string>::Handle  target_layer_;
+    // Layerid of the masking layer
+    State<std::string>::Handle  mask_layer_;
+    // Layerid of the data layer
+    State<std::string>::Handle  data_layer_;
+    
     // Radius of the brush
-    State<double>       brush_radius_;
-
-    // Layerid of the Data
-    State<std::string>  data_layerid_;
+    State<double>::Handle       brush_radius_;
     // Upper threshold for painting
-    State<double>       upper_threshold_;
+    State<double>::Handle       upper_threshold_;
     // Lower threshold for painting
-    State<double>       lower_threshold_;
+    State<double>::Handle       lower_threshold_;
+
+    // Erase data
+    State<bool>::Handle         erase_data_;
+    // Constrain mask layer
+    State<bool>::Handle         constrain_mask_;
+    // Constrain data layer
+    State<bool>::Handle         constrain_data_;
 };
 
 } // end namespace

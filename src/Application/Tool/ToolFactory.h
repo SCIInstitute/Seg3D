@@ -231,11 +231,11 @@ class ToolFactory : public boost::noncopyable  {
 
     // LIST_TOOLS:
     // List the tools with the properties associated with them
-    bool list_tools(tool_properties_list_type& tool_list) const;
+    bool list_tool_types(tool_properties_list_type& tool_types_list) const;
     
     // LIST_TOOLS_WITH_INTERFACE:
     // List the tools with properties are guaranteed to have an interface 
-    bool list_tools_with_interface(tool_properties_list_type& tool_list) const;
+    bool list_tool_types_with_interface(tool_properties_list_type& tool_types_list) const;
 
 // -- Singleton interface --
   public:

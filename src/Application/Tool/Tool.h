@@ -89,6 +89,7 @@ class Tool {
     std::string tool_type() const  { return tool_type_; }
     std::string toolid() const     { return toolid_; }
 
+
   protected:
     friend class ToolFactory;
     // As each tool is created through the factory the properties and the 
@@ -119,10 +120,25 @@ class Tool {
 
 // -- state variables --
   protected:
-  
     // ADD_STATE:
     // Add a local state variable to the Tool.
-    bool add_state(const std::string& key, StateBase* state) const;
+
+    template<class HANDLE>
+    bool add_state(const std::string& key, HANDLE& state)
+    { 
+      // Step (1): Generate the state variable
+      state = StateHandle(new typename HANDLE::element_type);
+
+      // Step (2): Generate a new unique ID for this state
+      std::string stateid = std::string("ToolManager::")+
+                                            toolid_+std::string("::")+key;
+  
+      // Step (3): Make the state variable aware of its key
+      state->set_stateid(stateid);
+
+      // Step (2): Add the state to the StateManager
+      return (StateManager::instance()->add_state(stateid,state)); 
+    }
     
 };
 

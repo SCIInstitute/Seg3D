@@ -48,8 +48,18 @@
 
 namespace Seg3D {
 
+// STATE:
+// Class that records the state of a variable
+
+template<class T>
+class State;
+
 template<class T>
 class State : public StateBase {
+  public:
+    // One cannot define a templated typedef of StateHandle<>,
+    // Hence we settle for State<T>::Handle
+    typedef boost::shared_ptr<State<T> > Handle;
 
 // -- constructor/destructor --
   public:
@@ -83,7 +93,7 @@ class State : public StateBase {
   
     // DISPATCH:
     // Set the value of this State
-    void dispatch(const T& value)
+    void dispatch(const T& value, bool trigger_update = true)
     {
       ActionSetHandle action(new ActionSet);
       action->set(stateid_,value);
@@ -96,6 +106,15 @@ class State : public StateBase {
     {
       return value_;
     }
+
+    // SET:
+    // Set the value in this State variable
+    void set(const T& val)
+    {
+      value_ = val;
+      value_changed_signal_();
+    }
+
 
     // EXPORT_TO_STRING:
     // Convert the contents of the State into a string
@@ -129,7 +148,7 @@ class State : public StateBase {
     // CONNECT_VALUE_CHANGED: 
     // Connect a functor to the internal signal
     template <class FUNCTOR>
-    boost::signals2::connection connect_value_changed(FUNCTOR functor)
+    boost::signals2::connection connect(FUNCTOR functor)
     {
       return value_changed_signal_.connect(functor);
     }
@@ -163,7 +182,8 @@ class State : public StateBase {
 
     // IMPORT_FROM_VARIANT:
     // Import the state data from a variant parameter.  
-    virtual bool import_from_variant(ActionVariantParameter& variant)
+    virtual bool import_from_variant(ActionVariantParameter& variant, 
+                                     bool trigger_signal = true)
     {
       T val;
       if(!(variant.get_value(val))) return (false);

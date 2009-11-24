@@ -49,6 +49,7 @@
 #include <Interface/AppInterface/ToolManagerInterface.h>
 #include <Interface/AppInterface/LayerManagerInterface.h>
 #include <Interface/AppInterface/ViewerInterface.h>
+#include <Interface/AppInterface/MenuBar.h>
 
 namespace Seg3D {
 
@@ -71,7 +72,7 @@ class AppInterface : public QMainWindow
   
     // virtual constructor needed by Qt to destroy this object
     virtual ~AppInterface();
-    
+  
   public:
   
     ViewerInterface* get_viewer_interface() {  return viewer_interface_; }

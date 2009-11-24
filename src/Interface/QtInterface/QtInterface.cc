@@ -89,6 +89,9 @@ QtInterface::exec()
   {
     SCI_LOG_DEBUG("Starting Qt main event loop");
     qapplication_->exec();
+    
+    delete qapplication_;
+    qapplication_ = 0;
   }
   catch(...)
   {
@@ -98,6 +101,31 @@ QtInterface::exec()
   
   return (true);
 }
+
+
+void QtCheckBoxSignal(QPointer<QCheckBox> qobject_ptr, bool state)
+{
+  if (!(Interface::instance()->is_interface_thread()))
+  {
+    PostInterface(boost::bind(&QtCheckBoxSignal,qobject_ptr,state));
+    return;
+  }
+
+  if (qobject_ptr) qobject_ptr->setChecked(state); 
+}
+
+bool
+QtInterface::connect(QCheckBox* qcheckbox, State<bool>::Handle& state_handle)
+{
+  // Connect the dispatch into the StateVariable (with auxillary object)
+  QtCheckBoxSlot* slot = new QtCheckBoxSlot(qcheckbox,state_handle);
+    
+  // Connect the state signal back into the Qt Variable  
+  state_handle->connect(boost::bind(&QtCheckBoxSignal,qcheckbox,_1));
+  
+  return (true);
+}
+
 
 // Singleton instantiation
 Utils::Singleton<QtInterface> QtInterface::instance_;

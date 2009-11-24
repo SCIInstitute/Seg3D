@@ -87,7 +87,7 @@ int main(int argc, char **argv)
     
   // -- Run QT event loop --
   SCI_LOG_DEBUG("Start the main QT event loop");
-  
+    
   if (!(QtInterface::instance()->exec()))
   {
     SCI_LOG_ERROR("Interface thread crashed");  

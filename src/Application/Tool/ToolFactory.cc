@@ -43,10 +43,10 @@ ToolFactory::is_tool_type(const std::string& tool_type) const
 }
 
 bool 
-ToolFactory::list_tools(tool_properties_list_type& tool_list) const
+ToolFactory::list_tool_types(tool_properties_list_type& tool_types_list) const
 {
   // clear the list
-  tool_list.clear();
+  tool_types_list.clear();
   properties_map_type::const_iterator it = tool_properties_.begin();
 
   // loop through all the tools
@@ -55,18 +55,18 @@ ToolFactory::list_tools(tool_properties_list_type& tool_list) const
     tool_properties_pair_type properties_pair = 
       make_pair((*it).first,(*it).second);
     ++it;
-    tool_list.push_back(properties_pair);
+    tool_types_list.push_back(properties_pair);
   }
-  if (tool_list.size() == 0) return (false);
+  if (tool_types_list.size() == 0) return (false);
   return (true);
 }
     
     
 bool 
-ToolFactory::list_tools_with_interface(tool_properties_list_type& tool_list) const
+ToolFactory::list_tool_types_with_interface(tool_properties_list_type& tool_types_list) const
 {
   // clear the list
-  tool_list.clear();
+  tool_types_list.clear();
   properties_map_type::const_iterator it = tool_properties_.begin();
 
   // loop through all the tools
@@ -78,10 +78,10 @@ ToolFactory::list_tools_with_interface(tool_properties_list_type& tool_list) con
     // check whether the interface exists
     if (toolinterface_builders_.find((*it).first) == toolinterface_builders_.end())
     {
-      tool_list.push_back(properties_pair);
+      tool_types_list.push_back(properties_pair);
     }
   }
-  if (tool_list.size() == 0) return (false);
+  if (tool_types_list.size() == 0) return (false);
   return (true);  
 }
 

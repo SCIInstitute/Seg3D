@@ -60,11 +60,11 @@ class StateManager : public boost::noncopyable {
     // ADD_STATE:
     // Add the base of a state variable to the central state database in
     // StateManager. 
-    bool add_state(const std::string& stateid, StateBase* state);
+    bool add_state(const std::string& stateid, StateBaseHandle& state);
   
     // GET_STATE:
     // Get pointer to the state variable based on the unique state tag
-    StateBase* get_state(const std::string& stateid);
+    bool get_state(const std::string& stateid, StateBaseHandle& state);
     
     // REMOVE_STATE:
     // Remove all the state variables that derive from the tag and the tag 
@@ -73,7 +73,7 @@ class StateManager : public boost::noncopyable {
     void remove_state(const std::string& stateid);
     
   private:
-    typedef boost::unordered_map<std::string,StateBase*> state_map_type;
+    typedef boost::unordered_map<std::string,StateBaseHandle> state_map_type;
 
     // Map containing pointers to the State variables in the class under control
     // by the StateManager

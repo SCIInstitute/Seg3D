@@ -33,6 +33,9 @@
 # pragma once
 #endif 
 
+// STL 
+#include <functional>
+
 // Core includes
 #include <Utils/Core/Log.h>
 #include <Utils/Singleton/Singleton.h>
@@ -60,7 +63,7 @@ class Interface : public Utils::EventHandler {
 
     // CREATE_ACTION_CONTEXT:
     // Create a new action context
-    ActionContextHandle create_action_context();
+    ActionContextHandle create_action_context(bool update_interface = true);
 
 // -- Interface thread --    
     
@@ -82,10 +85,20 @@ class Interface : public Utils::EventHandler {
     
 };
 
+// POSTINTERFACE:
+// Post a functor to the interface thread
+
+template<class FUNCTOR>
+void PostInterface(FUNCTOR functor)
+{
+  Interface::instance()->post_event(functor);
+}
+
+    
 // RUNACTIONFROMINTERFACE:
 // Function that runs an action with the interface context
 
-void RunActionFromInterface(ActionHandle action);
+void RunActionFromInterface(ActionHandle action, bool update_interface = true );
 
 } // end namespace Seg3D
 

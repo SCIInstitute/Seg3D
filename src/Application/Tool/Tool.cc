@@ -61,16 +61,4 @@ Tool::close_tool()
   StateManager::instance()->remove_state(tool_stateid);
 }
 
-bool
-Tool::add_state(const std::string& key, StateBase* state) const
-{
-  std::string stateid = std::string("ToolManager::")+toolid_+std::string("::")+key;
-  
-  // Step (1): Make the state variable aware of its key
-  state->set_stateid(stateid);
-
-  // Step (2): Add the state to the StateManager
-  return (StateManager::instance()->add_state(stateid,state));  
-}
-
 }

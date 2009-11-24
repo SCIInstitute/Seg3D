@@ -64,7 +64,7 @@ class LayerManagerInterface : public QDockWidget
     virtual ~LayerManagerInterface();   
 
 // -- internals --    
-  private slots:
+  private Q_SLOTS:
     void worldCoordsChanged();
     void indexCoordsChanged();
 

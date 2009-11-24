@@ -45,6 +45,9 @@
 
 namespace Seg3D {
 
+class StateBase;
+typedef boost::shared_ptr<StateBase> StateBaseHandle;
+
 class StateBase : public boost::noncopyable {
 
 // -- destructor --
@@ -72,7 +75,7 @@ class StateBase : public boost::noncopyable {
     // Set the unique id to be used to locate this state variable
     void set_stateid(const std::string& stateid) { stateid_ = stateid; }
     
-  private:
+  protected:
     std::string stateid_;
     
 // -- import from ActionVariantParameter --
@@ -88,7 +91,8 @@ class StateBase : public boost::noncopyable {
     
     // IMPORT_FROM_VARIANT:
     // Import the state data from a variant parameter.
-    virtual bool import_from_variant(ActionVariantParameter& variant) = 0;
+    virtual bool import_from_variant(ActionVariantParameter& variant,
+                                     bool trigger_signal = true) = 0;
     
     // EXPORT_TO_VARIANT
     // Export the state data to a variant parameter

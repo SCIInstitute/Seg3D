@@ -35,7 +35,7 @@ Interface::Interface()
 }
 
 ActionContextHandle
-Interface::create_action_context()
+Interface::create_action_context(bool update_interface)
 {
   return (ActionContextHandle(new ActionContext));
 }
@@ -43,10 +43,10 @@ Interface::create_action_context()
 // Singleton instance
 Utils::Singleton<Interface> Interface::instance_;
 
-void RunActionFromInterface(ActionHandle action)
+void RunActionFromInterface(ActionHandle action, bool update_interface)
 {
   ActionDispatcher::instance()->run_action(action,
-                              Interface::instance()->create_action_context());
+              Interface::instance()->create_action_context(update_interface));
 }
 
 

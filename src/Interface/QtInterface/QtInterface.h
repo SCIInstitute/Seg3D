@@ -35,6 +35,7 @@
 
 // Qt includes
 #include <QApplication>
+#include <QtGui>
 
 // Boost includes
 #include <boost/thread/mutex.hpp>
@@ -42,7 +43,12 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
 
+// Utils includes
 #include <Utils/Singleton/Singleton.h>
+
+// Application includes
+#include <Application/State/State.h>
+
 
 namespace Seg3D {
 
@@ -66,17 +72,30 @@ class QtInterface : public boost::noncopyable {
 
     // EXEC:
     // Start the interface execution
+    // This effectively will start the program.
     bool exec();
 
 // -- accessors --
-
+  public:
     // GET_QAPPLICATION:
     // Get the pointer to the main qt application
+    // NOTE: This function should only be called from the interface thread
     QApplication* get_qapplication() { return qapplication_; }
 
   private:  
     // main QT application class
     QApplication* qapplication_;
+
+
+// -- widget connectors --
+  public:
+    
+    // CONNECT:
+    // A series of helper functions to directly connect a widget with its underlying
+    // State variable.
+    
+    static bool connect(QCheckBox* qcheckbox, State<bool>::Handle& state_handle);
+
 
 
 // -- Singleton interface --

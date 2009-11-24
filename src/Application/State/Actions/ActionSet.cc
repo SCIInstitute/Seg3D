@@ -40,9 +40,10 @@ bool
 ActionSet::validate(ActionContextHandle& context)
 {
   // Check whether the state exists
-  StateBase* state = StateManager::instance()->get_state(stateid_.value());
-  // If not this action is invalid
-  if (state == 0) 
+  StateBaseHandle state;
+  
+  // If not the state cannot be retrieved report an error
+  if (!(StateManager::instance()->get_state(stateid_.value(),state))) 
   {
     context->report_error(
       std::string("Unknown state variable '")+stateid_.value()+"'");
@@ -70,10 +71,17 @@ bool
 ActionSet::run(ActionContextHandle& context)
 {
   // Get the state
-  StateBase* state = StateManager::instance()->get_state(stateid_.value());
-  // Set the value
-  state->import_from_variant(statevalue_);
-  return (true);
+  StateBaseHandle state; 
+  if( StateManager::instance()->get_state(stateid_.value(),state) )
+  {
+    // Set the value
+    state->import_from_variant(statevalue_,context->update_interface());
+    return (true);
+  }
+  else
+  {
+    return (false);
+  }
 }
 
 } // end namespace Seg3D
