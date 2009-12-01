@@ -47,7 +47,7 @@
 #include <Utils/Singleton/Singleton.h>
 
 // Application includes
-#include <Application/State/State.h>
+#include <Application/State/StateHandler.h>
 
 
 namespace Seg3D {
@@ -94,7 +94,7 @@ class QtInterface : public boost::noncopyable {
     // A series of helper functions to directly connect a widget with its underlying
     // State variable.
     
-    static bool connect(QCheckBox* qcheckbox, State<bool>::Handle& state_handle);
+    static bool connect(QCheckBox* qcheckbox, StateValue<bool>::Handle& state_handle);
 
 
 

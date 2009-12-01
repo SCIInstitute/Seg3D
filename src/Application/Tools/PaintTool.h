@@ -37,35 +37,38 @@ class PaintTool : public Tool {
 
 // -- constructor/destructor --
   public:
-    PaintTool();
+    PaintTool(const std::string& toolid);
     virtual ~PaintTool();
-    
-// -- dispatcher --
-  public:
-    void dispatch_paint();
 
+// -- constraint parameters --
+
+    // Constrain viewer to right painting tool when layer is selected
+    void active_constraint();
+
+    // Constrain state to right options when mask layer is selected
+    void mask_constraint();
+    
+// -- handle updates from layermanager --    
+    
+    void handle_layermanager_changed();
+    
 // -- state --
   public:
     // Layerid of the target layer
-    State<std::string>::Handle  target_layer_;
+    StateValue<std::string>::Handle  active_layer_;
     // Layerid of the masking layer
-    State<std::string>::Handle  mask_layer_;
-    // Layerid of the data layer
-    State<std::string>::Handle  data_layer_;
+    StateValue<std::string>::Handle  mask_layer_;
     
     // Radius of the brush
-    State<double>::Handle       brush_radius_;
+    StateClampedValue<int>::Handle         brush_radius_;
     // Upper threshold for painting
-    State<double>::Handle       upper_threshold_;
+    StateClampedValue<float>::Handle       upper_threshold_;
     // Lower threshold for painting
-    State<double>::Handle       lower_threshold_;
+    StateClampedValue<float>::Handle       lower_threshold_;
 
     // Erase data
-    State<bool>::Handle         erase_data_;
-    // Constrain mask layer
-    State<bool>::Handle         constrain_mask_;
-    // Constrain data layer
-    State<bool>::Handle         constrain_data_;
+    StateValue<bool>::Handle               erase_;
+
 };
 
 } // end namespace

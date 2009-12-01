@@ -26,28 +26,46 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#include <Application/Interface/Interface.h>
+#ifndef APPLICATION_STATE_STATEVALUE_H
+#define APPLICATION_STATE_STATEVALUE_H
+
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+# pragma once
+#endif
+
+#include <Application/State/State.h>
 
 namespace Seg3D {
 
-Interface::Interface()
-{
-}
+// STATEVALUE:
+// This class is a specification of State that is use to hold a single unbound
+// instance of a value.
 
-ActionContextHandle
-Interface::create_action_context(bool update_interface)
-{
-  return (ActionContextHandle(new ActionContext));
-}
+template<class T>
+class StateValue;
 
-// Singleton instance
-Utils::Singleton<Interface> Interface::instance_;
+template<class T>
+class StateValue : public State<T> {
+  public:
+    // One cannot define a templated typedef of StateHandle<>,
+    // Hence we settle for StateValue<T>::Handle
+    typedef boost::shared_ptr<StateValue<T> > Handle;
 
-void PostActionFromInterface(ActionHandle action, bool update_interface)
-{
-  ActionDispatcher::instance()->post_action(action,
-              Interface::instance()->create_action_context(update_interface));
-}
+// -- constructor/destructor --
+  public:
 
+    // It is always good to initialize a state value before
+    // using it.
+    StateValue(const T& default_value) :
+      State<T>(default_value)
+    {
+    }
+
+    virtual ~StateValue()
+    {
+    }
+};
 
 } // end namespace Seg3D
+
+#endif

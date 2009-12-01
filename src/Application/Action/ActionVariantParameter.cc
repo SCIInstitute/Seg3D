@@ -58,4 +58,58 @@ ActionVariantParameter::import_from_string(const std::string& str)
   string_value_ = str;
 }
 
+bool 
+ActionVariantParameter::validate_and_compare_option_value(
+               const std::vector<std::string>& option_list,
+               const std::string& old_val,
+               bool& changed,
+               std::string& error)
+{
+  // If a typed version exists
+  if (typed_value_.get())
+  {
+    // if the typed version exists, use that one
+    // use a dynamic cast to ensure that the type is correct
+    ActionParameter<std::string>* param_ptr = 
+        dynamic_cast<ActionParameter<std::string>*>(typed_value_.get());
+    if (param_ptr == 0) 
+    {
+      error = "The value stored in the parameter is not of the right type";
+      return (false);
+    }
+    std::string value = Utils::string_to_lower(param_ptr->value());
+    
+    if (option_list.end() == std::find(option_list.begin(),option_list.end(),
+        value)) 
+    {
+      error = "The option value is not one of the predefined options";
+      return (false);
+    }
+    
+    changed = (old_val != value);
+    return (true);
+  }
+  else
+  {
+    // Generate a new typed version. So it is only converted once
+    typed_value_ = ActionParameterBaseHandle(new ActionParameter<std::string>);
+    if(!(typed_value_->import_from_string(string_value_))) 
+    {
+      error = "The value '"+string_value_+"' cannot be converted into type string";
+      return (false);
+    }
+    ActionParameter<std::string>* param_ptr = 
+            static_cast<ActionParameter<std::string>*>(typed_value_.get());
+    std::string value = Utils::string_to_lower(param_ptr->value());
+    
+    if (option_list.end() == std::find(option_list.begin(),option_list.end(),
+          value)) 
+    {
+      error = "The option value is not one of the predefined options";
+      return (false);
+    }
+    return (true);           
+  }
+}
+
 } // end namespace Seg3D

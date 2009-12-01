@@ -33,6 +33,7 @@
 namespace Seg3D {
 
 Tool::Tool(const std::string& toolid) :
+  StateHandler(std::string("ToolManager::")+toolid),
   toolid_(toolid)
 {
   ToolManager::instance()->add_toolid(toolid);
@@ -52,13 +53,43 @@ Tool::~Tool()
 }
 
 void
-Tool::close_tool()
+Tool::close()
 {
-  // Remove all the pointers to the internal state of this tool from the
-  // StateManager. This will inhibit any updates from being executed to
-  // update the state of this tool.
-  std::string tool_stateid = std::string("ToolManager::")+toolid_;
-  StateManager::instance()->remove_state(tool_stateid);
+
+}
+
+void 
+Tool::add_connection(boost::signals2::connection connection)
+{
+  connection_list_.push_back(connection);
+}
+
+void
+Tool::close_connections()
+{  
+  // Delete all the connections
+  connection_list_type::iterator it = connection_list_.begin();
+  connection_list_type::iterator it_end = connection_list_.end();
+  while (it !=  it_end)
+  {
+    (*it).disconnect();
+    ++it;
+  }
+  
+  // Clear the list
+  connection_list_.clear();
+}
+
+void
+Tool::activate()
+{
+  // Defaults to doing nothing
+}
+
+void
+Tool::deactivate()
+{
+  // Defaults to doing nothing
 }
 
 }

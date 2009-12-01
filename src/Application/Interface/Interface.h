@@ -98,7 +98,7 @@ void PostInterface(FUNCTOR functor)
 // RUNACTIONFROMINTERFACE:
 // Function that runs an action with the interface context
 
-void RunActionFromInterface(ActionHandle action, bool update_interface = true );
+void PostActionFromInterface(ActionHandle action, bool update_interface = true );
 
 } // end namespace Seg3D
 

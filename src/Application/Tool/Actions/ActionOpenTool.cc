@@ -70,7 +70,9 @@ ActionOpenTool::validate(ActionContextHandle& context)
 bool 
 ActionOpenTool::run(ActionContextHandle& context)
 {
+  // Open and Activate the tool
   ToolManager::instance()->open_tool(tool_type_.value(),toolid_.value());
+  ToolManager::instance()->activate_tool(toolid_.value());
   return (true); // success
 }
 

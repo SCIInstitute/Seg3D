@@ -34,10 +34,12 @@
 
 #include <Application/Tool/Actions/ActionOpenTool.h>
 #include <Application/Tool/Actions/ActionCloseTool.h>
+#include <Application/Tool/Actions/ActionActivateTool.h>
 
 namespace Seg3D {
 
-ToolManager::ToolManager() 
+ToolManager::ToolManager() :
+  StateHandler("ToolManager")
 {
 }
 
@@ -54,7 +56,7 @@ ToolManager::dispatch_opentool(const std::string& tool_name) const
   // Set the action parameters
   action->set(tool_name,"");
   // Run the action on the application thread
-  RunActionFromInterface(action);
+  PostActionFromInterface(action);
 }
 
 void
@@ -65,7 +67,18 @@ ToolManager::dispatch_closetool(const std::string& toolid) const
   // Set the action parameters
   action->set(toolid);
   // Run the action on the application thread
-  RunActionFromInterface(action);
+  PostActionFromInterface(action);
+}
+
+void
+ToolManager::dispatch_activatetool(const std::string& toolid) const
+{
+  // Build new action
+  ActionActivateToolHandle action(new ActionActivateTool);
+  // Set the action parameters
+  action->set(toolid);
+  // Run the action on the application thread
+  PostActionFromInterface(action);
 }
 
 
@@ -74,7 +87,7 @@ ToolManager::dispatch_closetool(const std::string& toolid) const
 // application thread. Hence the function is always executed by the same thread.
 
 bool
-ToolManager::open_tool(const std::string& tool_type, std::string toolid)
+ToolManager::open_tool(const std::string& tool_type,std::string toolid)
 {
   // Step (1): If no tool id was supplied, create a new unique one
   if (toolid == "") toolid = create_toolid(tool_type);
@@ -101,13 +114,17 @@ ToolManager::open_tool(const std::string& tool_type, std::string toolid)
   return (true);
 }
 
+// THREAD-SAFETY:
+// Only ActionCloseTool calls this function and this action is only run on the
+// application thread. Hence the function is always executed by the same thread.
+
 void
 ToolManager::close_tool(const std::string& toolid)
 {
   ToolHandle tool;
  
-  {
-   // Step (1): Find the tool in the list.
+  { // within this scope the lists are locked
+    // Step (1): Find the tool in the list.
 
     boost::unique_lock<boost::mutex> lock(tool_list_lock_);
     tool_list_type::iterator it = tool_list_.find(toolid);
@@ -116,20 +133,82 @@ ToolManager::close_tool(const std::string& toolid)
       SCI_LOG_ERROR(std::string("Toolid '"+toolid+"' does not exist"));
       return;
     }
-    
-    // Step (2): Move the tool from the list. The tool handle still persists
-    // and will be removed after the signal has been posted.
     tool = (*it).second;
+        
+     // Step (2): Ensure that the tool is not the active tool
+    if (toolid == active_toolid_)
+    {
+      // Call the tool deactivate function that will unregister the current
+      // tool bindings
+      tool->deactivate();
+      
+      // Set no tool as active
+      active_toolid_ = "";
+    }
+  
+   
+    // Step (3): Move the tool from the list. The tool handle still persists
+    // and will be removed after the signal has been posted.
+
     tool_list_.erase(it);
+
+    // Step (4): Run the function in the tool that cleans up the parts that
+    // need to be cleaned up on the interface thread.
+    tool->close();  
+
+    // Step (5): Close any of the registered connections
+    tool->close_connections();      
   }
-  // Step (3): Remove the links to the StateManager.
   
-  tool->close_tool();  
-    
-  // Step (4): Signal that the tool will be closed.   
+  // Step (6): Signal that the tool will be closed.   
   close_tool_signal_(tool);
-  
 }
+
+// THREAD-SAFETY:
+// Only ActionActivateTool calls this function and this action is only run on the
+// application thread. Hence the function is always executed by the same thread.
+
+void
+ToolManager::activate_tool(const std::string& toolid)
+{
+  // Check if anything needs to be done
+  if (toolid == active_toolid_) return;
+
+  ToolHandle tool;
+  { // within this scope the lists are locked
+
+    // Step (1): Find the tool in the list.
+    boost::unique_lock<boost::mutex> lock(tool_list_lock_);
+    tool_list_type::iterator it = tool_list_.find(active_toolid_);
+
+    // Step (2): Deactivate tool if found
+    if (it != tool_list_.end())
+    {
+      (*it).second->deactivate();
+    }
+    
+    // Step (3): Find new active tool
+    it = tool_list_.find(toolid);
+    
+    // Step (4): Activate tool if found
+    if (it != tool_list_.end())
+    {
+      tool = (*it).second;
+      tool->activate();
+      active_toolid_ = toolid;
+    }
+    else
+    {
+      active_toolid_ = "";
+      return;
+    }
+  }
+  
+  // signal for interface
+  activate_tool_signal_(tool);
+}
+
+
 
 void
 ToolManager::add_toolid(const std::string& toolid)

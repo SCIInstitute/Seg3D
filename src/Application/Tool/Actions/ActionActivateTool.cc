@@ -26,28 +26,39 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#include <Application/Interface/Interface.h>
+#include <Application/Tool/ToolManager.h>
+#include <Application/Tool/Actions/ActionActivateTool.h>
 
 namespace Seg3D {
 
-Interface::Interface()
+// REGISTER ACTION:
+// Define a function that registers the action. The action also needs to be
+// registered in the CMake file.
+SCI_REGISTER_ACTION(ActivateTool);
+
+// VALIDATE:
+// As the action could be user input, we need to validate whether the action
+// is valid and can be executed.
+
+bool
+ActionActivateTool::validate(ActionContextHandle& context)
 {
+  if (!(ToolManager::instance()->is_toolid(toolid_.value())))
+  {
+    context->report_error(std::string("ToolID '")+toolid_.value()+"' is invalid");
+    return (false);
+  }
+  
+  return (true); // validated
 }
 
-ActionContextHandle
-Interface::create_action_context(bool update_interface)
+// RUN:
+// The code that runs the actual action
+bool 
+ActionActivateTool::run(ActionContextHandle& context)
 {
-  return (ActionContextHandle(new ActionContext));
+  ToolManager::instance()->activate_tool(toolid_.value());
+  return (true); // success
 }
-
-// Singleton instance
-Utils::Singleton<Interface> Interface::instance_;
-
-void PostActionFromInterface(ActionHandle action, bool update_interface)
-{
-  ActionDispatcher::instance()->post_action(action,
-              Interface::instance()->create_action_context(update_interface));
-}
-
 
 } // end namespace Seg3D

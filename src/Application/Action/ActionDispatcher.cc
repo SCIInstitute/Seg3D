@@ -37,26 +37,45 @@ ActionDispatcher::ActionDispatcher()
 {
 }
 
+
+void
+ActionDispatcher::post_action(ActionHandle action, ActionContextHandle action_context)
+{ 
+  // THREAD SAFETY:
+  // Always relay the function call to the application thread as an event, so
+  // event are handled in the order that they are posted and one action is fully
+  // handled before the next one
+
+  SCI_LOG_DEBUG(std::string("Posting Action: ")+action->action_type());  
+
+  Application::instance()->post_event(boost::bind
+      (&ActionDispatcher::run_action,this,action,action_context));
+}
+
+void
+ActionDispatcher::post_actions(std::vector<ActionHandle> actions, ActionContextHandle action_context)
+{ 
+  // THREAD SAFETY:
+  // Always relay the function call to the application thread as an event, so
+  // event are handled in the order that they are posted and one action is fully
+  // handled before the next one
+
+  for (size_t j = 0;  j < actions.size(); j++)
+  {
+    SCI_LOG_DEBUG(std::string("Posting Action sequence: ")+action[j]->action_type());  
+  }
+  
+  Application::instance()->post_event(boost::bind
+      (&ActionDispatcher::run_actions,this,actions,action_context));
+}
+
+
 void
 ActionDispatcher::run_action(ActionHandle action, ActionContextHandle action_context)
 { 
-  // THREAD SAFETY:
-  // If it is not on the application thread, relay the function call
-  // to the application thread
-  
-  // Synchronization of actions is done by forcing all actions that change the
-  // state of the program to run to an dedicated thread: the application thread.
-  
-  if (!(Application::instance()->is_eventhandler_thread()))
-  {
-    Application::instance()->post_event(boost::bind
-      (&ActionDispatcher::run_action,this,action,action_context));
-    return;
-  }
 
   SCI_LOG_DEBUG(std::string("Processing Action: ")+action->action_type());  
 
-  
   // Step (1): An action needs to be validated before it can be executed. 
   // The validation is a separate step as invalid actions should nor be 
   // posted to the observers recording what the program does
@@ -93,20 +112,6 @@ ActionDispatcher::run_action(ActionHandle action, ActionContextHandle action_con
 void
 ActionDispatcher::run_actions(std::vector<ActionHandle> actions, ActionContextHandle action_context)
 { 
-  // THREAD SAFETY:
-  // If it is not on the application thread, relay the function call
-  // to the application thread
-  
-  // Synchronization of actions is done by forcing all actions that change the
-  // state of the program to run to an dedicated thread: the application thread.
-  
-  if (!(Application::instance()->is_eventhandler_thread()))
-  {
-    Application::instance()->post_event(boost::bind
-      (&ActionDispatcher::run_actions,this,actions,action_context));
-    return;
-  }
-  
   // Now that we are on the application thread
   // Run the actions one by one.
   for (size_t j=0; j<actions.size(); j++)

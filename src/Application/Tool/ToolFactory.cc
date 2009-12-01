@@ -41,47 +41,22 @@ ToolFactory::is_tool_type(const std::string& tool_type) const
   if (it == tool_builders_.end()) return (false);
   return (true);
 }
-
-bool 
-ToolFactory::list_tool_types(tool_properties_list_type& tool_types_list) const
-{
-  // clear the list
-  tool_types_list.clear();
-  properties_map_type::const_iterator it = tool_properties_.begin();
-
-  // loop through all the tools
-  while (it != tool_properties_.end())
-  {
-    tool_properties_pair_type properties_pair = 
-      make_pair((*it).first,(*it).second);
-    ++it;
-    tool_types_list.push_back(properties_pair);
-  }
-  if (tool_types_list.size() == 0) return (false);
-  return (true);
-}
-    
     
 bool 
-ToolFactory::list_tool_types_with_interface(tool_properties_list_type& tool_types_list) const
+ToolFactory::list_tool_types(tool_list_type& tool_list, int tool_group) const
 {
   // clear the list
-  tool_types_list.clear();
-  properties_map_type::const_iterator it = tool_properties_.begin();
+  tool_list.clear();
+  group_map_type::const_iterator it = tool_group_.begin();
 
   // loop through all the tools
-  while (it != tool_properties_.end())
+  while (it != tool_group_.end())
   {
-    tool_properties_pair_type properties_pair = 
-      make_pair((*it).first,(*it).second);
+    if ((*it).second == tool_group) tool_list.push_back((*it).first);
     ++it;
-    // check whether the interface exists
-    if (toolinterface_builders_.find((*it).first) == toolinterface_builders_.end())
-    {
-      tool_types_list.push_back(properties_pair);
-    }
   }
-  if (tool_types_list.size() == 0) return (false);
+  
+  if (tool_list.size() == 0) return (false);
   return (true);  
 }
 
@@ -105,8 +80,8 @@ ToolFactory::create_tool(const std::string& tool_type,
   
   // Step (4): insert the type_name and the properties into the tool
   tool->set_tool_type(tool_type);
-  properties_map_type::const_iterator prop_it = tool_properties_.find(tool_type);
-  tool->set_properties((*prop_it).second);
+  group_map_type::const_iterator group_it = tool_group_.find(tool_type);
+  tool->set_tool_group((*group_it).second);
   
   return (true);
 }

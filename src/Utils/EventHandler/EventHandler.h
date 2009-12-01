@@ -74,15 +74,8 @@ class EventHandler : public boost::noncopyable  {
     template<class FUNCTOR>
     void post_event(FUNCTOR functor)
     {
-      if (is_eventhandler_thread()) 
-      {
-        functor();
-      }
-      else
-      {
-        EventHandle event = EventHandle(new EventT<FUNCTOR>(functor));
-        eventhandler_context_->post_event(event);
-      }
+      EventHandle event = EventHandle(new EventT<FUNCTOR>(functor));
+      eventhandler_context_->post_event(event);
     }
     
     // POST_AND_WAIT_EVENT:

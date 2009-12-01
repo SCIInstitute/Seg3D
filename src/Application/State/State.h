@@ -56,26 +56,12 @@ class State;
 
 template<class T>
 class State : public StateBase {
-  public:
-    // One cannot define a templated typedef of StateHandle<>,
-    // Hence we settle for State<T>::Handle
-    typedef boost::shared_ptr<State<T> > Handle;
 
 // -- constructor/destructor --
   public:
-
-    // It is always good to initialize a state Value before
-    // using it.
+    // Constructor with default value
     State(const T& default_value) :
       value_(default_value)
-    {
-    }
-
-    // Some state values like vectors have default constructors
-    // hence a default value is not always needed and sometimes
-    // more than a hassle. Unfortunately C++ does not have a
-    // default constructor for every class.
-    State()
     {
     }
 
@@ -87,32 +73,31 @@ class State : public StateBase {
       value_changed_signal_.disconnect_all_slots();
     }  
     
-
 // -- set/get value --
   public:
   
     // DISPATCH:
-    // Set the value of this State
-    void dispatch(const T& value, bool trigger_update = true)
+    // Set the value of this state from the interface
+    virtual void dispatch(const T& value, bool trigger_update = true)
     {
       ActionSetHandle action(new ActionSet);
       action->set(stateid_,value);
-      RunActionFromInterface(action);
+      PostActionFromInterface(action,trigger_update);
     }
     
     // GET:
     // Get the value from the State
-    T get() const
+    virtual T get() const
     {
       return value_;
     }
 
     // SET:
     // Set the value in this State variable
-    void set(const T& val)
+    virtual void set(const T& val)
     {
       value_ = val;
-      value_changed_signal_();
+      value_changed_signal_(value_);
     }
 
 
@@ -145,7 +130,7 @@ class State : public StateBase {
   public:
     typedef boost::signals2::signal<void (T)> value_changed_signal_type;
   
-    // CONNECT_VALUE_CHANGED: 
+    // CONNECT: 
     // Connect a functor to the internal signal
     template <class FUNCTOR>
     boost::signals2::connection connect(FUNCTOR functor)
@@ -161,7 +146,7 @@ class State : public StateBase {
     }
     
 // -- actual state of this object --
-  private:
+  protected:
     
     // The value stored in this state Value
     T value_;
@@ -169,15 +154,17 @@ class State : public StateBase {
     // Value changed, this signal is triggered when the value changed
     value_changed_signal_type  value_changed_signal_;
     
-  public:  
-  
+// -- action handling --
+  public:    
     // VALIDATE_AND_COMPARE_VARIANT:
     // Validate that the data contained in the variant parameter can actually
     // be used and check whether it changed from the current value.
     virtual bool validate_and_compare_variant(
-          ActionVariantParameter& variant, bool& changed) const
+          ActionVariantParameter& variant, 
+          bool& changed,
+          std::string& error) const
     {
-      return (variant.validate_and_compare_value<T>(value_,changed));
+      return (variant.validate_and_compare_value<T>(value_,changed,error));
     }
 
     // IMPORT_FROM_VARIANT:
@@ -190,7 +177,7 @@ class State : public StateBase {
       if (val != value_)
       {
         value_ = val;
-        value_changed_signal_();
+        if (trigger_signal) value_changed_signal_(value_);
       }
       return (true);
     }

@@ -115,7 +115,7 @@ void QtCheckBoxSignal(QPointer<QCheckBox> qobject_ptr, bool state)
 }
 
 bool
-QtInterface::connect(QCheckBox* qcheckbox, State<bool>::Handle& state_handle)
+QtInterface::connect(QCheckBox* qcheckbox, StateValue<bool>::Handle& state_handle)
 {
   // Connect the dispatch into the StateVariable (with auxillary object)
   QtCheckBoxSlot* slot = new QtCheckBoxSlot(qcheckbox,state_handle);

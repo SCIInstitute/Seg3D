@@ -55,9 +55,10 @@ ActionSet::validate(ActionContextHandle& context)
   // In any case we need to validate whether the value can be transcribed into
   // the type we want.
   bool changed = false;
-  if(!(state->validate_and_compare_variant(statevalue_,changed)))
+  std::string error;
+  if(!(state->validate_and_compare_variant(statevalue_,changed,error)))
   {
-    context->report_error("The state value cannot be converted into the right type");
+    context->report_error(error);
     return (false);
   }
   

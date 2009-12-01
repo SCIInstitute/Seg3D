@@ -26,28 +26,39 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#include <Application/Interface/Interface.h>
+#include <Application/State/StateHandler.h>
+#include <Application/State/StateManager.h>
 
 namespace Seg3D {
 
-Interface::Interface()
+StateHandler::StateHandler(const std::string& stateid_prefix) :
+  stateid_prefix_(stateid_prefix)
 {
 }
 
-ActionContextHandle
-Interface::create_action_context(bool update_interface)
+StateHandler::~StateHandler()
 {
-  return (ActionContextHandle(new ActionContext));
 }
 
-// Singleton instance
-Utils::Singleton<Interface> Interface::instance_;
-
-void PostActionFromInterface(ActionHandle action, bool update_interface)
+bool 
+StateHandler::add_statebase(const std::string& key, StateBaseHandle& state) const
 {
-  ActionDispatcher::instance()->post_action(action,
-              Interface::instance()->create_action_context(update_interface));
+  // Step (1): Generate a new unique ID for this state
+  std::string stateid = stateid_prefix_+std::string("::")+key;
+
+  // Step (2): Make the state variable aware of its key
+  state->set_stateid(stateid);
+
+  StateBaseHandle old_state;
+  // Step (3): Import the previous setting from the current variable
+  StateManager::instance()->get_state(stateid,old_state);
+  if (old_state.get())
+  { // use the string representation as intermediate
+    state->import_from_string(old_state->export_to_string());
+  }
+
+  // Step (4): Add the state to the StateManager
+  return (StateManager::instance()->add_state(stateid,state)); 
 }
 
-
-} // end namespace Seg3D
+}

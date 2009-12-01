@@ -47,6 +47,8 @@ SET(APPLICATION_TOOL_ACTIONS_SRCS
   Actions/ActionOpenTool.cc
   Actions/ActionCloseTool.h
   Actions/ActionCloseTool.cc
+  Actions/ActionActivateTool.h
+  Actions/ActionActivateTool.cc
   )
 
 ADD_LIBRARY(Application_Tool STATIC 

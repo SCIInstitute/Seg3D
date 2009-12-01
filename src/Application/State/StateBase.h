@@ -65,7 +65,6 @@ class StateBase : public boost::noncopyable {
     virtual bool import_from_string(const std::string& str) = 0;
     
 // -- stateid handling --
-  
   public:
     // GET_STATEID:
     // Get the unique id assigned to the state variable
@@ -87,7 +86,8 @@ class StateBase : public boost::noncopyable {
     // Validate that the data contained in the variat parameter can actually
     // be used.
     virtual bool validate_and_compare_variant(ActionVariantParameter& variant, 
-                                  bool& changed) const = 0;
+                                              bool& changed,
+                                              std::string& error) const = 0;
     
     // IMPORT_FROM_VARIANT:
     // Import the state data from a variant parameter.

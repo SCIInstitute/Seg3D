@@ -26,28 +26,42 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#include <Application/Interface/Interface.h>
+#ifndef APPLICATION_TOOL_ACTIONS_ACTIONACTIVATETOOL_H
+#define APPLICATION_TOOL_ACTIONS_ACTIONACTIVATETOOL_H
+
+#include <Application/Action/Action.h>
+#include <Application/Action/ActionFactory.h>
 
 namespace Seg3D {
 
-Interface::Interface()
-{
-}
+class ActionActivateTool : public Action {
 
-ActionContextHandle
-Interface::create_action_context(bool update_interface)
-{
-  return (ActionContextHandle(new ActionContext));
-}
+// -- Constructor/Destructor --
+  public:
+    ActionActivateTool() :
+      Action("ActivateTool",APPLICATION_E)
+    {
+      add_argument(toolid_);
+    }
+    
+    virtual ~ActionActivateTool() 
+    {}
 
-// Singleton instance
-Utils::Singleton<Interface> Interface::instance_;
+    void set(const std::string& toolid)
+    {
+      toolid_.value() = toolid;
+    }
 
-void PostActionFromInterface(ActionHandle action, bool update_interface)
-{
-  ActionDispatcher::instance()->post_action(action,
-              Interface::instance()->create_action_context(update_interface));
-}
+// -- Functions that describe action --
+    virtual bool validate(ActionContextHandle& context);
+    virtual bool run(ActionContextHandle& context);
+    
+// -- Action parameters --
+    ActionParameter<std::string> toolid_;
+};
 
+typedef boost::shared_ptr<ActionActivateTool> ActionActivateToolHandle;
 
 } // end namespace Seg3D
+
+#endif

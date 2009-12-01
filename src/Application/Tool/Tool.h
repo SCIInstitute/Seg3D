@@ -33,6 +33,7 @@
 #include <string>
 
 // Boost includes
+#include <boost/signals2/signal.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
 
@@ -42,7 +43,7 @@
 
 // Application includes
 #include <Application/State/StateManager.h>
-#include <Application/State/State.h>
+#include <Application/State/StateHandler.h>
 
 namespace Seg3D {
 
@@ -53,28 +54,18 @@ class Tool;
 typedef boost::shared_ptr<Tool> ToolHandle;
 
 
-class Tool {
-// -- definition of tool types --
-  // Tool types help organize the tools in different catagories
+class Tool : public StateHandler {
+// -- definition of tool groups --
+  // Tool groups help organize the tools in different catagories
   
-  enum tool_properties_type {
-    // TOOL - Tool is not a filter
-    TOOL_E   = 0x0001,
+  enum {
+    // Tools for Tool Menu
+    TOOL_E   = 1,
     
-    // MASK_FILTER - Tool is a filter
-    MASK_FILTER_E = 0x0002,
-
-    // DATA_FILTER - Tool is a filter
-    DATA_FILTER_E = 0x0002,
-    
-    // OUTPUTS_DATAVOLUME - Filter/tool works on datavolume
-    OUTPUTS_DATAVOLUME_E  = 0x0100,
-
-    // OUTPUTS_MASKVOLUME - Filter/tool works on maskvolume
-    OUTPUTS_MASKVOLUME_E  = 0x0200,
-
-    // OUTPUTS_LABELVOLUME - Filter/tool works on labelvolume
-    OUTPUTS_LABELVOLUME_E = 0x0400
+    // Tools for the filter menu
+    DATATODATA_FILTER_E = 2,
+    DATATOMASK_FILTER_E = 3,
+    MASKTOMASK_FILTER_E = 4
   };
 
 
@@ -83,9 +74,9 @@ class Tool {
     Tool(const std::string& toolid);
     virtual ~Tool();
 
-// -- tool_type/toolid --
+// -- tool_group/tool_type/toolid --
 
-    int         properties() const { return properties_; }
+    int         tool_group() const { return tool_group_; }
     std::string tool_type() const  { return tool_type_; }
     std::string toolid() const     { return toolid_; }
 
@@ -101,45 +92,57 @@ class Tool {
     // factory and then inserted into the Tool object upon creation. This
     // avoids duplicating the properties and typename registration.
     
-    void set_properties(int properties)              { properties_ = properties; }
+    void set_tool_group(int tool_group)              { tool_group_ = tool_group; }
     void set_tool_type(const std::string& tool_type) { tool_type_ = tool_type; }
 
   private:
     std::string           toolid_;
-    int                   properties_;    
+    int                   tool_group_;    
     std::string           tool_type_;
-
+    
 // -- close tool --
-  protected:
-    friend class ToolManager;
+  public:  
+    // CLOSE:
+    // This function is called when the application closes the tool. It is meant
+    // to disconnect all connections. Since close tool is called synchronously
+    // on the application thread, it can clean out most of the underlying
+    // connections safely.
+    // NOTE: since the tool handle is given to the user interface, the user
+    // interface thread may issue the final destruction of the class. Hence all
+    // thread critical pieces should be done by this function. 
+    virtual void close();
+
+// -- connection management --
+  public:
+    // ADD_CONNECTION:
+    // Add connections to the local tool database so they can be cleanup when
+    // the tool is closed.
     
-    // CLOSE_TOOL:
-    // Function for cleaning up the application part of the tool
-    // This one needs to cleanup the state variables.
-    virtual void close_tool();
-
-// -- state variables --
-  protected:
-    // ADD_STATE:
-    // Add a local state variable to the Tool.
-
-    template<class HANDLE>
-    bool add_state(const std::string& key, HANDLE& state)
-    { 
-      // Step (1): Generate the state variable
-      state = StateHandle(new typename HANDLE::element_type);
-
-      // Step (2): Generate a new unique ID for this state
-      std::string stateid = std::string("ToolManager::")+
-                                            toolid_+std::string("::")+key;
+    void add_connection(boost::signals2::connection connection);
   
-      // Step (3): Make the state variable aware of its key
-      state->set_stateid(stateid);
-
-      // Step (2): Add the state to the StateManager
-      return (StateManager::instance()->add_state(stateid,state)); 
-    }
+  
+  protected:
+    // CLOSE_CONNECTIONS:
+    // Close the conenctions registered using add connection when the tool is
+    // closed.
+    friend class ToolManager;
+    void close_connections();
     
+  private:
+    typedef std::list<boost::signals2::connection> connection_list_type;
+    connection_list_type connection_list_;
+
+// -- activate/deactivate --
+  public:
+    // ACTIVATE:
+    // Activate a tool: this tool is set as the active tool and hence it should
+    // setup the right mouse tools in the viewers.
+    virtual void activate();
+    
+    // DEACTIVATE:
+    // Deactivate a tool. A tool is always deactivate before the next one is 
+    // activated.
+    virtual void deactivate();
 };
 
 } // end namespace Seg3D

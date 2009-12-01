@@ -53,21 +53,33 @@ class ActionDispatcher : public boost::noncopyable {
     ActionDispatcher();
 
 // -- Action handling --
-  
-  public:    
-    // RUN_ACTION:
-    // Run an action in the application thread. If this function is called from
+  public:
+    // POST_ACTION:
+    // Post an action in the application thread. If this function is called from
     // an other thread, the action is posted on the stack of actions that need
     // to be processed. Each action needs to be posted with an ActionContextHandle
     // with describes whether feedback from the action needs to posted.
     // The action context needs to be created before posting the action
     
-    void run_action(ActionHandle action, ActionContextHandle action_context); // << THREAD-SAFE SLOT       
+    void post_action(ActionHandle action, ActionContextHandle action_context); // << THREAD-SAFE SLOT       
+
+    // POST_ACTIONS:
+    // Post multiple actions in specified order
+
+    void post_actions(std::vector<ActionHandle> actions, ActionContextHandle action_context); // << THREAD-SAFE SLOT   
+  
+  
+  private:
+  
+    // RUN_ACTION:
+    // Run the action
+    
+    void run_action(ActionHandle action, ActionContextHandle action_context);      
 
     // RUN_ACTIONS:
     // Run multiple actions in specified order
 
-    void run_actions(std::vector<ActionHandle> actions, ActionContextHandle action_context); // << THREAD-SAFE SLOT   
+    void run_actions(std::vector<ActionHandle> actions, ActionContextHandle action_context);   
 
 // -- Action monitoring --
 
@@ -107,12 +119,12 @@ class ActionDispatcher : public boost::noncopyable {
     static Utils::Singleton<ActionDispatcher> instance_;
 };
 
-// FUNCTION RunAction:
+// FUNCTION PostAction:
 // This function is a short cut to posting an action using the dispatcher
  
-inline void RunAction(ActionHandle action, ActionContextHandle action_context)
+inline void PostAction(ActionHandle action, ActionContextHandle action_context)
 {
-  ActionDispatcher::instance()->run_action(action, action_context);
+  ActionDispatcher::instance()->post_action(action, action_context);
 }
 
 } // namespace Seg3D

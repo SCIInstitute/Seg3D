@@ -42,7 +42,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
 
-// Core includes
+// Utils includes
 #include <Utils/Core/StringUtil.h>
 #include <Utils/Singleton/Singleton.h>
 
@@ -130,7 +130,7 @@ class ToolFactory : public boost::noncopyable  {
     // factory.
   
     template <class TOOL>
-    void register_tool(std::string tool_name, int properties)
+    void register_tool(std::string tool_name, int tool_group)
     {
       tool_name = Utils::string_to_lower(tool_name);
       // Lock the factory
@@ -148,7 +148,7 @@ class ToolFactory : public boost::noncopyable  {
 
       // Register the action and set its properties
       tool_builders_[tool_name] = new ToolBuilder<TOOL>;
-      tool_properties_[tool_name] = properties;
+      tool_group_[tool_name] = tool_group;
       
       SCI_LOG_DEBUG(std::string("Registering tool : ") + tool_name);
     }
@@ -157,12 +157,12 @@ class ToolFactory : public boost::noncopyable  {
   
     // Mutex protecting the singleton interface  
     typedef boost::unordered_map<std::string,ToolBuilderBase*>  tool_map_type;
-    typedef boost::unordered_map<std::string,int>               properties_map_type;
+    typedef boost::unordered_map<std::string,int>               group_map_type;
     
     // List with builders that can be called to generate a new object
-    tool_map_type         tool_builders_;
-    // List with properties per tool
-    properties_map_type   tool_properties_;
+    tool_map_type     tool_builders_;
+    // List with group of each tool
+    group_map_type   tool_group_;
     
     // Mutex for protecting registration
     boost::mutex     tool_builders_mutex_;
@@ -222,21 +222,16 @@ class ToolFactory : public boost::noncopyable  {
 
 // -- List of tools and interfaces --
   public:
-    typedef std::pair<std::string,int>             tool_properties_pair_type;
-    typedef std::vector<tool_properties_pair_type> tool_properties_list_type;
+    typedef std::vector<std::string> tool_list_type;
 
     // IS_TOOL_TYPE:
     // Check whether a tool with a specified name is available
     bool is_tool_type(const std::string& tool_type) const;
 
-    // LIST_TOOLS:
-    // List the tools with the properties associated with them
-    bool list_tool_types(tool_properties_list_type& tool_types_list) const;
+    // LIST_TOOL_TYPES:
+    // List the tools of a certain group
+    bool list_tool_types(tool_list_type& tool_list, int tool_group) const;
     
-    // LIST_TOOLS_WITH_INTERFACE:
-    // List the tools with properties are guaranteed to have an interface 
-    bool list_tool_types_with_interface(tool_properties_list_type& tool_types_list) const;
-
 // -- Singleton interface --
   public:
     

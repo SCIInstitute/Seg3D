@@ -34,8 +34,14 @@
 SET(APPLICATION_STATE_SRCS
   StateBase.h
   State.h
+  StateOption.cc
+  StateOption.h
+  StateValue.h
+  StateClampedValue.h
   StateManager.h
   StateManager.cc
+  StateHandler.h
+  StateHandler.cc
   )
 
 SET(APPLICATION_STATE_ACTIONS_SRCS

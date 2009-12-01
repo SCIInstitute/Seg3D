@@ -48,7 +48,7 @@
 #include <boost/thread/condition_variable.hpp>
 
 // Application includes
-#include <Application/State/State.h>
+#include <Application/State/StateValue.h>
 
 namespace Seg3D {
 
@@ -160,7 +160,7 @@ class QtEventHandlerContext : public Utils::EventHandlerContext {
 class QtCheckBoxSlot : public QObject {
   Q_OBJECT
   public:
-    QtCheckBoxSlot(QCheckBox* parent, State<bool>::Handle& state_handle) :
+    QtCheckBoxSlot(QCheckBox* parent, StateValue<bool>::Handle& state_handle) :
       QObject(parent),
       state_handle_(state_handle) 
     {
@@ -175,7 +175,7 @@ class QtCheckBoxSlot : public QObject {
     }
     
   private:
-    State<bool>::Handle state_handle_;
+    StateValue<bool>::Handle state_handle_;
 };
 
 
