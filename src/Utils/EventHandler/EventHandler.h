@@ -37,6 +37,7 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/function.hpp>
 #include <boost/utility.hpp>
 
 // For event handling
@@ -71,12 +72,7 @@ class EventHandler : public boost::noncopyable  {
     // these events are mixed in with the main event handler and are execute at
     // the same time.   
     
-    template<class FUNCTOR>
-    void post_event(FUNCTOR functor)
-    {
-      EventHandle event = EventHandle(new EventT<FUNCTOR>(functor));
-      eventhandler_context_->post_event(event);
-    }
+    void post_event(boost::function<void ()> function);
     
     // POST_AND_WAIT_EVENT:
     // This function is similar to post_event, but waits until the function 
@@ -85,37 +81,25 @@ class EventHandler : public boost::noncopyable  {
     // any events on the event stack in order for the application not to
     // dead lock
     
-    template<class FUNCTOR>
-    void post_and_wait_event(FUNCTOR functor)
-    {
-      if (is_eventhandler_thread())
-      {
-        functor();
-      }
-      else
-      {
-        EventHandle event = EventHandle(new EventT<FUNCTOR>(functor));
-        eventhandler_context_->post_and_wait_event(event);
-      }
-    }
+    void post_and_wait_event(boost::function<void ()> function);
 
     // POST_EVENT_AND_GET_RESULT:
     // This function is similar to post_event, but waits until the function 
     // has finished execution and it also grabs the output.
         
-    template<class FUNCTOR>
-    void post_event_and_get_result(FUNCTOR functor, 
-                                   typename FUNCTOR::result_type& result)
+    template<class FUNCTION>
+    void post_event_and_get_result(FUNCTION function, 
+                                   typename FUNCTION::result_type& result)
     {
       if (is_eventhandler_thread())
       {
-        result = functor();
+        result = function();
       }
       else
       {
-        EventHandle event = EventHandle(new EventRT<FUNCTOR>(functor));
+        EventHandle event = EventHandle(new EventRT<FUNCTION>(function));
         eventhandler_context_->post_and_wait_event(event);
-        result = dynamic_cast<EventRT<FUNCTOR> *>(event.get())->get_result();
+        result = dynamic_cast<EventRT<FUNCTION> *>(event.get())->get_result();
       }
     }
 

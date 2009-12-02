@@ -26,82 +26,12 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-// Core includes
-#include <Utils/Core/Log.h>
-
-// Application Layer includes
-#include <Application/Application/Application.h>
-#include <Application/Interface/Interface.h>
-
-// Interface includes
-#include <Interface/QtInterface/QtInterface.h>
-#include <Interface/QtInterface/QtInterfaceInternal.h>
-
-// Boost includes
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/thread.hpp>
-#include <boost/shared_ptr.hpp>
-
+#include <Interface/QtInterface/QtBridge.h>
+#include <Interface/QtInterface/QtBridgeInternal.h>
 
 namespace Seg3D {
 
-QtInterface::QtInterface() :
-  qapplication_(0)
-{
-}
-
-
-bool
-QtInterface::setup(int argc, char **argv)
-{
-  try
-  {
-    // Main application class
-    SCI_LOG_DEBUG("Creating QApplication");
-    qapplication_ = new QApplication(argc,argv);
-
-    
-    // Interface class to the main class of the event handler layer
-    SCI_LOG_DEBUG("Creating QtEventHandlerContext");
-    Utils::EventHandlerContextHandle qt_eventhandler_context = 
-        Utils::EventHandlerContextHandle(new QtEventHandlerContext(qapplication_));
-
-
-    // Insert the event handler into the application layer
-    SCI_LOG_DEBUG("Install the QtEventHandlerContext into the Interface layer");
-    Interface::instance()->install_eventhandler_context(qt_eventhandler_context);   
-    Interface::instance()->start_eventhandler(); 
-  }
-  catch(...)
-  {
-    SCI_LOG_ERROR("QtInterface failed to initialize");
-    return (false);
-  }
-  
-  return (true);
-}
-
-
-bool
-QtInterface::exec()
-{
-  try
-  {
-    SCI_LOG_DEBUG("Starting Qt main event loop");
-    qapplication_->exec();
-    
-    delete qapplication_;
-    qapplication_ = 0;
-  }
-  catch(...)
-  {
-    SCI_LOG_ERROR("Main Qt event loop crashed by throwing an exception");
-    return (false);
-  }
-  
-  return (true);
-}
-
+// -- Checkbox connector --
 
 void QtCheckBoxSignal(QPointer<QCheckBox> qobject_ptr, bool state)
 {
@@ -115,9 +45,12 @@ void QtCheckBoxSignal(QPointer<QCheckBox> qobject_ptr, bool state)
 }
 
 bool
-QtInterface::connect(QCheckBox* qcheckbox, StateValue<bool>::Handle& state_handle)
+QtBridge::connect(QCheckBox* qcheckbox, 
+                     StateValue<bool>::Handle& state_handle)
 {
   // Connect the dispatch into the StateVariable (with auxillary object)
+  // Link tbe slot to the parent widget, so Qt's memory manager will
+  // manage this one.
   QtCheckBoxSlot* slot = new QtCheckBoxSlot(qcheckbox,state_handle);
     
   // Connect the state signal back into the Qt Variable  
@@ -126,8 +59,18 @@ QtInterface::connect(QCheckBox* qcheckbox, StateValue<bool>::Handle& state_handl
   return (true);
 }
 
+// -- Tool menu connector --
 
-// Singleton instantiation
-Utils::Singleton<QtInterface> QtInterface::instance_;
+bool
+QtBridge::connect(QAction* qaction, 
+                     boost::function<void ()> function)
+{
+  // Link tbe slot to the parent widget, so Qt's memory manager will
+  // manage this one.
+  QtActionSlot* slot = new QtActionSlot(qaction,function);
+
+  return (true);
+}
+
 
 } // end namespace Seg3D

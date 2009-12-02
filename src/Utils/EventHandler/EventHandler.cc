@@ -57,6 +57,27 @@ EventHandler::install_eventhandler_context(EventHandlerContextHandle& context)
   eventhandler_context_ = context;
 }
 
+void 
+EventHandler::post_event(boost::function<void ()> function)
+{
+  EventHandle event = EventHandle(new EventT<boost::function<void ()> >(function));
+  eventhandler_context_->post_event(event);
+}
+
+void 
+EventHandler::post_and_wait_event(boost::function<void ()> function)
+{
+  if (is_eventhandler_thread())
+  {
+    function();
+  }
+  else
+  {
+    EventHandle event = EventHandle(new EventT<boost::function<void ()> >(function));
+    eventhandler_context_->post_and_wait_event(event);
+  }
+}
+
 // TERMINATE_EVENTHANDLER
 
 void TerminateEventHandlerThread(EventHandlerHandle handle)

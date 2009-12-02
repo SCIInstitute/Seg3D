@@ -28,7 +28,7 @@
 
 #include <Utils/Core/Exception.h>
 
-#include <Interface/QtInterface/QtInterfaceInternal.h>
+#include <Interface/QtInterface/QtApplicationInternal.h>
 
 namespace Seg3D {
 
@@ -154,4 +154,3 @@ QtEventHandlerContext::is_eventhandler_thread() const
 }
 
 } // end namespace Seg3D
-

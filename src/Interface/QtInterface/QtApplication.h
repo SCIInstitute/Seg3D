@@ -26,8 +26,8 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef INTERFACE_QTINTERFACE_QTINTERFACE_H
-#define INTERFACE_QTINTERFACE_QTINTERFACE_H
+#ifndef INTERFACE_QTINTERFACE_QTAPPLICATION_H
+#define INTERFACE_QTINTERFACE_QTAPPLICATION_H
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
@@ -56,12 +56,12 @@ namespace Seg3D {
 
 // This class is a wrapper around the QApplication class
 
-class QtInterface : public boost::noncopyable {
+class QtApplication : public boost::noncopyable {
 
 // -- constuctor --
   public:
   
-    QtInterface();
+    QtApplication();
 
 // -- entry point --
 
@@ -86,26 +86,14 @@ class QtInterface : public boost::noncopyable {
     // main QT application class
     QApplication* qapplication_;
 
-
-// -- widget connectors --
-  public:
-    
-    // CONNECT:
-    // A series of helper functions to directly connect a widget with its underlying
-    // State variable.
-    
-    static bool connect(QCheckBox* qcheckbox, StateValue<bool>::Handle& state_handle);
-
-
-
 // -- Singleton interface --
   public:
     
     // INSTANCE:
-    static QtInterface* instance() { instance_.instance(); }
+    static QtApplication* instance() { instance_.instance(); }
     
   private:  
-    static Utils::Singleton<QtInterface> instance_;
+    static Utils::Singleton<QtApplication> instance_;
 };
 
 } // end namespace Seg3D

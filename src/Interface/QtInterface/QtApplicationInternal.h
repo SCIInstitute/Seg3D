@@ -26,8 +26,8 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef INTERFACE_QTINTERFACE_QTINTERFACEINTERNAL_H
-#define INTERFACE_QTINTERFACE_QTINTERFACEINTERNAL_H
+#ifndef INTERFACE_QTINTERFACE_QTAPPLICATIONINTERNAL_H
+#define INTERFACE_QTINTERFACE_QTAPPLICATIONINTERNAL_H
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
@@ -47,18 +47,15 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition_variable.hpp>
 
-// Application includes
-#include <Application/State/StateValue.h>
-
 namespace Seg3D {
 
-// INTERFACEINTERNAL:
+// QTAPPLICATIONINTERNAL:
 
 // As QT takes ownership of events, these classes wraps around our
 // functor call back classes and hide all the QT handling behind
 // a cleaner interface.
 
-// CLASS QtInterfaceUserQEvent:
+// CLASS QtUserQEvent:
 // The user event class that is send to QT, it wraps around the 
 // ApplicationEvent class, and thence only needs a handle to that
 // class.
@@ -150,35 +147,6 @@ class QtEventHandlerContext : public Utils::EventHandlerContext {
     // Thread id from the thead that is running Qt
     boost::thread::id       interface_thread_id_;
 };
-
-
-// QObjects for linking QT signals to state variables
-// QT does *not* support templated classes (the moc does not process it), hence
-// for each signal type, we need to have a dedicated slot and we cannot template
-// this unfortunately. Hence we have helper classes that are inserted in between. 
-
-class QtCheckBoxSlot : public QObject {
-  Q_OBJECT
-  public:
-    QtCheckBoxSlot(QCheckBox* parent, StateValue<bool>::Handle& state_handle) :
-      QObject(parent),
-      state_handle_(state_handle) 
-    {
-      connect(parent,SIGNAL(stateChanged),this,SLOT(slot));
-    }
-    virtual ~QtCheckBoxSlot() {}
-    
-  public Q_SLOTS:
-    void slot(int state)
-    {
-      state_handle_->dispatch(static_cast<bool>(state));
-    }
-    
-  private:
-    StateValue<bool>::Handle state_handle_;
-};
-
-
 
 } // end namespace Seg3D
 

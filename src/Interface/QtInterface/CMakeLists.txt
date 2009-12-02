@@ -32,16 +32,19 @@
 ##################################################
 
 SET(INTERFACE_QTINTERFACE_SRCS
-  QtInterface.cc
-  QtInterfaceInternal.cc
+  QtApplication.cc
+  QtApplicationInternal.cc
+  QtBridge.cc
 )
 
 SET(INTERFACE_QTINTERFACE_MOC_SRCS
-  QtInterfaceInternal.h
+  QtApplicationInternal.h
+  QtBridgeInternal.h
 )
 
 SET(INTERFACE_QTINTERFACE_NO_MOC_SRCS
-  QtInterface.h
+  QtApplication.h
+  QtBridge.h
 )
 
 SET(INTERFACE_QTINTERFACE_UI_SRCS
