@@ -56,6 +56,9 @@ class State;
 
 template<class T>
 class State : public StateBase {
+// -- typedefs --
+  public:
+    typedef T value_type;
 
 // -- constructor/destructor --
   public:

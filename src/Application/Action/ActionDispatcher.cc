@@ -62,7 +62,7 @@ ActionDispatcher::post_actions(std::vector<ActionHandle> actions, ActionContextH
 
   for (size_t j = 0;  j < actions.size(); j++)
   {
-    SCI_LOG_DEBUG(std::string("Posting Action sequence: ")+action[j]->action_type());  
+    SCI_LOG_DEBUG(std::string("Posting Action sequence: ")+actions[j]->action_type());  
   }
   
   Application::instance()->post_event(boost::bind

@@ -49,7 +49,8 @@
 #include <Interface/AppInterface/ToolManagerInterface.h>
 #include <Interface/AppInterface/LayerManagerInterface.h>
 #include <Interface/AppInterface/ViewerInterface.h>
-#include <Interface/AppInterface/MenuBar.h>
+
+#include <Interface/AppInterface/AppMenu.h>
 
 namespace Seg3D {
 
@@ -88,6 +89,15 @@ class AppInterface : public QMainWindow
     ToolManagerInterface*     toolmanager_interface_;
     LayerManagerInterface*    layermanager_interface_;
     
+    //Pointers to Status bar items
+    QLabel *coordinatesLabel_;
+    QLabel *focusLabel_;
+    
+    // Function for creating our actions
+    void createStatusBar();
+    
+    // Application menu
+    AppMenu* application_menu_;
 };
 
 } //end namespace

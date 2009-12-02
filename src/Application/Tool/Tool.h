@@ -55,7 +55,9 @@ typedef boost::shared_ptr<Tool> ToolHandle;
 
 
 class Tool : public StateHandler {
+  
 // -- definition of tool groups --
+  public:
   // Tool groups help organize the tools in different catagories
   
   enum {

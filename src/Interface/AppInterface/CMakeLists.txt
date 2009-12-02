@@ -33,6 +33,7 @@
 
 SET(INTERFACE_APPINTERFACE_SRCS
   AppInterface.cc
+  AppMenu.cc
   LayerManagerInterface.cc
   ToolManagerInterface.cc
   ViewerInterface.cc
@@ -41,6 +42,7 @@ SET(INTERFACE_APPINTERFACE_SRCS
 
 SET(INTERFACE_APPINTERFACE_MOC_SRCS
   AppInterface.h
+  AppMenu.h
   LayerManagerInterface.h
   ToolManagerInterface.h
   ViewerInterface.h

@@ -60,10 +60,32 @@ AppInterface::AppInterface(QApplication* app)
   addDockWidget(Qt::LeftDockWidgetArea, workflow_interface_, Qt::Horizontal);
   addDockWidget(Qt::RightDockWidgetArea,layermanager_interface_, Qt::Horizontal);
   addDockWidget(Qt::BottomDockWidgetArea, toolmanager_interface_, Qt::Vertical);
+  
+  application_menu_ = new AppMenu(this);
 }
 
 AppInterface::~AppInterface()
 {
 }
+
+
+
+void AppInterface::createStatusBar()
+{
+  coordinatesLabel_ = new QLabel(" x: y: ");
+  coordinatesLabel_->setAlignment(Qt::AlignHCenter);
+  coordinatesLabel_->setMinimumSize(coordinatesLabel_->sizeHint());
+  coordinatesLabel_->setStyleSheet("margin-left: 2px;");
+  
+  focusLabel_ = new QLabel("Focus: ");
+  focusLabel_->setIndent(3);
+  
+  statusBar()->addWidget(coordinatesLabel_);
+  statusBar()->addWidget(focusLabel_, 1);
+  statusBar()->setStyleSheet("padding-left: 2px;");
+  
+}
+
+
 
 } //end namespace

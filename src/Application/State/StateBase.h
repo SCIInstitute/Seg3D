@@ -52,7 +52,7 @@ class StateBase : public boost::noncopyable {
 
 // -- destructor --
   public:
-    virtual ~StateBase() = 0;
+    virtual ~StateBase() {}
     
 // -- functions for accessing data --
 

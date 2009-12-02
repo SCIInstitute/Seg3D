@@ -41,7 +41,7 @@ StateHandler::~StateHandler()
 }
 
 bool 
-StateHandler::add_statebase(const std::string& key, StateBaseHandle& state) const
+StateHandler::add_statebase(const std::string& key, StateBaseHandle state)
 {
   // Step (1): Generate a new unique ID for this state
   std::string stateid = stateid_prefix_+std::string("::")+key;

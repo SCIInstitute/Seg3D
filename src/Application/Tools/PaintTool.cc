@@ -26,11 +26,14 @@
    DEALINGS IN THE SOFTWARE.
 */
 
+#include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/PaintTool.h>
-#include <Application/Layer/LayerManager.h>
-
+// #include <Application/Layer/LayerManager.h>
 
 namespace Seg3D {
+
+// Register the tool into the tool factory
+SCI_REGISTER_TOOL(PaintTool,Tool::TOOL_E)
 
 PaintTool::PaintTool(const std::string& toolid) :
   Tool(toolid)
@@ -38,30 +41,32 @@ PaintTool::PaintTool(const std::string& toolid) :
   // Need to set ranges and default values for all parameters
   add_state("active",active_layer_,"<none>","<none>");
   add_state("mask",mask_layer_,"<none>","<none>");
-  add_state("brush_radius",brush_radius_,1,10,2);
+  add_state("brush_radius",brush_radius_,1,10,1,2);
   add_state("upper_threshold",upper_threshold_,0.0,1.0,0.01,1.0);
   add_state("lower_threshold",lower_threshold_,0.0,1.0,0.01,0.0);
   add_state("erase",erase_,false);
   
   // Add constaints, so that when the state changes the right ranges of 
   // parameters are selected
-  active_layer_.connect(boost::bind(&PaintTool::active_constraint,this,_1));
-  mask_layer_.connect(boost::bind(&PaintTool::mask_constraint,this,_1));
+  active_layer_->connect(boost::bind(&PaintTool::active_constraint,this,_1));
+  mask_layer_->connect(boost::bind(&PaintTool::mask_constraint,this,_1));
 
   // If a layer is added or deleted update the lists
-  add_connection(LayerManager::instance()->connect_layers_changed(
-    boost:bind(&PaintTool::handle_layers_changed,this)));
+//  add_connection(LayerManager::instance()->connect_layers_changed(
+//    boost:bind(&PaintTool::handle_layers_changed,this)));
+  
   // Trigger a fresh update
   handle_layers_changed();
-  
 }
 
 PaintTool::~PaintTool()
 {
 }
 
+void
 PaintTool::handle_layers_changed()
 {
+/*
   std::vector<std::string> active_layers;
   LayerManager::instance()->get_layers(LayerManager::MASKLAYER_E|
                                        LayerManager::ACTIVE_E|
@@ -77,16 +82,18 @@ PaintTool::handle_layers_changed()
                                        mask_layers );
                                        
   mask_layer_->set_option_list(mask_layers);
+*/
 }
 
-
+void
 PaintTool::active_constraint(std::string layerid)
 {
 }
 
-
+void
 PaintTool::mask_constraint(std::string layerid)
 {
+/*
   if (layerid == "<none>")
   {
   
@@ -96,7 +103,17 @@ PaintTool::mask_constraint(std::string layerid)
     LayerHandle layer;
     LayerManager::instance()->get_layer(layerid,layer);
   }
+*/  
 }
 
+void
+PaintTool::activate()
+{
+}
+
+void
+PaintTool::deactivate()
+{
+}
 
 } // end namespace Seg3D

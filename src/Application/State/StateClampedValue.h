@@ -138,7 +138,7 @@ class StateClampedValue : public State<T> {
           bool& changed,
           std::string& error) const
     {
-      return (variant.validate_and_compare_value<T>(min_,max_,
+      return (variant.validate_and_compare_clamped_value<T>(min_,max_,
                                               this->value_,changed,error));
     }
 

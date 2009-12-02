@@ -63,10 +63,10 @@ class StateHandler : public boost::noncopyable {
                    const T& default_value)
     { 
       // Step (1): Generate the state variable
-      state = StateHandle(new typename HANDLE::element_type(default_value));
+      state = HANDLE(new typename HANDLE::element_type(default_value));
 
       // Step (2): Now handle the common part for each add_state function
-      return (add_statebase(key,state));
+      return (add_statebase(key,StateBaseHandle(state)));
     }  
 
     // ADD_STATE:
@@ -74,14 +74,14 @@ class StateHandler : public boost::noncopyable {
     
     template<class HANDLE, class T>
     bool add_state(const std::string& key, HANDLE& state, 
-                  const T& min, const T& max, 
-                  const T& step, T& default_value)
+                   const T& min, const T& max, 
+                   const T& step,const T& default_value)
     { 
       // Step (1): Generate the state variable
-      state = StateHandle(new typename HANDLE::element_type(min,max,step,default_value));
+      state = HANDLE(new typename HANDLE::element_type(min,max,step,default_value));
 
       // Step (2): Now handle the common part for each add_state function
-      return (add_statebase(key,state));
+      return (add_statebase(key,StateBaseHandle(state)));
     }  
 
     // ADD_STATE:
@@ -94,7 +94,7 @@ class StateHandler : public boost::noncopyable {
       state = StateHandle(new typename HANDLE::element_type);
 
       // Step (2): Now handle the common part for each add_state function
-      return (add_statebase(key,state));
+      return (add_statebase(key,StateBaseHandle(state)));
     }  
 
     // ADD_STATE:
@@ -106,15 +106,46 @@ class StateHandler : public boost::noncopyable {
                    const std::string& default_option)
     { 
       // Step (1): Generate the state variable
-      state = StateHandle(new typename HANDLE::element_type(option_list,default_option));
+      state = HANDLE(new typename HANDLE::element_type(option_list,default_option));
 
       // Step (2): Now handle the common part for each add_state function
-      return (add_statebase(key,state));
+      return (add_statebase(key,StateBaseHandle(state)));
+    }  
+
+    // ADD_STATE:
+    // Add a local state variable with option list
+
+    template<class HANDLE>
+    bool add_state(const std::string& key, HANDLE& state, 
+                   std::string option_list_string,
+                   const std::string& default_option)
+    { 
+      // Step (1): Convert option list string into a vector
+      // TODO: need to add this to StringUtils
+      std::vector<std::string> option_list;
+
+      while(1)
+      {
+        size_t loc = option_list_string.find('|');
+        if (loc >= option_list_string.size())
+        {
+          option_list.push_back(option_list_string);
+          break;
+        }
+        option_list.push_back(option_list_string.substr(0,loc));
+        option_list_string = option_list_string.substr(loc+1);
+      }
+      
+      // Step (2): Generate the state variable
+      state = HANDLE(new typename HANDLE::element_type(option_list,default_option));
+
+      // Step (3): Now handle the common part for each add_state function
+      return (add_statebase(key,StateBaseHandle(state)));
     }  
 
   private:
     // Function that adds the state variable to the database
-    bool add_statebase(const std::string& key, StateBaseHandle& state) const;
+    bool add_statebase(const std::string& key, StateBaseHandle state);
 
 };
 

@@ -26,64 +26,54 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#include <Utils/Core/Log.h>
+#ifndef INTERFACE_APPINTERFACE_APPMENU_H
+#define INTERFACE_APPINTERFACE_APPMENU_H
 
-#include <Application/Action/ActionContext.h>
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+# pragma once
+#endif 
+
+#include <QMenuBar>
+#include <QAction>
+#include <QMainWindow>
 
 namespace Seg3D {
 
-ActionContext::ActionContext()
+class AppMenu : public QObject
 {
-}
+  Q_OBJECT
+// -- constructor / destructor --    
+  public:
+    AppMenu(QMainWindow* parent = 0);
+    virtual ~AppMenu();
 
-ActionContext::~ActionContext()
-{
-}
+// -- functions for building menus --
+  public:
 
-void
-ActionContext::report_error(const std::string& error)
-{
-  SCI_LOG_ERROR(error);
-}
+    void create_file_menu(QMenu* menu);
+    void create_edit_menu(QMenu* menu);
+    void create_view_menu(QMenu* menu);
 
-void
-ActionContext::report_warning(const std::string& warning)
-{
-  SCI_LOG_WARNING(warning);
-}
+    void create_tool_menu(QMenu* menu);
+    void create_filter_menu(QMenu* menu);
 
-void
-ActionContext::report_message(const std::string& message)
-{
-  SCI_LOG_MESSAGE(message);
-}
+    void create_window_menu(QMenu* menu);
 
-void
-ActionContext::report_progress(double progress)
-{
-}
+// -- Menu pointers --
+  private:
+  
+    QMenu* file_menu_;
+    QMenu* edit_menu_;
+    QMenu* view_menu_;
+    QMenu* tool_menu_;
+    QMenu* filter_menu_;
+    QMenu* window_menu_;
+    
 
-void
-ActionContext::report_done(bool success)
-{
-}
 
-bool
-ActionContext::from_script() const
-{
-  return (false);
-}
-
-bool
-ActionContext::from_interface() const
-{
-  return (false);
-}
-
-bool
-ActionContext::update_interface() const
-{
-  return (true);
-}
+};
 
 } // end namespace Seg3D
+
+#endif
+

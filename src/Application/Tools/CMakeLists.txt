@@ -1,3 +1,4 @@
+
 #
 #  For more information, please see: http://software.sci.utah.edu
 # 
@@ -26,9 +27,29 @@
 #  DEALINGS IN THE SOFTWARE.
 #
 
-ADD_SUBDIRECTORY(Application)
-ADD_SUBDIRECTORY(Interface)
-ADD_SUBDIRECTORY(Action)
-ADD_SUBDIRECTORY(State)
-ADD_SUBDIRECTORY(Tool)
-ADD_SUBDIRECTORY(Tools)
+##################################################
+# Set sources
+##################################################
+
+SET(APPLICATION_TOOLS_SRCS
+  PaintTool.h
+  PaintTool.cc
+  )
+
+ADD_LIBRARY(Application_Tools STATIC 
+            ${APPLICATION_TOOLS_SRCS} )
+            
+TARGET_LINK_LIBRARIES(Application_Tools
+                      Utils_Converter
+                      Utils_Core
+                      Application_Application
+                      Application_Interface
+                      Application_Action
+                      Application_State
+                      Application_Tool
+                      ${SCI_BOOST_LIBRARY})
+
+# Register actions
+ADD_LIBRARY_TOOLS(Application_Tools
+                  ${APPLICATION_TOOLS_SRCS})
+                    

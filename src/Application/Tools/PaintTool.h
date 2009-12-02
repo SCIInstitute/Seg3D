@@ -43,31 +43,36 @@ class PaintTool : public Tool {
 // -- constraint parameters --
 
     // Constrain viewer to right painting tool when layer is selected
-    void active_constraint();
+    void active_constraint(std::string layerid);
 
     // Constrain state to right options when mask layer is selected
-    void mask_constraint();
+    void mask_constraint(std::string layerid);
     
 // -- handle updates from layermanager --    
     
-    void handle_layermanager_changed();
-    
+    void handle_layers_changed();
+
+// -- activate/deactivate tool --
+
+  virtual void activate();
+  virtual void deactivate();
+  
 // -- state --
   public:
     // Layerid of the target layer
-    StateValue<std::string>::Handle  active_layer_;
+    StateOption::Handle              active_layer_;
     // Layerid of the masking layer
-    StateValue<std::string>::Handle  mask_layer_;
+    StateOption::Handle              mask_layer_;
     
     // Radius of the brush
-    StateClampedValue<int>::Handle         brush_radius_;
+    StateClampedValue<int>::Handle   brush_radius_;
     // Upper threshold for painting
-    StateClampedValue<float>::Handle       upper_threshold_;
+    StateClampedValue<float>::Handle upper_threshold_;
     // Lower threshold for painting
-    StateClampedValue<float>::Handle       lower_threshold_;
+    StateClampedValue<float>::Handle lower_threshold_;
 
     // Erase data
-    StateValue<bool>::Handle               erase_;
+    StateValue<bool>::Handle         erase_;
 
 };
 

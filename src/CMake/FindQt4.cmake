@@ -845,7 +845,7 @@ IF (QT4_QMAKE_FOUND)
      GET_DIRECTORY_PROPERTY(_inc_DIRS INCLUDE_DIRECTORIES)
 
      FOREACH(_current ${_inc_DIRS})
-        SET(${_moc_INC_DIRS} "${${_moc_INC_DIRS}} -I${_current} ")
+        SET(${_moc_INC_DIRS} ${${_moc_INC_DIRS}} "-I" ${_current})
      ENDFOREACH(_current ${_inc_DIRS})
   ENDMACRO(QT4_GET_MOC_INC_DIRS)
 
@@ -881,7 +881,6 @@ IF (QT4_QMAKE_FOUND)
         COMMAND ${QT_MOC_EXECUTABLE}
         ARGS ${moc_includes} -o ${outfile} ${it}
         DEPENDS ${it})
-                
       SET(${outfiles} ${${outfiles}} ${outfile})
     ENDFOREACH(it)
 

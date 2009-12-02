@@ -43,6 +43,11 @@ namespace Seg3D {
 class StateOption;
 
 class StateOption : public State<std::string> {
+  public:
+    // One cannot define a templated typedef of StateHandle<>,
+    // Hence we settle for StateValue<T>::Handle
+    typedef boost::shared_ptr<StateOption> Handle;
+
 
 // -- constructor/destructor --
   public:
