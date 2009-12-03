@@ -27,30 +27,22 @@
 */
 
 #include <Application/Tool/ToolFactory.h>
-#include <Application/Tools/PaintTool.h>
+#include <Application/Tools/PolylineTool.h>
 // #include <Application/Layer/LayerManager.h>
 
 namespace Seg3D {
 
 // Register the tool into the tool factory
-SCI_REGISTER_TOOL(PaintTool,"Paint Tool",Tool::TOOL_E)
+SCI_REGISTER_TOOL(PolylineTool,"Polyline Tool",Tool::TOOL_E)
 
-PaintTool::PaintTool(const std::string& toolid) :
+PolylineTool::PolylineTool(const std::string& toolid) :
   Tool(toolid)
 {
   // Need to set ranges and default values for all parameters
   add_state("target",target_layer_,"<none>","<none>");
-  add_state("mask",mask_layer_,"<none>","<none>");
-  add_state("brush_radius",brush_radius_,1,10,1,2);
-  add_state("upper_threshold",upper_threshold_,0.0,1.0,0.01,1.0);
-  add_state("lower_threshold",lower_threshold_,0.0,1.0,0.01,0.0);
-  add_state("erase",erase_,false);
   
-  // Add constaints, so that when the state changes the right ranges of 
-  // parameters are selected
-  target_layer_->connect(boost::bind(&PaintTool::target_constraint,this,_1));
-  mask_layer_->connect(boost::bind(&PaintTool::mask_constraint,this,_1));
-
+  // No constraints are needed for this tool
+  
   // If a layer is added or deleted update the lists
 //  add_connection(LayerManager::instance()->connect_layers_changed(
 //    boost:bind(&PaintTool::handle_layers_changed,this)));
@@ -59,60 +51,48 @@ PaintTool::PaintTool(const std::string& toolid) :
   handle_layers_changed();
 }
 
-PaintTool::~PaintTool()
+PolylineTool::~PolylineTool()
 {
 }
 
 void
-PaintTool::handle_layers_changed()
+PolylineTool::handle_layers_changed()
 {
 /*
   std::vector<std::string> target_layers;
-  LayerManager::instance()->get_layers(LayerManager::MASKLAYER_E|
+  LayerManager::instance()->get_layers(LayerManager::DATALAYER_E|
+                                       LayerManager::MASKLAYER_E|
                                        LayerManager::ACTIVE_E|
                                        LayerManager::NONE_E,
                                        target_layers );
                                        
   target_layer_->set_option_list(target_layers);
 
-  std::vector<std::string> mask_layers;
-  LayerManager::instance()->get_layers(LayerManager::MASKLAYER_E|
-                                       LayerManager::DATALAYER_E|
-                                       LayerManager::NONE_E,
-                                       mask_layers );
-                                       
-  mask_layer_->set_option_list(mask_layers);
 */
 }
 
 void
-PaintTool::target_constraint(std::string layerid)
+PolylineTool::activate()
 {
 }
 
 void
-PaintTool::mask_constraint(std::string layerid)
-{
-/*
-  if (layerid == "<none>")
-  {
-  
-  }
-  else
-  {
-    LayerHandle layer;
-    LayerManager::instance()->get_layer(layerid,layer);
-  }
-*/  
-}
-
-void
-PaintTool::activate()
+PolylineTool::deactivate()
 {
 }
 
-void
-PaintTool::deactivate()
+void 
+PolylineTool::dispatch_fill_within_polyline() const
+{
+}
+
+void 
+PolylineTool::dispatch_erase_within_polyline() const
+{
+}  
+
+void 
+PolylineTool::dispatch_reset_polyline() const
 {
 }
 

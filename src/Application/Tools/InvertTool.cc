@@ -27,30 +27,21 @@
 */
 
 #include <Application/Tool/ToolFactory.h>
-#include <Application/Tools/PaintTool.h>
+#include <Application/Tools/InvertTool.h>
 // #include <Application/Layer/LayerManager.h>
 
 namespace Seg3D {
 
 // Register the tool into the tool factory
-SCI_REGISTER_TOOL(PaintTool,"Paint Tool",Tool::TOOL_E)
+SCI_REGISTER_TOOL(InvertTool,"Invert Tool",Tool::TOOL_E)
 
-PaintTool::PaintTool(const std::string& toolid) :
+InvertTool::InvertTool(const std::string& toolid) :
   Tool(toolid)
 {
   // Need to set ranges and default values for all parameters
   add_state("target",target_layer_,"<none>","<none>");
-  add_state("mask",mask_layer_,"<none>","<none>");
-  add_state("brush_radius",brush_radius_,1,10,1,2);
-  add_state("upper_threshold",upper_threshold_,0.0,1.0,0.01,1.0);
-  add_state("lower_threshold",lower_threshold_,0.0,1.0,0.01,0.0);
-  add_state("erase",erase_,false);
+  add_state("replace",replace_,true);
   
-  // Add constaints, so that when the state changes the right ranges of 
-  // parameters are selected
-  target_layer_->connect(boost::bind(&PaintTool::target_constraint,this,_1));
-  mask_layer_->connect(boost::bind(&PaintTool::mask_constraint,this,_1));
-
   // If a layer is added or deleted update the lists
 //  add_connection(LayerManager::instance()->connect_layers_changed(
 //    boost:bind(&PaintTool::handle_layers_changed,this)));
@@ -59,12 +50,12 @@ PaintTool::PaintTool(const std::string& toolid) :
   handle_layers_changed();
 }
 
-PaintTool::~PaintTool()
+InvertTool::~InvertTool()
 {
 }
 
 void
-PaintTool::handle_layers_changed()
+InvertTool::handle_layers_changed()
 {
 /*
   std::vector<std::string> target_layers;
@@ -86,33 +77,17 @@ PaintTool::handle_layers_changed()
 }
 
 void
-PaintTool::target_constraint(std::string layerid)
+InvertTool::activate()
 {
 }
 
 void
-PaintTool::mask_constraint(std::string layerid)
-{
-/*
-  if (layerid == "<none>")
-  {
-  
-  }
-  else
-  {
-    LayerHandle layer;
-    LayerManager::instance()->get_layer(layerid,layer);
-  }
-*/  
-}
-
-void
-PaintTool::activate()
+InvertTool::deactivate()
 {
 }
 
-void
-PaintTool::deactivate()
+void 
+InvertTool::dispatch_invert() const
 {
 }
 

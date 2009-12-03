@@ -26,27 +26,19 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_TOOLS_PAINTTOOL_H
-#define APPLICATION_TOOLS_PAINTTOOL_H
+#ifndef APPLICATION_TOOLS_POLYLINETOOL_H
+#define APPLICATION_TOOLS_POLYLINETOOL_H
 
 #include <Application/Tool/Tool.h>
 
 namespace Seg3D {
 
-class PaintTool : public Tool {
+class PolylineTool : public Tool {
 
 // -- constructor/destructor --
   public:
-    PaintTool(const std::string& toolid);
-    virtual ~PaintTool();
-
-// -- constraint parameters --
-
-    // Constrain viewer to right painting tool when layer is selected
-    void target_constraint(std::string layerid);
-
-    // Constrain state to right options when mask layer is selected
-    void mask_constraint(std::string layerid);
+    PolylineTool(const std::string& toolid);
+    virtual ~PolylineTool();
     
 // -- handle updates from layermanager --    
     
@@ -56,23 +48,20 @@ class PaintTool : public Tool {
 
   virtual void activate();
   virtual void deactivate();
+
+// -- dispatch functions --
+
+  void dispatch_fill_within_polyline() const;
+  void dispatch_erase_within_polyline() const;
+  void dispatch_reset_polyline() const;
   
 // -- state --
   public:
     // Layerid of the target layer
     StateOption::Handle              target_layer_;
-    // Layerid of the masking layer
-    StateOption::Handle              mask_layer_;
-    
-    // Radius of the brush
-    StateClampedValue<int>::Handle   brush_radius_;
-    // Upper threshold for painting
-    StateClampedValue<float>::Handle upper_threshold_;
-    // Lower threshold for painting
-    StateClampedValue<float>::Handle lower_threshold_;
 
-    // Erase data
-    StateValue<bool>::Handle         erase_;
+    // Polyline data
+    // StateVector<Point>              polyline_;
 
 };
 

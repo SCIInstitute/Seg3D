@@ -34,6 +34,14 @@
 SET(APPLICATION_TOOLS_SRCS
   PaintTool.h
   PaintTool.cc
+  FlipTool.h
+  FlipTool.cc
+  InvertTool.h
+  InvertTool.cc
+  PolylineTool.h
+  PolylineTool.cc
+  ThresholdTool.h
+  ThresholdTool.cc
   )
 
 ADD_LIBRARY(Application_Tools STATIC 
