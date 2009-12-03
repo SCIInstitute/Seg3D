@@ -32,9 +32,17 @@ namespace Seg3D {
 
 // -- ToolsWindow --
 // The Tools window contains a tab bar with tools that can be opened and closed
+  
+  class ToolManagerInterfacePrivate {
+  public:
+    // Main interface widget
+    QWidget*                  interface_;
+    
+  };
 
 ToolManagerInterface::ToolManagerInterface(QWidget* parent) :
-  QDockWidget("Tools",parent)
+  QDockWidget("Tools",parent),
+  private_(new ToolManagerInterfacePrivate)
 {
   // Set the areas in which we can dock this window
   setAllowedAreas(Qt::BottomDockWidgetArea | Qt::TopDockWidgetArea );   
@@ -65,6 +73,7 @@ ToolManagerInterface::ToolManagerInterface(QWidget* parent) :
   // Example tabs
   tabs_->addTab("2D Painter");
   tabs_->addTab("3D Painter");
+  tabs_->addTab("4D Painter");
 
   setWidget(interface_);
 }

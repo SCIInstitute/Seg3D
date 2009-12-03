@@ -71,6 +71,7 @@ class LayerManagerInterface : public QDockWidget
   private:
     // Internals of the LayerManagerInterface
     boost::shared_ptr<LayerManagerInterfacePrivate> private_;
+  
 };
 
 } // end namespace

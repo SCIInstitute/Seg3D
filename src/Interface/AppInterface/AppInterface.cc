@@ -40,29 +40,57 @@ AppInterface::AppInterface(QApplication* app)
   setWindowTitle(QString("Seg3D Version ")+SEG3D_VERSION);
   setWindowIconText(QString("Seg3D"));
   setDocumentMode(true);
+  resize(1280, 720);
   
   // Tell Qt where to doc the toolbars
   setCorner(Qt::TopLeftCorner,Qt::LeftDockWidgetArea);
   setCorner(Qt::TopRightCorner,Qt::RightDockWidgetArea);
   setCorner(Qt::BottomLeftCorner,Qt::LeftDockWidgetArea);
   setCorner(Qt::BottomRightCorner,Qt::RightDockWidgetArea);
+  
     
-//  setWindowIcon(QIcon(":/Resources/Logo.png"));
-//  application_->setWindowIcon(QIcon(":/Resources/Logo.png"));
 
   viewer_interface_ =        new ViewerInterface(this);
-  workflow_interface_ =       new WorkflowInterface(this);
-  toolmanager_interface_ =    new ToolManagerInterface(this);
-  layermanager_interface_  =  new LayerManagerInterface(this);
+  history_dock_window_ =     new HistoryDockWidget(this);
+  project_dock_window_ =   new ProjectDockWidget(this);
+  tools_dock_window_ =     new ToolsDockWidget(this);
 
   setCentralWidget(viewer_interface_);
 
-  addDockWidget(Qt::LeftDockWidgetArea, workflow_interface_, Qt::Horizontal);
-  addDockWidget(Qt::RightDockWidgetArea,layermanager_interface_, Qt::Horizontal);
-  addDockWidget(Qt::BottomDockWidgetArea, toolmanager_interface_, Qt::Vertical);
+// call function to create menu bar 
+
+  createStatusBar();
+  
+
+  addDockWidget(Qt::LeftDockWidgetArea,history_dock_window_, Qt::Horizontal);
+  addDockWidget(Qt::LeftDockWidgetArea,project_dock_window_, Qt::Horizontal);
+  addDockWidget(Qt::LeftDockWidgetArea,tools_dock_window_, Qt::Horizontal);
+  
+  tabifyDockWidget(project_dock_window_, history_dock_window_);
+  tabifyDockWidget(history_dock_window_, tools_dock_window_);
+  
+
   
   application_menu_ = new AppMenu(this);
 }
+
+  
+  void AppInterface::createStatusBar()
+  {
+    coordinatesLabel = new QLabel(" x: y: ");
+    coordinatesLabel->setAlignment(Qt::AlignHCenter);
+    coordinatesLabel->setMinimumSize(coordinatesLabel->sizeHint());
+    coordinatesLabel->setStyleSheet("margin-left: 2px;");
+    
+    focusLabel = new QLabel("Focus: ");
+    focusLabel->setIndent(3);
+    
+    statusBar()->addWidget(coordinatesLabel);
+    statusBar()->addWidget(focusLabel, 1);
+    statusBar()->setStyleSheet("padding-left: 2px;");
+    
+  }
+  
 
 AppInterface::~AppInterface()
 {
@@ -70,21 +98,7 @@ AppInterface::~AppInterface()
 
 
 
-void AppInterface::createStatusBar()
-{
-  coordinatesLabel_ = new QLabel(" x: y: ");
-  coordinatesLabel_->setAlignment(Qt::AlignHCenter);
-  coordinatesLabel_->setMinimumSize(coordinatesLabel_->sizeHint());
-  coordinatesLabel_->setStyleSheet("margin-left: 2px;");
-  
-  focusLabel_ = new QLabel("Focus: ");
-  focusLabel_->setIndent(3);
-  
-  statusBar()->addWidget(coordinatesLabel_);
-  statusBar()->addWidget(focusLabel_, 1);
-  statusBar()->setStyleSheet("padding-left: 2px;");
-  
-}
+
 
 
 

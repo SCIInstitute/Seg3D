@@ -44,6 +44,8 @@
 #include <boost/shared_ptr.hpp>
 
 namespace Seg3D {
+  
+class ToolManagerInterfacePrivate;
 
 class ToolManagerInterface : public QDockWidget
 {
@@ -56,7 +58,9 @@ class ToolManagerInterface : public QDockWidget
     
 // -- interface pieces --    
   private:
-
+  // Internals of the LayerManagerInterface
+    boost::shared_ptr<ToolManagerInterfacePrivate> private_;
+  
     QWidget*      interface_;
     QVBoxLayout*  layout_;
     QTabBar*      tabs_;

@@ -71,40 +71,18 @@ LayerManagerInterface::LayerManagerInterface(QWidget* parent) :
     // Import the widget
     setWidget(private_->interface_);
 
-    // Setup validators on text entry widgets
-    private_->ui_.worldXEdit->setValidator(
-             new QIntValidator(private_->ui_.worldXEdit));
-    private_->ui_.worldYEdit->setValidator(
-             new QIntValidator(private_->ui_.worldYEdit));
-    private_->ui_.worldZEdit->setValidator(
-             new QIntValidator(private_->ui_.worldZEdit));
-    private_->ui_.indexXEdit->setValidator(
-             new QIntValidator(private_->ui_.indexXEdit));
-    private_->ui_.indexYEdit->setValidator(
-             new QIntValidator(private_->ui_.indexYEdit));
-    private_->ui_.indexZEdit->setValidator(
-             new QIntValidator(private_->ui_.indexZEdit));
-
-    // Connect signals to slots
-    connect(private_->ui_.worldXEdit, SIGNAL(editingFinished()),
-      this, SLOT(worldCoordsChanged()));
-    connect(private_->ui_.worldYEdit, SIGNAL(editingFinished()),
-      this, SLOT(worldCoordsChanged()));
-    connect(private_->ui_.worldZEdit, SIGNAL(editingFinished()),
-      this, SLOT(worldCoordsChanged()));
-    connect(private_->ui_.indexXEdit, SIGNAL(editingFinished()),
-      this, SLOT(indexCoordsChanged()));
-    connect(private_->ui_.indexYEdit, SIGNAL(editingFinished()),
-      this, SLOT(indexCoordsChanged()));
-    connect(private_->ui_.indexZEdit, SIGNAL(editingFinished()),
-      this, SLOT(indexCoordsChanged()));
-
+   
   }  
 }
 
 LayerManagerInterface::~LayerManagerInterface()
 {
 }
+  
+//bool LayerManagerInterface::eventFilter(QObject *target, QEvent *event)
+//{
+//  return true;
+//} 
 
 void LayerManagerInterface::worldCoordsChanged()
 {

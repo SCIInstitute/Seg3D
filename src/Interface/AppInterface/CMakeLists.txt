@@ -34,26 +34,31 @@
 SET(INTERFACE_APPINTERFACE_SRCS
   AppInterface.cc
   AppMenu.cc
-  LayerManagerInterface.cc
-  ToolManagerInterface.cc
   ViewerInterface.cc
   WorkflowInterface.cc
+  HistoryDockWidget.cc
+  ProjectDockWidget.cc
+  ToolsDockWidget.cc
 )
 
 SET(INTERFACE_APPINTERFACE_MOC_SRCS
   AppInterface.h
   AppMenu.h
-  LayerManagerInterface.h
-  ToolManagerInterface.h
   ViewerInterface.h
   WorkflowInterface.h
+  HistoryDockWidget.h
+  ProjectDockWidget.h
+  ToolsDockWidget.h
 )
 
 SET(INTERFACE_APPINTERFACE_NO_MOC_SRCS
 )
 
 SET(INTERFACE_APPINTERFACE_UI_SRCS
-  LayerManagerInterface.ui
+  HistoryDockWidget.ui
+  ViewerInterface.ui  
+  ProjectDockWidget.ui
+  ToolsDockWidget.ui
 )
 
 ##################################################
@@ -90,7 +95,8 @@ ADD_LIBRARY(Interface_AppInterface STATIC
             ${INTERFACE_APPINTERFACE_SRCS} 
             ${INTERFACE_APPINTERFACE_QT_UI_SRCS}
             ${INTERFACE_APPINTERFACE_QT_MOC_SRCS}
-            ${INTERFACE_APPINTERFACE_NO_MOC_SRCS} )
+            ${INTERFACE_APPINTERFACE_NO_MOC_SRCS} 
+      ${INTERFACE_APPINTERFACE_MOC_SRCS})
             
             
 TARGET_LINK_LIBRARIES(Interface_AppInterface
