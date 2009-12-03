@@ -41,16 +41,15 @@ class ActionOpenTool : public Action {
     ActionOpenTool() :
       Action("OpenTool",Action::APPLICATION_E)
     {
-      add_argument(tool_type_);
-      add_parameter("id",toolid_);
+      add_argument(toolid_);
+      add_result(result_toolid_);
     }
     
     virtual ~ActionOpenTool() 
     {}
 
-    void set(const std::string& tool_type,const std::string& toolid)
+    void set(const std::string& toolid)
     {
-      tool_type_.value() = tool_type;
       toolid_.value() = toolid;
     }
 
@@ -60,8 +59,11 @@ class ActionOpenTool : public Action {
     
 // -- Action parameters --
   protected:
-    ActionParameter<std::string> tool_type_;
+    // ToolID that is requested
     ActionParameter<std::string> toolid_;
+
+    // ToolID that was assigned
+    ActionParameter<std::string> result_toolid_;
 };
 
 typedef boost::shared_ptr<ActionOpenTool> ActionOpenToolHandle;

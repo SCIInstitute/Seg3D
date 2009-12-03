@@ -78,8 +78,9 @@ class Tool : public StateHandler {
 
 // -- tool_group/tool_type/toolid --
 
-    int         tool_group() const { return tool_group_; }
-    std::string tool_type() const  { return tool_type_; }
+    int         properties() const { return properties_; }
+    std::string type() const       { return type_; }
+    std::string menu_name() const  { return menu_name_; }
     std::string toolid() const     { return toolid_; }
 
 
@@ -94,13 +95,15 @@ class Tool : public StateHandler {
     // factory and then inserted into the Tool object upon creation. This
     // avoids duplicating the properties and typename registration.
     
-    void set_tool_group(int tool_group)              { tool_group_ = tool_group; }
-    void set_tool_type(const std::string& tool_type) { tool_type_ = tool_type; }
+    void set_properties(int properties) { properties_ = properties; }
+    void set_menu_name(const std::string& menu_name) { menu_name_ = menu_name; }
+    void set_type(const std::string& type) { type_ = type; }
 
   private:
     std::string           toolid_;
-    int                   tool_group_;    
-    std::string           tool_type_;
+    int                   properties_;    
+    std::string           type_;
+    std::string           menu_name_;
     
 // -- close tool --
   public:  

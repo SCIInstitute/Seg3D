@@ -49,20 +49,20 @@ std::string export_to_string(const T& value)
                             typeid(value).name()+") was not implemented");
 }
 
-std::string export_to_string(const char value);
-std::string export_to_string(const unsigned char value);
+std::string export_to_string(const char& value);
+std::string export_to_string(const unsigned char& value);
 
-std::string export_to_string(const short value);
-std::string export_to_string(const unsigned short value);
+std::string export_to_string(const short& value);
+std::string export_to_string(const unsigned short& value);
 
-std::string export_to_string(const int value);
-std::string export_to_string(const unsigned int value);
+std::string export_to_string(const int& value);
+std::string export_to_string(const unsigned int& value);
 
-std::string export_to_string(const long value);
-std::string export_to_string(const unsigned long value);
+std::string export_to_string(const long& value);
+std::string export_to_string(const unsigned long& value);
 
-std::string export_to_string(const float value);
-std::string export_to_string(const double value);
+std::string export_to_string(const float& value);
+std::string export_to_string(const double& value);
 
 std::string export_to_string(const std::string& value);
 

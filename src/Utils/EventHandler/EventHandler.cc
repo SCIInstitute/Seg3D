@@ -27,6 +27,7 @@
 */
 
 #include <Utils/Core/Log.h>
+#include <Utils/Core/Exception.h>
 
 #include <Utils/EventHandler/EventHandler.h>
 #include <Utils/EventHandler/DefaultEventHandlerContext.h>
@@ -44,10 +45,28 @@ EventHandler::~EventHandler()
   eventhandler_context_->terminate_eventhandler();
 }
 
+bool 
+EventHandler::is_eventhandler_thread() const
+{ 
+  // use the private context class to answer this question
+  return (eventhandler_context_->is_eventhandler_thread());
+}
+
 void
 EventHandler::run_eventhandler()
 {
-  while (!(wait_and_process_events()));
+  SCI_LOG_DEBUG("Starting Event Handler");
+  
+  try
+  {
+    while (!(wait_and_process_events()));
+  }
+  catch(Exception& e)
+  {
+    SCI_LOG_ERROR(e.message());
+  }
+
+  SCI_LOG_DEBUG("Stopping Event Handler");
 }
 
 void
@@ -76,6 +95,32 @@ EventHandler::post_and_wait_event(boost::function<void ()> function)
     EventHandle event = EventHandle(new EventT<boost::function<void ()> >(function));
     eventhandler_context_->post_and_wait_event(event);
   }
+}
+
+bool 
+EventHandler::process_events()
+{
+  // use the implementation of the application context
+  return (eventhandler_context_->process_events());
+}
+
+bool 
+EventHandler::wait_and_process_events()
+{
+  // use the implementation of the application context
+  return (eventhandler_context_->wait_and_process_events());
+}
+
+bool 
+EventHandler::start_eventhandler()
+{
+  return (eventhandler_context_->start_eventhandler(this));
+}
+
+void 
+EventHandler::terminate_eventhandler()
+{
+  eventhandler_context_->terminate_eventhandler();
 }
 
 // TERMINATE_EVENTHANDLER

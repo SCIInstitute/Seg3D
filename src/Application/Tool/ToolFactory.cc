@@ -37,22 +37,26 @@ ToolFactory::ToolFactory()
 bool 
 ToolFactory::is_tool_type(const std::string& tool_type) const
 {
-  tool_map_type::const_iterator it = tool_builders_.find(tool_type);
-  if (it == tool_builders_.end()) return (false);
+  tool_map_type::const_iterator it = tools_.find(tool_type);
+  if (it == tools_.end()) return (false);
   return (true);
 }
     
 bool 
-ToolFactory::list_tool_types(tool_list_type& tool_list, int tool_group) const
+ToolFactory::list_tool_types(tool_list_type& tool_list, int properties) const
 {
   // clear the list
   tool_list.clear();
-  group_map_type::const_iterator it = tool_group_.begin();
+  
+  tool_map_type::const_iterator it = tools_.begin();
 
   // loop through all the tools
-  while (it != tool_group_.end())
+  while (it != tools_.end())
   {
-    if ((*it).second == tool_group) tool_list.push_back((*it).first);
+    if (((*it).second.properties_ & properties) == properties)
+    {
+      tool_list.push_back(std::make_pair((*it).first,(*it).second.menu_name_));
+    }
     ++it;
   }
   
@@ -66,22 +70,18 @@ ToolFactory::create_tool(const std::string& tool_type,
                          ToolHandle& tool) const
 {
   // Step (1): find the tool
-  tool_map_type::const_iterator it = tool_builders_.find(tool_type);
+  tool_map_type::const_iterator it = tools_.find(tool_type);
 
   // Step (2): check its existence
-  if (it == tool_builders_.end())
-  {
-    SCI_THROW_LOGICERROR(std::string("Trying to instantiate tool '")
-                                    +tool_type +"'that does not exist");
-  }
+  if (it == tools_.end()) return (false);
 
   // Step (3): build the tool
-  tool = (*it).second->build(toolid);
+  tool = (*it).second.builder_->build(toolid);
   
   // Step (4): insert the type_name and the properties into the tool
-  tool->set_tool_type(tool_type);
-  group_map_type::const_iterator group_it = tool_group_.find(tool_type);
-  tool->set_tool_group((*group_it).second);
+  tool->set_type(tool_type);
+  tool->set_properties((*it).second.properties_);
+  tool->set_menu_name((*it).second.menu_name_);
   
   return (true);
 }

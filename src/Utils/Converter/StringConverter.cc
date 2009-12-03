@@ -31,52 +31,52 @@
 
 namespace Utils {
 
-std::string export_to_string(const char value)
+std::string export_to_string(const char& value)
 {
   return to_string(value);
 }
 
-std::string export_to_string(const unsigned char value)
+std::string export_to_string(const unsigned char& value)
 {
   return to_string(value);
 }
 
-std::string export_to_string(const short value)
+std::string export_to_string(const short& value)
 {
   return to_string(value);
 }
 
-std::string export_to_string(const unsigned short value)
+std::string export_to_string(const unsigned short& value)
 {
   return to_string(value);
 }
 
-std::string export_to_string(const int value)
+std::string export_to_string(const int& value)
 {
   return to_string(value);
 }
 
-std::string export_to_string(const unsigned int value)
+std::string export_to_string(const unsigned int& value)
 {
   return to_string(value);
 }
 
-std::string export_to_string(const long value)
+std::string export_to_string(const long& value)
 {
   return to_string(value);
 }
 
-std::string export_to_string(const unsigned long value)
+std::string export_to_string(const unsigned long& value)
 {
   return to_string(value);
 }
 
-std::string export_to_string(const float value)
+std::string export_to_string(const float& value)
 {
   return to_string(value);
 }
 
-std::string export_to_string(const double value)
+std::string export_to_string(const double& value)
 {
   return to_string(value);
 }

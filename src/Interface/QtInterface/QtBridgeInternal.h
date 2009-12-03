@@ -58,7 +58,7 @@ class QtCheckBoxSlot : public QObject {
       state_handle_(state_handle) 
     {
       // Qt's connect function
-      connect(parent,SIGNAL(stateChanged),this,SLOT(slot));
+      connect(parent,SIGNAL(stateChanged(int)),this,SLOT(slot(int)));
     }
     
     // Virtual destructor: needed by Qt
@@ -79,6 +79,7 @@ class QtCheckBoxSlot : public QObject {
 
 class QtActionSlot : public QObject {
   Q_OBJECT
+  
   public:
 
     // Constructor
@@ -87,7 +88,7 @@ class QtActionSlot : public QObject {
       function_(function)
     {
       // Qt's connect function
-      connect(parent,SIGNAL(triggered),this,SLOT(slot));
+      connect(parent,SIGNAL(triggered()),this,SLOT(slot()));
     }
 
     // Virtual destructor: needed by Qt

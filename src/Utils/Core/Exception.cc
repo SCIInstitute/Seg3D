@@ -28,6 +28,7 @@
 
 #include <Utils/Core/Exception.h>
 #include <Utils/Core/StringUtil.h>
+#include <Utils/Core/Log.h>
 
 namespace Utils {
 

@@ -77,7 +77,7 @@ class ToolManager : public StateHandler {
   
     // OPEN_TOOL (accessed through Action):
     // Open a new tool into the current collection of active tools
-    bool open_tool(const std::string& tool_type, std::string toolid = std::string(""));
+    bool open_tool(const std::string& toolid, std::string& new_toolid);
 
     // CLOSE_TOOL (accessed through Action):
     // Close tool in current collection of active tools
@@ -159,15 +159,19 @@ class ToolManager : public StateHandler {
   
     // All the open tools are stored in this hash map
     tool_list_type   tool_list_;
+
+    // Lock for the tool_list
+    boost::mutex tool_list_lock_;
     
     // The tool that is currently active is stored here
     std::string      active_toolid_;
     
     // All the names that are currently in use
     toolid_list_type toolid_list_;
-    
+
     // Lock for the tool_list
-    boost::mutex tool_list_lock_;
+    boost::mutex toolid_list_lock_;
+    
 
 // -- Singleton interface --
   public:

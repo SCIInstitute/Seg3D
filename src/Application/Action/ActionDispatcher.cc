@@ -91,7 +91,7 @@ ActionDispatcher::run_action(ActionHandle action, ActionContextHandle action_con
   // the program as that may invalidate actions that were just tested.
 
   // Step (2): Tell observers what action is about to be executed
-  SCI_LOG_DEBUG("Posting Action");  
+  SCI_LOG_DEBUG("Posting Action for observers");  
   post_action_signal_(action);
   
   // Step (3): Run action from the context that was provided. And if the action
@@ -99,6 +99,8 @@ ActionDispatcher::run_action(ActionHandle action, ActionContextHandle action_con
   // program whether the action succeeded.
   SCI_LOG_DEBUG("Running Action");    
   bool success = action->run(action_context);
+
+  SCI_LOG_DEBUG("Action Done");    
   
   if (!(action->properties() & Action::ASYNCHRONOUS_E))
   {

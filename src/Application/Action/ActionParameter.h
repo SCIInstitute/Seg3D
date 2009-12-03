@@ -85,13 +85,13 @@ class ActionParameter : public ActionParameterBase {
     // export the value to a string
     virtual std::string export_to_string() const
     {
-      return Utils::export_to_string<T>(value_);
+      return Utils::export_to_string(value_);
     }
 
     // import the value from a string
     virtual bool import_from_string(const std::string& str)
     {
-      return Utils::import_from_string<T>(str,value_);
+      return Utils::import_from_string(str,value_);
     }
         
   private:

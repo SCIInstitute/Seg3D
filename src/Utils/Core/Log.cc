@@ -32,38 +32,43 @@
 #include <Utils/Core/StringUtil.h>
 
 #include <boost/bind.hpp>
+#include <boost/thread.hpp>
 
 namespace Utils {
 
 void
 Log::post_error(std::string message, const int line, const char* file)
 {
-  std::string str = std::string("[")+file+std::string(":")+to_string(line)+
-    std::string("] ERROR: ")+message;
+  std::string str = std::string("[T")+to_string(boost::this_thread::get_id())+
+                    std::string(":")+file+std::string(":")+to_string(line)+
+                    std::string("] ERROR: ")+message;
   post_log_signal_(ERROR_E, str);
 }  
 
 void
 Log::post_warning(std::string message, const int line, const char* file)
 {
-  std::string str = std::string("[")+file+std::string(":")+to_string(line)+
-    std::string("] WARNING: ")+message;
+  std::string str = std::string("[T")+to_string(boost::this_thread::get_id())+
+                    std::string(":")+file+std::string(":")+to_string(line)+
+                    std::string("] WARNING: ")+message;
   post_log_signal_(WARNING_E, str);
 }  
 
 void
 Log::post_message(std::string message, const int line, const char* file)
 {
-  std::string str = std::string("[")+file+std::string(":")+to_string(line)+
-    std::string("] MESSAGE: ")+message;
+  std::string str = std::string("[T")+to_string(boost::this_thread::get_id())+
+                    std::string(":")+file+std::string(":")+to_string(line)+
+                    std::string("] MESSAGE: ")+message;
   post_log_signal_(MESSAGE_E, str);
 }  
 
 void
 Log::post_debug(std::string message, const int line, const char* file)
 {
-  std::string str = std::string("[")+file+std::string(":")+to_string(line)+
-    std::string("] DEBUG: ")+message;
+  std::string str = std::string("[T")+to_string(boost::this_thread::get_id())+
+                    std::string(":")+file+std::string(":")+to_string(line)+
+                    std::string("] DEBUG: ")+message;
   post_log_signal_(DEBUG_E, str);
 }  
 

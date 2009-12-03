@@ -61,17 +61,14 @@ class EventHandler : public boost::noncopyable  {
 // -- Event handling --
   public:
     
-    bool is_eventhandler_thread() const
-    { 
-      // use the private context class to answer this question
-      return (eventhandler_context_->is_eventhandler_thread());
-    }
+    // IS_EVENTHANDLER_THREAD:
+    // Is this the event handler thread
+    bool is_eventhandler_thread() const;
     
     // POST_EVENT:
     // Post an event on the application event stack. If the program uses a GUI
     // these events are mixed in with the main event handler and are execute at
     // the same time.   
-    
     void post_event(boost::function<void ()> function);
     
     // POST_AND_WAIT_EVENT:
@@ -80,13 +77,11 @@ class EventHandler : public boost::noncopyable  {
     // application thread itself it will immediately execute and not post 
     // any events on the event stack in order for the application not to
     // dead lock
-    
     void post_and_wait_event(boost::function<void ()> function);
 
     // POST_EVENT_AND_GET_RESULT:
     // This function is similar to post_event, but waits until the function 
     // has finished execution and it also grabs the output.
-        
     template<class FUNCTION>
     void post_event_and_get_result(FUNCTION function, 
                                    typename FUNCTION::result_type& result)
@@ -103,38 +98,25 @@ class EventHandler : public boost::noncopyable  {
       }
     }
 
+
 // -- Processing events from within the event handler thread --
   protected:
     
     // PROCESS_EVENTS:
     // Process the events that are in the event handler queue.
-
-    bool process_events()
-    {
-      // use the implementation of the application context
-      return (eventhandler_context_->process_events());
-    }
+    bool process_events();
 
     // WAIT_AND_PROCESS_EVENTS:
     // Wait for events to come in and process the events
-
-    bool wait_and_process_events()
-    {
-      // use the implementation of the application context
-      return (eventhandler_context_->wait_and_process_events());
-    }
-
+    bool wait_and_process_events();
+    
 // -- Thread interface --
   public:
   
     // START_EVENTHANDLER:
     // Start the eventhandler. This will launch the eventhandler
     // thread and runs the run_eventhandler() function.
-  
-    bool start_eventhandler()
-    {
-      return (eventhandler_context_->start_eventhandler(this));
-    }
+    bool start_eventhandler();
   
     // RUN_EVENTHANDLER:
     // The main functions that processes all the incoming events.
@@ -142,18 +124,15 @@ class EventHandler : public boost::noncopyable  {
     
   private:
   
+    friend void TerminateEventHandlerThread(EventHandlerHandle handle);
+
     // TERMINATE_EVENTHANDLER:
     // Terminate processing events and kill the thread that processes them.
     // This function is private and can only be called from
     // TerminateEventHandler(). This function launches a separate thread
     // that joins with the eventhandler thread, to allow for the remainder
-    // events to be processed before the object is destructed.
-    friend void TerminateEventHandlerThread(EventHandlerHandle handle);
-    
-    void terminate_eventhandler()
-    {
-      eventhandler_context_->terminate_eventhandler();
-    }
+    // events to be processed before the object is destructed.    
+    void terminate_eventhandler();
     
 // -- Context interface --
   public:
@@ -162,7 +141,6 @@ class EventHandler : public boost::noncopyable  {
     // Setup the application context. The application context abstracts the 
     // interface piece of the GUI layer that is needed for communication with
     // the application thread.
-
     void install_eventhandler_context(EventHandlerContextHandle& context);
     
   private:  
@@ -171,7 +149,6 @@ class EventHandler : public boost::noncopyable  {
     // This is the internal representation of the handler.
     // This one can be overloaded, which is for instance needed
     // for the Qt thread.
-    
     EventHandlerContextHandle eventhandler_context_; 
     
 };

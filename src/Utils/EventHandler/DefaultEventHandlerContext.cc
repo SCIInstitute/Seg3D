@@ -47,6 +47,7 @@ DefaultEventHandlerContext::post_event(EventHandle& event)
 {
   boost::unique_lock<boost::mutex> lock(event_queue_mutex_);
   event_queue_.push(event);
+  event_queue_new_event_.notify_all();
 }  
 
 void
@@ -67,7 +68,7 @@ DefaultEventHandlerContext::post_and_wait_event(EventHandle& event)
     boost::unique_lock<boost::mutex> lock(event_queue_mutex_);
     // Adding event to queue
     event_queue_.push(event);
-    event_queue_new_event_.notify_one();
+    event_queue_new_event_.notify_all();
   }
   
   // wait for application to handle the event

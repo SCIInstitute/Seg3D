@@ -106,11 +106,11 @@ AppMenu::create_tool_menu(QMenu* qmenu)
   while(it != it_end)
   {
     // Add menu option to open tool
-    QAction* qaction = qmenu->addAction(QString((*it).c_str()));
+    QAction* qaction = qmenu->addAction(QString((*it).second.c_str()));
     // Connect the action with dispatching a command in the ToolManager
     QtBridge::connect(qaction,boost::bind(&ToolManager::dispatch_opentool,
                                           ToolManager::instance(),
-                                          (*it)));
+                                          (*it).first));
     ++it;
   }
 }
@@ -128,11 +128,11 @@ AppMenu::create_filter_menu(QMenu* qmenu)
     while(it != it_end)
     {
       // Add menu option to open tool
-      QAction* qaction = qmenu->addAction(QString((*it).c_str()));
+      QAction* qaction = qmenu->addAction(QString((*it).second.c_str()));
       // Connect the action with dispatching a command in the ToolManager
       QtBridge::connect(qaction,boost::bind(&ToolManager::dispatch_opentool,
                                             ToolManager::instance(),
-                                            (*it)));
+                                            (*it).first));
       ++it;
     }
   }
@@ -146,11 +146,11 @@ AppMenu::create_filter_menu(QMenu* qmenu)
     while(it != it_end)
     {
       // Add menu option to open tool
-      QAction* qaction = qmenu->addAction(QString((*it).c_str()));
+      QAction* qaction = qmenu->addAction(QString((*it).second.c_str()));
       // Connect the action with dispatching a command in the ToolManager
       QtBridge::connect(qaction,boost::bind(&ToolManager::dispatch_opentool,
                                             ToolManager::instance(),
-                                            (*it)));
+                                            (*it).first));
       ++it;
     }
   }
@@ -164,11 +164,11 @@ AppMenu::create_filter_menu(QMenu* qmenu)
     while(it != it_end)
     {
       // Add menu option to open tool
-      QAction* qaction = qmenu->addAction(QString((*it).c_str()));
+      QAction* qaction = qmenu->addAction(QString((*it).second.c_str()));
       // Connect the action with dispatching a command in the ToolManager
       QtBridge::connect(qaction,boost::bind(&ToolManager::dispatch_opentool,
                                             ToolManager::instance(),
-                                            (*it)));
+                                            (*it).first));
       ++it;
     }
   }

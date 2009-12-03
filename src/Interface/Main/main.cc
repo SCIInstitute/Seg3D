@@ -58,7 +58,7 @@ using namespace Seg3D;
 int main(int argc, char **argv)
 {
   // -- Setup error logging --
-  Utils::LogStreamer error_log(Utils::Log::ALL_E,&(std::cout));
+  Utils::LogStreamer error_log(Utils::Log::ALL_E,&(std::cerr));
 
   SCI_LOG_MESSAGE(std::string("--- Starting Seg3D ")+SEG3D_VERSION+" ---");
 
@@ -88,6 +88,7 @@ int main(int argc, char **argv)
   AppInterface* app_interface = 
     new AppInterface(QtApplication::instance()->get_qapplication());
   app_interface->show();
+  app_interface->raise();
     
   
   // -- Run QT event loop --

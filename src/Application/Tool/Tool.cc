@@ -36,7 +36,7 @@ Tool::Tool(const std::string& toolid) :
   StateHandler(std::string("ToolManager::")+toolid),
   toolid_(toolid)
 {
-  ToolManager::instance()->add_toolid(toolid);
+  ToolManager::instance()->add_toolid(toolid_);
 }
 
 Tool::~Tool()

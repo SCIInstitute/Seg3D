@@ -33,7 +33,7 @@
 namespace Seg3D {
 
 // Register the tool into the tool factory
-SCI_REGISTER_TOOL(PaintTool,Tool::TOOL_E)
+SCI_REGISTER_TOOL(PaintTool,"Paint Tool",Tool::TOOL_E)
 
 PaintTool::PaintTool(const std::string& toolid) :
   Tool(toolid)

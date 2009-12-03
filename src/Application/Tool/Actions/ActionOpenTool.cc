@@ -44,16 +44,22 @@ SCI_REGISTER_ACTION(OpenTool);
 bool
 ActionOpenTool::validate(ActionContextHandle& context)
 {
+  // Check whether an id number was attached
+  std::string tool_type = toolid_.value();
+  std::string::size_type loc = tool_type.find('_');
+  if (loc != std::string::npos) tool_type = tool_type.substr(0,loc);
+
   // Check whether the tool has a valid type
-  if (!(ToolFactory::instance()->is_tool_type(tool_type_.value())))
+  if (!(ToolFactory::instance()->is_tool_type(tool_type)))
   {
-    context->report_error(std::string("No tool available of type '")+tool_type_.value()+"'");
+    context->report_error(std::string("No tool available of type '")+tool_type+"'");
     return (false);
   }
 
   // Check whether name does not exist, if it exists we have to report an
   // error.
-  if (toolid_.value() != "")
+  
+  if (loc != std::string::npos)
   {
     if (ToolManager::instance()->is_toolid(toolid_.value()))
     {
@@ -61,6 +67,7 @@ ActionOpenTool::validate(ActionContextHandle& context)
       return (false);
     }
   }
+  
   return (true); // validated
 }
 
@@ -71,8 +78,8 @@ bool
 ActionOpenTool::run(ActionContextHandle& context)
 {
   // Open and Activate the tool
-  ToolManager::instance()->open_tool(tool_type_.value(),toolid_.value());
-  ToolManager::instance()->activate_tool(toolid_.value());
+  ToolManager::instance()->open_tool(toolid_.value(),result_toolid_.value());
+  ToolManager::instance()->activate_tool(result_toolid_.value());
   return (true); // success
 }
 

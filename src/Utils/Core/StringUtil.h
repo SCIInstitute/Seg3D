@@ -46,6 +46,9 @@
 #include <sstream>
 #include <fstream>
 
+// Boost includes
+#include <boost/thread.hpp>
+
 namespace Utils {
 
 // Convert multiple values in a string into a vector with numbers

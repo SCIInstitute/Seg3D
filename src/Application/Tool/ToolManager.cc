@@ -54,7 +54,7 @@ ToolManager::dispatch_opentool(const std::string& tool_name) const
   // Build new action
   ActionOpenToolHandle action(new ActionOpenTool);
   // Set the action parameters
-  action->set(tool_name,"");
+  action->set(tool_name);
   // Run the action on the application thread
   PostActionFromInterface(action);
 }
@@ -87,16 +87,31 @@ ToolManager::dispatch_activatetool(const std::string& toolid) const
 // application thread. Hence the function is always executed by the same thread.
 
 bool
-ToolManager::open_tool(const std::string& tool_type,std::string toolid)
+ToolManager::open_tool(const std::string& toolid ,std::string& new_toolid)
 {
-  // Step (1): If no tool id was supplied, create a new unique one
-  if (toolid == "") toolid = create_toolid(tool_type);
+  // Check whether an id number was attached
+  std::string tool_type = toolid;
+  std::string::size_type loc = tool_type.find('_');
+  if (loc != std::string::npos) 
+  {
+    tool_type = tool_type.substr(0,loc);
+    // ToolID was already assigned in the action
+    // and hence we do not need to generate a new one
+    new_toolid = toolid;
+  }
+  else
+  {
+    // No final toolID was assigned and a new one has to be made
+    new_toolid = create_toolid(tool_type);
+  }
+
+  SCI_LOG_DEBUG(std::string("Creating tool: ")+new_toolid+" of type "+tool_type);
     
   // Step (2): Build the tool using the factory. This will generate the default
   // settings.
   ToolHandle tool;
   
-  if (!(ToolFactory::instance()->create_tool(tool_type,toolid,tool)))
+  if (!(ToolFactory::instance()->create_tool(tool_type,new_toolid,tool)))
   {
     SCI_LOG_ERROR(std::string("Could not create tool of type: '")+tool_type+"'");
     return (false);
@@ -105,9 +120,10 @@ ToolManager::open_tool(const std::string& tool_type,std::string toolid)
   // Step (3): Add the tool id to the tool and add the tool to the list
   {
     boost::unique_lock<boost::mutex> lock(tool_list_lock_);
-    tool_list_[toolid] = tool;
+    tool_list_[new_toolid] = tool;
   }
-  
+    
+  SCI_LOG_DEBUG(std::string("Open tool: ")+new_toolid);
   // Step (4): Signal any observers (UIs) that the tool has been opened  
   open_tool_signal_(tool);
 
@@ -159,6 +175,8 @@ ToolManager::close_tool(const std::string& toolid)
     // Step (5): Close any of the registered connections
     tool->close_connections();      
   }
+
+  SCI_LOG_DEBUG(std::string("Close tool: ")+toolid);
   
   // Step (6): Signal that the tool will be closed.   
   close_tool_signal_(tool);
@@ -173,6 +191,8 @@ ToolManager::activate_tool(const std::string& toolid)
 {
   // Check if anything needs to be done
   if (toolid == active_toolid_) return;
+
+  SCI_LOG_DEBUG(std::string("Activate tool: ")+toolid);
 
   ToolHandle tool;
   { // within this scope the lists are locked
@@ -209,24 +229,24 @@ ToolManager::activate_tool(const std::string& toolid)
 }
 
 
-
 void
 ToolManager::add_toolid(const std::string& toolid)
 {
-  boost::unique_lock<boost::mutex> lock(tool_list_lock_);
+  boost::unique_lock<boost::mutex> lock(toolid_list_lock_);
   toolid_list_.insert(toolid);
 }        
 
 void
 ToolManager::remove_toolid(const std::string& toolid)
 {
-  boost::unique_lock<boost::mutex> lock(tool_list_lock_);
+  boost::unique_lock<boost::mutex> lock(toolid_list_lock_);
   toolid_list_.erase(toolid);
 }
 
 bool
 ToolManager::is_toolid(const std::string& toolid)
 {
+  boost::unique_lock<boost::mutex> lock(toolid_list_lock_);
   if(toolid_list_.find(toolid) != toolid_list_.end()) return (true);
   return (false);
 }
@@ -234,14 +254,15 @@ ToolManager::is_toolid(const std::string& toolid)
 std::string 
 ToolManager::create_toolid(const std::string& tool_type)
 {
-  boost::unique_lock<boost::mutex> lock(tool_list_lock_);
-  std::string toolid_base = std::string("ToolManager::")+tool_type; 
-  int num = 0;
+  boost::unique_lock<boost::mutex> lock(toolid_list_lock_);
 
+  int num = 0;
   std::string toolid;
+
   do 
   {
-    toolid = toolid_base+Utils::to_string(num++);
+    toolid = tool_type+std::string("_")+Utils::to_string(num);
+    num++;
   } 
   while(toolid_list_.find(toolid) != toolid_list_.end());
   
