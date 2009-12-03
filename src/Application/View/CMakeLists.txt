@@ -1,3 +1,4 @@
+
 #
 #  For more information, please see: http://software.sci.utah.edu
 # 
@@ -26,11 +27,33 @@
 #  DEALINGS IN THE SOFTWARE.
 #
 
-ADD_SUBDIRECTORY(Application)
-ADD_SUBDIRECTORY(Interface)
-ADD_SUBDIRECTORY(Action)
-ADD_SUBDIRECTORY(State)
-ADD_SUBDIRECTORY(Layer)
-ADD_SUBDIRECTORY(View)
-ADD_SUBDIRECTORY(Tool)
-ADD_SUBDIRECTORY(Tools)
+##################################################
+# Set sources
+##################################################
+
+SET(APPLICATION_VIEW_SRCS
+  View.h
+  View.cc
+  ViewManager.h
+  ViewManager.cc
+  )
+
+SET(APPLICATION_VIEW_ACTIONS_SRCS
+  )
+
+ADD_LIBRARY(Application_View STATIC 
+            ${APPLICATION_VIEW_SRCS}
+            ${APPLICATION_VIEW_ACTIONS_SRCS} )
+            
+TARGET_LINK_LIBRARIES(Application_View
+                      Utils_Core
+                      Application_Application
+                      Application_Interface
+                      Application_Action
+                      Application_State
+                      ${SCI_BOOST_LIBRARY})
+
+# Register actions
+ADD_LIBRARY_ACTIONS(Application_View
+                    ${APPLICATION_VIEW_ACTIONS_SRCS})
+                    
