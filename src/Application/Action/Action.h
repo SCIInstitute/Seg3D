@@ -96,8 +96,8 @@ class Action : public boost::noncopyable {
     std::string action_type() const { return action_type_; }
 
   private:
-    int         properties_;    
     std::string action_type_;
+    int         properties_;    
     
 // -- Run/Validate interface --
 

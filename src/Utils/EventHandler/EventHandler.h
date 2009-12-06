@@ -79,26 +79,6 @@ class EventHandler : public boost::noncopyable  {
     // dead lock
     void post_and_wait_event(boost::function<void ()> function);
 
-    // POST_EVENT_AND_GET_RESULT:
-    // This function is similar to post_event, but waits until the function 
-    // has finished execution and it also grabs the output.
-    template<class FUNCTION>
-    void post_event_and_get_result(FUNCTION function, 
-                                   typename FUNCTION::result_type& result)
-    {
-      if (is_eventhandler_thread())
-      {
-        result = function();
-      }
-      else
-      {
-        EventHandle event = EventHandle(new EventRT<FUNCTION>(function));
-        eventhandler_context_->post_and_wait_event(event);
-        result = dynamic_cast<EventRT<FUNCTION> *>(event.get())->get_result();
-      }
-    }
-
-
 // -- Processing events from within the event handler thread --
   protected:
     

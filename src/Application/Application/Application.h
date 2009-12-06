@@ -53,18 +53,27 @@ class Application : public Utils::EventHandler  {
 
 // -- Application thread --    
     
-    // IS_APPLICATION_THREAD:
+    // ISAPPLICATIONTHREAD:
     // Test whether the current thread is the application thread
+    static bool IsApplicationThread()
+      { return (Instance()->is_eventhandler_thread()); }
 
-    static bool is_application_thread()
-      { return (instance()->is_eventhandler_thread()); }
+    // POSTEVENT:
+    // Short cut to the event handler
+    static void PostEvent(boost::function<void ()> function)
+      { Instance()->post_event(function); }
+
+    // POSTANDWAITEVENT:
+    // Short cut to the event handler
+    static void PostAndWaitEvent(boost::function<void ()> function)
+      { Instance()->post_and_wait_event(function); }
 
 // -- Singleton interface --
   public:
     
     // INSTANCE:
     // Get the singleton interface
-    static Application* instance() { instance_.instance(); }
+    static Application* Instance() { return instance_.instance(); }
     
   private:  
     static Utils::Singleton<Application> instance_;

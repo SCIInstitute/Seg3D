@@ -31,8 +31,13 @@
 
 // STL includes
 #include <string>
+#include <map>
+#include <set>
 
 // Boost includes
+
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/recursive_mutex.hpp>
 #include <boost/unordered_set.hpp>
 #include <boost/unordered_map.hpp>
 #include <boost/shared_ptr.hpp>
@@ -87,18 +92,15 @@ class ToolManager : public StateHandler {
     // Set which tool is currently highlighted
     // The active tool has access to the viewer
     void activate_tool(const std::string& toolid);
-  
+    
 // -- Signals for the User Interface --
-
   public:
-    typedef boost::signals2::signal<void (ToolHandle)>  open_tool_signal_type;
-    typedef boost::signals2::signal<void (ToolHandle)>  close_tool_signal_type;
-    typedef boost::signals2::signal<void (ToolHandle)>  activate_tool_signal_type;
+    typedef boost::signals2::signal<void (ToolHandle)>  tool_signal_type;
   
     // CONNECT_OPEN_TOOL:
     // Connect to signal that signals new tool being created
     boost::signals2::connection 
-    connect_open_tool(open_tool_signal_type::slot_type slot)
+    connect_open_tool(tool_signal_type::slot_type slot) // << THREAD-SAFE
     {
       return open_tool_signal_.connect(slot);
     }
@@ -106,7 +108,7 @@ class ToolManager : public StateHandler {
     // CONNECT_CLOSE_TOOL:
     // Connect to signal that signals tool being closed
     boost::signals2::connection 
-    connect_close_tool(close_tool_signal_type::slot_type slot)
+    connect_close_tool(tool_signal_type::slot_type slot) // << THREAD-SAFE
     {
       return close_tool_signal_.connect(slot);
     }
@@ -114,7 +116,7 @@ class ToolManager : public StateHandler {
     // CONNECT_ACTIVATE_TOOL:
     // Connect to signal that signals tool being closed
     boost::signals2::connection 
-    connect_activate_tool(activate_tool_signal_type::slot_type slot)
+    connect_activate_tool(tool_signal_type::slot_type slot) // << THREAD-SAFE
     {
       return activate_tool_signal_.connect(slot);
     }
@@ -123,15 +125,36 @@ class ToolManager : public StateHandler {
     
     // OPEN_TOOL_SIGNAL:
     // This signal is triggered after a tool has been opened
-    open_tool_signal_type open_tool_signal_;
+    tool_signal_type open_tool_signal_;
     
     // CLOSE_TOOL_SIGNAL:
     // This signal is triggered when before a tool is closed
-    close_tool_signal_type close_tool_signal_;
+    tool_signal_type close_tool_signal_;
 
     // ACTIVATE_TOOL_SIGNAL:
     // This signal is triggered when before a tool is closed
-    activate_tool_signal_type activate_tool_signal_;
+    tool_signal_type activate_tool_signal_;
+
+// -- Access to toollist --
+  public:
+    typedef std::map<std::string,ToolHandle> tool_list_type;
+    typedef std::set<std::string> toolid_list_type;
+  
+    // TOOL_LIST:
+    // Get the current open tool list
+    tool_list_type tool_list();
+
+    // ACTIVE_TOOLID:
+    // Get the active toolid
+    std::string active_toolid();
+
+    // LOCK_TOOL_LIST:
+    // Lock the tool list
+    void lock_tool_list();
+
+    // UNLOCK_TOOL_LIST:
+    // Unlock the tool list
+    void unlock_tool_list();
 
 // -- Tool database --
   protected:
@@ -139,29 +162,27 @@ class ToolManager : public StateHandler {
 
     // ADD_TOOLID:
     // Mark a toolid as used
-    void add_toolid(const std::string& toolid);
+    void add_toolid(const std::string& toolid); // << THREAD-SAFE
     
     // REMOVE_TOOLID:
     // Remove the toolid from the list
-    void remove_toolid(const std::string& toolid);
+    void remove_toolid(const std::string& toolid); // << THREAD-SAFE
 
     // IS_TOOLID:
     // Check whether toolid is taken
-    bool is_toolid(const std::string& toolid);
+    bool is_toolid(const std::string& toolid); // << THREAD-SAFE
 
     // CREATE_TOOLID:
     // Create a new tool id that is not yet in the list
-    std::string create_toolid(const std::string& tool_type);
+    std::string create_toolid(const std::string& tool_type); // << THREAD-SAFE
 
   private:
-    typedef boost::unordered_map<std::string,ToolHandle> tool_list_type;
-    typedef boost::unordered_set<std::string> toolid_list_type;
   
     // All the open tools are stored in this hash map
     tool_list_type   tool_list_;
 
     // Lock for the tool_list
-    boost::mutex tool_list_lock_;
+    boost::recursive_mutex tool_list_lock_;
     
     // The tool that is currently active is stored here
     std::string      active_toolid_;
@@ -170,12 +191,12 @@ class ToolManager : public StateHandler {
     toolid_list_type toolid_list_;
 
     // Lock for the tool_list
-    boost::mutex toolid_list_lock_;
+    boost::mutex     toolid_list_lock_;
     
 
 // -- Singleton interface --
   public:
-    static ToolManager* instance() { instance_.instance(); }
+    static ToolManager* Instance() { return instance_.instance(); }
 
   private:
     static Utils::Singleton<ToolManager> instance_;

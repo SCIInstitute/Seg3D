@@ -45,8 +45,8 @@ Utils::Singleton<Interface> Interface::instance_;
 
 void PostActionFromInterface(ActionHandle action, bool update_interface)
 {
-  ActionDispatcher::instance()->post_action(action,
-              Interface::instance()->create_action_context(update_interface));
+  ActionDispatcher::Instance()->post_action(action,
+        Interface::Instance()->create_action_context(update_interface));
 }
 
 

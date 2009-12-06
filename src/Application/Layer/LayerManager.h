@@ -80,12 +80,11 @@ namespace Seg3D {
 
 // class definitions
 
-class LayerManager : public boost::noncopyable, public StateHandler {
+class LayerManager : public StateHandler {
 public:
   LayerManager();
   ~LayerManager();
   
-  static LayerManager* instance() { instance_.instance(); }
 
   // -- Signals for the User Interface --
   typedef boost::signals2::signal<void (LayerHandle)> layer_changed_signal_type;
@@ -136,6 +135,16 @@ protected:
   // LAYER_CHANGED_SIGNAL:
   // This signal is triggered after a layer has been modified
   layer_changed_signal_type layer_changed_signal_;
+
+
+
+// -- Singleton interface --
+  public:
+    
+    // INSTANCE:
+    // Get the singleton interface  
+    
+    static LayerManager* Instance() { return instance_.instance(); }
 
 private:
   static Utils::Singleton<LayerManager> instance_;

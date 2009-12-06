@@ -45,7 +45,7 @@ ActionRecorder::start()
 {
   if (!(connection_.connected()))
   {
-    connection_ = ActionDispatcher::instance()->connect_observer(
+    connection_ = ActionDispatcher::Instance()->connect_observer(
       boost::bind(&ActionRecorder::record,this,_1));
   }
 }

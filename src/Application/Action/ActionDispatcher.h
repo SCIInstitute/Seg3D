@@ -112,7 +112,7 @@ class ActionDispatcher : public boost::noncopyable {
 // -- Singleton interface --
   public:
     
-    static ActionDispatcher* instance() { instance_.instance(); } // << SINGLETON
+    static ActionDispatcher* Instance() { return instance_.instance(); } // << SINGLETON
     
   private:
     // Singleton internals
@@ -124,7 +124,7 @@ class ActionDispatcher : public boost::noncopyable {
  
 inline void PostAction(ActionHandle action, ActionContextHandle action_context)
 {
-  ActionDispatcher::instance()->post_action(action, action_context);
+  ActionDispatcher::Instance()->post_action(action, action_context);
 }
 
 } // namespace Seg3D

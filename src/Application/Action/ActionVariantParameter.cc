@@ -56,6 +56,8 @@ ActionVariantParameter::import_from_string(const std::string& str)
   // As we do not know the implied type. It can only be recorded as a string
   typed_value_.reset();
   string_value_ = str;
+  
+  return (true);
 }
 
 bool 

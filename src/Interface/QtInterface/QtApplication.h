@@ -90,7 +90,7 @@ class QtApplication : public boost::noncopyable {
   public:
     
     // INSTANCE:
-    static QtApplication* instance() { instance_.instance(); }
+    static QtApplication* instance() { return instance_.instance(); }
     
   private:  
     static Utils::Singleton<QtApplication> instance_;

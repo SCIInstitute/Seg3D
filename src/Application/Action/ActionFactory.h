@@ -143,7 +143,7 @@ class ActionFactory : public boost::noncopyable  {
 // -- Singleton interface --
   public:
     
-    static ActionFactory* instance() { instance_.instance(); }
+    static ActionFactory* Instance() { return instance_.instance(); }
 
   private:
     static Utils::Singleton<ActionFactory> instance_;
@@ -157,7 +157,7 @@ class ActionFactory : public boost::noncopyable  {
 #define SCI_REGISTER_ACTION(name)\
 void register_Action##name()\
 {\
-  ActionFactory::instance()->register_action<Action##name>(#name);\
+  ActionFactory::Instance()->register_action<Action##name>(#name);\
 } 
 
 } // end namespace seg3D

@@ -40,7 +40,11 @@ SET(MAIN_SRCS
 
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SEG3D_OUTPUT_DIRECTORY})
 
+IF(APPLE)
+ADD_EXECUTABLE(Seg3D MACOSX_BUNDLE ${MAIN_SRCS})
+ELSE(APPLE)
 ADD_EXECUTABLE(Seg3D ${MAIN_SRCS})
+ENDIF(APPLE)
 
 TARGET_LINK_LIBRARIES(Seg3D 
   ${QT_LIBRARIES}
@@ -59,3 +63,52 @@ TARGET_LINK_LIBRARIES(Seg3D
 IF(WIN32)
   TARGET_LINK_LIBRARIES(Seg3D ${QT_QTMAIN_LIBRARY} )
 ENDIF(WIN32)
+
+###########################################
+# SETUP MACOSX APPLICATION BUNDLE
+# There is no good way for incorporating 
+# external libraries into a bundle, hence
+# it is hard coded here what needs to be
+# done to generate an application that
+# does not depend on anything except the
+# operating system
+###########################################
+
+IF(APPLE)
+  IF(${CMAKE_GENERATOR} MATCHES "Xcode")
+    FILE(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug/Seg3D.app/Contents/MacOS)
+    FILE(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug/Seg3D.app/Contents/Resources)
+    FILE(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/Seg3D.app/Contents/MacOS)
+    FILE(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/Seg3D.app/Contents/Resources)
+
+
+  ELSE(${CMAKE_GENERATOR} MATCHES "Xcode")
+    ADD_CUSTOM_COMMAND(TARGET Seg3D 
+       POST_BUILD
+       COMMAND cp -rf "${QT_QTCORE_LIBRARY_RELEASE}/Versions/4/QtCore" "Seg3D.app/Contents/MacOS/"
+       COMMAND cp -rf "${QT_QTGUI_LIBRARY_RELEASE}/Versions/4/QtGui" "Seg3D.app/Contents/MacOS/"
+       COMMAND install_name_tool -id QtCore Seg3D.app/Contents/MacOS/QtCore
+       COMMAND install_name_tool -id QtGui Seg3D.app/Contents/MacOS/QtGui
+       COMMAND install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore Seg3D.app/Contents/MacOS/QtGui
+       COMMAND install_name_tool -change QtGui.framework/Versions/4/QtGui @executable_path/QtGui Seg3D.app/Contents/MacOS/Seg3D
+       COMMAND install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore Seg3D.app/Contents/MacOS/Seg3D
+       COMMAND cp "-rf" "${QT_QTGUI_LIBRARY_RELEASE}/Versions/Current/Resources" "Seg3D.app/Contents"
+       WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug)
+
+    ADD_CUSTOM_COMMAND(TARGET Seg3D 
+       POST_BUILD
+       COMMAND cp -rf "${QT_QTCORE_LIBRARY_RELEASE}/Versions/4/QtCore" "Seg3D.app/Contents/MacOS/"
+       COMMAND cp -rf "${QT_QTGUI_LIBRARY_RELEASE}/Versions/4/QtGui" "Seg3D.app/Contents/MacOS/"
+       COMMAND install_name_tool -id QtCore Seg3D.app/Contents/MacOS/QtCore
+       COMMAND install_name_tool -id QtGui Seg3D.app/Contents/MacOS/QtGui
+       COMMAND install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore Seg3D.app/Contents/MacOS/QtGui
+       COMMAND install_name_tool -change QtGui.framework/Versions/4/QtGui @executable_path/QtGui Seg3D.app/Contents/MacOS/Seg3D
+       COMMAND install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore Seg3D.app/Contents/MacOS/Seg3D
+       COMMAND cp "-rf" "${QT_QTGUI_LIBRARY_RELEASE}/Versions/Current/Resources" "Seg3D.app/Contents"
+       WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release)
+  ENDIF(${CMAKE_GENERATOR} MATCHES "Xcode")
+ENDIF(APPLE)
+
+INSTALL(TARGETS Seg3D 
+        RUNTIME DESTINATION bin
+        BUNDLE DESTINATION .)

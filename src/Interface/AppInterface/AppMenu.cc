@@ -98,7 +98,7 @@ void
 AppMenu::create_tool_menu(QMenu* qmenu)
 {
   ToolFactory::tool_list_type tool_types_list;
-  ToolFactory::instance()->list_tool_types(tool_types_list,Tool::TOOL_E);
+  ToolFactory::Instance()->list_tool_types(tool_types_list,Tool::TOOL_E);
   
   ToolFactory::tool_list_type::const_iterator it = tool_types_list.begin();
   ToolFactory::tool_list_type::const_iterator it_end = tool_types_list.end();
@@ -109,7 +109,7 @@ AppMenu::create_tool_menu(QMenu* qmenu)
     QAction* qaction = qmenu->addAction(QString((*it).second.c_str()));
     // Connect the action with dispatching a command in the ToolManager
     QtBridge::connect(qaction,boost::bind(&ToolManager::dispatch_opentool,
-                                          ToolManager::instance(),
+                                          ToolManager::Instance(),
                                           (*it).first));
     ++it;
   }
@@ -121,7 +121,7 @@ AppMenu::create_filter_menu(QMenu* qmenu)
 {
   ToolFactory::tool_list_type tool_types_list;
 
-  ToolFactory::instance()->list_tool_types(tool_types_list,Tool::DATATODATA_FILTER_E);  
+  ToolFactory::Instance()->list_tool_types(tool_types_list,Tool::DATATODATA_E|Tool::FILTER_E);  
   {
     ToolFactory::tool_list_type::const_iterator it = tool_types_list.begin();
     ToolFactory::tool_list_type::const_iterator it_end = tool_types_list.end();  
@@ -131,7 +131,7 @@ AppMenu::create_filter_menu(QMenu* qmenu)
       QAction* qaction = qmenu->addAction(QString((*it).second.c_str()));
       // Connect the action with dispatching a command in the ToolManager
       QtBridge::connect(qaction,boost::bind(&ToolManager::dispatch_opentool,
-                                            ToolManager::instance(),
+                                            ToolManager::Instance(),
                                             (*it).first));
       ++it;
     }
@@ -139,7 +139,7 @@ AppMenu::create_filter_menu(QMenu* qmenu)
   
   qmenu->addSeparator();
 
-  ToolFactory::instance()->list_tool_types(tool_types_list,Tool::DATATOMASK_FILTER_E);  
+  ToolFactory::Instance()->list_tool_types(tool_types_list,Tool::DATATOMASK_E|Tool::FILTER_E);  
   {
     ToolFactory::tool_list_type::const_iterator it = tool_types_list.begin();
     ToolFactory::tool_list_type::const_iterator it_end = tool_types_list.end();  
@@ -149,7 +149,7 @@ AppMenu::create_filter_menu(QMenu* qmenu)
       QAction* qaction = qmenu->addAction(QString((*it).second.c_str()));
       // Connect the action with dispatching a command in the ToolManager
       QtBridge::connect(qaction,boost::bind(&ToolManager::dispatch_opentool,
-                                            ToolManager::instance(),
+                                            ToolManager::Instance(),
                                             (*it).first));
       ++it;
     }
@@ -157,7 +157,7 @@ AppMenu::create_filter_menu(QMenu* qmenu)
 
   qmenu->addSeparator();
 
-  ToolFactory::instance()->list_tool_types(tool_types_list,Tool::MASKTOMASK_FILTER_E);  
+  ToolFactory::Instance()->list_tool_types(tool_types_list,Tool::MASKTOMASK_E|Tool::FILTER_E);  
   {
     ToolFactory::tool_list_type::const_iterator it = tool_types_list.begin();
     ToolFactory::tool_list_type::const_iterator it_end = tool_types_list.end();  
@@ -167,7 +167,7 @@ AppMenu::create_filter_menu(QMenu* qmenu)
       QAction* qaction = qmenu->addAction(QString((*it).second.c_str()));
       // Connect the action with dispatching a command in the ToolManager
       QtBridge::connect(qaction,boost::bind(&ToolManager::dispatch_opentool,
-                                            ToolManager::instance(),
+                                            ToolManager::Instance(),
                                             (*it).first));
       ++it;
     }

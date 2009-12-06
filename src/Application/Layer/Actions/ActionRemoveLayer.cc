@@ -62,7 +62,7 @@ bool
 ActionRemoveLayer::check_layer_availability()
 {
   bool is_available = false;
-  LayerHandle layer = LayerManager::instance()->get_layer(layer_to_remove_.value());
+  LayerHandle layer = LayerManager::Instance()->get_layer(layer_to_remove_.value());
   if (layer && !(layer->is_locked()))
   {
     is_available = true;
@@ -73,13 +73,13 @@ ActionRemoveLayer::check_layer_availability()
 bool
 ActionRemoveLayer::lock_layers() const
 {
-  LayerManager::instance()->lock_layer(layer_to_remove_.value()); 
+  LayerManager::Instance()->lock_layer(layer_to_remove_.value()); 
 }
 
 bool
 ActionRemoveLayer::release_layers() const
 {
-  LayerManager::instance()->unlock_layer(layer_to_remove_.value());
+  LayerManager::Instance()->unlock_layer(layer_to_remove_.value());
 }
 
 

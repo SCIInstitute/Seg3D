@@ -36,8 +36,6 @@ Application::Application()
   // This event handler will execute all the functions
   // that are send to it on the main application thread.
   start_eventhandler();
-
-  SCI_LOG_DEBUG("Created Application Thread");
 }
 
 // Singleton instance

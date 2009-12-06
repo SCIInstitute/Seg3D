@@ -199,8 +199,9 @@ class ActionVariantParameter : public ActionParameterBase {
         if(!(typed_value_->import_from_string(string_value_))) return (false);
         
         ActionParameter<T>* param_ptr = dynamic_cast<ActionParameter<T>*>(typed_value_.get());
-        value = param_ptr->value();            
+        value = param_ptr->value();   
       }
+        return (true);   
     }
 
   private:

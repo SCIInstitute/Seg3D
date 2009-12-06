@@ -35,7 +35,7 @@ namespace Seg3D {
 
 void QtCheckBoxSignal(QPointer<QCheckBox> qobject_ptr, bool state)
 {
-  if (!(Interface::instance()->is_interface_thread()))
+  if (!(Interface::Instance()->IsInterfaceThread()))
   {
     PostInterface(boost::bind(&QtCheckBoxSignal,qobject_ptr,state));
     return;
@@ -51,7 +51,7 @@ QtBridge::connect(QCheckBox* qcheckbox,
   // Connect the dispatch into the StateVariable (with auxillary object)
   // Link tbe slot to the parent widget, so Qt's memory manager will
   // manage this one.
-  QtCheckBoxSlot* slot = new QtCheckBoxSlot(qcheckbox,state_handle);
+  new QtCheckBoxSlot(qcheckbox,state_handle);
     
   // Connect the state signal back into the Qt Variable  
   state_handle->connect(boost::bind(&QtCheckBoxSignal,qcheckbox,_1));
@@ -67,7 +67,7 @@ QtBridge::connect(QAction* qaction,
 {
   // Link tbe slot to the parent widget, so Qt's memory manager will
   // manage this one.
-  QtActionSlot* slot = new QtActionSlot(qaction,function);
+  new QtActionSlot(qaction,function);
 
   return (true);
 }

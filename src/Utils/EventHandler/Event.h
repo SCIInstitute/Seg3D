@@ -115,38 +115,6 @@ class EventT : public Event {
     FUNCTOR functor_;
 };
 
-
-// CLASS EVENTRT <TEMPLATE>
-// This class is redefined for each functor and contains only the
-// pointer to the function object. It is generated on the fly whereever
-// the compiler needs it. This version of the template contains a return type
-// as well for streaming results back to the thread that was calling.
-
-template<class FUNCTOR>
-class EventRT : public Event {
-  public:
-    
-    // Constructor
-    EventRT(FUNCTOR functor) :
-      functor_(functor) {}
-
-    // Destructor (we need one for the base class destruction)
-    virtual ~EventRT() {}
-
-    // RUN:
-    // Run the functor object. This function is accessed from the base class
-    // so we do not need to template the inner workings of the event handler
-    virtual void run() { result_ = functor_(); }
-
-    // GET_RESULT:
-    // Get the result from the function call
-    typename FUNCTOR::result_type get_result() { return result_; }
-
-  private:
-    FUNCTOR functor_;
-    typename FUNCTOR::result_type result_;
-};
-
 } // end namespace Utils
 
 #endif

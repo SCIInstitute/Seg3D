@@ -69,8 +69,8 @@ QtApplication::setup(int argc, char **argv)
 
     // Insert the event handler into the application layer
     SCI_LOG_DEBUG("Install the QtEventHandlerContext into the Interface layer");
-    Interface::instance()->install_eventhandler_context(qt_eventhandler_context);   
-    Interface::instance()->start_eventhandler(); 
+    Interface::Instance()->install_eventhandler_context(qt_eventhandler_context);   
+    Interface::Instance()->start_eventhandler(); 
   }
   catch(...)
   {

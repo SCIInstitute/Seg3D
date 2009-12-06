@@ -262,7 +262,7 @@ class ToolFactory : public boost::noncopyable  {
 // -- Singleton interface --
   public:
     
-    static ToolFactory* instance() { instance_.instance(); }
+    static ToolFactory* Instance() { return instance_.instance(); }
 
   private:
     static Utils::Singleton<ToolFactory> instance_;
@@ -273,13 +273,13 @@ class ToolFactory : public boost::noncopyable  {
 #define SCI_REGISTER_TOOL(name,menuname,properties)\
 void register_tool_##name()\
 {\
-  ToolFactory::instance()->register_tool<name>(#name,menuname,properties);\
+  ToolFactory::Instance()->register_tool<name>(#name,menuname,properties);\
 } 
 
 #define SCI_REGISTER_TOOLINTERFACE(name)\
 void register_toolinterface_##name()\
 {\
-  ToolFactory::instance()->register_toolinterface<name>(#name);\
+  ToolFactory::Instance()->register_toolinterface<name>(#name);\
 } 
 
 #endif

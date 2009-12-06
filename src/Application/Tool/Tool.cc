@@ -36,7 +36,12 @@ Tool::Tool(const std::string& toolid) :
   StateHandler(std::string("ToolManager::")+toolid),
   toolid_(toolid)
 {
-  ToolManager::instance()->add_toolid(toolid_);
+  ToolManager::Instance()->add_toolid(toolid_);
+
+  // Extract the tool id number from the id tag and store it in the Tool class
+  std::string::size_type loc = toolid.find('_');
+  if(!(Utils::from_string(toolid.substr(loc+1),toolid_number_)))
+    toolid_number_ = 0;
 }
 
 Tool::~Tool()
@@ -49,7 +54,7 @@ Tool::~Tool()
   // needs to blocked until the tool is really removed to prevent
   // a tool with the same name to be instantiated and actions
   // for multiple tools with the same name being mixed.
-  ToolManager::instance()->remove_toolid(toolid_);
+  ToolManager::Instance()->remove_toolid(toolid_);
 }
 
 void

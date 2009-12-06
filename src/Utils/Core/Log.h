@@ -91,7 +91,7 @@ class Log : public boost::noncopyable {
 // -- Singleton interface --
   public:
     
-    static Log* instance() { instance_.instance(); }
+    static Log* Instance() { return instance_.instance(); }
     static Singleton<Log> instance_;
     
 };
@@ -100,17 +100,17 @@ class Log : public boost::noncopyable {
 // LOG FILE 
 
 #define SCI_LOG_ERROR(message)\
-Utils::Log::instance()->post_error(message,__LINE__,__FILE__)
+Utils::Log::Instance()->post_error(message,__LINE__,__FILE__)
 
 #define SCI_LOG_WARNING(message)\
-Utils::Log::instance()->post_warning(message,__LINE__,__FILE__)
+Utils::Log::Instance()->post_warning(message,__LINE__,__FILE__)
 
 #define SCI_LOG_MESSAGE(message)\
-Utils::Log::instance()->post_message(message,__LINE__,__FILE__)
+Utils::Log::Instance()->post_message(message,__LINE__,__FILE__)
 
 #ifdef DEBUG
 #define SCI_LOG_DEBUG(message)\
-Utils::Log::instance()->post_debug(message,__LINE__,__FILE__)
+Utils::Log::Instance()->post_debug(message,__LINE__,__FILE__)
 #else
 #define SCI_LOG_DEBUG(message)
 #endif

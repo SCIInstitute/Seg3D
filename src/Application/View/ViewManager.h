@@ -75,12 +75,11 @@ namespace Seg3D {
 
 // typedefs
 
-class ViewManager : public boost::noncopyable, public StateHandler {
+class ViewManager : public StateHandler {
 public:
   ViewManager();
   ~ViewManager();
   
-  static ViewManager* instance() { instance_.instance(); }
 
   // -- Signals for the User Interface --
   typedef boost::signals2::signal<void (ViewHandle)> view_changed_signal_type;
@@ -112,12 +111,19 @@ protected:
   // This signal is triggered after a view has been modified
   view_changed_signal_type view_changed_signal_;
 
-private:
-  static Utils::Singleton<ViewManager> instance_;
+// -- Singleton interface --
+  public:
+    
+    // INSTANCE:
+    // Get the singleton interface
+    static ViewManager* Instance() { return instance_.instance(); }
 
-  typedef boost::unordered_map<std::string, ViewHandle> view_map_type; 
-  view_map_type views_;
-  boost::mutex view_map_lock_;
+  private:
+    static Utils::Singleton<ViewManager> instance_;
+
+    typedef boost::unordered_map<std::string, ViewHandle> view_map_type; 
+    view_map_type views_;
+    boost::mutex view_map_lock_;
 
 
 }; // class ViewManager

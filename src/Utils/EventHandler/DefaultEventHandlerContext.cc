@@ -27,9 +27,12 @@
 */
 
 #include <Utils/Core/Exception.h>
+#include <Utils/Core/Log.h>
 
 #include <Utils/EventHandler/DefaultEventHandlerContext.h>
 #include <Utils/EventHandler/EventHandler.h>
+
+
 
 namespace Utils {
 
@@ -112,6 +115,8 @@ DefaultEventHandlerContext::process_events()
 bool
 DefaultEventHandlerContext::wait_and_process_events()
 {
+  SCI_LOG_DEBUG("Wait and Process Events");
+  
   // Only run on the eventhandler thread
   if (boost::this_thread::get_id() != eventhandler_thread_.get_id()) 
   {
@@ -127,6 +132,7 @@ DefaultEventHandlerContext::wait_and_process_events()
   
   while (!event_queue_.empty())
   {
+
     // get the next event
     EventHandle event_handle;
     event_handle.swap(event_queue_.front());
@@ -135,8 +141,10 @@ DefaultEventHandlerContext::wait_and_process_events()
 
     // unlock so the call back can add another event on the list
     lock.unlock();
+
     // run the call back
     event_handle->handle_event();
+
     // lock again so we can change the queue
     lock.lock();
   }
@@ -158,6 +166,7 @@ DefaultEventHandlerContext::start_eventhandler(EventHandler* eventhandler)
   // use that as callable
   eventhandler_thread_ = boost::thread(
                     boost::bind(&EventHandler::run_eventhandler,eventhandler));
+  return (true);
 }
 
 void

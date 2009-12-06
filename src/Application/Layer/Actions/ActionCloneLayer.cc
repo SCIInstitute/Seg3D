@@ -62,7 +62,7 @@ bool
 ActionCloneLayer::check_layer_availability()
 {
   bool is_available = false;
-  LayerHandle layer = LayerManager::instance()->get_layer(layer_to_clone_.value());
+  LayerHandle layer = LayerManager::Instance()->get_layer(layer_to_clone_.value());
   if (layer && !(layer->is_locked()))
   {
     is_available = true;
@@ -73,13 +73,15 @@ ActionCloneLayer::check_layer_availability()
 bool
 ActionCloneLayer::lock_layers() const
 {
-  LayerManager::instance()->lock_layer(layer_to_clone_.value()); 
+  LayerManager::Instance()->lock_layer(layer_to_clone_.value()); 
+  return (true);
 }
 
 bool
 ActionCloneLayer::release_layers() const
 {
-  LayerManager::instance()->unlock_layer(layer_to_clone_.value());
+  LayerManager::Instance()->unlock_layer(layer_to_clone_.value());
+  return (true);
 }
 
 
@@ -94,10 +96,10 @@ ActionCloneLayer::do_validate(ActionContextHandle& context)
 bool 
 ActionCloneLayer::execute(ActionContextHandle& context) const
 {
-  LayerHandle old_layer = LayerManager::instance()->get_layer(layer_to_clone_.value());
-  std::string new_name = LayerManager::instance()->derive_new_name(layer_to_clone_.value());
+  LayerHandle old_layer = LayerManager::Instance()->get_layer(layer_to_clone_.value());
+  std::string new_name = LayerManager::Instance()->derive_new_name(layer_to_clone_.value());
   LayerHandle new_layer = old_layer->clone(new_name);
-  LayerManager::instance()->add_layer(new_layer);
+  LayerManager::Instance()->add_layer(new_layer);
 }
 
 } // end namespace Seg3D

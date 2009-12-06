@@ -26,6 +26,10 @@
    DEALINGS IN THE SOFTWARE.
 */
 
+// STL includes
+#include <algorithm>
+
+// Application includes
 #include <Application/Tool/ToolFactory.h>
 
 namespace Seg3D {
@@ -40,6 +44,12 @@ ToolFactory::is_tool_type(const std::string& tool_type) const
   tool_map_type::const_iterator it = tools_.find(tool_type);
   if (it == tools_.end()) return (false);
   return (true);
+}
+
+bool LessToolList(ToolFactory::tool_list_type::value_type val1,
+                  ToolFactory::tool_list_type::value_type val2)
+{
+  return (val1.second < val2.second);
 }
     
 bool 
@@ -61,6 +71,8 @@ ToolFactory::list_tool_types(tool_list_type& tool_list, int properties) const
   }
   
   if (tool_list.size() == 0) return (false);
+  std::sort(tool_list.begin(),tool_list.end(),LessToolList);
+  
   return (true);  
 }
 

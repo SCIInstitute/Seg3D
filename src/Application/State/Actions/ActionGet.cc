@@ -41,7 +41,7 @@ ActionGet::validate(ActionContextHandle& context)
 {
   // Check whether the state exists
   StateBaseHandle state;
-  if(!(StateManager::instance()->get_state(stateid_.value(),state)))
+  if(!(StateManager::Instance()->get_state(stateid_.value(),state)))
   {
     context->report_error(
       std::string("Unknown state variable '")+stateid_.value()+"'");
@@ -57,7 +57,7 @@ ActionGet::run(ActionContextHandle& context)
 {
   // Get the state
   StateBaseHandle state;
-  if(!(StateManager::instance()->get_state(stateid_.value(),state)))
+  if(!(StateManager::Instance()->get_state(stateid_.value(),state)))
   {
     return (false);
   }

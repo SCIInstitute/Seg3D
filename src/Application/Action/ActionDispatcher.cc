@@ -48,7 +48,7 @@ ActionDispatcher::post_action(ActionHandle action, ActionContextHandle action_co
 
   SCI_LOG_DEBUG(std::string("Posting Action: ")+action->action_type());  
 
-  Application::instance()->post_event(boost::bind
+  Application::Instance()->post_event(boost::bind
       (&ActionDispatcher::run_action,this,action,action_context));
 }
 
@@ -65,7 +65,7 @@ ActionDispatcher::post_actions(std::vector<ActionHandle> actions, ActionContextH
     SCI_LOG_DEBUG(std::string("Posting Action sequence: ")+actions[j]->action_type());  
   }
   
-  Application::instance()->post_event(boost::bind
+  Application::Instance()->post_event(boost::bind
       (&ActionDispatcher::run_actions,this,actions,action_context));
 }
 
@@ -98,6 +98,7 @@ ActionDispatcher::run_action(ActionHandle action, ActionContextHandle action_con
   // was synchronous a done signal is triggered in the context, to inform the
   // program whether the action succeeded.
   SCI_LOG_DEBUG("Running Action");    
+
   bool success = action->run(action_context);
 
   SCI_LOG_DEBUG("Action Done");    

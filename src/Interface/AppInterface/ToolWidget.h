@@ -26,40 +26,31 @@
  DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef INTERFACE_APPINTERFACE_HISTORYDOCKWIDGET_H
-#define INTERFACE_APPINTERFACE_HISTORYDOCKWIDGET_H
+#ifndef INTERFACE_APPINTERFACE_TOOLWIDGET_H
+#define INTERFACE_APPINTERFACE_TOOLWIDGET_H
 
-// QT includes
-#include <QtGui>
-#include <QDockWidget>
+// QT Includes
+#include <QWidget>
 
-// STL includes
-#include <string>
-
-// Boost includes
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/thread.hpp>
-#include <boost/shared_ptr.hpp>
+// Application includes
+#include <Application/Tool/Tool.h>
 
 namespace Seg3D {
 
-class HistoryDockWidgetPrivate;
-
-class HistoryDockWidget : public QDockWidget {
-   
-    Q_OBJECT
+class ToolWidget : public QWidget {
+  Q_OBJECT
 
   public:
-    HistoryDockWidget(QWidget *parent = 0);
-    virtual ~HistoryDockWidget();
-
-
+    ToolWidget(QWidget* parent, ToolHandle& tool);
+    virtual ~ToolWidget();
+  
+  public:
+    std::string toolid() { return tool_->toolid(); }
+  
   private:
-    // Internals of the dockwidget
-    boost::shared_ptr<HistoryDockWidgetPrivate> private_;
-  
+    ToolHandle tool_;
 };
-  
-} // end namespace
 
-#endif // HISTORYDOCKWIDGET_H
+} //end namespace Seg3D
+
+#endif

@@ -67,18 +67,28 @@ class Interface : public Utils::EventHandler {
 
 // -- Interface thread --    
     
-    // IS_INTERFACE_THREAD:
+    // ISINTERFACETHREAD:
     // Test whether the current thread is the interface thread
 
-    static bool is_interface_thread()
-      { return (instance()->is_eventhandler_thread()); }
+    static bool IsInterfaceThread()
+      { return (Instance()->is_eventhandler_thread()); }
+
+    // POSTEVENT:
+    // Short cut to the event handler
+    static void PostEvent(boost::function<void ()> function)
+      { Instance()->post_event(function); }
+
+    // POSTANDWAITEVENT:
+    // Short cut to the event handler
+    static void PostAndWaitEvent(boost::function<void ()> function)
+      { Instance()->post_and_wait_event(function); }
 
 // -- Singleton interface --
   public:
     
     // INSTANCE:
     // Get the singleton interface
-    static Interface* instance() { instance_.instance(); }
+    static Interface* Instance() { return instance_.instance(); }
 
   private:  
     static Utils::Singleton<Interface> instance_;
@@ -88,13 +98,12 @@ class Interface : public Utils::EventHandler {
 // POSTINTERFACE:
 // Post a functor to the interface thread
 
-template<class FUNCTOR>
-void PostInterface(FUNCTOR functor)
+template<class FUNCTION>
+void PostInterface(FUNCTION function)
 {
-  Interface::instance()->post_event(functor);
+  Interface::Instance()->post_event(function);
 }
 
-    
 // RUNACTIONFROMINTERFACE:
 // Function that runs an action with the interface context
 

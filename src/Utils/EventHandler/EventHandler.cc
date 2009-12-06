@@ -80,6 +80,8 @@ void
 EventHandler::post_event(boost::function<void ()> function)
 {
   EventHandle event = EventHandle(new EventT<boost::function<void ()> >(function));
+
+  SCI_LOG_DEBUG("post event");
   eventhandler_context_->post_event(event);
 }
 

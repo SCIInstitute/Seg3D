@@ -43,7 +43,7 @@ SCI_REGISTER_ACTION(ActivateTool);
 bool
 ActionActivateTool::validate(ActionContextHandle& context)
 {
-  if (!(ToolManager::instance()->is_toolid(toolid_.value())))
+  if (!(ToolManager::Instance()->is_toolid(toolid_.value())))
   {
     context->report_error(std::string("ToolID '")+toolid_.value()+"' is invalid");
     return (false);
@@ -57,7 +57,7 @@ ActionActivateTool::validate(ActionContextHandle& context)
 bool 
 ActionActivateTool::run(ActionContextHandle& context)
 {
-  ToolManager::instance()->activate_tool(toolid_.value());
+  ToolManager::Instance()->activate_tool(toolid_.value());
   return (true); // success
 }
 

@@ -61,13 +61,11 @@ class Tool : public StateHandler {
   // Tool groups help organize the tools in different catagories
   
   enum {
-    // Tools for Tool Menu
-    TOOL_E   = 1,
-    
-    // Tools for the filter menu
-    DATATODATA_FILTER_E = 2,
-    DATATOMASK_FILTER_E = 3,
-    MASKTOMASK_FILTER_E = 4
+    TOOL_E        = 0x0001,
+    FILTER_E      = 0x0002,   
+    DATATODATA_E  = 0x0010,
+    DATATOMASK_E  = 0x0020,
+    MASKTOMASK_E  = 0x0040
   };
 
 
@@ -78,11 +76,11 @@ class Tool : public StateHandler {
 
 // -- tool_group/tool_type/toolid --
 
-    int         properties() const { return properties_; }
-    std::string type() const       { return type_; }
-    std::string menu_name() const  { return menu_name_; }
-    std::string toolid() const     { return toolid_; }
-
+    int         properties() const    { return properties_; }
+    std::string type() const          { return type_; }
+    std::string menu_name() const     { return menu_name_; }
+    std::string toolid() const        { return toolid_; }
+    int toolid_number() const         { return toolid_number_; }
 
   protected:
     friend class ToolFactory;
@@ -104,6 +102,7 @@ class Tool : public StateHandler {
     int                   properties_;    
     std::string           type_;
     std::string           menu_name_;
+    int                   toolid_number_;
     
 // -- close tool --
   public:  

@@ -111,9 +111,9 @@ LogStreamer::LogStreamer(unsigned int log_flags, std::ostream* stream)
   // if the object is destroyed. This will ensure that when the slot is called
   // the shared_ptr is locked so that the object is not destroyed while the
   // call back is evaluated.
-  Log::instance()->post_log_signal_.connect(
+  Log::Instance()->post_log_signal_.connect(
     Log::post_log_signal_type::slot_type(&LogStreamerInternal::stream_message, 
-      internal_.get(),_1,_2).track(internal_));
+                internal_.get(),_1,_2).track(internal_));
 }
 
 

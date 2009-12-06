@@ -84,7 +84,7 @@ class StateManager : public boost::noncopyable {
 
 // -- Singleton interface --
   public:
-    static StateManager* instance() { instance_.instance(); }
+    static StateManager* Instance() { return instance_.instance(); }
 
   private:
     static Utils::Singleton<StateManager> instance_;

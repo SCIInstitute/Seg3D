@@ -59,7 +59,7 @@ bool
 ActionNewMaskLayer::check_layer_availability()
 {
   bool is_available = false;
-  LayerHandle layer = LayerManager::instance()->get_layer(provided_layer_.value());
+  LayerHandle layer = LayerManager::Instance()->get_layer(provided_layer_.value());
   if (layer && !(layer->is_locked()))
   {
     is_available = true;
@@ -70,13 +70,15 @@ ActionNewMaskLayer::check_layer_availability()
 bool
 ActionNewMaskLayer::lock_layers() const
 {
-  LayerManager::instance()->lock_layer(provided_layer_.value()); 
+  LayerManager::Instance()->lock_layer(provided_layer_.value()); 
+  return (true);
 }
 
 bool
 ActionNewMaskLayer::release_layers() const
 {
-  LayerManager::instance()->unlock_layer(provided_layer_.value());
+  LayerManager::Instance()->unlock_layer(provided_layer_.value());
+  return (true);
 }
 
 
@@ -94,6 +96,7 @@ ActionNewMaskLayer::execute(ActionContextHandle& context) const
   // Create a zeroed out mask layer of the same size as 
   // provided_layer_
   // Give this new layer to the LayerManager
+  return (true);
 }
 
 } // end namespace Seg3D

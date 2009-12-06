@@ -57,6 +57,7 @@ class QtBridge : public boost::noncopyable {
     // Connect menu action to dispatcher
 
     static bool connect(QAction* qaction, boost::function<void ()> function);
+    
 };
 
 

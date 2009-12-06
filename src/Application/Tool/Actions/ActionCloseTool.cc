@@ -43,7 +43,7 @@ SCI_REGISTER_ACTION(CloseTool);
 bool
 ActionCloseTool::validate(ActionContextHandle& context)
 {
-  if (!(ToolManager::instance()->is_toolid(toolid_.value())))
+  if (!(ToolManager::Instance()->is_toolid(toolid_.value())))
   {
     context->report_error(std::string("ToolID '")+toolid_.value()+"' is invalid");
     return (false);
@@ -57,7 +57,7 @@ ActionCloseTool::validate(ActionContextHandle& context)
 bool 
 ActionCloseTool::run(ActionContextHandle& context)
 {
-  ToolManager::instance()->close_tool(toolid_.value());
+  ToolManager::Instance()->close_tool(toolid_.value());
   return (true); // success
 }
 

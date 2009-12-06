@@ -51,14 +51,14 @@ StateHandler::add_statebase(const std::string& key, StateBaseHandle state)
 
   StateBaseHandle old_state;
   // Step (3): Import the previous setting from the current variable
-  StateManager::instance()->get_state(stateid,old_state);
+  StateManager::Instance()->get_state(stateid,old_state);
   if (old_state.get())
   { // use the string representation as intermediate
     state->import_from_string(old_state->export_to_string());
   }
 
   // Step (4): Add the state to the StateManager
-  return (StateManager::instance()->add_state(stateid,state)); 
+  return (StateManager::Instance()->add_state(stateid,state)); 
 }
 
 }

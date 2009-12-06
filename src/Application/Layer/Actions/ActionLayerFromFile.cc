@@ -92,6 +92,7 @@ ActionLayerFromFile::execute(ActionContextHandle& context) const
   // Read data in from file
   // Populate a layer handle
   // Give the new layer to the LayerManager
+  return (true);
 }
 
 } // end namespace Seg3D

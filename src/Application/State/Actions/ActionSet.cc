@@ -43,7 +43,7 @@ ActionSet::validate(ActionContextHandle& context)
   StateBaseHandle state;
   
   // If not the state cannot be retrieved report an error
-  if (!(StateManager::instance()->get_state(stateid_.value(),state))) 
+  if (!(StateManager::Instance()->get_state(stateid_.value(),state))) 
   {
     context->report_error(
       std::string("Unknown state variable '")+stateid_.value()+"'");
@@ -73,7 +73,7 @@ ActionSet::run(ActionContextHandle& context)
 {
   // Get the state
   StateBaseHandle state; 
-  if( StateManager::instance()->get_state(stateid_.value(),state) )
+  if( StateManager::Instance()->get_state(stateid_.value(),state) )
   {
     // Set the value
     state->import_from_variant(statevalue_,context->update_interface());

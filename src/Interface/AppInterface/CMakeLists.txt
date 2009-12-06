@@ -35,20 +35,20 @@ SET(INTERFACE_APPINTERFACE_SRCS
   AppInterface.cc
   AppMenu.cc
   ViewerInterface.cc
-  WorkflowInterface.cc
   HistoryDockWidget.cc
   ProjectDockWidget.cc
   ToolsDockWidget.cc
+  ToolWidget.cc
 )
 
 SET(INTERFACE_APPINTERFACE_MOC_SRCS
   AppInterface.h
   AppMenu.h
   ViewerInterface.h
-  WorkflowInterface.h
   HistoryDockWidget.h
   ProjectDockWidget.h
   ToolsDockWidget.h
+  ToolWidget.h
 )
 
 SET(INTERFACE_APPINTERFACE_NO_MOC_SRCS

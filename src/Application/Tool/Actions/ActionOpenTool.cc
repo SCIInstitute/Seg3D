@@ -50,7 +50,7 @@ ActionOpenTool::validate(ActionContextHandle& context)
   if (loc != std::string::npos) tool_type = tool_type.substr(0,loc);
 
   // Check whether the tool has a valid type
-  if (!(ToolFactory::instance()->is_tool_type(tool_type)))
+  if (!(ToolFactory::Instance()->is_tool_type(tool_type)))
   {
     context->report_error(std::string("No tool available of type '")+tool_type+"'");
     return (false);
@@ -61,7 +61,7 @@ ActionOpenTool::validate(ActionContextHandle& context)
   
   if (loc != std::string::npos)
   {
-    if (ToolManager::instance()->is_toolid(toolid_.value()))
+    if (ToolManager::Instance()->is_toolid(toolid_.value()))
     {
       context->report_error(std::string("ToolID '")+toolid_.value()+"' is already in use");
       return (false);
@@ -78,8 +78,8 @@ bool
 ActionOpenTool::run(ActionContextHandle& context)
 {
   // Open and Activate the tool
-  ToolManager::instance()->open_tool(toolid_.value(),result_toolid_.value());
-  ToolManager::instance()->activate_tool(result_toolid_.value());
+  ToolManager::Instance()->open_tool(toolid_.value(),result_toolid_.value());
+  ToolManager::Instance()->activate_tool(result_toolid_.value());
   return (true); // success
 }
 
