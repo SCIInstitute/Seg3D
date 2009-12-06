@@ -1,0 +1,3 @@
+Welcome to the Seg3D installation.
+
+This program will guide you through the process of installing Seg3D on your computer.
