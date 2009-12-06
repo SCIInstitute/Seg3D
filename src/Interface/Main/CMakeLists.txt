@@ -41,6 +41,7 @@ SET(MAIN_SRCS
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SEG3D_OUTPUT_DIRECTORY})
 
 IF(APPLE)
+SET(MACOSX_BUNDLE_ICON_FILE "${CMAKE_SOURCE_DIR}/Resources/Seg3D2.icns")
 ADD_EXECUTABLE(Seg3D MACOSX_BUNDLE ${MAIN_SRCS})
 ELSE(APPLE)
 ADD_EXECUTABLE(Seg3D ${MAIN_SRCS})
@@ -95,8 +96,6 @@ IF(APPLE)
        COMMAND [ ! -d Release ] || install_name_tool -change QtGui.framework/Versions/4/QtGui @executable_path/QtGui Release/Seg3D.app/Contents/MacOS/Seg3D
        COMMAND [ ! -d Release ] || install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore Release/Seg3D.app/Contents/MacOS/Seg3D
        COMMAND [ ! -d Release ] || cp "-rf" "${QT_QTGUI_LIBRARY_RELEASE}/Versions/Current/Resources" "Release/Seg3D.app/Contents"
-
-
        WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
   ELSE(${CMAKE_GENERATOR} MATCHES "Xcode")
@@ -115,7 +114,11 @@ IF(APPLE)
   ENDIF(${CMAKE_GENERATOR} MATCHES "Xcode")
 ENDIF(APPLE)
 
-
-INSTALL(TARGETS Seg3D 
-        RUNTIME DESTINATION bin
-        BUNDLE DESTINATION /Applications )
+IF(APPLE)
+  INSTALL(TARGETS Seg3D 
+        RUNTIME DESTINATION .
+        BUNDLE DESTINATION . )
+ELSE(APPLE)
+  INSTALL(TARGETS Seg3D 
+        RUNTIME DESTINATION bin )
+ENDIF(APPLE)
