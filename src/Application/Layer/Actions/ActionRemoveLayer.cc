@@ -74,12 +74,14 @@ bool
 ActionRemoveLayer::lock_layers() const
 {
   LayerManager::Instance()->lock_layer(layer_to_remove_.value()); 
+  return (true);
 }
 
 bool
 ActionRemoveLayer::release_layers() const
 {
   LayerManager::Instance()->unlock_layer(layer_to_remove_.value());
+  return (true);
 }
 
 
@@ -96,6 +98,7 @@ ActionRemoveLayer::execute(ActionContextHandle& context) const
 {
   // Tell the LayerManager to delete this Layer from its list
   // Figure out how to appropriately unlock this layer
+  return true;
 }
 
 } // end namespace Seg3D

@@ -65,6 +65,8 @@ Layer::is_locked() const
 LayerHandle
 Layer::clone(std::string& clone_name) const
 {
+  LayerHandle handle;
+  return handle;
 }
 
 } // end namespace Seg3D

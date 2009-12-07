@@ -100,6 +100,7 @@ ActionCloneLayer::execute(ActionContextHandle& context) const
   std::string new_name = LayerManager::Instance()->derive_new_name(layer_to_clone_.value());
   LayerHandle new_layer = old_layer->clone(new_name);
   LayerManager::Instance()->add_layer(new_layer);
+  return (true);
 }
 
 } // end namespace Seg3D

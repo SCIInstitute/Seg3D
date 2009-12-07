@@ -212,12 +212,18 @@ ADD_SUBDIRECTORY(Init)
 # CPack.
 ###########################################
 
+#IF(WIN32)
+# Some how CMake wants to do the linux thing and install
+# the libs in /bin, which does not make sense for us
+# hence by pass this system
+#SET(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
 INCLUDE(InstallRequiredSystemLibraries)
+#INSTALL_PROGRAMS(/ ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS})
+#ENDIF(WIN32)
 
-MESSAGE(STATUS "cmake root = ${CMAKE_ROOT}")
 
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Seg3D")
-SET(CPACK_PACKAGE_VENDOR "SCI")
+SET(CPACK_PACKAGE_VENDOR "SCI/Numira")
       
 SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/CMake/ReadMe.txt")
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Seg3D ${SEG3D_MAJOR_VERSION}.${SEG3D_MINOR_VERSION} is a segmentation program")
@@ -231,14 +237,18 @@ SET(CPACK_PACKAGE_VERSION_MINOR "${SEG3D_MINOR_VERSION}")
 SET(CPACK_PACKAGE_VERSION_PATCH "${SEG3D_PATCH_VERSION}")
 
 SET(CPACK_PACKAGE_INSTALL_DIRECTORY 
-    "Seg3D ${SEG3D_VERSION_MAJOR}.${SEG3D_VERSION_MINOR}")
+    "Seg3D ${SEG3D_MAJOR_VERSION}.${SEG3D_MINOR_VERSION}")
     
     
 IF(WIN32 AND NOT UNIX)
   # There is a bug in NSIS that does not handle full unix paths properly. Make
   # sure there is at least one set of four (4) backlasshes.
-  SET(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/Resources\\\\InstallIcon.bmp")
-  SET(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\Seg3D.exe")
+#  SET(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/Resources\\\\Seg3D2_Logo32x32.bmp")
+    IF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+      SET(CPACK_INSTALL_PREFIX "/" CACHE PATH "Install path prefix, prepended onto install directories." FORCE)
+      SET(CMAKE_INSTALL_PREFIX "/" CACHE PATH "Install path prefix, prepended onto install directories." FORCE)
+    ENDIF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+  SET(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\Seg3D")
   SET(CPACK_NSIS_DISPLAY_NAME "${CPACK_PACKAGE_INSTALL_DIRECTORY} Seg3D ${SEG3D_MAJOR_VERSION}.${SEG3D_MINOR_VERSION}")
   SET(CPACK_NSIS_HELP_LINK "http:\\\\\\\\www.seg3d.org")
   SET(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\\\\\www.seg3d.org")

@@ -109,6 +109,8 @@ LayerManager::dispatch_removelayer(const std::string& layer_name) const
 const LayerHandle
 LayerManager::get_layer(const std::string& name) const
 {
+  LayerHandle handle;
+  return handle;
 }
 
 void
@@ -125,15 +127,24 @@ LayerManager::get_layer_group(const LayerProperties& properties, LayerGroup& gro
 
 std::vector<LayerGroup>
 LayerManager::cluster_layers(const LayerProperties& properties) const
-{}
+{
+  std::vector<LayerGroup> group;
+  return group;
+}
 
 DataVolumeHandle 
 LayerManager::checkpoint_data(const std::string& name, const SliceRange& slices) const
-{}
+{
+  DataVolumeHandle handle;
+  return handle;
+}
 
 LayerProperties 
 LayerManager::checkpoint_properties(const std::string& name) const
-{}
+{
+  LayerProperties prop;
+  return prop;
+}
 
 void 
 LayerManager::load_data_checkpoint(const std::string& name, const SliceRange& slices, DataVolumeHandle& data)
@@ -165,7 +176,9 @@ LayerManager::add_layer(LayerHandle new_layer)
 
 std::string 
 LayerManager::derive_new_name(const std::string& name) const
-{}
+{
+  return "";
+}
 
 // Singleton interface needs to be defined somewhere
 Utils::Singleton<LayerManager> LayerManager::instance_;

@@ -77,18 +77,18 @@ ActionLayer::run(ActionContextHandle& context)
 }
 
 bool
-ActionLayer::do_validate(ActionContextHandle& context) {}
+ActionLayer::do_validate(ActionContextHandle& context) { return true; }
 
 bool 
-ActionLayer::check_layer_availability() {}
+ActionLayer::check_layer_availability() { return true;}
 
 bool
-ActionLayer::lock_layers() const {}
+ActionLayer::lock_layers() const { return true; }
 
 bool 
-ActionLayer::release_layers() const {}
+ActionLayer::release_layers() const { return true; }
 
 bool 
-ActionLayer::execute(ActionContextHandle& context) const {}
+ActionLayer::execute(ActionContextHandle& context) const { return true; }
 
 } // end namespace Seg3D
