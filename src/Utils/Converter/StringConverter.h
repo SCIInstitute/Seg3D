@@ -49,6 +49,8 @@ std::string export_to_string(const T& value)
                             typeid(value).name()+") was not implemented");
 }
 
+std::string export_to_string(const bool& value);
+
 std::string export_to_string(const char& value);
 std::string export_to_string(const unsigned char& value);
 
@@ -70,28 +72,30 @@ std::string export_to_string(const std::string& value);
 // Function to convert a string back into the data it is representing
 
 template<class T>
-bool import_from_string(const std::string& xmlstring, T& value)
+bool import_from_string(const std::string& str, T& value)
 {
   SCI_THROW_NOTIMPLEMENTEDERROR(std::string("import_from_string(")+
                             typeid(value).name()+") was not implemented");
 }
 
-bool import_from_string(const std::string& xmlstring, char& value);
-bool import_from_string(const std::string& xmlstring, unsigned char& value);
+bool import_from_string(const std::string& str, bool& value);
 
-bool import_from_string(const std::string& xmlstring, short& value);
-bool import_from_string(const std::string& xmlstring, unsigned short& value);
+bool import_from_string(const std::string& str, char& value);
+bool import_from_string(const std::string& str, unsigned char& value);
 
-bool import_from_string(const std::string& xmlstring, int& value);
-bool import_from_string(const std::string& xmlstring, unsigned int& value);
+bool import_from_string(const std::string& str, short& value);
+bool import_from_string(const std::string& str, unsigned short& value);
 
-bool import_from_string(const std::string& xmlstring, long& value);
-bool import_from_string(const std::string& xmlstring, unsigned long& value);
+bool import_from_string(const std::string& str, int& value);
+bool import_from_string(const std::string& str, unsigned int& value);
 
-bool import_from_string(const std::string& xmlstring, float& value);
-bool import_from_string(const std::string& xmlstring, double& value);
+bool import_from_string(const std::string& str, long& value);
+bool import_from_string(const std::string& str, unsigned long& value);
 
-bool import_from_string(const std::string& xmlstring, std::string& value);
+bool import_from_string(const std::string& str, float& value);
+bool import_from_string(const std::string& str, double& value);
+
+bool import_from_string(const std::string& str, std::string& value);
 
 } // end namespace Utils
 

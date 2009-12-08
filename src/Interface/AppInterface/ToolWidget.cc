@@ -31,9 +31,39 @@
 namespace Seg3D {
 
 ToolWidget::ToolWidget(QWidget* parent, ToolHandle& tool) :
-  QWidget(parent),
+  QFrame(parent),
   tool_(tool)
 {
+  setFrameStyle(QFrame::NoFrame);
+  // Generate a vertical layout for the tool widget
+  QVBoxLayout* vbox = new QVBoxLayout;
+  vbox->setSpacing(0);
+  vbox->setContentsMargins(0,0,0,0);
+  setLayout(vbox);
+
+  QHBoxLayout* hbox = new QHBoxLayout;
+  hbox->setSpacing(0);
+  hbox->setContentsMargins(0,0,0,0);
+
+  QWidget* header = new QWidget;
+  header->setLayout(hbox);
+
+  help_button_ = new QToolButton;
+  help_button_->setIcon(style()->standardIcon(QStyle::SP_TitleBarContextHelpButton));
+  help_button_->setFixedHeight(12);
+
+  close_button_ = new QToolButton;
+  close_button_->setIcon(style()->standardIcon(QStyle::SP_TitleBarCloseButton));
+  close_button_->setFixedHeight(12);
+  
+  hbox->addStretch();
+  hbox->addWidget(help_button_);
+  hbox->addWidget(close_button_);
+    
+  vbox->addWidget(header);
+  vbox->addStretch();
+  
+  connect(close_button_,SIGNAL(released()),this,SLOT(close_tool()));
 }
 
 ToolWidget::~ToolWidget()

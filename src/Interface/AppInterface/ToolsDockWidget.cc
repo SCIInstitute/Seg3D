@@ -65,17 +65,19 @@ ToolsDockWidget::ToolsDockWidget(QWidget *parent) :
   // message, it will check whether the pointer still exists to the current 
   // QObject and then execute the function on the interface thread.
 
+  QPointer<ToolsDockWidget> qpointer(this);
+
   open_tool_connection_ =
     ToolManager::Instance()->connect_open_tool(
-        boost::bind(&ToolsDockWidget::post_open_tool,this,_1));
+        boost::bind(&ToolsDockWidget::post_open_tool,qpointer,_1));
 
   close_tool_connection_ =
     ToolManager::Instance()->connect_close_tool(
-        boost::bind(&ToolsDockWidget::post_close_tool,this,_1));
+        boost::bind(&ToolsDockWidget::post_close_tool,qpointer,_1));
 
   activate_tool_connection_ =
     ToolManager::Instance()->connect_activate_tool(
-        boost::bind(&ToolsDockWidget::post_activate_tool,this,_1));
+        boost::bind(&ToolsDockWidget::post_activate_tool,qpointer,_1));
 
   ToolManager::tool_list_type tool_list = ToolManager::Instance()->tool_list();
   ToolManager::tool_list_type::iterator it = tool_list.begin();
@@ -175,8 +177,11 @@ ToolsDockWidget::activate_tool(ToolHandle tool)
 void
 ToolsDockWidget::tool_changed(int index)
 {
-  ToolWidget *widget = static_cast<ToolWidget*>(toolbox_->widget(index));
-  ToolManager::Instance()->dispatch_activatetool(widget->toolid());
+  if (index > 0)
+  {
+    ToolWidget *widget = static_cast<ToolWidget*>(toolbox_->widget(index));
+    ToolManager::Instance()->dispatch_activatetool(widget->toolid());
+  }
 }
 
 
@@ -198,6 +203,7 @@ ToolsDockWidget::post_close_tool(QPointer<ToolsDockWidget> widget,ToolHandle too
 {
   if (!(Interface::IsInterfaceThread()))
   {
+    SCI_LOG_MESSAGE("Posting close tool");
     Interface::Instance()->post_event(boost::bind(&ToolsDockWidget::post_close_tool,widget,tool));
     return;
   }

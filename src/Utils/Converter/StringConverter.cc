@@ -31,6 +31,11 @@
 
 namespace Utils {
 
+std::string export_to_string(const bool& value)
+{
+  if (value) return (std::string("true")); else return (std::string("false"));
+}
+
 std::string export_to_string(const char& value)
 {
   return to_string(value);
@@ -86,59 +91,68 @@ std::string export_to_string(const std::string& value)
   return value;
 }
 
-bool import_from_string(const std::string& xmlstring, char& value)
+bool import_from_string(const std::string& str, bool& value)
 {
-  return (from_string(xmlstring,value));
+  std::string tmpstr(str);
+  strip_surrounding_spaces(tmpstr);
+  if ((tmpstr == "0")||(tmpstr == "false")||(tmpstr == "FALSE")) return (false);
+  return (true);
 }
 
-bool import_from_string(const std::string& xmlstring, unsigned char& value)
+
+bool import_from_string(const std::string& str, char& value)
 {
-  return (from_string(xmlstring,value));
+  return (from_string(str,value));
 }
 
-bool import_from_string(const std::string& xmlstring, short& value)
+bool import_from_string(const std::string& str, unsigned char& value)
 {
-  return (from_string(xmlstring,value));
+  return (from_string(str,value));
 }
 
-bool import_from_string(const std::string& xmlstring, unsigned short& value)
+bool import_from_string(const std::string& str, short& value)
 {
-  return (from_string(xmlstring,value));
+  return (from_string(str,value));
 }
 
-bool import_from_string(const std::string& xmlstring, int& value)
+bool import_from_string(const std::string& str, unsigned short& value)
 {
-  return (from_string(xmlstring,value));
+  return (from_string(str,value));
 }
 
-bool import_from_string(const std::string& xmlstring, unsigned int& value)
+bool import_from_string(const std::string& str, int& value)
 {
-  return (from_string(xmlstring,value));
+  return (from_string(str,value));
 }
 
-bool import_from_string(const std::string& xmlstring, long& value)
+bool import_from_string(const std::string& str, unsigned int& value)
 {
-  return (from_string(xmlstring,value));
+  return (from_string(str,value));
 }
 
-bool import_from_string(const std::string& xmlstring, unsigned long& value)
+bool import_from_string(const std::string& str, long& value)
 {
-  return (from_string(xmlstring,value));
+  return (from_string(str,value));
 }
 
-bool import_from_string(const std::string& xmlstring, float& value)
+bool import_from_string(const std::string& str, unsigned long& value)
 {
-  return (from_string(xmlstring,value));
+  return (from_string(str,value));
 }
 
-bool import_from_string(const std::string& xmlstring, double& value)
+bool import_from_string(const std::string& str, float& value)
 {
-  return (from_string(xmlstring,value));
+  return (from_string(str,value));
 }
 
-bool import_from_string(const std::string& xmlstring, std::string& value)
+bool import_from_string(const std::string& str, double& value)
 {
-  value = xmlstring;
+  return (from_string(str,value));
+}
+
+bool import_from_string(const std::string& str, std::string& value)
+{
+  value = str;
   return (true);
 }
 

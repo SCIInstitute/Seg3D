@@ -30,14 +30,15 @@
 #define INTERFACE_APPINTERFACE_TOOLWIDGET_H
 
 // QT Includes
-#include <QWidget>
+#include <QtGui>
 
 // Application includes
 #include <Application/Tool/Tool.h>
+#include <Application/Tool/ToolManager.h>
 
 namespace Seg3D {
 
-class ToolWidget : public QWidget {
+class ToolWidget : public QFrame {
   Q_OBJECT
 
   public:
@@ -47,8 +48,18 @@ class ToolWidget : public QWidget {
   public:
     std::string toolid() { return tool_->toolid(); }
   
-  private:
+  protected:
     ToolHandle tool_;
+    
+    QToolButton* close_button_;
+    QToolButton* help_button_;
+  
+  public Q_SLOTS:
+    void close_tool()
+    {
+      ToolManager::Instance()->dispatch_closetool(tool_->toolid());
+    }
+
 };
 
 } //end namespace Seg3D

@@ -164,19 +164,18 @@ ToolManager::close_tool(const std::string& toolid)
   // Step (3): Move the tool from the list. The tool handle still persists
   // and will be removed after the signal has been posted.
 
+  ToolHandle tool = (*it).second;
   tool_list_.erase(it);
 
   // Step (4): Run the function in the tool that cleans up the parts that
   // need to be cleaned up on the interface thread.
-  (*it).second->close();  
+  tool->close();  
 
   // Step (5): Close any of the registered connections
-  (*it).second->close_connections();      
+  tool->close_connections();      
 
-  SCI_LOG_DEBUG(std::string("Close tool: ")+toolid);
-  
   // Step (6): Signal that the tool will be closed.   
-  close_tool_signal_((*it).second);
+  close_tool_signal_(tool);
 }
 
 // THREAD-SAFETY:
