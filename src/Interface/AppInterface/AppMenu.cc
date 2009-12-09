@@ -98,7 +98,7 @@ void
 AppMenu::create_tool_menu(QMenu* qmenu)
 {
   ToolFactory::tool_list_type tool_types_list;
-  ToolFactory::Instance()->list_tool_types(tool_types_list,Tool::TOOL_E);
+  ToolFactory::Instance()->list_tool_types_with_interface(tool_types_list,Tool::TOOL_E);
   
   ToolFactory::tool_list_type::const_iterator it = tool_types_list.begin();
   ToolFactory::tool_list_type::const_iterator it_end = tool_types_list.end();
@@ -121,7 +121,7 @@ AppMenu::create_filter_menu(QMenu* qmenu)
 {
   ToolFactory::tool_list_type tool_types_list;
 
-  ToolFactory::Instance()->list_tool_types(tool_types_list,Tool::DATATODATA_E|Tool::FILTER_E);  
+  ToolFactory::Instance()->list_tool_types_with_interface(tool_types_list,Tool::DATATODATA_E|Tool::FILTER_E);  
   {
     ToolFactory::tool_list_type::const_iterator it = tool_types_list.begin();
     ToolFactory::tool_list_type::const_iterator it_end = tool_types_list.end();  
@@ -139,7 +139,7 @@ AppMenu::create_filter_menu(QMenu* qmenu)
   
   qmenu->addSeparator();
 
-  ToolFactory::Instance()->list_tool_types(tool_types_list,Tool::DATATOMASK_E|Tool::FILTER_E);  
+  ToolFactory::Instance()->list_tool_types_with_interface(tool_types_list,Tool::DATATOMASK_E|Tool::FILTER_E);  
   {
     ToolFactory::tool_list_type::const_iterator it = tool_types_list.begin();
     ToolFactory::tool_list_type::const_iterator it_end = tool_types_list.end();  
@@ -157,7 +157,7 @@ AppMenu::create_filter_menu(QMenu* qmenu)
 
   qmenu->addSeparator();
 
-  ToolFactory::Instance()->list_tool_types(tool_types_list,Tool::MASKTOMASK_E|Tool::FILTER_E);  
+  ToolFactory::Instance()->list_tool_types_with_interface(tool_types_list,Tool::MASKTOMASK_E|Tool::FILTER_E);  
   {
     ToolFactory::tool_list_type::const_iterator it = tool_types_list.begin();
     ToolFactory::tool_list_type::const_iterator it_end = tool_types_list.end();  

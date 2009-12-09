@@ -33,6 +33,7 @@
 
 // Application includes
 #include <Application/Tool/ToolManager.h>
+#include <Application/Tool/ToolFactory.h>
 #include <Application/Interface/Interface.h>
 
 // Interface includes
@@ -120,8 +121,18 @@ ToolsDockWidget::~ToolsDockWidget()
 void
 ToolsDockWidget::open_tool(ToolHandle tool)
 {
-  ToolWidget *widget = new ToolWidget(this,tool);
+  // Step (1) : find the widget class in the ToolFactory
+  ToolInterface *interface;
+  ToolFactory::Instance()->create_toolinterface(tool->type(),interface);
   
+  ToolWidget *widget = dynamic_cast<ToolWidget*>(interface);
+  if (widget == 0)
+  {
+    SCI_THROW_LOGICERROR("A ToolInterface cannot be up casted to a ToolWidget pointer");
+  }
+  // Step (2) : instantiate the widget
+  widget->create_widget(this,tool);
+
   toolbox_->addItem(widget,QString::fromStdString(tool->menu_name()
                                 +" "+Utils::to_string(tool->toolid_number())));
   widget_list_[tool->toolid()] = widget;

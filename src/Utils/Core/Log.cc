@@ -86,6 +86,7 @@ class LogStreamerInternal {
   private:
     unsigned int  log_flags_;
     std::ostream* ostream_ptr_;
+    boost::mutex  stream_mutex_;
 };
 
 
@@ -98,6 +99,7 @@ LogStreamerInternal::LogStreamerInternal(unsigned int log_flags, std::ostream* s
 void
 LogStreamerInternal::stream_message(unsigned int type, std::string message)
 {
+  boost::unique_lock<boost::mutex> lock(stream_mutex_);
   if (type & log_flags_) (*ostream_ptr_) << message << std::endl;
 }
 

@@ -39,8 +39,9 @@ ToolFactory::ToolFactory()
 }
 
 bool 
-ToolFactory::is_tool_type(const std::string& tool_type) const
+ToolFactory::is_tool_type(const std::string& tool_type)
 {
+  boost::unique_lock<boost::mutex> lock(tools_mutex_);
   tool_map_type::const_iterator it = tools_.find(tool_type);
   if (it == tools_.end()) return (false);
   return (true);
@@ -53,8 +54,10 @@ bool LessToolList(ToolFactory::tool_list_type::value_type val1,
 }
     
 bool 
-ToolFactory::list_tool_types(tool_list_type& tool_list, int properties) const
+ToolFactory::list_tool_types(tool_list_type& tool_list, int properties)
 {
+  boost::unique_lock<boost::mutex> lock(tools_mutex_);
+
   // clear the list
   tool_list.clear();
   
@@ -77,10 +80,43 @@ ToolFactory::list_tool_types(tool_list_type& tool_list, int properties) const
 }
 
 bool 
+ToolFactory::list_tool_types_with_interface(tool_list_type& tool_list, int properties)
+{
+  boost::unique_lock<boost::mutex> lock(toolinterfaces_mutex_);
+  boost::unique_lock<boost::mutex> lock2(tools_mutex_);
+
+  // clear the list
+  tool_list.clear();
+  
+  tool_map_type::const_iterator it = tools_.begin();
+
+  // loop through all the tools
+  while (it != tools_.end())
+  {
+    if (((*it).second.properties_ & properties) == properties)
+    {
+      if (toolinterfaces_.find((*it).first) != toolinterfaces_.end())
+      {
+        tool_list.push_back(std::make_pair((*it).first,(*it).second.menu_name_));
+      }
+    }
+    ++it;
+  }
+  
+  if (tool_list.size() == 0) return (false);
+  std::sort(tool_list.begin(),tool_list.end(),LessToolList);
+  
+  return (true);  
+}
+
+
+bool 
 ToolFactory::create_tool(const std::string& tool_type,
                          const std::string& toolid,
-                         ToolHandle& tool) const
+                         ToolHandle& tool)
 {
+  boost::unique_lock<boost::mutex> lock(tools_mutex_);
+
   // Step (1): find the tool
   tool_map_type::const_iterator it = tools_.find(tool_type);
 
@@ -101,13 +137,15 @@ ToolFactory::create_tool(const std::string& tool_type,
 
 bool 
 ToolFactory::create_toolinterface(const std::string& toolinterface_name,
-                              ToolInterfaceHandle& toolinterface) const
+                              ToolInterface*& toolinterface)
 {
+  boost::unique_lock<boost::mutex> lock(toolinterfaces_mutex_);
+
   // Step (1): find the tool
-  toolinterface_map_type::const_iterator it = toolinterface_builders_.find(toolinterface_name);
+  toolinterface_map_type::const_iterator it = toolinterfaces_.find(toolinterface_name);
 
   // Step (2): check its existence
-  if (it == toolinterface_builders_.end())
+  if (it == toolinterfaces_.end())
   {
     SCI_THROW_LOGICERROR(std::string("Trying to instantiate tool '")
                                     +toolinterface_name +"'that does not exist");

@@ -49,8 +49,15 @@ namespace Seg3D {
 // Base class needed for uniform access to import and export the value
 // in a uniform way.
 
-class ActionParameterBase {
+class ActionParameterBase;
+typedef boost::shared_ptr<ActionParameterBase> ActionParameterBaseHandle;
 
+class ActionParameterBase {
+// -- define handle --
+  public:
+    typedef boost::shared_ptr<ActionParameterBase> Handle;
+  
+// -- destructor --
   public:
     virtual ~ActionParameterBase();
     
@@ -62,9 +69,16 @@ class ActionParameterBase {
 // ACTIONPARAMETER:
 // Parameter for an action.
 
+template<class T> class ActionParameter;
+
 template<class T>
 class ActionParameter : public ActionParameterBase {
 
+// -- define handle --
+  public:
+    typedef boost::shared_ptr<ActionParameter<T> > Handle;
+
+// -- constructor/destructor --
   public:
     ActionParameter()
     {}

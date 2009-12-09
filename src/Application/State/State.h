@@ -103,7 +103,6 @@ class State : public StateBase {
       value_changed_signal_(value_);
     }
 
-
     // EXPORT_TO_STRING:
     // Convert the contents of the State into a string
     
@@ -158,16 +157,21 @@ class State : public StateBase {
     value_changed_signal_type  value_changed_signal_;
     
 // -- action handling --
-  public:    
+  public:
+  
     // VALIDATE_AND_COMPARE_VARIANT:
     // Validate that the data contained in the variant parameter can actually
     // be used and check whether it changed from the current value.
+    
     virtual bool validate_and_compare_variant(
           ActionVariantParameter& variant, 
           bool& changed,
           std::string& error) const
     {
-      return (variant.validate_and_compare_value<T>(value_,changed,error));
+      T new_value;
+      if (!(variant.get_value(new_value,error))) return (false);
+      changed = (value_ != new_value);
+      return (true);           
     }
 
     // IMPORT_FROM_VARIANT:

@@ -26,38 +26,32 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#include <Application/Action/ActionVariantParameter.h>
+#ifndef INTERFACE_TOOLINTERFACE_PAINTTOOLWIDGET_H
+#define INTERFACE_TOOLINTERFACE_PAINTTOOLWIDGET_H
+
+// Application includes
+#include <Application/Tool/ToolFactory.h>
+
+// Base class of the tool widget
+#include <Interface/AppInterface/ToolWidget.h>
 
 namespace Seg3D {
 
-ActionVariantParameter::~ActionVariantParameter()
-{
-}
+class PaintToolInterfacePrivate;
 
-std::string
-ActionVariantParameter::export_to_string() const
-{
-  // Export a value that is still typed or has been convereted to a string
-  // if typed_value exist, we need to convert it
-  if (typed_value_.get())
-  {
-    return (typed_value_->export_to_string());
-  }
-  else
-  {
-    // in case typed_value does not exist it must be recorded as a string
-    return (string_value_);
-  }
-}
-
-bool
-ActionVariantParameter::import_from_string(const std::string& str)
-{
-  // As we do not know the implied type. It can only be recorded as a string
-  typed_value_.reset();
-  string_value_ = str;
+class PaintToolInterface : public ToolWidget {
+  Q_OBJECT
   
-  return (true);
-}
+  public:
+    PaintToolInterface();
+    virtual ~PaintToolInterface();
 
-} // end namespace Seg3D
+    virtual bool build_widget(QFrame* frame);
+
+  private:
+    PaintToolInterfacePrivate* private_;
+};
+
+} // namespace Seg3D
+
+#endif

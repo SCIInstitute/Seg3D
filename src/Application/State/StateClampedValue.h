@@ -133,15 +133,23 @@ class StateClampedValue : public State<T> {
     // VALIDATE_AND_COMPARE_VARIANT:
     // Validate that the data contained in the variant parameter can actually
     // be used and check whether it changed from the current value.
-    virtual bool validate_and_compare_variant(
-          ActionVariantParameter& variant, 
-          bool& changed,
-          std::string& error) const
+    virtual bool validate_and_compare_variant(ActionVariantParameter& variant, 
+                                              bool& changed,
+                                              std::string& error) const
     {
-      return (variant.validate_and_compare_clamped_value<T>(min_,max_,
-                                              this->value_,changed,error));
-    }
+      T new_value;
+      if (!(variant.get_value(new_value,error))) return (false);
+      if (new_value < min_ || new_value > max_) 
+      {
+        error = "The new value is out of range";
+        return (false);
+      }
 
+      changed = (this->value_ != new_value);
+      return (true);   
+    }
+    
+    
     // IMPORT_FROM_VARIANT:
     // Import the state data from a variant parameter.  
     virtual bool import_from_variant(ActionVariantParameter& variant, 

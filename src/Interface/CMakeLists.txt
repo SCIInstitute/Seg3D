@@ -28,5 +28,8 @@
 
 ADD_SUBDIRECTORY(AppInterface)
 ADD_SUBDIRECTORY(QtInterface)
-#ADD_SUBDIRECTORY(ControllerInterface)
+
+ADD_SUBDIRECTORY(ToolInterface)
+
 ADD_SUBDIRECTORY(Main)
+#ADD_SUBDIRECTORY(ControllerInterface)

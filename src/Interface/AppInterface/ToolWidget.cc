@@ -30,40 +30,11 @@
 
 namespace Seg3D {
 
-ToolWidget::ToolWidget(QWidget* parent, ToolHandle& tool) :
-  QFrame(parent),
-  tool_(tool)
+ToolWidget::ToolWidget() :
+  close_button_(0),
+  help_button_(0),
+  main_frame_(0)
 {
-  setFrameStyle(QFrame::NoFrame);
-  // Generate a vertical layout for the tool widget
-  QVBoxLayout* vbox = new QVBoxLayout;
-  vbox->setSpacing(0);
-  vbox->setContentsMargins(0,0,0,0);
-  setLayout(vbox);
-
-  QHBoxLayout* hbox = new QHBoxLayout;
-  hbox->setSpacing(0);
-  hbox->setContentsMargins(0,0,0,0);
-
-  QWidget* header = new QWidget;
-  header->setLayout(hbox);
-
-  help_button_ = new QToolButton;
-  help_button_->setIcon(style()->standardIcon(QStyle::SP_TitleBarContextHelpButton));
-  help_button_->setFixedHeight(12);
-
-  close_button_ = new QToolButton;
-  close_button_->setIcon(style()->standardIcon(QStyle::SP_TitleBarCloseButton));
-  close_button_->setFixedHeight(12);
-  
-  hbox->addStretch();
-  hbox->addWidget(help_button_);
-  hbox->addWidget(close_button_);
-    
-  vbox->addWidget(header);
-  vbox->addStretch();
-  
-  connect(close_button_,SIGNAL(released()),this,SLOT(close_tool()));
 }
 
 ToolWidget::~ToolWidget()
@@ -71,6 +42,67 @@ ToolWidget::~ToolWidget()
 }
 
 
+bool
+ToolWidget::create_widget(QWidget* parent, ToolHandle& tool)
+{
+  // Setup the parent widget: this one will be used for memory management of
+  // this widget class
+  setParent(parent);
+
+    // Add the handle of the underlying tool to the widget
+  set_tool(tool);
+
+  // Generate a vertical layout for the tool widget
+  QVBoxLayout* vbox = new QVBoxLayout;
+  // Ensure it has some thight spacing
+  vbox->setSpacing(0);
+  vbox->setContentsMargins(0,0,0,0);
+  setLayout(vbox);
+
+  // Generate a layout for a horizontal bar
+  QHBoxLayout* hbox = new QHBoxLayout;
+  hbox->setSpacing(0);
+  hbox->setContentsMargins(0,0,0,0);
+
+  // Build the header widget
+  QWidget* header = new QWidget;
+  header->setLayout(hbox);
+
+  // Add the help button
+  help_button_ = new QToolButton;
+  help_button_->setIcon(style()->standardIcon(QStyle::SP_TitleBarContextHelpButton));
+  help_button_->setFixedHeight(12);
+
+  // Add the close button
+  close_button_ = new QToolButton;
+  close_button_->setIcon(style()->standardIcon(QStyle::SP_TitleBarCloseButton));
+  close_button_->setFixedHeight(12);
+  
+  // Move the close and help widget to the right of the header bar
+  hbox->addStretch();
+  hbox->addWidget(help_button_);
+  hbox->addWidget(close_button_);
+  
+  main_frame_ = new QFrame;  
+          
+  vbox->addWidget(header);
+  vbox->addWidget(main_frame_);
+  vbox->addStretch();
+  
+  // Ensure that when the close button is pressed, the tool will be closed
+  // The button is connected to an internal slot that relays the signal to the
+  // main application. 
+  connect(close_button_,SIGNAL(released()),this,SLOT(close_tool()));
+  
+  // Create the custom part of the widget
+  return ( build_widget(main_frame_));
+}
+
+bool
+ToolWidget::build_widget(QFrame* frame)
+{
+  return (true);
+}
 
 } //end namespace Seg3D
 

@@ -84,13 +84,15 @@ class ToolBuilder: public ToolBuilderBase {
 // TOOLINTERFACEBUILDER:
 // This class is the base functor for the class that builds the classes in
 // the factory
+// NOTE: This class does not use a handle to make it easier to incorporate this
+// code into Qt at the interface layer.
 
 class ToolInterfaceBuilderBase {
   public:
     // ensure we can delete the builder correctly
     virtual ~ToolInterfaceBuilderBase() {}
     // the functor call to build the object
-    virtual ToolInterfaceHandle build() = 0;
+    virtual ToolInterface* build() = 0;
 };
 
 // TOOLINTERFACEBUILDERT:
@@ -104,8 +106,8 @@ class ToolInterfaceBuilder: public ToolInterfaceBuilderBase {
     // ensure we can delete the builder correctly 
     virtual ~ToolInterfaceBuilder<TOOLINTERFACE>() {}
     // The actual builder call
-    virtual ToolInterfaceHandle build() 
-      { return ToolInterfaceHandle(new TOOLINTERFACE); }
+    virtual ToolInterface* build() 
+      { return new TOOLINTERFACE; }
 };
 
 
@@ -204,11 +206,18 @@ class ToolFactory : public boost::noncopyable  {
     void register_toolinterface(std::string toolinterface_name)
     {
       toolinterface_name = Utils::string_to_lower(toolinterface_name);
+      if (toolinterface_name.substr(toolinterface_name.size()-9) != std::string("interface"))
+      {
+        SCI_THROW_LOGICERROR(std::string("ToolInterface class name does not end with Interface"));
+      }
+      
+      // Strip out the word interface
+      toolinterface_name = toolinterface_name.substr(0,toolinterface_name.size()-9);
       // Lock the factory
-      boost::unique_lock<boost::mutex> lock(toolinterface_builders_mutex_);
+      boost::unique_lock<boost::mutex> lock(toolinterfaces_mutex_);
 
       // Test is tool was registered before.
-      if (toolinterface_builders_.find(toolinterface_name) != toolinterface_builders_.end())
+      if (toolinterfaces_.find(toolinterface_name) != toolinterfaces_.end())
       {
         // Actions that are registered twice, will cause problems
         // Hence the program will throw an exception.
@@ -218,17 +227,17 @@ class ToolFactory : public boost::noncopyable  {
       }
 
       // Register the action
-      toolinterface_builders_[toolinterface_name] = new ToolInterfaceBuilder<TOOLINTERFACE>;
+      toolinterfaces_[toolinterface_name] = new ToolInterfaceBuilder<TOOLINTERFACE>;
       SCI_LOG_DEBUG(std::string("Registering toolinterface : ") + toolinterface_name);
     }
 
   private:
     typedef boost::unordered_map<std::string,ToolInterfaceBuilderBase*> toolinterface_map_type;
     // List with builders that can be called to generate a new object
-    toolinterface_map_type  toolinterface_builders_;
+    toolinterface_map_type  toolinterfaces_;
 
     // Mutex for protecting registration
-    boost::mutex     toolinterface_builders_mutex_;
+    boost::mutex     toolinterfaces_mutex_;
     
 // -- Instantiate tools and toolinterfaces --
   public:
@@ -238,13 +247,13 @@ class ToolFactory : public boost::noncopyable  {
     // specification of the action.
     bool create_tool(const std::string& tool_type,
                      const std::string& toolid,
-                     ToolHandle& tool) const;
+                     ToolHandle& tool); // << THREAD-SAFE
 
     // CREATE_TOOLINTERFACE:
     // Generate an tool from an iostream object that contains the XML
     // specification of the action.
     bool create_toolinterface(const std::string& toolinterface_name,
-                              ToolInterfaceHandle& toolinterface) const;
+                              ToolInterface*& toolinterface); // << THREAD-SAFE
 
 // -- List of tools and interfaces --
   public:
@@ -253,11 +262,16 @@ class ToolFactory : public boost::noncopyable  {
 
     // IS_TOOL_TYPE:
     // Check whether a tool with a specified name is available
-    bool is_tool_type(const std::string& tool_type) const;
+    bool is_tool_type(const std::string& tool_type); // << THREAD-SAFE
 
     // LIST_TOOL_TYPES:
     // List the tools of a certain group
-    bool list_tool_types(tool_list_type& tool_list, int tool_property) const;
+    bool list_tool_types(tool_list_type& tool_list, int tool_property); // << THREAD-SAFE
+
+    // LIST_TOOL_TYPES_WITH_INTERFACE:
+    // List the tools of a certain group
+    bool list_tool_types_with_interface(tool_list_type& tool_list, 
+                                        int tool_property); // << THREAD-SAFE
     
 // -- Singleton interface --
   public:

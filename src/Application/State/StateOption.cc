@@ -109,14 +109,26 @@ StateOption::import_from_string(const std::string& str)
 }
     
 bool 
-StateOption::validate_and_compare_variant(
-      ActionVariantParameter& variant, 
-      bool& changed,
-      std::string& error) const
+StateOption::validate_and_compare_variant(ActionVariantParameter& variant, 
+                                          bool& changed,
+                                          std::string& error) const
 {
-  return (variant.validate_and_compare_option_value(option_list_,value_,changed,error));
-}
+  std::string new_value;
+  if (!(variant.get_value(new_value,error))) return (false);
 
+  new_value = Utils::string_to_lower(new_value);    
+  if (option_list_.end() == std::find(option_list_.begin(),option_list_.end(),
+      new_value)) 
+  {
+    error = "The option value is not one of the predefined options";
+    return (false);
+  }
+    
+  changed = (value_ != new_value);
+  return (true);   
+}
+  
+  
 bool 
 StateOption::import_from_variant(ActionVariantParameter& variant, 
                                      bool trigger_signal)

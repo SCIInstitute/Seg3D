@@ -37,8 +37,6 @@ namespace Seg3D {
 // Base class of each tool interface. These are not included inside the tool
 // to ensure that the GUI is propery separated from the application.
 
-class ToolInterface;
-typedef boost::shared_ptr<Tool> ToolInterfaceHandle;
 
 class ToolInterface : public boost::noncopyable {
 
@@ -51,9 +49,10 @@ class ToolInterface : public boost::noncopyable {
   public:
   
     void set_tool(ToolHandle tool) { tool_ = tool; }
-    ToolHandle get_tool() const { return tool_; }
+    ToolHandle tool() const { return tool_; }
+    std::string toolid() const { return tool_->toolid(); }
   
-  private:
+  protected:
     ToolHandle tool_;
 };
 

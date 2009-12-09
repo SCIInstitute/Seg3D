@@ -33,32 +33,45 @@
 #include <QtGui>
 
 // Application includes
+#include <Application/Tool/ToolInterface.h>
 #include <Application/Tool/Tool.h>
 #include <Application/Tool/ToolManager.h>
 
 namespace Seg3D {
 
-class ToolWidget : public QFrame {
+class ToolWidget : public QWidget, public ToolInterface {
   Q_OBJECT
 
+// -- constructor/destructor --
   public:
-    ToolWidget(QWidget* parent, ToolHandle& tool);
+    ToolWidget();
     virtual ~ToolWidget();
   
-  public:
-    std::string toolid() { return tool_->toolid(); }
+    // CREATE_WIDGET:
+    // The constructor only builds the class. Because this is handled through
+    // a factory method we use this auxillary function to build the inner parts
+    // of the widget
+    bool create_widget(QWidget* parent, ToolHandle& tool);
   
+    // BUILD_WIDGET:
+    // Function to create the specific tool widget:
+    // This one needs to be overloaded
+    virtual bool build_widget(QFrame* frame);
+
+// -- widget internals --
   protected:
-    ToolHandle tool_;
-    
     QToolButton* close_button_;
     QToolButton* help_button_;
   
+    QFrame*      main_frame_;
+  
+// -- common slots --  
   public Q_SLOTS:
     void close_tool()
     {
-      ToolManager::Instance()->dispatch_closetool(tool_->toolid());
+      ToolManager::Instance()->dispatch_closetool(tool()->toolid());
     }
+
 
 };
 
