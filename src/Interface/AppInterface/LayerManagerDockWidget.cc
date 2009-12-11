@@ -24,58 +24,38 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
-*/
+ */
+#include <sstream>
+#include <iostream>
 
-#ifndef INTERFACE_APPINTERFACE_TOOLWIDGET_H
-#define INTERFACE_APPINTERFACE_TOOLWIDGET_H
+#include <Utils/Core/Log.h>
 
-// QT Includes
-#include <QtGui>
+#include <Interface/AppInterface/LayerManagerDockWidget.h>
+#include "ui_LayerManagerDockWidget.h"
 
-// Application includes
-#include <Application/Tool/ToolInterface.h>
-#include <Application/Tool/Tool.h>
-#include <Application/Tool/ToolManager.h>
-
-namespace Seg3D {
-
-class ToolWidget : public QWidget, public ToolInterface {
-  Q_OBJECT
-
-// -- constructor/destructor --
+namespace Seg3D  {
+  
+  class LayerManagerDockWidgetPrivate {
   public:
-    ToolWidget();
-    virtual ~ToolWidget();
+    
+    Ui::LayerManagerDockWidget ui_;
+    
+  };
+
+
+LayerManagerDockWidget::LayerManagerDockWidget(QWidget *parent) :
+    QDockWidget("LayerManagerDockWidget",parent),
+    private_(new LayerManagerDockWidgetPrivate)
+{
+  if (private_) 
+  {
+    private_->ui_.setupUi(this);
+    
+  }
+}
+
+LayerManagerDockWidget::~LayerManagerDockWidget()
+{
   
-    // CREATE_WIDGET:
-    // The constructor only builds the class. Because this is handled through
-    // a factory method we use this auxillary function to build the inner parts
-    // of the widget
-    bool create_widget(QWidget* parent, ToolHandle& tool);
-  
-    // BUILD_WIDGET:
-    // Function to create the specific tool widget:
-    // This one needs to be overloaded
-    virtual bool build_widget(QFrame* frame);
-
-// -- widget internals --
-  protected:
-    QToolButton* close_button_;
-    QToolButton* help_button_;
-    QPushButton* activate_button_;
-  
-    QFrame*      main_frame_;
-  
-// -- common slots --  
-  public Q_SLOTS:
-    void close_tool()
-    {
-      ToolManager::Instance()->dispatch_closetool(tool()->toolid());
-    }
-
-
-};
-
-} //end namespace Seg3D
-
-#endif
+}
+} // end namespace

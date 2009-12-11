@@ -28,6 +28,7 @@
 
 #include <QMenuBar.h>
 
+
 //  Application includes
 #include <Application/Tool/ToolManager.h>
 #include <Application/Tool/ToolFactory.h>
@@ -35,16 +36,20 @@
 // Interface includes
 #include <Interface/QtInterface/QtBridge.h>
 #include <Interface/AppInterface/AppMenu.h>
+#include <Interface/AppInterface/ViewerInterface.h>
+#include <Interface/AppInterface/AppInterface.h>
 
 
 namespace Seg3D {
 
 
-AppMenu::AppMenu(QMainWindow* parent) :
+AppMenu::AppMenu(QMainWindow* parent, ViewerInterface* view_ptr) :
  QObject(parent)
 {
   // Obtain the menubar from the main widget
   QMenuBar* menubar = parent->menuBar();
+  
+  viewer_pointer_ = view_ptr;
 
   // menus
   QMenu* file_menu = menubar->addMenu(tr("&File"));
@@ -62,6 +67,7 @@ AppMenu::AppMenu(QMainWindow* parent) :
   create_filter_menu(filter_menu);
 
   create_window_menu(window_menu);
+
 }
 
 AppMenu::~AppMenu()
@@ -82,7 +88,9 @@ AppMenu::create_file_menu(QMenu* qmenu)
   qaction->setShortcut(tr("Ctrl+Q"));
   qaction->setToolTip(tr("Open a file."));
   connect(qaction, SIGNAL(triggered()), this->parent(), SLOT(close()));
+  
 }
+  
 
 void
 AppMenu::create_edit_menu(QMenu* qmenu)
@@ -92,7 +100,69 @@ AppMenu::create_edit_menu(QMenu* qmenu)
 void
 AppMenu::create_view_menu(QMenu* qmenu)
 {
+  QAction* qaction;
+  qaction = qmenu->addAction(tr("Toggle Full Screen"));
+  qaction->setShortcut(tr("Ctrl+F"));
+  qaction->setToolTip(tr("Toggle the view between full screen and normal"));
+
+
+//  ViewAction* vaction = new ViewAction(qaction,true);
+  //connect(vaction, SIGNAL(triggered(bool)), parent, SLOT(full_screen_toggle(bool)));
+  //connect(qaction, SIGNAL(triggered(bool)), viewer_pointer, SLOT(fullScreenToggle(bool)));  // the fullscreentoggle slot is in ViewerInterface
+  
+  QAction* qaction2;
+  qaction2 = qmenu->addAction(tr("Only One Viewer"));
+  qaction2->setShortcut(tr("ALT+`"));
+  qaction2->setToolTip(tr("Set the view to one large view"));
+  ViewAction* vaction2 = new ViewAction(qaction2,1,0);
+  connect(vaction2, SIGNAL(triggered(int, int)), viewer_pointer_, SLOT(set_views(int, int)));
+  
+  QAction* qaction3;
+  qaction3 = qmenu->addAction(tr("One and One"));
+  qaction3->setShortcut(tr("ALT+1"));
+  qaction3->setToolTip(tr("Set the view to two large views"));
+  ViewAction* vaction3 = new ViewAction(qaction3,1,1);
+  connect(vaction3, SIGNAL(triggered(int, int)), viewer_pointer_, SLOT(set_views(int, int)));
+
+  QAction* qaction4;
+  qaction4 = qmenu->addAction(tr("One and Two"));
+  qaction4->setShortcut(tr("ALT+2"));
+  qaction4->setToolTip(tr("Set the view one large and two smaller views"));
+  ViewAction* vaction4 = new ViewAction(qaction4,1,2);
+  connect(vaction4, SIGNAL(triggered(int, int)), viewer_pointer_, SLOT(set_views(int, int)));
+  
+  QAction* qaction5;
+  qaction5 = qmenu->addAction(tr("One and Three"));
+  qaction5->setShortcut(tr("ALT+3"));
+  qaction5->setToolTip(tr("Set the view one large and three smaller views"));
+  ViewAction* vaction5 = new ViewAction(qaction5,1,3);
+  connect(vaction5, SIGNAL(triggered(int, int)), viewer_pointer_, SLOT(set_views(int, int)));
+  
+  QAction* qaction6;
+  qaction6 = qmenu->addAction(tr("Two and Two"));
+  qaction6->setShortcut(tr("ALT+4"));
+  qaction6->setToolTip(tr("Set the view one large and three smaller views"));
+  ViewAction* vaction6 = new ViewAction(qaction6,2,2);
+  connect(vaction6, SIGNAL(triggered(int, int)), viewer_pointer_, SLOT(set_views(int, int)));
+  
+  QAction* qaction7;
+  qaction7 = qmenu->addAction(tr("Two and Three"));
+  qaction7->setShortcut(tr("ALT+5"));
+  qaction7->setToolTip(tr("Set the view two larger and three smaller views"));
+  ViewAction* vaction7 = new ViewAction(qaction7,2,3);
+  connect(vaction7, SIGNAL(triggered(int, int)), viewer_pointer_, SLOT(set_views(int, int)));
+  
+  QAction* qaction8;
+  qaction8 = qmenu->addAction(tr("Three and Three"));
+  qaction8->setShortcut(tr("ALT+6"));
+  qaction8->setToolTip(tr("Set the view to 6 equally sized views"));
+  ViewAction* vaction8 = new ViewAction(qaction8,3,3);
+  connect(vaction8, SIGNAL(triggered(int, int)), viewer_pointer_, SLOT(set_views(int, int)));
+ 
+  
+  
 }
+ 
 
 void 
 AppMenu::create_tool_menu(QMenu* qmenu)
@@ -102,11 +172,14 @@ AppMenu::create_tool_menu(QMenu* qmenu)
   
   ToolFactory::tool_list_type::const_iterator it = tool_types_list.begin();
   ToolFactory::tool_list_type::const_iterator it_end = tool_types_list.end();
+  int count = 0;
   
   while(it != it_end)
   {
     // Add menu option to open tool
     QAction* qaction = qmenu->addAction(QString((*it).second.c_str()));
+    // TODO Connect the action to a keyboard shortcut DOESNT WORK YET
+    qaction->setShortcut(tr("Alt+") + QString((count++)));
     // Connect the action with dispatching a command in the ToolManager
     QtBridge::connect(qaction,boost::bind(&ToolManager::dispatch_opentool,
                                           ToolManager::Instance(),

@@ -24,58 +24,44 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
-*/
+ */
 
-#ifndef INTERFACE_APPINTERFACE_TOOLWIDGET_H
-#define INTERFACE_APPINTERFACE_TOOLWIDGET_H
+#include "ViewAction.h"
 
-// QT Includes
-#include <QtGui>
+//#include <QAction>
 
-// Application includes
-#include <Application/Tool/ToolInterface.h>
-#include <Application/Tool/Tool.h>
-#include <Application/Tool/ToolManager.h>
 
-namespace Seg3D {
-
-class ToolWidget : public QWidget, public ToolInterface {
-  Q_OBJECT
-
-// -- constructor/destructor --
-  public:
-    ToolWidget();
-    virtual ~ToolWidget();
+namespace Seg3D  {
   
-    // CREATE_WIDGET:
-    // The constructor only builds the class. Because this is handled through
-    // a factory method we use this auxillary function to build the inner parts
-    // of the widget
-    bool create_widget(QWidget* parent, ToolHandle& tool);
+ViewAction::ViewAction(QAction* parent, int column1, int column2) : 
+  QObject(parent)
+{
+  col1_ = column1;
+  col2_ = column2;
   
-    // BUILD_WIDGET:
-    // Function to create the specific tool widget:
-    // This one needs to be overloaded
-    virtual bool build_widget(QFrame* frame);
+  connect(parent,SIGNAL(triggered()),this,SLOT(slot()));
+}
 
-// -- widget internals --
-  protected:
-    QToolButton* close_button_;
-    QToolButton* help_button_;
-    QPushButton* activate_button_;
+ViewAction::ViewAction(QAction* parent, bool true_or_false) : 
+  QObject(parent)
+{
+  state_ = true_or_false;
+  connect(parent, SIGNAL(triggered(bool)), this, SLOT(slot(bool)));
+}
   
-    QFrame*      main_frame_;
+
+void  ViewAction::slot()
+{  
+  Q_EMIT triggered(col1_,col2_);
+}
+ 
+void ViewAction::slot(bool torf)
+{
+  //Q_EMIT trigaficated(state_);
+}
   
-// -- common slots --  
-  public Q_SLOTS:
-    void close_tool()
-    {
-      ToolManager::Instance()->dispatch_closetool(tool()->toolid());
-    }
+
+ViewAction::~ViewAction(){}
 
 
-};
-
-} //end namespace Seg3D
-
-#endif
+}  //end namespace Seg3d

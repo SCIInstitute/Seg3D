@@ -4,7 +4,7 @@
 
 // QT includes
 #include <QtGui>
-#include <QDockWidget>
+
 
 // STL includes
 #include <string>
@@ -23,14 +23,18 @@ class ViewerInterface : public QWidget {
   Q_OBJECT
 
 public:
-    ViewerInterface(QWidget *parent = 0);
-    ~ViewerInterface();
-//    void writeSizeSettings();
-//    void readSizeSettings();
+  ViewerInterface(QWidget *parent = 0);
+  virtual ~ViewerInterface();
+  
+  void writeSizeSettings();
+  void readSizeSettings();
+  
 
 public Q_SLOTS:
-    void setViews(int, int);
-    void setFocusedView(int);
+  void set_views(int, int);
+  void set_focused_view(int);
+
+    
 
 private:
     

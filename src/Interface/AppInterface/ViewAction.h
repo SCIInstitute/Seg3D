@@ -24,58 +24,54 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
-*/
+ */
 
-#ifndef INTERFACE_APPINTERFACE_TOOLWIDGET_H
-#define INTERFACE_APPINTERFACE_TOOLWIDGET_H
+#ifndef INTERFACE_APPINTERFACE_VIEWACTION_H
+#define INTERFACE_APPINTERFACE_VIEWACTION_H
 
-// QT Includes
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+# pragma once
+#endif
+
 #include <QtGui>
+#include <QAction>
 
-// Application includes
-#include <Application/Tool/ToolInterface.h>
-#include <Application/Tool/Tool.h>
-#include <Application/Tool/ToolManager.h>
+
 
 namespace Seg3D {
-
-class ToolWidget : public QWidget, public ToolInterface {
+  
+class ViewAction : public QObject
+{    
   Q_OBJECT
+    
+  Q_SIGNALS:
+    void triggered(int,int);
 
-// -- constructor/destructor --
+    
+  
   public:
-    ToolWidget();
-    virtual ~ToolWidget();
-  
-    // CREATE_WIDGET:
-    // The constructor only builds the class. Because this is handled through
-    // a factory method we use this auxillary function to build the inner parts
-    // of the widget
-    bool create_widget(QWidget* parent, ToolHandle& tool);
-  
-    // BUILD_WIDGET:
-    // Function to create the specific tool widget:
-    // This one needs to be overloaded
-    virtual bool build_widget(QFrame* frame);
-
-// -- widget internals --
-  protected:
-    QToolButton* close_button_;
-    QToolButton* help_button_;
-    QPushButton* activate_button_;
-  
-    QFrame*      main_frame_;
-  
-// -- common slots --  
+    ViewAction(QAction *parent, int column1, int column2);
+    ViewAction(QAction *parent, bool true_or_false);
+    virtual ~ViewAction();
+    
   public Q_SLOTS:
-    void close_tool()
-    {
-      ToolManager::Instance()->dispatch_closetool(tool()->toolid());
-    }
-
-
+    void slot();
+    void slot(bool);
+    
+  private:
+    int col1_;
+    int col2_;
+    bool state_;
+    
+    
 };
 
-} //end namespace Seg3D
+
+
+} // end namespace Seg3D
 
 #endif
+
+
+
+

@@ -24,58 +24,74 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
-*/
+ */
 
-#ifndef INTERFACE_APPINTERFACE_TOOLWIDGET_H
-#define INTERFACE_APPINTERFACE_TOOLWIDGET_H
+#ifndef INTERFACE_APPINTERFACE_APPSTATUSBAR_H
+#define INTERFACE_APPINTERFACE_APPSTATUSBAR_H
 
-// QT Includes
-#include <QtGui>
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+# pragma once
+#endif 
 
-// Application includes
-#include <Application/Tool/ToolInterface.h>
-#include <Application/Tool/Tool.h>
-#include <Application/Tool/ToolManager.h>
+#include <QStatusBar>
+#include <qlabel.h>
+#include <QAction>
+#include <QMainWindow>
 
 namespace Seg3D {
 
-class ToolWidget : public QWidget, public ToolInterface {
+
+class AppStatusBar : public QObject
+{
   Q_OBJECT
-
-// -- constructor/destructor --
+  
+ 
+  // -- constructor / destructor --    
   public:
-    ToolWidget();
-    virtual ~ToolWidget();
+    AppStatusBar(QMainWindow* parent = 0);
+    virtual ~AppStatusBar();
   
-    // CREATE_WIDGET:
-    // The constructor only builds the class. Because this is handled through
-    // a factory method we use this auxillary function to build the inner parts
-    // of the widget
-    bool create_widget(QWidget* parent, ToolHandle& tool);
-  
-    // BUILD_WIDGET:
-    // Function to create the specific tool widget:
-    // This one needs to be overloaded
-    virtual bool build_widget(QFrame* frame);
 
-// -- widget internals --
-  protected:
-    QToolButton* close_button_;
-    QToolButton* help_button_;
-    QPushButton* activate_button_;
   
-    QFrame*      main_frame_;
-  
-// -- common slots --  
   public Q_SLOTS:
-    void close_tool()
-    {
-      ToolManager::Instance()->dispatch_closetool(tool()->toolid());
-    }
+    void set_coordinates_label(int, int);
+    void set_coordinates_mode(int);
+    void set_focus_label(int);
 
-
+  // -- status bar components -- //
+  private:
+    QLabel *coordinates_label_;
+    QLabel *focus_label_;
+  
+  // -- build status bar widgets -- //    
+  private:
+    void build_coordinates_label();
+    void build_focus_label();
+  
 };
+  
+  
+} // end namespace Seg3D
 
-} //end namespace Seg3D
+    
+    
 
 #endif
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+

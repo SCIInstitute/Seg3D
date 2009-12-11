@@ -36,6 +36,9 @@
 #include <QMenuBar>
 #include <QAction>
 #include <QMainWindow>
+#include <Interface/AppInterface/ViewerInterface.h>
+#include <Interface/AppInterface/ViewAction.h>
+
 
 namespace Seg3D {
 
@@ -45,6 +48,7 @@ class AppMenu : public QObject
 // -- constructor / destructor --    
   public:
     AppMenu(QMainWindow* parent = 0);
+    AppMenu(QMainWindow* parent, ViewerInterface* view_ptr); 
     virtual ~AppMenu();
 
 // -- functions for building menus --
@@ -58,10 +62,12 @@ class AppMenu : public QObject
     void create_filter_menu(QMenu* menu);
 
     void create_window_menu(QMenu* menu);
+  
+    ViewerInterface *viewer_pointer_;
 
 // -- Menu pointers --
   private:
-  
+
     QMenu* file_menu_;
     QMenu* edit_menu_;
     QMenu* view_menu_;
@@ -69,6 +75,7 @@ class AppMenu : public QObject
     QMenu* filter_menu_;
     QMenu* window_menu_;
     
+       
 
 
 };

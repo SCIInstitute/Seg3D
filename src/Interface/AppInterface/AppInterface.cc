@@ -40,6 +40,8 @@ AppInterface::AppInterface(QApplication* app)
   setWindowTitle(QString("Seg3D Version ")+SEG3D_VERSION);
   setWindowIconText(QString("Seg3D"));
   setDocumentMode(true);
+  
+  // Tell Qt what size to start up in
   resize(1280, 720);
   
   // Tell Qt where to doc the toolbars
@@ -50,50 +52,54 @@ AppInterface::AppInterface(QApplication* app)
   
     
 
-  viewer_interface_ =        new ViewerInterface(this);
-  history_dock_window_ =     new HistoryDockWidget(this);
-  project_dock_window_ =   new ProjectDockWidget(this);
-  tools_dock_window_ =     new ToolsDockWidget(this);
+  viewer_interface_ =           new ViewerInterface(this);
+  history_dock_window_ =        new HistoryDockWidget(this);
+  project_dock_window_ =        new ProjectDockWidget(this);
+  tools_dock_window_ =          new ToolsDockWidget(this);
+  layer_manager_dock_window_ =  new LayerManagerDockWidget(this);
+  measurement_dock_window_ =    new MeasurementDockWidget(this);
 
   setCentralWidget(viewer_interface_);
 
-// call function to create menu bar 
-
-  createStatusBar();
-  
-
-  addDockWidget(Qt::LeftDockWidgetArea,history_dock_window_, Qt::Horizontal);
-  addDockWidget(Qt::LeftDockWidgetArea,project_dock_window_, Qt::Horizontal);
-  addDockWidget(Qt::LeftDockWidgetArea,tools_dock_window_, Qt::Horizontal);
+  addDockWidget(Qt::LeftDockWidgetArea, history_dock_window_, Qt::Horizontal);
+  addDockWidget(Qt::LeftDockWidgetArea, project_dock_window_, Qt::Horizontal);
+  addDockWidget(Qt::LeftDockWidgetArea, tools_dock_window_, Qt::Horizontal);
   
   tabifyDockWidget(project_dock_window_, history_dock_window_);
   tabifyDockWidget(history_dock_window_, tools_dock_window_);
   
+  addDockWidget(Qt::RightDockWidgetArea, layer_manager_dock_window_, Qt::Horizontal);
+  addDockWidget(Qt::RightDockWidgetArea, measurement_dock_window_, Qt::Horizontal);
+  
+  tabifyDockWidget(measurement_dock_window_, layer_manager_dock_window_);
+  
 
   
-  application_menu_ = new AppMenu(this);
+
+  //showFullScreen();
+  application_menu_ = new AppMenu(this, viewer_interface_);
+  status_bar_ = new AppStatusBar(this);
+  
+  // set the viewer_interface_ to a default view of 1 and 3
+  viewer_interface_->set_views(1,3);
+  
+ 
+  
 }
 
+void
+AppInterface::full_screen_toggle(bool e)
+{
+  if(e) AppInterface::showFullScreen();
+  else AppInterface::showFullScreen();
+}
   
-  void AppInterface::createStatusBar()
-  {
-    coordinatesLabel = new QLabel(" x: y: ");
-    coordinatesLabel->setAlignment(Qt::AlignHCenter);
-    coordinatesLabel->setMinimumSize(coordinatesLabel->sizeHint());
-    coordinatesLabel->setStyleSheet("margin-left: 2px;");
-    
-    focusLabel = new QLabel("Focus: ");
-    focusLabel->setIndent(3);
-    
-    statusBar()->addWidget(coordinatesLabel);
-    statusBar()->addWidget(focusLabel, 1);
-    statusBar()->setStyleSheet("padding-left: 2px;");
-    
-  }
+
   
 
 AppInterface::~AppInterface()
 {
+  viewer_interface_->writeSizeSettings();
 }
 
 

@@ -88,6 +88,9 @@ IF(APPLE)
        COMMAND [ ! -d Debug ] || install_name_tool -change QtGui.framework/Versions/4/QtGui @executable_path/QtGui Debug/Seg3D.app/Contents/MacOS/Seg3D
        COMMAND [ ! -d Debug ] || install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore Debug/Seg3D.app/Contents/MacOS/Seg3D
        COMMAND [ ! -d Debug ] || cp "-rf" "${QT_QTGUI_LIBRARY_RELEASE}/Versions/Current/Resources" "Debug/Seg3D.app/Contents"
+       COMMAND [ ! -d Debug ] || [ -d Debug/Seg3D.app/Contents/MacOS/plugins ] || mkdir Debug/Seg3D.app/Contents/MacOS/plugins
+       COMMAND [ ! -d Debug ] || cp -rf "${CMAKE_SOURCE_DIR}/CMake/qt.conf" Debug/Seg3D.app/Contents/Resources
+
        COMMAND [ ! -d Release ] || cp -rf "${QT_QTCORE_LIBRARY_RELEASE}/Versions/4/QtCore" "Release/Seg3D.app/Contents/MacOS/" 
        COMMAND [ ! -d Release ] || cp -rf "${QT_QTGUI_LIBRARY_RELEASE}/Versions/4/QtGui" "Release/Seg3D.app/Contents/MacOS/"
        COMMAND [ ! -d Release ] || install_name_tool -id QtCore Release/Seg3D.app/Contents/MacOS/QtCore
@@ -96,6 +99,9 @@ IF(APPLE)
        COMMAND [ ! -d Release ] || install_name_tool -change QtGui.framework/Versions/4/QtGui @executable_path/QtGui Release/Seg3D.app/Contents/MacOS/Seg3D
        COMMAND [ ! -d Release ] || install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore Release/Seg3D.app/Contents/MacOS/Seg3D
        COMMAND [ ! -d Release ] || cp "-rf" "${QT_QTGUI_LIBRARY_RELEASE}/Versions/Current/Resources" "Release/Seg3D.app/Contents"
+       COMMAND [ ! -d Release ] || [ -d Release/Seg3D.app/Contents/MacOS/plugins ] || mkdir Release/Seg3D.app/Contents/MacOS/plugins
+       COMMAND [ ! -d Release ] || cp -rf "${CMAKE_SOURCE_DIR}/CMake/qt.conf" Release/Seg3D.app/Contents/Resources
+
        WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
   ELSE(${CMAKE_GENERATOR} MATCHES "Xcode")
@@ -109,6 +115,9 @@ IF(APPLE)
        COMMAND install_name_tool -change QtGui.framework/Versions/4/QtGui @executable_path/QtGui Seg3D.app/Contents/MacOS/Seg3D
        COMMAND install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore Seg3D.app/Contents/MacOS/Seg3D
        COMMAND cp "-rf" "${QT_QTGUI_LIBRARY_RELEASE}/Versions/Current/Resources" "Seg3D.app/Contents"
+       COMMAND [ -d Seg3D.app/Contents/MacOS/plugins ] || mkdir Seg3D.app/Contents/MacOS/plugins
+       COMMAND cp -rf "${CMAKE_SOURCE_DIR}/CMake/qt.conf" Seg3D.app/Contents/Resources
+
        WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
   ENDIF(${CMAKE_GENERATOR} MATCHES "Xcode")

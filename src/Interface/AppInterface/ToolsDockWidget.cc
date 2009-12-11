@@ -56,6 +56,8 @@ ToolsDockWidget::ToolsDockWidget(QWidget *parent) :
 {
   private_->ui_.setupUi(this);
   toolbox_ = private_->ui_.TB_Tools;
+  
+  
 
   // Ensure that the application does not change any of the tools while
   // the user interface is being built

@@ -23,7 +23,7 @@ class ProjectDockWidget : public QDockWidget {
   
 public:
     ProjectDockWidget(QWidget *parent = 0);
-    ~ProjectDockWidget();
+    virtual ~ProjectDockWidget();
 
 
 private:

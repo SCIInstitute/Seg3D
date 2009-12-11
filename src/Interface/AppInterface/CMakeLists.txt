@@ -34,21 +34,31 @@
 SET(INTERFACE_APPINTERFACE_SRCS
   AppInterface.cc
   AppMenu.cc
+  AppStatusBar.cc
   ViewerInterface.cc
   HistoryDockWidget.cc
   ProjectDockWidget.cc
   ToolsDockWidget.cc
   ToolWidget.cc
+  LayerManagerDockWidget.cc
+  MeasurementDockWidget.cc
+  ViewAction.cc
+  ToolBoxWidget.cc
 )
 
 SET(INTERFACE_APPINTERFACE_MOC_SRCS
   AppInterface.h
   AppMenu.h
+  AppStatusBar.h
   ViewerInterface.h
   HistoryDockWidget.h
   ProjectDockWidget.h
   ToolsDockWidget.h
   ToolWidget.h
+  LayerManagerDockWidget.h
+  MeasurementDockWidget.h
+  ViewAction.h
+  ToolBoxWidget.h
 )
 
 SET(INTERFACE_APPINTERFACE_NO_MOC_SRCS
@@ -59,6 +69,10 @@ SET(INTERFACE_APPINTERFACE_UI_SRCS
   ViewerInterface.ui  
   ProjectDockWidget.ui
   ToolsDockWidget.ui
+  LayerManagerDockWidget.ui
+  MeasurementDockWidget.ui
+  LayerManagerDockWidget.ui
+  MeasurementDockWidget.ui
 )
 
 ##################################################

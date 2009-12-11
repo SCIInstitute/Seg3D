@@ -55,38 +55,41 @@ ViewerInterface::ViewerInterface(QWidget *parent) :
     
     private_->ui_.setupUi(this);
 
-    setFocusedView(1);
-    setViews(1,3);
+    set_focused_view(1);
+    
+    //full_screen_toggle(true);
   }
 
 }
 
 
 //TODO - build viewer sizes state saver and recoverer
-//void ViewerInterface::writeSizeSettings()
-//{
-//    QSettings settings( "SCI", "Seg3D2.0" );
-//    settings.beginGroup("ViewerInterface");
-//    settings.setValue("geometry", saveGeometry());
-//    settings.setValue("mainSplitter", ui->mainSplitter->saveState());
-//    settings.setValue("eastSplitter", ui->eastSplitter->saveState());
-//    settings.setValue("westSplitter", ui->westSplitter->saveState());
-//    settings.endGroup();
-//}
-//
-//void ViewerInterface::readSizeSettings()
-//{
-//    QSettings settings( "SCI", "Seg3D2.0" );
-//    settings.beginGroup("ViewerInterface");
-//    restoreGeometry(settings.value("geometry").toByteArray());
-//    ui->mainSplitter->restoreState(settings.value("mainSplitter").toByteArray());
-//    ui->eastSplitter->restoreState(settings.value("eastSplitter").toByteArray());
-//    ui->westSplitter->restoreState(settings.value("westSplitter").toByteArray());
-//    settings.endGroup();
-//}
+void ViewerInterface::writeSizeSettings()
+{
+    QSettings settings( "SCI", "Seg3D2.0" );
+    settings.beginGroup("ViewerInterface");
+    settings.setValue("geometry", saveGeometry());
+    settings.setValue("mainSplitter", private_->ui_.mainSplitter->saveState());
+    settings.setValue("eastSplitter", private_->ui_.eastSplitter->saveState());
+    settings.setValue("westSplitter", private_->ui_.westSplitter->saveState());
+    settings.endGroup();
+}
 
+void ViewerInterface::readSizeSettings()
+{
+    QSettings settings( "SCI", "Seg3D2.0" );
+    settings.beginGroup("ViewerInterface");
+    restoreGeometry(settings.value("geometry").toByteArray());
+    private_->ui_.mainSplitter->restoreState(settings.value("mainSplitter").toByteArray());
+    private_->ui_.eastSplitter->restoreState(settings.value("eastSplitter").toByteArray());
+    private_->ui_.westSplitter->restoreState(settings.value("westSplitter").toByteArray());
+    settings.endGroup();
+}
 
-void ViewerInterface::setFocusedView(int viewForFocus)
+  
+//  --- Public Slots ---  //  
+
+void ViewerInterface::set_focused_view(int viewForFocus)
 {
   private_->ui_.viewerFrame_1->setAutoFillBackground(false);
     private_->ui_.viewerFrame_1->setAutoFillBackground(false);
@@ -127,7 +130,7 @@ void ViewerInterface::setFocusedView(int viewForFocus)
 }
 
 
-void ViewerInterface::setViews(int west, int east)
+void ViewerInterface::set_views(int west, int east)
 {
     QList<int> westWindows;
     QList<int> eastWindows;
@@ -144,6 +147,9 @@ void ViewerInterface::setViews(int west, int east)
 
     if ((west == 1)&&(east == 1))
     {
+        mainWindows.push_back(4000);
+        mainWindows.push_back(4000);
+        private_->ui_.mainSplitter->setSizes(mainWindows);
         westWindows.push_back(4000);
         private_->ui_.westSplitter->setSizes(westWindows);
         eastWindows.push_back(4000);
@@ -229,12 +235,7 @@ void ViewerInterface::setViews(int west, int east)
         eastWindows.push_back(4000);
         private_->ui_.eastSplitter->setSizes(eastWindows);
     }
-
-
-
-
 }
-
 
 
 ViewerInterface::~ViewerInterface()
