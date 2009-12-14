@@ -39,6 +39,12 @@
 
 #include <Utils/Core/Exception.h>
 
+#include <Utils/Geometry/Point.h>
+#include <Utils/Geometry/Vector.h>
+#include <Utils/Geometry/Transform.h>
+#include <Utils/Geometry/BBox.h>
+#include <Utils/Geometry/Plane.h>
+
 namespace Utils {
 
 
@@ -68,6 +74,31 @@ std::string export_to_string(const double& value);
 
 std::string export_to_string(const std::string& value);
 
+std::string export_to_string(const Point& value);
+std::string export_to_string(const Vector& value);
+
+std::string export_to_string(const std::vector<char>& value);
+std::string export_to_string(const std::vector<unsigned char>& value);
+
+std::string export_to_string(const std::vector<short>& value);
+std::string export_to_string(const std::vector<unsigned short>& value);
+
+std::string export_to_string(const std::vector<int>& value);
+std::string export_to_string(const std::vector<unsigned int>& value);
+
+std::string export_to_string(const std::vector<long>& value);
+std::string export_to_string(const std::vector<unsigned long>& value);
+
+std::string export_to_string(const std::vector<float>& value);
+std::string export_to_string(const std::vector<double>& value);
+
+std::string export_to_string(const std::vector<Point>& value);
+std::string export_to_string(const std::vector<Vector>& value);
+
+std::string export_to_string(const BBox& value);
+std::string export_to_string(const Transform& value);
+std::string export_to_string(const Plane& value);
+
 // import_from_string:
 // Function to convert a string back into the data it is representing
 
@@ -89,13 +120,39 @@ bool import_from_string(const std::string& str, unsigned short& value);
 bool import_from_string(const std::string& str, int& value);
 bool import_from_string(const std::string& str, unsigned int& value);
 
-bool import_from_string(const std::string& str, long& value);
-bool import_from_string(const std::string& str, unsigned long& value);
+bool import_from_string(const std::string& str, long long& value);
+bool import_from_string(const std::string& str, unsigned long long& value);
 
 bool import_from_string(const std::string& str, float& value);
 bool import_from_string(const std::string& str, double& value);
 
 bool import_from_string(const std::string& str, std::string& value);
+
+bool import_from_string(const std::string& str, Point& value);
+bool import_from_string(const std::string& str, Vector& value);
+
+bool import_from_string(const std::string& str, std::vector<char>& value);
+bool import_from_string(const std::string& str, std::vector<unsigned char>& value);
+
+bool import_from_string(const std::string& str, std::vector<short>& value);
+bool import_from_string(const std::string& str, std::vector<unsigned short>& value);
+
+bool import_from_string(const std::string& str, std::vector<int>& value);
+bool import_from_string(const std::string& str, std::vector<unsigned int>& value);
+
+bool import_from_string(const std::string& str, std::vector<long long>& value);
+bool import_from_string(const std::string& str, std::vector<unsigned long long>& value);
+
+
+bool import_from_string(const std::string& str, std::vector<float>& value);
+bool import_from_string(const std::string& str, std::vector<double>& value);
+
+bool import_from_string(const std::string& str, std::vector<Point>& value);
+bool import_from_string(const std::string& str, std::vector<Vector>& value);
+
+bool import_from_string(const std::string& str, BBox& value);
+bool import_from_string(const std::string& str, Transform& value);
+
 
 } // end namespace Utils
 

@@ -58,26 +58,35 @@ bool multiple_from_string(const std::string &str, std::vector<T> &values)
 {
   values.clear();
   
+  // Clear out any markup of the numbers that make it easier to read and
+  // replace it all with spaces.
   std::string data = str;
   for (size_t j=0; j<data.size(); j++) 
     if ((data[j] == '\t')||(data[j] == '\r')||(data[j] == '\n')||(data[j]=='"')
         ||(data[j]==',')||(data[j]=='[')||(data[j]==']')||(data[j]=='(')
         ||(data[j]==')')) data[j] = ' ';
-    
-  std::vector<std::string> nums;
+
+  // Loop over the data and extract all numbers from it.
   for (size_t p=0;p<data.size();)
   { 
-    while((data[p] == ' ')&&(p<data.size())) p++;
+    // find where the number starts
+    while((p<data.size())&&(data[p] == ' ')) p++;
+    // Exit if we are at the end of the series
     if (p >= data.size()) break;
 
+    // strip of the next number
     std::string::size_type next_space = data.find(' ',p);
     if (next_space == std::string::npos) next_space = data.size();
+
+    // Extract the number
     T value;
     if(from_string(data.substr(p,next_space-p),value)) values.push_back(value);
     p = next_space;
 
     if (p >= data.size()) break;
   }
+  
+  // If no numbers were extracted return false
   if (values.size() > 0) return (true);
   return (false);
 }
@@ -95,6 +104,23 @@ bool from_string(const std::string &str, T &value)
         ||(data[j]==')')) data[j] = ' ';
 
   std::istringstream iss(data);
+  iss.exceptions(std::ifstream::eofbit | std::ifstream::failbit | std::ifstream::badbit);
+  try
+  {
+    iss >> value;
+    return (true);
+  }
+  catch (...)
+  {
+    return (false);
+  }
+}
+
+
+template <class T>
+bool from_string_internal(const std::string &str, T &value)
+{
+  std::istringstream iss(str);
   iss.exceptions(std::ifstream::eofbit | std::ifstream::failbit | std::ifstream::badbit);
   try
   {
@@ -136,6 +162,9 @@ std::string string_to_lower(std::string);
 // Special cases that need additional rules to deal with inf and nan
 bool from_string(const std::string &str, double &value);
 bool from_string(const std::string &str, float &value);
+
+bool from_string_internal(const std::string &str, double &value);
+bool from_string_internal(const std::string &str, float &value);
 
 // Functions to strip out spaces at the start or at both ends of the string
 void strip_spaces(std::string& str);

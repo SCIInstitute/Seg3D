@@ -31,20 +31,22 @@
 # Set sources
 ##################################################
 
-SET(UTILS_CONVERTER_SRCS
-  StringConverter.h
-  StringConverter.cc
-  StringParser.h
-  StringParser.cc
+SET(UTILS_GEOMETRY_SRCS
+  BBox.h
+  BBox.cc
+  Plane.h
+  Plane.cc
+  Point.h
+  Point.cc
+  Transform.h
+  Transform.cc
+  Vector.h
+  Vector.cc
 )
 
 ##################################################
 # Build static library
 ##################################################
 
-ADD_LIBRARY(Utils_Converter STATIC ${UTILS_CONVERTER_SRCS})
-TARGET_LINK_LIBRARIES(Utils_Converter 
-                      Utils_Core
-                      Utils_Geometry
-                      ${SCI_BOOST_LIBRARY})
-
+ADD_LIBRARY(Utils_Geometry STATIC ${UTILS_GEOMETRY_SRCS})
+TARGET_LINK_LIBRARIES(Utils_Geometry ${SCI_BOOST_LIBRARY})

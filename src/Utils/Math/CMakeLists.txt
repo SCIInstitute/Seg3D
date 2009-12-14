@@ -31,20 +31,13 @@
 # Set sources
 ##################################################
 
-SET(UTILS_CONVERTER_SRCS
-  StringConverter.h
-  StringConverter.cc
-  StringParser.h
-  StringParser.cc
+SET(UTILS_MATH_SRCS
+  MathFunctions.h
 )
 
 ##################################################
 # Build static library
 ##################################################
 
-ADD_LIBRARY(Utils_Converter STATIC ${UTILS_CONVERTER_SRCS})
-TARGET_LINK_LIBRARIES(Utils_Converter 
-                      Utils_Core
-                      Utils_Geometry
-                      ${SCI_BOOST_LIBRARY})
+ADD_LIBRARY(Utils_Math STATIC ${UTILS_MATH_SRCS})
 
