@@ -28,8 +28,6 @@
 
 #include "ViewAction.h"
 
-//#include <QAction>
-
 
 namespace Seg3D  {
   

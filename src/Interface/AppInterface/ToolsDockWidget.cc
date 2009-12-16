@@ -54,9 +54,12 @@ ToolsDockWidget::ToolsDockWidget(QWidget *parent) :
     QDockWidget(parent),
     private_(new ToolsDockWidgetPrivate)
 {
-  private_->ui_.setupUi(this);
-  toolbox_ = private_->ui_.TB_Tools;
-  
+  //private_->ui_.setupUi(this);
+  toolbox_ = new ToolBoxWidget(this);
+  //TB_Tools = new ToolBoxWidget(this);
+  make_dock_widget();
+  //toolbox_ = private_->ui_.TB_Tools;
+  //toolbox_ = TB_Tools;
   
 
   // Ensure that the application does not change any of the tools while
@@ -110,7 +113,59 @@ ToolsDockWidget::ToolsDockWidget(QWidget *parent) :
   ToolManager::Instance()->unlock_tool_list();
   
 }
+  
+  
+// Build the GUI
+void ToolsDockWidget::make_dock_widget()
+{
+  QWidget *dockWidgetContents;
+  QVBoxLayout *verticalLayout;
+  QVBoxLayout *verticalLayout_2;
+  QScrollArea *scrollArea;
+  QWidget *scrollAreaWidgetContents;
+  
+  this->resize(243, 640);
+  QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+  sizePolicy.setHorizontalStretch(0);
+  sizePolicy.setVerticalStretch(0);
+  sizePolicy.setHeightForWidth(this->sizePolicy().hasHeightForWidth());
+  this->setSizePolicy(sizePolicy);
+  this->setMinimumSize(QSize(243, 184));
+  this->setMaximumSize(QSize(243, 524287));
+  this->setAllowedAreas(Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea);
+  this->setWindowTitle("Tools/Plugins");
 
+  dockWidgetContents = new QWidget();
+  dockWidgetContents->setObjectName(QString::fromUtf8("dockWidgetContents"));
+  
+  verticalLayout = new QVBoxLayout(dockWidgetContents);
+  verticalLayout->setSpacing(0);
+  verticalLayout->setContentsMargins(0, 0, 0, 0);
+  verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
+  
+  scrollArea = new QScrollArea(dockWidgetContents);
+  scrollArea->setObjectName(QString::fromUtf8("scrollArea"));
+  scrollArea->setWidgetResizable(true);
+  scrollAreaWidgetContents = new QWidget();
+  scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
+  scrollAreaWidgetContents->setGeometry(QRect(0, 0, 227, 598));
+  
+  verticalLayout_2 = new QVBoxLayout(scrollAreaWidgetContents);
+  verticalLayout_2->setSpacing(0);
+  verticalLayout_2->setContentsMargins(0, 0, 0, 0);
+  verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
+    
+  verticalLayout_2->addWidget(toolbox_);
+  
+  scrollArea->setWidget(scrollAreaWidgetContents);
+  
+  verticalLayout->addWidget(scrollArea);
+  
+  this->setWidget(dockWidgetContents);
+  
+}
+
+  
 
 
 ToolsDockWidget::~ToolsDockWidget()
@@ -134,9 +189,9 @@ ToolsDockWidget::open_tool(ToolHandle tool)
   }
   // Step (2) : instantiate the widget
   widget->create_widget(this,tool);
-
-  toolbox_->addItem(widget,QString::fromStdString(tool->menu_name()
-                                +" "+Utils::to_string(tool->toolid_number())));
+   
+  toolbox_->add_tool(widget,QString::fromStdString(tool->menu_name()
+                                                  +" "+Utils::to_string(tool->toolid_number())));
   widget_list_[tool->toolid()] = widget;
 }
 
@@ -153,7 +208,8 @@ ToolsDockWidget::close_tool(ToolHandle tool)
   ToolWidget *widget = (*it).second;
   
   // Remove this widget from the widget
-  toolbox_->removeItem(toolbox_->indexOf(widget));
+  //toolbox_->removeItem(toolbox_->indexOf(widget));
+  toolbox_->remove_tool(toolbox_->index_of(widget));
   // Remove the pointer from widget 
   widget_list_.erase(tool->toolid());
   
@@ -180,10 +236,9 @@ ToolsDockWidget::activate_tool(ToolHandle tool)
   } 
   ToolWidget *widget = (*it).second;
   
-  // Make the widget the active widget
-  if (widget != toolbox_->currentWidget())
+  if (widget != toolbox_->get_active_tool())
   {
-    toolbox_->setCurrentWidget(widget);  
+    toolbox_->set_active_tool(widget);  
   }
 }
 
@@ -192,7 +247,8 @@ ToolsDockWidget::tool_changed(int index)
 {
   if (index > 0)
   {
-    ToolWidget *widget = static_cast<ToolWidget*>(toolbox_->widget(index));
+    ToolWidget *widget = static_cast<ToolWidget*>(toolbox_->get_tool_at(index));
+    //ToolWidget *widget = static_cast<ToolWidget*>(toolbox_->widget(index));
     ToolManager::Instance()->dispatch_activatetool(widget->toolid());
   }
 }
