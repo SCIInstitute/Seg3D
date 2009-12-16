@@ -35,6 +35,8 @@
 // Base class of the tool widget
 #include <Interface/AppInterface/ToolWidget.h>
 
+#include <Interface/ToolInterface/CustomWidgets/SliderSpinCombo.h>
+
 namespace Seg3D {
 
 class PaintToolInterfacePrivate;
@@ -42,14 +44,57 @@ class PaintToolInterfacePrivate;
 class PaintToolInterface : public ToolWidget {
   Q_OBJECT
   
+  Q_SIGNALS:
+    void activeChanged(int);
+    void maskChanged(int);
+    
+    void eraseModeChanged(bool);
+    
+    void paintBrushSizeChanged(int);
+    void upperThresholdChanged(int);
+    void lowerThresholdChanged(int);
+  
+  
+  public Q_SLOTS:
+    void setActive(int);
+    void addToActive(QStringList&);
+    void setMask(int);
+    void addToMask(QStringList&);
+    void setPaintBrushSize(int);
+    void setLowerThreshold(double, double);
+    void setLowerThresholdStep(double);
+    
+    void setUpperThreshold(double, double);
+    void setUpperThresholdStep(double);
+  
+  
   public:
     PaintToolInterface();
     virtual ~PaintToolInterface();
 
     virtual bool build_widget(QFrame* frame);
 
+
   private:
     PaintToolInterfacePrivate* private_;
+    
+    SliderSpinCombo *paintBrushAdjuster;
+    SliderSpinCombo *upperThresholdAdjuster;
+    SliderSpinCombo *lowerThresholdAdjuster;
+    
+    void makeConnections();
+  
+  private Q_SLOTS:
+    void senseActiveChanged(int);
+    void senseMaskChanged(int);
+    
+    void senseEraseModeChanged(bool);
+    
+    void sensePaintBrushSizeChanged(double);
+    void senseUpperThresholdChanged(double);
+    void senselowerThresholdChanged(double);
+  
+  
 };
 
 } // namespace Seg3D
