@@ -67,9 +67,9 @@ namespace Seg3D {
 // Class declarations
 class ActionLayerFromFile : public ActionLayer
 {
+  SCI_ACTION_TYPE("LayerFromFile","",LAYER_E)
 public:
-  ActionLayerFromFile() :
-  ActionLayer("LayerFromFile", Action::LAYER_E)
+  ActionLayerFromFile()
   {
     add_argument(filename_);
   }
@@ -82,11 +82,11 @@ public:
     filename_.value() = filename;
   }
 
-  virtual bool do_validate(ActionContextHandle& context);
+  virtual bool do_validate(ActionHandle& self,ActionContextHandle& context);
   virtual bool check_layer_availability();
   virtual bool lock_layers() const;
   virtual bool release_layers() const;
-  virtual bool execute(ActionContextHandle& context) const;
+  virtual bool execute(ActionHandle& self,ActionContextHandle& context) const;
 
 private:
   ActionParameter<std::string> filename_;

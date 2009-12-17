@@ -44,8 +44,14 @@ SET(APPLICATION_ACTION_SRCS
   ActionDispatcher.cc
   ActionFactory.h
   ActionFactory.cc
+  ActionHistory.h
+  ActionHistory.cc
   ActionRecorder.h
   ActionRecorder.cc
+  ActionUndoItem.h
+  ActionUndoItem.cc
+  ActionUndoBuffer.h
+  ActionUndoBuffer.cc
   )
 
 

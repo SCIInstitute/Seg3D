@@ -63,29 +63,30 @@ namespace Seg3D {
 
 class ActionCloneLayer : public ActionLayer 
 {
-public:
-  ActionCloneLayer() :
-  ActionLayer("CloneLayer", Action::LAYER_E)
-  {
-    add_argument(layer_to_clone_);
-  }
+    SCI_ACTION_TYPE("CloneLayer","",Action::LAYER_E)
 
-  virtual ~ActionCloneLayer()
-  {}
+  public:
+    ActionCloneLayer()
+    {
+      add_argument(layer_to_clone_);
+    }
 
-  void set(const std::string& layer_to_clone)
-  {
-    layer_to_clone_.value() = layer_to_clone;
-  }
+    virtual ~ActionCloneLayer()
+    {}
 
-  virtual bool do_validate(ActionContextHandle& context);
-  virtual bool check_layer_availability();
-  virtual bool lock_layers() const;
-  virtual bool release_layers() const;
-  virtual bool execute(ActionContextHandle& context) const;
+    void set(const std::string& layer_to_clone)
+    {
+      layer_to_clone_.value() = layer_to_clone;
+    }
 
-private:
-  ActionParameter<std::string> layer_to_clone_;
+    virtual bool do_validate(ActionHandle& self, ActionContextHandle& context);
+    virtual bool check_layer_availability();
+    virtual bool lock_layers() const;
+    virtual bool release_layers() const;
+    virtual bool execute(ActionHandle& self,ActionContextHandle& context) const;
+
+  private:
+    ActionParameter<std::string> layer_to_clone_;
 
 };
 

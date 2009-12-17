@@ -41,7 +41,7 @@ void QtCheckBoxSignal(QPointer<QCheckBox> qobject_ptr, bool state)
     return;
   }
 
-  if (qobject_ptr) qobject_ptr->setChecked(state); 
+  if (qobject_ptr.data()) qobject_ptr->setChecked(state); 
 }
 
 bool

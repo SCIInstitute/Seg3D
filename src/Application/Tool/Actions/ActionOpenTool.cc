@@ -29,6 +29,8 @@
 #include <Application/Tool/ToolManager.h>
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tool/Actions/ActionOpenTool.h>
+#include <Application/Tool/Actions/ActionCloseTool.h>
+#include <Application/Tool/Actions/ActionActivateTool.h>
 
 namespace Seg3D {
 
@@ -42,7 +44,8 @@ SCI_REGISTER_ACTION(OpenTool);
 // is valid and can be executed.
 
 bool
-ActionOpenTool::validate(ActionContextHandle& context)
+ActionOpenTool::validate(ActionHandle& self,
+                         ActionContextHandle& context)
 {
   // Check whether an id number was attached
   std::string tool_type = toolid_.value();
@@ -75,11 +78,31 @@ ActionOpenTool::validate(ActionContextHandle& context)
 // The code that runs the actual action
 
 bool 
-ActionOpenTool::run(ActionContextHandle& context)
+ActionOpenTool::run(ActionHandle& self,
+                    ActionContextHandle& context)
 {
+  std::string active_tool = ToolManager::Instance()->active_toolid();
+
   // Open and Activate the tool
   ToolManager::Instance()->open_tool(toolid_.value(),result_toolid_.value());
   ToolManager::Instance()->activate_tool(result_toolid_.value());
+
+  if(need_undo(context))
+  {
+    ActionCloseToolHandle undo1(new ActionCloseTool);
+    undo1->set(toolid_.value());
+    if (active_tool != "")
+    {
+      ActionActivateToolHandle undo2(new ActionActivateTool);
+      undo2->set(active_tool);
+      AddUndoAction("Open Tool",undo1,undo2,self);
+    }
+    else
+    {
+      AddUndoAction("Open Tool",undo1,self);
+    }
+  }
+  
   return (true); // success
 }
 

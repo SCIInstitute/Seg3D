@@ -55,8 +55,6 @@ EventHandler::is_eventhandler_thread() const
 void
 EventHandler::run_eventhandler()
 {
-  SCI_LOG_DEBUG("Starting Event Handler");
-  
   try
   {
     while (!(wait_and_process_events()));
@@ -65,8 +63,6 @@ EventHandler::run_eventhandler()
   {
     SCI_LOG_ERROR(e.message());
   }
-
-  SCI_LOG_DEBUG("Stopping Event Handler");
 }
 
 void
@@ -80,8 +76,6 @@ void
 EventHandler::post_event(boost::function<void ()> function)
 {
   EventHandle event = EventHandle(new EventT<boost::function<void ()> >(function));
-
-  SCI_LOG_DEBUG("post event");
   eventhandler_context_->post_event(event);
 }
 

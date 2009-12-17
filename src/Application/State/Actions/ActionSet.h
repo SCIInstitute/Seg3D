@@ -37,11 +37,11 @@
 namespace Seg3D {
 
 class ActionSet : public Action {
+    SCI_ACTION_TYPE("Set","Set key value",APPLICATION_E)
 
 // -- Constructor/Destructor --
   public:
-    ActionSet() :
-      Action("Set",APPLICATION_E)
+    ActionSet()
     {
       add_argument(stateid_);
       add_argument(statevalue_);
@@ -61,8 +61,10 @@ class ActionSet : public Action {
     }
 
 // -- Functions that describe action --
-    virtual bool validate(ActionContextHandle& context);
-    virtual bool run(ActionContextHandle& context);
+    virtual bool validate(ActionHandle& self,
+                          ActionContextHandle& context);
+    virtual bool run(ActionHandle& self,
+                     ActionContextHandle& context);
 
 // -- Action parameters --
   private:

@@ -80,14 +80,14 @@ ActionLayerFromFile::release_layers() const
 
 
 bool 
-ActionLayerFromFile::do_validate(ActionContextHandle& context)
+ActionLayerFromFile::do_validate(ActionHandle& self,ActionContextHandle& context)
 {
   // TODO: verify that the filename provided is a valid, readable file
   return (true);
 }
 
 bool 
-ActionLayerFromFile::execute(ActionContextHandle& context) const
+ActionLayerFromFile::execute(ActionHandle& self,ActionContextHandle& context) const
 {
   // Read data in from file
   // Populate a layer handle

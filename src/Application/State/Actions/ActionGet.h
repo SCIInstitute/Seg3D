@@ -29,18 +29,16 @@
 #ifndef APPLICATION_STATE_ACTIONS_ACTIONGET_H
 #define APPLICATION_STATE_ACTIONS_ACTIONGET_H
 
-#include <Application/Action/Action.h>
-#include <Application/Action/ActionFactory.h>
-#include <Application/Action/ActionVariantParameter.h>
+#include <Application/Action/Actions.h>
 
 namespace Seg3D {
 
 class ActionGet : public Action {
-
+  SCI_ACTION_TYPE("Get","Get key",APPLICATION_E|QUERY_E)
+  
 // -- Constructor/Destructor --
   public:
-    ActionGet() :
-      Action("Get",APPLICATION_E|QUERY_E)
+    ActionGet()
     {
       add_argument(stateid_);
       add_result(stateresult_);
@@ -59,8 +57,10 @@ class ActionGet : public Action {
     }
 
 // -- Functions that describe action --
-    virtual bool validate(ActionContextHandle& context);
-    virtual bool run(ActionContextHandle& context);
+    virtual bool validate(ActionHandle& self,
+                          ActionContextHandle& context);
+    virtual bool run(ActionHandle& self,
+                     ActionContextHandle& context);
 
 // -- Action parameters --
   private:

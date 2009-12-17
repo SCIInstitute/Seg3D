@@ -34,6 +34,7 @@
 #endif 
 
 // STL includes
+#include <vector>
 #include <string>
 #include <map>
 
@@ -51,7 +52,8 @@
 namespace Seg3D {
 
 class Action;
-typedef boost::shared_ptr<Action>        ActionHandle;
+typedef boost::shared_ptr<Action>   ActionHandle;
+typedef std::vector<ActionHandle>   ActionHandleList;
 
 // CLASS ACTION:
 // Main class that defines an action in the program
@@ -79,25 +81,45 @@ class Action : public boost::noncopyable {
       // application thread and run while new actions can be issued
       ASYNCHRONOUS_E = 0x20000,
       
+      // COLLAPSEABLE ACTIONS - These actions can be inserted on top of each
+      // other. Their undo/redo action consist of only one action in each
+      // direction and they can be combined by taking the the last redo and
+      // the first undo
+      COLLAPSEABLE_E = 0x40000,
+      
       // QUERY ACTIONS - These actions do not alter the state of the program
       // but query state. They do not need to be recorded in a playback script.
-      QUERY_E = 0x40000
+      QUERY_E = 0x1000000
     };
 
 // -- Constructor/Destructor --
   public:    
     // Construct an action of a certain type and with certain properties
-    Action(const std::string& action_type, int properties);
+    Action();
 
     // Virtual destructor for memory management of derived classes  
     virtual ~Action(); // << NEEDS TO BE REIMPLEMENTED
 
-    int         properties() const { return properties_; }
-    std::string action_type() const { return action_type_; }
+    virtual std::string   type() const = 0;
+    virtual std::string   usage() const = 0;
+    virtual int           properties() const = 0;
 
-  private:
-    std::string action_type_;
-    int         properties_;    
+// -- Test properties --
+
+    // IS_UNDOABLE:
+    // Check whether the action is undoable
+    bool is_undoable() { return (UNDOABLE_E & properties()); }
+
+    // IS_ASYNCHRONOUS:
+    // Check whether this action is asynchronously
+    bool is_asynchronous() { return (ASYNCHRONOUS_E & properties()); }
+
+    // NEED_UNDO:
+    // Test whether an undo needs to be generated
+    bool need_undo(ActionContextHandle& context)
+    {
+      return (is_undoable() && !(context->from_undobuffer()));
+    }
     
 // -- Run/Validate interface --
 
@@ -111,8 +133,13 @@ class Action : public boost::noncopyable {
     // NOTE: This function is *not* const and may alter the values of the parameters
     //       and correct faulty input. Run on the other hand is not allowed to
     //       change anything in the action, as it is posted to any observers
-    //       after the action is validated    
-    virtual bool validate(ActionContextHandle& context);  
+    //       after the action is validated.
+    // NOTE: This function supplies a pointer to the handle to itself. As the
+    //       handle is generated outside the action. Creating a new handle will
+    //       lead to premature deletion of the object, the right handle is
+    //       supplied, so the action can archive itself for provenance or
+    //       undo buffers.
+    virtual bool validate(ActionHandle& self, ActionContextHandle& context);  
     
     // RUN:
     // Each action needs to have this piece implemented. It spells out how the
@@ -122,7 +149,7 @@ class Action : public boost::noncopyable {
     // the asynchronous part has finished. In any other case the ActionDispatcher
     // will issue the report_done() when run returns.
 
-    virtual bool run(ActionContextHandle& context) = 0;
+    virtual bool run(ActionHandle& self, ActionContextHandle& context) = 0;
 
 // -- Action parameters --
 
@@ -158,6 +185,9 @@ class Action : public boost::noncopyable {
     // Export the result into a string, so it can be send back to the user
     std::string export_result_to_string() const;
 
+  protected:
+    friend class ActionFactory;
+
     // IMPORT_ACTION_FROM_STRING:
     // Import an action command from astring. This function is used by the
     // ActionFactory.
@@ -187,6 +217,28 @@ class Action : public boost::noncopyable {
     result_type result_;
     
 };
+
+// ACTION_TYPE:
+// Action type should be defined at the top of each action. It renders code that
+// allows both the class as well as the Action object to determine what its 
+// properties are. By defining class specific static functions the class 
+// properties cna be queried without instantiating the action. On the other
+// hand you want to query these properties from the object as well, even when
+// we only have a pointer to the base object. Hence we need virtual functions
+// as well. 
+
+// Note: one would expect to use virtual static functions, but those are not
+// allowed in C++
+
+#define SCI_ACTION_TYPE(type_string,usage_string,properties_mask) \
+  public: \
+    static std::string action_type()  { return type_string; }\
+    static std::string action_usage() { return usage_string; }\
+    static int         action_properties() { return properties_mask; }\
+    \
+    virtual std::string   type() const  { return std::string(action_type()); } \
+    virtual std::string   usage() const { return std::string(action_usage()); } \
+    virtual int           properties() const { return action_properties(); }
 
 } // end namespace seg3D
 

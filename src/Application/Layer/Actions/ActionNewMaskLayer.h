@@ -68,29 +68,29 @@ namespace Seg3D {
 // Class declarations
 class ActionNewMaskLayer : public ActionLayer
 {
-public:
-  ActionNewMaskLayer() :
-  ActionLayer("NewMaskLayer", Action::LAYER_E)
-  {
-    add_argument(provided_layer_);
-  }
+    SCI_ACTION_TYPE("NewMaskLayer","NewMaskLayer",LAYER_E)
+  public:
+    ActionNewMaskLayer()
+    {
+      add_argument(provided_layer_);
+    }
 
-  virtual ~ActionNewMaskLayer()
-  {}
+    virtual ~ActionNewMaskLayer()
+    {}
 
-  void set(const std::string& provided_layer)
-  {
-    provided_layer_.value() = provided_layer;
-  }
+    void set(const std::string& provided_layer)
+    {
+      provided_layer_.value() = provided_layer;
+    }
 
-  virtual bool do_validate(ActionContextHandle& context);
-  virtual bool check_layer_availability();
-  virtual bool lock_layers() const;
-  virtual bool release_layers() const;
-  virtual bool execute(ActionContextHandle& context) const;
+    virtual bool do_validate(ActionHandle& self,ActionContextHandle& context);
+    virtual bool check_layer_availability();
+    virtual bool lock_layers() const;
+    virtual bool release_layers() const;
+    virtual bool execute(ActionHandle& self,ActionContextHandle& context) const;
 
-private:
-  ActionParameter<std::string> provided_layer_;
+  private:
+    ActionParameter<std::string> provided_layer_;
 
 };
 

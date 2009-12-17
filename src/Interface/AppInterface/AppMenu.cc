@@ -250,6 +250,11 @@ AppMenu::create_filter_menu(QMenu* qmenu)
 void
 AppMenu::create_window_menu(QMenu* qmenu)
 {
+  // Controller Window
+  qmenu->addSeparator();
+
+  
+
 }
 
 

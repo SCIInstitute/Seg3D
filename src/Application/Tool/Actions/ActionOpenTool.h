@@ -29,17 +29,16 @@
 #ifndef APPLICATION_TOOL_ACTIONS_ACTIONOPENTOOL_H
 #define APPLICATION_TOOL_ACTIONS_ACTIONOPENTOOL_H
 
-#include <Application/Action/Action.h>
-#include <Application/Action/ActionFactory.h>
+#include <Application/Action/Actions.h>
 
 namespace Seg3D {
 
 class ActionOpenTool : public Action {
-
+  SCI_ACTION_TYPE("OpenTool","OpenTool tooltype",APPLICATION_E)
+  
 // -- Constructor/Destructor --
   public:
-    ActionOpenTool() :
-      Action("OpenTool",Action::APPLICATION_E)
+    ActionOpenTool()
     {
       add_argument(toolid_);
       add_result(result_toolid_);
@@ -54,8 +53,10 @@ class ActionOpenTool : public Action {
     }
 
 // -- Functions that describe action --
-    virtual bool validate(ActionContextHandle& context);
-    virtual bool run(ActionContextHandle& context);
+    virtual bool validate(ActionHandle& self,
+                          ActionContextHandle& context);
+    virtual bool run(ActionHandle& self,
+                     ActionContextHandle& context);
     
 // -- Action parameters --
   protected:

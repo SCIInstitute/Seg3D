@@ -28,6 +28,8 @@
 
 #include <Application/Tool/ToolManager.h>
 #include <Application/Tool/Actions/ActionCloseTool.h>
+#include <Application/Tool/Actions/ActionOpenTool.h>
+#include <Application/Tool/Actions/ActionActivateTool.h>
 
 namespace Seg3D {
 
@@ -41,7 +43,8 @@ SCI_REGISTER_ACTION(CloseTool);
 // is valid and can be executed.
 
 bool
-ActionCloseTool::validate(ActionContextHandle& context)
+ActionCloseTool::validate(ActionHandle& self,
+                          ActionContextHandle& context)
 {
   if (!(ToolManager::Instance()->is_toolid(toolid_.value())))
   {
@@ -55,9 +58,20 @@ ActionCloseTool::validate(ActionContextHandle& context)
 // RUN:
 // The code that runs the actual action
 bool 
-ActionCloseTool::run(ActionContextHandle& context)
+ActionCloseTool::run(ActionHandle& self,
+                     ActionContextHandle& context)
 {
+  if(need_undo(context))
+  {
+    ActionOpenToolHandle undo1(new ActionOpenTool);
+    undo1->set(toolid_.value());
+    ActionActivateToolHandle undo2(new ActionActivateTool);
+    undo2->set(ToolManager::Instance()->active_toolid());
+    AddUndoAction("Close Tool",undo1,undo2,self);
+  }
+
   ToolManager::Instance()->close_tool(toolid_.value());
+
   return (true); // success
 }
 

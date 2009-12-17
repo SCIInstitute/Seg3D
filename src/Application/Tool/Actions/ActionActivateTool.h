@@ -29,17 +29,16 @@
 #ifndef APPLICATION_TOOL_ACTIONS_ACTIONACTIVATETOOL_H
 #define APPLICATION_TOOL_ACTIONS_ACTIONACTIVATETOOL_H
 
-#include <Application/Action/Action.h>
-#include <Application/Action/ActionFactory.h>
+#include <Application/Action/Actions.h>
 
 namespace Seg3D {
 
 class ActionActivateTool : public Action {
+  SCI_ACTION_TYPE("ActivateTool","ActivateTool toolid",APPLICATION_E|UNDOABLE_E)
 
 // -- Constructor/Destructor --
   public:
-    ActionActivateTool() :
-      Action("ActivateTool",APPLICATION_E)
+    ActionActivateTool()
     {
       add_argument(toolid_);
     }
@@ -53,8 +52,10 @@ class ActionActivateTool : public Action {
     }
 
 // -- Functions that describe action --
-    virtual bool validate(ActionContextHandle& context);
-    virtual bool run(ActionContextHandle& context);
+    virtual bool validate(ActionHandle& self,
+                          ActionContextHandle& context);
+    virtual bool run(ActionHandle& self,
+                     ActionContextHandle& context);
     
 // -- Action parameters --
     ActionParameter<std::string> toolid_;

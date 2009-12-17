@@ -37,7 +37,8 @@ namespace Seg3D {
 SCI_REGISTER_ACTION(Get);
 
 bool 
-ActionGet::validate(ActionContextHandle& context)
+ActionGet::validate(ActionHandle& self,
+                    ActionContextHandle& context)
 {
   // Check whether the state exists
   StateBaseHandle state;
@@ -53,7 +54,8 @@ ActionGet::validate(ActionContextHandle& context)
 }
 
 bool 
-ActionGet::run(ActionContextHandle& context)
+ActionGet::run(ActionHandle& self,
+               ActionContextHandle& context)
 {
   // Get the state
   StateBaseHandle state;

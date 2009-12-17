@@ -113,6 +113,14 @@ class DefaultEventHandlerContext : public EventHandlerContext {
 
     // Indicating that event handling is done
     bool                    done_;
+
+    // Signal handling to ensure thread is running before returning from
+    // start_eventhandler
+    boost::mutex               thread_mutex_;
+    boost::condition_variable  thread_condition_variable_;
+
+    // Function for safely starting thread
+    void start_thread(EventHandler* eventhandler);
 };
 
 } // end namespace Utils

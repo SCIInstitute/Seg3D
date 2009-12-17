@@ -86,6 +86,14 @@ class Log : public boost::noncopyable {
   public:
     typedef boost::signals2::signal<void (unsigned int type, std::string)> post_log_signal_type;
   
+    // CONNECT_POST_LOG
+    // Signal indicating that the history changed
+    boost::signals2::connection connect_post_log(
+      post_log_signal_type::slot_type slot)
+    {
+      return post_log_signal_.connect(slot);
+    }
+  
     post_log_signal_type post_log_signal_;
 
 // -- Singleton interface --

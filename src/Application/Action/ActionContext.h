@@ -72,14 +72,21 @@ class ActionContext : public boost::noncopyable {
     virtual void report_error(const std::string& error);
     virtual void report_warning(const std::string& warning);
     virtual void report_message(const std::string& message);
+    virtual void report_usage(const std::string& usage);
 
-    virtual void report_progress(double progress);
     virtual void report_done(bool success);
 
 // -- Source information --
 
+    // The action is run from a script: the interface needs to be updated.
     virtual bool from_script() const;
+    
+    // The action is run from the interface: the interface does not need an
+    // update.
     virtual bool from_interface() const;
+
+    virtual bool from_undobuffer() const;
+
     virtual bool update_interface() const;
 };
 

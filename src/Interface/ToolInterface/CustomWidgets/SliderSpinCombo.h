@@ -49,7 +49,7 @@ class SliderSpinCombo : public QWidget
         SliderSpinCombo(QWidget *parent, double minRange, double maxRange, double startValue, double stepSize);
         SliderSpinCombo(QWidget *parent, double minRange, double maxRange, double stepSize);
 
-        ~SliderSpinCombo() {}
+        virtual ~SliderSpinCombo() {}
 
     public Q_SLOTS:
         void setStep(double);

@@ -26,6 +26,8 @@
    DEALINGS IN THE SOFTWARE.
 */
 
+#include <iostream>
+
 #include <Utils/Converter/StringParser.h>
 
 namespace Utils {
@@ -77,6 +79,7 @@ scan_command(const std::string& str,
   }
 
   command = str.substr(command_start,command_size);
+
   return (true);
 }
 

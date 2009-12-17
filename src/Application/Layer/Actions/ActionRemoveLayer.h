@@ -62,29 +62,30 @@ namespace Seg3D {
 
 class ActionRemoveLayer : public ActionLayer 
 {
-public:
-  ActionRemoveLayer() :
-  ActionLayer("RemoveLayer", Action::LAYER_E)
-  {
-    add_argument(layer_to_remove_);
-  }
+    SCI_ACTION_TYPE("RemoveLayer","RemoveLayer",LAYER_E)
 
-  virtual ~ActionRemoveLayer()
-  {}
+  public:
+    ActionRemoveLayer()
+    {
+      add_argument(layer_to_remove_);
+    }
 
-  void set(const std::string& layer_to_remove)
-  {
-    layer_to_remove_.value() = layer_to_remove;
-  }
+    virtual ~ActionRemoveLayer()
+    {}
 
-  virtual bool do_validate(ActionContextHandle& context);
-  virtual bool check_layer_availability();
-  virtual bool lock_layers() const;
-  virtual bool release_layers() const;
-  virtual bool execute(ActionContextHandle& context) const;
+    void set(const std::string& layer_to_remove)
+    {
+      layer_to_remove_.value() = layer_to_remove;
+    }
 
-private:
-  ActionParameter<std::string> layer_to_remove_;
+    virtual bool do_validate(ActionHandle& self,ActionContextHandle& context);
+    virtual bool check_layer_availability();
+    virtual bool lock_layers() const;
+    virtual bool release_layers() const;
+    virtual bool execute(ActionHandle& self,ActionContextHandle& context) const;
+
+  private:
+    ActionParameter<std::string> layer_to_remove_;
 
 };
 

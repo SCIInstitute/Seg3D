@@ -26,9 +26,12 @@
    DEALINGS IN THE SOFTWARE.
 */
 
+#include <iostream>
+
 #include <boost/algorithm/string.hpp>
 
 // For the conversion code
+#include <Utils/Core/StringUtil.h>
 #include <Utils/Converter/StringParser.h>
 
 #include <Application/Action/ActionParameter.h>
@@ -36,9 +39,7 @@
 
 namespace Seg3D {
 
-Action::Action(const std::string& action_type, int properties) :
-  action_type_(action_type),
-  properties_(properties),
+Action::Action() :
   result_(0)
 {
 }
@@ -48,7 +49,7 @@ Action::~Action()
 }
 
 bool
-Action::validate(ActionContextHandle& context)
+Action::validate(ActionHandle& self, ActionContextHandle& context)
 {
   return (true);
 }
@@ -75,7 +76,7 @@ std::string
 Action::export_action_to_string() const
 {
   // Add action name to string
-  std::string command = std::string(action_type()) + " ";
+  std::string command = std::string(type()) + " ";
 
   // Loop through all the arguments and add them
   for (size_t j=0; j<arguments_.size(); j++)
@@ -99,7 +100,8 @@ Action::export_action_to_string() const
 std::string 
 Action::export_result_to_string() const
 {
-  return ( result_->export_to_string());
+  if (result_ ) return ( result_->export_to_string());
+  else return std::string("");
 }
 
 bool
@@ -115,12 +117,25 @@ Action::import_action_from_string(const std::string& action, std::string& error)
     error = std::string("SYNTAX ERROR: ") + error;
     return (false);
   }
+
+  if (command.empty())
+  {
+    error = std::string("ERROR: missing command.");
+    return (false);
+  }
   
   for (size_t j=0; j<arguments_.size(); j++)
   {
     if (!(Utils::scan_value(action,pos,value,error)))
     {
-      error = std::string("SYNTAX ERROR ")+error;
+      error = std::string("SYNTAX ERROR: ")+error;
+    }
+    
+    if (value.empty())
+    {
+      error = std::string("ERROR: not enough arguments, argument ")+
+            Utils::to_string(j+1)+" is missing.";
+      return false;
     }
     
     if (!(arguments_[j]->import_from_string(value)))
@@ -140,19 +155,20 @@ Action::import_action_from_string(const std::string& action, std::string& error)
       error = std::string("SYNTAX ERROR: ") + error;
       return (false);
     }
+
     if (key.empty()) break;
 
-     boost::to_lower(key);
+    boost::to_lower(key);
      
-     parameter_map_type::iterator it = parameters_.find(key);
-     if (it != parameters_.end()) 
-     {
-       if(!((*it).second->import_from_string(value)))
-       {
-         error = std::string("SYNTAX ERROR: Could not interpret '"+value+"'");
+    parameter_map_type::iterator it = parameters_.find(key);
+    if (it != parameters_.end()) 
+    {
+      if(!((*it).second->import_from_string(value)))
+      {
+        error = std::string("SYNTAX ERROR: Could not interpret '"+value+"'");
         return (false);
-       }
-     }
+      }
+    }
   }
 
   return (true);

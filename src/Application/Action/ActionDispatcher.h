@@ -43,6 +43,7 @@
 
 #include <Application/Action/Action.h>
 #include <Application/Action/ActionContext.h>
+#include <Application/Action/ActionFactory.h>
 
 namespace Seg3D {
 
@@ -87,7 +88,7 @@ class ActionDispatcher : public boost::noncopyable {
     // TYPEDEFS 
     // The type of the main action signal
 
-    typedef boost::signals2::signal<void (ActionHandle )> post_action_signal_type;
+    typedef boost::signals2::signal<void (ActionHandle )> action_signal_type;
     
     // POST_ACTION_SIGNAL:
     // This is the main signal stack for actions that are posted inside the
@@ -95,19 +96,31 @@ class ActionDispatcher : public boost::noncopyable {
     // are being issued by the program needs to connect to this signal as all
     // actions are published here before they are executed.
     
-    post_action_signal_type post_action_signal_;  
+    action_signal_type pre_action_signal_;  
+    action_signal_type post_action_signal_;  
 
   public:
   
-    // CONNECT_OBSERVER:
-    // Connect an observer that records all the actions in the program.
+     // NOTE: One can observe action before or after they have been issued:
+     // generally for provenance and tracking the program one wants to be 
+     // informed after the action has been posted. However for debugging 
+     // purposes it may be useful to extract this information before it is
+     // issued to the processing kernel. Hence this interface allows both
+     // options. 
+  
+    // CONNECT_POST_ACTION:
+    // Connect an observer that records all the actions in the program after
+    // they are exectuted.
     
-    template <class FUNCTOR>
-    boost::signals2::connection connect_observer(FUNCTOR functor)
-    {
-      return post_action_signal_.connect(functor);
-    }
+    boost::signals2::connection 
+      connect_post_action(action_signal_type::slot_type slot);
     
+    // CONNECT_PRE_ACTION:
+    // Connect an observer that records all the actions in the program before
+    // they are exectuted
+    
+    boost::signals2::connection 
+      connect_pre_action(action_signal_type::slot_type slot);
   
 // -- Singleton interface --
   public:
@@ -122,10 +135,12 @@ class ActionDispatcher : public boost::noncopyable {
 // FUNCTION PostAction:
 // This function is a short cut to posting an action using the dispatcher
  
-inline void PostAction(ActionHandle action, ActionContextHandle action_context)
-{
-  ActionDispatcher::Instance()->post_action(action, action_context);
-}
+void PostAction(ActionHandle action, ActionContextHandle action_context);
+
+// FUNCTION PostAction:
+// This function is a short cut to posting a raw unparsed action
+ 
+void PostAction(std::string& actionstring, ActionContextHandle action_context);
 
 } // namespace Seg3D
 

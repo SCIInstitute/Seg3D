@@ -46,7 +46,7 @@ ActionDispatcher::post_action(ActionHandle action, ActionContextHandle action_co
   // event are handled in the order that they are posted and one action is fully
   // handled before the next one
 
-  SCI_LOG_DEBUG(std::string("Posting Action: ")+action->action_type());  
+  SCI_LOG_DEBUG(std::string("Posting Action: ")+action->type());  
 
   Application::Instance()->post_event(boost::bind
       (&ActionDispatcher::run_action,this,action,action_context));
@@ -62,7 +62,7 @@ ActionDispatcher::post_actions(std::vector<ActionHandle> actions, ActionContextH
 
   for (size_t j = 0;  j < actions.size(); j++)
   {
-    SCI_LOG_DEBUG(std::string("Posting Action sequence: ")+actions[j]->action_type());  
+    SCI_LOG_DEBUG(std::string("Posting Action sequence: ")+actions[j]->type());  
   }
   
   Application::Instance()->post_event(boost::bind
@@ -74,41 +74,44 @@ void
 ActionDispatcher::run_action(ActionHandle action, ActionContextHandle action_context)
 { 
 
-  SCI_LOG_DEBUG(std::string("Processing Action: ")+action->action_type());  
+  SCI_LOG_DEBUG(std::string("Processing Action: ")+action->type());  
 
   // Step (1): An action needs to be validated before it can be executed. 
   // The validation is a separate step as invalid actions should nor be 
   // posted to the observers recording what the program does
 
   SCI_LOG_DEBUG("Validating Action");  
-  if(!(action->validate(action_context))) 
+  if(!(action->validate(action,action_context))) 
   {
+    action_context->report_usage(action->usage());
     action_context->report_done(false);
     return;
   }
-
-  // NOTE: Observers that connect to this signal should not change the state of
-  // the program as that may invalidate actions that were just tested.
-
-  // Step (2): Tell observers what action is about to be executed
-  SCI_LOG_DEBUG("Posting Action for observers");  
-  post_action_signal_(action);
   
+  // NOTE: Observers that connect to this signal should not change the state of
+  // the program as that may invalidate actions that were just run.
+
+  // Step (2): Tell observers what action has been executed
+  SCI_LOG_DEBUG("Pre Action Signal for observers");  
+  pre_action_signal_(action);
+
   // Step (3): Run action from the context that was provided. And if the action
   // was synchronous a done signal is triggered in the context, to inform the
   // program whether the action succeeded.
   SCI_LOG_DEBUG("Running Action");    
 
-  bool success = action->run(action_context);
+  bool success = action->run(action,action_context);
+  action_context->report_done(success);
 
-  SCI_LOG_DEBUG("Action Done");    
-  
-  if (!(action->properties() & Action::ASYNCHRONOUS_E))
-  {
-    // Ignore asynchronous actions, they will do their own reporting
-    action_context->report_done(success);
-  }
-  
+  SCI_LOG_DEBUG("Action Done");  
+
+  // NOTE: Observers that connect to this signal should not change the state of
+  // the program as that may invalidate actions that were just run.
+
+  // Step (4): Tell observers what action has been executed
+  SCI_LOG_DEBUG("Post Action Signal for observers");  
+  post_action_signal_(action);
+
   return;
 }
 
@@ -123,6 +126,42 @@ ActionDispatcher::run_actions(std::vector<ActionHandle> actions, ActionContextHa
   }
 }
 
+boost::signals2::connection 
+ActionDispatcher::connect_pre_action(action_signal_type::slot_type slot)
+{
+  return (pre_action_signal_.connect(slot));
+}
+
+boost::signals2::connection 
+ActionDispatcher::connect_post_action(action_signal_type::slot_type slot)
+{
+  return (post_action_signal_.connect(slot));
+}
+
+void 
+PostAction(ActionHandle action, ActionContextHandle action_context)
+{
+  ActionDispatcher::Instance()->post_action(action, action_context);
+}
+
+
+void 
+PostAction(std::string& actionstring, ActionContextHandle action_context)
+{
+  ActionHandle action;
+  std::string error;
+  std::string usage;
+  if(!(ActionFactory::Instance()->create_action(actionstring,action,error,usage)))
+  {
+    SCI_LOG_ERROR(std::string("Failed to parse action: ")+actionstring);
+    action_context->report_error(error);
+    // Post help to the user if the argument list failed to parse
+    if (!(usage.empty())) action_context->report_usage(usage);
+    return;
+  }
+  
+  ActionDispatcher::Instance()->post_action(action, action_context);
+}
 
 // Singleton interface needs to be defined somewhere
 Utils::Singleton<ActionDispatcher> ActionDispatcher::instance_;

@@ -64,32 +64,23 @@ namespace Seg3D {
 
 class ActionLayer : public Action 
 {
-public:
-  ActionLayer() :
-  Action("Layer", Action::LAYER_E)
-  {
-  }
+    SCI_ACTION_TYPE("Layer","",LAYER_E)
 
-  ActionLayer(const std::string& action_name, int properties) :
-  Action(action_name, properties)
-  {
-  }
+  public:
+    virtual ~ActionLayer() {}
+    
+    virtual bool run(ActionHandle& self, ActionContextHandle& context);
 
-  virtual ~ActionLayer()
-  {}
-  
-  virtual bool run(ActionContextHandle& context);
+  // TODO could have base validate call check_layer_availability and then call subclass's
+  // do_validate method.
+    virtual bool validate(ActionHandle& self, ActionContextHandle& context);
+    virtual bool do_validate(ActionHandle& self, ActionContextHandle& context); // cannot make pure virtual and register the action
+    virtual bool check_layer_availability(); // cannot make pure virtual and register the action
+    virtual bool lock_layers() const; // cannot make pure virtual and register the action
+    virtual bool release_layers() const; // cannot make pure virtual and register the action
+    virtual bool execute(ActionHandle& self, ActionContextHandle& context) const; // cannot make pure virtual and register the action
 
-// TODO could have base validate call check_layer_availability and then call subclass's
-// do_validate method.
-  virtual bool validate(ActionContextHandle& context);
-  virtual bool do_validate(ActionContextHandle& context); // cannot make pure virtual and register the action
-  virtual bool check_layer_availability(); // cannot make pure virtual and register the action
-  virtual bool lock_layers() const; // cannot make pure virtual and register the action
-  virtual bool release_layers() const; // cannot make pure virtual and register the action
-  virtual bool execute(ActionContextHandle& context) const; // cannot make pure virtual and register the action
-
-private:
+  private:
 
 };
 

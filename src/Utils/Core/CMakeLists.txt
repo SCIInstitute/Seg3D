@@ -36,6 +36,8 @@ SET(UTILS_CORE_SRCS
   Exception.cc
   Log.h
   Log.cc
+  LogHistory.h
+  LogHistory.cc
   StringUtil.h
   StringUtil.cc
 )

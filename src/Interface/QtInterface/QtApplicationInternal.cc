@@ -90,7 +90,10 @@ QtEventHandlerContext::post_event(Utils::EventHandle& event)
   QtUserEvent* qevent = new QtUserEvent(event);
 
   // Insert call into the QT event loop
-  QApplication::postEvent(qapplication_,qevent);
+  if (! QCoreApplication::closingDown())
+  {
+    QCoreApplication::postEvent(qapplication_,qevent);
+  }
 }
 
 

@@ -45,7 +45,6 @@
 
 // Application Interface components. 
 
-//#include <Interface/AppInterface/WorkflowInterface.h>
 #include <Interface/AppInterface/ViewerInterface.h>
 #include <Interface/AppInterface/HistoryDockWidget.h>
 #include <Interface/AppInterface/ProjectDockWidget.h>
@@ -54,8 +53,8 @@
 #include <Interface/AppInterface/MeasurementDockWidget.h>
 
 #include <Interface/AppInterface/AppMenu.h>
-
 #include <Interface/AppInterface/AppStatusBar.h>
+#include <Interface/AppController/AppController.h>
 
 namespace Seg3D {
 
@@ -74,7 +73,7 @@ class AppInterface : public QMainWindow
   
   public:
     // Constructor
-    AppInterface(QApplication* app);
+    AppInterface(QWidget* app = 0);
   
     // virtual constructor needed by Qt to destroy this object
     virtual ~AppInterface();
@@ -91,24 +90,41 @@ class AppInterface : public QMainWindow
   public Q_SLOTS:
     void full_screen_toggle(bool);
 
-    
-  
   private:
 
-    // Pointers to the various components
-  ViewerInterface*          viewer_interface_;
-  HistoryDockWidget*        history_dock_window_;
-  ProjectDockWidget*        project_dock_window_;
-  ToolsDockWidget*          tools_dock_window_;
-  LayerManagerDockWidget*   layer_manager_dock_window_;
-  MeasurementDockWidget*    measurement_dock_window_;
+    // Pointer to the main canvas of the main window
+    QPointer<ViewerInterface>          viewer_interface_;
+    QPointer<AppController>            controller_interface_;
 
+    // The dock widgets
+    QPointer<HistoryDockWidget>        history_dock_window_;
+    QPointer<ProjectDockWidget>        project_dock_window_;
+    QPointer<ToolsDockWidget>          tools_dock_window_;
+    QPointer<LayerManagerDockWidget>   layer_manager_dock_window_;
+    QPointer<MeasurementDockWidget>    measurement_dock_window_;
+
+    // Application menu, statusbar
+    QPointer<AppMenu>      application_menu_;
+    QPointer<AppStatusBar> status_bar_;
     
-    // Application menu
-    AppMenu* application_menu_;
-  
-    // Status Bar
-    AppStatusBar* status_bar_;
+
+// -- Qt singleton implementation --
+  public:
+    // Obtain the pointer to this class
+    static AppInterface* Instance() { return instance_.data(); }
+    
+  private:  
+    // Storing where the singleton is located
+    static QPointer<AppInterface> instance_;
+
+// -- Main Window management functions --
+  public:
+    
+    // Reopen a specific window after the user has closed it
+    static void HandleOpenWindow(std::string windowid);
+
+    // Close a dock or a window
+    static void HandleCloseWindow(std::string windowid);
 };
 
 } //end namespace

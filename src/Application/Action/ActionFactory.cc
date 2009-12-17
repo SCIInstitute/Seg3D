@@ -26,6 +26,8 @@
    DEALINGS IN THE SOFTWARE.
 */
 
+#include <iostream>
+
 #include <Utils/Converter/StringParser.h>
 #include <Utils/Converter/StringConverter.h>
 
@@ -40,10 +42,13 @@ ActionFactory::ActionFactory()
 bool
 ActionFactory::create_action(const std::string& action_string,
                              ActionHandle& action,
-                             std::string& error) const
+                             std::string& error,
+                             std::string& usage) const
 {
   std::string command;
-  std::string::size_type pos;
+  std::string::size_type pos = 0;
+  
+  usage = "";
   
   // Scan for the command that needs to be instanted.
   if(!(Utils::scan_command(action_string,pos,command,error)))
@@ -71,9 +76,14 @@ ActionFactory::create_action(const std::string& action_string,
   {
     // the import_action_from_string function reports the error and hence
     // we do not need to set it here.
+    
+    // The action did build but the argument list is incorrect
+    // Post the usage of the action for the user to help troubleshooting.
+    usage = action->usage();
     return (false);
   }
-  return true;
+  
+  return (true);
 }
 
 // Singleton instance

@@ -84,14 +84,14 @@ ActionNewMaskLayer::release_layers() const
 
 
 bool 
-ActionNewMaskLayer::do_validate(ActionContextHandle& context)
+ActionNewMaskLayer::do_validate(ActionHandle& self,ActionContextHandle& context)
 {
   // no parameter checking necessary for this action
   return (true);
 }
 
 bool 
-ActionNewMaskLayer::execute(ActionContextHandle& context) const
+ActionNewMaskLayer::execute(ActionHandle& self,ActionContextHandle& context) const
 {
   // Create a zeroed out mask layer of the same size as 
   // provided_layer_

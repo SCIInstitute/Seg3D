@@ -110,13 +110,19 @@ ADD_LIBRARY(Interface_AppInterface STATIC
             ${INTERFACE_APPINTERFACE_QT_UI_SRCS}
             ${INTERFACE_APPINTERFACE_QT_MOC_SRCS}
             ${INTERFACE_APPINTERFACE_NO_MOC_SRCS} 
-      ${INTERFACE_APPINTERFACE_MOC_SRCS})
-            
+            ${INTERFACE_APPINTERFACE_MOC_SRCS})
+
             
 TARGET_LINK_LIBRARIES(Interface_AppInterface
                       Utils_Core
                       Utils_EventHandler
+                      Application_Action
+                      Application_Interface
+                      Application_ActionManager
+                      Application_Tool
+                      Application_Tools
                       Interface_QtInterface
+                      Interface_AppController
                       ${QT_LIBRARIES} 
                       ${SCI_BOOST_LIBRARY})
 

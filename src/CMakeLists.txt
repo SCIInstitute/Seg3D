@@ -82,18 +82,6 @@ ADD_DEFINITIONS(-DBOOST_ALL_NO_LIB)
 ADD_DEFINITIONS(-DQT_NO_KEYWORDS)
 
 ###########################################
-# Build Seg3DConfiguration.h
-# this file contains information such as
-# version numbers and architecture
-# on which code can depend.
-###########################################
-
-CONFIGURE_FILE (${CMAKE_CURRENT_SOURCE_DIR}/Configuration/Seg3DConfiguration.h.in 
-                ${CMAKE_CURRENT_BINARY_DIR}/Seg3DConfiguration.h 
-                @ONLY )
-INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
-
-###########################################
 # Find QT
 # We need QT - We use a modified version of
 # the FindQt4.cmake file that can be set
@@ -141,7 +129,22 @@ ADD_SUBDIRECTORY(Externals)
 
 IF(CMAKE_BUILD_TYPE MATCHES "Debug")
   ADD_DEFINITIONS(-DDEBUG)
+  SET(SEG3D_DEBUG_VERSION "\"(Debug)\"")
+ELSE(CMAKE_BUILD_TYPE MATCHES "Debug")
+  SET(SEG3D_DEBUG_VERSION "\"\"")
 ENDIF(CMAKE_BUILD_TYPE MATCHES "Debug")
+
+###########################################
+# Build Seg3DConfiguration.h
+# this file contains information such as
+# version numbers and architecture
+# on which code can depend.
+###########################################
+
+CONFIGURE_FILE (${CMAKE_CURRENT_SOURCE_DIR}/Configuration/Seg3DConfiguration.h.in 
+                ${CMAKE_CURRENT_BINARY_DIR}/Seg3DConfiguration.h 
+                @ONLY )
+INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
 ###########################################
 # Set the include paths

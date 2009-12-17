@@ -59,7 +59,7 @@ ActionContext::report_message(const std::string& message)
 }
 
 void
-ActionContext::report_progress(double progress)
+ActionContext::report_usage(const std::string& usage)
 {
 }
 
@@ -79,6 +79,13 @@ ActionContext::from_interface() const
 {
   return (false);
 }
+
+bool
+ActionContext::from_undobuffer() const
+{
+  return (false);
+}
+
 
 bool
 ActionContext::update_interface() const

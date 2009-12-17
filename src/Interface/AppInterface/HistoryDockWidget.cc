@@ -46,14 +46,10 @@ namespace Seg3D  {
 HistoryDockWidget::HistoryDockWidget(QWidget *parent) :
     QDockWidget("HistoryDockWidget",parent),
     private_(new HistoryDockWidgetPrivate)
-{
-  
+{ 
   // Set up the private internals of the LayerManagerInterface class
-  if (private_) 
-  {
-    private_->ui_.setupUi(this);
+  private_->ui_.setupUi(this);
 
-  }
 }
 
 HistoryDockWidget::~HistoryDockWidget()

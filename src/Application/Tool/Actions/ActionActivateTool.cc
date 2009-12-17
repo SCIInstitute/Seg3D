@@ -41,7 +41,8 @@ SCI_REGISTER_ACTION(ActivateTool);
 // is valid and can be executed.
 
 bool
-ActionActivateTool::validate(ActionContextHandle& context)
+ActionActivateTool::validate(ActionHandle& self,
+                             ActionContextHandle& context)
 {
   if (!(ToolManager::Instance()->is_toolid(toolid_.value())))
   {
@@ -55,8 +56,16 @@ ActionActivateTool::validate(ActionContextHandle& context)
 // RUN:
 // The code that runs the actual action
 bool 
-ActionActivateTool::run(ActionContextHandle& context)
+ActionActivateTool::run(ActionHandle& self,
+                        ActionContextHandle& context)
 {
+  if (need_undo(context))
+  {
+    ActionActivateToolHandle undo(new ActionActivateTool);
+    undo->set(ToolManager::Instance()->active_toolid());
+    AddUndoAction("Activate Tool",undo,self);
+  }
+  
   ToolManager::Instance()->activate_tool(toolid_.value());
   return (true); // success
 }

@@ -85,7 +85,7 @@ DefaultEventHandlerContext::process_events()
   // Only run on the application thread
   if (boost::this_thread::get_id() != eventhandler_thread_.get_id()) 
   {
-    SCI_THROW_LOGICERROR("process_events was called from a thread that is processing the events");
+    SCI_THROW_LOGICERROR("process_events was called from a thread that is not processing the events");
   }
   
   // lock the queue, so it is not changed while we are taking events of the
@@ -115,12 +115,10 @@ DefaultEventHandlerContext::process_events()
 bool
 DefaultEventHandlerContext::wait_and_process_events()
 {
-  SCI_LOG_DEBUG("Wait and Process Events");
-  
   // Only run on the eventhandler thread
   if (boost::this_thread::get_id() != eventhandler_thread_.get_id()) 
   {
-    SCI_THROW_LOGICERROR("wait_and_process_events was called from a thread that is processing the events");
+    SCI_THROW_LOGICERROR("wait_and_process_events was called from a thread that is not processing the events");
   }
   
   // lock the queue, so it is not changed while we are taking events of the
@@ -164,10 +162,25 @@ DefaultEventHandlerContext::start_eventhandler(EventHandler* eventhandler)
   // Generate a new thread that will run the eventhandler
   // It needs a pointer to the run_eventhandler() and will
   // use that as callable
-  eventhandler_thread_ = boost::thread(
-                    boost::bind(&EventHandler::run_eventhandler,eventhandler));
+  
+  boost::unique_lock<boost::mutex> lock(thread_mutex_);
+  eventhandler_thread_ = boost::thread(boost::bind(&DefaultEventHandlerContext::start_thread,this,eventhandler));
+  // wait for thread to be initialized
+  thread_condition_variable_.wait(lock);
   return (true);
 }
+
+void
+DefaultEventHandlerContext::start_thread(EventHandler* eventhandler)
+{
+  {
+    boost::unique_lock<boost::mutex> lock(thread_mutex_);
+    thread_condition_variable_.notify_all();
+  }
+  eventhandler->run_eventhandler();
+}
+
+
 
 void
 DefaultEventHandlerContext::terminate_eventhandler()

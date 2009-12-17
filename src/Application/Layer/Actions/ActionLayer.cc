@@ -54,20 +54,20 @@ namespace Seg3D {
 SCI_REGISTER_ACTION(Layer);
 
 bool 
-ActionLayer::validate(ActionContextHandle& context)
+ActionLayer::validate(ActionHandle& self, ActionContextHandle& context)
 {
-  return (check_layer_availability() && do_validate(context));
+  return (check_layer_availability() && do_validate(self,context));
 }
 
 bool 
-ActionLayer::run(ActionContextHandle& context)
+ActionLayer::run(ActionHandle& self, ActionContextHandle& context)
 {
   if (!lock_layers()) {
     context->report_error(std::string("Unable to lock layers"));
     return (false);
   }
   
-  bool run_success = execute(context);
+  bool run_success = execute(self,context);
 
   if (!release_layers()) {
     context->report_error(std::string("Unable to unlock layers"));
@@ -77,7 +77,7 @@ ActionLayer::run(ActionContextHandle& context)
 }
 
 bool
-ActionLayer::do_validate(ActionContextHandle& context) { return true; }
+ActionLayer::do_validate(ActionHandle& self, ActionContextHandle& context) { return true; }
 
 bool 
 ActionLayer::check_layer_availability() { return true;}
@@ -89,6 +89,6 @@ bool
 ActionLayer::release_layers() const { return true; }
 
 bool 
-ActionLayer::execute(ActionContextHandle& context) const { return true; }
+ActionLayer::execute(ActionHandle& self, ActionContextHandle& context) const { return true; }
 
 } // end namespace Seg3D

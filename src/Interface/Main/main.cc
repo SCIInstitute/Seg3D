@@ -34,11 +34,12 @@
 
 // Core includes
 #include <Utils/Core/Log.h>
+#include <Utils/Core/LogHistory.h>
 
 // Application includes
 #include <Application/Application/Application.h>
 #include <Application/Interface/Interface.h>
-#include <Application/Action/ActionRecorder.h>
+#include <Application/Action/ActionHistory.h>
 
 // Interface includes
 #include <Interface/QtInterface/QtApplication.h>
@@ -59,13 +60,13 @@ int main(int argc, char **argv)
 {
   // -- Setup error logging --
   Utils::LogStreamer error_log(Utils::Log::ALL_E,&(std::cerr));
+  Utils::LogHistory::Instance()->set_max_history_size(1000);
 
-  SCI_LOG_MESSAGE(std::string("--- Starting Seg3D ")+SEG3D_VERSION+" ---");
+  SCI_LOG_MESSAGE(std::string("--- Starting Seg3D ")+SEG3D_VERSION+" "+SEG3D_BITS+" "+SEG3D_DEBUG_VERSION+" ---");
 
-  // -- Setup action recording --
-  SCI_LOG_DEBUG("Setup action recorder");
-  Seg3D::ActionRecorder action_recorder(&(std::cout));
-  action_recorder.start();
+  // -- Setup action history --
+  SCI_LOG_DEBUG("Setup action history");
+  Seg3D::ActionHistory::Instance()->set_max_history_size(300);
 
   // -- Add plugins into the architecture  
   SCI_LOG_DEBUG("Setup and register all the plugins");
@@ -85,9 +86,12 @@ int main(int argc, char **argv)
   // The application window needs the qApplication as parent, which is
   // defined in the QtApplication, which integrates the Qt eventloop with
   // the interface eventloop of the Application layer.
-  AppInterface* app_interface = 
-    new AppInterface(QtApplication::instance()->get_qapplication());
+  AppInterface* app_interface = new AppInterface;
+
+  // Show the full interface
   app_interface->show();
+  
+  // Put the interface on top of all the other windows
   app_interface->raise();
     
   

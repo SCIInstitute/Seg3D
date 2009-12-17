@@ -98,10 +98,12 @@ class ActionFactory : public boost::noncopyable  {
     // factory.
   
     template <class ACTION>
-    void register_action(std::string action_name)
+    void register_action()
     {
-      // ensure name is unique
+      // get the name of the action
+      std::string action_name = ACTION::action_type();
       boost::to_lower(action_name);
+
       // Lock the factory
       boost::unique_lock<boost::mutex> lock(action_builders_mutex_);
 
@@ -138,7 +140,8 @@ class ActionFactory : public boost::noncopyable  {
     // specification of the action.
     bool create_action(const std::string& actionstring,
                        ActionHandle& action,
-                       std::string& error) const;
+                       std::string& error,
+                       std::string& usage) const;
 
 // -- Singleton interface --
   public:
@@ -157,7 +160,7 @@ class ActionFactory : public boost::noncopyable  {
 #define SCI_REGISTER_ACTION(name)\
 void register_Action##name()\
 {\
-  ActionFactory::Instance()->register_action<Action##name>(#name);\
+  ActionFactory::Instance()->register_action<Action##name>();\
 } 
 
 } // end namespace seg3D
