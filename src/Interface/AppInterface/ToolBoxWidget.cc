@@ -26,7 +26,7 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include "ToolBoxWidget.h"
+#include <Interface/AppInterface/ToolBoxWidget.h>
 #include <Utils/Core/Log.h>
 
 #include <sstream>
@@ -42,13 +42,9 @@ ToolBoxWidget::ToolBoxWidget(QWidget* parent)
 {
   main_layout_ = new QVBoxLayout( this );
   main_layout_->setContentsMargins(4, 4, 4, 0);
-  main_layout_->setSpacing(2);
+  main_layout_->setSpacing(2);  
   
-//  main_layout = new QGridLayout( this );
-//  main_layout->setContentsMargins(4, 4, 4, 0);
-//  main_layout->setSpacing(2);
-  
-  
+ 
 }
   
 void ToolBoxWidget::add_tool(QWidget * tool, const QString &label)
@@ -216,10 +212,12 @@ void ToolBoxWidget::set_active_tool( QWidget *tool )
   active_tool_ = tool_list_.at(index)->tool_;
   active_page_ = tool_list_.at(index);
   
-  active_page_->page_->setFixedSize(215, 235);
+  active_page_->page_->setFixedSize(215, 400);
+  active_page_->tool_frame_->setFixedSize(215, 400);
+  
   
   //TODO - need to get the correct size of the tool to set the window size properly
-  active_page_->tool_frame_->setFixedSize(215, (235-30));
+  
   
   std::string h = boost::lexical_cast<std::string>(active_page_->tool_->height());
   SCI_LOG_MESSAGE("The the height of the active tool is: "+ h);
@@ -252,8 +250,10 @@ void ToolBoxWidget::set_active_tool( QWidget *tool )
                                                                           " font: bold;\n"
                                                                           "\n"
                                                                           "}\n"));
-      tool_list_.at(i)->page_->setFixedSize(215, 29);
+      
       tool_list_.at(i)->tool_frame_->setFixedSize(215, 0);
+      tool_list_.at(i)->page_->setFixedSize(215, 29);
+
       SCI_LOG_MESSAGE(tool_list_.at(i)->activate_button_->text().toStdString() + " - tool has been set to inactive.");
     }
   }

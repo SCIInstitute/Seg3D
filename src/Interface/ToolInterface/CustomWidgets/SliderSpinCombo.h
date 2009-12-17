@@ -29,6 +29,11 @@
 #ifndef INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_SLIDERSPINCOMBO_H
 #define INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_SLIDERSPINCOMBO_H
 
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+# pragma once
+#endif
+
+#include <QtGui>
 #include <QWidget>
 #include <QtGui/QSlider>
 #include <QtGui/QDoubleSpinBox>
@@ -49,7 +54,7 @@ class SliderSpinCombo : public QWidget
         SliderSpinCombo(QWidget *parent, double minRange, double maxRange, double startValue, double stepSize);
         SliderSpinCombo(QWidget *parent, double minRange, double maxRange, double stepSize);
 
-        virtual ~SliderSpinCombo() {}
+    virtual ~SliderSpinCombo();
 
     public Q_SLOTS:
         void setStep(double);

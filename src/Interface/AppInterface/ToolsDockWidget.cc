@@ -54,13 +54,10 @@ ToolsDockWidget::ToolsDockWidget(QWidget *parent) :
     QDockWidget(parent),
     private_(new ToolsDockWidgetPrivate)
 {
-  //private_->ui_.setupUi(this);
+
   toolbox_ = new ToolBoxWidget(this);
-  //TB_Tools = new ToolBoxWidget(this);
   make_dock_widget();
-  //toolbox_ = private_->ui_.TB_Tools;
-  //toolbox_ = TB_Tools;
-  
+
 
   // Ensure that the application does not change any of the tools while
   // the user interface is being built
@@ -143,23 +140,40 @@ void ToolsDockWidget::make_dock_widget()
   verticalLayout->setContentsMargins(0, 0, 0, 0);
   verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
   
+  
   scrollArea = new QScrollArea(dockWidgetContents);
   scrollArea->setObjectName(QString::fromUtf8("scrollArea"));
+  
+  QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::MinimumExpanding);
+  sizePolicy1.setHorizontalStretch(0);
+  sizePolicy1.setVerticalStretch(0);
+  sizePolicy1.setHeightForWidth(scrollArea->sizePolicy().hasHeightForWidth());
+  
+  scrollArea->setSizePolicy(sizePolicy1);
+  scrollArea->setMinimumSize(QSize(243, 29));
   scrollArea->setWidgetResizable(true);
+
   scrollAreaWidgetContents = new QWidget();
   scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
-  scrollAreaWidgetContents->setGeometry(QRect(0, 0, 227, 598));
+  scrollAreaWidgetContents->setGeometry(QRect(0, 0, 239, 610));
+  
+  QSizePolicy sizePolicy2(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
+  sizePolicy2.setHorizontalStretch(0);
+  sizePolicy2.setVerticalStretch(0);
+  sizePolicy2.setHeightForWidth(scrollAreaWidgetContents->sizePolicy().hasHeightForWidth());
+  scrollAreaWidgetContents->setSizePolicy(sizePolicy2);
+  
   
   verticalLayout_2 = new QVBoxLayout(scrollAreaWidgetContents);
   verticalLayout_2->setSpacing(0);
   verticalLayout_2->setContentsMargins(0, 0, 0, 0);
   verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
     
-  verticalLayout_2->addWidget(toolbox_);
+  verticalLayout_2->addWidget(toolbox_, Qt::AlignTop|Qt::AlignCenter);
   
   scrollArea->setWidget(scrollAreaWidgetContents);
   
-  verticalLayout->addWidget(scrollArea);
+  verticalLayout->addWidget(scrollArea, Qt::AlignTop|Qt::AlignCenter);
   
   this->setWidget(dockWidgetContents);
   

@@ -26,7 +26,7 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include "ViewAction.h"
+#include <Interface/AppInterface/ViewAction.h>
 
 
 namespace Seg3D  {

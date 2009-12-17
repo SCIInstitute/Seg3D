@@ -43,9 +43,8 @@ class PaintToolInterfacePrivate {
 
 PaintToolInterface::PaintToolInterface() :
   private_(new PaintToolInterfacePrivate)
-{
-  
-  
+{  
+  SCI_LOG_DEBUG("Building Paint Brush Interface");
 }
 
 PaintToolInterface::~PaintToolInterface()
@@ -57,6 +56,18 @@ PaintToolInterface::build_widget(QFrame* frame)
 {
   SCI_LOG_DEBUG("Building main widget");
   private_->ui_.setupUi(frame);
+  
+  paintBrushAdjuster = new SliderSpinCombo(frame, 1, 100, 1);
+  private_->ui_.verticalLayout->addWidget(paintBrushAdjuster);
+  
+  upperThresholdAdjuster = new SliderSpinCombo();
+  private_->ui_.upperHLayout_bottom->addWidget(upperThresholdAdjuster);
+  
+  lowerThresholdAdjuster = new SliderSpinCombo();
+  private_->ui_.lowerHLayout_bottom->addWidget(lowerThresholdAdjuster);
+  
+  makeConnections();
+  
   return (true);
 }
   

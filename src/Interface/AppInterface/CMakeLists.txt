@@ -65,7 +65,7 @@ SET(INTERFACE_APPINTERFACE_NO_MOC_SRCS
 )
 
 SET(INTERFACE_APPINTERFACE_UI_SRCS
-  HistoryDockWidget.ui
+  #HistoryDockWidget.ui
   ViewerInterface.ui  
   ProjectDockWidget.ui
   ToolsDockWidget.ui
