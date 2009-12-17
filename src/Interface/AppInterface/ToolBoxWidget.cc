@@ -61,7 +61,7 @@ void ToolBoxWidget::add_tool(QWidget * tool, const QString &label)
   
   page_handle_->page_ = new QWidget;
 
-  page_handle_->page_->setStyleSheet(QString::fromUtf8("QPushButton{\n"
+  page_handle_->page_->setStyleSheet(QString::fromUtf8("QPushButton#activate_button_{\n"
                                                  "  \n"
                                                  "  margin-right: 7px;\n"
                                                  "  height: 24px;\n"
@@ -72,7 +72,7 @@ void ToolBoxWidget::add_tool(QWidget * tool, const QString &label)
                                                  "\n"
                                                  "}\n"
                                                  "\n"
-                                                 "QPushButton:pressed{\n"
+                                                 "QPushButton#activate_button_:pressed{\n"
                                                  "  color: gray;\n"
                                                  "\n"
                                                  "\n"
@@ -82,10 +82,18 @@ void ToolBoxWidget::add_tool(QWidget * tool, const QString &label)
                                                  "\n"
                                                  "QToolButton{\n"
                                                  "  background-color: qlineargradient(spread:pad, x1:0.5, y1:0.733364, x2:0.5, y2:0, stop:0 rgba(25, 25, 25, 0), stop:1 rgba(136, 0, 0, 0));\n"
+                                                 //"  background-color: silver; padding-right: 2px;\n"
                                                  "  border: none;\n"
                                                  "\n"
                                                  "}\n"
                                                  "\n"
+                                                 "QToolButton:pressed{\n"
+                                                 "  background-color: qlineargradient(spread:pad, x1:0.5, y1:0.733364, x2:0.5, y2:0, stop:0 rgba(25, 25, 25, 0), stop:1 rgba(136, 0, 0, 0));\n"
+                                                 "  background-color: black; border-radius: 4px;\n"
+                                                 "  border: none;\n"
+                                                 "\n"
+                                                 "}\n"
+                                                 "\n"      
                                                  "QWidget#header_{\n"
                                                  "  \n"
                                                  "  background-color: qlineargradient(spread:pad, x1:0.5, y1:0.733364, x2:0.5, y2:0, stop:0 rgba(25, 25, 25, 255), stop:1 rgba(136, 0, 0, 0 ));\n"
@@ -136,19 +144,21 @@ void ToolBoxWidget::add_tool(QWidget * tool, const QString &label)
   page_handle_->help_button_->setObjectName(QString::fromUtf8("help_button_"));
   
   ///  ---  This is where we add the icon's for the help button --- //
-  //QIcon icon;
-  //icon.addFile(QString::fromUtf8(":/new/prefix1/show_info.png"), QSize(), QIcon::Normal, QIcon::Off);
-  //page_handle_->help_button_->setIcon(icon);
-  //page_handle_->help_button_->setIconSize(QSize(25, 25));
+  QIcon icon;
+  icon.addFile(QString::fromUtf8(":/new/images/show_info.png"), QSize(), QIcon::Normal, QIcon::Off);
+  page_handle_->help_button_->setIcon(icon);
+  page_handle_->help_button_->setIconSize(QSize(25, 25));
+  
   page_handle_->hLayout_->addWidget(page_handle_->help_button_);
   page_handle_->close_button_ = new QToolButton(page_handle_->header_);
   page_handle_->close_button_->setObjectName(QString::fromUtf8("close_button_"));
   
    ///  ---  This is where we add the icon's for the close button --- //
-  //QIcon icon1;
-  //icon1.addFile(QString::fromUtf8(":/new/prefix1/close.png"), QSize(), QIcon::Normal, QIcon::Off);
-  //page_handle_->close_button_->setIcon(icon1);
-  //page_handle_->close_button_->setIconSize(QSize(25, 25));
+  QIcon icon1;
+  icon1.addFile(QString::fromUtf8(":/new/images/close.png"), QSize(), QIcon::Normal, QIcon::Off);
+  page_handle_->close_button_->setIcon(icon1);
+  page_handle_->close_button_->setIconSize(QSize(25, 25));
+  
   page_handle_->hLayout_->addWidget(page_handle_->close_button_);
   page_handle_->hLayout_->setStretch(0, 1);
   page_handle_->hLayout_2->addWidget(page_handle_->header_);
@@ -214,15 +224,15 @@ void ToolBoxWidget::set_active_tool( QWidget *tool )
   
   active_page_->page_->setFixedSize(215, 400);
   active_page_->tool_frame_->setFixedSize(215, 400);
-  
-  
   //TODO - need to get the correct size of the tool to set the window size properly
   
   
-  std::string h = boost::lexical_cast<std::string>(active_page_->tool_->height());
+  //message for checking the height of the passed tool
+  std::string h = boost::lexical_cast<std::string>(tool->height());
   SCI_LOG_MESSAGE("The the height of the active tool is: "+ h);
   
   
+  //set the size of the active page as well as the color of its header
   active_page_->background_->setStyleSheet(QString::fromUtf8("QWidget#background_ { background-color: rgb(128, 0, 0); }"));
   active_page_->activate_button_->setStyleSheet(QString::fromUtf8("QPushButton{\n"
                                                                       " \n"
@@ -235,6 +245,7 @@ void ToolBoxWidget::set_active_tool( QWidget *tool )
                                                                       "\n"
                                                                       "}\n"));
   
+  //reset all the sizes and header colors of the inactive pages
   for(int i=0; i < tool_list_.size(); i++)
   {
     if(i != active_index_)
@@ -253,10 +264,10 @@ void ToolBoxWidget::set_active_tool( QWidget *tool )
       
       tool_list_.at(i)->tool_frame_->setFixedSize(215, 0);
       tool_list_.at(i)->page_->setFixedSize(215, 29);
-
       SCI_LOG_MESSAGE(tool_list_.at(i)->activate_button_->text().toStdString() + " - tool has been set to inactive.");
     }
   }
+  
   SCI_LOG_MESSAGE(active_page_->activate_button_->text().toStdString() + " - tool has been set active");
   Q_EMIT currentChanged (index_of(tool));
 }
@@ -285,10 +296,23 @@ void ToolBoxWidget::remove_tool( QWidget *tool )
 {
 
   int index = index_of(tool);
+//  for ( PageList::ConstIterator i = tool_list_.constBegin(); i != tool_list_.constEnd(); ++i )
+//  {
+//    if ( (*i)->tool_ == tool )
+//    {
+//      tool_list_.removeAt(i);
+//      main_layout_->removeWidget(*i);
+//    }
+//  }
+  
+  
+  
+  //remove_tool(index);
+  //main_layout_->removeWidget(tool);
   if (index >= 0)
   {
-    disconnect(tool, SIGNAL(destroyed(QObject *)), this, SLOT(itemDestroyed(QObject*)));
-    tool->setParent(this);
+    //disconnect(tool, SIGNAL(destroyed(QObject *)), this, SLOT(itemDestroyed(QObject*)));
+    //tool->setParent(this);
   }
   tool_removed(index);
 
@@ -297,8 +321,11 @@ void ToolBoxWidget::remove_tool( QWidget *tool )
  
 void ToolBoxWidget::remove_tool(int index)
 {
+
+  
   if (index >= 0)
   {
+    
     //TODO - remove the tool 
     //disconnect(tool_list_.at(index), SIGNAL(destroyed(QObject*)), this, SLOT(itemDestroyed(QObject*)));
   }

@@ -54,7 +54,7 @@ PaintToolInterface::~PaintToolInterface()
 bool
 PaintToolInterface::build_widget(QFrame* frame)
 {
-  SCI_LOG_DEBUG("Building main widget");
+  
   private_->ui_.setupUi(frame);
   
   paintBrushAdjuster = new SliderSpinCombo(frame, 1, 100, 1);
@@ -67,6 +67,7 @@ PaintToolInterface::build_widget(QFrame* frame)
   private_->ui_.lowerHLayout_bottom->addWidget(lowerThresholdAdjuster);
   
   makeConnections();
+  SCI_LOG_DEBUG("Finished Building a PolyLine Tool");
   
   return (true);
 }
