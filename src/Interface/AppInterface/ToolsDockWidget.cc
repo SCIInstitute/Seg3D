@@ -30,6 +30,7 @@
 #include <iostream>
 
 #include <Utils/Core/Log.h>
+#include <boost/lexical_cast.hpp>
 
 // Application includes
 #include <Application/Tool/ToolManager.h>
@@ -120,6 +121,9 @@ void ToolsDockWidget::make_dock_widget()
   QVBoxLayout *verticalLayout_2;
   QScrollArea *scrollArea;
   QWidget *scrollAreaWidgetContents;
+  QVBoxLayout *verticalLayout_3;
+  QSpacerItem *verticalSpacer;
+  
   
   this->resize(243, 640);
   QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
@@ -134,47 +138,51 @@ void ToolsDockWidget::make_dock_widget()
 
   dockWidgetContents = new QWidget();
   dockWidgetContents->setObjectName(QString::fromUtf8("dockWidgetContents"));
-  
-  verticalLayout = new QVBoxLayout(dockWidgetContents);
-  verticalLayout->setSpacing(0);
-  verticalLayout->setContentsMargins(0, 0, 0, 0);
-  verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
-  
-  
+  verticalLayout_2 = new QVBoxLayout(dockWidgetContents);
+  verticalLayout_2->setSpacing(0);
+  verticalLayout_2->setContentsMargins(0, 0, 0, 0);
+  verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
   scrollArea = new QScrollArea(dockWidgetContents);
   scrollArea->setObjectName(QString::fromUtf8("scrollArea"));
-  
   QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::MinimumExpanding);
   sizePolicy1.setHorizontalStretch(0);
   sizePolicy1.setVerticalStretch(0);
   sizePolicy1.setHeightForWidth(scrollArea->sizePolicy().hasHeightForWidth());
-  
   scrollArea->setSizePolicy(sizePolicy1);
   scrollArea->setMinimumSize(QSize(243, 29));
+  scrollArea->setStyleSheet(QString::fromUtf8(""));
   scrollArea->setWidgetResizable(true);
-
   scrollAreaWidgetContents = new QWidget();
   scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
   scrollAreaWidgetContents->setGeometry(QRect(0, 0, 239, 610));
-  
   QSizePolicy sizePolicy2(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
   sizePolicy2.setHorizontalStretch(0);
   sizePolicy2.setVerticalStretch(0);
   sizePolicy2.setHeightForWidth(scrollAreaWidgetContents->sizePolicy().hasHeightForWidth());
   scrollAreaWidgetContents->setSizePolicy(sizePolicy2);
+  verticalLayout_3 = new QVBoxLayout(scrollAreaWidgetContents);
+  verticalLayout_3->setSpacing(0);
+  verticalLayout_3->setContentsMargins(0, 0, 0, 0);
+  verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
+  verticalLayout = new QVBoxLayout();
+  verticalLayout->setSpacing(0);
+  verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
+ 
+  
+  verticalLayout->addWidget(toolbox_, Qt::AlignTop|Qt::AlignHCenter);
+  
+  verticalSpacer = new QSpacerItem(20, 406, QSizePolicy::Minimum, QSizePolicy::Preferred);
+  
+  verticalLayout->addItem(verticalSpacer);
   
   
-  verticalLayout_2 = new QVBoxLayout(scrollAreaWidgetContents);
-  verticalLayout_2->setSpacing(0);
-  verticalLayout_2->setContentsMargins(0, 0, 0, 0);
-  verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
-    
-  verticalLayout_2->addWidget(toolbox_, Qt::AlignTop|Qt::AlignCenter);
+  verticalLayout_3->addLayout(verticalLayout);
   
   scrollArea->setWidget(scrollAreaWidgetContents);
   
-  verticalLayout->addWidget(scrollArea, Qt::AlignTop|Qt::AlignCenter);
+  verticalLayout_2->addWidget(scrollArea, Qt::AlignTop|Qt::AlignHCenter);
   
+   
   this->setWidget(dockWidgetContents);
   
 }
@@ -203,6 +211,9 @@ ToolsDockWidget::open_tool(ToolHandle tool)
   }
   // Step (2) : instantiate the widget
   widget->create_widget(this,tool);
+  //widget->resize(215, 29);
+  std::string h = boost::lexical_cast<std::string>(widget->height());
+  SCI_LOG_MESSAGE("The the height of the widget is: "+ h);
    
   toolbox_->add_tool(widget,QString::fromStdString(tool->menu_name()
                                                   +" "+Utils::to_string(tool->toolid_number())));

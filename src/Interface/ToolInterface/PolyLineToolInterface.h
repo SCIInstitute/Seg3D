@@ -26,8 +26,8 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef INTERFACE_TOOLINTERFACE_PAINTTOOLINTERFACE_H
-#define INTERFACE_TOOLINTERFACE_PAINTTOOLINTERFACE_H
+#ifndef INTERFACE_TOOLINTERFACE_POLYLINETOOLINTERFACE_H
+#define INTERFACE_TOOLINTERFACE_POLYLINETOOLINTERFACE_H
 
 // Application includes
 #include <Application/Tool/ToolFactory.h>
@@ -35,60 +35,45 @@
 // Base class of the tool widget
 #include <Interface/AppInterface/ToolWidget.h>
 
-#include <Interface/ToolInterface/CustomWidgets/SliderSpinCombo.h>
 
 namespace Seg3D {
 
-class PaintToolInterfacePrivate;
+class PolyLineToolInterfacePrivate;
 
-class PaintToolInterface : public ToolWidget {
+class PolyLineToolInterface : public ToolWidget {
   Q_OBJECT
   
   Q_SIGNALS:
     void activeChanged(int);
-    void maskChanged(int);
-    void eraseModeChanged(bool);
-    void paintBrushSizeChanged(int);
-    void upperThresholdChanged(int);
-    void lowerThresholdChanged(int);
+    void resetPolyLineTool();
+    void fillPolyLine();
+    void erasePolyLine();
   
   
   public Q_SLOTS:
     void setActive(int);
     void addToActive(QStringList&);
-    void setMask(int);
-    void addToMask(QStringList&);
-    void setPaintBrushSize(int);
-    void setLowerThreshold(double, double);
-    void setLowerThresholdStep(double);
-    void setUpperThreshold(double, double);
-    void setUpperThresholdStep(double);
+    
   
   
   public:
-    PaintToolInterface();
-    virtual ~PaintToolInterface();
+    PolyLineToolInterface();
+    virtual ~PolyLineToolInterface();
+
     virtual bool build_widget(QFrame* frame);
 
 
   private:
-    PaintToolInterfacePrivate* private_;
-    
-    SliderSpinCombo *paintBrushAdjuster;
-    SliderSpinCombo *upperThresholdAdjuster;
-    SliderSpinCombo *lowerThresholdAdjuster;
-    
+    PolyLineToolInterfacePrivate* private_;
     void makeConnections();
-  
+    
+      
   private Q_SLOTS:
     void senseActiveChanged(int);
-    void senseMaskChanged(int);
+    void senseResetPolyLineTool();
+    void senseFillPolyLine();
+    void senseErasePolyLine();
     
-    void senseEraseModeChanged(bool);
-    
-    void sensePaintBrushSizeChanged(double);
-    void senseUpperThresholdChanged(double);
-    void senselowerThresholdChanged(double);
   
   
 };

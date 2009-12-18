@@ -27,6 +27,8 @@
 */
 
 #include <Interface/AppInterface/ToolWidget.h>
+#include <Utils/Core/Log.h>
+#include <boost/lexical_cast.hpp>
 
 namespace Seg3D {
 
@@ -46,6 +48,9 @@ bool
 ToolWidget::create_widget(QWidget* parent, ToolHandle& tool)
 {
 
+  //std::string h = boost::lexical_cast<std::string>(parent->height());
+//  SCI_LOG_MESSAGE("The the height of the PARENT tool is: "+ h);
+  
   
   // Setup the parent widget: this one will be used for memory management of
   // this widget class
@@ -63,9 +68,15 @@ ToolWidget::create_widget(QWidget* parent, ToolHandle& tool)
   setLayout(vbox);
   
   main_frame_ = new QFrame;  
-
+  
+  main_frame_->resize(1, 1);
   vbox->addWidget(main_frame_);
   vbox->addStretch();
+  
+  
+  std::string h = boost::lexical_cast<std::string>(&main_frame_);
+  //std::string h = boost::lexical_cast<std::string>(main_frame_->height());
+  SCI_LOG_MESSAGE("The the address of main_frame_ tool is: "+ h);
   
   return ( build_widget(main_frame_));
 }

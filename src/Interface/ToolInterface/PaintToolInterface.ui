@@ -6,15 +6,33 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>200</width>
-    <height>323</height>
+    <width>213</width>
+    <height>326</height>
    </rect>
   </property>
-   <property name="sizePolicy">
-   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>213</width>
+    <height>326</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>213</width>
+    <height>326</height>
+   </size>
+  </property>
+  <property name="baseSize">
+   <size>
+    <width>213</width>
+    <height>326</height>
+   </size>
   </property>
   <property name="font">
    <font>
@@ -22,47 +40,198 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>PaintTool</string>
+   <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
-   <property name="spacing">
-    <number>0</number>
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>4</x>
+     <y>54</y>
+     <width>205</width>
+     <height>27</height>
+    </rect>
    </property>
-   <property name="margin">
-    <number>2</number>
+   <layout class="QHBoxLayout" name="eraseHLayout">
+    <item>
+     <spacer name="eraseHSpacer_left">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>40</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item>
+     <widget class="QCheckBox" name="eraseCheckBox">
+      <property name="text">
+       <string>Erase Mode</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <spacer name="eraseHSpacer_right">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>40</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="layoutWidget_2">
+   <property name="geometry">
+    <rect>
+     <x>4</x>
+     <y>4</y>
+     <width>207</width>
+     <height>26</height>
+    </rect>
    </property>
-   <item>
-    <layout class="QHBoxLayout" name="activeHLayout">
+   <layout class="QHBoxLayout" name="activeHLayout" stretch="1,2">
+    <property name="spacing">
+     <number>3</number>
+    </property>
+    <item>
+     <widget class="QLabel" name="activeLabel">
+      <property name="text">
+       <string>Target:</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QComboBox" name="activeComboBox">
+      <property name="layoutDirection">
+       <enum>Qt::LeftToRight</enum>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="layoutWidget_4">
+   <property name="geometry">
+    <rect>
+     <x>4</x>
+     <y>29</y>
+     <width>207</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="maskHLayout" stretch="1,2">
+    <property name="spacing">
+     <number>3</number>
+    </property>
+    <item>
+     <widget class="QLabel" name="maskLabel">
+      <property name="text">
+       <string>Mask:</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QComboBox" name="maskComboBox"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="layoutWidget_5">
+   <property name="geometry">
+    <rect>
+     <x>4</x>
+     <y>80</y>
+     <width>205</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="brushHLayout">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <item>
+     <widget class="QLabel" name="brushLabel">
+      <property name="text">
+       <string>Brush Size:</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <spacer name="brushHSpacer">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>118</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QGroupBox" name="thresholdGroupBox">
+   <property name="geometry">
+    <rect>
+     <x>6</x>
+     <y>148</y>
+     <width>202</width>
+     <height>171</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Threshold</string>
+   </property>
+   <property name="flat">
+    <bool>false</bool>
+   </property>
+   <widget class="QWidget" name="layoutWidget_6">
+    <property name="geometry">
+     <rect>
+      <x>5</x>
+      <y>112</y>
+      <width>193</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="lowerHLayout_bottom"/>
+   </widget>
+   <widget class="QWidget" name="layoutWidget_7">
+    <property name="geometry">
+     <rect>
+      <x>5</x>
+      <y>41</y>
+      <width>193</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="upperHLayout_bottom"/>
+   </widget>
+   <widget class="QWidget" name="layoutWidget_8">
+    <property name="geometry">
+     <rect>
+      <x>5</x>
+      <y>20</y>
+      <width>193</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="upperHLayout_top">
      <item>
-      <widget class="QLabel" name="activeLabel">
+      <widget class="QLabel" name="upperLabel">
        <property name="text">
-        <string>Target:</string>
+        <string>Upper:</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="activeComboBox"/>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="maskHLayout">
-     <item>
-      <widget class="QLabel" name="maskLabel">
-       <property name="text">
-        <string>Mask:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QComboBox" name="maskComboBox"/>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="eraseHLayout">
-     <item>
-      <spacer name="eraseHSpacer_left">
+      <spacer name="upperHSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
@@ -74,15 +243,27 @@
        </property>
       </spacer>
      </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="layoutWidget_9">
+    <property name="geometry">
+     <rect>
+      <x>5</x>
+      <y>91</y>
+      <width>193</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="lowerHLayout_top">
      <item>
-      <widget class="QCheckBox" name="eraseCheckBox">
+      <widget class="QLabel" name="lowerLabel">
        <property name="text">
-        <string>Erase Mode</string>
+        <string>Lower:</string>
        </property>
       </widget>
      </item>
      <item>
-      <spacer name="eraseHSpacer_right">
+      <spacer name="lowerHSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
@@ -95,111 +276,26 @@
       </spacer>
      </item>
     </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="brushHLayout">
-     <property name="spacing">
-      <number>0</number>
-     </property>
-     <item>
-      <widget class="QLabel" name="brushLabel">
-       <property name="text">
-        <string>Brush Size:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="brushHSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>118</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QVBoxLayout" name="verticalLayout">
-     <property name="spacing">
-      <number>0</number>
-     </property>
-     <property name="sizeConstraint">
-      <enum>QLayout::SetDefaultConstraint</enum>
-     </property>
-    </layout>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="thresholdGroupBox">
-     <property name="title">
-      <string>Threshold</string>
-     </property>
-     <property name="flat">
-      <bool>false</bool>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_3">
-      <item>
-       <layout class="QHBoxLayout" name="upperHLayout_top">
-        <item>
-         <widget class="QLabel" name="upperLabel">
-          <property name="text">
-           <string>Upper:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="upperHSpacer">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="upperHLayout_bottom"/>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="lowerHLayout_top">
-        <item>
-         <widget class="QLabel" name="lowerLabel">
-          <property name="text">
-           <string>Lower:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="lowerHSpacer">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="lowerHLayout_bottom"/>
-      </item>
-     </layout>
-    </widget>
-   </item>
-  </layout>
+   </widget>
+  </widget>
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>4</x>
+     <y>101</y>
+     <width>205</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="sizeConstraint">
+     <enum>QLayout::SetDefaultConstraint</enum>
+    </property>
+   </layout>
+  </widget>
  </widget>
  <resources/>
  <connections/>
