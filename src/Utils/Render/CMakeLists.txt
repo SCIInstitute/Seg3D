@@ -1,3 +1,4 @@
+
 #
 #  For more information, please see: http://software.sci.utah.edu
 # 
@@ -26,9 +27,25 @@
 #  DEALINGS IN THE SOFTWARE.
 #
 
-ADD_SUBDIRECTORY(Converter)
-ADD_SUBDIRECTORY(Core)
-ADD_SUBDIRECTORY(EventHandler)
-ADD_SUBDIRECTORY(Geometry)
-ADD_SUBDIRECTORY(Math)
-ADD_SUBDIRECTORY(Render)
+##################################################
+# Set sources
+##################################################
+
+SET(UTILS_RENDER_SRCS
+  RenderResources.h
+  RenderResources.cc
+  RenderResourcesContext.h
+  RenderResourcesContext.cc
+  RenderContext.h
+  RenderContext.cc
+  )
+
+
+ADD_LIBRARY(Utils_Render STATIC 
+            ${UTILS_RENDER_SRCS} )
+            
+TARGET_LINK_LIBRARIES(Utils_Render
+                      Utils_Core
+                      Utils_EventHandler
+                      ${SCI_BOOST_LIBRARY})
+
