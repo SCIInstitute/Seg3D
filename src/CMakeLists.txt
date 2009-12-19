@@ -226,7 +226,7 @@ INCLUDE(InstallRequiredSystemLibraries)
 
 
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Seg3D")
-SET(CPACK_PACKAGE_VENDOR "SCI_Numira")
+SET(CPACK_PACKAGE_VENDOR "SCI_and_Numira_BioSciences")
       
 SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/CMake/ReadMe.txt")
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Seg3D ${SEG3D_MAJOR_VERSION}.${SEG3D_MINOR_VERSION} is a segmentation program")
@@ -246,7 +246,7 @@ SET(CPACK_PACKAGE_INSTALL_DIRECTORY
 IF(WIN32 AND NOT UNIX)
   # There is a bug in NSIS that does not handle full unix paths properly. Make
   # sure there is at least one set of four (4) backlasshes.
-#  SET(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/Resources\\\\Seg3D2_Logo32x32.bmp")
+  SET(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/Resources\\\\Seg3D2.bmp")
     IF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
       SET(CPACK_INSTALL_PREFIX "/" CACHE PATH "Install path prefix, prepended onto install directories." FORCE)
       SET(CMAKE_INSTALL_PREFIX "/" CACHE PATH "Install path prefix, prepended onto install directories." FORCE)
