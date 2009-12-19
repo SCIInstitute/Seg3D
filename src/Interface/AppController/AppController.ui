@@ -20,7 +20,7 @@
    <item>
     <widget class="QTabWidget" name="TW_CONTROLLER">
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <property name="usesScrollButtons">
       <bool>true</bool>
@@ -153,9 +153,23 @@
               <widget class="QLineEdit" name="LE_EDIT_ACTION"/>
              </item>
              <item>
-              <widget class="QPushButton" name="PB_RUN_ACTION">
+              <widget class="QToolButton" name="TB_ACTION">
+               <property name="font">
+                <font>
+                 <pointsize>10</pointsize>
+                </font>
+               </property>
                <property name="text">
-                <string>Run Action</string>
+                <string>Action</string>
+               </property>
+               <property name="popupMode">
+                <enum>QToolButton::InstantPopup</enum>
+               </property>
+               <property name="toolButtonStyle">
+                <enum>Qt::ToolButtonTextBesideIcon</enum>
+               </property>
+               <property name="arrowType">
+                <enum>Qt::NoArrow</enum>
                </property>
               </widget>
              </item>

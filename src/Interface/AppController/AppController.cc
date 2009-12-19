@@ -37,6 +37,8 @@
 #include <Application/Interface/Interface.h>
 
 // Interface includes
+#include <Interface/QtInterface/QtBridge.h>
+
 #include <Interface/AppController/AppController.h>
 #include <Interface/AppController/AppControllerContext.h>
 #include <Interface/AppController/AppControllerActionHistory.h>
@@ -57,9 +59,6 @@ class AppControllerPrivate {
     AppControllerContextHandle  context_;
 };
 
-// -- Helper classes for the widgets --
-
-
 
 AppController::AppController(QWidget* parent) : 
   QWidget(parent,Qt::Window),
@@ -74,10 +73,12 @@ AppController::AppController(QWidget* parent) :
 
   // Step 2: Modify the widget
   setWindowTitle(QString("Seg3D Controller"));
+  QPointer<AppController> controller(this);
+
 
   // Step 3: Get short cuts to all the widgets
   tw_controller_   = private_->ui_.TW_CONTROLLER;
-  pb_run_action_   = private_->ui_.PB_RUN_ACTION;
+  tb_action_       = private_->ui_.TB_ACTION;
   le_edit_action_  = private_->ui_.LE_EDIT_ACTION;
   l_action_status_ = private_->ui_.L_ACTION_STATUS;
   l_action_usage_  = private_->ui_.L_ACTION_USAGE;
@@ -96,9 +97,24 @@ AppController::AppController(QWidget* parent) :
   tv_log_history_->setColumnWidth(0,1000);
   tv_log_history_->resizeRowsToContents();
   
+  // Get the list of actions
+  ActionFactory::action_list_type action_list;
+  ActionFactory::Instance()->action_list(action_list);
+  
+  QMenu* action_menu = new QMenu(tb_action_);
+  ActionFactory::action_list_type::iterator it =  action_list.begin();
+  ActionFactory::action_list_type::iterator it_end =  action_list.end();
+  while (it != it_end)
+  {
+    QAction* action_item = action_menu->addAction(QString::fromStdString(*it));
+    QtBridge::connect(action_item,boost::bind(&AppController::SetActionType,controller,(*it)));
+    ++it;
+  }
+  
+  tb_action_->setMenu(action_menu);
+
   // Step 5: Link the ActionHistory to this widget and have it update 
   // automatically
-  QPointer<AppController> controller(this);
   
   ActionHistory::Instance()->connect_history_changed(boost::bind(
     &AppController::UpdateActionHistory,true,controller));
@@ -109,9 +125,6 @@ AppController::AppController(QWidget* parent) :
   // Step 6: Qt connections
   // Connect the edit box to the slot that posts the action
   connect(le_edit_action_,SIGNAL(editingFinished()),this,SLOT(post_action()));
-  
-  // Connect the push button to the same function
-  connect(pb_run_action_,SIGNAL(clicked()),this,SLOT(post_action()));
 }
 
 AppController::~AppController()
@@ -219,6 +232,18 @@ AppController::PostUsage(QPointer<AppController> controller,
   if (controller.data())
   {
     controller->post_usage(usage);
+  }
+}
+
+void
+AppController::SetActionType(QPointer<AppController> controller,
+                             std::string action_type)
+{
+  // Protect controller pointer, so we do not execute if controller does not
+  // exist anymore
+  if (controller.data())
+  {
+    controller->le_edit_action_->setText(QString::fromStdString(action_type));
   }
 }
 

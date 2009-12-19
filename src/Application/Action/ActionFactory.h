@@ -122,6 +122,13 @@ class ActionFactory : public boost::noncopyable  {
       SCI_LOG_DEBUG(std::string("Registering action : ") + action_name);
     }
 
+  public:
+    typedef std::vector<std::string> action_list_type;
+    
+    // ACTION_LIST:
+    // Retrieve the full list of registered actions 
+    bool action_list(action_list_type& action_list);
+
   private:
   
     // Mutex protecting the singleton interface  

@@ -72,13 +72,15 @@ class AppController : public QWidget {
     AppControllerPrivateHandle private_;
 
     QTabWidget*   tw_controller_;
-    QPushButton*  pb_run_action_;
+    QToolButton*  tb_action_;
     QLineEdit*    le_edit_action_;
     QLabel*       l_action_status_;
     QLabel*       l_action_usage_;
   
     QTableView*   tv_action_history_;
     QTableView*   tv_log_history_;
+    
+    
     
   public:
   
@@ -100,6 +102,8 @@ class AppController : public QWidget {
     // Post a message in the controller usage label
     static void PostUsage(QPointer<AppController> controller,
                           std::string usage);
+                          
+    static void SetActionType(QPointer<AppController> controller, std::string action_type);
 };
 
 } // end namespace Seg3D

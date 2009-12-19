@@ -86,6 +86,27 @@ ActionFactory::create_action(const std::string& action_string,
   return (true);
 }
 
+bool 
+ActionFactory::action_list(action_list_type& action_list)
+{
+  boost::unique_lock<boost::mutex> lock(action_builders_mutex_);  
+
+  action_map_type::iterator it = action_builders_.begin();
+  action_map_type::iterator it_end = action_builders_.end();
+
+  while (it != it_end)
+  {
+    action_list.push_back((*it).first);
+    ++it;
+  }
+  
+  std::sort(action_list.begin(),action_list.end());
+  
+  // indicate success
+  return (true);
+}
+
+
 // Singleton instance
 Utils::Singleton<ActionFactory> ActionFactory::instance_;
 

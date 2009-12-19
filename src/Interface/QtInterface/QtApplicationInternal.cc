@@ -67,7 +67,7 @@ QtEventFilter::eventFilter(QObject* obj, QEvent* event)
   }
 }
 
-// CLASS QtInterfaceContext:
+// CLASS QtEventHandlerContext:
 // This class needs to be constructed from the main Qt thread
 
 QtEventHandlerContext::QtEventHandlerContext(QApplication* qapplication) :
