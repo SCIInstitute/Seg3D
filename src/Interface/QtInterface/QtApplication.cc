@@ -32,21 +32,16 @@
 // Application Layer includes
 #include <Application/Application/Application.h>
 #include <Application/Interface/Interface.h>
+#include <Application/Renderer/RenderResources.h>
 
 // Interface includes
 #include <Interface/QtInterface/QtApplication.h>
-#include <Interface/QtInterface/QtApplicationInternal.h>
-
-// Boost includes
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/thread.hpp>
-#include <boost/shared_ptr.hpp>
-
+#include <Interface/QtInterface/QtEventHandler.h>
 
 namespace Seg3D {
 
 QtApplication::QtApplication() :
-  qapplication_(0)
+  qt_application_(0)
 {
 }
 
@@ -56,21 +51,26 @@ QtApplication::setup(int argc, char **argv)
 {
   try
   {
-    // Main application class
+    // Step 1: Main application class
     SCI_LOG_DEBUG("Creating QApplication");
-    qapplication_ = new QApplication(argc,argv);
+    qt_application_ = new QApplication(argc,argv);
 
-    
-    // Interface class to the main class of the event handler layer
+    // Step 2: Create interface class to the main class of the event handler layer
     SCI_LOG_DEBUG("Creating QtEventHandlerContext");
-    Utils::EventHandlerContextHandle qt_eventhandler_context = 
-        Utils::EventHandlerContextHandle(new QtEventHandlerContext(qapplication_));
+    Utils::EventHandlerContextHandle qt_eventhandler_context(new QtEventHandlerContext(qt_application_));
 
-
-    // Insert the event handler into the application layer
+    // Step 3: Insert the event handler into the application layer
     SCI_LOG_DEBUG("Install the QtEventHandlerContext into the Interface layer");
     Interface::Instance()->install_eventhandler_context(qt_eventhandler_context);   
     Interface::Instance()->start_eventhandler(); 
+    
+    // Step 4: Create opengl render resources
+    SCI_LOG_DEBUG("Creating QtRenderResourcesContext");
+    qt_renderresources_context_ = QtRenderResourcesContextHandle(new QtRenderResourcesContext);
+ 
+    // Step 5: Insert the render resources class into the application layer
+    RenderResources::Instance()->install_resources_context(qt_renderresources_context_);
+    
   }
   catch(...)
   {
@@ -88,10 +88,10 @@ QtApplication::exec()
   try
   {
     SCI_LOG_DEBUG("Starting Qt main event loop");
-    qapplication_->exec();
+    qt_application_->exec();
     
-    delete qapplication_;
-    qapplication_ = 0;
+    delete qt_application_;
+    qt_application_ = 0;
   }
   catch(...)
   {
@@ -102,7 +102,17 @@ QtApplication::exec()
   return (true);
 }
 
+QApplication* 
+QtApplication::qt_application()
+{
+  return qt_application_;
+}
 
+RenderResourcesContextHandle
+QtApplication::qt_renderresources_context()
+{
+  return qt_renderresources_context_;
+}
 
 // Singleton instantiation
 Utils::Singleton<QtApplication> QtApplication::instance_;

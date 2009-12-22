@@ -28,7 +28,7 @@
 
 #include <Utils/Core/Exception.h>
 
-#include <Interface/QtInterface/QtApplicationInternal.h>
+#include <Interface/QtInterface/QtEventHandler.h>
 
 namespace Seg3D {
 

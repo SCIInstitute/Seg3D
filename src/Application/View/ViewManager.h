@@ -95,7 +95,6 @@ public:
   // -- Dispatcher functions for User Interface --
   void dispatch_changeprimaryview(const std::string& view_name) const;
   void dispatch_changeviewtype(const std::string& view_name, View::view_type type) const;
-  void dispatch_changelayerorder(const std::string& view_name, const LayerStackType& new_order) const;
   void dispatch_changeactivelayer(const std::string& view_name, const std::string& layer_name) const;
   void dispatch_changeopacity(const std::string& view_name, const std::string& layer_name, unsigned int opacity) const;
   void dispatch_addlayertoview(const std::string& view_name, const std::string& layer_name) const;

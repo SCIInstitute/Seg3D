@@ -26,66 +26,41 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_VIEW_VIEW_H
-#define APPLICATION_VIEW_VIEW_H
-
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
-# pragma once
-#endif
-
-// STL includes
-#include <vector>
-
-// Boost includes 
-#include <boost/shared_ptr.hpp>
-
-// Application includes
-#include <Application/View/ViewRenderer.h>
+#include <Application/InterfaceManager/InterfaceManager.h>
+#include <Application/InterfaceManager/Actions/ActionShowWindow.h>
 
 namespace Seg3D {
 
-// Forward declarations
-class View;
-typedef boost::shared_ptr<View> ViewHandle;
+// REGISTER ACTION:
+// Define a function that registers the action. The action also needs to be
+// registered in the CMake file.
+SCI_REGISTER_ACTION(ShowWindow);
 
+// VALIDATE:
+// As the action could be user input, we need to validate whether the action
+// is valid and can be executed.
 
-// Class declarations
+bool
+ActionShowWindow::validate(ActionHandle& self,
+                           ActionContextHandle& context)
+{
+  if (!(InterfaceManager::Instance()->is_windowid(windowid_.value())))
+  {
+    context->report_error(std::string("WindowID '")+windowid_.value()+"' is invalid");
+    return (false);
+  }
+  
+  return (true); // validated
+}
 
-class View {
-
-// -- types of views --
-  public:
-    enum view_type {
-      AXIAL_E = 0,
-      SAGITTAL_E,
-      CORONAL_E,
-      VOLUME_E
-    };
-
-// -- constructor/destructor --
-  public:
-    View();
-    virtual ~View();
-
-    view_type type() const { return type_; }
-    void      set_type(view_type new_type) { type_ = new_type; }
-
-  private:
-    // Type of the view
-    view_type type_;
-
-// -- Renderer information --
-
-  // Note: by default a dummy renderer is generated.
-  public:
-    
-    ViewRendererHandle renderer() { return renderer_; }
-    void set_renderer(ViewRendererHandle renderer) { renderer_ = renderer; }
-
-  private:
-    ViewRendererHandle renderer_;
-};
+// RUN:
+// The code that runs the actual action
+bool 
+ActionShowWindow::run(ActionHandle& self,
+                      ActionContextHandle& context)
+{
+  InterfaceManager::Instance()->show_window_signal(windowid_.value());
+  return (true); // success
+}
 
 } // end namespace Seg3D
-
-#endif

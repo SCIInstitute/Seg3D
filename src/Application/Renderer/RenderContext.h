@@ -26,64 +26,48 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_VIEW_VIEW_H
-#define APPLICATION_VIEW_VIEW_H
+#ifndef APPLICATION_RENDERER_RENDERCONTEXT_H
+#define APPLICATION_RENDERER_RENDERCONTEXT_H
 
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
-# pragma once
-#endif
-
-// STL includes
-#include <vector>
-
-// Boost includes 
+// Boost includes
+#include <boost/thread/mutex.hpp>
 #include <boost/shared_ptr.hpp>
 
-// Application includes
-#include <Application/View/ViewRenderer.h>
+// Utils includes
+#include <Utils/Core/Log.h>
+#include <Application/Renderer/RenderContext.h>
 
 namespace Seg3D {
 
 // Forward declarations
-class View;
-typedef boost::shared_ptr<View> ViewHandle;
+class RenderContext;
+typedef boost::shared_ptr<RenderContext> RenderContextHandle;
 
-
-// Class declarations
-
-class View {
-
-// -- types of views --
-  public:
-    enum view_type {
-      AXIAL_E = 0,
-      SAGITTAL_E,
-      CORONAL_E,
-      VOLUME_E
-    };
-
-// -- constructor/destructor --
-  public:
-    View();
-    virtual ~View();
-
-    view_type type() const { return type_; }
-    void      set_type(view_type new_type) { type_ = new_type; }
-
-  private:
-    // Type of the view
-    view_type type_;
-
-// -- Renderer information --
-
-  // Note: by default a dummy renderer is generated.
-  public:
+// Class definition
+class RenderContext {
     
-    ViewRendererHandle renderer() { return renderer_; }
-    void set_renderer(ViewRendererHandle renderer) { renderer_ = renderer; }
+// -- constructor/ destructor --
+  public:  
+    RenderContext();
+    virtual ~RenderContext();
+  
+// -- context functions --
+    // IS_VALID:
+    // Test whether the context is valid
+    virtual bool is_valid() = 0;
 
-  private:
-    ViewRendererHandle renderer_;
+    // MAKE_CURRENT:
+    // Set the rendering context current to this thread
+    virtual void make_current() = 0;
+
+    // DONE_CURRENT:
+    // Indicate that rendering using this context is done for now
+    virtual void done_current() = 0;
+    
+    // SWAP_BUFFERS:
+    // Swap the front and back buffers
+    virtual void swap_buffers() = 0;
+
 };
 
 } // end namespace Seg3D

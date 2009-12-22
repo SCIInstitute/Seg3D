@@ -26,46 +26,35 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef UTILS_RENDER_RENDERCONTEXT_H
-#define UTILS_RENDER_RENDERCONTEXT_H
+#include <Application/Renderer/Renderer.h>
 
-// Boost includes
-#include <boost/thread/mutex.hpp>
-#include <boost/shared_ptr.hpp>
+namespace Seg3D {
 
-// Utils includes
-#include <Utils/Core/Log.h>
-#include <Utils/Render/RenderContext.h>
+Renderer::Renderer() :
+  context_(0)
+{
+  context_ = RenderResources::Instance()->create_render_context();
+}
 
-namespace Utils {
+Renderer::~Renderer() 
+{
+}
 
-class RenderContext;
-typedef boost::shared_ptr<RenderContext> RenderContextHandle;
+void
+Renderer::initialize()
+{
+}
 
-class RenderContext {
-    
-  public:  
+void
+Renderer::redraw()
+{
+}
 
-// -- constructor/ destructor --
-    RenderContext();
-    virtual ~RenderContext();
-  
-// -- context functions --
+void
+Renderer::resize(int width, int height)
+{
+}
 
-    // MAKE_CURRENT:
-    // Set the rendering context current to this thread
-    virtual void make_current() = 0;
+} // end namespace Seg3D
 
-    // DONE_CURRENT:
-    // Indicate that rendering using this context is done for now
-    virtual void done_current() = 0;
-    
-    // SWAP_BUFFERS:
-    // Swap the front and back buffers
-    virtual void swap_buffers() = 0;
 
-};
-
-} // end namespace Utils
-
-#endif

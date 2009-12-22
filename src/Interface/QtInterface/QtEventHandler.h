@@ -26,8 +26,8 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef INTERFACE_QTINTERFACE_QTAPPLICATIONINTERNAL_H
-#define INTERFACE_QTINTERFACE_QTAPPLICATIONINTERNAL_H
+#ifndef INTERFACE_QTINTERFACE_QTEVENTHANDLER_H
+#define INTERFACE_QTINTERFACE_QTEVENTHANDLER_H
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
@@ -49,7 +49,7 @@
 
 namespace Seg3D {
 
-// QTAPPLICATIONINTERNAL:
+// QTEVENTHANDLER:
 
 // As QT takes ownership of events, these classes wraps around our
 // functor call back classes and hide all the QT handling behind
@@ -140,7 +140,6 @@ class QtEventHandlerContext : public Utils::EventHandlerContext {
     virtual void terminate_eventhandler();
             
   private:
-    
     // A pointer to the main Qt application class
     QApplication*           qapplication_;
     

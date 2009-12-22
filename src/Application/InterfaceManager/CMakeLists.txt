@@ -31,21 +31,32 @@
 # Set sources
 ##################################################
 
-SET(UTILS_RENDER_SRCS
-  RenderResources.h
-  RenderResources.cc
-  RenderResourcesContext.h
-  RenderResourcesContext.cc
-  RenderContext.h
-  RenderContext.cc
+SET(APPLICATION_INTERFACEMANAGER_SRCS
+  InterfaceManager.h
+  InterfaceManager.cc
   )
 
+SET(APPLICATION_INTERFACEMANAGER_ACTIONS_SRCS
+  Actions/ActionShowWindow.h
+  Actions/ActionShowWindow.cc
+  Actions/ActionCloseWindow.h
+  Actions/ActionCloseWindow.cc
+  )
 
-ADD_LIBRARY(Utils_Render STATIC 
-            ${UTILS_RENDER_SRCS} )
+ADD_LIBRARY(Application_InterfaceManager STATIC 
+            ${APPLICATION_INTERFACEMANAGER_SRCS}
+            ${APPLICATION_INTERFACEMANAGER_ACTIONS_SRCS} )
             
-TARGET_LINK_LIBRARIES(Utils_Render
+TARGET_LINK_LIBRARIES(Application_InterfaceManager
+                      Utils_Converter
                       Utils_Core
-                      Utils_EventHandler
+                      Application_Application
+                      Application_Interface
+                      Application_Action
+                      Application_State
                       ${SCI_BOOST_LIBRARY})
 
+# Register actions
+ADD_LIBRARY_ACTIONS(Application_InterfaceManager
+                    ${APPLICATION_INTERFACEMANAGER_ACTIONS_SRCS})
+                    

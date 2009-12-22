@@ -37,14 +37,10 @@
 
 namespace Seg3D {
 
-AppInterface::AppInterface(QWidget* app) :
-  QMainWindow(app)
+AppInterface::AppInterface()
 {
-  // Store the pointer to this class, so callbacks can use it in the future
-  instance_ = this;
 
-  // Set the window information
-  // and set the version numbers
+  // Set the window information and set the version numbers
   setWindowTitle(QString("Seg3D Version ")+SEG3D_VERSION+QString(" ")+
                  SEG3D_BITS+QString(" ")+SEG3D_DEBUG_VERSION);
   setWindowIconText(QString("Seg3D"));
@@ -59,101 +55,255 @@ AppInterface::AppInterface(QWidget* app) :
   setCorner(Qt::BottomLeftCorner,Qt::LeftDockWidgetArea);
   setCorner(Qt::BottomRightCorner,Qt::RightDockWidgetArea);
   
-  viewer_interface_ =           new ViewerInterface(this);
-  history_dock_window_ =        new HistoryDockWidget(this);
-  project_dock_window_ =        new ProjectDockWidget(this);
-  tools_dock_window_ =          new ToolsDockWidget(this);
-  layer_manager_dock_window_ =  new LayerManagerDockWidget(this);
-  measurement_dock_window_ =    new MeasurementDockWidget(this);
+  // Define the main window viewer canvas
+  viewer_interface_ = new ViewerInterface(this);
 
-  controller_interface_ =       new AppController(this);
-  controller_interface_->show();
+  // Setup the history dock widget
+  show_window("history");
+  show_window("tools");
+  show_window("project");
+
+  show_window("layermanager");
+  show_window("measurement");
+  show_window("controller");
 
   setCentralWidget(viewer_interface_);
-
-  addDockWidget(Qt::LeftDockWidgetArea, history_dock_window_, Qt::Horizontal);
-  addDockWidget(Qt::LeftDockWidgetArea, project_dock_window_, Qt::Horizontal);
-  addDockWidget(Qt::LeftDockWidgetArea, tools_dock_window_, Qt::Horizontal);
-  
-  tabifyDockWidget(project_dock_window_, history_dock_window_);
-  tabifyDockWidget(history_dock_window_, tools_dock_window_);
-  
-  addDockWidget(Qt::RightDockWidgetArea, layer_manager_dock_window_, Qt::Horizontal);
-  addDockWidget(Qt::RightDockWidgetArea, measurement_dock_window_, Qt::Horizontal);
-  
-  tabifyDockWidget(measurement_dock_window_, layer_manager_dock_window_);
-  
 
   //showFullScreen();
   application_menu_ = new AppMenu(this, viewer_interface_);
   status_bar_ = new AppStatusBar(this);
   
+  QPointer<AppInterface> interface(this);
+  
+  InterfaceManager::Instance()->show_window_signal.connect(boost::bind(
+    AppInterface::HandleShowWindow,interface,_1));
+
+  InterfaceManager::Instance()->close_window_signal.connect(boost::bind(
+    AppInterface::HandleCloseWindow,interface,_1));
+
   // set the viewer_interface_ to a default view of 1 and 3
   viewer_interface_->set_views(1,3);
-  
- 
-  
 }
 
 void
-AppInterface::full_screen_toggle(bool e)
+AppInterface::full_screen_toggle(bool full_screen)
 {
-  if(e) AppInterface::showFullScreen();
+  if(full_screen) AppInterface::showFullScreen();
   else AppInterface::showFullScreen();
 }
   
-
-  
-
 AppInterface::~AppInterface()
 {
   viewer_interface_->writeSizeSettings();
 }
 
-void 
-AppInterface::HandleOpenWindow(std::string window_id)
-{
-  // Ensure that this request is forwarded to the interface thread
-  if (!(Interface::IsInterfaceThread()))
-  {
-    PostInterface(boost::bind(&AppInterface::HandleOpenWindow,window_id));
-    return;
-  }
+ViewerInterface*        
+AppInterface::viewer_interface()    
+{ 
+  return viewer_interface_.data(); 
+}
 
-  if (instance_.data())
+HistoryDockWidget*      
+AppInterface::history_dock_widget() 
+{ 
+  return history_dock_window_.data(); 
+}
+
+ProjectDockWidget*      
+AppInterface::project_dock_widget() 
+{ 
+  return project_dock_window_.data(); 
+}
+
+ToolsDockWidget*        
+AppInterface::tools_dock_widget()   
+{ 
+  return tools_dock_window_.data(); 
+}
+
+LayerManagerDockWidget* 
+AppInterface::layer_manager_dock_widget() 
+{ 
+  return layer_manager_dock_window_.data(); 
+}
+
+MeasurementDockWidget*  
+AppInterface::measurement_dock_widget() 
+{ 
+  return measurement_dock_window_.data(); 
+}
+
+void
+AppInterface::show_window(const std::string& windowid)
+{
+  std::string lower_windowid = Utils::string_to_lower(windowid);
+  InterfaceManager::Instance()->add_windowid(lower_windowid);
+  
+  if (lower_windowid == "controller")
   {
-    if (window_id == "Controller")
+    if (controller_interface_.isNull())
     {
-      if (instance_->controller_interface_.isNull())
-      {
-        instance_->controller_interface_ = new AppController(instance_.data());
-        instance_->controller_interface_->show();
-      }
+      controller_interface_ = new AppController(this);
+      controller_interface_->show();
     }
-    else if (window_id == "Project")
+    else
     {
-      if (instance_->project_dock_window_.isNull())
-      {
-        instance_->project_dock_window_ = new ProjectDockWidget(instance_.data());
-        instance_->addDockWidget(Qt::LeftDockWidgetArea, 
-                            instance_->project_dock_window_, Qt::Horizontal);
-      }
+      controller_interface_->show();
+      controller_interface_->raise();
+    }
+  }
+  else if (lower_windowid == "project")
+  {
+    if (project_dock_window_.isNull())
+    {
+      project_dock_window_ = new ProjectDockWidget(this);
+      addDockWidget(Qt::LeftDockWidgetArea,  project_dock_window_);
+      project_dock_window_->show();
+    }
+    else
+    {
+      project_dock_window_->show();
+      project_dock_window_->raise();
+    }
+  }
+  else if (lower_windowid == "layermanager")
+  {
+    if (layer_manager_dock_window_.isNull())
+    {
+      layer_manager_dock_window_ = new LayerManagerDockWidget(this);
+      addDockWidget(Qt::RightDockWidgetArea, layer_manager_dock_window_);
+      layer_manager_dock_window_->show();
+    }
+    else
+    {
+      layer_manager_dock_window_->show();
+      layer_manager_dock_window_->raise();
+    }
+  }
+  else if (lower_windowid == "history")
+  {
+    if (history_dock_window_.isNull())
+    {
+      history_dock_window_ = new HistoryDockWidget(this);
+      addDockWidget(Qt::LeftDockWidgetArea,  history_dock_window_);
+      history_dock_window_->show();
+    }
+    else
+    {
+      history_dock_window_->show();
+      history_dock_window_->raise();
+    }
+  }
+  else if (lower_windowid == "tools")
+  {
+    if (tools_dock_window_.isNull())
+    {
+      tools_dock_window_ = new ToolsDockWidget(this);
+      addDockWidget(Qt::LeftDockWidgetArea,  tools_dock_window_);
+      tools_dock_window_->show();
+    }
+    else
+    {
+      tools_dock_window_->show();
+      tools_dock_window_->raise();
+    }
+  }
+  else if (lower_windowid == "measurement")
+  {
+    if (measurement_dock_window_.isNull())
+    {
+      measurement_dock_window_ = new MeasurementDockWidget(this);
+      addDockWidget(Qt::RightDockWidgetArea, measurement_dock_window_);
+      measurement_dock_window_->show();
+    }
+    else
+    {
+      measurement_dock_window_->show();
+      measurement_dock_window_->raise();
     }
   }
 }
 
+void
+AppInterface::close_window(const std::string& windowid)
+{
+  std::string lower_windowid = Utils::string_to_lower(windowid);
+  if (lower_windowid == "controller")
+  {
+    if (!(controller_interface_.isNull()))
+    {
+      controller_interface_->close();
+    }
+  }
+  else if (lower_windowid == "project")
+  {
+    if (!(project_dock_window_.isNull())) project_dock_window_->close();
+  }
+  else if (lower_windowid == "layermanager")
+  {
+    if (!(layer_manager_dock_window_.isNull())) layer_manager_dock_window_->close();
+  }
+  else if (lower_windowid == "history")
+  {
+    if (!(history_dock_window_.isNull())) history_dock_window_->close();  
+  }
+  else if (lower_windowid == "tools")
+  {
+    if (!(tools_dock_window_.isNull())) tools_dock_window_->close();  
+  }
+  else if (lower_windowid == "measurement")
+  {
+    if (!(measurement_dock_window_.isNull())) measurement_dock_window_->close();  
+  }
+}
+
 void 
-AppInterface::HandleCloseWindow(std::string window_id)
+AppInterface::addDockWidget(Qt::DockWidgetArea area, QDockWidget* dock_widget)
+{
+  QMainWindow::addDockWidget(area,dock_widget);
+  
+  QList<QDockWidget*> object_list = findChildren<QDockWidget*>();
+  QList<QDockWidget*>::iterator it = object_list.begin();
+  QList<QDockWidget*>::iterator it_end = object_list.end();
+  while (it != it_end)
+  {
+    if ((dock_widget != *it) && (dockWidgetArea(*it) == area))
+    {
+      tabifyDockWidget(*it, dock_widget);      
+      break;
+    } 
+    ++it;
+  }
+}
+
+void 
+AppInterface::HandleShowWindow(QPointer<AppInterface> interface, 
+                               std::string windowid)
 {
   // Ensure that this request is forwarded to the interface thread
   if (!(Interface::IsInterfaceThread()))
   {
-    PostInterface(boost::bind(&AppInterface::HandleCloseWindow,window_id));
+    PostInterface(boost::bind(&AppInterface::HandleShowWindow,interface,windowid));
     return;
   }
+
+  SCI_LOG_DEBUG(std::string("Show window ")+windowid);
+
+  if (!(interface.isNull())) interface->show_window(windowid);
 }
 
-// Need to define singleton interface
-QPointer<AppInterface>  AppInterface::instance_;
+void 
+AppInterface::HandleCloseWindow(QPointer<AppInterface> interface, 
+                                std::string windowid)
+{
+  // Ensure that this request is forwarded to the interface thread
+  if (!(Interface::IsInterfaceThread()))
+  {
+    PostInterface(boost::bind(&AppInterface::HandleCloseWindow,interface,windowid));
+    return;
+  }
+  
+  if (!(interface.isNull())) interface->close_window(windowid);
+}
 
 } //end namespace

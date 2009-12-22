@@ -26,66 +26,17 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_VIEW_VIEW_H
-#define APPLICATION_VIEW_VIEW_H
-
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
-# pragma once
-#endif
-
-// STL includes
-#include <vector>
-
-// Boost includes 
-#include <boost/shared_ptr.hpp>
-
-// Application includes
-#include <Application/View/ViewRenderer.h>
+#include <Application/Renderer/RenderContext.h>
 
 namespace Seg3D {
 
-// Forward declarations
-class View;
-typedef boost::shared_ptr<View> ViewHandle;
+RenderContext::RenderContext() 
+{
+}
 
+RenderContext::~RenderContext() 
+{
+}
 
-// Class declarations
+} // end namespace Utils
 
-class View {
-
-// -- types of views --
-  public:
-    enum view_type {
-      AXIAL_E = 0,
-      SAGITTAL_E,
-      CORONAL_E,
-      VOLUME_E
-    };
-
-// -- constructor/destructor --
-  public:
-    View();
-    virtual ~View();
-
-    view_type type() const { return type_; }
-    void      set_type(view_type new_type) { type_ = new_type; }
-
-  private:
-    // Type of the view
-    view_type type_;
-
-// -- Renderer information --
-
-  // Note: by default a dummy renderer is generated.
-  public:
-    
-    ViewRendererHandle renderer() { return renderer_; }
-    void set_renderer(ViewRendererHandle renderer) { renderer_ = renderer; }
-
-  private:
-    ViewRendererHandle renderer_;
-};
-
-} // end namespace Seg3D
-
-#endif

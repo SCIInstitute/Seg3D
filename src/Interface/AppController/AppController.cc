@@ -124,7 +124,7 @@ AppController::AppController(QWidget* parent) :
 
   // Step 6: Qt connections
   // Connect the edit box to the slot that posts the action
-  connect(le_edit_action_,SIGNAL(editingFinished()),this,SLOT(post_action()));
+  connect(le_edit_action_,SIGNAL(returnPressed()),this,SLOT(post_action()));
 }
 
 AppController::~AppController()
@@ -134,7 +134,10 @@ AppController::~AppController()
 void
 AppController::post_action()
 {
+  // Clear usage string
   l_action_usage_->setText("");
+  
+  // Post the action string
   std::string stringaction = le_edit_action_->text().toStdString();
   PostAction(stringaction,ActionContextHandle(private_->context_));
 }

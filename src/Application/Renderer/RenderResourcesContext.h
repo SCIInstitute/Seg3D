@@ -26,66 +26,48 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_VIEW_VIEW_H
-#define APPLICATION_VIEW_VIEW_H
+#ifndef APPLICATION_RENDER_RENDERRESOURCESCONTEXT_H
+#define APPLICATION_RENDER_RENDERRESOURCESCONTEXT_H
 
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
-# pragma once
-#endif
-
-// STL includes
-#include <vector>
-
-// Boost includes 
+// Boost includes
+#include <boost/thread/mutex.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/utility.hpp>
 
-// Application includes
-#include <Application/View/ViewRenderer.h>
+// Utils includes
+#include <Utils/Core/Log.h>
+#include <Application/Renderer/RenderContext.h>
 
 namespace Seg3D {
 
 // Forward declarations
-class View;
-typedef boost::shared_ptr<View> ViewHandle;
+class RenderResourcesContext;
+typedef boost::shared_ptr<RenderResourcesContext> RenderResourcesContextHandle;
 
+// Class definitions
 
-// Class declarations
-
-class View {
-
-// -- types of views --
-  public:
-    enum view_type {
-      AXIAL_E = 0,
-      SAGITTAL_E,
-      CORONAL_E,
-      VOLUME_E
-    };
-
-// -- constructor/destructor --
-  public:
-    View();
-    virtual ~View();
-
-    view_type type() const { return type_; }
-    void      set_type(view_type new_type) { type_ = new_type; }
-
-  private:
-    // Type of the view
-    view_type type_;
-
-// -- Renderer information --
-
-  // Note: by default a dummy renderer is generated.
-  public:
+class RenderResourcesContext : public boost::noncopyable {
     
-    ViewRendererHandle renderer() { return renderer_; }
-    void set_renderer(ViewRendererHandle renderer) { renderer_ = renderer; }
+// -- constructor/ destructor --
+  public:  
+    RenderResourcesContext();
+    virtual ~RenderResourcesContext();
+  
+// -- functions implemented by GUI system --
 
-  private:
-    ViewRendererHandle renderer_;
+  protected:
+  
+    friend class RenderResources;
+    // CREATE_RENDER_CONTEXT:
+    // Generate a render context for one of the viewers
+    virtual bool create_render_context(RenderContextHandle& context) = 0;
+    
+    // SHARED_RENDER_CONTEXT:
+    // Get the handle to the main shared render context
+    virtual bool shared_render_context(RenderContextHandle& context) = 0;
+        
 };
 
-} // end namespace Seg3D
+} // end namespace Utils
 
 #endif

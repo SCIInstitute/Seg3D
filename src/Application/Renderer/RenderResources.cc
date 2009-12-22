@@ -26,43 +26,50 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#include <Utils/Render/RenderResources.h>
+#include <Application/Renderer/RenderResources.h>
 
-namespace Utils {
+namespace Seg3D {
 
-RenderResources::RenderResources() :
-  render_context_list_size_(6)
+RenderResources::RenderResources() 
 {
 }
 
 bool
-RenderResources::render_context(size_t index, RenderContextHandle& context)
+RenderResources::create_render_context(RenderContextHandle& context)
 {
-  if (index >= render_context_list_size_) return (false);
-  context = render_context_list_[index];
-  return (true);
+  // The context gets setup through the GUI system and is GUI dependent
+  // if this function is accessed before the GUI system is setup, something
+  // is wrong in the program logic, hence warn the user
+  if (!resources_context_.get())
+  {
+    SCI_THROW_LOGICERROR("No render resources were installed to create an opengl context");
+  }
+  
+  return (resources_context_->create_render_context(context));
+}
+
+bool
+RenderResources::shared_render_context(RenderContextHandle& context)
+{
+  // The context gets setup through the GUI system and is GUI dependent
+  // if this function is accessed before the GUI system is setup, something
+  // is wrong in the program logic, hence warn the user
+
+  if (!resources_context_.get())
+  {
+    SCI_THROW_LOGICERROR("No render resources were installed to create an opengl context");
+  }
+
+  return (resources_context_->shared_render_context(context));
 }
 
 void
-RenderResources::install_resources_context(RenderResourcesContextHandle& resources_context)
+RenderResources::install_resources_context(RenderResourcesContextHandle resources_context)
 {
+  // Check whether we got a proper render context
   if (!resources_context.get())
   {
     SCI_THROW_LOGICERROR("Cannot install an empty render resources context");
-  }
-  
-  if(!(resources_context->create_shared_render_context(shared_render_context_)))
-  {
-    SCI_THROW_LOGICERROR("Could not create a shared render context");
-  }
-
-  render_context_list_.resize(render_context_list_size_);
-  for (size_t j=0; j<render_context_list_size_; j++)
-  {
-    if(!(resources_context->create_shared_render_context(render_context_list_[j])))
-    {
-      SCI_THROW_LOGICERROR("Could not create a shared render context");
-    }  
   }
   
   resources_context_ = resources_context;
@@ -74,7 +81,8 @@ RenderResources::valid_render_resources()
   return (resources_context_.get()!=0);
 }
 
-Singleton<RenderResources> RenderResources::instance_;
+// Need to define singleton somewhere
+Utils::Singleton<RenderResources> RenderResources::instance_;
 
-} // end namespace Utils
+} // end namespace Seg3D
 

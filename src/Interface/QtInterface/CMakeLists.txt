@@ -33,17 +33,19 @@
 
 SET(INTERFACE_QTINTERFACE_SRCS
   QtApplication.cc
-  QtApplicationInternal.cc
+  QtEventHandler.cc
+  QtRenderResources.cc
   QtBridge.cc
 )
 
 SET(INTERFACE_QTINTERFACE_MOC_SRCS
-  QtApplicationInternal.h
+  QtEventHandler.h
   QtBridgeInternal.h
 )
 
 SET(INTERFACE_QTINTERFACE_NO_MOC_SRCS
   QtApplication.h
+  QtRenderResources.h
   QtBridge.h
 )
 
@@ -85,6 +87,7 @@ TARGET_LINK_LIBRARIES(Interface_QtInterface
                       Utils_Core
                       Utils_Converter
                       Utils_EventHandler
+                      Application_Renderer
                       ${QT_LIBRARIES} 
                       ${SCI_BOOST_LIBRARY})
 

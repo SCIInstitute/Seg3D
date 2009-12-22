@@ -26,65 +26,42 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_VIEW_VIEW_H
-#define APPLICATION_VIEW_VIEW_H
+#ifndef APPLICATION_INTERFACEMANAGER_ACTIONS_ACTIONCLOSETOOL_H
+#define APPLICATION_INTERFACEMANAGER_ACTIONS_ACTIONCLOSETOOL_H
 
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
-# pragma once
-#endif
-
-// STL includes
-#include <vector>
-
-// Boost includes 
-#include <boost/shared_ptr.hpp>
-
-// Application includes
-#include <Application/View/ViewRenderer.h>
+#include <Application/Action/Actions.h>
 
 namespace Seg3D {
 
-// Forward declarations
-class View;
-typedef boost::shared_ptr<View> ViewHandle;
+class ActionCloseWindow : public Action {
+  SCI_ACTION_TYPE("CloseWindow","CloseWindow windowid",INTERFACE_E)
 
-
-// Class declarations
-
-class View {
-
-// -- types of views --
+// -- Constructor/Destructor --
   public:
-    enum view_type {
-      AXIAL_E = 0,
-      SAGITTAL_E,
-      CORONAL_E,
-      VOLUME_E
-    };
-
-// -- constructor/destructor --
-  public:
-    View();
-    virtual ~View();
-
-    view_type type() const { return type_; }
-    void      set_type(view_type new_type) { type_ = new_type; }
-
-  private:
-    // Type of the view
-    view_type type_;
-
-// -- Renderer information --
-
-  // Note: by default a dummy renderer is generated.
-  public:
+    ActionCloseWindow()
+    {
+      add_argument(windowid_);
+    }
     
-    ViewRendererHandle renderer() { return renderer_; }
-    void set_renderer(ViewRendererHandle renderer) { renderer_ = renderer; }
+    virtual ~ActionCloseWindow() 
+    {}
 
-  private:
-    ViewRendererHandle renderer_;
+    void set(const std::string& windowid)
+    {
+      windowid_.value() = windowid;
+    }
+
+// -- Functions that describe action --
+    virtual bool validate(ActionHandle& self,
+                          ActionContextHandle& context);
+    virtual bool run(ActionHandle& self,
+                     ActionContextHandle& context);
+    
+// -- Action parameters --
+    ActionParameter<std::string> windowid_;
 };
+
+typedef boost::shared_ptr<ActionCloseWindow> ActionCloseWindowHandle;
 
 } // end namespace Seg3D
 

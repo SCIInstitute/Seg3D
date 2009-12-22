@@ -49,6 +49,9 @@
 // Application includes
 #include <Application/State/StateHandler.h>
 
+// Interface includes
+#include <Interface/QtInterface/QtRenderResources.h>
+
 
 namespace Seg3D {
 
@@ -77,23 +80,30 @@ class QtApplication : public boost::noncopyable {
 
 // -- accessors --
   public:
-    // GET_QAPPLICATION:
-    // Get the pointer to the main qt application
-    // NOTE: This function should only be called from the interface thread
-    QApplication* get_qapplication() { return qapplication_; }
+    // QT_APPLICATION:
+    // Get the pointer to the main QT Application
+    QApplication* qt_application();
 
+    // QT_RENDERRESOURCES_CONTEXT:
+    // Get the handle to the renderresources
+    RenderResourcesContextHandle qt_renderresources_context();
+    
   private:  
-    // main QT application class
-    QApplication* qapplication_;
+    // Main QT application class
+    QApplication* qt_application_;
+
+    // Class for managing the opengl rendering resources
+    QtRenderResourcesContextHandle qt_renderresources_context_;
 
 // -- Singleton interface --
   public:
     
     // INSTANCE:
-    static QtApplication* instance() { return instance_.instance(); }
+    static QtApplication* Instance() { return instance_.instance(); }
     
   private:  
     static Utils::Singleton<QtApplication> instance_;
+    
 };
 
 } // end namespace Seg3D

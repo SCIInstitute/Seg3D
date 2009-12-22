@@ -72,7 +72,11 @@ class Action : public boost::noncopyable {
       // LAYER ACTION - Layer actions affect layers/layer manager and are currently
       // the only actions that can be undone.
       LAYER_E = 0x0002,
-     
+
+      // INTERFACE ACTION - Interface actions only affect the appearance of the
+      // interface. 
+      INTERFACE_E = 0x0004,
+           
       // UNDOABLE ACTIONS - These actions will be forwarded to the undo/redo
       // stack. 
       UNDOABLE_E = 0x10000, 

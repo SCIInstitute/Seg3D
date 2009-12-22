@@ -26,25 +26,25 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef UTILS_RENDER_RENDERRESOURCES_H
-#define UTILS_RENDER_RENDERRESOURCES_H
+#ifndef APPLICATION_RENDERER_RENDERRESOURCES_H
+#define APPLICATION_RENDERER_RENDERRESOURCES_H
 
 // Boost includes
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/recursive_mutex.hpp>
-#include <boost/thread/thread.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/signals2.hpp>
-
+#include <boost/utility.hpp>
 
 // Utils includes
 #include <Utils/Core/Exception.h>
 #include <Utils/Core/Log.h>
 #include <Utils/Singleton/Singleton.h>
-#include <Utils/Render/RenderContext.h>
-#include <Utils/Render/RenderResourcesContext.h>
 
-namespace Utils {
+// Application includes
+#include <Application/Renderer/RenderContext.h>
+#include <Application/Renderer/RenderResourcesContext.h>
+
+namespace Seg3D {
 
 class RenderResources : public boost::noncopyable {
 
@@ -54,28 +54,24 @@ class RenderResources : public boost::noncopyable {
     
 // -- context handling --    
   public:  
-    // RENDER_CONTEXT:
-    // Get a handle to one of the allocated render contexts
-    bool render_context(size_t index, RenderContextHandle& context);
-
+    // CREATE_RENDER_CONTEXT:
+    // Generate a render context for one of the viewers
+    bool create_render_context(RenderContextHandle& context);
+    
+    // SHARED_RENDER_CONTEXT:
+    // Get the handle to the main shared render context
+    bool shared_render_context(RenderContextHandle& context);
+    
     // INSTALL_RESOURCES_CONTEXT:
     // Install a context from the UI system in the resource, so this
     // class can generate virtual OpenGL contexts. 
-    void install_resources_context(RenderResourcesContextHandle& resources_context);
+    void install_resources_context(RenderResourcesContextHandle resources_context);
     
     // VALID_RENDER_RESOURCES:
     // Check whether valid render resources have been installed
     bool valid_render_resources();
     
   private:
-    // Handle to the first renderer context that is always present.
-    RenderContextHandle              shared_render_context_;
-    
-    // List of predefined render contexts
-    std::vector<RenderContextHandle> render_context_list_;
-    
-    // Length of the list of predefined render contexts
-    size_t render_context_list_size_;
     
     // A Handle to resource that generated the contexts
     RenderResourcesContextHandle resources_context_;
@@ -102,9 +98,11 @@ class RenderResources : public boost::noncopyable {
   public:
     
     static RenderResources* Instance() { return instance_.instance(); }
-    static Singleton<RenderResources> instance_;
+    
+  private:
+    static Utils::Singleton<RenderResources> instance_;
 };
 
-} // end namespace Utils
+} // end namespace Seg3D
 
 #endif

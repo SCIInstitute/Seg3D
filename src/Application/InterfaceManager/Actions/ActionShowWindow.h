@@ -26,17 +26,43 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#include <Utils/Render/RenderResourcesContext.h>
+#ifndef APPLICATION_INTERFACEMANAGER_ACTIONS_ACTIONSHOWTOOL_H
+#define APPLICATION_INTERFACEMANAGER_ACTIONS_ACTIONSHOWTOOL_H
 
-namespace Utils {
+#include <Application/Action/Actions.h>
 
-RenderResourcesContext::RenderResourcesContext()
-{
-}
+namespace Seg3D {
 
-RenderResourcesContext::~RenderResourcesContext()
-{
-}
+class ActionShowWindow : public Action {
+  SCI_ACTION_TYPE("ShowWindow","ShowWindow windowid",INTERFACE_E)
 
-} // end namespace Utils
+// -- Constructor/Destructor --
+  public:
+    ActionShowWindow()
+    {
+      add_argument(windowid_);
+    }
+    
+    virtual ~ActionShowWindow() 
+    {}
 
+    void set(const std::string& windowid)
+    {
+      windowid_.value() = windowid;
+    }
+
+// -- Functions that describe action --
+    virtual bool validate(ActionHandle& self,
+                          ActionContextHandle& context);
+    virtual bool run(ActionHandle& self,
+                     ActionContextHandle& context);
+    
+// -- Action parameters --
+    ActionParameter<std::string> windowid_;
+};
+
+typedef boost::shared_ptr<ActionShowWindow> ActionShowWindowHandle;
+
+} // end namespace Seg3D
+
+#endif

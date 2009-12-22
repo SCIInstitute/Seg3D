@@ -82,22 +82,32 @@ IF(APPLE)
        POST_BUILD
        COMMAND [ ! -d Debug ] || cp -rf "${QT_QTCORE_LIBRARY_RELEASE}/Versions/4/QtCore" "Debug/Seg3D.app/Contents/MacOS/" 
        COMMAND [ ! -d Debug ] || cp -rf "${QT_QTGUI_LIBRARY_RELEASE}/Versions/4/QtGui" "Debug/Seg3D.app/Contents/MacOS/"
+       COMMAND [ ! -d Debug ] || cp -rf "${QT_QTOPENGL_LIBRARY_RELEASE}/Versions/4/QtOpenGL" "Debug/Seg3D.app/Contents/MacOS/"
        COMMAND [ ! -d Debug ] || install_name_tool -id QtCore Debug/Seg3D.app/Contents/MacOS/QtCore
        COMMAND [ ! -d Debug ] || install_name_tool -id QtGui Debug/Seg3D.app/Contents/MacOS/QtGui
+       COMMAND [ ! -d Debug ] || install_name_tool -id QtOpenGL Debug/Seg3D.app/Contents/MacOS/QtOpenGL
        COMMAND [ ! -d Debug ] || install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore Debug/Seg3D.app/Contents/MacOS/QtGui
+       COMMAND [ ! -d Debug ] || install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore Debug/Seg3D.app/Contents/MacOS/QtOpenGL
+       COMMAND [ ! -d Debug ] || install_name_tool -change QtGui.framework/Versions/4/QtGui @executable_path/QtGui Debug/Seg3D.app/Contents/MacOS/QtOpenGL
        COMMAND [ ! -d Debug ] || install_name_tool -change QtGui.framework/Versions/4/QtGui @executable_path/QtGui Debug/Seg3D.app/Contents/MacOS/Seg3D
        COMMAND [ ! -d Debug ] || install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore Debug/Seg3D.app/Contents/MacOS/Seg3D
+       COMMAND [ ! -d Debug ] || install_name_tool -change QtOpenGL.framework/Versions/4/QtOpenGL @executable_path/QtOpenGL Debug/Seg3D.app/Contents/MacOS/Seg3D
        COMMAND [ ! -d Debug ] || cp "-rf" "${QT_QTGUI_LIBRARY_RELEASE}/Versions/Current/Resources" "Debug/Seg3D.app/Contents"
        COMMAND [ ! -d Debug ] || [ -d Debug/Seg3D.app/Contents/MacOS/plugins ] || mkdir Debug/Seg3D.app/Contents/MacOS/plugins
        COMMAND [ ! -d Debug ] || cp -rf "${CMAKE_SOURCE_DIR}/CMake/qt.conf" Debug/Seg3D.app/Contents/Resources
 
        COMMAND [ ! -d Release ] || cp -rf "${QT_QTCORE_LIBRARY_RELEASE}/Versions/4/QtCore" "Release/Seg3D.app/Contents/MacOS/" 
        COMMAND [ ! -d Release ] || cp -rf "${QT_QTGUI_LIBRARY_RELEASE}/Versions/4/QtGui" "Release/Seg3D.app/Contents/MacOS/"
+       COMMAND [ ! -d Release ] || cp -rf "${QT_QTOPENGL_LIBRARY_RELEASE}/Versions/4/QtOpenGL" "Release/Seg3D.app/Contents/MacOS/"
        COMMAND [ ! -d Release ] || install_name_tool -id QtCore Release/Seg3D.app/Contents/MacOS/QtCore
        COMMAND [ ! -d Release ] || install_name_tool -id QtGui Release/Seg3D.app/Contents/MacOS/QtGui
+       COMMAND [ ! -d Release ] || install_name_tool -id QtOpenGL Release/Seg3D.app/Contents/MacOS/QtOpenGL
        COMMAND [ ! -d Release ] || install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore Release/Seg3D.app/Contents/MacOS/QtGui
+       COMMAND [ ! -d Release ] || install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore Release/Seg3D.app/Contents/MacOS/QtOpenGL
+       COMMAND [ ! -d Release ] || install_name_tool -change QtGui.framework/Versions/4/QtGui @executable_path/QtGui Release/Seg3D.app/Contents/MacOS/QtOpenGL
        COMMAND [ ! -d Release ] || install_name_tool -change QtGui.framework/Versions/4/QtGui @executable_path/QtGui Release/Seg3D.app/Contents/MacOS/Seg3D
        COMMAND [ ! -d Release ] || install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore Release/Seg3D.app/Contents/MacOS/Seg3D
+       COMMAND [ ! -d Release ] || install_name_tool -change QtOpenGL.framework/Versions/4/QtOpenGL @executable_path/QtOpenGL Release/Seg3D.app/Contents/MacOS/Seg3D
        COMMAND [ ! -d Release ] || cp "-rf" "${QT_QTGUI_LIBRARY_RELEASE}/Versions/Current/Resources" "Release/Seg3D.app/Contents"
        COMMAND [ ! -d Release ] || [ -d Release/Seg3D.app/Contents/MacOS/plugins ] || mkdir Release/Seg3D.app/Contents/MacOS/plugins
        COMMAND [ ! -d Release ] || cp -rf "${CMAKE_SOURCE_DIR}/CMake/qt.conf" Release/Seg3D.app/Contents/Resources
@@ -109,11 +119,16 @@ IF(APPLE)
        POST_BUILD
        COMMAND cp -rf "${QT_QTCORE_LIBRARY_RELEASE}/Versions/4/QtCore" "Seg3D.app/Contents/MacOS/"
        COMMAND cp -rf "${QT_QTGUI_LIBRARY_RELEASE}/Versions/4/QtGui" "Seg3D.app/Contents/MacOS/"
+       COMMAND cp -rf "${QT_QTOPENGL_LIBRARY_RELEASE}/Versions/4/QtOpenGL" "Seg3D.app/Contents/MacOS/"
        COMMAND install_name_tool -id QtCore Seg3D.app/Contents/MacOS/QtCore
        COMMAND install_name_tool -id QtGui Seg3D.app/Contents/MacOS/QtGui
+       COMMAND install_name_tool -id QtOpenGL Seg3D.app/Contents/MacOS/QtOpenGL
        COMMAND install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore Seg3D.app/Contents/MacOS/QtGui
+       COMMAND install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore Seg3D.app/Contents/MacOS/QtOpenGL
+       COMMAND install_name_tool -change QtGui.framework/Versions/4/QtGui @executable_path/QtGui   Seg3D.app/Contents/MacOS/QtOpenGL
        COMMAND install_name_tool -change QtGui.framework/Versions/4/QtGui @executable_path/QtGui Seg3D.app/Contents/MacOS/Seg3D
        COMMAND install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/QtCore Seg3D.app/Contents/MacOS/Seg3D
+       COMMAND install_name_tool -change QtOpenGL.framework/Versions/4/QtOpenGL @executable_path/QtOpenGL Seg3D.app/Contents/MacOS/Seg3D
        COMMAND cp "-rf" "${QT_QTGUI_LIBRARY_RELEASE}/Versions/Current/Resources" "Seg3D.app/Contents"
        COMMAND [ -d Seg3D.app/Contents/MacOS/plugins ] || mkdir Seg3D.app/Contents/MacOS/plugins
        COMMAND cp -rf "${CMAKE_SOURCE_DIR}/CMake/qt.conf" Seg3D.app/Contents/Resources
@@ -134,7 +149,7 @@ ELSE(APPLE)
     GET_FILENAME_COMPONENT(QTLIBDIR ${QT_QTCORE_LIBRARY_RELEASE} PATH)      
     GET_FILENAME_COMPONENT(QTLIBDIR ${QTLIBDIR} PATH)      
 
-    INSTALL(PROGRAMS ${QTLIBDIR}/bin/QtCore4.dll ${QTLIBDIR}/bin/QTGui4.dll
+    INSTALL(PROGRAMS ${QTLIBDIR}/bin/QtCore4.dll ${QTLIBDIR}/bin/QtGui4.dll ${QTLIBDIR}/bin/QtOpenGL4.dll
       DESTINATION bin )
   ELSE(WIN32)
     INSTALL(TARGETS Seg3D 

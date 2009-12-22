@@ -74,7 +74,7 @@ int main(int argc, char **argv)
   
   // -- Setup the QT Interface Layer --
   SCI_LOG_DEBUG("Setup QT Interface");
-  if (!(QtApplication::instance()->setup(argc,argv))) 
+  if (!(QtApplication::Instance()->setup(argc,argv))) 
   {
     SCI_LOG_ERROR("Could not setup QT Interface");  
     return (-1);
@@ -99,7 +99,7 @@ int main(int argc, char **argv)
   SCI_LOG_DEBUG("Start the main QT event loop");
   
   // Start the event processing loop
-  if (!(QtApplication::instance()->exec()))
+  if (!(QtApplication::Instance()->exec()))
   {
     SCI_LOG_ERROR("Interface thread crashed");  
     return (-1);

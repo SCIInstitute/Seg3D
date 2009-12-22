@@ -26,64 +26,43 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_VIEW_VIEW_H
-#define APPLICATION_VIEW_VIEW_H
+#ifndef APPLICATION_RENDERER_RENDERER_H
+#define APPLICATION_RENDERER_RENDERER_H
 
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+#ifdef (_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
 #endif
 
-// STL includes
-#include <vector>
-
-// Boost includes 
-#include <boost/shared_ptr.hpp>
 
 // Application includes
+#include <Application/Renderer/RenderContext.h>
 #include <Application/View/ViewRenderer.h>
 
 namespace Seg3D {
 
 // Forward declarations
-class View;
-typedef boost::shared_ptr<View> ViewHandle;
+class Renderer;
+boost::shared_ptr<Renderer> RendererHandle;
 
-
-// Class declarations
-
-class View {
-
-// -- types of views --
-  public:
-    enum view_type {
-      AXIAL_E = 0,
-      SAGITTAL_E,
-      CORONAL_E,
-      VOLUME_E
-    };
+// Class definitions
+class Renderer : public ViewRenderer {
 
 // -- constructor/destructor --
   public:
-    View();
-    virtual ~View();
+    Renderer();
+    virtual ~Renderer();
 
-    view_type type() const { return type_; }
-    void      set_type(view_type new_type) { type_ = new_type; }
-
-  private:
-    // Type of the view
-    view_type type_;
-
-// -- Renderer information --
-
-  // Note: by default a dummy renderer is generated.
   public:
+  
+    virtual void initialize();
+    virtual void redraw();
     
-    ViewRendererHandle renderer() { return renderer_; }
-    void set_renderer(ViewRendererHandle renderer) { renderer_ = renderer; }
+    virtual void resize(int width, int height);
 
   private:
-    ViewRendererHandle renderer_;
+    
+    // Context for rendering images
+    RenderContextHandle context_;
 };
 
 } // end namespace Seg3D

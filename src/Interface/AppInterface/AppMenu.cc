@@ -112,7 +112,7 @@ AppMenu::create_view_menu(QMenu* qmenu)
   
   QAction* qaction2;
   qaction2 = qmenu->addAction(tr("Only One Viewer"));
-  qaction2->setShortcut(tr("ALT+`"));
+  qaction2->setShortcut(tr("ALT+0"));
   qaction2->setToolTip(tr("Set the view to one large view"));
   ViewAction* vaction2 = new ViewAction(qaction2,1,0);
   connect(vaction2, SIGNAL(triggered(int, int)), viewer_pointer_, SLOT(set_views(int, int)));
@@ -168,8 +168,8 @@ void
 AppMenu::create_tool_menu(QMenu* qmenu)
 {
   ToolFactory::tool_list_type tool_types_list;
-  ToolFactory::Instance()->list_tool_types_with_interface(tool_types_list,Tool::TOOL_E);
   
+  ToolFactory::Instance()->list_tool_types_with_interface(tool_types_list,Tool::TOOL_E);  
   ToolFactory::tool_list_type::const_iterator it = tool_types_list.begin();
   ToolFactory::tool_list_type::const_iterator it_end = tool_types_list.end();
   int count = 0;
@@ -177,7 +177,7 @@ AppMenu::create_tool_menu(QMenu* qmenu)
   while(it != it_end)
   {
     // Add menu option to open tool
-    QAction* qaction = qmenu->addAction(QString((*it).second.c_str()));
+    QAction* qaction = qmenu->addAction(QString::fromStdString((*it).second));
     // TODO Connect the action to a keyboard shortcut DOESNT WORK YET
     qaction->setShortcut(tr("Alt+") + QString((count++)));
     // Connect the action with dispatching a command in the ToolManager
@@ -193,67 +193,99 @@ void
 AppMenu::create_filter_menu(QMenu* qmenu)
 {
   ToolFactory::tool_list_type tool_types_list;
-
+  ToolFactory::tool_list_type::const_iterator it;
+  ToolFactory::tool_list_type::const_iterator it_end;
+  
+  
   ToolFactory::Instance()->list_tool_types_with_interface(tool_types_list,Tool::DATATODATA_E|Tool::FILTER_E);  
+  it = tool_types_list.begin();
+  it_end = tool_types_list.end();  
+  while(it != it_end)
   {
-    ToolFactory::tool_list_type::const_iterator it = tool_types_list.begin();
-    ToolFactory::tool_list_type::const_iterator it_end = tool_types_list.end();  
-    while(it != it_end)
-    {
-      // Add menu option to open tool
-      QAction* qaction = qmenu->addAction(QString((*it).second.c_str()));
-      // Connect the action with dispatching a command in the ToolManager
-      QtBridge::connect(qaction,boost::bind(&ToolManager::dispatch_opentool,
-                                            ToolManager::Instance(),
-                                            (*it).first));
-      ++it;
-    }
+    // Add menu option to open tool
+    QAction* qaction = qmenu->addAction(QString::fromStdString((*it).second));
+    // Connect the action with dispatching a command in the ToolManager
+    QtBridge::connect(qaction,boost::bind(&ToolManager::dispatch_opentool,
+                                          ToolManager::Instance(),
+                                          (*it).first));
+    ++it;
   }
   
   qmenu->addSeparator();
 
   ToolFactory::Instance()->list_tool_types_with_interface(tool_types_list,Tool::DATATOMASK_E|Tool::FILTER_E);  
+  it = tool_types_list.begin();
+  it_end = tool_types_list.end();  
+  while(it != it_end)
   {
-    ToolFactory::tool_list_type::const_iterator it = tool_types_list.begin();
-    ToolFactory::tool_list_type::const_iterator it_end = tool_types_list.end();  
-    while(it != it_end)
-    {
-      // Add menu option to open tool
-      QAction* qaction = qmenu->addAction(QString((*it).second.c_str()));
-      // Connect the action with dispatching a command in the ToolManager
-      QtBridge::connect(qaction,boost::bind(&ToolManager::dispatch_opentool,
-                                            ToolManager::Instance(),
-                                            (*it).first));
-      ++it;
-    }
+    // Add menu option to open tool
+    QAction* qaction = qmenu->addAction(QString::fromStdString((*it).second));
+    // Connect the action with dispatching a command in the ToolManager
+    QtBridge::connect(qaction,boost::bind(&ToolManager::dispatch_opentool,
+                                          ToolManager::Instance(),
+                                          (*it).first));
+    ++it;
   }
 
   qmenu->addSeparator();
 
   ToolFactory::Instance()->list_tool_types_with_interface(tool_types_list,Tool::MASKTOMASK_E|Tool::FILTER_E);  
+  it = tool_types_list.begin();
+  it_end = tool_types_list.end();  
+  while(it != it_end)
   {
-    ToolFactory::tool_list_type::const_iterator it = tool_types_list.begin();
-    ToolFactory::tool_list_type::const_iterator it_end = tool_types_list.end();  
-    while(it != it_end)
-    {
-      // Add menu option to open tool
-      QAction* qaction = qmenu->addAction(QString((*it).second.c_str()));
-      // Connect the action with dispatching a command in the ToolManager
-      QtBridge::connect(qaction,boost::bind(&ToolManager::dispatch_opentool,
-                                            ToolManager::Instance(),
-                                            (*it).first));
-      ++it;
-    }
+    // Add menu option to open tool
+    QAction* qaction = qmenu->addAction(QString::fromStdString((*it).second));
+    // Connect the action with dispatching a command in the ToolManager
+    QtBridge::connect(qaction,boost::bind(&ToolManager::dispatch_opentool,
+                                          ToolManager::Instance(),
+                                          (*it).first));
+    ++it;
   }
 }
 
 void
 AppMenu::create_window_menu(QMenu* qmenu)
 {
-  // Controller Window
+  QAction* qaction = 0;
+
+  // Project Window
+  qaction = qmenu->addAction("Project Window");
+  QtBridge::connect(qaction,
+    boost::bind(&InterfaceManager::dispatch_show_window,
+                InterfaceManager::Instance(),std::string("project")));
+
+  // History Window
+  qaction = qmenu->addAction("History Window");
+  QtBridge::connect(qaction,
+    boost::bind(&InterfaceManager::dispatch_show_window,
+                InterfaceManager::Instance(),std::string("history")));
+
+  //Tools Window
+  qaction = qmenu->addAction("Tools Window");
+  QtBridge::connect(qaction,
+    boost::bind(&InterfaceManager::dispatch_show_window,
+                InterfaceManager::Instance(),std::string("tools")));
+
+  // Layer Manager Window
+  qaction = qmenu->addAction("Layer Manager Window");
+  QtBridge::connect(qaction,
+    boost::bind(&InterfaceManager::dispatch_show_window,
+                InterfaceManager::Instance(),std::string("layermanager")));
+
+  // Measurement Window
+  qaction = qmenu->addAction("Measurement Window");
+  QtBridge::connect(qaction,
+    boost::bind(&InterfaceManager::dispatch_show_window,
+                InterfaceManager::Instance(),std::string("measurement")));
+
   qmenu->addSeparator();
 
-  
+  // Controller Window
+  qaction = qmenu->addAction("Controller Window");
+  QtBridge::connect(qaction,
+    boost::bind(&InterfaceManager::dispatch_show_window,
+                InterfaceManager::Instance(),std::string("controller")));  
 
 }
 

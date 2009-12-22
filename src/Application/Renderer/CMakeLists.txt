@@ -1,3 +1,4 @@
+
 #
 #  For more information, please see: http://software.sci.utah.edu
 # 
@@ -26,14 +27,27 @@
 #  DEALINGS IN THE SOFTWARE.
 #
 
-ADD_SUBDIRECTORY(Action)
-ADD_SUBDIRECTORY(ActionManager)
-ADD_SUBDIRECTORY(Application)
-ADD_SUBDIRECTORY(Interface)
-ADD_SUBDIRECTORY(InterfaceManager)
-ADD_SUBDIRECTORY(Layer)
-ADD_SUBDIRECTORY(State)
-ADD_SUBDIRECTORY(Renderer)
-ADD_SUBDIRECTORY(Tool)
-ADD_SUBDIRECTORY(Tools)
-ADD_SUBDIRECTORY(View)
+##################################################
+# Set sources
+##################################################
+
+SET(APPLICATION_RENDERER_SRCS
+  RenderResources.h
+  RenderResources.cc
+  RenderResourcesContext.h
+  RenderResourcesContext.cc
+  RenderContext.h
+  RenderContext.cc
+  )
+
+
+ADD_LIBRARY(Application_Renderer STATIC 
+            ${APPLICATION_RENDERER_SRCS} )
+            
+TARGET_LINK_LIBRARIES(Application_Renderer
+                      Utils_Core
+                      Utils_EventHandler
+                      Application_View
+                      ${SCI_GLEW_LIBRARY}
+                      ${SCI_BOOST_LIBRARY})
+

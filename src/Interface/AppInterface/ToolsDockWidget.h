@@ -106,11 +106,11 @@ class ToolsDockWidget : public QDockWidget {
   // -- static functions for callbacks into this widget --
 
   public:
-    static void post_open_tool(QPointer<ToolsDockWidget> widget,
+    static void HandleOpenTool(QPointer<ToolsDockWidget> widget,
                                ToolHandle tool);
-    static void post_close_tool(QPointer<ToolsDockWidget> widget,
+    static void HandleCloseTool(QPointer<ToolsDockWidget> widget,
                                 ToolHandle tool);
-    static void post_activate_tool(QPointer<ToolsDockWidget> widget,
+    static void HandleActivateTool(QPointer<ToolsDockWidget> widget,
                                    ToolHandle tool);
     
 };
