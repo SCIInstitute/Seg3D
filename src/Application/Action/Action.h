@@ -222,11 +222,11 @@ class Action : public boost::noncopyable {
     
 };
 
-// ACTION_TYPE:
+// SCI_ACTION_TYPE:
 // Action type should be defined at the top of each action. It renders code that
 // allows both the class as well as the Action object to determine what its 
 // properties are. By defining class specific static functions the class 
-// properties cna be queried without instantiating the action. On the other
+// properties can be queried without instantiating the action. On the other
 // hand you want to query these properties from the object as well, even when
 // we only have a pointer to the base object. Hence we need virtual functions
 // as well. 
@@ -240,8 +240,8 @@ class Action : public boost::noncopyable {
     static std::string action_usage() { return usage_string; }\
     static int         action_properties() { return properties_mask; }\
     \
-    virtual std::string   type() const  { return std::string(action_type()); } \
-    virtual std::string   usage() const { return std::string(action_usage()); } \
+    virtual std::string   type() const  { return action_type(); } \
+    virtual std::string   usage() const { return action_usage(); } \
     virtual int           properties() const { return action_properties(); }
 
 } // end namespace seg3D

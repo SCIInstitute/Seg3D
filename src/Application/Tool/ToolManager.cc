@@ -93,7 +93,7 @@ ToolManager::open_tool(const std::string& toolid ,std::string& new_toolid)
   boost::unique_lock<boost::recursive_mutex> lock(tool_list_lock_);
 
   // Check whether an id number was attached
-  std::string tool_type = toolid;
+  std::string tool_type = Utils::string_to_lower(toolid);
   std::string::size_type loc = tool_type.find('_');
   if (loc != std::string::npos) 
   {

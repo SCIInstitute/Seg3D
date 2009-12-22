@@ -94,12 +94,9 @@ class ToolsDockWidget : public QDockWidget {
     widget_list_type widget_list_;
     
     // Pointer to the ToolBox Widget
-    //QToolBox* toolbox_;
     ToolBoxWidget* toolbox_;
-    
-  
+      
     // Build the GUI
-    //QToolBox* TB_Tools;
     ToolBoxWidget* TB_Tools;
     void make_dock_widget();
     

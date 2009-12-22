@@ -42,7 +42,7 @@ bool
 ToolFactory::is_tool_type(const std::string& tool_type)
 {
   boost::unique_lock<boost::mutex> lock(tools_mutex_);
-  tool_map_type::const_iterator it = tools_.find(tool_type);
+  tool_map_type::const_iterator it = tools_.find(Utils::string_to_lower(tool_type));
   if (it == tools_.end()) return (false);
   return (true);
 }
@@ -50,7 +50,7 @@ ToolFactory::is_tool_type(const std::string& tool_type)
 bool LessToolList(ToolFactory::tool_list_type::value_type val1,
                   ToolFactory::tool_list_type::value_type val2)
 {
-  return (val1.second < val2.second);
+  return (val1->menu_name() < val2->menu_name());
 }
     
 bool 
@@ -66,9 +66,9 @@ ToolFactory::list_tool_types(tool_list_type& tool_list, int properties)
   // loop through all the tools
   while (it != tools_.end())
   {
-    if (((*it).second.properties_ & properties) == properties)
+    if (((*it).second->properties() & properties) == properties)
     {
-      tool_list.push_back(std::make_pair((*it).first,(*it).second.menu_name_));
+      tool_list.push_back((*it).second);
     }
     ++it;
   }
@@ -93,11 +93,11 @@ ToolFactory::list_tool_types_with_interface(tool_list_type& tool_list, int prope
   // loop through all the tools
   while (it != tools_.end())
   {
-    if (((*it).second.properties_ & properties) == properties)
+    if (((*it).second->properties() & properties) == properties)
     {
       if (toolinterfaces_.find((*it).first) != toolinterfaces_.end())
       {
-        tool_list.push_back(std::make_pair((*it).first,(*it).second.menu_name_));
+        tool_list.push_back((*it).second);
       }
     }
     ++it;
@@ -118,19 +118,14 @@ ToolFactory::create_tool(const std::string& tool_type,
   boost::unique_lock<boost::mutex> lock(tools_mutex_);
 
   // Step (1): find the tool
-  tool_map_type::const_iterator it = tools_.find(tool_type);
+  tool_map_type::const_iterator it = tools_.find(Utils::string_to_lower(tool_type));
 
   // Step (2): check its existence
   if (it == tools_.end()) return (false);
 
   // Step (3): build the tool
-  tool = (*it).second.builder_->build(toolid);
-  
-  // Step (4): insert the type_name and the properties into the tool
-  tool->set_type(tool_type);
-  tool->set_properties((*it).second.properties_);
-  tool->set_menu_name((*it).second.menu_name_);
-  
+  tool = (*it).second->builder()->build(toolid);
+    
   return (true);
 }
 
@@ -148,7 +143,7 @@ ToolFactory::create_toolinterface(const std::string& toolinterface_name,
   if (it == toolinterfaces_.end())
   {
     SCI_THROW_LOGICERROR(std::string("Trying to instantiate tool '")
-                                    +toolinterface_name +"'that does not exist");
+                              +toolinterface_name +"' that does not exist");
   }
 
   // Step (3): build the tool

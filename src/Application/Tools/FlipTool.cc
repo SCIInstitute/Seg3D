@@ -33,7 +33,7 @@
 namespace Seg3D {
 
 // Register the tool into the tool factory
-SCI_REGISTER_TOOL(FlipTool,"Flip/Rotate Tool",Tool::TOOL_E)
+SCI_REGISTER_TOOL(FlipTool)
 
 FlipTool::FlipTool(const std::string& toolid) :
   Tool(toolid)

@@ -212,11 +212,12 @@ ToolsDockWidget::open_tool(ToolHandle tool)
   // Step (2) : instantiate the widget
   widget->create_widget(this,tool);
 
-  std::string h = boost::lexical_cast<std::string>(widget->height());
-   
   toolbox_->add_tool(widget,QString::fromStdString(tool->menu_name()
-                              +" "+Utils::to_string(tool->toolid_number())));
+                      +" "+Utils::to_string(tool->toolid_number())));
+
   widget_list_[tool->toolid()] = widget;
+  
+  raise();
 }
 
 void
@@ -224,16 +225,18 @@ ToolsDockWidget::close_tool(ToolHandle tool)
 {
   // Find the widget
   widget_list_type::iterator it = widget_list_.find(tool->toolid());
+  
   if (it == widget_list_.end()) 
   {
     SCI_LOG_ERROR(std::string("widget with toolid '")+tool->toolid()+"' does not exist");
     return;
   } 
+  
   ToolWidget *widget = (*it).second;
   
   // Remove this widget from the widget
-  //toolbox_->removeItem(toolbox_->indexOf(widget));
   toolbox_->remove_tool(toolbox_->index_of(widget));
+  
   // Remove the pointer from widget 
   widget_list_.erase(tool->toolid());
   
@@ -281,13 +284,12 @@ ToolsDockWidget::tool_changed(int index)
 void
 ToolsDockWidget::HandleOpenTool(QPointer<ToolsDockWidget> tools_widget,ToolHandle tool)
 {
-  SCI_LOG_DEBUG("Post Open Tool");
   if (!(Interface::IsInterfaceThread()))
   {
     Interface::Instance()->post_event(boost::bind(&ToolsDockWidget::HandleOpenTool,tools_widget,tool));
     return;
   }
-  
+
   if (tools_widget.data()) tools_widget->open_tool(tool);
 }
 
@@ -296,7 +298,6 @@ ToolsDockWidget::HandleCloseTool(QPointer<ToolsDockWidget> tools_widget,ToolHand
 {
   if (!(Interface::IsInterfaceThread()))
   {
-    SCI_LOG_MESSAGE("Posting close tool");
     Interface::Instance()->post_event(boost::bind(&ToolsDockWidget::HandleCloseTool,tools_widget,tool));
     return;
   }

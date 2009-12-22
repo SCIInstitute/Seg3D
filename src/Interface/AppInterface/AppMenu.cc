@@ -172,18 +172,16 @@ AppMenu::create_tool_menu(QMenu* qmenu)
   ToolFactory::Instance()->list_tool_types_with_interface(tool_types_list,Tool::TOOL_E);  
   ToolFactory::tool_list_type::const_iterator it = tool_types_list.begin();
   ToolFactory::tool_list_type::const_iterator it_end = tool_types_list.end();
-  int count = 0;
   
   while(it != it_end)
   {
     // Add menu option to open tool
-    QAction* qaction = qmenu->addAction(QString::fromStdString((*it).second));
-    // TODO Connect the action to a keyboard shortcut DOESNT WORK YET
-    qaction->setShortcut(tr("Alt+") + QString((count++)));
+    QAction* qaction = qmenu->addAction(QString::fromStdString((*it)->menu_name()));
+    qaction->setShortcut(QString::fromStdString((*it)->shortcut_key()));
+    
     // Connect the action with dispatching a command in the ToolManager
     QtBridge::connect(qaction,boost::bind(&ToolManager::dispatch_opentool,
-                                          ToolManager::Instance(),
-                                          (*it).first));
+                                          ToolManager::Instance(),(*it)->type()));
     ++it;
   }
 }
@@ -203,11 +201,11 @@ AppMenu::create_filter_menu(QMenu* qmenu)
   while(it != it_end)
   {
     // Add menu option to open tool
-    QAction* qaction = qmenu->addAction(QString::fromStdString((*it).second));
+    QAction* qaction = qmenu->addAction(QString::fromStdString((*it)->menu_name()));
     // Connect the action with dispatching a command in the ToolManager
     QtBridge::connect(qaction,boost::bind(&ToolManager::dispatch_opentool,
                                           ToolManager::Instance(),
-                                          (*it).first));
+                                          (*it)->type()));
     ++it;
   }
   
@@ -219,11 +217,11 @@ AppMenu::create_filter_menu(QMenu* qmenu)
   while(it != it_end)
   {
     // Add menu option to open tool
-    QAction* qaction = qmenu->addAction(QString::fromStdString((*it).second));
+    QAction* qaction = qmenu->addAction(QString::fromStdString((*it)->menu_name()));
     // Connect the action with dispatching a command in the ToolManager
     QtBridge::connect(qaction,boost::bind(&ToolManager::dispatch_opentool,
                                           ToolManager::Instance(),
-                                          (*it).first));
+                                          (*it)->type()));
     ++it;
   }
 
@@ -235,11 +233,11 @@ AppMenu::create_filter_menu(QMenu* qmenu)
   while(it != it_end)
   {
     // Add menu option to open tool
-    QAction* qaction = qmenu->addAction(QString::fromStdString((*it).second));
+    QAction* qaction = qmenu->addAction(QString::fromStdString((*it)->menu_name()));
     // Connect the action with dispatching a command in the ToolManager
     QtBridge::connect(qaction,boost::bind(&ToolManager::dispatch_opentool,
                                           ToolManager::Instance(),
-                                          (*it).first));
+                                          (*it)->type()));
     ++it;
   }
 }

@@ -101,7 +101,7 @@ int main(int argc, char **argv)
   // Start the event processing loop
   if (!(QtApplication::Instance()->exec()))
   {
-    SCI_LOG_ERROR("Interface thread crashed");  
+    SCI_LOG_ERROR("The interface thread crashed, exiting Seg3D");  
     return (-1);
   }
     
@@ -109,5 +109,3 @@ int main(int argc, char **argv)
   SCI_LOG_MESSAGE("--- Finished ---");
   return (0);
 }
-
-

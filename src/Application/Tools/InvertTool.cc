@@ -33,7 +33,7 @@
 namespace Seg3D {
 
 // Register the tool into the tool factory
-SCI_REGISTER_TOOL(InvertTool,"Invert Tool",Tool::TOOL_E)
+SCI_REGISTER_TOOL(InvertTool)
 
 InvertTool::InvertTool(const std::string& toolid) :
   Tool(toolid)

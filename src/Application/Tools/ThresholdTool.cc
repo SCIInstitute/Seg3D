@@ -33,7 +33,7 @@
 namespace Seg3D {
 
 // Register the tool into the tool factory
-SCI_REGISTER_TOOL(ThresholdTool,"Threshold Tool",Tool::TOOL_E)
+SCI_REGISTER_TOOL(ThresholdTool)
 
 ThresholdTool::ThresholdTool(const std::string& toolid) :
   Tool(toolid)

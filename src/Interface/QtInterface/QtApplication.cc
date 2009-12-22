@@ -85,21 +85,25 @@ QtApplication::setup(int argc, char **argv)
 bool
 QtApplication::exec()
 {
+  bool success = true;
   try
   {
     SCI_LOG_DEBUG("Starting Qt main event loop");
-    qt_application_->exec();
+    if (!(qt_application_->exec() == 0))
+    {
+      success = false;
+    }
     
     delete qt_application_;
     qt_application_ = 0;
   }
   catch(...)
   {
-    SCI_LOG_ERROR("Main Qt event loop crashed by throwing an exception");
-    return (false);
+    SCI_LOG_DEBUG("Qt crashed by throwing an exception");
+    success = false;
   }
   
-  return (true);
+  return (false);
 }
 
 QApplication* 

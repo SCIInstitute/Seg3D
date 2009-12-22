@@ -27,6 +27,7 @@
 */
 
 #include <Utils/Core/Exception.h>
+#include <Utils/Core/Log.h>
 
 #include <Interface/QtInterface/QtEventHandler.h>
 
@@ -57,7 +58,31 @@ QtEventFilter::eventFilter(QObject* obj, QEvent* event)
       dynamic_cast<QtUserEvent *>(event);
  
     // Run the code that was send to us
-    user_event->event_handle_->handle_event();
+    try
+    {
+      user_event->event_handle_->handle_event();
+    }
+    catch(Utils::Exception& except)
+    {  
+      // Catch any Seg3D generated exceptions and display there message in the log file
+      SCI_LOG_ERROR(std::string("Interface event loop crashed by throwing an exception: ") + except.message());
+      QCoreApplication::exit(-1);
+      return (false);
+    }
+    catch(std::exception& except)
+    {
+      // For any other exception
+      SCI_LOG_ERROR(std::string("Interface event loop crashed by throwing an exception: ") + except.what());
+      QCoreApplication::exit(-1);
+      return (false);
+    }
+    catch(...)
+    {
+      // For any other exception
+      SCI_LOG_ERROR(std::string("Interface event loop crashed by throwing an unknown exception"));
+      QCoreApplication::exit(-1);
+      return (false);
+    }
     
     return (false);
   }

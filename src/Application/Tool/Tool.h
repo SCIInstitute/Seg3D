@@ -76,32 +76,19 @@ class Tool : public StateHandler {
 
 // -- tool_group/tool_type/toolid --
 
-    int         properties() const    { return properties_; }
-    std::string type() const          { return type_; }
-    std::string menu_name() const     { return menu_name_; }
+    virtual std::string type() const = 0;
+    virtual std::string menu_name() const = 0;
+    virtual std::string shortcut_key() const = 0;
+    virtual int         properties() const = 0;
+    
     std::string toolid() const        { return toolid_; }
     int toolid_number() const         { return toolid_number_; }
 
   protected:
     friend class ToolFactory;
-    // As each tool is created through the factory the properties and the 
-    // type name are set through the factory so it only needs to be set once.
-    
-    // The detailed reason for not including these in the constructor is that
-    // the ToolFactory will not know about them until the object has been
-    // instantiated. In the current design it is recorded separately in the
-    // factory and then inserted into the Tool object upon creation. This
-    // avoids duplicating the properties and typename registration.
-    
-    void set_properties(int properties) { properties_ = properties; }
-    void set_menu_name(const std::string& menu_name) { menu_name_ = menu_name; }
-    void set_type(const std::string& type) { type_ = type; }
 
   private:
     std::string           toolid_;
-    int                   properties_;    
-    std::string           type_;
-    std::string           menu_name_;
     int                   toolid_number_;
     
 // -- close tool --
@@ -148,6 +135,28 @@ class Tool : public StateHandler {
     // activated.
     virtual void deactivate();
 };
+
+// SCI_TOOL_TYPE:
+// Tool type should be defined at the top of each action. It renders code that
+// allows both the class as well as the Tool object to determine what its
+// properties are. By defining class specific static functions the class 
+// properties can be queried without instantiating the action. On the other
+// hand you want to query these properties from the object as well, even when
+// we only have a pointer to the base object. Hence we need virtual functions
+// as well. 
+
+#define SCI_TOOL_TYPE(type_string,menu_name_string,shortcut_key_string,properties_mask) \
+  public: \
+    static std::string tool_type() { return Utils::string_to_lower(type_string); } \
+    static std::string tool_menu_name() { return menu_name_string; } \
+    static std::string tool_shortcut_key() { return shortcut_key_string; } \
+    static int         tool_properties() { return properties_mask; } \
+    \
+    virtual std::string type() const { return tool_type(); } \
+    virtual std::string menu_name() const { return tool_menu_name(); } \
+    virtual std::string shortcut_key() const { return tool_shortcut_key(); } \
+    virtual int         properties() const { return tool_properties(); }
+
 
 } // end namespace Seg3D
 

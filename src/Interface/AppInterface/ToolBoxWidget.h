@@ -45,81 +45,77 @@ namespace Seg3D {
 
 class ToolBoxWidget : public QWidget
 {    
-  Q_OBJECT
-  
-  Q_SIGNALS:
-    void currentChanged( int index );
-    void tool_removed_signal( int index );
-  
-public:
-  
-  ToolBoxWidget(QWidget* parent=0);
-  virtual ~ToolBoxWidget();
-  
-  struct Page {
+    Q_OBJECT
     
-    QWidget *page_;
+    Q_SIGNALS:
+      void currentChanged( int index );
+      void tool_removed_signal( int index );
+    
+  public:
+    
+    ToolBoxWidget(QWidget* parent=0);
+    virtual ~ToolBoxWidget();
+    
+    struct Page {
+      
+      QWidget *page_;
 
-    QWidget *background_;
-    QWidget *header_;
-    
-    QHBoxLayout *hLayout_;
-    QHBoxLayout *hLayout_2;
-    
-    QVBoxLayout *vLayout_;
-    QVBoxLayout *vLayout_2;
-    
-    QPushButton *activate_button_;
-    QToolButton *help_button_;
-    QToolButton *close_button_;
-    
-    QFrame *tool_frame_;
-    QWidget *tool_;
-            
-    inline bool operator==(const Page& other) const
-    {
-      return tool_ == other.tool_;
-    }
+      QWidget *background_;
+      QWidget *header_;
+      
+      QHBoxLayout *hLayout_;
+      QHBoxLayout *hLayout_2;
+      
+      QVBoxLayout *vLayout_;
+      QVBoxLayout *vLayout_2;
+      
+      QPushButton *activate_button_;
+      QToolButton *help_button_;
+      QToolButton *close_button_;
+      
+      QFrame *tool_frame_;
+      QWidget *tool_;
+              
+      inline bool operator==(const Page& other) const
+      {
+        return tool_ == other.tool_;
+      }
 
+      
+    };
     
-  };
-  
-  QVBoxLayout* main_layout_;
-  QGridLayout* main_layout;
-  
-  typedef QList <QSharedPointer<Page> > PageList;
-  PageList tool_list_;
-  
-  void add_tool ( QWidget * tool, const QString & text );
-  void remove_tool ( QWidget *tool );
-  void remove_tool ( int index );
-  void tool_removed( int index );
-  
-  int active_index_;
-  QWidget *active_tool_;
-  QSharedPointer <Page> active_page_;
-  
-  inline int get_active_index(){ return active_index_; }
-  inline QWidget *get_active_tool(){ return active_tool_;}
-  inline QWidget *get_tool_at(int index){ return tool_list_.at(index)->tool_; }
-  inline QSharedPointer <Page> get_active_page(){ return active_page_; }
-  
-  void set_active_index(int index);
-  void set_active_tool(QWidget *tool);
-  void set_active_page(Page *page);
-  
-  QSharedPointer <Page> page(QWidget *tool_);
-  
-  int index_of(QWidget *index);
-  
-  private Q_SLOTS:
-    void buttonClicked();
-    void itemDestroyed(QObject*);
-  
-  public Q_SLOTS:
- 
-  
-  
+    QVBoxLayout* main_layout_;
+    QGridLayout* main_layout;
+    
+    typedef QList <QSharedPointer<Page> > PageList;
+    PageList tool_list_;
+    
+    void add_tool ( QWidget * tool, const QString & text );
+    void remove_tool ( QWidget *tool );
+    void remove_tool ( int index );
+    void tool_removed( int index );
+    
+    int active_index_;
+    QWidget *active_tool_;
+    QSharedPointer <Page> active_page_;
+    
+    inline int get_active_index(){ return active_index_; }
+    inline QWidget *get_active_tool(){ return active_tool_;}
+    inline QWidget *get_tool_at(int index){ return tool_list_.at(index)->tool_; }
+    inline QSharedPointer <Page> get_active_page(){ return active_page_; }
+    
+    void set_active_index(int index);
+    void set_active_tool(QWidget *tool);
+    void set_active_page(Page *page);
+    
+    QSharedPointer <Page> page(QWidget *tool_);
+    
+    int index_of(QWidget *index);
+    
+    private Q_SLOTS:
+      void buttonClicked();
+      void itemDestroyed(QObject*);
+    
 };
 
 

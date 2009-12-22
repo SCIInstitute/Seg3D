@@ -113,29 +113,48 @@ class ToolInterfaceBuilder: public ToolInterfaceBuilderBase {
 
 class ToolInfo {
   public:
-    ToolInfo(ToolBuilderBase* builder, int properties, std::string menu_name) :
+    ToolInfo(std::string type,
+             ToolBuilderBase* builder, 
+             int properties, 
+             std::string menu_name,
+             std::string shortcut_key) :
+      type_(type),
       builder_(builder),
       properties_(properties),
-      menu_name_(menu_name)
+      menu_name_(menu_name),
+      shortcut_key_(shortcut_key)
     {}
     
     // Copy constructor and default constructor are needed by the unordered_map
     // class
     ToolInfo(const ToolInfo& toolinfo) :
+      type_(toolinfo.type_),
       builder_(toolinfo.builder_),
       properties_(toolinfo.properties_),
-      menu_name_(toolinfo.menu_name_)
+      menu_name_(toolinfo.menu_name_),
+      shortcut_key_(toolinfo.shortcut_key_)
     {}
     
     ToolInfo() :
+      type_(""),
       builder_(0),
       properties_(0),
-      menu_name_("")
+      menu_name_(""),
+      shortcut_key_("")
     {}
     
+    std::string       type() const { return type_; }
+    ToolBuilderBase*  builder() const { return builder_; }
+    int               properties() const { return properties_; }
+    std::string       menu_name() const { return menu_name_; }
+    std::string       shortcut_key() const { return shortcut_key_; }    
+        
+  private:
+    std::string       type_;
     ToolBuilderBase*  builder_;
     int               properties_;
     std::string       menu_name_;
+    std::string       shortcut_key_;
 };
 
 
@@ -159,35 +178,38 @@ class ToolFactory : public boost::noncopyable  {
     // factory.
   
     template <class TOOL>
-    void register_tool(std::string tool_name, 
-                       std::string tool_menu_name, 
-                       int tool_properties)
+    void register_tool()
     {
-      tool_name = Utils::string_to_lower(tool_name);
       // Lock the factory
       boost::unique_lock<boost::mutex> lock(tools_mutex_);
 
+      // Get the type of the tool
+      std::string tool_type = Utils::string_to_lower(TOOL::tool_type());
+
       // Test is tool was registered before.
-      if (tools_.find(tool_name) != tools_.end())
+      if (tools_.find(tool_type) != tools_.end())
       {
         // Actions that are registered twice, will cause problems
         // Hence the program will throw an exception.
         // As registration is done on startup, this will cause a
         // faulty program to fail always on startup.
-        SCI_THROW_LOGICERROR(std::string("Tool '")+tool_name+"' is registered twice");
+        SCI_THROW_LOGICERROR(std::string("Tool '")+tool_type+"' is registered twice");
       }
 
       // Register the action and set its properties
-      tools_[tool_name] = ToolInfo(new ToolBuilder<TOOL>,
-                                        tool_properties,tool_menu_name);
+      tools_[tool_type] = new ToolInfo(TOOL::tool_type(),
+                                       new ToolBuilder<TOOL>,
+                                       TOOL::tool_properties(),
+                                       TOOL::tool_menu_name(),
+                                       TOOL::tool_shortcut_key());
       
-      SCI_LOG_DEBUG(std::string("Registering tool : ") + tool_name);
+      SCI_LOG_DEBUG(std::string("Registering tool : ") + tool_type);
     }
 
   private:
     
     // Mutex protecting the singleton interface  
-    typedef boost::unordered_map<std::string,ToolInfo>  tool_map_type;
+    typedef boost::unordered_map<std::string,ToolInfo*>  tool_map_type;
     
     // List with builders that can be called to generate a new object
     tool_map_type    tools_;
@@ -258,7 +280,7 @@ class ToolFactory : public boost::noncopyable  {
 // -- List of tools and interfaces --
   public:
     // pairs of tool name and the name the tool should have in the menu
-    typedef std::vector<std::pair<std::string,std::string> > tool_list_type;
+    typedef std::vector<ToolInfo*> tool_list_type;
 
     // IS_TOOL_TYPE:
     // Check whether a tool with a specified name is available
@@ -284,10 +306,10 @@ class ToolFactory : public boost::noncopyable  {
 
 } // end namespace seg3D
 
-#define SCI_REGISTER_TOOL(name,menuname,properties)\
+#define SCI_REGISTER_TOOL(name)\
 void register_tool_##name()\
 {\
-  ToolFactory::Instance()->register_tool<name>(#name,menuname,properties);\
+  ToolFactory::Instance()->register_tool<name>();\
 } 
 
 #define SCI_REGISTER_TOOLINTERFACE(name)\
