@@ -81,6 +81,10 @@ class Log : public boost::noncopyable {
 
     void post_debug(std::string message, const int line, const char* file);
 
+  private:
+    // HEADER:
+    // Generate a uniform header for the message that is posted
+    std::string header(const int line, const char* file) const;
 
 // -- signal where to receive the logging information from --
   public:

@@ -52,9 +52,6 @@
 #include <Interface/AppInterface/ToolBoxWidget.h>
 
 namespace Seg3D {
-  
-class ToolsDockWidgetPrivate;
-  
 
 class ToolsDockWidget : public QDockWidget {
     Q_OBJECT
@@ -82,8 +79,6 @@ class ToolsDockWidget : public QDockWidget {
     void tool_changed(int index);
 
   private:
-    // Internals of the dockwidget  
-    boost::shared_ptr<ToolsDockWidgetPrivate> private_;
 
     boost::signals2::connection open_tool_connection_;
     boost::signals2::connection close_tool_connection_;
@@ -95,10 +90,6 @@ class ToolsDockWidget : public QDockWidget {
     
     // Pointer to the ToolBox Widget
     ToolBoxWidget* toolbox_;
-      
-    // Build the GUI
-    ToolBoxWidget* TB_Tools;
-    void make_dock_widget();
     
   // -- static functions for callbacks into this widget --
 

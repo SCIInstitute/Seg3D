@@ -93,6 +93,7 @@ class AppInterface : public QMainWindow
 
   private:
 
+    void add_windowids();
     void show_window(const std::string& windowid);
     void close_window(const std::string& windowid);
 

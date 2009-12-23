@@ -33,41 +33,47 @@
 #include <iostream>
 #include <boost/lexical_cast.hpp>
 
-
-
 namespace Seg3D  {
-
     
-ToolBoxWidget::ToolBoxWidget(QWidget* parent)
+ToolBoxWidget::ToolBoxWidget(QWidget* parent) :
+  QScrollArea(parent)
 {
-  main_layout_ = new QVBoxLayout( this );
-  main_layout_->setContentsMargins(2, 2, 2, 0);
-  main_layout_->setSpacing(2);  
+  setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+  setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+  setContentsMargins(1, 1, 1, 1);
+  setWidgetResizable(true);
+
+  main_ = new QWidget(this);
+  setWidget(main_);
+
+  main_layout_ = new QVBoxLayout( main_ );
+  main_layout_->setContentsMargins(1, 1, 1, 1);
+  main_layout_->setSpacing(1);
   
- 
+  tool_layout_ = new QVBoxLayout;
+  main_layout_->addLayout(tool_layout_);
+  main_layout_->addStretch();
+  
+  main_->setLayout(main_layout_);
+}
+
+ToolBoxWidget::~ToolBoxWidget()
+{
 }
   
-void ToolBoxWidget::add_tool(QWidget * tool, const QString &label)
+
+void 
+ToolBoxWidget::add_tool(QWidget * tool, const QString &label)
 {
+  if ( !tool ) return;
   
-  //message for checking the height of the passed tool
-  std::string h = boost::lexical_cast<std::string>(tool->height());
-  SCI_LOG_MESSAGE("The the height of the new tool is: "+ h);
-  
-  if ( !tool )
-    return;
-  
-  QSharedPointer<Page> page_handle_ (new Page);
-  
-  
-  page_handle_->tool_ = tool;
+  PageHandle page_handle(new Page);
+  page_handle->tool_ = tool;
     
   //  --- Begin QT Widget Design --- //
   
-  page_handle_->page_ = new QWidget;
-  //page_handle_->page_->resize(1,1);
-
-  page_handle_->page_->setStyleSheet(QString::fromUtf8("QPushButton#activate_button_{\n"
+  page_handle->page_ = new QWidget;
+  page_handle->page_->setStyleSheet(QString::fromUtf8("QPushButton#activate_button_{\n"
                                                  "  \n"
                                                  "  margin-right: 7px;\n"
                                                  "  height: 18px;\n"
@@ -91,7 +97,6 @@ void ToolBoxWidget::add_tool(QWidget * tool, const QString &label)
                                                  "\n"
                                                  "QToolButton{\n"
                                                  "  background-color: qlineargradient(spread:pad, x1:0.5, y1:0.733364, x2:0.5, y2:0, stop:0 rgba(25, 25, 25, 0), stop:1 rgba(136, 0, 0, 0));\n"
-                                                 //"  background-color: silver; padding-right: 2px;\n"
                                                  "  border: none;\n"
                                                  "\n"
                                                  "}\n"
@@ -115,95 +120,94 @@ void ToolBoxWidget::add_tool(QWidget * tool, const QString &label)
                                                  "    border-radius: 6px;\n"
                                                  "}\n"
                                                  "QFrame#tool_frame_{ border-radius: 4px; border: 1px solid gray; }     "));
-  page_handle_->vLayout_ = new QVBoxLayout(page_handle_->page_);
-  page_handle_->vLayout_->setSpacing(1);
-  page_handle_->vLayout_->setContentsMargins(0, 0, 0, 0);
-  page_handle_->vLayout_->setObjectName(QString::fromUtf8("vLayout_"));
-  page_handle_->vLayout_->setContentsMargins(0, 0, 0, 0);
-  page_handle_->background_ = new QWidget(page_handle_->page_);
-  page_handle_->background_->setObjectName(QString::fromUtf8("background_"));
+  page_handle->vLayout_ = new QVBoxLayout(page_handle->page_);
+  page_handle->vLayout_->setSpacing(1);
+  page_handle->vLayout_->setContentsMargins(0, 0, 0, 0);
+  page_handle->vLayout_->setObjectName(QString::fromUtf8("vLayout_"));
+  page_handle->vLayout_->setContentsMargins(0, 0, 0, 0);
+  page_handle->background_ = new QWidget(page_handle->page_);
+  page_handle->background_->setObjectName(QString::fromUtf8("background_"));
   QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
   sizePolicy.setHorizontalStretch(0);
   sizePolicy.setVerticalStretch(0);
-  sizePolicy.setHeightForWidth(page_handle_->background_->sizePolicy().hasHeightForWidth());
-  page_handle_->background_->setSizePolicy(sizePolicy);
-  page_handle_->background_->setMinimumSize(QSize(215, 21));
-  page_handle_->background_->setMaximumSize(QSize(215, 21));
-  page_handle_->hLayout_2 = new QHBoxLayout(page_handle_->background_);
-  page_handle_->hLayout_2->setSpacing(0);
-  page_handle_->hLayout_2->setContentsMargins(0, 0, 0, 0);
-  page_handle_->hLayout_2->setObjectName(QString::fromUtf8("hLayout_2"));
-  page_handle_->header_ = new QWidget(page_handle_->background_);
-  page_handle_->header_->setObjectName(QString::fromUtf8("header_"));
-  sizePolicy.setHeightForWidth(page_handle_->header_->sizePolicy().hasHeightForWidth());
-  page_handle_->header_->setSizePolicy(sizePolicy);
-  page_handle_->header_->setMinimumSize(QSize(215, 21));
-  page_handle_->header_->setMaximumSize(QSize(215, 21));
-  page_handle_->hLayout_ = new QHBoxLayout(page_handle_->header_);
-  page_handle_->hLayout_->setSpacing(1);
-  page_handle_->hLayout_->setContentsMargins(0, 0, 0, 0);
-  page_handle_->hLayout_->setObjectName(QString::fromUtf8("hLayout_"));
-  page_handle_->activate_button_ = new QPushButton(page_handle_->header_);
-  page_handle_->activate_button_->setText(label);
-  page_handle_->activate_button_->setObjectName(QString::fromUtf8("activate_button_"));
-  page_handle_->activate_button_->setCheckable(false);
-  page_handle_->activate_button_->setFlat(true);
-  page_handle_->hLayout_->addWidget(page_handle_->activate_button_);
-  page_handle_->help_button_ = new QToolButton(page_handle_->header_);
-  page_handle_->help_button_->setObjectName(QString::fromUtf8("help_button_"));
+  sizePolicy.setHeightForWidth(page_handle->background_->sizePolicy().hasHeightForWidth());
+  page_handle->background_->setSizePolicy(sizePolicy);
+  page_handle->background_->setMinimumSize(QSize(215, 21));
+  page_handle->background_->setMaximumSize(QSize(215, 21));
+  page_handle->hLayout_2 = new QHBoxLayout(page_handle->background_);
+  page_handle->hLayout_2->setSpacing(0);
+  page_handle->hLayout_2->setContentsMargins(0, 0, 0, 0);
+  page_handle->hLayout_2->setObjectName(QString::fromUtf8("hLayout_2"));
+  page_handle->header_ = new QWidget(page_handle->background_);
+  page_handle->header_->setObjectName(QString::fromUtf8("header_"));
+  sizePolicy.setHeightForWidth(page_handle->header_->sizePolicy().hasHeightForWidth());
+  page_handle->header_->setSizePolicy(sizePolicy);
+  page_handle->header_->setMinimumSize(QSize(215, 21));
+  page_handle->header_->setMaximumSize(QSize(215, 21));
+  page_handle->hLayout_ = new QHBoxLayout(page_handle->header_);
+  page_handle->hLayout_->setSpacing(1);
+  page_handle->hLayout_->setContentsMargins(0, 0, 0, 0);
+  page_handle->hLayout_->setObjectName(QString::fromUtf8("hLayout_"));
+  page_handle->activate_button_ = new QPushButton(page_handle->header_);
+  page_handle->activate_button_->setText(label);
+  page_handle->activate_button_->setObjectName(QString::fromUtf8("activate_button_"));
+  page_handle->activate_button_->setCheckable(false);
+  page_handle->activate_button_->setFlat(true);
+  page_handle->hLayout_->addWidget(page_handle->activate_button_);
+  page_handle->help_button_ = new QToolButton(page_handle->header_);
+  page_handle->help_button_->setObjectName(QString::fromUtf8("help_button_"));
   
   ///  ---  This is where we add the icon's for the help button --- //
   QIcon icon;
   icon.addFile(QString::fromUtf8(":/new/images/show_info.png"), QSize(), QIcon::Normal, QIcon::Off);
-  page_handle_->help_button_->setIcon(icon);
-  page_handle_->help_button_->setIconSize(QSize(18, 18));
+  page_handle->help_button_->setIcon(icon);
+  page_handle->help_button_->setIconSize(QSize(18, 18));
   
-  page_handle_->hLayout_->addWidget(page_handle_->help_button_);
-  page_handle_->close_button_ = new QToolButton(page_handle_->header_);
-  page_handle_->close_button_->setObjectName(QString::fromUtf8("close_button_"));
+  page_handle->hLayout_->addWidget(page_handle->help_button_);
+  page_handle->close_button_ = new QToolButton(page_handle->header_);
+  page_handle->close_button_->setObjectName(QString::fromUtf8("close_button_"));
   
    ///  ---  This is where we add the icon's for the close button --- //
   QIcon icon1;
   icon1.addFile(QString::fromUtf8(":/new/images/close.png"), QSize(), QIcon::Normal, QIcon::Off);
-  page_handle_->close_button_->setIcon(icon1);
-  page_handle_->close_button_->setIconSize(QSize(18, 18));
+  page_handle->close_button_->setIcon(icon1);
+  page_handle->close_button_->setIconSize(QSize(18, 18));
   
-  page_handle_->hLayout_->addWidget(page_handle_->close_button_);
-  page_handle_->hLayout_->setStretch(0, 1);
-  page_handle_->hLayout_2->addWidget(page_handle_->header_);
-  page_handle_->vLayout_->addWidget(page_handle_->background_);
+  page_handle->hLayout_->addWidget(page_handle->close_button_);
+  page_handle->hLayout_->setStretch(0, 1);
+  page_handle->hLayout_2->addWidget(page_handle->header_);
+  page_handle->vLayout_->addWidget(page_handle->background_);
   
-  page_handle_->tool_frame_ = new QFrame(page_handle_->page_);
-  page_handle_->tool_frame_->setObjectName(QString::fromUtf8("tool_frame_"));
-  page_handle_->tool_frame_->setFrameShape(QFrame::StyledPanel);
-  page_handle_->tool_frame_->setFrameShadow(QFrame::Raised);
+  page_handle->tool_frame_ = new QFrame(page_handle->page_);
+  page_handle->tool_frame_->setObjectName(QString::fromUtf8("tool_frame_"));
+  page_handle->tool_frame_->setFrameShape(QFrame::StyledPanel);
+  page_handle->tool_frame_->setFrameShadow(QFrame::Raised);
   
-  page_handle_->vLayout_2 = new QVBoxLayout(page_handle_->tool_frame_);
-  page_handle_->vLayout_2->setSpacing(0);
-  page_handle_->vLayout_2->setContentsMargins(0, 0, 0, 0);
-  page_handle_->vLayout_2->setObjectName(QString::fromUtf8("vLayout_2"));
+  page_handle->vLayout_2 = new QVBoxLayout(page_handle->tool_frame_);
+  page_handle->vLayout_2->setSpacing(0);
+  page_handle->vLayout_2->setContentsMargins(0, 0, 0, 0);
+  page_handle->vLayout_2->setObjectName(QString::fromUtf8("vLayout_2"));
   
-  page_handle_->vLayout_2->addWidget(page_handle_->tool_, 0, Qt::AlignTop);
+  page_handle->vLayout_2->addWidget(page_handle->tool_, 0, Qt::AlignTop);
   
-  page_handle_->vLayout_->addWidget(page_handle_->tool_frame_);
-  page_handle_->vLayout_->setStretch(1, 1);
+  page_handle->vLayout_->addWidget(page_handle->tool_frame_);
+  page_handle->vLayout_->setStretch(1, 1);
   //  --- End QT Widget Design --- //
   
   // Begin Connections 
-  connect(page_handle_->activate_button_, SIGNAL( clicked() ), this, SLOT(buttonClicked()));
+  connect(page_handle->activate_button_, SIGNAL( clicked() ), this, SLOT(buttonClicked()));
   connect(tool, SIGNAL(destroyed(QObject*)), this, SLOT(itemDestroyed(QObject*)));
   
-  tool_list_.insert(0, page_handle_);
+  tool_list_.insert(0, page_handle);
   
   // Add tool to the layout
-  main_layout_->addWidget(page_handle_->page_, 0, Qt::AlignTop|Qt::AlignCenter);
+  tool_layout_->addWidget(page_handle->page_, 0, Qt::AlignTop|Qt::AlignCenter);
 
   // Set active tool
-  set_active_tool(page_handle_->tool_);
+  set_active_tool(page_handle->tool_);
   
   // Report which tool was added
   SCI_LOG_MESSAGE(label.toStdString() + " - has been successfully added");
-  
 }
   
   
@@ -216,76 +220,71 @@ void ToolBoxWidget::set_active_index( int index )
   
 void ToolBoxWidget::set_active_tool( QWidget *tool )
 {
-  int index = 0;
-  while (!(tool_list_.at(index)->tool_ == tool)) {
-    index++;
-  }
+  // Find the index that corresponds to the tool
+  QList<PageHandle>::iterator it = tool_list_.begin();
+  QList<PageHandle>::iterator it_end = tool_list_.end();
   
-  QSharedPointer<Page> page_handle_ (new Page);
-  page_handle_ = tool_list_.at(index);
-  
-  
-  
-  std::string s = boost::lexical_cast<std::string>(index);
-  SCI_LOG_MESSAGE("The active tool is: "+ s);
-  
-  active_index_ = index;
-  active_tool_ = tool_list_.at(index)->tool_;
-  active_page_ = tool_list_.at(index);
-  
-  //message for checking the height of the passed tool
-  std::string h = boost::lexical_cast<std::string>(tool->height());
-  SCI_LOG_MESSAGE("The the height of the active tool is: "+ h);
-  
-  //active_page_->page_->setFixedSize(215, 358);
-  
-  active_page_->tool_frame_->show();
-  
-  
-  //active_page_->tool_frame_->setStyleSheet("QFrame#tool_frame_{border: 2px solid green;}");
-  //TODO - need to get the correct size of the tool to set the window size properly
-  
-  
-
-  
-  
-  //set the size of the active page as well as the color of its header
-  active_page_->background_->setStyleSheet(QString::fromUtf8("QWidget#background_ { background-color: rgb(128, 0, 0); }"));
-  active_page_->activate_button_->setStyleSheet(QString::fromUtf8("QPushButton{\n"
-                                                                      " \n"
-                                                                      " margin-right: 7px;\n"
-                                                                      " height: 24px;\n"
-                                                                      " text-align: left;\n"
-                                                                      " padding-left: 4px;\n"
-                                                                      " color: white;\n"
-                                                                      " font: bold;\n"
-                                                                      "\n"
-                                                                      "}\n"));
-  
-  //reset all the sizes and header colors of the inactive pages
-  for(int i=0; i < tool_list_.size(); i++)
-  {
-    if(i != active_index_)
-    {
-      tool_list_.at(i)->background_->setStyleSheet(QString::fromUtf8("QWidget#background_ { background-color: rgb(220, 220, 220); }"));
-      tool_list_.at(i)->activate_button_->setStyleSheet(QString::fromUtf8("QPushButton{\n"
-                                                                          " \n"
-                                                                          " margin-right: 7px;\n"
-                                                                          " height: 24px;\n"
-                                                                          " text-align: left;\n"
-                                                                          " padding-left: 4px;\n"
-                                                                          " color: rgb(180, 180, 180);\n"
-                                                                          " font: bold;\n"
-                                                                          "\n"
-                                                                          "}\n"));
-      
-      tool_list_.at(i)->tool_frame_->hide();
-      SCI_LOG_MESSAGE(tool_list_.at(i)->activate_button_->text().toStdString() + " - tool has been set to inactive.");
+  while (it != it_end) 
+  { 
+    if ((*it)->tool_ != tool)
+    { 
+      if (!((*it)->tool_frame_->isHidden()))
+      {
+        (*it)->background_->setStyleSheet(QString::fromUtf8("QWidget#background_ { background-color: rgb(220, 220, 220); }"));
+        (*it)->activate_button_->setStyleSheet(QString::fromUtf8(
+                                      "QPushButton{\n"
+                                      " \n"
+                                      " margin-right: 7px;\n"
+                                      " height: 24px;\n"
+                                      " text-align: left;\n"
+                                      " padding-left: 4px;\n"
+                                      " color: rgb(180, 180, 180);\n"
+                                      " font: bold;\n"
+                                      "\n"
+                                      "}\n"));
+        (*it)->tool_frame_->hide();
+        main_->adjustSize();
+      }
     }
+    ++it; 
+  }
+
+  size_t index = 0;
+  it = tool_list_.begin();
+  it_end = tool_list_.end();
+  
+  while (it != it_end) 
+  { 
+    if ((*it)->tool_ == tool)
+    {
+      active_index_ = index;
+      active_tool_ = (*it)->tool_;
+      active_page_ = *it;
+
+      if ((*it)->tool_frame_->isHidden())
+      {
+        //set the size of the active page as well as the color of its header
+        (*it)->background_->setStyleSheet(QString::fromUtf8(
+                    "QWidget#background_ { background-color: rgb(128, 0, 0); }"));
+        (*it)->activate_button_->setStyleSheet(QString::fromUtf8(
+                                      "QPushButton{\n"
+                                      " \n"
+                                      " margin-right: 7px;\n"
+                                      " height: 24px;\n"
+                                      " text-align: left;\n"
+                                      " padding-left: 4px;\n"
+                                      " color: white;\n"
+                                      " font: bold;\n"
+                                      "\n"
+                                      "}\n"));      
+        (*it)->tool_frame_->show();
+        main_->adjustSize();
+      }
+    }
+    ++it; index++; 
   }
   
-  SCI_LOG_MESSAGE(active_page_->activate_button_->text().toStdString() + " - tool has been set active");
-  Q_EMIT currentChanged (index_of(tool));
+  Q_EMIT currentChanged (active_index_);
 }
   
 QSharedPointer<ToolBoxWidget::Page> ToolBoxWidget::page( QWidget *tool )
@@ -324,7 +323,7 @@ void ToolBoxWidget::remove_tool( QWidget *tool )
   
   
   //remove_tool(index);
-  //main_layout_->removeWidget(tool);
+  //tool_layout_->removeWidget(tool);
   if (index >= 0)
   {
     //disconnect(tool, SIGNAL(destroyed(QObject *)), this, SLOT(itemDestroyed(QObject*)));
@@ -377,14 +376,4 @@ void ToolBoxWidget::itemDestroyed(QObject *object)
   //destroy!!
 }
   
-
-ToolBoxWidget::~ToolBoxWidget()
-{
-  
-}
-  
-  
-
-
-
 } //end Seg3D namespace

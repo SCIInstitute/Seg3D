@@ -127,7 +127,7 @@ ToolManager::open_tool(const std::string& toolid ,std::string& new_toolid)
     
   SCI_LOG_DEBUG(std::string("Open tool: ")+new_toolid);
   // Step (4): Signal any observers (UIs) that the tool has been opened  
-  open_tool_signal_(tool);
+  open_tool_signal(tool);
 
   return (true);
 }
@@ -160,7 +160,6 @@ ToolManager::close_tool(const std::string& toolid)
     active_toolid_ = "";
   }
 
- 
   // Step (3): Move the tool from the list. The tool handle still persists
   // and will be removed after the signal has been posted.
 
@@ -175,7 +174,7 @@ ToolManager::close_tool(const std::string& toolid)
   tool->close_connections();      
 
   // Step (6): Signal that the tool will be closed.   
-  close_tool_signal_(tool);
+  close_tool_signal(tool);
 }
 
 // THREAD-SAFETY:
@@ -218,7 +217,7 @@ ToolManager::activate_tool(const std::string& toolid)
   }
   
   // signal for interface
-  activate_tool_signal_((*it).second);
+  activate_tool_signal((*it).second);
 }
 
 

@@ -97,44 +97,19 @@ class ToolManager : public StateHandler {
   public:
     typedef boost::signals2::signal<void (ToolHandle)>  tool_signal_type;
   
-    // CONNECT_OPEN_TOOL:
-    // Connect to signal that signals new tool being created
-    boost::signals2::connection 
-    connect_open_tool(tool_signal_type::slot_type slot) // << THREAD-SAFE
-    {
-      return open_tool_signal_.connect(slot);
-    }
-  
-    // CONNECT_CLOSE_TOOL:
-    // Connect to signal that signals tool being closed
-    boost::signals2::connection 
-    connect_close_tool(tool_signal_type::slot_type slot) // << THREAD-SAFE
-    {
-      return close_tool_signal_.connect(slot);
-    }
-
-    // CONNECT_ACTIVATE_TOOL:
-    // Connect to signal that signals tool being closed
-    boost::signals2::connection 
-    connect_activate_tool(tool_signal_type::slot_type slot) // << THREAD-SAFE
-    {
-      return activate_tool_signal_.connect(slot);
-    }
-
-  protected:
-    
     // OPEN_TOOL_SIGNAL:
     // This signal is triggered after a tool has been opened
-    tool_signal_type open_tool_signal_;
+    tool_signal_type open_tool_signal;
     
     // CLOSE_TOOL_SIGNAL:
     // This signal is triggered when before a tool is closed
-    tool_signal_type close_tool_signal_;
+    tool_signal_type close_tool_signal;
 
     // ACTIVATE_TOOL_SIGNAL:
     // This signal is triggered when before a tool is closed
-    tool_signal_type activate_tool_signal_;
-
+    tool_signal_type activate_tool_signal;
+    
+    
 // -- Access to toollist --
   public:
     typedef std::map<std::string,ToolHandle> tool_list_type;

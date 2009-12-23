@@ -68,7 +68,6 @@ SET(INTERFACE_APPINTERFACE_UI_SRCS
   HistoryDockWidget.ui
   ViewerInterface.ui  
   ProjectDockWidget.ui
-  ToolsDockWidget.ui
   LayerManagerDockWidget.ui
   MeasurementDockWidget.ui
   LayerManagerDockWidget.ui

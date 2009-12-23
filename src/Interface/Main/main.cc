@@ -62,7 +62,8 @@ int main(int argc, char **argv)
   Utils::LogStreamer error_log(Utils::Log::ALL_E,&(std::cerr));
   Utils::LogHistory::Instance()->set_max_history_size(1000);
 
-  SCI_LOG_MESSAGE(std::string("--- Starting Seg3D ")+SEG3D_VERSION+" "+SEG3D_BITS+" "+SEG3D_DEBUG_VERSION+" ---");
+  SCI_LOG_MESSAGE(std::string("--- Starting Seg3D ")+SEG3D_VERSION+" "+
+                  SEG3D_BITS+" "+SEG3D_DEBUG_VERSION+" ---");
 
   // -- Setup action history --
   SCI_LOG_DEBUG("Setup action history");
@@ -94,7 +95,6 @@ int main(int argc, char **argv)
   // Put the interface on top of all the other windows
   app_interface->raise();
     
-  
   // -- Run QT event loop --
   SCI_LOG_DEBUG("Start the main QT event loop");
   

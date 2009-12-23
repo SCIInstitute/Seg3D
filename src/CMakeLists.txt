@@ -41,6 +41,12 @@ PROJECT(Seg3D)
 SET(SEG3D_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 ###########################################
+# COMPILE OPTIONS
+###########################################
+
+SET(SEG3D_BUILD_INTERFACE 1 CACHE BOOL "Build the interface to Seg3D")
+
+###########################################
 # SEG3D VERSION NUMBERS
 ###########################################
 
@@ -91,6 +97,8 @@ ADD_DEFINITIONS(-DQT_NO_KEYWORDS)
 # QT distribution. 
 ###########################################
 
+IF(SEG3D_BUILD_INTERFACE)
+
 SET(QT_DIR "" CACHE PATH "Path to QT")
 INCLUDE(CMake/FindQt4.cmake)
 SET(QT_USE_FILE ${CMAKE_CURRENT_SOURCE_DIR}/CMake/UseQt4.cmake)
@@ -101,6 +109,8 @@ IF (QT_FOUND)
 ELSE (QT_FOUND)
   MESSAGE(SEND_ERROR "QT is required for building Seg3D")
 ENDIF (QT_FOUND)
+
+ENDIF(SEG3D_BUILD_INTERFACE)
 
 
 ###########################################
@@ -177,7 +187,10 @@ INCLUDE(CMake/ToolLibrary.cmake)
 
 ADD_SUBDIRECTORY(Utils)
 ADD_SUBDIRECTORY(Application)
-ADD_SUBDIRECTORY(Interface)
+
+IF(SEG3D_BUILD_INTERFACE)
+  ADD_SUBDIRECTORY(Interface)
+ENDIF(SEG3D_BUILD_INTERFACE)
 
 ###########################################
 # Plugins:
@@ -216,15 +229,7 @@ ADD_SUBDIRECTORY(Init)
 # CPack.
 ###########################################
 
-#IF(WIN32)
-# Some how CMake wants to do the linux thing and install
-# the libs in /bin, which does not make sense for us
-# hence by pass this system
-#SET(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
 INCLUDE(InstallRequiredSystemLibraries)
-#INSTALL_PROGRAMS(/ ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS})
-#ENDIF(WIN32)
-
 
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Seg3D")
 SET(CPACK_PACKAGE_VENDOR "SCI_and_Numira_BioSciences")
@@ -247,7 +252,7 @@ SET(CPACK_PACKAGE_INSTALL_DIRECTORY
 IF(WIN32 AND NOT UNIX)
   # There is a bug in NSIS that does not handle full unix paths properly. Make
   # sure there is at least one set of four (4) backlasshes.
-  SET(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/Resources\\\\Seg3D2.bmp")
+  SET(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/Resources/Icons\\\\Seg3D2.bmp")
     IF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
       SET(CPACK_INSTALL_PREFIX "/" CACHE PATH "Install path prefix, prepended onto install directories." FORCE)
       SET(CMAKE_INSTALL_PREFIX "/" CACHE PATH "Install path prefix, prepended onto install directories." FORCE)

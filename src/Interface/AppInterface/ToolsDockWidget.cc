@@ -40,25 +40,21 @@
 // Interface includes
 #include <Interface/AppInterface/ToolsDockWidget.h>
 
-#include "ui_ToolsDockWidget.h"
-
 namespace Seg3D  {
-
-class ToolsDockWidgetPrivate {
-  public:
-    Ui::ToolsDockWidget ui_;
-  
-};
 
 
 ToolsDockWidget::ToolsDockWidget(QWidget *parent) :
-    QDockWidget(parent),
-    private_(new ToolsDockWidgetPrivate)
+    QDockWidget(parent)
 {
+//  setMinimumSize(QSize(240, 200));
+//  setMaximumSize(QSize(240, 6000));
+  setAllowedAreas(Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea);
+  setWindowTitle("Tools/Plugins");
 
   toolbox_ = new ToolBoxWidget(this);
-  make_dock_widget();
+  setWidget(toolbox_);
 
+//  make_dock_widget();
 
   // Ensure that the application does not change any of the tools while
   // the user interface is being built
@@ -71,21 +67,32 @@ ToolsDockWidget::ToolsDockWidget(QWidget *parent) :
 
   QPointer<ToolsDockWidget> dock_widget(this);
 
+  // Ensure no changes are made to list while the GUI is hooked up
+  // This needs to be done atomically, otherwise we may miss a message
+  // opening or closing a new tool
+  
+  ToolManager::Instance()->lock_tool_list();
+
   open_tool_connection_ =
-    ToolManager::Instance()->connect_open_tool(
+    ToolManager::Instance()->open_tool_signal.connect(
         boost::bind(&ToolsDockWidget::HandleOpenTool,dock_widget,_1));
 
   close_tool_connection_ =
-    ToolManager::Instance()->connect_close_tool(
+    ToolManager::Instance()->close_tool_signal.connect(
         boost::bind(&ToolsDockWidget::HandleCloseTool,dock_widget,_1));
 
   activate_tool_connection_ =
-    ToolManager::Instance()->connect_activate_tool(
+    ToolManager::Instance()->activate_tool_signal.connect(
         boost::bind(&ToolsDockWidget::HandleActivateTool,dock_widget,_1));
 
+  
   ToolManager::tool_list_type tool_list = ToolManager::Instance()->tool_list();
+  std::string active_toolid = ToolManager::Instance()->active_toolid();
+
   ToolManager::tool_list_type::iterator it = tool_list.begin();
   ToolManager::tool_list_type::iterator it_end = tool_list.end();
+
+  ToolManager::Instance()->unlock_tool_list();
 
   while (it != it_end)
   {
@@ -94,7 +101,6 @@ ToolsDockWidget::ToolsDockWidget(QWidget *parent) :
     ++it;
   }
   
-  std::string active_toolid = ToolManager::Instance()->active_toolid();
   ToolManager::tool_list_type::iterator active_it = tool_list.find(active_toolid);
 
   // Set the active tool
@@ -109,87 +115,8 @@ ToolsDockWidget::ToolsDockWidget(QWidget *parent) :
   
   // Now the tool list is up to date we can release the lock on the ToolManager
   ToolManager::Instance()->unlock_tool_list();
-  
 }
   
-  
-// Build the GUI
-void ToolsDockWidget::make_dock_widget()
-{
-  QWidget *dockWidgetContents;
-  QVBoxLayout *verticalLayout;
-  QVBoxLayout *verticalLayout_2;
-  QScrollArea *scrollArea;
-  QWidget *scrollAreaWidgetContents;
-  QVBoxLayout *verticalLayout_3;
-  QSpacerItem *verticalSpacer;
-  
-  
-  this->resize(243, 640);
-  QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
-  sizePolicy.setHorizontalStretch(0);
-  sizePolicy.setVerticalStretch(0);
-  sizePolicy.setHeightForWidth(this->sizePolicy().hasHeightForWidth());
-  this->setSizePolicy(sizePolicy);
-  this->setMinimumSize(QSize(243, 184));
-  this->setMaximumSize(QSize(243, 524287));
-  this->setAllowedAreas(Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea);
-  this->setWindowTitle("Tools/Plugins");
-
-  dockWidgetContents = new QWidget();
-  dockWidgetContents->setObjectName(QString::fromUtf8("dockWidgetContents"));
-  verticalLayout_2 = new QVBoxLayout(dockWidgetContents);
-  verticalLayout_2->setSpacing(0);
-  verticalLayout_2->setContentsMargins(0, 0, 0, 0);
-  verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
-  scrollArea = new QScrollArea(dockWidgetContents);
-  scrollArea->setObjectName(QString::fromUtf8("scrollArea"));
-  QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::MinimumExpanding);
-  sizePolicy1.setHorizontalStretch(0);
-  sizePolicy1.setVerticalStretch(0);
-  sizePolicy1.setHeightForWidth(scrollArea->sizePolicy().hasHeightForWidth());
-  scrollArea->setSizePolicy(sizePolicy1);
-  scrollArea->setMinimumSize(QSize(243, 29));
-  scrollArea->setStyleSheet(QString::fromUtf8(""));
-  scrollArea->setWidgetResizable(true);
-  scrollAreaWidgetContents = new QWidget();
-  scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
-  scrollAreaWidgetContents->setGeometry(QRect(0, 0, 239, 610));
-  QSizePolicy sizePolicy2(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
-  sizePolicy2.setHorizontalStretch(0);
-  sizePolicy2.setVerticalStretch(0);
-  sizePolicy2.setHeightForWidth(scrollAreaWidgetContents->sizePolicy().hasHeightForWidth());
-  scrollAreaWidgetContents->setSizePolicy(sizePolicy2);
-  verticalLayout_3 = new QVBoxLayout(scrollAreaWidgetContents);
-  verticalLayout_3->setSpacing(0);
-  verticalLayout_3->setContentsMargins(0, 0, 0, 0);
-  verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
-  verticalLayout = new QVBoxLayout();
-  verticalLayout->setSpacing(0);
-  verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
- 
-  
-  verticalLayout->addWidget(toolbox_, Qt::AlignTop|Qt::AlignHCenter);
-  
-  verticalSpacer = new QSpacerItem(20, 406, QSizePolicy::Minimum, QSizePolicy::Preferred);
-  
-  verticalLayout->addItem(verticalSpacer);
-  
-  
-  verticalLayout_3->addLayout(verticalLayout);
-  
-  scrollArea->setWidget(scrollAreaWidgetContents);
-  
-  verticalLayout_2->addWidget(scrollArea, Qt::AlignTop|Qt::AlignHCenter);
-  
-   
-  this->setWidget(dockWidgetContents);
-  
-}
-
-  
-
-
 ToolsDockWidget::~ToolsDockWidget()
 {
   open_tool_connection_.disconnect();
@@ -202,13 +129,15 @@ ToolsDockWidget::open_tool(ToolHandle tool)
 {
   // Step (1) : find the widget class in the ToolFactory
   ToolInterface *interface;
-  ToolFactory::Instance()->create_toolinterface(tool->type(),interface);
   
+  ToolFactory::Instance()->create_toolinterface(tool->type(),interface);
   ToolWidget *widget = dynamic_cast<ToolWidget*>(interface);
+  
   if (widget == 0)
   {
     SCI_THROW_LOGICERROR("A ToolInterface cannot be up casted to a ToolWidget pointer");
   }
+  
   // Step (2) : instantiate the widget
   widget->create_widget(this,tool);
 
@@ -217,6 +146,7 @@ ToolsDockWidget::open_tool(ToolHandle tool)
 
   widget_list_[tool->toolid()] = widget;
   
+  if (isHidden()) show(); 
   raise();
 }
 
@@ -247,13 +177,6 @@ ToolsDockWidget::close_tool(ToolHandle tool)
 void
 ToolsDockWidget::activate_tool(ToolHandle tool)
 {
-  // Ensure that this call is migrated to the interface thread
-  if (!Interface::IsInterfaceThread())
-  {
-    Interface::PostEvent(boost::bind(&ToolsDockWidget::activate_tool,this,tool));
-    return;
-  }
-
   // Find the widget
   widget_list_type::iterator it = widget_list_.find(tool->toolid());
   if (it == widget_list_.end()) 
@@ -272,10 +195,9 @@ ToolsDockWidget::activate_tool(ToolHandle tool)
 void
 ToolsDockWidget::tool_changed(int index)
 {
-  if (index > 0)
+  if (index >= 0)
   {
     ToolWidget *widget = static_cast<ToolWidget*>(toolbox_->get_tool_at(index));
-    //ToolWidget *widget = static_cast<ToolWidget*>(toolbox_->widget(index));
     ToolManager::Instance()->dispatch_activatetool(widget->toolid());
   }
 }

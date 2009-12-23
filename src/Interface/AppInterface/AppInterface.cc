@@ -59,13 +59,14 @@ AppInterface::AppInterface()
   viewer_interface_ = new ViewerInterface(this);
 
   // Setup the history dock widget
+  add_windowids();
+
   show_window("history");
   show_window("tools");
   show_window("project");
 
   show_window("layermanager");
   show_window("measurement");
-  show_window("controller");
 
   setCentralWidget(viewer_interface_);
 
@@ -134,11 +135,20 @@ AppInterface::measurement_dock_widget()
 }
 
 void
+AppInterface::add_windowids()
+{
+  InterfaceManager::Instance()->add_windowid("controller");
+  InterfaceManager::Instance()->add_windowid("project");
+  InterfaceManager::Instance()->add_windowid("history");
+  InterfaceManager::Instance()->add_windowid("layermanager");
+  InterfaceManager::Instance()->add_windowid("tools");
+  InterfaceManager::Instance()->add_windowid("measurement");
+}
+
+void
 AppInterface::show_window(const std::string& windowid)
 {
-  std::string lower_windowid = Utils::string_to_lower(windowid);
-  InterfaceManager::Instance()->add_windowid(lower_windowid);
-  
+  std::string lower_windowid = Utils::string_to_lower(windowid);  
   if (lower_windowid == "controller")
   {
     if (controller_interface_.isNull())

@@ -103,7 +103,7 @@ QtApplication::exec()
     success = false;
   }
   
-  return (false);
+  return (success);
 }
 
 QApplication* 
