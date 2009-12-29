@@ -26,6 +26,9 @@
    DEALINGS IN THE SOFTWARE.
 */
 
+#include <Utils/Core/StringUtil.h>
+#include <Utils/Core/Exception.h>
+
 #include <Interface/QtInterface/QtRenderResources.h>
 
 namespace Seg3D {
@@ -65,19 +68,15 @@ QtRenderContext::swap_buffers()
 }
 
 
-QtRenderResourcesContext::QtRenderResourcesContext()
+QtRenderResourcesContext::QtRenderResourcesContext() :
+  format_(QGLFormat::defaultFormat())
 {
   // Step 1: set up the render format properties of all the OpenGL contexts that
   // are used. These need to be the same for all the contexts as they need to
   // shared textures and objects.
   
   // For now do not double buffer
-  format_.setDoubleBuffer(false);
- 
-  // Create the shared context
-  shared_qt_context_ = QGLContextHandle(new QGLContext(format_));
-  shared_qt_context_->create();
-  shared_context_ = RenderContextHandle(new QtRenderContext(shared_qt_context_));
+  // format_.setDoubleBuffer(false);
 }
 
 QtRenderResourcesContext::~QtRenderResourcesContext()
@@ -88,19 +87,45 @@ QtRenderResourcesContext::~QtRenderResourcesContext()
 bool 
 QtRenderResourcesContext::create_render_context(RenderContextHandle& context)
 {
+  if (!(shared_widget_.data()))
+  {
+    SCI_THROW_LOGICERROR("OpenGL render context is not available");
+  }
+  
   // Generate a new context
-  QGLContextHandle qt_context = QGLContextHandle(new QGLContext(format_));
-  qt_context->create(shared_qt_context_.get());
+  QGLContextHandle qt_context = QGLContextHandle(new QGLContext(format_,shared_widget_->context()->device()));
+  qt_context->create(shared_widget_->context());
+
+  SCI_LOG_DEBUG(std::string("qt_context->valid = ")+Utils::to_string(qt_context->isValid()));
+
   // Bind the new context in the GUI independent wrapper class
   context = RenderContextHandle(new QtRenderContext(qt_context));
+  
   return (context->is_valid());
 }
 
-bool 
-QtRenderResourcesContext::shared_render_context(RenderContextHandle& context)
+QtRenderWidget*
+QtRenderResourcesContext::create_qt_render_widget(QWidget* parent)
 {
-  context = shared_context_;
-  return (context->is_valid());
+  if (!(shared_widget_.data()))
+  {
+    // Create the first shared widget
+    SCI_LOG_DEBUG("Create the shared OpenGL widget");
+    shared_widget_ = new QtRenderWidget(format_,parent,0);
+    return (shared_widget_.data());
+  }
+  else
+  {
+    // Create a sibling widget
+    SCI_LOG_DEBUG("Create OpenGL widget");
+    return (new QtRenderWidget(format_,parent,shared_widget_.data()));
+  }
+}
+
+bool
+QtRenderResourcesContext::valid_render_resources()
+{
+  return (shared_widget_.data() && shared_widget_->isValid());
 }
 
 } // end namespace Seg3D

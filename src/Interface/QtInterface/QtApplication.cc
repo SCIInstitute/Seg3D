@@ -68,6 +68,7 @@ QtApplication::setup(int argc, char **argv)
     SCI_LOG_DEBUG("Creating QtRenderResourcesContext");
     qt_renderresources_context_ = QtRenderResourcesContextHandle(new QtRenderResourcesContext);
  
+    SCI_LOG_DEBUG("Install the QtRenderResources into the Interface layer");
     // Step 5: Insert the render resources class into the application layer
     RenderResources::Instance()->install_resources_context(qt_renderresources_context_);
     
@@ -112,7 +113,7 @@ QtApplication::qt_application()
   return qt_application_;
 }
 
-RenderResourcesContextHandle
+QtRenderResourcesContextHandle
 QtApplication::qt_renderresources_context()
 {
   return qt_renderresources_context_;

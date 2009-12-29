@@ -17,31 +17,25 @@
 namespace Seg3D {
 
 class ViewerInterfacePrivate;
+typedef boost::shared_ptr<ViewerInterfacePrivate> ViewerInterfacePrivateHandle;
 
 class ViewerInterface : public QWidget {
     
-  Q_OBJECT
+    Q_OBJECT
 
-public:
-  ViewerInterface(QWidget *parent = 0);
-  virtual ~ViewerInterface();
-  
-  void writeSizeSettings();
-  void readSizeSettings();
-  
-
-public Q_SLOTS:
-  void set_views(int, int);
-  void set_focused_view(int);
-
+  public:
+    ViewerInterface(QWidget *parent = 0);
+    virtual ~ViewerInterface();
     
-
-private:
+  //  void writeSizeSettings();
+  //  void readSizeSettings();
     
-  boost::shared_ptr<ViewerInterfacePrivate> private_;
+  public Q_SLOTS:
+    void set_views(int, int);
+    void set_selected_viewer(int);
 
-
-
+  private:
+    ViewerInterfacePrivateHandle private_;
 };
 
 } // end namespace  

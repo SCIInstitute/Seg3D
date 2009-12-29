@@ -48,7 +48,7 @@ ActionHistory::set_max_history_size(size_t size)
     // remove part of the history
     action_history_.erase(action_history_.begin()+size,action_history_.end());
     // signal that buffer has changed
-    history_changed_signal_(); 
+    history_changed_signal(); 
   }
 }
 
@@ -92,7 +92,7 @@ ActionHistory::record_action(ActionHandle action)
   }
   
   SCI_LOG_DEBUG(std::string("Record action into history log: ")+action->type());
-  history_changed_signal_();
+  history_changed_signal();
 }
 
 // Singleton interface needs to be defined somewhere

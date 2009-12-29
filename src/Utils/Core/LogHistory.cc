@@ -34,7 +34,7 @@ LogHistory::LogHistory() :
   log_history_max_size_(0)
 {
   // Connect this class to the ActionDispatcher
-  log_connection_ = Log::Instance()->connect_post_log(
+  log_connection_ = Log::Instance()->post_log_signal.connect(
     boost::bind(&LogHistory::record_log,this,_1,_2));
 }
 
@@ -48,7 +48,7 @@ LogHistory::set_max_history_size(size_t size)
     // remove part of the history
     log_history_.erase(log_history_.begin()+size,log_history_.end());
     // signal that buffer has changed
-    history_changed_signal_(); 
+    history_changed_signal(); 
   }
 }
 
@@ -93,7 +93,7 @@ LogHistory::record_log(int type,std::string message)
     log_history_.pop_back();
   }
   
-  history_changed_signal_();
+  history_changed_signal();
 }
 
 // Singleton interface needs to be defined somewhere

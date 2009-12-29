@@ -26,48 +26,51 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#include <Application/Renderer/RenderResources.h>
+
+#ifndef INTERFACE_APPINTERFACE_VIEWERWIDGET_H
+#define INTERFACE_APPINTERFACE_VIEWERWIDGET_H
+
+// QT includes
+#include <QFrame>
+
+// STL includes
+#include <string>
+
+// Boost includes
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/thread.hpp>
+#include <boost/shared_ptr.hpp>
 
 namespace Seg3D {
 
-RenderResources::RenderResources() 
-{
-}
+// Forward declaration
+class ViewerWidgetPrivate;
+typedef boost::shared_ptr<ViewerWidgetPrivate> ViewerWidgetPrivateHandle;
 
-bool
-RenderResources::create_render_context(RenderContextHandle& context)
-{
-  // The context gets setup through the GUI system and is GUI dependent
-  // if this function is accessed before the GUI system is setup, something
-  // is wrong in the program logic, hence warn the user
-  if (!resources_context_.get())
-  {
-    SCI_THROW_LOGICERROR("No render resources were installed to create an opengl context");
-  }
+// Class definitions
+class ViewerWidget : public QFrame {
+    
+    Q_OBJECT
+  public:
+    ViewerWidget(int viewer_id, QWidget *parent = 0);
+    virtual ~ViewerWidget();
   
-  return (resources_context_->create_render_context(context));
-}
+  Q_SIGNALS:
+    void selected(int);
 
-void
-RenderResources::install_resources_context(RenderResourcesContextHandle resources_context)
-{
-  // Check whether we got a proper render context
-  if (!resources_context.get())
-  {
-    SCI_THROW_LOGICERROR("Cannot install an empty render resources context");
-  }
+  public Q_SLOTS:
   
-  resources_context_ = resources_context;
-}
+    void select();
+    void deselect();
 
-bool
-RenderResources::valid_render_resources()
-{
-  return (resources_context_.get() && resources_context_->valid_render_resources());
-}
-
-// Need to define singleton somewhere
-Utils::Singleton<RenderResources> RenderResources::instance_;
+  private:
+    // Internals of the viewer widget, so most dependencies do not need to
+    // be included here
+    ViewerWidgetPrivateHandle private_;
+    
+    int viewer_id_;
+};
 
 } // end namespace Seg3D
 
+#endif

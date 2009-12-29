@@ -86,7 +86,7 @@ class QtApplication : public boost::noncopyable {
 
     // QT_RENDERRESOURCES_CONTEXT:
     // Get the handle to the renderresources
-    RenderResourcesContextHandle qt_renderresources_context();
+    QtRenderResourcesContextHandle qt_renderresources_context();
     
   private:  
     // Main QT application class

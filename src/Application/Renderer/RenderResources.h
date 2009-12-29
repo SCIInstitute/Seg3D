@@ -58,10 +58,6 @@ class RenderResources : public boost::noncopyable {
     // Generate a render context for one of the viewers
     bool create_render_context(RenderContextHandle& context);
     
-    // SHARED_RENDER_CONTEXT:
-    // Get the handle to the main shared render context
-    bool shared_render_context(RenderContextHandle& context);
-    
     // INSTALL_RESOURCES_CONTEXT:
     // Install a context from the UI system in the resource, so this
     // class can generate virtual OpenGL contexts. 

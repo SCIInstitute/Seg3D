@@ -47,6 +47,7 @@
 
 // Init Plugins functionality
 #include <Init/Init.h>
+#include <Init/QtInit.h>
 
 //#include <Interface/ControllerInterface/ControllerInterface.h>
 
@@ -59,9 +60,12 @@ using namespace Seg3D;
 int main(int argc, char **argv)
 {
   // -- Setup error logging --
+  // stream error to the console window
   Utils::LogStreamer error_log(Utils::Log::ALL_E,&(std::cerr));
+  // stream errors to a history log that maintains the last 1000 entries
   Utils::LogHistory::Instance()->set_max_history_size(1000);
 
+  // -- Startup Seg3D --
   SCI_LOG_MESSAGE(std::string("--- Starting Seg3D ")+SEG3D_VERSION+" "+
                   SEG3D_BITS+" "+SEG3D_DEBUG_VERSION+" ---");
 
@@ -72,6 +76,7 @@ int main(int argc, char **argv)
   // -- Add plugins into the architecture  
   SCI_LOG_DEBUG("Setup and register all the plugins");
   Seg3D::InitPlugins();
+  Seg3D::QtInitResources();
   
   // -- Setup the QT Interface Layer --
   SCI_LOG_DEBUG("Setup QT Interface");
@@ -80,31 +85,53 @@ int main(int argc, char **argv)
     SCI_LOG_ERROR("Could not setup QT Interface");  
     return (-1);
   }
-  
+    
   // -- Setup Application Interface Window --
   SCI_LOG_DEBUG("Setup Application Interface");
   
   // The application window needs the qApplication as parent, which is
   // defined in the QtApplication, which integrates the Qt eventloop with
   // the interface eventloop of the Application layer.
-  AppInterface* app_interface = new AppInterface;
-
-  // Show the full interface
-  app_interface->show();
-  
-  // Put the interface on top of all the other windows
-  app_interface->raise();
-    
-  // -- Run QT event loop --
-  SCI_LOG_DEBUG("Start the main QT event loop");
-  
-  // Start the event processing loop
-  if (!(QtApplication::Instance()->exec()))
+  try
   {
-    SCI_LOG_ERROR("The interface thread crashed, exiting Seg3D");  
-    return (-1);
-  }
+    AppInterface* app_interface = new AppInterface;
     
+    // Show the full interface
+    app_interface->show();
+    
+    // Put the interface on top of all the other windows
+    app_interface->raise();
+      
+    // -- Run QT event loop --
+    SCI_LOG_DEBUG("Start the main QT event loop");
+    
+    // Start the event processing loop
+    if (!(QtApplication::Instance()->exec()))
+    {
+      SCI_LOG_ERROR("The interface thread crashed, exiting Seg3D");  
+      return (-1);
+    }    
+    
+  }
+  catch(Utils::Exception& except)
+  {  
+    // Catch any Seg3D generated exceptions and display there message in the log file
+    SCI_LOG_ERROR(std::string("Setup of the interface crashed by throwing an exception: ") + except.message());
+    return(-1);
+  }
+  catch(std::exception& except)
+  {
+    // For any other exception
+    SCI_LOG_ERROR(std::string("Setup of the interface crashed by throwing an exception: ") + except.what());
+    return(-1);
+  }
+  catch(...)
+  {
+    // For any other exception
+    SCI_LOG_ERROR(std::string("Setup of the interface crashed by throwing an unknown exception"));
+    return(-1);
+  }
+        
   // Indicate a successful finish of the program
   SCI_LOG_MESSAGE("--- Finished ---");
   return (0);

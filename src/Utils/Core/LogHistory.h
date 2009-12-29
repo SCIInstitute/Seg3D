@@ -90,17 +90,9 @@ class LogHistory : public boost::noncopyable {
   public:
     typedef boost::signals2::signal<void ()> history_changed_signal_type;
     
-    // CONNECT_HISTORY_CHANGED:
+    // HISTORY_CHANGED_SIGNAL:
     // Signal indicating that the history changed
-    boost::signals2::connection connect_history_changed(
-      history_changed_signal_type::slot_type slot)
-    {
-      return history_changed_signal_.connect(slot);
-    }
-  
-  private:
-    // Signal indicating that the history changed
-    history_changed_signal_type history_changed_signal_;
+    history_changed_signal_type history_changed_signal;
         
 // -- Singleton interface --
   public:

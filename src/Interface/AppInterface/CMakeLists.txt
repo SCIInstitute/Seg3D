@@ -44,6 +44,7 @@ SET(INTERFACE_APPINTERFACE_SRCS
   MeasurementDockWidget.cc
   ViewAction.cc
   ToolBoxWidget.cc
+  ViewerWidget.cc
 )
 
 SET(INTERFACE_APPINTERFACE_MOC_SRCS
@@ -59,6 +60,7 @@ SET(INTERFACE_APPINTERFACE_MOC_SRCS
   MeasurementDockWidget.h
   ViewAction.h
   ToolBoxWidget.h
+  ViewerWidget.h
 )
 
 SET(INTERFACE_APPINTERFACE_NO_MOC_SRCS
@@ -74,11 +76,15 @@ SET(INTERFACE_APPINTERFACE_UI_SRCS
   MeasurementDockWidget.ui
 )
 
+SET(INTERFACE_APPINTERFACE_RCC_SRCS
+  ../../Resources/AppInterface.qrc
+)
+
 ##################################################
 # Get Icon files
 ##################################################
 
-#QT4_ADD_RESOURCES(INTERFACE_APPINTERFACE_QT_RCC_SRCS Resources.qrc)
+QT4_ADD_RESOURCES(INTERFACE_APPINTERFACE_QT_RCC_SRCS ${INTERFACE_APPINTERFACE_RCC_SRCS})
 
 ##################################################
 # Generate header out of UI code
@@ -109,8 +115,8 @@ ADD_LIBRARY(Interface_AppInterface STATIC
             ${INTERFACE_APPINTERFACE_QT_UI_SRCS}
             ${INTERFACE_APPINTERFACE_QT_MOC_SRCS}
             ${INTERFACE_APPINTERFACE_NO_MOC_SRCS} 
-            ${INTERFACE_APPINTERFACE_MOC_SRCS})
-
+            ${INTERFACE_APPINTERFACE_MOC_SRCS}
+            ${INTERFACE_APPINTERFACE_QT_RCC_SRCS})
             
 TARGET_LINK_LIBRARIES(Interface_AppInterface
                       Utils_Core
@@ -125,3 +131,4 @@ TARGET_LINK_LIBRARIES(Interface_AppInterface
                       ${QT_LIBRARIES} 
                       ${SCI_BOOST_LIBRARY})
 
+ADD_LIBRARY_QTRESOURCES(AppInterface)

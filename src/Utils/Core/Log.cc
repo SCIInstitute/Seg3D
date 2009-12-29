@@ -53,28 +53,28 @@ void
 Log::post_error(std::string message, const int line, const char* file)
 {
   std::string str = header(line,file)+std::string(" ERROR: ")+message;
-  post_log_signal_(ERROR_E, str);
+  post_log_signal(ERROR_E, str);
 }  
 
 void
 Log::post_warning(std::string message, const int line, const char* file)
 {
   std::string str = header(line,file)+std::string(" WARNING: ")+message;
-  post_log_signal_(WARNING_E, str);
+  post_log_signal(WARNING_E, str);
 }  
 
 void
 Log::post_message(std::string message, const int line, const char* file)
 {
   std::string str = header(line,file)+std::string(" MESSAGE: ")+message;
-  post_log_signal_(MESSAGE_E, str);
+  post_log_signal(MESSAGE_E, str);
 }  
 
 void
 Log::post_debug(std::string message, const int line, const char* file)
 {
   std::string str = header(line,file)+std::string(" DEBUG: ")+message;
-  post_log_signal_(DEBUG_E, str);
+  post_log_signal(DEBUG_E, str);
 }  
 
 // Singleton instance
@@ -118,7 +118,7 @@ LogStreamer::LogStreamer(unsigned int log_flags, std::ostream* stream)
   // if the object is destroyed. This will ensure that when the slot is called
   // the shared_ptr is locked so that the object is not destroyed while the
   // call back is evaluated.
-  Log::Instance()->post_log_signal_.connect(
+  Log::Instance()->post_log_signal.connect(
     Log::post_log_signal_type::slot_type(&LogStreamerInternal::stream_message, 
                 internal_.get(),_1,_2).track(internal_));
 }

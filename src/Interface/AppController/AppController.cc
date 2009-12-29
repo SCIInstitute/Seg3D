@@ -116,10 +116,10 @@ AppController::AppController(QWidget* parent) :
   // Step 5: Link the ActionHistory to this widget and have it update 
   // automatically
   
-  ActionHistory::Instance()->connect_history_changed(boost::bind(
+  ActionHistory::Instance()->history_changed_signal.connect(boost::bind(
     &AppController::UpdateActionHistory,true,controller));
 
-  Utils::LogHistory::Instance()->connect_history_changed(boost::bind(
+  Utils::LogHistory::Instance()->history_changed_signal.connect(boost::bind(
     &AppController::UpdateLogHistory,true,controller));
 
   // Step 6: Qt connections

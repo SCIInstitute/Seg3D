@@ -37,9 +37,12 @@
 #include <QtOpenGL>
 #include <QtGui>
 
-// Util includes
+// Application includes
 #include <Application/Renderer/RenderResourcesContext.h>
 #include <Application/Renderer/RenderContext.h>
+
+// Interface includes
+#include <Interface/QtInterface/QtRenderWidget.h>
 
 namespace Seg3D {
 
@@ -95,21 +98,24 @@ class QtRenderResourcesContext : public RenderResourcesContext {
     // CREATE_RENDER_CONTEXT:
     // Generate a render context for one of the viewers
     virtual bool create_render_context(RenderContextHandle& context);
-    
-    // SHARED_RENDER_CONTEXT:
-    // Get the handle to the main shared render context
-    virtual bool shared_render_context(RenderContextHandle& context);
+
+    // CREATE_QT_RENDER_WIDGET:
+    // Get the Qt render context directly
+    // NOTE: The viewers access this directly
+    QtRenderWidget* create_qt_render_widget(QWidget* parent);
+
+    // VALID_RENDER_RESOURCES:
+    // Check whether valid render resources were installed
+    virtual bool valid_render_resources();
 
   private:
     // The Qt render context format options
     QGLFormat format_;
   
-    // The handle to the first render context that defines all the sharing
+    // The handle to the first qt widget that defines all the sharing
     // between contexts
-    QGLContextHandle shared_qt_context_;
+    QPointer<QtRenderWidget> shared_widget_;
     
-    // The wrapped version of the first shared context
-    RenderContextHandle shared_context_;
 };
 
 } // end namespace Seg3D

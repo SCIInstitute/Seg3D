@@ -34,12 +34,12 @@
 
 // Interface includes
 #include <Interface/AppInterface/AppInterface.h>
+#include <Interface/QtInterface/QtApplication.h>
 
 namespace Seg3D {
 
 AppInterface::AppInterface()
 {
-
   // Set the window information and set the version numbers
   setWindowTitle(QString("Seg3D Version ")+SEG3D_VERSION+QString(" ")+
                  SEG3D_BITS+QString(" ")+SEG3D_DEBUG_VERSION);
@@ -95,7 +95,7 @@ AppInterface::full_screen_toggle(bool full_screen)
   
 AppInterface::~AppInterface()
 {
-  viewer_interface_->writeSizeSettings();
+//  viewer_interface_->writeSizeSettings();
 }
 
 ViewerInterface*        

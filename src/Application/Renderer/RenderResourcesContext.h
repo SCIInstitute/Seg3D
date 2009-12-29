@@ -58,14 +58,15 @@ class RenderResourcesContext : public boost::noncopyable {
   protected:
   
     friend class RenderResources;
+    
     // CREATE_RENDER_CONTEXT:
     // Generate a render context for one of the viewers
     virtual bool create_render_context(RenderContextHandle& context) = 0;
     
-    // SHARED_RENDER_CONTEXT:
-    // Get the handle to the main shared render context
-    virtual bool shared_render_context(RenderContextHandle& context) = 0;
-        
+    // VALID_RENDER_RESOURCES:
+    // Check whether valid render resources were installed
+    virtual bool valid_render_resources() = 0;    
+    
 };
 
 } // end namespace Utils

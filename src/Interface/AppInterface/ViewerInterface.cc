@@ -25,53 +25,99 @@
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
  */
-#include <sstream>
-#include <iostream>
-
+ 
+// QT includes
+#include <QtGui> 
+ 
+// Utils includes
 #include <Utils/Core/Log.h>
+#include <Utils/Core/Exception.h>
 
+// Interface includes
 #include <Interface/AppInterface/ViewerInterface.h>
-#include "ui_ViewerInterface.h"
-//#include <QSettings>
+#include <Interface/AppInterface/ViewerWidget.h>
 
 namespace Seg3D {
   
-  class ViewerInterfacePrivate {
+class ViewerInterfacePrivate {
   public:
   
-    Ui::ViewerInterface ui_;
-  };
-
-
+    ViewerInterfacePrivate(QWidget* parent);
   
+  public:
+    QVBoxLayout* layout_;
+
+    QSplitter* horiz_splitter_;
+    
+    QSplitter* vert_splitter1_;
+    QSplitter* vert_splitter2_;
+
+    std::vector<ViewerWidget*> viewer_;
+    int selected_viewer_;
+};
+
+
+ViewerInterfacePrivate::ViewerInterfacePrivate(QWidget* parent)
+{
+  layout_ = new QVBoxLayout(parent);
+  layout_->setContentsMargins(0, 0, 0, 0);
+  layout_->setSpacing(0);
+
+  vert_splitter1_ = new QSplitter(Qt::Vertical,parent);
+  vert_splitter2_ = new QSplitter(Qt::Vertical,parent);
+  horiz_splitter_ = new QSplitter(Qt::Horizontal,parent);
+
+  horiz_splitter_->addWidget(vert_splitter1_);
+  horiz_splitter_->addWidget(vert_splitter2_);
+  horiz_splitter_->setOpaqueResize(false);
+   
+  viewer_.resize(6);
+  for (size_t j=0;j<6;j++) viewer_[j] = new ViewerWidget(j,parent);
+  
+  vert_splitter1_->addWidget(viewer_[0]);
+  vert_splitter1_->addWidget(viewer_[1]);
+  vert_splitter1_->addWidget(viewer_[2]);
+  vert_splitter1_->setOpaqueResize(false);
+
+  vert_splitter2_->addWidget(viewer_[3]);
+  vert_splitter2_->addWidget(viewer_[4]);
+  vert_splitter2_->addWidget(viewer_[5]);
+  vert_splitter2_->setOpaqueResize(false);
+
+  layout_->addWidget(horiz_splitter_);
+  parent->setLayout(layout_);
+  
+  for (size_t j=0;j<6;j++)
+    parent->connect(viewer_[j],SIGNAL(selected(int)),
+                        SLOT(set_selected_viewer(int)));
+                        
+  selected_viewer_ = -1;
+} 
   
   
   
 ViewerInterface::ViewerInterface(QWidget *parent) :
-    QWidget(parent),
-    private_(new ViewerInterfacePrivate)
+    QWidget(parent)
 {
-  if(private_){
-    
-    private_->ui_.setupUi(this);
-
-    set_focused_view(1);
-    
-    //full_screen_toggle(true);
-  }
-
+  private_ = ViewerInterfacePrivateHandle(new ViewerInterfacePrivate(this));
+  set_selected_viewer(0);
 }
 
+ViewerInterface::~ViewerInterface()
+{
+}
 
 //TODO - build viewer sizes state saver and recoverer
+
+/*
 void ViewerInterface::writeSizeSettings()
 {
     QSettings settings( "SCI", "Seg3D2.0" );
     settings.beginGroup("ViewerInterface");
     settings.setValue("geometry", saveGeometry());
     settings.setValue("mainSplitter", private_->ui_.mainSplitter->saveState());
-    settings.setValue("eastSplitter", private_->ui_.eastSplitter->saveState());
-    settings.setValue("westSplitter", private_->ui_.westSplitter->saveState());
+    settings.setValue("rightSplitter", private_->ui_.rightSplitter->saveState());
+    settings.setValue("leftSplitter", private_->ui_.leftSplitter->saveState());
     settings.endGroup();
 }
 
@@ -81,166 +127,166 @@ void ViewerInterface::readSizeSettings()
     settings.beginGroup("ViewerInterface");
     restoreGeometry(settings.value("geometry").toByteArray());
     private_->ui_.mainSplitter->restoreState(settings.value("mainSplitter").toByteArray());
-    private_->ui_.eastSplitter->restoreState(settings.value("eastSplitter").toByteArray());
-    private_->ui_.westSplitter->restoreState(settings.value("westSplitter").toByteArray());
+    private_->ui_.rightSplitter->restoreState(settings.value("rightSplitter").toByteArray());
+    private_->ui_.leftSplitter->restoreState(settings.value("leftSplitter").toByteArray());
     settings.endGroup();
 }
-
+*/
   
-//  --- Public Slots ---  //  
-
-void ViewerInterface::set_focused_view(int viewForFocus)
+void 
+ViewerInterface::set_selected_viewer(int selected_viewer)
 {
-  private_->ui_.viewerFrame_1->setAutoFillBackground(false);
-    private_->ui_.viewerFrame_1->setAutoFillBackground(false);
-    private_->ui_.viewerFrame_2->setAutoFillBackground(false);
-    private_->ui_.viewerFrame_3->setAutoFillBackground(false);
-    private_->ui_.viewerFrame_4->setAutoFillBackground(false);
-    private_->ui_.viewerFrame_5->setAutoFillBackground(false);
-    private_->ui_.viewerFrame_6->setAutoFillBackground(false);
+  if (selected_viewer >= 0 && private_->selected_viewer_ == selected_viewer) return;
 
-    switch (viewForFocus)
-    {
-        case 1:
-            private_->ui_.viewerFrame_1->setAutoFillBackground(true);
-            private_->ui_.viewerFrame_1->setFocus();
-            break;
-        case 2:
-            private_->ui_.viewerFrame_2->setAutoFillBackground(true);
-            private_->ui_.viewerFrame_2->setFocus();
-            break;
-        case 3:
-            private_->ui_.viewerFrame_3->setAutoFillBackground(true);
-            private_->ui_.viewerFrame_3->setFocus();
-            break;
-        case 4:
-            private_->ui_.viewerFrame_4->setAutoFillBackground(true);
-            private_->ui_.viewerFrame_4->setFocus();
-            break;
-        case 5:
-            private_->ui_.viewerFrame_5->setAutoFillBackground(true);
-            private_->ui_.viewerFrame_5->setFocus();
-            break;
-        case 6:
-            private_->ui_.viewerFrame_6->setAutoFillBackground(true);
-            private_->ui_.viewerFrame_6->setFocus();
-            break;
-    }
+  private_->selected_viewer_ = selected_viewer;
 
+  for (int j=0;j<6;j++)
+  {
+    if (j != private_->selected_viewer_) private_->viewer_[j]->deselect();
+  }
+  private_->viewer_[private_->selected_viewer_]->select();
 }
 
 
-void ViewerInterface::set_views(int west, int east)
+void 
+ViewerInterface::set_views(int left, int right)
 {
-    QList<int> westWindows;
-    QList<int> eastWindows;
-    QList<int> mainWindows;
+  if ((left == 1)&&(right == 0))
+  {
+    private_->viewer_[0]->show();
+    private_->viewer_[1]->hide();
+    private_->viewer_[2]->hide();
+    private_->viewer_[3]->hide();
+    private_->viewer_[4]->hide();
+    private_->viewer_[5]->hide();
+    private_->vert_splitter1_->show();
+    private_->vert_splitter2_->hide();
 
+    QList<int> sizes; sizes.push_back(100); sizes.push_back(0);
+    private_->horiz_splitter_->setSizes(sizes);
+    private_->horiz_splitter_->repaint();
+  }
 
-    if ((west == 1)&&(east == 0))
-    {
-        mainWindows.push_back(4000);
-        private_->ui_.mainSplitter->setSizes(mainWindows);
-        westWindows.push_back(4000);
-        private_->ui_.westSplitter->setSizes(westWindows);
-    }
+  if ((left == 1)&&(right == 1))
+  {
+    private_->viewer_[0]->show();
+    private_->viewer_[1]->hide();
+    private_->viewer_[2]->hide();
+    private_->viewer_[3]->show();
+    private_->viewer_[4]->hide();
+    private_->viewer_[5]->hide();
+    private_->vert_splitter1_->show();
+    private_->vert_splitter2_->show();
 
-    if ((west == 1)&&(east == 1))
-    {
-        mainWindows.push_back(4000);
-        mainWindows.push_back(4000);
-        private_->ui_.mainSplitter->setSizes(mainWindows);
-        westWindows.push_back(4000);
-        private_->ui_.westSplitter->setSizes(westWindows);
-        eastWindows.push_back(4000);
-        private_->ui_.eastSplitter->setSizes(eastWindows);
+    QList<int> sizes; sizes.push_back(100); sizes.push_back(100);
+    private_->horiz_splitter_->setSizes(sizes);
+    private_->horiz_splitter_->repaint();
+  }
 
-    }
+  if ((left == 1)&&(right == 2))
+  {
+    private_->viewer_[0]->show();
+    private_->viewer_[1]->hide();
+    private_->viewer_[2]->hide();
+    private_->viewer_[3]->show();
+    private_->viewer_[4]->show();
+    private_->viewer_[5]->hide();
+    private_->vert_splitter1_->show();
+    private_->vert_splitter2_->show();
 
-    if ((west == 1)&&(east == 2))
-    {
-        mainWindows.push_back(6000);
-        mainWindows.push_back(4000);
-        private_->ui_.mainSplitter->setSizes(mainWindows);
+    QList<int> sizes; sizes.push_back(300); sizes.push_back(100);
+    private_->horiz_splitter_->setSizes(sizes);
+    
+    QList<int> vsizes; vsizes.push_back(100); 
+    vsizes.push_back(100); vsizes.push_back(0);
+    private_->vert_splitter2_->setSizes(vsizes);
+    private_->horiz_splitter_->repaint();
+  }
+  
+  if ((left == 1)&&(right == 3))
+  {
+    private_->viewer_[0]->show();
+    private_->viewer_[1]->hide();
+    private_->viewer_[2]->hide();
+    private_->viewer_[3]->show();
+    private_->viewer_[4]->show();
+    private_->viewer_[5]->show();
+    private_->vert_splitter1_->show();
+    private_->vert_splitter2_->show();
 
-        westWindows.push_back(4000);
-        private_->ui_.westSplitter->setSizes(westWindows);
-        eastWindows.push_back(4000);
-        eastWindows.push_back(4000);
-        private_->ui_.eastSplitter->setSizes(eastWindows);
+    QList<int> sizes; sizes.push_back(300); sizes.push_back(100);
+    private_->horiz_splitter_->setSizes(sizes);
+    
+    QList<int> vsizes; vsizes.push_back(100); 
+    vsizes.push_back(100); vsizes.push_back(100);
+    private_->vert_splitter2_->setSizes(vsizes);
+    private_->horiz_splitter_->repaint();
+  }
 
-    }
+  if ((left == 2)&&(right == 2))
+  {
+    private_->viewer_[0]->show();
+    private_->viewer_[1]->show();
+    private_->viewer_[2]->hide();
+    private_->viewer_[3]->show();
+    private_->viewer_[4]->show();
+    private_->viewer_[5]->hide();
+    private_->vert_splitter1_->show();
+    private_->vert_splitter2_->show();
 
-    if ((west == 1)&&(east == 3))
-    {
-        mainWindows.push_back(4000);
-        mainWindows.push_back(2000);
-        private_->ui_.mainSplitter->setSizes(mainWindows);
+    QList<int> sizes; sizes.push_back(100); sizes.push_back(100);
+    private_->horiz_splitter_->setSizes(sizes);
+    
+    QList<int> vsizes; vsizes.push_back(100); 
+    vsizes.push_back(100); vsizes.push_back(0);
+    private_->vert_splitter1_->setSizes(vsizes);
+    private_->vert_splitter2_->setSizes(vsizes);
+    private_->horiz_splitter_->repaint();
+  }
 
-        westWindows.push_back(4000);
-        private_->ui_.westSplitter->setSizes(westWindows);
+  if ((left == 2)&&(right == 3))
+  {
+    private_->viewer_[0]->show();
+    private_->viewer_[1]->show();
+    private_->viewer_[2]->hide();
+    private_->viewer_[3]->show();
+    private_->viewer_[4]->show();
+    private_->viewer_[5]->show();
+    private_->vert_splitter1_->show();
+    private_->vert_splitter2_->show();
 
-        eastWindows.push_back(4000);
-        eastWindows.push_back(4000);
-        eastWindows.push_back(4000);
-        private_->ui_.eastSplitter->setSizes(eastWindows);
-    }
+    QList<int> sizes; sizes.push_back(100); sizes.push_back(100);
+    private_->horiz_splitter_->setSizes(sizes);
+    
+    QList<int> vsizes; vsizes.push_back(100); 
+    vsizes.push_back(100); vsizes.push_back(0);
+    private_->vert_splitter1_->setSizes(vsizes);
+    vsizes.last() = 100;
+    private_->vert_splitter2_->setSizes(vsizes);
+    private_->horiz_splitter_->repaint();
+  }
+  if ((left == 3)&&(right == 3))
+  {
+    private_->viewer_[0]->show();
+    private_->viewer_[1]->show();
+    private_->viewer_[2]->show();
+    private_->viewer_[3]->show();
+    private_->viewer_[4]->show();
+    private_->viewer_[5]->show();
+    private_->vert_splitter1_->show();
+    private_->vert_splitter2_->show();
 
-    if ((west == 2)&&(east == 2))
-    {
-        mainWindows.push_back(4000);
-        mainWindows.push_back(4000);
-        private_->ui_.mainSplitter->setSizes(mainWindows);
-
-        westWindows.push_back(4000);
-        westWindows.push_back(4000);
-        private_->ui_.westSplitter->setSizes(westWindows);
-
-        eastWindows.push_back(4000);
-        eastWindows.push_back(4000);
-        private_->ui_.eastSplitter->setSizes(eastWindows);
-
-    }
-
-    if ((west == 2)&&(east == 3))
-    {
-        mainWindows.push_back(5000);
-        mainWindows.push_back(4000);
-        private_->ui_.mainSplitter->setSizes(mainWindows);
-
-        westWindows.push_back(4000);
-        westWindows.push_back(4000);
-        private_->ui_.westSplitter->setSizes(westWindows);
-
-        eastWindows.push_back(4000);
-        eastWindows.push_back(4000);
-        eastWindows.push_back(4000);
-        private_->ui_.eastSplitter->setSizes(eastWindows);
-
-    }
-
-    if ((west == 3)&&(east == 3))
-    {
-        mainWindows.push_back(4000);
-        mainWindows.push_back(4000);
-        private_->ui_.mainSplitter->setSizes(mainWindows);
-
-        westWindows.push_back(4000);
-        westWindows.push_back(4000);
-        westWindows.push_back(4000);
-        private_->ui_.westSplitter->setSizes(westWindows);
-
-        eastWindows.push_back(4000);
-        eastWindows.push_back(4000);
-        eastWindows.push_back(4000);
-        private_->ui_.eastSplitter->setSizes(eastWindows);
-    }
+    QList<int> sizes; sizes.push_back(100); sizes.push_back(100);
+    private_->horiz_splitter_->setSizes(sizes);
+    
+    QList<int> vsizes; vsizes.push_back(100); 
+    vsizes.push_back(100); vsizes.push_back(100);
+    private_->vert_splitter1_->setSizes(vsizes);
+    private_->vert_splitter2_->setSizes(vsizes);
+    private_->horiz_splitter_->repaint();
+  }
+  
+  set_selected_viewer(0);
 }
 
-
-ViewerInterface::~ViewerInterface()
-{
-
-}
-
-}
+} // end namespace Seg3D
