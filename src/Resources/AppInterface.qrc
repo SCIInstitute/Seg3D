@@ -1,0 +1,10 @@
+<RCC>
+<qresource>
+  <file>Images/Xview.png</file>
+  <file>Images/Yview.png</file>
+  <file>Images/Zview.png</file>
+  <file>Images/XviewOff.png</file>
+  <file>Images/YviewOff.png</file>
+  <file>Images/ZviewOff.png</file>
+</qresource>
+</RCC>
