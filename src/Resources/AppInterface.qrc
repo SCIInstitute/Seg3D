@@ -3,8 +3,7 @@
   <file>Images/Xview.png</file>
   <file>Images/Yview.png</file>
   <file>Images/Zview.png</file>
-  <file>Images/XviewOff.png</file>
-  <file>Images/YviewOff.png</file>
-  <file>Images/ZviewOff.png</file>
+  <file>Images/Close.png</file>
+  <file>Images/Help.png</file>
 </qresource>
 </RCC>
