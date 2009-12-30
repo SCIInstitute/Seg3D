@@ -1,6 +1,6 @@
 /*
  For more information, please see: http://software.sci.utah.edu
- 
+ArithmeticFilter 
  The MIT License
  
  Copyright (c) 2009 Scientific Computing and Imaging Institute,
@@ -26,41 +26,48 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_TOOLS_MEDIANFILTER_H
-#define APPLICATION_TOOLS_MEDIANFILTER_H
+#include <Application/Tool/ToolFactory.h>
+#include <Application/Tools/ArithmeticFilter.h>
 
-#include <Application/Tool/Tool.h>
 
 namespace Seg3D {
-
-class MedianFilter : public Tool {
-  SCI_TOOL_TYPE("MedianFilter","Median Filter","",Tool::DATATODATA_E|Tool::FILTER_E)
-// -- constructor/destructor --  
-public:
-  MedianFilter(const std::string& toolid);
-  virtual ~MedianFilter();
-
-// -- constraint parameters --
   
-  // Constrain viewer to right painting tool when layer is selected
-  void target_constraint(std::string layerid);
+  // Register the tool into the tool factory
+  SCI_REGISTER_TOOL(ArithmeticFilter)
   
-// -- activate/deactivate tool --
   
-  virtual void activate();
-  virtual void deactivate();
+  ArithmeticFilter::ArithmeticFilter(const std::string& toolid) :
+  Tool(toolid)
+  {
+    //TODO - add guts
+    
+    
+  }
   
-// -- state --
-  public:
-    // Layerid of the target layer
-    StateOption::Handle              target_layer_;
+  void
+  ArithmeticFilter::target_constraint(std::string layerid)
+  {
+  }
   
+  ArithmeticFilter::~ArithmeticFilter()
+  {
+    
+  }
+  
+  void
+  ArithmeticFilter::activate()
+  {
+  }
+  
+  void
+  ArithmeticFilter::deactivate()
+  {
+  }
+  
+} // end namespace Seg3D
 
 
 
 
-};
 
-} // end namespace
 
-#endif

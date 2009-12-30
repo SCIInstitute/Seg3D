@@ -48,6 +48,8 @@ SET(APPLICATION_TOOLS_SRCS
   DiscreteGaussianFilter.cc
   AnisotropicDiffusionFilter.h
   AnisotropicDiffusionFilter.cc
+  ArithmeticFilter.h
+  ArithmeticFilter.cc
   )
 
 ADD_LIBRARY(Application_Tools STATIC 

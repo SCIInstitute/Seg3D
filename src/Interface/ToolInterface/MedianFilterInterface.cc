@@ -66,7 +66,8 @@ MedianFilterInterface::build_widget(QFrame* frame)
 }
 
 //  --- Function for making signal slots connections ---  //
-void MedianFilterInterface::makeConnections()
+void 
+MedianFilterInterface::makeConnections()
 {
   connect(private_->ui_.activeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(senseActiveChanged(int)));
   connect(radiusSizeAdjuster, SIGNAL(valueAdjusted(double)), this, SLOT(senseRadiusSizeChanged(double)));

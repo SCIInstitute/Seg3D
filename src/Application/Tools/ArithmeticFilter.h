@@ -26,41 +26,37 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_TOOLS_MEDIANFILTER_H
-#define APPLICATION_TOOLS_MEDIANFILTER_H
+#ifndef APPLICATION_TOOLS_ARITHMETICFILTER_H
+#define APPLICATION_TOOLS_ARITHMETICFILTER_H
 
 #include <Application/Tool/Tool.h>
 
-namespace Seg3D {
-
-class MedianFilter : public Tool {
-  SCI_TOOL_TYPE("MedianFilter","Median Filter","",Tool::DATATODATA_E|Tool::FILTER_E)
-// -- constructor/destructor --  
-public:
-  MedianFilter(const std::string& toolid);
-  virtual ~MedianFilter();
-
-// -- constraint parameters --
+namespace Seg3D  {
   
-  // Constrain viewer to right painting tool when layer is selected
-  void target_constraint(std::string layerid);
-  
-// -- activate/deactivate tool --
-  
-  virtual void activate();
-  virtual void deactivate();
-  
-// -- state --
+  class ArithmeticFilter : public Tool {
+    SCI_TOOL_TYPE("ArithmeticFilter","Arithmetic Filter", "",Tool::DATATODATA_E|Tool::FILTER_E)
+    
+  public:
+    ArithmeticFilter(const std::string& toolid);
+    virtual ~ArithmeticFilter();
+    
+    // -- constraint parameters --
+    
+    // Constrain viewer to right painting tool when layer is selected
+    void target_constraint(std::string layerid);
+    
+    // -- activate/deactivate tool --
+    
+    virtual void activate();
+    virtual void deactivate();
+    
+    // -- state --
   public:
     // Layerid of the target layer
     StateOption::Handle              target_layer_;
+    
+  };
   
-
-
-
-
-};
-
 } // end namespace
 
 #endif

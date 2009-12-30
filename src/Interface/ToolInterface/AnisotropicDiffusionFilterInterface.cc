@@ -44,7 +44,7 @@ public:
 AnisotropicDiffusionFilterInterface::AnisotropicDiffusionFilterInterface() :
 private_(new AnisotropicDiffusionFilterInterfacePrivate)
 {  
-  SCI_LOG_DEBUG("Building Paint Brush Interface");
+  SCI_LOG_DEBUG("Building Anisotropic Diffusion Filter Interface");
 }
 
 AnisotropicDiffusionFilterInterface::~AnisotropicDiffusionFilterInterface()

@@ -34,7 +34,7 @@
 namespace Seg3D  {
   
 class AnisotropicDiffusionFilter : public Tool {
-  SCI_TOOL_TYPE("AnisotropicDiffusionFilter","Anisotropic Diffusion Filter", "",Tool::DATATODATA_E)
+  SCI_TOOL_TYPE("AnisotropicDiffusionFilter","Anisotropic Diffusion Filter", "",Tool::DATATODATA_E|Tool::FILTER_E)
 
 public:
   AnisotropicDiffusionFilter(const std::string& toolid);

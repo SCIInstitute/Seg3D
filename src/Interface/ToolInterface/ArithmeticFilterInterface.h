@@ -26,41 +26,49 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_TOOLS_MEDIANFILTER_H
-#define APPLICATION_TOOLS_MEDIANFILTER_H
+#ifndef INTERFACE_TOOLINTERFACE_ARITHMETICFILTERINTERFACE_H
+#define INTERFACE_TOOLINTERFACE_ARITHMETICFILTERINTERFACE_H
 
-#include <Application/Tool/Tool.h>
+// Application includes
+#include <Application/Tool/ToolFactory.h>
+
+// Base class of the tool widget
+#include <Interface/AppInterface/ToolWidget.h>
+
+#include <Interface/ToolInterface/CustomWidgets/SliderSpinCombo.h>
 
 namespace Seg3D {
+  
+class ArithmeticFilterInterfacePrivate;
 
-class MedianFilter : public Tool {
-  SCI_TOOL_TYPE("MedianFilter","Median Filter","",Tool::DATATODATA_E|Tool::FILTER_E)
-// -- constructor/destructor --  
+class ArithmeticFilterInterface : public ToolWidget {
+  Q_OBJECT
+
+Q_SIGNALS:
+  void filterRun(bool);
+  
 public:
-  MedianFilter(const std::string& toolid);
-  virtual ~MedianFilter();
-
-// -- constraint parameters --
+  ArithmeticFilterInterface();
+  virtual ~ArithmeticFilterInterface();
+  virtual bool build_widget(QFrame* frame);
   
-  // Constrain viewer to right painting tool when layer is selected
-  void target_constraint(std::string layerid);
+private:
+  ArithmeticFilterInterfacePrivate* private_;
+  void makeConnections();
   
-// -- activate/deactivate tool --
+private Q_SLOTS:
+  void senseFilterRun();
   
-  virtual void activate();
-  virtual void deactivate();
   
-// -- state --
-  public:
-    // Layerid of the target layer
-    StateOption::Handle              target_layer_;
   
-
-
-
-
+  
+  
+  
+  
 };
 
-} // end namespace
+
+
+} // namespace Seg3D
 
 #endif

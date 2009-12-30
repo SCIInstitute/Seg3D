@@ -10,6 +10,24 @@
     <height>207</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>213</width>
+    <height>207</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>213</width>
+    <height>207</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
@@ -90,16 +108,16 @@
      <height>22</height>
     </rect>
    </property>
-   <layout class="QHBoxLayout" name="kernalHLayout_top">
+   <layout class="QHBoxLayout" name="kernelHLayout_top">
     <item>
-     <widget class="QLabel" name="kernalLabel">
+     <widget class="QLabel" name="kernelLabel">
       <property name="text">
-       <string>Maximum Kernal Width</string>
+       <string>Maximum Kernel Width</string>
       </property>
      </widget>
     </item>
     <item>
-     <spacer name="kernalHSpacer">
+     <spacer name="kernelHSpacer">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
@@ -122,7 +140,7 @@
      <height>51</height>
     </rect>
    </property>
-   <layout class="QHBoxLayout" name="kernalHLayout_bottom"/>
+   <layout class="QHBoxLayout" name="kernelHLayout_bottom"/>
   </widget>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
@@ -134,6 +152,9 @@
     </rect>
    </property>
    <layout class="QHBoxLayout" name="replaceInvertLayout">
+    <property name="spacing">
+     <number>0</number>
+    </property>
     <item>
      <widget class="QCheckBox" name="replaceCheckBox">
       <property name="text">
@@ -147,7 +168,7 @@
     <item>
      <widget class="QPushButton" name="invertButton">
       <property name="text">
-       <string>Invert</string>
+       <string>Run Filter</string>
       </property>
      </widget>
     </item>

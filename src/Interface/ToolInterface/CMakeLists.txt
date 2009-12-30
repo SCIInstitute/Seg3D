@@ -39,6 +39,8 @@ SET(INTERFACE_TOOLINTERFACE_SRCS
   InvertToolInterface.cc
   MedianFilterInterface.cc
   AnisotropicDiffusionFilterInterface.cc
+  DiscreteGaussianFilterInterface.cc
+  ArithmeticFilterInterface.cc
 )
 
 SET(INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_SRCS
@@ -53,6 +55,8 @@ SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
   InvertToolInterface.h
   MedianFilterInterface.h
   AnisotropicDiffusionFilterInterface.h
+  DiscreteGaussianFilterInterface.h
+  ArithmeticFilterInterface.h
 )
 
 SET(INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_MOC_SRCS
@@ -70,6 +74,8 @@ SET(INTERFACE_TOOLINTERFACE_UI_SRCS
   InvertToolInterface.ui
   MedianFilterInterface.ui
   AnisotropicDiffusionFilterInterface.ui
+  DiscreteGaussianFilterInterface.ui
+  ArithmeticFilterInterface.ui
 )
 
 ##################################################

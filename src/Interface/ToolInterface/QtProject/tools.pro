@@ -12,7 +12,8 @@ SOURCES += main.cpp \
     ThresholdToolInterface.cc \
     AnisotropicDiffusionFilterInterface.cc \
     MedianFilter.cc \
-    DiscreteGaussianFilterInterface.cc
+    DiscreteGaussianFilterInterface.cc \
+    ArithmeticFilterInterface.cc
 HEADERS += PaintToolInterface.h \
     sliderspincombo.h \
     FlipToolInterface.h \
@@ -21,7 +22,8 @@ HEADERS += PaintToolInterface.h \
     ThresholdToolInterface.h \
     AnisotropicDiffusionFilterInterface.h \
     MedianFilter.h \
-    DiscreteGaussianFilterInterface.h
+    DiscreteGaussianFilterInterface.h \
+    ArithmeticFilterInterface.h
 FORMS += ../PaintToolInterface.ui \
     ../FlipToolInterface.ui \
     ../InvertToolInterface.ui \
@@ -29,4 +31,5 @@ FORMS += ../PaintToolInterface.ui \
     ../ThresholdToolInterface.ui \
     ../AnisotropicDiffusionFilterInterface.ui \
     ../MedianFilterInterface.ui \
-    ../DiscreteGaussianFilterInterface.ui
+    ../DiscreteGaussianFilterInterface.ui \
+    ../ArithmeticFilterInterface.ui

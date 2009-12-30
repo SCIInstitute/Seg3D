@@ -159,7 +159,7 @@ ToolBoxWidget::add_tool(QWidget * tool, const QString &label)
   
   ///  ---  This is where we add the icon's for the help button --- //
   QIcon icon;
-  icon.addFile(QString::fromUtf8(":/Images/HelpLarge.png"), QSize(), QIcon::Normal, QIcon::Off);
+  icon.addFile(QString::fromUtf8(":/Images/Help.png"), QSize(), QIcon::Normal, QIcon::Off);
   page_handle->help_button_->setIcon(icon);
   page_handle->help_button_->setIconSize(QSize(16, 16));
   
