@@ -59,7 +59,7 @@ SliderSpinCombo::SliderSpinCombo( QWidget *parent, double minRange, double maxRa
     setRanges( minRange, maxRange);
     setStep(stepSize);
     setCurrentValue( startValue );
-  SCI_LOG_MESSAGE("SliderSpinCombo has been created!");
+    SCI_LOG_MESSAGE("SliderSpinCombo has been created!");
 }
 
 SliderSpinCombo::SliderSpinCombo( QWidget *parent, double minRange, double maxRange, double stepSize )

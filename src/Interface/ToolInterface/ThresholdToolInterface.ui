@@ -184,8 +184,8 @@
   <widget class="QLabel" name="tempHistogramLabel">
    <property name="geometry">
     <rect>
-     <x>60</x>
-     <y>290</y>
+     <x>48</x>
+     <y>278</y>
      <width>111</width>
      <height>51</height>
     </rect>

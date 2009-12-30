@@ -5,5 +5,10 @@
   <file>Images/Zview.png</file>
   <file>Images/Close.png</file>
   <file>Images/Help.png</file>
+  <file>Images/HelpLarge.png</file>
+  <file>Images/CloseSelected.png</file>
+  <file>Images/HelpSelected.png</file>
+  
+  
 </qresource>
 </RCC>

@@ -46,15 +46,12 @@ namespace Seg3D  {
 ToolsDockWidget::ToolsDockWidget(QWidget *parent) :
     QDockWidget(parent)
 {
-//  setMinimumSize(QSize(240, 200));
-//  setMaximumSize(QSize(240, 6000));
   setAllowedAreas(Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea);
   setWindowTitle("Tools/Plugins");
 
   toolbox_ = new ToolBoxWidget(this);
   setWidget(toolbox_);
 
-//  make_dock_widget();
 
   // Ensure that the application does not change any of the tools while
   // the user interface is being built

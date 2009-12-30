@@ -159,9 +159,9 @@ ToolBoxWidget::add_tool(QWidget * tool, const QString &label)
   
   ///  ---  This is where we add the icon's for the help button --- //
   QIcon icon;
-  icon.addFile(QString::fromUtf8(":/new/images/show_info.png"), QSize(), QIcon::Normal, QIcon::Off);
+  icon.addFile(QString::fromUtf8(":/Images/HelpLarge.png"), QSize(), QIcon::Normal, QIcon::Off);
   page_handle->help_button_->setIcon(icon);
-  page_handle->help_button_->setIconSize(QSize(18, 18));
+  page_handle->help_button_->setIconSize(QSize(16, 16));
   
   page_handle->hLayout_->addWidget(page_handle->help_button_);
   page_handle->close_button_ = new QToolButton(page_handle->header_);
@@ -169,7 +169,7 @@ ToolBoxWidget::add_tool(QWidget * tool, const QString &label)
   
    ///  ---  This is where we add the icon's for the close button --- //
   QIcon icon1;
-  icon1.addFile(QString::fromUtf8(":/new/images/close.png"), QSize(), QIcon::Normal, QIcon::Off);
+  icon1.addFile(QString::fromUtf8(":/Images/Close.png"), QSize(), QIcon::Normal, QIcon::Off);
   page_handle->close_button_->setIcon(icon1);
   page_handle->close_button_->setIconSize(QSize(18, 18));
   
@@ -196,9 +196,12 @@ ToolBoxWidget::add_tool(QWidget * tool, const QString &label)
   
   // Begin Connections 
   connect(page_handle->activate_button_, SIGNAL( clicked() ), this, SLOT(buttonClicked()));
+  connect(page_handle->close_button_, SIGNAL( clicked() ), this, SLOT(close_button_clicked()));
+  connect(page_handle->help_button_, SIGNAL( clicked() ), this, SLOT(help_button_clicked()));
+  
   connect(tool, SIGNAL(destroyed(QObject*)), this, SLOT(itemDestroyed(QObject*)));
   
-  tool_list_.insert(0, page_handle);
+  tool_list_.append(page_handle);
   
   // Add tool to the layout
   tool_layout_->addWidget(page_handle->page_, 0, Qt::AlignTop|Qt::AlignCenter);
@@ -213,8 +216,12 @@ ToolBoxWidget::add_tool(QWidget * tool, const QString &label)
   
 void ToolBoxWidget::set_active_index( int index )
 {
+  if (index >= 0) 
+  {
+    set_active_tool(tool_list_.at(index)->tool_);
+  }
   active_index_ = index;
-  set_active_tool(tool_list_.at(index)->tool_);
+  
 }
   
   
@@ -303,47 +310,41 @@ QSharedPointer<ToolBoxWidget::Page> ToolBoxWidget::page( QWidget *tool )
 int ToolBoxWidget::index_of( QWidget *tool ) 
 {
   QSharedPointer <Page> page_ptr_ = page( tool );
-  return page_ptr_ ? tool_list_.indexOf( page_ptr_ ) : -1;
+  int index = page_ptr_ ? tool_list_.indexOf( page_ptr_ ) : -1;
+  
+  std::string h = boost::lexical_cast<std::string>(index);
+  SCI_LOG_MESSAGE("The the index of the tool is: "+ h);
+  
+  return index;
+  
 }
   
-  
-void ToolBoxWidget::remove_tool( QWidget *tool )
-{
 
-  int index = index_of(tool);
-//  for ( PageList::ConstIterator i = tool_list_.constBegin(); i != tool_list_.constEnd(); ++i )
-//  {
-//    if ( (*i)->tool_ == tool )
-//    {
-//      tool_list_.removeAt(i);
-//      main_layout_->removeWidget(*i);
-//    }
-//  }
-  
-  
-  
-  //remove_tool(index);
-  //tool_layout_->removeWidget(tool);
-  if (index >= 0)
-  {
-    //disconnect(tool, SIGNAL(destroyed(QObject *)), this, SLOT(itemDestroyed(QObject*)));
-    //tool->setParent(this);
-  }
-  tool_removed(index);
-
-}
-  
- 
 void ToolBoxWidget::remove_tool(int index)
 {
+  // Set the previous tool to active if the one to be deleted is active.
+  if (active_index_ == index) { set_active_index(index-1); }
+   
+  // Find the index that corresponds to the tool
+  QList<PageHandle>::iterator it = tool_list_.begin();
+  QList<PageHandle>::iterator it_end = tool_list_.end();
 
-  
-  if (index >= 0)
+  int counter = 0;
+
+  // Loop through the tool list and remove the ones you dont need.
+  while (it != it_end) 
   {
-    
-    //TODO - remove the tool 
-    //disconnect(tool_list_.at(index), SIGNAL(destroyed(QObject*)), this, SLOT(itemDestroyed(QObject*)));
+    if (counter == index) 
+    {
+      tool_layout_->removeWidget((*it)->page_);
+         
+      (*it)->page_->deleteLater();
+      tool_list_.removeAt(index);
+      main_->adjustSize();
+    }
+    ++it; counter++;
   }
+  
   tool_removed(index);
 }
   
@@ -353,7 +354,7 @@ void ToolBoxWidget::tool_removed(int index)
   Q_UNUSED(index)
 }
   
-  
+// slot for activate button  
 void ToolBoxWidget::buttonClicked()
 {
   QPushButton *activate_button = ::qobject_cast<QPushButton*>(sender());
@@ -367,9 +368,51 @@ void ToolBoxWidget::buttonClicked()
      } 
     }
   set_active_tool( item );
-  SCI_LOG_MESSAGE("Button has been clicked.");
+  SCI_LOG_MESSAGE("Activate button has been clicked.");
   
 }
+
+void ToolBoxWidget:: close_button_clicked()
+{
+  SCI_LOG_MESSAGE("Close button has been clicked.");
+  QToolButton *close_button = ::qobject_cast<QToolButton*>(sender());
+  int counter = 0;
+  
+  QList<PageHandle>::iterator it = tool_list_.begin();
+  QList<PageHandle>::iterator it_end = tool_list_.end();
+  
+  while (it != it_end) 
+  { 
+    if ((*it)->close_button_ == close_button)
+    {
+      std::string h = boost::lexical_cast<std::string>(counter);
+      SCI_LOG_MESSAGE("made it to the remove section attempting to remove the widget at index: " + h);
+      remove_tool(counter);
+    }
+    ++it; counter++;
+  }
+  
+}
+  
+  void ToolBoxWidget:: help_button_clicked()
+  {
+    SCI_LOG_MESSAGE("Help button has been clicked.");
+    QToolButton *help_button = ::qobject_cast<QToolButton*>(sender());
+    int counter = 0;
+    
+    QList<PageHandle>::iterator it = tool_list_.begin();
+    QList<PageHandle>::iterator it_end = tool_list_.end();
+    
+    while (it != it_end) 
+    { 
+      if ((*it)->help_button_ == help_button)
+      {
+        
+      }
+      ++it; counter++;
+    }
+  }
+                                                                      
 
 void ToolBoxWidget::itemDestroyed(QObject *object)
 {
