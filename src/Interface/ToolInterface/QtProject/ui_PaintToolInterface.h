@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'PaintToolInterface.ui'
 **
-** Created: Fri Dec 18 15:00:15 2009
+** Created: Wed Dec 30 08:36:24 2009
 **      by: Qt User Interface Compiler version 4.6.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -216,7 +216,7 @@ public:
     {
         PaintToolInterface->setWindowTitle(QApplication::translate("PaintToolInterface", "Form", 0, QApplication::UnicodeUTF8));
         eraseCheckBox->setText(QApplication::translate("PaintToolInterface", "Erase Mode", 0, QApplication::UnicodeUTF8));
-        activeLabel->setText(QApplication::translate("PaintToolInterface", "Active:", 0, QApplication::UnicodeUTF8));
+        activeLabel->setText(QApplication::translate("PaintToolInterface", "Target:", 0, QApplication::UnicodeUTF8));
         maskLabel->setText(QApplication::translate("PaintToolInterface", "Mask:", 0, QApplication::UnicodeUTF8));
         brushLabel->setText(QApplication::translate("PaintToolInterface", "Brush Size:", 0, QApplication::UnicodeUTF8));
         thresholdGroupBox->setTitle(QApplication::translate("PaintToolInterface", "Threshold", 0, QApplication::UnicodeUTF8));

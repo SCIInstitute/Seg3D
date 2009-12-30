@@ -42,6 +42,12 @@ SET(APPLICATION_TOOLS_SRCS
   PolylineTool.cc
   ThresholdTool.h
   ThresholdTool.cc
+  MedianFilter.h
+  MedianFilter.cc
+  DiscreteGaussianFilter.h
+  DiscreteGaussianFilter.cc
+  AnisotropicDiffusionFilter.h
+  AnisotropicDiffusionFilter.cc
   )
 
 ADD_LIBRARY(Application_Tools STATIC 

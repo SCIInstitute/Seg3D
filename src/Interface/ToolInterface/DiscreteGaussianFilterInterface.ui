@@ -1,18 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>AnisotropicDiffusionFilter</class>
- <widget class="QWidget" name="AnisotropicDiffusionFilter">
+ <class>DiscreteGaussianFilterInterface</class>
+ <widget class="QWidget" name="DiscreteGaussianFilterInterface">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>213</width>
-    <height>306</height>
+    <height>207</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <widget class="QWidget" name="layoutWidget_7">
+   <property name="geometry">
+    <rect>
+     <x>4</x>
+     <y>50</y>
+     <width>205</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="varianceHLayout_bottom"/>
+  </widget>
   <widget class="QWidget" name="layoutWidget_2">
    <property name="geometry">
     <rect>
@@ -29,55 +40,12 @@
     <item>
      <widget class="QLabel" name="activeLabel">
       <property name="text">
-       <string>Active:</string>
+       <string>Target:</string>
       </property>
      </widget>
     </item>
     <item>
      <widget class="QComboBox" name="activeComboBox"/>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QWidget" name="layoutWidget_6">
-   <property name="geometry">
-    <rect>
-     <x>4</x>
-     <y>121</y>
-     <width>205</width>
-     <height>51</height>
-    </rect>
-   </property>
-   <layout class="QHBoxLayout" name="integrationHLayout_bottom"/>
-  </widget>
-  <widget class="QWidget" name="layoutWidget_9">
-   <property name="geometry">
-    <rect>
-     <x>4</x>
-     <y>100</y>
-     <width>205</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <layout class="QHBoxLayout" name="integrationHLayout_top">
-    <item>
-     <widget class="QLabel" name="integrationLabel">
-      <property name="text">
-       <string>Integration Step:</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <spacer name="integrationHSpacer">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>40</width>
-        <height>20</height>
-       </size>
-      </property>
-     </spacer>
     </item>
    </layout>
   </widget>
@@ -90,16 +58,16 @@
      <height>22</height>
     </rect>
    </property>
-   <layout class="QHBoxLayout" name="iterationsHLayout_top">
+   <layout class="QHBoxLayout" name="varianceHLayout_top">
     <item>
-     <widget class="QLabel" name="iterationsLabel">
+     <widget class="QLabel" name="varianceLabel">
       <property name="text">
-       <string>Number of Iterations:</string>
+       <string>Variance</string>
       </property>
      </widget>
     </item>
     <item>
-     <spacer name="iterationsHSpacer">
+     <spacer name="varianceHSpacer">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
@@ -113,65 +81,54 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget_7">
+  <widget class="QWidget" name="layoutWidget_9">
    <property name="geometry">
     <rect>
      <x>4</x>
-     <y>50</y>
+     <y>100</y>
      <width>205</width>
-     <height>51</height>
+     <height>22</height>
     </rect>
    </property>
-   <layout class="QHBoxLayout" name="iterationsHLayout_bottom"/>
+   <layout class="QHBoxLayout" name="kernalHLayout_top">
+    <item>
+     <widget class="QLabel" name="kernalLabel">
+      <property name="text">
+       <string>Maximum Kernal Width</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <spacer name="kernalHSpacer">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>40</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+   </layout>
   </widget>
   <widget class="QWidget" name="layoutWidget_10">
    <property name="geometry">
     <rect>
      <x>4</x>
-     <y>171</y>
-     <width>205</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <layout class="QHBoxLayout" name="conductanceHLayout">
-    <item>
-     <widget class="QLabel" name="conductanceLabel">
-      <property name="text">
-       <string>Conductance:</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <spacer name="conductanceHSpacer">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>40</width>
-        <height>20</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QWidget" name="layoutWidget_11">
-   <property name="geometry">
-    <rect>
-     <x>4</x>
-     <y>192</y>
+     <y>121</y>
      <width>205</width>
      <height>51</height>
     </rect>
    </property>
-   <layout class="QHBoxLayout" name="conductanceHLayout_bottom"/>
+   <layout class="QHBoxLayout" name="kernalHLayout_bottom"/>
   </widget>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>4</x>
-     <y>242</y>
+     <y>171</y>
      <width>205</width>
      <height>32</height>
     </rect>
@@ -195,19 +152,6 @@
      </widget>
     </item>
    </layout>
-  </widget>
-  <widget class="QPushButton" name="pushButton">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>274</y>
-     <width>151</width>
-     <height>32</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Set to defaults</string>
-   </property>
   </widget>
  </widget>
  <resources/>

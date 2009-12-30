@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'InvertToolInterface.ui'
 **
-** Created: Fri Dec 18 15:00:15 2009
+** Created: Wed Dec 30 08:36:24 2009
 **      by: Qt User Interface Compiler version 4.6.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -31,7 +31,7 @@ public:
     QHBoxLayout *activeHLayout;
     QLabel *activeLabel;
     QComboBox *activeComboBox;
-    QWidget *widget;
+    QWidget *layoutWidget;
     QHBoxLayout *replaceInvertLayout;
     QCheckBox *replaceCheckBox;
     QPushButton *invertButton;
@@ -40,15 +40,29 @@ public:
     {
         if (InvertToolInterface->objectName().isEmpty())
             InvertToolInterface->setObjectName(QString::fromUtf8("InvertToolInterface"));
-        InvertToolInterface->resize(231, 81);
+        InvertToolInterface->resize(213, 65);
+        QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(InvertToolInterface->sizePolicy().hasHeightForWidth());
+        InvertToolInterface->setSizePolicy(sizePolicy);
+        InvertToolInterface->setMinimumSize(QSize(213, 65));
+        InvertToolInterface->setMaximumSize(QSize(213, 65));
+        InvertToolInterface->setBaseSize(QSize(213, 65));
         layoutWidget_2 = new QWidget(InvertToolInterface);
         layoutWidget_2->setObjectName(QString::fromUtf8("layoutWidget_2"));
-        layoutWidget_2->setGeometry(QRect(10, 10, 211, 26));
+        layoutWidget_2->setGeometry(QRect(4, 4, 207, 26));
         activeHLayout = new QHBoxLayout(layoutWidget_2);
+        activeHLayout->setSpacing(0);
         activeHLayout->setObjectName(QString::fromUtf8("activeHLayout"));
         activeHLayout->setContentsMargins(0, 0, 0, 0);
         activeLabel = new QLabel(layoutWidget_2);
         activeLabel->setObjectName(QString::fromUtf8("activeLabel"));
+        QSizePolicy sizePolicy1(QSizePolicy::Preferred, QSizePolicy::Preferred);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(activeLabel->sizePolicy().hasHeightForWidth());
+        activeLabel->setSizePolicy(sizePolicy1);
 
         activeHLayout->addWidget(activeLabel);
 
@@ -57,19 +71,21 @@ public:
 
         activeHLayout->addWidget(activeComboBox);
 
-        widget = new QWidget(InvertToolInterface);
-        widget->setObjectName(QString::fromUtf8("widget"));
-        widget->setGeometry(QRect(10, 40, 211, 32));
-        replaceInvertLayout = new QHBoxLayout(widget);
+        activeHLayout->setStretch(0, 1);
+        activeHLayout->setStretch(1, 2);
+        layoutWidget = new QWidget(InvertToolInterface);
+        layoutWidget->setObjectName(QString::fromUtf8("layoutWidget"));
+        layoutWidget->setGeometry(QRect(4, 29, 207, 32));
+        replaceInvertLayout = new QHBoxLayout(layoutWidget);
         replaceInvertLayout->setObjectName(QString::fromUtf8("replaceInvertLayout"));
         replaceInvertLayout->setContentsMargins(0, 0, 0, 0);
-        replaceCheckBox = new QCheckBox(widget);
+        replaceCheckBox = new QCheckBox(layoutWidget);
         replaceCheckBox->setObjectName(QString::fromUtf8("replaceCheckBox"));
         replaceCheckBox->setChecked(true);
 
         replaceInvertLayout->addWidget(replaceCheckBox);
 
-        invertButton = new QPushButton(widget);
+        invertButton = new QPushButton(layoutWidget);
         invertButton->setObjectName(QString::fromUtf8("invertButton"));
 
         replaceInvertLayout->addWidget(invertButton);
@@ -83,7 +99,7 @@ public:
     void retranslateUi(QWidget *InvertToolInterface)
     {
         InvertToolInterface->setWindowTitle(QApplication::translate("InvertToolInterface", "Form", 0, QApplication::UnicodeUTF8));
-        activeLabel->setText(QApplication::translate("InvertToolInterface", "Active:", 0, QApplication::UnicodeUTF8));
+        activeLabel->setText(QApplication::translate("InvertToolInterface", "Target:", 0, QApplication::UnicodeUTF8));
         replaceCheckBox->setText(QApplication::translate("InvertToolInterface", "Replace", 0, QApplication::UnicodeUTF8));
         invertButton->setText(QApplication::translate("InvertToolInterface", "Invert", 0, QApplication::UnicodeUTF8));
     } // retranslateUi

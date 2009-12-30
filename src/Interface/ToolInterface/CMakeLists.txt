@@ -37,6 +37,8 @@ SET(INTERFACE_TOOLINTERFACE_SRCS
   ThresholdToolInterface.cc
   FlipToolInterface.cc
   InvertToolInterface.cc
+  MedianFilterInterface.cc
+  AnisotropicDiffusionFilterInterface.cc
 )
 
 SET(INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_SRCS
@@ -49,6 +51,8 @@ SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
   ThresholdToolInterface.h
   FlipToolInterface.h
   InvertToolInterface.h
+  MedianFilterInterface.h
+  AnisotropicDiffusionFilterInterface.h
 )
 
 SET(INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_MOC_SRCS
@@ -64,6 +68,8 @@ SET(INTERFACE_TOOLINTERFACE_UI_SRCS
   ThresholdToolInterface.ui
   FlipToolInterface.ui
   InvertToolInterface.ui
+  MedianFilterInterface.ui
+  AnisotropicDiffusionFilterInterface.ui
 )
 
 ##################################################

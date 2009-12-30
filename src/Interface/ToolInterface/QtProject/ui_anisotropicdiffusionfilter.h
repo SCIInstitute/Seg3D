@@ -1,7 +1,7 @@
 /********************************************************************************
-** Form generated from reading UI file 'anisotropicdiffusionfilter.ui'
+** Form generated from reading UI file 'AnisotropicDiffusionFilter.ui'
 **
-** Created: Fri Dec 18 15:00:15 2009
+** Created: Wed Dec 30 08:37:51 2009
 **      by: Qt User Interface Compiler version 4.6.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -60,11 +60,12 @@ public:
     {
         if (AnisotropicDiffusionFilter->objectName().isEmpty())
             AnisotropicDiffusionFilter->setObjectName(QString::fromUtf8("AnisotropicDiffusionFilter"));
-        AnisotropicDiffusionFilter->resize(231, 331);
+        AnisotropicDiffusionFilter->resize(213, 306);
         layoutWidget_2 = new QWidget(AnisotropicDiffusionFilter);
         layoutWidget_2->setObjectName(QString::fromUtf8("layoutWidget_2"));
-        layoutWidget_2->setGeometry(QRect(10, 10, 211, 26));
+        layoutWidget_2->setGeometry(QRect(4, 4, 207, 26));
         activeHLayout = new QHBoxLayout(layoutWidget_2);
+        activeHLayout->setSpacing(0);
         activeHLayout->setObjectName(QString::fromUtf8("activeHLayout"));
         activeHLayout->setContentsMargins(0, 0, 0, 0);
         activeLabel = new QLabel(layoutWidget_2);
@@ -77,15 +78,17 @@ public:
 
         activeHLayout->addWidget(activeComboBox);
 
+        activeHLayout->setStretch(0, 1);
+        activeHLayout->setStretch(1, 2);
         layoutWidget_6 = new QWidget(AnisotropicDiffusionFilter);
         layoutWidget_6->setObjectName(QString::fromUtf8("layoutWidget_6"));
-        layoutWidget_6->setGeometry(QRect(10, 127, 211, 51));
+        layoutWidget_6->setGeometry(QRect(4, 121, 205, 51));
         integrationHLayout_bottom = new QHBoxLayout(layoutWidget_6);
         integrationHLayout_bottom->setObjectName(QString::fromUtf8("integrationHLayout_bottom"));
         integrationHLayout_bottom->setContentsMargins(0, 0, 0, 0);
         layoutWidget_9 = new QWidget(AnisotropicDiffusionFilter);
         layoutWidget_9->setObjectName(QString::fromUtf8("layoutWidget_9"));
-        layoutWidget_9->setGeometry(QRect(10, 106, 211, 22));
+        layoutWidget_9->setGeometry(QRect(4, 100, 205, 22));
         integrationHLayout_top = new QHBoxLayout(layoutWidget_9);
         integrationHLayout_top->setObjectName(QString::fromUtf8("integrationHLayout_top"));
         integrationHLayout_top->setContentsMargins(0, 0, 0, 0);
@@ -100,7 +103,7 @@ public:
 
         layoutWidget_8 = new QWidget(AnisotropicDiffusionFilter);
         layoutWidget_8->setObjectName(QString::fromUtf8("layoutWidget_8"));
-        layoutWidget_8->setGeometry(QRect(10, 35, 211, 22));
+        layoutWidget_8->setGeometry(QRect(4, 29, 205, 22));
         iterationsHLayout_top = new QHBoxLayout(layoutWidget_8);
         iterationsHLayout_top->setObjectName(QString::fromUtf8("iterationsHLayout_top"));
         iterationsHLayout_top->setContentsMargins(0, 0, 0, 0);
@@ -115,13 +118,13 @@ public:
 
         layoutWidget_7 = new QWidget(AnisotropicDiffusionFilter);
         layoutWidget_7->setObjectName(QString::fromUtf8("layoutWidget_7"));
-        layoutWidget_7->setGeometry(QRect(10, 56, 211, 51));
+        layoutWidget_7->setGeometry(QRect(4, 50, 205, 51));
         iterationsHLayout_bottom = new QHBoxLayout(layoutWidget_7);
         iterationsHLayout_bottom->setObjectName(QString::fromUtf8("iterationsHLayout_bottom"));
         iterationsHLayout_bottom->setContentsMargins(0, 0, 0, 0);
         layoutWidget_10 = new QWidget(AnisotropicDiffusionFilter);
         layoutWidget_10->setObjectName(QString::fromUtf8("layoutWidget_10"));
-        layoutWidget_10->setGeometry(QRect(10, 177, 211, 22));
+        layoutWidget_10->setGeometry(QRect(4, 171, 205, 22));
         conductanceHLayout = new QHBoxLayout(layoutWidget_10);
         conductanceHLayout->setObjectName(QString::fromUtf8("conductanceHLayout"));
         conductanceHLayout->setContentsMargins(0, 0, 0, 0);
@@ -136,13 +139,13 @@ public:
 
         layoutWidget_11 = new QWidget(AnisotropicDiffusionFilter);
         layoutWidget_11->setObjectName(QString::fromUtf8("layoutWidget_11"));
-        layoutWidget_11->setGeometry(QRect(10, 198, 211, 51));
+        layoutWidget_11->setGeometry(QRect(4, 192, 205, 51));
         conductanceHLayout_bottom = new QHBoxLayout(layoutWidget_11);
         conductanceHLayout_bottom->setObjectName(QString::fromUtf8("conductanceHLayout_bottom"));
         conductanceHLayout_bottom->setContentsMargins(0, 0, 0, 0);
         layoutWidget = new QWidget(AnisotropicDiffusionFilter);
         layoutWidget->setObjectName(QString::fromUtf8("layoutWidget"));
-        layoutWidget->setGeometry(QRect(10, 248, 211, 32));
+        layoutWidget->setGeometry(QRect(4, 242, 205, 32));
         replaceInvertLayout = new QHBoxLayout(layoutWidget);
         replaceInvertLayout->setObjectName(QString::fromUtf8("replaceInvertLayout"));
         replaceInvertLayout->setContentsMargins(0, 0, 0, 0);
@@ -159,7 +162,7 @@ public:
 
         pushButton = new QPushButton(AnisotropicDiffusionFilter);
         pushButton->setObjectName(QString::fromUtf8("pushButton"));
-        pushButton->setGeometry(QRect(40, 290, 151, 32));
+        pushButton->setGeometry(QRect(30, 274, 151, 32));
 
         retranslateUi(AnisotropicDiffusionFilter);
 
@@ -169,7 +172,7 @@ public:
     void retranslateUi(QWidget *AnisotropicDiffusionFilter)
     {
         AnisotropicDiffusionFilter->setWindowTitle(QApplication::translate("AnisotropicDiffusionFilter", "Form", 0, QApplication::UnicodeUTF8));
-        activeLabel->setText(QApplication::translate("AnisotropicDiffusionFilter", "Active:", 0, QApplication::UnicodeUTF8));
+        activeLabel->setText(QApplication::translate("AnisotropicDiffusionFilter", "Target:", 0, QApplication::UnicodeUTF8));
         integrationLabel->setText(QApplication::translate("AnisotropicDiffusionFilter", "Integration Step:", 0, QApplication::UnicodeUTF8));
         iterationsLabel->setText(QApplication::translate("AnisotropicDiffusionFilter", "Number of Iterations:", 0, QApplication::UnicodeUTF8));
         conductanceLabel->setText(QApplication::translate("AnisotropicDiffusionFilter", "Conductance:", 0, QApplication::UnicodeUTF8));

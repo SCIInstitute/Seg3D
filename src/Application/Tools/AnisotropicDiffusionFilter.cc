@@ -26,49 +26,44 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_TOOLINTERFACE_INVERTTOOLINTERFACE_H
-#define INTERFACE_TOOLINTERFACE_INVERTTOOLINTERFACE_H
-
-// Application includes
 #include <Application/Tool/ToolFactory.h>
-
-// Base class of the tool widget
-#include <Interface/AppInterface/ToolWidget.h>
+#include <Application/Tools/AnisotropicDiffusionFilter.h>
 
 
 namespace Seg3D {
   
-class InvertToolInterfacePrivate;
+// Register the tool into the tool factory
+SCI_REGISTER_TOOL(AnisotropicDiffusionFilter)
 
-class InvertToolInterface : public ToolWidget {
-  Q_OBJECT
   
-Q_SIGNALS:
-  void activeChanged(int);
-  // sends a bool representing wether the user wants to replace the active layer or not
-  void invert(bool);
+AnisotropicDiffusionFilter::AnisotropicDiffusionFilter(const std::string& toolid) :
+Tool(toolid)
+{
+  //TODO - add guts
   
-public:
-  InvertToolInterface();
-  virtual ~InvertToolInterface();
-  virtual bool build_widget(QFrame* frame);
   
-public Q_SLOTS:
-  void setActive(int);
-  void addToActive(QStringList&);
+}
+
+void
+AnisotropicDiffusionFilter::target_constraint(std::string layerid)
+{
+}
+
+AnisotropicDiffusionFilter::~AnisotropicDiffusionFilter()
+{
   
-private:
-  InvertToolInterfacePrivate* private_;
-  void makeConnections();
+}
+
+void
+AnisotropicDiffusionFilter::activate()
+{
+}
+
+void
+AnisotropicDiffusionFilter::deactivate()
+{
+}
   
-private Q_SLOTS:
-  void senseActiveChanged(int);
-  void senseInverted();
+} // end namespace Seg3D
 
 
-};
-
-
-} // namespace Seg3D
-
-#endif

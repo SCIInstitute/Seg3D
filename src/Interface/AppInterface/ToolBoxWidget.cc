@@ -195,7 +195,7 @@ ToolBoxWidget::add_tool(QWidget * tool, const QString &label)
   //  --- End QT Widget Design --- //
   
   // Begin Connections 
-  connect(page_handle->activate_button_, SIGNAL( clicked() ), this, SLOT(buttonClicked()));
+  connect(page_handle->activate_button_, SIGNAL( clicked() ), this, SLOT(activate_button_clicked()));
   connect(page_handle->close_button_, SIGNAL( clicked() ), this, SLOT(close_button_clicked()));
   connect(page_handle->help_button_, SIGNAL( clicked() ), this, SLOT(help_button_clicked()));
   
@@ -355,7 +355,7 @@ void ToolBoxWidget::tool_removed(int index)
 }
   
 // slot for activate button  
-void ToolBoxWidget::buttonClicked()
+void ToolBoxWidget::activate_button_clicked()
 {
   QPushButton *activate_button = ::qobject_cast<QPushButton*>(sender());
   QWidget* item =0;

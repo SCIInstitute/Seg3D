@@ -1,38 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ThresholdToolInterface</class>
- <widget class="QWidget" name="ThresholdToolInterface">
+ <class>AnisotropicDiffusionFilterInterface</class>
+ <widget class="QWidget" name="AnisotropicDiffusionFilterInterface">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>213</width>
-    <height>396</height>
+    <height>306</height>
    </rect>
-  </property>
-  <property name="sizePolicy">
-   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-    <horstretch>0</horstretch>
-    <verstretch>0</verstretch>
-   </sizepolicy>
-  </property>
-  <property name="minimumSize">
-   <size>
-    <width>213</width>
-    <height>396</height>
-   </size>
-  </property>
-  <property name="maximumSize">
-   <size>
-    <width>213</width>
-    <height>396</height>
-   </size>
-  </property>
-  <property name="baseSize">
-   <size>
-    <width>213</width>
-    <height>396</height>
-   </size>
   </property>
   <property name="windowTitle">
    <string>Form</string>
@@ -71,7 +47,7 @@
      <height>51</height>
     </rect>
    </property>
-   <layout class="QHBoxLayout" name="lowerHLayout_bottom"/>
+   <layout class="QHBoxLayout" name="integrationHLayout_bottom"/>
   </widget>
   <widget class="QWidget" name="layoutWidget_9">
    <property name="geometry">
@@ -82,16 +58,16 @@
      <height>22</height>
     </rect>
    </property>
-   <layout class="QHBoxLayout" name="lowerHLayout_top">
+   <layout class="QHBoxLayout" name="integrationHLayout_top">
     <item>
-     <widget class="QLabel" name="lowerLabel">
+     <widget class="QLabel" name="integrationLabel">
       <property name="text">
-       <string>Lower Threshold:</string>
+       <string>Integration Step:</string>
       </property>
      </widget>
     </item>
     <item>
-     <spacer name="lowerHSpacer">
+     <spacer name="integrationHSpacer">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
@@ -114,16 +90,16 @@
      <height>22</height>
     </rect>
    </property>
-   <layout class="QHBoxLayout" name="upperHLayout_top">
+   <layout class="QHBoxLayout" name="iterationsHLayout_top">
     <item>
-     <widget class="QLabel" name="upperLabel">
+     <widget class="QLabel" name="iterationsLabel">
       <property name="text">
-       <string>Upper Threshold:</string>
+       <string>Number of Iterations:</string>
       </property>
      </widget>
     </item>
     <item>
-     <spacer name="upperHSpacer">
+     <spacer name="iterationsHSpacer">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
@@ -146,103 +122,92 @@
      <height>51</height>
     </rect>
    </property>
-   <layout class="QHBoxLayout" name="upperHLayout_bottom"/>
+   <layout class="QHBoxLayout" name="iterationsHLayout_bottom"/>
   </widget>
-  <widget class="QPushButton" name="createThresholdLayerButton">
+  <widget class="QWidget" name="layoutWidget_10">
    <property name="geometry">
     <rect>
-     <x>6</x>
-     <y>176</y>
-     <width>201</width>
-     <height>32</height>
+     <x>4</x>
+     <y>171</y>
+     <width>205</width>
+     <height>22</height>
     </rect>
    </property>
-   <property name="text">
-    <string>Create Threshold Layer</string>
-   </property>
+   <layout class="QHBoxLayout" name="conductanceHLayout">
+    <item>
+     <widget class="QLabel" name="conductanceLabel">
+      <property name="text">
+       <string>Conductance:</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <spacer name="conductanceHSpacer">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>40</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+   </layout>
   </widget>
-  <widget class="QPushButton" name="clearSeedsButton">
+  <widget class="QWidget" name="layoutWidget_11">
    <property name="geometry">
     <rect>
-     <x>50</x>
-     <y>208</y>
-     <width>115</width>
-     <height>32</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Clear Seeds</string>
-   </property>
-  </widget>
-  <widget class="QGraphicsView" name="histogramView">
-   <property name="geometry">
-    <rect>
-     <x>6</x>
-     <y>240</y>
-     <width>201</width>
-     <height>131</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLabel" name="tempHistogramLabel">
-   <property name="geometry">
-    <rect>
-     <x>48</x>
-     <y>278</y>
-     <width>111</width>
+     <x>4</x>
+     <y>192</y>
+     <width>205</width>
      <height>51</height>
     </rect>
    </property>
-   <property name="text">
-    <string>Histogram goes here.</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignCenter</set>
-   </property>
-   <property name="wordWrap">
-    <bool>true</bool>
-   </property>
+   <layout class="QHBoxLayout" name="conductanceHLayout_bottom"/>
   </widget>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>6</x>
-     <y>370</y>
-     <width>201</width>
-     <height>20</height>
+     <x>4</x>
+     <y>242</y>
+     <width>205</width>
+     <height>32</height>
     </rect>
    </property>
-   <layout class="QHBoxLayout" name="minMaxHLayout">
+   <layout class="QHBoxLayout" name="replaceInvertLayout">
     <item>
-     <widget class="QLabel" name="minLabel">
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-        <weight>50</weight>
-        <bold>false</bold>
-       </font>
-      </property>
+     <widget class="QCheckBox" name="replaceCheckBox">
       <property name="text">
-       <string>min</string>
+       <string>Replace</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
       </property>
      </widget>
     </item>
     <item>
-     <widget class="QLabel" name="maxLabel">
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
+     <widget class="QPushButton" name="invertButton">
       <property name="text">
-       <string>max</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       <string>Invert</string>
       </property>
      </widget>
     </item>
    </layout>
+  </widget>
+  <widget class="QPushButton" name="pushButton">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>274</y>
+     <width>151</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Set to defaults</string>
+   </property>
   </widget>
  </widget>
  <resources/>

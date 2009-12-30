@@ -26,48 +26,53 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_TOOLINTERFACE_INVERTTOOLINTERFACE_H
-#define INTERFACE_TOOLINTERFACE_INVERTTOOLINTERFACE_H
+#ifndef INTERFACE_TOOLINTERFACE_MEDIANFILTERINTERFACE_H
+#define INTERFACE_TOOLINTERFACE_MEDIANFILTERINTERFACE_H
 
 // Application includes
 #include <Application/Tool/ToolFactory.h>
 
 // Base class of the tool widget
 #include <Interface/AppInterface/ToolWidget.h>
+#include <Interface/ToolInterface/CustomWidgets/SliderSpinCombo.h>
 
 
 namespace Seg3D {
   
-class InvertToolInterfacePrivate;
+class MedianFilterInterfacePrivate;
 
-class InvertToolInterface : public ToolWidget {
+class MedianFilterInterface : public ToolWidget {
   Q_OBJECT
-  
+
 Q_SIGNALS:
   void activeChanged(int);
-  // sends a bool representing wether the user wants to replace the active layer or not
-  void invert(bool);
-  
+  void radiusSizeChanged(int);
+
 public:
-  InvertToolInterface();
-  virtual ~InvertToolInterface();
+  MedianFilterInterface();
+  virtual ~MedianFilterInterface();
   virtual bool build_widget(QFrame* frame);
   
 public Q_SLOTS:
   void setActive(int);
   void addToActive(QStringList&);
+  void setRadiusSize(int);
+
   
 private:
-  InvertToolInterfacePrivate* private_;
+  MedianFilterInterfacePrivate* private_;
+  SliderSpinCombo *radiusSizeAdjuster;
   void makeConnections();
   
 private Q_SLOTS:
   void senseActiveChanged(int);
-  void senseInverted();
+  void senseRadiusSizeChanged(double);
+
+
+
 
 
 };
-
 
 } // namespace Seg3D
 

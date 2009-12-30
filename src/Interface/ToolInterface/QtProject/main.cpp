@@ -4,13 +4,13 @@
 #include "InvertToolInterface.h"
 #include "PolyLineToolInterface.h"
 #include "ThresholdToolInterface.h"
-#include "anisotropicdiffusionfilter.h"
+#include "AnisotropicDiffusionFilterInterface.h"
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    AnisotropicDiffusionFilter t;
+    AnisotropicDiffusionFilterInterface t;
     t.show();
 
     PaintToolInterface v;

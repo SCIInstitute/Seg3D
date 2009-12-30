@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'PolyLineToolInterface.ui'
 **
-** Created: Fri Dec 18 15:00:15 2009
+** Created: Wed Dec 30 08:36:24 2009
 **      by: Qt User Interface Compiler version 4.6.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -43,19 +43,20 @@ public:
     {
         if (PolyLineToolInterface->objectName().isEmpty())
             PolyLineToolInterface->setObjectName(QString::fromUtf8("PolyLineToolInterface"));
-        PolyLineToolInterface->resize(213, 163);
+        PolyLineToolInterface->resize(213, 158);
         QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(PolyLineToolInterface->sizePolicy().hasHeightForWidth());
         PolyLineToolInterface->setSizePolicy(sizePolicy);
-        PolyLineToolInterface->setMinimumSize(QSize(213, 163));
-        PolyLineToolInterface->setMaximumSize(QSize(213, 163));
-        PolyLineToolInterface->setBaseSize(QSize(213, 163));
+        PolyLineToolInterface->setMinimumSize(QSize(213, 158));
+        PolyLineToolInterface->setMaximumSize(QSize(213, 158));
+        PolyLineToolInterface->setBaseSize(QSize(213, 158));
         layoutWidget_2 = new QWidget(PolyLineToolInterface);
         layoutWidget_2->setObjectName(QString::fromUtf8("layoutWidget_2"));
-        layoutWidget_2->setGeometry(QRect(6, 6, 205, 26));
+        layoutWidget_2->setGeometry(QRect(4, 4, 207, 26));
         activeHLayout = new QHBoxLayout(layoutWidget_2);
+        activeHLayout->setSpacing(0);
         activeHLayout->setObjectName(QString::fromUtf8("activeHLayout"));
         activeHLayout->setContentsMargins(0, 0, 0, 0);
         activeLabel = new QLabel(layoutWidget_2);
@@ -72,13 +73,13 @@ public:
         activeHLayout->setStretch(1, 2);
         resetPLButton = new QPushButton(PolyLineToolInterface);
         resetPLButton->setObjectName(QString::fromUtf8("resetPLButton"));
-        resetPLButton->setGeometry(QRect(6, 36, 189, 32));
+        resetPLButton->setGeometry(QRect(6, 36, 201, 32));
         insidePLGroupBox = new QGroupBox(PolyLineToolInterface);
         insidePLGroupBox->setObjectName(QString::fromUtf8("insidePLGroupBox"));
-        insidePLGroupBox->setGeometry(QRect(5, 66, 203, 91));
+        insidePLGroupBox->setGeometry(QRect(5, 62, 203, 91));
         layoutWidget = new QWidget(insidePLGroupBox);
         layoutWidget->setObjectName(QString::fromUtf8("layoutWidget"));
-        layoutWidget->setGeometry(QRect(0, 22, 203, 71));
+        layoutWidget->setGeometry(QRect(0, 22, 203, 69));
         insideVLayout = new QVBoxLayout(layoutWidget);
         insideVLayout->setSpacing(3);
         insideVLayout->setObjectName(QString::fromUtf8("insideVLayout"));
@@ -102,7 +103,7 @@ public:
     void retranslateUi(QWidget *PolyLineToolInterface)
     {
         PolyLineToolInterface->setWindowTitle(QApplication::translate("PolyLineToolInterface", "Form", 0, QApplication::UnicodeUTF8));
-        activeLabel->setText(QApplication::translate("PolyLineToolInterface", "Active:", 0, QApplication::UnicodeUTF8));
+        activeLabel->setText(QApplication::translate("PolyLineToolInterface", "Target:", 0, QApplication::UnicodeUTF8));
         resetPLButton->setText(QApplication::translate("PolyLineToolInterface", "Reset Polyline Tool", 0, QApplication::UnicodeUTF8));
         insidePLGroupBox->setTitle(QApplication::translate("PolyLineToolInterface", "Inside Polyline", 0, QApplication::UnicodeUTF8));
 #ifndef QT_NO_TOOLTIP

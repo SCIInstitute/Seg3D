@@ -26,49 +26,41 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_TOOLINTERFACE_INVERTTOOLINTERFACE_H
-#define INTERFACE_TOOLINTERFACE_INVERTTOOLINTERFACE_H
+#ifndef APPLICATION_TOOLS_MEDIANFILTER_H
+#define APPLICATION_TOOLS_MEDIANFILTER_H
 
-// Application includes
-#include <Application/Tool/ToolFactory.h>
-
-// Base class of the tool widget
-#include <Interface/AppInterface/ToolWidget.h>
-
+#include <Application/Tool/Tool.h>
 
 namespace Seg3D {
-  
-class InvertToolInterfacePrivate;
 
-class InvertToolInterface : public ToolWidget {
-  Q_OBJECT
-  
-Q_SIGNALS:
-  void activeChanged(int);
-  // sends a bool representing wether the user wants to replace the active layer or not
-  void invert(bool);
-  
+class MedianFilter : public Tool {
+  SCI_TOOL_TYPE("MedianFilter","Median Filter","",Tool::DATATODATA_E)
+// -- constructor/destructor --  
 public:
-  InvertToolInterface();
-  virtual ~InvertToolInterface();
-  virtual bool build_widget(QFrame* frame);
+  MedianFilter(const std::string& toolid);
+  virtual ~MedianFilter();
+
+// -- constraint parameters --
   
-public Q_SLOTS:
-  void setActive(int);
-  void addToActive(QStringList&);
+  // Constrain viewer to right painting tool when layer is selected
+  void target_constraint(std::string layerid);
   
-private:
-  InvertToolInterfacePrivate* private_;
-  void makeConnections();
+// -- activate/deactivate tool --
   
-private Q_SLOTS:
-  void senseActiveChanged(int);
-  void senseInverted();
+  virtual void activate();
+  virtual void deactivate();
+  
+// -- state --
+  public:
+    // Layerid of the target layer
+    StateOption::Handle              target_layer_;
+  
+
+
 
 
 };
 
-
-} // namespace Seg3D
+} // end namespace
 
 #endif

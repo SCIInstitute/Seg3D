@@ -27,76 +27,79 @@
  */
 
 
-#include "InvertToolInterface.h"
-#include "ui_InvertToolInterface.h"
+
+#include "MedianFilterInterface.h"
+#include "ui_MedianFilterInterface.h"
+
 
 namespace Seg3D {
   
-SCI_REGISTER_TOOLINTERFACE(InvertToolInterface)
+SCI_REGISTER_TOOLINTERFACE(MedianFilterInterface)
 
-class InvertToolInterfacePrivate {
-  public:
-    Ui::InvertToolInterface ui_;
+class MedianFilterInterfacePrivate {
+public:
+  Ui::MedianFilterInterface ui_;
 };
-  
-InvertToolInterface::InvertToolInterface() :
-private_(new InvertToolInterfacePrivate)
+
+MedianFilterInterface::MedianFilterInterface() :
+private_(new MedianFilterInterfacePrivate)
 {
   
 }
 
-InvertToolInterface::~InvertToolInterface()
+MedianFilterInterface::~MedianFilterInterface()
 {
 }
   
+
 bool
-InvertToolInterface::build_widget(QFrame* frame)
+MedianFilterInterface::build_widget(QFrame* frame)
 {
   private_->ui_.setupUi(frame);
-  SCI_LOG_DEBUG("Finished Building an Invert Tool");
-  makeConnections();
+  SCI_LOG_DEBUG("Finished Building an Median Interface Filter");
+  
+  radiusSizeAdjuster = new SliderSpinCombo();
+  private_->ui_.radiusHLayout_bottom->addWidget(radiusSizeAdjuster);
+  
   return (true);
   
 }
 
-
 //  --- Function for making signal slots connections ---  //
-void InvertToolInterface::makeConnections()
+void MedianFilterInterface::makeConnections()
 {
-  connect(private_->ui_.invertButton, SIGNAL(clicked()), this, SLOT(senseInverted()));
   connect(private_->ui_.activeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(senseActiveChanged(int)));
+  connect(radiusSizeAdjuster, SIGNAL(valueAdjusted(double)), this, SLOT(senseRadiusSizeChanged(double)));
 }
- 
-
+  
+  
 //  --- Private slots for custom signals ---  //
-void InvertToolInterface::senseActiveChanged(int active)
+void MedianFilterInterface::senseActiveChanged(int active)
 {
   Q_EMIT activeChanged(active);
 }
-
-void InvertToolInterface::senseInverted()
+  
+void MedianFilterInterface::senseRadiusSizeChanged(double size)
 {
-  if(private_->ui_.replaceCheckBox->isChecked())
-  {
-    Q_EMIT invert(true);
-  }
-  else
-  {
-    Q_EMIT invert(false);
-  }
+  Q_EMIT radiusSizeChanged(size);
 }
 
 //  --- Public slots for setting widget values ---  //
-void InvertToolInterface::setActive(int active)
+void MedianFilterInterface::setActive(int active)
 {
   private_->ui_.activeComboBox->setCurrentIndex(active);
 }
 
-void InvertToolInterface::addToActive(QStringList &items)
+void MedianFilterInterface::addToActive(QStringList &items)
 {
   private_->ui_.activeComboBox->addItems(items);
 }
+  
+void MedianFilterInterface::setRadiusSize(int size)
+{
+  radiusSizeAdjuster->setCurrentValue(size);
+}
+  
 
-
-
+  
 } // namespace Seg3D

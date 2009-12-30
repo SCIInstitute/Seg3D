@@ -26,49 +26,40 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_TOOLINTERFACE_INVERTTOOLINTERFACE_H
-#define INTERFACE_TOOLINTERFACE_INVERTTOOLINTERFACE_H
-
-// Application includes
 #include <Application/Tool/ToolFactory.h>
-
-// Base class of the tool widget
-#include <Interface/AppInterface/ToolWidget.h>
-
+#include <Application/Tools/MedianFilter.h>
 
 namespace Seg3D {
   
-class InvertToolInterfacePrivate;
-
-class InvertToolInterface : public ToolWidget {
-  Q_OBJECT
+// Register the tool into the tool factory
+SCI_REGISTER_TOOL(MedianFilter)
   
-Q_SIGNALS:
-  void activeChanged(int);
-  // sends a bool representing wether the user wants to replace the active layer or not
-  void invert(bool);
+MedianFilter::MedianFilter(const std::string& toolid) :
+Tool(toolid)
+{
+  //TODO - add guts
+
+}
+
+MedianFilter::~MedianFilter()
+{
+}
   
-public:
-  InvertToolInterface();
-  virtual ~InvertToolInterface();
-  virtual bool build_widget(QFrame* frame);
+void
+MedianFilter::target_constraint(std::string layerid)
+{
+}
   
-public Q_SLOTS:
-  void setActive(int);
-  void addToActive(QStringList&);
+
+void
+MedianFilter::activate()
+{
+}
+
+void
+MedianFilter::deactivate()
+{
+}  
+
   
-private:
-  InvertToolInterfacePrivate* private_;
-  void makeConnections();
-  
-private Q_SLOTS:
-  void senseActiveChanged(int);
-  void senseInverted();
-
-
-};
-
-
-} // namespace Seg3D
-
-#endif
+} // end namespace Seg3D

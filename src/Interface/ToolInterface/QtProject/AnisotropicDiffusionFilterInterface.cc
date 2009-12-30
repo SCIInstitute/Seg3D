@@ -1,9 +1,9 @@
-#include "anisotropicdiffusionfilter.h"
-#include "ui_anisotropicdiffusionfilter.h"
+#include "AnisotropicDiffusionFilterInterface.h"
+#include "ui_AnisotropicDiffusionFilterInterface.h"
 
-AnisotropicDiffusionFilter::AnisotropicDiffusionFilter(QWidget *parent) :
+AnisotropicDiffusionFilterInterface::AnisotropicDiffusionFilterInterface(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::AnisotropicDiffusionFilter)
+    ui(new Ui::AnisotropicDiffusionFilterInterface)
 {
     ui->setupUi(this);
 
@@ -28,34 +28,34 @@ AnisotropicDiffusionFilter::AnisotropicDiffusionFilter(QWidget *parent) :
 }
 
 //  --- Function for making signal slots connections ---  //
-void AnisotropicDiffusionFilter::makeConnections()
+void AnisotropicDiffusionFilterInterface::makeConnections()
 {
     connect(ui->activeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(senseActiveChanged(int)));
 
 }
 
 //  --- Private slots for custom signals ---  //
-void AnisotropicDiffusionFilter::senseActiveChanged(int active)
+void AnisotropicDiffusionFilterInterface::senseActiveChanged(int active)
 {
     emit activeChanged( active );
 }
 
-void AnisotropicDiffusionFilter::senseIterationsChanged(int iterations)
+void AnisotropicDiffusionFilterInterface::senseIterationsChanged(int iterations)
 {
     emit iterationsChanged(iterations);
 }
 
-void AnisotropicDiffusionFilter::senseStepChanged(double step)
+void AnisotropicDiffusionFilterInterface::senseStepChanged(double step)
 {
     emit stepChanged(step);
 }
 
-void AnisotropicDiffusionFilter::senseConductanceChanged(int conductance)
+void AnisotropicDiffusionFilterInterface::senseConductanceChanged(int conductance)
 {
     emit conductanceChanged(conductance);
 }
 
-void AnisotropicDiffusionFilter::senseFilterRun(bool)
+void AnisotropicDiffusionFilterInterface::senseFilterRun(bool)
 {
     if(ui->replaceCheckBox->isChecked())
     {
@@ -69,48 +69,48 @@ void AnisotropicDiffusionFilter::senseFilterRun(bool)
 
 
 //  --- Public slots for setting widget values ---  //
-void AnisotropicDiffusionFilter::setActive(int active)
+void AnisotropicDiffusionFilterInterface::setActive(int active)
 {
     ui->activeComboBox->setCurrentIndex(active);
 }
 
-void AnisotropicDiffusionFilter::addToActive(QStringList &items)
+void AnisotropicDiffusionFilterInterface::addToActive(QStringList &items)
 {
     ui->activeComboBox->addItems(items);
 }
 
-void AnisotropicDiffusionFilter::setIterations(int iterations)
+void AnisotropicDiffusionFilterInterface::setIterations(int iterations)
 {
     iterationsAdjuster->setCurrentValue(iterations);
 }
 
-void AnisotropicDiffusionFilter::setIterationRange(int lower, int upper)
+void AnisotropicDiffusionFilterInterface::setIterationRange(int lower, int upper)
 {
     iterationsAdjuster->setRanges(lower, upper);
 }
 
-void AnisotropicDiffusionFilter::setStep(double iterations)
+void AnisotropicDiffusionFilterInterface::setStep(double iterations)
 {
     stepAdjuster->setCurrentValue(iterations);
 }
 
-void AnisotropicDiffusionFilter::setStepRange(double lower, double upper)
+void AnisotropicDiffusionFilterInterface::setStepRange(double lower, double upper)
 {
     stepAdjuster->setRanges(lower, upper);
 }
 
-void AnisotropicDiffusionFilter::setConductance(int iterations)
+void AnisotropicDiffusionFilterInterface::setConductance(int iterations)
 {
     conductanceAdjuster->setCurrentValue(iterations);
 }
 
-void AnisotropicDiffusionFilter::setConductanceRange(int lower, int upper)
+void AnisotropicDiffusionFilterInterface::setConductanceRange(int lower, int upper)
 {
     conductanceAdjuster->setRanges(lower, upper);
 }
 
 
-AnisotropicDiffusionFilter::~AnisotropicDiffusionFilter()
+AnisotropicDiffusionFilterInterface::~AnisotropicDiffusionFilterInterface()
 {
     delete ui;
 }

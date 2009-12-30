@@ -10,17 +10,23 @@ SOURCES += main.cpp \
     InvertToolInterface.cc \
     PolyLineToolInterface.cpp \
     ThresholdToolInterface.cc \
-    anisotropicdiffusionfilter.cpp
+    AnisotropicDiffusionFilterInterface.cc \
+    MedianFilter.cc \
+    DiscreteGaussianFilterInterface.cc
 HEADERS += PaintToolInterface.h \
     sliderspincombo.h \
     FlipToolInterface.h \
     InvertToolInterface.h \
     PolyLineToolInterface.h \
     ThresholdToolInterface.h \
-    anisotropicdiffusionfilter.h
+    AnisotropicDiffusionFilterInterface.h \
+    MedianFilter.h \
+    DiscreteGaussianFilterInterface.h
 FORMS += ../PaintToolInterface.ui \
     ../FlipToolInterface.ui \
     ../InvertToolInterface.ui \
     ../PolyLineToolInterface.ui \
     ../ThresholdToolInterface.ui \
-    ../anisotropicdiffusionfilter.ui
+    ../AnisotropicDiffusionFilterInterface.ui \
+    ../MedianFilterInterface.ui \
+    ../DiscreteGaussianFilterInterface.ui

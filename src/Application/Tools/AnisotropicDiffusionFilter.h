@@ -26,49 +26,46 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_TOOLINTERFACE_INVERTTOOLINTERFACE_H
-#define INTERFACE_TOOLINTERFACE_INVERTTOOLINTERFACE_H
+#ifndef APPLICATION_TOOLS_ANISOTROPICDIFFUSIONFILTER_H
+#define APPLICATION_TOOLS_ANISOTROPICDIFFUSIONFILTER_H
 
-// Application includes
-#include <Application/Tool/ToolFactory.h>
+#include <Application/Tool/Tool.h>
 
-// Base class of the tool widget
-#include <Interface/AppInterface/ToolWidget.h>
-
-
-namespace Seg3D {
+namespace Seg3D  {
   
-class InvertToolInterfacePrivate;
+class AnisotropicDiffusionFilter : public Tool {
+  SCI_TOOL_TYPE("AnisotropicDiffusionFilter","Anisotropic Diffusion Filter", "",Tool::DATATODATA_E)
 
-class InvertToolInterface : public ToolWidget {
-  Q_OBJECT
-  
-Q_SIGNALS:
-  void activeChanged(int);
-  // sends a bool representing wether the user wants to replace the active layer or not
-  void invert(bool);
-  
 public:
-  InvertToolInterface();
-  virtual ~InvertToolInterface();
-  virtual bool build_widget(QFrame* frame);
+  AnisotropicDiffusionFilter(const std::string& toolid);
+  virtual ~AnisotropicDiffusionFilter();
   
-public Q_SLOTS:
-  void setActive(int);
-  void addToActive(QStringList&);
+  // -- constraint parameters --
   
-private:
-  InvertToolInterfacePrivate* private_;
-  void makeConnections();
+  // Constrain viewer to right painting tool when layer is selected
+  void target_constraint(std::string layerid);
   
-private Q_SLOTS:
-  void senseActiveChanged(int);
-  void senseInverted();
-
-
+  // -- activate/deactivate tool --
+  
+  virtual void activate();
+  virtual void deactivate();
+  
+  // -- state --
+public:
+  // Layerid of the target layer
+  StateOption::Handle              target_layer_;
+  
+  
+  
+  
+  
 };
-
-
-} // namespace Seg3D
+  
+  
+  
+  
+  
+  
+} // end namespace
 
 #endif

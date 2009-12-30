@@ -120,7 +120,7 @@ class ToolBoxWidget : public QScrollArea
     PageHandle page(QWidget *tool_);
     
   private Q_SLOTS:
-    void buttonClicked();
+    void activate_button_clicked();
     void close_button_clicked();
     void help_button_clicked();
     void itemDestroyed(QObject*);

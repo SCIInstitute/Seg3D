@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'ThresholdToolInterface.ui'
 **
-** Created: Fri Dec 18 15:00:15 2009
+** Created: Wed Dec 30 08:36:24 2009
 **      by: Qt User Interface Compiler version 4.6.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -70,6 +70,7 @@ public:
         layoutWidget_2->setObjectName(QString::fromUtf8("layoutWidget_2"));
         layoutWidget_2->setGeometry(QRect(4, 4, 207, 26));
         activeHLayout = new QHBoxLayout(layoutWidget_2);
+        activeHLayout->setSpacing(0);
         activeHLayout->setObjectName(QString::fromUtf8("activeHLayout"));
         activeHLayout->setContentsMargins(0, 0, 0, 0);
         activeLabel = new QLabel(layoutWidget_2);
@@ -82,6 +83,8 @@ public:
 
         activeHLayout->addWidget(activeComboBox);
 
+        activeHLayout->setStretch(0, 1);
+        activeHLayout->setStretch(1, 2);
         layoutWidget_6 = new QWidget(ThresholdToolInterface);
         layoutWidget_6->setObjectName(QString::fromUtf8("layoutWidget_6"));
         layoutWidget_6->setGeometry(QRect(4, 121, 205, 51));
@@ -135,7 +138,7 @@ public:
         histogramView->setGeometry(QRect(6, 240, 201, 131));
         tempHistogramLabel = new QLabel(ThresholdToolInterface);
         tempHistogramLabel->setObjectName(QString::fromUtf8("tempHistogramLabel"));
-        tempHistogramLabel->setGeometry(QRect(60, 290, 111, 51));
+        tempHistogramLabel->setGeometry(QRect(48, 278, 111, 51));
         tempHistogramLabel->setAlignment(Qt::AlignCenter);
         tempHistogramLabel->setWordWrap(true);
         layoutWidget = new QWidget(ThresholdToolInterface);
@@ -172,7 +175,7 @@ public:
     void retranslateUi(QWidget *ThresholdToolInterface)
     {
         ThresholdToolInterface->setWindowTitle(QApplication::translate("ThresholdToolInterface", "Form", 0, QApplication::UnicodeUTF8));
-        activeLabel->setText(QApplication::translate("ThresholdToolInterface", "Active:", 0, QApplication::UnicodeUTF8));
+        activeLabel->setText(QApplication::translate("ThresholdToolInterface", "Target:", 0, QApplication::UnicodeUTF8));
         lowerLabel->setText(QApplication::translate("ThresholdToolInterface", "Lower Threshold:", 0, QApplication::UnicodeUTF8));
         upperLabel->setText(QApplication::translate("ThresholdToolInterface", "Upper Threshold:", 0, QApplication::UnicodeUTF8));
         createThresholdLayerButton->setText(QApplication::translate("ThresholdToolInterface", "Create Threshold Layer", 0, QApplication::UnicodeUTF8));

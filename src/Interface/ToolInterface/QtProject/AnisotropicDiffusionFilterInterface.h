@@ -1,15 +1,15 @@
-#ifndef ANISOTROPICDIFFUSIONFILTER_H
-#define ANISOTROPICDIFFUSIONFILTER_H
+#ifndef ANISOTROPICDIFFUSIONFILTERINTERFACE_H
+#define ANISOTROPICDIFFUSIONFILTERINTERFACE_H
 
 #include <QtGui/QWidget>
 
 #include "sliderspincombo.h"
 
 namespace Ui {
-    class AnisotropicDiffusionFilter;
+    class AnisotropicDiffusionFilterInterface;
 }
 
-class AnisotropicDiffusionFilter : public QWidget {
+class AnisotropicDiffusionFilterInterface : public QWidget {
 
     Q_OBJECT
 
@@ -23,8 +23,8 @@ class AnisotropicDiffusionFilter : public QWidget {
         void filterRun(bool);
 
     public:
-        AnisotropicDiffusionFilter(QWidget *parent = 0);
-        ~AnisotropicDiffusionFilter();
+        AnisotropicDiffusionFilterInterface(QWidget *parent = 0);
+        ~AnisotropicDiffusionFilterInterface();
 
     public slots:
         void setActive(int);
@@ -40,7 +40,7 @@ class AnisotropicDiffusionFilter : public QWidget {
         void setConductanceRange(int, int);
 
     private:
-        Ui::AnisotropicDiffusionFilter *ui;
+        Ui::AnisotropicDiffusionFilterInterface *ui;
 
         SliderSpinCombo *iterationsAdjuster;
         SliderSpinCombo *stepAdjuster;
@@ -61,4 +61,4 @@ class AnisotropicDiffusionFilter : public QWidget {
 
 };
 
-#endif // ANISOTROPICDIFFUSIONFILTER_H
+#endif // ANISOTROPICDIFFUSIONFILTERINTERFACE_H
