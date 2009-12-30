@@ -54,7 +54,6 @@ class StateHandler : public boost::noncopyable {
     std::string stateid_prefix_;
 
   public:
-  
     // ADD_STATE:
     // Add a local state variable with default value
     
@@ -75,7 +74,7 @@ class StateHandler : public boost::noncopyable {
     template<class HANDLE, class T>
     bool add_state(const std::string& key, HANDLE& state, 
                    const T& min, const T& max, 
-                   const T& step,const T& default_value)
+                   const T& step, const T& default_value)
     { 
       // Step (1): Generate the state variable
       state = HANDLE(new typename HANDLE::element_type(min,max,step,default_value));

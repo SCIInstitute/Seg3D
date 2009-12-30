@@ -1,5 +1,28 @@
 <RCC>
 <qresource>
+  <file>Images/VolumeVisible.png</file>
+  <file>Images/VolumeVisibleOff.png</file>
+  <file>Images/IsosurfaceVisible.png</file>
+  <file>Images/IsosurfaceVisibleOff.png</file>
+  <file>Images/SlicesVisible.png</file>
+  <file>Images/SlicesVisibleOff.png</file>
+  <file>Images/NextSlice.png</file>
+  <file>Images/NextSliceOff.png</file>
+  <file>Images/PreviousSlice.png</file>
+  <file>Images/PreviousSliceOff.png</file>
+  <file>Images/Visible.png</file>
+  <file>Images/VisibleOff.png</file>
+  <file>Images/Lock.png</file>
+  <file>Images/LockOff.png</file>
+  <file>Images/Grid.png</file>
+  <file>Images/GridOff.png</file>
+  <file>Images/AutoView.png</file>
+  <file>Images/AutoViewOff.png</file>
+  <file>Images/FlipVert.png</file>
+  <file>Images/FlipVertOff.png</file>
+  <file>Images/FlipHoriz.png</file>
+  <file>Images/FlipHorizOff.png</file>
+  <file>Images/Vview.png</file>
   <file>Images/Xview.png</file>
   <file>Images/Yview.png</file>
   <file>Images/Zview.png</file>

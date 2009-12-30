@@ -162,7 +162,7 @@ ViewerInterface::set_views(int left, int right)
     private_->vert_splitter1_->show();
     private_->vert_splitter2_->hide();
 
-    QList<int> sizes; sizes.push_back(100); sizes.push_back(0);
+    QList<int> sizes; sizes.push_back(1000); sizes.push_back(0);
     private_->horiz_splitter_->setSizes(sizes);
     private_->horiz_splitter_->repaint();
   }
@@ -178,7 +178,7 @@ ViewerInterface::set_views(int left, int right)
     private_->vert_splitter1_->show();
     private_->vert_splitter2_->show();
 
-    QList<int> sizes; sizes.push_back(100); sizes.push_back(100);
+    QList<int> sizes; sizes.push_back(1000); sizes.push_back(1000);
     private_->horiz_splitter_->setSizes(sizes);
     private_->horiz_splitter_->repaint();
   }
@@ -194,11 +194,11 @@ ViewerInterface::set_views(int left, int right)
     private_->vert_splitter1_->show();
     private_->vert_splitter2_->show();
 
-    QList<int> sizes; sizes.push_back(300); sizes.push_back(100);
+    QList<int> sizes; sizes.push_back(3000); sizes.push_back(1000);
     private_->horiz_splitter_->setSizes(sizes);
     
-    QList<int> vsizes; vsizes.push_back(100); 
-    vsizes.push_back(100); vsizes.push_back(0);
+    QList<int> vsizes; vsizes.push_back(1000); 
+    vsizes.push_back(1000); vsizes.push_back(0);
     private_->vert_splitter2_->setSizes(vsizes);
     private_->horiz_splitter_->repaint();
   }
@@ -214,11 +214,11 @@ ViewerInterface::set_views(int left, int right)
     private_->vert_splitter1_->show();
     private_->vert_splitter2_->show();
 
-    QList<int> sizes; sizes.push_back(300); sizes.push_back(100);
+    QList<int> sizes; sizes.push_back(3000); sizes.push_back(1000);
     private_->horiz_splitter_->setSizes(sizes);
     
-    QList<int> vsizes; vsizes.push_back(100); 
-    vsizes.push_back(100); vsizes.push_back(100);
+    QList<int> vsizes; vsizes.push_back(1000); 
+    vsizes.push_back(1000); vsizes.push_back(1000);
     private_->vert_splitter2_->setSizes(vsizes);
     private_->horiz_splitter_->repaint();
   }
@@ -234,11 +234,11 @@ ViewerInterface::set_views(int left, int right)
     private_->vert_splitter1_->show();
     private_->vert_splitter2_->show();
 
-    QList<int> sizes; sizes.push_back(100); sizes.push_back(100);
+    QList<int> sizes; sizes.push_back(1000); sizes.push_back(1000);
     private_->horiz_splitter_->setSizes(sizes);
     
-    QList<int> vsizes; vsizes.push_back(100); 
-    vsizes.push_back(100); vsizes.push_back(0);
+    QList<int> vsizes; vsizes.push_back(1000); 
+    vsizes.push_back(1000); vsizes.push_back(0);
     private_->vert_splitter1_->setSizes(vsizes);
     private_->vert_splitter2_->setSizes(vsizes);
     private_->horiz_splitter_->repaint();
@@ -255,13 +255,13 @@ ViewerInterface::set_views(int left, int right)
     private_->vert_splitter1_->show();
     private_->vert_splitter2_->show();
 
-    QList<int> sizes; sizes.push_back(100); sizes.push_back(100);
+    QList<int> sizes; sizes.push_back(1000); sizes.push_back(1000);
     private_->horiz_splitter_->setSizes(sizes);
     
-    QList<int> vsizes; vsizes.push_back(100); 
-    vsizes.push_back(100); vsizes.push_back(0);
+    QList<int> vsizes; vsizes.push_back(1000); 
+    vsizes.push_back(1000); vsizes.push_back(0);
     private_->vert_splitter1_->setSizes(vsizes);
-    vsizes.last() = 100;
+    vsizes.last() = 1000;
     private_->vert_splitter2_->setSizes(vsizes);
     private_->horiz_splitter_->repaint();
   }
@@ -276,11 +276,11 @@ ViewerInterface::set_views(int left, int right)
     private_->vert_splitter1_->show();
     private_->vert_splitter2_->show();
 
-    QList<int> sizes; sizes.push_back(100); sizes.push_back(100);
+    QList<int> sizes; sizes.push_back(1000); sizes.push_back(1000);
     private_->horiz_splitter_->setSizes(sizes);
     
-    QList<int> vsizes; vsizes.push_back(100); 
-    vsizes.push_back(100); vsizes.push_back(100);
+    QList<int> vsizes; vsizes.push_back(1000); 
+    vsizes.push_back(1000); vsizes.push_back(1000);
     private_->vert_splitter1_->setSizes(vsizes);
     private_->vert_splitter2_->setSizes(vsizes);
     private_->horiz_splitter_->repaint();

@@ -57,9 +57,9 @@ class ViewerWidget : public QFrame {
   
   Q_SIGNALS:
     void selected(int);
+    void changed_viewer_type(int);
 
-  public Q_SLOTS:
-  
+  public Q_SLOTS:  
     void select();
     void deselect();
 

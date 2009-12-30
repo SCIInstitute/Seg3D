@@ -64,7 +64,7 @@ ActionOpenTool::validate(ActionHandle& self,
   
   if (loc != std::string::npos)
   {
-    if (ToolManager::Instance()->is_toolid(toolid_.value()))
+    if (!(ToolManager::Instance()->is_toolid(toolid_.value())))
     {
       context->report_error(std::string("ToolID '")+toolid_.value()+"' is already in use");
       return (false);

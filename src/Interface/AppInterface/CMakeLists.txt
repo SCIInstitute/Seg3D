@@ -80,6 +80,7 @@ SET(INTERFACE_APPINTERFACE_RCC_SRCS
   ../../Resources/AppInterface.qrc
 )
 
+
 ##################################################
 # Get Icon files
 ##################################################
@@ -117,6 +118,7 @@ ADD_LIBRARY(Interface_AppInterface STATIC
             ${INTERFACE_APPINTERFACE_NO_MOC_SRCS} 
             ${INTERFACE_APPINTERFACE_MOC_SRCS}
             ${INTERFACE_APPINTERFACE_QT_RCC_SRCS})
+                     
             
 TARGET_LINK_LIBRARIES(Interface_AppInterface
                       Utils_Core

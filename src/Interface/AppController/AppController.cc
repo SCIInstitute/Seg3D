@@ -90,13 +90,14 @@ AppController::AppController(QWidget* parent) :
   l_action_usage_->setText("");
   
   tv_action_history_->setModel(private_->action_history_model_);
-  tv_action_history_->setColumnWidth(0,450);
+  tv_action_history_->setColumnWidth(0,600);
+  tv_action_history_->setColumnWidth(1,200);
   tv_action_history_->resizeRowsToContents();
+//  tv_action_history_->resizeColumnsToContents();
   
   tv_log_history_->setModel(private_->log_history_model_);
   tv_log_history_->setColumnWidth(0,1000);
   tv_log_history_->resizeRowsToContents();
-  
   // Get the list of actions
   ActionFactory::action_list_type action_list;
   ActionFactory::Instance()->action_list(action_list);
