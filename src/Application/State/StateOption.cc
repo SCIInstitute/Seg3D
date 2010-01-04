@@ -109,13 +109,17 @@ StateOption::import_from_string(const std::string& str)
 }
     
 bool 
-StateOption::validate_and_compare_variant(ActionVariantParameter& variant, 
+StateOption::validate_and_compare_variant(ActionParameterVariant& variant, 
                                           bool& changed,
                                           std::string& error) const
 {
   std::string new_value;
-  if (!(variant.get_value(new_value,error))) return (false);
-
+  if (!(variant.get_value(new_value)))
+  {
+    error = std::string("Could not convert '")+variant.export_to_string()+
+      std::string("' to option");
+    return (false);
+  }
   new_value = Utils::string_to_lower(new_value);    
   if (option_list_.end() == std::find(option_list_.begin(),option_list_.end(),
       new_value)) 
@@ -130,7 +134,7 @@ StateOption::validate_and_compare_variant(ActionVariantParameter& variant,
   
   
 bool 
-StateOption::import_from_variant(ActionVariantParameter& variant, 
+StateOption::import_from_variant(ActionParameterVariant& variant, 
                                      bool trigger_signal)
 {
   std::string val;

@@ -26,40 +26,36 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#include <Application/InterfaceManager/InterfaceManager.h>
-#include <Application/InterfaceManager/Actions/ActionCloseWindow.h>
+#ifndef APPLICATION_ACTION_ACTIONSOCKET_H
+#define APPLICATION_ACTION_ACTIONSOCKET_H
+
+// STL includes
+#include <iostream>
+
+// Boost includes
+#include <boost/shared_ptr.hpp>
+#include <boost/signals2/signal.hpp>
+
+#include <Application/Action/Action.h>
+#include <Application/Action/ActionDispatcher.h>
 
 namespace Seg3D {
 
-// REGISTER ACTION:
-// Define a function that registers the action. The action also needs to be
-// registered in the CMake file.
-SCI_REGISTER_ACTION(CloseWindow);
 
-// VALIDATE:
-// As the action could be user input, we need to validate whether the action
-// is valid and can be executed.
+class ActionSocket  {
 
-bool
-ActionCloseWindow::validate(ActionContextHandle& context)
-{
-  if (!(InterfaceManager::Instance()->is_windowid(windowid_.value())))
-  {
-    context->report_error(std::string("WindowID '")+windowid_.value()+"' is invalid");
-    return (false);
-  }
+// -- Constructor/Destructor --
+  public:
+    ActionSocket(int portnum);
   
-  return (true); // validated
-}
+    ~ActionSocket();
+  
+  private:
+    static void run_action_socket(int portnum);
 
-// RUN:
-// The code that runs the actual action
-bool 
-ActionCloseWindow::run(ActionContextHandle& context,
-                       ActionResultHandle& result)
-{
-  InterfaceManager::Instance()->close_window_signal(windowid_.value());
-  return (true); // success
-}
+    boost::thread* action_socket_thread_;
+};
 
 } // end namespace Seg3D
+
+#endif

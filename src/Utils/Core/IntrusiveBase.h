@@ -26,38 +26,36 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#include <Application/Action/ActionVariantParameter.h>
+#ifndef UTILS_CORE_INTRUSIVEBASE_H
+#define UTILS_CORE_INTRUSIVEBASE_H
 
-namespace Seg3D {
+// Boost includes
+#include <boost/smart_ptr/detail/atomic_count.hpp>
+#include <boost/intrusive_ptr.hpp>
+#include <boost/utility.hpp>
 
-ActionVariantParameter::~ActionVariantParameter()
-{
-}
+namespace Utils {
 
-std::string
-ActionVariantParameter::export_to_string() const
-{
-  // Export a value that is still typed or has been convereted to a string
-  // if typed_value exist, we need to convert it
-  if (typed_value_.get())
-  {
-    return (typed_value_->export_to_string());
-  }
-  else
-  {
-    // in case typed_value does not exist it must be recorded as a string
-    return (string_value_);
-  }
-}
+// Forward declaration
+class IntrusiveBase;
 
-bool
-ActionVariantParameter::import_from_string(const std::string& str)
-{
-  // As we do not know the implied type. It can only be recorded as a string
-  typed_value_.reset();
-  string_value_ = str;
+// Class definition
+class IntrusiveBase : public boost::noncopyable {
+
+  public:
+    IntrusiveBase() : count_(0) {}
+    virtual ~IntrusiveBase() {}
   
-  return (true);
+  private:
+    friend void intrusive_ptr_add_ref(IntrusiveBase*);
+    friend void intrusive_ptr_release(IntrusiveBase*);
+
+    boost::detail::atomic_count count_;
+};
+
+void intrusive_ptr_add_ref(IntrusiveBase* object);
+void intrusive_ptr_release(IntrusiveBase* object);
+
 }
 
-} // end namespace Seg3D
+#endif

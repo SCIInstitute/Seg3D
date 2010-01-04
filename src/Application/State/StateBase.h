@@ -41,7 +41,7 @@
 #include <boost/utility.hpp>
 
 // Action includes
-#include <Application/Action/ActionVariantParameter.h>
+#include <Application/Action/ActionParameter.h>
 
 namespace Seg3D {
 
@@ -85,18 +85,18 @@ class StateBase : public boost::noncopyable {
     // VALIDATE_VARIANT:
     // Validate that the data contained in the variat parameter can actually
     // be used.
-    virtual bool validate_and_compare_variant(ActionVariantParameter& variant, 
+    virtual bool validate_and_compare_variant(ActionParameterVariant& variant, 
                                               bool& changed,
                                               std::string& error) const = 0;
     
     // IMPORT_FROM_VARIANT:
     // Import the state data from a variant parameter.
-    virtual bool import_from_variant(ActionVariantParameter& variant,
+    virtual bool import_from_variant(ActionParameterVariant& variant,
                                      bool trigger_signal = true) = 0;
     
     // EXPORT_TO_VARIANT
     // Export the state data to a variant parameter
-    virtual void export_to_variant(ActionVariantParameter& variant) = 0;    
+    virtual void export_to_variant(ActionParameterVariant& variant) = 0;    
 };
 
 } // end namespace Seg3D

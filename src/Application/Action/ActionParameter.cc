@@ -33,5 +33,40 @@ namespace Seg3D {
 ActionParameterBase::~ActionParameterBase()
 {
 }
-    
+
+ActionParameterVariant::ActionParameterVariant()
+{
+}
+ 
+ActionParameterVariant::~ActionParameterVariant()
+{
+}
+
+std::string
+ActionParameterVariant::export_to_string() const
+{
+  // Export a value that is still typed or has been convereted to a string
+  // if typed_value exist, we need to convert it
+  if (typed_value_.get())
+  {
+    return (typed_value_->export_to_string());
+  }
+  else
+  {
+    // in case typed_value does not exist it must be recorded as a string
+    return (string_value_);
+  }
+}
+
+bool
+ActionParameterVariant::import_from_string(const std::string& str)
+{
+  // As we do not know the implied type. It can only be recorded as a string
+  typed_value_.reset();
+  string_value_ = str;
+  
+  return (true);
+}
+
+       
 } // namespace Seg3D

@@ -64,9 +64,13 @@ class ActionHistory : public boost::noncopyable {
     // ACTION
     // Get the nth action in the buffer
     ActionHandle action(size_t index);
+
+    // ACTIONRESULT
+    // Get the nth action result in the buffer
+    ActionResultHandle result(size_t index);
         
   private:
-    typedef std::deque<ActionHandle> action_history_type;
+    typedef std::deque<std::pair<ActionHandle,ActionResultHandle> > action_history_type;
 
     boost::mutex        action_history_mutex_;
     action_history_type action_history_;
@@ -74,7 +78,7 @@ class ActionHistory : public boost::noncopyable {
 
     boost::signals2::connection dispatcher_connection_;
 
-    void record_action(ActionHandle handle);
+    void record_action(ActionHandle handle, ActionResultHandle result);
 
 // -- History changed signal --
   public:

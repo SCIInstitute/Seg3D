@@ -42,14 +42,12 @@ class ActionUndo : public Action {
     virtual ~ActionUndo() {}  
 
 // -- Functions that describe action --
-    virtual bool validate(ActionHandle& self,
-                          ActionContextHandle& context);
-    virtual bool run(ActionHandle& self,
-                     ActionContextHandle& context);
-
+    virtual bool validate(ActionContextHandle& context);
+    virtual bool run(ActionContextHandle& context,
+                     ActionResultHandle& result);
 };
 
-typedef boost::shared_ptr<ActionUndo> ActionUndoHandle;
+typedef boost::intrusive_ptr<ActionUndo> ActionUndoHandle;
 
 } // end namespace Seg3D
 

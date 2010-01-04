@@ -37,7 +37,7 @@
 namespace Seg3D {
 
 class ActionSet : public Action {
-    SCI_ACTION_TYPE("Set","Set key value",APPLICATION_E)
+    SCI_ACTION_TYPE("Set","Set <key> <value>",APPLICATION_E)
 
 // -- Constructor/Destructor --
   public:
@@ -47,9 +47,7 @@ class ActionSet : public Action {
       add_argument(statevalue_);
     }
     
-    virtual ~ActionSet() 
-    {
-    }
+    virtual ~ActionSet() {}
     
 // -- Function for setting the parameters --
 
@@ -61,10 +59,9 @@ class ActionSet : public Action {
     }
 
 // -- Functions that describe action --
-    virtual bool validate(ActionHandle& self,
-                          ActionContextHandle& context);
-    virtual bool run(ActionHandle& self,
-                     ActionContextHandle& context);
+    virtual bool validate(ActionContextHandle& context);
+    virtual bool run(ActionContextHandle& context, 
+                     ActionResultHandle& result);
 
 // -- Action parameters --
   private:
@@ -72,11 +69,11 @@ class ActionSet : public Action {
     ActionParameter<std::string> stateid_;
 
     // This one describes the value of the state variable
-    ActionVariantParameter statevalue_;
+    ActionParameterVariant statevalue_;
 
 };
 
-typedef boost::shared_ptr<ActionSet> ActionSetHandle;
+typedef boost::intrusive_ptr<ActionSet> ActionSetHandle;
 
 } // end namespace Seg3D
 

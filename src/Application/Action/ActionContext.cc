@@ -64,6 +64,11 @@ ActionContext::report_usage(const std::string& usage)
 }
 
 void
+ActionContext::report_result(const ActionResultHandle& result)
+{
+}
+
+void
 ActionContext::report_done(bool success)
 {
 }

@@ -66,14 +66,17 @@ AppControllerActionHistory::data(const QModelIndex& index, int role) const
     int sz = static_cast<int>(history_->history_size());
     if (index.row() < sz)
     {
-      ActionHandle action = history_->action(sz-index.row()-1);
       if (index.column() == 0)
       {
-        return QString::fromStdString(action->export_action_to_string());
+        ActionHandle action = history_->action(sz-index.row()-1);
+        if (action.get() == 0) return QString("");
+        return QString::fromStdString(action->export_to_string());
       }
       else
       {
-        return QString::fromStdString(action->export_result_to_string());      
+        ActionResultHandle result = history_->result(sz-index.row()-1);
+        if (result.get() == 0) return QString("");
+        return QString::fromStdString(result->export_to_string());      
       }
     }
     else

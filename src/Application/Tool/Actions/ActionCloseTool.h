@@ -52,16 +52,15 @@ class ActionCloseTool : public Action {
     }
 
 // -- Functions that describe action --
-    virtual bool validate(ActionHandle& self,
-                          ActionContextHandle& context);
-    virtual bool run(ActionHandle& self,
-                     ActionContextHandle& context);
+    virtual bool validate(ActionContextHandle& context);
+    virtual bool run(ActionContextHandle& context,
+                     ActionResultHandle& result);
     
 // -- Action parameters --
     ActionParameter<std::string> toolid_;
 };
 
-typedef boost::shared_ptr<ActionCloseTool> ActionCloseToolHandle;
+typedef boost::intrusive_ptr<ActionCloseTool> ActionCloseToolHandle;
 
 } // end namespace Seg3D
 

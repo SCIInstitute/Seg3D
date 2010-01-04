@@ -67,33 +67,32 @@ namespace Seg3D {
 // Class declarations
 class ActionLayerFromFile : public ActionLayer
 {
-  SCI_ACTION_TYPE("LayerFromFile","",LAYER_E)
-public:
-  ActionLayerFromFile()
-  {
-    add_argument(filename_);
-  }
+    SCI_ACTION_TYPE("LayerFromFile","",LAYER_E)
+  public:
+    ActionLayerFromFile()
+    {
+      add_argument(filename_);
+    }
 
-  virtual ~ActionLayerFromFile()
-  {}
+    virtual ~ActionLayerFromFile() {}
 
-  void set(const std::string& filename)
-  {
-    filename_.value() = filename;
-  }
+    void set(const std::string& filename)
+    {
+      filename_.value() = filename;
+    }
 
-  virtual bool do_validate(ActionHandle& self,ActionContextHandle& context);
-  virtual bool check_layer_availability();
-  virtual bool lock_layers() const;
-  virtual bool release_layers() const;
-  virtual bool execute(ActionHandle& self,ActionContextHandle& context) const;
+    virtual bool do_validate(ActionContextHandle& context);
+    virtual bool check_layer_availability();
+    virtual bool lock_layers() const;
+    virtual bool release_layers() const;
+    virtual bool execute(ActionContextHandle& context) const;
 
-private:
-  ActionParameter<std::string> filename_;
+  private:
+    ActionParameter<std::string> filename_;
 
 };
 
-  typedef boost::shared_ptr<ActionLayerFromFile> ActionLayerFromFileHandle;
+typedef boost::intrusive_ptr<ActionLayerFromFile> ActionLayerFromFileHandle;
 
 } // end namespace Seg3D
 

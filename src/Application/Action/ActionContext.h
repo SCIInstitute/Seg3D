@@ -40,6 +40,9 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
 
+// Application includes
+#include <Application/Action/ActionResult.h>
+
 namespace Seg3D {
 
 class ActionContext;
@@ -74,6 +77,7 @@ class ActionContext : public boost::noncopyable {
     virtual void report_message(const std::string& message);
     virtual void report_usage(const std::string& usage);
 
+    virtual void report_result(const ActionResultHandle& result);
     virtual void report_done(bool success);
 
 // -- Source information --

@@ -35,7 +35,7 @@
 
 // Application includes
 #include <Application/Action/ActionParameter.h>
-#include <Application/Action/ActionVariantParameter.h>
+#include <Application/Action/ActionResult.h>
 #include <Application/Action/Action.h>
 #include <Application/Action/ActionContext.h>
 #include <Application/Action/ActionFactory.h>

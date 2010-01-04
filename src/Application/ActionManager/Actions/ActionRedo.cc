@@ -37,8 +37,7 @@ namespace Seg3D {
 SCI_REGISTER_ACTION(Redo);
 
 bool
-ActionRedo::validate(ActionHandle& self,
-                     ActionContextHandle& context)
+ActionRedo::validate(ActionContextHandle& context)
 {
   if (!(ActionUndoBuffer::Instance()->has_redo_action()))
   {
@@ -51,8 +50,7 @@ ActionRedo::validate(ActionHandle& self,
 // RUN:
 // The code that runs the actual action
 bool 
-ActionRedo::run(ActionHandle& self,
-                ActionContextHandle& context)
+ActionRedo::run(ActionContextHandle& context, ActionResultHandle& result)
 {
   ActionUndoBuffer::Instance()->redo_action(context);
   return (true); // success

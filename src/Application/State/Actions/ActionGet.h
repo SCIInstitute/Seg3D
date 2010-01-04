@@ -34,19 +34,16 @@
 namespace Seg3D {
 
 class ActionGet : public Action {
-  SCI_ACTION_TYPE("Get","Get key",APPLICATION_E|QUERY_E)
+  SCI_ACTION_TYPE("Get","Get <key>",APPLICATION_E|QUERY_E)
   
 // -- Constructor/Destructor --
   public:
     ActionGet()
     {
       add_argument(stateid_);
-      add_result(stateresult_);
     }
     
-    virtual ~ActionGet() 
-    {
-    }
+    virtual ~ActionGet() {}
     
 // -- Function for setting the parameters --
 
@@ -57,22 +54,16 @@ class ActionGet : public Action {
     }
 
 // -- Functions that describe action --
-    virtual bool validate(ActionHandle& self,
-                          ActionContextHandle& context);
-    virtual bool run(ActionHandle& self,
-                     ActionContextHandle& context);
+    virtual bool validate(ActionContextHandle& context);
+    virtual bool run(ActionContextHandle& context, ActionResultHandle& result);
 
 // -- Action parameters --
   private:
     // This one describes where the state is located
     ActionParameter<std::string> stateid_;
-
-    // This one describes the value of the state variable
-    ActionVariantParameter stateresult_;
-
 };
 
-typedef boost::shared_ptr<ActionGet> ActionGetHandle;
+typedef boost::intrusive_ptr<ActionGet> ActionGetHandle;
 
 } // end namespace Seg3D
 

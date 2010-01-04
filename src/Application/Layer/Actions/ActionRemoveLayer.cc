@@ -87,14 +87,14 @@ ActionRemoveLayer::release_layers() const
 
 
 bool 
-ActionRemoveLayer::do_validate(ActionHandle& self,ActionContextHandle& context)
+ActionRemoveLayer::do_validate(ActionContextHandle& context)
 {
   // no parameter checking necessary for this action
   return (true);
 }
 
 bool 
-ActionRemoveLayer::execute(ActionHandle& self,ActionContextHandle& context) const
+ActionRemoveLayer::execute(ActionContextHandle& context) const
 {
   // Tell the LayerManager to delete this Layer from its list
   // Figure out how to appropriately unlock this layer

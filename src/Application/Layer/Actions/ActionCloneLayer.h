@@ -79,18 +79,18 @@ class ActionCloneLayer : public ActionLayer
       layer_to_clone_.value() = layer_to_clone;
     }
 
-    virtual bool do_validate(ActionHandle& self, ActionContextHandle& context);
+    virtual bool do_validate(ActionContextHandle& context);
     virtual bool check_layer_availability();
     virtual bool lock_layers() const;
     virtual bool release_layers() const;
-    virtual bool execute(ActionHandle& self,ActionContextHandle& context) const;
+    virtual bool execute(ActionContextHandle& context) const;
 
   private:
     ActionParameter<std::string> layer_to_clone_;
 
 };
 
-  typedef boost::shared_ptr<ActionCloneLayer> ActionCloneLayerHandle;
+typedef boost::intrusive_ptr<ActionCloneLayer> ActionCloneLayerHandle;
 
 } // end namespace Seg3D
 

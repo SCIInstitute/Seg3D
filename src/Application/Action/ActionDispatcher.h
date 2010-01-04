@@ -84,23 +84,20 @@ class ActionDispatcher : public boost::noncopyable {
 
 // -- Action monitoring --
 
-  private:
+  public:
     // TYPEDEFS 
     // The type of the main action signal
 
-    typedef boost::signals2::signal<void (ActionHandle )> action_signal_type;
-    
-    // POST_ACTION_SIGNAL:
-    // This is the main signal stack for actions that are posted inside the
-    // application. Any observer that wants to listen into the actions that
-    // are being issued by the program needs to connect to this signal as all
-    // actions are published here before they are executed.
-    
-    action_signal_type pre_action_signal_;  
-    action_signal_type post_action_signal_;  
+    typedef boost::signals2::signal<void (ActionHandle )> pre_action_signal_type;
 
-  public:
-  
+    typedef boost::signals2::signal<void (ActionHandle, ActionResultHandle )> post_action_signal_type;
+    
+    // PRE_ACTION_SIGNAL:
+    // Connect an observer that records all the actions in the program before
+    // they are exectuted
+    
+    pre_action_signal_type pre_action_signal;  
+
      // NOTE: One can observe action before or after they have been issued:
      // generally for provenance and tracking the program one wants to be 
      // informed after the action has been posted. However for debugging 
@@ -108,20 +105,12 @@ class ActionDispatcher : public boost::noncopyable {
      // issued to the processing kernel. Hence this interface allows both
      // options. 
   
-    // CONNECT_POST_ACTION:
+    // POST_ACTION_SIGNAL:
     // Connect an observer that records all the actions in the program after
     // they are exectuted.
-    
-    boost::signals2::connection 
-      connect_post_action(action_signal_type::slot_type slot);
-    
-    // CONNECT_PRE_ACTION:
-    // Connect an observer that records all the actions in the program before
-    // they are exectuted
-    
-    boost::signals2::connection 
-      connect_pre_action(action_signal_type::slot_type slot);
-  
+
+    post_action_signal_type post_action_signal;  
+
 // -- Singleton interface --
   public:
     

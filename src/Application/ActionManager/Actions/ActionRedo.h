@@ -38,22 +38,17 @@ class ActionRedo : public Action {
 
 // -- Constructor/Destructor --
   public:
-    ActionRedo() 
-    {
-    }
-    
-    virtual ~ActionRedo() 
-    {}  
+    ActionRedo() {}
+    virtual ~ActionRedo() {}  
 
 // -- Functions that describe action --
-    virtual bool validate(ActionHandle& self,
-                          ActionContextHandle& context);
-    virtual bool run(ActionHandle& self,
-                     ActionContextHandle& context);
+    virtual bool validate(ActionContextHandle& context);
+    virtual bool run(ActionContextHandle& context,
+                     ActionResultHandle& result);
 
 };
 
-typedef boost::shared_ptr<ActionRedo> ActionRedoHandle;
+typedef boost::intrusive_ptr<ActionRedo> ActionRedoHandle;
 
 } // end namespace Seg3D
 

@@ -43,8 +43,7 @@ SCI_REGISTER_ACTION(CloseTool);
 // is valid and can be executed.
 
 bool
-ActionCloseTool::validate(ActionHandle& self,
-                          ActionContextHandle& context)
+ActionCloseTool::validate(ActionContextHandle& context)
 {
   if (!(ToolManager::Instance()->is_toolid(toolid_.value())))
   {
@@ -58,8 +57,7 @@ ActionCloseTool::validate(ActionHandle& self,
 // RUN:
 // The code that runs the actual action
 bool 
-ActionCloseTool::run(ActionHandle& self,
-                     ActionContextHandle& context)
+ActionCloseTool::run(ActionContextHandle& context, ActionResultHandle& result)
 {
   if(need_undo(context))
   {
@@ -67,7 +65,7 @@ ActionCloseTool::run(ActionHandle& self,
     undo1->set(toolid_.value());
     ActionActivateToolHandle undo2(new ActionActivateTool);
     undo2->set(ToolManager::Instance()->active_toolid());
-    AddUndoAction("Close Tool",undo1,undo2,self);
+    AddUndoAction("Close Tool",undo1,undo2,ActionHandle(this));
   }
 
   ToolManager::Instance()->close_tool(toolid_.value());

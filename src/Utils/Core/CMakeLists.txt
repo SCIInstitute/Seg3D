@@ -32,6 +32,8 @@
 ##################################################
 
 SET(UTILS_CORE_SRCS
+  IntrusiveBase.h
+  IntrusiveBase.cc
   Exception.h
   Exception.cc
   Log.h

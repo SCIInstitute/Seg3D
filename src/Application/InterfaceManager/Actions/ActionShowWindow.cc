@@ -41,8 +41,7 @@ SCI_REGISTER_ACTION(ShowWindow);
 // is valid and can be executed.
 
 bool
-ActionShowWindow::validate(ActionHandle& self,
-                           ActionContextHandle& context)
+ActionShowWindow::validate(ActionContextHandle& context)
 {
   if (!(InterfaceManager::Instance()->is_windowid(windowid_.value())))
   {
@@ -56,8 +55,8 @@ ActionShowWindow::validate(ActionHandle& self,
 // RUN:
 // The code that runs the actual action
 bool 
-ActionShowWindow::run(ActionHandle& self,
-                      ActionContextHandle& context)
+ActionShowWindow::run(ActionContextHandle& context,
+                      ActionResultHandle& result)
 {
   InterfaceManager::Instance()->show_window_signal(windowid_.value());
   return (true); // success

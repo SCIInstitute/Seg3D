@@ -87,14 +87,14 @@ ActionCloneLayer::release_layers() const
 
 
 bool 
-ActionCloneLayer::do_validate(ActionHandle& self,ActionContextHandle& context)
+ActionCloneLayer::do_validate(ActionContextHandle& context)
 {
   // no parameter checking necessary for this action
   return (true);
 }
 
 bool 
-ActionCloneLayer::execute(ActionHandle& self,ActionContextHandle& context) const
+ActionCloneLayer::execute(ActionContextHandle& context) const
 {
   LayerHandle old_layer = LayerManager::Instance()->get_layer(layer_to_clone_.value());
   std::string new_name = LayerManager::Instance()->derive_new_name(layer_to_clone_.value());

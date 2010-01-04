@@ -39,8 +39,7 @@
 
 namespace Seg3D {
 
-Action::Action() :
-  result_(0)
+Action::Action()
 {
 }
 
@@ -49,7 +48,7 @@ Action::~Action()
 }
 
 bool
-Action::validate(ActionHandle& self, ActionContextHandle& context)
+Action::validate(ActionContextHandle& context)
 {
   return (true);
 }
@@ -66,14 +65,8 @@ Action::add_parameter_ptr(const std::string& key,ActionParameterBase* param)
   parameters_[boost::to_lower_copy(key)] = param;
 }
 
-void
-Action::add_result_ptr(ActionParameterBase* param)
-{
-  result_ = param;
-}
-
 std::string 
-Action::export_action_to_string() const
+Action::export_to_string() const
 {
   // Add action name to string
   std::string command = std::string(type()) + " ";
@@ -97,15 +90,15 @@ Action::export_action_to_string() const
   return command;
 }
 
-std::string 
-Action::export_result_to_string() const
+bool
+Action::import_from_string(const std::string& action)
 {
-  if (result_ ) return ( result_->export_to_string());
-  else return std::string("");
+  std::string error;
+  return (import_from_string(action,error));
 }
 
 bool
-Action::import_action_from_string(const std::string& action, std::string& error)
+Action::import_from_string(const std::string& action, std::string& error)
 {
   std::string::size_type pos = 0;
   std::string command;

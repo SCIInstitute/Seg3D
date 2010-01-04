@@ -72,9 +72,9 @@ ActionFactory::create_action(const std::string& action_string,
   // Build the action of the right type
   action = (*it).second->build();
   
-  if(!(action->import_action_from_string(action_string,error)))
+  if(!(action->import_from_string(action_string,error)))
   {
-    // the import_action_from_string function reports the error and hence
+    // the import_from_string function reports the error and hence
     // we do not need to set it here.
     
     // The action did build but the argument list is incorrect

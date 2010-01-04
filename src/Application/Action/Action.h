@@ -39,28 +39,32 @@
 #include <map>
 
 // Boost includes
+#include <boost/intrusive_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
 
 // Utils includes
 #include <Utils/Core/Log.h>
+#include <Utils/Core/IntrusiveBase.h>
 
 // Application includes
 #include <Application/Action/ActionContext.h>
 #include <Application/Action/ActionParameter.h>
+#include <Application/Action/ActionResult.h>
+
 
 namespace Seg3D {
 
 class Action;
-typedef boost::shared_ptr<Action>   ActionHandle;
-typedef std::vector<ActionHandle>   ActionHandleList;
+typedef boost::intrusive_ptr<Action>   ActionHandle;
+typedef std::vector<ActionHandle>      ActionHandleList;
 
 // CLASS ACTION:
 // Main class that defines an action in the program
 // An action is not copyable as that would invalidate 
 // the ActionParameter pointers used internally.
 
-class Action : public boost::noncopyable {
+class Action : public Utils::IntrusiveBase {
 
 // -- Action types/properties --
   public:
@@ -104,6 +108,8 @@ class Action : public boost::noncopyable {
     // Virtual destructor for memory management of derived classes  
     virtual ~Action(); // << NEEDS TO BE REIMPLEMENTED
 
+    // These functions define the properties of the action and are implemented
+    // by the SCI_ACTION_TYPE macro
     virtual std::string   type() const = 0;
     virtual std::string   usage() const = 0;
     virtual int           properties() const = 0;
@@ -138,12 +144,8 @@ class Action : public boost::noncopyable {
     //       and correct faulty input. Run on the other hand is not allowed to
     //       change anything in the action, as it is posted to any observers
     //       after the action is validated.
-    // NOTE: This function supplies a pointer to the handle to itself. As the
-    //       handle is generated outside the action. Creating a new handle will
-    //       lead to premature deletion of the object, the right handle is
-    //       supplied, so the action can archive itself for provenance or
-    //       undo buffers.
-    virtual bool validate(ActionHandle& self, ActionContextHandle& context);  
+
+    virtual bool validate(ActionContextHandle& context);  
     
     // RUN:
     // Each action needs to have this piece implemented. It spells out how the
@@ -153,7 +155,7 @@ class Action : public boost::noncopyable {
     // the asynchronous part has finished. In any other case the ActionDispatcher
     // will issue the report_done() when run returns.
 
-    virtual bool run(ActionHandle& self, ActionContextHandle& context) = 0;
+    virtual bool run(ActionContextHandle& context, ActionResultHandle& result) = 0; // << NEEDS TO BE REIMPLEMENTED
 
 // -- Action parameters --
 
@@ -173,29 +175,19 @@ class Action : public boost::noncopyable {
     // This function links the parameters of the action to an internal
     // key value pair system to records all the parameters
     template<class PARAMETER>
-    void add_parameter(const std::string& key,PARAMETER& param) {add_parameter_ptr(key,&param); }
+    void add_parameter(const std::string& key,PARAMETER& param) { add_parameter_ptr(key,&param); }
 
-    // ADD_RESULT:
-    // Describe where the result is stored
-    template<class PARAMETER>
-    void add_result(PARAMETER& param) { add_result_ptr(&param); }
-
-    // EXPORT_ACTION_TO_STRING:
+    // EXPORT_TO_STRING:
     // Export the action command into a string, so it can stored
     // The action factory can recreate the action from this string
-    std::string export_action_to_string() const;
-
-    // EXPORT_RESULT_TO_STRING:
-    // Export the result into a string, so it can be send back to the user
-    std::string export_result_to_string() const;
-
-  protected:
-    friend class ActionFactory;
+    std::string export_to_string() const; 
 
     // IMPORT_ACTION_FROM_STRING:
     // Import an action command from astring. This function is used by the
     // ActionFactory.
-    bool import_action_from_string(const std::string& action, std::string& error);
+    bool import_from_string(const std::string& action, std::string& error);
+
+    bool import_from_string(const std::string& action);
 
   private:
 
@@ -204,21 +196,16 @@ class Action : public boost::noncopyable {
     // with references of the parameters for more convenience.
     void add_argument_ptr(ActionParameterBase* param);
     void add_parameter_ptr(const std::string& key,ActionParameterBase* param);
-    void add_result_ptr(ActionParameterBase* param);
 
     // Typedefs
     typedef std::vector<ActionParameterBase*>          argument_vector_type;
     typedef std::map<std::string,ActionParameterBase*> parameter_map_type;
-    typedef ActionParameterBase*                       result_type;
     
     // Vector that stores the required arguments of the action.
     argument_vector_type arguments_;
     
     // Map that stores the location of the parameters in the action.
     parameter_map_type parameters_;
-    
-    // Pointer for where the result is stored
-    result_type result_;
     
 };
 

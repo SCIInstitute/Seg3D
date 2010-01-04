@@ -52,16 +52,15 @@ class ActionCloseWindow : public Action {
     }
 
 // -- Functions that describe action --
-    virtual bool validate(ActionHandle& self,
-                          ActionContextHandle& context);
-    virtual bool run(ActionHandle& self,
-                     ActionContextHandle& context);
+    virtual bool validate(ActionContextHandle& context);
+    virtual bool run(ActionContextHandle& context,
+                     ActionResultHandle& result);
     
 // -- Action parameters --
     ActionParameter<std::string> windowid_;
 };
 
-typedef boost::shared_ptr<ActionCloseWindow> ActionCloseWindowHandle;
+typedef boost::intrusive_ptr<ActionCloseWindow> ActionCloseWindowHandle;
 
 } // end namespace Seg3D
 

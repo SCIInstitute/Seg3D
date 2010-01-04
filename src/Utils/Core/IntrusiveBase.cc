@@ -26,40 +26,21 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#include <Application/InterfaceManager/InterfaceManager.h>
-#include <Application/InterfaceManager/Actions/ActionCloseWindow.h>
+#include <Utils/Core/IntrusiveBase.h>
 
-namespace Seg3D {
+namespace Utils {
 
-// REGISTER ACTION:
-// Define a function that registers the action. The action also needs to be
-// registered in the CMake file.
-SCI_REGISTER_ACTION(CloseWindow);
-
-// VALIDATE:
-// As the action could be user input, we need to validate whether the action
-// is valid and can be executed.
-
-bool
-ActionCloseWindow::validate(ActionContextHandle& context)
+void 
+intrusive_ptr_add_ref(IntrusiveBase* object)
 {
-  if (!(InterfaceManager::Instance()->is_windowid(windowid_.value())))
-  {
-    context->report_error(std::string("WindowID '")+windowid_.value()+"' is invalid");
-    return (false);
-  }
-  
-  return (true); // validated
+  ++(object->count_);
 }
 
-// RUN:
-// The code that runs the actual action
-bool 
-ActionCloseWindow::run(ActionContextHandle& context,
-                       ActionResultHandle& result)
+void 
+intrusive_ptr_release(IntrusiveBase* object)
 {
-  InterfaceManager::Instance()->close_window_signal(windowid_.value());
-  return (true); // success
+  if ( --(object->count_) == 0) delete object;
 }
 
-} // end namespace Seg3D
+}
+

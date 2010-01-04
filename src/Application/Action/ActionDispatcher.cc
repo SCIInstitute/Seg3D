@@ -81,7 +81,7 @@ ActionDispatcher::run_action(ActionHandle action, ActionContextHandle action_con
   // posted to the observers recording what the program does
 
   SCI_LOG_DEBUG("Validating Action");  
-  if(!(action->validate(action,action_context))) 
+  if(!(action->validate(action_context))) 
   {
     action_context->report_usage(action->usage());
     action_context->report_done(false);
@@ -93,24 +93,31 @@ ActionDispatcher::run_action(ActionHandle action, ActionContextHandle action_con
 
   // Step (2): Tell observers what action has been executed
   SCI_LOG_DEBUG("Pre Action Signal for observers");  
-  pre_action_signal_(action);
+  pre_action_signal(action);
 
   // Step (3): Run action from the context that was provided. And if the action
   // was synchronous a done signal is triggered in the context, to inform the
   // program whether the action succeeded.
   SCI_LOG_DEBUG("Running Action");    
 
-  bool success = action->run(action,action_context);
+  ActionResultHandle result;
+  bool success = action->run(action_context, result);
+
+  // Step (4): Set the action result if any was returned.
+  SCI_LOG_DEBUG("Set action result"); 
+  
+  if (result.get()) 
+  {
+    action_context->report_result(result);
+  }
   action_context->report_done(success);
-
-  SCI_LOG_DEBUG("Action Done");  
-
+ 
   // NOTE: Observers that connect to this signal should not change the state of
   // the program as that may invalidate actions that were just run.
 
-  // Step (4): Tell observers what action has been executed
+  // Step (5): Tell observers what action has been executed
   SCI_LOG_DEBUG("Post Action Signal for observers");  
-  post_action_signal_(action);
+  post_action_signal(action,result);
 
   return;
 }
@@ -126,18 +133,6 @@ ActionDispatcher::run_actions(std::vector<ActionHandle> actions, ActionContextHa
   }
 }
 
-boost::signals2::connection 
-ActionDispatcher::connect_pre_action(action_signal_type::slot_type slot)
-{
-  return (pre_action_signal_.connect(slot));
-}
-
-boost::signals2::connection 
-ActionDispatcher::connect_post_action(action_signal_type::slot_type slot)
-{
-  return (post_action_signal_.connect(slot));
-}
-
 void 
 PostAction(ActionHandle action, ActionContextHandle action_context)
 {
@@ -151,6 +146,7 @@ PostAction(std::string& actionstring, ActionContextHandle action_context)
   ActionHandle action;
   std::string error;
   std::string usage;
+  
   if(!(ActionFactory::Instance()->create_action(actionstring,action,error,usage)))
   {
     SCI_LOG_ERROR(std::string("Failed to parse action: ")+actionstring);

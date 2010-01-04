@@ -85,13 +85,13 @@ class StateOption : public State<std::string> {
     // VALIDATE_AND_COMPARE_VARIANT:
     // Validate that the data contained in the variant parameter can actually
     // be used and check whether it changed from the current value.
-    virtual bool validate_and_compare_variant(ActionVariantParameter& variant, 
+    virtual bool validate_and_compare_variant(ActionParameterVariant& variant, 
                                               bool& changed,
                                               std::string& error) const;
 
     // IMPORT_FROM_VARIANT:
     // Import the state data from a variant parameter.  
-    virtual bool import_from_variant(ActionVariantParameter& variant, 
+    virtual bool import_from_variant(ActionParameterVariant& variant, 
                                      bool trigger_signal = true);
 
 // -- option list --

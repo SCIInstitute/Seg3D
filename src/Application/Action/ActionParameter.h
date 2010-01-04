@@ -33,17 +33,30 @@
 # pragma once
 #endif 
 
+// STL
+#include <string>
+#include <algorithm>
+
 // Boost includes
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
 
-// Utils includes
+// Utils
+#include <Utils/Core/Log.h>
+#include <Utils/Core/StringUtil.h>
 #include <Utils/Converter/StringConverter.h>
 
 namespace Seg3D {
 
-// CLASS ACTIONPARAMETER:
-// Auxilary class for adding parameters into an action.
+// PARAMETER CLASSES
+// ACTIONPARAMETER<TYPE> and ACTIONPARAMETERVARIANT
+// These two classes are both used to store parameters the first one explicitly 
+// states the type and the second one does type conversion. The difference is
+// that for the first class type the compiler checks the type integrity and 
+// hence is the preferred model. However types are not always know up front
+// or the action is so general that the parameter is not of a specied class
+// for the latter case do we use the variant version.
+
 
 // ACTIONPARAMETERBASE:
 // Base class needed for uniform access to import and export the value
@@ -66,11 +79,14 @@ class ActionParameterBase {
 
 };
 
+
 // ACTIONPARAMETER:
 // Parameter for an action.
 
+// Forward declaration:
 template<class T> class ActionParameter;
 
+// Class definition:
 template<class T>
 class ActionParameter : public ActionParameterBase {
 
@@ -90,11 +106,18 @@ class ActionParameter : public ActionParameterBase {
     virtual ~ActionParameter()
     {}
 
+// -- access to value --
     // General access to the parameter value
     T& value() { return value_; } 
 
     // For run when running with constness
     const T& value() const { return value_; } 
+
+    // Get access similar to the variant version
+    bool get_value(T& value) { value = value_; return (true); }
+    
+    // Set access similar to the variant version
+    void set_value(const T& value) { value_ = value; }
 
     // export the value to a string
     virtual std::string export_to_string() const
@@ -112,6 +135,110 @@ class ActionParameter : public ActionParameterBase {
     // The actual value
     T value_;
 };
+
+// ACTIONPARAMETERVARIANT:
+// Parameter for an action.
+
+// Forward declaration:
+class ActionParameterVariant;
+
+// Class definition:
+class ActionParameterVariant : public ActionParameterBase {
+
+// -- define handle --
+  public:
+    typedef boost::shared_ptr<ActionParameterVariant> Handle;
+
+// -- constructor/destructor --
+  public:
+    // Default constructor of untyped parameter
+    ActionParameterVariant();
+
+    template<class T>
+    ActionParameterVariant(const T& default_value)
+    {
+      typed_value_ = ActionParameterBaseHandle(new ActionParameter<T>(default_value));
+    }
+  
+    virtual ~ActionParameterVariant();
+
+    virtual std::string export_to_string() const;
+    virtual bool import_from_string(const std::string& str);
+
+    // SET_VALUE
+    // Set the value using a typed version of the parameter
+    template<class T>
+    void set_value(const T& value)
+    {
+      // Set the value typed
+      typed_value_ = ActionParameterBaseHandle(new ActionParameter<T>(value));
+      // Clear string version
+      string_value_.clear();
+    }
+
+    // GET_VALUE
+    // Get the value from string or typed value. If a typed one is available
+    // use that one.
+    
+    template<class T>
+    bool get_value(T& value)
+    {
+      // If a typed version exists
+      if (typed_value_.get())
+      {
+        // if the typed version exists, use that one
+        // use a dynamic cast to ensure that the type is correct
+        ActionParameter<T>* param_ptr = 
+                        dynamic_cast<ActionParameter<T>*>(typed_value_.get());
+        if (param_ptr == 0)
+        {
+          if(!(Utils::import_from_string(typed_value_->export_to_string(),value)))
+          {
+            return (false);
+          }
+
+          return (true);
+        }
+        
+        value = param_ptr->value();
+        return (true);  
+      }
+      else
+      {
+        // Generate a new typed version. So it is only converted once
+        ActionParameter<T>* param_ptr = new ActionParameter<T>;
+        typed_value_ = ActionParameterBaseHandle(param_ptr);
+        if(!(typed_value_->import_from_string(string_value_)))
+        {
+          return (false);
+        }
+
+        value = param_ptr->value(); 
+        return (true);    
+      }
+    }
+
+// -- accessors --
+
+    // TYPED_VALUE:
+    // Access to the parameter variable that stores the typed variable.
+    ActionParameterBaseHandle& typed_value()  { return typed_value_;  }
+ 
+    // STRING_VALUE:
+    // The value stored as a string. This one is only valid if there is
+    // no typed value.
+    std::string&               string_value() { return string_value_; }
+
+  private:
+  
+    // Typed version
+    ActionParameterBaseHandle  typed_value_;
+
+    // String version
+    std::string                string_value_; 
+
+};
+
 
 } // namespace Seg3D
 

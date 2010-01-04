@@ -26,40 +26,29 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#include <Application/InterfaceManager/InterfaceManager.h>
-#include <Application/InterfaceManager/Actions/ActionCloseWindow.h>
+#ifndef APPLICATION_ACTION_ACTIONRESULT_H
+#define APPLICATION_ACTION_ACTIONRESULT_H
+
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+# pragma once
+#endif 
+
+// Boost includes
+#include <boost/shared_ptr.hpp>
+
+// Application
+#include <Application/Action/ActionParameter.h>
 
 namespace Seg3D {
 
-// REGISTER ACTION:
-// Define a function that registers the action. The action also needs to be
-// registered in the CMake file.
-SCI_REGISTER_ACTION(CloseWindow);
+// ACTIONRESULT
+// Class for returning the result of an action. As this needs to be a variant,
+// each action may have a different result we currently typedef this to the
+// ActionParameterVariant class
 
-// VALIDATE:
-// As the action could be user input, we need to validate whether the action
-// is valid and can be executed.
+typedef ActionParameterVariant                    ActionResult;
+typedef boost::shared_ptr<ActionParameterVariant> ActionResultHandle;
 
-bool
-ActionCloseWindow::validate(ActionContextHandle& context)
-{
-  if (!(InterfaceManager::Instance()->is_windowid(windowid_.value())))
-  {
-    context->report_error(std::string("WindowID '")+windowid_.value()+"' is invalid");
-    return (false);
-  }
-  
-  return (true); // validated
-}
+} // namespace Seg3D
 
-// RUN:
-// The code that runs the actual action
-bool 
-ActionCloseWindow::run(ActionContextHandle& context,
-                       ActionResultHandle& result)
-{
-  InterfaceManager::Instance()->close_window_signal(windowid_.value());
-  return (true); // success
-}
-
-} // end namespace Seg3D
+#endif

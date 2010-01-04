@@ -43,8 +43,7 @@ class ActionShowWindow : public Action {
       add_argument(windowid_);
     }
     
-    virtual ~ActionShowWindow() 
-    {}
+    virtual ~ActionShowWindow() {}
 
     void set(const std::string& windowid)
     {
@@ -52,16 +51,15 @@ class ActionShowWindow : public Action {
     }
 
 // -- Functions that describe action --
-    virtual bool validate(ActionHandle& self,
-                          ActionContextHandle& context);
-    virtual bool run(ActionHandle& self,
-                     ActionContextHandle& context);
+    virtual bool validate(ActionContextHandle& context);
+    virtual bool run(ActionContextHandle& context,
+                     ActionResultHandle& result);
     
 // -- Action parameters --
     ActionParameter<std::string> windowid_;
 };
 
-typedef boost::shared_ptr<ActionShowWindow> ActionShowWindowHandle;
+typedef boost::intrusive_ptr<ActionShowWindow> ActionShowWindowHandle;
 
 } // end namespace Seg3D
 

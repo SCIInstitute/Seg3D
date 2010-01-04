@@ -83,18 +83,18 @@ class ActionNewMaskLayer : public ActionLayer
       provided_layer_.value() = provided_layer;
     }
 
-    virtual bool do_validate(ActionHandle& self,ActionContextHandle& context);
+    virtual bool do_validate(ActionContextHandle& context);
     virtual bool check_layer_availability();
     virtual bool lock_layers() const;
     virtual bool release_layers() const;
-    virtual bool execute(ActionHandle& self,ActionContextHandle& context) const;
+    virtual bool execute(ActionContextHandle& context) const;
 
   private:
     ActionParameter<std::string> provided_layer_;
 
 };
 
-  typedef boost::shared_ptr<ActionNewMaskLayer> ActionNewMaskLayerHandle;
+  typedef boost::intrusive_ptr<ActionNewMaskLayer> ActionNewMaskLayerHandle;
 
 } // end namespace Seg3D
 

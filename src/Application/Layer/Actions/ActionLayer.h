@@ -47,17 +47,6 @@
 #ifndef APPLICATION_LAYER_ACTIONS_ACTIONLAYER_H
 #define APPLICATION_LAYER_ACTIONS_ACTIONLAYER_H 1
 
-//#ifdef (_MSC_VER) && (_MSC_VER >= 1020)
-//# pragma once
-//#endif
-
-// STL includes
-
-// Boost includes 
-#include <boost/shared_ptr.hpp>
-
-// ITK includes
-
 #include <Application/Action/Action.h>
 
 namespace Seg3D {
@@ -69,22 +58,22 @@ class ActionLayer : public Action
   public:
     virtual ~ActionLayer() {}
     
-    virtual bool run(ActionHandle& self, ActionContextHandle& context);
+    virtual bool run(ActionContextHandle& context, ActionResultHandle& result);
 
   // TODO could have base validate call check_layer_availability and then call subclass's
   // do_validate method.
-    virtual bool validate(ActionHandle& self, ActionContextHandle& context);
-    virtual bool do_validate(ActionHandle& self, ActionContextHandle& context); // cannot make pure virtual and register the action
+    virtual bool validate(ActionContextHandle& context);
+    virtual bool do_validate(ActionContextHandle& context); // cannot make pure virtual and register the action
     virtual bool check_layer_availability(); // cannot make pure virtual and register the action
     virtual bool lock_layers() const; // cannot make pure virtual and register the action
     virtual bool release_layers() const; // cannot make pure virtual and register the action
-    virtual bool execute(ActionHandle& self, ActionContextHandle& context) const; // cannot make pure virtual and register the action
+    virtual bool execute(ActionContextHandle& context) const; // cannot make pure virtual and register the action
 
   private:
 
 };
 
-  typedef boost::shared_ptr<ActionLayer> ActionLayerHandle;
+  typedef boost::intrusive_ptr<ActionLayer> ActionLayerHandle;
 
 } // end namespace Seg3D
 

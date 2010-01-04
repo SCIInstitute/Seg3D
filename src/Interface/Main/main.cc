@@ -62,6 +62,7 @@ int main(int argc, char **argv)
   // -- Setup error logging --
   // stream error to the console window
   Utils::LogStreamer error_log(Utils::Log::ALL_E,&(std::cerr));
+
   // stream errors to a history log that maintains the last 1000 entries
   Utils::LogHistory::Instance()->set_max_history_size(1000);
 

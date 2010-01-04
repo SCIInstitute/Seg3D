@@ -44,8 +44,7 @@ SCI_REGISTER_ACTION(OpenTool);
 // is valid and can be executed.
 
 bool
-ActionOpenTool::validate(ActionHandle& self,
-                         ActionContextHandle& context)
+ActionOpenTool::validate(ActionContextHandle& context)
 {
   // Check whether an id number was attached
   std::string tool_type = toolid_.value();
@@ -78,14 +77,16 @@ ActionOpenTool::validate(ActionHandle& self,
 // The code that runs the actual action
 
 bool 
-ActionOpenTool::run(ActionHandle& self,
-                    ActionContextHandle& context)
+ActionOpenTool::run(ActionContextHandle& context, ActionResultHandle& result)
 {
   std::string active_tool = ToolManager::Instance()->active_toolid();
 
   // Open and Activate the tool
-  ToolManager::Instance()->open_tool(toolid_.value(),result_toolid_.value());
-  ToolManager::Instance()->activate_tool(result_toolid_.value());
+  std::string new_tool_id;
+  ToolManager::Instance()->open_tool(toolid_.value(),new_tool_id);  
+  ToolManager::Instance()->activate_tool(new_tool_id);
+
+  result = ActionResultHandle(new ActionResult(new_tool_id));
 
   if(need_undo(context))
   {
@@ -95,11 +96,11 @@ ActionOpenTool::run(ActionHandle& self,
     {
       ActionActivateToolHandle undo2(new ActionActivateTool);
       undo2->set(active_tool);
-      AddUndoAction("Open Tool",undo1,undo2,self);
+      AddUndoAction("Open Tool",undo1,undo2,ActionHandle(this));
     }
     else
     {
-      AddUndoAction("Open Tool",undo1,self);
+      AddUndoAction("Open Tool",undo1,ActionHandle(this));
     }
   }
   

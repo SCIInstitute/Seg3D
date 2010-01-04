@@ -37,8 +37,7 @@ namespace Seg3D {
 SCI_REGISTER_ACTION(Undo);
 
 bool
-ActionUndo::validate(ActionHandle& self,
-                     ActionContextHandle& context)
+ActionUndo::validate(ActionContextHandle& context)
 {
   if (!(ActionUndoBuffer::Instance()->has_undo_action()))
   {
@@ -51,8 +50,8 @@ ActionUndo::validate(ActionHandle& self,
 // RUN:
 // The code that runs the actual action
 bool 
-ActionUndo::run(ActionHandle& self,
-                ActionContextHandle& context)
+ActionUndo::run(ActionContextHandle& context,
+                ActionResultHandle& result)
 {
   ActionUndoBuffer::Instance()->undo_action(context);
   return (true); // success

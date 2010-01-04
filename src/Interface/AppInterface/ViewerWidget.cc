@@ -157,7 +157,7 @@ ViewerWidgetPrivate::ViewerWidgetPrivate(QWidget *parent)
   slice_visible_icon.addPixmap(QPixmap(":/Images/VisibleOff.png"),QIcon::Normal,QIcon::Off);
 
   sagittal_viewer_ = new QAction(parent);
-  sagittal_viewer_->setIcon(axial_icon);
+  sagittal_viewer_->setIcon(sagittal_icon);
   sagittal_viewer_->setText(QString("Sagittal"));
   sagittal_viewer_->setToolTip(QString("Sagittal Slice Viewer"));
   sagittal_viewer_->setIconVisibleInMenu(true);

@@ -43,8 +43,7 @@ class ActionActivateTool : public Action {
       add_argument(toolid_);
     }
     
-    virtual ~ActionActivateTool() 
-    {}
+    virtual ~ActionActivateTool() {}
 
     void set(const std::string& toolid)
     {
@@ -52,16 +51,15 @@ class ActionActivateTool : public Action {
     }
 
 // -- Functions that describe action --
-    virtual bool validate(ActionHandle& self,
-                          ActionContextHandle& context);
-    virtual bool run(ActionHandle& self,
-                     ActionContextHandle& context);
+    virtual bool validate(ActionContextHandle& context);
+    virtual bool run(ActionContextHandle& context,
+                     ActionResultHandle& result);
     
 // -- Action parameters --
     ActionParameter<std::string> toolid_;
 };
 
-typedef boost::shared_ptr<ActionActivateTool> ActionActivateToolHandle;
+typedef boost::intrusive_ptr<ActionActivateTool> ActionActivateToolHandle;
 
 } // end namespace Seg3D
 

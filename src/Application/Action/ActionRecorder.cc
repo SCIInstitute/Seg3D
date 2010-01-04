@@ -45,7 +45,7 @@ ActionRecorder::start()
 {
   if (!(connection_.connected()))
   {
-    connection_ = ActionDispatcher::Instance()->connect_pre_action(
+    connection_ = ActionDispatcher::Instance()->pre_action_signal.connect(
       boost::bind(&ActionRecorder::record,this,_1));
   }
 }
@@ -62,7 +62,7 @@ ActionRecorder::stop()
 void
 ActionRecorder::record(ActionHandle action)
 {
-  (*action_stream_) << "ACTION: " << action->export_action_to_string() << std::endl;
+  (*action_stream_) << "ACTION: " << action->export_to_string() << std::endl;
 }
 
 } // end namespace Seg3D

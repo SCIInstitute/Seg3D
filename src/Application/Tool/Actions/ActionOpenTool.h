@@ -41,7 +41,6 @@ class ActionOpenTool : public Action {
     ActionOpenTool()
     {
       add_argument(toolid_);
-      add_result(result_toolid_);
     }
     
     virtual ~ActionOpenTool() 
@@ -53,21 +52,18 @@ class ActionOpenTool : public Action {
     }
 
 // -- Functions that describe action --
-    virtual bool validate(ActionHandle& self,
-                          ActionContextHandle& context);
-    virtual bool run(ActionHandle& self,
-                     ActionContextHandle& context);
+    virtual bool validate(ActionContextHandle& context);
+    virtual bool run(ActionContextHandle& context,
+                     ActionResultHandle& result);
     
 // -- Action parameters --
   protected:
     // ToolID that is requested
     ActionParameter<std::string> toolid_;
 
-    // ToolID that was assigned
-    ActionParameter<std::string> result_toolid_;
 };
 
-typedef boost::shared_ptr<ActionOpenTool> ActionOpenToolHandle;
+typedef boost::intrusive_ptr<ActionOpenTool> ActionOpenToolHandle;
 
 }
 

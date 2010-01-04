@@ -164,19 +164,24 @@ class State : public StateBase {
     // be used and check whether it changed from the current value.
     
     virtual bool validate_and_compare_variant(
-          ActionVariantParameter& variant, 
+          ActionParameterVariant& variant, 
           bool& changed,
           std::string& error) const
     {
       T new_value;
-      if (!(variant.get_value(new_value,error))) return (false);
+      if (!(variant.get_value(new_value))) 
+      {
+        error = std::string("Could not convert value '")+
+              variant.export_to_string()+std::string("'");
+        return (false);
+      }
       changed = (value_ != new_value);
       return (true);           
     }
 
     // IMPORT_FROM_VARIANT:
     // Import the state data from a variant parameter.  
-    virtual bool import_from_variant(ActionVariantParameter& variant, 
+    virtual bool import_from_variant(ActionParameterVariant& variant, 
                                      bool trigger_signal = true)
     {
       T val;
@@ -191,7 +196,7 @@ class State : public StateBase {
   
     // EXPORT_TO_VARIANT
     // Export the state data to a variant parameter
-    virtual void export_to_variant(ActionVariantParameter& variant)
+    virtual void export_to_variant(ActionParameterVariant& variant)
     {
       variant.set_value(value_);
     }

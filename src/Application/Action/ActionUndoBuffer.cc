@@ -201,7 +201,7 @@ ActionUndoBuffer::run_action(ActionHandle action,
   // posted to the observers recording what the program does
 
   SCI_LOG_DEBUG("Validating Undo/Redo Action");  
-  if(!(action->validate(action,action_context))) 
+  if(!(action->validate(action_context))) 
   {
     action_context->report_done(false);
     return;
@@ -216,7 +216,8 @@ ActionUndoBuffer::run_action(ActionHandle action,
   // program whether the action succeeded.
   SCI_LOG_DEBUG("Running Undo/Redo Action");    
 
-  action_context->report_done(action->run(action,action_context));
+  ActionResultHandle result;
+  action_context->report_done(action->run(action_context,result));
   
   return;
 }

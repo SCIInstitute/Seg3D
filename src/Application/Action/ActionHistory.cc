@@ -34,8 +34,8 @@ ActionHistory::ActionHistory() :
   action_history_max_size_(0)
 {
   // Connect this class to the ActionDispatcher
-  dispatcher_connection_ = ActionDispatcher::Instance()->connect_post_action(
-    boost::bind(&ActionHistory::record_action,this,_1));
+  dispatcher_connection_ = ActionDispatcher::Instance()->
+    post_action_signal.connect(boost::bind(&ActionHistory::record_action,this,_1,_2));
 }
 
 void
@@ -72,7 +72,7 @@ ActionHistory::action(size_t index)
   boost::unique_lock<boost::mutex> lock(action_history_mutex_);
   if (index < action_history_.size())
   {
-    return action_history_[index];
+    return action_history_[index].first;
   }
   else
   {
@@ -81,11 +81,27 @@ ActionHistory::action(size_t index)
   }
 }
 
-void 
-ActionHistory::record_action(ActionHandle action)
+ActionResultHandle
+ActionHistory::result(size_t index)
 {
   boost::unique_lock<boost::mutex> lock(action_history_mutex_);
-  action_history_.push_front(action);
+  if (index < action_history_.size())
+  {
+    return action_history_[index].second;
+  }
+  else
+  {
+    ActionResultHandle empty_handle;
+    return empty_handle;
+  }
+}
+
+
+void 
+ActionHistory::record_action(ActionHandle action, ActionResultHandle result)
+{
+  boost::unique_lock<boost::mutex> lock(action_history_mutex_);
+  action_history_.push_front(std::make_pair(action,result));
   if (action_history_.size() > action_history_max_size_)
   {
     action_history_.pop_back();
