@@ -13,7 +13,20 @@ SOURCES += main.cpp \
     AnisotropicDiffusionFilterInterface.cc \
     MedianFilter.cc \
     DiscreteGaussianFilterInterface.cc \
-    ArithmeticFilterInterface.cc
+    ArithmeticFilterInterface.cc \
+    CannyEdgeDetectionFilterInterface.cc \
+    GradientMagnitudeFilterInterface.cc \
+    IntensityCorrectionFilterInterface.cc \
+    HistogramEqualizationFilterInterface.cc \
+    MaskDataFilterInterface.cc \
+    ConfidenceConnectedFilterInterface.cc \
+    NeighborhoodConnectedFilterInterface.cc \
+    OtsuThresholdFilterInterface.cc \
+    ThresholdSegmentationLSFilterInterface.cc \
+    BooleanFilterInterface.cc \
+    BinaryDialateErodeFilterInterface.cc \
+    ConnectedComponentFilterInterface.cc \
+    FillHolesFilterInterface.cc
 HEADERS += PaintToolInterface.h \
     sliderspincombo.h \
     FlipToolInterface.h \
@@ -23,7 +36,20 @@ HEADERS += PaintToolInterface.h \
     AnisotropicDiffusionFilterInterface.h \
     MedianFilter.h \
     DiscreteGaussianFilterInterface.h \
-    ArithmeticFilterInterface.h
+    ArithmeticFilterInterface.h \
+    CannyEdgeDetectionFilterInterface.h \
+    GradientMagnitudeFilterInterface.h \
+    IntensityCorrectionFilterInterface.h \
+    HistogramEqualizationFilterInterface.h \
+    MaskDataFilterInterface.h \
+    ConfidenceConnectedFilterInterface.h \
+    NeighborhoodConnectedFilterInterface.h \
+    OtsuThresholdFilterInterface.h \
+    ThresholdSegmentationLSFilterInterface.h \
+    BooleanFilterInterface.h \
+    BinaryDialateErodeFilterInterface.h \
+    ConnectedComponentFilterInterface.h \
+    FillHolesFilterInterface.h
 FORMS += ../PaintToolInterface.ui \
     ../FlipToolInterface.ui \
     ../InvertToolInterface.ui \
@@ -32,4 +58,17 @@ FORMS += ../PaintToolInterface.ui \
     ../AnisotropicDiffusionFilterInterface.ui \
     ../MedianFilterInterface.ui \
     ../DiscreteGaussianFilterInterface.ui \
-    ../ArithmeticFilterInterface.ui
+    ../ArithmeticFilterInterface.ui \
+    ../CannyEdgeDetectionFilterInterface.ui \
+    ../GradientMagnitudeFilterInterface.ui \
+    ../IntensityCorrectionFilterInterface.ui \
+    ../HistogramEqualizationFilterInterface.ui \
+    ../MaskDataFilterInterface.ui \
+    ../ConfidenceConnectedFilterInterface.ui \
+    ../NeighborhoodConnectedFilterInterface.ui \
+    ../OtsuThresholdFilterInterface.ui \
+    ../ThresholdSegmentationLSFilterInterface.ui \
+    ../BooleanFilterInterface.ui \
+    ../BinaryDialateErodeFilterInterface.ui \
+    ../ConnectedComponentFilterInterface.ui \
+    ../FillHolesFilterInterface.ui

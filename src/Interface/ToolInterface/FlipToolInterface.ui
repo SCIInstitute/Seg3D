@@ -41,7 +41,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Flip Tool</string>
   </property>
   <widget class="QWidget" name="layoutWidget_2">
    <property name="geometry">

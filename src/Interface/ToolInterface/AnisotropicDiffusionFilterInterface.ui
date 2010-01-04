@@ -29,7 +29,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Anisotropic Diffusion Filter</string>
   </property>
   <widget class="QWidget" name="layoutWidget_2">
    <property name="geometry">

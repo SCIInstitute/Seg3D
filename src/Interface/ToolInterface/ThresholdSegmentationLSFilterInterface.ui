@@ -1,0 +1,410 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ThresholdSegmentationLSFilterInterface</class>
+ <widget class="QWidget" name="ThresholdSegmentationLSFilterInterface">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>213</width>
+    <height>568</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>213</width>
+    <height>568</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>213</width>
+    <height>568</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Threshold Segmentation Level Set Filter</string>
+  </property>
+  <widget class="QWidget" name="layoutWidget_2">
+   <property name="geometry">
+    <rect>
+     <x>4</x>
+     <y>4</y>
+     <width>207</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="activeHLayout" stretch="1,2">
+    <property name="spacing">
+     <number>3</number>
+    </property>
+    <item>
+     <widget class="QLabel" name="activeLabel">
+      <property name="text">
+       <string>Target:</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QComboBox" name="activeComboBox">
+      <property name="layoutDirection">
+       <enum>Qt::LeftToRight</enum>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QGroupBox" name="thresholdGroupBox">
+   <property name="geometry">
+    <rect>
+     <x>6</x>
+     <y>122</y>
+     <width>202</width>
+     <height>171</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Threshold</string>
+   </property>
+   <property name="flat">
+    <bool>false</bool>
+   </property>
+   <widget class="QWidget" name="layoutWidget_6">
+    <property name="geometry">
+     <rect>
+      <x>5</x>
+      <y>112</y>
+      <width>193</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="lowerHLayout_bottom"/>
+   </widget>
+   <widget class="QWidget" name="layoutWidget_7">
+    <property name="geometry">
+     <rect>
+      <x>5</x>
+      <y>41</y>
+      <width>193</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="upperHLayout_bottom"/>
+   </widget>
+   <widget class="QWidget" name="layoutWidget_8">
+    <property name="geometry">
+     <rect>
+      <x>5</x>
+      <y>20</y>
+      <width>193</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="upperHLayout_top">
+     <item>
+      <widget class="QLabel" name="upperLabel">
+       <property name="text">
+        <string>Upper</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="upperHSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="layoutWidget_9">
+    <property name="geometry">
+     <rect>
+      <x>5</x>
+      <y>91</y>
+      <width>193</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="lowerHLayout_top">
+     <item>
+      <widget class="QLabel" name="lowerLabel">
+       <property name="text">
+        <string>Lower</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="lowerHSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QWidget" name="layoutWidget_4">
+   <property name="geometry">
+    <rect>
+     <x>4</x>
+     <y>29</y>
+     <width>207</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="maskHLayout" stretch="1,2">
+    <property name="spacing">
+     <number>3</number>
+    </property>
+    <item>
+     <widget class="QLabel" name="maskLabel">
+      <property name="text">
+       <string>Mask:</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QComboBox" name="maskComboBox"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="layoutWidget_10">
+   <property name="geometry">
+    <rect>
+     <x>4</x>
+     <y>75</y>
+     <width>205</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="iterationsHLayout_bottom"/>
+  </widget>
+  <widget class="QWidget" name="layoutWidget_11">
+   <property name="geometry">
+    <rect>
+     <x>4</x>
+     <y>54</y>
+     <width>205</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="iterationsHLayout_top">
+    <item>
+     <widget class="QLabel" name="iterationsLabel">
+      <property name="text">
+       <string>Iterations</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <spacer name="iterationsHSpacer">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>40</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QGroupBox" name="weightsGroupBox">
+   <property name="geometry">
+    <rect>
+     <x>6</x>
+     <y>290</y>
+     <width>202</width>
+     <height>241</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Weights</string>
+   </property>
+   <property name="flat">
+    <bool>false</bool>
+   </property>
+   <widget class="QWidget" name="layoutWidget_12">
+    <property name="geometry">
+     <rect>
+      <x>5</x>
+      <y>112</y>
+      <width>193</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="propagationHLayout_bottom"/>
+   </widget>
+   <widget class="QWidget" name="layoutWidget_13">
+    <property name="geometry">
+     <rect>
+      <x>5</x>
+      <y>41</y>
+      <width>193</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="curvatureHLayout_bottom"/>
+   </widget>
+   <widget class="QWidget" name="layoutWidget_14">
+    <property name="geometry">
+     <rect>
+      <x>5</x>
+      <y>20</y>
+      <width>193</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="curvatureHLayout_top">
+     <item>
+      <widget class="QLabel" name="curvatureLabel">
+       <property name="text">
+        <string>Curvature</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="curvatureHSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="layoutWidget_15">
+    <property name="geometry">
+     <rect>
+      <x>5</x>
+      <y>91</y>
+      <width>193</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="propagationHLayout_top">
+     <item>
+      <widget class="QLabel" name="propagationLabel">
+       <property name="text">
+        <string>Propagation</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="propagationHSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="layoutWidget_16">
+    <property name="geometry">
+     <rect>
+      <x>6</x>
+      <y>162</y>
+      <width>193</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="edgeHLayout_top">
+     <item>
+      <widget class="QLabel" name="edgeLabel">
+       <property name="text">
+        <string>Edge</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="edgeHSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="layoutWidget_17">
+    <property name="geometry">
+     <rect>
+      <x>6</x>
+      <y>183</y>
+      <width>193</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="upperHLayout_bottom_3"/>
+   </widget>
+  </widget>
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>4</x>
+     <y>532</y>
+     <width>205</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="replaceRunLayout">
+    <item>
+     <widget class="QCheckBox" name="replaceCheckBox">
+      <property name="text">
+       <string>Replace</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="runButton">
+      <property name="text">
+       <string>Run Filter</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

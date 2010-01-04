@@ -31,61 +31,120 @@
 
 namespace Seg3D {
   
-  SCI_REGISTER_TOOLINTERFACE(ArithmeticFilterInterface)
+SCI_REGISTER_TOOLINTERFACE(ArithmeticFilterInterface)
+
+
+class ArithmeticFilterInterfacePrivate {
+public:
+  Ui::ArithmeticFilterInterface ui_;
+};
+
+
+ArithmeticFilterInterface::ArithmeticFilterInterface() :
+private_(new ArithmeticFilterInterfacePrivate)
+{  
+  SCI_LOG_DEBUG("Building an Arithmetic Filter Interface");
+}
+
+ArithmeticFilterInterface::~ArithmeticFilterInterface()
+{
+}
+
+
+bool
+ArithmeticFilterInterface::build_widget(QFrame* frame)
+{
   
+  private_->ui_.setupUi(frame);
   
-  class ArithmeticFilterInterfacePrivate {
-  public:
-    Ui::ArithmeticFilterInterface ui_;
-  };
-  
-  
-  ArithmeticFilterInterface::ArithmeticFilterInterface() :
-  private_(new ArithmeticFilterInterfacePrivate)
-  {  
-    SCI_LOG_DEBUG("Building an Arithmetic Filter Interface");
-  }
-  
-  ArithmeticFilterInterface::~ArithmeticFilterInterface()
-  {
-  }
-  
-  
-  bool
-  ArithmeticFilterInterface::build_widget(QFrame* frame)
-  {
-    
-    private_->ui_.setupUi(frame);
-    
-    //varianceAdjuster = new SliderSpinCombo();
+  //varianceAdjuster = new SliderSpinCombo();
 //    private_->ui_.varianceHLayout_bottom->addWidget(varianceAdjuster);
 //    
 //    kernelWidthAdjuster = new SliderSpinCombo();
 //    private_->ui_.kernelHLayout_bottom->addWidget(kernelWidthAdjuster);
-    
-    
-    makeConnections();
-    SCI_LOG_DEBUG("Finished Building an Arithmetic Filter");
-    
-    return (true);
-  }
   
-  void 
-  ArithmeticFilterInterface::makeConnections()
+  
+  makeConnections();
+  SCI_LOG_DEBUG("Finished Building an Arithmetic Filter");
+  
+  return (true);
+}
+
+void 
+ArithmeticFilterInterface::makeConnections()
+{
+}
+
+//  --- Private slots for custom signals ---  //
+void ArithmeticFilterInterface::senseVolumeAChanged(int active)
+{
+  Q_EMIT volumeAChanged( active );
+}
+
+void ArithmeticFilterInterface::senseVolumeBChanged(int active)
+{
+  Q_EMIT volumeBChanged( active );
+}
+
+void ArithmeticFilterInterface::senseVolumeCChanged(int active)
+{
+  Q_EMIT volumeCChanged( active );
+}
+
+
+void ArithmeticFilterInterface::senseFilterRun()
+{
+  if(private_->ui_.replaceCheckBox->isChecked())
   {
+    Q_EMIT filterRun(true);
   }
-  
-  
-  void ArithmeticFilterInterface::senseFilterRun()
+  else
   {
-    if(private_->ui_.replaceCheckBox->isChecked())
-    {
-      Q_EMIT filterRun(true);
-    }
-    else
-    {
-      Q_EMIT filterRun(false);
-    }
+    Q_EMIT filterRun(false);
   }
+}
+  
+//  --- Public slots for setting widget values ---  //
+void ArithmeticFilterInterface::setVolumeA(int active)
+{
+  private_->ui_.volumeAComboBox->setCurrentIndex(active);
+}
+
+void ArithmeticFilterInterface::addToVolumeA(QStringList &items)
+{
+  private_->ui_.volumeAComboBox->addItems(items);
+}
+  
+void ArithmeticFilterInterface::setVolumeB(int active)
+{
+  private_->ui_.volumeBComboBox->setCurrentIndex(active);
+}
+
+void ArithmeticFilterInterface::addToVolumeB(QStringList &items)
+{
+  private_->ui_.volumeBComboBox->addItems(items);
+}
+
+void ArithmeticFilterInterface::setVolumeC(int active)
+{
+  private_->ui_.volumeCComboBox->setCurrentIndex(active);
+}
+
+void ArithmeticFilterInterface::addToVolumeC(QStringList &items)
+{
+  private_->ui_.volumeCComboBox->addItems(items);
+}
+  
+void ArithmeticFilterInterface::addToSampleExpressions(QStringList &items)
+{
+  private_->ui_.comboBox->addItems(items);
+}
+
+void ArithmeticFilterInterface::addToExpressions(QStringList &items)
+{
+  //private_->ui_.comboBox->addItems(items);
+}
+  
+  
   
 } //end seg3d

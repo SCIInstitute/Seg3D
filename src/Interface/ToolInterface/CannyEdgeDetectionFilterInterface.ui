@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>CannyEdgeDetectionFilterInterface</class>
+ <widget class="QWidget" name="CannyEdgeDetectionFilterInterface">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>213</width>
+    <height>279</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>213</width>
+    <height>279</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>213</width>
+    <height>279</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Canny Edge Detection Filter</string>
+  </property>
+  <widget class="QWidget" name="layoutWidget_7">
+   <property name="geometry">
+    <rect>
+     <x>4</x>
+     <y>50</y>
+     <width>205</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="varianceHLayout_bottom"/>
+  </widget>
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>4</x>
+     <y>242</y>
+     <width>205</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="replaceInvertLayout">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <item>
+     <widget class="QCheckBox" name="replaceCheckBox">
+      <property name="text">
+       <string>Replace</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="invertButton">
+      <property name="text">
+       <string>Run Filter</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="layoutWidget_9">
+   <property name="geometry">
+    <rect>
+     <x>4</x>
+     <y>100</y>
+     <width>205</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="errorHLayout_top">
+    <item>
+     <widget class="QLabel" name="errorLabel">
+      <property name="text">
+       <string>Maximum Error</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <spacer name="errorHSpacer">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>40</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="layoutWidget_8">
+   <property name="geometry">
+    <rect>
+     <x>4</x>
+     <y>29</y>
+     <width>205</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="varianceHLayout_top">
+    <item>
+     <widget class="QLabel" name="varianceLabel">
+      <property name="text">
+       <string>Variance</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <spacer name="varianceHSpacer">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>40</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="layoutWidget_10">
+   <property name="geometry">
+    <rect>
+     <x>4</x>
+     <y>121</y>
+     <width>205</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="errorHLayout_bottom"/>
+  </widget>
+  <widget class="QWidget" name="layoutWidget_2">
+   <property name="geometry">
+    <rect>
+     <x>4</x>
+     <y>4</y>
+     <width>207</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="activeHLayout" stretch="1,2">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <item>
+     <widget class="QLabel" name="activeLabel">
+      <property name="text">
+       <string>Target:</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QComboBox" name="activeComboBox"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="layoutWidget_11">
+   <property name="geometry">
+    <rect>
+     <x>4</x>
+     <y>192</y>
+     <width>205</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="thresholdHLayout_bottom"/>
+  </widget>
+  <widget class="QWidget" name="layoutWidget_12">
+   <property name="geometry">
+    <rect>
+     <x>4</x>
+     <y>171</y>
+     <width>205</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="thresholdHLayout_top">
+    <item>
+     <widget class="QLabel" name="thresholdLabel">
+      <property name="text">
+       <string>Threshold</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <spacer name="thresholdHSpacer">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>40</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

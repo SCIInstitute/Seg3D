@@ -46,6 +46,19 @@ class ArithmeticFilterInterface : public ToolWidget {
 
 Q_SIGNALS:
   void filterRun(bool);
+  void volumeAChanged(int);
+  void volumeBChanged(int);
+  void volumeCChanged(int);
+  
+public Q_SLOTS:
+  void setVolumeA(int);
+  void addToVolumeA(QStringList&);
+  void setVolumeB(int);
+  void addToVolumeB(QStringList&);
+  void setVolumeC(int);
+  void addToVolumeC(QStringList&);
+  void addToSampleExpressions(QStringList&);
+  void addToExpressions(QStringList&);
   
 public:
   ArithmeticFilterInterface();
@@ -58,6 +71,9 @@ private:
   
 private Q_SLOTS:
   void senseFilterRun();
+  void senseVolumeAChanged(int);
+  void senseVolumeBChanged(int);
+  void senseVolumeCChanged(int);
   
   
   

@@ -32,7 +32,7 @@
 #include <Application/Action/Action.h>
 #include <Application/Action/ActionFactory.h>
 
-#include <Application/Action/ActionVariantParameter.h>
+#include <Application/Action/ActionParameter.h>
 
 namespace Seg3D {
 

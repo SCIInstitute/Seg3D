@@ -33,29 +33,29 @@
 
 namespace Seg3D  {
   
-  class ArithmeticFilter : public Tool {
-    SCI_TOOL_TYPE("ArithmeticFilter","Arithmetic Filter", "",Tool::DATATODATA_E|Tool::FILTER_E)
-    
-  public:
-    ArithmeticFilter(const std::string& toolid);
-    virtual ~ArithmeticFilter();
-    
-    // -- constraint parameters --
-    
-    // Constrain viewer to right painting tool when layer is selected
-    void target_constraint(std::string layerid);
-    
-    // -- activate/deactivate tool --
-    
-    virtual void activate();
-    virtual void deactivate();
-    
-    // -- state --
-  public:
-    // Layerid of the target layer
-    StateOption::Handle              target_layer_;
-    
-  };
+class ArithmeticFilter : public Tool {
+  SCI_TOOL_TYPE("ArithmeticFilter","Arithmetic Filter", "",Tool::DATATODATA_E|Tool::FILTER_E)
+  
+public:
+  ArithmeticFilter(const std::string& toolid);
+  virtual ~ArithmeticFilter();
+  
+  // -- constraint parameters --
+  
+  // Constrain viewer to right painting tool when layer is selected
+  void target_constraint(std::string layerid);
+  
+  // -- activate/deactivate tool --
+  
+  virtual void activate();
+  virtual void deactivate();
+  
+  // -- state --
+public:
+  // Layerid of the target layer
+  StateOption::Handle              target_layer_;
+  
+};
   
 } // end namespace
 

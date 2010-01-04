@@ -29,7 +29,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Discrete Gaussian Filter</string>
   </property>
   <widget class="QWidget" name="layoutWidget_7">
    <property name="geometry">

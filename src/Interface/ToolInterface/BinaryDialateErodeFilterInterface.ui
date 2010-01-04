@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>BinaryDialateErodeFilterInterface</class>
+ <widget class="QWidget" name="BinaryDialateErodeFilterInterface">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>213</width>
+    <height>271</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>213</width>
+    <height>271</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>213</width>
+    <height>271</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Binary Dialate Erode</string>
+  </property>
+  <widget class="QGroupBox" name="radiiGroupBox">
+   <property name="geometry">
+    <rect>
+     <x>4</x>
+     <y>32</y>
+     <width>202</width>
+     <height>171</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Radii</string>
+   </property>
+   <property name="flat">
+    <bool>false</bool>
+   </property>
+   <widget class="QWidget" name="layoutWidget_6">
+    <property name="geometry">
+     <rect>
+      <x>5</x>
+      <y>112</y>
+      <width>193</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="erodeHLayout_bottom"/>
+   </widget>
+   <widget class="QWidget" name="layoutWidget_7">
+    <property name="geometry">
+     <rect>
+      <x>5</x>
+      <y>41</y>
+      <width>193</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="dialateHLayout_bottom"/>
+   </widget>
+   <widget class="QWidget" name="layoutWidget_8">
+    <property name="geometry">
+     <rect>
+      <x>5</x>
+      <y>20</y>
+      <width>193</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="dialateHLayout_top">
+     <item>
+      <widget class="QLabel" name="dialateLabel">
+       <property name="text">
+        <string>Dialate:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="dialateHSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="layoutWidget_9">
+    <property name="geometry">
+     <rect>
+      <x>5</x>
+      <y>91</y>
+      <width>193</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="erodeHLayout_top">
+     <item>
+      <widget class="QLabel" name="erodeLabel">
+       <property name="text">
+        <string>Erode:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="erodeHSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QWidget" name="layoutWidget_2">
+   <property name="geometry">
+    <rect>
+     <x>4</x>
+     <y>6</y>
+     <width>207</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="activeHLayout" stretch="1,2">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <item>
+     <widget class="QLabel" name="activeLabel">
+      <property name="text">
+       <string>Target:</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QComboBox" name="activeComboBox"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>4</x>
+     <y>204</y>
+     <width>207</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="replaceRunLayout">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <item>
+     <widget class="QCheckBox" name="replaceCheckBox">
+      <property name="text">
+       <string>Replace</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="runButton">
+      <property name="font">
+       <font>
+        <pointsize>13</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Dialate-&gt;Erode</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>4</x>
+     <y>234</y>
+     <width>207</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="dialateErodeLayout">
+    <item>
+     <widget class="QPushButton" name="dialateButton">
+      <property name="font">
+       <font>
+        <pointsize>13</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Run Dialate</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="erodeButton">
+      <property name="font">
+       <font>
+        <pointsize>13</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Run Erode</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

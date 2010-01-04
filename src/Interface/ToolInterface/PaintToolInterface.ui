@@ -40,7 +40,7 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Paint Tool</string>
   </property>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
