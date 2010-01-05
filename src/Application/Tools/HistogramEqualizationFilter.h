@@ -35,7 +35,7 @@
 namespace Seg3D  {
   
 class HistogramEqualizationFilter : public Tool {
-  SCI_TOOL_TYPE("HistogramEqualizationFilter","Histogram Equalization Filter", "",Tool::DATATODATA_E|Tool::FILTER_E)
+  SCI_TOOL_TYPE("HistogramEqualizationFilter","Histogram Equalization", "",Tool::DATATODATA_E|Tool::FILTER_E)
   
 public:
   HistogramEqualizationFilter(const std::string& toolid);

@@ -34,7 +34,7 @@
 namespace Seg3D  {
 
 class DiscreteGaussianFilter : public Tool {
-  SCI_TOOL_TYPE("DiscreteGaussianFilter","Discrete Gaussian Filter", "",Tool::DATATODATA_E|Tool::FILTER_E)
+  SCI_TOOL_TYPE("DiscreteGaussianFilter","Discrete Gaussian", "",Tool::DATATODATA_E|Tool::FILTER_E)
 
 public:
   DiscreteGaussianFilter(const std::string& toolid);

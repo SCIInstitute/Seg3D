@@ -34,7 +34,7 @@
 namespace Seg3D  {
   
 class BooleanFilter : public Tool {
-  SCI_TOOL_TYPE("BooleanFilter","Boolean Filter", "",Tool::DATATODATA_E|Tool::FILTER_E)
+  SCI_TOOL_TYPE("BooleanFilter","Boolean", "",Tool::MASKTOMASK_E|Tool::FILTER_E)
   
 public:
   BooleanFilter(const std::string& toolid);

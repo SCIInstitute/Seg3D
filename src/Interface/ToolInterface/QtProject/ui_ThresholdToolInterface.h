@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'ThresholdToolInterface.ui'
 **
-** Created: Wed Dec 30 08:36:24 2009
+** Created: Tue Jan 5 13:59:09 2010
 **      by: Qt User Interface Compiler version 4.6.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -174,7 +174,7 @@ public:
 
     void retranslateUi(QWidget *ThresholdToolInterface)
     {
-        ThresholdToolInterface->setWindowTitle(QApplication::translate("ThresholdToolInterface", "Form", 0, QApplication::UnicodeUTF8));
+        ThresholdToolInterface->setWindowTitle(QApplication::translate("ThresholdToolInterface", "Threshold Tool", 0, QApplication::UnicodeUTF8));
         activeLabel->setText(QApplication::translate("ThresholdToolInterface", "Target:", 0, QApplication::UnicodeUTF8));
         lowerLabel->setText(QApplication::translate("ThresholdToolInterface", "Lower Threshold:", 0, QApplication::UnicodeUTF8));
         upperLabel->setText(QApplication::translate("ThresholdToolInterface", "Upper Threshold:", 0, QApplication::UnicodeUTF8));

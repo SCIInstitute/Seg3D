@@ -53,7 +53,7 @@ class ToolBoxWidget : public QScrollArea
     ToolBoxWidget(QWidget* parent=0);
     virtual ~ToolBoxWidget();
     
-    void add_tool ( QWidget * tool, const QString & text );
+  void add_tool ( QWidget * tool, const QString & text, boost::function<void ()> );
     //void remove_tool ( QWidget *tool );
     void remove_tool ( int index );
     
@@ -121,7 +121,6 @@ class ToolBoxWidget : public QScrollArea
     
   private Q_SLOTS:
     void activate_button_clicked();
-    void close_button_clicked();
     void help_button_clicked();
     void itemDestroyed(QObject*);
     

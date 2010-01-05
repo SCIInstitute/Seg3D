@@ -58,6 +58,17 @@ QtBridge::connect(QCheckBox* qcheckbox,
   
   return (true);
 }
+  
+bool
+QtBridge::connect(QToolButton* qtoolbutton, 
+                  boost::function<void ()> function)
+{
+  // Link tbe slot to the parent widget, so Qt's memory manager will
+  // manage this one.
+  new QtToolButtonSlot(qtoolbutton,function);
+  
+  return (true);
+}
 
 // -- Tool menu connector --
 

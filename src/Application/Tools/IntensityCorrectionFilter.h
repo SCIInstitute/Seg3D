@@ -34,7 +34,7 @@
 namespace Seg3D  {
   
 class IntensityCorrectionFilter : public Tool {
-  SCI_TOOL_TYPE("IntensityCorrectionFilter","Intensity Correction Filter", "",Tool::DATATODATA_E|Tool::FILTER_E)
+  SCI_TOOL_TYPE("IntensityCorrectionFilter","Intensity Correction", "",Tool::DATATODATA_E|Tool::FILTER_E)
   
 public:
   IntensityCorrectionFilter(const std::string& toolid);

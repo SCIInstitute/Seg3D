@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'MedianFilterInterface.ui'
 **
-** Created: Wed Dec 30 11:35:13 2009
+** Created: Tue Jan 5 13:59:09 2010
 **      by: Qt User Interface Compiler version 4.6.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -39,15 +39,22 @@ public:
     QWidget *layoutWidget_7;
     QHBoxLayout *radiusHLayout_bottom;
     QWidget *layoutWidget;
-    QHBoxLayout *replaceInvertLayout;
+    QHBoxLayout *replaceRunLayout;
     QCheckBox *replaceCheckBox;
-    QPushButton *invertButton;
+    QPushButton *runButton;
 
     void setupUi(QWidget *MedianFilterInterface)
     {
         if (MedianFilterInterface->objectName().isEmpty())
             MedianFilterInterface->setObjectName(QString::fromUtf8("MedianFilterInterface"));
         MedianFilterInterface->resize(213, 136);
+        QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(MedianFilterInterface->sizePolicy().hasHeightForWidth());
+        MedianFilterInterface->setSizePolicy(sizePolicy);
+        MedianFilterInterface->setMinimumSize(QSize(213, 136));
+        MedianFilterInterface->setMaximumSize(QSize(213, 136));
         layoutWidget_8 = new QWidget(MedianFilterInterface);
         layoutWidget_8->setObjectName(QString::fromUtf8("layoutWidget_8"));
         layoutWidget_8->setGeometry(QRect(4, 29, 205, 22));
@@ -91,19 +98,19 @@ public:
         layoutWidget = new QWidget(MedianFilterInterface);
         layoutWidget->setObjectName(QString::fromUtf8("layoutWidget"));
         layoutWidget->setGeometry(QRect(4, 100, 205, 32));
-        replaceInvertLayout = new QHBoxLayout(layoutWidget);
-        replaceInvertLayout->setObjectName(QString::fromUtf8("replaceInvertLayout"));
-        replaceInvertLayout->setContentsMargins(0, 0, 0, 0);
+        replaceRunLayout = new QHBoxLayout(layoutWidget);
+        replaceRunLayout->setObjectName(QString::fromUtf8("replaceRunLayout"));
+        replaceRunLayout->setContentsMargins(0, 0, 0, 0);
         replaceCheckBox = new QCheckBox(layoutWidget);
         replaceCheckBox->setObjectName(QString::fromUtf8("replaceCheckBox"));
         replaceCheckBox->setChecked(true);
 
-        replaceInvertLayout->addWidget(replaceCheckBox);
+        replaceRunLayout->addWidget(replaceCheckBox);
 
-        invertButton = new QPushButton(layoutWidget);
-        invertButton->setObjectName(QString::fromUtf8("invertButton"));
+        runButton = new QPushButton(layoutWidget);
+        runButton->setObjectName(QString::fromUtf8("runButton"));
 
-        replaceInvertLayout->addWidget(invertButton);
+        replaceRunLayout->addWidget(runButton);
 
 
         retranslateUi(MedianFilterInterface);
@@ -113,11 +120,11 @@ public:
 
     void retranslateUi(QWidget *MedianFilterInterface)
     {
-        MedianFilterInterface->setWindowTitle(QApplication::translate("MedianFilterInterface", "Form", 0, QApplication::UnicodeUTF8));
+        MedianFilterInterface->setWindowTitle(QApplication::translate("MedianFilterInterface", "Median Filter", 0, QApplication::UnicodeUTF8));
         radiusLabel->setText(QApplication::translate("MedianFilterInterface", "Radius", 0, QApplication::UnicodeUTF8));
         activeLabel->setText(QApplication::translate("MedianFilterInterface", "Target:", 0, QApplication::UnicodeUTF8));
         replaceCheckBox->setText(QApplication::translate("MedianFilterInterface", "Replace", 0, QApplication::UnicodeUTF8));
-        invertButton->setText(QApplication::translate("MedianFilterInterface", "Invert", 0, QApplication::UnicodeUTF8));
+        runButton->setText(QApplication::translate("MedianFilterInterface", "Run Filter", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 
 };

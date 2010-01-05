@@ -34,7 +34,7 @@
 namespace Seg3D  {
   
 class ConfidenceConnectedFilter : public Tool {
-  SCI_TOOL_TYPE("ConfidenceConnectedFilter","Confidence Connected Filter", "",Tool::DATATODATA_E|Tool::FILTER_E)
+  SCI_TOOL_TYPE("ConfidenceConnectedFilter","Confidence Connected", "",Tool::DATATOMASK_E|Tool::FILTER_E)
   
 public:
   ConfidenceConnectedFilter(const std::string& toolid);

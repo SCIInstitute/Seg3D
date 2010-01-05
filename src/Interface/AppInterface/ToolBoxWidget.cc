@@ -33,6 +33,8 @@
 #include <iostream>
 #include <boost/lexical_cast.hpp>
 
+#include <Interface/QtInterface/QtBridge.h>
+
 namespace Seg3D  {
     
 ToolBoxWidget::ToolBoxWidget(QWidget* parent) :
@@ -63,7 +65,7 @@ ToolBoxWidget::~ToolBoxWidget()
   
 
 void 
-ToolBoxWidget::add_tool(QWidget * tool, const QString &label)
+  ToolBoxWidget::add_tool(QWidget * tool, const QString &label, boost::function<void ()> close_function)
 {
   if ( !tool ) return;
   
@@ -80,8 +82,8 @@ ToolBoxWidget::add_tool(QWidget * tool, const QString &label)
                                                  "  text-align: left;\n"
                                                  "  padding-left: 4px;\n"
                                                  "  color: white;\n"
+                                                 "  font: 11pt;\n"
                                                  "  font: bold;\n"
-                                                 "\n"
                                                  "}\n"
                                                  "\n"
                                                  "QPushButton#activate_button_:pressed{\n"
@@ -110,13 +112,14 @@ ToolBoxWidget::add_tool(QWidget * tool, const QString &label)
                                                  "\n"      
                                                  "QWidget#header_{\n"
                                                  "  \n"
-                                                 "  background-color: qlineargradient(spread:pad, x1:0.5, y1:0.733364, x2:0.5, y2:0, stop:0 rgba(25, 25, 25, 255), stop:1 rgba(136, 0, 0, 0 ));\n"
+                                                 "background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(25, 25, 25, 0), stop:0.753769 rgba(0, 0, 0, 100), stop:1 rgba(0, 0, 0, 84));\n"
+                                                 //"  background-color: qlineargradient(spread:pad, x1:0.5, y1:0.733364, x2:0.5, y2:0, stop:0 rgba(25, 25, 25, 190), stop:1 rgba(136, 0, 0, 0 ));\n"
                                                  "    border-radius: 4px;\n"
                                                  "  border: 1px solid black;\n"
                                                  "}\n"
                                                  "\n"
                                                  "QWidget#background_{\n"
-                                                 "  background-color: rgb(128, 0, 0);\n"
+                                                 "  background-color: rgb(190, 0, 0);\n"
                                                  "    border-radius: 6px;\n"
                                                  "}\n"
                                                  "QFrame#tool_frame_{ border-radius: 4px; border: 1px solid gray; }     "));
@@ -164,7 +167,10 @@ ToolBoxWidget::add_tool(QWidget * tool, const QString &label)
   page_handle->help_button_->setIconSize(QSize(16, 16));
   
   page_handle->hLayout_->addWidget(page_handle->help_button_);
+  
   page_handle->close_button_ = new QToolButton(page_handle->header_);
+  QtBridge::connect(page_handle->close_button_, close_function);
+  
   page_handle->close_button_->setObjectName(QString::fromUtf8("close_button_"));
   
    ///  ---  This is where we add the icon's for the close button --- //
@@ -196,7 +202,6 @@ ToolBoxWidget::add_tool(QWidget * tool, const QString &label)
   
   // Begin Connections 
   connect(page_handle->activate_button_, SIGNAL( clicked() ), this, SLOT(activate_button_clicked()));
-  connect(page_handle->close_button_, SIGNAL( clicked() ), this, SLOT(close_button_clicked()));
   connect(page_handle->help_button_, SIGNAL( clicked() ), this, SLOT(help_button_clicked()));
   
   connect(tool, SIGNAL(destroyed(QObject*)), this, SLOT(itemDestroyed(QObject*)));
@@ -213,17 +218,7 @@ ToolBoxWidget::add_tool(QWidget * tool, const QString &label)
   SCI_LOG_MESSAGE(label.toStdString() + " - has been successfully added");
 }
   
-  
-void ToolBoxWidget::set_active_index( int index )
-{
-  if (index >= 0) 
-  {
-    set_active_tool(tool_list_.at(index)->tool_);
-  }
-  active_index_ = index;
-  
-}
-  
+
   
 void ToolBoxWidget::set_active_tool( QWidget *tool )
 {
@@ -245,12 +240,12 @@ void ToolBoxWidget::set_active_tool( QWidget *tool )
                                       " height: 24px;\n"
                                       " text-align: left;\n"
                                       " padding-left: 4px;\n"
-                                      " color: rgb(180, 180, 180);\n"
+                                      " color: rgb(25, 25, 25);\n"                           
                                       " font: bold;\n"
                                       "\n"
                                       "}\n"));
         (*it)->tool_frame_->hide();
-        main_->adjustSize();
+        //main_->adjustSize();
       }
     }
     ++it; 
@@ -272,7 +267,7 @@ void ToolBoxWidget::set_active_tool( QWidget *tool )
       {
         //set the size of the active page as well as the color of its header
         (*it)->background_->setStyleSheet(QString::fromUtf8(
-                    "QWidget#background_ { background-color: rgb(128, 0, 0); }"));
+                    "QWidget#background_ { background-color: rgb(190, 0, 0); }"));
         (*it)->activate_button_->setStyleSheet(QString::fromUtf8(
                                       "QPushButton{\n"
                                       " \n"
@@ -285,12 +280,12 @@ void ToolBoxWidget::set_active_tool( QWidget *tool )
                                       "\n"
                                       "}\n"));      
         (*it)->tool_frame_->show();
-        main_->adjustSize();
+        //main_->adjustSize();
       }
     }
     ++it; index++; 
   }
-  
+  main_->adjustSize();
   Q_EMIT currentChanged (active_index_);
 }
   
@@ -312,18 +307,60 @@ int ToolBoxWidget::index_of( QWidget *tool )
   QSharedPointer <Page> page_ptr_ = page( tool );
   int index = page_ptr_ ? tool_list_.indexOf( page_ptr_ ) : -1;
   
-  std::string h = boost::lexical_cast<std::string>(index);
-  SCI_LOG_MESSAGE("The the index of the tool is: "+ h);
+  //std::string h = boost::lexical_cast<std::string>(index);
+  //SCI_LOG_MESSAGE("The the index of the tool is: "+ h);
   
   return index;
   
 }
   
+  
+  
+void ToolBoxWidget::set_active_index( int index )
+{
+  //std::string h = boost::lexical_cast<std::string>(index);
+//  SCI_LOG_MESSAGE("The new index is: " + h);
+  
+  // Find the index that corresponds to the tool
+  QList<PageHandle>::iterator it = tool_list_.begin();
+  QList<PageHandle>::iterator it_end = tool_list_.end();
+  
+  
+  int counter = 0;
+
+  if (index >= 0) 
+  {
+    
+    while (it != it_end) 
+    { 
+      if (index == counter) 
+      {
+        set_active_tool( (*it)->tool_);
+      }
+      ++it; counter++;
+    }
+    
+    active_index_ = index;
+  }
+  else if(index < 0)
+  {
+
+    
+    if(it != tool_list_.end())
+    {
+      set_active_tool( (*it)->tool_);
+      //SCI_LOG_MESSAGE("the index is -1 so i am setting it to 0");
+    }
+    active_index_ = 0;
+  }
+  
+}
+
+  
 
 void ToolBoxWidget::remove_tool(int index)
 {
-  // Set the previous tool to active if the one to be deleted is active.
-  if (active_index_ == index) { set_active_index(index-1); }
+
    
   // Find the index that corresponds to the tool
   QList<PageHandle>::iterator it = tool_list_.begin();
@@ -340,12 +377,17 @@ void ToolBoxWidget::remove_tool(int index)
          
       (*it)->page_->deleteLater();
       tool_list_.removeAt(index);
-      main_->adjustSize();
+      //main_->adjustSize();
     }
     ++it; counter++;
   }
   
+  // Set the previous tool to active if the one to be deleted is active.
+  if (active_index_ == index) { set_active_index(index-1); }
+  
+  main_->adjustSize();
   tool_removed(index);
+  
 }
   
   
@@ -372,27 +414,7 @@ void ToolBoxWidget::activate_button_clicked()
   
 }
 
-void ToolBoxWidget:: close_button_clicked()
-{
-  SCI_LOG_MESSAGE("Close button has been clicked.");
-  QToolButton *close_button = ::qobject_cast<QToolButton*>(sender());
-  int counter = 0;
-  
-  QList<PageHandle>::iterator it = tool_list_.begin();
-  QList<PageHandle>::iterator it_end = tool_list_.end();
-  
-  while (it != it_end) 
-  { 
-    if ((*it)->close_button_ == close_button)
-    {
-      std::string h = boost::lexical_cast<std::string>(counter);
-      SCI_LOG_MESSAGE("made it to the remove section attempting to remove the widget at index: " + h);
-      remove_tool(counter);
-    }
-    ++it; counter++;
-  }
-  
-}
+
   
   void ToolBoxWidget:: help_button_clicked()
   {
@@ -407,7 +429,7 @@ void ToolBoxWidget:: close_button_clicked()
     { 
       if ((*it)->help_button_ == help_button)
       {
-        
+        //TODO add help dialog box
       }
       ++it; counter++;
     }

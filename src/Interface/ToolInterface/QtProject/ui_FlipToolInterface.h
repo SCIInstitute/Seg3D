@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'FlipToolInterface.ui'
 **
-** Created: Wed Dec 30 08:36:24 2009
+** Created: Tue Jan 5 13:59:09 2010
 **      by: Qt User Interface Compiler version 4.6.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -136,7 +136,7 @@ public:
 
     void retranslateUi(QWidget *FlipToolInterface)
     {
-        FlipToolInterface->setWindowTitle(QApplication::translate("FlipToolInterface", "Form", 0, QApplication::UnicodeUTF8));
+        FlipToolInterface->setWindowTitle(QApplication::translate("FlipToolInterface", "Flip Tool", 0, QApplication::UnicodeUTF8));
         activeLabel->setText(QApplication::translate("FlipToolInterface", "Target:", 0, QApplication::UnicodeUTF8));
         flipGroupBox->setTitle(QApplication::translate("FlipToolInterface", "Flip", 0, QApplication::UnicodeUTF8));
 #ifndef QT_NO_TOOLTIP

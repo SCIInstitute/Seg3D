@@ -34,7 +34,7 @@
 namespace Seg3D {
 
 class PolylineTool : public Tool {
-  SCI_TOOL_TYPE("PolylineTool","Polyline Tool","",Tool::TOOL_E)
+  SCI_TOOL_TYPE("PolylineTool","Polyline","",Tool::TOOL_E)
 // -- constructor/destructor --
   public:
     PolylineTool(const std::string& toolid);

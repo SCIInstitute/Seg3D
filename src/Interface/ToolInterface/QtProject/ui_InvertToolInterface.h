@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'InvertToolInterface.ui'
 **
-** Created: Wed Dec 30 08:36:24 2009
+** Created: Tue Jan 5 13:59:09 2010
 **      by: Qt User Interface Compiler version 4.6.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -98,7 +98,7 @@ public:
 
     void retranslateUi(QWidget *InvertToolInterface)
     {
-        InvertToolInterface->setWindowTitle(QApplication::translate("InvertToolInterface", "Form", 0, QApplication::UnicodeUTF8));
+        InvertToolInterface->setWindowTitle(QApplication::translate("InvertToolInterface", "Invert Tool", 0, QApplication::UnicodeUTF8));
         activeLabel->setText(QApplication::translate("InvertToolInterface", "Target:", 0, QApplication::UnicodeUTF8));
         replaceCheckBox->setText(QApplication::translate("InvertToolInterface", "Replace", 0, QApplication::UnicodeUTF8));
         invertButton->setText(QApplication::translate("InvertToolInterface", "Invert", 0, QApplication::UnicodeUTF8));

@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'AnisotropicDiffusionFilterInterface.ui'
 **
-** Created: Wed Dec 30 11:35:13 2009
+** Created: Tue Jan 5 13:59:09 2010
 **      by: Qt User Interface Compiler version 4.6.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -61,6 +61,13 @@ public:
         if (AnisotropicDiffusionFilterInterface->objectName().isEmpty())
             AnisotropicDiffusionFilterInterface->setObjectName(QString::fromUtf8("AnisotropicDiffusionFilterInterface"));
         AnisotropicDiffusionFilterInterface->resize(213, 306);
+        QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(AnisotropicDiffusionFilterInterface->sizePolicy().hasHeightForWidth());
+        AnisotropicDiffusionFilterInterface->setSizePolicy(sizePolicy);
+        AnisotropicDiffusionFilterInterface->setMinimumSize(QSize(213, 306));
+        AnisotropicDiffusionFilterInterface->setMaximumSize(QSize(213, 306));
         layoutWidget_2 = new QWidget(AnisotropicDiffusionFilterInterface);
         layoutWidget_2->setObjectName(QString::fromUtf8("layoutWidget_2"));
         layoutWidget_2->setGeometry(QRect(4, 4, 207, 26));
@@ -171,13 +178,13 @@ public:
 
     void retranslateUi(QWidget *AnisotropicDiffusionFilterInterface)
     {
-        AnisotropicDiffusionFilterInterface->setWindowTitle(QApplication::translate("AnisotropicDiffusionFilterInterface", "Form", 0, QApplication::UnicodeUTF8));
+        AnisotropicDiffusionFilterInterface->setWindowTitle(QApplication::translate("AnisotropicDiffusionFilterInterface", "Anisotropic Diffusion Filter", 0, QApplication::UnicodeUTF8));
         activeLabel->setText(QApplication::translate("AnisotropicDiffusionFilterInterface", "Target:", 0, QApplication::UnicodeUTF8));
         integrationLabel->setText(QApplication::translate("AnisotropicDiffusionFilterInterface", "Integration Step:", 0, QApplication::UnicodeUTF8));
         iterationsLabel->setText(QApplication::translate("AnisotropicDiffusionFilterInterface", "Number of Iterations:", 0, QApplication::UnicodeUTF8));
         conductanceLabel->setText(QApplication::translate("AnisotropicDiffusionFilterInterface", "Conductance:", 0, QApplication::UnicodeUTF8));
         replaceCheckBox->setText(QApplication::translate("AnisotropicDiffusionFilterInterface", "Replace", 0, QApplication::UnicodeUTF8));
-        invertButton->setText(QApplication::translate("AnisotropicDiffusionFilterInterface", "Invert", 0, QApplication::UnicodeUTF8));
+        invertButton->setText(QApplication::translate("AnisotropicDiffusionFilterInterface", "Run Filter", 0, QApplication::UnicodeUTF8));
         pushButton->setText(QApplication::translate("AnisotropicDiffusionFilterInterface", "Set to defaults", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 

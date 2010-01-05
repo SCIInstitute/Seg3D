@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'PolyLineToolInterface.ui'
 **
-** Created: Wed Dec 30 08:36:24 2009
+** Created: Tue Jan 5 13:59:09 2010
 **      by: Qt User Interface Compiler version 4.6.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -102,7 +102,7 @@ public:
 
     void retranslateUi(QWidget *PolyLineToolInterface)
     {
-        PolyLineToolInterface->setWindowTitle(QApplication::translate("PolyLineToolInterface", "Form", 0, QApplication::UnicodeUTF8));
+        PolyLineToolInterface->setWindowTitle(QApplication::translate("PolyLineToolInterface", "Polyline Tool", 0, QApplication::UnicodeUTF8));
         activeLabel->setText(QApplication::translate("PolyLineToolInterface", "Target:", 0, QApplication::UnicodeUTF8));
         resetPLButton->setText(QApplication::translate("PolyLineToolInterface", "Reset Polyline Tool", 0, QApplication::UnicodeUTF8));
         insidePLGroupBox->setTitle(QApplication::translate("PolyLineToolInterface", "Inside Polyline", 0, QApplication::UnicodeUTF8));

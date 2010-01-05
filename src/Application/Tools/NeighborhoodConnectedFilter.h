@@ -35,7 +35,7 @@
 namespace Seg3D  {
   
 class NeighborhoodConnectedFilter : public Tool {
-  SCI_TOOL_TYPE("NeighborhoodConnectedFilter","Neighborhood Connected Filter", "",Tool::DATATODATA_E|Tool::FILTER_E)
+  SCI_TOOL_TYPE("NeighborhoodConnectedFilter","Neighborhood Connected", "",Tool::DATATOMASK_E|Tool::FILTER_E)
   
 public:
   NeighborhoodConnectedFilter(const std::string& toolid);

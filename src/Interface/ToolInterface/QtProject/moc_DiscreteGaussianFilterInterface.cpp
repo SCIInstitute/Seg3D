@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'DiscreteGaussianFilterInterface.h'
 **
-** Created: Wed Dec 30 11:35:19 2009
+** Created: Tue Jan 5 13:59:53 2010
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.6.0)
 **
 ** WARNING! All changes made in this file will be lost!

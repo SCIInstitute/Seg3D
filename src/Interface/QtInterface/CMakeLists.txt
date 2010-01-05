@@ -82,6 +82,7 @@ ADD_LIBRARY(Interface_QtInterface STATIC
             ${INTERFACE_QTINTERFACE_SRCS} 
             ${INTERFACE_QTINTERFACE_QT_UI_SRCS}
             ${INTERFACE_QTINTERFACE_QT_MOC_SRCS}
+            ${INTERFACE_QTINTERFACE_MOC_SRCS}
             ${INTERFACE_QTINTERFACE_NO_MOC_SRCS} )
             
             

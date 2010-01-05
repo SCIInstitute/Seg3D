@@ -34,7 +34,7 @@
 namespace Seg3D  {
   
 class BinaryDialateErodeFilter : public Tool {
-  SCI_TOOL_TYPE("BinaryDialateErodeFilter","Binary Dialate->Erode Filter", "",Tool::DATATODATA_E|Tool::FILTER_E)
+  SCI_TOOL_TYPE("BinaryDialateErodeFilter","Binary Dialate -> Erode", "",Tool::MASKTOMASK_E|Tool::FILTER_E)
   
 public:
   BinaryDialateErodeFilter(const std::string& toolid);

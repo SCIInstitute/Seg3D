@@ -34,7 +34,7 @@
 namespace Seg3D  {
   
 class ArithmeticFilter : public Tool {
-  SCI_TOOL_TYPE("ArithmeticFilter","Arithmetic Filter", "",Tool::DATATODATA_E|Tool::FILTER_E)
+  SCI_TOOL_TYPE("ArithmeticFilter","Arithmetic", "",Tool::DATATODATA_E|Tool::FILTER_E)
   
 public:
   ArithmeticFilter(const std::string& toolid);

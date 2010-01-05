@@ -11,7 +11,7 @@ SOURCES += main.cpp \
     PolyLineToolInterface.cpp \
     ThresholdToolInterface.cc \
     AnisotropicDiffusionFilterInterface.cc \
-    MedianFilter.cc \
+    MedianFilterInterface.cc \
     DiscreteGaussianFilterInterface.cc \
     ArithmeticFilterInterface.cc \
     CannyEdgeDetectionFilterInterface.cc \
@@ -34,7 +34,7 @@ HEADERS += PaintToolInterface.h \
     PolyLineToolInterface.h \
     ThresholdToolInterface.h \
     AnisotropicDiffusionFilterInterface.h \
-    MedianFilter.h \
+    MedianFilterInterface.h \
     DiscreteGaussianFilterInterface.h \
     ArithmeticFilterInterface.h \
     CannyEdgeDetectionFilterInterface.h \

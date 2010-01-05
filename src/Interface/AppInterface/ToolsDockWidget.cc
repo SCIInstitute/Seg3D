@@ -37,6 +37,7 @@
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Interface/Interface.h>
 
+
 // Interface includes
 #include <Interface/AppInterface/ToolsDockWidget.h>
 
@@ -139,7 +140,7 @@ ToolsDockWidget::open_tool(ToolHandle tool)
   widget->create_widget(this,tool);
 
   toolbox_->add_tool(widget,QString::fromStdString(tool->menu_name()
-                      +" "+Utils::to_string(tool->toolid_number())));
+                                                   +" "+Utils::to_string(tool->toolid_number())), boost::bind(&ToolManager::dispatch_closetool, ToolManager::Instance(), tool->toolid()));
 
   widget_list_[tool->toolid()] = widget;
   
