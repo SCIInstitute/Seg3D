@@ -56,9 +56,9 @@ namespace Seg3D {
   GradientMagnitudeFilterInterface::build_widget(QFrame* frame)
   {
     private_->ui_.setupUi(frame);
-    SCI_LOG_DEBUG("Finished Building an Gradient Magnitude Filter");
     
     
+    SCI_LOG_DEBUG("Finished building a Gradient Magnitude Filter Interface");
     return (true);
     
   }

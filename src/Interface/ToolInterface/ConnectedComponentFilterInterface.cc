@@ -56,9 +56,8 @@ namespace Seg3D {
   ConnectedComponentFilterInterface::build_widget(QFrame* frame)
   {
     private_->ui_.setupUi(frame);
-    SCI_LOG_DEBUG("Finished Building an Binary Dialate Erode Filter");
     
-    
+    SCI_LOG_DEBUG("Finished building a Connected Component Filter Interface");
     return (true);
     
   }

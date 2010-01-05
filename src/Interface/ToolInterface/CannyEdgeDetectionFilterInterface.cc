@@ -44,7 +44,7 @@ namespace Seg3D {
   CannyEdgeDetectionFilterInterface::CannyEdgeDetectionFilterInterface() :
   private_(new CannyEdgeDetectionFilterInterfacePrivate)
   {  
-    SCI_LOG_DEBUG("Building Otsu Threshold Filter");
+    
   }
   
   CannyEdgeDetectionFilterInterface::~CannyEdgeDetectionFilterInterface()
@@ -67,8 +67,8 @@ namespace Seg3D {
     private_->ui_.thresholdHLayout_bottom->addWidget(thresholdAdjuster);
     
     makeConnections();
-    SCI_LOG_DEBUG("Finished Building a PolyLine Tool");
     
+    SCI_LOG_DEBUG("Finished building a Canny Edge Detection Filter Interface");
     return (true);
   }
   

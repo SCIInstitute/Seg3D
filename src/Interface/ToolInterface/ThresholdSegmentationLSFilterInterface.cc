@@ -56,8 +56,7 @@ namespace Seg3D {
   ThresholdSegmentationLSFilterInterface::build_widget(QFrame* frame)
   {
     private_->ui_.setupUi(frame);
-    SCI_LOG_DEBUG("Finished Building an Threshold Segmentation Level Set Filter");
-    
+        
     iterationsAdjuster = new SliderSpinCombo();
     private_->ui_.iterationsHLayout_bottom->addWidget(iterationsAdjuster);
     
@@ -76,6 +75,7 @@ namespace Seg3D {
     propagationAdjuster = new SliderSpinCombo();
     private_->ui_.propagationHLayout_bottom->addWidget(propagationAdjuster);
     
+    SCI_LOG_DEBUG("Finished building a Segmentation Level Set Filter Interface");
     return (true);
     
   }

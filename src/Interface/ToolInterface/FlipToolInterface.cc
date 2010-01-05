@@ -53,7 +53,7 @@ bool
 FlipToolInterface::build_widget(QFrame* frame)
 {
   private_->ui_.setupUi(frame);
-  SCI_LOG_DEBUG("Finished Building a Flip Tool"); 
+  SCI_LOG_DEBUG("Finished building a Flip Tool Interface"); 
   makeConnections();
   return (true);
 }

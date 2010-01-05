@@ -48,7 +48,7 @@ SliderSpinCombo::SliderSpinCombo( QWidget *parent )
     setRanges( 1, 100);
     setStep(1);
     setCurrentValue( 1 );
-    SCI_LOG_MESSAGE("SliderSpinCombo has been created!");
+    
 }
 
 SliderSpinCombo::SliderSpinCombo( QWidget *parent, double minRange, double maxRange, double startValue, double stepSize )
@@ -59,7 +59,7 @@ SliderSpinCombo::SliderSpinCombo( QWidget *parent, double minRange, double maxRa
     setRanges( minRange, maxRange);
     setStep(stepSize);
     setCurrentValue( startValue );
-    SCI_LOG_MESSAGE("SliderSpinCombo has been created!");
+    
 }
 
 SliderSpinCombo::SliderSpinCombo( QWidget *parent, double minRange, double maxRange, double stepSize )
@@ -70,7 +70,7 @@ SliderSpinCombo::SliderSpinCombo( QWidget *parent, double minRange, double maxRa
     setRanges( minRange, maxRange);
     setStep(stepSize);
     setCurrentValue( minRange );
-    SCI_LOG_MESSAGE("SliderSpinCombo has been created!");
+    
 }
 //  --- End Constructors ---  //
 
@@ -177,8 +177,9 @@ void SliderSpinCombo::setCurrentValue(double currentValue)
     slider->setValue(currentValue);
     spinner->setValue(currentValue);
 }
-  
-  SliderSpinCombo::~SliderSpinCombo()
-  {}
+
+//virtual destructor
+SliderSpinCombo::~SliderSpinCombo()
+{}
   
 } // namespace Seg3D

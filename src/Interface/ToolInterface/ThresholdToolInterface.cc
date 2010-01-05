@@ -41,7 +41,7 @@ class ThresholdToolInterfacePrivate {
 ThresholdToolInterface::ThresholdToolInterface() :
   private_(new ThresholdToolInterfacePrivate)
 {
-  SCI_LOG_DEBUG("Building Threshold Tool Interface");
+  
 }
 
 ThresholdToolInterface::~ThresholdToolInterface()
@@ -60,7 +60,7 @@ ThresholdToolInterface::build_widget(QFrame* frame)
   lowerThresholdAdjuster = new SliderSpinCombo();
   private_->ui_.lowerHLayout_bottom->addWidget(lowerThresholdAdjuster);
   
-  SCI_LOG_DEBUG("Finished Building a Threshold Tool"); 
+  SCI_LOG_DEBUG("Finished building a Threshold Tool Interface"); 
   return (true);
 }
 

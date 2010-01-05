@@ -56,14 +56,14 @@ namespace Seg3D {
   ConfidenceConnectedFilterInterface::build_widget(QFrame* frame)
   {
     private_->ui_.setupUi(frame);
-    SCI_LOG_DEBUG("Finished Building an Binary Dialate Erode Filter");
-    
+        
     iterationsAdjuster = new SliderSpinCombo();
     private_->ui_.iterationsHLayout_bottom->addWidget(iterationsAdjuster);
     
     multiplierAdjuster = new SliderSpinCombo();
     private_->ui_.multiplierHLayout_bottom->addWidget(multiplierAdjuster);
     
+    SCI_LOG_DEBUG("Finished building a Confidence Connected Filter Interface");
     return (true);
     
   }

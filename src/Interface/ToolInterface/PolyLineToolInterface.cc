@@ -44,7 +44,7 @@ class PolyLineToolInterfacePrivate {
 PolyLineToolInterface::PolyLineToolInterface() :
   private_(new PolyLineToolInterfacePrivate)
 {  
-  SCI_LOG_DEBUG("Building PolyLine Tool Interface");
+  
 }
 
 PolyLineToolInterface::~PolyLineToolInterface()
@@ -58,7 +58,7 @@ PolyLineToolInterface::build_widget(QFrame* frame)
   private_->ui_.setupUi(frame);
   makeConnections();
   
-  SCI_LOG_DEBUG("Finished Building a PolyLine Tool");
+  SCI_LOG_DEBUG("Finished building a PolyLine Tool Interface");
   return (true);
 }
   

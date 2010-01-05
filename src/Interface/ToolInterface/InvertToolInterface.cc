@@ -53,7 +53,7 @@ bool
 InvertToolInterface::build_widget(QFrame* frame)
 {
   private_->ui_.setupUi(frame);
-  SCI_LOG_DEBUG("Finished Building an Invert Tool");
+  SCI_LOG_DEBUG("Finished building an Invert Tool");
   makeConnections();
   return (true);
   

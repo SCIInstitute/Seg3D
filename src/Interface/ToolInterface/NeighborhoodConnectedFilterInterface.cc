@@ -56,9 +56,9 @@ namespace Seg3D {
   NeighborhoodConnectedFilterInterface::build_widget(QFrame* frame)
   {
     private_->ui_.setupUi(frame);
-    SCI_LOG_DEBUG("Finished Building an Neighborhood Connected Filter");
     
     
+    SCI_LOG_DEBUG("Finished building an Neighborhood Connected Filter Interface");
     return (true);
     
   }

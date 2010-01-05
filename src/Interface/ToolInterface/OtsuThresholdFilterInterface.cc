@@ -56,11 +56,11 @@ namespace Seg3D {
   OtsuThresholdFilterInterface::build_widget(QFrame* frame)
   {
     private_->ui_.setupUi(frame);
-    SCI_LOG_DEBUG("Finished Building an Median Interface Filter");
-    
+        
     orderAdjuster = new SliderSpinCombo();
     private_->ui_.orderHLayout_bottom->addWidget(orderAdjuster);
     
+    SCI_LOG_DEBUG("Finished building an Otsu Threshold Filter Interface");
     return (true);
     
   }

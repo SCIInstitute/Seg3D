@@ -44,7 +44,7 @@ namespace Seg3D {
   MaskDataFilterInterface::MaskDataFilterInterface() :
   private_(new MaskDataFilterInterfacePrivate)
   {  
-    SCI_LOG_DEBUG("Building Paint Brush Interface");
+    
   }
   
   MaskDataFilterInterface::~MaskDataFilterInterface()
@@ -58,8 +58,8 @@ namespace Seg3D {
     private_->ui_.setupUi(frame);
     
     makeConnections();
-    SCI_LOG_DEBUG("Finished Building a PolyLine Tool");
     
+    SCI_LOG_DEBUG("Finished building a Mask Data Filter Interface");
     return (true);
   }
   

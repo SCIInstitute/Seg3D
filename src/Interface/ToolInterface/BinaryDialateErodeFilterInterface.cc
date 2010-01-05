@@ -56,14 +56,14 @@ bool
 BinaryDialateErodeFilterInterface::build_widget(QFrame* frame)
 {
   private_->ui_.setupUi(frame);
-  SCI_LOG_DEBUG("Finished Building an Binary Dialate Erode Filter");
-  
+    
   erodeAdjuster = new SliderSpinCombo();
   private_->ui_.erodeHLayout_bottom->addWidget(erodeAdjuster);
   
   dialateAdjuster = new SliderSpinCombo();
   private_->ui_.dialateHLayout_bottom->addWidget(dialateAdjuster);
   
+  SCI_LOG_DEBUG("Finished building a Binary Dialate Erode Filter Interface");
   return (true);
   
 }

@@ -44,7 +44,7 @@ public:
 AnisotropicDiffusionFilterInterface::AnisotropicDiffusionFilterInterface() :
 private_(new AnisotropicDiffusionFilterInterfacePrivate)
 {  
-  SCI_LOG_DEBUG("Building Anisotropic Diffusion Filter Interface");
+  
 }
 
 AnisotropicDiffusionFilterInterface::~AnisotropicDiffusionFilterInterface()
@@ -67,7 +67,7 @@ AnisotropicDiffusionFilterInterface::build_widget(QFrame* frame)
   private_->ui_.conductanceHLayout_bottom->addWidget(conductanceAdjuster);
   
   makeConnections();
-  SCI_LOG_DEBUG("Finished Building a PolyLine Tool");
+  SCI_LOG_DEBUG("Finished building an Anisotropic Diffusion Filter Interface");
   
   return (true);
 }

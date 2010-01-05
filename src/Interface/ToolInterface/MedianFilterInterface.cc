@@ -56,7 +56,7 @@ bool
 MedianFilterInterface::build_widget(QFrame* frame)
 {
   private_->ui_.setupUi(frame);
-  SCI_LOG_DEBUG("Finished Building an Median Interface Filter");
+  SCI_LOG_DEBUG("Finished building a Median Filter Interface");
   
   radiusSizeAdjuster = new SliderSpinCombo();
   private_->ui_.radiusHLayout_bottom->addWidget(radiusSizeAdjuster);

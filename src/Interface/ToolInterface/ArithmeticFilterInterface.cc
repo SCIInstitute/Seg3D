@@ -43,7 +43,7 @@ public:
 ArithmeticFilterInterface::ArithmeticFilterInterface() :
 private_(new ArithmeticFilterInterfacePrivate)
 {  
-  SCI_LOG_DEBUG("Building an Arithmetic Filter Interface");
+  
 }
 
 ArithmeticFilterInterface::~ArithmeticFilterInterface()
@@ -65,7 +65,7 @@ ArithmeticFilterInterface::build_widget(QFrame* frame)
   
   
   makeConnections();
-  SCI_LOG_DEBUG("Finished Building an Arithmetic Filter");
+  SCI_LOG_DEBUG("Finished building an Arithmetic Filter Interface");
   
   return (true);
 }

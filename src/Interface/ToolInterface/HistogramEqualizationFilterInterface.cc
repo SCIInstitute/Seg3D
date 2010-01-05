@@ -56,8 +56,7 @@ namespace Seg3D {
   HistogramEqualizationFilterInterface::build_widget(QFrame* frame)
   {
     private_->ui_.setupUi(frame);
-    SCI_LOG_DEBUG("Finished Building an Binary Dialate Erode Filter");
-    
+        
     upperThresholdAdjuster = new SliderSpinCombo();
     private_->ui_.upperHLayout_bottom->addWidget(upperThresholdAdjuster);
     
@@ -67,6 +66,7 @@ namespace Seg3D {
     alphaAdjuster = new SliderSpinCombo();
     private_->ui_.alphaHLayout_bottom->addWidget(alphaAdjuster);
     
+    SCI_LOG_DEBUG("Finished building a Histogram Equalization Filter Interface");
     return (true);
     
   }

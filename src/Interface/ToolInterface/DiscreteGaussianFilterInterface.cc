@@ -43,7 +43,7 @@ namespace Seg3D {
 DiscreteGaussianFilterInterface::DiscreteGaussianFilterInterface() :
 private_(new DiscreteGaussianFilterInterfacePrivate)
 {  
-  SCI_LOG_DEBUG("Building Discrete Gaussian Filter Interface");
+  
 }
 
 DiscreteGaussianFilterInterface::~DiscreteGaussianFilterInterface()
@@ -65,7 +65,7 @@ DiscreteGaussianFilterInterface::build_widget(QFrame* frame)
 
   
   makeConnections();
-  SCI_LOG_DEBUG("Finished Building a PolyLine Tool");
+  SCI_LOG_DEBUG("Finished building a Discrete Gaussian Filter Interface");
   
   return (true);
 }

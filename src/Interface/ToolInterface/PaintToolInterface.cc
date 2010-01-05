@@ -44,7 +44,7 @@ class PaintToolInterfacePrivate {
 PaintToolInterface::PaintToolInterface() :
   private_(new PaintToolInterfacePrivate)
 {  
-  SCI_LOG_DEBUG("Building Paint Brush Interface");
+  
 }
 
 PaintToolInterface::~PaintToolInterface()
@@ -67,7 +67,7 @@ PaintToolInterface::build_widget(QFrame* frame)
   private_->ui_.lowerHLayout_bottom->addWidget(lowerThresholdAdjuster);
   
   makeConnections();
-  SCI_LOG_DEBUG("Finished Building a PolyLine Tool");
+  SCI_LOG_DEBUG("Finished building a Paint Brush Interface");
   
   return (true);
 }

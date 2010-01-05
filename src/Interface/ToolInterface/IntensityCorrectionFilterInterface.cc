@@ -56,14 +56,14 @@ namespace Seg3D {
   IntensityCorrectionFilterInterface::build_widget(QFrame* frame)
   {
     private_->ui_.setupUi(frame);
-    SCI_LOG_DEBUG("Finished Building an Binary Dialate Erode Filter");
-    
+        
     orderAdjuster = new SliderSpinCombo();
     private_->ui_.orderHLayout_bottom->addWidget(orderAdjuster);
     
     edgeAdjuster = new SliderSpinCombo();
     private_->ui_.edgeHLayout_bottom->addWidget(edgeAdjuster);
     
+    SCI_LOG_DEBUG("Finished building an Intensity Correction Filter Interface");
     return (true);
     
   }
