@@ -80,15 +80,7 @@ AnisotropicDiffusionFilterInterface::makeConnections()
   connect(stepAdjuster, SIGNAL(valueAdjusted(double)), this, SLOT(senseStepChanged(double)));
   connect(conductanceAdjuster, SIGNAL(valueAdjusted(double)), this, SLOT(senseConductanceChanged(double)));
   connect(private_->ui_.invertButton, SIGNAL(clicked()), this, SLOT(senseFilterRun()));
-  
                                                                                                 
-//  connect(private_->ui_.maskComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(senseMaskChanged(int)));
-//  connect(private_->ui_.eraseCheckBox, SIGNAL(toggled(bool)), this, SLOT(senseEraseModeChanged(bool)));
-//  
-//  
-//  connect(paintBrushAdjuster, SIGNAL(valueAdjusted(double)), this, SLOT(sensePaintBrushSizeChanged(double)));
-//  connect(upperThresholdAdjuster, SIGNAL(valueAdjusted(double)), this, SLOT(senseUpperThresholdChanged(double)));
-//  connect(lowerThresholdAdjuster, SIGNAL(valueAdjusted(double)), this, SLOT(senselowerThresholdChanged(double)));
 
 }
 

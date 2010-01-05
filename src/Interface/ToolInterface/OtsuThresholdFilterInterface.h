@@ -26,41 +26,54 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_TOOLS_GRADIENTMAGNITUDEFILTER_H
-#define APPLICATION_TOOLS_GRADIENTMAGNITUDEFILTER_H
+#ifndef INTERFACE_TOOLINTERFACE_OTSUTHRESHOLDFILTERINTERFACE_H
+#define INTERFACE_TOOLINTERFACE_OTSUTHRESHOLDFILTERINTERFACE_H
 
-#include <Application/Tool/Tool.h>
+// Application includes
+#include <Application/Tool/ToolFactory.h>
 
-namespace Seg3D  {
-  
-class GradientMagnitudeFilter : public Tool {
-  SCI_TOOL_TYPE("GradientMagnitudeFilter","Gradient Magnitude Filter", "",Tool::DATATODATA_E|Tool::FILTER_E)
-  
-public:
-  GradientMagnitudeFilter(const std::string& toolid);
-  virtual ~GradientMagnitudeFilter();
-  
-  // -- constraint parameters --
-  
-  // Constrain viewer to right painting tool when layer is selected
-  void target_constraint(std::string layerid);
-  
-  // -- activate/deactivate tool --
-  
-  virtual void activate();
-  virtual void deactivate();
-  
-  // -- state --
-public:
-  // Layerid of the target layer
-  StateOption::Handle              target_layer_;
-  
-  
-  
-  
-  
-};
+// Base class of the tool widget
+#include <Interface/AppInterface/ToolWidget.h>
+#include <Interface/ToolInterface/CustomWidgets/SliderSpinCombo.h>
 
-} // end namespace
+
+namespace Seg3D {
+  
+  class OtsuThresholdFilterInterfacePrivate;
+  
+  class OtsuThresholdFilterInterface : public ToolWidget {
+    Q_OBJECT
+    
+  Q_SIGNALS:
+    void activeChanged(int);
+    void orderChanged(int);
+    
+  public:
+    OtsuThresholdFilterInterface();
+    virtual ~OtsuThresholdFilterInterface();
+    virtual bool build_widget(QFrame* frame);
+    
+    public Q_SLOTS:
+    void setActive(int);
+    void addToActive(QStringList&);
+    void setOrder(int);
+    
+    
+  private:
+    OtsuThresholdFilterInterfacePrivate* private_;
+    SliderSpinCombo *orderAdjuster;
+    void makeConnections();
+    
+    private Q_SLOTS:
+    void senseActiveChanged(int);
+    void senseOrderChanged(double);
+    
+    
+    
+    
+    
+  };
+  
+} // namespace Seg3D
 
 #endif

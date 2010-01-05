@@ -50,6 +50,32 @@ SET(APPLICATION_TOOLS_SRCS
   AnisotropicDiffusionFilter.cc
   ArithmeticFilter.h
   ArithmeticFilter.cc
+  ConfidenceConnectedFilter.h
+  ConfidenceConnectedFilter.cc
+  FillHolesFilter.h
+  FillHolesFilter.cc
+  HistogramEqualizationFilter.h
+  HistogramEqualizationFilter.cc
+  ConnectedComponentFilter.h
+  ConnectedComponentFilter.cc
+  BinaryDialateErodeFilter.h
+  BinaryDialateErodeFilter.cc
+  NeighborhoodConnectedFilter.h
+  NeighborhoodConnectedFilter.cc
+  IntensityCorrectionFilter.h
+  IntensityCorrectionFilter.cc
+  BooleanFilter.h
+  BooleanFilter.cc
+  MaskDataFilter.h
+  MaskDataFilter.cc
+  GradientMagnitudeFilter.h
+  GradientMagnitudeFilter.cc
+  CannyEdgeDetectionFilter.h
+  CannyEdgeDetectionFilter.cc
+  OtsuThresholdFilter.h
+  OtsuThresholdFilter.cc
+  ThresholdSegmentationLSFilter.h
+  ThresholdSegmentationLSFilter.cc
   )
 
 ADD_LIBRARY(Application_Tools STATIC 

@@ -41,6 +41,19 @@ SET(INTERFACE_TOOLINTERFACE_SRCS
   AnisotropicDiffusionFilterInterface.cc
   DiscreteGaussianFilterInterface.cc
   ArithmeticFilterInterface.cc
+  BinaryDialateErodeFilterInterface.cc
+  BooleanFilterInterface.cc
+  ConfidenceConnectedFilterInterface.cc
+  FillHolesFilterInterface.cc
+  HistogramEqualizationFilterInterface.cc
+  ConnectedComponentFilterInterface.cc
+  NeighborhoodConnectedFilterInterface.cc
+  IntensityCorrectionFilterInterface.cc
+  MaskDataFilterInterface.cc
+  GradientMagnitudeFilterInterface.cc
+  CannyEdgeDetectionFilterInterface.cc
+  OtsuThresholdFilterInterface.cc
+  ThresholdSegmentationLSFilterInterface.cc
 )
 
 SET(INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_SRCS
@@ -57,6 +70,19 @@ SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
   AnisotropicDiffusionFilterInterface.h
   DiscreteGaussianFilterInterface.h
   ArithmeticFilterInterface.h
+  BinaryDialateErodeFilterInterface.h
+  BooleanFilterInterface.h
+  ConfidenceConnectedFilterInterface.h
+  FillHolesFilterInterface.h
+  HistogramEqualizationFilterInterface.h
+  ConnectedComponentFilterInterface.h
+  NeighborhoodConnectedFilterInterface.h
+  IntensityCorrectionFilterInterface.h
+  MaskDataFilterInterface.h
+  GradientMagnitudeFilterInterface.h
+  CannyEdgeDetectionFilterInterface.h
+  OtsuThresholdFilterInterface.h
+  ThresholdSegmentationLSFilterInterface.h
 )
 
 SET(INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_MOC_SRCS
@@ -76,6 +102,19 @@ SET(INTERFACE_TOOLINTERFACE_UI_SRCS
   AnisotropicDiffusionFilterInterface.ui
   DiscreteGaussianFilterInterface.ui
   ArithmeticFilterInterface.ui
+  BinaryDialateErodeFilterInterface.ui
+  BooleanFilterInterface.ui
+  ConfidenceConnectedFilterInterface.ui
+  FillHolesFilterInterface.ui
+  HistogramEqualizationFilterInterface.ui
+  ConnectedComponentFilterInterface.ui
+  NeighborhoodConnectedFilterInterface.ui
+  IntensityCorrectionFilterInterface.ui
+  MaskDataFilterInterface.ui
+  GradientMagnitudeFilterInterface.ui
+  CannyEdgeDetectionFilterInterface.ui
+  OtsuThresholdFilterInterface.ui
+  ThresholdSegmentationLSFilterInterface.ui
 )
 
 ##################################################

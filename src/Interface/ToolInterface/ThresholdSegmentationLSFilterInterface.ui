@@ -372,7 +372,7 @@
       <height>51</height>
      </rect>
     </property>
-    <layout class="QHBoxLayout" name="upperHLayout_bottom_3"/>
+    <layout class="QHBoxLayout" name="edgeHLayout_bottom"/>
    </widget>
   </widget>
   <widget class="QWidget" name="layoutWidget">
