@@ -29,33 +29,50 @@
 #include <iostream>
 
 #include <Utils/Core/Log.h>
+#include <boost/lexical_cast.hpp>
 
+// Interface includes
 #include <Interface/AppInterface/LayerManagerDockWidget.h>
-#include "ui_LayerManagerDockWidget.h"
+
 
 namespace Seg3D  {
   
-  class LayerManagerDockWidgetPrivate {
-  public:
-    
-    Ui::LayerManagerDockWidget ui_;
-    
-  };
-
 
 LayerManagerDockWidget::LayerManagerDockWidget(QWidget *parent) :
-    QDockWidget("LayerManagerDockWidget",parent),
-    private_(new LayerManagerDockWidgetPrivate)
+    QDockWidget("LayerManagerDockWidget")
 {
-  if (private_) 
-  {
-    private_->ui_.setupUi(this);
-    
-  }
+  setAllowedAreas(Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea);
+  setWindowTitle("Layer Manager");
+  
+  layer_manager_ = new QWidget(this);
+  setWidget(layer_manager_);
+  
 }
 
 LayerManagerDockWidget::~LayerManagerDockWidget()
 {
   
 }
+  
+void  
+LayerManagerDockWidget::new_group()
+{
+  //TODO implement new group function
+}
+void  
+LayerManagerDockWidget::close_group()
+{
+  //TODO implement close group function
+}
+void  
+LayerManagerDockWidget::open_data_layer()
+{
+  //TODO implement open data layer function
+}
+void  
+LayerManagerDockWidget::new_mask_layer()
+{
+  //TODO implement new mask function
+}
+  
 } // end namespace

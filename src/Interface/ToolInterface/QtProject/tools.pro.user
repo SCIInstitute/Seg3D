@@ -76,15 +76,15 @@
   <valuemap type="QVariantMap">
    <value key="ProjectExplorer.BuildConfiguration.DisplayName" type="QString">Debug</value>
    <valuelist key="abstractProcess.Environment" type="QVariantList">
-    <value type="QString">Apple_PubSub_Socket_Render=/tmp/launch-fSFtbK/Render</value>
+    <value type="QString">Apple_PubSub_Socket_Render=/tmp/launch-lMAfv8/Render</value>
     <value type="QString">COMMAND_MODE=legacy</value>
-    <value type="QString">DISPLAY=/tmp/launch-lSDlE9/:0</value>
+    <value type="QString">DISPLAY=/tmp/launch-lITOk6/:0</value>
     <value type="QString">HOME=/Users/wchristiansen</value>
     <value type="QString">LOGNAME=wchristiansen</value>
     <value type="QString">PATH=/Developer/Tools/Qt:/usr/bin:/bin:/usr/sbin:/sbin</value>
     <value type="QString">QTDIR=/usr/local/Qt4.6</value>
     <value type="QString">SHELL=/bin/bash</value>
-    <value type="QString">SSH_AUTH_SOCK=/tmp/launch-uU8Ht2/Listeners</value>
+    <value type="QString">SSH_AUTH_SOCK=/tmp/launch-QJ6vhB/Listeners</value>
     <value type="QString">TMPDIR=/var/folders/-2/-2KHiFd9Hn4W2yzekPuZGE+++TM/-Tmp-/</value>
     <value type="QString">USER=wchristiansen</value>
     <value type="QString">__CF_USER_TEXT_ENCODING=0x1F6:0:0</value>
@@ -105,15 +105,15 @@
   <valuemap type="QVariantMap">
    <value key="ProjectExplorer.BuildConfiguration.DisplayName" type="QString">Debug</value>
    <valuelist key="abstractProcess.Environment" type="QVariantList">
-    <value type="QString">Apple_PubSub_Socket_Render=/tmp/launch-fSFtbK/Render</value>
+    <value type="QString">Apple_PubSub_Socket_Render=/tmp/launch-lMAfv8/Render</value>
     <value type="QString">COMMAND_MODE=legacy</value>
-    <value type="QString">DISPLAY=/tmp/launch-lSDlE9/:0</value>
+    <value type="QString">DISPLAY=/tmp/launch-lITOk6/:0</value>
     <value type="QString">HOME=/Users/wchristiansen</value>
     <value type="QString">LOGNAME=wchristiansen</value>
     <value type="QString">PATH=/Developer/Tools/Qt:/usr/bin:/bin:/usr/sbin:/sbin</value>
     <value type="QString">QTDIR=/usr/local/Qt4.6</value>
     <value type="QString">SHELL=/bin/bash</value>
-    <value type="QString">SSH_AUTH_SOCK=/tmp/launch-uU8Ht2/Listeners</value>
+    <value type="QString">SSH_AUTH_SOCK=/tmp/launch-QJ6vhB/Listeners</value>
     <value type="QString">TMPDIR=/var/folders/-2/-2KHiFd9Hn4W2yzekPuZGE+++TM/-Tmp-/</value>
     <value type="QString">USER=wchristiansen</value>
     <value type="QString">__CF_USER_TEXT_ENCODING=0x1F6:0:0</value>
@@ -132,15 +132,15 @@
   <valuemap type="QVariantMap">
    <value key="ProjectExplorer.BuildConfiguration.DisplayName" type="QString">Debug</value>
    <valuelist key="abstractProcess.Environment" type="QVariantList">
-    <value type="QString">Apple_PubSub_Socket_Render=/tmp/launch-CbPJdJ/Render</value>
+    <value type="QString">Apple_PubSub_Socket_Render=/tmp/launch-lMAfv8/Render</value>
     <value type="QString">COMMAND_MODE=legacy</value>
-    <value type="QString">DISPLAY=/tmp/launch-tlhJNn/:0</value>
+    <value type="QString">DISPLAY=/tmp/launch-lITOk6/:0</value>
     <value type="QString">HOME=/Users/wchristiansen</value>
     <value type="QString">LOGNAME=wchristiansen</value>
     <value type="QString">PATH=/Developer/Tools/Qt:/usr/bin:/bin:/usr/sbin:/sbin</value>
     <value type="QString">QTDIR=/usr/local/Qt4.6</value>
     <value type="QString">SHELL=/bin/bash</value>
-    <value type="QString">SSH_AUTH_SOCK=/tmp/launch-RUBliU/Listeners</value>
+    <value type="QString">SSH_AUTH_SOCK=/tmp/launch-QJ6vhB/Listeners</value>
     <value type="QString">TMPDIR=/var/folders/-2/-2KHiFd9Hn4W2yzekPuZGE+++TM/-Tmp-/</value>
     <value type="QString">USER=wchristiansen</value>
     <value type="QString">__CF_USER_TEXT_ENCODING=0x1F6:0:0</value>
@@ -152,7 +152,7 @@
    </valuelist>
    <value key="abstractProcess.command" type="QString">/usr/bin/make</value>
    <value key="abstractProcess.enabled" type="bool">true</value>
-   <value key="abstractProcess.workingDirectory" type="QString">/Volumes/DROPBOX/Dropbox/Numira/Projects/tools/tools</value>
+   <value key="abstractProcess.workingDirectory" type="QString">/Users/wchristiansen/Seg3d2/trunk/src/Interface/ToolInterface/QtProject</value>
    <value key="cleanConfig" type="bool">true</value>
    <valuelist key="makeargs" type="QVariantList">
     <value type="QString">clean</value>

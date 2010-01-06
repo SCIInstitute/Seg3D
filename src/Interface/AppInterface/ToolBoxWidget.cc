@@ -112,10 +112,9 @@ void
                                                  "\n"      
                                                  "QWidget#header_{\n"
                                                  "  \n"
-                                                 "background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(25, 25, 25, 0), stop:0.753769 rgba(0, 0, 0, 100), stop:1 rgba(0, 0, 0, 84));\n"
-                                                 //"  background-color: qlineargradient(spread:pad, x1:0.5, y1:0.733364, x2:0.5, y2:0, stop:0 rgba(25, 25, 25, 190), stop:1 rgba(136, 0, 0, 0 ));\n"
-                                                 "    border-radius: 4px;\n"
-                                                 "  border: 1px solid black;\n"
+                                                 "  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(25, 25, 25, 0), stop:0.753769 rgba(0, 0, 0, 100), stop:1 rgba(0, 0, 0, 84));\n"
+                                                 "  border-radius: 4px;\n"
+                                                 "  border: 1px solid gray;\n"
                                                  "}\n"
                                                  "\n"
                                                  "QWidget#background_{\n"
@@ -168,9 +167,9 @@ void
   
   page_handle->hLayout_->addWidget(page_handle->help_button_);
   
+  ///  --- Create the close button and connect it to the close_function --- ///
   page_handle->close_button_ = new QToolButton(page_handle->header_);
   QtBridge::connect(page_handle->close_button_, close_function);
-  
   page_handle->close_button_->setObjectName(QString::fromUtf8("close_button_"));
   
    ///  ---  This is where we add the icon's for the close button --- //
@@ -307,9 +306,6 @@ int ToolBoxWidget::index_of( QWidget *tool )
   QSharedPointer <Page> page_ptr_ = page( tool );
   int index = page_ptr_ ? tool_list_.indexOf( page_ptr_ ) : -1;
   
-  //std::string h = boost::lexical_cast<std::string>(index);
-  //SCI_LOG_MESSAGE("The the index of the tool is: "+ h);
-  
   return index;
   
 }
@@ -318,9 +314,6 @@ int ToolBoxWidget::index_of( QWidget *tool )
   
 void ToolBoxWidget::set_active_index( int index )
 {
-  //std::string h = boost::lexical_cast<std::string>(index);
-//  SCI_LOG_MESSAGE("The new index is: " + h);
-  
   // Find the index that corresponds to the tool
   QList<PageHandle>::iterator it = tool_list_.begin();
   QList<PageHandle>::iterator it_end = tool_list_.end();

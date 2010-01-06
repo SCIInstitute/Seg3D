@@ -45,6 +45,7 @@ SET(INTERFACE_APPINTERFACE_SRCS
   ViewAction.cc
   ToolBoxWidget.cc
   ViewerWidget.cc
+  LayerManagerWidget.cc
 )
 
 SET(INTERFACE_APPINTERFACE_MOC_SRCS
@@ -61,6 +62,7 @@ SET(INTERFACE_APPINTERFACE_MOC_SRCS
   ViewAction.h
   ToolBoxWidget.h
   ViewerWidget.h
+  LayerManagerWidget.h
 )
 
 SET(INTERFACE_APPINTERFACE_NO_MOC_SRCS

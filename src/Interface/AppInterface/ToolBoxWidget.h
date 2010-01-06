@@ -53,8 +53,8 @@ class ToolBoxWidget : public QScrollArea
     ToolBoxWidget(QWidget* parent=0);
     virtual ~ToolBoxWidget();
     
-  void add_tool ( QWidget * tool, const QString & text, boost::function<void ()> );
-    //void remove_tool ( QWidget *tool );
+    void add_tool ( QWidget * tool, const QString & text, boost::function<void ()> );
+    
     void remove_tool ( int index );
     
     inline int      get_active_index(){ return active_index_; }
