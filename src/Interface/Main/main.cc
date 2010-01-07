@@ -40,6 +40,7 @@
 #include <Application/Application/Application.h>
 #include <Application/Interface/Interface.h>
 #include <Application/Action/ActionHistory.h>
+#include <Application/Action/ActionSocket.h>
 
 // Interface includes
 #include <Interface/QtInterface/QtApplication.h>
@@ -74,6 +75,9 @@ int main(int argc, char **argv)
   SCI_LOG_DEBUG("Setup action history");
   Seg3D::ActionHistory::Instance()->set_max_history_size(300);
 
+  // -- Add a socket for receiving actions --
+  ActionSocket::Instance()->start(3000);
+  
   // -- Add plugins into the architecture  
   SCI_LOG_DEBUG("Setup and register all the plugins");
   Seg3D::InitPlugins();
@@ -102,7 +106,7 @@ int main(int argc, char **argv)
     
     // Put the interface on top of all the other windows
     app_interface->raise();
-      
+            
     // -- Run QT event loop --
     SCI_LOG_DEBUG("Start the main QT event loop");
     

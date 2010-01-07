@@ -43,7 +43,7 @@ ActionDispatcher::post_action(ActionHandle action, ActionContextHandle action_co
 { 
   // THREAD SAFETY:
   // Always relay the function call to the application thread as an event, so
-  // event are handled in the order that they are posted and one action is fully
+  // events are handled in the order that they are posted and one action is fully
   // handled before the next one
 
   SCI_LOG_DEBUG(std::string("Posting Action: ")+action->type());  
@@ -53,11 +53,31 @@ ActionDispatcher::post_action(ActionHandle action, ActionContextHandle action_co
 }
 
 void
+ActionDispatcher::post_and_wait_action(ActionHandle action, ActionContextHandle action_context)
+{ 
+  // THREAD SAFETY:
+  // Always relay the function call to the application thread as an event, so
+  // events are handled in the order that they are posted and one action is fully
+  // handled before the next one
+
+  if (Application::IsApplicationThread())
+  {
+    SCI_THROW_LOGICERROR("Post and Wait action cannot be posted from the thread that processes the actions. This will lead to a dead lock");
+  }
+
+  SCI_LOG_DEBUG(std::string("Posting Action: ")+action->type());  
+
+  Application::Instance()->post_and_wait_event(boost::bind
+      (&ActionDispatcher::run_action,this,action,action_context));
+}
+
+
+void
 ActionDispatcher::post_actions(std::vector<ActionHandle> actions, ActionContextHandle action_context)
 { 
   // THREAD SAFETY:
   // Always relay the function call to the application thread as an event, so
-  // event are handled in the order that they are posted and one action is fully
+  // events are handled in the order that they are posted and one action is fully
   // handled before the next one
 
   for (size_t j = 0;  j < actions.size(); j++)
@@ -68,6 +88,30 @@ ActionDispatcher::post_actions(std::vector<ActionHandle> actions, ActionContextH
   Application::Instance()->post_event(boost::bind
       (&ActionDispatcher::run_actions,this,actions,action_context));
 }
+
+
+void
+ActionDispatcher::post_and_wait_actions(std::vector<ActionHandle> actions, ActionContextHandle action_context)
+{ 
+  // THREAD SAFETY:
+  // Always relay the function call to the application thread as an event, so
+  // events are handled in the order that they are posted and one action is fully
+  // handled before the next one
+
+  if (Application::IsApplicationThread())
+  {
+    SCI_THROW_LOGICERROR("Post and Wait actions cannot be posted from the thread that processes the actions. This will lead to a dead lock");
+  }
+
+  for (size_t j = 0;  j < actions.size(); j++)
+  {
+    SCI_LOG_DEBUG(std::string("Posting Action sequence: ")+actions[j]->type());  
+  }
+  
+  Application::Instance()->post_and_wait_event(boost::bind
+      (&ActionDispatcher::run_actions,this,actions,action_context));
+}
+
 
 
 void
@@ -134,14 +178,20 @@ ActionDispatcher::run_actions(std::vector<ActionHandle> actions, ActionContextHa
 }
 
 void 
-PostAction(ActionHandle action, ActionContextHandle action_context)
+PostAction(const ActionHandle& action, const ActionContextHandle& action_context)
 {
   ActionDispatcher::Instance()->post_action(action, action_context);
 }
 
+void 
+PostAndWaitAction(const ActionHandle& action, const ActionContextHandle& action_context)
+{
+  ActionDispatcher::Instance()->post_and_wait_action(action, action_context);
+}
+
 
 void 
-PostAction(std::string& actionstring, ActionContextHandle action_context)
+PostAction(const std::string& actionstring, const ActionContextHandle& action_context)
 {
   ActionHandle action;
   std::string error;
@@ -157,6 +207,25 @@ PostAction(std::string& actionstring, ActionContextHandle action_context)
   }
   
   ActionDispatcher::Instance()->post_action(action, action_context);
+}
+
+void 
+PostAndWaitAction(const std::string& actionstring, const ActionContextHandle& action_context)
+{
+  ActionHandle action;
+  std::string error;
+  std::string usage;
+  
+  if(!(ActionFactory::Instance()->create_action(actionstring,action,error,usage)))
+  {
+    SCI_LOG_ERROR(std::string("Failed to parse action: ")+actionstring);
+    action_context->report_error(error);
+    // Post help to the user if the argument list failed to parse
+    if (!(usage.empty())) action_context->report_usage(usage);
+    return;
+  }
+  
+  ActionDispatcher::Instance()->post_and_wait_action(action, action_context);
 }
 
 // Singleton interface needs to be defined somewhere

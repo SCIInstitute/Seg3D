@@ -30,6 +30,7 @@
 #define APPLICATION_TOOL_ACTIONS_ACTIONCLOSETOOL_H
 
 #include <Application/Action/Actions.h>
+#include <Application/Interface/Interface.h>
 
 namespace Seg3D {
 
@@ -43,24 +44,20 @@ class ActionCloseTool : public Action {
       add_argument(toolid_);
     }
     
-    virtual ~ActionCloseTool() 
-    {}
-
-    void set(const std::string& toolid)
-    {
-      toolid_.value() = toolid;
-    }
+    virtual ~ActionCloseTool() {}
 
 // -- Functions that describe action --
     virtual bool validate(ActionContextHandle& context);
     virtual bool run(ActionContextHandle& context,
                      ActionResultHandle& result);
+
+// -- Dispatch this action from the interface --
+    static void Dispatch(const std::string& toolid);
     
 // -- Action parameters --
+  private:
     ActionParameter<std::string> toolid_;
 };
-
-typedef boost::intrusive_ptr<ActionCloseTool> ActionCloseToolHandle;
 
 } // end namespace Seg3D
 

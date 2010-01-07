@@ -30,6 +30,7 @@
 #define APPLICATION_TOOL_ACTIONS_ACTIONOPENTOOL_H
 
 #include <Application/Action/Actions.h>
+#include <Application/Interface/Interface.h>
 
 namespace Seg3D {
 
@@ -43,27 +44,22 @@ class ActionOpenTool : public Action {
       add_argument(toolid_);
     }
     
-    virtual ~ActionOpenTool() 
-    {}
-
-    void set(const std::string& toolid)
-    {
-      toolid_.value() = toolid;
-    }
+    virtual ~ActionOpenTool() {}
 
 // -- Functions that describe action --
     virtual bool validate(ActionContextHandle& context);
     virtual bool run(ActionContextHandle& context,
                      ActionResultHandle& result);
-    
+
+// -- Dispatch this action from the interface --
+    static void Dispatch(const std::string& toolid);
+        
 // -- Action parameters --
-  protected:
+  private:
     // ToolID that is requested
     ActionParameter<std::string> toolid_;
 
 };
-
-typedef boost::intrusive_ptr<ActionOpenTool> ActionOpenToolHandle;
 
 }
 

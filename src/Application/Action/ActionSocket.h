@@ -32,7 +32,11 @@
 // STL includes
 #include <iostream>
 
+// Utils includes
+#include <Utils/Singleton/Singleton.h>
+
 // Boost includes
+#include <boost/utility.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/signals2/signal.hpp>
 
@@ -41,19 +45,29 @@
 
 namespace Seg3D {
 
-
-class ActionSocket  {
+class ActionSocket : public boost::noncopyable  {
 
 // -- Constructor/Destructor --
   public:
-    ActionSocket(int portnum);
+    ActionSocket();
   
     ~ActionSocket();
+  
+    void start(int portnum);
   
   private:
     static void run_action_socket(int portnum);
 
     boost::thread* action_socket_thread_;
+
+// -- Singleton interface --
+  public:
+    
+    static ActionSocket* Instance() { return instance_.instance(); } // << SINGLETON
+    
+  private:
+    // Singleton internals
+    static Utils::Singleton<ActionSocket> instance_;
 };
 
 } // end namespace Seg3D

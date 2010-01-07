@@ -28,8 +28,6 @@
 
 #include <Application/Tool/ToolManager.h>
 #include <Application/Tool/Actions/ActionCloseTool.h>
-#include <Application/Tool/Actions/ActionOpenTool.h>
-#include <Application/Tool/Actions/ActionActivateTool.h>
 
 namespace Seg3D {
 
@@ -59,18 +57,25 @@ ActionCloseTool::validate(ActionContextHandle& context)
 bool 
 ActionCloseTool::run(ActionContextHandle& context, ActionResultHandle& result)
 {
-  if(need_undo(context))
-  {
-    ActionOpenToolHandle undo1(new ActionOpenTool);
-    undo1->set(toolid_.value());
-    ActionActivateToolHandle undo2(new ActionActivateTool);
-    undo2->set(ToolManager::Instance()->active_toolid());
-    AddUndoAction("Close Tool",undo1,undo2,ActionHandle(this));
-  }
-
   ToolManager::Instance()->close_tool(toolid_.value());
 
   return (true); // success
+}
+
+// DISPATCH:
+// Dispatch this action with given parameters (from interface)
+
+void
+ActionCloseTool::Dispatch(const std::string& toolid)
+{
+  // Create new action
+  ActionCloseTool* action = new ActionCloseTool;
+
+  // Set action parameters
+  action->toolid_.value() = toolid;
+
+  // Post the new action
+  PostActionFromInterface(ActionHandle(action));
 }
 
 } // end namespace Seg3D

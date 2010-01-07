@@ -44,45 +44,6 @@ ToolManager::ToolManager() :
 }
 
 // THREAD-SAFETY:
-// The RunActionFromInterface function will migrate the function call to the
-// application thread. Hence there is no need to safe guard this function.
-// This code can be run directly form the interface thread.
-
-void
-ToolManager::dispatch_opentool(const std::string& tool_name) const
-{
-  // Build new action
-  ActionOpenToolHandle action(new ActionOpenTool);
-  // Set the action parameters
-  action->set(tool_name);
-  // Run the action on the application thread
-  PostActionFromInterface(action);
-}
-
-void
-ToolManager::dispatch_closetool(const std::string& toolid) const
-{
-  // Build new action
-  ActionCloseToolHandle action(new ActionCloseTool);
-  // Set the action parameters
-  action->set(toolid);
-  // Run the action on the application thread
-  PostActionFromInterface(action);
-}
-
-void
-ToolManager::dispatch_activatetool(const std::string& toolid) const
-{
-  // Build new action
-  ActionActivateToolHandle action(new ActionActivateTool);
-  // Set the action parameters
-  action->set(toolid);
-  // Run the action on the application thread
-  PostActionFromInterface(action);
-}
-
-
-// THREAD-SAFETY:
 // Only ActionOpenTool calls this function and this action is only run on the
 // application thread. Hence the function is always executed by the same thread.
 

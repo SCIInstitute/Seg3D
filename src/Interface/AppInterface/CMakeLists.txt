@@ -136,3 +136,10 @@ TARGET_LINK_LIBRARIES(Interface_AppInterface
                       ${SCI_BOOST_LIBRARY})
 
 ADD_LIBRARY_QTRESOURCES(AppInterface)
+
+
+FILE(GLOB RESOURCE_IMAGE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/../../Resources/Images/*.png")
+
+ADD_DEPENDENCIES(Interface_AppInterface
+                 DEPENDS ${RESOURCE_IMAGE_FILES})
+

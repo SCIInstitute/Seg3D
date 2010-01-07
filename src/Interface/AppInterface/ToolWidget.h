@@ -56,24 +56,12 @@ class ToolWidget : public QWidget, public ToolInterface {
     // BUILD_WIDGET:
     // Function to create the specific tool widget:
     // This one needs to be overloaded
-    virtual bool build_widget(QFrame* frame);
+    virtual bool build_widget(QFrame* frame) = 0; // << NEEDS TO BE REIMPLEMENTED
 
 // -- widget internals --
-  protected:
-//    QToolButton* close_button_;
-//    QToolButton* help_button_;
-//    QPushButton* activate_button_;
-  
+  protected:  
     QFrame*      main_frame_;
   
-// -- common slots --  
-  public Q_SLOTS:
-    void close_tool()
-    {
-      ToolManager::Instance()->dispatch_closetool(tool()->toolid());
-    }
-
-
 };
 
 } //end namespace Seg3D

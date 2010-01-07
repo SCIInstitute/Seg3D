@@ -32,6 +32,7 @@
 //  Application includes
 #include <Application/Tool/ToolManager.h>
 #include <Application/Tool/ToolFactory.h>
+#include <Application/Tool/Actions/ActionOpenTool.h>
 
 // Interface includes
 #include <Interface/QtInterface/QtBridge.h>
@@ -180,8 +181,7 @@ AppMenu::create_tool_menu(QMenu* qmenu)
     qaction->setShortcut(QString::fromStdString((*it)->shortcut_key()));
     
     // Connect the action with dispatching a command in the ToolManager
-    QtBridge::connect(qaction,boost::bind(&ToolManager::dispatch_opentool,
-                                          ToolManager::Instance(),(*it)->type()));
+    QtBridge::connect(qaction,boost::bind(&ActionOpenTool::Dispatch,(*it)->type()));
     ++it;
   }
 }
@@ -203,9 +203,7 @@ AppMenu::create_filter_menu(QMenu* qmenu)
     // Add menu option to open tool
     QAction* qaction = qmenu->addAction(QString::fromStdString((*it)->menu_name()));
     // Connect the action with dispatching a command in the ToolManager
-    QtBridge::connect(qaction,boost::bind(&ToolManager::dispatch_opentool,
-                                          ToolManager::Instance(),
-                                          (*it)->type()));
+    QtBridge::connect(qaction,boost::bind(&ActionOpenTool::Dispatch,(*it)->type()));
     ++it;
   }
   
@@ -219,9 +217,7 @@ AppMenu::create_filter_menu(QMenu* qmenu)
     // Add menu option to open tool
     QAction* qaction = qmenu->addAction(QString::fromStdString((*it)->menu_name()));
     // Connect the action with dispatching a command in the ToolManager
-    QtBridge::connect(qaction,boost::bind(&ToolManager::dispatch_opentool,
-                                          ToolManager::Instance(),
-                                          (*it)->type()));
+    QtBridge::connect(qaction,boost::bind(&ActionOpenTool::Dispatch,(*it)->type()));
     ++it;
   }
 
@@ -235,9 +231,7 @@ AppMenu::create_filter_menu(QMenu* qmenu)
     // Add menu option to open tool
     QAction* qaction = qmenu->addAction(QString::fromStdString((*it)->menu_name()));
     // Connect the action with dispatching a command in the ToolManager
-    QtBridge::connect(qaction,boost::bind(&ToolManager::dispatch_opentool,
-                                          ToolManager::Instance(),
-                                          (*it)->type()));
+    QtBridge::connect(qaction,boost::bind(&ActionOpenTool::Dispatch,(*it)->type()));
     ++it;
   }
 }

@@ -33,8 +33,6 @@
 namespace Seg3D {
 
 ToolWidget::ToolWidget() :
-  //close_button_(0),
-  //help_button_(0),
   main_frame_(0)
 {
 }
@@ -79,12 +77,6 @@ ToolWidget::create_widget(QWidget* parent, ToolHandle& tool)
   SCI_LOG_MESSAGE("The the address of main_frame_ tool is: "+ h);
   
   return ( build_widget(main_frame_));
-}
-
-bool
-ToolWidget::build_widget(QFrame* frame)
-{
-  return (true);
 }
 
 } //end namespace Seg3D

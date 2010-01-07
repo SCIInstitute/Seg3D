@@ -35,8 +35,63 @@
 
 namespace Seg3D {
 
-ActionSocket::ActionSocket(int portnum) :
+class ActionSocketContext;
+
+typedef boost::shared_ptr<ActionSocketContext> ActionSocketContextHandle;
+
+class ActionSocketContext : public ActionContext {
+
+// -- Constructor/destructor --
+  public:
+    // Wrap a context around an action
+    ActionSocketContext() {}
+ 
+    // Virtual destructor for memory management
+    virtual ~ActionSocketContext() {}
+
+// -- Reporting functions --
+
+    virtual void report_error(const std::string& error)
+    {
+      message_ += std::string("ERROR: ")+error+std::string("\r\n");
+    }
+
+    virtual void report_warning(const std::string& warning)
+    {
+      message_ += std::string("WARNING: ")+warning+std::string("\r\n");
+    }
+
+    virtual void report_message(const std::string& message)
+    {
+      message_ += std::string("MESSAGE: ")+message+std::string("\r\n");
+    }
+
+    virtual void report_result(const ActionResultHandle& result)
+    {
+      message_ += std::string("RESULT: ")+result->export_to_string()+std::string("\r\n");
+    }
+
+// -- Source information --
+
+    // The action is run from a script: the interface needs to be updated.
+    virtual bool from_script() const { return true; }
+
+// -- ActionSocket specific function --
+
+    void reset() { message_.clear(); }
+    std::string message() const { return message_; }
+
+  private:
+    std::string message_;
+};
+
+ActionSocket::ActionSocket() :
   action_socket_thread_(0)
+{  
+}
+
+void
+ActionSocket::start(int portnum)
 {  
   // Create new thread for running socket code
   action_socket_thread_ = 
@@ -57,41 +112,52 @@ ActionSocket::run_action_socket(int portnum)
   
   while (1)
   {
-    boost::asio::ip::tcp::socket sock(io_service);
-    acceptor.accept(sock);
+    boost::asio::ip::tcp::socket socket(io_service);
+    acceptor.accept(socket);
+    
+    boost::asio::write(socket,boost::asio::buffer(std::string("Welcome to Seg3D\r\n")));
     
     std::vector<char> data(512);
     boost::system::error_code read_ec;
     std::string action;
     
+    ActionSocketContextHandle context(new ActionSocketContext);
+    
     while (!read_ec)
     {
       boost::asio::streambuf buffer;
     
-      boost::asio::read_until(sock,buffer,std::string("\r\n"),read_ec);
+      boost::asio::read_until(socket,buffer,std::string("\r\n"),read_ec);
       std::istream is(&buffer);
-      std::string action;
-      is >> action;
+      
+      std::string action_string;
+      std::getline(is,action_string);
       
       if (!read_ec)
       {
-        ActionHandle action_handle;
+        ActionHandle action;
         std::string  error;
         std::string  usage;
-        if(!(ActionFactory::Instance()->create_action(action,action_handle,
+        if(!(ActionFactory::Instance()->create_action(action_string,action,
             error,usage)))
         {
           error += "\r\n";
-          boost::asio::write(sock,boost::asio::buffer(error));
+          boost::asio::write(socket,boost::asio::buffer(error));
         }
         else
         {
-        
+          context->reset();
+          PostAndWaitAction(action,context);
+          std::string message = context->message();
+          boost::asio::write(socket,boost::asio::buffer(message));
         }
       }
     }
   }
 }
+
+// Singleton interface needs to be defined somewhere
+Utils::Singleton<ActionSocket> ActionSocket::instance_;
 
 } // end namespace Seg3D
 

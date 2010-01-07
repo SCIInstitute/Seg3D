@@ -56,19 +56,36 @@ class ActionDispatcher : public boost::noncopyable {
 // -- Action handling --
   public:
     // POST_ACTION:
-    // Post an action in the application thread. If this function is called from
-    // an other thread, the action is posted on the stack of actions that need
-    // to be processed. Each action needs to be posted with an ActionContextHandle
-    // with describes whether feedback from the action needs to posted.
-    // The action context needs to be created before posting the action
+    // Post an action onto the application thread, the action is posted on the 
+    // stack of actions that need to be processed. Each action needs to be 
+    // posted with an ActionContextHandle which describes where feedback from 
+    // the action needs to posted.
+    // The action context needs to be created before posting the action.
     
     void post_action(ActionHandle action, ActionContextHandle action_context); // << THREAD-SAFE SLOT       
+
+    // POST_AND_WAIT_ACTION:
+    // Post an action onto the application thread, the action is posted on the 
+    // stack of actions that need to be processed. Each action needs to be 
+    // posted with an ActionContextHandle which describes where feedback from 
+    // the action needs to posted.
+    // The action context needs to be created before posting the action.
+    // This function also waits on the action to be fully completed and hence
+    // needs to be called from a thread that is not needed for action processing
+            
+    void post_and_wait_action(ActionHandle action, ActionContextHandle action_context); // << THREAD-SAFE SLOT  
 
     // POST_ACTIONS:
     // Post multiple actions in specified order
 
-    void post_actions(std::vector<ActionHandle> actions, ActionContextHandle action_context); // << THREAD-SAFE SLOT   
+    void post_actions(std::vector<ActionHandle> actions, 
+                      ActionContextHandle action_context); // << THREAD-SAFE SLOT   
   
+    // POST_AND_WAIT_ACTIONS:
+    // Post multiple actions in specified order and wait for them to finish
+
+    void post_and_wait_actions(std::vector<ActionHandle> actions, 
+                      ActionContextHandle action_context); // << THREAD-SAFE SLOT   
   
   private:
   
@@ -124,12 +141,27 @@ class ActionDispatcher : public boost::noncopyable {
 // FUNCTION PostAction:
 // This function is a short cut to posting an action using the dispatcher
  
-void PostAction(ActionHandle action, ActionContextHandle action_context);
+void PostAction(const ActionHandle& action, const ActionContextHandle& action_context);
+
+// FUNCTION PostAndWaitAction:
+// This function is a short cut to posting an action using the dispatcher and
+// waiting until the action has been completed
+ 
+void PostAndWaitAction(const ActionHandle& action, const ActionContextHandle& action_context);
+
 
 // FUNCTION PostAction:
 // This function is a short cut to posting a raw unparsed action
  
-void PostAction(std::string& actionstring, ActionContextHandle action_context);
+void PostAction(const std::string& actionstring, const ActionContextHandle& action_context);
+
+// FUNCTION PostAndWaitAction:
+// This function is a short cut to posting a raw unparsed action and waiting
+// until the action has been processed
+ 
+void PostAndWaitAction(const std::string& actionstring, const ActionContextHandle& action_context);
+
+
 
 } // namespace Seg3D
 

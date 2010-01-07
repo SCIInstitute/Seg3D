@@ -46,6 +46,8 @@ SET(APPLICATION_ACTION_SRCS
   ActionHistory.cc
   ActionRecorder.h
   ActionRecorder.cc
+  ActionSocket.h
+  ActionSocket.cc
   ActionUndoItem.h
   ActionUndoItem.cc
   ActionUndoBuffer.h

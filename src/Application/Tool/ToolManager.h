@@ -60,22 +60,9 @@ class ToolManager : public StateHandler {
 // -- constructor/destructor --
   public:
     ToolManager();
-
-// -- Dispatcher functions for User Interface -- 
-  public:
-    
-    // -- Open a tool --
-    void dispatch_opentool(const std::string& tool_name) const;
- 
-    // -- Close a tool --
-    void dispatch_closetool(const std::string& tool_id) const;
- 
-    // -- Activate tool --
-    void dispatch_activatetool(const std::string& tool_id) const;
  
 // -- Handler functions --
   protected:
-  
     friend class ActionOpenTool;
     friend class ActionCloseTool;
     friend class ActionActivateTool;

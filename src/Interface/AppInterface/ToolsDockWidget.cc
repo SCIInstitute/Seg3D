@@ -37,6 +37,9 @@
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Interface/Interface.h>
 
+#include <Application/Tool/Actions/ActionOpenTool.h>
+#include <Application/Tool/Actions/ActionCloseTool.h>
+#include <Application/Tool/Actions/ActionActivateTool.h>
 
 // Interface includes
 #include <Interface/AppInterface/ToolsDockWidget.h>
@@ -140,7 +143,8 @@ ToolsDockWidget::open_tool(ToolHandle tool)
   widget->create_widget(this,tool);
 
   toolbox_->add_tool(widget,QString::fromStdString(tool->menu_name()
-                                                   +" "+Utils::to_string(tool->toolid_number())), boost::bind(&ToolManager::dispatch_closetool, ToolManager::Instance(), tool->toolid()));
+    +" "+Utils::to_string(tool->toolid_number())), 
+    boost::bind(&ActionCloseTool::Dispatch, tool->toolid()));
 
   widget_list_[tool->toolid()] = widget;
   
@@ -196,7 +200,7 @@ ToolsDockWidget::tool_changed(int index)
   if (index >= 0)
   {
     ToolWidget *widget = static_cast<ToolWidget*>(toolbox_->get_tool_at(index));
-    ToolManager::Instance()->dispatch_activatetool(widget->toolid());
+    ActionActivateTool::Dispatch(widget->toolid());
   }
 }
 
@@ -236,8 +240,5 @@ ToolsDockWidget::HandleActivateTool(QPointer<ToolsDockWidget> tools_widget,ToolH
   
   if (tools_widget.data()) tools_widget->activate_tool(tool);
 }
-
-
-
 
 } // end namespace

@@ -40,23 +40,35 @@ namespace Seg3D  {
 ToolBoxWidget::ToolBoxWidget(QWidget* parent) :
   QScrollArea(parent)
 {
+  active_close_icon_.addFile(QString::fromUtf8(":/Images/CloseWhite.png"), 
+                             QSize(), QIcon::Normal, QIcon::Off);    
+  inactive_close_icon_.addFile(QString::fromUtf8(":/Images/Close.png"), 
+                               QSize(), QIcon::Normal, QIcon::Off);
+
+  active_help_icon_.addFile(QString::fromUtf8(":/Images/HelpWhite.png"), 
+                             QSize(), QIcon::Normal, QIcon::Off);    
+  inactive_help_icon_.addFile(QString::fromUtf8(":/Images/Help.png"), 
+                               QSize(), QIcon::Normal, QIcon::Off);
+
   setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
   setContentsMargins(1, 1, 1, 1);
   setWidgetResizable(true);
-
+  
   main_ = new QWidget(this);
   setWidget(main_);
 
   main_layout_ = new QVBoxLayout( main_ );
   main_layout_->setContentsMargins(1, 1, 1, 1);
   main_layout_->setSpacing(1);
+  main_layout_->setAlignment(Qt::AlignLeft);
   
   tool_layout_ = new QVBoxLayout;
   main_layout_->addLayout(tool_layout_);
   main_layout_->addStretch();
   
   main_->setLayout(main_layout_);
+
 }
 
 ToolBoxWidget::~ToolBoxWidget()
@@ -65,7 +77,7 @@ ToolBoxWidget::~ToolBoxWidget()
   
 
 void 
-  ToolBoxWidget::add_tool(QWidget * tool, const QString &label, boost::function<void ()> close_function)
+ToolBoxWidget::add_tool(QWidget * tool, const QString &label, boost::function<void ()> close_function)
 {
   if ( !tool ) return;
   
@@ -118,7 +130,7 @@ void
                                                  "}\n"
                                                  "\n"
                                                  "QWidget#background_{\n"
-                                                 "  background-color: rgb(190, 0, 0);\n"
+                                                 "  background-color: rgb(255, 135, 0);\n"
                                                  "    border-radius: 6px;\n"
                                                  "}\n"
                                                  "QFrame#tool_frame_{ border-radius: 4px; border: 1px solid gray; }     "));
@@ -160,10 +172,8 @@ void
   page_handle->help_button_->setObjectName(QString::fromUtf8("help_button_"));
   
   ///  ---  This is where we add the icon's for the help button --- //
-  QIcon icon;
-  icon.addFile(QString::fromUtf8(":/Images/Help.png"), QSize(), QIcon::Normal, QIcon::Off);
-  page_handle->help_button_->setIcon(icon);
-  page_handle->help_button_->setIconSize(QSize(16, 16));
+  page_handle->help_button_->setIcon(active_help_icon_);
+  page_handle->help_button_->setIconSize(QSize(18, 18));
   
   page_handle->hLayout_->addWidget(page_handle->help_button_);
   
@@ -173,9 +183,7 @@ void
   page_handle->close_button_->setObjectName(QString::fromUtf8("close_button_"));
   
    ///  ---  This is where we add the icon's for the close button --- //
-  QIcon icon1;
-  icon1.addFile(QString::fromUtf8(":/Images/Close.png"), QSize(), QIcon::Normal, QIcon::Off);
-  page_handle->close_button_->setIcon(icon1);
+  page_handle->close_button_->setIcon(active_close_icon_);
   page_handle->close_button_->setIconSize(QSize(18, 18));
   
   page_handle->hLayout_->addWidget(page_handle->close_button_);
@@ -243,6 +251,8 @@ void ToolBoxWidget::set_active_tool( QWidget *tool )
                                       " font: bold;\n"
                                       "\n"
                                       "}\n"));
+        (*it)->close_button_->setIcon(inactive_close_icon_);
+        (*it)->help_button_->setIcon(inactive_help_icon_);
         (*it)->tool_frame_->hide();
         //main_->adjustSize();
       }
@@ -266,7 +276,7 @@ void ToolBoxWidget::set_active_tool( QWidget *tool )
       {
         //set the size of the active page as well as the color of its header
         (*it)->background_->setStyleSheet(QString::fromUtf8(
-                    "QWidget#background_ { background-color: rgb(190, 0, 0); }"));
+                    "QWidget#background_ { background-color: rgb(255, 135, 0); }"));
         (*it)->activate_button_->setStyleSheet(QString::fromUtf8(
                                       "QPushButton{\n"
                                       " \n"
@@ -278,6 +288,8 @@ void ToolBoxWidget::set_active_tool( QWidget *tool )
                                       " font: bold;\n"
                                       "\n"
                                       "}\n"));      
+        (*it)->close_button_->setIcon(active_close_icon_);
+        (*it)->help_button_->setIcon(active_help_icon_);
         (*it)->tool_frame_->show();
         //main_->adjustSize();
       }
@@ -337,8 +349,6 @@ void ToolBoxWidget::set_active_index( int index )
   }
   else if(index < 0)
   {
-
-    
     if(it != tool_list_.end())
     {
       set_active_tool( (*it)->tool_);
@@ -353,8 +363,6 @@ void ToolBoxWidget::set_active_index( int index )
 
 void ToolBoxWidget::remove_tool(int index)
 {
-
-   
   // Find the index that corresponds to the tool
   QList<PageHandle>::iterator it = tool_list_.begin();
   QList<PageHandle>::iterator it_end = tool_list_.end();
@@ -380,7 +388,6 @@ void ToolBoxWidget::remove_tool(int index)
   
   main_->adjustSize();
   tool_removed(index);
-  
 }
   
   
@@ -409,24 +416,24 @@ void ToolBoxWidget::activate_button_clicked()
 
 
   
-  void ToolBoxWidget:: help_button_clicked()
-  {
-    SCI_LOG_MESSAGE("Help button has been clicked.");
-    QToolButton *help_button = ::qobject_cast<QToolButton*>(sender());
-    int counter = 0;
-    
-    QList<PageHandle>::iterator it = tool_list_.begin();
-    QList<PageHandle>::iterator it_end = tool_list_.end();
-    
-    while (it != it_end) 
-    { 
-      if ((*it)->help_button_ == help_button)
-      {
-        //TODO add help dialog box
-      }
-      ++it; counter++;
+void ToolBoxWidget:: help_button_clicked()
+{
+  SCI_LOG_MESSAGE("Help button has been clicked.");
+  QToolButton *help_button = ::qobject_cast<QToolButton*>(sender());
+  int counter = 0;
+  
+  QList<PageHandle>::iterator it = tool_list_.begin();
+  QList<PageHandle>::iterator it_end = tool_list_.end();
+  
+  while (it != it_end) 
+  { 
+    if ((*it)->help_button_ == help_button)
+    {
+      //TODO add help dialog box
     }
+    ++it; counter++;
   }
+}
                                                                       
 
 void ToolBoxWidget::itemDestroyed(QObject *object)

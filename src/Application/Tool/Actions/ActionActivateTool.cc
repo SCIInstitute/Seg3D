@@ -57,15 +57,25 @@ ActionActivateTool::validate(ActionContextHandle& context)
 bool 
 ActionActivateTool::run(ActionContextHandle& context, ActionResultHandle& result)
 {
-  if (need_undo(context))
-  {
-    ActionActivateToolHandle undo(new ActionActivateTool);
-    undo->set(ToolManager::Instance()->active_toolid());
-    AddUndoAction("Activate Tool",undo,ActionHandle(this));
-  }
-  
   ToolManager::Instance()->activate_tool(toolid_.value());
   return (true); // success
+}
+
+
+// DISPATCH:
+// Dispatch this action with given parameters (from interface)
+
+void
+ActionActivateTool::Dispatch(const std::string& toolid)
+{
+  // Create new action
+  ActionActivateTool* action = new ActionActivateTool;
+
+  // Set action parameters
+  action->toolid_.value() = toolid;
+
+  // Post the new action
+  PostActionFromInterface(ActionHandle(action));
 }
 
 } // end namespace Seg3D

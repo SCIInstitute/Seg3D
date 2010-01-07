@@ -112,6 +112,12 @@ class ToolBoxWidget : public QScrollArea
     QWidget *active_tool_;
     PageHandle active_page_;
         
+    QIcon active_close_icon_;    
+    QIcon inactive_close_icon_;    
+
+    QIcon active_help_icon_;    
+    QIcon inactive_help_icon_;    
+        
     inline PageHandle get_active_page() { return active_page_; }
     
     void tool_removed( int index );
