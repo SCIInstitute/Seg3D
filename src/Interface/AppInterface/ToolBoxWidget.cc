@@ -130,7 +130,7 @@ ToolBoxWidget::add_tool(QWidget * tool, const QString &label, boost::function<vo
                                                  "}\n"
                                                  "\n"
                                                  "QWidget#background_{\n"
-                                                 "  background-color: rgb(255, 135, 0);\n"
+                                                 "  background-color: rgb(255, 128, 0);\n"
                                                  "    border-radius: 6px;\n"
                                                  "}\n"
                                                  "QFrame#tool_frame_{ border-radius: 4px; border: 1px solid gray; }     "));
@@ -172,8 +172,9 @@ ToolBoxWidget::add_tool(QWidget * tool, const QString &label, boost::function<vo
   page_handle->help_button_->setObjectName(QString::fromUtf8("help_button_"));
   
   ///  ---  This is where we add the icon's for the help button --- //
+
   page_handle->help_button_->setIcon(active_help_icon_);
-  page_handle->help_button_->setIconSize(QSize(18, 18));
+  page_handle->help_button_->setIconSize(QSize(16, 16));
   
   page_handle->hLayout_->addWidget(page_handle->help_button_);
   
@@ -251,6 +252,7 @@ void ToolBoxWidget::set_active_tool( QWidget *tool )
                                       " font: bold;\n"
                                       "\n"
                                       "}\n"));
+
         (*it)->close_button_->setIcon(inactive_close_icon_);
         (*it)->help_button_->setIcon(inactive_help_icon_);
         (*it)->tool_frame_->hide();
@@ -276,7 +278,8 @@ void ToolBoxWidget::set_active_tool( QWidget *tool )
       {
         //set the size of the active page as well as the color of its header
         (*it)->background_->setStyleSheet(QString::fromUtf8(
-                    "QWidget#background_ { background-color: rgb(255, 135, 0); }"));
+                    "QWidget#background_ { background-color: rgb(255, 128, 0); }"));
+
         (*it)->activate_button_->setStyleSheet(QString::fromUtf8(
                                       "QPushButton{\n"
                                       " \n"
@@ -287,7 +290,8 @@ void ToolBoxWidget::set_active_tool( QWidget *tool )
                                       " color: white;\n"
                                       " font: bold;\n"
                                       "\n"
-                                      "}\n"));      
+                                      "}\n"));  
+        ///  ---  This is where we add the icon's for the help button --- //
         (*it)->close_button_->setIcon(active_close_icon_);
         (*it)->help_button_->setIcon(active_help_icon_);
         (*it)->tool_frame_->show();
