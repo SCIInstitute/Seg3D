@@ -1,6 +1,0 @@
-<RCC>
-    <qresource prefix="/new/images">
-        <file>close.png</file>
-        <file>show_info.png</file>
-    </qresource>
-</RCC>
