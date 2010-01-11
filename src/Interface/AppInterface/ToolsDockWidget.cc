@@ -146,7 +146,7 @@ ToolsDockWidget::open_tool(ToolHandle tool)
     +" "+Utils::to_string(tool->toolid_number())), 
     boost::bind(&ActionCloseTool::Dispatch, tool->toolid()));
 
-  widget_list_[tool->toolid()] = widget;
+  tool_widget_list_[tool->toolid()] = widget;
   
   if (isHidden()) show(); 
   raise();
@@ -156,9 +156,9 @@ void
 ToolsDockWidget::close_tool(ToolHandle tool)
 {
   // Find the widget
-  widget_list_type::iterator it = widget_list_.find(tool->toolid());
+  tool_widget_list_type::iterator it = tool_widget_list_.find(tool->toolid());
   
-  if (it == widget_list_.end()) 
+  if (it == tool_widget_list_.end()) 
   {
     SCI_LOG_ERROR(std::string("widget with toolid '")+tool->toolid()+"' does not exist");
     return;
@@ -170,7 +170,7 @@ ToolsDockWidget::close_tool(ToolHandle tool)
   toolbox_->remove_tool(toolbox_->index_of(widget));
   
   // Remove the pointer from widget 
-  widget_list_.erase(tool->toolid());
+  tool_widget_list_.erase(tool->toolid());
   
   // Schedule object to be destroyed by Qt
   widget->deleteLater();
@@ -180,8 +180,8 @@ void
 ToolsDockWidget::activate_tool(ToolHandle tool)
 {
   // Find the widget
-  widget_list_type::iterator it = widget_list_.find(tool->toolid());
-  if (it == widget_list_.end()) 
+  tool_widget_list_type::iterator it = tool_widget_list_.find(tool->toolid());
+  if (it == tool_widget_list_.end()) 
   {
     SCI_LOG_ERROR(std::string("widget with toolid '")+tool->toolid()+"' does not exist");
     return;

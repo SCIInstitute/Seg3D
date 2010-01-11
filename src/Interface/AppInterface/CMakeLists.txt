@@ -40,12 +40,13 @@ SET(INTERFACE_APPINTERFACE_SRCS
   ProjectDockWidget.cc
   ToolsDockWidget.cc
   ToolWidget.cc
+  LayerManagerWidget.cc
+  LayerWidget.cc
   LayerManagerDockWidget.cc
   MeasurementDockWidget.cc
   ViewAction.cc
   ToolBoxWidget.cc
   ViewerWidget.cc
-  LayerManagerWidget.cc
 )
 
 SET(INTERFACE_APPINTERFACE_MOC_SRCS
@@ -57,12 +58,13 @@ SET(INTERFACE_APPINTERFACE_MOC_SRCS
   ProjectDockWidget.h
   ToolsDockWidget.h
   ToolWidget.h
+  LayerWidget.h
+  LayerManagerWidget.h
   LayerManagerDockWidget.h
   MeasurementDockWidget.h
   ViewAction.h
   ToolBoxWidget.h
   ViewerWidget.h
-  LayerManagerWidget.h
 )
 
 SET(INTERFACE_APPINTERFACE_NO_MOC_SRCS

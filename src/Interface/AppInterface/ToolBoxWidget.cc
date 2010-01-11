@@ -99,7 +99,7 @@ ToolBoxWidget::add_tool(QWidget * tool, const QString &label, boost::function<vo
                                                  "}\n"
                                                  "\n"
                                                  "QPushButton#activate_button_:pressed{\n"
-                                                 "  color: gray; \n"
+                                                 "  color: black; \n"
                                                  "  margin-right: 7px; \n"
                                                  "  padding-left: 4px; \n"      
                                                  "  height: 18px; border-radius: 4px; \n"
@@ -188,12 +188,14 @@ ToolBoxWidget::add_tool(QWidget * tool, const QString &label, boost::function<vo
   page_handle->close_button_->setIconSize(QSize(18, 18));
   
   page_handle->hLayout_->addWidget(page_handle->close_button_);
+  
   page_handle->hLayout_->setStretch(0, 1);
   page_handle->hLayout_2->addWidget(page_handle->header_);
   page_handle->vLayout_->addWidget(page_handle->background_);
   
   page_handle->tool_frame_ = new QFrame(page_handle->page_);
   page_handle->tool_frame_->setObjectName(QString::fromUtf8("tool_frame_"));
+  
   page_handle->tool_frame_->setFrameShape(QFrame::StyledPanel);
   page_handle->tool_frame_->setFrameShadow(QFrame::Raised);
   
@@ -335,10 +337,11 @@ void ToolBoxWidget::set_active_index( int index )
   QList<PageHandle>::iterator it_end = tool_list_.end();
   
   
-  int counter = 0;
+  
 
   if (index >= 0) 
   {
+    int counter = 0;
     
     while (it != it_end) 
     { 

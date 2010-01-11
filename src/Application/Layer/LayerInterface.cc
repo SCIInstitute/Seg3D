@@ -24,55 +24,21 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
-*/
+ */
 
-#include <Interface/AppInterface/ToolWidget.h>
-#include <Utils/Core/Log.h>
-#include <boost/lexical_cast.hpp>
+#include <Application/Layer/LayerInterface.h>
 
 namespace Seg3D {
-
-ToolWidget::ToolWidget() :
-  main_frame_(0)
+  
+LayerInterface::LayerInterface()
 {
 }
 
-ToolWidget::~ToolWidget()
+LayerInterface::~LayerInterface()
 {
 }
+  
+} // end namespace Seg3D
 
 
-bool
-ToolWidget::create_widget(QWidget* parent, ToolHandle& tool)
-{
-
-  
-  // Setup the parent widget: this one will be used for memory management of
-  // this widget class
-  setParent(parent);
-
-    // Add the handle of the underlying tool to the widget
-  set_tool(tool);
-  
-  // Generate a vertical layout for the tool widget
-  QVBoxLayout* vbox = new QVBoxLayout;
-  
-  // Ensure it has some tight spacing  
-  vbox->setSpacing(0);
-  vbox->setContentsMargins(0,0,0,0);
-  setLayout(vbox);
-  
-  main_frame_ = new QFrame;  
-  
-  main_frame_->resize(1, 1);
-  vbox->addWidget(main_frame_);
-  vbox->addStretch();
-  
-  
-  //std::string h = boost::lexical_cast<std::string>(&main_frame_);
-  
-  return ( build_widget(main_frame_));
-}
-
-} //end namespace Seg3D
 

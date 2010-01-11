@@ -52,6 +52,13 @@ Q_SIGNALS:
   void active_group_changed( int index );
   void active_layer_changec( int group_index );
   
+public:
+  enum layer_type{
+      data_layer,
+      mask_layer,
+      label_layer
+  };
+  
 private:
   
   class Group 
@@ -59,24 +66,25 @@ private:
     // Private subclass for the groups
     public:
     
-      std::string *name_;
-      QWidget     *page_;
-      QWidget     *background_;
-      QWidget     *header_;
-      QHBoxLayout *hLayout_;
-      QHBoxLayout *hLayout_2;
-      QVBoxLayout *vLayout_;
-      QVBoxLayout *vLayout_2;
+      //std::string *name_;
+      QWidget *page_;
+      QVBoxLayout *verticalLayout_5;
+      QWidget *background_group_;
+      QVBoxLayout *verticalLayout_3;
+      QWidget *header_;
+      QHBoxLayout *horizontalLayout;
+      QToolButton *open_button_;
       QPushButton *activate_button_;
-      QToolButton *hide_show_button_;
-      QToolButton *info_button_;
+      QToolButton *add_new_button_;
       QToolButton *close_button_;
+      QFrame *group_frame_;
+      QVBoxLayout *verticalLayout_2;
       
     
-      inline bool operator==(const Group& other) const
-      {
-        return name_ == other.name_;
-      }
+//      inline bool operator==(const Group& other) const
+//      {
+//        //return name_ == other.name_;
+//      }
     
   };
    
@@ -87,16 +95,51 @@ private:
   class Layer : public QWidget 
   {
     public:
+      std::string *name_;
+      QWidget *layer_;
+      QVBoxLayout *verticalLayout_2;
       QWidget *background_;
+      QWidget *progress_bar_;
+      QWidget *layoutWidget;
+      QHBoxLayout *backgroundHLayout;
+      QWidget *typeBackground_;
+      QWidget *typeGradient_;
+      QHBoxLayout *horizontalLayout_9;
       QToolButton *colorChooseButton_;
-      QToolButton *lockButton_;
+      QVBoxLayout *verticalLayout;
       QPushButton *label_;
+      QHBoxLayout *toolButtonHLayout_;
       QToolButton *fillOpacityButton_;
       QToolButton *brightContrastButton_;
       QToolButton *visibleButton_;
       QToolButton *isoSurfaceButton_;
-      QToolButton *volumeTargetButton_;
       QToolButton *computeIsoSurfaceButton_;
+      QToolButton *volumeTargetButton_;
+      QToolButton *lockButton_;
+      QHBoxLayout *brightContrastHLayout;
+      QWidget *brightContrastBar;
+      QVBoxLayout *verticalLayout_6;
+      QHBoxLayout *brightnessHLayout;
+      QLabel *brightnessLabel;
+      QSlider *brightnessSlider;
+      QHBoxLayout *contrastHLayout;
+      QLabel *contrastLabel;
+      QSlider *contrastSlider;
+      QHBoxLayout *colorHLayout;
+      QWidget *colorChooseBar;
+      QHBoxLayout *horizontalLayout_14;
+      QToolButton *color_button_01_;
+      QToolButton *color_button_02_;
+      QToolButton *color_button_03_;
+      QToolButton *color_button_04_;
+      QToolButton *color_button_05_;
+      QToolButton *color_button_06_;
+      QToolButton *color_button_07_;
+      QToolButton *color_button_08_;
+      QToolButton *color_button_09_;
+      QToolButton *color_button_10_;
+      QToolButton *color_button_11_;
+      QToolButton *color_button_12_;
       Group *container_group_;
     
     
@@ -118,15 +161,26 @@ private:
   
   QWidget*     main_;
   QVBoxLayout* main_layout_;
-  QVBoxLayout* tool_layout_;
+  QVBoxLayout* group_layout_;
+  
+  QIcon active_close_icon_;    
+  QIcon inactive_close_icon_;    
+  
+  QIcon active_help_icon_;    
+  QIcon inactive_help_icon_; 
+  
+  QIcon active_new_icon_;    
+  QIcon inactive_new_icon_;
   
 public:
   
   LayerManagerWidget(QWidget* parent=0);
   virtual ~LayerManagerWidget();
   
-  void add_mask_layer( const QString &label, boost::function<void()>, Group &container_group );
-  void new_group();
+  //void add_layer( layer_type type, const QString &label, boost::function<void()>, Group &container_group );
+  void add_layer( const QString &label );
+  //void new_group( const QString &dimensions, boost::function<void()> );
+  void new_group( const QString &dimensions );
   void remove_mask_layer(int);
   
   inline int get_active_layer_index(){ return active_layer_index_; }
@@ -140,6 +194,8 @@ public:
   
   inline GroupHandle get_active_group(){ return active_group_; }
   inline LayerHandle get_active_layer(){ return active_layer_; }
+  
+  LayerHandle layer( QWidget *layer_);
 
 
 };

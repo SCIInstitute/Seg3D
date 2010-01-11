@@ -85,8 +85,8 @@ class ToolsDockWidget : public QDockWidget {
     boost::signals2::connection activate_tool_connection_;
   
     // List of tool widgets
-    typedef std::map<std::string,ToolWidget*> widget_list_type;
-    widget_list_type widget_list_;
+    typedef std::map<std::string,ToolWidget*> tool_widget_list_type;
+    tool_widget_list_type tool_widget_list_;
     
     // Pointer to the ToolBox Widget
     ToolBoxWidget* toolbox_;

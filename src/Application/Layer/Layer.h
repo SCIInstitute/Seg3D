@@ -101,7 +101,7 @@ class Layer {
     LayerProperties get_properties() const { return properties_; }
     DataVolumeHandle get_data() const { return data_handle_; }
     LayerHandle clone(std::string& clone_name) const;
-
+  
     bool is_locked() const;
 
   private:

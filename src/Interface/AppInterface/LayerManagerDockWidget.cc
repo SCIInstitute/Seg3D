@@ -31,8 +31,20 @@
 #include <Utils/Core/Log.h>
 #include <boost/lexical_cast.hpp>
 
+// Application Includes
+#include <Application/Layer/LayerManager.h>
+#include <Application/Interface/Interface.h>
+
+#include <Application/Layer/Actions/ActionCloneLayer.h>
+#include <Application/Layer/Actions/ActionLayer.h>
+#include <Application/Layer/Actions/ActionLayerFromFile.h>
+#include <Application/Layer/Actions/ActionNewMaskLayer.h>
+#include <Application/Layer/Actions/ActionRemoveLayer.h>
+
+
 // Interface includes
 #include <Interface/AppInterface/LayerManagerDockWidget.h>
+
 
 
 namespace Seg3D  {
@@ -44,8 +56,11 @@ LayerManagerDockWidget::LayerManagerDockWidget(QWidget *parent) :
   setAllowedAreas(Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea);
   setWindowTitle("Layer Manager");
   
-  layer_manager_ = new QWidget(this);
+  layer_manager_ = new LayerManagerWidget(this);
   setWidget(layer_manager_);
+  
+    
+  
   
 }
 
@@ -65,14 +80,30 @@ LayerManagerDockWidget::close_group()
   //TODO implement close group function
 }
 void  
-LayerManagerDockWidget::open_data_layer()
+LayerManagerDockWidget::layer_from_file()
 {
   //TODO implement open data layer function
+}
+void
+LayerManagerDockWidget::clone_layer(LayerHandle layer)
+{
+  //TODO implement clone layer function
 }
 void  
 LayerManagerDockWidget::new_mask_layer()
 {
-  //TODO implement new mask function
+  //TODO implement new mask layer function
+}
+void
+LayerManagerDockWidget::remove_layer(LayerHandle layer)
+{
+  //TODO implement remove layer function
+}
+
+void
+LayerManagerDockWidget::layer_changed(int index)
+{
+  //TODO implement layer changed slot
 }
   
 } // end namespace
