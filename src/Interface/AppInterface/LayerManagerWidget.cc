@@ -201,29 +201,29 @@ LayerManagerWidget::activate_group_button_clicked()
   }
 }
   
-  void
-  LayerManagerWidget::activate_layer_button_clicked()
+void
+LayerManagerWidget::activate_layer_button_clicked()
+{
+  QPushButton *active_button = ::qobject_cast<QPushButton*>(sender());
+  
+  for (LayerList::ConstIterator i = layer_list_.constBegin(); i != layer_list_.constEnd(); i++)
   {
-    QPushButton *active_button = ::qobject_cast<QPushButton*>(sender());
-    
-    for (LayerList::ConstIterator i = layer_list_.constBegin(); i != layer_list_.constEnd(); i++)
+    if ((*i)->label_ == active_button)
     {
-      if ((*i)->label_ == active_button)
+      for (GroupList::ConstIterator j = group_list_.constBegin(); j != group_list_.constEnd(); j++)
       {
-        for (GroupList::ConstIterator j = group_list_.constBegin(); j != group_list_.constEnd(); j++)
+        if ((*i)->container_group_ != (*j)) 
         {
-          if ((*i)->container_group_ != (*j)) 
-          {
-            (*j)->background_group_->setStyleSheet(QString::fromUtf8("QWidget#background_group_ { background-color: rgb(220, 220, 220); }"));
-          } 
-          else 
-          {
-            (*j)->background_group_->setStyleSheet(QString::fromUtf8("QWidget#background_group_ { background-color: rgb(255, 128, 0); }"));
-          }
+          (*j)->background_group_->setStyleSheet(QString::fromUtf8("QWidget#background_group_ { background-color: rgb(220, 220, 220); }"));
+        } 
+        else 
+        {
+          (*j)->background_group_->setStyleSheet(QString::fromUtf8("QWidget#background_group_ { background-color: rgb(255, 128, 0); }"));
         }
       }
     }
   }
+}
   
   
 void 
