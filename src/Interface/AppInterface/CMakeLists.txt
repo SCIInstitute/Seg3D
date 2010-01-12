@@ -81,7 +81,7 @@ SET(INTERFACE_APPINTERFACE_UI_SRCS
 )
 
 SET(INTERFACE_APPINTERFACE_RCC_SRCS
-  ../../Resources/AppInterface.qrc
+  Resources/AppInterface.qrc
 )
 
 
@@ -140,7 +140,7 @@ TARGET_LINK_LIBRARIES(Interface_AppInterface
 ADD_LIBRARY_QTRESOURCES(AppInterface)
 
 
-FILE(GLOB RESOURCE_IMAGE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/../../Resources/Images/*.png")
+FILE(GLOB RESOURCE_IMAGE_FILES "${CMAKE_CURRENT_SOURCE_DIR}Resources/Images/*.png")
 
 ADD_DEPENDENCIES(Interface_AppInterface
                  DEPENDS ${RESOURCE_IMAGE_FILES})

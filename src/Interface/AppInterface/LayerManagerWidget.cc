@@ -40,20 +40,47 @@ namespace Seg3D  {
 LayerManagerWidget::LayerManagerWidget(QWidget* parent) :
   QScrollArea(parent)
 {
-  active_close_icon_.addFile(QString::fromUtf8(":/Images/CloseWhite.png"), 
-                             QSize(), QIcon::Normal, QIcon::Off);    
-  inactive_close_icon_.addFile(QString::fromUtf8(":/Images/Close.png"), 
-                               QSize(), QIcon::Normal, QIcon::Off);
   
-  active_help_icon_.addFile(QString::fromUtf8(":/Images/HelpWhite.png"), 
-                            QSize(), QIcon::Normal, QIcon::Off);    
-  inactive_help_icon_.addFile(QString::fromUtf8(":/Images/Help.png"), 
-                              QSize(), QIcon::Normal, QIcon::Off);
+  // setup icons 
+  {
+    active_close_icon_.addFile(QString::fromUtf8(":/Images/CloseWhite.png"), 
+                               QSize(), QIcon::Normal, QIcon::Off);    
+    inactive_close_icon_.addFile(QString::fromUtf8(":/Images/Close.png"), 
+                                 QSize(), QIcon::Normal, QIcon::Off);
+    
+    active_help_icon_.addFile(QString::fromUtf8(":/Images/HelpWhite.png"), 
+                              QSize(), QIcon::Normal, QIcon::Off);    
+    inactive_help_icon_.addFile(QString::fromUtf8(":/Images/Help.png"), 
+                                QSize(), QIcon::Normal, QIcon::Off);
+    
+    active_new_icon_.addFile(QString::fromUtf8(":/Images/NewWhite.png"), 
+                              QSize(), QIcon::Normal, QIcon::Off);    
+    inactive_new_icon_.addFile(QString::fromUtf8(":/Images/New.png"), 
+                                QSize(), QIcon::Normal, QIcon::Off);
+    
+    mask_icon_.addFile(QString::fromUtf8(":/Images/MaskWhite_shadow.png"), QSize(), QIcon::Normal, QIcon::Off);
+    label_icon_.addFile(QString::fromUtf8(":/Images/LabelMapWhite.png"), QSize(), QIcon::Normal, QIcon::Off);
+    data_icon_.addFile(QString::fromUtf8(":/Images/DataWhite.png"), QSize(), QIcon::Normal, QIcon::Off);
+    
+    border_icon_.addFile(QString::fromUtf8(":/Images/BorderOff.png"), QSize(), QIcon::Normal, QIcon::Off);
+    border_icon_.addFile(QString::fromUtf8(":/Images/Border.png"), QSize(), QIcon::Normal, QIcon::On);
+    
+    brightness_icon_.addFile(QString::fromUtf8(":/Images/BrightnessOff.png"), QSize(), QIcon::Normal, QIcon::Off);
+    brightness_icon_.addFile(QString::fromUtf8(":/Images/Brightness.png"), QSize(), QIcon::Normal, QIcon::On);
+    
+    volume_visible_icon_.addFile(QString::fromUtf8(":/Images/VolumeVisibleOff.png"), QSize(), QIcon::Normal, QIcon::Off);
+    volume_visible_icon_.addFile(QString::fromUtf8(":/Images/VolumeVisible.png"), QSize(), QIcon::Normal, QIcon::On);
+    
+    isosurface_visible_icon_.addFile(QString::fromUtf8(":/Images/IsosurfaceVisibleOff.png"), QSize(), QIcon::Normal, QIcon::Off);
+    isosurface_visible_icon_.addFile(QString::fromUtf8(":/Images/IsosurfaceVisible.png"), QSize(), QIcon::Normal, QIcon::On);
+    
+    isosurface_computer_icon_.addFile(QString::fromUtf8(":/Images/IsosurfaceComputeOff.png"), QSize(), QIcon::Normal, QIcon::Off);
+    isosurface_computer_icon_.addFile(QString::fromUtf8(":/Images/IsosurfaceCompute.png"), QSize(), QIcon::Normal, QIcon::On);
+    
+    lock_icon_.addFile(QString::fromUtf8(":/Images/LockBigOff.png"), QSize(), QIcon::Normal, QIcon::Off);
+    lock_icon_.addFile(QString::fromUtf8(":/Images/LockBig.png"), QSize(), QIcon::Normal, QIcon::On);
+  }
   
-  active_new_icon_.addFile(QString::fromUtf8(":/Images/NewWhite.png"), 
-                            QSize(), QIcon::Normal, QIcon::Off);    
-  inactive_new_icon_.addFile(QString::fromUtf8(":/Images/New.png"), 
-                              QSize(), QIcon::Normal, QIcon::Off);
   
   setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
@@ -74,18 +101,134 @@ LayerManagerWidget::LayerManagerWidget(QWidget* parent) :
   main_->setLayout(main_layout_);
   
   ///////////////  Testing Stuff //////
-  new_group("green_footed_lemur_fetus");
-  add_layer("femur");
+  new_group("450x900x500");
+  
+  add_layer(data_layer, "green_footed_lemur_fetus", "450x900x500");
+  add_layer(mask_layer, "blue_footed_lemur_fetus", "450x900x500");
+  add_layer(label_layer, "peace_pipe", "200x1800x200");
   
 }
   
 LayerManagerWidget::~LayerManagerWidget()
 {
 }
+  
+  
+void
+LayerManagerWidget::hide_show_brightness_contrast_bar(bool hideshow)
+{
+  SCI_LOG_MESSAGE("Hide show brightness bar button has been clicked.");
+  QToolButton *hide_show_button = ::qobject_cast<QToolButton*>(sender());
+  
+  for (LayerList::ConstIterator i = layer_list_.constBegin(); i != layer_list_.constEnd(); i++)
+  {
+   if ((*i)->brightContrastButton_ == hide_show_button)
+   {
+     if (!hideshow) 
+     {
+       (*i)->brightContrastBar->hide();
+       main_->adjustSize();
+     }
+     else {
+       (*i)->brightContrastBar->show();
+     }
+   } 
+  }
+}
 
+void
+LayerManagerWidget::hide_show_color_choose_bar(bool hideshow)
+{
+  SCI_LOG_MESSAGE("Hide show color choose bar button has been clicked.");
+  QToolButton *hide_show_button = ::qobject_cast<QToolButton*>(sender());
+  
+  for (LayerList::ConstIterator i = layer_list_.constBegin(); i != layer_list_.constEnd(); i++)
+  {
+    if ((*i)->colorChooseButton_ == hide_show_button)
+    {
+      if (!hideshow) 
+      {
+        (*i)->colorChooseBar->hide();
+      }
+      else {
+        (*i)->colorChooseBar->show();
+      }
+      main_->adjustSize();
+    } 
+  }
+  
+}
+  
+void
+LayerManagerWidget::hide_show_group_layers(bool hideshow)
+{
+  QToolButton *hide_show_button = ::qobject_cast<QToolButton*>(sender());
+  
+  for (GroupList::ConstIterator i = group_list_.constBegin(); i != group_list_.constEnd(); i++)
+  {
+    if ((*i)->open_button_ == hide_show_button)
+    {
+      if (hideshow) 
+      {
+        (*i)->group_frame_->show();
+      }
+      else {
+        (*i)->group_frame_->hide();
+      }
+      main_->adjustSize();
+    } 
+  }
+  
+  
+}
+
+void
+LayerManagerWidget::activate_group_button_clicked()
+{
+  QPushButton *active_button = ::qobject_cast<QPushButton*>(sender());
+  
+  for (GroupList::ConstIterator i = group_list_.constBegin(); i != group_list_.constEnd(); i++)
+  {
+    if ((*i)->activate_button_ != active_button)
+    {
+      (*i)->background_group_->setStyleSheet(QString::fromUtf8("QWidget#background_group_ { background-color: rgb(220, 220, 220); }"));
+    } 
+    else 
+    {
+      (*i)->background_group_->setStyleSheet(QString::fromUtf8("QWidget#background_group_ { background-color: rgb(255, 128, 0); }"));
+    }
+
+  }
+}
+  
+  void
+  LayerManagerWidget::activate_layer_button_clicked()
+  {
+    QPushButton *active_button = ::qobject_cast<QPushButton*>(sender());
+    
+    for (LayerList::ConstIterator i = layer_list_.constBegin(); i != layer_list_.constEnd(); i++)
+    {
+      if ((*i)->label_ == active_button)
+      {
+        for (GroupList::ConstIterator j = group_list_.constBegin(); j != group_list_.constEnd(); j++)
+        {
+          if ((*i)->container_group_ != (*j)) 
+          {
+            (*j)->background_group_->setStyleSheet(QString::fromUtf8("QWidget#background_group_ { background-color: rgb(220, 220, 220); }"));
+          } 
+          else 
+          {
+            (*j)->background_group_->setStyleSheet(QString::fromUtf8("QWidget#background_group_ { background-color: rgb(255, 128, 0); }"));
+          }
+        }
+      }
+    }
+  }
+  
+  
 void 
 //LayerManagerWidget::add_layer( layer_type type, const QString &label, boost::function<void ()> close_function, Group &container_group )
-LayerManagerWidget::add_layer( const QString &label )
+LayerManagerWidget::add_layer( layer_type type, const QString &label, const QString &dimensions )
 {
   LayerHandle layer_handle_(new Layer);
   
@@ -97,6 +240,8 @@ LayerManagerWidget::add_layer( const QString &label )
   sizePolicy.setVerticalStretch(0);
   sizePolicy.setHeightForWidth(layer_handle_->layer_->sizePolicy().hasHeightForWidth());
   layer_handle_->layer_->setSizePolicy(sizePolicy);
+  // Set Style Sheet for the layer Widget
+  {
   layer_handle_->layer_->setStyleSheet(QString::fromUtf8("QWidget#progress_bar_{\n"
                                           " border-radius:6px;\n"
                                           " background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(255, 128, 0, 170), stop:0.5 rgba(255, 255, 255, 0), stop:1 rgba(255, 128, 0, 170));\n"
@@ -349,6 +494,8 @@ LayerManagerWidget::add_layer( const QString &label )
                                           "QToolButton#color_button_12_:pressed{\n"
                                           " border: 1px solid gray;\n"
                                           "}"));
+  }
+  
   layer_handle_->verticalLayout_2 = new QVBoxLayout(layer_handle_->layer_);
   layer_handle_->verticalLayout_2->setSpacing(0);
   layer_handle_->verticalLayout_2->setContentsMargins(0, 0, 0, 0);
@@ -364,7 +511,7 @@ LayerManagerWidget::add_layer( const QString &label )
   layer_handle_->background_->setMaximumSize(QSize(213, 46));
   layer_handle_->progress_bar_ = new QWidget(layer_handle_->background_);
   layer_handle_->progress_bar_->setObjectName(QString::fromUtf8("progress_bar_"));
-  layer_handle_->progress_bar_->setGeometry(QRect(0, 0, 16, 46));
+  layer_handle_->progress_bar_->setGeometry(QRect(0, 0, 0, 46));
   layer_handle_->progress_bar_->setStyleSheet(QString::fromUtf8(""));
   layer_handle_->layoutWidget = new QWidget(layer_handle_->background_);
   layer_handle_->layoutWidget->setObjectName(QString::fromUtf8("layoutWidget"));
@@ -401,15 +548,29 @@ LayerManagerWidget::add_layer( const QString &label )
   font.setPointSize(25);
   font.setBold(true);
   font.setWeight(75);
+  
   layer_handle_->colorChooseButton_->setFont(font);
-  QIcon icon;
-  icon.addFile(QString::fromUtf8(":/new/prefix1/pics/MaskWhite_shadow.png"), QSize(), QIcon::Normal, QIcon::Off);
-  layer_handle_->colorChooseButton_->setIcon(icon);
+  switch (type)
+  {
+    case data_layer:
+      layer_handle_->colorChooseButton_->setIcon(data_icon_);
+      break;
+    case mask_layer:
+      layer_handle_->colorChooseButton_->setIcon(mask_icon_);
+      break;
+    case label_layer:
+      layer_handle_->colorChooseButton_->setIcon(label_icon_);
+      break;
+    default:
+      break;
+  }
+  
   layer_handle_->colorChooseButton_->setIconSize(QSize(25, 25));
   layer_handle_->colorChooseButton_->setCheckable(true);
   layer_handle_->colorChooseButton_->setAutoRaise(false);
   
   layer_handle_->horizontalLayout_9->addWidget(layer_handle_->colorChooseButton_);
+  connect(layer_handle_->colorChooseButton_, SIGNAL(clicked(bool)), this, SLOT(hide_show_color_choose_bar(bool)));
   
   
   layer_handle_->backgroundHLayout->addWidget(layer_handle_->typeBackground_);
@@ -428,6 +589,8 @@ LayerManagerWidget::add_layer( const QString &label )
   
   layer_handle_->verticalLayout->addWidget(layer_handle_->label_);
   
+  connect(layer_handle_->label_, SIGNAL(clicked()), this, SLOT(activate_layer_button_clicked()));
+  
   layer_handle_->toolButtonHLayout_ = new QHBoxLayout();
   layer_handle_->toolButtonHLayout_->setSpacing(6);
   layer_handle_->toolButtonHLayout_->setObjectName(QString::fromUtf8("toolButtonHLayout_"));
@@ -435,10 +598,7 @@ LayerManagerWidget::add_layer( const QString &label )
   layer_handle_->fillOpacityButton_->setObjectName(QString::fromUtf8("fillOpacityButton_"));
   layer_handle_->fillOpacityButton_->setMinimumSize(QSize(16, 16));
   layer_handle_->fillOpacityButton_->setMaximumSize(QSize(16, 16));
-  QIcon icon1;
-  icon1.addFile(QString::fromUtf8(":/new/prefix1/pics/BorderOff.png"), QSize(), QIcon::Normal, QIcon::Off);
-  icon1.addFile(QString::fromUtf8(":/new/prefix1/pics/Border.png"), QSize(), QIcon::Normal, QIcon::On);
-  layer_handle_->fillOpacityButton_->setIcon(icon1);
+  layer_handle_->fillOpacityButton_->setIcon(border_icon_);
   layer_handle_->fillOpacityButton_->setCheckable(true);
   
   layer_handle_->toolButtonHLayout_->addWidget(layer_handle_->fillOpacityButton_);
@@ -447,22 +607,19 @@ LayerManagerWidget::add_layer( const QString &label )
   layer_handle_->brightContrastButton_->setObjectName(QString::fromUtf8("brightContrastButton_"));
   layer_handle_->brightContrastButton_->setMinimumSize(QSize(16, 16));
   layer_handle_->brightContrastButton_->setMaximumSize(QSize(16, 16));
-  QIcon icon2;
-  icon2.addFile(QString::fromUtf8(":/new/prefix1/pics/BrightnessOff.png"), QSize(), QIcon::Normal, QIcon::Off);
-  icon2.addFile(QString::fromUtf8(":/new/prefix1/pics/Brightness.png"), QSize(), QIcon::Normal, QIcon::On);
-  layer_handle_->brightContrastButton_->setIcon(icon2);
+  layer_handle_->brightContrastButton_->setIcon(brightness_icon_);
   layer_handle_->brightContrastButton_->setCheckable(true);
   
   layer_handle_->toolButtonHLayout_->addWidget(layer_handle_->brightContrastButton_);
+  connect(layer_handle_->brightContrastButton_, SIGNAL(clicked(bool)), this, SLOT(hide_show_brightness_contrast_bar(bool)));
+
+  
   
   layer_handle_->visibleButton_ = new QToolButton(layer_handle_->layoutWidget);
   layer_handle_->visibleButton_->setObjectName(QString::fromUtf8("visibleButton_"));
   layer_handle_->visibleButton_->setMinimumSize(QSize(16, 16));
   layer_handle_->visibleButton_->setMaximumSize(QSize(16, 16));
-  QIcon icon3;
-  icon3.addFile(QString::fromUtf8(":/new/prefix1/pics/VolumeVisibleOff.png"), QSize(), QIcon::Normal, QIcon::Off);
-  icon3.addFile(QString::fromUtf8(":/new/prefix1/pics/VolumeVisible.png"), QSize(), QIcon::Normal, QIcon::On);
-  layer_handle_->visibleButton_->setIcon(icon3);
+  layer_handle_->visibleButton_->setIcon(volume_visible_icon_);
   layer_handle_->visibleButton_->setCheckable(true);
   
   layer_handle_->toolButtonHLayout_->addWidget(layer_handle_->visibleButton_);
@@ -471,10 +628,7 @@ LayerManagerWidget::add_layer( const QString &label )
   layer_handle_->isoSurfaceButton_->setObjectName(QString::fromUtf8("isoSurfaceButton_"));
   layer_handle_->isoSurfaceButton_->setMinimumSize(QSize(16, 16));
   layer_handle_->isoSurfaceButton_->setMaximumSize(QSize(16, 16));
-  QIcon icon4;
-  icon4.addFile(QString::fromUtf8(":/new/prefix1/pics/IsosurfaceVisibleOff.png"), QSize(), QIcon::Normal, QIcon::Off);
-  icon4.addFile(QString::fromUtf8(":/new/prefix1/pics/IsosurfaceVisible.png"), QSize(), QIcon::Normal, QIcon::On);
-  layer_handle_->isoSurfaceButton_->setIcon(icon4);
+  layer_handle_->isoSurfaceButton_->setIcon(isosurface_visible_icon_);
   layer_handle_->isoSurfaceButton_->setCheckable(true);
   
   layer_handle_->toolButtonHLayout_->addWidget(layer_handle_->isoSurfaceButton_);
@@ -483,10 +637,7 @@ LayerManagerWidget::add_layer( const QString &label )
   layer_handle_->computeIsoSurfaceButton_->setObjectName(QString::fromUtf8("computeIsoSurfaceButton_"));
   layer_handle_->computeIsoSurfaceButton_->setMinimumSize(QSize(16, 16));
   layer_handle_->computeIsoSurfaceButton_->setMaximumSize(QSize(16, 16));
-  QIcon icon5;
-  icon5.addFile(QString::fromUtf8(":/new/prefix1/pics/IsosurfaceComputeOff.png"), QSize(), QIcon::Normal, QIcon::Off);
-  icon5.addFile(QString::fromUtf8(":/new/prefix1/pics/IsosurfaceCompute.png"), QSize(), QIcon::Normal, QIcon::On);
-  layer_handle_->computeIsoSurfaceButton_->setIcon(icon5);
+  layer_handle_->computeIsoSurfaceButton_->setIcon(isosurface_computer_icon_);
   layer_handle_->computeIsoSurfaceButton_->setCheckable(false);
   
   layer_handle_->toolButtonHLayout_->addWidget(layer_handle_->computeIsoSurfaceButton_);
@@ -503,10 +654,7 @@ LayerManagerWidget::add_layer( const QString &label )
   layer_handle_->lockButton_->setMinimumSize(QSize(28, 16));
   layer_handle_->lockButton_->setMaximumSize(QSize(28, 16));
   layer_handle_->lockButton_->setFont(font);
-  QIcon icon6;
-  icon6.addFile(QString::fromUtf8(":/new/prefix1/pics/LockBigOff.png"), QSize(), QIcon::Normal, QIcon::Off);
-  icon6.addFile(QString::fromUtf8(":/new/prefix1/pics/LockBig.png"), QSize(), QIcon::Normal, QIcon::On);
-  layer_handle_->lockButton_->setIcon(icon6);
+  layer_handle_->lockButton_->setIcon(lock_icon_);
   layer_handle_->lockButton_->setIconSize(QSize(25, 25));
   layer_handle_->lockButton_->setCheckable(true);
   layer_handle_->lockButton_->setChecked(false);
@@ -545,6 +693,7 @@ LayerManagerWidget::add_layer( const QString &label )
   QFont font1;
   font1.setPointSize(12);
   layer_handle_->brightnessLabel->setFont(font1);
+  layer_handle_->brightnessLabel->setText("Brightness:");
   
   layer_handle_->brightnessHLayout->addWidget(layer_handle_->brightnessLabel);
   
@@ -567,6 +716,7 @@ LayerManagerWidget::add_layer( const QString &label )
   layer_handle_->contrastLabel = new QLabel(layer_handle_->brightContrastBar);
   layer_handle_->contrastLabel->setObjectName(QString::fromUtf8("contrastLabel"));
   layer_handle_->contrastLabel->setFont(font1);
+  layer_handle_->contrastLabel->setText("Contrast:");
   
   layer_handle_->contrastHLayout->addWidget(layer_handle_->contrastLabel);
   
@@ -604,13 +754,11 @@ LayerManagerWidget::add_layer( const QString &label )
   layer_handle_->horizontalLayout_14->setContentsMargins(11, 11, 11, 11);
   layer_handle_->horizontalLayout_14->setObjectName(QString::fromUtf8("horizontalLayout_14"));
   layer_handle_->horizontalLayout_14->setContentsMargins(5, 0, 0, 0);
+  
   layer_handle_->color_button_01_ = new QToolButton(layer_handle_->colorChooseBar);
   layer_handle_->color_button_01_->setObjectName(QString::fromUtf8("color_button_01_"));
   layer_handle_->color_button_01_->setMinimumSize(QSize(16, 16));
   layer_handle_->color_button_01_->setMaximumSize(QSize(16, 16));
-  QIcon icon7;
-  icon7.addFile(QString::fromUtf8(":/new/prefix1/show_info.png"), QSize(), QIcon::Normal, QIcon::Off);
-  layer_handle_->color_button_01_->setIcon(icon7);
   layer_handle_->color_button_01_->setIconSize(QSize(25, 25));
   
   layer_handle_->horizontalLayout_14->addWidget(layer_handle_->color_button_01_);
@@ -619,7 +767,6 @@ LayerManagerWidget::add_layer( const QString &label )
   layer_handle_->color_button_02_->setObjectName(QString::fromUtf8("color_button_02_"));
   layer_handle_->color_button_02_->setMinimumSize(QSize(16, 16));
   layer_handle_->color_button_02_->setMaximumSize(QSize(16, 16));
-  layer_handle_->color_button_02_->setIcon(icon7);
   layer_handle_->color_button_02_->setIconSize(QSize(25, 25));
   
   layer_handle_->horizontalLayout_14->addWidget(layer_handle_->color_button_02_);
@@ -628,7 +775,6 @@ LayerManagerWidget::add_layer( const QString &label )
   layer_handle_->color_button_03_->setObjectName(QString::fromUtf8("color_button_03_"));
   layer_handle_->color_button_03_->setMinimumSize(QSize(16, 16));
   layer_handle_->color_button_03_->setMaximumSize(QSize(16, 16));
-  layer_handle_->color_button_03_->setIcon(icon7);
   layer_handle_->color_button_03_->setIconSize(QSize(25, 25));
   
   layer_handle_->horizontalLayout_14->addWidget(layer_handle_->color_button_03_);
@@ -637,7 +783,6 @@ LayerManagerWidget::add_layer( const QString &label )
   layer_handle_->color_button_04_->setObjectName(QString::fromUtf8("color_button_04_"));
   layer_handle_->color_button_04_->setMinimumSize(QSize(16, 16));
   layer_handle_->color_button_04_->setMaximumSize(QSize(16, 16));
-  layer_handle_->color_button_04_->setIcon(icon7);
   layer_handle_->color_button_04_->setIconSize(QSize(25, 25));
   
   layer_handle_->horizontalLayout_14->addWidget(layer_handle_->color_button_04_);
@@ -646,7 +791,6 @@ LayerManagerWidget::add_layer( const QString &label )
   layer_handle_->color_button_05_->setObjectName(QString::fromUtf8("color_button_05_"));
   layer_handle_->color_button_05_->setMinimumSize(QSize(16, 16));
   layer_handle_->color_button_05_->setMaximumSize(QSize(16, 16));
-  layer_handle_->color_button_05_->setIcon(icon7);
   layer_handle_->color_button_05_->setIconSize(QSize(25, 25));
   
   layer_handle_->horizontalLayout_14->addWidget(layer_handle_->color_button_05_);
@@ -655,7 +799,6 @@ LayerManagerWidget::add_layer( const QString &label )
   layer_handle_->color_button_06_->setObjectName(QString::fromUtf8("color_button_06_"));
   layer_handle_->color_button_06_->setMinimumSize(QSize(16, 16));
   layer_handle_->color_button_06_->setMaximumSize(QSize(16, 16));
-  layer_handle_->color_button_06_->setIcon(icon7);
   layer_handle_->color_button_06_->setIconSize(QSize(25, 25));
   
   layer_handle_->horizontalLayout_14->addWidget(layer_handle_->color_button_06_);
@@ -664,7 +807,6 @@ LayerManagerWidget::add_layer( const QString &label )
   layer_handle_->color_button_07_->setObjectName(QString::fromUtf8("color_button_07_"));
   layer_handle_->color_button_07_->setMinimumSize(QSize(16, 16));
   layer_handle_->color_button_07_->setMaximumSize(QSize(16, 16));
-  layer_handle_->color_button_07_->setIcon(icon7);
   layer_handle_->color_button_07_->setIconSize(QSize(25, 25));
   
   layer_handle_->horizontalLayout_14->addWidget(layer_handle_->color_button_07_);
@@ -673,7 +815,6 @@ LayerManagerWidget::add_layer( const QString &label )
   layer_handle_->color_button_08_->setObjectName(QString::fromUtf8("color_button_08_"));
   layer_handle_->color_button_08_->setMinimumSize(QSize(16, 16));
   layer_handle_->color_button_08_->setMaximumSize(QSize(16, 16));
-  layer_handle_->color_button_08_->setIcon(icon7);
   layer_handle_->color_button_08_->setIconSize(QSize(25, 25));
   
   layer_handle_->horizontalLayout_14->addWidget(layer_handle_->color_button_08_);
@@ -682,7 +823,6 @@ LayerManagerWidget::add_layer( const QString &label )
   layer_handle_->color_button_09_->setObjectName(QString::fromUtf8("color_button_09_"));
   layer_handle_->color_button_09_->setMinimumSize(QSize(16, 16));
   layer_handle_->color_button_09_->setMaximumSize(QSize(16, 16));
-  layer_handle_->color_button_09_->setIcon(icon7);
   layer_handle_->color_button_09_->setIconSize(QSize(25, 25));
   
   layer_handle_->horizontalLayout_14->addWidget(layer_handle_->color_button_09_);
@@ -691,7 +831,6 @@ LayerManagerWidget::add_layer( const QString &label )
   layer_handle_->color_button_10_->setObjectName(QString::fromUtf8("color_button_10_"));
   layer_handle_->color_button_10_->setMinimumSize(QSize(16, 16));
   layer_handle_->color_button_10_->setMaximumSize(QSize(16, 16));
-  layer_handle_->color_button_10_->setIcon(icon7);
   layer_handle_->color_button_10_->setIconSize(QSize(25, 25));
   
   layer_handle_->horizontalLayout_14->addWidget(layer_handle_->color_button_10_);
@@ -700,7 +839,6 @@ LayerManagerWidget::add_layer( const QString &label )
   layer_handle_->color_button_11_->setObjectName(QString::fromUtf8("color_button_11_"));
   layer_handle_->color_button_11_->setMinimumSize(QSize(16, 16));
   layer_handle_->color_button_11_->setMaximumSize(QSize(16, 16));
-  layer_handle_->color_button_11_->setIcon(icon7);
   layer_handle_->color_button_11_->setIconSize(QSize(25, 25));
   
   layer_handle_->horizontalLayout_14->addWidget(layer_handle_->color_button_11_);
@@ -709,7 +847,6 @@ LayerManagerWidget::add_layer( const QString &label )
   layer_handle_->color_button_12_->setObjectName(QString::fromUtf8("color_button_12_"));
   layer_handle_->color_button_12_->setMinimumSize(QSize(16, 16));
   layer_handle_->color_button_12_->setMaximumSize(QSize(16, 16));
-  layer_handle_->color_button_12_->setIcon(icon7);
   layer_handle_->color_button_12_->setIconSize(QSize(25, 25));
   
   layer_handle_->horizontalLayout_14->addWidget(layer_handle_->color_button_12_);
@@ -719,22 +856,59 @@ LayerManagerWidget::add_layer( const QString &label )
   
   
   layer_handle_->verticalLayout_2->addLayout(layer_handle_->colorHLayout);
+  layer_handle_->colorChooseBar->hide();
+  layer_handle_->brightContrastBar->hide();
   
-  group_layout_->addWidget(layer_handle_->layer_, 0, Qt::AlignTop|Qt::AlignCenter);
-
-
+  layer_list_.append(layer_handle_);
+  
+  QList<GroupHandle>::iterator it = group_list_.begin();
+  QList<GroupHandle>::iterator it_end = group_list_.end();
+  
+  bool found_it = false;
+  while( it != it_end )
+  {
+    if ((*it)->activate_button_->text() == dimensions)
+    {
+      (*it)->verticalLayout_2->addWidget(layer_handle_->layer_, 0, Qt::AlignTop|Qt::AlignCenter);
+      layer_handle_->container_group_ = (*it);
+      found_it = true;
+    }
+    ++it;    
+  }
+  
+  if (!found_it) {
+    new_group(dimensions);
+    it = group_list_.begin();
+    it_end = group_list_.end();
+    
+    while( it != it_end )
+    {
+      if ((*it)->activate_button_->text() == dimensions)
+      {
+        (*it)->verticalLayout_2->addWidget(layer_handle_->layer_, 0, Qt::AlignTop|Qt::AlignCenter);
+        layer_handle_->container_group_ = (*it);
+      }
+      ++it;    
+    }
+    
+  }
+  
 }
+  
+
   
 void
 //LayerManagerWidget::new_group( const QString &dimensions, boost::function<void ()> close_function )
 
-LayerManagerWidget::new_group( const QString &dimensions ){
+LayerManagerWidget::new_group( const QString &dimensions )
+{
   
   GroupHandle group_handle(new Group);
-  group_handle->page_ = new QWidget;
+  
   
   //  --- Begin QT Widget Design --- //
   
+  group_handle->page_ = new QWidget;
   group_handle->page_->setStyleSheet(QString::fromUtf8("QPushButton#activate_button_{\n"
                                         " \n"
                                         " margin-right: 7px;\n"
@@ -760,7 +934,7 @@ LayerManagerWidget::new_group( const QString &dimensions ){
                                         " border-radius: 4px;\n"
                                         " border: 1px solid gray;\n"
                                         " \n"
-                                        " background-image: url(:/new/images/stripe_light.png) repeat;\n"
+                                        " background-color: gray;\n"
                                         "}\n"
                                         "\n"
                                         "\n"
@@ -791,14 +965,9 @@ LayerManagerWidget::new_group( const QString &dimensions ){
                                         "}"));
   
   group_handle->page_->setObjectName(QString::fromUtf8("group_handle->page_"));
-  group_handle->page_->setGeometry(QRect(4, 4, 215, 167));
-  QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+  QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
   sizePolicy.setHorizontalStretch(0);
   sizePolicy.setVerticalStretch(0);
-  sizePolicy.setHeightForWidth(group_handle->page_->sizePolicy().hasHeightForWidth());
-  group_handle->page_->setSizePolicy(sizePolicy);
-  group_handle->page_->setMinimumSize(QSize(215, 167));
-  group_handle->page_->setMaximumSize(QSize(215, 167));
   group_handle->verticalLayout_5 = new QVBoxLayout(group_handle->page_);
   group_handle->verticalLayout_5->setSpacing(0);
   group_handle->verticalLayout_5->setContentsMargins(0, 0, 0, 0);
@@ -830,12 +999,17 @@ LayerManagerWidget::new_group( const QString &dimensions ){
   group_handle->open_button_->setObjectName(QString::fromUtf8("open_button_"));
   group_handle->open_button_->setMinimumSize(QSize(21, 21));
   group_handle->open_button_->setMaximumSize(QSize(21, 21));
+  group_handle->open_button_->setCheckable(true);
+  group_handle->open_button_->setChecked(true);
+  
   QIcon icon;
   icon.addFile(QString::fromUtf8(":/new/images/OpenWhite.png"), QSize(), QIcon::Normal, QIcon::Off);
   group_handle->open_button_->setIcon(icon);
   group_handle->open_button_->setIconSize(QSize(18, 18));
   
   group_handle->horizontalLayout->addWidget(group_handle->open_button_);
+  
+  connect(group_handle->open_button_, SIGNAL(clicked(bool)), this, SLOT(hide_show_group_layers(bool)));
   
   group_handle->activate_button_ = new QPushButton(group_handle->header_);
   group_handle->activate_button_->setObjectName(QString::fromUtf8("activate_button_"));
@@ -846,6 +1020,8 @@ LayerManagerWidget::new_group( const QString &dimensions ){
   group_handle->activate_button_->setCheckable(false);
   group_handle->activate_button_->setFlat(true);
   group_handle->activate_button_->setText(dimensions);
+  
+  connect(group_handle->activate_button_, SIGNAL(clicked()), this, SLOT(activate_group_button_clicked()));
   
   group_handle->horizontalLayout->addWidget(group_handle->activate_button_);
   
@@ -928,7 +1104,6 @@ LayerManagerWidget::set_active_layer(int index)
     if(it != layer_list_.end())
     {
       //set_active_layer( (*it)->???);
-      //SCI_LOG_MESSAGE("the index is -1 so i am setting it to 0");
     }
     active_layer_index_ = 0;
   }

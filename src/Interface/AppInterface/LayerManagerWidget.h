@@ -63,10 +63,11 @@ private:
   
   class Group 
   {
+      
+    
     // Private subclass for the groups
     public:
     
-      //std::string *name_;
       QWidget *page_;
       QVBoxLayout *verticalLayout_5;
       QWidget *background_group_;
@@ -79,13 +80,7 @@ private:
       QToolButton *close_button_;
       QFrame *group_frame_;
       QVBoxLayout *verticalLayout_2;
-      
-    
-//      inline bool operator==(const Group& other) const
-//      {
-//        //return name_ == other.name_;
-//      }
-    
+   
   };
    
   typedef QSharedPointer<Group> GroupHandle;
@@ -96,6 +91,7 @@ private:
   {
     public:
       std::string *name_;
+      std::string *color_;
       QWidget *layer_;
       QVBoxLayout *verticalLayout_2;
       QWidget *background_;
@@ -140,7 +136,7 @@ private:
       QToolButton *color_button_10_;
       QToolButton *color_button_11_;
       QToolButton *color_button_12_;
-      Group *container_group_;
+      QSharedPointer<Group> container_group_;
     
     
   };
@@ -172,13 +168,32 @@ private:
   QIcon active_new_icon_;    
   QIcon inactive_new_icon_;
   
+  QIcon mask_icon_;
+  QIcon label_icon_;
+  QIcon data_icon_;
+  QIcon border_icon_;
+  QIcon brightness_icon_;
+  QIcon volume_visible_icon_;
+  QIcon isosurface_visible_icon_;
+  QIcon isosurface_computer_icon_;
+  QIcon lock_icon_;
+  
+   
+private Q_SLOTS:
+  void hide_show_brightness_contrast_bar(bool);
+  void hide_show_color_choose_bar(bool);
+  void hide_show_group_layers(bool);
+  void activate_group_button_clicked();
+  void activate_layer_button_clicked();
+  
+  
 public:
   
   LayerManagerWidget(QWidget* parent=0);
   virtual ~LayerManagerWidget();
   
   //void add_layer( layer_type type, const QString &label, boost::function<void()>, Group &container_group );
-  void add_layer( const QString &label );
+  void add_layer( layer_type type, const QString &label, const QString &dimensions );
   //void new_group( const QString &dimensions, boost::function<void()> );
   void new_group( const QString &dimensions );
   void remove_mask_layer(int);

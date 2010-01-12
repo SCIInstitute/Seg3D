@@ -138,7 +138,7 @@ ToolBoxWidget::add_tool(QWidget * tool, const QString &label, boost::function<vo
   page_handle->vLayout_->setSpacing(1);
   page_handle->vLayout_->setContentsMargins(0, 0, 0, 0);
   page_handle->vLayout_->setObjectName(QString::fromUtf8("vLayout_"));
-  page_handle->vLayout_->setContentsMargins(0, 0, 0, 0);
+  //page_handle->vLayout_->setContentsMargins(0, 0, 0, 0);
   page_handle->background_ = new QWidget(page_handle->page_);
   page_handle->background_->setObjectName(QString::fromUtf8("background_"));
   QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);

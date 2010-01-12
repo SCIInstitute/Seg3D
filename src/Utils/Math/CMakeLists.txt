@@ -40,4 +40,5 @@ SET(UTILS_MATH_SRCS
 ##################################################
 
 ADD_LIBRARY(Utils_Math STATIC ${UTILS_MATH_SRCS})
+TARGET_LINK_LIBRARIES(Utils_Math ${SCI_BOOST_LIBRARY})
 
