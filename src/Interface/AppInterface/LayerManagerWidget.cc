@@ -103,9 +103,14 @@ LayerManagerWidget::LayerManagerWidget(QWidget* parent) :
   ///////////////  Testing Stuff //////
   new_group("450x900x500");
   
+  // test adding a layer with a group that exists
   add_layer(data_layer, "green_footed_lemur_fetus", "450x900x500");
   add_layer(mask_layer, "blue_footed_lemur_fetus", "450x900x500");
+  
+  // test adding a layer to a group that doesnt exist
   add_layer(label_layer, "peace_pipe", "200x1800x200");
+  
+  new_group("234x654x432");
   
 }
   
@@ -139,8 +144,8 @@ LayerManagerWidget::hide_show_brightness_contrast_bar(bool hideshow)
 void
 LayerManagerWidget::hide_show_color_choose_bar(bool hideshow)
 {
-  SCI_LOG_MESSAGE("Hide show color choose bar button has been clicked.");
   QToolButton *hide_show_button = ::qobject_cast<QToolButton*>(sender());
+  
   
   for (LayerList::ConstIterator i = layer_list_.constBegin(); i != layer_list_.constEnd(); i++)
   {
@@ -186,6 +191,7 @@ void
 LayerManagerWidget::activate_group_button_clicked()
 {
   QPushButton *active_button = ::qobject_cast<QPushButton*>(sender());
+  int group_index = 0;
   
   for (GroupList::ConstIterator i = group_list_.constBegin(); i != group_list_.constEnd(); i++)
   {
@@ -196,6 +202,8 @@ LayerManagerWidget::activate_group_button_clicked()
     else 
     {
       (*i)->background_group_->setStyleSheet(QString::fromUtf8("QWidget#background_group_ { background-color: rgb(255, 128, 0); }"));
+      active_group_index_ = group_index;
+      Q_EMIT active_group_changed(group_index);
     }
 
   }
@@ -205,6 +213,8 @@ void
 LayerManagerWidget::activate_layer_button_clicked()
 {
   QPushButton *active_button = ::qobject_cast<QPushButton*>(sender());
+  int layer_index = 0;
+  int group_index = 0;
   
   for (LayerList::ConstIterator i = layer_list_.constBegin(); i != layer_list_.constEnd(); i++)
   {
@@ -219,15 +229,20 @@ LayerManagerWidget::activate_layer_button_clicked()
         else 
         {
           (*j)->background_group_->setStyleSheet(QString::fromUtf8("QWidget#background_group_ { background-color: rgb(255, 128, 0); }"));
+          active_group_index_ = group_index;
+          Q_EMIT active_group_changed(group_index);
         }
+        group_index++;
       }
+      active_layer_index_ = layer_index;
+      Q_EMIT active_layer_changed(layer_index);
     }
+    layer_index++;
   }
 }
   
   
 void 
-//LayerManagerWidget::add_layer( layer_type type, const QString &label, boost::function<void ()> close_function, Group &container_group )
 LayerManagerWidget::add_layer( layer_type type, const QString &label, const QString &dimensions )
 {
   LayerHandle layer_handle_(new Layer);
@@ -865,6 +880,7 @@ LayerManagerWidget::add_layer( layer_type type, const QString &label, const QStr
   QList<GroupHandle>::iterator it_end = group_list_.end();
   
   bool found_it = false;
+  int group_counter = 0;
   while( it != it_end )
   {
     if ((*it)->activate_button_->text() == dimensions)
@@ -873,7 +889,7 @@ LayerManagerWidget::add_layer( layer_type type, const QString &label, const QStr
       layer_handle_->container_group_ = (*it);
       found_it = true;
     }
-    ++it;    
+    ++it; group_counter++;
   }
   
   if (!found_it) {
@@ -896,10 +912,7 @@ LayerManagerWidget::add_layer( layer_type type, const QString &label, const QStr
 }
   
 
-  
 void
-//LayerManagerWidget::new_group( const QString &dimensions, boost::function<void ()> close_function )
-
 LayerManagerWidget::new_group( const QString &dimensions )
 {
   
@@ -1070,7 +1083,7 @@ LayerManagerWidget::new_group( const QString &dimensions )
 
 
 void
-LayerManagerWidget::remove_mask_layer(int index)
+LayerManagerWidget::remove_layer(int index)
 {
   
 }
@@ -1098,6 +1111,7 @@ LayerManagerWidget::set_active_layer(int index)
     }
     
     active_layer_index_ = index;
+    Q_EMIT active_layer_changed(active_layer_index_);
   }
   else if(index < 0)
   {
@@ -1106,6 +1120,7 @@ LayerManagerWidget::set_active_layer(int index)
       //set_active_layer( (*it)->???);
     }
     active_layer_index_ = 0;
+    Q_EMIT active_layer_changed(active_layer_index_);
   }
 
 }
@@ -1133,6 +1148,7 @@ LayerManagerWidget::set_active_group(int index)
     }
     
     active_group_index_ = index;
+    Q_EMIT active_group_changed(active_group_index_);
   }
   else if(index < 0)
   {
@@ -1142,6 +1158,7 @@ LayerManagerWidget::set_active_group(int index)
       //SCI_LOG_MESSAGE("the index is -1 so i am setting it to 0");
     }
     active_group_index_ = 0;
+    Q_EMIT active_group_changed(active_group_index_);
   }
   
   

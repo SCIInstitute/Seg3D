@@ -50,7 +50,7 @@ class LayerManagerWidget : public QScrollArea
   
 Q_SIGNALS:
   void active_group_changed( int index );
-  void active_layer_changec( int group_index );
+  void active_layer_changed( int index );
   
 public:
   enum layer_type{
@@ -192,11 +192,10 @@ public:
   LayerManagerWidget(QWidget* parent=0);
   virtual ~LayerManagerWidget();
   
-  //void add_layer( layer_type type, const QString &label, boost::function<void()>, Group &container_group );
   void add_layer( layer_type type, const QString &label, const QString &dimensions );
-  //void new_group( const QString &dimensions, boost::function<void()> );
   void new_group( const QString &dimensions );
-  void remove_mask_layer(int);
+  
+  void remove_layer(int);
   
   inline int get_active_layer_index(){ return active_layer_index_; }
   inline int get_active_group_index(){ return active_group_index_; }
