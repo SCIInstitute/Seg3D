@@ -258,7 +258,7 @@ void ToolBoxWidget::set_active_tool( QWidget *tool )
         (*it)->close_button_->setIcon(inactive_close_icon_);
         (*it)->help_button_->setIcon(inactive_help_icon_);
         (*it)->tool_frame_->hide();
-        //main_->adjustSize();
+        
       }
     }
     ++it; 
@@ -297,12 +297,12 @@ void ToolBoxWidget::set_active_tool( QWidget *tool )
         (*it)->close_button_->setIcon(active_close_icon_);
         (*it)->help_button_->setIcon(active_help_icon_);
         (*it)->tool_frame_->show();
-        //main_->adjustSize();
+        
       }
     }
     ++it; index++; 
   }
-  main_->adjustSize();
+  //main_->adjustSize();
   Q_EMIT currentChanged (active_index_);
 }
   
@@ -385,7 +385,7 @@ void ToolBoxWidget::remove_tool(int index)
          
       (*it)->page_->deleteLater();
       tool_list_.removeAt(index);
-      //main_->adjustSize();
+     
     }
     ++it; counter++;
   }
@@ -393,7 +393,7 @@ void ToolBoxWidget::remove_tool(int index)
   // Set the previous tool to active if the one to be deleted is active.
   if (active_index_ == index) { set_active_index(index-1); }
   
-  main_->adjustSize();
+  //main_->adjustSize();
   tool_removed(index);
 }
   

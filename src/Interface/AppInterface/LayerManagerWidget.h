@@ -93,18 +93,18 @@ private:
       std::string *name_;
       std::string *color_;
       QWidget *layer_;
-      QVBoxLayout *verticalLayout_2;
-      QWidget *background_;
-      QWidget *progress_bar_;
-      QWidget *layoutWidget;
-      QHBoxLayout *backgroundHLayout;
+      QVBoxLayout *verticalLayout_4;
+      QWidget *background_1;
+      QHBoxLayout *horizontalLayout_5;
+      QHBoxLayout *horizontalLayout_2;
       QWidget *typeBackground_;
+      QHBoxLayout *horizontalLayout;
       QWidget *typeGradient_;
       QHBoxLayout *horizontalLayout_9;
       QToolButton *colorChooseButton_;
       QVBoxLayout *verticalLayout;
       QPushButton *label_;
-      QHBoxLayout *toolButtonHLayout_;
+      QHBoxLayout *horizontalLayout_7;
       QToolButton *fillOpacityButton_;
       QToolButton *brightContrastButton_;
       QToolButton *visibleButton_;
@@ -112,18 +112,20 @@ private:
       QToolButton *computeIsoSurfaceButton_;
       QToolButton *volumeTargetButton_;
       QToolButton *lockButton_;
-      QHBoxLayout *brightContrastHLayout;
       QWidget *brightContrastBar;
-      QVBoxLayout *verticalLayout_6;
-      QHBoxLayout *brightnessHLayout;
-      QLabel *brightnessLabel;
-      QSlider *brightnessSlider;
-      QHBoxLayout *contrastHLayout;
-      QLabel *contrastLabel;
-      QSlider *contrastSlider;
-      QHBoxLayout *colorHLayout;
+      QHBoxLayout *horizontalLayout_3;
+      QVBoxLayout *verticalLayout_2;
+      QFrame *line;
+      QHBoxLayout *horizontalLayout_11;
+      QLabel *brightnessLabel_;
+      QSlider *horizontalSlider_5;
+      QHBoxLayout *horizontalLayout_12;
+      QLabel *contrastLabel_;
+      QSlider *horizontalSlider_6;
       QWidget *colorChooseBar;
-      QHBoxLayout *horizontalLayout_14;
+      QVBoxLayout *verticalLayout_3;
+      QFrame *line_2;
+      QHBoxLayout *horizontalLayout_4;
       QToolButton *color_button_01_;
       QToolButton *color_button_02_;
       QToolButton *color_button_03_;
@@ -135,7 +137,7 @@ private:
       QToolButton *color_button_09_;
       QToolButton *color_button_10_;
       QToolButton *color_button_11_;
-      QToolButton *color_button_12_;
+      QToolButton *color_button_12_;    
       QSharedPointer<Group> container_group_;
     
     
@@ -175,7 +177,7 @@ private:
   QIcon brightness_icon_;
   QIcon volume_visible_icon_;
   QIcon isosurface_visible_icon_;
-  QIcon isosurface_computer_icon_;
+  QIcon isosurface_compute_icon_;
   QIcon lock_icon_;
   
    
