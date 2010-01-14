@@ -1,5 +1,7 @@
 <RCC>
     <qresource prefix="/">
+        <file>Images/Add.png</file>
+        <file>Images/AddWhite.png</file>
         <file>Images/AutoView.png</file>
         <file>Images/AutoViewOff.png</file>
         <file>Images/Border.png</file>
