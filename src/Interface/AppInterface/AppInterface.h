@@ -37,6 +37,7 @@
 #include <QtGui>
 #include <QMainWindow>
 #include <QDockWidget>
+#include <QPointer>
 
 // Boost includes
 #include <boost/thread/mutex.hpp>
@@ -120,10 +121,10 @@ class AppInterface : public QMainWindow
   public:
     
     // Reopen a specific window after the user has closed it
-    static void HandleShowWindow(QPointer<AppInterface> interface, std::string windowid);
+    static void HandleShowWindow(QPointer<AppInterface> app_interface, std::string windowid);
 
     // Close a dock or a window
-    static void HandleCloseWindow(QPointer<AppInterface> interface, std::string windowid);
+    static void HandleCloseWindow(QPointer<AppInterface> app_interface, std::string windowid);
 };
 
 } //end namespace

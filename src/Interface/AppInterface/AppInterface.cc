@@ -74,13 +74,13 @@ AppInterface::AppInterface()
   application_menu_ = new AppMenu(this, viewer_interface_);
   status_bar_ = new AppStatusBar(this);
   
-  QPointer<AppInterface> interface(this);
+  QPointer<AppInterface> app_interface(this);
   
   InterfaceManager::Instance()->show_window_signal.connect(boost::bind(
-    AppInterface::HandleShowWindow,interface,_1));
+    AppInterface::HandleShowWindow,app_interface,_1));
 
   InterfaceManager::Instance()->close_window_signal.connect(boost::bind(
-    AppInterface::HandleCloseWindow,interface,_1));
+    AppInterface::HandleCloseWindow,app_interface,_1));
 
   // set the viewer_interface_ to a default view of 1 and 3
   viewer_interface_->set_views(1,3);
@@ -287,33 +287,33 @@ AppInterface::addDockWidget(Qt::DockWidgetArea area, QDockWidget* dock_widget)
 }
 
 void 
-AppInterface::HandleShowWindow(QPointer<AppInterface> interface, 
+AppInterface::HandleShowWindow(QPointer<AppInterface> app_interface, 
                                std::string windowid)
 {
   // Ensure that this request is forwarded to the interface thread
   if (!(Interface::IsInterfaceThread()))
   {
-    PostInterface(boost::bind(&AppInterface::HandleShowWindow,interface,windowid));
+    PostInterface(boost::bind(&AppInterface::HandleShowWindow,app_interface,windowid));
     return;
   }
 
   SCI_LOG_DEBUG(std::string("Show window ")+windowid);
 
-  if (!(interface.isNull())) interface->show_window(windowid);
+  if (!(app_interface.isNull())) app_interface->show_window(windowid);
 }
 
 void 
-AppInterface::HandleCloseWindow(QPointer<AppInterface> interface, 
+AppInterface::HandleCloseWindow(QPointer<AppInterface> app_interface, 
                                 std::string windowid)
 {
   // Ensure that this request is forwarded to the interface thread
   if (!(Interface::IsInterfaceThread()))
   {
-    PostInterface(boost::bind(&AppInterface::HandleCloseWindow,interface,windowid));
+    PostInterface(boost::bind(&AppInterface::HandleCloseWindow,app_interface,windowid));
     return;
   }
   
-  if (!(interface.isNull())) interface->close_window(windowid);
+  if (!(app_interface.isNull())) app_interface->close_window(windowid);
 }
 
 } //end namespace

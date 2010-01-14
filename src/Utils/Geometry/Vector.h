@@ -487,7 +487,7 @@ Vector::operator/(const double d) const
 inline VectorF 
 VectorF::operator/(const float d) const
 {
-  float s = 1.0/d;
+  float s = 1.0f/d;
   return VectorF(data_[0]*s, data_[1]*s, data_[2]*s);
 }
 

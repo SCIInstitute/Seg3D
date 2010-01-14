@@ -118,11 +118,11 @@ class Action : public Utils::IntrusiveBase {
 
     // IS_UNDOABLE:
     // Check whether the action is undoable
-    bool is_undoable() { return (UNDOABLE_E & properties()); }
+    bool is_undoable() { return ((UNDOABLE_E & properties()) != 0); }
 
     // IS_ASYNCHRONOUS:
     // Check whether this action is asynchronously
-    bool is_asynchronous() { return (ASYNCHRONOUS_E & properties()); }
+    bool is_asynchronous() { return ((ASYNCHRONOUS_E & properties()) != 0); }
 
     // NEED_UNDO:
     // Test whether an undo needs to be generated
