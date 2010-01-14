@@ -59,7 +59,7 @@ LayerManagerWidget::LayerManagerWidget(QWidget* parent) :
                                 QSize(), QIcon::Normal, QIcon::Off);
     
     mask_icon_.addFile(QString::fromUtf8(":/Images/MaskWhite_shadow.png"), QSize(), QIcon::Normal, QIcon::Off);
-    mask_icon_.addFile(QString::fromUtf8(":/Images/Mask.png"), QSize(), QIcon::Normal, QIcon::On);
+    //mask_icon_.addFile(QString::fromUtf8(":/Images/Mask.png"), QSize(), QIcon::Normal, QIcon::On);
     
     label_icon_.addFile(QString::fromUtf8(":/Images/LabelMapWhite.png"), QSize(), QIcon::Normal, QIcon::Off);
     data_icon_.addFile(QString::fromUtf8(":/Images/DataWhite.png"), QSize(), QIcon::Normal, QIcon::Off);
@@ -247,6 +247,66 @@ LayerManagerWidget::activate_layer_button_clicked()
   }
 }
   
+void
+  LayerManagerWidget::color_button_clicked()
+  {
+    QToolButton *color_button = ::qobject_cast<QToolButton*>(sender());
+    
+    for (LayerList::ConstIterator i = layer_list_.constBegin(); i != layer_list_.constEnd(); i++)
+    {
+      if ((*i)->color_button_01_ == color_button)
+      {
+        (*i)->typeBackground_->setStyleSheet(QString::fromUtf8("QWidget#typeBackground_{background-color: rgb(251,255,74);}"));
+      }
+      if ((*i)->color_button_02_ == color_button)
+      {
+        (*i)->typeBackground_->setStyleSheet(QString::fromUtf8("QWidget#typeBackground_{background-color: rgb(248,188,37);}"));
+      }
+      if ((*i)->color_button_03_ == color_button)
+      {
+        (*i)->typeBackground_->setStyleSheet(QString::fromUtf8("QWidget#typeBackground_{background-color: rgb(249,152,28);}"));
+      }
+      if ((*i)->color_button_04_ == color_button)
+      {
+        (*i)->typeBackground_->setStyleSheet(QString::fromUtf8("QWidget#typeBackground_{background-color: rgb(251,78,15);}"));
+      }
+      if ((*i)->color_button_05_ == color_button)
+      {
+        (*i)->typeBackground_->setStyleSheet(QString::fromUtf8("QWidget#typeBackground_{background-color: rgb(252,21,17);}"));
+      }
+      if ((*i)->color_button_06_ == color_button)
+      {
+        (*i)->typeBackground_->setStyleSheet(QString::fromUtf8("QWidget#typeBackground_{background-color: rgb(166,12,73);}"));
+      }
+      if ((*i)->color_button_07_ == color_button)
+      {
+        (*i)->typeBackground_->setStyleSheet(QString::fromUtf8("QWidget#typeBackground_{background-color: rgb(135,0,172);}"));
+      }
+      if ((*i)->color_button_08_ == color_button)
+      {
+        (*i)->typeBackground_->setStyleSheet(QString::fromUtf8("QWidget#typeBackground_{background-color: rgb(66,0,161);}"));
+      }
+      if ((*i)->color_button_09_ == color_button)
+      {
+        (*i)->typeBackground_->setStyleSheet(QString::fromUtf8("QWidget#typeBackground_{background-color: rgb(45,66,250);}"));
+      }
+      if ((*i)->color_button_10_ == color_button)
+      {
+        (*i)->typeBackground_->setStyleSheet(QString::fromUtf8("QWidget#typeBackground_{background-color: rgb(32,146,204);}"));
+      }
+      if ((*i)->color_button_11_ == color_button)
+      {
+        (*i)->typeBackground_->setStyleSheet(QString::fromUtf8("QWidget#typeBackground_{background-color: rgb(100,177,61);}"));
+      }
+      if ((*i)->color_button_12_ == color_button)
+      {
+        (*i)->typeBackground_->setStyleSheet(QString::fromUtf8("QWidget#typeBackground_{background-color: rgb(205,235,66);}"));
+      }
+      
+    }
+    
+  }
+  
   
 void 
 LayerManagerWidget::add_layer( layer_type type, const QString &label, const QString &dimensions )
@@ -255,12 +315,12 @@ LayerManagerWidget::add_layer( layer_type type, const QString &label, const QStr
     
   layer_handle_->layer_ = new QWidget;
   layer_handle_->layer_->setObjectName(QString::fromUtf8("layer_"));
-  layer_handle_->layer_->setGeometry(QRect(8, 10, 213, 144));
+  //layer_handle_->layer_->setGeometry(QRect(8, 10, 213, 144));
   QSizePolicy sizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
   sizePolicy.setHorizontalStretch(0);
   sizePolicy.setVerticalStretch(0);
-  sizePolicy.setHeightForWidth(layer_handle_->layer_->sizePolicy().hasHeightForWidth());
-  layer_handle_->layer_->setSizePolicy(sizePolicy);
+//  sizePolicy.setHeightForWidth(layer_handle_->layer_->sizePolicy().hasHeightForWidth());
+//  layer_handle_->layer_->setSizePolicy(sizePolicy);
   // Set Style Sheet for the layer Widget
   {
     layer_handle_->layer_->setStyleSheet(QString::fromUtf8("QWidget#progress_bar_{\n"
@@ -547,7 +607,7 @@ LayerManagerWidget::add_layer( layer_type type, const QString &label, const QStr
  
     layer_handle_->colorChooseButton_ = new QToolButton(layer_handle_->typeGradient_);
     layer_handle_->colorChooseButton_->setObjectName(QString::fromUtf8("colorChooseButton_"));
-    layer_handle_->colorChooseButton_->setIconSize(QSize(25, 25));
+    layer_handle_->colorChooseButton_->setIconSize(QSize(31, 42));
     layer_handle_->colorChooseButton_->setCheckable(true);
     layer_handle_->colorChooseButton_->setAutoRaise(false);
     
@@ -872,7 +932,18 @@ LayerManagerWidget::add_layer( layer_type type, const QString &label, const QStr
   connect(layer_handle_->colorChooseButton_, SIGNAL(clicked(bool)), this, SLOT(hide_show_color_choose_bar(bool)));
   connect(layer_handle_->label_, SIGNAL(clicked()), this, SLOT(activate_layer_button_clicked()));
   connect(layer_handle_->brightContrastButton_, SIGNAL(clicked(bool)), this, SLOT(hide_show_brightness_contrast_bar(bool)));
-  
+  connect(layer_handle_->color_button_01_, SIGNAL(clicked()), this, SLOT(color_button_clicked()));
+  connect(layer_handle_->color_button_02_, SIGNAL(clicked()), this, SLOT(color_button_clicked()));
+  connect(layer_handle_->color_button_03_, SIGNAL(clicked()), this, SLOT(color_button_clicked()));
+  connect(layer_handle_->color_button_04_, SIGNAL(clicked()), this, SLOT(color_button_clicked()));
+  connect(layer_handle_->color_button_05_, SIGNAL(clicked()), this, SLOT(color_button_clicked()));
+  connect(layer_handle_->color_button_06_, SIGNAL(clicked()), this, SLOT(color_button_clicked()));
+  connect(layer_handle_->color_button_07_, SIGNAL(clicked()), this, SLOT(color_button_clicked()));
+  connect(layer_handle_->color_button_08_, SIGNAL(clicked()), this, SLOT(color_button_clicked()));
+  connect(layer_handle_->color_button_09_, SIGNAL(clicked()), this, SLOT(color_button_clicked()));
+  connect(layer_handle_->color_button_10_, SIGNAL(clicked()), this, SLOT(color_button_clicked()));
+  connect(layer_handle_->color_button_11_, SIGNAL(clicked()), this, SLOT(color_button_clicked()));
+  connect(layer_handle_->color_button_12_, SIGNAL(clicked()), this, SLOT(color_button_clicked()));
 
   
 

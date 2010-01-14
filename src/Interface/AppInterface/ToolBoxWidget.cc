@@ -77,7 +77,7 @@ ToolBoxWidget::~ToolBoxWidget()
   
 
 void 
-ToolBoxWidget::add_tool(QWidget * tool, const QString &label, boost::function<void ()> close_function)
+ToolBoxWidget::add_tool(QWidget * tool, const QString &label, boost::function<void ()> close_function, boost::function<void ()> activate_function)
 {
   if ( !tool ) return;
   
@@ -168,6 +168,10 @@ ToolBoxWidget::add_tool(QWidget * tool, const QString &label, boost::function<vo
   page_handle->activate_button_->setCheckable(false);
   page_handle->activate_button_->setFlat(true);
   page_handle->hLayout_->addWidget(page_handle->activate_button_);
+  
+  QtBridge::connect(page_handle->activate_button_, activate_function);
+  
+  
   page_handle->help_button_ = new QToolButton(page_handle->header_);
   page_handle->help_button_->setObjectName(QString::fromUtf8("help_button_"));
   
@@ -211,7 +215,7 @@ ToolBoxWidget::add_tool(QWidget * tool, const QString &label, boost::function<vo
   //  --- End QT Widget Design --- //
   
   // Begin Connections 
-  connect(page_handle->activate_button_, SIGNAL( clicked() ), this, SLOT(activate_button_clicked()));
+  //connect(page_handle->activate_button_, SIGNAL( clicked() ), this, SLOT(activate_button_clicked()));
   connect(page_handle->help_button_, SIGNAL( clicked() ), this, SLOT(help_button_clicked()));
   
   connect(tool, SIGNAL(destroyed(QObject*)), this, SLOT(itemDestroyed(QObject*)));
@@ -258,7 +262,6 @@ void ToolBoxWidget::set_active_tool( QWidget *tool )
         (*it)->close_button_->setIcon(inactive_close_icon_);
         (*it)->help_button_->setIcon(inactive_help_icon_);
         (*it)->tool_frame_->hide();
-        
       }
     }
     ++it; 
@@ -281,7 +284,6 @@ void ToolBoxWidget::set_active_tool( QWidget *tool )
         //set the size of the active page as well as the color of its header
         (*it)->background_->setStyleSheet(QString::fromUtf8(
                     "QWidget#background_ { background-color: rgb(255, 128, 0); }"));
-
         (*it)->activate_button_->setStyleSheet(QString::fromUtf8(
                                       "QPushButton{\n"
                                       " \n"
@@ -293,16 +295,15 @@ void ToolBoxWidget::set_active_tool( QWidget *tool )
                                       " font: bold;\n"
                                       "\n"
                                       "}\n"));  
+        
         ///  ---  This is where we add the icon's for the help button --- //
         (*it)->close_button_->setIcon(active_close_icon_);
         (*it)->help_button_->setIcon(active_help_icon_);
         (*it)->tool_frame_->show();
-        
       }
     }
     ++it; index++; 
   }
-  //main_->adjustSize();
   Q_EMIT currentChanged (active_index_);
 }
   
@@ -335,9 +336,6 @@ void ToolBoxWidget::set_active_index( int index )
   // Find the index that corresponds to the tool
   QList<PageHandle>::iterator it = tool_list_.begin();
   QList<PageHandle>::iterator it_end = tool_list_.end();
-  
-  
-  
 
   if (index >= 0) 
   {
@@ -404,22 +402,22 @@ void ToolBoxWidget::tool_removed(int index)
 }
   
 // slot for activate button  
-void ToolBoxWidget::activate_button_clicked()
-{
-  QPushButton *activate_button = ::qobject_cast<QPushButton*>(sender());
-  QWidget* item =0;
-    for ( PageList::ConstIterator i = tool_list_.constBegin(); i != tool_list_.constEnd(); ++i )
-    {
-     if ((*i)->activate_button_ == activate_button ) 
-     {
-       item = (*i)->tool_;
-       break;
-     } 
-    }
-  set_active_tool( item );
-  SCI_LOG_MESSAGE("Activate button has been clicked.");
-  
-}
+//void ToolBoxWidget::activate_button_clicked()
+//{
+//  QPushButton *activate_button = ::qobject_cast<QPushButton*>(sender());
+//  QWidget* item =0;
+//    for ( PageList::ConstIterator i = tool_list_.constBegin(); i != tool_list_.constEnd(); ++i )
+//    {
+//     if ((*i)->activate_button_ == activate_button ) 
+//     {
+//       item = (*i)->tool_;
+//       break;
+//     } 
+//    }
+//  set_active_tool( item );
+//  SCI_LOG_MESSAGE("Activate button has been clicked.");
+//  
+//}
 
 
   

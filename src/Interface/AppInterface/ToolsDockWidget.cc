@@ -144,7 +144,8 @@ ToolsDockWidget::open_tool(ToolHandle tool)
 
   toolbox_->add_tool(widget,QString::fromStdString(tool->menu_name()
     +" "+Utils::to_string(tool->toolid_number())), 
-    boost::bind(&ActionCloseTool::Dispatch, tool->toolid()));
+    boost::bind(&ActionCloseTool::Dispatch, tool->toolid()),
+    boost::bind(&ActionActivateTool::Dispatch, tool->toolid()));
 
   tool_widget_list_[tool->toolid()] = widget;
   

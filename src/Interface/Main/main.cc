@@ -35,6 +35,7 @@
 // Core includes
 #include <Utils/Core/Log.h>
 #include <Utils/Core/LogHistory.h>
+#include <Utils/Core/Environment.h>
 
 // Application includes
 #include <Application/Application/Application.h>
@@ -60,6 +61,9 @@ using namespace Seg3D;
 
 int main(int argc, char **argv)
 {
+  
+
+  
   // -- Setup error logging --
   // stream error to the console window
   Utils::LogStreamer error_log(Utils::Log::ALL_E,&(std::cerr));
@@ -74,9 +78,20 @@ int main(int argc, char **argv)
   // -- Setup action history --
   SCI_LOG_DEBUG("Setup action history");
   Seg3D::ActionHistory::Instance()->set_max_history_size(300);
+  
+  
+  ///////////  TEST CODE FOR COMMAND LINE PARAMETERS ////////  
+  int socketNumber = 3000;
+  
+//  if(std::string(argv[1]) == "-s")
+//  {
+//  }
+  ///////////  END TEST CODE FOR COMMAND LINE PARAMETERS ////
 
   // -- Add a socket for receiving actions --
-  ActionSocket::Instance()->start(3000);
+  //ActionSocket::Instance()->start(3000);
+  SCI_LOG_DEBUG("Starting the socket");
+  ActionSocket::Instance()->start(socketNumber);
   
   // -- Add plugins into the architecture  
   SCI_LOG_DEBUG("Setup and register all the plugins");
@@ -136,8 +151,16 @@ int main(int argc, char **argv)
     SCI_LOG_ERROR(std::string("Setup of the interface crashed by throwing an unknown exception"));
     return(-1);
   }
-        
+  
   // Indicate a successful finish of the program
   SCI_LOG_MESSAGE("--- Finished ---");
   return (0);
+}
+
+// Function for parsing the command line parameters -- TEST ONLY
+int
+parse_command_line_parameters( int argc, char **argv)
+{
+  
+  return 0;
 }

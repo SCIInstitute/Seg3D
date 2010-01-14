@@ -134,7 +134,36 @@ private:
   // Function object
   boost::function<void ()> function_;
 };
-
+  
+class QtPushButtonSlot : public QObject {
+  Q_OBJECT
+  
+public:
+  
+  // Constructor
+  QtPushButtonSlot(QPushButton* parent, boost::function<void ()> function) :
+  QObject(parent),
+  function_(function)
+  {
+    // Qt's connect function
+    connect(parent,SIGNAL(clicked()),this,SLOT(slot()));
+  }
+  
+  // Virtual destructor: needed by Qt
+  virtual ~QtPushButtonSlot() {}
+  
+  public Q_SLOTS:
+  // Slot that Qt will call
+  void slot()
+  {
+    function_();
+  }
+  
+private:
+  // Function object
+  boost::function<void ()> function_;
+};
+  
 } //end namespace Seg3D
 
 #endif

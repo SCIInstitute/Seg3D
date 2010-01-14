@@ -187,6 +187,7 @@ private Q_SLOTS:
   void hide_show_group_layers(bool);
   void activate_group_button_clicked();
   void activate_layer_button_clicked();
+  void color_button_clicked();
   
   
 public:

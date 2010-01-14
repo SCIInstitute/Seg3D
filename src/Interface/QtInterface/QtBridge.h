@@ -49,7 +49,10 @@ class QtBridge : public boost::noncopyable {
     
     // Connect a QCheckBox to StateValue<bool>
     static bool connect(QCheckBox* qcheckbox, StateValue<bool>::Handle& state_handle);
+  
+    // Connect QToolButton & QPushButtons
     static bool connect(QToolButton* qtoolbutton, boost::function<void ()> function);
+    static bool connect(QPushButton* qpushbutton, boost::function<void ()> function);
 
 
 // -- menu connectors --

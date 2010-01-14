@@ -70,6 +70,17 @@ QtBridge::connect(QToolButton* qtoolbutton,
   return (true);
 }
 
+bool
+QtBridge::connect(QPushButton* qpushbutton, 
+                  boost::function<void ()> function)
+{
+  // Link tbe slot to the parent widget, so Qt's memory manager will
+  // manage this one.
+  new QtPushButtonSlot(qpushbutton,function);
+  
+  return (true);
+}
+
 // -- Tool menu connector --
 
 bool
