@@ -34,7 +34,7 @@
 namespace Seg3D {
 
 class PaintTool : public Tool {
-  SCI_TOOL_TYPE("PaintTool","Paint Brush","Alt+P",Tool::TOOL_E)
+  SCI_TOOL_TYPE("PaintTool","Paint Brush","Alt+P",Tool::TOOL_E, QUrl::fromEncoded("http://seg3d.org/"))
 // -- constructor/destructor --
   public:
     PaintTool(const std::string& toolid);

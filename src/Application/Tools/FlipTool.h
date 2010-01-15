@@ -34,7 +34,7 @@
 namespace Seg3D {
 
 class FlipTool : public Tool {
-  SCI_TOOL_TYPE("FlipTool","Flip/Rotate","Alt+F",Tool::TOOL_E)
+  SCI_TOOL_TYPE("FlipTool","Flip/Rotate","Alt+F",Tool::TOOL_E, QUrl::fromEncoded("http://seg3d.org/"))
 
 // -- constructor/destructor --
   public:

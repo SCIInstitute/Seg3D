@@ -35,6 +35,10 @@
 
 #include <Interface/QtInterface/QtBridge.h>
 
+// Qt includes
+#include <QUrl>
+#include <QDesktopServices>
+
 namespace Seg3D  {
     
 ToolBoxWidget::ToolBoxWidget(QWidget* parent) :
@@ -77,12 +81,13 @@ ToolBoxWidget::~ToolBoxWidget()
   
 
 void 
-ToolBoxWidget::add_tool(QWidget * tool, const QString &label, boost::function<void ()> close_function, boost::function<void ()> activate_function)
+ToolBoxWidget::add_tool(QWidget * tool, const QString &label, boost::function<void ()> close_function, boost::function<void ()> activate_function, QUrl help_url)
 {
   if ( !tool ) return;
   
   PageHandle page_handle(new Page);
   page_handle->tool_ = tool;
+  page_handle->url_ = help_url;
     
   //  --- Begin QT Widget Design --- //
   
@@ -169,7 +174,7 @@ ToolBoxWidget::add_tool(QWidget * tool, const QString &label, boost::function<vo
   page_handle->activate_button_->setFlat(true);
   page_handle->hLayout_->addWidget(page_handle->activate_button_);
   
-  QtBridge::connect(page_handle->activate_button_, activate_function);
+  
   
   
   page_handle->help_button_ = new QToolButton(page_handle->header_);
@@ -182,9 +187,8 @@ ToolBoxWidget::add_tool(QWidget * tool, const QString &label, boost::function<vo
   
   page_handle->hLayout_->addWidget(page_handle->help_button_);
   
-  ///  --- Create the close button and connect it to the close_function --- ///
   page_handle->close_button_ = new QToolButton(page_handle->header_);
-  QtBridge::connect(page_handle->close_button_, close_function);
+  
   page_handle->close_button_->setObjectName(QString::fromUtf8("close_button_"));
   
    ///  ---  This is where we add the icon's for the close button --- //
@@ -215,8 +219,9 @@ ToolBoxWidget::add_tool(QWidget * tool, const QString &label, boost::function<vo
   //  --- End QT Widget Design --- //
   
   // Begin Connections 
-  //connect(page_handle->activate_button_, SIGNAL( clicked() ), this, SLOT(activate_button_clicked()));
   connect(page_handle->help_button_, SIGNAL( clicked() ), this, SLOT(help_button_clicked()));
+  QtBridge::connect(page_handle->activate_button_, activate_function);
+  QtBridge::connect(page_handle->close_button_, close_function);
   
   connect(tool, SIGNAL(destroyed(QObject*)), this, SLOT(itemDestroyed(QObject*)));
   
@@ -306,6 +311,7 @@ void ToolBoxWidget::set_active_tool( QWidget *tool )
   }
   Q_EMIT currentChanged (active_index_);
 }
+  
   
 QSharedPointer<ToolBoxWidget::Page> ToolBoxWidget::page( QWidget *tool )
 {
@@ -401,25 +407,6 @@ void ToolBoxWidget::tool_removed(int index)
   Q_UNUSED(index)
 }
   
-// slot for activate button  
-//void ToolBoxWidget::activate_button_clicked()
-//{
-//  QPushButton *activate_button = ::qobject_cast<QPushButton*>(sender());
-//  QWidget* item =0;
-//    for ( PageList::ConstIterator i = tool_list_.constBegin(); i != tool_list_.constEnd(); ++i )
-//    {
-//     if ((*i)->activate_button_ == activate_button ) 
-//     {
-//       item = (*i)->tool_;
-//       break;
-//     } 
-//    }
-//  set_active_tool( item );
-//  SCI_LOG_MESSAGE("Activate button has been clicked.");
-//  
-//}
-
-
   
 void ToolBoxWidget:: help_button_clicked()
 {
@@ -430,11 +417,14 @@ void ToolBoxWidget:: help_button_clicked()
   QList<PageHandle>::iterator it = tool_list_.begin();
   QList<PageHandle>::iterator it_end = tool_list_.end();
   
+  //QUrl google = QString::fromUtf8("http://www.google.com");
+  //QDesktopServices::openUrl(QUrl::fromEncoded("http://www.google.com"));
+  
   while (it != it_end) 
   { 
     if ((*it)->help_button_ == help_button)
     {
-      //TODO add help dialog box
+      QDesktopServices::openUrl((*it)->url_);
     }
     ++it; counter++;
   }

@@ -53,7 +53,7 @@ class ToolBoxWidget : public QScrollArea
     ToolBoxWidget(QWidget* parent=0);
     virtual ~ToolBoxWidget();
     
-    void add_tool ( QWidget * tool, const QString & text, boost::function<void ()> close_function, boost::function<void ()> activate_function );
+    void add_tool ( QWidget * tool, const QString & text, boost::function<void ()> close_function, boost::function<void ()> activate_function, QUrl help_url );
     
     void remove_tool ( int index );
     
@@ -92,6 +92,8 @@ class ToolBoxWidget : public QScrollArea
         
         QFrame  *tool_frame_;
         QWidget *tool_;
+      
+        QUrl url_;
                 
         inline bool operator==(const Page& other) const
         {

@@ -45,6 +45,9 @@
 #include <Application/State/StateManager.h>
 #include <Application/State/StateHandler.h>
 
+// Qt includes
+#include <QUrl>
+
 namespace Seg3D {
 
 // CLASS TOOL:
@@ -80,6 +83,7 @@ class Tool : public StateHandler {
     virtual std::string menu_name() const = 0;
     virtual std::string shortcut_key() const = 0;
     virtual int         properties() const = 0;
+    virtual QUrl        url() const = 0;
     
     std::string toolid() const        { return toolid_; }
     int toolid_number() const         { return toolid_number_; }
@@ -145,17 +149,19 @@ class Tool : public StateHandler {
 // we only have a pointer to the base object. Hence we need virtual functions
 // as well. 
 
-#define SCI_TOOL_TYPE(type_string,menu_name_string,shortcut_key_string,properties_mask) \
+#define SCI_TOOL_TYPE(type_string,menu_name_string,shortcut_key_string,properties_mask,help_url) \
   public: \
     static std::string tool_type() { return Utils::string_to_lower(type_string); } \
     static std::string tool_menu_name() { return menu_name_string; } \
     static std::string tool_shortcut_key() { return shortcut_key_string; } \
     static int         tool_properties() { return properties_mask; } \
+    static QUrl        tool_url() { return help_url; } \
     \
     virtual std::string type() const { return tool_type(); } \
     virtual std::string menu_name() const { return tool_menu_name(); } \
     virtual std::string shortcut_key() const { return tool_shortcut_key(); } \
-    virtual int         properties() const { return tool_properties(); }
+    virtual int         properties() const { return tool_properties(); } \
+    virtual QUrl        url() const { return tool_url(); }
 
 
 } // end namespace Seg3D

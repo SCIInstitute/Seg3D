@@ -34,7 +34,7 @@
 namespace Seg3D  {
   
 class OtsuThresholdFilter : public Tool {
-  SCI_TOOL_TYPE("OtsuThresholdFilter","Otsu Threshold", "",Tool::DATATOMASK_E|Tool::FILTER_E)
+  SCI_TOOL_TYPE("OtsuThresholdFilter","Otsu Threshold", "",Tool::DATATOMASK_E|Tool::FILTER_E, QUrl::fromEncoded("http://seg3d.org/"))
   
 public:
   OtsuThresholdFilter(const std::string& toolid);

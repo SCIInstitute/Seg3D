@@ -124,8 +124,7 @@ LayerManagerWidget::~LayerManagerWidget()
 void
 LayerManagerWidget::hide_show_brightness_contrast_bar(bool hideshow)
 {
-  SCI_LOG_MESSAGE("Hide show brightness bar button has been clicked.");
-  QToolButton *hide_show_button = ::qobject_cast<QToolButton*>(sender());
+ QToolButton *hide_show_button = ::qobject_cast<QToolButton*>(sender());
   
   for (LayerList::ConstIterator i = layer_list_.constBegin(); i != layer_list_.constEnd(); i++)
   {
@@ -827,7 +826,9 @@ LayerManagerWidget::add_layer( layer_type type, const QString &label, const QStr
     
     layer_handle_->verticalLayout_3->addWidget(layer_handle_->line_2);
   
-  layer_handle_->horizontalLayout_4 = new QHBoxLayout(layer_handle_->colorChooseBar);
+  
+  layer_handle_->horizontalLayout_4 = new QHBoxLayout();
+
   layer_handle_->horizontalLayout_4->setSpacing(1);
   
   layer_handle_->color_button_01_ = new QToolButton(layer_handle_->colorChooseBar);

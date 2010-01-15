@@ -34,7 +34,7 @@
 namespace Seg3D  {
   
 class ThresholdSegmentationLSFilter : public Tool {
-  SCI_TOOL_TYPE("ThresholdSegmentationLSFilter","Segmentation Level Set", "",Tool::DATATOMASK_E|Tool::FILTER_E)
+  SCI_TOOL_TYPE("ThresholdSegmentationLSFilter","Segmentation Level Set", "",Tool::DATATOMASK_E|Tool::FILTER_E, QUrl::fromEncoded("http://seg3d.org/"))
    
 public:
   ThresholdSegmentationLSFilter(const std::string& toolid);

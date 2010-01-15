@@ -75,11 +75,11 @@ AnisotropicDiffusionFilterInterface::build_widget(QFrame* frame)
 void 
 AnisotropicDiffusionFilterInterface::makeConnections()
 {
-  connect(private_->ui_.activeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(senseActiveChanged(int)));
-  connect(iterationsAdjuster, SIGNAL(valueAdjusted(double)), this, SLOT(senseIterationsChanged(double)));
-  connect(stepAdjuster, SIGNAL(valueAdjusted(double)), this, SLOT(senseStepChanged(double)));
-  connect(conductanceAdjuster, SIGNAL(valueAdjusted(double)), this, SLOT(senseConductanceChanged(double)));
-  connect(private_->ui_.invertButton, SIGNAL(clicked()), this, SLOT(senseFilterRun()));
+//  connect(private_->ui_.activeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(senseActiveChanged(int)));
+//  connect(iterationsAdjuster, SIGNAL(valueAdjusted(double)), this, SLOT(senseIterationsChanged(double)));
+//  connect(stepAdjuster, SIGNAL(valueAdjusted(double)), this, SLOT(senseStepChanged(double)));
+//  connect(conductanceAdjuster, SIGNAL(valueAdjusted(double)), this, SLOT(senseConductanceChanged(double)));
+//  connect(private_->ui_.invertButton, SIGNAL(clicked()), this, SLOT(senseFilterRun()));
                                                                                                 
 
 }

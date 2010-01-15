@@ -34,7 +34,7 @@
 namespace Seg3D {
 
 class MedianFilter : public Tool {
-  SCI_TOOL_TYPE("MedianFilter","Median","",Tool::DATATODATA_E|Tool::FILTER_E)
+  SCI_TOOL_TYPE("MedianFilter","Median","",Tool::DATATODATA_E|Tool::FILTER_E, QUrl::fromEncoded("http://seg3d.org/"))
 // -- constructor/destructor --  
 public:
   MedianFilter(const std::string& toolid);

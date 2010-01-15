@@ -34,7 +34,7 @@
 namespace Seg3D  {
   
 class MaskDataFilter : public Tool {
-  SCI_TOOL_TYPE("MaskDataFilter","Mask Data", "",Tool::DATATODATA_E|Tool::FILTER_E)
+  SCI_TOOL_TYPE("MaskDataFilter","Mask Data", "",Tool::DATATODATA_E|Tool::FILTER_E, QUrl::fromEncoded("http://seg3d.org/"))
   
 public:
   MaskDataFilter(const std::string& toolid);

@@ -34,7 +34,7 @@
 namespace Seg3D  {
   
 class ConnectedComponentFilter : public Tool {
-  SCI_TOOL_TYPE("ConnectedComponentFilter","Connected Component", "",Tool::MASKTOMASK_E|Tool::FILTER_E)
+  SCI_TOOL_TYPE("ConnectedComponentFilter","Connected Component", "",Tool::MASKTOMASK_E|Tool::FILTER_E, QUrl::fromEncoded("http://seg3d.org/"))
   
 public:
   ConnectedComponentFilter(const std::string& toolid);

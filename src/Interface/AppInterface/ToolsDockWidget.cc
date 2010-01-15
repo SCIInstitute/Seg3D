@@ -139,13 +139,16 @@ ToolsDockWidget::open_tool(ToolHandle tool)
     SCI_THROW_LOGICERROR("A ToolInterface cannot be up casted to a ToolWidget pointer");
   }
   
+  //QUrl test = tool->url();
+  
   // Step (2) : instantiate the widget
   widget->create_widget(this,tool);
 
   toolbox_->add_tool(widget,QString::fromStdString(tool->menu_name()
     +" "+Utils::to_string(tool->toolid_number())), 
     boost::bind(&ActionCloseTool::Dispatch, tool->toolid()),
-    boost::bind(&ActionActivateTool::Dispatch, tool->toolid()));
+    boost::bind(&ActionActivateTool::Dispatch, tool->toolid()),
+    tool->url());
 
   tool_widget_list_[tool->toolid()] = widget;
   
@@ -239,7 +242,10 @@ ToolsDockWidget::HandleActivateTool(QPointer<ToolsDockWidget> tools_widget,ToolH
     return;
   }
   
-  if (tools_widget.data()) tools_widget->activate_tool(tool);
+  if (tools_widget.data())
+  { 
+    tools_widget->activate_tool(tool);
+  }
 }
 
 } // end namespace
