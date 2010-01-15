@@ -40,5 +40,31 @@ Application::Application()
 
 // Singleton instance
 Utils::Singleton<Application> Application::instance_;
+  
+//This map stores the parameters that were set when Seg3D was started.  
+static std::map <std::string, std::string> parameters;
+
+
+//This is a function to check parameters.  
+//This avoids accidentally putting data into the map that we dont want
+std::string
+Application::checkCommandLineParameter( const std::string &key )
+{
+  if (parameters.find(key) == parameters.end()) {
+    return "0";
+  }
+  else {
+    return parameters[key];
+  }
+}
+
+//This function sets parameters in the parameters map.
+void
+Application::setParameter( const std::string &key, const std::string &val )
+{
+  parameters[key] = val;
+}
+  
+  
 
 } // end namespace Seg3D

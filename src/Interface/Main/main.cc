@@ -28,6 +28,7 @@
 
 // STL includes
 #include <iostream>
+#include <string>
 
 // Include CMake generated files
 #include <Seg3DConfiguration.h>
@@ -35,7 +36,6 @@
 // Core includes
 #include <Utils/Core/Log.h>
 #include <Utils/Core/LogHistory.h>
-#include <Utils/Core/Environment.h>
 
 // Application includes
 #include <Application/Application/Application.h>
@@ -51,11 +51,63 @@
 #include <Init/Init.h>
 #include <Init/QtInit.h>
 
+// Boost Includes
+#include<boost/tokenizer.hpp>
+#include <boost/lexical_cast.hpp>
+
 //#include <Interface/ControllerInterface/ControllerInterface.h>
 
 ///////////////////////////////////////////////////////////
 // Main Seg3D entry point
 ///////////////////////////////////////////////////////////
+
+
+
+namespace Seg3D {
+  
+  // Function for parsing the command line parameters
+  void
+  parse_command_line_parameters( int argc, char **argv)
+  {
+    int count_ = 1;  // start at 1 because the filename/path counts as 0
+    std::string key;
+    std::string value;
+    
+    
+    
+    typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+    boost::char_separator<char> seperator("-=|;");
+    
+    while (count_ < argc) 
+    {
+      std::string param(argv[count_]);
+      tokenizer tokens(param, seperator);
+      std::vector<std::string> param_vector_;
+  
+      for (tokenizer::iterator tok_iter = tokens.begin();tok_iter != tokens.end(); ++tok_iter)
+      {
+        param_vector_.push_back(*tok_iter);
+      }
+      
+      if (param_vector_.size() == 2) {
+        key = param_vector_[0];
+        value = param_vector_[1];
+      }
+      else 
+      {
+        key = param_vector_[0];
+        value = "1";
+      }
+      std::string parameter_number_ = boost::lexical_cast<std::string>(count_);
+      SCI_LOG_MESSAGE("Parameter " + parameter_number_ + " - Key: " + key + ", Value: " + value);
+      Seg3D::Application::Instance()->setParameter(key, value);
+      count_++;
+    }
+    
+  }
+  
+}
+
 
 using namespace Seg3D;
 
@@ -80,18 +132,27 @@ int main(int argc, char **argv)
   Seg3D::ActionHistory::Instance()->set_max_history_size(300);
   
   
-  ///////////  TEST CODE FOR COMMAND LINE PARAMETERS ////////  
-  int socketNumber = 3000;
+  // -- Parse the command line parameters and put them in a stl::map --
+  // -- Use checkCommandLineParameter( const std::string &key ) to test if a
+  // -- parameter was given.
+  parse_command_line_parameters( argc, argv );
   
-//  if(std::string(argv[1]) == "-s")
-//  {
-//  }
-  ///////////  END TEST CODE FOR COMMAND LINE PARAMETERS ////
 
-  // -- Add a socket for receiving actions --
-  //ActionSocket::Instance()->start(3000);
-  SCI_LOG_DEBUG("Starting the socket");
-  ActionSocket::Instance()->start(socketNumber);
+  // -- Checking for the socket parameter --
+  std::string socket_number_as_string_ = Seg3D::Application::Instance()->checkCommandLineParameter("socket");
+  
+  int socket_number_ =  boost::lexical_cast<int>(socket_number_as_string_);
+  
+  if (socket_number_ > 0) 
+  {
+    // -- Add a socket for receiving actions --
+      
+    SCI_LOG_DEBUG("Starting a socket on port: " + socket_number_as_string_);
+      
+    ActionSocket::Instance()->start(socket_number_);
+    
+  }
+  
   
   // -- Add plugins into the architecture  
   SCI_LOG_DEBUG("Setup and register all the plugins");
@@ -157,10 +218,3 @@ int main(int argc, char **argv)
   return (0);
 }
 
-// Function for parsing the command line parameters -- TEST ONLY
-int
-parse_command_line_parameters( int argc, char **argv)
-{
-  
-  return 0;
-}
