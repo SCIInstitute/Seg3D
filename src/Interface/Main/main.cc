@@ -141,7 +141,6 @@ int main(int argc, char **argv)
 
   // -- Checking for the socket parameter --
   std::string socket_number_as_string_ = Seg3D::Application::Instance()->checkCommandLineParameter("socket");
-  
   int socket_number_ =  boost::lexical_cast<int>(socket_number_as_string_);
   
   if (socket_number_ > 0) 

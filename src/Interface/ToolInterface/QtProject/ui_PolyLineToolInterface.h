@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'PolyLineToolInterface.ui'
 **
-** Created: Mon Jan 18 16:33:21 2010
+** Created: Fri Jan 22 11:26:41 2010
 **      by: Qt User Interface Compiler version 4.6.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -43,13 +43,13 @@ public:
     {
         if (PolyLineToolInterface->objectName().isEmpty())
             PolyLineToolInterface->setObjectName(QString::fromUtf8("PolyLineToolInterface"));
-        PolyLineToolInterface->resize(650, 158);
-        QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-        sizePolicy.setHorizontalStretch(0);
+        PolyLineToolInterface->resize(213, 158);
+        QSizePolicy sizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
+        sizePolicy.setHorizontalStretch(1);
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(PolyLineToolInterface->sizePolicy().hasHeightForWidth());
         PolyLineToolInterface->setSizePolicy(sizePolicy);
-        PolyLineToolInterface->setMinimumSize(QSize(0, 158));
+        PolyLineToolInterface->setMinimumSize(QSize(213, 158));
         PolyLineToolInterface->setMaximumSize(QSize(16777215, 158));
         verticalLayout_2 = new QVBoxLayout(PolyLineToolInterface);
         verticalLayout_2->setSpacing(0);
@@ -75,16 +75,18 @@ public:
 
         resetPLButton = new QPushButton(PolyLineToolInterface);
         resetPLButton->setObjectName(QString::fromUtf8("resetPLButton"));
-        QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Fixed);
-        sizePolicy1.setHorizontalStretch(0);
-        sizePolicy1.setVerticalStretch(0);
-        sizePolicy1.setHeightForWidth(resetPLButton->sizePolicy().hasHeightForWidth());
-        resetPLButton->setSizePolicy(sizePolicy1);
+        sizePolicy.setHeightForWidth(resetPLButton->sizePolicy().hasHeightForWidth());
+        resetPLButton->setSizePolicy(sizePolicy);
+        resetPLButton->setMinimumSize(QSize(0, 32));
+        resetPLButton->setMaximumSize(QSize(16777215, 32));
 
         verticalLayout_2->addWidget(resetPLButton);
 
         insidePLGroupBox = new QGroupBox(PolyLineToolInterface);
         insidePLGroupBox->setObjectName(QString::fromUtf8("insidePLGroupBox"));
+        QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Fixed);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
         sizePolicy1.setHeightForWidth(insidePLGroupBox->sizePolicy().hasHeightForWidth());
         insidePLGroupBox->setSizePolicy(sizePolicy1);
         insidePLGroupBox->setMinimumSize(QSize(0, 91));

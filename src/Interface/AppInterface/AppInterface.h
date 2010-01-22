@@ -90,7 +90,7 @@ class AppInterface : public QMainWindow
   MeasurementDockWidget*  measurement_dock_widget();
   
   public Q_SLOTS:
-    void full_screen_toggle(bool);
+    void full_screen_toggle();
 
   private:
 
@@ -125,6 +125,9 @@ class AppInterface : public QMainWindow
 
     // Close a dock or a window
     static void HandleCloseWindow(QPointer<AppInterface> app_interface, std::string windowid);
+  
+    // Full Screen the Main Window
+    static void HandleFullScreenWindow(QPointer<AppInterface> app_interface, std::string windowid);
 };
 
 } //end namespace

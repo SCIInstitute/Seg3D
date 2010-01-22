@@ -179,6 +179,7 @@ private:
   QIcon isosurface_visible_icon_;
   QIcon isosurface_compute_icon_;
   QIcon lock_icon_;
+  QIcon expand_close_group_icon_;
   
    
 private Q_SLOTS:

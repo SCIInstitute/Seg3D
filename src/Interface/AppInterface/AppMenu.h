@@ -39,6 +39,8 @@
 #include <Interface/AppInterface/ViewerInterface.h>
 #include <Interface/AppInterface/ViewAction.h>
 
+//#include <Interface/AppInterface/AppInterface.h>
+
 
 namespace Seg3D {
 

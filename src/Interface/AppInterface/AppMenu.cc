@@ -102,14 +102,24 @@ void
 AppMenu::create_view_menu(QMenu* qmenu)
 {
   QAction* qaction;
-  qaction = qmenu->addAction(tr("Toggle Full Screen"));
+  
+  // Full Screen Window
+  qaction = qmenu->addAction("Toggle Full Screen");
   qaction->setShortcut(tr("Ctrl+F"));
   qaction->setToolTip(tr("Toggle the view between full screen and normal"));
-
-
-//  ViewAction* vaction = new ViewAction(qaction,true);
-  //connect(vaction, SIGNAL(triggered(bool)), parent, SLOT(full_screen_toggle(bool)));
-  //connect(qaction, SIGNAL(triggered(bool)), viewer_pointer, SLOT(fullScreenToggle(bool)));  // the fullscreentoggle slot is in ViewerInterface
+  QtBridge::connect(qaction,
+                    boost::bind(&InterfaceManager::dispatch_full_screen_window,
+                                InterfaceManager::Instance(),std::string("fullscreen")));
+  
+  
+  
+  
+  //qaction = qmenu->addAction(tr("Toggle Full Screen"));
+//  qaction->setShortcut(tr("Ctrl+F"));
+//  qaction->setToolTip(tr("Toggle the view between full screen and normal"));
+//  //qaction->setCheckable(true);
+//  //qaction->setChecked(false);
+//  connect(qaction, SIGNAL(triggered(bool)), this->parent(), SLOT(full_screen_toggle(bool)));
   
   QAction* qaction2;
   qaction2 = qmenu->addAction(tr("Only One Viewer"));

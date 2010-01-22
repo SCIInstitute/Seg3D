@@ -32,6 +32,7 @@
 #include <Application/InterfaceManager/InterfaceManager.h>
 #include <Application/InterfaceManager/Actions/ActionShowWindow.h>
 #include <Application/InterfaceManager/Actions/ActionCloseWindow.h>
+#include <Application/InterfaceManager/Actions/ActionFullScreenWindow.h>
 
 namespace Seg3D {
 
@@ -66,6 +67,20 @@ InterfaceManager::dispatch_close_window(const std::string& windowid) const
   // Run the action on the application thread
   PostActionFromInterface(action);
 }
+ 
+void
+InterfaceManager::dispatch_full_screen_window(const std::string& windowid) const
+{
+  // Build new action
+  ActionFullScreenWindowHandle action(new ActionFullScreenWindow);
+  // Set the action parameters
+  action->set(windowid);
+  // Run the action on the application thread
+  PostActionFromInterface(action);
+}
+  
+  
+  
 
 void
 InterfaceManager::add_windowid(const std::string& windowid)

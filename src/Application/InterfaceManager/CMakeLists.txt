@@ -41,6 +41,8 @@ SET(APPLICATION_INTERFACEMANAGER_ACTIONS_SRCS
   Actions/ActionShowWindow.cc
   Actions/ActionCloseWindow.h
   Actions/ActionCloseWindow.cc
+  Actions/ActionFullScreenWindow.h
+  Actions/ActionFullScreenWindow.cc
   )
 
 ADD_LIBRARY(Application_InterfaceManager STATIC 

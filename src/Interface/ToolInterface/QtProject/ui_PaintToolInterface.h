@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'PaintToolInterface.ui'
 **
-** Created: Mon Jan 18 16:33:21 2010
+** Created: Fri Jan 22 11:26:41 2010
 **      by: Qt User Interface Compiler version 4.6.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -59,8 +59,8 @@ public:
     {
         if (PaintToolInterface->objectName().isEmpty())
             PaintToolInterface->setObjectName(QString::fromUtf8("PaintToolInterface"));
-        PaintToolInterface->resize(650, 326);
-        QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+        PaintToolInterface->resize(213, 326);
+        QSizePolicy sizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(PaintToolInterface->sizePolicy().hasHeightForWidth());
@@ -79,7 +79,7 @@ public:
         activeHLayout->setObjectName(QString::fromUtf8("activeHLayout"));
         activeLabel = new QLabel(PaintToolInterface);
         activeLabel->setObjectName(QString::fromUtf8("activeLabel"));
-        QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Preferred);
+        QSizePolicy sizePolicy1(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
         sizePolicy1.setHorizontalStretch(0);
         sizePolicy1.setVerticalStretch(0);
         sizePolicy1.setHeightForWidth(activeLabel->sizePolicy().hasHeightForWidth());
@@ -115,8 +115,8 @@ public:
 
         maskComboBox = new QComboBox(PaintToolInterface);
         maskComboBox->setObjectName(QString::fromUtf8("maskComboBox"));
-        sizePolicy2.setHeightForWidth(maskComboBox->sizePolicy().hasHeightForWidth());
-        maskComboBox->setSizePolicy(sizePolicy2);
+        sizePolicy.setHeightForWidth(maskComboBox->sizePolicy().hasHeightForWidth());
+        maskComboBox->setSizePolicy(sizePolicy);
 
         maskHLayout->addWidget(maskComboBox);
 
@@ -127,7 +127,7 @@ public:
 
         eraseHLayout = new QHBoxLayout();
         eraseHLayout->setObjectName(QString::fromUtf8("eraseHLayout"));
-        eraseHSpacer_left = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        eraseHSpacer_left = new QSpacerItem(40, 20, QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
 
         eraseHLayout->addItem(eraseHSpacer_left);
 
@@ -136,7 +136,7 @@ public:
 
         eraseHLayout->addWidget(eraseCheckBox);
 
-        eraseHSpacer_right = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        eraseHSpacer_right = new QSpacerItem(40, 20, QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
 
         eraseHLayout->addItem(eraseHSpacer_right);
 
@@ -151,7 +151,7 @@ public:
 
         brushHLayout->addWidget(brushLabel);
 
-        brushHSpacer = new QSpacerItem(118, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        brushHSpacer = new QSpacerItem(118, 20, QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
 
         brushHLayout->addItem(brushHSpacer);
 
@@ -167,8 +167,8 @@ public:
 
         thresholdGroupBox = new QGroupBox(PaintToolInterface);
         thresholdGroupBox->setObjectName(QString::fromUtf8("thresholdGroupBox"));
-        sizePolicy2.setHeightForWidth(thresholdGroupBox->sizePolicy().hasHeightForWidth());
-        thresholdGroupBox->setSizePolicy(sizePolicy2);
+        sizePolicy.setHeightForWidth(thresholdGroupBox->sizePolicy().hasHeightForWidth());
+        thresholdGroupBox->setSizePolicy(sizePolicy);
         thresholdGroupBox->setMinimumSize(QSize(0, 171));
         thresholdGroupBox->setMaximumSize(QSize(16777215, 171));
         thresholdGroupBox->setFlat(false);

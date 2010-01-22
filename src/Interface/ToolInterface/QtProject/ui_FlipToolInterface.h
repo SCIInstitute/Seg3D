@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'FlipToolInterface.ui'
 **
-** Created: Mon Jan 18 16:33:21 2010
+** Created: Fri Jan 22 11:26:41 2010
 **      by: Qt User Interface Compiler version 4.6.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -49,8 +49,8 @@ public:
     {
         if (FlipToolInterface->objectName().isEmpty())
             FlipToolInterface->setObjectName(QString::fromUtf8("FlipToolInterface"));
-        FlipToolInterface->resize(650, 297);
-        QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+        FlipToolInterface->resize(213, 297);
+        QSizePolicy sizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(FlipToolInterface->sizePolicy().hasHeightForWidth());
@@ -61,7 +61,7 @@ public:
         verticalLayout_3 = new QVBoxLayout(FlipToolInterface);
         verticalLayout_3->setSpacing(0);
         verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
-        verticalLayout_3->setContentsMargins(4, 0, 4, 4);
+        verticalLayout_3->setContentsMargins(4, 0, 4, 0);
         activeHLayout = new QHBoxLayout();
         activeHLayout->setSpacing(0);
         activeHLayout->setObjectName(QString::fromUtf8("activeHLayout"));

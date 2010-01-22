@@ -17,7 +17,7 @@ AnisotropicDiffusionFilterInterface::AnisotropicDiffusionFilterInterface(QWidget
     ui->conductanceHLayout_bottom->addWidget(conductanceAdjuster);
 
     widgeter = new QWidget();
-    widgeter->resize();
+    //widgeter->resize();
 
     makeConnections();
 

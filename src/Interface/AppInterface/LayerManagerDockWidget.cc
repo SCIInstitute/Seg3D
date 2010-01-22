@@ -59,7 +59,7 @@ LayerManagerDockWidget::LayerManagerDockWidget(QWidget *parent) :
   layer_manager_ = new LayerManagerWidget(this);
   setWidget(layer_manager_);
   
-    
+
   
   
 }

@@ -63,8 +63,9 @@ namespace Seg3D {
     setLayout(vbox);
     
     main_frame_ = new QFrame;  
+    main_frame_->setStyleSheet(QString::fromUtf8("QFrame#main_frame_{ background-color: blue; }"));
     
-    main_frame_->resize(1, 1);
+    //main_frame_->resize(1, 1);
     vbox->addWidget(main_frame_);
     vbox->addStretch();
     

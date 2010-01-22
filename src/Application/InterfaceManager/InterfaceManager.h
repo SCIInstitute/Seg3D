@@ -66,6 +66,9 @@ class InterfaceManager : public StateHandler {
  
     // -- Close an interface window --
     void dispatch_close_window(const std::string& windowid) const;
+  
+    // -- Full Screen the main window --  
+    void dispatch_full_screen_window(const std::string& windowid) const;
 
 // -- Signals --
   public:
@@ -78,6 +81,10 @@ class InterfaceManager : public StateHandler {
     // CLOSE_WINDOW_SIGNAL:
     // This signal is triggered after a window needs to be closed
     window_signal_type close_window_signal;
+  
+    // FULL_SCREEN_SIGNAL:
+    // This signal is triggered after fullscreen is triggered
+    window_signal_type full_screen_window_signal;
 
 // -- Access to toollist --
   public:

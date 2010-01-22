@@ -24,57 +24,37 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
-*/
+ */
 
-#include <Interface/AppInterface/ToolWidget.h>
-#include <Utils/Core/Log.h>
-#include <boost/lexical_cast.hpp>
+#include <Application/InterfaceManager/InterfaceManager.h>
+#include <Application/InterfaceManager/Actions/ActionFullScreenWindow.h>
 
 namespace Seg3D {
-
-ToolWidget::ToolWidget() :
-  main_frame_(0)
-{
-}
-
-ToolWidget::~ToolWidget()
-{
-}
-
-
-bool
-ToolWidget::create_widget(QWidget* parent, ToolHandle& tool)
-{
-
   
-  // Setup the parent widget: this one will be used for memory management of
-  // this widget class
-  setParent(parent);
-
-    // Add the handle of the underlying tool to the widget
-  set_tool(tool);
+  // REGISTER ACTION:
+  // Define a function that registers the action. The action also needs to be
+  // registered in the CMake file.
+  SCI_REGISTER_ACTION(FullScreenWindow);
   
-  // Generate a vertical layout for the tool widget
-  QVBoxLayout* vbox = new QVBoxLayout;
+  // VALIDATE:
+  // As the action could be user input, we need to validate whether the action
+  // is valid and can be executed.
   
-  // Ensure it has some tight spacing  
-  vbox->setSpacing(0);
-  vbox->setContentsMargins(0,0,0,0);
-  setLayout(vbox);
+  bool
+  ActionFullScreenWindow::validate(ActionContextHandle& context)
+  {
+    // In this case its always valid! yeay!
+    return (true); // validated
+  }
   
-  main_frame_ = new QFrame;  
+  // RUN:
+  // The code that runs the actual action
+  bool 
+  ActionFullScreenWindow::run(ActionContextHandle& context,
+                         ActionResultHandle& result)
+  {
+    InterfaceManager::Instance()->full_screen_window_signal(windowid_.value());
+    return (true); // success
+  }
   
-  main_frame_->resize(1, 1);
-  //main_frame_->setStyleSheet("background-color: red;");
-  main_frame_->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
-  vbox->addWidget(main_frame_);
-  vbox->addStretch();
-  
-  
-  //std::string h = boost::lexical_cast<std::string>(&main_frame_);
-  
-  return ( build_widget(main_frame_));
-}
-
-} //end namespace Seg3D
-
+} // end namespace Seg3D

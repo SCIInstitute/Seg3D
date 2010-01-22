@@ -81,6 +81,10 @@ LayerManagerWidget::LayerManagerWidget(QWidget* parent) :
     
     lock_icon_.addFile(QString::fromUtf8(":/Images/LockBigOff.png"), QSize(), QIcon::Normal, QIcon::Off);
     lock_icon_.addFile(QString::fromUtf8(":/Images/LockBig.png"), QSize(), QIcon::Normal, QIcon::On);
+    
+    expand_close_group_icon_.addFile(QString::fromUtf8(":/Images/RightArrowWhite.png"), QSize(), QIcon::Normal, QIcon::Off);
+    expand_close_group_icon_.addFile(QString::fromUtf8(":/Images/DownArrowWhite.png"), QSize(), QIcon::Normal, QIcon::On);
+    
   }
   
   
@@ -101,6 +105,8 @@ LayerManagerWidget::LayerManagerWidget(QWidget* parent) :
   main_layout_->addStretch();
   
   main_->setLayout(main_layout_);
+  main_->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
+  main_->setStyleSheet(QString::fromUtf8("QWidget#main_{ background-color: blue; }"));
   
   ///////////////  Testing Stuff //////
   new_group("450x900x500");
@@ -315,11 +321,11 @@ LayerManagerWidget::add_layer( layer_type type, const QString &label, const QStr
   layer_handle_->layer_ = new QWidget;
   layer_handle_->layer_->setObjectName(QString::fromUtf8("layer_"));
   //layer_handle_->layer_->setGeometry(QRect(8, 10, 213, 144));
-  QSizePolicy sizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+  QSizePolicy sizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
   sizePolicy.setHorizontalStretch(0);
   sizePolicy.setVerticalStretch(0);
 //  sizePolicy.setHeightForWidth(layer_handle_->layer_->sizePolicy().hasHeightForWidth());
-//  layer_handle_->layer_->setSizePolicy(sizePolicy);
+  layer_handle_->layer_->setSizePolicy(sizePolicy);
   // Set Style Sheet for the layer Widget
   {
     layer_handle_->layer_->setStyleSheet(QString::fromUtf8("QWidget#progress_bar_{\n"
@@ -569,24 +575,25 @@ LayerManagerWidget::add_layer( layer_type type, const QString &label, const QStr
     layer_handle_->verticalLayout_4->setObjectName(QString::fromUtf8("verticalLayout_4"));
     layer_handle_->background_1 = new QWidget(layer_handle_->layer_);
     layer_handle_->background_1->setObjectName(QString::fromUtf8("background_1"));
-    QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    QSizePolicy sizePolicy1(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
     sizePolicy1.setHorizontalStretch(0);
     sizePolicy1.setVerticalStretch(0);
     sizePolicy1.setHeightForWidth(layer_handle_->background_1->sizePolicy().hasHeightForWidth());
     layer_handle_->background_1->setSizePolicy(sizePolicy1);
     layer_handle_->background_1->setMinimumSize(QSize(213, 46));
-    layer_handle_->background_1->setMaximumSize(QSize(213, 46));
+    layer_handle_->background_1->setMaximumSize(QSize(16777215, 46));
     layer_handle_->horizontalLayout_5 = new QHBoxLayout(layer_handle_->background_1);
     layer_handle_->horizontalLayout_5->setSpacing(0);
-    layer_handle_->horizontalLayout_5->setContentsMargins(0, 0, 0, 0);
+    layer_handle_->horizontalLayout_5->setContentsMargins(2, 0, 0, 0);
     layer_handle_->horizontalLayout_5->setObjectName(QString::fromUtf8("horizontalLayout_5"));
     layer_handle_->horizontalLayout_2 = new QHBoxLayout();
     layer_handle_->horizontalLayout_2->setSpacing(0);
     layer_handle_->horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
     layer_handle_->typeBackground_ = new QWidget(layer_handle_->background_1);
     layer_handle_->typeBackground_->setObjectName(QString::fromUtf8("typeBackground_"));
-    sizePolicy1.setHeightForWidth(layer_handle_->typeBackground_->sizePolicy().hasHeightForWidth());
-    layer_handle_->typeBackground_->setSizePolicy(sizePolicy1);
+    QSizePolicy sizePolicy8(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    sizePolicy8.setHeightForWidth(layer_handle_->typeBackground_->sizePolicy().hasHeightForWidth());
+    layer_handle_->typeBackground_->setSizePolicy(sizePolicy8);
     layer_handle_->typeBackground_->setMinimumSize(QSize(31, 42));
     layer_handle_->typeBackground_->setMaximumSize(QSize(31, 42));
     layer_handle_->horizontalLayout = new QHBoxLayout(layer_handle_->typeBackground_);
@@ -595,8 +602,8 @@ LayerManagerWidget::add_layer( layer_type type, const QString &label, const QStr
     layer_handle_->horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
     layer_handle_->typeGradient_ = new QWidget(layer_handle_->typeBackground_);
     layer_handle_->typeGradient_->setObjectName(QString::fromUtf8("typeGradient_"));
-    sizePolicy1.setHeightForWidth(layer_handle_->typeGradient_->sizePolicy().hasHeightForWidth());
-    layer_handle_->typeGradient_->setSizePolicy(sizePolicy1);
+    sizePolicy8.setHeightForWidth(layer_handle_->typeGradient_->sizePolicy().hasHeightForWidth());
+    layer_handle_->typeGradient_->setSizePolicy(sizePolicy8);
     layer_handle_->typeGradient_->setMinimumSize(QSize(31, 42));
     layer_handle_->typeGradient_->setMaximumSize(QSize(31, 42));
     layer_handle_->horizontalLayout_9 = new QHBoxLayout(layer_handle_->typeGradient_);
@@ -626,7 +633,7 @@ LayerManagerWidget::add_layer( layer_type type, const QString &label, const QStr
     sizePolicy1.setHeightForWidth(layer_handle_->label_->sizePolicy().hasHeightForWidth());
     layer_handle_->label_->setSizePolicy(sizePolicy1);
     layer_handle_->label_->setMinimumSize(QSize(180, 21));
-    layer_handle_->label_->setMaximumSize(QSize(180, 21));
+    layer_handle_->label_->setMaximumSize(QSize(16777215, 21));
     layer_handle_->label_->setFlat(true);
     
     layer_handle_->verticalLayout->addWidget(layer_handle_->label_);
@@ -1082,7 +1089,7 @@ LayerManagerWidget::new_group( const QString &dimensions )
                                         "}"));
   
   group_handle->page_->setObjectName(QString::fromUtf8("group_handle->page_"));
-  QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+  QSizePolicy sizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
   sizePolicy.setHorizontalStretch(0);
   sizePolicy.setVerticalStretch(0);
   group_handle->verticalLayout_5 = new QVBoxLayout(group_handle->page_);
@@ -1091,13 +1098,13 @@ LayerManagerWidget::new_group( const QString &dimensions )
   group_handle->verticalLayout_5->setObjectName(QString::fromUtf8("verticalLayout_5"));
   group_handle->background_group_ = new QWidget(group_handle->page_);
   group_handle->background_group_->setObjectName(QString::fromUtf8("background_group_"));
-  QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::Fixed);
+  QSizePolicy sizePolicy1(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
   sizePolicy1.setHorizontalStretch(0);
   sizePolicy1.setVerticalStretch(0);
   sizePolicy1.setHeightForWidth(group_handle->background_group_->sizePolicy().hasHeightForWidth());
   group_handle->background_group_->setSizePolicy(sizePolicy1);
   group_handle->background_group_->setMinimumSize(QSize(215, 21));
-  group_handle->background_group_->setMaximumSize(QSize(215, 21));
+  group_handle->background_group_->setMaximumSize(QSize(16777215, 21));
   group_handle->verticalLayout_3 = new QVBoxLayout(group_handle->background_group_);
   group_handle->verticalLayout_3->setSpacing(0);
   group_handle->verticalLayout_3->setContentsMargins(0, 0, 0, 0);
@@ -1119,10 +1126,8 @@ LayerManagerWidget::new_group( const QString &dimensions )
   group_handle->open_button_->setCheckable(true);
   group_handle->open_button_->setChecked(true);
   
-  QIcon icon;
-  icon.addFile(QString::fromUtf8(":/new/images/OpenWhite.png"), QSize(), QIcon::Normal, QIcon::Off);
-  group_handle->open_button_->setIcon(icon);
-  group_handle->open_button_->setIconSize(QSize(18, 18));
+  group_handle->open_button_->setIcon(expand_close_group_icon_);
+  group_handle->open_button_->setIconSize(QSize(14, 14));
   
   group_handle->horizontalLayout->addWidget(group_handle->open_button_);
   

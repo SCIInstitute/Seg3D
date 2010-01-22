@@ -61,12 +61,14 @@ ToolBoxWidget::ToolBoxWidget(QWidget* parent) :
   
   main_ = new QWidget(this);
   setWidget(main_);
-
+  
+ 
+  //main_->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
   main_layout_ = new QVBoxLayout( main_ );
   main_layout_->setContentsMargins(1, 1, 1, 1);
   main_layout_->setSpacing(1);
   main_layout_->setAlignment(Qt::AlignLeft);
-  
+   
   tool_layout_ = new QVBoxLayout;
   main_layout_->addLayout(tool_layout_);
   main_layout_->addStretch();
@@ -92,6 +94,9 @@ ToolBoxWidget::add_tool(QWidget * tool, const QString &label, boost::function<vo
   //  --- Begin QT Widget Design --- //
   
   page_handle->page_ = new QWidget;
+  //page_handle->page_->setBaseSize(233,0);
+  //page_handle->page_->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
+  
   page_handle->page_->setStyleSheet(QString::fromUtf8("QPushButton#activate_button_{\n"
                                                  "  \n"
                                                  "  margin-right: 7px;\n"
@@ -111,7 +116,7 @@ ToolBoxWidget::add_tool(QWidget * tool, const QString &label, boost::function<vo
                                                  "\n"
                                                  "\n"
                                                  "}\n"
-                                                 "QWidget#page_{ background-color: black; }\n"
+                                                 "QWidget#page_{ background-color: blue; }\n"
                                                  "\n"
                                                  "\n"
                                                  "QToolButton{\n"
@@ -146,13 +151,13 @@ ToolBoxWidget::add_tool(QWidget * tool, const QString &label, boost::function<vo
   //page_handle->vLayout_->setContentsMargins(0, 0, 0, 0);
   page_handle->background_ = new QWidget(page_handle->page_);
   page_handle->background_->setObjectName(QString::fromUtf8("background_"));
-  QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+  QSizePolicy sizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
   sizePolicy.setHorizontalStretch(0);
   sizePolicy.setVerticalStretch(0);
   sizePolicy.setHeightForWidth(page_handle->background_->sizePolicy().hasHeightForWidth());
   page_handle->background_->setSizePolicy(sizePolicy);
   page_handle->background_->setMinimumSize(QSize(215, 21));
-  page_handle->background_->setMaximumSize(QSize(215, 21));
+  //page_handle->background_->setMaximumSize(QSize(215, 21));
   page_handle->hLayout_2 = new QHBoxLayout(page_handle->background_);
   page_handle->hLayout_2->setSpacing(0);
   page_handle->hLayout_2->setContentsMargins(0, 0, 0, 0);
@@ -162,7 +167,7 @@ ToolBoxWidget::add_tool(QWidget * tool, const QString &label, boost::function<vo
   sizePolicy.setHeightForWidth(page_handle->header_->sizePolicy().hasHeightForWidth());
   page_handle->header_->setSizePolicy(sizePolicy);
   page_handle->header_->setMinimumSize(QSize(215, 21));
-  page_handle->header_->setMaximumSize(QSize(215, 21));
+  //page_handle->header_->setMaximumSize(QSize(215, 21));
   page_handle->hLayout_ = new QHBoxLayout(page_handle->header_);
   page_handle->hLayout_->setSpacing(1);
   page_handle->hLayout_->setContentsMargins(0, 0, 0, 0);
@@ -215,6 +220,10 @@ ToolBoxWidget::add_tool(QWidget * tool, const QString &label, boost::function<vo
   page_handle->vLayout_2->addWidget(page_handle->tool_, 0, Qt::AlignTop);
   
   page_handle->vLayout_->addWidget(page_handle->tool_frame_);
+  
+  //sizePolicy.setHeightForWidth(page_handle->tool_frame_->sizePolicy().hasHeightForWidth());
+  //page_handle->tool_frame_->setSizePolicy(sizePolicy);
+  
   page_handle->vLayout_->setStretch(1, 1);
   //  --- End QT Widget Design --- //
   

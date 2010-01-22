@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'ThresholdToolInterface.ui'
 **
-** Created: Mon Jan 18 16:33:21 2010
+** Created: Fri Jan 22 11:26:41 2010
 **      by: Qt User Interface Compiler version 4.6.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -53,15 +53,14 @@ public:
     {
         if (ThresholdToolInterface->objectName().isEmpty())
             ThresholdToolInterface->setObjectName(QString::fromUtf8("ThresholdToolInterface"));
-        ThresholdToolInterface->resize(650, 396);
-        QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+        ThresholdToolInterface->resize(213, 396);
+        QSizePolicy sizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(ThresholdToolInterface->sizePolicy().hasHeightForWidth());
         ThresholdToolInterface->setSizePolicy(sizePolicy);
         ThresholdToolInterface->setMinimumSize(QSize(213, 396));
         ThresholdToolInterface->setMaximumSize(QSize(16777215, 396));
-        ThresholdToolInterface->setBaseSize(QSize(650, 396));
         verticalLayout_2 = new QVBoxLayout(ThresholdToolInterface);
         verticalLayout_2->setSpacing(0);
         verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
@@ -76,6 +75,8 @@ public:
 
         activeComboBox = new QComboBox(ThresholdToolInterface);
         activeComboBox->setObjectName(QString::fromUtf8("activeComboBox"));
+        sizePolicy.setHeightForWidth(activeComboBox->sizePolicy().hasHeightForWidth());
+        activeComboBox->setSizePolicy(sizePolicy);
 
         activeHLayout->addWidget(activeComboBox);
 
@@ -91,7 +92,7 @@ public:
 
         upperHLayout_top->addWidget(upperLabel);
 
-        upperHSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        upperHSpacer = new QSpacerItem(40, 20, QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
 
         upperHLayout_top->addItem(upperHSpacer);
 
@@ -110,7 +111,7 @@ public:
 
         lowerHLayout_top->addWidget(lowerLabel);
 
-        lowerHSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        lowerHSpacer = new QSpacerItem(40, 20, QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
 
         lowerHLayout_top->addItem(lowerHSpacer);
 
@@ -127,11 +128,15 @@ public:
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         createThresholdLayerButton = new QPushButton(ThresholdToolInterface);
         createThresholdLayerButton->setObjectName(QString::fromUtf8("createThresholdLayerButton"));
+        sizePolicy.setHeightForWidth(createThresholdLayerButton->sizePolicy().hasHeightForWidth());
+        createThresholdLayerButton->setSizePolicy(sizePolicy);
 
         verticalLayout->addWidget(createThresholdLayerButton);
 
         clearSeedsButton = new QPushButton(ThresholdToolInterface);
         clearSeedsButton->setObjectName(QString::fromUtf8("clearSeedsButton"));
+        sizePolicy.setHeightForWidth(clearSeedsButton->sizePolicy().hasHeightForWidth());
+        clearSeedsButton->setSizePolicy(sizePolicy);
 
         verticalLayout->addWidget(clearSeedsButton);
 
@@ -140,11 +145,8 @@ public:
 
         histogramView = new QGraphicsView(ThresholdToolInterface);
         histogramView->setObjectName(QString::fromUtf8("histogramView"));
-        QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Fixed);
-        sizePolicy1.setHorizontalStretch(0);
-        sizePolicy1.setVerticalStretch(0);
-        sizePolicy1.setHeightForWidth(histogramView->sizePolicy().hasHeightForWidth());
-        histogramView->setSizePolicy(sizePolicy1);
+        sizePolicy.setHeightForWidth(histogramView->sizePolicy().hasHeightForWidth());
+        histogramView->setSizePolicy(sizePolicy);
         histogramView->setMinimumSize(QSize(0, 131));
         histogramView->setMaximumSize(QSize(16777215, 131));
 
@@ -154,6 +156,11 @@ public:
         minMaxHLayout->setObjectName(QString::fromUtf8("minMaxHLayout"));
         minLabel = new QLabel(ThresholdToolInterface);
         minLabel->setObjectName(QString::fromUtf8("minLabel"));
+        QSizePolicy sizePolicy1(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(minLabel->sizePolicy().hasHeightForWidth());
+        minLabel->setSizePolicy(sizePolicy1);
         QFont font;
         font.setPointSize(10);
         font.setBold(false);
@@ -164,6 +171,8 @@ public:
 
         maxLabel = new QLabel(ThresholdToolInterface);
         maxLabel->setObjectName(QString::fromUtf8("maxLabel"));
+        sizePolicy1.setHeightForWidth(maxLabel->sizePolicy().hasHeightForWidth());
+        maxLabel->setSizePolicy(sizePolicy1);
         QFont font1;
         font1.setPointSize(10);
         maxLabel->setFont(font1);

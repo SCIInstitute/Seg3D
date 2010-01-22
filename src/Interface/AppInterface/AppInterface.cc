@@ -30,11 +30,15 @@
 #include "Seg3DConfiguration.h"
 
 // Application includes
+#include <Application/Application/Application.h>
 #include <Application/Interface/Interface.h>
 
 // Interface includes
 #include <Interface/AppInterface/AppInterface.h>
 #include <Interface/QtInterface/QtApplication.h>
+
+// Boost include
+#include <boost/lexical_cast.hpp>
 
 namespace Seg3D {
 
@@ -48,7 +52,14 @@ AppInterface::AppInterface()
   
   // Tell Qt what size to start up in
   resize(1280, 720);
-  
+   
+  // Enable fullscreen on startup via commandline argument
+  std::string true_false_ = Seg3D::Application::Instance()->checkCommandLineParameter("fullscreen");
+  if (boost::lexical_cast<bool>(true_false_)) {
+    SCI_LOG_MESSAGE("Going full screen based on command line parameter");
+    showFullScreen();
+  }
+   
   // Tell Qt where to doc the toolbars
   setCorner(Qt::TopLeftCorner,Qt::LeftDockWidgetArea);
   setCorner(Qt::TopRightCorner,Qt::RightDockWidgetArea);
@@ -63,8 +74,8 @@ AppInterface::AppInterface()
 
   show_window("history");
   show_window("tools");
+  
   show_window("project");
-
   show_window("layermanager");
   show_window("measurement");
 
@@ -81,16 +92,23 @@ AppInterface::AppInterface()
 
   InterfaceManager::Instance()->close_window_signal.connect(boost::bind(
     AppInterface::HandleCloseWindow,app_interface,_1));
+  
+  InterfaceManager::Instance()->full_screen_window_signal.connect(boost::bind(
+    AppInterface::HandleFullScreenWindow, app_interface, _1));                                
 
   // set the viewer_interface_ to a default view of 1 and 3
   viewer_interface_->set_views(1,3);
 }
 
 void
-AppInterface::full_screen_toggle(bool full_screen)
+AppInterface::full_screen_toggle()
 {
-  if(full_screen) AppInterface::showFullScreen();
-  else AppInterface::showFullScreen();
+  if (isFullScreen()) {
+    showNormal();
+  }
+  else {
+    showFullScreen();
+  }
 }
   
 AppInterface::~AppInterface()
@@ -267,6 +285,10 @@ AppInterface::close_window(const std::string& windowid)
   }
 }
 
+
+  
+  
+
 void 
 AppInterface::addDockWidget(Qt::DockWidgetArea area, QDockWidget* dock_widget)
 {
@@ -315,5 +337,19 @@ AppInterface::HandleCloseWindow(QPointer<AppInterface> app_interface,
   
   if (!(app_interface.isNull())) app_interface->close_window(windowid);
 }
+  
+void 
+AppInterface::HandleFullScreenWindow(QPointer<AppInterface> app_interface, 
+                                std::string windowid)
+{
+  // Ensure that this request is forwarded to the interface thread
+  if (!(Interface::IsInterfaceThread()))
+  {
+    PostInterface(boost::bind(&AppInterface::HandleFullScreenWindow,app_interface,windowid));
+    return;
+  }
+  
+  if (!(app_interface.isNull())) app_interface->full_screen_toggle();
+}  
 
 } //end namespace
