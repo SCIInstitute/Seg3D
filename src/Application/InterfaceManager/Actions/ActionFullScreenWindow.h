@@ -34,7 +34,7 @@
 namespace Seg3D {
   
   class ActionFullScreenWindow : public Action {
-    SCI_ACTION_TYPE("FullScreen","FullScreen windowid",INTERFACE_E)
+    SCI_ACTION_TYPE("FullScreen","FullScreen",INTERFACE_E)
     
     // -- Constructor/Destructor --
   public:

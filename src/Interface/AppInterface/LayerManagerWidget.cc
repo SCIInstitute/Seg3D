@@ -625,6 +625,7 @@ LayerManagerWidget::add_layer( layer_type type, const QString &label, const QStr
     
     layer_handle_->horizontalLayout_2->addWidget(layer_handle_->typeBackground_);
     
+    
     layer_handle_->verticalLayout = new QVBoxLayout();
     layer_handle_->verticalLayout->setSpacing(0);
     layer_handle_->verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
@@ -637,6 +638,7 @@ LayerManagerWidget::add_layer( layer_type type, const QString &label, const QStr
     layer_handle_->label_->setFlat(true);
     
     layer_handle_->verticalLayout->addWidget(layer_handle_->label_);
+    layer_handle_->verticalLayout->addStretch();
     
     layer_handle_->horizontalLayout_7 = new QHBoxLayout();
     layer_handle_->horizontalLayout_7->setSpacing(0);
@@ -707,7 +709,7 @@ LayerManagerWidget::add_layer( layer_type type, const QString &label, const QStr
     
     
     layer_handle_->horizontalLayout_5->addLayout(layer_handle_->horizontalLayout_2);
-    
+
     
     layer_handle_->verticalLayout_4->addWidget(layer_handle_->background_1);
   

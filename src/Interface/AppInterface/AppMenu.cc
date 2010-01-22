@@ -109,7 +109,7 @@ AppMenu::create_view_menu(QMenu* qmenu)
   qaction->setToolTip(tr("Toggle the view between full screen and normal"));
   QtBridge::connect(qaction,
                     boost::bind(&InterfaceManager::dispatch_full_screen_window,
-                                InterfaceManager::Instance(),std::string("fullscreen")));
+                                InterfaceManager::Instance(),std::string("toggle")));
   
   
   
