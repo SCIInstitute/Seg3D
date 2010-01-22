@@ -240,7 +240,10 @@ AppInterface::close_window(const std::string& windowid)
   std::string lower_windowid = Utils::string_to_lower(windowid);
   if (lower_windowid == "controller")
   {
-    if (!(controller_interface_.isNull())) controller_interface_->close();
+    if (!(controller_interface_.isNull()))
+    {
+      controller_interface_->close();
+    }
   }
   else if (lower_windowid == "project")
   {
