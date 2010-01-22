@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'FlipToolInterface.ui'
 **
-** Created: Tue Jan 5 13:59:09 2010
+** Created: Mon Jan 18 16:33:21 2010
 **      by: Qt User Interface Compiler version 4.6.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -28,18 +28,18 @@ QT_BEGIN_NAMESPACE
 class Ui_FlipToolInterface
 {
 public:
-    QWidget *layoutWidget_2;
+    QVBoxLayout *verticalLayout_3;
     QHBoxLayout *activeHLayout;
     QLabel *activeLabel;
     QComboBox *activeComboBox;
     QGroupBox *flipGroupBox;
-    QWidget *layoutWidget;
+    QVBoxLayout *verticalLayout;
     QVBoxLayout *flipVLayout;
     QPushButton *flipAxialButton;
     QPushButton *flipCoronalButton;
     QPushButton *flipSagittalButton;
     QGroupBox *rotateGroupBox;
-    QWidget *layoutWidget1;
+    QVBoxLayout *verticalLayout_2;
     QVBoxLayout *rotateVLayout;
     QPushButton *rotateACButton;
     QPushButton *rotateASButton;
@@ -49,84 +49,114 @@ public:
     {
         if (FlipToolInterface->objectName().isEmpty())
             FlipToolInterface->setObjectName(QString::fromUtf8("FlipToolInterface"));
-        FlipToolInterface->resize(213, 297);
-        QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        FlipToolInterface->resize(650, 297);
+        QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(FlipToolInterface->sizePolicy().hasHeightForWidth());
         FlipToolInterface->setSizePolicy(sizePolicy);
-        FlipToolInterface->setMinimumSize(QSize(213, 297));
-        FlipToolInterface->setMaximumSize(QSize(213, 297));
+        FlipToolInterface->setMinimumSize(QSize(0, 297));
+        FlipToolInterface->setMaximumSize(QSize(16777215, 297));
         FlipToolInterface->setSizeIncrement(QSize(0, 0));
-        FlipToolInterface->setBaseSize(QSize(213, 297));
-        layoutWidget_2 = new QWidget(FlipToolInterface);
-        layoutWidget_2->setObjectName(QString::fromUtf8("layoutWidget_2"));
-        layoutWidget_2->setGeometry(QRect(4, 4, 207, 26));
-        activeHLayout = new QHBoxLayout(layoutWidget_2);
+        verticalLayout_3 = new QVBoxLayout(FlipToolInterface);
+        verticalLayout_3->setSpacing(0);
+        verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
+        verticalLayout_3->setContentsMargins(4, 0, 4, 4);
+        activeHLayout = new QHBoxLayout();
         activeHLayout->setSpacing(0);
         activeHLayout->setObjectName(QString::fromUtf8("activeHLayout"));
-        activeHLayout->setContentsMargins(0, 0, 0, 0);
-        activeLabel = new QLabel(layoutWidget_2);
+        activeLabel = new QLabel(FlipToolInterface);
         activeLabel->setObjectName(QString::fromUtf8("activeLabel"));
+        QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Preferred);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(activeLabel->sizePolicy().hasHeightForWidth());
+        activeLabel->setSizePolicy(sizePolicy1);
 
         activeHLayout->addWidget(activeLabel);
 
-        activeComboBox = new QComboBox(layoutWidget_2);
+        activeComboBox = new QComboBox(FlipToolInterface);
         activeComboBox->setObjectName(QString::fromUtf8("activeComboBox"));
+        QSizePolicy sizePolicy2(QSizePolicy::Expanding, QSizePolicy::Fixed);
+        sizePolicy2.setHorizontalStretch(0);
+        sizePolicy2.setVerticalStretch(0);
+        sizePolicy2.setHeightForWidth(activeComboBox->sizePolicy().hasHeightForWidth());
+        activeComboBox->setSizePolicy(sizePolicy2);
 
         activeHLayout->addWidget(activeComboBox);
 
         activeHLayout->setStretch(0, 1);
         activeHLayout->setStretch(1, 2);
+
+        verticalLayout_3->addLayout(activeHLayout);
+
         flipGroupBox = new QGroupBox(FlipToolInterface);
         flipGroupBox->setObjectName(QString::fromUtf8("flipGroupBox"));
-        flipGroupBox->setGeometry(QRect(6, 28, 201, 131));
-        layoutWidget = new QWidget(flipGroupBox);
-        layoutWidget->setObjectName(QString::fromUtf8("layoutWidget"));
-        layoutWidget->setGeometry(QRect(0, 22, 201, 109));
-        flipVLayout = new QVBoxLayout(layoutWidget);
-        flipVLayout->setSpacing(1);
+        sizePolicy2.setHeightForWidth(flipGroupBox->sizePolicy().hasHeightForWidth());
+        flipGroupBox->setSizePolicy(sizePolicy2);
+        flipGroupBox->setMinimumSize(QSize(0, 134));
+        flipGroupBox->setMaximumSize(QSize(16777215, 134));
+        verticalLayout = new QVBoxLayout(flipGroupBox);
+        verticalLayout->setSpacing(0);
+        verticalLayout->setContentsMargins(0, 0, 0, 0);
+        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
+        flipVLayout = new QVBoxLayout();
+        flipVLayout->setSpacing(6);
         flipVLayout->setObjectName(QString::fromUtf8("flipVLayout"));
-        flipVLayout->setContentsMargins(0, 0, 0, 0);
-        flipAxialButton = new QPushButton(layoutWidget);
+        flipAxialButton = new QPushButton(flipGroupBox);
         flipAxialButton->setObjectName(QString::fromUtf8("flipAxialButton"));
 
         flipVLayout->addWidget(flipAxialButton);
 
-        flipCoronalButton = new QPushButton(layoutWidget);
+        flipCoronalButton = new QPushButton(flipGroupBox);
         flipCoronalButton->setObjectName(QString::fromUtf8("flipCoronalButton"));
 
         flipVLayout->addWidget(flipCoronalButton);
 
-        flipSagittalButton = new QPushButton(layoutWidget);
+        flipSagittalButton = new QPushButton(flipGroupBox);
         flipSagittalButton->setObjectName(QString::fromUtf8("flipSagittalButton"));
 
         flipVLayout->addWidget(flipSagittalButton);
 
+
+        verticalLayout->addLayout(flipVLayout);
+
+
+        verticalLayout_3->addWidget(flipGroupBox);
+
         rotateGroupBox = new QGroupBox(FlipToolInterface);
         rotateGroupBox->setObjectName(QString::fromUtf8("rotateGroupBox"));
-        rotateGroupBox->setGeometry(QRect(6, 160, 201, 131));
-        layoutWidget1 = new QWidget(rotateGroupBox);
-        layoutWidget1->setObjectName(QString::fromUtf8("layoutWidget1"));
-        layoutWidget1->setGeometry(QRect(0, 22, 201, 109));
-        rotateVLayout = new QVBoxLayout(layoutWidget1);
-        rotateVLayout->setSpacing(1);
+        sizePolicy2.setHeightForWidth(rotateGroupBox->sizePolicy().hasHeightForWidth());
+        rotateGroupBox->setSizePolicy(sizePolicy2);
+        rotateGroupBox->setMinimumSize(QSize(0, 134));
+        rotateGroupBox->setMaximumSize(QSize(16777215, 134));
+        verticalLayout_2 = new QVBoxLayout(rotateGroupBox);
+        verticalLayout_2->setSpacing(0);
+        verticalLayout_2->setContentsMargins(0, 0, 0, 0);
+        verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
+        rotateVLayout = new QVBoxLayout();
+        rotateVLayout->setSpacing(6);
         rotateVLayout->setObjectName(QString::fromUtf8("rotateVLayout"));
-        rotateVLayout->setContentsMargins(0, 0, 0, 0);
-        rotateACButton = new QPushButton(layoutWidget1);
+        rotateACButton = new QPushButton(rotateGroupBox);
         rotateACButton->setObjectName(QString::fromUtf8("rotateACButton"));
 
         rotateVLayout->addWidget(rotateACButton);
 
-        rotateASButton = new QPushButton(layoutWidget1);
+        rotateASButton = new QPushButton(rotateGroupBox);
         rotateASButton->setObjectName(QString::fromUtf8("rotateASButton"));
 
         rotateVLayout->addWidget(rotateASButton);
 
-        rotateSAButton = new QPushButton(layoutWidget1);
+        rotateSAButton = new QPushButton(rotateGroupBox);
         rotateSAButton->setObjectName(QString::fromUtf8("rotateSAButton"));
 
         rotateVLayout->addWidget(rotateSAButton);
+
+
+        verticalLayout_2->addLayout(rotateVLayout);
+
+
+        verticalLayout_3->addWidget(rotateGroupBox);
 
 
         retranslateUi(FlipToolInterface);

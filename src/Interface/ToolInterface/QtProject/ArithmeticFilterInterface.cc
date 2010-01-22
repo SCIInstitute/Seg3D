@@ -6,6 +6,7 @@ ArithmeticFilterInterface::ArithmeticFilterInterface(QWidget *parent) :
     ui(new Ui::ArithmeticFilterInterface)
 {
     ui->setupUi(this);
+
 }
 
 ArithmeticFilterInterface::~ArithmeticFilterInterface()

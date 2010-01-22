@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>213</width>
+    <width>650</width>
     <height>207</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -24,156 +24,131 @@
   </property>
   <property name="maximumSize">
    <size>
-    <width>213</width>
+    <width>16777215</width>
     <height>207</height>
+   </size>
+  </property>
+  <property name="baseSize">
+   <size>
+    <width>650</width>
+    <height>0</height>
    </size>
   </property>
   <property name="windowTitle">
    <string>Discrete Gaussian Filter</string>
   </property>
-  <widget class="QWidget" name="layoutWidget_7">
-   <property name="geometry">
-    <rect>
-     <x>4</x>
-     <y>50</y>
-     <width>205</width>
-     <height>51</height>
-    </rect>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>0</number>
    </property>
-   <layout class="QHBoxLayout" name="varianceHLayout_bottom"/>
-  </widget>
-  <widget class="QWidget" name="layoutWidget_2">
-   <property name="geometry">
-    <rect>
-     <x>4</x>
-     <y>4</y>
-     <width>207</width>
-     <height>26</height>
-    </rect>
+   <property name="leftMargin">
+    <number>4</number>
    </property>
-   <layout class="QHBoxLayout" name="activeHLayout" stretch="1,2">
-    <property name="spacing">
-     <number>0</number>
-    </property>
-    <item>
-     <widget class="QLabel" name="activeLabel">
-      <property name="text">
-       <string>Target:</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QComboBox" name="activeComboBox"/>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QWidget" name="layoutWidget_8">
-   <property name="geometry">
-    <rect>
-     <x>4</x>
-     <y>29</y>
-     <width>205</width>
-     <height>22</height>
-    </rect>
+   <property name="topMargin">
+    <number>0</number>
    </property>
-   <layout class="QHBoxLayout" name="varianceHLayout_top">
-    <item>
-     <widget class="QLabel" name="varianceLabel">
-      <property name="text">
-       <string>Variance</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <spacer name="varianceHSpacer">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>40</width>
-        <height>20</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QWidget" name="layoutWidget_9">
-   <property name="geometry">
-    <rect>
-     <x>4</x>
-     <y>100</y>
-     <width>205</width>
-     <height>22</height>
-    </rect>
+   <property name="rightMargin">
+    <number>4</number>
    </property>
-   <layout class="QHBoxLayout" name="kernelHLayout_top">
-    <item>
-     <widget class="QLabel" name="kernelLabel">
-      <property name="text">
-       <string>Maximum Kernel Width</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <spacer name="kernelHSpacer">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>40</width>
-        <height>20</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QWidget" name="layoutWidget_10">
-   <property name="geometry">
-    <rect>
-     <x>4</x>
-     <y>121</y>
-     <width>205</width>
-     <height>51</height>
-    </rect>
+   <property name="bottomMargin">
+    <number>0</number>
    </property>
-   <layout class="QHBoxLayout" name="kernelHLayout_bottom"/>
-  </widget>
-  <widget class="QWidget" name="layoutWidget">
-   <property name="geometry">
-    <rect>
-     <x>4</x>
-     <y>171</y>
-     <width>205</width>
-     <height>32</height>
-    </rect>
-   </property>
-   <layout class="QHBoxLayout" name="replaceInvertLayout">
-    <property name="spacing">
-     <number>0</number>
-    </property>
-    <item>
-     <widget class="QCheckBox" name="replaceCheckBox">
-      <property name="text">
-       <string>Replace</string>
-      </property>
-      <property name="checked">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QPushButton" name="invertButton">
-      <property name="text">
-       <string>Run Filter</string>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
+   <item>
+    <layout class="QHBoxLayout" name="activeHLayout" stretch="1,2">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="activeLabel">
+       <property name="text">
+        <string>Target:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="activeComboBox"/>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="varianceHLayout_top">
+     <item>
+      <widget class="QLabel" name="varianceLabel">
+       <property name="text">
+        <string>Variance</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="varianceHSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="varianceHLayout_bottom"/>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="kernelHLayout_top">
+     <item>
+      <widget class="QLabel" name="kernelLabel">
+       <property name="text">
+        <string>Maximum Kernel Width</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="kernelHSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="kernelHLayout_bottom"/>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="replaceInvertLayout">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QCheckBox" name="replaceCheckBox">
+       <property name="text">
+        <string>Replace</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="invertButton">
+       <property name="text">
+        <string>Run Filter</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
  </widget>
  <resources/>
  <connections/>

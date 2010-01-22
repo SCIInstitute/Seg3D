@@ -16,6 +16,9 @@ AnisotropicDiffusionFilterInterface::AnisotropicDiffusionFilterInterface(QWidget
     conductanceAdjuster = new SliderSpinCombo();
     ui->conductanceHLayout_bottom->addWidget(conductanceAdjuster);
 
+    widgeter = new QWidget();
+    widgeter->resize();
+
     makeConnections();
 
     // sample data for displaying in layer box

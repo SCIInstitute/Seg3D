@@ -6,97 +6,92 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>213</width>
+    <width>650</width>
     <height>65</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
   <property name="minimumSize">
    <size>
-    <width>213</width>
+    <width>0</width>
     <height>65</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>213</width>
-    <height>65</height>
-   </size>
-  </property>
-  <property name="baseSize">
-   <size>
-    <width>213</width>
+    <width>16777215</width>
     <height>65</height>
    </size>
   </property>
   <property name="windowTitle">
    <string>Invert Tool</string>
   </property>
-  <widget class="QWidget" name="layoutWidget_2">
-   <property name="geometry">
-    <rect>
-     <x>4</x>
-     <y>4</y>
-     <width>207</width>
-     <height>26</height>
-    </rect>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>0</number>
    </property>
-   <layout class="QHBoxLayout" name="activeHLayout" stretch="1,2">
-    <property name="spacing">
-     <number>0</number>
-    </property>
-    <item>
-     <widget class="QLabel" name="activeLabel">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="text">
-       <string>Target:</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QComboBox" name="activeComboBox"/>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QWidget" name="layoutWidget">
-   <property name="geometry">
-    <rect>
-     <x>4</x>
-     <y>29</y>
-     <width>207</width>
-     <height>32</height>
-    </rect>
+   <property name="leftMargin">
+    <number>4</number>
    </property>
-   <layout class="QHBoxLayout" name="replaceInvertLayout">
-    <item>
-     <widget class="QCheckBox" name="replaceCheckBox">
-      <property name="text">
-       <string>Replace</string>
-      </property>
-      <property name="checked">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QPushButton" name="invertButton">
-      <property name="text">
-       <string>Invert</string>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>4</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <layout class="QHBoxLayout" name="activeHLayout" stretch="1,2">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="activeLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Target:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="activeComboBox"/>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="replaceInvertLayout">
+     <item>
+      <widget class="QCheckBox" name="replaceCheckBox">
+       <property name="text">
+        <string>Replace</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="invertButton">
+       <property name="text">
+        <string>Invert</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
  </widget>
  <resources/>
  <connections/>

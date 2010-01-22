@@ -25,6 +25,7 @@ class AnisotropicDiffusionFilterInterface : public QWidget {
     public:
         AnisotropicDiffusionFilterInterface(QWidget *parent = 0);
         ~AnisotropicDiffusionFilterInterface();
+        QWidget *widgeter;
 
     public slots:
         void setActive(int);
@@ -38,6 +39,8 @@ class AnisotropicDiffusionFilterInterface : public QWidget {
 
         void setConductance(int);
         void setConductanceRange(int, int);
+
+
 
     private:
         Ui::AnisotropicDiffusionFilterInterface *ui;

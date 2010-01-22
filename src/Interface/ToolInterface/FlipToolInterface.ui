@@ -6,25 +6,25 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>213</width>
+    <width>650</width>
     <height>297</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
   <property name="minimumSize">
    <size>
-    <width>213</width>
+    <width>0</width>
     <height>297</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>213</width>
+    <width>16777215</width>
     <height>297</height>
    </size>
   </property>
@@ -34,156 +34,196 @@
     <height>0</height>
    </size>
   </property>
-  <property name="baseSize">
-   <size>
-    <width>213</width>
-    <height>297</height>
-   </size>
-  </property>
   <property name="windowTitle">
    <string>Flip Tool</string>
   </property>
-  <widget class="QWidget" name="layoutWidget_2">
-   <property name="geometry">
-    <rect>
-     <x>4</x>
-     <y>4</y>
-     <width>207</width>
-     <height>26</height>
-    </rect>
+  <layout class="QVBoxLayout" name="verticalLayout_3">
+   <property name="spacing">
+    <number>0</number>
    </property>
-   <layout class="QHBoxLayout" name="activeHLayout" stretch="1,2">
-    <property name="spacing">
-     <number>0</number>
-    </property>
-    <item>
-     <widget class="QLabel" name="activeLabel">
-      <property name="text">
-       <string>Target:</string>
+   <property name="leftMargin">
+    <number>4</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>4</number>
+   </property>
+   <property name="bottomMargin">
+    <number>4</number>
+   </property>
+   <item>
+    <layout class="QHBoxLayout" name="activeHLayout" stretch="1,2">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="activeLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Target:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="activeComboBox">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="flipGroupBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>134</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>134</height>
+      </size>
+     </property>
+     <property name="title">
+      <string>Flip</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="spacing">
+       <number>0</number>
       </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QComboBox" name="activeComboBox"/>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QGroupBox" name="flipGroupBox">
-   <property name="geometry">
-    <rect>
-     <x>6</x>
-     <y>28</y>
-     <width>201</width>
-     <height>131</height>
-    </rect>
-   </property>
-   <property name="title">
-    <string>Flip</string>
-   </property>
-   <widget class="QWidget" name="layoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>22</y>
-      <width>201</width>
-      <height>109</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="flipVLayout">
-     <property name="spacing">
-      <number>1</number>
+      <property name="margin">
+       <number>0</number>
+      </property>
+      <item>
+       <layout class="QVBoxLayout" name="flipVLayout" stretch="0,0,0">
+        <property name="spacing">
+         <number>6</number>
+        </property>
+        <item>
+         <widget class="QPushButton" name="flipAxialButton">
+          <property name="toolTip">
+           <string>Flip across the axial plain</string>
+          </property>
+          <property name="text">
+           <string>Axial</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="flipCoronalButton">
+          <property name="toolTip">
+           <string>Flip across the coronal plain</string>
+          </property>
+          <property name="text">
+           <string>Coronal</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="flipSagittalButton">
+          <property name="toolTip">
+           <string>Flip across the sagittal plain</string>
+          </property>
+          <property name="text">
+           <string>Sagittal</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="rotateGroupBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
-     <item>
-      <widget class="QPushButton" name="flipAxialButton">
-       <property name="toolTip">
-        <string>Flip across the axial plain</string>
-       </property>
-       <property name="text">
-        <string>Axial</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="flipCoronalButton">
-       <property name="toolTip">
-        <string>Flip across the coronal plain</string>
-       </property>
-       <property name="text">
-        <string>Coronal</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="flipSagittalButton">
-       <property name="toolTip">
-        <string>Flip across the sagittal plain</string>
-       </property>
-       <property name="text">
-        <string>Sagittal</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-  </widget>
-  <widget class="QGroupBox" name="rotateGroupBox">
-   <property name="geometry">
-    <rect>
-     <x>6</x>
-     <y>160</y>
-     <width>201</width>
-     <height>131</height>
-    </rect>
-   </property>
-   <property name="title">
-    <string>Rotate</string>
-   </property>
-   <widget class="QWidget" name="layoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>22</y>
-      <width>201</width>
-      <height>109</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="rotateVLayout">
-     <property name="spacing">
-      <number>1</number>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>134</height>
+      </size>
      </property>
-     <item>
-      <widget class="QPushButton" name="rotateACButton">
-       <property name="toolTip">
-        <string>Rotate axial to coronal</string>
-       </property>
-       <property name="text">
-        <string>Axial - Coronal</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="rotateASButton">
-       <property name="toolTip">
-        <string>Rotate axial to sagittal</string>
-       </property>
-       <property name="text">
-        <string>Axial - Sagittal</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="rotateSAButton">
-       <property name="toolTip">
-        <string>Rotate sagittal to axial</string>
-       </property>
-       <property name="text">
-        <string>Sagittal - Axial</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-  </widget>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>134</height>
+      </size>
+     </property>
+     <property name="title">
+      <string>Rotate</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="margin">
+       <number>0</number>
+      </property>
+      <item>
+       <layout class="QVBoxLayout" name="rotateVLayout" stretch="0,0,0">
+        <property name="spacing">
+         <number>6</number>
+        </property>
+        <item>
+         <widget class="QPushButton" name="rotateACButton">
+          <property name="toolTip">
+           <string>Rotate axial to coronal</string>
+          </property>
+          <property name="text">
+           <string>Axial - Coronal</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="rotateASButton">
+          <property name="toolTip">
+           <string>Rotate axial to sagittal</string>
+          </property>
+          <property name="text">
+           <string>Axial - Sagittal</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="rotateSAButton">
+          <property name="toolTip">
+           <string>Rotate sagittal to axial</string>
+          </property>
+          <property name="text">
+           <string>Sagittal - Axial</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
  </widget>
  <resources/>
  <connections/>

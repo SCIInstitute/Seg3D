@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'MedianFilterInterface.ui'
 **
-** Created: Tue Jan 5 13:59:09 2010
+** Created: Mon Jan 18 16:33:21 2010
 **      by: Qt User Interface Compiler version 4.6.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -21,6 +21,7 @@
 #include <QtGui/QLabel>
 #include <QtGui/QPushButton>
 #include <QtGui/QSpacerItem>
+#include <QtGui/QVBoxLayout>
 #include <QtGui/QWidget>
 
 QT_BEGIN_NAMESPACE
@@ -28,17 +29,14 @@ QT_BEGIN_NAMESPACE
 class Ui_MedianFilterInterface
 {
 public:
-    QWidget *layoutWidget_8;
-    QHBoxLayout *radiusHLayout_top;
-    QLabel *radiusLabel;
-    QSpacerItem *radiusHSpacer;
-    QWidget *layoutWidget_2;
+    QVBoxLayout *verticalLayout;
     QHBoxLayout *activeHLayout;
     QLabel *activeLabel;
     QComboBox *activeComboBox;
-    QWidget *layoutWidget_7;
+    QHBoxLayout *radiusHLayout_top;
+    QLabel *radiusLabel;
+    QSpacerItem *radiusHSpacer;
     QHBoxLayout *radiusHLayout_bottom;
-    QWidget *layoutWidget;
     QHBoxLayout *replaceRunLayout;
     QCheckBox *replaceCheckBox;
     QPushButton *runButton;
@@ -47,21 +45,40 @@ public:
     {
         if (MedianFilterInterface->objectName().isEmpty())
             MedianFilterInterface->setObjectName(QString::fromUtf8("MedianFilterInterface"));
-        MedianFilterInterface->resize(213, 136);
-        QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        MedianFilterInterface->resize(650, 136);
+        QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(MedianFilterInterface->sizePolicy().hasHeightForWidth());
         MedianFilterInterface->setSizePolicy(sizePolicy);
         MedianFilterInterface->setMinimumSize(QSize(213, 136));
-        MedianFilterInterface->setMaximumSize(QSize(213, 136));
-        layoutWidget_8 = new QWidget(MedianFilterInterface);
-        layoutWidget_8->setObjectName(QString::fromUtf8("layoutWidget_8"));
-        layoutWidget_8->setGeometry(QRect(4, 29, 205, 22));
-        radiusHLayout_top = new QHBoxLayout(layoutWidget_8);
+        MedianFilterInterface->setMaximumSize(QSize(16777215, 136));
+        MedianFilterInterface->setBaseSize(QSize(650, 136));
+        verticalLayout = new QVBoxLayout(MedianFilterInterface);
+        verticalLayout->setSpacing(0);
+        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
+        verticalLayout->setContentsMargins(4, 0, 4, 0);
+        activeHLayout = new QHBoxLayout();
+        activeHLayout->setSpacing(0);
+        activeHLayout->setObjectName(QString::fromUtf8("activeHLayout"));
+        activeLabel = new QLabel(MedianFilterInterface);
+        activeLabel->setObjectName(QString::fromUtf8("activeLabel"));
+
+        activeHLayout->addWidget(activeLabel);
+
+        activeComboBox = new QComboBox(MedianFilterInterface);
+        activeComboBox->setObjectName(QString::fromUtf8("activeComboBox"));
+
+        activeHLayout->addWidget(activeComboBox);
+
+        activeHLayout->setStretch(0, 1);
+        activeHLayout->setStretch(1, 2);
+
+        verticalLayout->addLayout(activeHLayout);
+
+        radiusHLayout_top = new QHBoxLayout();
         radiusHLayout_top->setObjectName(QString::fromUtf8("radiusHLayout_top"));
-        radiusHLayout_top->setContentsMargins(0, 0, 0, 0);
-        radiusLabel = new QLabel(layoutWidget_8);
+        radiusLabel = new QLabel(MedianFilterInterface);
         radiusLabel->setObjectName(QString::fromUtf8("radiusLabel"));
 
         radiusHLayout_top->addWidget(radiusLabel);
@@ -70,47 +87,29 @@ public:
 
         radiusHLayout_top->addItem(radiusHSpacer);
 
-        layoutWidget_2 = new QWidget(MedianFilterInterface);
-        layoutWidget_2->setObjectName(QString::fromUtf8("layoutWidget_2"));
-        layoutWidget_2->setGeometry(QRect(4, 4, 207, 26));
-        activeHLayout = new QHBoxLayout(layoutWidget_2);
-        activeHLayout->setSpacing(0);
-        activeHLayout->setObjectName(QString::fromUtf8("activeHLayout"));
-        activeHLayout->setContentsMargins(0, 0, 0, 0);
-        activeLabel = new QLabel(layoutWidget_2);
-        activeLabel->setObjectName(QString::fromUtf8("activeLabel"));
 
-        activeHLayout->addWidget(activeLabel);
+        verticalLayout->addLayout(radiusHLayout_top);
 
-        activeComboBox = new QComboBox(layoutWidget_2);
-        activeComboBox->setObjectName(QString::fromUtf8("activeComboBox"));
-
-        activeHLayout->addWidget(activeComboBox);
-
-        activeHLayout->setStretch(0, 1);
-        activeHLayout->setStretch(1, 2);
-        layoutWidget_7 = new QWidget(MedianFilterInterface);
-        layoutWidget_7->setObjectName(QString::fromUtf8("layoutWidget_7"));
-        layoutWidget_7->setGeometry(QRect(4, 50, 205, 51));
-        radiusHLayout_bottom = new QHBoxLayout(layoutWidget_7);
+        radiusHLayout_bottom = new QHBoxLayout();
         radiusHLayout_bottom->setObjectName(QString::fromUtf8("radiusHLayout_bottom"));
-        radiusHLayout_bottom->setContentsMargins(0, 0, 0, 0);
-        layoutWidget = new QWidget(MedianFilterInterface);
-        layoutWidget->setObjectName(QString::fromUtf8("layoutWidget"));
-        layoutWidget->setGeometry(QRect(4, 100, 205, 32));
-        replaceRunLayout = new QHBoxLayout(layoutWidget);
+
+        verticalLayout->addLayout(radiusHLayout_bottom);
+
+        replaceRunLayout = new QHBoxLayout();
         replaceRunLayout->setObjectName(QString::fromUtf8("replaceRunLayout"));
-        replaceRunLayout->setContentsMargins(0, 0, 0, 0);
-        replaceCheckBox = new QCheckBox(layoutWidget);
+        replaceCheckBox = new QCheckBox(MedianFilterInterface);
         replaceCheckBox->setObjectName(QString::fromUtf8("replaceCheckBox"));
         replaceCheckBox->setChecked(true);
 
         replaceRunLayout->addWidget(replaceCheckBox);
 
-        runButton = new QPushButton(layoutWidget);
+        runButton = new QPushButton(MedianFilterInterface);
         runButton->setObjectName(QString::fromUtf8("runButton"));
 
         replaceRunLayout->addWidget(runButton);
+
+
+        verticalLayout->addLayout(replaceRunLayout);
 
 
         retranslateUi(MedianFilterInterface);
@@ -121,8 +120,8 @@ public:
     void retranslateUi(QWidget *MedianFilterInterface)
     {
         MedianFilterInterface->setWindowTitle(QApplication::translate("MedianFilterInterface", "Median Filter", 0, QApplication::UnicodeUTF8));
-        radiusLabel->setText(QApplication::translate("MedianFilterInterface", "Radius", 0, QApplication::UnicodeUTF8));
         activeLabel->setText(QApplication::translate("MedianFilterInterface", "Target:", 0, QApplication::UnicodeUTF8));
+        radiusLabel->setText(QApplication::translate("MedianFilterInterface", "Radius", 0, QApplication::UnicodeUTF8));
         replaceCheckBox->setText(QApplication::translate("MedianFilterInterface", "Replace", 0, QApplication::UnicodeUTF8));
         runButton->setText(QApplication::translate("MedianFilterInterface", "Run Filter", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
