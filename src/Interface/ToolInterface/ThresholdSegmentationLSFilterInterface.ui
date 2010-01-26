@@ -41,22 +41,16 @@
    <property name="spacing">
     <number>0</number>
    </property>
-   <property name="leftMargin">
+   <property name="margin">
     <number>4</number>
-   </property>
-   <property name="topMargin">
-    <number>0</number>
-   </property>
-   <property name="rightMargin">
-    <number>4</number>
-   </property>
-   <property name="bottomMargin">
-    <number>0</number>
    </property>
    <item>
     <layout class="QHBoxLayout" name="activeHLayout" stretch="1,2">
      <property name="spacing">
       <number>3</number>
+     </property>
+     <property name="bottomMargin">
+      <number>4</number>
      </property>
      <item>
       <widget class="QLabel" name="activeLabel">
@@ -96,7 +90,7 @@
      <item>
       <widget class="QLabel" name="iterationsLabel">
        <property name="text">
-        <string>Iterations</string>
+        <string>Iterations:</string>
        </property>
       </widget>
      </item>
@@ -148,7 +142,16 @@
       <property name="spacing">
        <number>0</number>
       </property>
-      <property name="margin">
+      <property name="leftMargin">
+       <number>4</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>4</number>
+      </property>
+      <property name="bottomMargin">
        <number>0</number>
       </property>
       <item>
@@ -156,7 +159,7 @@
         <item>
          <widget class="QLabel" name="upperLabel">
           <property name="text">
-           <string>Upper</string>
+           <string>Upper:</string>
           </property>
          </widget>
         </item>
@@ -183,7 +186,7 @@
         <item>
          <widget class="QLabel" name="lowerLabel">
           <property name="text">
-           <string>Lower</string>
+           <string>Lower:</string>
           </property>
          </widget>
         </item>
@@ -238,7 +241,16 @@
       <property name="spacing">
        <number>0</number>
       </property>
-      <property name="margin">
+      <property name="leftMargin">
+       <number>4</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>4</number>
+      </property>
+      <property name="bottomMargin">
        <number>0</number>
       </property>
       <item>
@@ -246,7 +258,7 @@
         <item>
          <widget class="QLabel" name="curvatureLabel">
           <property name="text">
-           <string>Curvature</string>
+           <string>Curvature:</string>
           </property>
          </widget>
         </item>
@@ -273,7 +285,7 @@
         <item>
          <widget class="QLabel" name="propagationLabel">
           <property name="text">
-           <string>Propagation</string>
+           <string>Propagation:</string>
           </property>
          </widget>
         </item>
@@ -300,7 +312,7 @@
         <item>
          <widget class="QLabel" name="edgeLabel">
           <property name="text">
-           <string>Edge</string>
+           <string>Edge:</string>
           </property>
          </widget>
         </item>

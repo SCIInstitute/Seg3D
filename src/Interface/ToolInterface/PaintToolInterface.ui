@@ -40,16 +40,7 @@
    <property name="spacing">
     <number>0</number>
    </property>
-   <property name="leftMargin">
-    <number>4</number>
-   </property>
-   <property name="topMargin">
-    <number>0</number>
-   </property>
-   <property name="rightMargin">
-    <number>4</number>
-   </property>
-   <property name="bottomMargin">
+   <property name="margin">
     <number>4</number>
    </property>
    <item>
@@ -163,6 +154,12 @@
      <property name="spacing">
       <number>0</number>
      </property>
+     <property name="leftMargin">
+      <number>4</number>
+     </property>
+     <property name="rightMargin">
+      <number>4</number>
+     </property>
      <item>
       <widget class="QLabel" name="brushLabel">
        <property name="text">
@@ -195,6 +192,12 @@
      </property>
      <property name="sizeConstraint">
       <enum>QLayout::SetDefaultConstraint</enum>
+     </property>
+     <property name="leftMargin">
+      <number>4</number>
+     </property>
+     <property name="rightMargin">
+      <number>5</number>
      </property>
     </layout>
    </item>
@@ -233,6 +236,15 @@
       </property>
       <item>
        <layout class="QHBoxLayout" name="upperHLayout_top">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="leftMargin">
+         <number>4</number>
+        </property>
+        <property name="rightMargin">
+         <number>4</number>
+        </property>
         <item>
          <widget class="QLabel" name="upperLabel">
           <property name="text">
@@ -256,10 +268,29 @@
        </layout>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="upperHLayout_bottom"/>
+       <layout class="QHBoxLayout" name="upperHLayout_bottom">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="leftMargin">
+         <number>4</number>
+        </property>
+        <property name="rightMargin">
+         <number>4</number>
+        </property>
+       </layout>
       </item>
       <item>
        <layout class="QHBoxLayout" name="lowerHLayout_top">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="leftMargin">
+         <number>4</number>
+        </property>
+        <property name="rightMargin">
+         <number>4</number>
+        </property>
         <item>
          <widget class="QLabel" name="lowerLabel">
           <property name="text">
@@ -283,7 +314,17 @@
        </layout>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="lowerHLayout_bottom"/>
+       <layout class="QHBoxLayout" name="lowerHLayout_bottom">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="leftMargin">
+         <number>4</number>
+        </property>
+        <property name="rightMargin">
+         <number>4</number>
+        </property>
+       </layout>
       </item>
      </layout>
     </widget>

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>650</width>
+    <width>213</width>
     <height>271</height>
    </rect>
   </property>
@@ -41,17 +41,8 @@
    <property name="spacing">
     <number>0</number>
    </property>
-   <property name="leftMargin">
+   <property name="margin">
     <number>4</number>
-   </property>
-   <property name="topMargin">
-    <number>0</number>
-   </property>
-   <property name="rightMargin">
-    <number>4</number>
-   </property>
-   <property name="bottomMargin">
-    <number>0</number>
    </property>
    <item>
     <layout class="QHBoxLayout" name="activeHLayout" stretch="1,2">
@@ -113,7 +104,16 @@
       <property name="spacing">
        <number>0</number>
       </property>
-      <property name="margin">
+      <property name="leftMargin">
+       <number>4</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>4</number>
+      </property>
+      <property name="bottomMargin">
        <number>0</number>
       </property>
       <item>
@@ -202,11 +202,6 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="font">
-        <font>
-         <pointsize>13</pointsize>
-        </font>
-       </property>
        <property name="text">
         <string>Dialate-&gt;Erode</string>
        </property>
@@ -227,11 +222,6 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="font">
-        <font>
-         <pointsize>13</pointsize>
-        </font>
-       </property>
        <property name="text">
         <string>Run Dialate</string>
        </property>
@@ -244,11 +234,6 @@
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>13</pointsize>
-        </font>
        </property>
        <property name="text">
         <string>Run Erode</string>

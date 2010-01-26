@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>650</width>
+    <width>213</width>
     <height>281</height>
    </rect>
   </property>
@@ -35,22 +35,16 @@
    <property name="spacing">
     <number>0</number>
    </property>
-   <property name="leftMargin">
+   <property name="margin">
     <number>4</number>
-   </property>
-   <property name="topMargin">
-    <number>0</number>
-   </property>
-   <property name="rightMargin">
-    <number>4</number>
-   </property>
-   <property name="bottomMargin">
-    <number>0</number>
    </property>
    <item>
     <layout class="QHBoxLayout" name="volumeAHLayout" stretch="1,2">
      <property name="spacing">
       <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>2</number>
      </property>
      <item>
       <widget class="QLabel" name="volumeALabel">
@@ -69,6 +63,12 @@
      <property name="spacing">
       <number>0</number>
      </property>
+     <property name="topMargin">
+      <number>2</number>
+     </property>
+     <property name="bottomMargin">
+      <number>2</number>
+     </property>
      <item>
       <widget class="QLabel" name="volumeBLabel">
        <property name="text">
@@ -86,6 +86,12 @@
      <property name="spacing">
       <number>0</number>
      </property>
+     <property name="topMargin">
+      <number>2</number>
+     </property>
+     <property name="bottomMargin">
+      <number>2</number>
+     </property>
      <item>
       <widget class="QLabel" name="volumeCLabel">
        <property name="text">
@@ -102,6 +108,9 @@
     <layout class="QVBoxLayout" name="verticalLayout">
      <property name="spacing">
       <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>4</number>
      </property>
      <item>
       <widget class="QLabel" name="label">
