@@ -112,16 +112,6 @@ AppMenu::create_view_menu(QMenu* qmenu)
                     boost::bind(&InterfaceManager::dispatch_full_screen_window,
                                 InterfaceManager::Instance(),std::string("toggle")));
   
-  
-  
-  
-  //qaction = qmenu->addAction(tr("Toggle Full Screen"));
-//  qaction->setShortcut(tr("Ctrl+F"));
-//  qaction->setToolTip(tr("Toggle the view between full screen and normal"));
-//  //qaction->setCheckable(true);
-//  //qaction->setChecked(false);
-//  connect(qaction, SIGNAL(triggered(bool)), this->parent(), SLOT(full_screen_toggle(bool)));
-  
   QAction* qaction2;
   qaction2 = qmenu->addAction(tr("Only One Viewer"));
   qaction2->setShortcut(tr("ALT+0"));

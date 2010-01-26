@@ -102,7 +102,7 @@ private:
       QWidget *typeGradient_;
       QHBoxLayout *horizontalLayout_9;
       QToolButton *colorChooseButton_;
-      QVBoxLayout *verticalLayout;
+      QVBoxLayout *verticalLayout_box;
       QPushButton *label_;
       QHBoxLayout *horizontalLayout_7;
       QToolButton *fillOpacityButton_;
@@ -125,6 +125,7 @@ private:
       QWidget *colorChooseBar;
       QVBoxLayout *verticalLayout_3;
       QFrame *line_2;
+      QFrame *line_3;
       QHBoxLayout *horizontalLayout_4;
       QToolButton *color_button_01_;
       QToolButton *color_button_02_;

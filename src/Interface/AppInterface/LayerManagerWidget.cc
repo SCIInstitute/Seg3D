@@ -626,9 +626,10 @@ LayerManagerWidget::add_layer( layer_type type, const QString &label, const QStr
     layer_handle_->horizontalLayout_2->addWidget(layer_handle_->typeBackground_);
     
     
-    layer_handle_->verticalLayout = new QVBoxLayout();
-    layer_handle_->verticalLayout->setSpacing(0);
-    layer_handle_->verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
+    layer_handle_->verticalLayout_box = new QVBoxLayout();
+    layer_handle_->verticalLayout_box->setSpacing(0);
+    //layer_handle_->verticalLayout_box->setContentsMargins(2,0,2,0);
+    layer_handle_->verticalLayout_box->setObjectName(QString::fromUtf8("verticalLayout_box"));
     layer_handle_->label_ = new QPushButton(layer_handle_->background_1);
     layer_handle_->label_->setObjectName(QString::fromUtf8("label_"));
     sizePolicy1.setHeightForWidth(layer_handle_->label_->sizePolicy().hasHeightForWidth());
@@ -637,11 +638,20 @@ LayerManagerWidget::add_layer( layer_type type, const QString &label, const QStr
     layer_handle_->label_->setMaximumSize(QSize(16777215, 21));
     layer_handle_->label_->setFlat(true);
     
-    layer_handle_->verticalLayout->addWidget(layer_handle_->label_);
-    layer_handle_->verticalLayout->addStretch();
+    layer_handle_->verticalLayout_box->addWidget(layer_handle_->label_);
+    
+    layer_handle_->line_3 = new QFrame(layer_handle_->background_1);
+    layer_handle_->line_3->setObjectName(QString::fromUtf8("line_3"));
+    layer_handle_->line_3->setFrameShape(QFrame::HLine);
+    layer_handle_->line_3->setFrameShadow(QFrame::Sunken);
+  
+    layer_handle_->verticalLayout_box->addWidget(layer_handle_->line_3);
+    layer_handle_->line_3->setStyleSheet(QString::fromUtf8("QFrame#line_3{ margin-right: 4px; margin-left: 2px; }"));
+    layer_handle_->verticalLayout_box->addStretch();
     
     layer_handle_->horizontalLayout_7 = new QHBoxLayout();
     layer_handle_->horizontalLayout_7->setSpacing(0);
+    layer_handle_->horizontalLayout_7->setContentsMargins(0,0,0,2);
     layer_handle_->horizontalLayout_7->setObjectName(QString::fromUtf8("horizontalLayout_7"));
     
     layer_handle_->fillOpacityButton_ = new QToolButton(layer_handle_->background_1);
@@ -702,10 +712,10 @@ LayerManagerWidget::add_layer( layer_type type, const QString &label, const QStr
     layer_handle_->horizontalLayout_7->addWidget(layer_handle_->lockButton_);
     
     
-    layer_handle_->verticalLayout->addLayout(layer_handle_->horizontalLayout_7);
+    layer_handle_->verticalLayout_box->addLayout(layer_handle_->horizontalLayout_7);
     
     
-    layer_handle_->horizontalLayout_2->addLayout(layer_handle_->verticalLayout);
+    layer_handle_->horizontalLayout_2->addLayout(layer_handle_->verticalLayout_box);
     
     
     layer_handle_->horizontalLayout_5->addLayout(layer_handle_->horizontalLayout_2);
