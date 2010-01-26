@@ -37,6 +37,7 @@ SET(APPLICATION_STATE_SRCS
   StateOption.cc
   StateOption.h
   StateValue.h
+  StateVector.h
   StateRangedValue.h
   StateManager.h
   StateManager.cc
