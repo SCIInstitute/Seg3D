@@ -48,8 +48,8 @@ PaintTool::PaintTool(const std::string& toolid) :
   
   // Add constaints, so that when the state changes the right ranges of 
   // parameters are selected
-  target_layer_->connect(boost::bind(&PaintTool::target_constraint,this,_1));
-  mask_layer_->connect(boost::bind(&PaintTool::mask_constraint,this,_1));
+  target_layer_->value_changed_signal.connect(boost::bind(&PaintTool::target_constraint,this,_1));
+  mask_layer_->value_changed_signal.connect(boost::bind(&PaintTool::mask_constraint,this,_1));
 
   // If a layer is added or deleted update the lists
 //  add_connection(LayerManager::instance()->connect_layers_changed(

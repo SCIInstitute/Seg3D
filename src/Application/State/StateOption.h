@@ -33,74 +33,121 @@
 # pragma once
 #endif
 
-#include <Application/State/State.h>
+#include <boost/smart_ptr.hpp>
+
+#include <Application/State/StateBase.h>
 
 namespace Seg3D {
 
-// STATE:
-// Class that records the state of a variable
+// STATEOPTION:
+// This class is a specification of State that is used to hold an option out of
+// a list of possible options.
 
 class StateOption;
 
-class StateOption : public State<std::string> {
-  public:
-    // One cannot define a templated typedef of StateHandle<>,
-    // Hence we settle for StateValue<T>::Handle
-    typedef boost::shared_ptr<StateOption> Handle;
+typedef boost::shared_ptr<StateOption> StateOptionHandle;
 
+class StateOption : public StateBase {
 
 // -- constructor/destructor --
   public:
 
-    StateOption(const std::vector<std::string>& option_list, 
-                const std::string& default_option);
-                
+    // CONSTRUCTOR
+    StateOption(const std::string& default_value,
+                const std::string& option_list);
+
+    StateOption(const std::string& default_value,
+                const std::vector<std::string>& option_list);                
+    // DESTRUCTOR
     virtual ~StateOption();
+
+// -- functions for accessing data --
+
+  public:
+    // EXPORT_TO_STRING:
+    // Convert the contents of the State into a string
+    virtual std::string export_to_string() const;
     
-// -- set/get value --
+    // IMPORT_FROM_STRING:
+    // Set the State from a string
+    virtual bool import_from_string(const std::string& str,
+                                    bool from_interface = false);
+                                    
+  protected:    
+    // EXPORT_TO_VARIANT
+    // Export the state data to a variant parameter
+    virtual void export_to_variant(ActionParameterVariant& variant) const;
+    
+    // IMPORT_FROM_VARIANT:
+    // Import the state data from a variant parameter.
+    virtual bool import_from_variant(ActionParameterVariant& variant,
+                                     bool from_interface = false);
+          
+    // VALIDATE_VARIANT:
+    // Validate a variant parameter
+    // This function returns false if the parameter is invalid or cannot be 
+    // converted and in that case error will describe the error.
+    virtual bool validate_variant(ActionParameterVariant& variant, 
+                                  std::string& error);
+    
+    // COMPARE_VARIANT:
+    // Compare with variant parameter
+    virtual bool compare_variant(ActionParameterVariant& variant);                                    
+                                    
+// -- signals describing the state --
+
+  public:
+    // VALUE_CHANGED_SIGNAL:
+    // Signal when the data in the state is changed, the second bool indicates
+    // whether the signal was triggered from the interface, in which case it may
+    // not need to update the interface.
+
+    typedef boost::signals2::signal<void (std::string, bool)> value_changed_signal_type;
+    value_changed_signal_type value_changed_signal;
+
+    // OPTIONLIST_CHANGED_SIGNAL:
+    // Signal when the option list is changed
+    typedef boost::signals2::signal<void ()> optionlist_changed_signal_type;
+    optionlist_changed_signal_type optionlist_changed_signal;    
+
+// -- Functions specific to this type of state --
   public:
 
-    // SET:
-    // Set the value in this State variable
-    virtual void set(const std::string& option);
+    // SET_OPTION_LIST:
+    // Set the list of options from which one can choose
+    void set_option_list(const std::string& option_list);
+
+    // SET_OPTION_LIST:
+    // Set the list of options from which one can choose
+    void set_option_list(const std::string& option_list,
+                         const std::string& option);
+   
 
     // SET_OPTION_LIST:
     // Set the list of options from which one can choose
     void set_option_list(const std::vector<std::string>& option_list);
 
+    // SET_OPTION_LIST:
+    // Set the list of options from which one can choose
+    void set_option_list(const std::vector<std::string>& option_list,
+                         const std::string& option);    
+      
+    // OPTION_LIST:
+    // Get the option list
+    std::vector<std::string> option_list();
+    
     // IS_OPTION:
     // Check whether a string is a valid option
     bool is_option(const std::string& option);
-
-    // IMPORT_FROM_STRING:
-    // Set the State from a string
-    // NOTE: this does not trigger the value_changed_signal.
-    // This function returns whether the conversion was successful
-    // As the user may have altered the input the return value of
-    // this function needs to be checked.
-    virtual bool import_from_string(const std::string& str);
     
-// -- action handling --
-  public:    
-    // VALIDATE_AND_COMPARE_VARIANT:
-    // Validate that the data contained in the variant parameter can actually
-    // be used and check whether it changed from the current value.
-    virtual bool validate_and_compare_variant(ActionParameterVariant& variant, 
-                                              bool& changed,
-                                              std::string& error) const;
-
-    // IMPORT_FROM_VARIANT:
-    // Import the state data from a variant parameter.  
-    virtual bool import_from_variant(ActionParameterVariant& variant, 
-                                     bool trigger_signal = true);
-
 // -- option list --
   protected:
+  
+    // Storage for the actual value
+    std::string value_;
+  
     // List with all the allowed options in lower case
     std::vector<std::string> option_list_;
-    
-    // Default option which will be inserted if the current option is invalidated
-    std::string default_option_;
                                     
 };
 

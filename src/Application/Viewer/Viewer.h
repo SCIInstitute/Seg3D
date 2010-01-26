@@ -26,8 +26,8 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_VIEW_VIEW_H
-#define APPLICATION_VIEW_VIEW_H
+#ifndef APPLICATION_VIEWER_VIEWER_H
+#define APPLICATION_VIEWER_VIEWER_H
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
@@ -40,50 +40,45 @@
 #include <boost/shared_ptr.hpp>
 
 // Application includes
-#include <Application/View/ViewRenderer.h>
+#include <Application/State/StateHandler.h>
+#include <Application/Viewer/ViewerRenderer.h>
 
 namespace Seg3D {
 
 // Forward declarations
-class View;
-typedef boost::shared_ptr<View> ViewHandle;
+class Viewer;
+typedef boost::shared_ptr<Viewer> ViewerHandle;
 
 
 // Class declarations
 
-class View {
-
-// -- types of views --
-  public:
-    enum view_type {
-      AXIAL_E = 0,
-      SAGITTAL_E,
-      CORONAL_E,
-      VOLUME_E
-    };
+class Viewer : public StateHandler {
 
 // -- constructor/destructor --
   public:
-    View();
-    virtual ~View();
+    Viewer(const std::string& key);
+    virtual ~Viewer();
 
-    view_type type() const { return type_; }
-    void      set_type(view_type new_type) { type_ = new_type; }
-
-  private:
-    // Type of the view
-    view_type type_;
-
+// -- State information --
+  public:
+    StateOptionHandle         viewer_type_;
+    StateBoolHandle    viewer_flip_x_;
+    StateBoolHandle    viewer_flip_y_;
+    StateBoolHandle    viewer_grid_;
+    StateBoolHandle    viewer_lock_;
+    
 // -- Renderer information --
-
-  // Note: by default a dummy renderer is generated.
   public:
     
-    ViewRendererHandle renderer() { return renderer_; }
-    void set_renderer(ViewRendererHandle renderer) { renderer_ = renderer; }
+    ViewerRendererHandle renderer() { return renderer_; }
+    void set_renderer(ViewerRendererHandle renderer) { renderer_ = renderer; }
+
 
   private:
-    ViewRendererHandle renderer_;
+    // A handle to the renderer that is used to render the data
+    ViewerRendererHandle renderer_;
+    
+        
 };
 
 } // end namespace Seg3D

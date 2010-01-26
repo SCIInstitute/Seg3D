@@ -47,7 +47,7 @@ ADD_LIBRARY(Application_Renderer STATIC
 TARGET_LINK_LIBRARIES(Application_Renderer
                       Utils_Core
                       Utils_EventHandler
-                      Application_View
+                      Application_Viewer
                       ${SCI_GLEW_LIBRARY}
                       ${SCI_BOOST_LIBRARY})
 

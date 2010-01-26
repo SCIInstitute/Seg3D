@@ -26,6 +26,7 @@
    DEALINGS IN THE SOFTWARE.
 */
 
+#include <Application/Interface/Interface.h>
 #include <Application/InterfaceManager/InterfaceManager.h>
 #include <Application/InterfaceManager/Actions/ActionShowWindow.h>
 
@@ -61,5 +62,19 @@ ActionShowWindow::run(ActionContextHandle& context,
   InterfaceManager::Instance()->show_window_signal(windowid_.value());
   return (true); // success
 }
+
+void 
+ActionShowWindow::Dispatch(const std::string& windowid)
+{
+  // Create new action
+  ActionShowWindow* action = new ActionShowWindow;
+
+  // Set action parameters
+  action->windowid_.value() = windowid;
+
+  // Post the new action
+  PostActionFromInterface(ActionHandle(action));
+}
+
 
 } // end namespace Seg3D

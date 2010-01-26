@@ -26,6 +26,7 @@
    DEALINGS IN THE SOFTWARE.
 */
 
+#include <Application/Interface/Interface.h>
 #include <Interface/QtInterface/QtBridge.h>
 #include <Interface/QtInterface/QtBridgeInternal.h>
 
@@ -46,7 +47,7 @@ void QtCheckBoxSignal(QPointer<QCheckBox> qobject_ptr, bool state)
 
 bool
 QtBridge::connect(QCheckBox* qcheckbox, 
-                     StateValue<bool>::Handle& state_handle)
+                     StateBoolHandle& state_handle)
 {
   // Connect the dispatch into the StateVariable (with auxillary object)
   // Link tbe slot to the parent widget, so Qt's memory manager will
@@ -54,7 +55,7 @@ QtBridge::connect(QCheckBox* qcheckbox,
   new QtCheckBoxSlot(qcheckbox,state_handle);
     
   // Connect the state signal back into the Qt Variable  
-  state_handle->connect(boost::bind(&QtCheckBoxSignal,qcheckbox,_1));
+  state_handle->value_changed_signal.connect(boost::bind(&QtCheckBoxSignal,qcheckbox,_1));
   
   return (true);
 }

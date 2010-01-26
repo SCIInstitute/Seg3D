@@ -26,62 +26,59 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_STATE_STATEVALUE_H
-#define APPLICATION_STATE_STATEVALUE_H
+#ifndef APPLICATION_STATE_STATERANGEDVALUE_H
+#define APPLICATION_STATE_STATERANGEDVALUE_H
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
 #endif
 
-#include <Utils/Converter/StringConverter.h>
 #include <Application/State/StateBase.h>
 
 namespace Seg3D {
 
 // STATEVALUE:
-// This class is a specification of State that is used to hold a single unbound
+// This class is a specification of State that is used to hold a single bound
 // instance of a value.
 
 // Forward declaration of the StateValue class
 template<class T>
-class StateValue;
+class StateRangedValue;
 
 // Predefine the StateValue instantiation that are used in Seg3D
 
-typedef StateValue<double>                      StateDouble;
-typedef boost::shared_ptr<StateDouble>          StateDoubleHandle;
+typedef StateRangedValue<double>                StateRangedDouble;
+typedef boost::shared_ptr<StateRangedDouble>    StateRangedDoubleHandle;
 
-typedef StateValue<Utils::Point>                StatePoint;
-typedef boost::shared_ptr<StatePoint>           StatePointHandle;
-
-typedef StateValue<bool>                        StateBool;
-typedef boost::shared_ptr<StateBool>            StateBoolHandle;
-
-typedef StateValue<int>                         StateInt;
-typedef boost::shared_ptr<StateInt>             StateIntHandle;
-
-typedef StateValue<std::string>                 StateString;
-typedef boost::shared_ptr<StateString>          StateStringHandle;
+typedef StateRangedValue<int>                   StateRangedInt;
+typedef boost::shared_ptr<StateRangedInt>       StateRangedIntHandle;
 
 // Definition of the templated StateValue class
 
 template<class T>
-class StateValue : public StateBase {
+class StateRangedValue : public StateBase {
 
 // -- constructor/destructor --
   public:
 
     // CONSTRUCTOR
-    StateValue(const T& default_value) :
-      value_(default_value)
-    {}
+    StateRangedValue(const T& default_value, 
+                     const T& min_value, 
+                     const T& max_value,
+                     const T& step_value) :
+      value_(default_value),
+      min_value_(min_value),
+      max_value_(max_value),
+      step_value_(step_value)
+    {
+      if (min_value_ > max_value_) std::swap(min_value_,max_value_);
+    }
 
     // DESTRUCTOR
-    virtual ~StateValue() {}
+    virtual ~StateRangedValue() {}
 
 // -- functions for accessing data --
-
-  public:
+  public:  
     // EXPORT_TO_STRING:
     // Convert the contents of the State into a string
     virtual std::string export_to_string() const
@@ -98,6 +95,8 @@ class StateValue : public StateBase {
       if (!(Utils::import_from_string(str,value))) return (false);
       if (value != value_)
       {
+        if (value < min_value_) value = min_value_;
+        if (value > max_value_) value = max_value_;
         value_ = value;
         value_changed_signal(value_,from_interface);
       }
@@ -121,6 +120,8 @@ class StateValue : public StateBase {
       if (!( variant.get_value(value) )) return (false);
       if (value != value_)
       {
+        if (value < min_value_) value = min_value_;
+        if (value > max_value_) value = max_value_;
         value_ = value;
         value_changed_signal(value_,from_interface);
       }
@@ -131,11 +132,21 @@ class StateValue : public StateBase {
     // Validate a variant parameter
     // This function returns false if the parameter is invalid or cannot be 
     // converted and in that case error will describe the error.
-    virtual bool validate_variant(ActionParameterVariant& variant, std::string& error)
+    virtual bool validate_variant(ActionParameterVariant& variant, 
+                                  std::string& error)
     {
       if (!(variant.validate_type<T>()))
       {
         error = "Cannot convert the value '"+variant.export_to_string()+"'";
+        return (false);
+      }
+      
+      T value;
+      variant.get_value(value);
+      if (value < min_value_ || value > max_value_)
+      {
+        error = "Value "+Utils::to_string(value)+"is out of range ["+
+          Utils::to_string(min_value_)+","+Utils::to_string(max_value_)+"]";
         return (false);
       }
       error = "";
@@ -151,6 +162,28 @@ class StateValue : public StateBase {
       return (value_ == value);
     }
 
+// -- Functions specific to this type of state --
+  public:
+    void set_range(const T& min_value, const T& max_value)
+    {
+      if (min_value < max_value) std::swap(min_value,max_value);
+      min_value_ = min_value;
+      max_value_ = max_value;
+      
+      if (value_ < min_value_) 
+      {
+        value_ = min_value_;
+        value_changed_signal(value_,false);
+      }
+      else if (value_ > max_value_)
+      {
+        value_ = max_value_;
+        value_changed_signal(value_,false);
+      }
+      
+      range_changed_signal(min_value_,max_value_);
+    }
+
 // -- signals describing the state --
 
   public:
@@ -162,11 +195,22 @@ class StateValue : public StateBase {
     typedef boost::signals2::signal<void (T, bool)> value_changed_signal_type;
     value_changed_signal_type value_changed_signal;
     
+    // RANGE_CHANGED_SIGNAL:
+    // This signal is triggered when the range of the state is changed
+    typedef boost::signals2::signal<void (T,T)> range_changed_signal_type;
+    range_changed_signal_type range_changed_signal;
+    
 // -- internals of StateValue --
   private:
 
     // Storage for the actual value
     T value_;
+    
+    // Min and max values
+    T min_value_;
+    T max_value_;
+    T step_value_;
+  
 };
 
 } // end namespace Seg3D

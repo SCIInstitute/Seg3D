@@ -33,40 +33,120 @@
 
 namespace Seg3D {
 
-StateOption::StateOption(const std::vector<std::string>& option_list, 
-            const std::string& default_option) :
-  State<std::string>(default_option),
-  option_list_(option_list),
-  default_option_(default_option)
+StateOption::StateOption(const std::string& default_value,
+                         const std::string& option_list ) :
+  value_(default_value)
 {
-  // Ensure that options are lower case
-  for (size_t j=0; j<option_list_.size();j++)
+  // Unwrap the option lists
+  std::string option_list_string = Utils::string_to_lower(option_list);
+  while(1)
   {
-    option_list_[j] = Utils::string_to_lower(option_list_[j]);
+    size_t loc = option_list_string.find('|');
+    if (loc >= option_list_string.size())
+    {
+      option_list_.push_back(option_list_string);
+      break;
+    }
+    option_list_.push_back(option_list_string.substr(0,loc));
+    option_list_string = option_list_string.substr(loc+1);
+  }
+}
+
+StateOption::StateOption(const std::string& default_value,
+                         const std::vector<std::string>& option_list ) :
+  value_(default_value)
+{
+  option_list_.resize(option_list.size());
+  for (size_t j=0; j<option_list.size(); j++)
+  {
+    option_list_[j] = Utils::string_to_lower(option_list[j]);
   }
 }
 
 StateOption::~StateOption()
 {
 }  
-    
-void 
-StateOption::set(const std::string& option)
+
+std::string 
+StateOption::export_to_string() const
 {
-  std::string lower_option = Utils::string_to_lower(option);
+  return (value_);
+}
+
+bool 
+StateOption::import_from_string(const std::string& str,
+                                bool from_interface)
+{
+  // Ensure that value is only changed when the string can
+  // successfully converted.
+  std::string value;
+  if(!(Utils::import_from_string(str,value))) return (false);
   
-  // Ensure that options are lower case
-  for (size_t j=0; j<option_list_.size();j++)
+  value = Utils::string_to_lower(value);
+  if (value != value_) 
   {
-    option_list_[j] = Utils::string_to_lower(option_list_[j]);
+    if (option_list_.end() == std::find(option_list_.begin(),
+            option_list_.end(),value)) return (false);
+    value_ = value;
+    value_changed_signal(value_,from_interface);
+  }
+  return (true);
+}
+
+void 
+StateOption::export_to_variant(ActionParameterVariant& variant) const
+{
+  variant.set_value(value_);
+}
+
+bool 
+StateOption::import_from_variant(ActionParameterVariant& variant,
+                                 bool from_interface)
+{
+  std::string value;
+  if (!( variant.get_value(value) )) return (false);
+
+  value = Utils::string_to_lower(value);
+  if (value != value_)
+  {
+    if (option_list_.end() == std::find(option_list_.begin(),
+            option_list_.end(),value)) return (false);
+    value_ = value;
+    value_changed_signal(value_,from_interface);
+  }
+  return (true);
+}
+
+bool 
+StateOption::validate_variant(ActionParameterVariant& variant, 
+                              std::string& error)
+{
+  std::string value;
+  if (!(variant.get_value(value)))
+  {
+    error = "Cannot convert the value '"+variant.export_to_string()+"'";
+    return (false);
   }
   
-  // Ensure it is a valid option
-  if (option_list_.end() == std::find(option_list_.begin(),option_list_.end(),
-    lower_option)) return;
+  value = Utils::string_to_lower(value);
+  if (option_list_.end() == std::find(option_list_.begin(),
+      option_list_.end(),value))
+  {
+    error = "Option '"+value+"' is not a valid option";
+    return (false);
+  }
+  
+  error = "";
+  return (true);
+}
 
-  value_ = lower_option;
-  value_changed_signal_(value_);
+bool 
+StateOption::compare_variant(ActionParameterVariant& variant)
+{
+  std::string value;
+  variant.get_value(value);
+  value = Utils::string_to_lower(value);
+  return (value_ == value);
 }
 
 bool 
@@ -77,80 +157,89 @@ StateOption::is_option(const std::string& option)
   return (true);
 }
 
+
 void 
 StateOption::set_option_list(const std::vector<std::string>& option_list)
 {
   option_list_ = option_list;
-  if (option_list_.end() == std::find(option_list_.begin(),option_list_.end(),
-    value_))
+  if (option_list_.end() == std::find(option_list_.begin(),option_list_.end(),value_))
   {
-    value_ = default_option_;
-    value_changed_signal_(value_);
+    if (option_list.size()) value_ = option_list[0]; else value_ = "";
+    value_changed_signal(value_,false);
   }
+  
+  optionlist_changed_signal();
 }
 
-bool 
-StateOption::import_from_string(const std::string& str)
-{
-  // Ensure that value is only changed when the string can
-  // successfully converted.
-  std::string value;
-  bool success = Utils::import_from_string(str,value);
 
-  if (success) 
-  {
-    value = Utils::string_to_lower(value);
-    if (option_list_.end() == std::find(option_list_.begin(),
-            option_list_.end(),value)) success = false;
-    // only initialize with a valid value
-    if (success) value_ = value;
-  }
-  return (success);
-}
-    
-bool 
-StateOption::validate_and_compare_variant(ActionParameterVariant& variant, 
-                                          bool& changed,
-                                          std::string& error) const
-{
-  std::string new_value;
-  if (!(variant.get_value(new_value)))
-  {
-    error = std::string("Could not convert '")+variant.export_to_string()+
-      std::string("' to option");
-    return (false);
-  }
-  new_value = Utils::string_to_lower(new_value);    
-  if (option_list_.end() == std::find(option_list_.begin(),option_list_.end(),
-      new_value)) 
-  {
-    error = "The option value is not one of the predefined options";
-    return (false);
-  }
-    
-  changed = (value_ != new_value);
-  return (true);   
-}
-  
-  
-bool 
-StateOption::import_from_variant(ActionParameterVariant& variant, 
-                                     bool trigger_signal)
-{
-  std::string val;
-  if(!(variant.get_value(val))) return (false);
-  
-  val = Utils::string_to_lower(val);
-  // Check if it is valid option
-  if (option_list_.end() == std::find(option_list_.begin(),
-                                option_list_.end(),val)) return (false);
 
-  if (val != value_)
+void 
+StateOption::set_option_list(const std::string& option_list)
+{
+  // Unwrap the option lists
+  std::string option_list_string = Utils::string_to_lower(option_list);
+  
+  option_list_.clear();
+  while(1)
   {
-    value_ = val;
-    if (trigger_signal) value_changed_signal_(value_);
+    size_t loc = option_list_string.find('|');
+    if (loc >= option_list_string.size())
+    {
+      option_list_.push_back(option_list_string);
+      break;
+    }
+    option_list_.push_back(option_list_string.substr(0,loc));
+    option_list_string = option_list_string.substr(loc+1);
   }
-  return (true);
-}        
+  
+  if (option_list_.end() == std::find(option_list_.begin(),option_list_.end(),value_))
+  {
+    if (option_list.size()) value_ = option_list[0]; else value_ = "";
+    value_changed_signal(value_,false);
+  }
+  
+  optionlist_changed_signal();
+}
+
+void 
+StateOption::set_option_list(const std::string& option_list,
+                             const std::string& option)
+{
+  // Unwrap the option lists
+  std::string option_list_string = Utils::string_to_lower(option_list);
+  
+  option_list_.clear();
+  while(1)
+  {
+    size_t loc = option_list_string.find('|');
+    if (loc >= option_list_string.size())
+    {
+      option_list_.push_back(option_list_string);
+      break;
+    }
+    option_list_.push_back(option_list_string.substr(0,loc));
+    option_list_string = option_list_string.substr(loc+1);
+  }
+
+  std::string lower_option = Utils::string_to_lower(option);
+  
+  if (option_list_.end() == 
+      std::find(option_list_.begin(),option_list_.end(),lower_option))
+  {
+    if (option_list.size()) value_ = option_list[0]; else value_ = "";
+    value_changed_signal(value_,false);
+  }
+  else
+  {
+    if (value_ != lower_option)
+    { 
+      value_ = lower_option;
+      value_changed_signal(value_,false);
+    }
+  }
+  
+  optionlist_changed_signal();
+}
+
 
 } // end namespace Seg3D

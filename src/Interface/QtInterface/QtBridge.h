@@ -34,7 +34,6 @@
 
 // Application includes
 #include <Application/State/StateValue.h>
-#include <Application/State/StateClampedValue.h>
 #include <Application/State/StateOption.h>
 
 namespace Seg3D {
@@ -48,7 +47,7 @@ class QtBridge : public boost::noncopyable {
   public:
     
     // Connect a QCheckBox to StateValue<bool>
-    static bool connect(QCheckBox* qcheckbox, StateValue<bool>::Handle& state_handle);
+    static bool connect(QCheckBox* qcheckbox, StateBoolHandle& state_handle);
   
     // Connect QToolButton & QPushButtons
     static bool connect(QToolButton* qtoolbutton, boost::function<void ()> function);

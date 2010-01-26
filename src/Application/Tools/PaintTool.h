@@ -60,20 +60,19 @@ class PaintTool : public Tool {
 // -- state --
   public:
     // Layerid of the target layer
-    StateOption::Handle              target_layer_;
+    StateOptionHandle              target_layer_;
     // Layerid of the masking layer
-    StateOption::Handle              mask_layer_;
+    StateOptionHandle              mask_layer_;
     
     // Radius of the brush
-    StateClampedValue<int>::Handle   brush_radius_;
+    StateRangedIntHandle    brush_radius_;
     // Upper threshold for painting
-    StateClampedValue<float>::Handle upper_threshold_;
+    StateRangedDoubleHandle upper_threshold_;
     // Lower threshold for painting
-    StateClampedValue<float>::Handle lower_threshold_;
+    StateRangedDoubleHandle lower_threshold_;
 
     // Erase data
-    StateValue<bool>::Handle         erase_;
-
+    StateBoolHandle         erase_;
 };
 
 } // end namespace

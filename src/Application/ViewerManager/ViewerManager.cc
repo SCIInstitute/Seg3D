@@ -26,40 +26,29 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-/*
- *****************************************************************************
- *
- *   ViewManager.cc
- *
- *   Authors:
- *      Kristen Zygmunt   -- initial attempt      11/19/2009
- *
- *    
- *****************************************************************************
- */
-
 // STL includes
 
 // Boost includes 
 
 #include <Application/Interface/Interface.h>
-
-#include <Application/View/ViewManager.h>
+ 
+#include <Application/ViewerManager/ViewerManager.h>
 
 namespace Seg3D {
 
-ViewManager::ViewManager() :
-  StateHandler("ViewManager")
+ViewerManager::ViewerManager() :
+  StateHandler("ViewerManager")
 {
+  add_state("layout",state_layout_,"2and3","single|1and1|1and2|2and3|3and3");
 }
   
-ViewManager::~ViewManager()
+ViewerManager::~ViewerManager()
 {
 }
 
 
 // Singleton interface needs to be defined somewhere
-Utils::Singleton<ViewManager> ViewManager::instance_;
+Utils::Singleton<ViewerManager> ViewerManager::instance_;
 
 } // end namespace Seg3D
 

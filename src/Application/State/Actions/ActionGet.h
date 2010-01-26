@@ -44,14 +44,6 @@ class ActionGet : public Action {
     }
     
     virtual ~ActionGet() {}
-    
-// -- Function for setting the parameters --
-
-    template<class T>
-    void set(const std::string& stateid)
-    {
-      stateid_.value() = stateid;
-    }
 
 // -- Functions that describe action --
     virtual bool validate(ActionContextHandle& context);
@@ -61,9 +53,13 @@ class ActionGet : public Action {
   private:
     // This one describes where the state is located
     ActionParameter<std::string> stateid_;
+
+// -- Dispatch this action from the interface --
+  public:
+  
+    static void Dispatch(StateBaseHandle& state);
 };
 
-typedef boost::intrusive_ptr<ActionGet> ActionGetHandle;
 
 } // end namespace Seg3D
 

@@ -39,11 +39,12 @@ StateManager::add_state(const std::string& state_id, StateBaseHandle& state)
 {
   boost::unique_lock<boost::mutex> lock(state_map_lock_);
   
-  state_map_type::const_iterator it = state_map_.find(state_id);
+  state_map_type::iterator it = state_map_.find(state_id);
+
   if (it != state_map_.end())
   {
-    SCI_LOG_ERROR(std::string("Trying to add state variable '")+state_id+"' twice");
-    return (false);
+    // State is already there
+    state_map_.erase(it);
   }
 
   state_map_[state_id] = state;
@@ -58,6 +59,7 @@ StateManager::get_state(const std::string& state_id, StateBaseHandle& state)
   state_map_type::const_iterator it = state_map_.find(state_id);
   if (it == state_map_.end())
   {
+    // make the handle invalid
     state.reset();
     return (false);
   }

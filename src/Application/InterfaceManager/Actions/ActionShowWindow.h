@@ -45,21 +45,20 @@ class ActionShowWindow : public Action {
     
     virtual ~ActionShowWindow() {}
 
-    void set(const std::string& windowid)
-    {
-      windowid_.value() = windowid;
-    }
-
 // -- Functions that describe action --
     virtual bool validate(ActionContextHandle& context);
     virtual bool run(ActionContextHandle& context,
                      ActionResultHandle& result);
     
 // -- Action parameters --
+  private:
     ActionParameter<std::string> windowid_;
-};
 
-typedef boost::intrusive_ptr<ActionShowWindow> ActionShowWindowHandle;
+// -- Dispatcher for the GUI --
+  public:
+    static void Dispatch(const std::string& windowid);
+
+};
 
 } // end namespace Seg3D
 

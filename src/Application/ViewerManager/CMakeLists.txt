@@ -31,29 +31,28 @@
 # Set sources
 ##################################################
 
-SET(APPLICATION_VIEW_SRCS
-  View.h
-  View.cc
-  ViewManager.h
-  ViewManager.cc
+SET(APPLICATION_VIEWMANAGER_SRCS
+  ViewerManager.h
+  ViewerManager.cc
   )
 
-SET(APPLICATION_VIEW_ACTIONS_SRCS
+SET(APPLICATION_VIEWMANAGER_ACTIONS_SRCS
   )
 
-ADD_LIBRARY(Application_View STATIC 
-            ${APPLICATION_VIEW_SRCS}
-            ${APPLICATION_VIEW_ACTIONS_SRCS} )
+ADD_LIBRARY(Application_ViewerManager STATIC 
+            ${APPLICATION_VIEWMANAGER_SRCS}
+            ${APPLICATION_VIEWMANAGER_ACTIONS_SRCS} )
             
-TARGET_LINK_LIBRARIES(Application_View
+TARGET_LINK_LIBRARIES(Application_ViewerManager
                       Utils_Core
                       Application_Application
                       Application_Interface
                       Application_Action
                       Application_State
+                      Application_Viewer
                       ${SCI_BOOST_LIBRARY})
 
 # Register actions
-ADD_LIBRARY_ACTIONS(Application_View
-                    ${APPLICATION_VIEW_ACTIONS_SRCS})
+ADD_LIBRARY_ACTIONS(Application_ViewerManager
+                    ${APPLICATION_VIEWMANAGER_ACTIONS_SRCS})
                     

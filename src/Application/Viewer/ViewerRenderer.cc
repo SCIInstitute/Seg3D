@@ -26,41 +26,9 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_TOOL_ACTIONS_ACTIONCLOSETOOL_H
-#define APPLICATION_TOOL_ACTIONS_ACTIONCLOSETOOL_H
-
-#include <Application/Action/Actions.h>
-#include <Application/Interface/Interface.h>
+#include <Application/Viewer/ViewerRenderer.h>
 
 namespace Seg3D {
 
-class ActionCloseTool : public Action {
-  SCI_ACTION_TYPE("CloseTool","CloseTool toolid",APPLICATION_E)
-
-// -- Constructor/Destructor --
-  public:
-    ActionCloseTool()
-    {
-      add_argument(toolid_);
-    }
-    
-    virtual ~ActionCloseTool() {}
-
-// -- Functions that describe action --
-    virtual bool validate(ActionContextHandle& context);
-    virtual bool run(ActionContextHandle& context,
-                     ActionResultHandle& result);
-    
-// -- Action parameters --
-  private:
-    ActionParameter<std::string> toolid_;
-
-// -- Dispatch this action from the interface --
-  public:
-    static void Dispatch(const std::string& toolid);
-
-};
 
 } // end namespace Seg3D
-
-#endif

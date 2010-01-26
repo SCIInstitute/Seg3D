@@ -47,7 +47,7 @@
 #ifndef APPLICATION_LAYER_ACTIONS_ACTIONLAYER_H
 #define APPLICATION_LAYER_ACTIONS_ACTIONLAYER_H 1
 
-#include <Application/Action/Action.h>
+#include <Application/Action/Actions.h>
 
 namespace Seg3D {
 

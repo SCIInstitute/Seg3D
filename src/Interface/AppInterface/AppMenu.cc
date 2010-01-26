@@ -33,6 +33,7 @@
 #include <Application/Tool/ToolManager.h>
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tool/Actions/ActionOpenTool.h>
+#include <Application/InterfaceManager/Actions/ActionShowWindow.h>
 
 // Interface includes
 #include <Interface/QtInterface/QtBridge.h>
@@ -254,40 +255,34 @@ AppMenu::create_window_menu(QMenu* qmenu)
   // Project Window
   qaction = qmenu->addAction("Project Window");
   QtBridge::connect(qaction,
-    boost::bind(&InterfaceManager::dispatch_show_window,
-                InterfaceManager::Instance(),std::string("project")));
+    boost::bind(&ActionShowWindow::Dispatch,std::string("project")));
 
   // History Window
   qaction = qmenu->addAction("History Window");
   QtBridge::connect(qaction,
-    boost::bind(&InterfaceManager::dispatch_show_window,
-                InterfaceManager::Instance(),std::string("history")));
+    boost::bind(&ActionShowWindow::Dispatch,std::string("history")));
 
   //Tools Window
   qaction = qmenu->addAction("Tools Window");
   QtBridge::connect(qaction,
-    boost::bind(&InterfaceManager::dispatch_show_window,
-                InterfaceManager::Instance(),std::string("tools")));
+    boost::bind(&ActionShowWindow::Dispatch,std::string("tools")));
 
   // Layer Manager Window
   qaction = qmenu->addAction("Layer Manager Window");
   QtBridge::connect(qaction,
-    boost::bind(&InterfaceManager::dispatch_show_window,
-                InterfaceManager::Instance(),std::string("layermanager")));
+    boost::bind(&ActionShowWindow::Dispatch,std::string("layermanager")));
 
   // Measurement Window
   qaction = qmenu->addAction("Measurement Window");
   QtBridge::connect(qaction,
-    boost::bind(&InterfaceManager::dispatch_show_window,
-                InterfaceManager::Instance(),std::string("measurement")));
+    boost::bind(&ActionShowWindow::Dispatch,std::string("measurement")));
 
   qmenu->addSeparator();
 
   // Controller Window
   qaction = qmenu->addAction("Controller Window");
   QtBridge::connect(qaction,
-    boost::bind(&InterfaceManager::dispatch_show_window,
-                InterfaceManager::Instance(),std::string("controller")));  
+    boost::bind(&ActionShowWindow::Dispatch,std::string("controller")));  
 
 }
 

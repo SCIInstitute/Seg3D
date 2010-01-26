@@ -26,18 +26,42 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-// Application includes
-#include <Application/View/View.h>
+#ifndef APPLICATION_VIEWER_VIEWERRENDERER_H
+#define APPLICATION_VIEWER_VIEWERRENDERER_H
+
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+# pragma once
+#endif
+
+// Boost includes 
+#include <boost/utility.hpp>
+#include <boost/shared_ptr.hpp>
 
 namespace Seg3D {
 
-View::View() 
-{
-}
+// Forward declarations
+class ViewerRenderer;
+typedef boost::shared_ptr<ViewerRenderer> ViewerRendererHandle;
+
+// Class definitions
+class ViewerRenderer : public boost::noncopyable {
+
+  public:
+    ViewerRenderer();
+    virtual ~ViewerRenderer();
+
+  public:
   
-View::~View()
-{
-}
+    // Functions for drawing content
+    virtual void initialize();
+    virtual void redraw();
+    
+    virtual void resize(int width, int height);
+
+};
 
 } // end namespace Seg3D
+
+
+#endif
 

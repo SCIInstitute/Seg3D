@@ -26,6 +26,7 @@
    DEALINGS IN THE SOFTWARE.
 */
 
+#include <Application/Interface/Interface.h>
 #include <Application/InterfaceManager/InterfaceManager.h>
 #include <Application/InterfaceManager/Actions/ActionCloseWindow.h>
 
@@ -60,6 +61,19 @@ ActionCloseWindow::run(ActionContextHandle& context,
 {
   InterfaceManager::Instance()->close_window_signal(windowid_.value());
   return (true); // success
+}
+
+void 
+ActionCloseWindow::Dispatch(const std::string& windowid)
+{
+  // Create new action
+  ActionCloseWindow* action = new ActionCloseWindow;
+
+  // Set action parameters
+  action->windowid_.value() = windowid;
+
+  // Post the new action
+  PostActionFromInterface(ActionHandle(action));
 }
 
 } // end namespace Seg3D

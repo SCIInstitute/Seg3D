@@ -56,10 +56,10 @@ class InvertTool : public Tool {
 // -- state --
   public:
     // Layerid of the target layer
-    StateOption::Handle              target_layer_;
+    StateOptionHandle              target_layer_;
 
     // Replace data
-    StateValue<bool>::Handle         replace_;
+    StateBoolHandle                replace_;
 
 };
 

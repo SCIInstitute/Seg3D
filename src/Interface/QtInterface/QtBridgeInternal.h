@@ -37,9 +37,11 @@
 
 // Application includes
 #include <Application/State/StateValue.h>
-#include <Application/State/StateClampedValue.h>
+#include <Application/State/StateRangedValue.h>
 #include <Application/State/StateOption.h>
 #include <Application/State/StateManager.h>
+#include <Application/State/Actions/ActionSet.h>
+
 
 namespace Seg3D {
 
@@ -53,7 +55,7 @@ class QtCheckBoxSlot : public QObject {
   public:
 
     // Constructor
-    QtCheckBoxSlot(QCheckBox* parent, StateValue<bool>::Handle& state_handle) :
+    QtCheckBoxSlot(QCheckBox* parent, StateBoolHandle& state_handle) :
       QObject(parent),
       state_handle_(state_handle) 
     {
@@ -68,12 +70,12 @@ class QtCheckBoxSlot : public QObject {
     // Slot that Qt will call
     void slot(int state)
     {
-      state_handle_->dispatch(static_cast<bool>(state));
+      ActionSet::Dispatch(state_handle_,static_cast<bool>(state));
     }
     
   private:
     // Function object
-    StateValue<bool>::Handle state_handle_;
+    StateBoolHandle state_handle_;
 };
 
 

@@ -121,6 +121,9 @@ LogStreamer::LogStreamer(unsigned int log_flags, std::ostream* stream)
   Log::Instance()->post_log_signal.connect(
     Log::post_log_signal_type::slot_type(&LogStreamerInternal::stream_message, 
                 internal_.get(),_1,_2).track(internal_));
+                
+//   Log::Instance()->post_log_signal.connect(boost::bind(&LogStreamerInternal::stream_message,
+//      internal_.get(),_1,_2));             
 }
 
 

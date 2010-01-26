@@ -58,7 +58,7 @@ class PolylineTool : public Tool {
 // -- state --
   public:
     // Layerid of the target layer
-    StateOption::Handle              target_layer_;
+    StateOptionHandle                  target_layer_;
 
     // Polyline data
     // StateVector<Point>              polyline_;

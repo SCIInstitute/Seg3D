@@ -31,39 +31,29 @@
 # Set sources
 ##################################################
 
-SET(APPLICATION_STATE_SRCS
-  StateBase.h
-  State.h
-  StateOption.cc
-  StateOption.h
-  StateValue.h
-  StateRangedValue.h
-  StateManager.h
-  StateManager.cc
-  StateHandler.h
-  StateHandler.cc
+SET(APPLICATION_VIEW_SRCS
+  Viewer.h
+  Viewer.cc
+  ViewerRenderer.h
+  ViewerRenderer.cc
   )
 
-SET(APPLICATION_STATE_ACTIONS_SRCS
-  Actions/ActionSet.h
-  Actions/ActionSet.cc
-  Actions/ActionGet.h
-  Actions/ActionGet.cc
+SET(APPLICATION_VIEW_ACTIONS_SRCS
   )
 
-ADD_LIBRARY(Application_State STATIC 
-            ${APPLICATION_STATE_SRCS}
-            ${APPLICATION_STATE_ACTIONS_SRCS} )
+ADD_LIBRARY(Application_Viewer STATIC 
+            ${APPLICATION_VIEW_SRCS}
+            ${APPLICATION_VIEW_ACTIONS_SRCS} )
             
-TARGET_LINK_LIBRARIES(Application_State
-                      Utils_Converter
+TARGET_LINK_LIBRARIES(Application_Viewer
                       Utils_Core
                       Application_Application
                       Application_Interface
                       Application_Action
+                      Application_State
                       ${SCI_BOOST_LIBRARY})
 
 # Register actions
-ADD_LIBRARY_ACTIONS(Application_State
-                    ${APPLICATION_STATE_ACTIONS_SRCS})
+ADD_LIBRARY_ACTIONS(Application_Viewer
+                    ${APPLICATION_VIEW_ACTIONS_SRCS})
                     

@@ -59,8 +59,6 @@ class ActionActivateTool : public Action {
     ActionParameter<std::string> toolid_;
 };
 
-typedef boost::intrusive_ptr<ActionActivateTool> ActionActivateToolHandle;
-
 } // end namespace Seg3D
 
 #endif

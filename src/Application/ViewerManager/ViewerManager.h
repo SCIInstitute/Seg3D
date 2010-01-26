@@ -26,27 +26,9 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-/*
- *****************************************************************************
- *
- *   ViewManager.h
- *
- *   ViewManager provides the interface to manage the views in the system.
- *
- *   To perform an action to update a view or views, for instance add a view,
- *   delete a view, change a view's state, use the dispatch_* methods
- *
- *   Also see: View
- *
- *   Authors:
- *      Kristen Zygmunt   -- initial attempt      10/26/2009
- *
- *    
- *****************************************************************************
- */
 
-#ifndef APPLICATION_VIEW_VIEWMANAGER_H
-#define APPLICATION_VIEW_VIEWMANAGER_H 1
+#ifndef APPLICATION_VIEWER_VIEWERMANAGER_H
+#define APPLICATION_VIEWER_VIEWERMANAGER_H 1
 
 //#ifdef (_MSC_VER) && (_MSC_VER >= 1020)
 //# pragma once
@@ -65,8 +47,8 @@
 
 // Application includes
 #include <Utils/Singleton/Singleton.h>
-#include <Application/View/View.h>
-#include <Application/State/StateHandler.h>
+#include <Application/Viewer/Viewer.h>
+#include <Application/State/State.h>
 
 
 namespace Seg3D {
@@ -75,14 +57,14 @@ namespace Seg3D {
 
 // typedefs
 
-class ViewManager : public StateHandler {
+class ViewerManager : public StateHandler {
 public:
-  ViewManager();
-  ~ViewManager();
+  ViewerManager();
+  ~ViewerManager();
   
 
   // -- Signals for the User Interface --
-  typedef boost::signals2::signal<void (ViewHandle)> view_changed_signal_type;
+  typedef boost::signals2::signal<void (ViewerHandle)> view_changed_signal_type;
 
   // CONNECT_VIEW_CHANGED:
   // Connect to the signal that indicates a view has changed
@@ -94,14 +76,13 @@ public:
 
   // -- Dispatcher functions for User Interface --
   void dispatch_changeprimaryview(const std::string& view_name) const;
-  void dispatch_changeviewtype(const std::string& view_name, View::view_type type) const;
   void dispatch_changeactivelayer(const std::string& view_name, const std::string& layer_name) const;
   void dispatch_changeopacity(const std::string& view_name, const std::string& layer_name, unsigned int opacity) const;
   void dispatch_addlayertoview(const std::string& view_name, const std::string& layer_name) const;
   //void dispatch_newview() const;
   void dispatch_removeview(const std::string& view_name) const;
 
-  const ViewHandle get_view(const std::string& view_name) const;
+  const ViewerHandle get_view(const std::string& view_name) const;
 
 protected:
   friend class ActionChangePrimaryView;
@@ -110,22 +91,29 @@ protected:
   // This signal is triggered after a view has been modified
   view_changed_signal_type view_changed_signal_;
 
+
+
+
+    std::vector<ViewerHandle> viewers_;
+
+// -- State variables
+  public:
+    
+    StateOptionHandle   state_layout_;
+  
+
+
 // -- Singleton interface --
   public:
     
     // INSTANCE:
     // Get the singleton interface
-    static ViewManager* Instance() { return instance_.instance(); }
+    static ViewerManager* Instance() { return instance_.instance(); }
 
   private:
-    static Utils::Singleton<ViewManager> instance_;
+    static Utils::Singleton<ViewerManager> instance_;
 
-    typedef boost::unordered_map<std::string, ViewHandle> view_map_type; 
-    view_map_type views_;
-    boost::mutex view_map_lock_;
-
-
-}; // class ViewManager
+}; // class ViewerManager
 
 } // end namespace Seg3D
 

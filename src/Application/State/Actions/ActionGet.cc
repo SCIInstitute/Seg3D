@@ -28,6 +28,7 @@
 
 #include <Application/State/StateManager.h>
 #include <Application/State/Actions/ActionGet.h>
+#include <Application/Interface/Interface.h>
 
 namespace Seg3D {
 
@@ -69,5 +70,19 @@ ActionGet::run(ActionContextHandle& context, ActionResultHandle& result)
   // Signal action is done
   return (true);
 }
+
+void 
+ActionGet::Dispatch(StateBaseHandle& state)
+{
+  // Create new action
+  ActionGet* action = new ActionGet;
+
+  // Set action parameters
+  action->stateid_.value() = state->stateid();
+
+  // Post the new action
+  PostActionFromInterface(ActionHandle(action));      
+}
+
 
 } // end namespace Seg3D

@@ -74,7 +74,14 @@ class ActionParameterBase {
   public:
     virtual ~ActionParameterBase();
     
+// -- functions for accessing data --
+    // EXPORT_TO_STRING
+    // export the contents of the parameter to string
     virtual std::string export_to_string() const = 0;
+ 
+    // IMPORT_FROM_STRING
+    // import a parameter from a string. The function returns true
+    // if the import succeeded
     virtual bool import_from_string(const std::string& str) = 0;
 
 };
@@ -107,6 +114,7 @@ class ActionParameter : public ActionParameterBase {
     {}
 
 // -- access to value --
+  public:
     // General access to the parameter value
     T& value() { return value_; } 
 
@@ -119,13 +127,16 @@ class ActionParameter : public ActionParameterBase {
     // Set access similar to the variant version
     void set_value(const T& value) { value_ = value; }
 
-    // export the value to a string
+    // EXPORT_TO_STRING
+    // export the contents of the parameter to string
     virtual std::string export_to_string() const
     {
       return Utils::export_to_string(value_);
     }
 
-    // import the value from a string
+    // IMPORT_FROM_STRING
+    // import a parameter from a string. The function returns true
+    // if the import succeeded
     virtual bool import_from_string(const std::string& str)
     {
       return Utils::import_from_string(str,value_);
@@ -151,18 +162,29 @@ class ActionParameterVariant : public ActionParameterBase {
 
 // -- constructor/destructor --
   public:
-    // Default constructor of untyped parameter
+    // CONSTRUCTOR of untyped parameter
     ActionParameterVariant();
 
+    // CONSTRUCTOR of typed version
     template<class T>
     ActionParameterVariant(const T& default_value)
     {
       typed_value_ = ActionParameterBaseHandle(new ActionParameter<T>(default_value));
     }
-  
+    
+    // DESTRUCTOR
     virtual ~ActionParameterVariant();
 
+// -- functions for accessing data --
+  public:
+  
+    // EXPORT_TO_STRING
+    // export the contents of the parameter to string
     virtual std::string export_to_string() const;
+    
+    // IMPORT_FROM_STRING
+    // import a parameter from a string. The function returns true
+    // if the import succeeded
     virtual bool import_from_string(const std::string& str);
 
     // SET_VALUE
@@ -179,7 +201,6 @@ class ActionParameterVariant : public ActionParameterBase {
     // GET_VALUE
     // Get the value from string or typed value. If a typed one is available
     // use that one.
-    
     template<class T>
     bool get_value(T& value)
     {
@@ -217,6 +238,46 @@ class ActionParameterVariant : public ActionParameterBase {
         return (true);    
       }
     }
+
+    // VALIDATE_TYPE
+    // Check and convert to a certain type, but do not return the value
+    // This function is intended for validating the action by forcing the
+    // contained value to be converted to a certain type
+    template<class T>
+    bool validate_type()
+    {
+      // If a typed version exists
+      if (typed_value_.get())
+      {
+        // if the typed version exists, use that one
+        // use a dynamic cast to ensure that the type is correct
+        ActionParameter<T>* param_ptr = 
+                        dynamic_cast<ActionParameter<T>*>(typed_value_.get());
+        if (param_ptr == 0)
+        {
+          T value;
+          if(!(Utils::import_from_string(typed_value_->export_to_string(),value)))
+          {
+            return (false);
+          }
+        }
+        return (true);  
+      }
+      else
+      {
+        // Generate a new typed version. So it is only converted once
+        ActionParameter<T>* param_ptr = new ActionParameter<T>;
+        typed_value_ = ActionParameterBaseHandle(param_ptr);
+        if(!(typed_value_->import_from_string(string_value_)))
+        {
+          return (false);
+        }
+        return (true);    
+      }
+    }
+
+
+
 
 // -- accessors --
 

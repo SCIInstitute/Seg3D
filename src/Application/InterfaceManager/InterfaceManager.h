@@ -60,12 +60,6 @@ class InterfaceManager : public StateHandler {
 
 // -- Dispatcher functions for User Interface -- 
   public:
-    
-    // -- Open an interface window --
-    void dispatch_show_window(const std::string& windowid) const;
- 
-    // -- Close an interface window --
-    void dispatch_close_window(const std::string& windowid) const;
   
     // -- Full Screen the main window --  
     void dispatch_full_screen_window(const std::string& windowid) const;

@@ -30,7 +30,7 @@
 #define APPLICATION_STATE_ACTIONS_ACTIONSET_H
 
 #include <Application/Action/Action.h>
-#include <Application/Action/ActionFactory.h>
+#include <Application/Interface/Interface.h>
 
 namespace Seg3D {
 
@@ -47,15 +47,6 @@ class ActionSet : public Action {
     
     virtual ~ActionSet() {}
     
-// -- Function for setting the parameters --
-
-    template<class T>
-    void set(const std::string& stateid, const T& statevalue)
-    {
-      stateid_.value() = stateid;
-      statevalue_.set_value(statevalue);
-    }
-
 // -- Functions that describe action --
     virtual bool validate(ActionContextHandle& context);
     virtual bool run(ActionContextHandle& context, 
@@ -67,11 +58,26 @@ class ActionSet : public Action {
     ActionParameter<std::string> stateid_;
 
     // This one describes the value of the state variable
-    ActionParameterVariant statevalue_;
+    ActionParameterVariant       statevalue_;
+
+// -- Dispatch this action from the interface --
+  public:
+  
+    template<class HANDLE, class T>
+    static void Dispatch(const HANDLE& state, const T& statevalue)
+    {
+      // Create new action
+      ActionSet* action = new ActionSet;
+    
+      // Set action parameters
+      action->stateid_.value() = state->stateid();
+      action->statevalue_.set_value(statevalue);
+
+      // Post the new action
+      PostActionFromInterface(ActionHandle(action));      
+    }
 
 };
-
-typedef boost::intrusive_ptr<ActionSet> ActionSetHandle;
 
 } // end namespace Seg3D
 

@@ -40,33 +40,6 @@ InterfaceManager::InterfaceManager() :
   StateHandler("InterfaceManager")
 {
 }
-
-// THREAD-SAFETY:
-// The RunActionFromInterface function will migrate the function call to the
-// application thread. Hence there is no need to safe guard this function.
-// This code can be run directly form the interface thread.
-
-void
-InterfaceManager::dispatch_show_window(const std::string& windowid) const
-{
-  // Build new action
-  ActionShowWindowHandle action(new ActionShowWindow);
-  // Set the action parameters
-  action->set(windowid);
-  // Run the action on the application thread
-  PostActionFromInterface(action);
-}
-
-void
-InterfaceManager::dispatch_close_window(const std::string& windowid) const
-{
-  // Build new action
-  ActionCloseWindowHandle action(new ActionCloseWindow);
-  // Set the action parameters
-  action->set(windowid);
-  // Run the action on the application thread
-  PostActionFromInterface(action);
-}
  
 void
 InterfaceManager::dispatch_full_screen_window(const std::string& windowid) const
@@ -80,8 +53,6 @@ InterfaceManager::dispatch_full_screen_window(const std::string& windowid) const
 }
   
   
-  
-
 void
 InterfaceManager::add_windowid(const std::string& windowid)
 {

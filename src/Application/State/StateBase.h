@@ -45,13 +45,16 @@
 
 namespace Seg3D {
 
+// -- STATEBASE --
+
 class StateBase;
 typedef boost::shared_ptr<StateBase> StateBaseHandle;
 
 class StateBase : public boost::noncopyable {
 
-// -- destructor --
+// -- constructor / destructor --
   public:
+    StateBase() {}
     virtual ~StateBase() {}
     
 // -- functions for accessing data --
@@ -62,13 +65,37 @@ class StateBase : public boost::noncopyable {
 
     // IMPORT_FROM_STRING:
     // Set the State from a string
-    virtual bool import_from_string(const std::string& str) = 0;
+    virtual bool import_from_string(const std::string& str,
+                                    bool from_interface = false) = 0;
+    
+  protected:
+    friend class ActionSet;
+    friend class ActionGet;
+
+    // EXPORT_TO_VARIANT
+    // Export the state data to a variant parameter
+    virtual void export_to_variant(ActionParameterVariant& variant) const = 0;  
+
+    // IMPORT_FROM_VARIANT:
+    // Import the state data from a variant parameter.
+    virtual bool import_from_variant(ActionParameterVariant& variant, 
+                                     bool from_interface = false) = 0;    
+
+    // VALIDATE_VARIANT:
+    // Validate a variant parameter
+    // This function returns false if the parameter is invalid or cannot be 
+    // converted and in that case error will describe the error.
+    virtual bool validate_variant(ActionParameterVariant& variant, std::string& error) = 0;
+    
+    // COMPARE_VARIANT:
+    // Compare with variant parameter
+    virtual bool compare_variant(ActionParameterVariant& variant) = 0;
     
 // -- stateid handling --
   public:
     // GET_STATEID:
     // Get the unique id assigned to the state variable
-    std::string get_stateid() const { return (stateid_); }
+    std::string stateid() const { return (stateid_); }
   
     // SET_STATEID:
     // Set the unique id to be used to locate this state variable
@@ -76,28 +103,9 @@ class StateBase : public boost::noncopyable {
     
   protected:
     std::string stateid_;
-    
-// -- import from ActionVariantParameter --
-  protected:
-    friend class ActionSet;
-    friend class ActionGet;
-    
-    // VALIDATE_VARIANT:
-    // Validate that the data contained in the variat parameter can actually
-    // be used.
-    virtual bool validate_and_compare_variant(ActionParameterVariant& variant, 
-                                              bool& changed,
-                                              std::string& error) const = 0;
-    
-    // IMPORT_FROM_VARIANT:
-    // Import the state data from a variant parameter.
-    virtual bool import_from_variant(ActionParameterVariant& variant,
-                                     bool trigger_signal = true) = 0;
-    
-    // EXPORT_TO_VARIANT
-    // Export the state data to a variant parameter
-    virtual void export_to_variant(ActionParameterVariant& variant) = 0;    
+     
 };
+
 
 } // end namespace Seg3D
 

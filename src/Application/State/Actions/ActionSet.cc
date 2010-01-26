@@ -54,16 +54,13 @@ ActionSet::validate(ActionContextHandle& context)
   // its right format or a string in case it is send from a script.
   // In any case we need to validate whether the value can be transcribed into
   // the type we want.
-  bool changed = false;
+
   std::string error;
-  if(!(state->validate_and_compare_variant(statevalue_,changed,error)))
+  if (!(state->validate_variant(statevalue_,error)))
   {
     context->report_error(error);
     return (false);
   }
-  
-  // No error to report, but this action does not need to be executed.
-  if (changed == false) return (false);
   
   return (true);
 }
@@ -72,17 +69,16 @@ bool
 ActionSet::run(ActionContextHandle& context, ActionResultHandle& result)
 {
   // Get the state
-  StateBaseHandle state; 
+  StateBaseHandle state;
+  
   if( StateManager::Instance()->get_state(stateid_.value(),state) )
   {
     // Set the value
-    state->import_from_variant(statevalue_,context->update_interface());
+    state->import_from_variant(statevalue_,context->from_interface());
     return (true);
   }
-  else
-  {
-    return (false);
-  }
+  
+  return (false);
 }
 
 } // end namespace Seg3D

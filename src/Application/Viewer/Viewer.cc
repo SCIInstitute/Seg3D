@@ -26,42 +26,24 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_VIEW_VIEWRENDERER_H
-#define APPLICATION_VIEW_VIEWRENDERER_H
-
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
-# pragma once
-#endif
-
-// Boost includes 
-#include <boost/utility.hpp>
-#include <boost/shared_ptr.hpp>
+// Application includes
+#include <Application/Viewer/Viewer.h>
 
 namespace Seg3D {
 
-// Forward declarations
-class ViewRenderer;
-typedef boost::shared_ptr<ViewRenderer> ViewRendererHandle;
-
-// Class definitions
-class ViewRenderer : public boost::noncopyable {
-
-  public:
-    ViewRenderer();
-    virtual ~ViewRenderer();
-
-  public:
+Viewer::Viewer(const std::string& key) :
+  StateHandler(key)
+{
+  add_state("type",viewer_type_,"axial|coronal|sagittal|volume","axial");
+  add_state("flipx",viewer_flip_x_,false);
+  add_state("flipy",viewer_flip_y_,false);
+  add_state("grid",viewer_grid_,true);
+  add_state("lock",viewer_lock_,true);
+}
   
-    // Functions for drawing content
-    virtual void initialize();
-    virtual void redraw();
-    
-    virtual void resize(int width, int height);
-
-};
+Viewer::~Viewer()
+{
+}
 
 } // end namespace Seg3D
-
-
-#endif
 

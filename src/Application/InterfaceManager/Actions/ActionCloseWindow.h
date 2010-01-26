@@ -34,7 +34,7 @@
 namespace Seg3D {
 
 class ActionCloseWindow : public Action {
-  SCI_ACTION_TYPE("CloseWindow","CloseWindow windowid",INTERFACE_E)
+  SCI_ACTION_TYPE("CloseWindow","CloseWindow <windowid>",INTERFACE_E)
 
 // -- Constructor/Destructor --
   public:
@@ -43,13 +43,7 @@ class ActionCloseWindow : public Action {
       add_argument(windowid_);
     }
     
-    virtual ~ActionCloseWindow() 
-    {}
-
-    void set(const std::string& windowid)
-    {
-      windowid_.value() = windowid;
-    }
+    virtual ~ActionCloseWindow() {}
 
 // -- Functions that describe action --
     virtual bool validate(ActionContextHandle& context);
@@ -57,10 +51,14 @@ class ActionCloseWindow : public Action {
                      ActionResultHandle& result);
     
 // -- Action parameters --
+  private:
     ActionParameter<std::string> windowid_;
-};
 
-typedef boost::intrusive_ptr<ActionCloseWindow> ActionCloseWindowHandle;
+// -- Dispatcher for the GUI --
+  public:
+    static void Dispatch(const std::string& windowid);
+  
+};
 
 } // end namespace Seg3D
 
