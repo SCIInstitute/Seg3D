@@ -188,6 +188,20 @@ std::string export_to_string(const std::string& value)
   return value;
 }
 
+std::string export_to_string(const View3D& value)
+{
+  return (std::string(1,'[')+export_to_string(value.eyep())+' '+
+      export_to_string(value.lookat())+' '+export_to_string(value.up())+
+      ' '+ export_to_string(value.fov())+']');
+}
+
+std::string export_to_string(const View2D& value)
+{
+  return (std::string(1,'[')+export_to_string(value.center())+' '+
+            export_to_string(value.scalex())+' '+
+            export_to_string(value.scaley())+']');
+}
+
 std::string export_to_string(const Point& value)
 {
   return (std::string(1,'[')+to_string(value.x())+' '+
@@ -224,8 +238,18 @@ bool import_from_string(const std::string& str, bool& value)
 {
   std::string tmpstr(str);
   strip_surrounding_spaces(tmpstr);
-  if ((tmpstr == "0")||(tmpstr == "false")||(tmpstr == "FALSE")) return (false);
-  return (true);
+  tmpstr = string_to_lower(tmpstr);
+  if ((tmpstr == "0")||(tmpstr == "false")||(tmpstr=="off"))
+  {
+    value = false;
+    return (true);
+  }
+  else if ((tmpstr == "1")||(tmpstr == "true")||(tmpstr=="on"))
+  {
+    value = true;
+    return (true);
+  }
+  return (false);
 }
 
 
@@ -346,6 +370,35 @@ bool import_from_string(const std::string& str, Point& value)
   }
   return (false);
 }
+
+bool import_from_string(const std::string& str, View3D& value)
+{
+  std::vector<double> values;
+  multiple_from_string(str,values);
+  if (values.size() == 10) 
+  { 
+    value = View3D(Point(values[0],values[1],values[2]),
+                   Point(values[3],values[4],values[5]),
+                   Vector(values[6],values[7],values[8]),
+                   values[9]);
+    return (true);
+  }
+  return (false);
+}
+
+bool import_from_string(const std::string& str, View2D& value)
+{
+  std::vector<double> values;
+  multiple_from_string(str,values);
+  if (values.size() == 16) 
+  { 
+    value = View2D(Point(values[0],values[1],values[2]),
+                   values[3],values[4]); 
+    return (true);
+  }
+  return (false);
+}
+
 
 bool import_from_string(const std::string& str, Vector& value)
 {

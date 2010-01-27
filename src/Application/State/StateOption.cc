@@ -141,22 +141,12 @@ StateOption::validate_variant(ActionParameterVariant& variant,
 }
 
 bool 
-StateOption::compare_variant(ActionParameterVariant& variant)
-{
-  std::string value;
-  variant.get_value(value);
-  value = Utils::string_to_lower(value);
-  return (value_ == value);
-}
-
-bool 
 StateOption::is_option(const std::string& option)
 {
   if (option_list_.end() == std::find(option_list_.begin(),option_list_.end(),
     Utils::string_to_lower(option))) return (false);
   return (true);
 }
-
 
 void 
 StateOption::set_option_list(const std::vector<std::string>& option_list)

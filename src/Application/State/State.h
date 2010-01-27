@@ -39,6 +39,8 @@
 #include <Application/State/StateValue.h>
 #include <Application/State/StateRangedValue.h>
 #include <Application/State/StateOption.h>
+#include <Application/State/StateView2D.h>
+#include <Application/State/StateView3D.h>
 #include <Application/State/StateVector.h>
 
 #include <Application/State/StateHandler.h>

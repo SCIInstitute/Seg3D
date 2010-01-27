@@ -26,34 +26,71 @@
    DEALINGS IN THE SOFTWARE.
 */
 
+// STL includes
+#include <algorithm>
+
 // Application includes
-#include <Application/Viewer/Viewer.h>
+#include <Application/State/StateView2D.h>
 
 namespace Seg3D {
 
-Viewer::Viewer(const std::string& key) :
-  StateHandler(key)
+StateView2D::StateView2D()
 {
-  add_state("view_mode",view_mode_,"axial|coronal|sagittal|volume","axial");
-  
-  add_state("axial_view",axial_view_);
-  add_state("sagittal_view",sagittal_view_);
-  add_state("coronal_view",coronal_view_);
-  add_state("volume_view",volume_view_);
-
-  add_state("slice_lock",slice_lock_,true);
-  add_state("slice_grid",slice_grid_,true);
-  add_state("slice_visible",slice_visible_,true);
-
-  add_state("volume_lock",volume_lock_,true);
-  add_state("volume_slices_visible",volume_slices_visible_,true);
-  add_state("volume_isosurfaces_visible",volume_isosurfaces_visible_,true);
-  add_state("volume_volume_rendering_visible",volume_volume_rendering_visible_,false);
 }
-  
-Viewer::~Viewer()
+
+
+StateView2D::~StateView2D()
 {
+}  
+
+std::string 
+StateView2D::export_to_string() const
+{
+  return (Utils::export_to_string(value_));
+}
+
+bool 
+StateView2D::import_from_string(const std::string& str,
+                                bool from_interface)
+{
+  return (Utils::import_from_string(str,value_));
+}
+
+void 
+StateView2D::export_to_variant(ActionParameterVariant& variant) const
+{
+  variant.set_value(value_);
+}
+
+bool 
+StateView2D::import_from_variant(ActionParameterVariant& variant,
+                                 bool from_interface)
+{
+  Utils::View2D value;
+  if (!(variant.get_value(value))) return (false);
+
+  if (value != value_)
+  {
+    value_ = value;
+    value_changed_signal(value_,from_interface);
+  }
+  return (true);
+}
+
+bool 
+StateView2D::validate_variant(ActionParameterVariant& variant, 
+                              std::string& error)
+{
+  Utils::View2D value;
+  if (!(variant.get_value(value)))
+  {
+    error = "Cannot convert the value '"+variant.export_to_string()+
+            "' to a 2D Camera position";
+    return (false);
+  }
+  
+  error = "";
+  return (true);
 }
 
 } // end namespace Seg3D
-

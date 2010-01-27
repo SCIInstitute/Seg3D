@@ -40,7 +40,7 @@
 #include <boost/shared_ptr.hpp>
 
 // Application includes
-#include <Application/State/StateHandler.h>
+#include <Application/State/State.h>
 #include <Application/Viewer/ViewerRenderer.h>
 
 namespace Seg3D {
@@ -61,18 +61,27 @@ class Viewer : public StateHandler {
 
 // -- State information --
   public:
-    StateOptionHandle         viewer_type_;
-    StateBoolHandle    viewer_flip_x_;
-    StateBoolHandle    viewer_flip_y_;
-    StateBoolHandle    viewer_grid_;
-    StateBoolHandle    viewer_lock_;
+    StateOptionHandle  view_mode_;
+
+    StateView2DHandle  axial_view_;
+    StateView2DHandle  sagittal_view_;
+    StateView2DHandle  coronal_view_;
+    StateView3DHandle  volume_view_;
+    
+    StateBoolHandle    slice_lock_;
+    StateBoolHandle    slice_grid_;
+    StateBoolHandle    slice_visible_;
+
+    StateBoolHandle    volume_lock_;
+    StateBoolHandle    volume_slices_visible_;
+    StateBoolHandle    volume_isosurfaces_visible_;
+    StateBoolHandle    volume_volume_rendering_visible_;
     
 // -- Renderer information --
   public:
     
     ViewerRendererHandle renderer() { return renderer_; }
     void set_renderer(ViewerRendererHandle renderer) { renderer_ = renderer; }
-
 
   private:
     // A handle to the renderer that is used to render the data

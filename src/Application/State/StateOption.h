@@ -88,14 +88,9 @@ class StateOption : public StateBase {
     // This function returns false if the parameter is invalid or cannot be 
     // converted and in that case error will describe the error.
     virtual bool validate_variant(ActionParameterVariant& variant, 
-                                  std::string& error);
-    
-    // COMPARE_VARIANT:
-    // Compare with variant parameter
-    virtual bool compare_variant(ActionParameterVariant& variant);                                    
+                                  std::string& error);                          
                                     
 // -- signals describing the state --
-
   public:
     // VALUE_CHANGED_SIGNAL:
     // Signal when the data in the state is changed, the second bool indicates

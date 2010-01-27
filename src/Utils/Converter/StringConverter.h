@@ -44,6 +44,8 @@
 #include <Utils/Geometry/Transform.h>
 #include <Utils/Geometry/BBox.h>
 #include <Utils/Geometry/Plane.h>
+#include <Utils/Geometry/View2D.h>
+#include <Utils/Geometry/View3D.h>
 
 namespace Utils {
 
@@ -99,6 +101,9 @@ std::string export_to_string(const BBox& value);
 std::string export_to_string(const Transform& value);
 std::string export_to_string(const Plane& value);
 
+std::string export_to_string(const View2D& value);
+std::string export_to_string(const View3D& value);
+
 // import_from_string:
 // Function to convert a string back into the data it is representing
 
@@ -152,6 +157,9 @@ bool import_from_string(const std::string& str, std::vector<Vector>& value);
 
 bool import_from_string(const std::string& str, BBox& value);
 bool import_from_string(const std::string& str, Transform& value);
+
+bool import_from_string(const std::string& str, View2D& value);
+bool import_from_string(const std::string& str, View3D& value);
 
 
 } // end namespace Utils

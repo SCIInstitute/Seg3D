@@ -33,7 +33,7 @@
 namespace Seg3D {
 
 Tool::Tool(const std::string& toolid) :
-  StateHandler(std::string("ToolManager::")+toolid),
+  StateHandler(toolid),
   toolid_(toolid)
 {
   ToolManager::Instance()->add_toolid(toolid_);

@@ -26,122 +26,72 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_STATE_STATEVALUE_H
-#define APPLICATION_STATE_STATEVALUE_H
+#ifndef APPLICATION_STATE_STATEVIEW2D_H
+#define APPLICATION_STATE_STATEVIEW2D_H
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
 #endif
 
+// boost includes
+#include <boost/smart_ptr.hpp>
+
+// Utils includes
+#include <Utils/Geometry/View2D.h>
 #include <Utils/Converter/StringConverter.h>
+
+// Application includes
 #include <Application/State/StateBase.h>
 
 namespace Seg3D {
 
-// STATEVALUE:
-// This class is a specification of State that is used to hold a single unbound
-// instance of a value.
+// STATEOPTION:
+// This class is a specification of State that is used to hold an option out of
+// a list of possible options.
 
-// Forward declaration of the StateValue class
-template<class T>
-class StateValue;
+class StateView2D;
+typedef boost::shared_ptr<StateView2D> StateView2DHandle;
 
-// Predefine the StateValue instantiation that are used in Seg3D
-
-typedef StateValue<double>                      StateDouble;
-typedef boost::shared_ptr<StateDouble>          StateDoubleHandle;
-
-typedef StateValue<Utils::Point>                StatePoint;
-typedef boost::shared_ptr<StatePoint>           StatePointHandle;
-
-typedef StateValue<bool>                        StateBool;
-typedef boost::shared_ptr<StateBool>            StateBoolHandle;
-
-typedef StateValue<int>                         StateInt;
-typedef boost::shared_ptr<StateInt>             StateIntHandle;
-
-typedef StateValue<std::string>                 StateString;
-typedef boost::shared_ptr<StateString>          StateStringHandle;
-
-// Definition of the templated StateValue class
-
-template<class T>
-class StateValue : public StateBase {
+class StateView2D : public StateBase {
 
 // -- constructor/destructor --
   public:
 
     // CONSTRUCTOR
-    StateValue(const T& default_value) :
-      value_(default_value)
-    {}
-
+    StateView2D();
+           
     // DESTRUCTOR
-    virtual ~StateValue() {}
+    virtual ~StateView2D();
 
 // -- functions for accessing data --
 
   public:
     // EXPORT_TO_STRING:
     // Convert the contents of the State into a string
-    virtual std::string export_to_string() const
-    {
-      return (Utils::export_to_string(value_));
-    }
+    virtual std::string export_to_string() const;
     
     // IMPORT_FROM_STRING:
     // Set the State from a string
     virtual bool import_from_string(const std::string& str,
-                                    bool from_interface = false)
-    {
-      T value;
-      if (!(Utils::import_from_string(str,value))) return (false);
-      if (value != value_)
-      {
-        value_ = value;
-        value_changed_signal(value_,from_interface);
-      }
-      return (true);      
-    }
-
+                                    bool from_interface = false);
+                                    
   protected:    
     // EXPORT_TO_VARIANT
     // Export the state data to a variant parameter
-    virtual void export_to_variant(ActionParameterVariant& variant) const
-    {
-      variant.set_value(value_);
-    }
+    virtual void export_to_variant(ActionParameterVariant& variant) const;
     
     // IMPORT_FROM_VARIANT:
     // Import the state data from a variant parameter.
     virtual bool import_from_variant(ActionParameterVariant& variant,
-                                     bool from_interface = false)
-    {
-      T value;
-      if (!( variant.get_value(value) )) return (false);
-      if (value != value_)
-      {
-        value_ = value;
-        value_changed_signal(value_,from_interface);
-      }
-      return (true);
-    }
+                                     bool from_interface = false);
           
     // VALIDATE_VARIANT:
     // Validate a variant parameter
     // This function returns false if the parameter is invalid or cannot be 
     // converted and in that case error will describe the error.
-    virtual bool validate_variant(ActionParameterVariant& variant, std::string& error)
-    {
-      if (!(variant.validate_type<T>()))
-      {
-        error = "Cannot convert the value '"+variant.export_to_string()+"'";
-        return (false);
-      }
-      error = "";
-      return (true);
-    }
-
+    virtual bool validate_variant(ActionParameterVariant& variant, 
+                                  std::string& error);                                  
+                                    
 // -- signals describing the state --
   public:
     // VALUE_CHANGED_SIGNAL:
@@ -149,15 +99,17 @@ class StateValue : public StateBase {
     // whether the signal was triggered from the interface, in which case it may
     // not need to update the interface.
 
-    typedef boost::signals2::signal<void (T, bool)> value_changed_signal_type;
+    typedef boost::signals2::signal<void (Utils::View2D, bool)> value_changed_signal_type;
     value_changed_signal_type value_changed_signal;
-    
-// -- internals of StateValue --
-  private:
 
-    // Storage for the actual value
-    T value_;
-};
+// -- Functions specific to this type of state --
+  public:
+
+// -- storage of the view --
+  protected:
+    // Storage for the actual view
+    Utils::View2D value_;
+  };
 
 } // end namespace Seg3D
 

@@ -26,8 +26,8 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_STATE_STATEMANAGER_H
-#define APPLICATION_STATE_STATEMANAGER_H
+#ifndef APPLICATION_STATE_STATEDATABASE_H
+#define APPLICATION_STATE_STATEDATABASE_H
 
 // STL includes
 #include <map>
@@ -46,20 +46,20 @@
 
 namespace Seg3D {
 
-class StateManager;
+class StateDataBase;
 
-class StateManager : public boost::noncopyable {
+class StateDataBase : public boost::noncopyable {
 
 // -- Constructor/destructor --
   public:
-    StateManager();
+    StateDataBase();
     
 // -- Interface for accessing state variables --
   public:
   
     // ADD_STATE:
     // Add the base of a state variable to the central state database in
-    // StateManager. 
+    // StateDataBase. 
     bool add_state(const std::string& stateid, StateBaseHandle& state);
   
     // GET_STATE:
@@ -68,15 +68,15 @@ class StateManager : public boost::noncopyable {
     
     // REMOVE_STATE:
     // Remove all the state variables that derive from the tag and the tag 
-    // itself. So remove ToolManager::PaintTool will remove as well derived
-    // values like ToolManager::PaintTool::Brushsize.
+    // itself. So remove ToolDataBase::PaintTool will remove as well derived
+    // values like ToolDataBase::PaintTool::Brushsize.
     void remove_state(const std::string& stateid);
     
   private:
     typedef boost::unordered_map<std::string,StateBaseHandle> state_map_type;
 
     // Map containing pointers to the State variables in the class under control
-    // by the StateManager
+    // by the StateDataBase
     state_map_type state_map_;
     
     // Mutex protecting the pointer map
@@ -84,10 +84,10 @@ class StateManager : public boost::noncopyable {
 
 // -- Singleton interface --
   public:
-    static StateManager* Instance() { return instance_.instance(); }
+    static StateDataBase* Instance() { return instance_.instance(); }
 
   private:
-    static Utils::Singleton<StateManager> instance_;
+    static Utils::Singleton<StateDataBase> instance_;
 };
 
 } // end namespace Seg3D

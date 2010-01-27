@@ -36,13 +36,17 @@ SET(APPLICATION_STATE_SRCS
   State.h
   StateOption.cc
   StateOption.h
+  StateView2D.cc
+  StateView2D.h
+  StateView3D.cc
+  StateView3D.h
   StateValue.h
   StateVector.h
   StateRangedValue.h
-  StateManager.h
-  StateManager.cc
   StateHandler.h
   StateHandler.cc
+  StateDataBase.h
+  StateDataBase.cc
   )
 
 SET(APPLICATION_STATE_ACTIONS_SRCS

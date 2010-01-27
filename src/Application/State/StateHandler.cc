@@ -27,7 +27,7 @@
 */
 
 #include <Application/State/StateHandler.h>
-#include <Application/State/StateManager.h>
+#include <Application/State/StateDataBase.h>
 
 namespace Seg3D {
 
@@ -51,17 +51,17 @@ StateHandler::add_statebase(const std::string& key, StateBaseHandle state)
 
   StateBaseHandle old_state;
   // Step (3): Import the previous setting from the current variable
-  StateManager::Instance()->get_state(stateid,old_state);
+  StateDataBase::Instance()->get_state(stateid,old_state);
   if (old_state.get())
   { 
     // use the string representation as intermediate
     state->import_from_string(old_state->export_to_string());
     // delete the old state from the manager
-    StateManager::Instance()->remove_state(stateid);
+    StateDataBase::Instance()->remove_state(stateid);
   }
 
   // Step (4): Add the state to the StateManager
-  return (StateManager::Instance()->add_state(stateid,state)); 
+  return (StateDataBase::Instance()->add_state(stateid,state)); 
 }
 
 }

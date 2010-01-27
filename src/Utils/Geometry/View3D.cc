@@ -26,34 +26,57 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-// Application includes
-#include <Application/Viewer/Viewer.h>
+#include <Utils/Geometry/View3D.h>
+#include <Utils/Math/MathFunctions.h>
 
-namespace Seg3D {
+namespace Utils {
 
-Viewer::Viewer(const std::string& key) :
-  StateHandler(key)
-{
-  add_state("view_mode",view_mode_,"axial|coronal|sagittal|volume","axial");
-  
-  add_state("axial_view",axial_view_);
-  add_state("sagittal_view",sagittal_view_);
-  add_state("coronal_view",coronal_view_);
-  add_state("volume_view",volume_view_);
-
-  add_state("slice_lock",slice_lock_,true);
-  add_state("slice_grid",slice_grid_,true);
-  add_state("slice_visible",slice_visible_,true);
-
-  add_state("volume_lock",volume_lock_,true);
-  add_state("volume_slices_visible",volume_slices_visible_,true);
-  add_state("volume_isosurfaces_visible",volume_isosurfaces_visible_,true);
-  add_state("volume_volume_rendering_visible",volume_volume_rendering_visible_,false);
-}
-  
-Viewer::~Viewer()
+View3D::View3D()
 {
 }
 
-} // end namespace Seg3D
+View3D::~View3D()
+{
+}
 
+View3D::View3D(const Point& eyep, const Point& lookat, 
+               const Vector& up,  double fov) : 
+  eyep_(eyep), 
+  lookat_(lookat), 
+  up_(up), 
+  fov_(fov)
+{
+}
+
+View3D::View3D(const View3D& copy) : 
+  eyep_(copy.eyep_), 
+  lookat_(copy.lookat_), 
+  up_(copy.up_), 
+  fov_(copy.fov_)
+{
+}
+
+View3D& View3D::operator=(const View3D& copy)
+{
+  eyep_     = copy.eyep_;
+  lookat_   = copy.lookat_;
+  up_       = copy.up_;
+  fov_      = copy.fov_;
+  return *this;
+}
+
+bool
+View3D::operator==(const View3D& copy)
+{
+  return (eyep_ == copy.eyep_ && lookat_ == copy.lookat_ &&
+      up_ == copy.up_     && fov_ == copy.fov_ ); 
+}
+
+bool
+View3D::operator!=(const View3D& copy)
+{
+  return (eyep_ != copy.eyep_ || lookat_ != copy.lookat_ ||
+          up_ != copy.up_     || fov_ != copy.fov_);
+}
+
+} // End namespace Utils

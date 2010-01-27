@@ -87,10 +87,6 @@ class StateBase : public boost::noncopyable {
     // converted and in that case error will describe the error.
     virtual bool validate_variant(ActionParameterVariant& variant, std::string& error) = 0;
     
-    // COMPARE_VARIANT:
-    // Compare with variant parameter
-    virtual bool compare_variant(ActionParameterVariant& variant) = 0;
-    
 // -- stateid handling --
   public:
     // GET_STATEID:

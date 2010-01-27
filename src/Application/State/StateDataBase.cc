@@ -26,16 +26,16 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#include <Application/State/StateManager.h>
+#include <Application/State/StateDataBase.h>
 
 namespace Seg3D {
 
-StateManager::StateManager()
+StateDataBase::StateDataBase()
 {
 }
   
 bool
-StateManager::add_state(const std::string& state_id, StateBaseHandle& state)
+StateDataBase::add_state(const std::string& state_id, StateBaseHandle& state)
 {
   boost::unique_lock<boost::mutex> lock(state_map_lock_);
   
@@ -52,7 +52,7 @@ StateManager::add_state(const std::string& state_id, StateBaseHandle& state)
 }
 
 bool 
-StateManager::get_state(const std::string& state_id, StateBaseHandle& state)
+StateDataBase::get_state(const std::string& state_id, StateBaseHandle& state)
 {
   boost::unique_lock<boost::mutex> lock(state_map_lock_);
   
@@ -69,7 +69,7 @@ StateManager::get_state(const std::string& state_id, StateBaseHandle& state)
 }
 
 void
-StateManager::remove_state(const std::string& state_id)
+StateDataBase::remove_state(const std::string& state_id)
 {
   boost::unique_lock<boost::mutex> lock(state_map_lock_);
   
@@ -103,6 +103,6 @@ StateManager::remove_state(const std::string& state_id)
 
 
 // Singleton interface needs to be defined somewhere
-Utils::Singleton<StateManager> StateManager::instance_;
+Utils::Singleton<StateDataBase> StateDataBase::instance_;
 
 } // end namespace Seg3D

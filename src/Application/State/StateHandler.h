@@ -39,6 +39,8 @@
 #include <Application/State/StateValue.h>
 #include <Application/State/StateRangedValue.h>
 #include <Application/State/StateOption.h>
+#include <Application/State/StateView2D.h>
+#include <Application/State/StateView3D.h>
 
 namespace Seg3D {
 
@@ -88,7 +90,7 @@ class StateHandler : public boost::noncopyable {
     bool add_state(const std::string& key, HANDLE& state)
     { 
       // Step (1): Generate the state variable
-      state = StateHandle(new typename HANDLE::element_type);
+      state = HANDLE(new typename HANDLE::element_type);
 
       // Step (2): Now handle the common part for each add_state function
       return (add_statebase(key,StateBaseHandle(state)));

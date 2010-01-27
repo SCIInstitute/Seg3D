@@ -26,44 +26,52 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_STATE_ACTIONS_ACTIONGET_H
-#define APPLICATION_STATE_ACTIONS_ACTIONGET_H
+#ifndef UTILS_GEOMETRY_VIEW2D_H
+#define UTILS_GEOMETRY_VIEW2D_H
 
-#include <Application/Action/Actions.h>
-#include <Application/Interface/Interface.h>
+#include <Utils/Geometry/Point.h>
+#include <Utils/Geometry/Vector.h>
 
+namespace Utils {
 
-namespace Seg3D {
+// Forward declaration
+class View2D;
 
-class ActionGet : public Action {
-  SCI_ACTION_TYPE("Get","Get <key>",APPLICATION_E|QUERY_E)
-  
-// -- Constructor/Destructor --
+class View2D {
   public:
-    ActionGet()
-    {
-      add_argument(stateid_);
-    }
+    View2D();
+    View2D(const Point& center, double scale);
+    View2D(const Point& center, double scalex, double scaley);
+
+    ~View2D();
+
+    View2D(const View2D&);
+    View2D& operator=(const View2D&);
+
+    // compare 2 views; are they exactly the same?
+    bool operator==(const View2D&);
+    bool operator!=(const View2D&);
+
+    inline Point center() const                { return center_; }
+    inline void center(const Point& center)    { center_ = center; }
+
+    inline double scalex() const                { return scalex_; }
+    inline void   scalex(double scalex)         { scalex_ = scalex; }
+
+    inline double scaley() const                { return scaley_; }
+    inline void   scaley(double scaley)         { scaley_ = scaley; }
     
-    virtual ~ActionGet() {}
-
-// -- Functions that describe action --
-    virtual bool validate(ActionContextHandle& context);
-    virtual bool run(ActionContextHandle& context, ActionResultHandle& result);
-
-// -- Action parameters --
   private:
-    // This one describes where the state is located
-    ActionParameter<std::string> stateid_;
+    // Center point
+    Point  center_;
+    
+    // Size of slice displayed in x direction (if negative the axis needs to be flipped)
+    double scalex_;
 
-// -- Dispatch this action from the interface --
-  public:
-  
-    static void Dispatch(StateBaseHandle& state);
-};
+    // Size of slice displayed in y direction (if negative the axis needs to be flipped)
+    double scaley_;
+    };
 
-
-} // end namespace Seg3D
+} // End namespace Utils
 
 #endif
-

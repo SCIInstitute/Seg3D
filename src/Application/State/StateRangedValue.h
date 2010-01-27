@@ -152,15 +152,6 @@ class StateRangedValue : public StateBase {
       error = "";
       return (true);
     }
-    
-    // COMPARE_VARIANT:
-    // Compare with variant parameter
-    virtual bool compare_variant(ActionParameterVariant& variant)
-    {
-      T value;
-      variant.get_value(value);
-      return (value_ == value);
-    }
 
 // -- Functions specific to this type of state --
   public:

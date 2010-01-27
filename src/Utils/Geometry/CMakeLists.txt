@@ -42,6 +42,10 @@ SET(UTILS_GEOMETRY_SRCS
   Transform.cc
   Vector.h
   Vector.cc
+  View3D.h
+  View3D.cc
+  View2D.h
+  View2D.cc
 )
 
 ##################################################

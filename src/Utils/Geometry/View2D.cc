@@ -26,34 +26,60 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-// Application includes
-#include <Application/Viewer/Viewer.h>
+#include <Utils/Geometry/View2D.h>
+#include <Utils/Math/MathFunctions.h>
 
-namespace Seg3D {
+namespace Utils {
 
-Viewer::Viewer(const std::string& key) :
-  StateHandler(key)
-{
-  add_state("view_mode",view_mode_,"axial|coronal|sagittal|volume","axial");
-  
-  add_state("axial_view",axial_view_);
-  add_state("sagittal_view",sagittal_view_);
-  add_state("coronal_view",coronal_view_);
-  add_state("volume_view",volume_view_);
-
-  add_state("slice_lock",slice_lock_,true);
-  add_state("slice_grid",slice_grid_,true);
-  add_state("slice_visible",slice_visible_,true);
-
-  add_state("volume_lock",volume_lock_,true);
-  add_state("volume_slices_visible",volume_slices_visible_,true);
-  add_state("volume_isosurfaces_visible",volume_isosurfaces_visible_,true);
-  add_state("volume_volume_rendering_visible",volume_volume_rendering_visible_,false);
-}
-  
-Viewer::~Viewer()
+View2D::View2D()
 {
 }
 
-} // end namespace Seg3D
+View2D::~View2D()
+{
+}
 
+View2D::View2D(const Point& center, double scale) :
+  center_(center),
+  scalex_(scale),
+  scaley_(scale)
+{
+}
+
+View2D::View2D(const Point& center, double scalex, double scaley) :
+  center_(center),
+  scalex_(scalex),
+  scaley_(scaley)
+{
+}
+
+View2D::View2D(const View2D& copy) : 
+  center_(copy.center_), 
+  scalex_(copy.scalex_), 
+  scaley_(copy.scaley_) 
+{
+}
+
+View2D& View2D::operator=(const View2D& copy)
+{
+  center_ = copy.center_;
+  scalex_  = copy.scalex_;
+  scaley_  = copy.scaley_;
+  return *this;
+}
+
+bool
+View2D::operator==(const View2D& copy)
+{
+  return (center_ == copy.center_ && scalex_ == copy.scalex_ &&
+          scaley_ == copy.scaley_ ); 
+}
+
+bool
+View2D::operator!=(const View2D& copy)
+{
+  return (center_ != copy.center_ || scalex_ != copy.scalex_ ||
+          scaley_ != copy.scaley_ ); 
+}
+
+} // End namespace Utils
