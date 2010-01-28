@@ -287,7 +287,7 @@ void ToolBoxWidget::set_active_tool( QWidget *tool )
   { 
     if ((*it)->tool_ == tool)
     {
-      active_index_ = index;
+      active_index_ = (size_t)index;
       active_tool_ = (*it)->tool_;
       active_page_ = *it;
 

@@ -59,11 +59,14 @@ InvertToolInterface::build_widget(QFrame* frame)
   ToolHandle base_tool_ = tool();
   InvertTool* tool = dynamic_cast<InvertTool*>(base_tool_.get());
   QtBridge::connect(private_->ui_.replaceCheckBox,tool->replace_);
-  //QtBridge::connect(private_->ui_.activeComboBox, tool->target_layer_);
+  
 
-  private_->ui_.activeComboBox->addItem(QString::fromUtf8("first item"));
-  private_->ui_.activeComboBox->addItem(QString::fromUtf8("second item"));
-  private_->ui_.activeComboBox->addItem(QString::fromUtf8("third item"));
+  private_->ui_.activeComboBox->addItem(QString::fromUtf8("firstitem"));
+  private_->ui_.activeComboBox->addItem(QString::fromUtf8("seconditem"));
+  private_->ui_.activeComboBox->addItem(QString::fromUtf8("thirditem"));
+
+  QtBridge::connect(private_->ui_.activeComboBox, tool->target_layer_);
+
   makeConnections();
   return (true);
   

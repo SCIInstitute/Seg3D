@@ -35,7 +35,8 @@
 // Base class of the tool widget
 #include <Interface/AppInterface/ToolWidget.h>
 
-#include <Interface/ToolInterface/CustomWidgets/SliderSpinCombo.h>
+#include <Interface/ToolInterface/CustomWidgets/SliderSpinComboInt.h>
+#include <Interface/ToolInterface/CustomWidgets/SliderSpinComboDouble.h>
 
 namespace Seg3D {
 
@@ -45,12 +46,12 @@ class PaintToolInterface : public ToolWidget {
   Q_OBJECT
   
   Q_SIGNALS:
-    void activeChanged(int);
-    void maskChanged(int);
+    void activeChanged(QString);
+    void maskChanged(QString);
     void eraseModeChanged(bool);
     void paintBrushSizeChanged(int);
-    void upperThresholdChanged(int);
-    void lowerThresholdChanged(int);
+    void upperThresholdChanged(double);
+    void lowerThresholdChanged(double);
   
   
   public Q_SLOTS:
@@ -74,15 +75,15 @@ class PaintToolInterface : public ToolWidget {
   private:
     PaintToolInterfacePrivate* private_;
     
-    SliderSpinCombo *paintBrushAdjuster;
-    SliderSpinCombo *upperThresholdAdjuster;
-    SliderSpinCombo *lowerThresholdAdjuster;
+    SliderSpinComboInt *paintBrushAdjuster;
+    SliderSpinComboDouble *upperThresholdAdjuster;
+    SliderSpinComboDouble *lowerThresholdAdjuster;
     
     void makeConnections();
   
   private Q_SLOTS:
-    void senseActiveChanged(int);
-    void senseMaskChanged(int);
+    void senseActiveChanged(QString);
+    void senseMaskChanged(QString);
     
     void senseEraseModeChanged(bool);
     

@@ -59,20 +59,25 @@ PaintToolInterface::build_widget(QFrame* frame)
   
   private_->ui_.setupUi(frame);
   
-  paintBrushAdjuster = new SliderSpinCombo();
+  paintBrushAdjuster = new SliderSpinComboInt();
   private_->ui_.verticalLayout->addWidget(paintBrushAdjuster);
   
-  upperThresholdAdjuster = new SliderSpinCombo();
+  upperThresholdAdjuster = new SliderSpinComboDouble();
   private_->ui_.upperHLayout_bottom->addWidget(upperThresholdAdjuster);
   
-  lowerThresholdAdjuster = new SliderSpinCombo();
+  lowerThresholdAdjuster = new SliderSpinComboDouble();
   private_->ui_.lowerHLayout_bottom->addWidget(lowerThresholdAdjuster);
 
 
   ToolHandle base_tool_ = tool();
   PaintTool* tool = dynamic_cast<PaintTool*>(base_tool_.get());
+  QtBridge::connect(private_->ui_.activeComboBox, tool->target_layer_);
+  QtBridge::connect(private_->ui_.maskComboBox, tool->mask_layer_);
   QtBridge::connect(paintBrushAdjuster, tool->brush_radius_);
-  
+  QtBridge::connect(upperThresholdAdjuster, tool->upper_threshold_);
+  QtBridge::connect(lowerThresholdAdjuster, tool->lower_threshold_);
+  QtBridge::connect(private_->ui_.eraseCheckBox, tool->erase_);
+
   makeConnections();
   SCI_LOG_DEBUG("Finished building a Paint Brush Interface");
   
@@ -81,25 +86,20 @@ PaintToolInterface::build_widget(QFrame* frame)
   
 void PaintToolInterface::makeConnections()
 {
-  connect(private_->ui_.activeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(senseActiveChanged(int)));
-  connect(private_->ui_.maskComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(senseMaskChanged(int)));
-  connect(private_->ui_.eraseCheckBox, SIGNAL(toggled(bool)), this, SLOT(senseEraseModeChanged(bool)));
-  
-  
-  //connect(paintBrushAdjuster, SIGNAL(valueAdjusted(double)), this, SLOT(sensePaintBrushSizeChanged(double)));
-  connect(upperThresholdAdjuster, SIGNAL(valueAdjusted(double)), this, SLOT(senseUpperThresholdChanged(double)));
-  connect(lowerThresholdAdjuster, SIGNAL(valueAdjusted(double)), this, SLOT(senselowerThresholdChanged(double)));
+  connect(private_->ui_.activeComboBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(senseActiveChanged(QString)));
+  connect(private_->ui_.maskComboBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(senseMaskChanged(QString)));
+
 }
 
 
 //  --- Private slots for custom signals ---  //
-void PaintToolInterface::senseActiveChanged(int active)
+void PaintToolInterface::senseActiveChanged(QString active)
 {
   //private_->ui_.maskComboBox->setCurrentIndex(0);
   Q_EMIT activeChanged( active );
 }
 
-void PaintToolInterface::senseMaskChanged(int mask)
+void PaintToolInterface::senseMaskChanged(QString mask)
 {
   Q_EMIT maskChanged(mask);
 }

@@ -31,7 +31,8 @@
 
 // Qt includes
 #include <QtGui>
-#include <Interface/ToolInterface/CustomWidgets/SliderSpinCombo.h>
+#include <Interface/ToolInterface/CustomWidgets/SliderSpinComboInt.h>
+#include <Interface/ToolInterface/CustomWidgets/SliderSpinComboDouble.h>
 
 // boost includes
 #include <boost/signals2/signal.hpp>
@@ -77,41 +78,12 @@ class QtCheckBoxSlot : public QObject {
 };
 
 
-class QtSliderSpinComboDoubleSlot : public QObject {
-  Q_OBJECT
-  public:
-
-    // Constructor
-    QtSliderSpinComboDoubleSlot(SliderSpinCombo* parent, StateDoubleHandle& state_handle) :
-      QObject(parent),
-      state_handle_(state_handle) 
-    {
-      // Qt's connect function
-      connect(parent,SIGNAL(valueAdjusted(double)),this,SLOT(slot(double)));
-    }
-
-    
-    // Virtual destructor: needed by Qt
-    virtual ~QtSliderSpinComboDoubleSlot() {}
-    
-  public Q_SLOTS:
-    // Slot that Qt will call
-    void slot(double state)
-    {
-      ActionSet::Dispatch(state_handle_,static_cast<double>(state));
-    }
-    
-  private:
-    // Function object
-    StateDoubleHandle state_handle_;
-};
-
 class QtSliderSpinComboRangedIntSlot : public QObject {
   Q_OBJECT
   public:
     
      // Constructor
-    QtSliderSpinComboRangedIntSlot(SliderSpinCombo* parent, StateRangedIntHandle& state_handle) :
+    QtSliderSpinComboRangedIntSlot(SliderSpinComboInt* parent, StateRangedIntHandle& state_handle) :
       QObject(parent),
       state_handle_(state_handle) 
     {
@@ -137,37 +109,36 @@ class QtSliderSpinComboRangedIntSlot : public QObject {
 
 };
 
-
-
-class QtSliderSpinComboIntSlot : public QObject {
+class QtSliderSpinComboRangedDoubleSlot : public QObject {
   Q_OBJECT
   public:
-
-    // Constructor
-    QtSliderSpinComboIntSlot(SliderSpinCombo* parent, StateIntHandle& state_handle) :
+    
+     // Constructor
+    QtSliderSpinComboRangedDoubleSlot(SliderSpinComboDouble* parent, StateRangedDoubleHandle& state_handle) :
       QObject(parent),
       state_handle_(state_handle) 
     {
       // Qt's connect function
-      connect(parent,SIGNAL(valueAdjusted(int)),this,SLOT(slot(int)));
+      connect(parent,SIGNAL(valueAdjusted(double)),this,SLOT(slot(double)));
     }
 
     
     // Virtual destructor: needed by Qt
-    virtual ~QtSliderSpinComboIntSlot() {}
+    virtual ~QtSliderSpinComboRangedDoubleSlot() {}
     
   public Q_SLOTS:
     // Slot that Qt will call
-    void slot(int state)
+    void slot(double state)
     {
-      ActionSet::Dispatch(state_handle_,static_cast<int>(state));
+      ActionSet::Dispatch(state_handle_,static_cast<double>(state));
     }
     
   private:
     // Function object
-    StateIntHandle state_handle_;
-};
+    StateRangedDoubleHandle state_handle_;
 
+
+};
 
 
 class QtComboBoxSlot : public QObject {
@@ -180,7 +151,7 @@ class QtComboBoxSlot : public QObject {
       state_handle_(state_handle) 
     {
       // Qt's connect function
-      connect(parent,SIGNAL(stateChanged(int)),this,SLOT(slot(int)));
+      connect(parent,SIGNAL(currentIndexChanged(QString)),this,SLOT(slot(QString)));
     }
     
     // Virtual destructor: needed by Qt
@@ -188,9 +159,10 @@ class QtComboBoxSlot : public QObject {
     
   public Q_SLOTS:
     // Slot that Qt will call
-    void slot(int state)
+    void slot(QString state)
     {
-      ActionSet::Dispatch(state_handle_,state);
+
+      ActionSet::Dispatch(state_handle_,state.toStdString());
     }
     
   private:

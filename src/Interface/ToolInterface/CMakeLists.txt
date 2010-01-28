@@ -58,6 +58,9 @@ SET(INTERFACE_TOOLINTERFACE_SRCS
 
 SET(INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_SRCS
   CustomWidgets/SliderSpinCombo.cc
+  CustomWidgets/SliderSpinComboInt.cc
+  CustomWidgets/SliderSpinComboDouble.cc
+  
 )
 
 SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
@@ -87,6 +90,8 @@ SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
 
 SET(INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_MOC_SRCS
   CustomWidgets/SliderSpinCombo.h
+  CustomWidgets/SliderSpinComboInt.h
+  CustomWidgets/SliderSpinComboDouble.h
 )
 
 SET(INTERFACE_TOOLINTERFACE_NO_MOC_SRCS

@@ -31,7 +31,8 @@
 
 // QT includes/custom widget
 #include <QtGui>
-#include <Interface/ToolInterface/CustomWidgets/SliderSpinCombo.h>
+#include <Interface/ToolInterface/CustomWidgets/SliderSpinComboInt.h>
+#include <Interface/ToolInterface/CustomWidgets/SliderSpinComboDouble.h>
 
 // Application includes
 #include <Application/State/StateValue.h>
@@ -53,14 +54,12 @@ class QtBridge : public boost::noncopyable {
     // Connect a QCheckBox to StateValue<bool>
     static bool connect(QCheckBox* qcheckbox, StateBoolHandle& state_handle);
     
-    // Connect a SliderSpinCombo to StateValue<int>
-    static bool connect(SliderSpinCombo* sscombo, StateIntHandle& state_handle);
-    
-    // Connect a SliderSpinCombo to StateValue<double>
-    static bool connect(SliderSpinCombo* sscombo, StateDoubleHandle& state_handle);
+    // Connect a SliderSpinCombo to StateRangedIntValue
+    static bool connect(SliderSpinComboInt* sscombo, StateRangedIntHandle& state_handle);
 
-    // Connect a SliderSpinCombo to StateValue<double>
-    static bool connect(SliderSpinCombo* sscombo, StateRangedIntHandle& state_handle);
+    // Connect a SliderSpinCombo to StateRangedDoubleValue
+    static bool connect(SliderSpinComboDouble* sscombo, StateRangedDoubleHandle& state_handle);
+
     
     // Connect a QComboBox to StateValue<int>
     static bool connect(QComboBox* qcombobox, StateOptionHandle& state_handle);
