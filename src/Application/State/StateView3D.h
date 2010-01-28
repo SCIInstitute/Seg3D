@@ -33,8 +33,16 @@
 # pragma once
 #endif
 
+// boost includes
 #include <boost/smart_ptr.hpp>
+
+// Utils includes
+#include <Utils/Geometry/View2D.h>
+#include <Utils/Converter/StringConverter.h>
+
+// Application includes
 #include <Application/State/StateBase.h>
+#include <Application/State/StateEngine.h>
 
 namespace Seg3D {
 
@@ -97,6 +105,13 @@ class StateView3D : public StateBase {
 
 // -- Functions specific to this type of state --
   public:
+
+
+// -- access value --
+  public:
+   // GET:
+   // Get the value of the state variable
+   Utils::View3D get() { return value_; }
 
 // -- storage of the view --
   protected:

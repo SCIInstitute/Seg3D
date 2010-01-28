@@ -77,6 +77,9 @@ bool
 StateOption::import_from_string(const std::string& str,
                                 bool from_interface)
 {
+  // Lock the state engine so no other thread will be accessing it
+  StateEngine::lock_type lock(StateEngine::Instance()->get_mutex());
+
   // Ensure that value is only changed when the string can
   // successfully converted.
   std::string value;
@@ -88,6 +91,7 @@ StateOption::import_from_string(const std::string& str,
     if (option_list_.end() == std::find(option_list_.begin(),
             option_list_.end(),value)) return (false);
     value_ = value;
+
     value_changed_signal(value_,from_interface);
   }
   return (true);
@@ -103,6 +107,9 @@ bool
 StateOption::import_from_variant(ActionParameterVariant& variant,
                                  bool from_interface)
 {
+  // Lock the state engine so no other thread will be accessing it
+  StateEngine::lock_type lock(StateEngine::Instance()->get_mutex());
+
   std::string value;
   if (!( variant.get_value(value) )) return (false);
 

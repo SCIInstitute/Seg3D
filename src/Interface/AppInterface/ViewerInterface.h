@@ -30,12 +30,17 @@ class ViewerInterface : public QWidget {
   //  void writeSizeSettings();
   //  void readSizeSettings();
     
-  public Q_SLOTS:
-    void set_views(int, int);
+    void set_layout(const std::string& layout);
     void set_selected_viewer(int);
 
   private:
     ViewerInterfacePrivateHandle private_;
+    
+  public:
+    typedef QPointer<ViewerInterface> qpointer_type;
+    
+    // SetViewerLayout: (Thread safe - slot)
+    static void SetViewerLayout(qpointer_type qpointer, std::string layout);
 };
 
 } // end namespace  

@@ -33,6 +33,10 @@
 #include <Utils/Core/Log.h>
 #include <Utils/Core/Exception.h>
 
+// Application
+#include <Application/Interface/Interface.h>
+#include <Application/ViewerManager/ViewerManager.h>
+
 // Interface includes
 #include <Interface/AppInterface/ViewerInterface.h>
 #include <Interface/AppInterface/ViewerWidget.h>
@@ -45,14 +49,17 @@ class ViewerInterfacePrivate {
     ViewerInterfacePrivate(QWidget* parent);
   
   public:
+    // Layout elements
     QVBoxLayout* layout_;
 
-    QSplitter* horiz_splitter_;
-    
+    // Splitters
+    QSplitter* horiz_splitter_;    
     QSplitter* vert_splitter1_;
     QSplitter* vert_splitter2_;
 
+    // All six viewers
     std::vector<ViewerWidget*> viewer_;
+
     int selected_viewer_;
 };
 
@@ -95,11 +102,29 @@ ViewerInterfacePrivate::ViewerInterfacePrivate(QWidget* parent)
 } 
   
   
-  
 ViewerInterface::ViewerInterface(QWidget *parent) :
     QWidget(parent)
 {
+  // Create the internals of the interface
   private_ = ViewerInterfacePrivateHandle(new ViewerInterfacePrivate(this));
+
+  // Get a qpointer to this object, so all the application signal callbacks
+  // can use this to ensure that the pointer to this object is still valid.
+  qpointer_type qpointer(this);
+
+  // We need a lock here as connecting to the state engine and getting the 
+  // the current value needs to be atomic
+  StateEngine::Lock();
+
+  // Connect an update to whenever the viewer layout is changed
+  ViewerManager::Instance()->layout_state->value_changed_signal.connect(
+    boost::bind(&ViewerInterface::SetViewerLayout,qpointer,_1));
+
+  // set the viewer_interface_ to a default view of 1 and 3
+  set_layout(ViewerManager::Instance()->layout_state->get());
+
+  StateEngine::Unlock();
+
   set_selected_viewer(0);
 }
 
@@ -149,9 +174,9 @@ ViewerInterface::set_selected_viewer(int selected_viewer)
 
 
 void 
-ViewerInterface::set_views(int left, int right)
+ViewerInterface::set_layout(const std::string& layout)
 {
-  if ((left == 1)&&(right == 0))
+  if (layout == "single")
   {
     private_->viewer_[0]->show();
     private_->viewer_[1]->hide();
@@ -166,8 +191,7 @@ ViewerInterface::set_views(int left, int right)
     private_->horiz_splitter_->setSizes(sizes);
     private_->horiz_splitter_->repaint();
   }
-
-  if ((left == 1)&&(right == 1))
+  else if (layout == "1and1")
   {
     private_->viewer_[0]->show();
     private_->viewer_[1]->hide();
@@ -182,8 +206,7 @@ ViewerInterface::set_views(int left, int right)
     private_->horiz_splitter_->setSizes(sizes);
     private_->horiz_splitter_->repaint();
   }
-
-  if ((left == 1)&&(right == 2))
+  else if (layout == "1and2")
   {
     private_->viewer_[0]->show();
     private_->viewer_[1]->hide();
@@ -202,8 +225,7 @@ ViewerInterface::set_views(int left, int right)
     private_->vert_splitter2_->setSizes(vsizes);
     private_->horiz_splitter_->repaint();
   }
-  
-  if ((left == 1)&&(right == 3))
+  else if (layout == "1and3")
   {
     private_->viewer_[0]->show();
     private_->viewer_[1]->hide();
@@ -222,8 +244,7 @@ ViewerInterface::set_views(int left, int right)
     private_->vert_splitter2_->setSizes(vsizes);
     private_->horiz_splitter_->repaint();
   }
-
-  if ((left == 2)&&(right == 2))
+  else if (layout == "2and2")
   {
     private_->viewer_[0]->show();
     private_->viewer_[1]->show();
@@ -243,8 +264,7 @@ ViewerInterface::set_views(int left, int right)
     private_->vert_splitter2_->setSizes(vsizes);
     private_->horiz_splitter_->repaint();
   }
-
-  if ((left == 2)&&(right == 3))
+  else if (layout == "2and3")
   {
     private_->viewer_[0]->show();
     private_->viewer_[1]->show();
@@ -265,7 +285,7 @@ ViewerInterface::set_views(int left, int right)
     private_->vert_splitter2_->setSizes(vsizes);
     private_->horiz_splitter_->repaint();
   }
-  if ((left == 3)&&(right == 3))
+  else if (layout == "3and3")
   {
     private_->viewer_[0]->show();
     private_->viewer_[1]->show();
@@ -288,5 +308,22 @@ ViewerInterface::set_views(int left, int right)
   
   set_selected_viewer(0);
 }
+
+
+void
+ViewerInterface::SetViewerLayout(qpointer_type qpointer, std::string layout)
+{
+  if (!(Interface::IsInterfaceThread()))
+  {
+    Interface::Instance()->post_event(boost::bind(&ViewerInterface::SetViewerLayout,qpointer,layout));
+    return;
+  }
+  
+  if (qpointer.data()) qpointer->set_layout(layout);
+}
+
+
+
+
 
 } // end namespace Seg3D

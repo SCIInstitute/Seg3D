@@ -210,42 +210,39 @@ ToolsDockWidget::tool_changed(int index)
 
 
 void
-ToolsDockWidget::HandleOpenTool(QPointer<ToolsDockWidget> tools_widget,ToolHandle tool)
+ToolsDockWidget::HandleOpenTool(qpointer_type qpointer, ToolHandle tool)
 {
   if (!(Interface::IsInterfaceThread()))
   {
-    Interface::Instance()->post_event(boost::bind(&ToolsDockWidget::HandleOpenTool,tools_widget,tool));
+    Interface::Instance()->post_event(boost::bind(&ToolsDockWidget::HandleOpenTool,qpointer,tool));
     return;
   }
 
-  if (tools_widget.data()) tools_widget->open_tool(tool);
+  if (qpointer.data()) qpointer->open_tool(tool);
 }
 
 void
-ToolsDockWidget::HandleCloseTool(QPointer<ToolsDockWidget> tools_widget,ToolHandle tool)
+ToolsDockWidget::HandleCloseTool(qpointer_type qpointer, ToolHandle tool)
 {
   if (!(Interface::IsInterfaceThread()))
   {
-    Interface::Instance()->post_event(boost::bind(&ToolsDockWidget::HandleCloseTool,tools_widget,tool));
+    Interface::Instance()->post_event(boost::bind(&ToolsDockWidget::HandleCloseTool,qpointer,tool));
     return;
   }
   
-  if (tools_widget.data()) tools_widget->close_tool(tool);
+  if (qpointer.data()) qpointer->close_tool(tool);
 }
 
 void
-ToolsDockWidget::HandleActivateTool(QPointer<ToolsDockWidget> tools_widget,ToolHandle tool)
+ToolsDockWidget::HandleActivateTool(qpointer_type qpointer, ToolHandle tool)
 {
   if (!(Interface::IsInterfaceThread()))
   {
-    Interface::Instance()->post_event(boost::bind(&ToolsDockWidget::HandleActivateTool,tools_widget,tool));
+    Interface::Instance()->post_event(boost::bind(&ToolsDockWidget::HandleActivateTool,qpointer,tool));
     return;
   }
   
-  if (tools_widget.data())
-  { 
-    tools_widget->activate_tool(tool);
-  }
+  if (qpointer.data()) qpointer->activate_tool(tool);
 }
 
 } // end namespace

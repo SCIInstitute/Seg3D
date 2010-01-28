@@ -33,9 +33,8 @@
 # pragma once
 #endif
 
-#include <boost/smart_ptr.hpp>
-
 #include <Application/State/StateBase.h>
+#include <Application/State/StateEngine.h>
 
 namespace Seg3D {
 
@@ -134,6 +133,12 @@ class StateOption : public StateBase {
     // IS_OPTION:
     // Check whether a string is a valid option
     bool is_option(const std::string& option);
+
+// -- access value --
+  public:
+   // GET:
+   // Get the value of the state variable
+   std::string get() { return value_; }
     
 // -- option list --
   protected:

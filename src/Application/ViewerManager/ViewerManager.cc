@@ -30,22 +30,38 @@
 
 // Boost includes 
 
+// Application includes
+#include <Application/Viewer/Viewer.h> 
+#include <Application/ViewerManager/ViewerManager.h>
 #include <Application/Interface/Interface.h>
  
-#include <Application/ViewerManager/ViewerManager.h>
 
 namespace Seg3D {
 
 ViewerManager::ViewerManager() :
-  StateHandler("ViewerManager")
+  StateHandler("view")
 {
-  add_state("layout",state_layout_,"2and3","single|1and1|1and2|2and3|3and3");
+  add_state("layout",layout_state,"2and3","single|1and1|1and2|1and3|2and2|2and3|3and3");
+  
+  viewers_.resize(6);
+  for (size_t j=0; j< viewers_.size(); j++)
+  {
+    std::string key = std::string("viewer")+Utils::to_string(j);
+    viewers_[j] = ViewerHandle(new Viewer(key));
+  }
 }
   
 ViewerManager::~ViewerManager()
 {
 }
 
+ViewerHandle 
+ViewerManager::get_viewer(size_t idx)
+{
+  ViewerHandle handle;
+  if (idx < viewers_.size()) handle = viewers_[idx];
+  return handle;
+}
 
 // Singleton interface needs to be defined somewhere
 Utils::Singleton<ViewerManager> ViewerManager::instance_;

@@ -42,8 +42,7 @@
 #include <Utils/Core/Exception.h>
 
 // Application includes
-#include <Application/State/StateDataBase.h>
-#include <Application/State/StateHandler.h>
+#include <Application/State/State.h>
 
 // Qt includes
 #include <QUrl>

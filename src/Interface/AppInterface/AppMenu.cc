@@ -35,6 +35,10 @@
 #include <Application/Tool/Actions/ActionOpenTool.h>
 #include <Application/InterfaceManager/Actions/ActionShowWindow.h>
 
+#include <Application/State/State.h>
+#include <Application/State/Actions/ActionSet.h>
+#include <Application/ViewerManager/ViewerManager.h>
+
 // Interface includes
 #include <Interface/QtInterface/QtBridge.h>
 #include <Interface/AppInterface/AppMenu.h>
@@ -111,58 +115,55 @@ AppMenu::create_view_menu(QMenu* qmenu)
   QtBridge::connect(qaction,
                     boost::bind(&InterfaceManager::dispatch_full_screen_window,
                                 InterfaceManager::Instance(),std::string("toggle")));
-  
-  QAction* qaction2;
-  qaction2 = qmenu->addAction(tr("Only One Viewer"));
-  qaction2->setShortcut(tr("ALT+0"));
-  qaction2->setToolTip(tr("Set the view to one large view"));
-  ViewAction* vaction2 = new ViewAction(qaction2,1,0);
-  connect(vaction2, SIGNAL(triggered(int, int)), viewer_pointer_, SLOT(set_views(int, int)));
-  
-  QAction* qaction3;
-  qaction3 = qmenu->addAction(tr("One and One"));
-  qaction3->setShortcut(tr("ALT+1"));
-  qaction3->setToolTip(tr("Set the view to two large views"));
-  ViewAction* vaction3 = new ViewAction(qaction3,1,1);
-  connect(vaction3, SIGNAL(triggered(int, int)), viewer_pointer_, SLOT(set_views(int, int)));
 
-  QAction* qaction4;
-  qaction4 = qmenu->addAction(tr("One and Two"));
-  qaction4->setShortcut(tr("ALT+2"));
-  qaction4->setToolTip(tr("Set the view one large and two smaller views"));
-  ViewAction* vaction4 = new ViewAction(qaction4,1,2);
-  connect(vaction4, SIGNAL(triggered(int, int)), viewer_pointer_, SLOT(set_views(int, int)));
+  qaction = qmenu->addAction(tr("Only One Viewer"));
+  qaction->setShortcut(tr("ALT+0"));
+  qaction->setToolTip(tr("Set the view to one large view"));
+  QtBridge::connect(qaction,
+    boost::bind(&ActionSet::Dispatch<StateOptionHandle,std::string>,
+      ViewerManager::Instance()->layout_state,"single"));
+
+  qaction = qmenu->addAction(tr("One and One"));
+  qaction->setShortcut(tr("ALT+1"));
+  qaction->setToolTip(tr("Set the view to two large views"));
+  QtBridge::connect(qaction,
+    boost::bind(&ActionSet::Dispatch<StateOptionHandle,std::string>,
+      ViewerManager::Instance()->layout_state,"1and1"));
   
-  QAction* qaction5;
-  qaction5 = qmenu->addAction(tr("One and Three"));
-  qaction5->setShortcut(tr("ALT+3"));
-  qaction5->setToolTip(tr("Set the view one large and three smaller views"));
-  ViewAction* vaction5 = new ViewAction(qaction5,1,3);
-  connect(vaction5, SIGNAL(triggered(int, int)), viewer_pointer_, SLOT(set_views(int, int)));
+  qaction = qmenu->addAction(tr("One and Two"));
+  qaction->setShortcut(tr("ALT+2"));
+  qaction->setToolTip(tr("Set the view one large and two smaller views"));
+  QtBridge::connect(qaction,
+    boost::bind(&ActionSet::Dispatch<StateOptionHandle,std::string>,
+      ViewerManager::Instance()->layout_state,"1and2"));
+
+  qaction = qmenu->addAction(tr("One and Three"));
+  qaction->setShortcut(tr("ALT+3"));
+  qaction->setToolTip(tr("Set the view one large and three smaller views"));
+  QtBridge::connect(qaction,
+    boost::bind(&ActionSet::Dispatch<StateOptionHandle,std::string>,
+      ViewerManager::Instance()->layout_state,"1and3"));
   
-  QAction* qaction6;
-  qaction6 = qmenu->addAction(tr("Two and Two"));
-  qaction6->setShortcut(tr("ALT+4"));
-  qaction6->setToolTip(tr("Set the view one large and three smaller views"));
-  ViewAction* vaction6 = new ViewAction(qaction6,2,2);
-  connect(vaction6, SIGNAL(triggered(int, int)), viewer_pointer_, SLOT(set_views(int, int)));
+  qaction = qmenu->addAction(tr("Two and Two"));
+  qaction->setShortcut(tr("ALT+4"));
+  qaction->setToolTip(tr("Set the view one large and three smaller views"));
+  QtBridge::connect(qaction,
+    boost::bind(&ActionSet::Dispatch<StateOptionHandle,std::string>,
+      ViewerManager::Instance()->layout_state,"2and2"));
   
-  QAction* qaction7;
-  qaction7 = qmenu->addAction(tr("Two and Three"));
-  qaction7->setShortcut(tr("ALT+5"));
-  qaction7->setToolTip(tr("Set the view two larger and three smaller views"));
-  ViewAction* vaction7 = new ViewAction(qaction7,2,3);
-  connect(vaction7, SIGNAL(triggered(int, int)), viewer_pointer_, SLOT(set_views(int, int)));
+  qaction = qmenu->addAction(tr("Two and Three"));
+  qaction->setShortcut(tr("ALT+5"));
+  qaction->setToolTip(tr("Set the view two larger and three smaller views"));
+  QtBridge::connect(qaction,
+    boost::bind(&ActionSet::Dispatch<StateOptionHandle,std::string>,
+      ViewerManager::Instance()->layout_state,"2and3"));
   
-  QAction* qaction8;
-  qaction8 = qmenu->addAction(tr("Three and Three"));
-  qaction8->setShortcut(tr("ALT+6"));
-  qaction8->setToolTip(tr("Set the view to 6 equally sized views"));
-  ViewAction* vaction8 = new ViewAction(qaction8,3,3);
-  connect(vaction8, SIGNAL(triggered(int, int)), viewer_pointer_, SLOT(set_views(int, int)));
- 
-  
-  
+  qaction = qmenu->addAction(tr("Three and Three"));
+  qaction->setShortcut(tr("ALT+6"));
+  qaction->setToolTip(tr("Set the view to 6 equally sized views"));
+  QtBridge::connect(qaction,
+    boost::bind(&ActionSet::Dispatch<StateOptionHandle,std::string>,
+      ViewerManager::Instance()->layout_state,"3and3"));
 }
  
 
@@ -171,22 +172,24 @@ AppMenu::create_tool_menu(QMenu* qmenu)
 {
   ToolFactory::tool_list_type tool_types_list;
   
-  ToolFactory::Instance()->list_tool_types_with_interface(tool_types_list,Tool::TOOL_E);  
+  ToolFactory::Instance()->list_tool_types_with_interface(tool_types_list,
+                                                                Tool::TOOL_E);  
   ToolFactory::tool_list_type::const_iterator it = tool_types_list.begin();
   ToolFactory::tool_list_type::const_iterator it_end = tool_types_list.end();
   
+  QAction* qaction;
   while(it != it_end)
   {
     // Add menu option to open tool
-    QAction* qaction = qmenu->addAction(QString::fromStdString((*it)->menu_name()));
+    qaction = qmenu->addAction(QString::fromStdString((*it)->menu_name()));
     qaction->setShortcut(QString::fromStdString((*it)->shortcut_key()));
     
     // Connect the action with dispatching a command in the ToolManager
-    QtBridge::connect(qaction,boost::bind(&ActionOpenTool::Dispatch,(*it)->type()));
+    QtBridge::connect(qaction,
+                      boost::bind(&ActionOpenTool::Dispatch,(*it)->type()));
     ++it;
   }
 }
-
 
 void 
 AppMenu::create_filter_menu(QMenu* qmenu)
@@ -196,43 +199,51 @@ AppMenu::create_filter_menu(QMenu* qmenu)
   ToolFactory::tool_list_type::const_iterator it_end;
   
   
-  ToolFactory::Instance()->list_tool_types_with_interface(tool_types_list,Tool::DATATODATA_E|Tool::FILTER_E);  
+  ToolFactory::Instance()->list_tool_types_with_interface(tool_types_list,
+                                            Tool::DATATODATA_E|Tool::FILTER_E);  
   it = tool_types_list.begin();
-  it_end = tool_types_list.end();  
+  it_end = tool_types_list.end();
+  QAction* qaction;
+  
   while(it != it_end)
   {
     // Add menu option to open tool
-    QAction* qaction = qmenu->addAction(QString::fromStdString((*it)->menu_name()));
+    qaction = qmenu->addAction(QString::fromStdString((*it)->menu_name()));
     // Connect the action with dispatching a command in the ToolManager
-    QtBridge::connect(qaction,boost::bind(&ActionOpenTool::Dispatch,(*it)->type()));
+    QtBridge::connect(qaction,
+                      boost::bind(&ActionOpenTool::Dispatch,(*it)->type()));
     ++it;
   }
   
   qmenu->addSeparator();
 
-  ToolFactory::Instance()->list_tool_types_with_interface(tool_types_list,Tool::DATATOMASK_E|Tool::FILTER_E);  
+  ToolFactory::Instance()->list_tool_types_with_interface(tool_types_list,
+                                            Tool::DATATOMASK_E|Tool::FILTER_E);  
   it = tool_types_list.begin();
   it_end = tool_types_list.end();  
   while(it != it_end)
   {
     // Add menu option to open tool
-    QAction* qaction = qmenu->addAction(QString::fromStdString((*it)->menu_name()));
+    qaction = qmenu->addAction(QString::fromStdString((*it)->menu_name()));
     // Connect the action with dispatching a command in the ToolManager
-    QtBridge::connect(qaction,boost::bind(&ActionOpenTool::Dispatch,(*it)->type()));
+    QtBridge::connect(qaction,
+                      boost::bind(&ActionOpenTool::Dispatch,(*it)->type()));
     ++it;
   }
 
   qmenu->addSeparator();
 
-  ToolFactory::Instance()->list_tool_types_with_interface(tool_types_list,Tool::MASKTOMASK_E|Tool::FILTER_E);  
+  ToolFactory::Instance()->list_tool_types_with_interface(tool_types_list,
+                                            Tool::MASKTOMASK_E|Tool::FILTER_E);  
   it = tool_types_list.begin();
   it_end = tool_types_list.end();  
   while(it != it_end)
   {
     // Add menu option to open tool
-    QAction* qaction = qmenu->addAction(QString::fromStdString((*it)->menu_name()));
+    qaction = qmenu->addAction(QString::fromStdString((*it)->menu_name()));
     // Connect the action with dispatching a command in the ToolManager
-    QtBridge::connect(qaction,boost::bind(&ActionOpenTool::Dispatch,(*it)->type()));
+    QtBridge::connect(qaction,
+                      boost::bind(&ActionOpenTool::Dispatch,(*it)->type()));
     ++it;
   }
 }

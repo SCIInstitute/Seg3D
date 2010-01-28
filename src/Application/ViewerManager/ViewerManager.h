@@ -58,51 +58,35 @@ namespace Seg3D {
 // typedefs
 
 class ViewerManager : public StateHandler {
-public:
-  ViewerManager();
-  ~ViewerManager();
+
+// -- constructor/destructor --
+  public:
+    ViewerManager();
+    virtual ~ViewerManager();
   
+// -- getting information from manager -- 
+  
+  public:
+    ViewerHandle get_viewer(size_t idx);
+  
+  
+// -- signals viewer layout --
+  public:
 
-  // -- Signals for the User Interface --
-  typedef boost::signals2::signal<void (ViewerHandle)> view_changed_signal_type;
+    // VIEWER_LAYOUT_CHANGED_SIGNAL:
+    // This signal is triggered after a view has been modified
+    typedef boost::signals2::signal<void ()> viewer_layout_changed_signal_type;
+    viewer_layout_changed_signal_type viewer_layout_changed_signal;
 
-  // CONNECT_VIEW_CHANGED:
-  // Connect to the signal that indicates a view has changed
-  boost::signals2::connection
-  connect_view_changed(view_changed_signal_type::slot_type slot)
-  {
-    return view_changed_signal_.connect(slot);
-  }
+// -- State information --
+  public:    
+    StateOptionHandle   layout_state;
 
-  // -- Dispatcher functions for User Interface --
-  void dispatch_changeprimaryview(const std::string& view_name) const;
-  void dispatch_changeactivelayer(const std::string& view_name, const std::string& layer_name) const;
-  void dispatch_changeopacity(const std::string& view_name, const std::string& layer_name, unsigned int opacity) const;
-  void dispatch_addlayertoview(const std::string& view_name, const std::string& layer_name) const;
-  //void dispatch_newview() const;
-  void dispatch_removeview(const std::string& view_name) const;
-
-  const ViewerHandle get_view(const std::string& view_name) const;
-
-protected:
-  friend class ActionChangePrimaryView;
-
-  // VIEW_CHANGED_SIGNAL:
-  // This signal is triggered after a view has been modified
-  view_changed_signal_type view_changed_signal_;
-
-
-
+// -- Viewer information --
+  private:
 
     std::vector<ViewerHandle> viewers_;
-
-// -- State variables
-  public:
-    
-    StateOptionHandle   state_layout_;
   
-
-
 // -- Singleton interface --
   public:
     

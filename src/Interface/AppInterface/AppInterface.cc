@@ -95,9 +95,6 @@ AppInterface::AppInterface()
   
   InterfaceManager::Instance()->full_screen_window_signal.connect(boost::bind(
     AppInterface::HandleFullScreenWindow, app_interface, _1));                                
-
-  // set the viewer_interface_ to a default view of 1 and 3
-  viewer_interface_->set_views(1,3);
 }
 
 void

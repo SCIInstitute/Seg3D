@@ -26,18 +26,22 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#include <Application/State/StateDataBase.h>
+#include <Application/State/StateEngine.h>
 
 namespace Seg3D {
 
-StateDataBase::StateDataBase()
+StateEngine::StateEngine()
+{
+}
+
+StateEngine::~StateEngine()
 {
 }
   
 bool
-StateDataBase::add_state(const std::string& state_id, StateBaseHandle& state)
+StateEngine::add_state(const std::string& state_id, StateBaseHandle& state)
 {
-  boost::unique_lock<boost::mutex> lock(state_map_lock_);
+  lock_type lock(get_mutex());
   
   state_map_type::iterator it = state_map_.find(state_id);
 
@@ -52,9 +56,9 @@ StateDataBase::add_state(const std::string& state_id, StateBaseHandle& state)
 }
 
 bool 
-StateDataBase::get_state(const std::string& state_id, StateBaseHandle& state)
+StateEngine::get_state(const std::string& state_id, StateBaseHandle& state)
 {
-  boost::unique_lock<boost::mutex> lock(state_map_lock_);
+  lock_type lock(get_mutex());
   
   state_map_type::const_iterator it = state_map_.find(state_id);
   if (it == state_map_.end())
@@ -69,9 +73,9 @@ StateDataBase::get_state(const std::string& state_id, StateBaseHandle& state)
 }
 
 void
-StateDataBase::remove_state(const std::string& state_id)
+StateEngine::remove_state(const std::string& state_id)
 {
-  boost::unique_lock<boost::mutex> lock(state_map_lock_);
+  lock_type lock(get_mutex());
   
   state_map_type::iterator it = state_map_.begin();
   state_map_type::iterator it_end = state_map_.end();
@@ -101,8 +105,7 @@ StateDataBase::remove_state(const std::string& state_id)
   }
 }
 
-
 // Singleton interface needs to be defined somewhere
-Utils::Singleton<StateDataBase> StateDataBase::instance_;
+Utils::Singleton<StateEngine> StateEngine::instance_;
 
 } // end namespace Seg3D

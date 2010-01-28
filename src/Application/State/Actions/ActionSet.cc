@@ -26,7 +26,7 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#include <Application/State/StateDataBase.h>
+#include <Application/State/StateEngine.h>
 #include <Application/State/Actions/ActionSet.h>
 
 namespace Seg3D {
@@ -43,7 +43,7 @@ ActionSet::validate(ActionContextHandle& context)
   StateBaseHandle state;
   
   // If not the state cannot be retrieved report an error
-  if (!(StateDataBase::Instance()->get_state(stateid_.value(),state))) 
+  if (!(StateEngine::Instance()->get_state(stateid_.value(),state))) 
   {
     context->report_error(
       std::string("Unknown state variable '")+stateid_.value()+"'");
@@ -71,7 +71,7 @@ ActionSet::run(ActionContextHandle& context, ActionResultHandle& result)
   // Get the state
   StateBaseHandle state;
   
-  if( StateDataBase::Instance()->get_state(stateid_.value(),state) )
+  if( StateEngine::Instance()->get_state(stateid_.value(),state) )
   {
     // Set the value
     state->import_from_variant(statevalue_,context->from_interface());

@@ -33,8 +33,8 @@
 # pragma once
 #endif
 
-#include <Utils/Converter/StringConverter.h>
 #include <Application/State/StateBase.h>
+#include <Application/State/StateEngine.h>
 
 namespace Seg3D {
 
@@ -94,6 +94,10 @@ class StateValue : public StateBase {
     virtual bool import_from_string(const std::string& str,
                                     bool from_interface = false)
     {
+      // Lock the state engine so no other thread will be accessing it
+      StateEngine* engine = StateEngine::Instance();
+      StateEngine::lock_type lock(engine->get_mutex() );
+      
       T value;
       if (!(Utils::import_from_string(str,value))) return (false);
       if (value != value_)
@@ -117,6 +121,9 @@ class StateValue : public StateBase {
     virtual bool import_from_variant(ActionParameterVariant& variant,
                                      bool from_interface = false)
     {
+      // Lock the state engine so no other thread will be accessing it
+      StateEngine::lock_type lock(StateEngine::Instance()->get_mutex());
+      
       T value;
       if (!( variant.get_value(value) )) return (false);
       if (value != value_)
@@ -141,6 +148,12 @@ class StateValue : public StateBase {
       error = "";
       return (true);
     }
+
+// -- access value --
+  public:
+   // GET:
+   // Get the value of the state variable
+   T get() { return value_; }
 
 // -- signals describing the state --
   public:

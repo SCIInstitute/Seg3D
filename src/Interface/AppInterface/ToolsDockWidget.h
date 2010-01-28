@@ -94,13 +94,11 @@ class ToolsDockWidget : public QDockWidget {
   // -- static functions for callbacks into this widget --
 
   public:
-    static void HandleOpenTool(QPointer<ToolsDockWidget> widget,
-                               ToolHandle tool);
-    static void HandleCloseTool(QPointer<ToolsDockWidget> widget,
-                                ToolHandle tool);
-    static void HandleActivateTool(QPointer<ToolsDockWidget> widget,
-                                   ToolHandle tool);
-    
+    typedef QPointer<ToolsDockWidget> qpointer_type;
+  
+    static void HandleOpenTool(qpointer_type qpointer, ToolHandle tool);
+    static void HandleCloseTool(qpointer_type qpointer, ToolHandle tool);
+    static void HandleActivateTool(qpointer_type qpointer, ToolHandle tool);
 };
   
 } // end namespace

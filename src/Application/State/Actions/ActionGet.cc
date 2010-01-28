@@ -26,7 +26,7 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#include <Application/State/StateDataBase.h>
+#include <Application/State/StateEngine.h>
 #include <Application/State/Actions/ActionGet.h>
 #include <Application/Interface/Interface.h>
 
@@ -42,7 +42,7 @@ ActionGet::validate(ActionContextHandle& context)
 {
   // Check whether the state exists
   StateBaseHandle state;
-  if(!(StateDataBase::Instance()->get_state(stateid_.value(),state)))
+  if(!(StateEngine::Instance()->get_state(stateid_.value(),state)))
   {
     context->report_error(
       std::string("Unknown state variable '")+stateid_.value()+"'");
@@ -58,7 +58,7 @@ ActionGet::run(ActionContextHandle& context, ActionResultHandle& result)
 {
   // Get the state
   StateBaseHandle state;
-  if(!(StateDataBase::Instance()->get_state(stateid_.value(),state)))
+  if(!(StateEngine::Instance()->get_state(stateid_.value(),state)))
   {
     return (false);
   }

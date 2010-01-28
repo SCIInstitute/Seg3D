@@ -35,7 +35,7 @@
 
 // This include file includes all the State variable combinations
 
-// Application includes
+// The various state variables
 #include <Application/State/StateValue.h>
 #include <Application/State/StateRangedValue.h>
 #include <Application/State/StateOption.h>
@@ -43,6 +43,11 @@
 #include <Application/State/StateView3D.h>
 #include <Application/State/StateVector.h>
 
+// The state handler
 #include <Application/State/StateHandler.h>
+
+// The state actions
+#include <Application/State/Actions/ActionSet.h>
+#include <Application/State/Actions/ActionGet.h>
 
 #endif

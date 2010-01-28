@@ -36,6 +36,7 @@
 #include <boost/utility.hpp>
 
 // State includes
+#include <Application/State/StateEngine.h>
 #include <Application/State/StateValue.h>
 #include <Application/State/StateRangedValue.h>
 #include <Application/State/StateOption.h>
@@ -77,7 +78,8 @@ class StateHandler : public boost::noncopyable {
                    const T& step )
     { 
       // Step (1): Generate the state variable
-      state = HANDLE(new typename HANDLE::element_type(default_value,min_value,max_value,step));
+      state = HANDLE(new typename HANDLE::element_type(
+                                    default_value,min_value,max_value,step));
 
       // Step (2): Now handle the common part for each add_state function
       return (add_statebase(key,StateBaseHandle(state)));
@@ -105,7 +107,8 @@ class StateHandler : public boost::noncopyable {
                    const std::string& option_list)
     { 
       // Step (1): Generate the state variable
-      state = HANDLE(new typename HANDLE::element_type(default_option,option_list));
+      state = HANDLE(new typename HANDLE::element_type(default_option,
+                                                                option_list));
 
       // Step (2): Now handle the common part for each add_state function
       return (add_statebase(key,StateBaseHandle(state)));
@@ -120,7 +123,8 @@ class StateHandler : public boost::noncopyable {
                    const std::vector<std::string> option_list)
     { 
       // Step (1): Generate the state variable
-      state = HANDLE(new typename HANDLE::element_type(default_option,option_list));
+      state = HANDLE(new typename HANDLE::element_type(default_option,
+                                                                option_list));
 
       // Step (2): Now handle the common part for each add_state function
       return (add_statebase(key,StateBaseHandle(state)));

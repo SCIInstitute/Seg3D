@@ -53,6 +53,9 @@ bool
 StateView2D::import_from_string(const std::string& str,
                                 bool from_interface)
 {
+  // Lock the state engine so no other thread will be accessing it
+  StateEngine::lock_type lock(StateEngine::Instance()->get_mutex());
+
   return (Utils::import_from_string(str,value_));
 }
 
@@ -66,6 +69,9 @@ bool
 StateView2D::import_from_variant(ActionParameterVariant& variant,
                                  bool from_interface)
 {
+  // Lock the state engine so no other thread will be accessing it
+  StateEngine::lock_type lock(StateEngine::Instance()->get_mutex());
+
   Utils::View2D value;
   if (!(variant.get_value(value))) return (false);
 

@@ -49,9 +49,7 @@ namespace Seg3D {
 class Viewer;
 typedef boost::shared_ptr<Viewer> ViewerHandle;
 
-
-// Class declarations
-
+// Class definition
 class Viewer : public StateHandler {
 
 // -- constructor/destructor --
@@ -61,21 +59,22 @@ class Viewer : public StateHandler {
 
 // -- State information --
   public:
-    StateOptionHandle  view_mode_;
+  
+    StateOptionHandle  view_mode_state;
 
-    StateView2DHandle  axial_view_;
-    StateView2DHandle  sagittal_view_;
-    StateView2DHandle  coronal_view_;
-    StateView3DHandle  volume_view_;
+    StateView2DHandle  axial_view_state;
+    StateView2DHandle  sagittal_view_state;
+    StateView2DHandle  coronal_view_state;
+    StateView3DHandle  volume_view_state;
     
-    StateBoolHandle    slice_lock_;
-    StateBoolHandle    slice_grid_;
-    StateBoolHandle    slice_visible_;
+    StateBoolHandle    slice_lock_state;
+    StateBoolHandle    slice_grid_state;
+    StateBoolHandle    slice_visible_state;
 
-    StateBoolHandle    volume_lock_;
-    StateBoolHandle    volume_slices_visible_;
-    StateBoolHandle    volume_isosurfaces_visible_;
-    StateBoolHandle    volume_volume_rendering_visible_;
+    StateBoolHandle    volume_lock_state;
+    StateBoolHandle    volume_slices_visible_state;
+    StateBoolHandle    volume_isosurfaces_visible_state;
+    StateBoolHandle    volume_volume_rendering_visible_state;
     
 // -- Renderer information --
   public:
@@ -87,7 +86,6 @@ class Viewer : public StateHandler {
     // A handle to the renderer that is used to render the data
     ViewerRendererHandle renderer_;
     
-        
 };
 
 } // end namespace Seg3D

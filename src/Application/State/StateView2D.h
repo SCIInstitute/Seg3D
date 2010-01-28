@@ -42,6 +42,7 @@
 
 // Application includes
 #include <Application/State/StateBase.h>
+#include <Application/State/StateEngine.h>
 
 namespace Seg3D {
 
@@ -104,6 +105,12 @@ class StateView2D : public StateBase {
 
 // -- Functions specific to this type of state --
   public:
+
+// -- access value --
+  public:
+   // GET:
+   // Get the value of the state variable
+   Utils::View2D get() { return value_; }
 
 // -- storage of the view --
   protected:

@@ -34,21 +34,21 @@ namespace Seg3D {
 Viewer::Viewer(const std::string& key) :
   StateHandler(key)
 {
-  add_state("view_mode",view_mode_,"axial|coronal|sagittal|volume","axial");
+  add_state("view_mode",view_mode_state,"axial|coronal|sagittal|volume","axial");
   
-  add_state("axial_view",axial_view_);
-  add_state("sagittal_view",sagittal_view_);
-  add_state("coronal_view",coronal_view_);
-  add_state("volume_view",volume_view_);
+  add_state("axial_view",axial_view_state);
+  add_state("sagittal_view",sagittal_view_state);
+  add_state("coronal_view",coronal_view_state);
+  add_state("volume_view",volume_view_state);
 
-  add_state("slice_lock",slice_lock_,true);
-  add_state("slice_grid",slice_grid_,true);
-  add_state("slice_visible",slice_visible_,true);
+  add_state("slice_lock",slice_lock_state,true);
+  add_state("slice_grid",slice_grid_state,true);
+  add_state("slice_visible",slice_visible_state,true);
 
-  add_state("volume_lock",volume_lock_,true);
-  add_state("volume_slices_visible",volume_slices_visible_,true);
-  add_state("volume_isosurfaces_visible",volume_isosurfaces_visible_,true);
-  add_state("volume_volume_rendering_visible",volume_volume_rendering_visible_,false);
+  add_state("volume_lock",volume_lock_state,true);
+  add_state("volume_slices_visible",volume_slices_visible_state,true);
+  add_state("volume_isosurfaces_visible",volume_isosurfaces_visible_state,true);
+  add_state("volume_volume_rendering_visible",volume_volume_rendering_visible_state,false);
 }
   
 Viewer::~Viewer()

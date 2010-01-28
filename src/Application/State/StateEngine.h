@@ -26,8 +26,8 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_STATE_STATEDATABASE_H
-#define APPLICATION_STATE_STATEDATABASE_H
+#ifndef APPLICATION_STATE_STATEENGINE_H
+#define APPLICATION_STATE_STATEENGINE_H
 
 // STL includes
 #include <map>
@@ -35,6 +35,7 @@
 // boost includes
 #include <boost/unordered_map.hpp>
 #include <boost/thread/mutex.hpp>
+#include <boost/thread/recursive_mutex.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
 
@@ -46,20 +47,21 @@
 
 namespace Seg3D {
 
-class StateDataBase;
+class StateEngine;
 
-class StateDataBase : public boost::noncopyable {
+class StateEngine : public boost::noncopyable {
 
 // -- Constructor/destructor --
   public:
-    StateDataBase();
+    StateEngine();
+    virtual ~StateEngine();
     
 // -- Interface for accessing state variables --
   public:
   
     // ADD_STATE:
-    // Add the base of a state variable to the central state database in
-    // StateDataBase. 
+    // Add the base of a state variable to the central state Engine in
+    // StateEngine. 
     bool add_state(const std::string& stateid, StateBaseHandle& state);
   
     // GET_STATE:
@@ -68,26 +70,60 @@ class StateDataBase : public boost::noncopyable {
     
     // REMOVE_STATE:
     // Remove all the state variables that derive from the tag and the tag 
-    // itself. So remove ToolDataBase::PaintTool will remove as well derived
-    // values like ToolDataBase::PaintTool::Brushsize.
+    // itself. So remove ToolManager::PaintTool will remove as well derived
+    // values like ToolManager::PaintTool::Brushsize.
     void remove_state(const std::string& stateid);
     
+// -- state engine locking interface --
+  public:
+    // Mutex protecting the StateEngine
+    typedef boost::recursive_mutex          mutex_type;
+    typedef boost::unique_lock<mutex_type>  lock_type;
+
+    // GET_MUTEX:
+    // Get the mutex that controls whether changes can be made to the
+    // state engine.
+    inline mutex_type& get_mutex() { return state_engine_lock_; }
+    
+    // LOCK:
+    // Lock the mutex that controls whether changes can be made to the
+    // state engine
+    inline void lock() { state_engine_lock_.lock(); }
+
+    // UNLOCK:
+    // Lock the mutex that controls whether changes can be made to the
+    // state engine
+    inline void unlock() { state_engine_lock_.unlock(); }
+    
+  private:
+    // Lock that controls whether changes can be made to the state engine
+    mutex_type state_engine_lock_;
+
+// -- state database --
   private:
     typedef boost::unordered_map<std::string,StateBaseHandle> state_map_type;
 
     // Map containing pointers to the State variables in the class under control
-    // by the StateDataBase
+    // by the StateEngine
     state_map_type state_map_;
     
-    // Mutex protecting the pointer map
-    boost::mutex state_map_lock_;
-
 // -- Singleton interface --
   public:
-    static StateDataBase* Instance() { return instance_.instance(); }
+    static StateEngine* Instance() { return instance_.instance(); }
 
   private:
-    static Utils::Singleton<StateDataBase> instance_;
+    static Utils::Singleton<StateEngine> instance_;
+    
+// -- Static convenience functions --
+
+  public:
+    // LOCK
+    // Prohibit changes to be made in the state of the program
+    static void Lock() { Instance()->lock(); }
+    
+    // UNLOCK
+    // Allow changes to be made in the state of the program
+    static void Unlock() { Instance()->unlock(); }
 };
 
 } // end namespace Seg3D

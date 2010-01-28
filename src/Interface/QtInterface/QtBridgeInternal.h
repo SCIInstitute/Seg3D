@@ -36,10 +36,7 @@
 #include <boost/signals2/signal.hpp>
 
 // Application includes
-#include <Application/State/StateValue.h>
-#include <Application/State/StateRangedValue.h>
-#include <Application/State/StateOption.h>
-#include <Application/State/StateDataBase.h>
+#include <Application/State/State.h>
 #include <Application/State/Actions/ActionSet.h>
 
 

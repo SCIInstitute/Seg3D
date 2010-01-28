@@ -40,8 +40,13 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
 
+// Utils includes
+#include <Utils/Converter/StringConverter.h>
+
 // Action includes
 #include <Application/Action/ActionParameter.h>
+
+
 
 namespace Seg3D {
 
@@ -101,7 +106,6 @@ class StateBase : public boost::noncopyable {
     std::string stateid_;
      
 };
-
 
 } // end namespace Seg3D
 

@@ -64,7 +64,7 @@ class ActionSet : public Action {
   public:
   
     template<class HANDLE, class T>
-    static void Dispatch(const HANDLE& state, const T& statevalue)
+    static void Dispatch(HANDLE& state, const T& statevalue)
     {
       // Create new action
       ActionSet* action = new ActionSet;

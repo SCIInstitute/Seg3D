@@ -45,8 +45,8 @@ SET(APPLICATION_STATE_SRCS
   StateRangedValue.h
   StateHandler.h
   StateHandler.cc
-  StateDataBase.h
-  StateDataBase.cc
+  StateEngine.h
+  StateEngine.cc
   )
 
 SET(APPLICATION_STATE_ACTIONS_SRCS
