@@ -90,6 +90,17 @@ class RenderResources : public boost::noncopyable {
     // OpenGL resources at the same time
     boost::recursive_mutex shared_context_mutex_;
 
+// -- OpenGL initialization --
+  public:
+  
+    // Initialize the OpenGL environment
+    void init_gl();
+    
+  private:
+  
+    // State variable indicating whether the OpenGL environment has been initialized
+    bool gl_initialized_;
+    
 // -- Singleton interface --
   public:
     

@@ -33,10 +33,6 @@
 # pragma once
 #endif 
 
-// Qt includes
-#include <QApplication>
-#include <QtGui>
-
 // Boost includes
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
@@ -52,6 +48,9 @@
 // Interface includes
 #include <Interface/QtInterface/QtRenderResources.h>
 
+// Qt includes
+#include <QApplication>
+#include <QtGui>
 
 namespace Seg3D {
 

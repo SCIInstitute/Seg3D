@@ -26,63 +26,44 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_RENDERER_RENDERER_H
-#define APPLICATION_RENDERER_RENDERER_H
+#ifndef APPLICATION_RENDERER_FRAMEBUFFEROBJECT_H
+#define APPLICATION_RENDERER_FRAMEBUFFEROBJECT_H
 
-#if defined (_MSC_VER) && (_MSC_VER >= 1020)
-# pragma once
-#endif
+#include <boost/utility.hpp>
+#include <boost/shared_ptr.hpp>
 
-// boost includes
-#include <boost/thread/mutex.hpp>
+#include <GL/glew.h>
 
-// Application includes
-#include <Application/Renderer/RenderContext.h>
-#include <Application/Viewer/ViewerRenderer.h>
 #include <Application/Renderer/Texture.h>
 #include <Application/Renderer/RenderBuffer.h>
-#include <Application/Renderer/FrameBufferObject.h>
-#include <Utils/EventHandler/EventHandler.h>
 
 namespace Seg3D {
 
-// Forward declarations
-class Renderer;
-typedef boost::shared_ptr<Renderer> RendererHandle;
+class FrameBufferObject;
+typedef boost::shared_ptr<FrameBufferObject> FrameBufferObjectHandle;
 
-// Class definitions
-class Renderer : public ViewerRenderer, private Utils::EventHandler {
-
-// -- constructor/destructor --
-  public:
-    Renderer();
-    virtual ~Renderer();
+class FrameBufferObject : public boost::noncopyable {
 
   public:
   
-    virtual void initialize();
-    virtual void redraw();
+    FrameBufferObject();
+    ~FrameBufferObject();
     
-    virtual void resize(int width, int height);
-
+    void enable();
+    void disable();
+    
+    void attach_texture(TextureHandle texture, unsigned int attachment = GL_COLOR_ATTACHMENT0_EXT, int level = 0, int layer = 0);
+    void attach_render_buffer(RenderBufferHandle render_buffer, unsigned int attachment);
+    
   private:
+  
+    void _safe_bind();
+    void _safe_unbind();
     
-    // Context for rendering images
-    RenderContextHandle context_;
+    unsigned int id_;
+    int saved_id_;
     
-    TextureHandle textures_[2];
-    RenderBufferHandle depth_buffer_;
-    FrameBufferObjectHandle frame_buffer_;
-    int active_render_texture_;
-    
-    int width_;
-    int height_;
-    bool invalid_;
-    bool resized_;
-    boost::mutex mutex_invalid_;
-    
-    static int red;
-    int red_;
+    const static unsigned int TARGET_;
 };
 
 } // end namespace Seg3D

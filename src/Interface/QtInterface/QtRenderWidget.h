@@ -33,10 +33,10 @@
 # pragma once
 #endif 
  
- 
-#include <QtOpenGL>
-
 #include <Application/Renderer/RenderResources.h> 
+#include <Application/Renderer/Renderer.h>
+
+#include <QtOpenGL>
  
 namespace Seg3D {
 
@@ -47,6 +47,8 @@ class QtRenderWidget : public QGLWidget {
   
     QtRenderWidget(const QGLFormat& format, QWidget* parent, QtRenderWidget* share);
     virtual ~QtRenderWidget();
+    
+    void rendering_completed_slot(TextureHandle texture);
 
   protected:
   
@@ -55,7 +57,11 @@ class QtRenderWidget : public QGLWidget {
     virtual void resizeGL(int width, int height);
 
   private:
-
+    RendererHandle renderer_;
+    TextureHandle renderer_texture_;
+    
+    boost::signals2::connection rendering_completed_connection_;
+    //boost::recursive_mutex renderer_texture_mutex_;
 };
 
 } // end namespace Seg3D

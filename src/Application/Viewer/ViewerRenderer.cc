@@ -30,5 +30,27 @@
 
 namespace Seg3D {
 
+ViewerRenderer::ViewerRenderer()
+{
+}
+
+ViewerRenderer::~ViewerRenderer()
+{
+}
+
+void 
+ViewerRenderer::initialize()
+{
+}
+
+void 
+ViewerRenderer::redraw()
+{
+}
+    
+void 
+ViewerRenderer::resize(int width, int height)
+{
+}
 
 } // end namespace Seg3D

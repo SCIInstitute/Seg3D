@@ -38,6 +38,14 @@ SET(APPLICATION_RENDERER_SRCS
   RenderResourcesContext.cc
   RenderContext.h
   RenderContext.cc
+  Renderer.h
+  Renderer.cc
+  Texture.h
+  Texture.cc
+  RenderBuffer.h
+  RenderBuffer.cc
+  FrameBufferObject.h
+  FrameBufferObject.cc
   )
 
 

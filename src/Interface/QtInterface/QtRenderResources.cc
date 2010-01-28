@@ -76,7 +76,7 @@ QtRenderResourcesContext::QtRenderResourcesContext() :
   // shared textures and objects.
   
   // For now do not double buffer
-  // format_.setDoubleBuffer(false);
+   //format_.setDoubleBuffer(false);
 }
 
 QtRenderResourcesContext::~QtRenderResourcesContext()

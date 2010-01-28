@@ -27,10 +27,12 @@
 */
 
 #include <Application/Renderer/RenderResources.h>
+#include <GL/glew.h>
 
 namespace Seg3D {
 
-RenderResources::RenderResources() 
+RenderResources::RenderResources() :
+  gl_initialized_(false)
 {
 }
 
@@ -64,6 +66,21 @@ bool
 RenderResources::valid_render_resources()
 {
   return (resources_context_.get() && resources_context_->valid_render_resources());
+}
+
+void
+RenderResources::init_gl()
+{
+  if (!gl_initialized_)
+  {
+    lock_shared_context();
+    if (!gl_initialized_)
+    {
+      glewInit();
+      gl_initialized_ = true;
+    }
+    unlock_shared_context();
+  }
 }
 
 // Need to define singleton somewhere

@@ -94,7 +94,7 @@ class DefaultEventHandlerContext : public EventHandlerContext {
     // Terminate the eventhandler
     virtual void terminate_eventhandler();
     
-  private:
+  protected:
 
     // Queue type that is used to store the events
     typedef std::queue<EventHandle> event_queue_type;

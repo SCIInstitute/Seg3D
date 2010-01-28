@@ -33,9 +33,6 @@
 # pragma once
 #endif 
 
-// Qt includes
-#include <QtOpenGL>
-#include <QtGui>
 
 // Application includes
 #include <Application/Renderer/RenderResourcesContext.h>
@@ -43,6 +40,10 @@
 
 // Interface includes
 #include <Interface/QtInterface/QtRenderWidget.h>
+
+// Qt includes
+#include <QtOpenGL>
+#include <QtGui>
 
 namespace Seg3D {
 

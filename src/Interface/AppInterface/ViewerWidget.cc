@@ -26,10 +26,6 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-// QT includes
-#include <QtGui>
-#include <QtOpenGL>
-
 // Utils includes
 #include <Utils/Core/Log.h>
 
@@ -37,6 +33,10 @@
 #include <Interface/QtInterface/QtRenderResources.h>
 #include <Interface/QtInterface/QtApplication.h>
 #include <Interface/QtInterface/QtRenderWidget.h>
+
+// QT includes
+#include <QtGui>
+#include <QtOpenGL>
 
 // Interface includes
 #include <Interface/AppInterface/ViewerWidget.h>
@@ -363,7 +363,9 @@ ViewerWidget::ViewerWidget(int viewer_id, QWidget *parent) :
   setFrameShape(QFrame::Panel);
   setFrameShadow(QFrame::Raised);
 
-
+  //setAutoFillBackground(false);
+  //setAttribute(Qt::WA_OpaquePaintEvent);
+  //setAttribute(Qt::WA_NoSystemBackground);
 }
 
 ViewerWidget::~ViewerWidget()

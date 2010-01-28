@@ -26,63 +26,48 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_RENDERER_RENDERER_H
-#define APPLICATION_RENDERER_RENDERER_H
+#ifndef APPLICATION_RENDERER_RENDERBUFFER_H
+#define APPLICATION_RENDERER_RENDERBUFFER_H
 
-#if defined (_MSC_VER) && (_MSC_VER >= 1020)
-# pragma once
-#endif
+#include <boost/utility.hpp>
+#include <boost/shared_ptr.hpp>
 
-// boost includes
-#include <boost/thread/mutex.hpp>
-
-// Application includes
-#include <Application/Renderer/RenderContext.h>
-#include <Application/Viewer/ViewerRenderer.h>
-#include <Application/Renderer/Texture.h>
-#include <Application/Renderer/RenderBuffer.h>
-#include <Application/Renderer/FrameBufferObject.h>
-#include <Utils/EventHandler/EventHandler.h>
+#include <GL/glew.h>
 
 namespace Seg3D {
 
-// Forward declarations
-class Renderer;
-typedef boost::shared_ptr<Renderer> RendererHandle;
+class RenderBuffer;
+typedef boost::shared_ptr<RenderBuffer> RenderBufferHandle;
 
-// Class definitions
-class Renderer : public ViewerRenderer, private Utils::EventHandler {
-
-// -- constructor/destructor --
+class RenderBuffer : public boost::noncopyable {
   public:
-    Renderer();
-    virtual ~Renderer();
-
-  public:
-  
-    virtual void initialize();
-    virtual void redraw();
+    RenderBuffer();
+    ~RenderBuffer();
     
-    virtual void resize(int width, int height);
-
+    void bind();
+    void unbind();
+    
+    void set_storage(int width, int height, unsigned int internal_format, int samples = 1);
+    
+    unsigned int get_id() const
+    {
+      return id_;
+    }
+    
+    unsigned int get_target() const
+    {
+      return TARGET_;
+    }
+    
+    
   private:
+    void _safe_bind();
+    void _safe_unbind();
     
-    // Context for rendering images
-    RenderContextHandle context_;
-    
-    TextureHandle textures_[2];
-    RenderBufferHandle depth_buffer_;
-    FrameBufferObjectHandle frame_buffer_;
-    int active_render_texture_;
-    
-    int width_;
-    int height_;
-    bool invalid_;
-    bool resized_;
-    boost::mutex mutex_invalid_;
-    
-    static int red;
-    int red_;
+    unsigned int id_;
+    int saved_id_;
+        
+    const static unsigned int TARGET_;
 };
 
 } // end namespace Seg3D

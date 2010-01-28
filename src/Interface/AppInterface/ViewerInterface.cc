@@ -126,6 +126,11 @@ ViewerInterface::ViewerInterface(QWidget *parent) :
   StateEngine::Unlock();
 
   set_selected_viewer(0);
+  
+  //setAutoFillBackground(false);
+  //setAttribute(Qt::WA_OpaquePaintEvent);
+  //setAttribute(Qt::WA_NoSystemBackground);
+
 }
 
 ViewerInterface::~ViewerInterface()

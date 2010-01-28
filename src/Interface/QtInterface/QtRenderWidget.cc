@@ -37,36 +37,118 @@
 
 // Interface includes
 #include <Interface/QtInterface/QtRenderWidget.h>
+#include <Application/Interface/Interface.h>
 
 namespace Seg3D {
 
 QtRenderWidget::QtRenderWidget(const QGLFormat& format, QWidget* parent, QtRenderWidget* share) :
   QGLWidget(format,parent,share)
 {
+  setAutoFillBackground(false);
+  setAttribute(Qt::WA_OpaquePaintEvent);
+  setAttribute(Qt::WA_NoSystemBackground);
 }
 
 QtRenderWidget::~QtRenderWidget()
 {
+  rendering_completed_connection_.disconnect();
+}
+
+void 
+QtRenderWidget::rendering_completed_slot(TextureHandle texture)
+{
+  // if not in the interface thread, post an event to the interface thread
+  if (!Interface::IsInterfaceThread())
+  {
+    Interface::PostEvent(boost::bind(&QtRenderWidget::rendering_completed_slot, this, texture));
+    return;
+  }
+  
+  //boost::unique_lock<boost::recursive_mutex> lock(renderer_texture_mutex_);
+  renderer_texture_ = texture;
+  updateGL();
 }
 
 void
 QtRenderWidget::initializeGL()
 {
-  glewInit();
+  RenderResources::Instance()->init_gl();
+  
+  renderer_ = RendererHandle(new Renderer());
+  rendering_completed_connection_ 
+    = renderer_->rendering_completed_signal.connect(boost::bind(&QtRenderWidget::rendering_completed_slot, this, _1));
 }
 
 void
 QtRenderWidget::paintGL()
 {
-  glClearColor(0.25,0.25,0.25,0.0);
-  glClear(GL_COLOR_BUFFER_BIT);
+  //return;
+  
+  
+  //glDrawBuffer(GL_BACK);
+  //glClearColor(0.25,0.25,1.0,0.0);
+  //glClear(GL_COLOR_BUFFER_BIT);
+  //return;
+
+  if (!renderer_texture_.get())
+  {
+    return;
+  }
+  
+  //boost::unique_lock<boost::recursive_mutex> lock(renderer_texture_mutex_);  
+  renderer_texture_->lock();
+  
+  // draw a window size quad and map the render texture onto it
+  QSize view_size = QWidget::size();
+  int width = view_size.width();
+  int height = view_size.height();
+  
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  gluOrtho2D(0, width, 0, height);
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
+  //glActiveTexture(GL_TEXTURE0);
+  //renderer_texture_->enable();
+  //renderer_texture_->disable();
+  //glFinish();
+  renderer_texture_->enable();
+  GLenum err = glGetError();
+  glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+  //GLenum err = glGetError();
+  //const GLubyte* err_str = gluErrorString(err);
+  glBegin(GL_QUADS);
+    glColor3f(0.5f, 0.5f, 0.5f);
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex2f(0.0f, 0.0f);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex2f(width, 0.0f);
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex2f(width, height);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex2f(0.0f, height);
+  glEnd();
+  renderer_texture_->disable();
+  
+  renderer_texture_->unlock();
 }
 
 void
 QtRenderWidget::resizeGL(int width,int height)
 {
-  glClearColor(0.25,0.25,0.25,0.0);
-  glClear(GL_COLOR_BUFFER_BIT);
+  //return;
+  //glClearColor(0.25,0.25,0.25,0.0);
+  //glClear(GL_COLOR_BUFFER_BIT);
+  
+  glViewport(0, 0, width, height);  
+  paintGL();
+  //
+  if (renderer_.get())
+  {
+    renderer_texture_ = TextureHandle();
+    renderer_->resize(width, height);
+  }
+  
 }
 
 } // end namespace Seg3D
