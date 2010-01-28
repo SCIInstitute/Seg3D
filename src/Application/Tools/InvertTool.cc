@@ -39,7 +39,7 @@ InvertTool::InvertTool(const std::string& toolid) :
   Tool(toolid)
 {
   // Need to set ranges and default values for all parameters
-  add_state("target",target_layer_,"<none>","<none>");
+  add_state("target",target_layer_,"firstitem","firstitem|seconditem|thirditem");
   add_state("replace",replace_,false);
   
   // If a layer is added or deleted update the lists

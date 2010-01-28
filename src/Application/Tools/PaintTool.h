@@ -67,13 +67,11 @@ class PaintTool : public Tool {
     // Radius of the brush
     StateRangedIntHandle            brush_radius_;
     
-    //test code
-    StateIntHandle               brush_size_;
-    
     // Upper threshold for painting
-    StateRangedDoubleHandle upper_threshold_;
+    StateRangedDoubleHandle         upper_threshold_;
+
     // Lower threshold for painting
-    StateRangedDoubleHandle lower_threshold_;
+    StateRangedDoubleHandle         lower_threshold_;
 
     // Erase data
     StateBoolHandle         erase_;
