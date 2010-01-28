@@ -40,7 +40,7 @@ InvertTool::InvertTool(const std::string& toolid) :
 {
   // Need to set ranges and default values for all parameters
   add_state("target",target_layer_,"<none>","<none>");
-  add_state("replace",replace_,true);
+  add_state("replace",replace_,false);
   
   // If a layer is added or deleted update the lists
 //  add_connection(LayerManager::instance()->connect_layers_changed(

@@ -90,8 +90,6 @@ class ActionContext : public boost::noncopyable {
     virtual bool from_interface() const;
 
     virtual bool from_undobuffer() const;
-
-    virtual bool update_interface() const;
 };
 
 } // end namespace Seg3D

@@ -60,12 +60,16 @@ class PaintTool : public Tool {
 // -- state --
   public:
     // Layerid of the target layer
-    StateOptionHandle              target_layer_;
+    StateOptionHandle               target_layer_;
     // Layerid of the masking layer
-    StateOptionHandle              mask_layer_;
+    StateOptionHandle               mask_layer_;
     
     // Radius of the brush
-    StateRangedIntHandle    brush_radius_;
+    StateRangedIntHandle            brush_radius_;
+    
+    //test code
+    StateIntHandle               brush_size_;
+    
     // Upper threshold for painting
     StateRangedDoubleHandle upper_threshold_;
     // Lower threshold for painting

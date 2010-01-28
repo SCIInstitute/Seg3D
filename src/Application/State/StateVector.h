@@ -53,7 +53,9 @@ namespace Seg3D {
 template<class T>
 class StateVector;
   
-// Predefine the StateVector instantiation that are used in Seg3D
+// Predefine the StateVector instantiation that are used in Seg3D 
+
+//TODO add more if needed
 
 typedef StateVector<Utils::Point>               StatePoints;
 typedef boost::shared_ptr<StatePoints>          StatePointsHandle;

@@ -63,7 +63,7 @@ class Interface : public Utils::EventHandler {
 
     // CREATE_ACTION_CONTEXT:
     // Create a new action context
-    ActionContextHandle create_action_context(bool update_interface = true);
+    ActionContextHandle create_action_context();
 
 // -- Interface thread --    
     
@@ -107,7 +107,7 @@ void PostInterface(FUNCTION function)
 // RUNACTIONFROMINTERFACE:
 // Function that runs an action with the interface context
 
-void PostActionFromInterface(ActionHandle action, bool update_interface = true );
+void PostActionFromInterface(ActionHandle action );
 
 } // end namespace Seg3D
 

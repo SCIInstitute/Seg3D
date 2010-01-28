@@ -91,11 +91,4 @@ ActionContext::from_undobuffer() const
   return (false);
 }
 
-
-bool
-ActionContext::update_interface() const
-{
-  return (true);
-}
-
 } // end namespace Seg3D
