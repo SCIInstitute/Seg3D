@@ -29,12 +29,16 @@
 #ifndef INTERFACE_QTINTERFACE_QTBRIDGE_H
 #define INTERFACE_QTINTERFACE_QTBRIDGE_H
 
-// QT includes
+// QT includes/custom widget
 #include <QtGui>
+#include <Interface/ToolInterface/CustomWidgets/SliderSpinCombo.h>
 
 // Application includes
 #include <Application/State/StateValue.h>
 #include <Application/State/StateOption.h>
+#include <Application/State/StateVector.h>
+#include <Application/State/StateRangedValue.h>
+
 
 namespace Seg3D {
 
@@ -48,6 +52,20 @@ class QtBridge : public boost::noncopyable {
     
     // Connect a QCheckBox to StateValue<bool>
     static bool connect(QCheckBox* qcheckbox, StateBoolHandle& state_handle);
+    
+    // Connect a SliderSpinCombo to StateValue<int>
+    static bool connect(SliderSpinCombo* sscombo, StateIntHandle& state_handle);
+    
+    // Connect a SliderSpinCombo to StateValue<double>
+    static bool connect(SliderSpinCombo* sscombo, StateDoubleHandle& state_handle);
+
+    // Connect a SliderSpinCombo to StateValue<double>
+    static bool connect(SliderSpinCombo* sscombo, StateRangedIntHandle& state_handle);
+    
+    // Connect a QComboBox to StateValue<int>
+    static bool connect(QComboBox* qcombobox, StateOptionHandle& state_handle);
+
+
   
     // Connect QToolButton & QPushButtons
     static bool connect(QToolButton* qtoolbutton, boost::function<void ()> function);

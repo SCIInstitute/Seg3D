@@ -47,7 +47,8 @@ class SliderSpinCombo : public QWidget
     Q_OBJECT
 
     Q_SIGNALS:
-        void valueAdjusted(double);
+        //void valueAdjusted(double);
+        void valueAdjusted(int);
 
     public:
         SliderSpinCombo(QWidget *parent = 0);

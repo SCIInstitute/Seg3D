@@ -135,7 +135,7 @@ void SliderSpinCombo::setSliderValue( int value )
 void SliderSpinCombo::setSpinnerValue( double value )
 {
     setCurrentValue( value );
-    Q_EMIT valueAdjusted( value );
+    //Q_EMIT valueAdjusted( value );
 }
 
 

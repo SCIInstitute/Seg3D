@@ -29,6 +29,8 @@
 
 #include "InvertToolInterface.h"
 #include "ui_InvertToolInterface.h"
+#include <Interface/QtInterface/QtBridge.h>
+#include <Application/Tools/InvertTool.h>
 
 namespace Seg3D {
   
@@ -54,6 +56,14 @@ InvertToolInterface::build_widget(QFrame* frame)
 {
   private_->ui_.setupUi(frame);
   SCI_LOG_DEBUG("Finished building an Invert Tool");
+  ToolHandle base_tool_ = tool();
+  InvertTool* tool = dynamic_cast<InvertTool*>(base_tool_.get());
+  QtBridge::connect(private_->ui_.replaceCheckBox,tool->replace_);
+  //QtBridge::connect(private_->ui_.activeComboBox, tool->target_layer_);
+
+  private_->ui_.activeComboBox->addItem(QString::fromUtf8("first item"));
+  private_->ui_.activeComboBox->addItem(QString::fromUtf8("second item"));
+  private_->ui_.activeComboBox->addItem(QString::fromUtf8("third item"));
   makeConnections();
   return (true);
   

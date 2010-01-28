@@ -28,6 +28,8 @@
 
 
 #include <Interface/ToolInterface/PaintToolInterface.h>
+#include <Interface/QtInterface/QtBridge.h>
+#include <Application/Tools/PaintTool.h>
 #include "ui_PaintToolInterface.h"
 
 namespace Seg3D {
@@ -57,7 +59,7 @@ PaintToolInterface::build_widget(QFrame* frame)
   
   private_->ui_.setupUi(frame);
   
-  paintBrushAdjuster = new SliderSpinCombo(frame, 1, 100, 1);
+  paintBrushAdjuster = new SliderSpinCombo();
   private_->ui_.verticalLayout->addWidget(paintBrushAdjuster);
   
   upperThresholdAdjuster = new SliderSpinCombo();
@@ -65,6 +67,11 @@ PaintToolInterface::build_widget(QFrame* frame)
   
   lowerThresholdAdjuster = new SliderSpinCombo();
   private_->ui_.lowerHLayout_bottom->addWidget(lowerThresholdAdjuster);
+
+
+  ToolHandle base_tool_ = tool();
+  PaintTool* tool = dynamic_cast<PaintTool*>(base_tool_.get());
+  QtBridge::connect(paintBrushAdjuster, tool->brush_radius_);
   
   makeConnections();
   SCI_LOG_DEBUG("Finished building a Paint Brush Interface");
@@ -79,7 +86,7 @@ void PaintToolInterface::makeConnections()
   connect(private_->ui_.eraseCheckBox, SIGNAL(toggled(bool)), this, SLOT(senseEraseModeChanged(bool)));
   
   
-  connect(paintBrushAdjuster, SIGNAL(valueAdjusted(double)), this, SLOT(sensePaintBrushSizeChanged(double)));
+  //connect(paintBrushAdjuster, SIGNAL(valueAdjusted(double)), this, SLOT(sensePaintBrushSizeChanged(double)));
   connect(upperThresholdAdjuster, SIGNAL(valueAdjusted(double)), this, SLOT(senseUpperThresholdChanged(double)));
   connect(lowerThresholdAdjuster, SIGNAL(valueAdjusted(double)), this, SLOT(senselowerThresholdChanged(double)));
 }
@@ -88,7 +95,7 @@ void PaintToolInterface::makeConnections()
 //  --- Private slots for custom signals ---  //
 void PaintToolInterface::senseActiveChanged(int active)
 {
-  private_->ui_.maskComboBox->setCurrentIndex(0);
+  //private_->ui_.maskComboBox->setCurrentIndex(0);
   Q_EMIT activeChanged( active );
 }
 
