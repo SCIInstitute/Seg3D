@@ -40,8 +40,10 @@
 #include <Application/State/StateValue.h>
 #include <Application/State/StateRangedValue.h>
 #include <Application/State/StateOption.h>
+#include <Application/State/StateVector.h>
 #include <Application/State/StateView2D.h>
 #include <Application/State/StateView3D.h>
+
 
 namespace Seg3D {
 
@@ -129,6 +131,22 @@ class StateHandler : public boost::noncopyable {
       // Step (2): Now handle the common part for each add_state function
       return (add_statebase(key,StateBaseHandle(state)));
     }  
+  
+    // ADD_STATE:
+    // Add a local state variable without default value
+    
+    template<class HANDLE, class T>
+    bool add_state(const std::string& key, HANDLE& state,
+                   const std::vector<T>& default_value)
+    { 
+      // Step (1): Generate the state variable
+      state = HANDLE(new typename HANDLE::element_type(default_value));
+      
+      // Step (2): Now handle the common part for each add_state function
+      return (add_statebase(key,StateBaseHandle(state)));
+      
+    }   
+
 
   private:
     // Function that adds the state variable to the database
