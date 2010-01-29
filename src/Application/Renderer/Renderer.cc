@@ -81,7 +81,7 @@ Renderer::Renderer() :
   RenderResources::Instance()->unlock_shared_context();
   
   // starting the rendering thread
-  install_eventhandler_context(Utils::EventHandlerContextHandle(new RendererEventHandlerContext()));
+  // install_eventhandler_context(Utils::EventHandlerContextHandle(new RendererEventHandlerContext));
   start_eventhandler();
 }
 

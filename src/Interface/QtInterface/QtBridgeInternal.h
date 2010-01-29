@@ -49,13 +49,57 @@ namespace Seg3D {
 // for each signal type, we need to have a dedicated slot and we cannot template
 // this unfortunately. Hence we have helper classes that are inserted in between. 
 
-class QtCheckBoxSlot : public QObject {
+// QtSlot class allows for blocking the signals going back into the application
+// to be stopped. This should prevent a feedback of signals through the 
+// interface. 
+
+class QtSlot : public QObject {
+  Q_OBJECT
+  public:
+  
+    QtSlot( QObject* object) :
+      QObject(object),
+      blocked_(false)
+    {
+      setObjectName(QString("AppSlot"));
+    }
+    
+    virtual ~QtSlot() {}
+
+    // BLOCK:
+    // Block forwarding of signals to the application
+    void block() { blocked_ = true; }
+
+    // UNBLOCK:
+    // Unblock forwarding of signals to the application
+    void unblock() { blocked_ = false; }    
+
+  protected:
+    bool blocked_;
+    
+  public:
+
+    template<class QPOINTER>
+    static void Block(QPOINTER qpointer)
+    {
+      qpointer->findChild<QtSlot*>( QString("AppSlot"))->block();
+    }
+
+    template<class QPOINTER>
+    static void Unblock(QPOINTER qpointer)
+    {
+      qpointer->findChild<QtSlot*>( QString("AppSlot"))->unblock();
+    }
+};
+
+
+class QtCheckBoxSlot : public QtSlot {
   Q_OBJECT
   public:
 
     // Constructor
     QtCheckBoxSlot(QCheckBox* parent, StateBoolHandle& state_handle) :
-      QObject(parent),
+      QtSlot(parent),
       state_handle_(state_handle) 
     {
       // Qt's connect function
@@ -69,7 +113,7 @@ class QtCheckBoxSlot : public QObject {
     // Slot that Qt will call
     void slot(int state)
     {
-      ActionSet::Dispatch(state_handle_,static_cast<bool>(state));
+      if (!blocked_) ActionSet::Dispatch(state_handle_,static_cast<bool>(state));
     }
     
   private:
@@ -78,51 +122,47 @@ class QtCheckBoxSlot : public QObject {
 };
 
 
-class QtSliderSpinComboRangedIntSlot : public QObject {
+class QtSliderSpinComboRangedIntSlot : public QtSlot {
   Q_OBJECT
   public:
     
      // Constructor
     QtSliderSpinComboRangedIntSlot(SliderSpinComboInt* parent, StateRangedIntHandle& state_handle) :
-      QObject(parent),
+      QtSlot(parent),
       state_handle_(state_handle) 
     {
       // Qt's connect function
       connect(parent,SIGNAL(valueAdjusted(int)),this,SLOT(slot(int)));
     }
 
-    
     // Virtual destructor: needed by Qt
     virtual ~QtSliderSpinComboRangedIntSlot() {}
-    
+
   public Q_SLOTS:
     // Slot that Qt will call
     void slot(int state)
     {
-      ActionSet::Dispatch(state_handle_,static_cast<int>(state));
+      if (!blocked_) ActionSet::Dispatch(state_handle_,static_cast<int>(state));
     }
     
   private:
     // Function object
     StateRangedIntHandle state_handle_;
-
-
 };
 
-class QtSliderSpinComboRangedDoubleSlot : public QObject {
+class QtSliderSpinComboRangedDoubleSlot : public QtSlot {
   Q_OBJECT
   public:
     
      // Constructor
     QtSliderSpinComboRangedDoubleSlot(SliderSpinComboDouble* parent, StateRangedDoubleHandle& state_handle) :
-      QObject(parent),
+      QtSlot(parent),
       state_handle_(state_handle) 
     {
       // Qt's connect function
       connect(parent,SIGNAL(valueAdjusted(double)),this,SLOT(slot(double)));
     }
 
-    
     // Virtual destructor: needed by Qt
     virtual ~QtSliderSpinComboRangedDoubleSlot() {}
     
@@ -130,24 +170,23 @@ class QtSliderSpinComboRangedDoubleSlot : public QObject {
     // Slot that Qt will call
     void slot(double state)
     {
-      ActionSet::Dispatch(state_handle_,static_cast<double>(state));
+      if (!blocked_) ActionSet::Dispatch(state_handle_,static_cast<double>(state));
     }
     
   private:
     // Function object
     StateRangedDoubleHandle state_handle_;
 
-
 };
 
 
-class QtComboBoxSlot : public QObject {
+class QtComboBoxSlot : public QtSlot {
   Q_OBJECT
   public:
 
     // Constructor
     QtComboBoxSlot(QComboBox* parent, StateOptionHandle& state_handle) :
-      QObject(parent),
+      QtSlot(parent),
       state_handle_(state_handle) 
     {
       // Qt's connect function
@@ -161,8 +200,7 @@ class QtComboBoxSlot : public QObject {
     // Slot that Qt will call
     void slot(QString state)
     {
-
-      ActionSet::Dispatch(state_handle_,state.toStdString());
+      if (!blocked_) ActionSet::Dispatch(state_handle_,state.toStdString());
     }
     
   private:

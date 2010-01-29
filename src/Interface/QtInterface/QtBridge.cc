@@ -35,74 +35,90 @@ namespace Seg3D {
 
 // -- Checkbox connector --
 
-void QtCheckBoxSignal(QPointer<QCheckBox> qobject_ptr, bool state, bool from_interface)
+void QtCheckBoxSignal(QPointer<QCheckBox> qpointer, bool state, bool from_interface)
 {
   if(!from_interface)
   {
     if (!(Interface::Instance()->IsInterfaceThread()))
     {
-      PostInterface(boost::bind(&QtCheckBoxSignal,qobject_ptr,state, false));
+      PostInterface(boost::bind(&QtCheckBoxSignal,qpointer,state, false));
       return;
     }
-    if (qobject_ptr.data()) qobject_ptr->setChecked(state); 
+    
+    if (qpointer.data()) 
+    {
+      // Blocking the slot will prevent the signal to loop back to the application
+      QtSlot::Block(qpointer);
+      qpointer->setChecked(state);
+      QtSlot::Unblock(qpointer);
+    }
   }
 }
 
-void QtComboBoxSignal(QPointer<QComboBox> qobject_ptr, std::string state, bool from_interface)
+void QtComboBoxSignal(QPointer<QComboBox> qpointer, std::string state, bool from_interface)
 {
   if(!from_interface)
   {
     if (!(Interface::Instance()->IsInterfaceThread()))
     {
-      PostInterface(boost::bind(&QtComboBoxSignal,qobject_ptr,state,false));
+      PostInterface(boost::bind(&QtComboBoxSignal,qpointer,state,false));
       return;
     }
-    if (qobject_ptr.data()) 
+    if (qpointer.data()) 
     {
       //convert from our std::string back to a QString so that we can check to see if it exists
       //in the combo box.
       QString qstring_state = QString::fromStdString(state);
 
-      int index = qobject_ptr->findText(qstring_state, Qt::MatchFlags(Qt::CaseInsensitive));
+      int index = qpointer->findText(qstring_state, Qt::MatchFlags(Qt::CaseInsensitive));
 
       if(index >= 0)
       {
-        qobject_ptr->setCurrentIndex(index);
+        QtSlot::Block(qpointer);
+        qpointer->setCurrentIndex(index);
+        QtSlot::Unblock(qpointer);
       }
     }
   }
 }
 
-
-
-void QtSliderSpinComboRangedIntSignal(QPointer<SliderSpinComboInt> qobject_ptr, int state, bool from_interface)
+void QtSliderSpinComboRangedIntSignal(QPointer<SliderSpinComboInt> qpointer, int state, bool from_interface)
 {
   if(!from_interface)
   { 
      if (!(Interface::Instance()->IsInterfaceThread()))
     {
-      PostInterface(boost::bind(&QtSliderSpinComboRangedIntSignal,qobject_ptr,state,false));
+      PostInterface(boost::bind(&QtSliderSpinComboRangedIntSignal,qpointer,state,false));
       return;
     }
 
-    if (qobject_ptr.data()) qobject_ptr->setCurrentValue(state);
+    if (qpointer.data()) 
+    {
+      QtSlot::Block(qpointer);
+      qpointer->setCurrentValue(state);
+      QtSlot::Unblock(qpointer);
+    }
   }
 }
 
-void QtSliderSpinComboRangedDoubleSignal(QPointer<SliderSpinComboDouble> qobject_ptr, double state, bool from_interface)
+void QtSliderSpinComboRangedDoubleSignal(QPointer<SliderSpinComboDouble> qpointer, double state, bool from_interface)
 {
   if(!from_interface)
   { 
      if (!(Interface::Instance()->IsInterfaceThread()))
     {
-      PostInterface(boost::bind(&QtSliderSpinComboRangedDoubleSignal,qobject_ptr,state,false));
+      PostInterface(boost::bind(&QtSliderSpinComboRangedDoubleSignal,qpointer,state,false));
       return;
     }
 
-    if (qobject_ptr.data()) qobject_ptr->setCurrentValue(state);
+    if (qpointer.data()) 
+    {
+      QtSlot::Block(qpointer);
+      qpointer->setCurrentValue(state);
+      QtSlot::Unblock(qpointer);
+    }
   }
 }
-
 
 bool
 QtBridge::connect(QCheckBox* qcheckbox, 
@@ -121,7 +137,7 @@ QtBridge::connect(QCheckBox* qcheckbox,
 
 bool
 QtBridge::connect(QComboBox* qcombobox,
-                    StateOptionHandle& state_handle)
+                  StateOptionHandle& state_handle)
 {
   // Connect the dispatch into the StateVariable (with auxillary object)
   // Link tbe slot to the parent widget, so Qt's memory manager will
@@ -134,11 +150,9 @@ QtBridge::connect(QComboBox* qcombobox,
   return (true);
 }
 
-
-
 bool
 QtBridge::connect(SliderSpinComboInt* sscombo,
-                    StateRangedIntHandle& state_handle)
+                  StateRangedIntHandle& state_handle)
 {
   new QtSliderSpinComboRangedIntSlot(sscombo,state_handle);
 
@@ -159,9 +173,6 @@ QtBridge::connect(SliderSpinComboDouble* sscombo,
 
   return (true);
 }
-
-
-
   
 bool
 QtBridge::connect(QToolButton* qtoolbutton, 
@@ -189,7 +200,7 @@ QtBridge::connect(QPushButton* qpushbutton,
 
 bool
 QtBridge::connect(QAction* qaction, 
-                     boost::function<void ()> function)
+                  boost::function<void ()> function)
 {
   // Link tbe slot to the parent widget, so Qt's memory manager will
   // manage this one.
@@ -197,6 +208,5 @@ QtBridge::connect(QAction* qaction,
 
   return (true);
 }
-
 
 } // end namespace Seg3D

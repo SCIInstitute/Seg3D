@@ -159,10 +159,10 @@ void SliderSpinComboInt::setRanges( int lower, int upper)
         slider->setPageStep((upper - lower)/10);
     }
 
-    valueString = QString().sprintf("%4.0f", lower);
+    valueString = QString().sprintf("%d", lower);
     minValueLabel->setText(valueString);
 
-    valueString = QString().sprintf("%4.0f", upper);
+    valueString = QString().sprintf("%d", upper);
     maxValueLabel->setText(valueString);
 
 }
