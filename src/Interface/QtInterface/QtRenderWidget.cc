@@ -77,6 +77,7 @@ QtRenderWidget::initializeGL()
   renderer_ = RendererHandle(new Renderer());
   rendering_completed_connection_ 
     = renderer_->rendering_completed_signal.connect(boost::bind(&QtRenderWidget::rendering_completed_slot, this, _1));
+  renderer_->redraw();
 }
 
 void
@@ -118,7 +119,7 @@ QtRenderWidget::paintGL()
   //GLenum err = glGetError();
   //const GLubyte* err_str = gluErrorString(err);
   glBegin(GL_QUADS);
-    glColor3f(0.5f, 0.5f, 0.5f);
+    glColor3f(0.5f, 0.5f, 1.f);
     glTexCoord2f(0.0f, 0.0f);
     glVertex2f(0.0f, 0.0f);
     glTexCoord2f(1.0f, 0.0f);
