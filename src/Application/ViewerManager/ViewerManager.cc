@@ -41,8 +41,14 @@ namespace Seg3D {
 ViewerManager::ViewerManager() :
   StateHandler("view")
 {
-  add_state("layout",layout_state,"2and3","single|1and1|1and2|1and3|2and2|2and3|3and3");
+  // Step (1)
+  // Set the default state of this element
+  add_state("layout",layout_state,"1and3","single|1and1|1and2|1and3|2and2|2and3|3and3");
+  add_state("active_viewer",active_viewer_state,0);
   
+  // Step (2)
+  // Create the viewers that are part of the application
+  // Currently a maximum of 6 viewers can be created
   viewers_.resize(6);
   for (size_t j=0; j< viewers_.size(); j++)
   {

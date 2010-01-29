@@ -59,18 +59,17 @@ namespace Seg3D {
 
 class ViewerManager : public StateHandler {
 
-// -- constructor/destructor --
+// -- Constructor/Destructor --
   public:
     ViewerManager();
     virtual ~ViewerManager();
   
-// -- getting information from manager -- 
+// -- Getting information from manager -- 
   
   public:
     ViewerHandle get_viewer(size_t idx);
   
-  
-// -- signals viewer layout --
+// -- Signals --
   public:
 
     // VIEWER_LAYOUT_CHANGED_SIGNAL:
@@ -78,13 +77,19 @@ class ViewerManager : public StateHandler {
     typedef boost::signals2::signal<void ()> viewer_layout_changed_signal_type;
     viewer_layout_changed_signal_type viewer_layout_changed_signal;
 
+    // ACTIVE_VIEWER_CHANGED_SIGNAL:
+    // This signal is triggered after a different viewer is set to active
+    typedef boost::signals2::signal<void (int)> active_viewer_changed_signal_type;
+    active_viewer_changed_signal_type active_viewer_changed_signal;
+
 // -- State information --
   public:    
     StateOptionHandle   layout_state;
+    StateIntHandle      active_viewer_state;
 
 // -- Viewer information --
   private:
-
+  
     std::vector<ViewerHandle> viewers_;
   
 // -- Singleton interface --

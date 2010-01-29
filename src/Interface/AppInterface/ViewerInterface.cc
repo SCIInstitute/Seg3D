@@ -50,17 +50,15 @@ class ViewerInterfacePrivate {
   
   public:
     // Layout elements
-    QVBoxLayout* layout_;
+    QVBoxLayout*  layout_;
 
     // Splitters
-    QSplitter* horiz_splitter_;    
-    QSplitter* vert_splitter1_;
-    QSplitter* vert_splitter2_;
+    QSplitter*    horiz_splitter_;    
+    QSplitter*    vert_splitter1_;
+    QSplitter*    vert_splitter2_;
 
     // All six viewers
     std::vector<ViewerWidget*> viewer_;
-
-    int selected_viewer_;
 };
 
 
@@ -97,8 +95,6 @@ ViewerInterfacePrivate::ViewerInterfacePrivate(QWidget* parent)
   for (size_t j=0;j<6;j++)
     parent->connect(viewer_[j],SIGNAL(selected(int)),
                         SLOT(set_selected_viewer(int)));
-                        
-  selected_viewer_ = -1;
 } 
   
   
@@ -116,21 +112,17 @@ ViewerInterface::ViewerInterface(QWidget *parent) :
   // the current value needs to be atomic
   StateEngine::Lock();
 
-  // Connect an update to whenever the viewer layout is changed
+  // Connect signals
   ViewerManager::Instance()->layout_state->value_changed_signal.connect(
     boost::bind(&ViewerInterface::SetViewerLayout,qpointer,_1));
+  ViewerManager::Instance()->active_viewer_state->value_changed_signal.connect(
+    boost::bind(&ViewerInterface::SetActiveViewer,qpointer,_1));
 
-  // set the viewer_interface_ to a default view of 1 and 3
+  // set the default state
   set_layout(ViewerManager::Instance()->layout_state->get());
+  set_active_viewer(ViewerManager::Instance()->active_viewer_state->get());
 
   StateEngine::Unlock();
-
-  set_selected_viewer(0);
-  
-  //setAutoFillBackground(false);
-  //setAttribute(Qt::WA_OpaquePaintEvent);
-  //setAttribute(Qt::WA_NoSystemBackground);
-
 }
 
 ViewerInterface::~ViewerInterface()
@@ -164,17 +156,18 @@ void ViewerInterface::readSizeSettings()
 */
   
 void 
-ViewerInterface::set_selected_viewer(int selected_viewer)
+ViewerInterface::set_active_viewer(int active_viewer)
 {
-  if (selected_viewer >= 0 && private_->selected_viewer_ == selected_viewer) return;
-
-  private_->selected_viewer_ = selected_viewer;
-
-  for (int j=0;j<6;j++)
+  for(size_t j=0;j<private_->viewer_.size();j++)
   {
-    if (j != private_->selected_viewer_) private_->viewer_[j]->deselect();
+    if (static_cast<int>(j) != active_viewer) private_->viewer_[j]->deselect();
   }
-  private_->viewer_[private_->selected_viewer_]->select();
+  
+  if (active_viewer >= 0 && 
+      active_viewer < static_cast<int>(private_->viewer_.size()))
+  {
+    private_->viewer_[active_viewer]->select();
+  }
 }
 
 
@@ -310,8 +303,6 @@ ViewerInterface::set_layout(const std::string& layout)
     private_->vert_splitter2_->setSizes(vsizes);
     private_->horiz_splitter_->repaint();
   }
-  
-  set_selected_viewer(0);
 }
 
 
@@ -327,6 +318,17 @@ ViewerInterface::SetViewerLayout(qpointer_type qpointer, std::string layout)
   if (qpointer.data()) qpointer->set_layout(layout);
 }
 
+void
+ViewerInterface::SetActiveViewer(qpointer_type qpointer, int active_viewer)
+{
+  if (!(Interface::IsInterfaceThread()))
+  {
+    Interface::Instance()->post_event(boost::bind(&ViewerInterface::SetActiveViewer,qpointer,active_viewer));
+    return;
+  }
+  
+  if (qpointer.data()) qpointer->set_active_viewer(active_viewer);
+}
 
 
 
