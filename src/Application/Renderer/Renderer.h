@@ -77,9 +77,9 @@ class Renderer : public ViewerRenderer, private Utils::EventHandler {
     
     int width_;
     int height_;
-    bool invalid_;
+    bool redraw_needed_;
     bool resized_;
-    boost::mutex mutex_invalid_;
+    boost::mutex redraw_needed_mutex_;
     
     static int red;
     int red_;

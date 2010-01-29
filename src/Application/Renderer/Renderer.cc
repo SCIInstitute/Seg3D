@@ -61,7 +61,7 @@ int Renderer::red = 1;
 
 Renderer::Renderer() :
   active_render_texture_(0), width_(0), 
-  height_(0), invalid_(false), resized_(false)
+  height_(0), redraw_needed_(false), resized_(false)
 {
   if (!RenderResources::Instance()->create_render_context(context_))
   {
@@ -99,22 +99,23 @@ Renderer::redraw()
 {
   if (!is_eventhandler_thread())
   {
-    boost::unique_lock<boost::mutex> lock(mutex_invalid_);
-    invalid_ = true;
+    boost::unique_lock<boost::mutex> lock(redraw_needed_mutex_);
+    redraw_needed_ = true;
     post_event(boost::bind(&Renderer::redraw, this));
     return;
   }
   
   {
-    boost::unique_lock<boost::mutex> lock(mutex_invalid_);
-    invalid_ = false;
+    boost::unique_lock<boost::mutex> lock(redraw_needed_mutex_);
+    redraw_needed_ = false;
   }
   
   // make the rendering context current
   context_->make_current();
 
   // lock the active render texture
-  textures_[active_render_texture_]->lock();
+  boost::unique_lock<boost::mutex> texture_lock(textures_[active_render_texture_]->get_mutex());
+  //textures_[active_render_texture_]->lock();
   frame_buffer_->attach_texture(textures_[active_render_texture_]);
   
   // bind the framebuffer object
@@ -145,20 +146,24 @@ Renderer::redraw()
    
   frame_buffer_->disable(); 
   // release the lock on the active render texture
-  textures_[active_render_texture_]->unlock();
+  texture_lock.unlock();
+  //textures_[active_render_texture_]->unlock();
   
   // signal rendering completed
-   rendering_completed_signal(textures_[active_render_texture_]);
+  rendering_completed_signal(textures_[active_render_texture_]);
    
   // swap render textures 
   active_render_texture_ = (active_render_texture_+1)%2;
-  textures_[active_render_texture_]->lock();
-  if (resized_)
   {
-    textures_[active_render_texture_]->set_image(width_, height_, 1, GL_RGBA);
-    resized_ = false;
+    boost::unique_lock<boost::mutex> texture_lock(textures_[active_render_texture_]->get_mutex());
+    //textures_[active_render_texture_]->lock();
+    if (resized_)
+    {
+      textures_[active_render_texture_]->set_image(width_, height_, 1, GL_RGBA);
+      resized_ = false;
+    }
+    //textures_[active_render_texture_]->unlock();
   }
-  textures_[active_render_texture_]->unlock();
 }
 
 void
@@ -175,9 +180,11 @@ Renderer::resize(int width, int height)
     return;
   }
   
-  textures_[active_render_texture_]->lock();
-  textures_[active_render_texture_]->set_image(width, height, 1, GL_RGBA);
-  textures_[active_render_texture_]->unlock();
+  {
+    boost::unique_lock<boost::mutex> lock(textures_[active_render_texture_]->get_mutex());
+    textures_[active_render_texture_]->set_image(width, height, 1, GL_RGBA);
+  }
+  
   depth_buffer_->set_storage(width, height, GL_DEPTH_COMPONENT);
 
   width_ = width;

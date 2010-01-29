@@ -50,7 +50,6 @@ class Texture : public boost::noncopyable {
   public:
     Texture();
     
-    // Make the destructor pure virtual so Texture can't be instantiated
     virtual ~Texture();
     
     virtual void set_image(int width, int height, int depth, int internal_format = GL_RGBA, const void *pixels = 0,
@@ -74,6 +73,11 @@ class Texture : public boost::noncopyable {
     unsigned int get_target() const
     {
       return target_;
+    }
+    
+    boost::mutex& get_mutex()
+    {
+      return mutex_;
     }
     
     void lock() { mutex_.lock(); }

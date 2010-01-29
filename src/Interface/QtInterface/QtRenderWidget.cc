@@ -96,8 +96,8 @@ QtRenderWidget::paintGL()
     return;
   }
   
-  //boost::unique_lock<boost::recursive_mutex> lock(renderer_texture_mutex_);  
-  renderer_texture_->lock();
+  boost::unique_lock<boost::mutex> lock(renderer_texture_->get_mutex());  
+  //renderer_texture_->lock();
   
   // draw a window size quad and map the render texture onto it
   QSize view_size = QWidget::size();
@@ -114,7 +114,6 @@ QtRenderWidget::paintGL()
   //renderer_texture_->disable();
   //glFinish();
   renderer_texture_->enable();
-  GLenum err = glGetError();
   glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
   //GLenum err = glGetError();
   //const GLubyte* err_str = gluErrorString(err);
@@ -131,7 +130,7 @@ QtRenderWidget::paintGL()
   glEnd();
   renderer_texture_->disable();
   
-  renderer_texture_->unlock();
+  //renderer_texture_->unlock();
 }
 
 void
