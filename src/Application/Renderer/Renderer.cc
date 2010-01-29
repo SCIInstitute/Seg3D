@@ -35,12 +35,12 @@
 
 namespace Seg3D {
 
-class RendererEventHandlerConext : public Utils::DefaultEventHandlerContext
+class RendererEventHandlerContext : public Utils::DefaultEventHandlerContext
 {
   public:
      
-     RendererEventHandlerConext() : DefaultEventHandlerContext() { }
-     virtual ~RendererEventHandlerConext() { }
+     RendererEventHandlerContext() : DefaultEventHandlerContext() { }
+     virtual ~RendererEventHandlerContext() { }
   
     virtual void post_event(Utils::EventHandle& event)
     {
@@ -81,7 +81,7 @@ Renderer::Renderer() :
   RenderResources::Instance()->unlock_shared_context();
   
   // starting the rendering thread
-  install_eventhandler_context(Utils::EventHandlerContextHandle(new RendererEventHandlerConext()));
+  install_eventhandler_context(Utils::EventHandlerContextHandle(new RendererEventHandlerContext()));
   start_eventhandler();
 }
 
@@ -170,10 +170,10 @@ Renderer::resize(int width, int height)
     return;
   }
   
-  //if (width_ == width && height_ == height)
-  //{
-  //  return;
-  //}
+  if (width_ == width && height_ == height)
+  {
+    return;
+  }
   
   textures_[active_render_texture_]->lock();
   textures_[active_render_texture_]->set_image(width, height, 1, GL_RGBA);
