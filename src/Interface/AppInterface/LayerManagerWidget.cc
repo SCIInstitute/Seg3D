@@ -780,9 +780,9 @@ LayerManagerWidget::add_layer( layer_type type, const QString &label, const QStr
     layer_handle_->horizontalLayout_11->setContentsMargins(0, -1, 0, -1);
     layer_handle_->brightnessLabel_ = new QLabel(layer_handle_->brightContrastBar);
     layer_handle_->brightnessLabel_->setObjectName(QString::fromUtf8("brightnessLabel_"));
-    QFont font2;
-    font2.setPointSize(12);
-    layer_handle_->brightnessLabel_->setFont(font2);
+    //QFont font2;
+    //font2.setPointSize(12);
+    //layer_handle_->brightnessLabel_->setFont(font2);
     
     layer_handle_->horizontalLayout_11->addWidget(layer_handle_->brightnessLabel_);
     
@@ -804,7 +804,7 @@ LayerManagerWidget::add_layer( layer_type type, const QString &label, const QStr
     layer_handle_->horizontalLayout_12->setContentsMargins(0, -1, 0, -1);
     layer_handle_->contrastLabel_ = new QLabel(layer_handle_->brightContrastBar);
     layer_handle_->contrastLabel_->setObjectName(QString::fromUtf8("contrastLabel_"));
-    layer_handle_->contrastLabel_->setFont(font2);
+    //layer_handle_->contrastLabel_->setFont(font2);
     
     layer_handle_->horizontalLayout_12->addWidget(layer_handle_->contrastLabel_);
     
