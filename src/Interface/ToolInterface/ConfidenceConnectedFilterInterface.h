@@ -34,41 +34,25 @@
 
 // Base class of the tool widget
 #include <Interface/AppInterface/ToolWidget.h>
-#include <Interface/ToolInterface/CustomWidgets/SliderSpinCombo.h>
+#include <Interface/ToolInterface/CustomWidgets/SliderSpinComboInt.h>
 
 
 namespace Seg3D {
   
-  class ConfidenceConnectedFilterInterfacePrivate;
-  
-  class ConfidenceConnectedFilterInterface : public ToolWidget {
-    Q_OBJECT
-    
-  Q_SIGNALS:
-    void activeChanged(int);
+class ConfidenceConnectedFilterInterfacePrivate;
+
+class ConfidenceConnectedFilterInterface : public ToolWidget {
+  Q_OBJECT
     
   public:
     ConfidenceConnectedFilterInterface();
     virtual ~ConfidenceConnectedFilterInterface();
     virtual bool build_widget(QFrame* frame);
     
-    public Q_SLOTS:
-    void setActive(int);
-    void addToActive(QStringList&);
-    
-    
   private:
     ConfidenceConnectedFilterInterfacePrivate* private_;
-    SliderSpinCombo *iterationsAdjuster;
-    SliderSpinCombo *multiplierAdjuster;
-    void makeConnections();
-    
-    
-    private Q_SLOTS:
-    void senseActiveChanged(int);
-    
-    
-    
+    SliderSpinComboInt *iterationsAdjuster;
+    SliderSpinComboInt *multiplierAdjuster;
     
   };
   

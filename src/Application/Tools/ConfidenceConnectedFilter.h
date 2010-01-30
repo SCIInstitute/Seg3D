@@ -52,8 +52,11 @@ public:
   
   // -- state --
 public:
+  
   // Layerid of the target layer
-  StateOptionHandle              target_layer_;
+  StateOptionHandle               target_layer_;
+  StateRangedIntHandle            iterations_;
+  StateRangedIntHandle            threshold_multiplier_;
   
   
   

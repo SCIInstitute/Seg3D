@@ -24,76 +24,68 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
- */
+*/
 
+//Interface Includes
+#include <Interface/QtInterface/QtBridge.h>
 
-
-#include "ConfidenceConnectedFilterInterface.h"
+//Qt Gui Includes
+#include <Interface/ToolInterface/ConfidenceConnectedFilterInterface.h>
 #include "ui_ConfidenceConnectedFilterInterface.h"
+
+//Application Includes
+#include <Application/Tools/ConfidenceConnectedFilter.h>
 
 
 namespace Seg3D {
   
-  SCI_REGISTER_TOOLINTERFACE(ConfidenceConnectedFilterInterface)
+SCI_REGISTER_TOOLINTERFACE(ConfidenceConnectedFilterInterface)
+
+class ConfidenceConnectedFilterInterfacePrivate {
+public:
+  Ui::ConfidenceConnectedFilterInterface ui_;
+};
   
-  class ConfidenceConnectedFilterInterfacePrivate {
-  public:
-    Ui::ConfidenceConnectedFilterInterface ui_;
-  };
-  
+  // constructor
   ConfidenceConnectedFilterInterface::ConfidenceConnectedFilterInterface() :
   private_(new ConfidenceConnectedFilterInterfacePrivate)
   {
     
   }
   
+  // destructor
   ConfidenceConnectedFilterInterface::~ConfidenceConnectedFilterInterface()
   {
   }
   
   
+  // build the interface and connect it to the state manager
   bool
   ConfidenceConnectedFilterInterface::build_widget(QFrame* frame)
   {
+    //Step 1 - build the Qt GUI Widget
     private_->ui_.setupUi(frame);
         
-    iterationsAdjuster = new SliderSpinCombo();
-    private_->ui_.iterationsHLayout_bottom->addWidget(iterationsAdjuster);
+      iterationsAdjuster = new SliderSpinComboInt();
+      private_->ui_.iterationsHLayout_bottom->addWidget(iterationsAdjuster);
+      
+      multiplierAdjuster = new SliderSpinComboInt();
+      private_->ui_.multiplierHLayout_bottom->addWidget(multiplierAdjuster);
     
-    multiplierAdjuster = new SliderSpinCombo();
-    private_->ui_.multiplierHLayout_bottom->addWidget(multiplierAdjuster);
+    //Step 2 - get a pointer to the tool
+    ToolHandle base_tool_ = tool();
+    ConfidenceConnectedFilter* tool = dynamic_cast<ConfidenceConnectedFilter*>(base_tool_.get());
     
+    //Step 3 - connect the gui to the tool through the QtBridge
+    QtBridge::connect(private_->ui_.targetComboBox, tool->target_layer_);
+    QtBridge::connect(iterationsAdjuster, tool->iterations_);
+    QtBridge::connect(multiplierAdjuster, tool->threshold_multiplier_);
+    
+    //Send a message to the log that we have finised with building the Confidence Connected Filter Interface
     SCI_LOG_DEBUG("Finished building a Confidence Connected Filter Interface");
     return (true);
     
-  }
-  
-  //  --- Function for making signal slots connections ---  //
-  void 
-  ConfidenceConnectedFilterInterface::makeConnections()
-  {
-    connect(private_->ui_.activeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(senseActiveChanged(int)));
-    
-  }
+  } // end build_widget
   
   
-  //  --- Private slots for custom signals ---  //
-  void ConfidenceConnectedFilterInterface::senseActiveChanged(int active)
-  {
-    Q_EMIT activeChanged(active);
-  }
-  
-  
-  //  --- Public slots for setting widget values ---  //
-  void ConfidenceConnectedFilterInterface::setActive(int active)
-  {
-    private_->ui_.activeComboBox->setCurrentIndex(active);
-  }
-  
-  void ConfidenceConnectedFilterInterface::addToActive(QStringList &items)
-  {
-    private_->ui_.activeComboBox->addItems(items);
-  }
-  
-  
-} // namespace Seg3D
+} // end namespace Seg3D

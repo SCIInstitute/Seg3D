@@ -54,6 +54,8 @@ class ThresholdToolInterfacePrivate {
   ThresholdToolInterface::~ThresholdToolInterface()
   { }
 
+  
+  // build the interface and connect it to the state manager
   bool
   ThresholdToolInterface::build_widget(QFrame* frame)
   {
