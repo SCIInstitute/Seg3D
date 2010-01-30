@@ -48,8 +48,7 @@ class PaintTool : public Tool {
     // Constrain state to right options when mask layer is selected
     void mask_constraint(std::string layerid);
     
-// -- handle updates from layermanager --    
-    
+    // -- handle updates from layermanager --    
     void handle_layers_changed();
 
 // -- activate/deactivate tool --

@@ -40,8 +40,8 @@ ThresholdTool::ThresholdTool(const std::string& toolid) :
 {
   // Need to set ranges and default values for all parameters
   add_state("target",target_layer_,"<none>","<none>");
-  add_state("upper_threshold",upper_threshold_,0.0f,1.0f,0.01f,1.0f);
-  add_state("lower_threshold",lower_threshold_,0.0f,1.0f,0.01f,0.0f);
+  add_state("upper_threshold",upper_threshold_,0.0f,100.0f,1.0f,1.0f);
+  add_state("lower_threshold",lower_threshold_,0.0f,100.0f,1.0f,1.0f);
   
   // Add constaints, so that when the state changes the right ranges of 
   // parameters are selected

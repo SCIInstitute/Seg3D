@@ -39,14 +39,30 @@ SCI_REGISTER_TOOL(AnisotropicDiffusionFilter)
 AnisotropicDiffusionFilter::AnisotropicDiffusionFilter(const std::string& toolid) :
 Tool(toolid)
 {
-  //TODO - add guts
+  // Need to set ranges and default values for all parameters
+  add_state("target",target_layer_,"<none>","<none>");
+  add_state("iterations_",iterations_,1,100,1,2);
+  add_state("steps_",steps_,1,100,1,2);
+  add_state("conductance_",conductance_,0.0f,100.0f,01.0f,1.0f);
+  add_state("replace",replace_,false);
+  
+  // Add constaints, so that when the state changes the right ranges of 
+  // parameters are selected
+  target_layer_->value_changed_signal.connect(boost::bind(&AnisotropicDiffusionFilter::target_constraint,this,_1));
   
   
 }
 
 void
+AnisotropicDiffusionFilter::handle_layers_changed()
+{
+  //TODO - finish
+}
+
+void
 AnisotropicDiffusionFilter::target_constraint(std::string layerid)
 {
+
 }
 
 AnisotropicDiffusionFilter::~AnisotropicDiffusionFilter()

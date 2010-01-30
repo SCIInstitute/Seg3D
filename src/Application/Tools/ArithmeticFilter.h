@@ -53,8 +53,17 @@ public:
   // -- state --
 public:
   // Layerid of the target layer
-  StateOptionHandle              target_layer_;
+  StateOptionHandle               volume_a_;
   
+  StateOptionHandle               volume_b_;
+  
+  StateOptionHandle               volume_c_;
+  
+  StateOptionHandle               example_expressions_;
+  
+  StateBoolHandle                 replace_;
+
+
 };
   
 } // end namespace

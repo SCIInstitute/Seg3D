@@ -35,14 +35,24 @@ namespace Seg3D {
   // Register the tool into the tool factory
   SCI_REGISTER_TOOL(ArithmeticFilter)
   
-  
+  // Constructor, set default values
   ArithmeticFilter::ArithmeticFilter(const std::string& toolid) :
   Tool(toolid)
   {
-    //TODO - add guts
-    
-    
-  }
+    add_state("volume_a",volume_a_,"<none>","<none>");
+    add_state("volume_b",volume_b_,"<none>","<none>");
+    add_state("volume_c",volume_c_,"<none>","<none>");
+    add_state("example_expressions",example_expressions_,"<none>","<none>");
+    add_state("replace",replace_,false);
+
+    // Add constaints, so that when the state changes the right ranges of 
+    // parameters are selected
+    volume_a_->value_changed_signal.connect(boost::bind(&ArithmeticFilter::target_constraint,this,_1));
+    volume_b_->value_changed_signal.connect(boost::bind(&ArithmeticFilter::target_constraint,this,_1));
+    volume_c_->value_changed_signal.connect(boost::bind(&ArithmeticFilter::target_constraint,this,_1));
+
+
+  } // end constructor
   
   void
   ArithmeticFilter::target_constraint(std::string layerid)
@@ -51,7 +61,6 @@ namespace Seg3D {
   
   ArithmeticFilter::~ArithmeticFilter()
   {
-    
   }
   
   void

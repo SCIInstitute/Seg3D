@@ -40,10 +40,13 @@ public:
   AnisotropicDiffusionFilter(const std::string& toolid);
   virtual ~AnisotropicDiffusionFilter();
   
-  // -- constraint parameters --
+// -- constraint parameters --
   
   // Constrain viewer to right painting tool when layer is selected
   void target_constraint(std::string layerid);
+
+  // -- handle updates from layermanager --    
+  void handle_layers_changed();
   
   // -- activate/deactivate tool --
   
@@ -53,12 +56,16 @@ public:
   // -- state --
 public:
   // Layerid of the target layer
-  StateOptionHandle              target_layer_;
-  
-  
-  
-  
-  
+  StateOptionHandle               target_layer_;
+
+  StateRangedIntHandle            iterations_;
+
+  StateRangedIntHandle            steps_;
+
+  StateRangedDoubleHandle         conductance_;
+
+  StateBoolHandle                 replace_;
+
 };
   
   

@@ -39,9 +39,18 @@ namespace Seg3D {
   CannyEdgeDetectionFilter::CannyEdgeDetectionFilter(const std::string& toolid) :
   Tool(toolid)
   {
-    //TODO - add guts
-    
-    
+    // Need to set ranges and default values for all parameters
+    add_state("target",target_layer_,"<none>","<none>");
+    add_state("variance",variance_,0.0f,100.0f,1.0f,1.0f);
+    add_state("max_error",max_error_,0.0f,100.0f,1.0f,1.0f);
+    add_state("threshold",threshold_,0.0f,100.0f,1.0f,1.0f);
+    add_state("replace",replace_,false);
+
+    // Add constaints, so that when the state changes the right ranges of 
+    // parameters are selected
+    target_layer_->value_changed_signal.connect(boost::bind(&CannyEdgeDetectionFilter::target_constraint,this,_1));
+
+
   }
   
   void

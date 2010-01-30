@@ -53,7 +53,15 @@ public:
   // -- state --
 public:
   // Layerid of the target layer
-  StateOptionHandle              target_layer_;
+  StateOptionHandle               target_layer_;
+  
+  StateRangedDoubleHandle          variance_;
+  
+  StateRangedDoubleHandle          max_error_;
+  
+  StateRangedDoubleHandle          threshold_;
+
+  StateBoolHandle                 replace_;
   
   
   

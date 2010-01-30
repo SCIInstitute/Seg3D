@@ -62,12 +62,13 @@ class ThresholdTool : public Tool {
 // -- state --
   public:
     // Layerid of the target layer
-    StateOptionHandle              target_layer_;
+    StateOptionHandle               target_layer_;
     
     // Upper threshold for painting
-    StateRangedDoubleHandle upper_threshold_;
+    StateRangedDoubleHandle         upper_threshold_;
+
     // Lower threshold for painting
-    StateRangedDoubleHandle lower_threshold_;
+    StateRangedDoubleHandle         lower_threshold_;
   
     // Seed Points
     // StateVector<Point>            seed_points_;
