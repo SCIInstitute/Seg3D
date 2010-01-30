@@ -49,12 +49,12 @@ class RenderBuffer : public boost::noncopyable {
     
     void set_storage(int width, int height, unsigned int internal_format, int samples = 1);
     
-    unsigned int get_id() const
+    inline unsigned int get_id() const
     {
       return id_;
     }
     
-    unsigned int get_target() const
+    inline unsigned int get_target() const
     {
       return TARGET_;
     }

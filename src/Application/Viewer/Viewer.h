@@ -80,7 +80,7 @@ class Viewer : public StateHandler {
   public:
     
     ViewerRendererHandle renderer() { return renderer_; }
-    void set_renderer(ViewerRendererHandle renderer) { renderer_ = renderer; }
+    void set_renderer(ViewerRendererHandle renderer);
 
   private:
     // A handle to the renderer that is used to render the data

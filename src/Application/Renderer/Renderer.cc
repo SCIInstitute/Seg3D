@@ -60,29 +60,10 @@ class RendererEventHandlerContext : public Utils::DefaultEventHandlerContext
 int Renderer::red = 1;
 
 Renderer::Renderer() :
-  active_render_texture_(0), width_(0), 
+  EventHandler(), active_render_texture_(0), width_(0), 
   height_(0), redraw_needed_(false), resized_(false)
 {
-  if (!RenderResources::Instance()->create_render_context(context_))
-  {
-    SCI_THROW_EXCEPTION("Failed to create a valid rendering context");
-  }
   red_ = (red++);
-  
-  RenderResources::Instance()->lock_shared_context();
-  
-  textures_[0] = TextureHandle(new Texture2D());
-  textures_[1] = TextureHandle(new Texture2D());
-  depth_buffer_ = RenderBufferHandle(new RenderBuffer());
-  frame_buffer_ = FrameBufferObjectHandle(new FrameBufferObject());
-  
-  frame_buffer_->attach_render_buffer(depth_buffer_, GL_DEPTH_ATTACHMENT_EXT);
-  
-  RenderResources::Instance()->unlock_shared_context();
-  
-  // starting the rendering thread
-  // install_eventhandler_context(Utils::EventHandlerContextHandle(new RendererEventHandlerContext));
-  start_eventhandler();
 }
 
 Renderer::~Renderer() 
@@ -92,6 +73,25 @@ Renderer::~Renderer()
 void
 Renderer::initialize()
 {
+  if (!RenderResources::Instance()->create_render_context(context_))
+  {
+    SCI_THROW_EXCEPTION("Failed to create a valid rendering context");
+  }
+
+  // lock the shared render context
+  boost::unique_lock<RenderResources::mutex_type> lock(RenderResources::Instance()->shared_context_mutex());
+
+  textures_[0] = TextureHandle(new Texture2D());
+  textures_[1] = TextureHandle(new Texture2D());
+  depth_buffer_ = RenderBufferHandle(new RenderBuffer());
+  frame_buffer_ = FrameBufferObjectHandle(new FrameBufferObject());
+  frame_buffer_->attach_render_buffer(depth_buffer_, GL_DEPTH_ATTACHMENT_EXT);
+  
+  // release the lock
+  lock.unlock();
+  
+  // starting the rendering thread
+  start_eventhandler();
 }
 
 void
@@ -114,8 +114,8 @@ Renderer::redraw()
   context_->make_current();
 
   // lock the active render texture
-  boost::unique_lock<boost::mutex> texture_lock(textures_[active_render_texture_]->get_mutex());
-  //textures_[active_render_texture_]->lock();
+  boost::unique_lock<Texture::mutex_type> texture_lock(textures_[active_render_texture_]->get_mutex());
+
   frame_buffer_->attach_texture(textures_[active_render_texture_]);
   
   // bind the framebuffer object
@@ -135,8 +135,6 @@ Renderer::redraw()
   
   glFlush();
   
-  glFinish();
-  //frame_buffer_->disable();
   //err = glGetError();
   
   //if (pixels != NULL)
@@ -145,25 +143,17 @@ Renderer::redraw()
   //}
    
   frame_buffer_->disable(); 
+  
   // release the lock on the active render texture
   texture_lock.unlock();
-  //textures_[active_render_texture_]->unlock();
+  
+  glFinish();
   
   // signal rendering completed
   rendering_completed_signal(textures_[active_render_texture_]);
    
   // swap render textures 
-  active_render_texture_ = (active_render_texture_+1)%2;
-  {
-    boost::unique_lock<boost::mutex> texture_lock(textures_[active_render_texture_]->get_mutex());
-    //textures_[active_render_texture_]->lock();
-    if (resized_)
-    {
-      textures_[active_render_texture_]->set_image(width_, height_, 1, GL_RGBA);
-      resized_ = false;
-    }
-    //textures_[active_render_texture_]->unlock();
-  }
+  active_render_texture_ = (~active_render_texture_)&1;
 }
 
 void
@@ -175,15 +165,19 @@ Renderer::resize(int width, int height)
     return;
   }
   
-  if (width_ == width && height_ == height)
+  if ( width == 0 || height == 0
+      || (width_ == width && height_ == height) )
   {
     return;
   }
-  
+    
   {
-    boost::unique_lock<boost::mutex> lock(textures_[active_render_texture_]->get_mutex());
-    textures_[active_render_texture_]->set_image(width, height, 1, GL_RGBA);
+    boost::unique_lock<RenderResources::mutex_type> lock(RenderResources::Instance()->shared_context_mutex());
+    textures_[0] = TextureHandle(new Texture2D());
+    textures_[1] = TextureHandle(new Texture2D());
   }
+  textures_[0]->set_image(width, height, 1, GL_RGBA);
+  textures_[1]->set_image(width, height, 1, GL_RGBA);
   
   depth_buffer_->set_storage(width, height, GL_DEPTH_COMPONENT);
 

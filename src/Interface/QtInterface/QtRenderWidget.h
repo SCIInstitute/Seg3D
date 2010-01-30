@@ -35,6 +35,7 @@
  
 #include <Application/Renderer/RenderResources.h> 
 #include <Application/Renderer/Renderer.h>
+#include <Application/Viewer/ViewerRenderer.h>
 
 #include <QtOpenGL>
  
@@ -49,6 +50,11 @@ class QtRenderWidget : public QGLWidget {
     virtual ~QtRenderWidget();
     
     void rendering_completed_slot(TextureHandle texture);
+    
+    ViewerRendererHandle renderer()
+    {
+      return renderer_;
+    }
 
   protected:
   
@@ -61,7 +67,6 @@ class QtRenderWidget : public QGLWidget {
     TextureHandle renderer_texture_;
     
     boost::signals2::connection rendering_completed_connection_;
-    //boost::recursive_mutex renderer_texture_mutex_;
 };
 
 } // end namespace Seg3D

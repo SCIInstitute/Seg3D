@@ -362,14 +362,16 @@ ViewerWidget::ViewerWidget(int viewer_id, QWidget *parent) :
   setLineWidth(3);
   setFrameShape(QFrame::Panel);
   setFrameShadow(QFrame::Raised);
-
-  //setAutoFillBackground(false);
-  //setAttribute(Qt::WA_OpaquePaintEvent);
-  //setAttribute(Qt::WA_NoSystemBackground);
 }
 
 ViewerWidget::~ViewerWidget()
 {
+}
+
+ViewerRendererHandle
+ViewerWidget::renderer()
+{
+  return private_->viewer_->renderer();
 }
 
 void

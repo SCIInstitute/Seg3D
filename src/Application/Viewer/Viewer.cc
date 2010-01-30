@@ -55,5 +55,10 @@ Viewer::~Viewer()
 {
 }
 
+void Viewer::set_renderer( ViewerRendererHandle renderer )
+{
+  renderer_ = renderer;
+}
+
 } // end namespace Seg3D
 

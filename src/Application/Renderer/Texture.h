@@ -65,24 +65,26 @@ class Texture : public boost::noncopyable {
     void set_wrap_t(int wrap_mode);
     void set_wrap_r(int wrap_mode);
     
-    unsigned int get_id() const
+    inline unsigned int get_id() const
     {
       return texture_id_;
     }
     
-    unsigned int get_target() const
+    inline unsigned int get_target() const
     {
       return target_;
     }
     
-    boost::mutex& get_mutex()
+    typedef boost::mutex mutex_type;
+    
+    inline mutex_type& get_mutex()
     {
       return mutex_;
     }
     
-    void lock() { mutex_.lock(); }
+    inline void lock() { mutex_.lock(); }
     
-    void unlock() { mutex_.unlock(); }
+    inline void unlock() { mutex_.unlock(); }
     
   protected:
     void _safe_bind();
@@ -93,7 +95,7 @@ class Texture : public boost::noncopyable {
     unsigned int target_;
     unsigned int query_target_;
     
-    boost::mutex mutex_;
+    mutex_type mutex_;
 };
 
 // CLASS TEXTURE1D

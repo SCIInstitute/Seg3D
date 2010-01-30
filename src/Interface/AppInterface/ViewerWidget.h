@@ -30,6 +30,8 @@
 #ifndef INTERFACE_APPINTERFACE_VIEWERWIDGET_H
 #define INTERFACE_APPINTERFACE_VIEWERWIDGET_H
 
+#include <Application/Viewer/ViewerRenderer.h>
+
 // QT includes
 #include <QFrame>
 
@@ -54,6 +56,8 @@ class ViewerWidget : public QFrame {
   public:
     ViewerWidget(int viewer_id, QWidget *parent = 0);
     virtual ~ViewerWidget();
+    
+    ViewerRendererHandle renderer();
   
   Q_SIGNALS:
     void selected(int);

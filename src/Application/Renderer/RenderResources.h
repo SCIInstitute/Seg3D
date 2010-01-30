@@ -74,6 +74,8 @@ class RenderResources : public boost::noncopyable {
     
 // -- render locks --
   public:
+  
+    typedef boost::recursive_mutex mutex_type;
 
     // LOCK_SHARED_CONTEXT:
     void lock_shared_context() { shared_context_mutex_.lock(); }
@@ -83,12 +85,12 @@ class RenderResources : public boost::noncopyable {
 
     // SHARED_CONTEXT_MUTEX:
     // reference to the mutex that protects the common pool of textures
-    boost::recursive_mutex& shared_context_mutex() { return shared_context_mutex_; }
+    mutex_type& shared_context_mutex() { return shared_context_mutex_; }
 
   private:
     // We need a lock that protects against multiple threads reserving
     // OpenGL resources at the same time
-    boost::recursive_mutex shared_context_mutex_;
+    mutex_type shared_context_mutex_;
 
 // -- OpenGL initialization --
   public:
