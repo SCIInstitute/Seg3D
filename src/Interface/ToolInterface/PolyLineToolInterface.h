@@ -43,41 +43,17 @@ class PolyLineToolInterfacePrivate;
 class PolyLineToolInterface : public ToolWidget {
   Q_OBJECT
   
-  Q_SIGNALS:
-    void activeChanged(int);
-    void resetPolyLineTool();
-    void fillPolyLine();
-    void erasePolyLine();
-  
-  
-  public Q_SLOTS:
-    void setActive(int);
-    void addToActive(QStringList&);
-    
-  
-  
+  // Constructor/destructor  
   public:
     PolyLineToolInterface();
     virtual ~PolyLineToolInterface();
-
     virtual bool build_widget(QFrame* frame);
-
 
   private:
     PolyLineToolInterfacePrivate* private_;
-    void makeConnections();
     
-      
-  private Q_SLOTS:
-    void senseActiveChanged(int);
-    void senseResetPolyLineTool();
-    void senseFillPolyLine();
-    void senseErasePolyLine();
-    
-  
-  
 };
 
-} // namespace Seg3D
+} // end namespace Seg3D
 
 #endif

@@ -32,7 +32,7 @@
 // Application includes
 #include <Application/Tool/ToolFactory.h>
 
-// Base class of the tool widget
+// Base class of the tool widget include
 #include <Interface/AppInterface/ToolWidget.h>
 
 
@@ -42,33 +42,18 @@ class InvertToolInterfacePrivate;
 
 class InvertToolInterface : public ToolWidget {
   Q_OBJECT
-  
-Q_SIGNALS:
-  void activeChanged(int);
-  // sends a bool representing wether the user wants to replace the active layer or not
-  void invert(bool);
-  
+
+// Constructor/destructor
 public:
   InvertToolInterface();
   virtual ~InvertToolInterface();
   virtual bool build_widget(QFrame* frame);
-  
-public Q_SLOTS:
-  void setActive(int);
-  void addToActive(QStringList&);
-  
+
 private:
   InvertToolInterfacePrivate* private_;
-  void makeConnections();
-  
-private Q_SLOTS:
-  void senseActiveChanged(int);
-  void senseInverted();
-
 
 };
 
-
-} // namespace Seg3D
+} // end namespace Seg3D
 
 #endif

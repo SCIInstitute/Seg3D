@@ -24,142 +24,71 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
- */
+*/
 
+//Interface Includes
+#include <Interface/QtInterface/QtBridge.h>
 
+//Qt Gui Includes
 #include <Interface/ToolInterface/CannyEdgeDetectionFilterInterface.h>
 #include "ui_CannyEdgeDetectionFilterInterface.h"
 
+//Application Includes
+#include <Application/Tools/CannyEdgeDetectionFilter.h>
+
+
 namespace Seg3D {
   
-  SCI_REGISTER_TOOLINTERFACE(CannyEdgeDetectionFilterInterface)
+SCI_REGISTER_TOOLINTERFACE(CannyEdgeDetectionFilterInterface)
+
+
+class CannyEdgeDetectionFilterInterfacePrivate {
+public:
+  Ui::CannyEdgeDetectionFilterInterface ui_;
+};
   
-  
-  class CannyEdgeDetectionFilterInterfacePrivate {
-  public:
-    Ui::CannyEdgeDetectionFilterInterface ui_;
-  };
-  
-  
+  // constructor
   CannyEdgeDetectionFilterInterface::CannyEdgeDetectionFilterInterface() :
   private_(new CannyEdgeDetectionFilterInterfacePrivate)
-  {  
-    
-  }
+  { }
   
+  // destructor
   CannyEdgeDetectionFilterInterface::~CannyEdgeDetectionFilterInterface()
-  {
-  }
+  { }
   
+  // build the interface and connect it to the state manager
   bool
   CannyEdgeDetectionFilterInterface::build_widget(QFrame* frame)
   {
-    
+    //Step 1 - build the Qt GUI Widget
     private_->ui_.setupUi(frame);
     
-    varianceAdjuster = new SliderSpinCombo();
-    private_->ui_.varianceHLayout_bottom->addWidget(varianceAdjuster);
+      //Add the SliderSpinCombos
+      varianceAdjuster = new SliderSpinComboDouble();
+      private_->ui_.varianceHLayout_bottom->addWidget(varianceAdjuster);
+      
+      errorAdjuster = new SliderSpinComboDouble();
+      private_->ui_.errorHLayout_bottom->addWidget(errorAdjuster);
+      
+      thresholdAdjuster = new SliderSpinComboDouble();
+      private_->ui_.thresholdHLayout_bottom->addWidget(thresholdAdjuster);
     
-    errorAdjuster = new SliderSpinCombo();
-    private_->ui_.errorHLayout_bottom->addWidget(errorAdjuster);
+    //Step 2 - get a pointer to the tool
+    ToolHandle base_tool_ = tool();
+    CannyEdgeDetectionFilter* tool = dynamic_cast<CannyEdgeDetectionFilter*>(base_tool_.get());
     
-    thresholdAdjuster = new SliderSpinCombo();
-    private_->ui_.thresholdHLayout_bottom->addWidget(thresholdAdjuster);
-    
-    makeConnections();
-    
+    //Step 3 - connect the gui to the tool through the QtBridge
+    QtBridge::connect(private_->ui_.targetComboBox, tool->target_layer_);
+    QtBridge::connect(varianceAdjuster, tool->variance_);
+    QtBridge::connect(errorAdjuster, tool->max_error_);
+    QtBridge::connect(thresholdAdjuster, tool->threshold_);
+    QtBridge::connect(private_->ui_.replaceCheckBox, tool->replace_);
+
+    //Send a message to the log that we have finised with building the Detection Filter Interface
     SCI_LOG_DEBUG("Finished building a Canny Edge Detection Filter Interface");
+   
     return (true);
-  }
-  
-  void 
-  CannyEdgeDetectionFilterInterface::makeConnections()
-  {
-    connect(private_->ui_.activeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(senseActiveChanged(int)));
-    connect(errorAdjuster, SIGNAL(valueAdjusted(double)), this, SLOT(senseErrorChanged(double)));
-    connect(varianceAdjuster, SIGNAL(valueAdjusted(double)), this, SLOT(senseVarianceChanged(double)));
-    connect(thresholdAdjuster, SIGNAL(valueAdjusted(double)), this, SLOT(senseThresholdChanged(double)));
-    connect(private_->ui_.invertButton, SIGNAL(clicked()), this, SLOT(senseFilterRun()));
-    
-    
-  }
-  
-  //  --- Private slots for custom signals ---  //
-  void CannyEdgeDetectionFilterInterface::senseActiveChanged(int active)
-  {
-    Q_EMIT activeChanged( active );
-  }
-  
-  void CannyEdgeDetectionFilterInterface::senseErrorChanged(int errors)
-  {
-    Q_EMIT errorChanged(errors);
-  }
-  
-  void CannyEdgeDetectionFilterInterface::senseVarianceChanged(double variance)
-  {
-    Q_EMIT varianceChanged(variance);
-  }
-  
-  void CannyEdgeDetectionFilterInterface::senseThresholdChanged(int threshold)
-  {
-    Q_EMIT thresholdChanged(threshold);
-  }
-  
-  void CannyEdgeDetectionFilterInterface::senseFilterRun()
-  {
-    if(private_->ui_.replaceCheckBox->isChecked())
-    {
-      Q_EMIT filterRun(true);
-    }
-    else
-    {
-      Q_EMIT filterRun(false);
-    }
-  }
-  
-  
-  //  --- Public slots for setting widget values ---  //
-  void CannyEdgeDetectionFilterInterface::setActive(int active)
-  {
-    private_->ui_.activeComboBox->setCurrentIndex(active);
-  }
-  
-  void CannyEdgeDetectionFilterInterface::addToActive(QStringList &items)
-  {
-    private_->ui_.activeComboBox->addItems(items);
-  }
-  
-  void CannyEdgeDetectionFilterInterface::setVariance(int variance)
-  {
-    varianceAdjuster->setCurrentValue(variance);
-  }
-  
-  void CannyEdgeDetectionFilterInterface::setVarianceRange(int lower, int upper)
-  {
-    varianceAdjuster->setRanges(lower, upper);
-  }
-  
-  void CannyEdgeDetectionFilterInterface::setError(double errors)
-  {
-    errorAdjuster->setCurrentValue(errors);
-  }
-  
-  void CannyEdgeDetectionFilterInterface::setErrorRange(double lower, double upper)
-  {
-    errorAdjuster->setRanges(lower, upper);
-  }
-  
-  void CannyEdgeDetectionFilterInterface::setThreshold(int threshold)
-  {
-    thresholdAdjuster->setCurrentValue(threshold);
-  }
-  
-  void CannyEdgeDetectionFilterInterface::setThresholdRange(int lower, int upper)
-  {
-    thresholdAdjuster->setRanges(lower, upper);
-  }
-  
-  
+  } 
   
 } // namespace Seg3D
 

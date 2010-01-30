@@ -34,7 +34,9 @@
 
 // Base class of the tool widget
 #include <Interface/AppInterface/ToolWidget.h>
-#include <Interface/ToolInterface/CustomWidgets/SliderSpinCombo.h>
+
+// Qt Gui Includes
+#include <Interface/ToolInterface/CustomWidgets/SliderSpinComboDouble.h>
 
 namespace Seg3D {
   
@@ -42,49 +44,20 @@ class ThresholdToolInterfacePrivate;
 
 class ThresholdToolInterface : public ToolWidget {
   Q_OBJECT
-  
-Q_SIGNALS:
-  void activeChanged(int);
-  void createThresholdLayer();
-  void clearSeeds();
-  void upperThresholdChanged(int);
-  void lowerThresholdChanged(int);
-  
-public Q_SLOTS:
-  void setActive(int);
-  void addToActive(QStringList&);
-  void setLowerThreshold(double, double);
-  void setLowerThresholdStep(double);
-  void setUpperThreshold(double, double);
-  void setUpperThresholdStep(double);
-  void setHistogram();
-  
-public:
-  ThresholdToolInterface();
-  virtual ~ThresholdToolInterface();
-  virtual bool build_widget(QFrame* frame);
-  
-private:
-  ThresholdToolInterfacePrivate* private_;
-  SliderSpinCombo *upperThresholdAdjuster;
-  SliderSpinCombo *lowerThresholdAdjuster;
-  
-  void makeConnections();
-  
-private Q_SLOTS:
-  void senseActiveChanged(int);
-  void senseCreateThresholdLayer();
-  void senseClearSeeds();
-  void senseUpperThresholdChanged(double);
-  void senselowerThresholdChanged(double);
 
-  
-  
-
+// Constructor/destructor  
+  public:
+    ThresholdToolInterface();
+    virtual ~ThresholdToolInterface();
+    virtual bool build_widget(QFrame* frame);
+    
+  private:
+    ThresholdToolInterfacePrivate* private_;
+    SliderSpinComboDouble *upperThresholdAdjuster;
+    SliderSpinComboDouble *lowerThresholdAdjuster;
+    
 };
-  
-  
-  
+    
 } // end namespace Seg3D
 
 

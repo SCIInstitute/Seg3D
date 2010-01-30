@@ -26,87 +26,53 @@
    DEALINGS IN THE SOFTWARE.
 */
 
+//Interface Includes
+#include <Interface/QtInterface/QtBridge.h>
 
+//Qt Gui Includes
 #include <Interface/ToolInterface/PolyLineToolInterface.h>
 #include "ui_PolyLineToolInterface.h"
+
+//Application Includes
+#include <Application/Tools/PolylineTool.h>
 
 namespace Seg3D {
 
 SCI_REGISTER_TOOLINTERFACE(PolyLineToolInterface)
-
 
 class PolyLineToolInterfacePrivate {
   public:
     Ui::PolyLineToolInterface ui_;
 };
 
+  // constructor
+  PolyLineToolInterface::PolyLineToolInterface() :
+    private_(new PolyLineToolInterfacePrivate)
+  { }
 
-PolyLineToolInterface::PolyLineToolInterface() :
-  private_(new PolyLineToolInterfacePrivate)
-{  
+  // destructor
+  PolyLineToolInterface::~PolyLineToolInterface()
+  { }
+
+  // build the interface and connect it to the state manager
+  bool
+  PolyLineToolInterface::build_widget(QFrame* frame)
+  {
+    //Step 1 - build the Qt GUI Widget
+    private_->ui_.setupUi(frame);
+
+    //Step 2 - get a pointer to the tool
+    ToolHandle base_tool_ = tool();
+    PolylineTool* tool = dynamic_cast<PolylineTool*>(base_tool_.get());
+
+    //Step 3 - connect the gui to the tool through the QtBridge
+    QtBridge::connect(private_->ui_.targetComboBox, tool->target_layer_);
+    
+    //Send a message to the log that we have finised with building the Polyline Tool Interface
+    SCI_LOG_MESSAGE("Finished building a PolyLine Tool Interface");
+
+    return (true);
+  } // end build_widget
   
-}
-
-PolyLineToolInterface::~PolyLineToolInterface()
-{
-}
-
-bool
-PolyLineToolInterface::build_widget(QFrame* frame)
-{
-  
-  private_->ui_.setupUi(frame);
-  makeConnections();
-  
-  SCI_LOG_DEBUG("Finished building a PolyLine Tool Interface");
-  return (true);
-}
-  
-//  --- Function for making signal slots connections ---  //
-void PolyLineToolInterface::makeConnections()
-{
-  connect(private_->ui_.activeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(senseActiveChanged(int)));
-  connect(private_->ui_.resetPLButton, SIGNAL(clicked()), this, SLOT(senseResetPolyLineTool()));
-  connect(private_->ui_.insideFillButton, SIGNAL(clicked()), this, SLOT(senseFillPolyLine()));
-  connect(private_->ui_.insideEraseButton, SIGNAL(clicked()), this, SLOT(senseErasePolyLine()));
-}
-
-
-//  --- Private slots for custom signals ---  //
-void PolyLineToolInterface::senseActiveChanged(int active)
-{
-  Q_EMIT activeChanged(active);
-}
-
-void PolyLineToolInterface::senseResetPolyLineTool()
-{
-  Q_EMIT resetPolyLineTool();
-}
-
-void PolyLineToolInterface::senseFillPolyLine()
-{
-  Q_EMIT fillPolyLine();
-}
-
-void PolyLineToolInterface::senseErasePolyLine()
-{
-  Q_EMIT erasePolyLine();
-}
-
-//  --- Public slots for setting widget values ---  //
-void PolyLineToolInterface::setActive(int active)
-{
-  private_->ui_.activeComboBox->setCurrentIndex(active);
-}
-
-void PolyLineToolInterface::addToActive(QStringList &items)
-{
-  private_->ui_.activeComboBox->addItems(items);
-}
-  
-  
-  
-  
-
-} // namespace Seg3D
+} // end namespace Seg3D
 

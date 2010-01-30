@@ -24,10 +24,17 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
- */
+*/
 
-#include "ThresholdToolInterface.h"
+//Interface Includes
+#include <Interface/QtInterface/QtBridge.h>
+
+//Qt Gui Includes
+#include <Interface/ToolInterface/ThresholdToolInterface.h>
 #include "ui_ThresholdToolInterface.h"
+
+//Application Includes
+#include <Application/Tools/ThresholdTool.h>
 
 namespace Seg3D {
   
@@ -38,108 +45,40 @@ class ThresholdToolInterfacePrivate {
     Ui::ThresholdToolInterface ui_;
 };
 
-ThresholdToolInterface::ThresholdToolInterface() :
-  private_(new ThresholdToolInterfacePrivate)
-{
-  
-}
+  // constructor
+  ThresholdToolInterface::ThresholdToolInterface() :
+    private_(new ThresholdToolInterfacePrivate)
+  { }
 
-ThresholdToolInterface::~ThresholdToolInterface()
-{
-  
-}
+  // destructor
+  ThresholdToolInterface::~ThresholdToolInterface()
+  { }
 
-bool
-ThresholdToolInterface::build_widget(QFrame* frame)
-{
-  private_->ui_.setupUi(frame);
-  
-  upperThresholdAdjuster = new SliderSpinCombo();
-  private_->ui_.upperHLayout_bottom->addWidget(upperThresholdAdjuster);
-  
-  lowerThresholdAdjuster = new SliderSpinCombo();
-  private_->ui_.lowerHLayout_bottom->addWidget(lowerThresholdAdjuster);
-  
-  SCI_LOG_DEBUG("Finished building a Threshold Tool Interface"); 
-  return (true);
-}
+  bool
+  ThresholdToolInterface::build_widget(QFrame* frame)
+  {
+    //Step 1 - build the Qt GUI Widget
+    private_->ui_.setupUi(frame);
 
-//  --- Function for making signal slots connections ---  //
-void ThresholdToolInterface::makeConnections()
-{
-  connect(private_->ui_.activeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(senseActiveChanged(int)));
-  connect(upperThresholdAdjuster, SIGNAL(valueAdjusted(double)), this, SLOT(senseUpperThresholdChanged(double)));
-  connect(lowerThresholdAdjuster, SIGNAL(valueAdjusted(double)), this, SLOT(senselowerThresholdChanged(double)));
-  connect(private_->ui_.createThresholdLayerButton, SIGNAL(clicked()), this, SLOT(senseCreateThresholdLayer()));
-  connect(private_->ui_.clearSeedsButton, SIGNAL(clicked()), this, SLOT(senseClearSeeds()));
-}
-  
-  
-//  --- Private slots for custom signals ---  //
-void ThresholdToolInterface::senseActiveChanged(int active)
-{
-  Q_EMIT activeChanged(active);
-}
+      upperThresholdAdjuster = new SliderSpinComboDouble();
+      private_->ui_.upperHLayout_bottom->addWidget(upperThresholdAdjuster);
+      
+      lowerThresholdAdjuster = new SliderSpinComboDouble();
+      private_->ui_.lowerHLayout_bottom->addWidget(lowerThresholdAdjuster);
 
-void ThresholdToolInterface::senseCreateThresholdLayer()
-{
-  Q_EMIT createThresholdLayer();
-}
+    //Step 2 - get a pointer to the tool
+    ToolHandle base_tool_ = tool();
+    ThresholdTool* tool = dynamic_cast<ThresholdTool*>(base_tool_.get());
 
-void ThresholdToolInterface::senseClearSeeds()
-{
-  Q_EMIT clearSeeds();
-}
+    //Step 3 - connect the gui to the tool through the QtBridge
+    QtBridge::connect(private_->ui_.targetComboBox, tool->target_layer_);
+    QtBridge::connect(upperThresholdAdjuster, tool->upper_threshold_);
+    QtBridge::connect(lowerThresholdAdjuster, tool->lower_threshold_);
 
-void ThresholdToolInterface::senseUpperThresholdChanged(double upper)
-{
-  Q_EMIT upperThresholdChanged(upper);
-}
+    //Send a message to the log that we have finised with building the Threshold Tool Interface   
+    SCI_LOG_DEBUG("Finished building a Threshold Tool Interface"); 
 
-void ThresholdToolInterface::senselowerThresholdChanged(double lower)
-{
-  Q_EMIT lowerThresholdChanged(lower);
-}
-  
+    return (true);
+  } // end build_widget
 
-//  --- Public slots for setting widget values ---  //
-void ThresholdToolInterface::setActive(int active)
-{
-  private_->ui_.activeComboBox->setCurrentIndex(active);
-}
-
-void ThresholdToolInterface::addToActive(QStringList &items)
-{
-  private_->ui_.activeComboBox->addItems(items);
-}
-
-void ThresholdToolInterface::setLowerThreshold(double lower, double upper)
-{
-  lowerThresholdAdjuster->setRanges(lower, upper);
-}
-
-void ThresholdToolInterface::setLowerThresholdStep(double step)
-{
-  lowerThresholdAdjuster->setStep(step);
-}
-
-void ThresholdToolInterface::setUpperThreshold(double lower, double upper)
-{
-  upperThresholdAdjuster->setRanges(lower, upper);
-}
-
-void ThresholdToolInterface::setUpperThresholdStep(double step)
-{
-  upperThresholdAdjuster->setStep(step);
-}
-
-void ThresholdToolInterface::setHistogram()
-{
-  //TODO - implement histogram display
-}
-  
-  
-  
-  
-  
 }  // end namespace Seg3D

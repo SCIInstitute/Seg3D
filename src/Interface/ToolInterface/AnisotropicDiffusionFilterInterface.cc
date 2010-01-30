@@ -24,11 +24,18 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
- */
+*/
 
+//Interface Includes
+#include <Interface/QtInterface/QtBridge.h>
 
+//Qt Gui Includes
 #include <Interface/ToolInterface/AnisotropicDiffusionFilterInterface.h>
 #include "ui_AnisotropicDiffusionFilterInterface.h"
+
+//Application Includes
+#include <Application/Tools/AnisotropicDiffusionFilter.h>
+
 
 namespace Seg3D {
   
@@ -40,126 +47,47 @@ public:
   Ui::AnisotropicDiffusionFilterInterface ui_;
 };
 
+  // constructor
+  AnisotropicDiffusionFilterInterface::AnisotropicDiffusionFilterInterface() :
+  private_(new AnisotropicDiffusionFilterInterfacePrivate)
+  { }
+  
+  // destructor
+  AnisotropicDiffusionFilterInterface::~AnisotropicDiffusionFilterInterface()
+  { }
+   
+  // build the interface and connect it to the state manager
+  bool
+  AnisotropicDiffusionFilterInterface::build_widget(QFrame* frame)
+  {
+    //Step 1 - build the Qt GUI Widget
+    private_->ui_.setupUi(frame);
+    
+      iterationsAdjuster = new SliderSpinComboInt();
+      private_->ui_.iterationsHLayout_bottom->addWidget(iterationsAdjuster);
+      
+      stepAdjuster = new SliderSpinComboInt();
+      private_->ui_.integrationHLayout_bottom->addWidget(stepAdjuster);
+      
+      conductanceAdjuster = new SliderSpinComboDouble();
+      private_->ui_.conductanceHLayout_bottom->addWidget(conductanceAdjuster);
 
-AnisotropicDiffusionFilterInterface::AnisotropicDiffusionFilterInterface() :
-private_(new AnisotropicDiffusionFilterInterfacePrivate)
-{  
-  
-}
+    //Step 2 - get a pointer to the tool
+    ToolHandle base_tool_ = tool();
+    AnisotropicDiffusionFilter* tool = dynamic_cast<AnisotropicDiffusionFilter*>(base_tool_.get());
 
-AnisotropicDiffusionFilterInterface::~AnisotropicDiffusionFilterInterface()
-{
-}
-  
-bool
-AnisotropicDiffusionFilterInterface::build_widget(QFrame* frame)
-{
-  
-  private_->ui_.setupUi(frame);
-  
-  iterationsAdjuster = new SliderSpinCombo();
-  private_->ui_.iterationsHLayout_bottom->addWidget(iterationsAdjuster);
-  
-  stepAdjuster = new SliderSpinCombo();
-  private_->ui_.integrationHLayout_bottom->addWidget(stepAdjuster);
-  
-  conductanceAdjuster = new SliderSpinCombo();
-  private_->ui_.conductanceHLayout_bottom->addWidget(conductanceAdjuster);
-  
-  makeConnections();
-  SCI_LOG_DEBUG("Finished building an Anisotropic Diffusion Filter Interface");
-  
-  return (true);
-}
+    //Step 3 - connect the gui to the tool through the QtBridge
+    QtBridge::connect(private_->ui_.targetComboBox, tool->target_layer_);
+    QtBridge::connect(iterationsAdjuster, tool->iterations_);
+    QtBridge::connect(stepAdjuster, tool->steps_);
+    QtBridge::connect(conductanceAdjuster, tool->conductance_);
+    QtBridge::connect(private_->ui_.replaceCheckBox,tool->replace_);
+    
+    //Send a message to the log that we have finised with building the Anisotropic Diffusion Filter Interface   
+    SCI_LOG_DEBUG("Finished building an Anisotropic Diffusion Filter Interface");
+    
+    return (true);
+  } // end build_widget
 
-void 
-AnisotropicDiffusionFilterInterface::makeConnections()
-{
-//  connect(private_->ui_.activeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(senseActiveChanged(int)));
-//  connect(iterationsAdjuster, SIGNAL(valueAdjusted(double)), this, SLOT(senseIterationsChanged(double)));
-//  connect(stepAdjuster, SIGNAL(valueAdjusted(double)), this, SLOT(senseStepChanged(double)));
-//  connect(conductanceAdjuster, SIGNAL(valueAdjusted(double)), this, SLOT(senseConductanceChanged(double)));
-//  connect(private_->ui_.invertButton, SIGNAL(clicked()), this, SLOT(senseFilterRun()));
-                                                                                                
-
-}
-
-  //  --- Private slots for custom signals ---  //
-  void AnisotropicDiffusionFilterInterface::senseActiveChanged(int active)
-  {
-    Q_EMIT activeChanged( active );
-  }
-  
-  void AnisotropicDiffusionFilterInterface::senseIterationsChanged(int iterations)
-  {
-    Q_EMIT iterationsChanged(iterations);
-  }
-  
-  void AnisotropicDiffusionFilterInterface::senseStepChanged(double step)
-  {
-    Q_EMIT stepChanged(step);
-  }
-  
-  void AnisotropicDiffusionFilterInterface::senseConductanceChanged(int conductance)
-  {
-    Q_EMIT conductanceChanged(conductance);
-  }
-  
-  void AnisotropicDiffusionFilterInterface::senseFilterRun()
-  {
-    if(private_->ui_.replaceCheckBox->isChecked())
-    {
-      Q_EMIT filterRun(true);
-    }
-    else
-    {
-      Q_EMIT filterRun(false);
-    }
-  }
-  
-  
-  //  --- Public slots for setting widget values ---  //
-  void AnisotropicDiffusionFilterInterface::setActive(int active)
-  {
-    private_->ui_.activeComboBox->setCurrentIndex(active);
-  }
-  
-  void AnisotropicDiffusionFilterInterface::addToActive(QStringList &items)
-  {
-    private_->ui_.activeComboBox->addItems(items);
-  }
-  
-  void AnisotropicDiffusionFilterInterface::setIterations(int iterations)
-  {
-    iterationsAdjuster->setCurrentValue(iterations);
-  }
-  
-  void AnisotropicDiffusionFilterInterface::setIterationRange(int lower, int upper)
-  {
-    iterationsAdjuster->setRanges(lower, upper);
-  }
-  
-  void AnisotropicDiffusionFilterInterface::setStep(double iterations)
-  {
-    stepAdjuster->setCurrentValue(iterations);
-  }
-  
-  void AnisotropicDiffusionFilterInterface::setStepRange(double lower, double upper)
-  {
-    stepAdjuster->setRanges(lower, upper);
-  }
-  
-  void AnisotropicDiffusionFilterInterface::setConductance(int iterations)
-  {
-    conductanceAdjuster->setCurrentValue(iterations);
-  }
-  
-  void AnisotropicDiffusionFilterInterface::setConductanceRange(int lower, int upper)
-  {
-    conductanceAdjuster->setRanges(lower, upper);
-  }
-  
-  
-
-} // namespace Seg3D
+} // end namespace Seg3D
 

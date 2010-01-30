@@ -26,9 +26,15 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+//Interface Includes
+#include <Interface/QtInterface/QtBridge.h>
 
-#include "FlipToolInterface.h"
+//Qt Gui Includes
+#include <Interface/ToolInterface/FlipToolInterface.h>
 #include "ui_FlipToolInterface.h"
+
+//Application Includes
+#include <Application/Tools/FlipTool.h>
 
 namespace Seg3D {
   
@@ -39,86 +45,32 @@ class FlipToolInterfacePrivate {
     Ui::FlipToolInterface ui_;
 };
   
-FlipToolInterface::FlipToolInterface() :
-private_(new FlipToolInterfacePrivate)
-{
-  
-}
+  FlipToolInterface::FlipToolInterface() :
+  private_(new FlipToolInterfacePrivate)
+  { } 
 
-FlipToolInterface::~FlipToolInterface()
-{
-}
+  FlipToolInterface::~FlipToolInterface()
+  { }
 
-bool
-FlipToolInterface::build_widget(QFrame* frame)
-{
-  private_->ui_.setupUi(frame);
-  SCI_LOG_DEBUG("Finished building a Flip Tool Interface"); 
-  makeConnections();
-  return (true);
-}
-  
-//  --- Function for making signal slots connections ---  //
-void FlipToolInterface::makeConnections()
-{
-  connect(private_->ui_.activeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(senseActiveChanged(int)));
-  connect(private_->ui_.flipAxialButton, SIGNAL(clicked()), this, SLOT(senseFlipAxial()));
-  connect(private_->ui_.flipCoronalButton, SIGNAL(clicked()), this, SLOT(senseFlipCoronal()));
-  connect(private_->ui_.flipSagittalButton, SIGNAL(clicked()), this, SLOT(senseFlipSagittal()));
-  connect(private_->ui_.rotateACButton, SIGNAL(clicked()), this, SLOT(senseRotateAxialCoronal()));
-  connect(private_->ui_.rotateASButton, SIGNAL(clicked()), this, SLOT(senseRotateAxialSagital()));
-  connect(private_->ui_.rotateSAButton, SIGNAL(clicked()), this, SLOT(senseRotateSagittalAxial()));
-}
+  // build the interface and connect it to the state manager
+  bool
+  FlipToolInterface::build_widget(QFrame* frame)
+  {
+    //Step 1 - build the Qt GUI Widget
+    private_->ui_.setupUi(frame);
 
+    //Step 2 - get a pointer to the tool
+    ToolHandle base_tool_ = tool();
+    FlipTool* tool = dynamic_cast<FlipTool*>(base_tool_.get());
 
-//  --- Private slots for custom signals ---  //
-void FlipToolInterface::senseActiveChanged(int active)
-{
-  Q_EMIT activeChanged(active);
-}
+    //Step 3 - connect the gui to the tool through the QtBridge
+    QtBridge::connect(private_->ui_.targetComboBox, tool->target_layer_);
 
-void FlipToolInterface::senseFlipAxial()
-{
-  Q_EMIT flipAxial();
-}
-
-void FlipToolInterface::senseFlipCoronal()
-{
-  Q_EMIT flipCoronal();
-}
-
-void FlipToolInterface::senseFlipSagittal()
-{
-  Q_EMIT flipSagittal();
-}
-
-void FlipToolInterface::senseRotateAxialCoronal()
-{
-  Q_EMIT rotateAxialCoronal();
-}
-
-void FlipToolInterface::senseRotateAxialSagital()
-{
-  Q_EMIT rotateAxialSagittal();
-}
-
-void FlipToolInterface::senseRotateSagittalAxial()
-{
-  Q_EMIT rotateSagittalAxial();
-}
-
-//  --- Public slots for setting widget values ---  //
-void FlipToolInterface::setActive(int active)
-{
-  private_->ui_.activeComboBox->setCurrentIndex(active);
-}
-
-void FlipToolInterface::addToActive(QStringList &items)
-{
-  private_->ui_.activeComboBox->addItems(items);
-}
-  
-
+    //Send a message to the log that we have finised with building the Flip Tool Interface
+    SCI_LOG_DEBUG("Finished building a Flip Tool Interface"); 
+    
+    return (true);
+  } // end build_widget
   
   
 } // namespace Seg3D

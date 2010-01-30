@@ -26,10 +26,14 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-
-#include "InvertToolInterface.h"
-#include "ui_InvertToolInterface.h"
+//Interface Includes
 #include <Interface/QtInterface/QtBridge.h>
+
+//Qt Gui Includes
+#include <Interface/ToolInterface/InvertToolInterface.h>
+#include "ui_InvertToolInterface.h"
+
+//Application Includes
 #include <Application/Tools/InvertTool.h>
 
 namespace Seg3D {
@@ -41,75 +45,39 @@ class InvertToolInterfacePrivate {
     Ui::InvertToolInterface ui_;
 };
   
-InvertToolInterface::InvertToolInterface() :
-private_(new InvertToolInterfacePrivate)
-{
+  // constructor
+  InvertToolInterface::InvertToolInterface() :
+  private_(new InvertToolInterfacePrivate)
+  { }
+
+  // destructor
+  InvertToolInterface::~InvertToolInterface()
+  { }
   
-}
-
-InvertToolInterface::~InvertToolInterface()
-{
-}
-  
-bool
-InvertToolInterface::build_widget(QFrame* frame)
-{
-  private_->ui_.setupUi(frame);
-  SCI_LOG_DEBUG("Finished building an Invert Tool");
-  ToolHandle base_tool_ = tool();
-  InvertTool* tool = dynamic_cast<InvertTool*>(base_tool_.get());
-  QtBridge::connect(private_->ui_.replaceCheckBox,tool->replace_);
-  
-
-  private_->ui_.activeComboBox->addItem(QString::fromUtf8("firstitem"));
-  private_->ui_.activeComboBox->addItem(QString::fromUtf8("seconditem"));
-  private_->ui_.activeComboBox->addItem(QString::fromUtf8("thirditem"));
-
-  QtBridge::connect(private_->ui_.activeComboBox, tool->target_layer_);
-
-  makeConnections();
-  return (true);
-  
-}
-
-
-//  --- Function for making signal slots connections ---  //
-void InvertToolInterface::makeConnections()
-{
-  connect(private_->ui_.invertButton, SIGNAL(clicked()), this, SLOT(senseInverted()));
-  connect(private_->ui_.activeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(senseActiveChanged(int)));
-}
- 
-
-//  --- Private slots for custom signals ---  //
-void InvertToolInterface::senseActiveChanged(int active)
-{
-  Q_EMIT activeChanged(active);
-}
-
-void InvertToolInterface::senseInverted()
-{
-  if(private_->ui_.replaceCheckBox->isChecked())
+  // build the interface and connect it to the state manager
+  bool
+  InvertToolInterface::build_widget(QFrame* frame)
   {
-    Q_EMIT invert(true);
-  }
-  else
-  {
-    Q_EMIT invert(false);
-  }
-}
+    //Step 1 - build the Qt GUI Widget
+    private_->ui_.setupUi(frame);
+   
+    //Step 2 - get a pointer to the tool
+    ToolHandle base_tool_ = tool();
+    InvertTool* tool = dynamic_cast<InvertTool*>(base_tool_.get());
+    
+    //Step 3 - connect the gui to the tool through the QtBridge
+    QtBridge::connect(private_->ui_.replaceCheckBox,tool->replace_);
+    QtBridge::connect(private_->ui_.targetComboBox, tool->target_layer_);
 
-//  --- Public slots for setting widget values ---  //
-void InvertToolInterface::setActive(int active)
-{
-  private_->ui_.activeComboBox->setCurrentIndex(active);
-}
+    //TEST CODE
+    private_->ui_.targetComboBox->addItem(QString::fromUtf8("firstitem"));
+    private_->ui_.targetComboBox->addItem(QString::fromUtf8("seconditem"));
+    private_->ui_.targetComboBox->addItem(QString::fromUtf8("thirditem"));
 
-void InvertToolInterface::addToActive(QStringList &items)
-{
-  private_->ui_.activeComboBox->addItems(items);
-}
+    //Send a message to the log that we have finised with building the Invert Tool Interface
+    SCI_LOG_MESSAGE("Finished building an Invert Tool Interface");
+    
+    return (true);
+  } // end build_widget
 
-
-
-} // namespace Seg3D
+} // end namespace Seg3D

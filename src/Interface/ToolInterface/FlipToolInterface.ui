@@ -63,7 +63,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="activeComboBox">
+      <widget class="QComboBox" name="targetComboBox">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
          <horstretch>0</horstretch>

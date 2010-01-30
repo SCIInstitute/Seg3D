@@ -35,33 +35,16 @@
 // Base class of the tool widget
 #include <Interface/AppInterface/ToolWidget.h>
 
-#include <Interface/ToolInterface/CustomWidgets/SliderSpinCombo.h>
+// Qt Gui Includes
+#include <Interface/ToolInterface/CustomWidgets/SliderSpinComboInt.h>
+#include <Interface/ToolInterface/CustomWidgets/SliderSpinComboDouble.h>
 
 namespace Seg3D {
   
-  class CannyEdgeDetectionFilterInterfacePrivate;
-  
-  class CannyEdgeDetectionFilterInterface : public ToolWidget {
-    Q_OBJECT
-    
-  Q_SIGNALS:
-    void activeChanged(int);
-    void varianceChanged(int);
-    void errorChanged(double);
-    void thresholdChanged(int);
-    void filterRun(bool);
-    
-    public Q_SLOTS:
-    void setActive(int);
-    void addToActive(QStringList&);
-    void setVariance(int);
-    void setVarianceRange(int, int);
-    void setError(double);
-    void setErrorRange(double, double);
-    void setThreshold(int);
-    void setThresholdRange(int, int);
-    
-    
+class CannyEdgeDetectionFilterInterfacePrivate;
+
+class CannyEdgeDetectionFilterInterface : public ToolWidget {
+  Q_OBJECT
     
   public:
     CannyEdgeDetectionFilterInterface();
@@ -70,20 +53,11 @@ namespace Seg3D {
     
   private:
     CannyEdgeDetectionFilterInterfacePrivate* private_;
-    SliderSpinCombo *varianceAdjuster;
-    SliderSpinCombo *errorAdjuster;
-    SliderSpinCombo *thresholdAdjuster;
-    void makeConnections();
-    
-    private Q_SLOTS:
-    void senseActiveChanged(int);
-    void senseVarianceChanged(double);
-    void senseErrorChanged(int);
-    void senseThresholdChanged(int);
-    void senseFilterRun();
-    
-    
-  };
+    SliderSpinComboDouble *varianceAdjuster;
+    SliderSpinComboDouble *errorAdjuster;
+    SliderSpinComboDouble *thresholdAdjuster;
+   
+};
   
   
   

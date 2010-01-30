@@ -24,10 +24,17 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
- */
+*/
 
+//Interface Includes
+#include <Interface/QtInterface/QtBridge.h>
+
+//Qt Gui Includes
 #include <Interface/ToolInterface/ArithmeticFilterInterface.h>
 #include "ui_ArithmeticFilterInterface.h"
+
+//Application Includes
+#include <Application/Tools/ArithmeticFilter.h>
 
 namespace Seg3D {
   
@@ -39,112 +46,39 @@ public:
   Ui::ArithmeticFilterInterface ui_;
 };
 
+  // constructor
+  ArithmeticFilterInterface::ArithmeticFilterInterface() :
+  private_(new ArithmeticFilterInterfacePrivate)
+  { }
 
-ArithmeticFilterInterface::ArithmeticFilterInterface() :
-private_(new ArithmeticFilterInterfacePrivate)
-{  
-  
-}
+  // destructor
+  ArithmeticFilterInterface::~ArithmeticFilterInterface()
+  { }
 
-ArithmeticFilterInterface::~ArithmeticFilterInterface()
-{
-}
-
-
-bool
-ArithmeticFilterInterface::build_widget(QFrame* frame)
-{
-  
-  private_->ui_.setupUi(frame);
-  
-  //varianceAdjuster = new SliderSpinCombo();
-//    private_->ui_.varianceHLayout_bottom->addWidget(varianceAdjuster);
-//    
-//    kernelWidthAdjuster = new SliderSpinCombo();
-//    private_->ui_.kernelHLayout_bottom->addWidget(kernelWidthAdjuster);
-  
-  
-  makeConnections();
-  SCI_LOG_DEBUG("Finished building an Arithmetic Filter Interface");
-  
-  return (true);
-}
-
-void 
-ArithmeticFilterInterface::makeConnections()
-{
-}
-
-//  --- Private slots for custom signals ---  //
-void ArithmeticFilterInterface::senseVolumeAChanged(int active)
-{
-  Q_EMIT volumeAChanged( active );
-}
-
-void ArithmeticFilterInterface::senseVolumeBChanged(int active)
-{
-  Q_EMIT volumeBChanged( active );
-}
-
-void ArithmeticFilterInterface::senseVolumeCChanged(int active)
-{
-  Q_EMIT volumeCChanged( active );
-}
-
-
-void ArithmeticFilterInterface::senseFilterRun()
-{
-  if(private_->ui_.replaceCheckBox->isChecked())
+  // build the interface and connect it to the state manager
+  bool
+  ArithmeticFilterInterface::build_widget(QFrame* frame)
   {
-    Q_EMIT filterRun(true);
-  }
-  else
-  {
-    Q_EMIT filterRun(false);
-  }
-}
-  
-//  --- Public slots for setting widget values ---  //
-void ArithmeticFilterInterface::setVolumeA(int active)
-{
-  private_->ui_.volumeAComboBox->setCurrentIndex(active);
-}
+    //Step 1 - build the Qt GUI Widget
+    private_->ui_.setupUi(frame);
 
-void ArithmeticFilterInterface::addToVolumeA(QStringList &items)
-{
-  private_->ui_.volumeAComboBox->addItems(items);
-}
-  
-void ArithmeticFilterInterface::setVolumeB(int active)
-{
-  private_->ui_.volumeBComboBox->setCurrentIndex(active);
-}
+    //Step 2 - get a pointer to the tool
+    ToolHandle base_tool_ = tool();
+    ArithmeticFilter* tool = dynamic_cast<ArithmeticFilter*>(base_tool_.get());
+    
+    //Step 3 - connect the gui to the tool through the QtBridge
+    QtBridge::connect(private_->ui_.volumeAComboBox, tool->volume_a_);
+    QtBridge::connect(private_->ui_.volumeBComboBox, tool->volume_b_);
+    QtBridge::connect(private_->ui_.volumeCComboBox, tool->volume_c_);
+    QtBridge::connect(private_->ui_.exampleExpComboBox, tool->example_expressions_);
+    QtBridge::connect(private_->ui_.replaceCheckBox,tool->replace_);
 
-void ArithmeticFilterInterface::addToVolumeB(QStringList &items)
-{
-  private_->ui_.volumeBComboBox->addItems(items);
-}
+    //Send a message to the log that we have finised with building the Arithmetic Filter
+    SCI_LOG_DEBUG("Finished building an Arithmetic Filter Interface");
+    
+    return (true);
+  } // end build_widget
 
-void ArithmeticFilterInterface::setVolumeC(int active)
-{
-  private_->ui_.volumeCComboBox->setCurrentIndex(active);
-}
-
-void ArithmeticFilterInterface::addToVolumeC(QStringList &items)
-{
-  private_->ui_.volumeCComboBox->addItems(items);
-}
-  
-void ArithmeticFilterInterface::addToSampleExpressions(QStringList &items)
-{
-  private_->ui_.comboBox->addItems(items);
-}
-
-void ArithmeticFilterInterface::addToExpressions(QStringList &items)
-{
-  //private_->ui_.comboBox->addItems(items);
-}
-  
-  
+ 
   
 } //end seg3d

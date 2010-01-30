@@ -41,115 +41,102 @@ namespace Seg3D {
 
 //  --- Start constructors ---  //
 SliderSpinComboInt::SliderSpinComboInt( QWidget *parent )
-    : QWidget( parent )
+  : QWidget( parent )
 {
     buildWidget();
     makeConnections();
     setRanges( 1, 100);
     setStep(1);
     setCurrentValue( 1 );
-    
 }
-
-//SliderSpinComboInt::SliderSpinComboInt( QWidget *parent, double minRange, double maxRange, double startValue, double stepSize )
-//    : QWidget( parent )
-//{
-//    buildWidget();
-//    makeConnections();
-//    setRanges( minRange, maxRange);
-//    setStep(stepSize);
-//    setCurrentValue( startValue );
-//    
-//}
-//
-//SliderSpinComboInt::SliderSpinComboInt( QWidget *parent, double minRange, double maxRange, double stepSize )
-//    : QWidget( parent )
-//{
-//    buildWidget();
-//    makeConnections();
-//    setRanges( minRange, maxRange);
-//    setStep(stepSize);
-//    setCurrentValue( minRange );
-//    
-//}
-//  --- End Constructors ---  //
 
 
 //  --- function for visually building the widget ---  //
-void SliderSpinComboInt::buildWidget()
-{
-    vLayout = new QVBoxLayout( this );
-    vLayout->setSpacing( 0 );
-    vLayout->setContentsMargins( 0, 0, 0, 0 );
+  void SliderSpinComboInt::buildWidget()
+  {
+    mainLayout = new QHBoxLayout(this);
+    mainLayout->setSpacing(2);
+    mainLayout->setObjectName(QString::fromUtf8("mainLayout"));
+    mainLayout->setContentsMargins(0,0,2,0);
 
-    hTopLayout = new QHBoxLayout();
-    hTopLayout->setSpacing( 0 );
-    hTopLayout->setContentsMargins( 0, 0, 0, 0 );
+    sliderSideLayout = new QVBoxLayout();
+    sliderSideLayout->setSpacing(0);
+    sliderSideLayout->setObjectName(QString::fromUtf8("sliderSideLayout"));
+    sliderSideLayout->setContentsMargins(0,0,0,0);
 
-    slider = new QSlider;
-    slider->setOrientation( Qt::Horizontal );
-    slider->setFocusPolicy( Qt::StrongFocus );
-    slider->setTickPosition( QSlider::TicksBelow );
+    slider = new QSlider(this);
+    slider->setObjectName(QString::fromUtf8("slider"));
+    slider->setOrientation(Qt::Horizontal);
+    slider->setTickPosition(QSlider::TicksBelow);
 
-    hTopLayout->addWidget( slider );
+    sliderSideLayout->addWidget(slider);
 
-    spinner = new QSpinBox;
-    //spinner->setDecimals( 0 );
-    spinner->setFocusPolicy( Qt::StrongFocus );
-    hTopLayout->addWidget( spinner );
+    labelLayout = new QHBoxLayout();
+    labelLayout->setSpacing(0);
+    labelLayout->setObjectName(QString::fromUtf8("labelLayout"));
+    labelLayout->setContentsMargins(2,0,6,0);
 
-    vLayout->addLayout( hTopLayout );
+    minValueLabel = new QLabel(this);
+    minValueLabel->setObjectName(QString::fromUtf8("minValueLabel"));
+    minValueLabel->setMinimumSize(QSize(0,12));
+    minValueLabel->setMaximumSize(QSize(16777215,12));
 
-    hBottomLayout = new QHBoxLayout();
-    hBottomLayout->setSpacing( 0 );
-    hBottomLayout->setContentsMargins( 0,0,0,0 );
+    labelLayout->addWidget(minValueLabel);
 
-    minValueLabel = new QLabel( this );
-    QFont labelFont;
-    labelFont.setPointSize( 10) ;
-    minValueLabel->setFont( labelFont );
-    minValueLabel->setStyleSheet( QString::fromUtf8("padding-left: -2px; margin-left: 0px;") );
+    maxValueLabel = new QLabel(this);
+    maxValueLabel->setObjectName(QString::fromUtf8("maxValueLabel"));
+    maxValueLabel->setMinimumSize(QSize(0,12));
+    maxValueLabel->setMaximumSize(QSize(16777215,12));
+    maxValueLabel->setLayoutDirection(Qt::RightToLeft);
 
-    hBottomLayout->addWidget(minValueLabel);
+    labelLayout->addWidget(maxValueLabel);
 
-    maxValueLabel = new QLabel( this );
-    maxValueLabel->setFont( labelFont );
-    maxValueLabel->setAlignment( Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter );
+    sliderSideLayout->addLayout(labelLayout);
 
-    hBottomLayout->addWidget( maxValueLabel );
+    mainLayout->addLayout(sliderSideLayout);
 
-    spacer = new QSpacerItem( 62, 20, QSizePolicy::Fixed, QSizePolicy::Minimum );
-    hBottomLayout->addItem( spacer );
+    spinnerSideLayout = new QVBoxLayout();
+    spinnerSideLayout->setSpacing(0);
+    spinnerSideLayout->setObjectName(QString::fromUtf8("spinnerSideLayout"));
+    spinnerSideLayout->setContentsMargins(0,0,0,0);
+    spinner = new QSpinBox(this);
+    spinner->setObjectName(QString::fromUtf8("spinner"));
 
-    vLayout->addLayout( hBottomLayout );
+    spinnerSideLayout->addWidget(spinner);
 
-}
+    verticalSpacer = new QSpacerItem(10, 15, QSizePolicy::Fixed, QSizePolicy::Fixed);
+
+    spinnerSideLayout->addItem(verticalSpacer);
+
+    mainLayout->addLayout(spinnerSideLayout);
+  } // end buildWidget
 
 
-//  --- Private slots --- //
-void SliderSpinComboInt::setSliderValue( int value )
-{
+  //  --- Private slots --- //
+  void SliderSpinComboInt::setSliderValue( int value )
+  {
     setCurrentValue( value );
     Q_EMIT valueAdjusted( value );
-}
-void SliderSpinComboInt::setSpinnerValue( int value )
-{
+  } // end setSliderValue
+
+
+  void SliderSpinComboInt::setSpinnerValue( int value )
+  {
     setCurrentValue( value );
-}
+  } // end setSpinnerValue
 
 
-//  --- function for setting up signals and slots ---  //
-void SliderSpinComboInt::makeConnections()
-{
-  // --- connect the slider and spinner
+  //  --- function for setting up signals and slots ---  //
+  void SliderSpinComboInt::makeConnections()
+  {
+    // --- connect the slider and spinner
     connect( slider,  SIGNAL( valueChanged( int )),    this, SLOT( setSliderValue( int )));
     connect( spinner, SIGNAL( valueChanged( int )), this, SLOT( setSpinnerValue( int )));
+  } // end makeConnections
 
-}
-
-//  --- setters ---  //
-void SliderSpinComboInt::setRanges( int lower, int upper)
-{
+  //  --- setters ---  //
+  void SliderSpinComboInt::setRanges( int lower, int upper)
+  {
 
     slider->setRange(lower, upper);
     spinner->setRange(lower, upper);
@@ -159,27 +146,27 @@ void SliderSpinComboInt::setRanges( int lower, int upper)
         slider->setPageStep((upper - lower)/10);
     }
 
-    valueString = QString().sprintf("%d", lower);
+    QString valueString = QString().sprintf("%d", lower);
     minValueLabel->setText(valueString);
 
     valueString = QString().sprintf("%d", upper);
     maxValueLabel->setText(valueString);
 
-}
+  } // end setRanges
 
-void SliderSpinComboInt::setStep(int stepSize)
-{
+  void SliderSpinComboInt::setStep(int stepSize)
+  {
     slider->setSingleStep(stepSize);
-}
+  } // end setStep
 
-void SliderSpinComboInt::setCurrentValue(int currentValue)
-{
+  void SliderSpinComboInt::setCurrentValue(int currentValue)
+  {
     slider->setValue(currentValue);
     spinner->setValue(currentValue);
-}
+  } // end setCurrentValue
 
-//virtual destructor
-SliderSpinComboInt::~SliderSpinComboInt()
-{}
+  //virtual destructor
+  SliderSpinComboInt::~SliderSpinComboInt()
+  {}
   
 } // namespace Seg3D

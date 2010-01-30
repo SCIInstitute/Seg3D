@@ -44,40 +44,40 @@ namespace Seg3D {
 
 class SliderSpinComboDouble : public QWidget
 {
-    Q_OBJECT
+  Q_OBJECT
 
-    Q_SIGNALS:
-        void valueAdjusted(double);
+  Q_SIGNALS:
+    void valueAdjusted(double);
 
-    public:
-        SliderSpinComboDouble(QWidget *parent = 0);
-        virtual ~SliderSpinComboDouble();
+  public:
+    SliderSpinComboDouble(QWidget* parent = 0);
+    virtual ~SliderSpinComboDouble();
 
-    public Q_SLOTS:
-        void setStep(double);
-        void setRanges(double, double);
-        void setCurrentValue(double);
+  public Q_SLOTS:
+    void setStep(double);
+    void setRanges(double, double);
+    void setCurrentValue(double);
 
-    private:
-        QVBoxLayout *vLayout;
-        QHBoxLayout *hTopLayout;
-        QHBoxLayout *hBottomLayout;
+  private:
+    QHBoxLayout* mainLayout;
+    QHBoxLayout* labelLayout;
+    QVBoxLayout* sliderSideLayout;
+    QVBoxLayout* spinnerSideLayout;
+    
+    QSpacerItem* verticalSpacer;
+    
+    QSlider* slider;
+    QDoubleSpinBox* spinner;
+    
+    QLabel* minValueLabel;
+    QLabel* maxValueLabel;
 
-        QSpacerItem *spacer;
+    void buildWidget();
+    void makeConnections();
 
-        QLabel *minValueLabel;
-        QLabel *maxValueLabel;
-        QString valueString;
-
-        QSlider *slider;
-        QDoubleSpinBox *spinner;
-
-        void buildWidget();
-        void makeConnections();
-
-    private Q_SLOTS:
-        void setSliderValue(int);
-        void setSpinnerValue(double);
+  private Q_SLOTS:
+    void setSliderValue(int);
+    void setSpinnerValue(double);
 };
 
 } // end namespace Seg3D

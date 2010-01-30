@@ -44,44 +44,41 @@ namespace Seg3D {
 
 class SliderSpinComboInt : public QWidget
 {
-    Q_OBJECT
+  Q_OBJECT
 
-    Q_SIGNALS:
-        //void valueAdjusted(double);
-        void valueAdjusted(int);
+  Q_SIGNALS:
+    void valueAdjusted(int);
 
-    public:
-        SliderSpinComboInt(QWidget *parent = 0);
-        //SliderSpinComboInt(QWidget *parent, double minRange, double maxRange, double startValue, double stepSize);
-        //SliderSpinComboInt(QWidget *parent, double minRange, double maxRange, double stepSize);
+  public:
+    SliderSpinComboInt(QWidget *parent = 0);
+      
+  virtual ~SliderSpinComboInt();
 
-    virtual ~SliderSpinComboInt();
+  public Q_SLOTS:
+    void setStep(int);
+    void setRanges(int, int);
+    void setCurrentValue(int);
 
-    public Q_SLOTS:
-        void setStep(int);
-        void setRanges(int, int);
-        void setCurrentValue(int);
+  private:
+    QHBoxLayout* mainLayout;
+    QHBoxLayout* labelLayout;
+    QVBoxLayout* sliderSideLayout;
+    QVBoxLayout* spinnerSideLayout;
+    
+    QSpacerItem* verticalSpacer;
+    
+    QSlider* slider;
+    QSpinBox* spinner;
+    
+    QLabel* minValueLabel;
+    QLabel* maxValueLabel;
 
-    private:
-        QVBoxLayout *vLayout;
-        QHBoxLayout *hTopLayout;
-        QHBoxLayout *hBottomLayout;
+    void buildWidget();
+    void makeConnections();
 
-        QSpacerItem *spacer;
-
-        QLabel *minValueLabel;
-        QLabel *maxValueLabel;
-        QString valueString;
-
-        QSlider *slider;
-        QSpinBox *spinner;
-
-        void buildWidget();
-        void makeConnections();
-
-    private Q_SLOTS:
-        void setSliderValue(int);
-        void setSpinnerValue(int);
+  private Q_SLOTS:
+    void setSliderValue(int);
+    void setSpinnerValue(int);
 };
 
 } // end namespace Seg3D

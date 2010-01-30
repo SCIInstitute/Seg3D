@@ -35,7 +35,9 @@
 // Base class of the tool widget
 #include <Interface/AppInterface/ToolWidget.h>
 
-#include <Interface/ToolInterface/CustomWidgets/SliderSpinCombo.h>
+// Qt Gui Includes
+#include <Interface/ToolInterface/CustomWidgets/SliderSpinComboInt.h>
+#include <Interface/ToolInterface/CustomWidgets/SliderSpinComboDouble.h>
 
 namespace Seg3D {
   
@@ -44,48 +46,20 @@ class AnisotropicDiffusionFilterInterfacePrivate;
 class AnisotropicDiffusionFilterInterface : public ToolWidget {
   Q_OBJECT
 
-  Q_SIGNALS:
-    void activeChanged(int);
-    void iterationsChanged(int);
-    void stepChanged(double);
-    void conductanceChanged(int);
-    void filterRun(bool);
-  
-  public Q_SLOTS:
-    void setActive(int);
-    void addToActive(QStringList&);
-    void setIterations(int);
-    void setIterationRange(int, int);
-    void setStep(double);
-    void setStepRange(double, double);
-    void setConductance(int);
-    void setConductanceRange(int, int);
-  
-  
-  
+ // Constructor/destructor 
   public:
     AnisotropicDiffusionFilterInterface();
     virtual ~AnisotropicDiffusionFilterInterface();
+
     virtual bool build_widget(QFrame* frame);
     
   private:
     AnisotropicDiffusionFilterInterfacePrivate* private_;
-    SliderSpinCombo *iterationsAdjuster;
-    SliderSpinCombo *stepAdjuster;
-    SliderSpinCombo *conductanceAdjuster;
-    void makeConnections();
-  
-  private Q_SLOTS:
-    void senseActiveChanged(int);
-    void senseIterationsChanged(int);
-    void senseStepChanged(double);
-    void senseConductanceChanged(int);
-    void senseFilterRun();
-  
+    SliderSpinComboInt *iterationsAdjuster;
+    SliderSpinComboInt *stepAdjuster;
+    SliderSpinComboDouble *conductanceAdjuster;
   
 };
-
-
 
 } // namespace Seg3D
 

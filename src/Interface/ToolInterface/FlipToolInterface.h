@@ -32,7 +32,7 @@
 // Application includes
 #include <Application/Tool/ToolFactory.h>
 
-// Base class of the tool widget
+// Base class of the tool widget include
 #include <Interface/AppInterface/ToolWidget.h>
 
 
@@ -43,43 +43,17 @@ class FlipToolInterfacePrivate;
 class FlipToolInterface : public ToolWidget {
   Q_OBJECT
 
-Q_SIGNALS:
-  void activeChanged(int);
-  void flipAxial();
-  void flipCoronal();
-  void flipSagittal();
-  void rotateAxialCoronal();
-  void rotateAxialSagittal();
-  void rotateSagittalAxial();
-  
-public:
-  FlipToolInterface();
-  virtual ~FlipToolInterface();
-  virtual bool build_widget(QFrame* frame);
-  
-public Q_SLOTS:
-  void setActive(int);
-  void addToActive(QStringList&);
+  // Constructor/destructor  
+  public:
+    FlipToolInterface();
+    virtual ~FlipToolInterface();
+    virtual bool build_widget(QFrame* frame);
 
-private:
-  FlipToolInterfacePrivate* private_;
-  void makeConnections();
-  
-private Q_SLOTS:
-  void senseActiveChanged(int);
-  void senseFlipAxial();
-  void senseFlipCoronal();
-  void senseFlipSagittal();
-  void senseRotateAxialCoronal();
-  void senseRotateAxialSagital();
-  void senseRotateSagittalAxial();
-
+  private:
+    FlipToolInterfacePrivate* private_;
 
 };    
 
-
-
-  
-} // namespace Seg3D
+} // end namespace Seg3D
 
 #endif

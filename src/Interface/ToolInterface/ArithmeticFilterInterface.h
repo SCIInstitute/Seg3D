@@ -35,8 +35,6 @@
 // Base class of the tool widget
 #include <Interface/AppInterface/ToolWidget.h>
 
-#include <Interface/ToolInterface/CustomWidgets/SliderSpinCombo.h>
-
 namespace Seg3D {
   
 class ArithmeticFilterInterfacePrivate;
@@ -44,43 +42,15 @@ class ArithmeticFilterInterfacePrivate;
 class ArithmeticFilterInterface : public ToolWidget {
   Q_OBJECT
 
-Q_SIGNALS:
-  void filterRun(bool);
-  void volumeAChanged(int);
-  void volumeBChanged(int);
-  void volumeCChanged(int);
-  
-public Q_SLOTS:
-  void setVolumeA(int);
-  void addToVolumeA(QStringList&);
-  void setVolumeB(int);
-  void addToVolumeB(QStringList&);
-  void setVolumeC(int);
-  void addToVolumeC(QStringList&);
-  void addToSampleExpressions(QStringList&);
-  void addToExpressions(QStringList&);
-  
-public:
-  ArithmeticFilterInterface();
-  virtual ~ArithmeticFilterInterface();
-  virtual bool build_widget(QFrame* frame);
-  
-private:
-  ArithmeticFilterInterfacePrivate* private_;
-  void makeConnections();
-  
-private Q_SLOTS:
-  void senseFilterRun();
-  void senseVolumeAChanged(int);
-  void senseVolumeBChanged(int);
-  void senseVolumeCChanged(int);
-  
-  
-  
-  
-  
-  
-  
+// Constructor/destructor
+  public:
+    ArithmeticFilterInterface();
+    virtual ~ArithmeticFilterInterface();
+    virtual bool build_widget(QFrame* frame);
+    
+  private:
+    ArithmeticFilterInterfacePrivate* private_;
+   
 };
 
 

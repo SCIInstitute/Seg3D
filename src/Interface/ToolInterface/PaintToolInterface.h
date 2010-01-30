@@ -32,9 +32,10 @@
 // Application includes
 #include <Application/Tool/ToolFactory.h>
 
-// Base class of the tool widget
+// Base class of the tool widget include
 #include <Interface/AppInterface/ToolWidget.h>
 
+// Qt Gui Includes
 #include <Interface/ToolInterface/CustomWidgets/SliderSpinComboInt.h>
 #include <Interface/ToolInterface/CustomWidgets/SliderSpinComboDouble.h>
 
@@ -45,52 +46,18 @@ class PaintToolInterfacePrivate;
 class PaintToolInterface : public ToolWidget {
   Q_OBJECT
   
-  Q_SIGNALS:
-    void activeChanged(QString);
-    void maskChanged(QString);
-    void eraseModeChanged(bool);
-    void paintBrushSizeChanged(int);
-    void upperThresholdChanged(double);
-    void lowerThresholdChanged(double);
-  
-  
-  public Q_SLOTS:
-    void setActive(int);
-    void addToActive(QStringList&);
-    void setMask(int);
-    void addToMask(QStringList&);
-    void setPaintBrushSize(int);
-    void setLowerThreshold(double, double);
-    void setLowerThresholdStep(double);
-    void setUpperThreshold(double, double);
-    void setUpperThresholdStep(double);
-  
-  
+// Constructor/destructor
   public:
     PaintToolInterface();
     virtual ~PaintToolInterface();
-    virtual bool build_widget(QFrame* frame);
 
+    virtual bool build_widget(QFrame* frame);
 
   private:
     PaintToolInterfacePrivate* private_;
-    
     SliderSpinComboInt *paintBrushAdjuster;
     SliderSpinComboDouble *upperThresholdAdjuster;
     SliderSpinComboDouble *lowerThresholdAdjuster;
-    
-    void makeConnections();
-  
-  private Q_SLOTS:
-    void senseActiveChanged(QString);
-    void senseMaskChanged(QString);
-    
-    void senseEraseModeChanged(bool);
-    
-    void sensePaintBrushSizeChanged(double);
-    void senseUpperThresholdChanged(double);
-    void senselowerThresholdChanged(double);
-  
   
 };
 
