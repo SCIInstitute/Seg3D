@@ -41,9 +41,9 @@ Tool(toolid)
 {
   // Need to set ranges and default values for all parameters
   add_state("target",target_layer_,"<none>","<none>");
-  add_state("iterations_",iterations_,1,100,1,2);
-  add_state("steps_",steps_,1,100,1,2);
-  add_state("conductance_",conductance_,0.0f,100.0f,01.0f,1.0f);
+  add_state("iterations",iterations_,1,100,1,2);
+  add_state("steps",steps_,1,100,1,2);
+  add_state("conductance",conductance_,0.0f,100.0f,01.0f,1.0f);
   add_state("replace",replace_,false);
   
   // Add constaints, so that when the state changes the right ranges of 

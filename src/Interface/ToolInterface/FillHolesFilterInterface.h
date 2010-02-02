@@ -38,37 +38,21 @@
 
 namespace Seg3D {
   
-  class FillHolesFilterInterfacePrivate;
-  
-  class FillHolesFilterInterface : public ToolWidget {
-    Q_OBJECT
-    
-  Q_SIGNALS:
-    void activeChanged(int);
-    
+class FillHolesFilterInterfacePrivate;
+
+class FillHolesFilterInterface : public ToolWidget {
+  Q_OBJECT
+         
   public:
     FillHolesFilterInterface();
     virtual ~FillHolesFilterInterface();
     virtual bool build_widget(QFrame* frame);
-    
-    public Q_SLOTS:
-    void setActive(int);
-    void addToActive(QStringList&);
-    
-    
+
   private:
-    FillHolesFilterInterfacePrivate* private_;
-    void makeConnections();
-    
-    
-    private Q_SLOTS:
-    void senseActiveChanged(int);
-    
-    
-    
-    
-  };
+    FillHolesFilterInterfacePrivate* private_;   
+
+};
   
-} // namespace Seg3D
+} // end namespace Seg3D
 
 #endif

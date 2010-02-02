@@ -24,70 +24,53 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
- */
+*/
 
+//Interface Includes
+#include <Interface/QtInterface/QtBridge.h>
 
-
-#include "FillHolesFilterInterface.h"
+//Qt Gui Includes
+#include <Interface/ToolInterface/FillHolesFilterInterface.h>
 #include "ui_FillHolesFilterInterface.h"
 
+//Application Includes
+#include <Application/Tools/FillHolesFilter.h>
 
 namespace Seg3D {
   
   SCI_REGISTER_TOOLINTERFACE(FillHolesFilterInterface)
   
-  class FillHolesFilterInterfacePrivate {
-  public:
-    Ui::FillHolesFilterInterface ui_;
-  };
+class FillHolesFilterInterfacePrivate {
+public:
+  Ui::FillHolesFilterInterface ui_;
+};
   
+  // constructor
   FillHolesFilterInterface::FillHolesFilterInterface() :
   private_(new FillHolesFilterInterfacePrivate)
-  {
-    
-  }
+  { }
   
+  // destructor
   FillHolesFilterInterface::~FillHolesFilterInterface()
-  {
-  }
+  { }
   
-  
+  // build the interface and connect it to the state manager
   bool
   FillHolesFilterInterface::build_widget(QFrame* frame)
   {
+    //Step 1 - build the Qt GUI Widget
     private_->ui_.setupUi(frame);
+
+    //Step 2 - get a pointer to the tool
+    ToolHandle base_tool_ = tool();
+    FillHolesFilter* tool = dynamic_cast<FillHolesFilter*>(base_tool_.get());
     
+    //Step 3 - connect the gui to the tool through the QtBridge
+    QtBridge::connect(private_->ui_.targetComboBox, tool->target_layer_);
+    
+    //Send a message to the log that we have finised with building the Fill Holes Filter Interface"
     SCI_LOG_DEBUG("Finished building a Fill Holes Filter Interface");
     return (true);
-    
-  }
-  
-  //  --- Function for making signal slots connections ---  //
-  void 
-  FillHolesFilterInterface::makeConnections()
-  {
-    connect(private_->ui_.activeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(senseActiveChanged(int)));
-    
-  }
-  
-  
-  //  --- Private slots for custom signals ---  //
-  void FillHolesFilterInterface::senseActiveChanged(int active)
-  {
-    Q_EMIT activeChanged(active);
-  }
-  
-  
-  //  --- Public slots for setting widget values ---  //
-  void FillHolesFilterInterface::setActive(int active)
-  {
-    private_->ui_.activeComboBox->setCurrentIndex(active);
-  }
-  
-  void FillHolesFilterInterface::addToActive(QStringList &items)
-  {
-    private_->ui_.activeComboBox->addItems(items);
-  }
-  
-  
-} // namespace Seg3D
+  } // end build_widget
+   
+} // end namespace Seg3D

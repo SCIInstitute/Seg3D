@@ -24,79 +24,68 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
- */
+*/
 
+//Interface Includes
+#include <Interface/QtInterface/QtBridge.h>
 
-
-#include "HistogramEqualizationFilterInterface.h"
+//Qt Gui Includes
+#include <Interface/ToolInterface/HistogramEqualizationFilterInterface.h>
 #include "ui_HistogramEqualizationFilterInterface.h"
+
+//Application Includes
+#include <Application/Tools/HistogramEqualizationFilter.h>
 
 
 namespace Seg3D {
   
   SCI_REGISTER_TOOLINTERFACE(HistogramEqualizationFilterInterface)
+
+class HistogramEqualizationFilterInterfacePrivate {
+public:
+  Ui::HistogramEqualizationFilterInterface ui_;
+};
   
-  class HistogramEqualizationFilterInterfacePrivate {
-  public:
-    Ui::HistogramEqualizationFilterInterface ui_;
-  };
-  
+  // constructor
   HistogramEqualizationFilterInterface::HistogramEqualizationFilterInterface() :
   private_(new HistogramEqualizationFilterInterfacePrivate)
-  {
-    
-  }
-  
+  { }
+
+  // destructor
   HistogramEqualizationFilterInterface::~HistogramEqualizationFilterInterface()
-  {
-  }
+  { }
   
-  
+  // build the interface and connect it to the state manager
   bool
   HistogramEqualizationFilterInterface::build_widget(QFrame* frame)
   {
+    //Step 1 - build the Qt GUI Widget
     private_->ui_.setupUi(frame);
-        
-    upperThresholdAdjuster = new SliderSpinCombo();
-    private_->ui_.upperHLayout_bottom->addWidget(upperThresholdAdjuster);
     
-    lowerThresholdAdjuster = new SliderSpinCombo();
-    private_->ui_.lowerHLayout_bottom->addWidget(lowerThresholdAdjuster);
+      //Add the SliderSpinCombos
+      upperThresholdAdjuster = new SliderSpinComboInt();
+      private_->ui_.upperHLayout_bottom->addWidget(upperThresholdAdjuster);
+      
+      lowerThresholdAdjuster = new SliderSpinComboInt();
+      private_->ui_.lowerHLayout_bottom->addWidget(lowerThresholdAdjuster);
+      
+      alphaAdjuster = new SliderSpinComboInt();
+      private_->ui_.alphaHLayout_bottom->addWidget(alphaAdjuster);
+
+    //Step 2 - get a pointer to the tool
+    ToolHandle base_tool_ = tool();
+    HistogramEqualizationFilter* tool = dynamic_cast<HistogramEqualizationFilter*>(base_tool_.get());
+   
+    //Step 3 - connect the gui to the tool through the QtBridge
+    QtBridge::connect(private_->ui_.targetComboBox, tool->target_layer_);
+    QtBridge::connect(upperThresholdAdjuster, tool->upper_threshold_);
+    QtBridge::connect(lowerThresholdAdjuster, tool->lower_threshold_);
+    QtBridge::connect(alphaAdjuster, tool->alpha_);
+    QtBridge::connect(private_->ui_.replaceCheckBox,tool->replace_)
     
-    alphaAdjuster = new SliderSpinCombo();
-    private_->ui_.alphaHLayout_bottom->addWidget(alphaAdjuster);
-    
+      //Send a message to the log that we have finised with building the Histogram Equalization Filter Interface
     SCI_LOG_DEBUG("Finished building a Histogram Equalization Filter Interface");
     return (true);
-    
-  }
+  } // end build_widget
   
-  //  --- Function for making signal slots connections ---  //
-  void 
-  HistogramEqualizationFilterInterface::makeConnections()
-  {
-    connect(private_->ui_.activeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(senseActiveChanged(int)));
-    
-  }
-  
-  
-  //  --- Private slots for custom signals ---  //
-  void HistogramEqualizationFilterInterface::senseActiveChanged(int active)
-  {
-    Q_EMIT activeChanged(active);
-  }
-  
-  
-  //  --- Public slots for setting widget values ---  //
-  void HistogramEqualizationFilterInterface::setActive(int active)
-  {
-    private_->ui_.activeComboBox->setCurrentIndex(active);
-  }
-  
-  void HistogramEqualizationFilterInterface::addToActive(QStringList &items)
-  {
-    private_->ui_.activeComboBox->addItems(items);
-  }
-  
-  
-} // namespace Seg3D
+} // end namespace Seg3D

@@ -35,7 +35,7 @@
 // Base class of the tool widget
 #include <Interface/AppInterface/ToolWidget.h>
 
-#include <Interface/ToolInterface/CustomWidgets/SliderSpinCombo.h>
+#include <Interface/ToolInterface/CustomWidgets/SliderSpinComboInt.h>
 
 namespace Seg3D {
   
@@ -43,45 +43,19 @@ class DiscreteGaussianFilterInterfacePrivate;
 
 class DiscreteGaussianFilterInterface : public ToolWidget {
   Q_OBJECT
-  
-Q_SIGNALS:
-  void activeChanged(int);
-  void varianceChanged(double);
-  void kernelWidthChanged(int);
-  void filterRun(bool);
-  
-  
-public Q_SLOTS:
-  void setActive(int);
-  void addToActive(QStringList&);
-  void setVariance(double);
-  void setVarianceRange(int, int);
-  void setKernel(int);
-  void setKernelRange(int, int);
 
-public:
-  DiscreteGaussianFilterInterface();
-  virtual ~DiscreteGaussianFilterInterface();
-  virtual bool build_widget(QFrame* frame);
-  
-private:
-  DiscreteGaussianFilterInterfacePrivate* private_;
-  SliderSpinCombo *varianceAdjuster;
-  SliderSpinCombo *kernelWidthAdjuster;
-  void makeConnections();
-  
-private Q_SLOTS:
-  void senseActiveChanged(int);
-  void senseVarianceChanged(double);
-  void senseKernelWidthChanged(int);
-  void senseFilterRun();
-  
+  public:
+    DiscreteGaussianFilterInterface();
+    virtual ~DiscreteGaussianFilterInterface();
+    virtual bool build_widget(QFrame* frame);
+    
+  private:
+    DiscreteGaussianFilterInterfacePrivate* private_;
+    SliderSpinComboInt *varianceAdjuster;
+    SliderSpinComboInt *kernelWidthAdjuster;
   
 };
 
-
-  
-  
-} // namespace Seg3D
+} // end namespace Seg3D
 
 #endif

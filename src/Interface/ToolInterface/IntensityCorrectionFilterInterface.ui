@@ -51,7 +51,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="activeComboBox"/>
+      <widget class="QComboBox" name="targetComboBox"/>
      </item>
     </layout>
    </item>

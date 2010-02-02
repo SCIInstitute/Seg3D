@@ -39,7 +39,14 @@ namespace Seg3D {
   GradientMagnitudeFilter::GradientMagnitudeFilter(const std::string& toolid) :
   Tool(toolid)
   {
-    //TODO - add guts
+    // Need to set ranges and default values for all parameters
+    add_state("target",target_layer_,"<none>","<none>");
+    add_state("replace",replace_,false);
+
+    // Add constaints, so that when the state changes the right ranges of 
+    // parameters are selected
+    target_layer_->value_changed_signal.connect(boost::bind(&GradientMagnitudeFilter::target_constraint,this,_1));
+    
     
     
   }

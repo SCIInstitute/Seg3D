@@ -48,6 +48,7 @@ class SliderSpinComboInt : public QWidget
 
   Q_SIGNALS:
     void valueAdjusted(int);
+    void valueAdjustedContinuously(int);
 
   public:
     SliderSpinComboInt(QWidget *parent = 0);
@@ -77,8 +78,9 @@ class SliderSpinComboInt : public QWidget
     void makeConnections();
 
   private Q_SLOTS:
-    void setSliderValue(int);
-    void setSpinnerValue(int);
+    void signalGuiFromSlider(int);
+    void signalGuiFromSpinner(int);
+    void signalGuiFromSliderReleased();
 };
 
 } // end namespace Seg3D

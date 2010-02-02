@@ -49,14 +49,11 @@ public:
   // constructor
   ConfidenceConnectedFilterInterface::ConfidenceConnectedFilterInterface() :
   private_(new ConfidenceConnectedFilterInterfacePrivate)
-  {
-    
-  }
+  { }
   
   // destructor
   ConfidenceConnectedFilterInterface::~ConfidenceConnectedFilterInterface()
-  {
-  }
+  { }
   
   
   // build the interface and connect it to the state manager
@@ -65,7 +62,8 @@ public:
   {
     //Step 1 - build the Qt GUI Widget
     private_->ui_.setupUi(frame);
-        
+      
+      //Add the SliderSpinCombos
       iterationsAdjuster = new SliderSpinComboInt();
       private_->ui_.iterationsHLayout_bottom->addWidget(iterationsAdjuster);
       

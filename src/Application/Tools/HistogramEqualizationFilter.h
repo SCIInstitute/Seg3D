@@ -55,10 +55,14 @@ public:
 public:
   // Layerid of the target layer
   StateOptionHandle              target_layer_;
-  
-  
-  
-  
+
+  StateRangedIntHandle            upper_threshold_;
+
+  StateRangedIntHandle            lower_threshold_;
+
+  StateRangedIntHandle            alpha_;
+
+  StateBoolHandle                 replace_;
   
 };
 

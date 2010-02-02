@@ -34,45 +34,29 @@
 
 // Base class of the tool widget
 #include <Interface/AppInterface/ToolWidget.h>
-#include <Interface/ToolInterface/CustomWidgets/SliderSpinCombo.h>
+#include <Interface/ToolInterface/CustomWidgets/SliderSpinComboInt.h>
 
 
 namespace Seg3D {
   
-  class HistogramEqualizationFilterInterfacePrivate;
-  
-  class HistogramEqualizationFilterInterface : public ToolWidget {
-    Q_OBJECT
-    
-  Q_SIGNALS:
-    void activeChanged(int);
-    
+class HistogramEqualizationFilterInterfacePrivate;
+
+class HistogramEqualizationFilterInterface : public ToolWidget {
+  Q_OBJECT
+     
   public:
     HistogramEqualizationFilterInterface();
     virtual ~HistogramEqualizationFilterInterface();
     virtual bool build_widget(QFrame* frame);
-    
-    public Q_SLOTS:
-    void setActive(int);
-    void addToActive(QStringList&);
-    
-    
+
   private:
     HistogramEqualizationFilterInterfacePrivate* private_;
-    SliderSpinCombo *upperThresholdAdjuster;
-    SliderSpinCombo *lowerThresholdAdjuster;
-    SliderSpinCombo *alphaAdjuster;
-    void makeConnections();
-    
-    
-    private Q_SLOTS:
-    void senseActiveChanged(int);
-    
-    
-    
-    
+    SliderSpinComboInt *upperThresholdAdjuster;
+    SliderSpinComboInt *lowerThresholdAdjuster;
+    SliderSpinComboInt *alphaAdjuster;
+   
   };
   
-} // namespace Seg3D
+} // end namespace Seg3D
 
 #endif

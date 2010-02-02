@@ -42,31 +42,17 @@ namespace Seg3D {
   
   class ConnectedComponentFilterInterface : public ToolWidget {
     Q_OBJECT
-    
-  Q_SIGNALS:
-    void activeChanged(int);
+
     
   public:
     ConnectedComponentFilterInterface();
     virtual ~ConnectedComponentFilterInterface();
     virtual bool build_widget(QFrame* frame);
-    
-    public Q_SLOTS:
-    void setActive(int);
-    void addToActive(QStringList&);
-    
-    
+
   private:
     ConnectedComponentFilterInterfacePrivate* private_;
     void makeConnections();
-    
-    
-    private Q_SLOTS:
-    void senseActiveChanged(int);
-    
-    
-    
-    
+
   };
   
 } // namespace Seg3D

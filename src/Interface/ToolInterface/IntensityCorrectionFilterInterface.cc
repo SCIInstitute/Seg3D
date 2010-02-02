@@ -24,76 +24,65 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
- */
+*/
 
+//Interface Includes
+#include <Interface/QtInterface/QtBridge.h>
 
-
-#include "IntensityCorrectionFilterInterface.h"
+//Qt Gui Includes
+#include <Interface/ToolInterface/IntensityCorrectionFilterInterface.h>
 #include "ui_IntensityCorrectionFilterInterface.h"
 
+//Application Includes
+#include <Application/Tools/IntensityCorrectionFilter.h>
 
 namespace Seg3D {
   
   SCI_REGISTER_TOOLINTERFACE(IntensityCorrectionFilterInterface)
   
-  class IntensityCorrectionFilterInterfacePrivate {
-  public:
-    Ui::IntensityCorrectionFilterInterface ui_;
-  };
+class IntensityCorrectionFilterInterfacePrivate {
+public:
+  Ui::IntensityCorrectionFilterInterface ui_;
+};
   
+  // constructor
   IntensityCorrectionFilterInterface::IntensityCorrectionFilterInterface() :
   private_(new IntensityCorrectionFilterInterfacePrivate)
-  {
-    
-  }
+  { }
   
+  // destructor
   IntensityCorrectionFilterInterface::~IntensityCorrectionFilterInterface()
-  {
-  }
+  { }
   
-  
+   // build the interface and connect it to the state manager
   bool
   IntensityCorrectionFilterInterface::build_widget(QFrame* frame)
   {
+    //Step 1 - build the Qt GUI Widget
     private_->ui_.setupUi(frame);
         
-    orderAdjuster = new SliderSpinCombo();
-    private_->ui_.orderHLayout_bottom->addWidget(orderAdjuster);
+      //Add the SliderSpinCombos
+      orderAdjuster = new SliderSpinComboInt();
+      private_->ui_.orderHLayout_bottom->addWidget(orderAdjuster);
+      
+      edgeAdjuster = new SliderSpinComboInt();
+      private_->ui_.edgeHLayout_bottom->addWidget(edgeAdjuster);
+
+     //Step 2 - get a pointer to the tool
+    ToolHandle base_tool_ = tool();
+    IntensityCorrectionFilter* tool = dynamic_cast<IntensityCorrectionFilter*>(base_tool_.get());
+   
+      
+    //Step 3 - connect the gui to the tool through the QtBridge
+    QtBridge::connect(private_->ui_.targetComboBox, tool->target_layer_);
+    QtBridge::connect(orderAdjuster, tool->order_);
+    QtBridge::connect(edgeAdjuster, tool->edge_);
+    QtBridge::connect(private_->ui_.replaceCheckBox,tool->replace_)
     
-    edgeAdjuster = new SliderSpinCombo();
-    private_->ui_.edgeHLayout_bottom->addWidget(edgeAdjuster);
-    
+
+   //Send a message to the log that we have finised with building the tensity Correction Filter Interface
     SCI_LOG_DEBUG("Finished building an Intensity Correction Filter Interface");
     return (true);
     
-  }
-  
-  //  --- Function for making signal slots connections ---  //
-  void 
-  IntensityCorrectionFilterInterface::makeConnections()
-  {
-    connect(private_->ui_.activeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(senseActiveChanged(int)));
-    
-  }
-  
-  
-  //  --- Private slots for custom signals ---  //
-  void IntensityCorrectionFilterInterface::senseActiveChanged(int active)
-  {
-    Q_EMIT activeChanged(active);
-  }
-  
-  
-  //  --- Public slots for setting widget values ---  //
-  void IntensityCorrectionFilterInterface::setActive(int active)
-  {
-    private_->ui_.activeComboBox->setCurrentIndex(active);
-  }
-  
-  void IntensityCorrectionFilterInterface::addToActive(QStringList &items)
-  {
-    private_->ui_.activeComboBox->addItems(items);
-  }
-  
-  
+  } // end build_widget
 } // namespace Seg3D

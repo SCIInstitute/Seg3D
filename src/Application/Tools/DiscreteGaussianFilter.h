@@ -53,9 +53,14 @@ public:
 // -- state --
   public:
     // Layerid of the target layer
-    StateOptionHandle              target_layer_;
-  
+    StateOptionHandle               target_layer_;
 
+    // Variance
+    StateRangedIntHandle            variance_;
+
+    StateRangedIntHandle            maximum_kernel_width_;
+  
+    StateBoolHandle                 replace_;
 
 
 

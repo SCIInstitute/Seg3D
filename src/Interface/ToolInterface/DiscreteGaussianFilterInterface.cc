@@ -24,118 +24,64 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
- */
+*/
 
+//Interface Includes
+#include <Interface/QtInterface/QtBridge.h>
+
+//Qt Gui Includes
 #include <Interface/ToolInterface/DiscreteGaussianFilterInterface.h>
 #include "ui_DiscreteGaussianFilterInterface.h"
+
+//Application Includes
+#include <Application/Tools/DiscreteGaussianFilter.h>
 
 namespace Seg3D {
   
   SCI_REGISTER_TOOLINTERFACE(DiscreteGaussianFilterInterface)
   
   
-  class DiscreteGaussianFilterInterfacePrivate {
-  public:
-    Ui::DiscreteGaussianFilterInterface ui_;
-  };
+class DiscreteGaussianFilterInterfacePrivate {
+public:
+  Ui::DiscreteGaussianFilterInterface ui_;
+};
   
-  
-DiscreteGaussianFilterInterface::DiscreteGaussianFilterInterface() :
-private_(new DiscreteGaussianFilterInterfacePrivate)
-{  
-  
-}
+  // constructor
+  DiscreteGaussianFilterInterface::DiscreteGaussianFilterInterface() :
+  private_(new DiscreteGaussianFilterInterfacePrivate)
+  { }
 
-DiscreteGaussianFilterInterface::~DiscreteGaussianFilterInterface()
-{
-}
+  // destructor
+  DiscreteGaussianFilterInterface::~DiscreteGaussianFilterInterface()
+  { }
   
-  
-bool
-DiscreteGaussianFilterInterface::build_widget(QFrame* frame)
-{
-  
-  private_->ui_.setupUi(frame);
-  
-  varianceAdjuster = new SliderSpinCombo();
-  private_->ui_.varianceHLayout_bottom->addWidget(varianceAdjuster);
-  
-  kernelWidthAdjuster = new SliderSpinCombo();
-  private_->ui_.kernelHLayout_bottom->addWidget(kernelWidthAdjuster);
-
-  
-  makeConnections();
-  SCI_LOG_DEBUG("Finished building a Discrete Gaussian Filter Interface");
-  
-  return (true);
-}
-  
-void 
-DiscreteGaussianFilterInterface::makeConnections()
-{
-}
-
-//  --- Private slots for custom signals ---  //
-void DiscreteGaussianFilterInterface::senseActiveChanged(int active)
-{
-  Q_EMIT activeChanged( active );
-}
-
-void DiscreteGaussianFilterInterface::senseVarianceChanged(double variance)
-{
-  Q_EMIT varianceChanged(variance);
-}
-
-void DiscreteGaussianFilterInterface::senseKernelWidthChanged(int kernel)
-{
-  Q_EMIT kernelWidthChanged(kernel);
-}
-  
-void DiscreteGaussianFilterInterface::senseFilterRun()
-{
-  if(private_->ui_.replaceCheckBox->isChecked())
+  // build the interface and connect it to the state manager
+  bool
+  DiscreteGaussianFilterInterface::build_widget(QFrame* frame)
   {
-    Q_EMIT filterRun(true);
-  }
-  else
-  {
-    Q_EMIT filterRun(false);
-  }
-}
+    //Step 1 - build the Qt GUI Widget
+    private_->ui_.setupUi(frame);
+    
+      //Add the SliderSpinCombos
+      varianceAdjuster = new SliderSpinComboInt();
+      private_->ui_.varianceHLayout_bottom->addWidget(varianceAdjuster);
+      
+      kernelWidthAdjuster = new SliderSpinComboInt();
+      private_->ui_.kernelHLayout_bottom->addWidget(kernelWidthAdjuster);
+    
+    //Step 2 - get a pointer to the tool
+    ToolHandle base_tool_ = tool();
+    DiscreteGaussianFilter* tool = dynamic_cast<DiscreteGaussianFilter*>(base_tool_.get());
+    
+    //Step 3 - connect the gui to the tool through the QtBridge
+    QtBridge::connect(private_->ui_.targetComboBox, tool->target_layer_);
+    QtBridge::connect(varianceAdjuster, tool->variance_);
+    QtBridge::connect(kernelWidthAdjuster, tool->maximum_kernel_width_);
+    QtBridge::connect(private_->ui_.replaceCheckBox,tool->replace_);
+    
+    //Send a message to the log that we have finised with building the Discrete Gaussian Filter Interface
+    SCI_LOG_DEBUG("Finished building a Discrete Gaussian Filter Interface");
+    return (true);
+  } // end build_widget
   
-  
-  
-//  --- Public slots for setting widget values ---  //
-void DiscreteGaussianFilterInterface::setActive(int active)
-{
-  private_->ui_.activeComboBox->setCurrentIndex(active);
-}
-
-void DiscreteGaussianFilterInterface::addToActive(QStringList &items)
-{
-  private_->ui_.activeComboBox->addItems(items);
-}
-
-void DiscreteGaussianFilterInterface::setVariance(double variance)
-{
-  varianceAdjuster->setCurrentValue(variance);
-}
-
-void DiscreteGaussianFilterInterface::setVarianceRange(int lower, int upper)
-{
-  varianceAdjuster->setRanges(lower, upper);
-}
-
-void DiscreteGaussianFilterInterface::setKernel(int kernel)
-{
-  kernelWidthAdjuster->setCurrentValue(kernel);
-}
-
-void DiscreteGaussianFilterInterface::setKernelRange(int lower, int upper)
-{
-  kernelWidthAdjuster->setRanges(lower, upper);
-}
-
-
-  
-} // namespace Seg3D
+} // end namespace Seg3D

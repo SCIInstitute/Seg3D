@@ -34,42 +34,26 @@
 
 // Base class of the tool widget
 #include <Interface/AppInterface/ToolWidget.h>
-#include <Interface/ToolInterface/CustomWidgets/SliderSpinCombo.h>
+#include <Interface/ToolInterface/CustomWidgets/SliderSpinComboInt.h>
 
 
 namespace Seg3D {
   
-  class IntensityCorrectionFilterInterfacePrivate;
+class IntensityCorrectionFilterInterfacePrivate;
   
-  class IntensityCorrectionFilterInterface : public ToolWidget {
+class IntensityCorrectionFilterInterface : public ToolWidget {
     Q_OBJECT
-    
-  Q_SIGNALS:
-    void activeChanged(int);
+
     
   public:
     IntensityCorrectionFilterInterface();
     virtual ~IntensityCorrectionFilterInterface();
     virtual bool build_widget(QFrame* frame);
     
-    public Q_SLOTS:
-    void setActive(int);
-    void addToActive(QStringList&);
-    
-    
   private:
     IntensityCorrectionFilterInterfacePrivate* private_;
-    SliderSpinCombo *orderAdjuster;
-    SliderSpinCombo *edgeAdjuster;
-    void makeConnections();
-    
-    
-    private Q_SLOTS:
-    void senseActiveChanged(int);
-    
-    
-    
-    
+    SliderSpinComboInt *orderAdjuster;
+    SliderSpinComboInt *edgeAdjuster;
   };
   
 } // namespace Seg3D

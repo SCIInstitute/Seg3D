@@ -38,37 +38,23 @@
 
 namespace Seg3D {
   
-  class GradientMagnitudeFilterInterfacePrivate;
-  
-  class GradientMagnitudeFilterInterface : public ToolWidget {
-    Q_OBJECT
-    
-  Q_SIGNALS:
-    void activeChanged(int);
+class GradientMagnitudeFilterInterfacePrivate;
+
+class GradientMagnitudeFilterInterface : public ToolWidget {
+  Q_OBJECT
+
     
   public:
     GradientMagnitudeFilterInterface();
     virtual ~GradientMagnitudeFilterInterface();
     virtual bool build_widget(QFrame* frame);
-    
-    public Q_SLOTS:
-    void setActive(int);
-    void addToActive(QStringList&);
-    
-    
+
   private:
     GradientMagnitudeFilterInterfacePrivate* private_;
     void makeConnections();
     
-    
-    private Q_SLOTS:
-    void senseActiveChanged(int);
-    
-    
-    
-    
-  };
+};
   
-} // namespace Seg3D
+} // end namespace Seg3D
 
 #endif

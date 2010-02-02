@@ -55,7 +55,7 @@ public:
   // Layerid of the target layer
   StateOptionHandle              target_layer_;
   
-  
+  StateBoolHandle                replace_;
   
   
   

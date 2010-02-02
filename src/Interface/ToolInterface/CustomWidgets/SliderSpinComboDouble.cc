@@ -113,25 +113,44 @@ SliderSpinComboDouble::SliderSpinComboDouble( QWidget *parent )
 
 
   //  --- Private slots --- //
-  void SliderSpinComboDouble::setSliderValue( int value )
+  void SliderSpinComboDouble::signalGuiFromSlider( int value )
   { 
     //TODO - need to do conversions because sliders are int only
     double new_value;
     new_value = value;
-    setCurrentValue( value );
-    Q_EMIT valueAdjusted( new_value );
+    
+    //block signals before we set the value of the spinner to avoid loops
+    spinner->blockSignals( true );
+    spinner->setValue( new_value );
+    spinner->blockSignals( false );
+
+    // emit signals for in case we need continuous updates from the slider
+    Q_EMIT valueAdjustedContinuously( new_value );
   }
-  void SliderSpinComboDouble::setSpinnerValue( double value )
+  void SliderSpinComboDouble::signalGuiFromSpinner( double value )
   {
-    setCurrentValue( value );
+    //block signals before we set the value of the slider to avoid loops
+    slider->blockSignals( true );
+    slider->setValue( value );
+    slider->blockSignals( false );
+    
+    // emit changed signals
+    Q_EMIT valueAdjusted( value );
+    Q_EMIT valueAdjustedContinuously( value );
+  }
+
+  void SliderSpinComboDouble::signalGuiFromSliderReleased()
+  {
+    Q_EMIT valueAdjusted(slider->value());
   }
 
 
   //  --- function for setting up signals and slots ---  //
   void SliderSpinComboDouble::makeConnections()
   {
-    connect( slider,  SIGNAL( valueChanged( int )),    this, SLOT( setSliderValue( int )));
-    connect( spinner, SIGNAL( valueChanged( double )), this, SLOT( setSpinnerValue( double )));
+    connect( slider,  SIGNAL( valueChanged( int )),    this, SLOT( signalGuiFromSlider( int )));
+    connect( slider,  SIGNAL( sliderReleased()),       this, SLOT( signalGuiFromSliderReleased()));
+    connect( spinner, SIGNAL( valueChanged( double )), this, SLOT( signalGuiFromSpinner( double )));
   } // end makeConnections
 
 

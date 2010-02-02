@@ -39,9 +39,12 @@ namespace Seg3D {
   ConnectedComponentFilter::ConnectedComponentFilter(const std::string& toolid) :
   Tool(toolid)
   {
-    //TODO - add guts
+    // Need to set ranges and default values for all parameters
+    add_state("target",target_layer_,"<none>","<none>");
     
-    
+    // Add constaints, so that when the state changes the right ranges of 
+    // parameters are selected
+    target_layer_->value_changed_signal.connect(boost::bind(&ConnectedComponentFilter::target_constraint,this,_1));
   }
   
   void
@@ -50,9 +53,7 @@ namespace Seg3D {
   }
   
   ConnectedComponentFilter::~ConnectedComponentFilter()
-  {
-    
-  }
+  { }
   
   void
   ConnectedComponentFilter::activate()
