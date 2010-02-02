@@ -26,7 +26,7 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#include <QMenuBar.h>
+#include <QMenuBar>
 
 
 //  Application includes

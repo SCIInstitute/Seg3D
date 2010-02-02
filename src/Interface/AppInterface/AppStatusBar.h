@@ -34,7 +34,7 @@
 #endif 
 
 #include <QStatusBar>
-#include <qlabel.h>
+#include <QLabel>
 #include <QAction>
 #include <QMainWindow>
 

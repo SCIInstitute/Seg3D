@@ -26,7 +26,7 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include "QStatusBar.h"
+#include <QStatusBar>
 
 //  Application includes
 #include <Application/Tool/ToolManager.h>
