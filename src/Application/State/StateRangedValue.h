@@ -103,6 +103,7 @@ class StateRangedValue : public StateBase {
         if (value > max_value_) value = max_value_;
         value_ = value;
         value_changed_signal(value_,from_interface);
+        state_changed_signal();
       }
       return (true);      
     }
@@ -131,6 +132,7 @@ class StateRangedValue : public StateBase {
         if (value > max_value_) value = max_value_;
         value_ = value;
         value_changed_signal(value_,from_interface);
+        state_changed_signal();
       }
       return (true);
     }
@@ -172,11 +174,13 @@ class StateRangedValue : public StateBase {
       {
         value_ = min_value_;
         value_changed_signal(value_,false);
+        state_changed_signal();
       }
       else if (value_ > max_value_)
       {
         value_ = max_value_;
         value_changed_signal(value_,false);
+        state_changed_signal();
       }
       
       range_changed_signal(min_value_,max_value_);

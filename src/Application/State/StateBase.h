@@ -46,8 +46,6 @@
 // Action includes
 #include <Application/Action/ActionParameter.h>
 
-
-
 namespace Seg3D {
 
 // -- STATEBASE --
@@ -101,6 +99,13 @@ class StateBase : public boost::noncopyable {
     // SET_STATEID:
     // Set the unique id to be used to locate this state variable
     void set_stateid(const std::string& stateid) { stateid_ = stateid; }
+
+// -- signal handling --
+  public:
+    // STATE_CHANGED_SIGNAL:
+    // This signal is triggered when the state is changed
+    typedef boost::signals2::signal<void ()> state_changed_signal_type;
+    state_changed_signal_type state_changed_signal;
     
   protected:
     std::string stateid_;

@@ -104,6 +104,7 @@ class StateValue : public StateBase {
       {
         value_ = value;
         value_changed_signal(value_,from_interface);
+        state_changed_signal();
       }
       return (true);      
     }
@@ -130,6 +131,7 @@ class StateValue : public StateBase {
       {
         value_ = value;
         value_changed_signal(value_,from_interface);
+        state_changed_signal();
       }
       return (true);
     }

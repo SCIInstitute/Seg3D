@@ -311,7 +311,6 @@ ViewerInterface::set_layout(const std::string& layout)
   }
 }
 
-
 void
 ViewerInterface::SetViewerLayout(qpointer_type qpointer, std::string layout)
 {

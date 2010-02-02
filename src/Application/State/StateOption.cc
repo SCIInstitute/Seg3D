@@ -93,6 +93,7 @@ StateOption::import_from_string(const std::string& str,
     value_ = value;
 
     value_changed_signal(value_,from_interface);
+    state_changed_signal();
   }
   return (true);
 }
@@ -120,6 +121,7 @@ StateOption::import_from_variant(ActionParameterVariant& variant,
             option_list_.end(),value)) return (false);
     value_ = value;
     value_changed_signal(value_,from_interface);
+    state_changed_signal();
   }
   return (true);
 }
@@ -163,6 +165,7 @@ StateOption::set_option_list(const std::vector<std::string>& option_list)
   {
     if (option_list.size()) value_ = option_list[0]; else value_ = "";
     value_changed_signal(value_,false);
+    state_changed_signal();
   }
   
   optionlist_changed_signal();
@@ -193,6 +196,7 @@ StateOption::set_option_list(const std::string& option_list)
   {
     if (option_list.size()) value_ = option_list[0]; else value_ = "";
     value_changed_signal(value_,false);
+    state_changed_signal();
   }
   
   optionlist_changed_signal();
@@ -225,6 +229,7 @@ StateOption::set_option_list(const std::string& option_list,
   {
     if (option_list.size()) value_ = option_list[0]; else value_ = "";
     value_changed_signal(value_,false);
+    state_changed_signal();
   }
   else
   {
@@ -232,6 +237,7 @@ StateOption::set_option_list(const std::string& option_list,
     { 
       value_ = lower_option;
       value_changed_signal(value_,false);
+      state_changed_signal();
     }
   }
   

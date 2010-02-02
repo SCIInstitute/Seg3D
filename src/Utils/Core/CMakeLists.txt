@@ -32,10 +32,12 @@
 ##################################################
 
 SET(UTILS_CORE_SRCS
-  IntrusiveBase.h
-  IntrusiveBase.cc
+  ConnectionHandler.h
+  ConnectionHandler.cc
   Exception.h
   Exception.cc
+  IntrusiveBase.h
+  IntrusiveBase.cc
   Log.h
   Log.cc
   LogHistory.h

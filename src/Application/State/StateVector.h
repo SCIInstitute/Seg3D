@@ -98,6 +98,7 @@ class StateVector : public StateBase {
       {
         values_vector_ = value;
         value_changed_signal(values_vector_,from_interface);
+        state_changed_signal();
       }
       return (true);      
     }
@@ -124,6 +125,7 @@ class StateVector : public StateBase {
       {
         values_vector_ = value;
         value_changed_signal(values_vector_,from_interface);
+        state_changed_signal();
       }
       return (true);
     }
@@ -162,10 +164,3 @@ class StateVector : public StateBase {
 } // end namespace Seg3D
 
 #endif
-
-  
-  
-  
-  
-
-

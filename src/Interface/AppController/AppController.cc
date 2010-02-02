@@ -193,8 +193,8 @@ AppController::UpdateLogHistory(bool relay,QPointer<AppController> controller)
   // exist anymore
   if (controller.data())
   {
-    controller->private_->log_history_model_->updateHistory();
-    controller->tv_log_history_->resizeRowsToContents();
+//    controller->private_->log_history_model_->updateHistory();
+//    controller->tv_log_history_->resizeRowsToContents();
 
     // Auto scroll to last event
     QScrollBar* scrollbar = controller->tv_log_history_->verticalScrollBar();

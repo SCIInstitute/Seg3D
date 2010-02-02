@@ -56,7 +56,16 @@ StateView3D::import_from_string(const std::string& str,
   // Lock the state engine so no other thread will be accessing it
   StateEngine::lock_type lock(StateEngine::Instance()->get_mutex());
 
-  return (Utils::import_from_string(str,value_));
+  Utils::View3D value;
+  if (!(Utils::import_from_string(str,value))) return (false);
+
+  if (value != value_)
+  {
+    value_ = value;
+    value_changed_signal(value_,from_interface);
+    state_changed_signal();
+  }
+  return (true);
 }
 
 void 
@@ -79,6 +88,7 @@ StateView3D::import_from_variant(ActionParameterVariant& variant,
   {
     value_ = value;
     value_changed_signal(value_,from_interface);
+    state_changed_signal();
   }
   return (true);
 }

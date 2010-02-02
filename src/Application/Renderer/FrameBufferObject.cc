@@ -57,7 +57,7 @@ void FrameBufferObject::attach_texture(TextureHandle texture, unsigned int attac
 void FrameBufferObject::_safe_bind()
 {
   glGetIntegerv(GL_FRAMEBUFFER_BINDING_EXT, &saved_id_);
-  if (id_ != saved_id_)
+  if (static_cast<int>(id_) != saved_id_)
   {
     glBindFramebufferEXT(TARGET_, id_);
   }
@@ -65,7 +65,7 @@ void FrameBufferObject::_safe_bind()
 
 void FrameBufferObject::_safe_unbind()
 {
-  if (id_ != saved_id_)
+  if (static_cast<int>(id_) != saved_id_)
   {
     glBindFramebufferEXT(TARGET_, saved_id_);
   }

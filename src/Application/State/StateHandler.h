@@ -29,11 +29,15 @@
 #ifndef APPLICATION_STATE_STATEHANDLER_H
 #define APPLICATION_STATE_STATEHANDLER_H
 
+// STL includes
 #include <vector>
 #include <string>
 
 // Boost includes
 #include <boost/utility.hpp>
+
+// Utils includes
+#include <Utils/Core/ConnectionHandler.h>
 
 // State includes
 #include <Application/State/StateEngine.h>
@@ -47,7 +51,7 @@
 
 namespace Seg3D {
 
-class StateHandler : public boost::noncopyable {
+class StateHandler : public Utils::ConnectionHandler {
 
 // -- constructor/destructor --
   public:
@@ -147,7 +151,13 @@ class StateHandler : public boost::noncopyable {
       
     }   
 
-
+    // STATE_CHANGED:
+    // this function is called when any of the state variables are changed
+    virtual void state_changed()
+    {
+      // default function is to do nothing
+    }
+    
   private:
     // Function that adds the state variable to the database
     bool add_statebase(const std::string& key, StateBaseHandle state);
