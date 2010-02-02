@@ -81,7 +81,7 @@ public:
     QtBridge::connect(upperThresholdAdjuster, tool->upper_threshold_);
     QtBridge::connect(lowerThresholdAdjuster, tool->lower_threshold_);
     QtBridge::connect(alphaAdjuster, tool->alpha_);
-    QtBridge::connect(private_->ui_.replaceCheckBox,tool->replace_)
+    QtBridge::connect(private_->ui_.replaceCheckBox,tool->replace_);
     
       //Send a message to the log that we have finised with building the Histogram Equalization Filter Interface
     SCI_LOG_DEBUG("Finished building a Histogram Equalization Filter Interface");

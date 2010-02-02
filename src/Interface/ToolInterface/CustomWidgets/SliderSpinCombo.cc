@@ -130,7 +130,7 @@ void SliderSpinCombo::buildWidget()
 void SliderSpinCombo::setSliderValue( int value )
 {
     setCurrentValue( value );
-    Q_EMIT valueAdjusted( value );
+    
 }
 void SliderSpinCombo::setSpinnerValue( double value )
 {
@@ -176,6 +176,7 @@ void SliderSpinCombo::setCurrentValue(double currentValue)
 {
     slider->setValue(currentValue);
     spinner->setValue(currentValue);
+  
 }
 
 //virtual destructor

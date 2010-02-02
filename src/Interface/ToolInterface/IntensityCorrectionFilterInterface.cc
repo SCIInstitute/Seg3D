@@ -77,7 +77,7 @@ public:
     QtBridge::connect(private_->ui_.targetComboBox, tool->target_layer_);
     QtBridge::connect(orderAdjuster, tool->order_);
     QtBridge::connect(edgeAdjuster, tool->edge_);
-    QtBridge::connect(private_->ui_.replaceCheckBox,tool->replace_)
+    QtBridge::connect(private_->ui_.replaceCheckBox,tool->replace_);
     
 
    //Send a message to the log that we have finised with building the tensity Correction Filter Interface

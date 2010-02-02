@@ -46,7 +46,7 @@ ActionDispatcher::post_action(ActionHandle action, ActionContextHandle action_co
   // events are handled in the order that they are posted and one action is fully
   // handled before the next one
 
-  SCI_LOG_DEBUG(std::string("Posting Action: ")+action->type());  
+//  SCI_LOG_DEBUG(std::string("Posting Action: ")+action->type());  
 
   Application::Instance()->post_event(boost::bind
       (&ActionDispatcher::run_action,this,action,action_context));
@@ -65,7 +65,7 @@ ActionDispatcher::post_and_wait_action(ActionHandle action, ActionContextHandle 
     SCI_THROW_LOGICERROR("Post and Wait action cannot be posted from the thread that processes the actions. This will lead to a dead lock");
   }
 
-  SCI_LOG_DEBUG(std::string("Posting Action: ")+action->type());  
+  //SCI_LOG_DEBUG(std::string("Posting Action: ")+action->type());  
 
   Application::Instance()->post_and_wait_event(boost::bind
       (&ActionDispatcher::run_action,this,action,action_context));
@@ -80,10 +80,10 @@ ActionDispatcher::post_actions(std::vector<ActionHandle> actions, ActionContextH
   // events are handled in the order that they are posted and one action is fully
   // handled before the next one
 
-  for (size_t j = 0;  j < actions.size(); j++)
-  {
-    SCI_LOG_DEBUG(std::string("Posting Action sequence: ")+actions[j]->type());  
-  }
+//  for (size_t j = 0;  j < actions.size(); j++)
+//  {
+//    SCI_LOG_DEBUG(std::string("Posting Action sequence: ")+actions[j]->type());  
+//  }
   
   Application::Instance()->post_event(boost::bind
       (&ActionDispatcher::run_actions,this,actions,action_context));
@@ -103,10 +103,10 @@ ActionDispatcher::post_and_wait_actions(std::vector<ActionHandle> actions, Actio
     SCI_THROW_LOGICERROR("Post and Wait actions cannot be posted from the thread that processes the actions. This will lead to a dead lock");
   }
 
-  for (size_t j = 0;  j < actions.size(); j++)
-  {
-    SCI_LOG_DEBUG(std::string("Posting Action sequence: ")+actions[j]->type());  
-  }
+//  for (size_t j = 0;  j < actions.size(); j++)
+//  {
+//    SCI_LOG_DEBUG(std::string("Posting Action sequence: ")+actions[j]->type());  
+//  }
   
   Application::Instance()->post_and_wait_event(boost::bind
       (&ActionDispatcher::run_actions,this,actions,action_context));
@@ -118,13 +118,13 @@ void
 ActionDispatcher::run_action(ActionHandle action, ActionContextHandle action_context)
 { 
 
-  SCI_LOG_DEBUG(std::string("Processing Action: ")+action->type());  
+//  SCI_LOG_DEBUG(std::string("Processing Action: ")+action->type());  
 
   // Step (1): An action needs to be validated before it can be executed. 
   // The validation is a separate step as invalid actions should nor be 
   // posted to the observers recording what the program does
 
-  SCI_LOG_DEBUG("Validating Action");  
+//  SCI_LOG_DEBUG("Validating Action");  
   if(!(action->validate(action_context))) 
   {
     action_context->report_usage(action->usage());
@@ -136,19 +136,19 @@ ActionDispatcher::run_action(ActionHandle action, ActionContextHandle action_con
   // the program as that may invalidate actions that were just run.
 
   // Step (2): Tell observers what action has been executed
-  SCI_LOG_DEBUG("Pre Action Signal for observers");  
+//  SCI_LOG_DEBUG("Pre Action Signal for observers");  
   pre_action_signal(action);
 
   // Step (3): Run action from the context that was provided. And if the action
   // was synchronous a done signal is triggered in the context, to inform the
   // program whether the action succeeded.
-  SCI_LOG_DEBUG("Running Action");    
+//  SCI_LOG_DEBUG("Running Action");    
 
   ActionResultHandle result;
   bool success = action->run(action_context, result);
 
   // Step (4): Set the action result if any was returned.
-  SCI_LOG_DEBUG("Set action result"); 
+//  SCI_LOG_DEBUG("Set action result"); 
   
   if (result.get()) 
   {
@@ -160,7 +160,7 @@ ActionDispatcher::run_action(ActionHandle action, ActionContextHandle action_con
   // the program as that may invalidate actions that were just run.
 
   // Step (5): Tell observers what action has been executed
-  SCI_LOG_DEBUG("Post Action Signal for observers");  
+//  SCI_LOG_DEBUG("Post Action Signal for observers");  
   post_action_signal(action,result);
 
   return;
