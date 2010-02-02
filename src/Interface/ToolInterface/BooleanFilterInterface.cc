@@ -24,72 +24,60 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
- */
+*/
 
+//Interface Includes
+#include <Interface/QtInterface/QtBridge.h>
 
-
-#include "BooleanFilterInterface.h"
+//Qt Gui Includes
+#include <Interface/ToolInterface/BooleanFilterInterface.h>
 #include "ui_BooleanFilterInterface.h"
+
+//Application Includes
+#include <Application/Tools/BooleanFilter.h>
 
 
 namespace Seg3D {
   
   SCI_REGISTER_TOOLINTERFACE(BooleanFilterInterface)
   
-  class BooleanFilterInterfacePrivate {
-  public:
-    Ui::BooleanFilterInterface ui_;
-  };
+class BooleanFilterInterfacePrivate {
+public:
+  Ui::BooleanFilterInterface ui_;
+};
   
+  // constructor
   BooleanFilterInterface::BooleanFilterInterface() :
   private_(new BooleanFilterInterfacePrivate)
-  {
-    
-  }
+  { }
   
+  // destructor
   BooleanFilterInterface::~BooleanFilterInterface()
-  {
-  }
+  { }
   
-  
+  // build the interface and connect it to the state manager
   bool
   BooleanFilterInterface::build_widget(QFrame* frame)
   {
+    //Step 1 - build the Qt GUI Widget
     private_->ui_.setupUi(frame);
     
+    //Step 2 - get a pointer to the tool
+    ToolHandle base_tool_ = tool();
+    BooleanFilter* tool = dynamic_cast<BooleanFilter*>(base_tool_.get());
+    
+    //Step 3 - connect the gui to the tool through the QtBridge
+    QtBridge::connect(private_->ui_.maskAComboBox, tool->mask_a_);
+    QtBridge::connect(private_->ui_.maskBComboBox, tool->mask_b_);
+    QtBridge::connect(private_->ui_.maskCComboBox, tool->mask_c_);
+    QtBridge::connect(private_->ui_.maskDComboBox, tool->mask_d_);
+    QtBridge::connect(private_->ui_.exampleExpComboBox, tool->example_expressions_);
+    QtBridge::connect(private_->ui_.replaceCheckBox,tool->replace_);
+    
+    //Send a message to the log that we have finised with building the Boolean Filter Interface
     SCI_LOG_DEBUG("Finished building a Boolean Filter Interface");
     return (true);
     
-  }
+  }// end build_widget
   
-  //  --- Function for making signal slots connections ---  //
-  void 
-  BooleanFilterInterface::makeConnections()
-  {
-    //connect(private_->ui_.activeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(senseActiveChanged(int)));
-    connect(radiusSizeAdjuster, SIGNAL(valueAdjusted(double)), this, SLOT(senseRadiusSizeChanged(double)));
-  }
-  
-  
-  //  --- Private slots for custom signals ---  //
-  void BooleanFilterInterface::senseActiveChanged(int active)
-  {
-    Q_EMIT activeChanged(active);
-  }
-  
-  
-  //  --- Public slots for setting widget values ---  //
-  void BooleanFilterInterface::setActive(int active)
-  {
-    //private_->ui_.activeComboBox->setCurrentIndex(active);
-  }
-  
-  void BooleanFilterInterface::addToActive(QStringList &items)
-  {
-    //private_->ui_.activeComboBox->addItems(items);
-  }
-  
-
-  
-  
-} // namespace Seg3D
+} // end namespace Seg3D

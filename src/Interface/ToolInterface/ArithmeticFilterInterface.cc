@@ -38,8 +38,7 @@
 
 namespace Seg3D {
   
-SCI_REGISTER_TOOLINTERFACE(ArithmeticFilterInterface)
-
+  SCI_REGISTER_TOOLINTERFACE(ArithmeticFilterInterface)
 
 class ArithmeticFilterInterfacePrivate {
 public:
@@ -79,6 +78,4 @@ public:
     return (true);
   } // end build_widget
 
- 
-  
 } //end seg3d

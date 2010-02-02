@@ -34,7 +34,7 @@
 
 // Base class of the tool widget
 #include <Interface/AppInterface/ToolWidget.h>
-#include <Interface/ToolInterface/CustomWidgets/SliderSpinCombo.h>
+#include <Interface/ToolInterface/CustomWidgets/SliderSpinComboInt.h>
 
 
 namespace Seg3D {
@@ -44,33 +44,15 @@ class MedianFilterInterfacePrivate;
 class MedianFilterInterface : public ToolWidget {
   Q_OBJECT
 
-Q_SIGNALS:
-  void activeChanged(int);
-  void radiusSizeChanged(int);
 
-public:
-  MedianFilterInterface();
-  virtual ~MedianFilterInterface();
-  virtual bool build_widget(QFrame* frame);
-  
-public Q_SLOTS:
-  void setActive(int);
-  void addToActive(QStringList&);
-  void setRadiusSize(int);
-
-  
-private:
-  MedianFilterInterfacePrivate* private_;
-  SliderSpinCombo *radiusSizeAdjuster;
-  void makeConnections();
-  
-private Q_SLOTS:
-  void senseActiveChanged(int);
-  void senseRadiusSizeChanged(double);
-
-
-
-
+  public:
+    MedianFilterInterface();
+    virtual ~MedianFilterInterface();
+    virtual bool build_widget(QFrame* frame);
+    
+  private:
+    MedianFilterInterfacePrivate* private_;
+    SliderSpinComboInt *radiusSizeAdjuster;
 
 };
 

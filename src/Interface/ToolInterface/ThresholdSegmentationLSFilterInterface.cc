@@ -24,175 +24,82 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
- */
+*/
 
+//Interface Includes
+#include <Interface/QtInterface/QtBridge.h>
 
-
-#include "ThresholdSegmentationLSFilterInterface.h"
+//Qt Gui Includes
+#include <Interface/ToolInterface/ThresholdSegmentationLSFilterInterface.h>
 #include "ui_ThresholdSegmentationLSFilterInterface.h"
+
+//Application Includes
+#include <Application/Tools/ThresholdSegmentationLSFilter.h>
 
 
 namespace Seg3D {
   
   SCI_REGISTER_TOOLINTERFACE(ThresholdSegmentationLSFilterInterface)
   
-  class ThresholdSegmentationLSFilterInterfacePrivate {
-  public:
-    Ui::ThresholdSegmentationLSFilterInterface ui_;
-  };
+class ThresholdSegmentationLSFilterInterfacePrivate {
+public:
+  Ui::ThresholdSegmentationLSFilterInterface ui_;
+};
   
+  // constructor
   ThresholdSegmentationLSFilterInterface::ThresholdSegmentationLSFilterInterface() :
   private_(new ThresholdSegmentationLSFilterInterfacePrivate)
-  {
-    
-  }
+  { }
   
+  // destructor
   ThresholdSegmentationLSFilterInterface::~ThresholdSegmentationLSFilterInterface()
-  {
-  }
+  { }
   
-  
+  // build the interface and connect it to the state manager
   bool
   ThresholdSegmentationLSFilterInterface::build_widget(QFrame* frame)
   {
+    //Step 1 - build the Qt GUI Widget
     private_->ui_.setupUi(frame);
         
-    iterationsAdjuster = new SliderSpinCombo();
-    private_->ui_.iterationsHLayout_bottom->addWidget(iterationsAdjuster);
+      // add sliderspinnercombo's
+      iterationsAdjuster = new SliderSpinComboInt();
+      private_->ui_.iterationsHLayout_bottom->addWidget(iterationsAdjuster);
+      
+      upperThresholdAdjuster = new SliderSpinComboInt();
+      private_->ui_.upperHLayout_bottom->addWidget(upperThresholdAdjuster);
+      
+      lowerThresholdAdjuster = new SliderSpinComboInt();
+      private_->ui_.lowerHLayout_bottom->addWidget(lowerThresholdAdjuster);
+      
+      curvatureAdjuster = new SliderSpinComboInt();
+      private_->ui_.curvatureHLayout_bottom->addWidget(curvatureAdjuster);
+      
+      edgeAdjuster = new SliderSpinComboInt();
+      private_->ui_.edgeHLayout_bottom->addWidget(edgeAdjuster);
+      
+      propagationAdjuster = new SliderSpinComboInt();
+      private_->ui_.propagationHLayout_bottom->addWidget(propagationAdjuster);
     
-    upperThresholdAdjuster = new SliderSpinCombo();
-    private_->ui_.upperHLayout_bottom->addWidget(upperThresholdAdjuster);
+    //Step 2 - get a pointer to the tool
+    ToolHandle base_tool_ = tool();
+    ThresholdSegmentationLSFilter* tool = dynamic_cast<ThresholdSegmentationLSFilter*>(base_tool_.get());
     
-    lowerThresholdAdjuster = new SliderSpinCombo();
-    private_->ui_.lowerHLayout_bottom->addWidget(lowerThresholdAdjuster);
+    //Step 3 - connect the gui to the tool through the QtBridge
+    QtBridge::connect(private_->ui_.targetComboBox, tool->target_layer_);
+    QtBridge::connect(private_->ui_.maskComboBox, tool->mask_layer_);
+    QtBridge::connect(iterationsAdjuster, tool->iterations_);
+    QtBridge::connect(upperThresholdAdjuster, tool->upper_threshold_);
+    QtBridge::connect(lowerThresholdAdjuster, tool->lower_threshold_);
+    QtBridge::connect(curvatureAdjuster, tool->curvature_);
+    QtBridge::connect(edgeAdjuster, tool->propagation_);
+    QtBridge::connect(propagationAdjuster, tool->edge_);
+    QtBridge::connect(private_->ui_.replaceCheckBox,tool->replace_);
     
-    curvatureAdjuster = new SliderSpinCombo();
-    private_->ui_.curvatureHLayout_bottom->addWidget(curvatureAdjuster);
-    
-    edgeAdjuster = new SliderSpinCombo();
-    private_->ui_.edgeHLayout_bottom->addWidget(edgeAdjuster);
-    
-    propagationAdjuster = new SliderSpinCombo();
-    private_->ui_.propagationHLayout_bottom->addWidget(propagationAdjuster);
-    
+    //Send a message to the log that we have finised with building the Segmentation Level Set Filter Interface   
     SCI_LOG_DEBUG("Finished building a Segmentation Level Set Filter Interface");
     return (true);
     
-  }
+  } // end build_widget
   
-  //  --- Function for making signal slots connections ---  //
-  void 
-  ThresholdSegmentationLSFilterInterface::makeConnections()
-  {
-    connect(private_->ui_.activeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(senseActiveChanged(int)));
-    connect(iterationsAdjuster, SIGNAL(valueAdjusted(double)), this, SLOT(senseIterationsChanged(double)));
-  }
-  
-  
-  //  --- Private slots for custom signals ---  //
-  void ThresholdSegmentationLSFilterInterface::senseActiveChanged(int active)
-  {
-    Q_EMIT activeChanged(active);
-  }
-  
-  void ThresholdSegmentationLSFilterInterface::senseIterationsChanged(int iteration)
-  {
-    Q_EMIT iterationsChanged(iteration);
-  }
-  
-  void ThresholdSegmentationLSFilterInterface::senseUpperThresholdChanged(int upper)
-  {
-    Q_EMIT  upperThresholdChanged(upper);
-  }
-  
-  void ThresholdSegmentationLSFilterInterface::senselowerThresholdChanged(int lower)
-  {
-    Q_EMIT lowerThresholdChanged(lower);
-  }
-  
-  void ThresholdSegmentationLSFilterInterface::senseCurvatureChanged(int curve)
-  {
-    Q_EMIT curvatureChanged(curve);
-  }
-  
-  void ThresholdSegmentationLSFilterInterface::senseEdgeChanged(int edge)
-  {
-    Q_EMIT  edgeChanged(edge);
-  }
-  
-  void ThresholdSegmentationLSFilterInterface::sensePropagationChanged(int propagation)
-  {
-    Q_EMIT propagationChanged(propagation);
-  }
-  
-  
-  
-  //  --- Public slots for setting widget values ---  //
-  void ThresholdSegmentationLSFilterInterface::setActive(int active)
-  {
-    private_->ui_.activeComboBox->setCurrentIndex(active);
-  }
-  
-  void ThresholdSegmentationLSFilterInterface::addToActive(QStringList &items)
-  {
-    private_->ui_.activeComboBox->addItems(items);
-  }
-  
-  void ThresholdSegmentationLSFilterInterface::setIterations(int iterations)
-  {
-    iterationsAdjuster->setCurrentValue(iterations);
-  }
-  
-  void ThresholdSegmentationLSFilterInterface::setLowerThreshold(double lower, double upper)
-  {
-    lowerThresholdAdjuster->setRanges(lower, upper);
-  }
-  
-  void ThresholdSegmentationLSFilterInterface::setLowerThresholdStep(double step)
-  {
-    lowerThresholdAdjuster->setStep(step);
-  }
-  
-  void ThresholdSegmentationLSFilterInterface::setUpperThreshold(double lower, double upper)
-  {
-    upperThresholdAdjuster->setRanges(lower, upper);
-  }
-  
-  void ThresholdSegmentationLSFilterInterface::setUpperThresholdStep(double step)
-  {
-    upperThresholdAdjuster->setStep(step);
-  } 
-  
-  void ThresholdSegmentationLSFilterInterface::setCurvature(double lower, double upper)
-  {
-    curvatureAdjuster->setRanges(lower, upper);
-  }
-  
-  void ThresholdSegmentationLSFilterInterface::setCurvatureStep(double step)
-  {
-    curvatureAdjuster->setStep(step);
-  }
-  
-  void ThresholdSegmentationLSFilterInterface::setEdge(double lower, double upper)
-  {
-    edgeAdjuster->setRanges(lower, upper);
-  }
-  
-  void ThresholdSegmentationLSFilterInterface::setEdgeStep(double step)
-  {
-    edgeAdjuster->setStep(step);
-  } 
-  
-  void ThresholdSegmentationLSFilterInterface::setPropagation(double lower, double upper)
-  {
-    propagationAdjuster->setRanges(lower, upper);
-  }
-  
-  void ThresholdSegmentationLSFilterInterface::setPropagationStep(double step)
-  {
-    propagationAdjuster->setStep(step);
-  } 
-  
-  
-  
-} // namespace Seg3D
+} // end namespace Seg3D

@@ -39,6 +39,7 @@ namespace Seg3D {
   ArithmeticFilter::ArithmeticFilter(const std::string& toolid) :
   Tool(toolid)
   {
+    // add default values for the the states
     add_state("volume_a",volume_a_,"<none>","<none>");
     add_state("volume_b",volume_b_,"<none>","<none>");
     add_state("volume_c",volume_c_,"<none>","<none>");

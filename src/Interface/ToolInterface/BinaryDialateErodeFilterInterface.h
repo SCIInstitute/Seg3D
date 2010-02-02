@@ -34,43 +34,29 @@
 
 // Base class of the tool widget
 #include <Interface/AppInterface/ToolWidget.h>
-#include <Interface/ToolInterface/CustomWidgets/SliderSpinCombo.h>
+#include <Interface/ToolInterface/CustomWidgets/SliderSpinComboInt.h>
 
 
 namespace Seg3D {
   
-  class BinaryDialateErodeFilterInterfacePrivate;
-  
-  class BinaryDialateErodeFilterInterface : public ToolWidget {
-    Q_OBJECT
+class BinaryDialateErodeFilterInterfacePrivate;
+
+class BinaryDialateErodeFilterInterface : public ToolWidget {
+  Q_OBJECT
     
-  Q_SIGNALS:
-    void activeChanged(int);
-    
+
   public:
     BinaryDialateErodeFilterInterface();
     virtual ~BinaryDialateErodeFilterInterface();
     virtual bool build_widget(QFrame* frame);
     
-    public Q_SLOTS:
-    void setActive(int);
-    void addToActive(QStringList&);
-    
     
   private:
     BinaryDialateErodeFilterInterfacePrivate* private_;
-    SliderSpinCombo *erodeAdjuster;
-    SliderSpinCombo *dialateAdjuster;
-    void makeConnections();
-
+    SliderSpinComboInt *erodeAdjuster;
+    SliderSpinComboInt *dialateAdjuster;
     
-  private Q_SLOTS:
-    void senseActiveChanged(int);
-    
-    
-    
-    
-  };
+};
   
 } // namespace Seg3D
 

@@ -53,7 +53,23 @@ public:
   // -- state --
 public:
   // Layerid of the target layer
-  StateOptionHandle              target_layer_;
+  StateOptionHandle               target_layer_;
+  
+  StateOptionHandle               mask_layer_;
+  
+  StateRangedIntHandle            iterations_;
+  
+  StateRangedIntHandle            upper_threshold_;
+  
+  StateRangedIntHandle            lower_threshold_;
+  
+  StateRangedIntHandle            curvature_;
+  
+  StateRangedIntHandle            propagation_;
+  
+  StateRangedIntHandle            edge_;
+  
+  StateBoolHandle                 replace_;
   
   
   

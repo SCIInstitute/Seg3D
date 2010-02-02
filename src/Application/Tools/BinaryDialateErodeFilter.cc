@@ -39,7 +39,15 @@ namespace Seg3D {
   BinaryDialateErodeFilter::BinaryDialateErodeFilter(const std::string& toolid) :
   Tool(toolid)
   {
-    //TODO - add guts
+    // Need to set ranges and default values for all parameters
+    add_state("target",target_layer_,"<none>","<none>");
+    add_state("dialate",dialate_,1,100,1,2);
+    add_state("erode",erode_,1,100,1,2);
+    add_state("replace",replace_,false);
+    
+    // Add constaints, so that when the state changes the right ranges of 
+    // parameters are selected
+    target_layer_->value_changed_signal.connect(boost::bind(&BinaryDialateErodeFilter::target_constraint,this,_1));
     
     
   }

@@ -34,44 +34,27 @@
 
 // Base class of the tool widget
 #include <Interface/AppInterface/ToolWidget.h>
-#include <Interface/ToolInterface/CustomWidgets/SliderSpinCombo.h>
+#include <Interface/ToolInterface/CustomWidgets/SliderSpinComboInt.h>
 
 
 namespace Seg3D {
   
-  class OtsuThresholdFilterInterfacePrivate;
-  
-  class OtsuThresholdFilterInterface : public ToolWidget {
-    Q_OBJECT
-    
-  Q_SIGNALS:
-    void activeChanged(int);
-    void orderChanged(int);
+class OtsuThresholdFilterInterfacePrivate;
+
+class OtsuThresholdFilterInterface : public ToolWidget {
+  Q_OBJECT
+
     
   public:
     OtsuThresholdFilterInterface();
     virtual ~OtsuThresholdFilterInterface();
     virtual bool build_widget(QFrame* frame);
     
-    public Q_SLOTS:
-    void setActive(int);
-    void addToActive(QStringList&);
-    void setOrder(int);
-    
     
   private:
     OtsuThresholdFilterInterfacePrivate* private_;
-    SliderSpinCombo *orderAdjuster;
-    void makeConnections();
-    
-    private Q_SLOTS:
-    void senseActiveChanged(int);
-    void senseOrderChanged(double);
-    
-    
-    
-    
-    
+    SliderSpinComboInt *orderAdjuster;
+
   };
   
 } // namespace Seg3D

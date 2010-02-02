@@ -39,7 +39,20 @@ namespace Seg3D {
   BooleanFilter::BooleanFilter(const std::string& toolid) :
   Tool(toolid)
   {
-    //TODO - add guts
+    // add default values for the the states
+    add_state("mask_a",mask_a_,"<none>","<none>");
+    add_state("mask_b",mask_b_,"<none>","<none>");
+    add_state("mask_c",mask_c_,"<none>","<none>");
+    add_state("mask_d",mask_d_,"<none>","<none>");
+    add_state("example_expressions",example_expressions_,"<none>","<none>");
+    add_state("replace",replace_,false);
+    
+    // Add constaints, so that when the state changes the right ranges of 
+    // parameters are selected
+    mask_a_->value_changed_signal.connect(boost::bind(&BooleanFilter::target_constraint,this,_1));
+    mask_b_->value_changed_signal.connect(boost::bind(&BooleanFilter::target_constraint,this,_1));
+    mask_c_->value_changed_signal.connect(boost::bind(&BooleanFilter::target_constraint,this,_1));
+    mask_d_->value_changed_signal.connect(boost::bind(&BooleanFilter::target_constraint,this,_1));
     
     
   }

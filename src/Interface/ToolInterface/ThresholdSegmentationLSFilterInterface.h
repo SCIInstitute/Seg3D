@@ -34,69 +34,31 @@
 
 // Base class of the tool widget
 #include <Interface/AppInterface/ToolWidget.h>
-#include <Interface/ToolInterface/CustomWidgets/SliderSpinCombo.h>
+#include <Interface/ToolInterface/CustomWidgets/SliderSpinComboInt.h>
 
 
 namespace Seg3D {
   
-  class ThresholdSegmentationLSFilterInterfacePrivate;
-  
-  class ThresholdSegmentationLSFilterInterface : public ToolWidget {
-    Q_OBJECT
-    
-  Q_SIGNALS:
-    void activeChanged(int);
-    void iterationsChanged(int);
-    void upperThresholdChanged(int);
-    void lowerThresholdChanged(int);
-    void curvatureChanged(int);
-    void edgeChanged(int);
-    void propagationChanged(int);
+class ThresholdSegmentationLSFilterInterfacePrivate;
+
+class ThresholdSegmentationLSFilterInterface : public ToolWidget {
+  Q_OBJECT
+
     
   public:
     ThresholdSegmentationLSFilterInterface();
     virtual ~ThresholdSegmentationLSFilterInterface();
     virtual bool build_widget(QFrame* frame);
     
-    public Q_SLOTS:
-    void setActive(int);
-    void addToActive(QStringList&);
-    void setIterations(int);
-    void setLowerThreshold(double, double);
-    void setLowerThresholdStep(double);
-    void setUpperThreshold(double, double);
-    void setUpperThresholdStep(double);
-    
-    void setCurvature(double, double);
-    void setCurvatureStep(double);
-    void setEdge(double, double);
-    void setEdgeStep(double);
-    void setPropagation(double, double);
-    void setPropagationStep(double);
-    
     
   private:
     ThresholdSegmentationLSFilterInterfacePrivate* private_;
-    SliderSpinCombo *iterationsAdjuster;
-    SliderSpinCombo *upperThresholdAdjuster;
-    SliderSpinCombo *lowerThresholdAdjuster;
-    SliderSpinCombo *curvatureAdjuster;
-    SliderSpinCombo *edgeAdjuster;
-    SliderSpinCombo *propagationAdjuster;
-    void makeConnections();
-    
-    private Q_SLOTS:
-    void senseActiveChanged(int);
-    void senseIterationsChanged(int);
-    void senseUpperThresholdChanged(int);
-    void senselowerThresholdChanged(int);
-    void senseCurvatureChanged(int);
-    void senseEdgeChanged(int);
-    void sensePropagationChanged(int);
-    
-    
-    
-    
+    SliderSpinComboInt *iterationsAdjuster;
+    SliderSpinComboInt *upperThresholdAdjuster;
+    SliderSpinComboInt *lowerThresholdAdjuster;
+    SliderSpinComboInt *curvatureAdjuster;
+    SliderSpinComboInt *edgeAdjuster;
+    SliderSpinComboInt *propagationAdjuster;
     
   };
   

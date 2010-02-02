@@ -24,83 +24,60 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
- */
+*/
 
+//Interface Includes
+#include <Interface/QtInterface/QtBridge.h>
 
-
-#include "OtsuThresholdFilterInterface.h"
+//Qt Gui Includes
+#include <Interface/ToolInterface/OtsuThresholdFilterInterface.h>
 #include "ui_OtsuThresholdFilterInterface.h"
+
+//Application Includes
+#include <Application/Tools/OtsuThresholdFilter.h>
 
 
 namespace Seg3D {
   
   SCI_REGISTER_TOOLINTERFACE(OtsuThresholdFilterInterface)
   
-  class OtsuThresholdFilterInterfacePrivate {
-  public:
-    Ui::OtsuThresholdFilterInterface ui_;
-  };
+class OtsuThresholdFilterInterfacePrivate {
+public:
+  Ui::OtsuThresholdFilterInterface ui_;
+};
   
+  // constructor
   OtsuThresholdFilterInterface::OtsuThresholdFilterInterface() :
   private_(new OtsuThresholdFilterInterfacePrivate)
-  {
-    
-  }
+  { }
   
+  // destructor
   OtsuThresholdFilterInterface::~OtsuThresholdFilterInterface()
-  {
-  }
+  { }
   
-  
+  // build the interface and connect it to the state manager
   bool
   OtsuThresholdFilterInterface::build_widget(QFrame* frame)
   {
+    //Step 1 - build the Qt GUI Widget
     private_->ui_.setupUi(frame);
-        
-    orderAdjuster = new SliderSpinCombo();
-    private_->ui_.orderHLayout_bottom->addWidget(orderAdjuster);
+      
+      // add sliderspincombos
+      orderAdjuster = new SliderSpinComboInt();
+      private_->ui_.orderHLayout_bottom->addWidget(orderAdjuster);
     
+    //Step 2 - get a pointer to the tool
+    ToolHandle base_tool_ = tool();
+    OtsuThresholdFilter* tool = dynamic_cast<OtsuThresholdFilter*>(base_tool_.get());
+    
+    //Step 3 - connect the gui to the tool through the QtBridge
+    QtBridge::connect(private_->ui_.targetComboBox, tool->target_layer_);
+    QtBridge::connect(orderAdjuster, tool->order_);
+    
+    //Send a message to the log that we have finised with building the Otsu Threshold Filter Interface
     SCI_LOG_DEBUG("Finished building an Otsu Threshold Filter Interface");
     return (true);
     
-  }
+  } // end build_widget
   
-  //  --- Function for making signal slots connections ---  //
-  void 
-  OtsuThresholdFilterInterface::makeConnections()
-  {
-    connect(private_->ui_.activeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(senseActiveChanged(int)));
-    connect(orderAdjuster, SIGNAL(valueAdjusted(double)), this, SLOT(senseOrderChanged(double)));
-  }
-  
-  
-  //  --- Private slots for custom signals ---  //
-  void OtsuThresholdFilterInterface::senseActiveChanged(int active)
-  {
-    Q_EMIT activeChanged(active);
-  }
-  
-  void OtsuThresholdFilterInterface::senseOrderChanged(double size)
-  {
-    Q_EMIT orderChanged(size);
-  }
-  
-  //  --- Public slots for setting widget values ---  //
-  void OtsuThresholdFilterInterface::setActive(int active)
-  {
-    private_->ui_.activeComboBox->setCurrentIndex(active);
-  }
-  
-  void OtsuThresholdFilterInterface::addToActive(QStringList &items)
-  {
-    private_->ui_.activeComboBox->addItems(items);
-  }
-  
-  void OtsuThresholdFilterInterface::setOrder(int orders)
-  {
-    orderAdjuster->setCurrentValue(orders);
-  }
-  
-  
-  
-} // namespace Seg3D
+} // end namespace Seg3D

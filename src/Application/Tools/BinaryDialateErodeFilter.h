@@ -53,8 +53,13 @@ public:
   // -- state --
 public:
   // Layerid of the target layer
-  StateOptionHandle              target_layer_;
+  StateOptionHandle               target_layer_;
+
+  StateRangedIntHandle            dialate_;
   
+  StateRangedIntHandle            erode_;
+  
+  StateBoolHandle                 replace_;
   
   
   

@@ -38,34 +38,19 @@
 
 namespace Seg3D {
   
-  class NeighborhoodConnectedFilterInterfacePrivate;
-  
-  class NeighborhoodConnectedFilterInterface : public ToolWidget {
-    Q_OBJECT
-    
-  Q_SIGNALS:
-    void activeChanged(int);
+class NeighborhoodConnectedFilterInterfacePrivate;
+
+class NeighborhoodConnectedFilterInterface : public ToolWidget {
+  Q_OBJECT
     
   public:
     NeighborhoodConnectedFilterInterface();
     virtual ~NeighborhoodConnectedFilterInterface();
     virtual bool build_widget(QFrame* frame);
     
-    public Q_SLOTS:
-    void setActive(int);
-    void addToActive(QStringList&);
-    
-    
+ 
   private:
     NeighborhoodConnectedFilterInterfacePrivate* private_;
-    void makeConnections();
-    
-    
-    private Q_SLOTS:
-    void senseActiveChanged(int);
-    
-    
-    
     
   };
   

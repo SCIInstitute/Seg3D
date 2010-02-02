@@ -24,12 +24,17 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
- */
+*/
 
+//Interface Includes
+#include <Interface/QtInterface/QtBridge.h>
 
-
-#include "BinaryDialateErodeFilterInterface.h"
+//Qt Gui Includes
+#include <Interface/ToolInterface/BinaryDialateErodeFilterInterface.h>
 #include "ui_BinaryDialateErodeFilterInterface.h"
+
+//Application Includes
+#include <Application/Tools/BinaryDialateErodeFilter.h>
 
 
 namespace Seg3D {
@@ -41,59 +46,44 @@ public:
   Ui::BinaryDialateErodeFilterInterface ui_;
 };
 
-BinaryDialateErodeFilterInterface::BinaryDialateErodeFilterInterface() :
-private_(new BinaryDialateErodeFilterInterfacePrivate)
-{
-  
-}
+  // constructor
+  BinaryDialateErodeFilterInterface::BinaryDialateErodeFilterInterface() :
+  private_(new BinaryDialateErodeFilterInterfacePrivate)
+  { }
 
-BinaryDialateErodeFilterInterface::~BinaryDialateErodeFilterInterface()
-{
-}
+  // destructor
+  BinaryDialateErodeFilterInterface::~BinaryDialateErodeFilterInterface()
+  { }
 
-
-bool
-BinaryDialateErodeFilterInterface::build_widget(QFrame* frame)
-{
-  private_->ui_.setupUi(frame);
+  // build the interface and connect it to the state manager
+  bool
+  BinaryDialateErodeFilterInterface::build_widget(QFrame* frame)
+  {
+    //Step 1 - build the Qt GUI Widget
+    private_->ui_.setupUi(frame);
     
-  erodeAdjuster = new SliderSpinCombo();
-  private_->ui_.erodeHLayout_bottom->addWidget(erodeAdjuster);
-  
-  dialateAdjuster = new SliderSpinCombo();
-  private_->ui_.dialateHLayout_bottom->addWidget(dialateAdjuster);
-  
-  SCI_LOG_DEBUG("Finished building a Binary Dialate Erode Filter Interface");
-  return (true);
-  
-}
+      // add sliderspinnercombo's
+      erodeAdjuster = new SliderSpinComboInt();
+      private_->ui_.erodeHLayout_bottom->addWidget(erodeAdjuster);
+      
+      dialateAdjuster = new SliderSpinComboInt();
+      private_->ui_.dialateHLayout_bottom->addWidget(dialateAdjuster);
+    
+    
+    //Step 2 - get a pointer to the tool
+    ToolHandle base_tool_ = tool();
+    BinaryDialateErodeFilter* tool = dynamic_cast<BinaryDialateErodeFilter*>(base_tool_.get());
+    
+    //Step 3 - connect the gui to the tool through the QtBridge
+    QtBridge::connect(private_->ui_.targetComboBox, tool->target_layer_);
+    QtBridge::connect(erodeAdjuster, tool->erode_);
+    QtBridge::connect(dialateAdjuster, tool->dialate_);
+    QtBridge::connect(private_->ui_.replaceCheckBox,tool->replace_);
+    
+    //Send a message to the log that we have finised with building the Binary Dialate Erode Filter Interface
+    SCI_LOG_DEBUG("Finished building a Binary Dialate Erode Filter Interface");
+    return (true);
+    
+  } // end build_widget
 
-//  --- Function for making signal slots connections ---  //
-void 
-BinaryDialateErodeFilterInterface::makeConnections()
-{
-  connect(private_->ui_.activeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(senseActiveChanged(int)));
-  
-}
-
-
-//  --- Private slots for custom signals ---  //
-void BinaryDialateErodeFilterInterface::senseActiveChanged(int active)
-{
-  Q_EMIT activeChanged(active);
-}
-
-
-//  --- Public slots for setting widget values ---  //
-void BinaryDialateErodeFilterInterface::setActive(int active)
-{
-  private_->ui_.activeComboBox->setCurrentIndex(active);
-}
-
-void BinaryDialateErodeFilterInterface::addToActive(QStringList &items)
-{
-  private_->ui_.activeComboBox->addItems(items);
-}
-
-  
-} // namespace Seg3D
+} // end namespace Seg3D

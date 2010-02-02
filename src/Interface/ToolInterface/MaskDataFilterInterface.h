@@ -39,22 +39,10 @@
 
 namespace Seg3D {
   
-  class MaskDataFilterInterfacePrivate;
-  
-  class MaskDataFilterInterface : public ToolWidget {
-    Q_OBJECT
-    
-  Q_SIGNALS:
-    void activeChanged(int);
-    void maskChanged(int);
-   
-    
-    public Q_SLOTS:
-    void setActive(int);
-    void addToActive(QStringList&);
-    void setMask(int);
-    void addToMask(QStringList&);
-       
+class MaskDataFilterInterfacePrivate;
+
+class MaskDataFilterInterface : public ToolWidget {
+  Q_OBJECT
     
   public:
     MaskDataFilterInterface();
@@ -64,14 +52,9 @@ namespace Seg3D {
     
   private:
     MaskDataFilterInterfacePrivate* private_;
-    void makeConnections();
-    
-  private Q_SLOTS:
-    void senseActiveChanged(int);
-    void senseMaskChanged(int);
-    
+  
        
-  };
+};
   
 } // namespace Seg3D
 

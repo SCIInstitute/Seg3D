@@ -39,8 +39,17 @@ namespace Seg3D {
   MaskDataFilter::MaskDataFilter(const std::string& toolid) :
   Tool(toolid)
   {
-    //TODO - add guts
+    // add default values for the the states
+    add_state("target_layer",target_layer_,"<none>","<none>");
+    add_state("mask_layer",mask_layer_,"<none>","<none>");
+    add_state("replace_with",replace_with_,"<none>","<none>");
+    add_state("replace",replace_,false);
     
+    // Add constaints, so that when the state changes the right ranges of 
+    // parameters are selected
+    target_layer_->value_changed_signal.connect(boost::bind(&MaskDataFilter::target_constraint,this,_1));
+    mask_layer_->value_changed_signal.connect(boost::bind(&MaskDataFilter::target_constraint,this,_1));
+    replace_with_->value_changed_signal.connect(boost::bind(&MaskDataFilter::target_constraint,this,_1));
     
   }
   

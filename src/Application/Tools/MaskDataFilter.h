@@ -52,8 +52,15 @@ public:
   
   // -- state --
 public:
+  
   // Layerid of the target layer
-  StateOptionHandle              target_layer_;
+  StateOptionHandle               target_layer_;
+  
+  StateOptionHandle               mask_layer_;
+  
+  StateOptionHandle               replace_with_;
+  
+  StateBoolHandle                 replace_;
   
   
   
