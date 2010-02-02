@@ -60,7 +60,7 @@ namespace Seg3D {
   
   CannyEdgeDetectionFilter::~CannyEdgeDetectionFilter()
   {
-    
+    disconnect_all(); 
   }
   
   void

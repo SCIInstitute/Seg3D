@@ -57,7 +57,7 @@ namespace Seg3D {
   
   ConfidenceConnectedFilter::~ConfidenceConnectedFilter()
   {
-    
+    disconnect_all(); 
   }
   
   void

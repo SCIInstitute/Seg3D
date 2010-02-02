@@ -52,6 +52,7 @@ InvertTool::InvertTool(const std::string& toolid) :
 
 InvertTool::~InvertTool()
 {
+  disconnect_all();
 }
 
 void

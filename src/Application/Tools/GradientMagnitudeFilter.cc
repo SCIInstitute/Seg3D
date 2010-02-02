@@ -58,7 +58,7 @@ namespace Seg3D {
   
   GradientMagnitudeFilter::~GradientMagnitudeFilter()
   {
-    
+    disconnect_all();
   }
   
   void

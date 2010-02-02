@@ -53,6 +53,7 @@ FlipTool::FlipTool(const std::string& toolid) :
 
 FlipTool::~FlipTool()
 {
+  disconnect_all();
 }
 
 void

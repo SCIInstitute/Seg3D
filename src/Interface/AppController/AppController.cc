@@ -51,6 +51,7 @@ namespace Seg3D {
 
 class AppControllerPrivate {
   public:
+    // The User Inrterface from the designer
     Ui::F_CONTROLLER ui_;
 
     // Local classes that are only of interest for this class
@@ -68,13 +69,15 @@ AppController::AppController(QWidget* parent) :
   // Step 1: Setup the private structure and allocate all the needed structures
   private_->ui_.setupUi(this);
   private_->context_ = AppControllerContextHandle(new AppControllerContext(this)); 
+
+  // These next two are Qt objects and will be deleted when the parent object is
+  // deleted
   private_->action_history_model_ = new AppControllerActionHistory(this);
-  private_->log_history_model_ = new AppControllerLogHistory(this);
+  private_->log_history_model_ = new AppControllerLogHistory(1000,this);
 
   // Step 2: Modify the widget
   setWindowTitle(QString("Seg3D Controller"));
-  QPointer<AppController> controller(this);
-
+  qpointer_type controller(this);
 
   // Step 3: Get short cuts to all the widgets
   tw_controller_   = private_->ui_.TW_CONTROLLER;
@@ -89,20 +92,22 @@ AppController::AppController(QWidget* parent) :
   l_action_status_->setText("");
   l_action_usage_->setText("");
   
+  // Set up the model view widgets
   tv_action_history_->setModel(private_->action_history_model_);
   tv_action_history_->setColumnWidth(0,600);
   tv_action_history_->setColumnWidth(1,200);
   tv_action_history_->resizeRowsToContents();
-//  tv_action_history_->resizeColumnsToContents();
   
   tv_log_history_->setModel(private_->log_history_model_);
   tv_log_history_->setColumnWidth(0,1000);
   tv_log_history_->resizeRowsToContents();
+
   // Get the list of actions
   ActionFactory::action_list_type action_list;
   ActionFactory::Instance()->action_list(action_list);
   
   QMenu* action_menu = new QMenu(tb_action_);
+  
   ActionFactory::action_list_type::iterator it =  action_list.begin();
   ActionFactory::action_list_type::iterator it_end =  action_list.end();
   while (it != it_end)
@@ -118,10 +123,10 @@ AppController::AppController(QWidget* parent) :
   // automatically
   
   ActionHistory::Instance()->history_changed_signal.connect(boost::bind(
-    &AppController::UpdateActionHistory,true,controller));
+    &AppController::UpdateActionHistory,controller));
 
-  Utils::LogHistory::Instance()->history_changed_signal.connect(boost::bind(
-    &AppController::UpdateLogHistory,true,controller));
+  Utils::Log::Instance()->post_log_signal.connect(boost::bind(
+    &AppController::UpdateLogHistory,controller,true,_1,_2));
 
   // Step 6: Qt connections
   // Connect the edit box to the slot that posts the action
@@ -144,24 +149,24 @@ AppController::post_action()
 }
 
 void
-AppController::post_message(std::string message)
+AppController::post_action_message(std::string message)
 {
   l_action_status_->setText(QString::fromStdString(message));
 }
 
 void
-AppController::post_usage(std::string usage)
+AppController::post_action_usage(std::string usage)
 {
   l_action_usage_->setText(QString::fromStdString(usage));
 }
 
 void 
-AppController::UpdateActionHistory(bool relay,QPointer<AppController> controller)
+AppController::UpdateActionHistory(qpointer_type controller)
 {
   // Ensure that this call gets relayed to the right thread
-  if (relay)
+  if (!(Interface::IsInterfaceThread()))
   {
-    PostInterface(boost::bind(&AppController::UpdateActionHistory,false,controller));
+    PostInterface(boost::bind(&AppController::UpdateActionHistory,controller));
     return;
   }
   
@@ -170,32 +175,32 @@ AppController::UpdateActionHistory(bool relay,QPointer<AppController> controller
   if (controller.data())
   {
     controller->private_->action_history_model_->updateHistory();
-    controller->tv_action_history_->resizeRowsToContents();
+    // controller->tv_action_history_->resizeRowsToContents();
     // Auto scroll to last event
     QScrollBar* scrollbar = controller->tv_action_history_->verticalScrollBar();
     if (scrollbar) scrollbar->setValue(scrollbar->maximum());
-
   }
 }
 
 
 void 
-AppController::UpdateLogHistory(bool relay,QPointer<AppController> controller)
+AppController::UpdateLogHistory(qpointer_type controller, bool relay,
+                                int message_type, std::string message)
 {
   // Ensure that this call gets relayed to the right thread
   if (relay)
   {
-    PostInterface(boost::bind(&AppController::UpdateLogHistory,false,controller));
+    PostInterface(boost::bind(&AppController::UpdateLogHistory,controller,
+                          false,message_type,message));
     return;
   }
-  
+
   // Protect controller pointer, so we do not execute if controller does not
   // exist anymore
   if (controller.data())
   {
-//    controller->private_->log_history_model_->updateHistory();
-//    controller->tv_log_history_->resizeRowsToContents();
-
+    controller->private_->log_history_model_->add_log_entry(message_type,message);
+    
     // Auto scroll to last event
     QScrollBar* scrollbar = controller->tv_log_history_->verticalScrollBar();
     if (scrollbar) scrollbar->setValue(scrollbar->maximum());
@@ -204,44 +209,41 @@ AppController::UpdateLogHistory(bool relay,QPointer<AppController> controller)
 
 
 void
-AppController::PostMessage(QPointer<AppController> controller,
-                           std::string message)
+AppController::PostActionMessage(qpointer_type controller, std::string message)
 {
   // Ensure that this call gets relayed to the right thread
   if (!(Interface::IsInterfaceThread()))
   {
-    PostInterface(boost::bind(&AppController::PostMessage,controller,message));
+    PostInterface(boost::bind(&AppController::PostActionMessage,controller,message));
   }
 
   // Protect controller pointer, so we do not execute if controller does not
   // exist anymore
   if (controller.data())
   {
-    controller->post_message(message);
+    controller->post_action_message(message);
   }
 }
 
 void
-AppController::PostUsage(QPointer<AppController> controller,
-                         std::string usage)
+AppController::PostActionUsage(qpointer_type controller, std::string usage)
 {
   // Ensure that this call gets relayed to the right thread
   if (!(Interface::IsInterfaceThread()))
   {
-    PostInterface(boost::bind(&AppController::PostUsage,controller,usage));
+    PostInterface(boost::bind(&AppController::PostActionUsage,controller,usage));
   }
 
   // Protect controller pointer, so we do not execute if controller does not
   // exist anymore
   if (controller.data())
   {
-    controller->post_usage(usage);
+    controller->post_action_usage(usage);
   }
 }
 
 void
-AppController::SetActionType(QPointer<AppController> controller,
-                             std::string action_type)
+AppController::SetActionType(qpointer_type controller, std::string action_type)
 {
   // Protect controller pointer, so we do not execute if controller does not
   // exist anymore

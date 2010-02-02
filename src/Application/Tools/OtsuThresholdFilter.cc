@@ -56,7 +56,7 @@ namespace Seg3D {
   
   OtsuThresholdFilter::~OtsuThresholdFilter()
   {
-    
+    disconnect_all();
   }
   
   void

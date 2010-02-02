@@ -56,7 +56,7 @@ namespace Seg3D {
   
   FillHolesFilter::~FillHolesFilter()
   {
-    
+    disconnect_all();
   }
   
   void

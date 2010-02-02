@@ -64,7 +64,7 @@ namespace Seg3D {
   
   BooleanFilter::~BooleanFilter()
   {
-    
+    disconnect_all();
   }
   
   void

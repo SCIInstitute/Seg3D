@@ -57,6 +57,7 @@ ThresholdTool::ThresholdTool(const std::string& toolid) :
 
 ThresholdTool::~ThresholdTool()
 {
+  disconnect_all();
 }
 
 void

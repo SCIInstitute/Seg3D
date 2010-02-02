@@ -61,18 +61,13 @@
 // Main Seg3D entry point
 ///////////////////////////////////////////////////////////
 
-
 using namespace Seg3D;
 
 int main(int argc, char **argv)
 {
-    
   // -- Setup error logging --
   // stream error to the console window
   Utils::LogStreamer error_log(Utils::Log::ALL_E,&(std::cerr));
-
-  // stream errors to a history log that maintains the last 1000 entries
-  Utils::LogHistory::Instance()->set_max_history_size(1000);
 
   // -- Startup Seg3D --
   SCI_LOG_MESSAGE(std::string("--- Starting Seg3D ")+SEG3D_VERSION+" "+
@@ -88,19 +83,17 @@ int main(int argc, char **argv)
   // -- Use Seg3D::Application::Instance()->checkCommandLineParameter( const std::string &key ) 
   // -- to test if a given parameter was passed.
   // -- Checking for the socket parameter --
-  std::string socket_number_as_string_ = Seg3D::Application::Instance()->checkCommandLineParameter("socket");
+  std::string socket_number_as_string_ = 
+          Seg3D::Application::Instance()->checkCommandLineParameter("socket");
   int socket_number_ =  boost::lexical_cast<int>(socket_number_as_string_);
   
   if (socket_number_ > 0) 
   {
     // -- Add a socket for receiving actions --
-      
     SCI_LOG_DEBUG("Starting a socket on port: " + socket_number_as_string_);
       
     ActionSocket::Instance()->start(socket_number_);
-    
   }
-  
   
   // -- Add plugins into the architecture  
   SCI_LOG_DEBUG("Setup and register all the plugins");

@@ -64,7 +64,7 @@ class AppControllerContext : public ActionContext {
 
   private:
     // To which controller does the action information need to be relayed
-    QPointer<AppController> controller_;
+    AppController::qpointer_type controller_;
 };
 
 } //end namespace Seg3D

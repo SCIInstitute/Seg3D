@@ -53,6 +53,7 @@ Viewer::Viewer(const std::string& key) :
   
 Viewer::~Viewer()
 {
+  disconnect_all();
 }
 
 void Viewer::set_renderer( ViewerRendererHandle renderer )

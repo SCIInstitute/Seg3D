@@ -59,7 +59,7 @@ namespace Seg3D {
   
   IntensityCorrectionFilter::~IntensityCorrectionFilter()
   {
-    
+    disconnect_all();
   }
   
   void

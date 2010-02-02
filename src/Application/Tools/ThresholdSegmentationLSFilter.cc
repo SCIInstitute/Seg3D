@@ -65,7 +65,7 @@ namespace Seg3D {
   
   ThresholdSegmentationLSFilter::~ThresholdSegmentationLSFilter()
   {
-    
+    disconnect_all();
   }
   
   void

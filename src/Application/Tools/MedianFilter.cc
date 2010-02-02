@@ -50,6 +50,7 @@ Tool(toolid)
 
 MedianFilter::~MedianFilter()
 {
+  disconnect_all();
 }
   
 void

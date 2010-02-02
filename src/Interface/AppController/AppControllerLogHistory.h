@@ -33,19 +33,22 @@
 # pragma once
 #endif 
 
+// STL includes
+#include <string>
+#include <deque>
+
 // QT includes
 #include <QtGui>
 
 // Utils includes
 #include <Utils/Core/Log.h>
-#include <Utils/Core/LogHistory.h>
 
 namespace Seg3D {
 
 class AppControllerLogHistory : public QAbstractTableModel
 {
   public:
-    AppControllerLogHistory(QObject* parent= 0);
+    AppControllerLogHistory(size_t log_size, QObject* parent= 0);
     
     virtual ~AppControllerLogHistory();
     
@@ -55,11 +58,15 @@ class AppControllerLogHistory : public QAbstractTableModel
     QVariant data(const QModelIndex& index, int role) const;
     QVariant headerData(int section, Qt::Orientation orientation, int role) const;
     
-    void updateHistory();
+    void add_log_entry(int message_type,std::string& message);
   
   private:
-    // Short cut to where the history is stored
-    Utils::LogHistory* history_;
+    // Classes needed for storing the recent log history
+    typedef std::pair<int,std::string>      log_entry_type;
+    typedef std::deque<log_entry_type>      log_history_type;
+    
+    log_history_type  log_history_;
+    size_t            log_history_size_;
 };
 
 } // end namespace Seg3D

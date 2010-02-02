@@ -58,7 +58,7 @@ DiscreteGaussianFilter::target_constraint(std::string layerid)
   
 DiscreteGaussianFilter::~DiscreteGaussianFilter()
 {
-  
+  disconnect_all();
 }
 
 void

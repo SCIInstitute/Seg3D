@@ -53,7 +53,9 @@ namespace Seg3D {
   }
   
   ConnectedComponentFilter::~ConnectedComponentFilter()
-  { }
+  { 
+    disconnect_all();
+  }
   
   void
   ConnectedComponentFilter::activate()

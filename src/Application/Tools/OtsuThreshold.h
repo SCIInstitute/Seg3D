@@ -54,9 +54,5 @@ namespace Seg3D  {
   public:
     // Layerid of the target layer
     StateOption::Handle              target_layer_;
-    
-    
-    
-    
-    
+ 
   };

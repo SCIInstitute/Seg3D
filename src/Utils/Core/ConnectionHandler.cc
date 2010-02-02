@@ -47,7 +47,7 @@ ConnectionHandler::~ConnectionHandler()
 }
 
 void 
-ConnectionHandler::add_connection(boost::signals2::connection& connection)
+ConnectionHandler::add_connection(const boost::signals2::connection& connection)
 {
   connections_.push_back(connection);
 }

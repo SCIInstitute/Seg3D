@@ -59,7 +59,7 @@ namespace Seg3D {
   
   HistogramEqualizationFilter::~HistogramEqualizationFilter()
   {
-    
+    disconnect_all();
   }
   
   void

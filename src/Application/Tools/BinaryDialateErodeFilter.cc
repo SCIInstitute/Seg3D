@@ -59,7 +59,7 @@ namespace Seg3D {
   
   BinaryDialateErodeFilter::~BinaryDialateErodeFilter()
   {
-    
+    disconnect_all();
   }
   
   void

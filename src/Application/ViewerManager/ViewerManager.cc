@@ -59,6 +59,7 @@ ViewerManager::ViewerManager() :
   
 ViewerManager::~ViewerManager()
 {
+  disconnect_all();
 }
 
 ViewerHandle 

@@ -44,31 +44,31 @@ AppControllerContext::~AppControllerContext()
 void
 AppControllerContext::report_error(const std::string& error)
 {
-  AppController::PostMessage(controller_,error);
+  AppController::PostActionMessage(controller_,error);
 }
 
 void
 AppControllerContext::report_warning(const std::string& warning)
 {
-  AppController::PostMessage(controller_,warning);
+  AppController::PostActionMessage(controller_,warning);
 }
 
 void
 AppControllerContext::report_message(const std::string& message)
 {
-  AppController::PostMessage(controller_,message);
+  AppController::PostActionMessage(controller_,message);
 }
 
 void
 AppControllerContext::report_usage(const std::string& usage)
 {
-  AppController::PostUsage(controller_,usage);
+  AppController::PostActionUsage(controller_,usage);
 }
 
 void
 AppControllerContext::report_done(bool success)
 {
-  if (success) AppController::PostMessage(controller_,"");
+  if (success) AppController::PostActionMessage(controller_,"");
 }
 
 bool

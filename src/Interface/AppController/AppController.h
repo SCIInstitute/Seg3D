@@ -51,22 +51,25 @@ namespace Seg3D {
 class AppControllerPrivate;
 typedef boost::shared_ptr<AppControllerPrivate> AppControllerPrivateHandle;
 
+// Forward declaration
+class AppController;
+
+// Class definition
 class AppController : public QWidget {
     Q_OBJECT
-
-// constructor/destructor
+    
+// -- constructor/destructor --
   
   public:  
     AppController(QWidget* parent = 0);
-    
     virtual ~AppController();
 
+// -- qt slots --
   public Q_SLOTS:
     
     void post_action();
-    
-    void post_message(std::string message);
-    void post_usage(std::string usage);
+    void post_action_message(std::string message);
+    void post_action_usage(std::string usage);
 
   private:
     AppControllerPrivateHandle private_;
@@ -80,9 +83,8 @@ class AppController : public QWidget {
     QTableView*   tv_action_history_;
     QTableView*   tv_log_history_;
     
-    
-    
   public:
+    typedef QPointer<AppController> qpointer_type;
   
     // These functions are static as they are called from the callback stack
     // and as they may be delay, it is not clear whether the AppController
@@ -90,20 +92,19 @@ class AppController : public QWidget {
     // These functions also relay the function calls to the right thread.
     
     // Force the Controller to update its action history widget
-    static void UpdateActionHistory(bool relay, QPointer<AppController> controller);
+    static void UpdateActionHistory(qpointer_type controller);
 
     // Force the Controller to update its log history widget
-    static void UpdateLogHistory(bool relay, QPointer<AppController> controller);
+    static void UpdateLogHistory(qpointer_type controller, bool relay, 
+                                 int message_type, std::string message);
 
     // Post a message in the Controller message label
-    static void PostMessage(QPointer<AppController> controller,
-                            std::string message);
+    static void PostActionMessage(qpointer_type controller, std::string message);
 
     // Post a message in the controller usage label
-    static void PostUsage(QPointer<AppController> controller,
-                          std::string usage);
+    static void PostActionUsage(qpointer_type controller, std::string usage);
                           
-    static void SetActionType(QPointer<AppController> controller, std::string action_type);
+    static void SetActionType(qpointer_type controller, std::string action_type);
 };
 
 } // end namespace Seg3D

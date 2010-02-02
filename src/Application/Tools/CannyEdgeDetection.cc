@@ -51,7 +51,7 @@ namespace Seg3D {
   
   CannyEdgeDetection::~CannyEdgeDetection()
   {
-    
+    disconnect_all();
   }
   
   void

@@ -62,6 +62,7 @@ namespace Seg3D {
   
   ArithmeticFilter::~ArithmeticFilter()
   {
+    disconnect_all();
   }
   
   void

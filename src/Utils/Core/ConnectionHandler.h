@@ -59,7 +59,7 @@ class ConnectionHandler : public boost::noncopyable {
     // ADD_CONNECTION:
     // Add a connection into the list so it can be deleted on the destruction
     // of the clas
-    void add_connection(boost::signals2::connection& connection);
+    void add_connection(const boost::signals2::connection& connection);
 
     // DISCONNECT_ALL:
     // Disconnect alal the connections that are stored in this class.

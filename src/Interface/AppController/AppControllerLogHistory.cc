@@ -30,9 +30,9 @@
 
 namespace Seg3D {
 
-AppControllerLogHistory::AppControllerLogHistory(QObject* parent) :
+AppControllerLogHistory::AppControllerLogHistory(size_t log_history_size, QObject* parent) :
   QAbstractTableModel(parent),
-  history_(Utils::LogHistory::Instance())
+  log_history_size_(log_history_size)
 {
 }
 
@@ -41,13 +41,13 @@ AppControllerLogHistory::~AppControllerLogHistory()
 }
 
 int
-AppControllerLogHistory::rowCount(const QModelIndex& /*index*/) const
+AppControllerLogHistory::rowCount(const QModelIndex&) const
 {
-  return (static_cast<int>(history_->history_size()));
+  return (static_cast<int>(log_history_.size()));
 }
 
 int
-AppControllerLogHistory::columnCount(const QModelIndex& /*index*/) const
+AppControllerLogHistory::columnCount(const QModelIndex&) const
 {
   return (1);
 }
@@ -63,10 +63,10 @@ AppControllerLogHistory::data(const QModelIndex& index, int role) const
   }
   else if (role == Qt::DisplayRole)
   {
-    int sz = static_cast<int>(history_->history_size());
+    int sz = static_cast<int>(log_history_.size());
     if (index.row() < sz)
     {
-      Utils::LogHistory::log_entry_type log_entry = history_->log_entry(sz-index.row()-1);
+      log_entry_type log_entry = log_history_[sz-index.row()-1];
       if (index.column() == 0)
       {
         return (QString::fromStdString(log_entry.second));
@@ -76,6 +76,26 @@ AppControllerLogHistory::data(const QModelIndex& index, int role) const
     {
       return QVariant();
     }
+  }
+  else if (role == Qt::ForegroundRole)
+  {
+    int sz = static_cast<int>(log_history_.size());
+    if (index.row() < sz)
+    {
+      log_entry_type log_entry = log_history_[sz-index.row()-1];
+      if (index.column() == 0)
+      {
+        if (log_entry.first & Utils::Log::ERROR_E) return QBrush(QColor(1.0,0.0,0.0));
+        if (log_entry.first & Utils::Log::WARNING_E) return QBrush(QColor(0.8,0.2,0.0));
+        if (log_entry.first & Utils::Log::MESSAGE_E) return QBrush(QColor(0.0,0.0,0.3));
+        return QBrush(QColor(0.3,0.0,0.0));
+      }
+    }
+    else
+    {
+      return QVariant();
+    }
+    
   }
   else
   {
@@ -98,8 +118,16 @@ AppControllerLogHistory::headerData(int section, Qt::Orientation orientation, in
 }
 
 void 
-AppControllerLogHistory::updateHistory() 
-{ 
+AppControllerLogHistory::add_log_entry(int message_type,std::string& message)
+{
+  log_entry_type entry = std::make_pair(message_type,message);
+  
+  log_history_.push_front(entry);
+  if (log_history_.size() > log_history_size_)
+  {
+    log_history_.pop_back();
+  }
+    
   reset(); 
 }
 

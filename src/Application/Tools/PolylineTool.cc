@@ -53,6 +53,7 @@ PolylineTool::PolylineTool(const std::string& toolid) :
 
 PolylineTool::~PolylineTool()
 {
+  disconnect_all();
 }
 
 void

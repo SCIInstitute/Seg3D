@@ -49,8 +49,6 @@ Tool(toolid)
   // Add constaints, so that when the state changes the right ranges of 
   // parameters are selected
   target_layer_->value_changed_signal.connect(boost::bind(&AnisotropicDiffusionFilter::target_constraint,this,_1));
-  
-  
 }
 
 void
@@ -67,7 +65,7 @@ AnisotropicDiffusionFilter::target_constraint(std::string layerid)
 
 AnisotropicDiffusionFilter::~AnisotropicDiffusionFilter()
 {
-  
+  disconnect_all();
 }
 
 void

@@ -60,7 +60,7 @@ namespace Seg3D {
   
   MaskDataFilter::~MaskDataFilter()
   {
-    
+    disconnect_all();
   }
   
   void

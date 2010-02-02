@@ -61,6 +61,11 @@ StateHandler::add_statebase(const std::string& key, StateBaseHandle state)
     StateEngine::Instance()->remove_state(stateid);
   }
 
+  // Step (4): Link with statehandler
+
+  add_connection(state->state_changed_signal.connect(boost::bind(
+    &StateHandler::state_changed,this)));
+
   // Step (4): Add the state to the StateManager
   return (StateEngine::Instance()->add_state(stateid,state)); 
 }

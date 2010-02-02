@@ -69,6 +69,9 @@ AppInterface::AppInterface()
   // Define the main window viewer canvas
   viewer_interface_ = new ViewerInterface(this);
 
+  controller_interface_ =  new AppController(this);
+  controller_interface_->hide();
+
   // Setup the history dock widget
   add_windowids();
 

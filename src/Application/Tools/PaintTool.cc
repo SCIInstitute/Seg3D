@@ -61,6 +61,7 @@ PaintTool::PaintTool(const std::string& toolid) :
 
 PaintTool::~PaintTool()
 {
+  disconnect_all();
 }
 
 void

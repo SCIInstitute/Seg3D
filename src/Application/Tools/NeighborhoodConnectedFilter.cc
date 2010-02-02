@@ -56,7 +56,7 @@ namespace Seg3D {
   
   NeighborhoodConnectedFilter::~NeighborhoodConnectedFilter()
   {
-    
+    disconnect_all();
   }
   
   void
