@@ -50,23 +50,24 @@ class AppStatusBar : public QObject
   public:
     AppStatusBar(QMainWindow* parent = 0);
     virtual ~AppStatusBar();
-  
 
-  
   public Q_SLOTS:
     void set_coordinates_label(int, int);
     void set_coordinates_mode(int);
     void set_focus_label(int);
+    void set_active_tool_label(QString);
 
   // -- status bar components -- //
   private:
-    QLabel *coordinates_label_;
-    QLabel *focus_label_;
+    QLabel* coordinates_label_;
+    QLabel* focus_label_;
+    QLabel* active_tool_label_;
   
   // -- build status bar widgets -- //    
   private:
     void build_coordinates_label();
     void build_focus_label();
+    void build_active_tool_label();
   
 };
   

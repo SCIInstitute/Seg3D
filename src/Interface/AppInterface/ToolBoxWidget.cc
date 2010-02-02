@@ -74,13 +74,14 @@ ToolBoxWidget::ToolBoxWidget(QWidget* parent) :
   main_layout_->addStretch();
   
   main_->setLayout(main_layout_);
+  
 
 }
+    
 
 ToolBoxWidget::~ToolBoxWidget()
 {
 }
-  
 
 void 
 ToolBoxWidget::add_tool(QWidget * tool, const QString &label, boost::function<void ()> close_function, boost::function<void ()> activate_function, QUrl help_url)
@@ -308,15 +309,16 @@ void ToolBoxWidget::set_active_tool( QWidget *tool )
                                       "\n"
                                       "}\n"));  
         
-        ///  ---  This is where we add the icon's for the help button --- //
+        ///  ---  This is where we change the icon's for the help button --- //
         (*it)->close_button_->setIcon(active_close_icon_);
         (*it)->help_button_->setIcon(active_help_icon_);
         (*it)->tool_frame_->show();
+        Q_EMIT currentChanged ((*it)->activate_button_->text());
       }
     }
     ++it; index++; 
   }
-  Q_EMIT currentChanged (active_index_);
+  
 }
   
   

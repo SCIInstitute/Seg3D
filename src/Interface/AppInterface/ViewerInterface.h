@@ -57,8 +57,6 @@ class ViewerInterface : public QWidget {
     ViewerInterface(QWidget *parent = 0);
     virtual ~ViewerInterface();
     
-  //  void writeSizeSettings();
-  //  void readSizeSettings();
 
 // -- Setting widget state --    
     void set_layout(const std::string& layout);

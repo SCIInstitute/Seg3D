@@ -46,10 +46,12 @@ AppStatusBar::AppStatusBar(QMainWindow* parent) :
   QStatusBar* statusbar = parent->statusBar();
   
   build_coordinates_label();
+  build_active_tool_label();
   build_focus_label();
   
   statusbar->addWidget(coordinates_label_, 0);
-  statusbar->addWidget(focus_label_, 1);
+  statusbar->addWidget(active_tool_label_, 1);
+  statusbar->addWidget(focus_label_, 2);
   
   set_coordinates_label(234, 232);
 }
@@ -72,6 +74,11 @@ AppStatusBar::~AppStatusBar()
     focus_label_ = new QLabel("Focus: ");
     focus_label_->setIndent(3);
   }  
+  
+  void AppStatusBar::build_active_tool_label()
+  {
+    active_tool_label_ = new QLabel("The active tool is: ");
+  }
   
   // -- public slots -- //
   
@@ -115,7 +122,12 @@ AppStatusBar::~AppStatusBar()
   }
   
   
-  
+  void AppStatusBar::set_active_tool_label(QString active_tool)
+  {
+    
+    active_tool_label_ = new QLabel("The active tool is: " + active_tool);
+    
+  }
   
   
   

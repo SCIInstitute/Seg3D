@@ -67,7 +67,7 @@ class ToolBoxWidget : public QScrollArea
     int index_of(QWidget *index);
     
   Q_SIGNALS:
-      void currentChanged( int index );
+      void currentChanged( QString );
       void tool_removed_signal( int index );
 
   private:

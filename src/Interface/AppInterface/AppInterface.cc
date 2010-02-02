@@ -81,6 +81,7 @@ AppInterface::AppInterface()
 
   setCentralWidget(viewer_interface_);
 
+
   //showFullScreen();
   application_menu_ = new AppMenu(this, viewer_interface_);
   status_bar_ = new AppStatusBar(this);
@@ -94,7 +95,9 @@ AppInterface::AppInterface()
     AppInterface::HandleCloseWindow,app_interface,_1));
   
   InterfaceManager::Instance()->full_screen_window_signal.connect(boost::bind(
-    AppInterface::HandleFullScreenWindow, app_interface, _1));                                
+    AppInterface::HandleFullScreenWindow, app_interface, _1));     
+  
+   
 }
 
 void

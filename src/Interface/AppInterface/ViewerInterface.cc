@@ -136,31 +136,6 @@ ViewerInterface::~ViewerInterface()
 {
 }
 
-//TODO - build viewer sizes state saver and recoverer
-
-/*
-void ViewerInterface::writeSizeSettings()
-{
-    QSettings settings( "SCI", "Seg3D2.0" );
-    settings.beginGroup("ViewerInterface");
-    settings.setValue("geometry", saveGeometry());
-    settings.setValue("mainSplitter", private_->ui_.mainSplitter->saveState());
-    settings.setValue("rightSplitter", private_->ui_.rightSplitter->saveState());
-    settings.setValue("leftSplitter", private_->ui_.leftSplitter->saveState());
-    settings.endGroup();
-}
-
-void ViewerInterface::readSizeSettings()
-{
-    QSettings settings( "SCI", "Seg3D2.0" );
-    settings.beginGroup("ViewerInterface");
-    restoreGeometry(settings.value("geometry").toByteArray());
-    private_->ui_.mainSplitter->restoreState(settings.value("mainSplitter").toByteArray());
-    private_->ui_.rightSplitter->restoreState(settings.value("rightSplitter").toByteArray());
-    private_->ui_.leftSplitter->restoreState(settings.value("leftSplitter").toByteArray());
-    settings.endGroup();
-}
-*/
   
 void 
 ViewerInterface::set_active_viewer(int active_viewer)

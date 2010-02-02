@@ -77,7 +77,7 @@ class ToolsDockWidget : public QDockWidget {
   public Q_SLOTS:
   
     void tool_changed(int index);
-
+    
   private:
 
     boost::signals2::connection open_tool_connection_;
