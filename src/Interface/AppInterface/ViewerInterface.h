@@ -62,6 +62,8 @@ class ViewerInterface : public QWidget {
 
 // -- Setting widget state --    
     void set_layout(const std::string& layout);
+  
+  public Q_SLOTS:
     void set_active_viewer(int);
 
 // -- Slots --    

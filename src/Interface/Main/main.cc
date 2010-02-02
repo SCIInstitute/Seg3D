@@ -62,62 +62,11 @@
 ///////////////////////////////////////////////////////////
 
 
-
-namespace Seg3D {
-  
-  // Function for parsing the command line parameters
-  void
-  parse_command_line_parameters( int argc, char **argv)
-  {
-    int count_ = 1;  // start at 1 because the filename/path counts as 0
-    std::string key;
-    std::string value;
-    
-    typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
-    boost::char_separator<char> seperator(":-=|;");
-    
-    // parse through the command line arguments
-    while (count_ < argc) 
-    {
-      std::string param(argv[count_]);
-      tokenizer tokens(param, seperator);
-      std::vector<std::string> param_vector_;
-
-      for (tokenizer::iterator tok_iter = tokens.begin();tok_iter != tokens.end(); ++tok_iter)
-      {
-        param_vector_.push_back(*tok_iter);
-      } // end for loop
-      
-      if (param_vector_.size() == 2) {
-        key = param_vector_[0];
-        value = param_vector_[1];
-      } // end if
-      else 
-      {
-        key = param_vector_[0];
-        value = "1";
-      } // end else
-      
-      // output the parsed parameters to the log
-      std::string parameter_number_ = boost::lexical_cast<std::string>(count_);
-      SCI_LOG_MESSAGE("Parameter " + parameter_number_ + " - Key: " + key + ", Value: " + value);
-      
-      Seg3D::Application::Instance()->setParameter(key, value);
-      count_++;
-    }  // end while
-    
-  }  // end parse_command_line_parameters
-  
-}
-
-
 using namespace Seg3D;
 
 int main(int argc, char **argv)
 {
-  
-
-  
+    
   // -- Setup error logging --
   // stream error to the console window
   Utils::LogStreamer error_log(Utils::Log::ALL_E,&(std::cerr));
@@ -134,11 +83,10 @@ int main(int argc, char **argv)
   Seg3D::ActionHistory::Instance()->set_max_history_size(300);
   
   // -- Parse the command line parameters and put them in a stl::map --
+  Seg3D::Application::Instance()->parse_command_line_parameters( argc, argv );
+  
   // -- Use Seg3D::Application::Instance()->checkCommandLineParameter( const std::string &key ) 
   // -- to test if a given parameter was passed.
-  parse_command_line_parameters( argc, argv );
-  
-
   // -- Checking for the socket parameter --
   std::string socket_number_as_string_ = Seg3D::Application::Instance()->checkCommandLineParameter("socket");
   int socket_number_ =  boost::lexical_cast<int>(socket_number_as_string_);

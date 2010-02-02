@@ -76,6 +76,12 @@ class Application : public Utils::EventHandler  {
     // SETPARAMETER
     // put parameters from the command line into a map
     void setParameter( const std::string &key, const std::string &val );
+  
+    // PARSEPARAMETERS
+    // parse paremeters from the command line
+    void parse_command_line_parameters( int argc, char **argv);
+
+
 
 // -- Singleton interface --
   public:

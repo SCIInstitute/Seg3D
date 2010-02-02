@@ -92,9 +92,10 @@ ViewerInterfacePrivate::ViewerInterfacePrivate(QWidget* parent)
   layout_->addWidget(horiz_splitter_);
   parent->setLayout(layout_);
   
+
   for (size_t j=0;j<6;j++)
-    parent->connect(viewer_[j],SIGNAL(selected(int)),
-                        SLOT(set_selected_viewer(int)));
+    parent->connect(viewer_[j],SIGNAL(selected(int)), 
+                        SLOT(set_active_viewer(int)));
 } 
   
   
