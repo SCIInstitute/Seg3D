@@ -123,12 +123,6 @@ ViewerInterface::ViewerInterface(QWidget *parent) :
   set_layout(ViewerManager::Instance()->layout_state->get());
   set_active_viewer(ViewerManager::Instance()->active_viewer_state->get());
   
-  for (size_t i = 0; i < 6; i++)
-  {
-    ViewerManager::Instance()->get_viewer(i)->set_renderer(private_->viewer_[i]->renderer());
-  }
-  
-
   StateEngine::Unlock();
 }
 

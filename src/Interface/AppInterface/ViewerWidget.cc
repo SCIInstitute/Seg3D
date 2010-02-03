@@ -362,16 +362,12 @@ ViewerWidget::ViewerWidget(int viewer_id, QWidget *parent) :
   setLineWidth(3);
   setFrameShape(QFrame::Panel);
   setFrameShadow(QFrame::Raised);
+  
+  private_->viewer_->set_id(viewer_id_);
 }
 
 ViewerWidget::~ViewerWidget()
 {
-}
-
-ViewerRendererHandle
-ViewerWidget::renderer()
-{
-  return private_->viewer_->renderer();
 }
 
 void

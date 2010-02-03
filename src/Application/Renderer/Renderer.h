@@ -80,6 +80,7 @@ class Renderer : public ViewerRenderer, private Utils::EventHandler {
     bool redraw_needed_;
     bool resized_;
     boost::mutex redraw_needed_mutex_;
+    boost::mutex size_mutex_;
     
     static int red;
     int red_;

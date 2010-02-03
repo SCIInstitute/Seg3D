@@ -36,6 +36,7 @@
 #include <Application/Renderer/RenderResources.h> 
 #include <Application/Renderer/Renderer.h>
 #include <Application/Viewer/ViewerRenderer.h>
+#include <Application/Viewer/Viewer.h>
 
 #include <QtOpenGL>
  
@@ -50,23 +51,37 @@ class QtRenderWidget : public QGLWidget {
     virtual ~QtRenderWidget();
     
     void rendering_completed_slot(TextureHandle texture);
-    
-    ViewerRendererHandle renderer()
-    {
-      return renderer_;
-    }
+        
+    void set_id(size_t viewer_id);
 
   protected:
   
     virtual void initializeGL();
     virtual void paintGL();
     virtual void resizeGL(int width, int height);
-
+    
+    virtual void  mouseDoubleClickEvent ( QMouseEvent * event ) {}
+    virtual void  mouseMoveEvent ( QMouseEvent * event );
+    virtual void  mousePressEvent ( QMouseEvent * event );
+    virtual void  mouseReleaseEvent ( QMouseEvent * event );
+    
   private:
+  
+    inline int convert_qt_mousebuttons_to_viewer(Qt::MouseButtons buttons) {
+      return int(buttons);
+    }
+
+    inline int convert_qt_keymodifiers_to_viewer(Qt::KeyboardModifiers modifiers) {
+      return int(modifiers);
+    }
+
     RendererHandle renderer_;
     TextureHandle renderer_texture_;
     
     boost::signals2::connection rendering_completed_connection_;
+    
+    size_t viewer_id_;
+    ViewerHandle viewer_;
 };
 
 } // end namespace Seg3D

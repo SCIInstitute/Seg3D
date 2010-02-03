@@ -60,7 +60,7 @@ class RendererEventHandlerContext : public Utils::DefaultEventHandlerContext
 int Renderer::red = 1;
 
 Renderer::Renderer() :
-  EventHandler(), active_render_texture_(0), width_(0), 
+  ViewerRenderer(), EventHandler(), active_render_texture_(0), width_(0), 
   height_(0), redraw_needed_(false), resized_(false)
 {
   red_ = (red++);
@@ -109,6 +109,15 @@ Renderer::redraw()
     boost::unique_lock<boost::mutex> lock(redraw_needed_mutex_);
     redraw_needed_ = false;
   }
+  
+  {
+    boost::unique_lock<boost::mutex> lock(redraw_needed_mutex_);
+    if (redraw_needed_)
+    {
+      return;
+    }
+  }
+  
   
   // make the rendering context current
   context_->make_current();
@@ -166,11 +175,11 @@ Renderer::resize(int width, int height)
   }
   
   if ( width == 0 || height == 0
-      || (width_ == width && height_ == height) )
+    || (width_ == width && height_ == height) )
   {
     return;
   }
-    
+  
   {
     boost::unique_lock<RenderResources::mutex_type> lock(RenderResources::Instance()->shared_context_mutex());
     textures_[0] = TextureHandle(new Texture2D());
@@ -183,7 +192,6 @@ Renderer::resize(int width, int height)
 
   width_ = width;
   height_ = height;
-  resized_ = true;
   
   redraw();
 }

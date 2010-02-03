@@ -38,6 +38,7 @@
 // Interface includes
 #include <Interface/QtInterface/QtRenderWidget.h>
 #include <Application/Interface/Interface.h>
+#include <Application/ViewerManager/ViewerManager.h>
 
 namespace Seg3D {
 
@@ -113,7 +114,7 @@ QtRenderWidget::paintGL()
     glTexCoord2f(0.0f, 1.0f);
     glVertex2f(0.0f, height);
   glEnd();
-  renderer_texture_->disable();
+  renderer_texture_->disable(); 
 }
 
 void
@@ -130,6 +131,40 @@ QtRenderWidget::resizeGL(int width,int height)
   {
     renderer_->resize(width, height);
   }
+}
+
+void 
+QtRenderWidget::mouseMoveEvent( QMouseEvent * event )
+{
+  viewer_->mouse_move_event(
+    event->x(), event->y(),
+    convert_qt_mousebuttons_to_viewer(event->buttons()),
+    convert_qt_keymodifiers_to_viewer(event->modifiers()));
+}
+
+void 
+QtRenderWidget::mousePressEvent( QMouseEvent * event )
+{
+  viewer_->mouse_press_event(
+    event->x(), event->y(),
+    convert_qt_mousebuttons_to_viewer(event->buttons()),
+    convert_qt_keymodifiers_to_viewer(event->modifiers()));
+}
+
+void 
+QtRenderWidget::mouseReleaseEvent( QMouseEvent * event )
+{
+  viewer_->mouse_release_event(
+    event->x(), event->y(),
+    convert_qt_mousebuttons_to_viewer(event->buttons()),
+    convert_qt_keymodifiers_to_viewer(event->modifiers()));
+}
+
+void QtRenderWidget::set_id( size_t viewer_id )
+{
+  viewer_id_ = viewer_id;
+  viewer_ = ViewerManager::Instance()->get_viewer(viewer_id);
+  renderer_->set_id(viewer_id);
 }
 
 } // end namespace Seg3D

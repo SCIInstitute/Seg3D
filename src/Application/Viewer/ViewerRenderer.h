@@ -61,11 +61,17 @@ class ViewerRenderer : public boost::noncopyable {
     
     virtual void resize(int width, int height);
     
+    // Set the index of the corresponding viewer in the ViewerManager
+    inline void set_id(size_t viewer_id) { viewer_id_ = viewer_id; }
+    
     
 // -- signals handling --
   public:
     typedef boost::signals2::signal<void (TextureHandle)> rendering_completed_signal_type;
-    rendering_completed_signal_type rendering_completed_signal;    
+    rendering_completed_signal_type rendering_completed_signal;  
+    
+  protected:
+    size_t viewer_id_;  
 };
 
 } // end namespace Seg3D

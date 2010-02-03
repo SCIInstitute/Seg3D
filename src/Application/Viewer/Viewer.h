@@ -38,6 +38,7 @@
 
 // Boost includes 
 #include <boost/shared_ptr.hpp>
+#include <boost/function.hpp>
 
 // Application includes
 #include <Application/State/State.h>
@@ -56,7 +57,64 @@ class Viewer : public StateHandler {
   public:
     Viewer(const std::string& key);
     virtual ~Viewer();
+    
+// -- Enumerates --
+  public:
+    // enums for mouse buttons 
+    // they have the same values as corresponding Qt ones
+    enum {
+      NO_BUTTON_E = 0x00000000,
+      LEFT_BUTTON_E = 0x00000001,
+      RIGHT_BUTTON_E = 0x00000002,
+      MID_BUTTON_E = 0x00000004
+    };
+    
+    // enums for key modifiers
+    // they have the same values as corresponding Qt ones
+    enum {
+      NO_MODIFIER_E = 0x00000000,
+      SHIFT_MODIFIER_E = 0x02000000,
+      CONTROL_MODIFIER_E = 0x04000000,
+      ALT_MODIFIER_E = 0x08000000
+    };
 
+// -- mouse events handling --
+  public:
+    
+    struct MousePosition {
+      int x;
+      int y;
+    };
+    
+    struct MousePositions {
+      MousePosition start;
+      MousePosition previous;
+      MousePosition current;
+    };
+    
+    void mouse_move_event(int x, int y, int buttons, int modifiers);
+    void mouse_press_event(int x, int y, int buttons, int modifiers);
+    void mouse_release_event(int x, int y, int buttons, int modifiers);
+    
+    typedef boost::function<bool (int, int, int, int)> mouse_event_handler;
+    
+    inline void set_mouse_move_handler(mouse_event_handler func) {
+      mouse_move_handler_ = func;
+    }
+    
+    inline void set_mouse_press_handler(mouse_event_handler func) {
+      mouse_press_handler_ = func;
+    }
+    
+    inline void set_mouse_release_handler(mouse_event_handler func) {
+      mouse_release_handler_ = func;
+    }
+    
+  private:
+    mouse_event_handler mouse_move_handler_;
+    mouse_event_handler mouse_press_handler_;
+    mouse_event_handler mouse_release_handler_;
+    
 // -- State information --
   public:
   
@@ -75,17 +133,7 @@ class Viewer : public StateHandler {
     StateBoolHandle    volume_slices_visible_state;
     StateBoolHandle    volume_isosurfaces_visible_state;
     StateBoolHandle    volume_volume_rendering_visible_state;
-    
-// -- Renderer information --
-  public:
-    
-    ViewerRendererHandle renderer() { return renderer_; }
-    void set_renderer(ViewerRendererHandle renderer);
 
-  private:
-    // A handle to the renderer that is used to render the data
-    ViewerRendererHandle renderer_;
-    
 };
 
 } // end namespace Seg3D

@@ -56,9 +56,52 @@ Viewer::~Viewer()
   disconnect_all();
 }
 
-void Viewer::set_renderer( ViewerRendererHandle renderer )
+void 
+Viewer::mouse_move_event( int x, int y, int buttons, int modifiers )
 {
-  renderer_ = renderer;
+  if (!mouse_move_handler_.empty())
+  {
+    // if the registered handler handled the event, no further process needed
+    if (mouse_move_handler_(x, y, buttons, modifiers))
+    {
+      return;
+    }
+  }
+  
+  // default handling here
+
+}
+
+void 
+Viewer::mouse_press_event( int x, int y, int buttons, int modifiers )
+{
+  if (!mouse_press_handler_.empty())
+  {
+    // if the registered handler handled the event, no further process needed
+    if (mouse_press_handler_(x, y, buttons, modifiers))
+    {
+      return;
+    }
+  }
+
+  // default handling here
+
+}
+
+void 
+Viewer::mouse_release_event( int x, int y, int buttons, int modifiers )
+{
+  if (!mouse_release_handler_.empty())
+  {
+    // if the registered handler handled the event, no further process needed
+    if (mouse_release_handler_(x, y, buttons, modifiers))
+    {
+      return;
+    }
+  }
+
+  // default handling here
+
 }
 
 } // end namespace Seg3D

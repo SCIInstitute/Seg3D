@@ -56,9 +56,7 @@ class ViewerWidget : public QFrame {
   public:
     ViewerWidget(int viewer_id, QWidget *parent = 0);
     virtual ~ViewerWidget();
-    
-    ViewerRendererHandle renderer();
-  
+
   Q_SIGNALS:
     void selected(int);
     void changed_viewer_type(int);

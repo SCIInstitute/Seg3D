@@ -30,7 +30,8 @@
 
 namespace Seg3D {
 
-ViewerRenderer::ViewerRenderer()
+ViewerRenderer::ViewerRenderer() :
+  viewer_id_(0)
 {
 }
 
