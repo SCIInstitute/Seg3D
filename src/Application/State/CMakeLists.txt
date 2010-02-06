@@ -54,8 +54,8 @@ SET(APPLICATION_STATE_ACTIONS_SRCS
   Actions/ActionSet.cc
   Actions/ActionGet.h
   Actions/ActionGet.cc
-#  Actions/ActionRotate.h
-#  Actions/ActionRotate.cc
+  Actions/ActionRotate.h
+  Actions/ActionRotate.cc
   )
 
 ADD_LIBRARY(Application_State STATIC 

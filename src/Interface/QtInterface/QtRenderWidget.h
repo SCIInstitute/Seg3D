@@ -82,6 +82,8 @@ class QtRenderWidget : public QGLWidget {
     
     size_t viewer_id_;
     ViewerHandle viewer_;
+    
+    MouseHistory mouse_history_;
 };
 
 } // end namespace Seg3D

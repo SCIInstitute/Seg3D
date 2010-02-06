@@ -36,6 +36,7 @@ namespace Utils {
 
 // Forward declaration
 class View3D;
+class Quaternion;
 
 class View3D {
   public:
@@ -45,7 +46,7 @@ class View3D {
 
     View3D(const View3D&);
     View3D& operator=(const View3D&);
-
+    
     // compare 2 views; are they exactly the same?
     bool operator==(const View3D&);
     bool operator!=(const View3D&);
@@ -61,6 +62,8 @@ class View3D {
 
     inline double fov() const                { return fov_; }
     inline void fov(double fov)              { fov_ = fov; }
+    
+    void rotate(const Quaternion& rotation);
     
   private:
     // Eye point

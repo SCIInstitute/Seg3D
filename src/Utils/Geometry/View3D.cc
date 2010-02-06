@@ -28,6 +28,7 @@
 
 #include <Utils/Geometry/View3D.h>
 #include <Utils/Math/MathFunctions.h>
+#include <Utils/Geometry/Quaternion.h>
 
 namespace Utils {
 
@@ -77,6 +78,11 @@ View3D::operator!=(const View3D& copy)
 {
   return (eyep_ != copy.eyep_ || lookat_ != copy.lookat_ ||
           up_ != copy.up_     || fov_ != copy.fov_);
+}
+
+void View3D::rotate( const Quaternion& rotation )
+{
+
 }
 
 } // End namespace Utils

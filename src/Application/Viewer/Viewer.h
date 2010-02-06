@@ -81,22 +81,28 @@ class Viewer : public StateHandler {
 // -- mouse events handling --
   public:
     
-    struct MousePosition {
-      int x;
-      int y;
+    class MousePosition {
+      public:
+        MousePosition() : x(0), y(0) {}
+        
+        int x;
+        int y;
     };
     
-    struct MousePositions {
-      MousePosition start;
-      MousePosition previous;
-      MousePosition current;
+    class MouseHistory {
+      public:
+        MousePosition left_start;
+        MousePosition right_start;
+        MousePosition mid_start;
+        MousePosition previous;
+        MousePosition current;
     };
     
-    void mouse_move_event(int x, int y, int buttons, int modifiers);
-    void mouse_press_event(int x, int y, int buttons, int modifiers);
-    void mouse_release_event(int x, int y, int buttons, int modifiers);
+    void mouse_move_event(const MouseHistory& mouse_history, int buttons, int modifiers);
+    void mouse_press_event(const MouseHistory& mouse_history, int buttons, int modifiers);
+    void mouse_release_event(const MouseHistory& mouse_history, int buttons, int modifiers);
     
-    typedef boost::function<bool (int, int, int, int)> mouse_event_handler;
+    typedef boost::function<bool (const MouseHistory&, int, int)> mouse_event_handler;
     
     inline void set_mouse_move_handler(mouse_event_handler func) {
       mouse_move_handler_ = func;
@@ -135,6 +141,9 @@ class Viewer : public StateHandler {
     StateBoolHandle    volume_volume_rendering_visible_state;
 
 };
+
+typedef Viewer::MousePosition MousePosition;
+typedef Viewer::MouseHistory MouseHistory;
 
 } // end namespace Seg3D
 

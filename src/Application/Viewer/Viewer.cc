@@ -56,13 +56,12 @@ Viewer::~Viewer()
   disconnect_all();
 }
 
-void 
-Viewer::mouse_move_event( int x, int y, int buttons, int modifiers )
+void Viewer::mouse_move_event( const MouseHistory& mouse_history, int buttons, int modifiers )
 {
   if (!mouse_move_handler_.empty())
   {
     // if the registered handler handled the event, no further process needed
-    if (mouse_move_handler_(x, y, buttons, modifiers))
+    if (mouse_move_handler_(mouse_history, buttons, modifiers))
     {
       return;
     }
@@ -72,13 +71,12 @@ Viewer::mouse_move_event( int x, int y, int buttons, int modifiers )
 
 }
 
-void 
-Viewer::mouse_press_event( int x, int y, int buttons, int modifiers )
+void Viewer::mouse_press_event( const MouseHistory& mouse_history, int buttons, int modifiers )
 {
   if (!mouse_press_handler_.empty())
   {
     // if the registered handler handled the event, no further process needed
-    if (mouse_press_handler_(x, y, buttons, modifiers))
+    if (mouse_press_handler_(mouse_history, buttons, modifiers))
     {
       return;
     }
@@ -88,13 +86,12 @@ Viewer::mouse_press_event( int x, int y, int buttons, int modifiers )
 
 }
 
-void 
-Viewer::mouse_release_event( int x, int y, int buttons, int modifiers )
+void Viewer::mouse_release_event( const MouseHistory& mouse_history, int buttons, int modifiers )
 {
   if (!mouse_release_handler_.empty())
   {
     // if the registered handler handled the event, no further process needed
-    if (mouse_release_handler_(x, y, buttons, modifiers))
+    if (mouse_release_handler_(mouse_history, buttons, modifiers))
     {
       return;
     }

@@ -52,6 +52,7 @@ namespace Seg3D {
 
 class StateView3D;
 typedef boost::shared_ptr<StateView3D> StateView3DHandle;
+typedef boost::weak_ptr<StateView3D> StateView3DWeakHandle;
 
 class StateView3D : public StateBase {
 

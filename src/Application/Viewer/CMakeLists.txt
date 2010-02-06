@@ -36,6 +36,8 @@ SET(APPLICATION_VIEW_SRCS
   Viewer.cc
   ViewerRenderer.h
   ViewerRenderer.cc
+  Trackball.h
+  Trackball.cc
   )
 
 SET(APPLICATION_VIEW_ACTIONS_SRCS

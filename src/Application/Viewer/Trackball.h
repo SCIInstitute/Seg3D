@@ -26,64 +26,40 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#include <Application/Renderer/RenderBuffer.h>
+#ifndef APPLICATION_VIEWER_TRACKBALL_H
+#define APPLICATION_VIEWER_TRACKBALL_H
+
+// Utils includes
+#include <Utils/Geometry/Quaternion.h>
+#include <Utils/Geometry/Vector.h>
 
 namespace Seg3D {
 
-const unsigned int RenderBuffer::TARGET_ = GL_RENDERBUFFER_EXT;
+class Trackball {
 
-RenderBuffer::RenderBuffer()
-{
-  glGenRenderbuffersEXT(1, &id_);
-  
-  _safe_bind();
-  _safe_unbind();
-}
+  public:
+    Trackball();
+    ~Trackball();
+    
+    Utils::Quaternion map_mouse_move_to_rotation(int x0, int y0, int x1, int y1);
+    
+    void resize(int width, int height) { width_ = width; height_ = height; }
+    void set_invert_y(bool invert_y) { invert_y_ = invert_y; }
+    void set_camera_mode(bool camera_mode) { camera_mode_ = camera_mode; }
+    
+  private:
+    Utils::Vector project_point_on_sphere(int x, int y);
+    
+    int width_;
+    int height_;
+    
+    // whether to invert the y coordinate
+    bool invert_y_;
+    
+    // indicates if the camera, instead of objects, is being rotated
+    bool camera_mode_;
+};
 
-RenderBuffer::~RenderBuffer()
-{
-  glDeleteRenderbuffersEXT(1, &id_);
-}
+} // End namespace Seg3D
 
-void RenderBuffer::bind()
-{
-  glBindRenderbufferEXT(TARGET_, id_);
-}
-
-void RenderBuffer::set_storage(int width, int height, unsigned int internal_format, int samples)
-{
-  _safe_bind();
-  if (samples > 1)
-  {
-    glRenderbufferStorageMultisampleEXT(TARGET_, samples, internal_format, width, height);
-  }
-  else
-  {
-    glRenderbufferStorageEXT(TARGET_, internal_format, width, height);
-  }
-  _safe_unbind();
-}
-
-void RenderBuffer::unbind()
-{
-  glBindRenderbufferEXT(TARGET_, 0);
-}
-
-void RenderBuffer::_safe_bind()
-{
-  glGetIntegerv(GL_RENDERBUFFER_BINDING_EXT, &saved_id_);
-  if (id_ != saved_id_)
-  {
-    glBindRenderbufferEXT(TARGET_, id_);
-  }
-}
-
-void RenderBuffer::_safe_unbind()
-{
-  if (id_ != saved_id_)
-  {
-    glBindRenderbufferEXT(TARGET_, saved_id_);
-  }
-}
-
-} // end namespace Seg3D
+#endif

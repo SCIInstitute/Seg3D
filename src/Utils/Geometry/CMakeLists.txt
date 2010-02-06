@@ -46,6 +46,10 @@ SET(UTILS_GEOMETRY_SRCS
   View3D.cc
   View2D.h
   View2D.cc
+  Quaternion.h
+  Quaternion.cc
+  Matrix.h
+  Matrix.cc
 )
 
 ##################################################

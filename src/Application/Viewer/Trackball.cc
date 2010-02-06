@@ -26,64 +26,53 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#include <Application/Renderer/RenderBuffer.h>
+// Utils includes
+#include <Utils/Math/MathFunctions.h>
+
+// Application includes
+#include <Application/Viewer/Trackball.h>
 
 namespace Seg3D {
 
-const unsigned int RenderBuffer::TARGET_ = GL_RENDERBUFFER_EXT;
-
-RenderBuffer::RenderBuffer()
+Trackball::Trackball() :
+  width_(0), height_(0), 
+  invert_y_(true), camera_mode_(true)
 {
-  glGenRenderbuffersEXT(1, &id_);
+}
+
+Trackball::~Trackball()
+{
+}
+
+Utils::Quaternion 
+Trackball::map_mouse_move_to_rotation(int x0, int y0, int x1, int y1)
+{
+  Utils::Vector v0 = project_point_on_sphere(x0, y0);
+  Utils::Vector v1 = project_point_on_sphere(x1, y1);
   
-  _safe_bind();
-  _safe_unbind();
-}
-
-RenderBuffer::~RenderBuffer()
-{
-  glDeleteRenderbuffersEXT(1, &id_);
-}
-
-void RenderBuffer::bind()
-{
-  glBindRenderbufferEXT(TARGET_, id_);
-}
-
-void RenderBuffer::set_storage(int width, int height, unsigned int internal_format, int samples)
-{
-  _safe_bind();
-  if (samples > 1)
+  Utils::Vector axis = Utils::Cross(v0, v1);
+  double angle = Utils::Acos(Dot(v0, v1));
+  
+  // negate the angle for camera rotation
+  if (camera_mode_)
   {
-    glRenderbufferStorageMultisampleEXT(TARGET_, samples, internal_format, width, height);
+    angle = -angle;
   }
-  else
-  {
-    glRenderbufferStorageEXT(TARGET_, internal_format, width, height);
-  }
-  _safe_unbind();
+  
+  return Utils::Quaternion(axis, angle);
 }
 
-void RenderBuffer::unbind()
+Utils::Vector 
+Trackball::project_point_on_sphere( int x, int y )
 {
-  glBindRenderbufferEXT(TARGET_, 0);
+  Utils::Vector v(x*2.0/width_-1.0, (invert_y_? (height_-y) : y)*2.0/height_-1.0, 0.0);
+  double len2 = v.length2();
+  v[2] = len2 >= 1.0 ? 0.0 : Utils::Sqrt(1.0 - len2);
+  v.normalize();
+  
+  return v;
 }
 
-void RenderBuffer::_safe_bind()
-{
-  glGetIntegerv(GL_RENDERBUFFER_BINDING_EXT, &saved_id_);
-  if (id_ != saved_id_)
-  {
-    glBindRenderbufferEXT(TARGET_, id_);
-  }
-}
 
-void RenderBuffer::_safe_unbind()
-{
-  if (id_ != saved_id_)
-  {
-    glBindRenderbufferEXT(TARGET_, saved_id_);
-  }
-}
 
-} // end namespace Seg3D
+} // End namespace Seg3D

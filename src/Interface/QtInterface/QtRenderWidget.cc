@@ -24,7 +24,7 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
- */
+*/
 
 // Glew includes
 #include <GL/glew.h>
@@ -136,8 +136,12 @@ QtRenderWidget::resizeGL(int width,int height)
 void 
 QtRenderWidget::mouseMoveEvent( QMouseEvent * event )
 {
+  mouse_history_.previous = mouse_history_.current;
+  mouse_history_.current.x = event->x();
+  mouse_history_.current.y = event->y();
+  
   viewer_->mouse_move_event(
-    event->x(), event->y(),
+    mouse_history_,
     convert_qt_mousebuttons_to_viewer(event->buttons()),
     convert_qt_keymodifiers_to_viewer(event->modifiers()));
 }
@@ -145,8 +149,26 @@ QtRenderWidget::mouseMoveEvent( QMouseEvent * event )
 void 
 QtRenderWidget::mousePressEvent( QMouseEvent * event )
 {
+  mouse_history_.current.x = mouse_history_.previous.x = event->x();
+  mouse_history_.current.y = mouse_history_.previous.y = event->y();
+  if ((event->buttons() & Qt::LeftButton) != 0)
+  {
+    mouse_history_.left_start.x = event->x();
+    mouse_history_.left_start.y = event->y();
+  }
+  if ((event->buttons() & Qt::RightButton) != 0)
+  {
+    mouse_history_.right_start.x = event->x();
+    mouse_history_.right_start.y = event->y();
+  }
+  if ((event->buttons() & Qt::MidButton) != 0)
+  {
+    mouse_history_.mid_start.x = event->x();
+    mouse_history_.mid_start.y = event->y();
+  }
+  
   viewer_->mouse_press_event(
-    event->x(), event->y(),
+    mouse_history_,
     convert_qt_mousebuttons_to_viewer(event->buttons()),
     convert_qt_keymodifiers_to_viewer(event->modifiers()));
 }
@@ -154,8 +176,12 @@ QtRenderWidget::mousePressEvent( QMouseEvent * event )
 void 
 QtRenderWidget::mouseReleaseEvent( QMouseEvent * event )
 {
+  mouse_history_.previous = mouse_history_.current;
+  mouse_history_.current.x = event->x();
+  mouse_history_.current.y = event->y();
+
   viewer_->mouse_release_event(
-    event->x(), event->y(),
+    mouse_history_,
     convert_qt_mousebuttons_to_viewer(event->buttons()),
     convert_qt_keymodifiers_to_viewer(event->modifiers()));
 }
