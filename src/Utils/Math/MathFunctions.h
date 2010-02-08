@@ -43,6 +43,7 @@
 #undef max
 #endif
 
+#include <cstdlib>
 
 // C includes
 #include <math.h>
