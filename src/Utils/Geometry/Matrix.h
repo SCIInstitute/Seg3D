@@ -43,7 +43,12 @@ class Matrix :
   typedef boost::numeric::ublas::matrix<double, boost::numeric::ublas::column_major> base_type;
     
   public:
-    Matrix() : base_type(4, 4) {}
+    inline Matrix() : base_type(4, 4) {}
+
+  inline Matrix(const double m[4][4]) : base_type(4, 4)
+  {
+    this->data(m);
+  }
     
     Matrix(const base_type& m) : base_type(m) 
     {
@@ -58,6 +63,18 @@ class Matrix :
       assign(m);
       return (*this);
     }
+
+  inline double* data()
+  {
+    return &(this->operator()(0, 0));
+  }
+
+  inline const double* data() const
+  {
+    return &(this->operator()(0, 0));
+  }
+
+  inline void data(const double m[4][4]);
     
     Vector operator*(const Vector& rhs) const;
     VectorF operator*(const VectorF& rhs) const;
@@ -78,6 +95,10 @@ class Matrix :
     const static double EPSILON_C;
 };
 
+inline void Matrix::data(const double m[4][4])
+{
+  std::memcpy(this->data(), m, 16*sizeof(double));
+}
 
 // Compute the inverse of the input matrix using LU decomposition
 bool Invert(const Matrix& m, Matrix& inverse);
