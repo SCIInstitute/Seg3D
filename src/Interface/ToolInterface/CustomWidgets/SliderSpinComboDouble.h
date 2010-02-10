@@ -80,6 +80,8 @@ class SliderSpinComboDouble : public QWidget
     void signalGuiFromSlider(int);
     void signalGuiFromSpinner(double);
     void signalGuiFromSliderReleased();
+    void signalGuiFromSliderReleased( int );
+
 };
 
 } // end namespace Seg3D

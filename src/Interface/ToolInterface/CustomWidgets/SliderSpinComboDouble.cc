@@ -120,12 +120,17 @@ SliderSpinComboDouble::SliderSpinComboDouble( QWidget *parent )
     new_value = value;
     
     //block signals before we set the value of the spinner to avoid loops
+    
     spinner->blockSignals( true );
     spinner->setValue( new_value );
     spinner->blockSignals( false );
-
-    // emit signals for in case we need continuous updates from the slider
     Q_EMIT valueAdjustedContinuously( new_value );
+    
+    slider->setTracking( false );
+    Q_EMIT valueAdjusted( value );
+    slider->setTracking( true );
+    // emit signals for in case we need continuous updates from the slider
+   
   }
   void SliderSpinComboDouble::signalGuiFromSpinner( double value )
   {
@@ -141,7 +146,23 @@ SliderSpinComboDouble::SliderSpinComboDouble( QWidget *parent )
 
   void SliderSpinComboDouble::signalGuiFromSliderReleased()
   {
-    Q_EMIT valueAdjusted(slider->value());
+    //TODO - need to do conversions because sliders are int only
+    //double new_value;
+    //new_value = value;
+
+    //Q_EMIT valueAdjusted(slider->value());
+    //Q_EMIT valueAdjusted( new_value );
+  }
+
+  void SliderSpinComboDouble::signalGuiFromSliderReleased(int value)
+  {
+    //TODO - need to do conversions because sliders are int only
+    //double new_value;
+    //new_value = value;
+    //slider->setTracking(false);
+    //Q_EMIT valueAdjusted(value);
+    //slider->setTracking(true);
+    //Q_EMIT valueAdjusted( new_value );
   }
 
 
@@ -149,6 +170,7 @@ SliderSpinComboDouble::SliderSpinComboDouble( QWidget *parent )
   void SliderSpinComboDouble::makeConnections()
   {
     connect( slider,  SIGNAL( valueChanged( int )),    this, SLOT( signalGuiFromSlider( int )));
+    connect( slider,  SIGNAL( valueChanged( int )),    this, SLOT( signalGuiFromSliderReleased( int )));
     connect( slider,  SIGNAL( sliderReleased()),       this, SLOT( signalGuiFromSliderReleased()));
     connect( spinner, SIGNAL( valueChanged( double )), this, SLOT( signalGuiFromSpinner( double )));
   } // end makeConnections

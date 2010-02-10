@@ -13,33 +13,11 @@ class AnisotropicDiffusionFilterInterface : public QWidget {
 
     Q_OBJECT
 
-    signals:
-        void activeChanged(int);
-
-        void iterationsChanged(int);
-        void stepChanged(double);
-        void conductanceChanged(int);
-
-        void filterRun(bool);
 
     public:
         AnisotropicDiffusionFilterInterface(QWidget *parent = 0);
         ~AnisotropicDiffusionFilterInterface();
         QWidget *widgeter;
-
-    public slots:
-        void setActive(int);
-        void addToActive(QStringList&);
-
-        void setIterations(int);
-        void setIterationRange(int, int);
-
-        void setStep(double);
-        void setStepRange(double, double);
-
-        void setConductance(int);
-        void setConductanceRange(int, int);
-
 
 
     private:
@@ -49,16 +27,6 @@ class AnisotropicDiffusionFilterInterface : public QWidget {
         SliderSpinCombo *stepAdjuster;
         SliderSpinCombo *conductanceAdjuster;
 
-        void makeConnections();
-
-    private slots:
-        void senseActiveChanged(int);
-
-        void senseIterationsChanged(int);
-        void senseStepChanged(double);
-        void senseConductanceChanged(int);
-
-        void senseFilterRun(bool);
 
 
 

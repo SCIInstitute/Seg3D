@@ -28,14 +28,15 @@
     <height>305</height>
    </size>
   </property>
-  <property name="baseSize">
-   <size>
-    <width>650</width>
-    <height>0</height>
-   </size>
-  </property>
   <property name="windowTitle">
    <string>Boolean Filter</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QWidget#BooleanFilterInterface{
+  border-radius: 4px;
+  border: 1px solid rgb(90, 90, 90);
+  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(221, 221, 221, 255), stop:0.155779 rgba(228, 228, 228, 255), stop:1 rgba(202, 204, 204, 255));      
+}</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
    <property name="spacing">
@@ -168,7 +169,7 @@
      <item>
       <widget class="QLabel" name="label_2">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -178,39 +179,17 @@
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QTextEdit" name="textEdit">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>98</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>16777215</width>
-         <height>98</height>
-        </size>
-       </property>
-      </widget>
-     </item>
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="replaceInvertLayout">
+    <layout class="QHBoxLayout" name="replaceInvertLayout" stretch="2,3">
      <property name="spacing">
       <number>3</number>
      </property>
      <item>
       <widget class="QCheckBox" name="replaceCheckBox">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -226,7 +205,7 @@
      <item>
       <widget class="QPushButton" name="invertButton">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>

@@ -31,6 +31,13 @@
   <property name="windowTitle">
    <string>Threshold Tool</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">QWidget#ThresholdToolInterface{
+  border-radius: 4px;
+  border: 1px solid rgb(90, 90, 90);
+  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(221, 221, 221, 255), stop:0.155779 rgba(228, 228, 228, 255), stop:1 rgba(202, 204, 204, 255));      
+}</string>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <property name="spacing">
     <number>0</number>
@@ -71,22 +78,6 @@
        </property>
       </widget>
      </item>
-     <item>
-      <spacer name="upperHSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeType">
-        <enum>QSizePolicy::MinimumExpanding</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
     </layout>
    </item>
    <item>
@@ -100,22 +91,6 @@
         <string>Lower Threshold:</string>
        </property>
       </widget>
-     </item>
-     <item>
-      <spacer name="lowerHSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeType">
-        <enum>QSizePolicy::MinimumExpanding</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
      </item>
     </layout>
    </item>
@@ -171,7 +146,7 @@
      </property>
      <property name="minimumSize">
       <size>
-       <width>0</width>
+       <width>200</width>
        <height>131</height>
       </size>
      </property>
@@ -181,10 +156,16 @@
        <height>131</height>
       </size>
      </property>
+     <property name="horizontalScrollBarPolicy">
+      <enum>Qt::ScrollBarAlwaysOff</enum>
+     </property>
     </widget>
    </item>
    <item>
     <layout class="QHBoxLayout" name="minMaxHLayout">
+     <property name="spacing">
+      <number>0</number>
+     </property>
      <item>
       <widget class="QLabel" name="minLabel">
        <property name="sizePolicy">
