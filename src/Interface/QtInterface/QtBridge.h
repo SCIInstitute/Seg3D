@@ -59,13 +59,10 @@ class QtBridge : public boost::noncopyable {
 
     // Connect a SliderSpinCombo to StateRangedDoubleValue
     static bool connect(SliderSpinComboDouble* sscombo, StateRangedDoubleHandle& state_handle);
-
     
     // Connect a QComboBox to StateValue<int>
     static bool connect(QComboBox* qcombobox, StateOptionHandle& state_handle);
 
-
-  
     // Connect QToolButton & QPushButtons
     static bool connect(QToolButton* qtoolbutton, boost::function<void ()> function);
     static bool connect(QPushButton* qpushbutton, boost::function<void ()> function);
