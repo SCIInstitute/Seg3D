@@ -84,8 +84,6 @@ AppInterface::AppInterface()
 
   setCentralWidget(viewer_interface_);
 
-
-  //showFullScreen();
   application_menu_ = new AppMenu(this, viewer_interface_);
   status_bar_ = new AppStatusBar(this);
   

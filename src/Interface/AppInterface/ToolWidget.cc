@@ -55,23 +55,20 @@ ToolWidget::create_widget(QWidget* parent, ToolHandle& tool)
   set_tool(tool);
   
   // Generate a vertical layout for the tool widget
-  QVBoxLayout* vbox = new QVBoxLayout;
-  
-  // Ensure it has some tight spacing  
-  vbox->setSpacing(0);
-  vbox->setContentsMargins(0,0,0,0);
-  setLayout(vbox);
+  QHBoxLayout* hbox = new QHBoxLayout;
+  //
+  //// Ensure it has some tight spacing  
+  hbox->setSpacing(0);
+  hbox->setContentsMargins(0,0,0,0);
+  setLayout(hbox);
   
   main_frame_ = new QFrame;  
   
   main_frame_->resize(1, 1);
-  //main_frame_->setStyleSheet("background-color: red;");
+
   main_frame_->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
-  vbox->addWidget(main_frame_);
-  vbox->addStretch();
-  
-  
-  //std::string h = boost::lexical_cast<std::string>(&main_frame_);
+  hbox->addWidget(main_frame_);
+
   
   return ( build_widget(main_frame_));
 }

@@ -29,6 +29,7 @@
         <file>Images/IsosurfaceVisibleOff.png</file>
         <file>Images/LabelMap.png</file>
         <file>Images/LabelMapWhite.png</file>
+        <file>Images/LabelMapWhite.png</file>
         <file>Images/Lock.png</file>
         <file>Images/LockOff.png</file>
         <file>Images/LockBig.png</file>
@@ -44,7 +45,7 @@
         <file>Images/RightArrowWhite.png</file>
         <file>Images/SlicesVisible.png</file>
         <file>Images/SlicesVisibleOff.png</file>
-	      <file>Images/UpArrowWhite.png</file>
+        <file>Images/UpArrowWhite.png</file>
         <file>Images/Visible.png</file>
         <file>Images/VisibleOff.png</file>
         <file>Images/VolumeVisible.png</file>

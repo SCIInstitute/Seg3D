@@ -31,7 +31,6 @@
 
 // QT includes
 #include <QtGui>
-#include <QDockWidget>
 
 // STL includes
 #include <string>
@@ -45,9 +44,9 @@ namespace Seg3D {
 
 class HistoryDockWidgetPrivate;
 
-class HistoryDockWidget : public QDockWidget {
-   
-    Q_OBJECT
+class HistoryDockWidget : public QDockWidget 
+{   
+  Q_OBJECT
 
   public:
     HistoryDockWidget(QWidget *parent = 0);

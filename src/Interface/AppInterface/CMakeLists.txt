@@ -78,6 +78,8 @@ SET(INTERFACE_APPINTERFACE_UI_SRCS
   MeasurementDockWidget.ui
   LayerManagerDockWidget.ui
   MeasurementDockWidget.ui
+  LayerGroupWidget.ui
+  LayerWidget.ui
 )
 
 SET(INTERFACE_APPINTERFACE_RCC_SRCS

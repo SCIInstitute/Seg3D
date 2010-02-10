@@ -41,182 +41,62 @@
 #include <Application/Tool/Tool.h>
 #include <Application/Tool/ToolManager.h>
 
+
+
+
 namespace Seg3D {
+
+class LayerManagerWidgetPrivate;
 
 class LayerManagerWidget : public QScrollArea
 {   
   // Needed to make it a Qt object
   Q_OBJECT
-  
-Q_SIGNALS:
-  void active_group_changed( int index );
-  void active_layer_changed( int index );
-  
-public:
-  enum layer_type{
-      data_layer,
-      mask_layer,
-      label_layer
-  };
-  
-private:
-  
-  class Group 
-  {
-      
-    
-    // Private subclass for the groups
-    public:
-    
-      QWidget *page_;
-      QVBoxLayout *verticalLayout_5;
-      QWidget *background_group_;
-      QVBoxLayout *verticalLayout_3;
-      QWidget *header_;
-      QHBoxLayout *horizontalLayout;
-      QToolButton *open_button_;
-      QPushButton *activate_button_;
-      QToolButton *add_new_button_;
-      QToolButton *close_button_;
-      QFrame *group_frame_;
-      QVBoxLayout *verticalLayout_2;
-   
-  };
-   
-  typedef QSharedPointer<Group> GroupHandle;
-  typedef QList<GroupHandle> GroupList;
-  
-  // Private subclass for the layers
-  class Layer : public QWidget 
-  {
-    public:
-      std::string *name_;
-      std::string *color_;
-      QWidget *layer_;
-      QVBoxLayout *verticalLayout_4;
-      QWidget *background_1;
-      QHBoxLayout *horizontalLayout_5;
-      QHBoxLayout *horizontalLayout_2;
-      QWidget *typeBackground_;
-      QHBoxLayout *horizontalLayout;
-      QWidget *typeGradient_;
-      QHBoxLayout *horizontalLayout_9;
-      QToolButton *colorChooseButton_;
-      QVBoxLayout *verticalLayout_box;
-      QPushButton *label_;
-      QHBoxLayout *horizontalLayout_7;
-      QToolButton *fillOpacityButton_;
-      QToolButton *brightContrastButton_;
-      QToolButton *visibleButton_;
-      QToolButton *isoSurfaceButton_;
-      QToolButton *computeIsoSurfaceButton_;
-      QToolButton *volumeTargetButton_;
-      QToolButton *lockButton_;
-      QWidget *brightContrastBar;
-      QHBoxLayout *horizontalLayout_3;
-      QVBoxLayout *verticalLayout_2;
-      QFrame *line;
-      QHBoxLayout *horizontalLayout_11;
-      QLabel *brightnessLabel_;
-      QSlider *horizontalSlider_5;
-      QHBoxLayout *horizontalLayout_12;
-      QLabel *contrastLabel_;
-      QSlider *horizontalSlider_6;
-      QWidget *colorChooseBar;
-      QVBoxLayout *verticalLayout_3;
-      QFrame *line_2;
-      QFrame *line_3;
-      QHBoxLayout *horizontalLayout_4;
-      QToolButton *color_button_01_;
-      QToolButton *color_button_02_;
-      QToolButton *color_button_03_;
-      QToolButton *color_button_04_;
-      QToolButton *color_button_05_;
-      QToolButton *color_button_06_;
-      QToolButton *color_button_07_;
-      QToolButton *color_button_08_;
-      QToolButton *color_button_09_;
-      QToolButton *color_button_10_;
-      QToolButton *color_button_11_;
-      QToolButton *color_button_12_;    
-      QSharedPointer<Group> container_group_;
-    
-    
-  };
-  
-  typedef QSharedPointer<Layer> LayerHandle;
-  typedef QList<LayerHandle> LayerList;
-  
-  GroupList group_list_;
-  LayerList layer_list_;                      
-        
-  
-  int active_group_index_;
-  GroupHandle active_group_;
-  
-  int active_layer_index_;
-  LayerHandle active_layer_;
-  
-  
-  QWidget*     main_;
-  QVBoxLayout* main_layout_;
-  QVBoxLayout* group_layout_;
-  
-  QIcon active_close_icon_;    
-  QIcon inactive_close_icon_;    
-  
-  QIcon active_help_icon_;    
-  QIcon inactive_help_icon_; 
-  
-  QIcon active_new_icon_;    
-  QIcon inactive_new_icon_;
-  
-  QIcon mask_icon_;
-  QIcon label_icon_;
-  QIcon data_icon_;
-  QIcon border_icon_;
-  QIcon brightness_icon_;
-  QIcon volume_visible_icon_;
-  QIcon isosurface_visible_icon_;
-  QIcon isosurface_compute_icon_;
-  QIcon lock_icon_;
-  QIcon expand_close_group_icon_;
-  
-   
-private Q_SLOTS:
-  void hide_show_brightness_contrast_bar(bool);
-  void hide_show_color_choose_bar(bool);
-  void hide_show_group_layers(bool);
-  void activate_group_button_clicked();
-  void activate_layer_button_clicked();
-  void color_button_clicked();
-  
-  
-public:
-  
-  LayerManagerWidget(QWidget* parent=0);
-  virtual ~LayerManagerWidget();
-  
-  void add_layer( layer_type type, const QString &label, const QString &dimensions );
-  void new_group( const QString &dimensions );
-  
-  void remove_layer(int);
-  
-  inline int get_active_layer_index(){ return active_layer_index_; }
-  inline int get_active_group_index(){ return active_group_index_; }
-  
-  void set_active_layer(int);
-  void set_active_group(int);
-  
-  int index_of_layer(LayerHandle);
-  int index_of_group(GroupHandle);
-  
-  inline GroupHandle get_active_group(){ return active_group_; }
-  inline LayerHandle get_active_layer(){ return active_layer_; }
-  
-  LayerHandle layer( QWidget *layer_);
 
+  //constructor - destructor
+  public:
+    LayerManagerWidget(QWidget *parent = 0);
+    virtual ~LayerManagerWidget();
+    
 
+  private Q_SLOTS:
+    void hide_show_resample(bool);
+    void hide_show_roi(bool);
+    void hide_show_layers(bool);
+    
+    void hide_show_brightness_contrast_bar(bool);
+    void hide_show_color_choose_bar(bool);
+    void color_button_clicked();
+
+  public:
+    void new_group(const QString &dimensions );
+    void new_layer( int type, const QString &label, const QString &dimensions );
+    
+    // enum for layer types
+    enum {
+        DATA_LAYER_E,
+        MASK_LAYER_E,
+        LABEL_LAYER_E
+    };
+
+  private:
+    // private Qt GUI Components for the LayerManagerWidget
+    QWidget*     main_;
+    QVBoxLayout* main_layout_;
+    QVBoxLayout* group_layout_;
+    int number_of_groups_;
+
+    typedef boost::shared_ptr<LayerManagerWidgetPrivate> LayerManagerWidgetPrivateHandle;
+    LayerManagerWidgetPrivateHandle private_;
+
+    // Icons for the GUI
+    QIcon active_close_icon_;    
+    QIcon inactive_close_icon_;
+    QIcon expand_close_group_icon_;
+
+  private:
+    bool validate_new_layer(const QString &dimensions);
+     
 };
 
 }  //endnamespace Seg3d

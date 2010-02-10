@@ -45,54 +45,49 @@ namespace Seg3D {
 
 class ToolBoxWidget : public QScrollArea
 {   
-    // Needed to make it a Qt object
-    Q_OBJECT
+  Q_OBJECT
+
+  Q_SIGNALS:
+    void currentChanged( QString );
+    void tool_removed_signal( int index );
 
   public:
-    
-    ToolBoxWidget(QWidget* parent=0);
+    // constructor & Destructor
+    ToolBoxWidget( QWidget* parent=0 );
     virtual ~ToolBoxWidget();
     
+    // public functions for adding and removing tools
     void add_tool ( QWidget * tool, const QString & text, boost::function<void ()> close_function, boost::function<void ()> activate_function, QUrl help_url );
-    
     void remove_tool ( int index );
     
+    // public functions for getting and setting
+    inline  QWidget *get_active_tool(){ return active_tool_;}
+    inline  QWidget *get_tool_at( int index ){ return tool_list_.at(index)->tool_; }
     inline int      get_active_index(){ return active_index_; }
-    inline QWidget *get_active_tool(){ return active_tool_;}
-    inline QWidget *get_tool_at(int index){ return tool_list_.at(index)->tool_; }
+    void    set_active_index( int index );
+    void    set_active_tool( QWidget *tool );
 
-    void set_active_index(int index);
-    void set_active_tool(QWidget *tool);
+    // indexOf function for ToolBoxWidget
+    int index_of( QWidget *index );
 
-    int index_of(QWidget *index);
-    
-  Q_SIGNALS:
-      void currentChanged( QString );
-      void tool_removed_signal( int index );
 
+  // internal private class for building the Qt Page GUI
   private:
-
     class Page {
-      
+
       public:
         QWidget     *page_;
-
-        QWidget     *background_;
-        QWidget     *header_;
-        
-        QHBoxLayout *hLayout_;
-        QHBoxLayout *hLayout_2;
-        
-        QVBoxLayout *vLayout_;
-        QVBoxLayout *vLayout_2;
-        
+        QVBoxLayout *verticalLayout_;
+        QWidget *page_background_;
+        QHBoxLayout *horizontalLayout_1_;
+        QWidget *page_header_;
+        QHBoxLayout *horizontalLayout;
         QPushButton *activate_button_;
         QToolButton *help_button_;
         QToolButton *close_button_;
-        
-        QFrame  *tool_frame_;
-        QWidget *tool_;
-      
+        QFrame *tool_frame_;
+        QHBoxLayout *tool_layout_;
+        QWidget* tool_;
         QUrl url_;
                 
         inline bool operator==(const Page& other) const
@@ -101,37 +96,33 @@ class ToolBoxWidget : public QScrollArea
         }
     };
 
-    typedef QSharedPointer<Page> PageHandle;
-    typedef QList<PageHandle>    PageList;
-    
-    QWidget*     main_;
-    QVBoxLayout* main_layout_;
-    QVBoxLayout* tool_layout_;
-    
-    PageList tool_list_;  
+private:
+  QWidget*     main_;
+  QVBoxLayout* main_layout_;
+  QVBoxLayout* tool_layout_;
 
-    int active_index_;
-    QWidget *active_tool_;
-    PageHandle active_page_;
-        
-    QIcon active_close_icon_;    
-    QIcon inactive_close_icon_;    
+  typedef QSharedPointer<Page> PageHandle;
+  typedef QList<PageHandle>    PageList;
+  PageList tool_list_;  
 
-    QIcon active_help_icon_;    
-    QIcon inactive_help_icon_;    
-        
-    inline PageHandle get_active_page() { return active_page_; }
-    
-    void tool_removed( int index );
-    void set_active_page(Page *page);
-    
-    PageHandle page(QWidget *tool_);
+  int active_index_;
+  QWidget *active_tool_;
+  PageHandle active_page_;
+      
+  //Icons for buttons
+  QIcon active_close_icon_;    
+  QIcon inactive_close_icon_;    
+
+  QIcon active_help_icon_;    
+  QIcon inactive_help_icon_;    
+      
+  //void set_active_page(Page *page);
+  PageHandle page(QWidget *tool_);
+  inline PageHandle get_active_page() { return active_page_; }
     
   private Q_SLOTS:
     void help_button_clicked();
-    void itemDestroyed(QObject*);
-  
-  
+   
     
 };
 
