@@ -88,6 +88,15 @@ ADD_DEFINITIONS(-DBOOST_ALL_NO_LIB)
 ADD_DEFINITIONS(-DQT_NO_KEYWORDS)
 
 ###########################################
+# Disable Visual C++ Secure Warnings
+###########################################
+
+IF (WIN32 AND MSVC)
+  ADD_DEFINITIONS(-D_SCL_SECURE_NO_WARNINGS)
+  ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
+ENDIF (WIN32 AND MSVC)
+
+###########################################
 # Find QT
 # We need QT - We use a modified version of
 # the FindQt4.cmake file that can be set
