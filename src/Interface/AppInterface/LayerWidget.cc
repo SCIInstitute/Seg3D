@@ -55,7 +55,7 @@ namespace Seg3D {
     set_layer(layer);
     
     // Generate a vertical layout for the tool widget
-    QVBoxLayout* vbox = new QVBoxLayout;
+    QHBoxLayout* vbox = new QHBoxLayout;
     
     // Ensure it has some tight spacing  
     vbox->setSpacing(0);

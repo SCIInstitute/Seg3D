@@ -177,7 +177,7 @@ ToolsDockWidget::close_tool(ToolHandle tool)
   tool_widget_list_.erase(tool->toolid());
   
   // Schedule object to be destroyed by Qt
-  widget->deleteLater();
+  //widget->deleteLater();
 }
 
 void

@@ -58,8 +58,8 @@ class LayerManagerWidgetPrivate {
 };
 
 
-LayerManagerWidget::LayerManagerWidget(QWidget* parent) :
-  QScrollArea(parent)
+LayerManagerWidget::LayerManagerWidget( QWidget* parent ) :
+  QScrollArea( parent )
 { 
   //initialize the number of groups
   number_of_groups_ = 0;
@@ -78,42 +78,42 @@ LayerManagerWidget::LayerManagerWidget(QWidget* parent) :
 
   } // end initialize the icons
 
-  // make a new LayerManagerWidgetPrivateHandle object
-  private_ = LayerManagerWidgetPrivateHandle (new LayerManagerWidgetPrivate);
+  // make a new LayerManagerWidgetPrivateHandle_type object
+  private_ = LayerManagerWidgetPrivateHandle_type ( new LayerManagerWidgetPrivate );
   
   // set some values for the scrollarea widget
-  setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-  setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-  setContentsMargins(1, 1, 1, 1);
-  setWidgetResizable(true);  
+  setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+  setVerticalScrollBarPolicy( Qt::ScrollBarAsNeeded );
+  setContentsMargins( 1, 1, 1, 1 );
+  setWidgetResizable( true );  
 
-  main_ = new QWidget(parent);
-  setWidget(main_);
+  main_ = new QWidget( parent );
+  setWidget( main_ );
  
   main_layout_ = new QVBoxLayout( main_ );
-  main_layout_->setContentsMargins(1, 1, 1, 1);
-  main_layout_->setSpacing(1);
+  main_layout_->setContentsMargins( 1, 1, 1, 1 );
+  main_layout_->setSpacing( 1 );
 
   group_layout_ = new QVBoxLayout;
-  main_layout_->addLayout(group_layout_);
+  main_layout_->addLayout( group_layout_ );
   main_layout_->addStretch();
 
-  main_->setLayout(main_layout_);
-  main_->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
+  main_->setLayout( main_layout_ );
+  main_->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Preferred );
 
 
   // add test groups
-  new_group(QString::fromUtf8("600x300x240"));
-  new_group(QString::fromUtf8("600x300x240"));
-  new_group(QString::fromUtf8("400x300x340"));
-  new_group(QString::fromUtf8("300x200x400"));
-  new_group(QString::fromUtf8("800x300x940"));
-  new_group(QString::fromUtf8("900x200x300"));
-  new_group(QString::fromUtf8("700x300x440"));
-  new_group(QString::fromUtf8("100x200x200"));
+  new_group( QString::fromUtf8( "600x300x240" ));
+  new_group( QString::fromUtf8( "600x300x240" ));
+  new_group( QString::fromUtf8( "400x300x340" ));
+  new_group( QString::fromUtf8( "300x200x400" ));
+  new_group( QString::fromUtf8( "800x300x940" ));
+  new_group( QString::fromUtf8( "900x200x300" ));
+  new_group( QString::fromUtf8( "700x300x440" ));
+  new_group( QString::fromUtf8( "100x200x200" ));
 
   //add test layers
-  new_layer(DATA_LAYER_E, QString::fromUtf8("Green Footed Lemur Fetus"), QString::fromUtf8("300x200x400") );
+  new_layer(DATA_LAYER_E, QString::fromUtf8( "Green Footed Lemur Fetus" ), QString::fromUtf8( "300x200x400" ));
   //new_layer(DATA_LAYER_E, QString::fromUtf8("Mouse Specimen #1"), QString::fromUtf8("300x200x400") );
   //new_layer(DATA_LAYER_E, QString::fromUtf8("3rd Trimester Monkey Brain"), QString::fromUtf8("300x200x400") );
   //new_layer(DATA_LAYER_E, QString::fromUtf8("Green Footed Lemur Fetus"), QString::fromUtf8("300x200x400") );
@@ -127,27 +127,27 @@ LayerManagerWidget::~LayerManagerWidget()
   // create a new group and add it to the group_layout_
   // add it also to the group_list_
   void
-  LayerManagerWidget::new_group(const QString &dimensions )
+  LayerManagerWidget::new_group( const QString &dimensions )
   {
-    if (!validate_new_layer(dimensions))
+    if ( !validate_new_layer(dimensions) )
     {
       return;
     }
 
     // create a new widget to add to the group_layout_
-    QWidget* newgroup_ = new QWidget();
+    QWidget* new_group_ = new QWidget();
 
-    private_->group_ui_.setupUi(newgroup_);
+    private_->group_ui_.setupUi( new_group_ );
     
     // create a handle to the group ui object
-    LayerGroupWidgetHandle_type group_handle_ (new Ui::LayerGroupWidget( private_->group_ui_));
+    LayerGroupWidgetHandle_type group_handle_ ( new Ui::LayerGroupWidget( private_->group_ui_ ));
     
     // set some values of the GUI
-    group_handle_->activate_button_->setText(dimensions);
-    group_handle_->close_button_->setIcon(active_close_icon_);
-    group_handle_->close_button_->setIconSize(QSize(16,16));
-    group_handle_->open_button_->setIcon(expand_close_group_icon_);
-    group_handle_->open_button_->setIconSize(QSize(16,16));
+    group_handle_->activate_button_->setText( dimensions );
+    group_handle_->close_button_->setIcon( active_close_icon_ );
+    group_handle_->close_button_->setIconSize( QSize( 16, 16 ));
+    group_handle_->open_button_->setIcon( expand_close_group_icon_ );
+    group_handle_->open_button_->setIconSize( QSize( 16, 16 ));
     group_handle_->open_button_->setChecked( false );
     group_handle_->group_frame_->hide();
 
@@ -156,12 +156,12 @@ LayerManagerWidget::~LayerManagerWidget()
     group_handle_->resample_->hide();
 
     // connect the signals and slots
-    connect(group_handle_->open_button_, SIGNAL(clicked(bool)), this, SLOT(hide_show_layers(bool)));
-    connect(group_handle_->resample_button_group_, SIGNAL(clicked(bool)), this, SLOT(hide_show_resample(bool)));
-    connect(group_handle_->roi_button_group_, SIGNAL(clicked(bool)), this, SLOT(hide_show_roi(bool)));
+    connect(group_handle_->open_button_, SIGNAL( clicked( bool )), this, SLOT(hide_show_layers( bool )));
+    connect(group_handle_->resample_button_group_, SIGNAL( clicked( bool ) ), this, SLOT(hide_show_resample( bool )));
+    connect(group_handle_->roi_button_group_, SIGNAL( clicked( bool )), this, SLOT(hide_show_roi( bool )));
     
     // add the new widget to the group_layout_
-    group_layout_->addWidget(newgroup_);
+    group_layout_->addWidget( new_group_ );
 
     // add the new group handle to the group_list_
     private_->group_list_.push_back(group_handle_);
@@ -173,13 +173,13 @@ LayerManagerWidget::~LayerManagerWidget()
   
   // iterate through all the current layers and check to see if a layer with similar dimensions already exists
   bool
-  LayerManagerWidget::validate_new_layer(const QString &dimensions)
+  LayerManagerWidget::validate_new_layer( const QString &dimensions )
   {
-    for (GroupList_type::const_iterator i = private_->group_list_.begin(); i != private_->group_list_.end(); i++)
+    for ( GroupList_type::const_iterator i = private_->group_list_.begin(); i != private_->group_list_.end(); i++ )
     {
-      if ((*i)->activate_button_->text() == dimensions)
+      if ( (*i)->activate_button_->text() == dimensions )
       { 
-        SCI_LOG_ERROR(std::string("A layer with dimensions: '") +  dimensions.toStdString() + "' already exists, not creating another.");
+        SCI_LOG_ERROR(std::string( "A group with dimensions: '") +  dimensions.toStdString() + "' already exists, not creating another." );
         return false; 
       }
     }
@@ -193,11 +193,11 @@ LayerManagerWidget::~LayerManagerWidget()
   LayerManagerWidget::new_layer( int type, const QString &label, const QString &dimensions )
   {
     // create a new widget to add to the group layout
-    QWidget* newlayer = new QWidget();
-    private_->layer_ui_.setupUi(newlayer);
+    QWidget* new_layer_ = new QWidget();
+    private_->layer_ui_.setupUi( new_layer_ );
 
     // create a handle to the layer ui object
-    LayerWidgetHandle_type layer_ (new Ui::LayerWidget( private_->layer_ui_));
+    LayerWidgetHandle_type layer_ ( new Ui::LayerWidget( private_->layer_ui_ ));
 
     // set some values in the GUI
     layer_->label_->setText(label);
@@ -208,15 +208,15 @@ LayerManagerWidget::~LayerManagerWidget()
     layer_->selection_checkbox_->hide();
 
     // connect the signals and slots
-    connect( layer_->colorChooseButton_, SIGNAL(clicked(bool)), this, SLOT(hide_show_color_choose_bar(bool)));
-    connect( layer_->brightContrastButton_, SIGNAL(clicked(bool)), this, SLOT(hide_show_brightness_contrast_bar(bool)));
+    connect( layer_->colorChooseButton_, SIGNAL(clicked( bool )), this, SLOT( hide_show_color_choose_bar( bool )));
+    connect( layer_->brightContrastButton_, SIGNAL(clicked( bool )), this, SLOT( hide_show_brightness_contrast_bar( bool )));
    
     // add the new widget to the appropriate group's group_frame_layout_
-    for (GroupList_type::const_iterator i = private_->group_list_.begin(); i != private_->group_list_.end(); i++)
+    for ( GroupList_type::const_iterator i = private_->group_list_.begin(); i != private_->group_list_.end(); i++ )
     {
       if ( (*i)->activate_button_->text() == dimensions )
       {
-        (*i)->group_frame_layout_->addWidget( newlayer );
+        (*i)->group_frame_layout_->addWidget( new_layer_ );
         (*i)->group_frame_->show();
         (*i)->open_button_->setChecked( true );
       }
@@ -232,21 +232,22 @@ LayerManagerWidget::~LayerManagerWidget()
 
   // hide or show the Resample tool box
   void
-  LayerManagerWidget::hide_show_resample(bool down)
+  LayerManagerWidget::hide_show_resample( bool down )
   {
-    QPushButton *hide_show_button = ::qobject_cast<QPushButton*>(sender());
+    QPushButton *hide_show_button = ::qobject_cast<QPushButton*>( sender() );
     
-    for (GroupList_type::const_iterator i = private_->group_list_.begin(); i != private_->group_list_.end(); i++)
+    for( GroupList_type::const_iterator i = private_->group_list_.begin(); i != private_->group_list_.end(); i++ )
     {
-      if ((*i)->resample_button_group_ == hide_show_button)
+      if( (*i)->resample_button_group_ == hide_show_button )
       {
-        if (down) 
+        if( down ) 
         {
           (*i)->resample_->show();
           (*i)->roi_->hide();
           (*i)->roi_button_group_->setChecked(false);
         }
-        else {
+        else 
+        {
           (*i)->resample_->hide();
         }
       } 
@@ -254,7 +255,7 @@ LayerManagerWidget::~LayerManagerWidget()
 
     for (LayerList_type::const_iterator i = private_->layer_list_.begin(); i != private_->layer_list_.end(); i++)
     {
-      if(down) (*i)->selection_checkbox_->show();
+      if( down ) (*i)->selection_checkbox_->show();
       else (*i)->selection_checkbox_->hide();
     }
   } // end hide_show_resample
@@ -262,23 +263,24 @@ LayerManagerWidget::~LayerManagerWidget()
 
   // hide or show the Region Of Interest tool box
   void
-  LayerManagerWidget::hide_show_roi(bool down)
+  LayerManagerWidget::hide_show_roi( bool down )
   {
-    QPushButton *hide_show_button = ::qobject_cast<QPushButton*>(sender());
+    QPushButton *hide_show_button = ::qobject_cast<QPushButton*>( sender() );
     QString dimensions_;
     
-    for (GroupList_type::const_iterator i = private_->group_list_.begin(); i != private_->group_list_.end(); i++)
+    for ( GroupList_type::const_iterator i = private_->group_list_.begin(); i != private_->group_list_.end(); i++ )
     {
-      if ((*i)->roi_button_group_ == hide_show_button)
+      if ( (*i)->roi_button_group_ == hide_show_button )
       {
         dimensions_ = (*i)->activate_button_->text();
-        if (down) 
+        if ( down ) 
         {
           (*i)->roi_->show();
           (*i)->resample_->hide();
-          (*i)->resample_button_group_->setChecked(false);
+          (*i)->resample_button_group_->setChecked( false );
         }
-        else {
+        else
+        {
           (*i)->roi_->hide();
         }
       } 
@@ -286,9 +288,9 @@ LayerManagerWidget::~LayerManagerWidget()
     
     // hide or show the checkboxes
     // TODO - figure out how to link the layers to the groups
-    for (LayerList_type::const_iterator i = private_->layer_list_.begin(); i != private_->layer_list_.end(); i++)
+    for ( LayerList_type::const_iterator i = private_->layer_list_.begin(); i != private_->layer_list_.end(); i++ )
     {
-      if(down) (*i)->selection_checkbox_->show();
+      if( down ) (*i)->selection_checkbox_->show();
       else (*i)->selection_checkbox_->hide();
     }
   } // end hide_show_roi
@@ -296,19 +298,20 @@ LayerManagerWidget::~LayerManagerWidget()
 
   
   void
-  LayerManagerWidget::hide_show_layers(bool hideshow)
+  LayerManagerWidget::hide_show_layers( bool hideshow )
   {
-    QToolButton *hide_show_button = ::qobject_cast<QToolButton*>(sender());
+    QToolButton *hide_show_button = ::qobject_cast<QToolButton*>( sender() );
     
-    for (GroupList_type::const_iterator i = private_->group_list_.begin(); i != private_->group_list_.end(); i++)
+    for( GroupList_type::const_iterator i = private_->group_list_.begin(); i != private_->group_list_.end(); i++)
     {
-      if ((*i)->open_button_ == hide_show_button)
+      if( (*i)->open_button_ == hide_show_button )
       {
-        if (hideshow) 
+        if( hideshow ) 
         {
           (*i)->group_frame_->show();
         }
-        else {
+        else 
+        {
           (*i)->group_frame_->hide();
         }
       } 
@@ -319,21 +322,22 @@ LayerManagerWidget::~LayerManagerWidget()
 
   // hide or show the color choose bar
   void
-  LayerManagerWidget::hide_show_color_choose_bar(bool hideshow)
+  LayerManagerWidget::hide_show_color_choose_bar( bool hideshow )
   {
-    QToolButton *hide_show_button = ::qobject_cast<QToolButton*>(sender());
+    QToolButton *hide_show_button = ::qobject_cast<QToolButton*>( sender() );
     
-    for (LayerList_type::const_iterator i = private_->layer_list_.begin(); i != private_->layer_list_.end(); i++)
+    for( LayerList_type::const_iterator i = private_->layer_list_.begin(); i != private_->layer_list_.end(); i++ )
     {
-      if ( (*i)->colorChooseButton_ == hide_show_button )
+      if( (*i)->colorChooseButton_ == hide_show_button )
       {
-        if (hideshow) 
+        if( hideshow ) 
         {
           (*i)->color_bar_->show();
           (*i)->bright_contrast_bar_->hide();
         }
-        else {
-          (*i)->brightContrastButton_->setChecked(false);
+        else
+        {
+          (*i)->brightContrastButton_->setChecked( false );
           (*i)->color_bar_->hide();
           (*i)->bright_contrast_bar_->hide();
         }
@@ -343,21 +347,22 @@ LayerManagerWidget::~LayerManagerWidget()
 
 
   // hide or show the brightness/contrast bar
-  void LayerManagerWidget::hide_show_brightness_contrast_bar(bool hideshow)
+  void LayerManagerWidget::hide_show_brightness_contrast_bar( bool hideshow )
   {
-    QToolButton *hide_show_button = ::qobject_cast<QToolButton*>(sender());
+    QToolButton *hide_show_button = ::qobject_cast<QToolButton*>( sender() );
   
-    for (LayerList_type::const_iterator i = private_->layer_list_.begin(); i != private_->layer_list_.end(); i++)
+    for( LayerList_type::const_iterator i = private_->layer_list_.begin(); i != private_->layer_list_.end(); i++ )
     {
-      if ((*i)->brightContrastButton_ == hide_show_button)
+      if( (*i)->brightContrastButton_ == hide_show_button )
       {
-        if (hideshow) 
+        if( hideshow ) 
         {
           (*i)->bright_contrast_bar_->show();
           (*i)->color_bar_->hide();
         }
-        else {
-          (*i)->colorChooseButton_->setChecked(false);
+        else
+        {
+          (*i)->colorChooseButton_->setChecked( false );
           (*i)->color_bar_->show();
           (*i)->bright_contrast_bar_->hide();
         }
@@ -365,60 +370,59 @@ LayerManagerWidget::~LayerManagerWidget()
     }
   } // end hide_show_brightness_contrast_bar
 
-  void
-  LayerManagerWidget::color_button_clicked()
+  void LayerManagerWidget::color_button_clicked()
   {
-    QToolButton *color_button = ::qobject_cast<QToolButton*>(sender());
+    QToolButton *color_button = ::qobject_cast<QToolButton*>( sender() );
   
-    for (LayerList_type::const_iterator i = private_->layer_list_.begin(); i != private_->layer_list_.end(); i++)
+    for ( LayerList_type::const_iterator i = private_->layer_list_.begin(); i != private_->layer_list_.end(); i++ )
     {
-      if ((*i)->color_button_01_ == color_button)
+      if ( (*i)->color_button_01_ == color_button )
       {
-        (*i)->typeBackground_->setStyleSheet(QString::fromUtf8("QWidget#typeBackground_{background-color: rgb(251,255,74);}"));
+        (*i)->typeBackground_->setStyleSheet( QString::fromUtf8( "QWidget#typeBackground_{background-color: rgb(251,255,74);}" ));
       }
-      if ((*i)->color_button_02_ == color_button)
+      if ( (*i)->color_button_02_ == color_button )
       {
-        (*i)->typeBackground_->setStyleSheet(QString::fromUtf8("QWidget#typeBackground_{background-color: rgb(248,188,37);}"));
+        (*i)->typeBackground_->setStyleSheet( QString::fromUtf8( "QWidget#typeBackground_{background-color: rgb(248,188,37);}" ));
       }
-      if ((*i)->color_button_03_ == color_button)
+      if ( (*i)->color_button_03_ == color_button )
       {
-        (*i)->typeBackground_->setStyleSheet(QString::fromUtf8("QWidget#typeBackground_{background-color: rgb(249,152,28);}"));
+        (*i)->typeBackground_->setStyleSheet( QString::fromUtf8( "QWidget#typeBackground_{background-color: rgb(249,152,28);}" ));
       }
-      if ((*i)->color_button_04_ == color_button)
+      if ( (*i)->color_button_04_ == color_button )
       {
-        (*i)->typeBackground_->setStyleSheet(QString::fromUtf8("QWidget#typeBackground_{background-color: rgb(251,78,15);}"));
+        (*i)->typeBackground_->setStyleSheet( QString::fromUtf8( "QWidget#typeBackground_{background-color: rgb(251,78,15);}" ));
       }
-      if ((*i)->color_button_05_ == color_button)
+      if ( (*i)->color_button_05_ == color_button ) 
       {
-        (*i)->typeBackground_->setStyleSheet(QString::fromUtf8("QWidget#typeBackground_{background-color: rgb(252,21,17);}"));
+        (*i)->typeBackground_->setStyleSheet( QString::fromUtf8( "QWidget#typeBackground_{background-color: rgb(252,21,17);}" ));
       }
-      if ((*i)->color_button_06_ == color_button)
+      if ( (*i)->color_button_06_ == color_button )
       {
-        (*i)->typeBackground_->setStyleSheet(QString::fromUtf8("QWidget#typeBackground_{background-color: rgb(166,12,73);}"));
+        (*i)->typeBackground_->setStyleSheet( QString::fromUtf8( "QWidget#typeBackground_{background-color: rgb(166,12,73);}" ));
       }
-      if ((*i)->color_button_07_ == color_button)
+      if ( (*i)->color_button_07_ == color_button )
       {
-        (*i)->typeBackground_->setStyleSheet(QString::fromUtf8("QWidget#typeBackground_{background-color: rgb(135,0,172);}"));
+        (*i)->typeBackground_->setStyleSheet( QString::fromUtf8( "QWidget#typeBackground_{background-color: rgb(135,0,172);}" ));
       }
-      if ((*i)->color_button_08_ == color_button)
+      if ( (*i)->color_button_08_ == color_button )
       {
-        (*i)->typeBackground_->setStyleSheet(QString::fromUtf8("QWidget#typeBackground_{background-color: rgb(66,0,161);}"));
+        (*i)->typeBackground_->setStyleSheet( QString::fromUtf8( "QWidget#typeBackground_{background-color: rgb(66,0,161);}" ));
       }
-      if ((*i)->color_button_09_ == color_button)
+      if ( (*i)->color_button_09_ == color_button )
       {
-        (*i)->typeBackground_->setStyleSheet(QString::fromUtf8("QWidget#typeBackground_{background-color: rgb(45,66,250);}"));
+        (*i)->typeBackground_->setStyleSheet( QString::fromUtf8( "QWidget#typeBackground_{background-color: rgb(45,66,250);}" ));
       }
-      if ((*i)->color_button_10_ == color_button)
+      if ( (*i)->color_button_10_ == color_button )
       {
-        (*i)->typeBackground_->setStyleSheet(QString::fromUtf8("QWidget#typeBackground_{background-color: rgb(32,146,204);}"));
+        (*i)->typeBackground_->setStyleSheet( QString::fromUtf8( "QWidget#typeBackground_{background-color: rgb(32,146,204);}" ));
       }
-      if ((*i)->color_button_11_ == color_button)
+      if ( (*i)->color_button_11_ == color_button ) 
       {
-        (*i)->typeBackground_->setStyleSheet(QString::fromUtf8("QWidget#typeBackground_{background-color: rgb(100,177,61);}"));
+        (*i)->typeBackground_->setStyleSheet( QString::fromUtf8( "QWidget#typeBackground_{background-color: rgb(100,177,61);}" ));
       }
-      if ((*i)->color_button_12_ == color_button)
+      if ( (*i)->color_button_12_ == color_button )
       {
-        (*i)->typeBackground_->setStyleSheet(QString::fromUtf8("QWidget#typeBackground_{background-color: rgb(205,235,66);}"));
+        (*i)->typeBackground_->setStyleSheet( QString::fromUtf8( "QWidget#typeBackground_{background-color: rgb(205,235,66);}" ));
       }
     }
   } // end color_button_clicked

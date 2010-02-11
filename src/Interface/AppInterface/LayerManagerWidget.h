@@ -55,25 +55,26 @@ class LayerManagerWidget : public QScrollArea
 
   //constructor - destructor
   public:
-    LayerManagerWidget(QWidget *parent = 0);
+    LayerManagerWidget( QWidget *parent = 0 );
     virtual ~LayerManagerWidget();
     
 
   private Q_SLOTS:
-    void hide_show_resample(bool);
-    void hide_show_roi(bool);
-    void hide_show_layers(bool);
+    void hide_show_resample( bool );
+    void hide_show_roi( bool );
+    void hide_show_layers( bool );
     
-    void hide_show_brightness_contrast_bar(bool);
-    void hide_show_color_choose_bar(bool);
+    void hide_show_brightness_contrast_bar( bool );
+    void hide_show_color_choose_bar( bool );
     void color_button_clicked();
 
   public:
-    void new_group(const QString &dimensions );
+    void new_group( const QString &dimensions );
     void new_layer( int type, const QString &label, const QString &dimensions );
     
     // enum for layer types
-    enum {
+    enum 
+    {
         DATA_LAYER_E,
         MASK_LAYER_E,
         LABEL_LAYER_E
@@ -86,8 +87,8 @@ class LayerManagerWidget : public QScrollArea
     QVBoxLayout* group_layout_;
     int number_of_groups_;
 
-    typedef boost::shared_ptr<LayerManagerWidgetPrivate> LayerManagerWidgetPrivateHandle;
-    LayerManagerWidgetPrivateHandle private_;
+    typedef boost::shared_ptr< LayerManagerWidgetPrivate > LayerManagerWidgetPrivateHandle_type;
+    LayerManagerWidgetPrivateHandle_type private_;
 
     // Icons for the GUI
     QIcon active_close_icon_;    
@@ -95,7 +96,7 @@ class LayerManagerWidget : public QScrollArea
     QIcon expand_close_group_icon_;
 
   private:
-    bool validate_new_layer(const QString &dimensions);
+    bool validate_new_layer( const QString &dimensions );
      
 };
 
