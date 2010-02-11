@@ -37,8 +37,9 @@
 #include <boost/smart_ptr.hpp>
 
 // Utils includes
-#include <Utils/Geometry/View2D.h>
 #include <Utils/Converter/StringConverter.h>
+#include <Utils/Geometry/Quaternion.h>
+#include <Utils/Geometry/View2D.h>
 
 // Application includes
 #include <Application/State/StateBase.h>
@@ -76,6 +77,9 @@ class StateView3D : public StateBase {
     // Set the State from a string
     virtual bool import_from_string(const std::string& str,
                                     bool from_interface = false);
+
+  // Rotate the stored View3D
+  void rotate(const Utils::Quaternion& rotation);
                                     
   protected:    
     // EXPORT_TO_VARIANT
@@ -112,7 +116,7 @@ class StateView3D : public StateBase {
   public:
    // GET:
    // Get the value of the state variable
-   Utils::View3D get() { return value_; }
+    const Utils::View3D& get() { return value_; }
 
 // -- storage of the view --
   protected:

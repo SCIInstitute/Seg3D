@@ -68,6 +68,11 @@ StateView3D::import_from_string(const std::string& str,
   return (true);
 }
 
+void StateView3D::rotate(const Utils::Quaternion& rotation)
+{
+  this->value_.rotate(rotation);
+}
+
 void 
 StateView3D::export_to_variant(ActionParameterVariant& variant) const
 {

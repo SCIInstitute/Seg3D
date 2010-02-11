@@ -26,6 +26,8 @@
    DEALINGS IN THE SOFTWARE.
 */
 
+#include <Utils/Geometry/Matrix.h>
+#include <Utils/Geometry/Transform.h>
 #include <Utils/Geometry/View3D.h>
 #include <Utils/Math/MathFunctions.h>
 #include <Utils/Geometry/Quaternion.h>
@@ -45,7 +47,7 @@ View3D::View3D(const Point& eyep, const Point& lookat,
   eyep_(eyep), 
   lookat_(lookat), 
   up_(up), 
-  fov_(fov)
+  fovy_(fov)
 {
 }
 
@@ -53,7 +55,7 @@ View3D::View3D(const View3D& copy) :
   eyep_(copy.eyep_), 
   lookat_(copy.lookat_), 
   up_(copy.up_), 
-  fov_(copy.fov_)
+  fovy_(copy.fovy_)
 {
 }
 
@@ -62,7 +64,7 @@ View3D& View3D::operator=(const View3D& copy)
   eyep_     = copy.eyep_;
   lookat_   = copy.lookat_;
   up_       = copy.up_;
-  fov_      = copy.fov_;
+  fovy_      = copy.fovy_;
   return *this;
 }
 
@@ -70,19 +72,30 @@ bool
 View3D::operator==(const View3D& copy)
 {
   return (eyep_ == copy.eyep_ && lookat_ == copy.lookat_ &&
-      up_ == copy.up_     && fov_ == copy.fov_ ); 
+      up_ == copy.up_     && fovy_ == copy.fovy_ ); 
 }
 
 bool
 View3D::operator!=(const View3D& copy)
 {
   return (eyep_ != copy.eyep_ || lookat_ != copy.lookat_ ||
-          up_ != copy.up_     || fov_ != copy.fov_);
+          up_ != copy.up_     || fovy_ != copy.fovy_);
 }
 
 void View3D::rotate( const Quaternion& rotation )
 {
+  Vector z(this->eyep_ - this->lookat_);
+  double eye_distance = z.normalize();
+  Vector x(Cross(this->up_, z));
+  x.normalize();
+  Vector y(Cross(z, x));
 
+  // Convert the quaternion to matrix
+  Matrix mat;
+  rotation.to_matrix(mat);
+
+  this->up_ = mat * y;
+  this->eyep_ = this->lookat_ + mat * z * eye_distance; 
 }
 
 } // End namespace Utils

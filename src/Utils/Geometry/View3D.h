@@ -60,20 +60,20 @@ class View3D {
     inline Vector up() const                 { return up_; }
     inline void up(const Vector& up)         { up_ = up;}
 
-    inline double fov() const                { return fov_; }
-    inline void fov(double fov)              { fov_ = fov; }
+    inline double fov() const                { return fovy_; }
+    inline void fov(double fov)              { fovy_ = fov; }
     
     void rotate(const Quaternion& rotation);
     
   private:
     // Eye point
-    Point                    eyep_;
+    Point eyep_;
     // Look at this point in space
-    Point                    lookat_;
+    Point lookat_;
     // Vector pointing to the up position
-    Vector                   up_;
-    // Field of view
-    double                   fov_;
+    Vector up_;
+    // Field of view in y direction
+    double fovy_;
 };
 
 } // End namespace Utils
