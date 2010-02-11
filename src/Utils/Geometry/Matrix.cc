@@ -43,32 +43,16 @@ const double Matrix::EPSILON_C = 1e-7;
 
 Vector Matrix::operator *(const Vector &rhs) const
 {
-  ublas::vector<double> v(4);
-  v[0] = rhs[0];
-  v[1] = rhs[1];
-  v[2] = rhs[2];
-  v[3] = 1.0;
-
-  ublas::vector<double> result(4);
-  result = ublas::prec_prod(*this, v);
-
-  return Vector(result[0]/result[3], result[1]/result[3], result[2]/result[3]);
+  return Vector((*this)(0, 0) * rhs[0] + (*this)(0, 1) * rhs[1] + (*this)(0, 2) * rhs[2],
+              (*this)(1, 0) * rhs[0] + (*this)(1, 1) * rhs[1] + (*this)(1, 2) * rhs[2],
+              (*this)(2, 0) * rhs[0] + (*this)(2, 1) * rhs[1] + (*this)(2, 2) * rhs[2]);
 }
 
 VectorF Matrix::operator *(const VectorF &rhs) const
 {  
-  ublas::vector<double> v(4);
-  v[0] = rhs[0];
-  v[1] = rhs[1];
-  v[2] = rhs[2];
-  v[3] = 1.0;
-
-  ublas::vector<double> result(4);
-  result = ublas::prod(*this, v);
-
-  return VectorF(static_cast<float>(result[0]/result[3]), 
-              static_cast<float>(result[1]/result[3]), 
-              static_cast<float>(result[2]/result[3]));
+  return VectorF(static_cast<float>((*this)(0, 0) * rhs[0] + (*this)(0, 1) * rhs[1] + (*this)(0, 2) * rhs[2]), 
+              static_cast<float>((*this)(1, 0) * rhs[0] + (*this)(1, 1) * rhs[1] + (*this)(1, 2) * rhs[2]), 
+              static_cast<float>((*this)(2, 0) * rhs[0] + (*this)(2, 1) * rhs[1] + (*this)(2, 2) * rhs[2]));
 }
 
 Point Matrix::operator*(const Point& rhs) const
@@ -99,6 +83,17 @@ PointF Matrix::operator*(const PointF& rhs) const
   return PointF(static_cast<float>(result[0]/result[3]), 
               static_cast<float>(result[1]/result[3]), 
               static_cast<float>(result[2]/result[3]));
+}
+
+Matrix Matrix::operator*( const Matrix& rhs ) const
+{
+  return Matrix(prec_prod(*this, rhs));
+}
+
+Matrix& Matrix::operator*=( const Matrix& rhs )
+{
+  this->assign(this->operator *(rhs));
+  return *this;
 }
 
 bool Invert(const Matrix& m, Matrix& inverse)

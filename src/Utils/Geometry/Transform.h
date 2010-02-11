@@ -39,6 +39,7 @@
 #include <ostream>
 
 // Utils includes
+#include <Utils/Geometry/Matrix.h>
 #include <Utils/Geometry/Point.h>
 #include <Utils/Geometry/Vector.h>
 #include <Utils/Geometry/Plane.h>
@@ -49,88 +50,82 @@ namespace Utils {
 
 class Transform
 {
-  public:
-    Transform();
-    Transform(const Transform&);
-    Transform(const Point&, const Vector&, const Vector&, const Vector&);
-    Transform(const std::vector<double>& values);
+public:
+  Transform();
+  Transform(const Transform&);
+  Transform(const Point&, const Vector&, const Vector&, const Vector&);
 
-    Transform& operator=(const Transform& copy);
+  Transform& operator=(const Transform& copy);
 
-    void load_basis(const Point&,const Vector&, const Vector&, const Vector&);
-    void load_frame(const Vector&, const Vector&, const Vector&);
+  void load_identity();
+  void load_basis(const Point&,const Vector&, const Vector&, const Vector&);
+  void load_frame(const Vector&, const Vector&, const Vector&);
+  void invert();
 
-    void post_trans(const Transform&);
-    void pre_trans(const Transform&);
-      
-    void pre_permute(int xmap, int ymap, int zmap);
-    void post_permute(int xmap, int ymap, int zmap);
-    
-    void pre_scale(const Vector&);
-    void post_scale(const Vector&);
-    
-    void pre_shear(const Vector&, const Plane&);
-    void post_shear(const Vector&, const Plane&);
-    
-    void pre_rotate(double, const Vector& axis);
-    void post_rotate(double, const Vector& axis);
-    
-    void pre_translate(const Vector&);
-    void post_translate(const Vector&);
+  void post_transform(const Transform&);
+  void pre_transform(const Transform&);
 
-    // Returns true if the rotation happened, false otherwise.
-    bool rotate(const Vector& from, const Vector& to);
+  void post_mult_matrix(const Matrix& m);
+  void pre_mult_matrix(const Matrix& m);
 
-    Point   unproject(const Point& p) const;
-    Vector  unproject(const Vector& p) const;
-    PointF  unproject(const PointF& p) const;
-    VectorF unproject(const VectorF& p) const;
+  void pre_permute(int xmap, int ymap, int zmap);
+  void post_permute(int xmap, int ymap, int zmap);
 
-    Point   project(const Point& p) const;
-    Vector  project(const Vector& p) const;
-    PointF  project(const PointF& p) const;
-    VectorF project(const VectorF& p) const;
-    Vector  project_normal(const Vector&) const;
-    VectorF project_normal(const VectorF&) const;
- 
-    void get(double*) const;
-    void get_trans(double*) const;
-    void set(double*);
-    void set_trans(double*);
-    
-    void invert();
-    void load_identity();
-    void perspective(const Point& eyep, const Point& lookat,
-         const Vector& up, double fov, double znear, double zfar,
-         int xres, int yres);
-         
-    friend Point   operator*(Transform &t, const Point &d);
-    friend Vector  operator*(Transform &t, const Vector &d); 
-    friend PointF  operator*(Transform &t, const PointF &d);
-    friend VectorF operator*(Transform &t, const VectorF &d); 
+  void pre_scale(const Vector&);
+  void post_scale(const Vector&);
 
-  private:
+  void pre_shear(const Vector&, const Plane&);
+  void post_shear(const Vector&, const Plane&);
 
-    void install_mat(double[4][4]);
-    void build_permute(double m[4][4], int, int, int, bool pre);
-    void build_rotate(double m[4][4], double, const Vector&);
-    void build_shear(double mat[4][4], const Vector&, const Plane&);
-    void build_scale(double m[4][4], const Vector&);
-    void build_translate(double m[4][4], const Vector&);
-    void pre_mulmat(const double[4][4]);
-    void post_mulmat(const double[4][4]);
-    void load_identity(double[4][4]);
+  void pre_rotate(double, const Vector& axis);
+  void post_rotate(double, const Vector& axis);
 
-    void compute_imat();
+  void pre_translate(const Vector&);
+  void post_translate(const Vector&);
 
-    double mat_[4][4];
-    double imat_[4][4];
+  // Returns true if the rotation happened, false otherwise.
+  bool rotate(const Vector& from, const Vector& to);
+
+  void perspective(const Point& eyep, const Point& lookat, const Vector& up, 
+                double fovy, double znear, double zfar, double aspect);
+
+  const Matrix& get_matrix() const;
+  const Matrix& get_inverse_matrix() const;
+
+  void get(double* data) const;
+  void set(const double* data);
+
+  Point   unproject(const Point& p) const;
+  Vector  unproject(const Vector& p) const;
+  PointF  unproject(const PointF& p) const;
+  VectorF unproject(const VectorF& p) const;
+
+  Point   project(const Point& p) const;
+  Vector  project(const Vector& p) const;
+  PointF  project(const PointF& p) const;
+  VectorF project(const VectorF& p) const;
+
+public:
+
+  static void BuildPermute(Matrix& m, int xmap, int ymap, int zmap, bool pre);
+  static void BuildRotate(Matrix& m, double angle, const Vector& axis);
+  static void BuildShear(Matrix& m, const Vector& s, const Plane& p);
+  static void BuildScale(Matrix& m, const Vector& v);
+  static void BuildTranslate(Matrix& m, const Vector& v);
+
+private:
+
+  void compute_inverse() const;
+
+  Matrix mat_;
+  mutable Matrix inverse_mat_;
+  mutable bool inverse_valid_;
 };
 
-Point operator*(Transform &t, const Point &d);
-Vector operator*(Transform &t, const Vector &d);
-PointF operator*(Transform &t, const PointF &d);
-VectorF operator*(Transform &t, const VectorF &d);
+Point operator*(const Transform& t, const Point& d);
+Vector operator*(const Transform& t, const Vector& d);
+PointF operator*(const Transform& t, const PointF& d);
+VectorF operator*(const Transform& t, const VectorF& d);
 
 } // End namespace Utils
 

@@ -33,6 +33,7 @@
 #include <Utils/Geometry/Vector.h>
 #include <Utils/Geometry/Quaternion.h>
 #include <Utils/Math/MathFunctions.h>
+#include <Utils/Geometry/Matrix.h>
 
 namespace Utils {
 
@@ -58,13 +59,13 @@ Quaternion::Quaternion(const Vector& axis, double angle)
   }
 }
 
-Quaternion::Quaternion(const double matrix[4][4])
+Quaternion::Quaternion(const Matrix& matrix)
 {
   from_matrix(matrix);
 }
 
 void 
-Quaternion::to_matrix(double matrix[4][4]) const
+Quaternion::to_matrix(Matrix& matrix) const
 {
   double x2 = x_ + x_;
   double y2 = y_ + y_;
@@ -82,62 +83,62 @@ Quaternion::to_matrix(double matrix[4][4]) const
   double zz = z_ * z2;
   double zw = z2 * w_;
   
-  matrix[0][0] = 1.0 - (yy + zz);
-  matrix[1][0] = xy - zw;
-  matrix[2][0] = xz + yw;
+  matrix(0, 0) = 1.0 - (yy + zz);
+  matrix(0, 1) = xy - zw;
+  matrix(0, 2) = xz + yw;
   
-  matrix[0][1] = xy + zw;
-  matrix[1][1] = 1.0 - (xx + zz);
-  matrix[2][1] = yz - xw;
+  matrix(1, 0) = xy + zw;
+  matrix(1, 1) = 1.0 - (xx + zz);
+  matrix(1, 2) = yz - xw;
   
-  matrix[0][2] = xz - yw;
-  matrix[1][2] = yz + xw;
-  matrix[2][2] = 1.0 - (xx + yy);
+  matrix(2, 0) = xz - yw;
+  matrix(2, 1) = yz + xw;
+  matrix(2, 2) = 1.0 - (xx + yy);
   
-  matrix[0][3] = matrix[1][3] = matrix[2][3] 
-    = matrix[3][0] = matrix[3][1] = matrix[3][2] = 0.0;
-  matrix[3][3] = 1.0;
+  matrix(0, 3) = matrix(1, 3) = matrix(2, 3) 
+    = matrix(3, 0) = matrix(3, 1) = matrix(3, 2) = 0.0;
+  matrix(3, 3) = 1.0;
 }
 
 void 
-Quaternion::from_matrix(const double matrix[4][4])
+Quaternion::from_matrix(const Matrix& matrix)
 {
-  double trace = matrix[0][0] + matrix[1][1] + matrix[2][2];
+  double trace = matrix(0, 0) + matrix(1, 1) + matrix(2, 2);
 
   if (trace > 0)
   {
     double s = 0.5 / Sqrt(trace + 1.0);
     w_ = 0.25 / s;
-    x_ = (matrix[1][2] - matrix[2][1]) * s;
-    y_ = (matrix[2][0] - matrix[0][2]) * s;
-    z_ = (matrix[0][1] - matrix[1][0]) * s;
+    x_ = (matrix(2, 1) - matrix(1, 2)) * s;
+    y_ = (matrix(0, 2) - matrix(2, 0)) * s;
+    z_ = (matrix(1, 0) - matrix(0, 1)) * s;
   }
-  else if (matrix[0][0] > matrix[1][1] && matrix[0][0] > matrix[2][2])
+  else if (matrix(0, 0) > matrix(1, 1) && matrix(0, 0) > matrix(2, 2))
   {
-    double s = Sqrt(1.0 + matrix[0][0] - matrix[1][1] - matrix[2][2]);
+    double s = Sqrt(1.0 + matrix(0, 0) - matrix(1, 1) - matrix(2, 2));
     x_ = 0.5 * s;
     s = 0.5 / s;
-    w_ = (matrix[1][2] - matrix[2][1]) * s;
-    y_ = (matrix[1][0] + matrix[0][1]) * s;
-    z_ = (matrix[2][0] + matrix[0][2]) * s;
+    w_ = (matrix(2, 1) - matrix(1, 2)) * s;
+    y_ = (matrix(1, 0) + matrix(0, 1)) * s;
+    z_ = (matrix(0, 2) + matrix(2, 0)) * s;
   }
-  else if (matrix[1][1] > matrix[2][2])
+  else if (matrix(1, 1) > matrix(2, 2))
   {
-    double s = Sqrt(1.0 + matrix[1][1] - matrix[0][0] - matrix[2][2]);
+    double s = Sqrt(1.0 + matrix(1, 1) - matrix(0, 0) - matrix(2, 2));
     y_ = 0.5 * s;
     s = 0.5 / s;
-    w_ = (matrix[2][0] - matrix[0][2]) * s;
-    x_ = (matrix[1][0] + matrix[0][1]) * s;
-    z_ = (matrix[2][1] + matrix[1][2]) * s;
+    w_ = (matrix(0, 2) - matrix(2, 0)) * s;
+    x_ = (matrix(0, 1) + matrix(1, 0)) * s;
+    z_ = (matrix(1, 2) + matrix(2, 1)) * s;
   } 
   else
   {
-    double s = Sqrt(1.0 + matrix[2][2] - matrix[0][0] - matrix[1][1]);
+    double s = Sqrt(1.0 + matrix(2, 2) - matrix(0, 0) - matrix(1, 1));
     z_ = 0.5 * s;
     s = 0.5 / s;
-    w_ = (matrix[0][1] - matrix[1][0]) * s;
-    x_ = (matrix[2][0] + matrix[0][2]) * s;
-    y_ = (matrix[2][1] + matrix[1][2]) * s;
+    w_ = (matrix(1, 0) - matrix(0, 1)) * s;
+    x_ = (matrix(0, 2) + matrix(2, 0)) * s;
+    y_ = (matrix(1, 2) + matrix(2, 1)) * s;
   }
   
   normalize();
@@ -146,13 +147,13 @@ Quaternion::from_matrix(const double matrix[4][4])
 Vector 
 Quaternion::rotate(const Vector& vec) const
 {
-  double matrix[4][4];
+  Matrix matrix;
   to_matrix(matrix);
     
   Vector result;
-  result[0] = matrix[0][0] * vec[0] + matrix[1][0] * vec[1] + matrix[2][0] * vec[2];
-  result[1] = matrix[0][1] * vec[0] + matrix[1][1] * vec[1] + matrix[2][1] * vec[2];
-  result[2] = matrix[0][2] * vec[0] + matrix[1][2] * vec[1] + matrix[2][2] * vec[2];
+  result[0] = matrix(0, 0) * vec[0] + matrix(0, 1) * vec[1] + matrix(0, 2) * vec[2];
+  result[1] = matrix(1, 0) * vec[0] + matrix(1, 1) * vec[1] + matrix(1, 2) * vec[2];
+  result[2] = matrix(2, 0) * vec[0] + matrix(2, 1) * vec[1] + matrix(2, 2) * vec[2];
   
   return result;
 }

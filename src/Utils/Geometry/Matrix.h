@@ -50,7 +50,7 @@ public:
     this->data(m);
   }
 
-  Matrix(const base_type& m) : base_type(m) 
+  inline Matrix(const base_type& m) : base_type(m) 
   {
     assert(m.size1() == 4 && m.size2() == 4);
   }
@@ -81,6 +81,8 @@ public:
   Point operator*(const Point& rhs) const;
   PointF operator*(const PointF& rhs) const;
 
+  Matrix operator*(const Matrix& rhs) const;
+  Matrix& operator*=(const Matrix& rhs);
 
 private:
 
