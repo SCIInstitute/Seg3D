@@ -41,9 +41,9 @@ namespace Seg3D {
   {
     // Need to set ranges and default values for all parameters
     add_state("target",target_layer_,"<none>","<none>");
-    add_state("order",order_,0.0f,100.0f,1.0f,1.0f);
+    add_state("order", order_, 0, 100, 1, 1);
     
-    // Add constaints, so that when the state changes the right ranges of 
+    // Add constraints, so that when the state changes the right ranges of 
     // parameters are selected
     target_layer_->value_changed_signal.connect(boost::bind(&OtsuThresholdFilter::target_constraint,this,_1));
 
