@@ -63,7 +63,9 @@ class View3D {
     inline double fov() const                { return fovy_; }
     inline void fov(double fov)              { fovy_ = fov; }
     
-    void rotate(const Quaternion& rotation);
+  void rotate(const Vector& axis, double angle);
+  void scale(double ratio);
+  void translate(const Vector& offset);
     
   private:
     // Eye point

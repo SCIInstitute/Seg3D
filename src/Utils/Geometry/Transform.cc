@@ -351,7 +351,7 @@ void Transform::perspective( const Point& eyep, const Point& lookat, const Vecto
   pre_transform(tf);
 
   // Perspective projection
-  double f = Cot(DegreeToRadian(fovy * 0.5));
+  double f = Cot(fovy * 0.5);
 
   Matrix proj = Matrix::ZERO_C;
   proj(0, 0) = f / aspect;

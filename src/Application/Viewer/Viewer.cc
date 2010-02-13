@@ -28,6 +28,7 @@
 
 // Application includes
 #include <Application/Viewer/Viewer.h>
+#include <Application/Viewer/ViewManipulator.h>
 
 namespace Seg3D {
 
@@ -49,6 +50,8 @@ Viewer::Viewer(const std::string& key) :
   add_state("volume_slices_visible",volume_slices_visible_state,true);
   add_state("volume_isosurfaces_visible",volume_isosurfaces_visible_state,true);
   add_state("volume_volume_rendering_visible",volume_volume_rendering_visible_state,false);
+
+  this->view_manipulator_ = boost::shared_ptr<ViewManipulator>(new ViewManipulator(this));
 }
   
 Viewer::~Viewer()
@@ -56,49 +59,49 @@ Viewer::~Viewer()
   disconnect_all();
 }
 
-void Viewer::mouse_move_event( const MouseHistory& mouse_history, int buttons, int modifiers )
+void Viewer::mouse_move_event( const MouseHistory& mouse_history, int button, int buttons, int modifiers )
 {
   if (!mouse_move_handler_.empty())
   {
     // if the registered handler handled the event, no further process needed
-    if (mouse_move_handler_(mouse_history, buttons, modifiers))
+    if (mouse_move_handler_(mouse_history, button, buttons, modifiers))
     {
       return;
     }
   }
   
   // default handling here
-
+  this->view_manipulator_->mouse_move(mouse_history, button, buttons, modifiers);
 }
 
-void Viewer::mouse_press_event( const MouseHistory& mouse_history, int buttons, int modifiers )
+void Viewer::mouse_press_event( const MouseHistory& mouse_history, int button, int buttons, int modifiers )
 {
   if (!mouse_press_handler_.empty())
   {
     // if the registered handler handled the event, no further process needed
-    if (mouse_press_handler_(mouse_history, buttons, modifiers))
+    if (mouse_press_handler_(mouse_history, button, buttons, modifiers))
     {
       return;
     }
   }
 
   // default handling here
-
+  this->view_manipulator_->mouse_press(mouse_history, button, buttons, modifiers);
 }
 
-void Viewer::mouse_release_event( const MouseHistory& mouse_history, int buttons, int modifiers )
+void Viewer::mouse_release_event( const MouseHistory& mouse_history, int button, int buttons, int modifiers )
 {
   if (!mouse_release_handler_.empty())
   {
     // if the registered handler handled the event, no further process needed
-    if (mouse_release_handler_(mouse_history, buttons, modifiers))
+    if (mouse_release_handler_(mouse_history, button, buttons, modifiers))
     {
       return;
     }
   }
 
   // default handling here
-
+  this->view_manipulator_->mouse_release(mouse_history, button, buttons, modifiers);
 }
 
 } // end namespace Seg3D

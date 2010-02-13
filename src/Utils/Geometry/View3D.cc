@@ -29,8 +29,8 @@
 #include <Utils/Geometry/Matrix.h>
 #include <Utils/Geometry/Transform.h>
 #include <Utils/Geometry/View3D.h>
-#include <Utils/Math/MathFunctions.h>
 #include <Utils/Geometry/Quaternion.h>
+#include <Utils/Math/MathFunctions.h>
 
 namespace Utils {
 
@@ -82,7 +82,7 @@ View3D::operator!=(const View3D& copy)
           up_ != copy.up_     || fovy_ != copy.fovy_);
 }
 
-void View3D::rotate( const Quaternion& rotation )
+void View3D::rotate( const Vector& axis, double angle )
 {
   Vector z(this->eyep_ - this->lookat_);
   double eye_distance = z.normalize();
@@ -91,11 +91,22 @@ void View3D::rotate( const Quaternion& rotation )
   Vector y(Cross(z, x));
 
   // Convert the quaternion to matrix
+  Quaternion quat(axis, DegreeToRadian(angle));
   Matrix mat;
-  rotation.to_matrix(mat);
+  quat.to_matrix(mat);
 
   this->up_ = mat * y;
   this->eyep_ = this->lookat_ + mat * z * eye_distance; 
+}
+
+void View3D::scale( double ratio )
+{
+  this->eyep_ = this->lookat_ + (this->eyep_ - this->lookat_) * ratio;
+}
+
+void View3D::translate( const Vector& offset )
+{
+
 }
 
 } // End namespace Utils

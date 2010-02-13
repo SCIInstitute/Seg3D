@@ -140,10 +140,8 @@ QtRenderWidget::mouseMoveEvent( QMouseEvent * event )
   mouse_history_.current.x = event->x();
   mouse_history_.current.y = event->y();
   
-  viewer_->mouse_move_event(
-    mouse_history_,
-    convert_qt_mousebuttons_to_viewer(event->buttons()),
-    convert_qt_keymodifiers_to_viewer(event->modifiers()));
+  viewer_->mouse_move_event(this->mouse_history_, event->button(), 
+                        event->buttons(), event->modifiers());
 }
 
 void 
@@ -151,26 +149,24 @@ QtRenderWidget::mousePressEvent( QMouseEvent * event )
 {
   mouse_history_.current.x = mouse_history_.previous.x = event->x();
   mouse_history_.current.y = mouse_history_.previous.y = event->y();
-  if ((event->buttons() & Qt::LeftButton) != 0)
+  if (event->button() == Qt::LeftButton)
   {
     mouse_history_.left_start.x = event->x();
     mouse_history_.left_start.y = event->y();
   }
-  if ((event->buttons() & Qt::RightButton) != 0)
+  else if (event->button() == Qt::RightButton)
   {
     mouse_history_.right_start.x = event->x();
     mouse_history_.right_start.y = event->y();
   }
-  if ((event->buttons() & Qt::MidButton) != 0)
+  else if (event->button() == Qt::MidButton)
   {
     mouse_history_.mid_start.x = event->x();
     mouse_history_.mid_start.y = event->y();
   }
   
-  viewer_->mouse_press_event(
-    mouse_history_,
-    convert_qt_mousebuttons_to_viewer(event->buttons()),
-    convert_qt_keymodifiers_to_viewer(event->modifiers()));
+  viewer_->mouse_press_event(this->mouse_history_, event->button(), 
+                        event->buttons(), event->modifiers());
 }
 
 void 
@@ -180,10 +176,8 @@ QtRenderWidget::mouseReleaseEvent( QMouseEvent * event )
   mouse_history_.current.x = event->x();
   mouse_history_.current.y = event->y();
 
-  viewer_->mouse_release_event(
-    mouse_history_,
-    convert_qt_mousebuttons_to_viewer(event->buttons()),
-    convert_qt_keymodifiers_to_viewer(event->modifiers()));
+  viewer_->mouse_release_event(this->mouse_history_, event->button(),
+                          event->buttons(), event->modifiers());
 }
 
 void QtRenderWidget::set_id( size_t viewer_id )

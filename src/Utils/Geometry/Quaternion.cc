@@ -45,7 +45,7 @@ Quaternion::Quaternion(const Vector& axis, double angle)
   double len = tmp.normalize();
   if (len > NUMERIC_EPSILON)
   {
-    double half_angle = angle*0.5;
+    double half_angle = angle * 0.5;
     double sin_half_angle = Sin(half_angle);
     w_ = Cos(half_angle);
     x_ = tmp[0] * sin_half_angle;

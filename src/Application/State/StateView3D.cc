@@ -68,9 +68,19 @@ StateView3D::import_from_string(const std::string& str,
   return (true);
 }
 
-void StateView3D::rotate(const Utils::Quaternion& rotation)
+void StateView3D::rotate( const Utils::Vector& axis, double angle )
 {
-  this->value_.rotate(rotation);
+  this->value_.rotate(axis, angle);
+}
+
+void StateView3D::scale( double ratio )
+{
+  this->value_.scale(ratio);
+}
+
+void StateView3D::translate( const Utils::Vector& offset )
+{
+  this->value_.translate(offset);
 }
 
 void 

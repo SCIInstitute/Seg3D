@@ -38,7 +38,6 @@
 
 // Utils includes
 #include <Utils/Converter/StringConverter.h>
-#include <Utils/Geometry/Quaternion.h>
 #include <Utils/Geometry/View2D.h>
 
 // Application includes
@@ -79,7 +78,11 @@ class StateView3D : public StateBase {
                                     bool from_interface = false);
 
   // Rotate the stored View3D
-  void rotate(const Utils::Quaternion& rotation);
+  void rotate(const Utils::Vector& axis, double angle);
+
+  void scale(double ratio);
+
+  void translate(const Utils::Vector& offset);
                                     
   protected:    
     // EXPORT_TO_VARIANT
@@ -116,7 +119,7 @@ class StateView3D : public StateBase {
   public:
    // GET:
    // Get the value of the state variable
-    const Utils::View3D& get() { return value_; }
+    const Utils::View3D& get() const { return value_; }
 
 // -- storage of the view --
   protected:

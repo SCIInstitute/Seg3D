@@ -47,6 +47,7 @@
 namespace Seg3D {
 
 // Forward declarations
+class ViewManipulator;
 class Viewer;
 typedef boost::shared_ptr<Viewer> ViewerHandle;
 
@@ -98,28 +99,30 @@ class Viewer : public StateHandler {
         MousePosition current;
     };
     
-    void mouse_move_event(const MouseHistory& mouse_history, int buttons, int modifiers);
-    void mouse_press_event(const MouseHistory& mouse_history, int buttons, int modifiers);
-    void mouse_release_event(const MouseHistory& mouse_history, int buttons, int modifiers);
+  void mouse_move_event(const MouseHistory& mouse_history, int button, int buttons, int modifiers);
+  void mouse_press_event(const MouseHistory& mouse_history, int button, int buttons, int modifiers);
+  void mouse_release_event(const MouseHistory& mouse_history, int button, int buttons, int modifiers);
     
-    typedef boost::function<bool (const MouseHistory&, int, int)> mouse_event_handler;
+    typedef boost::function<bool (const MouseHistory&, int, int, int)> mouse_event_handler_type;
     
-    inline void set_mouse_move_handler(mouse_event_handler func) {
+    inline void set_mouse_move_handler(mouse_event_handler_type func) {
       mouse_move_handler_ = func;
     }
     
-    inline void set_mouse_press_handler(mouse_event_handler func) {
+    inline void set_mouse_press_handler(mouse_event_handler_type func) {
       mouse_press_handler_ = func;
     }
     
-    inline void set_mouse_release_handler(mouse_event_handler func) {
+    inline void set_mouse_release_handler(mouse_event_handler_type func) {
       mouse_release_handler_ = func;
     }
     
   private:
-    mouse_event_handler mouse_move_handler_;
-    mouse_event_handler mouse_press_handler_;
-    mouse_event_handler mouse_release_handler_;
+    mouse_event_handler_type mouse_move_handler_;
+    mouse_event_handler_type mouse_press_handler_;
+    mouse_event_handler_type mouse_release_handler_;
+
+  boost::shared_ptr<ViewManipulator> view_manipulator_;
     
 // -- State information --
   public:

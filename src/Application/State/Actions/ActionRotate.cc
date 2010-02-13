@@ -56,7 +56,7 @@ ActionRotate::run(ActionContextHandle &context, ActionResultHandle &result)
 
   if (state)
   {
-    state->rotate(rotation_.value());
+    //state->rotate(rotation_.value());
     return (true);
   }
   
