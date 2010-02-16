@@ -29,18 +29,23 @@
 #include <Application/Application/Application.h>
 #include <Application/Interface/Interface.h>
 
-#include <Application/Tool/ToolManager.h>
 #include <Application/Tool/ToolFactory.h>
+#include <Application/ToolManager/ToolManager.h>
 
-#include <Application/Tool/Actions/ActionOpenTool.h>
-#include <Application/Tool/Actions/ActionCloseTool.h>
-#include <Application/Tool/Actions/ActionActivateTool.h>
+#include <Application/ToolManager/Actions/ActionOpenTool.h>
+#include <Application/ToolManager/Actions/ActionCloseTool.h>
+#include <Application/ToolManager/Actions/ActionActivateTool.h>
 
 namespace Seg3D {
 
 ToolManager::ToolManager() :
   StateHandler("ToolManager")
 {
+}
+
+ToolManager::~ToolManager()
+{
+  disconnect_all();
 }
 
 // THREAD-SAFETY:
@@ -50,28 +55,23 @@ ToolManager::ToolManager() :
 bool
 ToolManager::open_tool(const std::string& toolid ,std::string& new_toolid)
 {
-  // Lock the list
-  boost::unique_lock<boost::recursive_mutex> lock(tool_list_lock_);
+  // Step (1): Make the function thread safe
+  lock_type lock(tool_list_mutex_);
 
-  // Check whether an id number was attached
-  std::string tool_type = Utils::string_to_lower(toolid);
-  std::string::size_type loc = tool_type.find('_');
-  if (loc != std::string::npos) 
+  // Step (2): Add an entry in the debug log
+  SCI_LOG_DEBUG(std::string("Open tool: ")+toolid);
+
+  // STEP (3): Create a new toolid and extract the tool type from the string
+  if (!( StateEngine::Instance()->create_stateid(toolid,new_toolid)))
   {
-    tool_type = tool_type.substr(0,loc);
-    // ToolID was already assigned in the action
-    // and hence we do not need to generate a new one
-    new_toolid = toolid;
-  }
-  else
-  {
-    // No final toolID was assigned and a new one has to be made
-    new_toolid = create_toolid(tool_type);
+    SCI_LOG_ERROR(std::string("Could not create tool  '")+toolid+"'");
+    return (false);  
   }
 
-  SCI_LOG_DEBUG(std::string("Creating tool: ")+new_toolid+" of type "+tool_type);
-    
-  // Step (2): Build the tool using the factory. This will generate the default
+  std::string::size_type loc = new_toolid.find('_');  
+  std::string tool_type = new_toolid.substr(0,loc);
+
+  // Step (4): Build the tool using the factory. This will generate the default
   // settings.
   ToolHandle tool;
   
@@ -81,16 +81,18 @@ ToolManager::open_tool(const std::string& toolid ,std::string& new_toolid)
     return (false);
   }
   
-  // Step (3): Add the tool id to the tool and add the tool to the list
+  // Step (5): Add the tool id to the tool and add the tool to the list
   {
     tool_list_[new_toolid] = tool;
   }
     
   SCI_LOG_DEBUG(std::string("Open tool: ")+new_toolid);
-  // Step (4): Signal any observers (UIs) that the tool has been opened  
-  open_tool_signal(tool);
+  
+  // Step (6): Signal any observers (UIs) that the tool has been opened  
+  open_tool_signal_(tool);
 
-  return (true);
+  // All done
+  return true;
 }
 
 // THREAD-SAFETY:
@@ -100,42 +102,42 @@ ToolManager::open_tool(const std::string& toolid ,std::string& new_toolid)
 void
 ToolManager::close_tool(const std::string& toolid)
 {
-  boost::unique_lock<boost::recursive_mutex> lock(tool_list_lock_);
+  // Step (1): Make the function thread safe
+  lock_type lock(tool_list_mutex_);
 
-  // Step (1): Find the tool in the list.
+  // Step (2): Add an entry in the debug log
+  SCI_LOG_DEBUG(std::string("Close tool: ")+toolid);
+
+  // Step (3): Find the tool in the list.
   tool_list_type::iterator it = tool_list_.find(toolid);
   if (it == tool_list_.end()) 
   {
     SCI_LOG_ERROR(std::string("Toolid '"+toolid+"' does not exist"));
     return;
   }
-      
-   // Step (2): Ensure that the tool is not the active tool
+
+  // Step (4): Get the tool from the iterator 
+  ToolHandle tool = (*it).second;
   if (toolid == active_toolid_)
   {
     // Call the tool deactivate function that will unregister the current
     // tool bindings
-    (*it).second->deactivate();
+    tool->deactivate();
     
     // Set no tool as active
     active_toolid_ = "";
   }
 
-  // Step (3): Move the tool from the list. The tool handle still persists
+  // Step (5): Move the tool from the list. The tool handle still persists
   // and will be removed after the signal has been posted.
-
-  ToolHandle tool = (*it).second;
   tool_list_.erase(it);
 
-  // Step (4): Run the function in the tool that cleans up the parts that
+  // Step (6): Run the function in the tool that cleans up the parts that
   // need to be cleaned up on the interface thread.
   tool->close();  
 
-  // Step (5): Close any of the registered connections
-  tool->close_connections();      
-
-  // Step (6): Signal that the tool will be closed.   
-  close_tool_signal(tool);
+  // Step (7): Signal that the tool will be closed.   
+  close_tool_signal_(tool);
 }
 
 // THREAD-SAFETY:
@@ -145,27 +147,24 @@ ToolManager::close_tool(const std::string& toolid)
 void
 ToolManager::activate_tool(const std::string& toolid)
 {
-  // Lock access to tool_list
-  boost::unique_lock<boost::recursive_mutex> lock(tool_list_lock_);
+  // Step (1): Make the function thread safe
+  lock_type lock(tool_list_mutex_);
 
-  // Check if anything needs to be done
-  if (toolid == active_toolid_) return;
-
+  // Step (2): Add an entry in the debug log
   SCI_LOG_DEBUG(std::string("Activate tool: ")+toolid);
 
-  // Step (1): Find the tool in the list.
-  tool_list_type::iterator it = tool_list_.find(active_toolid_);
+  // Step (3): Check if anything needs to be done
+  if (toolid == active_toolid_) return;
 
-  // Step (2): Deactivate tool if found
+  // Step (4): Deactivate tool if found
+  tool_list_type::iterator it = tool_list_.find(active_toolid_);
   if (it != tool_list_.end())
   {
     (*it).second->deactivate();
   }
   
-  // Step (3): Find new active tool
+  // Step (5): Find new active tool and activate it
   it = tool_list_.find(toolid);
-  
-  // Step (4): Activate tool if found
   if (it != tool_list_.end())
   {
     (*it).second->activate();
@@ -177,76 +176,33 @@ ToolManager::activate_tool(const std::string& toolid)
     return;
   }
   
-  // signal for interface
-  activate_tool_signal((*it).second);
+  // Step (4): signal for interface
+  activate_tool_signal_((*it).second);
 }
 
 
 ToolManager::tool_list_type
 ToolManager::tool_list()
 {
-  boost::unique_lock<boost::recursive_mutex> lock(tool_list_lock_);
+  lock_type lock(tool_list_mutex_);
   return tool_list_;
 }
+
 
 std::string
 ToolManager::active_toolid()
 {
-  boost::unique_lock<boost::recursive_mutex> lock(tool_list_lock_);
+  lock_type lock(tool_list_mutex_);
   return active_toolid_;
 }
 
-void
-ToolManager::lock_tool_list()
+
+ToolManager::mutex_type&
+ToolManager::get_mutex()
 {
-  tool_list_lock_.lock();
+  return tool_list_mutex_;
 }
 
-void
-ToolManager::unlock_tool_list()
-{
-  tool_list_lock_.unlock();
-}
-
-void
-ToolManager::add_toolid(const std::string& toolid)
-{
-  boost::unique_lock<boost::mutex> lock(toolid_list_lock_);
-  toolid_list_.insert(toolid);
-}        
-
-void
-ToolManager::remove_toolid(const std::string& toolid)
-{
-  boost::unique_lock<boost::mutex> lock(toolid_list_lock_);
-  toolid_list_.erase(toolid);
-}
-
-bool
-ToolManager::is_toolid(const std::string& toolid)
-{
-  boost::unique_lock<boost::mutex> lock(toolid_list_lock_);
-  if(toolid_list_.find(toolid) != toolid_list_.end()) return (true);
-  return (false);
-}
-
-std::string 
-ToolManager::create_toolid(const std::string& tool_type)
-{
-  boost::unique_lock<boost::mutex> lock(toolid_list_lock_);
-
-  int num = 0;
-  std::string toolid;
-
-  do 
-  {
-    toolid = tool_type+std::string("_")+Utils::to_string(num);
-    num++;
-  } 
-  while(toolid_list_.find(toolid) != toolid_list_.end());
-  
-  return (toolid);
-}
 
 // Singleton interface needs to be defined somewhere
 Utils::Singleton<ToolManager> ToolManager::instance_;

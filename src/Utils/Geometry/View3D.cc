@@ -69,14 +69,14 @@ View3D& View3D::operator=(const View3D& copy)
 }
 
 bool
-View3D::operator==(const View3D& copy)
+View3D::operator==(const View3D& copy) const
 {
   return (eyep_ == copy.eyep_ && lookat_ == copy.lookat_ &&
       up_ == copy.up_     && fovy_ == copy.fovy_ ); 
 }
 
 bool
-View3D::operator!=(const View3D& copy)
+View3D::operator!=(const View3D& copy) const
 {
   return (eyep_ != copy.eyep_ || lookat_ != copy.lookat_ ||
           up_ != copy.up_     || fovy_ != copy.fovy_);

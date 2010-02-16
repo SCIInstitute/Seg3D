@@ -46,23 +46,23 @@
 
 namespace Seg3D {
 
+
+// Forward declaration
 class ActionManager;
 
+// Class definition
 class ActionManager : public boost::noncopyable {
 
 // -- Constructor --
 
-  public:
+  private:
+    friend class Utils::Singleton<ActionManager>;
     ActionManager();
 
-// -- dispatcher --
   public:
-
-    void dispatch_undo() const;
-    void dispatch_redo() const;
-
+    virtual ~ActionManager();
+    
 // -- Signal/Slots --
-
   public:
     
     // CONNECT_TAGS_CHANGED:

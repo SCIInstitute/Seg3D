@@ -28,6 +28,7 @@
 
 
 #include <Application/ActionManager/Actions/ActionUndo.h>
+#include <Application/Interface/Interface.h>
 
 namespace Seg3D {
 
@@ -42,9 +43,9 @@ ActionUndo::validate(ActionContextHandle& context)
   if (!(ActionUndoBuffer::Instance()->has_undo_action()))
   {
     context->report_error(std::string("No actions to undo"));
-    return (false);
+    return false;
   }
-  return (true); // validated
+  return true; // validated
 }
 
 // RUN:
@@ -54,7 +55,22 @@ ActionUndo::run(ActionContextHandle& context,
                 ActionResultHandle& result)
 {
   ActionUndoBuffer::Instance()->undo_action(context);
-  return (true); // success
+  return true; // success
+}
+
+void 
+ActionUndo::Dispatch()
+{
+  // Post the new action
+  Interface::PostAction(Create());      
+}
+
+ActionHandle 
+ActionUndo::Create()
+{
+  // Create new action
+  ActionUndo* action = new ActionUndo;
+  return ActionHandle(action);
 }
 
 

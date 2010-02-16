@@ -34,11 +34,14 @@
 namespace Seg3D {
 
 class MedianFilter : public Tool {
-  SCI_TOOL_TYPE("MedianFilter","Median","",Tool::DATATODATA_E|Tool::FILTER_E, QUrl::fromEncoded("http://seg3d.org/"))
+  SCI_TOOL_TYPE( "MedianFilter", "Median", "",
+                 Tool::DATATODATA_E|Tool::FILTER_E, 
+                 "http://seg3d.org/")
+
 // -- constructor/destructor --  
-public:
-  MedianFilter(const std::string& toolid);
-  virtual ~MedianFilter();
+  public:
+    MedianFilter(const std::string& toolid);
+    virtual ~MedianFilter();
 
 // -- constraint parameters --
   
@@ -52,16 +55,13 @@ public:
   
 // -- state --
   public:
-  // Layerid of the target layer
-  StateOptionHandle               target_layer_;
-  
-  StateRangedIntHandle            radius_;
-  
-  StateBoolHandle                 replace_;
-  
-
-
-
+    // Layerid of the target layer
+    StateOptionHandle               target_layer_state_;
+    
+    StateRangedIntHandle            radius_state_;
+    
+    StateBoolHandle                 replace_state_;
+    
 
 };
 

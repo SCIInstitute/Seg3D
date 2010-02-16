@@ -28,7 +28,7 @@
 
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/ThresholdTool.h>
-// #include <Application/Layer/LayerManager.h>
+// #include <Application/LayerManager/LayerManager.h>
 
 namespace Seg3D {
 
@@ -39,13 +39,13 @@ ThresholdTool::ThresholdTool(const std::string& toolid) :
   Tool(toolid)
 {
   // Need to set ranges and default values for all parameters
-  add_state("target",target_layer_,"<none>","<none>");
-  add_state("upper_threshold",upper_threshold_,0.0f,100.0f,1.0f,1.0f);
-  add_state("lower_threshold",lower_threshold_,0.0f,100.0f,1.0f,1.0f);
+  add_state("target",target_layer_state_,"<none>","<none>");
+  add_state("upper_threshold",upper_threshold_state_,0.0f,100.0f,1.0f,1.0f);
+  add_state("lower_threshold",lower_threshold_state_,0.0f,100.0f,1.0f,1.0f);
   
   // Add constaints, so that when the state changes the right ranges of 
   // parameters are selected
-  target_layer_->value_changed_signal.connect(boost::bind(&ThresholdTool::target_constraint,this,_1));
+  target_layer_state_->value_changed_signal_.connect(boost::bind(&ThresholdTool::target_constraint,this,_1));
 
   // If a layer is added or deleted update the lists
 //  add_connection(LayerManager::instance()->connect_layers_changed(

@@ -41,38 +41,47 @@ bool
 ActionGet::validate(ActionContextHandle& context)
 {
   // Check whether the state exists
-  StateBaseHandle state;
-  if(!(StateEngine::Instance()->get_state(stateid_.value(),state)))
-  {
-    context->report_error(
-      std::string("Unknown state variable '")+stateid_.value()+"'");
-    return (false);
-  }
   
+  // NOTE: We use lock() to avoid constructor from throwing an exception
+  StateBaseHandle state(state_weak_handle_.lock());
+  
+  // If not the state cannot be retrieved report an error
+  if (! state.get())
+  {
+    if (!(StateEngine::Instance()->get_state(stateid_.value(),state))) 
+    {
+      context->report_error(
+        std::string("Unknown state variable '")+stateid_.value()+"'");
+      return false;
+    }
+    state_weak_handle_ = state;
+  }
+   
   // The action should be able to run 
-  return (true);
+  return true;
 }
 
 bool 
 ActionGet::run(ActionContextHandle& context, ActionResultHandle& result)
 {
   // Get the state
-  StateBaseHandle state;
-  if(!(StateEngine::Instance()->get_state(stateid_.value(),state)))
+  StateBaseHandle state(state_weak_handle_.lock());
+  
+  if (state.get())
   {
-    return (false);
+    // Retrieve the current state
+    result = ActionResultHandle(new ActionResult);
+    state->export_to_variant(*result);
+    return true;
   }
-
-  // Retrieve the current state
-  result = ActionResultHandle(new ActionResult);
-  state->export_to_variant(*result);
   
   // Signal action is done
-  return (true);
+  return false;
 }
 
-void 
-ActionGet::Dispatch(StateBaseHandle& state)
+
+ActionHandle
+ActionGet::Create(StateBaseHandle& state)
 {
   // Create new action
   ActionGet* action = new ActionGet;
@@ -80,9 +89,18 @@ ActionGet::Dispatch(StateBaseHandle& state)
   // Set action parameters
   action->stateid_.value() = state->stateid();
 
-  // Post the new action
-  PostActionFromInterface(ActionHandle(action));      
+  // Add optimization
+  action->state_weak_handle_ = state;
+
+  // return the new action
+  return ActionHandle(action);      
 }
 
+void 
+ActionGet::Dispatch(StateBaseHandle& state)
+{
+  // Post the a action
+  Interface::PostAction(Create(state));      
+}
 
 } // end namespace Seg3D

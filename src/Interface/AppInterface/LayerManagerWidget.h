@@ -33,20 +33,18 @@
 # pragma once
 #endif
 
+// Qt includes
 #include <QtGui>
 #include <QSharedPointer>
 
-// Application includes
-#include <Application/Tool/ToolInterface.h>
-#include <Application/Tool/Tool.h>
-#include <Application/Tool/ToolManager.h>
-
-
+// boost includes
+#include <boost/smart_ptr.hpp>
 
 
 namespace Seg3D {
 
 class LayerManagerWidgetPrivate;
+typedef boost::shared_ptr< LayerManagerWidgetPrivate > LayerManagerWidgetPrivateHandle;
 
 class LayerManagerWidget : public QScrollArea
 {   
@@ -87,8 +85,7 @@ class LayerManagerWidget : public QScrollArea
     QVBoxLayout* group_layout_;
     int number_of_groups_;
 
-    typedef boost::shared_ptr< LayerManagerWidgetPrivate > LayerManagerWidgetPrivateHandle_type;
-    LayerManagerWidgetPrivateHandle_type private_;
+    LayerManagerWidgetPrivateHandle private_;
 
     // Icons for the GUI
     QIcon active_close_icon_;    

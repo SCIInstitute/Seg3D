@@ -48,8 +48,8 @@ class View3D {
     View3D& operator=(const View3D&);
     
     // compare 2 views; are they exactly the same?
-    bool operator==(const View3D&);
-    bool operator!=(const View3D&);
+    bool operator==(const View3D&) const;
+    bool operator!=(const View3D&) const;
 
     inline Point eyep() const                { return eyep_; }
     inline void eyep(const Point& eyep)      { eyep_ = eyep; }

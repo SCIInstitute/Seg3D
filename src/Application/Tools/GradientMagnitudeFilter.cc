@@ -40,14 +40,13 @@ namespace Seg3D {
   Tool(toolid)
   {
     // Need to set ranges and default values for all parameters
-    add_state("target",target_layer_,"<none>","<none>");
-    add_state("replace",replace_,false);
+    add_state("target",target_layer_state_,"<none>","<none>");
+    add_state("replace",replace_state_,false);
 
     // Add constaints, so that when the state changes the right ranges of 
     // parameters are selected
-    target_layer_->value_changed_signal.connect(boost::bind(&GradientMagnitudeFilter::target_constraint,this,_1));
-    
-    
+    target_layer_state_->value_changed_signal_.connect(
+      boost::bind(&GradientMagnitudeFilter::target_constraint,this,_1));
     
   }
   

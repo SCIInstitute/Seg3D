@@ -41,11 +41,22 @@
 
 namespace Seg3D {
 
+// CLASS ACTIONHISTORY
+// A record of the last actions issued in the program
+
+// Forward Declaration
+class ActionHistory;
+
+// Class defintion
 class ActionHistory : public boost::noncopyable {
 
 // -- Constructor/Destructor --
-  public:
+  private:
+    friend class Utils::Singleton<ActionHistory>;
     ActionHistory();
+  
+  public:
+    virtual ~ActionHistory();
   
 // -- History recording --
 
@@ -86,7 +97,7 @@ class ActionHistory : public boost::noncopyable {
     
     // HISTORY_CHANGED_SIGNAL:
     // Signal indicating that the history changed
-    history_changed_signal_type history_changed_signal;
+    history_changed_signal_type history_changed_signal_;
 
 // -- Singleton interface --
   public:

@@ -30,30 +30,47 @@
 
 namespace Seg3D {
 
-class InterfaceActionContext : public ActionContext {
-public: 
-  virtual bool from_interface() const { return true; }
 
-};
-
-
-Interface::Interface()
+Interface::Interface() :
+  context_(new InterfaceActionContext)
 {
 }
 
-ActionContextHandle
-Interface::create_action_context()
+
+Interface::~Interface()
 {
-  return (ActionContextHandle(new InterfaceActionContext));
 }
+
+
+InterfaceActionContextHandle
+Interface::interface_action_context()
+{
+  return context_;
+}
+
+
+void
+Interface::PostEvent(boost::function<void ()> function)
+{
+  Instance()->post_event(function);
+}
+
+
+void
+Interface::PostAndWaitEvent(boost::function<void ()> function)
+{
+  Instance()->post_and_wait_event(function);
+}
+
+void 
+Interface::PostAction(ActionHandle action)
+{
+  ActionDispatcher::Instance()->post_action(action,
+    ActionContextHandle(Interface::Instance()->interface_action_context()));
+}
+
 
 // Singleton instance
 Utils::Singleton<Interface> Interface::instance_;
-
-void PostActionFromInterface(ActionHandle action)
-{
-  ActionDispatcher::Instance()->post_action(action,
-        Interface::Instance()->create_action_context());
-}
 
 } // end namespace Seg3D

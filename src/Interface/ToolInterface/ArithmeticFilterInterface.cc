@@ -66,11 +66,11 @@ public:
     ArithmeticFilter* tool = dynamic_cast<ArithmeticFilter*>(base_tool_.get());
     
     //Step 3 - connect the gui to the tool through the QtBridge
-    QtBridge::connect(private_->ui_.volumeAComboBox, tool->volume_a_);
-    QtBridge::connect(private_->ui_.volumeBComboBox, tool->volume_b_);
-    QtBridge::connect(private_->ui_.volumeCComboBox, tool->volume_c_);
-    QtBridge::connect(private_->ui_.exampleExpComboBox, tool->example_expressions_);
-    QtBridge::connect(private_->ui_.replaceCheckBox,tool->replace_);
+    QtBridge::connect(private_->ui_.volumeAComboBox, tool->volume_a_state_);
+    QtBridge::connect(private_->ui_.volumeBComboBox, tool->volume_b_state_);
+    QtBridge::connect(private_->ui_.volumeCComboBox, tool->volume_c_state_);
+    QtBridge::connect(private_->ui_.exampleExpComboBox, tool->example_expressions_state_);
+    QtBridge::connect(private_->ui_.replaceCheckBox,tool->replace_state_);
 
     //Send a message to the log that we have finised with building the Arithmetic Filter
     SCI_LOG_DEBUG("Finished building an Arithmetic Filter Interface");

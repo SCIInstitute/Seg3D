@@ -45,9 +45,19 @@ class ActionUndo : public Action {
     virtual bool validate(ActionContextHandle& context);
     virtual bool run(ActionContextHandle& context,
                      ActionResultHandle& result);
+
+// -- Dispatch/Create this action from the interface --
+  public:
+  
+    // DISPATCH:
+    // Dispatch the action from the interface
+    static void Dispatch();
+
+    // CREATE:
+    // Create the action but do not dispatch it yet
+    static ActionHandle Create();
 };
 
-typedef boost::intrusive_ptr<ActionUndo> ActionUndoHandle;
 
 } // end namespace Seg3D
 

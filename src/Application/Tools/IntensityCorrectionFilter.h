@@ -34,7 +34,9 @@
 namespace Seg3D  {
   
 class IntensityCorrectionFilter : public Tool {
-  SCI_TOOL_TYPE("IntensityCorrectionFilter","Intensity Correction", "",Tool::DATATODATA_E|Tool::FILTER_E, QUrl::fromEncoded("http://seg3d.org/"))
+  SCI_TOOL_TYPE( "IntensityCorrectionFilter", "Intensity Correction", "",
+                 Tool::DATATODATA_E|Tool::FILTER_E, 
+                 "http://seg3d.org/")
   
 public:
   IntensityCorrectionFilter(const std::string& toolid);
@@ -53,13 +55,13 @@ public:
   // -- state --
 public:
   // Layerid of the target layer
-  StateOptionHandle               target_layer_;
+  StateOptionHandle               target_layer_state_;
   
-  StateRangedIntHandle            order_;
+  StateRangedIntHandle            order_state_;
 
-  StateRangedIntHandle            edge_;
+  StateRangedIntHandle            edge_state_;
 
-  StateBoolHandle                 replace_;
+  StateBoolHandle                 replace_state_;
   
   
   

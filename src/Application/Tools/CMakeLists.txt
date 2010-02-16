@@ -88,7 +88,9 @@ TARGET_LINK_LIBRARIES(Application_Tools
                       Application_Interface
                       Application_Action
                       Application_State
+                      Application_StateManager                      
                       Application_Tool
+                      Application_ToolManager
                       ${SCI_BOOST_LIBRARY})
 
 # Register actions

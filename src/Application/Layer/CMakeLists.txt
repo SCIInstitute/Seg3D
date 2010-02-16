@@ -34,37 +34,19 @@
 SET(APPLICATION_LAYER_SRCS
   Layer.h
   Layer.cc
-  LayerManager.h
-  LayerManager.cc
-  LayerInterface.h
-  LayerInterface.cc
-  )
-
-# SET(APPLICATION_LAYER_ACTIONS_SRCS
-#   Actions/ActionLayer.h
-#   Actions/ActionLayerFromFile.h
-#   Actions/ActionCloneLayer.h
-#   Actions/ActionNewMaskLayer.h
-#   )
-
-# SET(APPLICATION_LAYER_SRCS
-#   Layer.h
-#   Layer.cc
-#   LayerManager.h
-#   LayerManager.cc
-#   )
+)
 
 SET(APPLICATION_LAYER_ACTIONS_SRCS
-  Actions/ActionLayer.h
-  Actions/ActionLayer.cc
-  Actions/ActionLayerFromFile.h
-  Actions/ActionLayerFromFile.cc
-  Actions/ActionCloneLayer.h
-  Actions/ActionCloneLayer.cc
-  Actions/ActionNewMaskLayer.h
-  Actions/ActionNewMaskLayer.cc
-  Actions/ActionRemoveLayer.h
-  Actions/ActionRemoveLayer.cc
+#  Actions/ActionLayer.h
+#  Actions/ActionLayer.cc
+#  Actions/ActionLayerFromFile.h
+#  Actions/ActionLayerFromFile.cc
+#  Actions/ActionCloneLayer.h
+#  Actions/ActionCloneLayer.cc
+#  Actions/ActionNewMaskLayer.h
+#  Actions/ActionNewMaskLayer.cc
+#  Actions/ActionRemoveLayer.h
+#  Actions/ActionRemoveLayer.cc
   )
 
 ADD_LIBRARY(Application_Layer STATIC 
@@ -75,11 +57,13 @@ TARGET_LINK_LIBRARIES(Application_Layer
                       Utils_Core
                       Application_Application
                       Application_Interface
+                      Application_InterfaceManager
                       Application_Action
                       Application_State
+                      Application_StateManager
                       ${SCI_BOOST_LIBRARY})
 
 # Register actions
-ADD_LIBRARY_ACTIONS(Application_Layer
-                    ${APPLICATION_LAYER_ACTIONS_SRCS})
+#ADD_LIBRARY_ACTIONS(Application_Layer
+#                    ${APPLICATION_LAYER_ACTIONS_SRCS})
                     

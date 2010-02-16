@@ -57,9 +57,10 @@ class QtSlot : public QObject {
   Q_OBJECT
   public:
   
-    QtSlot( QObject* object) :
+    QtSlot( QObject* object, bool blocking = true) :
       QObject(object),
-      blocked_(false)
+      blocked_(false),
+      blocking_(blocking)
     {
       setObjectName(QString("AppSlot"));
     }
@@ -68,14 +69,18 @@ class QtSlot : public QObject {
 
     // BLOCK:
     // Block forwarding of signals to the application
-    void block() { blocked_ = true; }
+    void block() { if (blocking_) blocked_ = true; }
 
     // UNBLOCK:
     // Unblock forwarding of signals to the application
-    void unblock() { blocked_ = false; }    
+    void unblock() { if (blocking_)  blocked_ = false; }    
 
   protected:
+    // Whether feedback to the UI is blocked
     bool blocked_;
+    
+    // Whether this slot is blocking
+    bool blocking_;
     
   public:
 
@@ -98,9 +103,11 @@ class QtCheckBoxSlot : public QtSlot {
   public:
 
     // Constructor
-    QtCheckBoxSlot(QCheckBox* parent, StateBoolHandle& state_handle) :
-      QtSlot(parent),
-      state_handle_(state_handle) 
+    QtCheckBoxSlot(QCheckBox* parent, 
+      StateBoolHandle& state_handle,
+      bool blocking = true) :
+        QtSlot(parent,blocking),
+        state_handle_(state_handle) 
     {
       // Qt's connect function
       connect(parent,SIGNAL(stateChanged(int)),this,SLOT(slot(int)));
@@ -127,9 +134,11 @@ class QtSliderSpinComboRangedIntSlot : public QtSlot {
   public:
     
      // Constructor
-    QtSliderSpinComboRangedIntSlot(SliderSpinComboInt* parent, StateRangedIntHandle& state_handle) :
-      QtSlot(parent),
-      state_handle_(state_handle) 
+    QtSliderSpinComboRangedIntSlot(SliderSpinComboInt* parent, 
+      StateRangedIntHandle& state_handle,
+      bool blocking = true) :
+        QtSlot(parent,blocking),
+        state_handle_(state_handle) 
     {
       // Qt's connect function
       connect(parent,SIGNAL(valueAdjusted(int)),this,SLOT(slot(int)));
@@ -155,9 +164,11 @@ class QtSliderSpinComboRangedDoubleSlot : public QtSlot {
   public:
     
      // Constructor
-    QtSliderSpinComboRangedDoubleSlot(SliderSpinComboDouble* parent, StateRangedDoubleHandle& state_handle) :
-      QtSlot(parent),
-      state_handle_(state_handle) 
+    QtSliderSpinComboRangedDoubleSlot(SliderSpinComboDouble* parent, 
+      StateRangedDoubleHandle& state_handle,
+      bool blocking = true) :
+        QtSlot(parent,blocking),
+        state_handle_(state_handle) 
     {
       // Qt's connect function
       connect(parent,SIGNAL(valueAdjusted(double)),this,SLOT(slot(double)));
@@ -185,9 +196,11 @@ class QtComboBoxSlot : public QtSlot {
   public:
 
     // Constructor
-    QtComboBoxSlot(QComboBox* parent, StateOptionHandle& state_handle) :
-      QtSlot(parent),
-      state_handle_(state_handle) 
+    QtComboBoxSlot(QComboBox* parent, 
+      StateOptionHandle& state_handle,
+      bool blocking = true) :
+        QtSlot(parent,blocking),
+        state_handle_(state_handle) 
     {
       // Qt's connect function
       connect(parent,SIGNAL(currentIndexChanged(QString)),this,SLOT(slot(QString)));
@@ -209,17 +222,16 @@ class QtComboBoxSlot : public QtSlot {
 };
 
 
-
-
 class QtActionSlot : public QObject {
   Q_OBJECT
   
   public:
 
     // Constructor
-    QtActionSlot(QAction* parent, boost::function<void ()> function) :
-      QObject(parent),
-      function_(function)
+    QtActionSlot(QAction* parent, 
+      boost::function<void ()> function) :
+        QObject(parent),
+        function_(function)
     {
       // Qt's connect function
       connect(parent,SIGNAL(triggered()),this,SLOT(slot()));
@@ -240,6 +252,38 @@ class QtActionSlot : public QObject {
     boost::function<void ()> function_;
 };
   
+
+class QtActionToggleSlot : public QObject {
+  Q_OBJECT
+  
+  public:
+
+    // Constructor
+    QtActionToggleSlot(QAction* parent, 
+      StateBoolHandle& state_handle) :
+        QObject(parent),
+        state_handle_(state_handle)
+    {
+      // Qt's connect function
+      connect(parent,SIGNAL(toggled(bool)),this,SLOT(slot(bool)));
+    }
+
+    // Virtual destructor: needed by Qt
+    virtual ~QtActionToggleSlot() {}
+    
+  public Q_SLOTS:
+    // Slot that Qt will call
+    void slot(bool state)
+    {
+      ActionSet::Dispatch(state_handle_,state);
+    }
+
+  private:
+    // Function object
+    StateBoolHandle state_handle_;
+};
+
+
 class QtToolButtonSlot : public QObject {
   Q_OBJECT
   

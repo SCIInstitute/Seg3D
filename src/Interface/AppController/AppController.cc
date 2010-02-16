@@ -27,18 +27,17 @@
 */
 
 // QT includes
-
 #include <QtGui>
 
 // Application layer includes
 #include <Application/Action/Actions.h>
 #include <Application/Action/ActionHistory.h>
-
 #include <Application/Interface/Interface.h>
 
-// Interface includes
+// Interface bridging includes
 #include <Interface/QtInterface/QtBridge.h>
 
+// Interface includes
 #include <Interface/AppController/AppController.h>
 #include <Interface/AppController/AppControllerContext.h>
 #include <Interface/AppController/AppControllerActionHistory.h>
@@ -57,7 +56,9 @@ class AppControllerPrivate {
     // Local classes that are only of interest for this class
     AppControllerActionHistory* action_history_model_;
     AppControllerLogHistory*    log_history_model_;
-    AppControllerContextHandle  context_;
+
+    // Action context for running the command line
+    ActionContextHandle         context_;
 };
 
 
@@ -68,7 +69,7 @@ AppController::AppController(QWidget* parent) :
 
   // Step 1: Setup the private structure and allocate all the needed structures
   private_->ui_.setupUi(this);
-  private_->context_ = AppControllerContextHandle(new AppControllerContext(this)); 
+  private_->context_ = ActionContextHandle(new AppControllerContext(this)); 
 
   // These next two are Qt objects and will be deleted when the parent object is
   // deleted
@@ -122,10 +123,10 @@ AppController::AppController(QWidget* parent) :
   // Step 5: Link the ActionHistory to this widget and have it update 
   // automatically
   
-  ActionHistory::Instance()->history_changed_signal.connect(boost::bind(
+  ActionHistory::Instance()->history_changed_signal_.connect(boost::bind(
     &AppController::UpdateActionHistory,controller));
 
-  Utils::Log::Instance()->post_log_signal.connect(boost::bind(
+  Utils::Log::Instance()->post_log_signal_.connect(boost::bind(
     &AppController::UpdateLogHistory,controller,true,_1,_2));
 
   // Step 6: Qt connections
@@ -144,8 +145,22 @@ AppController::post_action()
   l_action_usage_->setText("");
   
   // Post the action string
-  std::string stringaction = le_edit_action_->text().toStdString();
-  PostAction(stringaction,ActionContextHandle(private_->context_));
+  std::string action_string = le_edit_action_->text().toStdString();
+  std::string action_error;
+  std::string action_usage;
+  
+  ActionHandle action;
+  if (!(ActionFactory::CreateAction(action_string,action,
+        action_error,action_usage)))
+  {
+    qpointer_type controller(this);
+    AppController::PostActionMessage(controller,action_error);
+    AppController::PostActionUsage(controller,action_usage);
+  }
+  else
+  {  
+    PostAction(action,private_->context_);
+  }
 }
 
 void
@@ -166,7 +181,8 @@ AppController::UpdateActionHistory(qpointer_type controller)
   // Ensure that this call gets relayed to the right thread
   if (!(Interface::IsInterfaceThread()))
   {
-    PostInterface(boost::bind(&AppController::UpdateActionHistory,controller));
+    Interface::PostEvent(boost::bind(
+      &AppController::UpdateActionHistory, controller));
     return;
   }
   
@@ -184,14 +200,14 @@ AppController::UpdateActionHistory(qpointer_type controller)
 
 
 void 
-AppController::UpdateLogHistory(qpointer_type controller, bool relay,
+AppController::UpdateLogHistory( qpointer_type controller, bool relay,
                                 int message_type, std::string message)
 {
   // Ensure that this call gets relayed to the right thread
   if (relay)
   {
-    PostInterface(boost::bind(&AppController::UpdateLogHistory,controller,
-                          false,message_type,message));
+    Interface::PostEvent(boost::bind( &AppController::UpdateLogHistory,
+      controller, false, message_type, message));
     return;
   }
 
@@ -214,7 +230,8 @@ AppController::PostActionMessage(qpointer_type controller, std::string message)
   // Ensure that this call gets relayed to the right thread
   if (!(Interface::IsInterfaceThread()))
   {
-    PostInterface(boost::bind(&AppController::PostActionMessage,controller,message));
+    Interface::PostEvent( boost::bind( &AppController::PostActionMessage,
+      controller, message));
   }
 
   // Protect controller pointer, so we do not execute if controller does not
@@ -231,7 +248,8 @@ AppController::PostActionUsage(qpointer_type controller, std::string usage)
   // Ensure that this call gets relayed to the right thread
   if (!(Interface::IsInterfaceThread()))
   {
-    PostInterface(boost::bind(&AppController::PostActionUsage,controller,usage));
+    Interface::PostEvent( boost::bind( &AppController::PostActionUsage,
+      controller, usage));
   }
 
   // Protect controller pointer, so we do not execute if controller does not
@@ -252,8 +270,6 @@ AppController::SetActionType(qpointer_type controller, std::string action_type)
     controller->le_edit_action_->setText(QString::fromStdString(action_type));
   }
 }
-
-
 
 } // end namespace Seg3D
 

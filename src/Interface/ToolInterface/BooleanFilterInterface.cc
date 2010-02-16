@@ -67,12 +67,12 @@ public:
     BooleanFilter* tool = dynamic_cast<BooleanFilter*>(base_tool_.get());
     
     //Step 3 - connect the gui to the tool through the QtBridge
-    QtBridge::connect(private_->ui_.maskAComboBox, tool->mask_a_);
-    QtBridge::connect(private_->ui_.maskBComboBox, tool->mask_b_);
-    QtBridge::connect(private_->ui_.maskCComboBox, tool->mask_c_);
-    QtBridge::connect(private_->ui_.maskDComboBox, tool->mask_d_);
-    QtBridge::connect(private_->ui_.exampleExpComboBox, tool->example_expressions_);
-    QtBridge::connect(private_->ui_.replaceCheckBox,tool->replace_);
+    QtBridge::connect(private_->ui_.maskAComboBox, tool->mask_a_state_);
+    QtBridge::connect(private_->ui_.maskBComboBox, tool->mask_b_state_);
+    QtBridge::connect(private_->ui_.maskCComboBox, tool->mask_c_state_);
+    QtBridge::connect(private_->ui_.maskDComboBox, tool->mask_d_state_);
+    QtBridge::connect(private_->ui_.exampleExpComboBox, tool->example_expressions_state_);
+    QtBridge::connect(private_->ui_.replaceCheckBox,tool->replace_state_);
     
     //Send a message to the log that we have finised with building the Boolean Filter Interface
     SCI_LOG_DEBUG("Finished building a Boolean Filter Interface");

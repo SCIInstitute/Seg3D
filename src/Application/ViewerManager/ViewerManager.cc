@@ -35,7 +35,6 @@
 #include <Application/ViewerManager/ViewerManager.h>
 #include <Application/Interface/Interface.h>
  
-
 namespace Seg3D {
 
 ViewerManager::ViewerManager() :
@@ -43,8 +42,8 @@ ViewerManager::ViewerManager() :
 {
   // Step (1)
   // Set the default state of this element
-  add_state("layout",layout_state,"1and3","single|1and1|1and2|1and3|2and2|2and3|3and3");
-  add_state("active_viewer",active_viewer_state,0);
+  add_state("layout",layout_state_,"1and3","single|1and1|1and2|1and3|2and2|2and3|3and3");
+  add_state("active_viewer",active_viewer_state_,0);
   
   // Step (2)
   // Create the viewers that are part of the application

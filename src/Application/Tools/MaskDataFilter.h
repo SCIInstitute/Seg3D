@@ -34,7 +34,9 @@
 namespace Seg3D  {
   
 class MaskDataFilter : public Tool {
-  SCI_TOOL_TYPE("MaskDataFilter","Mask Data", "",Tool::DATATODATA_E|Tool::FILTER_E, QUrl::fromEncoded("http://seg3d.org/"))
+  SCI_TOOL_TYPE( "MaskDataFilter", "Mask Data", "",
+                 Tool::DATATODATA_E|Tool::FILTER_E, 
+                 "http://seg3d.org/")
   
 public:
   MaskDataFilter(const std::string& toolid);
@@ -54,17 +56,13 @@ public:
 public:
   
   // Layerid of the target layer
-  StateOptionHandle               target_layer_;
+  StateOptionHandle               target_layer_state_;
   
-  StateOptionHandle               mask_layer_;
+  StateOptionHandle               mask_layer_state_;
   
-  StateOptionHandle               replace_with_;
+  StateOptionHandle               replace_with_state_;
   
-  StateBoolHandle                 replace_;
-  
-  
-  
-  
+  StateBoolHandle                 replace_state_;
   
 };
 

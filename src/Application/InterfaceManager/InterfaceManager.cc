@@ -27,32 +27,26 @@
 */
 
 #include <Application/Application/Application.h>
-#include <Application/Interface/Interface.h>
 
+#include <Application/Interface/Interface.h>
 #include <Application/InterfaceManager/InterfaceManager.h>
-#include <Application/InterfaceManager/Actions/ActionShowWindow.h>
-#include <Application/InterfaceManager/Actions/ActionCloseWindow.h>
-#include <Application/InterfaceManager/Actions/ActionFullScreenWindow.h>
 
 namespace Seg3D {
 
 InterfaceManager::InterfaceManager() :
-  StateHandler("InterfaceManager")
+  StateHandler("interface")
 {
+  // set up state variables
+  add_state("fullscreen",full_screen_state_,false);
 }
  
-void
-InterfaceManager::dispatch_full_screen_window(const std::string& windowid) const
+
+InterfaceManager::~InterfaceManager()
 {
-  // Build new action
-  ActionFullScreenWindowHandle action(new ActionFullScreenWindow);
-  // Set the action parameters
-  action->set(windowid);
-  // Run the action on the application thread
-  PostActionFromInterface(action);
+  disconnect_all();
 }
-  
-  
+ 
+
 void
 InterfaceManager::add_windowid(const std::string& windowid)
 {

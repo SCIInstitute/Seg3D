@@ -34,7 +34,7 @@
 namespace Seg3D {
 
 class ThresholdTool : public Tool {
-  SCI_TOOL_TYPE("ThresholdTool","Threshold","Alt+T",Tool::TOOL_E, QUrl::fromEncoded("http://seg3d.org/"))
+  SCI_TOOL_TYPE("ThresholdTool","Threshold","Alt+T",Tool::TOOL_E, "http://seg3d.org/")
 // -- constructor/destructor --
   public:
     ThresholdTool(const std::string& toolid);
@@ -62,16 +62,16 @@ class ThresholdTool : public Tool {
 // -- state --
   public:
     // Layerid of the target layer
-    StateOptionHandle               target_layer_;
+    StateOptionHandle               target_layer_state_;
     
     // Upper threshold for painting
-    StateRangedDoubleHandle         upper_threshold_;
+    StateRangedDoubleHandle         upper_threshold_state_;
 
     // Lower threshold for painting
-    StateRangedDoubleHandle         lower_threshold_;
+    StateRangedDoubleHandle         lower_threshold_state_;
   
     // Seed Points
-    // StateVector<Point>            seed_points_;
+    // StateVector<Point>            seed_points_state_;
 };
 
 } // end namespace

@@ -28,6 +28,7 @@
 
 
 #include <Application/ActionManager/Actions/ActionRedo.h>
+#include <Application/Interface/Interface.h>
 
 namespace Seg3D {
 
@@ -36,24 +37,41 @@ namespace Seg3D {
 // registered in the CMake file.
 SCI_REGISTER_ACTION(Redo);
 
+
 bool
 ActionRedo::validate(ActionContextHandle& context)
 {
   if (!(ActionUndoBuffer::Instance()->has_redo_action()))
   {
     context->report_error(std::string("No actions to redo"));
-    return (false);
+    return false;
   }
-  return (true); // validated
+  return true; // validated
 }
 
-// RUN:
-// The code that runs the actual action
+
 bool 
 ActionRedo::run(ActionContextHandle& context, ActionResultHandle& result)
 {
   ActionUndoBuffer::Instance()->redo_action(context);
-  return (true); // success
+  return true; // success
+}
+
+
+void 
+ActionRedo::Dispatch()
+{
+  // Post the new action
+  Interface::PostAction(Create());      
+}
+
+
+ActionHandle 
+ActionRedo::Create()
+{
+  // Create new action
+  ActionRedo* action = new ActionRedo;
+  return ActionHandle(action);
 }
 
 

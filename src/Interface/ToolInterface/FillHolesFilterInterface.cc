@@ -66,7 +66,7 @@ public:
     FillHolesFilter* tool = dynamic_cast<FillHolesFilter*>(base_tool_.get());
     
     //Step 3 - connect the gui to the tool through the QtBridge
-    QtBridge::connect(private_->ui_.targetComboBox, tool->target_layer_);
+    QtBridge::connect(private_->ui_.targetComboBox, tool->target_layer_state_);
     
     //Send a message to the log that we have finised with building the Fill Holes Filter Interface"
     SCI_LOG_DEBUG("Finished building a Fill Holes Filter Interface");

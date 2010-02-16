@@ -28,7 +28,7 @@
 
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/InvertTool.h>
-// #include <Application/Layer/LayerManager.h>
+// #include <Application/LayerManager/LayerManager.h>
 
 namespace Seg3D {
 
@@ -39,8 +39,8 @@ InvertTool::InvertTool(const std::string& toolid) :
   Tool(toolid)
 {
   // Need to set ranges and default values for all parameters
-  add_state("target",target_layer_,"firstitem","firstitem|seconditem|thirditem");
-  add_state("replace",replace_,false);
+  add_state("target",target_layer_state_,"firstitem","firstitem|seconditem|thirditem");
+  add_state("replace",replace_state_,false);
   
   // If a layer is added or deleted update the lists
 //  add_connection(LayerManager::instance()->connect_layers_changed(

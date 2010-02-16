@@ -34,7 +34,7 @@
 namespace Seg3D {
 
 class FlipTool : public Tool {
-  SCI_TOOL_TYPE("FlipTool","Flip/Rotate","Alt+F",Tool::TOOL_E, QUrl::fromEncoded("http://seg3d.org/"))
+  SCI_TOOL_TYPE("FlipTool","Flip/Rotate","Alt+F",Tool::TOOL_E, "http://seg3d.org/")
 
 // -- constructor/destructor --
   public:
@@ -54,7 +54,7 @@ class FlipTool : public Tool {
 
   void dispatch_flip_coronal() const;
   void dispatch_flip_sagittal() const;
-  void dispatch_fip_axial() const;
+  void dispatch_flip_axial() const;
   
   void dispatch_rotate90_coronal() const;
   void dispatch_rotate90_sagittal() const;
@@ -68,7 +68,7 @@ class FlipTool : public Tool {
   public:
   
     // Layerid of the target layer
-    StateOptionHandle              target_layer_;
+    StateOptionHandle              target_layer_state_;
     
 };
 

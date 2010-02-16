@@ -90,22 +90,11 @@ class StateRangedValue : public StateBase {
     // IMPORT_FROM_STRING:
     // Set the State from a string
     virtual bool import_from_string(const std::string& str,
-                                    bool from_interface = false)
+                                    ActionSource source = ACTION_SOURCE_NONE_E)
     {
-      // Lock the state engine so no other thread will be accessing it
-      StateEngine::lock_type lock(StateEngine::Instance()->get_mutex());
-
       T value;
       if (!(Utils::import_from_string(str,value))) return (false);
-      if (value != value_)
-      {
-        if (value < min_value_) value = min_value_;
-        if (value > max_value_) value = max_value_;
-        value_ = value;
-        value_changed_signal(value_,from_interface);
-        state_changed_signal();
-      }
-      return (true);      
+      return (set(value,source));
     }
 
   protected:    
@@ -119,22 +108,14 @@ class StateRangedValue : public StateBase {
     // IMPORT_FROM_VARIANT:
     // Import the state data from a variant parameter.
     virtual bool import_from_variant(ActionParameterVariant& variant,
-                                     bool from_interface = false)
+                                     ActionSource source = ACTION_SOURCE_NONE_E)
     {
-      // Lock the state engine so no other thread will be accessing it
-      StateEngine::lock_type lock(StateEngine::Instance()->get_mutex() );
-
+      // Get the value from the action parameter
       T value;
       if (!( variant.get_value(value) )) return (false);
-      if (value != value_)
-      {
-        if (value < min_value_) value = min_value_;
-        if (value > max_value_) value = max_value_;
-        value_ = value;
-        value_changed_signal(value_,from_interface);
-        state_changed_signal();
-      }
-      return (true);
+      
+      // Set the parameter in this state variable
+      return (set(value,source));
     }
           
     // VALIDATE_VARIANT:
@@ -164,6 +145,12 @@ class StateRangedValue : public StateBase {
 
 // -- Functions specific to this type of state --
   public:
+    
+    // SET_RANGE:
+    // Set the range of permissible values for this state variable. This
+    // variable normally is represented by a slider and this one records the
+    // min and max values so values can be validated correctly
+  
     void set_range(const T& min_value, const T& max_value)
     {
       if (min_value < max_value) std::swap(min_value,max_value);
@@ -173,28 +160,63 @@ class StateRangedValue : public StateBase {
       if (value_ < min_value_) 
       {
         value_ = min_value_;
-        value_changed_signal(value_,false);
-        state_changed_signal();
+        value_changed_signal_(value_,ACTION_SOURCE_NONE_E);
+        state_changed_signal_();
       }
       else if (value_ > max_value_)
       {
         value_ = max_value_;
-        value_changed_signal(value_,false);
-        state_changed_signal();
+        value_changed_signal_(value_,ACTION_SOURCE_NONE_E);
+        state_changed_signal_();
       }
       
-      range_changed_signal(min_value_,max_value_);
+      range_changed_signal_(min_value_,max_value_);
     }
 
 // -- access value --
   public:
     // GET:
     // Get the value of the state variable
-    T get() 
+    const T& get() const
     { 
       return value_; 
     }
 
+    // SET:
+    // Set the value of the state variable
+    // NOTE: this function by passes the action mechanism and should only be used
+    // to enforce a constraint from another action. Normally use the action
+    // mechanism to ensure that the action is recorded correctly.
+    bool set(T& value, ActionSource source = ACTION_SOURCE_NONE_E)
+    {
+      // Lock the state engine so no other thread will be accessing it
+      StateEngine::lock_type lock(StateEngine::Instance()->get_mutex() );
+
+      if (value != value_)
+      {
+        // NOTE: If the value is out of bound the variable from_interface is
+        // rewmoved to ensure that any updates make it to the widget as well
+        // Normally from_interface will ensure that the widget is not updated
+        // by the user and the application at the same time. This prevents 
+        // loop backs of signals between the application layer and the 
+        // interface layer.
+        if (value < min_value_) 
+        { 
+          value = min_value_; 
+          source = ACTION_SOURCE_NONE_E; 
+        }
+        if (value > max_value_) 
+        { 
+          value = max_value_; 
+          source = ACTION_SOURCE_NONE_E; 
+        }
+        value_ = value;
+        value_changed_signal_(value_,source);
+        state_changed_signal_();
+      }
+      return (true);    
+    }
+   
     // GET_RANGE:
     // Get the range of the variable
     void get_range(T& min_value, T& max_value) 
@@ -206,18 +228,19 @@ class StateRangedValue : public StateBase {
 // -- signals describing the state --
 
   public:
+  
     // VALUE_CHANGED_SIGNAL:
-    // Signal when the data in the state is changed, the second bool indicates
-    // whether the signal was triggered from the interface, in which case it may
-    // not need to update the interface.
+    // Signal when the data in the state is changed, the second parameter
+    // indicates the source of the change
 
-    typedef boost::signals2::signal<void (T, bool)> value_changed_signal_type;
-    value_changed_signal_type value_changed_signal;
+    typedef boost::signals2::signal<void (T, ActionSource)> 
+                                                      value_changed_signal_type;
+    value_changed_signal_type value_changed_signal_;
     
     // RANGE_CHANGED_SIGNAL:
     // This signal is triggered when the range of the state is changed
     typedef boost::signals2::signal<void (T,T)> range_changed_signal_type;
-    range_changed_signal_type range_changed_signal;
+    range_changed_signal_type range_changed_signal_;
     
 // -- internals of StateValue --
   private:

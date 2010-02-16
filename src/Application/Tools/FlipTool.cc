@@ -28,7 +28,7 @@
 
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/FlipTool.h>
-// #include <Application/Layer/LayerManager.h>
+// #include <Application/LayerManager/LayerManager.h>
 
 namespace Seg3D {
 
@@ -39,7 +39,7 @@ FlipTool::FlipTool(const std::string& toolid) :
   Tool(toolid)
 {
   // Need to set ranges and default values for all parameters
-  add_state("target",target_layer_,"<none>","<none>");
+  add_state("target",target_layer_state_,"<none>","<none>");
   
   // No constraints are needed for this tool
   
@@ -93,7 +93,7 @@ FlipTool::dispatch_flip_sagittal() const
 }
 
 void 
-FlipTool::dispatch_fip_axial() const
+FlipTool::dispatch_flip_axial() const
 {
 }
   

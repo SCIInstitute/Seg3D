@@ -52,28 +52,38 @@ class QtBridge : public boost::noncopyable {
   public:
     
     // Connect a QCheckBox to StateValue<bool>
-    static bool connect(QCheckBox* qcheckbox, StateBoolHandle& state_handle);
+    static bool connect(QCheckBox* qcheckbox, 
+                        StateBoolHandle& state_handle);
     
     // Connect a SliderSpinCombo to StateRangedIntValue
-    static bool connect(SliderSpinComboInt* sscombo, StateRangedIntHandle& state_handle);
+    static bool connect(SliderSpinComboInt* sscombo, 
+                        StateRangedIntHandle& state_handle);
 
     // Connect a SliderSpinCombo to StateRangedDoubleValue
-    static bool connect(SliderSpinComboDouble* sscombo, StateRangedDoubleHandle& state_handle);
+    static bool connect(SliderSpinComboDouble* sscombo, 
+                        StateRangedDoubleHandle& state_handle);
     
     // Connect a QComboBox to StateValue<int>
-    static bool connect(QComboBox* qcombobox, StateOptionHandle& state_handle);
+    static bool connect(QComboBox* qcombobox, 
+                        StateOptionHandle& state_handle);
 
     // Connect QToolButton & QPushButtons
-    static bool connect(QToolButton* qtoolbutton, boost::function<void ()> function);
-    static bool connect(QPushButton* qpushbutton, boost::function<void ()> function);
+    static bool connect(QToolButton* qtoolbutton, 
+                        boost::function<void ()> function);
 
+    static bool connect(QPushButton* qpushbutton, 
+                        boost::function<void ()> function);
 
 // -- menu connectors --
   public:
   
     // Connect menu action to dispatcher
+    static bool connect(QAction* qaction, 
+                        boost::function<void ()> function);
 
-    static bool connect(QAction* qaction, boost::function<void ()> function);
+    // Connect menu toggle action to dispatcher
+    static bool connect(QAction* qaction, 
+                        StateBoolHandle& state_handle);
     
 };
 

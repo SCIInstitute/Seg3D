@@ -34,13 +34,13 @@
 namespace Seg3D {
 
 class PaintTool : public Tool {
-  SCI_TOOL_TYPE("PaintTool","Paint Brush","Alt+P",Tool::TOOL_E, QUrl::fromEncoded("http://seg3d.org/"))
+  SCI_TOOL_TYPE("PaintTool","Paint Brush","Alt+P",Tool::TOOL_E, "http://seg3d.org/")
 // -- constructor/destructor --
   public:
     PaintTool(const std::string& toolid);
     virtual ~PaintTool();
 
-// -- constraint parameters --
+// -- state constraints --
 
     // Constrain viewer to right painting tool when layer is selected
     void target_constraint(std::string layerid);
@@ -59,21 +59,21 @@ class PaintTool : public Tool {
 // -- state --
   public:
     // Layerid of the target layer
-    StateOptionHandle               target_layer_;
+    StateOptionHandle               target_layer_state_;
     // Layerid of the masking layer
-    StateOptionHandle               mask_layer_;
+    StateOptionHandle               mask_layer_state_;
     
     // Radius of the brush
-    StateRangedIntHandle            brush_radius_;
+    StateRangedIntHandle            brush_radius_state_;
     
     // Upper threshold for painting
-    StateRangedDoubleHandle         upper_threshold_;
+    StateRangedDoubleHandle         upper_threshold_state_;
 
     // Lower threshold for painting
-    StateRangedDoubleHandle         lower_threshold_;
+    StateRangedDoubleHandle         lower_threshold_state_;
 
-    // Erase data
-    StateBoolHandle         erase_;
+    // Erase data instead of painting
+    StateBoolHandle                 erase_state_;
 };
 
 } // end namespace

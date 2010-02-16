@@ -55,14 +55,17 @@
 namespace Seg3D {
 
 // -- QtInterface class (singleton) --
-
 // This class is a wrapper around the QApplication class
 
+// Forward declaration
+class QtApplication;
+
+// Class definition
 class QtApplication : public boost::noncopyable {
 
 // -- constuctor --
-  public:
-  
+  private:
+    friend class Utils::Singleton<QtApplication>;
     QtApplication();
 
 // -- entry point --

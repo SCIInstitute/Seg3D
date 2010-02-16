@@ -40,19 +40,19 @@ namespace Seg3D {
   Tool(toolid)
   {
     // add default values for the the states
-    add_state("mask_a",mask_a_,"<none>","<none>");
-    add_state("mask_b",mask_b_,"<none>","<none>");
-    add_state("mask_c",mask_c_,"<none>","<none>");
-    add_state("mask_d",mask_d_,"<none>","<none>");
-    add_state("example_expressions",example_expressions_,"<none>","<none>");
-    add_state("replace",replace_,false);
+    add_state("mask_a",mask_a_state_,"<none>","<none>");
+    add_state("mask_b",mask_b_state_,"<none>","<none>");
+    add_state("mask_c",mask_c_state_,"<none>","<none>");
+    add_state("mask_d",mask_d_state_,"<none>","<none>");
+    add_state("example_expressions",example_expressions_state_,"<none>","<none>");
+    add_state("replace",replace_state_,false);
     
     // Add constaints, so that when the state changes the right ranges of 
     // parameters are selected
-    mask_a_->value_changed_signal.connect(boost::bind(&BooleanFilter::target_constraint,this,_1));
-    mask_b_->value_changed_signal.connect(boost::bind(&BooleanFilter::target_constraint,this,_1));
-    mask_c_->value_changed_signal.connect(boost::bind(&BooleanFilter::target_constraint,this,_1));
-    mask_d_->value_changed_signal.connect(boost::bind(&BooleanFilter::target_constraint,this,_1));
+    mask_a_state_->value_changed_signal_.connect(boost::bind(&BooleanFilter::target_constraint,this,_1));
+    mask_b_state_->value_changed_signal_.connect(boost::bind(&BooleanFilter::target_constraint,this,_1));
+    mask_c_state_->value_changed_signal_.connect(boost::bind(&BooleanFilter::target_constraint,this,_1));
+    mask_d_state_->value_changed_signal_.connect(boost::bind(&BooleanFilter::target_constraint,this,_1));
     
     
   }

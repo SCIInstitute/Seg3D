@@ -34,7 +34,9 @@
 namespace Seg3D  {
   
 class ArithmeticFilter : public Tool {
-  SCI_TOOL_TYPE("ArithmeticFilter","Arithmetic", "",Tool::DATATODATA_E|Tool::FILTER_E, QUrl::fromEncoded("http://seg3d.org/"))
+  SCI_TOOL_TYPE( "ArithmeticFilter", "Arithmetic", "",
+                 Tool::DATATODATA_E|Tool::FILTER_E, 
+                 "http://seg3d.org/")
   
 public:
   ArithmeticFilter(const std::string& toolid);
@@ -53,15 +55,15 @@ public:
   // -- state --
 public:
   // Layerid of the target layer
-  StateOptionHandle               volume_a_;
+  StateOptionHandle               volume_a_state_;
   
-  StateOptionHandle               volume_b_;
+  StateOptionHandle               volume_b_state_;
   
-  StateOptionHandle               volume_c_;
+  StateOptionHandle               volume_c_state_;
   
-  StateOptionHandle               example_expressions_;
+  StateOptionHandle               example_expressions_state_;
   
-  StateBoolHandle                 replace_;
+  StateBoolHandle                 replace_state_;
 
 
 };

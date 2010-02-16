@@ -75,10 +75,10 @@ public:
     BinaryDialateErodeFilter* tool = dynamic_cast<BinaryDialateErodeFilter*>(base_tool_.get());
     
     //Step 3 - connect the gui to the tool through the QtBridge
-    QtBridge::connect(private_->ui_.targetComboBox, tool->target_layer_);
-    QtBridge::connect(erodeAdjuster, tool->erode_);
-    QtBridge::connect(dialateAdjuster, tool->dialate_);
-    QtBridge::connect(private_->ui_.replaceCheckBox,tool->replace_);
+    QtBridge::connect(private_->ui_.targetComboBox, tool->target_layer_state_);
+    QtBridge::connect(erodeAdjuster, tool->erode_state_);
+    QtBridge::connect(dialateAdjuster, tool->dialate_state_);
+    QtBridge::connect(private_->ui_.replaceCheckBox,tool->replace_state_);
     
     //Send a message to the log that we have finised with building the Binary Dialate Erode Filter Interface
     SCI_LOG_DEBUG("Finished building a Binary Dialate Erode Filter Interface");

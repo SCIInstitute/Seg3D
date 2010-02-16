@@ -36,6 +36,12 @@ RenderResources::RenderResources() :
 {
 }
 
+
+RenderResources::~RenderResources()
+{
+}
+
+
 bool
 RenderResources::create_render_context(RenderContextHandle& context)
 {
@@ -49,6 +55,7 @@ RenderResources::create_render_context(RenderContextHandle& context)
   
   return (resources_context_->create_render_context(context));
 }
+
 
 void
 RenderResources::install_resources_context(RenderResourcesContextHandle resources_context)
@@ -68,6 +75,7 @@ RenderResources::valid_render_resources()
   return (resources_context_.get() && resources_context_->valid_render_resources());
 }
 
+
 void
 RenderResources::init_gl()
 {
@@ -82,6 +90,7 @@ RenderResources::init_gl()
     unlock_shared_context();
   }
 }
+
 
 // Need to define singleton somewhere
 Utils::Singleton<RenderResources> RenderResources::instance_;

@@ -28,7 +28,7 @@
 
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/PaintTool.h>
-// #include <Application/Layer/LayerManager.h>
+// #include <Application/LayerManager/LayerManager.h>
 
 namespace Seg3D {
 
@@ -39,17 +39,17 @@ PaintTool::PaintTool(const std::string& toolid) :
   Tool(toolid)
 {
   // Need to set ranges and default values for all parameters
-  add_state("target",target_layer_,"<none>","<none>");
-  add_state("mask",mask_layer_,"<none>","<none>");
-  add_state("brush_radius",brush_radius_,1,100,1,2);
-  add_state("upper_threshold",upper_threshold_,0.0f,100.0f,01.0f,1.0f);
-  add_state("lower_threshold",lower_threshold_,0.0f,100.0f,01.0f,1.0f);
-  add_state("erase",erase_,false);
+  add_state("target",target_layer_state_,"<none>","<none>");
+  add_state("mask",mask_layer_state_,"<none>","<none>");
+  add_state("brush_radius",brush_radius_state_,1,100,1,2);
+  add_state("upper_threshold",upper_threshold_state_,0.0f,100.0f,01.0f,1.0f);
+  add_state("lower_threshold",lower_threshold_state_,0.0f,100.0f,01.0f,1.0f);
+  add_state("erase",erase_state_,false);
   
   // Add constaints, so that when the state changes the right ranges of 
   // parameters are selected
-  target_layer_->value_changed_signal.connect(boost::bind(&PaintTool::target_constraint,this,_1));
-  mask_layer_->value_changed_signal.connect(boost::bind(&PaintTool::mask_constraint,this,_1));
+  target_layer_state_->value_changed_signal_.connect(boost::bind(&PaintTool::target_constraint,this,_1));
+  mask_layer_state_->value_changed_signal_.connect(boost::bind(&PaintTool::mask_constraint,this,_1));
 
   // If a layer is added or deleted update the lists
 //  add_connection(LayerManager::instance()->connect_layers_changed(

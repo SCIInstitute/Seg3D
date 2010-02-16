@@ -83,7 +83,7 @@ void ActionScaleView3D::Dispatch( StateView3DHandle& view3d_state, double ratio 
   action->scale_ratio_ = ratio;
   action->view3d_state_ = StateView3DWeakHandle(view3d_state);
 
-  PostActionFromInterface(ActionHandle(action));
+  Interface::PostAction(ActionHandle(action));
 }
 
 } // end namespace Seg3D

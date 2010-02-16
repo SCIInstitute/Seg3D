@@ -111,19 +111,18 @@ ViewerInterface::ViewerInterface(QWidget *parent) :
 
   // We need a lock here as connecting to the state engine and getting the 
   // the current value needs to be atomic
-  StateEngine::Lock();
+  {
+    StateEngine::lock_type lock(StateEngine::GetMutex());
+    // Connect signals
+    ViewerManager::Instance()->layout_state_->value_changed_signal_.connect(
+      boost::bind(&ViewerInterface::SetViewerLayout,qpointer,_1));
+    ViewerManager::Instance()->active_viewer_state_->value_changed_signal_.connect(
+      boost::bind(&ViewerInterface::SetActiveViewer,qpointer,_1));
 
-  // Connect signals
-  ViewerManager::Instance()->layout_state->value_changed_signal.connect(
-    boost::bind(&ViewerInterface::SetViewerLayout,qpointer,_1));
-  ViewerManager::Instance()->active_viewer_state->value_changed_signal.connect(
-    boost::bind(&ViewerInterface::SetActiveViewer,qpointer,_1));
-
-  // set the default state
-  set_layout(ViewerManager::Instance()->layout_state->get());
-  set_active_viewer(ViewerManager::Instance()->active_viewer_state->get());
-  
-  StateEngine::Unlock();
+    // set the default state
+    set_layout(ViewerManager::Instance()->layout_state_->get());
+    set_active_viewer(ViewerManager::Instance()->active_viewer_state_->get());
+  }
 }
 
 ViewerInterface::~ViewerInterface()

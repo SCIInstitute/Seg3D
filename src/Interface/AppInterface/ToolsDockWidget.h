@@ -44,8 +44,11 @@
 #include <boost/thread/thread.hpp>
 #include <boost/shared_ptr.hpp>
 
+// Core includes
+#include <Utils/Core/ConnectionHandler.h>
+
 // Application includes
-#include <Application/Tool/ToolManager.h>
+#include <Application/ToolManager/ToolManager.h>
 
 // Interface includes
 #include <Interface/AppInterface/ToolWidget.h>
@@ -53,7 +56,11 @@
 
 namespace Seg3D {
 
-class ToolsDockWidget : public QDockWidget {
+// Forward declaration
+class ToolsDockWidget;
+
+// Class definition
+class ToolsDockWidget : public QDockWidget, public Utils::ConnectionHandler {
     Q_OBJECT
     
 // -- constructor/destructor --
@@ -64,43 +71,52 @@ class ToolsDockWidget : public QDockWidget {
 // -- functions that control the toolbox --
   public:
   
-    // Open a tool
-    void open_tool(ToolHandle tool);
+    // OPEN_TOOL
+    // The internals of opening a tool
+    void open_tool(ToolHandle& tool);
 
-    // Close a tool
-    void close_tool(ToolHandle tool);
+    // CLOSE_TOOL
+    // The internals of closing a tool
+    void close_tool(ToolHandle& tool);
     
-    // Activate tool
-    void activate_tool(ToolHandle tool);
+    // ACTIVATE_TOOL
+    // The internals of activating a tool
+    void activate_tool(ToolHandle& tool);
 
-// -- slots --
-  public Q_SLOTS:
-  
-    void tool_changed(int index);
-    
+// -- internals of this class --    
   private:
-
-    boost::signals2::connection open_tool_connection_;
-    boost::signals2::connection close_tool_connection_;
-    boost::signals2::connection activate_tool_connection_;
-  
     // List of tool widgets
     typedef std::map<std::string,ToolWidget*> tool_widget_list_type;
     tool_widget_list_type tool_widget_list_;
     
     // Pointer to the ToolBox Widget
-    ToolBoxWidget* toolbox_;
+    ToolBoxWidget*        toolbox_;
     
-  // -- static functions for callbacks into this widget --
-
+// -- static functions for callbacks into this widget --
   public:
     typedef QPointer<ToolsDockWidget> qpointer_type;
-  
+
+    // NOTE: This function do not take references as the parameters are 
+    // forwarded to a different thread and thus need a copy of the handle
+    // to ensure that the tool will not be destructed until this function is
+    // handled.
+
+    // HANDLEOPENTOOL:
+    // This function should be called to open the tool, this one relays all the
+    // information properly to the Qt thread
     static void HandleOpenTool(qpointer_type qpointer, ToolHandle tool);
+
+    // HANDLECLOSETOOL:
+    // This function should be called to close the tool, this one relays all the
+    // information properly to the Qt thread
     static void HandleCloseTool(qpointer_type qpointer, ToolHandle tool);
+    
+    // HANDLEACTIVATETOOL:
+    // This function should be called to close the tool, this one relays all the
+    // information properly to the Qt thread
     static void HandleActivateTool(qpointer_type qpointer, ToolHandle tool);
 };
   
 } // end namespace
 
-#endif // TOOLSDOCKWIDGET_H
+#endif

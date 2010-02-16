@@ -26,56 +26,47 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#include <Application/Tool/ToolManager.h>
-#include <Application/Tool/Actions/ActionCloseTool.h>
+#ifndef APPLICATION_TOOL_ACTIONS_ACTIONCLOSETOOL_H
+#define APPLICATION_TOOL_ACTIONS_ACTIONCLOSETOOL_H
+
+#include <Application/Action/Actions.h>
+#include <Application/Interface/Interface.h>
 
 namespace Seg3D {
 
-// REGISTER ACTION:
-// Define a function that registers the action. The action also needs to be
-// registered in the CMake file.
-SCI_REGISTER_ACTION(CloseTool);
+class ActionCloseTool : public Action {
+  SCI_ACTION_TYPE("CloseTool","CloseTool <toolid>",APPLICATION_E)
 
-// VALIDATE:
-// As the action could be user input, we need to validate whether the action
-// is valid and can be executed.
+// -- Constructor/Destructor --
+  public:
+    ActionCloseTool()
+    {
+      add_argument(toolid_);
+    }
+    
+    virtual ~ActionCloseTool() {}
 
-bool
-ActionCloseTool::validate(ActionContextHandle& context)
-{
-  if (!(ToolManager::Instance()->is_toolid(toolid_.value())))
-  {
-    context->report_error(std::string("ToolID '")+toolid_.value()+"' is invalid");
-    return (false);
-  }
+// -- Functions that describe action --
+  public:
+    virtual bool validate( ActionContextHandle& context );
+    virtual bool run( ActionContextHandle& context,
+                      ActionResultHandle& result );
+    
+// -- Action parameters --
+  private:
+    ActionParameter<std::string> toolid_;
+
+// -- Dispatch this action from the interface --
+  public:
+    // CREATE
+    // Create action that closes a tool
+    static ActionHandle Create( const std::string& toolid );
   
-  return (true); // validated
-}
-
-// RUN:
-// The code that runs the actual action
-bool 
-ActionCloseTool::run(ActionContextHandle& context, ActionResultHandle& result)
-{
-  ToolManager::Instance()->close_tool(toolid_.value());
-
-  return (true); // success
-}
-
-// DISPATCH:
-// Dispatch this action with given parameters (from interface)
-
-void
-ActionCloseTool::Dispatch(const std::string& toolid)
-{
-  // Create new action
-  ActionCloseTool* action = new ActionCloseTool;
-
-  // Set action parameters
-  action->toolid_.value() = toolid;
-
-  // Post the new action
-  PostActionFromInterface(ActionHandle(action));
-}
+    // DISPATCH
+    // Create and dispatch action that closes a tool
+    static void Dispatch( const std::string& toolid );
+};
 
 } // end namespace Seg3D
+
+#endif

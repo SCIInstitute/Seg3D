@@ -96,7 +96,7 @@ void Texture::set_wrap_t(int wrap_mode)
 void Texture::_safe_bind()
 {
   glGetIntegerv(query_target_, &saved_id_);
-  if (texture_id_ != saved_id_)
+  if (static_cast<int>(texture_id_) != saved_id_)
   {
     glBindTexture(target_, texture_id_);
   }
@@ -104,7 +104,7 @@ void Texture::_safe_bind()
 
 void Texture::_safe_unbind()
 {
-  if (texture_id_ != saved_id_)
+  if (static_cast<int>(texture_id_) != saved_id_)
   {
     glBindTexture(target_, saved_id_);
   }

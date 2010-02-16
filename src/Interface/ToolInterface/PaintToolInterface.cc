@@ -36,7 +36,6 @@
 //Application Includes
 #include <Application/Tools/PaintTool.h>
 
-
 namespace Seg3D {
 
 SCI_REGISTER_TOOLINTERFACE(PaintToolInterface)
@@ -45,51 +44,55 @@ SCI_REGISTER_TOOLINTERFACE(PaintToolInterface)
 class PaintToolInterfacePrivate {
   public:
     Ui::PaintToolInterface ui_;
+    
+    SliderSpinComboInt      *brush_radius_;
+    SliderSpinComboDouble   *upper_threshold_;
+    SliderSpinComboDouble   *lower_threshold_;
 };
 
-  // constructor
-  PaintToolInterface::PaintToolInterface() :
-    private_(new PaintToolInterfacePrivate)
-  { }
+// constructor
+PaintToolInterface::PaintToolInterface() :
+  private_(new PaintToolInterfacePrivate)
+{ }
 
-  // destructor
-  PaintToolInterface::~PaintToolInterface()
-  { }
+// destructor
+PaintToolInterface::~PaintToolInterface()
+{ }
 
-  // build the interface and connect it to the state manager
-  bool
-  PaintToolInterface::build_widget(QFrame* frame)
-  {
-    //Step 1 - build the Qt GUI Widget
-    private_->ui_.setupUi(frame);
-    
-      //Add the SliderSpinCombos
-      paintBrushAdjuster = new SliderSpinComboInt();
-      private_->ui_.verticalLayout->addWidget(paintBrushAdjuster);
-      
-      upperThresholdAdjuster = new SliderSpinComboDouble();
-      private_->ui_.upperHLayout_bottom->addWidget(upperThresholdAdjuster);
-      
-      lowerThresholdAdjuster = new SliderSpinComboDouble();
-      private_->ui_.lowerHLayout_bottom->addWidget(lowerThresholdAdjuster);
+// build the interface and connect it to the state manager
+bool
+PaintToolInterface::build_widget(QFrame* frame)
+{
+  //Step 1 - build the Qt GUI Widget
+  private_->ui_.setupUi(frame);
+  
+  //Add the SliderSpinCombos
+  private_->brush_radius_ = new SliderSpinComboInt();
+  private_->ui_.verticalLayout->addWidget(private_->brush_radius_);
+  
+  private_->upper_threshold_ = new SliderSpinComboDouble();
+  private_->ui_.upperHLayout_bottom->addWidget(private_->upper_threshold_);
+  
+  private_->lower_threshold_ = new SliderSpinComboDouble();
+  private_->ui_.lowerHLayout_bottom->addWidget(private_->lower_threshold_);
 
-    //Step 2 - get a pointer to the tool
-    ToolHandle base_tool_ = tool();
-    PaintTool* tool = dynamic_cast<PaintTool*>(base_tool_.get());
+  //Step 2 - get a pointer to the tool
+  ToolHandle base_tool_ = tool();
+  PaintTool* tool = dynamic_cast<PaintTool*>(base_tool_.get());
 
-    //Step 3 - connect the gui to the tool through the QtBridge
-    QtBridge::connect(private_->ui_.targetComboBox, tool->target_layer_);
-    QtBridge::connect(private_->ui_.maskComboBox, tool->mask_layer_);
-    QtBridge::connect(paintBrushAdjuster, tool->brush_radius_);
-    QtBridge::connect(upperThresholdAdjuster, tool->upper_threshold_);
-    QtBridge::connect(lowerThresholdAdjuster, tool->lower_threshold_);
-    QtBridge::connect(private_->ui_.eraseCheckBox, tool->erase_);
+  //Step 3 - connect the gui to the tool through the QtBridge
+  QtBridge::connect(private_->ui_.targetComboBox, tool->target_layer_state_);
+  QtBridge::connect(private_->ui_.maskComboBox,   tool->mask_layer_state_);
+  QtBridge::connect(private_->brush_radius_,      tool->brush_radius_state_);
+  QtBridge::connect(private_->upper_threshold_,   tool->upper_threshold_state_);
+  QtBridge::connect(private_->lower_threshold_,   tool->lower_threshold_state_);
+  QtBridge::connect(private_->ui_.eraseCheckBox,  tool->erase_state_);
 
-    //Send a message to the log that we have finised with building the Paint Brush Interface
-    SCI_LOG_MESSAGE("Finished building a Paint Brush Interface");
-    
-    return (true);
-  } // end build_widget
+  //Send a message to the log that we have finised with building the Paint Brush Interface
+  SCI_LOG_MESSAGE("Finished building a Paint Brush Interface");
+  
+  return (true);
+} // end build_widget
 
 } // end namespace Seg3D
 

@@ -71,19 +71,14 @@ class Action : public Utils::IntrusiveBase {
     enum action_properties_type {
       // APPLICATION ACTION - For now all actions that are no layer actions are
       // classified as application actions.
-      APPLICATION_E = 0x0001,
+      APPLICATION_E  = 0x0001,
       
       // LAYER ACTION - Layer actions affect layers/layer manager and are currently
       // the only actions that can be undone.
-      LAYER_E = 0x0002,
+      LAYER_E        = 0x0002,
 
-      // INTERFACE ACTION - Interface actions only affect the appearance of the
-      // interface. 
-      INTERFACE_E = 0x0004,
-           
-      // UNDOABLE ACTIONS - These actions will be forwarded to the undo/redo
-      // stack. 
-      UNDOABLE_E = 0x10000, 
+      // INTERFACE ACTION - Layer actions only affect the interface
+      INTERFACE_E    = 0x0004,
       
       // ASYNCHRONOUS ACTIONS - These actions do not complete on the main
       // application thread and run while new actions can be issued
@@ -97,7 +92,7 @@ class Action : public Utils::IntrusiveBase {
       
       // QUERY ACTIONS - These actions do not alter the state of the program
       // but query state. They do not need to be recorded in a playback script.
-      QUERY_E = 0x1000000
+      QUERY_E        = 0x1000000
     };
 
 // -- Constructor/Destructor --
@@ -114,23 +109,6 @@ class Action : public Utils::IntrusiveBase {
     virtual std::string   usage() const = 0;
     virtual int           properties() const = 0;
 
-// -- Test properties --
-
-    // IS_UNDOABLE:
-    // Check whether the action is undoable
-    bool is_undoable() { return ((UNDOABLE_E & properties()) != 0); }
-
-    // IS_ASYNCHRONOUS:
-    // Check whether this action is asynchronously
-    bool is_asynchronous() { return ((ASYNCHRONOUS_E & properties()) != 0); }
-
-    // NEED_UNDO:
-    // Test whether an undo needs to be generated
-    bool need_undo(ActionContextHandle& context)
-    {
-      return (is_undoable() && !(context->from_undobuffer()));
-    }
-    
 // -- Run/Validate interface --
 
   public:
@@ -146,7 +124,7 @@ class Action : public Utils::IntrusiveBase {
     //       after the action is validated.
 
     virtual bool validate(ActionContextHandle& context);  
-    
+        
     // RUN:
     // Each action needs to have this piece implemented. It spells out how the
     // action is run. It returns whether the action was successful or not.
@@ -155,8 +133,7 @@ class Action : public Utils::IntrusiveBase {
     // the asynchronous part has finished. In any other case the ActionDispatcher
     // will issue the report_done() when run returns.
 
-    virtual bool run(ActionContextHandle& context, ActionResultHandle& result) = 0; // << NEEDS TO BE REIMPLEMENTED
-
+    virtual bool run(ActionContextHandle& context, ActionResultHandle& result) = 0;
 // -- Action parameters --
 
   public:

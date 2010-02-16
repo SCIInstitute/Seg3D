@@ -46,11 +46,22 @@
 
 namespace Seg3D {
 
+// CLASS RENDERRESOURCES
+// The resources for rendering in an abstract interface
+
+// Forward declaration
+class RenderResources;
+
+// Class definition
 class RenderResources : public boost::noncopyable {
 
 // -- constructor --
-  public:
+  private:
+    friend class Utils::Singleton<RenderResources>;
     RenderResources();
+    
+  public:
+    virtual ~RenderResources();
     
 // -- context handling --    
   public:  

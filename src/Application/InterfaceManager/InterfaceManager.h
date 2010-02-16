@@ -52,17 +52,27 @@
 
 namespace Seg3D {
 
+// CLASS INTERFACEMANAGER
+// This class manages the layout of the application
+
+// Forward Declaration
+class InterfaceManager;
+
+// Class Definition
 class InterfaceManager : public StateHandler {
 
 // -- constructor/destructor --
-  public:
+  private:
+    friend class Utils::Singleton<InterfaceManager>;
     InterfaceManager();
-
-// -- Dispatcher functions for User Interface -- 
-  public:
   
-    // -- Full Screen the main window --  
-    void dispatch_full_screen_window(const std::string& windowid) const;
+  public:
+    virtual ~InterfaceManager();
+
+// -- state variables of interface --
+  public:
+    // Whether the view is in full screen mode
+    StateBoolHandle full_screen_state_;
 
 // -- Signals --
   public:
@@ -70,15 +80,11 @@ class InterfaceManager : public StateHandler {
     
     // OPEN_WINDOW_SIGNAL:
     // This signal is triggered after a window needs to be opened
-    window_signal_type show_window_signal;
+    window_signal_type show_window_signal_;
     
     // CLOSE_WINDOW_SIGNAL:
     // This signal is triggered after a window needs to be closed
-    window_signal_type close_window_signal;
-  
-    // FULL_SCREEN_SIGNAL:
-    // This signal is triggered after fullscreen is triggered
-    window_signal_type full_screen_window_signal;
+    window_signal_type close_window_signal_;
 
 // -- Access to toollist --
   public:

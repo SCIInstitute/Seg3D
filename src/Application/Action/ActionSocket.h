@@ -45,13 +45,22 @@
 
 namespace Seg3D {
 
+// CLASS ACTIONSOCKET
+// Class that defines a socket for issuing commands
+
+// Forward declaration
+class AtionSocket;
+
+// Class defintion
 class ActionSocket : public boost::noncopyable  {
 
 // -- Constructor/Destructor --
-  public:
+  private:
+    friend class Utils::Singleton<ActionSocket>;
     ActionSocket();
   
-    ~ActionSocket();
+  public:
+    virtual ~ActionSocket();
   
     void start(int portnum);
   

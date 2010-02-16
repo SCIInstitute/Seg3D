@@ -55,11 +55,23 @@ namespace Seg3D {
 class Tool;
 typedef boost::shared_ptr<Tool> ToolHandle;
 
+// CLASS TOOLMANAGER:
+// This class manages the tools in the toolbox of the application
+
+// Forward declaration
+class ToolManager;
+
+// Class definition
 class ToolManager : public StateHandler {
 
 // -- constructor/destructor --
-  public:
+  private:
+    // NOTE: Constructor is private: use Instance() to generate this singleton
+    friend class Utils::Singleton<ToolManager>;
     ToolManager();
+ 
+  public:
+    virtual ~ToolManager();
  
 // -- Handler functions --
   protected:
@@ -86,21 +98,22 @@ class ToolManager : public StateHandler {
   
     // OPEN_TOOL_SIGNAL:
     // This signal is triggered after a tool has been opened
-    tool_signal_type open_tool_signal;
+    tool_signal_type open_tool_signal_;
     
     // CLOSE_TOOL_SIGNAL:
     // This signal is triggered when before a tool is closed
-    tool_signal_type close_tool_signal;
+    tool_signal_type close_tool_signal_;
 
     // ACTIVATE_TOOL_SIGNAL:
     // This signal is triggered when before a tool is closed
-    tool_signal_type activate_tool_signal;
-    
+    tool_signal_type activate_tool_signal_;
     
 // -- Access to toollist --
   public:
-    typedef std::map<std::string,ToolHandle> tool_list_type;
-    typedef std::set<std::string> toolid_list_type;
+    typedef std::map<std::string,ToolHandle>  tool_list_type;
+    typedef std::set<std::string>             toolid_list_type;
+    typedef boost::recursive_mutex            mutex_type;
+    typedef boost::unique_lock<mutex_type>    lock_type;
   
     // TOOL_LIST:
     // Get the current open tool list
@@ -110,51 +123,21 @@ class ToolManager : public StateHandler {
     // Get the active toolid
     std::string active_toolid();
 
-    // LOCK_TOOL_LIST:
-    // Lock the tool list
-    void lock_tool_list();
-
-    // UNLOCK_TOOL_LIST:
-    // Unlock the tool list
-    void unlock_tool_list();
-
-// -- Tool database --
-  protected:
-    friend class Tool;
-
-    // ADD_TOOLID:
-    // Mark a toolid as used
-    void add_toolid(const std::string& toolid); // << THREAD-SAFE
-    
-    // REMOVE_TOOLID:
-    // Remove the toolid from the list
-    void remove_toolid(const std::string& toolid); // << THREAD-SAFE
-
-    // IS_TOOLID:
-    // Check whether toolid is taken
-    bool is_toolid(const std::string& toolid); // << THREAD-SAFE
-
-    // CREATE_TOOLID:
-    // Create a new tool id that is not yet in the list
-    std::string create_toolid(const std::string& tool_type); // << THREAD-SAFE
+    // GET_MUTEX:
+    // Get the mutex, so it can be locked by the interface that is built
+    // on top of this
+    mutex_type& get_mutex();
 
   private:
   
     // All the open tools are stored in this hash map
-    tool_list_type   tool_list_;
+    tool_list_type  tool_list_;
 
     // Lock for the tool_list
-    boost::recursive_mutex tool_list_lock_;
+    mutex_type      tool_list_mutex_;
     
     // The tool that is currently active is stored here
-    std::string      active_toolid_;
-    
-    // All the names that are currently in use
-    toolid_list_type toolid_list_;
-
-    // Lock for the tool_list
-    boost::mutex     toolid_list_lock_;
-    
+    std::string     active_toolid_;
 
 // -- Singleton interface --
   public:

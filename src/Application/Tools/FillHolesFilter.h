@@ -34,7 +34,9 @@
 namespace Seg3D  {
   
 class FillHolesFilter : public Tool {
-  SCI_TOOL_TYPE("FillHolesFilter","Fill Holes", "",Tool::MASKTOMASK_E|Tool::FILTER_E, QUrl::fromEncoded("http://seg3d.org/"))
+  SCI_TOOL_TYPE( "FillHolesFilter", "Fill Holes", "",
+                 Tool::MASKTOMASK_E|Tool::FILTER_E, 
+                 "http://seg3d.org/")
   
 public:
   FillHolesFilter(const std::string& toolid);
@@ -53,11 +55,7 @@ public:
   // -- state --
 public:
   // Layerid of the target layer
-  StateOptionHandle              target_layer_;
-  
-  
-  
-  
+  StateOptionHandle              target_layer_state_;
   
 };
 

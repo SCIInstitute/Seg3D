@@ -50,24 +50,30 @@ StateView2D::export_to_string() const
 }
 
 bool 
-StateView2D::import_from_string(const std::string& str,
-                                bool from_interface)
+StateView2D::import_from_string(const std::string& str, ActionSource source)
+{
+  Utils::View2D value;
+  if (!(Utils::import_from_string(str,value))) return (false);
+ 
+  return (set(value,source)); 
+}
+
+bool 
+StateView2D::set(const Utils::View2D& value, ActionSource source)
 {
   // Lock the state engine so no other thread will be accessing it
   StateEngine::lock_type lock(StateEngine::Instance()->get_mutex());
 
-  Utils::View2D value;
-  if (!(Utils::import_from_string(str,value))) return (false);
-  
   if (value_ != value)
   {
     value_ = value;
-    value_changed_signal(value_,from_interface);
-    state_changed_signal();
+    value_changed_signal_(value_,source);
+    state_changed_signal_();
   }
 
   return (true);
 }
+
 
 void 
 StateView2D::export_to_variant(ActionParameterVariant& variant) const
@@ -76,22 +82,13 @@ StateView2D::export_to_variant(ActionParameterVariant& variant) const
 }
 
 bool 
-StateView2D::import_from_variant(ActionParameterVariant& variant,
-                                 bool from_interface)
+StateView2D::import_from_variant(ActionParameterVariant& variant, 
+                                 ActionSource source)
 {
-  // Lock the state engine so no other thread will be accessing it
-  StateEngine::lock_type lock(StateEngine::Instance()->get_mutex());
-
   Utils::View2D value;
   if (!(variant.get_value(value))) return (false);
 
-  if (value != value_)
-  {
-    value_ = value;
-    value_changed_signal(value_,from_interface);
-    state_changed_signal();
-  }
-  return (true);
+  return (set(value,source));
 }
 
 bool 

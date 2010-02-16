@@ -49,14 +49,23 @@
 
 namespace Utils {
 
-// CLASS LOG:
+// CLASS LOGHISTORY:
+// This class records the last entries of the log and keeps a record of the
+// last entries.
 
+// Forward declaration
+class LogHistory;
+
+// Class definition
 class LogHistory : public boost::noncopyable {
 
   public:
     typedef std::pair<int,std::string>      log_entry_type;
     typedef std::deque<log_entry_type>      log_history_type;
 
+// -- constructor / destructor --
+  private:
+    friend class Singleton<LogHistory>;
     LogHistory();
     
 // -- History recording --
@@ -92,7 +101,7 @@ class LogHistory : public boost::noncopyable {
     
     // HISTORY_CHANGED_SIGNAL:
     // Signal indicating that the history changed
-    history_changed_signal_type history_changed_signal;
+    history_changed_signal_type history_changed_signal_;
         
 // -- Singleton interface --
   public:

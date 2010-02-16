@@ -87,8 +87,12 @@ class ActionFactory : public boost::noncopyable  {
 
 // -- Constructor --
 
-  public:
+  private:
+    friend class Utils::Singleton<ActionFactory>;
     ActionFactory();
+
+  public:
+    virtual ~ActionFactory();
 
 // -- Action registration --
 
@@ -149,6 +153,24 @@ class ActionFactory : public boost::noncopyable  {
                        ActionHandle& action,
                        std::string& error,
                        std::string& usage) const;
+
+
+// -- Shortcuts for creating actions --
+  public:
+    // CREATEACTION:
+    // Create an action from a string using the ActionFactory object
+    static bool CreateAction(const std::string& actionstring,
+                             ActionHandle& action,
+                             std::string& error);
+
+    // CREATEACTION:
+    // Create an action from a string using the ActionFactory object
+    // This version also returns the usage of the action if the action could
+    // not be created
+    static bool CreateAction(const std::string& actionstring,
+                             ActionHandle& action,
+                             std::string& error,
+                             std::string& usage);
 
 // -- Singleton interface --
   public:

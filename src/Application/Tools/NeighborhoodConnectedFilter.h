@@ -35,7 +35,9 @@
 namespace Seg3D  {
   
 class NeighborhoodConnectedFilter : public Tool {
-  SCI_TOOL_TYPE("NeighborhoodConnectedFilter","Neighborhood Connected", "",Tool::DATATOMASK_E|Tool::FILTER_E, QUrl::fromEncoded("http://seg3d.org/"))
+  SCI_TOOL_TYPE( "NeighborhoodConnectedFilter", "Neighborhood Connected", "",
+                 Tool::DATATOMASK_E|Tool::FILTER_E, 
+                 "http://seg3d.org/")
   
 public:
   NeighborhoodConnectedFilter(const std::string& toolid);
@@ -54,7 +56,7 @@ public:
   // -- state --
 public:
   // Layerid of the target layer
-  StateOptionHandle              target_layer_;
+  StateOptionHandle              target_layer_state_;
   
   
   

@@ -30,7 +30,7 @@
 #define INTERFACE_APPINTERFACE_APPINTERFACE_H
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
-# pragma once
+#pragma once
 #endif 
 
 // Qt includes
@@ -46,6 +46,7 @@
 
 // Application Interface components. 
 #include <Application/InterfaceManager/InterfaceManager.h>
+#include <Application/Action/Actions.h>
 
 #include <Interface/AppInterface/ViewerInterface.h>
 #include <Interface/AppInterface/HistoryDockWidget.h>
@@ -73,6 +74,7 @@ class AppInterface : public QMainWindow
 {
   Q_OBJECT
   
+// -- constructor/destructor --
   public:
     // Constructor
     AppInterface();
@@ -82,18 +84,19 @@ class AppInterface : public QMainWindow
   
   public:
   
-  ViewerInterface*        viewer_interface();
-  HistoryDockWidget*      history_dock_widget();
-  ProjectDockWidget*      project_dock_widget();
-  ToolsDockWidget*        tools_dock_widget();
-  LayerManagerDockWidget* layer_manager_dock_widget();
-  MeasurementDockWidget*  measurement_dock_widget();
+    ViewerInterface*        viewer_interface();
+    HistoryDockWidget*      history_dock_widget();
+    ProjectDockWidget*      project_dock_widget();
+    ToolsDockWidget*        tools_dock_widget();
+    LayerManagerDockWidget* layer_manager_dock_widget();
+    MeasurementDockWidget*  measurement_dock_widget();
   
-  public Q_SLOTS:
-    void full_screen_toggle();
+// -- functions to handle the properties of the interface --  
+  public:
+    void set_full_screen(bool full_screen);
+
 
   private:
-
     void add_windowids();
     void show_window(const std::string& windowid);
     void close_window(const std::string& windowid);
@@ -119,15 +122,27 @@ class AppInterface : public QMainWindow
 
 // -- Main Window management functions --
   public:
-    
-    // Reopen a specific window after the user has closed it
-    static void HandleShowWindow(QPointer<AppInterface> app_interface, std::string windowid);
+    typedef QPointer<AppInterface> qpointer_type; 
 
+    // NOTE: These functions are static to ensure that they can serve as targets
+    // for the signal/slot mechanism. As the main interface may be closed while
+    // there are still function callbacks in the loop, these functions test for 
+    // the existence of the interface before executing.
+    
+    // HANDLESHOWWINDOW:
+    // Reopen a specific window after the user has closed it
+    static void HandleShowWindow(qpointer_type app_interface, 
+                                 std::string windowid);
+
+    // HANDLECLOSEWINDOW:
     // Close a dock or a window
-    static void HandleCloseWindow(QPointer<AppInterface> app_interface, std::string windowid);
+    static void HandleCloseWindow(qpointer_type app_interface, 
+                                  std::string windowid);
   
-    // Full Screen the Main Window
-    static void HandleFullScreenWindow(QPointer<AppInterface> app_interface, std::string windowid);
+    // SETFULLSCREEN:
+    // Set full screen mode of the Main Window
+    static void SetFullScreen(qpointer_type app_interface, 
+                                 bool full_screen, ActionSource source);
 };
 
 } //end namespace

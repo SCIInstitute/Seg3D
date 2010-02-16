@@ -31,18 +31,22 @@
 
 #include <Application/Action/Action.h>
 #include <Application/Interface/Interface.h>
+#include <Application/State/StateBase.h>
 
 namespace Seg3D {
 
+// CLASS ActionSet
+// Set the value of a state variable
+
 class ActionSet : public Action {
-    SCI_ACTION_TYPE("Set","Set <key> <value>",APPLICATION_E)
+    SCI_ACTION_TYPE("Set","Set <state> <value>",APPLICATION_E)
 
 // -- Constructor/Destructor --
   public:
     ActionSet()
     {
       add_argument(stateid_);
-      add_argument(statevalue_);
+      add_argument(state_value_);
     }
     
     virtual ~ActionSet() {}
@@ -58,23 +62,44 @@ class ActionSet : public Action {
     ActionParameter<std::string> stateid_;
 
     // This one describes the value of the state variable
-    ActionParameterVariant       statevalue_;
+    ActionParameterVariant       state_value_;
+
+// -- Action optimization --
+  private:
+    // This is an internal optimization to avoid the lookup in the state
+    // database
+    StateBaseWeakHandle state_weak_handle_;
+
 
 // -- Dispatch this action from the interface --
   public:
-  
+
+    // CREATE:
+    // Create the action but do not dispatch it yet
     template<class HANDLE, class T>
-    static void Dispatch(HANDLE& state, const T& statevalue)
+    static ActionHandle Create(HANDLE& state, const T& statevalue)
     {
       // Create new action
       ActionSet* action = new ActionSet;
     
       // Set action parameters
       action->stateid_.value() = state->stateid();
-      action->statevalue_.set_value(statevalue);
-
+      action->state_value_.set_value(statevalue);    
+      
+      // Add optimization
+      action->state_weak_handle_ = state;
+      
+      // return the new action
+      return ActionHandle(action);
+    }
+  
+    // DISPATCH:
+    // Dispatch the action from the interface
+    template<class HANDLE, class T>
+    static void Dispatch(HANDLE& state, const T& statevalue)
+    {
       // Post the new action
-      PostActionFromInterface(ActionHandle(action));      
+      Interface::PostAction(Create(state,statevalue));      
     }
 
 };

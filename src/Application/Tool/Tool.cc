@@ -28,7 +28,6 @@
 
 #include <Application/Tool/Tool.h>
 #include <Application/Tool/ToolFactory.h>
-#include <Application/Tool/ToolManager.h>
 
 namespace Seg3D {
 
@@ -36,7 +35,7 @@ Tool::Tool(const std::string& toolid) :
   StateHandler(toolid),
   toolid_(toolid)
 {
-  ToolManager::Instance()->add_toolid(toolid_);
+  StateEngine::Instance()->add_stateid(toolid_);
 
   // Extract the tool id number from the id tag and store it in the Tool class
   std::string::size_type loc = toolid.find('_');
@@ -54,35 +53,14 @@ Tool::~Tool()
   // needs to blocked until the tool is really removed to prevent
   // a tool with the same name to be instantiated and actions
   // for multiple tools with the same name being mixed.
-  ToolManager::Instance()->remove_toolid(toolid_);
+  
+  StateEngine::Instance()->remove_stateid(toolid_);
 }
 
 void
 Tool::close()
 {
-
-}
-
-void 
-Tool::add_connection(boost::signals2::connection connection)
-{
-  connection_list_.push_back(connection);
-}
-
-void
-Tool::close_connections()
-{  
-  // Delete all the connections
-  connection_list_type::iterator it = connection_list_.begin();
-  connection_list_type::iterator it_end = connection_list_.end();
-  while (it !=  it_end)
-  {
-    (*it).disconnect();
-    ++it;
-  }
-  
-  // Clear the list
-  connection_list_.clear();
+  disconnect_all();
 }
 
 void

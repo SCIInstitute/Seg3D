@@ -63,7 +63,7 @@ StateHandler::add_statebase(const std::string& key, StateBaseHandle state)
 
   // Step (4): Link with statehandler
 
-  add_connection(state->state_changed_signal.connect(boost::bind(
+  add_connection(state->state_changed_signal_.connect(boost::bind(
     &StateHandler::state_changed,this)));
 
   // Step (4): Add the state to the StateManager

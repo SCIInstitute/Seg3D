@@ -39,7 +39,7 @@
 // Application includes
 #include <Application/Tool/ToolInterface.h>
 #include <Application/Tool/Tool.h>
-#include <Application/Tool/ToolManager.h>
+#include <Application/ToolManager/ToolManager.h>
 
 namespace Seg3D {
 
@@ -55,8 +55,11 @@ class ToolBoxWidget : public QScrollArea
     ToolBoxWidget(QWidget* parent=0);
     virtual ~ToolBoxWidget();
     
-    void add_tool ( QWidget * tool, const QString & text, boost::function<void ()> close_function, 
-           boost::function<void ()> activate_function, QUrl help_url );
+    void add_tool ( QWidget * tool, const QString & text, 
+                    boost::function<void ()> close_function, 
+                    boost::function<void ()> activate_function, 
+                    const std::string& help_url );
+    
     void remove_tool ( int index );
     
     inline int      get_active_index(){ return active_index_; }
@@ -70,9 +73,7 @@ class ToolBoxWidget : public QScrollArea
     int index_of(QWidget *index);
     
   Q_SIGNALS:
-      void currentChanged( QString );
       void tool_removed_signal( int index );
-
 
 private:
     
@@ -98,10 +99,7 @@ private:
   private Q_SLOTS:
     void help_button_clicked();
   
-  
-    
 };
-
 
 }  //endnamespace Seg3d
 

@@ -42,13 +42,23 @@ class ActionRedo : public Action {
     virtual ~ActionRedo() {}  
 
 // -- Functions that describe action --
+
+  public:
     virtual bool validate(ActionContextHandle& context);
     virtual bool run(ActionContextHandle& context,
                      ActionResultHandle& result);
 
-};
+// -- Dispatch/Create this action from the interface --
+  public:
+  
+    // DISPATCH:
+    // Dispatch the action from the interface
+    static void Dispatch();
 
-typedef boost::intrusive_ptr<ActionRedo> ActionRedoHandle;
+    // CREATE:
+    // Create the action but do not dispatch it yet
+    static ActionHandle Create();
+};
 
 } // end namespace Seg3D
 

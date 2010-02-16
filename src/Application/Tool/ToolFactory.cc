@@ -38,25 +38,36 @@ ToolFactory::ToolFactory()
 {
 }
 
+
+ToolFactory::~ToolFactory()
+{
+}
+
+
 bool 
 ToolFactory::is_tool_type(const std::string& tool_type)
 {
-  boost::unique_lock<boost::mutex> lock(tools_mutex_);
-  tool_map_type::const_iterator it = tools_.find(Utils::string_to_lower(tool_type));
-  if (it == tools_.end()) return (false);
-  return (true);
+  lock_type lock( mutex_ );
+  
+  tool_map_type::const_iterator it = 
+    tools_.find(Utils::string_to_lower(tool_type));
+    
+  if (it == tools_.end()) return false;
+  return true;
 }
+
 
 bool LessToolList(ToolFactory::tool_list_type::value_type val1,
                   ToolFactory::tool_list_type::value_type val2)
 {
   return (val1->menu_name() < val2->menu_name());
 }
+
     
 bool 
 ToolFactory::list_tool_types(tool_list_type& tool_list, int properties)
 {
-  boost::unique_lock<boost::mutex> lock(tools_mutex_);
+  lock_type lock( mutex_ );
 
   // clear the list
   tool_list.clear();
@@ -73,17 +84,17 @@ ToolFactory::list_tool_types(tool_list_type& tool_list, int properties)
     ++it;
   }
   
-  if (tool_list.size() == 0) return (false);
+  if (tool_list.size() == 0) return false;
   std::sort(tool_list.begin(),tool_list.end(),LessToolList);
   
-  return (true);  
+  return true;  
 }
+
 
 bool 
 ToolFactory::list_tool_types_with_interface(tool_list_type& tool_list, int properties)
 {
-  boost::unique_lock<boost::mutex> lock(toolinterfaces_mutex_);
-  boost::unique_lock<boost::mutex> lock2(tools_mutex_);
+  lock_type lock(mutex_);
 
   // clear the list
   tool_list.clear();
@@ -106,7 +117,7 @@ ToolFactory::list_tool_types_with_interface(tool_list_type& tool_list, int prope
   if (tool_list.size() == 0) return (false);
   std::sort(tool_list.begin(),tool_list.end(),LessToolList);
   
-  return (true);  
+  return true;  
 }
 
 
@@ -115,18 +126,18 @@ ToolFactory::create_tool(const std::string& tool_type,
                          const std::string& toolid,
                          ToolHandle& tool)
 {
-  boost::unique_lock<boost::mutex> lock(tools_mutex_);
+  lock_type lock( mutex_ );
 
   // Step (1): find the tool
   tool_map_type::const_iterator it = tools_.find(Utils::string_to_lower(tool_type));
 
   // Step (2): check its existence
-  if (it == tools_.end()) return (false);
+  if (it == tools_.end()) return false;
 
   // Step (3): build the tool
   tool = (*it).second->builder()->build(toolid);
     
-  return (true);
+  return true;
 }
 
 
@@ -134,7 +145,7 @@ bool
 ToolFactory::create_toolinterface(const std::string& toolinterface_name,
                               ToolInterface*& toolinterface)
 {
-  boost::unique_lock<boost::mutex> lock(toolinterfaces_mutex_);
+  lock_type lock( mutex_ );
 
   // Step (1): find the tool
   toolinterface_map_type::const_iterator it = toolinterfaces_.find(toolinterface_name);
@@ -151,6 +162,7 @@ ToolFactory::create_toolinterface(const std::string& toolinterface_name,
   
   return (true);
 }
+
 
 // Singleton interface needs to live somewhere
 Utils::Singleton<ToolFactory> ToolFactory::instance_;

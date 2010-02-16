@@ -26,9 +26,9 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#include <Application/Tool/ToolManager.h>
+#include <Application/ToolManager/ToolManager.h>
 #include <Application/Tool/ToolFactory.h>
-#include <Application/Tool/Actions/ActionOpenTool.h>
+#include <Application/ToolManager/Actions/ActionOpenTool.h>
 
 namespace Seg3D {
 
@@ -37,12 +37,8 @@ namespace Seg3D {
 // registered in the CMake file.
 SCI_REGISTER_ACTION(OpenTool);
 
-// VALIDATE:
-// As the action could be user input, we need to validate whether the action
-// is valid and can be executed.
-
 bool
-ActionOpenTool::validate(ActionContextHandle& context)
+ActionOpenTool::validate( ActionContextHandle& context )
 {
   // Check whether an id number was attached
   std::string tool_type = toolid_.value();
@@ -53,7 +49,7 @@ ActionOpenTool::validate(ActionContextHandle& context)
   if (!(ToolFactory::Instance()->is_tool_type(tool_type)))
   {
     context->report_error(std::string("No tool available of type '")+tool_type+"'");
-    return (false);
+    return false;
   }
 
   // Check whether name does not exist, if it exists we have to report an
@@ -61,18 +57,16 @@ ActionOpenTool::validate(ActionContextHandle& context)
   
   if (loc != std::string::npos)
   {
-    if (!(ToolManager::Instance()->is_toolid(toolid_.value())))
+    if (!(StateEngine::Instance()->is_stateid(toolid_.value())))
     {
       context->report_error(std::string("ToolID '")+toolid_.value()+"' is already in use");
-      return (false);
+      return false;
     }
   }
   
-  return (true); // validated
+  return true; // validated
 }
 
-// RUN:
-// The code that runs the actual action
 
 bool 
 ActionOpenTool::run(ActionContextHandle& context, ActionResultHandle& result)
@@ -85,14 +79,11 @@ ActionOpenTool::run(ActionContextHandle& context, ActionResultHandle& result)
   ToolManager::Instance()->activate_tool(new_tool_id);
 
   result = ActionResultHandle(new ActionResult(new_tool_id));
-  return (true); // success
+  return true; // success
 }
 
-// DISPATCH:
-// Dispatch this action with given parameters (from interface)
-
-void
-ActionOpenTool::Dispatch(const std::string& toolid)
+ActionHandle
+ActionOpenTool::Create(const std::string& toolid)
 {
   // Create new action
   ActionOpenTool* action = new ActionOpenTool;
@@ -100,8 +91,15 @@ ActionOpenTool::Dispatch(const std::string& toolid)
   // Set action parameters
   action->toolid_.value() = toolid;
 
-  // Post the new action
-  PostActionFromInterface(ActionHandle(action));
+  return ActionHandle(action);
 }
+
+
+void
+ActionOpenTool::Dispatch(const std::string& toolid)
+{
+  Interface::PostAction( Create( toolid ) );
+}
+
 
 } // end namespace Seg3D

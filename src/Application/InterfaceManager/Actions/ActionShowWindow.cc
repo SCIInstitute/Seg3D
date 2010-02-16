@@ -37,9 +37,6 @@ namespace Seg3D {
 // registered in the CMake file.
 SCI_REGISTER_ACTION(ShowWindow);
 
-// VALIDATE:
-// As the action could be user input, we need to validate whether the action
-// is valid and can be executed.
 
 bool
 ActionShowWindow::validate(ActionContextHandle& context)
@@ -53,18 +50,18 @@ ActionShowWindow::validate(ActionContextHandle& context)
   return (true); // validated
 }
 
-// RUN:
-// The code that runs the actual action
+
 bool 
 ActionShowWindow::run(ActionContextHandle& context,
                       ActionResultHandle& result)
 {
-  InterfaceManager::Instance()->show_window_signal(windowid_.value());
+  InterfaceManager::Instance()->show_window_signal_(windowid_.value());
   return (true); // success
 }
 
-void 
-ActionShowWindow::Dispatch(const std::string& windowid)
+
+ActionHandle 
+ActionShowWindow::Create(const std::string& windowid)
 {
   // Create new action
   ActionShowWindow* action = new ActionShowWindow;
@@ -72,8 +69,16 @@ ActionShowWindow::Dispatch(const std::string& windowid)
   // Set action parameters
   action->windowid_.value() = windowid;
 
+  // Create action handle
+  return ActionHandle(action);
+}
+
+
+void 
+ActionShowWindow::Dispatch(const std::string& windowid)
+{
   // Post the new action
-  PostActionFromInterface(ActionHandle(action));
+  Interface::PostAction(Create(windowid));
 }
 
 

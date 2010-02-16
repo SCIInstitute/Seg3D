@@ -37,9 +37,6 @@ namespace Seg3D {
 // registered in the CMake file.
 SCI_REGISTER_ACTION(CloseWindow);
 
-// VALIDATE:
-// As the action could be user input, we need to validate whether the action
-// is valid and can be executed.
 
 bool
 ActionCloseWindow::validate(ActionContextHandle& context)
@@ -53,18 +50,18 @@ ActionCloseWindow::validate(ActionContextHandle& context)
   return (true); // validated
 }
 
-// RUN:
-// The code that runs the actual action
+
 bool 
 ActionCloseWindow::run(ActionContextHandle& context,
                        ActionResultHandle& result)
 {
-  InterfaceManager::Instance()->close_window_signal(windowid_.value());
+  InterfaceManager::Instance()->close_window_signal_(windowid_.value());
   return (true); // success
 }
 
-void 
-ActionCloseWindow::Dispatch(const std::string& windowid)
+
+ActionHandle
+ActionCloseWindow::Create(const std::string& windowid)
 {
   // Create new action
   ActionCloseWindow* action = new ActionCloseWindow;
@@ -72,8 +69,16 @@ ActionCloseWindow::Dispatch(const std::string& windowid)
   // Set action parameters
   action->windowid_.value() = windowid;
 
+  // Create action handle
+  return (ActionHandle(action));
+}
+
+
+void 
+ActionCloseWindow::Dispatch(const std::string& windowid)
+{
   // Post the new action
-  PostActionFromInterface(ActionHandle(action));
+  Interface::PostAction(Create(windowid));
 }
 
 } // end namespace Seg3D

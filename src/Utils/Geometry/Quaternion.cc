@@ -162,8 +162,6 @@ Quaternion
 Slerp(const Quaternion& from, const Quaternion& to, double t, bool shortest_path)
 {
   Quaternion result;
-  
-  const Quaternion& p = from;
   Quaternion q;
   
   double cos_theta = from.w_*to.w_ + from.x_*to.x_ + from.y_*to.y_ + from.z_*to.z_;

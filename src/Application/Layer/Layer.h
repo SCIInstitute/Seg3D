@@ -26,93 +26,63 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-/*
- *****************************************************************************
- *
- *   Layer.h
- *
- *   Also see: 
- *
- *   Authors:
- *      Kristen Zygmunt   -- initial attempt      11/10/2009
- *
- *    
- *****************************************************************************
- */
-
 #ifndef APPLICATION_LAYER_LAYER_H
-#define APPLICATION_LAYER_LAYER_H 1
+#define APPLICATION_LAYER_LAYER_H
 
-//#ifdef (_MSC_VER) && (_MSC_VER >= 1020)
-//# pragma once
-//#endif
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+#pragma once
+#endif
 
 // STL includes
 #include <string>
 #include <deque>
+#include <vector>
 
 // Boost includes 
 #include <boost/shared_ptr.hpp>
 #include <boost/thread/mutex.hpp>
 
-// Application includes
+// DataVolume includes
 //#include <DataVolume/DataVolume.h>
-#include <Utils/Stubs/Stubs.h>
+
+// Application includes
+#include <Application/Application/Application.h>
+#include <Application/Interface/Interface.h>
+#include <Application/Action/Action.h>
+#include <Application/State/State.h>
 
 namespace Seg3D {
 
 // Forward declarations
 class Layer;
-
-// typedefs
 typedef boost::shared_ptr<Layer> LayerHandle;
-typedef std::deque<LayerHandle> LayerGroup;
 
-// Class declarations
-class LayerProperties {
-  public:
-    enum {
-      NONE_E = 0x0000,
-      // MASKLAYER is a type of layer with 0/1 data
-      MASKLAYER_E = 0x0001,
-      // DATAGRAY is a layer with grayscale data
-      DATAGRAY_E = 0x0002,
-      // DATARGB is a layer with RGB data
-      DATARGB_E = 0x0004,
-      // ACTIVE is a layer that is currently active
-      ACTIVE_E = 0x0008
-    };
+class Layer : public StateHandler {
     
-    int kind_;
-    Color label_color_; 
-    BoundingBox bbox_;
-    bool operator==(const LayerProperties& other) {
-      return (bbox_ == other.bbox_);
-    }
-};
-
-class Layer {
-    
+// -- constructor/destructor --    
   public:
 
-    Layer(std::string& name, DataVolumeHandle& data);
-    ~Layer();
+    Layer(std::string& name);
+    virtual ~Layer();
 
-    LayerProperties get_properties() const { return properties_; }
-    DataVolumeHandle get_data() const { return data_handle_; }
-    LayerHandle clone(std::string& clone_name) const;
-  
-    bool is_locked() const;
+// -- state variables --
+  public:
+    // The name of the layer 
+    StateStringHandle               name_state_;
+    
+    StateBoolHandle                 lock_state_;
+    StateIntHandle                  color_index_state_;
 
-  private:
-    std::string name_;
-    boost::mutex thread_lock_; // used for indicating whether or not the layer is being looked at by another thread
-    boost::mutex user_lock_; // used for indicating whether the user has said this thread cannot be modified
-    bool dirty_;
-    DataVolumeHandle data_handle_; // data volume has a lock for whether or not the data can be viewed/accessed
-    //Isosurface iso_; // belongs in viewer
-    MaskIndex mask_index_;
-    LayerProperties properties_;
+    StateDoubleHandle               contrast_state_;
+    StateDoubleHandle               brightness_state_;
+    
+    // Per viewer control of state
+    std::vector<StateDoubleHandle>  opacity_state_;
+    std::vector<StateBoolHandle>    visibility_state_;
+    
+    std::vector<StateBoolHandle>    border_state_;
+    std::vector<StateBoolHandle>    fill_state_;
+    
 };
 
 } // end namespace Seg3D

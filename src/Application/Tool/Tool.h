@@ -43,19 +43,19 @@
 
 // Application includes
 #include <Application/State/State.h>
+#include <Application/State/StateEngine.h>
 
-// Qt includes
-#include <QUrl>
 
 namespace Seg3D {
 
 // CLASS TOOL:
-// Base class of each tool
+// Base class of a tool
 
+// Forward declaration
 class Tool;
 typedef boost::shared_ptr<Tool> ToolHandle;
 
-
+// Class definition
 class Tool : public StateHandler {
   
 // -- definition of tool groups --
@@ -76,13 +76,13 @@ class Tool : public StateHandler {
     Tool(const std::string& toolid);
     virtual ~Tool();
 
-// -- tool_group/tool_type/toolid --
-
+// -- query properties of tool --
+  public:
     virtual std::string type() const = 0;
     virtual std::string menu_name() const = 0;
     virtual std::string shortcut_key() const = 0;
     virtual int         properties() const = 0;
-    virtual QUrl        url() const = 0;
+    virtual std::string url() const = 0;
     
     std::string toolid() const        { return toolid_; }
     int toolid_number() const         { return toolid_number_; }
@@ -106,26 +106,6 @@ class Tool : public StateHandler {
     // thread critical pieces should be done by this function. 
     virtual void close();
 
-// -- connection management --
-  public:
-    // ADD_CONNECTION:
-    // Add connections to the local tool database so they can be cleanup when
-    // the tool is closed.
-    
-    void add_connection(boost::signals2::connection connection);
-  
-  
-  protected:
-    // CLOSE_CONNECTIONS:
-    // Close the conenctions registered using add connection when the tool is
-    // closed.
-    friend class ToolManager;
-    void close_connections();
-    
-  private:
-    typedef std::list<boost::signals2::connection> connection_list_type;
-    connection_list_type connection_list_;
-
 // -- activate/deactivate --
   public:
     // ACTIVATE:
@@ -137,6 +117,7 @@ class Tool : public StateHandler {
     // Deactivate a tool. A tool is always deactivate before the next one is 
     // activated.
     virtual void deactivate();
+        
 };
 
 // SCI_TOOL_TYPE:
@@ -154,13 +135,13 @@ class Tool : public StateHandler {
     static std::string tool_menu_name() { return menu_name_string; } \
     static std::string tool_shortcut_key() { return shortcut_key_string; } \
     static int         tool_properties() { return properties_mask; } \
-    static QUrl        tool_url() { return help_url; } \
+    static std::string tool_url() { return help_url; } \
     \
     virtual std::string type() const { return tool_type(); } \
     virtual std::string menu_name() const { return tool_menu_name(); } \
     virtual std::string shortcut_key() const { return tool_shortcut_key(); } \
     virtual int         properties() const { return tool_properties(); } \
-    virtual QUrl        url() const { return tool_url(); }
+    virtual std::string url() const { return tool_url(); }
 
 
 } // end namespace Seg3D

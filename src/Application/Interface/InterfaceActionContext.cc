@@ -26,56 +26,55 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#include <Application/Tool/ToolManager.h>
-#include <Application/Tool/Actions/ActionActivateTool.h>
+#include <Application/Interface/InterfaceActionContext.h>
 
 namespace Seg3D {
 
-// REGISTER ACTION:
-// Define a function that registers the action. The action also needs to be
-// registered in the CMake file.
-SCI_REGISTER_ACTION(ActivateTool);
 
-// VALIDATE:
-// As the action could be user input, we need to validate whether the action
-// is valid and can be executed.
-
-bool
-ActionActivateTool::validate(ActionContextHandle& context)
+InterfaceActionContext::InterfaceActionContext()
 {
-  if (!(ToolManager::Instance()->is_toolid(toolid_.value())))
-  {
-    context->report_error(std::string("ToolID '")+toolid_.value()+"' is invalid");
-    return (false);
-  }
-  
-  return (true); // validated
-}
-
-// RUN:
-// The code that runs the actual action
-bool 
-ActionActivateTool::run(ActionContextHandle& context, ActionResultHandle& result)
-{
-  ToolManager::Instance()->activate_tool(toolid_.value());
-  return (true); // success
 }
 
 
-// DISPATCH:
-// Dispatch this action with given parameters (from interface)
+InterfaceActionContext::~InterfaceActionContext()
+{
+}
+
 
 void
-ActionActivateTool::Dispatch(const std::string& toolid)
+InterfaceActionContext::report_error(const std::string& error)
 {
-  // Create new action
-  ActionActivateTool* action = new ActionActivateTool;
+  action_message_signal_(Utils::Log::ERROR_E, error);
+}
 
-  // Set action parameters
-  action->toolid_.value() = toolid;
 
-  // Post the new action
-  PostActionFromInterface(ActionHandle(action));
+void
+InterfaceActionContext::report_warning(const std::string& warning)
+{
+  action_message_signal_(Utils::Log::WARNING_E, warning);
+}
+
+
+void
+InterfaceActionContext::report_message(const std::string& message)
+{
+  action_message_signal_(Utils::Log::MESSAGE_E, message);
+}
+
+
+void
+InterfaceActionContext::report_need_resource(ResourceLockHandle& resource)
+{
+  std::string error = std::string("Resource '") + resource->name() + 
+                      "' is not available";
+  action_message_signal_(Utils::Log::ERROR_E, error);
+}
+
+
+void 
+InterfaceActionContext::report_done()
+{
+  action_done_signal_(status());
 }
 
 } // end namespace Seg3D

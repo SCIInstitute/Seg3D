@@ -26,41 +26,56 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_TOOL_ACTIONS_ACTIONCLOSETOOL_H
-#define APPLICATION_TOOL_ACTIONS_ACTIONCLOSETOOL_H
-
-#include <Application/Action/Actions.h>
-#include <Application/Interface/Interface.h>
+#include <Application/ToolManager/ToolManager.h>
+#include <Application/ToolManager/Actions/ActionCloseTool.h>
 
 namespace Seg3D {
 
-class ActionCloseTool : public Action {
-  SCI_ACTION_TYPE("CloseTool","CloseTool toolid",APPLICATION_E)
+// REGISTER ACTION:
+// Define a function that registers the action. The action also needs to be
+// registered in the CMake file.
+SCI_REGISTER_ACTION(CloseTool);
 
-// -- Constructor/Destructor --
-  public:
-    ActionCloseTool()
-    {
-      add_argument(toolid_);
-    }
-    
-    virtual ~ActionCloseTool() {}
 
-// -- Functions that describe action --
-    virtual bool validate(ActionContextHandle& context);
-    virtual bool run(ActionContextHandle& context,
-                     ActionResultHandle& result);
-    
-// -- Action parameters --
-  private:
-    ActionParameter<std::string> toolid_;
+bool
+ActionCloseTool::validate( ActionContextHandle& context )
+{
+  if (!(StateEngine::Instance()->is_stateid(toolid_.value())))
+  {
+    context->report_error(std::string("ToolID '")+toolid_.value()+"' is invalid");
+    return false;
+  }
+  
+  return true; // validated
+}
 
-// -- Dispatch this action from the interface --
-  public:
-    static void Dispatch(const std::string& toolid);
 
-};
+bool 
+ActionCloseTool::run( ActionContextHandle& context, ActionResultHandle& result )
+{
+  ToolManager::Instance()->close_tool(toolid_.value());
+  return true; // success
+}
+
+
+ActionHandle
+ActionCloseTool::Create( const std::string& toolid )
+{
+  // Create new action
+  ActionCloseTool* action = new ActionCloseTool;
+
+  // Set action parameters
+  action->toolid_.value() = toolid;
+
+  // Post the new action
+  return ActionHandle(action);
+}
+
+
+void
+ActionCloseTool::Dispatch( const std::string& toolid )
+{
+  Interface::PostAction(Create(toolid));
+}
 
 } // end namespace Seg3D
-
-#endif

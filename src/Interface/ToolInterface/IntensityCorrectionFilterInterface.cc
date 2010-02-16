@@ -74,10 +74,10 @@ public:
    
       
     //Step 3 - connect the gui to the tool through the QtBridge
-    QtBridge::connect(private_->ui_.targetComboBox, tool->target_layer_);
-    QtBridge::connect(orderAdjuster, tool->order_);
-    QtBridge::connect(edgeAdjuster, tool->edge_);
-    QtBridge::connect(private_->ui_.replaceCheckBox,tool->replace_);
+    QtBridge::connect(private_->ui_.targetComboBox, tool->target_layer_state_);
+    QtBridge::connect(orderAdjuster, tool->order_state_);
+    QtBridge::connect(edgeAdjuster, tool->edge_state_);
+    QtBridge::connect(private_->ui_.replaceCheckBox,tool->replace_state_);
     
 
    //Send a message to the log that we have finised with building the tensity Correction Filter Interface

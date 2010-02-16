@@ -35,7 +35,7 @@
 // Application includes
 #include <Application/Tool/ToolInterface.h>
 #include <Application/Tool/Tool.h>
-#include <Application/Tool/ToolManager.h>
+#include <Application/ToolManager/ToolManager.h>
 
 namespace Seg3D {
 

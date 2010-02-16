@@ -34,7 +34,9 @@
 namespace Seg3D  {
   
 class ThresholdSegmentationLSFilter : public Tool {
-  SCI_TOOL_TYPE("ThresholdSegmentationLSFilter","Segmentation Level Set", "",Tool::DATATOMASK_E|Tool::FILTER_E, QUrl::fromEncoded("http://seg3d.org/"))
+  SCI_TOOL_TYPE( "ThresholdSegmentationLSFilter", "Segmentation Level Set", "",
+                 Tool::DATATOMASK_E|Tool::FILTER_E, 
+                 "http://seg3d.org/")
    
 public:
   ThresholdSegmentationLSFilter(const std::string& toolid);
@@ -53,27 +55,23 @@ public:
   // -- state --
 public:
   // Layerid of the target layer
-  StateOptionHandle               target_layer_;
+  StateOptionHandle               target_layer_state_;
   
-  StateOptionHandle               mask_layer_;
+  StateOptionHandle               mask_layer_state_;
   
-  StateRangedIntHandle            iterations_;
+  StateRangedIntHandle            iterations_state_;
   
-  StateRangedIntHandle            upper_threshold_;
+  StateRangedIntHandle            upper_threshold_state_;
   
-  StateRangedIntHandle            lower_threshold_;
+  StateRangedIntHandle            lower_threshold_state_;
   
-  StateRangedIntHandle            curvature_;
+  StateRangedIntHandle            curvature_state_;
   
-  StateRangedIntHandle            propagation_;
+  StateRangedIntHandle            propagation_state_;
   
-  StateRangedIntHandle            edge_;
+  StateRangedIntHandle            edge_state_;
   
-  StateBoolHandle                 replace_;
-  
-  
-  
-  
+  StateBoolHandle                 replace_state_;
   
 };
 

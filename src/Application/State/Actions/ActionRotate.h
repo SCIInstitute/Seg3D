@@ -30,6 +30,7 @@
 #define APPLICATION_STATE_ACTIONS_ACTIONROTATE_H
 
 // Utils includes
+#include <Utils/Geometry/Vector.h>
 #include <Utils/Geometry/Quaternion.h>
 
 // Application includes
@@ -40,7 +41,7 @@
 namespace Seg3D {
 
 class ActionRotate : public Action {
-  SCI_ACTION_TYPE("Rotate", "Rotate <key> <rotation>", APPLICATION_E)
+  SCI_ACTION_TYPE("Rotate", "Rotate <key> <axis> <angle>", APPLICATION_E)
 
   public:
     ActionRotate()
@@ -55,21 +56,41 @@ class ActionRotate : public Action {
     virtual bool validate(ActionContextHandle& context);
     virtual bool run(ActionContextHandle& context, ActionResultHandle& result);
     
+
+// -- Action parameters --
   private:
-    ActionParameter<std::string> stateid_;
-    ActionParameter<StateView3DWeakHandle> state_;
-    ActionParameter<Utils::Quaternion> rotation_;
+    // This one describes where the state is located
+    ActionParameter<std::string>    stateid_;
+    // The axis around which the rotation is performed
+    ActionParameter<Utils::Vector>  axis_;
+    // The angle of rotation
+    ActionParameter<Utils::Vector>  angle_;
+
+// -- Action optimization --
+  private:
+    // This is an internal optimization to avoid the lookup in the state
+    // database
+    StateBaseWeakHandle state_weak_handle_;
     
   public:
-    static void Dispatch(StateView3DHandle& view3d_state, const Utils::Quaternion& rotation)
+    template <class HANDLE>
+    static void Create(HANDLE& state, Utils::Vector axis, double angle)
     {
       ActionRotate* action = new ActionRotate;
+      action->stateid_ = state->stateid();
+      action->axis_.value() = axis;
+      action->angle_.value() = angle;
       
-      action->stateid_.value() = view3d_state->stateid();
-      action->state_.value() = StateView3DWeakHandle(view3d_state);
-      action->rotation_.set_value(rotation);
+      // Add optimization
+      action->state_weak_handle_ = state;
       
-      PostActionFromInterface(ActionHandle(action));
+      return ActionHandle(action);
+    }
+  
+    template <class HANDLE>
+    static void Dispatch(HANDLE& state, Utils::Vector axis, double angle)
+    {
+      PostActionFromInterface(Create(state,axis,angle));
     }
 };
 

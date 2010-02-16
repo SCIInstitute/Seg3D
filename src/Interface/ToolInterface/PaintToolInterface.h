@@ -46,18 +46,16 @@ class PaintToolInterfacePrivate;
 class PaintToolInterface : public ToolWidget {
   Q_OBJECT
   
-// Constructor/destructor
+// -- constructor/destructor --
   public:
     PaintToolInterface();
     virtual ~PaintToolInterface();
 
     virtual bool build_widget(QFrame* frame);
 
+// -- private structure wwith widget classes --
   private:
     PaintToolInterfacePrivate* private_;
-    SliderSpinComboInt *paintBrushAdjuster;
-    SliderSpinComboDouble *upperThresholdAdjuster;
-    SliderSpinComboDouble *lowerThresholdAdjuster;
   
 };
 

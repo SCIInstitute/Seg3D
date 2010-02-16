@@ -86,6 +86,43 @@ std::string export_to_string(const double& value)
   return to_string(value);
 }
 
+std::string export_to_string(const View3D& value)
+{
+  return (std::string(1,'[')+export_to_string(value.eyep())+' '+
+      export_to_string(value.lookat())+' '+export_to_string(value.up())+
+      ' '+ export_to_string(value.fov())+']');
+}
+
+std::string export_to_string(const View2D& value)
+{
+  return (std::string(1,'[')+export_to_string(value.center())+' '+
+            export_to_string(value.scalex())+' '+
+            export_to_string(value.scaley())+']');
+}
+
+std::string export_to_string(const Point& value)
+{
+  return (std::string(1,'[')+to_string(value.x())+' '+
+      to_string(value.y())+' '+to_string(value.z())+']');
+}
+
+std::string export_to_string(const Vector& value)
+{
+  return (std::string(1,'[')+to_string(value.x())+' '+
+      to_string(value.y())+' '+to_string(value.z())+']');
+}
+
+std::string export_to_string(const Color& value)
+{
+  return (std::string(1,'[')+to_string(value.r())+' '+
+      to_string(value.g())+' '+to_string(value.b())+']');
+}
+
+std::string export_to_string(const BBox& value)
+{
+  return (std::string(1,'[')+export_to_string(value.min())+' '+export_to_string(value.max())+']');
+}
+
 std::string export_to_string(const std::vector<char>& value)
 {
   std::string result(1,'[');
@@ -188,36 +225,7 @@ std::string export_to_string(const std::string& value)
   return value;
 }
 
-std::string export_to_string(const View3D& value)
-{
-  return (std::string(1,'[')+export_to_string(value.eyep())+' '+
-      export_to_string(value.lookat())+' '+export_to_string(value.up())+
-      ' '+ export_to_string(value.fov())+']');
-}
 
-std::string export_to_string(const View2D& value)
-{
-  return (std::string(1,'[')+export_to_string(value.center())+' '+
-            export_to_string(value.scalex())+' '+
-            export_to_string(value.scaley())+']');
-}
-
-std::string export_to_string(const Point& value)
-{
-  return (std::string(1,'[')+to_string(value.x())+' '+
-      to_string(value.y())+' '+to_string(value.z())+']');
-}
-
-std::string export_to_string(const Vector& value)
-{
-  return (std::string(1,'[')+to_string(value.x())+' '+
-      to_string(value.y())+' '+to_string(value.z())+']');
-}
-
-std::string export_to_string(const BBox& value)
-{
-  return (std::string(1,'[')+export_to_string(value.min())+' '+export_to_string(value.max())+']');
-}
 
 std::string export_to_string(const Transform& value)
 {
@@ -233,6 +241,16 @@ std::string export_to_string(const Plane& value)
 {
   return (std::string(1,'[')+export_to_string(value.normal())+' '+export_to_string(value.distance())+']');
 }
+
+
+std::string export_to_string(const Quaternion& value)
+{
+  return (std::string(1,'[')+export_to_string(value.w())+' '+
+                             export_to_string(value.x())+' '+
+                             export_to_string(value.y())+' '+
+                             export_to_string(value.z())+" ]");
+}
+
 
 bool import_from_string(const std::string& str, bool& value)
 {
@@ -303,6 +321,84 @@ bool import_from_string(const std::string& str, double& value)
   return (from_string(str,value));
 }
 
+bool import_from_string(const std::string& str, Point& value)
+{
+  std::vector<double> values;
+  multiple_from_string(str,values);
+  if (values.size() == 3) 
+  { 
+    value = Point(values[0],values[1],values[2]);
+    return (true);
+  }
+  return (false);
+}
+
+bool import_from_string(const std::string& str, Quaternion& value)
+{
+  std::vector<double> values;
+  multiple_from_string(str,values);
+  if (values.size() == 4) 
+  { 
+    value = Quaternion(values[0],values[1],values[2],values[3]);
+    return (true);
+  }
+  return (false);
+}
+
+
+bool import_from_string(const std::string& str, View3D& value)
+{
+  std::vector<double> values;
+  multiple_from_string(str,values);
+  if (values.size() == 10) 
+  { 
+    value = View3D(Point(values[0],values[1],values[2]),
+                   Point(values[3],values[4],values[5]),
+                   Vector(values[6],values[7],values[8]),
+                   values[9]);
+    return (true);
+  }
+  return (false);
+}
+
+bool import_from_string(const std::string& str, View2D& value)
+{
+  std::vector<double> values;
+  multiple_from_string(str,values);
+  if (values.size() == 16) 
+  { 
+    value = View2D(Point(values[0],values[1],values[2]),
+                   values[3],values[4]); 
+    return (true);
+  }
+  return (false);
+}
+
+
+bool import_from_string(const std::string& str, Vector& value)
+{
+  std::vector<double> values;
+  multiple_from_string(str,values);
+  if (values.size() == 3) 
+  { 
+    value = Vector(values[0],values[1],values[2]);
+    return (true);
+  }
+  return (false);
+}
+
+bool import_from_string(const std::string& str, Color& value)
+{
+  std::vector<double> values;
+  multiple_from_string(str,values);
+  if (values.size() == 3) 
+  { 
+    value = Color(values[0],values[1],values[2]);
+    return (true);
+  }
+  return (false);
+}
+
 bool import_from_string(const std::string& str, std::vector<char>& value)
 {
   return (multiple_from_string(str,value));
@@ -359,58 +455,7 @@ bool import_from_string(const std::string& str, std::string& value)
   return (true);
 }
 
-bool import_from_string(const std::string& str, Point& value)
-{
-  std::vector<double> values;
-  multiple_from_string(str,values);
-  if (values.size() == 3) 
-  { 
-    value = Point(values[0],values[1],values[2]);
-    return (true);
-  }
-  return (false);
-}
 
-bool import_from_string(const std::string& str, View3D& value)
-{
-  std::vector<double> values;
-  multiple_from_string(str,values);
-  if (values.size() == 10) 
-  { 
-    value = View3D(Point(values[0],values[1],values[2]),
-                   Point(values[3],values[4],values[5]),
-                   Vector(values[6],values[7],values[8]),
-                   values[9]);
-    return (true);
-  }
-  return (false);
-}
-
-bool import_from_string(const std::string& str, View2D& value)
-{
-  std::vector<double> values;
-  multiple_from_string(str,values);
-  if (values.size() == 16) 
-  { 
-    value = View2D(Point(values[0],values[1],values[2]),
-                   values[3],values[4]); 
-    return (true);
-  }
-  return (false);
-}
-
-
-bool import_from_string(const std::string& str, Vector& value)
-{
-  std::vector<double> values;
-  multiple_from_string(str,values);
-  if (values.size() == 3) 
-  { 
-    value = Vector(values[0],values[1],values[2]);
-    return (true);
-  }
-  return (false);
-}
 
 bool import_from_string(const std::string& str, std::vector<Point>& value)
 {

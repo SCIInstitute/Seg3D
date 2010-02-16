@@ -34,7 +34,9 @@
 namespace Seg3D  {
   
 class BinaryDialateErodeFilter : public Tool {
-  SCI_TOOL_TYPE("BinaryDialateErodeFilter","Binary Dialate -> Erode", "",Tool::MASKTOMASK_E|Tool::FILTER_E, QUrl::fromEncoded("http://seg3d.org/"))
+  SCI_TOOL_TYPE( "BinaryDialateErodeFilter", "Binary Dialate -> Erode", "",
+                 Tool::MASKTOMASK_E|Tool::FILTER_E,
+                 "http://seg3d.org/")
   
 public:
   BinaryDialateErodeFilter(const std::string& toolid);
@@ -53,16 +55,13 @@ public:
   // -- state --
 public:
   // Layerid of the target layer
-  StateOptionHandle               target_layer_;
+  StateOptionHandle               target_layer_state_;
 
-  StateRangedIntHandle            dialate_;
+  StateRangedIntHandle            dialate_state_;
   
-  StateRangedIntHandle            erode_;
+  StateRangedIntHandle            erode_state_;
   
-  StateBoolHandle                 replace_;
-  
-  
-  
+  StateBoolHandle                 replace_state_;
   
 };
 

@@ -39,14 +39,15 @@ namespace Seg3D {
   ConfidenceConnectedFilter::ConfidenceConnectedFilter(const std::string& toolid) :
   Tool(toolid)
   {
-    add_state("target",target_layer_,"<none>","<none>");
-    add_state("iterations",iterations_,1,100,1,1);
-    add_state("threshold_multiplier",threshold_multiplier_,1,100,1,1);
+    add_state("target",target_layer_state_,"<none>","<none>");
+    add_state("iterations",iterations_state_,1,100,1,1);
+    add_state("threshold_multiplier",threshold_multiplier_state_,1,100,1,1);
     
     
     // Add constaints, so that when the state changes the right ranges of 
     // parameters are selected
-    target_layer_->value_changed_signal.connect(boost::bind(&ConfidenceConnectedFilter::target_constraint,this,_1));
+    target_layer_state_->value_changed_signal_.connect(
+      boost::bind(&ConfidenceConnectedFilter::target_constraint,this,_1));
     
   }
   

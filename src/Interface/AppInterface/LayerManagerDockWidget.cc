@@ -32,7 +32,7 @@
 #include <boost/lexical_cast.hpp>
 
 // Application Includes
-#include <Application/Layer/LayerManager.h>
+#include <Application/LayerManager/LayerManager.h>
 #include <Application/Interface/Interface.h>
 
 #include <Application/Layer/Actions/ActionCloneLayer.h>

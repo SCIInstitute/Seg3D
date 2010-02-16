@@ -34,7 +34,7 @@
 namespace Seg3D {
 
 class ActionShowWindow : public Action {
-  SCI_ACTION_TYPE("ShowWindow","ShowWindow windowid",INTERFACE_E)
+  SCI_ACTION_TYPE("ShowWindow","ShowWindow <windowid>",INTERFACE_E)
 
 // -- Constructor/Destructor --
   public:
@@ -56,6 +56,13 @@ class ActionShowWindow : public Action {
 
 // -- Dispatcher for the GUI --
   public:
+  
+    // CREATE:
+    // Create the action
+    static ActionHandle Create(const std::string& windowid);
+
+    // DISPATCH:
+    // Create the action and dispatch it
     static void Dispatch(const std::string& windowid);
 
 };

@@ -56,6 +56,13 @@ class ActionCloseWindow : public Action {
 
 // -- Dispatcher for the GUI --
   public:
+
+    // CREATE:
+    // Create the action
+    static ActionHandle Create(const std::string& windowid);
+  
+    // DISPATCH:
+    // Create the action and dispatch it
     static void Dispatch(const std::string& windowid);
   
 };

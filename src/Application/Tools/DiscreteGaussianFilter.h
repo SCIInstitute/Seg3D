@@ -34,8 +34,9 @@
 namespace Seg3D  {
 
 class DiscreteGaussianFilter : public Tool {
-  SCI_TOOL_TYPE("DiscreteGaussianFilter","Discrete Gaussian", "",Tool::DATATODATA_E|Tool::FILTER_E, QUrl::fromEncoded("http://seg3d.org/"))
-
+  SCI_TOOL_TYPE( "DiscreteGaussianFilter", "Discrete Gaussian", "",
+                 Tool::DATATODATA_E|Tool::FILTER_E, 
+                 "http://seg3d.org/")
 public:
   DiscreteGaussianFilter(const std::string& toolid);
   virtual ~DiscreteGaussianFilter();
@@ -53,23 +54,17 @@ public:
 // -- state --
   public:
     // Layerid of the target layer
-    StateOptionHandle               target_layer_;
+    StateOptionHandle               target_layer_state_;
 
     // Variance
-    StateRangedIntHandle            variance_;
+    StateRangedIntHandle            variance_state_;
 
-    StateRangedIntHandle            maximum_kernel_width_;
+    StateRangedIntHandle            maximum_kernel_width_state_;
   
-    StateBoolHandle                 replace_;
-
+    StateBoolHandle                 replace_state_;
 
 
 };
-
-  
-
-
-
 
 } // end namespace
 

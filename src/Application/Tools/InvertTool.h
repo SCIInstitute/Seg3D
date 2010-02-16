@@ -34,7 +34,7 @@
 namespace Seg3D {
 
 class InvertTool : public Tool {
-  SCI_TOOL_TYPE("InvertTool","Invert","",Tool::TOOL_E, QUrl::fromEncoded("http://seg3d.org/"))
+  SCI_TOOL_TYPE("InvertTool","Invert","",Tool::TOOL_E, "http://seg3d.org/")
 // -- constructor/destructor --
   public:
     InvertTool(const std::string& toolid);
@@ -56,10 +56,10 @@ class InvertTool : public Tool {
 // -- state --
   public:
     // Layerid of the target layer
-    StateOptionHandle              target_layer_;
+    StateOptionHandle              target_layer_state_;
 
     // Replace data
-    StateBoolHandle                replace_;
+    StateBoolHandle                replace_state_;
 
 };
 

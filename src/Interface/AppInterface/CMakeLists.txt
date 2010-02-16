@@ -133,7 +133,10 @@ TARGET_LINK_LIBRARIES(Interface_AppInterface
                       Application_Action
                       Application_Interface
                       Application_ActionManager
+                      Application_State
+                      Application_StateManager
                       Application_Tool
+                      Application_ToolManager
                       Application_Tools
                       Interface_QtInterface
                       Interface_AppController

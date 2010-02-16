@@ -36,7 +36,7 @@
 namespace Seg3D {
 
 class ActionGet : public Action {
-  SCI_ACTION_TYPE("Get","Get <key>",APPLICATION_E|QUERY_E)
+  SCI_ACTION_TYPE("Get","Get <state>",APPLICATION_E|QUERY_E)
   
 // -- Constructor/Destructor --
   public:
@@ -56,9 +56,21 @@ class ActionGet : public Action {
     // This one describes where the state is located
     ActionParameter<std::string> stateid_;
 
+// -- Action optimization --
+  private:
+    // This is an internal optimization to avoid the lookup in the state
+    // database
+    StateBaseWeakHandle state_weak_handle_;
+
 // -- Dispatch this action from the interface --
   public:
   
+    // CREATE:
+    // Create the action but do not dispatch it yet
+    static ActionHandle Create(StateBaseHandle& state);  
+  
+    // DISPATCH:
+    // Dispatch the action from the interface  
     static void Dispatch(StateBaseHandle& state);
 };
 

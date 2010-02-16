@@ -89,6 +89,6 @@ void ActionRotateView3D::Dispatch( StateView3DHandle& view3d_state, const Utils:
   action->angle_.value() = angle;
   action->view3d_state_ = StateView3DWeakHandle(view3d_state);
 
-  PostActionFromInterface(ActionHandle(action));
+  Interface::PostAction(ActionHandle(action));
 }
 }

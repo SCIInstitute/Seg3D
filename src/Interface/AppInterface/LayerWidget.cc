@@ -52,7 +52,7 @@ namespace Seg3D {
     setParent(parent);
     
     // Add the handle of the underlying tool to the widget
-    set_layer(layer);
+    // set_layer(layer);
     
     // Generate a vertical layout for the tool widget
     QHBoxLayout* vbox = new QHBoxLayout;

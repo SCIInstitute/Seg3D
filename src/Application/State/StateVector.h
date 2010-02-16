@@ -55,12 +55,16 @@ class StateVector;
   
 // Predefine the StateVector instantiation that are used in Seg3D 
 
-//TODO add more if needed
+typedef StateVector<Utils::Point>               StatePointVector;
+typedef boost::shared_ptr<StatePointVector>     StatePointVectorHandle;
 
-typedef StateVector<Utils::Point>               StatePoints;
-typedef boost::shared_ptr<StatePoints>          StatePointsHandle;
+typedef StateVector<bool>                       StateBoolVector;
+typedef boost::shared_ptr<StateBoolVector>      StateBoolVectorHandle;
+
+typedef StateVector<double>                     StateDoubleVector;
+typedef boost::shared_ptr<StateDoubleVector>    StateDoubleVectorHandle;
   
-  
+
 template<class T>
 class StateVector : public StateBase {
   
@@ -87,7 +91,7 @@ class StateVector : public StateBase {
     // IMPORT_FROM_STRING:
     // Set the State from a string
     virtual bool import_from_string(const std::string& str,
-                                    bool from_interface = false)
+                                    ActionSource source = ACTION_SOURCE_NONE_E)
     {
       // Lock the state engine so no other thread will be accessing it
       StateEngine::lock_type lock(StateEngine::Instance()->get_mutex());
@@ -97,8 +101,8 @@ class StateVector : public StateBase {
       if (value != values_vector_)
       {
         values_vector_ = value;
-        value_changed_signal(values_vector_,from_interface);
-        state_changed_signal();
+        value_changed_signal_(values_vector_,source);
+        state_changed_signal_();
       }
       return (true);      
     }
@@ -124,8 +128,8 @@ class StateVector : public StateBase {
       if (value != values_vector_)
       {
         values_vector_ = value;
-        value_changed_signal(values_vector_,from_interface);
-        state_changed_signal();
+        value_changed_signal_(values_vector_,from_interface);
+        state_changed_signal_();
       }
       return (true);
     }
@@ -134,7 +138,8 @@ class StateVector : public StateBase {
     // Validate a variant parameter
     // This function returns false if the parameter is invalid or cannot be 
     // converted and in that case error will describe the error.
-    virtual bool validate_variant(ActionParameterVariant& variant, std::string& error)
+    virtual bool validate_variant(ActionParameterVariant& variant, 
+                                  std::string& error)
     {
       if (!(variant.validate_type<T>()))
       {
@@ -145,16 +150,44 @@ class StateVector : public StateBase {
       return (true);
     }
 
+// -- access value --
+  public:
+    // GET:
+    // Get the value of the state variable
+    const std::vector<T>& get() const  
+    { 
+      return values_vector_; 
+    }
+
+    // SET:
+    // Set the value of the state variable
+    // NOTE: this function by passes the action mechanism and should only be used
+    // to enforce a constraint from another action.
+    bool set(const std::vector<T>& value, 
+             ActionSource source = ACTION_SOURCE_NONE_E)
+    {
+      // Lock the state engine so no other thread will be accessing it
+      StateEngine::lock_type lock(StateEngine::Instance()->get_mutex());
+      
+      if (value != values_vector_)
+      {
+        values_vector_ = value;
+        value_changed_signal_(values_vector_,source);
+        state_changed_signal_();
+      }
+      return (true);    
+    }  
+
+
 // -- signals describing the state --
   public:
     // VALUE_CHANGED_SIGNAL:
-    // Signal when the data in the state is changed, the second bool indicates
-    // whether the signal was triggered from the interface, in which case it may
-    // not need to update the interface.
+    // Signal when the data in the state is changed.
     
-    typedef boost::signals2::signal<void (T, bool)> value_changed_signal_type;
+    typedef boost::signals2::signal<void (ActionSource)> 
+                                                      value_changed_signal_type;
     value_changed_signal_type value_changed_signal;
-    
+
 // -- internals of StateValue --
   private:
     // Storage for the actual vector

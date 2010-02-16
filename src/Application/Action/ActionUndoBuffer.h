@@ -54,15 +54,20 @@ namespace Seg3D {
 // Singleton undo/redo buffer that encapsulates the general undo/redo buffer
 // of the program.
 
+// Forward declaration
 class ActionUndoBuffer;  
 
+// Class definition
 class ActionUndoBuffer : public boost::noncopyable {
 
 // -- Constructor --
 
-  public:
+  private:
+    friend class Utils::Singleton<ActionUndoBuffer>;
     ActionUndoBuffer();
 
+  public:
+    virtual ~ActionUndoBuffer();
 
 // -- Add undo/redo action --
   public:

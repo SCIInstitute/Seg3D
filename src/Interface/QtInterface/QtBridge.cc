@@ -35,13 +35,16 @@ namespace Seg3D {
 
 // -- Checkbox connector --
 
-void QtCheckBoxSignal(QPointer<QCheckBox> qpointer, bool state, bool from_interface)
+void 
+QtCheckBoxSignal(QPointer<QCheckBox> qpointer, bool state, 
+                 ActionSource source)
 {
-  if(!from_interface)
+  if(source != ACTION_SOURCE_INTERFACE_E)
   {
     if (!(Interface::Instance()->IsInterfaceThread()))
     {
-      PostInterface(boost::bind(&QtCheckBoxSignal,qpointer,state, false));
+      Interface::PostEvent(boost::bind( &QtCheckBoxSignal, qpointer, state,
+         ACTION_SOURCE_NONE_E));
       return;
     }
     
@@ -55,13 +58,17 @@ void QtCheckBoxSignal(QPointer<QCheckBox> qpointer, bool state, bool from_interf
   }
 }
 
-void QtComboBoxSignal(QPointer<QComboBox> qpointer, std::string state, bool from_interface)
+
+void 
+QtComboBoxSignal(QPointer<QComboBox> qpointer, std::string state,
+                 ActionSource source)
 {
-  if(!from_interface)
+  if(source != ACTION_SOURCE_INTERFACE_E)
   {
     if (!(Interface::Instance()->IsInterfaceThread()))
     {
-      PostInterface(boost::bind(&QtComboBoxSignal,qpointer,state,false));
+      Interface::PostEvent(boost::bind( &QtComboBoxSignal, qpointer, state,
+         ACTION_SOURCE_NONE_E));
       return;
     }
     if (qpointer.data()) 
@@ -82,13 +89,17 @@ void QtComboBoxSignal(QPointer<QComboBox> qpointer, std::string state, bool from
   }
 }
 
-void QtSliderSpinComboRangedIntSignal(QPointer<SliderSpinComboInt> qpointer, int state, bool from_interface)
+
+void 
+QtSliderSpinComboRangedIntSignal(QPointer<SliderSpinComboInt> qpointer, 
+                                 int state, ActionSource source)
 {
-  if(!from_interface)
+  if(source != ACTION_SOURCE_INTERFACE_E)
   { 
      if (!(Interface::Instance()->IsInterfaceThread()))
     {
-      PostInterface(boost::bind(&QtSliderSpinComboRangedIntSignal,qpointer,state,false));
+      Interface::PostEvent(boost::bind(&QtSliderSpinComboRangedIntSignal,
+                    qpointer, state, ACTION_SOURCE_NONE_E));
       return;
     }
 
@@ -101,13 +112,16 @@ void QtSliderSpinComboRangedIntSignal(QPointer<SliderSpinComboInt> qpointer, int
   }
 }
 
-void QtSliderSpinComboRangedDoubleSignal(QPointer<SliderSpinComboDouble> qpointer, double state, bool from_interface)
+void
+QtSliderSpinComboRangedDoubleSignal(QPointer<SliderSpinComboDouble> qpointer, 
+                                    double state, ActionSource source)
 {
-  if(!from_interface)
+  if(source != ACTION_SOURCE_INTERFACE_E)
   { 
      if (!(Interface::Instance()->IsInterfaceThread()))
     {
-      PostInterface(boost::bind(&QtSliderSpinComboRangedDoubleSignal,qpointer,state,false));
+      Interface::PostEvent(boost::bind(&QtSliderSpinComboRangedDoubleSignal,
+                    qpointer, state, ACTION_SOURCE_NONE_E));
       return;
     }
 
@@ -119,10 +133,11 @@ void QtSliderSpinComboRangedDoubleSignal(QPointer<SliderSpinComboDouble> qpointe
     }
   }
 }
+
 
 bool
 QtBridge::connect(QCheckBox* qcheckbox, 
-                     StateBoolHandle& state_handle)
+                  StateBoolHandle& state_handle)
 {
   // Connect the dispatch into the StateVariable (with auxillary object)
   // Link tbe slot to the parent widget, so Qt's memory manager will
@@ -130,10 +145,12 @@ QtBridge::connect(QCheckBox* qcheckbox,
   new QtCheckBoxSlot(qcheckbox,state_handle);
     
   // Connect the state signal back into the Qt Variable  
-  state_handle->value_changed_signal.connect(boost::bind(&QtCheckBoxSignal,qcheckbox,_1,_2));
+  state_handle->value_changed_signal_.connect(
+    boost::bind( &QtCheckBoxSignal, qcheckbox, _1, _2 ));
   
   return (true);
 }
+
 
 bool
 QtBridge::connect(QComboBox* qcombobox,
@@ -145,10 +162,12 @@ QtBridge::connect(QComboBox* qcombobox,
   new QtComboBoxSlot(qcombobox,state_handle);
 
   // Connect the state signal back to the Qt Variable
-  state_handle->value_changed_signal.connect(boost::bind(&QtComboBoxSignal,qcombobox,_1,_2));
+  state_handle->value_changed_signal_.connect(
+    boost::bind( &QtComboBoxSignal, qcombobox, _1, _2 ));
 
   return (true);
 }
+
 
 bool
 QtBridge::connect(SliderSpinComboInt* sscombo,
@@ -157,10 +176,12 @@ QtBridge::connect(SliderSpinComboInt* sscombo,
   new QtSliderSpinComboRangedIntSlot(sscombo,state_handle);
 
   // Connect the state signal back to the Qt Variable
-  state_handle->value_changed_signal.connect(boost::bind(&QtSliderSpinComboRangedIntSignal,sscombo,_1,_2));
+  state_handle->value_changed_signal_.connect(
+    boost::bind( &QtSliderSpinComboRangedIntSignal, sscombo, _1, _2 ));
 
   return (true);
 }
+
 
 bool
 QtBridge::connect(SliderSpinComboDouble* sscombo,
@@ -169,10 +190,12 @@ QtBridge::connect(SliderSpinComboDouble* sscombo,
   new QtSliderSpinComboRangedDoubleSlot(sscombo,state_handle);
 
   // Connect the state signal back to the Qt Variable
-  state_handle->value_changed_signal.connect(boost::bind(&QtSliderSpinComboRangedDoubleSignal,sscombo,_1,_2));
+  state_handle->value_changed_signal_.connect(
+    boost::bind( &QtSliderSpinComboRangedDoubleSignal, sscombo, _1, _2 ));
 
   return (true);
 }
+
   
 bool
 QtBridge::connect(QToolButton* qtoolbutton, 
@@ -185,6 +208,7 @@ QtBridge::connect(QToolButton* qtoolbutton,
   return (true);
 }
 
+
 bool
 QtBridge::connect(QPushButton* qpushbutton, 
                   boost::function<void ()> function)
@@ -196,17 +220,30 @@ QtBridge::connect(QPushButton* qpushbutton,
   return (true);
 }
 
-// -- Tool menu connector --
 
+// Menu connectors
 bool
 QtBridge::connect(QAction* qaction, 
                   boost::function<void ()> function)
 {
   // Link tbe slot to the parent widget, so Qt's memory manager will
   // manage this one.
-  new QtActionSlot(qaction,function);
+  new QtActionSlot( qaction, function );
 
   return (true);
 }
+
+
+bool
+QtBridge::connect(QAction* qaction, 
+                  StateBoolHandle& state_handle)
+{
+  // Link tbe slot to the parent widget, so Qt's memory manager will
+  // manage this one.
+  new QtActionToggleSlot( qaction, state_handle );
+
+  return (true);
+}
+
 
 } // end namespace Seg3D

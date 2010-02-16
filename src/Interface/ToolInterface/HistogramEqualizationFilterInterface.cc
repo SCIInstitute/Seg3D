@@ -77,11 +77,11 @@ public:
     HistogramEqualizationFilter* tool = dynamic_cast<HistogramEqualizationFilter*>(base_tool_.get());
    
     //Step 3 - connect the gui to the tool through the QtBridge
-    QtBridge::connect(private_->ui_.targetComboBox, tool->target_layer_);
-    QtBridge::connect(upperThresholdAdjuster, tool->upper_threshold_);
-    QtBridge::connect(lowerThresholdAdjuster, tool->lower_threshold_);
-    QtBridge::connect(alphaAdjuster, tool->alpha_);
-    QtBridge::connect(private_->ui_.replaceCheckBox,tool->replace_);
+    QtBridge::connect(private_->ui_.targetComboBox, tool->target_layer_state_);
+    QtBridge::connect(upperThresholdAdjuster, tool->upper_threshold_state_);
+    QtBridge::connect(lowerThresholdAdjuster, tool->lower_threshold_state_);
+    QtBridge::connect(alphaAdjuster, tool->alpha_state_);
+    QtBridge::connect(private_->ui_.replaceCheckBox,tool->replace_state_);
     
       //Send a message to the log that we have finised with building the Histogram Equalization Filter Interface
     SCI_LOG_DEBUG("Finished building a Histogram Equalization Filter Interface");

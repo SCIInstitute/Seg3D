@@ -72,7 +72,7 @@ void RenderBuffer::unbind()
 void RenderBuffer::_safe_bind()
 {
   glGetIntegerv(GL_RENDERBUFFER_BINDING_EXT, &saved_id_);
-  if (id_ != saved_id_)
+  if (static_cast<int>(id_) != saved_id_)
   {
     glBindRenderbufferEXT(TARGET_, id_);
   }
@@ -80,7 +80,7 @@ void RenderBuffer::_safe_bind()
 
 void RenderBuffer::_safe_unbind()
 {
-  if (id_ != saved_id_)
+  if (static_cast<int>(id_) != saved_id_)
   {
     glBindRenderbufferEXT(TARGET_, saved_id_);
   }

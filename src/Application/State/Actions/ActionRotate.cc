@@ -36,17 +36,30 @@ bool
 ActionRotate::validate(ActionContextHandle &context)
 {
   // Check whether the state exists
-  StateView3DHandle state = state_.value().lock();
+  StateBaseHandle state(state_weak_handle_.lock());
 
   // If the state no longer exists report an error
-  if (!state) 
+  if (! state.get()) 
   {
-    context->report_error(
-      std::string("State variable '")+stateid_.value()+"' doesn't exist");
-    return (false);
+    if (!(StateEngine::Instance()->get_state(stateid_.value(),state))) 
+    {
+      context->report_error(
+        std::string("State variable '")+stateid_.value()+"' doesn't exist");
+      return false;
+    }
+    
+    // store the handle for future use
+    state_weak_handle_ = state;
   }
   
-  return (true);
+  if (! state->is_rotatable())
+  {
+    context->report_error(
+      std::string("State variable '")+stateid_.value()+"' cannot be rotated");
+    return false;
+  }
+  
+  return true;
 }
 
 bool

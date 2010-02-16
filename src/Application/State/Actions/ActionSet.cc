@@ -40,14 +40,20 @@ bool
 ActionSet::validate(ActionContextHandle& context)
 {
   // Check whether the state exists
-  StateBaseHandle state;
+  
+  // NOTE: We use lock() to avoid constructor from throwing an exception
+  StateBaseHandle state(state_weak_handle_.lock());
   
   // If not the state cannot be retrieved report an error
-  if (!(StateEngine::Instance()->get_state(stateid_.value(),state))) 
+  if (! state.get())
   {
-    context->report_error(
-      std::string("Unknown state variable '")+stateid_.value()+"'");
-    return (false);
+    if (!(StateEngine::Instance()->get_state(stateid_.value(),state))) 
+    {
+      context->report_error(
+        std::string("Unknown state variable '")+stateid_.value()+"'");
+      return false;
+    }
+    state_weak_handle_ = state;
   }
   
   // The Variant parameter can contain both the value send from the State in
@@ -56,29 +62,29 @@ ActionSet::validate(ActionContextHandle& context)
   // the type we want.
 
   std::string error;
-  if (!(state->validate_variant(statevalue_,error)))
+  if (!(state->validate_variant(state_value_,error)))
   {
     context->report_error(error);
-    return (false);
+    return false;
   }
   
-  return (true);
+  return true;
 }
 
 bool 
 ActionSet::run(ActionContextHandle& context, ActionResultHandle& result)
 {
   // Get the state
-  StateBaseHandle state;
+  StateBaseHandle state(state_weak_handle_.lock());
   
-  if( StateEngine::Instance()->get_state(stateid_.value(),state) )
+  if (state.get())
   {
     // Set the value
-    state->import_from_variant(statevalue_,context->from_interface());
-    return (true);
+    state->import_from_variant(state_value_,context->source());
+    return true;
   }
   
-  return (false);
+  return false;
 }
 
 } // end namespace Seg3D

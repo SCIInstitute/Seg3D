@@ -31,6 +31,7 @@
 
 // STL includes
 #include <map>
+#include <set>
 
 // boost includes
 #include <boost/unordered_map.hpp>
@@ -47,13 +48,20 @@
 
 namespace Seg3D {
 
+// CLASS STATEENGINE
+
+// Forward decclaration
 class StateEngine;
 
+// Class definition
 class StateEngine : public boost::noncopyable {
 
 // -- Constructor/destructor --
-  public:
+  private:
+    friend class Utils::Singleton<StateEngine>;
     StateEngine();
+    
+  public:
     virtual ~StateEngine();
     
 // -- Interface for accessing state variables --
@@ -62,18 +70,37 @@ class StateEngine : public boost::noncopyable {
     // ADD_STATE:
     // Add the base of a state variable to the central state Engine in
     // StateEngine. 
-    bool add_state(const std::string& stateid, StateBaseHandle& state);
+    bool add_state( const std::string& stateid, StateBaseHandle& state );
   
     // GET_STATE:
     // Get pointer to the state variable based on the unique state tag
-    bool get_state(const std::string& stateid, StateBaseHandle& state);
+    bool get_state( const std::string& stateid, StateBaseHandle& state );
     
     // REMOVE_STATE:
     // Remove all the state variables that derive from the tag and the tag 
     // itself. So remove ToolManager::PaintTool will remove as well derived
     // values like ToolManager::PaintTool::Brushsize.
-    void remove_state(const std::string& stateid);
+    void remove_state( const std::string& stateid );
     
+// -- Interface for accounting stateids --    
+  public:
+    // ADD_STATEID:
+    // Add a new id to the list
+    void add_stateid( const std::string& stateid );
+
+    // REMOVE_STATEID:
+    // Remove an id from the list
+    void remove_stateid( const std::string& stateid );
+
+    // IS_STATEID:
+    // Check whether an id exists
+    bool is_stateid( const std::string& stateid );
+    
+    // CREATE_STATEID:
+    // Create a new id based on idname but with an unique extension padded to
+    // the end
+    bool create_stateid( const std::string& basename, std::string& new_stateid );
+
 // -- state engine locking interface --
   public:
     // Mutex protecting the StateEngine
@@ -83,30 +110,34 @@ class StateEngine : public boost::noncopyable {
     // GET_MUTEX:
     // Get the mutex that controls whether changes can be made to the
     // state engine.
-    inline mutex_type& get_mutex() { return state_engine_lock_; }
+    inline mutex_type& get_mutex() { return mutex_; }
     
     // LOCK:
     // Lock the mutex that controls whether changes can be made to the
     // state engine
-    inline void lock() { state_engine_lock_.lock(); }
+    inline void lock() { mutex_.lock(); }
 
     // UNLOCK:
     // Lock the mutex that controls whether changes can be made to the
     // state engine
-    inline void unlock() { state_engine_lock_.unlock(); }
+    inline void unlock() { mutex_.unlock(); }
     
   private:
     // Lock that controls whether changes can be made to the state engine
-    mutex_type state_engine_lock_;
+    mutex_type mutex_;
 
 // -- state database --
   private:
+    typedef std::set<std::string>                             stateid_list_type;
     typedef boost::unordered_map<std::string,StateBaseHandle> state_map_type;
 
     // Map containing pointers to the State variables in the class under control
     // by the StateEngine
     state_map_type state_map_;
     
+    // The list of IDs that are in use
+    stateid_list_type stateid_list_;
+        
 // -- Singleton interface --
   public:
     static StateEngine* Instance() { return instance_.instance(); }
@@ -124,6 +155,10 @@ class StateEngine : public boost::noncopyable {
     // UNLOCK
     // Allow changes to be made in the state of the program
     static void Unlock() { Instance()->unlock(); }
+    
+    // GETMUTEX
+    // Get the mutex of the state engine
+    static mutex_type& GetMutex() { return Instance()->get_mutex(); }
 };
 
 } // end namespace Seg3D

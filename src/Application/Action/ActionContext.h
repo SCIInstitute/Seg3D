@@ -41,9 +41,61 @@
 #include <boost/utility.hpp>
 
 // Application includes
+#include <Application/Resource/ResourceLock.h>
 #include <Application/Action/ActionResult.h>
 
 namespace Seg3D {
+
+// ENUM ActionStatus
+// This enum lists the possible outcomes of preforming an action
+
+enum ActionStatus {
+  // ACTION_SUCCESS - Everything went fine and the action was executed
+  ACTION_SUCCESS_E = 0,
+  
+  // ACTION_ERROR - The action did not execute properly and failed
+  ACTION_ERROR_E   = 1,
+  
+  // ACTION_INVALID - The action did not get validated
+  ACTION_INVALID_E = 2,
+  
+  // ACTION_UNAVAILABLE - The action could not be executed, because
+  // resources are not available 
+  ACTION_UNAVAILABLE_E = 3
+};
+
+// ENUM ActionSource
+// This enum lists the possible sources of where an action can be triggered
+// from. Depending on the source the action may change. For instance, an
+// action run from the provenance buffer requires a different path for recording
+// provenance.
+
+enum ActionSource {
+  // ACTION_SOURCE_NONE - It did not result from an action.
+  ACTION_SOURCE_NONE_E = 0, 
+
+  // ACTION_SOURCE_INTERFACE - The action is run from the interface, 
+  // the interface may not need an update, if the GUI already did the update.
+  ACTION_SOURCE_INTERFACE_E = 1,
+  
+  // ACTION_SOURCE_SCRIPT -The action is run from a script, which means that
+  // the interface needs to be updated and as well that actions need to be
+  // queued. Hence for this source the required resource lock needs to be 
+  // returned, so the script can wait for the action to be completed.
+  ACTION_SOURCE_SCRIPT_E = 2,
+
+  // ACTION_SOURCE_COMMANDLINE - This action is run from the command line, it 
+  // needs to update the interface, but does not allow queueing
+  ACTION_SOURCE_COMMANDLINE_E = 3,
+  
+  // ACTION_SOURCE_PROVENANCE - The action is run from the provenance buffer
+  // Hence it should not be recorded again into the provenance buffer
+  ACTION_SOURCE_PROVENANCE_E = 4,
+  
+  // ACTION_SOURCE_UNDOBUFFER - The action is run from the undobuffer
+  ACTION_SOURCE_UNDOBUFFER_E = 5
+};
+
 
 class ActionContext;
 typedef boost::shared_ptr<ActionContext> ActionContextHandle;
@@ -71,25 +123,38 @@ class ActionContext : public boost::noncopyable {
     virtual ~ActionContext();
 
 // -- Reporting functions --
-
+  public:
     virtual void report_error(const std::string& error);
     virtual void report_warning(const std::string& warning);
     virtual void report_message(const std::string& message);
-    virtual void report_usage(const std::string& usage);
 
+// -- Report back status and results --
+  public:
+    virtual void report_status(ActionStatus status);
     virtual void report_result(const ActionResultHandle& result);
-    virtual void report_done(bool success);
+    virtual void report_need_resource(ResourceLockHandle& resource);
 
-// -- Source information --
+// -- Report that action was done --
+  public:
+    virtual void report_done();
 
-    // The action is run from a script: the interface needs to be updated.
-    virtual bool from_script() const;
+// -- Source/Status information --
+  public:
+    virtual ActionStatus status();
+    virtual ActionSource source();
     
-    // The action is run from the interface: the interface does not need an
-    // update.
-    virtual bool from_interface() const;
-
-    virtual bool from_undobuffer() const;
+// -- shortcuts for checking status --
+  public:
+    bool is_success()     { return status_ == ACTION_SUCCESS_E; }
+    bool is_invalid()     { return status_ == ACTION_INVALID_E; }
+    bool is_unavailable() { return status_ == ACTION_UNAVAILABLE_E; }
+    bool is_error()       { return status_ == ACTION_ERROR_E; }
+    
+// -- Status information --    
+  protected:
+  
+    // The last status report from the action engine
+    ActionStatus status_;
 };
 
 } // end namespace Seg3D

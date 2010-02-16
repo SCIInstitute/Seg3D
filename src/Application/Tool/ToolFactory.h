@@ -54,7 +54,7 @@ namespace Seg3D {
 
 // ---- Auxilary Classes -----
 
-// TOOLBUILDER:
+// TOOLBUILDERBASE:
 // This class is the base functor for the class that builds the classes in
 // the factory
 
@@ -62,11 +62,12 @@ class ToolBuilderBase {
   public:
     // ensure we can delete the builder correctly
     virtual ~ToolBuilderBase() {}
+    
     // the functor call to build the object
     virtual ToolHandle build(const std::string& toolid) = 0;
 };
 
-// TOOLBUILDERT:
+// TOOLBUILDER:
 // The actual instantiation that builds the tool of type TOOL. This class
 // is loaded on top of the base functor and creates the action
 
@@ -75,13 +76,17 @@ class ToolBuilder: public ToolBuilderBase {
 
   public:
     // ensure we can delete the builder correctly 
-    virtual ~ToolBuilder<TOOL>() {}
+    virtual ~ToolBuilder() {}
+    
     // The actual builder call
-    virtual ToolHandle build(const std::string& toolid) { return ToolHandle(new TOOL(toolid)); }
+    virtual ToolHandle build(const std::string& toolid) 
+    { 
+      return ToolHandle(new TOOL(toolid)); 
+    }
 };
 
 
-// TOOLINTERFACEBUILDER:
+// TOOLINTERFACEBUILDERBASE:
 // This class is the base functor for the class that builds the classes in
 // the factory
 // NOTE: This class does not use a handle to make it easier to incorporate this
@@ -91,12 +96,13 @@ class ToolInterfaceBuilderBase {
   public:
     // ensure we can delete the builder correctly
     virtual ~ToolInterfaceBuilderBase() {}
+    
     // the functor call to build the object
     virtual ToolInterface* build() = 0;
 };
 
-// TOOLINTERFACEBUILDERT:
-// The actual instantiation that builds the tool of type TOOLINTERFACE. This 
+// TOOLINTERFACEBUILDER:
+// The actual instantiation that builds the tool of type ToolInterface. This 
 // class is loaded on top of the base functor and creates the action
 
 template <class TOOLINTERFACE>
@@ -104,10 +110,13 @@ class ToolInterfaceBuilder: public ToolInterfaceBuilderBase {
 
   public:
     // ensure we can delete the builder correctly 
-    virtual ~ToolInterfaceBuilder<TOOLINTERFACE>() {}
+    virtual ~ToolInterfaceBuilder() {}
+    
     // The actual builder call
     virtual ToolInterface* build() 
-      { return new TOOLINTERFACE; }
+    { 
+      return new TOOLINTERFACE; 
+    }
 };
 
 
@@ -163,15 +172,21 @@ class ToolInfo {
 // TOOLFACTORY:
 // The factory object that instantiates the tools
 
+// Forward declaration
+class ToolFactory;
+
+// Class definition
 class ToolFactory : public boost::noncopyable  {
 
 // -- Constructor --
-
-  public:
+  private:
+    friend class Utils::Singleton<ToolFactory>;
     ToolFactory();
-
+    
+  public:
+    virtual ~ToolFactory();
+  
 // -- Tool registration --
-
   public:
     // REGISTER_TOOL:
     // Register a tool so that it can be automatically build in the tool
@@ -181,7 +196,7 @@ class ToolFactory : public boost::noncopyable  {
     void register_tool()
     {
       // Lock the factory
-      boost::unique_lock<boost::mutex> lock(tools_mutex_);
+      lock_type lock( mutex_ );
 
       // Get the type of the tool
       std::string tool_type = Utils::string_to_lower(TOOL::tool_type());
@@ -207,18 +222,17 @@ class ToolFactory : public boost::noncopyable  {
     }
 
   private:
-    
-    // Mutex protecting the singleton interface  
-    typedef boost::unordered_map<std::string,ToolInfo*>  tool_map_type;
-    
+    typedef boost::unordered_map<std::string,ToolInfo*> tool_map_type;
+    typedef boost::mutex                                mutex_type;
+    typedef boost::unique_lock<mutex_type>              lock_type;
+        
     // List with builders that can be called to generate a new object
     tool_map_type    tools_;
     
     // Mutex for protecting registration
-    boost::mutex     tools_mutex_;
+    mutex_type       mutex_;
     
 // -- ToolInterface registration --
-
   public:
     // REGISTER_TOOLINTERFACE:
     // Register a tool so that it can be automatically build in the tool
@@ -235,8 +249,9 @@ class ToolFactory : public boost::noncopyable  {
       
       // Strip out the word interface
       toolinterface_name = toolinterface_name.substr(0,toolinterface_name.size()-9);
+
       // Lock the factory
-      boost::unique_lock<boost::mutex> lock(toolinterfaces_mutex_);
+      lock_type lock(mutex_);
 
       // Test is tool was registered before.
       if (toolinterfaces_.find(toolinterface_name) != toolinterfaces_.end())
@@ -245,7 +260,8 @@ class ToolFactory : public boost::noncopyable  {
         // Hence the program will throw an exception.
         // As registration is done on startup, this will cause a
         // faulty program to fail always on startup.
-        SCI_THROW_LOGICERROR(std::string("ToolInterface '")+toolinterface_name+"' is registered twice");
+        SCI_THROW_LOGICERROR(std::string("ToolInterface '")+
+                                    toolinterface_name+"' is registered twice");
       }
 
       // Register the action
@@ -257,9 +273,6 @@ class ToolFactory : public boost::noncopyable  {
     typedef boost::unordered_map<std::string,ToolInterfaceBuilderBase*> toolinterface_map_type;
     // List with builders that can be called to generate a new object
     toolinterface_map_type  toolinterfaces_;
-
-    // Mutex for protecting registration
-    boost::mutex     toolinterfaces_mutex_;
     
 // -- Instantiate tools and toolinterfaces --
   public:
@@ -288,7 +301,8 @@ class ToolFactory : public boost::noncopyable  {
 
     // LIST_TOOL_TYPES:
     // List the tools of a certain group
-    bool list_tool_types(tool_list_type& tool_list, int tool_property); // << THREAD-SAFE
+    bool list_tool_types(tool_list_type& tool_list, 
+                         int tool_property); // << THREAD-SAFE
 
     // LIST_TOOL_TYPES_WITH_INTERFACE:
     // List the tools of a certain group
@@ -297,7 +311,6 @@ class ToolFactory : public boost::noncopyable  {
     
 // -- Singleton interface --
   public:
-    
     static ToolFactory* Instance() { return instance_.instance(); }
 
   private:

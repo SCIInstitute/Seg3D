@@ -60,21 +60,23 @@ AppControllerContext::report_message(const std::string& message)
 }
 
 void
-AppControllerContext::report_usage(const std::string& usage)
+AppControllerContext::report_need_resource(const ResourceLockHandle& resource)
 {
-  AppController::PostActionUsage(controller_,usage);
+  std::string message = std::string("Resource '")+resource->name()+
+      std::string("' is currently unavailable");
+  AppController::PostActionMessage(controller_,message);
 }
 
 void
-AppControllerContext::report_done(bool success)
+AppControllerContext::report_done()
 {
-  if (success) AppController::PostActionMessage(controller_,"");
+  if (is_success()) AppController::PostActionMessage(controller_,"");
 }
 
-bool
-AppControllerContext::from_script() const
+ActionSource
+AppControllerContext::source() const
 {
-  return (true);
+  return ACTION_SOURCE_COMMANDLINE_E;
 }
 
 } //end namespace Seg3D

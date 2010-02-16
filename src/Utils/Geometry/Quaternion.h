@@ -82,6 +82,11 @@ public:
 
   inline Quaternion& operator=(const Quaternion& rhs);
 
+  inline double w() const { return w_; }
+  inline double x() const { return x_; }
+  inline double y() const { return y_; }
+  inline double z() const { return z_; }
+
 private:
 
   friend Quaternion Slerp(const Quaternion&, const Quaternion&, double, bool);

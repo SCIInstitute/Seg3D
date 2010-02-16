@@ -37,6 +37,9 @@ ActionUndoBuffer::ActionUndoBuffer() :
 {
 }
 
+ActionUndoBuffer::~ActionUndoBuffer()
+{
+}
 
 void
 ActionUndoBuffer::add_undo_action(std::string& tag,
@@ -201,9 +204,14 @@ ActionUndoBuffer::run_action(ActionHandle action,
   // posted to the observers recording what the program does
 
   SCI_LOG_DEBUG("Validating Undo/Redo Action");  
-  if(!(action->validate(action_context))) 
+  if (!(action->validate(action_context)))
   {
-    action_context->report_done(false);
+    // The action  context should return unavailable or invalid
+    if (action_context->status() != ACTION_UNAVAILABLE_E)
+    {
+      action_context->report_status(ACTION_INVALID_E);
+    }
+    action_context->report_done();
     return;
   }
 
@@ -217,7 +225,11 @@ ActionUndoBuffer::run_action(ActionHandle action,
   SCI_LOG_DEBUG("Running Undo/Redo Action");    
 
   ActionResultHandle result;
-  action_context->report_done(action->run(action_context,result));
+  if(!(action->run(action_context, result)))
+  {
+    action_context->report_status(ACTION_ERROR_E);
+    action_context->report_done();
+  }
   
   return;
 }

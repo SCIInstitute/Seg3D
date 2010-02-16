@@ -45,43 +45,58 @@
 #include <Application/Action/ActionContext.h>
 #include <Application/Action/ActionDispatcher.h>
 
+// Interface includes
+#include <Application/Interface/InterfaceActionContext.h>
+
 namespace Seg3D {
  
 // CLASS INTERFACE: 
 // Interface is the abstraction of the interface layer
 // It manages the events and thread of the user interface.
 
+// Forward declaration
 class Interface; 
  
+// Class defintion
 class Interface : public Utils::EventHandler {
 
 // -- Constructor/Destructor --
-  public:
+  private:
+    friend class Utils::Singleton<Interface>;
     Interface();
+    
+  public:
+    virtual ~Interface();
 
-// -- ActionContext --
+// -- Action context interface --
+  public:
+    // INTERFACE_ACTION_CONTEXT:
+    // Get the current interface action context
+    InterfaceActionContextHandle interface_action_context();
 
-    // CREATE_ACTION_CONTEXT:
-    // Create a new action context
-    ActionContextHandle create_action_context();
+  private:
+    // Handle to the interface context that the interface should be using
+    InterfaceActionContextHandle context_;
 
 // -- Interface thread --    
+  public:  
     
     // ISINTERFACETHREAD:
     // Test whether the current thread is the interface thread
-
     static bool IsInterfaceThread()
       { return (Instance()->is_eventhandler_thread()); }
 
     // POSTEVENT:
     // Short cut to the event handler
-    static void PostEvent(boost::function<void ()> function)
-      { Instance()->post_event(function); }
+    static void PostEvent(boost::function<void ()> function);
 
     // POSTANDWAITEVENT:
     // Short cut to the event handler
-    static void PostAndWaitEvent(boost::function<void ()> function)
-      { Instance()->post_and_wait_event(function); }
+    static void PostAndWaitEvent(boost::function<void ()> function);
+
+    // POSTACTION:
+    // Function that runs an action with the interface context
+    static void PostAction(ActionHandle action);
 
 // -- Singleton interface --
   public:
@@ -94,20 +109,6 @@ class Interface : public Utils::EventHandler {
     static Utils::Singleton<Interface> instance_;
     
 };
-
-// POSTINTERFACE:
-// Post a functor to the interface thread
-
-template<class FUNCTION>
-void PostInterface(FUNCTION function)
-{
-  Interface::Instance()->post_event(function);
-}
-
-// RUNACTIONFROMINTERFACE:
-// Function that runs an action with the interface context
-
-void PostActionFromInterface(ActionHandle action );
 
 } // end namespace Seg3D
 

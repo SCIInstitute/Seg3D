@@ -26,34 +26,12 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-/*
- *****************************************************************************
- *
- *   LayerManager.h
- *
- *   LayerManager provides the interface to access the various layers of data 
- *   that are managed in the system.
- *
- *   To perform an action to update a layer or layers, for instance add a layer,
- *   delete a layer, copy a layer, modify a layer, first use the dispatcher
- *   to create and dispatch an action.  This action will be given to the 
- *   handler to actually perform the appropriate action.
- *
- *   Also see: Layer
- *
- *   Authors:
- *      Kristen Zygmunt   -- initial attempt      10/26/2009
- *
- *    
- *****************************************************************************
- */
-
 #ifndef APPLICATION_LAYER_LAYERMANAGER_H
-#define APPLICATION_LAYER_LAYERMANAGER_H 1
+#define APPLICATION_LAYER_LAYERMANAGER_H
 
-//#ifdef (_MSC_VER) && (_MSC_VER >= 1020)
-//# pragma once
-//#endif
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+#pragma once
+#endif
 
 // STL includes
 #include <string>
@@ -81,12 +59,16 @@ namespace Seg3D {
 // class definitions
 
 class LayerManager : public StateHandler {
-public:
-  LayerManager();
-  ~LayerManager();
-  
 
-  // -- Signals for the User Interface --
+// -- constructor/destructor --    
+  private:
+    friend class Singleton<LayerManager>;
+    LayerManager();
+    
+  public:  
+    virtual ~LayerManager();
+  
+// -- Signals for the User Interface --
   typedef boost::signals2::signal<void (LayerHandle)> layer_changed_signal_type;
   
 
@@ -145,11 +127,10 @@ protected:
     
     // INSTANCE:
     // Get the singleton interface  
-    
     static LayerManager* Instance() { return instance_.instance(); }
 
-private:
-  static Utils::Singleton<LayerManager> instance_;
+  private:
+    static Utils::Singleton<LayerManager> instance_;
 
   typedef boost::unordered_map<std::string, LayerHandle> layer_map_type; 
   layer_map_type layers_;

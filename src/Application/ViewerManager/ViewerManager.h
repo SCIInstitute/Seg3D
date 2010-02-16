@@ -54,38 +54,28 @@
 namespace Seg3D {
 
 // Forward declarations
+class ViewerManager;
 
 // typedefs
-
 class ViewerManager : public StateHandler {
 
 // -- Constructor/Destructor --
-  public:
+  private:
+    friend class Utils::Singleton<ViewerManager>;
     ViewerManager();
+  
+  public:
     virtual ~ViewerManager();
   
 // -- Getting information from manager -- 
   
   public:
     ViewerHandle get_viewer(size_t idx);
-  
-// -- Signals --
-  public:
-
-    // VIEWER_LAYOUT_CHANGED_SIGNAL:
-    // This signal is triggered after a view has been modified
-    typedef boost::signals2::signal<void ()> viewer_layout_changed_signal_type;
-    viewer_layout_changed_signal_type viewer_layout_changed_signal;
-
-    // ACTIVE_VIEWER_CHANGED_SIGNAL:
-    // This signal is triggered after a different viewer is set to active
-    typedef boost::signals2::signal<void (int)> active_viewer_changed_signal_type;
-    active_viewer_changed_signal_type active_viewer_changed_signal;
 
 // -- State information --
   public:    
-    StateOptionHandle   layout_state;
-    StateIntHandle      active_viewer_state;
+    StateOptionHandle   layout_state_;
+    StateIntHandle      active_viewer_state_;
 
 // -- Viewer information --
   private:

@@ -39,6 +39,10 @@ ActionFactory::ActionFactory()
 {
 }
 
+ActionFactory::~ActionFactory()
+{
+}
+
 bool
 ActionFactory::create_action(const std::string& action_string,
                              ActionHandle& action,
@@ -104,6 +108,24 @@ ActionFactory::action_list(action_list_type& action_list)
   
   // indicate success
   return (true);
+}
+
+bool 
+ActionFactory::CreateAction(const std::string& actionstring,
+                             ActionHandle& action,
+                             std::string& error)
+{
+  std::string dummy;
+  return ActionFactory::Instance()->create_action(actionstring,action,error,dummy);
+}
+
+bool 
+ActionFactory::CreateAction(const std::string& actionstring,
+                             ActionHandle& action,
+                             std::string& error,
+                             std::string& usage)
+{
+  return ActionFactory::Instance()->create_action(actionstring,action,error,usage);
 }
 
 

@@ -26,39 +26,14 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_TOOL_ACTIONS_ACTIONACTIVATETOOL_H
-#define APPLICATION_TOOL_ACTIONS_ACTIONACTIVATETOOL_H
+#include <Utils/Geometry/Color.h>
 
-#include <Application/Action/Actions.h>
-#include <Application/Interface/Interface.h>
+namespace Utils {
 
-namespace Seg3D {
+Color 
+operator*(double alpha, Color color)
+{
+  return (color*alpha);
+}
 
-class ActionActivateTool : public Action {
-  SCI_ACTION_TYPE("ActivateTool","ActivateTool toolid",APPLICATION_E|UNDOABLE_E)
-
-// -- Constructor/Destructor --
-  public:
-    ActionActivateTool()
-    {
-      add_argument(toolid_);
-    }
-    
-    virtual ~ActionActivateTool() {}
-
-// -- Functions that describe action --
-    virtual bool validate(ActionContextHandle& context);
-    virtual bool run(ActionContextHandle& context,
-                     ActionResultHandle& result);
-
-// -- Dispatch this action from the interface --
-    static void Dispatch(const std::string& toolid);
-        
-// -- Action parameters --
-  private:
-    ActionParameter<std::string> toolid_;
-};
-
-} // end namespace Seg3D
-
-#endif
+} // End namespace Utils

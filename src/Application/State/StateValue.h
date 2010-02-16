@@ -54,6 +54,9 @@ typedef boost::shared_ptr<StateDouble>          StateDoubleHandle;
 typedef StateValue<Utils::Point>                StatePoint;
 typedef boost::shared_ptr<StatePoint>           StatePointHandle;
 
+typedef StateValue<Utils::Color>                StateColor;
+typedef boost::shared_ptr<StateColor>           StateColorHandle;
+
 typedef StateValue<bool>                        StateBool;
 typedef boost::shared_ptr<StateBool>            StateBoolHandle;
 
@@ -92,21 +95,12 @@ class StateValue : public StateBase {
     // IMPORT_FROM_STRING:
     // Set the State from a string
     virtual bool import_from_string(const std::string& str,
-                                    bool from_interface = false)
+                                    ActionSource source = ACTION_SOURCE_NONE_E)
     {
-      // Lock the state engine so no other thread will be accessing it
-      StateEngine* engine = StateEngine::Instance();
-      StateEngine::lock_type lock(engine->get_mutex() );
-      
       T value;
       if (!(Utils::import_from_string(str,value))) return (false);
-      if (value != value_)
-      {
-        value_ = value;
-        value_changed_signal(value_,from_interface);
-        state_changed_signal();
-      }
-      return (true);      
+
+      return (set(value,source));
     }
 
   protected:    
@@ -120,27 +114,19 @@ class StateValue : public StateBase {
     // IMPORT_FROM_VARIANT:
     // Import the state data from a variant parameter.
     virtual bool import_from_variant(ActionParameterVariant& variant,
-                                     bool from_interface = false)
+                                     ActionSource source = ACTION_SOURCE_NONE_E)
     {
-      // Lock the state engine so no other thread will be accessing it
-      StateEngine::lock_type lock(StateEngine::Instance()->get_mutex());
-      
       T value;
       if (!( variant.get_value(value) )) return (false);
-      if (value != value_)
-      {
-        value_ = value;
-        value_changed_signal(value_,from_interface);
-        state_changed_signal();
-      }
-      return (true);
+      return (set(value,source));
     }
           
     // VALIDATE_VARIANT:
     // Validate a variant parameter
     // This function returns false if the parameter is invalid or cannot be 
     // converted and in that case error will describe the error.
-    virtual bool validate_variant(ActionParameterVariant& variant, std::string& error)
+    virtual bool validate_variant(ActionParameterVariant& variant, 
+                                  std::string& error)
     {
       if (!(variant.validate_type<T>()))
       {
@@ -153,19 +139,43 @@ class StateValue : public StateBase {
 
 // -- access value --
   public:
-   // GET:
-   // Get the value of the state variable
-   T get() { return value_; }
+    // GET:
+    // Get the value of the state variable
+    const T& get() const  
+    { 
+      return value_; 
+    }
+
+    // SET:
+    // Set the value of the state variable
+    // NOTE: this function by passes the action mechanism and should only be used
+    // to enforce a constraint from another action.
+    bool set(const T& value, ActionSource source = ACTION_SOURCE_NONE_E)
+    {
+      SCI_LOG_DEBUG(std::string("Set Value ")+ stateid() +
+                    std::string(" ") + Utils::to_string(value));
+    
+      // Lock the state engine so no other thread will be accessing it
+      StateEngine::lock_type lock(StateEngine::Instance()->get_mutex());
+      
+      if (value != value_)
+      {
+        value_ = value;
+        value_changed_signal_(value_,source);
+        state_changed_signal_();
+      }
+      return (true);    
+    }  
 
 // -- signals describing the state --
   public:
     // VALUE_CHANGED_SIGNAL:
-    // Signal when the data in the state is changed, the second bool indicates
-    // whether the signal was triggered from the interface, in which case it may
-    // not need to update the interface.
+    // Signal when the data in the state is changed, the second parameter
+    // indicates the source of the change
 
-    typedef boost::signals2::signal<void (T, bool)> value_changed_signal_type;
-    value_changed_signal_type value_changed_signal;
+    typedef boost::signals2::signal<void (T, ActionSource)> 
+                                                      value_changed_signal_type;
+    value_changed_signal_type value_changed_signal_;
     
 // -- internals of StateValue --
   private:

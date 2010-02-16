@@ -44,6 +44,7 @@
 #include <Utils/Converter/StringConverter.h>
 
 // Action includes
+#include <Application/Action/ActionContext.h>
 #include <Application/Action/ActionParameter.h>
 
 namespace Seg3D {
@@ -52,6 +53,7 @@ namespace Seg3D {
 
 class StateBase;
 typedef boost::shared_ptr<StateBase> StateBaseHandle;
+typedef boost::weak_ptr<StateBase>   StateBaseWeakHandle;
 
 class StateBase : public boost::noncopyable {
 
@@ -69,7 +71,7 @@ class StateBase : public boost::noncopyable {
     // IMPORT_FROM_STRING:
     // Set the State from a string
     virtual bool import_from_string(const std::string& str,
-                                    bool from_interface = false) = 0;
+                                ActionSource source = ACTION_SOURCE_NONE_E) = 0;
     
   protected:
     friend class ActionSet;
@@ -82,13 +84,14 @@ class StateBase : public boost::noncopyable {
     // IMPORT_FROM_VARIANT:
     // Import the state data from a variant parameter.
     virtual bool import_from_variant(ActionParameterVariant& variant, 
-                                     bool from_interface = false) = 0;    
+                                ActionSource source = ACTION_SOURCE_NONE_E) = 0;    
 
     // VALIDATE_VARIANT:
     // Validate a variant parameter
     // This function returns false if the parameter is invalid or cannot be 
     // converted and in that case error will describe the error.
-    virtual bool validate_variant(ActionParameterVariant& variant, std::string& error) = 0;
+    virtual bool validate_variant(ActionParameterVariant& variant, 
+                                  std::string& error) = 0;
     
 // -- stateid handling --
   public:
@@ -100,16 +103,16 @@ class StateBase : public boost::noncopyable {
     // Set the unique id to be used to locate this state variable
     void set_stateid(const std::string& stateid) { stateid_ = stateid; }
 
+  protected:
+    std::string stateid_;
+
 // -- signal handling --
   public:
     // STATE_CHANGED_SIGNAL:
     // This signal is triggered when the state is changed
     typedef boost::signals2::signal<void ()> state_changed_signal_type;
-    state_changed_signal_type state_changed_signal;
+    state_changed_signal_type state_changed_signal_;
     
-  protected:
-    std::string stateid_;
-     
 };
 
 } // end namespace Seg3D

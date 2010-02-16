@@ -33,13 +33,12 @@ DEALINGS IN THE SOFTWARE.
 #include <QtGui>
 
 // Application includes
-#include <Application/Layer/LayerInterface.h>
 #include <Application/Layer/Layer.h>
-#include <Application/Layer/LayerManager.h>
+#include <Application/LayerManager/LayerManager.h>
 
 namespace Seg3D {
   
-  class LayerWidget : public QWidget, public LayerInterface {
+  class LayerWidget : public QWidget {
     Q_OBJECT
     
     // -- constructor/destructor --

@@ -32,6 +32,8 @@
 ##################################################
 
 SET(APPLICATION_INTERFACE_SRCS
+  InterfaceActionContext.h
+  InterfaceActionContext.cc
   Interface.h
   Interface.cc
   )

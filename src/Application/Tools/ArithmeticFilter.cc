@@ -40,17 +40,17 @@ namespace Seg3D {
   Tool(toolid)
   {
     // add default values for the the states
-    add_state("volume_a",volume_a_,"<none>","<none>");
-    add_state("volume_b",volume_b_,"<none>","<none>");
-    add_state("volume_c",volume_c_,"<none>","<none>");
-    add_state("example_expressions",example_expressions_,"<none>","<none>");
-    add_state("replace",replace_,false);
+    add_state("volume_a",volume_a_state_,"<none>","<none>");
+    add_state("volume_b",volume_b_state_,"<none>","<none>");
+    add_state("volume_c",volume_c_state_,"<none>","<none>");
+    add_state("example_expressions",example_expressions_state_,"<none>","<none>");
+    add_state("replace",replace_state_,false);
 
     // Add constaints, so that when the state changes the right ranges of 
     // parameters are selected
-    volume_a_->value_changed_signal.connect(boost::bind(&ArithmeticFilter::target_constraint,this,_1));
-    volume_b_->value_changed_signal.connect(boost::bind(&ArithmeticFilter::target_constraint,this,_1));
-    volume_c_->value_changed_signal.connect(boost::bind(&ArithmeticFilter::target_constraint,this,_1));
+    volume_a_state_->value_changed_signal_.connect(boost::bind(&ArithmeticFilter::target_constraint,this,_1));
+    volume_b_state_->value_changed_signal_.connect(boost::bind(&ArithmeticFilter::target_constraint,this,_1));
+    volume_c_state_->value_changed_signal_.connect(boost::bind(&ArithmeticFilter::target_constraint,this,_1));
 
 
   } // end constructor

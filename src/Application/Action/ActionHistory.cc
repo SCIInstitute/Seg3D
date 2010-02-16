@@ -35,8 +35,14 @@ ActionHistory::ActionHistory() :
 {
   // Connect this class to the ActionDispatcher
   dispatcher_connection_ = ActionDispatcher::Instance()->
-    post_action_signal.connect(boost::bind(&ActionHistory::record_action,this,_1,_2));
+    post_action_signal_.connect(boost::bind(&ActionHistory::record_action,this,_1,_2));
 }
+
+
+ActionHistory::~ActionHistory()
+{
+}
+
 
 void
 ActionHistory::set_max_history_size(size_t size)
@@ -48,9 +54,10 @@ ActionHistory::set_max_history_size(size_t size)
     // remove part of the history
     action_history_.erase(action_history_.begin()+size,action_history_.end());
     // signal that buffer has changed
-    history_changed_signal(); 
+    history_changed_signal_(); 
   }
 }
+
 
 size_t
 ActionHistory::max_history_size()
@@ -59,12 +66,14 @@ ActionHistory::max_history_size()
   return (action_history_max_size_ );
 }
 
+
 size_t
 ActionHistory::history_size()
 {
   boost::unique_lock<boost::mutex> lock(action_history_mutex_);
   return (action_history_.size() );
 }
+
 
 ActionHandle
 ActionHistory::action(size_t index)
@@ -108,8 +117,9 @@ ActionHistory::record_action(ActionHandle action, ActionResultHandle result)
   }
   
 //  SCI_LOG_DEBUG(std::string("Record action into history log: ")+action->type());
-  history_changed_signal();
+  history_changed_signal_();
 }
+
 
 // Singleton interface needs to be defined somewhere
 Utils::Singleton<ActionHistory> ActionHistory::instance_;

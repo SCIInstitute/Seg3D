@@ -34,7 +34,9 @@
 namespace Seg3D  {
   
 class ConfidenceConnectedFilter : public Tool {
-  SCI_TOOL_TYPE("ConfidenceConnectedFilter","Confidence Connected", "",Tool::DATATOMASK_E|Tool::FILTER_E, QUrl::fromEncoded("http://seg3d.org/"))
+  SCI_TOOL_TYPE( "ConfidenceConnectedFilter", "Confidence Connected", "",
+                 Tool::DATATOMASK_E|Tool::FILTER_E,
+                 "http://seg3d.org/")
   
 public:
   ConfidenceConnectedFilter(const std::string& toolid);
@@ -54,9 +56,9 @@ public:
 public:
   
   // Layerid of the target layer
-  StateOptionHandle               target_layer_;
-  StateRangedIntHandle            iterations_;
-  StateRangedIntHandle            threshold_multiplier_;
+  StateOptionHandle               target_layer_state_;
+  StateRangedIntHandle            iterations_state_;
+  StateRangedIntHandle            threshold_multiplier_state_;
   
   
   

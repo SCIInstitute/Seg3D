@@ -38,22 +38,10 @@ SET(APPLICATION_TOOL_SRCS
   ToolInterface.cc
   ToolFactory.h
   ToolFactory.cc
-  ToolManager.h
-  ToolManager.cc
-  )
-
-SET(APPLICATION_TOOL_ACTIONS_SRCS
-  Actions/ActionOpenTool.h
-  Actions/ActionOpenTool.cc
-  Actions/ActionCloseTool.h
-  Actions/ActionCloseTool.cc
-  Actions/ActionActivateTool.h
-  Actions/ActionActivateTool.cc
   )
 
 ADD_LIBRARY(Application_Tool STATIC 
-            ${APPLICATION_TOOL_SRCS}
-            ${APPLICATION_TOOL_ACTIONS_SRCS} )
+            ${APPLICATION_TOOL_SRCS} )
             
 TARGET_LINK_LIBRARIES(Application_Tool
                       Utils_Converter
@@ -63,8 +51,4 @@ TARGET_LINK_LIBRARIES(Application_Tool
                       Application_Action
                       Application_State
                       ${SCI_BOOST_LIBRARY})
-
-# Register actions
-ADD_LIBRARY_ACTIONS(Application_Tool
-                    ${APPLICATION_TOOL_ACTIONS_SRCS})
                     

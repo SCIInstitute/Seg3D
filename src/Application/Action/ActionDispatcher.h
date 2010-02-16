@@ -47,11 +47,22 @@
 
 namespace Seg3D {
 
+// CLASS ACTIONDISPATCHER
+// The main dispatcher of actions in the Seg3D framework
+
+// Forward declaration
+class ActionDispatcher;
+
+// Class defintion
 class ActionDispatcher : public boost::noncopyable {
 
 // -- Constructor
-  public:
+  private:
+    friend class Utils::Singleton<ActionDispatcher>;
     ActionDispatcher();
+    
+  public:
+    virtual ~ActionDispatcher();
 
 // -- Action handling --
   public:
@@ -62,7 +73,8 @@ class ActionDispatcher : public boost::noncopyable {
     // the action needs to posted.
     // The action context needs to be created before posting the action.
     
-    void post_action(ActionHandle action, ActionContextHandle action_context); // << THREAD-SAFE SLOT       
+    void post_action(ActionHandle action, 
+                    ActionContextHandle action_context); // << THREAD-SAFE SLOT       
 
     // POST_AND_WAIT_ACTION:
     // Post an action onto the application thread, the action is posted on the 
@@ -73,19 +85,20 @@ class ActionDispatcher : public boost::noncopyable {
     // This function also waits on the action to be fully completed and hence
     // needs to be called from a thread that is not needed for action processing
             
-    void post_and_wait_action(ActionHandle action, ActionContextHandle action_context); // << THREAD-SAFE SLOT  
+    void post_and_wait_action(ActionHandle action, 
+                    ActionContextHandle action_context); // << THREAD-SAFE SLOT  
 
     // POST_ACTIONS:
     // Post multiple actions in specified order
 
     void post_actions(std::vector<ActionHandle> actions, 
-                      ActionContextHandle action_context); // << THREAD-SAFE SLOT   
+                    ActionContextHandle action_context); // << THREAD-SAFE SLOT   
   
     // POST_AND_WAIT_ACTIONS:
     // Post multiple actions in specified order and wait for them to finish
 
     void post_and_wait_actions(std::vector<ActionHandle> actions, 
-                      ActionContextHandle action_context); // << THREAD-SAFE SLOT   
+                    ActionContextHandle action_context); // << THREAD-SAFE SLOT   
   
   private:
   
@@ -97,7 +110,8 @@ class ActionDispatcher : public boost::noncopyable {
     // RUN_ACTIONS:
     // Run multiple actions in specified order
 
-    void run_actions(std::vector<ActionHandle> actions, ActionContextHandle action_context);   
+    void run_actions(std::vector<ActionHandle> actions, 
+                     ActionContextHandle action_context);   
 
 // -- Action monitoring --
 
@@ -113,7 +127,7 @@ class ActionDispatcher : public boost::noncopyable {
     // Connect an observer that records all the actions in the program before
     // they are exectuted
     
-    pre_action_signal_type pre_action_signal;  
+    pre_action_signal_type pre_action_signal_;  
 
      // NOTE: One can observe action before or after they have been issued:
      // generally for provenance and tracking the program one wants to be 
@@ -126,7 +140,7 @@ class ActionDispatcher : public boost::noncopyable {
     // Connect an observer that records all the actions in the program after
     // they are exectuted.
 
-    post_action_signal_type post_action_signal;  
+    post_action_signal_type post_action_signal_;  
 
 // -- Singleton interface --
   public:
@@ -141,26 +155,15 @@ class ActionDispatcher : public boost::noncopyable {
 // FUNCTION PostAction:
 // This function is a short cut to posting an action using the dispatcher
  
-void PostAction(const ActionHandle& action, const ActionContextHandle& action_context);
+void PostAction(const ActionHandle& action, 
+                const ActionContextHandle& action_context);
 
 // FUNCTION PostAndWaitAction:
 // This function is a short cut to posting an action using the dispatcher and
 // waiting until the action has been completed
  
-void PostAndWaitAction(const ActionHandle& action, const ActionContextHandle& action_context);
-
-
-// FUNCTION PostAction:
-// This function is a short cut to posting a raw unparsed action
- 
-void PostAction(const std::string& actionstring, const ActionContextHandle& action_context);
-
-// FUNCTION PostAndWaitAction:
-// This function is a short cut to posting a raw unparsed action and waiting
-// until the action has been processed
- 
-void PostAndWaitAction(const std::string& actionstring, const ActionContextHandle& action_context);
-
+void PostAndWaitAction(const ActionHandle& action, 
+                       const ActionContextHandle& action_context);
 
 
 } // namespace Seg3D

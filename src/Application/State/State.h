@@ -41,7 +41,7 @@
 #include <Application/State/StateOption.h>
 #include <Application/State/StateView2D.h>
 #include <Application/State/StateView3D.h>
-#include <Application/State/StateVector.h>
+//#include <Application/State/StateVector.h>
 
 // The state handler
 #include <Application/State/StateHandler.h>

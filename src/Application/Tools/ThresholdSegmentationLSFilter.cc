@@ -40,20 +40,20 @@ namespace Seg3D {
   Tool(toolid)
   {
     // add default values for the the states
-    add_state("target_layer",target_layer_,"<none>","<none>");
-    add_state("mask_layer",mask_layer_,"<none>","<none>");
-    add_state("iterations",iterations_,1,100,1,2);
-    add_state("upper_threshold",upper_threshold_,1,100,1,2);
-    add_state("lower_threshold",lower_threshold_,1,100,1,2);
-    add_state("curvature",curvature_,1,100,1,2);
-    add_state("propagation",propagation_,1,100,1,2);
-    add_state("edge",edge_,1,100,1,2);
-    add_state("replace",replace_,false);
+    add_state("target_layer",target_layer_state_,"<none>","<none>");
+    add_state("mask_layer",mask_layer_state_,"<none>","<none>");
+    add_state("iterations",iterations_state_,1,100,1,2);
+    add_state("upper_threshold",upper_threshold_state_,1,100,1,2);
+    add_state("lower_threshold",lower_threshold_state_,1,100,1,2);
+    add_state("curvature",curvature_state_,1,100,1,2);
+    add_state("propagation",propagation_state_,1,100,1,2);
+    add_state("edge",edge_state_,1,100,1,2);
+    add_state("replace",replace_state_,false);
     
     // Add constaints, so that when the state changes the right ranges of 
     // parameters are selected
-    target_layer_->value_changed_signal.connect(boost::bind(&ThresholdSegmentationLSFilter::target_constraint,this,_1));
-    mask_layer_->value_changed_signal.connect(boost::bind(&ThresholdSegmentationLSFilter::target_constraint,this,_1));
+    target_layer_state_->value_changed_signal_.connect(boost::bind(&ThresholdSegmentationLSFilter::target_constraint,this,_1));
+    mask_layer_state_->value_changed_signal_.connect(boost::bind(&ThresholdSegmentationLSFilter::target_constraint,this,_1));
     
     
   }

@@ -26,41 +26,19 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_TOOL_ACTIONS_ACTIONOPENTOOL_H
-#define APPLICATION_TOOL_ACTIONS_ACTIONOPENTOOL_H
-
-#include <Application/Action/Actions.h>
-#include <Application/Interface/Interface.h>
+#include <Application/LayerManager/LayerManager.h>
 
 namespace Seg3D {
 
-class ActionOpenTool : public Action {
-  SCI_ACTION_TYPE("OpenTool","OpenTool tooltype",APPLICATION_E)
-  
-// -- Constructor/Destructor --
-  public:
-    ActionOpenTool()
-    {
-      add_argument(toolid_);
-    }
-    
-    virtual ~ActionOpenTool() {}
-
-// -- Functions that describe action --
-    virtual bool validate(ActionContextHandle& context);
-    virtual bool run(ActionContextHandle& context,
-                     ActionResultHandle& result);
-
-// -- Dispatch this action from the interface --
-    static void Dispatch(const std::string& toolid);
-        
-// -- Action parameters --
-  private:
-    // ToolID that is requested
-    ActionParameter<std::string> toolid_;
-
-};
-
+LayerManager::LayerManager()
+{
 }
 
-#endif
+LayerManager::~LayerManager()
+{
+}
+
+// Singleton needs to store somewhere
+Utils::Singleton<LayerManager> LayerManager::instance_;
+
+} // end namespace seg3D

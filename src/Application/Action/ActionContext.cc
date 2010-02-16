@@ -58,37 +58,40 @@ ActionContext::report_message(const std::string& message)
   SCI_LOG_MESSAGE(message);
 }
 
-void
-ActionContext::report_usage(const std::string& usage)
-{
-}
 
 void
 ActionContext::report_result(const ActionResultHandle& result)
 {
 }
 
+
 void
-ActionContext::report_done(bool success)
+ActionContext::report_status(ActionStatus status)
+{
+  status_ = status;
+}
+
+void 
+ActionContext::report_need_resource(ResourceLockHandle& resource)
 {
 }
 
-bool
-ActionContext::from_script() const
+ActionStatus
+ActionContext::status()
 {
-  return (false);
+  return (status_);
 }
 
-bool
-ActionContext::from_interface() const
+
+ActionSource
+ActionContext::source()
 {
-  return (false);
+  return (ACTION_SOURCE_COMMANDLINE_E);
 }
 
-bool
-ActionContext::from_undobuffer() const
+void
+ActionContext::report_done()
 {
-  return (false);
 }
 
 } // end namespace Seg3D

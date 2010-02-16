@@ -26,14 +26,18 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <Interface/AppInterface/LayerManagerWidget.h>
-#include <Utils/Core/Log.h>
-
+// STL includes
 #include <sstream>
 #include <iostream>
+
+// Boost includes
 #include <boost/lexical_cast.hpp>
 
+// Utils includes
+#include <Utils/Core/Log.h>
+
 #include <Interface/QtInterface/QtBridge.h>
+#include <Interface/AppInterface/LayerManagerWidget.h>
 
 // Gt Gui Includes
 #include "ui_LayerGroupWidget.h"
@@ -79,7 +83,7 @@ LayerManagerWidget::LayerManagerWidget( QWidget* parent ) :
   } // end initialize the icons
 
   // make a new LayerManagerWidgetPrivateHandle_type object
-  private_ = LayerManagerWidgetPrivateHandle_type ( new LayerManagerWidgetPrivate );
+  private_ = LayerManagerWidgetPrivateHandle( new LayerManagerWidgetPrivate );
   
   // set some values for the scrollarea widget
   setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );

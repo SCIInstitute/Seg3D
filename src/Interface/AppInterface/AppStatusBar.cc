@@ -29,8 +29,8 @@
 #include <QStatusBar>
 
 //  Application includes
-#include <Application/Tool/ToolManager.h>
 #include <Application/Tool/ToolFactory.h>
+#include <Application/ToolManager/ToolManager.h>
 
 // Interface includes
 #include <Interface/QtInterface/QtBridge.h>

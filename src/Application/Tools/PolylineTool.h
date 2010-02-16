@@ -34,7 +34,9 @@
 namespace Seg3D {
 
 class PolylineTool : public Tool {
-  SCI_TOOL_TYPE("PolylineTool","Polyline","",Tool::TOOL_E, QUrl::fromEncoded("http://seg3d.org/"))
+  SCI_TOOL_TYPE( "PolylineTool", "Polyline", "",
+                 Tool::TOOL_E, 
+                 "http://seg3d.org/" )
 // -- constructor/destructor --
   public:
     PolylineTool(const std::string& toolid);
@@ -58,7 +60,7 @@ class PolylineTool : public Tool {
 // -- state --
   public:
     // Layerid of the target layer
-    StateOptionHandle                  target_layer_;
+    StateOptionHandle                  target_layer_state_;
 
     // Polyline data
     // StateVector<Point>              polyline_;

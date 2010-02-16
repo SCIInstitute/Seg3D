@@ -34,7 +34,9 @@
 namespace Seg3D  {
   
 class AnisotropicDiffusionFilter : public Tool {
-  SCI_TOOL_TYPE("AnisotropicDiffusionFilter","Anisotropic Diffusion", "",Tool::DATATODATA_E|Tool::FILTER_E, QUrl::fromEncoded("http://seg3d.org/"))
+  SCI_TOOL_TYPE( "AnisotropicDiffusionFilter", "Anisotropic Diffusion", "",
+                  Tool::DATATODATA_E|Tool::FILTER_E, 
+                  "http://seg3d.org/")
 
 public:
   AnisotropicDiffusionFilter(const std::string& toolid);
@@ -56,15 +58,15 @@ public:
   // -- state --
 public:
   // Layerid of the target layer
-  StateOptionHandle               target_layer_;
+  StateOptionHandle               target_layer_state_;
 
-  StateRangedIntHandle            iterations_;
+  StateRangedIntHandle            iterations_state_;
 
-  StateRangedIntHandle            steps_;
+  StateRangedIntHandle            steps_state_;
 
-  StateRangedDoubleHandle         conductance_;
+  StateRangedDoubleHandle         conductance_state_;
 
-  StateBoolHandle                 replace_;
+  StateBoolHandle                 replace_state_;
 
 };
   

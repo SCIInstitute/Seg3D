@@ -35,7 +35,9 @@
 namespace Seg3D  {
   
 class HistogramEqualizationFilter : public Tool {
-  SCI_TOOL_TYPE("HistogramEqualizationFilter","Histogram Equalization", "",Tool::DATATODATA_E|Tool::FILTER_E, QUrl::fromEncoded("http://seg3d.org/"))
+  SCI_TOOL_TYPE( "HistogramEqualizationFilter", "Histogram Equalization", "",
+                 Tool::DATATODATA_E|Tool::FILTER_E, 
+                 "http://seg3d.org/")
   
 public:
   HistogramEqualizationFilter(const std::string& toolid);
@@ -54,15 +56,15 @@ public:
   // -- state --
 public:
   // Layerid of the target layer
-  StateOptionHandle              target_layer_;
+  StateOptionHandle              target_layer_state_;
 
-  StateRangedIntHandle            upper_threshold_;
+  StateRangedIntHandle            upper_threshold_state_;
 
-  StateRangedIntHandle            lower_threshold_;
+  StateRangedIntHandle            lower_threshold_state_;
 
-  StateRangedIntHandle            alpha_;
+  StateRangedIntHandle            alpha_state_;
 
-  StateBoolHandle                 replace_;
+  StateBoolHandle                 replace_state_;
   
 };
 

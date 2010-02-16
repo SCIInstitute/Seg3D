@@ -26,47 +26,57 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-/*
- *****************************************************************************
- *
- *   Layer.cc
- *
- *   Authors:
- *      Kristen Zygmunt   -- initial attempt      11/19/2009
- *
- *    
- *****************************************************************************
- */
-
 // STL includes
 
 // Boost includes 
 
+#include <Application/Application/Application.h>
 #include <Application/Layer/Layer.h>
 
 
 namespace Seg3D {
 
-Layer::Layer(std::string& name, DataVolumeHandle& data) 
+Layer::Layer(std::string& name) :
+  StateHandler(name)
 {
+  // Step (1) : Build the viewer dependent state variables
+  size_t num_viewers = Application::Instance()->number_of_viewers();
+
+  opacity_state_.resize(num_viewers);
+  visibility_state_.resize(num_viewers);
+  border_state_.resize(num_viewers);
+  fill_state_.resize(num_viewers);
+
+  for (size_t j=0; j<num_viewers; j++)
+  {
+    std::string key;
+    
+    key = std::string("opacity")+Utils::to_string(j);
+    add_state(key,opacity_state_[j],1.0);
+
+    key = std::string("visibitily")+Utils::to_string(j);
+    add_state(key,visibility_state_[j],true);
+
+    key = std::string("border")+Utils::to_string(j);
+    add_state(key,border_state_[j],true);
+
+    key = std::string("fill")+Utils::to_string(j);
+    add_state(key,border_state_[j],true);
+  }
+
+  // Step (2) : Build the layer specific state variables
+  
+  add_state("name",name_state_,name);
+  add_state("lock",lock_state_,false);
+  add_state("color_index",color_index_state_,0);
+  add_state("contrast",contrast_state_,1.0);
+  add_state("brighness",brightness_state_,1.0);
+  
 }
   
 Layer::~Layer()
 {
-}
-
-bool
-Layer::is_locked() const
-{
-  // TODO: implement correctly
-  return false;
-}
-
-LayerHandle
-Layer::clone(std::string& clone_name) const
-{
-  LayerHandle handle;
-  return handle;
+  disconnect_all();
 }
 
 } // end namespace Seg3D

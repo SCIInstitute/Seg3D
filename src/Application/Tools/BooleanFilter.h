@@ -34,7 +34,9 @@
 namespace Seg3D  {
   
 class BooleanFilter : public Tool {
-  SCI_TOOL_TYPE("BooleanFilter","Boolean", "",Tool::MASKTOMASK_E|Tool::FILTER_E, QUrl::fromEncoded("http://seg3d.org/"))
+  SCI_TOOL_TYPE( "BooleanFilter", "Boolean", "",
+                 Tool::MASKTOMASK_E|Tool::FILTER_E,
+                 "http://seg3d.org/")
   
 public:
   BooleanFilter(const std::string& toolid);
@@ -53,21 +55,17 @@ public:
   // -- state --
 public:
   // Layerid of the target layer
-  StateOptionHandle               mask_a_;
+  StateOptionHandle               mask_a_state_;
   
-  StateOptionHandle               mask_b_;
+  StateOptionHandle               mask_b_state_;
   
-  StateOptionHandle               mask_c_;
+  StateOptionHandle               mask_c_state_;
   
-  StateOptionHandle               mask_d_;
+  StateOptionHandle               mask_d_state_;
   
-  StateOptionHandle               example_expressions_;
+  StateOptionHandle               example_expressions_state_;
   
-  StateBoolHandle                 replace_;
-  
-  
-  
-  
+  StateBoolHandle                 replace_state_;
   
 };
 

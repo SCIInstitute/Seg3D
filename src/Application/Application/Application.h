@@ -48,8 +48,35 @@ class Application;
 class Application : public Utils::EventHandler  {
 
 // -- Constructor/Destructor --
-  public:
+  private:
+    friend class Utils::Singleton<Application>;
     Application();
+
+  public:
+    virtual ~Application();
+
+// -- Application wide settings --
+  public:
+    
+    // NUMBER_OF_VIEWERS
+    // The number of viewers that is available in the application
+    // This is a preset number to simplify the dependency scheme
+    size_t number_of_viewers() { return 6; }
+    
+// -- Command line parser --
+  public:
+    // CHECKCOMMANDLINEPARAMETERS
+    // check to see if a particular parameter has been placed into the map
+    // if so it returns the value as a string
+    std::string checkCommandLineParameter( const std::string& key );
+  
+    // SETPARAMETER
+    // put parameters from the command line into a map
+    void setParameter( const std::string& key, const std::string& val );
+  
+    // PARSEPARAMETERS
+    // parse paremeters from the command line
+    void parse_command_line_parameters( int argc, char** argv);
 
 // -- Application thread --    
     
@@ -67,21 +94,6 @@ class Application : public Utils::EventHandler  {
     // Short cut to the event handler
     static void PostAndWaitEvent(boost::function<void ()> function)
       { Instance()->post_and_wait_event(function); }
-  
-    // CHECKCOMMANDLINEPARAMETERS
-    // check to see if a particular parameter has been placed into the map
-    // if so it returns the value as a string
-    std::string checkCommandLineParameter( const std::string &key );
-  
-    // SETPARAMETER
-    // put parameters from the command line into a map
-    void setParameter( const std::string &key, const std::string &val );
-  
-    // PARSEPARAMETERS
-    // parse paremeters from the command line
-    void parse_command_line_parameters( int argc, char **argv);
-
-
 
 // -- Singleton interface --
   public:

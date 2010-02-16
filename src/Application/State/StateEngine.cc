@@ -33,15 +33,15 @@ namespace Seg3D {
 StateEngine::StateEngine()
 {
 }
-
+  
 StateEngine::~StateEngine()
 {
-}
+}  
   
 bool
 StateEngine::add_state(const std::string& state_id, StateBaseHandle& state)
 {
-  lock_type lock(get_mutex());
+  lock_type lock(mutex_);
   
   state_map_type::iterator it = state_map_.find(state_id);
 
@@ -58,7 +58,7 @@ StateEngine::add_state(const std::string& state_id, StateBaseHandle& state)
 bool 
 StateEngine::get_state(const std::string& state_id, StateBaseHandle& state)
 {
-  lock_type lock(get_mutex());
+  lock_type lock(mutex_);
   
   state_map_type::const_iterator it = state_map_.find(state_id);
   if (it == state_map_.end())
@@ -75,7 +75,7 @@ StateEngine::get_state(const std::string& state_id, StateBaseHandle& state)
 void
 StateEngine::remove_state(const std::string& state_id)
 {
-  lock_type lock(get_mutex());
+  lock_type lock(mutex_);
   
   state_map_type::iterator it = state_map_.begin();
   state_map_type::iterator it_end = state_map_.end();
@@ -104,6 +104,68 @@ StateEngine::remove_state(const std::string& state_id)
     ++it;
   }
 }
+
+
+void
+StateEngine::add_stateid( const std::string& stateid )
+{
+  lock_type lock( mutex_ );
+  if ( stateid_list_.find( stateid ) != stateid_list_.end() )
+  {
+    SCI_THROW_LOGICERROR( std::string("Trying to add stateid '") + stateid +
+        std::string("' that already exists") );
+  }
+  stateid_list_.insert( stateid );
+}
+
+
+void
+StateEngine::remove_stateid( const std::string& stateid )
+{
+  lock_type lock( mutex_ );
+  stateid_list_.erase( stateid );
+}
+
+
+bool
+StateEngine::is_stateid( const std::string& stateid )
+{
+  lock_type lock( mutex_ );
+  return ( stateid_list_.find( stateid ) != stateid_list_.end() );
+}
+
+
+bool
+StateEngine::create_stateid( const std::string& baseid , 
+                             std::string& new_stateid )
+{
+  lock_type lock( mutex_ );
+  
+  std::string::size_type loc = baseid.find('_');
+  if (loc != std::string::npos) 
+  {
+    if ( stateid_list_.find( baseid ) != stateid_list_.end() )
+    {
+      new_stateid = "";
+      return false;
+    }
+    new_stateid = baseid;
+  }
+  else
+  {
+    int num = 0;
+
+    do 
+    {
+      new_stateid = baseid+std::string("_")+Utils::to_string(num);
+      num++;
+    } 
+    while( stateid_list_.find( new_stateid ) != stateid_list_.end() );
+  }
+
+  return true;
+}
+
 
 // Singleton interface needs to be defined somewhere
 Utils::Singleton<StateEngine> StateEngine::instance_;

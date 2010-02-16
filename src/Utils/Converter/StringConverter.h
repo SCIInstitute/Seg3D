@@ -39,16 +39,17 @@
 
 #include <Utils/Core/Exception.h>
 
-#include <Utils/Geometry/Point.h>
-#include <Utils/Geometry/Vector.h>
-#include <Utils/Geometry/Transform.h>
 #include <Utils/Geometry/BBox.h>
+#include <Utils/Geometry/Color.h>
 #include <Utils/Geometry/Plane.h>
+#include <Utils/Geometry/Point.h>
+#include <Utils/Geometry/Transform.h>
+#include <Utils/Geometry/Quaternion.h>
+#include <Utils/Geometry/Vector.h>
 #include <Utils/Geometry/View2D.h>
 #include <Utils/Geometry/View3D.h>
 
 namespace Utils {
-
 
 template<class T>
 std::string export_to_string(const T& value)
@@ -78,6 +79,15 @@ std::string export_to_string(const std::string& value);
 
 std::string export_to_string(const Point& value);
 std::string export_to_string(const Vector& value);
+std::string export_to_string(const Color& value);
+
+std::string export_to_string(const BBox& value);
+std::string export_to_string(const Transform& value);
+std::string export_to_string(const Plane& value);
+std::string export_to_string(const Quaternion& value);
+
+std::string export_to_string(const View2D& value);
+std::string export_to_string(const View3D& value);
 
 std::string export_to_string(const std::vector<char>& value);
 std::string export_to_string(const std::vector<unsigned char>& value);
@@ -96,13 +106,6 @@ std::string export_to_string(const std::vector<double>& value);
 
 std::string export_to_string(const std::vector<Point>& value);
 std::string export_to_string(const std::vector<Vector>& value);
-
-std::string export_to_string(const BBox& value);
-std::string export_to_string(const Transform& value);
-std::string export_to_string(const Plane& value);
-
-std::string export_to_string(const View2D& value);
-std::string export_to_string(const View3D& value);
 
 // import_from_string:
 // Function to convert a string back into the data it is representing
@@ -135,6 +138,8 @@ bool import_from_string(const std::string& str, std::string& value);
 
 bool import_from_string(const std::string& str, Point& value);
 bool import_from_string(const std::string& str, Vector& value);
+bool import_from_string(const std::string& str, Color& value);
+bool import_from_string(const std::string& str, Quaternion& value);
 
 bool import_from_string(const std::string& str, std::vector<char>& value);
 bool import_from_string(const std::string& str, std::vector<unsigned char>& value);

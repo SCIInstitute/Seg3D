@@ -34,6 +34,8 @@
 SET(UTILS_GEOMETRY_SRCS
   BBox.h
   BBox.cc
+  Color.h
+  Color.cc
   Plane.h
   Plane.cc
   Point.h

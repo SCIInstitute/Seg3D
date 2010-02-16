@@ -47,8 +47,20 @@
 namespace Utils {
 
 // CLASS LOG:
+// This class records a log entry and pushes it onto a signal so more than
+// one recorder can record the log entries.
 
+
+// Forward declaration
+class Log;
+
+// Class definition
 class Log : public boost::noncopyable {
+
+// -- constructor / destructor --
+  private:
+    friend class Singleton<Log>;
+    Log();
 
 // -- Message types supported --
   public:
@@ -93,7 +105,7 @@ class Log : public boost::noncopyable {
     // POST_LOG_SIGNAL
     // Signal indicating that the history changed
 
-    post_log_signal_type post_log_signal;
+    post_log_signal_type post_log_signal_;
 
 // -- Singleton interface --
   public:

@@ -49,8 +49,8 @@ class View2D {
     View2D& operator=(const View2D&);
 
     // compare 2 views; are they exactly the same?
-    bool operator==(const View2D&);
-    bool operator!=(const View2D&);
+    bool operator==(const View2D&) const;
+    bool operator!=(const View2D&) const;
 
     inline Point center() const                { return center_; }
     inline void center(const Point& center)    { center_ = center; }

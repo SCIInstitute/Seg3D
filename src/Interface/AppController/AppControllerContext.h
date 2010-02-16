@@ -48,19 +48,25 @@ typedef boost::shared_ptr<AppControllerContext> AppControllerContextHandle;
 
 class AppControllerContext : public ActionContext {
 
+// -- Constructor/destructor --
   public:
     AppControllerContext(AppController* controller);
     virtual ~AppControllerContext();
 
+// -- Reporting functions --
+  public:
     virtual void report_error(const std::string& error);
     virtual void report_warning(const std::string& warning);
     virtual void report_message(const std::string& message);
-    virtual void report_usage(const std::string& usage);
+    virtual void report_need_resource(const ResourceLockHandle& resource);
 
-    virtual void report_done(bool success);
+// -- Report that action was done --
+  public:
+    virtual void report_done();
     
-    // Run from the command line as if it is a script
-    virtual bool from_script() const;
+// -- Source/Status information --
+  public:
+    virtual ActionSource source() const;
 
   private:
     // To which controller does the action information need to be relayed

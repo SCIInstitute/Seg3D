@@ -70,7 +70,7 @@ class StateOption : public StateBase {
     // IMPORT_FROM_STRING:
     // Set the State from a string
     virtual bool import_from_string(const std::string& str,
-                                    bool from_interface = false);
+                                    ActionSource source = ACTION_SOURCE_NONE_E);
                                     
   protected:    
     // EXPORT_TO_VARIANT
@@ -80,7 +80,7 @@ class StateOption : public StateBase {
     // IMPORT_FROM_VARIANT:
     // Import the state data from a variant parameter.
     virtual bool import_from_variant(ActionParameterVariant& variant,
-                                     bool from_interface = false);
+                                    ActionSource source = ACTION_SOURCE_NONE_E);
           
     // VALIDATE_VARIANT:
     // Validate a variant parameter
@@ -92,17 +92,17 @@ class StateOption : public StateBase {
 // -- signals describing the state --
   public:
     // VALUE_CHANGED_SIGNAL:
-    // Signal when the data in the state is changed, the second bool indicates
-    // whether the signal was triggered from the interface, in which case it may
-    // not need to update the interface.
+    // Signal when the data in the state is changed, the second parameter
+    // indicates the source of the change
 
-    typedef boost::signals2::signal<void (std::string, bool)> value_changed_signal_type;
-    value_changed_signal_type value_changed_signal;
+    typedef boost::signals2::signal<void (std::string, ActionSource)> 
+                                                      value_changed_signal_type;
+    value_changed_signal_type value_changed_signal_;
 
     // OPTIONLIST_CHANGED_SIGNAL:
     // Signal when the option list is changed
     typedef boost::signals2::signal<void ()> optionlist_changed_signal_type;
-    optionlist_changed_signal_type optionlist_changed_signal;    
+    optionlist_changed_signal_type optionlist_changed_signal_;    
 
 // -- Functions specific to this type of state --
   public:
@@ -136,9 +136,16 @@ class StateOption : public StateBase {
 
 // -- access value --
   public:
-   // GET:
-   // Get the value of the state variable
-   std::string get() { return value_; }
+    // GET:
+    // Get the value of the state variable
+    const std::string& get() const { return value_; }
+
+    // SET:
+    // Set the value of the state variable
+    // NOTE: this function by passes the action mechanism and should only be used
+    // to enforce a constraint from another action.
+    bool set(const std::string& value, 
+             ActionSource source = ACTION_SOURCE_NONE_E);  
     
 // -- option list --
   protected:

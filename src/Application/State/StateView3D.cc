@@ -43,27 +43,35 @@ StateView3D::~StateView3D()
 {
 }  
 
+
 std::string 
 StateView3D::export_to_string() const
 {
   return (Utils::export_to_string(value_));
 }
 
+
 bool 
-StateView3D::import_from_string(const std::string& str,
-                                bool from_interface)
+StateView3D::import_from_string(const std::string& str, ActionSource source)
+{
+  Utils::View3D value;
+  if (!(Utils::import_from_string(str,value))) return (false);
+
+  return (set(value,source));
+}
+
+
+bool 
+StateView3D::set(const Utils::View3D& value, ActionSource source)
 {
   // Lock the state engine so no other thread will be accessing it
   StateEngine::lock_type lock(StateEngine::Instance()->get_mutex());
 
-  Utils::View3D value;
-  if (!(Utils::import_from_string(str,value))) return (false);
-
   if (value != value_)
   {
     value_ = value;
-    value_changed_signal(value_,from_interface);
-    state_changed_signal();
+    value_changed_signal_(value_,source);
+    state_changed_signal_();
   }
   return (true);
 }
@@ -89,24 +97,17 @@ StateView3D::export_to_variant(ActionParameterVariant& variant) const
   variant.set_value(value_);
 }
 
+
 bool 
 StateView3D::import_from_variant(ActionParameterVariant& variant,
-                                 bool from_interface)
+                                 ActionSource source)
 {
-  // Lock the state engine so no other thread will be accessing it
-  StateEngine::lock_type lock(StateEngine::Instance()->get_mutex());
-
   Utils::View3D value;
   if (!(variant.get_value(value))) return (false);
 
-  if (value != value_)
-  {
-    value_ = value;
-    value_changed_signal(value_,from_interface);
-    state_changed_signal();
-  }
-  return (true);
+  return (set(value,source));
 }
+
 
 bool 
 StateView3D::validate_variant(ActionParameterVariant& variant, 
@@ -123,5 +124,6 @@ StateView3D::validate_variant(ActionParameterVariant& variant,
   error = "";
   return (true);
 }
+
 
 } // end namespace Seg3D

@@ -26,75 +26,66 @@
  DEALINGS IN THE SOFTWARE.
 */
  
+// STL includes
 #include <sstream>
 #include <iostream>
 
+// Utils includes
 #include <Utils/Core/Log.h>
-#include <boost/lexical_cast.hpp>
 
 // Application includes
-#include <Application/Tool/ToolManager.h>
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Interface/Interface.h>
 
-#include <Application/Tool/Actions/ActionOpenTool.h>
-#include <Application/Tool/Actions/ActionCloseTool.h>
-#include <Application/Tool/Actions/ActionActivateTool.h>
+#include <Application/ToolManager/ToolManager.h>
+#include <Application/ToolManager/Actions/ActionOpenTool.h>
+#include <Application/ToolManager/Actions/ActionCloseTool.h>
+#include <Application/ToolManager/Actions/ActionActivateTool.h>
 
 // Interface includes
 #include <Interface/AppInterface/ToolsDockWidget.h>
 
 namespace Seg3D  {
 
-
 ToolsDockWidget::ToolsDockWidget(QWidget *parent) :
     QDockWidget(parent)
 {
+  // Update the title and where this window can be docked
   setAllowedAreas(Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea);
   setWindowTitle("Tools/Plugins");
 
+  // Create a new ToolBoxWidget that encapsulates all the tool widgets
   toolbox_ = new ToolBoxWidget(this);
   setWidget(toolbox_);
 
-
-  // Ensure that the application does not change any of the tools while
-  // the user interface is being built
-  ToolManager::Instance()->lock_tool_list();
+  // NOTE: Ensure no changes are made to list while the GUI is hooked up
+  // This needs to be done atomically, otherwise we may miss a message
+  // opening or closing a new tool as this is not run on the application
+  // thread. This ensures that no modifications are made and the application
+  // thread is waiting until this is done. 
+  ToolManager::lock_type lock(ToolManager::Instance()->get_mutex());
   
   // Forward the open tool:
   // This function binds a set of functions together: (1) it post a new function
   // message, it will check whether the pointer still exists to the current 
   // QObject and then execute the function on the interface thread.
 
-  QPointer<ToolsDockWidget> dock_widget(this);
+  qpointer_type dock_widget(this);
 
-  // Ensure no changes are made to list while the GUI is hooked up
-  // This needs to be done atomically, otherwise we may miss a message
-  // opening or closing a new tool
-  
-  ToolManager::Instance()->lock_tool_list();
+  add_connection( ToolManager::Instance()->open_tool_signal_.connect(
+        boost::bind(&ToolsDockWidget::HandleOpenTool,dock_widget,_1)));
 
-  open_tool_connection_ =
-    ToolManager::Instance()->open_tool_signal.connect(
-        boost::bind(&ToolsDockWidget::HandleOpenTool,dock_widget,_1));
+  add_connection( ToolManager::Instance()->close_tool_signal_.connect(
+        boost::bind(&ToolsDockWidget::HandleCloseTool,dock_widget,_1)));
 
-  close_tool_connection_ =
-    ToolManager::Instance()->close_tool_signal.connect(
-        boost::bind(&ToolsDockWidget::HandleCloseTool,dock_widget,_1));
+  add_connection( ToolManager::Instance()->activate_tool_signal_.connect(
+        boost::bind(&ToolsDockWidget::HandleActivateTool,dock_widget,_1)));
 
-  activate_tool_connection_ =
-    ToolManager::Instance()->activate_tool_signal.connect(
-        boost::bind(&ToolsDockWidget::HandleActivateTool,dock_widget,_1));
-
-  
   ToolManager::tool_list_type tool_list = ToolManager::Instance()->tool_list();
   std::string active_toolid = ToolManager::Instance()->active_toolid();
 
   ToolManager::tool_list_type::iterator it = tool_list.begin();
   ToolManager::tool_list_type::iterator it_end = tool_list.end();
-
-  ToolManager::Instance()->unlock_tool_list();
-
   while (it != it_end)
   {
     // Call open_tool for each tool in the list
@@ -109,39 +100,32 @@ ToolsDockWidget::ToolsDockWidget(QWidget *parent) :
   {
     activate_tool((*active_it).second);
   } 
-
-  // Connect the signal that the active tool was changed to dispatching
-  // an action in the application.
-  connect(toolbox_,SIGNAL(currentChanged(int)),this,SLOT(tool_changed(int)));
-  
-  // Now the tool list is up to date we can release the lock on the ToolManager
-  ToolManager::Instance()->unlock_tool_list();
 }
-  
+
+
 ToolsDockWidget::~ToolsDockWidget()
 {
-  open_tool_connection_.disconnect();
-  close_tool_connection_.disconnect();
-  activate_tool_connection_.disconnect();
+  disconnect_all();
 }
 
+
 void
-ToolsDockWidget::open_tool(ToolHandle tool)
+ToolsDockWidget::open_tool(ToolHandle& tool)
 {
-  // Step (1) : find the widget class in the ToolFactory
-  ToolInterface *interface;
+  // Step (1) : Find the widget class in the ToolFactory
+  ToolInterface *tool_interface;
   
-  ToolFactory::Instance()->create_toolinterface(tool->type(),interface);
-  ToolWidget *widget = dynamic_cast<ToolWidget*>(interface);
+  // NOTE: The reason that the tool interface is upcasted to the real type, is
+  // because the ToolFactory only stores pointers to the base classes
+  ToolFactory::Instance()->create_toolinterface(tool->type(),tool_interface);
+  ToolWidget *widget = dynamic_cast<ToolWidget*>(tool_interface);
   
   if (widget == 0)
   {
     SCI_THROW_LOGICERROR("A ToolInterface cannot be up casted to a ToolWidget pointer");
   }
   
-  //QUrl test = tool->url();
-  
-  // Step (2) : instantiate the widget
+  // Step (2) : Instantiate the widget and add the tool to the toolbox
   widget->create_widget(this,tool);
 
   toolbox_->add_tool(widget,QString::fromStdString(tool->menu_name()
@@ -150,61 +134,58 @@ ToolsDockWidget::open_tool(ToolHandle tool)
     boost::bind(&ActionActivateTool::Dispatch, tool->toolid()),
     tool->url());
 
+  // Step (3) : Add the tool to the list
   tool_widget_list_[tool->toolid()] = widget;
   
-  if (isHidden()) show(); 
+  // Step (4) : If the dock widget was hidden (somebody closed the window),
+  // reopen the window
+  
+  if (isHidden()) { show(); }
   raise();
 }
 
+
 void
-ToolsDockWidget::close_tool(ToolHandle tool)
+ToolsDockWidget::close_tool(ToolHandle& tool)
 {
-  // Find the widget
+  // Step (1): Find the widget in the list
   tool_widget_list_type::iterator it = tool_widget_list_.find(tool->toolid());
-  
   if (it == tool_widget_list_.end()) 
   {
-    SCI_LOG_ERROR(std::string("widget with toolid '")+tool->toolid()+"' does not exist");
+    SCI_LOG_ERROR(std::string("widget with toolid '")+
+                  tool->toolid()+"' does not exist");
     return;
-  } 
-  
+  }
   ToolWidget *widget = (*it).second;
   
-  // Remove this widget from the widget
+  // Step (2): Remove this widget from the widget
   toolbox_->remove_tool(toolbox_->index_of(widget));
   
-  // Remove the pointer from widget 
+  // Step (3): Remove the widget from the toollist
   tool_widget_list_.erase(tool->toolid());
   
-  // Schedule object to be destroyed by Qt
+  // Step (4): Schedule object to be destroyed by Qt
   //widget->deleteLater();
 }
 
+
 void
-ToolsDockWidget::activate_tool(ToolHandle tool)
+ToolsDockWidget::activate_tool(ToolHandle& tool)
 {
-  // Find the widget
+  // Step (1): Find the widget
   tool_widget_list_type::iterator it = tool_widget_list_.find(tool->toolid());
   if (it == tool_widget_list_.end()) 
   {
-    SCI_LOG_ERROR(std::string("widget with toolid '")+tool->toolid()+"' does not exist");
+    SCI_LOG_ERROR(std::string("widget with toolid '")+
+                  tool->toolid()+"' does not exist");
     return;
   } 
   ToolWidget *widget = (*it).second;
   
+  // Step (2): Set the active tool if it is not active already
   if (widget != toolbox_->get_active_tool())
   {
     toolbox_->set_active_tool(widget);  
-  }
-}
-
-void
-ToolsDockWidget::tool_changed(int index)
-{
-  if (index >= 0)
-  {
-    ToolWidget *widget = static_cast<ToolWidget*>(toolbox_->get_tool_at(index));
-    ActionActivateTool::Dispatch(widget->toolid());
   }
 }
 
@@ -221,6 +202,7 @@ ToolsDockWidget::HandleOpenTool(qpointer_type qpointer, ToolHandle tool)
   if (qpointer.data()) qpointer->open_tool(tool);
 }
 
+
 void
 ToolsDockWidget::HandleCloseTool(qpointer_type qpointer, ToolHandle tool)
 {
@@ -232,6 +214,7 @@ ToolsDockWidget::HandleCloseTool(qpointer_type qpointer, ToolHandle tool)
   
   if (qpointer.data()) qpointer->close_tool(tool);
 }
+
 
 void
 ToolsDockWidget::HandleActivateTool(qpointer_type qpointer, ToolHandle tool)

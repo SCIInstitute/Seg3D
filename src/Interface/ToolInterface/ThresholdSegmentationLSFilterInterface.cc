@@ -86,15 +86,15 @@ public:
     ThresholdSegmentationLSFilter* tool = dynamic_cast<ThresholdSegmentationLSFilter*>(base_tool_.get());
     
     //Step 3 - connect the gui to the tool through the QtBridge
-    QtBridge::connect(private_->ui_.targetComboBox, tool->target_layer_);
-    QtBridge::connect(private_->ui_.maskComboBox, tool->mask_layer_);
-    QtBridge::connect(iterationsAdjuster, tool->iterations_);
-    QtBridge::connect(upperThresholdAdjuster, tool->upper_threshold_);
-    QtBridge::connect(lowerThresholdAdjuster, tool->lower_threshold_);
-    QtBridge::connect(curvatureAdjuster, tool->curvature_);
-    QtBridge::connect(edgeAdjuster, tool->propagation_);
-    QtBridge::connect(propagationAdjuster, tool->edge_);
-    QtBridge::connect(private_->ui_.replaceCheckBox,tool->replace_);
+    QtBridge::connect(private_->ui_.targetComboBox, tool->target_layer_state_);
+    QtBridge::connect(private_->ui_.maskComboBox, tool->mask_layer_state_);
+    QtBridge::connect(iterationsAdjuster, tool->iterations_state_);
+    QtBridge::connect(upperThresholdAdjuster, tool->upper_threshold_state_);
+    QtBridge::connect(lowerThresholdAdjuster, tool->lower_threshold_state_);
+    QtBridge::connect(curvatureAdjuster, tool->curvature_state_);
+    QtBridge::connect(edgeAdjuster, tool->propagation_state_);
+    QtBridge::connect(propagationAdjuster, tool->edge_state_);
+    QtBridge::connect(private_->ui_.replaceCheckBox,tool->replace_state_);
     
     //Send a message to the log that we have finised with building the Segmentation Level Set Filter Interface   
     SCI_LOG_DEBUG("Finished building a Segmentation Level Set Filter Interface");

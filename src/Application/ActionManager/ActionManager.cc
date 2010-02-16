@@ -36,20 +36,14 @@
 
 namespace Seg3D {
 
-void
-ActionManager::dispatch_undo() const
+ActionManager::ActionManager()
 {
-  ActionHandle action = ActionHandle(new ActionUndo);
-  PostActionFromInterface(action);
 }
 
-
-void
-ActionManager::dispatch_redo() const
+ActionManager::~ActionManager()
 {
-  ActionHandle action = ActionHandle(new ActionRedo);
-  PostActionFromInterface(action);
 }
+
 
 // Singleton interface needs to be defined somewhere
 Utils::Singleton<ActionManager> ActionManager::instance_;

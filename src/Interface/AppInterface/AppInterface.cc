@@ -29,16 +29,17 @@
 // For the version numbers
 #include "Seg3DConfiguration.h"
 
+// Boost include
+#include <boost/lexical_cast.hpp>
+
 // Application includes
 #include <Application/Application/Application.h>
 #include <Application/Interface/Interface.h>
 
 // Interface includes
-#include <Interface/AppInterface/AppInterface.h>
 #include <Interface/QtInterface/QtApplication.h>
-
-// Boost include
-#include <boost/lexical_cast.hpp>
+#include <Interface/QtInterface/QtPointer.h>
+#include <Interface/AppInterface/AppInterface.h>
 
 namespace Seg3D {
 
@@ -87,29 +88,34 @@ AppInterface::AppInterface()
   application_menu_ = new AppMenu(this, viewer_interface_);
   status_bar_ = new AppStatusBar(this);
   
-  QPointer<AppInterface> app_interface(this);
+  qpointer_type app_interface(this);
   
-  InterfaceManager::Instance()->show_window_signal.connect(boost::bind(
-    AppInterface::HandleShowWindow,app_interface,_1));
+  InterfaceManager::Instance()->show_window_signal_.connect( boost::bind(
+    &AppInterface::HandleShowWindow, app_interface, _1));
 
-  InterfaceManager::Instance()->close_window_signal.connect(boost::bind(
-    AppInterface::HandleCloseWindow,app_interface,_1));
+  InterfaceManager::Instance()->close_window_signal_.connect( boost::bind(
+    &AppInterface::HandleCloseWindow, app_interface, _1));
   
-  InterfaceManager::Instance()->full_screen_window_signal.connect(boost::bind(
-    AppInterface::HandleFullScreenWindow, app_interface, _1));     
+  // Connect state and reflect the current state
   
-   
+  {
+    // NOTE: State Engine is locked so the application thread cannot make
+    // any changes to it
+    StateEngine::lock_type lock(StateEngine::GetMutex());
+  
+    // Connect and update full screen state
+    set_full_screen(InterfaceManager::Instance()->full_screen_state_->get());
+    InterfaceManager::Instance()->full_screen_state_->
+      value_changed_signal_.connect( boost::bind(
+        &AppInterface::SetFullScreen, app_interface, _1, _2 ));     
+  }
 }
 
 void
-AppInterface::full_screen_toggle()
+AppInterface::set_full_screen(bool full_screen)
 {
-  if (isFullScreen()) {
-    showNormal();
-  }
-  else {
-    showFullScreen();
-  }
+  if (full_screen) showFullScreen();
+  else showNormal();
 }
   
 AppInterface::~AppInterface()
@@ -287,9 +293,6 @@ AppInterface::close_window(const std::string& windowid)
 }
 
 
-  
-  
-
 void 
 AppInterface::addDockWidget(Qt::DockWidgetArea area, QDockWidget* dock_widget)
 {
@@ -316,11 +319,10 @@ AppInterface::HandleShowWindow(QPointer<AppInterface> app_interface,
   // Ensure that this request is forwarded to the interface thread
   if (!(Interface::IsInterfaceThread()))
   {
-    PostInterface(boost::bind(&AppInterface::HandleShowWindow,app_interface,windowid));
+    Interface::PostEvent( boost::bind( &AppInterface::HandleShowWindow,
+      app_interface, windowid));
     return;
   }
-
-  SCI_LOG_DEBUG(std::string("Show window ")+windowid);
 
   if (!(app_interface.isNull())) app_interface->show_window(windowid);
 }
@@ -332,7 +334,8 @@ AppInterface::HandleCloseWindow(QPointer<AppInterface> app_interface,
   // Ensure that this request is forwarded to the interface thread
   if (!(Interface::IsInterfaceThread()))
   {
-    PostInterface(boost::bind(&AppInterface::HandleCloseWindow,app_interface,windowid));
+    Interface::PostEvent( boost::bind( &AppInterface::HandleCloseWindow,
+      app_interface, windowid));
     return;
   }
   
@@ -340,17 +343,13 @@ AppInterface::HandleCloseWindow(QPointer<AppInterface> app_interface,
 }
   
 void 
-AppInterface::HandleFullScreenWindow(QPointer<AppInterface> app_interface, 
-                                std::string windowid)
+AppInterface::SetFullScreen(qpointer_type app_interface, 
+                            bool full_screen, 
+                            ActionSource action_source)
 {
-  // Ensure that this request is forwarded to the interface thread
-  if (!(Interface::IsInterfaceThread()))
-  {
-    PostInterface(boost::bind(&AppInterface::HandleFullScreenWindow,app_interface,windowid));
-    return;
-  }
-  
-  if (!(app_interface.isNull())) app_interface->full_screen_toggle();
+  Interface::PostEvent( CheckQtPointer( app_interface, 
+    boost::bind( &AppInterface::set_full_screen, 
+      app_interface.data(), full_screen )));
 }  
 
 } //end namespace

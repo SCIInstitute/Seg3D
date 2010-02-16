@@ -28,7 +28,7 @@
 
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/PolylineTool.h>
-// #include <Application/Layer/LayerManager.h>
+// #include <Application/LayerManager/LayerManager.h>
 
 namespace Seg3D {
 
@@ -39,7 +39,7 @@ PolylineTool::PolylineTool(const std::string& toolid) :
   Tool(toolid)
 {
   // Need to set ranges and default values for all parameters
-  add_state("target",target_layer_,"<none>","<none>");
+  add_state("target",target_layer_state_,"<none>","<none>");
   
   // No constraints are needed for this tool
   
