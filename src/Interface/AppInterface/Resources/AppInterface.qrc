@@ -45,12 +45,16 @@
         <file>Images/RightArrowWhite.png</file>
         <file>Images/SlicesVisible.png</file>
         <file>Images/SlicesVisibleOff.png</file>
+        <file>Images/Text.png</file>
+        <file>Images/TextOff.png</file>
         <file>Images/UpArrowWhite.png</file>
         <file>Images/Visible.png</file>
         <file>Images/VisibleOff.png</file>
         <file>Images/VolumeVisible.png</file>
         <file>Images/VolumeVisibleOff.png</file>
         <file>Images/Vview.png</file>
+        <file>Images/World.png</file>
+        <file>Images/WorldOff.png</file>
         <file>Images/Xview.png</file>
         <file>Images/Yview.png</file>
         <file>Images/Zview.png</file>
