@@ -36,6 +36,8 @@ SET(APPLICATION_STATE_SRCS
   State.h
   StateOption.cc
   StateOption.h
+  StateViewBase.h
+  StateViewBase.cc
   StateView2D.cc
   StateView2D.h
   StateView3D.cc
@@ -54,12 +56,14 @@ SET(APPLICATION_STATE_ACTIONS_SRCS
   Actions/ActionSet.cc
   Actions/ActionGet.h
   Actions/ActionGet.cc
-#  Actions/ActionRotate.h
-#  Actions/ActionRotate.cc
+  Actions/ActionResizeView.h
+  Actions/ActionResizeView.cc
   Actions/ActionRotateView3D.h
   Actions/ActionRotateView3D.cc
   Actions/ActionScaleView3D.h
   Actions/ActionScaleView3D.cc
+  Actions/ActionTranslateView3D.h
+  Actions/ActionTranslateView3D.cc
   )
 
 ADD_LIBRARY(Application_State STATIC 

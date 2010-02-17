@@ -41,8 +41,8 @@
 #include <Utils/Geometry/View2D.h>
 
 // Application includes
-#include <Application/State/StateBase.h>
 #include <Application/State/StateEngine.h>
+#include <Application/State/StateViewBase.h>
 
 namespace Seg3D {
 
@@ -54,7 +54,7 @@ class StateView3D;
 typedef boost::shared_ptr<StateView3D> StateView3DHandle;
 typedef boost::weak_ptr<StateView3D>   StateView3DWeakHandle;
 
-class StateView3D : public StateBase {
+class StateView3D : public StateViewBase {
 
 // -- constructor/destructor --
   public:
@@ -80,9 +80,11 @@ class StateView3D : public StateBase {
   // Rotate the stored View3D
   void rotate(const Utils::Vector& axis, double angle);
 
-  void scale(double ratio);
+  virtual void scale(double ratio);
 
-  void translate(const Utils::Vector& offset);
+  virtual void translate(const Utils::Vector& offset);
+
+  virtual void resize(int width, int height);
                                     
   protected:    
     // EXPORT_TO_VARIANT

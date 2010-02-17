@@ -26,64 +26,29 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_RENDERER_RENDERER_H
-#define APPLICATION_RENDERER_RENDERER_H
+#ifndef APPLICATION_STATE_STATEVIEWBASE_H
+#define APPLICATION_STATE_STATEVIEWBASE_H
 
-#if defined (_MSC_VER) && (_MSC_VER >= 1020)
-# pragma once
-#endif
+#include <boost/smart_ptr.hpp>
 
-// boost includes
-#include <boost/thread/mutex.hpp>
+#include <Application/State/StateBase.h>
 
-// Application includes
-#include <Application/Renderer/RenderContext.h>
-#include <Application/Viewer/ViewerRenderer.h>
-#include <Application/Renderer/Texture.h>
-#include <Application/Renderer/RenderBuffer.h>
-#include <Application/Renderer/FrameBufferObject.h>
-#include <Utils/EventHandler/EventHandler.h>
-
-namespace Seg3D {
-
-// Forward declarations
-class Renderer;
-typedef boost::shared_ptr<Renderer> RendererHandle;
-
-// Class definitions
-class Renderer : public ViewerRenderer, private Utils::EventHandler 
+namespace Seg3D
 {
 
-  // -- constructor/destructor --
+class StateViewBase;
+typedef boost::shared_ptr<StateViewBase> StateViewBaseHandle;
+typedef boost::weak_ptr<StateViewBase> StateViewBaseWeakHandle;
+
+class StateViewBase : public StateBase
+{
 public:
-  Renderer();
-  virtual ~Renderer();
+  StateViewBase() : StateBase() {}
+  virtual ~StateViewBase() {}
 
-public:
-
-  virtual void initialize();
-  virtual void redraw();
-
-  virtual void resize(int width, int height);
-
-private:
-
-  // Context for rendering images
-  RenderContextHandle context_;
-
-  TextureHandle textures_[2];
-  RenderBufferHandle depth_buffer_;
-  FrameBufferObjectHandle frame_buffer_;
-  int active_render_texture_;
-
-  int width_;
-  int height_;
-  bool redraw_needed_;
-
-  boost::mutex redraw_needed_mutex_;
-
-  static int red;
-  int red_;
+  virtual void scale(double ratio) = 0;
+  virtual void translate(const Utils::Vector& offset) = 0;
+  virtual void resize(int width, int height) = 0;
 };
 
 } // end namespace Seg3D

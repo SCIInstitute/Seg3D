@@ -26,66 +26,51 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_RENDERER_RENDERER_H
-#define APPLICATION_RENDERER_RENDERER_H
+#ifndef APPLICATION_STATE_ACTIONS_ACTIONRESIZEVIEW_H
+#define APPLICATION_STATE_ACTIONS_ACTIONRESIZEVIEW_H
 
-#if defined (_MSC_VER) && (_MSC_VER >= 1020)
-# pragma once
-#endif
+#include <Application/Action/Action.h>
+#include <Application/Interface/Interface.h>
+#include <Application/State/StateViewBase.h>
 
-// boost includes
-#include <boost/thread/mutex.hpp>
-
-// Application includes
-#include <Application/Renderer/RenderContext.h>
-#include <Application/Viewer/ViewerRenderer.h>
-#include <Application/Renderer/Texture.h>
-#include <Application/Renderer/RenderBuffer.h>
-#include <Application/Renderer/FrameBufferObject.h>
-#include <Utils/EventHandler/EventHandler.h>
-
-namespace Seg3D {
-
-// Forward declarations
-class Renderer;
-typedef boost::shared_ptr<Renderer> RendererHandle;
-
-// Class definitions
-class Renderer : public ViewerRenderer, private Utils::EventHandler 
+namespace Seg3D
 {
 
-  // -- constructor/destructor --
-public:
-  Renderer();
-  virtual ~Renderer();
+class ActionResizeView : public Action
+{
+  SCI_ACTION_TYPE("Resize", "Resize <key> <width> <height>", APPLICATION_E)
 
 public:
+  ActionResizeView();
+  virtual ~ActionResizeView() {}
 
-  virtual void initialize();
-  virtual void redraw();
-
-  virtual void resize(int width, int height);
+  virtual bool validate(ActionContextHandle& context);
+  virtual bool run(ActionContextHandle& context, ActionResultHandle& result);
 
 private:
+  ActionParameter<std::string> stateid_;
+  ActionParameter<int> width_;
+  ActionParameter<int> height_;
 
-  // Context for rendering images
-  RenderContextHandle context_;
+  StateViewBaseWeakHandle state_weak_handle_;
 
-  TextureHandle textures_[2];
-  RenderBufferHandle depth_buffer_;
-  FrameBufferObjectHandle frame_buffer_;
-  int active_render_texture_;
-
-  int width_;
-  int height_;
-  bool redraw_needed_;
-
-  boost::mutex redraw_needed_mutex_;
-
-  static int red;
-  int red_;
+public:
+  template <class VIEWSTATEHANDLE>
+  static void Dispatch(VIEWSTATEHANDLE& view_state, int width, int height);
 };
 
-} // end namespace Seg3D
+template <class VIEWSTATEHANDLE>
+void ActionResizeView::Dispatch( VIEWSTATEHANDLE& view_state, int width, int height )
+{
+  ActionResizeView* action = new ActionResizeView;
+  action->stateid_ = view_state->stateid();
+  action->width_ = width;
+  action->height_ = height;
+  action->state_weak_handle_ = view_state;
+
+  Interface::PostAction(ActionHandle(action));
+}
+
+} // end namespace Seg3d
 
 #endif

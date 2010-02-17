@@ -363,7 +363,7 @@ ViewerWidget::ViewerWidget(int viewer_id, QWidget *parent) :
   setFrameShape(QFrame::Panel);
   setFrameShadow(QFrame::Raised);
   
-  private_->viewer_->set_id(viewer_id_);
+  private_->viewer_->set_viewer_id(viewer_id_);
 }
 
 ViewerWidget::~ViewerWidget()

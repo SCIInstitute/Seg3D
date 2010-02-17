@@ -58,6 +58,21 @@ StateView2D::import_from_string(const std::string& str, ActionSource source)
   return (set(value,source)); 
 }
 
+void StateView2D::scale( double ratio )
+{
+
+}
+
+void StateView2D::translate( const Utils::Vector& offset )
+{
+
+}
+
+void StateView2D::resize( int width, int height )
+{
+
+}
+
 bool 
 StateView2D::set(const Utils::View2D& value, ActionSource source)
 {

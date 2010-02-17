@@ -31,6 +31,7 @@
 
 #include <Application/State/Actions/ActionRotateView3D.h>
 #include <Application/State/Actions/ActionScaleView3D.h>
+#include <Application/State/Actions/ActionTranslateView3D.h>
 #include <Application/Viewer/Viewer.h>
 #include <Application/Viewer/ViewManipulator.h>
 
@@ -96,6 +97,10 @@ void ViewManipulator::mouse_move( const MouseHistory& mouse_history, int button,
     Utils::Vector offset = this->compute_translation(mouse_history.previous.x, mouse_history.previous.y,
                                           mouse_history.current.x, mouse_history.current.y);
     // dispatch an ActionTranslate
+    if (this->viewer_->view_mode_state->get() == "volume")
+    {
+      ActionTranslateView3D::Dispatch(this->viewer_->volume_view_state, offset);
+    }
   }
   else if (this->scale_active_)
   {
@@ -105,8 +110,7 @@ void ViewManipulator::mouse_move( const MouseHistory& mouse_history, int button,
     if (this->viewer_->view_mode_state->get() == "volume")
     {
       ActionScaleView3D::Dispatch(this->viewer_->volume_view_state, scale_ratio);
-    }
-    
+    } 
   } 
   else if (this->rotate_active_)
   {
@@ -118,7 +122,6 @@ void ViewManipulator::mouse_move( const MouseHistory& mouse_history, int button,
       // dispatch an ActionRotateView3D
       ActionRotateView3D::Dispatch(this->viewer_->volume_view_state, axis, angle);
     }
-    
   } 
 }
 
@@ -191,8 +194,6 @@ Utils::Vector ViewManipulator::compute_translation( int x0, int y0, int x1, int 
 {
   double dx = x1 - x0;
   double dy = this->flip_y_ ? (y0 - y1) : (y1 - y0);
-  dx /= this->width_;
-  dy /= this->height_;
 
   if (this->camera_mode_)
   {

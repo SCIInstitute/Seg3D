@@ -26,20 +26,20 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#include <Application/State/Actions/ActionScaleView3D.h>
+#include <Application/State/Actions/ActionTranslateView3D.h>
 
 namespace Seg3D
 {
 
-SCI_REGISTER_ACTION(ScaleView3D);
+SCI_REGISTER_ACTION(TranslateView3D);
 
-ActionScaleView3D::ActionScaleView3D()
+ActionTranslateView3D::ActionTranslateView3D()
 {
-  add_argument(stateid_);
-  add_argument(scale_ratio_);
+  add_argument(this->stateid_);
+  add_argument(this->offset_);
 }
 
-bool ActionScaleView3D::validate( ActionContextHandle& context )
+bool ActionTranslateView3D::validate( Seg3D::ActionContextHandle &context )
 {
   StateBaseHandle state = this->state_weak_handle_.lock();
   if (!state)
@@ -63,24 +63,24 @@ bool ActionScaleView3D::validate( ActionContextHandle& context )
   return true;
 }
 
-bool ActionScaleView3D::run( ActionContextHandle& context, ActionResultHandle& result )
+bool ActionTranslateView3D::run( ActionContextHandle& context, ActionResultHandle& result )
 {
   StateView3DHandle state = this->state_weak_handle_.lock();
 
   if (state)
   {
-    state->scale(this->scale_ratio_.value());
+    state->translate(this->offset_.value());
     return true;
   }
 
   return false;
 }
 
-void ActionScaleView3D::Dispatch( StateView3DHandle& view3d_state, double ratio )
+void ActionTranslateView3D::Dispatch( StateView3DHandle& view3d_state, const Utils::Vector& offset )
 {
-  ActionScaleView3D* action = new ActionScaleView3D;
+  ActionTranslateView3D* action = new ActionTranslateView3D;
   action->stateid_ = view3d_state->stateid();
-  action->scale_ratio_ = ratio;
+  action->offset_ = offset;
   action->state_weak_handle_ = StateView3DWeakHandle(view3d_state);
 
   Interface::PostAction(ActionHandle(action));

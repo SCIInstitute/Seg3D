@@ -51,7 +51,7 @@ private:
   ActionParameter<std::string> stateid_;
   ActionParameter<double> scale_ratio_;
 
-  StateView3DWeakHandle view3d_state_;
+  StateView3DWeakHandle state_weak_handle_;
 
 public:
   static void Dispatch(StateView3DHandle& view3d_state, double ratio);

@@ -52,7 +52,7 @@ class QtRenderWidget : public QGLWidget {
     
     void rendering_completed_slot(TextureHandle texture);
         
-    void set_id(size_t viewer_id);
+    void set_viewer_id(size_t viewer_id);
 
   protected:
   
@@ -80,7 +80,6 @@ class QtRenderWidget : public QGLWidget {
     
     boost::signals2::connection rendering_completed_connection_;
     
-    size_t viewer_id_;
     ViewerHandle viewer_;
     
     MouseHistory mouse_history_;

@@ -39,43 +39,59 @@ class View3D;
 class Quaternion;
 
 class View3D {
-  public:
-    View3D();
-    View3D(const Point&, const Point&, const Vector&, double);
-    ~View3D();
+public:
+  View3D();
+  View3D(const Point& eyep, const Point& lookat, const Vector& up,  double fov);
+  ~View3D();
 
-    View3D(const View3D&);
-    View3D& operator=(const View3D&);
-    
-    // compare 2 views; are they exactly the same?
-    bool operator==(const View3D&) const;
-    bool operator!=(const View3D&) const;
+  View3D(const View3D&);
+  View3D& operator=(const View3D&);
 
-    inline Point eyep() const                { return eyep_; }
-    inline void eyep(const Point& eyep)      { eyep_ = eyep; }
+  // compare 2 views; are they exactly the same?
+  bool operator==(const View3D&) const;
+  bool operator!=(const View3D&) const;
 
-    inline Point lookat() const              { return lookat_; }
-    inline void lookat(const Point& lookat)  { lookat_ = lookat; }
+  inline Point eyep() const                { return this->eyep_; }
+  inline void eyep(const Point& eyep)      { this->eyep_ = eyep; this->viewplane_changed_ = true; }
 
-    inline Vector up() const                 { return up_; }
-    inline void up(const Vector& up)         { up_ = up;}
+  inline Point lookat() const              { return this->lookat_; }
+  inline void lookat(const Point& lookat)  { this->lookat_ = lookat; this->viewplane_changed_ = true; }
 
-    inline double fov() const                { return fovy_; }
-    inline void fov(double fov)              { fovy_ = fov; }
-    
+  inline Vector up() const                 { return this->up_; }
+  inline void up(const Vector& up)         { this->up_ = up; this->viewplane_changed_ = true; }
+
+  inline double fov() const                { return this->fovy_; }
+  inline void fov(double fov)              { this->fovy_ = fov; this->viewplane_changed_ = true; }
+
   void rotate(const Vector& axis, double angle);
   void scale(double ratio);
   void translate(const Vector& offset);
-    
-  private:
-    // Eye point
-    Point eyep_;
-    // Look at this point in space
-    Point lookat_;
-    // Vector pointing to the up position
-    Vector up_;
-    // Field of view in y direction
-    double fovy_;
+  void resize(int width, int height);
+
+private:
+
+  // compute the orientation and size of the viewplane placed at
+  // the lookat point
+  void update_viewplane();
+
+  // x direction scaled by the width of the viewplane
+  Vector u_;
+  // y direction scaled by the height of the viewplane
+  Vector v_;
+  // Indicates whether the viewplane has been changed
+  bool viewplane_changed_;
+
+  // Eye point
+  Point eyep_;
+  // Look at this point in space
+  Point lookat_;
+  // Vector pointing to the up position
+  Vector up_;
+  // Field of view in y direction
+  double fovy_;
+
+  int width_;
+  int height_;
 };
 
 } // End namespace Utils

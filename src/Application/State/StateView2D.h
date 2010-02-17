@@ -41,8 +41,8 @@
 #include <Utils/Converter/StringConverter.h>
 
 // Application includes
-#include <Application/State/StateBase.h>
 #include <Application/State/StateEngine.h>
+#include <Application/State/StateViewBase.h>
 
 namespace Seg3D {
 
@@ -53,7 +53,7 @@ namespace Seg3D {
 class StateView2D;
 typedef boost::shared_ptr<StateView2D> StateView2DHandle;
 
-class StateView2D : public StateBase {
+class StateView2D : public StateViewBase {
 
 // -- constructor/destructor --
   public:
@@ -75,7 +75,13 @@ class StateView2D : public StateBase {
     // Set the State from a string
     virtual bool import_from_string(const std::string& str,
                                     ActionSource source = ACTION_SOURCE_NONE_E);
-                                    
+
+  virtual void scale(double ratio);
+
+  virtual void translate(const Utils::Vector& offset);
+
+  virtual void resize(int width, int height);
+                                
   protected:    
     // EXPORT_TO_VARIANT
     // Export the state data to a variant parameter

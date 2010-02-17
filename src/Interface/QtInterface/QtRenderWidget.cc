@@ -34,19 +34,20 @@
 #include <Utils/Core/Log.h>
 
 // Application includes
-
-// Interface includes
-#include <Interface/QtInterface/QtRenderWidget.h>
 #include <Application/Interface/Interface.h>
 #include <Application/ViewerManager/ViewerManager.h>
 
+// Interface includes
+#include <Interface/QtInterface/QtRenderWidget.h>
+
 namespace Seg3D {
 
-QtRenderWidget::QtRenderWidget(const QGLFormat& format, QWidget* parent, QtRenderWidget* share) :
-  QGLWidget(format,parent,share)
+QtRenderWidget::QtRenderWidget(const QGLFormat& format, QWidget* parent, 
+  QtRenderWidget* share) :
+  QGLWidget(format, parent, share)
 {
-  renderer_ = RendererHandle(new Renderer());
-  rendering_completed_connection_ 
+  this->renderer_ = RendererHandle(new Renderer());
+  this->rendering_completed_connection_ 
     = renderer_->rendering_completed_signal.connect(boost::bind(&QtRenderWidget::rendering_completed_slot, this, _1));
 
   setAutoFillBackground(false);
@@ -59,8 +60,7 @@ QtRenderWidget::~QtRenderWidget()
   rendering_completed_connection_.disconnect();
 }
 
-void 
-QtRenderWidget::rendering_completed_slot(TextureHandle texture)
+void QtRenderWidget::rendering_completed_slot(TextureHandle texture)
 {
   // if not in the interface thread, post an event to the interface thread
   if (!Interface::IsInterfaceThread())
@@ -68,35 +68,33 @@ QtRenderWidget::rendering_completed_slot(TextureHandle texture)
     Interface::PostEvent(boost::bind(&QtRenderWidget::rendering_completed_slot, this, texture));
     return;
   }
-  
+
   renderer_texture_ = texture;
   updateGL();
 }
 
-void
-QtRenderWidget::initializeGL()
+void QtRenderWidget::initializeGL()
 {
   RenderResources::Instance()->init_gl();
   renderer_->initialize();
-  
+
   renderer_->redraw();
 }
 
-void
-QtRenderWidget::paintGL()
+void QtRenderWidget::paintGL()
 {
   if (!renderer_texture_.get())
   {
     return;
   }
-  
+
   boost::unique_lock<Texture::mutex_type> lock(renderer_texture_->get_mutex());  
-  
+
   // draw a window size quad and map the render texture onto it
   QSize view_size = QWidget::size();
   int width = view_size.width();
   int height = view_size.height();
-  
+
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
   renderer_texture_->enable();
@@ -104,21 +102,20 @@ QtRenderWidget::paintGL()
   //GLenum err = glGetError();
   //const GLubyte* err_str = gluErrorString(err);
   glBegin(GL_QUADS);
-    glColor3f(0.5f, 0.5f, 1.f);
-    glTexCoord2f(0.0f, 0.0f);
-    glVertex2f(0.0f, 0.0f);
-    glTexCoord2f(1.0f, 0.0f);
-    glVertex2f(width, 0.0f);
-    glTexCoord2f(1.0f, 1.0f);
-    glVertex2f(width, height);
-    glTexCoord2f(0.0f, 1.0f);
-    glVertex2f(0.0f, height);
+  glColor3f(0.5f, 0.5f, 1.f);
+  glTexCoord2f(0.0f, 0.0f);
+  glVertex2f(0.0f, 0.0f);
+  glTexCoord2f(1.0f, 0.0f);
+  glVertex2f(width, 0.0f);
+  glTexCoord2f(1.0f, 1.0f);
+  glVertex2f(width, height);
+  glTexCoord2f(0.0f, 1.0f);
+  glVertex2f(0.0f, height);
   glEnd();
   renderer_texture_->disable(); 
 }
 
-void
-QtRenderWidget::resizeGL(int width,int height)
+void QtRenderWidget::resizeGL(int width,int height)
 {
   glViewport(0, 0, width, height);  
   glMatrixMode(GL_PROJECTION);
@@ -127,25 +124,24 @@ QtRenderWidget::resizeGL(int width,int height)
 
   paintGL();
 
+  this->viewer_->resize(width, height);
   if (renderer_.get())
   {
     renderer_->resize(width, height);
   }
 }
 
-void 
-QtRenderWidget::mouseMoveEvent( QMouseEvent * event )
+void QtRenderWidget::mouseMoveEvent( QMouseEvent * event )
 {
   mouse_history_.previous = mouse_history_.current;
   mouse_history_.current.x = event->x();
   mouse_history_.current.y = event->y();
-  
+
   viewer_->mouse_move_event(this->mouse_history_, event->button(), 
-                        event->buttons(), event->modifiers());
+    event->buttons(), event->modifiers());
 }
 
-void 
-QtRenderWidget::mousePressEvent( QMouseEvent * event )
+void QtRenderWidget::mousePressEvent( QMouseEvent * event )
 {
   mouse_history_.current.x = mouse_history_.previous.x = event->x();
   mouse_history_.current.y = mouse_history_.previous.y = event->y();
@@ -164,27 +160,25 @@ QtRenderWidget::mousePressEvent( QMouseEvent * event )
     mouse_history_.mid_start.x = event->x();
     mouse_history_.mid_start.y = event->y();
   }
-  
+
   viewer_->mouse_press_event(this->mouse_history_, event->button(), 
-                        event->buttons(), event->modifiers());
+    event->buttons(), event->modifiers());
 }
 
-void 
-QtRenderWidget::mouseReleaseEvent( QMouseEvent * event )
+void QtRenderWidget::mouseReleaseEvent( QMouseEvent * event )
 {
   mouse_history_.previous = mouse_history_.current;
   mouse_history_.current.x = event->x();
   mouse_history_.current.y = event->y();
 
   viewer_->mouse_release_event(this->mouse_history_, event->button(),
-                          event->buttons(), event->modifiers());
+    event->buttons(), event->modifiers());
 }
 
-void QtRenderWidget::set_id( size_t viewer_id )
+void QtRenderWidget::set_viewer_id( size_t viewer_id )
 {
-  viewer_id_ = viewer_id;
   viewer_ = ViewerManager::Instance()->get_viewer(viewer_id);
-  renderer_->set_id(viewer_id);
+  renderer_->set_viewer_id(viewer_id);
 }
 
 } // end namespace Seg3D

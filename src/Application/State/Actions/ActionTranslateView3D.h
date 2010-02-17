@@ -26,65 +26,39 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_RENDERER_RENDERER_H
-#define APPLICATION_RENDERER_RENDERER_H
+#ifndef APPLICATION_STATE_ACTIONS_ACTIONTRANSLATEVIEW3D_H
+#define APPLICATION_STATE_ACTIONS_ACTIONTRANSLATEVIEW3D_H
 
-#if defined (_MSC_VER) && (_MSC_VER >= 1020)
-# pragma once
-#endif
+#include <Application/Action/Action.h>
+#include <Application/Interface/Interface.h>
+#include <Application/State/StateView3D.h>
 
-// boost includes
-#include <boost/thread/mutex.hpp>
+#include <Utils/Geometry/Vector.h>
 
-// Application includes
-#include <Application/Renderer/RenderContext.h>
-#include <Application/Viewer/ViewerRenderer.h>
-#include <Application/Renderer/Texture.h>
-#include <Application/Renderer/RenderBuffer.h>
-#include <Application/Renderer/FrameBufferObject.h>
-#include <Utils/EventHandler/EventHandler.h>
-
-namespace Seg3D {
-
-// Forward declarations
-class Renderer;
-typedef boost::shared_ptr<Renderer> RendererHandle;
-
-// Class definitions
-class Renderer : public ViewerRenderer, private Utils::EventHandler 
+namespace Seg3D
 {
 
-  // -- constructor/destructor --
-public:
-  Renderer();
-  virtual ~Renderer();
+  class ActionTranslateView3D : public Action
+  {
+    SCI_ACTION_TYPE("TranslateView3D", "Translate <key> <offset>", APPLICATION_E)
 
-public:
+  public:
+    ActionTranslateView3D();
+    virtual ~ActionTranslateView3D() {}
 
-  virtual void initialize();
-  virtual void redraw();
+    virtual bool validate(ActionContextHandle& context);
+    virtual bool run(ActionContextHandle& context, ActionResultHandle& result);
 
-  virtual void resize(int width, int height);
+  private:
+    ActionParameter<std::string> stateid_;
+    ActionParameter<Utils::Vector> offset_;
 
-private:
+    StateView3DWeakHandle state_weak_handle_;
 
-  // Context for rendering images
-  RenderContextHandle context_;
+  public:
+    static void Dispatch(StateView3DHandle& view3d_state, const Utils::Vector& offset);
 
-  TextureHandle textures_[2];
-  RenderBufferHandle depth_buffer_;
-  FrameBufferObjectHandle frame_buffer_;
-  int active_render_texture_;
-
-  int width_;
-  int height_;
-  bool redraw_needed_;
-
-  boost::mutex redraw_needed_mutex_;
-
-  static int red;
-  int red_;
-};
+  };
 
 } // end namespace Seg3D
 
