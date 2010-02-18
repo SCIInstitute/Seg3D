@@ -29,6 +29,9 @@
 #ifndef INTERFACE_TOOLINTERFACE_PAINTTOOLINTERFACE_H
 #define INTERFACE_TOOLINTERFACE_PAINTTOOLINTERFACE_H
 
+// Utils includes
+#include <Utils/Core/Log.h>
+
 // Application includes
 #include <Application/Tool/ToolFactory.h>
 
@@ -51,7 +54,7 @@ class PaintToolInterface : public ToolWidget {
     PaintToolInterface();
     virtual ~PaintToolInterface();
 
-    virtual bool build_widget(QFrame* frame);
+    virtual bool build_widget( QFrame* frame );
 
 // -- private structure wwith widget classes --
   private:

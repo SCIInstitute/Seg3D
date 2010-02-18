@@ -110,7 +110,7 @@ AppMenu::create_view_menu(QMenu* qmenu)
   QAction* qaction;
   
   // Full Screen Window
-  qaction = qmenu->addAction( "Toggle Full Screen" );
+  qaction = qmenu->addAction( "Full Screen" );
   qaction->setShortcut( tr("Ctrl+F") );
   qaction->setToolTip( tr("Toggle the view between full screen and normal") );
   qaction->setCheckable( true );

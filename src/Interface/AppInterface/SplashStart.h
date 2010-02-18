@@ -26,43 +26,39 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_TOOLINTERFACE_THRESHOLDTOOLINTERFACE_H
-#define INTERFACE_TOOLINTERFACE_THRESHOLDTOOLINTERFACE_H
+#ifndef INTERFACE_APPINTERFACE_SPLASHSTART_H
+#define INTERFACE_APPINTERFACE_SPLASHSTART_H
 
-// Utils includes
-#include <Utils/Core/Log.h>
+// QT includes
+#include <QtGui>
 
-// Application includes
-#include <Application/Tool/ToolFactory.h>
+// STL includes
+#include <string>
 
-// Base class of the tool widget
-#include <Interface/AppInterface/ToolWidget.h>
-
-// Qt Gui Includes
-#include <Interface/ToolInterface/CustomWidgets/SliderSpinComboDouble.h>
+// Boost includes
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/thread.hpp>
+#include <boost/shared_ptr.hpp>
 
 namespace Seg3D {
   
-class ThresholdToolInterfacePrivate;
-
-class ThresholdToolInterface : public ToolWidget {
-  Q_OBJECT
-
-// Constructor/destructor  
+  class SplashStartPrivate;
+  
+  class SplashStart : public QDialog 
+  {   
+    Q_OBJECT
+    
   public:
-    ThresholdToolInterface();
-    virtual ~ThresholdToolInterface();
-    virtual bool build_widget(QFrame* frame);
+    SplashStart(QDialog* parent = 0);
+    virtual ~SplashStart();
+    
     
   private:
-    ThresholdToolInterfacePrivate* private_;
-    SliderSpinComboDouble *upperThresholdAdjuster;
-    SliderSpinComboDouble *lowerThresholdAdjuster;
-    
-};
-    
-} // end namespace Seg3D
+    // Internals of the dockwidget
+    boost::shared_ptr<SplashStartPrivate> private_;
+      
+  };
+  
+} // end namespace
 
-
-
-#endif
+#endif // SPLASHSTART_H

@@ -29,6 +29,9 @@
 #ifndef INTERFACE_TOOLINTERFACE_ThresholdSegmentationLSFilterInterface_H
 #define INTERFACE_TOOLINTERFACE_ThresholdSegmentationLSFilterInterface_H
 
+// Utils includes
+#include <Utils/Core/Log.h>
+
 // Application includes
 #include <Application/Tool/ToolFactory.h>
 

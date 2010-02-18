@@ -25,44 +25,38 @@
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
  */
+#include <sstream>
+#include <iostream>
 
-#ifndef INTERFACE_TOOLINTERFACE_THRESHOLDTOOLINTERFACE_H
-#define INTERFACE_TOOLINTERFACE_THRESHOLDTOOLINTERFACE_H
-
-// Utils includes
 #include <Utils/Core/Log.h>
 
-// Application includes
-#include <Application/Tool/ToolFactory.h>
+#include <Interface/AppInterface/SplashStart.h>
+#include "ui_Splash.h"
 
-// Base class of the tool widget
-#include <Interface/AppInterface/ToolWidget.h>
-
-// Qt Gui Includes
-#include <Interface/ToolInterface/CustomWidgets/SliderSpinComboDouble.h>
-
-namespace Seg3D {
+namespace Seg3D  {
   
-class ThresholdToolInterfacePrivate;
-
-class ThresholdToolInterface : public ToolWidget {
-  Q_OBJECT
-
-// Constructor/destructor  
+  class SplashStartPrivate {
   public:
-    ThresholdToolInterface();
-    virtual ~ThresholdToolInterface();
-    virtual bool build_widget(QFrame* frame);
     
-  private:
-    ThresholdToolInterfacePrivate* private_;
-    SliderSpinComboDouble *upperThresholdAdjuster;
-    SliderSpinComboDouble *lowerThresholdAdjuster;
+    Ui::Splash ui_;
     
-};
+  };
+  
+  
+  SplashStart::SplashStart( QDialog *parent ) :
+  private_( new SplashStartPrivate )
+  { 
+    // Set up the private internals of the SplashStart class
+    private_->ui_.setupUi( this );
+    private_->ui_.existing_project_button_->setEnabled(false);
     
-} // end namespace Seg3D
+    //connect(private_->ui_.new_project_button_, SIGNAL( clicked() ), this, SLOT( close_splash()) );
+        
+  }
+  
+  SplashStart::~SplashStart()
+  { }
+  
 
-
-
-#endif
+  
+} // end namespace

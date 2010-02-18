@@ -61,15 +61,15 @@ class AppController : public QWidget {
 // -- constructor/destructor --
   
   public:  
-    AppController(QWidget* parent = 0);
+    AppController( QWidget* parent = 0 );
     virtual ~AppController();
 
 // -- qt slots --
   public Q_SLOTS:
     
     void post_action();
-    void post_action_message(std::string message);
-    void post_action_usage(std::string usage);
+    void post_action_message( std::string message );
+    void post_action_usage( std::string usage );
 
   private:
     AppControllerPrivateHandle private_;
@@ -92,19 +92,19 @@ class AppController : public QWidget {
     // These functions also relay the function calls to the right thread.
     
     // Force the Controller to update its action history widget
-    static void UpdateActionHistory(qpointer_type controller);
+    static void UpdateActionHistory( qpointer_type controller );
 
     // Force the Controller to update its log history widget
-    static void UpdateLogHistory(qpointer_type controller, bool relay, 
-                                 int message_type, std::string message);
+    static void UpdateLogHistory( qpointer_type controller, bool relay, 
+                                 int message_type, std::string message );
 
     // Post a message in the Controller message label
-    static void PostActionMessage(qpointer_type controller, std::string message);
+    static void PostActionMessage( qpointer_type controller, std::string message );
 
     // Post a message in the controller usage label
-    static void PostActionUsage(qpointer_type controller, std::string usage);
+    static void PostActionUsage( qpointer_type controller, std::string usage );
                           
-    static void SetActionType(qpointer_type controller, std::string action_type);
+    static void SetActionType( qpointer_type controller, std::string action_type );
 };
 
 } // end namespace Seg3D

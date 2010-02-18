@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>213</width>
-    <height>139</height>
+    <width>258</width>
+    <height>215</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -17,9 +17,12 @@
    </sizepolicy>
   </property>
   <property name="styleSheet">
-   <string notr="true">QWidget#LayerWidget{
-  
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(221, 221, 221, 255), stop:0.155779 rgba(228, 228, 228, 255), stop:1 rgba(202, 204, 204, 255));
+   <string notr="true">QProgressBar#progress_bar_{
+  margin-top:-2px;
+}
+
+QWidget#LayerWidget{
+  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(241, 241, 241, 255), stop:0.155779 rgba(248, 248, 248, 255), stop:1 rgba(224, 224, 224, 255));
   border-radius: 4px;
   border: 1px solid rgb(127, 127, 127);
 }
@@ -53,17 +56,7 @@ QToolButton#colorChooseButton_:pressed{
   border-radius: 4px;
 }
 
-QToolButton#lockButton_{
-  background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
-  border-radius: 4px;
-  color: white;
-}
 
-QToolButton#lockButton_:pressed{
-  
-  background-color: rgb(170,170,170);
-  border-radius: 4px;
-}
 
 QPushButton#label_{
   text-align: left;
@@ -75,59 +68,104 @@ QPushButton#label_:pressed{
 }
 
 /* Buttons */
-QToolButton#fillOpacityButton_{
+
+QToolButton#lock_button_{
   background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
   border: 1px solid qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
 }
-QToolButton#fillOpacityButton_:pressed{
-  background-color: gray;
-  color: white;
+QToolButton#lock_button_:pressed{
+  background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
+  border: 1px solid rgb(139, 139, 139);
 }
 
-QToolButton#brightContrastButton_{
+QToolButton#opacity_button_{
   background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
   border: 1px solid qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
 }
-QToolButton#brightContrastButton_:pressed{
-  background-color: gray;
-  color: white;
+QToolButton#opacity_button_:pressed{
+  background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
+  border: 1px solid rgb(139, 139, 139);
 }
 
-QToolButton#visibleButton_{
+QToolButton#brightness_contrast_button_{
   background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
   border: 1px solid qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
 }
-QToolButton#visibleButton_:pressed{
-  background-color: gray;
-  color: white;
+QToolButton#brightness_contrast_button_:pressed{
+  background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
+  border: 1px solid rgb(139, 139, 139);
 }
 
-
-QToolButton#isoSurfaceButton_{
+QToolButton#visibility_button_{
   background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
   border: 1px solid qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
 }
-QToolButton#isoSurfaceButton_:pressed{
-  background-color: gray;
-  color: white;
+QToolButton#visibility_button_:pressed{
+  background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
+  border: 1px solid rgb(139, 139, 139);
 }
 
-QToolButton#computeIsoSurfaceButton_{
+QToolButton#iso_surface_button_{
   background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
   border: 1px solid qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
 }
-QToolButton#computeIsoSurfaceButton_:pressed{
-  background-color: gray;
-  color: white;
+QToolButton#iso_surface_button_:pressed{
+  background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
+  border: 1px solid rgb(139, 139, 139);
 }
 
-QToolButton#volumeTargetButton_{
+QToolButton#compute_iso_surface_button_{
   background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
   border: 1px solid qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
 }
-QToolButton#volumeTargetButton_:pressed{
-  background-color: gray;
-  color: white;
+QToolButton#compute_iso_surface_button_:pressed{
+  background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
+  border: 1px solid rgb(139, 139, 139);
+}
+
+QToolButton#fill_border_button_{
+  background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
+  border: 1px solid qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
+}
+QToolButton#fill_border_button_:pressed{
+  background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
+  border: 1px solid rgb(139, 139, 139);
+}
+
+QToolButton#fill_border_button_{
+  background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
+  border: 1px solid qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
+}
+QToolButton#fill_border_button_:pressed{
+  background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
+  border: 1px solid rgb(139, 139, 139);
+}
+
+QToolButton#volume_rendered_button_{
+  background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
+  border: 1px solid qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
+}
+QToolButton#volume_rendered_button_:pressed{
+  background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
+  border: 1px solid rgb(139, 139, 139);
+}
+
+QToolButton#color_button_{
+  background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
+  border: 1px solid qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
+}
+QToolButton#color_button_:pressed{
+  background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
+  border: 1px solid rgb(139, 139, 139);
+}
+
+
+QToolButton#progress_cancel_button_{
+  background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
+  border: 1px solid qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
+}
+QToolButton#progress_cancel_button_:pressed{
+  background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
 }
 
 QToolButton#color_button_01_{
@@ -251,7 +289,7 @@ QToolButton#color_button_12_:pressed{
 
 </string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_4">
+  <layout class="QVBoxLayout" name="verticalLayout_5">
    <property name="spacing">
     <number>0</number>
    </property>
@@ -295,26 +333,44 @@ QToolButton#color_button_12_:pressed{
        <number>0</number>
       </property>
       <item>
-       <widget class="QCheckBox" name="selection_checkbox_">
-        <property name="maximumSize">
-         <size>
-          <width>16</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="text">
-         <string notr="true"/>
-        </property>
-        <property name="tristate">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
        <layout class="QHBoxLayout" name="header_h_layout_">
         <property name="spacing">
          <number>0</number>
         </property>
+        <item>
+         <widget class="QWidget" name="checkbox_widget_" native="true">
+          <property name="minimumSize">
+           <size>
+            <width>23</width>
+            <height>0</height>
+           </size>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <property name="margin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QCheckBox" name="selection_checkbox_">
+             <property name="maximumSize">
+              <size>
+               <width>16</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string notr="true"/>
+             </property>
+             <property name="tristate">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
         <item>
          <widget class="QWidget" name="typeBackground_" native="true">
           <property name="sizePolicy">
@@ -371,6 +427,18 @@ QToolButton#color_button_12_:pressed{
               </property>
               <item>
                <widget class="QToolButton" name="colorChooseButton_">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>42</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>42</height>
+                 </size>
+                </property>
                 <property name="font">
                  <font>
                   <pointsize>25</pointsize>
@@ -382,8 +450,8 @@ QToolButton#color_button_12_:pressed{
                  <string/>
                 </property>
                 <property name="icon">
-                 <iconset>
-                  <normaloff>:/new/images/MaskWhite_shadow.png</normaloff>:/new/images/MaskWhite_shadow.png</iconset>
+                 <iconset resource="Resources/AppInterface.qrc">
+                  <normaloff>:/Images/MaskWhite_shadow.png</normaloff>:/Images/MaskWhite_shadow.png</iconset>
                 </property>
                 <property name="iconSize">
                  <size>
@@ -431,7 +499,7 @@ QToolButton#color_button_12_:pressed{
              </size>
             </property>
             <property name="text">
-             <string>2116_test-2_121709-booger</string>
+             <string notr="true">2116_test-2_121709-booger</string>
             </property>
             <property name="flat">
              <bool>true</bool>
@@ -448,13 +516,16 @@ QToolButton#color_button_12_:pressed{
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_7">
             <property name="spacing">
-             <number>0</number>
+             <number>1</number>
+            </property>
+            <property name="topMargin">
+             <number>1</number>
             </property>
             <property name="bottomMargin">
-             <number>2</number>
+             <number>0</number>
             </property>
             <item>
-             <widget class="QToolButton" name="fillOpacityButton_">
+             <widget class="QToolButton" name="visibility_button_">
               <property name="minimumSize">
                <size>
                 <width>16</width>
@@ -471,17 +542,20 @@ QToolButton#color_button_12_:pressed{
                <string/>
               </property>
               <property name="icon">
-               <iconset>
-                <normaloff>:/new/images/BorderOff.png</normaloff>
-                <normalon>:/new/images/Border.png</normalon>:/new/images/BorderOff.png</iconset>
+               <iconset resource="Resources/AppInterface.qrc">
+                <normaloff>:/Images/VisibleOff.png</normaloff>
+                <normalon>:/Images/Visible.png</normalon>:/Images/VisibleOff.png</iconset>
               </property>
               <property name="checkable">
+               <bool>true</bool>
+              </property>
+              <property name="checked">
                <bool>true</bool>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QToolButton" name="brightContrastButton_">
+             <widget class="QToolButton" name="opacity_button_">
               <property name="minimumSize">
                <size>
                 <width>16</width>
@@ -498,9 +572,9 @@ QToolButton#color_button_12_:pressed{
                <string/>
               </property>
               <property name="icon">
-               <iconset>
-                <normaloff>:/new/images/BrightnessOff.png</normaloff>
-                <normalon>:/new/images/Brightness.png</normalon>:/new/images/BrightnessOff.png</iconset>
+               <iconset resource="Resources/AppInterface.qrc">
+                <normaloff>:/Images/OpacityOff.png</normaloff>
+                <normalon>:/Images/Opacity.png</normalon>:/Images/OpacityOff.png</iconset>
               </property>
               <property name="checkable">
                <bool>true</bool>
@@ -508,7 +582,57 @@ QToolButton#color_button_12_:pressed{
              </widget>
             </item>
             <item>
-             <widget class="QToolButton" name="visibleButton_">
+             <widget class="QToolButton" name="lock_button_">
+              <property name="minimumSize">
+               <size>
+                <width>16</width>
+                <height>16</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16</width>
+                <height>16</height>
+               </size>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>25</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="Resources/AppInterface.qrc">
+                <normaloff>:/Images/LockOff.png</normaloff>
+                <normalon>:/Images/Lock.png</normalon>:/Images/LockOff.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>16</width>
+                <height>16</height>
+               </size>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+              <property name="checked">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="Line" name="header_seperator_line_">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QToolButton" name="color_button_">
               <property name="minimumSize">
                <size>
                 <width>16</width>
@@ -522,12 +646,12 @@ QToolButton#color_button_12_:pressed{
                </size>
               </property>
               <property name="text">
-               <string>V</string>
+               <string/>
               </property>
               <property name="icon">
-               <iconset>
-                <normaloff>:/new/images/VolumeVisibleOff.png</normaloff>
-                <normalon>:/new/images/VolumeVisible.png</normalon>:/new/images/VolumeVisibleOff.png</iconset>
+               <iconset resource="Resources/AppInterface.qrc">
+                <normaloff>:/Images/ColorOff.png</normaloff>
+                <normalon>:/Images/Color.png</normalon>:/Images/ColorOff.png</iconset>
               </property>
               <property name="checkable">
                <bool>true</bool>
@@ -535,7 +659,7 @@ QToolButton#color_button_12_:pressed{
              </widget>
             </item>
             <item>
-             <widget class="QToolButton" name="isoSurfaceButton_">
+             <widget class="QToolButton" name="iso_surface_button_">
               <property name="minimumSize">
                <size>
                 <width>16</width>
@@ -552,9 +676,9 @@ QToolButton#color_button_12_:pressed{
                <string>I</string>
               </property>
               <property name="icon">
-               <iconset>
-                <normaloff>:/new/images/IsosurfaceVisibleOff.png</normaloff>
-                <normalon>:/new/images/IsosurfaceVisible.png</normalon>:/new/images/IsosurfaceVisibleOff.png</iconset>
+               <iconset resource="Resources/AppInterface.qrc">
+                <normaloff>:/Images/IsosurfaceVisibleOff.png</normaloff>
+                <normalon>:/Images/IsosurfaceVisible.png</normalon>:/Images/IsosurfaceVisibleOff.png</iconset>
               </property>
               <property name="checkable">
                <bool>true</bool>
@@ -562,7 +686,7 @@ QToolButton#color_button_12_:pressed{
              </widget>
             </item>
             <item>
-             <widget class="QToolButton" name="computeIsoSurfaceButton_">
+             <widget class="QToolButton" name="compute_iso_surface_button_">
               <property name="minimumSize">
                <size>
                 <width>16</width>
@@ -579,9 +703,9 @@ QToolButton#color_button_12_:pressed{
                <string>C</string>
               </property>
               <property name="icon">
-               <iconset>
-                <normaloff>:/new/images/IsosurfaceComputeOff.png</normaloff>
-                <normalon>:/new/images/IsosurfaceCompute.png</normalon>:/new/images/IsosurfaceComputeOff.png</iconset>
+               <iconset resource="Resources/AppInterface.qrc">
+                <normaloff>:/Images/IsosurfaceComputeOff.png</normaloff>
+                <normalon>:/Images/IsosurfaceCompute.png</normalon>:/Images/IsosurfaceComputeOff.png</iconset>
               </property>
               <property name="checkable">
                <bool>false</bool>
@@ -589,7 +713,7 @@ QToolButton#color_button_12_:pressed{
              </widget>
             </item>
             <item>
-             <widget class="QToolButton" name="volumeTargetButton_">
+             <widget class="QToolButton" name="fill_border_button_">
               <property name="minimumSize">
                <size>
                 <width>16</width>
@@ -601,52 +725,65 @@ QToolButton#color_button_12_:pressed{
                 <width>16</width>
                 <height>16</height>
                </size>
-              </property>
-              <property name="text">
-               <string>T</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QToolButton" name="lockButton_">
-              <property name="minimumSize">
-               <size>
-                <width>28</width>
-                <height>16</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>28</width>
-                <height>16</height>
-               </size>
-              </property>
-              <property name="font">
-               <font>
-                <pointsize>25</pointsize>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
               </property>
               <property name="text">
                <string/>
               </property>
               <property name="icon">
-               <iconset>
-                <normaloff>:/new/images/LockBigOff.png</normaloff>
-                <normalon>:/new/images/LockBig.png</normalon>:/new/images/LockBigOff.png</iconset>
+               <iconset resource="Resources/AppInterface.qrc">
+                <normaloff>:/Images/BorderOff.png</normaloff>
+                <normalon>:/Images/Border.png</normalon>:/Images/BorderOff.png</iconset>
               </property>
-              <property name="iconSize">
+             </widget>
+            </item>
+            <item>
+             <widget class="QToolButton" name="volume_rendered_button_">
+              <property name="minimumSize">
                <size>
-                <width>25</width>
-                <height>25</height>
+                <width>16</width>
+                <height>16</height>
                </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16</width>
+                <height>16</height>
+               </size>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="Resources/AppInterface.qrc">
+                <normaloff>:/Images/VolumeVisibleOff.png</normaloff>
+                <normalon>:/Images/VolumeVisible.png</normalon>:/Images/VolumeVisibleOff.png</iconset>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QToolButton" name="brightness_contrast_button_">
+              <property name="minimumSize">
+               <size>
+                <width>16</width>
+                <height>16</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16</width>
+                <height>16</height>
+               </size>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="Resources/AppInterface.qrc">
+                <normaloff>:/Images/BrightnessOff.png</normaloff>
+                <normalon>:/Images/Brightness.png</normalon>:/Images/BrightnessOff.png</iconset>
               </property>
               <property name="checkable">
                <bool>true</bool>
-              </property>
-              <property name="checked">
-               <bool>false</bool>
               </property>
              </widget>
             </item>
@@ -676,7 +813,7 @@ QToolButton#color_button_12_:pressed{
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>60</height>
+       <height>16777215</height>
       </size>
      </property>
      <property name="styleSheet">
@@ -684,7 +821,7 @@ QToolButton#color_button_12_:pressed{
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <property name="spacing">
-       <number>0</number>
+       <number>2</number>
       </property>
       <property name="margin">
        <number>4</number>
@@ -704,6 +841,9 @@ QToolButton#color_button_12_:pressed{
       </item>
       <item>
        <layout class="QHBoxLayout" name="brightness_h_layout_">
+        <property name="spacing">
+         <number>3</number>
+        </property>
         <item>
          <widget class="QLabel" name="brigntness_label_">
           <property name="sizePolicy">
@@ -714,13 +854,13 @@ QToolButton#color_button_12_:pressed{
           </property>
           <property name="minimumSize">
            <size>
-            <width>59</width>
+            <width>75</width>
             <height>0</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>59</width>
+            <width>75</width>
             <height>16777215</height>
            </size>
           </property>
@@ -729,20 +869,13 @@ QToolButton#color_button_12_:pressed{
           </property>
          </widget>
         </item>
-        <item>
-         <widget class="QSlider" name="brightness_slider_">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="tickPosition">
-           <enum>QSlider::NoTicks</enum>
-          </property>
-         </widget>
-        </item>
        </layout>
       </item>
       <item>
        <layout class="QHBoxLayout" name="contrast_h_layout_">
+        <property name="spacing">
+         <number>3</number>
+        </property>
         <item>
          <widget class="QLabel" name="contrast_label_">
           <property name="sizePolicy">
@@ -753,31 +886,18 @@ QToolButton#color_button_12_:pressed{
           </property>
           <property name="minimumSize">
            <size>
-            <width>59</width>
+            <width>75</width>
             <height>0</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>59</width>
+            <width>75</width>
             <height>16777215</height>
            </size>
           </property>
           <property name="text">
            <string>Contrast:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QSlider" name="contrast_slider_">
-          <property name="singleStep">
-           <number>1</number>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="tickPosition">
-           <enum>QSlider::NoTicks</enum>
           </property>
          </widget>
         </item>
@@ -803,7 +923,7 @@ QToolButton#color_button_12_:pressed{
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>33</height>
+       <height>16777215</height>
       </size>
      </property>
      <property name="styleSheet">
@@ -1187,9 +1307,139 @@ QToolButton#color_button_12_:pressed{
      </layout>
     </widget>
    </item>
+   <item>
+    <widget class="QWidget" name="opacity_bar_" native="true">
+     <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0">
+      <property name="spacing">
+       <number>2</number>
+      </property>
+      <property name="margin">
+       <number>4</number>
+      </property>
+      <item>
+       <widget class="Line" name="opacity_bar_line_">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="opacity_label_">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Opacity:</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QWidget" name="progress_bar_bar_" native="true">
+     <layout class="QVBoxLayout" name="verticalLayout_4">
+      <property name="spacing">
+       <number>2</number>
+      </property>
+      <property name="margin">
+       <number>4</number>
+      </property>
+      <item>
+       <widget class="Line" name="progress_line_">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <property name="spacing">
+         <number>2</number>
+        </property>
+        <item>
+         <widget class="QToolButton" name="progress_cancel_button_">
+          <property name="minimumSize">
+           <size>
+            <width>16</width>
+            <height>16</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16</width>
+            <height>16</height>
+           </size>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="Resources/AppInterface.qrc">
+            <normaloff>:/Images/Close.png</normaloff>:/Images/Close.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>16</width>
+            <height>16</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QProgressBar" name="progress_bar_">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>16</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>16</height>
+           </size>
+          </property>
+          <property name="value">
+           <number>50</number>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+          <property name="textVisible">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QLabel" name="dimensions_">
+        <property name="layoutDirection">
+         <enum>Qt::RightToLeft</enum>
+        </property>
+        <property name="text">
+         <string>hidden dimensions label</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="Resources/AppInterface.qrc"/>
+ </resources>
  <connections/>
 </ui>

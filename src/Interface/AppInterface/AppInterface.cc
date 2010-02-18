@@ -40,6 +40,7 @@
 #include <Interface/QtInterface/QtApplication.h>
 #include <Interface/QtInterface/QtPointer.h>
 #include <Interface/AppInterface/AppInterface.h>
+#include <Interface/AppInterface/SplashStart.h>
 
 namespace Seg3D {
 
@@ -53,6 +54,9 @@ AppInterface::AppInterface()
   
   // Tell Qt what size to start up in
   resize(1280, 720);
+  
+  SplashStart* splash_screen_ = new SplashStart();
+  splash_screen_->exec();
    
   // Enable fullscreen on startup via commandline argument
   std::string true_false_ = Seg3D::Application::Instance()->checkCommandLineParameter("fullscreen");

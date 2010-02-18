@@ -38,6 +38,9 @@
 #include <Utils/Singleton/Singleton.h>
 #include <Utils/EventHandler/EventHandler.h>
 
+//Qt include
+#include <QtGui>
+
 namespace Seg3D {
 
 // CLASS APPLICATION:
@@ -62,6 +65,8 @@ class Application : public Utils::EventHandler  {
     // The number of viewers that is available in the application
     // This is a preset number to simplify the dependency scheme
     size_t number_of_viewers() { return 6; }
+  
+
     
 // -- Command line parser --
   public:
@@ -77,6 +82,7 @@ class Application : public Utils::EventHandler  {
     // PARSEPARAMETERS
     // parse paremeters from the command line
     void parse_command_line_parameters( int argc, char** argv);
+  
 
 // -- Application thread --    
     

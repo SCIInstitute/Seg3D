@@ -26,43 +26,39 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_TOOLINTERFACE_THRESHOLDTOOLINTERFACE_H
-#define INTERFACE_TOOLINTERFACE_THRESHOLDTOOLINTERFACE_H
+#ifndef INTERFACE_APPINTERFACE_HISTORYWIDGET_H
+#define INTERFACE_APPINTERFACE_HISTORYWIDGET_H
 
-// Utils includes
-#include <Utils/Core/Log.h>
+// QT includes
+#include <QtGui>
 
-// Application includes
-#include <Application/Tool/ToolFactory.h>
+// STL includes
+#include <string>
 
-// Base class of the tool widget
-#include <Interface/AppInterface/ToolWidget.h>
-
-// Qt Gui Includes
-#include <Interface/ToolInterface/CustomWidgets/SliderSpinComboDouble.h>
+// Boost includes
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/thread.hpp>
+#include <boost/shared_ptr.hpp>
 
 namespace Seg3D {
   
-class ThresholdToolInterfacePrivate;
-
-class ThresholdToolInterface : public ToolWidget {
-  Q_OBJECT
-
-// Constructor/destructor  
+  class HistoryWidgetPrivate;
+  
+  class HistoryWidget : public QWidget 
+  {   
+    Q_OBJECT
+    
   public:
-    ThresholdToolInterface();
-    virtual ~ThresholdToolInterface();
-    virtual bool build_widget(QFrame* frame);
+    HistoryWidget(QWidget *parent = 0);
+    virtual ~HistoryWidget();
+    
     
   private:
-    ThresholdToolInterfacePrivate* private_;
-    SliderSpinComboDouble *upperThresholdAdjuster;
-    SliderSpinComboDouble *lowerThresholdAdjuster;
+    // Internals of the dockwidget
+    boost::shared_ptr<HistoryWidgetPrivate> private_;
     
-};
-    
-} // end namespace Seg3D
+  };
+  
+} // end namespace
 
-
-
-#endif
+#endif // HISTORYWIDGET_H

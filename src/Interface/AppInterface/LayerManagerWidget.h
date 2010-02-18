@@ -41,10 +41,12 @@
 #include <boost/smart_ptr.hpp>
 
 
+
+
 namespace Seg3D {
 
 class LayerManagerWidgetPrivate;
-typedef boost::shared_ptr< LayerManagerWidgetPrivate > LayerManagerWidgetPrivateHandle;
+typedef boost::shared_ptr< LayerManagerWidgetPrivate > LayerManagerWidgetPrivateHandle_type;
 
 class LayerManagerWidget : public QScrollArea
 {   
@@ -58,12 +60,18 @@ class LayerManagerWidget : public QScrollArea
     
 
   private Q_SLOTS:
-    void hide_show_resample( bool );
-    void hide_show_roi( bool );
-    void hide_show_layers( bool );
+    void hide_show_resample( bool hideshow );
+    void hide_show_roi( bool hideshow );
+  void hide_show_transform( bool hideshow );
+  void hide_show_flip_rotate( bool hideshow );
+    void hide_show_layers( bool hideshow );
     
-    void hide_show_brightness_contrast_bar( bool );
-    void hide_show_color_choose_bar( bool );
+    void hide_show_brightness_contrast_bar( bool hideshow );
+    void hide_show_color_choose_bar( bool hideshow );
+  void hide_show_opacity_bar( bool hideshow );
+  void lock_unlock_layer( bool lockunlock );
+  void show_progress_bar_bar();
+  void hide_progress_bar_bar();
     void color_button_clicked();
 
   public:
@@ -85,15 +93,16 @@ class LayerManagerWidget : public QScrollArea
     QVBoxLayout* group_layout_;
     int number_of_groups_;
 
-    LayerManagerWidgetPrivateHandle private_;
+
+    LayerManagerWidgetPrivateHandle_type private_;
 
     // Icons for the GUI
-    QIcon active_close_icon_;    
-    QIcon inactive_close_icon_;
-    QIcon expand_close_group_icon_;
+//    QIcon inactive_close_icon_;
+//    QIcon expand_close_group_icon_;
 
   private:
     bool validate_new_layer( const QString &dimensions );
+  void turn_off_or_on_checkboxes( const QString &dimensions, const bool &hideshow );
      
 };
 

@@ -25,44 +25,35 @@
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
  */
+#include <sstream>
+#include <iostream>
 
-#ifndef INTERFACE_TOOLINTERFACE_THRESHOLDTOOLINTERFACE_H
-#define INTERFACE_TOOLINTERFACE_THRESHOLDTOOLINTERFACE_H
-
-// Utils includes
 #include <Utils/Core/Log.h>
 
-// Application includes
-#include <Application/Tool/ToolFactory.h>
+#include <Interface/AppInterface/HistoryWidget.h>
+#include "ui_HistoryWidget.h"
 
-// Base class of the tool widget
-#include <Interface/AppInterface/ToolWidget.h>
-
-// Qt Gui Includes
-#include <Interface/ToolInterface/CustomWidgets/SliderSpinComboDouble.h>
-
-namespace Seg3D {
+namespace Seg3D  {
   
-class ThresholdToolInterfacePrivate;
-
-class ThresholdToolInterface : public ToolWidget {
-  Q_OBJECT
-
-// Constructor/destructor  
+  class HistoryWidgetPrivate {
   public:
-    ThresholdToolInterface();
-    virtual ~ThresholdToolInterface();
-    virtual bool build_widget(QFrame* frame);
     
-  private:
-    ThresholdToolInterfacePrivate* private_;
-    SliderSpinComboDouble *upperThresholdAdjuster;
-    SliderSpinComboDouble *lowerThresholdAdjuster;
+    Ui::HistoryWidget ui_;
     
-};
+  };
+  
+  
+  HistoryWidget::HistoryWidget( QWidget *parent ) :
+    private_( new HistoryWidgetPrivate )
+  { 
+    // Set up the private internals of the LayerManagerInterface class
+    private_->ui_.setupUi( this );
     
-} // end namespace Seg3D
-
-
-
-#endif
+  }
+  
+  HistoryWidget::~HistoryWidget()
+  {
+    
+  }
+  
+} // end namespace

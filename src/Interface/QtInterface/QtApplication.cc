@@ -46,8 +46,7 @@ QtApplication::QtApplication() :
 }
 
 
-bool
-QtApplication::setup(int argc, char **argv)
+bool QtApplication::setup(int argc, char **argv)
 {
   try
   {
@@ -83,8 +82,7 @@ QtApplication::setup(int argc, char **argv)
 }
 
 
-bool
-QtApplication::exec()
+bool QtApplication::exec()
 {
   bool success = true;
   try
@@ -107,14 +105,12 @@ QtApplication::exec()
   return (success);
 }
 
-QApplication* 
-QtApplication::qt_application()
+QApplication* QtApplication::qt_application()
 {
   return qt_application_;
 }
 
-QtRenderResourcesContextHandle
-QtApplication::qt_renderresources_context()
+QtRenderResourcesContextHandle QtApplication::qt_renderresources_context()
 {
   return qt_renderresources_context_;
 }

@@ -9,10 +9,12 @@
         <file>Images/Brightness.png</file>
         <file>Images/BrightnessOff.png</file>
         <file>Images/Close.png</file>
+		<file>Images/CloseWhite.png</file>
         <file>Images/Crop.png</file>
         <file>Images/CropOff.png</file>
-        <file>Images/CloseWhite.png</file>
-        <file>Images/DownArrow.png</file>
+		<file>Images/Color.png</file>
+		<file>Images/ColorOff.png</file>
+		<file>Images/DownArrow.png</file>
         <file>Images/DownArrowWhite.png</file>
         <file>Images/Data.png</file>
         <file>Images/DataWhite.png</file>
@@ -43,6 +45,8 @@
         <file>Images/MaskWhite_shadow.png</file>
         <file>Images/NextSlice.png</file>
         <file>Images/NextSliceOff.png</file>
+		<file>Images/Opacity.png</file>
+		<file>Images/OpacityOff.png</file>
         <file>Images/PreviousSlice.png</file>
         <file>Images/PreviousSliceOff.png</file>
         <file>Images/Resample.png</file>
@@ -51,6 +55,7 @@
         <file>Images/RightArrowWhite.png</file>
         <file>Images/SlicesVisible.png</file>
         <file>Images/SlicesVisibleOff.png</file>
+		<file>Images/Seg3DSplash.png</file>
         <file>Images/Transform.png</file>
         <file>Images/TransformOff.png</file>
         <file>Images/Text.png</file>
