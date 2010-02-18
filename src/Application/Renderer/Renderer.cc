@@ -31,7 +31,9 @@
 // application includes
 #include <Application/Renderer/Renderer.h>
 #include <Application/Renderer/RenderResources.h>
+#include <Application/Renderer/UnitCube.h>
 #include <Application/ViewerManager/ViewerManager.h>
+
 #include <Utils/EventHandler/DefaultEventHandlerContext.h>
 #include <Utils/Geometry/View3D.h>
 
@@ -59,14 +61,11 @@ public:
   }
 };
 
-int Renderer::red = 1;
-
 Renderer::Renderer() : 
   ViewerRenderer(), EventHandler(), 
   active_render_texture_(0), width_(0), 
   height_(0), redraw_needed_(false)
 {
-  red_ = (red++);
 }
 
 Renderer::~Renderer() 
@@ -88,6 +87,7 @@ void Renderer::initialize()
   depth_buffer_ = RenderBufferHandle(new RenderBuffer());
   frame_buffer_ = FrameBufferObjectHandle(new FrameBufferObject());
   frame_buffer_->attach_render_buffer(depth_buffer_, GL_DEPTH_ATTACHMENT_EXT);
+  this->cube_ = UnitCubeHandle(new UnitCube());
 
   // release the lock
   lock.unlock();
@@ -139,6 +139,11 @@ void Renderer::redraw()
   // do some rendering
   // ...
   // ...
+  //glEnable(GL_DEPTH_TEST);
+  //glDisable(GL_CULL_FACE);
+  //glCullFace(GL_FRONT);
+  //glFrontFace(GL_CW);
+  //glPolygonMode(GL_BACK, GL_LINE);
   const Utils::View3D& view3d = ViewerManager::Instance()->get_viewer(this->viewer_id_)->volume_view_state->get();
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
@@ -148,6 +153,12 @@ void Renderer::redraw()
   gluLookAt(view3d.eyep().x(), view3d.eyep().y(), view3d.eyep().z(), 
     view3d.lookat().x(), view3d.lookat().y(), view3d.lookat().z(),
     view3d.up().x(), view3d.up().y(), view3d.up().z());
+
+  //glRotatef(45.0f, 1, 1, 1);
+  //glScalef(0.5f, 0.5f, 0.5f);
+  //glTranslatef(-0.5f, -0.5f, -0.5f);
+  //this->cube_->draw();
+
   glBegin(GL_TRIANGLES);
   glColor3f(1.0, 0.0, 0.0);
   glVertex3f(0.5, -0.5, 0);

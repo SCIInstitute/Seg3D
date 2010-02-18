@@ -26,66 +26,33 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_RENDERER_RENDERER_H
-#define APPLICATION_RENDERER_RENDERER_H
+#ifndef APPLICATION_RENDERER_UNITCUBE_H
+#define APPLICATION_RENDERER_UNITCUBE_H
 
-#if defined (_MSC_VER) && (_MSC_VER >= 1020)
-# pragma once
-#endif
+#include <boost/smart_ptr.hpp>
 
-// boost includes
-#include <boost/thread/mutex.hpp>
+#include <Application/Renderer/VertexBufferObject.h>
 
-// Application includes
-#include <Application/Renderer/FrameBufferObject.h>
-#include <Application/Renderer/RenderBuffer.h>
-#include <Application/Renderer/RenderContext.h>
-#include <Application/Renderer/Texture.h>
-#include <Application/Renderer/UnitCube.h>
-#include <Application/Viewer/ViewerRenderer.h>
-
-#include <Utils/EventHandler/EventHandler.h>
-
-namespace Seg3D {
-
-// Forward declarations
-class Renderer;
-typedef boost::shared_ptr<Renderer> RendererHandle;
-
-// Class definitions
-class Renderer : public ViewerRenderer, private Utils::EventHandler 
+namespace Seg3D
 {
+class UnitCube;
+typedef boost::shared_ptr<UnitCube> UnitCubeHandle;
 
-  // -- constructor/destructor --
+class UnitCube
+{
 public:
-  Renderer();
-  virtual ~Renderer();
+  UnitCube();
+  ~UnitCube();
 
-public:
-
-  virtual void initialize();
-  virtual void redraw();
-
-  virtual void resize(int width, int height);
+  void draw();
 
 private:
+  VertexBufferObjectHandle vertices_buffer_;
+  VertexBufferObjectHandle faces_buffer_;
+  VertexBufferObjectHandle colors_buffer_;
 
-  // Context for rendering images
-  RenderContextHandle context_;
-
-  TextureHandle textures_[2];
-  RenderBufferHandle depth_buffer_;
-  FrameBufferObjectHandle frame_buffer_;
-  UnitCubeHandle cube_;
-
-  int active_render_texture_;
-
-  int width_;
-  int height_;
-  bool redraw_needed_;
-
-  boost::mutex redraw_needed_mutex_;
-
+  const static GLfloat VERTICES_C[8][3];
+  const static GLubyte FACES_C[6][4];
 };
 
 } // end namespace Seg3D

@@ -46,6 +46,10 @@ SET(APPLICATION_RENDERER_SRCS
   RenderBuffer.cc
   FrameBufferObject.h
   FrameBufferObject.cc
+  VertexBufferObject.h
+  VertexBufferObject.cc
+  UnitCube.h
+  UnitCube.cc
   )
 
 
