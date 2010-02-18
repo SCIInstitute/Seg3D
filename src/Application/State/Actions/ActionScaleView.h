@@ -26,23 +26,23 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_STATE_ACTIONS_ACTIONSCALEVIEW3D_H
-#define APPLICATION_STATE_ACTIONS_ACTIONSCALEVIEW3D_H
+#ifndef APPLICATION_STATE_ACTIONS_ACTIONSCALEVIEW_H
+#define APPLICATION_STATE_ACTIONS_ACTIONSCALEVIEW_H
 
 #include <Application/Action/Action.h>
 #include <Application/Interface/Interface.h>
-#include <Application/State/StateView3D.h>
+#include <Application/State/StateViewBase.h>
 
 namespace Seg3D {
 
-class ActionScaleView3D : public Action
+class ActionScaleView : public Action
 {
   SCI_ACTION_TYPE("Scale", "Scale <key> <ratio>", APPLICATION_E)
 
 public:
-  ActionScaleView3D();
+  ActionScaleView();
 
-  virtual ~ActionScaleView3D() {}
+  virtual ~ActionScaleView() {}
 
   virtual bool validate(ActionContextHandle& context);
   virtual bool run(ActionContextHandle& context, ActionResultHandle& result);
@@ -51,11 +51,23 @@ private:
   ActionParameter<std::string> stateid_;
   ActionParameter<double> scale_ratio_;
 
-  StateView3DWeakHandle state_weak_handle_;
+  StateViewBaseWeakHandle state_weak_handle_;
 
 public:
-  static void Dispatch(StateView3DHandle& view3d_state, double ratio);
+  template <class VIEWSTATEHANDLE>
+  static void Dispatch(VIEWSTATEHANDLE& view_state, double ratio);
 };
+
+template <class VIEWSTATEHANDLE>
+void ActionScaleView::Dispatch( VIEWSTATEHANDLE& view_state, double ratio )
+{
+  ActionScaleView* action = new ActionScaleView;
+  action->stateid_ = view_state->stateid();
+  action->scale_ratio_ = ratio;
+  action->state_weak_handle_ = view_state;
+
+  Interface::PostAction(ActionHandle(action));
+}
 
 } // end namespace Seg3D
 

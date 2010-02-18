@@ -30,8 +30,8 @@
 #include <Utils/Math/MathFunctions.h>
 
 #include <Application/State/Actions/ActionRotateView3D.h>
-#include <Application/State/Actions/ActionScaleView3D.h>
-#include <Application/State/Actions/ActionTranslateView3D.h>
+#include <Application/State/Actions/ActionScaleView.h>
+#include <Application/State/Actions/ActionTranslateView.h>
 #include <Application/Viewer/Viewer.h>
 #include <Application/Viewer/ViewManipulator.h>
 
@@ -99,7 +99,7 @@ void ViewManipulator::mouse_move( const MouseHistory& mouse_history, int button,
     // dispatch an ActionTranslate
     if (this->viewer_->view_mode_state->get() == "volume")
     {
-      ActionTranslateView3D::Dispatch(this->viewer_->volume_view_state, offset);
+      ActionTranslateView::Dispatch(this->viewer_->volume_view_state, offset);
     }
   }
   else if (this->scale_active_)
@@ -109,7 +109,7 @@ void ViewManipulator::mouse_move( const MouseHistory& mouse_history, int button,
     // dispatch an ActionScale
     if (this->viewer_->view_mode_state->get() == "volume")
     {
-      ActionScaleView3D::Dispatch(this->viewer_->volume_view_state, scale_ratio);
+      ActionScaleView::Dispatch(this->viewer_->volume_view_state, scale_ratio);
     } 
   } 
   else if (this->rotate_active_)
@@ -155,12 +155,6 @@ bool ViewManipulator::compute_rotation( int x0, int y0, int x1, int y1, Utils::V
     return false;
   }
 
-  // negate the angle for camera rotation
-  if (this->camera_mode_)
-  {
-    angle = -angle;
-  }
-  // convert angle from radian to degrees
   angle = angle * 180.0 / Utils::Pi();
   
   return true;

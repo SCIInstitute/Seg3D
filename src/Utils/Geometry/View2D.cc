@@ -31,7 +31,8 @@
 
 namespace Utils {
 
-View2D::View2D()
+View2D::View2D() :
+  center_(0, 0, 0), scalex_(0.5), scaley_(0.5)
 {
 }
 
@@ -80,6 +81,22 @@ View2D::operator!=(const View2D& copy) const
 {
   return (center_ != copy.center_ || scalex_ != copy.scalex_ ||
           scaley_ != copy.scaley_ ); 
+}
+
+void View2D::scale( double ratio )
+{
+
+}
+
+void View2D::translate( const Vector& offset )
+{
+
+}
+
+void View2D::resize( int width, int height )
+{
+  this->width_ = width;
+  this->height_ = height;
 }
 
 } // End namespace Utils

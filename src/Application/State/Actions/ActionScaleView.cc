@@ -26,20 +26,22 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#include <Application/State/Actions/ActionScaleView3D.h>
+#include <Application/State/Actions/ActionScaleView.h>
+#include <Application/State/StateView2D.h>
+#include <Application/State/StateView3D.h>
 
 namespace Seg3D
 {
 
-SCI_REGISTER_ACTION(ScaleView3D);
+SCI_REGISTER_ACTION(ScaleView);
 
-ActionScaleView3D::ActionScaleView3D()
+ActionScaleView::ActionScaleView()
 {
-  add_argument(stateid_);
-  add_argument(scale_ratio_);
+  add_argument(this->stateid_);
+  add_argument(this->scale_ratio_);
 }
 
-bool ActionScaleView3D::validate( ActionContextHandle& context )
+bool ActionScaleView::validate( ActionContextHandle& context )
 {
   StateBaseHandle state = this->state_weak_handle_.lock();
   if (!state)
@@ -50,22 +52,22 @@ bool ActionScaleView3D::validate( ActionContextHandle& context )
       return false;
     }
 
-    if (typeid(*state) != typeid(StateView3D))
+    if (typeid(*state) != typeid(StateView2D) && typeid(*state) != typeid(StateView3D))
     {
       context->report_error(std::string("State variable '") + stateid_.value() 
-        + "' doesn't support ActionScaleView3D");
+        + "' doesn't support ActionScaleView");
       return false;
     }
 
-    this->state_weak_handle_ = StateView3DWeakHandle(boost::dynamic_pointer_cast<StateView3D>(state));
+    this->state_weak_handle_ = boost::dynamic_pointer_cast<StateViewBase>(state);
   }
 
   return true;
 }
 
-bool ActionScaleView3D::run( ActionContextHandle& context, ActionResultHandle& result )
+bool ActionScaleView::run( ActionContextHandle& context, ActionResultHandle& result )
 {
-  StateView3DHandle state = this->state_weak_handle_.lock();
+  StateViewBaseHandle state = this->state_weak_handle_.lock();
 
   if (state)
   {
@@ -74,16 +76,6 @@ bool ActionScaleView3D::run( ActionContextHandle& context, ActionResultHandle& r
   }
 
   return false;
-}
-
-void ActionScaleView3D::Dispatch( StateView3DHandle& view3d_state, double ratio )
-{
-  ActionScaleView3D* action = new ActionScaleView3D;
-  action->stateid_ = view3d_state->stateid();
-  action->scale_ratio_ = ratio;
-  action->state_weak_handle_ = StateView3DWeakHandle(view3d_state);
-
-  Interface::PostAction(ActionHandle(action));
 }
 
 } // end namespace Seg3D

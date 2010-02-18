@@ -60,10 +60,10 @@ SET(APPLICATION_STATE_ACTIONS_SRCS
   Actions/ActionResizeView.cc
   Actions/ActionRotateView3D.h
   Actions/ActionRotateView3D.cc
-  Actions/ActionScaleView3D.h
-  Actions/ActionScaleView3D.cc
-  Actions/ActionTranslateView3D.h
-  Actions/ActionTranslateView3D.cc
+  Actions/ActionScaleView.h
+  Actions/ActionScaleView.cc
+  Actions/ActionTranslateView.h
+  Actions/ActionTranslateView.cc
   )
 
 ADD_LIBRARY(Application_State STATIC 

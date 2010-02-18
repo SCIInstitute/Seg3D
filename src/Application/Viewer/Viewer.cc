@@ -64,13 +64,10 @@ Viewer::~Viewer()
 void Viewer::resize( int width, int height )
 {
   this->view_manipulator_->resize(width, height);
-  if (width != 0 && height != 0)
-  {
-    ActionResizeView::Dispatch(this->volume_view_state, width, height);
-    ActionResizeView::Dispatch(this->axial_view_state, width, height);
-    ActionResizeView::Dispatch(this->sagittal_view_state, width, height);
-    ActionResizeView::Dispatch(this->coronal_view_state, width, height);
-  } 
+  ActionResizeView::Dispatch(this->volume_view_state, width, height);
+  ActionResizeView::Dispatch(this->axial_view_state, width, height);
+  ActionResizeView::Dispatch(this->sagittal_view_state, width, height);
+  ActionResizeView::Dispatch(this->coronal_view_state, width, height);
 }
 
 void Viewer::mouse_move_event( const MouseHistory& mouse_history, int button, int buttons, int modifiers )

@@ -26,39 +26,51 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_STATE_ACTIONS_ACTIONTRANSLATEVIEW3D_H
-#define APPLICATION_STATE_ACTIONS_ACTIONTRANSLATEVIEW3D_H
+#ifndef APPLICATION_STATE_ACTIONS_ACTIONTRANSLATEVIEW_H
+#define APPLICATION_STATE_ACTIONS_ACTIONTRANSLATEVIEW_H
 
 #include <Application/Action/Action.h>
 #include <Application/Interface/Interface.h>
-#include <Application/State/StateView3D.h>
+#include <Application/State/StateViewBase.h>
 
 #include <Utils/Geometry/Vector.h>
 
 namespace Seg3D
 {
 
-  class ActionTranslateView3D : public Action
-  {
-    SCI_ACTION_TYPE("TranslateView3D", "Translate <key> <offset>", APPLICATION_E)
+class ActionTranslateView : public Action
+{
+  SCI_ACTION_TYPE("Translate", "Translate <key> <offset>", APPLICATION_E)
 
-  public:
-    ActionTranslateView3D();
-    virtual ~ActionTranslateView3D() {}
+public:
+  ActionTranslateView();
+  virtual ~ActionTranslateView() {}
 
-    virtual bool validate(ActionContextHandle& context);
-    virtual bool run(ActionContextHandle& context, ActionResultHandle& result);
+  virtual bool validate(ActionContextHandle& context);
+  virtual bool run(ActionContextHandle& context, ActionResultHandle& result);
 
-  private:
-    ActionParameter<std::string> stateid_;
-    ActionParameter<Utils::Vector> offset_;
+private:
+  ActionParameter<std::string> stateid_;
+  ActionParameter<Utils::Vector> offset_;
 
-    StateView3DWeakHandle state_weak_handle_;
+  StateViewBaseWeakHandle state_weak_handle_;
 
-  public:
-    static void Dispatch(StateView3DHandle& view3d_state, const Utils::Vector& offset);
+public:
+  template <class VIEWSTATEHANDLE> 
+  static void Dispatch(VIEWSTATEHANDLE& view_state, const Utils::Vector& offset);
 
-  };
+};
+
+template <class VIEWSTATEHANDLE>  
+void ActionTranslateView::Dispatch( VIEWSTATEHANDLE& view_state, const Utils::Vector& offset )
+{
+  ActionTranslateView* action = new ActionTranslateView;
+  action->stateid_ = view_state->stateid();
+  action->offset_ = offset;
+  action->state_weak_handle_ = view_state;
+
+  Interface::PostAction(ActionHandle(action));
+}
 
 } // end namespace Seg3D
 

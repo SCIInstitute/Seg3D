@@ -55,13 +55,15 @@ View3D::View3D(const Point& eyep, const Point& lookat,
 }
 
 View3D::View3D(const View3D& copy) : 
+  u_(copy.u_),
+  v_(copy.v_),
+  viewplane_changed_(copy.viewplane_changed_),
   eyep_(copy.eyep_), 
   lookat_(copy.lookat_), 
   up_(copy.up_), 
   fovy_(copy.fovy_),
-  u_(copy.u_),
-  v_(copy.v_),
-  viewplane_changed_(copy.viewplane_changed_)
+  width_(copy.width_),
+  height_(copy.height_)
 {
 }
 
@@ -74,6 +76,8 @@ View3D& View3D::operator=(const View3D& copy)
   this->u_ = copy.u_;
   this->v_ = copy.v_;
   this->viewplane_changed_ = copy.viewplane_changed_;
+  this->width_ = copy.width_;
+  this->height_ = copy.height_;
 
   return *this;
 }
@@ -103,14 +107,20 @@ void View3D::rotate( const Vector& axis, double angle )
   Matrix mat;
   quat.to_matrix(mat);
 
-  this->up_ = mat * y;
-  this->eyep_ = this->lookat_ + mat * z * eye_distance; 
+  Transform view_trans;
+  view_trans.load_frame(x, y, z);
+  view_trans.pre_mult_matrix(mat);
+  const Matrix& view_mat = view_trans.get_matrix();
+
+  this->up_ = Vector(view_mat(1, 0), view_mat(1, 1), view_mat(1, 2));
+  this->eyep_ = this->lookat_ + eye_distance  * Vector(view_mat(2, 0), view_mat(2, 1), view_mat(2, 2));
+
   this->viewplane_changed_ = true;
 }
 
 void View3D::scale( double ratio )
 {
-  this->eyep_ = this->lookat_ + (this->eyep_ - this->lookat_) * ratio;
+  this->eyep_ = this->lookat_ + (this->eyep_ - this->lookat_) / ratio;
   this->viewplane_changed_ = true;
 }
 

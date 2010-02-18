@@ -38,39 +38,46 @@ namespace Utils {
 class View2D;
 
 class View2D {
-  public:
-    View2D();
-    View2D(const Point& center, double scale);
-    View2D(const Point& center, double scalex, double scaley);
+public:
+  View2D();
+  View2D(const Point& center, double scale);
+  View2D(const Point& center, double scalex, double scaley);
 
-    ~View2D();
+  ~View2D();
 
-    View2D(const View2D&);
-    View2D& operator=(const View2D&);
+  View2D(const View2D&);
+  View2D& operator=(const View2D&);
 
-    // compare 2 views; are they exactly the same?
-    bool operator==(const View2D&) const;
-    bool operator!=(const View2D&) const;
+  // compare 2 views; are they exactly the same?
+  bool operator==(const View2D&) const;
+  bool operator!=(const View2D&) const;
 
-    inline Point center() const                { return center_; }
-    inline void center(const Point& center)    { center_ = center; }
+  inline Point center() const                { return center_; }
+  inline void center(const Point& center)    { center_ = center; }
 
-    inline double scalex() const                { return scalex_; }
-    inline void   scalex(double scalex)         { scalex_ = scalex; }
+  inline double scalex() const                { return scalex_; }
+  inline void   scalex(double scalex)         { scalex_ = scalex; }
 
-    inline double scaley() const                { return scaley_; }
-    inline void   scaley(double scaley)         { scaley_ = scaley; }
-    
-  private:
-    // Center point
-    Point  center_;
-    
-    // Size of slice displayed in x direction (if negative the axis needs to be flipped)
-    double scalex_;
+  inline double scaley() const                { return scaley_; }
+  inline void   scaley(double scaley)         { scaley_ = scaley; }
 
-    // Size of slice displayed in y direction (if negative the axis needs to be flipped)
-    double scaley_;
-    };
+  void scale(double ratio);
+  void translate(const Vector& offset);
+  void resize(int width, int height);
+
+private:
+  // Center point
+  Point  center_;
+
+  // Size of slice displayed in x direction (if negative the axis needs to be flipped)
+  double scalex_;
+
+  // Size of slice displayed in y direction (if negative the axis needs to be flipped)
+  double scaley_;
+
+  int width_;
+  int height_;
+};
 
 } // End namespace Utils
 
