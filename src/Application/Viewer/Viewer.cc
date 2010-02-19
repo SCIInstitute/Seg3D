@@ -36,7 +36,7 @@ namespace Seg3D {
 Viewer::Viewer(const std::string& key) :
   StateHandler(key)
 {
-  add_state("view_mode", view_mode_state, "axial", "axial|coronal|sagittal|volume");
+  add_state("view_mode", view_mode_state, "volume", "axial|coronal|sagittal|volume");
 
   add_state("axial_view", axial_view_state);
   add_state("sagittal_view", sagittal_view_state);

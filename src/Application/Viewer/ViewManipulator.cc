@@ -96,13 +96,15 @@ void ViewManipulator::mouse_move( const MouseHistory& mouse_history, int button,
   {
     Utils::Vector offset = this->compute_translation(mouse_history.previous.x, mouse_history.previous.y,
       mouse_history.current.x, mouse_history.current.y);
-    ActionTranslateView::Dispatch(this->viewer_->get_active_view_state(), offset);
+    StateViewBaseHandle view_state = this->viewer_->get_active_view_state();
+    ActionTranslateView::Dispatch(view_state, offset);
   }
   else if (this->scale_active_)
   {
     double scale_ratio = this->compute_scaling(mouse_history.previous.x, mouse_history.previous.y,
       mouse_history.current.x, mouse_history.current.y);
-    ActionScaleView::Dispatch(this->viewer_->get_active_view_state(), scale_ratio);
+    StateViewBaseHandle view_state = this->viewer_->get_active_view_state();
+    ActionScaleView::Dispatch(view_state, scale_ratio);
   }
   else if (this->rotate_active_)
   {

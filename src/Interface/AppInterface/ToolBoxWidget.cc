@@ -42,6 +42,7 @@
 
 namespace Seg3D  {
   
+  
 typedef std::vector<QWidget*> tool_page_list_type;
 
 class ToolBoxWidgetPrivate {  

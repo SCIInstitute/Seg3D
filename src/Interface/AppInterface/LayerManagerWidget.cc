@@ -67,19 +67,6 @@ QScrollArea( parent )
   //initialize the number of groups
   number_of_groups_ = 0;
   
-//  { // initialize the icons
-//    active_close_icon_.addFile(QString::fromUtf8(":/Images/CloseWhite.png"), 
-//                   QSize(), QIcon::Normal, QIcon::Off);    
-//    inactive_close_icon_.addFile(QString::fromUtf8(":/Images/Close.png"), 
-//                   QSize(), QIcon::Normal, QIcon::Off);
-//    
-//    expand_close_group_icon_.addFile(QString::fromUtf8(":/Images/RightArrowWhite.png"), 
-//                     QSize(), QIcon::Normal, QIcon::Off);
-//    expand_close_group_icon_.addFile(QString::fromUtf8(":/Images/DownArrowWhite.png"), 
-//                     QSize(), QIcon::Normal, QIcon::On);
-//  } // end initialize the icons
-  
-  
   // make a new LayerManagerWidgetPrivateHandle_type object
   private_ = LayerManagerWidgetPrivateHandle_type ( new LayerManagerWidgetPrivate );
   
@@ -157,55 +144,55 @@ LayerManagerWidget::~LayerManagerWidget()
     group_handle_->transform_->hide();
     
     // add the slider spinner combo's for the crop
-    SliderSpinComboInt* x_adjuster_ = new SliderSpinComboInt(new_group_);
-    group_handle_->horizontalLayout_11->addWidget(x_adjuster_);
-    x_adjuster_->setObjectName(QString::fromUtf8("x_adjuster_"));
+    SliderSpinComboInt* x_adjuster_crop = new SliderSpinComboInt(new_group_);
+    group_handle_->horizontalLayout_11->addWidget(x_adjuster_crop);
+    x_adjuster_crop->setObjectName(QString::fromUtf8("x_adjuster_crop"));
     
-    SliderSpinComboInt* y_adjuster_ = new SliderSpinComboInt(new_group_);
-    group_handle_->horizontalLayout_12->addWidget(y_adjuster_);
-    y_adjuster_->setObjectName(QString::fromUtf8("y_adjuster_"));
+    SliderSpinComboInt* y_adjuster_crop = new SliderSpinComboInt(new_group_);
+    group_handle_->horizontalLayout_12->addWidget(y_adjuster_crop);
+    y_adjuster_crop->setObjectName(QString::fromUtf8("y_adjuster_crop"));
     
-    SliderSpinComboInt* z_adjuster_ = new SliderSpinComboInt(new_group_);
-    group_handle_->horizontalLayout_14->addWidget(z_adjuster_);
-    z_adjuster_->setObjectName(QString::fromUtf8("z_adjuster_"));
+    SliderSpinComboInt* z_adjuster_crop = new SliderSpinComboInt(new_group_);
+    group_handle_->horizontalLayout_14->addWidget(z_adjuster_crop);
+    z_adjuster_crop->setObjectName(QString::fromUtf8("z_adjuster_crop"));
     
-    SliderSpinComboInt* height_adjuster_ = new SliderSpinComboInt(new_group_);
-    group_handle_->horizontalLayout_7->addWidget(height_adjuster_);
-    height_adjuster_->setObjectName(QString::fromUtf8("height_adjuster_"));
+    SliderSpinComboInt* height_adjuster_crop = new SliderSpinComboInt(new_group_);
+    group_handle_->horizontalLayout_7->addWidget(height_adjuster_crop);
+    height_adjuster_crop->setObjectName(QString::fromUtf8("height_adjuster_crop"));
     
-    SliderSpinComboInt* width_adjuster_ = new SliderSpinComboInt(new_group_);
-    group_handle_->horizontalLayout_9->addWidget(width_adjuster_);
-    width_adjuster_->setObjectName(QString::fromUtf8("width_adjuster_"));
+    SliderSpinComboInt* width_adjuster_crop = new SliderSpinComboInt(new_group_);
+    group_handle_->horizontalLayout_9->addWidget(width_adjuster_crop);
+    width_adjuster_crop->setObjectName(QString::fromUtf8("width_adjuster_crop"));
     
-    SliderSpinComboInt* depth_adjuster_ = new SliderSpinComboInt(new_group_);
-    group_handle_->horizontalLayout_10->addWidget(depth_adjuster_);
-    depth_adjuster_->setObjectName(QString::fromUtf8("depth_adjuster_"));
+    SliderSpinComboInt* depth_adjuster_crop = new SliderSpinComboInt(new_group_);
+    group_handle_->horizontalLayout_10->addWidget(depth_adjuster_crop);
+    depth_adjuster_crop->setObjectName(QString::fromUtf8("depth_adjuster_crop"));
     
     
     // add the slider spinner combo's for the tranform
-    SliderSpinComboInt* x_adjuster_2 = new SliderSpinComboInt(new_group_);
-    group_handle_->horizontalLayout_16->addWidget(x_adjuster_2);
-    x_adjuster_2->setObjectName(QString::fromUtf8("x_adjuster_2"));
+    SliderSpinComboInt* x_adjuster_transform = new SliderSpinComboInt(new_group_);
+    group_handle_->horizontalLayout_16->addWidget(x_adjuster_transform);
+    x_adjuster_transform->setObjectName(QString::fromUtf8("x_adjuster_transform"));
     
-    SliderSpinComboInt* y_adjuster_2 = new SliderSpinComboInt(new_group_);
-    group_handle_->horizontalLayout_17->addWidget(y_adjuster_2);
-    y_adjuster_2->setObjectName(QString::fromUtf8("y_adjuster_2"));
+    SliderSpinComboInt* y_adjuster_transform = new SliderSpinComboInt(new_group_);
+    group_handle_->horizontalLayout_17->addWidget(y_adjuster_transform);
+    y_adjuster_transform->setObjectName(QString::fromUtf8("y_adjuster_transform"));
     
-    SliderSpinComboInt* z_adjuster_2 = new SliderSpinComboInt(new_group_);
-    group_handle_->horizontalLayout_18->addWidget(z_adjuster_2);
-    z_adjuster_2->setObjectName(QString::fromUtf8("z_adjuster_2"));
+    SliderSpinComboInt* z_adjuster_transform = new SliderSpinComboInt(new_group_);
+    group_handle_->horizontalLayout_18->addWidget(z_adjuster_transform);
+    z_adjuster_transform->setObjectName(QString::fromUtf8("z_adjuster_transform"));
     
-    SliderSpinComboDouble* height_adjuster_2 = new SliderSpinComboDouble(new_group_);
-    group_handle_->horizontalLayout_20->addWidget(height_adjuster_2);
-    height_adjuster_2->setObjectName(QString::fromUtf8("height_adjuster_2"));
+    SliderSpinComboDouble* height_adjuster_transform = new SliderSpinComboDouble(new_group_);
+    group_handle_->horizontalLayout_20->addWidget(height_adjuster_transform);
+    height_adjuster_transform->setObjectName(QString::fromUtf8("height_adjuster_transform"));
     
-    SliderSpinComboDouble* width_adjuster_2 = new SliderSpinComboDouble(new_group_);
-    group_handle_->horizontalLayout_19->addWidget(width_adjuster_2);
-    width_adjuster_2->setObjectName(QString::fromUtf8("width_adjuster_2"));
+    SliderSpinComboDouble* width_adjuster_transform = new SliderSpinComboDouble(new_group_);
+    group_handle_->horizontalLayout_19->addWidget(width_adjuster_transform);
+    width_adjuster_transform->setObjectName(QString::fromUtf8("width_adjuster_transform"));
     
-    SliderSpinComboDouble* depth_adjuster_2 = new SliderSpinComboDouble(new_group_);
-    group_handle_->horizontalLayout_21->addWidget(depth_adjuster_2);
-    depth_adjuster_2->setObjectName(QString::fromUtf8("depth_adjuster_2"));
+    SliderSpinComboDouble* depth_adjuster_transform = new SliderSpinComboDouble(new_group_);
+    group_handle_->horizontalLayout_21->addWidget(depth_adjuster_transform);
+    depth_adjuster_transform->setObjectName(QString::fromUtf8("depth_adjuster_transform"));
     
     
     SliderSpinComboInt* scale_adjuster = new SliderSpinComboInt(new_group_);
@@ -289,6 +276,7 @@ LayerManagerWidget::~LayerManagerWidget()
     connect( layer_handle_->brightness_contrast_button_,  SIGNAL(clicked( bool )),  this, SLOT( hide_show_brightness_contrast_bar( bool )));
     connect( layer_handle_->compute_iso_surface_button_,  SIGNAL(clicked()),      this, SLOT( show_progress_bar_bar()));
     connect( layer_handle_->progress_cancel_button_,    SIGNAL(clicked()),      this, SLOT( hide_progress_bar_bar()));
+    connect( layer_handle_->lock_button_,         SIGNAL( clicked( bool ) ),  this, SLOT( lock_unlock_layer( bool )));
     
     // add the new widget to the appropriate group's group_frame_layout_
     for ( GroupList_type::const_iterator i = private_->group_list_.begin(); i != private_->group_list_.end(); i++ )
@@ -531,13 +519,14 @@ LayerManagerWidget::~LayerManagerWidget()
       {
         if( lockunlock ) 
         {
-          //(*i).setStyleSheet(QString::fromUtf8("QWidget#layer_widget_{"
-          //  "background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(221, 118, 25, 255), stop:0.155779 rgba(228, 163, 81, 255), stop:1 rgba(185, 82, 22, 255));}"));
+          (*i)->header_->setStyleSheet(QString::fromUtf8("QWidget#header_{"
+            "background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(221, 118, 25, 255), stop:0.155779 rgba(228, 163, 81, 255), stop:1 rgba(185, 82, 22, 255));"
+            "border-radius: 6px;}"));
         }
         else
         {
-          //(*i)->setStyleSheet(QString::fromUtf8("QWidget#LayerWidget{"
-          //"background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(241, 241, 241, 255), stop:0.155779 rgba(248, 248, 248, 255), stop:1 rgba(224, 224, 224, 255));}"));
+          (*i)->header_->setStyleSheet(QString::fromUtf8("QWidget#header_{"
+          "background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));}"));
         }
       } 
     }

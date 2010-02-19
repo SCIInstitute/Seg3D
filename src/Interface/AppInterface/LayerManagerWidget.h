@@ -93,12 +93,7 @@ class LayerManagerWidget : public QScrollArea
     QVBoxLayout* group_layout_;
     int number_of_groups_;
 
-
     LayerManagerWidgetPrivateHandle_type private_;
-
-    // Icons for the GUI
-//    QIcon inactive_close_icon_;
-//    QIcon expand_close_group_icon_;
 
   private:
     bool validate_new_layer( const QString &dimensions );
