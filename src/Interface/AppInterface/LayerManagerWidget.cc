@@ -44,6 +44,9 @@
 
 namespace Seg3D  {
   
+  typedef boost::shared_ptr <QWidget> QWidgetHandle;
+  typedef std::list<QWidgetHandle> newlayerlisttype;
+
 typedef boost::shared_ptr <Ui::LayerGroupWidget> LayerGroupWidgetHandle_type;
 typedef std::list<LayerGroupWidgetHandle_type> GroupList_type;
 
@@ -58,6 +61,7 @@ public:
   
   GroupList_type group_list_;
   LayerList_type layer_list_;
+  newlayerlisttype layer_widget_list_;
 };
 
 
@@ -103,11 +107,11 @@ QScrollArea( parent )
   new_group( QString::fromUtf8( "100x200x200" ));
   
   //add test layers
-  new_layer(DATA_LAYER_E, QString::fromUtf8( "Green Footed Lemur Fetus" ), QString::fromUtf8( "300x200x400" ));
-  new_layer(DATA_LAYER_E, QString::fromUtf8("Mouse Specimen #1"), QString::fromUtf8("300x200x400") );
-  new_layer(DATA_LAYER_E, QString::fromUtf8("3rd Trimester Monkey Brain"), QString::fromUtf8("300x200x400") );
-  new_layer(DATA_LAYER_E, QString::fromUtf8("Green Footed Lemur Fetus"), QString::fromUtf8("300x200x400") );
-  new_layer(DATA_LAYER_E, QString::fromUtf8("Bleu Cheese Dressing"), QString::fromUtf8("700x300x440") );
+  new_layer(DATA_LAYER_E, QString::fromUtf8( "Mouse Study 23430.43" ), QString::fromUtf8( "300x200x400" ));
+  new_layer(DATA_LAYER_E, QString::fromUtf8( "Rat Spine-432.d9s" ), QString::fromUtf8("300x200x400") );
+  new_layer(DATA_LAYER_E, QString::fromUtf8( "CervicalSpine_23k3s.23" ), QString::fromUtf8("300x200x400") );
+  new_layer(DATA_LAYER_E, QString::fromUtf8( "Neuro Study Rat.3421" ), QString::fromUtf8("300x200x400") );
+  new_layer(DATA_LAYER_E, QString::fromUtf8( "Cervical_239.sle" ), QString::fromUtf8("700x300x440") );
   
 }
 // destructor
@@ -119,7 +123,7 @@ LayerManagerWidget::~LayerManagerWidget()
   // add it also to the group_list_
   void LayerManagerWidget::new_group( const QString &dimensions )
   {
-    if ( !validate_new_layer(dimensions) )
+    if ( !validate_new_group(dimensions) )
     {
       return;
     }
@@ -219,7 +223,7 @@ LayerManagerWidget::~LayerManagerWidget()
   
   
   // iterate through all the current layers and check to see if a layer with similar dimensions already exists
-  bool LayerManagerWidget::validate_new_layer( const QString &dimensions )
+  bool LayerManagerWidget::validate_new_group( const QString &dimensions )
   {
     for ( GroupList_type::const_iterator i = private_->group_list_.begin(); i != private_->group_list_.end(); i++ )
     {
@@ -245,8 +249,15 @@ LayerManagerWidget::~LayerManagerWidget()
     // create a handle to the layer ui object
     LayerWidgetHandle_type layer_handle_ ( new Ui::LayerWidget( private_->layer_ui_ ));
     
+    //QWidgetHandle layer_widget_handle_ (new QWidget(new_layer_));
+
+    
     // set some values in the GUI
     layer_handle_->label_->setText(label);
+    //->findChild< QToolButton* >( "close_button_" )
+    //SCI_LOG_ERROR(new_layer_->findChild< QLineEdit* >( "label_" )->text().toStdString());
+    //SCI_LOG_ERROR(layer_widget_handle_->findChild< QLineEdit* >( "label_" )->text().toStdString());//->setText(QString::fromUtf8("testing"));
+    
     layer_handle_->dimensions_->setText(dimensions);
     
     // hide the tool bars and the selection checkbox
@@ -255,6 +266,7 @@ LayerManagerWidget::~LayerManagerWidget()
     layer_handle_->checkbox_widget_->hide();
     layer_handle_->opacity_bar_->hide();
     layer_handle_->progress_bar_bar_->hide();
+    layer_handle_->border_bar_->hide();
     layer_handle_->dimensions_->hide();
     
     SliderSpinComboInt* opacity_adjuster_ = new SliderSpinComboInt(new_layer_);
@@ -268,15 +280,20 @@ LayerManagerWidget::~LayerManagerWidget()
     SliderSpinComboInt* contrast_adjuster_ = new SliderSpinComboInt(new_layer_);
     layer_handle_->contrast_h_layout_->addWidget(contrast_adjuster_);
     contrast_adjuster_->setObjectName(QString::fromUtf8("contrast_adjuster_"));
+
+    layer_handle_->border_selection_combo_->addItem(QString::fromUtf8("No Border"));
+    layer_handle_->border_selection_combo_->addItem(QString::fromUtf8("Thin Border"));
+    layer_handle_->border_selection_combo_->addItem(QString::fromUtf8("Thick Border"));
     
     
     // connect the signals and slots
-    connect( layer_handle_->color_button_,          SIGNAL(clicked( bool )),  this, SLOT( hide_show_color_choose_bar( bool )));
-    connect( layer_handle_->opacity_button_,        SIGNAL(clicked( bool )),  this, SLOT( hide_show_opacity_bar( bool )));
-    connect( layer_handle_->brightness_contrast_button_,  SIGNAL(clicked( bool )),  this, SLOT( hide_show_brightness_contrast_bar( bool )));
-    connect( layer_handle_->compute_iso_surface_button_,  SIGNAL(clicked()),      this, SLOT( show_progress_bar_bar()));
-    connect( layer_handle_->progress_cancel_button_,    SIGNAL(clicked()),      this, SLOT( hide_progress_bar_bar()));
-    connect( layer_handle_->lock_button_,         SIGNAL( clicked( bool ) ),  this, SLOT( lock_unlock_layer( bool )));
+    connect( layer_handle_->color_button_,          SIGNAL( clicked( bool )), this, SLOT( hide_show_color_choose_bar( bool )));
+    connect( layer_handle_->opacity_button_,        SIGNAL( clicked( bool )), this, SLOT( hide_show_opacity_bar( bool )));
+    connect( layer_handle_->brightness_contrast_button_,  SIGNAL( clicked( bool )), this, SLOT( hide_show_brightness_contrast_bar( bool )));
+    connect( layer_handle_->compute_iso_surface_button_,  SIGNAL( clicked() ),      this, SLOT( show_progress_bar_bar()));
+    connect( layer_handle_->progress_cancel_button_,    SIGNAL( clicked() ),      this, SLOT( hide_progress_bar_bar()));
+    connect( layer_handle_->lock_button_,         SIGNAL( clicked( bool )), this, SLOT( lock_unlock_layer( bool )));
+    connect( layer_handle_->fill_border_button_,  SIGNAL( clicked( bool )), this, SLOT( hide_show_border_bar ( bool )));
     
     // add the new widget to the appropriate group's group_frame_layout_
     for ( GroupList_type::const_iterator i = private_->group_list_.begin(); i != private_->group_list_.end(); i++ )
@@ -496,6 +513,8 @@ LayerManagerWidget::~LayerManagerWidget()
           (*i)->brightness_contrast_button_->setChecked( false );
           (*i)->opacity_bar_->hide();
           (*i)->opacity_button_->setChecked( false );
+          (*i)->border_bar_->hide();
+          (*i)->fill_border_button_->setChecked( false );
           //TEST CODE
           (*i)->progress_bar_bar_->hide();
           (*i)->compute_iso_surface_button_->setChecked( false );
@@ -509,70 +528,6 @@ LayerManagerWidget::~LayerManagerWidget()
   } // end hide_show_color_choose_bar
   
   
-  // lock or unlock a layer
-  void LayerManagerWidget::lock_unlock_layer( bool lockunlock )
-  {
-    QToolButton *lock_unlock_button = ::qobject_cast<QToolButton*>( sender() );
-    
-    for( LayerList_type::const_iterator i = private_->layer_list_.begin(); i != private_->layer_list_.end(); i++ )
-    {
-      if( (*i)->lock_button_ == lock_unlock_button )
-      {
-        if( lockunlock ) 
-        {
-          (*i)->header_->setStyleSheet(QString::fromUtf8("QWidget#header_{"
-            "background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(201, 201, 201, 255), stop:0.155779 rgba(208, 208, 208, 255), stop:1 rgba(184, 184, 184, 255));"
-            "border-radius: 6px;}"));
-          (*i)->typeBackground_->setStyleSheet(QString::fromUtf8(
-                "QWidget#typeBackground_{"
-                "background-color: gray;"
-                "border: 1px solid rgb(141, 141, 141);"
-                "border-radius: 4px;}"));
-          
-          (*i)->label_->setStyleSheet(QString::fromUtf8("QLineEdit#label_{background-color:rgb(208, 208, 208); color: gray;}"));
-          (*i)->colorChooseButton_->setEnabled( false );
-          (*i)->opacity_button_->setEnabled( false );
-          (*i)->visibility_button_->setEnabled( false );
-          (*i)->color_button_->setEnabled( false );
-          (*i)->compute_iso_surface_button_->setEnabled( false );
-          (*i)->iso_surface_button_->setEnabled( false );
-          (*i)->fill_border_button_->setEnabled( false );
-          (*i)->volume_rendered_button_->setEnabled( false );
-          (*i)->brightness_contrast_button_->setEnabled( false );
-          (*i)->checkbox_widget_->hide();
-
-        }
-        else
-        {
-          (*i)->header_->setStyleSheet(QString::fromUtf8(
-            "QWidget#header_{"
-            "background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));}"));
-          (*i)->typeBackground_->setStyleSheet(QString::fromUtf8(
-            "QWidget#typeBackground_{"
-              "background-color: rgb(255, 128, 0);"
-              "border: 1px solid rgb(141, 141, 141);"
-              "border-radius: 4px;}"));
-          (*i)->label_->setStyleSheet(QString::fromUtf8(
-            "QLineEdit#label_{"
-            " text-align: left;"
-            " color: black;"
-            " margin-right: 3px;"
-            " background-color: rgb(243, 243, 243);}"));
-
-          (*i)->colorChooseButton_->setEnabled( true );
-          (*i)->opacity_button_->setEnabled( true );
-          (*i)->visibility_button_->setEnabled( true );
-          (*i)->color_button_->setEnabled( true );
-          (*i)->compute_iso_surface_button_->setEnabled( true );
-          (*i)->iso_surface_button_->setEnabled( true );
-          (*i)->fill_border_button_->setEnabled( true );
-          (*i)->volume_rendered_button_->setEnabled( true );
-          (*i)->brightness_contrast_button_->setEnabled( true );
-          
-        }
-      } 
-    }
-  } // end lock_unlock_layer
   
   
   // hide or show the opacity bar
@@ -591,6 +546,8 @@ LayerManagerWidget::~LayerManagerWidget()
           (*i)->brightness_contrast_button_->setChecked( false );
           (*i)->color_bar_->hide();
           (*i)->color_button_->setChecked( false );
+          (*i)->border_bar_->hide();
+          (*i)->fill_border_button_->setChecked( false );
           //TEST CODE
           (*i)->progress_bar_bar_->hide();
           (*i)->compute_iso_surface_button_->setChecked( false );
@@ -620,6 +577,8 @@ LayerManagerWidget::~LayerManagerWidget()
           (*i)->color_button_->setChecked( false );
           (*i)->opacity_bar_->hide();
           (*i)->opacity_button_->setChecked( false );
+          (*i)->border_bar_->hide();
+          (*i)->fill_border_button_->setChecked( false );
           //TEST CODE
           (*i)->progress_bar_bar_->hide();
           (*i)->compute_iso_surface_button_->setChecked( false );
@@ -631,6 +590,39 @@ LayerManagerWidget::~LayerManagerWidget()
       } 
     }
   } // end hide_show_brightness_contrast_bar
+
+
+  // hide or show the brightness/contrast bar
+  void LayerManagerWidget::hide_show_border_bar( bool hideshow )
+  {
+    QToolButton *hide_show_button = ::qobject_cast<QToolButton*>( sender() );
+    
+    for( LayerList_type::const_iterator i = private_->layer_list_.begin(); i != private_->layer_list_.end(); i++ )
+    {
+      if( (*i)->fill_border_button_ == hide_show_button )
+      {
+        if( hideshow ) 
+        {
+          (*i)->border_bar_->show();
+          (*i)->bright_contrast_bar_->hide();
+          (*i)->brightness_contrast_button_->setChecked( false );
+          (*i)->color_bar_->hide();
+          (*i)->color_button_->setChecked( false );
+          (*i)->opacity_bar_->hide();
+          (*i)->opacity_button_->setChecked( false );
+          //TEST CODE
+          (*i)->progress_bar_bar_->hide();
+          (*i)->compute_iso_surface_button_->setChecked( false );
+        }
+        else
+        {
+          (*i)->border_bar_->hide();
+        }
+      } 
+    }
+  } // end hide_show_brightness_contrast_bar
+
+
   
   
   // show the progress bar bar
@@ -719,6 +711,73 @@ LayerManagerWidget::~LayerManagerWidget()
       }
     }
   } // end color_button_clicked
+
+
+  // lock or unlock a layer
+  void LayerManagerWidget::lock_unlock_layer( bool lockunlock )
+  {
+    QToolButton *lock_unlock_button = ::qobject_cast<QToolButton*>( sender() );
+    
+    for( LayerList_type::const_iterator i = private_->layer_list_.begin(); i != private_->layer_list_.end(); i++ )
+    {
+      if( (*i)->lock_button_ == lock_unlock_button )
+      {
+        if( lockunlock ) 
+        {
+          (*i)->header_->setStyleSheet(QString::fromUtf8("QWidget#header_{"
+            "background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(201, 201, 201, 255), stop:0.155779 rgba(208, 208, 208, 255), stop:1 rgba(184, 184, 184, 255));"
+            "border-radius: 6px;}"));
+          (*i)->typeBackground_->setStyleSheet(QString::fromUtf8(
+                "QWidget#typeBackground_{"
+                "background-color: gray;"
+                "border: 1px solid rgb(141, 141, 141);"
+                "border-radius: 4px;}"));
+          
+          (*i)->label_->setStyleSheet(QString::fromUtf8("QLineEdit#label_{background-color:rgb(208, 208, 208); color: gray;}"));
+          (*i)->colorChooseButton_->setEnabled( false );
+          (*i)->opacity_button_->setEnabled( false );
+          (*i)->visibility_button_->setEnabled( false );
+          (*i)->color_button_->setEnabled( false );
+          (*i)->compute_iso_surface_button_->setEnabled( false );
+          (*i)->iso_surface_button_->setEnabled( false );
+          (*i)->fill_border_button_->setEnabled( false );
+          (*i)->volume_rendered_button_->setEnabled( false );
+          (*i)->brightness_contrast_button_->setEnabled( false );
+          (*i)->checkbox_widget_->hide();
+
+        }
+        else
+        {
+          (*i)->header_->setStyleSheet(QString::fromUtf8(
+            "QWidget#header_{"
+            "background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));}"));
+          (*i)->typeBackground_->setStyleSheet(QString::fromUtf8(
+            "QWidget#typeBackground_{"
+              "background-color: rgb(255, 128, 0);"
+              "border: 1px solid rgb(141, 141, 141);"
+              "border-radius: 4px;}"));
+          (*i)->label_->setStyleSheet(QString::fromUtf8(
+            "QLineEdit#label_{"
+            " text-align: left;"
+            " color: black;"
+            " margin-right: 3px;"
+            " background-color: rgb(243, 243, 243);}"));
+
+          (*i)->colorChooseButton_->setEnabled( true );
+          (*i)->opacity_button_->setEnabled( true );
+          (*i)->visibility_button_->setEnabled( true );
+          (*i)->color_button_->setEnabled( true );
+          (*i)->compute_iso_surface_button_->setEnabled( true );
+          (*i)->iso_surface_button_->setEnabled( true );
+          (*i)->fill_border_button_->setEnabled( true );
+          (*i)->volume_rendered_button_->setEnabled( true );
+          (*i)->brightness_contrast_button_->setEnabled( true );
+          
+        }
+      } 
+    }
+  } // end lock_unlock_layer
+  
   
   
 } //end Seg3D namespace

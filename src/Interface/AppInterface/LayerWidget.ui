@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>258</width>
-    <height>215</height>
+    <width>225</width>
+    <height>244</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -75,10 +75,12 @@ QToolButton#lock_button_{
 QToolButton#lock_button_:pressed{
   background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
   border: 1px solid rgb(139, 139, 139);
+  margin:0;
 }
 QToolButton#lock_button_:checked{
   background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
   border: 1px solid rgb(139, 139, 139);
+  margin:0;
 }
 
 QToolButton#opacity_button_{
@@ -88,10 +90,12 @@ QToolButton#opacity_button_{
 QToolButton#opacity_button_:pressed{
   background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
   border: 1px solid rgb(139, 139, 139);
+  margin:0;
 }
 QToolButton#opacity_button_:checked{
   background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
   border: 1px solid rgb(139, 139, 139);
+  margin:0;
 }
 
 QToolButton#brightness_contrast_button_{
@@ -101,10 +105,12 @@ QToolButton#brightness_contrast_button_{
 QToolButton#brightness_contrast_button_:pressed{
   background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
   border: 1px solid rgb(139, 139, 139);
+  margin:0;
 }
 QToolButton#brightness_contrast_button_:checked{
   background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
   border: 1px solid rgb(139, 139, 139);
+  margin:0;
 }
 
 QToolButton#visibility_button_{
@@ -114,10 +120,12 @@ QToolButton#visibility_button_{
 QToolButton#visibility_button_:pressed{
   background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
   border: 1px solid rgb(139, 139, 139);
+  margin:0;
 }
 QToolButton#visibility_button_:checked{
   background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
   border: 1px solid rgb(139, 139, 139);
+  margin:0;
 }
 
 QToolButton#iso_surface_button_{
@@ -127,10 +135,12 @@ QToolButton#iso_surface_button_{
 QToolButton#iso_surface_button_:pressed{
   background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
   border: 1px solid rgb(139, 139, 139);
+  margin:0;
 }
 QToolButton#iso_surface_button_:checked{
   background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
   border: 1px solid rgb(139, 139, 139);
+  margin:0;
 }
 
 QToolButton#compute_iso_surface_button_{
@@ -140,10 +150,12 @@ QToolButton#compute_iso_surface_button_{
 QToolButton#compute_iso_surface_button_:pressed{
   background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
   border: 1px solid rgb(139, 139, 139);
+  margin:0;
 }
 QToolButton#compute_iso_surface_button_:checked{
   background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
   border: 1px solid rgb(139, 139, 139);
+  margin:0;
 }
 
 QToolButton#fill_border_button_{
@@ -153,10 +165,12 @@ QToolButton#fill_border_button_{
 QToolButton#fill_border_button_:pressed{
   background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
   border: 1px solid rgb(139, 139, 139);
+  margin:0;
 }
 QToolButton#fill_border_button_:checked{
   background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
   border: 1px solid rgb(139, 139, 139);
+  margin:0;
 }
 
 QToolButton#fill_border_button_{
@@ -166,10 +180,12 @@ QToolButton#fill_border_button_{
 QToolButton#fill_border_button_:pressed{
   background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
   border: 1px solid rgb(139, 139, 139);
+  margin:0;
 }
 QToolButton#fill_border_button_:checked{
   background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
   border: 1px solid rgb(139, 139, 139);
+  margin:0;
 }
 
 QToolButton#volume_rendered_button_{
@@ -179,10 +195,12 @@ QToolButton#volume_rendered_button_{
 QToolButton#volume_rendered_button_:pressed{
   background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
   border: 1px solid rgb(139, 139, 139);
+  margin:0;
 }
 QToolButton#volume_rendered_button_:checked{
   background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
   border: 1px solid rgb(139, 139, 139);
+  margin:0;
 }
 
 QToolButton#color_button_{
@@ -192,10 +210,12 @@ QToolButton#color_button_{
 QToolButton#color_button_:pressed{
   background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
   border: 1px solid rgb(139, 139, 139);
+  margin:0;
 }
 QToolButton#color_button_:checked{
   background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
   border: 1px solid rgb(139, 139, 139);
+  margin:0;
 }
 
 
@@ -328,7 +348,7 @@ QToolButton#color_button_12_:pressed{
 
 </string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_5">
+  <layout class="QVBoxLayout" name="verticalLayout_6">
    <property name="spacing">
     <number>0</number>
    </property>
@@ -763,6 +783,9 @@ QToolButton#color_button_12_:pressed{
                <iconset resource="Resources/AppInterface.qrc">
                 <normaloff>:/Images/BorderOff.png</normaloff>
                 <normalon>:/Images/Border.png</normalon>:/Images/BorderOff.png</iconset>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -1440,7 +1463,7 @@ QToolButton#color_button_12_:pressed{
            </size>
           </property>
           <property name="value">
-           <number>50</number>
+           <number>24</number>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -1461,6 +1484,28 @@ QToolButton#color_button_12_:pressed{
          <string>hidden dimensions label</string>
         </property>
        </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QWidget" name="border_bar_" native="true">
+     <layout class="QVBoxLayout" name="verticalLayout_5">
+      <property name="spacing">
+       <number>2</number>
+      </property>
+      <property name="margin">
+       <number>4</number>
+      </property>
+      <item>
+       <widget class="Line" name="border_line_">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="border_selection_combo_"/>
       </item>
      </layout>
     </widget>

@@ -69,6 +69,7 @@ class LayerManagerWidget : public QScrollArea
     void hide_show_brightness_contrast_bar( bool hideshow );
     void hide_show_color_choose_bar( bool hideshow );
   void hide_show_opacity_bar( bool hideshow );
+  void hide_show_border_bar( bool hideshow );
   void lock_unlock_layer( bool lockunlock );
   void show_progress_bar_bar();
   void hide_progress_bar_bar();
@@ -96,7 +97,7 @@ class LayerManagerWidget : public QScrollArea
     LayerManagerWidgetPrivateHandle_type private_;
 
   private:
-    bool validate_new_layer( const QString &dimensions );
+    bool validate_new_group( const QString &dimensions );
   void turn_off_or_on_checkboxes( const QString &dimensions, const bool &hideshow );
      
 };
