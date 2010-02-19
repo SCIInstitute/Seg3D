@@ -112,6 +112,9 @@ public:
   void set_mouse_release_handler(mouse_event_handler_type func);
   void reset_mouse_handlers();
 
+  bool is_volume_view() const;
+  StateViewBaseHandle get_active_view_state();
+
   virtual void state_changed();
   typedef boost::signals2::signal<void ()> redraw_signal_type;
   redraw_signal_type redraw_signal_;

@@ -77,8 +77,6 @@ void QtRenderWidget::initializeGL()
 {
   RenderResources::Instance()->init_gl();
   renderer_->initialize();
-
-  renderer_->redraw();
 }
 
 void QtRenderWidget::paintGL()

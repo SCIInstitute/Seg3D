@@ -36,7 +36,7 @@ namespace Seg3D {
 Viewer::Viewer(const std::string& key) :
   StateHandler(key)
 {
-  add_state("view_mode", view_mode_state, "volume", "axial|coronal|sagittal|volume");
+  add_state("view_mode", view_mode_state, "axial", "axial|coronal|sagittal|volume");
 
   add_state("axial_view", axial_view_state);
   add_state("sagittal_view", sagittal_view_state);
@@ -140,6 +140,31 @@ void Viewer::reset_mouse_handlers()
 void Viewer::state_changed()
 {
   redraw_signal_();
+}
+
+bool Viewer::is_volume_view() const
+{
+  return this->view_mode_state->get() == "volume";
+}
+
+StateViewBaseHandle Viewer::get_active_view_state()
+{
+  if (this->view_mode_state->get() == "volume")
+  {
+    return this->volume_view_state;
+  }
+  else if (this->view_mode_state->get() == "axial")
+  {
+    return this->axial_view_state;
+  }
+  else if (this->view_mode_state->get() == "coronal")
+  {
+    return this->coronal_view_state;
+  }
+  else
+  {
+    return this->sagittal_view_state;
+  }
 }
 
 } // end namespace Seg3D

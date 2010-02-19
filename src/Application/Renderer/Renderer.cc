@@ -37,7 +37,8 @@
 #include <Utils/EventHandler/DefaultEventHandlerContext.h>
 #include <Utils/Geometry/View3D.h>
 
-namespace Seg3D {
+namespace Seg3D 
+{
 
 class RendererEventHandlerContext : public Utils::DefaultEventHandlerContext
 {
@@ -61,6 +62,19 @@ public:
   }
 };
 
+#ifdef NDEBUG
+#define CHECK_OPENGL_ERROR()
+#else
+#define CHECK_OPENGL_ERROR()\
+{\
+  GLenum err = glGetError();\
+  if (err != GL_NO_ERROR)\
+  {\
+    SCI_LOG_ERROR(std::string("OpenGL error: ") + Utils::to_string(err));\
+  }\
+}
+#endif
+
 Renderer::Renderer() : 
   ViewerRenderer(), EventHandler(), 
   active_render_texture_(0), width_(0), 
@@ -74,13 +88,32 @@ Renderer::~Renderer()
 
 void Renderer::initialize()
 {
-  if (!RenderResources::Instance()->create_render_context(context_))
+  // NOTE: it is important to postpone the allocation of OpenGL objects to the 
+  // rendering thread. If created in a different thread, these objects might not
+  // be ready when the rendering thread uses them the first time, which caused
+  // the scene to be blank sometimes.
+
+  if (!is_eventhandler_thread())
   {
-    SCI_THROW_EXCEPTION("Failed to create a valid rendering context");
+    if (!RenderResources::Instance()->create_render_context(context_))
+    {
+      SCI_THROW_EXCEPTION("Failed to create a valid rendering context");
+    }
+    post_event(boost::bind(&Renderer::initialize, this));
+    start_eventhandler();
+    return;
   }
+  
+  // Make the GL context current. Since it is the only context in the rendering
+  // thread, this call is only needed once.
+  this->context_->make_current();
+
+  glEnable(GL_DEPTH_TEST);
+  //glEnable(GL_CULL_FACE);
 
   // lock the shared render context
-  boost::unique_lock<RenderResources::mutex_type> lock(RenderResources::Instance()->shared_context_mutex());
+  boost::unique_lock<RenderResources::mutex_type> 
+    lock(RenderResources::Instance()->shared_context_mutex());
 
   textures_[0] = TextureHandle(new Texture2D());
   textures_[1] = TextureHandle(new Texture2D());
@@ -92,9 +125,8 @@ void Renderer::initialize()
   // release the lock
   lock.unlock();
 
-  ViewerManager::Instance()->get_viewer(this->viewer_id_)->redraw_signal_.connect(boost::bind(&Renderer::redraw, this));
-  // starting the rendering thread
-  start_eventhandler();
+  ViewerManager::Instance()->get_viewer(this->viewer_id_)
+    ->redraw_signal_.connect(boost::bind(&Renderer::redraw, this));
 }
 
 void Renderer::redraw()
@@ -120,53 +152,74 @@ void Renderer::redraw()
     }
   }
 
-
-  // make the rendering context current
-  context_->make_current();
-
   // lock the active render texture
-  boost::unique_lock<Texture::mutex_type> texture_lock(textures_[active_render_texture_]->get_mutex());
+  boost::unique_lock<Texture::mutex_type> 
+    texture_lock(textures_[active_render_texture_]->get_mutex());
 
   frame_buffer_->attach_texture(textures_[active_render_texture_]);
+  
+  CHECK_OPENGL_ERROR();
 
   // bind the framebuffer object
   frame_buffer_->enable();
+  if ( !frame_buffer_->check_status() )
+  {
+    return;
+  }
   //glDrawBuffer(GL_COLOR_ATTACHMENT0_EXT);
+  CHECK_OPENGL_ERROR();
 
   glViewport(0, 0, width_, height_); 
-  glClearColor(0.0, 0.0, 0.0, 1.0);
+  glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  CHECK_OPENGL_ERROR();
   // do some rendering
   // ...
   // ...
   //glEnable(GL_DEPTH_TEST);
-  //glDisable(GL_CULL_FACE);
+  //glEnable(GL_CULL_FACE);
   //glCullFace(GL_FRONT);
-  //glFrontFace(GL_CW);
-  //glPolygonMode(GL_BACK, GL_LINE);
-  const Utils::View3D& view3d = ViewerManager::Instance()->get_viewer(this->viewer_id_)->volume_view_state->get();
+  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+  ViewerHandle viewer = ViewerManager::Instance()->get_viewer(this->viewer_id_);
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  gluPerspective(60, width_ / (1.0 * height_), 0.1, 5.0);
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
-  gluLookAt(view3d.eyep().x(), view3d.eyep().y(), view3d.eyep().z(), 
-    view3d.lookat().x(), view3d.lookat().y(), view3d.lookat().z(),
-    view3d.up().x(), view3d.up().y(), view3d.up().z());
+  if (viewer->is_volume_view())
+  {
+    Utils::View3D view3d( viewer->volume_view_state->get() );
+    gluPerspective(view3d.fov(), width_ / (1.0 * height_), 0.1, 5.0);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    gluLookAt(view3d.eyep().x(), view3d.eyep().y(), view3d.eyep().z(), 
+      view3d.lookat().x(), view3d.lookat().y(), view3d.lookat().z(),
+      view3d.up().x(), view3d.up().y(), view3d.up().z());
+  }
+  else
+  {
+    Utils::View2D view2d( 
+      dynamic_cast<StateView2D*>(viewer->get_active_view_state().get())->get() );
+    double left, right, top, bottom;
+    view2d.get_clipping_planes(left, right, bottom, top);
+    gluOrtho2D(left, right, bottom, top);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+  }
+  
+  CHECK_OPENGL_ERROR();
+  glRotatef(45.0f, 1, 1, 1);
+  glScalef(0.5f, 0.5f, 0.5f);
+  glTranslatef(-0.5f, -0.5f, -0.5f);
+  this->cube_->draw();
 
-  //glRotatef(45.0f, 1, 1, 1);
-  //glScalef(0.5f, 0.5f, 0.5f);
-  //glTranslatef(-0.5f, -0.5f, -0.5f);
-  //this->cube_->draw();
-
-  glBegin(GL_TRIANGLES);
-  glColor3f(1.0, 0.0, 0.0);
-  glVertex3f(0.5, -0.5, 0);
-  glColor3f(0.0, 1.0, 0.0);
-  glVertex3f(0.0, 0.5, 0);
-  glColor3f(0.0, 0.0, 1.0);
-  glVertex3f(-0.5, -0.5, 0);
-  glEnd();
+  CHECK_OPENGL_ERROR();
+  //glBegin(GL_TRIANGLES);
+  //glColor3f(1.0, 0.0, 0.0);
+  //glVertex3f(0.5, -0.5, 0);
+  //glColor3f(0.0, 1.0, 0.0);
+  //glVertex3f(0.0, 0.5, 0);
+  //glColor3f(0.0, 0.0, 1.0);
+  //glVertex3f(-0.5, -0.5, 0);
+  //glEnd();
 
   //unsigned char* pixels = new unsigned char[(width_)*(height_)*3];
   //glReadPixels(0, 0, width_, height_, GL_RGB, GL_UNSIGNED_BYTE, (GLvoid*)pixels);

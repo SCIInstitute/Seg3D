@@ -86,6 +86,9 @@ VertexBufferObject::VertexBufferObject( GLenum target, GLenum array_type )
   default:
     assert(false);
   }
+
+  this->safe_bind();
+  this->safe_unbind();
 }
 
 VertexBufferObject::~VertexBufferObject(void)

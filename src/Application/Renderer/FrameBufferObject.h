@@ -54,16 +54,17 @@ class FrameBufferObject : public boost::noncopyable {
     
     void attach_texture(TextureHandle texture, unsigned int attachment = GL_COLOR_ATTACHMENT0_EXT, int level = 0, int layer = 0);
     void attach_render_buffer(RenderBufferHandle render_buffer, unsigned int attachment);
+  bool check_status(GLenum* status = NULL);
     
   private:
   
-    void _safe_bind();
-    void _safe_unbind();
+    void safe_bind();
+    void safe_unbind();
     
     unsigned int id_;
     int saved_id_;
     
-    const static unsigned int TARGET_;
+    const static unsigned int TARGET_C;
 };
 
 } // end namespace Seg3D

@@ -65,6 +65,8 @@ public:
   void translate(const Vector& offset);
   void resize(int width, int height);
 
+  void get_clipping_planes(double& left, double& right, double& bottom, double& top) const;
+
 private:
   // Center point
   Point  center_;

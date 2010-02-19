@@ -60,7 +60,7 @@ void ViewManipulator::mouse_press( const MouseHistory& mouse_history, int button
     return;
   }
   
-  if (this->viewer_->view_mode_state->get() == "volume")
+  if (this->viewer_->is_volume_view())
   {
     if (button == Viewer::LEFT_BUTTON_E)
     {
@@ -95,23 +95,15 @@ void ViewManipulator::mouse_move( const MouseHistory& mouse_history, int button,
   if (this->translate_active_)
   {
     Utils::Vector offset = this->compute_translation(mouse_history.previous.x, mouse_history.previous.y,
-                                          mouse_history.current.x, mouse_history.current.y);
-    // dispatch an ActionTranslate
-    if (this->viewer_->view_mode_state->get() == "volume")
-    {
-      ActionTranslateView::Dispatch(this->viewer_->volume_view_state, offset);
-    }
+      mouse_history.current.x, mouse_history.current.y);
+    ActionTranslateView::Dispatch(this->viewer_->get_active_view_state(), offset);
   }
   else if (this->scale_active_)
   {
     double scale_ratio = this->compute_scaling(mouse_history.previous.x, mouse_history.previous.y,
-                                       mouse_history.current.x, mouse_history.current.y);
-    // dispatch an ActionScale
-    if (this->viewer_->view_mode_state->get() == "volume")
-    {
-      ActionScaleView::Dispatch(this->viewer_->volume_view_state, scale_ratio);
-    } 
-  } 
+      mouse_history.current.x, mouse_history.current.y);
+    ActionScaleView::Dispatch(this->viewer_->get_active_view_state(), scale_ratio);
+  }
   else if (this->rotate_active_)
   {
     Utils::Vector axis;
