@@ -50,8 +50,7 @@ namespace Seg3D  {
     private_->ui_.setupUi( this );
     private_->ui_.existing_project_button_->setEnabled(false);
     
-    //connect(private_->ui_.new_project_button_, SIGNAL( clicked() ), this, SLOT( close_splash()) );
-        
+    
   }
   
   SplashStart::~SplashStart()
