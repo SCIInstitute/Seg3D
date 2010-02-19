@@ -81,13 +81,20 @@ RenderResources::init_gl()
 {
   if (!gl_initialized_)
   {
-    lock_shared_context();
+    boost::unique_lock<mutex_type> lock(this->shared_context_mutex_);
     if (!gl_initialized_)
     {
       glewInit();
       gl_initialized_ = true;
+      if (!GL_VERSION_1_5)
+      {
+        SCI_THROW_EXCEPTION("Minimum OpenGL version 1.5 required.");
+      }
+      if (!GL_EXT_framebuffer_object)
+      {
+        SCI_THROW_EXCEPTION("GL_EXT_framebuffer_object not found.");
+      }
     }
-    unlock_shared_context();
   }
 }
 
