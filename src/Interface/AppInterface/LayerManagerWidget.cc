@@ -441,7 +441,8 @@ LayerManagerWidget::~LayerManagerWidget()
     {
       if( hideshow && ( dimensions == (*i)->dimensions_->text())) 
       {
-        (*i)->checkbox_widget_->show();
+        if( !(*i)->lock_button_->isChecked() )
+          (*i)->checkbox_widget_->show();
       }
       else {
         if( dimensions == (*i)->dimensions_->text())
@@ -520,13 +521,54 @@ LayerManagerWidget::~LayerManagerWidget()
         if( lockunlock ) 
         {
           (*i)->header_->setStyleSheet(QString::fromUtf8("QWidget#header_{"
-            "background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(221, 118, 25, 255), stop:0.155779 rgba(228, 163, 81, 255), stop:1 rgba(185, 82, 22, 255));"
+            "background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(201, 201, 201, 255), stop:0.155779 rgba(208, 208, 208, 255), stop:1 rgba(184, 184, 184, 255));"
             "border-radius: 6px;}"));
+          (*i)->typeBackground_->setStyleSheet(QString::fromUtf8(
+                "QWidget#typeBackground_{"
+                "background-color: gray;"
+                "border: 1px solid rgb(141, 141, 141);"
+                "border-radius: 4px;}"));
+          
+          (*i)->label_->setStyleSheet(QString::fromUtf8("QLineEdit#label_{background-color:rgb(208, 208, 208); color: gray;}"));
+          (*i)->colorChooseButton_->setEnabled( false );
+          (*i)->opacity_button_->setEnabled( false );
+          (*i)->visibility_button_->setEnabled( false );
+          (*i)->color_button_->setEnabled( false );
+          (*i)->compute_iso_surface_button_->setEnabled( false );
+          (*i)->iso_surface_button_->setEnabled( false );
+          (*i)->fill_border_button_->setEnabled( false );
+          (*i)->volume_rendered_button_->setEnabled( false );
+          (*i)->brightness_contrast_button_->setEnabled( false );
+          (*i)->checkbox_widget_->hide();
+
         }
         else
         {
-          (*i)->header_->setStyleSheet(QString::fromUtf8("QWidget#header_{"
-          "background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));}"));
+          (*i)->header_->setStyleSheet(QString::fromUtf8(
+            "QWidget#header_{"
+            "background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));}"));
+          (*i)->typeBackground_->setStyleSheet(QString::fromUtf8(
+            "QWidget#typeBackground_{"
+              "background-color: rgb(255, 128, 0);"
+              "border: 1px solid rgb(141, 141, 141);"
+              "border-radius: 4px;}"));
+          (*i)->label_->setStyleSheet(QString::fromUtf8(
+            "QLineEdit#label_{"
+            " text-align: left;"
+            " color: black;"
+            " margin-right: 3px;"
+            " background-color: rgb(243, 243, 243);}"));
+
+          (*i)->colorChooseButton_->setEnabled( true );
+          (*i)->opacity_button_->setEnabled( true );
+          (*i)->visibility_button_->setEnabled( true );
+          (*i)->color_button_->setEnabled( true );
+          (*i)->compute_iso_surface_button_->setEnabled( true );
+          (*i)->iso_surface_button_->setEnabled( true );
+          (*i)->fill_border_button_->setEnabled( true );
+          (*i)->volume_rendered_button_->setEnabled( true );
+          (*i)->brightness_contrast_button_->setEnabled( true );
+          
         }
       } 
     }

@@ -61,7 +61,8 @@ QToolButton#colorChooseButton_:pressed{
 QLineEdit#label_{
   text-align: left;
   color: black;
-  background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
+  margin-right: 3px;
+  background-color: rgb(243, 243, 243);
 }
 
 
@@ -521,11 +522,14 @@ QToolButton#color_button_12_:pressed{
             <property name="focusPolicy">
              <enum>Qt::ClickFocus</enum>
             </property>
+            <property name="autoFillBackground">
+             <bool>false</bool>
+            </property>
             <property name="inputMask">
-             <string notr="true"/>
+             <string/>
             </property>
             <property name="text">
-             <string notr="true">2116_test-2_121709-booger</string>
+             <string>2116_test-2_121709-booger</string>
             </property>
             <property name="frame">
              <bool>false</bool>
