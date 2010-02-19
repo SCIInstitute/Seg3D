@@ -206,6 +206,13 @@ namespace Seg3D {
   
   void AppStatusBar::UpdateStatusBar( qpointer_type statusbar_pointer, int message_type, std::string message )
   {
+    if (!Interface::IsInterfaceThread())
+    {
+      Interface::PostEvent(boost::bind(&AppStatusBar::UpdateStatusBar, 
+        statusbar_pointer, message_type, message));
+      return;
+    }
+    
     // Protect controller pointer, so we do not execute if controller does not
     // exist anymore
     if (statusbar_pointer.data())
