@@ -79,8 +79,6 @@ class StateView2D : public StateViewBase {
   virtual void scale(double ratio);
 
   virtual void translate(const Utils::Vector& offset);
-
-  virtual void resize(int width, int height);
                                 
   protected:    
     // EXPORT_TO_VARIANT

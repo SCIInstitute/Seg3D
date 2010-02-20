@@ -199,14 +199,14 @@ void Renderer::redraw()
     Utils::View2D view2d( 
       dynamic_cast<StateView2D*>(viewer->get_active_view_state().get())->get() );
     double left, right, top, bottom;
-    view2d.get_clipping_planes(left, right, bottom, top);
+    this->compute_2d_clipping_planes(view2d, left, right, bottom, top);
     gluOrtho2D(left, right, bottom, top);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
   }
   
   CHECK_OPENGL_ERROR();
-  glRotatef(45.0f, 1, 1, 1);
+  glRotatef(25.0f * (this->viewer_id_+1), 1, 0, 1);
   glScalef(0.5f, 0.5f, 0.5f);
   glTranslatef(-0.5f, -0.5f, -0.5f);
   this->cube_->draw();
@@ -276,6 +276,18 @@ void Renderer::resize(int width, int height)
   height_ = height;
 
   redraw();
+}
+
+void Renderer::compute_2d_clipping_planes( const Utils::View2D& view2d, 
+                      double& left, double& right, double& bottom, double& top )
+{
+  double dimension = Utils::Min(this->width_, this->height_);
+  double clipping_width = this->width_ / dimension / view2d.scalex() * 0.5;
+  double clipping_height = this->height_ / dimension / view2d.scaley() * 0.5;
+  left = view2d.center().x() - clipping_width;
+  right = view2d.center().x() + clipping_width;
+  bottom = view2d.center().y() - clipping_height;
+  top =view2d.center().y() + clipping_height;
 }
 
 } // end namespace Seg3D

@@ -56,8 +56,6 @@ SET(APPLICATION_STATE_ACTIONS_SRCS
   Actions/ActionSet.cc
   Actions/ActionGet.h
   Actions/ActionGet.cc
-  Actions/ActionResizeView.h
-  Actions/ActionResizeView.cc
   Actions/ActionRotateView3D.h
   Actions/ActionRotateView3D.cc
   Actions/ActionScaleView.h

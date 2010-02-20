@@ -48,7 +48,6 @@ public:
 
   virtual void scale(double ratio) = 0;
   virtual void translate(const Utils::Vector& offset) = 0;
-  virtual void resize(int width, int height) = 0;
 };
 
 } // end namespace Seg3D

@@ -45,6 +45,7 @@
 #include <Application/Viewer/ViewerRenderer.h>
 
 #include <Utils/EventHandler/EventHandler.h>
+#include <Utils/Geometry/View2D.h>
 
 namespace Seg3D {
 
@@ -69,6 +70,9 @@ public:
   virtual void resize(int width, int height);
 
 private:
+
+  void compute_2d_clipping_planes(const Utils::View2D& view2d, 
+    double& left, double& right, double& bottom, double& top);
 
   // Context for rendering images
   RenderContextHandle context_;

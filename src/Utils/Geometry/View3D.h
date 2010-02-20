@@ -52,34 +52,22 @@ public:
   bool operator!=(const View3D&) const;
 
   inline Point eyep() const                { return this->eyep_; }
-  inline void eyep(const Point& eyep)      { this->eyep_ = eyep; this->viewplane_changed_ = true; }
+  inline void eyep(const Point& eyep)      { this->eyep_ = eyep; }
 
   inline Point lookat() const              { return this->lookat_; }
-  inline void lookat(const Point& lookat)  { this->lookat_ = lookat; this->viewplane_changed_ = true; }
+  inline void lookat(const Point& lookat)  { this->lookat_ = lookat; }
 
   inline Vector up() const                 { return this->up_; }
-  inline void up(const Vector& up)         { this->up_ = up; this->viewplane_changed_ = true; }
+  inline void up(const Vector& up)         { this->up_ = up; }
 
   inline double fov() const                { return this->fovy_; }
-  inline void fov(double fov)              { this->fovy_ = fov; this->viewplane_changed_ = true; }
+  inline void fov(double fov)              { this->fovy_ = fov; }
 
   void rotate(const Vector& axis, double angle);
   void scale(double ratio);
   void translate(const Vector& offset);
-  void resize(int width, int height);
 
 private:
-
-  // compute the orientation and size of the viewplane placed at
-  // the lookat point
-  void update_viewplane();
-
-  // x direction scaled by the width of the viewplane
-  Vector u_;
-  // y direction scaled by the height of the viewplane
-  Vector v_;
-  // Indicates whether the viewplane has been changed
-  bool viewplane_changed_;
 
   // Eye point
   Point eyep_;
@@ -90,8 +78,6 @@ private:
   // Field of view in y direction
   double fovy_;
 
-  int width_;
-  int height_;
 };
 
 } // End namespace Utils

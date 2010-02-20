@@ -43,16 +43,12 @@ StateView3D::~StateView3D()
 {
 }  
 
-
-std::string 
-StateView3D::export_to_string() const
+std::string StateView3D::export_to_string() const
 {
   return (Utils::export_to_string(value_));
 }
 
-
-bool 
-StateView3D::import_from_string(const std::string& str, ActionSource source)
+bool StateView3D::import_from_string(const std::string& str, ActionSource source)
 {
   Utils::View3D value;
   if (!(Utils::import_from_string(str,value))) return (false);
@@ -60,9 +56,7 @@ StateView3D::import_from_string(const std::string& str, ActionSource source)
   return (set(value,source));
 }
 
-
-bool 
-StateView3D::set(const Utils::View3D& value, ActionSource source)
+bool StateView3D::set(const Utils::View3D& value, ActionSource source)
 {
   // Lock the state engine so no other thread will be accessing it
   StateEngine::lock_type lock(StateEngine::Instance()->get_mutex());
@@ -94,20 +88,12 @@ void StateView3D::translate( const Utils::Vector& offset )
   this->state_changed_signal_();
 }
 
-void StateView3D::resize( int width, int height )
-{
-  this->value_.resize(width, height);
-}
-
-void 
-StateView3D::export_to_variant(ActionParameterVariant& variant) const
+void StateView3D::export_to_variant(ActionParameterVariant& variant) const
 {
   variant.set_value(value_);
 }
 
-
-bool 
-StateView3D::import_from_variant(ActionParameterVariant& variant,
+bool StateView3D::import_from_variant(ActionParameterVariant& variant,
                                  ActionSource source)
 {
   Utils::View3D value;
@@ -116,9 +102,7 @@ StateView3D::import_from_variant(ActionParameterVariant& variant,
   return (set(value,source));
 }
 
-
-bool 
-StateView3D::validate_variant(ActionParameterVariant& variant, 
+bool StateView3D::validate_variant(ActionParameterVariant& variant, 
                               std::string& error)
 {
   Utils::View3D value;

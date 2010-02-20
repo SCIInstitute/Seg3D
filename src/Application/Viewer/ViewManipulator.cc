@@ -65,6 +65,7 @@ void ViewManipulator::mouse_press( const MouseHistory& mouse_history, int button
     if (button == Viewer::LEFT_BUTTON_E)
     {
       this->translate_active_ = true;
+      this->compute_3d_viewplane();
     } 
     else if (button == Viewer::RIGHT_BUTTON_E)
     {
@@ -95,7 +96,7 @@ void ViewManipulator::mouse_move( const MouseHistory& mouse_history, int button,
   if (this->translate_active_)
   {
     Utils::Vector offset = this->compute_translation(mouse_history.previous.x, mouse_history.previous.y,
-      mouse_history.current.x, mouse_history.current.y);
+      mouse_history.current.x, mouse_history.current.y, this->viewer_->is_volume_view());
     StateViewBaseHandle view_state = this->viewer_->get_active_view_state();
     ActionTranslateView::Dispatch(view_state, offset);
   }
@@ -178,18 +179,25 @@ double ViewManipulator::compute_scaling( int x0, int y0, int x1, int y1 ) const
   return scale;
 }
 
-Utils::Vector ViewManipulator::compute_translation( int x0, int y0, int x1, int y1 ) const
+Utils::Vector ViewManipulator::compute_translation( int x0, int y0, 
+                           int x1, int y1, bool is_view3d ) const
 {
   double dx = x1 - x0;
   double dy = this->flip_y_ ? (y0 - y1) : (y1 - y0);
 
-  if (this->camera_mode_)
+  if (is_view3d)
   {
-    dx = -dx;
-    dy = -dy;
+    dx /= this->width_;
+    dy /= this->height_;
+    return (this->viewplane_u_ * dx + this->viewplane_v_ * dy);
   }
-  
-  return Utils::Vector(dx, dy, 0.0);
+  else
+  {
+    double dimension = Utils::Min(this->width_, this->height_);
+    dx /= dimension;
+    dy /= dimension;
+    return Utils::Vector(dx, dy, 0.0);
+  }
 }
 
 Utils::Vector ViewManipulator::project_point_onto_sphere( int x, int y ) const
@@ -200,6 +208,23 @@ Utils::Vector ViewManipulator::project_point_onto_sphere( int x, int y ) const
   v.normalize();
 
   return v;
+}
+
+void ViewManipulator::compute_3d_viewplane()
+{
+  const Utils::View3D& view3d = this->viewer_->volume_view_state->get();
+  Utils::Vector z(view3d.eyep() - view3d.lookat());
+  double eye_distance = z.normalize();
+  Utils::Vector x(Cross(view3d.up(), z));
+  x.normalize();
+  Utils::Vector y(Cross(z, x));
+
+  double half_fov = Utils::DegreeToRadian(view3d.fov()) * 0.5;
+  double viewplane_height = eye_distance * Utils::Tan(half_fov) * 2;
+  double viewplane_width = this->width_ * (viewplane_height / this->height_);
+
+  this->viewplane_u_ = x * viewplane_width;
+  this->viewplane_v_ = y * viewplane_height;
 }
 
 } // end namespace Seg3D

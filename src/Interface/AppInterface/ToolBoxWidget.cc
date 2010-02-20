@@ -168,7 +168,7 @@ ToolBoxWidget::~ToolBoxWidget()
       // then, we activate the active one.
       else 
       {
-        this->active_index_ = i;
+        this->active_index_ = static_cast<int>(i);
         this->active_tool_ = private_->page_list_[i]->findChild< QWidget* >("tool_");
         
         if (this->private_->page_list_[i]->findChild< QFrame* >("tool_frame_")->isHidden())
@@ -200,7 +200,7 @@ ToolBoxWidget::~ToolBoxWidget()
     {
       if (this->private_->page_list_[i]->findChild< QWidget* >("tool_") == tool) 
       {
-        return i;
+        return static_cast<int>(i);
       }
     }
     return -1;

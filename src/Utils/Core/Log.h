@@ -127,11 +127,11 @@ Utils::Log::Instance()->post_warning(message,__LINE__,__FILE__)
 #define SCI_LOG_MESSAGE(message)\
 Utils::Log::Instance()->post_message(message,__LINE__,__FILE__)
 
-#ifdef DEBUG
+#ifdef NDEBUG
+#define SCI_LOG_DEBUG(message)
+#else
 #define SCI_LOG_DEBUG(message)\
 Utils::Log::Instance()->post_debug(message,__LINE__,__FILE__)
-#else
-#define SCI_LOG_DEBUG(message)
 #endif
 
 // CLASS LOGSTREAMER:

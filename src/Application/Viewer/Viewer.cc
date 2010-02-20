@@ -29,7 +29,6 @@
 // Application includes
 #include <Application/Viewer/Viewer.h>
 #include <Application/Viewer/ViewManipulator.h>
-#include <Application/State/Actions/ActionResizeView.h>
 
 namespace Seg3D {
 
@@ -53,7 +52,6 @@ Viewer::Viewer(const std::string& key) :
   add_state("volume_volume_rendering_visible", volume_volume_rendering_visible_state, false);
 
   this->view_manipulator_ = boost::shared_ptr<ViewManipulator>(new ViewManipulator(this));
-  //this->view_mode_state->set("volume");
 }
 
 Viewer::~Viewer()
@@ -64,10 +62,6 @@ Viewer::~Viewer()
 void Viewer::resize( int width, int height )
 {
   this->view_manipulator_->resize(width, height);
-  ActionResizeView::Dispatch(this->volume_view_state, width, height);
-  ActionResizeView::Dispatch(this->axial_view_state, width, height);
-  ActionResizeView::Dispatch(this->sagittal_view_state, width, height);
-  ActionResizeView::Dispatch(this->coronal_view_state, width, height);
 }
 
 void Viewer::mouse_move_event( const MouseHistory& mouse_history, int button, int buttons, int modifiers )

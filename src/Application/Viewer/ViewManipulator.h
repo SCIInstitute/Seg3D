@@ -58,7 +58,9 @@ private:
 
   bool compute_rotation( int x0, int y0, int x1, int y1, Utils::Vector& axis, double& angle ) const;
   double compute_scaling( int x0, int y0, int x1, int y1 ) const;
-  Utils::Vector compute_translation( int x0, int y0, int x1, int y1 ) const;
+  Utils::Vector compute_translation( int x0, int y0, int x1, int y1, bool is_view3d ) const;
+
+  void compute_3d_viewplane();
   Utils::Vector project_point_onto_sphere( int x, int y ) const;
   inline int remap_y( int y ) const;
 
@@ -75,6 +77,9 @@ private:
   bool scale_active_;
 
   Viewer* viewer_;
+
+  Utils::Vector viewplane_u_;
+  Utils::Vector viewplane_v_;
 };
 
 inline void ViewManipulator::resize( int width, int height )

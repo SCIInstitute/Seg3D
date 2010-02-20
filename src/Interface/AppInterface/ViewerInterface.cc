@@ -77,7 +77,7 @@ ViewerInterfacePrivate::ViewerInterfacePrivate(QWidget* parent)
   horiz_splitter_->setOpaqueResize(false);
    
   viewer_.resize(6);
-  for (size_t j=0;j<6;j++) viewer_[j] = new ViewerWidget(j,parent);
+  for (size_t j=0;j<6;j++) viewer_[j] = new ViewerWidget(static_cast<int>(j),parent);
   
   vert_splitter1_->addWidget(viewer_[0]);
   vert_splitter1_->addWidget(viewer_[1]);

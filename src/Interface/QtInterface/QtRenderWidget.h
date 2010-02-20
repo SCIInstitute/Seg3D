@@ -81,7 +81,8 @@ class QtRenderWidget : public QGLWidget {
     boost::signals2::connection rendering_completed_connection_;
     
     ViewerHandle viewer_;
-    
+    size_t viewer_id_;
+
     MouseHistory mouse_history_;
 };
 

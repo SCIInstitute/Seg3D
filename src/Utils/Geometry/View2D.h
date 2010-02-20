@@ -63,9 +63,6 @@ public:
 
   void scale(double ratio);
   void translate(const Vector& offset);
-  void resize(int width, int height);
-
-  void get_clipping_planes(double& left, double& right, double& bottom, double& top) const;
 
 private:
   // Center point
@@ -77,8 +74,6 @@ private:
   // Size of slice displayed in y direction (if negative the axis needs to be flipped)
   double scaley_;
 
-  int width_;
-  int height_;
 };
 
 } // End namespace Utils

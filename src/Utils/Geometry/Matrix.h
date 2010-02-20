@@ -29,6 +29,8 @@ DEALINGS IN THE SOFTWARE.
 #ifndef UTILS_GEOMETRY_MATRIX_H
 #define UTILS_GEOMETRY_MATRIX_H
 
+#include <cstring>
+
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/matrix_expression.hpp>
 
@@ -99,7 +101,7 @@ public:
 
 inline void Matrix::data(const double m[4][4])
 {
-  std::memcpy(this->data(), m, 16*sizeof(double));
+  memcpy(this->data(), m, 16*sizeof(double));
 }
 
 // Compute the inverse of the input matrix using LU decomposition

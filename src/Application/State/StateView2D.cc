@@ -70,11 +70,6 @@ void StateView2D::translate( const Utils::Vector& offset )
   this->state_changed_signal_();
 }
 
-void StateView2D::resize( int width, int height )
-{
-  this->value_.resize(width, height);
-}
-
 bool 
 StateView2D::set(const Utils::View2D& value, ActionSource source)
 {

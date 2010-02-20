@@ -69,6 +69,8 @@ void QtRenderWidget::rendering_completed_slot(TextureHandle texture)
     return;
   }
 
+  SCI_LOG_DEBUG(std::string("QtRenderWidget ") + Utils::to_string(this->viewer_id_)
+    + ": received new texture");
   renderer_texture_ = texture;
   updateGL();
 }
@@ -125,6 +127,8 @@ void QtRenderWidget::resizeGL(int width,int height)
   this->viewer_->resize(width, height);
   if (renderer_.get())
   {
+    SCI_LOG_DEBUG(std::string("QtRenderWidget ") + Utils::to_string(this->viewer_id_)
+      + ": sending resize event to renderer");
     renderer_->resize(width, height);
   }
 }
@@ -175,6 +179,7 @@ void QtRenderWidget::mouseReleaseEvent( QMouseEvent * event )
 
 void QtRenderWidget::set_viewer_id( size_t viewer_id )
 {
+  this->viewer_id_ = viewer_id;
   viewer_ = ViewerManager::Instance()->get_viewer(viewer_id);
   renderer_->set_viewer_id(viewer_id);
 }
