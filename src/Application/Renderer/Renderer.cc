@@ -79,7 +79,7 @@ void Renderer::initialize()
   // rendering thread. If created in a different thread, these objects might not
   // be ready when the rendering thread uses them the first time, which caused
   // the scene to be blank sometimes.
-
+#if defined(WIN32) || defined(APPLE)
   if (!is_eventhandler_thread())
   {
     if (!RenderResources::Instance()->create_render_context(context_))
@@ -90,6 +90,20 @@ void Renderer::initialize()
     start_eventhandler();
     return;
   }
+#else
+  if (!RenderResources::Instance()->create_render_context(context_))
+  {
+    SCI_THROW_EXCEPTION("Failed to create a valid rendering context");
+  }
+  if (!Interface::IsInterfaceThread())
+  {
+    Interface::PostEvent(boost::bind(&Renderer::initialize, this));
+    return;
+  }
+#endif
+
+  SCI_LOG_DEBUG(std::string("Renderer ") + Utils::to_string(this->viewer_id_)
+          + ": initializing");
   
   // Make the GL context current. Since it is the only context in the rendering
   // thread, this call is only needed once.
@@ -118,6 +132,7 @@ void Renderer::initialize()
 
 void Renderer::redraw()
 {
+#if defined(WIN32) || defined(APPLE)
   if (!is_eventhandler_thread())
   {
     boost::unique_lock<boost::mutex> lock(redraw_needed_mutex_);
@@ -125,7 +140,13 @@ void Renderer::redraw()
     post_event(boost::bind(&Renderer::redraw, this));
     return;
   }
-
+#else
+  if (!Interface::IsInterfaceThread())
+  {
+    Interface::PostEvent(boost::bind(&Renderer::redraw, this));
+    return;
+  }
+#endif
   {
     boost::unique_lock<boost::mutex> lock(redraw_needed_mutex_);
     redraw_needed_ = false;
@@ -141,6 +162,8 @@ void Renderer::redraw()
 
   // lock the active render texture
   Texture::lock_type texture_lock(textures_[active_render_texture_]->get_mutex());
+
+  this->context_->make_current();
 
   frame_buffer_->attach_texture(textures_[active_render_texture_]);
   
@@ -240,11 +263,19 @@ void Renderer::redraw()
 
 void Renderer::resize(int width, int height)
 {
+#if defined(WIN32) || defined(APPLE)
   if (!is_eventhandler_thread())
   {
     post_event(boost::bind(&Renderer::resize, this, width, height));
     return;
   }
+#else
+  if (!Interface::IsInterfaceThread())
+  {
+    Interface::PostEvent(boost::bind(&Renderer::resize, this, width, height));
+    return;
+  }
+#endif
 
   if ( width == 0 || height == 0
     || (width_ == width && height_ == height) )
