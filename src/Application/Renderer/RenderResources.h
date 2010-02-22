@@ -87,6 +87,7 @@ class RenderResources : public boost::noncopyable {
   public:
   
     typedef boost::recursive_mutex mutex_type;
+  typedef boost::unique_lock<mutex_type> lock_type;
 
     // LOCK_SHARED_CONTEXT:
     void lock_shared_context() { shared_context_mutex_.lock(); }
@@ -122,6 +123,18 @@ class RenderResources : public boost::noncopyable {
   private:
     static Utils::Singleton<RenderResources> instance_;
 };
+
+class OpenGLException : public Utils::Exception
+{
+public:
+  OpenGLException(std::string message, unsigned int line, const char* file);
+  virtual ~OpenGLException();
+
+  virtual std::string what() const;
+};
+
+#define SCI_THROW_OPENGLEXCEPTION(message)\
+throw OpenGLException(message, __LINE__, __FILE__)
 
 } // end namespace Seg3D
 

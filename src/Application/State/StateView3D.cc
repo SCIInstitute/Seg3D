@@ -72,19 +72,31 @@ bool StateView3D::set(const Utils::View3D& value, ActionSource source)
 
 void StateView3D::rotate( const Utils::Vector& axis, double angle )
 {
-  this->value_.rotate(axis, angle);
+  {
+    // Lock the state engine so no other thread will be accessing it
+    StateEngine::lock_type lock(StateEngine::Instance()->get_mutex());
+    this->value_.rotate(axis, angle);
+  }
   this->state_changed_signal_();
 }
 
 void StateView3D::scale( double ratio )
 {
-  this->value_.scale(ratio);
+  {
+    // Lock the state engine so no other thread will be accessing it
+    StateEngine::lock_type lock(StateEngine::Instance()->get_mutex());
+    this->value_.scale(ratio);
+  }
   this->state_changed_signal_();
 }
 
 void StateView3D::translate( const Utils::Vector& offset )
 {
-  this->value_.translate(offset);
+  {
+    // Lock the state engine so no other thread will be accessing it
+    StateEngine::lock_type lock(StateEngine::Instance()->get_mutex());
+    this->value_.translate(offset);
+  }
   this->state_changed_signal_();
 }
 

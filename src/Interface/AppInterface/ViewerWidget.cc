@@ -1,33 +1,35 @@
 /*
- For more information, please see: http://software.sci.utah.edu
- 
- The MIT License
- 
- Copyright (c) 2009 Scientific Computing and Imaging Institute,
- University of Utah.
- 
- 
- Permission is hereby granted, free of charge, to any person obtaining a
- copy of this software and associated documentation files (the "Software"),
- to deal in the Software without restriction, including without limitation
- the rights to use, copy, modify, merge, publish, distribute, sublicense,
- and/or sell copies of the Software, and to permit persons to whom the
- Software is furnished to do so, subject to the following conditions:
- 
- The above copyright notice and this permission notice shall be included
- in all copies or substantial portions of the Software.
- 
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
- OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
- THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- DEALINGS IN THE SOFTWARE.
- */
+   For more information, please see: http://software.sci.utah.edu
+
+   The MIT License
+
+   Copyright (c) 2009 Scientific Computing and Imaging Institute,
+   University of Utah.
+
+   
+   Permission is hereby granted, free of charge, to any person obtaining a
+   copy of this software and associated documentation files (the "Software"),
+   to deal in the Software without restriction, including without limitation
+   the rights to use, copy, modify, merge, publish, distribute, sublicense,
+   and/or sell copies of the Software, and to permit persons to whom the
+   Software is furnished to do so, subject to the following conditions:
+
+   The above copyright notice and this permission notice shall be included
+   in all copies or substantial portions of the Software.
+
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+   OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+   THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+   DEALINGS IN THE SOFTWARE.
+*/
 
 // Utils includes
 #include <Utils/Core/Log.h>
+
+#include <Application/ViewerManager/ViewerManager.h>
 
 // Qt Interface support classes
 #include <Interface/QtInterface/QtRenderResources.h>
@@ -44,69 +46,69 @@
 namespace Seg3D {
   
 class ViewerWidgetPrivate {
-  public:
-    ViewerWidgetPrivate(QWidget *parent);
+public:
+  ViewerWidgetPrivate(QWidget *parent);
 
-  public:
-    QVBoxLayout*    layout_;
-    QtRenderWidget* viewer_;
-    QFrame*         buttonbar_;
-    
-    QHBoxLayout*    buttonbar_layout_;
-    
-    QToolButton*    viewer_type_button_;
-    QToolButton*    auto_view_button_;
-    QToolButton*    grid_button_;
-    QToolButton*    lock_button_;
-    
-    QToolButton*    flip_horiz_button_;
-    QToolButton*    flip_vert_button_;
-    
-    QToolButton*    next_slice_button_;
-    QToolButton*    previous_slice_button_;
+public:
+  QVBoxLayout*    layout_;
+  QtRenderWidget* viewer_;
+  QFrame*         buttonbar_;
 
-    QToolButton*    slice_visible_button_;
-    
-    // Viewer actions
-    // Which viewer to use
-    QAction*        axial_viewer_;
-    QAction*        sagittal_viewer_;
-    QAction*        coronal_viewer_;
-    QAction*        volume_viewer_;
-    
-    QActionGroup*   viewer_selection_;
-    QMenu*          viewer_menu_;
-    
-    // Autoview a specific viewer
-    QAction*        auto_view_;
-    // Switch on grif in 2D viewer
-    QAction*        grid_;
-    
-    // Lock zoom/pan/slice advance etc with viewers of the same type
-    QAction*        lock_;
+  QHBoxLayout*    buttonbar_layout_;
 
-    // Buttons for next and previous slice in
-    // slice viewer
-    QAction*        next_slice_;
-    QAction*        previous_slice_;
+  QToolButton*    viewer_type_button_;
+  QToolButton*    auto_view_button_;
+  QToolButton*    grid_button_;
+  QToolButton*    lock_button_;
 
-    // Flip the viewer horizontally / vertically
-    QAction*        flip_horiz_;
-    QAction*        flip_vert_;
+  QToolButton*    flip_horiz_button_;
+  QToolButton*    flip_vert_button_;
 
-    // visibility buttons for 2D viewer
-    QAction*        slice_visible_;
+  QToolButton*    next_slice_button_;
+  QToolButton*    previous_slice_button_;
 
-    // visibility buttons for 3D viewer
-    QAction*        slices_visible_;
-    QAction*        isosurfaces_visible_;
-    QAction*        volume_visible_;
-    
-    QColor          select_color_;
-    QColor          select_color_dark_;
-    QColor          deselect_color_;
-    QColor          deselect_color_dark_;
-    
+  QToolButton*    slice_visible_button_;
+
+  // Viewer actions
+  // Which viewer to use
+  QAction*        axial_viewer_;
+  QAction*        sagittal_viewer_;
+  QAction*        coronal_viewer_;
+  QAction*        volume_viewer_;
+
+  QActionGroup*   viewer_selection_;
+  QMenu*          viewer_menu_;
+
+  // Autoview a specific viewer
+  QAction*        auto_view_;
+  // Switch on grif in 2D viewer
+  QAction*        grid_;
+
+  // Lock zoom/pan/slice advance etc with viewers of the same type
+  QAction*        lock_;
+
+  // Buttons for next and previous slice in
+  // slice viewer
+  QAction*        next_slice_;
+  QAction*        previous_slice_;
+
+  // Flip the viewer horizontally / vertically
+  QAction*        flip_horiz_;
+  QAction*        flip_vert_;
+
+  // visibility buttons for 2D viewer
+  QAction*        slice_visible_;
+
+  // visibility buttons for 3D viewer
+  QAction*        slices_visible_;
+  QAction*        isosurfaces_visible_;
+  QAction*        volume_visible_;
+
+  QColor          select_color_;
+  QColor          select_color_dark_;
+  QColor          deselect_color_;
+  QColor          deselect_color_dark_;
+
 };
 
 
@@ -222,7 +224,7 @@ ViewerWidgetPrivate::ViewerWidgetPrivate(QWidget *parent)
   lock_->setText(QString("Lock"));
   lock_->setToolTip(QString("Lock changes to view to other viewers"));
   lock_->setIconVisibleInMenu(true);
-  
+
   flip_horiz_ = new QAction(parent);
   flip_horiz_->setCheckable(true);
   flip_horiz_->setIcon(fliphoriz_icon);
@@ -247,36 +249,36 @@ ViewerWidgetPrivate::ViewerWidgetPrivate(QWidget *parent)
 
   // --------------------------------------
   // Generate the OpenGL part of the widget
-  
+
   viewer_ = QtApplication::Instance()->qt_renderresources_context()
-      ->create_qt_render_widget(parent);
-      
+    ->create_qt_render_widget(parent);
+
   if (viewer_ == 0)
   {
     SCI_THROW_LOGICERROR("OpenGL was not initialized correctly");
   }
   viewer_->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 
-      
+
   // --------------------------------------
   // Generate button bar at the bottom of
   // the Viewer widget
   SCI_LOG_DEBUG("Create button bar for ViewWidget");
-  
+
   buttonbar_ = new QFrame(parent);
-  
+
   buttonbar_layout_ = new QHBoxLayout(buttonbar_);
   buttonbar_layout_->setContentsMargins(0,0,0,0);
   buttonbar_layout_->setSpacing(0);
-  
+
   buttonbar_->setLayout(buttonbar_layout_);
-  
+
   viewer_type_button_ = new QToolButton(buttonbar_);
-    viewer_menu_ = new QMenu(viewer_type_button_);
-    viewer_menu_->addAction(sagittal_viewer_);
-    viewer_menu_->addAction(coronal_viewer_);
-    viewer_menu_->addAction(axial_viewer_);
-    viewer_menu_->addAction(volume_viewer_);
+  viewer_menu_ = new QMenu(viewer_type_button_);
+  viewer_menu_->addAction(sagittal_viewer_);
+  viewer_menu_->addAction(coronal_viewer_);
+  viewer_menu_->addAction(axial_viewer_);
+  viewer_menu_->addAction(volume_viewer_);
   viewer_type_button_->setPopupMode(QToolButton::InstantPopup);  
   viewer_type_button_->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
   viewer_type_button_->setDefaultAction(sagittal_viewer_);
@@ -345,33 +347,34 @@ ViewerWidgetPrivate::ViewerWidgetPrivate(QWidget *parent)
 
   layout_->addWidget(viewer_);
   layout_->addWidget(buttonbar_);
-  
+
   deselect_color_ =      QColor(85,85,85);
   deselect_color_dark_ = QColor(35,35,35);
   select_color_ =        QColor(225,125,0);
   select_color_dark_ =   QColor(180,90,0);
 }
 
-  
+
 ViewerWidget::ViewerWidget(int viewer_id, QWidget *parent) :
-    QFrame(parent),
-    viewer_id_(viewer_id)
+  QFrame(parent),
+  viewer_id_(viewer_id)
 {
   private_ = ViewerWidgetPrivateHandle(new ViewerWidgetPrivate(this));
   setLayout(private_->layout_);
   setLineWidth(3);
   setFrameShape(QFrame::Panel);
   setFrameShadow(QFrame::Raised);
-  
+
   private_->viewer_->set_viewer_id(viewer_id_);
+  this->connect(this->private_->viewer_selection_, 
+    SIGNAL(triggered(QAction*)), SLOT(change_view_type(QAction*))); 
 }
 
 ViewerWidget::~ViewerWidget()
 {
 }
 
-void
-ViewerWidget::select()
+void ViewerWidget::select()
 {
   QPalette pal(palette());
   pal.setColor(QPalette::Light,private_->select_color_);
@@ -379,13 +382,38 @@ ViewerWidget::select()
   setPalette(pal);
 }
 
-void
-ViewerWidget::deselect()
+void ViewerWidget::deselect()
 {
   QPalette pal(palette());
   pal.setColor(QPalette::Light,private_->deselect_color_);
   pal.setColor(QPalette::Dark,private_->deselect_color_dark_);
   setPalette(pal);
+}
+
+void ViewerWidget::change_view_type( QAction* viewer_type )
+{
+  QAction* current_type = this->private_->viewer_type_button_->defaultAction();
+  if (current_type != viewer_type)
+  {
+    this->private_->viewer_type_button_->setDefaultAction(viewer_type);
+    ViewerHandle viewer = ViewerManager::Instance()->get_viewer(this->viewer_id_);
+    if (viewer_type == this->private_->axial_viewer_)
+    {
+      ActionSet::Dispatch(viewer->view_mode_state, std::string("axial"));
+    }
+    else if (viewer_type == this->private_->coronal_viewer_)
+    {
+      ActionSet::Dispatch(viewer->view_mode_state, std::string("coronal"));
+    }
+    else if (viewer_type == this->private_->sagittal_viewer_)
+    {
+      ActionSet::Dispatch(viewer->view_mode_state, std::string("sagittal"));
+    }
+    else
+    {
+      ActionSet::Dispatch(viewer->view_mode_state, std::string("volume"));
+    }
+  }
 }
 
 } // end namespace Seg3D

@@ -212,7 +212,10 @@ Utils::Vector ViewManipulator::project_point_onto_sphere( int x, int y ) const
 
 void ViewManipulator::compute_3d_viewplane()
 {
-  const Utils::View3D& view3d = this->viewer_->volume_view_state->get();
+  StateEngine::lock_type lock(StateEngine::Instance()->get_mutex());
+  Utils::View3D view3d (this->viewer_->volume_view_state->get());
+  lock.unlock();
+
   Utils::Vector z(view3d.eyep() - view3d.lookat());
   double eye_distance = z.normalize();
   Utils::Vector x(Cross(view3d.up(), z));

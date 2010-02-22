@@ -62,19 +62,6 @@ public:
   }
 };
 
-#ifdef NDEBUG
-#define CHECK_OPENGL_ERROR()
-#else
-#define CHECK_OPENGL_ERROR()\
-{\
-  GLenum err = glGetError();\
-  if (err != GL_NO_ERROR)\
-  {\
-    SCI_LOG_ERROR(std::string("OpenGL error: ") + Utils::to_string(err));\
-  }\
-}
-#endif
-
 Renderer::Renderer() : 
   ViewerRenderer(), EventHandler(), 
   active_render_texture_(0), width_(0), 
@@ -112,8 +99,8 @@ void Renderer::initialize()
   //glEnable(GL_CULL_FACE);
 
   // lock the shared render context
-  boost::unique_lock<RenderResources::mutex_type> 
-    lock(RenderResources::Instance()->shared_context_mutex());
+  RenderResources::lock_type lock(
+    RenderResources::Instance()->shared_context_mutex());
 
   textures_[0] = TextureHandle(new Texture2D());
   textures_[1] = TextureHandle(new Texture2D());
@@ -153,12 +140,11 @@ void Renderer::redraw()
   }
 
   // lock the active render texture
-  boost::unique_lock<Texture::mutex_type> 
-    texture_lock(textures_[active_render_texture_]->get_mutex());
+  Texture::lock_type texture_lock(textures_[active_render_texture_]->get_mutex());
 
   frame_buffer_->attach_texture(textures_[active_render_texture_]);
   
-  CHECK_OPENGL_ERROR();
+  SCI_CHECK_OPENGL_ERROR();
 
   // bind the framebuffer object
   frame_buffer_->enable();
@@ -167,12 +153,12 @@ void Renderer::redraw()
     return;
   }
   //glDrawBuffer(GL_COLOR_ATTACHMENT0_EXT);
-  CHECK_OPENGL_ERROR();
+  SCI_CHECK_OPENGL_ERROR();
 
   glViewport(0, 0, width_, height_); 
   glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  CHECK_OPENGL_ERROR();
+  SCI_CHECK_OPENGL_ERROR();
   // do some rendering
   // ...
   // ...
@@ -186,7 +172,9 @@ void Renderer::redraw()
   glLoadIdentity();
   if (viewer->is_volume_view())
   {
+    StateEngine::lock_type lock(StateEngine::Instance()->get_mutex());
     Utils::View3D view3d( viewer->volume_view_state->get() );
+    lock.unlock();
     gluPerspective(view3d.fov(), width_ / (1.0 * height_), 0.1, 5.0);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -196,8 +184,10 @@ void Renderer::redraw()
   }
   else
   {
+    StateEngine::lock_type lock(StateEngine::Instance()->get_mutex());
     Utils::View2D view2d( 
       dynamic_cast<StateView2D*>(viewer->get_active_view_state().get())->get() );
+    lock.unlock();
     double left, right, top, bottom;
     this->compute_2d_clipping_planes(view2d, left, right, bottom, top);
     gluOrtho2D(left, right, bottom, top);
@@ -205,13 +195,13 @@ void Renderer::redraw()
     glLoadIdentity();
   }
   
-  CHECK_OPENGL_ERROR();
+  SCI_CHECK_OPENGL_ERROR();
   glRotatef(25.0f * (this->viewer_id_+1), 1, 0, 1);
   glScalef(0.5f, 0.5f, 0.5f);
   glTranslatef(-0.5f, -0.5f, -0.5f);
   this->cube_->draw();
 
-  CHECK_OPENGL_ERROR();
+  SCI_CHECK_OPENGL_ERROR();
   //glBegin(GL_TRIANGLES);
   //glColor3f(1.0, 0.0, 0.0);
   //glVertex3f(0.5, -0.5, 0);
@@ -263,7 +253,7 @@ void Renderer::resize(int width, int height)
   }
 
   {
-    boost::unique_lock<RenderResources::mutex_type> lock(RenderResources::Instance()->shared_context_mutex());
+    RenderResources::lock_type lock(RenderResources::Instance()->shared_context_mutex());
     textures_[0] = TextureHandle(new Texture2D());
     textures_[1] = TextureHandle(new Texture2D());
     textures_[0]->set_image(width, height, 1, GL_RGBA);

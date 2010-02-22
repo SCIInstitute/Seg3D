@@ -33,6 +33,7 @@
 #include <Application/Viewer/ViewerRenderer.h>
 
 // QT includes
+#include <QAction>
 #include <QFrame>
 
 // STL includes
@@ -64,6 +65,7 @@ class ViewerWidget : public QFrame {
   public Q_SLOTS:  
     void select();
     void deselect();
+  void change_view_type(QAction*);
 
   private:
     // Internals of the viewer widget, so most dependencies do not need to

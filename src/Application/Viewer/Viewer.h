@@ -63,7 +63,8 @@ public:
 public:
   // enums for mouse buttons 
   // they have the same values as corresponding Qt ones
-  enum {
+  enum MouseButton
+  {
     NO_BUTTON_E = 0x00000000,
     LEFT_BUTTON_E = 0x00000001,
     RIGHT_BUTTON_E = 0x00000002,
@@ -72,7 +73,8 @@ public:
 
   // enums for key modifiers
   // they have the same values as corresponding Qt ones
-  enum {
+  enum KeyModifier
+  {
     NO_MODIFIER_E = 0x00000000,
     SHIFT_MODIFIER_E = 0x02000000,
     CONTROL_MODIFIER_E = 0x04000000,

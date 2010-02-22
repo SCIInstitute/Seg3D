@@ -88,7 +88,7 @@ void QtRenderWidget::paintGL()
     return;
   }
 
-  boost::unique_lock<Texture::mutex_type> lock(renderer_texture_->get_mutex());  
+  Texture::lock_type lock(renderer_texture_->get_mutex());  
 
   // draw a window size quad and map the render texture onto it
   QSize view_size = QWidget::size();

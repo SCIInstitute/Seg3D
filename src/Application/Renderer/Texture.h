@@ -75,7 +75,8 @@ class Texture : public boost::noncopyable {
       return target_;
     }
     
-    typedef boost::mutex mutex_type;
+    typedef boost::recursive_mutex mutex_type;
+  typedef boost::unique_lock<mutex_type> lock_type;
     
     inline mutex_type& get_mutex()
     {

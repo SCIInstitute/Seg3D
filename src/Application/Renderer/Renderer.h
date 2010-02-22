@@ -92,6 +92,19 @@ private:
 
 };
 
+#ifdef NDEBUG
+#define SCI_CHECK_OPENGL_ERROR()
+#else
+#define SCI_CHECK_OPENGL_ERROR()\
+{\
+  GLenum err = glGetError();\
+  if (err != GL_NO_ERROR)\
+  {\
+    SCI_LOG_ERROR(std::string("OpenGL error: ") + Utils::to_string(err));\
+  }\
+}
+#endif
+
 } // end namespace Seg3D
 
 #endif

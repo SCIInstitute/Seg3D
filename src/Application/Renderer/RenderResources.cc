@@ -88,11 +88,11 @@ RenderResources::init_gl()
       gl_initialized_ = true;
       if (!GL_VERSION_1_5)
       {
-        SCI_THROW_EXCEPTION("Minimum OpenGL version 1.5 required.");
+        SCI_THROW_OPENGLEXCEPTION("Minimum OpenGL version 1.5 required.");
       }
       if (!GL_EXT_framebuffer_object)
       {
-        SCI_THROW_EXCEPTION("GL_EXT_framebuffer_object not found.");
+        SCI_THROW_OPENGLEXCEPTION("GL_EXT_framebuffer_object not found.");
       }
     }
   }
@@ -101,6 +101,22 @@ RenderResources::init_gl()
 
 // Need to define singleton somewhere
 Utils::Singleton<RenderResources> RenderResources::instance_;
+
+
+OpenGLException::OpenGLException( std::string message, 
+                 unsigned int line, const char* file ) :
+  Utils::Exception(message, line, file)
+{
+}
+
+OpenGLException::~OpenGLException()
+{
+}
+
+std::string OpenGLException::what() const
+{
+  return std::string("OpenGLException");
+}
 
 } // end namespace Seg3D
 
