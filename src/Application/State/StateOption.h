@@ -155,6 +155,9 @@ class StateOption : public StateBase {
   
     // List with all the allowed options in lower case
     std::vector<std::string> option_list_;
+
+public:
+  const static char SPLITTER_C;
                                     
 };
 

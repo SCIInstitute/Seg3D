@@ -26,54 +26,35 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#include <Application/State/Actions/ActionRotate.h>
+#ifndef APPLICATION_STATE_ACTIONS_ACTIONFLIP_H
+#define APPLICATION_STATE_ACTIONS_ACTIONFLIP_H
 
-namespace Seg3D {
+#include <Application/Action/Action.h>
+#include <Application/Interface/Interface.h>
+#include <Application/State/StateView2D.h>
 
-SCI_REGISTER_ACTION(Rotate);
-
-bool 
-ActionRotate::validate(ActionContextHandle &context)
+namespace Seg3D
 {
-  // Check whether the state exists
-  StateBaseHandle state(state_weak_handle_.lock());
-
-  // If the state no longer exists report an error
-  if (! state.get()) 
+  class ActionFlip : public Action
   {
-    if (!(StateEngine::Instance()->get_state(stateid_.value(),state))) 
-    {
-      context->report_error(
-        std::string("State variable '")+stateid_.value()+"' doesn't exist");
-      return false;
-    }
-    
-    // store the handle for future use
-    state_weak_handle_ = state;
-  }
-  
-  if (! state->is_rotatable())
-  {
-    context->report_error(
-      std::string("State variable '")+stateid_.value()+"' cannot be rotated");
-    return false;
-  }
-  
-  return true;
-}
+    SCI_ACTION_TYPE("Flip", "Flip <key> <direction>", APPLICATION_E)
 
-bool
-ActionRotate::run(ActionContextHandle &context, ActionResultHandle &result)
-{
-  StateView3DHandle state = state_.value().lock();
+  public:
+    ActionFlip();
+    virtual ~ActionFlip();
 
-  if (state)
-  {
-    //state->rotate(rotation_.value());
-    return (true);
-  }
-  
-  return (false);
-}
+    virtual bool validate(ActionContextHandle& context);
+    virtual bool run(ActionContextHandle& context, ActionResultHandle& result);
 
-} // End namespace Seg3D
+  private:
+    ActionParameter<std::string> stateid_;
+    ActionParameter<int> direction_;
+
+    StateView2DWeakHandle view2d_state_;
+
+  public:
+    static void Dispatch(StateView2DHandle& state, Utils::View2D::Direction direction);
+  };
+} // end namespace Seg3D
+
+#endif

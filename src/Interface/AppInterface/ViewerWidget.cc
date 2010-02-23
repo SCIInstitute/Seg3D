@@ -29,6 +29,7 @@
 // Utils includes
 #include <Utils/Core/Log.h>
 
+#include <Application/State/Actions/ActionFlip.h>
 #include <Application/ViewerManager/ViewerManager.h>
 
 // Qt Interface support classes
@@ -281,7 +282,7 @@ ViewerWidgetPrivate::ViewerWidgetPrivate(QWidget *parent)
   viewer_menu_->addAction(volume_viewer_);
   viewer_type_button_->setPopupMode(QToolButton::InstantPopup);  
   viewer_type_button_->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-  viewer_type_button_->setDefaultAction(sagittal_viewer_);
+  viewer_type_button_->setDefaultAction(axial_viewer_);
   viewer_type_button_->setFixedHeight(20);  
   viewer_type_button_->setFixedWidth(80);  
   viewer_type_button_->setMenu(viewer_menu_);
@@ -368,6 +369,13 @@ ViewerWidget::ViewerWidget(int viewer_id, QWidget *parent) :
   private_->viewer_->set_viewer_id(viewer_id_);
   this->connect(this->private_->viewer_selection_, 
     SIGNAL(triggered(QAction*)), SLOT(change_view_type(QAction*))); 
+  this->connect(this->private_->flip_horiz_, SIGNAL(triggered(bool)),
+    SLOT(flip_view_horiz(bool)));
+  this->connect(this->private_->flip_vert_, SIGNAL(triggered(bool)),
+    SLOT(flip_view_vert(bool)));
+
+  ViewerManager::Instance()->get_viewer(this->viewer_id_)->view_mode_state_
+    ->value_changed_signal_.connect(boost::bind(&ViewerWidget::change_view_type, this, _1, _2));
 }
 
 ViewerWidget::~ViewerWidget()
@@ -399,20 +407,60 @@ void ViewerWidget::change_view_type( QAction* viewer_type )
     ViewerHandle viewer = ViewerManager::Instance()->get_viewer(this->viewer_id_);
     if (viewer_type == this->private_->axial_viewer_)
     {
-      ActionSet::Dispatch(viewer->view_mode_state, std::string("axial"));
+      ActionSet::Dispatch(viewer->view_mode_state_, Viewer::AXIAL_C);
     }
     else if (viewer_type == this->private_->coronal_viewer_)
     {
-      ActionSet::Dispatch(viewer->view_mode_state, std::string("coronal"));
+      ActionSet::Dispatch(viewer->view_mode_state_, Viewer::CORONAL_C);
     }
     else if (viewer_type == this->private_->sagittal_viewer_)
     {
-      ActionSet::Dispatch(viewer->view_mode_state, std::string("sagittal"));
+      ActionSet::Dispatch(viewer->view_mode_state_, Viewer::SAGITTAL_C);
     }
     else
     {
-      ActionSet::Dispatch(viewer->view_mode_state, std::string("volume"));
+      ActionSet::Dispatch(viewer->view_mode_state_, Viewer::VOLUME_C);
     }
+  }
+}
+
+void ViewerWidget::flip_view_horiz( bool flip )
+{
+  ViewerHandle viewer = ViewerManager::Instance()->get_viewer(this->viewer_id_);
+  if (!viewer->is_volume_view())
+  {
+    StateView2DHandle view2d_state = boost::dynamic_pointer_cast<StateView2D>(viewer->get_active_view_state());
+    ActionFlip::Dispatch(view2d_state, Utils::View2D::HORIZONTAL_E);
+  }
+}
+
+void ViewerWidget::flip_view_vert( bool flip )
+{
+  ViewerHandle viewer = ViewerManager::Instance()->get_viewer(this->viewer_id_);
+  if (!viewer->is_volume_view())
+  {
+    StateView2DHandle view2d_state = boost::dynamic_pointer_cast<StateView2D>(viewer->get_active_view_state());
+    ActionFlip::Dispatch(view2d_state, Utils::View2D::VERTICAL_E);
+  }
+}
+
+void ViewerWidget::change_view_type( std::string type, ActionSource action_source )
+{
+  if (!Interface::IsInterfaceThread())
+  {
+    Interface::PostEvent(boost::bind(&ViewerWidget::change_view_type, this, type, action_source));
+    return;
+  }
+  
+  ViewerHandle viewer = ViewerManager::Instance()->get_viewer(this->viewer_id_);
+  this->private_->flip_horiz_button_->setDisabled(viewer->is_volume_view());
+  this->private_->flip_vert_button_->setDisabled(viewer->is_volume_view());
+
+  if (type != Viewer::VOLUME_C)
+  {
+    StateView2DHandle view2d_state = boost::dynamic_pointer_cast<StateView2D>(viewer->get_active_view_state());
+    this->private_->flip_horiz_->setChecked(view2d_state->x_flipped());
+    this->private_->flip_vert_->setChecked(view2d_state->y_flipped());
   }
 }
 

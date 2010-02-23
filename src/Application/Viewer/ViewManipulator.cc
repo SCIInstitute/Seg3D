@@ -115,7 +115,7 @@ void ViewManipulator::mouse_move( const MouseHistory& mouse_history, int button,
                           mouse_history.current.x, mouse_history.current.y, axis, angle))
     {
       // dispatch an ActionRotateView3D
-      ActionRotateView3D::Dispatch(this->viewer_->volume_view_state, axis, angle);
+      ActionRotateView3D::Dispatch(this->viewer_->volume_view_state_, axis, angle);
     }
   } 
 }
@@ -213,7 +213,7 @@ Utils::Vector ViewManipulator::project_point_onto_sphere( int x, int y ) const
 void ViewManipulator::compute_3d_viewplane()
 {
   StateEngine::lock_type lock(StateEngine::Instance()->get_mutex());
-  Utils::View3D view3d (this->viewer_->volume_view_state->get());
+  Utils::View3D view3d (this->viewer_->volume_view_state_->get());
   lock.unlock();
 
   Utils::Vector z(view3d.eyep() - view3d.lookat());

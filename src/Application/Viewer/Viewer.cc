@@ -35,21 +35,24 @@ namespace Seg3D {
 Viewer::Viewer(const std::string& key) :
   StateHandler(key)
 {
-  add_state("view_mode", view_mode_state, "volume", "axial|coronal|sagittal|volume");
+  add_state("view_mode", view_mode_state_, AXIAL_C, 
+    AXIAL_C + StateOption::SPLITTER_C + 
+    CORONAL_C + StateOption::SPLITTER_C + 
+    SAGITTAL_C + StateOption::SPLITTER_C +  VOLUME_C);
 
-  add_state("axial_view", axial_view_state);
-  add_state("sagittal_view", sagittal_view_state);
-  add_state("coronal_view", coronal_view_state);
-  add_state("volume_view", volume_view_state);
+  add_state("axial_view", axial_view_state_);
+  add_state("sagittal_view", sagittal_view_state_);
+  add_state("coronal_view", coronal_view_state_);
+  add_state("volume_view", volume_view_state_);
 
-  add_state("slice_lock", slice_lock_state, true);
-  add_state("slice_grid", slice_grid_state, true);
-  add_state("slice_visible", slice_visible_state, true);
+  add_state("slice_lock", slice_lock_state_, true);
+  add_state("slice_grid", slice_grid_state_, true);
+  add_state("slice_visible", slice_visible_state_, true);
 
-  add_state("volume_lock", volume_lock_state, true);
-  add_state("volume_slices_visible", volume_slices_visible_state, true);
-  add_state("volume_isosurfaces_visible", volume_isosurfaces_visible_state, true);
-  add_state("volume_volume_rendering_visible", volume_volume_rendering_visible_state, false);
+  add_state("volume_lock", volume_lock_state_, true);
+  add_state("volume_slices_visible", volume_slices_visible_state_, true);
+  add_state("volume_isosurfaces_visible", volume_isosurfaces_visible_state_, true);
+  add_state("volume_volume_rendering_visible", volume_volume_rendering_visible_state_, false);
 
   this->view_manipulator_ = boost::shared_ptr<ViewManipulator>(new ViewManipulator(this));
 }
@@ -138,28 +141,33 @@ void Viewer::state_changed()
 
 bool Viewer::is_volume_view() const
 {
-  return this->view_mode_state->get() == "volume";
+  return this->view_mode_state_->get() == VOLUME_C;
 }
 
 StateViewBaseHandle Viewer::get_active_view_state()
 {
-  if (this->view_mode_state->get() == "volume")
+  if (this->view_mode_state_->get() == VOLUME_C)
   {
-    return this->volume_view_state;
+    return this->volume_view_state_;
   }
-  else if (this->view_mode_state->get() == "axial")
+  else if (this->view_mode_state_->get() == AXIAL_C)
   {
-    return this->axial_view_state;
+    return this->axial_view_state_;
   }
-  else if (this->view_mode_state->get() == "coronal")
+  else if (this->view_mode_state_->get() == CORONAL_C)
   {
-    return this->coronal_view_state;
+    return this->coronal_view_state_;
   }
   else
   {
-    return this->sagittal_view_state;
+    return this->sagittal_view_state_;
   }
 }
+
+const std::string Viewer::AXIAL_C("axial");
+const std::string Viewer::SAGITTAL_C("sagittal");
+const std::string Viewer::CORONAL_C("coronal");
+const std::string Viewer::VOLUME_C("volume");
 
 } // end namespace Seg3D
 

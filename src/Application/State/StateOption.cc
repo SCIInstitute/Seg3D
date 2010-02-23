@@ -41,7 +41,7 @@ StateOption::StateOption(const std::string& default_value,
   std::string option_list_string = Utils::string_to_lower(option_list);
   while(1)
   {
-    size_t loc = option_list_string.find('|');
+    size_t loc = option_list_string.find(SPLITTER_C);
     if (loc >= option_list_string.size())
     {
       option_list_.push_back(option_list_string);
@@ -187,7 +187,7 @@ StateOption::set_option_list(const std::string& option_list)
   option_list_.clear();
   while(1)
   {
-    size_t loc = option_list_string.find('|');
+    size_t loc = option_list_string.find(SPLITTER_C);
     if (loc >= option_list_string.size())
     {
       option_list_.push_back(option_list_string);
@@ -217,7 +217,7 @@ StateOption::set_option_list(const std::string& option_list,
   option_list_.clear();
   while(1)
   {
-    size_t loc = option_list_string.find('|');
+    size_t loc = option_list_string.find(SPLITTER_C);
     if (loc >= option_list_string.size())
     {
       option_list_.push_back(option_list_string);
@@ -249,5 +249,6 @@ StateOption::set_option_list(const std::string& option_list,
   optionlist_changed_signal_();
 }
 
+const char StateOption::SPLITTER_C = '|';
 
 } // end namespace Seg3D

@@ -52,6 +52,7 @@ namespace Seg3D {
 
 class StateView2D;
 typedef boost::shared_ptr<StateView2D> StateView2DHandle;
+typedef boost::weak_ptr<StateView2D> StateView2DWeakHandle;
 
 class StateView2D : public StateViewBase {
 
@@ -79,6 +80,12 @@ class StateView2D : public StateViewBase {
   virtual void scale(double ratio);
 
   virtual void translate(const Utils::Vector& offset);
+
+  void flip(Utils::View2D::Direction direction);
+
+  bool x_flipped() const;
+
+  bool y_flipped() const;
                                 
   protected:    
     // EXPORT_TO_VARIANT

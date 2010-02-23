@@ -78,8 +78,26 @@ void StateView2D::translate( const Utils::Vector& offset )
   this->state_changed_signal_();
 }
 
-bool 
-StateView2D::set(const Utils::View2D& value, ActionSource source)
+void StateView2D::flip(Utils::View2D::Direction direction)
+{
+  {
+    StateEngine::lock_type lock(StateEngine::Instance()->get_mutex());
+    this->value_.flip(direction);
+  }
+  this->state_changed_signal_();
+}
+
+bool StateView2D::x_flipped() const
+{
+  return this->value_.x_flipped();
+}
+
+bool StateView2D::y_flipped() const
+{
+  return this->value_.y_flipped();
+}
+
+bool StateView2D::set(const Utils::View2D& value, ActionSource source)
 {
   // Lock the state engine so no other thread will be accessing it
   StateEngine::lock_type lock(StateEngine::Instance()->get_mutex());

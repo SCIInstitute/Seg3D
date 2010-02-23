@@ -75,11 +75,11 @@ Renderer::~Renderer()
 
 void Renderer::initialize()
 {
+#if defined(WIN32) || defined(APPLE)
   // NOTE: it is important to postpone the allocation of OpenGL objects to the 
   // rendering thread. If created in a different thread, these objects might not
   // be ready when the rendering thread uses them the first time, which caused
   // the scene to be blank sometimes.
-#if defined(WIN32) || defined(APPLE)
   if (!is_eventhandler_thread())
   {
     if (!RenderResources::Instance()->create_render_context(context_))
@@ -147,6 +147,7 @@ void Renderer::redraw()
     return;
   }
 #endif
+
   {
     boost::unique_lock<boost::mutex> lock(redraw_needed_mutex_);
     redraw_needed_ = false;
@@ -163,7 +164,9 @@ void Renderer::redraw()
   // lock the active render texture
   Texture::lock_type texture_lock(textures_[active_render_texture_]->get_mutex());
 
+#if !defined(WIN32) && !defined(APPLE)
   this->context_->make_current();
+#endif
 
   frame_buffer_->attach_texture(textures_[active_render_texture_]);
   
@@ -196,7 +199,7 @@ void Renderer::redraw()
   if (viewer->is_volume_view())
   {
     StateEngine::lock_type lock(StateEngine::Instance()->get_mutex());
-    Utils::View3D view3d( viewer->volume_view_state->get() );
+    Utils::View3D view3d( viewer->volume_view_state_->get() );
     lock.unlock();
     gluPerspective(view3d.fov(), width_ / (1.0 * height_), 0.1, 5.0);
     glMatrixMode(GL_MODELVIEW);

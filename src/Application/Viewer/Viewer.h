@@ -131,21 +131,26 @@ private:
   // -- State information --
 public:
 
-  StateOptionHandle  view_mode_state;
+  StateOptionHandle  view_mode_state_;
 
-  StateView2DHandle  axial_view_state;
-  StateView2DHandle  sagittal_view_state;
-  StateView2DHandle  coronal_view_state;
-  StateView3DHandle  volume_view_state;
+  StateView2DHandle  axial_view_state_;
+  StateView2DHandle  sagittal_view_state_;
+  StateView2DHandle  coronal_view_state_;
+  StateView3DHandle  volume_view_state_;
 
-  StateBoolHandle    slice_lock_state;
-  StateBoolHandle    slice_grid_state;
-  StateBoolHandle    slice_visible_state;
+  StateBoolHandle    slice_lock_state_;
+  StateBoolHandle    slice_grid_state_;
+  StateBoolHandle    slice_visible_state_;
 
-  StateBoolHandle    volume_lock_state;
-  StateBoolHandle    volume_slices_visible_state;
-  StateBoolHandle    volume_isosurfaces_visible_state;
-  StateBoolHandle    volume_volume_rendering_visible_state;
+  StateBoolHandle    volume_lock_state_;
+  StateBoolHandle    volume_slices_visible_state_;
+  StateBoolHandle    volume_isosurfaces_visible_state_;
+  StateBoolHandle    volume_volume_rendering_visible_state_;
+
+  const static std::string AXIAL_C;
+  const static std::string SAGITTAL_C;
+  const static std::string CORONAL_C;
+  const static std::string VOLUME_C;
 
 };
 

@@ -139,8 +139,8 @@ bool
 QtBridge::connect(QCheckBox* qcheckbox, 
                   StateBoolHandle& state_handle)
 {
-  // Connect the dispatch into the StateVariable (with auxillary object)
-  // Link tbe slot to the parent widget, so Qt's memory manager will
+  // Connect the dispatch into the StateVariable (with auxiliary object)
+  // Link the slot to the parent widget, so Qt's memory manager will
   // manage this one.
   new QtCheckBoxSlot(qcheckbox,state_handle);
     
@@ -156,8 +156,8 @@ bool
 QtBridge::connect(QComboBox* qcombobox,
                   StateOptionHandle& state_handle)
 {
-  // Connect the dispatch into the StateVariable (with auxillary object)
-  // Link tbe slot to the parent widget, so Qt's memory manager will
+  // Connect the dispatch into the StateVariable (with auxiliary object)
+  // Link the slot to the parent widget, so Qt's memory manager will
   // manage this one.
   new QtComboBoxSlot(qcombobox,state_handle);
 
@@ -201,7 +201,7 @@ bool
 QtBridge::connect(QToolButton* qtoolbutton, 
                   boost::function<void ()> function)
 {
-  // Link tbe slot to the parent widget, so Qt's memory manager will
+  // Link the slot to the parent widget, so Qt's memory manager will
   // manage this one.
   new QtToolButtonSlot(qtoolbutton,function);
   
@@ -213,7 +213,7 @@ bool
 QtBridge::connect(QPushButton* qpushbutton, 
                   boost::function<void ()> function)
 {
-  // Link tbe slot to the parent widget, so Qt's memory manager will
+  // Link the slot to the parent widget, so Qt's memory manager will
   // manage this one.
   new QtPushButtonSlot(qpushbutton,function);
   
@@ -226,7 +226,7 @@ bool
 QtBridge::connect(QAction* qaction, 
                   boost::function<void ()> function)
 {
-  // Link tbe slot to the parent widget, so Qt's memory manager will
+  // Link the slot to the parent widget, so Qt's memory manager will
   // manage this one.
   new QtActionSlot( qaction, function );
 
@@ -238,7 +238,7 @@ bool
 QtBridge::connect(QAction* qaction, 
                   StateBoolHandle& state_handle)
 {
-  // Link tbe slot to the parent widget, so Qt's memory manager will
+  // Link the slot to the parent widget, so Qt's memory manager will
   // manage this one.
   new QtActionToggleSlot( qaction, state_handle );
 

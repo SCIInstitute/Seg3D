@@ -31,6 +31,7 @@
 #define INTERFACE_APPINTERFACE_VIEWERWIDGET_H
 
 #include <Application/Viewer/ViewerRenderer.h>
+#include <Application/Action/ActionContext.h>
 
 // QT includes
 #include <QAction>
@@ -66,6 +67,11 @@ class ViewerWidget : public QFrame {
     void select();
     void deselect();
   void change_view_type(QAction*);
+  void flip_view_horiz(bool);
+  void flip_view_vert(bool);
+
+private:
+  void change_view_type(std::string type, ActionSource action_source);
 
   private:
     // Internals of the viewer widget, so most dependencies do not need to

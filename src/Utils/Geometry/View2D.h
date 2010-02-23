@@ -39,6 +39,13 @@ class View2D;
 
 class View2D {
 public:
+
+  enum Direction
+  {
+    HORIZONTAL_E = 0,
+    VERTICAL_E = 1
+  };
+
   View2D();
   View2D(const Point& center, double scale);
   View2D(const Point& center, double scalex, double scaley);
@@ -61,8 +68,12 @@ public:
   inline double scaley() const                { return scaley_; }
   inline void   scaley(double scaley)         { scaley_ = scaley; }
 
+  inline bool x_flipped() const   { return this->scalex_ < 0; }
+  inline bool y_flipped() const   { return this->scaley_ < 0; }
+
   void scale(double ratio);
   void translate(const Vector& offset);
+  void flip(Direction direction);
 
 private:
   // Center point

@@ -97,4 +97,16 @@ void View2D::translate( const Vector& offset )
   this->center_[1] -= delta_y;
 }
 
+void View2D::flip(Direction direction)
+{
+  if (direction == HORIZONTAL_E)
+  {
+    this->scalex_ = -this->scalex_;
+  }
+  else
+  {
+    this->scaley_ = -this->scaley_;
+  }
+}
+
 } // End namespace Utils
