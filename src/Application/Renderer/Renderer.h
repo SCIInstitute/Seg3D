@@ -88,7 +88,7 @@ private:
   int height_;
   bool redraw_needed_;
 
-  boost::mutex redraw_needed_mutex_;
+  boost::recursive_mutex redraw_needed_mutex_;
 
 };
 

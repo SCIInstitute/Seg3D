@@ -237,6 +237,29 @@ BUILD_REGISTER_QTRESOURCES_LIBRARY()
 ADD_SUBDIRECTORY(Init)
 
 ###########################################
+# Check for "XInitThreads" on X-window
+# systems.
+###########################################
+
+IF(NOT WIN32 AND NOT APPLE)
+  CHECK_C_SOURCE_COMPILES(
+  "
+  #include <X11/Xlib.h>
+
+  int main()
+  {
+    XInitThreads();
+    return 0;
+  }
+  "
+  X11_THREADSAFE
+  )
+  IF(${X11_THREADSAFE})
+    ADD_DEFINITIONS(-DX11_THREADSAFE)
+  ENDIF(${X11_THREADSAFE})
+ENDIF(NOT WIN32 AND NOT APPLE)
+
+###########################################
 # Packaging:
 # This part sets up the packager using
 # CPack.

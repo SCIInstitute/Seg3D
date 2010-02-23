@@ -55,6 +55,10 @@
 #include<boost/tokenizer.hpp>
 #include <boost/lexical_cast.hpp>
 
+#ifdef X11_THREADSAFE
+#include <X11/Xlib.h>
+#endif
+
 //#include <Interface/ControllerInterface/ControllerInterface.h>
 
 ///////////////////////////////////////////////////////////
@@ -65,6 +69,12 @@ using namespace Seg3D;
 
 int main(int argc, char **argv)
 {
+
+#ifdef X11_THREADSAFE
+  // Make X11 thread safe if the API is available.
+  XInitThreads();
+#endif
+
   // -- Setup error logging --
   // stream error to the console window
   Utils::LogStreamer error_log(Utils::Log::ALL_E,&(std::cerr));

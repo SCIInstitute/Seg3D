@@ -75,7 +75,7 @@ Renderer::~Renderer()
 
 void Renderer::initialize()
 {
-#if defined(WIN32) || defined(APPLE)
+#if defined(WIN32) || defined(APPLE) || defined(X11_THREADSAFE)
   // NOTE: it is important to postpone the allocation of OpenGL objects to the 
   // rendering thread. If created in a different thread, these objects might not
   // be ready when the rendering thread uses them the first time, which caused
@@ -91,14 +91,14 @@ void Renderer::initialize()
     return;
   }
 #else
-  if (!RenderResources::Instance()->create_render_context(context_))
-  {
-    SCI_THROW_EXCEPTION("Failed to create a valid rendering context");
-  }
   if (!Interface::IsInterfaceThread())
   {
     Interface::PostEvent(boost::bind(&Renderer::initialize, this));
     return;
+  }
+  if (!RenderResources::Instance()->create_render_context(context_))
+  {
+    SCI_THROW_EXCEPTION("Failed to create a valid rendering context");
   }
 #endif
 
@@ -132,10 +132,10 @@ void Renderer::initialize()
 
 void Renderer::redraw()
 {
-#if defined(WIN32) || defined(APPLE)
+#if defined(WIN32) || defined(APPLE) || defined(X11_THREADSAFE)
   if (!is_eventhandler_thread())
   {
-    boost::unique_lock<boost::mutex> lock(redraw_needed_mutex_);
+    boost::unique_lock<boost::recursive_mutex> lock(redraw_needed_mutex_);
     redraw_needed_ = true;
     post_event(boost::bind(&Renderer::redraw, this));
     return;
@@ -143,18 +143,20 @@ void Renderer::redraw()
 #else
   if (!Interface::IsInterfaceThread())
   {
+    boost::unique_lock<boost::recursive_mutex> lock(redraw_needed_mutex_);
+    redraw_needed_ = true;
     Interface::PostEvent(boost::bind(&Renderer::redraw, this));
     return;
   }
 #endif
 
   {
-    boost::unique_lock<boost::mutex> lock(redraw_needed_mutex_);
+    boost::unique_lock<boost::recursive_mutex> lock(redraw_needed_mutex_);
     redraw_needed_ = false;
   }
 
   {
-    boost::unique_lock<boost::mutex> lock(redraw_needed_mutex_);
+    boost::unique_lock<boost::recursive_mutex> lock(redraw_needed_mutex_);
     if (redraw_needed_)
     {
       return;
@@ -164,7 +166,7 @@ void Renderer::redraw()
   // lock the active render texture
   Texture::lock_type texture_lock(textures_[active_render_texture_]->get_mutex());
 
-#if !defined(WIN32) && !defined(APPLE)
+#if !defined(WIN32) && !defined(APPLE) && !defined(X11_THREADSAFE)
   this->context_->make_current();
 #endif
 
@@ -266,7 +268,7 @@ void Renderer::redraw()
 
 void Renderer::resize(int width, int height)
 {
-#if defined(WIN32) || defined(APPLE)
+#if defined(WIN32) || defined(APPLE) || defined(X11_THREADSAFE)
   if (!is_eventhandler_thread())
   {
     post_event(boost::bind(&Renderer::resize, this, width, height));
