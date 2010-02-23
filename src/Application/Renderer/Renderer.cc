@@ -76,6 +76,9 @@ Renderer::~Renderer()
 void Renderer::initialize()
 {
 #if defined(WIN32) || defined(APPLE) || defined(X11_THREADSAFE)
+#ifdef X11_THREADSAFE
+  SCI_LOG_DEBUG(std::string("Multithreaded rendering enabled on X-Window"));
+#endif
   // NOTE: it is important to postpone the allocation of OpenGL objects to the 
   // rendering thread. If created in a different thread, these objects might not
   // be ready when the rendering thread uses them the first time, which caused

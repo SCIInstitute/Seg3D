@@ -156,6 +156,34 @@ ELSE(CMAKE_BUILD_TYPE MATCHES "Debug")
 ENDIF(CMAKE_BUILD_TYPE MATCHES "Debug")
 
 ###########################################
+# Check for "XInitThreads" on X-window
+# systems.
+###########################################
+
+IF(NOT WIN32 AND NOT APPLE)
+  SET(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} X11)
+
+  CHECK_C_SOURCE_COMPILES(
+
+  "
+  #include <X11/Xlib.h>
+
+  int main()
+  {
+    XInitThreads();
+    return 1;
+  }
+
+  "
+  X11_THREADSAFE
+  )
+  IF(${X11_THREADSAFE})
+  MESSAGE(STATUS "XInitThreads found")
+  ADD_DEFINITIONS(-DX11_THREADSAFE)
+  ENDIF(${X11_THREADSAFE})
+ENDIF(NOT WIN32 AND NOT APPLE)
+
+###########################################
 # Build Seg3DConfiguration.h
 # this file contains information such as
 # version numbers and architecture
@@ -235,29 +263,6 @@ BUILD_REGISTER_QTRESOURCES_LIBRARY()
 ###########################################
 
 ADD_SUBDIRECTORY(Init)
-
-###########################################
-# Check for "XInitThreads" on X-window
-# systems.
-###########################################
-
-IF(NOT WIN32 AND NOT APPLE)
-  CHECK_C_SOURCE_COMPILES(
-  "
-  #include <X11/Xlib.h>
-
-  int main()
-  {
-    XInitThreads();
-    return 0;
-  }
-  "
-  X11_THREADSAFE
-  )
-  IF(${X11_THREADSAFE})
-    ADD_DEFINITIONS(-DX11_THREADSAFE)
-  ENDIF(${X11_THREADSAFE})
-ENDIF(NOT WIN32 AND NOT APPLE)
 
 ###########################################
 # Packaging:
