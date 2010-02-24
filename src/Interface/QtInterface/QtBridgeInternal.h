@@ -341,6 +341,33 @@ private:
   // Function object
   boost::function<void ()> function_;
 };
+
+class QtActionGroupSlot : public QtSlot
+{
+  Q_OBJECT
+
+public:
+  QtActionGroupSlot(QActionGroup* parent, StateOptionHandle& state_handle) :
+    QtSlot(parent), option_state_(state_handle)
+  {
+    this->connect(parent, SIGNAL(triggered(QAction*)), this, SLOT(slot(QAction*)));
+  }
+
+  virtual ~QtActionGroupSlot() {}
+
+public Q_SLOTS:
+
+  void slot(QAction* action)
+  {
+    if (!this->blocked_)
+    {
+      ActionSet::Dispatch(this->option_state_, action->objectName().toStdString());
+    }
+  }
+
+private:
+  StateOptionHandle option_state_;
+};
   
 } //end namespace Seg3D
 

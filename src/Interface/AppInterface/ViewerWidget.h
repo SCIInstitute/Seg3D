@@ -70,9 +70,6 @@ class ViewerWidget : public QFrame {
   void flip_view_horiz(bool);
   void flip_view_vert(bool);
 
-private:
-  void change_view_type(std::string type, ActionSource action_source);
-
   private:
     // Internals of the viewer widget, so most dependencies do not need to
     // be included here

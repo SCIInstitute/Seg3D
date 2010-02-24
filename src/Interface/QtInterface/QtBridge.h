@@ -74,6 +74,9 @@ class QtBridge : public boost::noncopyable {
     static bool connect(QPushButton* qpushbutton, 
                         boost::function<void ()> function);
 
+  static bool connect(QActionGroup* qactiongroup, 
+            StateOptionHandle& state_handle);
+
 // -- menu connectors --
   public:
   

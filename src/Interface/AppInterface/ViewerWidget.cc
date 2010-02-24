@@ -33,8 +33,9 @@
 #include <Application/ViewerManager/ViewerManager.h>
 
 // Qt Interface support classes
-#include <Interface/QtInterface/QtRenderResources.h>
 #include <Interface/QtInterface/QtApplication.h>
+#include <Interface/QtInterface/QtBridge.h>
+#include <Interface/QtInterface/QtRenderResources.h>
 #include <Interface/QtInterface/QtRenderWidget.h>
 
 // QT includes
@@ -371,15 +372,23 @@ ViewerWidget::ViewerWidget(int viewer_id, QWidget *parent) :
   setFrameShadow(QFrame::Raised);
 
   private_->viewer_->set_viewer_id(viewer_id_);
+  
+  QtBridge::connect(this->private_->viewer_selection_,
+    ViewerManager::Instance()->get_viewer(this->viewer_id_)->view_mode_state_);
+
+  this->connect(this->private_->viewer_selection_, SIGNAL(triggered(QAction*)),
+    this->private_->viewer_type_button_, SLOT(setDefaultAction(QAction*)));
+
   this->connect(this->private_->viewer_selection_, 
     SIGNAL(triggered(QAction*)), SLOT(change_view_type(QAction*))); 
+
   this->connect(this->private_->flip_horiz_, SIGNAL(triggered(bool)),
     SLOT(flip_view_horiz(bool)));
   this->connect(this->private_->flip_vert_, SIGNAL(triggered(bool)),
     SLOT(flip_view_vert(bool)));
 
-  ViewerManager::Instance()->get_viewer(this->viewer_id_)->view_mode_state_
-    ->value_changed_signal_.connect(boost::bind(&ViewerWidget::change_view_type, this, _1, _2));
+  //ViewerManager::Instance()->get_viewer(this->viewer_id_)->view_mode_state_
+  //  ->value_changed_signal_.connect(boost::bind(&ViewerWidget::change_view_type, this, _1, _2));
 }
 
 ViewerWidget::~ViewerWidget()
@@ -404,12 +413,18 @@ void ViewerWidget::deselect()
 
 void ViewerWidget::change_view_type( QAction* viewer_type )
 {
-  QAction* current_type = this->private_->viewer_type_button_->defaultAction();
-  if (current_type != viewer_type)
+  ViewerHandle viewer = ViewerManager::Instance()->get_viewer(this->viewer_id_);
+  
+  StateEngine::lock_type lock(StateEngine::GetMutex());
+  
+  this->private_->flip_horiz_button_->setVisible(!viewer->is_volume_view());
+  this->private_->flip_vert_button_->setVisible(!viewer->is_volume_view());
+
+  if (!viewer->is_volume_view())
   {
-    this->private_->viewer_type_button_->setDefaultAction(viewer_type);
-    ViewerHandle viewer = ViewerManager::Instance()->get_viewer(this->viewer_id_);
-    ActionSet::Dispatch(viewer->view_mode_state_, viewer_type->objectName().toStdString());
+    StateView2DHandle view2d_state = boost::dynamic_pointer_cast<StateView2D>(viewer->get_active_view_state());
+    this->private_->flip_horiz_->setChecked(view2d_state->x_flipped());
+    this->private_->flip_vert_->setChecked(view2d_state->y_flipped());
   }
 }
 
@@ -430,43 +445,6 @@ void ViewerWidget::flip_view_vert( bool flip )
   {
     StateView2DHandle view2d_state = boost::dynamic_pointer_cast<StateView2D>(viewer->get_active_view_state());
     ActionFlip::Dispatch(view2d_state, Utils::View2D::VERTICAL_E);
-  }
-}
-
-void ViewerWidget::change_view_type( std::string type, ActionSource action_source )
-{
-  if (!Interface::IsInterfaceThread())
-  {
-    Interface::PostEvent(boost::bind(&ViewerWidget::change_view_type, this, type, action_source));
-    return;
-  }
-  
-  ViewerHandle viewer = ViewerManager::Instance()->get_viewer(this->viewer_id_);
-  this->private_->flip_horiz_button_->setVisible(!viewer->is_volume_view());
-  this->private_->flip_vert_button_->setVisible(!viewer->is_volume_view());
-
-  if (type != Viewer::VOLUME_C)
-  {
-    StateView2DHandle view2d_state = boost::dynamic_pointer_cast<StateView2D>(viewer->get_active_view_state());
-    this->private_->flip_horiz_->setChecked(view2d_state->x_flipped());
-    this->private_->flip_vert_->setChecked(view2d_state->y_flipped());
-  }
-
-  if (type == Viewer::AXIAL_C)
-  {
-    this->private_->viewer_type_button_->setDefaultAction(this->private_->axial_viewer_);
-  }
-  else if (type == Viewer::SAGITTAL_C)
-  {
-    this->private_->viewer_type_button_->setDefaultAction(this->private_->sagittal_viewer_);
-  }
-  else if (type == Viewer::CORONAL_C)
-  {
-    this->private_->viewer_type_button_->setDefaultAction(this->private_->coronal_viewer_);
-  }
-  else
-  {
-    this->private_->viewer_type_button_->setDefaultAction(this->private_->volume_viewer_);
   }
 }
 

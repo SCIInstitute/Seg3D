@@ -34,7 +34,6 @@
 namespace Seg3D {
 
 // -- Checkbox connector --
-
 void 
 QtCheckBoxSignal(QPointer<QCheckBox> qpointer, bool state, 
                  ActionSource source)
@@ -134,6 +133,34 @@ QtSliderSpinComboRangedDoubleSignal(QPointer<SliderSpinComboDouble> qpointer,
   }
 }
 
+void QtActionGroupSignal(QPointer<QActionGroup> qpointer,
+             std::string option, ActionSource source)
+{
+  if(source != ACTION_SOURCE_INTERFACE_E)
+  { 
+    if (!(Interface::IsInterfaceThread()))
+    {
+      Interface::PostEvent(boost::bind(&QtActionGroupSignal,
+        qpointer, option, ACTION_SOURCE_NONE_E));
+      return;
+    }
+
+    if (qpointer.data()) 
+    {
+      QList<QAction*> actions = qpointer.data()->actions();
+      for (QList<QAction*>::iterator it = actions.begin(); it != actions.end(); it++)
+      {
+        if ( (*it)->objectName().toStdString() == option )
+        {
+          QtSlot::Block(qpointer);
+          (*it)->trigger();
+          QtSlot::Unblock(qpointer);
+          break;
+        }
+      }     
+    }
+  }
+}
 
 bool
 QtBridge::connect(QCheckBox* qcheckbox, 
@@ -245,5 +272,15 @@ QtBridge::connect(QAction* qaction,
   return (true);
 }
 
+bool QtBridge::connect(QActionGroup* qactiongroup, 
+             StateOptionHandle& state_handle)
+{
+  new QtActionGroupSlot(qactiongroup, state_handle);
+
+  state_handle->value_changed_signal_.connect(
+    boost::bind(&QtActionGroupSignal, qactiongroup, _1, _2));
+
+  return true;
+}
 
 } // end namespace Seg3D
