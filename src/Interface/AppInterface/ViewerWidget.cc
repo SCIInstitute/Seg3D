@@ -165,7 +165,7 @@ ViewerWidgetPrivate::ViewerWidgetPrivate(QWidget *parent)
   sagittal_viewer_->setToolTip(QString("Sagittal Slice Viewer"));
   sagittal_viewer_->setIconVisibleInMenu(true);
   sagittal_viewer_->setActionGroup(viewer_selection_);
-  sagittal_viewer_->setData(QVariant(QString(Viewer::SAGITTAL_C.c_str())));
+  sagittal_viewer_->setObjectName(QString(Viewer::SAGITTAL_C.c_str()));
 
   coronal_viewer_ = new QAction(parent);
   coronal_viewer_->setIcon(coronal_icon);
@@ -173,7 +173,7 @@ ViewerWidgetPrivate::ViewerWidgetPrivate(QWidget *parent)
   coronal_viewer_->setToolTip(QString("Coronal Slice Viewer"));
   coronal_viewer_->setIconVisibleInMenu(true);
   coronal_viewer_->setActionGroup(viewer_selection_);
-  coronal_viewer_->setData(QVariant(QString(Viewer::CORONAL_C.c_str())));
+  coronal_viewer_->setObjectName(QString(Viewer::CORONAL_C.c_str()));
 
   axial_viewer_ = new QAction(parent);
   axial_viewer_->setIcon(axial_icon);
@@ -181,15 +181,15 @@ ViewerWidgetPrivate::ViewerWidgetPrivate(QWidget *parent)
   axial_viewer_->setToolTip(QString("Axial Slice Viewer"));
   axial_viewer_->setIconVisibleInMenu(true);
   axial_viewer_->setActionGroup(viewer_selection_);
-  axial_viewer_->setData(QVariant(QString(Viewer::AXIAL_C.c_str())));
+  axial_viewer_->setObjectName(QString(Viewer::AXIAL_C.c_str()));
 
   volume_viewer_ = new QAction(parent);
   volume_viewer_->setIcon(volume_icon);
   volume_viewer_->setText(QString("Volume"));
   volume_viewer_->setToolTip(QString("3D Volume Viewer"));
   volume_viewer_->setIconVisibleInMenu(true);
-  volume_viewer_->setActionGroup(viewer_selection_);  
-  volume_viewer_->setData(QVariant(QString(Viewer::VOLUME_C.c_str())));
+  volume_viewer_->setActionGroup(viewer_selection_);
+  volume_viewer_->setObjectName(QString(Viewer::VOLUME_C.c_str()));
 
   auto_view_ = new QAction(parent);
   auto_view_->setIcon(auto_view_icon);
@@ -409,7 +409,7 @@ void ViewerWidget::change_view_type( QAction* viewer_type )
   {
     this->private_->viewer_type_button_->setDefaultAction(viewer_type);
     ViewerHandle viewer = ViewerManager::Instance()->get_viewer(this->viewer_id_);
-    ActionSet::Dispatch(viewer->view_mode_state_, viewer_type->data().toString().toStdString());
+    ActionSet::Dispatch(viewer->view_mode_state_, viewer_type->objectName().toStdString());
   }
 }
 

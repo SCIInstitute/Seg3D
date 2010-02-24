@@ -62,29 +62,29 @@ void ViewManipulator::mouse_press( const MouseHistory& mouse_history, int button
   
   if (this->viewer_->is_volume_view())
   {
-    if (button == Viewer::LEFT_BUTTON_E)
+    if (button == MouseButton::LEFT_BUTTON_E)
     {
       this->translate_active_ = true;
       this->compute_3d_viewplane();
     } 
-    else if (button == Viewer::RIGHT_BUTTON_E)
+    else if (button == MouseButton::RIGHT_BUTTON_E)
     {
       this->scale_active_ = true;
     }
-    else if (button == Viewer::MID_BUTTON_E)
+    else if (button == MouseButton::MID_BUTTON_E)
     {
       this->rotate_active_ = true;
     }   
   }
   else
   {
-    if ((button == Viewer::LEFT_BUTTON_E)
-      && (modifiers == Viewer::SHIFT_MODIFIER_E))
+    if ((button == MouseButton::LEFT_BUTTON_E)
+      && (modifiers == KeyModifier::SHIFT_MODIFIER_E))
     {
       this->translate_active_ = true;
     }
-    else if ((button == Viewer::RIGHT_BUTTON_E)
-      && (modifiers == Viewer::SHIFT_MODIFIER_E))
+    else if ((button == MouseButton::RIGHT_BUTTON_E)
+      && (modifiers == KeyModifier::SHIFT_MODIFIER_E))
     {
       this->scale_active_ = true;
     }
@@ -124,13 +124,13 @@ void ViewManipulator::mouse_release( const MouseHistory& mouse_history, int butt
 {
   switch(button)
   {
-  case Viewer::LEFT_BUTTON_E:
+  case MouseButton::LEFT_BUTTON_E:
     this->translate_active_ = false;
     break;
-  case Viewer::RIGHT_BUTTON_E:
+  case MouseButton::RIGHT_BUTTON_E:
     this->scale_active_ = false;
     break;
-  case Viewer::MID_BUTTON_E:
+  case MouseButton::MID_BUTTON_E:
     this->rotate_active_ = false;
     break;
   }

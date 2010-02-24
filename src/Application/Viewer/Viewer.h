@@ -44,7 +44,31 @@
 #include <Application/State/State.h>
 #include <Application/Viewer/ViewerRenderer.h>
 
+#include <Utils/Core/EnumClass.h>
+
 namespace Seg3D {
+
+// Enums for mouse buttons 
+// they have the same values as corresponding Qt ones
+SCI_ENUM_CLASS
+(
+  MouseButton,
+  NO_BUTTON_E = 0x00000000,
+  LEFT_BUTTON_E = 0x00000001,
+  RIGHT_BUTTON_E = 0x00000002,
+  MID_BUTTON_E = 0x00000004
+)
+
+// Enums for key modifiers
+// they have the same values as corresponding Qt ones
+SCI_ENUM_CLASS
+(
+  KeyModifier,
+  NO_MODIFIER_E = 0x00000000,
+  SHIFT_MODIFIER_E = 0x02000000,
+  CONTROL_MODIFIER_E = 0x04000000,
+  ALT_MODIFIER_E = 0x08000000
+)
 
 // Forward declarations
 class ViewManipulator;
@@ -59,27 +83,6 @@ public:
   Viewer(const std::string& key);
   virtual ~Viewer();
 
-  // -- Enumerates --
-public:
-  // enums for mouse buttons 
-  // they have the same values as corresponding Qt ones
-  enum MouseButton
-  {
-    NO_BUTTON_E = 0x00000000,
-    LEFT_BUTTON_E = 0x00000001,
-    RIGHT_BUTTON_E = 0x00000002,
-    MID_BUTTON_E = 0x00000004
-  };
-
-  // enums for key modifiers
-  // they have the same values as corresponding Qt ones
-  enum KeyModifier
-  {
-    NO_MODIFIER_E = 0x00000000,
-    SHIFT_MODIFIER_E = 0x02000000,
-    CONTROL_MODIFIER_E = 0x04000000,
-    ALT_MODIFIER_E = 0x08000000
-  };
 
   // -- mouse events handling --
 public:

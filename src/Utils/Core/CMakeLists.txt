@@ -44,6 +44,7 @@ SET(UTILS_CORE_SRCS
   LogHistory.cc
   StringUtil.h
   StringUtil.cc
+  EnumClass.h
 )
 
 ##################################################
