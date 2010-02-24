@@ -242,18 +242,20 @@ void Renderer::redraw()
   //glVertex3f(-0.5, -0.5, 0);
   //glEnd();
 
-  //unsigned char* pixels = new unsigned char[(width_)*(height_)*3];
-  //glReadPixels(0, 0, width_, height_, GL_RGB, GL_UNSIGNED_BYTE, (GLvoid*)pixels);
-  //unsigned char val = pixels[width_*height_+1];
 
   glFlush();
 
-  //err = glGetError();
+/*
+  unsigned char* pixels = new unsigned char[(width_)*(height_)*3];
+  glPixelStorei(GL_PACK_ALIGNMENT, 1);
+  glReadPixels(0, 0, width_, height_, GL_RGB, GL_UNSIGNED_BYTE, (GLvoid*)pixels);
+  unsigned char val = pixels[width_*height_+1];
 
-  //if (pixels != NULL)
-  //{
-  //  delete[] pixels;
-  //}
+  if (pixels != NULL)
+  {
+    delete[] pixels;
+  }
+*/
 
   frame_buffer_->disable(); 
 

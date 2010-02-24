@@ -115,6 +115,7 @@ scan_value(const std::string& str,
   {
     int paren_count = 1;
     start++;
+  value_size++;
     while(start < str.size())
     {
       if (str[start] == '[') paren_count++; 
@@ -153,7 +154,8 @@ scan_value(const std::string& str,
   {
     int paren_count = 1;
     start++;
-    while(start < str.size())
+  value_size++;
+   while(start < str.size())
     {
       if (str[start] == '(') paren_count++; 
       else if (str[start] == ')') paren_count--;
@@ -287,6 +289,7 @@ scan_keyvaluepair(const std::string& str,
   {
     int paren_count = 1;
     start++;
+  value_size++;
     while(start < str.size())
     {
       if (str[start] == '[') paren_count++; 
@@ -325,6 +328,7 @@ scan_keyvaluepair(const std::string& str,
   {
     int paren_count = 1;
     start++;
+  value_size++;
     while(start < str.size())
     {
       if (str[start] == '(') paren_count++; 

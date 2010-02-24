@@ -453,14 +453,31 @@ void ViewerWidget::change_view_type( std::string type, ActionSource action_sourc
   }
   
   ViewerHandle viewer = ViewerManager::Instance()->get_viewer(this->viewer_id_);
-  this->private_->flip_horiz_button_->setDisabled(viewer->is_volume_view());
-  this->private_->flip_vert_button_->setDisabled(viewer->is_volume_view());
+  this->private_->flip_horiz_button_->setVisible(!viewer->is_volume_view());
+  this->private_->flip_vert_button_->setVisible(!viewer->is_volume_view());
 
   if (type != Viewer::VOLUME_C)
   {
     StateView2DHandle view2d_state = boost::dynamic_pointer_cast<StateView2D>(viewer->get_active_view_state());
     this->private_->flip_horiz_->setChecked(view2d_state->x_flipped());
     this->private_->flip_vert_->setChecked(view2d_state->y_flipped());
+  }
+
+  if (type == Viewer::AXIAL_C)
+  {
+    this->private_->viewer_type_button_->setDefaultAction(this->private_->axial_viewer_);
+  }
+  else if (type == Viewer::SAGITTAL_C)
+  {
+    this->private_->viewer_type_button_->setDefaultAction(this->private_->sagittal_viewer_);
+  }
+  else if (type == Viewer::CORONAL_C)
+  {
+    this->private_->viewer_type_button_->setDefaultAction(this->private_->coronal_viewer_);
+  }
+  else
+  {
+    this->private_->viewer_type_button_->setDefaultAction(this->private_->volume_viewer_);
   }
 }
 

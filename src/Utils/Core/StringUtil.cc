@@ -26,6 +26,7 @@
    DEALINGS IN THE SOFTWARE.
 */
 
+#include <Utils/Core/Log.h>
 #include <Utils/Core/StringUtil.h>
 
 #include <stdlib.h>
@@ -57,7 +58,7 @@ bool from_string(const std::string &str, double &value)
 {
   // Clear out any markup of the numbers that make it easier to read and
   // replace it all with spaces.
-  std::string data = str;
+  std::string data = str + " ";
   for (size_t j=0; j<data.size(); j++) 
     if ((data[j] == '\t')||(data[j] == '\r')||(data[j] == '\n')||(data[j]=='"')
         ||(data[j]==',')||(data[j]=='[')||(data[j]==']')||(data[j]=='(')
@@ -112,8 +113,9 @@ bool from_string(const std::string &str, double &value)
     iss >> value;
     return (true);
   }
-  catch (...)
+  catch (std::istringstream::failure e)
   {
+    SCI_LOG_DEBUG(e.what());
     return (false);
   }  
 }
@@ -177,7 +179,7 @@ bool from_string(const std::string &str, float &value)
 {
   // Clear out any markup of the numbers that make it easier to read and
   // replace it all with spaces.
-  std::string data = str;
+  std::string data = str + " ";
   for (size_t j=0; j<data.size(); j++) 
     if ((data[j] == '\t')||(data[j] == '\r')||(data[j] == '\n')||(data[j]=='"')
         ||(data[j]==',')||(data[j]=='[')||(data[j]==']')||(data[j]=='(')
