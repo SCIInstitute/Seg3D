@@ -215,7 +215,7 @@ ToolBoxWidget::~ToolBoxWidget()
   
   void ToolBoxWidget::set_active_index( int index )
   {
-    if ( ( index < this->private_->page_list_.size()) && (index >= 0) ) 
+    if ( ( index < static_cast<int>(this->private_->page_list_.size())) && (index >= 0) ) 
       set_active_tool( this->private_->page_list_[index]->findChild< QWidget* >("tool_") );
     
   } // end set_active_index

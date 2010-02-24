@@ -101,6 +101,22 @@ class StateEngine : public boost::noncopyable {
     // the end
     bool create_stateid( const std::string& basename, std::string& new_stateid );
 
+// -- Interface for accounting statealias --    
+  public:
+    
+    // ADD_STATEALIAS:
+    // Add a new alias to the list
+    void add_statealias( const std::string& statealias,
+                         const std::string& stateid );
+
+    // REMOVE_STATEALIAS:
+    // Remove an alias from the list
+    void remove_statealias( const std::string& statealias );
+
+    // IS_STATEALIAS:
+    // Check whether an alias exists
+    bool is_statealias( const std::string& statealias );
+
 // -- state engine locking interface --
   public:
     // Mutex protecting the StateEngine
@@ -130,13 +146,17 @@ class StateEngine : public boost::noncopyable {
   private:
     typedef std::set<std::string>                             stateid_list_type;
     typedef boost::unordered_map<std::string,StateBaseHandle> state_map_type;
+    typedef boost::unordered_map<std::string,std::string>     statealias_map_type;
 
     // Map containing pointers to the State variables in the class under control
     // by the StateEngine
     state_map_type state_map_;
     
     // The list of IDs that are in use
-    stateid_list_type stateid_list_;
+    stateid_list_type   stateid_list_;
+    
+    // Aliases that are associated with the list
+    statealias_map_type statealias_list_;
         
 // -- Singleton interface --
   public:

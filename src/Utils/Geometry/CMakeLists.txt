@@ -42,6 +42,8 @@ SET(UTILS_GEOMETRY_SRCS
   Point.cc
   Transform.h
   Transform.cc
+  GridTransform.h
+  GridTransform.cc
   Vector.h
   Vector.cc
   View3D.h

@@ -26,28 +26,30 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_STATE_STATE_H
-#define APPLICATION_STATE_STATE_H
+#include <Utils/Volume/Volume.h>
 
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
-# pragma once
-#endif
+namespace Utils {
 
-// This include file includes all the State variable combinations
+Volume::Volume(const GridTransform& grid_transform, 
+               const DataBlockHandle& data_block, 
+               VolumeType type) :
+  type_(type),
+  grid_transform_(grid_transform),
+  data_block_(data_block)
+{
+}
 
-// The various state variables
-#include <Application/State/StateAlias.h>
-#include <Application/State/StateRangedValue.h>
-#include <Application/State/StateOption.h>
-#include <Application/State/StateValue.h>
-#include <Application/State/StateView2D.h>
-#include <Application/State/StateView3D.h>
+Volume::Volume(const GridTransform& grid_transform, 
+               const MaskDataBlockHandle& mask_data_block) :
+  type_(MASK_E),
+  grid_transform_(grid_transform),
+  mask_data_block_(mask_data_block)
+{
+}
 
-// The state handler
-#include <Application/State/StateHandler.h>
+Volume::~Volume()
+{
+}
 
-// The state actions
-#include <Application/State/Actions/ActionSet.h>
-#include <Application/State/Actions/ActionGet.h>
+} // end namespace Utils
 
-#endif

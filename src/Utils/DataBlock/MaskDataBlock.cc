@@ -26,34 +26,23 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef DATAVOLUME_DATAVOLUME_DATABLOCK_H
-#define DATAVOLUME_DATAVOLUME_DATABLOCK_H
+#include <Utils/DataBlock/MaskDataBlock.h>
+#include <Utils/DataBlock/MaskDataBlockManager.h>
 
-namespace Seg3D {
+namespace Utils {
 
-
-class DataBlock;
-typedef boost::shared_ptr<DataBlock> DataBlockHandle;
-
-class DataBlock : public boost::noncopyable {
-
-// -- constructor/destructor --
-  public:
-    DataBlock();
-    virtual ~DataBlock();
-  
-  private:
+MaskDataBlock::MaskDataBlock(DataBlockHandle& data_block, unsigned int mask_bit) :
+  nx_(data_block->nx()),
+  ny_(data_block->ny()),
+  nz_(data_block->nz()),
+  data_block_(data_block),
+  mask_bit_(mask_bit)
+{
+}   
     
-    // Dimensions of the datablock 
-    size_t           nx_;
-    size_t           ny_;
-    size_t           nz_;
-    
-    
-    
-};
+MaskDataBlock::~MaskDataBlock()
+{
+  MaskDataBlockManager::Instance()->release(data_block_,mask_bit_);
+}
 
-
-} // end namespace Seg3D
-
-#endif
+} // end namespace Utils

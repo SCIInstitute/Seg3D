@@ -44,6 +44,7 @@
 #include <Utils/Geometry/Plane.h>
 #include <Utils/Geometry/Point.h>
 #include <Utils/Geometry/Transform.h>
+#include <Utils/Geometry/GridTransform.h>
 #include <Utils/Geometry/Quaternion.h>
 #include <Utils/Geometry/Vector.h>
 #include <Utils/Geometry/View2D.h>
@@ -83,6 +84,8 @@ std::string export_to_string(const Color& value);
 
 std::string export_to_string(const BBox& value);
 std::string export_to_string(const Transform& value);
+std::string export_to_string(const GridTransform& value);
+
 std::string export_to_string(const Plane& value);
 std::string export_to_string(const Quaternion& value);
 
@@ -141,6 +144,12 @@ bool import_from_string(const std::string& str, Vector& value);
 bool import_from_string(const std::string& str, Color& value);
 bool import_from_string(const std::string& str, Quaternion& value);
 
+bool import_from_string(const std::string& str, BBox& value);
+bool import_from_string(const std::string& str, Transform& value);
+bool import_from_string(const std::string& str, GridTransform& value);
+bool import_from_string(const std::string& str, View2D& value);
+bool import_from_string(const std::string& str, View3D& value);
+
 bool import_from_string(const std::string& str, std::vector<char>& value);
 bool import_from_string(const std::string& str, std::vector<unsigned char>& value);
 
@@ -160,11 +169,6 @@ bool import_from_string(const std::string& str, std::vector<double>& value);
 bool import_from_string(const std::string& str, std::vector<Point>& value);
 bool import_from_string(const std::string& str, std::vector<Vector>& value);
 
-bool import_from_string(const std::string& str, BBox& value);
-bool import_from_string(const std::string& str, Transform& value);
-
-bool import_from_string(const std::string& str, View2D& value);
-bool import_from_string(const std::string& str, View3D& value);
 
 
 } // end namespace Utils

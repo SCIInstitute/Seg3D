@@ -31,45 +31,26 @@
 # Set sources
 ##################################################
 
-SET(APPLICATION_LAYER_SRCS
-  Layer.h
-  Layer.cc
-  DataLayer.h
-  DataLayer.cc
-  MaskLayer.h
-  MaskLayer.cc
-  LabelLayer.h
-  LabelLayer.cc
-)
-
-SET(APPLICATION_LAYER_ACTIONS_SRCS
-#  Actions/ActionLayer.h
-#  Actions/ActionLayer.cc
-#  Actions/ActionLayerFromFile.h
-#  Actions/ActionLayerFromFile.cc
-#  Actions/ActionCloneLayer.h
-#  Actions/ActionCloneLayer.cc
-#  Actions/ActionNewMaskLayer.h
-#  Actions/ActionNewMaskLayer.cc
-#  Actions/ActionRemoveLayer.h
-#  Actions/ActionRemoveLayer.cc
+SET(UTILS_DATABLOCK_SRCS
+  DataBlock.h
+  DataBlock.cc
+  MaskDataBlock.h
+  MaskDataBlock.cc
+  NrrdData.h
+  NrrdData.cc
+  NrrdDataBlock.h
+  NrrdDataBlock.cc
+  StdDataBlock.h
+  StdDataBlock.cc
   )
 
-ADD_LIBRARY(Application_Layer STATIC 
-            ${APPLICATION_LAYER_SRCS}
-            ${APPLICATION_LAYER_ACTIONS_SRCS} )
+
+ADD_LIBRARY(Utils_DataBlock STATIC 
+            ${UTILS_DATABLOCK_SRCS} )
             
-TARGET_LINK_LIBRARIES(Application_Layer
+TARGET_LINK_LIBRARIES(Utils_DataBlock
                       Utils_Core
-                      Application_Application
-                      Application_Interface
-                      Application_InterfaceManager
-                      Application_Action
-                      Application_State
-                      Application_StateManager
+                      Utils_Geometry
+                      ${SCI_TEEM_LIBRARY}
                       ${SCI_BOOST_LIBRARY})
 
-# Register actions
-#ADD_LIBRARY_ACTIONS(Application_Layer
-#                    ${APPLICATION_LAYER_ACTIONS_SRCS})
-                    

@@ -26,28 +26,21 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_STATE_STATE_H
-#define APPLICATION_STATE_STATE_H
+#include <Utils/DataBlock/DataBlock.h>
 
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
-# pragma once
-#endif
+namespace Utils {
 
-// This include file includes all the State variable combinations
+DataBlock::DataBlock() :
+  nx_(0),
+  ny_(0),
+  nz_(0),
+  data_type_(UNKNOWN_E),
+  data_(0)
+{
+}   
+    
+DataBlock::~DataBlock()
+{
+}
 
-// The various state variables
-#include <Application/State/StateAlias.h>
-#include <Application/State/StateRangedValue.h>
-#include <Application/State/StateOption.h>
-#include <Application/State/StateValue.h>
-#include <Application/State/StateView2D.h>
-#include <Application/State/StateView3D.h>
-
-// The state handler
-#include <Application/State/StateHandler.h>
-
-// The state actions
-#include <Application/State/Actions/ActionSet.h>
-#include <Application/State/Actions/ActionGet.h>
-
-#endif
+} // end namespace Utils

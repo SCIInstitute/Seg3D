@@ -317,33 +317,21 @@ AppInterface::addDockWidget(Qt::DockWidgetArea area, QDockWidget* dock_widget)
 }
 
 void 
-AppInterface::HandleShowWindow(QPointer<AppInterface> app_interface, 
+AppInterface::HandleShowWindow(qpointer_type app_interface, 
                                std::string windowid)
 {
-  // Ensure that this request is forwarded to the interface thread
-  if (!(Interface::IsInterfaceThread()))
-  {
-    Interface::PostEvent( boost::bind( &AppInterface::HandleShowWindow,
-      app_interface, windowid));
-    return;
-  }
-
-  if (!(app_interface.isNull())) app_interface->show_window(windowid);
+  Interface::PostEvent( CheckQtPointer( app_interface,
+    boost::bind( &AppInterface::show_window,
+      app_interface.data(), windowid )));
 }
 
 void 
-AppInterface::HandleCloseWindow(QPointer<AppInterface> app_interface, 
+AppInterface::HandleCloseWindow(qpointer_type app_interface, 
                                 std::string windowid)
 {
-  // Ensure that this request is forwarded to the interface thread
-  if (!(Interface::IsInterfaceThread()))
-  {
-    Interface::PostEvent( boost::bind( &AppInterface::HandleCloseWindow,
-      app_interface, windowid));
-    return;
-  }
-  
-  if (!(app_interface.isNull())) app_interface->close_window(windowid);
+  Interface::PostEvent( CheckQtPointer( app_interface,
+    boost::bind( &AppInterface::close_window,
+      app_interface.data(), windowid )));
 }
   
 void 

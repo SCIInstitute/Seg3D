@@ -26,28 +26,37 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_STATE_STATE_H
-#define APPLICATION_STATE_STATE_H
+// STL includes
 
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
-# pragma once
-#endif
+// Boost includes 
 
-// This include file includes all the State variable combinations
+#include <Application/Application/Application.h>
+#include <Application/Layer/DataLayer.h>
 
-// The various state variables
-#include <Application/State/StateAlias.h>
-#include <Application/State/StateRangedValue.h>
-#include <Application/State/StateOption.h>
-#include <Application/State/StateValue.h>
-#include <Application/State/StateView2D.h>
-#include <Application/State/StateView3D.h>
+namespace Seg3D {
 
-// The state handler
-#include <Application/State/StateHandler.h>
+DataLayer::DataLayer(const std::string& name, const Utils::VolumeHandle& volume) :
+  Layer(name,Utils::DATA_E,volume)
+{
+  // Step (1) : Build the layer specific state variables
+  
+  // == Contrast ==
+  add_state("contrast",contrast_state_,0.5,0.0,1.0,0.05);
 
-// The state actions
-#include <Application/State/Actions/ActionSet.h>
-#include <Application/State/Actions/ActionGet.h>
+  // == Brightness ==
+  add_state("brightness",brightness_state_,0.5,0.0,1.0,0.05);
+  
+  // == Is this volume rendered through the volume renderer ==
+  add_state("volume_rendered",volume_rendered_state_,false);
+}
+  
 
-#endif
+DataLayer::~DataLayer()
+{
+  // Disconnect all current connections
+  disconnect_all();
+}
+
+
+} // end namespace Seg3D
+

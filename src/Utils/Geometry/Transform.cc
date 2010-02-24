@@ -39,16 +39,11 @@ Transform::Transform()
 Transform::Transform(const Transform& copy) 
 {
   this->mat_ = copy.mat_;
-  this->inverse_mat_ = copy.inverse_mat_;
-  this->inverse_valid_ = copy.inverse_valid_;
 }
 
 Transform& Transform::operator=(const Transform& copy) 
 {
   this->mat_ = copy.mat_;
-  this->inverse_mat_ = copy.inverse_mat_;
-  this->inverse_valid_ = copy.inverse_valid_;
-
   return (*this);
 }
 
@@ -86,32 +81,26 @@ void  Transform::load_frame(const Vector& x,
   mat_(2, 0) = z.x();
   mat_(2, 1) = z.y();
   mat_(2, 2) = z.z();
-
-  this->inverse_valid_ = false;
 }
 
 void Transform::post_transform(const Transform& trans)
 {
   this->mat_ *= trans.mat_;
-  this->inverse_valid_ = false;
 }
 
 void Transform::pre_transform(const Transform& trans)
 {
   this->mat_ = trans.mat_ * this->mat_;
-  this->inverse_valid_ = false;
 }
 
 void Transform::post_mult_matrix(const Matrix& m)
 {
   this->mat_ *= m;
-  this->inverse_valid_ = false;
 }
 
 void Transform::pre_mult_matrix(const Matrix& m)
 {
   this->mat_ = m * this->mat_;
-  this->inverse_valid_ = false;
 }
 
 void Transform::pre_scale(const Vector& v)
@@ -120,7 +109,6 @@ void Transform::pre_scale(const Vector& v)
   Transform::BuildScale(m, v);
 
   this->mat_ = m * this->mat_;
-  this->inverse_valid_ = false;
 }
 
 void Transform::post_scale(const Vector& v)
@@ -129,7 +117,6 @@ void Transform::post_scale(const Vector& v)
   Transform::BuildScale(m, v);
 
   this->mat_ *= m;
-  this->inverse_valid_ = false;
 }
 
 void Transform::pre_shear(const Vector& s, const Plane& p)
@@ -138,7 +125,6 @@ void Transform::pre_shear(const Vector& s, const Plane& p)
   Transform::BuildShear(m, s, p);
 
   this->mat_ = m * this->mat_;
-  this->inverse_valid_ = false;
 }
 
 void Transform::post_shear(const Vector& s, const Plane& p)
@@ -147,7 +133,6 @@ void Transform::post_shear(const Vector& s, const Plane& p)
   Transform::BuildShear(m, s, p);
 
   this->mat_ *= m;
-  this->inverse_valid_ = false;
 }
 
 void Transform::pre_translate(const Vector& v)
@@ -156,7 +141,6 @@ void Transform::pre_translate(const Vector& v)
   Transform::BuildTranslate(m, v);
 
   this->mat_ = m * this->mat_;
-  this->inverse_valid_ = false;
 }
 
 void Transform::post_translate(const Vector& v)
@@ -165,7 +149,6 @@ void Transform::post_translate(const Vector& v)
   Transform::BuildTranslate(m, v);
 
   this->mat_ *= m;
-  this->inverse_valid_ = false;
 }
 
 void Transform::pre_rotate(double angle, const Vector& axis)
@@ -174,7 +157,6 @@ void Transform::pre_rotate(double angle, const Vector& axis)
   Transform::BuildRotate(m, angle, axis);
 
   this->mat_ = m * this->mat_;
-  this->inverse_valid_ = false;
 }       
 
 void Transform::post_rotate(double angle, const Vector& axis)
@@ -183,7 +165,6 @@ void Transform::post_rotate(double angle, const Vector& axis)
   Transform::BuildRotate(m, angle, axis);
 
   this->mat_ *= m;
-  this->inverse_valid_ = false;
 }
 
 bool Transform::rotate(const Vector& from, const Vector& to)
@@ -198,7 +179,7 @@ bool Transform::rotate(const Vector& from, const Vector& to)
   {
     // Vectors are too close to each other to get a stable axis of
     // rotation, so return.
-    return (false);
+    return false;
   }
 
   double sinth=axis.length();
@@ -206,7 +187,7 @@ bool Transform::rotate(const Vector& from, const Vector& to)
   if(Abs(sinth) < 1.0e-9)
   {
     if(costh > 0.0)
-      return (false); // no rotate;
+      return false; // no rotate;
     else 
     {
       // from and to are in opposite directions, find an axis of rotation
@@ -223,8 +204,9 @@ bool Transform::rotate(const Vector& from, const Vector& to)
   {
     post_rotate(Atan2(sinth, costh), axis.normal());
   }
-  return (true);
+  return true;
 }
+
 
 void Transform::pre_permute(int xmap, int ymap, int zmap)
 {
@@ -232,7 +214,6 @@ void Transform::pre_permute(int xmap, int ymap, int zmap)
   Transform::BuildPermute(m, xmap, ymap, zmap, true);
 
   this->mat_ = m * this->mat_;
-  this->inverse_valid_ = false;
 }
 
 void Transform::post_permute(int xmap, int ymap, int zmap)
@@ -241,7 +222,6 @@ void Transform::post_permute(int xmap, int ymap, int zmap)
   Transform::BuildPermute(m, xmap, ymap, zmap, false);
 
   this->mat_ *= m;
-  this->inverse_valid_ = false;
 }
 
 Point Transform::project(const Point& p) const
@@ -264,39 +244,9 @@ VectorF Transform::project(const VectorF& v) const
   return this->mat_ * v;
 }
 
-Point Transform::unproject(const Point& p) const
-{
-  compute_inverse();
-  return this->inverse_mat_ * p;
-}
-
-Vector Transform::unproject(const Vector& v) const
-{
-  compute_inverse();
-  return this->inverse_mat_ * v;
-}
-
-PointF Transform::unproject(const PointF& p) const
-{
-  compute_inverse();
-  return this->inverse_mat_ * p;
-}
-
-VectorF Transform::unproject(const VectorF& v) const
-{
-  compute_inverse();
-  return this->inverse_mat_ * v;
-}
-
 const Matrix& Transform::get_matrix() const
 {
   return this->mat_;
-}
-
-const Matrix& Transform::get_inverse_matrix() const
-{
-  compute_inverse();
-  return this->inverse_mat_;
 }
 
 void Transform::get(double* data) const
@@ -307,32 +257,18 @@ void Transform::get(double* data) const
 void Transform::set(const double* data)
 {
   std::memcpy(this->mat_.data(), data, sizeof(double) * 16);
-  this->inverse_valid_ = false;
 }
 
 void Transform::load_identity()
 {
   mat_ = Matrix::IDENTITY_C;
-  inverse_mat_ = Matrix::IDENTITY_C;
-  this->inverse_valid_ = true;
 }
 
-void Transform::invert()
+Transform Transform::invert()
 {
-  compute_inverse();
-
-  Matrix tmp = mat_;
-  mat_ = inverse_mat_;
-  inverse_mat_ = tmp;
-}
-
-void Transform::compute_inverse() const
-{
-  if ( !this->inverse_valid_ )
-  {
-    Invert(this->mat_, this->inverse_mat_);
-    this->inverse_valid_ = true;
-  }
+  Transform inv_transform;
+  Invert(mat_,inv_transform.mat_);
+  return (inv_transform);
 }
 
 void Transform::perspective( const Point& eyep, const Point& lookat, const Vector& up, 
@@ -361,8 +297,20 @@ void Transform::perspective( const Point& eyep, const Point& lookat, const Vecto
   proj(3, 2) = -1;
 
   this->mat_ = proj * this->mat_;
-  this->inverse_valid_ = false;
- }
+}
+
+
+bool Transform::operator==(const Transform& transform) const
+{
+  return (transform.mat_ == mat_);
+}
+
+
+bool Transform::operator!=(const Transform& transform) const
+{
+  return (transform.mat_ != mat_);
+}
+
 
 void Transform::BuildTranslate( Matrix& m, const Vector& v )
 {
@@ -406,7 +354,9 @@ void Transform::BuildShear( Matrix& m, const Vector& s, const Plane& p )
   shear(1, 2) = yshear;
   shear(1, 3) = -yshear * p.distance();
 
-  m = r.inverse_mat_*shear*r.mat_;
+  Matrix r_inverse_mat;
+  Invert(r.mat_,r_inverse_mat);
+  m = r_inverse_mat*shear*r.mat_;
 }
 
 void Transform::BuildScale( Matrix& m, const Vector& v )
@@ -491,7 +441,5 @@ VectorF operator*( const Transform& t, const VectorF& d )
 {
   return t.project(d);
 }
-
-
 
 } // namespace Utils

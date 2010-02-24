@@ -226,7 +226,6 @@ std::string export_to_string(const std::string& value)
 }
 
 
-
 std::string export_to_string(const Transform& value)
 {
   std::string result(1,']');
@@ -237,9 +236,20 @@ std::string export_to_string(const Transform& value)
   return (result);
 }
 
+
+std::string export_to_string(const GridTransform& value)
+{
+  return (std::string(1,'[') + export_to_string(value.nx())+' '+
+          export_to_string(value.ny())+' '+
+          export_to_string(value.nz())+' '+
+          export_to_string(value.transform())+']');
+}
+
+
 std::string export_to_string(const Plane& value)
 {
-  return (std::string(1,'[')+export_to_string(value.normal())+' '+export_to_string(value.distance())+']');
+  return (std::string(1,'[')+export_to_string(value.normal())+' '+
+          export_to_string(value.distance())+']');
 }
 
 
@@ -517,6 +527,22 @@ bool import_from_string(const std::string& str, Transform& value)
   }
   return (false);
 }
+
+bool import_from_string(const std::string& str, GridTransform& value)
+{
+  std::vector<double> values;
+  multiple_from_string(str,values);
+  if (values.size() == 19)
+  {
+    value.nx(static_cast<size_t>(values[0]));
+    value.ny(static_cast<size_t>(values[1]));
+    value.nz(static_cast<size_t>(values[2]));
+    value.transform().set(&values[3]);
+    return (true);
+  }
+  return (false);
+}
+
 
 bool import_from_string(const std::string& str, Plane& value)
 {

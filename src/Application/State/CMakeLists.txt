@@ -32,23 +32,24 @@
 ##################################################
 
 SET(APPLICATION_STATE_SRCS
+  StateAlias.h
+  StateAlias.cc
   StateBase.h
-  State.h
+  StateEngine.h
+  StateEngine.cc
+  StateHandler.h
+  StateHandler.cc
   StateOption.cc
   StateOption.h
+  StateRangedValue.h
+  StateValue.h
   StateViewBase.h
-#  StateViewBase.cc
   StateView2D.cc
   StateView2D.h
   StateView3D.cc
   StateView3D.h
-  StateValue.h
   StateVector.h
-  StateRangedValue.h
-  StateHandler.h
-  StateHandler.cc
-  StateEngine.h
-  StateEngine.cc
+  State.h
   )
 
 SET(APPLICATION_STATE_ACTIONS_SRCS

@@ -60,7 +60,25 @@ StateEngine::get_state(const std::string& state_id, StateBaseHandle& state)
 {
   lock_type lock(mutex_);
   
-  state_map_type::const_iterator it = state_map_.find(state_id);
+  state_map_type::const_iterator it;
+  if ( state_id.size() > 0 && state_id[0] == '$' )
+  {
+    // This name is an alias
+    std::string state_alias = state_id.substr(1);
+    // Find the name in the alias list
+    if ( statealias_list_.find(state_alias) == statealias_list_.end() )
+    {
+      state.reset();
+      return (false);
+    }
+    
+    // fill in the proper state id
+    it = state_map_.find(statealias_list_[state_alias]);
+  }
+  else
+  {
+    it = state_map_.find(state_id);
+  }
   if (it == state_map_.end())
   {
     // make the handle invalid
@@ -73,9 +91,26 @@ StateEngine::get_state(const std::string& state_id, StateBaseHandle& state)
 }
 
 void
-StateEngine::remove_state(const std::string& state_id)
+StateEngine::remove_state(const std::string& remove_state_id)
 {
   lock_type lock(mutex_);
+
+  // ensure that we can change it
+  std::string state_id = remove_state_id;
+
+  if ( state_id.size() > 0 && state_id[0] == '$' )
+  {
+    // This name is an alias
+    std::string state_alias = state_id.substr(1);
+    // Find the name in the alias list
+    if ( statealias_list_.find(state_alias) == statealias_list_.end() )
+    {
+       return;
+    }
+    
+    // fill in the proper state id
+    state_id = statealias_list_[state_alias];
+  }
   
   state_map_type::iterator it = state_map_.begin();
   state_map_type::iterator it_end = state_map_.end();
@@ -164,6 +199,35 @@ StateEngine::create_stateid( const std::string& baseid ,
   }
 
   return true;
+}
+
+void
+StateEngine::add_statealias( const std::string& statealias,
+                             const std::string& stateid )
+{
+  lock_type lock( mutex_ );
+  if ( statealias_list_.find( statealias ) != statealias_list_.end() )
+  {
+    SCI_THROW_LOGICERROR( std::string("Trying to add statealias '") + 
+        statealias + std::string("' that already exists") );
+  }
+  statealias_list_[ statealias ] = stateid;
+}
+
+
+void
+StateEngine::remove_statealias( const std::string& statealias )
+{
+  lock_type lock( mutex_ );
+  statealias_list_.erase( statealias );
+}
+
+
+bool
+StateEngine::is_statealias( const std::string& statealias )
+{
+  lock_type lock( mutex_ );
+  return ( statealias_list_.find( statealias ) != statealias_list_.end() );
 }
 
 

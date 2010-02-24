@@ -26,28 +26,40 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_STATE_STATE_H
-#define APPLICATION_STATE_STATE_H
 
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
-# pragma once
-#endif
+#include <teem/nrrd.h>
+#include <Utils/DataBlock/NrrdDataBlock.h>
 
-// This include file includes all the State variable combinations
+namespace Utils {
 
-// The various state variables
-#include <Application/State/StateAlias.h>
-#include <Application/State/StateRangedValue.h>
-#include <Application/State/StateOption.h>
-#include <Application/State/StateValue.h>
-#include <Application/State/StateView2D.h>
-#include <Application/State/StateView3D.h>
+NrrdDataBlock::NrrdDataBlock(NrrdDataHandle nrrd_data) :
+  nrrd_data_(nrrd_data)
+{
+  // Copy the information of the nrrd into the C++ class
+  Nrrd* nrrd = nrrd_data->nrrd();
 
-// The state handler
-#include <Application/State/StateHandler.h>
+  unsigned int dim = nrrd->dim;
+  if (dim > 0) set_nx(nrrd->axis[0].size); else set_nx(1);
+  if (dim > 1) set_ny(nrrd->axis[1].size); else set_ny(1);
+  if (dim > 2) set_nz(nrrd->axis[1].size); else set_nz(1);
+  
+  switch (nrrd->type)
+  {
+    case nrrdTypeChar: set_type(CHAR_E); break;
+    case nrrdTypeUChar: set_type(UCHAR_E); break;
+    case nrrdTypeShort: set_type(SHORT_E); break;
+    case nrrdTypeUShort: set_type(USHORT_E); break;
+    case nrrdTypeInt: set_type(INT_E); break;
+    case nrrdTypeUInt: set_type(UINT_E); break;
+    case nrrdTypeFloat: set_type(FLOAT_E); break;
+    case nrrdTypeDouble: set_type(DOUBLE_E); break;
+  }
 
-// The state actions
-#include <Application/State/Actions/ActionSet.h>
-#include <Application/State/Actions/ActionGet.h>
+  set_data(nrrd->data);
+}   
+    
+NrrdDataBlock::~NrrdDataBlock()
+{
+}
 
-#endif
+} // end namespace Utils

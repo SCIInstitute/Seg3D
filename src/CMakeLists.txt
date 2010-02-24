@@ -217,8 +217,7 @@ INCLUDE(CMake/QtResourcesLibrary.cmake)
 
 ###########################################
 # Application layers:
-#  Core
-#  DataVolume
+#  Utils
 #  Application
 #  Interface
 ###########################################

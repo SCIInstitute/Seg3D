@@ -85,16 +85,36 @@ PointF Matrix::operator*(const PointF& rhs) const
               static_cast<float>(result[2]/result[3]));
 }
 
+
 Matrix Matrix::operator*( const Matrix& rhs ) const
 {
   return Matrix(prec_prod(*this, rhs));
 }
+
 
 Matrix& Matrix::operator*=( const Matrix& rhs )
 {
   this->assign(this->operator *(rhs));
   return *this;
 }
+
+
+bool Matrix::operator==(const Matrix& mat) const
+{
+  for ( size_t i = 0; i < 4; i++)
+    for ( size_t j = 0; j < 4; j++)
+      if ((*this)(i, j) != mat(i,j)) return false;
+  return true;
+}
+
+bool Matrix::operator!=(const Matrix& mat) const
+{
+  for ( size_t i = 0; i < 4; i++)
+    for ( size_t j = 0; j < 4; j++)
+      if ((*this)(i, j) != mat(i,j)) return true;
+  return false;
+}
+
 
 bool Invert(const Matrix& m, Matrix& inverse)
 {

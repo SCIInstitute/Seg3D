@@ -26,28 +26,47 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_STATE_STATE_H
-#define APPLICATION_STATE_STATE_H
+#ifndef APPLICATION_LAYER_DATALAYER_H
+#define APPLICATION_LAYER_DATALAYER_H
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
-# pragma once
+#pragma once
 #endif
 
-// This include file includes all the State variable combinations
+// Application includes
+#include <Application/Layer/Layer.h>
 
-// The various state variables
-#include <Application/State/StateAlias.h>
-#include <Application/State/StateRangedValue.h>
-#include <Application/State/StateOption.h>
-#include <Application/State/StateValue.h>
-#include <Application/State/StateView2D.h>
-#include <Application/State/StateView3D.h>
+namespace Seg3D {
 
-// The state handler
-#include <Application/State/StateHandler.h>
+// CLASS DataLayer
 
-// The state actions
-#include <Application/State/Actions/ActionSet.h>
-#include <Application/State/Actions/ActionGet.h>
+// Forward declarations
+class DataLayer;
+typedef boost::shared_ptr<DataLayer> DataLayerHandle;
+
+// Class definition
+class DataLayer : public Layer {
+    
+// -- constructor/destructor --    
+  public:
+
+    DataLayer(const std::string& name, const Utils::VolumeHandle& volume);
+    virtual ~DataLayer();
+
+// -- state variables --
+  public:
+
+    // State describing contrast
+    StateRangedDoubleHandle     contrast_state_;
+    
+    // State describing brightness
+    StateRangedDoubleHandle     brightness_state_;
+    
+    // State describing whether volume is volume rendered
+    StateBoolHandle             volume_rendered_state_;
+    
+};
+
+} // end namespace Seg3D
 
 #endif

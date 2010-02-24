@@ -26,28 +26,40 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_STATE_STATE_H
-#define APPLICATION_STATE_STATE_H
+#ifndef APPLICATION_LAYER_LabelLAYER_H
+#define APPLICATION_LAYER_LabelLAYER_H
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
-# pragma once
+#pragma once
 #endif
 
-// This include file includes all the State variable combinations
+// Application includes
+#include <Application/Layer/Layer.h>
 
-// The various state variables
-#include <Application/State/StateAlias.h>
-#include <Application/State/StateRangedValue.h>
-#include <Application/State/StateOption.h>
-#include <Application/State/StateValue.h>
-#include <Application/State/StateView2D.h>
-#include <Application/State/StateView3D.h>
+namespace Seg3D {
 
-// The state handler
-#include <Application/State/StateHandler.h>
+// CLASS LabelLayer
 
-// The state actions
-#include <Application/State/Actions/ActionSet.h>
-#include <Application/State/Actions/ActionGet.h>
+// Forward declarations
+class LabelLayer;
+typedef boost::shared_ptr<LabelLayer> LabelLayerHandle;
+
+// Class definition
+class LabelLayer : public Layer {
+    
+// -- constructor/destructor --    
+  public:
+
+    LabelLayer(const std::string& name, const Utils::VolumeHandle& volume);
+    virtual ~LabelLayer();
+
+// -- state variables --
+  public:
+
+    // TODO: Need to generate this class
+    
+};
+
+} // end namespace Seg3D
 
 #endif

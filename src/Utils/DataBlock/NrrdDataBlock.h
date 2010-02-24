@@ -26,28 +26,33 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_STATE_STATE_H
-#define APPLICATION_STATE_STATE_H
+#ifndef UTILS_DATABLOCK_NRRDDATABLOCK_H
+#define UTILS_DATABLOCK_NRRDDATABLOCK_H
 
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
-# pragma once
-#endif
+// Utils includes
+#include <Utils/DataBlock/DataBlock.h>
+#include <Utils/DataBlock/NrrdData.h>
 
-// This include file includes all the State variable combinations
+namespace Utils {
 
-// The various state variables
-#include <Application/State/StateAlias.h>
-#include <Application/State/StateRangedValue.h>
-#include <Application/State/StateOption.h>
-#include <Application/State/StateValue.h>
-#include <Application/State/StateView2D.h>
-#include <Application/State/StateView3D.h>
+// Forward Declaration
+class NrrdDataBlock;
+typedef boost::shared_ptr<NrrdDataBlock> NrrdDataBlockHandle;
 
-// The state handler
-#include <Application/State/StateHandler.h>
+// Class definition
+class NrrdDataBlock : public DataBlock {
 
-// The state actions
-#include <Application/State/Actions/ActionSet.h>
-#include <Application/State/Actions/ActionGet.h>
+// -- Constructor/destructor --
+  public:
+    NrrdDataBlock(NrrdDataHandle nrrd_data);    
+    virtual ~NrrdDataBlock();
+
+// -- Information for retrieving nrrd --
+  private:
+    // Location where the original nrrd is stored
+    NrrdDataHandle nrrd_data_;
+};
+
+} // end namespace Utils
 
 #endif

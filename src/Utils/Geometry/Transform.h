@@ -48,78 +48,74 @@
 
 namespace Utils {
 
+//Forward declaration
+class Transform;
+
+// Class definition
 class Transform
 {
-public:
-  Transform();
-  Transform(const Transform&);
-  Transform(const Point&, const Vector&, const Vector&, const Vector&);
+  public:
+    Transform();
+    Transform(const Transform&);
+    Transform(const Point&, const Vector&, const Vector&, const Vector&);
 
-  Transform& operator=(const Transform& copy);
+    Transform& operator=(const Transform& copy);
 
-  void load_identity();
-  void load_basis(const Point&,const Vector&, const Vector&, const Vector&);
-  void load_frame(const Vector&, const Vector&, const Vector&);
-  void invert();
+    void load_identity();
+    void load_basis(const Point&,const Vector&, const Vector&, const Vector&);
+    void load_frame(const Vector&, const Vector&, const Vector&);
+    Transform invert();
 
-  void post_transform(const Transform&);
-  void pre_transform(const Transform&);
+    void post_transform(const Transform&);
+    void pre_transform(const Transform&);
 
-  void post_mult_matrix(const Matrix& m);
-  void pre_mult_matrix(const Matrix& m);
+    void post_mult_matrix(const Matrix& m);
+    void pre_mult_matrix(const Matrix& m);
 
-  void pre_permute(int xmap, int ymap, int zmap);
-  void post_permute(int xmap, int ymap, int zmap);
+    void pre_permute(int xmap, int ymap, int zmap);
+    void post_permute(int xmap, int ymap, int zmap);
 
-  void pre_scale(const Vector&);
-  void post_scale(const Vector&);
+    void pre_scale(const Vector&);
+    void post_scale(const Vector&);
 
-  void pre_shear(const Vector&, const Plane&);
-  void post_shear(const Vector&, const Plane&);
+    void pre_shear(const Vector&, const Plane&);
+    void post_shear(const Vector&, const Plane&);
 
-  void pre_rotate(double, const Vector& axis);
-  void post_rotate(double, const Vector& axis);
+    void pre_rotate(double, const Vector& axis);
+    void post_rotate(double, const Vector& axis);
 
-  void pre_translate(const Vector&);
-  void post_translate(const Vector&);
+    void pre_translate(const Vector&);
+    void post_translate(const Vector&);
 
-  // Returns true if the rotation happened, false otherwise.
-  bool rotate(const Vector& from, const Vector& to);
+    // Returns true if the rotation happened, false otherwise.
+    bool rotate(const Vector& from, const Vector& to);
 
-  void perspective(const Point& eyep, const Point& lookat, const Vector& up, 
-                double fovy, double znear, double zfar, double aspect);
+    void perspective(const Point& eyep, const Point& lookat, const Vector& up, 
+                  double fovy, double znear, double zfar, double aspect);
 
-  const Matrix& get_matrix() const;
-  const Matrix& get_inverse_matrix() const;
+    const Matrix& get_matrix() const;
 
-  void get(double* data) const;
-  void set(const double* data);
+    void get(double* data) const;
+    void set(const double* data);
 
-  Point   unproject(const Point& p) const;
-  Vector  unproject(const Vector& p) const;
-  PointF  unproject(const PointF& p) const;
-  VectorF unproject(const VectorF& p) const;
+    Point   project(const Point& p) const;
+    Vector  project(const Vector& p) const;
+    PointF  project(const PointF& p) const;
+    VectorF project(const VectorF& p) const;
 
-  Point   project(const Point& p) const;
-  Vector  project(const Vector& p) const;
-  PointF  project(const PointF& p) const;
-  VectorF project(const VectorF& p) const;
+    bool operator==(const Transform&) const;
+    bool operator!=(const Transform&) const;
 
-public:
+  public:
 
-  static void BuildPermute(Matrix& m, int xmap, int ymap, int zmap, bool pre);
-  static void BuildRotate(Matrix& m, double angle, const Vector& axis);
-  static void BuildShear(Matrix& m, const Vector& s, const Plane& p);
-  static void BuildScale(Matrix& m, const Vector& v);
-  static void BuildTranslate(Matrix& m, const Vector& v);
+    static void BuildPermute(Matrix& m, int xmap, int ymap, int zmap, bool pre);
+    static void BuildRotate(Matrix& m, double angle, const Vector& axis);
+    static void BuildShear(Matrix& m, const Vector& s, const Plane& p);
+    static void BuildScale(Matrix& m, const Vector& v);
+    static void BuildTranslate(Matrix& m, const Vector& v);
 
-private:
-
-  void compute_inverse() const;
-
-  Matrix mat_;
-  mutable Matrix inverse_mat_;
-  mutable bool inverse_valid_;
+  protected:
+    Matrix mat_;
 };
 
 Point operator*(const Transform& t, const Point& d);

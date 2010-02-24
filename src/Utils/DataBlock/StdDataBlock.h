@@ -26,28 +26,32 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_STATE_STATE_H
-#define APPLICATION_STATE_STATE_H
+#ifndef UTILS_DATABLOCK_STDDATABLOCK_H
+#define UTILS_DATABLOCK_STDDATABLOCK_H
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
-#endif
+#endif 
 
-// This include file includes all the State variable combinations
+// Boost includes
+#include <Utils/DataBlock/DataBlock.h>
 
-// The various state variables
-#include <Application/State/StateAlias.h>
-#include <Application/State/StateRangedValue.h>
-#include <Application/State/StateOption.h>
-#include <Application/State/StateValue.h>
-#include <Application/State/StateView2D.h>
-#include <Application/State/StateView3D.h>
+namespace Utils {
 
-// The state handler
-#include <Application/State/StateHandler.h>
+// Forward Declaration
+class StdDataBlock;
+typedef boost::shared_ptr<StdDataBlock> StdDataBlockHandle;
 
-// The state actions
-#include <Application/State/Actions/ActionSet.h>
-#include <Application/State/Actions/ActionGet.h>
+// Class definition
+class StdDataBlock : public DataBlock {
+
+// -- Constructor/destructor --
+  public:
+    StdDataBlock(size_t nx, size_t ny, size_t nz, data_type type);    
+    virtual ~StdDataBlock();
+
+};
+
+} // end namespace Utils
 
 #endif

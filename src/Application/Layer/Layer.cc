@@ -36,48 +36,64 @@
 
 namespace Seg3D {
 
-Layer::Layer(std::string& name) :
-  StateHandler(name)
+Layer::Layer(const std::string& name, 
+             Utils::VolumeType type, 
+             const Utils::VolumeHandle& volume) :
+  StateHandler(name),
+  type_(type),
+  volume_(volume)
 {
-  // Step (1) : Build the viewer dependent state variables
-  size_t num_viewers = Application::Instance()->number_of_viewers();
-
-  opacity_state_.resize(num_viewers);
-  visibility_state_.resize(num_viewers);
-  border_state_.resize(num_viewers);
-  fill_state_.resize(num_viewers);
-
-  for (size_t j=0; j<num_viewers; j++)
-  {
-    std::string key;
-    
-    key = std::string("opacity")+Utils::to_string(j);
-    add_state(key,opacity_state_[j],1.0);
-
-    key = std::string("visibitily")+Utils::to_string(j);
-    add_state(key,visibility_state_[j],true);
-
-    key = std::string("border")+Utils::to_string(j);
-    add_state(key,border_state_[j],true);
-
-    key = std::string("fill")+Utils::to_string(j);
-    add_state(key,border_state_[j],true);
-  }
-
-  // Step (2) : Build the layer specific state variables
+  // Step (1) : Build the layer specific state variables
   
+  // == The name of the layer ==
   add_state("name",name_state_,name);
-  add_state("lock",lock_state_,false);
-  add_state("color_index",color_index_state_,0);
-  add_state("contrast",contrast_state_,1.0);
-  add_state("brighness",brightness_state_,1.0);
+
+  // == Visibility information for this layer per viewer ==
+  size_t num_viewers = Application::Instance()->number_of_viewers();
+  visible_state_.resize(num_viewers);
+
+  for (size_t j=0; j< visible_state_.size(); j++)
+  {
+    std::string key = std::string("visible")+Utils::to_string(j);
+    add_state(key,visible_state_[j],true);
+  }
   
+  // == The state of the lock ==
+  add_state("lock",lock_state_,false);
+  
+  // == The opacity of the layer ==
+  add_state("opacity",opacity_state_,1.0,0.0,1.0,0.05);
+  
+  // == Selected by the LayerGroup ==
+  add_state("selected",selected_state_,true);
+  
+  // == Which of the submenus is being editted ==
+  add_state("edit_mode",edit_mode_state_,"none",
+            "none|opacity|color|contrast|appearance");
+  
+  // Step (2) : Update internal state
+  
+  // == cache the grid transform in the Layer class ==
+  if ( volume_.get() ) grid_transform_ = volume_->grid_transform();
+
 }
   
+
 Layer::~Layer()
 {
+  // Disconnect all current connections
   disconnect_all();
 }
+
+
+void
+Layer::set_volume(Utils::VolumeHandle volume)
+{
+  volume_ = volume;
+  if ( volume_.get() ) grid_transform_ = volume->grid_transform();
+}
+
+
 
 } // end namespace Seg3D
 

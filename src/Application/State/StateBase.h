@@ -98,6 +98,10 @@ class StateBase : public boost::noncopyable {
     // GET_STATEID:
     // Get the unique id assigned to the state variable
     std::string stateid() const { return (stateid_); }
+
+    // GET_BASEID:
+    // Get the base id of this state variable
+    std::string baseid() const { return (stateid_.substr(0,stateid_.find(':'))); } 
   
     // SET_STATEID:
     // Set the unique id to be used to locate this state variable

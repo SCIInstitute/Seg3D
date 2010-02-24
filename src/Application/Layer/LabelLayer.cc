@@ -26,28 +26,28 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_STATE_STATE_H
-#define APPLICATION_STATE_STATE_H
+// STL includes
 
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
-# pragma once
-#endif
+// Boost includes 
 
-// This include file includes all the State variable combinations
+#include <Application/Application/Application.h>
+#include <Application/Layer/LabelLayer.h>
 
-// The various state variables
-#include <Application/State/StateAlias.h>
-#include <Application/State/StateRangedValue.h>
-#include <Application/State/StateOption.h>
-#include <Application/State/StateValue.h>
-#include <Application/State/StateView2D.h>
-#include <Application/State/StateView3D.h>
+namespace Seg3D {
 
-// The state handler
-#include <Application/State/StateHandler.h>
+LabelLayer::LabelLayer(const std::string& name, const Utils::VolumeHandle& volume) :
+  Layer(name,Utils::LABEL_E,volume)
+{
+  // Step (1) : Build the layer specific state variables
+  
+}
+  
+LabelLayer::~LabelLayer()
+{
+  // Disconnect all current connections
+  disconnect_all();
+}
 
-// The state actions
-#include <Application/State/Actions/ActionSet.h>
-#include <Application/State/Actions/ActionGet.h>
 
-#endif
+} // end namespace Seg3D
+

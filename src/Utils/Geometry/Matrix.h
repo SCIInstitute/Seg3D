@@ -86,6 +86,9 @@ public:
   Matrix operator*(const Matrix& rhs) const;
   Matrix& operator*=(const Matrix& rhs);
 
+  bool operator==(const Matrix& mat) const;
+  bool operator!=(const Matrix& mat) const;
+  
 private:
 
 public:

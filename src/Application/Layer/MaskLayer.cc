@@ -26,28 +26,39 @@
    DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_STATE_STATE_H
-#define APPLICATION_STATE_STATE_H
+// STL includes
 
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
-# pragma once
-#endif
+// Boost includes 
 
-// This include file includes all the State variable combinations
+#include <Application/Application/Application.h>
+#include <Application/Layer/MaskLayer.h>
 
-// The various state variables
-#include <Application/State/StateAlias.h>
-#include <Application/State/StateRangedValue.h>
-#include <Application/State/StateOption.h>
-#include <Application/State/StateValue.h>
-#include <Application/State/StateView2D.h>
-#include <Application/State/StateView3D.h>
+namespace Seg3D {
 
-// The state handler
-#include <Application/State/StateHandler.h>
+MaskLayer::MaskLayer(const std::string& name, const Utils::VolumeHandle& volume) :
+  Layer(name,Utils::MASK_E,volume)
+{
+  // Step (1) : Build the layer specific state variables
+  
+  // == Color of the layer ==
+  add_state("color",color_state_,0,0,9,1);
 
-// The state actions
-#include <Application/State/Actions/ActionSet.h>
-#include <Application/State/Actions/ActionGet.h>
+  // == What border is used ==
+  add_state("border",border_state_,"thick","none|thin|thick");
+  
+  // == How is the segmentation filled in ==
+  add_state("fill",fill_state_,"striped","none|striped|solid");
+  
+  // == Whether the isosurface is shown in the volume display ==
+  add_state("isosurface", show_isosurface_state_, false);
+}
+  
+MaskLayer::~MaskLayer()
+{
+  // Disconnect all current connections
+  disconnect_all();
+}
 
-#endif
+
+} // end namespace Seg3D
+
