@@ -65,10 +65,10 @@ bool ThresholdToolInterface::build_widget( QFrame* frame )
   private_->ui_.setupUi( frame );
 
   upperThresholdAdjuster = new SliderSpinComboDouble();
-  private_->ui_.upperHLayout_bottom->addWidget( upperThresholdAdjuster );
+  private_->ui_.verticalLayout_2->addWidget( upperThresholdAdjuster );
 
   lowerThresholdAdjuster = new SliderSpinComboDouble();
-  private_->ui_.lowerHLayout_bottom->addWidget( lowerThresholdAdjuster );
+  private_->ui_.verticalLayout_3->addWidget( lowerThresholdAdjuster );
 
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();

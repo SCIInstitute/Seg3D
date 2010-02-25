@@ -18,7 +18,7 @@
   </property>
   <property name="styleSheet">
    <string notr="true">QTabWidget::pane{
-  background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
+  background-color: rgba(0, 0, 0, 0);
   border: 2px solid rgb(90,90,90);
   border-radius: 4px;
 }
@@ -33,9 +33,9 @@ background-color:qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, 
 border-top-left-radius: 4px;
 border-top-right-radius: 4px;
 min-width:12ex;
-height: 15px;
+height: 20px;
 padding-left: 4px;
-padding-top:4px;
+padding-top:0px;
 border-top: 1px solid rgb(90,90,90);
 border-left: 1px solid rgb(90,90,90);
 border-right: 1px solid rgb(90,90,90);
@@ -57,33 +57,33 @@ QTabBar::tab:last:selected {
 
 
 QToolButton#group_crop_button_{
-  background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
-  border: 1px solid qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
+  background-color: rgba(0, 0, 0, 0);
+  border: 1px solid rgba(0, 0, 0, 0);
 }
 
 QToolButton#group_flip_rotate_button_{
-  background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
-  border: 1px solid qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
+  background-color: rgba(0, 0, 0, 0);
+  border: 1px solid rgba(0, 0, 0, 0);
 }
 
 QToolButton#group_new_button_{
-  background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
-  border: 1px solid qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
+  background-color: rgba(0, 0, 0, 0);
+  border: 1px solid rgba(0, 0, 0, 0);
 }
 
 QToolButton#group_resample_button_{
-  background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
-  border: 1px solid qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
+  background-color: rgba(0, 0, 0, 0);
+  border: 1px solid rgba(0, 0, 0, 0);
 }
 
 QToolButton#group_transform_button_{
-  background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
-  border: 1px solid qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
+  background-color: rgba(0, 0, 0, 0);
+  border: 1px solid rgba(0, 0, 0, 0);
 }
 
 QToolButton#group_visibility_button_{
-  background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
-  border: 1px solid qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));
+  background-color: rgba(0, 0, 0, 0);
+  border: 1px solid rgba(0, 0, 0, 0);
 }
 
 
@@ -104,18 +104,18 @@ QPushButton#activate_button_:pressed{
 }
 
 QFrame#group_frame_{
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0.733364, x2:0.5, y2:0, stop:0 rgba(25, 25, 25, 0), stop:1 rgba(136, 0, 0, 0));
+  background-color: rgba(0, 0, 0, 0);
   border: none;
 }
 
 
 QToolButton#open_button_{
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0.733364, x2:0.5, y2:0, stop:0 rgba(25, 25, 25, 0), stop:1 rgba(136, 0, 0, 0));
+  background-color: rgba(0, 0, 0, 0);
   border-radius: 4px;
 }
 
 QToolButton#close_button_{
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0.733364, x2:0.5, y2:0, stop:0 rgba(25, 25, 25, 0), stop:1 rgba(136, 0, 0, 0));
+  background-color: rgba(0, 0, 0, 0);
   border-radius: 4px;
 }
 
