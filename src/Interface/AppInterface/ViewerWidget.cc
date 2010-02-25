@@ -372,19 +372,19 @@ ViewerWidget::ViewerWidget( int viewer_id, QWidget *parent ) :
 
   private_->viewer_->set_viewer_id( viewer_id_ );
 
-  QtBridge::connect( this->private_->viewer_selection_, ViewerManager::Instance()->get_viewer(
-      this->viewer_id_ )->view_mode_state_ );
+  QtBridge::connect( this->private_->viewer_selection_, 
+    ViewerManager::Instance()->get_viewer( this->viewer_id_  )->view_mode_state_ );
 
-  this->connect(this->private_->viewer_selection_, SIGNAL(triggered(QAction*)),
-    this->private_->viewer_type_button_, SLOT(setDefaultAction(QAction*)));
+  this->connect( this->private_->viewer_selection_, SIGNAL( triggered( QAction* ) ),
+    this->private_->viewer_type_button_, SLOT( setDefaultAction( QAction* ) ) );
 
-  this->connect(this->private_->viewer_selection_,
-    SIGNAL(triggered(QAction*)), SLOT(change_view_type(QAction*)));
+  this->connect( this->private_->viewer_selection_,
+    SIGNAL( triggered( QAction* ) ), SLOT( change_view_type( QAction* ) ) );
 
-  this->connect(this->private_->flip_horiz_, SIGNAL(triggered(bool)),
-    SLOT(flip_view_horiz(bool)));
-  this->connect(this->private_->flip_vert_, SIGNAL(triggered(bool)),
-    SLOT(flip_view_vert(bool)));
+  this->connect( this->private_->flip_horiz_, SIGNAL( triggered( bool ) ),
+    SLOT( flip_view_horiz( bool ) ) );
+  this->connect( this->private_->flip_vert_, SIGNAL( triggered( bool ) ),
+    SLOT( flip_view_vert( bool ) ) );
 }
 
 ViewerWidget::~ViewerWidget()
@@ -393,54 +393,57 @@ ViewerWidget::~ViewerWidget()
 
 void ViewerWidget::select()
 {
-  QPalette pal(palette());
-  pal.setColor(QPalette::Light,private_->select_color_);
-  pal.setColor(QPalette::Dark,private_->select_color_dark_);
-  setPalette(pal);
+  QPalette pal( palette() );
+  pal.setColor( QPalette::Light, private_->select_color_ );
+  pal.setColor( QPalette::Dark, private_->select_color_dark_ );
+  setPalette( pal );
 }
 
 void ViewerWidget::deselect()
 {
-  QPalette pal(palette());
-  pal.setColor(QPalette::Light,private_->deselect_color_);
-  pal.setColor(QPalette::Dark,private_->deselect_color_dark_);
-  setPalette(pal);
+  QPalette pal( palette() );
+  pal.setColor( QPalette::Light, private_->deselect_color_ );
+  pal.setColor( QPalette::Dark, private_->deselect_color_dark_ );
+  setPalette( pal );
 }
 
 void ViewerWidget::change_view_type( QAction* viewer_type )
 {
-  ViewerHandle viewer = ViewerManager::Instance()->get_viewer(this->viewer_id_);
+  ViewerHandle viewer = ViewerManager::Instance()->get_viewer( this->viewer_id_ );
 
-  StateEngine::lock_type lock(StateEngine::GetMutex());
+  StateEngine::lock_type lock( StateEngine::GetMutex() );
 
-  this->private_->flip_horiz_button_->setVisible(!viewer->is_volume_view());
-  this->private_->flip_vert_button_->setVisible(!viewer->is_volume_view());
+  this->private_->flip_horiz_button_->setVisible( !viewer->is_volume_view() );
+  this->private_->flip_vert_button_->setVisible( !viewer->is_volume_view() );
 
-  if (!viewer->is_volume_view())
+  if ( !viewer->is_volume_view() )
   {
-    StateView2DHandle view2d_state = boost::dynamic_pointer_cast<StateView2D>(viewer->get_active_view_state());
-    this->private_->flip_horiz_->setChecked(view2d_state->x_flipped());
-    this->private_->flip_vert_->setChecked(view2d_state->y_flipped());
+    StateView2DHandle view2d_state = 
+      boost::dynamic_pointer_cast<StateView2D>( viewer->get_active_view_state() );
+    this->private_->flip_horiz_->setChecked( view2d_state->x_flipped() );
+    this->private_->flip_vert_->setChecked( view2d_state->y_flipped() );
   }
 }
 
 void ViewerWidget::flip_view_horiz( bool flip )
 {
-  ViewerHandle viewer = ViewerManager::Instance()->get_viewer(this->viewer_id_);
-  if (!viewer->is_volume_view())
+  ViewerHandle viewer = ViewerManager::Instance()->get_viewer( this->viewer_id_ );
+  if ( !viewer->is_volume_view() )
   {
-    StateView2DHandle view2d_state = boost::dynamic_pointer_cast<StateView2D>(viewer->get_active_view_state());
-    ActionFlip::Dispatch(view2d_state, Utils::View2D::HORIZONTAL_E);
+    StateView2DHandle view2d_state = 
+      boost::dynamic_pointer_cast<StateView2D>( viewer->get_active_view_state() );
+    ActionFlip::Dispatch( view2d_state, Utils::View2D::HORIZONTAL_E );
   }
 }
 
 void ViewerWidget::flip_view_vert( bool flip )
 {
-  ViewerHandle viewer = ViewerManager::Instance()->get_viewer(this->viewer_id_);
-  if (!viewer->is_volume_view())
+  ViewerHandle viewer = ViewerManager::Instance()->get_viewer( this->viewer_id_ );
+  if ( !viewer->is_volume_view() )
   {
-    StateView2DHandle view2d_state = boost::dynamic_pointer_cast<StateView2D>(viewer->get_active_view_state());
-    ActionFlip::Dispatch(view2d_state, Utils::View2D::VERTICAL_E);
+    StateView2DHandle view2d_state = 
+      boost::dynamic_pointer_cast<StateView2D>( viewer->get_active_view_state() );
+    ActionFlip::Dispatch( view2d_state, Utils::View2D::VERTICAL_E );
   }
 }
 

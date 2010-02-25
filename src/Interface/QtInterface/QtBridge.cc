@@ -34,25 +34,41 @@
 namespace Seg3D
 {
 
+template<class QTPOINTER>
+void QtSignal( QTPOINTER qpointer, boost::function<void ()> func )
+{
+  if ( !Interface::IsInterfaceThread() )
+  {
+    Interface::PostEvent( boost::bind( &QtSignal<QTPOINTER>, qpointer, func ) );
+    return;
+  }
+
+  if ( qpointer.data() )
+  {
+    QtSlot::Block( qpointer );
+    func();
+    QtSlot::Unblock( qpointer );
+  }
+}
+
 // -- Checkbox connector --
 void QtCheckBoxSignal( QPointer< QCheckBox > qpointer, bool state, ActionSource source )
 {
   if ( source != ACTION_SOURCE_INTERFACE_E )
   {
-    if ( !( Interface::Instance()->IsInterfaceThread() ) )
-    {
-      Interface::PostEvent( boost::bind( &QtCheckBoxSignal, qpointer, state,
-          ACTION_SOURCE_NONE_E ) );
-      return;
-    }
+    QtSignal( qpointer, boost::bind( &QCheckBox::setChecked, 
+      qpointer.data(), state ) ); 
+  }
+}
 
-    if ( qpointer.data() )
-    {
-      // Blocking the slot will prevent the signal to loop back to the application
-      QtSlot::Block( qpointer );
-      qpointer->setChecked( state );
-      QtSlot::Unblock( qpointer );
-    }
+void QtComboBoxSignal( QComboBox* qcombobox, std::string state )
+{
+  QString qstring_state = QString::fromStdString( state );
+  int index = qcombobox->findText( qstring_state, Qt::MatchFlags( Qt::CaseInsensitive ) );
+
+  if ( index >= 0 )
+  {
+    qcombobox->setCurrentIndex( index );
   }
 }
 
@@ -60,26 +76,7 @@ void QtComboBoxSignal( QPointer< QComboBox > qpointer, std::string state, Action
 {
   if ( source != ACTION_SOURCE_INTERFACE_E )
   {
-    if ( !( Interface::Instance()->IsInterfaceThread() ) )
-    {
-      Interface::PostEvent( boost::bind( &QtComboBoxSignal, qpointer, state,
-          ACTION_SOURCE_NONE_E ) );
-      return;
-    }
-    if ( qpointer.data() )
-    {
-      //convert from our std::string back to a QString so that we can check to see if it exists
-      //in the combo box.
-      QString qstring_state = QString::fromStdString( state );
-      int index = qpointer->findText( qstring_state, Qt::MatchFlags( Qt::CaseInsensitive ) );
-
-      if ( index >= 0 )
-      {
-        QtSlot::Block( qpointer );
-        qpointer->setCurrentIndex( index );
-        QtSlot::Unblock( qpointer );
-      }
-    }
+    QtSignal( qpointer, boost::bind( &QtComboBoxSignal, qpointer.data(), state ) );
   }
 }
 
@@ -88,19 +85,7 @@ void QtSliderSpinComboRangedIntSignal( QPointer< SliderSpinComboInt > qpointer, 
 {
   if ( source != ACTION_SOURCE_INTERFACE_E )
   {
-    if ( !( Interface::Instance()->IsInterfaceThread() ) )
-    {
-      Interface::PostEvent( boost::bind( &QtSliderSpinComboRangedIntSignal, qpointer, state,
-          ACTION_SOURCE_NONE_E ) );
-      return;
-    }
-
-    if ( qpointer.data() )
-    {
-      QtSlot::Block( qpointer );
-      qpointer->setCurrentValue( state );
-      QtSlot::Unblock( qpointer );
-    }
+    QtSignal( qpointer, boost::bind( &SliderSpinComboInt::setCurrentValue, qpointer.data(), state ) );
   }
 }
 
@@ -109,18 +94,19 @@ void QtSliderSpinComboRangedDoubleSignal( QPointer< SliderSpinComboDouble > qpoi
 {
   if ( source != ACTION_SOURCE_INTERFACE_E )
   {
-    if ( !( Interface::Instance()->IsInterfaceThread() ) )
-    {
-      Interface::PostEvent( boost::bind( &QtSliderSpinComboRangedDoubleSignal, qpointer,
-          state, ACTION_SOURCE_NONE_E ) );
-      return;
-    }
+    QtSignal( qpointer, boost::bind( &SliderSpinComboDouble::setCurrentValue, qpointer.data(), state ) );
+  }
+}
 
-    if ( qpointer.data() )
+void QtActionGroupSignal( QActionGroup* qactiongroup, std::string option )
+{
+  QList< QAction* > actions = qactiongroup->actions();
+  for ( QList< QAction* >::iterator it = actions.begin(); it != actions.end(); it++ )
+  {
+    if ( ( *it )->objectName().toStdString() == option )
     {
-      QtSlot::Block( qpointer );
-      qpointer->setCurrentValue( state );
-      QtSlot::Unblock( qpointer );
+      ( *it )->trigger();
+      break;
     }
   }
 }
@@ -130,27 +116,7 @@ void QtActionGroupSignal( QPointer< QActionGroup > qpointer, std::string option,
 {
   if ( source != ACTION_SOURCE_INTERFACE_E )
   {
-    if ( !( Interface::IsInterfaceThread() ) )
-    {
-      Interface::PostEvent( boost::bind( &QtActionGroupSignal, qpointer, option,
-          ACTION_SOURCE_NONE_E ) );
-      return;
-    }
-
-    if ( qpointer.data() )
-    {
-      QList< QAction* > actions = qpointer.data()->actions();
-      for ( QList< QAction* >::iterator it = actions.begin(); it != actions.end(); it++ )
-      {
-        if ( ( *it )->objectName().toStdString() == option )
-        {
-          QtSlot::Block( qpointer );
-          ( *it )->trigger();
-          QtSlot::Unblock( qpointer );
-          break;
-        }
-      }
-    }
+    QtSignal( qpointer, boost::bind( &QtActionGroupSignal, qpointer.data(), option ) );
   }
 }
 
@@ -243,8 +209,8 @@ bool QtBridge::connect( QActionGroup* qactiongroup, StateOptionHandle& state_han
 {
   new QtActionGroupSlot( qactiongroup, state_handle );
 
-  state_handle->value_changed_signal_.connect( boost::bind( &QtActionGroupSignal, qactiongroup,
-      _1, _2 ) );
+  state_handle->value_changed_signal_.connect( 
+    boost::bind( &QtActionGroupSignal, qactiongroup, _1, _2 ) );
 
   return true;
 }

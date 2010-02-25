@@ -69,6 +69,9 @@ public:
 
   static bool connect( QPushButton* qpushbutton, boost::function< void() > function );
 
+  // Connect QActionGroup and StateOption
+  // NOTE: This requires that each QAction in the QActionGroup has its objectName
+  // the same as its corresponding option string
   static bool connect( QActionGroup* qactiongroup, StateOptionHandle& state_handle );
 
   // -- menu connectors --
