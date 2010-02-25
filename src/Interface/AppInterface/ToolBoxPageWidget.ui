@@ -18,14 +18,20 @@
   </property>
   <property name="styleSheet">
    <string notr="true">QPushButton#activate_button_{
+  background-color:rgba(0, 0, 0, 0);
+  border-color: rgba(0, 0, 0, 0);
+  border: none;
   height: 24px;
   text-align: left;
   color: white;
+  padding-left:4px;
 }
 
 QPushButton#activate_button_:pressed{
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0.733364, x2:0.5, y2:0, stop:0 rgba(25, 25, 25, 0), stop:1 rgba(136, 0, 0, 0));
-  border: 1px solid  qlineargradient(spread:pad, x1:0.5, y1:0.733364, x2:0.5, y2:0, stop:0 rgba(25, 25, 25, 0), stop:1 rgba(136, 0, 0, 0));
+  background-color:rgba(0, 0, 0, 0);
+  border-color: rgba(0, 0, 0, 0);
+  padding-left:4px;
+  border: none;
   color:  rgb(68, 68, 68);
 }
 
@@ -75,12 +81,14 @@ QWidget#tool_frame_{
   border: 1px solid  qlineargradient(spread:pad, x1:0.5, y1:0.733364, x2:0.5, y2:0, stop:0 rgba(25, 25, 25, 0), stop:1 rgba(136, 0, 0, 0));
 }
 
+/*
 //QWidget#tool_{
 //  background-color: rgb(240, 240, 240);
 //  border-radius: 4px;
 //  border: 1px solid rgb(90, 90, 90);
 //    background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(221, 221, 221, 255), stop:0.155779 rgba(228, 228, 228, 255), stop:1 rgba(202, 204, 204, 255));
 //}
+*/
 
 </string>
   </property>

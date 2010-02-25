@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>246</width>
-    <height>523</height>
+    <height>546</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -33,8 +33,9 @@ background-color:qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, 
 border-top-left-radius: 4px;
 border-top-right-radius: 4px;
 min-width:12ex;
-height: 12px;
-padding: 4px;
+height: 15px;
+padding-left: 4px;
+padding-top:4px;
 border-top: 1px solid rgb(90,90,90);
 border-left: 1px solid rgb(90,90,90);
 border-right: 1px solid rgb(90,90,90);
@@ -87,13 +88,18 @@ QToolButton#group_visibility_button_{
 
 
 QPushButton#activate_button_{
+  background-color:rgba(0, 0, 0, 0);
+  border-color: rgba(0, 0, 0, 0);
+  border: none;
   height: 24px;
   text-align: left;
   color: white;
 }
 
 QPushButton#activate_button_:pressed{
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0.733364, x2:0.5, y2:0, stop:0 rgba(25, 25, 25, 0), stop:1 rgba(136, 0, 0, 0));
+  background-color:rgba(0, 0, 0, 0);
+  border: none;
+  border-color: rgba(0, 0, 0, 0);
   color: gray;
 }
 
@@ -130,37 +136,6 @@ QWidget#LayerGroupWidget{
 }
 
 
-QWidget#resample_{
-  /*
-  border-radius: 4px;
-  border: 1px solid rgb(90, 90, 90);
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(221, 221, 221, 255), stop:0.155779 rgba(228, 228, 228, 255), stop:1 rgba(202, 204, 204, 255));
-  */
-}
-
-QWidget#roi_{
-/*
-  border-radius: 4px;
-  border: 1px solid rgb(90, 90, 90);
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(221, 221, 221, 255), stop:0.155779 rgba(228, 228, 228, 255), stop:1 rgba(202, 204, 204, 255));
-  margin: 4px;
-  */
-}
-
-QWidget#flip_rotate_{
-/*
-  border-radius: 4px;
-  border: 1px solid rgb(90, 90, 90);
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(221, 221, 221, 255), stop:0.155779 rgba(228, 228, 228, 255), stop:1 rgba(202, 204, 204, 255));
-*/
-}
-
-QWidget#transform_{
-  /*border-radius: 4px;
-  border: 1px solid rgb(90, 90, 90);
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(221, 221, 221, 255), stop:0.155779 rgba(228, 228, 228, 255), stop:1 rgba(202, 204, 204, 255));
-  */
-}
 QWidget#group_tools_{
   border-radius: 4px;
   border: 1px solid rgb(90, 90, 90);
@@ -787,6 +762,11 @@ QWidget#group_tools_{
          </item>
          <item>
           <widget class="QTabWidget" name="tabWidget">
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
            <property name="tabPosition">
             <enum>QTabWidget::North</enum>
            </property>
