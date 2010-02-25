@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>225</width>
+    <width>309</width>
     <height>248</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -358,7 +358,7 @@ QToolButton#color_button_12_:pressed{
    <item>
     <widget class="QWidget" name="header_" native="true">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -400,7 +400,7 @@ QToolButton#color_button_12_:pressed{
          <widget class="QWidget" name="checkbox_widget_" native="true">
           <property name="minimumSize">
            <size>
-            <width>26</width>
+            <width>30</width>
             <height>0</height>
            </size>
           </property>
@@ -413,10 +413,16 @@ QToolButton#color_button_12_:pressed{
            </property>
            <item>
             <widget class="QCheckBox" name="selection_checkbox_">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="maximumSize">
               <size>
                <width>16</width>
-               <height>16777215</height>
+               <height>16</height>
               </size>
              </property>
              <property name="text">
@@ -537,8 +543,17 @@ QToolButton#color_button_12_:pressed{
           <property name="spacing">
            <number>0</number>
           </property>
+          <property name="rightMargin">
+           <number>4</number>
+          </property>
           <item>
            <widget class="QLineEdit" name="label_">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="focusPolicy">
              <enum>Qt::ClickFocus</enum>
             </property>
@@ -558,6 +573,12 @@ QToolButton#color_button_12_:pressed{
           </item>
           <item>
            <widget class="Line" name="header_line_">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
@@ -566,7 +587,10 @@ QToolButton#color_button_12_:pressed{
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_7">
             <property name="spacing">
-             <number>1</number>
+             <number>8</number>
+            </property>
+            <property name="leftMargin">
+             <number>3</number>
             </property>
             <property name="topMargin">
              <number>1</number>
@@ -840,6 +864,19 @@ QToolButton#color_button_12_:pressed{
               </property>
              </widget>
             </item>
+            <item>
+             <spacer name="horizontalSpacer">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>10</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
            </layout>
           </item>
          </layout>
@@ -852,7 +889,7 @@ QToolButton#color_button_12_:pressed{
    <item>
     <widget class="QWidget" name="bright_contrast_bar_" native="true">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -882,7 +919,7 @@ QToolButton#color_button_12_:pressed{
       <item>
        <widget class="Line" name="brightness_contrast_bar_line_">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -900,7 +937,7 @@ QToolButton#color_button_12_:pressed{
         <item>
          <widget class="QLabel" name="brigntness_label_">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
@@ -932,7 +969,7 @@ QToolButton#color_button_12_:pressed{
         <item>
          <widget class="QLabel" name="contrast_label_">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
@@ -962,7 +999,7 @@ QToolButton#color_button_12_:pressed{
    <item>
     <widget class="QWidget" name="color_bar_" native="true">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -992,7 +1029,7 @@ QToolButton#color_button_12_:pressed{
       <item>
        <widget class="Line" name="color_bar_line_">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -1372,7 +1409,7 @@ QToolButton#color_button_12_:pressed{
       <item>
        <widget class="Line" name="opacity_bar_line_">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -1409,6 +1446,12 @@ QToolButton#color_button_12_:pressed{
       </property>
       <item>
        <widget class="Line" name="progress_line_">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
@@ -1450,6 +1493,12 @@ QToolButton#color_button_12_:pressed{
         </item>
         <item>
          <widget class="QProgressBar" name="progress_bar_">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="minimumSize">
            <size>
             <width>0</width>
@@ -1508,6 +1557,12 @@ QToolButton#color_button_12_:pressed{
       </property>
       <item>
        <widget class="Line" name="border_line_">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>

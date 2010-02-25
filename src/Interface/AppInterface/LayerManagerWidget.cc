@@ -111,11 +111,11 @@ LayerManagerWidget::LayerManagerWidget( QWidget* parent ) :
   new_group( QString::fromUtf8( "100x200x200" ) );
 
   //add test layers
-  new_layer( DATA_LAYER_E, QString::fromUtf8( "Mouse Study 23430.43" ), QString::fromUtf8(
+  new_layer( MASK_LAYER_E, QString::fromUtf8( "Mouse Study 23430.43" ), QString::fromUtf8(
       "300x200x400" ) );
-  new_layer( DATA_LAYER_E, QString::fromUtf8( "Rat Spine-432.d9s" ), QString::fromUtf8(
+  new_layer( MASK_LAYER_E, QString::fromUtf8( "Rat Spine-432.d9s" ), QString::fromUtf8(
       "300x200x400" ) );
-  new_layer( DATA_LAYER_E, QString::fromUtf8( "CervicalSpine_23k3s.23" ), QString::fromUtf8(
+  new_layer( MASK_LAYER_E, QString::fromUtf8( "CervicalSpine_23k3s.23" ), QString::fromUtf8(
       "300x200x400" ) );
   new_layer( DATA_LAYER_E, QString::fromUtf8( "Neuro Study Rat.3421" ), QString::fromUtf8(
       "300x200x400" ) );
@@ -299,9 +299,16 @@ void LayerManagerWidget::new_layer( int type, const QString &label, const QStrin
   {
   case 1:
     layer_handle_->color_button_->hide();
+    layer_handle_->compute_iso_surface_button_->hide();
+    layer_handle_->fill_border_button_->hide();
+    layer_handle_->iso_surface_button_->hide();
+      layer_handle_->typeBackground_->setStyleSheet(QString::fromUtf8("QWidget#typeBackground_{ background-color: rgb(166, 12, 73); }"));
+    layer_handle_->colorChooseButton_->setIcon(data_layer_icon_);
     break;
   case 2:
-    //layer_handle_->
+    layer_handle_->brightness_contrast_button_->hide();
+    layer_handle_->volume_rendered_button_->hide();
+      
     break;
 
   default:

@@ -35,7 +35,6 @@ SET(INTERFACE_TOOLINTERFACE_SRCS
   PaintToolInterface.cc
   PolyLineToolInterface.cc
   ThresholdToolInterface.cc
-  FlipToolInterface.cc
   InvertToolInterface.cc
   MedianFilterInterface.cc
   AnisotropicDiffusionFilterInterface.cc
@@ -67,7 +66,6 @@ SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
   PaintToolInterface.h
   PolyLineToolInterface.h
   ThresholdToolInterface.h
-  FlipToolInterface.h
   InvertToolInterface.h
   MedianFilterInterface.h
   AnisotropicDiffusionFilterInterface.h
@@ -101,7 +99,6 @@ SET(INTERFACE_TOOLINTERFACE_UI_SRCS
   PaintToolInterface.ui
   PolyLineToolInterface.ui
   ThresholdToolInterface.ui
-  FlipToolInterface.ui
   InvertToolInterface.ui
   MedianFilterInterface.ui
   AnisotropicDiffusionFilterInterface.ui

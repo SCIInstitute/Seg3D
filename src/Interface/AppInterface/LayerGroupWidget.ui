@@ -7,11 +7,11 @@
     <x>0</x>
     <y>0</y>
     <width>246</width>
-    <height>546</height>
+    <height>711</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -44,7 +44,6 @@ padding-top:0px;
 border-top: 1px solid rgb(90,90,90);
 border-left: 1px solid rgb(90,90,90);
 border-right: 1px solid rgb(90,90,90);
-
 }
 
 QTabBar::tab:selected{
@@ -65,25 +64,51 @@ QToolButton#group_crop_button_{
   background-color: rgba(0, 0, 0, 0);
   border: 1px solid rgba(0, 0, 0, 0);
 }
+QToolButton#group_crop_button_:checked{
+  background-color: rgb(233, 111, 53);
+  border-radius: 3px;
+  border: 1px solid rgb(142, 67, 32);
+}
 
 QToolButton#group_flip_rotate_button_{
   background-color: rgba(0, 0, 0, 0);
   border: 1px solid rgba(0, 0, 0, 0);
+}
+QToolButton#group_flip_rotate_button_:checked{
+  background-color: rgb(233, 111, 53);
+  border-radius: 3px;
+  border: 1px solid rgb(142, 67, 32);
 }
 
 QToolButton#group_new_button_{
   background-color: rgba(0, 0, 0, 0);
   border: 1px solid rgba(0, 0, 0, 0);
 }
+QToolButton#group_new_button_:pressed{
+  background-color: rgb(233, 111, 53);
+  border-radius: 3px;
+  border: 1px solid rgb(142, 67, 32);
+}
+
 
 QToolButton#group_resample_button_{
   background-color: rgba(0, 0, 0, 0);
   border: 1px solid rgba(0, 0, 0, 0);
 }
+QToolButton#group_resample_button_:checked{
+  background-color: rgb(233, 111, 53);
+  border-radius: 3px;
+  border: 1px solid rgb(142, 67, 32);
+}
 
 QToolButton#group_transform_button_{
   background-color: rgba(0, 0, 0, 0);
   border: 1px solid rgba(0, 0, 0, 0);
+}
+QToolButton#group_transform_button_:checked{
+  background-color: rgb(233, 111, 53);
+  border-radius: 3px;
+  border: 1px solid rgb(142, 67, 32);
 }
 
 QToolButton#group_visibility_button_{
@@ -157,7 +182,7 @@ QWidget#group_tools_{
    <item>
     <widget class="QWidget" name="group_background_" native="true">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -184,7 +209,7 @@ QWidget#group_tools_{
       <item>
        <widget class="QWidget" name="group_header_" native="true">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -247,7 +272,7 @@ QWidget#group_tools_{
          <item>
           <widget class="QPushButton" name="activate_button_">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -311,7 +336,7 @@ QWidget#group_tools_{
    <item>
     <widget class="QFrame" name="group_frame_">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -550,6 +575,12 @@ QWidget#group_tools_{
       </item>
       <item>
        <widget class="QWidget" name="resample_" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>120</height>
+         </size>
+        </property>
         <layout class="QVBoxLayout" name="verticalLayout">
          <property name="spacing">
           <number>2</number>
@@ -751,6 +782,12 @@ QWidget#group_tools_{
       </item>
       <item>
        <widget class="QWidget" name="roi_" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>205</height>
+         </size>
+        </property>
         <layout class="QVBoxLayout" name="verticalLayout_23">
          <property name="spacing">
           <number>2</number>
@@ -767,6 +804,12 @@ QWidget#group_tools_{
          </item>
          <item>
           <widget class="QTabWidget" name="tabWidget">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="font">
             <font>
              <pointsize>11</pointsize>
@@ -779,12 +822,18 @@ QWidget#group_tools_{
             <enum>QTabWidget::Rounded</enum>
            </property>
            <property name="currentIndex">
-            <number>0</number>
+            <number>1</number>
            </property>
            <property name="elideMode">
             <enum>Qt::ElideRight</enum>
            </property>
            <widget class="QWidget" name="tab">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>80</height>
+             </size>
+            </property>
             <attribute name="title">
              <string>Origin</string>
             </attribute>
@@ -882,6 +931,12 @@ QWidget#group_tools_{
             </layout>
            </widget>
            <widget class="QWidget" name="tab_2">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>80</height>
+             </size>
+            </property>
             <attribute name="title">
              <string>Size</string>
             </attribute>
@@ -997,6 +1052,12 @@ QWidget#group_tools_{
             </property>
             <item>
              <widget class="QCheckBox" name="checkBox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="minimumSize">
                <size>
                 <width>80</width>
@@ -1038,6 +1099,12 @@ QWidget#group_tools_{
          </property>
          <item>
           <widget class="Line" name="line_4">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
@@ -1045,10 +1112,27 @@ QWidget#group_tools_{
          </item>
          <item>
           <widget class="QTabWidget" name="tabWidget_2">
-           <property name="currentIndex">
-            <number>0</number>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
            </property>
-           <widget class="QWidget" name="tab_3">
+           <property name="font">
+            <font>
+             <pointsize>11</pointsize>
+            </font>
+           </property>
+           <property name="currentIndex">
+            <number>1</number>
+           </property>
+           <widget class="QWidget" name="flip_tab_">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>86</height>
+             </size>
+            </property>
             <attribute name="title">
              <string>Flip</string>
             </attribute>
@@ -1060,21 +1144,39 @@ QWidget#group_tools_{
               <number>2</number>
              </property>
              <item>
-              <widget class="QPushButton" name="pushButton_5">
+              <widget class="QPushButton" name="axial_flip_button_">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
                <property name="text">
                 <string>Axial</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="pushButton_4">
+              <widget class="QPushButton" name="coronal_flip_button_">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
                <property name="text">
                 <string>Coronal</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="pushButton_6">
+              <widget class="QPushButton" name="sagittal_flip_button_">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
                <property name="text">
                 <string>Sagittal</string>
                </property>
@@ -1082,7 +1184,13 @@ QWidget#group_tools_{
              </item>
             </layout>
            </widget>
-           <widget class="QWidget" name="tab_4">
+           <widget class="QWidget" name="rotate_tab_">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>86</height>
+             </size>
+            </property>
             <attribute name="title">
              <string>Rotate</string>
             </attribute>
@@ -1094,21 +1202,39 @@ QWidget#group_tools_{
               <number>2</number>
              </property>
              <item>
-              <widget class="QPushButton" name="pushButton">
+              <widget class="QPushButton" name="axial_coronal_rotate_button_">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
                <property name="text">
                 <string>Axial - Coronal</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="pushButton_2">
+              <widget class="QPushButton" name="axial_sagittal_rotate_button_">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
                <property name="text">
                 <string>Axial - Sagittal</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="pushButton_3">
+              <widget class="QPushButton" name="sagittal_axial_rotate_button_">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
                <property name="text">
                 <string>Sagittal - Axial</string>
                </property>
@@ -1123,6 +1249,12 @@ QWidget#group_tools_{
       </item>
       <item>
        <widget class="QWidget" name="transform_" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>205</height>
+         </size>
+        </property>
         <layout class="QVBoxLayout" name="verticalLayout_7">
          <property name="spacing">
           <number>2</number>
@@ -1132,6 +1264,18 @@ QWidget#group_tools_{
          </property>
          <item>
           <widget class="Line" name="line_3">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
@@ -1139,6 +1283,17 @@ QWidget#group_tools_{
          </item>
          <item>
           <widget class="QTabWidget" name="tabWidget_3">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>11</pointsize>
+            </font>
+           </property>
            <property name="tabPosition">
             <enum>QTabWidget::North</enum>
            </property>
@@ -1146,12 +1301,18 @@ QWidget#group_tools_{
             <enum>QTabWidget::Rounded</enum>
            </property>
            <property name="currentIndex">
-            <number>0</number>
+            <number>1</number>
            </property>
            <property name="elideMode">
             <enum>Qt::ElideRight</enum>
            </property>
            <widget class="QWidget" name="tab_5">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>80</height>
+             </size>
+            </property>
             <attribute name="title">
              <string>Origin</string>
             </attribute>
@@ -1249,6 +1410,12 @@ QWidget#group_tools_{
             </layout>
            </widget>
            <widget class="QWidget" name="tab_6">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>80</height>
+             </size>
+            </property>
             <attribute name="title">
              <string>Size</string>
             </attribute>
@@ -1364,6 +1531,12 @@ QWidget#group_tools_{
             </property>
             <item>
              <widget class="QCheckBox" name="checkBox_3">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="minimumSize">
                <size>
                 <width>80</width>
