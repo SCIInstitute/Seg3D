@@ -29,37 +29,34 @@
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/AnisotropicDiffusionFilter.h>
 
+namespace Seg3D
+{
 
-namespace Seg3D {
-  
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL(AnisotropicDiffusionFilter)
 
-  
-AnisotropicDiffusionFilter::AnisotropicDiffusionFilter(const std::string& toolid) :
-Tool(toolid)
+AnisotropicDiffusionFilter::AnisotropicDiffusionFilter( const std::string& toolid ) :
+  Tool( toolid )
 {
   // Need to set ranges and default values for all parameters
-  add_state("target",target_layer_state_,"<none>","<none>");
-  add_state("iterations",iterations_state_,1,100,1,2);
-  add_state("steps",steps_state_,1,100,1,2);
-  add_state("conductance",conductance_state_,0.0f,100.0f,01.0f,1.0f);
-  add_state("replace",replace_state_,false);
-  
-  // Add constaints, so that when the state changes the right ranges of 
+  add_state( "target", target_layer_state_, "<none>", "<none>" );
+  add_state( "iterations", iterations_state_, 1, 100, 1, 2 );
+  add_state( "steps", steps_state_, 1, 100, 1, 2 );
+  add_state( "conductance", conductance_state_, 0.0f, 100.0f, 01.0f, 1.0f );
+  add_state( "replace", replace_state_, false );
+
+  // Add constaints, so that when the state changes the right ranges of
   // parameters are selected
-  target_layer_state_->value_changed_signal_.connect(
-    boost::bind(&AnisotropicDiffusionFilter::target_constraint,this,_1));
+  target_layer_state_->value_changed_signal_.connect( boost::bind(
+      &AnisotropicDiffusionFilter::target_constraint, this, _1 ) );
 }
 
-void
-AnisotropicDiffusionFilter::handle_layers_changed()
+void AnisotropicDiffusionFilter::handle_layers_changed()
 {
   //TODO - finish
 }
 
-void
-AnisotropicDiffusionFilter::target_constraint(std::string layerid)
+void AnisotropicDiffusionFilter::target_constraint( std::string layerid )
 {
 
 }
@@ -69,16 +66,14 @@ AnisotropicDiffusionFilter::~AnisotropicDiffusionFilter()
   disconnect_all();
 }
 
-void
-AnisotropicDiffusionFilter::activate()
+void AnisotropicDiffusionFilter::activate()
 {
 }
 
-void
-AnisotropicDiffusionFilter::deactivate()
+void AnisotropicDiffusionFilter::deactivate()
 {
 }
-  
+
 } // end namespace Seg3D
 
 

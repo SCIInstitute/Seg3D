@@ -1,27 +1,27 @@
 #include "ArithmeticFilterInterface.h"
 #include "ui_ArithmeticFilterInterface.h"
 
-ArithmeticFilterInterface::ArithmeticFilterInterface(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::ArithmeticFilterInterface)
+ArithmeticFilterInterface::ArithmeticFilterInterface( QWidget *parent ) :
+  QWidget( parent ), ui( new Ui::ArithmeticFilterInterface )
 {
-    ui->setupUi(this);
+  ui->setupUi( this );
 
 }
 
 ArithmeticFilterInterface::~ArithmeticFilterInterface()
 {
-    delete ui;
+  delete ui;
 }
 
-void ArithmeticFilterInterface::changeEvent(QEvent *e)
+void ArithmeticFilterInterface::changeEvent( QEvent *e )
 {
-    QWidget::changeEvent(e);
-    switch (e->type()) {
-    case QEvent::LanguageChange:
-        ui->retranslateUi(this);
-        break;
-    default:
-        break;
-    }
+  QWidget::changeEvent( e );
+  switch( e->type() )
+  {
+  case QEvent::LanguageChange:
+    ui->retranslateUi( this );
+    break;
+  default:
+    break;
+  }
 }

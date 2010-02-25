@@ -29,50 +29,49 @@
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/MaskDataFilter.h>
 
+namespace Seg3D
+{
 
-namespace Seg3D {
-  
-  // Register the tool into the tool factory
-  SCI_REGISTER_TOOL(MaskDataFilter)
-  
-  
-  MaskDataFilter::MaskDataFilter(const std::string& toolid) :
-  Tool(toolid)
-  {
-    // add default values for the the states
-    add_state("target_layer",target_layer_state_,"<none>","<none>");
-    add_state("mask_layer",mask_layer_state_,"<none>","<none>");
-    add_state("replace_with",replace_with_state_,"<none>","<none>");
-    add_state("replace",replace_state_,false);
-    
-    // Add constaints, so that when the state changes the right ranges of 
-    // parameters are selected
-    target_layer_state_->value_changed_signal_.connect(boost::bind(&MaskDataFilter::target_constraint,this,_1));
-    mask_layer_state_->value_changed_signal_.connect(boost::bind(&MaskDataFilter::target_constraint,this,_1));
-    replace_with_state_->value_changed_signal_.connect(boost::bind(&MaskDataFilter::target_constraint,this,_1));
-    
-  }
-  
-  void
-  MaskDataFilter::target_constraint(std::string layerid)
-  {
-  }
-  
-  MaskDataFilter::~MaskDataFilter()
-  {
-    disconnect_all();
-  }
-  
-  void
-  MaskDataFilter::activate()
-  {
-  }
-  
-  void
-  MaskDataFilter::deactivate()
-  {
-  }
-  
+// Register the tool into the tool factory
+SCI_REGISTER_TOOL(MaskDataFilter)
+
+MaskDataFilter::MaskDataFilter( const std::string& toolid ) :
+  Tool( toolid )
+{
+  // add default values for the the states
+  add_state( "target_layer", target_layer_state_, "<none>", "<none>" );
+  add_state( "mask_layer", mask_layer_state_, "<none>", "<none>" );
+  add_state( "replace_with", replace_with_state_, "<none>", "<none>" );
+  add_state( "replace", replace_state_, false );
+
+  // Add constaints, so that when the state changes the right ranges of
+  // parameters are selected
+  target_layer_state_->value_changed_signal_.connect( boost::bind(
+      &MaskDataFilter::target_constraint, this, _1 ) );
+  mask_layer_state_->value_changed_signal_.connect( boost::bind(
+      &MaskDataFilter::target_constraint, this, _1 ) );
+  replace_with_state_->value_changed_signal_.connect( boost::bind(
+      &MaskDataFilter::target_constraint, this, _1 ) );
+
+}
+
+void MaskDataFilter::target_constraint( std::string layerid )
+{
+}
+
+MaskDataFilter::~MaskDataFilter()
+{
+  disconnect_all();
+}
+
+void MaskDataFilter::activate()
+{
+}
+
+void MaskDataFilter::deactivate()
+{
+}
+
 } // end namespace Seg3D
 
 

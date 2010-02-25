@@ -36,41 +36,44 @@
 //Application Includes
 #include <Application/Tools/FlipTool.h>
 
-namespace Seg3D {
-  
+namespace Seg3D
+{
+
 SCI_REGISTER_TOOLINTERFACE(FlipToolInterface)
-  
-class FlipToolInterfacePrivate {
-  public:
-    Ui::FlipToolInterface ui_;
+
+class FlipToolInterfacePrivate
+{
+public:
+  Ui::FlipToolInterface ui_;
 };
-  
-  FlipToolInterface::FlipToolInterface() :
-  private_(new FlipToolInterfacePrivate)
-  { } 
 
-  FlipToolInterface::~FlipToolInterface()
-  { }
+FlipToolInterface::FlipToolInterface() :
+  private_( new FlipToolInterfacePrivate )
+{
+}
 
-  // build the interface and connect it to the state manager
-  bool
-  FlipToolInterface::build_widget(QFrame* frame)
-  {
-    //Step 1 - build the Qt GUI Widget
-    private_->ui_.setupUi(frame);
+FlipToolInterface::~FlipToolInterface()
+{
+}
 
-    //Step 2 - get a pointer to the tool
-    ToolHandle base_tool_ = tool();
-    FlipTool* tool = dynamic_cast<FlipTool*>(base_tool_.get());
+// build the interface and connect it to the state manager
+bool FlipToolInterface::build_widget( QFrame* frame )
+{
+  //Step 1 - build the Qt GUI Widget
+  private_->ui_.setupUi( frame );
 
-    //Step 3 - connect the gui to the tool through the QtBridge
-    QtBridge::connect(private_->ui_.targetComboBox, tool->target_layer_state_);
+  //Step 2 - get a pointer to the tool
+  ToolHandle base_tool_ = tool();
+  FlipTool* tool = dynamic_cast< FlipTool* > ( base_tool_.get() );
 
-    //Send a message to the log that we have finised with building the Flip Tool Interface
-    SCI_LOG_DEBUG("Finished building a Flip Tool Interface"); 
-    
-    return (true);
-  } // end build_widget
-  
-  
+  //Step 3 - connect the gui to the tool through the QtBridge
+  QtBridge::connect( private_->ui_.targetComboBox, tool->target_layer_state_ );
+
+  //Send a message to the log that we have finised with building the Flip Tool Interface
+  SCI_LOG_DEBUG("Finished building a Flip Tool Interface");
+
+  return ( true );
+} // end build_widget
+
+
 } // namespace Seg3D

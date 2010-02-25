@@ -40,47 +40,48 @@
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QLabel>
 
-namespace Seg3D {
+namespace Seg3D
+{
 
 class SliderSpinComboInt : public QWidget
 {
   Q_OBJECT
 
   Q_SIGNALS:
-    void valueAdjusted(int);
-    void valueAdjustedContinuously(int);
+  void valueAdjusted(int);
+  void valueAdjustedContinuously( int );
 
-  public:
-    SliderSpinComboInt(QWidget *parent = 0);
-      
+public:
+  SliderSpinComboInt( QWidget *parent = 0 );
+
   virtual ~SliderSpinComboInt();
 
-  public Q_SLOTS:
-    void setStep(int);
-    void setRanges(int, int);
-    void setCurrentValue(int);
+public Q_SLOTS:
+  void setStep(int);
+  void setRanges( int, int );
+  void setCurrentValue( int );
 
-  private:
-    QHBoxLayout* mainLayout;
-    QHBoxLayout* labelLayout;
-    QVBoxLayout* sliderSideLayout;
-    QVBoxLayout* spinnerSideLayout;
-    
-    QSpacerItem* verticalSpacer;
-    
-    QSlider* slider;
-    QSpinBox* spinner;
-    
-    QLabel* minValueLabel;
-    QLabel* maxValueLabel;
+private:
+  QHBoxLayout* mainLayout;
+  QHBoxLayout* labelLayout;
+  QVBoxLayout* sliderSideLayout;
+  QVBoxLayout* spinnerSideLayout;
 
-    void buildWidget();
-    void makeConnections();
+  QSpacerItem* verticalSpacer;
 
-  private Q_SLOTS:
-    void signalGuiFromSlider(int);
-    void signalGuiFromSpinner(int);
-    void signalGuiFromSliderReleased();
+  QSlider* slider;
+  QSpinBox* spinner;
+
+  QLabel* minValueLabel;
+  QLabel* maxValueLabel;
+
+  void buildWidget();
+  void makeConnections();
+
+private Q_SLOTS:
+  void signalGuiFromSlider(int);
+  void signalGuiFromSpinner( int );
+  void signalGuiFromSliderReleased();
 };
 
 } // end namespace Seg3D

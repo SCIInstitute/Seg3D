@@ -41,70 +41,57 @@
 #include <Application/Layer/Actions/ActionNewMaskLayer.h>
 #include <Application/Layer/Actions/ActionRemoveLayer.h>
 
-
 // Interface includes
 #include <Interface/AppInterface/LayerManagerDockWidget.h>
 
-
-
-namespace Seg3D  {
-  
-
-LayerManagerDockWidget::LayerManagerDockWidget(QWidget *parent) :
-    QDockWidget("LayerManagerDockWidget")
+namespace Seg3D
 {
-  setAllowedAreas(Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea);
-  setWindowTitle("Layer Manager");
-  
-  resize(250, 640);
-  layer_manager_ = new LayerManagerWidget(this);
-  setWidget(layer_manager_);
-  
 
-  
-  
+LayerManagerDockWidget::LayerManagerDockWidget( QWidget *parent ) :
+  QDockWidget( "LayerManagerDockWidget" )
+{
+  setAllowedAreas( Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea );
+  setWindowTitle( "Layer Manager" );
+
+  resize( 250, 640 );
+  layer_manager_ = new LayerManagerWidget( this );
+  setWidget( layer_manager_ );
+
 }
 
 LayerManagerDockWidget::~LayerManagerDockWidget()
 {
-  
+
 }
-  
-void  
-LayerManagerDockWidget::new_group()
+
+void LayerManagerDockWidget::new_group()
 {
   //TODO implement new group function
 }
-void  
-LayerManagerDockWidget::close_group()
+void LayerManagerDockWidget::close_group()
 {
   //TODO implement close group function
 }
-void  
-LayerManagerDockWidget::layer_from_file()
+void LayerManagerDockWidget::layer_from_file()
 {
   //TODO implement open data layer function
 }
-void
-LayerManagerDockWidget::clone_layer(LayerHandle layer)
+void LayerManagerDockWidget::clone_layer( LayerHandle layer )
 {
   //TODO implement clone layer function
 }
-void  
-LayerManagerDockWidget::new_mask_layer()
+void LayerManagerDockWidget::new_mask_layer()
 {
   //TODO implement new mask layer function
 }
-void
-LayerManagerDockWidget::remove_layer(LayerHandle layer)
+void LayerManagerDockWidget::remove_layer( LayerHandle layer )
 {
   //TODO implement remove layer function
 }
 
-void
-LayerManagerDockWidget::layer_changed(int index)
+void LayerManagerDockWidget::layer_changed( int index )
 {
   //TODO implement layer changed slot
 }
-  
+
 } // end namespace

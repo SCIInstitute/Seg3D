@@ -1,30 +1,30 @@
 /*
-   For more information, please see: http://software.sci.utah.edu
+ For more information, please see: http://software.sci.utah.edu
 
-   The MIT License
+ The MIT License
 
-   Copyright (c) 2009 Scientific Computing and Imaging Institute,
-   University of Utah.
+ Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ University of Utah.
 
-   
-   Permission is hereby granted, free of charge, to any person obtaining a
-   copy of this software and associated documentation files (the "Software"),
-   to deal in the Software without restriction, including without limitation
-   the rights to use, copy, modify, merge, publish, distribute, sublicense,
-   and/or sell copies of the Software, and to permit persons to whom the
-   Software is furnished to do so, subject to the following conditions:
 
-   The above copyright notice and this permission notice shall be included
-   in all copies or substantial portions of the Software.
+ Permission is hereby granted, free of charge, to any person obtaining a
+ copy of this software and associated documentation files (the "Software"),
+ to deal in the Software without restriction, including without limitation
+ the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ and/or sell copies of the Software, and to permit persons to whom the
+ Software is furnished to do so, subject to the following conditions:
 
-   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-   OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-   THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-   DEALINGS IN THE SOFTWARE.
-*/
+ The above copyright notice and this permission notice shall be included
+ in all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+ OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ DEALINGS IN THE SOFTWARE.
+ */
 
 #ifndef UTILS_DATABLOCK_DATABLOCK_H
 #define UTILS_DATABLOCK_DATABLOCK_H
@@ -40,7 +40,8 @@
 #include <boost/thread/recursive_mutex.hpp>
 #include <boost/thread/thread.hpp>
 
-namespace Utils {
+namespace Utils
+{
 
 // CLASS DataBlock
 // This class is an abstract representation of a block of volume data in
@@ -53,102 +54,138 @@ namespace Utils {
 
 // Forward Declaration
 class DataBlock;
-typedef boost::shared_ptr<DataBlock> DataBlockHandle;
+typedef boost::shared_ptr< DataBlock > DataBlockHandle;
 
 // Class definition
-class DataBlock : public boost::noncopyable {
+class DataBlock : public boost::noncopyable
+{
 
-// -- typedefs --
-  public:
-    // Lock types
-    typedef boost::recursive_mutex            mutex_type;
-    typedef boost::unique_lock<mutex_type>    lock_type;
+  // -- typedefs --
+public:
+  // Lock types
+  typedef boost::recursive_mutex mutex_type;
+  typedef boost::unique_lock< mutex_type > lock_type;
 
-    // Data types
-    enum data_type {
-      UNKNOWN_E,
-      CHAR_E,
-      UCHAR_E,
-      SHORT_E,
-      USHORT_E,
-      INT_E,
-      UINT_E,
-      FLOAT_E,
-      DOUBLE_E
-    };
+  // Data types
+  enum data_type
+  {
+    UNKNOWN_E, CHAR_E, UCHAR_E, SHORT_E, USHORT_E, INT_E, UINT_E, FLOAT_E, DOUBLE_E
+  };
 
-// -- Constructor/destructor --
-  public:
-    DataBlock();    
-    virtual ~DataBlock();
+  // -- Constructor/destructor --
+public:
+  DataBlock();
+  virtual ~DataBlock();
 
-// -- Access properties of data block --
-  public:
-    
-    // NX, NY, NZ, SIZE
-    // The dimensions of the datablock
-    size_t nx() const { return nx_; }
-    size_t ny() const { return ny_; }
-    size_t nz() const { return nz_; }
-    size_t size() const { return nx_*ny_*nz_; }
+  // -- Access properties of data block --
+public:
 
-    // TYPE
-    // The type of the data
-    data_type type() const { return data_type_; }
+  // NX, NY, NZ, SIZE
+  // The dimensions of the datablock
+  size_t nx() const
+  {
+    return nx_;
+  }
+  size_t ny() const
+  {
+    return ny_;
+  }
+  size_t nz() const
+  {
+    return nz_;
+  }
+  size_t size() const
+  {
+    return nx_ * ny_ * nz_;
+  }
 
-    // DATA
-    // Pointer to the block of data
-    void* data() const { return data_; }
+  // TYPE
+  // The type of the data
+  data_type type() const
+  {
+    return data_type_;
+  }
 
-// -- Pointer to where the data is stored
-  protected:
+  // DATA
+  // Pointer to the block of data
+  void* data() const
+  {
+    return data_;
+  }
 
-    // SET_NX, SET_NY, SET_NZ
-    // Set the dimensions of the datablock
-    void set_nx(size_t nx) { nx_ = nx; }
-    void set_ny(size_t ny) { ny_ = ny; }
-    void set_nz(size_t nz) { nz_ = nz; }
+  // -- Pointer to where the data is stored
+protected:
 
-    // SET_TYPE
-    // Set the type of the data
-    void set_type(data_type type) { data_type_ = type; }
+  // SET_NX, SET_NY, SET_NZ
+  // Set the dimensions of the datablock
+  void set_nx( size_t nx )
+  {
+    nx_ = nx;
+  }
+  void set_ny( size_t ny )
+  {
+    ny_ = ny;
+  }
+  void set_nz( size_t nz )
+  {
+    nz_ = nz;
+  }
 
-    // SET_DATA
-    // Set the data pointer of the data
-    void set_data(void* data) { data_ =  data; }
+  // SET_TYPE
+  // Set the type of the data
+  void set_type( data_type type )
+  {
+    data_type_ = type;
+  }
 
-// -- Locking of the datablock --
-  public:
-  
-    // LOCK:
-    // Lock the datablock
-    void lock() { mutex_.lock(); }
-    
-    // UNLOCK:
-    // Unlock the datablock
-    void unlock() { mutex_.unlock(); }
-    
-    // GETMUTEX:
-    // Get the mutex that locks the datablock
-    mutex_type& get_mutex() { return mutex_;}
+  // SET_DATA
+  // Set the data pointer of the data
+  void set_data( void* data )
+  {
+    data_ = data;
+  }
 
-// -- internals of the DataBlock --
-  private:
-    // The dimensions of the datablock
-    size_t nx_;
-    size_t ny_;
-    size_t nz_;
-      
-    // The type of the data in this data block
-    data_type data_type_;
-                
-    // The mutex that protects the data
-    // As data is shared between the renderer and the application threads, we
-    // need locking.
-    mutex_type mutex_;    
-  
-    // Pointer to the data
-    void* data_;
+  // -- Locking of the datablock --
+public:
+
+  // LOCK:
+  // Lock the datablock
+  void lock()
+  {
+    mutex_.lock();
+  }
+
+  // UNLOCK:
+  // Unlock the datablock
+  void unlock()
+  {
+    mutex_.unlock();
+  }
+
+  // GETMUTEX:
+  // Get the mutex that locks the datablock
+  mutex_type& get_mutex()
+  {
+    return mutex_;
+  }
+
+  // -- internals of the DataBlock --
+private:
+  // The dimensions of the datablock
+  size_t nx_;
+  size_t ny_;
+  size_t nz_;
+
+  // The type of the data in this data block
+  data_type data_type_;
+
+  // The mutex that protects the data
+  // As data is shared between the renderer and the application threads, we
+  // need locking.
+  mutex_type mutex_;
+
+  // Pointer to the data
+  void* data_;
 };
 
 } // end namespace Utils

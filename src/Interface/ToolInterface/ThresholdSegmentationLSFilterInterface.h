@@ -39,32 +39,31 @@
 #include <Interface/AppInterface/ToolWidget.h>
 #include <Interface/ToolInterface/CustomWidgets/SliderSpinComboInt.h>
 
+namespace Seg3D
+{
 
-namespace Seg3D {
-  
 class ThresholdSegmentationLSFilterInterfacePrivate;
 
-class ThresholdSegmentationLSFilterInterface : public ToolWidget {
-  Q_OBJECT
+class ThresholdSegmentationLSFilterInterface : public ToolWidget
+{
+Q_OBJECT
 
-    
-  public:
-    ThresholdSegmentationLSFilterInterface();
-    virtual ~ThresholdSegmentationLSFilterInterface();
-    virtual bool build_widget(QFrame* frame);
-    
-    
-  private:
-    ThresholdSegmentationLSFilterInterfacePrivate* private_;
-    SliderSpinComboInt *iterationsAdjuster;
-    SliderSpinComboInt *upperThresholdAdjuster;
-    SliderSpinComboInt *lowerThresholdAdjuster;
-    SliderSpinComboInt *curvatureAdjuster;
-    SliderSpinComboInt *edgeAdjuster;
-    SliderSpinComboInt *propagationAdjuster;
-    
-  };
-  
+public:
+  ThresholdSegmentationLSFilterInterface();
+  virtual ~ThresholdSegmentationLSFilterInterface();
+  virtual bool build_widget( QFrame* frame );
+
+private:
+  ThresholdSegmentationLSFilterInterfacePrivate* private_;
+  SliderSpinComboInt *iterationsAdjuster;
+  SliderSpinComboInt *upperThresholdAdjuster;
+  SliderSpinComboInt *lowerThresholdAdjuster;
+  SliderSpinComboInt *curvatureAdjuster;
+  SliderSpinComboInt *edgeAdjuster;
+  SliderSpinComboInt *propagationAdjuster;
+
+};
+
 } // namespace Seg3D
 
 #endif

@@ -24,7 +24,7 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
-*/
+ */
 
 #ifndef MEASUREMENTDOCKWIDGET_H
 #define MEASUREMENTDOCKWIDGET_H
@@ -41,24 +41,26 @@
 #include <boost/thread/thread.hpp>
 #include <boost/shared_ptr.hpp>
 
-namespace Seg3D {
-  
+namespace Seg3D
+{
+
 class MeasurementDockWidgetPrivate;
 
-class MeasurementDockWidget : public QDockWidget {
+class MeasurementDockWidget : public QDockWidget
+{
 
-    Q_OBJECT
+Q_OBJECT
 
 public:
-    MeasurementDockWidget(QWidget *parent = 0);
-    ~MeasurementDockWidget();
+  MeasurementDockWidget( QWidget *parent = 0 );
+  ~MeasurementDockWidget();
 
 private:
-  
-  boost::shared_ptr<MeasurementDockWidgetPrivate> private_;
-   
+
+  boost::shared_ptr< MeasurementDockWidgetPrivate > private_;
+
 };
-  
+
 } // end namespace
 
 #endif // MEASUREMENTDOCKWIDGET_H

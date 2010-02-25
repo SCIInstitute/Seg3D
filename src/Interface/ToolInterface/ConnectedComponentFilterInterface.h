@@ -38,26 +38,26 @@
 // Base class of the tool widget
 #include <Interface/AppInterface/ToolWidget.h>
 
+namespace Seg3D
+{
 
-namespace Seg3D {
-  
-  class ConnectedComponentFilterInterfacePrivate;
-  
-  class ConnectedComponentFilterInterface : public ToolWidget {
-    Q_OBJECT
+class ConnectedComponentFilterInterfacePrivate;
 
-    
-  public:
-    ConnectedComponentFilterInterface();
-    virtual ~ConnectedComponentFilterInterface();
-    virtual bool build_widget(QFrame* frame);
+class ConnectedComponentFilterInterface : public ToolWidget
+{
+Q_OBJECT
 
-  private:
-    ConnectedComponentFilterInterfacePrivate* private_;
-    void makeConnections();
+public:
+  ConnectedComponentFilterInterface();
+  virtual ~ConnectedComponentFilterInterface();
+  virtual bool build_widget( QFrame* frame );
 
-  };
-  
+private:
+  ConnectedComponentFilterInterfacePrivate* private_;
+  void makeConnections();
+
+};
+
 } // namespace Seg3D
 
 #endif

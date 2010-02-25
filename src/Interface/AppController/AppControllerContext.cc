@@ -30,10 +30,11 @@
 
 #include <Interface/AppController/AppControllerContext.h>
 
-namespace Seg3D {
+namespace Seg3D
+{
 
-AppControllerContext::AppControllerContext(AppController* controller) :
-  controller_(controller)
+AppControllerContext::AppControllerContext( AppController* controller ) :
+  controller_( controller )
 {
 }
 
@@ -41,40 +42,34 @@ AppControllerContext::~AppControllerContext()
 {
 }
 
-void
-AppControllerContext::report_error(const std::string& error)
+void AppControllerContext::report_error( const std::string& error )
 {
-  AppController::PostActionMessage(controller_,error);
+  AppController::PostActionMessage( controller_, error );
 }
 
-void
-AppControllerContext::report_warning(const std::string& warning)
+void AppControllerContext::report_warning( const std::string& warning )
 {
-  AppController::PostActionMessage(controller_,warning);
+  AppController::PostActionMessage( controller_, warning );
 }
 
-void
-AppControllerContext::report_message(const std::string& message)
+void AppControllerContext::report_message( const std::string& message )
 {
-  AppController::PostActionMessage(controller_,message);
+  AppController::PostActionMessage( controller_, message );
 }
 
-void
-AppControllerContext::report_need_resource(const ResourceLockHandle& resource)
+void AppControllerContext::report_need_resource( const ResourceLockHandle& resource )
 {
-  std::string message = std::string("Resource '")+resource->name()+
-      std::string("' is currently unavailable");
-  AppController::PostActionMessage(controller_,message);
+  std::string message = std::string( "Resource '" ) + resource->name() + std::string(
+      "' is currently unavailable" );
+  AppController::PostActionMessage( controller_, message );
 }
 
-void
-AppControllerContext::report_done()
+void AppControllerContext::report_done()
 {
-  if (is_success()) AppController::PostActionMessage(controller_,"");
+  if ( is_success() ) AppController::PostActionMessage( controller_, "" );
 }
 
-ActionSource
-AppControllerContext::source() const
+ActionSource AppControllerContext::source() const
 {
   return ACTION_SOURCE_COMMANDLINE_E;
 }

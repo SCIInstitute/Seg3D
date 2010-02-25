@@ -41,26 +41,27 @@
 #include <Application/Action/Actions.h>
 #include <Application/Action/ActionHistory.h>
 
-namespace Seg3D {
+namespace Seg3D
+{
 
 class AppControllerActionHistory : public QAbstractTableModel
 {
 public:
-    AppControllerActionHistory(QObject* parent = 0);
-    
-    virtual ~AppControllerActionHistory();
-    
-    int rowCount(const QModelIndex &index) const;
-    int columnCount(const QModelIndex &index) const;
-    
-    QVariant data(const QModelIndex& index, int role) const;
-    QVariant headerData(int section, Qt::Orientation orientation, int role) const;
-    
-    void updateHistory();
-  
+  AppControllerActionHistory( QObject* parent = 0 );
+
+  virtual ~AppControllerActionHistory();
+
+  int rowCount( const QModelIndex &index ) const;
+  int columnCount( const QModelIndex &index ) const;
+
+  QVariant data( const QModelIndex& index, int role ) const;
+  QVariant headerData( int section, Qt::Orientation orientation, int role ) const;
+
+  void updateHistory();
+
 private:
-    // Short cut to where the history is stored
-    ActionHistory* history_;
+  // Short cut to where the history is stored
+  ActionHistory* history_;
 };
 
 } // end namespace Seg3D

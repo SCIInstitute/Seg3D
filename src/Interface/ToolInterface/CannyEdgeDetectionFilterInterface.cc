@@ -24,7 +24,7 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
-*/
+ */
 
 //Interface Includes
 #include <Interface/QtInterface/QtBridge.h>
@@ -36,59 +36,60 @@
 //Application Includes
 #include <Application/Tools/CannyEdgeDetectionFilter.h>
 
+namespace Seg3D
+{
 
-namespace Seg3D {
-  
 SCI_REGISTER_TOOLINTERFACE(CannyEdgeDetectionFilterInterface)
 
-
-class CannyEdgeDetectionFilterInterfacePrivate {
+class CannyEdgeDetectionFilterInterfacePrivate
+{
 public:
   Ui::CannyEdgeDetectionFilterInterface ui_;
 };
-  
-  // constructor
-  CannyEdgeDetectionFilterInterface::CannyEdgeDetectionFilterInterface() :
-  private_(new CannyEdgeDetectionFilterInterfacePrivate)
-  { }
-  
-  // destructor
-  CannyEdgeDetectionFilterInterface::~CannyEdgeDetectionFilterInterface()
-  { }
-  
-  // build the interface and connect it to the state manager
-  bool
-  CannyEdgeDetectionFilterInterface::build_widget(QFrame* frame)
-  {
-    //Step 1 - build the Qt GUI Widget
-    private_->ui_.setupUi(frame);
-    
-      //Add the SliderSpinCombos
-      varianceAdjuster = new SliderSpinComboDouble();
-      private_->ui_.varianceHLayout_bottom->addWidget(varianceAdjuster);
-      
-      errorAdjuster = new SliderSpinComboDouble();
-      private_->ui_.errorHLayout_bottom->addWidget(errorAdjuster);
-      
-      thresholdAdjuster = new SliderSpinComboDouble();
-      private_->ui_.thresholdHLayout_bottom->addWidget(thresholdAdjuster);
-    
-    //Step 2 - get a pointer to the tool
-    ToolHandle base_tool_ = tool();
-    CannyEdgeDetectionFilter* tool = dynamic_cast<CannyEdgeDetectionFilter*>(base_tool_.get());
-    
-    //Step 3 - connect the gui to the tool through the QtBridge
-    QtBridge::connect(private_->ui_.targetComboBox, tool->target_layer_state_);
-    QtBridge::connect(varianceAdjuster, tool->variance_state_);
-    QtBridge::connect(errorAdjuster, tool->max_error_state_);
-    QtBridge::connect(thresholdAdjuster, tool->threshold_state_);
-    QtBridge::connect(private_->ui_.replaceCheckBox, tool->replace_state_);
 
-    //Send a message to the log that we have finised with building the Detection Filter Interface
-    SCI_LOG_DEBUG("Finished building a Canny Edge Detection Filter Interface");
-   
-    return (true);
-  } 
-  
+// constructor
+CannyEdgeDetectionFilterInterface::CannyEdgeDetectionFilterInterface() :
+  private_( new CannyEdgeDetectionFilterInterfacePrivate )
+{
+}
+
+// destructor
+CannyEdgeDetectionFilterInterface::~CannyEdgeDetectionFilterInterface()
+{
+}
+
+// build the interface and connect it to the state manager
+bool CannyEdgeDetectionFilterInterface::build_widget( QFrame* frame )
+{
+  //Step 1 - build the Qt GUI Widget
+  private_->ui_.setupUi( frame );
+
+  //Add the SliderSpinCombos
+  varianceAdjuster = new SliderSpinComboDouble();
+  private_->ui_.varianceHLayout_bottom->addWidget( varianceAdjuster );
+
+  errorAdjuster = new SliderSpinComboDouble();
+  private_->ui_.errorHLayout_bottom->addWidget( errorAdjuster );
+
+  thresholdAdjuster = new SliderSpinComboDouble();
+  private_->ui_.thresholdHLayout_bottom->addWidget( thresholdAdjuster );
+
+  //Step 2 - get a pointer to the tool
+  ToolHandle base_tool_ = tool();
+  CannyEdgeDetectionFilter* tool = dynamic_cast< CannyEdgeDetectionFilter* > ( base_tool_.get() );
+
+  //Step 3 - connect the gui to the tool through the QtBridge
+  QtBridge::connect( private_->ui_.targetComboBox, tool->target_layer_state_ );
+  QtBridge::connect( varianceAdjuster, tool->variance_state_ );
+  QtBridge::connect( errorAdjuster, tool->max_error_state_ );
+  QtBridge::connect( thresholdAdjuster, tool->threshold_state_ );
+  QtBridge::connect( private_->ui_.replaceCheckBox, tool->replace_state_ );
+
+  //Send a message to the log that we have finised with building the Detection Filter Interface
+  SCI_LOG_DEBUG("Finished building a Canny Edge Detection Filter Interface");
+
+  return ( true );
+}
+
 } // namespace Seg3D
 

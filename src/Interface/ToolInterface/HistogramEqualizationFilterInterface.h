@@ -39,27 +39,28 @@
 #include <Interface/AppInterface/ToolWidget.h>
 #include <Interface/ToolInterface/CustomWidgets/SliderSpinComboInt.h>
 
+namespace Seg3D
+{
 
-namespace Seg3D {
-  
 class HistogramEqualizationFilterInterfacePrivate;
 
-class HistogramEqualizationFilterInterface : public ToolWidget {
-  Q_OBJECT
-     
-  public:
-    HistogramEqualizationFilterInterface();
-    virtual ~HistogramEqualizationFilterInterface();
-    virtual bool build_widget(QFrame* frame);
+class HistogramEqualizationFilterInterface : public ToolWidget
+{
+Q_OBJECT
 
-  private:
-    HistogramEqualizationFilterInterfacePrivate* private_;
-    SliderSpinComboInt *upperThresholdAdjuster;
-    SliderSpinComboInt *lowerThresholdAdjuster;
-    SliderSpinComboInt *alphaAdjuster;
-   
-  };
-  
+public:
+  HistogramEqualizationFilterInterface();
+  virtual ~HistogramEqualizationFilterInterface();
+  virtual bool build_widget( QFrame* frame );
+
+private:
+  HistogramEqualizationFilterInterfacePrivate* private_;
+  SliderSpinComboInt *upperThresholdAdjuster;
+  SliderSpinComboInt *lowerThresholdAdjuster;
+  SliderSpinComboInt *alphaAdjuster;
+
+};
+
 } // end namespace Seg3D
 
 #endif

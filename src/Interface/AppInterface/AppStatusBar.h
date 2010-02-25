@@ -45,78 +45,54 @@
 #include <Interface/AppInterface/HistoryWidget.h>
 //#include <Application/Action/ActionDispatcher.h>
 
-namespace Seg3D {
-  
+namespace Seg3D
+{
+
 class AppStatusBar : public QObject
 {
-    Q_OBJECT
-    
-    // -- constructor / destructor --    
-  public:
-    AppStatusBar(QMainWindow* parent = 0);
-    virtual ~AppStatusBar();
-    
-    
-  public Q_SLOTS:
-    void set_coordinates_label( int y, int x, int z );
-    void set_coordinates_mode( bool is_local_ );
-    void set_status_report_label( std::string& report );
-    void activate_history(bool is_active_);
-    
-    
-    // -- build status bar widgets -- //    
-  private:
-    void build_coordinates_label();
-    void build_status_report_label();
-    void build_buttons();
-    
-    // -- status bar components -- //
-  private:
-    QLabel* coordinates_label_;
-    QLabel* status_report_label_;
-    QToolButton* world_button_;
-    QToolButton* info_button_;
-  
-    HistoryWidget* history_widget_;
-    int coordinates_mode_;
-    QIcon world_icon_;
-    QIcon text_icon_;
-  
-  private Q_SLOTS:
-    void fix_icon_status();
-  
+Q_OBJECT
 
-    
-  public:
-    typedef QPointer<AppStatusBar> qpointer_type;
-    
-    static void UpdateStatusBar( qpointer_type statusbar, int message_type, std::string message );
-  
-    
-    
-    
-    
+// -- constructor / destructor --
+public:
+  AppStatusBar( QMainWindow* parent = 0 );
+  virtual ~AppStatusBar();
+
+public Q_SLOTS:
+  void set_coordinates_label( int y, int x, int z );
+  void set_coordinates_mode( bool is_local_ );
+  void set_status_report_label( std::string& report );
+  void activate_history( bool is_active_ );
+
+  // -- build status bar widgets -- //
+private:
+  void build_coordinates_label();
+  void build_status_report_label();
+  void build_buttons();
+
+  // -- status bar components -- //
+private:
+  QLabel* coordinates_label_;
+  QLabel* status_report_label_;
+  QToolButton* world_button_;
+  QToolButton* info_button_;
+
+  HistoryWidget* history_widget_;
+  int coordinates_mode_;
+  QIcon world_icon_;
+  QIcon text_icon_;
+
+private Q_SLOTS:
+void fix_icon_status();
+
+public:
+  typedef QPointer< AppStatusBar > qpointer_type;
+
+  static void UpdateStatusBar( qpointer_type statusbar, int message_type, std::string message );
+
 };
 
 } // end namespace Seg3D
 
 
 #endif //INTERFACE_APPINTERFACE_APPSTATUSBAR_H
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

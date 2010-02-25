@@ -29,47 +29,43 @@
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/GradientMagnitudeFilter.h>
 
+namespace Seg3D
+{
 
-namespace Seg3D {
-  
-  // Register the tool into the tool factory
-  SCI_REGISTER_TOOL(GradientMagnitudeFilter)
-  
-  
-  GradientMagnitudeFilter::GradientMagnitudeFilter(const std::string& toolid) :
-  Tool(toolid)
-  {
-    // Need to set ranges and default values for all parameters
-    add_state("target",target_layer_state_,"<none>","<none>");
-    add_state("replace",replace_state_,false);
+// Register the tool into the tool factory
+SCI_REGISTER_TOOL(GradientMagnitudeFilter)
 
-    // Add constaints, so that when the state changes the right ranges of 
-    // parameters are selected
-    target_layer_state_->value_changed_signal_.connect(
-      boost::bind(&GradientMagnitudeFilter::target_constraint,this,_1));
-    
-  }
-  
-  void
-  GradientMagnitudeFilter::target_constraint(std::string layerid)
-  {
-  }
-  
-  GradientMagnitudeFilter::~GradientMagnitudeFilter()
-  {
-    disconnect_all();
-  }
-  
-  void
-  GradientMagnitudeFilter::activate()
-  {
-  }
-  
-  void
-  GradientMagnitudeFilter::deactivate()
-  {
-  }
-  
+GradientMagnitudeFilter::GradientMagnitudeFilter( const std::string& toolid ) :
+  Tool( toolid )
+{
+  // Need to set ranges and default values for all parameters
+  add_state( "target", target_layer_state_, "<none>", "<none>" );
+  add_state( "replace", replace_state_, false );
+
+  // Add constaints, so that when the state changes the right ranges of
+  // parameters are selected
+  target_layer_state_->value_changed_signal_.connect( boost::bind(
+      &GradientMagnitudeFilter::target_constraint, this, _1 ) );
+
+}
+
+void GradientMagnitudeFilter::target_constraint( std::string layerid )
+{
+}
+
+GradientMagnitudeFilter::~GradientMagnitudeFilter()
+{
+  disconnect_all();
+}
+
+void GradientMagnitudeFilter::activate()
+{
+}
+
+void GradientMagnitudeFilter::deactivate()
+{
+}
+
 } // end namespace Seg3D
 
 

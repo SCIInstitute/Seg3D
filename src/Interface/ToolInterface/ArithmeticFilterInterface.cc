@@ -24,7 +24,7 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
-*/
+ */
 
 //Interface Includes
 #include <Interface/QtInterface/QtBridge.h>
@@ -36,46 +36,49 @@
 //Application Includes
 #include <Application/Tools/ArithmeticFilter.h>
 
-namespace Seg3D {
-  
-  SCI_REGISTER_TOOLINTERFACE(ArithmeticFilterInterface)
+namespace Seg3D
+{
 
-class ArithmeticFilterInterfacePrivate {
+SCI_REGISTER_TOOLINTERFACE(ArithmeticFilterInterface)
+
+class ArithmeticFilterInterfacePrivate
+{
 public:
   Ui::ArithmeticFilterInterface ui_;
 };
 
-  // constructor
-  ArithmeticFilterInterface::ArithmeticFilterInterface() :
-  private_(new ArithmeticFilterInterfacePrivate)
-  { }
+// constructor
+ArithmeticFilterInterface::ArithmeticFilterInterface() :
+  private_( new ArithmeticFilterInterfacePrivate )
+{
+}
 
-  // destructor
-  ArithmeticFilterInterface::~ArithmeticFilterInterface()
-  { }
+// destructor
+ArithmeticFilterInterface::~ArithmeticFilterInterface()
+{
+}
 
-  // build the interface and connect it to the state manager
-  bool
-  ArithmeticFilterInterface::build_widget(QFrame* frame)
-  {
-    //Step 1 - build the Qt GUI Widget
-    private_->ui_.setupUi(frame);
+// build the interface and connect it to the state manager
+bool ArithmeticFilterInterface::build_widget( QFrame* frame )
+{
+  //Step 1 - build the Qt GUI Widget
+  private_->ui_.setupUi( frame );
 
-    //Step 2 - get a pointer to the tool
-    ToolHandle base_tool_ = tool();
-    ArithmeticFilter* tool = dynamic_cast<ArithmeticFilter*>(base_tool_.get());
-    
-    //Step 3 - connect the gui to the tool through the QtBridge
-    QtBridge::connect(private_->ui_.volumeAComboBox, tool->volume_a_state_);
-    QtBridge::connect(private_->ui_.volumeBComboBox, tool->volume_b_state_);
-    QtBridge::connect(private_->ui_.volumeCComboBox, tool->volume_c_state_);
-    QtBridge::connect(private_->ui_.exampleExpComboBox, tool->example_expressions_state_);
-    QtBridge::connect(private_->ui_.replaceCheckBox,tool->replace_state_);
+  //Step 2 - get a pointer to the tool
+  ToolHandle base_tool_ = tool();
+  ArithmeticFilter* tool = dynamic_cast< ArithmeticFilter* > ( base_tool_.get() );
 
-    //Send a message to the log that we have finised with building the Arithmetic Filter
-    SCI_LOG_DEBUG("Finished building an Arithmetic Filter Interface");
-    
-    return (true);
-  } // end build_widget
+  //Step 3 - connect the gui to the tool through the QtBridge
+  QtBridge::connect( private_->ui_.volumeAComboBox, tool->volume_a_state_ );
+  QtBridge::connect( private_->ui_.volumeBComboBox, tool->volume_b_state_ );
+  QtBridge::connect( private_->ui_.volumeCComboBox, tool->volume_c_state_ );
+  QtBridge::connect( private_->ui_.exampleExpComboBox, tool->example_expressions_state_ );
+  QtBridge::connect( private_->ui_.replaceCheckBox, tool->replace_state_ );
+
+  //Send a message to the log that we have finised with building the Arithmetic Filter
+  SCI_LOG_DEBUG("Finished building an Arithmetic Filter Interface");
+
+  return ( true );
+} // end build_widget
 
 } //end seg3d

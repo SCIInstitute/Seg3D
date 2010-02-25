@@ -41,38 +41,39 @@
 // Include interface code
 #include <Interface/AppController/AppController.h>
 
-namespace Seg3D {
-
+namespace Seg3D
+{
 
 class AppControllerContext;
-typedef boost::shared_ptr<AppControllerContext> AppControllerContextHandle;
+typedef boost::shared_ptr< AppControllerContext > AppControllerContextHandle;
 
-class AppControllerContext : public ActionContext {
+class AppControllerContext : public ActionContext
+{
 
   // -- Constructor/destructor --
 public:
-    AppControllerContext(AppController* controller);
-    virtual ~AppControllerContext();
-  
+  AppControllerContext( AppController* controller );
+  virtual ~AppControllerContext();
+
   // -- Reporting functions --
 public:
-    virtual void report_error(const std::string& error);
-    virtual void report_warning(const std::string& warning);
-    virtual void report_message(const std::string& message);
-    virtual void report_need_resource(const ResourceLockHandle& resource);
-  
+  virtual void report_error( const std::string& error );
+  virtual void report_warning( const std::string& warning );
+  virtual void report_message( const std::string& message );
+  virtual void report_need_resource( const ResourceLockHandle& resource );
+
   // -- Report that action was done --
 public:
-    virtual void report_done();
-    
+  virtual void report_done();
+
   // -- Source/Status information --
 public:
-    virtual ActionSource source() const;
-  
+  virtual ActionSource source() const;
+
 private:
-    // To which controller does the action information need to be relayed
-    AppController::qpointer_type controller_;
-  
+  // To which controller does the action information need to be relayed
+  AppController::qpointer_type controller_;
+
 };
 
 } //end namespace Seg3D

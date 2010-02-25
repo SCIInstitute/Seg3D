@@ -3,21 +3,23 @@
 
 #include <QWidget>
 
-namespace Ui {
-    class CannyEdgeDetectionFilterInterface;
+namespace Ui
+{
+class CannyEdgeDetectionFilterInterface;
 }
 
-class CannyEdgeDetectionFilterInterface : public QWidget {
-    Q_OBJECT
+class CannyEdgeDetectionFilterInterface : public QWidget
+{
+Q_OBJECT
 public:
-    CannyEdgeDetectionFilterInterface(QWidget *parent = 0);
-    ~CannyEdgeDetectionFilterInterface();
+  CannyEdgeDetectionFilterInterface( QWidget *parent = 0 );
+  ~CannyEdgeDetectionFilterInterface();
 
 protected:
-    void changeEvent(QEvent *e);
+  void changeEvent( QEvent *e );
 
 private:
-    Ui::CannyEdgeDetectionFilterInterface *ui;
+  Ui::CannyEdgeDetectionFilterInterface *ui;
 };
 
 #endif // CANNYEDGEDETECTIONFILTERINTERFACE_H

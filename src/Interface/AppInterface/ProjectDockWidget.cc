@@ -30,26 +30,26 @@
 
 #include <Utils/Core/Log.h>
 
-
 #include <Interface/AppInterface/ProjectDockWidget.h>
 #include "ui_ProjectDockWidget.h"
 
-namespace Seg3D  {
-  
-  class ProjectDockWidgetPrivate {
-  public:
-
-    Ui::ProjectDockWidget ui_;
-    
-  };
-
-
-ProjectDockWidget::ProjectDockWidget(QWidget *parent) :
-    QDockWidget(parent),
-    private_(new ProjectDockWidgetPrivate)
+namespace Seg3D
 {
-  if(private_){
-    private_->ui_.setupUi(this);
+
+class ProjectDockWidgetPrivate
+{
+public:
+
+  Ui::ProjectDockWidget ui_;
+
+};
+
+ProjectDockWidget::ProjectDockWidget( QWidget *parent ) :
+  QDockWidget( parent ), private_( new ProjectDockWidgetPrivate )
+{
+  if ( private_ )
+  {
+    private_->ui_.setupUi( this );
   }
 }
 
@@ -58,6 +58,4 @@ ProjectDockWidget::~ProjectDockWidget()
 
 }
 
-
-  
 } // end namespace

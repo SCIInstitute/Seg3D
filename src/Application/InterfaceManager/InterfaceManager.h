@@ -1,30 +1,30 @@
 /*
-   For more information, please see: http://software.sci.utah.edu
+ For more information, please see: http://software.sci.utah.edu
 
-   The MIT License
+ The MIT License
 
-   Copyright (c) 2009 Scientific Computing and Imaging Institute,
-   University of Utah.
+ Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ University of Utah.
 
-   
-   Permission is hereby granted, free of charge, to any person obtaining a
-   copy of this software and associated documentation files (the "Software"),
-   to deal in the Software without restriction, including without limitation
-   the rights to use, copy, modify, merge, publish, distribute, sublicense,
-   and/or sell copies of the Software, and to permit persons to whom the
-   Software is furnished to do so, subject to the following conditions:
 
-   The above copyright notice and this permission notice shall be included
-   in all copies or substantial portions of the Software.
+ Permission is hereby granted, free of charge, to any person obtaining a
+ copy of this software and associated documentation files (the "Software"),
+ to deal in the Software without restriction, including without limitation
+ the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ and/or sell copies of the Software, and to permit persons to whom the
+ Software is furnished to do so, subject to the following conditions:
 
-   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-   OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-   THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-   DEALINGS IN THE SOFTWARE.
-*/
+ The above copyright notice and this permission notice shall be included
+ in all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+ OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ DEALINGS IN THE SOFTWARE.
+ */
 
 #ifndef APPLICATION_INTERFACEMANAGER_INTERFACEMANAGER_H
 #define APPLICATION_INTERFACEMANAGER_INTERFACEMANAGER_H
@@ -50,7 +50,8 @@
 // Application includes
 #include <Application/State/StateHandler.h>
 
-namespace Seg3D {
+namespace Seg3D
+{
 
 // CLASS INTERFACEMANAGER
 // This class manages the layout of the application
@@ -59,55 +60,59 @@ namespace Seg3D {
 class InterfaceManager;
 
 // Class Definition
-class InterfaceManager : public StateHandler {
+class InterfaceManager : public StateHandler
+{
 
-// -- constructor/destructor --
-  private:
-    friend class Utils::Singleton<InterfaceManager>;
-    InterfaceManager();
-  
-  public:
-    virtual ~InterfaceManager();
+  // -- constructor/destructor --
+private:
+  friend class Utils::Singleton< InterfaceManager >;
+  InterfaceManager();
 
-// -- state variables of interface --
-  public:
-    // Whether the view is in full screen mode
-    StateBoolHandle full_screen_state_;
+public:
+  virtual ~InterfaceManager();
 
-// -- Signals --
-  public:
-    typedef boost::signals2::signal<void (std::string)> window_signal_type;
-    
-    // OPEN_WINDOW_SIGNAL:
-    // This signal is triggered after a window needs to be opened
-    window_signal_type show_window_signal_;
-    
-    // CLOSE_WINDOW_SIGNAL:
-    // This signal is triggered after a window needs to be closed
-    window_signal_type close_window_signal_;
+  // -- state variables of interface --
+public:
+  // Whether the view is in full screen mode
+  StateBoolHandle full_screen_state_;
 
-// -- Access to toollist --
-  public:
-    typedef std::set<std::string> windowid_list_type;
-  
-    // ADD_WINDOWID:
-    // Mark a windowid as available
-    void add_windowid(const std::string& windowid); // << THREAD-SAFE
-    
-    // IS_WINDOWIS:
-    // Check whether window id is valid
-    bool is_windowid(const std::string& windowid); // << THREAD-SAFE
-  
-  private:
-    boost::mutex       windowid_list_mutex_;
-    windowid_list_type windowid_list_;
-    
-// -- Singleton interface --
-  public:
-    static InterfaceManager* Instance() { return instance_.instance(); }
+  // -- Signals --
+public:
+  typedef boost::signals2::signal< void( std::string ) > window_signal_type;
 
-  private:
-    static Utils::Singleton<InterfaceManager> instance_;
+  // OPEN_WINDOW_SIGNAL:
+  // This signal is triggered after a window needs to be opened
+  window_signal_type show_window_signal_;
+
+  // CLOSE_WINDOW_SIGNAL:
+  // This signal is triggered after a window needs to be closed
+  window_signal_type close_window_signal_;
+
+  // -- Access to toollist --
+public:
+  typedef std::set< std::string > windowid_list_type;
+
+  // ADD_WINDOWID:
+  // Mark a windowid as available
+  void add_windowid( const std::string& windowid ); // << THREAD-SAFE
+
+  // IS_WINDOWIS:
+  // Check whether window id is valid
+  bool is_windowid( const std::string& windowid ); // << THREAD-SAFE
+
+private:
+  boost::mutex windowid_list_mutex_;
+  windowid_list_type windowid_list_;
+
+  // -- Singleton interface --
+public:
+  static InterfaceManager* Instance()
+  {
+    return instance_.instance();
+  }
+
+private:
+  static Utils::Singleton< InterfaceManager > instance_;
 };
 
 } // namespace Seg3D

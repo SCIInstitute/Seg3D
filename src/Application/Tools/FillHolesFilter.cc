@@ -29,42 +29,39 @@
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/FillHolesFilter.h>
 
+namespace Seg3D
+{
 
-namespace Seg3D {
-  
-  // Register the tool into the tool factory
-  SCI_REGISTER_TOOL(FillHolesFilter)
-  
-  
-  FillHolesFilter::FillHolesFilter(const std::string& toolid) :
-  Tool(toolid)
-  {
-    // Need to set ranges and default values for all parameters
-    add_state("target",target_layer_state_,"<none>","<none>");
-    
-    // Add constaints, so that when the state changes the right ranges of 
-    // parameters are selected
-    target_layer_state_->value_changed_signal_.connect(boost::bind(&FillHolesFilter::target_constraint,this,_1));
-  }
-  
-  void
-  FillHolesFilter::target_constraint(std::string layerid)
-  {
-  }
-  
-  FillHolesFilter::~FillHolesFilter()
-  {
-    disconnect_all();
-  }
-  
-  void
-  FillHolesFilter::activate()
-  {
-  }
-  
-  void
-  FillHolesFilter::deactivate()
-  {
-  }
-  
+// Register the tool into the tool factory
+SCI_REGISTER_TOOL(FillHolesFilter)
+
+FillHolesFilter::FillHolesFilter( const std::string& toolid ) :
+  Tool( toolid )
+{
+  // Need to set ranges and default values for all parameters
+  add_state( "target", target_layer_state_, "<none>", "<none>" );
+
+  // Add constaints, so that when the state changes the right ranges of
+  // parameters are selected
+  target_layer_state_->value_changed_signal_.connect( boost::bind(
+      &FillHolesFilter::target_constraint, this, _1 ) );
+}
+
+void FillHolesFilter::target_constraint( std::string layerid )
+{
+}
+
+FillHolesFilter::~FillHolesFilter()
+{
+  disconnect_all();
+}
+
+void FillHolesFilter::activate()
+{
+}
+
+void FillHolesFilter::deactivate()
+{
+}
+
 } // end namespace Seg3D

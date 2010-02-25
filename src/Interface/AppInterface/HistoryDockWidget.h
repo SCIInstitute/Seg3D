@@ -24,7 +24,7 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
-*/
+ */
 
 #ifndef INTERFACE_APPINTERFACE_HISTORYDOCKWIDGET_H
 #define INTERFACE_APPINTERFACE_HISTORYDOCKWIDGET_H
@@ -40,25 +40,25 @@
 #include <boost/thread/thread.hpp>
 #include <boost/shared_ptr.hpp>
 
-namespace Seg3D {
+namespace Seg3D
+{
 
 class HistoryDockWidgetPrivate;
 
-class HistoryDockWidget : public QDockWidget 
-{   
-  Q_OBJECT
+class HistoryDockWidget : public QDockWidget
+{
+Q_OBJECT
 
-  public:
-    HistoryDockWidget(QWidget *parent = 0);
-    virtual ~HistoryDockWidget();
+public:
+  HistoryDockWidget( QWidget *parent = 0 );
+  virtual ~HistoryDockWidget();
 
+private:
+  // Internals of the dockwidget
+  boost::shared_ptr< HistoryDockWidgetPrivate > private_;
 
-  private:
-    // Internals of the dockwidget
-    boost::shared_ptr<HistoryDockWidgetPrivate> private_;
-  
 };
-  
+
 } // end namespace
 
 #endif // HISTORYDOCKWIDGET_H

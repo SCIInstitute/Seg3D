@@ -40,68 +40,66 @@
 // boost includes
 #include <boost/smart_ptr.hpp>
 
-
-
-
-namespace Seg3D {
+namespace Seg3D
+{
 
 class LayerManagerWidgetPrivate;
 typedef boost::shared_ptr< LayerManagerWidgetPrivate > LayerManagerWidgetPrivateHandle_type;
 
 class LayerManagerWidget : public QScrollArea
-{   
+{
   // Needed to make it a Qt object
-  Q_OBJECT
+Q_OBJECT
 
-  //constructor - destructor
-  public:
-    LayerManagerWidget( QWidget *parent = 0 );
-    virtual ~LayerManagerWidget();
-    
+//constructor - destructor
+public:
+  LayerManagerWidget( QWidget *parent = 0 );
+  virtual ~LayerManagerWidget();
 
-  private Q_SLOTS:
-    void hide_show_resample( bool hideshow );
-    void hide_show_roi( bool hideshow );
+private Q_SLOTS:
+  void hide_show_resample( bool hideshow );
+  void hide_show_roi( bool hideshow );
   void hide_show_transform( bool hideshow );
   void hide_show_flip_rotate( bool hideshow );
-    void hide_show_layers( bool hideshow );
-    
-    void hide_show_brightness_contrast_bar( bool hideshow );
-    void hide_show_color_choose_bar( bool hideshow );
+  void hide_show_layers( bool hideshow );
+
+  void hide_show_brightness_contrast_bar( bool hideshow );
+  void hide_show_color_choose_bar( bool hideshow );
   void hide_show_opacity_bar( bool hideshow );
   void hide_show_border_bar( bool hideshow );
   void lock_unlock_layer( bool lockunlock );
   void show_progress_bar_bar();
   void hide_progress_bar_bar();
-    void color_button_clicked();
+  void color_button_clicked();
 
-  public:
-    void new_group( const QString &dimensions );
-    void new_layer( int type, const QString &label, const QString &dimensions );
-    
-    // enum for layer types
-    enum 
-    {
-        DATA_LAYER_E,
-        MASK_LAYER_E,
-        LABEL_LAYER_E
-    };
+public:
+  void new_group( const QString &dimensions );
+  void new_layer( int type, const QString &label, const QString &dimensions );
 
-  private:
-    // private Qt GUI Components for the LayerManagerWidget
-    QWidget*     main_;
-    QVBoxLayout* main_layout_;
-    QVBoxLayout* group_layout_;
-    int number_of_groups_;
+  // enum for layer types
+  enum
+  {
+    DATA_LAYER_E = 1, MASK_LAYER_E = 2, LABEL_LAYER_E = 3
+  };
 
-    LayerManagerWidgetPrivateHandle_type private_;
+private:
+  // private Qt GUI Components for the LayerManagerWidget
+  QWidget* main_;
+  QVBoxLayout* main_layout_;
+  QVBoxLayout* group_layout_;
+  //    int number_of_groups_;
 
-  private:
-    bool validate_new_group( const QString &dimensions );
+  QIcon data_layer_icon_;
+  QIcon label_layer_icon_;
+
+  LayerManagerWidgetPrivateHandle_type private_;
+
+private:
+  bool validate_new_group( const QString &dimensions );
   void turn_off_or_on_checkboxes( const QString &dimensions, const bool &hideshow );
-     
+
 };
 
-}  //endnamespace Seg3d
+} //endnamespace Seg3d
 
 #endif

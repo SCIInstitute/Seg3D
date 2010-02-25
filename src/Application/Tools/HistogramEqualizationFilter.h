@@ -1,4 +1,3 @@
-
 /*
  For more information, please see: http://software.sci.utah.edu
  
@@ -32,40 +31,42 @@
 
 #include <Application/Tool/Tool.h>
 
-namespace Seg3D  {
-  
-class HistogramEqualizationFilter : public Tool {
-  SCI_TOOL_TYPE( "HistogramEqualizationFilter", "Histogram Equalization", "",
-                 Tool::DATATODATA_E|Tool::FILTER_E, 
-                 "http://seg3d.org/")
-  
+namespace Seg3D
+{
+
+class HistogramEqualizationFilter : public Tool
+{
+SCI_TOOL_TYPE( "HistogramEqualizationFilter", "Histogram Equalization", "",
+  Tool::DATATODATA_E|Tool::FILTER_E,
+  "http://seg3d.org/")
+
 public:
-  HistogramEqualizationFilter(const std::string& toolid);
+  HistogramEqualizationFilter( const std::string& toolid );
   virtual ~HistogramEqualizationFilter();
-  
+
   // -- constraint parameters --
-  
+
   // Constrain viewer to right painting tool when layer is selected
-  void target_constraint(std::string layerid);
-  
+  void target_constraint( std::string layerid );
+
   // -- activate/deactivate tool --
-  
+
   virtual void activate();
   virtual void deactivate();
-  
+
   // -- state --
 public:
   // Layerid of the target layer
-  StateOptionHandle              target_layer_state_;
+  StateOptionHandle target_layer_state_;
 
-  StateRangedIntHandle            upper_threshold_state_;
+  StateRangedIntHandle upper_threshold_state_;
 
-  StateRangedIntHandle            lower_threshold_state_;
+  StateRangedIntHandle lower_threshold_state_;
 
-  StateRangedIntHandle            alpha_state_;
+  StateRangedIntHandle alpha_state_;
 
-  StateBoolHandle                 replace_state_;
-  
+  StateBoolHandle replace_state_;
+
 };
 
 } // end namespace

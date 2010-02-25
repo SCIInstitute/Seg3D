@@ -40,25 +40,25 @@
 #include <boost/thread/thread.hpp>
 #include <boost/shared_ptr.hpp>
 
-namespace Seg3D {
-  
-  class HistoryWidgetPrivate;
-  
-  class HistoryWidget : public QWidget 
-  {   
-    Q_OBJECT
-    
-  public:
-    HistoryWidget(QWidget *parent = 0);
-    virtual ~HistoryWidget();
-    
-    
-  private:
-    // Internals of the dockwidget
-    boost::shared_ptr<HistoryWidgetPrivate> private_;
-    
-  };
-  
+namespace Seg3D
+{
+
+class HistoryWidgetPrivate;
+
+class HistoryWidget : public QWidget
+{
+Q_OBJECT
+
+public:
+  HistoryWidget( QWidget *parent = 0 );
+  virtual ~HistoryWidget();
+
+private:
+  // Internals of the dockwidget
+  boost::shared_ptr< HistoryWidgetPrivate > private_;
+
+};
+
 } // end namespace
 
 #endif // HISTORYWIDGET_H

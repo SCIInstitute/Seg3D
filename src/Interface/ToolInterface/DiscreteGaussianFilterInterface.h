@@ -40,23 +40,25 @@
 
 #include <Interface/ToolInterface/CustomWidgets/SliderSpinComboInt.h>
 
-namespace Seg3D {
-  
+namespace Seg3D
+{
+
 class DiscreteGaussianFilterInterfacePrivate;
 
-class DiscreteGaussianFilterInterface : public ToolWidget {
-  Q_OBJECT
+class DiscreteGaussianFilterInterface : public ToolWidget
+{
+Q_OBJECT
 
-  public:
-    DiscreteGaussianFilterInterface();
-    virtual ~DiscreteGaussianFilterInterface();
-    virtual bool build_widget(QFrame* frame);
-    
-  private:
-    DiscreteGaussianFilterInterfacePrivate* private_;
-    SliderSpinComboInt *varianceAdjuster;
-    SliderSpinComboInt *kernelWidthAdjuster;
-  
+public:
+  DiscreteGaussianFilterInterface();
+  virtual ~DiscreteGaussianFilterInterface();
+  virtual bool build_widget( QFrame* frame );
+
+private:
+  DiscreteGaussianFilterInterfacePrivate* private_;
+  SliderSpinComboInt *varianceAdjuster;
+  SliderSpinComboInt *kernelWidthAdjuster;
+
 };
 
 } // end namespace Seg3D

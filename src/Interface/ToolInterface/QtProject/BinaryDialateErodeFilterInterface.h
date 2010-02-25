@@ -3,21 +3,23 @@
 
 #include <QWidget>
 
-namespace Ui {
-    class BinaryDialateErodeFilterInterface;
+namespace Ui
+{
+class BinaryDialateErodeFilterInterface;
 }
 
-class BinaryDialateErodeFilterInterface : public QWidget {
-    Q_OBJECT
+class BinaryDialateErodeFilterInterface : public QWidget
+{
+Q_OBJECT
 public:
-    BinaryDialateErodeFilterInterface(QWidget *parent = 0);
-    ~BinaryDialateErodeFilterInterface();
+  BinaryDialateErodeFilterInterface( QWidget *parent = 0 );
+  ~BinaryDialateErodeFilterInterface();
 
 protected:
-    void changeEvent(QEvent *e);
+  void changeEvent( QEvent *e );
 
 private:
-    Ui::BinaryDialateErodeFilterInterface *ui;
+  Ui::BinaryDialateErodeFilterInterface *ui;
 };
 
 #endif // BINARYDIALATEERODEFILTERINTERFACE_H

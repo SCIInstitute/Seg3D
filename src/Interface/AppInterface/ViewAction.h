@@ -36,42 +36,33 @@
 #include <QtGui>
 #include <QAction>
 
+namespace Seg3D
+{
 
-
-namespace Seg3D {
-  
 class ViewAction : public QObject
-{    
-  Q_OBJECT
-    
-  Q_SIGNALS:
-    void triggered(int,int);
+{
+Q_OBJECT
 
-    
-  
-  public:
-    ViewAction(QAction *parent, int column1, int column2);
-    ViewAction(QAction *parent, bool true_or_false);
-    virtual ~ViewAction();
-    
-  public Q_SLOTS:
-    void slot();
-    void slot(bool);
-    
-  private:
-    int col1_;
-    int col2_;
-    bool state_;
-    
-    
+Q_SIGNALS:
+void triggered(int,int);
+
+public:
+  ViewAction( QAction *parent, int column1, int column2 );
+  ViewAction( QAction *parent, bool true_or_false );
+  virtual ~ViewAction();
+
+public Q_SLOTS:
+  void slot();
+  void slot( bool );
+
+private:
+  int col1_;
+  int col2_;
+  bool state_;
+
 };
-
-
 
 } // end namespace Seg3D
 
 #endif
-
-
-
 

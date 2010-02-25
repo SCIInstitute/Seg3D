@@ -31,43 +31,44 @@
 
 #include <Application/Tool/Tool.h>
 
-namespace Seg3D  {
-  
-class ArithmeticFilter : public Tool {
-  SCI_TOOL_TYPE( "ArithmeticFilter", "Arithmetic", "",
-                 Tool::DATATODATA_E|Tool::FILTER_E, 
-                 "http://seg3d.org/")
-  
+namespace Seg3D
+{
+
+class ArithmeticFilter : public Tool
+{
+SCI_TOOL_TYPE( "ArithmeticFilter", "Arithmetic", "",
+  Tool::DATATODATA_E|Tool::FILTER_E,
+  "http://seg3d.org/")
+
 public:
-  ArithmeticFilter(const std::string& toolid);
+  ArithmeticFilter( const std::string& toolid );
   virtual ~ArithmeticFilter();
-  
+
   // -- constraint parameters --
-  
+
   // Constrain viewer to right painting tool when layer is selected
-  void target_constraint(std::string layerid);
-  
+  void target_constraint( std::string layerid );
+
   // -- activate/deactivate tool --
-  
+
   virtual void activate();
   virtual void deactivate();
-  
+
   // -- state --
 public:
   // Layerid of the target layer
-  StateOptionHandle               volume_a_state_;
-  
-  StateOptionHandle               volume_b_state_;
-  
-  StateOptionHandle               volume_c_state_;
-  
-  StateOptionHandle               example_expressions_state_;
-  
-  StateBoolHandle                 replace_state_;
+  StateOptionHandle volume_a_state_;
 
+  StateOptionHandle volume_b_state_;
+
+  StateOptionHandle volume_c_state_;
+
+  StateOptionHandle example_expressions_state_;
+
+  StateBoolHandle replace_state_;
 
 };
-  
+
 } // end namespace
 
 #endif

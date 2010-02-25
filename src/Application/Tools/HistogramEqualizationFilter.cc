@@ -29,50 +29,46 @@
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/HistogramEqualizationFilter.h>
 
+namespace Seg3D
+{
 
-namespace Seg3D {
-  
-  // Register the tool into the tool factory
-  SCI_REGISTER_TOOL(HistogramEqualizationFilter)
-  
-  
-  HistogramEqualizationFilter::HistogramEqualizationFilter(const std::string& toolid) :
-  Tool(toolid)
-  {
-    // Need to set ranges and default values for all parameters
-    add_state("target",target_layer_state_,"<none>","<none>");
-    add_state("upper_threshold",upper_threshold_state_,1,100,1,2);
-    add_state("lower_threshold",lower_threshold_state_,1,100,1,2);
-    add_state("alpha",alpha_state_,1,100,1,2);
-    add_state("replace",replace_state_,false);
+// Register the tool into the tool factory
+SCI_REGISTER_TOOL(HistogramEqualizationFilter)
 
-    // Add constaints, so that when the state changes the right ranges of 
-    // parameters are selected
-    target_layer_state_->value_changed_signal_.connect(
-      boost::bind(&HistogramEqualizationFilter::target_constraint,this,_1));
-   
-  }
-  
-  void
-  HistogramEqualizationFilter::target_constraint(std::string layerid)
-  {
-  }
-  
-  HistogramEqualizationFilter::~HistogramEqualizationFilter()
-  {
-    disconnect_all();
-  }
-  
-  void
-  HistogramEqualizationFilter::activate()
-  {
-  }
-  
-  void
-  HistogramEqualizationFilter::deactivate()
-  {
-  }
-  
+HistogramEqualizationFilter::HistogramEqualizationFilter( const std::string& toolid ) :
+  Tool( toolid )
+{
+  // Need to set ranges and default values for all parameters
+  add_state( "target", target_layer_state_, "<none>", "<none>" );
+  add_state( "upper_threshold", upper_threshold_state_, 1, 100, 1, 2 );
+  add_state( "lower_threshold", lower_threshold_state_, 1, 100, 1, 2 );
+  add_state( "alpha", alpha_state_, 1, 100, 1, 2 );
+  add_state( "replace", replace_state_, false );
+
+  // Add constaints, so that when the state changes the right ranges of
+  // parameters are selected
+  target_layer_state_->value_changed_signal_.connect( boost::bind(
+      &HistogramEqualizationFilter::target_constraint, this, _1 ) );
+
+}
+
+void HistogramEqualizationFilter::target_constraint( std::string layerid )
+{
+}
+
+HistogramEqualizationFilter::~HistogramEqualizationFilter()
+{
+  disconnect_all();
+}
+
+void HistogramEqualizationFilter::activate()
+{
+}
+
+void HistogramEqualizationFilter::deactivate()
+{
+}
+
 } // end namespace Seg3D
 
 

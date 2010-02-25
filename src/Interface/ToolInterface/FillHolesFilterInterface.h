@@ -38,24 +38,25 @@
 // Base class of the tool widget
 #include <Interface/AppInterface/ToolWidget.h>
 
+namespace Seg3D
+{
 
-namespace Seg3D {
-  
 class FillHolesFilterInterfacePrivate;
 
-class FillHolesFilterInterface : public ToolWidget {
-  Q_OBJECT
-         
-  public:
-    FillHolesFilterInterface();
-    virtual ~FillHolesFilterInterface();
-    virtual bool build_widget(QFrame* frame);
+class FillHolesFilterInterface : public ToolWidget
+{
+Q_OBJECT
 
-  private:
-    FillHolesFilterInterfacePrivate* private_;   
+public:
+  FillHolesFilterInterface();
+  virtual ~FillHolesFilterInterface();
+  virtual bool build_widget( QFrame* frame );
+
+private:
+  FillHolesFilterInterfacePrivate* private_;
 
 };
-  
+
 } // end namespace Seg3D
 
 #endif

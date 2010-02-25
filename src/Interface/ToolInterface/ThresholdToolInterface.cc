@@ -24,7 +24,7 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
-*/
+ */
 
 //Interface Includes
 #include <Interface/QtInterface/QtBridge.h>
@@ -36,51 +36,53 @@
 //Application Includes
 #include <Application/Tools/ThresholdTool.h>
 
-namespace Seg3D {
-  
+namespace Seg3D
+{
+
 SCI_REGISTER_TOOLINTERFACE(ThresholdToolInterface)
 
-class ThresholdToolInterfacePrivate {
-  public:
-    Ui::ThresholdToolInterface ui_;
+class ThresholdToolInterfacePrivate
+{
+public:
+  Ui::ThresholdToolInterface ui_;
 };
 
-  // constructor
-  ThresholdToolInterface::ThresholdToolInterface() :
-    private_(new ThresholdToolInterfacePrivate)
-  { }
+// constructor
+ThresholdToolInterface::ThresholdToolInterface() :
+  private_( new ThresholdToolInterfacePrivate )
+{
+}
 
-  // destructor
-  ThresholdToolInterface::~ThresholdToolInterface()
-  { }
+// destructor
+ThresholdToolInterface::~ThresholdToolInterface()
+{
+}
 
-  
-  // build the interface and connect it to the state manager
-  bool
-  ThresholdToolInterface::build_widget(QFrame* frame)
-  {
-    //Step 1 - build the Qt GUI Widget
-    private_->ui_.setupUi(frame);
+// build the interface and connect it to the state manager
+bool ThresholdToolInterface::build_widget( QFrame* frame )
+{
+  //Step 1 - build the Qt GUI Widget
+  private_->ui_.setupUi( frame );
 
-      upperThresholdAdjuster = new SliderSpinComboDouble();
-      private_->ui_.upperHLayout_bottom->addWidget(upperThresholdAdjuster);
-      
-      lowerThresholdAdjuster = new SliderSpinComboDouble();
-      private_->ui_.lowerHLayout_bottom->addWidget(lowerThresholdAdjuster);
+  upperThresholdAdjuster = new SliderSpinComboDouble();
+  private_->ui_.upperHLayout_bottom->addWidget( upperThresholdAdjuster );
 
-    //Step 2 - get a pointer to the tool
-    ToolHandle base_tool_ = tool();
-    ThresholdTool* tool = dynamic_cast<ThresholdTool*>(base_tool_.get());
+  lowerThresholdAdjuster = new SliderSpinComboDouble();
+  private_->ui_.lowerHLayout_bottom->addWidget( lowerThresholdAdjuster );
 
-    //Step 3 - connect the gui to the tool through the QtBridge
-    QtBridge::connect(private_->ui_.targetComboBox, tool->target_layer_state_);
-    QtBridge::connect(upperThresholdAdjuster, tool->upper_threshold_state_);
-    QtBridge::connect(lowerThresholdAdjuster, tool->lower_threshold_state_);
+  //Step 2 - get a pointer to the tool
+  ToolHandle base_tool_ = tool();
+  ThresholdTool* tool = dynamic_cast< ThresholdTool* > ( base_tool_.get() );
 
-    //Send a message to the log that we have finised with building the Threshold Tool Interface   
-    SCI_LOG_DEBUG("Finished building a Threshold Tool Interface"); 
+  //Step 3 - connect the gui to the tool through the QtBridge
+  QtBridge::connect( private_->ui_.targetComboBox, tool->target_layer_state_ );
+  QtBridge::connect( upperThresholdAdjuster, tool->upper_threshold_state_ );
+  QtBridge::connect( lowerThresholdAdjuster, tool->lower_threshold_state_ );
 
-    return (true);
-  } // end build_widget
+  //Send a message to the log that we have finised with building the Threshold Tool Interface
+  SCI_LOG_DEBUG("Finished building a Threshold Tool Interface");
 
-}  // end namespace Seg3D
+  return ( true );
+} // end build_widget
+
+} // end namespace Seg3D

@@ -43,32 +43,33 @@
 // Utils includes
 #include <Utils/Core/Log.h>
 
-namespace Seg3D {
-  
-  class AppControllerLogHistory : public QAbstractTableModel
-  {
-  public:
-    AppControllerLogHistory( size_t log_size, QObject* parent= 0 );
-    
-    virtual ~AppControllerLogHistory();
-    
-    int rowCount( const QModelIndex &index ) const;
-    int columnCount( const QModelIndex &index ) const;
-    
-    QVariant data( const QModelIndex& index, int role ) const;
-    QVariant headerData( int section, Qt::Orientation orientation, int role ) const;
-    
-    void add_log_entry( int message_type,std::string& message );
-    
-  private:
-    // Classes needed for storing the recent log history
-    typedef std::pair<int,std::string>      log_entry_type;
-    typedef std::deque<log_entry_type>      log_history_type;
-    
-    log_history_type  log_history_;
-    size_t            log_history_size_;
-  };
-  
+namespace Seg3D
+{
+
+class AppControllerLogHistory : public QAbstractTableModel
+{
+public:
+  AppControllerLogHistory( size_t log_size, QObject* parent = 0 );
+
+  virtual ~AppControllerLogHistory();
+
+  int rowCount( const QModelIndex &index ) const;
+  int columnCount( const QModelIndex &index ) const;
+
+  QVariant data( const QModelIndex& index, int role ) const;
+  QVariant headerData( int section, Qt::Orientation orientation, int role ) const;
+
+  void add_log_entry( int message_type, std::string& message );
+
+private:
+  // Classes needed for storing the recent log history
+  typedef std::pair< int, std::string > log_entry_type;
+  typedef std::deque< log_entry_type > log_history_type;
+
+  log_history_type log_history_;
+  size_t log_history_size_;
+};
+
 } // end namespace Seg3D
 
 #endif

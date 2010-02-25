@@ -36,48 +36,51 @@
 //Application Includes
 #include <Application/Tools/InvertTool.h>
 
-namespace Seg3D {
-  
+namespace Seg3D
+{
+
 SCI_REGISTER_TOOLINTERFACE(InvertToolInterface)
 
-class InvertToolInterfacePrivate {
-  public:
-    Ui::InvertToolInterface ui_;
+class InvertToolInterfacePrivate
+{
+public:
+  Ui::InvertToolInterface ui_;
 };
-  
-  // constructor
-  InvertToolInterface::InvertToolInterface() :
-  private_(new InvertToolInterfacePrivate)
-  { }
 
-  // destructor
-  InvertToolInterface::~InvertToolInterface()
-  { }
-  
-  // build the interface and connect it to the state manager
-  bool
-  InvertToolInterface::build_widget(QFrame* frame)
-  {
-    //Step 1 - build the Qt GUI Widget
-    private_->ui_.setupUi(frame);
-   
-    //Step 2 - get a pointer to the tool
-    ToolHandle base_tool_ = tool();
-    InvertTool* tool = dynamic_cast<InvertTool*>(base_tool_.get());
-    
-    //Step 3 - connect the gui to the tool through the QtBridge
-    QtBridge::connect(private_->ui_.replaceCheckBox,tool->replace_state_);
-    QtBridge::connect(private_->ui_.targetComboBox, tool->target_layer_state_);
+// constructor
+InvertToolInterface::InvertToolInterface() :
+  private_( new InvertToolInterfacePrivate )
+{
+}
 
-    //TEST CODE
-    private_->ui_.targetComboBox->addItem(QString::fromUtf8("firstitem"));
-    private_->ui_.targetComboBox->addItem(QString::fromUtf8("seconditem"));
-    private_->ui_.targetComboBox->addItem(QString::fromUtf8("thirditem"));
+// destructor
+InvertToolInterface::~InvertToolInterface()
+{
+}
 
-    //Send a message to the log that we have finised with building the Invert Tool Interface
-    SCI_LOG_MESSAGE("Finished building an Invert Tool Interface");
-    
-    return (true);
-  } // end build_widget
+// build the interface and connect it to the state manager
+bool InvertToolInterface::build_widget( QFrame* frame )
+{
+  //Step 1 - build the Qt GUI Widget
+  private_->ui_.setupUi( frame );
+
+  //Step 2 - get a pointer to the tool
+  ToolHandle base_tool_ = tool();
+  InvertTool* tool = dynamic_cast< InvertTool* > ( base_tool_.get() );
+
+  //Step 3 - connect the gui to the tool through the QtBridge
+  QtBridge::connect( private_->ui_.replaceCheckBox, tool->replace_state_ );
+  QtBridge::connect( private_->ui_.targetComboBox, tool->target_layer_state_ );
+
+  //TEST CODE
+  private_->ui_.targetComboBox->addItem( QString::fromUtf8( "firstitem" ) );
+  private_->ui_.targetComboBox->addItem( QString::fromUtf8( "seconditem" ) );
+  private_->ui_.targetComboBox->addItem( QString::fromUtf8( "thirditem" ) );
+
+  //Send a message to the log that we have finised with building the Invert Tool Interface
+  SCI_LOG_MESSAGE("Finished building an Invert Tool Interface");
+
+  return ( true );
+} // end build_widget
 
 } // end namespace Seg3D

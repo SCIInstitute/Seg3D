@@ -41,28 +41,29 @@
 // Qt Gui Includes
 #include <Interface/ToolInterface/CustomWidgets/SliderSpinComboDouble.h>
 
-namespace Seg3D {
-  
+namespace Seg3D
+{
+
 class ThresholdToolInterfacePrivate;
 
-class ThresholdToolInterface : public ToolWidget {
-  Q_OBJECT
+class ThresholdToolInterface : public ToolWidget
+{
+Q_OBJECT
 
 // Constructor/destructor  
-  public:
-    ThresholdToolInterface();
-    virtual ~ThresholdToolInterface();
-    virtual bool build_widget(QFrame* frame);
-    
-  private:
-    ThresholdToolInterfacePrivate* private_;
-    SliderSpinComboDouble *upperThresholdAdjuster;
-    SliderSpinComboDouble *lowerThresholdAdjuster;
-    
-};
-    
-} // end namespace Seg3D
+public:
+  ThresholdToolInterface();
+  virtual ~ThresholdToolInterface();
+  virtual bool build_widget( QFrame* frame );
 
+private:
+  ThresholdToolInterfacePrivate* private_;
+  SliderSpinComboDouble *upperThresholdAdjuster;
+  SliderSpinComboDouble *lowerThresholdAdjuster;
+
+};
+
+} // end namespace Seg3D
 
 
 #endif

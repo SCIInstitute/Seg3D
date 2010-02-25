@@ -30,50 +30,47 @@
 #include <Utils/Core/Log.h>
 #include <boost/lexical_cast.hpp>
 
-namespace Seg3D {
-  
-  LayerWidget::LayerWidget() :
-  main_frame_(0)
-  {
-  }
-  
-  LayerWidget::~LayerWidget()
-  {
-  }
-  
-  
-  bool
-  LayerWidget::create_widget(QWidget* parent, LayerHandle& layer)
-  {
-    
-    
-    // Setup the parent widget: this one will be used for memory management of
-    // this widget class
-    setParent(parent);
-    
-    // Add the handle of the underlying tool to the widget
-    // set_layer(layer);
-    
-    // Generate a vertical layout for the tool widget
-    QHBoxLayout* vbox = new QHBoxLayout;
-    
-    // Ensure it has some tight spacing  
-    vbox->setSpacing(0);
-    vbox->setContentsMargins(0,0,0,0);
-    setLayout(vbox);
-    
-    main_frame_ = new QFrame;  
-    main_frame_->setStyleSheet(QString::fromUtf8("QFrame#main_frame_{ background-color: blue; }"));
-    
-    //main_frame_->resize(1, 1);
-    vbox->addWidget(main_frame_);
-    vbox->addStretch();
-    
-    
-    //std::string h = boost::lexical_cast<std::string>(&main_frame_);
-    
-    return ( build_widget(main_frame_));
-  }
-  
+namespace Seg3D
+{
+
+LayerWidget::LayerWidget() :
+  main_frame_( 0 )
+{
+}
+
+LayerWidget::~LayerWidget()
+{
+}
+
+bool LayerWidget::create_widget( QWidget* parent, LayerHandle& layer )
+{
+
+  // Setup the parent widget: this one will be used for memory management of
+  // this widget class
+  setParent( parent );
+
+  // Add the handle of the underlying tool to the widget
+  // set_layer(layer);
+
+  // Generate a vertical layout for the tool widget
+  QHBoxLayout* vbox = new QHBoxLayout;
+
+  // Ensure it has some tight spacing
+  vbox->setSpacing( 0 );
+  vbox->setContentsMargins( 0, 0, 0, 0 );
+  setLayout( vbox );
+
+  main_frame_ = new QFrame;
+  main_frame_->setStyleSheet( QString::fromUtf8( "QFrame#main_frame_{ background-color: blue; }" ) );
+
+  //main_frame_->resize(1, 1);
+  vbox->addWidget( main_frame_ );
+  vbox->addStretch();
+
+  //std::string h = boost::lexical_cast<std::string>(&main_frame_);
+
+  return ( build_widget( main_frame_ ) );
+}
+
 } //end namespace Seg3D
 

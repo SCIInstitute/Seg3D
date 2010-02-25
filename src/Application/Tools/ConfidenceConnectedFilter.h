@@ -31,39 +31,37 @@
 
 #include <Application/Tool/Tool.h>
 
-namespace Seg3D  {
-  
-class ConfidenceConnectedFilter : public Tool {
-  SCI_TOOL_TYPE( "ConfidenceConnectedFilter", "Confidence Connected", "",
-                 Tool::DATATOMASK_E|Tool::FILTER_E,
-                 "http://seg3d.org/")
-  
+namespace Seg3D
+{
+
+class ConfidenceConnectedFilter : public Tool
+{
+SCI_TOOL_TYPE( "ConfidenceConnectedFilter", "Confidence Connected", "",
+  Tool::DATATOMASK_E|Tool::FILTER_E,
+  "http://seg3d.org/")
+
 public:
-  ConfidenceConnectedFilter(const std::string& toolid);
+  ConfidenceConnectedFilter( const std::string& toolid );
   virtual ~ConfidenceConnectedFilter();
-  
+
   // -- constraint parameters --
-  
+
   // Constrain viewer to right painting tool when layer is selected
-  void target_constraint(std::string layerid);
-  
+  void target_constraint( std::string layerid );
+
   // -- activate/deactivate tool --
-  
+
   virtual void activate();
   virtual void deactivate();
-  
+
   // -- state --
 public:
-  
+
   // Layerid of the target layer
-  StateOptionHandle               target_layer_state_;
-  StateRangedIntHandle            iterations_state_;
-  StateRangedIntHandle            threshold_multiplier_state_;
-  
-  
-  
-  
-  
+  StateOptionHandle target_layer_state_;
+  StateRangedIntHandle iterations_state_;
+  StateRangedIntHandle threshold_multiplier_state_;
+
 };
 } // end namespace
 

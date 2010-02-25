@@ -39,23 +39,23 @@
 #include <Interface/AppInterface/ToolWidget.h>
 #include <Interface/ToolInterface/CustomWidgets/SliderSpinComboInt.h>
 
+namespace Seg3D
+{
 
-namespace Seg3D {
-  
 class MedianFilterInterfacePrivate;
 
-class MedianFilterInterface : public ToolWidget {
-  Q_OBJECT
+class MedianFilterInterface : public ToolWidget
+{
+Q_OBJECT
 
+public:
+  MedianFilterInterface();
+  virtual ~MedianFilterInterface();
+  virtual bool build_widget( QFrame* frame );
 
-  public:
-    MedianFilterInterface();
-    virtual ~MedianFilterInterface();
-    virtual bool build_widget(QFrame* frame);
-    
-  private:
-    MedianFilterInterfacePrivate* private_;
-    SliderSpinComboInt *radiusSizeAdjuster;
+private:
+  MedianFilterInterfacePrivate* private_;
+  SliderSpinComboInt *radiusSizeAdjuster;
 
 };
 

@@ -42,28 +42,28 @@
 #include <Interface/ToolInterface/CustomWidgets/SliderSpinComboInt.h>
 #include <Interface/ToolInterface/CustomWidgets/SliderSpinComboDouble.h>
 
-namespace Seg3D {
-  
+namespace Seg3D
+{
+
 class CannyEdgeDetectionFilterInterfacePrivate;
 
-class CannyEdgeDetectionFilterInterface : public ToolWidget {
-  Q_OBJECT
-    
-  public:
-    CannyEdgeDetectionFilterInterface();
-    virtual ~CannyEdgeDetectionFilterInterface();
-    virtual bool build_widget(QFrame* frame);
-    
-  private:
-    CannyEdgeDetectionFilterInterfacePrivate* private_;
-    SliderSpinComboDouble *varianceAdjuster;
-    SliderSpinComboDouble *errorAdjuster;
-    SliderSpinComboDouble *thresholdAdjuster;
-   
+class CannyEdgeDetectionFilterInterface : public ToolWidget
+{
+Q_OBJECT
+
+public:
+  CannyEdgeDetectionFilterInterface();
+  virtual ~CannyEdgeDetectionFilterInterface();
+  virtual bool build_widget( QFrame* frame );
+
+private:
+  CannyEdgeDetectionFilterInterfacePrivate* private_;
+  SliderSpinComboDouble *varianceAdjuster;
+  SliderSpinComboDouble *errorAdjuster;
+  SliderSpinComboDouble *thresholdAdjuster;
+
 };
-  
-  
-  
+
 } // namespace Seg3D
 
 #endif

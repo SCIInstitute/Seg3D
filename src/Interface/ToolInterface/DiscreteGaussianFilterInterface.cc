@@ -24,7 +24,7 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
-*/
+ */
 
 //Interface Includes
 #include <Interface/QtInterface/QtBridge.h>
@@ -36,52 +36,54 @@
 //Application Includes
 #include <Application/Tools/DiscreteGaussianFilter.h>
 
-namespace Seg3D {
-  
-  SCI_REGISTER_TOOLINTERFACE(DiscreteGaussianFilterInterface)
-  
-  
-class DiscreteGaussianFilterInterfacePrivate {
+namespace Seg3D
+{
+
+SCI_REGISTER_TOOLINTERFACE(DiscreteGaussianFilterInterface)
+
+class DiscreteGaussianFilterInterfacePrivate
+{
 public:
   Ui::DiscreteGaussianFilterInterface ui_;
 };
-  
-  // constructor
-  DiscreteGaussianFilterInterface::DiscreteGaussianFilterInterface() :
-  private_(new DiscreteGaussianFilterInterfacePrivate)
-  { }
 
-  // destructor
-  DiscreteGaussianFilterInterface::~DiscreteGaussianFilterInterface()
-  { }
-  
-  // build the interface and connect it to the state manager
-  bool
-  DiscreteGaussianFilterInterface::build_widget(QFrame* frame)
-  {
-    //Step 1 - build the Qt GUI Widget
-    private_->ui_.setupUi(frame);
-    
-      //Add the SliderSpinCombos
-      varianceAdjuster = new SliderSpinComboInt();
-      private_->ui_.varianceHLayout_bottom->addWidget(varianceAdjuster);
-      
-      kernelWidthAdjuster = new SliderSpinComboInt();
-      private_->ui_.kernelHLayout_bottom->addWidget(kernelWidthAdjuster);
-    
-    //Step 2 - get a pointer to the tool
-    ToolHandle base_tool_ = tool();
-    DiscreteGaussianFilter* tool = dynamic_cast<DiscreteGaussianFilter*>(base_tool_.get());
-    
-    //Step 3 - connect the gui to the tool through the QtBridge
-    QtBridge::connect(private_->ui_.targetComboBox, tool->target_layer_state_);
-    QtBridge::connect(varianceAdjuster, tool->variance_state_);
-    QtBridge::connect(kernelWidthAdjuster, tool->maximum_kernel_width_state_);
-    QtBridge::connect(private_->ui_.replaceCheckBox,tool->replace_state_);
-    
-    //Send a message to the log that we have finised with building the Discrete Gaussian Filter Interface
-    SCI_LOG_DEBUG("Finished building a Discrete Gaussian Filter Interface");
-    return (true);
-  } // end build_widget
-  
+// constructor
+DiscreteGaussianFilterInterface::DiscreteGaussianFilterInterface() :
+  private_( new DiscreteGaussianFilterInterfacePrivate )
+{
+}
+
+// destructor
+DiscreteGaussianFilterInterface::~DiscreteGaussianFilterInterface()
+{
+}
+
+// build the interface and connect it to the state manager
+bool DiscreteGaussianFilterInterface::build_widget( QFrame* frame )
+{
+  //Step 1 - build the Qt GUI Widget
+  private_->ui_.setupUi( frame );
+
+  //Add the SliderSpinCombos
+  varianceAdjuster = new SliderSpinComboInt();
+  private_->ui_.varianceHLayout_bottom->addWidget( varianceAdjuster );
+
+  kernelWidthAdjuster = new SliderSpinComboInt();
+  private_->ui_.kernelHLayout_bottom->addWidget( kernelWidthAdjuster );
+
+  //Step 2 - get a pointer to the tool
+  ToolHandle base_tool_ = tool();
+  DiscreteGaussianFilter* tool = dynamic_cast< DiscreteGaussianFilter* > ( base_tool_.get() );
+
+  //Step 3 - connect the gui to the tool through the QtBridge
+  QtBridge::connect( private_->ui_.targetComboBox, tool->target_layer_state_ );
+  QtBridge::connect( varianceAdjuster, tool->variance_state_ );
+  QtBridge::connect( kernelWidthAdjuster, tool->maximum_kernel_width_state_ );
+  QtBridge::connect( private_->ui_.replaceCheckBox, tool->replace_state_ );
+
+  //Send a message to the log that we have finised with building the Discrete Gaussian Filter Interface
+  SCI_LOG_DEBUG("Finished building a Discrete Gaussian Filter Interface");
+  return ( true );
+} // end build_widget
+
 } // end namespace Seg3D

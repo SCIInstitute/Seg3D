@@ -40,48 +40,50 @@
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QLabel>
 
-namespace Seg3D {
+namespace Seg3D
+{
 
 class SliderSpinCombo : public QWidget
 {
-    Q_OBJECT
+Q_OBJECT
 
-    Q_SIGNALS:
-        //void valueAdjusted(double);
-        void valueAdjusted(int);
+Q_SIGNALS:
+//void valueAdjusted(double);
+void valueAdjusted(int);
 
-    public:
-        SliderSpinCombo(QWidget *parent = 0);
-        SliderSpinCombo(QWidget *parent, double minRange, double maxRange, double startValue, double stepSize);
-        SliderSpinCombo(QWidget *parent, double minRange, double maxRange, double stepSize);
+public:
+  SliderSpinCombo( QWidget *parent = 0 );
+  SliderSpinCombo( QWidget *parent, double minRange, double maxRange, double startValue,
+      double stepSize );
+  SliderSpinCombo( QWidget *parent, double minRange, double maxRange, double stepSize );
 
-    virtual ~SliderSpinCombo();
+  virtual ~SliderSpinCombo();
 
-    public Q_SLOTS:
-        void setStep(double);
-        void setRanges(double, double);
-        void setCurrentValue(double);
+public Q_SLOTS:
+  void setStep(double);
+  void setRanges( double, double );
+  void setCurrentValue( double );
 
-    private:
-        QVBoxLayout *vLayout;
-        QHBoxLayout *hTopLayout;
-        QHBoxLayout *hBottomLayout;
+private:
+  QVBoxLayout *vLayout;
+  QHBoxLayout *hTopLayout;
+  QHBoxLayout *hBottomLayout;
 
-        QSpacerItem *spacer;
+  QSpacerItem *spacer;
 
-        QLabel *minValueLabel;
-        QLabel *maxValueLabel;
-        QString valueString;
+  QLabel *minValueLabel;
+  QLabel *maxValueLabel;
+  QString valueString;
 
-        QSlider *slider;
-        QDoubleSpinBox *spinner;
+  QSlider *slider;
+  QDoubleSpinBox *spinner;
 
-        void buildWidget();
-        void makeConnections();
+  void buildWidget();
+  void makeConnections();
 
-    private Q_SLOTS:
-        void setSliderValue(int);
-        void setSpinnerValue(double);
+private Q_SLOTS:
+  void setSliderValue(int);
+  void setSpinnerValue( double );
 };
 
 } // end namespace Seg3D

@@ -1,6 +1,6 @@
 /*
  For more information, please see: http://software.sci.utah.edu
-ArithmeticFilter 
+ ArithmeticFilter
  The MIT License
  
  Copyright (c) 2009 Scientific Computing and Imaging Institute,
@@ -29,56 +29,51 @@ ArithmeticFilter
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/ArithmeticFilter.h>
 
+namespace Seg3D
+{
 
-namespace Seg3D {
-  
-  // Register the tool into the tool factory
-  SCI_REGISTER_TOOL(ArithmeticFilter)
-  
-  // Constructor, set default values
-  ArithmeticFilter::ArithmeticFilter(const std::string& toolid) :
-  Tool(toolid)
-  {
-    // add default values for the the states
-    add_state("volume_a",volume_a_state_,"<none>","<none>");
-    add_state("volume_b",volume_b_state_,"<none>","<none>");
-    add_state("volume_c",volume_c_state_,"<none>","<none>");
-    add_state("example_expressions",example_expressions_state_,"<none>","<none>");
-    add_state("replace",replace_state_,false);
+// Register the tool into the tool factory
+SCI_REGISTER_TOOL(ArithmeticFilter)
 
-    // Add constaints, so that when the state changes the right ranges of 
-    // parameters are selected
-    volume_a_state_->value_changed_signal_.connect(boost::bind(&ArithmeticFilter::target_constraint,this,_1));
-    volume_b_state_->value_changed_signal_.connect(boost::bind(&ArithmeticFilter::target_constraint,this,_1));
-    volume_c_state_->value_changed_signal_.connect(boost::bind(&ArithmeticFilter::target_constraint,this,_1));
+// Constructor, set default values
+ArithmeticFilter::ArithmeticFilter( const std::string& toolid ) :
+  Tool( toolid )
+{
+  // add default values for the the states
+  add_state( "volume_a", volume_a_state_, "<none>", "<none>" );
+  add_state( "volume_b", volume_b_state_, "<none>", "<none>" );
+  add_state( "volume_c", volume_c_state_, "<none>", "<none>" );
+  add_state( "example_expressions", example_expressions_state_, "<none>", "<none>" );
+  add_state( "replace", replace_state_, false );
 
+  // Add constaints, so that when the state changes the right ranges of
+  // parameters are selected
+  volume_a_state_->value_changed_signal_.connect( boost::bind(
+      &ArithmeticFilter::target_constraint, this, _1 ) );
+  volume_b_state_->value_changed_signal_.connect( boost::bind(
+      &ArithmeticFilter::target_constraint, this, _1 ) );
+  volume_c_state_->value_changed_signal_.connect( boost::bind(
+      &ArithmeticFilter::target_constraint, this, _1 ) );
 
-  } // end constructor
-  
-  void
-  ArithmeticFilter::target_constraint(std::string layerid)
-  {
-  }
-  
-  ArithmeticFilter::~ArithmeticFilter()
-  {
-    disconnect_all();
-  }
-  
-  void
-  ArithmeticFilter::activate()
-  {
-  }
-  
-  void
-  ArithmeticFilter::deactivate()
-  {
-  }
-  
+} // end constructor
+
+void ArithmeticFilter::target_constraint( std::string layerid )
+{
+}
+
+ArithmeticFilter::~ArithmeticFilter()
+{
+  disconnect_all();
+}
+
+void ArithmeticFilter::activate()
+{
+}
+
+void ArithmeticFilter::deactivate()
+{
+}
+
 } // end namespace Seg3D
-
-
-
-
 
 

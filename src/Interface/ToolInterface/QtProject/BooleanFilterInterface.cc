@@ -1,26 +1,26 @@
 #include "BooleanFilterInterface.h"
 #include "ui_BooleanFilterInterface.h"
 
-BooleanFilterInterface::BooleanFilterInterface(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::BooleanFilterInterface)
+BooleanFilterInterface::BooleanFilterInterface( QWidget *parent ) :
+  QWidget( parent ), ui( new Ui::BooleanFilterInterface )
 {
-    ui->setupUi(this);
+  ui->setupUi( this );
 }
 
 BooleanFilterInterface::~BooleanFilterInterface()
 {
-    delete ui;
+  delete ui;
 }
 
-void BooleanFilterInterface::changeEvent(QEvent *e)
+void BooleanFilterInterface::changeEvent( QEvent *e )
 {
-    QWidget::changeEvent(e);
-    switch (e->type()) {
-    case QEvent::LanguageChange:
-        ui->retranslateUi(this);
-        break;
-    default:
-        break;
-    }
+  QWidget::changeEvent( e );
+  switch( e->type() )
+  {
+  case QEvent::LanguageChange:
+    ui->retranslateUi( this );
+    break;
+  default:
+    break;
+  }
 }

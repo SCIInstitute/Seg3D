@@ -42,26 +42,28 @@
 #include <Interface/ToolInterface/CustomWidgets/SliderSpinComboInt.h>
 #include <Interface/ToolInterface/CustomWidgets/SliderSpinComboDouble.h>
 
-namespace Seg3D {
-  
+namespace Seg3D
+{
+
 class AnisotropicDiffusionFilterInterfacePrivate;
 
-class AnisotropicDiffusionFilterInterface : public ToolWidget {
-  Q_OBJECT
+class AnisotropicDiffusionFilterInterface : public ToolWidget
+{
+Q_OBJECT
 
- // Constructor/destructor 
-  public:
-    AnisotropicDiffusionFilterInterface();
-    virtual ~AnisotropicDiffusionFilterInterface();
+// Constructor/destructor
+public:
+  AnisotropicDiffusionFilterInterface();
+  virtual ~AnisotropicDiffusionFilterInterface();
 
-    virtual bool build_widget(QFrame* frame);
-    
-  private:
-    AnisotropicDiffusionFilterInterfacePrivate* private_;
-    SliderSpinComboInt *iterationsAdjuster;
-    SliderSpinComboInt *stepAdjuster;
-    SliderSpinComboDouble *conductanceAdjuster;
-  
+  virtual bool build_widget( QFrame* frame );
+
+private:
+  AnisotropicDiffusionFilterInterfacePrivate* private_;
+  SliderSpinComboInt *iterationsAdjuster;
+  SliderSpinComboInt *stepAdjuster;
+  SliderSpinComboDouble *conductanceAdjuster;
+
 };
 
 } // namespace Seg3D

@@ -31,41 +31,43 @@
 
 #include <Application/Tool/Tool.h>
 
-namespace Seg3D  {
-  
-class CannyEdgeDetectionFilter : public Tool {
-  SCI_TOOL_TYPE( "CannyEdgeDetectionFilter", "Canny Edge Detection", "",
-                 Tool::DATATODATA_E|Tool::FILTER_E, 
-                 "http://seg3d.org/")
+namespace Seg3D
+{
+
+class CannyEdgeDetectionFilter : public Tool
+{
+SCI_TOOL_TYPE( "CannyEdgeDetectionFilter", "Canny Edge Detection", "",
+  Tool::DATATODATA_E|Tool::FILTER_E,
+  "http://seg3d.org/")
 public:
-  CannyEdgeDetectionFilter(const std::string& toolid);
+  CannyEdgeDetectionFilter( const std::string& toolid );
   virtual ~CannyEdgeDetectionFilter();
-  
+
   // -- constraint parameters --
-  
+
   // Constrain viewer to right painting tool when layer is selected
-  void target_constraint(std::string layerid);
-  
+  void target_constraint( std::string layerid );
+
   // -- activate/deactivate tool --
-  
+
   virtual void activate();
   virtual void deactivate();
-  
+
   // -- state --
 public:
   // Layerid of the target layer
-  StateOptionHandle               target_layer_state_;
-  
-  StateRangedDoubleHandle          variance_state_;
-  
-  StateRangedDoubleHandle          max_error_state_;
-  
-  StateRangedDoubleHandle          threshold_state_;
+  StateOptionHandle target_layer_state_;
 
-  StateBoolHandle                 replace_state_;
-  
+  StateRangedDoubleHandle variance_state_;
+
+  StateRangedDoubleHandle max_error_state_;
+
+  StateRangedDoubleHandle threshold_state_;
+
+  StateBoolHandle replace_state_;
+
 };
-  
+
 } // end namespace
 
 #endif

@@ -1,26 +1,26 @@
 #include "DiscreteGaussianFilterInterface.h"
 #include "ui_DiscreteGaussianFilterInterface.h"
 
-DiscreteGaussianFilterInterface::DiscreteGaussianFilterInterface(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::DiscreteGaussianFilterInterface)
+DiscreteGaussianFilterInterface::DiscreteGaussianFilterInterface( QWidget *parent ) :
+  QWidget( parent ), ui( new Ui::DiscreteGaussianFilterInterface )
 {
-    ui->setupUi(this);
+  ui->setupUi( this );
 }
 
 DiscreteGaussianFilterInterface::~DiscreteGaussianFilterInterface()
 {
-    delete ui;
+  delete ui;
 }
 
-void DiscreteGaussianFilterInterface::changeEvent(QEvent *e)
+void DiscreteGaussianFilterInterface::changeEvent( QEvent *e )
 {
-    QWidget::changeEvent(e);
-    switch (e->type()) {
-    case QEvent::LanguageChange:
-        ui->retranslateUi(this);
-        break;
-    default:
-        break;
-    }
+  QWidget::changeEvent( e );
+  switch( e->type() )
+  {
+  case QEvent::LanguageChange:
+    ui->retranslateUi( this );
+    break;
+  default:
+    break;
+  }
 }

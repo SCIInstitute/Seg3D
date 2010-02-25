@@ -28,85 +28,85 @@
 
 #include <Interface/AppController/AppControllerActionHistory.h>
 
-namespace Seg3D {
-  
-  AppControllerActionHistory::AppControllerActionHistory( QObject* parent ) :
-  QAbstractTableModel( parent ),
-  history_( ActionHistory::Instance() )
+namespace Seg3D
+{
+
+AppControllerActionHistory::AppControllerActionHistory( QObject* parent ) :
+  QAbstractTableModel( parent ), history_( ActionHistory::Instance() )
+{
+}
+
+AppControllerActionHistory::~AppControllerActionHistory()
+{
+}
+
+int AppControllerActionHistory::rowCount( const QModelIndex& /*index*/) const
+{
+  return ( static_cast< int > ( history_->history_size() ) );
+}
+
+int AppControllerActionHistory::columnCount( const QModelIndex& /*index*/) const
+{
+  return ( 2 );
+}
+
+QVariant AppControllerActionHistory::data( const QModelIndex& index, int role ) const
+{
+  if ( !index.isValid() ) return QVariant();
+
+  if ( role == Qt::TextAlignmentRole )
   {
+    return int( Qt::AlignLeft | Qt::AlignVCenter );
   }
-  
-  AppControllerActionHistory::~AppControllerActionHistory()
+  else if ( role == Qt::DisplayRole )
   {
-  }
-  
-  int AppControllerActionHistory::rowCount( const QModelIndex& /*index*/ ) const
-  {
-    return (static_cast<int>(history_->history_size()));
-  }
-  
-  int AppControllerActionHistory::columnCount( const QModelIndex& /*index*/ ) const
-  {
-    return ( 2 );
-  }
-  
-  QVariant AppControllerActionHistory::data( const QModelIndex& index, int role ) const
-  {
-    if( !index.isValid() ) return QVariant();
-    
-    if( role == Qt::TextAlignmentRole )
+    int sz = static_cast< int > ( history_->history_size() );
+    if ( index.row() < sz )
     {
-      return int( Qt::AlignLeft|Qt::AlignVCenter );
-    }
-    else if( role == Qt::DisplayRole )
-    {
-      int sz = static_cast<int>( history_->history_size() );
-      if( index.row() < sz )
+      if ( index.column() == 0 )
       {
-        if( index.column() == 0) 
-        {
-          ActionHandle action = history_->action( sz-index.row()-1 );
-          if( action.get() == 0 ) return QString( "" );
-          return QString::fromStdString( action->export_to_string() );
-        }
-        else
-        {
-          ActionResultHandle result = history_->result( sz-index.row()-1 );
-          if( result.get() == 0 ) return QString( "" );
-          return QString::fromStdString( result->export_to_string() );      
-        }
+        ActionHandle action = history_->action( sz - index.row() - 1 );
+        if ( action.get() == 0 ) return QString( "" );
+        return QString::fromStdString( action->export_to_string() );
       }
       else
       {
-        return QVariant();
+        ActionResultHandle result = history_->result( sz - index.row() - 1 );
+        if ( result.get() == 0 ) return QString( "" );
+        return QString::fromStdString( result->export_to_string() );
       }
-    }
-    else if( role == Qt::SizeHintRole )
-    {
-      if( index.column() == 0 ) return QSize( 200, 12 );
-      else return QSize( 100, 12 );
     }
     else
     {
       return QVariant();
     }
   }
-  
-  QVariant AppControllerActionHistory::headerData( int section, Qt::Orientation orientation, int role ) const
+  else if ( role == Qt::SizeHintRole )
   {
-    if( role != Qt::DisplayRole || orientation == Qt::Vertical )
-    {
-      return QVariant();
-    }
-    
-    if( section == 0 ) return QString( "Action" );
-    if( section == 1 ) return QString( "Result" );
-    else return QVariant();
+    if ( index.column() == 0 ) return QSize( 200, 12 );
+    else return QSize( 100, 12 );
   }
-  
-  void AppControllerActionHistory::updateHistory() 
-  { 
-    reset(); 
+  else
+  {
+    return QVariant();
   }
-  
+}
+
+QVariant AppControllerActionHistory::headerData( int section, Qt::Orientation orientation, int role ) const
+{
+  if ( role != Qt::DisplayRole || orientation == Qt::Vertical )
+  {
+    return QVariant();
+  }
+
+  if ( section == 0 ) return QString( "Action" );
+  if ( section == 1 ) return QString( "Result" );
+  else return QVariant();
+}
+
+void AppControllerActionHistory::updateHistory()
+{
+  reset();
+}
+
 } // end namespace Seg3D

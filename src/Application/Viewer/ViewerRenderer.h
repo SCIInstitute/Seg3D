@@ -1,30 +1,30 @@
 /*
-   For more information, please see: http://software.sci.utah.edu
+ For more information, please see: http://software.sci.utah.edu
 
-   The MIT License
+ The MIT License
 
-   Copyright (c) 2009 Scientific Computing and Imaging Institute,
-   University of Utah.
+ Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ University of Utah.
 
-   
-   Permission is hereby granted, free of charge, to any person obtaining a
-   copy of this software and associated documentation files (the "Software"),
-   to deal in the Software without restriction, including without limitation
-   the rights to use, copy, modify, merge, publish, distribute, sublicense,
-   and/or sell copies of the Software, and to permit persons to whom the
-   Software is furnished to do so, subject to the following conditions:
 
-   The above copyright notice and this permission notice shall be included
-   in all copies or substantial portions of the Software.
+ Permission is hereby granted, free of charge, to any person obtaining a
+ copy of this software and associated documentation files (the "Software"),
+ to deal in the Software without restriction, including without limitation
+ the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ and/or sell copies of the Software, and to permit persons to whom the
+ Software is furnished to do so, subject to the following conditions:
 
-   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-   OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-   THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-   DEALINGS IN THE SOFTWARE.
-*/
+ The above copyright notice and this permission notice shall be included
+ in all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+ OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ DEALINGS IN THE SOFTWARE.
+ */
 
 #ifndef APPLICATION_VIEWER_VIEWERRENDERER_H
 #define APPLICATION_VIEWER_VIEWERRENDERER_H
@@ -40,38 +40,42 @@
 
 #include <Application/Renderer/Texture.h>
 
-namespace Seg3D {
+namespace Seg3D
+{
 
 // Forward declarations
 class ViewerRenderer;
-typedef boost::shared_ptr<ViewerRenderer> ViewerRendererHandle;
+typedef boost::shared_ptr< ViewerRenderer > ViewerRendererHandle;
 
 // Class definitions
-class ViewerRenderer : public boost::noncopyable {
+class ViewerRenderer : public boost::noncopyable
+{
 
-  public:
-    ViewerRenderer();
-    virtual ~ViewerRenderer();
+public:
+  ViewerRenderer();
+  virtual ~ViewerRenderer();
 
-  public:
-  
-    // Functions for drawing content
-    virtual void initialize();
-    virtual void redraw();
-    
-    virtual void resize(int width, int height);
-    
-    // Set the index of the corresponding viewer in the ViewerManager
-    inline void set_viewer_id(size_t viewer_id) { viewer_id_ = viewer_id; }
-    
-    
-// -- signals handling --
-  public:
-    typedef boost::signals2::signal<void (TextureHandle)> rendering_completed_signal_type;
-    rendering_completed_signal_type rendering_completed_signal;  
-    
-  protected:
-    size_t viewer_id_;  
+public:
+
+  // Functions for drawing content
+  virtual void initialize();
+  virtual void redraw();
+
+  virtual void resize( int width, int height );
+
+  // Set the index of the corresponding viewer in the ViewerManager
+  inline void set_viewer_id( size_t viewer_id )
+  {
+    viewer_id_ = viewer_id;
+  }
+
+  // -- signals handling --
+public:
+  typedef boost::signals2::signal< void( TextureHandle ) > rendering_completed_signal_type;
+  rendering_completed_signal_type rendering_completed_signal;
+
+protected:
+  size_t viewer_id_;
 };
 
 } // end namespace Seg3D

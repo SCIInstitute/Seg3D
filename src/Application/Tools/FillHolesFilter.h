@@ -31,34 +31,35 @@
 
 #include <Application/Tool/Tool.h>
 
-namespace Seg3D  {
-  
-class FillHolesFilter : public Tool {
-  SCI_TOOL_TYPE( "FillHolesFilter", "Fill Holes", "",
-                 Tool::MASKTOMASK_E|Tool::FILTER_E, 
-                 "http://seg3d.org/")
-  
+namespace Seg3D
+{
+
+class FillHolesFilter : public Tool
+{
+SCI_TOOL_TYPE( "FillHolesFilter", "Fill Holes", "",
+  Tool::MASKTOMASK_E|Tool::FILTER_E,
+  "http://seg3d.org/")
+
 public:
-  FillHolesFilter(const std::string& toolid);
+  FillHolesFilter( const std::string& toolid );
   virtual ~FillHolesFilter();
-  
+
   // -- constraint parameters --
-  
+
   // Constrain viewer to right painting tool when layer is selected
-  void target_constraint(std::string layerid);
-  
+  void target_constraint( std::string layerid );
+
   // -- activate/deactivate tool --
-  
+
   virtual void activate();
   virtual void deactivate();
-  
+
   // -- state --
 public:
   // Layerid of the target layer
-  StateOptionHandle              target_layer_state_;
-  
-};
+  StateOptionHandle target_layer_state_;
 
+};
 
 } // end namespace
 

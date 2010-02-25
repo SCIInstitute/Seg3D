@@ -38,25 +38,25 @@
 // Base class of the tool widget
 #include <Interface/AppInterface/ToolWidget.h>
 
-namespace Seg3D {
-  
+namespace Seg3D
+{
+
 class ArithmeticFilterInterfacePrivate;
 
-class ArithmeticFilterInterface : public ToolWidget {
-  Q_OBJECT
+class ArithmeticFilterInterface : public ToolWidget
+{
+Q_OBJECT
 
 // Constructor/destructor
-  public:
-    ArithmeticFilterInterface();
-    virtual ~ArithmeticFilterInterface();
-    virtual bool build_widget(QFrame* frame);
-    
-  private:
-    ArithmeticFilterInterfacePrivate* private_;
-   
+public:
+  ArithmeticFilterInterface();
+  virtual ~ArithmeticFilterInterface();
+  virtual bool build_widget( QFrame* frame );
+
+private:
+  ArithmeticFilterInterfacePrivate* private_;
+
 };
-
-
 
 } // namespace Seg3D
 

@@ -1,26 +1,26 @@
 #include "BinaryDialateErodeFilterInterface.h"
 #include "ui_BinaryDialateErodeFilterInterface.h"
 
-BinaryDialateErodeFilterInterface::BinaryDialateErodeFilterInterface(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::BinaryDialateErodeFilterInterface)
+BinaryDialateErodeFilterInterface::BinaryDialateErodeFilterInterface( QWidget *parent ) :
+  QWidget( parent ), ui( new Ui::BinaryDialateErodeFilterInterface )
 {
-    ui->setupUi(this);
+  ui->setupUi( this );
 }
 
 BinaryDialateErodeFilterInterface::~BinaryDialateErodeFilterInterface()
 {
-    delete ui;
+  delete ui;
 }
 
-void BinaryDialateErodeFilterInterface::changeEvent(QEvent *e)
+void BinaryDialateErodeFilterInterface::changeEvent( QEvent *e )
 {
-    QWidget::changeEvent(e);
-    switch (e->type()) {
-    case QEvent::LanguageChange:
-        ui->retranslateUi(this);
-        break;
-    default:
-        break;
-    }
+  QWidget::changeEvent( e );
+  switch( e->type() )
+  {
+  case QEvent::LanguageChange:
+    ui->retranslateUi( this );
+    break;
+  default:
+    break;
+  }
 }

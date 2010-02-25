@@ -31,38 +31,39 @@
 
 #include <Application/Tool/Tool.h>
 
-namespace Seg3D  {
+namespace Seg3D
+{
 
-class DiscreteGaussianFilter : public Tool {
-  SCI_TOOL_TYPE( "DiscreteGaussianFilter", "Discrete Gaussian", "",
-                 Tool::DATATODATA_E|Tool::FILTER_E, 
-                 "http://seg3d.org/")
+class DiscreteGaussianFilter : public Tool
+{
+SCI_TOOL_TYPE( "DiscreteGaussianFilter", "Discrete Gaussian", "",
+  Tool::DATATODATA_E|Tool::FILTER_E,
+  "http://seg3d.org/")
 public:
-  DiscreteGaussianFilter(const std::string& toolid);
+  DiscreteGaussianFilter( const std::string& toolid );
   virtual ~DiscreteGaussianFilter();
-  
-// -- constraint parameters --
-  
+
+  // -- constraint parameters --
+
   // Constrain viewer to right painting tool when layer is selected
-  void target_constraint(std::string layerid);
-  
-// -- activate/deactivate tool --
-  
+  void target_constraint( std::string layerid );
+
+  // -- activate/deactivate tool --
+
   virtual void activate();
   virtual void deactivate();
-  
-// -- state --
-  public:
-    // Layerid of the target layer
-    StateOptionHandle               target_layer_state_;
 
-    // Variance
-    StateRangedIntHandle            variance_state_;
+  // -- state --
+public:
+  // Layerid of the target layer
+  StateOptionHandle target_layer_state_;
 
-    StateRangedIntHandle            maximum_kernel_width_state_;
-  
-    StateBoolHandle                 replace_state_;
+  // Variance
+  StateRangedIntHandle variance_state_;
 
+  StateRangedIntHandle maximum_kernel_width_state_;
+
+  StateBoolHandle replace_state_;
 
 };
 

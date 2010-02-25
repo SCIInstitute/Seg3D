@@ -33,29 +33,28 @@
 #include <Interface/AppInterface/SplashStart.h>
 #include "ui_Splash.h"
 
-namespace Seg3D  {
-  
-  class SplashStartPrivate {
-  public:
-    
-    Ui::Splash ui_;
-    
-  };
-  
-  
-  SplashStart::SplashStart( QDialog *parent ) :
-  private_( new SplashStartPrivate )
-  { 
-    // Set up the private internals of the SplashStart class
-    private_->ui_.setupUi( this );
-    private_->ui_.existing_project_button_->setEnabled(false);
-    
-    
-  }
-  
-  SplashStart::~SplashStart()
-  { }
-  
+namespace Seg3D
+{
 
-  
+class SplashStartPrivate
+{
+public:
+
+  Ui::Splash ui_;
+
+};
+
+SplashStart::SplashStart( QDialog *parent ) :
+  private_( new SplashStartPrivate )
+{
+  // Set up the private internals of the SplashStart class
+  private_->ui_.setupUi( this );
+  private_->ui_.existing_project_button_->setEnabled( false );
+
+}
+
+SplashStart::~SplashStart()
+{
+}
+
 } // end namespace

@@ -39,7 +39,8 @@
 #include <Application/Action/Action.h>
 #include <Application/Action/ActionDispatcher.h>
 
-namespace Seg3D {
+namespace Seg3D
+{
 
 // CLASS ACTIONHISTORY
 // A record of the last actions issued in the program
@@ -48,65 +49,69 @@ namespace Seg3D {
 class ActionHistory;
 
 // Class defintion
-class ActionHistory : public boost::noncopyable {
+class ActionHistory : public boost::noncopyable
+{
 
-// -- Constructor/Destructor --
-  private:
-    friend class Utils::Singleton<ActionHistory>;
-    ActionHistory();
-  
-  public:
-    virtual ~ActionHistory();
-  
-// -- History recording --
+  // -- Constructor/Destructor --
+private:
+  friend class Utils::Singleton< ActionHistory >;
+  ActionHistory();
 
-  public:
-    // SET_MAX_HISTORY_SIZE:
-    // Set the size of the action history buffer
-    void set_max_history_size(size_t size);
-    
-    // MAX_HISTORY_SIZE:
-    // Retrieve the size of this buffer
-    size_t max_history_size();
-    
-    // HISTORY_SIZE:
-    size_t history_size();
-    
-    // ACTION
-    // Get the nth action in the buffer
-    ActionHandle action(size_t index);
+public:
+  virtual ~ActionHistory();
 
-    // ACTIONRESULT
-    // Get the nth action result in the buffer
-    ActionResultHandle result(size_t index);
-        
-  private:
-    typedef std::deque<std::pair<ActionHandle,ActionResultHandle> > action_history_type;
+  // -- History recording --
 
-    boost::mutex        action_history_mutex_;
-    action_history_type action_history_;
-    size_t              action_history_max_size_;
+public:
+  // SET_MAX_HISTORY_SIZE:
+  // Set the size of the action history buffer
+  void set_max_history_size( size_t size );
 
-    boost::signals2::connection dispatcher_connection_;
+  // MAX_HISTORY_SIZE:
+  // Retrieve the size of this buffer
+  size_t max_history_size();
 
-    void record_action(ActionHandle handle, ActionResultHandle result);
+  // HISTORY_SIZE:
+  size_t history_size();
 
-// -- History changed signal --
-  public:
-    typedef boost::signals2::signal<void ()> history_changed_signal_type;
-    
-    // HISTORY_CHANGED_SIGNAL:
-    // Signal indicating that the history changed
-    history_changed_signal_type history_changed_signal_;
+  // ACTION
+  // Get the nth action in the buffer
+  ActionHandle action( size_t index );
 
-// -- Singleton interface --
-  public:
-    
-    static ActionHistory* Instance() { return instance_.instance(); } // << SINGLETON
-    
-  private:
-    // Singleton internals
-    static Utils::Singleton<ActionHistory> instance_;
+  // ACTIONRESULT
+  // Get the nth action result in the buffer
+  ActionResultHandle result( size_t index );
+
+private:
+  typedef std::deque< std::pair< ActionHandle, ActionResultHandle > > action_history_type;
+
+  boost::mutex action_history_mutex_;
+  action_history_type action_history_;
+  size_t action_history_max_size_;
+
+  boost::signals2::connection dispatcher_connection_;
+
+  void record_action( ActionHandle handle, ActionResultHandle result );
+
+  // -- History changed signal --
+public:
+  typedef boost::signals2::signal< void() > history_changed_signal_type;
+
+  // HISTORY_CHANGED_SIGNAL:
+  // Signal indicating that the history changed
+  history_changed_signal_type history_changed_signal_;
+
+  // -- Singleton interface --
+public:
+
+  static ActionHistory* Instance()
+  {
+    return instance_.instance();
+  } // << SINGLETON
+
+private:
+  // Singleton internals
+  static Utils::Singleton< ActionHistory > instance_;
 };
 
 } // end namespace Seg3D

@@ -24,7 +24,7 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
-*/
+ */
 
 #ifndef INTERFACE_APPINTERFACE_TOOLWIDGET_H
 #define INTERFACE_APPINTERFACE_TOOLWIDGET_H
@@ -37,31 +37,33 @@
 #include <Application/Tool/Tool.h>
 #include <Application/ToolManager/ToolManager.h>
 
-namespace Seg3D {
+namespace Seg3D
+{
 
-class ToolWidget : public QWidget, public ToolInterface {
-  Q_OBJECT
+class ToolWidget : public QWidget, public ToolInterface
+{
+Q_OBJECT
 
 // -- constructor/destructor --
-  public:
-    ToolWidget();
-    virtual ~ToolWidget();
-  
-    // CREATE_WIDGET:
-    // The constructor only builds the class. Because this is handled through
-    // a factory method we use this auxillary function to build the inner parts
-    // of the widget
-    bool create_widget(QWidget* parent, ToolHandle& tool);
-  
-    // BUILD_WIDGET:
-    // Function to create the specific tool widget:
-    // This one needs to be overloaded
-    virtual bool build_widget(QFrame* frame) = 0; // << NEEDS TO BE REIMPLEMENTED
+public:
+  ToolWidget();
+  virtual ~ToolWidget();
 
-// -- widget internals --
-  protected:  
-    QFrame*      main_frame_;
-  
+  // CREATE_WIDGET:
+  // The constructor only builds the class. Because this is handled through
+  // a factory method we use this auxillary function to build the inner parts
+  // of the widget
+  bool create_widget( QWidget* parent, ToolHandle& tool );
+
+  // BUILD_WIDGET:
+  // Function to create the specific tool widget:
+  // This one needs to be overloaded
+  virtual bool build_widget( QFrame* frame ) = 0; // << NEEDS TO BE REIMPLEMENTED
+
+  // -- widget internals --
+protected:
+  QFrame* main_frame_;
+
 };
 
 } //end namespace Seg3D

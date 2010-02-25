@@ -5,30 +5,27 @@
 
 #include "sliderspincombo.h"
 
-namespace Ui {
-    class AnisotropicDiffusionFilterInterface;
+namespace Ui
+{
+class AnisotropicDiffusionFilterInterface;
 }
 
-class AnisotropicDiffusionFilterInterface : public QWidget {
+class AnisotropicDiffusionFilterInterface : public QWidget
+{
 
-    Q_OBJECT
+Q_OBJECT
 
+public:
+  AnisotropicDiffusionFilterInterface( QWidget *parent = 0 );
+  ~AnisotropicDiffusionFilterInterface();
+  QWidget *widgeter;
 
-    public:
-        AnisotropicDiffusionFilterInterface(QWidget *parent = 0);
-        ~AnisotropicDiffusionFilterInterface();
-        QWidget *widgeter;
+private:
+  Ui::AnisotropicDiffusionFilterInterface *ui;
 
-
-    private:
-        Ui::AnisotropicDiffusionFilterInterface *ui;
-
-        SliderSpinCombo *iterationsAdjuster;
-        SliderSpinCombo *stepAdjuster;
-        SliderSpinCombo *conductanceAdjuster;
-
-
-
+  SliderSpinCombo *iterationsAdjuster;
+  SliderSpinCombo *stepAdjuster;
+  SliderSpinCombo *conductanceAdjuster;
 
 };
 

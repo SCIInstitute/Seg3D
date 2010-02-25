@@ -1,30 +1,30 @@
 /*
-   For more information, please see: http://software.sci.utah.edu
+ For more information, please see: http://software.sci.utah.edu
 
-   The MIT License
+ The MIT License
 
-   Copyright (c) 2009 Scientific Computing and Imaging Institute,
-   University of Utah.
+ Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ University of Utah.
 
-   
-   Permission is hereby granted, free of charge, to any person obtaining a
-   copy of this software and associated documentation files (the "Software"),
-   to deal in the Software without restriction, including without limitation
-   the rights to use, copy, modify, merge, publish, distribute, sublicense,
-   and/or sell copies of the Software, and to permit persons to whom the
-   Software is furnished to do so, subject to the following conditions:
 
-   The above copyright notice and this permission notice shall be included
-   in all copies or substantial portions of the Software.
+ Permission is hereby granted, free of charge, to any person obtaining a
+ copy of this software and associated documentation files (the "Software"),
+ to deal in the Software without restriction, including without limitation
+ the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ and/or sell copies of the Software, and to permit persons to whom the
+ Software is furnished to do so, subject to the following conditions:
 
-   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-   OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-   THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-   DEALINGS IN THE SOFTWARE.
-*/
+ The above copyright notice and this permission notice shall be included
+ in all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+ OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ DEALINGS IN THE SOFTWARE.
+ */
 
 #ifndef APPLICATION_ACTION_ACTIONCONTEXT_H
 #define APPLICATION_ACTION_ACTIONCONTEXT_H
@@ -44,23 +44,25 @@
 #include <Application/Resource/ResourceLock.h>
 #include <Application/Action/ActionResult.h>
 
-namespace Seg3D {
+namespace Seg3D
+{
 
 // ENUM ActionStatus
 // This enum lists the possible outcomes of preforming an action
 
-enum ActionStatus {
+enum ActionStatus
+{
   // ACTION_SUCCESS - Everything went fine and the action was executed
   ACTION_SUCCESS_E = 0,
-  
+
   // ACTION_ERROR - The action did not execute properly and failed
-  ACTION_ERROR_E   = 1,
-  
+  ACTION_ERROR_E = 1,
+
   // ACTION_INVALID - The action did not get validated
   ACTION_INVALID_E = 2,
-  
+
   // ACTION_UNAVAILABLE - The action could not be executed, because
-  // resources are not available 
+  // resources are not available
   ACTION_UNAVAILABLE_E = 3
 };
 
@@ -70,35 +72,35 @@ enum ActionStatus {
 // action run from the provenance buffer requires a different path for recording
 // provenance.
 
-enum ActionSource {
+enum ActionSource
+{
   // ACTION_SOURCE_NONE - It did not result from an action.
-  ACTION_SOURCE_NONE_E = 0, 
+  ACTION_SOURCE_NONE_E = 0,
 
-  // ACTION_SOURCE_INTERFACE - The action is run from the interface, 
+  // ACTION_SOURCE_INTERFACE - The action is run from the interface,
   // the interface may not need an update, if the GUI already did the update.
   ACTION_SOURCE_INTERFACE_E = 1,
-  
+
   // ACTION_SOURCE_SCRIPT -The action is run from a script, which means that
   // the interface needs to be updated and as well that actions need to be
-  // queued. Hence for this source the required resource lock needs to be 
+  // queued. Hence for this source the required resource lock needs to be
   // returned, so the script can wait for the action to be completed.
   ACTION_SOURCE_SCRIPT_E = 2,
 
-  // ACTION_SOURCE_COMMANDLINE - This action is run from the command line, it 
+  // ACTION_SOURCE_COMMANDLINE - This action is run from the command line, it
   // needs to update the interface, but does not allow queueing
   ACTION_SOURCE_COMMANDLINE_E = 3,
-  
+
   // ACTION_SOURCE_PROVENANCE - The action is run from the provenance buffer
   // Hence it should not be recorded again into the provenance buffer
   ACTION_SOURCE_PROVENANCE_E = 4,
-  
+
   // ACTION_SOURCE_UNDOBUFFER - The action is run from the undobuffer
   ACTION_SOURCE_UNDOBUFFER_E = 5
 };
 
-
 class ActionContext;
-typedef boost::shared_ptr<ActionContext> ActionContextHandle;
+typedef boost::shared_ptr< ActionContext > ActionContextHandle;
 
 // CLASS ACTIONCONTEXT:
 // The action context contains all the information for the action to relay
@@ -112,49 +114,62 @@ typedef boost::shared_ptr<ActionContext> ActionContextHandle;
 // class and generate the specifics of where information needs to be relayed
 // to.
 
-class ActionContext : public boost::noncopyable {
+class ActionContext : public boost::noncopyable
+{
 
-// -- Constructor/destructor --
-  public:
-    // Wrap a context around an action
-    ActionContext();
- 
-    // Virtual destructor for memory management
-    virtual ~ActionContext();
+  // -- Constructor/destructor --
+public:
+  // Wrap a context around an action
+  ActionContext();
 
-// -- Reporting functions --
-  public:
-    virtual void report_error(const std::string& error);
-    virtual void report_warning(const std::string& warning);
-    virtual void report_message(const std::string& message);
+  // Virtual destructor for memory management
+  virtual ~ActionContext();
 
-// -- Report back status and results --
-  public:
-    virtual void report_status(ActionStatus status);
-    virtual void report_result(const ActionResultHandle& result);
-    virtual void report_need_resource(ResourceLockHandle& resource);
+  // -- Reporting functions --
+public:
+  virtual void report_error( const std::string& error );
+  virtual void report_warning( const std::string& warning );
+  virtual void report_message( const std::string& message );
 
-// -- Report that action was done --
-  public:
-    virtual void report_done();
+  // -- Report back status and results --
+public:
+  virtual void report_status( ActionStatus status );
+  virtual void report_result( const ActionResultHandle& result );
+  virtual void report_need_resource( ResourceLockHandle& resource );
 
-// -- Source/Status information --
-  public:
-    virtual ActionStatus status();
-    virtual ActionSource source();
-    
-// -- shortcuts for checking status --
-  public:
-    bool is_success()     { return status_ == ACTION_SUCCESS_E; }
-    bool is_invalid()     { return status_ == ACTION_INVALID_E; }
-    bool is_unavailable() { return status_ == ACTION_UNAVAILABLE_E; }
-    bool is_error()       { return status_ == ACTION_ERROR_E; }
-    
-// -- Status information --    
-  protected:
-  
-    // The last status report from the action engine
-    ActionStatus status_;
+  // -- Report that action was done --
+public:
+  virtual void report_done();
+
+  // -- Source/Status information --
+public:
+  virtual ActionStatus status();
+  virtual ActionSource source();
+
+  // -- shortcuts for checking status --
+public:
+  bool is_success()
+  {
+    return status_ == ACTION_SUCCESS_E;
+  }
+  bool is_invalid()
+  {
+    return status_ == ACTION_INVALID_E;
+  }
+  bool is_unavailable()
+  {
+    return status_ == ACTION_UNAVAILABLE_E;
+  }
+  bool is_error()
+  {
+    return status_ == ACTION_ERROR_E;
+  }
+
+  // -- Status information --
+protected:
+
+  // The last status report from the action engine
+  ActionStatus status_;
 };
 
 } // end namespace Seg3D

@@ -24,16 +24,17 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
-*/
+ */
 
 #include <Interface/AppInterface/ToolWidget.h>
 #include <Utils/Core/Log.h>
 #include <boost/lexical_cast.hpp>
 
-namespace Seg3D {
+namespace Seg3D
+{
 
 ToolWidget::ToolWidget() :
-  main_frame_(0)
+  main_frame_( 0 )
 {
 }
 
@@ -41,36 +42,32 @@ ToolWidget::~ToolWidget()
 {
 }
 
-
-bool
-ToolWidget::create_widget(QWidget* parent, ToolHandle& tool)
+bool ToolWidget::create_widget( QWidget* parent, ToolHandle& tool )
 {
 
-  
   // Setup the parent widget: this one will be used for memory management of
   // this widget class
-  setParent(parent);
+  setParent( parent );
 
-    // Add the handle of the underlying tool to the widget
-  set_tool(tool);
-  
+  // Add the handle of the underlying tool to the widget
+  set_tool( tool );
+
   // Generate a vertical layout for the tool widget
   QHBoxLayout* hbox = new QHBoxLayout;
   //
-  //// Ensure it has some tight spacing  
-  hbox->setSpacing(0);
-  hbox->setContentsMargins(0,0,0,0);
-  setLayout(hbox);
-  
-  main_frame_ = new QFrame;  
-  
-  main_frame_->resize(1, 1);
+  //// Ensure it has some tight spacing
+  hbox->setSpacing( 0 );
+  hbox->setContentsMargins( 0, 0, 0, 0 );
+  setLayout( hbox );
 
-  main_frame_->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
-  hbox->addWidget(main_frame_);
+  main_frame_ = new QFrame;
 
-  
-  return ( build_widget(main_frame_));
+  main_frame_->resize( 1, 1 );
+
+  main_frame_->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Preferred );
+  hbox->addWidget( main_frame_ );
+
+  return ( build_widget( main_frame_ ) );
 }
 
 } //end namespace Seg3D

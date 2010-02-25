@@ -33,27 +33,28 @@
 #include <Interface/AppInterface/HistoryWidget.h>
 #include "ui_HistoryWidget.h"
 
-namespace Seg3D  {
-  
-  class HistoryWidgetPrivate {
-  public:
-    
-    Ui::HistoryWidget ui_;
-    
-  };
-  
-  
-  HistoryWidget::HistoryWidget( QWidget *parent ) :
-    private_( new HistoryWidgetPrivate )
-  { 
-    // Set up the private internals of the LayerManagerInterface class
-    private_->ui_.setupUi( this );
-    
-  }
-  
-  HistoryWidget::~HistoryWidget()
-  {
-    
-  }
-  
+namespace Seg3D
+{
+
+class HistoryWidgetPrivate
+{
+public:
+
+  Ui::HistoryWidget ui_;
+
+};
+
+HistoryWidget::HistoryWidget( QWidget *parent ) :
+  private_( new HistoryWidgetPrivate )
+{
+  // Set up the private internals of the LayerManagerInterface class
+  private_->ui_.setupUi( this );
+
+}
+
+HistoryWidget::~HistoryWidget()
+{
+
+}
+
 } // end namespace

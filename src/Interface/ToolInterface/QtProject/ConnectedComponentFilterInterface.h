@@ -3,21 +3,23 @@
 
 #include <QWidget>
 
-namespace Ui {
-    class ConnectedComponentFilterInterface;
+namespace Ui
+{
+class ConnectedComponentFilterInterface;
 }
 
-class ConnectedComponentFilterInterface : public QWidget {
-    Q_OBJECT
+class ConnectedComponentFilterInterface : public QWidget
+{
+Q_OBJECT
 public:
-    ConnectedComponentFilterInterface(QWidget *parent = 0);
-    ~ConnectedComponentFilterInterface();
+  ConnectedComponentFilterInterface( QWidget *parent = 0 );
+  ~ConnectedComponentFilterInterface();
 
 protected:
-    void changeEvent(QEvent *e);
+  void changeEvent( QEvent *e );
 
 private:
-    Ui::ConnectedComponentFilterInterface *ui;
+  Ui::ConnectedComponentFilterInterface *ui;
 };
 
 #endif // CONNECTEDCOMPONENTFILTERINTERFACE_H

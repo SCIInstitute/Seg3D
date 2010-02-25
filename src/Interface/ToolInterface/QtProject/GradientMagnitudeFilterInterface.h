@@ -3,21 +3,23 @@
 
 #include <QWidget>
 
-namespace Ui {
-    class GradientMagnitudeFilterInterface;
+namespace Ui
+{
+class GradientMagnitudeFilterInterface;
 }
 
-class GradientMagnitudeFilterInterface : public QWidget {
-    Q_OBJECT
+class GradientMagnitudeFilterInterface : public QWidget
+{
+Q_OBJECT
 public:
-    GradientMagnitudeFilterInterface(QWidget *parent = 0);
-    ~GradientMagnitudeFilterInterface();
+  GradientMagnitudeFilterInterface( QWidget *parent = 0 );
+  ~GradientMagnitudeFilterInterface();
 
 protected:
-    void changeEvent(QEvent *e);
+  void changeEvent( QEvent *e );
 
 private:
-    Ui::GradientMagnitudeFilterInterface *ui;
+  Ui::GradientMagnitudeFilterInterface *ui;
 };
 
 #endif // GRADIENTMAGNITUDEFILTERINTERFACE_H

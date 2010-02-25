@@ -38,26 +38,26 @@
 // Base class of the tool widget
 #include <Interface/AppInterface/ToolWidget.h>
 
+namespace Seg3D
+{
 
-namespace Seg3D {
-  
 class GradientMagnitudeFilterInterfacePrivate;
 
-class GradientMagnitudeFilterInterface : public ToolWidget {
-  Q_OBJECT
+class GradientMagnitudeFilterInterface : public ToolWidget
+{
+Q_OBJECT
 
-    
-  public:
-    GradientMagnitudeFilterInterface();
-    virtual ~GradientMagnitudeFilterInterface();
-    virtual bool build_widget(QFrame* frame);
+public:
+  GradientMagnitudeFilterInterface();
+  virtual ~GradientMagnitudeFilterInterface();
+  virtual bool build_widget( QFrame* frame );
 
-  private:
-    GradientMagnitudeFilterInterfacePrivate* private_;
-    void makeConnections();
-    
+private:
+  GradientMagnitudeFilterInterfacePrivate* private_;
+  void makeConnections();
+
 };
-  
+
 } // end namespace Seg3D
 
 #endif

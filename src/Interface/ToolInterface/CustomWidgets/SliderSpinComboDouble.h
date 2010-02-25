@@ -40,47 +40,48 @@
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QLabel>
 
-namespace Seg3D {
+namespace Seg3D
+{
 
 class SliderSpinComboDouble : public QWidget
 {
   Q_OBJECT
 
   Q_SIGNALS:
-    void valueAdjusted(double);
-    void valueAdjustedContinuously(double);
+  void valueAdjusted(double);
+  void valueAdjustedContinuously( double );
 
-  public:
-    SliderSpinComboDouble(QWidget* parent = 0);
-    virtual ~SliderSpinComboDouble();
+public:
+  SliderSpinComboDouble( QWidget* parent = 0 );
+  virtual ~SliderSpinComboDouble();
 
-  public Q_SLOTS:
-    void setStep(double);
-    void setRanges(double, double);
-    void setCurrentValue(double);
+public Q_SLOTS:
+  void setStep(double);
+  void setRanges( double, double );
+  void setCurrentValue( double );
 
-  private:
-    QHBoxLayout* mainLayout;
-    QHBoxLayout* labelLayout;
-    QVBoxLayout* sliderSideLayout;
-    QVBoxLayout* spinnerSideLayout;
-    
-    QSpacerItem* verticalSpacer;
-    
-    QSlider* slider;
-    QDoubleSpinBox* spinner;
-    
-    QLabel* minValueLabel;
-    QLabel* maxValueLabel;
+private:
+  QHBoxLayout* mainLayout;
+  QHBoxLayout* labelLayout;
+  QVBoxLayout* sliderSideLayout;
+  QVBoxLayout* spinnerSideLayout;
 
-    void buildWidget();
-    void makeConnections();
+  QSpacerItem* verticalSpacer;
 
-  private Q_SLOTS:
-    void signalGuiFromSlider(int);
-    void signalGuiFromSpinner(double);
-    void signalGuiFromSliderReleased();
-    void signalGuiFromSliderReleased( int );
+  QSlider* slider;
+  QDoubleSpinBox* spinner;
+
+  QLabel* minValueLabel;
+  QLabel* maxValueLabel;
+
+  void buildWidget();
+  void makeConnections();
+
+private Q_SLOTS:
+  void signalGuiFromSlider(int);
+  void signalGuiFromSpinner( double );
+  void signalGuiFromSliderReleased();
+  void signalGuiFromSliderReleased( int );
 
 };
 

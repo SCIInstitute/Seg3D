@@ -24,7 +24,7 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
-*/
+ */
 
 //Interface Includes
 #include <Interface/QtInterface/QtBridge.h>
@@ -36,48 +36,50 @@
 //Application Includes
 #include <Application/Tools/BooleanFilter.h>
 
+namespace Seg3D
+{
 
-namespace Seg3D {
-  
-  SCI_REGISTER_TOOLINTERFACE(BooleanFilterInterface)
-  
-class BooleanFilterInterfacePrivate {
+SCI_REGISTER_TOOLINTERFACE(BooleanFilterInterface)
+
+class BooleanFilterInterfacePrivate
+{
 public:
   Ui::BooleanFilterInterface ui_;
 };
-  
-  // constructor
-  BooleanFilterInterface::BooleanFilterInterface() :
-  private_(new BooleanFilterInterfacePrivate)
-  { }
-  
-  // destructor
-  BooleanFilterInterface::~BooleanFilterInterface()
-  { }
-  
-  // build the interface and connect it to the state manager
-  bool
-  BooleanFilterInterface::build_widget(QFrame* frame)
-  {
-    //Step 1 - build the Qt GUI Widget
-    private_->ui_.setupUi(frame);
-    
-    //Step 2 - get a pointer to the tool
-    ToolHandle base_tool_ = tool();
-    BooleanFilter* tool = dynamic_cast<BooleanFilter*>(base_tool_.get());
-    
-    //Step 3 - connect the gui to the tool through the QtBridge
-    QtBridge::connect(private_->ui_.maskAComboBox, tool->mask_a_state_);
-    QtBridge::connect(private_->ui_.maskBComboBox, tool->mask_b_state_);
-    QtBridge::connect(private_->ui_.maskCComboBox, tool->mask_c_state_);
-    QtBridge::connect(private_->ui_.maskDComboBox, tool->mask_d_state_);
-    QtBridge::connect(private_->ui_.exampleExpComboBox, tool->example_expressions_state_);
-    QtBridge::connect(private_->ui_.replaceCheckBox,tool->replace_state_);
-    
-    //Send a message to the log that we have finised with building the Boolean Filter Interface
-    SCI_LOG_DEBUG("Finished building a Boolean Filter Interface");
-    return (true);
-    
-  }// end build_widget
-  
+
+// constructor
+BooleanFilterInterface::BooleanFilterInterface() :
+  private_( new BooleanFilterInterfacePrivate )
+{
+}
+
+// destructor
+BooleanFilterInterface::~BooleanFilterInterface()
+{
+}
+
+// build the interface and connect it to the state manager
+bool BooleanFilterInterface::build_widget( QFrame* frame )
+{
+  //Step 1 - build the Qt GUI Widget
+  private_->ui_.setupUi( frame );
+
+  //Step 2 - get a pointer to the tool
+  ToolHandle base_tool_ = tool();
+  BooleanFilter* tool = dynamic_cast< BooleanFilter* > ( base_tool_.get() );
+
+  //Step 3 - connect the gui to the tool through the QtBridge
+  QtBridge::connect( private_->ui_.maskAComboBox, tool->mask_a_state_ );
+  QtBridge::connect( private_->ui_.maskBComboBox, tool->mask_b_state_ );
+  QtBridge::connect( private_->ui_.maskCComboBox, tool->mask_c_state_ );
+  QtBridge::connect( private_->ui_.maskDComboBox, tool->mask_d_state_ );
+  QtBridge::connect( private_->ui_.exampleExpComboBox, tool->example_expressions_state_ );
+  QtBridge::connect( private_->ui_.replaceCheckBox, tool->replace_state_ );
+
+  //Send a message to the log that we have finised with building the Boolean Filter Interface
+  SCI_LOG_DEBUG("Finished building a Boolean Filter Interface");
+  return ( true );
+
+}// end build_widget
+
 } // end namespace Seg3D

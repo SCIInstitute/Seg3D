@@ -29,49 +29,45 @@
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/IntensityCorrectionFilter.h>
 
+namespace Seg3D
+{
 
-namespace Seg3D {
-  
-  // Register the tool into the tool factory
-  SCI_REGISTER_TOOL(IntensityCorrectionFilter)
-  
-  
-  IntensityCorrectionFilter::IntensityCorrectionFilter(const std::string& toolid) :
-  Tool(toolid)
-  {
-    // Need to set ranges and default values for all parameters
-    add_state("target",target_layer_state_,"<none>","<none>");
-    add_state("order",order_state_,1,100,1,2);
-    add_state("edge",edge_state_,1,100,1,2);
-    add_state("replace",replace_state_,false);
-    
-    // Add constaints, so that when the state changes the right ranges of 
-    // parameters are selected
-    target_layer_state_->value_changed_signal_.connect(
-      boost::bind(&IntensityCorrectionFilter::target_constraint,this,_1));
-   
-  }
-  
-  void
-  IntensityCorrectionFilter::target_constraint(std::string layerid)
-  {
-  }
-  
-  IntensityCorrectionFilter::~IntensityCorrectionFilter()
-  {
-    disconnect_all();
-  }
-  
-  void
-  IntensityCorrectionFilter::activate()
-  {
-  }
-  
-  void
-  IntensityCorrectionFilter::deactivate()
-  {
-  }
-  
+// Register the tool into the tool factory
+SCI_REGISTER_TOOL(IntensityCorrectionFilter)
+
+IntensityCorrectionFilter::IntensityCorrectionFilter( const std::string& toolid ) :
+  Tool( toolid )
+{
+  // Need to set ranges and default values for all parameters
+  add_state( "target", target_layer_state_, "<none>", "<none>" );
+  add_state( "order", order_state_, 1, 100, 1, 2 );
+  add_state( "edge", edge_state_, 1, 100, 1, 2 );
+  add_state( "replace", replace_state_, false );
+
+  // Add constaints, so that when the state changes the right ranges of
+  // parameters are selected
+  target_layer_state_->value_changed_signal_.connect( boost::bind(
+      &IntensityCorrectionFilter::target_constraint, this, _1 ) );
+
+}
+
+void IntensityCorrectionFilter::target_constraint( std::string layerid )
+{
+}
+
+IntensityCorrectionFilter::~IntensityCorrectionFilter()
+{
+  disconnect_all();
+}
+
+void IntensityCorrectionFilter::activate()
+{
+}
+
+void IntensityCorrectionFilter::deactivate()
+{
+}
+
 } // end namespace Seg3D
 
 

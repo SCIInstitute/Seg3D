@@ -28,60 +28,52 @@
 
 #include <Application/Action/ActionHistory.h>
 
-namespace Seg3D {
+namespace Seg3D
+{
 
 ActionHistory::ActionHistory() :
-  action_history_max_size_(0)
+  action_history_max_size_( 0 )
 {
   // Connect this class to the ActionDispatcher
-  dispatcher_connection_ = ActionDispatcher::Instance()->
-    post_action_signal_.connect(boost::bind(&ActionHistory::record_action,this,_1,_2));
+  dispatcher_connection_ = ActionDispatcher::Instance()-> post_action_signal_.connect(
+      boost::bind( &ActionHistory::record_action, this, _1, _2 ) );
 }
-
 
 ActionHistory::~ActionHistory()
 {
 }
 
-
-void
-ActionHistory::set_max_history_size(size_t size)
+void ActionHistory::set_max_history_size( size_t size )
 {
-  boost::unique_lock<boost::mutex> lock(action_history_mutex_);
+  boost::unique_lock< boost::mutex > lock( action_history_mutex_ );
   action_history_max_size_ = size;
-  if (action_history_.size() > action_history_max_size_)
+  if ( action_history_.size() > action_history_max_size_ )
   {
     // remove part of the history
-    action_history_.erase(action_history_.begin()+size,action_history_.end());
+    action_history_.erase( action_history_.begin() + size, action_history_.end() );
     // signal that buffer has changed
-    history_changed_signal_(); 
+    history_changed_signal_();
   }
 }
 
-
-size_t
-ActionHistory::max_history_size()
+size_t ActionHistory::max_history_size()
 {
-  boost::unique_lock<boost::mutex> lock(action_history_mutex_);
-  return (action_history_max_size_ );
+  boost::unique_lock< boost::mutex > lock( action_history_mutex_ );
+  return ( action_history_max_size_ );
 }
 
-
-size_t
-ActionHistory::history_size()
+size_t ActionHistory::history_size()
 {
-  boost::unique_lock<boost::mutex> lock(action_history_mutex_);
-  return (action_history_.size() );
+  boost::unique_lock< boost::mutex > lock( action_history_mutex_ );
+  return ( action_history_.size() );
 }
 
-
-ActionHandle
-ActionHistory::action(size_t index)
+ActionHandle ActionHistory::action( size_t index )
 {
-  boost::unique_lock<boost::mutex> lock(action_history_mutex_);
-  if (index < action_history_.size())
+  boost::unique_lock< boost::mutex > lock( action_history_mutex_ );
+  if ( index < action_history_.size() )
   {
-    return action_history_[index].first;
+    return action_history_[ index ].first;
   }
   else
   {
@@ -90,13 +82,12 @@ ActionHistory::action(size_t index)
   }
 }
 
-ActionResultHandle
-ActionHistory::result(size_t index)
+ActionResultHandle ActionHistory::result( size_t index )
 {
-  boost::unique_lock<boost::mutex> lock(action_history_mutex_);
-  if (index < action_history_.size())
+  boost::unique_lock< boost::mutex > lock( action_history_mutex_ );
+  if ( index < action_history_.size() )
   {
-    return action_history_[index].second;
+    return action_history_[ index ].second;
   }
   else
   {
@@ -105,24 +96,21 @@ ActionHistory::result(size_t index)
   }
 }
 
-
-void 
-ActionHistory::record_action(ActionHandle action, ActionResultHandle result)
+void ActionHistory::record_action( ActionHandle action, ActionResultHandle result )
 {
-  boost::unique_lock<boost::mutex> lock(action_history_mutex_);
-  action_history_.push_front(std::make_pair(action,result));
-  if (action_history_.size() > action_history_max_size_)
+  boost::unique_lock< boost::mutex > lock( action_history_mutex_ );
+  action_history_.push_front( std::make_pair( action, result ) );
+  if ( action_history_.size() > action_history_max_size_ )
   {
     action_history_.pop_back();
   }
-  
-//  SCI_LOG_DEBUG(std::string("Record action into history log: ")+action->type());
+
+  //  SCI_LOG_DEBUG(std::string("Record action into history log: ")+action->type());
   history_changed_signal_();
 }
 
-
 // Singleton interface needs to be defined somewhere
-Utils::Singleton<ActionHistory> ActionHistory::instance_;
+Utils::Singleton< ActionHistory > ActionHistory::instance_;
 
 } // end namespace Seg3D
 

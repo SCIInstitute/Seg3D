@@ -33,30 +33,31 @@
 #include <Interface/AppInterface/MeasurementDockWidget.h>
 #include "ui_MeasurementDockWidget.h"
 
-namespace Seg3D  {
-  
-  class MeasurementDockWidgetPrivate {
-  public:
-    
-    Ui::MeasurementDockWidget ui_;
-    
-  };
+namespace Seg3D
+{
 
-MeasurementDockWidget::MeasurementDockWidget(QWidget *parent) :
-    QDockWidget(parent),
-    private_(new MeasurementDockWidgetPrivate)
+class MeasurementDockWidgetPrivate
+{
+public:
+
+  Ui::MeasurementDockWidget ui_;
+
+};
+
+MeasurementDockWidget::MeasurementDockWidget( QWidget *parent ) :
+  QDockWidget( parent ), private_( new MeasurementDockWidgetPrivate )
 {
   // Set up the private internals of the LayerManagerInterface class
-  if (private_) 
+  if ( private_ )
   {
-    private_->ui_.setupUi(this);
-    
+    private_->ui_.setupUi( this );
+
   }
 }
 
 MeasurementDockWidget::~MeasurementDockWidget()
 {
-    
+
 }
 
 } // end namespace

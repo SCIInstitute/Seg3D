@@ -39,26 +39,27 @@
 #include <Interface/AppInterface/ToolWidget.h>
 #include <Interface/ToolInterface/CustomWidgets/SliderSpinComboInt.h>
 
+namespace Seg3D
+{
 
-namespace Seg3D {
-  
 class ConfidenceConnectedFilterInterfacePrivate;
 
-class ConfidenceConnectedFilterInterface : public ToolWidget {
-  Q_OBJECT
-    
-  public:
-    ConfidenceConnectedFilterInterface();
-    virtual ~ConfidenceConnectedFilterInterface();
-    virtual bool build_widget(QFrame* frame);
-    
-  private:
-    ConfidenceConnectedFilterInterfacePrivate* private_;
-    SliderSpinComboInt *iterationsAdjuster;
-    SliderSpinComboInt *multiplierAdjuster;
-    
-  };
-  
+class ConfidenceConnectedFilterInterface : public ToolWidget
+{
+Q_OBJECT
+
+public:
+  ConfidenceConnectedFilterInterface();
+  virtual ~ConfidenceConnectedFilterInterface();
+  virtual bool build_widget( QFrame* frame );
+
+private:
+  ConfidenceConnectedFilterInterfacePrivate* private_;
+  SliderSpinComboInt *iterationsAdjuster;
+  SliderSpinComboInt *multiplierAdjuster;
+
+};
+
 } // namespace Seg3D
 
 #endif

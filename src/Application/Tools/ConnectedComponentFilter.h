@@ -31,32 +31,34 @@
 
 #include <Application/Tool/Tool.h>
 
-namespace Seg3D  {
-  
-class ConnectedComponentFilter : public Tool {
-  SCI_TOOL_TYPE( "ConnectedComponentFilter", "Connected Component", "",
-                 Tool::MASKTOMASK_E|Tool::FILTER_E,
-                 "http://seg3d.org/")
-  
+namespace Seg3D
+{
+
+class ConnectedComponentFilter : public Tool
+{
+SCI_TOOL_TYPE( "ConnectedComponentFilter", "Connected Component", "",
+  Tool::MASKTOMASK_E|Tool::FILTER_E,
+  "http://seg3d.org/")
+
 public:
-  ConnectedComponentFilter(const std::string& toolid);
+  ConnectedComponentFilter( const std::string& toolid );
   virtual ~ConnectedComponentFilter();
-  
+
   // -- constraint parameters --
-  
+
   // Constrain viewer to right painting tool when layer is selected
-  void target_constraint(std::string layerid);
-  
+  void target_constraint( std::string layerid );
+
   // -- activate/deactivate tool --
-  
+
   virtual void activate();
   virtual void deactivate();
-  
+
   // -- state --
 public:
   // Layerid of the target layer
-  StateOptionHandle              target_layer_state_;
-  
+  StateOptionHandle target_layer_state_;
+
 };
 
 } // end namespace

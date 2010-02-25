@@ -28,102 +28,104 @@
 
 #include <Interface/AppController/AppControllerLogHistory.h>
 
-namespace Seg3D {
-  
-  AppControllerLogHistory::AppControllerLogHistory( size_t log_history_size, QObject* parent ) :
-  QAbstractTableModel( parent ),
-  log_history_size_( log_history_size )
+namespace Seg3D
+{
+
+AppControllerLogHistory::AppControllerLogHistory( size_t log_history_size, QObject* parent ) :
+  QAbstractTableModel( parent ), log_history_size_( log_history_size )
+{
+}
+
+AppControllerLogHistory::~AppControllerLogHistory()
+{
+}
+
+int AppControllerLogHistory::rowCount( const QModelIndex& ) const
+{
+  return ( static_cast< int > ( log_history_.size() ) );
+}
+
+int AppControllerLogHistory::columnCount( const QModelIndex& ) const
+{
+  return ( 1 );
+}
+
+QVariant AppControllerLogHistory::data( const QModelIndex& index, int role ) const
+{
+  if ( !index.isValid() ) return QVariant();
+
+  if ( role == Qt::TextAlignmentRole )
   {
+    return int( Qt::AlignLeft | Qt::AlignVCenter );
   }
-  
-  AppControllerLogHistory::~AppControllerLogHistory()
+  else if ( role == Qt::DisplayRole )
   {
-  }
-  
-  int AppControllerLogHistory::rowCount( const QModelIndex& ) const
-  {
-    return ( static_cast<int>(log_history_.size()) );
-  }
-  
-  int AppControllerLogHistory::columnCount( const QModelIndex& ) const
-  {
-    return ( 1 );
-  }
-  
-  QVariant AppControllerLogHistory::data( const QModelIndex& index, int role ) const
-  {
-    if( !index.isValid() ) return QVariant();
-    
-    if( role == Qt::TextAlignmentRole )
+    int sz = static_cast< int > ( log_history_.size() );
+    if ( index.row() < sz )
     {
-      return int( Qt::AlignLeft|Qt::AlignVCenter );
-    }
-    else if( role == Qt::DisplayRole )
-    {
-      int sz = static_cast<int>( log_history_.size() );
-      if( index.row() < sz )
+      log_entry_type log_entry = log_history_[ sz - index.row() - 1 ];
+      if ( index.column() == 0 )
       {
-        log_entry_type log_entry = log_history_[sz-index.row()-1];
-        if( index.column() == 0 )
-        {
-          return ( QString::fromStdString(log_entry.second) );
-        }
+        return ( QString::fromStdString( log_entry.second ) );
       }
-      else
-      {
-        return QVariant();
-      }
-    }
-    else if( role == Qt::ForegroundRole )
-    {
-      int sz = static_cast<int>( log_history_.size() );
-      if( index.row() < sz )
-      {
-        log_entry_type log_entry = log_history_[sz-index.row()-1];
-        if( index.column() == 0 )
-        {
-          if( log_entry.first & Utils::Log::ERROR_E ) return QBrush( QColor(1.0, 0.0, 0.0) );
-          if( log_entry.first & Utils::Log::WARNING_E ) return QBrush( QColor(0.8, 0.2, 0.0) );
-          if( log_entry.first & Utils::Log::MESSAGE_E ) return QBrush( QColor(0.0, 0.0, 0.3) );
-          return QBrush( QColor(0.3, 0.0, 0.0) );
-        }
-      }
-      else
-      {
-        return QVariant();
-      }
-      
     }
     else
     {
       return QVariant();
     }
-    
-    return QVariant();
   }
-  
-  QVariant AppControllerLogHistory::headerData( int section, Qt::Orientation orientation, int role ) const
+  else if ( role == Qt::ForegroundRole )
   {
-    if( role != Qt::DisplayRole || orientation == Qt::Vertical )
+    int sz = static_cast< int > ( log_history_.size() );
+    if ( index.row() < sz )
+    {
+      log_entry_type log_entry = log_history_[ sz - index.row() - 1 ];
+      if ( index.column() == 0 )
+      {
+        if ( log_entry.first & Utils::Log::ERROR_E ) return QBrush( QColor( 1.0, 0.0, 0.0 ) );
+        if ( log_entry.first & Utils::Log::WARNING_E ) return QBrush(
+            QColor( 0.8, 0.2, 0.0 ) );
+        if ( log_entry.first & Utils::Log::MESSAGE_E ) return QBrush(
+            QColor( 0.0, 0.0, 0.3 ) );
+        return QBrush( QColor( 0.3, 0.0, 0.0 ) );
+      }
+    }
+    else
     {
       return QVariant();
     }
-    
-    if( section == 0 ) return QString( "Log entry" );
-    else return QVariant();
+
   }
-  
-  void AppControllerLogHistory::add_log_entry( int message_type,std::string& message )
+  else
   {
-    log_entry_type entry = std::make_pair( message_type,message );
-    
-    log_history_.push_front( entry );
-    if ( log_history_.size() > log_history_size_ )
-    {
-      log_history_.pop_back();
-    }
-    
-    reset(); 
+    return QVariant();
   }
-  
+
+  return QVariant();
+}
+
+QVariant AppControllerLogHistory::headerData( int section, Qt::Orientation orientation, int role ) const
+{
+  if ( role != Qt::DisplayRole || orientation == Qt::Vertical )
+  {
+    return QVariant();
+  }
+
+  if ( section == 0 ) return QString( "Log entry" );
+  else return QVariant();
+}
+
+void AppControllerLogHistory::add_log_entry( int message_type, std::string& message )
+{
+  log_entry_type entry = std::make_pair( message_type, message );
+
+  log_history_.push_front( entry );
+  if ( log_history_.size() > log_history_size_ )
+  {
+    log_history_.pop_back();
+  }
+
+  reset();
+}
+
 } // end namespace Seg3D

@@ -41,66 +41,71 @@
 #include <Application/Tool/Tool.h>
 #include <Application/ToolManager/ToolManager.h>
 
-namespace Seg3D {
+namespace Seg3D
+{
 
 class ToolBoxWidgetPrivate;
 
 class ToolBoxWidget : public QScrollArea
-{   
-    // Needed to make it a Qt object
-    Q_OBJECT
+{
+  // Needed to make it a Qt object
+Q_OBJECT
 
-  public:
-    
-    ToolBoxWidget(QWidget* parent=0);
-    virtual ~ToolBoxWidget();
-    
-    void add_tool ( QWidget * tool, const QString & text, 
-                    boost::function<void ()> close_function, 
-                    boost::function<void ()> activate_function, 
-                    const std::string& help_url );
-    
-    void remove_tool ( int index );
-    
-    inline int      get_active_index(){ return active_index_; }
-    inline QWidget* get_active_tool(){ return active_tool_;}
+public:
 
-    QWidget* get_tool_at(int index);
+  ToolBoxWidget( QWidget* parent = 0 );
+  virtual ~ToolBoxWidget();
 
-    void set_active_index(int index);
-    void set_active_tool(QWidget *tool);
+  void add_tool( QWidget * tool, const QString & text, boost::function< void() > close_function,
+      boost::function< void() > activate_function, const std::string& help_url );
 
-    int index_of(QWidget *index);
-    
-  Q_SIGNALS:
-      void tool_removed_signal( int index );
+  void remove_tool( int index );
+
+  inline int get_active_index()
+  {
+    return active_index_;
+  }
+  inline QWidget* get_active_tool()
+  {
+    return active_tool_;
+  }
+
+  QWidget* get_tool_at( int index );
+
+  void set_active_index( int index );
+  void set_active_tool( QWidget *tool );
+
+  int index_of( QWidget *index );
+
+Q_SIGNALS:
+void tool_removed_signal( int index );
 
 private:
-    
-    QWidget*     main_;
-    QVBoxLayout* main_layout_;
-    QVBoxLayout* tool_layout_;
 
-    typedef boost::shared_ptr<ToolBoxWidgetPrivate> ToolBoxWidgetPrivateHandle;
-    ToolBoxWidgetPrivateHandle private_;
-    
-    int active_index_ ;
-    QWidget *active_tool_;
-        
-    QIcon active_close_icon_;    
-    QIcon inactive_close_icon_;    
+  QWidget* main_;
+  QVBoxLayout* main_layout_;
+  QVBoxLayout* tool_layout_;
 
-    QIcon active_help_icon_;    
-    QIcon inactive_help_icon_;    
-        
-    //void tool_removed( int index );
+  typedef boost::shared_ptr< ToolBoxWidgetPrivate > ToolBoxWidgetPrivateHandle;
+  ToolBoxWidgetPrivateHandle private_;
 
-    
-  private Q_SLOTS:
-    void help_button_clicked();
-  
+  int active_index_;
+  QWidget *active_tool_;
+
+  QIcon active_close_icon_;
+  QIcon inactive_close_icon_;
+
+  QIcon active_help_icon_;
+  QIcon inactive_help_icon_;
+
+  //void tool_removed( int index );
+
+
+private Q_SLOTS:
+void help_button_clicked();
+
 };
 
-}  //endnamespace Seg3d
+} //endnamespace Seg3d
 
 #endif

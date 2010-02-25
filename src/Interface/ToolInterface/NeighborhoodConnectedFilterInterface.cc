@@ -24,7 +24,7 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
-*/
+ */
 
 //Interface Includes
 #include <Interface/QtInterface/QtBridge.h>
@@ -36,44 +36,46 @@
 //Application Includes
 #include <Application/Tools/NeighborhoodConnectedFilter.h>
 
+namespace Seg3D
+{
 
-namespace Seg3D {
-  
-  SCI_REGISTER_TOOLINTERFACE(NeighborhoodConnectedFilterInterface)
-  
-class NeighborhoodConnectedFilterInterfacePrivate {
+SCI_REGISTER_TOOLINTERFACE(NeighborhoodConnectedFilterInterface)
+
+class NeighborhoodConnectedFilterInterfacePrivate
+{
 public:
   Ui::NeighborhoodConnectedFilterInterface ui_;
 };
-  
-  // constructor
-  NeighborhoodConnectedFilterInterface::NeighborhoodConnectedFilterInterface() :
-  private_(new NeighborhoodConnectedFilterInterfacePrivate)
-  { }
-  
-  // destructor
-  NeighborhoodConnectedFilterInterface::~NeighborhoodConnectedFilterInterface()
-  { }
-  
-  // build the interface and connect it to the state manager
-  bool
-  NeighborhoodConnectedFilterInterface::build_widget(QFrame* frame)
-  {
-    //Step 1 - build the Qt GUI Widget
-    private_->ui_.setupUi(frame);
-    
-    //Step 2 - get a pointer to the tool
-    ToolHandle base_tool_ = tool();
-    NeighborhoodConnectedFilter* tool = dynamic_cast<NeighborhoodConnectedFilter*>(base_tool_.get());
-    
-    //Step 3 - connect the gui to the tool through the QtBridge
-    QtBridge::connect(private_->ui_.targetComboBox, tool->target_layer_state_);
-    
-    //Send a message to the log that we have finised with building the Neighborhood Connected Filter Interface
-    SCI_LOG_DEBUG("Finished building an Neighborhood Connected Filter Interface");
-    return (true);
-    
-  }
-  
-   
+
+// constructor
+NeighborhoodConnectedFilterInterface::NeighborhoodConnectedFilterInterface() :
+  private_( new NeighborhoodConnectedFilterInterfacePrivate )
+{
+}
+
+// destructor
+NeighborhoodConnectedFilterInterface::~NeighborhoodConnectedFilterInterface()
+{
+}
+
+// build the interface and connect it to the state manager
+bool NeighborhoodConnectedFilterInterface::build_widget( QFrame* frame )
+{
+  //Step 1 - build the Qt GUI Widget
+  private_->ui_.setupUi( frame );
+
+  //Step 2 - get a pointer to the tool
+  ToolHandle base_tool_ = tool();
+  NeighborhoodConnectedFilter* tool =
+      dynamic_cast< NeighborhoodConnectedFilter* > ( base_tool_.get() );
+
+  //Step 3 - connect the gui to the tool through the QtBridge
+  QtBridge::connect( private_->ui_.targetComboBox, tool->target_layer_state_ );
+
+  //Send a message to the log that we have finised with building the Neighborhood Connected Filter Interface
+  SCI_LOG_DEBUG("Finished building an Neighborhood Connected Filter Interface");
+  return ( true );
+
+}
+
 } // namespace Seg3D

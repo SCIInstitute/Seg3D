@@ -29,46 +29,41 @@
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/ConfidenceConnectedFilter.h>
 
+namespace Seg3D
+{
 
-namespace Seg3D {
-  
-  // Register the tool into the tool factory
-  SCI_REGISTER_TOOL(ConfidenceConnectedFilter)
-  
-  
-  ConfidenceConnectedFilter::ConfidenceConnectedFilter(const std::string& toolid) :
-  Tool(toolid)
-  {
-    add_state("target",target_layer_state_,"<none>","<none>");
-    add_state("iterations",iterations_state_,1,100,1,1);
-    add_state("threshold_multiplier",threshold_multiplier_state_,1,100,1,1);
-    
-    
-    // Add constaints, so that when the state changes the right ranges of 
-    // parameters are selected
-    target_layer_state_->value_changed_signal_.connect(
-      boost::bind(&ConfidenceConnectedFilter::target_constraint,this,_1));
-    
-  }
-  
-  void
-  ConfidenceConnectedFilter::target_constraint(std::string layerid)
-  {
-  }
-  
-  ConfidenceConnectedFilter::~ConfidenceConnectedFilter()
-  {
-    disconnect_all(); 
-  }
-  
-  void
-  ConfidenceConnectedFilter::activate()
-  {
-  }
-  
-  void
-  ConfidenceConnectedFilter::deactivate()
-  {
-  }
-  
+// Register the tool into the tool factory
+SCI_REGISTER_TOOL(ConfidenceConnectedFilter)
+
+ConfidenceConnectedFilter::ConfidenceConnectedFilter( const std::string& toolid ) :
+  Tool( toolid )
+{
+  add_state( "target", target_layer_state_, "<none>", "<none>" );
+  add_state( "iterations", iterations_state_, 1, 100, 1, 1 );
+  add_state( "threshold_multiplier", threshold_multiplier_state_, 1, 100, 1, 1 );
+
+  // Add constaints, so that when the state changes the right ranges of
+  // parameters are selected
+  target_layer_state_->value_changed_signal_.connect( boost::bind(
+      &ConfidenceConnectedFilter::target_constraint, this, _1 ) );
+
+}
+
+void ConfidenceConnectedFilter::target_constraint( std::string layerid )
+{
+}
+
+ConfidenceConnectedFilter::~ConfidenceConnectedFilter()
+{
+  disconnect_all();
+}
+
+void ConfidenceConnectedFilter::activate()
+{
+}
+
+void ConfidenceConnectedFilter::deactivate()
+{
+}
+
 } // end namespace Seg3D

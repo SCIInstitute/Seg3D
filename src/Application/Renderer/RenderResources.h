@@ -1,30 +1,30 @@
 /*
-   For more information, please see: http://software.sci.utah.edu
+ For more information, please see: http://software.sci.utah.edu
 
-   The MIT License
+ The MIT License
 
-   Copyright (c) 2009 Scientific Computing and Imaging Institute,
-   University of Utah.
+ Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ University of Utah.
 
-   
-   Permission is hereby granted, free of charge, to any person obtaining a
-   copy of this software and associated documentation files (the "Software"),
-   to deal in the Software without restriction, including without limitation
-   the rights to use, copy, modify, merge, publish, distribute, sublicense,
-   and/or sell copies of the Software, and to permit persons to whom the
-   Software is furnished to do so, subject to the following conditions:
 
-   The above copyright notice and this permission notice shall be included
-   in all copies or substantial portions of the Software.
+ Permission is hereby granted, free of charge, to any person obtaining a
+ copy of this software and associated documentation files (the "Software"),
+ to deal in the Software without restriction, including without limitation
+ the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ and/or sell copies of the Software, and to permit persons to whom the
+ Software is furnished to do so, subject to the following conditions:
 
-   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-   OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-   THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-   DEALINGS IN THE SOFTWARE.
-*/
+ The above copyright notice and this permission notice shall be included
+ in all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+ OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ DEALINGS IN THE SOFTWARE.
+ */
 
 #ifndef APPLICATION_RENDERER_RENDERRESOURCES_H
 #define APPLICATION_RENDERER_RENDERRESOURCES_H
@@ -44,7 +44,8 @@
 #include <Application/Renderer/RenderContext.h>
 #include <Application/Renderer/RenderResourcesContext.h>
 
-namespace Seg3D {
+namespace Seg3D
+{
 
 // CLASS RENDERRESOURCES
 // The resources for rendering in an abstract interface
@@ -53,75 +54,88 @@ namespace Seg3D {
 class RenderResources;
 
 // Class definition
-class RenderResources : public boost::noncopyable {
+class RenderResources : public boost::noncopyable
+{
 
-// -- constructor --
-  private:
-    friend class Utils::Singleton<RenderResources>;
-    RenderResources();
-    
-  public:
-    virtual ~RenderResources();
-    
-// -- context handling --    
-  public:  
-    // CREATE_RENDER_CONTEXT:
-    // Generate a render context for one of the viewers
-    bool create_render_context(RenderContextHandle& context);
-    
-    // INSTALL_RESOURCES_CONTEXT:
-    // Install a context from the UI system in the resource, so this
-    // class can generate virtual OpenGL contexts. 
-    void install_resources_context(RenderResourcesContextHandle resources_context);
-    
-    // VALID_RENDER_RESOURCES:
-    // Check whether valid render resources have been installed
-    bool valid_render_resources();
-    
-  private:
-    
-    // A Handle to resource that generated the contexts
-    RenderResourcesContextHandle resources_context_;
-    
-// -- render locks --
-  public:
-  
-    typedef boost::recursive_mutex mutex_type;
-  typedef boost::unique_lock<mutex_type> lock_type;
+  // -- constructor --
+private:
+  friend class Utils::Singleton< RenderResources >;
+  RenderResources();
 
-    // LOCK_SHARED_CONTEXT:
-    void lock_shared_context() { shared_context_mutex_.lock(); }
+public:
+  virtual ~RenderResources();
 
-    // LOCK_SHARED_CONTEXT:
-    void unlock_shared_context() { shared_context_mutex_.unlock(); }
+  // -- context handling --
+public:
+  // CREATE_RENDER_CONTEXT:
+  // Generate a render context for one of the viewers
+  bool create_render_context( RenderContextHandle& context );
 
-    // SHARED_CONTEXT_MUTEX:
-    // reference to the mutex that protects the common pool of textures
-    mutex_type& shared_context_mutex() { return shared_context_mutex_; }
+  // INSTALL_RESOURCES_CONTEXT:
+  // Install a context from the UI system in the resource, so this
+  // class can generate virtual OpenGL contexts.
+  void install_resources_context( RenderResourcesContextHandle resources_context );
 
-  private:
-    // We need a lock that protects against multiple threads reserving
-    // OpenGL resources at the same time
-    mutex_type shared_context_mutex_;
+  // VALID_RENDER_RESOURCES:
+  // Check whether valid render resources have been installed
+  bool valid_render_resources();
 
-// -- OpenGL initialization --
-  public:
-  
-    // Initialize the OpenGL environment
-    void init_gl();
-    
-  private:
-  
-    // State variable indicating whether the OpenGL environment has been initialized
-    bool gl_initialized_;
-    
-// -- Singleton interface --
-  public:
-    
-    static RenderResources* Instance() { return instance_.instance(); }
-    
-  private:
-    static Utils::Singleton<RenderResources> instance_;
+private:
+
+  // A Handle to resource that generated the contexts
+  RenderResourcesContextHandle resources_context_;
+
+  // -- render locks --
+public:
+
+  typedef boost::recursive_mutex mutex_type;
+  typedef boost::unique_lock< mutex_type > lock_type;
+
+  // LOCK_SHARED_CONTEXT:
+  void lock_shared_context()
+  {
+    shared_context_mutex_.lock();
+  }
+
+  // LOCK_SHARED_CONTEXT:
+  void unlock_shared_context()
+  {
+    shared_context_mutex_.unlock();
+  }
+
+  // SHARED_CONTEXT_MUTEX:
+  // reference to the mutex that protects the common pool of textures
+  mutex_type& shared_context_mutex()
+  {
+    return shared_context_mutex_;
+  }
+
+private:
+  // We need a lock that protects against multiple threads reserving
+  // OpenGL resources at the same time
+  mutex_type shared_context_mutex_;
+
+  // -- OpenGL initialization --
+public:
+
+  // Initialize the OpenGL environment
+  void init_gl();
+
+private:
+
+  // State variable indicating whether the OpenGL environment has been initialized
+  bool gl_initialized_;
+
+  // -- Singleton interface --
+public:
+
+  static RenderResources* Instance()
+  {
+    return instance_.instance();
+  }
+
+private:
+  static Utils::Singleton< RenderResources > instance_;
 };
 
 class OpenGLException : public Utils::Exception

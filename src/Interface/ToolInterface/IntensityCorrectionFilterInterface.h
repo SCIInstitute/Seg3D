@@ -39,26 +39,26 @@
 #include <Interface/AppInterface/ToolWidget.h>
 #include <Interface/ToolInterface/CustomWidgets/SliderSpinComboInt.h>
 
+namespace Seg3D
+{
 
-namespace Seg3D {
-  
 class IntensityCorrectionFilterInterfacePrivate;
-  
-class IntensityCorrectionFilterInterface : public ToolWidget {
-    Q_OBJECT
 
-    
-  public:
-    IntensityCorrectionFilterInterface();
-    virtual ~IntensityCorrectionFilterInterface();
-    virtual bool build_widget(QFrame* frame);
-    
-  private:
-    IntensityCorrectionFilterInterfacePrivate* private_;
-    SliderSpinComboInt *orderAdjuster;
-    SliderSpinComboInt *edgeAdjuster;
-  };
-  
+class IntensityCorrectionFilterInterface : public ToolWidget
+{
+Q_OBJECT
+
+public:
+  IntensityCorrectionFilterInterface();
+  virtual ~IntensityCorrectionFilterInterface();
+  virtual bool build_widget( QFrame* frame );
+
+private:
+  IntensityCorrectionFilterInterfacePrivate* private_;
+  SliderSpinComboInt *orderAdjuster;
+  SliderSpinComboInt *edgeAdjuster;
+};
+
 } // namespace Seg3D
 
 #endif

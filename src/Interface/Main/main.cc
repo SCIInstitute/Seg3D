@@ -67,7 +67,7 @@
 
 using namespace Seg3D;
 
-int main(int argc, char **argv)
+int main( int argc, char **argv )
 {
 
 #ifdef X11_THREADSAFE
@@ -77,95 +77,95 @@ int main(int argc, char **argv)
 
   // -- Setup error logging --
   // stream error to the console window
-  Utils::LogStreamer error_log(Utils::Log::ALL_E,&(std::cerr));
-  
+  Utils::LogStreamer error_log( Utils::Log::ALL_E, &( std::cerr ) );
+
   // -- Startup Seg3D --
   SCI_LOG_MESSAGE(std::string("--- Starting Seg3D ")+SEG3D_VERSION+" "+
-          SEG3D_BITS+" "+SEG3D_DEBUG_VERSION+" ---");
-  
+    SEG3D_BITS+" "+SEG3D_DEBUG_VERSION+" ---");
+
   // -- Setup action history --
   SCI_LOG_DEBUG("Setup action history");
-  Seg3D::ActionHistory::Instance()->set_max_history_size(300);
-  
+  Seg3D::ActionHistory::Instance()->set_max_history_size( 300 );
+
   // -- Parse the command line parameters and put them in a stl::map --
   Seg3D::Application::Instance()->parse_command_line_parameters( argc, argv );
-  
+
   // -- Use Seg3D::Application::Instance()->checkCommandLineParameter( const std::string &key ) 
   // -- to test if a given parameter was passed.
   // -- Checking for the socket parameter --
-  std::string socket_number_as_string_ = 
-  Seg3D::Application::Instance()->checkCommandLineParameter("socket");
-  int socket_number_ =  boost::lexical_cast<int>(socket_number_as_string_);
-  
-  if (socket_number_ > 0) 
+  std::string socket_number_as_string_ =
+      Seg3D::Application::Instance()->checkCommandLineParameter( "socket" );
+  int socket_number_ = boost::lexical_cast< int >( socket_number_as_string_ );
+
+  if ( socket_number_ > 0 )
   {
     // -- Add a socket for receiving actions --
     SCI_LOG_DEBUG("Starting a socket on port: " + socket_number_as_string_);
-    
-    ActionSocket::Instance()->start(socket_number_);
+
+    ActionSocket::Instance()->start( socket_number_ );
   }
-  
+
   // -- Add plugins into the architecture  
   SCI_LOG_DEBUG("Setup and register all the plugins");
   Seg3D::InitPlugins();
   Seg3D::QtInitResources();
-  
+
   // -- Setup the QT Interface Layer --
   SCI_LOG_DEBUG("Setup QT Interface");
-  if (!(QtApplication::Instance()->setup(argc,argv))) 
+  if ( !( QtApplication::Instance()->setup( argc, argv ) ) )
   {
-    SCI_LOG_ERROR("Could not setup QT Interface");  
-    return (-1);
+    SCI_LOG_ERROR("Could not setup QT Interface");
+    return ( -1 );
   }
-    
+
   // -- Setup Application Interface Window --
   SCI_LOG_DEBUG("Setup Application Interface");
-  
+
   // The application window needs the qApplication as parent, which is
   // defined in the QtApplication, which integrates the Qt eventloop with
   // the interface eventloop of the Application layer.
   try
   {
     AppInterface* app_interface = new AppInterface;
-    
+
     // Show the full interface
     app_interface->show();
-    
+
     // Put the interface on top of all the other windows
     app_interface->raise();
-    
+
     // -- Run QT event loop --
     SCI_LOG_DEBUG("Start the main QT event loop");
-    
+
     // Start the event processing loop
-    if (!(QtApplication::Instance()->exec()))
+    if ( !( QtApplication::Instance()->exec() ) )
     {
-      SCI_LOG_ERROR("The interface thread crashed, exiting Seg3D");  
-      return (-1);
-    }    
-    
+      SCI_LOG_ERROR("The interface thread crashed, exiting Seg3D");
+      return ( -1 );
+    }
+
   }
-  catch(Utils::Exception& except)
-  {  
+  catch ( Utils::Exception& except )
+  {
     // Catch any Seg3D generated exceptions and display there message in the log file
     SCI_LOG_ERROR(std::string("Setup of the interface crashed by throwing an exception: ") + except.message());
-    return(-1);
+    return ( -1 );
   }
-  catch(std::exception& except)
+  catch ( std::exception& except )
   {
     // For any other exception
     SCI_LOG_ERROR(std::string("Setup of the interface crashed by throwing an exception: ") + except.what());
-    return(-1);
+    return ( -1 );
   }
-  catch(...)
+  catch ( ... )
   {
     // For any other exception
     SCI_LOG_ERROR(std::string("Setup of the interface crashed by throwing an unknown exception"));
-    return(-1);
+    return ( -1 );
   }
-  
+
   // Indicate a successful finish of the program
   SCI_LOG_MESSAGE("--- Finished ---");
-  return (0);
+  return ( 0 );
 }
 

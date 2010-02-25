@@ -40,25 +40,25 @@
 #include <boost/thread/thread.hpp>
 #include <boost/shared_ptr.hpp>
 
-namespace Seg3D {
-  
-  class SplashStartPrivate;
-  
-  class SplashStart : public QDialog 
-  {   
-    Q_OBJECT
-    
-  public:
-    SplashStart(QDialog* parent = 0);
-    virtual ~SplashStart();
-    
-    
-  private:
-    // Internals of the dockwidget
-    boost::shared_ptr<SplashStartPrivate> private_;
-      
-  };
-  
+namespace Seg3D
+{
+
+class SplashStartPrivate;
+
+class SplashStart : public QDialog
+{
+Q_OBJECT
+
+public:
+  SplashStart( QDialog* parent = 0 );
+  virtual ~SplashStart();
+
+private:
+  // Internals of the dockwidget
+  boost::shared_ptr< SplashStartPrivate > private_;
+
+};
+
 } // end namespace
 
 #endif // SPLASHSTART_H

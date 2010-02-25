@@ -24,7 +24,7 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
-*/
+ */
 
 #ifndef PROJECTDOCKWIDGET_H
 #define PROJECTDOCKWIDGET_H
@@ -41,23 +41,24 @@
 #include <boost/thread/thread.hpp>
 #include <boost/shared_ptr.hpp>
 
-namespace Seg3D{
-  
-class ProjectDockWidgetPrivate;
-  
-class ProjectDockWidget : public QDockWidget {
-  
-    Q_OBJECT
-  
-public:
-    ProjectDockWidget(QWidget *parent = 0);
-    virtual ~ProjectDockWidget();
+namespace Seg3D
+{
 
+class ProjectDockWidgetPrivate;
+
+class ProjectDockWidget : public QDockWidget
+{
+
+Q_OBJECT
+
+public:
+  ProjectDockWidget( QWidget *parent = 0 );
+  virtual ~ProjectDockWidget();
 
 private:
-    boost::shared_ptr<ProjectDockWidgetPrivate> private_;
+  boost::shared_ptr< ProjectDockWidgetPrivate > private_;
 };
-  
+
 } // end namespace
 
 #endif // PROJECTDOCKWIDGET_H

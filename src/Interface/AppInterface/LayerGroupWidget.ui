@@ -762,11 +762,6 @@ QWidget#group_tools_{
          </item>
          <item>
           <widget class="QTabWidget" name="tabWidget">
-           <property name="font">
-            <font>
-             <pointsize>10</pointsize>
-            </font>
-           </property>
            <property name="tabPosition">
             <enum>QTabWidget::North</enum>
            </property>
@@ -777,7 +772,7 @@ QWidget#group_tools_{
             <number>0</number>
            </property>
            <property name="elideMode">
-            <enum>Qt::ElideNone</enum>
+            <enum>Qt::ElideRight</enum>
            </property>
            <widget class="QWidget" name="tab">
             <attribute name="title">
@@ -1144,7 +1139,7 @@ QWidget#group_tools_{
             <number>0</number>
            </property>
            <property name="elideMode">
-            <enum>Qt::ElideNone</enum>
+            <enum>Qt::ElideRight</enum>
            </property>
            <widget class="QWidget" name="tab_5">
             <attribute name="title">

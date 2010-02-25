@@ -38,24 +38,25 @@
 // Base class of the tool widget include
 #include <Interface/AppInterface/ToolWidget.h>
 
-
-namespace Seg3D {
+namespace Seg3D
+{
 
 class FlipToolInterfacePrivate;
 
-class FlipToolInterface : public ToolWidget {
-  Q_OBJECT
+class FlipToolInterface : public ToolWidget
+{
+Q_OBJECT
 
-  // Constructor/destructor  
-  public:
-    FlipToolInterface();
-    virtual ~FlipToolInterface();
-    virtual bool build_widget(QFrame* frame);
+// Constructor/destructor
+public:
+  FlipToolInterface();
+  virtual ~FlipToolInterface();
+  virtual bool build_widget( QFrame* frame );
 
-  private:
-    FlipToolInterfacePrivate* private_;
+private:
+  FlipToolInterfacePrivate* private_;
 
-};    
+};
 
 } // end namespace Seg3D
 

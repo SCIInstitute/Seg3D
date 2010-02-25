@@ -38,27 +38,25 @@
 // Base class of the tool widget
 #include <Interface/AppInterface/ToolWidget.h>
 
+namespace Seg3D
+{
 
-namespace Seg3D {
-  
 class BooleanFilterInterfacePrivate;
 
-class BooleanFilterInterface : public ToolWidget {
-  Q_OBJECT
-    
-   
-  public:
-    BooleanFilterInterface();
-    virtual ~BooleanFilterInterface();
-    virtual bool build_widget(QFrame* frame);
-    
-    
-  private:
-    BooleanFilterInterfacePrivate* private_;
- 
-    
-  };
-  
+class BooleanFilterInterface : public ToolWidget
+{
+Q_OBJECT
+
+public:
+  BooleanFilterInterface();
+  virtual ~BooleanFilterInterface();
+  virtual bool build_widget( QFrame* frame );
+
+private:
+  BooleanFilterInterfacePrivate* private_;
+
+};
+
 } // namespace Seg3D
 
 #endif

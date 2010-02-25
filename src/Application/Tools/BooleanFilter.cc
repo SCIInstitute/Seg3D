@@ -29,54 +29,53 @@
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/BooleanFilter.h>
 
+namespace Seg3D
+{
 
-namespace Seg3D {
-  
-  // Register the tool into the tool factory
-  SCI_REGISTER_TOOL(BooleanFilter)
-  
-  
-  BooleanFilter::BooleanFilter(const std::string& toolid) :
-  Tool(toolid)
-  {
-    // add default values for the the states
-    add_state("mask_a",mask_a_state_,"<none>","<none>");
-    add_state("mask_b",mask_b_state_,"<none>","<none>");
-    add_state("mask_c",mask_c_state_,"<none>","<none>");
-    add_state("mask_d",mask_d_state_,"<none>","<none>");
-    add_state("example_expressions",example_expressions_state_,"<none>","<none>");
-    add_state("replace",replace_state_,false);
-    
-    // Add constaints, so that when the state changes the right ranges of 
-    // parameters are selected
-    mask_a_state_->value_changed_signal_.connect(boost::bind(&BooleanFilter::target_constraint,this,_1));
-    mask_b_state_->value_changed_signal_.connect(boost::bind(&BooleanFilter::target_constraint,this,_1));
-    mask_c_state_->value_changed_signal_.connect(boost::bind(&BooleanFilter::target_constraint,this,_1));
-    mask_d_state_->value_changed_signal_.connect(boost::bind(&BooleanFilter::target_constraint,this,_1));
-    
-    
-  }
-  
-  void
-  BooleanFilter::target_constraint(std::string layerid)
-  {
-  }
-  
-  BooleanFilter::~BooleanFilter()
-  {
-    disconnect_all();
-  }
-  
-  void
-  BooleanFilter::activate()
-  {
-  }
-  
-  void
-  BooleanFilter::deactivate()
-  {
-  }
-  
+// Register the tool into the tool factory
+SCI_REGISTER_TOOL(BooleanFilter)
+
+BooleanFilter::BooleanFilter( const std::string& toolid ) :
+  Tool( toolid )
+{
+  // add default values for the the states
+  add_state( "mask_a", mask_a_state_, "<none>", "<none>" );
+  add_state( "mask_b", mask_b_state_, "<none>", "<none>" );
+  add_state( "mask_c", mask_c_state_, "<none>", "<none>" );
+  add_state( "mask_d", mask_d_state_, "<none>", "<none>" );
+  add_state( "example_expressions", example_expressions_state_, "<none>", "<none>" );
+  add_state( "replace", replace_state_, false );
+
+  // Add constaints, so that when the state changes the right ranges of
+  // parameters are selected
+  mask_a_state_->value_changed_signal_.connect( boost::bind( &BooleanFilter::target_constraint,
+      this, _1 ) );
+  mask_b_state_->value_changed_signal_.connect( boost::bind( &BooleanFilter::target_constraint,
+      this, _1 ) );
+  mask_c_state_->value_changed_signal_.connect( boost::bind( &BooleanFilter::target_constraint,
+      this, _1 ) );
+  mask_d_state_->value_changed_signal_.connect( boost::bind( &BooleanFilter::target_constraint,
+      this, _1 ) );
+
+}
+
+void BooleanFilter::target_constraint( std::string layerid )
+{
+}
+
+BooleanFilter::~BooleanFilter()
+{
+  disconnect_all();
+}
+
+void BooleanFilter::activate()
+{
+}
+
+void BooleanFilter::deactivate()
+{
+}
+
 } // end namespace Seg3D
 
 

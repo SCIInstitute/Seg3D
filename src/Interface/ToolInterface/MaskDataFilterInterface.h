@@ -40,25 +40,25 @@
 
 #include <Interface/ToolInterface/CustomWidgets/SliderSpinCombo.h>
 
-namespace Seg3D {
-  
+namespace Seg3D
+{
+
 class MaskDataFilterInterfacePrivate;
 
-class MaskDataFilterInterface : public ToolWidget {
-  Q_OBJECT
-    
-  public:
-    MaskDataFilterInterface();
-    virtual ~MaskDataFilterInterface();
-    virtual bool build_widget(QFrame* frame);
-    
-    
-  private:
-    MaskDataFilterInterfacePrivate* private_;
-  
-       
+class MaskDataFilterInterface : public ToolWidget
+{
+Q_OBJECT
+
+public:
+  MaskDataFilterInterface();
+  virtual ~MaskDataFilterInterface();
+  virtual bool build_widget( QFrame* frame );
+
+private:
+  MaskDataFilterInterfacePrivate* private_;
+
 };
-  
+
 } // namespace Seg3D
 
 #endif

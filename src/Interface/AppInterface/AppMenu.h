@@ -1,30 +1,30 @@
 /*
-   For more information, please see: http://software.sci.utah.edu
+ For more information, please see: http://software.sci.utah.edu
 
-   The MIT License
+ The MIT License
 
-   Copyright (c) 2009 Scientific Computing and Imaging Institute,
-   University of Utah.
+ Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ University of Utah.
 
-   
-   Permission is hereby granted, free of charge, to any person obtaining a
-   copy of this software and associated documentation files (the "Software"),
-   to deal in the Software without restriction, including without limitation
-   the rights to use, copy, modify, merge, publish, distribute, sublicense,
-   and/or sell copies of the Software, and to permit persons to whom the
-   Software is furnished to do so, subject to the following conditions:
 
-   The above copyright notice and this permission notice shall be included
-   in all copies or substantial portions of the Software.
+ Permission is hereby granted, free of charge, to any person obtaining a
+ copy of this software and associated documentation files (the "Software"),
+ to deal in the Software without restriction, including without limitation
+ the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ and/or sell copies of the Software, and to permit persons to whom the
+ Software is furnished to do so, subject to the following conditions:
 
-   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-   OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-   THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-   DEALINGS IN THE SOFTWARE.
-*/
+ The above copyright notice and this permission notice shall be included
+ in all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+ OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ DEALINGS IN THE SOFTWARE.
+ */
 
 #ifndef INTERFACE_APPINTERFACE_APPMENU_H
 #define INTERFACE_APPINTERFACE_APPMENU_H
@@ -42,41 +42,39 @@
 //#include <Interface/AppInterface/AppInterface.h>
 
 
-namespace Seg3D {
+namespace Seg3D
+{
 
 class AppMenu : public QObject
 {
-  Q_OBJECT
+Q_OBJECT
 // -- constructor / destructor --    
-  public:
-    AppMenu(QMainWindow* parent = 0);
-    AppMenu(QMainWindow* parent, ViewerInterface* view_ptr); 
-    virtual ~AppMenu();
+public:
+  AppMenu( QMainWindow* parent = 0 );
+  AppMenu( QMainWindow* parent, ViewerInterface* view_ptr );
+  virtual ~AppMenu();
 
-// -- functions for building menus --
-  public:
+  // -- functions for building menus --
+public:
 
-    void create_file_menu(QMenu* menu);
-    void create_edit_menu(QMenu* menu);
-    void create_view_menu(QMenu* menu);
-    void create_tool_menu(QMenu* menu);
-    void create_filter_menu(QMenu* menu);
-    void create_window_menu(QMenu* menu);
-  
-    ViewerInterface *viewer_pointer_;
+  void create_file_menu( QMenu* menu );
+  void create_edit_menu( QMenu* menu );
+  void create_view_menu( QMenu* menu );
+  void create_tool_menu( QMenu* menu );
+  void create_filter_menu( QMenu* menu );
+  void create_window_menu( QMenu* menu );
 
-// -- Menu pointers --
-  private:
+  ViewerInterface *viewer_pointer_;
 
-    QMenu* file_menu_;
-    QMenu* edit_menu_;
-    QMenu* view_menu_;
-    QMenu* tool_menu_;
-    QMenu* filter_menu_;
-    QMenu* window_menu_;
-    
-       
+  // -- Menu pointers --
+private:
 
+  QMenu* file_menu_;
+  QMenu* edit_menu_;
+  QMenu* view_menu_;
+  QMenu* tool_menu_;
+  QMenu* filter_menu_;
+  QMenu* window_menu_;
 
 };
 

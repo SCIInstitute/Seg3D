@@ -1,30 +1,30 @@
 /*
-For more information, please see: http://software.sci.utah.edu
+ For more information, please see: http://software.sci.utah.edu
 
-The MIT License
+ The MIT License
 
-Copyright (c) 2009 Scientific Computing and Imaging Institute,
-University of Utah.
+ Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ University of Utah.
 
 
-Permission is hereby granted, free of charge, to any person obtaining a
-copy of this software and associated documentation files (the "Software"),
-to deal in the Software without restriction, including without limitation
-the rights to use, copy, modify, merge, publish, distribute, sublicense,
-and/or sell copies of the Software, and to permit persons to whom the
-Software is furnished to do so, subject to the following conditions:
+ Permission is hereby granted, free of charge, to any person obtaining a
+ copy of this software and associated documentation files (the "Software"),
+ to deal in the Software without restriction, including without limitation
+ the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ and/or sell copies of the Software, and to permit persons to whom the
+ Software is furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included
-in all copies or substantial portions of the Software.
+ The above copyright notice and this permission notice shall be included
+ in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-DEALINGS IN THE SOFTWARE.
-*/
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+ OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ DEALINGS IN THE SOFTWARE.
+ */
 
 #ifndef UTILS_GEOMETRY_QUATERNION_H
 #define UTILS_GEOMETRY_QUATERNION_H
@@ -32,7 +32,8 @@ DEALINGS IN THE SOFTWARE.
 // Utils includes
 #include <Utils/Math/MathFunctions.h>
 
-namespace Utils {
+namespace Utils
+{
 
 class Vector;
 class Matrix;
@@ -43,53 +44,66 @@ class Matrix;
 // using Quaternion for rotation only. Similarly, only functions and operators necessary 
 // for performing rotations are implemented.
 
-class Quaternion {
+class Quaternion
+{
 
 public:
 
   // default constructor, makes an identity quaternion
   inline Quaternion();
 
-  inline Quaternion(double w, double x, double y, double z);
+  inline Quaternion( double w, double x, double y, double z );
 
   // copy constructor
-  inline Quaternion(const Quaternion& src);
+  inline Quaternion( const Quaternion& src );
 
   //inline explicit Quaternion(const Vector& vec);
 
   // construct a quaternion from the given axis and angle of rotation
-  Quaternion(const Vector& axis, double angle);
+  Quaternion( const Vector& axis, double angle );
 
   // construct a quaternion from the given rotation transformation
   // NOTE: if the matrix is not pure rotation, the result is undefined
   // NOTE: the matrix should be column major
-  explicit Quaternion(const Matrix& matrix);
+  explicit Quaternion( const Matrix& matrix );
 
   inline Quaternion get_conjugate() const;
   inline void conjugate();
 
   // convert the quaternion to a column major matrix
-  void to_matrix(Matrix& matrix) const;
+  void to_matrix( Matrix& matrix ) const;
 
-  void from_matrix(const Matrix& matrix);
+  void from_matrix( const Matrix& matrix );
 
-  Vector rotate(const Vector& vec) const;
+  Vector rotate( const Vector& vec ) const;
 
-  inline Quaternion operator*(const Quaternion& rhs) const;
-  inline Quaternion& operator*=(const Quaternion& rhs);
+  inline Quaternion operator*( const Quaternion& rhs ) const;
+  inline Quaternion& operator*=( const Quaternion& rhs );
 
-  inline bool operator==(const Quaternion& rhs) const;
+  inline bool operator==( const Quaternion& rhs ) const;
 
-  inline Quaternion& operator=(const Quaternion& rhs);
+  inline Quaternion& operator=( const Quaternion& rhs );
 
-  inline double w() const { return w_; }
-  inline double x() const { return x_; }
-  inline double y() const { return y_; }
-  inline double z() const { return z_; }
+  inline double w() const
+  {
+    return w_;
+  }
+  inline double x() const
+  {
+    return x_;
+  }
+  inline double y() const
+  {
+    return y_;
+  }
+  inline double z() const
+  {
+    return z_;
+  }
 
 private:
 
-  friend Quaternion Slerp(const Quaternion&, const Quaternion&, double, bool);
+  friend Quaternion Slerp( const Quaternion&, const Quaternion&, double, bool );
 
   inline double normalize();
   inline double norm() const;
@@ -108,27 +122,27 @@ private:
 };
 
 inline Quaternion::Quaternion() :
-  w_(1), x_(0), y_(0), z_(0)
+  w_( 1 ), x_( 0 ), y_( 0 ), z_( 0 )
 {
 }
 
-inline Quaternion::Quaternion(double w, double x, double y, double z) :
-  w_(w), x_(x), y_(y), z_(z)
+inline Quaternion::Quaternion( double w, double x, double y, double z ) :
+  w_( w ), x_( x ), y_( y ), z_( z )
 {
   normalize();
 }
 
-inline Quaternion::Quaternion(const Quaternion &src) :
-  w_(src.w_), x_(src.x_), y_(src.y_), z_(src.z_)
+inline Quaternion::Quaternion( const Quaternion &src ) :
+  w_( src.w_ ), x_( src.x_ ), y_( src.y_ ), z_( src.z_ )
 {
 }
 
 inline double Quaternion::normalize()
 {
   double len = norm();
-  if (len > NUMERIC_EPSILON)
+  if ( len > NUMERIC_EPSILON )
   {
-    double s = 1.0/len;
+    double s = 1.0 / len;
     w_ *= s;
     x_ *= s;
     y_ *= s;
@@ -146,7 +160,7 @@ inline double Quaternion::normalize()
 
 inline double Quaternion::norm() const
 {
-  return Sqrt(w_*w_ + x_*x_ + y_*y_ + z_*z_);
+  return Sqrt( w_ * w_ + x_ * x_ + y_ * y_ + z_ * z_ );
 }
 
 inline Quaternion Quaternion::get_conjugate() const
@@ -167,41 +181,42 @@ inline void Quaternion::conjugate()
   z_ = -z_;
 }
 
-inline Quaternion Quaternion::operator*(const Quaternion& rhs) const
+inline Quaternion Quaternion::operator*( const Quaternion& rhs ) const
 {
   Quaternion result;
-  result.x_ = x_*rhs.w_ + y_*rhs.z_ - z_*rhs.y_ + w_*rhs.x_;
-  result.y_ = -x_*rhs.z_ + y_*rhs.w_ + z_*rhs.x_ + w_*rhs.y_;
-  result.z_ = x_*rhs.y_ - y_*rhs.x_ + z_*rhs.w_ + w_*rhs.z_;
-  result.w_ = -x_*rhs.x_ - y_*rhs.y_ - z_*rhs.z_ + w_*rhs.w_;
+  result.x_ = x_ * rhs.w_ + y_ * rhs.z_ - z_ * rhs.y_ + w_ * rhs.x_;
+  result.y_ = -x_ * rhs.z_ + y_ * rhs.w_ + z_ * rhs.x_ + w_ * rhs.y_;
+  result.z_ = x_ * rhs.y_ - y_ * rhs.x_ + z_ * rhs.w_ + w_ * rhs.z_;
+  result.w_ = -x_ * rhs.x_ - y_ * rhs.y_ - z_ * rhs.z_ + w_ * rhs.w_;
 
   return result;
 }
 
-inline Quaternion& Quaternion::operator*=(const Quaternion& rhs)
+inline Quaternion& Quaternion::operator*=( const Quaternion& rhs )
 {
-  *this = (*this) * rhs;
+  *this = ( *this ) * rhs;
 
-  return (*this);
+  return ( *this );
 }
 
-inline bool Quaternion::operator==(const Quaternion& rhs) const
+inline bool Quaternion::operator==( const Quaternion& rhs ) const
 {
-  return (w_==rhs.w_ && x_==rhs.x_ && y_==rhs.y_ && z_==rhs.z_);
+  return ( w_ == rhs.w_ && x_ == rhs.x_ && y_ == rhs.y_ && z_ == rhs.z_ );
 }
 
-inline Quaternion& Quaternion::operator=(const Quaternion& rhs)
+inline Quaternion& Quaternion::operator=( const Quaternion& rhs )
 {
   w_ = rhs.w_;
   x_ = rhs.x_;
   y_ = rhs.y_;
   z_ = rhs.z_;
 
-  return (*this);
+  return ( *this );
 }
 
 // Spherical linear interpolation between two quaternions
-Quaternion Slerp(const Quaternion& from, const Quaternion& to, double t, bool shortest_path = true);
+Quaternion
+    Slerp( const Quaternion& from, const Quaternion& to, double t, bool shortest_path = true );
 
 } // end namespace Utils
 

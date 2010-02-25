@@ -31,36 +31,36 @@
 
 #include <Application/Tool/Tool.h>
 
-namespace Seg3D  {
-  
-class GradientMagnitudeFilter : public Tool {
-  SCI_TOOL_TYPE( "GradientMagnitudeFilter", "Gradient Magnitude", "",
-                 Tool::DATATODATA_E|Tool::FILTER_E, 
-                 "http://seg3d.org/")
-  
+namespace Seg3D
+{
+
+class GradientMagnitudeFilter : public Tool
+{
+SCI_TOOL_TYPE( "GradientMagnitudeFilter", "Gradient Magnitude", "",
+  Tool::DATATODATA_E|Tool::FILTER_E,
+  "http://seg3d.org/")
+
 public:
-  GradientMagnitudeFilter(const std::string& toolid);
+  GradientMagnitudeFilter( const std::string& toolid );
   virtual ~GradientMagnitudeFilter();
-  
+
   // -- constraint parameters --
-  
+
   // Constrain viewer to right painting tool when layer is selected
-  void target_constraint(std::string layerid);
-  
+  void target_constraint( std::string layerid );
+
   // -- activate/deactivate tool --
-  
+
   virtual void activate();
   virtual void deactivate();
-  
+
   // -- state --
 public:
   // Layerid of the target layer
-  StateOptionHandle              target_layer_state_;
-  
-  StateBoolHandle                replace_state_;
-  
-  
-  
+  StateOptionHandle target_layer_state_;
+
+  StateBoolHandle replace_state_;
+
 };
 
 } // end namespace

@@ -1,30 +1,30 @@
 /*
-   For more information, please see: http://software.sci.utah.edu
+ For more information, please see: http://software.sci.utah.edu
 
-   The MIT License
+ The MIT License
 
-   Copyright (c) 2009 Scientific Computing and Imaging Institute,
-   University of Utah.
+ Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ University of Utah.
 
-   
-   Permission is hereby granted, free of charge, to any person obtaining a
-   copy of this software and associated documentation files (the "Software"),
-   to deal in the Software without restriction, including without limitation
-   the rights to use, copy, modify, merge, publish, distribute, sublicense,
-   and/or sell copies of the Software, and to permit persons to whom the
-   Software is furnished to do so, subject to the following conditions:
 
-   The above copyright notice and this permission notice shall be included
-   in all copies or substantial portions of the Software.
+ Permission is hereby granted, free of charge, to any person obtaining a
+ copy of this software and associated documentation files (the "Software"),
+ to deal in the Software without restriction, including without limitation
+ the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ and/or sell copies of the Software, and to permit persons to whom the
+ Software is furnished to do so, subject to the following conditions:
 
-   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-   OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-   THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-   DEALINGS IN THE SOFTWARE.
-*/
+ The above copyright notice and this permission notice shall be included
+ in all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+ OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ DEALINGS IN THE SOFTWARE.
+ */
 
 #ifndef UTILS_CORE_LOG_H
 #define UTILS_CORE_LOG_H
@@ -44,7 +44,8 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
 
-namespace Utils {
+namespace Utils
+{
 
 // CLASS LOG:
 // This class records a log entry and pushes it onto a signal so more than
@@ -55,64 +56,68 @@ namespace Utils {
 class Log;
 
 // Class definition
-class Log : public boost::noncopyable {
+class Log : public boost::noncopyable
+{
 
-// -- constructor / destructor --
-  private:
-    friend class Singleton<Log>;
-    Log();
+  // -- constructor / destructor --
+private:
+  friend class Singleton< Log > ;
+  Log();
 
-// -- Message types supported --
-  public:
-    enum { ERROR_E = 0x01,
-           WARNING_E = 0x02,
-           MESSAGE_E = 0x04,
-           DEBUG_E = 0x08,
-           ALL_E = ERROR_E|WARNING_E|MESSAGE_E|DEBUG_E };
+  // -- Message types supported --
+public:
+  enum
+  {
+    ERROR_E = 0x01, WARNING_E = 0x02, MESSAGE_E = 0x04, DEBUG_E = 0x08, ALL_E = ERROR_E
+        | WARNING_E | MESSAGE_E | DEBUG_E
+  };
 
-// -- functions for logging --  
-  public:
+  // -- functions for logging --
+public:
 
-    // POST_ERROR:
-    // Post an error onto the log signal
-    
-    void post_error(std::string message, const int line, const char* file);
+  // POST_ERROR:
+  // Post an error onto the log signal
 
-    // POST_WARNING:
-    // Post a warning onto the log signal
-    
-    void post_warning(std::string message, const int line, const char* file);
+  void post_error( std::string message, const int line, const char* file );
 
-    // POST_MESSAGE:
-    // Post a message onto the log signal
+  // POST_WARNING:
+  // Post a warning onto the log signal
 
-    void post_message(std::string message, const int line, const char* file);
+  void post_warning( std::string message, const int line, const char* file );
 
-    // POST_DEBUG:
-    // Post debug information onto the log signal
+  // POST_MESSAGE:
+  // Post a message onto the log signal
 
-    void post_debug(std::string message, const int line, const char* file);
+  void post_message( std::string message, const int line, const char* file );
 
-  private:
-    // HEADER:
-    // Generate a uniform header for the message that is posted
-    std::string header(const int line, const char* file) const;
+  // POST_DEBUG:
+  // Post debug information onto the log signal
 
-// -- signal where to receive the logging information from --
-  public:
-    typedef boost::signals2::signal<void (unsigned int, std::string)> post_log_signal_type;
-  
-    // POST_LOG_SIGNAL
-    // Signal indicating that the history changed
+  void post_debug( std::string message, const int line, const char* file );
 
-    post_log_signal_type post_log_signal_;
+private:
+  // HEADER:
+  // Generate a uniform header for the message that is posted
+  std::string header( const int line, const char* file ) const;
 
-// -- Singleton interface --
-  public:
-    
-    static Log* Instance() { return instance_.instance(); }
-    static Singleton<Log> instance_;
-    
+  // -- signal where to receive the logging information from --
+public:
+  typedef boost::signals2::signal< void( unsigned int, std::string ) > post_log_signal_type;
+
+  // POST_LOG_SIGNAL
+  // Signal indicating that the history changed
+
+  post_log_signal_type post_log_signal_;
+
+  // -- Singleton interface --
+public:
+
+  static Log* Instance()
+  {
+    return instance_.instance();
+  }
+  static Singleton< Log > instance_;
+
 };
 
 // MACROS FOR AUTOMATICALLY INCLUDING LINE NUMBER AND FILE IN THE
@@ -140,13 +145,14 @@ Utils::Log::Instance()->post_debug(message,__LINE__,__FILE__)
 // Internals are separated from the interface
 class LogStreamerInternal;
 
-class LogStreamer {
-  
-  public:
-    LogStreamer(unsigned int log_flags, std::ostream* stream);
+class LogStreamer
+{
 
-  private:
-    boost::shared_ptr<LogStreamerInternal> internal_;
+public:
+LogStreamer(unsigned int log_flags, std::ostream* stream);
+
+private:
+  boost::shared_ptr< LogStreamerInternal > internal_;
 
 };
 

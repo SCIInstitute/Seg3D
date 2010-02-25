@@ -29,51 +29,46 @@
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/CannyEdgeDetectionFilter.h>
 
+namespace Seg3D
+{
 
-namespace Seg3D {
-  
-  // Register the tool into the tool factory
-  SCI_REGISTER_TOOL(CannyEdgeDetectionFilter)
-  
-  
-  CannyEdgeDetectionFilter::CannyEdgeDetectionFilter(const std::string& toolid) :
-  Tool(toolid)
-  {
-    // Need to set ranges and default values for all parameters
-    add_state("target",target_layer_state_,"<none>","<none>");
-    add_state("variance",variance_state_,0.0f,100.0f,1.0f,1.0f);
-    add_state("max_error",max_error_state_,0.0f,100.0f,1.0f,1.0f);
-    add_state("threshold",threshold_state_,0.0f,100.0f,1.0f,1.0f);
-    add_state("replace",replace_state_,false);
+// Register the tool into the tool factory
+SCI_REGISTER_TOOL(CannyEdgeDetectionFilter)
 
-    // Add constaints, so that when the state changes the right ranges of 
-    // parameters are selected
-    target_layer_state_->value_changed_signal_.connect(
-      boost::bind(&CannyEdgeDetectionFilter::target_constraint,this,_1));
+CannyEdgeDetectionFilter::CannyEdgeDetectionFilter( const std::string& toolid ) :
+  Tool( toolid )
+{
+  // Need to set ranges and default values for all parameters
+  add_state( "target", target_layer_state_, "<none>", "<none>" );
+  add_state( "variance", variance_state_, 0.0f, 100.0f, 1.0f, 1.0f );
+  add_state( "max_error", max_error_state_, 0.0f, 100.0f, 1.0f, 1.0f );
+  add_state( "threshold", threshold_state_, 0.0f, 100.0f, 1.0f, 1.0f );
+  add_state( "replace", replace_state_, false );
 
+  // Add constaints, so that when the state changes the right ranges of
+  // parameters are selected
+  target_layer_state_->value_changed_signal_.connect( boost::bind(
+      &CannyEdgeDetectionFilter::target_constraint, this, _1 ) );
 
-  }
-  
-  void
-  CannyEdgeDetectionFilter::target_constraint(std::string layerid)
-  {
-  }
-  
-  CannyEdgeDetectionFilter::~CannyEdgeDetectionFilter()
-  {
-    disconnect_all(); 
-  }
-  
-  void
-  CannyEdgeDetectionFilter::activate()
-  {
-  }
-  
-  void
-  CannyEdgeDetectionFilter::deactivate()
-  {
-  }
-  
+}
+
+void CannyEdgeDetectionFilter::target_constraint( std::string layerid )
+{
+}
+
+CannyEdgeDetectionFilter::~CannyEdgeDetectionFilter()
+{
+  disconnect_all();
+}
+
+void CannyEdgeDetectionFilter::activate()
+{
+}
+
+void CannyEdgeDetectionFilter::deactivate()
+{
+}
+
 } // end namespace Seg3D
 
 

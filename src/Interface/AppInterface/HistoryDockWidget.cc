@@ -33,28 +33,28 @@
 #include <Interface/AppInterface/HistoryDockWidget.h>
 #include "ui_HistoryDockWidget.h"
 
-namespace Seg3D  {
-  
-  class HistoryDockWidgetPrivate {
-  public:
+namespace Seg3D
+{
 
-    Ui::HistoryDockWidget ui_;
-    
-  };
-  
+class HistoryDockWidgetPrivate
+{
+public:
 
-HistoryDockWidget::HistoryDockWidget(QWidget *parent) :
-    QDockWidget("HistoryDockWidget",parent),
-    private_(new HistoryDockWidgetPrivate)
-{ 
+  Ui::HistoryDockWidget ui_;
+
+};
+
+HistoryDockWidget::HistoryDockWidget( QWidget *parent ) :
+  QDockWidget( "HistoryDockWidget", parent ), private_( new HistoryDockWidgetPrivate )
+{
   // Set up the private internals of the LayerManagerInterface class
-  private_->ui_.setupUi(this);
+  private_->ui_.setupUi( this );
 
 }
 
 HistoryDockWidget::~HistoryDockWidget()
 {
-    
+
 }
 
 } // end namespace

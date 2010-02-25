@@ -38,25 +38,25 @@
 // Base class of the tool widget
 #include <Interface/AppInterface/ToolWidget.h>
 
+namespace Seg3D
+{
 
-namespace Seg3D {
-  
 class NeighborhoodConnectedFilterInterfacePrivate;
 
-class NeighborhoodConnectedFilterInterface : public ToolWidget {
-  Q_OBJECT
-    
-  public:
-    NeighborhoodConnectedFilterInterface();
-    virtual ~NeighborhoodConnectedFilterInterface();
-    virtual bool build_widget(QFrame* frame);
-    
- 
-  private:
-    NeighborhoodConnectedFilterInterfacePrivate* private_;
-    
-  };
-  
+class NeighborhoodConnectedFilterInterface : public ToolWidget
+{
+Q_OBJECT
+
+public:
+  NeighborhoodConnectedFilterInterface();
+  virtual ~NeighborhoodConnectedFilterInterface();
+  virtual bool build_widget( QFrame* frame );
+
+private:
+  NeighborhoodConnectedFilterInterfacePrivate* private_;
+
+};
+
 } // namespace Seg3D
 
 #endif

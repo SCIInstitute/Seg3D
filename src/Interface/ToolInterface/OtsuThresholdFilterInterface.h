@@ -39,27 +39,26 @@
 #include <Interface/AppInterface/ToolWidget.h>
 #include <Interface/ToolInterface/CustomWidgets/SliderSpinComboInt.h>
 
+namespace Seg3D
+{
 
-namespace Seg3D {
-  
 class OtsuThresholdFilterInterfacePrivate;
 
-class OtsuThresholdFilterInterface : public ToolWidget {
-  Q_OBJECT
+class OtsuThresholdFilterInterface : public ToolWidget
+{
+Q_OBJECT
 
-    
-  public:
-    OtsuThresholdFilterInterface();
-    virtual ~OtsuThresholdFilterInterface();
-    virtual bool build_widget(QFrame* frame);
-    
-    
-  private:
-    OtsuThresholdFilterInterfacePrivate* private_;
-    SliderSpinComboInt *orderAdjuster;
+public:
+  OtsuThresholdFilterInterface();
+  virtual ~OtsuThresholdFilterInterface();
+  virtual bool build_widget( QFrame* frame );
 
-  };
-  
+private:
+  OtsuThresholdFilterInterfacePrivate* private_;
+  SliderSpinComboInt *orderAdjuster;
+
+};
+
 } // namespace Seg3D
 
 #endif

@@ -1,30 +1,30 @@
 /*
-   For more information, please see: http://software.sci.utah.edu
+ For more information, please see: http://software.sci.utah.edu
 
-   The MIT License
+ The MIT License
 
-   Copyright (c) 2009 Scientific Computing and Imaging Institute,
-   University of Utah.
+ Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ University of Utah.
 
-   
-   Permission is hereby granted, free of charge, to any person obtaining a
-   copy of this software and associated documentation files (the "Software"),
-   to deal in the Software without restriction, including without limitation
-   the rights to use, copy, modify, merge, publish, distribute, sublicense,
-   and/or sell copies of the Software, and to permit persons to whom the
-   Software is furnished to do so, subject to the following conditions:
 
-   The above copyright notice and this permission notice shall be included
-   in all copies or substantial portions of the Software.
+ Permission is hereby granted, free of charge, to any person obtaining a
+ copy of this software and associated documentation files (the "Software"),
+ to deal in the Software without restriction, including without limitation
+ the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ and/or sell copies of the Software, and to permit persons to whom the
+ Software is furnished to do so, subject to the following conditions:
 
-   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-   OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-   THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-   DEALINGS IN THE SOFTWARE.
-*/
+ The above copyright notice and this permission notice shall be included
+ in all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+ OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ DEALINGS IN THE SOFTWARE.
+ */
 
 #ifndef APPLICATION_TOOL_TOOL_H
 #define APPLICATION_TOOL_TOOL_H
@@ -45,79 +45,86 @@
 #include <Application/State/State.h>
 #include <Application/State/StateEngine.h>
 
-
-namespace Seg3D {
+namespace Seg3D
+{
 
 // CLASS TOOL:
 // Base class of a tool
 
 // Forward declaration
 class Tool;
-typedef boost::shared_ptr<Tool> ToolHandle;
+typedef boost::shared_ptr< Tool > ToolHandle;
 
 // Class definition
-class Tool : public StateHandler {
-  
-// -- definition of tool groups --
-  public:
+class Tool : public StateHandler
+{
+
+  // -- definition of tool groups --
+public:
   // Tool groups help organize the tools in different catagories
-  
-  enum {
-    TOOL_E        = 0x0001,
-    FILTER_E      = 0x0002,   
-    DATATODATA_E  = 0x0010,
-    DATATOMASK_E  = 0x0020,
-    MASKTOMASK_E  = 0x0040
+
+  enum
+  {
+    TOOL_E = 0x0001,
+    FILTER_E = 0x0002,
+    DATATODATA_E = 0x0010,
+    DATATOMASK_E = 0x0020,
+    MASKTOMASK_E = 0x0040
   };
 
+  // -- constructor/destructor --
+public:
+  Tool( const std::string& toolid );
+  virtual ~Tool();
 
-// -- constructor/destructor --
-  public:
-    Tool(const std::string& toolid);
-    virtual ~Tool();
+  // -- query properties of tool --
+public:
+  virtual std::string type() const = 0;
+  virtual std::string menu_name() const = 0;
+  virtual std::string shortcut_key() const = 0;
+  virtual int properties() const = 0;
+  virtual std::string url() const = 0;
 
-// -- query properties of tool --
-  public:
-    virtual std::string type() const = 0;
-    virtual std::string menu_name() const = 0;
-    virtual std::string shortcut_key() const = 0;
-    virtual int         properties() const = 0;
-    virtual std::string url() const = 0;
-    
-    std::string toolid() const        { return toolid_; }
-    int toolid_number() const         { return toolid_number_; }
+  std::string toolid() const
+  {
+    return toolid_;
+  }
+  int toolid_number() const
+  {
+    return toolid_number_;
+  }
 
-  protected:
-    friend class ToolFactory;
+protected:
+  friend class ToolFactory;
 
-  private:
-    std::string           toolid_;
-    int                   toolid_number_;
-    
-// -- close tool --
-  public:  
-    // CLOSE:
-    // This function is called when the application closes the tool. It is meant
-    // to disconnect all connections. Since close tool is called synchronously
-    // on the application thread, it can clean out most of the underlying
-    // connections safely.
-    // NOTE: since the tool handle is given to the user interface, the user
-    // interface thread may issue the final destruction of the class. Hence all
-    // thread critical pieces should be done by this function. 
-    virtual void close();
+private:
+  std::string toolid_;
+  int toolid_number_;
 
-// -- activate/deactivate --
-  public:
-    // ACTIVATE:
-    // Activate a tool: this tool is set as the active tool and hence it should
-    // setup the right mouse tools in the viewers.
-    virtual void activate();
-    
-    // DEACTIVATE:
-    // Deactivate a tool. A tool is always deactivate before the next one is 
-    // activated.
-    virtual void deactivate();
-        
+  // -- close tool --
+public:
+  // CLOSE:
+  // This function is called when the application closes the tool. It is meant
+  // to disconnect all connections. Since close tool is called synchronously
+  // on the application thread, it can clean out most of the underlying
+  // connections safely.
+  // NOTE: since the tool handle is given to the user interface, the user
+  // interface thread may issue the final destruction of the class. Hence all
+  // thread critical pieces should be done by this function.
+  virtual void close();
+
+  // -- activate/deactivate --
+public:
+  // ACTIVATE:
+  // Activate a tool: this tool is set as the active tool and hence it should
+  // setup the right mouse tools in the viewers.
+  virtual void activate();
+
+  // DEACTIVATE:
+  // Deactivate a tool. A tool is always deactivate before the next one is
+  // activated.
+  virtual void deactivate();
+
 };
 
 // SCI_TOOL_TYPE:
@@ -142,7 +149,6 @@ class Tool : public StateHandler {
     virtual std::string shortcut_key() const { return tool_shortcut_key(); } \
     virtual int         properties() const { return tool_properties(); } \
     virtual std::string url() const { return tool_url(); }
-
 
 } // end namespace Seg3D
 

@@ -1,30 +1,30 @@
 /*
-   For more information, please see: http://software.sci.utah.edu
+ For more information, please see: http://software.sci.utah.edu
 
-   The MIT License
+ The MIT License
 
-   Copyright (c) 2009 Scientific Computing and Imaging Institute,
-   University of Utah.
+ Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ University of Utah.
 
-   
-   Permission is hereby granted, free of charge, to any person obtaining a
-   copy of this software and associated documentation files (the "Software"),
-   to deal in the Software without restriction, including without limitation
-   the rights to use, copy, modify, merge, publish, distribute, sublicense,
-   and/or sell copies of the Software, and to permit persons to whom the
-   Software is furnished to do so, subject to the following conditions:
 
-   The above copyright notice and this permission notice shall be included
-   in all copies or substantial portions of the Software.
+ Permission is hereby granted, free of charge, to any person obtaining a
+ copy of this software and associated documentation files (the "Software"),
+ to deal in the Software without restriction, including without limitation
+ the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ and/or sell copies of the Software, and to permit persons to whom the
+ Software is furnished to do so, subject to the following conditions:
 
-   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-   OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-   THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-   DEALINGS IN THE SOFTWARE.
-*/
+ The above copyright notice and this permission notice shall be included
+ in all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+ OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ DEALINGS IN THE SOFTWARE.
+ */
 
 #ifndef UTILS_CORE_EXCEPTION_H
 #define UTILS_CORE_EXCEPTION_H
@@ -36,7 +36,8 @@
 // STL includes
 #include <string>
 
-namespace Utils {
+namespace Utils
+{
 
 // CLASS EXCEPTION:
 // This exception model is modeled after the std::exception classes
@@ -49,155 +50,162 @@ namespace Utils {
 
 // Hence it is recommended to use the macros for throwing the exceptions
 
-class Exception {
+class Exception
+{
 
-  public:
-    // Constructor/destructor
-    Exception(std::string message, 
-              unsigned int line, 
-              const char* file);
-              
-    virtual ~Exception();
-  
-    // Description of the type of exception
-    virtual std::string what()    const;
+public:
+  // Constructor/destructor
+  Exception(std::string message,
+    unsigned int line,
+    const char* file);
 
-    // Description of what caused the exception
-    std::string message() const;
+  virtual ~Exception();
 
-  private:
-    
-    // Error message for debug purposes
-    std::string   message_;
+  // Description of the type of exception
+  virtual std::string what() const;
+
+  // Description of what caused the exception
+  std::string message() const;
+
+private:
+
+  // Error message for debug purposes
+  std::string message_;
 };
 
+class LogicError : public Exception
+{
 
-class LogicError : public Exception {
+public:
+  // Constructor/destructor
+  LogicError(std::string message,
+    unsigned int line,
+    const char* file);
 
-  public:
-    // Constructor/destructor
-    LogicError(std::string message, 
-              unsigned int line, 
-              const char* file);
+  virtual ~LogicError();
 
-    virtual ~LogicError();
-
-    // Description of the type of exception
-    virtual std::string what()    const;
+  // Description of the type of exception
+  virtual std::string what() const;
 };
 
+class RunTimeError : public Exception
+{
 
-class RunTimeError : public Exception {
+public:
+  // Constructor/destructor
+  RunTimeError(std::string message,
+    unsigned int line,
+    const char* file);
 
-  public:
-    // Constructor/destructor
-    RunTimeError(std::string message, 
-              unsigned int line, 
-              const char* file);
+  virtual ~RunTimeError();
 
-    virtual ~RunTimeError();
-    
-    // Description of the type of exception
-    virtual std::string what()    const;
+  // Description of the type of exception
+  virtual std::string what() const;
 };
 
-class NotImplementedError : public Exception {
+class NotImplementedError : public Exception
+{
 
-  public:
-    // Constructor/destructor
-    NotImplementedError(std::string message, 
-              unsigned int line, 
-              const char* file);
+public:
+  // Constructor/destructor
+  NotImplementedError(std::string message,
+    unsigned int line,
+    const char* file);
 
-    virtual ~NotImplementedError();
+  virtual ~NotImplementedError();
 
-    // Description of the type of exception
-    virtual std::string what()    const;
+  // Description of the type of exception
+  virtual std::string what() const;
 };
 
-class InvalidArgument : public LogicError {
+class InvalidArgument : public LogicError
+{
 
-  public:
-    // Constructor/destructor
-    InvalidArgument(std::string message, 
-              unsigned int line, 
-              const char* file);
+public:
+  // Constructor/destructor
+  InvalidArgument(std::string message,
+    unsigned int line,
+    const char* file);
 
-    virtual ~InvalidArgument();
-    
-    // Description of the type of exception
-    virtual std::string what()    const;
+  virtual ~InvalidArgument();
+
+  // Description of the type of exception
+  virtual std::string what() const;
 };
 
+class LengthError : public LogicError
+{
 
-class LengthError : public LogicError {
+public:
+  // Constructor/destructor
+  LengthError(std::string message,
+    unsigned int line,
+    const char* file);
 
-  public:
-    // Constructor/destructor
-    LengthError(std::string message, 
-              unsigned int line, 
-              const char* file);
+  virtual ~LengthError();
 
-    virtual ~LengthError();
-    
-    // Description of the type of exception
-    virtual std::string what()    const;
+  // Description of the type of exception
+  virtual std::string what() const;
 };
 
-class OutOfRange : public LogicError {
+class OutOfRange : public LogicError
+{
 
-  public:
-    // Constructor/destructor
-    OutOfRange(std::string message, 
-              unsigned int line, 
-              const char* file);
+public:
+  // Constructor/destructor
+  OutOfRange(std::string message,
+    unsigned int line,
+    const char* file);
 
-    virtual ~OutOfRange();
-    
-    // Description of the type of exception
-    virtual std::string what()    const;
+  virtual ~OutOfRange();
+
+  // Description of the type of exception
+  virtual std::string what() const;
 };
 
-class RangeError : public RunTimeError {
+class RangeError : public RunTimeError
+{
 
-  public:
-    // Constructor/destructor
-    RangeError(std::string message, 
-              unsigned int line, 
-              const char* file);
+public:
+  // Constructor/destructor
+  RangeError(std::string message,
+    unsigned int line,
+    const char* file);
 
-    virtual ~RangeError();
-    
-    // Description of the type of exception
-    virtual std::string what()    const;
+  virtual ~RangeError();
+
+  // Description of the type of exception
+  virtual std::string what() const;
 };
 
-class OverflowError : public RunTimeError {
+class OverflowError : public RunTimeError
+{
 
-  public:
-    // Constructor/destructor
-    OverflowError(std::string message, 
-              unsigned int line, 
-              const char* file);
+public:
+  // Constructor/destructor
+  OverflowError(std::string message,
+    unsigned int line,
+    const char* file);
 
-    virtual ~OverflowError();
-    
-    // Description of the type of exception
-    virtual std::string what()    const;
+  virtual ~OverflowError();
+
+  // Description of the type of exception
+  virtual std::string what() const;
 };
 
-class UnderflowError : public RunTimeError {
+class UnderflowError : public RunTimeError
+{
 
-  public:
-    // Constructor/destructor
-    UnderflowError(std::string message, 
-              unsigned int line, 
-              const char* file);
+public:
+  // Constructor/destructor
+  UnderflowError(std::string message,
+    unsigned int line,
+    const char* file);
 
-    virtual ~UnderflowError();
-    
-    // Description of the type of exception
-    virtual std::string what()    const;
+  virtual ~UnderflowError();
+
+  // Description of the type of exception
+  virtual std::string what() const;
 };
 
 // MACROS FOR AUTOMATICALLY INCLUDING LINE NUMBER AND FILE IN THE

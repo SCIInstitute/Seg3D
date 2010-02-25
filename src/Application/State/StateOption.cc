@@ -1,251 +1,237 @@
 /*
-   For more information, please see: http://software.sci.utah.edu
+ For more information, please see: http://software.sci.utah.edu
 
-   The MIT License
+ The MIT License
 
-   Copyright (c) 2009 Scientific Computing and Imaging Institute,
-   University of Utah.
+ Copyright (c) 2009 Scientific Computing and Imaging Institute,
+ University of Utah.
 
-   
-   Permission is hereby granted, free of charge, to any person obtaining a
-   copy of this software and associated documentation files (the "Software"),
-   to deal in the Software without restriction, including without limitation
-   the rights to use, copy, modify, merge, publish, distribute, sublicense,
-   and/or sell copies of the Software, and to permit persons to whom the
-   Software is furnished to do so, subject to the following conditions:
 
-   The above copyright notice and this permission notice shall be included
-   in all copies or substantial portions of the Software.
+ Permission is hereby granted, free of charge, to any person obtaining a
+ copy of this software and associated documentation files (the "Software"),
+ to deal in the Software without restriction, including without limitation
+ the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ and/or sell copies of the Software, and to permit persons to whom the
+ Software is furnished to do so, subject to the following conditions:
 
-   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-   OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-   THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-   DEALINGS IN THE SOFTWARE.
-*/
+ The above copyright notice and this permission notice shall be included
+ in all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+ OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ DEALINGS IN THE SOFTWARE.
+ */
 
 // STL includes
 #include <algorithm>
 
 #include <Application/State/StateOption.h>
 
-namespace Seg3D {
+namespace Seg3D
+{
 
-StateOption::StateOption(const std::string& default_value,
-                         const std::string& option_list ) :
-  value_(default_value)
+StateOption::StateOption( const std::string& default_value, const std::string& option_list ) :
+  value_( default_value )
 {
   // Unwrap the option lists
-  std::string option_list_string = Utils::string_to_lower(option_list);
-  while(1)
+  std::string option_list_string = Utils::string_to_lower( option_list );
+  while ( 1 )
   {
-    size_t loc = option_list_string.find(SPLITTER_C);
-    if (loc >= option_list_string.size())
+    size_t loc = option_list_string.find( SPLITTER_C );
+    if ( loc >= option_list_string.size() )
     {
-      option_list_.push_back(option_list_string);
+      option_list_.push_back( option_list_string );
       break;
     }
-    option_list_.push_back(option_list_string.substr(0,loc));
-    option_list_string = option_list_string.substr(loc+1);
+    option_list_.push_back( option_list_string.substr( 0, loc ) );
+    option_list_string = option_list_string.substr( loc + 1 );
   }
 }
 
-StateOption::StateOption(const std::string& default_value,
-                         const std::vector<std::string>& option_list ) :
-  value_(default_value)
+StateOption::StateOption( const std::string& default_value,
+    const std::vector< std::string >& option_list ) :
+  value_( default_value )
 {
-  option_list_.resize(option_list.size());
-  for (size_t j=0; j<option_list.size(); j++)
+  option_list_.resize( option_list.size() );
+  for ( size_t j = 0; j < option_list.size(); j++ )
   {
-    option_list_[j] = Utils::string_to_lower(option_list[j]);
+    option_list_[ j ] = Utils::string_to_lower( option_list[ j ] );
   }
 }
 
 StateOption::~StateOption()
 {
-}  
-
-std::string 
-StateOption::export_to_string() const
-{
-  return (value_);
 }
 
-bool
-StateOption::set(const std::string& input_value, ActionSource source)
+std::string StateOption::export_to_string() const
+{
+  return ( value_ );
+}
+
+bool StateOption::set( const std::string& input_value, ActionSource source )
 {
   // Lock the state engine so no other thread will be accessing it
-  StateEngine::lock_type lock(StateEngine::Instance()->get_mutex());
+  StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
 
-  std::string value = Utils::string_to_lower(input_value);
-  if (value != value_) 
+  std::string value = Utils::string_to_lower( input_value );
+  if ( value != value_ )
   {
-    if (option_list_.end() == std::find(option_list_.begin(),
-        option_list_.end(),value))
+    if ( option_list_.end() == std::find( option_list_.begin(), option_list_.end(), value ) )
     {
-      if (source == ACTION_SOURCE_INTERFACE_E)
+      if ( source == ACTION_SOURCE_INTERFACE_E )
       {
         // NOTE: This is a special case in which the option requested by the
         // interface does not exist and hence the value may be out of sync and
         // hence needs to be set to the correct value. Hence we generate the
         // signal that indicates that the state has changed anyway.
-        
+
         // Any other sources are fine as they do not reflect a different value
         // and are validated before the code can reach this point.
-        value_changed_signal_(value_,source);
-        state_changed_signal_();        
+        value_changed_signal_( value_, source );
+        state_changed_signal_();
       }
-      return (false);
+      return ( false );
     }
     value_ = value;
 
-    value_changed_signal_(value_,source);
+    value_changed_signal_( value_, source );
     state_changed_signal_();
   }
-  return (true);
+  return ( true );
 }
 
-bool 
-StateOption::import_from_string(const std::string& str,
-                                ActionSource source)
+bool StateOption::import_from_string( const std::string& str, ActionSource source )
 {
   std::string value;
-  if(!(Utils::import_from_string(str,value))) return (false);
- 
-  return (set(value,source));
+  if ( !( Utils::import_from_string( str, value ) ) ) return ( false );
+
+  return ( set( value, source ) );
 }
 
-void 
-StateOption::export_to_variant(ActionParameterVariant& variant) const
+void StateOption::export_to_variant( ActionParameterVariant& variant ) const
 {
-  variant.set_value(value_);
+  variant.set_value( value_ );
 }
 
-bool 
-StateOption::import_from_variant(ActionParameterVariant& variant,
-                                 ActionSource source)
+bool StateOption::import_from_variant( ActionParameterVariant& variant, ActionSource source )
 {
   std::string value;
-  if (!( variant.get_value(value) )) return (false);
+  if ( !( variant.get_value( value ) ) ) return ( false );
 
-  return (set(value,source));
+  return ( set( value, source ) );
 }
 
-bool 
-StateOption::validate_variant(ActionParameterVariant& variant, 
-                              std::string& error)
+bool StateOption::validate_variant( ActionParameterVariant& variant, std::string& error )
 {
   std::string value;
-  if (!(variant.get_value(value)))
+  if ( !( variant.get_value( value ) ) )
   {
-    error = "Cannot convert the value '"+variant.export_to_string()+"'";
-    return (false);
+    error = "Cannot convert the value '" + variant.export_to_string() + "'";
+    return ( false );
   }
-  
-  value = Utils::string_to_lower(value);
-  if (option_list_.end() == std::find(option_list_.begin(),
-      option_list_.end(),value))
+
+  value = Utils::string_to_lower( value );
+  if ( option_list_.end() == std::find( option_list_.begin(), option_list_.end(), value ) )
   {
-    error = "Option '"+value+"' is not a valid option";
-    return (false);
+    error = "Option '" + value + "' is not a valid option";
+    return ( false );
   }
-  
+
   error = "";
-  return (true);
+  return ( true );
 }
 
-bool 
-StateOption::is_option(const std::string& option)
+bool StateOption::is_option( const std::string& option )
 {
-  if (option_list_.end() == std::find(option_list_.begin(),option_list_.end(),
-    Utils::string_to_lower(option))) return (false);
-  return (true);
+  if ( option_list_.end() == std::find( option_list_.begin(), option_list_.end(),
+      Utils::string_to_lower( option ) ) ) return ( false );
+  return ( true );
 }
 
-void 
-StateOption::set_option_list(const std::vector<std::string>& option_list)
+void StateOption::set_option_list( const std::vector< std::string >& option_list )
 {
   option_list_ = option_list;
-  if (option_list_.end() == std::find(option_list_.begin(),option_list_.end(),value_))
+  if ( option_list_.end() == std::find( option_list_.begin(), option_list_.end(), value_ ) )
   {
-    if (option_list.size()) value_ = option_list[0]; else value_ = "";
-    value_changed_signal_(value_,ACTION_SOURCE_NONE_E);
+    if ( option_list.size() ) value_ = option_list[ 0 ];
+    else value_ = "";
+    value_changed_signal_( value_, ACTION_SOURCE_NONE_E );
     state_changed_signal_();
   }
-  
+
   optionlist_changed_signal_();
 }
 
-void 
-StateOption::set_option_list(const std::string& option_list)
+void StateOption::set_option_list( const std::string& option_list )
 {
   // Unwrap the option lists
-  std::string option_list_string = Utils::string_to_lower(option_list);
-  
+  std::string option_list_string = Utils::string_to_lower( option_list );
+
   option_list_.clear();
-  while(1)
+  while ( 1 )
   {
-    size_t loc = option_list_string.find(SPLITTER_C);
-    if (loc >= option_list_string.size())
+    size_t loc = option_list_string.find( SPLITTER_C );
+    if ( loc >= option_list_string.size() )
     {
-      option_list_.push_back(option_list_string);
+      option_list_.push_back( option_list_string );
       break;
     }
-    option_list_.push_back(option_list_string.substr(0,loc));
-    option_list_string = option_list_string.substr(loc+1);
+    option_list_.push_back( option_list_string.substr( 0, loc ) );
+    option_list_string = option_list_string.substr( loc + 1 );
   }
-  
-  if (option_list_.end() == std::find(option_list_.begin(),option_list_.end(),value_))
+
+  if ( option_list_.end() == std::find( option_list_.begin(), option_list_.end(), value_ ) )
   {
-    if (option_list.size()) value_ = option_list[0]; else value_ = "";
-    value_changed_signal_(value_,ACTION_SOURCE_NONE_E);
+    if ( option_list.size() ) value_ = option_list[ 0 ];
+    else value_ = "";
+    value_changed_signal_( value_, ACTION_SOURCE_NONE_E );
     state_changed_signal_();
   }
-  
+
   optionlist_changed_signal_();
 }
 
-void 
-StateOption::set_option_list(const std::string& option_list,
-                             const std::string& option)
+void StateOption::set_option_list( const std::string& option_list, const std::string& option )
 {
   // Unwrap the option lists
-  std::string option_list_string = Utils::string_to_lower(option_list);
-  
+  std::string option_list_string = Utils::string_to_lower( option_list );
+
   option_list_.clear();
-  while(1)
+  while ( 1 )
   {
-    size_t loc = option_list_string.find(SPLITTER_C);
-    if (loc >= option_list_string.size())
+    size_t loc = option_list_string.find( SPLITTER_C );
+    if ( loc >= option_list_string.size() )
     {
-      option_list_.push_back(option_list_string);
+      option_list_.push_back( option_list_string );
       break;
     }
-    option_list_.push_back(option_list_string.substr(0,loc));
-    option_list_string = option_list_string.substr(loc+1);
+    option_list_.push_back( option_list_string.substr( 0, loc ) );
+    option_list_string = option_list_string.substr( loc + 1 );
   }
 
-  std::string lower_option = Utils::string_to_lower(option);
-  
-  if (option_list_.end() == 
-      std::find(option_list_.begin(),option_list_.end(),lower_option))
+  std::string lower_option = Utils::string_to_lower( option );
+
+  if ( option_list_.end() == std::find( option_list_.begin(), option_list_.end(), lower_option ) )
   {
-    if (option_list.size()) value_ = option_list[0]; else value_ = "";
-    value_changed_signal_(value_,ACTION_SOURCE_NONE_E);
+    if ( option_list.size() ) value_ = option_list[ 0 ];
+    else value_ = "";
+    value_changed_signal_( value_, ACTION_SOURCE_NONE_E );
     state_changed_signal_();
   }
   else
   {
-    if (value_ != lower_option)
-    { 
+    if ( value_ != lower_option )
+    {
       value_ = lower_option;
-      value_changed_signal_(value_,ACTION_SOURCE_NONE_E);
+      value_changed_signal_( value_, ACTION_SOURCE_NONE_E );
       state_changed_signal_();
     }
   }
-  
+
   optionlist_changed_signal_();
 }
 
