@@ -60,4 +60,4 @@ MeasurementDockWidget::~MeasurementDockWidget()
 
 }
 
-} // end namespace
+} // end namespace Seg3D

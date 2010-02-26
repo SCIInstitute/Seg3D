@@ -57,4 +57,4 @@ HistoryDockWidget::~HistoryDockWidget()
 
 }
 
-} // end namespace
+} // end namespace Seg3D

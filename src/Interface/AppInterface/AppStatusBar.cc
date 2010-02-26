@@ -256,4 +256,4 @@ void AppStatusBar::UpdateStatusBar( qpointer_type statusbar_pointer, int message
   }
 }
 
-} // end namespace Seg3d
+} // end namespace Seg3D

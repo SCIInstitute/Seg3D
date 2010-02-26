@@ -268,4 +268,4 @@ void AppMenu::create_window_menu( QMenu* qmenu )
 
 }
 
-} // end namespace
+} // end namespace Seg3D

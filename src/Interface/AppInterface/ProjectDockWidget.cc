@@ -58,4 +58,4 @@ ProjectDockWidget::~ProjectDockWidget()
 
 }
 
-} // end namespace
+} // end namespace Seg3D

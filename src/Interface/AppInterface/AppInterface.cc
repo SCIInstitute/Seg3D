@@ -331,4 +331,4 @@ void AppInterface::SetFullScreen( qpointer_type app_interface, bool full_screen,
       &AppInterface::set_full_screen, app_interface.data(), full_screen ) ) );
 }
 
-} //end namespace
+} // end namespace Seg3D

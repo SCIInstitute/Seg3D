@@ -229,7 +229,7 @@ void ToolBoxWidget::set_active_index( int index )
 void ToolBoxWidget::remove_tool( int index )
 {
   // Find the index that corresponds to the tool
-  if ( index >= this->private_->page_list_.size() )
+  if ( index >=  static_cast< int > (this->private_->page_list_.size()) )
   {
     return;
   }
@@ -241,7 +241,14 @@ void ToolBoxWidget::remove_tool( int index )
   // Set the previous tool to active if the one to be deleted is active.
   if ( this->active_index_ == index )
   {
-    set_active_index( index - 1 );
+    if ( index == 0 )
+    {
+      set_active_index( index );
+    }
+    else
+    {
+      set_active_index( index - 1 );
+    }
   }
 
 }
@@ -262,4 +269,4 @@ void ToolBoxWidget::help_button_clicked()
   }
 }
 
-}
+} // end namespace Seg3D

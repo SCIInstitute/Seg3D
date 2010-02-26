@@ -94,4 +94,4 @@ void LayerManagerDockWidget::layer_changed( int index )
   //TODO implement layer changed slot
 }
 
-} // end namespace
+}  // end namespace Seg3D

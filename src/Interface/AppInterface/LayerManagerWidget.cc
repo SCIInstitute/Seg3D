@@ -821,4 +821,4 @@ void LayerManagerWidget::lock_unlock_layer( bool lockunlock )
 } // end lock_unlock_layer
 
 
-} //end Seg3D namespace
+}  // end namespace Seg3D

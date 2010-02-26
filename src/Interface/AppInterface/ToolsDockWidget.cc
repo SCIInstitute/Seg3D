@@ -220,4 +220,4 @@ void ToolsDockWidget::HandleActivateTool( qpointer_type qpointer, ToolHandle too
   if ( qpointer.data() ) qpointer->activate_tool( tool );
 }
 
-} // end namespace
+} // end namespace Seg3D

@@ -57,4 +57,4 @@ SplashStart::~SplashStart()
 {
 }
 
-} // end namespace
+} // end namespace Seg3D

@@ -60,4 +60,4 @@ void ViewAction::slot(bool torf)
 ViewAction::~ViewAction()
 {}
 
-} //end namespace Seg3d
+} // end namespace Seg3D

@@ -57,4 +57,4 @@ HistoryWidget::~HistoryWidget()
 
 }
 
-} // end namespace
+} // end namespace Seg3D
