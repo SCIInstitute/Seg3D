@@ -97,6 +97,18 @@ IF (WIN32 AND MSVC)
 ENDIF (WIN32 AND MSVC)
 
 ###########################################
+# RPATH settings for Linux
+###########################################
+
+IF(UNIX)
+  MESSAGE(STATUS "Configuring RPATH settings")
+  SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
+  SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
+  SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+  SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+ENDIF(UNIX)
+
+###########################################
 # Find QT
 # We need QT - We use a modified version of
 # the FindQt4.cmake file that can be set

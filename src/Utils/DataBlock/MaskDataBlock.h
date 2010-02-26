@@ -68,7 +68,7 @@ public:
 
   // -- Constructor/destructor --
 public:
-  MaskDataBlock(DataBlockHandle& data_block, unsigned int mask_bit);
+  MaskDataBlock( DataBlockHandle& data_block, unsigned int mask_bit );
   virtual ~MaskDataBlock();
 
   // -- Access properties of data block --
@@ -95,60 +95,65 @@ public:
 
   // DATA
   // Pointer to the block of data
-  unsigned
-  char* data() const
+  unsigned  char* data() const
   {
-return  reinterpret_cast<unsigned char *>(data_block_->data());
-}
+    return  reinterpret_cast<unsigned char *>( data_block_->data() );
+  }
 
-// MASK_BIT
-// Get the bit that describes the mask
-unsigned int mask_bit()
-{
-  return mask_bit_;
-}
+  // MASK_BIT
+  // Get the bit that describes the mask
+  unsigned int mask_bit()
+  {
+    return mask_bit_;
+  }
 
-// DATA_BLOCK
-// Retrieve the pointer to the data block
-// NOTE: This one is needed for loading the textures onto the
-// graphics card. As masks are shared the Texture will be shared
-// hence access to the datablock is needed to see whether this one
-// has already been uploaded
-DataBlockHandle data_block()
-{
-  return data_block_;
-}
+  // DATA_BLOCK
+  // Retrieve the pointer to the data block
+  // NOTE: This one is needed for loading the textures onto the
+  // graphics card. As masks are shared the Texture will be shared
+  // hence access to the datablock is needed to see whether this one
+  // has already been uploaded
+  DataBlockHandle data_block()
+  {
+    return data_block_;
+  }
 
 // -- Locking of the datablock --
 public:
 
-// LOCK:
-// Lock the datablock
-void lock()
-{ data_block_->lock();}
+  // LOCK:
+  // Lock the datablock
+  void lock()
+  { 
+    data_block_->lock();
+  }
 
-// UNLOCK:
-// Unlock the datablock
-void unlock()
-{ data_block_->unlock();}
+  // UNLOCK:
+  // Unlock the datablock
+  void unlock()
+  { 
+    data_block_->unlock();
+  }
 
-// GETMUTEX:
-// Get the mutex that locks the datablock
-mutex_type& get_mutex()
-{ return data_block_->get_mutex();}
+  // GETMUTEX:
+  // Get the mutex that locks the datablock
+  mutex_type& get_mutex()
+  { 
+    return data_block_->get_mutex();
+  }
 
 // -- internals of the DataBlock --
 private:
-// The dimensions of the datablock
-size_t nx_;
-size_t ny_;
-size_t nz_;
+  // The dimensions of the datablock
+  size_t nx_;
+  size_t ny_;
+  size_t nz_;
 
-// The datablock that is shared
-DataBlockHandle data_block_;
+  // The datablock that is shared
+  DataBlockHandle data_block_;
 
-// The bit that is used for this mask
-unsigned int mask_bit_;
+  // The bit that is used for this mask
+  unsigned int mask_bit_;
 };
 
 } // end namespace Utils
