@@ -24,7 +24,7 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
- */
+*/
 
 #include <Application/ToolManager/ToolManager.h>
 #include <Application/ToolManager/Actions/ActionCloseTool.h>
@@ -35,8 +35,7 @@ namespace Seg3D
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
-SCI_REGISTER_ACTION(CloseTool)
-;
+SCI_REGISTER_ACTION(CloseTool);
 
 bool ActionCloseTool::validate( ActionContextHandle& context )
 {

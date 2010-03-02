@@ -36,7 +36,7 @@ SET(INTERFACE_APPINTERFACE_SRCS
   AppMenu.cc
   AppStatusBar.cc
   HistoryDockWidget.cc
-  HistoryWidget.cc
+  MessageHistoryWidget.cc
   LayerManagerWidget.cc
   LayerWidget.cc
   LayerManagerDockWidget.cc
@@ -58,7 +58,7 @@ SET(INTERFACE_APPINTERFACE_MOC_SRCS
   AppStatusBar.h
   ViewerInterface.h
   HistoryDockWidget.h
-  HistoryWidget.h
+  MessageHistoryWidget.h
   ProjectDockWidget.h
   ToolsDockWidget.h
   ToolWidget.h
@@ -86,7 +86,7 @@ SET(INTERFACE_APPINTERFACE_UI_SRCS
   LayerGroupWidget.ui
   LayerWidget.ui
   ToolBoxPageWidget.ui
-  HistoryWidget.ui
+  MessageHistoryWidget.ui
   Splash.ui
 )
 

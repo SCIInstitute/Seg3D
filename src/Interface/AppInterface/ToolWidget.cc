@@ -60,14 +60,14 @@ bool ToolWidget::create_widget( QWidget* parent, ToolHandle& tool )
   hbox->setContentsMargins( 0, 0, 0, 0 );
   setLayout( hbox );
 
-  main_frame_ = new QFrame;
+  this->main_frame_ = new QFrame;
 
-  main_frame_->resize( 1, 1 );
+  this->main_frame_->resize( 1, 1 );
 
-  main_frame_->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Preferred );
-  hbox->addWidget( main_frame_ );
+  this->main_frame_->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Preferred );
+  hbox->addWidget( this->main_frame_ );
 
-  return ( build_widget( main_frame_ ) );
+  return ( build_widget( this->main_frame_ ) );
 }
 
 } //end namespace Seg3D

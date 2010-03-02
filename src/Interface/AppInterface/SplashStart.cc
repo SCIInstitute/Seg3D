@@ -48,8 +48,8 @@ SplashStart::SplashStart( QDialog *parent ) :
   private_( new SplashStartPrivate )
 {
   // Set up the private internals of the SplashStart class
-  private_->ui_.setupUi( this );
-  private_->ui_.existing_project_button_->setEnabled( false );
+  this->private_->ui_.setupUi( this );
+  this->private_->ui_.existing_project_button_->setEnabled( false );
 
 }
 

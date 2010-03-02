@@ -42,7 +42,7 @@
 
 // Application includes
 #include <Utils/Core/Log.h>
-#include <Interface/AppInterface/HistoryWidget.h>
+#include <Interface/AppInterface/MessageHistoryWidget.h>
 //#include <Application/Action/ActionDispatcher.h>
 
 namespace Seg3D
@@ -76,7 +76,7 @@ private:
   QToolButton* world_button_;
   QToolButton* info_button_;
 
-  HistoryWidget* history_widget_;
+  MessageHistoryWidget* history_widget_;
   int coordinates_mode_;
   QIcon world_icon_;
   QIcon text_icon_;

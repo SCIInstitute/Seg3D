@@ -26,7 +26,16 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#include <Application/Application/Application.h>
+#include <Application/Interface/Interface.h>
+
 #include <Application/LayerManager/LayerManager.h>
+#include <Application/LayerManager/Actions/ActionInsertLayerAbove.h>
+#include <Application/LayerManager/Actions/ActionCloneLayer.h>
+#include <Application/LayerManager/Actions/ActionLayer.h>
+#include <Application/LayerManager/Actions/ActionNewMaskLayer.h>
+#include <Application/LayerManager/Actions/ActionRemoveLayer.h>
+#include <Application/LayerManager/Actions/ActionLayerFromFile.h>
 
 namespace Seg3D
 {

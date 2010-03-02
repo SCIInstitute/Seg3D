@@ -35,7 +35,6 @@
 #include <set>
 
 // Boost includes
-
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 #include <boost/unordered_set.hpp>

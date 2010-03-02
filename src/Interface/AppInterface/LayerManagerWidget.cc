@@ -77,7 +77,7 @@ LayerManagerWidget::LayerManagerWidget( QWidget* parent ) :
   }
 
   // make a new LayerManagerWidgetPrivateHandle_type object
-  private_ = LayerManagerWidgetPrivateHandle_type( new LayerManagerWidgetPrivate );
+  this->private_ = LayerManagerWidgetPrivateHandle_type( new LayerManagerWidgetPrivate );
 
   // set some values for the scrollarea widget
   setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
@@ -85,20 +85,20 @@ LayerManagerWidget::LayerManagerWidget( QWidget* parent ) :
   setContentsMargins( 1, 1, 1, 1 );
   setWidgetResizable( true );
 
-  main_ = new QWidget( parent );
-  setWidget( main_ );
+  this->main_ = new QWidget( parent );
+  setWidget( this->main_ );
 
-  main_layout_ = new QVBoxLayout( main_ );
-  main_layout_->setContentsMargins( 1, 1, 1, 1 );
-  main_layout_->setSpacing( 1 );
+  this->main_layout_ = new QVBoxLayout( this->main_ );
+  this->main_layout_->setContentsMargins( 1, 1, 1, 1 );
+  this->main_layout_->setSpacing( 1 );
 
-  group_layout_ = new QVBoxLayout;
-  group_layout_->setSpacing( 5 );
-  main_layout_->addLayout( group_layout_ );
-  main_layout_->addStretch();
+  this->group_layout_ = new QVBoxLayout;
+  this->group_layout_->setSpacing( 5 );
+  this->main_layout_->addLayout( this->group_layout_ );
+  this->main_layout_->addStretch();
 
-  main_->setLayout( main_layout_ );
-  main_->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Preferred );
+  this->main_->setLayout( this->main_layout_ );
+  this->main_->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Preferred );
 
   // add test groups
   new_group( QString::fromUtf8( "600x300x240" ) );
@@ -140,10 +140,10 @@ void LayerManagerWidget::new_group( const QString &dimensions )
   // create a new widget to add to the group_layout_
   QWidget* new_group_ = new QWidget();
 
-  private_->group_ui_.setupUi( new_group_ );
+  this->private_->group_ui_.setupUi( new_group_ );
 
   // create a handle to the group ui object
-  LayerGroupWidgetHandle_type group_handle_( new Ui::LayerGroupWidget( private_->group_ui_ ) );
+  LayerGroupWidgetHandle_type group_handle_( new Ui::LayerGroupWidget( this->private_->group_ui_ ) );
 
   // set some values of the GUI
   group_handle_->activate_button_->setText( dimensions );
@@ -155,6 +155,8 @@ void LayerManagerWidget::new_group( const QString &dimensions )
   group_handle_->resample_->hide();
   group_handle_->flip_rotate_->hide();
   group_handle_->transform_->hide();
+  group_handle_->delete_->hide();
+  group_handle_->delete_button_->setEnabled( false );
 
   // add the slider spinner combo's for the crop
   SliderSpinComboInt* x_adjuster_crop = new SliderSpinComboInt( new_group_ );
@@ -211,17 +213,19 @@ void LayerManagerWidget::new_group( const QString &dimensions )
   scale_adjuster->setObjectName( QString::fromUtf8( "scale_adjuster" ) );
 
   // connect the signals and slots
-  connect(group_handle_->open_button_, SIGNAL( clicked( bool )), this, SLOT(hide_show_layers( bool )));
-  connect(group_handle_->group_resample_button_, SIGNAL( clicked( bool ) ), this, SLOT(hide_show_resample( bool )));
-  connect(group_handle_->group_crop_button_, SIGNAL( clicked( bool )), this, SLOT(hide_show_roi( bool )));
-  connect(group_handle_->group_transform_button_, SIGNAL( clicked( bool ) ), this, SLOT(hide_show_transform( bool )));
-  connect(group_handle_->group_flip_rotate_button_, SIGNAL( clicked ( bool ) ), this, SLOT(hide_show_flip_rotate( bool )));
+  connect( group_handle_->open_button_, SIGNAL( clicked( bool ) ), this, SLOT( hide_show_layers( bool )) );
+  connect( group_handle_->group_resample_button_, SIGNAL( clicked( bool ) ), this, SLOT( hide_show_resample( bool )) );
+  connect( group_handle_->group_crop_button_, SIGNAL( clicked( bool ) ), this, SLOT( hide_show_roi( bool )) );
+  connect( group_handle_->group_transform_button_, SIGNAL( clicked( bool ) ), this, SLOT( hide_show_transform( bool )) );
+  connect( group_handle_->group_flip_rotate_button_, SIGNAL( clicked ( bool ) ), this, SLOT( hide_show_flip_rotate( bool )) );
+  connect( group_handle_->group_delete_button_, SIGNAL( clicked ( bool ) ), this, SLOT( hide_show_delete( bool )) );
+  connect( group_handle_->confirm_delete_checkbox_, SIGNAL( clicked ( bool ) ), this, SLOT( enable_disable_delete_button( bool )) );
 
   // add the new widget to the group_layout_
   group_layout_->addWidget( new_group_ );
 
   // add the new group handle to the group_list_
-  private_->group_list_.push_back( group_handle_ );
+  this->private_->group_list_.push_back( group_handle_ );
 
   //    // increment the number of groups
   //    number_of_groups_++;
@@ -231,8 +235,8 @@ void LayerManagerWidget::new_group( const QString &dimensions )
 // iterate through all the current layers and check to see if a layer with similar dimensions already exists
 bool LayerManagerWidget::validate_new_group( const QString &dimensions )
 {
-  for ( GroupList_type::const_iterator i = private_->group_list_.begin(); i
-      != private_->group_list_.end(); i++ )
+  for ( GroupList_type::const_iterator i = this->private_->group_list_.begin(); i
+      != this->private_->group_list_.end(); i++ )
   {
     if ( ( *i )->activate_button_->text() == dimensions )
     {
@@ -250,10 +254,10 @@ void LayerManagerWidget::new_layer( int type, const QString &label, const QStrin
 
   // create a new widget to add to the group layout
   QWidget* new_layer_ = new QWidget();
-  private_->layer_ui_.setupUi( new_layer_ );
+  this->private_->layer_ui_.setupUi( new_layer_ );
 
   // create a handle to the layer ui object
-  LayerWidgetHandle_type layer_handle_( new Ui::LayerWidget( private_->layer_ui_ ) );
+  LayerWidgetHandle_type layer_handle_( new Ui::LayerWidget( this->private_->layer_ui_ ) );
 
   // set some values in the GUI
   layer_handle_->label_->setText( label );
@@ -302,8 +306,8 @@ void LayerManagerWidget::new_layer( int type, const QString &label, const QStrin
     layer_handle_->compute_iso_surface_button_->hide();
     layer_handle_->fill_border_button_->hide();
     layer_handle_->iso_surface_button_->hide();
-      layer_handle_->typeBackground_->setStyleSheet(QString::fromUtf8("QWidget#typeBackground_{ background-color: rgb(166, 12, 73); }"));
-    layer_handle_->colorChooseButton_->setIcon(data_layer_icon_);
+    layer_handle_->typeBackground_->setStyleSheet(QString::fromUtf8("QWidget#typeBackground_{ background-color: rgb(166, 12, 73); }"));
+    layer_handle_->colorChooseButton_->setIcon(this->data_layer_icon_);
     break;
   case 2:
     layer_handle_->brightness_contrast_button_->hide();
@@ -316,8 +320,8 @@ void LayerManagerWidget::new_layer( int type, const QString &label, const QStrin
   }
 
   // add the new widget to the appropriate group's group_frame_layout_
-  for ( GroupList_type::const_iterator i = private_->group_list_.begin(); i
-      != private_->group_list_.end(); i++ )
+  for ( GroupList_type::const_iterator i = this->private_->group_list_.begin(); i
+      != this->private_->group_list_.end(); i++ )
   {
     if ( ( *i )->activate_button_->text() == dimensions )
     {
@@ -331,21 +335,37 @@ void LayerManagerWidget::new_layer( int type, const QString &label, const QStrin
   }
 
   // add the new layer handle to the layer_list_
-  private_->layer_list_.push_back( layer_handle_ );
+  this->private_->layer_list_.push_back( layer_handle_ );
 
 } // end new_layer
 
+// function for enabling the delete button
+void LayerManagerWidget::enable_disable_delete_button( bool enable )
+{
+  QCheckBox *confirm = ::qobject_cast< QCheckBox* >( sender() );
+  
+  for ( GroupList_type::const_iterator i = this->private_->group_list_.begin(); i
+     != this->private_->group_list_.end(); i++ )
+  {
+    if ( ( *i )->confirm_delete_checkbox_ == confirm )
+    {
+      ( *i )->delete_button_->setEnabled( enable );
+    }
+  }
+}
+  
+  
 
 // --- Functions for Hiding and showing Layer and Group options --- //
 
-// hide or show the Resample tool box
+// hide or show the Resample tool pane
 void LayerManagerWidget::hide_show_resample( bool hideshow )
 {
   QToolButton *hide_show_button = ::qobject_cast< QToolButton* >( sender() );
   QString group_dimensions_;
 
-  for ( GroupList_type::const_iterator i = private_->group_list_.begin(); i
-      != private_->group_list_.end(); i++ )
+  for ( GroupList_type::const_iterator i = this->private_->group_list_.begin(); i
+      != this->private_->group_list_.end(); i++ )
   {
     if ( ( *i )->group_resample_button_ == hide_show_button )
     {
@@ -354,6 +374,8 @@ void LayerManagerWidget::hide_show_resample( bool hideshow )
       {
         ( *i )->resample_->show();
         ( *i )->roi_->hide();
+        ( *i )->delete_->hide();
+        ( *i )->group_delete_button_->setChecked( false );
         ( *i )->group_crop_button_->setChecked( false );
         ( *i )->flip_rotate_->hide();
         ( *i )->group_flip_rotate_button_->setChecked( false );
@@ -373,14 +395,14 @@ void LayerManagerWidget::hide_show_resample( bool hideshow )
 } // end hide_show_resample
 
 
-// hide or show the Region Of Interest tool box
+// hide or show the Region Of Interest tool pane
 void LayerManagerWidget::hide_show_roi( bool hideshow )
 {
   QToolButton *hide_show_button = ::qobject_cast< QToolButton* >( sender() );
   QString group_dimensions_;
 
-  for ( GroupList_type::const_iterator i = private_->group_list_.begin(); i
-      != private_->group_list_.end(); i++ )
+  for ( GroupList_type::const_iterator i = this->private_->group_list_.begin(); i
+      != this->private_->group_list_.end(); i++ )
   {
     if ( ( *i )->group_crop_button_ == hide_show_button )
     {
@@ -389,6 +411,8 @@ void LayerManagerWidget::hide_show_roi( bool hideshow )
       {
         ( *i )->roi_->show();
         ( *i )->resample_->hide();
+        ( *i )->delete_->hide();
+        ( *i )->group_delete_button_->setChecked( false );
         ( *i )->group_resample_button_->setChecked( false );
         ( *i )->flip_rotate_->hide();
         ( *i )->group_flip_rotate_button_->setChecked( false );
@@ -406,16 +430,53 @@ void LayerManagerWidget::hide_show_roi( bool hideshow )
   turn_off_or_on_checkboxes( group_dimensions_, hideshow );
 
 } // end hide_show_roi
+  
+  
+  // hide or show the delete layer tool pane
+  void LayerManagerWidget::hide_show_delete( bool hideshow )
+  {
+    QToolButton *hide_show_button = ::qobject_cast< QToolButton* >( sender() );
+    QString group_dimensions_;
+    
+    for ( GroupList_type::const_iterator i = this->private_->group_list_.begin(); i
+       != this->private_->group_list_.end(); i++ )
+    {
+      if ( ( *i )->group_delete_button_ == hide_show_button )
+      {
+        group_dimensions_ = ( *i )->activate_button_->text();
+        if ( hideshow )
+        {
+          ( *i )->delete_->show();
+          ( *i )->roi_->hide();
+          ( *i )->group_crop_button_->setChecked( false );
+          ( *i )->resample_->hide();
+          ( *i )->group_resample_button_->setChecked( false );
+          ( *i )->flip_rotate_->hide();
+          ( *i )->group_flip_rotate_button_->setChecked( false );
+          ( *i )->transform_->hide();
+          ( *i )->group_transform_button_->setChecked( false );
+        }
+        else
+        {
+          ( *i )->delete_->hide();
+        }
+      }
+    }
+    
+    // hide or show the appropriate checkboxes
+    turn_off_or_on_checkboxes( group_dimensions_, hideshow );
+    
+  } // end hide_show_delete 
 
 
-// hide or show the Region Of Interest tool box
+// hide or show the Region Of Interest tool pane
 void LayerManagerWidget::hide_show_transform( bool hideshow )
 {
   QToolButton *hide_show_button = ::qobject_cast< QToolButton* >( sender() );
   QString group_dimensions_;
 
-  for ( GroupList_type::const_iterator i = private_->group_list_.begin(); i
-      != private_->group_list_.end(); i++ )
+  for ( GroupList_type::const_iterator i = this->private_->group_list_.begin(); i
+      != this->private_->group_list_.end(); i++ )
   {
     if ( ( *i )->group_transform_button_ == hide_show_button )
     {
@@ -426,6 +487,8 @@ void LayerManagerWidget::hide_show_transform( bool hideshow )
         ( *i )->resample_->hide();
         ( *i )->roi_->hide();
         ( *i )->flip_rotate_->hide();
+        ( *i )->delete_->hide();
+        ( *i )->group_delete_button_->setChecked( false );
         ( *i )->group_flip_rotate_button_->setChecked( false );
         ( *i )->group_resample_button_->setChecked( false );
         ( *i )->group_crop_button_->setChecked( false );
@@ -442,14 +505,14 @@ void LayerManagerWidget::hide_show_transform( bool hideshow )
 } // end hide_show_transform
 
 
-// hide or show the flip rotate tool box
+// hide or show the flip rotate tool pane
 void LayerManagerWidget::hide_show_flip_rotate( bool hideshow )
 {
   QToolButton *hide_show_button = ::qobject_cast< QToolButton* >( sender() );
   QString group_dimensions_;
 
-  for ( GroupList_type::const_iterator i = private_->group_list_.begin(); i
-      != private_->group_list_.end(); i++ )
+  for ( GroupList_type::const_iterator i = this->private_->group_list_.begin(); i
+      != this->private_->group_list_.end(); i++ )
   {
     if ( ( *i )->group_flip_rotate_button_ == hide_show_button )
     {
@@ -460,6 +523,8 @@ void LayerManagerWidget::hide_show_flip_rotate( bool hideshow )
         ( *i )->transform_->hide();
         ( *i )->resample_->hide();
         ( *i )->roi_->hide();
+        ( *i )->delete_->hide();
+        ( *i )->group_delete_button_->setChecked( false );
         ( *i )->group_resample_button_->setChecked( false );
         ( *i )->group_crop_button_->setChecked( false );
         ( *i )->group_transform_button_->setChecked( false );
@@ -479,8 +544,8 @@ void LayerManagerWidget::hide_show_flip_rotate( bool hideshow )
 // turn off or on the checkboxes
 void LayerManagerWidget::turn_off_or_on_checkboxes( const QString &dimensions, const bool &hideshow )
 {
-  for ( LayerList_type::const_iterator i = private_->layer_list_.begin(); i
-      != private_->layer_list_.end(); i++ )
+  for ( LayerList_type::const_iterator i = this->private_->layer_list_.begin(); i
+      != this->private_->layer_list_.end(); i++ )
   {
     if ( hideshow && ( dimensions == ( *i )->dimensions_->text() ) )
     {
@@ -501,8 +566,8 @@ void LayerManagerWidget::hide_show_layers( bool hideshow )
 {
   QToolButton *hide_show_button = ::qobject_cast< QToolButton* >( sender() );
 
-  for ( GroupList_type::const_iterator i = private_->group_list_.begin(); i
-      != private_->group_list_.end(); i++ )
+  for ( GroupList_type::const_iterator i = this->private_->group_list_.begin(); i
+      != this->private_->group_list_.end(); i++ )
   {
     if ( ( *i )->open_button_ == hide_show_button )
     {
@@ -526,8 +591,8 @@ void LayerManagerWidget::hide_show_color_choose_bar( bool hideshow )
 {
   QToolButton *hide_show_button = ::qobject_cast< QToolButton* >( sender() );
 
-  for ( LayerList_type::const_iterator i = private_->layer_list_.begin(); i
-      != private_->layer_list_.end(); i++ )
+  for ( LayerList_type::const_iterator i = this->private_->layer_list_.begin(); i
+      != this->private_->layer_list_.end(); i++ )
   {
     if ( ( *i )->color_button_ == hide_show_button )
     {
@@ -558,8 +623,8 @@ void LayerManagerWidget::hide_show_opacity_bar( bool hideshow )
 {
   QToolButton *hide_show_button = ::qobject_cast< QToolButton* >( sender() );
 
-  for ( LayerList_type::const_iterator i = private_->layer_list_.begin(); i
-      != private_->layer_list_.end(); i++ )
+  for ( LayerList_type::const_iterator i = this->private_->layer_list_.begin(); i
+      != this->private_->layer_list_.end(); i++ )
   {
     if ( ( *i )->opacity_button_ == hide_show_button )
     {
@@ -590,8 +655,8 @@ void LayerManagerWidget::hide_show_brightness_contrast_bar( bool hideshow )
 {
   QToolButton *hide_show_button = ::qobject_cast< QToolButton* >( sender() );
 
-  for ( LayerList_type::const_iterator i = private_->layer_list_.begin(); i
-      != private_->layer_list_.end(); i++ )
+  for ( LayerList_type::const_iterator i = this->private_->layer_list_.begin(); i
+      != this->private_->layer_list_.end(); i++ )
   {
     if ( ( *i )->brightness_contrast_button_ == hide_show_button )
     {
@@ -622,8 +687,8 @@ void LayerManagerWidget::hide_show_border_bar( bool hideshow )
 {
   QToolButton *hide_show_button = ::qobject_cast< QToolButton* >( sender() );
 
-  for ( LayerList_type::const_iterator i = private_->layer_list_.begin(); i
-      != private_->layer_list_.end(); i++ )
+  for ( LayerList_type::const_iterator i = this->private_->layer_list_.begin(); i
+      != this->private_->layer_list_.end(); i++ )
   {
     if ( ( *i )->fill_border_button_ == hide_show_button )
     {
@@ -654,8 +719,8 @@ void LayerManagerWidget::show_progress_bar_bar()
 {
   QToolButton *hide_show_button = ::qobject_cast< QToolButton* >( sender() );
 
-  for ( LayerList_type::const_iterator i = private_->layer_list_.begin(); i
-      != private_->layer_list_.end(); i++ )
+  for ( LayerList_type::const_iterator i = this->private_->layer_list_.begin(); i
+      != this->private_->layer_list_.end(); i++ )
   {
     if ( ( *i )->compute_iso_surface_button_ == hide_show_button )
     {
@@ -669,8 +734,8 @@ void LayerManagerWidget::hide_progress_bar_bar()
 {
   QToolButton *cancel_button = ::qobject_cast< QToolButton* >( sender() );
 
-  for ( LayerList_type::const_iterator i = private_->layer_list_.begin(); i
-      != private_->layer_list_.end(); i++ )
+  for ( LayerList_type::const_iterator i = this->private_->layer_list_.begin(); i
+      != this->private_->layer_list_.end(); i++ )
   {
     if ( ( *i )->progress_cancel_button_ == cancel_button )
     {
@@ -684,8 +749,8 @@ void LayerManagerWidget::color_button_clicked()
 {
   QToolButton *color_button = ::qobject_cast< QToolButton* >( sender() );
 
-  for ( LayerList_type::const_iterator i = private_->layer_list_.begin(); i
-      != private_->layer_list_.end(); i++ )
+  for ( LayerList_type::const_iterator i = this->private_->layer_list_.begin(); i
+      != this->private_->layer_list_.end(); i++ )
   {
     if ( ( *i )->color_button_01_ == color_button )
     {
@@ -756,8 +821,8 @@ void LayerManagerWidget::lock_unlock_layer( bool lockunlock )
 {
   QToolButton *lock_unlock_button = ::qobject_cast< QToolButton* >( sender() );
 
-  for ( LayerList_type::const_iterator i = private_->layer_list_.begin(); i
-      != private_->layer_list_.end(); i++ )
+  for ( LayerList_type::const_iterator i = this->private_->layer_list_.begin(); i
+      != this->private_->layer_list_.end(); i++ )
   {
     if ( ( *i )->lock_button_ == lock_unlock_button )
     {

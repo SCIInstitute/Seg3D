@@ -145,6 +145,7 @@ public:
   static void Lock()
   {
     StateEngine::Lock();
+    lock_status_ = true;
   }
 
   // UNLOCK
@@ -152,6 +153,7 @@ public:
   static void Unlock()
   {
     StateEngine::Unlock();
+    lock_status_ = false;
   }
 
   // GETMUTEX
@@ -160,6 +162,17 @@ public:
   {
     return StateEngine::GetMutex();
   }
+  
+  // IS_LOCKED
+  // Return the status of the lock
+  static bool is_locked()
+  {
+    return lock_status_;
+  }
+  
+private:
+  static bool lock_status_;
+  
 };
 
 } // end namespace Seg3D

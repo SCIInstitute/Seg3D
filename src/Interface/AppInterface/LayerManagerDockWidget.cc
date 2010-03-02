@@ -35,11 +35,11 @@
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/Interface/Interface.h>
 
-#include <Application/Layer/Actions/ActionCloneLayer.h>
-#include <Application/Layer/Actions/ActionLayer.h>
-#include <Application/Layer/Actions/ActionLayerFromFile.h>
-#include <Application/Layer/Actions/ActionNewMaskLayer.h>
-#include <Application/Layer/Actions/ActionRemoveLayer.h>
+#include <Application/LayerManager/Actions/ActionCloneLayer.h>
+#include <Application/LayerManager/Actions/ActionLayer.h>
+#include <Application/LayerManager/Actions/ActionLayerFromFile.h>
+#include <Application/LayerManager/Actions/ActionNewMaskLayer.h>
+#include <Application/LayerManager/Actions/ActionRemoveLayer.h>
 
 // Interface includes
 #include <Interface/AppInterface/LayerManagerDockWidget.h>
@@ -76,7 +76,7 @@ void LayerManagerDockWidget::layer_from_file()
 {
   //TODO implement open data layer function
 }
-void LayerManagerDockWidget::clone_layer( LayerHandle layer )
+void LayerManagerDockWidget::clone_layer( LayerHandle& layer )
 {
   //TODO implement clone layer function
 }
@@ -84,14 +84,21 @@ void LayerManagerDockWidget::new_mask_layer()
 {
   //TODO implement new mask layer function
 }
-void LayerManagerDockWidget::remove_layer( LayerHandle layer )
+void LayerManagerDockWidget::remove_layer( LayerHandle& layer )
 {
   //TODO implement remove layer function
 }
-
-void LayerManagerDockWidget::layer_changed( int index )
+  
+void LayerManagerDockWidget::insert_above_layer( LayerHandle& below_layer, LayerHandle& above_layer )
 {
-  //TODO implement layer changed slot
+  //TODO implement insert layer above function
 }
+  
+
+
+//void LayerManagerDockWidget::layer_changed( int index )
+//{
+//  //TODO implement layer changed slot
+//}
 
 }  // end namespace Seg3D

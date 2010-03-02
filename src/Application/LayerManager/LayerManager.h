@@ -40,9 +40,12 @@
 // Core includes
 #include <Utils/Core/StringUtil.h>
 #include <Utils/Singleton/Singleton.h>
+#include <Utils/Core/Log.h>
+#include <Utils/Core/Exception.h>
 
 // Application includes
 #include <Application/Layer/Layer.h>
+#include <Application/State/StateHandler.h>
 
 namespace Seg3D
 {
@@ -62,10 +65,19 @@ private:
 
 public:
   virtual ~LayerManager();
+  
+protected:
+  friend class ActionCloneLayer;
+  friend class ActionInsertLayerAbove;
+  friend class ActionNewMaskLayer;
+  friend class ActionRemoveLayer;
+  
+  bool insert_layer_above( const std::string& above_layer_name, std::string& below_layer_name ); 
 
   // -- Signal/Slots --
-public:
-
+  typedef boost::signals2::signal< void( LayerHandle ) > layer_signal_type;
+  layer_signal_type layer_changed_signal;
+  
   // -- Singleton interface --
 public:
   static LayerManager* Instance()

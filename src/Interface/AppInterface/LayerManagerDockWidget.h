@@ -71,18 +71,26 @@ public:
   void layer_from_file();
 
   //Clone layer
-  void clone_layer( LayerHandle layer );
+  void clone_layer( LayerHandle& layer );
 
   //New mask layer
   void new_mask_layer();
 
   //Remove layer
-  void remove_layer( LayerHandle layer );
+  void remove_layer( LayerHandle& layer );
+  
+  //Move Layer Above
+  void insert_above_layer( LayerHandle& below_layer, LayerHandle& above_layer );
+  
+  //Flip or Rotate Layer
+//  void flip_layer( layer_widget_list_type layers_to_crop_list );
+//  void crop_layer( layer_widget_list_type layers_to_crop_list );
+//  void resample_layer( layer_widget_list_type layers_to_crop_list );
+//  void transform_layer( 
 
   //  -- slots --
-public Q_SLOTS:
-
-void layer_changed(int index);
+//public Q_SLOTS:
+//  void layer_changed(int index);
 
 private:
 
@@ -98,15 +106,18 @@ private:
 
   LayerManagerWidget* layer_manager_;
 
+  // -- static functions for callbacks into this widget --
 public:
-  static void HandleNewGroup( QPointer< LayerManagerDockWidget > widget, LayerHandle layer );
-  static void HandleCloseGroup( QPointer< LayerManagerDockWidget > widget, LayerHandle layer );
-  static void HandleDataFromFile( QPointer< LayerManagerDockWidget > widget, LayerHandle layer );
-  static void HandleCloneLayer( QPointer< LayerManagerDockWidget > widget, LayerHandle layer );
-  static void HandleNewMaskLayer( QPointer< LayerManagerDockWidget > widget, LayerHandle layer );
-  static void HandleRemoveLayer( QPointer< LayerManagerDockWidget > widget, LayerHandle layer );
+  typedef QPointer< LayerManagerDockWidget > qpointer_type;
+  
+  static void HandleNewGroup( qpointer_type qpointer, LayerHandle layer );
+  static void HandleCloseGroup( qpointer_type qpointer, LayerHandle layer );
+  static void HandleDataFromFile( qpointer_type qpointer, LayerHandle layer );
+  static void HandleCloneLayer( qpointer_type qpointer, LayerHandle layer );
+  static void HandleNewMaskLayer( qpointer_type qpointer, LayerHandle layer );
+  static void HandleRemoveLayer( qpointer_type qpointer, LayerHandle layer );
 
 };
 
-} // end namespace
+} // end namespace Seg3D
 #endif // LAYERMANAGERDOCKWIDGET_H

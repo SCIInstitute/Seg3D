@@ -119,6 +119,6 @@ public:
   static void HandleActivateTool( qpointer_type qpointer, ToolHandle tool );
 };
 
-} // end namespace
+} // end namespace Seg3D
 
 #endif

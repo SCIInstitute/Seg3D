@@ -37,6 +37,26 @@ SET(APPLICATION_LAYERMANAGER_SRCS
   )
 
 SET(APPLICATION_LAYERMANAGER_ACTIONS_SRCS
+  Actions/ActionInsertLayerAbove.h
+  Actions/ActionInsertLayerAbove.cc
+  Actions/ActionCloneLayer.h
+  Actions/ActionCloneLayer.cc
+  Actions/ActionCrop.h
+  Actions/ActionCrop.cc
+  Actions/ActionFlipLayer.h
+  Actions/ActionFlipLayer.cc
+  Actions/ActionLayer.h
+  Actions/ActionLayer.cc
+  Actions/ActionLayerFromFile.h
+  Actions/ActionLayerFromFile.cc
+  Actions/ActionNewMaskLayer.h
+  Actions/ActionNewMaskLayer.cc
+  Actions/ActionRemoveLayer.h
+  Actions/ActionRemoveLayer.cc
+  Actions/ActionResampleLayer.h
+  Actions/ActionResampleLayer.cc
+  Actions/ActionTransformLayer.h
+  Actions/ActionTransformLayer.cc
   )
 
 

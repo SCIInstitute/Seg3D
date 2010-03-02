@@ -48,7 +48,7 @@ HistoryDockWidget::HistoryDockWidget( QWidget *parent ) :
   QDockWidget( "HistoryDockWidget", parent ), private_( new HistoryDockWidgetPrivate )
 {
   // Set up the private internals of the LayerManagerInterface class
-  private_->ui_.setupUi( this );
+  this->private_->ui_.setupUi( this );
 
 }
 

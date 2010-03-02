@@ -62,7 +62,10 @@ private Q_SLOTS:
   void hide_show_transform( bool hideshow );
   void hide_show_flip_rotate( bool hideshow );
   void hide_show_layers( bool hideshow );
+  void hide_show_delete( bool hideshow );
 
+  void enable_disable_delete_button( bool enable );
+  
   void hide_show_brightness_contrast_bar( bool hideshow );
   void hide_show_color_choose_bar( bool hideshow );
   void hide_show_opacity_bar( bool hideshow );

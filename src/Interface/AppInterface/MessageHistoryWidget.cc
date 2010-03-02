@@ -30,31 +30,42 @@
 
 #include <Utils/Core/Log.h>
 
-#include <Interface/AppInterface/HistoryWidget.h>
-#include "ui_HistoryWidget.h"
+#include <Interface/AppInterface/MessageHistoryWidget.h>
+#include "ui_MessageHistoryWidget.h"
 
 namespace Seg3D
 {
 
-class HistoryWidgetPrivate
+class MessageHistoryWidgetPrivate
 {
 public:
 
-  Ui::HistoryWidget ui_;
+  Ui::MessageHistoryWidget ui_;
 
 };
 
-HistoryWidget::HistoryWidget( QWidget *parent ) :
-  private_( new HistoryWidgetPrivate )
+MessageHistoryWidget::MessageHistoryWidget( QWidget *parent ) :
+  private_( new MessageHistoryWidgetPrivate )
 {
+  setWindowFlags(Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint);
   // Set up the private internals of the LayerManagerInterface class
-  private_->ui_.setupUi( this );
-
+  this->private_->ui_.setupUi( this );
+  
+  
 }
 
-HistoryWidget::~HistoryWidget()
+MessageHistoryWidget::~MessageHistoryWidget()
 {
 
+}
+  
+void MessageHistoryWidget::add_history_item(const QString &message, const QColor &color)
+{
+  QListWidgetItem* item = new QListWidgetItem(message, this->private_->ui_.history_list_);
+  item->setTextColor(color);
+  item->setFont(QFont("Lucida Grande", 13, QFont::Bold));
+  this->private_->ui_.history_list_->addItem(item);
+  this->private_->ui_.history_list_->setCurrentItem(item);
 }
 
 } // end namespace Seg3D

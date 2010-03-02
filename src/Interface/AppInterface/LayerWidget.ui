@@ -425,6 +425,9 @@ QToolButton#color_button_12_:pressed{
                <height>16</height>
               </size>
              </property>
+             <property name="toolTip">
+              <string>Check this box to select this layer</string>
+             </property>
              <property name="text">
               <string notr="true"/>
              </property>
@@ -557,6 +560,9 @@ QToolButton#color_button_12_:pressed{
             <property name="focusPolicy">
              <enum>Qt::ClickFocus</enum>
             </property>
+            <property name="toolTip">
+             <string>Click here to edit the name</string>
+            </property>
             <property name="autoFillBackground">
              <bool>false</bool>
             </property>
@@ -612,6 +618,9 @@ QToolButton#color_button_12_:pressed{
                 <height>16</height>
                </size>
               </property>
+              <property name="toolTip">
+               <string>Turn on or off this layer's visibility</string>
+              </property>
               <property name="text">
                <string/>
               </property>
@@ -641,6 +650,9 @@ QToolButton#color_button_12_:pressed{
                 <width>16</width>
                 <height>16</height>
                </size>
+              </property>
+              <property name="toolTip">
+               <string>Open the opacity menu</string>
               </property>
               <property name="text">
                <string/>
@@ -675,6 +687,9 @@ QToolButton#color_button_12_:pressed{
                 <weight>75</weight>
                 <bold>true</bold>
                </font>
+              </property>
+              <property name="toolTip">
+               <string>Lock or unlock the layer</string>
               </property>
               <property name="text">
                <string/>
@@ -719,6 +734,9 @@ QToolButton#color_button_12_:pressed{
                 <height>16</height>
                </size>
               </property>
+              <property name="toolTip">
+               <string>Open the color menu</string>
+              </property>
               <property name="text">
                <string/>
               </property>
@@ -745,6 +763,9 @@ QToolButton#color_button_12_:pressed{
                 <width>16</width>
                 <height>16</height>
                </size>
+              </property>
+              <property name="toolTip">
+               <string>Turn on or off the ISO surface</string>
               </property>
               <property name="text">
                <string>I</string>
@@ -773,6 +794,9 @@ QToolButton#color_button_12_:pressed{
                 <height>16</height>
                </size>
               </property>
+              <property name="toolTip">
+               <string>Compute the ISO surface</string>
+              </property>
               <property name="text">
                <string>C</string>
               </property>
@@ -799,6 +823,9 @@ QToolButton#color_button_12_:pressed{
                 <width>16</width>
                 <height>16</height>
                </size>
+              </property>
+              <property name="toolTip">
+               <string>Open the fill/border menu</string>
               </property>
               <property name="text">
                <string/>
@@ -827,6 +854,9 @@ QToolButton#color_button_12_:pressed{
                 <height>16</height>
                </size>
               </property>
+              <property name="toolTip">
+               <string>Turn on or off the volume render</string>
+              </property>
               <property name="text">
                <string/>
               </property>
@@ -850,6 +880,9 @@ QToolButton#color_button_12_:pressed{
                 <width>16</width>
                 <height>16</height>
                </size>
+              </property>
+              <property name="toolTip">
+               <string>Open the brightness/contrast menu</string>
               </property>
               <property name="text">
                <string/>

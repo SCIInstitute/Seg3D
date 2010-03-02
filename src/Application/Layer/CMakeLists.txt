@@ -43,17 +43,7 @@ SET(APPLICATION_LAYER_SRCS
 )
 
 SET(APPLICATION_LAYER_ACTIONS_SRCS
-#  Actions/ActionLayer.h
-#  Actions/ActionLayer.cc
-#  Actions/ActionLayerFromFile.h
-#  Actions/ActionLayerFromFile.cc
-#  Actions/ActionCloneLayer.h
-#  Actions/ActionCloneLayer.cc
-#  Actions/ActionNewMaskLayer.h
-#  Actions/ActionNewMaskLayer.cc
-#  Actions/ActionRemoveLayer.h
-#  Actions/ActionRemoveLayer.cc
-  )
+)
 
 ADD_LIBRARY(Application_Layer STATIC 
             ${APPLICATION_LAYER_SRCS}

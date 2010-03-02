@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_APPINTERFACE_HISTORYWIDGET_H
-#define INTERFACE_APPINTERFACE_HISTORYWIDGET_H
+#ifndef INTERFACE_APPINTERFACE_MESSAGEHISTORYWIDGET_H
+#define INTERFACE_APPINTERFACE_MESSAGEHISTORYWIDGET_H
 
 // QT includes
 #include <QtGui>
@@ -43,22 +43,31 @@
 namespace Seg3D
 {
 
-class HistoryWidgetPrivate;
+class MessageHistoryWidgetPrivate;
 
-class HistoryWidget : public QWidget
+class MessageHistoryWidget : public QDialog
 {
 Q_OBJECT
 
+  
+Q_SIGNALS:
+  void hidden();
+  
 public:
-  HistoryWidget( QWidget *parent = 0 );
-  virtual ~HistoryWidget();
+  MessageHistoryWidget( QWidget *parent = 0 );
+  virtual ~MessageHistoryWidget();
 
 private:
-  // Internals of the dockwidget
-  boost::shared_ptr< HistoryWidgetPrivate > private_;
+  boost::shared_ptr< MessageHistoryWidgetPrivate > private_;
+  QList<QString> log_;
+  
+public:
+  void add_history_item(const QString &message, const QColor &color);
+  
+  
 
 };
 
 } // end namespace
 
-#endif // HISTORYWIDGET_H
+#endif // MESSAGEHISTORYWIDGET_H

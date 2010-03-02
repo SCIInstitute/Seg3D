@@ -6,12 +6,39 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1018</width>
+    <width>1030</width>
     <height>479</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>1030</width>
+    <height>479</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>1030</width>
+    <height>479</height>
+   </size>
+  </property>
+  <property name="font">
+   <font>
+    <family>Lucida Sans</family>
+   </font>
+  </property>
   <property name="windowTitle">
    <string/>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>../../Resources/Icons/Seg3DLarge.png</normaloff>../../Resources/Icons/Seg3DLarge.png</iconset>
   </property>
   <property name="styleSheet">
    <string notr="true">QDialog#Splash {
@@ -32,6 +59,9 @@ QPushButton:pressed{
   margin:4px;
 
 }</string>
+  </property>
+  <property name="sizeGripEnabled">
+   <bool>false</bool>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <property name="spacing">
@@ -91,7 +121,17 @@ QPushButton:pressed{
        </widget>
       </item>
       <item>
-       <widget class="QListView" name="recent_project_list_"/>
+       <widget class="QListWidget" name="recent_project_list_">
+        <property name="focusPolicy">
+         <enum>Qt::ClickFocus</enum>
+        </property>
+        <property name="editTriggers">
+         <set>QAbstractItemView::NoEditTriggers</set>
+        </property>
+        <property name="alternatingRowColors">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QPushButton" name="existing_project_button_">
