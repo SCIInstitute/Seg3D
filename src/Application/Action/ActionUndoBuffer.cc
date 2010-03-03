@@ -250,7 +250,5 @@ void AddUndoAction( std::string undo_tag, ActionHandleList& undo_list, ActionHan
 {
   ActionUndoBuffer::Instance()->add_undo_action( undo_tag, undo_list, redo );
 }
-// Singleton interface needs to be defined somewhere
-Utils::Singleton< ActionUndoBuffer > ActionUndoBuffer::instance_;
 
 } // end namespace Seg3D

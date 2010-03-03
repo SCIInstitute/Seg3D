@@ -54,15 +54,13 @@ namespace Seg3D
 class RenderResources;
 
 // Class definition
-class RenderResources : public boost::noncopyable
+class RenderResources : public Utils::Singleton< RenderResources >
 {
 
   // -- constructor --
 private:
   friend class Utils::Singleton< RenderResources >;
   RenderResources();
-
-public:
   virtual ~RenderResources();
 
   // -- context handling --
@@ -126,16 +124,6 @@ private:
   // State variable indicating whether the OpenGL environment has been initialized
   bool gl_initialized_;
 
-  // -- Singleton interface --
-public:
-
-  static RenderResources* Instance()
-  {
-    return instance_.instance();
-  }
-
-private:
-  static Utils::Singleton< RenderResources > instance_;
 };
 
 class OpenGLException : public Utils::Exception

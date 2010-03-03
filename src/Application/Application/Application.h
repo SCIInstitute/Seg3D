@@ -49,15 +49,13 @@ namespace Seg3D
 
 class Application;
 
-class Application : public Utils::EventHandler
+class Application : public Utils::EventHandler, public Utils::Singleton< Application >
 {
 
   // -- Constructor/Destructor --
 private:
   friend class Utils::Singleton< Application >;
   Application();
-
-public:
   virtual ~Application();
 
   // -- Application wide settings --
@@ -108,19 +106,6 @@ public:
   {
     Instance()->post_and_wait_event( function );
   }
-
-  // -- Singleton interface --
-public:
-
-  // INSTANCE:
-  // Get the singleton interface
-  static Application* Instance()
-  {
-    return instance_.instance();
-  }
-
-private:
-  static Utils::Singleton< Application > instance_;
 
 };
 

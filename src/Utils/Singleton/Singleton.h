@@ -33,6 +33,7 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/utility.hpp>
 
 namespace Utils
 {
@@ -43,42 +44,46 @@ namespace Utils
 // the creation of the singleton class.
 
 template< class T >
-class Singleton
+class Singleton : public boost::noncopyable
 {
 
-public:
+protected:
   // SINGLETON:
   Singleton() :
     initialized_( false ), instance_( 0 )
   {
   }
 
-public:
+  virtual ~Singleton()
+  {
+  }
+
+private:
   // INSTANCE:
   // Get the singleton pointer to the application
 
   T* instance()
   {
     // if no singleton was allocated, allocate it now
-    if ( !initialized_ )
+    if ( !this->initialized_ )
     {
       //in case multiple threads try to allocate this one at once.
       {
-        boost::unique_lock< boost::mutex > lock( instance_mutex_ );
+        boost::unique_lock< boost::mutex > lock( this->instance_mutex_ );
         // The first test was not locked and hence not thread safe
         // This one will do a thread-safe allocation of the interface
         // class
-        if ( instance_ == 0 ) instance_ = new T;
+        if ( this->instance_ == 0 ) this->instance_ = new T;
       }
 
       {
         // Enforce memory synchronization so the singleton is initialized
         // before we set initialized to true
-        boost::unique_lock< boost::mutex > lock( instance_mutex_ );
-        initialized_ = true;
+        boost::unique_lock< boost::mutex > lock( this->instance_mutex_ );
+        this->initialized_ = true;
       }
     }
-    return ( instance_ );
+    return this->instance_;
   }
 
 private:
@@ -89,6 +94,13 @@ private:
   bool initialized_;
   // Pointer that contains the singleton interface to this class
   T* instance_;
+
+public:
+  static T* Instance()
+  {
+    static Singleton<T> instance_s;
+    return instance_s.instance();
+  }
 
 };
 

@@ -189,16 +189,14 @@ std::string shortcut_key_;
 class ToolFactory;
 
 // Class definition
-class ToolFactory : public boost::noncopyable
+class ToolFactory : public Utils::Singleton<ToolFactory>
 {
 
 // -- Constructor --
 private:
-friend class Utils::Singleton<ToolFactory>;
-ToolFactory();
-
-public:
-virtual ~ToolFactory();
+  friend class Utils::Singleton<ToolFactory>;
+  ToolFactory();
+  virtual ~ToolFactory();
 
 // -- Tool registration --
 public:
@@ -323,13 +321,6 @@ bool list_tool_types(tool_list_type& tool_list,
 bool list_tool_types_with_interface(tool_list_type& tool_list,
   int tool_property); // << THREAD-SAFE
 
-// -- Singleton interface --
-public:
-static ToolFactory* Instance()
-{ return instance_.instance();}
-
-private:
-static Utils::Singleton<ToolFactory> instance_;
 };
 
 } // end namespace seg3D

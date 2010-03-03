@@ -63,7 +63,4 @@ bool InterfaceManager::is_windowid( const std::string& windowid )
   return ( windowid_list_.find( lower_windowid ) != windowid_list_.end() );
 }
 
-// Singleton interface needs to be defined somewhere
-Utils::Singleton< InterfaceManager > InterfaceManager::instance_;
-
 } // end namespace Seg3D

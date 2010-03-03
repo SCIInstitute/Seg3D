@@ -138,6 +138,12 @@ public:
     return value_;
   }
 
+  // Get the index of the value
+  inline int index() const
+  {
+    return this->index_;
+  }
+
   // SET:
   // Set the value of the state variable
   // NOTE: this function by passes the action mechanism and should only be used
@@ -150,8 +156,13 @@ protected:
   // Storage for the actual value
   std::string value_;
 
+  // Index of the current value in the option list
+  int index_;
+
   // List with all the allowed options in lower case
   std::vector< std::string > option_list_;
+
+  typedef std::vector< std::string >::iterator option_list_iterator_type;
 
 public:
   const static char SPLITTER_C;

@@ -61,7 +61,4 @@ void Interface::PostAction( ActionHandle action )
       Interface::Instance()->interface_action_context() ) );
 }
 
-// Singleton instance
-Utils::Singleton< Interface > Interface::instance_;
-
 } // end namespace Seg3D

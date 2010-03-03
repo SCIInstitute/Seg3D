@@ -59,7 +59,7 @@ namespace Seg3D
 class ActionUndoBuffer;
 
 // Class definition
-class ActionUndoBuffer : public boost::noncopyable
+class ActionUndoBuffer : public Utils::Singleton< ActionUndoBuffer >
 {
 
   // -- Constructor --
@@ -67,8 +67,6 @@ class ActionUndoBuffer : public boost::noncopyable
 private:
   friend class Utils::Singleton< ActionUndoBuffer >;
   ActionUndoBuffer();
-
-public:
   virtual ~ActionUndoBuffer();
 
   // -- Add undo/redo action --
@@ -152,17 +150,6 @@ protected:
   // function that triggers the signal that tells when new tags are ready for
   // labeling the undo/redo state of the program.
   void tags_changed();
-
-  // -- Singleton interface --
-public:
-
-  static ActionUndoBuffer* Instance()
-  {
-    return instance_.instance();
-  }
-
-private:
-  static Utils::Singleton< ActionUndoBuffer > instance_;
 
 };
 

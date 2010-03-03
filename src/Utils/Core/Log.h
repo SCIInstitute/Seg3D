@@ -56,7 +56,7 @@ namespace Utils
 class Log;
 
 // Class definition
-class Log : public boost::noncopyable
+class Log : public Singleton< Log >
 {
 
   // -- constructor / destructor --
@@ -108,15 +108,6 @@ public:
   // Signal indicating that the history changed
 
   post_log_signal_type post_log_signal_;
-
-  // -- Singleton interface --
-public:
-
-  static Log* Instance()
-  {
-    return instance_.instance();
-  }
-  static Singleton< Log > instance_;
 
 };
 

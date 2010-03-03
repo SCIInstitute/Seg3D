@@ -53,9 +53,6 @@ Application::~Application()
 {
 }
 
-// Singleton instance
-Utils::Singleton< Application > Application::instance_;
-
 //TODO - put this in the class
 //This map stores the parameters that were set when Seg3D was started.
 static std::map< std::string, std::string > parameters;

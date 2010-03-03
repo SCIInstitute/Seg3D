@@ -60,15 +60,13 @@ namespace Seg3D
 class InterfaceManager;
 
 // Class Definition
-class InterfaceManager : public StateHandler
+class InterfaceManager : public StateHandler, public Utils::Singleton< InterfaceManager >
 {
 
   // -- constructor/destructor --
 private:
   friend class Utils::Singleton< InterfaceManager >;
   InterfaceManager();
-
-public:
   virtual ~InterfaceManager();
 
   // -- state variables of interface --
@@ -104,15 +102,6 @@ private:
   boost::mutex windowid_list_mutex_;
   windowid_list_type windowid_list_;
 
-  // -- Singleton interface --
-public:
-  static InterfaceManager* Instance()
-  {
-    return instance_.instance();
-  }
-
-private:
-  static Utils::Singleton< InterfaceManager > instance_;
 };
 
 } // namespace Seg3D

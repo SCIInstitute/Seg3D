@@ -55,15 +55,13 @@ namespace Seg3D
 class StateEngine;
 
 // Class definition
-class StateEngine : public boost::noncopyable
+class StateEngine : public Utils::Singleton< StateEngine >
 {
 
   // -- Constructor/destructor --
 private:
   friend class Utils::Singleton< StateEngine >;
   StateEngine();
-
-public:
   virtual ~StateEngine();
 
   // -- Interface for accessing state variables --
@@ -167,16 +165,6 @@ private:
 
   // Aliases that are associated with the list
   statealias_map_type statealias_list_;
-
-  // -- Singleton interface --
-public:
-  static StateEngine* Instance()
-  {
-    return instance_.instance();
-  }
-
-private:
-  static Utils::Singleton< StateEngine > instance_;
 
   // -- Static convenience functions --
 

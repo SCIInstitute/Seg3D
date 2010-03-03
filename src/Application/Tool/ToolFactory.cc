@@ -150,7 +150,4 @@ bool ToolFactory::create_toolinterface( const std::string& toolinterface_name,
   return ( true );
 }
 
-// Singleton interface needs to live somewhere
-Utils::Singleton< ToolFactory > ToolFactory::instance_;
-
 } // end namespace seg3D

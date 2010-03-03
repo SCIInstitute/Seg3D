@@ -190,7 +190,4 @@ void PostAndWaitAction( const ActionHandle& action, const ActionContextHandle& a
   ActionDispatcher::Instance()->post_and_wait_action( action, action_context );
 }
 
-// Singleton interface needs to be defined somewhere
-Utils::Singleton< ActionDispatcher > ActionDispatcher::instance_;
-
 } // end namespace Seg3D

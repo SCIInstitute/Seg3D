@@ -152,9 +152,10 @@ public:
 
   void set_range( const T& min_value, const T& max_value )
   {
-    if ( min_value < max_value ) std::swap( min_value, max_value );
     min_value_ = min_value;
     max_value_ = max_value;
+
+    if ( min_value_ > max_value_ ) std::swap( min_value_, max_value_ );
 
     if ( value_ < min_value_ )
     {

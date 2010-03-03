@@ -44,7 +44,4 @@ ActionManager::~ActionManager()
 {
 }
 
-// Singleton interface needs to be defined somewhere
-Utils::Singleton< ActionManager > ActionManager::instance_;
-
 } // end namespace seg3D

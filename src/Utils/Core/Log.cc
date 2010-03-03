@@ -77,9 +77,6 @@ void Log::post_debug( std::string message, const int line, const char* file )
   post_log_signal_( DEBUG_E, str );
 }
 
-// Singleton instance
-Singleton< Log > Log::instance_;
-
 class LogStreamerInternal
 {
 

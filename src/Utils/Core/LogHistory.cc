@@ -92,8 +92,5 @@ void LogHistory::record_log( int type, std::string message )
   history_changed_signal_();
 }
 
-// Singleton interface needs to be defined somewhere
-Utils::Singleton< LogHistory > LogHistory::instance_;
-
 } // end namespace Utils
 

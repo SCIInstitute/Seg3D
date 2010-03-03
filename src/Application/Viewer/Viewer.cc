@@ -40,9 +40,13 @@ Viewer::Viewer( const std::string& key ) :
       + CORONAL_C + StateOption::SPLITTER_C + SAGITTAL_C + StateOption::SPLITTER_C + VOLUME_C );
 
   add_state( "axial_view", axial_view_state_ );
-  add_state( "sagittal_view", sagittal_view_state_ );
   add_state( "coronal_view", coronal_view_state_ );
+  add_state( "sagittal_view", sagittal_view_state_ );
   add_state( "volume_view", volume_view_state_ );
+
+  add_state( "axial_slice_number", this->axial_slice_number_state_, 0, 0, 0, 1 );
+  add_state( "coronal_slice_number", this->coronal_slice_number_state_, 0, 0, 0, 1 );
+  add_state( "sagittal_slice_number", this->sagittal_slice_number_state_, 0, 0, 0, 1 );
 
   add_state( "slice_lock", slice_lock_state_, true );
   add_state( "slice_grid", slice_grid_state_, true );

@@ -146,9 +146,13 @@ public:
   StateOptionHandle view_mode_state_;
 
   StateView2DHandle axial_view_state_;
-  StateView2DHandle sagittal_view_state_;
   StateView2DHandle coronal_view_state_;
+  StateView2DHandle sagittal_view_state_;
   StateView3DHandle volume_view_state_;
+
+  StateRangedIntHandle axial_slice_number_state_;
+  StateRangedIntHandle coronal_slice_number_state_;
+  StateRangedIntHandle sagittal_slice_number_state_;
 
   StateBoolHandle slice_lock_state_;
   StateBoolHandle slice_grid_state_;

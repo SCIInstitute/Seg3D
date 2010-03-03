@@ -55,15 +55,13 @@ namespace Seg3D
 class ActionDispatcher;
 
 // Class defintion
-class ActionDispatcher : public boost::noncopyable
+class ActionDispatcher : public Utils::Singleton< ActionDispatcher >
 {
 
   // -- Constructor
 private:
   friend class Utils::Singleton< ActionDispatcher >;
   ActionDispatcher();
-
-public:
   virtual ~ActionDispatcher();
 
   // -- Action handling --
@@ -141,17 +139,6 @@ public:
 
   post_action_signal_type post_action_signal_;
 
-  // -- Singleton interface --
-public:
-
-  static ActionDispatcher* Instance()
-  {
-    return instance_.instance();
-  } // << SINGLETON
-
-private:
-  // Singleton internals
-  static Utils::Singleton< ActionDispatcher > instance_;
 };
 
 // FUNCTION PostAction:

@@ -49,15 +49,13 @@ namespace Seg3D
 class ActionHistory;
 
 // Class defintion
-class ActionHistory : public boost::noncopyable
+class ActionHistory : public Utils::Singleton< ActionHistory >
 {
 
   // -- Constructor/Destructor --
 private:
   friend class Utils::Singleton< ActionHistory >;
   ActionHistory();
-
-public:
   virtual ~ActionHistory();
 
   // -- History recording --
@@ -101,17 +99,6 @@ public:
   // Signal indicating that the history changed
   history_changed_signal_type history_changed_signal_;
 
-  // -- Singleton interface --
-public:
-
-  static ActionHistory* Instance()
-  {
-    return instance_.instance();
-  } // << SINGLETON
-
-private:
-  // Singleton internals
-  static Utils::Singleton< ActionHistory > instance_;
 };
 
 } // end namespace Seg3D

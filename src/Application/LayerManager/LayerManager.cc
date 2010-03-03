@@ -48,7 +48,4 @@ LayerManager::~LayerManager()
 {
 }
 
-// Singleton needs to store somewhere
-Utils::Singleton< LayerManager > LayerManager::instance_;
-
 } // end namespace seg3D

@@ -69,8 +69,5 @@ ViewerHandle ViewerManager::get_viewer( size_t idx )
   return handle;
 }
 
-// Singleton interface needs to be defined somewhere
-Utils::Singleton< ViewerManager > ViewerManager::instance_;
-
 } // end namespace Seg3D
 

@@ -91,9 +91,6 @@ void RenderResources::init_gl()
   }
 }
 
-// Need to define singleton somewhere
-Utils::Singleton< RenderResources > RenderResources::instance_;
-
 OpenGLException::OpenGLException( std::string message,
   unsigned int line, const char* file ) :
 Utils::Exception(message, line, file)

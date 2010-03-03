@@ -53,17 +53,16 @@ namespace Seg3D
 class AtionSocket;
 
 // Class defintion
-class ActionSocket : public boost::noncopyable
+class ActionSocket : public Utils::Singleton< ActionSocket >
 {
 
   // -- Constructor/Destructor --
 private:
   friend class Utils::Singleton< ActionSocket >;
   ActionSocket();
-
-public:
   virtual ~ActionSocket();
 
+public:
   void start( int portnum );
 
 private:
@@ -71,17 +70,6 @@ private:
 
   boost::thread* action_socket_thread_;
 
-  // -- Singleton interface --
-public:
-
-  static ActionSocket* Instance()
-  {
-    return instance_.instance();
-  } // << SINGLETON
-
-private:
-  // Singleton internals
-  static Utils::Singleton< ActionSocket > instance_;
 };
 
 } // end namespace Seg3D

@@ -59,15 +59,13 @@ namespace Seg3D
 class Interface;
 
 // Class defintion
-class Interface : public Utils::EventHandler
+class Interface : public Utils::EventHandler, public Utils::Singleton< Interface >
 {
 
   // -- Constructor/Destructor --
 private:
   friend class Utils::Singleton< Interface >;
   Interface();
-
-public:
   virtual ~Interface();
 
   // -- Action context interface --
@@ -101,19 +99,6 @@ public:
   // POSTACTION:
   // Function that runs an action with the interface context
   static void PostAction( ActionHandle action );
-
-  // -- Singleton interface --
-public:
-
-  // INSTANCE:
-  // Get the singleton interface
-  static Interface* Instance()
-  {
-    return instance_.instance();
-  }
-
-private:
-  static Utils::Singleton< Interface > instance_;
 
 };
 

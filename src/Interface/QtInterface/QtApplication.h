@@ -62,7 +62,7 @@ namespace Seg3D
 class QtApplication;
 
 // Class definition
-class QtApplication : public boost::noncopyable
+class QtApplication : public Utils::Singleton< QtApplication >
 {
 
   // -- constuctor --
@@ -98,18 +98,6 @@ private:
 
   // Class for managing the opengl rendering resources
   QtRenderResourcesContextHandle qt_renderresources_context_;
-
-  // -- Singleton interface --
-public:
-
-  // INSTANCE:
-  static QtApplication* Instance()
-  {
-    return instance_.instance();
-  }
-
-private:
-  static Utils::Singleton< QtApplication > instance_;
 
 };
 

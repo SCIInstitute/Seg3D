@@ -39,7 +39,4 @@ StateManager::~StateManager()
 {
 }
 
-// Singleton needs to store somewhere
-Utils::Singleton< StateManager > StateManager::instance_;
-
 } // end namespace seg3D

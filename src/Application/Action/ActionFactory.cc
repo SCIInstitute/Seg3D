@@ -120,7 +120,4 @@ bool ActionFactory::CreateAction( const std::string& actionstring, ActionHandle&
   return ActionFactory::Instance()->create_action( actionstring, action, error, usage );
 }
 
-// Singleton instance
-Utils::Singleton< ActionFactory > ActionFactory::instance_;
-
 } // end namespace seg3D

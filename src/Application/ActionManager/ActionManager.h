@@ -51,7 +51,7 @@ namespace Seg3D
 class ActionManager;
 
 // Class definition
-class ActionManager : public boost::noncopyable
+class ActionManager : public Utils::Singleton< ActionManager >
 {
 
   // -- Constructor --
@@ -59,8 +59,6 @@ class ActionManager : public boost::noncopyable
 private:
   friend class Utils::Singleton< ActionManager >;
   ActionManager();
-
-public:
   virtual ~ActionManager();
 
   // -- Signal/Slots --
@@ -76,16 +74,6 @@ public:
     return ( ActionUndoBuffer::Instance()->tags_changed_.connect( slot ) );
   }
 
-  // -- Singleton interface --
-public:
-
-  static ActionManager* Instance()
-  {
-    return instance_.instance();
-  }
-
-private:
-  static Utils::Singleton< ActionManager > instance_;
 };
 
 } // end namespace seg3D

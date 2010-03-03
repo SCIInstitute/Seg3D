@@ -212,7 +212,4 @@ bool StateEngine::is_statealias( const std::string& statealias )
   return ( statealias_list_.find( statealias ) != statealias_list_.end() );
 }
 
-// Singleton interface needs to be defined somewhere
-Utils::Singleton< StateEngine > StateEngine::instance_;
-
 } // end namespace Seg3D

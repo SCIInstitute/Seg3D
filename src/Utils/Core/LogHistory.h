@@ -58,7 +58,7 @@ namespace Utils
 class LogHistory;
 
 // Class definition
-class LogHistory : public boost::noncopyable
+class LogHistory : public Singleton< LogHistory >
 {
 
 public:
@@ -104,15 +104,6 @@ public:
   // HISTORY_CHANGED_SIGNAL:
   // Signal indicating that the history changed
   history_changed_signal_type history_changed_signal_;
-
-  // -- Singleton interface --
-public:
-
-  static LogHistory* Instance()
-  {
-    return instance_.instance();
-  }
-  static Singleton< LogHistory > instance_;
 
 };
 

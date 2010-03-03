@@ -62,7 +62,7 @@ typedef boost::shared_ptr< Tool > ToolHandle;
 class ToolManager;
 
 // Class definition
-class ToolManager : public StateHandler
+class ToolManager : public StateHandler, public Utils::Singleton< ToolManager >
 {
 
   // -- constructor/destructor --
@@ -70,8 +70,6 @@ private:
   // NOTE: Constructor is private: use Instance() to generate this singleton
   friend class Utils::Singleton< ToolManager >;
   ToolManager();
-
-public:
   virtual ~ToolManager();
 
   // -- Handler functions --
@@ -140,15 +138,6 @@ private:
   // The tool that is currently active is stored here
   std::string active_toolid_;
 
-  // -- Singleton interface --
-public:
-  static ToolManager* Instance()
-  {
-    return instance_.instance();
-  }
-
-private:
-  static Utils::Singleton< ToolManager > instance_;
 };
 
 } // namespace Seg3D

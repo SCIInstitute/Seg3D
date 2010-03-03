@@ -56,15 +56,13 @@ namespace Seg3D
 class ViewerManager;
 
 // typedefs
-class ViewerManager : public StateHandler
+class ViewerManager : public StateHandler, public Utils::Singleton< ViewerManager >
 {
 
   // -- Constructor/Destructor --
 private:
   friend class Utils::Singleton< ViewerManager >;
   ViewerManager();
-
-public:
   virtual ~ViewerManager();
 
   // -- Getting information from manager --
@@ -81,19 +79,6 @@ public:
 private:
 
   std::vector< ViewerHandle > viewers_;
-
-  // -- Singleton interface --
-public:
-
-  // INSTANCE:
-  // Get the singleton interface
-  static ViewerManager* Instance()
-  {
-    return instance_.instance();
-  }
-
-private:
-  static Utils::Singleton< ViewerManager > instance_;
 
 }; // class ViewerManager
 

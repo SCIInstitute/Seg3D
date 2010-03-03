@@ -169,8 +169,5 @@ void ActionSocket::run_action_socket( int portnum )
   }
 }
 
-// Singleton interface needs to be defined somewhere
-Utils::Singleton< ActionSocket > ActionSocket::instance_;
-
 } // end namespace Seg3D
 

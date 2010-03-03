@@ -79,6 +79,7 @@ void QtRenderWidget::rendering_completed_slot( TextureHandle texture )
 void QtRenderWidget::initializeGL()
 {
   RenderResources::Instance()->init_gl();
+  glClearColor( 0.5, 0.5, 0.5, 1.0 );
   renderer_->initialize();
 }
 
@@ -86,6 +87,7 @@ void QtRenderWidget::paintGL()
 {
   if ( !renderer_texture_.get() )
   {
+    glClear( GL_COLOR_BUFFER_BIT );
     return;
   }
 
@@ -122,8 +124,6 @@ void QtRenderWidget::resizeGL( int width, int height )
   glMatrixMode( GL_PROJECTION );
   glLoadIdentity();
   gluOrtho2D( 0, width, 0, height );
-
-  paintGL();
 
   this->viewer_->resize( width, height );
   if ( renderer_.get() )

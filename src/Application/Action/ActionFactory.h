@@ -89,17 +89,15 @@ virtual ActionHandle build()
 // The factory object that instantiates the actions for the scripting and 
 // and playback systems in the application.
 
-class ActionFactory : public boost::noncopyable
+class ActionFactory : public Utils::Singleton<ActionFactory>
 {
 
 // -- Constructor --
 
 private:
-friend class Utils::Singleton<ActionFactory>;
-ActionFactory();
-
-public:
-virtual ~ActionFactory();
+  friend class Utils::Singleton<ActionFactory>;
+  ActionFactory();
+  virtual ~ActionFactory();
 
 // -- Action registration --
 
@@ -178,14 +176,6 @@ static bool CreateAction(const std::string& actionstring,
   std::string& error,
   std::string& usage);
 
-// -- Singleton interface --
-public:
-
-static ActionFactory* Instance()
-{ return instance_.instance();}
-
-private:
-static Utils::Singleton<ActionFactory> instance_;
 };
 
 // Macro for adding function for registering action

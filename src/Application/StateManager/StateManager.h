@@ -51,7 +51,7 @@ namespace Seg3D
 class StateManager;
 
 // Class definition
-class StateManager : public boost::noncopyable
+class StateManager : public Utils::Singleton< StateManager >
 {
 
   // -- Constructor/Destructor --
@@ -59,22 +59,11 @@ class StateManager : public boost::noncopyable
 private:
   friend class Utils::Singleton< StateManager >;
   StateManager();
-
-public:
   virtual ~StateManager();
 
   // -- Signal/Slots --
 public:
 
-  // -- Singleton interface --
-public:
-  static StateManager* Instance()
-  {
-    return instance_.instance();
-  }
-
-private:
-  static Utils::Singleton< StateManager > instance_;
 };
 
 } // end namespace seg3D

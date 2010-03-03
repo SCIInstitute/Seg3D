@@ -196,7 +196,4 @@ ToolManager::get_mutex()
   return tool_list_mutex_;
 }
 
-// Singleton interface needs to be defined somewhere
-Utils::Singleton< ToolManager > ToolManager::instance_;
-
 } // end namespace Seg3D

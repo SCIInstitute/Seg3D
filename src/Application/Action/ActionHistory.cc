@@ -109,8 +109,5 @@ void ActionHistory::record_action( ActionHandle action, ActionResultHandle resul
   history_changed_signal_();
 }
 
-// Singleton interface needs to be defined somewhere
-Utils::Singleton< ActionHistory > ActionHistory::instance_;
-
 } // end namespace Seg3D
 

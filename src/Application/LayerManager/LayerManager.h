@@ -54,7 +54,7 @@ namespace Seg3D
 class LayerManager;
 
 // Class definition
-class LayerManager : public boost::noncopyable
+class LayerManager : public Utils::Singleton< LayerManager >
 {
 
   // -- Constructor/Destructor --
@@ -62,8 +62,6 @@ class LayerManager : public boost::noncopyable
 private:
   friend class Utils::Singleton< LayerManager >;
   LayerManager();
-
-public:
   virtual ~LayerManager();
   
 protected:
@@ -74,19 +72,11 @@ protected:
   
   bool insert_layer_above( const std::string& above_layer_name, std::string& below_layer_name ); 
 
+public:
   // -- Signal/Slots --
   typedef boost::signals2::signal< void( LayerHandle ) > layer_signal_type;
   layer_signal_type layer_changed_signal;
   
-  // -- Singleton interface --
-public:
-  static LayerManager* Instance()
-  {
-    return instance_.instance();
-  }
-
-private:
-  static Utils::Singleton< LayerManager > instance_;
 };
 
 } // end namespace seg3D

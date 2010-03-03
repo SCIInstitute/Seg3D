@@ -115,7 +115,4 @@ QtRenderResourcesContextHandle QtApplication::qt_renderresources_context()
   return qt_renderresources_context_;
 }
 
-// Singleton instantiation
-Utils::Singleton< QtApplication > QtApplication::instance_;
-
 } // end namespace Seg3D
