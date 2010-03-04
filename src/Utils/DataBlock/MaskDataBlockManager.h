@@ -74,7 +74,7 @@ public:
 class MaskDataBlockManager;
 
 // Class definition
-class MaskDataBlockManager : public boost::noncopyable
+class MaskDataBlockManager : public Utils::Singleton< MaskDataBlockManager >
 {
 
   // -- typedefs --
@@ -142,20 +142,6 @@ private:
 
   // Mutex that protects the list
   mutex_type mutex_;
-
-  // -- Singleton interface --
-public:
-
-  // Instance:
-  // Get the singleton interface
-  static MaskDataBlockManager* Instance()
-  {
-    return instance_.instance();
-  }
-
-private:
-  // Internals of the singleton
-  static Singleton< MaskDataBlockManager > instance_;
 
 };
 
