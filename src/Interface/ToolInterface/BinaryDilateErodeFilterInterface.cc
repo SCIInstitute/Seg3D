@@ -30,36 +30,36 @@
 #include <Interface/QtInterface/QtBridge.h>
 
 //Qt Gui Includes
-#include <Interface/ToolInterface/BinaryDialateErodeFilterInterface.h>
-#include "ui_BinaryDialateErodeFilterInterface.h"
+#include <Interface/ToolInterface/BinaryDilateErodeFilterInterface.h>
+#include "ui_BinaryDilateErodeFilterInterface.h"
 
 //Application Includes
-#include <Application/Tools/BinaryDialateErodeFilter.h>
+#include <Application/Tools/BinaryDilateErodeFilter.h>
 
 namespace Seg3D
 {
 
-SCI_REGISTER_TOOLINTERFACE(BinaryDialateErodeFilterInterface)
+SCI_REGISTER_TOOLINTERFACE(BinaryDilateErodeFilterInterface)
 
-class BinaryDialateErodeFilterInterfacePrivate
+class BinaryDilateErodeFilterInterfacePrivate
 {
 public:
   Ui::BinaryDialateErodeFilterInterface ui_;
 };
 
 // constructor
-BinaryDialateErodeFilterInterface::BinaryDialateErodeFilterInterface() :
-  private_( new BinaryDialateErodeFilterInterfacePrivate )
+BinaryDilateErodeFilterInterface::BinaryDilateErodeFilterInterface() :
+  private_( new BinaryDilateErodeFilterInterfacePrivate )
 {
 }
 
 // destructor
-BinaryDialateErodeFilterInterface::~BinaryDialateErodeFilterInterface()
+BinaryDilateErodeFilterInterface::~BinaryDilateErodeFilterInterface()
 {
 }
 
 // build the interface and connect it to the state manager
-bool BinaryDialateErodeFilterInterface::build_widget( QFrame* frame )
+bool BinaryDilateErodeFilterInterface::build_widget( QFrame* frame )
 {
   //Step 1 - build the Qt GUI Widget
   private_->ui_.setupUi( frame );
@@ -73,7 +73,7 @@ bool BinaryDialateErodeFilterInterface::build_widget( QFrame* frame )
 
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
-  BinaryDialateErodeFilter* tool = dynamic_cast< BinaryDialateErodeFilter* > ( base_tool_.get() );
+  BinaryDilateErodeFilter* tool = dynamic_cast< BinaryDilateErodeFilter* > ( base_tool_.get() );
 
   //Step 3 - connect the gui to the tool through the QtBridge
   QtBridge::connect( private_->ui_.targetComboBox, tool->target_layer_state_ );
@@ -82,7 +82,7 @@ bool BinaryDialateErodeFilterInterface::build_widget( QFrame* frame )
   QtBridge::connect( private_->ui_.replaceCheckBox, tool->replace_state_ );
 
   //Send a message to the log that we have finised with building the Binary Dialate Erode Filter Interface
-  SCI_LOG_DEBUG("Finished building a Binary Dialate Erode Filter Interface");
+  SCI_LOG_DEBUG("Finished building a Binary Dilate Erode Filter Interface");
   return ( true );
 
 } // end build_widget

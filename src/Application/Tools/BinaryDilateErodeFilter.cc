@@ -26,43 +26,48 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_TOOLS_GRADIENTMAGNITUDEFILTER_H
-#define APPLICATION_TOOLS_GRADIENTMAGNITUDEFILTER_H
-
-#include <Application/Tool/Tool.h>
+#include <Application/Tool/ToolFactory.h>
+#include <Application/Tools/BinaryDilateErodeFilter.h>
 
 namespace Seg3D
 {
 
-class GradientMagnitudeFilter : public Tool
+// Register the tool into the tool factory
+SCI_REGISTER_TOOL(BinaryDilateErodeFilter)
+
+BinaryDilateErodeFilter::BinaryDilateErodeFilter( const std::string& toolid ) :
+  Tool( toolid )
 {
-SCI_TOOL_TYPE( "GradientMagnitudeFilter", "Gradient Magnitude", "ALT+G",
-  Tool::DATATODATA_E|Tool::FILTER_E,
-  "http://seg3d.org/")
+  // Need to set ranges and default values for all parameters
+  add_state( "target", target_layer_state_, "<none>", "<none>" );
+  add_state( "dialate", dialate_state_, 1, 100, 1, 2 );
+  add_state( "erode", erode_state_, 1, 100, 1, 2 );
+  add_state( "replace", replace_state_, false );
 
-public:
-  GradientMagnitudeFilter( const std::string& toolid );
-  virtual ~GradientMagnitudeFilter();
+  // Add constaints, so that when the state changes the right ranges of
+  // parameters are selected
+  target_layer_state_->value_changed_signal_.connect( boost::bind(
+      &BinaryDilateErodeFilter::target_constraint, this, _1 ) );
 
-  // -- constraint parameters --
+}
 
-  // Constrain viewer to right painting tool when layer is selected
-  void target_constraint( std::string layerid );
+void BinaryDilateErodeFilter::target_constraint( std::string layerid )
+{
+}
 
-  // -- activate/deactivate tool --
+BinaryDilateErodeFilter::~BinaryDilateErodeFilter()
+{
+  disconnect_all();
+}
 
-  virtual void activate();
-  virtual void deactivate();
+void BinaryDilateErodeFilter::activate()
+{
+}
 
-  // -- state --
-public:
-  // Layerid of the target layer
-  StateOptionHandle target_layer_state_;
+void BinaryDilateErodeFilter::deactivate()
+{
+}
 
-  StateBoolHandle replace_state_;
+} // end namespace Seg3D
 
-};
 
-} // end namespace
-
-#endif

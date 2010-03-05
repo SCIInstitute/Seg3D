@@ -41,6 +41,7 @@
 #include <Interface/AppController/AppController.h>
 #include <Interface/AppController/AppControllerContext.h>
 #include <Interface/AppController/AppControllerActionHistory.h>
+#include <Interface/AppController/AppControllerStateEngine.h>
 #include <Interface/AppController/AppControllerLogHistory.h>
 
 // The interface from the designer
@@ -57,6 +58,7 @@ public:
 
   // Local classes that are only of interest for this class
   AppControllerActionHistory* action_history_model_;
+  AppControllerStateEngine* state_engine_model_;
   AppControllerLogHistory* log_history_model_;
 
   // Action context for running the command line
@@ -74,6 +76,7 @@ AppController::AppController( QWidget* parent ) :
   // These next two are Qt objects and will be deleted when the parent object is
   // deleted
   private_->action_history_model_ = new AppControllerActionHistory( this );
+  private_->state_engine_model_ = new AppControllerStateEngine( this );
   private_->log_history_model_ = new AppControllerLogHistory( 1000, this );
 
   // Step 2: Modify the widget
@@ -87,6 +90,7 @@ AppController::AppController( QWidget* parent ) :
   l_action_status_ = private_->ui_.L_ACTION_STATUS;
   l_action_usage_ = private_->ui_.L_ACTION_USAGE;
   tv_action_history_ = private_->ui_.TV_ACTION_HISTORY;
+  tv_state_engine_ = private_->ui_.TV_STATE_ENGINE;
   tv_log_history_ = private_->ui_.TV_LOG_HISTORY;
 
   // Step 4: Fix the widget properties
@@ -98,6 +102,11 @@ AppController::AppController( QWidget* parent ) :
   tv_action_history_->setColumnWidth( 0, 600 );
   tv_action_history_->setColumnWidth( 1, 200 );
   tv_action_history_->resizeRowsToContents();
+
+  tv_state_engine_->setModel(private_->state_engine_model_ );
+  tv_state_engine_->setColumnWidth( 0, 500 );
+  tv_state_engine_->setColumnWidth( 1, 500 );
+  tv_state_engine_->resizeRowsToContents();
 
   tv_log_history_->setModel( private_->log_history_model_ );
   tv_log_history_->setColumnWidth( 0, 1000 );
@@ -121,12 +130,15 @@ AppController::AppController( QWidget* parent ) :
 
   tb_action_->setMenu( action_menu );
 
-  // Step 5: Link the ActionHistory to this widget and have it update 
-  // automatically
+  // Step 5: Link the ActionHistory/StateEngine/EventLog to this widget and have it update 
+  // automatically using the signal/slot system
 
   ActionHistory::Instance()->history_changed_signal_.connect( boost::bind(
       &AppController::UpdateActionHistory, controller ) );
 
+  StateEngine::Instance()->state_changed_signal_.connect( boost::bind(
+    &AppController::UpdateStateEngine, controller ) );
+  
   Utils::Log::Instance()->post_log_signal_.connect( boost::bind(
       &AppController::UpdateLogHistory, controller, true, _1, _2 ) );
 
@@ -185,13 +197,30 @@ void AppController::UpdateActionHistory( qpointer_type controller )
   // exist anymore
   if ( controller.data() )
   {
-    controller->private_->action_history_model_->updateHistory();
-    // controller->tv_action_history_->resizeRowsToContents();
-    // Auto scroll to last event
+    controller->private_->action_history_model_->update();
+    // Auto scroll to last action in the list
     QScrollBar* scrollbar = controller->tv_action_history_->verticalScrollBar();
     if ( scrollbar ) scrollbar->setValue( scrollbar->maximum() );
   }
 }
+
+void AppController::UpdateStateEngine( qpointer_type controller )
+{ 
+  // Ensure that this call gets relayed to the right thread
+  if ( !( Interface::IsInterfaceThread() ) )
+  {
+    Interface::PostEvent( boost::bind( &AppController::UpdateStateEngine, controller ) );
+    return;
+  }
+
+  // Protect controller pointer, so we do not execute if controller does not
+  // exist anymore
+  if ( controller.data() )
+  {
+    controller->private_->state_engine_model_->update();
+  }
+}
+
 
 void AppController::UpdateLogHistory( qpointer_type controller, bool relay, int message_type,
     std::string message )
@@ -210,7 +239,7 @@ void AppController::UpdateLogHistory( qpointer_type controller, bool relay, int 
   {
     controller->private_->log_history_model_->add_log_entry( message_type, message );
 
-    // Auto scroll to last event
+    // Auto scroll to last event in the list
     QScrollBar* scrollbar = controller->tv_log_history_->verticalScrollBar();
     if ( scrollbar ) scrollbar->setValue( scrollbar->maximum() );
   }

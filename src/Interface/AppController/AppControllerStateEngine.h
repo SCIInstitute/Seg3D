@@ -26,40 +26,38 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_TOOLINTERFACE_BINARYDIALATEERODEFILTERINTERFACE_H
-#define INTERFACE_TOOLINTERFACE_BINARYDIALATEERODEFILTERINTERFACE_H
+#ifndef INTERFACE_APPCONTROLLER_APPCONTROLLERSTATEENGINE_H
+#define INTERFACE_APPCONTROLLER_APPCONTROLLERSTATEENGINE_H
 
-// Utils includes
-#include <Utils/Core/Log.h>
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+# pragma once
+#endif 
 
-// Application includes
-#include <Application/Tool/ToolFactory.h>
+// STL includes
+#include <string>
 
-// Base class of the tool widget
-#include <Interface/AppInterface/ToolWidget.h>
-#include <Interface/ToolInterface/CustomWidgets/SliderSpinComboInt.h>
+// QT includes
+#include <QtGui>
 
 namespace Seg3D
 {
 
-class BinaryDialateErodeFilterInterfacePrivate;
-
-class BinaryDialateErodeFilterInterface : public ToolWidget
+class AppControllerStateEngine : public QAbstractTableModel
 {
-Q_OBJECT
-
 public:
-  BinaryDialateErodeFilterInterface();
-  virtual ~BinaryDialateErodeFilterInterface();
-  virtual bool build_widget( QFrame* frame );
+  AppControllerStateEngine( QObject* parent = 0 );
 
-private:
-  BinaryDialateErodeFilterInterfacePrivate* private_;
-  SliderSpinComboInt *erodeAdjuster;
-  SliderSpinComboInt *dialateAdjuster;
+  virtual ~AppControllerStateEngine();
 
+  int rowCount( const QModelIndex &index ) const;
+  int columnCount( const QModelIndex &index ) const;
+
+  QVariant data( const QModelIndex& index, int role ) const;
+  QVariant headerData( int section, Qt::Orientation orientation, int role ) const;
+
+  void update() { reset(); }
 };
 
-} // namespace Seg3D
+} // end namespace Seg3D
 
 #endif

@@ -35,6 +35,7 @@ SET(INTERFACE_APPCONTROLLER_SRCS
   AppController.cc
   AppControllerContext.cc
   AppControllerActionHistory.cc
+  AppControllerStateEngine.cc
   AppControllerLogHistory.cc
 )
 
@@ -42,6 +43,7 @@ SET(INTERFACE_APPCONTROLLER_MOC_SRCS
   AppController.h
   AppControllerContext.h
   AppControllerActionHistory.h
+  AppControllerStateEngine.h
   AppControllerLogHistory.h
 )
 

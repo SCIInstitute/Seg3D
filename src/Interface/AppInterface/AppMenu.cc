@@ -197,6 +197,8 @@ void AppMenu::create_filter_menu( QMenu* qmenu )
   {
     // Add menu option to open tool
     qaction = qmenu->addAction( QString::fromStdString( ( *it )->menu_name() ) );
+    qaction->setShortcut( QString::fromStdString( ( *it )->shortcut_key() ) );
+
     // Connect the action with dispatching a command in the ToolManager
     QtBridge::connect( qaction, boost::bind( &ActionOpenTool::Dispatch, ( *it )->type() ) );
     ++it;
@@ -212,6 +214,8 @@ void AppMenu::create_filter_menu( QMenu* qmenu )
   {
     // Add menu option to open tool
     qaction = qmenu->addAction( QString::fromStdString( ( *it )->menu_name() ) );
+    qaction->setShortcut( QString::fromStdString( ( *it )->shortcut_key() ) );
+
     // Connect the action with dispatching a command in the ToolManager
     QtBridge::connect( qaction, boost::bind( &ActionOpenTool::Dispatch, ( *it )->type() ) );
     ++it;
@@ -227,6 +231,8 @@ void AppMenu::create_filter_menu( QMenu* qmenu )
   {
     // Add menu option to open tool
     qaction = qmenu->addAction( QString::fromStdString( ( *it )->menu_name() ) );
+    qaction->setShortcut( QString::fromStdString( ( *it )->shortcut_key() ) );
+
     // Connect the action with dispatching a command in the ToolManager
     QtBridge::connect( qaction, boost::bind( &ActionOpenTool::Dispatch, ( *it )->type() ) );
     ++it;
@@ -239,23 +245,28 @@ void AppMenu::create_window_menu( QMenu* qmenu )
 
   // Project Window
   qaction = qmenu->addAction( "Project Window" );
+  qaction->setShortcut( tr( "Ctrl+Shift+P" ) );
   QtBridge::connect( qaction, boost::bind( &ActionShowWindow::Dispatch, std::string( "project" ) ) );
 
   // History Window
   qaction = qmenu->addAction( "History Window" );
+  qaction->setShortcut( tr( "Ctrl+Shift+H" ) );
   QtBridge::connect( qaction, boost::bind( &ActionShowWindow::Dispatch, std::string( "history" ) ) );
 
   //Tools Window
   qaction = qmenu->addAction( "Tools Window" );
+  qaction->setShortcut( tr( "Ctrl+Shift+T" ) );
   QtBridge::connect( qaction, boost::bind( &ActionShowWindow::Dispatch, std::string( "tools" ) ) );
 
   // Layer Manager Window
   qaction = qmenu->addAction( "Layer Manager Window" );
+  qaction->setShortcut( tr( "Ctrl+Shift+L" ) );
   QtBridge::connect( qaction, boost::bind( &ActionShowWindow::Dispatch, std::string(
       "layermanager" ) ) );
 
   // Measurement Window
   qaction = qmenu->addAction( "Measurement Window" );
+  qaction->setShortcut( tr( "Ctrl+Shift+M" ) );
   QtBridge::connect( qaction, boost::bind( &ActionShowWindow::Dispatch, std::string(
       "measurement" ) ) );
 
@@ -263,6 +274,7 @@ void AppMenu::create_window_menu( QMenu* qmenu )
 
   // Controller Window
   qaction = qmenu->addAction( "Controller Window" );
+  qaction->setShortcut( tr( "Ctrl+Shift+C" ) );
   QtBridge::connect( qaction, boost::bind( &ActionShowWindow::Dispatch,
       std::string( "controller" ) ) );
 

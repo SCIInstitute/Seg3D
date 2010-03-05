@@ -58,8 +58,8 @@ SET(APPLICATION_TOOLS_SRCS
   HistogramEqualizationFilter.cc
   ConnectedComponentFilter.h
   ConnectedComponentFilter.cc
-  BinaryDialateErodeFilter.h
-  BinaryDialateErodeFilter.cc
+  BinaryDilateErodeFilter.h
+  BinaryDilateErodeFilter.cc
   NeighborhoodConnectedFilter.h
   NeighborhoodConnectedFilter.cc
   IntensityCorrectionFilter.h

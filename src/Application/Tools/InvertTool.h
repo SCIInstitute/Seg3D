@@ -36,7 +36,7 @@ namespace Seg3D
 
 class InvertTool : public Tool
 {
-SCI_TOOL_TYPE("InvertTool","Invert","",Tool::TOOL_E, "http://seg3d.org/")
+SCI_TOOL_TYPE("InvertTool","Invert","Alt+I",Tool::TOOL_E, "http://seg3d.org/")
   // -- constructor/destructor --
 public:
   InvertTool( const std::string& toolid );

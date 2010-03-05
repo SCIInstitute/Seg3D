@@ -140,6 +140,13 @@ private:
   // Handle to where the mask volume is really stored
   MaskDataBlockHandle mask_data_block_;
 
+  // The data range
+  double min_;
+  double max_;
+
+  // Histogram
+//  HistogramHandle histogram_;
+
   // -- Static constructors --
 public:
 

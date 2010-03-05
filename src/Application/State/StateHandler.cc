@@ -49,8 +49,8 @@ bool StateHandler::add_statebase( const std::string& key, StateBaseHandle state 
   // Step (2): Make the state variable aware of its key
   state->set_stateid( stateid );
 
-  StateBaseHandle old_state;
   // Step (3): Import the previous setting from the current variable
+  StateBaseHandle old_state;
   StateEngine::Instance()->get_state( stateid, old_state );
 
   if ( old_state.get() )
@@ -62,12 +62,22 @@ bool StateHandler::add_statebase( const std::string& key, StateBaseHandle state 
   }
 
   // Step (4): Link with statehandler
-
   add_connection( state->state_changed_signal_.connect( boost::bind(
-      &StateHandler::state_changed, this ) ) );
+      &StateHandler::handle_state_changed, this ) ) );
 
   // Step (4): Add the state to the StateManager
   return ( StateEngine::Instance()->add_state( stateid, state ) );
 }
 
+void StateHandler::handle_state_changed()
+{
+  // Trigger the signal in the state engine
+  SCI_LOG_DEBUG("Triggering state changed signal");
+  StateEngine::Instance()->state_changed_signal_();
+  
+  // Call the local function of this state engine that handles the specifics of the derived
+  // class when the state engine has changed
+  state_changed();
 }
+
+} // end namespace Seg3D

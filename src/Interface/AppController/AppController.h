@@ -83,6 +83,7 @@ private:
   QLabel* l_action_usage_;
 
   QTableView* tv_action_history_;
+  QTableView* tv_state_engine_;
   QTableView* tv_log_history_;
 
 public:
@@ -93,19 +94,29 @@ public:
   // still exists, hence the static functions check for the existence first
   // These functions also relay the function calls to the right thread.
 
+  // UPDATEACTIONHISTORY:
   // Force the Controller to update its action history widget
   static void UpdateActionHistory( qpointer_type controller );
 
+  // UODATELOGHISTORY:
   // Force the Controller to update its log history widget
   static void UpdateLogHistory( qpointer_type controller, bool relay, int message_type,
       std::string message );
 
+  // UPDATESTATEENGINE:
+  // Force the Contriller to update the state engine widget
+  static void UpdateStateEngine( qpointer_type controller );
+
+  // POSTACTIONMESSAGE:
   // Post a message in the Controller message label
   static void PostActionMessage( qpointer_type controller, std::string message );
 
+  // POSTACTIONUSAGE:
   // Post a message in the controller usage label
   static void PostActionUsage( qpointer_type controller, std::string usage );
 
+  // SETACTIONTYPE:
+  // Set the action types available
   static void SetActionType( qpointer_type controller, std::string action_type );
 };
 

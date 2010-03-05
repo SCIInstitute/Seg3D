@@ -82,6 +82,14 @@ public:
   // values like ToolManager::PaintTool::Brushsize.
   void remove_state( const std::string& stateid );
 
+  // NUM_STATES:
+  // The number of state variables in the system
+  size_t num_states();
+  
+  // GET_STATE:
+  // Get the state variable by index
+  bool get_state( const size_t idx, StateBaseHandle& state);
+
   // -- Interface for accounting stateids --
 public:
   // ADD_STATEID:
@@ -116,10 +124,16 @@ public:
   // Check whether an alias exists
   bool is_statealias( const std::string& statealias );
 
+
+  // -- Signals --
+public:
+  typedef boost::signals2::signal<void ()> state_changed_signal_type;
+  state_changed_signal_type state_changed_signal_;
+
   // -- state engine locking interface --
 public:
   // Mutex protecting the StateEngine
-  typedef boost::recursive_mutex mutex_type;
+  typedef boost::recursive_mutex  mutex_type;
   typedef boost::unique_lock< mutex_type > lock_type;
 
   // GET_MUTEX:
@@ -155,10 +169,15 @@ private:
   typedef std::set< std::string > stateid_list_type;
   typedef boost::unordered_map< std::string, StateBaseHandle > state_map_type;
   typedef boost::unordered_map< std::string, std::string > statealias_map_type;
+  typedef std::vector< StateBaseHandle > state_list_type;
 
   // Map containing pointers to the State variables in the class under control
   // by the StateEngine
   state_map_type state_map_;
+
+  // Maintain an organized vector of states as well, so the order is established for
+  // writing the states to disk
+  state_list_type state_list_;
 
   // The list of IDs that are in use
   stateid_list_type stateid_list_;

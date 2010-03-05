@@ -36,7 +36,7 @@ namespace Seg3D
 
 class FillHolesFilter : public Tool
 {
-SCI_TOOL_TYPE( "FillHolesFilter", "Fill Holes", "",
+SCI_TOOL_TYPE( "FillHolesFilter", "Fill Holes", "Alt+Shift+F",
   Tool::MASKTOMASK_E|Tool::FILTER_E,
   "http://seg3d.org/")
 

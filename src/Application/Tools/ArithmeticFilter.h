@@ -36,7 +36,7 @@ namespace Seg3D
 
 class ArithmeticFilter : public Tool
 {
-SCI_TOOL_TYPE( "ArithmeticFilter", "Arithmetic", "",
+SCI_TOOL_TYPE( "ArithmeticFilter", "Arithmetic", "Alt+Shift+A",
   Tool::DATATODATA_E|Tool::FILTER_E,
   "http://seg3d.org/")
 

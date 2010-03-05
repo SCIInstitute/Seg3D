@@ -40,7 +40,7 @@ SET(INTERFACE_TOOLINTERFACE_SRCS
   AnisotropicDiffusionFilterInterface.cc
   DiscreteGaussianFilterInterface.cc
   ArithmeticFilterInterface.cc
-  BinaryDialateErodeFilterInterface.cc
+  BinaryDilateErodeFilterInterface.cc
   BooleanFilterInterface.cc
   ConfidenceConnectedFilterInterface.cc
   FillHolesFilterInterface.cc
@@ -71,7 +71,7 @@ SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
   AnisotropicDiffusionFilterInterface.h
   DiscreteGaussianFilterInterface.h
   ArithmeticFilterInterface.h
-  BinaryDialateErodeFilterInterface.h
+  BinaryDilateErodeFilterInterface.h
   BooleanFilterInterface.h
   ConfidenceConnectedFilterInterface.h
   FillHolesFilterInterface.h
@@ -104,7 +104,7 @@ SET(INTERFACE_TOOLINTERFACE_UI_SRCS
   AnisotropicDiffusionFilterInterface.ui
   DiscreteGaussianFilterInterface.ui
   ArithmeticFilterInterface.ui
-  BinaryDialateErodeFilterInterface.ui
+  BinaryDilateErodeFilterInterface.ui
   BooleanFilterInterface.ui
   ConfidenceConnectedFilterInterface.ui
   FillHolesFilterInterface.ui

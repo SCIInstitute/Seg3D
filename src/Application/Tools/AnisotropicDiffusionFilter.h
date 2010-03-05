@@ -36,7 +36,7 @@ namespace Seg3D
 
 class AnisotropicDiffusionFilter : public Tool
 {
-SCI_TOOL_TYPE( "AnisotropicDiffusionFilter", "Anisotropic Diffusion", "",
+SCI_TOOL_TYPE( "AnisotropicDiffusionFilter", "Anisotropic Diffusion", "Alt+A",
   Tool::DATATODATA_E|Tool::FILTER_E,
   "http://seg3d.org/")
 

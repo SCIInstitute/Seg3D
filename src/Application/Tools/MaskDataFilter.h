@@ -36,7 +36,7 @@ namespace Seg3D
 
 class MaskDataFilter : public Tool
 {
-SCI_TOOL_TYPE( "MaskDataFilter", "Mask Data", "",
+SCI_TOOL_TYPE( "MaskDataFilter", "Mask Data", "Alt+Shift+M",
   Tool::DATATODATA_E|Tool::FILTER_E,
   "http://seg3d.org/")
 

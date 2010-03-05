@@ -36,7 +36,7 @@ namespace Seg3D
 
 class PolylineTool : public Tool
 {
-SCI_TOOL_TYPE( "PolylineTool", "Polyline", "",
+SCI_TOOL_TYPE( "PolylineTool", "Polyline", "Alt+Y",
   Tool::TOOL_E,
   "http://seg3d.org/" )
   // -- constructor/destructor --

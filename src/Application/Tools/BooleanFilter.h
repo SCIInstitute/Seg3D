@@ -36,7 +36,7 @@ namespace Seg3D
 
 class BooleanFilter : public Tool
 {
-SCI_TOOL_TYPE( "BooleanFilter", "Boolean", "",
+SCI_TOOL_TYPE( "BooleanFilter", "Boolean", "Alt+B",
   Tool::MASKTOMASK_E|Tool::FILTER_E,
   "http://seg3d.org/")
 

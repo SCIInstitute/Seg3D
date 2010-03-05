@@ -13,6 +13,14 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">QWidget#TAB_ACTION_HISTORY
+{
+  border-radius: 4px;
+  border: 1px solid rgb(90, 90, 90);
+  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(221, 221, 221, 255), stop:0.155779 rgba(228, 228, 228, 255), stop:1 rgba(202, 204, 204, 255));      
+}</string>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout_5">
    <property name="margin">
     <number>0</number>
@@ -20,10 +28,10 @@
    <item>
     <widget class="QTabWidget" name="TW_CONTROLLER">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <property name="usesScrollButtons">
-      <bool>true</bool>
+      <bool>false</bool>
      </property>
      <property name="documentMode">
       <bool>true</bool>
@@ -31,7 +39,14 @@
      <property name="movable">
       <bool>true</bool>
      </property>
-     <widget class="QWidget" name="tab">
+     <widget class="QWidget" name="TAB_ACTION_HISTORY">
+      <property name="styleSheet">
+       <string notr="true">QWidget#TAB_ACTION_HISTORY{
+  border-radius: 4px;
+  border: 1px solid rgb(90, 90, 90);
+  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(221, 221, 221, 255), stop:0.155779 rgba(228, 228, 228, 255), stop:1 rgba(202, 204, 204, 255));      
+}</string>
+      </property>
       <attribute name="title">
        <string notr="true">Actions</string>
       </attribute>
@@ -97,21 +112,6 @@
          </attribute>
          <attribute name="verticalHeaderMinimumSectionSize">
           <number>12</number>
-         </attribute>
-         <attribute name="verticalHeaderVisible">
-          <bool>false</bool>
-         </attribute>
-         <attribute name="horizontalHeaderMinimumSectionSize">
-          <number>2</number>
-         </attribute>
-         <attribute name="verticalHeaderMinimumSectionSize">
-          <number>12</number>
-         </attribute>
-         <attribute name="verticalHeaderHighlightSections">
-          <bool>false</bool>
-         </attribute>
-         <attribute name="horizontalHeaderDefaultSectionSize">
-          <number>2</number>
          </attribute>
         </widget>
        </item>
@@ -233,7 +233,15 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_3">
+     <widget class="QWidget" name="TAB_STATE_ENGINE">
+      <property name="styleSheet">
+       <string notr="true">QWidget#TAB_STATE_ENGINE
+{
+  border-radius: 4px;
+  border: 1px solid rgb(90, 90, 90);
+  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(221, 221, 221, 255), stop:0.155779 rgba(228, 228, 228, 255), stop:1 rgba(202, 204, 204, 255));      
+}</string>
+      </property>
       <attribute name="title">
        <string>State Variables</string>
       </attribute>
@@ -242,18 +250,40 @@
         <number>5</number>
        </property>
        <item>
-        <widget class="QLabel" name="label_5">
-         <property name="text">
-          <string>State Variables:</string>
+        <widget class="QTableView" name="TV_STATE_ENGINE">
+         <property name="horizontalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
          </property>
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
+         <property name="selectionMode">
+          <enum>QAbstractItemView::NoSelection</enum>
+         </property>
+         <property name="showGrid">
+          <bool>false</bool>
+         </property>
+         <property name="gridStyle">
+          <enum>Qt::NoPen</enum>
+         </property>
+         <attribute name="verticalHeaderVisible">
+          <bool>false</bool>
+         </attribute>
+         <attribute name="verticalHeaderVisible">
+          <bool>false</bool>
+         </attribute>
         </widget>
-       </item>
-       <item>
-        <widget class="QColumnView" name="CV_STATE_VARIABLES"/>
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_4">
+     <widget class="QWidget" name="TAB_EVENT_LOG">
+      <property name="styleSheet">
+       <string notr="true">QWidget#TAB_EVENT_LOG{
+  border-radius: 4px;
+  border: 1px solid rgb(90, 90, 90);
+  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(221, 221, 221, 255), stop:0.155779 rgba(228, 228, 228, 255), stop:1 rgba(202, 204, 204, 255));      
+}</string>
+      </property>
       <attribute name="title">
        <string>Event Log</string>
       </attribute>
@@ -267,6 +297,9 @@
           <font>
            <pointsize>10</pointsize>
           </font>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Sunken</enum>
          </property>
          <property name="editTriggers">
           <set>QAbstractItemView::NoEditTriggers</set>
@@ -283,12 +316,6 @@
          <property name="cornerButtonEnabled">
           <bool>false</bool>
          </property>
-         <attribute name="verticalHeaderVisible">
-          <bool>false</bool>
-         </attribute>
-         <attribute name="verticalHeaderHighlightSections">
-          <bool>false</bool>
-         </attribute>
          <attribute name="verticalHeaderVisible">
           <bool>false</bool>
          </attribute>

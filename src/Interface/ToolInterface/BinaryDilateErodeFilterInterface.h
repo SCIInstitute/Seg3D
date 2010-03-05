@@ -26,48 +26,40 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#ifndef INTERFACE_TOOLINTERFACE_BINARYDILATEERODEFILTERINTERFACE_H
+#define INTERFACE_TOOLINTERFACE_BINARYDILATEERODEFILTERINTERFACE_H
+
+// Utils includes
+#include <Utils/Core/Log.h>
+
+// Application includes
 #include <Application/Tool/ToolFactory.h>
-#include <Application/Tools/BinaryDialateErodeFilter.h>
+
+// Base class of the tool widget
+#include <Interface/AppInterface/ToolWidget.h>
+#include <Interface/ToolInterface/CustomWidgets/SliderSpinComboInt.h>
 
 namespace Seg3D
 {
 
-// Register the tool into the tool factory
-SCI_REGISTER_TOOL(BinaryDialateErodeFilter)
+class BinaryDilateErodeFilterInterfacePrivate;
 
-BinaryDialateErodeFilter::BinaryDialateErodeFilter( const std::string& toolid ) :
-  Tool( toolid )
+class BinaryDilateErodeFilterInterface : public ToolWidget
 {
-  // Need to set ranges and default values for all parameters
-  add_state( "target", target_layer_state_, "<none>", "<none>" );
-  add_state( "dialate", dialate_state_, 1, 100, 1, 2 );
-  add_state( "erode", erode_state_, 1, 100, 1, 2 );
-  add_state( "replace", replace_state_, false );
+Q_OBJECT
 
-  // Add constaints, so that when the state changes the right ranges of
-  // parameters are selected
-  target_layer_state_->value_changed_signal_.connect( boost::bind(
-      &BinaryDialateErodeFilter::target_constraint, this, _1 ) );
+public:
+  BinaryDilateErodeFilterInterface();
+  virtual ~BinaryDilateErodeFilterInterface();
+  virtual bool build_widget( QFrame* frame );
 
-}
+private:
+  BinaryDilateErodeFilterInterfacePrivate* private_;
+  SliderSpinComboInt *erodeAdjuster;
+  SliderSpinComboInt *dialateAdjuster;
 
-void BinaryDialateErodeFilter::target_constraint( std::string layerid )
-{
-}
+};
 
-BinaryDialateErodeFilter::~BinaryDialateErodeFilter()
-{
-  disconnect_all();
-}
+} // namespace Seg3D
 
-void BinaryDialateErodeFilter::activate()
-{
-}
-
-void BinaryDialateErodeFilter::deactivate()
-{
-}
-
-} // end namespace Seg3D
-
-
+#endif

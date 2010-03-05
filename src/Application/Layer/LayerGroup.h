@@ -125,7 +125,7 @@ public:
   // Get the transform of the layer
   const GridTransform& grid_transform() const
   {
-    return grid_transform_;
+    return this->grid_transform_;
   }
 
 private:
@@ -166,6 +166,10 @@ protected:
   // FLIP_LAYER:
   // Performs a flip or rotate on the selected layers based on which layers were selected
   void flip_layer();
+
+  // MOVE_LAYER_ABOVE:
+  // Moves a layer up or down
+  void move_layer_above( LayerHandle move_layer, LayerHandle layer );
 
 private:
   typedef std::list< LayerHandle > layer_list_type;

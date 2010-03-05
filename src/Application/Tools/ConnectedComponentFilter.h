@@ -36,7 +36,7 @@ namespace Seg3D
 
 class ConnectedComponentFilter : public Tool
 {
-SCI_TOOL_TYPE( "ConnectedComponentFilter", "Connected Component", "",
+SCI_TOOL_TYPE( "ConnectedComponentFilter", "Connected Component", "Alt+C",
   Tool::MASKTOMASK_E|Tool::FILTER_E,
   "http://seg3d.org/")
 

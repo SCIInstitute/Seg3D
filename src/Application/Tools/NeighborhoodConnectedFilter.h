@@ -36,7 +36,7 @@ namespace Seg3D
 
 class NeighborhoodConnectedFilter : public Tool
 {
-SCI_TOOL_TYPE( "NeighborhoodConnectedFilter", "Neighborhood Connected", "",
+SCI_TOOL_TYPE( "NeighborhoodConnectedFilter", "Neighborhood Connected", "Alt+N",
   Tool::DATATOMASK_E|Tool::FILTER_E,
   "http://seg3d.org/")
 

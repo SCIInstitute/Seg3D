@@ -132,7 +132,7 @@ public:
 
   // ADD_STATE:
   // Add a local state variable without default value
-
+  
   template< class HANDLE, class T >
   bool add_state( const std::string& key, HANDLE& state, const std::vector< T >& default_value )
   {
@@ -145,11 +145,17 @@ public:
   }
 
   // STATE_CHANGED:
-  // this function is called when any of the state variables are changed
+  // This function is called when any of the state variables are changed
+  
   virtual void state_changed()
   {
     // default function is to do nothing
   }
+
+private:
+  // HANDLE_STATE_CHANGED:
+  // This function is called whenever a state registered with this statehandler is changed
+  void handle_state_changed();
 
 private:
   // Function that adds the state variable to the database
@@ -159,6 +165,6 @@ private:
   std::string stateid_prefix_;
 };
 
-} // end namespace
+} // end namespace Seg3D
 
 #endif

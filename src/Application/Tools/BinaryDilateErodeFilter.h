@@ -26,23 +26,23 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_TOOLS_BINARYDIALATEERODEFILTER_H
-#define APPLICATION_TOOLS_BINARYDIALATEERODEFILTER_H
+#ifndef APPLICATION_TOOLS_BINARYDILATEERODEFILTER_H
+#define APPLICATION_TOOLS_BINARYDILATEERODEFILTER_H
 
 #include <Application/Tool/Tool.h>
 
 namespace Seg3D
 {
 
-class BinaryDialateErodeFilter : public Tool
+class BinaryDilateErodeFilter : public Tool
 {
-SCI_TOOL_TYPE( "BinaryDialateErodeFilter", "Binary Dialate -> Erode", "",
+SCI_TOOL_TYPE( "BinaryDilateErodeFilter", "Binary Dialate -> Erode", "Alt+Shift+E",
   Tool::MASKTOMASK_E|Tool::FILTER_E,
   "http://seg3d.org/")
 
 public:
-  BinaryDialateErodeFilter( const std::string& toolid );
-  virtual ~BinaryDialateErodeFilter();
+  BinaryDilateErodeFilter( const std::string& toolid );
+  virtual ~BinaryDilateErodeFilter();
 
   // -- constraint parameters --
 

@@ -52,6 +52,10 @@ bool StateEngine::add_state( const std::string& state_id, StateBaseHandle& state
   }
 
   state_map_[ state_id ] = state;
+  state_list_.push_back(state);
+  
+  state_changed_signal_();
+  
   return ( true );
 }
 
@@ -110,31 +114,60 @@ void StateEngine::remove_state( const std::string& remove_state_id )
     state_id = statealias_list_[ state_alias ];
   }
 
-  state_map_type::iterator it = state_map_.begin();
-  state_map_type::iterator it_end = state_map_.end();
+  state_list_type::iterator it = state_list_.begin();
+  state_list_type::iterator it_end = state_list_.end();
 
   while ( it != it_end )
   {
-    if ( ( *it ).first.size() >= state_id.size() )
+    std::string state_name = (*it)->stateid();
+    
+    if ( state_name.size() >= state_id.size() )
     {
-      if ( ( *it ).first.compare( 0, state_id.size(), state_id, 0, state_id.size() ) == 0 )
+      if ( state_name.compare( 0, state_id.size(), state_id, 0, state_id.size() ) == 0 )
       {
-        if ( ( *it ).first.size() > state_id.size() )
+        if ( state_name.size() > state_id.size() )
         {
-          if ( ( *it ).first[ state_id.size() ] == ':' )
+          if ( state_name[ state_id.size() ] == ':' )
           {
-            state_map_.erase( it++ );
+            state_map_.erase( state_map_.find( state_name ) );
+            it = state_list_.erase(it);
+            it_end = state_list_.end();
             continue;
           }
         }
         else
         {
-          state_map_.erase( it++ );
+          state_map_.erase( state_map_.find( state_name ) );
+          it = state_list_.erase(it);
+          it_end = state_list_.end();
           continue;
         }
       }
     }
     ++it;
+  }
+  
+  state_changed_signal_();  
+}
+
+size_t StateEngine::num_states()
+{
+  lock_type lock( mutex_ );
+  return state_list_.size();
+}
+
+bool StateEngine::get_state( const size_t idx, StateBaseHandle& state)
+{
+  lock_type lock( mutex_ );
+  if (idx < state_list_.size())
+  {
+    state = state_list_[idx];
+    return true;
+  }
+  else
+  {
+    state.reset();
+    return false;
   }
 }
 
