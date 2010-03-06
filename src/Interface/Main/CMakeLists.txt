@@ -58,6 +58,7 @@ TARGET_LINK_LIBRARIES(Seg3D
   Utils_Core
   Utils_Converter
   Utils_EventHandler
+  Utils_Graphics
   Application_Application
   Application_Interface
   Application_Action

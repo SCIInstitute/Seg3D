@@ -33,12 +33,13 @@ namespace Utils
 {
 
 MaskDataBlock::MaskDataBlock(DataBlockHandle& data_block, unsigned int mask_bit) :
-nx_(data_block->nx()),
-ny_(data_block->ny()),
-nz_(data_block->nz()),
-data_block_(data_block),
-mask_bit_(mask_bit)
+  nx_(data_block->nx()),
+  ny_(data_block->ny()),
+  nz_(data_block->nz()),
+  data_block_(data_block),
+  mask_bit_(mask_bit)
 {
+  this->data_ = reinterpret_cast<unsigned char*>( this->data_block_->data() );
 }
 
 MaskDataBlock::~MaskDataBlock()

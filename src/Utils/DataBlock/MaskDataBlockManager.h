@@ -74,7 +74,7 @@ public:
 class MaskDataBlockManager;
 
 // Class definition
-class MaskDataBlockManager : public Utils::Singleton< MaskDataBlockManager >
+class MaskDataBlockManager : public Utils::Singleton<MaskDataBlockManager>
 {
 
   // -- typedefs --
@@ -84,7 +84,8 @@ public:
   typedef boost::unique_lock< mutex_type > lock_type;
 
   // -- Constructor/destructor --
-public:
+private:
+  friend class Utils::Singleton<MaskDataBlockManager>;
   MaskDataBlockManager();
   virtual ~MaskDataBlockManager();
 
@@ -108,7 +109,7 @@ protected:
   // Function that is called by the destructor of the MaskDataBlock to
   // inform that a bitplane can be reused or that a DataBlock can be
   // released
-void release(DataBlockHandle& datablock, unsigned int mask_bit);
+  void release(DataBlockHandle& datablock, unsigned int mask_bit);
 
 // -- Locking of the datablock --
 public:

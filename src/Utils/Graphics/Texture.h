@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_RENDERER_TEXTURE_H
-#define APPLICATION_RENDERER_TEXTURE_H
+#ifndef UTILS_GRAPHICS_TEXTURE_H
+#define UTILS_GRAPHICS_TEXTURE_H
 
 #include <boost/utility.hpp>
 #include <boost/shared_ptr.hpp>
@@ -36,11 +36,12 @@
 
 #include <GL/glew.h>
 
-namespace Seg3D
+namespace Utils
 {
 
 class Texture;
 typedef boost::shared_ptr< Texture > TextureHandle;
+typedef boost::shared_ptr< const Texture > TextureConstHandle;
 
 // CLASS TEXTURE
 // A wrapper of the OpenGL texture
@@ -58,8 +59,9 @@ public:
     unsigned int format = GL_RGBA, unsigned int type = GL_UNSIGNED_BYTE, int level = 0) = 0;
 
   void enable();
-  void disable();void set_parameter(unsigned int param_name, int param_value);
-
+  void disable();
+  
+  void set_parameter(unsigned int param_name, int param_value);
   void set_mag_filter( int filter );
   void set_min_filter( int filter );
   void set_wrap_s( int wrap_mode );

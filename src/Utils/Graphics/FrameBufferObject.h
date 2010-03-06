@@ -26,65 +26,49 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <Application/Renderer/RenderBuffer.h>
+#ifndef UTILS_GRAPHICS_FRAMEBUFFEROBJECT_H
+#define UTILS_GRAPHICS_FRAMEBUFFEROBJECT_H
 
-namespace Seg3D
+#include <boost/utility.hpp>
+#include <boost/shared_ptr.hpp>
+
+#include <GL/glew.h>
+
+#include <Utils/Graphics/Texture.h>
+#include <Utils/Graphics/RenderBuffer.h>
+
+namespace Utils
 {
 
-const unsigned int RenderBuffer::TARGET_ = GL_RENDERBUFFER_EXT;
+class FrameBufferObject;
+typedef boost::shared_ptr< FrameBufferObject > FrameBufferObjectHandle;
 
-RenderBuffer::RenderBuffer()
+class FrameBufferObject : public boost::noncopyable
 {
-  glGenRenderbuffersEXT( 1, &id_ );
 
-  _safe_bind();
-  _safe_unbind();
-}
+public:
 
-RenderBuffer::~RenderBuffer()
-{
-  glDeleteRenderbuffersEXT( 1, &id_ );
-}
+  FrameBufferObject();
+  ~FrameBufferObject();
 
-void RenderBuffer::bind()
-{
-  glBindRenderbufferEXT( TARGET_, id_ );
-}
+  void enable();
+  void disable();
 
-void RenderBuffer::set_storage(int width, int height, unsigned int internal_format, int samples)
-{
-  _safe_bind();
-  if (samples > 1)
-  {
-    glRenderbufferStorageMultisampleEXT(TARGET_, samples, internal_format, width, height);
-  }
-  else
-  {
-    glRenderbufferStorageEXT(TARGET_, internal_format, width, height);
-  }
-  _safe_unbind();
-}
+  void attach_texture(TextureHandle texture, unsigned int attachment = GL_COLOR_ATTACHMENT0_EXT, int level = 0, int layer = 0);
+  void attach_render_buffer(RenderBufferHandle render_buffer, unsigned int attachment);
+  bool check_status( GLenum* status = NULL );
 
-void RenderBuffer::unbind()
-{
-  glBindRenderbufferEXT( TARGET_, 0 );
-}
+private:
 
-void RenderBuffer::_safe_bind()
-{
-  glGetIntegerv( GL_RENDERBUFFER_BINDING_EXT, &saved_id_ );
-  if ( static_cast< int > ( id_ ) != saved_id_ )
-  {
-    glBindRenderbufferEXT( TARGET_, id_ );
-  }
-}
+  void safe_bind();
+  void safe_unbind();
 
-void RenderBuffer::_safe_unbind()
-{
-  if ( static_cast< int > ( id_ ) != saved_id_ )
-  {
-    glBindRenderbufferEXT( TARGET_, saved_id_ );
-  }
-}
+  unsigned int id_;
+  int saved_id_;
+
+const static unsigned int TARGET_C;
+};
 
 } // end namespace Seg3D
+
+#endif

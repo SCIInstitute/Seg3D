@@ -26,9 +26,9 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <Application/Renderer/Texture.h>
+#include <Utils/Graphics/Texture.h>
 
-namespace Seg3D
+namespace Utils
 {
 
 Texture::Texture()

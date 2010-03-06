@@ -28,9 +28,9 @@
 
 #include <boost/bind.hpp>
 
-#include <Application/Renderer/VertexBufferObject.h>
+#include <Utils/Graphics/VertexBufferObject.h>
 
-namespace Seg3D
+namespace Utils
 {
 
 VertexBufferObject::VertexBufferObject( GLenum target, GLenum array_type ) :

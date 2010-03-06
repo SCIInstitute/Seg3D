@@ -26,49 +26,65 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_RENDERER_FRAMEBUFFEROBJECT_H
-#define APPLICATION_RENDERER_FRAMEBUFFEROBJECT_H
+#include <Utils/Graphics/RenderBuffer.h>
 
-#include <boost/utility.hpp>
-#include <boost/shared_ptr.hpp>
-
-#include <GL/glew.h>
-
-#include <Application/Renderer/Texture.h>
-#include <Application/Renderer/RenderBuffer.h>
-
-namespace Seg3D
+namespace Utils
 {
 
-class FrameBufferObject;
-typedef boost::shared_ptr< FrameBufferObject > FrameBufferObjectHandle;
+const unsigned int RenderBuffer::TARGET_ = GL_RENDERBUFFER_EXT;
 
-class FrameBufferObject : public boost::noncopyable
+RenderBuffer::RenderBuffer()
 {
+  glGenRenderbuffersEXT( 1, &id_ );
 
-public:
+  _safe_bind();
+  _safe_unbind();
+}
 
-  FrameBufferObject();
-  ~FrameBufferObject();
+RenderBuffer::~RenderBuffer()
+{
+  glDeleteRenderbuffersEXT( 1, &id_ );
+}
 
-  void enable();
-  void disable();
+void RenderBuffer::bind()
+{
+  glBindRenderbufferEXT( TARGET_, id_ );
+}
 
-  void attach_texture(TextureHandle texture, unsigned int attachment = GL_COLOR_ATTACHMENT0_EXT, int level = 0, int layer = 0);
-  void attach_render_buffer(RenderBufferHandle render_buffer, unsigned int attachment);
-  bool check_status( GLenum* status = NULL );
+void RenderBuffer::set_storage(int width, int height, unsigned int internal_format, int samples)
+{
+  _safe_bind();
+  if (samples > 1)
+  {
+    glRenderbufferStorageMultisampleEXT(TARGET_, samples, internal_format, width, height);
+  }
+  else
+  {
+    glRenderbufferStorageEXT(TARGET_, internal_format, width, height);
+  }
+  _safe_unbind();
+}
 
-private:
+void RenderBuffer::unbind()
+{
+  glBindRenderbufferEXT( TARGET_, 0 );
+}
 
-  void safe_bind();
-  void safe_unbind();
+void RenderBuffer::_safe_bind()
+{
+  glGetIntegerv( GL_RENDERBUFFER_BINDING_EXT, &saved_id_ );
+  if ( static_cast< int > ( id_ ) != saved_id_ )
+  {
+    glBindRenderbufferEXT( TARGET_, id_ );
+  }
+}
 
-  unsigned int id_;
-  int saved_id_;
-
-const static unsigned int TARGET_C;
-};
+void RenderBuffer::_safe_unbind()
+{
+  if ( static_cast< int > ( id_ ) != saved_id_ )
+  {
+    glBindRenderbufferEXT( TARGET_, saved_id_ );
+  }
+}
 
 } // end namespace Seg3D
-
-#endif

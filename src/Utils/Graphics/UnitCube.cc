@@ -26,9 +26,9 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <Application/Renderer/UnitCube.h>
+#include <Utils/Graphics/UnitCube.h>
 
-namespace Seg3D
+namespace Utils
 {
 
 const GLfloat UnitCube::VERTICES_C[ 8 ][ 3 ] =

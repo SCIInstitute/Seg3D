@@ -34,6 +34,7 @@
 #endif
 
 // STL includes
+#include <map>
 #include <vector>
 
 // Boost includes 
@@ -45,6 +46,7 @@
 #include <Application/Viewer/ViewerRenderer.h>
 
 #include <Utils/Core/EnumClass.h>
+#include <Utils/DataBlock/MaskDataSlice.h>
 
 namespace Seg3D
 {
@@ -71,6 +73,28 @@ SCI_ENUM_CLASS
   ALT_MODIFIER_E = 0x08000000
 )
 
+class MousePosition
+{
+public:
+  MousePosition() :
+    x( 0 ), y( 0 )
+  {
+  }
+
+  int x;
+  int y;
+};
+
+class MouseHistory
+{
+public:
+  MousePosition left_start;
+  MousePosition right_start;
+  MousePosition mid_start;
+  MousePosition previous;
+  MousePosition current;
+};
+
 // Forward declarations
 class ViewManipulator;
 class Viewer;
@@ -88,30 +112,6 @@ public:
   // -- mouse events handling --
 public:
 
-  class MousePosition
-  {
-  public:
-    MousePosition() :
-      x( 0 ), y( 0 )
-    {
-    }
-
-    int x;
-    int y;
-  };
-
-  class MouseHistory
-  {
-  public:
-    MousePosition left_start;
-    MousePosition right_start;
-    MousePosition mid_start;
-    MousePosition previous;
-    MousePosition current;
-  };
-
-  void resize( int width, int height );
-
   void mouse_move_event( const MouseHistory& mouse_history, int button, int buttons,
       int modifiers );
   void mouse_press_event( const MouseHistory& mouse_history, int button, int buttons,
@@ -126,6 +126,7 @@ public:
   void set_mouse_release_handler( mouse_event_handler_type func );
   void reset_mouse_handlers();
 
+  void resize( int width, int height );
   bool is_volume_view() const;
   StateViewBaseHandle get_active_view_state();
 
@@ -163,15 +164,14 @@ public:
   StateBoolHandle volume_isosurfaces_visible_state_;
   StateBoolHandle volume_volume_rendering_visible_state_;
 
+  std::map<std::string, Utils::MaskDataSliceHandle> mask_slices_;
+
   const static std::string AXIAL_C;
   const static std::string SAGITTAL_C;
   const static std::string CORONAL_C;
   const static std::string VOLUME_C;
 
 };
-
-typedef Viewer::MousePosition MousePosition;
-typedef Viewer::MouseHistory MouseHistory;
 
 } // end namespace Seg3D
 

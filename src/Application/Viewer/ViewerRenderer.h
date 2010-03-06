@@ -34,11 +34,11 @@
 #endif
 
 // Boost includes 
-#include <boost/utility.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/signals2/signal.hpp>
+#include <boost/utility.hpp>
 
-#include <Application/Renderer/Texture.h>
+#include <Utils/Graphics/Texture.h>
 
 namespace Seg3D
 {
@@ -71,7 +71,7 @@ public:
 
   // -- signals handling --
 public:
-  typedef boost::signals2::signal< void( TextureHandle ) > rendering_completed_signal_type;
+  typedef boost::signals2::signal< void( Utils::TextureHandle ) > rendering_completed_signal_type;
   rendering_completed_signal_type rendering_completed_signal;
 
 protected:

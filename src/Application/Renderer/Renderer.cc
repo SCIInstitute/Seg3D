@@ -31,11 +31,11 @@
 // application includes
 #include <Application/Renderer/Renderer.h>
 #include <Application/Renderer/RenderResources.h>
-#include <Application/Renderer/UnitCube.h>
 #include <Application/ViewerManager/ViewerManager.h>
 
 #include <Utils/EventHandler/DefaultEventHandlerContext.h>
 #include <Utils/Geometry/View3D.h>
+#include <Utils/Graphics/UnitCube.h>
 
 namespace Seg3D
 {
@@ -122,12 +122,12 @@ void Renderer::initialize()
   // lock the shared render context
   RenderResources::lock_type lock( RenderResources::Instance()->shared_context_mutex() );
 
-  textures_[ 0 ] = TextureHandle( new Texture2D() );
-  textures_[ 1 ] = TextureHandle( new Texture2D() );
-  depth_buffer_ = RenderBufferHandle( new RenderBuffer() );
-  frame_buffer_ = FrameBufferObjectHandle( new FrameBufferObject() );
+  textures_[ 0 ] = Utils::TextureHandle( new Utils::Texture2D() );
+  textures_[ 1 ] = Utils::TextureHandle( new Utils::Texture2D() );
+  depth_buffer_ = Utils::RenderBufferHandle( new Utils::RenderBuffer() );
+  frame_buffer_ = Utils::FrameBufferObjectHandle( new Utils::FrameBufferObject() );
   frame_buffer_->attach_render_buffer( depth_buffer_, GL_DEPTH_ATTACHMENT_EXT );
-  this->cube_ = UnitCubeHandle( new UnitCube() );
+  this->cube_ = Utils::UnitCubeHandle( new Utils::UnitCube() );
 
   // release the lock
   lock.unlock();
@@ -170,7 +170,7 @@ void Renderer::redraw()
   }
 
   // lock the active render texture
-  Texture::lock_type texture_lock( textures_[ active_render_texture_ ]->get_mutex() );
+  Utils::Texture::lock_type texture_lock( textures_[ active_render_texture_ ]->get_mutex() );
 
 #if !defined(WIN32) && !defined(APPLE) && !defined(X11_THREADSAFE)
   this->context_->make_current();
@@ -297,8 +297,8 @@ void Renderer::resize( int width, int height )
 
   {
     RenderResources::lock_type lock( RenderResources::Instance()->shared_context_mutex() );
-    textures_[ 0 ] = TextureHandle( new Texture2D() );
-    textures_[ 1 ] = TextureHandle( new Texture2D() );
+    textures_[ 0 ] = Utils::TextureHandle( new Utils::Texture2D() );
+    textures_[ 1 ] = Utils::TextureHandle( new Utils::Texture2D() );
     textures_[ 0 ]->set_image( width, height, 1, GL_RGBA );
     textures_[ 1 ]->set_image( width, height, 1, GL_RGBA );
 

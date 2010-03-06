@@ -31,25 +31,24 @@
 # Set sources
 ##################################################
 
-SET(APPLICATION_RENDERER_SRCS
-  RenderResources.h
-  RenderResources.cc
-  RenderResourcesContext.h
-  RenderResourcesContext.cc
-  RenderContext.h
-  RenderContext.cc
-  Renderer.h
-  Renderer.cc
+SET(UTILS_GRAPHICS_SRCS
+  Texture.h
+  Texture.cc
+  RenderBuffer.h
+  RenderBuffer.cc
+  FrameBufferObject.h
+  FrameBufferObject.cc
+  VertexBufferObject.h
+  VertexBufferObject.cc
+  UnitCube.h
+  UnitCube.cc
   )
 
 
-ADD_LIBRARY(Application_Renderer STATIC 
-            ${APPLICATION_RENDERER_SRCS} )
+ADD_LIBRARY(Utils_Graphics STATIC 
+            ${UTILS_GRAPHICS_SRCS} )
             
-TARGET_LINK_LIBRARIES(Application_Renderer
-                      Utils_Core
-                      Utils_EventHandler
-                      Application_Viewer
+TARGET_LINK_LIBRARIES(Utils_Graphics
                       ${SCI_GLEW_LIBRARY}
                       ${SCI_BOOST_LIBRARY})
 

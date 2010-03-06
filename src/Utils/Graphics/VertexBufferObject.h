@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_RENDERER_VERTEXBUFFEROBJECT_H
-#define APPLICATION_RENDERER_VERTEXBUFFEROBJECT_H
+#ifndef UTILS_GRAPHICS_VERTEXBUFFEROBJECT_H
+#define UTILS_GRAPHICS_VERTEXBUFFEROBJECT_H
 
 #include <boost/utility.hpp>
 #include <boost/shared_ptr.hpp>
@@ -35,7 +35,7 @@
 
 #include <GL/glew.h>
 
-namespace Seg3D
+namespace Utils
 {
 class VertexBufferObject;
 typedef boost::shared_ptr< VertexBufferObject > VertexBufferObjectHandle;

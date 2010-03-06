@@ -43,7 +43,7 @@ NrrdDataBlock::NrrdDataBlock( NrrdDataHandle nrrd_data ) :
   else set_nx( 1 );
   if ( dim > 1 ) set_ny( nrrd->axis[ 1 ].size );
   else set_ny( 1 );
-  if ( dim > 2 ) set_nz( nrrd->axis[ 1 ].size );
+  if ( dim > 2 ) set_nz( nrrd->axis[ 2 ].size );
   else set_nz( 1 );
 
   switch( nrrd->type )

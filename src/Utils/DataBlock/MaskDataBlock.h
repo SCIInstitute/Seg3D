@@ -93,11 +93,16 @@ public:
     return nx_ * ny_ * nz_;
   }
 
+  inline size_t to_index( size_t x, size_t y, size_t z ) const
+  {
+    return this->data_block_->to_index( x, y, z );
+  }
+
   // DATA
   // Pointer to the block of data
-  unsigned  char* data() const
+  unsigned  char* data()
   {
-    return  reinterpret_cast<unsigned char *>( data_block_->data() );
+    return  this->data_;
   }
 
   // MASK_BIT
@@ -116,6 +121,36 @@ public:
   DataBlockHandle data_block()
   {
     return data_block_;
+  }
+
+  inline unsigned char get_mask_at( size_t x, size_t y, size_t z ) const
+  {
+    return this->get_mask_at( this->to_index( x, y, z ) );
+  }
+
+  inline unsigned char get_mask_at( size_t index ) const
+  {
+    return this->data_[ index ] & ( 1 << this->mask_bit_ );
+  }
+
+  inline void set_mask_at( size_t x, size_t y, size_t z )
+  {
+    this->set_mask_at( this->to_index( x, y, z ) );
+  }
+
+  inline void set_mask_at( size_t index )
+  {
+    this->data_[ index ] |= ( 1 << this->mask_bit_ );
+  }
+
+  inline void clear_mask_at( size_t x, size_t y, size_t z )
+  {
+    this->clear_mask_at( this->to_index( x, y, z ) );
+  }
+
+  inline void clear_mask_at( size_t index )
+  {
+    this->data_[ index ] &= ~( 1 << this->mask_bit_ );
   }
 
 // -- Locking of the datablock --
@@ -142,6 +177,17 @@ public:
     return data_block_->get_mutex();
   }
 
+  // -- Signals and slots --
+public:
+
+  // MASK_UPDATED_SIGNAL
+  // Triggered when mask has been update
+  //
+  // NOTE: This signal is never triggered inside the class. 
+  // Any object that makes change to the mask data is responsible for triggering
+  // this signal after modification is done.
+  boost::signals2::signal<void ()> mask_updated_signal_;
+
 // -- internals of the DataBlock --
 private:
   // The dimensions of the datablock
@@ -154,6 +200,9 @@ private:
 
   // The bit that is used for this mask
   unsigned int mask_bit_;
+
+  // Cached data pointer of the underlying DataBlock
+  unsigned char* data_;
 };
 
 } // end namespace Utils

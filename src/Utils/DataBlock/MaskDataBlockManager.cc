@@ -47,7 +47,7 @@ bool MaskDataBlockManager::create( size_t nx, size_t ny, size_t nz, MaskDataBloc
   unsigned int mask_bit = 0;
   size_t mask_entry_index = 0;
 
-  for (size_t j=0;j<mask_list_.size();++)
+  for (size_t j=0; j<mask_list_.size(); j++)
   {
     // Find an empty location
     if ( (nx == mask_list_[j].data_block_->nx()) &&
@@ -60,9 +60,9 @@ bool MaskDataBlockManager::create( size_t nx, size_t ny, size_t nz, MaskDataBloc
 
       for (size_t k = 0; k < 8; k++)
       {
-        if (!(mask_list_[j].test(k)))
+        if (!(mask_list_[j].bits_used_.test(k)))
         {
-          mask_bit = k;
+          mask_bit = static_cast<unsigned int>( k );
           // drop out of for loop
           break;
         }
@@ -75,7 +75,7 @@ bool MaskDataBlockManager::create( size_t nx, size_t ny, size_t nz, MaskDataBloc
   if ( !( data_block.get() ) )
   {
     // Could not find empty position, so create a new data block
-    data_block = new StdDataBlock( nx, ny, nz, DataBlock::UCHAR_E );
+    data_block = DataBlockHandle( new StdDataBlock( nx, ny, nz, DataBlock::UCHAR_E ) );
     mask_bit = 0;
     mask_entry_index = mask_list_.size();
     mask_list_.push_back( MaskDataBlockEntry( data_block ) );
@@ -97,7 +97,7 @@ MaskDataBlockManager::release(DataBlockHandle& datablock, unsigned int mask_bit)
   lock_type lock(get_mutex());
 
   // Remove the MaskDataBlock from the list
-  for (size_t j=0;j<mask_list_.size();++)
+  for (size_t j=0; j<mask_list_.size(); j++)
   {
     if ( mask_list_[j].data_block_ == datablock )
     {
@@ -118,6 +118,7 @@ MaskDataBlockManager::release(DataBlockHandle& datablock, unsigned int mask_bit)
 bool MaskDataBlockManager::compact()
 {
   // TODO: Need to implement this
+  return false;
 }
 
 } // end namespace Utils

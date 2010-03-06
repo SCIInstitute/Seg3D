@@ -34,8 +34,14 @@
 SET(UTILS_DATABLOCK_SRCS
   DataBlock.h
   DataBlock.cc
+  DataSlice.h
+  DataSlice.cc
   MaskDataBlock.h
   MaskDataBlock.cc
+  MaskDataSlice.h
+  MaskDataSlice.cc
+  MaskDataBlockManager.h
+  MaskDataBlockManager.cc
   NrrdData.h
   NrrdData.cc
   NrrdDataBlock.h
@@ -51,6 +57,7 @@ ADD_LIBRARY(Utils_DataBlock STATIC
 TARGET_LINK_LIBRARIES(Utils_DataBlock
                       Utils_Core
                       Utils_Geometry
+            Utils_Graphics
                       ${SCI_TEEM_LIBRARY}
                       ${SCI_BOOST_LIBRARY})
 

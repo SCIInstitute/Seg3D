@@ -36,7 +36,7 @@ namespace Seg3D
 {
 
 class Viewer;
-class Viewer::MouseHistory;
+class MouseHistory;
 
 class ViewManipulator
 {

@@ -26,9 +26,9 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <Application/Renderer/FrameBufferObject.h>
+#include <Utils/Graphics/FrameBufferObject.h>
 
-namespace Seg3D
+namespace Utils
 {
 
 const unsigned int FrameBufferObject::TARGET_C = GL_FRAMEBUFFER_EXT;

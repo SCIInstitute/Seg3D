@@ -52,7 +52,7 @@ public:
   QtRenderWidget( const QGLFormat& format, QWidget* parent, QtRenderWidget* share );
   virtual ~QtRenderWidget();
 
-  void rendering_completed_slot( TextureHandle texture );
+  void rendering_completed_slot( Utils::TextureHandle texture );
 
   void set_viewer_id( size_t viewer_id );
 
@@ -82,7 +82,7 @@ private:
   }
 
   RendererHandle renderer_;
-  TextureHandle renderer_texture_;
+  Utils::TextureHandle renderer_texture_;
 
   boost::signals2::connection rendering_completed_connection_;
 

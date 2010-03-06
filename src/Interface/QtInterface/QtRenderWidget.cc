@@ -60,7 +60,7 @@ QtRenderWidget::~QtRenderWidget()
   rendering_completed_connection_.disconnect();
 }
 
-void QtRenderWidget::rendering_completed_slot( TextureHandle texture )
+void QtRenderWidget::rendering_completed_slot( Utils::TextureHandle texture )
 {
   // if not in the interface thread, post an event to the interface thread
   if ( !Interface::IsInterfaceThread() )
@@ -91,7 +91,7 @@ void QtRenderWidget::paintGL()
     return;
   }
 
-  Texture::lock_type lock( renderer_texture_->get_mutex() );
+  Utils::Texture::lock_type lock( renderer_texture_->get_mutex() );
 
   // draw a window size quad and map the render texture onto it
   QSize view_size = QWidget::size();

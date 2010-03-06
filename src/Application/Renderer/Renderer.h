@@ -37,15 +37,15 @@
 #include <boost/thread/mutex.hpp>
 
 // Application includes
-#include <Application/Renderer/FrameBufferObject.h>
-#include <Application/Renderer/RenderBuffer.h>
 #include <Application/Renderer/RenderContext.h>
-#include <Application/Renderer/Texture.h>
-#include <Application/Renderer/UnitCube.h>
 #include <Application/Viewer/ViewerRenderer.h>
 
 #include <Utils/EventHandler/EventHandler.h>
 #include <Utils/Geometry/View2D.h>
+#include <Utils/Graphics/FrameBufferObject.h>
+#include <Utils/Graphics/RenderBuffer.h>
+#include <Utils/Graphics/Texture.h>
+#include <Utils/Graphics/UnitCube.h>
 
 namespace Seg3D
 {
@@ -78,10 +78,10 @@ private:
   // Context for rendering images
   RenderContextHandle context_;
 
-  TextureHandle textures_[ 2 ];
-  RenderBufferHandle depth_buffer_;
-  FrameBufferObjectHandle frame_buffer_;
-  UnitCubeHandle cube_;
+  Utils::TextureHandle textures_[ 2 ];
+  Utils::RenderBufferHandle depth_buffer_;
+  Utils::FrameBufferObjectHandle frame_buffer_;
+  Utils::UnitCubeHandle cube_;
 
   int active_render_texture_;
 

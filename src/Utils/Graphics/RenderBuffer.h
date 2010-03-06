@@ -26,33 +26,49 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_RENDERER_UNITCUBE_H
-#define APPLICATION_RENDERER_UNITCUBE_H
+#ifndef UTILS_GRAPHICS_RENDERBUFFER_H
+#define UTILS_GRAPHICS_RENDERBUFFER_H
 
-#include <boost/smart_ptr.hpp>
+#include <boost/utility.hpp>
+#include <boost/shared_ptr.hpp>
 
-#include <Application/Renderer/VertexBufferObject.h>
+#include <GL/glew.h>
 
-namespace Seg3D
+namespace Utils
 {
-class UnitCube;
-typedef boost::shared_ptr< UnitCube > UnitCubeHandle;
 
-class UnitCube
+class RenderBuffer;
+typedef boost::shared_ptr< RenderBuffer > RenderBufferHandle;
+
+class RenderBuffer : public boost::noncopyable
 {
 public:
-  UnitCube();
-  ~UnitCube();
+  RenderBuffer();
+  ~RenderBuffer();
 
-  void draw();
+  void bind();
+  void unbind();
+
+void set_storage(int width, int height, unsigned int internal_format, int samples = 1);
+
+inline unsigned int get_id() const
+{
+  return id_;
+}
+
+inline unsigned int get_target() const
+{
+  return TARGET_;
+}
 
 private:
-  VertexBufferObjectHandle vertices_buffer_;
-  VertexBufferObjectHandle faces_buffer_;
-  VertexBufferObjectHandle colors_buffer_;
+  void _safe_bind();
+  void _safe_unbind();
 
-  const static GLfloat VERTICES_C[ 8 ][ 3 ];
-  const static GLubyte FACES_C[ 6 ][ 4 ];
+  unsigned int id_;
+  int saved_id_;
+
+const static unsigned int TARGET_;
 };
 
 } // end namespace Seg3D

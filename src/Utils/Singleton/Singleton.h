@@ -43,6 +43,8 @@ namespace Utils
 // A singleton class embeds this class to handle 
 // the creation of the singleton class.
 
+// NOTE: This singleton model requires that the project is linked statically
+
 template< class T >
 class Singleton : public boost::noncopyable
 {
