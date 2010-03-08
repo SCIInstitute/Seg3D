@@ -34,12 +34,14 @@
 SET(UTILS_GRAPHICS_SRCS
   Texture.h
   Texture.cc
-  RenderBuffer.h
-  RenderBuffer.cc
-  FrameBufferObject.h
-  FrameBufferObject.cc
+  Renderbuffer.h
+  Renderbuffer.cc
+  FramebufferObject.h
+  FramebufferObject.cc
   VertexBufferObject.h
   VertexBufferObject.cc
+  PixelBufferObject.h
+  PixelBufferObject.cc
   UnitCube.h
   UnitCube.cc
   )

@@ -26,47 +26,55 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef UTILS_GRAPHICS_FRAMEBUFFEROBJECT_H
-#define UTILS_GRAPHICS_FRAMEBUFFEROBJECT_H
+#ifndef UTILS_GRAPHICS_PIXELBUFFEROBJECT_H
+#define UTILS_GRAPHICS_PIXELBUFFEROBJECT_H
 
+#include <boost/smart_ptr.hpp>
 #include <boost/utility.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include <GL/glew.h>
 
-#include <Utils/Graphics/Texture.h>
-#include <Utils/Graphics/Renderbuffer.h>
+#include <Utils/Core/EnumClass.h>
 
 namespace Utils
 {
 
-class FramebufferObject;
-typedef boost::shared_ptr< FramebufferObject > FrameBufferObjectHandle;
+SCI_ENUM_CLASS
+(
+  PixelBufferType,
+  PACK_BUFFER_E = 0,
+  UNPACK_BUFFER_E
+)
 
-class FramebufferObject : public boost::noncopyable
+class PixelBufferObject;
+typedef boost::shared_ptr< PixelBufferObject > PixelBufferObjectHandle;
+
+class PixelBufferObject : public boost::noncopyable
 {
 
 public:
+  PixelBufferObject(PixelBufferType buffer_type);
+  ~PixelBufferObject();
 
-  FramebufferObject();
-  ~FramebufferObject();
+  void bind();
+  void unbind();
 
-  void enable();
-  void disable();
+  void set_buffer_data( GLsizeiptr size, const GLvoid* data, GLenum usage );
+  void set_buffer_sub_data( GLintptr offset, GLsizeiptr size, const GLvoid* data );
 
-  void attach_texture(TextureHandle texture, unsigned int attachment = GL_COLOR_ATTACHMENT0_EXT, int level = 0, int layer = 0);
-  void attach_render_buffer(RenderBufferHandle render_buffer, unsigned int attachment);
-  bool check_status( GLenum* status = NULL );
+  void* map_buffer(GLenum access);
+  GLboolean unmap_buffer();
 
 private:
-
   void safe_bind();
   void safe_unbind();
 
-  unsigned int id_;
-  int saved_id_;
+private:
+  GLenum target_;
+  GLenum query_target_;
+  GLuint id_;
+  GLint saved_id_;
 
-const static unsigned int TARGET_C;
 };
 
 } // end namespace Utils

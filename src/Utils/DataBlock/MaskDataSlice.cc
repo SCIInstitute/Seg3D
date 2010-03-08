@@ -66,18 +66,36 @@ void MaskDataSlice::upload_texture()
   if ( !this->texture_.get() )
   {
     this->texture_ = TextureHandle( new Texture2D );
+    this->pixel_buffer_ = PixelBufferObjectHandle( 
+      new PixelBufferObject( PixelBufferType::UNPACK_BUFFER_E ) );
   }
 
   if ( this->data_changed_ )
   {
-    Texture::lock_type lock( this->texture_->get_mutex() );
     glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+    size_t w = this->width();
+    size_t h = this->height();
 
     // Step 1. copy the data in the slice to a pixel unpack buffer
-    // Step 2. bind the pixel buffer
-    // Step 3. copy from the pixel buffer to texture
-    //this->texture_->set_image( static_cast<int>( this->width() ), static_cast<int>( this->height() ),
-    //  1, GL_ALPHA, ..., GL_ALPHA, GL_UNSIGNED_BYTE );
+    this->pixel_buffer_->bind();
+    this->pixel_buffer_->set_buffer_data( sizeof(unsigned char) * w * h,
+      NULL, GL_STREAM_DRAW );
+    unsigned char* buffer = reinterpret_cast<unsigned char*>(
+      this->pixel_buffer_->map_buffer( GL_WRITE_ONLY ) );
+    for ( size_t j = 0; j < h; j++ )
+    {
+      for ( size_t i = 0; i < w; i++ )
+      {
+        size_t index = this->to_index( i, j );
+        buffer[ j * w + i ] = this->mask_data_block_->get_mask_at( index );
+      }
+    }
+    
+    // Step 2. copy from the pixel buffer to texture
+    this->pixel_buffer_->unmap_buffer();
+    this->texture_->set_image( static_cast<int>( w ), static_cast<int>( h ), 1, 
+      GL_ALPHA, 0, GL_ALPHA, GL_UNSIGNED_BYTE );
+    this->pixel_buffer_->unbind();
 
     this->data_changed_ = false;
   }

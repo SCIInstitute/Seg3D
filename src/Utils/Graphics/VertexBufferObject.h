@@ -29,63 +29,94 @@
 #ifndef UTILS_GRAPHICS_VERTEXBUFFEROBJECT_H
 #define UTILS_GRAPHICS_VERTEXBUFFEROBJECT_H
 
+#include <vector>
+
 #include <boost/utility.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/function.hpp>
 
 #include <GL/glew.h>
 
+#include <Utils/Core/EnumClass.h>
+
 namespace Utils
 {
 class VertexBufferObject;
 typedef boost::shared_ptr< VertexBufferObject > VertexBufferObjectHandle;
 
+SCI_ENUM_CLASS
+(
+  VertexAttribArrayType,
+  VERTEX_E = 0,
+  COLOR_E,
+  TEXTURE_COORD_E,
+  SECONDARY_COLOR_E,
+  NORMAL_E,
+  FOG_COORD_E,
+  INDEX_E,
+  EDGE_FLAG_E
+)
+
 class VertexBufferObject : public boost::noncopyable
 {
-public:
-  VertexBufferObject( GLenum target, GLenum array_type );
-  ~VertexBufferObject( void );
+private:
+  
+  class VertexArrayInfo
+  {
+  public:
+    VertexArrayInfo(VertexAttribArrayType array_type) : type_(array_type) {}
+    ~VertexArrayInfo() {}
 
-  void set_buffer_data( GLenum data_type, GLint vertex_size, GLsizeiptr size, const GLvoid* data,
-      GLenum usage );
+    VertexAttribArrayType type_;
+    boost::function< void () > gl_array_pointer_func_;
+  };
+
+  typedef boost::shared_ptr< VertexArrayInfo > VertexArrayInfoHandle;
+
+public:
+  VertexBufferObject( GLenum target );
+  ~VertexBufferObject();
+
+  void set_buffer_data( GLsizeiptr size, const GLvoid* data, GLenum usage );
   void set_buffer_sub_data( GLintptr offset, GLsizeiptr size, const GLvoid* data );
 
+  // SET_ARRAY:
+  // Set up a vertex attribute array in the vertex buffer
+  void set_array( VertexAttribArrayType array_type, GLint vertex_size, GLenum data_type, 
+    GLsizei stride, int offset );
+  void set_array( VertexAttribArrayType array_type, GLenum data_type, GLsizei stride, int offset );
+  void set_array( VertexAttribArrayType array_type, GLsizei stride, int offset );
+
+  void enable_arrays();
+  void disable_arrays();
+
   void bind();
-  void enable();
-  void disable();
+  void unbind();
 
   void draw_arrays( GLenum mode, GLint first, GLsizei count );
   void multi_draw_arrays( GLenum mode, GLint* first, GLsizei* count, GLsizei primcount );
 
-  void draw_elements( GLenum mode, GLsizei count );
-  void draw_range_elements( GLenum mode, GLuint start, GLuint end, GLsizei count );
-  void multi_draw_elements( GLenum mode, GLsizei* count, GLsizei primcount );
+  void draw_elements( GLenum mode, GLsizei count, GLenum data_type, int offset = 0 );
+  void draw_range_elements( GLenum mode, GLuint start, GLuint end, GLsizei count, 
+    GLenum data_type, int offset = 0 );
+  void multi_draw_elements( GLenum mode, GLsizei* count, GLenum data_type,
+    const GLvoid** offsets, GLsizei primcount );
 
 private:
-  boost::function< void( GLint, GLenum, GLsizei, GLvoid* ) > gl_array_pointer_func4_;
-  boost::function< void( GLenum, GLsizei, const GLvoid* ) > gl_array_pointer_func3_;
-  boost::function< void( GLsizei, const GLvoid* ) > gl_array_pointer_func2_;
-
-  boost::function< void() > invoke_gl_array_pointer_func_;
-
   void safe_bind();
   void safe_unbind();
 
-  void invoke_array_pointer_func4();
-  void invoke_array_pointer_func3();
-  void invoke_array_pointer_func2();
-
 private:
   GLenum target_;
-  GLuint id_;
-  GLenum array_type_;
   GLenum query_target_;
-  GLint vertex_size_;
-  GLenum data_type_;
+  GLuint id_;
   GLint saved_id_;
 
+  std::vector<VertexArrayInfoHandle> vertex_arrays_;
+
+  const static GLenum GL_ARRAY_TYPES_C[];
 };
 
-} // end namespace Seg3D
+} // end namespace Utils
 
 #endif

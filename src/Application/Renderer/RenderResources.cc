@@ -79,9 +79,9 @@ void RenderResources::init_gl()
     {
       glewInit();
       gl_initialized_ = true;
-      if ( !GL_VERSION_1_5 )
+      if ( !GL_VERSION_2_1 )
       {
-        SCI_THROW_OPENGLEXCEPTION("Minimum OpenGL version 1.5 required.");
+        SCI_THROW_OPENGLEXCEPTION("Minimum OpenGL version 2.1 required.");
       }
       if ( !GL_EXT_framebuffer_object )
       {

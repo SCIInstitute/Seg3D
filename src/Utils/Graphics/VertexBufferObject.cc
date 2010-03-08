@@ -28,19 +28,32 @@
 
 #include <boost/bind.hpp>
 
+#include <Utils/Core/Log.h>
 #include <Utils/Graphics/VertexBufferObject.h>
 
 namespace Utils
 {
 
-VertexBufferObject::VertexBufferObject( GLenum target, GLenum array_type ) :
-  target_( target ), array_type_( array_type )
+const GLenum VertexBufferObject::GL_ARRAY_TYPES_C[] = 
 {
-  assert(target_ == GL_ARRAY_BUFFER || target_ == GL_ELEMENT_ARRAY_BUFFER);
+  GL_VERTEX_ARRAY,
+  GL_COLOR_ARRAY,
+  GL_TEXTURE_COORD_ARRAY,
+  GL_SECONDARY_COLOR_ARRAY,
+  GL_NORMAL_ARRAY,
+  GL_FOG_COORD_ARRAY,
+  GL_INDEX_ARRAY,
+  GL_EDGE_FLAG_ARRAY
+};
+
+VertexBufferObject::VertexBufferObject( GLenum target ) :
+  target_( target )
+{
+  assert( target_ == GL_ARRAY_BUFFER || target_ == GL_ELEMENT_ARRAY_BUFFER );
   glGenBuffers( 1, &( this->id_ ) );
   this->saved_id_ = 0;
 
-  if ( target_ == GL_ARRAY_BUFFER )
+  if ( this->target_ == GL_ARRAY_BUFFER )
   {
     this->query_target_ = GL_ARRAY_BUFFER_BINDING;
   }
@@ -49,64 +62,18 @@ VertexBufferObject::VertexBufferObject( GLenum target, GLenum array_type ) :
     this->query_target_ = GL_ELEMENT_ARRAY_BUFFER_BINDING;
   }
 
-  switch( array_type_ )
-  {
-  case GL_VERTEX_ARRAY:
-    this->gl_array_pointer_func4_ = boost::bind( glVertexPointer, _1, _2, _3, _4 );
-    this->invoke_gl_array_pointer_func_ = boost::bind(
-        &VertexBufferObject::invoke_array_pointer_func4, this );
-    break;
-  case GL_COLOR_ARRAY:
-    this->gl_array_pointer_func4_ = boost::bind( glColorPointer, _1, _2, _3, _4 );
-    this->invoke_gl_array_pointer_func_ = boost::bind(
-        &VertexBufferObject::invoke_array_pointer_func4, this );
-    break;
-  case GL_TEXTURE_COORD_ARRAY:
-    this->gl_array_pointer_func4_ = boost::bind( glTexCoordPointer, _1, _2, _3, _4 );
-    this->invoke_gl_array_pointer_func_ = boost::bind(
-        &VertexBufferObject::invoke_array_pointer_func4, this );
-    break;
-  case GL_SECONDARY_COLOR_ARRAY:
-    this->gl_array_pointer_func4_ = boost::bind( glSecondaryColorPointer, _1, _2, _3, _4 );
-    this->invoke_gl_array_pointer_func_ = boost::bind(
-        &VertexBufferObject::invoke_array_pointer_func4, this );
-    break;
-  case GL_NORMAL_ARRAY:
-    this->gl_array_pointer_func3_ = boost::bind( glNormalPointer, _1, _2, _3 );
-    this->invoke_gl_array_pointer_func_ = boost::bind(
-        &VertexBufferObject::invoke_array_pointer_func3, this );
-    break;
-  case GL_FOG_COORD_ARRAY:
-    this->gl_array_pointer_func3_ = boost::bind( glFogCoordPointer, _1, _2, _3 );
-    this->invoke_gl_array_pointer_func_ = boost::bind(
-        &VertexBufferObject::invoke_array_pointer_func3, this );
-    break;
-  case GL_INDEX_ARRAY:
-    this->gl_array_pointer_func3_ = boost::bind( glIndexPointer, _1, _2, _3 );
-    this->invoke_gl_array_pointer_func_ = boost::bind(
-        &VertexBufferObject::invoke_array_pointer_func3, this );
-    break;
-  case GL_EDGE_FLAG_ARRAY:
-    this->gl_array_pointer_func2_ = boost::bind( glEdgeFlagPointer, _1, _2 );
-    this->invoke_gl_array_pointer_func_ = boost::bind(
-        &VertexBufferObject::invoke_array_pointer_func2, this );
-    break;
-  default:
-    assert(false);
-  }
-
   this->safe_bind();
   this->safe_unbind();
 }
 
-VertexBufferObject::~VertexBufferObject( void )
+VertexBufferObject::~VertexBufferObject()
 {
   glDeleteBuffers( 1, &( this->id_ ) );
 }
 
 void VertexBufferObject::safe_bind()
 {
-  glGetIntegerv( query_target_, &( this->saved_id_ ) );
+  glGetIntegerv( this->query_target_, &( this->saved_id_ ) );
   if ( this->id_ != this->saved_id_ )
   {
     glBindBuffer( this->target_, this->id_ );
@@ -126,37 +93,13 @@ void VertexBufferObject::bind()
   glBindBuffer( this->target_, this->id_ );
 }
 
-void VertexBufferObject::enable()
+void VertexBufferObject::unbind()
 {
-  glBindBuffer( this->target_, this->id_ );
-  if ( this->target_ == GL_ARRAY_BUFFER )
-  {
-    this->invoke_gl_array_pointer_func_();
-    glEnableClientState( this->array_type_ );
-  }
+  glBindBuffer( this->target_, 0 );
 }
 
-void VertexBufferObject::invoke_array_pointer_func4()
+void VertexBufferObject::set_buffer_data( GLsizeiptr size, const GLvoid* data, GLenum usage )
 {
-  this->gl_array_pointer_func4_( this->vertex_size_, this->data_type_, 0, 0 );
-}
-
-void VertexBufferObject::invoke_array_pointer_func3()
-{
-  this->gl_array_pointer_func3_( this->data_type_, 0, 0 );
-}
-
-void VertexBufferObject::invoke_array_pointer_func2()
-{
-  this->gl_array_pointer_func2_( 0, 0 );
-}
-
-void VertexBufferObject::set_buffer_data( GLenum data_type, GLint vertex_size, GLsizeiptr size,
-    const GLvoid* data, GLenum usage )
-{
-  this->data_type_ = data_type;
-  this->vertex_size_ = vertex_size;
-
   this->safe_bind();
   glBufferData( this->target_, size, data, usage );
   this->safe_unbind();
@@ -169,44 +112,184 @@ void VertexBufferObject::set_buffer_sub_data( GLintptr offset, GLsizeiptr size, 
   this->safe_unbind();
 }
 
-void VertexBufferObject::disable()
+void VertexBufferObject::set_array( VertexAttribArrayType array_type, GLint vertex_size, 
+                            GLenum data_type, GLsizei stride, int offset )
 {
-  if ( this->target_ == GL_ARRAY_BUFFER )
+  if ( this->target_ != GL_ARRAY_BUFFER )
   {
-    glDisableClientState( this->array_type_ );
+    return;
   }
-  glBindBuffer( this->target_, 0 );
+
+  VertexArrayInfoHandle array_info( new VertexArrayInfo( array_type ) );
+
+  switch(array_type)
+  {
+  case VertexAttribArrayType::VERTEX_E:
+    array_info->gl_array_pointer_func_ = boost::bind( glVertexPointer, vertex_size,
+      data_type, stride, reinterpret_cast<void*>( offset ) );
+    break;
+  case VertexAttribArrayType::COLOR_E:
+    array_info->gl_array_pointer_func_ = boost::bind( glColorPointer, vertex_size,
+      data_type, stride, reinterpret_cast<void*>( offset ) );
+    break;
+  case VertexAttribArrayType::TEXTURE_COORD_E:
+    array_info->gl_array_pointer_func_ = boost::bind( glTexCoordPointer, vertex_size,
+      data_type, stride, reinterpret_cast<void*>( offset ) );
+    break;
+  case  VertexAttribArrayType::SECONDARY_COLOR_E:
+    array_info->gl_array_pointer_func_ = boost::bind( glSecondaryColorPointer, vertex_size,
+      data_type, stride, reinterpret_cast<void*>( offset ) );
+    break;
+  default:
+    SCI_LOG_ERROR( "Incompatible vertex array type and parameters" );
+    assert( false );
+    return;
+  }
+
+  this->vertex_arrays_.push_back( array_info );
+}
+
+void VertexBufferObject::set_array( VertexAttribArrayType array_type, 
+                            GLenum data_type, GLsizei stride, int offset )
+{
+  if ( this->target_ != GL_ARRAY_BUFFER )
+  {
+    return;
+  }
+
+  VertexArrayInfoHandle array_info( new VertexArrayInfo( array_type ) );
+
+  switch( array_type )
+  {
+  case VertexAttribArrayType::NORMAL_E:
+    array_info->gl_array_pointer_func_ = boost::bind( glNormalPointer, data_type,
+      stride, reinterpret_cast<void*>( offset ) );
+    break;
+  case VertexAttribArrayType::FOG_COORD_E:
+    array_info->gl_array_pointer_func_ = boost::bind( glFogCoordPointer, data_type,
+      stride, reinterpret_cast<void*>( offset ) );
+    break;
+  case VertexAttribArrayType::INDEX_E:
+    array_info->gl_array_pointer_func_ = boost::bind( glIndexPointer, data_type,
+      stride, reinterpret_cast<void*>( offset ) );
+    break;
+  default:
+    SCI_LOG_ERROR( "Incompatible vertex array type and parameters" );
+    assert( false );
+    return;
+  }
+
+  this->vertex_arrays_.push_back( array_info );
+}
+
+void VertexBufferObject::set_array( VertexAttribArrayType array_type, GLsizei stride, int offset )
+{
+  if ( this->target_ != GL_ARRAY_BUFFER )
+  {
+    return;
+  }
+
+  VertexArrayInfoHandle array_info( new VertexArrayInfo( array_type ) );
+
+  switch( array_type )
+  {
+  case VertexAttribArrayType::EDGE_FLAG_E:
+    array_info->gl_array_pointer_func_ = boost::bind( glEdgeFlagPointer, stride,
+      reinterpret_cast<void*>( offset ) );
+    break;
+  default:
+    SCI_LOG_ERROR( "Incompatible vertex array type and parameters" );
+    assert( false );
+    return;
+  }
+
+  this->vertex_arrays_.push_back( array_info );
+}
+
+void VertexBufferObject::enable_arrays()
+{
+  if ( this->target_ != GL_ARRAY_BUFFER )
+  {
+    assert( false );
+    return;
+  }
+
+  size_t num_of_arrays = this->vertex_arrays_.size();
+  if ( num_of_arrays == 0 )
+  {
+    assert( false );
+    return;
+  }
+
+  this->safe_bind();
+  for (size_t i = 0; i < num_of_arrays; i++)
+  {
+    this->vertex_arrays_[i]->gl_array_pointer_func_();
+    glEnableClientState( GL_ARRAY_TYPES_C[ this->vertex_arrays_[i]->type_ ] );
+  }
+  this->safe_unbind();
+}
+
+void VertexBufferObject::disable_arrays()
+{
+  if ( this->target_ != GL_ARRAY_BUFFER )
+  {
+    return;
+  }
+
+  size_t num_of_arrays = this->vertex_arrays_.size();
+  if ( num_of_arrays == 0 )
+  {
+    return;
+  }
+
+  for (size_t i = 0; i < num_of_arrays; i++)
+  {
+    glDisableClientState( GL_ARRAY_TYPES_C[ this->vertex_arrays_[i]->type_ ] );
+  }
 }
 
 void VertexBufferObject::draw_arrays( GLenum mode, GLint first, GLsizei count )
 {
   assert(this->target_ == GL_ARRAY_BUFFER);
+  this->enable_arrays();
   glDrawArrays( mode, first, count );
+  this->disable_arrays();
 }
 
 void VertexBufferObject::multi_draw_arrays( GLenum mode, GLint* first, GLsizei* count,
     GLsizei primcount )
 {
   assert(this->target_ == GL_ARRAY_BUFFER);
+  this->enable_arrays();
   glMultiDrawArrays( mode, first, count, primcount );
+  this->disable_arrays();
 }
 
-void VertexBufferObject::draw_elements( GLenum mode, GLsizei count )
+void VertexBufferObject::draw_elements( GLenum mode, GLsizei count, GLenum data_type, int offset )
 {
   assert(this->target_ == GL_ELEMENT_ARRAY_BUFFER);
-  glDrawElements( mode, count, this->data_type_, NULL );
+  this->safe_bind();
+  glDrawElements( mode, count, data_type, reinterpret_cast<void*>( offset ) );
+  this->safe_unbind();
 }
 
-void VertexBufferObject::draw_range_elements( GLenum mode, GLuint start, GLuint end, GLsizei count )
+void VertexBufferObject::draw_range_elements( GLenum mode, GLuint start, GLuint end, 
+  GLsizei count, GLenum data_type, int offset )
 {
   assert(this->target_ == GL_ELEMENT_ARRAY_BUFFER);
-  glDrawRangeElements( mode, start, end, count, this->data_type_, NULL );
+  this->safe_bind();
+  glDrawRangeElements( mode, start, end, count, data_type, reinterpret_cast<void*>( offset ) );
+  this->safe_unbind();
 }
 
-void VertexBufferObject::multi_draw_elements( GLenum mode, GLsizei* count, GLsizei primcount )
+void VertexBufferObject::multi_draw_elements( GLenum mode, GLsizei* count, 
+  GLenum data_type, const GLvoid** offsets, GLsizei primcount )
 {
   assert(this->target_ == GL_ELEMENT_ARRAY_BUFFER);
-  glMultiDrawElements( mode, count, this->data_type_, NULL, primcount );
+  this->safe_bind();
+  glMultiDrawElements( mode, count, data_type, offsets, primcount );
+  this->safe_unbind();
 }
 
-} // end namespace Seg3D
+} // end namespace Utils

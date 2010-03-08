@@ -54,47 +54,47 @@ void Texture::disable()
 
 void Texture::set_parameter(unsigned int param_name, int param_value)
 {
-  _safe_bind();
+  safe_bind();
   glTexParameteri(target_, param_name, param_value);
-  _safe_unbind();
+  safe_unbind();
 }
 
 void Texture::set_mag_filter( int filter )
 {
-  _safe_bind();
+  safe_bind();
   glTexParameteri( target_, GL_TEXTURE_MAG_FILTER, filter );
-  _safe_unbind();
+  safe_unbind();
 }
 
 void Texture::set_min_filter( int filter )
 {
-  _safe_bind();
+  safe_bind();
   glTexParameteri( target_, GL_TEXTURE_MIN_FILTER, filter );
-  _safe_unbind();
+  safe_unbind();
 }
 
 void Texture::set_wrap_r( int wrap_mode )
 {
-  _safe_bind();
+  safe_bind();
   glTexParameteri( target_, GL_TEXTURE_WRAP_R, wrap_mode );
-  _safe_unbind();
+  safe_unbind();
 }
 
 void Texture::set_wrap_s( int wrap_mode )
 {
-  _safe_bind();
+  safe_bind();
   glTexParameteri( target_, GL_TEXTURE_WRAP_S, wrap_mode );
-  _safe_unbind();
+  safe_unbind();
 }
 
 void Texture::set_wrap_t( int wrap_mode )
 {
-  _safe_bind();
+  safe_bind();
   glTexParameteri( target_, GL_TEXTURE_WRAP_T, wrap_mode );
-  _safe_unbind();
+  safe_unbind();
 }
 
-void Texture::_safe_bind()
+void Texture::safe_bind()
 {
   glGetIntegerv( query_target_, &saved_id_ );
   if ( static_cast< int > ( texture_id_ ) != saved_id_ )
@@ -103,7 +103,7 @@ void Texture::_safe_bind()
   }
 }
 
-void Texture::_safe_unbind()
+void Texture::safe_unbind()
 {
   if ( static_cast< int > ( texture_id_ ) != saved_id_ )
   {
@@ -125,9 +125,9 @@ Texture1D::Texture1D() :
 void Texture1D::set_image(int width, int height, int depth, int internal_format, const void *pixels,
   unsigned int format, unsigned int type, int level)
 {
-  _safe_bind();
+  safe_bind();
   glTexImage1D(target_, level, internal_format, width, 0, format, type, pixels);
-  _safe_unbind();
+  safe_unbind();
 }
 
 Texture2D::Texture2D() :
@@ -145,9 +145,9 @@ Texture2D::Texture2D() :
 void Texture2D::set_image(int width, int height, int depth, int internal_format, const void *pixels,
   unsigned int format, unsigned int type, int level)
 {
-  _safe_bind();
+  safe_bind();
   glTexImage2D(target_, level, internal_format, width, height, 0, format, type, pixels);
-  _safe_unbind();
+  safe_unbind();
 }
 
 Texture3D::Texture3D() :
@@ -166,9 +166,9 @@ Texture3D::Texture3D() :
 void Texture3D::set_image(int width, int height, int depth, int internal_format, const void *pixels,
   unsigned int format, unsigned int type, int level)
 {
-  _safe_bind();
+  safe_bind();
   glTexImage3D(target_, level, internal_format, width, height, depth, 0, format, type, pixels);
-  _safe_unbind();
+  safe_unbind();
 }
 
-} // end namespace Seg3D
+} // end namespace Utils

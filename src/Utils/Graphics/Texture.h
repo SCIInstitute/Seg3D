@@ -97,8 +97,8 @@ public:
   }
 
 protected:
-  void _safe_bind();
-  void _safe_unbind();
+  void safe_bind();
+  void safe_unbind();
 
   int saved_id_;
   unsigned int texture_id_;
@@ -141,6 +141,6 @@ void set_image(int width, int height, int depth, int internal_format = GL_RGBA, 
   unsigned int format = GL_RGBA, unsigned int type = GL_UNSIGNED_BYTE, int level = 0);
 };
 
-} // end namespace Seg3D
+} // end namespace Utils
 
 #endif

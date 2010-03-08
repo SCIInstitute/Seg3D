@@ -42,8 +42,8 @@
 
 #include <Utils/EventHandler/EventHandler.h>
 #include <Utils/Geometry/View2D.h>
-#include <Utils/Graphics/FrameBufferObject.h>
-#include <Utils/Graphics/RenderBuffer.h>
+#include <Utils/Graphics/FramebufferObject.h>
+#include <Utils/Graphics/Renderbuffer.h>
 #include <Utils/Graphics/Texture.h>
 #include <Utils/Graphics/UnitCube.h>
 

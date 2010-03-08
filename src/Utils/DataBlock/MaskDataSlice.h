@@ -36,6 +36,7 @@
 #include <Utils/DataBlock/MaskDataBlock.h>
 #include <Utils/DataBlock/DataSlice.h>
 #include <Utils/Graphics/Texture.h>
+#include <Utils/Graphics/PixelBufferObject.h>
 
 namespace Utils
 {
@@ -111,6 +112,10 @@ public:
     this->data_changed_ = changed;
   }
 
+  // Upload the mask slice to graphics texture.
+  // NOTE: This function allocates memory on the GPU, so the caller should
+  // acquire a lock on the RenderResources before calling this function. The caller should
+  // also lock the MaskDataSlice object for data consistency.
   void upload_texture();
 
 public:
@@ -153,6 +158,7 @@ private:
   size_t slice_number_;
   bool data_changed_;
   TextureHandle texture_;
+  PixelBufferObjectHandle pixel_buffer_;
 
 };
 

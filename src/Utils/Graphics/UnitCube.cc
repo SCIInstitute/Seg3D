@@ -43,7 +43,7 @@ const GLfloat UnitCube::VERTICES_C[ 8 ][ 3 ] =
   { 1, 1, 1 }
 };
 
-const GLubyte UnitCube::FACES_C[ 6 ][ 4 ] =
+const GLushort UnitCube::FACES_C[ 6 ][ 4 ] =
 {
   { 0, 2, 6, 4 }, // back
   { 0, 1, 3, 2 }, // left 
@@ -55,19 +55,17 @@ const GLubyte UnitCube::FACES_C[ 6 ][ 4 ] =
 
 UnitCube::UnitCube()
 {
-  this->vertices_buffer_ = VertexBufferObjectHandle( new VertexBufferObject( GL_ARRAY_BUFFER,
-      GL_VERTEX_ARRAY ) );
-  this->vertices_buffer_->set_buffer_data( GL_FLOAT, 3, sizeof(GLfloat) * 8 * 3,
+  this->vertices_buffer_ = VertexBufferObjectHandle( 
+    new VertexBufferObject( GL_ARRAY_BUFFER ) );
+  this->vertices_buffer_->set_buffer_data( sizeof(GLfloat) * 8 * 3,
       reinterpret_cast< const GLvoid* > ( &VERTICES_C[ 0 ][ 0 ] ), GL_STATIC_DRAW );
+  this->vertices_buffer_->set_array( VertexAttribArrayType::VERTEX_E, 3, GL_FLOAT, 0, 0 );
+  this->vertices_buffer_->set_array( VertexAttribArrayType::COLOR_E, 3, GL_FLOAT, 0, 0 );
 
-  this->colors_buffer_ = VertexBufferObjectHandle( new VertexBufferObject( GL_ARRAY_BUFFER,
-      GL_COLOR_ARRAY ) );
-  this->colors_buffer_->set_buffer_data( GL_FLOAT, 3, sizeof(GLfloat) * 8 * 3,
-      reinterpret_cast< const GLvoid* > ( &VERTICES_C[ 0 ][ 0 ] ), GL_STATIC_DRAW );
 
-  this->faces_buffer_ = VertexBufferObjectHandle( new VertexBufferObject(
-      GL_ELEMENT_ARRAY_BUFFER, GL_INDEX_ARRAY ) );
-  this->faces_buffer_->set_buffer_data( GL_UNSIGNED_BYTE, 1, sizeof(GLubyte) * 6 * 4,
+  this->faces_buffer_ = VertexBufferObjectHandle( 
+    new VertexBufferObject( GL_ELEMENT_ARRAY_BUFFER ) );
+  this->faces_buffer_->set_buffer_data( sizeof(GLushort) * 6 * 4,
       reinterpret_cast< const GLvoid* > ( &FACES_C[ 0 ][ 0 ] ), GL_STATIC_DRAW );
 }
 
@@ -77,13 +75,9 @@ UnitCube::~UnitCube()
 
 void UnitCube::draw()
 {
-  this->vertices_buffer_->enable();
-  this->colors_buffer_->enable();
-  this->faces_buffer_->enable();
-  this->faces_buffer_->draw_elements( GL_QUADS, 24 );
-  this->faces_buffer_->disable();
-  this->colors_buffer_->disable();
-  this->vertices_buffer_->disable();
+  this->vertices_buffer_->enable_arrays();
+  this->faces_buffer_->draw_elements( GL_QUADS, 24, GL_UNSIGNED_SHORT );
+  this->vertices_buffer_->disable_arrays();
 }
 
-} // end namespace Seg3D
+} // end namespace Utils

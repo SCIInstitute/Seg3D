@@ -26,14 +26,14 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <Utils/Graphics/FrameBufferObject.h>
+#include <Utils/Graphics/FramebufferObject.h>
 
 namespace Utils
 {
 
-const unsigned int FrameBufferObject::TARGET_C = GL_FRAMEBUFFER_EXT;
+const unsigned int FramebufferObject::TARGET_C = GL_FRAMEBUFFER_EXT;
 
-FrameBufferObject::FrameBufferObject()
+FramebufferObject::FramebufferObject()
 {
   glGenFramebuffersEXT( 1, &id_ );
 
@@ -41,29 +41,29 @@ FrameBufferObject::FrameBufferObject()
   safe_unbind();
 }
 
-FrameBufferObject::~FrameBufferObject()
+FramebufferObject::~FramebufferObject()
 {
   glDeleteFramebuffersEXT( 1, &id_ );
 }
 
-void FrameBufferObject::enable()
+void FramebufferObject::enable()
 {
   glBindFramebufferEXT( TARGET_C, id_ );
 }
 
-void FrameBufferObject::disable()
+void FramebufferObject::disable()
 {
   glBindFramebufferEXT( TARGET_C, 0 );
 }
 
-void FrameBufferObject::attach_render_buffer(RenderBufferHandle render_buffer, unsigned int attachment)
+void FramebufferObject::attach_render_buffer(RenderBufferHandle render_buffer, unsigned int attachment)
 {
   safe_bind();
   glFramebufferRenderbufferEXT(TARGET_C, attachment, render_buffer->get_target(), render_buffer->get_id());
   safe_unbind();
 }
 
-void FrameBufferObject::attach_texture(TextureHandle texture, unsigned int attachment, int level, int layer)
+void FramebufferObject::attach_texture(TextureHandle texture, unsigned int attachment, int level, int layer)
 {
   safe_bind();
 
@@ -83,7 +83,7 @@ void FrameBufferObject::attach_texture(TextureHandle texture, unsigned int attac
   safe_unbind();
 }
 
-bool FrameBufferObject::check_status( GLenum* status )
+bool FramebufferObject::check_status( GLenum* status )
 {
   this->safe_bind();
   GLenum result = glCheckFramebufferStatusEXT( TARGET_C );
@@ -96,7 +96,7 @@ bool FrameBufferObject::check_status( GLenum* status )
   return ( result == GL_FRAMEBUFFER_COMPLETE_EXT );
 }
 
-void FrameBufferObject::safe_bind()
+void FramebufferObject::safe_bind()
 {
   glGetIntegerv( GL_FRAMEBUFFER_BINDING_EXT, &saved_id_ );
   if ( static_cast< int > ( id_ ) != saved_id_ )
@@ -105,7 +105,7 @@ void FrameBufferObject::safe_bind()
   }
 }
 
-void FrameBufferObject::safe_unbind()
+void FramebufferObject::safe_unbind()
 {
   if ( static_cast< int > ( id_ ) != saved_id_ )
   {
@@ -113,4 +113,4 @@ void FrameBufferObject::safe_unbind()
   }
 }
 
-} // end namespace Seg3D
+} // end namespace Utils

@@ -26,34 +26,34 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <Utils/Graphics/RenderBuffer.h>
+#include <Utils/Graphics/Renderbuffer.h>
 
 namespace Utils
 {
 
-const unsigned int RenderBuffer::TARGET_ = GL_RENDERBUFFER_EXT;
+const unsigned int Renderbuffer::TARGET_ = GL_RENDERBUFFER_EXT;
 
-RenderBuffer::RenderBuffer()
+Renderbuffer::Renderbuffer()
 {
   glGenRenderbuffersEXT( 1, &id_ );
 
-  _safe_bind();
-  _safe_unbind();
+  safe_bind();
+  safe_unbind();
 }
 
-RenderBuffer::~RenderBuffer()
+Renderbuffer::~Renderbuffer()
 {
   glDeleteRenderbuffersEXT( 1, &id_ );
 }
 
-void RenderBuffer::bind()
+void Renderbuffer::bind()
 {
   glBindRenderbufferEXT( TARGET_, id_ );
 }
 
-void RenderBuffer::set_storage(int width, int height, unsigned int internal_format, int samples)
+void Renderbuffer::set_storage(int width, int height, unsigned int internal_format, int samples)
 {
-  _safe_bind();
+  safe_bind();
   if (samples > 1)
   {
     glRenderbufferStorageMultisampleEXT(TARGET_, samples, internal_format, width, height);
@@ -62,15 +62,15 @@ void RenderBuffer::set_storage(int width, int height, unsigned int internal_form
   {
     glRenderbufferStorageEXT(TARGET_, internal_format, width, height);
   }
-  _safe_unbind();
+  safe_unbind();
 }
 
-void RenderBuffer::unbind()
+void Renderbuffer::unbind()
 {
   glBindRenderbufferEXT( TARGET_, 0 );
 }
 
-void RenderBuffer::_safe_bind()
+void Renderbuffer::safe_bind()
 {
   glGetIntegerv( GL_RENDERBUFFER_BINDING_EXT, &saved_id_ );
   if ( static_cast< int > ( id_ ) != saved_id_ )
@@ -79,7 +79,7 @@ void RenderBuffer::_safe_bind()
   }
 }
 
-void RenderBuffer::_safe_unbind()
+void Renderbuffer::safe_unbind()
 {
   if ( static_cast< int > ( id_ ) != saved_id_ )
   {
@@ -87,4 +87,4 @@ void RenderBuffer::_safe_unbind()
   }
 }
 
-} // end namespace Seg3D
+} // end namespace Utils

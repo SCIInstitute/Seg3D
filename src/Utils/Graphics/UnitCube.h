@@ -49,12 +49,11 @@ public:
 private:
   VertexBufferObjectHandle vertices_buffer_;
   VertexBufferObjectHandle faces_buffer_;
-  VertexBufferObjectHandle colors_buffer_;
 
   const static GLfloat VERTICES_C[ 8 ][ 3 ];
-  const static GLubyte FACES_C[ 6 ][ 4 ];
+  const static GLushort FACES_C[ 6 ][ 4 ];
 };
 
-} // end namespace Seg3D
+} // end namespace Utils
 
 #endif

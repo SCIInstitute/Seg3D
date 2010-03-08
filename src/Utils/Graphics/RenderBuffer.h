@@ -37,14 +37,14 @@
 namespace Utils
 {
 
-class RenderBuffer;
-typedef boost::shared_ptr< RenderBuffer > RenderBufferHandle;
+class Renderbuffer;
+typedef boost::shared_ptr< Renderbuffer > RenderBufferHandle;
 
-class RenderBuffer : public boost::noncopyable
+class Renderbuffer : public boost::noncopyable
 {
 public:
-  RenderBuffer();
-  ~RenderBuffer();
+  Renderbuffer();
+  ~Renderbuffer();
 
   void bind();
   void unbind();
@@ -62,8 +62,8 @@ inline unsigned int get_target() const
 }
 
 private:
-  void _safe_bind();
-  void _safe_unbind();
+  void safe_bind();
+  void safe_unbind();
 
   unsigned int id_;
   int saved_id_;
@@ -71,6 +71,6 @@ private:
 const static unsigned int TARGET_;
 };
 
-} // end namespace Seg3D
+} // end namespace Utils
 
 #endif

@@ -124,8 +124,8 @@ void Renderer::initialize()
 
   textures_[ 0 ] = Utils::TextureHandle( new Utils::Texture2D() );
   textures_[ 1 ] = Utils::TextureHandle( new Utils::Texture2D() );
-  depth_buffer_ = Utils::RenderBufferHandle( new Utils::RenderBuffer() );
-  frame_buffer_ = Utils::FrameBufferObjectHandle( new Utils::FrameBufferObject() );
+  depth_buffer_ = Utils::RenderBufferHandle( new Utils::Renderbuffer() );
+  frame_buffer_ = Utils::FrameBufferObjectHandle( new Utils::FramebufferObject() );
   frame_buffer_->attach_render_buffer( depth_buffer_, GL_DEPTH_ATTACHMENT_EXT );
   this->cube_ = Utils::UnitCubeHandle( new Utils::UnitCube() );
 
