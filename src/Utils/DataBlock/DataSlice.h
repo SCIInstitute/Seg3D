@@ -79,15 +79,13 @@ public:
     }
   }
 
-  template<class DATA_TYPE>
-  inline DATA_TYPE get_data_at ( size_t i, size_t j ) const
+  inline double get_data_at ( size_t i, size_t j ) const
   {
-    return this->data_block_->get_data_at<DATA_TYPE>( 
+    return this->data_block_->get_data_at( 
       this->index_func_[ this->slice_type_ ]( i, j ) );
   }
 
-  template<class DATA_TYPE>
-  inline void set_data_at( size_t i, size_t j, DATA_TYPE value ) 
+  inline void set_data_at( size_t i, size_t j, double value ) 
   {
     this->data_block_->set_data_at( 
       this->index_func_[ this->slice_type_ ]( i, j ), value );
