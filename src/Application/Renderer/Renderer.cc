@@ -122,10 +122,10 @@ void Renderer::initialize()
   // lock the shared render context
   RenderResources::lock_type lock( RenderResources::Instance()->shared_context_mutex() );
 
-  textures_[ 0 ] = Utils::TextureHandle( new Utils::Texture2D() );
-  textures_[ 1 ] = Utils::TextureHandle( new Utils::Texture2D() );
-  depth_buffer_ = Utils::RenderBufferHandle( new Utils::Renderbuffer() );
-  frame_buffer_ = Utils::FrameBufferObjectHandle( new Utils::FramebufferObject() );
+  textures_[ 0 ] = Utils::Texture2DHandle( new Utils::Texture2D() );
+  textures_[ 1 ] = Utils::Texture2DHandle( new Utils::Texture2D() );
+  depth_buffer_ = Utils::RenderbufferHandle( new Utils::Renderbuffer() );
+  frame_buffer_ = Utils::FramebufferObjectHandle( new Utils::FramebufferObject() );
   frame_buffer_->attach_render_buffer( depth_buffer_, GL_DEPTH_ATTACHMENT_EXT );
   this->cube_ = Utils::UnitCubeHandle( new Utils::UnitCube() );
 
@@ -297,10 +297,10 @@ void Renderer::resize( int width, int height )
 
   {
     RenderResources::lock_type lock( RenderResources::Instance()->shared_context_mutex() );
-    textures_[ 0 ] = Utils::TextureHandle( new Utils::Texture2D() );
-    textures_[ 1 ] = Utils::TextureHandle( new Utils::Texture2D() );
-    textures_[ 0 ]->set_image( width, height, 1, GL_RGBA );
-    textures_[ 1 ]->set_image( width, height, 1, GL_RGBA );
+    textures_[ 0 ] = Utils::Texture2DHandle( new Utils::Texture2D() );
+    textures_[ 1 ] = Utils::Texture2DHandle( new Utils::Texture2D() );
+    textures_[ 0 ]->set_image( width, height, GL_RGBA );
+    textures_[ 1 ]->set_image( width, height, GL_RGBA );
 
     depth_buffer_->set_storage( width, height, GL_DEPTH_COMPONENT );
   }

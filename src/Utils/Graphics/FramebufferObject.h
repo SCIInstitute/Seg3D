@@ -41,7 +41,7 @@ namespace Utils
 {
 
 class FramebufferObject;
-typedef boost::shared_ptr< FramebufferObject > FrameBufferObjectHandle;
+typedef boost::shared_ptr< FramebufferObject > FramebufferObjectHandle;
 
 class FramebufferObject : public boost::noncopyable
 {
@@ -55,7 +55,7 @@ public:
   void disable();
 
   void attach_texture(TextureHandle texture, unsigned int attachment = GL_COLOR_ATTACHMENT0_EXT, int level = 0, int layer = 0);
-  void attach_render_buffer(RenderBufferHandle render_buffer, unsigned int attachment);
+  void attach_render_buffer(RenderbufferHandle render_buffer, unsigned int attachment);
   bool check_status( GLenum* status = NULL );
 
 private:
@@ -66,7 +66,7 @@ private:
   unsigned int id_;
   int saved_id_;
 
-const static unsigned int TARGET_C;
+  const static unsigned int TARGET_C;
 };
 
 } // end namespace Utils

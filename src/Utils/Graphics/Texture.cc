@@ -111,6 +111,16 @@ void Texture::safe_unbind()
   }
 }
 
+void Texture::SetActiveTextureUnit( unsigned int unit )
+{
+  glActiveTexture( GL_TEXTURE0 + unit );
+}
+
+void Texture::SetClientActiveTextureUnit( unsigned int unit )
+{
+  glClientActiveTexture( GL_TEXTURE0 + unit );
+}
+
 Texture1D::Texture1D() :
   Texture()
 {
@@ -122,12 +132,20 @@ Texture1D::Texture1D() :
   set_wrap_s( GL_CLAMP );
 }
 
-void Texture1D::set_image(int width, int height, int depth, int internal_format, const void *pixels,
-  unsigned int format, unsigned int type, int level)
+void Texture1D::set_image( int width, int internal_format, const void *pixels, 
+              unsigned int format, unsigned int type, int level )
 {
-  safe_bind();
-  glTexImage1D(target_, level, internal_format, width, 0, format, type, pixels);
-  safe_unbind();
+  this->safe_bind();
+  glTexImage1D( this->target_, level, internal_format, width, 0, format, type, pixels );
+  this->safe_unbind();
+}
+
+void Texture1D::set_sub_image( int xoffset, int width, const void* data, 
+                unsigned int format, unsigned int type, int level )
+{
+  this->safe_bind();
+  glTexSubImage1D( this->target_, level, xoffset, width, format, type, data );
+  this->safe_unbind();
 }
 
 Texture2D::Texture2D() :
@@ -142,12 +160,20 @@ Texture2D::Texture2D() :
   set_wrap_t( GL_CLAMP );
 }
 
-void Texture2D::set_image(int width, int height, int depth, int internal_format, const void *pixels,
-  unsigned int format, unsigned int type, int level)
+void Texture2D::set_image(int width, int height, int internal_format, const void *pixels,
+                unsigned int format, unsigned int type, int level)
 {
   safe_bind();
   glTexImage2D(target_, level, internal_format, width, height, 0, format, type, pixels);
   safe_unbind();
+}
+
+void Texture2D::set_sub_image( int xoffset, int yoffset, int width, int height, 
+                const void* data, unsigned int format, unsigned int type, int level /* = 0 */ )
+{
+  this->safe_bind();
+  glTexSubImage2D( this->target_, level, xoffset, yoffset, width, height, format, type, data );
+  this->safe_unbind();
 }
 
 Texture3D::Texture3D() :
@@ -166,9 +192,17 @@ Texture3D::Texture3D() :
 void Texture3D::set_image(int width, int height, int depth, int internal_format, const void *pixels,
   unsigned int format, unsigned int type, int level)
 {
-  safe_bind();
+  this->safe_bind();
   glTexImage3D(target_, level, internal_format, width, height, depth, 0, format, type, pixels);
-  safe_unbind();
+  this->safe_unbind();
+}
+
+void Texture3D::set_sub_image( int xoffset, int yoffset, int zoffset, int width, int height, int depth, 
+                const void* data, unsigned int format, unsigned int type, int level /* = 0 */ )
+{
+  this->safe_bind();
+  glTexSubImage3D( this->target_, level, xoffset, yoffset, zoffset, width, height, depth, format, type, data );
+  this->safe_unbind();
 }
 
 } // end namespace Utils

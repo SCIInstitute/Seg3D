@@ -26,49 +26,58 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef UTILS_GRAPHICS_PIXELBUFFEROBJECT_H
-#define UTILS_GRAPHICS_PIXELBUFFEROBJECT_H
+#ifndef UTILS_GRAPHICS_BUFFEROBJECT_H
+#define UTILS_GRAPHICS_BUFFEROBJECT_H
 
-#include <boost/smart_ptr.hpp>
-#include <boost/utility.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <GL/glew.h>
-
-#include <Utils/Graphics/BufferObject.h>
 
 namespace Utils
 {
 
-class PixelBufferObject;
-typedef boost::shared_ptr< PixelBufferObject > PixelBufferObjectHandle;
+class BufferObject;
+typedef boost::shared_ptr< BufferObject > BufferObjectHandle;
 
-class PixelBufferObject : public BufferObject
+class BufferObject
 {
 protected:
-  PixelBufferObject();
-  PixelBufferObject( const BufferObjectHandle& bo );
-  virtual ~PixelBufferObject();
-};
+  // Default constructor
+  BufferObject();
 
-class PixelPackBuffer : public PixelBufferObject
-{
-public:
-  PixelPackBuffer();
-  PixelPackBuffer( const BufferObjectHandle& bo );
-  virtual ~PixelPackBuffer() {}
+  // Copy constructor
+  // Allows binding buffer objects to different targets. The destructor will not
+  // delete the underlying OpenGL object. It is deleted by the original instance.
+  BufferObject( const BufferObjectHandle& bo );
+
+  virtual ~BufferObject();
 
 public:
-  static void RestoreDefault();
-};
+  void set_buffer_data( GLsizeiptr size, const GLvoid* data, GLenum usage );
+  void set_buffer_sub_data( GLintptr offset, GLsizeiptr size, const GLvoid* data );
 
-class PixelUnpackBuffer : public PixelBufferObject
-{
-public:
-  PixelUnpackBuffer();
-  PixelUnpackBuffer( const BufferObjectHandle& bo );
-  virtual ~PixelUnpackBuffer() {}
-public:
-  static void RestoreDefault();
+  void bind();
+  void unbind();
+
+  void* map_buffer(GLenum access);
+  GLboolean unmap_buffer();
+
+protected:
+  void safe_bind();
+  void safe_unbind();
+
+protected:
+  GLenum target_;
+  GLenum query_target_;
+
+private:
+  BufferObject& operator=( const BufferObject& bo );
+
+private:
+  GLuint id_;
+  GLint saved_id_;
+  bool copy_constructed_;
+  BufferObjectHandle buffer_object_;
 };
 
 } // end namespace Utils

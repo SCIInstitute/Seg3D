@@ -31,86 +31,60 @@
 namespace Utils
 {
 
-PixelBufferObject::PixelBufferObject( PixelBufferType buffer_type )
+PixelBufferObject::PixelBufferObject() :
+  BufferObject()
 {
-  if ( buffer_type == PixelBufferType::PACK_BUFFER_E )
-  {
-    this->target_ = GL_PIXEL_PACK_BUFFER;
-    this->query_target_ = GL_PIXEL_PACK_BUFFER_BINDING;
-  }
-  else
-  {
-    this->target_ = GL_PIXEL_UNPACK_BUFFER;
-    this->query_target_ = GL_PIXEL_UNPACK_BUFFER_BINDING;
-  }
+}
 
-  glGenBuffers( 1, &( this->id_ ) );
-  this->saved_id_ = 0;
-
-  this->safe_bind();
-  this->safe_unbind();
+PixelBufferObject::PixelBufferObject( const BufferObjectHandle& bo ) :
+  BufferObject( bo )
+{
 }
 
 PixelBufferObject::~PixelBufferObject()
 {
-  glDeleteBuffers( 1, &( this->id_ ) );
 }
 
-void PixelBufferObject::bind()
+PixelPackBuffer::PixelPackBuffer() :
+  PixelBufferObject()
 {
-  glBindBuffer( this->target_, this->id_ );
-}
-
-void PixelBufferObject::unbind()
-{
-  glBindBuffer( this->target_, 0 );
-}
-
-void PixelBufferObject::safe_bind()
-{
-  glGetIntegerv( this->query_target_, &( this->saved_id_ ) );
-  if ( this->id_ != this->saved_id_ )
-  {
-    glBindBuffer( this->target_, this->id_ );
-  }
-}
-
-void PixelBufferObject::safe_unbind()
-{
-  if ( this->id_ != this->saved_id_ )
-  {
-    glBindBuffer( this->target_, this->saved_id_ );
-  }
-}
-
-void PixelBufferObject::set_buffer_data( GLsizeiptr size, const GLvoid* data, GLenum usage )
-{
+  this->target_ = GL_PIXEL_PACK_BUFFER;
+  this->query_target_ = GL_PIXEL_PACK_BUFFER_BINDING;
   this->safe_bind();
-  glBufferData( this->target_, size, data, usage );
   this->safe_unbind();
 }
 
-void PixelBufferObject::set_buffer_sub_data( GLintptr offset, GLsizeiptr size, const GLvoid* data )
+PixelPackBuffer::PixelPackBuffer( const BufferObjectHandle& bo ) :
+  PixelBufferObject( bo )
 {
+  this->target_ = GL_PIXEL_PACK_BUFFER;
+  this->query_target_ = GL_PIXEL_PACK_BUFFER_BINDING;
+}
+
+void PixelPackBuffer::RestoreDefault()
+{
+  glBindBuffer( GL_PIXEL_PACK_BUFFER, 0 );
+}
+
+PixelUnpackBuffer::PixelUnpackBuffer() :
+  PixelBufferObject()
+{
+  this->target_ = GL_PIXEL_UNPACK_BUFFER;
+  this->query_target_ = GL_PIXEL_UNPACK_BUFFER_BINDING;
   this->safe_bind();
-  glBufferSubData( this->target_, offset, size, data );
   this->safe_unbind();
 }
 
-void* PixelBufferObject::map_buffer( GLenum access )
+PixelUnpackBuffer::PixelUnpackBuffer( const BufferObjectHandle& bo ) :
+  PixelBufferObject( bo )
 {
-  this->safe_bind();
-  void* buffer = glMapBuffer( this->target_, access );
-  this->safe_unbind();
-  return buffer;
+  this->target_ = GL_PIXEL_UNPACK_BUFFER;
+  this->query_target_ = GL_PIXEL_UNPACK_BUFFER_BINDING;
 }
 
-GLboolean PixelBufferObject::unmap_buffer()
+void PixelUnpackBuffer::RestoreDefault()
 {
-  this->safe_bind();
-  GLboolean result = glUnmapBuffer( this->target_ );
-  this->safe_unbind();
-  return result;
+  glBindBuffer( GL_PIXEL_UNPACK_BUFFER, 0 );
 }
 
 } // end namespace Utils

@@ -78,9 +78,9 @@ private:
   // Context for rendering images
   RenderContextHandle context_;
 
-  Utils::TextureHandle textures_[ 2 ];
-  Utils::RenderBufferHandle depth_buffer_;
-  Utils::FrameBufferObjectHandle frame_buffer_;
+  Utils::Texture2DHandle textures_[ 2 ];
+  Utils::RenderbufferHandle depth_buffer_;
+  Utils::FramebufferObjectHandle frame_buffer_;
   Utils::UnitCubeHandle cube_;
 
   int active_render_texture_;

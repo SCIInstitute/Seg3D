@@ -47,8 +47,8 @@ public:
   void draw();
 
 private:
-  VertexBufferObjectHandle vertices_buffer_;
-  VertexBufferObjectHandle faces_buffer_;
+  VertexAttribArrayBufferHandle vertices_buffer_;
+  ElementArrayBufferHandle faces_buffer_;
 
   const static GLfloat VERTICES_C[ 8 ][ 3 ];
   const static GLushort FACES_C[ 6 ][ 4 ];

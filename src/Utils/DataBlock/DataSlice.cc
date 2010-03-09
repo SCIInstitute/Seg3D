@@ -35,7 +35,7 @@ namespace Utils
 DataSlice::DataSlice( const DataBlockHandle& data_block, 
            SliceType slice_type, size_t slice_num ) :
   data_block_( data_block ), slice_type_( slice_type ), slice_number_ ( slice_num ),
-  data_changed_( true )
+  slice_changed_( true )
 {
   this->index_func_[0] = boost::bind( &DataBlock::to_index, this->data_block_, 
     _1, _2, boost::bind( &DataSlice::slice_number, this ) );
@@ -55,11 +55,6 @@ DataSlice::DataSlice( const DataBlockHandle& data_block,
 
 DataSlice::~DataSlice()
 {
-}
-
-void DataSlice::upload_texture()
-{
-  // To be implemented
 }
 
 } // end namespace Utils

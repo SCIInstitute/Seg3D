@@ -61,7 +61,10 @@ public:
     if ( this->slice_type_ != type )
     {
       this->slice_type_ = type;
-      this->data_changed_ = true;
+      this->slice_changed_ = true;
+      this->width_ = this->width_func_[ this->slice_type_ ]();
+      this->height_ = this->height_func_[ this->slice_type_ ]();
+      this->size_changed_ = true;
     }
   }
 
@@ -70,7 +73,7 @@ public:
     if ( this->slice_number_ != slice_num )
     {
       this->slice_number_ = slice_num;
-      this->data_changed_ = true;
+      this->slice_changed_ = true;
     }
   }
 
@@ -99,21 +102,21 @@ public:
 
   inline size_t width() const
   {
-    return this->width_func_[ this->slice_type_ ]();
+    return this->width_;
   }
 
   inline size_t height() const
   {
-    return this->height_func_[ this->slice_type_ ]();
+    return this->height_;
   }
 
   inline void set_changed( bool changed = true )
   {
-    this->data_changed_ = changed;
+    this->slice_changed_ = changed;
   }
 
   // Upload the mask slice to graphics texture.
-  // NOTE: This function allocates memory on the GPU, so the caller should
+  // NOTE: This function allocates resources on the GPU, so the caller should
   // acquire a lock on the RenderResources before calling this function. The caller should
   // also lock the MaskDataSlice object for data consistency.
   void upload_texture();
@@ -156,12 +159,17 @@ private:
   MaskDataBlockHandle mask_data_block_;
   SliceType slice_type_;
   size_t slice_number_;
-  bool data_changed_;
-  TextureHandle texture_;
+  bool slice_changed_;
+  bool size_changed_;
+
+  size_t width_;
+  size_t height_;
+
+  Texture2DHandle texture_;
   PixelBufferObjectHandle pixel_buffer_;
 
 };
 
-} // end namespace Seg3D
+} // end namespace Utils
 
 #endif

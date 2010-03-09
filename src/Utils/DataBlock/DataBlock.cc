@@ -105,13 +105,11 @@ void DataBlock::upload_texture()
   if ( !this->texture_.get() )
   {
     // The texture is not created yet
-    this->texture_ = TextureHandle( new Texture3D );
+    this->texture_ = Texture3DHandle( new Texture3D );
   }
 
   if ( this->data_changed_ )
   {
-    Texture::lock_type lock( this->texture_->get_mutex() );
-
     glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
     this->texture_->set_image( static_cast<int>(this->nx_), static_cast<int>(this->ny_), 
       static_cast<int>(this->nz_), GL_TEXTURE_FORMAT_C[ this->data_type_ ], this->data_, 

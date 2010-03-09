@@ -66,7 +66,7 @@ public:
     if ( this->slice_type_ != type )
     {
       this->slice_type_ = type;
-      this->data_changed_ = true;
+      this->slice_changed_ = true;
     }
   }
 
@@ -75,7 +75,7 @@ public:
     if ( this->slice_number_ != slice_num )
     {
       this->slice_number_ = slice_num;
-      this->data_changed_ = true;
+      this->slice_changed_ = true;
     }
   }
 
@@ -110,10 +110,8 @@ public:
 
   inline void set_changed( bool changed = true )
   {
-    this->data_changed_ = changed;
+    this->slice_changed_ = changed;
   }
-
-  void upload_texture();
 
 public:
 
@@ -153,8 +151,7 @@ private:
   DataBlockHandle data_block_;
   SliceType slice_type_;
   size_t slice_number_;
-  bool data_changed_;
-  TextureHandle texture_;
+  bool slice_changed_;
 
 };
 

@@ -271,7 +271,7 @@ private:
   boost::function<void (size_t, double)> set_data_func_;
 
   bool data_changed_;
-  TextureHandle texture_;
+  Texture3DHandle texture_;
 
   // An array of GLenum's for data types, indexed by data_type values
   const static unsigned int GL_DATA_TYPE_C[];

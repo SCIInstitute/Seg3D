@@ -35,7 +35,7 @@ MaskDataSlice::MaskDataSlice( const MaskDataBlockHandle &mask_data_block,
                           SliceType slice_type, size_t slice_num ) :
   mask_data_block_( mask_data_block ), 
   slice_type_( slice_type ), slice_number_ ( slice_num ),
-  data_changed_( true )
+  slice_changed_( true ), size_changed_( true )
 {
   this->index_func_[0] = boost::bind( &MaskDataBlock::to_index, this->mask_data_block_, 
     _1, _2, boost::bind( &MaskDataSlice::slice_number, this ) );
@@ -54,6 +54,9 @@ MaskDataSlice::MaskDataSlice( const MaskDataBlockHandle &mask_data_block,
 
   this->add_connection( this->mask_data_block_->mask_updated_signal_.connect( 
     boost::bind(&MaskDataSlice::set_changed, this, true) ) );
+
+  this->width_ = this->width_func_[ this->slice_type_ ]();
+  this->height_ = this->height_func_[ this->slice_type_ ]();
 }
 
 MaskDataSlice::~MaskDataSlice()
@@ -65,41 +68,50 @@ void MaskDataSlice::upload_texture()
 {
   if ( !this->texture_.get() )
   {
-    this->texture_ = TextureHandle( new Texture2D );
-    this->pixel_buffer_ = PixelBufferObjectHandle( 
-      new PixelBufferObject( PixelBufferType::UNPACK_BUFFER_E ) );
+    this->texture_ = Texture2DHandle( new Texture2D );
+    // It doesn't make sense to use linear interpolation for mask texture
+    this->texture_->set_mag_filter( GL_NEAREST );
+    this->texture_->set_min_filter( GL_NEAREST );
   }
 
-  if ( this->data_changed_ )
+  if ( this->slice_changed_ )
   {
-    glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
-    size_t w = this->width();
-    size_t h = this->height();
-
+    if ( this->size_changed_ )
+    {
+      PixelUnpackBuffer::RestoreDefault();
+      this->texture_->set_image( static_cast<int>( this->width_ ), 
+        static_cast<int>( this->height_ ), GL_ALPHA );
+      this->size_changed_ = false;
+    }
+    
     // Step 1. copy the data in the slice to a pixel unpack buffer
+    this->pixel_buffer_ = PixelBufferObjectHandle( new PixelUnpackBuffer );
     this->pixel_buffer_->bind();
-    this->pixel_buffer_->set_buffer_data( sizeof(unsigned char) * w * h,
+    this->pixel_buffer_->set_buffer_data( sizeof(unsigned char) * this->width_ * this->height_,
       NULL, GL_STREAM_DRAW );
     unsigned char* buffer = reinterpret_cast<unsigned char*>(
       this->pixel_buffer_->map_buffer( GL_WRITE_ONLY ) );
-    for ( size_t j = 0; j < h; j++ )
+    for ( size_t j = 0; j < this->height_; j++ )
     {
-      for ( size_t i = 0; i < w; i++ )
+      for ( size_t i = 0; i < this->width_; i++ )
       {
         size_t index = this->to_index( i, j );
-        buffer[ j * w + i ] = this->mask_data_block_->get_mask_at( index );
+        buffer[ j * this->width_ + i ] = this->mask_data_block_->get_mask_at( index );
       }
     }
     
     // Step 2. copy from the pixel buffer to texture
     this->pixel_buffer_->unmap_buffer();
-    this->texture_->set_image( static_cast<int>( w ), static_cast<int>( h ), 1, 
-      GL_ALPHA, 0, GL_ALPHA, GL_UNSIGNED_BYTE );
+    glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+    this->texture_->set_sub_image( 0, 0, static_cast<int>( this->width_ ), 
+      static_cast<int>( this->height_ ), NULL, GL_ALPHA, GL_UNSIGNED_BYTE );
+
+    // Step 3. release the pixel unpack buffer
     this->pixel_buffer_->unbind();
+    this->pixel_buffer_.reset();
 
-    this->data_changed_ = false;
+    this->slice_changed_ = false;
   }
-
 }
 
-} // end namespace Seg3D
+} // end namespace Utils

@@ -31,18 +31,16 @@
 
 #include <vector>
 
-#include <boost/utility.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/function.hpp>
 
 #include <GL/glew.h>
 
 #include <Utils/Core/EnumClass.h>
+#include <Utils/Graphics/BufferObject.h>
 
 namespace Utils
 {
-class VertexBufferObject;
-typedef boost::shared_ptr< VertexBufferObject > VertexBufferObjectHandle;
 
 SCI_ENUM_CLASS
 (
@@ -57,28 +55,41 @@ SCI_ENUM_CLASS
   EDGE_FLAG_E
 )
 
-class VertexBufferObject : public boost::noncopyable
+class VertexBufferObject;
+class VertexAttribArrayBuffer;
+class ElementArrayBuffer;
+typedef boost::shared_ptr< VertexBufferObject > VertexBufferObjectHandle;
+typedef boost::shared_ptr< VertexAttribArrayBuffer > VertexAttribArrayBufferHandle;
+typedef boost::shared_ptr< ElementArrayBuffer > ElementArrayBufferHandle;
+
+class VertexBufferObject : public BufferObject
+{
+protected:
+  VertexBufferObject();
+  VertexBufferObject( const BufferObjectHandle& bo );
+  virtual ~VertexBufferObject();
+};
+
+class VertexAttribArrayBuffer : public VertexBufferObject
 {
 private:
-  
-  class VertexArrayInfo
+
+  class VertexAttribArrayInfo
   {
   public:
-    VertexArrayInfo(VertexAttribArrayType array_type) : type_(array_type) {}
-    ~VertexArrayInfo() {}
+    VertexAttribArrayInfo(VertexAttribArrayType array_type) : type_(array_type) {}
+    ~VertexAttribArrayInfo() {}
 
     VertexAttribArrayType type_;
     boost::function< void () > gl_array_pointer_func_;
   };
 
-  typedef boost::shared_ptr< VertexArrayInfo > VertexArrayInfoHandle;
+  typedef boost::shared_ptr< VertexAttribArrayInfo > VertexAttribArrayInfoHandle;
 
 public:
-  VertexBufferObject( GLenum target );
-  ~VertexBufferObject();
-
-  void set_buffer_data( GLsizeiptr size, const GLvoid* data, GLenum usage );
-  void set_buffer_sub_data( GLintptr offset, GLsizeiptr size, const GLvoid* data );
+  VertexAttribArrayBuffer();
+  VertexAttribArrayBuffer( const BufferObjectHandle& bo );
+  virtual ~VertexAttribArrayBuffer() {}
 
   // SET_ARRAY:
   // Set up a vertex attribute array in the vertex buffer
@@ -90,31 +101,27 @@ public:
   void enable_arrays();
   void disable_arrays();
 
-  void bind();
-  void unbind();
-
   void draw_arrays( GLenum mode, GLint first, GLsizei count );
   void multi_draw_arrays( GLenum mode, GLint* first, GLsizei* count, GLsizei primcount );
+
+private:
+  std::vector<VertexAttribArrayInfoHandle> vertex_arrays_;
+  const static GLenum GL_ARRAY_TYPES_C[];
+
+};
+
+class ElementArrayBuffer : public VertexBufferObject
+{
+public:
+  ElementArrayBuffer();
+  ElementArrayBuffer( const BufferObjectHandle& bo );
+  virtual ~ElementArrayBuffer() {}
 
   void draw_elements( GLenum mode, GLsizei count, GLenum data_type, int offset = 0 );
   void draw_range_elements( GLenum mode, GLuint start, GLuint end, GLsizei count, 
     GLenum data_type, int offset = 0 );
   void multi_draw_elements( GLenum mode, GLsizei* count, GLenum data_type,
     const GLvoid** offsets, GLsizei primcount );
-
-private:
-  void safe_bind();
-  void safe_unbind();
-
-private:
-  GLenum target_;
-  GLenum query_target_;
-  GLuint id_;
-  GLint saved_id_;
-
-  std::vector<VertexArrayInfoHandle> vertex_arrays_;
-
-  const static GLenum GL_ARRAY_TYPES_C[];
 };
 
 } // end namespace Utils

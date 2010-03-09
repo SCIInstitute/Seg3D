@@ -55,16 +55,14 @@ const GLushort UnitCube::FACES_C[ 6 ][ 4 ] =
 
 UnitCube::UnitCube()
 {
-  this->vertices_buffer_ = VertexBufferObjectHandle( 
-    new VertexBufferObject( GL_ARRAY_BUFFER ) );
+  this->vertices_buffer_ = VertexAttribArrayBufferHandle( new VertexAttribArrayBuffer );
   this->vertices_buffer_->set_buffer_data( sizeof(GLfloat) * 8 * 3,
       reinterpret_cast< const GLvoid* > ( &VERTICES_C[ 0 ][ 0 ] ), GL_STATIC_DRAW );
   this->vertices_buffer_->set_array( VertexAttribArrayType::VERTEX_E, 3, GL_FLOAT, 0, 0 );
   this->vertices_buffer_->set_array( VertexAttribArrayType::COLOR_E, 3, GL_FLOAT, 0, 0 );
 
 
-  this->faces_buffer_ = VertexBufferObjectHandle( 
-    new VertexBufferObject( GL_ELEMENT_ARRAY_BUFFER ) );
+  this->faces_buffer_ = ElementArrayBufferHandle( new ElementArrayBuffer );
   this->faces_buffer_->set_buffer_data( sizeof(GLushort) * 6 * 4,
       reinterpret_cast< const GLvoid* > ( &FACES_C[ 0 ][ 0 ] ), GL_STATIC_DRAW );
 }

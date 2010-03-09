@@ -40,8 +40,13 @@ namespace Utils
 {
 
 class Texture;
+class Texture1D;
+class Texture2D;
+class Texture3D;
 typedef boost::shared_ptr< Texture > TextureHandle;
-typedef boost::shared_ptr< const Texture > TextureConstHandle;
+typedef boost::shared_ptr< Texture1D > Texture1DHandle;
+typedef boost::shared_ptr< Texture2D > Texture2DHandle;
+typedef boost::shared_ptr< Texture3D > Texture3DHandle;
 
 // CLASS TEXTURE
 // A wrapper of the OpenGL texture
@@ -52,11 +57,7 @@ class Texture : public boost::noncopyable
   // -- Constructor/Destructor --
 public:
   Texture();
-
-  virtual ~Texture();
-
-  virtual void set_image(int width, int height, int depth, int internal_format = GL_RGBA, const void *pixels = 0,
-    unsigned int format = GL_RGBA, unsigned int type = GL_UNSIGNED_BYTE, int level = 0) = 0;
+  virtual ~Texture() = 0;
 
   void enable();
   void disable();
@@ -106,6 +107,10 @@ protected:
   unsigned int query_target_;
 
   mutex_type mutex_;
+
+public:
+  static void SetActiveTextureUnit( unsigned int unit );
+  static void SetClientActiveTextureUnit( unsigned int unit );
 };
 
 // CLASS TEXTURE1D
@@ -114,9 +119,12 @@ class Texture1D : public Texture
 {
 public:
   Texture1D();
+  virtual ~Texture1D() {}
 
-void set_image(int width, int height, int depth, int internal_format = GL_RGBA, const void *pixels = 0,
-  unsigned int format = GL_RGBA, unsigned int type = GL_UNSIGNED_BYTE, int level = 0);
+  void set_image(int width, int internal_format = GL_RGBA, const void *pixels = 0, 
+    unsigned int format = GL_RGBA, unsigned int type = GL_UNSIGNED_BYTE, int level = 0);
+  void set_sub_image( int xoffset, int width, const void* data, unsigned int format, 
+    unsigned int type, int level = 0 );
 };
 
 // CLASS TEXTURE2D
@@ -124,10 +132,13 @@ void set_image(int width, int height, int depth, int internal_format = GL_RGBA, 
 class Texture2D : public Texture
 {
 public:
-Texture2D();
+  Texture2D();
+  virtual ~Texture2D() {}
 
-void set_image(int width, int height, int depth, int internal_format = GL_RGBA, const void *pixels = 0,
-  unsigned int format = GL_RGBA, unsigned int type = GL_UNSIGNED_BYTE, int level = 0);
+  void set_image(int width, int height, int internal_format = GL_RGBA, const void *pixels = 0,
+    unsigned int format = GL_RGBA, unsigned int type = GL_UNSIGNED_BYTE, int level = 0);
+  void set_sub_image( int xoffset, int yoffset, int width, int height, const void* data, 
+    unsigned int format, unsigned int type, int level = 0 );
 };
 
 // CLASS TEXTURE3D
@@ -135,10 +146,13 @@ void set_image(int width, int height, int depth, int internal_format = GL_RGBA, 
 class Texture3D : public Texture
 {
 public:
-Texture3D();
+  Texture3D();
+  virtual ~Texture3D() {}
 
-void set_image(int width, int height, int depth, int internal_format = GL_RGBA, const void *pixels = 0,
-  unsigned int format = GL_RGBA, unsigned int type = GL_UNSIGNED_BYTE, int level = 0);
+  void set_image(int width, int height, int depth, int internal_format = GL_RGBA, const void *pixels = 0,
+    unsigned int format = GL_RGBA, unsigned int type = GL_UNSIGNED_BYTE, int level = 0);
+  void set_sub_image( int xoffset, int yoffset, int zoffset, int width, int height, int depth,
+    const void* data, unsigned int format, unsigned int type, int level = 0 );
 };
 
 } // end namespace Utils

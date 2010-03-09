@@ -56,7 +56,7 @@ void FramebufferObject::disable()
   glBindFramebufferEXT( TARGET_C, 0 );
 }
 
-void FramebufferObject::attach_render_buffer(RenderBufferHandle render_buffer, unsigned int attachment)
+void FramebufferObject::attach_render_buffer(RenderbufferHandle render_buffer, unsigned int attachment)
 {
   safe_bind();
   glFramebufferRenderbufferEXT(TARGET_C, attachment, render_buffer->get_target(), render_buffer->get_id());
@@ -70,13 +70,13 @@ void FramebufferObject::attach_texture(TextureHandle texture, unsigned int attac
   unsigned int texture_target = texture->get_target();
   switch (texture_target)
   {
-    case GL_TEXTURE_1D:
+  case GL_TEXTURE_1D:
     glFramebufferTexture1DEXT(TARGET_C, attachment, texture_target, texture->get_id(), level);
     break;
-    case GL_TEXTURE_3D:
+  case GL_TEXTURE_3D:
     glFramebufferTexture3DEXT(TARGET_C, attachment, texture_target, texture->get_id(), level, layer);
     break;
-    default:
+  default:
     glFramebufferTexture2DEXT(TARGET_C, attachment, texture_target, texture->get_id(), level);
   }
 

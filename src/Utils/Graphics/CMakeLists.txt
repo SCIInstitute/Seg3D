@@ -38,6 +38,8 @@ SET(UTILS_GRAPHICS_SRCS
   Renderbuffer.cc
   FramebufferObject.h
   FramebufferObject.cc
+  BufferObject.h
+  BufferObject.cc
   VertexBufferObject.h
   VertexBufferObject.cc
   PixelBufferObject.h

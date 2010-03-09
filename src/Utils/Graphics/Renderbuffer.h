@@ -38,7 +38,7 @@ namespace Utils
 {
 
 class Renderbuffer;
-typedef boost::shared_ptr< Renderbuffer > RenderBufferHandle;
+typedef boost::shared_ptr< Renderbuffer > RenderbufferHandle;
 
 class Renderbuffer : public boost::noncopyable
 {
@@ -49,17 +49,17 @@ public:
   void bind();
   void unbind();
 
-void set_storage(int width, int height, unsigned int internal_format, int samples = 1);
+  void set_storage(int width, int height, unsigned int internal_format, int samples = 1);
 
-inline unsigned int get_id() const
-{
-  return id_;
-}
+  inline unsigned int get_id() const
+  {
+    return id_;
+  }
 
-inline unsigned int get_target() const
-{
-  return TARGET_;
-}
+  inline unsigned int get_target() const
+  {
+    return TARGET_;
+  }
 
 private:
   void safe_bind();
@@ -68,7 +68,7 @@ private:
   unsigned int id_;
   int saved_id_;
 
-const static unsigned int TARGET_;
+  const static unsigned int TARGET_;
 };
 
 } // end namespace Utils
