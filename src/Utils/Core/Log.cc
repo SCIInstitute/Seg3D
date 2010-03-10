@@ -56,25 +56,25 @@ std::string Log::header( const int line, const char* file ) const
 void Log::post_error( std::string message, const int line, const char* file )
 {
   std::string str = header( line, file ) + std::string( " ERROR: " ) + message;
-  post_log_signal_( ERROR_E, str );
+  post_log_signal_( LogMessageType::ERROR_E, str );
 }
 
 void Log::post_warning( std::string message, const int line, const char* file )
 {
   std::string str = header( line, file ) + std::string( " WARNING: " ) + message;
-  post_log_signal_( WARNING_E, str );
+  post_log_signal_( LogMessageType::WARNING_E, str );
 }
 
 void Log::post_message( std::string message, const int line, const char* file )
 {
   std::string str = header( line, file ) + std::string( " MESSAGE: " ) + message;
-  post_log_signal_( MESSAGE_E, str );
+  post_log_signal_( LogMessageType::MESSAGE_E, str );
 }
 
 void Log::post_debug( std::string message, const int line, const char* file )
 {
   std::string str = header( line, file ) + std::string( " DEBUG: " ) + message;
-  post_log_signal_( DEBUG_E, str );
+  post_log_signal_( LogMessageType::DEBUG_E, str );
 }
 
 class LogStreamerInternal

@@ -69,7 +69,7 @@ namespace Seg3D
 // Class declarations
 class ActionNewMaskLayer : public ActionLayer
 {
-SCI_ACTION_TYPE("NewMaskLayer","NewMaskLayer",LAYER_E)
+SCI_ACTION_TYPE( "NewMaskLayer", "NewMaskLayer", ActionPropertiesType::LAYER_E)
 public:
   ActionNewMaskLayer()
   {

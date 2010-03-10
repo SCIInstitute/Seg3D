@@ -77,7 +77,7 @@ int main( int argc, char **argv )
 
   // -- Setup error logging --
   // stream error to the console window
-  Utils::LogStreamer error_log( Utils::Log::ALL_E, &( std::cerr ) );
+  Utils::LogStreamer error_log( Utils::LogMessageType::ALL_E, &( std::cerr ) );
 
   // -- Startup Seg3D --
   SCI_LOG_MESSAGE(std::string("--- Starting Seg3D ")+SEG3D_VERSION+" "+

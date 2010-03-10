@@ -203,12 +203,12 @@ public:
       if ( value < min_value_ )
       {
         value = min_value_;
-        source = ACTION_SOURCE_NONE_E;
+        source = ActionSource::ACTION_SOURCE_NONE_E;
       }
       if ( value > max_value_ )
       {
         value = max_value_;
-        source = ACTION_SOURCE_NONE_E;
+        source = ActionSource::ACTION_SOURCE_NONE_E;
       }
       value_ = value;
       value_changed_signal_( value_, source );

@@ -37,7 +37,8 @@ namespace Seg3D
 
 class ActionGet : public Action
 {
-SCI_ACTION_TYPE("Get","Get <state>",APPLICATION_E|QUERY_E)
+SCI_ACTION_TYPE("Get","Get <state>", 
+  ActionPropertiesType::APPLICATION_E|ActionPropertiesType::QUERY_E)
 
   // -- Constructor/Destructor --
 public:

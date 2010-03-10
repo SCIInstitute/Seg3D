@@ -50,6 +50,8 @@ protected:
   virtual ~PixelBufferObject();
 };
 
+// CLASS PixelPackBuffer
+// Buffer Target: GL_PIXEL_PACK_BUFFER
 class PixelPackBuffer : public PixelBufferObject
 {
 public:
@@ -61,6 +63,8 @@ public:
   static void RestoreDefault();
 };
 
+// CLASS PixelUnpackBuffer
+// Buffer Target: GL_PIXEL_UNPACK_BUFFER
 class PixelUnpackBuffer : public PixelBufferObject
 {
 public:

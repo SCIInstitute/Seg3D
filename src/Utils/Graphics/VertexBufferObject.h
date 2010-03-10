@@ -70,6 +70,8 @@ protected:
   virtual ~VertexBufferObject();
 };
 
+// CLASS VertexAttribArrayBuffer
+// Buffer Target: GL_ARRAY_BUFFER
 class VertexAttribArrayBuffer : public VertexBufferObject
 {
 private:
@@ -77,10 +79,10 @@ private:
   class VertexAttribArrayInfo
   {
   public:
-    VertexAttribArrayInfo(VertexAttribArrayType array_type) : type_(array_type) {}
+    VertexAttribArrayInfo() {}
     ~VertexAttribArrayInfo() {}
 
-    VertexAttribArrayType type_;
+    GLenum array_type_;
     boost::function< void () > gl_array_pointer_func_;
   };
 
@@ -108,8 +110,12 @@ private:
   std::vector<VertexAttribArrayInfoHandle> vertex_arrays_;
   const static GLenum GL_ARRAY_TYPES_C[];
 
+public:
+  static void RestoreDefault();
 };
 
+// CLASS ElementArrayBuffer
+// Buffer Target: GL_ELEMENT_ARRAY_BUFFER
 class ElementArrayBuffer : public VertexBufferObject
 {
 public:
@@ -122,6 +128,9 @@ public:
     GLenum data_type, int offset = 0 );
   void multi_draw_elements( GLenum mode, GLsizei* count, GLenum data_type,
     const GLvoid** offsets, GLsizei primcount );
+
+public:
+  static void RestoreDefault();
 };
 
 } // end namespace Utils

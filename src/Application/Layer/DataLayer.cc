@@ -37,7 +37,7 @@ namespace Seg3D
 {
 
 DataLayer::DataLayer( const std::string& name, const Utils::VolumeHandle& volume ) :
-  Layer( name, Utils::DATA_E, volume )
+  Layer( name, Utils::VolumeType::DATA_E, volume )
 {
   // Step (1) : Build the layer specific state variables
 

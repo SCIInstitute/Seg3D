@@ -33,81 +33,81 @@ namespace Utils
 
 Texture::Texture()
 {
-  glGenTextures( 1, &texture_id_ );
+  glGenTextures( 1, &this->texture_id_ );
 }
 
 Texture::~Texture()
 {
-  glDeleteTextures( 1, &texture_id_ );
+  glDeleteTextures( 1, &this->texture_id_ );
 }
 
 void Texture::enable()
 {
-  glEnable( target_ );
-  glBindTexture( target_, texture_id_ );
+  glEnable( this->target_ );
+  glBindTexture( this->target_, this->texture_id_ );
 }
 
 void Texture::disable()
 {
-  glDisable( target_ );
+  glDisable( this->target_ );
 }
 
 void Texture::set_parameter(unsigned int param_name, int param_value)
 {
-  safe_bind();
-  glTexParameteri(target_, param_name, param_value);
-  safe_unbind();
+  this->safe_bind();
+  glTexParameteri( this->target_, param_name, param_value );
+  this->safe_unbind();
 }
 
 void Texture::set_mag_filter( int filter )
 {
-  safe_bind();
-  glTexParameteri( target_, GL_TEXTURE_MAG_FILTER, filter );
-  safe_unbind();
+  this->safe_bind();
+  glTexParameteri( this->target_, GL_TEXTURE_MAG_FILTER, filter );
+  this->safe_unbind();
 }
 
 void Texture::set_min_filter( int filter )
 {
-  safe_bind();
-  glTexParameteri( target_, GL_TEXTURE_MIN_FILTER, filter );
-  safe_unbind();
+  this->safe_bind();
+  glTexParameteri( this->target_, GL_TEXTURE_MIN_FILTER, filter );
+  this->safe_unbind();
 }
 
 void Texture::set_wrap_r( int wrap_mode )
 {
-  safe_bind();
-  glTexParameteri( target_, GL_TEXTURE_WRAP_R, wrap_mode );
-  safe_unbind();
+  this->safe_bind();
+  glTexParameteri( this->target_, GL_TEXTURE_WRAP_R, wrap_mode );
+  this->safe_unbind();
 }
 
 void Texture::set_wrap_s( int wrap_mode )
 {
-  safe_bind();
-  glTexParameteri( target_, GL_TEXTURE_WRAP_S, wrap_mode );
-  safe_unbind();
+  this->safe_bind();
+  glTexParameteri( this->target_, GL_TEXTURE_WRAP_S, wrap_mode );
+  this->safe_unbind();
 }
 
 void Texture::set_wrap_t( int wrap_mode )
 {
-  safe_bind();
-  glTexParameteri( target_, GL_TEXTURE_WRAP_T, wrap_mode );
-  safe_unbind();
+  this->safe_bind();
+  glTexParameteri( this->target_, GL_TEXTURE_WRAP_T, wrap_mode );
+  this->safe_unbind();
 }
 
 void Texture::safe_bind()
 {
-  glGetIntegerv( query_target_, &saved_id_ );
-  if ( static_cast< int > ( texture_id_ ) != saved_id_ )
+  glGetIntegerv( this->query_target_, &this->saved_id_ );
+  if ( static_cast< int > ( this->texture_id_ ) != this->saved_id_ )
   {
-    glBindTexture( target_, texture_id_ );
+    glBindTexture( this->target_, this->texture_id_ );
   }
 }
 
 void Texture::safe_unbind()
 {
-  if ( static_cast< int > ( texture_id_ ) != saved_id_ )
+  if ( static_cast< int > ( this->texture_id_ ) != this->saved_id_ )
   {
-    glBindTexture( target_, saved_id_ );
+    glBindTexture( this->target_, this->saved_id_ );
   }
 }
 
@@ -124,8 +124,8 @@ void Texture::SetClientActiveTextureUnit( unsigned int unit )
 Texture1D::Texture1D() :
   Texture()
 {
-  target_ = GL_TEXTURE_1D;
-  query_target_ = GL_TEXTURE_BINDING_1D;
+  this->target_ = GL_TEXTURE_1D;
+  this->query_target_ = GL_TEXTURE_BINDING_1D;
 
   set_mag_filter( GL_LINEAR );
   set_min_filter( GL_LINEAR );
@@ -151,8 +151,8 @@ void Texture1D::set_sub_image( int xoffset, int width, const void* data,
 Texture2D::Texture2D() :
   Texture()
 {
-  target_ = GL_TEXTURE_2D;
-  query_target_ = GL_TEXTURE_BINDING_2D;
+  this->target_ = GL_TEXTURE_2D;
+  this->query_target_ = GL_TEXTURE_BINDING_2D;
 
   set_mag_filter( GL_LINEAR );
   set_min_filter( GL_LINEAR );
@@ -163,9 +163,9 @@ Texture2D::Texture2D() :
 void Texture2D::set_image(int width, int height, int internal_format, const void *pixels,
                 unsigned int format, unsigned int type, int level)
 {
-  safe_bind();
+  this->safe_bind();
   glTexImage2D(target_, level, internal_format, width, height, 0, format, type, pixels);
-  safe_unbind();
+  this->safe_unbind();
 }
 
 void Texture2D::set_sub_image( int xoffset, int yoffset, int width, int height, 
@@ -179,8 +179,8 @@ void Texture2D::set_sub_image( int xoffset, int yoffset, int width, int height,
 Texture3D::Texture3D() :
   Texture()
 {
-  target_ = GL_TEXTURE_3D;
-  query_target_ = GL_TEXTURE_BINDING_3D;
+  this->target_ = GL_TEXTURE_3D;
+  this->query_target_ = GL_TEXTURE_BINDING_3D;
 
   set_mag_filter( GL_LINEAR );
   set_min_filter( GL_LINEAR );

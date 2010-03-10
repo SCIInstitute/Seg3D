@@ -55,10 +55,11 @@ class Texture : public boost::noncopyable
 {
 
   // -- Constructor/Destructor --
-public:
+protected:
   Texture();
-  virtual ~Texture() = 0;
+  virtual ~Texture();
 
+public:
   void enable();
   void disable();
   
@@ -71,12 +72,12 @@ public:
 
   inline unsigned int get_id() const
   {
-    return texture_id_;
+    return this->texture_id_;
   }
 
   inline unsigned int get_target() const
   {
-    return target_;
+    return this->target_;
   }
 
   typedef boost::recursive_mutex mutex_type;
@@ -84,17 +85,17 @@ public:
 
   inline mutex_type& get_mutex()
   {
-    return mutex_;
+    return this->mutex_;
   }
 
   inline void lock()
   {
-    mutex_.lock();
+    this->mutex_.lock();
   }
 
   inline void unlock()
   {
-    mutex_.unlock();
+    this->mutex_.unlock();
   }
 
 protected:

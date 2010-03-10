@@ -44,14 +44,18 @@
 #include <Application/Resource/ResourceLock.h>
 #include <Application/Action/ActionResult.h>
 
+#include <Utils/Core/EnumClass.h>
+
 namespace Seg3D
 {
 
 // ENUM ActionStatus
 // This enum lists the possible outcomes of preforming an action
 
-enum ActionStatus
-{
+SCI_ENUM_CLASS
+(
+  ActionStatus,
+
   // ACTION_SUCCESS - Everything went fine and the action was executed
   ACTION_SUCCESS_E = 0,
 
@@ -64,7 +68,7 @@ enum ActionStatus
   // ACTION_UNAVAILABLE - The action could not be executed, because
   // resources are not available
   ACTION_UNAVAILABLE_E = 3
-};
+)
 
 // ENUM ActionSource
 // This enum lists the possible sources of where an action can be triggered
@@ -72,8 +76,10 @@ enum ActionStatus
 // action run from the provenance buffer requires a different path for recording
 // provenance.
 
-enum ActionSource
-{
+SCI_ENUM_CLASS
+(
+  ActionSource,
+
   // ACTION_SOURCE_NONE - It did not result from an action.
   ACTION_SOURCE_NONE_E = 0,
 
@@ -88,7 +94,7 @@ enum ActionSource
   ACTION_SOURCE_SCRIPT_E = 2,
 
   // ACTION_SOURCE_COMMANDLINE - This action is run from the command line, it
-  // needs to update the interface, but does not allow queueing
+  // needs to update the interface, but does not allow queuing
   ACTION_SOURCE_COMMANDLINE_E = 3,
 
   // ACTION_SOURCE_PROVENANCE - The action is run from the provenance buffer
@@ -97,7 +103,7 @@ enum ActionSource
 
   // ACTION_SOURCE_UNDOBUFFER - The action is run from the undobuffer
   ACTION_SOURCE_UNDOBUFFER_E = 5
-};
+)
 
 class ActionContext;
 typedef boost::shared_ptr< ActionContext > ActionContextHandle;
@@ -150,19 +156,19 @@ public:
 public:
   bool is_success()
   {
-    return status_ == ACTION_SUCCESS_E;
+    return status_ == ActionStatus::ACTION_SUCCESS_E;
   }
   bool is_invalid()
   {
-    return status_ == ACTION_INVALID_E;
+    return status_ == ActionStatus::ACTION_INVALID_E;
   }
   bool is_unavailable()
   {
-    return status_ == ACTION_UNAVAILABLE_E;
+    return status_ == ActionStatus::ACTION_UNAVAILABLE_E;
   }
   bool is_error()
   {
-    return status_ == ACTION_ERROR_E;
+    return status_ == ActionStatus::ACTION_ERROR_E;
   }
 
   // -- Status information --

@@ -71,7 +71,7 @@ void AppControllerContext::report_done()
 
 ActionSource AppControllerContext::source() const
 {
-  return ACTION_SOURCE_COMMANDLINE_E;
+  return ActionSource::ACTION_SOURCE_COMMANDLINE_E;
 }
 
 } //end namespace Seg3D

@@ -34,6 +34,7 @@
 #include <boost/smart_ptr.hpp>
 
 // Util includes
+#include <Utils/Core/EnumClass.h>
 #include <Utils/DataBlock/DataBlock.h>
 #include <Utils/DataBlock/NrrdData.h>
 #include <Utils/DataBlock/MaskDataBlock.h>
@@ -50,10 +51,13 @@ namespace Utils
 class Volume;
 typedef boost::shared_ptr< Volume > VolumeHandle;
 
-enum VolumeType
-{
-  DATA_E = 1, MASK_E = 2, LABEL_E = 3
-};
+SCI_ENUM_CLASS
+(
+  VolumeType,
+  DATA_E = 1, 
+  MASK_E = 2, 
+  LABEL_E = 3
+)
 
 // Class definition
 class Volume : public boost::noncopyable
@@ -64,7 +68,7 @@ public:
 
   // For defining a data/label volume
   Volume( const GridTransform& grid_transform, const DataBlockHandle& data_block,
-      VolumeType type = DATA_E );
+    VolumeType type = VolumeType::DATA_E );
 
   // For definint a mask volume
   Volume( const GridTransform& grid_transform, const MaskDataBlockHandle& mask_data_block );
@@ -83,7 +87,7 @@ public:
 
   // GRIDTRANSFORM
   // Get the grid location
-  Utils::GridTransform grid_transform() const
+  const Utils::GridTransform& grid_transform() const
   {
     return grid_transform_;
   }

@@ -32,7 +32,6 @@ namespace Seg3D
 {
 
 SCI_REGISTER_ACTION(Flip)
-;
 
 ActionFlip::ActionFlip()
 {
@@ -76,14 +75,14 @@ bool ActionFlip::validate( ActionContextHandle &context )
 
     if ( state )
     {
-      state->flip( static_cast< Utils::View2D::Direction > ( this->direction_.value() ) );
+      state->flip( static_cast< Utils::FlipDirectionType::enum_type > ( this->direction_.value() ) );
       return true;
     }
 
     return false;
   }
 
-  void ActionFlip::Dispatch( StateView2DHandle& state, Utils::View2D::Direction direction )
+  void ActionFlip::Dispatch( StateView2DHandle& state, Utils::FlipDirectionType direction )
   {
     ActionFlip* action = new ActionFlip;
     action->stateid_.value() = state->stateid();

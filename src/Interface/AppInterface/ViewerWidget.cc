@@ -432,7 +432,7 @@ void ViewerWidget::flip_view_horiz( bool flip )
   {
     StateView2DHandle view2d_state = 
       boost::dynamic_pointer_cast<StateView2D>( viewer->get_active_view_state() );
-    ActionFlip::Dispatch( view2d_state, Utils::View2D::HORIZONTAL_E );
+    ActionFlip::Dispatch( view2d_state, Utils::FlipDirectionType::HORIZONTAL_E );
   }
 }
 
@@ -443,7 +443,7 @@ void ViewerWidget::flip_view_vert( bool flip )
   {
     StateView2DHandle view2d_state = 
       boost::dynamic_pointer_cast<StateView2D>( viewer->get_active_view_state() );
-    ActionFlip::Dispatch( view2d_state, Utils::View2D::VERTICAL_E );
+    ActionFlip::Dispatch( view2d_state, Utils::FlipDirectionType::VERTICAL_E );
   }
 }
 

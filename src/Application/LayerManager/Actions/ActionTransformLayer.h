@@ -35,42 +35,43 @@
 namespace Seg3D
 {
   
-  class ActionTransformLayer : public Action
+class ActionTransformLayer : public Action
+{
+SCI_ACTION_TYPE("TransformLayer", "Transform Layer <name>",
+  ActionPropertiesType::LAYER_E)
+  
+  // -- Constructor/Destructor --
+public:
+  ActionTransformLayer()
   {
-    SCI_ACTION_TYPE("TransformLayer","Transform Layer <name>",LAYER_E)
-    
-    // -- Constructor/Destructor --
-  public:
-    ActionTransformLayer()
-    {
-      add_argument( name_ );
-    }
-    
-    virtual ~ActionTransformLayer()
-    {
-    }
-    
-    // -- Functions that describe action --
-  public:
-    virtual bool validate( ActionContextHandle& context );
-    virtual bool run( ActionContextHandle& context, ActionResultHandle& result );
-    
-    // -- Action parameters --
-  private:
-    // ToolID that is requested
-    ActionParameter< std::string > name_;
-    
-    // -- Dispatch this action from the interface --
-  public:
-    // CREATE
-    // Create action that moves the layer above
-    static ActionHandle Create( const std::string& name );
-    
-    // DISPATCH
-    // Create and dispatch action that moves the layer above 
-    static void Dispatch( const std::string& name );
-    
-  };
+    add_argument( name_ );
+  }
+  
+  virtual ~ActionTransformLayer()
+  {
+  }
+  
+  // -- Functions that describe action --
+public:
+  virtual bool validate( ActionContextHandle& context );
+  virtual bool run( ActionContextHandle& context, ActionResultHandle& result );
+  
+  // -- Action parameters --
+private:
+  // ToolID that is requested
+  ActionParameter< std::string > name_;
+  
+  // -- Dispatch this action from the interface --
+public:
+  // CREATE
+  // Create action that moves the layer above
+  static ActionHandle Create( const std::string& name );
+  
+  // DISPATCH
+  // Create and dispatch action that moves the layer above 
+  static void Dispatch( const std::string& name );
+  
+};
   
 } // end namespace Seg3D
 

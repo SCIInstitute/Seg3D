@@ -109,7 +109,7 @@ public:
   // Get the bit that describes the mask
   unsigned int mask_bit()
   {
-    return mask_bit_;
+    return this->mask_bit_;
   }
 
   // DATA_BLOCK
@@ -130,7 +130,7 @@ public:
 
   inline unsigned char get_mask_at( size_t index ) const
   {
-    return this->data_[ index ] & ( 1 << this->mask_bit_ );
+    return ( this->data_[ index ] & this->bit_tester_ ) != 0;
   }
 
   inline void set_mask_at( size_t x, size_t y, size_t z )
@@ -140,7 +140,7 @@ public:
 
   inline void set_mask_at( size_t index )
   {
-    this->data_[ index ] |= ( 1 << this->mask_bit_ );
+    this->data_[ index ] |= this->bit_tester_;
   }
 
   inline void clear_mask_at( size_t x, size_t y, size_t z )
@@ -150,7 +150,7 @@ public:
 
   inline void clear_mask_at( size_t index )
   {
-    this->data_[ index ] &= ~( 1 << this->mask_bit_ );
+    this->data_[ index ] &= ~( this->bit_tester_ );
   }
 
 // -- Locking of the datablock --
@@ -199,7 +199,9 @@ private:
   DataBlockHandle data_block_;
 
   // The bit that is used for this mask
-  unsigned int mask_bit_;
+  const unsigned int mask_bit_;
+
+  const unsigned char bit_tester_;
 
   // Cached data pointer of the underlying DataBlock
   unsigned char* data_;

@@ -64,7 +64,7 @@ namespace Seg3D
 
 class ActionCloneLayer : public ActionLayer
 {
-SCI_ACTION_TYPE("CloneLayer","",Action::LAYER_E)
+SCI_ACTION_TYPE("CloneLayer", "", ActionPropertiesType::LAYER_E)
 
 public:
   ActionCloneLayer()

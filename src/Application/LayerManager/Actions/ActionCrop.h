@@ -35,42 +35,42 @@
 namespace Seg3D
 {
   
-  class ActionCrop : public Action
+class ActionCrop : public Action
+{
+SCI_ACTION_TYPE("Crop", "Crop <name>", ActionPropertiesType::LAYER_E)
+  
+  // -- Constructor/Destructor --
+public:
+  ActionCrop()
   {
-    SCI_ACTION_TYPE("Crop","Crop <name>",LAYER_E)
-    
-    // -- Constructor/Destructor --
-  public:
-    ActionCrop()
-    {
-      add_argument( name_ );
-    }
-    
-    virtual ~ActionCrop()
-    {
-    }
-    
-    // -- Functions that describe action --
-  public:
-    virtual bool validate( ActionContextHandle& context );
-    virtual bool run( ActionContextHandle& context, ActionResultHandle& result );
-    
-    // -- Action parameters --
-  private:
-    // ToolID that is requested
-    ActionParameter< std::string > name_;
-    
-    // -- Dispatch this action from the interface --
-  public:
-    // CREATE
-    // Create action that moves the layer above
-    static ActionHandle Create( const std::string& name );
-    
-    // DISPATCH
-    // Create and dispatch action that moves the layer above 
-    static void Dispatch( const std::string& name );
-    
-  };
+    add_argument( name_ );
+  }
+  
+  virtual ~ActionCrop()
+  {
+  }
+  
+  // -- Functions that describe action --
+public:
+  virtual bool validate( ActionContextHandle& context );
+  virtual bool run( ActionContextHandle& context, ActionResultHandle& result );
+  
+  // -- Action parameters --
+private:
+  // ToolID that is requested
+  ActionParameter< std::string > name_;
+  
+  // -- Dispatch this action from the interface --
+public:
+  // CREATE
+  // Create action that moves the layer above
+  static ActionHandle Create( const std::string& name );
+  
+  // DISPATCH
+  // Create and dispatch action that moves the layer above 
+  static void Dispatch( const std::string& name );
+  
+};
   
 } // end namespace Seg3D
 

@@ -63,7 +63,7 @@ namespace Seg3D
 
 class ActionRemoveLayer : public ActionLayer
 {
-SCI_ACTION_TYPE("RemoveLayer","RemoveLayer",LAYER_E)
+SCI_ACTION_TYPE("RemoveLayer", "RemoveLayer", ActionPropertiesType::LAYER_E)
 
 public:
   ActionRemoveLayer()

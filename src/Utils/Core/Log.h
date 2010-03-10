@@ -33,6 +33,7 @@
 # pragma once
 #endif 
 
+#include <Utils/Core/EnumClass.h>
 #include <Utils/Singleton/Singleton.h>
 
 // STL includes
@@ -55,6 +56,16 @@ namespace Utils
 // Forward declaration
 class Log;
 
+SCI_ENUM_CLASS
+(
+  LogMessageType,
+  ERROR_E = 0x01, 
+  WARNING_E = 0x02, 
+  MESSAGE_E = 0x04, 
+  DEBUG_E = 0x08, 
+  ALL_E = ERROR_E | WARNING_E | MESSAGE_E | DEBUG_E
+ )
+
 // Class definition
 class Log : public Singleton< Log >
 {
@@ -63,14 +74,6 @@ class Log : public Singleton< Log >
 private:
   friend class Singleton< Log > ;
   Log();
-
-  // -- Message types supported --
-public:
-  enum
-  {
-    ERROR_E = 0x01, WARNING_E = 0x02, MESSAGE_E = 0x04, DEBUG_E = 0x08, ALL_E = ERROR_E
-        | WARNING_E | MESSAGE_E | DEBUG_E
-  };
 
   // -- functions for logging --
 public:

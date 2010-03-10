@@ -37,7 +37,8 @@ namespace Seg3D
 
 class ActionInsertLayerAbove : public Action
 {
-  SCI_ACTION_TYPE("InsertLayerAbove","Insert Layer Above <name>",LAYER_E)
+SCI_ACTION_TYPE("InsertLayerAbove","Insert Layer Above <name>", 
+  ActionPropertiesType::LAYER_E)
   
   // -- Constructor/Destructor --
 public:

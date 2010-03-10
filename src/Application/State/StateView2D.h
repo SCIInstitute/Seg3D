@@ -77,13 +77,13 @@ public:
   // IMPORT_FROM_STRING:
   // Set the State from a string
   virtual bool import_from_string( const std::string& str, ActionSource source =
-      ACTION_SOURCE_NONE_E );
+      ActionSource::ACTION_SOURCE_NONE_E );
 
   virtual void scale( double ratio );
 
   virtual void translate( const Utils::Vector& offset );
 
-  void flip( Utils::View2D::Direction direction );
+  void flip( Utils::FlipDirectionType direction );
 
   bool x_flipped() const;
 
@@ -97,7 +97,7 @@ protected:
   // IMPORT_FROM_VARIANT:
   // Import the state data from a variant parameter.
   virtual bool import_from_variant( ActionParameterVariant& variant, ActionSource source =
-      ACTION_SOURCE_NONE_E );
+      ActionSource::ACTION_SOURCE_NONE_E );
 
   // VALIDATE_VARIANT:
   // Validate a variant parameter
@@ -131,7 +131,8 @@ public:
   // Set the value of the state variable
   // NOTE: this function by passes the action mechanism and should only be used
   // to enforce a constraint from another action.
-  bool set( const Utils::View2D& value, ActionSource source = ACTION_SOURCE_NONE_E );
+  bool set( const Utils::View2D& value, 
+    ActionSource source = ActionSource::ACTION_SOURCE_NONE_E );
 
   // -- storage of the view --
 protected:

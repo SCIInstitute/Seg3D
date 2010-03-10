@@ -81,7 +81,7 @@ public:
   // IMPORT_FROM_STRING:
   // Set the State from a string
   virtual bool import_from_string( const std::string& str, ActionSource source =
-      ACTION_SOURCE_NONE_E );
+      ActionSource::ACTION_SOURCE_NONE_E );
 
 protected:
   // EXPORT_TO_VARIANT
@@ -91,7 +91,7 @@ protected:
   // IMPORT_FROM_VARIANT:
   // Import the state data from a variant parameter.
   virtual bool import_from_variant( ActionParameterVariant& variant, ActionSource source =
-      ACTION_SOURCE_NONE_E );
+      ActionSource::ACTION_SOURCE_NONE_E );
 
   // VALIDATE_VARIANT:
   // Validate a variant parameter
@@ -121,7 +121,8 @@ public:
   // Set the value of the state variable
   // NOTE: this function by passes the action mechanism and should only be used
   // to enforce a constraint from another action.
-  bool set( const std::string& value, ActionSource source = ACTION_SOURCE_NONE_E );
+  bool set( const std::string& value, 
+    ActionSource source = ActionSource::ACTION_SOURCE_NONE_E );
 
   // -- storage of the view --
 protected:

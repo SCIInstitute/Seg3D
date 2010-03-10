@@ -38,6 +38,7 @@
 #include <boost/utility.hpp>
 
 // Utils includes
+#include <Utils/Core/EnumClass.h>
 #include <Utils/Core/Log.h>
 #include <Utils/Core/Exception.h>
 
@@ -55,22 +56,20 @@ namespace Seg3D
 class Tool;
 typedef boost::shared_ptr< Tool > ToolHandle;
 
+// Tool groups help organize the tools in different categories
+SCI_ENUM_CLASS
+(
+  ToolGroupType,
+  TOOL_E = 0x0001,
+  FILTER_E = 0x0002,
+  DATATODATA_E = 0x0010,
+  DATATOMASK_E = 0x0020,
+  MASKTOMASK_E = 0x0040
+)
+
 // Class definition
 class Tool : public StateHandler
 {
-
-  // -- definition of tool groups --
-public:
-  // Tool groups help organize the tools in different catagories
-
-  enum
-  {
-    TOOL_E = 0x0001,
-    FILTER_E = 0x0002,
-    DATATODATA_E = 0x0010,
-    DATATOMASK_E = 0x0020,
-    MASKTOMASK_E = 0x0040
-  };
 
   // -- constructor/destructor --
 public:

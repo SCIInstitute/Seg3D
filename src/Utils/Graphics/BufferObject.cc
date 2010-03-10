@@ -40,8 +40,7 @@ BufferObject::BufferObject() :
 }
 
 BufferObject::BufferObject( const BufferObjectHandle& bo ) :
-  id_( bo->id_ ), saved_id_( bo->saved_id_ ),
-  copy_constructed_( true ), buffer_object_( bo )
+  id_( bo->id_ ), copy_constructed_( true ), buffer_object_( bo )
 {
 }
 
@@ -96,7 +95,7 @@ GLboolean BufferObject::unmap_buffer()
 void BufferObject::safe_bind()
 {
   glGetIntegerv( this->query_target_, &( this->saved_id_ ) );
-  if ( this->id_ != this->saved_id_ )
+  if ( this->id_ != static_cast<unsigned int>( this->saved_id_ ) )
   {
     glBindBuffer( this->target_, this->id_ );
   }
@@ -104,7 +103,7 @@ void BufferObject::safe_bind()
 
 void BufferObject::safe_unbind()
 {
-  if ( this->id_ != this->saved_id_ )
+  if ( this->id_ != static_cast<unsigned int>( this->saved_id_ ) )
   {
     glBindBuffer( this->target_, this->saved_id_ );
   }

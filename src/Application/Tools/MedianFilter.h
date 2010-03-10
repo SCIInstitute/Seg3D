@@ -37,7 +37,7 @@ namespace Seg3D
 class MedianFilter : public Tool
 {
 SCI_TOOL_TYPE( "MedianFilter", "Median", "Alt+M",
-  Tool::DATATODATA_E|Tool::FILTER_E,
+  ToolGroupType::DATATODATA_E|ToolGroupType::FILTER_E,
   "http://seg3d.org/")
 
   // -- constructor/destructor --

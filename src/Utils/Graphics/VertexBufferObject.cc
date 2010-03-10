@@ -87,7 +87,8 @@ VertexAttribArrayBuffer::VertexAttribArrayBuffer( const BufferObjectHandle &bo )
 void VertexAttribArrayBuffer::set_array( VertexAttribArrayType array_type, GLint vertex_size, 
                             GLenum data_type, GLsizei stride, int offset )
 {
-  VertexAttribArrayInfoHandle array_info( new VertexAttribArrayInfo( array_type ) );
+  VertexAttribArrayInfoHandle array_info( new VertexAttribArrayInfo );
+  array_info->array_type_ = GL_ARRAY_TYPES_C[ array_type ];
 
   switch(array_type)
   {
@@ -108,7 +109,7 @@ void VertexAttribArrayBuffer::set_array( VertexAttribArrayType array_type, GLint
       data_type, stride, reinterpret_cast<void*>( offset ) );
     break;
   default:
-    SCI_LOG_ERROR( "Incompatible vertex array type and parameters" );
+    SCI_LOG_ERROR( "Incompatible array type and parameters" );
     assert( false );
     return;
   }
@@ -119,7 +120,8 @@ void VertexAttribArrayBuffer::set_array( VertexAttribArrayType array_type, GLint
 void VertexAttribArrayBuffer::set_array( VertexAttribArrayType array_type, 
                             GLenum data_type, GLsizei stride, int offset )
 {
-  VertexAttribArrayInfoHandle array_info( new VertexAttribArrayInfo( array_type ) );
+  VertexAttribArrayInfoHandle array_info( new VertexAttribArrayInfo );
+  array_info->array_type_ = GL_ARRAY_TYPES_C[ array_type ];
 
   switch( array_type )
   {
@@ -136,7 +138,7 @@ void VertexAttribArrayBuffer::set_array( VertexAttribArrayType array_type,
       stride, reinterpret_cast<void*>( offset ) );
     break;
   default:
-    SCI_LOG_ERROR( "Incompatible vertex array type and parameters" );
+    SCI_LOG_ERROR( "Incompatible array type and parameters" );
     assert( false );
     return;
   }
@@ -146,7 +148,8 @@ void VertexAttribArrayBuffer::set_array( VertexAttribArrayType array_type,
 
 void VertexAttribArrayBuffer::set_array( VertexAttribArrayType array_type, GLsizei stride, int offset )
 {
-  VertexAttribArrayInfoHandle array_info( new VertexAttribArrayInfo( array_type ) );
+  VertexAttribArrayInfoHandle array_info( new VertexAttribArrayInfo );
+  array_info->array_type_ = GL_ARRAY_TYPES_C[ array_type ];
 
   switch( array_type )
   {
@@ -155,7 +158,7 @@ void VertexAttribArrayBuffer::set_array( VertexAttribArrayType array_type, GLsiz
       reinterpret_cast<void*>( offset ) );
     break;
   default:
-    SCI_LOG_ERROR( "Incompatible vertex array type and parameters" );
+    SCI_LOG_ERROR( "Incompatible array type and parameters" );
     assert( false );
     return;
   }
@@ -176,7 +179,7 @@ void VertexAttribArrayBuffer::enable_arrays()
   for (size_t i = 0; i < num_of_arrays; i++)
   {
     this->vertex_arrays_[i]->gl_array_pointer_func_();
-    glEnableClientState( GL_ARRAY_TYPES_C[ this->vertex_arrays_[i]->type_ ] );
+    glEnableClientState( this->vertex_arrays_[i]->array_type_ );
   }
   this->safe_unbind();
 }
@@ -191,7 +194,7 @@ void VertexAttribArrayBuffer::disable_arrays()
 
   for (size_t i = 0; i < num_of_arrays; i++)
   {
-    glDisableClientState( GL_ARRAY_TYPES_C[ this->vertex_arrays_[i]->type_ ] );
+    glDisableClientState( this->vertex_arrays_[i]->array_type_ );
   }
 }
 
@@ -208,6 +211,11 @@ void VertexAttribArrayBuffer::multi_draw_arrays( GLenum mode, GLint* first, GLsi
   this->enable_arrays();
   glMultiDrawArrays( mode, first, count, primcount );
   this->disable_arrays();
+}
+
+void VertexAttribArrayBuffer::RestoreDefault()
+{
+  glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -251,6 +259,11 @@ void ElementArrayBuffer::multi_draw_elements( GLenum mode, GLsizei* count,
   this->safe_bind();
   glMultiDrawElements( mode, count, data_type, offsets, primcount );
   this->safe_unbind();
+}
+
+void ElementArrayBuffer::RestoreDefault()
+{
+  glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
 }
 
 } // end namespace Utils

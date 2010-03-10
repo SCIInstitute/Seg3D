@@ -29,6 +29,7 @@
 #ifndef UTILS_GEOMETRY_VIEW2D_H
 #define UTILS_GEOMETRY_VIEW2D_H
 
+#include <Utils/Core/EnumClass.h>
 #include <Utils/Geometry/Point.h>
 #include <Utils/Geometry/Vector.h>
 
@@ -38,14 +39,16 @@ namespace Utils
 // Forward declaration
 class View2D;
 
+SCI_ENUM_CLASS
+(
+  FlipDirectionType,
+  HORIZONTAL_E = 0, 
+  VERTICAL_E = 1
+)
+
 class View2D
 {
 public:
-
-  enum Direction
-  {
-    HORIZONTAL_E = 0, VERTICAL_E = 1
-  };
 
   View2D();
   View2D( const Point& center, double scale );
@@ -98,7 +101,7 @@ public:
 
   void scale( double ratio );
   void translate( const Vector& offset );
-  void flip( Direction direction );
+  void flip( FlipDirectionType direction );
 
 private:
   // Center point

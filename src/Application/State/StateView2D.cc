@@ -76,7 +76,7 @@ void StateView2D::translate( const Utils::Vector& offset )
   this->state_changed_signal_();
 }
 
-void StateView2D::flip( Utils::View2D::Direction direction )
+void StateView2D::flip( Utils::FlipDirectionType direction )
 {
   {
     StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );

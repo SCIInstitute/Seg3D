@@ -37,7 +37,7 @@ namespace Seg3D
 class IntensityCorrectionFilter : public Tool
 {
 SCI_TOOL_TYPE( "IntensityCorrectionFilter", "Intensity Correction", "Alt+Shift+I",
-  Tool::DATATODATA_E|Tool::FILTER_E,
+  ToolGroupType::DATATODATA_E|ToolGroupType::FILTER_E,
   "http://seg3d.org/")
 
 public:

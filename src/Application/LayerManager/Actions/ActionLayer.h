@@ -54,7 +54,7 @@ namespace Seg3D
 
 class ActionLayer : public Action
 {
-SCI_ACTION_TYPE("Layer","",LAYER_E)
+SCI_ACTION_TYPE( "Layer", "", ActionPropertiesType::LAYER_E )
 
 public:
   virtual ~ActionLayer()

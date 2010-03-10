@@ -37,7 +37,7 @@ namespace Seg3D
 {
 class ActionFlip : public Action
 {
-SCI_ACTION_TYPE("Flip", "Flip <key> <direction>", APPLICATION_E)
+SCI_ACTION_TYPE("Flip", "Flip <key> <direction>", ActionPropertiesType::APPLICATION_E)
 
 public:
   ActionFlip();
@@ -53,7 +53,7 @@ private:
   StateView2DWeakHandle view2d_state_;
 
 public:
-  static void Dispatch( StateView2DHandle& state, Utils::View2D::Direction direction );
+  static void Dispatch( StateView2DHandle& state, Utils::FlipDirectionType direction );
 };
 } // end namespace Seg3D
 

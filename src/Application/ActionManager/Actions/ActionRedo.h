@@ -36,7 +36,7 @@ namespace Seg3D
 
 class ActionRedo : public Action
 {
-SCI_ACTION_TYPE("Redo","Redo",APPLICATION_E)
+SCI_ACTION_TYPE("Redo","Redo", ActionPropertiesType::APPLICATION_E)
   ;
 
   // -- Constructor/Destructor --

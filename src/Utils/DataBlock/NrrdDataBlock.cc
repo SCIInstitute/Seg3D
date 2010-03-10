@@ -49,28 +49,28 @@ NrrdDataBlock::NrrdDataBlock( NrrdDataHandle nrrd_data ) :
   switch( nrrd->type )
   {
   case nrrdTypeChar:
-    set_type( CHAR_E );
+    set_type( DataType::CHAR_E );
     break;
   case nrrdTypeUChar:
-    set_type( UCHAR_E );
+    set_type( DataType::UCHAR_E );
     break;
   case nrrdTypeShort:
-    set_type( SHORT_E );
+    set_type( DataType::SHORT_E );
     break;
   case nrrdTypeUShort:
-    set_type( USHORT_E );
+    set_type( DataType::USHORT_E );
     break;
   case nrrdTypeInt:
-    set_type( INT_E );
+    set_type( DataType::INT_E );
     break;
   case nrrdTypeUInt:
-    set_type( UINT_E );
+    set_type( DataType::UINT_E );
     break;
   case nrrdTypeFloat:
-    set_type( FLOAT_E );
+    set_type( DataType::FLOAT_E );
     break;
   case nrrdTypeDouble:
-    set_type( DOUBLE_E );
+    set_type( DataType::DOUBLE_E );
     break;
   }
 

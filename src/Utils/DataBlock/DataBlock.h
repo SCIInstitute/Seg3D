@@ -42,6 +42,7 @@
 #include <boost/thread/thread.hpp>
 #include <boost/utility.hpp>
 
+#include <Utils/Core/EnumClass.h>
 #include <Utils/Graphics/Texture.h>
 
 namespace Utils
@@ -60,6 +61,20 @@ namespace Utils
 class DataBlock;
 typedef boost::shared_ptr< DataBlock > DataBlockHandle;
 
+SCI_ENUM_CLASS
+(
+  DataType,
+  CHAR_E = 0, 
+  UCHAR_E, 
+  SHORT_E, 
+  USHORT_E, 
+  INT_E, 
+  UINT_E, 
+  FLOAT_E, 
+  DOUBLE_E, 
+  UNKNOWN_E
+)
+
 // Class definition
 class DataBlock : public boost::noncopyable
 {
@@ -69,20 +84,6 @@ public:
   // Lock types
   typedef boost::recursive_mutex mutex_type;
   typedef boost::unique_lock< mutex_type > lock_type;
-
-  // Data types
-  enum data_type
-  {
-    CHAR_E = 0, 
-    UCHAR_E, 
-    SHORT_E, 
-    USHORT_E, 
-    INT_E, 
-    UINT_E, 
-    FLOAT_E, 
-    DOUBLE_E, 
-    UNKNOWN_E
-  };
 
   // -- Constructor/destructor --
 public:
@@ -119,7 +120,7 @@ public:
 
   // TYPE
   // The type of the data
-  data_type type() const
+  DataType type() const
   {
     return data_type_;
   }
@@ -133,7 +134,7 @@ public:
 
   inline float* float_data()
   {
-    if ( this->data_type_ == FLOAT_E )
+    if ( this->data_type_ == DataType::FLOAT_E )
     {
       return reinterpret_cast<float*>( this->data_ );
     }
@@ -142,7 +143,7 @@ public:
 
   inline unsigned char* uchar_data()
   {
-    if ( this->data_type_ == UCHAR_E )
+    if ( this->data_type_ == DataType::UCHAR_E )
     {
       return reinterpret_cast<unsigned char*>( this->data_ );
     }
@@ -154,9 +155,9 @@ public:
     return this->get_data_at( this->to_index( x, y, z ) );
   }
 
-  double get_data_at( size_t idx ) const
+  double get_data_at( size_t index ) const
   {
-    return this->get_data_func_( idx );
+    return this->get_data_func_( index );
   }
 
   void set_data_at( size_t x, size_t y, size_t z, double value )
@@ -164,9 +165,9 @@ public:
     this->set_data_at( this->to_index( x, y, z ), value );
   }
 
-  void set_data_at( size_t idx, double value )
+  void set_data_at( size_t index, double value )
   {
-    this->set_data_func_( idx, value );
+    this->set_data_func_( index, value );
   }
 
   void upload_texture();
@@ -193,7 +194,7 @@ protected:
 
   // SET_TYPE
   // Set the type of the data
-  void set_type( data_type type );
+  void set_type( DataType type );
 
   // SET_DATA
   // Set the data pointer of the data
@@ -238,17 +239,17 @@ private:
   // Access the data at the specified index, and return the value in a void pointer.
   // NOTE: This will only work for integer types
   template<class DATA_TYPE>
-  inline DATA_TYPE internal_get_data( size_t idx ) const
+  inline DATA_TYPE internal_get_data( size_t index ) const
   {
     DATA_TYPE* data_ptr = reinterpret_cast<DATA_TYPE*>( this->data_ );
-    return data_ptr[ idx ];
+    return data_ptr[ index ];
   }
 
   template<class DATA_TYPE>
-  inline void internal_set_data( size_t idx, double value )
+  inline void internal_set_data( size_t index, double value )
   {
     DATA_TYPE* data_ptr = reinterpret_cast<DATA_TYPE*>( this->data_ );
-    data_ptr[ idx ] = static_cast<DATA_TYPE>( value );
+    data_ptr[ index ] = static_cast<DATA_TYPE>( value );
   }
 
   // The dimensions of the datablock
@@ -257,7 +258,7 @@ private:
   size_t nz_;
 
   // The type of the data in this data block
-  data_type data_type_;
+  DataType data_type_;
 
   // The mutex that protects the data
   // As data is shared between the renderer and the application threads, we

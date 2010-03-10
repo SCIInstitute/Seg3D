@@ -37,7 +37,7 @@ namespace Seg3D
 {
 
 MaskLayer::MaskLayer( const std::string& name, const Utils::VolumeHandle& volume ) :
-  Layer( name, Utils::MASK_E, volume )
+  Layer( name, Utils::VolumeType::MASK_E, volume )
 {
   // Step (1) : Build the layer specific state variables
 

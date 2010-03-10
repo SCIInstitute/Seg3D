@@ -37,7 +37,7 @@ namespace Seg3D
 
 class ActionActivateTool : public Action
 {
-SCI_ACTION_TYPE("ActivateTool","ActivateTool <toolid>",APPLICATION_E)
+SCI_ACTION_TYPE("ActivateTool", "ActivateTool <toolid>", ActionPropertiesType::APPLICATION_E)
 
   // -- Constructor/Destructor --
 public:

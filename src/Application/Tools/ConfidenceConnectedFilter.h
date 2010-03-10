@@ -37,7 +37,7 @@ namespace Seg3D
 class ConfidenceConnectedFilter : public Tool
 {
 SCI_TOOL_TYPE( "ConfidenceConnectedFilter", "Confidence Connected", "Alt+Shift+C",
-  Tool::DATATOMASK_E|Tool::FILTER_E,
+  ToolGroupType::DATATOMASK_E|ToolGroupType::FILTER_E,
   "http://seg3d.org/")
 
 public:

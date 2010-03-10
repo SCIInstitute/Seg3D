@@ -37,7 +37,7 @@ namespace Seg3D
 class CannyEdgeDetectionFilter : public Tool
 {
 SCI_TOOL_TYPE( "CannyEdgeDetectionFilter", "Canny Edge Detection", "Alt+E",
-  Tool::DATATODATA_E|Tool::FILTER_E,
+  ToolGroupType::DATATODATA_E|ToolGroupType::FILTER_E,
   "http://seg3d.org/")
 public:
   CannyEdgeDetectionFilter( const std::string& toolid );

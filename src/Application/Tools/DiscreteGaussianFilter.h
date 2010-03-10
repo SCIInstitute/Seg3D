@@ -37,7 +37,7 @@ namespace Seg3D
 class DiscreteGaussianFilter : public Tool
 {
 SCI_TOOL_TYPE( "DiscreteGaussianFilter", "Discrete Gaussian", "Alt+D",
-  Tool::DATATODATA_E|Tool::FILTER_E,
+  ToolGroupType::DATATODATA_E|ToolGroupType::FILTER_E,
   "http://seg3d.org/")
 public:
   DiscreteGaussianFilter( const std::string& toolid );

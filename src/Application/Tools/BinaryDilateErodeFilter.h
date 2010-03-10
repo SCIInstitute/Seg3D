@@ -37,7 +37,7 @@ namespace Seg3D
 class BinaryDilateErodeFilter : public Tool
 {
 SCI_TOOL_TYPE( "BinaryDilateErodeFilter", "Binary Dialate -> Erode", "Alt+Shift+E",
-  Tool::MASKTOMASK_E|Tool::FILTER_E,
+  ToolGroupType::MASKTOMASK_E|ToolGroupType::FILTER_E,
   "http://seg3d.org/")
 
 public:

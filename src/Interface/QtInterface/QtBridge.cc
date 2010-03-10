@@ -54,7 +54,7 @@ void QtSignal( QTPOINTER qpointer, boost::function<void ()> func )
 // -- Checkbox connector --
 void QtCheckBoxSignal( QPointer< QCheckBox > qpointer, bool state, ActionSource source )
 {
-  if ( source != ACTION_SOURCE_INTERFACE_E )
+  if ( source != ActionSource::ACTION_SOURCE_INTERFACE_E )
   {
     QtSignal( qpointer, boost::bind( &QCheckBox::setChecked, 
       qpointer.data(), state ) ); 
@@ -74,7 +74,7 @@ void QtComboBoxSignal( QComboBox* qcombobox, std::string state )
 
 void QtComboBoxSignal( QPointer< QComboBox > qpointer, std::string state, ActionSource source )
 {
-  if ( source != ACTION_SOURCE_INTERFACE_E )
+  if ( source != ActionSource::ACTION_SOURCE_INTERFACE_E )
   {
     QtSignal( qpointer, boost::bind( &QtComboBoxSignal, qpointer.data(), state ) );
   }
@@ -83,7 +83,7 @@ void QtComboBoxSignal( QPointer< QComboBox > qpointer, std::string state, Action
 void QtSliderSpinComboRangedIntSignal( QPointer< SliderSpinComboInt > qpointer, int state,
     ActionSource source )
 {
-  if ( source != ACTION_SOURCE_INTERFACE_E )
+  if ( source != ActionSource::ACTION_SOURCE_INTERFACE_E )
   {
     QtSignal( qpointer, boost::bind( &SliderSpinComboInt::setCurrentValue, qpointer.data(), state ) );
   }
@@ -92,7 +92,7 @@ void QtSliderSpinComboRangedIntSignal( QPointer< SliderSpinComboInt > qpointer, 
 void QtSliderSpinComboRangedDoubleSignal( QPointer< SliderSpinComboDouble > qpointer, double state,
     ActionSource source )
 {
-  if ( source != ACTION_SOURCE_INTERFACE_E )
+  if ( source != ActionSource::ACTION_SOURCE_INTERFACE_E )
   {
     QtSignal( qpointer, boost::bind( &SliderSpinComboDouble::setCurrentValue, qpointer.data(), state ) );
   }
@@ -114,7 +114,7 @@ void QtActionGroupSignal( QActionGroup* qactiongroup, std::string option )
 void QtActionGroupSignal( QPointer< QActionGroup > qpointer, std::string option,
     ActionSource source )
 {
-  if ( source != ACTION_SOURCE_INTERFACE_E )
+  if ( source != ActionSource::ACTION_SOURCE_INTERFACE_E )
   {
     QtSignal( qpointer, boost::bind( &QtActionGroupSignal, qpointer.data(), option ) );
   }

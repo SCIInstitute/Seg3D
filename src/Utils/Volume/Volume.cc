@@ -38,7 +38,7 @@ Volume::Volume( const GridTransform& grid_transform, const DataBlockHandle& data
 }
 
 Volume::Volume( const GridTransform& grid_transform, const MaskDataBlockHandle& mask_data_block ) :
-  type_( MASK_E ), grid_transform_( grid_transform ), mask_data_block_( mask_data_block )
+  type_( VolumeType::MASK_E ), grid_transform_( grid_transform ), mask_data_block_( mask_data_block )
 {
 }
 

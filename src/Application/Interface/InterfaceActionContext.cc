@@ -41,23 +41,23 @@ InterfaceActionContext::~InterfaceActionContext()
 
 void InterfaceActionContext::report_error( const std::string& error )
 {
-  action_message_signal_( Utils::Log::ERROR_E, error );
+  action_message_signal_( Utils::LogMessageType::ERROR_E, error );
 }
 
 void InterfaceActionContext::report_warning( const std::string& warning )
 {
-  action_message_signal_( Utils::Log::WARNING_E, warning );
+  action_message_signal_( Utils::LogMessageType::WARNING_E, warning );
 }
 
 void InterfaceActionContext::report_message( const std::string& message )
 {
-  action_message_signal_( Utils::Log::MESSAGE_E, message );
+  action_message_signal_( Utils::LogMessageType::MESSAGE_E, message );
 }
 
 void InterfaceActionContext::report_need_resource( ResourceLockHandle& resource )
 {
   std::string error = std::string( "Resource '" ) + resource->name() + "' is not available";
-  action_message_signal_( Utils::Log::ERROR_E, error );
+  action_message_signal_( Utils::LogMessageType::ERROR_E, error );
 }
 
 void InterfaceActionContext::report_done()

@@ -79,11 +79,11 @@ void RenderResources::init_gl()
     {
       glewInit();
       gl_initialized_ = true;
-      if ( !GL_VERSION_2_1 )
+      if ( !GLEW_VERSION_2_1 )
       {
         SCI_THROW_OPENGLEXCEPTION("Minimum OpenGL version 2.1 required.");
       }
-      if ( !GL_EXT_framebuffer_object )
+      if ( !GLEW_EXT_framebuffer_object )
       {
         SCI_THROW_OPENGLEXCEPTION("GL_EXT_framebuffer_object not found.");
       }

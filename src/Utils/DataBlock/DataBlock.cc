@@ -41,12 +41,12 @@ const unsigned int DataBlock::GL_TEXTURE_FORMAT_C[] =
 {
   GL_INTENSITY8, GL_INTENSITY8, 
   GL_INTENSITY16, GL_INTENSITY16,
-  GL_INTENSITY32F_ARB, GL_INTENSITY32F_ARB, 
-  GL_INTENSITY32F_ARB, GL_INTENSITY32F_ARB
+  GL_INTENSITY16, GL_INTENSITY16, 
+  GL_INTENSITY16, GL_INTENSITY16
 };
 
 DataBlock::DataBlock() :
-  nx_( 0 ), ny_( 0 ), nz_( 0 ), data_type_( UNKNOWN_E ), 
+  nx_( 0 ), ny_( 0 ), nz_( 0 ), data_type_( DataType::UNKNOWN_E ), 
   data_( 0 ), data_changed_( true )
 {
 }
@@ -55,41 +55,41 @@ DataBlock::~DataBlock()
 {
 }
 
-void DataBlock::set_type( data_type type )
+void DataBlock::set_type( DataType type )
 {
   this->data_type_ = type;
 
   switch( data_type_ )
   {
-  case CHAR_E:
+  case DataType::CHAR_E:
     this->get_data_func_ = boost::bind( &DataBlock::internal_get_data<char>, this, _1 );
     this->set_data_func_ = boost::bind( &DataBlock::internal_set_data<char>, this, _1, _2 );
     break;
-  case UCHAR_E:
+  case DataType::UCHAR_E:
     this->get_data_func_ = boost::bind( &DataBlock::internal_get_data<unsigned char>, this, _1 ); 
     this->set_data_func_ = boost::bind( &DataBlock::internal_set_data<unsigned char>, this, _1, _2 );
     break;
-  case SHORT_E:
+  case DataType::SHORT_E:
     this->get_data_func_ = boost::bind( &DataBlock::internal_get_data<short>, this, _1 );
     this->set_data_func_ = boost::bind( &DataBlock::internal_set_data<short>, this, _1, _2 );
     break;
-  case USHORT_E:
+  case DataType::USHORT_E:
     this->get_data_func_ = boost::bind( &DataBlock::internal_get_data<unsigned short>, this, _1 ); 
     this->set_data_func_ = boost::bind( &DataBlock::internal_set_data<unsigned short>, this, _1, _2 );
     break;
-  case INT_E:
+  case DataType::INT_E:
     this->get_data_func_ = boost::bind( &DataBlock::internal_get_data<int>, this, _1 );
     this->set_data_func_ = boost::bind( &DataBlock::internal_set_data<int>, this, _1, _2 );
     break;
-  case UINT_E:
+  case DataType::UINT_E:
     this->get_data_func_ = boost::bind( &DataBlock::internal_get_data<unsigned int>, this, _1 ); 
     this->set_data_func_ = boost::bind( &DataBlock::internal_set_data<unsigned int>, this, _1, _2 );
     break;
-  case FLOAT_E:
+  case DataType::FLOAT_E:
     this->get_data_func_ = boost::bind( &DataBlock::internal_get_data<float>, this, _1 );
     this->set_data_func_ = boost::bind( &DataBlock::internal_set_data<float>, this, _1, _2 );
     break;
-  case DOUBLE_E:
+  case DataType::DOUBLE_E:
     this->get_data_func_ = boost::bind( &DataBlock::internal_get_data<double>, this, _1 );
     this->set_data_func_ = boost::bind( &DataBlock::internal_set_data<double>, this, _1, _2 );
     break;
@@ -106,6 +106,8 @@ void DataBlock::upload_texture()
   {
     // The texture is not created yet
     this->texture_ = Texture3DHandle( new Texture3D );
+    this->texture_->set_min_filter( GL_LINEAR );
+    this->texture_->set_mag_filter( GL_LINEAR );
   }
 
   if ( this->data_changed_ )

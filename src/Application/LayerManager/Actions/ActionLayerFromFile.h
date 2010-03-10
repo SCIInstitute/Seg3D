@@ -68,7 +68,7 @@ namespace Seg3D
 // Class declarations
 class ActionLayerFromFile : public ActionLayer
 {
-SCI_ACTION_TYPE("LayerFromFile","",LAYER_E)
+SCI_ACTION_TYPE("LayerFromFile", "", ActionPropertiesType::LAYER_E)
 public:
   ActionLayerFromFile()
   {

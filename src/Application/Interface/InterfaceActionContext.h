@@ -80,7 +80,7 @@ public:
 public:
   virtual ActionSource source() const
   {
-    return ACTION_SOURCE_INTERFACE_E;
+    return ActionSource::ACTION_SOURCE_INTERFACE_E;
   }
 
   // -- Signals --

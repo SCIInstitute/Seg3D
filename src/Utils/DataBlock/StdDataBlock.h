@@ -49,7 +49,7 @@ class StdDataBlock : public DataBlock
 
   // -- Constructor/destructor --
 public:
-  StdDataBlock( size_t nx, size_t ny, size_t nz, data_type type );
+  StdDataBlock( size_t nx, size_t ny, size_t nz, DataType type );
   virtual ~StdDataBlock();
 
 };

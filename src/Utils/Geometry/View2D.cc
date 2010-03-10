@@ -97,9 +97,9 @@ void View2D::translate( const Vector& offset )
   this->center_[1] -= delta_y;
 }
 
-void View2D::flip(Direction direction)
+void View2D::flip(FlipDirectionType direction)
 {
-  if (direction == HORIZONTAL_E)
+  if (direction == FlipDirectionType::HORIZONTAL_E)
   {
     this->scalex_ = -this->scalex_;
   }

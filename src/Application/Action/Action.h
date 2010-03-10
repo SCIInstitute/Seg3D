@@ -44,6 +44,7 @@
 #include <boost/utility.hpp>
 
 // Utils includes
+#include <Utils/Core/EnumClass.h>
 #include <Utils/Core/Log.h>
 #include <Utils/Core/IntrusiveBase.h>
 
@@ -59,6 +60,37 @@ class Action;
 typedef boost::intrusive_ptr< Action > ActionHandle;
 typedef std::vector< ActionHandle > ActionHandleList;
 
+// Action types/properties
+SCI_ENUM_CLASS
+(
+  ActionPropertiesType,
+
+  // APPLICATION ACTION - For now all actions that are no layer actions are
+  // classified as application actions.
+  APPLICATION_E = 0x0001,
+
+  // LAYER ACTION - Layer actions affect layers/layer manager and are currently
+  // the only actions that can be undone.
+  LAYER_E = 0x0002,
+
+  // INTERFACE ACTION - Layer actions only affect the interface
+  INTERFACE_E = 0x0004,
+
+  // ASYNCHRONOUS ACTIONS - These actions do not complete on the main
+  // application thread and run while new actions can be issued
+  ASYNCHRONOUS_E = 0x20000,
+
+  // COLLAPSEABLE ACTIONS - These actions can be inserted on top of each
+  // other. Their undo/redo action consist of only one action in each
+  // direction and they can be combined by taking the the last redo and
+  // the first undo
+  COLLAPSEABLE_E = 0x40000,
+
+  // QUERY ACTIONS - These actions do not alter the state of the program
+  // but query state. They do not need to be recorded in a playback script.
+  QUERY_E = 0x1000000
+)
+
 // CLASS ACTION:
 // Main class that defines an action in the program
 // An action is not copyable as that would invalidate 
@@ -66,37 +98,6 @@ typedef std::vector< ActionHandle > ActionHandleList;
 
 class Action : public Utils::IntrusiveBase
 {
-
-  // -- Action types/properties --
-public:
-  enum action_properties_type
-  {
-    // APPLICATION ACTION - For now all actions that are no layer actions are
-    // classified as application actions.
-    APPLICATION_E = 0x0001,
-
-    // LAYER ACTION - Layer actions affect layers/layer manager and are currently
-    // the only actions that can be undone.
-    LAYER_E = 0x0002,
-
-    // INTERFACE ACTION - Layer actions only affect the interface
-    INTERFACE_E = 0x0004,
-
-    // ASYNCHRONOUS ACTIONS - These actions do not complete on the main
-    // application thread and run while new actions can be issued
-    ASYNCHRONOUS_E = 0x20000,
-
-    // COLLAPSEABLE ACTIONS - These actions can be inserted on top of each
-    // other. Their undo/redo action consist of only one action in each
-    // direction and they can be combined by taking the the last redo and
-    // the first undo
-    COLLAPSEABLE_E = 0x40000,
-
-    // QUERY ACTIONS - These actions do not alter the state of the program
-    // but query state. They do not need to be recorded in a playback script.
-    QUERY_E = 0x1000000
-  };
-
   // -- Constructor/Destructor --
 public:
   // Construct an action of a certain type and with certain properties

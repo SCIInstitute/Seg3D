@@ -38,6 +38,7 @@
 #include <ostream>
 
 // Utils includes
+#include <Utils/Core/EnumClass.h>
 #include <Utils/Geometry/Point.h>
 #include <Utils/Geometry/Vector.h>
 #include <Utils/Math/MathFunctions.h>
@@ -45,13 +46,17 @@
 namespace Utils
 {
 
+SCI_ENUM_CLASS
+(
+  IntersectionType,
+  INSIDE_E = 1, 
+  INTERSECT_E = 0, 
+  OUTSIDE_E = -1
+)
+
 class BBox
 {
 public:
-  enum
-  {
-    INSIDE_E = 1, INTERSECT_E = 0, OUTSIDE_E = -1
-  };
 
   BBox() :
     is_valid_( false )
@@ -306,17 +311,17 @@ public:
         < b.cmin_.y() ) || ( cmin_.y() > b.cmax_.y() ) || ( cmax_.z() < b.cmin_.z() )
         || ( cmin_.z() > b.cmax_.z() ) )
     {
-      return OUTSIDE_E;
+      return IntersectionType::OUTSIDE_E;
     }
 
     if ( ( cmin_.x() <= b.cmin_.x() ) && ( cmax_.x() >= b.cmax_.x() ) && ( cmin_.y()
         <= b.cmin_.y() ) && ( cmax_.y() >= b.cmax_.y() ) && ( cmin_.z() <= b.cmin_.z() )
         && ( cmax_.z() >= b.cmax_.z() ) )
     {
-      return INSIDE_E;
+      return IntersectionType::INSIDE_E;
     }
 
-    return INTERSECT_E;
+    return IntersectionType::INTERSECT_E;
   }
 
   inline double x_length()

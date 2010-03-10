@@ -78,7 +78,9 @@ void MaskDataSlice::upload_texture()
   {
     if ( this->size_changed_ )
     {
+      // Make sure there is no pixel unpack buffer bound
       PixelUnpackBuffer::RestoreDefault();
+
       this->texture_->set_image( static_cast<int>( this->width_ ), 
         static_cast<int>( this->height_ ), GL_ALPHA );
       this->size_changed_ = false;
@@ -107,6 +109,7 @@ void MaskDataSlice::upload_texture()
       static_cast<int>( this->height_ ), NULL, GL_ALPHA, GL_UNSIGNED_BYTE );
 
     // Step 3. release the pixel unpack buffer
+    // NOTE: The texture streaming will still succeed even if the PBO is deleted.
     this->pixel_buffer_->unbind();
     this->pixel_buffer_.reset();
 
