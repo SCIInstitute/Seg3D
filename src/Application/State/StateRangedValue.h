@@ -90,7 +90,7 @@ public:
   // IMPORT_FROM_STRING:
   // Set the State from a string
   virtual bool import_from_string( const std::string& str, ActionSource source =
-      ACTION_SOURCE_NONE_E )
+    ActionSource::ACTION_SOURCE_NONE_E )
   {
     T value;
     if ( !( Utils::import_from_string( str, value ) ) ) return ( false );
@@ -108,7 +108,7 @@ protected:
   // IMPORT_FROM_VARIANT:
   // Import the state data from a variant parameter.
   virtual bool import_from_variant( ActionParameterVariant& variant, ActionSource source =
-      ACTION_SOURCE_NONE_E )
+                    ActionSource::ACTION_SOURCE_NONE_E )
   {
     // Get the value from the action parameter
     T value;
@@ -160,13 +160,13 @@ public:
     if ( value_ < min_value_ )
     {
       value_ = min_value_;
-      value_changed_signal_( value_, ACTION_SOURCE_NONE_E );
+      value_changed_signal_( value_, ActionSource::ACTION_SOURCE_NONE_E );
       state_changed_signal_();
     }
     else if ( value_ > max_value_ )
     {
       value_ = max_value_;
-      value_changed_signal_( value_, ACTION_SOURCE_NONE_E );
+      value_changed_signal_( value_, ActionSource::ACTION_SOURCE_NONE_E );
       state_changed_signal_();
     }
 
@@ -187,7 +187,7 @@ public:
   // NOTE: this function by passes the action mechanism and should only be used
   // to enforce a constraint from another action. Normally use the action
   // mechanism to ensure that the action is recorded correctly.
-  bool set( T& value, ActionSource source = ACTION_SOURCE_NONE_E )
+  bool set( T& value, ActionSource source = ActionSource::ACTION_SOURCE_NONE_E )
   {
     // Lock the state engine so no other thread will be accessing it
     StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );

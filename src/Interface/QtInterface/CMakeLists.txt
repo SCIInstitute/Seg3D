@@ -90,6 +90,7 @@ TARGET_LINK_LIBRARIES(Interface_QtInterface
                       Utils_Core
                       Utils_Converter
                       Utils_EventHandler
+            Utils_Graphics
                       Application_Renderer
                       ${QT_LIBRARIES} 
                       ${SCI_GLEW_LIBRARY}

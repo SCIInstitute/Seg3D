@@ -100,7 +100,7 @@ public:
   // IMPORT_FROM_STRING:
   // Set the State from a string
   virtual bool import_from_string( const std::string& str, ActionSource source =
-      ACTION_SOURCE_NONE_E )
+    ActionSource::ACTION_SOURCE_NONE_E )
   {
     T value;
     if ( !( Utils::import_from_string( str, value ) ) ) return ( false );
@@ -119,7 +119,7 @@ protected:
   // IMPORT_FROM_VARIANT:
   // Import the state data from a variant parameter.
   virtual bool import_from_variant( ActionParameterVariant& variant, ActionSource source =
-      ACTION_SOURCE_NONE_E )
+    ActionSource::ACTION_SOURCE_NONE_E )
   {
     T value;
     if ( !( variant.get_value( value ) ) ) return ( false );
@@ -154,7 +154,7 @@ public:
   // Set the value of the state variable
   // NOTE: this function by passes the action mechanism and should only be used
   // to enforce a constraint from another action.
-  bool set( const T& value, ActionSource source = ACTION_SOURCE_NONE_E )
+  bool set( const T& value, ActionSource source = ActionSource::ACTION_SOURCE_NONE_E )
   {
     SCI_LOG_DEBUG(std::string("Set Value ")+ stateid() +
       std::string(" ") + Utils::to_string(value));
