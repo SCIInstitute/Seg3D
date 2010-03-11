@@ -126,7 +126,7 @@ void Renderer::initialize()
   textures_[ 1 ] = Utils::Texture2DHandle( new Utils::Texture2D() );
   depth_buffer_ = Utils::RenderbufferHandle( new Utils::Renderbuffer() );
   frame_buffer_ = Utils::FramebufferObjectHandle( new Utils::FramebufferObject() );
-  frame_buffer_->attach_render_buffer( depth_buffer_, GL_DEPTH_ATTACHMENT_EXT );
+  frame_buffer_->attach_renderbuffer( depth_buffer_, GL_DEPTH_ATTACHMENT_EXT );
   this->cube_ = Utils::UnitCubeHandle( new Utils::UnitCube() );
 
   // release the lock

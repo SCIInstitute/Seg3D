@@ -56,10 +56,10 @@ void FramebufferObject::disable()
   glBindFramebufferEXT( TARGET_C, 0 );
 }
 
-void FramebufferObject::attach_render_buffer(RenderbufferHandle render_buffer, unsigned int attachment)
+void FramebufferObject::attach_renderbuffer(RenderbufferHandle renderbuffer, unsigned int attachment)
 {
   safe_bind();
-  glFramebufferRenderbufferEXT(TARGET_C, attachment, render_buffer->get_target(), render_buffer->get_id());
+  glFramebufferRenderbufferEXT(TARGET_C, attachment, renderbuffer->get_target(), renderbuffer->get_id());
   safe_unbind();
 }
 

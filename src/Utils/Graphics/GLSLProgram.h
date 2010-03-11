@@ -26,47 +26,49 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef UTILS_GRAPHICS_FRAMEBUFFEROBJECT_H
-#define UTILS_GRAPHICS_FRAMEBUFFEROBJECT_H
+#ifndef UTILS_GRAPHICS_GLSLPROGRAM_H
+#define UTILS_GRAPHICS_GLSLPROGRAM_H
 
-#include <boost/utility.hpp>
+#include <string>
+
 #include <boost/shared_ptr.hpp>
+#include <boost/utility.hpp>
 
 #include <GL/glew.h>
 
-#include <Utils/Graphics/Texture.h>
-#include <Utils/Graphics/Renderbuffer.h>
+#include <Utils/Graphics/GLSLShader.h>
 
 namespace Utils
 {
 
-class FramebufferObject;
-typedef boost::shared_ptr< FramebufferObject > FramebufferObjectHandle;
+class GLSLProgram;
+typedef boost::shared_ptr< GLSLProgram > GLSLProgramHandle;
 
-class FramebufferObject : public boost::noncopyable
+class GLSLProgram : public boost::noncopyable
 {
-
 public:
+  GLSLProgram();
+  ~GLSLProgram();
 
-  FramebufferObject();
-  ~FramebufferObject();
+  void attach_shader( GLSLShaderHandle shader );
+  void detach_shader( GLSLShaderHandle shader );
+
+  // Link the program. Returns true if successful, otherwise false.
+  // Additional information can be acquired by calling "get_info_log".
+  bool link();
+
+  // Validate the program against the current OpenGL state. 
+  // Returns true if successful, otherwise false. 
+  // Additional information can be acquired by calling "get_info_log".
+  bool validate();
+
+  std::string get_info_log();
 
   void enable();
   void disable();
 
-  void attach_texture(TextureHandle texture, unsigned int attachment = GL_COLOR_ATTACHMENT0_EXT, int level = 0, int layer = 0);
-  void attach_renderbuffer(RenderbufferHandle renderbuffer, unsigned int attachment);
-  bool check_status( GLenum* status = NULL );
-
 private:
-
-  void safe_bind();
-  void safe_unbind();
-
-  unsigned int id_;
-  int saved_id_;
-
-  const static unsigned int TARGET_C;
+  GLuint program_id_;
 };
 
 } // end namespace Utils

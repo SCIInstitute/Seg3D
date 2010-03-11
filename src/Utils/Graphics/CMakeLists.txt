@@ -46,6 +46,10 @@ SET(UTILS_GRAPHICS_SRCS
   PixelBufferObject.cc
   UnitCube.h
   UnitCube.cc
+  GLSLShader.h
+  GLSLShader.cc
+  GLSLProgram.h
+  GLSLProgram.cc
   )
 
 

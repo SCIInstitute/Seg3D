@@ -26,47 +26,62 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef UTILS_GRAPHICS_FRAMEBUFFEROBJECT_H
-#define UTILS_GRAPHICS_FRAMEBUFFEROBJECT_H
+#ifndef UTILS_GRAPHICS_GLSLSHADER_H
+#define UTILS_GRAPHICS_GLSLSHADER_H
 
-#include <boost/utility.hpp>
+#include <string>
+
 #include <boost/shared_ptr.hpp>
+#include <boost/utility.hpp>
 
 #include <GL/glew.h>
-
-#include <Utils/Graphics/Texture.h>
-#include <Utils/Graphics/Renderbuffer.h>
 
 namespace Utils
 {
 
-class FramebufferObject;
-typedef boost::shared_ptr< FramebufferObject > FramebufferObjectHandle;
+class GLSLShader;
+typedef boost::shared_ptr< GLSLShader > GLSLShaderHandle;
 
-class FramebufferObject : public boost::noncopyable
+class GLSLShader : public boost::noncopyable
 {
+protected:
+  GLSLShader( GLenum shader_type );
+  virtual ~GLSLShader();
 
 public:
+  bool set_source( const std::string& file_name );
 
-  FramebufferObject();
-  ~FramebufferObject();
+  // Compile the shader. Returns true if successful, otherwise false.
+  // Additional information can be acquired by calling "get_info_log".
+  bool compile();
 
-  void enable();
-  void disable();
-
-  void attach_texture(TextureHandle texture, unsigned int attachment = GL_COLOR_ATTACHMENT0_EXT, int level = 0, int layer = 0);
-  void attach_renderbuffer(RenderbufferHandle renderbuffer, unsigned int attachment);
-  bool check_status( GLenum* status = NULL );
+  std::string get_info_log();
 
 private:
+  friend class GLSLProgram;
+  GLuint shader_id_;
+};
 
-  void safe_bind();
-  void safe_unbind();
+class GLSLVertexShader : public GLSLShader
+{
+public:
+  GLSLVertexShader() : 
+    GLSLShader( GL_VERTEX_SHADER )
+  {
+  }
 
-  unsigned int id_;
-  int saved_id_;
+  ~GLSLVertexShader() {}
+};
 
-  const static unsigned int TARGET_C;
+class GLSLFragmentShader : public GLSLShader
+{
+public:
+  GLSLFragmentShader() :
+    GLSLShader( GL_FRAGMENT_SHADER )
+  {
+  }
+
+  ~GLSLFragmentShader() {}
 };
 
 } // end namespace Utils
