@@ -50,6 +50,7 @@
 #include <Application/Action/Action.h>
 #include <Application/State/State.h>
 
+
 namespace Seg3D
 {
 
@@ -57,8 +58,15 @@ namespace Seg3D
 // This is the main class for collecting state information on a layer
 
 // Forward declarations
+  
+class LayerGroup;
+typedef boost::shared_ptr< LayerGroup > LayerGroupHandle;
+typedef boost::weak_ptr< LayerGroup > LayerGroupWeakHandle;
+  
 class Layer;
 typedef boost::shared_ptr< Layer > LayerHandle;
+typedef std::list< LayerHandle > layer_list_type;
+
 
 // Class definition
 class Layer : public StateHandler
@@ -97,7 +105,7 @@ public:
   // SET_VOLUME
   // Add a volume to this layer
   void set_volume( Utils::VolumeHandle volume );
-
+  
 protected:
   // The type of the layer
   Utils::VolumeType type_;
@@ -108,9 +116,12 @@ protected:
 
   // Cached version of the grid transform of the underlying volume object
   Utils::GridTransform grid_transform_;
+  
+
 
   // -- State variables --
 public:
+  
   // The name of the layer
   StateAliasHandle name_state_;
 
@@ -145,7 +156,7 @@ public:
   static void Lock()
   {
     StateEngine::Lock();
-    lock_status_ = true;
+
   }
 
   // UNLOCK
@@ -153,7 +164,7 @@ public:
   static void Unlock()
   {
     StateEngine::Unlock();
-    lock_status_ = false;
+
   }
 
   // GETMUTEX
@@ -163,16 +174,37 @@ public:
     return StateEngine::GetMutex();
   }
   
-  // IS_LOCKED
-  // Return the status of the lock
-  static bool is_locked()
-  {
-    return lock_status_;
+  
+  LayerGroupHandle get_layer_group() 
+  { 
+    return layer_group_.lock(); 
   }
   
-private:
-  static bool lock_status_;
+  inline void set_layer_group( LayerGroupWeakHandle layer_group )
+  {
+    layer_group_ = layer_group;
+  }
   
+  Utils::GridTransform& get_grid_transform()
+  {
+    return grid_transform_;
+  }
+  
+  // test code 
+  void set_grid_transform( int x, int y, int  z )
+  {
+    grid_transform_ = Utils::GridTransform( x, y, z );
+  }
+  
+  const std::string get_layer_id()
+  {
+    return layer_id_;
+  }
+  
+private:  
+  // The unique ID of the layer
+  std::string layer_id_;
+  LayerGroupWeakHandle layer_group_;
 };
 
 } // end namespace Seg3D

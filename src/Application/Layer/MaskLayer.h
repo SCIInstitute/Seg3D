@@ -35,6 +35,7 @@
 
 // Application includes
 #include <Application/Layer/Layer.h>
+#include <Utils/Volume/Volume.h>
 
 namespace Seg3D
 {

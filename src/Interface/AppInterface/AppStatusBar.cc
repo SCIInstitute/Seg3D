@@ -68,8 +68,8 @@ AppStatusBar::AppStatusBar( QMainWindow* parent ) :
   qpointer_type statusbar_pointer( this );
 
   statusbar->setContentsMargins( 4, 0, 0, 0 );
-  statusbar->addWidget( status_report_label_, 5 );
   statusbar->addWidget( info_button_, 0 );
+  statusbar->addWidget( status_report_label_, 5 );
   statusbar->addWidget( coordinates_label_, 1 );
   statusbar->addWidget( world_button_, 0 );
   statusbar->setStyleSheet(

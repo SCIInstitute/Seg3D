@@ -131,53 +131,50 @@ virtual ToolInterface* build()
 class ToolInfo
 {
 public:
-ToolInfo(std::string type,
-  ToolBuilderBase* builder,
-  int properties,
-  std::string menu_name,
-  std::string shortcut_key) :
-type_(type),
-builder_(builder),
-properties_(properties),
-menu_name_(menu_name),
-shortcut_key_(shortcut_key)
-{}
+  ToolInfo(std::string type,
+    ToolBuilderBase* builder,
+    int properties,
+    std::string menu_name,
+    std::string shortcut_key) :
+    type_(type),
+    builder_(builder),
+    properties_(properties),
+    menu_name_(menu_name),
+    shortcut_key_(shortcut_key)
+    {}
 
-// Copy constructor and default constructor are needed by the unordered_map
-// class
-ToolInfo(const ToolInfo& toolinfo) :
-type_(toolinfo.type_),
-builder_(toolinfo.builder_),
-properties_(toolinfo.properties_),
-menu_name_(toolinfo.menu_name_),
-shortcut_key_(toolinfo.shortcut_key_)
-{}
+  // Copy constructor and default constructor are needed by the unordered_map
+  // class
+  ToolInfo(const ToolInfo& toolinfo) : 
+    type_(toolinfo.type_), builder_(toolinfo.builder_), properties_(toolinfo.properties_),
+    menu_name_(toolinfo.menu_name_), shortcut_key_(toolinfo.shortcut_key_)
+    {}
 
-ToolInfo() :
-type_(""),
-builder_(0),
-properties_(0),
-menu_name_(""),
-shortcut_key_("")
-{}
+  ToolInfo() :
+    type_(""), builder_(0), properties_(0), menu_name_(""), shortcut_key_("")
+    {}
 
-std::string type() const
-{ return type_;}
-ToolBuilderBase* builder() const
-{ return builder_;}
-int properties() const
-{ return properties_;}
-std::string menu_name() const
-{ return menu_name_;}
-std::string shortcut_key() const
-{ return shortcut_key_;}
+  std::string type() const
+  { return type_;}
+    
+  ToolBuilderBase* builder() const
+  { return builder_;}
+    
+  int properties() const
+  { return properties_;}
+    
+  std::string menu_name() const
+  { return menu_name_;}
+    
+  std::string shortcut_key() const
+  { return shortcut_key_;}
 
 private:
-std::string type_;
-ToolBuilderBase* builder_;
-int properties_;
-std::string menu_name_;
-std::string shortcut_key_;
+  std::string type_;
+  ToolBuilderBase* builder_;
+  int properties_;
+  std::string menu_name_;
+  std::string shortcut_key_;
 };
 
 // ------------------------------
@@ -201,7 +198,7 @@ private:
 // -- Tool registration --
 public:
 // REGISTER_TOOL:
-// Register a tool so that it can be automatically build in the tool
+// Register a tool so that it can be automatically built in the tool
 // factory.
 
 template <class TOOL>
@@ -234,15 +231,15 @@ void register_tool()
 }
 
 private:
-typedef boost::unordered_map<std::string,ToolInfo*> tool_map_type;
-typedef boost::mutex mutex_type;
-typedef boost::unique_lock<mutex_type> lock_type;
+  typedef boost::unordered_map<std::string,ToolInfo*> tool_map_type;
+  typedef boost::mutex mutex_type;
+  typedef boost::unique_lock<mutex_type> lock_type;
 
-// List with builders that can be called to generate a new object
-tool_map_type tools_;
+  // List with builders that can be called to generate a new object
+  tool_map_type tools_;
 
-// Mutex for protecting registration
-mutex_type mutex_;
+  // Mutex for protecting registration
+  mutex_type mutex_;
 
 // -- ToolInterface registration --
 public:

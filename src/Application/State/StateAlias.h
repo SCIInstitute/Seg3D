@@ -55,7 +55,7 @@ namespace Seg3D
 // layer name needs to be unique
 
 class StateAlias;
-typedef boost::shared_ptr< StateAlias > StateAliasHandle;
+  typedef boost::shared_ptr< StateAlias > StateAliasHandle;
 
 class StateAlias : public StateBase
 {

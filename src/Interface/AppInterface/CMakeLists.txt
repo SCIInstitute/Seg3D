@@ -40,6 +40,7 @@ SET(INTERFACE_APPINTERFACE_SRCS
   MessageHistoryWidget.cc
   LayerManagerWidget.cc
   LayerWidget.cc
+  LayerGroupWidget.cc
   LayerManagerDockWidget.cc
   MeasurementDockWidget.cc
   ProjectDockWidget.cc
@@ -64,6 +65,7 @@ SET(INTERFACE_APPINTERFACE_MOC_SRCS
   ToolsDockWidget.h
   ToolWidget.h
   LayerWidget.h
+  LayerGroupWidget.h
   LayerManagerWidget.h
   LayerManagerDockWidget.h
   SplashStart.h

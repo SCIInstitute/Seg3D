@@ -43,6 +43,7 @@
 #include <Utils/Geometry/Vector.h>
 #include <Utils/Geometry/Transform.h>
 #include <Utils/Geometry/GridTransform.h>
+#include <Utils/Core/EnumClass.h>
 
 namespace Utils
 {

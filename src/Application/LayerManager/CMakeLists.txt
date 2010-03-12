@@ -37,6 +37,8 @@ SET(APPLICATION_LAYERMANAGER_SRCS
   )
 
 SET(APPLICATION_LAYERMANAGER_ACTIONS_SRCS
+  Actions/ActionInsertLayer.h
+  Actions/ActionInsertLayer.cc
   Actions/ActionInsertLayerAbove.h
   Actions/ActionInsertLayerAbove.cc
   Actions/ActionCloneLayer.h

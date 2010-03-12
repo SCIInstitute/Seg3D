@@ -86,7 +86,7 @@ private:
   QVBoxLayout* main_layout_;
   QVBoxLayout* tool_layout_;
 
-  typedef boost::shared_ptr< ToolBoxWidgetPrivate > ToolBoxWidgetPrivateHandle;
+  typedef QSharedPointer< ToolBoxWidgetPrivate > ToolBoxWidgetPrivateHandle;
   ToolBoxWidgetPrivateHandle private_;
 
   int active_index_;

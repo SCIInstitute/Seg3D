@@ -31,8 +31,6 @@
 
 // QT includes
 #include <QtGui>
-#include <QDockWidget>
-#include <QPointer>
 
 // STL includes
 #include <string>

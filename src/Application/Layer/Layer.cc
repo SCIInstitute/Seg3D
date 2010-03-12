@@ -39,10 +39,14 @@ namespace Seg3D
 Layer::Layer( const std::string& name, Utils::VolumeType type, const Utils::VolumeHandle& volume ) :
   StateHandler( name ), type_( type ), volume_( volume )
 {
+//  std::string new_name;
+//  StateEngine::Instance()->create_stateid( "layer", new_name );
+  this->layer_id_ = name;
+  
   // Step (1) : Build the layer specific state variables
 
   // == The name of the layer ==
-  add_state( "name", name_state_, name );
+  add_state( "name", name_state_, name);
 
   // == Visibility information for this layer per viewer ==
   size_t num_viewers = Application::Instance()->number_of_viewers();
@@ -61,7 +65,7 @@ Layer::Layer( const std::string& name, Utils::VolumeType type, const Utils::Volu
   add_state( "opacity", opacity_state_, 1.0, 0.0, 1.0, 0.05 );
 
   // == Selected by the LayerGroup ==
-  add_state( "selected", selected_state_, true );
+  add_state( "selected", selected_state_, false );
 
   // == Which of the submenus is being editted ==
   add_state( "edit_mode", edit_mode_state_, "none", "none|opacity|color|contrast|appearance" );
@@ -73,11 +77,14 @@ Layer::Layer( const std::string& name, Utils::VolumeType type, const Utils::Volu
 
 }
 
+
+  
 Layer::~Layer()
 {
   // Disconnect all current connections
   disconnect_all();
 }
+
 
 void Layer::set_volume( Utils::VolumeHandle volume )
 {

@@ -40,6 +40,8 @@ StateHandler::StateHandler( const std::string& stateid_prefix ) :
 StateHandler::~StateHandler()
 {
 }
+  
+  
 
 bool StateHandler::add_statebase( const std::string& key, StateBaseHandle state )
 {

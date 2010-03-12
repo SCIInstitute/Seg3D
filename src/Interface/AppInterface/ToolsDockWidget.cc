@@ -38,7 +38,7 @@
 #include <Application/Interface/Interface.h>
 
 #include <Application/ToolManager/ToolManager.h>
-#include <Application/ToolManager/Actions/ActionOpenTool.h>
+//#include <Application/ToolManager/Actions/ActionOpenTool.h>
 #include <Application/ToolManager/Actions/ActionCloseTool.h>
 #include <Application/ToolManager/Actions/ActionActivateTool.h>
 

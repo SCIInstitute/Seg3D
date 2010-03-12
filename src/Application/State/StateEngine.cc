@@ -216,7 +216,8 @@ bool StateEngine::create_stateid( const std::string& baseid, std::string& new_st
     {
       new_stateid = baseid + std::string( "_" ) + Utils::to_string( num );
       num++;
-    }while ( stateid_list_.find( new_stateid ) != stateid_list_.end() );
+    }
+    while ( stateid_list_.find( new_stateid ) != stateid_list_.end() );
   }
 
   return true;

@@ -196,6 +196,7 @@ void ToolBoxWidget::set_active_tool( QWidget *tool )
             active_help_icon_ );
         this->private_->page_list_[ i ]->findChild< QFrame* > ( "tool_frame_" )->show();
       }
+      
     }
   }
 }

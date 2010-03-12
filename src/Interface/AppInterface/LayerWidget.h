@@ -34,34 +34,47 @@
 
 // Application includes
 #include <Application/Layer/Layer.h>
-#include <Application/LayerManager/LayerManager.h>
+
 
 namespace Seg3D
 {
+  
+class LayerGroupWidget;
+typedef QSharedPointer< LayerGroupWidget > LayerGroupWidget_handle;
+  
+class LayerWidget;
+typedef QSharedPointer< LayerWidget > LayerWidget_handle;
 
+
+class LayerWidgetPrivate;
+  
 class LayerWidget : public QWidget
 {
 Q_OBJECT
 
 // -- constructor/destructor --
 public:
-  LayerWidget();
+  LayerWidget( QFrame* parent, LayerHandle layer );
   virtual ~LayerWidget();
-
-  // CREATE_WIDGET:
-  // The constructor only builds the class. Because this is handled through
-  // a factory method we use this auxillary function to build the inner parts
-  // of the widget
-  bool create_widget( QWidget* parent, LayerHandle& tool );
-
-  // BUILD_WIDGET:
-  // Function to create the specific tool widget:
-  // This one needs to be overloaded
-  virtual bool build_widget( QFrame* frame ) = 0; // << NEEDS TO BE REIMPLEMENTED
-
-  // -- widget internals --
-protected:
-  QFrame* main_frame_;
+    
+// -- widget internals --
+public Q_SLOTS:
+  void show_opacity_bar( bool show );
+  void show_brightness_contrast_bar( bool show );
+  void show_border_fill_bar( bool show );
+  void show_color_bar( bool show );
+  void show_progress_bar( bool show );
+  void visual_lock( bool lock );
+  
+public:
+  void show_selection_checkbox( bool hideshow );
+  
+private:
+  LayerWidgetPrivate* private_;
+  
+  // icons to represent the layer types
+  QIcon data_layer_icon_;
+  QIcon label_layer_icon_;
 
 };
 

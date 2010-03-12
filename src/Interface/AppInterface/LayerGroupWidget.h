@@ -26,68 +26,55 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_QTWIDGETS_LAYERMANAGERWIDGET_H
-#define INTERFACE_QTWIDGETS_LAYERMANAGERWIDGET_H
+#ifndef INTERFACE_APPINTERFACE_LAYERGROUPWIDGET_H
+#define INTERFACE_APPINTERFACE_LAYERGROUPWIDGET_H
 
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
-# pragma once
-#endif
-
-// Qt includes
+// QT Includes
 #include <QtGui>
 
-// Application Includes
-#include <Utils/Core/EnumClass.h>
-
+// Application includes
 #include <Application/Layer/LayerGroup.h>
-#include <Interface/AppInterface/LayerGroupWidget.h>
+//#include <Application/Layer/LayerManager.h>
+#include <Interface/AppInterface/LayerWidget.h>
 
 namespace Seg3D
 {
-  
-// enum for layer types
-SCI_ENUM_CLASS
-(
-  LayerType,
-  DATA_LAYER_E = 1, 
-  MASK_LAYER_E = 2, 
-  LABEL_LAYER_E = 3
-)
-  
-  
 
-//class LayerManagerWidgetPrivate;
-//typedef boost::shared_ptr< LayerManagerWidgetPrivate > LayerManagerWidgetPrivateHandle_type;
+class LayerGroupWidgetPrivate;
 
-class LayerManagerWidget : public QScrollArea
+class LayerGroupWidget : public QWidget
 {
-  // Needed to make it a Qt object
-Q_OBJECT
-
-//constructor - destructor
-public:
-  LayerManagerWidget( QWidget *parent = 0 );
-  virtual ~LayerManagerWidget();
-
-
-public:
-  void process_group( LayerGroupHandle group );
-  //void find_and_delete( LayerGroupWidget_handle group_to_delete );
+  Q_OBJECT
   
-
-private:
-  // private Qt GUI Components for the LayerManagerWidget
-  QWidget* main_;
-  QVBoxLayout* main_layout_;
-  QVBoxLayout* group_layout_;
+  // -- constructor/destructor --
+public:
+  LayerGroupWidget( QWidget* parent, LayerGroupHandle group );
+  virtual ~LayerGroupWidget();
   
-
+public:
+  QVector< LayerWidget_handle > layer_list_;
+  void add_layer( LayerHandle layer );
+  std::string &get_group_id();
+  
+public Q_SLOTS:
+  void show_layers( bool show );
+  void show_resample( bool show );
+  void show_transform( bool show );
+  void show_crop( bool show );
+  void show_flip_rotate( bool show );
+  void show_delete( bool show );
+  void show_selection_checkboxes( bool show );
+  void enable_delete_button( bool enable );
+  
+  
+  // -- widget internals --
 private:
-  QList< LayerGroupWidget_handle > group_list_;
-  //void clean_out_layers( LayerGroupHandle group_to_clean );
-
+  LayerGroupWidgetPrivate* private_;  
+    
 };
+    
 
-} //endnamespace Seg3d
+
+} //end namespace Seg3D
 
 #endif

@@ -31,7 +31,6 @@
 
 // QT includes
 #include <QtGui>
-#include <QDockWidget>
 
 // STL includes
 #include <string>
@@ -42,6 +41,9 @@
 #include <boost/thread/thread.hpp>
 #include <boost/shared_ptr.hpp>
 
+// Core includes
+#include <Utils/Core/ConnectionHandler.h>
+
 // Interface includes
 #include <Interface/AppInterface/LayerWidget.h>
 #include <Interface/AppInterface/LayerManagerWidget.h>
@@ -49,7 +51,7 @@
 namespace Seg3D
 {
 
-class LayerManagerDockWidget : public QDockWidget
+class LayerManagerDockWidget : public QDockWidget, public Utils::ConnectionHandler
 {
 Q_OBJECT
 
@@ -80,17 +82,17 @@ public:
   void remove_layer( LayerHandle& layer );
   
   //Move Layer Above
-  void insert_above_layer( LayerHandle& below_layer, LayerHandle& above_layer );
+  void insert_above_layer( LayerHandle& below_layer, LayerHandle &above_layer );
+  
+  //Insert Layer default
+  void insert_layer( LayerHandle &layer );
+  void process_group_ui( LayerGroupHandle &group );
   
   //Flip or Rotate Layer
 //  void flip_layer( layer_widget_list_type layers_to_crop_list );
 //  void crop_layer( layer_widget_list_type layers_to_crop_list );
 //  void resample_layer( layer_widget_list_type layers_to_crop_list );
 //  void transform_layer( 
-
-  //  -- slots --
-//public Q_SLOTS:
-//  void layer_changed(int index);
 
 private:
 
@@ -101,15 +103,16 @@ private:
   boost::signals2::connection new_mask_layer_connection_;
   boost::signals2::connection remove_layer_connection_;
 
-  typedef std::map< std::string, LayerWidget* > layer_widget_list_type;
-  layer_widget_list_type layer_widget_list_;
+  //typedef std::map< std::string, LayerWidget* > layer_widget_list_type;
+  //layer_widget_list_type layer_widget_list_;
 
-  LayerManagerWidget* layer_manager_;
+  LayerManagerWidget* layer_manager_widget_;
 
   // -- static functions for callbacks into this widget --
 public:
   typedef QPointer< LayerManagerDockWidget > qpointer_type;
   
+  static void handle_insert_layer( qpointer_type qpointer, LayerGroupHandle &group );
   static void HandleNewGroup( qpointer_type qpointer, LayerHandle layer );
   static void HandleCloseGroup( qpointer_type qpointer, LayerHandle layer );
   static void HandleDataFromFile( qpointer_type qpointer, LayerHandle layer );

@@ -59,12 +59,12 @@ bool ToolManager::open_tool( const std::string& toolid, std::string& new_toolid 
   lock_type lock( tool_list_mutex_ );
 
   // Step (2): Add an entry in the debug log
-  SCI_LOG_DEBUG(std::string("Open tool: ")+toolid);
+  SCI_LOG_DEBUG( std::string("Open tool: ")+toolid );
 
   // STEP (3): Create a new toolid and extract the tool type from the string
   if ( !( StateEngine::Instance()->create_stateid( toolid, new_toolid ) ) )
   {
-    SCI_LOG_ERROR(std::string("Could not create tool  '")+toolid+"'");
+    SCI_LOG_ERROR( std::string("Could not create tool  '")+toolid+"'" );
     return ( false );
   }
 

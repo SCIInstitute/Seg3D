@@ -39,9 +39,10 @@ StateAlias::StateAlias()
 {
 }
 
-StateAlias::StateAlias( const std::string default_value ) :
-  value_( default_value )
+StateAlias::StateAlias( const std::string default_value ) //:
+  //value_( default_value )
 {
+  value_ = default_value;
   if ( !( value_.empty() ) )
   {
     StateEngine::Instance()->add_statealias( baseid(), value_ );

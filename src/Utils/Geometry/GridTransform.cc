@@ -26,6 +26,9 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+//Boost Includes
+#include <boost/lexical_cast.hpp>
+
 #include <Utils/Geometry/GridTransform.h>
 
 namespace Utils
@@ -73,6 +76,17 @@ Transform GridTransform::transform() const
 {
   return ( Transform( *this ) );
 }
+  
+  std::string GridTransform::get_as_string()
+  {
+    std::string string_representation;
+    string_representation = boost::lexical_cast<std::string>( nx_ )+ "x" + 
+      boost::lexical_cast<std::string>( ny_ ) + "x" +
+    boost::lexical_cast<std::string>( nz_ );
+    return string_representation;
+  }
+  
+  
 
 bool GridTransform::operator==( const GridTransform& gt ) const
 {

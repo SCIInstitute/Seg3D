@@ -32,6 +32,8 @@
 ##################################################
 
 SET(UTILS_CORE_SRCS
+  GenerationNumber.h
+  GenerationNumber.cc
   ConnectionHandler.h
   ConnectionHandler.cc
   Exception.h

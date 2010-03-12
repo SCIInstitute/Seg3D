@@ -32,6 +32,8 @@
 ##################################################
 
 SET(APPLICATION_LAYER_SRCS
+  LayerGroup.h
+  LayerGroup.cc
   Layer.h
   Layer.cc
   DataLayer.h
@@ -57,6 +59,7 @@ TARGET_LINK_LIBRARIES(Application_Layer
                       Application_Action
                       Application_State
                       Application_StateManager
+            Application_LayerManager
                       ${SCI_BOOST_LIBRARY})
 
 # Register actions

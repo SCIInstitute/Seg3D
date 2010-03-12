@@ -43,7 +43,7 @@
 #include <boost/thread/mutex.hpp>
 
 // Utils includes
-#include <Utils/Geometry/GridTransform.h>
+//#include <Utils/Geometry/GridTransform.h>
 
 // Application includes
 #include <Application/Application/Application.h>
@@ -61,8 +61,7 @@ namespace Seg3D
 // This is the class that records the layers that are grouped together
 
 // Forward declarations
-class LayerGroup;
-typedef boost::shared_ptr< LayerGroup > LayerGroupHandle;
+
 
 // Class definition
 class LayerGroup : public StateHandler
@@ -71,7 +70,7 @@ class LayerGroup : public StateHandler
   // -- constructor/destructor --
 public:
 
-  LayerGroup( std::string& name );
+  LayerGroup( const std::string &name, Utils::GridTransform grid_transform );
   virtual ~LayerGroup();
 
   // -- state variables --
@@ -118,38 +117,29 @@ public:
 
   StateBoolHandle visibility_state_;
 
-  // -- Group transformation information --
 
-public:
-  // GRID_TRANSFORM
-  // Get the transform of the layer
-  const GridTransform& grid_transform() const
-  {
-    return this->grid_transform_;
-  }
-
-private:
-  // The transformation that describes the grid dimensions and the spacing
-  // information
-  GridTransform grid_transform_;
 
   // -- Layers contained within group --
 protected:
   // NOTE: Only the layer manager groups the layers, this is all done
   // dynamically
   friend class LayerManager;
+  
+  // CREATE_LAYER:
+  // Creates a new layer in the correct position
+  void create_mask_layer();
 
   // INSERT_NEW_LAYER:
   // Inserts a layer in the top most position
-  void insert_new_layer( LayerHandle new_layer );
+  void insert_layer( LayerHandle new_layer );
 
   // INSERT_LAYER_ABOVE:
   // Inserts a layer above a certain layer
-  void insert_layer_above( LayerHandle above_layer, LayerHandle layer );
+    void insert_layer_above( LayerHandle layer, LayerHandle layer_below );
   
   // DELETE_LAYER:
   // Delete a layer from the list
-  void delete_layer();
+  void delete_layer( LayerHandle layer );
     
   // CROP_LAYER:
   // Crops the selected layers based on the state of the crop panel
@@ -166,16 +156,46 @@ protected:
   // FLIP_LAYER:
   // Performs a flip or rotate on the selected layers based on which layers were selected
   void flip_layer();
+  
+  //TODO add move_layer function();
 
-  // MOVE_LAYER_ABOVE:
-  // Moves a layer up or down
-  void move_layer_above( LayerHandle move_layer, LayerHandle layer );
-
+  // -- Group transformation information --
+public:
+  // GRID_TRANSFORM
+  // Get the transform of the layer
+  Utils::GridTransform get_grid_transform() 
+  {
+    return grid_transform_;
+  }
+  
+  std::string get_group_id()
+  {
+    return group_id_;
+  }
+  
+  
+  
+  layer_list_type get_layer_list()
+  {
+    return layer_list_;
+  }
+  int get_list_size()
+  {
+    return layer_list_.size();
+  }
+  
 private:
-  typedef std::list< LayerHandle > layer_list_type;
-
+  
+  // information
+  std::string group_id_;
+  
+  // The transformation that describes the grid dimensions and the spacing
+  Utils::GridTransform grid_transform_;
+  
   // The list that contains the layers that are stored in this class
   layer_list_type layer_list_;
+  
+
 
 };
 

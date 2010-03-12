@@ -290,6 +290,41 @@ private:
   // Function object
   StateBoolHandle state_handle_;
 };
+  
+  class QtToolButtonToggleSlot : public QObject
+  {
+    Q_OBJECT
+    
+  public:
+    
+    // Constructor
+    QtToolButtonToggleSlot(QToolButton* parent, StateBoolHandle& state_handle) :
+    QObject(parent),
+    state_handle_(state_handle)
+    {
+      // Qt's connect function
+      connect(parent,SIGNAL(toggled(bool)),this,SLOT(slot(bool)));
+    }
+    
+    // Virtual destructor: needed by Qt
+    virtual ~QtToolButtonToggleSlot()
+    {}
+    
+    public Q_SLOTS:
+    // Slot that Qt will call
+    void slot(bool state)
+    {
+      ActionSet::Dispatch(state_handle_,state);
+    }
+    
+  private:
+    // Function object
+    StateBoolHandle state_handle_;
+  };
+
+  
+  
+  
 
 class QtToolButtonSlot : public QObject
 {

@@ -98,6 +98,8 @@ public:
   {
     nz_ = nz;
   }
+  
+  std::string get_as_string();
 
   Transform transform() const;
 

@@ -33,6 +33,9 @@
 
 // Application Includes
 #include <Application/LayerManager/LayerManager.h>
+#include <Application/Layer/DataLayer.h>
+#include <Application/Layer/MaskLayer.h>
+#include <Application/Layer/LabelLayer.h>
 #include <Application/Interface/Interface.h>
 
 #include <Application/LayerManager/Actions/ActionCloneLayer.h>
@@ -44,6 +47,7 @@
 // Interface includes
 #include <Interface/AppInterface/LayerManagerDockWidget.h>
 
+
 namespace Seg3D
 {
 
@@ -54,14 +58,42 @@ LayerManagerDockWidget::LayerManagerDockWidget( QWidget *parent ) :
   setWindowTitle( "Layer Manager" );
 
   resize( 280, 640 );
-  layer_manager_ = new LayerManagerWidget( this );
-  setWidget( layer_manager_ );
+  layer_manager_widget_ = new LayerManagerWidget( this );
+  setWidget( layer_manager_widget_ );
+  
+  LayerManager::lock_type lock( LayerManager::Instance()->get_mutex() );
+  
+  qpointer_type layer_dock_widget( this );
+  
+  add_connection( LayerManager::Instance()->group_layers_changed_signal_.connect( boost::bind(
+          &LayerManagerDockWidget::handle_insert_layer, layer_dock_widget, _1 ) ) );
+  
 
+  std::vector< LayerGroupHandle > temporary_layergrouphandle_vector;
+  LayerManager::Instance()->return_group_vector( temporary_layergrouphandle_vector );
+  
+  for( size_t i = 0; i <  temporary_layergrouphandle_vector.size(); ++i)
+  {
+    process_group_ui( temporary_layergrouphandle_vector[i] );
+  }
+  
 }
 
 LayerManagerDockWidget::~LayerManagerDockWidget()
 {
 
+}
+
+void LayerManagerDockWidget::process_group_ui( LayerGroupHandle &group )
+{
+  layer_manager_widget_->process_group( group );
+}
+  
+  
+void LayerManagerDockWidget::insert_layer( LayerHandle &layer ) 
+{
+  //layer_manager_widget_->new_layer( layer );
+  //layer_manager_widget_->new_layer( layer );
 }
 
 void LayerManagerDockWidget::new_group()
@@ -94,11 +126,16 @@ void LayerManagerDockWidget::insert_above_layer( LayerHandle& below_layer, Layer
   //TODO implement insert layer above function
 }
   
-
-
-//void LayerManagerDockWidget::layer_changed( int index )
-//{
-//  //TODO implement layer changed slot
-//}
+void LayerManagerDockWidget::handle_insert_layer( qpointer_type qpointer, LayerGroupHandle &group )
+{
+  if ( !( Interface::IsInterfaceThread() ) )
+  {
+    Interface::Instance()->post_event( boost::bind( &LayerManagerDockWidget::handle_insert_layer,
+                             qpointer, group ) );
+    return;
+  }
+  
+  if ( qpointer.data() ) qpointer->process_group_ui( group );
+}
 
 }  // end namespace Seg3D

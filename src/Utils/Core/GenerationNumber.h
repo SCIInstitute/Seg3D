@@ -26,68 +26,43 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_QTWIDGETS_LAYERMANAGERWIDGET_H
-#define INTERFACE_QTWIDGETS_LAYERMANAGERWIDGET_H
+#ifndef UTILS_CORE_GENERATIONNUMBER_H
+#define UTILS_CORE_GENERATIONNUMBER_H
 
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
-# pragma once
-#endif
+// Boost includes
+#include <boost/smart_ptr/detail/atomic_count.hpp>
+#include <boost/intrusive_ptr.hpp>
+#include <boost/utility.hpp>
 
-// Qt includes
-#include <QtGui>
+namespace Utils
+{
+// Forward declaration
+class GenerationNumber;
 
-// Application Includes
-#include <Utils/Core/EnumClass.h>
-
-#include <Application/Layer/LayerGroup.h>
-#include <Interface/AppInterface/LayerGroupWidget.h>
-
-namespace Seg3D
+// Class definition
+class GenerationNumber : public boost::noncopyable
 {
   
-// enum for layer types
-SCI_ENUM_CLASS
-(
-  LayerType,
-  DATA_LAYER_E = 1, 
-  MASK_LAYER_E = 2, 
-  LABEL_LAYER_E = 3
-)
   
-  
-
-//class LayerManagerWidgetPrivate;
-//typedef boost::shared_ptr< LayerManagerWidgetPrivate > LayerManagerWidgetPrivateHandle_type;
-
-class LayerManagerWidget : public QScrollArea
-{
-  // Needed to make it a Qt object
-Q_OBJECT
-
-//constructor - destructor
 public:
-  LayerManagerWidget( QWidget *parent = 0 );
-  virtual ~LayerManagerWidget();
-
-
+  GenerationNumber();
+  virtual ~GenerationNumber();
+  
+  
 public:
-  void process_group( LayerGroupHandle group );
-  //void find_and_delete( LayerGroupWidget_handle group_to_delete );
+  int get_generation()
+  {
+    return count_;
+  }
   
-
 private:
-  // private Qt GUI Components for the LayerManagerWidget
-  QWidget* main_;
-  QVBoxLayout* main_layout_;
-  QVBoxLayout* group_layout_;
+  static void next_number();
+  static boost::detail::atomic_count count_;
+
   
-
-private:
-  QList< LayerGroupWidget_handle > group_list_;
-  //void clean_out_layers( LayerGroupHandle group_to_clean );
-
 };
 
-} //endnamespace Seg3d
+
+} // end namespace Utils
 
 #endif

@@ -177,6 +177,17 @@ bool QtBridge::connect( QToolButton* qtoolbutton, boost::function< void() > func
   return ( true );
 }
 
+  bool QtBridge::connect( QToolButton* qtoolbutton, StateBoolHandle& state_handle )
+  {
+    // Link the slot to the parent widget, so Qt's memory manager will
+    // manage this one.
+    new QtToolButtonToggleSlot( qtoolbutton, state_handle );
+    
+    return ( true );
+  }
+  
+  
+
 bool QtBridge::connect( QPushButton* qpushbutton, boost::function< void() > function )
 {
   // Link the slot to the parent widget, so Qt's memory manager will
