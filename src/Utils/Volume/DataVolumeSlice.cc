@@ -26,34 +26,18 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <Utils/Volume/Volume.h>
+#include <Utils/Volume/DataVolumeSlice.h>
 
 namespace Utils
 {
 
-Volume::Volume( const GridTransform& grid_transform, VolumeType type ) :
-  type_( type ), grid_transform_( grid_transform )
+DataVolumeSlice::DataVolumeSlice( const DataVolumeHandle& data_volume, 
+                 VolumeSliceType type, size_t slice_num ) :
+  VolumeSlice( data_volume, type, slice_num )
 {
-  this->nx_ = this->grid_transform_.nx();
-  this->ny_ = this->grid_transform_.ny();
-  this->nz_ = this->grid_transform_.nz();
-
-  this->inverse_grid_transform_ = this->grid_transform_.transform().get_inverse();
-}
-
-Volume::~Volume()
-{
-}
-
-Point Volume::apply_grid_transform( const Point& pt ) const
-{
-  return this->grid_transform_ * pt;
-}
-
-Point Volume::apply_inverse_grid_transform( const Point& pt ) const
-{
-  return this->inverse_grid_transform_ * pt;
+  this->data_block_ = data_volume->data_block().get();
+  this->add_connection( this->data_block_->data_changed_signal_.connect( 
+    boost::bind( &VolumeSlice::volume_updated, this ) ) );
 }
 
 } // end namespace Utils
-

@@ -34,6 +34,16 @@
 SET(UTILS_VOLUME_SRCS
   Volume.h
   Volume.cc
+  DataVolume.h
+  DataVolume.cc
+  MaskVolume.h
+  MaskVolume.cc
+  VolumeSlice.h
+  VolumeSlice.cc
+  MaskVolumeSlice.h
+  MaskVolumeSlice.cc
+  DataVolumeSlice.h
+  DataVolumeSlice.cc
   )
 
 
@@ -42,6 +52,8 @@ ADD_LIBRARY(Utils_Volume STATIC
             
 TARGET_LINK_LIBRARIES(Utils_Volume
                       Utils_Core
+            Utils_DataBlock
+            Utils_Graphics
                       ${SCI_TEEM_LIBRARY}
                       ${SCI_BOOST_LIBRARY})
 

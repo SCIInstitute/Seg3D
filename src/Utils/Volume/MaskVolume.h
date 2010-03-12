@@ -26,34 +26,57 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#ifndef UTILS_VOLUME_MASKVOLUME_H
+#define UTILS_VOLUME_MASKVOLUME_H
+
+#include <Utils/DataBlock/MaskDataBlock.h>
+#include <Utils/DataBlock/NrrdData.h>
 #include <Utils/Volume/Volume.h>
 
 namespace Utils
 {
 
-Volume::Volume( const GridTransform& grid_transform, VolumeType type ) :
-  type_( type ), grid_transform_( grid_transform )
-{
-  this->nx_ = this->grid_transform_.nx();
-  this->ny_ = this->grid_transform_.ny();
-  this->nz_ = this->grid_transform_.nz();
+class MaskVolume;
+typedef boost::shared_ptr< MaskVolume > MaskVolumeHandle;
 
-  this->inverse_grid_transform_ = this->grid_transform_.transform().get_inverse();
-}
-
-Volume::~Volume()
+class MaskVolume : public Volume
 {
-}
+public:
+  MaskVolume( const GridTransform& grid_transform, const MaskDataBlockHandle& mask_data_block );
+  virtual ~MaskVolume() {}
 
-Point Volume::apply_grid_transform( const Point& pt ) const
-{
-  return this->grid_transform_ * pt;
-}
+  // MASK_DATA_BLOCK:
+  // Get the datablock that contains the mask
+  MaskDataBlockHandle mask_data_block()
+  {
+    return this->mask_data_block_;
+  }
 
-Point Volume::apply_inverse_grid_transform( const Point& pt ) const
-{
-  return this->inverse_grid_transform_ * pt;
-}
+  virtual void lock()
+  {
+    this->mask_data_block_->lock();
+  }
+
+  virtual void unlock()
+  {
+    this->mask_data_block_->unlock();
+  }
+
+  virtual mutex_type& get_mutex()
+  {
+    return this->mask_data_block_->get_mutex();
+  }
+
+private:
+  // Handle to where the mask volume is really stored
+  MaskDataBlockHandle mask_data_block_;
+
+public:
+  // CREATEMASKVOLUMEFROMNRRD:
+  // Create a data volume from a nrrd
+  static VolumeHandle CreateMaskVolumeFromNrrd( NrrdDataHandle& nrrddata );
+};
 
 } // end namespace Utils
 
+#endif

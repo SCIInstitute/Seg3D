@@ -26,35 +26,42 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <Utils/DataBlock/DataSlice.h>
-#include <Utils/Geometry/Point.h>
+#ifndef UTILS_VOLUME_DATAVOLUMESLICE_H
+#define UTILS_VOLUME_DATAVOLUMESLICE_H
+
+#include <Utils/DataBlock/DataBlock.h>
+#include <Utils/Volume/DataVolume.h>
+#include <Utils/Volume/VolumeSlice.h>
 
 namespace Utils
 {
 
-DataSlice::DataSlice( const DataBlockHandle& data_block, 
-           SliceType slice_type, size_t slice_num ) :
-  data_block_( data_block ), slice_type_( slice_type ), slice_number_ ( slice_num ),
-  slice_changed_( true )
+class DataVolumeSlice;
+typedef boost::shared_ptr< DataVolumeSlice > DataVolumeSliceHandle;
+
+class DataVolumeSlice : public VolumeSlice
 {
-  this->index_func_[0] = boost::bind( &DataBlock::to_index, this->data_block_, 
-    _1, _2, boost::bind( &DataSlice::slice_number, this ) );
-  this->index_func_[1] = boost::bind( &DataBlock::to_index, this->data_block_,
-    _2, boost::bind( &DataSlice::slice_number, this ), _1 );
-  this->index_func_[2] = boost::bind( &DataBlock::to_index, this->data_block_,
-    boost::bind( &DataSlice::slice_number, this ), _1, _2 );
+public:
+  DataVolumeSlice( const DataVolumeHandle& data_volume, 
+    VolumeSliceType type = VolumeSliceType::AXIAL_E, size_t slice_num = 0 );
+  virtual ~DataVolumeSlice() {}
 
-  this->width_func_[0] = boost::bind( &DataBlock::nx, this->data_block_ );
-  this->width_func_[1] = boost::bind( &DataBlock::nz, this->data_block_ );
-  this->width_func_[2] = boost::bind( &DataBlock::ny, this->data_block_ );
+  inline double get_data_at ( size_t i, size_t j ) const
+  {
+    return this->data_block_->get_data_at( this->to_index( i, j ) );
+  }
 
-  this->height_func_[0] = boost::bind( &DataBlock::ny, this->data_block_ );
-  this->height_func_[1] = boost::bind( &DataBlock::nx, this->data_block_ );
-  this->height_func_[2] = boost::bind( &DataBlock::nz, this->data_block_ );
-}
+  inline void set_data_at( size_t i, size_t j, double value ) 
+  {
+    this->data_block_->set_data_at( this->to_index( i, j ), value );
+  }
 
-DataSlice::~DataSlice()
-{
-}
+private:
+  // Pointer to the data block. The base class keeps a handle of the volume,
+  // so it is safe to use a pointer here.
+  DataBlock* data_block_;
+};
 
 } // end namespace Utils
+
+#endif

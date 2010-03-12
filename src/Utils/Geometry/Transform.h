@@ -64,7 +64,7 @@ public:
   void load_identity();
   void load_basis( const Point&, const Vector&, const Vector&, const Vector& );
   void load_frame( const Vector&, const Vector&, const Vector& );
-  Transform invert();
+  Transform get_inverse();
 
   void post_transform( const Transform& );
   void pre_transform( const Transform& );

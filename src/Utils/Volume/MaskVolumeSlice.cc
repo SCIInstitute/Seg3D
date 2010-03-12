@@ -26,45 +26,21 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <Utils/DataBlock/MaskDataSlice.h>
+#include <Utils/Volume/MaskVolumeSlice.h>
 
 namespace Utils
 {
 
-MaskDataSlice::MaskDataSlice( const MaskDataBlockHandle &mask_data_block, 
-                          SliceType slice_type, size_t slice_num ) :
-  mask_data_block_( mask_data_block ), 
-  slice_type_( slice_type ), slice_number_ ( slice_num ),
-  slice_changed_( true ), size_changed_( true )
+MaskVolumeSlice::MaskVolumeSlice( const MaskVolumeHandle& mask_volume, 
+                 VolumeSliceType type, size_t slice_num ) :
+  VolumeSlice( mask_volume, type, slice_num )
 {
-  this->index_func_[0] = boost::bind( &MaskDataBlock::to_index, this->mask_data_block_, 
-    _1, _2, boost::bind( &MaskDataSlice::slice_number, this ) );
-  this->index_func_[1] = boost::bind( &MaskDataBlock::to_index, this->mask_data_block_,
-    _2, boost::bind( &MaskDataSlice::slice_number, this ), _1 );
-  this->index_func_[2] = boost::bind( &MaskDataBlock::to_index, this->mask_data_block_,
-    boost::bind( &MaskDataSlice::slice_number, this ), _1, _2 );
-
-  this->width_func_[0] = boost::bind( &MaskDataBlock::nx, this->mask_data_block_ );
-  this->width_func_[1] = boost::bind( &MaskDataBlock::nz, this->mask_data_block_ );
-  this->width_func_[2] = boost::bind( &MaskDataBlock::ny, this->mask_data_block_ );
-
-  this->height_func_[0] = boost::bind( &MaskDataBlock::ny, this->mask_data_block_ );
-  this->height_func_[1] = boost::bind( &MaskDataBlock::nx, this->mask_data_block_ );
-  this->height_func_[2] = boost::bind( &MaskDataBlock::nz, this->mask_data_block_ );
-
+  this->mask_data_block_ = mask_volume->mask_data_block().get();
   this->add_connection( this->mask_data_block_->mask_updated_signal_.connect( 
-    boost::bind(&MaskDataSlice::set_changed, this, true) ) );
-
-  this->width_ = this->width_func_[ this->slice_type_ ]();
-  this->height_ = this->height_func_[ this->slice_type_ ]();
+    boost::bind( &VolumeSlice::volume_updated, this ) ) );
 }
 
-MaskDataSlice::~MaskDataSlice()
-{
-  this->disconnect_all();
-}
-
-void MaskDataSlice::upload_texture()
+void MaskVolumeSlice::upload_texture()
 {
   if ( !this->texture_.get() )
   {

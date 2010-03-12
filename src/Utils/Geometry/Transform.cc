@@ -256,10 +256,10 @@ void Transform::load_identity()
   mat_ = Matrix::IDENTITY_C;
 }
 
-Transform Transform::invert()
+Transform Transform::get_inverse()
 {
   Transform inv_transform;
-  Invert( mat_, inv_transform.mat_ );
+  Invert( this->mat_, inv_transform.mat_ );
   return ( inv_transform );
 }
 

@@ -34,11 +34,7 @@
 #include <boost/smart_ptr.hpp>
 
 // Util includes
-#include <Utils/Core/EnumClass.h>
 #include <Utils/DataBlock/DataBlock.h>
-#include <Utils/DataBlock/NrrdData.h>
-#include <Utils/DataBlock/MaskDataBlock.h>
-
 #include <Utils/Geometry/Point.h>
 #include <Utils/Geometry/Vector.h>
 #include <Utils/Geometry/Transform.h>
@@ -51,6 +47,7 @@ namespace Utils
 // Forward Declaration
 class Volume;
 typedef boost::shared_ptr< Volume > VolumeHandle;
+typedef boost::weak_ptr< Volume > VolumeWeakHandle;
 
 SCI_ENUM_CLASS
 (
@@ -63,16 +60,15 @@ SCI_ENUM_CLASS
 // Class definition
 class Volume : public boost::noncopyable
 {
+public:
+  typedef DataBlock::mutex_type mutex_type;
+  typedef DataBlock::lock_type lock_type;
 
   // -- constructor/destructor --
 public:
 
-  // For defining a data/label volume
-  Volume( const GridTransform& grid_transform, const DataBlockHandle& data_block,
-    VolumeType type = VolumeType::DATA_E );
-
-  // For definint a mask volume
-  Volume( const GridTransform& grid_transform, const MaskDataBlockHandle& mask_data_block );
+  // Called by the constructors of subclasses
+  Volume( const GridTransform& grid_transform, VolumeType type );
 
   virtual ~Volume();
 
@@ -83,48 +79,50 @@ public:
   // Get the type of the data layer
   VolumeType type() const
   {
-    return type_;
+    return this->type_;
   }
 
   // GRIDTRANSFORM
   // Get the grid location
   const Utils::GridTransform& grid_transform() const
   {
-    return grid_transform_;
+    return this->grid_transform_;
   }
 
   // NX, NY, NZ, SIZE
   // The volume dimensions
-  size_t nx() const
+  inline size_t nx() const
   {
-    return grid_transform_.nx();
-  }
-  size_t ny() const
-  {
-    return grid_transform_.ny();
-  }
-  size_t nz() const
-  {
-    return grid_transform_.nz();
-  }
-  size_t size() const
-  {
-    return nx() * ny() * nz();
+    return this->nx_;
   }
 
-  // DATA_BLOCK:
-  // Get the datablock that contains the volume data
-  DataBlockHandle data_block()
+  inline size_t ny() const
   {
-    return data_block_;
+    return this->ny_;
   }
 
-  // MASK_DATA_BLOCK:
-  // Get the datablock that contains the mask
-  MaskDataBlockHandle mask_data_block()
+  inline size_t nz() const
   {
-    return mask_data_block_;
+    return this->nz_;
   }
+
+  inline size_t size() const
+  {
+    return this->nx_ * this->ny_ * this->nz_;
+  }
+
+  inline size_t to_index( size_t x, size_t y, size_t z ) const
+  {
+    assert( x < this->nx_ && y < this->ny_ && z < this->nz_ );
+    return z * this->nx_ * this->ny_ + y * this->nx_ + x;
+  }
+
+  Point apply_grid_transform( const Point& pt ) const;
+  Point apply_inverse_grid_transform( const Point& pt ) const;
+
+  virtual void lock() = 0;
+  virtual void unlock() = 0;
+  virtual mutex_type& get_mutex() = 0;
 
   // -- internals of volume --
 private:
@@ -136,32 +134,15 @@ private:
   // NOTE: Currently only axis aligned transforms are allowed
   GridTransform grid_transform_;
 
-  // NOTE: Either a DataBlock or a mask DataBlock is defined
-  // *not* both, hence one of the handles will remain empty
+  Transform inverse_grid_transform_;
 
-  // Handle to where the volume data is really stored
-  DataBlockHandle data_block_;
-
-  // Handle to where the mask volume is really stored
-  MaskDataBlockHandle mask_data_block_;
-
-  // The data range
-  double min_;
-  double max_;
+  // Cached size information of the GridTransform
+  size_t nx_;
+  size_t ny_;
+  size_t nz_;
 
   // Histogram
 //  HistogramHandle histogram_;
-
-  // -- Static constructors --
-public:
-
-  // CREATEDATAVOLUMEFROMNRRD:
-  // Create a data volume from a nrrd
-  static VolumeHandle CreateDataVolumeFromNrrd( NrrdDataHandle& nrrddata );
-
-  // CREATEMASKVOLUMEFROMNRRD:
-  // Create a data volume from a nrrd
-  static VolumeHandle CreateMaskVolumeFromNrrd( NrrdDataHandle& nrrddata );
 
 };
 

@@ -26,34 +26,21 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <Utils/Volume/Volume.h>
+#include <Utils/Volume/DataVolume.h>
 
 namespace Utils
 {
 
-Volume::Volume( const GridTransform& grid_transform, VolumeType type ) :
-  type_( type ), grid_transform_( grid_transform )
-{
-  this->nx_ = this->grid_transform_.nx();
-  this->ny_ = this->grid_transform_.ny();
-  this->nz_ = this->grid_transform_.nz();
-
-  this->inverse_grid_transform_ = this->grid_transform_.transform().get_inverse();
-}
-
-Volume::~Volume()
+DataVolume::DataVolume( const GridTransform& grid_transform, 
+             const DataBlockHandle& data_block ) :
+  Volume( grid_transform, VolumeType::DATA_E ), 
+  data_block_( data_block )
 {
 }
 
-Point Volume::apply_grid_transform( const Point& pt ) const
+DataVolume::~DataVolume()
 {
-  return this->grid_transform_ * pt;
 }
 
-Point Volume::apply_inverse_grid_transform( const Point& pt ) const
-{
-  return this->inverse_grid_transform_ * pt;
-}
 
 } // end namespace Utils
-

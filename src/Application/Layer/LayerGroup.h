@@ -179,7 +179,7 @@ public:
   {
     return layer_list_;
   }
-  int get_list_size()
+  size_t get_list_size()
   {
     return layer_list_.size();
   }
