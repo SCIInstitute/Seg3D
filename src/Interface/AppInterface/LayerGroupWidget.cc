@@ -90,9 +90,7 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
   // set some values of the GUI
 
   this->private_->ui_.activate_button_->setText( QString::fromStdString( group->get_grid_transform().get_as_string() ) );
-  //this->private_->ui_.group_frame_->hide();
-  //this->private_->ui_.group_tools_->hide();
-  
+
   // hide the tool bars 
   this->private_->ui_.roi_->hide();
   this->private_->ui_.resample_->hide();

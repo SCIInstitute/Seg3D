@@ -58,6 +58,8 @@ public:
   virtual ~LayerWidget();
     
 // -- widget internals --
+  
+//TODO connect to state engine
 public Q_SLOTS:
   void show_opacity_bar( bool show );
   void show_brightness_contrast_bar( bool show );

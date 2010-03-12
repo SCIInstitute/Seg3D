@@ -72,7 +72,7 @@ public:
 
 public:
   void process_group( LayerGroupHandle group );
-  //void find_and_delete( LayerGroupWidget_handle group_to_delete );
+  void delete_group( LayerGroupHandle group );
   
 
 private:
@@ -84,8 +84,6 @@ private:
 
 private:
   QList< LayerGroupWidget_handle > group_list_;
-  //void clean_out_layers( LayerGroupHandle group_to_clean );
-
 };
 
 } //endnamespace Seg3d

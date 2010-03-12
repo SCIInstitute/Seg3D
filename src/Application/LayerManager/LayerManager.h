@@ -79,6 +79,7 @@ public:
 public:
   bool insert_layer( LayerHandle layer );
   bool insert_layer( LayerGroupHandle group );
+  
   void insert_layer_top( LayerHandle layer );
   void set_active_layer( LayerHandle layer );
   LayerHandle get_active_layer();
@@ -112,7 +113,9 @@ public:
   layer_signal_type add_layer_signal_;
   layer_signal_type delete_layer_signal_;
   
+  // This signal is triggered when the groups layers have changed
   group_signal_type group_layers_changed_signal_;
+  
   group_signal_type add_group_signal_;
   group_signal_type delete_group_signal_;
   

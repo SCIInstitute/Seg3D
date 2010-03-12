@@ -71,28 +71,29 @@ LayerManagerWidget::~LayerManagerWidget()
 {
 }
 
-  void LayerManagerWidget::process_group( LayerGroupHandle group )
-  {
-    
-    
-    for ( QList< LayerGroupWidget_handle >::iterator i = this->group_list_.begin(); 
-       i  != this->group_list_.end(); i++ )
-    {
-      if ( group->get_group_id() == ( *i )->get_group_id() ) {
-        ( *i )->deleteLater();
-      }
-    }
-    
-    LayerGroupWidget_handle new_group_handle( new LayerGroupWidget( this->main_, group  ));
-    this->group_layout_->addWidget( new_group_handle.data() );
-    this->group_list_.push_back( new_group_handle );
-    
-  }
+void LayerManagerWidget::process_group( LayerGroupHandle group )
+{
   
-//  void LayerManagerWidget::find_and_delete( LayerGroupWidget_handle group_to_delete )
-//  {
-//    
-//  }
+  this->delete_group( group );
+  
+  LayerGroupWidget_handle new_group_handle( new LayerGroupWidget( this->main_, group  ));
+  this->group_layout_->addWidget( new_group_handle.data() );
+  this->group_list_.push_back( new_group_handle );
+  
+}
+  
+void LayerManagerWidget::delete_group( LayerGroupHandle group )
+{
+  for ( QList< LayerGroupWidget_handle >::iterator i = this->group_list_.begin(); 
+     i  != this->group_list_.end(); i++ )
+  {
+    if ( group->get_group_id() == ( *i )->get_group_id() ) {
+      ( *i )->deleteLater();
+    }
+  }
+}
+  
+
   
   
 //void LayerManagerWidget::clean_out_layers( LayerGroupHandle group_to_clean )

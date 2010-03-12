@@ -56,6 +56,8 @@ public:
   void add_layer( LayerHandle layer );
   std::string &get_group_id();
   
+  
+//TODO - connect these though the state engine
 public Q_SLOTS:
   void show_layers( bool show );
   void show_resample( bool show );

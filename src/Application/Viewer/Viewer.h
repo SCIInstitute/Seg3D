@@ -46,7 +46,7 @@
 #include <Application/Viewer/ViewerRenderer.h>
 
 #include <Utils/Core/EnumClass.h>
-#include <Utils/DataBlock/MaskDataSlice.h>
+//#include <Utils/DataBlock/MaskDataSlice.h>
 
 namespace Seg3D
 {
@@ -164,7 +164,7 @@ public:
   StateBoolHandle volume_isosurfaces_visible_state_;
   StateBoolHandle volume_volume_rendering_visible_state_;
 
-  std::map<std::string, Utils::MaskDataSliceHandle> mask_slices_;
+//  std::map<std::string, Utils::MaskDataSliceHandle> mask_slices_;
 
   const static std::string AXIAL_C;
   const static std::string SAGITTAL_C;

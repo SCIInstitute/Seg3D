@@ -47,7 +47,7 @@ LayerManager::LayerManager() :
   StateHandler( "LayerManager" )
 { 
 
-  for( int i = 0; i < 1; i++ )
+  for( int i = 0; i < 2; i++ )
   {
     std::string new_name;
     new_name = "new_layer_" + boost::lexical_cast< std::string >( i );
@@ -58,8 +58,8 @@ LayerManager::LayerManager() :
     mask_layer_new0 = MaskLayerHandle ( new MaskLayer( new_name, volume0 ) );
     mask_layer_new0->set_grid_transform( 256, 640, 480 );
     LayerHandle plain_layer = mask_layer_new0;
-    insert_layer( plain_layer );
-    
+    //insert_layer( plain_layer );
+    ActionInsertLayer::Dispatch( plain_layer );
     
   }
 }
