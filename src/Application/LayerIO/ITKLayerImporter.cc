@@ -26,44 +26,59 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <Application/ActionManager/Actions/ActionRedo.h>
-#include <Application/Interface/Interface.h>
+// Application includes
+#include <Application/LayerIO/ITKLayerImporter.h>
 
 namespace Seg3D
 {
 
-// REGISTER ACTION:
-// Define a function that registers the action. The action also needs to be
-// registered in the CMake file.
-SCI_REGISTER_ACTION(Redo);
+SCI_REGISTER_IMPORTER(ITKLayerImporter);
 
-bool ActionRedo::validate( ActionContextHandle& context )
+bool ITKLayerImporter::import_header()
 {
-  if ( !( ActionUndoBuffer::Instance()->has_redo_action() ) )
-  {
-    context->report_error( std::string( "No actions to redo" ) );
-    return false;
-  }
-  return true; // validated
+  return false;
 }
 
-bool ActionRedo::run( ActionContextHandle& context, ActionResultHandle& result )
+bool ITKLayerImporter::import_data()
 {
-  ActionUndoBuffer::Instance()->redo_action( context );
-  return true; // success
+  return false;
 }
 
-void ActionRedo::Dispatch()
+Utils::GridTransform ITKLayerImporter::get_grid_transform()
 {
-  // Post the new action
-  Interface::PostAction( Create() );
+  Utils::GridTransform identity(1,1,1);
+  return identity;
 }
 
-ActionHandle ActionRedo::Create()
+bool ITKLayerImporter::is_data_volume_compatible()
 {
-  // Create new action
-  ActionRedo* action = new ActionRedo;
-  return ActionHandle( action );
+  return false;
 }
 
-} // end namespace Seg3D
+bool ITKLayerImporter::is_mask_volume_compatible()
+{
+  return false;
+}
+
+bool ITKLayerImporter::is_label_volume_compatible()
+{
+  return false;
+}
+
+bool ITKLayerImporter::import_as_datavolume( LayerHandle& layer )
+{
+  return false;
+}
+
+bool ITKLayerImporter::import_as_maskvolume( std::vector<LayerHandle>& layers,
+    LayerMaskImporterMode mode )
+{
+  return false;
+}
+
+bool ITKLayerImporter::import_as_labelvolume( LayerHandle& layer )
+{
+  return false;
+}
+
+} // end namespace seg3D

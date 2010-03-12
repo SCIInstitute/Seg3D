@@ -92,7 +92,7 @@ AppInterface::AppInterface()
 
   setCentralWidget( viewer_interface_ );
 
-  application_menu_ = new AppMenu( this, viewer_interface_ );
+  application_menu_ = new AppMenu( this );
   status_bar_ = new AppStatusBar( this );
 
   qpointer_type app_interface( this );

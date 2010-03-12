@@ -1,3 +1,4 @@
+
 #
 #  For more information, please see: http://software.sci.utah.edu
 # 
@@ -26,19 +27,46 @@
 #  DEALINGS IN THE SOFTWARE.
 #
 
-ADD_SUBDIRECTORY(Action)
-ADD_SUBDIRECTORY(ActionManager)
-ADD_SUBDIRECTORY(Application)
-ADD_SUBDIRECTORY(Interface)
-ADD_SUBDIRECTORY(InterfaceManager)
-ADD_SUBDIRECTORY(State)
-ADD_SUBDIRECTORY(StateManager)
-ADD_SUBDIRECTORY(Layer)
-ADD_SUBDIRECTORY(LayerIO)
-ADD_SUBDIRECTORY(LayerManager)
-ADD_SUBDIRECTORY(Renderer)
-ADD_SUBDIRECTORY(Tool)
-ADD_SUBDIRECTORY(ToolManager)
-ADD_SUBDIRECTORY(Tools)
-ADD_SUBDIRECTORY(Viewer)
-ADD_SUBDIRECTORY(ViewerManager)
+##################################################
+# Set sources
+##################################################
+
+SET(APPLICATION_LAYERIO_SRCS
+  LayerIO.h
+  LayerIO.cc
+  LayerImporter.h
+  LayerImporter.cc
+)
+
+SET(APPLICATION_LAYERIO_ACTIONS_SRCS
+)
+
+SET(APPLICATION_LAYERIO_IMPORTERS_SRCS
+  ITKLayerImporter.h
+  ITKLayerImporter.cc
+  MatlabLayerImporter.h
+  MatlabLayerImporter.cc
+  NrrdLayerImporter.h
+  NrrdLayerImporter.cc
+)
+
+ADD_LIBRARY(Application_LayerIO STATIC 
+            ${APPLICATION_LAYERIO_SRCS}
+      ${APPLICATION_LAYERIO_IMPORTERS_SRCS}
+            ${APPLICATION_LAYERIO_ACTIONS_SRCS} )
+            
+TARGET_LINK_LIBRARIES(Application_LayerIO
+                      Utils_Core
+                      Application_Application
+                      Application_Interface
+                      Application_InterfaceManager
+                      Application_Action
+                      Application_State
+                      Application_StateManager
+                      Application_Layer
+                      ${SCI_BOOST_LIBRARY})
+
+# Register actions
+ADD_LIBRARY_ACTIONS(Application_LayerIO ${APPLICATION_LAYERIO_ACTIONS_SRCS})
+
+ADD_LIBRARY_IMPORTERS(Application_LayerIO ${APPLICATION_LAYERIO_IMPORTERS_SRCS})

@@ -169,6 +169,10 @@ bool from_string_internal( const std::string &str, float &value );
 void strip_spaces( std::string& str );
 void strip_surrounding_spaces( std::string& str );
 
+// Function to split a list of options delimited by a characher into a vector of
+// strings
+std::vector<std::string> split_string( const std::string& str, const std::string& delimiter );
+
 } // End namespace Utils
 
 #endif

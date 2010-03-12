@@ -47,17 +47,17 @@
 namespace Seg3D
 {
 
-AppMenu::AppMenu( QMainWindow* parent, ViewerInterface* view_ptr ) :
-  QObject( parent )
+AppMenu::AppMenu( QMainWindow* parent ) :
+  QObject( parent ),
+  main_window_(parent)
 {
   // Obtain the menubar from the main widget
   QMenuBar* menubar = parent->menuBar();
 
-  viewer_pointer_ = view_ptr;
-
   // menus
   QMenu* file_menu = menubar->addMenu( tr( "&File" ) );
   QMenu* edit_menu = menubar->addMenu( tr( "&Edit" ) );
+  QMenu* layer_menu = menubar->addMenu( tr( "&Layer" ) );
   QMenu* view_menu = menubar->addMenu( "View" );
   QMenu* tool_menu = menubar->addMenu( "Tools" );
   QMenu* filter_menu = menubar->addMenu( "Filters" );
@@ -65,13 +65,11 @@ AppMenu::AppMenu( QMainWindow* parent, ViewerInterface* view_ptr ) :
 
   create_file_menu( file_menu );
   create_edit_menu( edit_menu );
+  create_layer_menu( layer_menu );
   create_view_menu( view_menu );
-
   create_tool_menu( tool_menu );
   create_filter_menu( filter_menu );
-
   create_window_menu( window_menu );
-
 }
 
 AppMenu::~AppMenu()
@@ -96,6 +94,21 @@ void AppMenu::create_file_menu( QMenu* qmenu )
 void AppMenu::create_edit_menu( QMenu* qmenu )
 {
 }
+
+void AppMenu::create_layer_menu( QMenu* qmenu )
+{
+  QAction* qaction;
+  qaction = qmenu->addAction( tr( "Import Layer... ") );
+  qaction->setShortcut( tr( "Ctrl+Shift+O" ) );
+  qaction->setToolTip( tr( "Import a new layer into the layer manager" ) );
+  QtBridge::connect( qaction, boost::bind( &AppLayerIO::Import,  main_window_ ) );
+
+  qaction = qmenu->addAction( tr( "Export Layer...") );
+  qaction->setShortcut( tr( "Ctrl+Shift+S" ) );
+  qaction->setToolTip( tr( "Export the active layer" ) );
+  QtBridge::connect( qaction, boost::bind( &AppLayerIO::Export, main_window_ ) );
+}
+
 
 void AppMenu::create_view_menu( QMenu* qmenu )
 {

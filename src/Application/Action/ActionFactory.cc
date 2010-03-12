@@ -45,8 +45,9 @@ ActionFactory::~ActionFactory()
 }
 
 bool ActionFactory::create_action( const std::string& action_string, ActionHandle& action,
-    std::string& error, std::string& usage ) const
+    std::string& error, std::string& usage )
 {
+  lock_type lock( mutex_ );
   std::string command;
   std::string::size_type pos = 0;
 
@@ -90,7 +91,7 @@ bool ActionFactory::create_action( const std::string& action_string, ActionHandl
 
 bool ActionFactory::action_list( action_list_type& action_list )
 {
-  boost::unique_lock< boost::mutex > lock( action_builders_mutex_ );
+  lock_type lock( mutex_ );
 
   action_map_type::iterator it = action_builders_.begin();
   action_map_type::iterator it_end = action_builders_.end();

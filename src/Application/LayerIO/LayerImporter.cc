@@ -26,44 +26,71 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <Application/ActionManager/Actions/ActionRedo.h>
-#include <Application/Interface/Interface.h>
+// Application includes
+#include <Application/LayerIO/LayerImporter.h>
 
 namespace Seg3D
 {
 
-// REGISTER ACTION:
-// Define a function that registers the action. The action also needs to be
-// registered in the CMake file.
-SCI_REGISTER_ACTION(Redo);
-
-bool ActionRedo::validate( ActionContextHandle& context )
+LayerImporter::LayerImporter( const std::string& filename ) :
+  filename_( filename )
 {
-  if ( !( ActionUndoBuffer::Instance()->has_redo_action() ) )
-  {
-    context->report_error( std::string( "No actions to redo" ) );
-    return false;
-  }
-  return true; // validated
 }
 
-bool ActionRedo::run( ActionContextHandle& context, ActionResultHandle& result )
+LayerImporter::~LayerImporter()
 {
-  ActionUndoBuffer::Instance()->redo_action( context );
-  return true; // success
 }
 
-void ActionRedo::Dispatch()
-{
-  // Post the new action
-  Interface::PostAction( Create() );
+std::string LayerImporter::get_filename() 
+{ 
+  return filename_; 
 }
 
-ActionHandle ActionRedo::Create()
+bool LayerImporter::import_header()
 {
-  // Create new action
-  ActionRedo* action = new ActionRedo;
-  return ActionHandle( action );
+  return false;
 }
 
-} // end namespace Seg3D
+bool LayerImporter::import_data()
+{
+  return false;
+}
+
+Utils::GridTransform LayerImporter::get_grid_transform()
+{
+  Utils::GridTransform identity(1,1,1);
+  return identity;
+}
+
+bool LayerImporter::is_data_volume_compatible()
+{
+  return false;
+}
+
+bool LayerImporter::is_mask_volume_compatible()
+{
+  return false;
+}
+
+bool LayerImporter::is_label_volume_compatible()
+{
+  return false;
+}
+
+bool LayerImporter::import_as_datavolume( LayerHandle& layer )
+{
+  return false;
+}
+
+bool LayerImporter::import_as_maskvolume( std::vector<LayerHandle>& layers,
+    LayerMaskImporterMode mode )
+{
+  return false;
+}
+
+bool LayerImporter::import_as_labelvolume( LayerHandle& layer )
+{
+  return false;
+}
+
+} // end namespace seg3D

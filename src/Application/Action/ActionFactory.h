@@ -62,25 +62,26 @@ public:
   virtual ~ActionBuilderBase()
   {
   }
-  // the functor call to build the object
-virtual ActionHandle build() = 0;
+  
+  // the function call to build the object
+  virtual ActionHandle build() = 0;
 };
 
-// ACTIONBUILDERT:
+// ACTIONBUILDER:
 // The actual instantiation that builds the action of type ACTION. This class
 // is loaded on top of the base functor and creates the action
 
 template <class ACTION>
 class ActionBuilder: public ActionBuilderBase
 {
-
 public:
-// ensure we can delete the builder correctly
-virtual ~ActionBuilder<ACTION>()
-{}
-// The actual builder call
-virtual ActionHandle build()
-{ return ActionHandle(new ACTION);}
+  // ensure we can delete the builder correctly
+  virtual ~ActionBuilder<ACTION>()
+  {}
+  
+  // The actual builder call
+  virtual ActionHandle build()
+  { return ActionHandle( new ACTION );}
 };
 
 // ------------------------------
@@ -92,86 +93,86 @@ virtual ActionHandle build()
 class ActionFactory : public Utils::Singleton<ActionFactory>
 {
 
-// -- Constructor --
-
+  // -- Constructor / Destructor --
 private:
   friend class Utils::Singleton<ActionFactory>;
   ActionFactory();
   virtual ~ActionFactory();
 
-// -- Action registration --
-
+  // -- Action registration --
 public:
-// REGISTER_ACTION:
-// Register an action so that it can be automatically build in the action
-// factory.
+  // REGISTER_ACTION:
+  // Register an action so that it can be automatically build in the action
+  // factory.
 
-template <class ACTION>
-void register_action()
-{
-  // get the name of the action
-  std::string action_name = ACTION::action_type();
-  boost::to_lower(action_name);
-
-  // Lock the factory
-  boost::unique_lock<boost::mutex> lock(action_builders_mutex_);
-
-  // Test is action was registered before.
-  if (action_builders_.find(action_name) != action_builders_.end())
+  template <class ACTION>
+  void register_action()
   {
-    // Actions that are registered twice, will cause problems
-    // Hence the program will throw an exception.
-    // As registration is done on startup, this will cause a
-    // faulty program to fail always on startup.
-    SCI_THROW_LOGICERROR(std::string("Action '")+action_name+"' was registered twice");
+    // get the name of the action
+    std::string action_name = ACTION::action_type();
+    boost::to_lower(action_name);
+
+    // Lock the factory
+    lock_type lock(mutex_);
+
+    // Test is action was registered before.
+    if (action_builders_.find(action_name) != action_builders_.end())
+    {
+      // Actions that are registered twice, will cause problems
+      // Hence the program will throw an exception.
+      // As registration is done on startup, this will cause a
+      // faulty program to fail always on startup.
+      SCI_THROW_LOGICERROR(std::string("Action '")+action_name+"' was registered twice");
+    }
+
+    // Register the action
+    action_builders_[action_name] = new ActionBuilder<ACTION>;
+    SCI_LOG_DEBUG(std::string("Registering action : ") + action_name);
   }
 
-  // Register the action
-  action_builders_[action_name] = new ActionBuilder<ACTION>;
-  SCI_LOG_DEBUG(std::string("Registering action : ") + action_name);
-}
-
 public:
-typedef std::vector<std::string> action_list_type;
+  typedef boost::mutex mutex_type;
+  typedef boost::unique_lock<mutex_type> lock_type;
+  typedef std::vector<std::string> action_list_type;
 
-// ACTION_LIST:
-// Retrieve the full list of registered actions
-bool action_list(action_list_type& action_list);
+  // ACTION_LIST:
+  // Retrieve the full list of registered actions
+  bool action_list(action_list_type& action_list);
 
 private:
 
-// Mutex protecting the singleton interface
-typedef boost::unordered_map<std::string,ActionBuilderBase*> action_map_type;
-// List with builders that can be called to generate a new object
-action_map_type action_builders_;
+  // Mutex protecting the singleton interface
+  typedef boost::unordered_map<std::string,ActionBuilderBase*> action_map_type;
+  // List with builders that can be called to generate a new object
+  action_map_type action_builders_;
+  
+  // Mutex for protecting registration
+  mutex_type mutex_;
 
-// Mutex for protecting registration
-boost::mutex action_builders_mutex_;
-
-// -- Instantiate actions --
+  // -- Instantiate actions --
 public:
 
-// CREATE_ACTION:
-// Generate an action from an iostream object that contains the XML
-// specification of the action.
-bool create_action(const std::string& actionstring,
-  ActionHandle& action,
-  std::string& error,
-  std::string& usage) const;
+  // CREATE_ACTION:
+  // Generate an action from an iostream object that contains the XML
+  // specification of the action.
+  bool create_action(const std::string& actionstring,
+    ActionHandle& action,
+    std::string& error,
+    std::string& usage);
 
-// -- Shortcuts for creating actions --
+  // -- Shortcuts for creating actions --
 public:
-// CREATEACTION:
-// Create an action from a string using the ActionFactory object
-static bool CreateAction(const std::string& actionstring,
+  // CREATEACTION:
+  // Create an action from a string using the ActionFactory object
+  static bool CreateAction(const std::string& actionstring,
   ActionHandle& action,
   std::string& error);
 
-// CREATEACTION:
-// Create an action from a string using the ActionFactory object
-// This version also returns the usage of the action if the action could
-// not be created
-static bool CreateAction(const std::string& actionstring,
+  // CREATEACTION:
+  // Create an action from a string using the ActionFactory object
+  // This version also returns the usage of the action if the action could
+  // not be created
+  static bool CreateAction(const std::string& actionstring,
   ActionHandle& action,
   std::string& error,
   std::string& usage);

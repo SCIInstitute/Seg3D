@@ -38,18 +38,7 @@ StateOption::StateOption( const std::string& default_value, const std::string& o
   value_( default_value )
 {
   // Unwrap the option lists
-  std::string option_list_string = Utils::string_to_lower( option_list );
-  while ( 1 )
-  {
-    size_t loc = option_list_string.find( SPLITTER_C );
-    if ( loc >= option_list_string.size() )
-    {
-      option_list_.push_back( option_list_string );
-      break;
-    }
-    option_list_.push_back( option_list_string.substr( 0, loc ) );
-    option_list_string = option_list_string.substr( loc + 1 );
-  }
+  this->option_list_ = Utils::split_string( Utils::string_to_lower( option_list), "|" );
 
   option_list_iterator_type it = 
     std::find( this->option_list_.begin(), this->option_list_.end(), this->value_ );

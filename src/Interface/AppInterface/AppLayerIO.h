@@ -26,44 +26,31 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <Application/ActionManager/Actions/ActionRedo.h>
-#include <Application/Interface/Interface.h>
+#ifndef INTERFACE_APPINTERFACE_APPLAYERIO_H
+#define INTERFACE_APPINTERFACE_APPLAYERIO_H
+
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+# pragma once
+#endif 
+
+// #include <Interface/AppInterface/AppLayerImporter.h>
 
 namespace Seg3D
 {
 
-// REGISTER ACTION:
-// Define a function that registers the action. The action also needs to be
-// registered in the CMake file.
-SCI_REGISTER_ACTION(Redo);
-
-bool ActionRedo::validate( ActionContextHandle& context )
+class AppLayerIO
 {
-  if ( !( ActionUndoBuffer::Instance()->has_redo_action() ) )
-  {
-    context->report_error( std::string( "No actions to redo" ) );
-    return false;
-  }
-  return true; // validated
-}
-
-bool ActionRedo::run( ActionContextHandle& context, ActionResultHandle& result )
-{
-  ActionUndoBuffer::Instance()->redo_action( context );
-  return true; // success
-}
-
-void ActionRedo::Dispatch()
-{
-  // Post the new action
-  Interface::PostAction( Create() );
-}
-
-ActionHandle ActionRedo::Create()
-{
-  // Create new action
-  ActionRedo* action = new ActionRedo;
-  return ActionHandle( action );
-}
+public:
+  // IMPORT:
+  // Import a layer into the LayerManager
+  static void Import( QMainWindow* main_window );
+  
+  // EXPORT:
+  // Export the current layer to file
+  static void Export( QMainWindow* main_window );
+};
 
 } // end namespace Seg3D
+
+#endif
+

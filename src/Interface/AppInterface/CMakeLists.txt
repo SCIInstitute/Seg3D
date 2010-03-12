@@ -34,6 +34,7 @@
 SET(INTERFACE_APPINTERFACE_SRCS
   AppInterface.cc
   AppMenu.cc
+  AppLayerIO.cc
   AppStatusBar.cc
   HistoryDockWidget.cc
   MessageHistoryWidget.cc

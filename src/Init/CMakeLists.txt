@@ -47,6 +47,8 @@ ENDIF(QT_FOUND)
 # Build static library
 ##################################################
 
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
+
 ADD_LIBRARY(Init_Init STATIC ${INIT_INIT_SRCS})
 
 TARGET_LINK_LIBRARIES(Init_Init 
