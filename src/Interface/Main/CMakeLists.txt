@@ -57,8 +57,10 @@ TARGET_LINK_LIBRARIES(Seg3D
   ${SCI_BOOST_LIBRARY}
   Utils_Core
   Utils_Converter
+  Utils_DataBlock
   Utils_EventHandler
   Utils_Graphics
+  Utils_Volume
   Application_Application
   Application_Interface
   Application_Action

@@ -36,8 +36,8 @@
 namespace Seg3D
 {
 
-Layer::Layer( const std::string& name, Utils::VolumeType type, const Utils::VolumeHandle& volume ) :
-  StateHandler( name ), type_( type ), volume_( volume )
+Layer::Layer( const std::string& name, const Utils::VolumeHandle& volume ) :
+  StateHandler( name ), volume_( volume )
 {
 //  std::string new_name;
 //  StateEngine::Instance()->create_stateid( "layer", new_name );

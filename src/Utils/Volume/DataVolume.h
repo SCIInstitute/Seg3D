@@ -46,6 +46,11 @@ public:
   DataVolume( const GridTransform& grid_transform, const DataBlockHandle& data_block );
   virtual ~DataVolume();
 
+  virtual VolumeType type() const
+  {
+    return VolumeType::DATA_E;
+  }
+
   // DATA_BLOCK:
   // Get the data block that contains the volume data
   DataBlockHandle data_block()

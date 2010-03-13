@@ -35,7 +35,7 @@
 
 // Application includes
 #include <Application/Layer/Layer.h>
-#include <Utils/Volume/Volume.h>
+#include <Utils/Volume/DataVolume.h>
 
 namespace Seg3D
 {
@@ -53,7 +53,7 @@ class DataLayer : public Layer
   // -- constructor/destructor --
 public:
 
-  DataLayer( const std::string& name, const Utils::VolumeHandle& volume );
+  DataLayer( const std::string& name, const Utils::DataVolumeHandle& volume );
   virtual ~DataLayer();
 
   // -- state variables --
@@ -68,6 +68,8 @@ public:
   // State describing whether volume is volume rendered
   StateBoolHandle volume_rendered_state_;
 
+private:
+  Utils::DataVolume* data_volume_;
 };
 
 } // end namespace Seg3D

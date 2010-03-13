@@ -26,16 +26,38 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <Utils/Volume/MaskVolume.h>
+#ifndef APPLICATION_LAYERMANAGER_LAYERSCENE_H
+#define APPLICATION_LAYERMANAGER_LAYERSCENE_H
 
-namespace Utils
+#include <vector>
+#include <boost/shared_ptr.hpp>
+
+#include <Application/Layer/Layer.h>
+
+namespace Seg3D
 {
 
-MaskVolume::MaskVolume( const GridTransform& grid_transform, 
-             const MaskDataBlockHandle& mask_data_block ) :
-  Volume( grid_transform ),
-  mask_data_block_( mask_data_block )
-{
-}
+class LayerSceneItem;
+typedef boost::shared_ptr< LayerSceneItem > LayerSceneItemHandle;
 
-} // end namespace Utils
+typedef std::vector< LayerSceneItemHandle > LayerGroupSceneItem;
+typedef boost::shared_ptr< LayerGroupSceneItem > LayerGroupSceneItemHandle;
+
+typedef std::vector< LayerGroupSceneItemHandle > LayerScene;
+typedef boost::shared_ptr< LayerScene > LayerSceneHandle;
+
+class LayerSceneItem
+{
+public:
+  LayerSceneItem() {}
+  ~LayerSceneItem() {}
+
+public:
+  Utils::VolumeHandle volume_;
+  double opacity_;
+  Utils::GridTransform grid_transform_;
+};
+
+} // end namespace Seg3D
+
+#endif

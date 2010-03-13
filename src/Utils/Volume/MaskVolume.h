@@ -45,6 +45,11 @@ public:
   MaskVolume( const GridTransform& grid_transform, const MaskDataBlockHandle& mask_data_block );
   virtual ~MaskVolume() {}
 
+  virtual VolumeType type() const
+  {
+    return VolumeType::MASK_E;
+  }
+
   // MASK_DATA_BLOCK:
   // Get the datablock that contains the mask
   MaskDataBlockHandle mask_data_block()

@@ -31,8 +31,8 @@
 namespace Utils
 {
 
-Volume::Volume( const GridTransform& grid_transform, VolumeType type ) :
-  type_( type ), grid_transform_( grid_transform )
+Volume::Volume( const GridTransform& grid_transform ) :
+  grid_transform_( grid_transform )
 {
   this->nx_ = this->grid_transform_.nx();
   this->ny_ = this->grid_transform_.ny();

@@ -33,7 +33,7 @@ namespace Utils
 
 DataVolume::DataVolume( const GridTransform& grid_transform, 
              const DataBlockHandle& data_block ) :
-  Volume( grid_transform, VolumeType::DATA_E ), 
+  Volume( grid_transform ), 
   data_block_( data_block )
 {
 }

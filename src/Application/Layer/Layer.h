@@ -75,7 +75,7 @@ class Layer : public StateHandler
   // -- constructor/destructor --
 public:
 
-  Layer( const std::string& name, Utils::VolumeType type, const Utils::VolumeHandle& volume );
+  Layer( const std::string& name, const Utils::VolumeHandle& volume );
   virtual ~Layer();
 
   // -- Layer properties --
@@ -85,7 +85,7 @@ public:
   // Get the type of the layer
   inline Utils::VolumeType type() const
   {
-    return type_;
+    return this->volume_->type();
   }
 
   // GRID_TRANSFORM
@@ -107,8 +107,6 @@ public:
   void set_volume( Utils::VolumeHandle volume );
   
 protected:
-  // The type of the layer
-  Utils::VolumeType type_;
 
   // The underlying structure that contains data plus transform, but no
   // state information
@@ -185,7 +183,7 @@ public:
     layer_group_ = layer_group;
   }
   
-  Utils::GridTransform& get_grid_transform()
+  const Utils::GridTransform& get_grid_transform() const
   {
     return grid_transform_;
   }
@@ -196,7 +194,7 @@ public:
     grid_transform_ = Utils::GridTransform( x, y, z );
   }
   
-  const std::string get_layer_id()
+  const std::string& get_layer_id() const
   {
     return layer_id_;
   }

@@ -113,7 +113,4 @@ void VolumeSlice::update()
   }
 }
 
-
-
-
 } // end namespace Utils

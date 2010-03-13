@@ -128,7 +128,7 @@ public:
     return this->get_mask_at( this->to_index( x, y, z ) );
   }
 
-  inline unsigned char get_mask_at( size_t index ) const
+  inline bool get_mask_at( size_t index ) const
   {
     return ( this->data_[ index ] & this->bit_tester_ ) != 0;
   }

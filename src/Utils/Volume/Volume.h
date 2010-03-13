@@ -68,7 +68,7 @@ public:
 public:
 
   // Called by the constructors of subclasses
-  Volume( const GridTransform& grid_transform, VolumeType type );
+  Volume( const GridTransform& grid_transform );
 
   virtual ~Volume();
 
@@ -77,10 +77,7 @@ public:
 
   // TYPE
   // Get the type of the data layer
-  VolumeType type() const
-  {
-    return this->type_;
-  }
+  virtual VolumeType type() const = 0;
 
   // GRIDTRANSFORM
   // Get the grid location
@@ -126,9 +123,6 @@ public:
 
   // -- internals of volume --
 private:
-
-  // Type of volume
-  VolumeType type_;
 
   // Location of the volume object in space
   // NOTE: Currently only axis aligned transforms are allowed

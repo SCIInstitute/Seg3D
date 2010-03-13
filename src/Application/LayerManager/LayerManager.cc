@@ -32,8 +32,9 @@
 #include <Boost/lexical_cast.hpp>
 #include <vector>
 
-#include <Application/LayerManager/LayerManager.h>
 #include <Application/LayerManager/Actions/ActionInsertLayer.h>
+#include <Application/LayerManager/LayerManager.h>
+#include <Application/Layermanager/LayerScene.h>
 
 
 #include <Application/Layer/MaskLayer.h>
@@ -46,13 +47,14 @@ namespace Seg3D
 LayerManager::LayerManager() :
   StateHandler( "LayerManager" )
 { 
-
-  for( int i = 0; i < 2; i++ )
+  for( int i = 0; i < 1; i++ )
   {
     std::string new_name;
     new_name = "new_layer_" + boost::lexical_cast< std::string >( i );
 
-    Utils::VolumeHandle volume0;
+    Utils::GridTransform grid_transform;
+    Utils::MaskDataBlockHandle mask_data_block;
+    Utils::MaskVolumeHandle volume0( new Utils::MaskVolume( grid_transform, mask_data_block ) );
     MaskLayerHandle mask_layer_new0;
     
     mask_layer_new0 = MaskLayerHandle ( new MaskLayer( new_name, volume0 ) );

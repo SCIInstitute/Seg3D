@@ -35,7 +35,7 @@
 
 // Application includes
 #include <Application/Layer/Layer.h>
-#include <Utils/Volume/Volume.h>
+#include <Utils/Volume/MaskVolume.h>
 
 namespace Seg3D
 {
@@ -53,7 +53,7 @@ class MaskLayer : public Layer
   // -- constructor/destructor --
 public:
 
-  MaskLayer( const std::string& name, const Utils::VolumeHandle& volume );
+  MaskLayer( const std::string& name, const Utils::MaskVolumeHandle& volume );
   virtual ~MaskLayer();
 
   // -- state variables --
@@ -71,6 +71,8 @@ public:
   // State that describes whether to show the  isosurface state
   StateBoolHandle show_isosurface_state_;
 
+private:
+  Utils::MaskVolume* mask_volume_;
 };
 
 } // end namespace Seg3D

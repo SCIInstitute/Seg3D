@@ -37,7 +37,7 @@ DataVolumeSlice::DataVolumeSlice( const DataVolumeHandle& data_volume,
 {
   this->data_block_ = data_volume->data_block().get();
   this->add_connection( this->data_block_->data_changed_signal_.connect( 
-    boost::bind( &VolumeSlice::volume_updated, this ) ) );
+    boost::bind( &VolumeSlice::volume_updated_slot, this ) ) );
 }
 
 } // end namespace Utils

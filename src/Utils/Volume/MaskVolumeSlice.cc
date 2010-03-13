@@ -37,7 +37,7 @@ MaskVolumeSlice::MaskVolumeSlice( const MaskVolumeHandle& mask_volume,
 {
   this->mask_data_block_ = mask_volume->mask_data_block().get();
   this->add_connection( this->mask_data_block_->mask_updated_signal_.connect( 
-    boost::bind( &VolumeSlice::volume_updated, this ) ) );
+    boost::bind( &VolumeSlice::volume_updated_slot, this ) ) );
 }
 
 void MaskVolumeSlice::upload_texture()

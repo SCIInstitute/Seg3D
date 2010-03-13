@@ -103,7 +103,12 @@ public:
     return this->number_of_slices_;
   }
 
-  inline void volume_updated()
+  bool slice_changed() const
+  {
+    return this->slice_changed_;
+  }
+
+  inline void volume_updated_slot()
   {
     this->slice_changed_ = true;
   }

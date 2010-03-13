@@ -37,7 +37,7 @@ namespace Seg3D
 {
 
 LabelLayer::LabelLayer( const std::string& name, const Utils::VolumeHandle& volume ) :
-  Layer( name, Utils::VolumeType::LABEL_E, volume )
+  Layer( name, volume )
 {
   // Step (1) : Build the layer specific state variables
 

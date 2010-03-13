@@ -47,7 +47,7 @@ public:
     VolumeSliceType type = VolumeSliceType::AXIAL_E, size_t slice_num = 0 );
   virtual ~MaskVolumeSlice() {}
 
-  inline unsigned char get_mask_at( size_t i, size_t j ) const
+  inline bool get_mask_at( size_t i, size_t j ) const
   {
     return this->mask_data_block_->get_mask_at( this->to_index( i, j ) );
   }
