@@ -130,8 +130,8 @@ void ToolBoxWidget::add_tool( QWidget * tool, const QString &label,
   //make all the proper connections
   connect( this->private_->ui_.help_button_, SIGNAL( clicked() ), this, SLOT(
       help_button_clicked() ) );
-  QtBridge::connect( this->private_->ui_.activate_button_, activate_function );
-  QtBridge::connect( this->private_->ui_.close_button_, close_function );
+  QtBridge::Connect( this->private_->ui_.activate_button_, activate_function );
+  QtBridge::Connect( this->private_->ui_.close_button_, close_function );
 
   set_active_tool( new_page_->findChild< QWidget* > ( "tool_" ) );
 

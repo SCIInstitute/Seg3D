@@ -135,9 +135,9 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   
   
   // make the default connections, for any layer type, to the state engine
-  QtBridge::connect( this->private_->ui_.selection_checkbox_, layer->selected_state_ );
-  QtBridge::connect( this->private_->ui_.lock_button_, layer->lock_state_ );
-  QtBridge::connect( this->private_->opacity_adjuster_, layer->opacity_state_ );
+  QtBridge::Connect( this->private_->ui_.selection_checkbox_, layer->selected_state_ );
+  QtBridge::Connect( this->private_->ui_.lock_button_, layer->lock_state_ );
+  QtBridge::Connect( this->private_->opacity_adjuster_, layer->opacity_state_ );
   
   switch( layer->type() )
   {
@@ -152,8 +152,8 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
       this->private_->ui_.typeBackground_->setStyleSheet(QString::fromUtf8("QWidget#typeBackground_{ background-color: rgb(166, 12, 73); }"));
       this->private_->ui_.colorChooseButton_->setIcon(this->data_layer_icon_);
       
-      QtBridge::connect( this->private_->brightness_adjuster_, boost::shared_dynamic_cast< DataLayer > (layer)->brightness_state_ );
-      QtBridge::connect( this->private_->contrast_adjuster_, boost::shared_dynamic_cast< DataLayer >(layer)->contrast_state_ );
+      QtBridge::Connect( this->private_->brightness_adjuster_, boost::shared_dynamic_cast< DataLayer > (layer)->brightness_state_ );
+      QtBridge::Connect( this->private_->contrast_adjuster_, boost::shared_dynamic_cast< DataLayer >(layer)->contrast_state_ );
       
       break;
     // This is for the Mask Layers  
@@ -161,8 +161,8 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
       this->private_->ui_.brightness_contrast_button_->hide();
       this->private_->ui_.volume_rendered_button_->hide();
       
-      QtBridge::connect( this->private_->ui_.iso_surface_button_, boost::shared_dynamic_cast< MaskLayer >(layer)->show_isosurface_state_ );
-      QtBridge::connect( this->private_->ui_.border_selection_combo_, boost::shared_dynamic_cast< MaskLayer >(layer)->fill_state_ );
+      QtBridge::Connect( this->private_->ui_.iso_surface_button_, boost::shared_dynamic_cast< MaskLayer >(layer)->show_isosurface_state_ );
+      QtBridge::Connect( this->private_->ui_.border_selection_combo_, boost::shared_dynamic_cast< MaskLayer >(layer)->fill_state_ );
       
       break;
       

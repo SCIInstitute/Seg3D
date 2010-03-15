@@ -79,11 +79,11 @@ bool CannyEdgeDetectionFilterInterface::build_widget( QFrame* frame )
   CannyEdgeDetectionFilter* tool = dynamic_cast< CannyEdgeDetectionFilter* > ( base_tool_.get() );
 
   //Step 3 - connect the gui to the tool through the QtBridge
-  QtBridge::connect( private_->ui_.targetComboBox, tool->target_layer_state_ );
-  QtBridge::connect( varianceAdjuster, tool->variance_state_ );
-  QtBridge::connect( errorAdjuster, tool->max_error_state_ );
-  QtBridge::connect( thresholdAdjuster, tool->threshold_state_ );
-  QtBridge::connect( private_->ui_.replaceCheckBox, tool->replace_state_ );
+  QtBridge::Connect( private_->ui_.targetComboBox, tool->target_layer_state_ );
+  QtBridge::Connect( varianceAdjuster, tool->variance_state_ );
+  QtBridge::Connect( errorAdjuster, tool->max_error_state_ );
+  QtBridge::Connect( thresholdAdjuster, tool->threshold_state_ );
+  QtBridge::Connect( private_->ui_.replaceCheckBox, tool->replace_state_ );
 
   //Send a message to the log that we have finised with building the Detection Filter Interface
   SCI_LOG_DEBUG("Finished building a Canny Edge Detection Filter Interface");

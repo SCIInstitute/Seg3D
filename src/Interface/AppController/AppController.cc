@@ -123,7 +123,7 @@ AppController::AppController( QWidget* parent ) :
   while ( it != it_end )
   {
     QAction* action_item = action_menu->addAction( QString::fromStdString( *it ) );
-    QtBridge::connect( action_item, boost::bind( &AppController::SetActionType, controller,
+    QtBridge::Connect( action_item, boost::bind( &AppController::SetActionType, controller,
         ( *it ) ) );
     ++it;
   }

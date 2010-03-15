@@ -120,7 +120,7 @@ void QtActionGroupSignal( QPointer< QActionGroup > qpointer, std::string option,
   }
 }
 
-bool QtBridge::connect( QCheckBox* qcheckbox, StateBoolHandle& state_handle )
+bool QtBridge::Connect( QCheckBox* qcheckbox, StateBoolHandle& state_handle )
 {
   // Connect the dispatch into the StateVariable (with auxiliary object)
   // Link the slot to the parent widget, so Qt's memory manager will
@@ -130,10 +130,10 @@ bool QtBridge::connect( QCheckBox* qcheckbox, StateBoolHandle& state_handle )
   // Connect the state signal back into the Qt Variable
   state_handle->value_changed_signal_.connect( boost::bind( &QtCheckBoxSignal, qcheckbox, _1, _2 ) );
 
-  return ( true );
+  return true;
 }
 
-bool QtBridge::connect( QComboBox* qcombobox, StateOptionHandle& state_handle )
+bool QtBridge::Connect( QComboBox* qcombobox, StateOptionHandle& state_handle )
 {
   // Connect the dispatch into the StateVariable (with auxiliary object)
   // Link the slot to the parent widget, so Qt's memory manager will
@@ -143,10 +143,10 @@ bool QtBridge::connect( QComboBox* qcombobox, StateOptionHandle& state_handle )
   // Connect the state signal back to the Qt Variable
   state_handle->value_changed_signal_.connect( boost::bind( &QtComboBoxSignal, qcombobox, _1, _2 ) );
 
-  return ( true );
+  return true;
 }
 
-bool QtBridge::connect( SliderSpinComboInt* sscombo, StateRangedIntHandle& state_handle )
+bool QtBridge::Connect( SliderSpinComboInt* sscombo, StateRangedIntHandle& state_handle )
 {
   new QtSliderSpinComboRangedIntSlot( sscombo, state_handle );
 
@@ -154,10 +154,10 @@ bool QtBridge::connect( SliderSpinComboInt* sscombo, StateRangedIntHandle& state
   state_handle->value_changed_signal_.connect( boost::bind( &QtSliderSpinComboRangedIntSignal,
       sscombo, _1, _2 ) );
 
-  return ( true );
+  return true;
 }
 
-bool QtBridge::connect( SliderSpinComboDouble* sscombo, StateRangedDoubleHandle& state_handle )
+bool QtBridge::Connect( SliderSpinComboDouble* sscombo, StateRangedDoubleHandle& state_handle )
 {
   new QtSliderSpinComboRangedDoubleSlot( sscombo, state_handle );
 
@@ -165,58 +165,58 @@ bool QtBridge::connect( SliderSpinComboDouble* sscombo, StateRangedDoubleHandle&
   state_handle->value_changed_signal_.connect( boost::bind( &QtSliderSpinComboRangedDoubleSignal,
       sscombo, _1, _2 ) );
 
-  return ( true );
+  return true;
 }
 
-bool QtBridge::connect( QToolButton* qtoolbutton, boost::function< void() > function )
+bool QtBridge::Connect( QToolButton* qtoolbutton, boost::function< void() > function )
 {
   // Link the slot to the parent widget, so Qt's memory manager will
   // manage this one.
   new QtToolButtonSlot( qtoolbutton, function );
 
-  return ( true );
+  return true;
 }
 
-  bool QtBridge::connect( QToolButton* qtoolbutton, StateBoolHandle& state_handle )
-  {
-    // Link the slot to the parent widget, so Qt's memory manager will
-    // manage this one.
-    new QtToolButtonToggleSlot( qtoolbutton, state_handle );
-    
-    return ( true );
-  }
+bool QtBridge::Connect( QToolButton* qtoolbutton, StateBoolHandle& state_handle )
+{
+  // Link the slot to the parent widget, so Qt's memory manager will
+  // manage this one.
+  new QtToolButtonToggleSlot( qtoolbutton, state_handle );
   
+  return true;
+}
+
   
 
-bool QtBridge::connect( QPushButton* qpushbutton, boost::function< void() > function )
+bool QtBridge::Connect( QPushButton* qpushbutton, boost::function< void() > function )
 {
   // Link the slot to the parent widget, so Qt's memory manager will
   // manage this one.
   new QtPushButtonSlot( qpushbutton, function );
 
-  return ( true );
+  return true;
 }
 
 // Menu connectors
-bool QtBridge::connect( QAction* qaction, boost::function< void() > function )
+bool QtBridge::Connect( QAction* qaction, boost::function< void() > function )
 {
   // Link the slot to the parent widget, so Qt's memory manager will
   // manage this one.
   new QtActionSlot( qaction, function );
 
-  return ( true );
+  return true;
 }
 
-bool QtBridge::connect( QAction* qaction, StateBoolHandle& state_handle )
+bool QtBridge::Connect( QAction* qaction, StateBoolHandle& state_handle )
 {
   // Link the slot to the parent widget, so Qt's memory manager will
   // manage this one.
   new QtActionToggleSlot( qaction, state_handle );
 
-  return ( true );
+  return true;
 }
 
-bool QtBridge::connect( QActionGroup* qactiongroup, StateOptionHandle& state_handle )
+bool QtBridge::Connect( QActionGroup* qactiongroup, StateOptionHandle& state_handle )
 {
   new QtActionGroupSlot( qactiongroup, state_handle );
 

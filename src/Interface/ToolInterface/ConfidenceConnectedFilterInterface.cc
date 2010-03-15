@@ -77,9 +77,9 @@ bool ConfidenceConnectedFilterInterface::build_widget( QFrame* frame )
       dynamic_cast< ConfidenceConnectedFilter* > ( base_tool_.get() );
 
   //Step 3 - connect the gui to the tool through the QtBridge
-  QtBridge::connect( private_->ui_.targetComboBox, tool->target_layer_state_ );
-  QtBridge::connect( iterationsAdjuster, tool->iterations_state_ );
-  QtBridge::connect( multiplierAdjuster, tool->threshold_multiplier_state_ );
+  QtBridge::Connect( private_->ui_.targetComboBox, tool->target_layer_state_ );
+  QtBridge::Connect( iterationsAdjuster, tool->iterations_state_ );
+  QtBridge::Connect( multiplierAdjuster, tool->threshold_multiplier_state_ );
 
   //Send a message to the log that we have finised with building the Confidence Connected Filter Interface
   SCI_LOG_DEBUG("Finished building a Confidence Connected Filter Interface");

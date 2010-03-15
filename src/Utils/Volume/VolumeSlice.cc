@@ -38,8 +38,7 @@ VolumeSlice::VolumeSlice( const VolumeHandle& volume,
   size_changed_( true ),
   volume_( volume ), 
   slice_type_( type ), 
-  slice_number_ ( slice_num ),
-  slice_changed_( true )
+  slice_number_ ( slice_num )
 {
   this->update();
   this->slice_number_ = Min( this->slice_number_, this->number_of_slices_ - 1 );

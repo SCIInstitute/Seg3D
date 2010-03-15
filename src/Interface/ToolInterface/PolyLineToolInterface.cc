@@ -69,7 +69,7 @@ bool PolyLineToolInterface::build_widget( QFrame* frame )
   PolylineTool* tool = dynamic_cast< PolylineTool* > ( base_tool_.get() );
 
   //Step 3 - connect the gui to the tool through the QtBridge
-  QtBridge::connect( private_->ui_.targetComboBox, tool->target_layer_state_ );
+  QtBridge::Connect( private_->ui_.targetComboBox, tool->target_layer_state_ );
 
   //Send a message to the log that we have finised with building the Polyline Tool Interface
   SCI_LOG_MESSAGE("Finished building a PolyLine Tool Interface");

@@ -79,11 +79,11 @@ bool AnisotropicDiffusionFilterInterface::build_widget( QFrame* frame )
       dynamic_cast< AnisotropicDiffusionFilter* > ( base_tool_.get() );
 
   //Step 3 - connect the gui to the tool through the QtBridge
-  QtBridge::connect( private_->ui_.targetComboBox, tool->target_layer_state_ );
-  QtBridge::connect( iterationsAdjuster, tool->iterations_state_ );
-  QtBridge::connect( stepAdjuster, tool->steps_state_ );
-  QtBridge::connect( conductanceAdjuster, tool->conductance_state_ );
-  QtBridge::connect( private_->ui_.replaceCheckBox, tool->replace_state_ );
+  QtBridge::Connect( private_->ui_.targetComboBox, tool->target_layer_state_ );
+  QtBridge::Connect( iterationsAdjuster, tool->iterations_state_ );
+  QtBridge::Connect( stepAdjuster, tool->steps_state_ );
+  QtBridge::Connect( conductanceAdjuster, tool->conductance_state_ );
+  QtBridge::Connect( private_->ui_.replaceCheckBox, tool->replace_state_ );
 
   //Send a message to the log that we have finised with building the Anisotropic Diffusion Filter Interface
   SCI_LOG_DEBUG("Finished building an Anisotropic Diffusion Filter Interface");

@@ -83,12 +83,12 @@ bool PaintToolInterface::build_widget( QFrame* frame )
   PaintTool* tool = dynamic_cast< PaintTool* > ( base_tool_.get() );
 
   //Step 3 - connect the gui to the tool through the QtBridge
-  QtBridge::connect( private_->ui_.targetComboBox, tool->target_layer_state_ );
-  QtBridge::connect( private_->ui_.maskComboBox, tool->mask_layer_state_ );
-  QtBridge::connect( private_->brush_radius_, tool->brush_radius_state_ );
-  QtBridge::connect( private_->upper_threshold_, tool->upper_threshold_state_ );
-  QtBridge::connect( private_->lower_threshold_, tool->lower_threshold_state_ );
-  QtBridge::connect( private_->ui_.eraseCheckBox, tool->erase_state_ );
+  QtBridge::Connect( private_->ui_.targetComboBox, tool->target_layer_state_ );
+  QtBridge::Connect( private_->ui_.maskComboBox, tool->mask_layer_state_ );
+  QtBridge::Connect( private_->brush_radius_, tool->brush_radius_state_ );
+  QtBridge::Connect( private_->upper_threshold_, tool->upper_threshold_state_ );
+  QtBridge::Connect( private_->lower_threshold_, tool->lower_threshold_state_ );
+  QtBridge::Connect( private_->ui_.eraseCheckBox, tool->erase_state_ );
 
   //Send a message to the log that we have finised with building the Paint Brush Interface
   SCI_LOG_MESSAGE("Finished building a Paint Brush Interface");

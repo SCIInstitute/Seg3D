@@ -69,8 +69,8 @@ bool InvertToolInterface::build_widget( QFrame* frame )
   InvertTool* tool = dynamic_cast< InvertTool* > ( base_tool_.get() );
 
   //Step 3 - connect the gui to the tool through the QtBridge
-  QtBridge::connect( private_->ui_.replaceCheckBox, tool->replace_state_ );
-  QtBridge::connect( private_->ui_.targetComboBox, tool->target_layer_state_ );
+  QtBridge::Connect( private_->ui_.replaceCheckBox, tool->replace_state_ );
+  QtBridge::Connect( private_->ui_.targetComboBox, tool->target_layer_state_ );
 
   //TEST CODE
   private_->ui_.targetComboBox->addItem( QString::fromUtf8( "firstitem" ) );

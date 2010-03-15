@@ -75,9 +75,9 @@ bool ThresholdToolInterface::build_widget( QFrame* frame )
   ThresholdTool* tool = dynamic_cast< ThresholdTool* > ( base_tool_.get() );
 
   //Step 3 - connect the gui to the tool through the QtBridge
-  QtBridge::connect( private_->ui_.targetComboBox, tool->target_layer_state_ );
-  QtBridge::connect( upperThresholdAdjuster, tool->upper_threshold_state_ );
-  QtBridge::connect( lowerThresholdAdjuster, tool->lower_threshold_state_ );
+  QtBridge::Connect( private_->ui_.targetComboBox, tool->target_layer_state_ );
+  QtBridge::Connect( upperThresholdAdjuster, tool->upper_threshold_state_ );
+  QtBridge::Connect( lowerThresholdAdjuster, tool->lower_threshold_state_ );
 
   //Send a message to the log that we have finised with building the Threshold Tool Interface
   SCI_LOG_DEBUG("Finished building a Threshold Tool Interface");

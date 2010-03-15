@@ -73,9 +73,9 @@ bool MedianFilterInterface::build_widget( QFrame* frame )
   MedianFilter* tool = dynamic_cast< MedianFilter* > ( base_tool_.get() );
 
   //Step 3 - connect the gui to the tool through the QtBridge
-  QtBridge::connect( private_->ui_.targetComboBox, tool->target_layer_state_ );
-  QtBridge::connect( radiusSizeAdjuster, tool->radius_state_ );
-  QtBridge::connect( private_->ui_.replaceCheckBox, tool->replace_state_ );
+  QtBridge::Connect( private_->ui_.targetComboBox, tool->target_layer_state_ );
+  QtBridge::Connect( radiusSizeAdjuster, tool->radius_state_ );
+  QtBridge::Connect( private_->ui_.replaceCheckBox, tool->replace_state_ );
 
   //Send a message to the log that we have finised with building the Median Filter Interface
   SCI_LOG_DEBUG("Finished building an Median Filter Interface");

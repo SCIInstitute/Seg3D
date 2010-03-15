@@ -49,41 +49,38 @@ namespace Seg3D
 class QtBridge : public boost::noncopyable
 {
 
-  // -- widget connectors --
+  // -- widget/menu connectors --
 public:
 
   // Connect a QCheckBox to StateValue<bool>
-  static bool connect( QCheckBox* qcheckbox, StateBoolHandle& state_handle );
+  static bool Connect( QCheckBox* qcheckbox, StateBoolHandle& state_handle );
 
   // Connect a SliderSpinCombo to StateRangedIntValue
-  static bool connect( SliderSpinComboInt* sscombo, StateRangedIntHandle& state_handle );
+  static bool Connect( SliderSpinComboInt* sscombo, StateRangedIntHandle& state_handle );
 
   // Connect a SliderSpinCombo to StateRangedDoubleValue
-  static bool connect( SliderSpinComboDouble* sscombo, StateRangedDoubleHandle& state_handle );
+  static bool Connect( SliderSpinComboDouble* sscombo, StateRangedDoubleHandle& state_handle );
 
   // Connect a QComboBox to StateValue<int>
-  static bool connect( QComboBox* qcombobox, StateOptionHandle& state_handle );
+  static bool Connect( QComboBox* qcombobox, StateOptionHandle& state_handle );
 
   // Connect QToolButton & QPushButtons
-  static bool connect( QToolButton* qtoolbutton, StateBoolHandle& state_handle );
+  static bool Connect( QToolButton* qtoolbutton, StateBoolHandle& state_handle );
   
-  static bool connect( QToolButton* qtoolbutton, boost::function< void() > function );
+  static bool Connect( QToolButton* qtoolbutton, boost::function< void() > function );
 
-  static bool connect( QPushButton* qpushbutton, boost::function< void() > function );
+  static bool Connect( QPushButton* qpushbutton, boost::function< void() > function );
 
   // Connect QActionGroup and StateOption
   // NOTE: This requires that each QAction in the QActionGroup has its objectName
   // the same as its corresponding option string
-  static bool connect( QActionGroup* qactiongroup, StateOptionHandle& state_handle );
-
-  // -- menu connectors --
-public:
+  static bool Connect( QActionGroup* qactiongroup, StateOptionHandle& state_handle );
 
   // Connect menu action to dispatcher
-  static bool connect( QAction* qaction, boost::function< void() > function );
+  static bool Connect( QAction* qaction, boost::function< void() > function );
 
   // Connect menu toggle action to dispatcher
-  static bool connect( QAction* qaction, StateBoolHandle& state_handle );
+  static bool Connect( QAction* qaction, StateBoolHandle& state_handle );
 
 };
 

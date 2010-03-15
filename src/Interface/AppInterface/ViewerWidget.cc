@@ -372,7 +372,7 @@ ViewerWidget::ViewerWidget( int viewer_id, QWidget *parent ) :
 
   private_->viewer_->set_viewer_id( viewer_id_ );
 
-  QtBridge::connect( this->private_->viewer_selection_, 
+  QtBridge::Connect( this->private_->viewer_selection_, 
     ViewerManager::Instance()->get_viewer( this->viewer_id_  )->view_mode_state_ );
 
   this->connect( this->private_->viewer_selection_, SIGNAL( triggered( QAction* ) ),
