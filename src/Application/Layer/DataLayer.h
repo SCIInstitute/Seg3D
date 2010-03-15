@@ -56,6 +56,14 @@ public:
   DataLayer( const std::string& name, const Utils::DataVolumeHandle& volume );
   virtual ~DataLayer();
 
+  virtual Utils::VolumeType type() const { return Utils::VolumeType::DATA_E; }
+
+  virtual const Utils::GridTransform& get_grid_transform() const 
+  { 
+    return data_volume_->get_grid_transform(); 
+  }
+  
+  
   // -- state variables --
 public:
 
@@ -69,7 +77,7 @@ public:
   StateBoolHandle volume_rendered_state_;
 
 private:
-  Utils::DataVolume* data_volume_;
+  Utils::DataVolumeHandle data_volume_;
 };
 
 } // end namespace Seg3D

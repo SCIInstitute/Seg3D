@@ -36,8 +36,8 @@
 namespace Seg3D
 {
 
-Layer::Layer( const std::string& name, const Utils::VolumeHandle& volume ) :
-  StateHandler( name ), volume_( volume )
+Layer::Layer( const std::string& name) :
+  StateHandler( name )
 {
 //  std::string new_name;
 //  StateEngine::Instance()->create_stateid( "layer", new_name );
@@ -70,26 +70,12 @@ Layer::Layer( const std::string& name, const Utils::VolumeHandle& volume ) :
   // == Which of the submenus is being editted ==
   add_state( "edit_mode", edit_mode_state_, "none", "none|opacity|color|contrast|appearance" );
 
-  // Step (2) : Update internal state
-
-  // == cache the grid transform in the Layer class ==
-  if ( volume_.get() ) grid_transform_ = volume_->grid_transform();
-
 }
-
-
   
 Layer::~Layer()
 {
   // Disconnect all current connections
   disconnect_all();
-}
-
-
-void Layer::set_volume( Utils::VolumeHandle volume )
-{
-  volume_ = volume;
-  if ( volume_.get() ) grid_transform_ = volume->grid_transform();
 }
 
 } // end namespace Seg3D

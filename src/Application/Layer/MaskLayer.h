@@ -56,6 +56,13 @@ public:
   MaskLayer( const std::string& name, const Utils::MaskVolumeHandle& volume );
   virtual ~MaskLayer();
 
+  virtual Utils::VolumeType type() const { return Utils::VolumeType::MASK_E; }
+
+  virtual const Utils::GridTransform& get_grid_transform() const 
+  { 
+    return mask_volume_->get_grid_transform(); 
+  }
+  
   // -- state variables --
 public:
 
@@ -72,7 +79,7 @@ public:
   StateBoolHandle show_isosurface_state_;
 
 private:
-  Utils::MaskVolume* mask_volume_;
+  Utils::MaskVolumeHandle mask_volume_;
 };
 
 } // end namespace Seg3D

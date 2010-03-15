@@ -81,7 +81,7 @@ public:
 
   // GRIDTRANSFORM
   // Get the grid location
-  const Utils::GridTransform& grid_transform() const
+  const Utils::GridTransform& get_grid_transform() const
   {
     return this->grid_transform_;
   }

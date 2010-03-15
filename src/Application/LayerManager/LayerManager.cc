@@ -52,13 +52,13 @@ LayerManager::LayerManager() :
     std::string new_name;
     new_name = "new_layer_" + boost::lexical_cast< std::string >( i );
 
-    Utils::GridTransform grid_transform;
+    Utils::GridTransform grid_transform( 256, 640, 480 );
     Utils::MaskDataBlockHandle mask_data_block;
     Utils::MaskVolumeHandle volume0( new Utils::MaskVolume( grid_transform, mask_data_block ) );
     MaskLayerHandle mask_layer_new0;
     
     mask_layer_new0 = MaskLayerHandle ( new MaskLayer( new_name, volume0 ) );
-    mask_layer_new0->set_grid_transform( 256, 640, 480 );
+//    mask_layer_new0->set_grid_transform( 256, 640, 480 );
     LayerHandle plain_layer = mask_layer_new0;
     //insert_layer( plain_layer );
     ActionInsertLayer::Dispatch( plain_layer );

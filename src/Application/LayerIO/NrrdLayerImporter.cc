@@ -34,6 +34,8 @@
 
 // Application includes
 #include <Application/LayerIO/NrrdLayerImporter.h>
+#include <Application/Layer/DataLayer.h>
+#include <Application/Layer/MaskLayer.h>
 
 namespace Seg3D
 {
@@ -105,10 +107,10 @@ bool NrrdLayerImporter::import_as_data( std::vector<LayerHandle>& layers )
 {
   layers.resize(1);
   Utils::DataBlockHandle datablock( new Utils::NrrdDataBlock( nrrd_data_) );
-  Utils::VolumeHandle datavolume( new 
+  Utils::DataVolumeHandle datavolume( new 
     Utils::DataVolume( nrrd_data_->get_grid_transform(), datablock ) );
 
-  layers[0] = LayerHandle( new Layer( get_base_filename(), datavolume ) );
+  layers[0] = LayerHandle( new DataLayer( get_base_filename(), datavolume ) );
 
   return true;
 }

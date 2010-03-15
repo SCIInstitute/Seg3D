@@ -73,9 +73,9 @@ class Layer : public StateHandler
 {
 
   // -- constructor/destructor --
-public:
-
-  Layer( const std::string& name, const Utils::VolumeHandle& volume );
+protected:
+  // NOTE: Use the specific class to build the layer
+  Layer( const std::string& name);
   virtual ~Layer();
 
   // -- Layer properties --
@@ -83,40 +83,12 @@ public:
 
   // TYPE
   // Get the type of the layer
-  inline Utils::VolumeType type() const
-  {
-    return this->volume_->type();
-  }
+  virtual Utils::VolumeType type() const = 0;
 
   // GRID_TRANSFORM
   // Get the transform of the layer
-  inline Utils::GridTransform grid_transform() const
-  {
-    return grid_transform_;
-  }
-
-  // VOLUME
-  // Return the underlying volume
-  inline Utils::VolumeHandle volume() const
-  {
-    return volume_;
-  }
-
-  // SET_VOLUME
-  // Add a volume to this layer
-  void set_volume( Utils::VolumeHandle volume );
+  virtual const Utils::GridTransform& get_grid_transform() const = 0;
   
-protected:
-
-  // The underlying structure that contains data plus transform, but no
-  // state information
-  Utils::VolumeHandle volume_;
-
-  // Cached version of the grid transform of the underlying volume object
-  Utils::GridTransform grid_transform_;
-  
-
-
   // -- State variables --
 public:
   
@@ -145,34 +117,7 @@ public:
   typedef StateEngine::mutex_type mutex_type;
   typedef StateEngine::lock_type lock_type;
 
-  // NOTE: The locking of making changes to the layer layout should be inline
-  // with the StateEngine. Since this is a recursive lock, this will force
-  // things to locked while the layer layout is redone.
 
-  // LOCK
-  // Lock the layer state engine
-  static void Lock()
-  {
-    StateEngine::Lock();
-
-  }
-
-  // UNLOCK
-  // Unlock the layer state engine
-  static void Unlock()
-  {
-    StateEngine::Unlock();
-
-  }
-
-  // GETMUTEX
-  // Get the mutex of the state engine
-  static mutex_type& GetMutex()
-  {
-    return StateEngine::GetMutex();
-  }
-  
-  
   LayerGroupHandle get_layer_group() 
   { 
     return layer_group_.lock(); 
@@ -181,17 +126,6 @@ public:
   inline void set_layer_group( LayerGroupWeakHandle layer_group )
   {
     layer_group_ = layer_group;
-  }
-  
-  const Utils::GridTransform& get_grid_transform() const
-  {
-    return grid_transform_;
-  }
-  
-  // test code 
-  void set_grid_transform( int x, int y, int  z )
-  {
-    grid_transform_ = Utils::GridTransform( x, y, z );
   }
   
   const std::string& get_layer_id() const
@@ -203,6 +137,15 @@ private:
   // The unique ID of the layer
   std::string layer_id_;
   LayerGroupWeakHandle layer_group_;
+
+  // GETMUTEX
+public:
+  // Get the mutex of the state engine
+  static mutex_type& GetMutex()
+  {
+    return StateEngine::GetMutex();
+  }
+  
 };
 
 } // end namespace Seg3D

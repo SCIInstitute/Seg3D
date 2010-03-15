@@ -73,7 +73,7 @@ LayerManagerDockWidget::LayerManagerDockWidget( QWidget *parent ) :
   qpointer_type layer_dock_widget( this );
   
   add_connection( LayerManager::Instance()->group_layers_changed_signal_.connect( boost::bind(
-          &LayerManagerDockWidget::handle_insert_layer, layer_dock_widget, _1 ) ) );
+          &LayerManagerDockWidget::HandleInsertLayer, layer_dock_widget, _1 ) ) );
   
 
   std::vector< LayerGroupHandle > temporary_layergrouphandle_vector;
@@ -133,11 +133,11 @@ void LayerManagerDockWidget::insert_above_layer( LayerHandle& below_layer, Layer
   //TODO implement insert layer above function
 }
   
-void LayerManagerDockWidget::handle_insert_layer( qpointer_type qpointer, LayerGroupHandle &group )
+void LayerManagerDockWidget::HandleInsertLayer( qpointer_type qpointer, LayerGroupHandle group )
 {
   if ( !( Interface::IsInterfaceThread() ) )
   {
-    Interface::Instance()->post_event( boost::bind( &LayerManagerDockWidget::handle_insert_layer,
+    Interface::Instance()->post_event( boost::bind( &LayerManagerDockWidget::HandleInsertLayer,
                              qpointer, group ) );
     return;
   }

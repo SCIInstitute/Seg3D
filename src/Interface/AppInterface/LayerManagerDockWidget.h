@@ -112,7 +112,7 @@ private:
 public:
   typedef QPointer< LayerManagerDockWidget > qpointer_type;
   
-  static void handle_insert_layer( qpointer_type qpointer, LayerGroupHandle &group );
+  static void HandleInsertLayer( qpointer_type qpointer, LayerGroupHandle group );
   static void HandleNewGroup( qpointer_type qpointer, LayerHandle layer );
   static void HandleCloseGroup( qpointer_type qpointer, LayerHandle layer );
   static void HandleDataFromFile( qpointer_type qpointer, LayerHandle layer );

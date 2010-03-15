@@ -55,7 +55,10 @@ public:
   LabelLayer( const std::string& name, const Utils::VolumeHandle& volume );
   virtual ~LabelLayer();
 
-  // -- state variables --
+  virtual Utils::VolumeType type() const { return Utils::VolumeType::LABEL_E; }
+  
+  virtual const Utils::GridTransform& get_grid_transform() const = 0;
+
 public:
 
   // TODO: Need to generate this class
