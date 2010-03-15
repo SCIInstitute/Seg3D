@@ -60,14 +60,16 @@ AppInterface::AppInterface()
   splash_screen_->exec();
 
   // Enable fullscreen on startup via commandline argument
-  std::string true_false_ = Seg3D::Application::Instance()->checkCommandLineParameter(
-      "fullscreen" );
-  if ( boost::lexical_cast< bool >( true_false_ ) )
+  std::string value;
+  if ( Application::Instance()->check_command_line_parameter( "fullscreen", value ) )
   {
-    SCI_LOG_MESSAGE("Going full screen based on command line parameter");
-    showFullScreen();
+    if ( boost::lexical_cast< bool >( value ) )
+    {
+      SCI_LOG_MESSAGE("Going full screen based on command line parameter");
+      showFullScreen();
+    }
   }
-
+  
   // Tell Qt where to doc the toolbars
   setCorner( Qt::TopLeftCorner, Qt::LeftDockWidgetArea );
   setCorner( Qt::TopRightCorner, Qt::RightDockWidgetArea );

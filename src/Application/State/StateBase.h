@@ -61,9 +61,11 @@ class StateBase : public boost::noncopyable
 
   // -- constructor / destructor --
 public:
-  StateBase()
+  StateBase(const std::string& stateid) :
+    stateid_( stateid )
   {
   }
+  
   virtual ~StateBase()
   {
   }
@@ -114,14 +116,7 @@ public:
     return ( stateid_.substr( 0, stateid_.find( ':' ) ) );
   }
 
-  // SET_STATEID:
-  // Set the unique id to be used to locate this state variable
-  void set_stateid( const std::string& stateid )
-  {
-    stateid_ = stateid;
-  }
-
-protected:
+private:
   std::string stateid_;
 
   // -- signal handling --

@@ -117,8 +117,6 @@ public:
   Point apply_grid_transform( const Point& pt ) const;
   Point apply_inverse_grid_transform( const Point& pt ) const;
 
-  virtual void lock() = 0;
-  virtual void unlock() = 0;
   virtual mutex_type& get_mutex() = 0;
 
   // -- internals of volume --

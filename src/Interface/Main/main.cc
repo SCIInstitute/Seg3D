@@ -90,21 +90,20 @@ int main( int argc, char **argv )
   // -- Parse the command line parameters and put them in a stl::map --
   Seg3D::Application::Instance()->parse_command_line_parameters( argc, argv );
 
-  // -- Use Seg3D::Application::Instance()->checkCommandLineParameter( const std::string &key ) 
-  // -- to test if a given parameter was passed.
   // -- Checking for the socket parameter --
-  std::string socket_number_as_string_ =
-      Seg3D::Application::Instance()->checkCommandLineParameter( "socket" );
-  int socket_number_ = boost::lexical_cast< int >( socket_number_as_string_ );
-
-  if ( socket_number_ > 0 )
+  std::string port_number_string;
+  if ( Application::Instance()->check_command_line_parameter( "socket", port_number_string ) )
   {
-    // -- Add a socket for receiving actions --
-    SCI_LOG_DEBUG("Starting a socket on port: " + socket_number_as_string_);
-
-    ActionSocket::Instance()->start( socket_number_ );
+    int port_number;
+    if ( Utils::from_string( port_number_string, port_number) )
+    {
+      // -- Add a socket for receiving actions --
+      SCI_LOG_DEBUG( std::string("Starting a socket on port: ") + 
+        Utils::to_string( port_number ) );
+      ActionSocket::Instance()->start( port_number );
+    }
   }
-
+  
   // -- Add plugins into the architecture  
   SCI_LOG_DEBUG("Setup and register all the plugins");
   Seg3D::InitPlugins();

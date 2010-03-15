@@ -32,6 +32,51 @@
 namespace Seg3D
 {
 
+std::string ExportToString( LayerImporterMode mode )
+{
+  switch ( mode )
+  {
+    case LayerImporterMode::DATA_E: return "data";
+    case LayerImporterMode::SINGLE_MASK_E: return "single_mask";
+    case LayerImporterMode::BITPLANE_MASK_E: return "bitplane_mask";
+    case LayerImporterMode::LABEL_MASK_E: return "label_mask";
+    default: return "unknown";
+  }
+}
+
+bool ImportFromString( const std::string& import_type_string, LayerImporterMode& mode )
+{
+  std::string import_type = import_type_string;
+  boost::to_lower( import_type );
+  boost::erase_all( import_type , " " );
+
+  if ( import_type == "data" )
+  {
+    mode = LayerImporterMode::DATA_E;
+    return true;
+  }
+  else if ( import_type == "singlemask" || import_type == "single_mask" || import_type == "mask" )
+  {
+    mode = LayerImporterMode::SINGLE_MASK_E;
+    return true;
+  }
+  else if ( import_type == "bitplane_mask" || import_type == "bitplanemask" )
+  {
+    mode = LayerImporterMode::BITPLANE_MASK_E;
+    return true;
+  }
+  else if ( import_type == "label_mask" || import_type == "labelmask" )
+  {
+    mode = LayerImporterMode::LABEL_MASK_E;
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+
 LayerImporter::LayerImporter( const std::string& filename ) :
   filename_( filename )
 {
@@ -45,6 +90,13 @@ std::string LayerImporter::get_filename()
 { 
   return filename_; 
 }
+
+std::string LayerImporter::get_base_filename() 
+{ 
+  boost::filesystem::path full_filename(filename_);
+  return full_filename.stem() ; 
+}
+
 
 bool LayerImporter::import_header()
 {
@@ -62,13 +114,18 @@ Utils::GridTransform LayerImporter::get_grid_transform()
   return identity;
 }
 
-bool LayerImporter::has_import_mode( LayerImporterMode mode )
+
+Utils::DataType LayerImporter::get_data_type()
+{
+  return Utils::DataType::UNKNOWN_E;
+}
+
+bool LayerImporter::has_importer_mode( LayerImporterMode mode )
 {
   return false;
 }
 
-bool LayerImporter::import_layer( std::vector<LayerHandle>& layers, 
-  LayerImporterMode mode )
+bool LayerImporter::import_layer( std::vector<LayerHandle>& layers, LayerImporterMode mode )
 {
   return false;
 }

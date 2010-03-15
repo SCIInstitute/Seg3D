@@ -29,6 +29,8 @@
 // Utils includes
 #include <Utils/DataBlock/NrrdData.h>
 #include <Utils/DataBlock/NrrdDataBlock.h>
+#include <Utils/Volume/DataVolume.h>
+#include <Utils/Volume/MaskVolume.h>
 
 // Application includes
 #include <Application/LayerIO/NrrdLayerImporter.h>
@@ -67,17 +69,64 @@ Utils::GridTransform NrrdLayerImporter::get_grid_transform()
   else return LayerImporter::get_grid_transform();
 }
 
-bool NrrdLayerImporter::has_import_mode( LayerImporterMode mode )
+Utils::DataType NrrdLayerImporter::get_data_type()
 {
-  if ( nrrd_data_->is_integer() ) return true;
-  else if ( nrrd_data_->is_real() && mode == LayerImporterMode::DATA_E ) return true;
-  return false;
+  if ( nrrd_data_ ) return nrrd_data_->get_data_type();
+  else return LayerImporter::get_data_type();
 }
 
+bool NrrdLayerImporter::has_importer_mode( LayerImporterMode mode )
+{
+  Utils::DataType data_type = nrrd_data_->get_data_type();
+   
+  if ( Utils::IsInteger( data_type ) ) return true;
+  else if ( Utils::IsReal( data_type )  && mode == LayerImporterMode::DATA_E ) return true;
+  return false;
+}
 
 bool NrrdLayerImporter::import_layer( std::vector<LayerHandle>& layers, LayerImporterMode mode )
 {
+  switch (mode)
+  {
+    case LayerImporterMode::DATA_E:
+      return (  import_as_data( layers ) );
+    case LayerImporterMode::SINGLE_MASK_E:
+      return (  import_as_single_mask( layers ) );
+    case LayerImporterMode::BITPLANE_MASK_E:
+      return (  import_as_bitplane_mask( layers ) );
+    case LayerImporterMode::LABEL_MASK_E:
+      return (  import_as_label_mask( layers ) ); 
+    default:
+      return false;
+  }
+}
+
+bool NrrdLayerImporter::import_as_data( std::vector<LayerHandle>& layers )
+{
+  layers.resize(1);
+  Utils::DataBlockHandle datablock( new Utils::NrrdDataBlock( nrrd_data_) );
+  Utils::VolumeHandle datavolume( new 
+    Utils::DataVolume( nrrd_data_->get_grid_transform(), datablock ) );
+
+  layers[0] = LayerHandle( new Layer( get_base_filename(), datavolume ) );
+
+  return true;
+}
+
+bool NrrdLayerImporter::import_as_single_mask( std::vector<LayerHandle>& layers )
+{
   return false;
 }
+
+bool NrrdLayerImporter::import_as_bitplane_mask( std::vector<LayerHandle>& layers )
+{
+  return false;
+}
+
+bool NrrdLayerImporter::import_as_label_mask( std::vector<LayerHandle>& layers )
+{
+  return false;
+}
+
 
 } // end namespace seg3D

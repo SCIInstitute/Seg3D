@@ -54,9 +54,12 @@ class StateOption : public StateBase
 public:
 
   // CONSTRUCTOR
-  StateOption( const std::string& default_value, const std::string& option_list );
+  StateOption( const std::string& stateid, const std::string& default_value, 
+    const std::string& option_list );
 
-  StateOption( const std::string& default_value, const std::vector< std::string >& option_list );
+  StateOption( const std::string& stateid, const std::string& default_value, 
+    const std::vector< std::string >& option_list );
+  
   // DESTRUCTOR
   virtual ~StateOption();
 

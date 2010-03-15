@@ -50,7 +50,7 @@ Utils::GridTransform ITKLayerImporter::get_grid_transform()
   return identity;
 }
 
-bool ITKLayerImporter::has_import_mode( LayerImporterMode mode )
+bool ITKLayerImporter::has_importer_mode( LayerImporterMode mode )
 {
   import_header();
   

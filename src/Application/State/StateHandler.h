@@ -67,11 +67,14 @@ public:
   template< class HANDLE, class T >
   bool add_state( const std::string& key, HANDLE& state, const T& default_value )
   {
-    // Step (1): Generate the state variable
-    state = HANDLE( new typename HANDLE::element_type( default_value ) );
+    // Step (1): Generate a new unique ID for this state
+    std::string stateid = stateid_prefix_ + std::string( "::" ) + key;
+  
+    // Step (2): Generate the state variable
+    state = HANDLE( new typename HANDLE::element_type( stateid, default_value ) );
 
-    // Step (2): Now handle the common part for each add_state function
-    return ( add_statebase( key, StateBaseHandle( state ) ) );
+    // Step (3): Now handle the common part for each add_state function
+    return ( add_statebase( StateBaseHandle( state ) ) );
   }
 
   // ADD_STATE:
@@ -81,12 +84,15 @@ public:
   bool add_state( const std::string& key, HANDLE& state, const T& default_value,
       const T& min_value, const T& max_value, const T& step )
   {
-    // Step (1): Generate the state variable
-    state = HANDLE( new typename HANDLE::element_type( default_value, min_value, max_value,
-        step ) );
+    // Step (1): Generate a new unique ID for this state
+    std::string stateid = stateid_prefix_ + std::string( "::" ) + key;
+    
+    // Step (2): Generate the state variable
+    state = HANDLE( new typename HANDLE::element_type( stateid, default_value, 
+      min_value, max_value, step ) );
 
-    // Step (2): Now handle the common part for each add_state function
-    return ( add_statebase( key, StateBaseHandle( state ) ) );
+    // Step (3): Now handle the common part for each add_state function
+    return ( add_statebase( StateBaseHandle( state ) ) );
   }
 
   // ADD_STATE:
@@ -95,11 +101,14 @@ public:
   template< class HANDLE >
   bool add_state( const std::string& key, HANDLE& state )
   {
-    // Step (1): Generate the state variable
-    state = HANDLE( new typename HANDLE::element_type );
+    // Step (1): Generate a new unique ID for this state
+    std::string stateid = stateid_prefix_ + std::string( "::" ) + key;
+    
+    // Step (2): Generate the state variable
+    state = HANDLE( new typename HANDLE::element_type( stateid ) );
 
-    // Step (2): Now handle the common part for each add_state function
-    return ( add_statebase( key, StateBaseHandle( state ) ) );
+    // Step (3): Now handle the common part for each add_state function
+    return ( add_statebase( StateBaseHandle( state ) ) );
   }
 
   // ADD_STATE:
@@ -108,12 +117,15 @@ public:
   template< class HANDLE >
   bool add_state( const std::string& key, HANDLE& state, const std::string& default_option,
       const std::string& option_list )
-  {
-    // Step (1): Generate the state variable
-    state = HANDLE( new typename HANDLE::element_type( default_option, option_list ) );
+  {   
+    // Step (1): Generate a new unique ID for this state
+    std::string stateid = stateid_prefix_ + std::string( "::" ) + key;
+  
+    // Step (2): Generate the state variable
+    state = HANDLE( new typename HANDLE::element_type( stateid, default_option, option_list ) );
 
-    // Step (2): Now handle the common part for each add_state function
-    return ( add_statebase( key, StateBaseHandle( state ) ) );
+    // Step (3): Now handle the common part for each add_state function
+    return ( add_statebase( StateBaseHandle( state ) ) );
   }
 
   // ADD_STATE:
@@ -123,11 +135,14 @@ public:
   bool add_state( const std::string& key, HANDLE& state, const std::string& default_option,
       const std::vector< std::string > option_list )
   {
-    // Step (1): Generate the state variable
-    state = HANDLE( new typename HANDLE::element_type( default_option, option_list ) );
+    // Step (1): Generate a new unique ID for this state
+    std::string stateid = stateid_prefix_ + std::string( "::" ) + key;
+      
+    // Step (2): Generate the state variable
+    state = HANDLE( new typename HANDLE::element_type( stateid, default_option, option_list ) );
 
-    // Step (2): Now handle the common part for each add_state function
-    return ( add_statebase( key, StateBaseHandle( state ) ) );
+    // Step (3): Now handle the common part for each add_state function
+    return ( add_statebase( StateBaseHandle( state ) ) );
   }
 
   // ADD_STATE:
@@ -136,11 +151,14 @@ public:
   template< class HANDLE, class T >
   bool add_state( const std::string& key, HANDLE& state, const std::vector< T >& default_value )
   {
-    // Step (1): Generate the state variable
-    state = HANDLE( new typename HANDLE::element_type( default_value ) );
+    // Step (1): Generate a new unique ID for this state
+    std::string stateid = stateid_prefix_ + std::string( "::" ) + key;
+    
+    // Step (2): Generate the state variable
+    state = HANDLE( new typename HANDLE::element_type( stateid, default_value ) );
 
-    // Step (2): Now handle the common part for each add_state function
-    return ( add_statebase( key, StateBaseHandle( state ) ) );
+    // Step (3): Now handle the common part for each add_state function
+    return ( add_statebase( StateBaseHandle( state ) ) );
 
   }
 
@@ -159,7 +177,7 @@ private:
 
 private:
   // Function that adds the state variable to the database
-  bool add_statebase( const std::string& key, StateBaseHandle state );
+  bool add_statebase( StateBaseHandle state );
 
   // Prefix for all state variables of this class
   std::string stateid_prefix_;

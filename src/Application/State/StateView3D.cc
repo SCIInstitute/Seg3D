@@ -35,7 +35,8 @@
 namespace Seg3D
 {
 
-StateView3D::StateView3D()
+StateView3D::StateView3D( const std::string& stateid ) :
+  StateViewBase( stateid )
 {
 }
 

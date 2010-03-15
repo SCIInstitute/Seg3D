@@ -156,21 +156,7 @@ public:
 // -- Locking of the datablock --
 public:
 
-  // LOCK:
-  // Lock the datablock
-  void lock()
-  { 
-    data_block_->lock();
-  }
-
-  // UNLOCK:
-  // Unlock the datablock
-  void unlock()
-  { 
-    data_block_->unlock();
-  }
-
-  // GETMUTEX:
+  // GET_MUTEX:
   // Get the mutex that locks the datablock
   mutex_type& get_mutex()
   { 

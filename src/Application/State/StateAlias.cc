@@ -35,14 +35,15 @@
 namespace Seg3D
 {
 
-StateAlias::StateAlias()
+StateAlias::StateAlias( const std::string& stateid ) :
+  StateBase( stateid )
 {
 }
 
-StateAlias::StateAlias( const std::string default_value ) //:
-  //value_( default_value )
+StateAlias::StateAlias( const std::string& stateid, const std::string default_value ) :
+  StateBase( stateid ),
+  value_( default_value )
 {
-  value_ = default_value;
   if ( !( value_.empty() ) )
   {
     StateEngine::Instance()->add_statealias( baseid(), value_ );

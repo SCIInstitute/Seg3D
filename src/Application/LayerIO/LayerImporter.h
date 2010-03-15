@@ -39,11 +39,13 @@
 #include <map>
 
 // Boost includes
+#include <boost/filesystem.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
 
 // Utils includes
+#include <Utils/DataBlock/DataType.h>
 #include <Utils/Core/EnumClass.h>
 #include <Utils/Core/Log.h>
 
@@ -75,6 +77,9 @@ SCI_ENUM_CLASS
   // Each separate number is interpreted as a separate mask
   LABEL_MASK_E = 4  
 )
+
+std::string ExportToString( LayerImporterMode mode );
+bool ImportFromString( const std::string& import_type_string, LayerImporterMode& mode );
 
 class LayerImporter;
 typedef boost::shared_ptr< LayerImporter > LayerImporterHandle;
@@ -109,7 +114,11 @@ public:
   // GET_FILENAME:
   // Get the filename that this importer is importing
   std::string get_filename();
-
+  
+  // GET_BASE_FILENAME
+  // Get the filename without path and without extension
+  std::string get_base_filename();
+  
   // -- internals of the importer -- 
 protected:
   // FILENAME:
@@ -134,11 +143,15 @@ public:
   // Get the grid transform of the grid that we are importing
   virtual Utils::GridTransform get_grid_transform();
 
+  // GET_DATA_TYPE:
+  // Get the type of data that is being imported
+  virtual Utils::DataType get_data_type();
+
   // -- Import the data as a specific type -- 
 public: 
-  // HAS_IMPORT_MODE:
+  // HAS_IMPORTER_MODE:
   // Test whether the importer a specific importer mode
-  virtual bool has_import_mode( LayerImporterMode mode );
+  virtual bool has_importer_mode( LayerImporterMode mode );
 
   // IMPORT_LAYER
   // Import the layer from the file

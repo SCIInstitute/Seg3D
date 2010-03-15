@@ -101,8 +101,6 @@ Transform NrrdData::get_transform() const
     }
   }
 
-  SCI_LOG_DEBUG( export_to_string(min) + " | " + export_to_string(max) );
-
   // Remove empty dimensions
   size_t k = 0;
   for ( size_t p = 0; p < dim; p++ )
@@ -124,8 +122,6 @@ Transform NrrdData::get_transform() const
     rsize[ k ] = size[ p ];
     k++;
   }
-
-  SCI_LOG_DEBUG( export_to_string(rmin) + " | " + export_to_string(rmax) );
 
   if ( rdim == 1 )
   {
@@ -305,64 +301,23 @@ size_t NrrdData::nz() const
   return 1;
 }
 
-bool NrrdData::is_char() const
+DataType NrrdData::get_data_type() const
 {
-  if ( nrrd_ && nrrd_->type == nrrdTypeChar ) return true;
-  return false;
-}
-
-bool NrrdData::is_unsigned_char() const
-{
-  if ( nrrd_ && nrrd_->type == nrrdTypeUChar ) return true;
-  return false;
-}
-
-bool NrrdData::is_short() const
-{
-  if ( nrrd_ && nrrd_->type == nrrdTypeShort ) return true;
-  return false;
-}
-
-bool NrrdData::is_unsigned_short() const
-{
-  if ( nrrd_ && nrrd_->type == nrrdTypeUShort ) return true;
-  return false;
-}
-
-bool NrrdData::is_int() const
-{
-  if ( nrrd_ && nrrd_->type == nrrdTypeInt ) return true;
-  return false;
-}
-
-bool NrrdData::is_unsigned_int() const
-{
-  if ( nrrd_ && nrrd_->type == nrrdTypeUInt ) return true;
-  return false;
-}
-
-bool NrrdData::is_longlong() const
-{
-  if ( nrrd_ && nrrd_->type == nrrdTypeLLong ) return true;
-  return false;
-}
-
-bool NrrdData::is_unsigned_longlong() const
-{
-  if ( nrrd_ && nrrd_->type == nrrdTypeULLong ) return true;
-  return false;
-}
-
-bool NrrdData::is_float() const
-{
-  if ( nrrd_ && nrrd_->type == nrrdTypeFloat ) return true;
-  return false;
-}
-
-bool NrrdData::is_double() const
-{
-  if ( nrrd_ && nrrd_->type == nrrdTypeDouble ) return true;
-  return false;
+  if ( ! (nrrd_) ) return DataType::UNKNOWN_E;
+  switch ( nrrd_->type )
+  {
+    case nrrdTypeChar: return DataType::CHAR_E;
+    case nrrdTypeUChar: return DataType::UCHAR_E;
+    case nrrdTypeShort: return DataType::SHORT_E;
+    case nrrdTypeUShort: return DataType::USHORT_E;
+    case nrrdTypeInt: return DataType::INT_E;
+    case nrrdTypeUInt: return DataType::UINT_E;
+    case nrrdTypeLLong: return DataType::LONGLONG_E;
+    case nrrdTypeULLong: return DataType::ULONGLONG_E;
+    case nrrdTypeFloat: return DataType::FLOAT_E;
+    case nrrdTypeDouble: return DataType::DOUBLE_E;
+    default: return DataType::UNKNOWN_E;
+  }
 }
 
 bool NrrdData::LoadNrrd( const std::string& filename, NrrdDataHandle& nrrddata, std::string& error )

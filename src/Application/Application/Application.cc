@@ -53,72 +53,66 @@ Application::~Application()
 {
 }
 
-//TODO - put this in the class
-//This map stores the parameters that were set when Seg3D was started.
-static std::map< std::string, std::string > parameters;
-
 //This is a function to check parameters.
 //This avoids accidentally putting data into the map that we dont want
-std::string Application::checkCommandLineParameter( const std::string &key )
+bool Application::check_command_line_parameter( const std::string &key, std::string& value )
 {
-  if ( parameters.find( key ) == parameters.end() )
+  lock_type lock( get_mutex() );
+
+  if ( this->parameters_.find( key ) == this->parameters_.end() )
   {
-    return "0";
+    return false;
   }
   else
   {
-    return parameters[ key ];
+    value = this->parameters_[ key ];
+    return true;
   }
 }
 
 //This function sets parameters in the parameters map.
-void Application::setParameter( const std::string &key, const std::string &val )
+void Application::set_command_line_parameter( const std::string& key, const std::string& value )
 {
-  parameters[ key ] = val;
+  lock_type lock( get_mutex() );
+  this->parameters_[ key ] = value;
 }
 
 // Function for parsing the command line parameters
 void Application::parse_command_line_parameters( int argc, char **argv )
 {
-  int count_ = 1; // start at 1 because the filename/path counts as 0
-  std::string key;
-  std::string value;
+  lock_type lock( get_mutex() );
 
   typedef boost::tokenizer< boost::char_separator< char > > tokenizer;
   boost::char_separator< char > seperator( ":-=|;" );
 
   // parse through the command line arguments
-  while ( count_ < argc )
+
+  for ( int count = 1; count < argc; count++ )
   {
-    std::string param( argv[ count_ ] );
-    tokenizer tokens( param, seperator );
-    std::vector< std::string > param_vector_;
+    tokenizer tokens( std::string ( argv[ count ] ), seperator );
+    std::vector< std::string > param_vector;
 
     for ( tokenizer::iterator tok_iter = tokens.begin(); tok_iter != tokens.end(); ++tok_iter )
     {
-      param_vector_.push_back( *tok_iter );
-    } // end for loop
+      param_vector.push_back( *tok_iter );
+    }
 
-    if ( param_vector_.size() == 2 )
+    // Create empty string
+    std::string value = "1";
+    
+    if ( param_vector.size() > 1 ) 
+    { 
+      value = param_vector[ 1 ];
+    }
+    if ( param_vector.size() > 0 )
     {
-      key = param_vector_[ 0 ];
-      value = param_vector_[ 1 ];
-    } // end if
-    else
-    {
-      key = param_vector_[ 0 ];
-      value = "1";
-    } // end else
-
-    // output the parsed parameters to the log
-    std::string parameter_number_ = boost::lexical_cast< std::string >( count_ );
-    SCI_LOG_MESSAGE("Parameter " + parameter_number_ + " - Key: " + key + ", Value: " + value);
-
-    setParameter( key, value );
-    count_++;
-  } // end while
-
-} // end parse_command_line_parameters
+      std::string key = param_vector[ 0 ];
+      this->parameters_[ key ] = value;
+      SCI_LOG_MESSAGE( std::string("Set command line parameter key: ") + 
+      key + ", value: " + value);
+    }
+  }
+}
 
 
 } // end namespace Seg3D

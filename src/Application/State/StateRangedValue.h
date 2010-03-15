@@ -65,10 +65,13 @@ class StateRangedValue : public StateBase
 public:
 
   // CONSTRUCTOR
-  StateRangedValue( const T& default_value, const T& min_value, const T& max_value,
-      const T& step_value ) :
-    value_( default_value ), min_value_( min_value ), max_value_( max_value ), step_value_(
-        step_value )
+  StateRangedValue( const std::string& stateid, const T& default_value, const T& min_value, 
+    const T& max_value, const T& step_value ) :
+    StateBase( stateid ),
+    value_( default_value ), 
+    min_value_( min_value ), 
+    max_value_( max_value ), 
+    step_value_( step_value )
   {
     if ( min_value_ > max_value_ ) std::swap( min_value_, max_value_ );
   }

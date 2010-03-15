@@ -123,16 +123,6 @@ public:
     return this->volume_->apply_inverse_grid_transform( pt );
   }
 
-  void lock()
-  {
-    return this->volume_->lock();
-  }
-
-  void unlock()
-  {
-    return this->volume_->unlock();
-  }
-
   mutex_type& get_mutex()
   {
     return this->volume_->get_mutex();

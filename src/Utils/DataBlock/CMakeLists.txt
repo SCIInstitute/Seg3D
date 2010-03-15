@@ -32,6 +32,8 @@
 ##################################################
 
 SET(UTILS_DATABLOCK_SRCS
+  DataType.h
+  DataType.cc
   DataBlock.h
   DataBlock.cc
   MaskDataBlock.h

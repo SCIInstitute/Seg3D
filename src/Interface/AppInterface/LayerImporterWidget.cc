@@ -32,11 +32,14 @@
 // Utils includes
 #include <Utils/Core/Log.h>
 
+// Application includes
+#include <Application/LayerManager/Actions/ActionImportLayer.h>
+
 //Interface Includes
 #include <Interface/QtInterface/QtBridge.h>
 #include <Interface/AppInterface/LayerImporterWidget.h>
 
-// Gt Gui Includes
+// Qt Gui Includes
 #include "ui_LayerImporterWidget.h"
 
 namespace Seg3D
@@ -120,25 +123,25 @@ LayerImporterWidget::LayerImporterWidget( LayerImporterHandle importer, QWidget*
   private_->ui_.setupUi( this );
 
   // Switch off options that this importer does not support
-  if ( !( importer_->has_import_mode( LayerImporterMode::DATA_E ) ) )
+  if ( !( importer_->has_importer_mode( LayerImporterMode::DATA_E ) ) )
   {
     private_->ui_.data_->hide();
     private_->ui_.data_label_->hide();
   }
 
-  if ( !( importer_->has_import_mode( LayerImporterMode::SINGLE_MASK_E ) ) )
+  if ( !( importer_->has_importer_mode( LayerImporterMode::SINGLE_MASK_E ) ) )
   {
     private_->ui_.single_mask_->hide();
     private_->ui_.single_mask_label_->hide();
   }
 
-  if ( !( importer_->has_import_mode( LayerImporterMode::BITPLANE_MASK_E ) ) )
+  if ( !( importer_->has_importer_mode( LayerImporterMode::BITPLANE_MASK_E ) ) )
   {
     private_->ui_.bitplane_mask_->hide();
     private_->ui_.bitplane_mask_label_->hide();
   }
 
-  if ( !( importer_->has_import_mode( LayerImporterMode::LABEL_MASK_E ) ) )
+  if ( !( importer_->has_importer_mode( LayerImporterMode::LABEL_MASK_E ) ) )
   {
     private_->ui_.label_mask_->hide();
     private_->ui_.label_mask_label_->hide();
@@ -150,6 +153,9 @@ LayerImporterWidget::LayerImporterWidget( LayerImporterHandle importer, QWidget*
   // Add information to importer
   boost::filesystem::path full_filename( importer_->get_filename() );
   private_->ui_.filename_->setText( QString::fromStdString( full_filename.filename() ) );
+  
+  std::string data_type = Utils::ExportToString( importer_->get_data_type() );
+  private_->ui_.data_type_->setText( QString::fromStdString( data_type ) );
   
   Utils::GridTransform grid_transform = importer_->get_grid_transform();
   private_->ui_.x_size_->setText( 
@@ -261,7 +267,7 @@ void LayerImporterWidget::set_mode( LayerImporterMode mode )
 
 void LayerImporterWidget::import()
 {
-  
+  ActionImportLayer::Dispatch( importer_, mode_ );
   accept();
 }
 

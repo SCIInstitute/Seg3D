@@ -42,7 +42,7 @@
 #include <boost/thread/thread.hpp>
 #include <boost/utility.hpp>
 
-#include <Utils/Core/EnumClass.h>
+#include <Utils/DataBlock/DataType.h>
 #include <Utils/Graphics/Texture.h>
 
 namespace Utils
@@ -60,20 +60,6 @@ namespace Utils
 // Forward Declaration
 class DataBlock;
 typedef boost::shared_ptr< DataBlock > DataBlockHandle;
-
-SCI_ENUM_CLASS
-(
-  DataType,
-  CHAR_E = 0, 
-  UCHAR_E, 
-  SHORT_E, 
-  USHORT_E, 
-  INT_E, 
-  UINT_E, 
-  FLOAT_E, 
-  DOUBLE_E, 
-  UNKNOWN_E
-)
 
 // Class definition
 class DataBlock : public boost::noncopyable
@@ -125,7 +111,7 @@ public:
     return data_type_;
   }
 
-  // DATA
+  // DATA:
   // Pointer to the block of data
   void* data()
   {
@@ -206,21 +192,7 @@ protected:
   // -- Locking of the datablock --
 public:
 
-  // LOCK:
-  // Lock the datablock
-  void lock()
-  {
-    mutex_.lock();
-  }
-
-  // UNLOCK:
-  // Unlock the datablock
-  void unlock()
-  {
-    mutex_.unlock();
-  }
-
-  // GETMUTEX:
+  // GET_MUTEX:
   // Get the mutex that locks the datablock
   mutex_type& get_mutex()
   {

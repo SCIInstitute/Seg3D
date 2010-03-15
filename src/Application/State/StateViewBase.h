@@ -43,10 +43,11 @@ typedef boost::weak_ptr< StateViewBase > StateViewBaseWeakHandle;
 class StateViewBase : public StateBase
 {
 public:
-  StateViewBase() :
-    StateBase()
+  StateViewBase( const std::string& stateid ) :
+    StateBase( stateid )
   {
   }
+  
   virtual ~StateViewBase()
   {
   }

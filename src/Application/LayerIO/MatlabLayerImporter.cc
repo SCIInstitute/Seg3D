@@ -50,7 +50,7 @@ Utils::GridTransform MatlabLayerImporter::get_grid_transform()
   return identity;
 }
 
-bool MatlabLayerImporter::has_import_mode( LayerImporterMode mode )
+bool MatlabLayerImporter::has_importer_mode( LayerImporterMode mode )
 {
   import_header();
   

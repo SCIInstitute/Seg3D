@@ -71,21 +71,38 @@ public:
 
   // -- Command line parser --
 public:
-  // CHECKCOMMANDLINEPARAMETERS
+  // CHECK_COMMAND_LINE_PARAMETERS
   // check to see if a particular parameter has been placed into the map
   // if so it returns the value as a string
-  std::string checkCommandLineParameter( const std::string& key );
+  bool check_command_line_parameter( const std::string& key, std::string& value );
 
-  // SETPARAMETER
+  // SET_PARAMETER
   // put parameters from the command line into a map
-  void setParameter( const std::string& key, const std::string& val );
+  void set_command_line_parameter( const std::string& key, const std::string& value );
 
-  // PARSEPARAMETERS
+  // PARSE_COMMAND_LINE_PARAMETERS
   // parse paremeters from the command line
   void parse_command_line_parameters( int argc, char** argv );
 
-  // -- Application thread --
+private:
+  typedef std::map< std::string, std::string > parameters_type;
+  parameters_type parameters_;
 
+  // -- Thread safety --
+public:
+  typedef boost::mutex mutex_type;
+  typedef boost::unique_lock<mutex_type> lock_type;
+
+  // GET_MUTEX:
+  // Get the mutex that protects this class
+  mutex_type& get_mutex() { return mutex_; }
+
+private:
+  // Lock for this lock
+  mutex_type mutex_;
+
+  // -- Application thread --
+public:
   // ISAPPLICATIONTHREAD:
   // Test whether the current thread is the application thread
   static bool IsApplicationThread()

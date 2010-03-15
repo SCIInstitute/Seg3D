@@ -62,7 +62,7 @@ class StateView3D : public StateViewBase
 public:
 
   // CONSTRUCTOR
-  StateView3D();
+  StateView3D(const std::string& stateid );
 
   // DESTRUCTOR
   virtual ~StateView3D();

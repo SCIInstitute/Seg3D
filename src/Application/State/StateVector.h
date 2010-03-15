@@ -72,7 +72,8 @@ class StateVector : public StateBase
   // -- constructor/destructor --
 public:
   // CONSTRUCTOR
-  StateVector( const std::vector< T >& default_value ) :
+  StateVector( const std::string& stateid, const std::vector< T >& default_value ) :
+    StateBase( stateid ),
     values_vector_( default_value )
   {
   }

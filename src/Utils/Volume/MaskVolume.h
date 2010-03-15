@@ -57,16 +57,6 @@ public:
     return this->mask_data_block_;
   }
 
-  virtual void lock()
-  {
-    this->mask_data_block_->lock();
-  }
-
-  virtual void unlock()
-  {
-    this->mask_data_block_->unlock();
-  }
-
   virtual mutex_type& get_mutex()
   {
     return this->mask_data_block_->get_mutex();

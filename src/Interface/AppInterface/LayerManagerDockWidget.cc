@@ -58,6 +58,13 @@ LayerManagerDockWidget::LayerManagerDockWidget( QWidget *parent ) :
   setWindowTitle( "Layer Manager" );
 
   resize( 280, 640 );
+  QSizePolicy sizePolicy( QSizePolicy::Fixed, QSizePolicy::Preferred );
+  sizePolicy.setHorizontalStretch(0);
+  sizePolicy.setVerticalStretch(0);
+  setSizePolicy( sizePolicy );
+  setMinimumSize( QSize( 280, 313 ) );
+    setMaximumSize( QSize( 524287, 524287 ) );
+  
   layer_manager_widget_ = new LayerManagerWidget( this );
   setWidget( layer_manager_widget_ );
   

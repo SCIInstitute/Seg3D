@@ -26,56 +26,58 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_APPINTERFACE_VIEWERINTERFACE_H
-#define INTERFACE_APPINTERFACE_VIEWERINTERFACE_H
+#ifndef UTILS_DATABLOCK_DATATYPE_H
+#define UTILS_DATABLOCK_DATATYPE_H
 
-// QT includes
-#include <QtGui>
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+# pragma once
+#endif 
 
 // STL includes
 #include <string>
 
-// Boost includes
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/thread.hpp>
-#include <boost/shared_ptr.hpp>
+// Utils includes
+#include <Utils/Core/EnumClass.h>
 
-namespace Seg3D
+namespace Utils
 {
 
-class ViewerInterfacePrivate;
-typedef boost::shared_ptr< ViewerInterfacePrivate > ViewerInterfacePrivateHandle;
+// CLASS DataType:
+// This class describes the data types that the program uses
 
-class ViewerInterface : public QWidget
-{
+SCI_ENUM_CLASS
+(
+  DataType,
+  CHAR_E = 0, 
+  UCHAR_E, 
+  SHORT_E, 
+  USHORT_E, 
+  INT_E, 
+  UINT_E,
+  LONGLONG_E,
+  ULONGLONG_E, 
+  FLOAT_E, 
+  DOUBLE_E, 
+  UNKNOWN_E
+)
 
-Q_OBJECT
-// -- Private class containing all the widgets --
-private:
-  ViewerInterfacePrivateHandle private_;
+// IMPORT FROM STRING:
+// Import a DataType from a string
+// NOTE: If the import fails UNKNOWN_E is returned and the function returns false
+bool ImportFromString( const std::string& data_type_string, DataType& data_type_string );
 
-  // -- Constructor/Destructor --
-public:
-  ViewerInterface( QWidget *parent = 0 );
-  virtual ~ViewerInterface();
+// EXPORT TO STRING:
+// Export the data type to a string
+std::string ExportToString( DataType data_type );
 
-  // -- Setting widget state --
-  void set_layout( const std::string& layout );
+// IS INTEGER
+// Test whether data type is an integer 
+bool IsInteger( const DataType& data_type );
 
-public Q_SLOTS:
-void set_active_viewer(int);
+// IS REAL
+// Test whether data is floating point
+bool IsReal( const DataType& data_type );
 
-// -- Slots --    
-public:
-  typedef QPointer< ViewerInterface > qpointer_type;
-
-  // SetViewerLayout: (Thread safe slot)
-  static void SetViewerLayout( qpointer_type qpointer, std::string layout );
-
-  // SetActiveViewer: (Thread safe slot)
-  static void SetActiveViewer( qpointer_type qpointer, int active_viewer );
-};
-
-} // end namespaceSeg3D
+} // end namespace Utils
 
 #endif

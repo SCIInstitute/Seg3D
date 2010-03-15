@@ -49,6 +49,8 @@ SET(APPLICATION_LAYERMANAGER_ACTIONS_SRCS
   Actions/ActionCrop.cc
   Actions/ActionFlipLayer.h
   Actions/ActionFlipLayer.cc
+  Actions/ActionImportLayer.h
+  Actions/ActionImportLayer.cc
   Actions/ActionLayer.h
   Actions/ActionLayer.cc
   Actions/ActionLayerFromFile.h

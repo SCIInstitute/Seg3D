@@ -48,6 +48,8 @@
 #include <Utils/Geometry/GridTransform.h>
 #include <Utils/Geometry/Vector.h>
 
+#include <Utils/DataBlock/DataType.h>
+
 namespace Utils
 {
 
@@ -66,14 +68,22 @@ public:
 
   // -- Accessors --
 public:
-  // NRRD
+  // NRRD:
   // Return the nrrd structure
   Nrrd* nrrd() const
   {
     return nrrd_;
   }
 
-  // OWN_DATA
+  // GET_DATA:
+  // Get the pointer to the data block within the nrrd
+  void* get_data() const
+  {
+    if ( nrrd_ ) return nrrd_->data;
+    else return 0;
+  }
+
+  // OWN_DATA:
   // Return whether the nrrd owns the data
   bool own_data() const
   {
@@ -100,27 +110,8 @@ public:
 
   // IS_<TYPE>
   // Test whether nrrd is of a certain type
-  bool is_char() const;
-  bool is_unsigned_char() const;
-  bool is_short() const;
-  bool is_unsigned_short() const;
-  bool is_int() const;
-  bool is_unsigned_int() const;
-  bool is_longlong() const;
-  bool is_unsigned_longlong() const;
-  bool is_float() const;
-  bool is_double() const;
+  DataType get_data_type() const;
 
-  bool is_integer() const
-  {
-    return is_char() || is_unsigned_char() || is_short() || is_unsigned_short() ||
-      is_int() || is_unsigned_int() || is_longlong() || is_unsigned_longlong();
-  }
-
-  bool is_real() const
-  {
-    return is_float() || is_double();
-  }
   // -- Information for retrieving nrrd --
 private:
   // Location where the original nrrd is stored
@@ -137,7 +128,7 @@ public:
   static bool
       LoadNrrd( const std::string& filename, NrrdDataHandle& nrrddata, std::string& error );
 
-  // SaveNRRD
+  // SAVENRRD
   // Save a nrrd to file from nrrd data structure
   static bool SaveNrrd( const std::string& filename, NrrdDataHandle nrrddata, std::string& error );
 
@@ -145,20 +136,6 @@ public:
 public:
   typedef boost::recursive_mutex mutex_type;
   typedef boost::unique_lock< mutex_type > lock_type;
-
-  // LOCK:
-  // Protect the Teem library
-  static void Lock()
-  {
-    teem_mutex_.lock();
-  }
-
-  // UNLOCK
-  // Unlock the Teem library
-  static void Unlock()
-  {
-    teem_mutex_.unlock();
-  }
 
   // GETMUTEX:
   // Get the mutex that protects the Teem library

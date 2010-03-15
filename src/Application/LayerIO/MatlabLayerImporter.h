@@ -81,7 +81,7 @@ public:
 public: 
   // HAS_IMPORT_MODE:
   // Test whether the importer a specific importer mode
-  virtual bool has_import_mode( LayerImporterMode mode );
+  virtual bool has_importer_mode( LayerImporterMode mode );
 
   // IMPORT_LAYER
   // Import the layer from the file

@@ -58,16 +58,6 @@ public:
     return this->data_block_;
   }
 
-  virtual void lock()
-  {
-    this->data_block_->lock();
-  }
-
-  virtual void unlock()
-  {
-    this->data_block_->unlock();
-  }
-
   virtual mutex_type& get_mutex()
   {
     return this->data_block_->get_mutex();
@@ -77,10 +67,6 @@ private:
   // Handle to where the volume data is really stored
   DataBlockHandle data_block_;
 
-public:
-  // CREATEDATAVOLUMEFROMNRRD:
-  // Create a data volume from a nrrd
-  static VolumeHandle CreateDataVolumeFromNrrd( NrrdDataHandle& nrrddata );
 };
 
 } // end namespace Utils

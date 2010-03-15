@@ -64,9 +64,9 @@ class StateAlias : public StateBase
 public:
 
   // CONSTRUCTOR
-  StateAlias();
+  StateAlias( const std::string& stateid );
 
-  StateAlias( const std::string default_value );
+  StateAlias( const std::string& stateid, const std::string default_value );
 
   // DESTRUCTOR
   virtual ~StateAlias();

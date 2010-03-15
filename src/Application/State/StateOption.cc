@@ -34,7 +34,9 @@
 namespace Seg3D
 {
 
-StateOption::StateOption( const std::string& default_value, const std::string& option_list ) :
+StateOption::StateOption( const std::string& stateid, const std::string& default_value, 
+  const std::string& option_list ) :
+  StateBase( stateid ),
   value_( default_value )
 {
   // Unwrap the option lists
@@ -50,8 +52,9 @@ StateOption::StateOption( const std::string& default_value, const std::string& o
   this->index_ = static_cast<int>( it - this->option_list_.begin() );
 }
 
-StateOption::StateOption( const std::string& default_value,
+StateOption::StateOption( const std::string& stateid, const std::string& default_value,
     const std::vector< std::string >& option_list ) :
+  StateBase( stateid ),
   value_( default_value )
 {
   option_list_.resize( option_list.size() );

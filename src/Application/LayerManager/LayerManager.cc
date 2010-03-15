@@ -72,9 +72,6 @@ LayerManager::~LayerManager()
   
 bool LayerManager::insert_layer( LayerHandle layer )
 {
-    
-  
-  
   lock_type lock( group_handle_list_mutex_ );
   
   SCI_LOG_DEBUG( std::string("Insert new layer: ") + layer->get_layer_id());

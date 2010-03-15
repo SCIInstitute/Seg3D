@@ -77,7 +77,8 @@ class StateValue : public StateBase
 public:
 
   // CONSTRUCTOR
-  StateValue( const T& default_value ) :
+  StateValue( const std::string& stateid, const T& default_value ) :
+    StateBase( stateid ),
     value_( default_value )
   {
   }

@@ -43,15 +43,12 @@ StateHandler::~StateHandler()
   
   
 
-bool StateHandler::add_statebase( const std::string& key, StateBaseHandle state )
+bool StateHandler::add_statebase( StateBaseHandle state )
 {
-  // Step (1): Generate a new unique ID for this state
-  std::string stateid = stateid_prefix_ + std::string( "::" ) + key;
+  // Step (1): Get unique state id
+  std::string stateid = state->stateid();
 
-  // Step (2): Make the state variable aware of its key
-  state->set_stateid( stateid );
-
-  // Step (3): Import the previous setting from the current variable
+  // Step (2): Import the previous setting from the current variable
   StateBaseHandle old_state;
   StateEngine::Instance()->get_state( stateid, old_state );
 
@@ -63,7 +60,7 @@ bool StateHandler::add_statebase( const std::string& key, StateBaseHandle state 
     StateEngine::Instance()->remove_state( stateid );
   }
 
-  // Step (4): Link with statehandler
+  // Step (3): Link with statehandler
   add_connection( state->state_changed_signal_.connect( boost::bind(
       &StateHandler::handle_state_changed, this ) ) );
 

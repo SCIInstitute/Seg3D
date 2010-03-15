@@ -35,46 +35,11 @@ namespace Utils
 NrrdDataBlock::NrrdDataBlock( NrrdDataHandle nrrd_data ) :
   nrrd_data_( nrrd_data )
 {
-  // Copy the information of the nrrd into the C++ class
-  Nrrd* nrrd = nrrd_data->nrrd();
-
-  unsigned int dim = nrrd->dim;
-  if ( dim > 0 ) set_nx( nrrd->axis[ 0 ].size );
-  else set_nx( 1 );
-  if ( dim > 1 ) set_ny( nrrd->axis[ 1 ].size );
-  else set_ny( 1 );
-  if ( dim > 2 ) set_nz( nrrd->axis[ 2 ].size );
-  else set_nz( 1 );
-
-  switch( nrrd->type )
-  {
-  case nrrdTypeChar:
-    set_type( DataType::CHAR_E );
-    break;
-  case nrrdTypeUChar:
-    set_type( DataType::UCHAR_E );
-    break;
-  case nrrdTypeShort:
-    set_type( DataType::SHORT_E );
-    break;
-  case nrrdTypeUShort:
-    set_type( DataType::USHORT_E );
-    break;
-  case nrrdTypeInt:
-    set_type( DataType::INT_E );
-    break;
-  case nrrdTypeUInt:
-    set_type( DataType::UINT_E );
-    break;
-  case nrrdTypeFloat:
-    set_type( DataType::FLOAT_E );
-    break;
-  case nrrdTypeDouble:
-    set_type( DataType::DOUBLE_E );
-    break;
-  }
-
-  set_data( nrrd->data );
+  set_nx( nrrd_data->nx() );
+  set_ny( nrrd_data->ny() );
+  set_nz( nrrd_data->nz() );
+  set_type( nrrd_data->get_data_type() );
+  set_data( nrrd_data->get_data() );
 }
 
 NrrdDataBlock::~NrrdDataBlock()
