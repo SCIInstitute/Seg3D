@@ -235,7 +235,7 @@ std::string export_to_string( const std::string& value )
 
 std::string export_to_string( const Transform& value )
 {
-  std::string result( 1, ']' );
+  std::string result( 1, '[' );
   std::vector< double > trans( 16 );
   value.get( &trans[ 0 ] );
   for ( size_t j = 0; j < 16; j++ )

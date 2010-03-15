@@ -50,33 +50,15 @@ Utils::GridTransform ITKLayerImporter::get_grid_transform()
   return identity;
 }
 
-bool ITKLayerImporter::is_data_volume_compatible()
+bool ITKLayerImporter::has_import_mode( LayerImporterMode mode )
 {
-  return false;
+  import_header();
+  
+  return true;
 }
 
-bool ITKLayerImporter::is_mask_volume_compatible()
-{
-  return false;
-}
 
-bool ITKLayerImporter::is_label_volume_compatible()
-{
-  return false;
-}
-
-bool ITKLayerImporter::import_as_datavolume( LayerHandle& layer )
-{
-  return false;
-}
-
-bool ITKLayerImporter::import_as_maskvolume( std::vector<LayerHandle>& layers,
-    LayerMaskImporterMode mode )
-{
-  return false;
-}
-
-bool ITKLayerImporter::import_as_labelvolume( LayerHandle& layer )
+bool ITKLayerImporter::import_layer( std::vector<LayerHandle>& layers, LayerImporterMode mode )
 {
   return false;
 }

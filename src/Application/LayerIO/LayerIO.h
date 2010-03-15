@@ -149,6 +149,12 @@ class LayerIO;
 
 class LayerIO : public Utils::Singleton<LayerIO>
 {
+  // -- typedefs --
+public:
+  typedef boost::mutex mutex_type;
+  typedef boost::unique_lock<mutex_type> lock_type;
+  typedef std::vector<std::string> importer_types_type;
+
   // -- constructor / destructor --
 private:
   friend class Utils::Singleton<LayerIO>;
@@ -157,6 +163,7 @@ private:
 
   // -- Importer/Exporter registration --
 public:
+
   // REGISTER_IMPORTER:
   // Register an importer that abstracts importing a file in a certain file format
 
@@ -177,7 +184,6 @@ public:
 
   // GET_IMPORTER_TYPES:
   // Get the names of all the importers that are available
-  typedef std::vector<std::string> importer_types_type;
   importer_types_type get_importer_types();
 
 private:
@@ -187,8 +193,6 @@ private:
 
   // -- locking interface --
 public:
-  typedef boost::mutex mutex_type;
-  typedef boost::unique_lock<mutex_type> lock_type;
 
   // GET_MUTEX:
   // Get the mutex so we can lock it from outside the class
@@ -196,6 +200,7 @@ public:
   
 private:
 
+  // Mutex protecting this resource
   mutex_type mutex_;
   
   // -- functions for creating an importer
@@ -207,7 +212,6 @@ public:
   // search to that specific name of importer
   bool create_importer( const std::string& filename, LayerImporterHandle& importer,
               const std::string importername = "");
-
 
 };
 

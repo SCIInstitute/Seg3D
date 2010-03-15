@@ -45,6 +45,7 @@
 // Utils includes
 #include <Utils/Geometry/Point.h>
 #include <Utils/Geometry/Transform.h>
+#include <Utils/Geometry/GridTransform.h>
 #include <Utils/Geometry/Vector.h>
 
 namespace Utils
@@ -79,9 +80,13 @@ public:
     return own_data_;
   }
 
+  // GRID_TRANSFORM
+  // Extract the transform from the nrrd
+  GridTransform get_grid_transform() const;
+
   // TRANSFORM
   // Extract the transform from the nrrd
-  Transform transform() const;
+  Transform get_transform() const;
 
   // SET_TRANSFORM
   // Set the transfrom in the nrrd data
@@ -106,23 +111,16 @@ public:
   bool is_float() const;
   bool is_double() const;
 
-  bool is_8bit() const
+  bool is_integer() const
   {
-    return is_char() || is_unsigned_char();
-  }
-  bool is_16bit() const
-  {
-    return is_short() || is_unsigned_short();
-  }
-  bool is_32bit() const
-  {
-    return is_int() || is_unsigned_int() || is_float();
-  }
-  bool is_64bit() const
-  {
-    return is_longlong() || is_unsigned_longlong() || is_double();
+    return is_char() || is_unsigned_char() || is_short() || is_unsigned_short() ||
+      is_int() || is_unsigned_int() || is_longlong() || is_unsigned_longlong();
   }
 
+  bool is_real() const
+  {
+    return is_float() || is_double();
+  }
   // -- Information for retrieving nrrd --
 private:
   // Location where the original nrrd is stored

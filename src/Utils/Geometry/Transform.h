@@ -106,6 +106,8 @@ public:
   bool operator==( const Transform& ) const;
   bool operator!=( const Transform& ) const;
 
+  bool is_axis_aligned() const;
+
 public:
 
   static void BuildPermute( Matrix& m, int xmap, int ymap, int zmap, bool pre );

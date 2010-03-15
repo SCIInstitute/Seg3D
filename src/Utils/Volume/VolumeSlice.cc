@@ -34,9 +34,12 @@ namespace Utils
 
 VolumeSlice::VolumeSlice( const VolumeHandle& volume, 
              VolumeSliceType type, size_t slice_num ) :
-  volume_( volume ), slice_type_( type ), 
+  slice_changed_( true ), 
+  size_changed_( true ),
+  volume_( volume ), 
+  slice_type_( type ), 
   slice_number_ ( slice_num ),
-  slice_changed_( true ), size_changed_( true )
+  slice_changed_( true )
 {
   this->update();
   this->slice_number_ = Min( this->slice_number_, this->number_of_slices_ - 1 );

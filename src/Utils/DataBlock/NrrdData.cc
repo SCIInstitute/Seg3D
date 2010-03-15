@@ -27,7 +27,10 @@
  */
 
 #include <Utils/Math/MathFunctions.h>
+#include <Utils/Geometry/GridTransform.h>
 #include <Utils/DataBlock/NrrdData.h>
+#include <Utils/Converter/StringConverter.h>
+#include <Utils/Core/Log.h>
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
@@ -54,7 +57,7 @@ NrrdData::~NrrdData()
   }
 }
 
-Transform NrrdData::transform() const
+Transform NrrdData::get_transform() const
 {
   Transform transform;
   transform.load_identity();
@@ -63,6 +66,7 @@ Transform NrrdData::transform() const
 
   size_t dim = nrrd_->dim;
 
+  // Ensure min and max are of the proper size and are initialized
   std::vector< double > min( dim, 0.0 ), max( dim, 0.0 );
   std::vector< size_t > size( dim, 0 );
 
@@ -97,6 +101,9 @@ Transform NrrdData::transform() const
     }
   }
 
+  SCI_LOG_DEBUG( export_to_string(min) + " | " + export_to_string(max) );
+
+  // Remove empty dimensions
   size_t k = 0;
   for ( size_t p = 0; p < dim; p++ )
   {
@@ -117,6 +124,8 @@ Transform NrrdData::transform() const
     rsize[ k ] = size[ p ];
     k++;
   }
+
+  SCI_LOG_DEBUG( export_to_string(rmin) + " | " + export_to_string(rmax) );
 
   if ( rdim == 1 )
   {
@@ -229,6 +238,13 @@ Transform NrrdData::transform() const
   }
 
   return transform;
+}
+
+
+GridTransform NrrdData::get_grid_transform() const
+{
+  Utils::GridTransform grid_transform( nx(), ny(), nz(), get_transform() );
+  return grid_transform;
 }
 
 void NrrdData::set_transform( Transform& transform )

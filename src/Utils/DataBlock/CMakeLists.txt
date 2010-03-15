@@ -52,6 +52,7 @@ ADD_LIBRARY(Utils_DataBlock STATIC
             
 TARGET_LINK_LIBRARIES(Utils_DataBlock
                       Utils_Core
+                      Utils_Converter
                       Utils_Geometry
                       ${SCI_TEEM_LIBRARY}
                       ${SCI_BOOST_LIBRARY})

@@ -86,6 +86,21 @@ public:
     return nz_;
   }
 
+  double spacing_x() const
+  {
+    return project( Vector(1.0,0.0,0.0) ).length();
+  }
+
+  double spacing_y() const
+  {
+    return project( Vector(0.0,1.0,0.0) ).length();
+  }
+
+  double spacing_z() const
+  {
+    return project( Vector(0.0,0.0,1.0) ).length();
+  }
+
   void nx( size_t nx )
   {
     nx_ = nx;

@@ -26,10 +26,14 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// Qt includes
+#include <QMessageBox>
+
 // Application includes
 #include <Application/LayerIO/LayerIO.h>
 
 // Interface includes
+#include <Interface/AppInterface/LayerImporterWidget.h>
 #include <Interface/AppInterface/AppLayerIO.h>
 
 namespace Seg3D
@@ -45,10 +49,9 @@ void AppLayerIO::Import( QMainWindow* main_window )
   {
     filters << QString::fromStdString( importer_types[j] );
   }
-  filters << "All Importers (*)";
 
   // Step (2): Bring up the file dialog
-  QFileDialog import_dialog( main_window, QString( "Import Layer ... " ) );
+  QFileDialog import_dialog( main_window, QString( "Import Layer... " ) );
 
   import_dialog.setNameFilters( filters );
   import_dialog.setAcceptMode( QFileDialog::AcceptOpen );
@@ -56,25 +59,61 @@ void AppLayerIO::Import( QMainWindow* main_window )
   import_dialog.setViewMode( QFileDialog::Detail );
   import_dialog.exec();
   
-  // Step (3): Get the selected filename
+  // Step (3): Get the selected filename and name filter
   QStringList file_list = import_dialog.selectedFiles();
   if ( file_list.size() == 0) return;
-
   std::string filename = file_list[0].toStdString();
+  std::string filtername = import_dialog.selectedNameFilter().toStdString();
   
+  // Step (4): Get the importer for this specific file type
+  LayerImporterHandle importer;
+  if ( ! ( LayerIO::Instance()->create_importer( filename, importer, filtername ) ) )
+  {
+    std::string error_message = std::string("ERROR: No importer is available for file '") + 
+      filename + std::string("'.");
+        
+    QMessageBox message_box( main_window );
+    message_box.setWindowTitle( "Import Layer..." );
+    message_box.addButton( QMessageBox::Ok );
+    message_box.setIcon( QMessageBox::Critical );
+    message_box.setText( QString::fromStdString( error_message ) );
+    message_box.exec();
+    return;
+  }
+
+  // Step (5): Check whether the file can be imported, otherwise inform the user about a
+  // a problem.
+  if ( ! ( importer->import_header() ) )
+  {
+    std::string error_message = std::string("ERROR: Could not import file '") + filename +
+      std::string("'.");
+    std::string detailed_message = importer->get_error(); 
+      
+    QMessageBox message_box( main_window );
+    message_box.setWindowTitle( "Import Layer..." );
+    message_box.addButton( QMessageBox::Ok );
+    message_box.setIcon( QMessageBox::Critical );
+    message_box.setText( QString::fromStdString( error_message ) );
+    message_box.setDetailedText( QString::fromStdString ( detailed_message ) );
+    message_box.exec();
+    return;
+  }
   
+  // Step (6): Open the importer dialog that issues the action to import a data file
+  LayerImporterWidget layer_import_dialog( importer, main_window );
+  layer_import_dialog.exec();
   
+  // NOTE: The dialog will have posted the right action, hence we just need to exit here.
 }
   
 void AppLayerIO::Export( QMainWindow* main_window )
 {
-  QFileDialog* export_dialog = new QFileDialog( main_window, 
-    QString( "Export Layer" ));
+  QFileDialog export_dialog( main_window, QString( "Export Layer ... " ) );
 
-  export_dialog->setFileMode( QFileDialog::AnyFile );
-  export_dialog->setViewMode( QFileDialog::Detail );
-  export_dialog->setAcceptMode( QFileDialog::AcceptSave );
-  export_dialog->exec();
+  export_dialog.setFileMode( QFileDialog::AnyFile );
+  export_dialog.setViewMode( QFileDialog::Detail );
+  export_dialog.setAcceptMode( QFileDialog::AcceptSave );
+  export_dialog.exec();
 }
 
 } // end namespace Seg3D

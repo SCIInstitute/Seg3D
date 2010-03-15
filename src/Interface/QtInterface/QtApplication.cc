@@ -87,14 +87,18 @@ bool QtApplication::exec()
   bool success = true;
   try
   {
-    SCI_LOG_DEBUG("Starting Qt main event loop");
+    SCI_LOG_DEBUG("Starting main QT event loop");
+
     if ( !( qt_application_->exec() == 0 ) )
     {
+      SCI_LOG_DEBUG("Qt crashed by dropping out of the event loop");
       success = false;
     }
 
     delete qt_application_;
     qt_application_ = 0;
+
+    SCI_LOG_DEBUG("Exiting main QT event loop");
   }
   catch ( ... )
   {

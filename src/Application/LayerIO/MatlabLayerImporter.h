@@ -77,32 +77,15 @@ public:
   // Get the grid transform of the grid that we are importing
   virtual Utils::GridTransform get_grid_transform();
 
-  // IS_DATAVOLUME_COMPATIBLE:
-  // Check whether the file can be interpreted as a datavolume
-  virtual bool is_data_volume_compatible();
-  
-  // IS_MASKVOLUME_COMPATIBLE:
-  // Check whether the file can be interpreted as a maskvolume
-  virtual bool is_mask_volume_compatible();
-
-  // IS_LABELVOLUME_COMPATIBLE:
-  // Check whether the file can be interpreted as a labelvolume
-  virtual bool is_label_volume_compatible();
-  
   // --Import the data as a specific type --  
 public: 
-  // IMPORT_AS_DATAVOLUME
-  // Import the file as a datavolume
-  virtual bool import_as_datavolume( LayerHandle& layer );
-  
-  // IMPORT_AS_MASKVOLUME
-  // Import the file as a maskvolume
-  virtual bool import_as_maskvolume( std::vector<LayerHandle>& layers,
-    LayerMaskImporterMode mode );
+  // HAS_IMPORT_MODE:
+  // Test whether the importer a specific importer mode
+  virtual bool has_import_mode( LayerImporterMode mode );
 
-  // IMPORT_AS_LABELVOLUME
-  // Import the file as a labelvolume
-  virtual bool import_as_labelvolume( LayerHandle& layer );
+  // IMPORT_LAYER
+  // Import the layer from the file
+  virtual bool import_layer( std::vector<LayerHandle>& layers, LayerImporterMode mode );
 
 };
 

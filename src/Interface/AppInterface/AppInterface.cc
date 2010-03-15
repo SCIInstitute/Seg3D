@@ -83,11 +83,10 @@ AppInterface::AppInterface()
   // Setup the history dock widget
   add_windowids();
 
-  show_window( "history" );
-  show_window( "project" );
+//  show_window( "history" );
+//  show_window( "project" );
   show_window( "tools" );
-
-  show_window( "measurement" );
+//  show_window( "measurement" );
   show_window( "layermanager" );
 
   setCentralWidget( viewer_interface_ );

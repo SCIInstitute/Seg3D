@@ -301,6 +301,40 @@ bool Transform::operator!=( const Transform& transform ) const
   return ( transform.mat_ != mat_ );
 }
 
+bool Transform::is_axis_aligned() const
+{
+  bool found_x_axis = false;
+  bool found_y_axis = false;
+  bool found_z_axis = false;
+
+  Vector ex(1.0,0.0,0.0);
+  Vector ey(0.0,1.0,0.0);
+  Vector ez(0.0,0.0,1.0);
+  Vector test;
+  
+  double target = 1.0 - 1.0e-6;
+
+  test = project( ex ); 
+  test.normalize();
+  if ( Dot( test, ex ) > target ) found_x_axis = true;
+  else if ( Dot( test, ey ) > target ) found_y_axis = true;
+  else if ( Dot( test, ez ) > target ) found_z_axis = true;
+
+  test = project( ey ); 
+  test.normalize();
+  if ( Dot( test, ex ) > target ) found_x_axis = true;
+  else if ( Dot( test, ey ) > target ) found_y_axis = true;
+  else if ( Dot( test, ez ) > target ) found_z_axis = true;
+
+  test = project( ez ); 
+  test.normalize();
+  if ( Dot( test, ex ) > target ) found_x_axis = true;
+  else if ( Dot( test, ey ) > target ) found_y_axis = true;
+  else if ( Dot( test, ez ) > target ) found_z_axis = true;
+
+  return ( found_x_axis && found_y_axis && found_z_axis ); 
+}
+
 void Transform::BuildTranslate( Matrix& m, const Vector& v )
 {
   m = Matrix::IDENTITY_C;

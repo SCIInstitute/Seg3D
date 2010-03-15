@@ -44,6 +44,7 @@
 #include <boost/utility.hpp>
 
 // Utils includes
+#include <Utils/Core/EnumClass.h>
 #include <Utils/Core/Log.h>
 
 // Application includes
@@ -52,25 +53,38 @@
 namespace Seg3D
 {
 
+// LayerImporterMode class definition
+SCI_ENUM_CLASS
+(
+  LayerImporterMode,
+
+  // -- DATA --
+  // Convert the data into a data volume
+  DATA_E = 0,
+
+  // -- SINGLE_MASK --
+  // Convert the data such that every value that is not zero is assumed to indicate the
+  // mask.
+  SINGLE_MASK_E = 2,
+  
+  // -- BIT_MASKS --
+  // Every bitplane that has a bit set will be assumed to be a separate mask
+  BITPLANE_MASK_E   = 3,
+
+  // -- LABEL_MASKS --
+  // Each separate number is interpreted as a separate mask
+  LABEL_MASK_E = 4  
+)
+
 class LayerImporter;
 typedef boost::shared_ptr< LayerImporter > LayerImporterHandle;
-
 
 class LayerImporter : public boost::noncopyable
 {
 public:
   // Definitions for different importer behavior for mask
   enum LayerMaskImporterMode {
-    // -- SINGLE_MASK --
-    // Convert the data such that every value that is not zero is assumed to indicate the
-    // mask.
-    SINGLE_MASK_E = 1,
-    // -- BIT_MASKS --
-    // Every bitplane that has a bit set will be assumed to be a separate mask
-    BIT_MASKS_E   = 2,
-    // -- LABEL_MASKS --
-    // Each separate number is interpreted as a separate mask
-    LABEL_MASKS_E = 3
+
   };
 
   // -- Constructor/Destructor --
@@ -96,9 +110,13 @@ public:
   // Get the filename that this importer is importing
   std::string get_filename();
 
+  // -- internals of the importer -- 
+protected:
+  // FILENAME:
+  std::string filename_;
+  
   // -- Import a file --
 public:
-
   // IMPORT_HEADER:
   // Import all the information needed to translate the header and metadata information, but not
   // necessarily read the whole file. NOTE: Some external packages do not support reading a header
@@ -116,38 +134,35 @@ public:
   // Get the grid transform of the grid that we are importing
   virtual Utils::GridTransform get_grid_transform();
 
-  // IS_DATAVOLUME_COMPATIBLE:
-  // Check whether the file can be interpreted as a datavolume
-  virtual bool is_data_volume_compatible();
-  
-  // IS_MASKVOLUME_COMPATIBLE:
-  // Check whether the file can be interpreted as a maskvolume
-  virtual bool is_mask_volume_compatible();
-
-  // IS_LABELVOLUME_COMPATIBLE:
-  // Check whether the file can be interpreted as a labelvolume
-  virtual bool is_label_volume_compatible();
-  
-  
-  // --Import the data as a specific type --  
+  // -- Import the data as a specific type -- 
 public: 
-  // IMPORT_AS_DATAVOLUME
-  // Import the file as a datavolume
-  virtual bool import_as_datavolume( LayerHandle& layer );
-  
-  // IMPORT_AS_MASKVOLUME
-  // Import the file as a maskvolume
-  virtual bool import_as_maskvolume( std::vector<LayerHandle>& layers,
-    LayerMaskImporterMode mode );
+  // HAS_IMPORT_MODE:
+  // Test whether the importer a specific importer mode
+  virtual bool has_import_mode( LayerImporterMode mode );
 
-  // IMPORT_AS_LABELVOLUME
-  // Import the file as a labelvolume
-  virtual bool import_as_labelvolume( LayerHandle& layer );
+  // IMPORT_LAYER
+  // Import the layer from the file
+  virtual bool import_layer( std::vector<LayerHandle>& layers, LayerImporterMode mode );
 
-  // -- internals of the importer -- 
+  // -- Error handling --
+public:
+  // GET_ERROR:
+  // Get the last error recorded in the importer
+  std::string get_error() const 
+  { 
+    return error_; 
+  }
+
+protected:
+  // SET_ERROR:
+  // Set the error message
+  void set_error( const std::string& error )
+  {
+    error_ = error;
+  }
+
 private:
-  // FILENAME:
-  std::string filename_;
+  std::string error_;
 
 };
 

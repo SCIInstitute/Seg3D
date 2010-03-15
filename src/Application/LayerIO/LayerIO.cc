@@ -100,7 +100,6 @@ unsigned int LayerImporterInfo::priority() const
   return priority_;
 }
 
-
 LayerIO::LayerIO()
 {
 }
@@ -113,10 +112,13 @@ LayerIO::importer_types_type LayerIO::get_importer_types()
 {
   lock_type lock( mutex_ ); 
   std::vector<std::string> importer_types;
+  importer_types.push_back( "All Importers (*)" );
+
   for ( size_t j = 0; j<importer_list_.size(); j++ )
   {
     importer_types.push_back( importer_list_[j]->file_type_string() );
   }
+  
   return importer_types;
 }
 
@@ -142,7 +144,7 @@ bool LayerIO::create_importer( const std::string& filename,
   // If no name was given, the most appriopriate is used by
   // searching the list for the importer that deals with this
   // file type and has the highest priority
-  if ( importername == "" )
+  if ( importername == "" || importername == "All Importers (*)" )
   {
     unsigned int priority = 0;
     

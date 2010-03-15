@@ -57,6 +57,9 @@ ADD_LIBRARY(Application_LayerIO STATIC
             
 TARGET_LINK_LIBRARIES(Application_LayerIO
                       Utils_Core
+            Utils_Geometry
+            Utils_DataBlock
+            Utils_Volume
                       Application_Application
                       Application_Interface
                       Application_InterfaceManager

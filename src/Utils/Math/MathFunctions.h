@@ -300,21 +300,19 @@ inline int Ceil( T value )
 
 inline bool IsNan( double val )
 {
-  return ( val == std::numeric_limits< double >::quiet_NaN() || val == std::numeric_limits<
-      double >::signaling_NaN() );
-}
-
-inline bool IsFinite( double val )
-{
-  return ( val != std::numeric_limits< double >::quiet_NaN() && val != std::numeric_limits<
-      double >::signaling_NaN() && val != std::numeric_limits< double >::infinity() && val
-      != -std::numeric_limits< double >::infinity() );
+  // NOTE: Special case, IEEE says that this is true for a NaN value
+  return ( val != val );
 }
 
 inline bool IsInfinite( double val )
 {
   return ( val == std::numeric_limits< double >::infinity() || val == -std::numeric_limits<
       double >::infinity() );
+}
+
+inline bool IsFinite( double val )
+{
+  return ( ( !IsNan(val) ) && ( !IsInfinite(val) ) );
 }
 
 inline double Nan()
@@ -329,16 +327,7 @@ inline double Epsilon()
 
 inline bool IsNan( float val )
 {
-  return ( val == std::numeric_limits< float >::quiet_NaN() || val
-      == std::numeric_limits< float >::signaling_NaN() );
-}
-
-inline bool IsFinite( float val )
-{
-  return ( val != std::numeric_limits< float >::quiet_NaN() && val
-      != std::numeric_limits< float >::signaling_NaN() && val
-      != std::numeric_limits< float >::infinity() && val
-      != -std::numeric_limits< float >::infinity() );
+  return ( val != val );
 }
 
 inline bool IsInfinite( float val )
@@ -346,6 +335,12 @@ inline bool IsInfinite( float val )
   return ( val == std::numeric_limits< float >::infinity() || val
       == -std::numeric_limits< float >::infinity() );
 }
+
+inline bool IsFinite( float val )
+{
+  return ( ( !IsNan(val) ) && ( !IsInfinite(val) ) );
+}
+
 
 inline float Nanf()
 {

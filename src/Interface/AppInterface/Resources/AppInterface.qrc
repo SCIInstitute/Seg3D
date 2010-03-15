@@ -5,6 +5,7 @@
         <file>Images/AutoView.png</file>
         <file>Images/AutoViewOff.png</file>
         <file>Images/BitPlaneMask.png</file>
+        <file>Images/BitPlaneMaskOff.png</file>
         <file>Images/Border.png</file>
         <file>Images/BorderOff.png</file>
         <file>Images/Brightness.png</file>
@@ -19,6 +20,7 @@
         <file>Images/DownArrowWhite.png</file>
         <file>Images/Data.png</file>
         <file>Images/DataVolume.png</file>
+        <file>Images/DataVolumeOff.png</file>
         <file>Images/DataWhite.png</file>
 		<file>Images/Delete.png</file>
 		<file>Images/DeleteWhite.png</file>
@@ -39,6 +41,7 @@
         <file>Images/IsosurfaceVisibleOff.png</file>
         <file>Images/LabelMap.png</file>
         <file>Images/LabelMask.png</file>
+        <file>Images/LabelMaskOff.png</file>
 		<file>Images/LabelMapVolume.png</file>
         <file>Images/LabelMapWhite.png</file>
         <file>Images/LabelMapWhite.png</file>
@@ -60,6 +63,7 @@
         <file>Images/RightArrow.png</file>
         <file>Images/RightArrowWhite.png</file>
         <file>Images/SingleMask.png</file>
+        <file>Images/SingleMaskOff.png</file>
         <file>Images/SlicesVisible.png</file>
         <file>Images/SlicesVisibleOff.png</file>
 		<file>Images/Seg3DSplash.png</file>

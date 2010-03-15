@@ -50,35 +50,17 @@ Utils::GridTransform MatlabLayerImporter::get_grid_transform()
   return identity;
 }
 
-bool MatlabLayerImporter::is_data_volume_compatible()
+bool MatlabLayerImporter::has_import_mode( LayerImporterMode mode )
+{
+  import_header();
+  
+  return true;
+}
+
+bool MatlabLayerImporter::import_layer( std::vector<LayerHandle>& layers, LayerImporterMode mode )
 {
   return false;
 }
 
-bool MatlabLayerImporter::is_mask_volume_compatible()
-{
-  return false;
-}
-
-bool MatlabLayerImporter::is_label_volume_compatible()
-{
-  return false;
-}
-
-bool MatlabLayerImporter::import_as_datavolume( LayerHandle& layer )
-{
-  return false;
-}
-
-bool MatlabLayerImporter::import_as_maskvolume( std::vector<LayerHandle>& layers,
-    LayerMaskImporterMode mode )
-{
-  return false;
-}
-
-bool MatlabLayerImporter::import_as_labelvolume( LayerHandle& layer )
-{
-  return false;
-}
 
 } // end namespace seg3D

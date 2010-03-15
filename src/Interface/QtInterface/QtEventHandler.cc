@@ -26,9 +26,14 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// Qt includes
+#include <QMessageBox>
+
+// Utils includes
 #include <Utils/Core/Exception.h>
 #include <Utils/Core/Log.h>
 
+// Interface includes
 #include <Interface/QtInterface/QtEventHandler.h>
 
 namespace Seg3D
@@ -62,21 +67,38 @@ bool QtEventFilter::eventFilter( QObject* obj, QEvent* event )
     catch ( Utils::Exception& except )
     {
       // Catch any Seg3D generated exceptions and display there message in the log file
-      SCI_LOG_ERROR(std::string("Interface event loop crashed by throwing an exception: ") + except.message());
+      std::string error_message = 
+        std::string( "Interface event loop crashed by throwing an exception: " ) + 
+        except.message();
+        
+      SCI_LOG_ERROR( error_message );
+      QMessageBox::critical( 0, QString( "Fatal Error" ), 
+        QString::fromStdString( error_message) );
       QCoreApplication::exit( -1 );
       return ( false );
     }
     catch ( std::exception& except )
     {
       // For any other exception
-      SCI_LOG_ERROR(std::string("Interface event loop crashed by throwing an exception: ") + except.what());
+      std::string error_message = 
+        std::string( "Interface event loop crashed by throwing an exception: " ) + 
+        except.what();
+        
+      SCI_LOG_ERROR( error_message );
+      QMessageBox::critical( 0, QString( "Fatal Error" ),  
+        QString::fromStdString( error_message) );
       QCoreApplication::exit( -1 );
       return ( false );
     }
     catch ( ... )
     {
       // For any other exception
-      SCI_LOG_ERROR(std::string("Interface event loop crashed by throwing an unknown exception"));
+      std::string error_message =  
+        std::string( "Interface event loop crashed by throwing an unknown exception" );
+
+      SCI_LOG_ERROR( error_message );
+      QMessageBox::critical( 0, QString( "Fatal Error" ),  
+        QString::fromStdString( error_message) );
       QCoreApplication::exit( -1 );
       return ( false );
     }

@@ -39,6 +39,7 @@ SET(INTERFACE_APPINTERFACE_SRCS
   HistoryDockWidget.cc
   MessageHistoryWidget.cc
   LayerManagerWidget.cc
+  LayerImporterWidget.cc
   LayerWidget.cc
   LayerGroupWidget.cc
   LayerManagerDockWidget.cc
@@ -65,6 +66,7 @@ SET(INTERFACE_APPINTERFACE_MOC_SRCS
   ToolsDockWidget.h
   ToolWidget.h
   LayerWidget.h
+  LayerImporterWidget.h
   LayerGroupWidget.h
   LayerManagerWidget.h
   LayerManagerDockWidget.h
@@ -80,17 +82,16 @@ SET(INTERFACE_APPINTERFACE_NO_MOC_SRCS
 
 SET(INTERFACE_APPINTERFACE_UI_SRCS
   HistoryDockWidget.ui
-  ViewerInterface.ui  
-  ProjectDockWidget.ui
-  LayerManagerDockWidget.ui
-  MeasurementDockWidget.ui
-  LayerManagerDockWidget.ui
-  MeasurementDockWidget.ui
   LayerGroupWidget.ui
+  LayerImporterWidget.ui
+  LayerManagerDockWidget.ui
   LayerWidget.ui
-  ToolBoxPageWidget.ui
+  MeasurementDockWidget.ui
   MessageHistoryWidget.ui
+  ProjectDockWidget.ui
   Splash.ui
+  ToolBoxPageWidget.ui
+  ViewerInterface.ui  
 )
 
 SET(INTERFACE_APPINTERFACE_RCC_SRCS

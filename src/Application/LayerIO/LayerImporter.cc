@@ -62,33 +62,13 @@ Utils::GridTransform LayerImporter::get_grid_transform()
   return identity;
 }
 
-bool LayerImporter::is_data_volume_compatible()
+bool LayerImporter::has_import_mode( LayerImporterMode mode )
 {
   return false;
 }
 
-bool LayerImporter::is_mask_volume_compatible()
-{
-  return false;
-}
-
-bool LayerImporter::is_label_volume_compatible()
-{
-  return false;
-}
-
-bool LayerImporter::import_as_datavolume( LayerHandle& layer )
-{
-  return false;
-}
-
-bool LayerImporter::import_as_maskvolume( std::vector<LayerHandle>& layers,
-    LayerMaskImporterMode mode )
-{
-  return false;
-}
-
-bool LayerImporter::import_as_labelvolume( LayerHandle& layer )
+bool LayerImporter::import_layer( std::vector<LayerHandle>& layers, 
+  LayerImporterMode mode )
 {
   return false;
 }
