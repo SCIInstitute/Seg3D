@@ -133,7 +133,9 @@ void ToolsDockWidget::open_tool( ToolHandle& tool )
   // Step (2) : Instantiate the widget and add the tool to the toolbox
   widget->create_widget( this, tool );
 
-  toolbox_->add_tool( widget, QString::fromStdString( tool->toolid() ), boost::bind( &ActionCloseTool::Dispatch, tool->toolid() ),
+  std::string label = tool->menu_name() + " " + tool->toolid().substr(tool->toolid().find('_')+1);
+  toolbox_->add_tool( widget, QString::fromStdString( label ), 
+    boost::bind( &ActionCloseTool::Dispatch, tool->toolid() ),
       boost::bind( &ActionActivateTool::Dispatch, tool->toolid() ), tool->url() );
 
   // Step (3) : Add the tool to the list

@@ -341,7 +341,7 @@ QWidget#group_tools_{
               <property name="icon">
                <iconset resource="Resources/AppInterface.qrc">
                 <normaloff>:/Images/VisibleOff.png</normaloff>
-                <normalon>:/Images/Visible.png</normalon>:/Images/VisibleOff.png</iconset>
+                <normalon>:/Images/VisibleWhite.png</normalon>:/Images/VisibleOff.png</iconset>
               </property>
               <property name="iconSize">
                <size>
