@@ -64,7 +64,7 @@ SCI_ENUM_CLASS
 // IMPORT FROM STRING:
 // Import a DataType from a string
 // NOTE: If the import fails UNKNOWN_E is returned and the function returns false
-bool ImportFromString( const std::string& data_type_string, DataType& data_type_string );
+bool ImportFromString( const std::string& data_type_string, DataType& data_type );
 
 // EXPORT TO STRING:
 // Export the data type to a string
