@@ -36,13 +36,9 @@
 namespace Seg3D
 {
 
-Layer::Layer( const std::string& name) :
-  StateHandler( name )
-{
-//  std::string new_name;
-//  StateEngine::Instance()->create_stateid( "layer", new_name );
-  this->layer_id_ = name;
-  
+Layer::Layer( const std::string& name ) :
+  StateHandler( StateEngine::CreateStateID( "layer" ) )
+{ 
   // Step (1) : Build the layer specific state variables
 
   // == The name of the layer ==

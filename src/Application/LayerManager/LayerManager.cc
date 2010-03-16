@@ -76,14 +76,14 @@ bool LayerManager::insert_layer( LayerHandle layer )
   
   SCI_LOG_DEBUG( std::string("Insert new layer: ") + layer->get_layer_id());
   
-  for ( group_handle_list_type::iterator i = group_handle_list_.begin(); 
-     i != group_handle_list_.end(); ++i )
+  for ( group_handle_list_type::iterator it = group_handle_list_.begin(); 
+     it != group_handle_list_.end(); ++it )
   {
           
-    if (layer->get_grid_transform() == ( *i )->get_grid_transform()) 
+    if (layer->get_grid_transform() == ( *it )->get_grid_transform()) 
     {
-      ( *i )->insert_layer( layer );
-      layer->set_layer_group( *i );
+      ( *it )->insert_layer( layer );
+      layer->set_layer_group( *it );
       layer_inserted_signal_( layer );
       return true;
     }
@@ -125,9 +125,7 @@ bool LayerManager::insert_layer( LayerHandle layer )
 
 LayerGroupHandle LayerManager::create_group( const Utils::GridTransform&  transform ) const
 {
-  std::string new_name;
-  StateEngine::Instance()->create_stateid( "group", new_name );
-  return LayerGroupHandle( new LayerGroup( new_name, transform  ));
+  return LayerGroupHandle( new LayerGroup( transform  ));
 }
 
 

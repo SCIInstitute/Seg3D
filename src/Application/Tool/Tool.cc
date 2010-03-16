@@ -33,27 +33,12 @@ namespace Seg3D
 {
 
 Tool::Tool( const std::string& toolid ) :
-  StateHandler( toolid ), toolid_( toolid )
+  StateHandler( StateEngine::CreateStateID( toolid ) )
 {
-  StateEngine::Instance()->add_stateid( toolid_ );
-
-  // Extract the tool id number from the id tag and store it in the Tool class
-  std::string::size_type loc = toolid.find( '_' );
-  if ( !( Utils::from_string( toolid.substr( loc + 1 ), toolid_number_ ) ) ) toolid_number_ = 0;
 }
 
 Tool::~Tool()
 {
-  // This one is only removed when the class is removed
-  // As the destruction of the class ensures that no new
-  // actions are posted with this Tool as target.
-  // Once the tool is unlinked all the actions that are still
-  // being posted are removed by the validator. However the name
-  // needs to blocked until the tool is really removed to prevent
-  // a tool with the same name to be instantiated and actions
-  // for multiple tools with the same name being mixed.
-
-  StateEngine::Instance()->remove_stateid( toolid_ );
 }
 
 void Tool::close()

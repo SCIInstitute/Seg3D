@@ -43,14 +43,22 @@
 namespace Seg3D
 {
 
-typedef std::vector< QWidget* > tool_page_list_type;
+class ToolBoxPageWidget
+{
+public:
+  QWidget* page_;
+  QWidget* tool_;
+  Ui::ToolBoxPageWidget ui_;
+};
+
+typedef std::vector<ToolBoxPageWidget> ToolBoxPageWidgetVector;
 
 class ToolBoxWidgetPrivate
 {
 public:
-  Ui::ToolBoxPageWidget ui_;
-  tool_page_list_type page_list_;
+  ToolBoxPageWidgetVector page_list_;
 };
+
 
 ToolBoxWidget::ToolBoxWidget( QWidget* parent ) :
   QScrollArea( parent )
@@ -102,56 +110,54 @@ void ToolBoxWidget::add_tool( QWidget * tool, const QString &label,
 {
   if ( !tool ) return;
 
-  //create a new base QWidget
-  QWidget* new_page_ = new QWidget();
-  this->private_->ui_.setupUi( new_page_ );
+  ToolBoxPageWidget new_page;
 
-  this->private_->ui_.url_->setText( QString::fromStdString( help_url ) );
-  this->private_->ui_.url_->hide();
+  new_page.page_ = new QWidget();
+  new_page.tool_ = tool;
+  new_page.ui_.setupUi( new_page.page_ );
 
-  this->private_->ui_.activate_button_->setText( label );
+  new_page.ui_.url_->setText( QString::fromStdString( help_url ) );
+  new_page.ui_.url_->hide();
 
-  this->private_->ui_.help_button_->setIcon( active_help_icon_ );
-  this->private_->ui_.help_button_->setIconSize( QSize( 16, 16 ) );
+  new_page.ui_.activate_button_->setText( label );
 
-  this->private_->ui_.close_button_->setIcon( active_close_icon_ );
-  this->private_->ui_.close_button_->setIconSize( QSize( 18, 18 ) );
+  new_page.ui_.help_button_->setIcon( active_help_icon_ );
+  new_page.ui_.help_button_->setIconSize( QSize( 18, 18 ) );
 
-  // create a new widget, send new_page_ as its parent,
-  //  assign its value as tool, set its name, and add it to the tool_layout_
-  QWidget* tool_ = new QWidget( new_page_ );
-  tool_ = tool;
-  tool_->setObjectName( QString::fromUtf8( "tool_" ) );
-  this->private_->ui_.tool_frame_layout_->addWidget( tool_ );
+  new_page.ui_.close_button_->setIcon( active_close_icon_ );
+  new_page.ui_.close_button_->setIconSize( QSize( 18, 18 ) );
+
+  new_page.ui_.tool_frame_layout_->addWidget( new_page.tool_ );
 
   // add the new_page_ to the tool_layout
-  this->tool_layout_->addWidget( new_page_ );
+  this->tool_layout_->addWidget( new_page.page_ );
 
   //make all the proper connections
-  connect( this->private_->ui_.help_button_, SIGNAL( clicked() ), this, SLOT(
-      help_button_clicked() ) );
-  QtBridge::Connect( this->private_->ui_.activate_button_, activate_function );
-  QtBridge::Connect( this->private_->ui_.close_button_, close_function );
+  connect( new_page.ui_.help_button_, SIGNAL( clicked() ), this, 
+    SLOT( help_button_clicked() ) );
+  QtBridge::Connect( new_page.ui_.activate_button_, activate_function );
+  QtBridge::Connect( new_page.ui_.close_button_, close_function );
 
-  set_active_tool( new_page_->findChild< QWidget* > ( "tool_" ) );
+  set_active_tool( tool );
 
-  this->private_->page_list_.push_back( new_page_ );
-
+  this->private_->page_list_.push_back( new_page );
 }
 
 void ToolBoxWidget::set_active_tool( QWidget *tool )
 {
+  this->main_->setUpdatesEnabled( false );
+  
   for ( size_t i = 0; i < this->private_->page_list_.size(); i++ )
   {
     // first we deactivate the inactive tools
-    if ( this->private_->page_list_[ i ]->findChild< QWidget* > ( "tool_" ) != tool )
+    if ( this->private_->page_list_[ i ].tool_ != tool )
     {
-      if ( !this->private_->page_list_[ i ]->findChild< QFrame* > ( "tool_frame_" )->isHidden() )
+      if ( !( this->private_->page_list_[ i ].ui_.tool_frame_->isHidden() ) )
       {
-        this->private_->page_list_[ i ]->findChild< QWidget* > ( "page_background_" )->setStyleSheet(
-            QString::fromUtf8(
-                " QWidget#page_background_ { background-color: rgb(220, 220, 220); }" ) );
-        this->private_->page_list_[ i ]->findChild< QPushButton* > ( "activate_button_" )->setStyleSheet(
+        this->private_->page_list_[ i ].ui_.page_background_->setStyleSheet( 
+          QString::fromUtf8(
+            " QWidget#page_background_ { background-color: rgb(220, 220, 220); }" ) );
+        this->private_->page_list_[ i ].ui_.activate_button_->setStyleSheet(
             QString::fromUtf8( "QPushButton#activate_button_{\n"
               " margin-right: 7px;\n"
               " height: 24px;\n"
@@ -160,28 +166,30 @@ void ToolBoxWidget::set_active_tool( QWidget *tool )
               " color: rgb(25, 25, 25);\n"
               " font: normal;\n"
               "}\n" ) );
-        this->private_->page_list_[ i ]->findChild< QToolButton* > ( "close_button_" )->setIcon(
+        this->private_->page_list_[ i ].ui_.close_button_->setIcon(
             inactive_close_icon_ );
-        this->private_->page_list_[ i ]->findChild< QToolButton* > ( "help_button_" )->setIcon(
+        this->private_->page_list_[ i ].ui_.help_button_->setIcon(
             inactive_help_icon_ );
-        this->private_->page_list_[ i ]->findChild< QFrame* > ( "tool_frame_" )->hide();
-
+        this->private_->page_list_[ i ].ui_.tool_frame_->hide();
       }
     }
-
+  }
+  
     // then, we activate the active one.
-    else
+  for ( size_t i = 0; i < this->private_->page_list_.size(); i++ )
+  {
+    if ( this->private_->page_list_[ i ].tool_ == tool )
     {
       this->active_index_ = static_cast< int > ( i );
-      this->active_tool_ = private_->page_list_[ i ]->findChild< QWidget* > ( "tool_" );
+      this->active_tool_ = private_->page_list_[ i ].tool_;
 
-      if ( this->private_->page_list_[ i ]->findChild< QFrame* > ( "tool_frame_" )->isHidden() )
+      if ( this->private_->page_list_[ i ].ui_.tool_frame_->isHidden() )
       {
-        this->private_->page_list_[ i ]->findChild< QWidget* > ( "page_background_" )->setStyleSheet(
+        this->private_->page_list_[ i ].ui_.page_background_->setStyleSheet(
             QString::fromUtf8(
                 "QWidget#page_background_ { background-color: rgb(255, 128, 0); }" ) );
 
-        this->private_->page_list_[ i ]->findChild< QPushButton* > ( "activate_button_" )->setStyleSheet(
+        this->private_->page_list_[ i ].ui_.activate_button_->setStyleSheet(
             QString::fromUtf8( "QPushButton#activate_button_{\n"
               " margin-right: 7px;\n"
               " height: 24px;\n"
@@ -190,22 +198,24 @@ void ToolBoxWidget::set_active_tool( QWidget *tool )
               " color: white;\n"
               " font: bold;\n"
               "}\n" ) );
-        this->private_->page_list_[ i ]->findChild< QToolButton* > ( "close_button_" )->setIcon(
+        this->private_->page_list_[ i ].ui_.close_button_->setIcon(
             active_close_icon_ );
-        this->private_->page_list_[ i ]->findChild< QToolButton* > ( "help_button_" )->setIcon(
+        this->private_->page_list_[ i ].ui_.help_button_->setIcon(
             active_help_icon_ );
-        this->private_->page_list_[ i ]->findChild< QFrame* > ( "tool_frame_" )->show();
+        this->private_->page_list_[ i ].ui_.tool_frame_->show();
       }
       
     }
   }
+  
+  this->main_->setUpdatesEnabled( true );
 }
 
 int ToolBoxWidget::index_of( QWidget *tool )
 {
   for ( size_t i = 0; i < this->private_->page_list_.size(); i++ )
   {
-    if ( this->private_->page_list_[ i ]->findChild< QWidget* > ( "tool_" ) == tool )
+    if ( this->private_->page_list_[ i ].tool_ == tool )
     {
       return static_cast< int > ( i );
     }
@@ -215,14 +225,14 @@ int ToolBoxWidget::index_of( QWidget *tool )
 
 QWidget* ToolBoxWidget::get_tool_at( int index )
 {
-  return this->private_->page_list_[ index ];
+  return this->private_->page_list_[ index ].page_;
 } // end get_tool_at
 
 
 void ToolBoxWidget::set_active_index( int index )
 {
   if ( ( index < static_cast< int > ( this->private_->page_list_.size() ) ) && ( index >= 0 ) ) set_active_tool(
-      this->private_->page_list_[ index ]->findChild< QWidget* > ( "tool_" ) );
+      this->private_->page_list_[ index ].tool_ );
 
 } // end set_active_index
 
@@ -235,8 +245,8 @@ void ToolBoxWidget::remove_tool( int index )
     return;
   }
 
-  this->tool_layout_->removeWidget( private_->page_list_[ index ] );
-  this->private_->page_list_[ index ]->deleteLater();
+  this->tool_layout_->removeWidget( private_->page_list_[ index ].page_ );
+  this->private_->page_list_[ index ].page_->deleteLater();
   this->private_->page_list_.erase( private_->page_list_.begin() + index );
 
   // Set the previous tool to active if the one to be deleted is active.
@@ -260,11 +270,9 @@ void ToolBoxWidget::help_button_clicked()
 
   for ( size_t i = 0; i < this->private_->page_list_.size(); i++ )
   {
-    if ( this->private_->page_list_[ i ]->findChild< QToolButton* > ( "help_button_" )
-        == help_button )
+    if ( this->private_->page_list_[ i ].ui_.help_button_ == help_button )
     {
-      QDesktopServices::openUrl( QUrl(
-          this->private_->page_list_[ i ]->findChild< QLabel* > ( "url_" )->text() ) );
+      QDesktopServices::openUrl( QUrl( this->private_->page_list_[ i ].ui_.url_->text() ) );
       break;
     }
   }

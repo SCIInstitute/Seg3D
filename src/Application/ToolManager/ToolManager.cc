@@ -53,23 +53,16 @@ ToolManager::~ToolManager()
 // Only ActionOpenTool calls this function and this action is only run on the
 // application thread. Hence the function is always executed by the same thread.
 
-bool ToolManager::open_tool( const std::string& toolid, std::string& new_toolid )
+bool ToolManager::open_tool( const std::string& tool_type, std::string& new_toolid )
 {
   // Step (1): Make the function thread safe
   lock_type lock( tool_list_mutex_ );
 
   // Step (2): Add an entry in the debug log
-  SCI_LOG_DEBUG( std::string("Open tool: ")+toolid );
+  SCI_LOG_DEBUG( std::string("Open tool: ") + tool_type );
 
   // STEP (3): Create a new toolid and extract the tool type from the string
-  if ( !( StateEngine::Instance()->create_stateid( toolid, new_toolid ) ) )
-  {
-    SCI_LOG_ERROR( std::string("Could not create tool  '")+toolid+"'" );
-    return ( false );
-  }
-
-  std::string::size_type loc = new_toolid.find( '_' );
-  std::string tool_type = new_toolid.substr( 0, loc );
+  new_toolid = StateEngine::CreateStateID( tool_type );
 
   // Step (4): Build the tool using the factory. This will generate the default
   // settings.
@@ -78,15 +71,11 @@ bool ToolManager::open_tool( const std::string& toolid, std::string& new_toolid 
   if ( !( ToolFactory::Instance()->create_tool( tool_type, new_toolid, tool ) ) )
   {
     SCI_LOG_ERROR(std::string("Could not create tool of type: '")+tool_type+"'");
-    return ( false );
+    return false;
   }
 
   // Step (5): Add the tool id to the tool and add the tool to the list
-  {
-    tool_list_[ new_toolid ] = tool;
-  }
-
-  SCI_LOG_DEBUG(std::string("Open tool: ")+new_toolid);
+  tool_list_[ new_toolid ] = tool;
 
   // Step (6): Signal any observers (UIs) that the tool has been opened
   open_tool_signal_( tool );

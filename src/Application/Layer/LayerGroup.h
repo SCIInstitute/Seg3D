@@ -70,7 +70,7 @@ class LayerGroup : public StateHandler
   // -- constructor/destructor --
 public:
 
-  LayerGroup( const std::string &name, Utils::GridTransform grid_transform );
+  LayerGroup( Utils::GridTransform grid_transform );
   virtual ~LayerGroup();
 
   // -- state variables --
@@ -170,10 +170,8 @@ public:
   
   std::string get_group_id()
   {
-    return group_id_;
+    return stateid();
   }
-  
-  
   
   layer_list_type get_layer_list()
   {
@@ -185,9 +183,6 @@ public:
   }
   
 private:
-  
-  // information
-  std::string group_id_;
   
   // The transformation that describes the grid dimensions and the spacing
   Utils::GridTransform grid_transform_;

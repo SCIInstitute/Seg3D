@@ -84,21 +84,13 @@ public:
   virtual int properties() const = 0;
   virtual std::string url() const = 0;
 
-  std::string toolid() const
+  inline std::string toolid() const 
   {
-    return toolid_;
-  }
-  int toolid_number() const
-  {
-    return toolid_number_;
+    return stateid();
   }
 
 protected:
   friend class ToolFactory;
-
-private:
-  std::string toolid_;
-  int toolid_number_;
 
   // -- close tool --
 public:
@@ -137,17 +129,17 @@ public:
 
 #define SCI_TOOL_TYPE(type_string,menu_name_string,shortcut_key_string,properties_mask,help_url) \
   public: \
-    static std::string tool_type() { return Utils::string_to_lower(type_string); } \
-    static std::string tool_menu_name() { return menu_name_string; } \
-    static std::string tool_shortcut_key() { return shortcut_key_string; } \
-    static int         tool_properties() { return properties_mask; } \
-    static std::string tool_url() { return help_url; } \
+    static std::string Type() { return Utils::string_to_lower(type_string); } \
+    static std::string MenuName() { return menu_name_string; } \
+    static std::string ShortcutKey() { return shortcut_key_string; } \
+    static int         Properties() { return properties_mask; } \
+    static std::string Url() { return help_url; } \
     \
-    virtual std::string type() const { return tool_type(); } \
-    virtual std::string menu_name() const { return tool_menu_name(); } \
-    virtual std::string shortcut_key() const { return tool_shortcut_key(); } \
-    virtual int         properties() const { return tool_properties(); } \
-    virtual std::string url() const { return tool_url(); }
+    virtual std::string type() const { return Type(); } \
+    virtual std::string menu_name() const { return MenuName(); } \
+    virtual std::string shortcut_key() const { return ShortcutKey(); } \
+    virtual int         properties() const { return Properties(); } \
+    virtual std::string url() const { return Url(); }
 
 } // end namespace Seg3D
 

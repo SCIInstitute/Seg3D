@@ -35,13 +35,14 @@ namespace Seg3D
 StateHandler::StateHandler( const std::string& stateid_prefix ) :
   stateid_prefix_( stateid_prefix )
 {
+  StateEngine::Instance()->add_stateid( stateid_prefix_ );
 }
 
 StateHandler::~StateHandler()
 {
+  StateEngine::Instance()->remove_stateid( stateid_prefix_ );
 }
-  
-  
+    
 
 bool StateHandler::add_statebase( StateBaseHandle state )
 {

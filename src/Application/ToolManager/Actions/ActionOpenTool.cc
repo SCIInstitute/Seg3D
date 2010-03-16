@@ -41,29 +41,12 @@ SCI_REGISTER_ACTION(OpenTool)
 
 bool ActionOpenTool::validate( ActionContextHandle& context )
 {
-  // Check whether an id number was attached
-  std::string tool_type = toolid_.value();
-  std::string::size_type loc = tool_type.find( '_' );
-  if ( loc != std::string::npos ) tool_type = tool_type.substr( 0, loc );
-
   // Check whether the tool has a valid type
-  if ( !( ToolFactory::Instance()->is_tool_type( tool_type ) ) )
+  if ( !( ToolFactory::Instance()->is_tool_type( toolid_.value() ) ) )
   {
-    context->report_error( std::string( "No tool available of type '" ) + tool_type + "'" );
+    context->report_error( std::string( "No tool available of type '" ) + 
+      toolid_.value() + "'" );
     return false;
-  }
-
-  // Check whether name does not exist, if it exists we have to report an
-  // error.
-
-  if ( loc != std::string::npos )
-  {
-    if ( !( StateEngine::Instance()->is_stateid( toolid_.value() ) ) )
-    {
-      context->report_error( std::string( "ToolID '" ) + toolid_.value()
-          + "' is already in use" );
-      return false;
-    }
   }
 
   return true; // validated
@@ -71,10 +54,9 @@ bool ActionOpenTool::validate( ActionContextHandle& context )
 
 bool ActionOpenTool::run( ActionContextHandle& context, ActionResultHandle& result )
 {
-  std::string active_tool = ToolManager::Instance()->active_toolid();
+  std::string new_tool_id;
 
   // Open and Activate the tool
-  std::string new_tool_id;
   ToolManager::Instance()->open_tool( toolid_.value(), new_tool_id );
   ToolManager::Instance()->activate_tool( new_tool_id );
 

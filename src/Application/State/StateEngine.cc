@@ -26,6 +26,13 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// Boost includes
+#include <boost/algorithm/string.hpp>
+
+// STL includes
+#include <string>
+
+// Application includes
 #include <Application/State/StateEngine.h>
 
 namespace Seg3D
@@ -152,13 +159,13 @@ void StateEngine::remove_state( const std::string& remove_state_id )
 
 size_t StateEngine::num_states()
 {
-  lock_type lock( mutex_ );
+  lock_type lock( get_mutex() );
   return state_list_.size();
 }
 
 bool StateEngine::get_state( const size_t idx, StateBaseHandle& state)
 {
-  lock_type lock( mutex_ );
+  lock_type lock( get_mutex() );
   if (idx < state_list_.size())
   {
     state = state_list_[idx];
@@ -173,7 +180,7 @@ bool StateEngine::get_state( const size_t idx, StateBaseHandle& state)
 
 void StateEngine::add_stateid( const std::string& stateid )
 {
-  lock_type lock( mutex_ );
+  lock_type lock( get_mutex() );
   if ( stateid_list_.find( stateid ) != stateid_list_.end() )
   {
     SCI_THROW_LOGICERROR( std::string("Trying to add stateid '") + stateid +
@@ -190,38 +197,44 @@ void StateEngine::remove_stateid( const std::string& stateid )
 
 bool StateEngine::is_stateid( const std::string& stateid )
 {
-  lock_type lock( mutex_ );
+  lock_type lock( get_mutex() );
   return ( stateid_list_.find( stateid ) != stateid_list_.end() );
 }
 
-bool StateEngine::create_stateid( const std::string& baseid, std::string& new_stateid )
+std::string StateEngine::create_stateid( std::string baseid )
 {
-  lock_type lock( mutex_ );
-
-  std::string::size_type loc = baseid.find( '_' );
+  // Check
+  std::string::size_type loc = baseid.find_last_of( '_' );
   if ( loc != std::string::npos )
   {
-    if ( stateid_list_.find( baseid ) != stateid_list_.end() )
+    // there is an under score in the name
+    // check whether the last part is a name
+    bool is_number = true;
+    if ( loc == baseid.size()-1 ) is_number = false;
+  
+    for ( std::string::size_type j = loc + 1; j < baseid.size(); j++ )
     {
-      new_stateid = "";
-      return false;
+      if ( baseid[j] < '0' || baseid[j] > '9' ) is_number = false;
     }
-    new_stateid = baseid;
+    
+    if ( is_number ) baseid = baseid.substr( 0, loc );
   }
-  else
+
+  lock_type lock( get_mutex() );
+  
+  int number = 1;
+  std::string new_stateid;
+  
+  do
   {
-    int num = 0;
-
-    do
-    {
-      new_stateid = baseid + std::string( "_" ) + Utils::to_string( num );
-      num++;
-    }
-    while ( stateid_list_.find( new_stateid ) != stateid_list_.end() );
+    new_stateid = baseid + std::string( "_" ) + Utils::to_string( number );
+    number++;
   }
+  while ( stateid_list_.find( new_stateid ) != stateid_list_.end() );
 
-  return true;
+  return new_stateid;
 }
+
 
 void StateEngine::add_statealias( const std::string& statealias, const std::string& stateid )
 {
@@ -244,6 +257,40 @@ bool StateEngine::is_statealias( const std::string& statealias )
 {
   lock_type lock( mutex_ );
   return ( statealias_list_.find( statealias ) != statealias_list_.end() );
+}
+
+std::string StateEngine::create_statealias( std::string basealias )
+{
+  // Check
+  std::string::size_type loc = basealias.find_last_of( '_' );
+  if ( loc != std::string::npos )
+  {
+    // there is an under score in the name
+    // check whether the last part is a name
+    bool is_number = true;
+    if ( loc == basealias.size()-1 ) is_number = false;
+  
+    for ( std::string::size_type j = loc + 1; j < basealias.size(); j++ )
+    {
+      if ( basealias[j] < '0' || basealias[j] > '9' ) is_number = false;
+    }
+    
+    if ( is_number ) basealias = basealias.substr( 0, loc );
+  }
+
+  lock_type lock( get_mutex() );
+  
+  int number = 1;
+  std::string new_statealias;
+  
+  do
+  {
+    new_statealias = basealias + std::string( "_" ) + Utils::to_string( number );
+    number++;
+  }
+  while ( statealias_list_.find( new_statealias ) != statealias_list_.end() );
+
+  return new_statealias;
 }
 
 } // end namespace Seg3D

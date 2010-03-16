@@ -42,11 +42,11 @@ StateAlias::StateAlias( const std::string& stateid ) :
 
 StateAlias::StateAlias( const std::string& stateid, const std::string default_value ) :
   StateBase( stateid ),
-  value_( default_value )
+  value_( StateEngine::CreateStateAlias( default_value ) )
 {
   if ( !( value_.empty() ) )
   {
-    StateEngine::Instance()->add_statealias( baseid(), value_ );
+    StateEngine::Instance()->add_statealias( value_, baseid() );
   }
 }
 
@@ -76,24 +76,28 @@ bool StateAlias::set( const std::string& value, ActionSource source )
   // Lock the state engine so no other thread will be accessing it
   StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
 
-  if ( StateEngine::Instance()->is_statealias( value ) ) return false;
+  std::string new_value = StateEngine::CreateStateAlias( value );
+  if ( new_value != value ) source = ActionSource::ACTION_SOURCE_NONE_E;
 
-  if ( value != value_ )
+  if ( StateEngine::Instance()->is_statealias( new_value ) ) return false;
+
+  if ( new_value != value_ )
   {
-    if ( !( value.empty() ) )
+    if ( !( value_.empty() ) )
     {
-      StateEngine::Instance()->remove_statealias( value );
+      StateEngine::Instance()->remove_statealias( value_ );
     }
 
-    value_ = value;
-    if ( !( value.empty() ) )
+    value_ = new_value;
+    if ( !( value_.empty() ) )
     {
-      StateEngine::Instance()->add_statealias( baseid(), value );
+      StateEngine::Instance()->add_statealias( value_, baseid() );
     }
 
     value_changed_signal_( value_, source );
     state_changed_signal_();
   }
+  
   return true;
 }
 

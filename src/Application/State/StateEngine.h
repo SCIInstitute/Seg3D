@@ -105,9 +105,9 @@ public:
   bool is_stateid( const std::string& stateid );
 
   // CREATE_STATEID:
-  // Create a new id based on idname but with an unique extension padded to
+  // Create a new id based on basename but with an unique extension padded to
   // the end
-  bool create_stateid( const std::string& basename, std::string& new_stateid );
+  std::string create_stateid( std::string basename );
 
   // -- Interface for accounting statealias --
 public:
@@ -124,6 +124,10 @@ public:
   // Check whether an alias exists
   bool is_statealias( const std::string& statealias );
 
+  // CREATE_STATEALIAS:
+  // Create a new alias based on basename but with an unique extension padded to
+  // the end
+  std::string create_statealias( std::string basename );
 
   // -- Signals --
 public:
@@ -142,22 +146,6 @@ public:
   inline mutex_type& get_mutex()
   {
     return mutex_;
-  }
-
-  // LOCK:
-  // Lock the mutex that controls whether changes can be made to the
-  // state engine
-  inline void lock()
-  {
-    mutex_.lock();
-  }
-
-  // UNLOCK:
-  // Lock the mutex that controls whether changes can be made to the
-  // state engine
-  inline void unlock()
-  {
-    mutex_.unlock();
   }
 
 private:
@@ -188,19 +176,6 @@ private:
   // -- Static convenience functions --
 
 public:
-  // LOCK
-  // Prohibit changes to be made in the state of the program
-  static void Lock()
-  {
-    Instance()->lock();
-  }
-
-  // UNLOCK
-  // Allow changes to be made in the state of the program
-  static void Unlock()
-  {
-    Instance()->unlock();
-  }
 
   // GETMUTEX
   // Get the mutex of the state engine
@@ -208,6 +183,20 @@ public:
   {
     return Instance()->get_mutex();
   }
+  
+  // CREATESTATEID
+  // Create an unique stateid from a baseid
+  static std::string CreateStateID(const std::string& baseid )
+  {
+    return Instance()->create_stateid( baseid );
+  }
+
+  // CREATESTATEALIAS
+  // Create an unique stateid from a basealias
+  static std::string CreateStateAlias(const std::string& basealias )
+  {
+    return Instance()->create_statealias( basealias );
+  } 
 };
 
 } // end namespace Seg3D

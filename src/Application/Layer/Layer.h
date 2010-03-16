@@ -128,14 +128,14 @@ public:
     layer_group_ = layer_group;
   }
   
-  const std::string& get_layer_id() const
+  std::string get_layer_id() const
   {
-    return layer_id_;
+    return stateid();
   }
   
 private:  
   // The unique ID of the layer
-  std::string layer_id_;
+
   LayerGroupWeakHandle layer_group_;
 
   // GETMUTEX

@@ -230,7 +230,14 @@ std::string export_to_string( const std::vector< Vector >& value )
 
 std::string export_to_string( const std::string& value )
 {
-  return value;
+  bool need_quotes = false;
+  for ( size_t j = 0; j < value.size(); j++)
+  {
+    if ( value[j] == ' ' || value[j] == '\t' || value[j] == '[' || value[j] == ']' ||
+      value[j] == '(' || value[j] == ')' || value[j] == ',' ) need_quotes = true;
+  }
+  if ( need_quotes ) return std::string("\"") + value + std::string("\"");
+  else return value;
 }
 
 std::string export_to_string( const Transform& value )

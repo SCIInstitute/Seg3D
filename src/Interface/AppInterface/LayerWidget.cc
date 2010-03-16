@@ -152,7 +152,6 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
         this->private_->ui_.colorChooseButton_->setIcon(this->data_layer_icon_);
         
         DataLayer* data_layer = dynamic_cast< DataLayer* >( layer.get() );
-        if ( data_layer == 0 ) SCI_THROW_LOGICERROR("Pointer is empty");
         QtBridge::Connect( this->private_->brightness_adjuster_, data_layer->brightness_state_ );
         QtBridge::Connect( this->private_->contrast_adjuster_, data_layer->contrast_state_ );
       }
@@ -163,9 +162,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
         this->private_->ui_.brightness_contrast_button_->hide();
         this->private_->ui_.volume_rendered_button_->hide();
         
-        MaskLayer* mask_layer = dynamic_cast< MaskLayer* >( layer.get() );
-        if ( mask_layer == 0 ) SCI_THROW_LOGICERROR("Pointer is empty");
-        
+        MaskLayer* mask_layer = dynamic_cast< MaskLayer* >( layer.get() );        
         QtBridge::Connect( this->private_->ui_.iso_surface_button_, mask_layer->show_isosurface_state_ );
         QtBridge::Connect( this->private_->ui_.border_selection_combo_, mask_layer->fill_state_ );
       }

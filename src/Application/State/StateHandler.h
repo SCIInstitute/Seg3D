@@ -170,6 +170,12 @@ public:
     // default function is to do nothing
   }
 
+  std::string stateid() const
+  {
+    return ( stateid_prefix_ );
+  }
+  
+
 private:
   // HANDLE_STATE_CHANGED:
   // This function is called whenever a state registered with this statehandler is changed
