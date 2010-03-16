@@ -39,6 +39,7 @@ namespace Utils
 
 class DataVolume;
 typedef boost::shared_ptr< DataVolume > DataVolumeHandle;
+typedef boost::weak_ptr< DataVolume > DataVolumeWeakHandle;
 
 class DataVolume : public Volume
 {

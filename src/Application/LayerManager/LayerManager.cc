@@ -102,42 +102,38 @@ bool LayerManager::insert_layer( LayerHandle layer )
   return true;
 }
   
-  bool LayerManager::insert_layer( LayerGroupHandle group )
-  {
-    
-    return true;
+bool LayerManager::insert_layer( LayerGroupHandle group )
+{
   
-  }
-  
-  LayerGroupHandle LayerManager::check_for_group( std::string group_id )
+  return true;
+
+}
+
+LayerGroupHandle LayerManager::check_for_group( std::string group_id )
+{
+  for( group_handle_list_type::iterator i = group_handle_list_.begin(); 
+    i != group_handle_list_.end(); ++i )
   {
-    for( group_handle_list_type::iterator i = group_handle_list_.begin(); 
-      i != group_handle_list_.end(); ++i )
-    {
-      if (( *i )->get_group_id() == group_id ) {
-        return ( *i );
-      }
+    if (( *i )->get_group_id() == group_id ) {
+      return ( *i );
     }
-    return LayerGroupHandle();
   }
-  
-  
+  return LayerGroupHandle();
+}
 
 LayerGroupHandle LayerManager::create_group( const Utils::GridTransform&  transform ) const
 {
   return LayerGroupHandle( new LayerGroup( transform  ));
 }
 
-
-  void LayerManager::return_group_vector( std::vector< LayerGroupHandle > &vector_of_groups )
+void LayerManager::return_group_vector( std::vector< LayerGroupHandle > &vector_of_groups )
+{
+  for( group_handle_list_type::iterator i = group_handle_list_.begin(); 
+    i != group_handle_list_.end(); ++i )
   {
-    for( group_handle_list_type::iterator i = group_handle_list_.begin(); 
-      i != group_handle_list_.end(); ++i )
-    {
-      vector_of_groups.push_back( *i );
-    }
+    vector_of_groups.push_back( *i );
   }
-  
+}
   
 void LayerManager::insert_layer_top( LayerHandle layer )
 {
@@ -168,12 +164,85 @@ LayerGroupWeakHandle LayerManager::get_active_group()
   return active_layer_->get_layer_group();
 }
 
-LayerManager::mutex_type&
-LayerManager::get_mutex()
+LayerManager::mutex_type& LayerManager::get_mutex()
 {
   return group_handle_list_mutex_;
 }
   
-  
+LayerSceneHandle LayerManager::compose_layer_scene( size_t viewer_id )
+{
+  // Lock the LayerManager
+  lock_type lock( this->group_handle_list_mutex_ );
+
+  LayerSceneHandle layer_scene( new LayerScene );
+
+  // For each group, generate a LayerGroupSceneItem
+  group_handle_list_type::iterator group_iterator = this->group_handle_list_.begin();
+  for ( ; group_iterator != this->group_handle_list_.end(); group_iterator++)
+  {
+    LayerGroupSceneItemHandle layer_group_scene_item( new LayerGroupSceneItem );
+    layer_list_type layer_list = ( *group_iterator )->get_layer_list();
+
+    layer_list_type::iterator layer_iterator = layer_list.begin();
+    // For each layer in the group
+    for ( ; layer_iterator != layer_list.end(); layer_iterator++ )
+    {
+      LayerHandle layer = *layer_iterator;
+      
+      // Skip processing this layer if it's not visible
+      if ( !layer->visible_state_[ viewer_id ]->get() )
+      {
+        continue;
+      }
+
+      LayerSceneItemHandle layer_scene_item;
+
+      switch( layer->type() )
+      {
+      case Utils::VolumeType::DATA_E:
+        {
+          DataLayer* data_layer = dynamic_cast< DataLayer* >( layer.get() );
+          DataLayerSceneItem* data_layer_scene_item = new DataLayerSceneItem;
+          layer_scene_item = LayerSceneItemHandle( data_layer_scene_item );
+          data_layer_scene_item->data_volume_ = data_layer->get_data_volume();
+          data_layer_scene_item->contrast_ = data_layer->contrast_state_->get();
+          data_layer_scene_item->brightness_ = data_layer->brightness_state_->get();
+          data_layer_scene_item->volume_rendered_ = data_layer->volume_rendered_state_->get();
+        }
+        break;
+      case Utils::VolumeType::MASK_E:
+        {
+          MaskLayer* mask_layer = dynamic_cast< MaskLayer* >( layer.get() );
+          MaskLayerSceneItem* mask_layer_scene_item = new MaskLayerSceneItem;
+          layer_scene_item = LayerSceneItemHandle( mask_layer_scene_item );
+          mask_layer_scene_item->mask_volume_ = mask_layer->get_mask_volume();
+          mask_layer_scene_item->color_ = mask_layer->color_state_->get();
+          mask_layer_scene_item->border_ = mask_layer->border_state_->get();
+          mask_layer_scene_item->fill_ = mask_layer->fill_state_->get();
+          mask_layer_scene_item->show_isosurface_ = mask_layer->show_isosurface_state_->get();
+        }
+        break;
+      default:
+        assert( false );
+        break;
+      } // end switch
+
+      layer_scene_item->layer_id_ = layer->get_layer_id();
+      layer_scene_item->opacity_ = layer->opacity_state_->get();
+      layer_scene_item->grid_transform_ = layer->get_grid_transform();
+
+      layer_group_scene_item->push_back( layer_scene_item );
+    } // end for each layer
+
+    // only added the group to the scene if its number of visible layers isn't 0
+    if ( layer_group_scene_item->size() > 0 )
+    {
+      layer_scene->push_back( layer_group_scene_item );
+    }
+
+  } // end for each group
+
+  return layer_scene;
+}
 
 } // end namespace seg3D

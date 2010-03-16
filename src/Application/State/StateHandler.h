@@ -162,6 +162,7 @@ public:
 
   }
 
+protected:
   // STATE_CHANGED:
   // This function is called when any of the state variables are changed
   

@@ -38,6 +38,7 @@ namespace Utils
 
 class MaskVolume;
 typedef boost::shared_ptr< MaskVolume > MaskVolumeHandle;
+typedef boost::weak_ptr< MaskVolume > MaskVolumeWeakHandle;
 
 class MaskVolume : public Volume
 {

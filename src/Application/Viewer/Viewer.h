@@ -42,11 +42,14 @@
 #include <boost/function.hpp>
 
 // Application includes
+#include <Application/LayerManager/LayerManager.h>
 #include <Application/State/State.h>
 #include <Application/Viewer/ViewerRenderer.h>
+#include <Application/Viewer/ViewManipulator.h>
 
 #include <Utils/Core/EnumClass.h>
-//#include <Utils/DataBlock/MaskDataSlice.h>
+#include <Utils/Volume/MaskVolumeSlice.h>
+#include <Utils/Volume/DataVolumeSlice.h>
 
 namespace Seg3D
 {
@@ -112,6 +115,8 @@ public:
   // -- mouse events handling --
 public:
 
+  typedef boost::function< bool( const MouseHistory&, int, int, int ) > mouse_event_handler_type;
+
   void mouse_move_event( const MouseHistory& mouse_history, int button, int buttons,
       int modifiers );
   void mouse_press_event( const MouseHistory& mouse_history, int button, int buttons,
@@ -119,27 +124,47 @@ public:
   void mouse_release_event( const MouseHistory& mouse_history, int button, int buttons,
       int modifiers );
 
-  typedef boost::function< bool( const MouseHistory&, int, int, int ) > mouse_event_handler_type;
-
   void set_mouse_move_handler( mouse_event_handler_type func );
   void set_mouse_press_handler( mouse_event_handler_type func );
   void set_mouse_release_handler( mouse_event_handler_type func );
   void reset_mouse_handlers();
-
-  void resize( int width, int height );
-  bool is_volume_view() const;
-  StateViewBaseHandle get_active_view_state();
-
-  virtual void state_changed();
-  typedef boost::signals2::signal< void() > redraw_signal_type;
-  redraw_signal_type redraw_signal_;
 
 private:
   mouse_event_handler_type mouse_move_handler_;
   mouse_event_handler_type mouse_press_handler_;
   mouse_event_handler_type mouse_release_handler_;
 
-  boost::shared_ptr< ViewManipulator > view_manipulator_;
+  ViewManipulatorHandle view_manipulator_;
+
+public:
+  void resize( int width, int height );
+  bool is_volume_view() const;
+  StateViewBaseHandle get_active_view_state();
+
+protected:
+  virtual void state_changed();
+
+  // -- Signals and Slots --
+public:
+
+  typedef boost::signals2::signal< void() > redraw_signal_type;
+  redraw_signal_type redraw_signal_;
+
+private:
+  void insert_layer( LayerHandle layer );
+  void delete_layer( LayerHandle layer );
+
+  // -- 2D slices of layers --
+public:
+  Utils::MaskVolumeSliceHandle get_mask_volume_slice( const std::string& layer_id );
+  Utils::DataVolumeSliceHandle get_data_volume_slice( const std::string& layer_id );
+  
+private:
+  typedef std::map< std::string, Utils::MaskVolumeSliceHandle >::iterator mask_slices_iterator_type;
+  typedef std::map< std::string, Utils::DataVolumeSliceHandle >::iterator data_slices_iterator_type;
+
+  std::map< std::string, Utils::MaskVolumeSliceHandle > mask_slices_;
+  std::map< std::string, Utils::DataVolumeSliceHandle > data_slices_;
 
   // -- State information --
 public:
@@ -163,8 +188,6 @@ public:
   StateBoolHandle volume_slices_visible_state_;
   StateBoolHandle volume_isosurfaces_visible_state_;
   StateBoolHandle volume_volume_rendering_visible_state_;
-
-//  std::map<std::string, Utils::MaskDataSliceHandle> mask_slices_;
 
   const static std::string AXIAL_C;
   const static std::string SAGITTAL_C;

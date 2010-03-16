@@ -62,6 +62,11 @@ public:
   { 
     return mask_volume_->get_grid_transform(); 
   }
+
+  Utils::MaskVolumeHandle get_mask_volume()
+  {
+    return this->mask_volume_;
+  }
   
   // -- state variables --
 public:

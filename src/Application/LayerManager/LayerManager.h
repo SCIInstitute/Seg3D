@@ -48,6 +48,7 @@
 // Application includes
 #include <Application/Layer/Layer.h>
 #include <Application/Layer/LayerGroup.h>
+#include <Application/LayerManager/LayerScene.h>
 #include <Application/State/StateHandler.h>
 
 namespace Seg3D
@@ -87,6 +88,10 @@ public:
   void delete_layer( LayerHandle layer );
   
   friend class ActionInsertLayer;
+
+public:
+  // Take an atomic snapshot of visual properties of layers for rendering in the specified viewer
+  LayerSceneHandle compose_layer_scene( size_t viewer_id );
   
 public: 
   typedef boost::recursive_mutex mutex_type;
@@ -110,8 +115,7 @@ public:
   // This signal is triggered after a layer has been inserted
   layer_signal_type layer_inserted_signal_;
   
-  layer_signal_type add_layer_signal_;
-  layer_signal_type delete_layer_signal_;
+  layer_signal_type layer_deleted_signal_;
   
   // This signal is triggered when the groups layers have changed
   group_signal_type group_layers_changed_signal_;

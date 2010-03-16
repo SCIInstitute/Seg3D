@@ -29,6 +29,8 @@
 #ifndef APPLICATION_VIEWER_VIEWMANIPULATOR_H
 #define APPLICATION_VIEWER_VIEWMANIPULATOR_H
 
+#include <boost/shared_ptr.hpp>
+
 #include <Utils/Geometry/Quaternion.h>
 #include <Utils/Geometry/Vector.h>
 
@@ -37,6 +39,8 @@ namespace Seg3D
 
 class Viewer;
 class MouseHistory;
+class ViewManipulator;
+typedef boost::shared_ptr< ViewManipulator > ViewManipulatorHandle;
 
 class ViewManipulator
 {

@@ -78,6 +78,11 @@ std::string export_to_string(const unsigned long& value)
   return to_string(value);
 }
 
+std::string export_to_string( const size_t& value )
+{
+  return to_string( value );
+}
+
 std::string export_to_string( const float& value )
 {
   return to_string( value );

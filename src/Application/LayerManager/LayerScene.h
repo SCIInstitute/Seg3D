@@ -34,6 +34,9 @@
 
 #include <Application/Layer/Layer.h>
 
+#include <Utils/Volume/DataVolume.h>
+#include <Utils/Volume/MaskVolume.h>
+
 namespace Seg3D
 {
 
@@ -52,10 +55,49 @@ public:
   LayerSceneItem() {}
   ~LayerSceneItem() {}
 
+  virtual Utils::VolumeType type() = 0;
+
 public:
-  Utils::VolumeHandle volume_;
+  std::string layer_id_;
   double opacity_;
   Utils::GridTransform grid_transform_;
+};
+
+class DataLayerSceneItem : public LayerSceneItem
+{
+public:
+  DataLayerSceneItem() {}
+  ~DataLayerSceneItem() {}
+
+  virtual Utils::VolumeType type()
+  {
+    return Utils::VolumeType::DATA_E;
+  }
+
+public:
+  Utils::DataVolumeHandle data_volume_;
+  double contrast_;
+  double brightness_;
+  bool volume_rendered_;
+};
+
+class MaskLayerSceneItem : public LayerSceneItem
+{
+public:
+  MaskLayerSceneItem() {}
+  ~MaskLayerSceneItem() {}
+
+  virtual Utils::VolumeType type()
+  {
+    return Utils::VolumeType::MASK_E;
+  }
+
+public:
+  Utils::MaskVolumeHandle mask_volume_;
+  int color_;
+  std::string border_;
+  std::string fill_;
+  bool show_isosurface_;
 };
 
 } // end namespace Seg3D

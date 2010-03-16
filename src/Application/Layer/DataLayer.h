@@ -63,7 +63,11 @@ public:
     return data_volume_->get_grid_transform(); 
   }
   
-  
+  Utils::DataVolumeHandle get_data_volume()
+  {
+    return this->data_volume_;
+  }
+
   // -- state variables --
 public:
 
