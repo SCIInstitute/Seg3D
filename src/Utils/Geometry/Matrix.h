@@ -118,6 +118,8 @@ inline void Matrix::data( const double m[ 4 ][ 4 ] )
 // Compute the inverse of the input matrix using LU decomposition
 bool Invert( const Matrix& m, Matrix& inverse );
 
+void Transpose( const Matrix& m, Matrix& trans );
+
 } // End namespace Utils
 
 #endif

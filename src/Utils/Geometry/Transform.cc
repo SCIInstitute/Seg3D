@@ -78,6 +78,11 @@ void Transform::load_frame( const Vector& x, const Vector& y, const Vector& z )
   mat_( 2, 2 ) = z.z();
 }
 
+void Transform::load_matrix( const Matrix& m )
+{
+  this->mat_ = m;
+}
+
 void Transform::post_transform( const Transform& trans )
 {
   this->mat_ *= trans.mat_;

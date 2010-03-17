@@ -141,4 +141,9 @@ bool Invert( const Matrix& m, Matrix& inverse )
   return true;
 }
 
+void Transpose( const Matrix& m, Matrix& trans )
+{
+  trans = ublas::trans( m );
+}
+
 } // End namespace Utils
