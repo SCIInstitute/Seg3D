@@ -47,23 +47,22 @@ namespace Seg3D
 LayerManager::LayerManager() :
   StateHandler( "LayerManager" )
 { 
-  for( int i = 0; i < 1; i++ )
-  {
-    std::string new_name;
-    new_name = "new_layer_" + boost::lexical_cast< std::string >( i );
+  //for( int i = 0; i < 2; i++ )
+  //{
+  //  std::string new_name;
+  //  new_name = "new_layer_" + boost::lexical_cast< std::string >( i );
 
-    Utils::GridTransform grid_transform( 256, 640, 480 );
-    Utils::MaskDataBlockHandle mask_data_block;
-    Utils::MaskVolumeHandle volume0( new Utils::MaskVolume( grid_transform, mask_data_block ) );
-    MaskLayerHandle mask_layer_new0;
-    
-    mask_layer_new0 = MaskLayerHandle ( new MaskLayer( new_name, volume0 ) );
-//    mask_layer_new0->set_grid_transform( 256, 640, 480 );
-    LayerHandle plain_layer = mask_layer_new0;
-    //insert_layer( plain_layer );
-    ActionInsertLayer::Dispatch( plain_layer );
-    
-  }
+  //  Utils::GridTransform grid_transform( 256, 640, 480 );
+  //  Utils::MaskDataBlockHandle mask_data_block;
+  //  Utils::MaskVolumeHandle volume0( new Utils::MaskVolume( grid_transform, mask_data_block ) );
+  //  MaskLayerHandle mask_layer_new0;
+  //  
+  //  mask_layer_new0 = MaskLayerHandle ( new MaskLayer( new_name, volume0 ) );
+  //  LayerHandle plain_layer = mask_layer_new0;
+
+  //  ActionInsertLayer::Dispatch( plain_layer );
+  //  
+  //}
 }
 
 LayerManager::~LayerManager()
@@ -84,7 +83,9 @@ bool LayerManager::insert_layer( LayerHandle layer )
     {
       ( *it )->insert_layer( layer );
       layer->set_layer_group( *it );
+      
       layer_inserted_signal_( layer );
+      group_layers_changed_signal_( ( *it ) );
       return true;
     }
   }
@@ -97,6 +98,7 @@ bool LayerManager::insert_layer( LayerHandle layer )
   group_handle_list_.push_back( new_group );
   
   // Send a signal alerting the UI that we have inserted a layer
+  layer_inserted_signal_( layer );
   group_layers_changed_signal_( new_group );
 
   return true;
@@ -104,9 +106,7 @@ bool LayerManager::insert_layer( LayerHandle layer )
   
 bool LayerManager::insert_layer( LayerGroupHandle group )
 {
-  
-  return true;
-
+    return true;
 }
 
 LayerGroupHandle LayerManager::check_for_group( std::string group_id )
@@ -128,6 +128,8 @@ LayerGroupHandle LayerManager::create_group( const Utils::GridTransform&  transf
 
 void LayerManager::return_group_vector( std::vector< LayerGroupHandle > &vector_of_groups )
 {
+    lock_type lock( group_handle_list_mutex_ );
+    
   for( group_handle_list_type::iterator i = group_handle_list_.begin(); 
     i != group_handle_list_.end(); ++i )
   {

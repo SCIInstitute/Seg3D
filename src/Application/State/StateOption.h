@@ -126,7 +126,10 @@ public:
 
   // OPTION_LIST:
   // Get the option list
-  std::vector< std::string > option_list();
+  std::vector< std::string > option_list()
+  {
+      return option_list_;
+  }
 
   // IS_OPTION:
   // Check whether a string is a valid option

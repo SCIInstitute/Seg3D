@@ -83,39 +83,39 @@ public:
   // = Transformation menu state variables =
 
   // Origin where the center of the dataset should
-  StateDoubleHandle transform_origin_x_state_;
-  StateDoubleHandle transform_origin_y_state_;
-  StateDoubleHandle transform_origin_z_state_;
+  StateRangedDoubleHandle transform_origin_x_state_;
+  StateRangedDoubleHandle transform_origin_y_state_;
+  StateRangedDoubleHandle transform_origin_z_state_;
 
   // The new Size information
-  StateDoubleHandle transform_size_x_state_;
-  StateDoubleHandle transform_size_y_state_;
-  StateDoubleHandle transform_size_z_state_;
+  StateRangedDoubleHandle transform_size_x_state_;
+  StateRangedDoubleHandle transform_size_y_state_;
+  StateRangedDoubleHandle transform_size_z_state_;
 
   StateBoolHandle transform_replace_state_;
 
   // = Crop menu state variables =
+  StateRangedDoubleHandle crop_min_x_state_;
+  StateRangedDoubleHandle crop_max_x_state_;
 
-  StateDoubleHandle crop_min_x_state_;
-  StateDoubleHandle crop_max_x_state_;
+  StateRangedDoubleHandle crop_min_y_state_;
+  StateRangedDoubleHandle crop_max_y_state_;
 
-  StateDoubleHandle crop_min_y_state_;
-  StateDoubleHandle crop_max_y_state_;
-
-  StateDoubleHandle crop_min_z_state_;
-  StateDoubleHandle crop_max_z_state_;
+  StateRangedDoubleHandle crop_min_z_state_;
+  StateRangedDoubleHandle crop_max_z_state_;
 
   StateBoolHandle crop_replace_state_;
 
   // = Resample state variables =
-
-  StateDoubleHandle resample_factor_state_;
+  StateRangedDoubleHandle resample_factor_state_;
 
   StateBoolHandle resample_replace_state_;
 
   // = Group visibility =
 
   StateBoolHandle visibility_state_;
+  
+  StateBoolHandle show_layers_state_;
 
 
 

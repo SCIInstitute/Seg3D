@@ -42,7 +42,7 @@ Layer::Layer( const std::string& name ) :
   // Step (1) : Build the layer specific state variables
 
   // == The name of the layer ==
-  add_state( "name", name_state_, name);
+  add_state( "name", name_state_, name );
 
   // == Visibility information for this layer per viewer ==
   size_t num_viewers = Application::Instance()->number_of_viewers();
@@ -65,6 +65,15 @@ Layer::Layer( const std::string& name ) :
 
   // == Which of the submenus is being editted ==
   add_state( "edit_mode", edit_mode_state_, "none", "none|opacity|color|contrast|appearance" );
+  
+  // == The user defined name
+  add_state( "user_defined_name", user_defined_name_state_, name );
+  
+  // == Which fill mode is active ==
+  add_state( "fill_mode", fill_mode_state_, "none", "none|crosshatch|stipple|solid" );
+  
+  // == Which border mode is active ==
+  add_state( "border_mode", border_mode_state_, "none", "none|solid|dashed|dotted" );
 
 }
   

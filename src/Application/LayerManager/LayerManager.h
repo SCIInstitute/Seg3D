@@ -120,6 +120,7 @@ public:
   // This signal is triggered when the groups layers have changed
   group_signal_type group_layers_changed_signal_;
   
+  //group_signal_type layer_inserted_signal_;
   group_signal_type add_group_signal_;
   group_signal_type delete_group_signal_;
   

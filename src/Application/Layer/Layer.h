@@ -62,6 +62,7 @@ namespace Seg3D
 class LayerGroup;
 typedef boost::shared_ptr< LayerGroup > LayerGroupHandle;
 typedef boost::weak_ptr< LayerGroup > LayerGroupWeakHandle;
+typedef std::list < LayerGroupHandle > group_handle_list_type;
   
 class Layer;
 typedef boost::shared_ptr< Layer > LayerHandle;
@@ -110,6 +111,16 @@ public:
 
   // State that describes which menu is currently shown
   StateOptionHandle edit_mode_state_;
+  
+  // The name for the layer that is defined by the user or by the imported file
+  StateStringHandle user_defined_name_state_;
+  
+  // State that describes which fill mode is active
+  StateOptionHandle fill_mode_state_;
+  
+  // State that describes which border mode is active
+  StateOptionHandle border_mode_state_;
+  
 
   // -- Locking system --
 public:
