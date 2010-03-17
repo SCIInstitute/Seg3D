@@ -27,13 +27,14 @@
  */
 
 #include <iostream>
-
-#include <Utils/Core/Log.h>
-#include <Utils/Core/StringUtil.h>
+#include <sstream>
 
 #include <boost/bind.hpp>
 #include <boost/thread.hpp>
 #include <boost/filesystem.hpp>
+
+#include <Utils/Core/Log.h>
+#include <Utils/Core/StringUtil.h>
 
 namespace Utils
 {
@@ -45,7 +46,9 @@ Log::Log()
 std::string Log::header( const int line, const char* file ) const
 {
   boost::filesystem::path filename( file );
-  std::string header_string = std::string( "[T" ) + to_string( boost::this_thread::get_id() )
+  std::ostringstream oss;
+  oss << boost::this_thread::get_id();
+  std::string header_string = std::string( "[T" ) + oss.str()
       + std::string( ":" ) + filename.filename() + std::string( ":" ) + to_string( line )
       + std::string( "]" );
   //  if (header_string.size() < 60) header_string += std::string(60-header_string.size(),' ');
