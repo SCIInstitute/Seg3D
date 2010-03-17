@@ -80,7 +80,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   
   // Set the defaults
   // this is a default setting until we can get the name of the layer from the file or by some other means
-  this->private_->ui_.label_->setText( QString::fromStdString( layer->get_layer_id() ) );
+  this->private_->ui_.label_->setText( QString::fromStdString( layer->user_defined_name_state_->get()) );
   
   // here we set the unique layer_id_ of the layer
   this->private_->layer_id_ = layer->get_layer_id();
@@ -109,10 +109,24 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   this->private_->ui_.contrast_h_layout_->addWidget( this->private_->contrast_adjuster_ );
   this->private_->contrast_adjuster_->setObjectName( QString::fromUtf8( "contrast_adjuster_" ) );
   
-  //--Temporary-- eventually we will set these with the state engine
-  this->private_->ui_.border_selection_combo_->addItem( QString::fromUtf8( "No Border" ) );
-  this->private_->ui_.border_selection_combo_->addItem( QString::fromUtf8( "Thin Border" ) );
-  this->private_->ui_.border_selection_combo_->addItem( QString::fromUtf8( "Thick Border" ) );
+  // --- set the values for the dropdown menu's using values from the state handles
+  // -- set the border selection combo box's values 
+  std::vector< std::string > temp_border_option_list = layer->border_mode_state_->option_list();
+  for( size_t i = 0; i < temp_border_option_list.size(); i++)
+  {   
+      this->private_->ui_.border_selection_combo_->addItem( QString::fromStdString( temp_border_option_list[i] ) );
+  }
+  // Set it's default value
+  this->private_->ui_.border_selection_combo_->setCurrentIndex(layer->border_mode_state_->index());
+  
+  // -- set the fill selection combo box's values 
+  std::vector< std::string > temp_fill_option_list = layer->fill_mode_state_->option_list();
+  for( size_t i = 0; i < temp_fill_option_list.size(); i++)
+  {   
+      this->private_->ui_.fill_selection_combo_->addItem( QString::fromStdString( temp_fill_option_list[i] ) );
+  }
+  // Set it's default value
+  this->private_->ui_.fill_selection_combo_->setCurrentIndex(layer->fill_mode_state_->index());
   
   // connect the signals and slots
   connect( this->private_->ui_.opacity_button_, 
@@ -130,14 +144,18 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   
   // this is only for testing until we have this hooked up through the state manager
   connect( this->private_->ui_.lock_button_, 
-      SIGNAL( clicked( bool )), this, 
+      SIGNAL( toggled( bool )), this, 
       SLOT( visual_lock( bool )));
   
   
   // make the default connections, for any layer type, to the state engine
   QtBridge::Connect( this->private_->ui_.selection_checkbox_, layer->selected_state_ );
+  
   QtBridge::Connect( this->private_->ui_.lock_button_, layer->lock_state_ );
+  
   QtBridge::Connect( this->private_->opacity_adjuster_, layer->opacity_state_ );
+  
+  QtBridge::Connect( this->private_->ui_.label_, layer->user_defined_name_state_ );
   
   switch( layer->type() )
   {
@@ -181,11 +199,12 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   
 LayerWidget::~LayerWidget()
 {
+
 }
   
 void LayerWidget::show_selection_checkbox( bool show )
 {
-  if( show )
+  if( show && (!this->private_->ui_.lock_button_->isChecked()) )
   { 
     this->private_->ui_.checkbox_widget_->show();
   }
@@ -324,12 +343,14 @@ void LayerWidget::visual_lock( bool lock )
     this->private_->ui_.fill_border_button_->setEnabled( false );
     this->private_->ui_.volume_rendered_button_->setEnabled( false );
     this->private_->ui_.brightness_contrast_button_->setEnabled( false );
+    this->private_->ui_.label_->setEnabled( false );
     this->private_->ui_.checkbox_widget_->hide();
     this->private_->ui_.color_bar_->hide();
     this->private_->ui_.progress_bar_bar_->hide();
     this->private_->ui_.border_bar_->hide();
     this->private_->ui_.opacity_bar_->hide();
     this->private_->ui_.bright_contrast_bar_->hide();
+    
     
   }
   else
@@ -361,6 +382,7 @@ void LayerWidget::visual_lock( bool lock )
     this->private_->ui_.fill_border_button_->setEnabled( true );
     this->private_->ui_.volume_rendered_button_->setEnabled( true );
     this->private_->ui_.brightness_contrast_button_->setEnabled( true );
+    this->private_->ui_.label_->setEnabled( true );
     
   }
 }

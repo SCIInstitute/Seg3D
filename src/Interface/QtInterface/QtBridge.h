@@ -39,6 +39,7 @@
 #include <Application/State/StateOption.h>
 #include <Application/State/StateVector.h>
 #include <Application/State/StateRangedValue.h>
+#include <Application/State/StateAlias.h>
 
 namespace Seg3D
 {
@@ -70,6 +71,11 @@ public:
   static bool Connect( QToolButton* qtoolbutton, boost::function< void() > function );
 
   static bool Connect( QPushButton* qpushbutton, boost::function< void() > function );
+  
+  // Coonect QLineEdits
+  static bool Connect( QLineEdit* qlineedit, StateStringHandle& state_handle );
+  
+  static bool Connect( QLineEdit* qlineedit, StateAliasHandle& state_handle );
 
   // Connect QActionGroup and StateOption
   // NOTE: This requires that each QAction in the QActionGroup has its objectName

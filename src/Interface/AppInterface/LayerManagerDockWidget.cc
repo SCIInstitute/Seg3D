@@ -54,19 +54,19 @@ namespace Seg3D
 LayerManagerDockWidget::LayerManagerDockWidget( QWidget *parent ) :
   QDockWidget( "LayerManagerDockWidget" )
 {
-  setAllowedAreas( Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea );
-  setWindowTitle( "Layer Manager" );
+  this->setAllowedAreas( Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea );
+  this->setWindowTitle( "Layer Manager" );
 
-  resize( 280, 640 );
+  this->resize( 280, 640 );
   QSizePolicy sizePolicy( QSizePolicy::Fixed, QSizePolicy::Preferred );
   sizePolicy.setHorizontalStretch(0);
   sizePolicy.setVerticalStretch(0);
   setSizePolicy( sizePolicy );
-  setMinimumSize( QSize( 280, 313 ) );
-    setMaximumSize( QSize( 524287, 524287 ) );
+  this->setMinimumSize( QSize( 280, 313 ) );
+    this->setMaximumSize( QSize( 524287, 524287 ) );
   
-  layer_manager_widget_ = new LayerManagerWidget( this );
-  setWidget( layer_manager_widget_ );
+  this->layer_manager_widget_ = new LayerManagerWidget( this );
+  this->setWidget( layer_manager_widget_ );
   
   LayerManager::lock_type lock( LayerManager::Instance()->get_mutex() );
   
@@ -96,13 +96,6 @@ void LayerManagerDockWidget::process_group_ui( LayerGroupHandle &group )
   layer_manager_widget_->process_group( group );
 }
   
-  
-void LayerManagerDockWidget::insert_layer( LayerHandle &layer ) 
-{
-  //layer_manager_widget_->new_layer( layer );
-  //layer_manager_widget_->new_layer( layer );
-}
-
 void LayerManagerDockWidget::new_group()
 {
   //TODO implement new group function

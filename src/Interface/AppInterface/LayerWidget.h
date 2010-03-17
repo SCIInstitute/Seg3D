@@ -72,7 +72,8 @@ public:
   void show_selection_checkbox( bool hideshow );
   
 private:
-  LayerWidgetPrivate* private_;
+
+    boost::shared_ptr< LayerWidgetPrivate > private_;
   
   // icons to represent the layer types
   QIcon data_layer_icon_;

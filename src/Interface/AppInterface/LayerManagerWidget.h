@@ -73,6 +73,7 @@ public:
 public:
   void process_group( LayerGroupHandle group );
   void delete_group( LayerGroupHandle group );
+  void show_group( LayerGroupHandle group );
   
 
 private:

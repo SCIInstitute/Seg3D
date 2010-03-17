@@ -81,7 +81,7 @@ bool PaintToolInterface::build_widget( QFrame* frame )
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
   PaintTool* tool = dynamic_cast< PaintTool* > ( base_tool_.get() );
-
+  
   //Step 3 - connect the gui to the tool through the QtBridge
   QtBridge::Connect( private_->ui_.targetComboBox, tool->target_layer_state_ );
   QtBridge::Connect( private_->ui_.maskComboBox, tool->mask_layer_state_ );
@@ -89,8 +89,34 @@ bool PaintToolInterface::build_widget( QFrame* frame )
   QtBridge::Connect( private_->upper_threshold_, tool->upper_threshold_state_ );
   QtBridge::Connect( private_->lower_threshold_, tool->lower_threshold_state_ );
   QtBridge::Connect( private_->ui_.eraseCheckBox, tool->erase_state_ );
-
-  //Send a message to the log that we have finised with building the Paint Brush Interface
+  
+  
+  //Step 4 - set the values for the tool ui from the state engine
+      
+      // set the defaults for the paint brush size
+      int brush_min = 0; 
+      int brush_max = 0;
+      tool->brush_radius_state_->get_range( brush_min, brush_max );
+        private_->brush_radius_->setRanges( brush_min, brush_max );
+        private_->brush_radius_->setCurrentValue( tool->brush_radius_state_->get() );
+        
+        // set the defaults for the upper threshold
+        double upper_threshold_min = 0.0; 
+      double upper_threshold_max = 0.0;
+      tool->upper_threshold_state_->get_range( upper_threshold_min, upper_threshold_max );
+        private_->upper_threshold_->setRanges( upper_threshold_min, upper_threshold_max );
+        private_->upper_threshold_->setCurrentValue( tool->upper_threshold_state_->get() );
+        
+        // set the defaults for the lower threshold
+        double lower_threshold_min = 0.0; 
+      double lower_threshold_max = 0.0;
+      tool->lower_threshold_state_->get_range( lower_threshold_min, lower_threshold_max );
+        private_->lower_threshold_->setRanges( lower_threshold_min, lower_threshold_max );
+        private_->lower_threshold_->setCurrentValue( tool->lower_threshold_state_->get() );
+        
+        private_->ui_.eraseCheckBox->setChecked( tool->erase_state_->get() );
+    
+    //Send a message to the log that we have finised with building the Paint Brush Interface
   SCI_LOG_MESSAGE("Finished building a Paint Brush Interface");
 
   return ( true );

@@ -78,10 +78,10 @@ ToolBoxWidget::ToolBoxWidget( QWidget* parent ) :
 
   this->private_ = ToolBoxWidgetPrivateHandle( new ToolBoxWidgetPrivate );
 
-  setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-  setVerticalScrollBarPolicy( Qt::ScrollBarAsNeeded );
-  setContentsMargins( 1, 1, 1, 1 );
-  setWidgetResizable( true );
+  this->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+  this->setVerticalScrollBarPolicy( Qt::ScrollBarAsNeeded );
+  this->setContentsMargins( 1, 1, 1, 1 );
+  this->setWidgetResizable( true );
 
   this->main_ = new QWidget( this );
   setWidget( this->main_ );

@@ -51,6 +51,7 @@ void QtSignal( QTPOINTER qpointer, boost::function<void ()> func )
   }
 }
 
+
 // -- Checkbox connector --
 void QtCheckBoxSignal( QPointer< QCheckBox > qpointer, bool state, ActionSource source )
 {
@@ -78,6 +79,15 @@ void QtComboBoxSignal( QPointer< QComboBox > qpointer, std::string state, Action
   {
     QtSignal( qpointer, boost::bind( &QtComboBoxSignal, qpointer.data(), state ) );
   }
+}
+
+void QtToolButtonToggleSignal( QPointer< QToolButton > qpointer, bool state, ActionSource source )
+{
+    if ( source != ActionSource::ACTION_SOURCE_INTERFACE_E )
+    {
+       QtSignal( qpointer, boost::bind( &QToolButton::setChecked, 
+      qpointer.data(), state ) ); 
+    }
 }
 
 void QtSliderSpinComboRangedIntSignal( QPointer< SliderSpinComboInt > qpointer, int state,
@@ -120,6 +130,14 @@ void QtActionGroupSignal( QPointer< QActionGroup > qpointer, std::string option,
   }
 }
 
+
+void QtLineEditSignal( QPointer< QLineEdit > qpointer, std::string state, ActionSource source )
+{
+  if ( source != ActionSource::ACTION_SOURCE_INTERFACE_E )
+  {
+    QtSignal( qpointer, boost::bind( &QLineEdit::setText, qpointer.data(), QString::fromStdString( state ) ) ); 
+  }
+}
 bool QtBridge::Connect( QCheckBox* qcheckbox, StateBoolHandle& state_handle )
 {
   // Connect the dispatch into the StateVariable (with auxiliary object)
@@ -128,10 +146,45 @@ bool QtBridge::Connect( QCheckBox* qcheckbox, StateBoolHandle& state_handle )
   new QtCheckBoxSlot( qcheckbox, state_handle );
 
   // Connect the state signal back into the Qt Variable
-  state_handle->value_changed_signal_.connect( boost::bind( &QtCheckBoxSignal, qcheckbox, _1, _2 ) );
+  QPointer< QCheckBox > qpointer( qcheckbox );
+  
+  new QtDeleteSlot( qcheckbox, state_handle->value_changed_signal_.connect( 
+      boost::bind( &QtCheckBoxSignal, qpointer, _1, _2 ) ) );
 
   return true;
 }
+
+bool QtBridge::Connect( QLineEdit* qlineedit, StateStringHandle& state_handle )
+{
+  // Connect the dispatch into the StateVariable (with auxiliary object)
+  // Link the slot to the parent widget, so Qt's memory manager will
+  // manage this one.
+  new QtLineEditSlot( qlineedit, state_handle );
+  QPointer< QLineEdit > qpointer( qlineedit );
+
+  // Connect the state signal back into the Qt Variable
+  new QtDeleteSlot( qlineedit, state_handle->value_changed_signal_.connect( 
+      boost::bind( &QtLineEditSignal, qpointer, _1, _2 ) ) );
+
+  return true;
+}
+
+bool QtBridge::Connect( QLineEdit* qlineedit, StateAliasHandle& state_handle )
+{
+  // Connect the dispatch into the StateVariable (with auxiliary object)
+  // Link the slot to the parent widget, so Qt's memory manager will
+  // manage this one.
+  new QtLineEditAliasSlot( qlineedit, state_handle );
+  QPointer< QLineEdit > qpointer( qlineedit );
+
+  // Connect the state signal back into the Qt Variable
+  new QtDeleteSlot( qlineedit, state_handle->value_changed_signal_.connect( 
+      boost::bind( &QtLineEditSignal, qpointer, _1, _2 ) ) );
+
+  return true;
+}
+
+
 
 bool QtBridge::Connect( QComboBox* qcombobox, StateOptionHandle& state_handle )
 {
@@ -139,9 +192,11 @@ bool QtBridge::Connect( QComboBox* qcombobox, StateOptionHandle& state_handle )
   // Link the slot to the parent widget, so Qt's memory manager will
   // manage this one.
   new QtComboBoxSlot( qcombobox, state_handle );
+  QPointer< QComboBox > qpointer( qcombobox );
 
   // Connect the state signal back to the Qt Variable
-  state_handle->value_changed_signal_.connect( boost::bind( &QtComboBoxSignal, qcombobox, _1, _2 ) );
+  new QtDeleteSlot( qcombobox, state_handle->value_changed_signal_.connect( 
+      boost::bind( &QtComboBoxSignal, qpointer, _1, _2 ) ) );
 
   return true;
 }
@@ -149,10 +204,12 @@ bool QtBridge::Connect( QComboBox* qcombobox, StateOptionHandle& state_handle )
 bool QtBridge::Connect( SliderSpinComboInt* sscombo, StateRangedIntHandle& state_handle )
 {
   new QtSliderSpinComboRangedIntSlot( sscombo, state_handle );
+  
+  QPointer< SliderSpinComboInt > qpointer( sscombo );
 
   // Connect the state signal back to the Qt Variable
-  state_handle->value_changed_signal_.connect( boost::bind( &QtSliderSpinComboRangedIntSignal,
-      sscombo, _1, _2 ) );
+  new QtDeleteSlot( sscombo, state_handle->value_changed_signal_.connect(
+      boost::bind( &QtSliderSpinComboRangedIntSignal, qpointer, _1, _2 ) ) );
 
   return true;
 }
@@ -161,9 +218,10 @@ bool QtBridge::Connect( SliderSpinComboDouble* sscombo, StateRangedDoubleHandle&
 {
   new QtSliderSpinComboRangedDoubleSlot( sscombo, state_handle );
 
+    QPointer< SliderSpinComboDouble > qpointer( sscombo );
   // Connect the state signal back to the Qt Variable
-  state_handle->value_changed_signal_.connect( boost::bind( &QtSliderSpinComboRangedDoubleSignal,
-      sscombo, _1, _2 ) );
+  new QtDeleteSlot( sscombo, state_handle->value_changed_signal_.connect( 
+      boost::bind( &QtSliderSpinComboRangedDoubleSignal, qpointer, _1, _2 ) ) );
 
   return true;
 }
@@ -182,6 +240,10 @@ bool QtBridge::Connect( QToolButton* qtoolbutton, StateBoolHandle& state_handle 
   // Link the slot to the parent widget, so Qt's memory manager will
   // manage this one.
   new QtToolButtonToggleSlot( qtoolbutton, state_handle );
+  QPointer< QToolButton > qpointer( qtoolbutton );
+  
+  new QtDeleteSlot( qtoolbutton, state_handle->value_changed_signal_.connect( 
+      boost::bind( &QtToolButtonToggleSignal, qpointer, _1, _2 ) ) );
   
   return true;
 }
@@ -213,15 +275,18 @@ bool QtBridge::Connect( QAction* qaction, StateBoolHandle& state_handle )
   // manage this one.
   new QtActionToggleSlot( qaction, state_handle );
 
+    // TODO: Check whether there needs to be signal
+
   return true;
 }
 
 bool QtBridge::Connect( QActionGroup* qactiongroup, StateOptionHandle& state_handle )
 {
   new QtActionGroupSlot( qactiongroup, state_handle );
+  QPointer< QActionGroup > qpointer( qactiongroup );
 
-  state_handle->value_changed_signal_.connect( 
-    boost::bind( &QtActionGroupSignal, qactiongroup, _1, _2 ) );
+  new QtDeleteSlot( qactiongroup, state_handle->value_changed_signal_.connect( 
+    boost::bind( &QtActionGroupSignal, qpointer, _1, _2 ) ) );
 
   return true;
 }

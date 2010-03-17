@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>242</width>
-    <height>757</height>
+    <height>785</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -37,9 +37,10 @@ QTabBar::tab{
 background-color:qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(101, 101, 101, 255), stop:0.155779 rgba(115, 115, 115, 255), stop:1 rgba(84, 84, 84, 255));
 border-top-left-radius: 4px;
 border-top-right-radius: 4px;
-min-width:12ex;
+min-width:16ex;
 height: 22px;
 padding-left: 4px;
+padding-right: 4px;
 padding-top:0px;
 border-top: 1px solid rgb(90,90,90);
 border-left: 1px solid rgb(90,90,90);
@@ -51,6 +52,7 @@ QTabBar::tab:selected{
 background-color:qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(151, 151, 151, 255), stop:0.155779 rgba(165, 165, 165, 255), stop:1 rgba(134, 134, 134, 255));
 margin-left: -4px;
 margin-right: -4px;
+
 }
 
 QTabBar::tab:first:selected {
@@ -65,67 +67,93 @@ QTabBar::tab:last:selected {
 QToolButton#group_crop_button_{
   background-color: rgba(0, 0, 0, 0);
   border: 1px solid rgba(0, 0, 0, 0);
+  margin: 0 0 0 0;
+  padding: 0 0 0 0;
 }
 QToolButton#group_crop_button_:checked{
   background-color: rgb(233, 111, 53);
   border-radius: 3px;
   border: 1px solid rgb(142, 67, 32);
+  margin: 0 0 0 0;
+  padding: 0 0 0 0;
 }
 
 QToolButton#group_flip_rotate_button_{
   background-color: rgba(0, 0, 0, 0);
   border: 1px solid rgba(0, 0, 0, 0);
+  margin: 0 0 0 0;
+  padding: 0 0 0 0;
 }
 QToolButton#group_flip_rotate_button_:checked{
   background-color: rgb(233, 111, 53);
   border-radius: 3px;
   border: 1px solid rgb(142, 67, 32);
+  margin: 0 0 0 0;
+  padding: 0 0 0 0;
 }
 
 QToolButton#group_new_button_{
   background-color: rgba(0, 0, 0, 0);
   border: 1px solid rgba(0, 0, 0, 0);
+  margin: 0 0 0 0;
+  padding: 0 0 0 0;
 }
 QToolButton#group_new_button_:pressed{
   background-color: rgb(233, 111, 53);
   border-radius: 3px;
   border: 1px solid rgb(142, 67, 32);
+  margin: 0 0 0 0;
+  padding: 0 0 0 0;
 }
 
 QToolButton#group_delete_button_{
   background-color: rgba(0, 0, 0, 0);
   border: 1px solid rgba(0, 0, 0, 0);
+  margin: 0 0 0 0;
+  padding: 0 0 0 0;
 }
 QToolButton#group_delete_button_:checked{
   background-color: rgb(233, 111, 53);
   border-radius: 3px;
   border: 1px solid rgb(142, 67, 32);
+  margin: 0 0 0 0;
+  padding: 0 0 0 0;
 }
 
 
 QToolButton#group_resample_button_{
   background-color: rgba(0, 0, 0, 0);
   border: 1px solid rgba(0, 0, 0, 0);
+  margin: 0 0 0 0;
+  padding: 0 0 0 0;
 }
 QToolButton#group_resample_button_:checked{
   background-color: rgb(233, 111, 53);
   border-radius: 3px;
   border: 1px solid rgb(142, 67, 32);
+  margin: 0 0 0 0;
+  padding: 0 0 0 0;
 }
 
 QToolButton#group_transform_button_{
   background-color: rgba(0, 0, 0, 0);
   border: 1px solid rgba(0, 0, 0, 0);
+  margin: 0 0 0 0;
+  padding: 0 0 0 0;
 }
 QToolButton#group_transform_button_:checked{
   background-color: rgb(233, 111, 53);
   border-radius: 3px;
   border: 1px solid rgb(142, 67, 32);
+  margin: 0 0 0 0;
+  padding: 0 0 0 0;
 }
 
 QToolButton#group_visibility_button_{
   background-color: rgba(0, 0, 0, 0);
   border: 1px solid rgba(0, 0, 0, 0);
+  margin: 0 0 0 0;
+  padding: 0 0 0 0;
 }
 
 
@@ -136,6 +164,8 @@ QPushButton#activate_button_{
   height: 24px;
   text-align: left;
   color: white;
+  margin: 0 0 0 0;
+  padding: 0 0 0 0;
 }
 
 QPushButton#activate_button_:pressed{
@@ -143,6 +173,8 @@ QPushButton#activate_button_:pressed{
   border: none;
   border-color: rgba(0, 0, 0, 0);
   color: gray;
+  margin: 0 0 0 0;
+  padding: 0 0 0 0;
 }
 
 QFrame#group_frame_{
@@ -583,14 +615,14 @@ QWidget#group_tools_{
              <widget class="QToolButton" name="group_delete_button_">
               <property name="minimumSize">
                <size>
-                <width>20</width>
-                <height>20</height>
+                <width>22</width>
+                <height>22</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>20</width>
-                <height>20</height>
+                <width>22</width>
+                <height>22</height>
                </size>
               </property>
               <property name="toolTip">
@@ -613,13 +645,13 @@ QWidget#group_tools_{
              <widget class="QToolButton" name="group_new_button_">
               <property name="minimumSize">
                <size>
-                <width>20</width>
+                <width>22</width>
                 <height>22</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>20</width>
+                <width>22</width>
                 <height>22</height>
                </size>
               </property>
@@ -831,7 +863,7 @@ QWidget#group_tools_{
                <number>8</number>
               </property>
               <item>
-               <widget class="QCheckBox" name="checkBox_2">
+               <widget class="QCheckBox" name="resample_replace_checkBox_">
                 <property name="toolTip">
                  <string>Check this box to replace the current layer with the resampled one</string>
                 </property>
@@ -902,7 +934,7 @@ QWidget#group_tools_{
               </property>
               <property name="font">
                <font>
-                <pointsize>11</pointsize>
+                <pointsize>10</pointsize>
                </font>
               </property>
               <property name="tabPosition">
@@ -915,7 +947,7 @@ QWidget#group_tools_{
                <number>1</number>
               </property>
               <property name="elideMode">
-               <enum>Qt::ElideRight</enum>
+               <enum>Qt::ElideNone</enum>
               </property>
               <widget class="QWidget" name="tab">
                <property name="minimumSize">
@@ -1141,7 +1173,7 @@ QWidget#group_tools_{
                 <number>0</number>
                </property>
                <item>
-                <widget class="QCheckBox" name="checkBox">
+                <widget class="QCheckBox" name="crop_replace_checkBox_">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                    <horstretch>0</horstretch>
@@ -1225,7 +1257,7 @@ QWidget#group_tools_{
               </property>
               <property name="font">
                <font>
-                <pointsize>11</pointsize>
+                <pointsize>10</pointsize>
                </font>
               </property>
               <property name="currentIndex">
@@ -1468,7 +1500,7 @@ QWidget#group_tools_{
               </property>
               <property name="font">
                <font>
-                <pointsize>11</pointsize>
+                <pointsize>10</pointsize>
                </font>
               </property>
               <property name="tabPosition">
@@ -1481,7 +1513,7 @@ QWidget#group_tools_{
                <number>1</number>
               </property>
               <property name="elideMode">
-               <enum>Qt::ElideRight</enum>
+               <enum>Qt::ElideNone</enum>
               </property>
               <widget class="QWidget" name="tab_5">
                <property name="minimumSize">
@@ -1707,7 +1739,7 @@ QWidget#group_tools_{
                 <number>0</number>
                </property>
                <item>
-                <widget class="QCheckBox" name="checkBox_3">
+                <widget class="QCheckBox" name="transform_replace_checkBox_">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                    <horstretch>0</horstretch>

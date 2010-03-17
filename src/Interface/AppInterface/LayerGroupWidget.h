@@ -67,12 +67,15 @@ public Q_SLOTS:
   void show_delete( bool show );
   void show_selection_checkboxes( bool show );
   void enable_delete_button( bool enable );
+
+private Q_SLOTS:
+    void adjust_new_size_labels( double scale_factor );
   
   
   // -- widget internals --
 private:
-  LayerGroupWidgetPrivate* private_;  
-    
+    boost::shared_ptr< LayerGroupWidgetPrivate > private_;
+      
 };
     
 

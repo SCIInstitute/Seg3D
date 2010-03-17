@@ -45,9 +45,9 @@ SliderSpinComboInt::SliderSpinComboInt( QWidget *parent ) :
 {
   buildWidget();
   makeConnections();
-  setRanges( 1, 100 );
+  /*setRanges( 1, 100 );
   setStep( 1 );
-  setCurrentValue( 1 );
+  setCurrentValue( 1 );*/
 }
 
 //  --- function for visually building the widget ---  //

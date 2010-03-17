@@ -85,7 +85,6 @@ public:
   void insert_above_layer( LayerHandle& below_layer, LayerHandle &above_layer );
   
   //Insert Layer default
-  void insert_layer( LayerHandle &layer );
   void process_group_ui( LayerGroupHandle &group );
   
   //Flip or Rotate Layer

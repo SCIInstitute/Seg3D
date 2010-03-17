@@ -36,6 +36,7 @@
 
 // boost includes
 #include <boost/signals2/signal.hpp>
+#include <boost/signals2/connection.hpp>
 
 // Application includes
 #include <Application/State/State.h>
@@ -43,6 +44,29 @@
 
 namespace Seg3D
 {
+
+
+class QtDeleteSlot : public QObject
+{
+  Q_OBJECT
+public:
+
+  QtDeleteSlot( QObject* object, boost::signals2::connection connection ) :
+      QObject( object ), connection_( connection )
+  {
+  }
+
+    virtual ~QtDeleteSlot()
+    {
+       connection_.disconnect();
+    }
+ 
+
+private:
+    
+    boost::signals2::connection connection_; 
+};
+
 
 // QObjects for linking QT signals to state variables
 // QT does *not* support templated classes (the moc does not process it), hence
@@ -59,9 +83,9 @@ class QtSlot : public QObject
 public:
 
   QtSlot( QObject* object, bool blocking = true ) :
-  QObject( object ), blocked_( false ), blocking_( blocking )
+      QObject( object ), blocked_( false ), blocking_( blocking )
   {
-    setObjectName( QString( "AppSlot" ) );
+        setObjectName( QString( "AppSlot" ) );
   }
 
   virtual ~QtSlot()
@@ -132,6 +156,68 @@ public Q_SLOTS:
 private:
   // Function object
   StateBoolHandle state_handle_;
+};
+
+class QtLineEditSlot : public QtSlot
+{
+  Q_OBJECT
+public:
+
+  // Constructor
+  QtLineEditSlot( QLineEdit* parent, StateStringHandle& state_handle, bool blocking = true ) :
+  QtSlot( parent, blocking ), state_handle_( state_handle )
+  {
+    // Qt's connect function
+    connect( parent, SIGNAL( textChanged( QString ) ), this, SLOT( slot( QString ) ) );
+  }
+
+  // Virtual destructor: needed by Qt
+  virtual ~QtLineEditSlot()
+  {
+  }
+
+public Q_SLOTS:
+  // Slot that Qt will call
+  void slot(QString state)
+  {
+      std::string std_state = state.toStdString();
+    if (!blocked_) ActionSet::Dispatch( state_handle_, std_state );
+  }
+
+private:
+  // Function object
+  StateStringHandle state_handle_;
+};
+
+class QtLineEditAliasSlot : public QtSlot
+{
+  Q_OBJECT
+public:
+
+  // Constructor
+  QtLineEditAliasSlot( QLineEdit* parent, StateAliasHandle& state_handle, bool blocking = true ) :
+  QtSlot( parent, blocking ), state_handle_( state_handle )
+  {
+    // Qt's connect function
+    connect( parent, SIGNAL( textChanged( QString ) ), this, SLOT( slot( QString ) ) );
+  }
+
+  // Virtual destructor: needed by Qt
+  virtual ~QtLineEditAliasSlot()
+  {
+  }
+
+public Q_SLOTS:
+  // Slot that Qt will call
+  void slot(QString state)
+  {
+      std::string std_state = state.toStdString();
+    if (!blocked_) ActionSet::Dispatch( state_handle_, std_state );
+  }
+
+private:
+  // Function object
+  StateAliasHandle state_handle_;
 };
 
 class QtSliderSpinComboRangedIntSlot : public QtSlot
@@ -267,12 +353,12 @@ class QtActionToggleSlot : public QObject
 public:
 
   // Constructor
-  QtActionToggleSlot(QAction* parent, StateBoolHandle& state_handle) :
+  QtActionToggleSlot( QAction* parent, StateBoolHandle& state_handle ) :
     QObject(parent),
-    state_handle_(state_handle)
+    state_handle_( state_handle )
   {
     // Qt's connect function
-    connect(parent,SIGNAL(toggled(bool)),this,SLOT(slot(bool)));
+    connect( parent,SIGNAL(  toggled( bool ) ),this,SLOT( slot( bool ) ) );
   }
 
   // Virtual destructor: needed by Qt
@@ -291,40 +377,37 @@ private:
   StateBoolHandle state_handle_;
 };
   
-  class QtToolButtonToggleSlot : public QObject
+class QtToolButtonToggleSlot : public QtSlot
+{
+  Q_OBJECT
+  
+public:
+  
+  // Constructor
+  QtToolButtonToggleSlot(QToolButton* parent, StateBoolHandle& state_handle, bool blocking = true ) :
+  QtSlot( parent, blocking ), state_handle_( state_handle )
   {
-    Q_OBJECT
-    
-  public:
-    
-    // Constructor
-    QtToolButtonToggleSlot(QToolButton* parent, StateBoolHandle& state_handle) :
-    QObject(parent),
-    state_handle_(state_handle)
-    {
-      // Qt's connect function
-      connect(parent,SIGNAL(toggled(bool)),this,SLOT(slot(bool)));
-    }
-    
-    // Virtual destructor: needed by Qt
-    virtual ~QtToolButtonToggleSlot()
-    {}
-    
-    public Q_SLOTS:
-    // Slot that Qt will call
-    void slot(bool state)
-    {
-      ActionSet::Dispatch(state_handle_,state);
-    }
-    
-  private:
-    // Function object
-    StateBoolHandle state_handle_;
-  };
+    // Qt's connect function
+    connect(parent,SIGNAL(toggled(bool)),this,SLOT(slot(bool)));
+  }
+  
+  // Virtual destructor: needed by Qt
+  virtual ~QtToolButtonToggleSlot()
+  {}
+  
+  public Q_SLOTS:
+  // Slot that Qt will call
+  void slot(bool state)
+  {
+    if (!blocked_) ActionSet::Dispatch(state_handle_,state);
+  }
+  
+private:
+  // Function object
+  StateBoolHandle state_handle_;
+};
 
-  
-  
-  
+
 
 class QtToolButtonSlot : public QObject
 {

@@ -43,9 +43,9 @@ SliderSpinComboDouble::SliderSpinComboDouble( QWidget *parent ) :
 {
   buildWidget();
   makeConnections();
-  setRanges( 1, 100 );
-  setStep( 1 );
-  setCurrentValue( 1 );
+  //setRanges( 1, 100 );
+  //setStep( 1 );
+  //setCurrentValue( 1 );
 }
 //  --- End Constructors ---  //
 
@@ -171,7 +171,7 @@ void SliderSpinComboDouble::makeConnections()
   connect( slider, SIGNAL( valueChanged( int ) ), this, SLOT( signalGuiFromSlider( int ) ) );
   connect( slider, SIGNAL( valueChanged( int ) ), this, SLOT( signalGuiFromSliderReleased( int ) ) );
   connect( slider, SIGNAL( sliderReleased() ), this, SLOT( signalGuiFromSliderReleased() ) );
-connect( spinner, SIGNAL( valueChanged( double )), this, SLOT( signalGuiFromSpinner( double )));
+    connect( spinner, SIGNAL( valueChanged( double )), this, SLOT( signalGuiFromSpinner( double )));
 } // end makeConnections
 
 
