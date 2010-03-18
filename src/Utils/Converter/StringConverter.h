@@ -74,7 +74,8 @@ std::string export_to_string(const unsigned int& value);
 std::string export_to_string( const long& value );
 std::string export_to_string(const unsigned long& value);
 
-std::string export_to_string( const size_t& value );
+std::string export_to_string( const long long& value );
+std::string export_to_string( const unsigned long long& value );
 
 std::string export_to_string( const float& value );
 std::string export_to_string( const double& value );

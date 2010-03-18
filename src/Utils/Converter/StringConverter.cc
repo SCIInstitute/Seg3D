@@ -78,7 +78,12 @@ std::string export_to_string(const unsigned long& value)
   return to_string(value);
 }
 
-std::string export_to_string( const size_t& value )
+std::string export_to_string( const long long& value )
+{
+  return to_string( value );
+}
+
+std::string export_to_string( const unsigned long long& value )
 {
   return to_string( value );
 }
