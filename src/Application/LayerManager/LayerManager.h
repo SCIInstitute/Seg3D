@@ -71,21 +71,31 @@ private:
   
 public:
   typedef std::list < LayerGroupHandle > group_handle_list_type;
-  group_handle_list_type group_handle_list_;
-  LayerHandle active_layer_;
+  
+  // Accessor Functions
+public:
+    // Functions for getting a copy of the Layers and Groups with the proper locking
   void return_group_vector( std::vector< LayerGroupHandle > &vector_of_groups );
+  void return_layers_vector( std::vector< std::string > &vector_of_layers );
+  
   LayerGroupHandle check_for_group( std::string group_id );
+  LayerGroupWeakHandle get_active_group();
+  LayerHandle get_active_layer()
+    {
+        return active_layer_;
+    }
   
-  
+  // Action Functions
 public:
   bool insert_layer( LayerHandle layer );
   bool insert_layer( LayerGroupHandle group );
-  
-  void insert_layer_top( LayerHandle layer );
-  void set_active_layer( LayerHandle layer );
-  LayerHandle get_active_layer();
-  LayerGroupWeakHandle get_active_group();
   void delete_layer( LayerHandle layer );
+  
+
+
+  void set_active_layer( LayerHandle layer );
+  
+  
   
   friend class ActionInsertLayer;
 
@@ -93,6 +103,7 @@ public:
   // Take an atomic snapshot of visual properties of layers for rendering in the specified viewer
   LayerSceneHandle compose_layer_scene( size_t viewer_id );
   
+  // Typedef's for the Mutex
 public: 
   typedef boost::recursive_mutex mutex_type;
   typedef boost::unique_lock< mutex_type > lock_type;
@@ -106,6 +117,9 @@ public:
   // -- Signal/Slots --
   typedef boost::signals2::signal< void( LayerHandle ) > layer_signal_type;
   typedef boost::signals2::signal< void( LayerGroupHandle ) > group_signal_type;
+  typedef boost::signals2::signal< void() > signal_type;
+  
+  signal_type connect_layers_changed_signal_;
   
   // ACTIVE_LAYER_CHANGED_SIGNAL:
   // This signal is triggered after the active layer is changed
@@ -115,6 +129,8 @@ public:
   // This signal is triggered after a layer has been inserted
   layer_signal_type layer_inserted_signal_;
   
+  // LAYER_DELETED_SIGNAL:
+  // This signal is triggered after a layer has been deleted
   layer_signal_type layer_deleted_signal_;
   
   // This signal is triggered when the groups layers have changed
@@ -129,6 +145,11 @@ private:
   // mutex for the group_handle_list
   LayerGroupHandle create_group( const Utils::GridTransform& ) const;
   mutex_type group_handle_list_mutex_; 
+  
+  group_handle_list_type group_handle_list_;
+  
+  LayerHandle active_layer_;
+  LayerGroupHandle active_group_;
     
 };
 

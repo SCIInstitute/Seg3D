@@ -29,12 +29,12 @@
 #include <Application/Application/Application.h>
 #include <Application/Interface/Interface.h>
 
-#include <Boost/lexical_cast.hpp>
+#include <boost/lexical_cast.hpp>
 #include <vector>
 
 #include <Application/LayerManager/Actions/ActionInsertLayer.h>
 #include <Application/LayerManager/LayerManager.h>
-#include <Application/Layermanager/LayerScene.h>
+#include <Application/LayerManager/LayerScene.h>
 
 
 #include <Application/Layer/MaskLayer.h>
@@ -86,6 +86,7 @@ bool LayerManager::insert_layer( LayerHandle layer )
       
       layer_inserted_signal_( layer );
       group_layers_changed_signal_( ( *it ) );
+      connect_layers_changed_signal_();
       return true;
     }
   }
@@ -100,6 +101,7 @@ bool LayerManager::insert_layer( LayerHandle layer )
   // Send a signal alerting the UI that we have inserted a layer
   layer_inserted_signal_( layer );
   group_layers_changed_signal_( new_group );
+  connect_layers_changed_signal_();
 
   return true;
 }
@@ -136,10 +138,22 @@ void LayerManager::return_group_vector( std::vector< LayerGroupHandle > &vector_
     vector_of_groups.push_back( *i );
   }
 }
-  
-void LayerManager::insert_layer_top( LayerHandle layer )
+
+
+void LayerManager::return_layers_vector( std::vector< std::string > &vector_of_layers )
 {
-  
+    lock_type lock( group_handle_list_mutex_ );
+    
+  for( group_handle_list_type::iterator i = group_handle_list_.begin(); 
+    i != group_handle_list_.end(); ++i )
+  {
+      for( layer_list_type::iterator j = ( *i )->layer_list_.begin(); 
+    j != ( *i )->layer_list_.end(); ++j )
+      {
+          vector_of_layers.push_back( (*j)->name_state_->get() );
+      }
+  }
+
 }
 
 void LayerManager::set_active_layer( LayerHandle layer )
@@ -151,15 +165,14 @@ void LayerManager::set_active_layer( LayerHandle layer )
 void LayerManager::delete_layer( LayerHandle layer )
 {
   LayerGroupHandle group = layer->get_layer_group();
-  if ( group ){
+  if ( group )
+  {
     group->delete_layer( layer );
   }
+  connect_layers_changed_signal_();
 } // end delete_layer
 
-LayerHandle LayerManager::get_active_layer()
-{
-  return active_layer_;
-}
+
 
 LayerGroupWeakHandle LayerManager::get_active_group()
 {
