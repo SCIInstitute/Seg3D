@@ -59,11 +59,8 @@ public:
   virtual bool build_widget( QFrame* frame );
 
 private:
-  AnisotropicDiffusionFilterInterfacePrivate* private_;
-  SliderSpinComboInt *iterationsAdjuster;
-  SliderSpinComboInt *stepAdjuster;
-  SliderSpinComboDouble *conductanceAdjuster;
-
+  boost::shared_ptr< AnisotropicDiffusionFilterInterfacePrivate > private_;
+  
 };
 
 } // namespace Seg3D

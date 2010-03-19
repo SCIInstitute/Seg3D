@@ -62,6 +62,9 @@ public:
   // Connect a SliderSpinCombo to StateRangedDoubleValue
   static bool Connect( SliderSpinComboDouble* sscombo, StateRangedDoubleHandle& state_handle );
 
+  // Connect a QDoubleSpinBox to a StateDoubleValue
+  static bool Connect( QDoubleSpinBox* qdoublespinbox, StateDoubleHandle& state_handle );
+  
   // Connect a QComboBox to StateValue<int>
   static bool Connect( QComboBox* qcombobox, StateOptionHandle& state_handle );
 

@@ -54,7 +54,7 @@ public:
   virtual bool build_widget( QFrame* frame );
 
 private:
-  PolyLineToolInterfacePrivate* private_;
+  boost::shared_ptr< PolyLineToolInterfacePrivate > private_;
 
 };
 

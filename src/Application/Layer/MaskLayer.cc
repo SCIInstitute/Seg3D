@@ -53,6 +53,8 @@ MaskLayer::MaskLayer( const std::string& name, const Utils::MaskVolumeHandle& vo
 
   // == Whether the isosurface is shown in the volume display ==
   add_state( "isosurface", show_isosurface_state_, false );
+  
+  
 }
 
 MaskLayer::~MaskLayer()

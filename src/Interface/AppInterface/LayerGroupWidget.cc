@@ -55,23 +55,15 @@ class LayerGroupWidgetPrivate
 public:
   Ui::LayerGroupWidget ui_;
   
-  SliderSpinComboDouble* x_adjuster_crop;
-  SliderSpinComboDouble* y_adjuster_crop;
-  SliderSpinComboDouble* z_adjuster_crop;
+  SliderSpinComboDouble* center_x_adjuster_crop;
+  SliderSpinComboDouble* center_y_adjuster_crop;
+  SliderSpinComboDouble* center_z_adjuster_crop;
   
-  SliderSpinComboDouble* height_adjuster_crop;
-  SliderSpinComboDouble* width_adjuster_crop;
-  SliderSpinComboDouble* depth_adjuster_crop;
+  SliderSpinComboDouble* size_width_adjuster_crop;
+  SliderSpinComboDouble* size_height_adjuster_crop;
+  SliderSpinComboDouble* size_depth_adjuster_crop;
   
-  SliderSpinComboDouble* x_adjuster_transform;
-  SliderSpinComboDouble* y_adjuster_transform;
-  SliderSpinComboDouble* z_adjuster_transform;
-  
-  SliderSpinComboDouble* height_adjuster_transform;
-  SliderSpinComboDouble* width_adjuster_transform;
-  SliderSpinComboDouble* depth_adjuster_transform;
-  
-  SliderSpinComboDouble* scale_adjuster;
+    SliderSpinComboDouble* scale_adjuster;
   
   std::string group_id_;
   Utils::GridTransform grid_transform_;
@@ -103,85 +95,43 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
   this->private_->ui_.transform_->hide();
   this->private_->ui_.delete_->hide();
   this->private_->ui_.delete_button_->setEnabled( false );
-  this->private_->ui_.open_button_->setChecked( true );
+  //this->private_->ui_.open_button_->setChecked( true );
   
   // add the slider spinner combo's for the crop
-  this->private_->x_adjuster_crop = new SliderSpinComboDouble( this->private_->ui_.widget );
-  this->private_->ui_.horizontalLayout_11->addWidget( this->private_->x_adjuster_crop );
-  this->private_->x_adjuster_crop->setObjectName( QString::fromUtf8( "x_adjuster_crop" ) );
+  this->private_->center_x_adjuster_crop = new SliderSpinComboDouble( this->private_->ui_.widget );
+  this->private_->ui_.horizontalLayout_11->addWidget( this->private_->center_x_adjuster_crop );
+  this->private_->center_x_adjuster_crop->setObjectName( QString::fromUtf8( "center_x_adjuster_crop" ) );
   
-  this->private_->y_adjuster_crop = new SliderSpinComboDouble( this->private_->ui_.widget_2 );
-  this->private_->ui_.horizontalLayout_12->addWidget( this->private_->y_adjuster_crop );
-  this->private_->y_adjuster_crop->setObjectName( QString::fromUtf8( "y_adjuster_crop" ) );
+  this->private_->center_y_adjuster_crop = new SliderSpinComboDouble( this->private_->ui_.widget_2 );
+  this->private_->ui_.horizontalLayout_12->addWidget( this->private_->center_y_adjuster_crop );
+  this->private_->center_y_adjuster_crop->setObjectName( QString::fromUtf8( "center_y_adjuster_crop" ) );
   
-  this->private_->z_adjuster_crop = new SliderSpinComboDouble( this->private_->ui_.widget_3 );
-  this->private_->ui_.horizontalLayout_14->addWidget( this->private_->z_adjuster_crop );
-  this->private_->z_adjuster_crop->setObjectName( QString::fromUtf8( "z_adjuster_crop" ) );
+  this->private_->center_z_adjuster_crop = new SliderSpinComboDouble( this->private_->ui_.widget_3 );
+  this->private_->ui_.horizontalLayout_14->addWidget( this->private_->center_z_adjuster_crop );
+  this->private_->center_z_adjuster_crop->setObjectName( QString::fromUtf8( "center_z_adjuster_crop" ) );
   
-  this->private_->height_adjuster_crop = new SliderSpinComboDouble( this->private_->ui_.widget_4 );
-  this->private_->ui_.horizontalLayout_7->addWidget( this->private_->height_adjuster_crop );
-  this->private_->height_adjuster_crop->setObjectName( QString::fromUtf8( "height_adjuster_crop" ) );
+  this->private_->size_height_adjuster_crop = new SliderSpinComboDouble( this->private_->ui_.widget_4 );
+  this->private_->ui_.horizontalLayout_7->addWidget( this->private_->size_height_adjuster_crop );
+  this->private_->size_height_adjuster_crop->setObjectName( QString::fromUtf8( "size_height_adjuster_crop" ) );
   
-  this->private_->width_adjuster_crop = new SliderSpinComboDouble( this->private_->ui_.widget_5 );
-  this->private_->ui_.horizontalLayout_9->addWidget( this->private_->width_adjuster_crop );
-  this->private_->width_adjuster_crop->setObjectName( QString::fromUtf8( "width_adjuster_crop" ) );
+  this->private_->size_width_adjuster_crop = new SliderSpinComboDouble( this->private_->ui_.widget_5 );
+  this->private_->ui_.horizontalLayout_9->addWidget( this->private_->size_width_adjuster_crop );
+  this->private_->size_width_adjuster_crop->setObjectName( QString::fromUtf8( "size_width_adjuster_crop" ) );
   
-  this->private_->depth_adjuster_crop = new SliderSpinComboDouble( this->private_->ui_.widget_6 );
-  this->private_->ui_.horizontalLayout_10->addWidget( this->private_->depth_adjuster_crop );
-  this->private_->depth_adjuster_crop->setObjectName( QString::fromUtf8( "depth_adjuster_crop" ) );
-  
-  // add the slider spinner combo's for the tranform
-  this->private_->x_adjuster_transform = new SliderSpinComboDouble( this->private_->ui_.widget_8 );
-  this->private_->ui_.horizontalLayout_16->addWidget( this->private_->x_adjuster_transform );
-  this->private_->x_adjuster_transform->setObjectName( QString::fromUtf8( "x_adjuster_transform" ) );
-  
-  this->private_->y_adjuster_transform = new SliderSpinComboDouble( this->private_->ui_.widget_9 );
-  this->private_->ui_.horizontalLayout_17->addWidget( this->private_->y_adjuster_transform );
-  this->private_->y_adjuster_transform->setObjectName( QString::fromUtf8( "y_adjuster_transform" ) );
-  
-  this->private_->z_adjuster_transform = new SliderSpinComboDouble( this->private_->ui_.widget_10 );
-  this->private_->ui_.horizontalLayout_18->addWidget( this->private_->z_adjuster_transform );
-  this->private_->z_adjuster_transform->setObjectName( QString::fromUtf8( "z_adjuster_transform" ) );
-  
-  this->private_->height_adjuster_transform = new SliderSpinComboDouble( this->private_->ui_.widget_12 );
-  this->private_->ui_.horizontalLayout_20->addWidget( this->private_->height_adjuster_transform );
-  this->private_->height_adjuster_transform->setObjectName( QString::fromUtf8( "height_adjuster_transform" ) );
-  
-  this->private_->width_adjuster_transform = new SliderSpinComboDouble( this->private_->ui_.widget_11 );
-  this->private_->ui_.horizontalLayout_19->addWidget( this->private_->width_adjuster_transform );
-  this->private_->width_adjuster_transform->setObjectName( QString::fromUtf8( "width_adjuster_transform" ) );
-  
-  this->private_->depth_adjuster_transform = new SliderSpinComboDouble( this->private_->ui_.widget_13 );
-  this->private_->ui_.horizontalLayout_21->addWidget( this->private_->depth_adjuster_transform );
-  this->private_->depth_adjuster_transform->setObjectName( QString::fromUtf8( "depth_adjuster_transform" ) );
+  this->private_->size_depth_adjuster_crop = new SliderSpinComboDouble( this->private_->ui_.widget_6 );
+  this->private_->ui_.horizontalLayout_10->addWidget( this->private_->size_depth_adjuster_crop );
+  this->private_->size_depth_adjuster_crop->setObjectName( QString::fromUtf8( "size_depth_adjuster_crop" ) );
   
   this->private_->scale_adjuster = new SliderSpinComboDouble( this->private_->ui_.widget_7 );
   this->private_->ui_.horizontalLayout_15->addWidget( this->private_->scale_adjuster );
   this->private_->scale_adjuster->setObjectName( QString::fromUtf8( "scale_adjuster" ) );
   
+  // set some local values for the current size
   this->private_->current_width = group->get_grid_transform().nx();
   this->private_->current_height = group->get_grid_transform().ny();
   this->private_->current_depth = group->get_grid_transform().nz();
   
-  QtBridge::Connect( this->private_->ui_.open_button_, group->show_layers_state_ );
-  QtBridge::Connect( this->private_->ui_.group_visibility_button_, group->visibility_state_ );
-  
-  QtBridge::Connect( this->private_->scale_adjuster, group->resample_factor_state_ );
-  QtBridge::Connect( this->private_->ui_.resample_replace_checkBox_, group->resample_replace_state_ );
-  
-  QtBridge::Connect( this->private_->x_adjuster_transform, group->transform_origin_x_state_ );
-  QtBridge::Connect( this->private_->y_adjuster_transform, group->transform_origin_y_state_ );
-  QtBridge::Connect( this->private_->z_adjuster_transform, group->transform_origin_z_state_ );
-  
-  QtBridge::Connect( this->private_->height_adjuster_transform, group->transform_size_x_state_ );
-  QtBridge::Connect( this->private_->width_adjuster_transform, group->transform_size_y_state_ );
-  QtBridge::Connect( this->private_->depth_adjuster_transform, group->transform_size_z_state_ );
-  
-  
-  
-  
-  
-//  connect the signals and slots
+  //  connect the gui signals and slots
     connect( this->private_->scale_adjuster, SIGNAL( valueAdjustedContinuously( double ) ), this, SLOT( adjust_new_size_labels( double )) );
   connect( this->private_->ui_.open_button_, SIGNAL( toggled( bool ) ), this, SLOT( show_layers( bool )) );
   connect( this->private_->ui_.group_resample_button_, SIGNAL( clicked( bool ) ), this, SLOT( show_resample( bool )) );
@@ -190,7 +140,7 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
   connect( this->private_->ui_.group_flip_rotate_button_, SIGNAL( clicked ( bool ) ), this, SLOT( show_flip_rotate( bool )) );
   connect( this->private_->ui_.group_delete_button_, SIGNAL( clicked ( bool ) ), this, SLOT( show_delete( bool )) );
   connect( this->private_->ui_.confirm_delete_checkbox_, SIGNAL( clicked ( bool ) ), this, SLOT( enable_delete_button( bool )) );
-//  
+
   
   // Add all the layers to the group
   layer_list_type temp_layer_list = group->get_layer_list();
@@ -199,50 +149,93 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
     this->add_layer(( *i ));
   }
   
-  //Set the defaulf values for the Group
-      // --- TRANSFORM ---
+  //Set the defaulf values for the Group UI and make the connections to the state engine
+      // --- GENERAL ---
+      this->private_->ui_.open_button_->setChecked( group->show_layers_state_.get() );
+      this->private_->ui_.group_visibility_button_->setChecked(group->visibility_state_.get() );
+      
+      QtBridge::Connect( this->private_->ui_.open_button_, group->show_layers_state_ );
+      QtBridge::Connect( this->private_->ui_.group_visibility_button_, group->visibility_state_ );
+  
+  
+      // --- RESAMPLE ---
+      // = set the default values
       this->private_->ui_.x_axis_label_current_->setText( QString::fromUtf8("X: ") + QString::number(group->get_grid_transform().nx()) );
       this->private_->ui_.y_axis_label_current_->setText( QString::fromUtf8("Y: ") + QString::number(group->get_grid_transform().ny()) );
       this->private_->ui_.z_axis_label_current_->setText( QString::fromUtf8("Z: ") + QString::number(group->get_grid_transform().nz()) );
+      
       this->private_->ui_.x_axis_label_new_->setText( QString::fromUtf8("X: ") + QString::number(group->get_grid_transform().nx()) );
       this->private_->ui_.y_axis_label_new_->setText( QString::fromUtf8("Y: ") + QString::number(group->get_grid_transform().ny()) );
       this->private_->ui_.z_axis_label_new_->setText( QString::fromUtf8("Z: ") + QString::number(group->get_grid_transform().nz()) );
+      
       QFont font;
         font.setPointSize(8);
         this->private_->ui_.x_axis_label_current_->setFont(font);
         this->private_->ui_.y_axis_label_current_->setFont(font);
         this->private_->ui_.z_axis_label_current_->setFont(font);
+        
         font.setBold(true);
         this->private_->ui_.x_axis_label_new_->setFont(font);
         this->private_->ui_.y_axis_label_new_->setFont(font);
         this->private_->ui_.z_axis_label_new_->setFont(font);
+        
         this->private_->ui_.resample_replace_checkBox_->setChecked( group->resample_replace_state_->get() );
         
+         // = make the connections
+        QtBridge::Connect( this->private_->scale_adjuster, group->resample_factor_state_ );
+      QtBridge::Connect( this->private_->ui_.resample_replace_checkBox_, group->resample_replace_state_ );
+        
+        
         // --- CROP ---
-        this->private_->height_adjuster_crop->setRanges( 0, group->get_grid_transform().nx() );
-        this->private_->width_adjuster_crop->setRanges( 0, group->get_grid_transform().ny() );
-        this->private_->depth_adjuster_crop->setRanges( 0, group->get_grid_transform().nz() );
+        // = set the default values
+        this->private_->size_width_adjuster_crop->setRanges( 0, group->get_grid_transform().nx() );
+        this->private_->size_height_adjuster_crop->setRanges( 0, group->get_grid_transform().ny() );
+        this->private_->size_depth_adjuster_crop->setRanges( 0, group->get_grid_transform().nz() );
         
-        this->private_->height_adjuster_crop->setCurrentValue( group->get_grid_transform().nx() );
-        this->private_->width_adjuster_crop->setCurrentValue( group->get_grid_transform().ny() );
-        this->private_->depth_adjuster_crop->setCurrentValue( group->get_grid_transform().nz() );
+        this->private_->size_width_adjuster_crop->setCurrentValue( group->get_grid_transform().nx() );
+        this->private_->size_height_adjuster_crop->setCurrentValue( group->get_grid_transform().ny() );
+        this->private_->size_depth_adjuster_crop->setCurrentValue( group->get_grid_transform().nz() );
 
-        this->private_->x_adjuster_crop->setRanges( 0, group->get_grid_transform().nx() );
-        this->private_->y_adjuster_crop->setRanges( 0, group->get_grid_transform().ny() );
-        this->private_->z_adjuster_crop->setRanges( 0, group->get_grid_transform().nz() );
+        this->private_->center_x_adjuster_crop->setRanges( 0, group->get_grid_transform().nx() );
+        this->private_->center_y_adjuster_crop->setRanges( 0, group->get_grid_transform().ny() );
+        this->private_->center_z_adjuster_crop->setRanges( 0, group->get_grid_transform().nz() );
         
-        this->private_->x_adjuster_crop->setCurrentValue( 0 );
-        this->private_->y_adjuster_crop->setCurrentValue( 0 );
-        this->private_->z_adjuster_crop->setCurrentValue( 0 );
+        this->private_->center_x_adjuster_crop->setCurrentValue( 0 );
+        this->private_->center_y_adjuster_crop->setCurrentValue( 0 );
+        this->private_->center_z_adjuster_crop->setCurrentValue( 0 );
         
         this->private_->ui_.crop_replace_checkBox_->setChecked( group->crop_replace_state_->get() );
         
+        // = make the connections
+        QtBridge::Connect( this->private_->size_width_adjuster_crop, group->crop_size_width_state_ );
+        QtBridge::Connect( this->private_->size_height_adjuster_crop, group->crop_size_height_state_ );
+        QtBridge::Connect( this->private_->size_depth_adjuster_crop, group->crop_size_depth_state_ );
+        
+        QtBridge::Connect( this->private_->center_x_adjuster_crop, group->crop_center_x_state_ );
+        QtBridge::Connect( this->private_->center_y_adjuster_crop, group->crop_center_y_state_ );
+        QtBridge::Connect( this->private_->center_z_adjuster_crop, group->crop_center_z_state_ );
+        
+        QtBridge::Connect( this->private_->ui_.crop_replace_checkBox_, group->crop_replace_state_ );
+        
+        
         // --- TRANSFORM ---
-        this->private_->height_adjuster_transform->setCurrentValue( group->get_grid_transform().nx() );
-        this->private_->width_adjuster_transform->setCurrentValue( group->get_grid_transform().ny() );
-        this->private_->depth_adjuster_transform->setCurrentValue( group->get_grid_transform().nz() );
+        // = set the default values
+        this->private_->ui_.spacing_x_spinbox_->setValue( group->get_grid_transform().nx() );
+        this->private_->ui_.spacing_y_spinbox_->setValue( group->get_grid_transform().ny() );
+        this->private_->ui_.spacing_z_spinbox_->setValue( group->get_grid_transform().nz() );
+        
         this->private_->ui_.transform_replace_checkBox_->setChecked( group->resample_replace_state_->get() );
         
+        // = make the connections
+      QtBridge::Connect( this->private_->ui_.origin_x_spinbox_, group->transform_origin_x_state_ );
+      QtBridge::Connect( this->private_->ui_.origin_y_spinbox_, group->transform_origin_y_state_ );
+      QtBridge::Connect( this->private_->ui_.origin_z_spinbox_, group->transform_origin_z_state_ );
+      
+      QtBridge::Connect( this->private_->ui_.spacing_x_spinbox_, group->transform_spacing_x_state_ );
+      QtBridge::Connect( this->private_->ui_.spacing_y_spinbox_, group->transform_spacing_y_state_ );
+      QtBridge::Connect( this->private_->ui_.spacing_z_spinbox_, group->transform_spacing_z_state_ );
+        
+        QtBridge::Connect( this->private_->ui_.transform_replace_checkBox_, group->transform_replace_state_ );
         
         
 
@@ -290,10 +283,12 @@ void LayerGroupWidget::show_layers( bool show )
   if (show) 
   {
     this->private_->ui_.group_frame_->show();
+    this->private_->ui_.group_tools_->show();
   }
   else
   {
     this->private_->ui_.group_frame_->hide();
+    this->private_->ui_.group_tools_->hide();
   }
 }
 

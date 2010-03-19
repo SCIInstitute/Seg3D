@@ -41,27 +41,29 @@ LayerGroup::LayerGroup( Utils::GridTransform grid_transform ) :
   add_state( "mode", edit_mode_state_, "none", "none|TRANSFORM|COPY|RESAMPLE" );
 
     // = Transformation menu state variables =
-  add_state( "origin_x", transform_origin_x_state_, 0.0f, 00.0f, 1000.0f, 1.0f );
-  add_state( "origin_y", transform_origin_y_state_ , 0.0f, 00.0f, 1000.0f, 1.0f );
-  add_state( "origin_z", transform_origin_z_state_ , 0.0f, 00.0f, 1000.0f, 1.0f );
-  add_state( "size_x", transform_size_x_state_, 0.0f, 00.0f, 1000.0f, 1.0f );
-  add_state( "size_y", transform_size_y_state_, 0.0f, 00.0f, 1000.0f, 1.0f );
-  add_state( "size_z", transform_size_z_state_, 0.0f, 00.0f, 1000.0f, 1.0f );
+  add_state( "transform_origin_x", transform_origin_x_state_, 0.0f );
+  add_state( "transform_origin_y", transform_origin_y_state_ , 0.0f );
+  add_state( "transform_origin_z", transform_origin_z_state_ , 0.0f );
+  add_state( "transform_spacing_x", transform_spacing_x_state_, 1.0f );
+  add_state( "transform_spacing_y", transform_spacing_y_state_, 1.0f );
+  add_state( "transform_spacing_z", transform_spacing_z_state_, 1.0f );
   add_state( "transform_replace", transform_replace_state_, false );
   
       // = Set Crop menu state variables =
-  add_state( "min_x", crop_min_x_state_, 0.0f, 00.0f, 1000.0f, 1.0f );
-  add_state( "min_y", crop_min_y_state_, 0.0f, 00.0f, 1000.0f, 1.0f );
-  add_state( "min_z", crop_min_z_state_, 0.0f, 00.0f, 1000.0f, 1.0f );
-  add_state( "max_x", crop_max_x_state_, 0.0f, 00.0f, 1000.0f, 1.0f );
-  add_state( "max_y", crop_max_y_state_, 0.0f, 00.0f, 1000.0f, 1.0f );
-  add_state( "max_z", crop_max_z_state_, 0.0f, 00.0f, 1000.0f, 1.0f );
+  add_state( "crop_center_x", crop_center_x_state_, 0.0f, 00.0f, 1000.0f, 1.0f );
+  add_state( "crop_center_y", crop_center_y_state_, 0.0f, 00.0f, 1000.0f, 1.0f );
+  add_state( "crop_center_z", crop_center_z_state_, 0.0f, 00.0f, 1000.0f, 1.0f );
+  add_state( "crop_size_x", crop_size_width_state_, 0.0f, 00.0f, 1000.0f, 1.0f );
+  add_state( "crop_size_y", crop_size_height_state_, 0.0f, 00.0f, 1000.0f, 1.0f );
+  add_state( "crop_size_z", crop_size_depth_state_, 0.0f, 00.0f, 1000.0f, 1.0f );
   add_state( "crop_replace", crop_replace_state_, false );
   
   
   // = Set Resample state variables =
-  add_state( "factor", resample_factor_state_, 0.0f, 00.0f, 01.0f, .01f );
+  add_state( "resample_factor", resample_factor_state_, 0.0f, 00.0f, 01.0f, .01f );
   add_state( "resample_replace", resample_replace_state_, false );
+  
+  // = General state settings
   add_state( "show_layers", show_layers_state_, true );
   add_state( "visibility", visibility_state_, true );
   

@@ -50,6 +50,7 @@ DataLayer::DataLayer( const std::string& name, const Utils::DataVolumeHandle& vo
 
   // == Is this volume rendered through the volume renderer ==
   add_state( "volume_rendered", volume_rendered_state_, false );
+  
 }
 
 DataLayer::~DataLayer()

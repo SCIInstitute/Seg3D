@@ -68,30 +68,38 @@ bool PaintToolInterface::build_widget( QFrame* frame )
   //Step 1 - build the Qt GUI Widget
   private_->ui_.setupUi( frame );
 
-  //Add the SliderSpinCombos
-  private_->brush_radius_ = new SliderSpinComboInt();
-  private_->ui_.verticalLayout->addWidget( private_->brush_radius_ );
+      //Add the SliderSpinCombos
+      private_->brush_radius_ = new SliderSpinComboInt();
+      private_->ui_.verticalLayout->addWidget( private_->brush_radius_ );
 
-  private_->upper_threshold_ = new SliderSpinComboDouble();
-  private_->ui_.upperHLayout_bottom->addWidget( private_->upper_threshold_ );
+      private_->upper_threshold_ = new SliderSpinComboDouble();
+      private_->ui_.upperHLayout_bottom->addWidget( private_->upper_threshold_ );
 
-  private_->lower_threshold_ = new SliderSpinComboDouble();
-  private_->ui_.lowerHLayout_bottom->addWidget( private_->lower_threshold_ );
+      private_->lower_threshold_ = new SliderSpinComboDouble();
+      private_->ui_.lowerHLayout_bottom->addWidget( private_->lower_threshold_ );
 
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
   PaintTool* tool = dynamic_cast< PaintTool* > ( base_tool_.get() );
   
-  //Step 3 - connect the gui to the tool through the QtBridge
-  QtBridge::Connect( private_->ui_.targetComboBox, tool->target_layer_state_ );
-  QtBridge::Connect( private_->ui_.maskComboBox, tool->mask_layer_state_ );
-  QtBridge::Connect( private_->brush_radius_, tool->brush_radius_state_ );
-  QtBridge::Connect( private_->upper_threshold_, tool->upper_threshold_state_ );
-  QtBridge::Connect( private_->lower_threshold_, tool->lower_threshold_state_ );
-  QtBridge::Connect( private_->ui_.eraseCheckBox, tool->erase_state_ );
+  //Step 3 - set the values for the tool ui from the state engine
   
-  
-  //Step 4 - set the values for the tool ui from the state engine
+      //set default falues for the target option list 
+      std::vector< std::string > temp_option_list = tool->target_layer_state_->option_list();
+      for( size_t i = 0; i < temp_option_list.size(); i++)
+      {   
+          this->private_->ui_.targetComboBox->addItem( QString::fromStdString( temp_option_list[i] ) );
+      } 
+        this->private_->ui_.targetComboBox->setCurrentIndex(tool->target_layer_state_->index());
+      
+      //set default falues for the target option list 
+      temp_option_list = tool->mask_layer_state_->option_list();
+      for( size_t i = 0; i < temp_option_list.size(); i++)
+      {   
+          this->private_->ui_.maskComboBox->addItem( QString::fromStdString( temp_option_list[i] ) );
+      } 
+        this->private_->ui_.maskComboBox->setCurrentIndex(tool->target_layer_state_->index());
+      
       
       // set the defaults for the paint brush size
       int brush_min = 0; 
@@ -102,20 +110,30 @@ bool PaintToolInterface::build_widget( QFrame* frame )
         
         // set the defaults for the upper threshold
         double upper_threshold_min = 0.0; 
-      double upper_threshold_max = 0.0;
+      double upper_threshold_max = 1.0;
       tool->upper_threshold_state_->get_range( upper_threshold_min, upper_threshold_max );
         private_->upper_threshold_->setRanges( upper_threshold_min, upper_threshold_max );
         private_->upper_threshold_->setCurrentValue( tool->upper_threshold_state_->get() );
         
         // set the defaults for the lower threshold
         double lower_threshold_min = 0.0; 
-      double lower_threshold_max = 0.0;
+      double lower_threshold_max = 1.0;
       tool->lower_threshold_state_->get_range( lower_threshold_min, lower_threshold_max );
         private_->lower_threshold_->setRanges( lower_threshold_min, lower_threshold_max );
         private_->lower_threshold_->setCurrentValue( tool->lower_threshold_state_->get() );
         
+        // set the default setchecked state
         private_->ui_.eraseCheckBox->setChecked( tool->erase_state_->get() );
-    
+  
+  //Step 4 - connect the gui to the tool through the QtBridge
+  QtBridge::Connect( private_->ui_.targetComboBox, tool->target_layer_state_ );
+  QtBridge::Connect( private_->ui_.maskComboBox, tool->mask_layer_state_ );
+  QtBridge::Connect( private_->brush_radius_, tool->brush_radius_state_ );
+  QtBridge::Connect( private_->upper_threshold_, tool->upper_threshold_state_ );
+  QtBridge::Connect( private_->lower_threshold_, tool->lower_threshold_state_ );
+  QtBridge::Connect( private_->ui_.eraseCheckBox, tool->erase_state_ );
+  
+  
     //Send a message to the log that we have finised with building the Paint Brush Interface
   SCI_LOG_MESSAGE("Finished building a Paint Brush Interface");
 

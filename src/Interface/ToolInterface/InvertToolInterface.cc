@@ -62,20 +62,29 @@ InvertToolInterface::~InvertToolInterface()
 bool InvertToolInterface::build_widget( QFrame* frame )
 {
   //Step 1 - build the Qt GUI Widget
-  private_->ui_.setupUi( frame );
+  this->private_->ui_.setupUi( frame );
 
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
   InvertTool* tool = dynamic_cast< InvertTool* > ( base_tool_.get() );
+  
+  //Step 3 - set the default values from the state variables
 
-  //Step 3 - connect the gui to the tool through the QtBridge
+        //set default falues for the target option list 
+      std::vector< std::string > temp_option_list = tool->target_layer_state_->option_list();
+      for( size_t i = 0; i < temp_option_list.size(); i++)
+      {   
+          this->private_->ui_.targetComboBox->addItem( QString::fromStdString( temp_option_list[i] ) );
+      } 
+        this->private_->ui_.targetComboBox->setCurrentIndex(tool->target_layer_state_->index());
+        
+        //set the default replace checkbox value
+        this->private_->ui_.replaceCheckBox->setChecked(tool->replace_state_);
+  
+  //Step 4 - connect the gui to the tool through the QtBridge
   QtBridge::Connect( private_->ui_.replaceCheckBox, tool->replace_state_ );
   QtBridge::Connect( private_->ui_.targetComboBox, tool->target_layer_state_ );
 
-  //TEST CODE
-  private_->ui_.targetComboBox->addItem( QString::fromUtf8( "firstitem" ) );
-  private_->ui_.targetComboBox->addItem( QString::fromUtf8( "seconditem" ) );
-  private_->ui_.targetComboBox->addItem( QString::fromUtf8( "thirditem" ) );
 
   //Send a message to the log that we have finised with building the Invert Tool Interface
   SCI_LOG_MESSAGE("Finished building an Invert Tool Interface");

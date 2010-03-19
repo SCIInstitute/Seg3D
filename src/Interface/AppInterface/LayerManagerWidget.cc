@@ -73,9 +73,27 @@ LayerManagerWidget::~LayerManagerWidget()
 
 void LayerManagerWidget::process_group( LayerGroupHandle group )
 {
-  
-  this->delete_group( group );
-  
+    // The group is no longer deleted if it exists. Only its layers are deleted and re-added in the proper order
+  for ( QList< LayerGroupWidget_handle >::iterator i = this->group_list_.begin(); 
+     i  != this->group_list_.end(); i++ )
+  {
+    if ( group->get_group_id() == ( *i )->get_group_id() ) 
+    {
+        // delete all the existing gui layers
+        ( *i )->clear_all_layers();
+    
+        // make new ones
+          layer_list_type temp_layer_list = group->get_layer_list();
+          for( layer_list_type::reverse_iterator j = temp_layer_list.rbegin(); j != temp_layer_list.rend(); ++j )
+          {
+            ( *i )->add_layer(( *j ));
+          }
+          // exit when we are done.
+          return;
+        }
+      
+  }
+  // If the group doesnt exist yet, we make a new one.
   LayerGroupWidget_handle new_group_handle( new LayerGroupWidget( this->main_, group ));
   this->group_layout_->addWidget( new_group_handle.data() );
   this->group_list_.push_back( new_group_handle );
@@ -92,6 +110,7 @@ void LayerManagerWidget::delete_group( LayerGroupHandle group )
       ( *i )->deleteLater();
       group_list_.erase( i );
     }
+    return;
   }
 }
   

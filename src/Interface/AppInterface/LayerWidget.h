@@ -74,7 +74,7 @@ public:
 private:
 
     boost::shared_ptr< LayerWidgetPrivate > private_;
-  
+    
   // icons to represent the layer types
   QIcon data_layer_icon_;
   QIcon label_layer_icon_;

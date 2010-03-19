@@ -90,9 +90,6 @@ public:
   bool insert_layer( LayerHandle layer );
   bool insert_layer( LayerGroupHandle group );
   void delete_layer( LayerHandle layer );
-  
-
-
   void set_active_layer( LayerHandle layer );
   
   

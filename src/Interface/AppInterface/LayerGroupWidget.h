@@ -52,9 +52,12 @@ public:
   virtual ~LayerGroupWidget();
   
 public:
-  QVector< LayerWidget_handle > layer_list_;
   void add_layer( LayerHandle layer );
   std::string &get_group_id();
+  void clear_all_layers()
+    {
+        this->layer_list_.clear();
+    }
   
   
 //TODO - connect these though the state engine
@@ -75,6 +78,7 @@ private Q_SLOTS:
   // -- widget internals --
 private:
     boost::shared_ptr< LayerGroupWidgetPrivate > private_;
+    QVector< LayerWidget_handle > layer_list_;
       
 };
     

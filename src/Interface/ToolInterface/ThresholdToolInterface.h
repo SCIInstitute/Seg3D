@@ -38,9 +38,6 @@
 // Base class of the tool widget
 #include <Interface/AppInterface/ToolWidget.h>
 
-// Qt Gui Includes
-#include <Interface/ToolInterface/CustomWidgets/SliderSpinComboDouble.h>
-
 namespace Seg3D
 {
 
@@ -57,10 +54,8 @@ public:
   virtual bool build_widget( QFrame* frame );
 
 private:
-  ThresholdToolInterfacePrivate* private_;
-  SliderSpinComboDouble *upperThresholdAdjuster;
-  SliderSpinComboDouble *lowerThresholdAdjuster;
-
+    boost::shared_ptr < ThresholdToolInterfacePrivate > private_;
+  
 };
 
 } // end namespace Seg3D

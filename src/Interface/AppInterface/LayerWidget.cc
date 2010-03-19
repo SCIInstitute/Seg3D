@@ -111,19 +111,19 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   
   // --- set the values for the dropdown menu's using values from the state handles
   // -- set the border selection combo box's values 
-  std::vector< std::string > temp_border_option_list = layer->border_mode_state_->option_list();
-  for( size_t i = 0; i < temp_border_option_list.size(); i++)
+  std::vector< std::string > temp_option_list = layer->border_mode_state_->option_list();
+  for( size_t i = 0; i < temp_option_list.size(); i++)
   {   
-      this->private_->ui_.border_selection_combo_->addItem( QString::fromStdString( temp_border_option_list[i] ) );
+      this->private_->ui_.border_selection_combo_->addItem( QString::fromStdString( temp_option_list[i] ) );
   }
   // Set it's default value
   this->private_->ui_.border_selection_combo_->setCurrentIndex(layer->border_mode_state_->index());
   
   // -- set the fill selection combo box's values 
-  std::vector< std::string > temp_fill_option_list = layer->fill_mode_state_->option_list();
-  for( size_t i = 0; i < temp_fill_option_list.size(); i++)
+  temp_option_list = layer->fill_mode_state_->option_list();
+  for( size_t i = 0; i < temp_option_list.size(); i++)
   {   
-      this->private_->ui_.fill_selection_combo_->addItem( QString::fromStdString( temp_fill_option_list[i] ) );
+      this->private_->ui_.fill_selection_combo_->addItem( QString::fromStdString( temp_option_list[i] ) );
   }
   // Set it's default value
   this->private_->ui_.fill_selection_combo_->setCurrentIndex(layer->fill_mode_state_->index());
@@ -166,7 +166,8 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
         this->private_->ui_.compute_iso_surface_button_->hide();
         this->private_->ui_.fill_border_button_->hide();
         this->private_->ui_.iso_surface_button_->hide();
-        this->private_->ui_.typeBackground_->setStyleSheet(QString::fromUtf8("QWidget#typeBackground_{ background-color: rgb(166, 12, 73); }"));
+        this->private_->ui_.typeBackground_->setStyleSheet(
+            QString::fromUtf8("QWidget#typeBackground_{ background-color: rgb(166, 12, 73); }"));
         this->private_->ui_.colorChooseButton_->setIcon(this->data_layer_icon_);
         
         DataLayer* data_layer = dynamic_cast< DataLayer* >( layer.get() );
@@ -187,7 +188,10 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
       break;
       
     // This is for the Label Layers
-    case 3:
+    case Utils::VolumeType::LABEL_E:
+        {
+        
+        }
       
       break;
       

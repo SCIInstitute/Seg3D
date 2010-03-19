@@ -54,7 +54,7 @@ public:
   virtual bool build_widget( QFrame* frame );
 
 private:
-  InvertToolInterfacePrivate* private_;
+    boost::shared_ptr< InvertToolInterfacePrivate > private_;
 
 };
 

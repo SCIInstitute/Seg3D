@@ -28,7 +28,7 @@
 
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/PaintTool.h>
-// #include <Application/LayerManager/LayerManager.h>
+#include <Application/LayerManager/LayerManager.h>
 
 namespace Seg3D
 {
@@ -55,8 +55,8 @@ PaintTool::PaintTool( const std::string& toolid ) :
       this, _1 ) );
 
   // If a layer is added or deleted update the lists
-  //  add_connection(LayerManager::instance()->connect_layers_changed(
-  //    boost:bind(&PaintTool::handle_layers_changed,this)));
+  LayerManager::Instance()->connect_layers_changed_signal_.connect(
+      boost::bind(&PaintTool::handle_layers_changed,this));
 
   // Trigger a fresh update
   handle_layers_changed();
@@ -69,6 +69,12 @@ PaintTool::~PaintTool()
 
 void PaintTool::handle_layers_changed()
 {
+    std::vector< std::string > target_layers;
+    LayerManager::Instance()->return_layers_vector( target_layers );
+    
+    //TODO need to filter out the layers that are not valid for target
+    target_layer_state_->set_option_list(target_layers);
+
   /*
    std::vector<std::string> target_layers;
    LayerManager::instance()->get_layers(LayerManager::MASKLAYER_E|

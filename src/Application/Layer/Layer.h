@@ -120,7 +120,6 @@ public:
   
   // State that describes which border mode is active
   StateOptionHandle border_mode_state_;
-  
 
   // -- Locking system --
 public:

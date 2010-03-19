@@ -45,6 +45,9 @@ class AnisotropicDiffusionFilterInterfacePrivate
 {
 public:
   Ui::AnisotropicDiffusionFilterInterface ui_;
+  SliderSpinComboInt *iterationsAdjuster;
+  SliderSpinComboInt *stepAdjuster;
+  SliderSpinComboDouble *conductanceAdjuster;
 };
 
 // constructor
@@ -62,28 +65,61 @@ AnisotropicDiffusionFilterInterface::~AnisotropicDiffusionFilterInterface()
 bool AnisotropicDiffusionFilterInterface::build_widget( QFrame* frame )
 {
   //Step 1 - build the Qt GUI Widget
-  private_->ui_.setupUi( frame );
+  this->private_->ui_.setupUi( frame );
 
-  iterationsAdjuster = new SliderSpinComboInt();
-  private_->ui_.iterationsHLayout_bottom->addWidget( iterationsAdjuster );
+  this->private_->iterationsAdjuster = new SliderSpinComboInt();
+  this->private_->ui_.iterationsHLayout_bottom->addWidget( this->private_->iterationsAdjuster );
 
-  stepAdjuster = new SliderSpinComboInt();
-  private_->ui_.integrationHLayout_bottom->addWidget( stepAdjuster );
+  this->private_->stepAdjuster = new SliderSpinComboInt();
+  this->private_->ui_.integrationHLayout_bottom->addWidget( this->private_->stepAdjuster );
 
-  conductanceAdjuster = new SliderSpinComboDouble();
-  private_->ui_.conductanceHLayout_bottom->addWidget( conductanceAdjuster );
+  this->private_->conductanceAdjuster = new SliderSpinComboDouble();
+  this->private_->ui_.conductanceHLayout_bottom->addWidget( this->private_->conductanceAdjuster );
 
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
   AnisotropicDiffusionFilter* tool =
       dynamic_cast< AnisotropicDiffusionFilter* > ( base_tool_.get() );
 
-  //Step 3 - connect the gui to the tool through the QtBridge
-  QtBridge::Connect( private_->ui_.targetComboBox, tool->target_layer_state_ );
-  QtBridge::Connect( iterationsAdjuster, tool->iterations_state_ );
-  QtBridge::Connect( stepAdjuster, tool->steps_state_ );
-  QtBridge::Connect( conductanceAdjuster, tool->conductance_state_ );
-  QtBridge::Connect( private_->ui_.replaceCheckBox, tool->replace_state_ );
+    //Step 3 - set the values for the tool ui from the state engine
+  
+      //set default falues for the target option list 
+      std::vector< std::string > temp_option_list = tool->target_layer_state_->option_list();
+      for( size_t i = 0; i < temp_option_list.size(); i++)
+      {   
+          this->private_->ui_.targetComboBox->addItem( QString::fromStdString( temp_option_list[i] ) );
+      } 
+        this->private_->ui_.targetComboBox->setCurrentIndex(tool->target_layer_state_->index());
+      
+      // set the defaults for the iterations from the state variables
+        int iterations_min = 0.0; 
+      int iterations_max = 0.0;
+      tool->iterations_state_->get_range( iterations_min, iterations_max );
+        this->private_->iterationsAdjuster->setRanges( iterations_min, iterations_max );
+        this->private_->iterationsAdjuster->setCurrentValue( tool->iterations_state_->get() );
+        
+        // set the defaults for the step from the state variables
+        int step_min = 0.0; 
+      int step_max = 0.0;
+      tool->steps_state_->get_range( step_min, step_max );
+        this->private_->stepAdjuster->setRanges( step_min, step_max );
+        this->private_->stepAdjuster->setCurrentValue( tool->steps_state_->get() );
+        
+        // set the defaults for the conductance from the state variables
+        double conductance_min = 0.0; 
+      double conductance_max = 0.0;
+      tool->conductance_state_->get_range( conductance_min, conductance_max );
+        this->private_->stepAdjuster->setRanges( step_min, step_max );
+        this->private_->stepAdjuster->setCurrentValue( tool->conductance_state_->get() );
+
+      
+
+  //Step 4 - connect the gui to the tool through the QtBridge
+  QtBridge::Connect( this->private_->ui_.targetComboBox, tool->target_layer_state_ );
+  QtBridge::Connect( this->private_->iterationsAdjuster, tool->iterations_state_ );
+  QtBridge::Connect( this->private_->stepAdjuster, tool->steps_state_ );
+  QtBridge::Connect( this->private_->conductanceAdjuster, tool->conductance_state_ );
+  QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
 
   //Send a message to the log that we have finised with building the Anisotropic Diffusion Filter Interface
   SCI_LOG_DEBUG("Finished building an Anisotropic Diffusion Filter Interface");

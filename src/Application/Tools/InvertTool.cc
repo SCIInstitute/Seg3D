@@ -25,10 +25,12 @@
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
  */
+//#include <Boost/bind.hpp>
 
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/InvertTool.h>
-// #include <Application/LayerManager/LayerManager.h>
+#include <Application/LayerManager/LayerManager.h>
+
 
 namespace Seg3D
 {
@@ -40,13 +42,14 @@ InvertTool::InvertTool( const std::string& toolid ) :
   Tool( toolid )
 {
   // Need to set ranges and default values for all parameters
-  add_state( "target", target_layer_state_, "firstitem", "firstitem|seconditem|thirditem" );
+  add_state( "target", target_layer_state_, "<none>", "<none>" );
   add_state( "replace", replace_state_, false );
 
   // If a layer is added or deleted update the lists
-  //  add_connection(LayerManager::instance()->connect_layers_changed(
-  //    boost:bind(&PaintTool::handle_layers_changed,this)));
+    //add_connection( LayerManager::Instance()->connect_layers_changed_signal_(
+    //  boost::bind(&InvertTool::handle_layers_changed )) );
 
+    
   // Trigger a fresh update
   handle_layers_changed();
 }
@@ -58,20 +61,14 @@ InvertTool::~InvertTool()
 
 void InvertTool::handle_layers_changed()
 {
-  /*
-   std::vector<std::string> target_layers;
-   LayerManager::instance()->get_layers(LayerManager::MASKLAYER_E|
-   LayerManager::ACTIVE_E|
-   LayerManager::NONE_E,
-   target_layers );
-
+  
+   //std::vector< LayerHandle > target_layers;
+   //LayerManager::Instance()->return_layers_vector( target_layers );
+    /*
    target_layer_->set_option_list(target_layers);
 
    std::vector<std::string> mask_layers;
-   LayerManager::instance()->get_layers(LayerManager::MASKLAYER_E|
-   LayerManager::DATALAYER_E|
-   LayerManager::NONE_E,
-   mask_layers );
+   LayerManager::instance()->get_layers(LayerManager::MASKLAYER_E | LayerManager::DATALAYER_E | LayerManager::NONE_E, mask_layers );
 
    mask_layer_->set_option_list(mask_layers);
    */

@@ -138,6 +138,18 @@ void QtLineEditSignal( QPointer< QLineEdit > qpointer, std::string state, Action
     QtSignal( qpointer, boost::bind( &QLineEdit::setText, qpointer.data(), QString::fromStdString( state ) ) ); 
   }
 }
+
+
+void QtDoubleSpinBoxSignal( QPointer< QDoubleSpinBox > qpointer, double state, ActionSource source )
+{
+  if ( source != ActionSource::ACTION_SOURCE_INTERFACE_E )
+  {
+    QtSignal( qpointer, boost::bind( &QDoubleSpinBox::setValue, qpointer.data(), state ) ); 
+  }
+}
+
+
+
 bool QtBridge::Connect( QCheckBox* qcheckbox, StateBoolHandle& state_handle )
 {
   // Connect the dispatch into the StateVariable (with auxiliary object)
@@ -184,6 +196,20 @@ bool QtBridge::Connect( QLineEdit* qlineedit, StateAliasHandle& state_handle )
   return true;
 }
 
+bool QtBridge::Connect( QDoubleSpinBox* qdoublespinbox, StateDoubleHandle& state_handle )
+{
+    // Connect the dispatch into the StateVariable (with auxiliary object)
+  // Link the slot to the parent widget, so Qt's memory manager will
+  // manage this one.
+    new QtDoubleSpinBoxSlot( qdoublespinbox, state_handle );
+    QPointer< QDoubleSpinBox > qpointer( qdoublespinbox );
+    
+    // Connect the state signal back into the Qt Variable
+    new QtDeleteSlot( qdoublespinbox, state_handle->value_changed_signal_.connect( 
+      boost::bind( &QtDoubleSpinBoxSignal, qpointer, _1, _2 ) ) );
+      
+  return true;
+}
 
 
 bool QtBridge::Connect( QComboBox* qcombobox, StateOptionHandle& state_handle )

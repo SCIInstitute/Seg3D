@@ -189,6 +189,40 @@ private:
   StateStringHandle state_handle_;
 };
 
+
+class QtDoubleSpinBoxSlot : public QtSlot
+{
+  Q_OBJECT
+public:
+
+  // Constructor
+  QtDoubleSpinBoxSlot( QDoubleSpinBox* parent, StateDoubleHandle& state_handle, bool blocking = true ) :
+  QtSlot( parent, blocking ), state_handle_( state_handle )
+  {
+    // Qt's connect function
+    connect( parent, SIGNAL( valueChanged( double ) ), this, SLOT( slot( double ) ) );
+  }
+
+  // Virtual destructor: needed by Qt
+  virtual ~QtDoubleSpinBoxSlot()
+  {
+  }
+
+public Q_SLOTS:
+  // Slot that Qt will call
+  void slot(double state)
+  {
+    if (!blocked_) ActionSet::Dispatch( state_handle_, state );
+  }
+
+private:
+  // Function object
+  StateDoubleHandle state_handle_;
+};
+
+
+
+
 class QtLineEditAliasSlot : public QtSlot
 {
   Q_OBJECT
@@ -288,14 +322,15 @@ class QtComboBoxSlot : public QtSlot
 public:
 
   // Constructor
-  QtComboBoxSlot(QComboBox* parent,
+  QtComboBoxSlot( QComboBox* parent,
                 StateOptionHandle& state_handle,
                 bool blocking = true) :
     QtSlot(parent,blocking),
     state_handle_(state_handle)
   {
     // Qt's connect function
-    connect(parent,SIGNAL(currentIndexChanged(QString)),this,SLOT(slot(QString)));
+    connect( parent, SIGNAL( currentIndexChanged( QString )), this,SLOT( slot( QString ) ));
+    
   }
 
   // Virtual destructor: needed by Qt

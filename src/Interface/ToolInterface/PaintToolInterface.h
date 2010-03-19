@@ -60,7 +60,7 @@ public:
 
   // -- private structure wwith widget classes --
 private:
-  PaintToolInterfacePrivate* private_;
+  boost::shared_ptr< PaintToolInterfacePrivate > private_;
 
 };
 
