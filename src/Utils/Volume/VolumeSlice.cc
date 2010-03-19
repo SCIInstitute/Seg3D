@@ -44,6 +44,20 @@ VolumeSlice::VolumeSlice( const VolumeHandle& volume,
   this->slice_number_ = Min( this->slice_number_, this->number_of_slices_ - 1 );
 }
 
+VolumeSlice::VolumeSlice( const VolumeSlice& copy ) :
+  slice_changed_( copy.slice_changed_ ),
+  size_changed_( copy.size_changed_ ),
+  width_( copy.width_ ),
+  height_( copy.height_ ),
+  number_of_slices_( copy.number_of_slices_ ),
+  texture_( copy.texture_ ),
+  volume_( copy.volume_ ),
+  slice_type_( copy.slice_type_ ),
+  slice_number_( copy.slice_number_ )
+{
+  this->update();
+}
+
 VolumeSlice::~VolumeSlice()
 {
   this->disconnect_all();
@@ -69,6 +83,52 @@ void VolumeSlice::set_slice_number( size_t slice_num )
   {
     this->slice_number_ = slice_num;
     this->slice_changed_ = true;
+  }
+}
+
+void VolumeSlice::get_world_space_boundary_3d( Point& bottom_left, Point& bottom_right, 
+  Point& top_left, Point& top_right  ) const
+{
+  full_index_type index;
+  this->to_index( 0, 0, index );
+  bottom_left = this->volume_->apply_grid_transform( Point( index[0], index[1], index[2] ) );
+  this->to_index( this->width_ - 1, 0, index );
+  bottom_right = this->volume_->apply_grid_transform( Point( index[0], index[1], index[2] ) );
+  this->to_index( this->width_ - 1, this->height_ - 1, index );
+  top_right = this->volume_->apply_grid_transform( Point( index[0], index[1], index[2] ) );
+  this->to_index( 0, this->height_ - 1, index );
+  top_left = this->volume_->apply_grid_transform( Point( index[0], index[1], index[2] ) );
+}
+
+void VolumeSlice::get_world_space_boundary_2d(double& left, double& right, 
+    double& bottom, double& top  ) const
+{
+  full_index_type index;
+  this->to_index( 0, 0, index );
+  Point bottom_left = this->volume_->apply_grid_transform( Point( index[0], index[1], index[2] ) );
+  this->to_index( this->width_ - 1, this->height_ - 1, index );
+  Point top_right = this->volume_->apply_grid_transform( Point( index[0], index[1], index[2] ) );
+
+  switch ( this->slice_type_ )
+  {
+  case VolumeSliceType::AXIAL_E:
+    left = bottom_left.x();
+    right = top_right.x();
+    bottom = bottom_left.y();
+    top = top_right.y();
+    break;
+  case VolumeSliceType::CORONAL_E:
+    left = bottom_left.z();
+    right = top_right.z();
+    bottom = bottom_left.x();
+    top = top_right.x();
+    break;
+  case VolumeSliceType::SAGITTAL_E:
+    left = bottom_left.y();
+    right = top_right.y();
+    bottom = bottom_left.z();
+    top = top_right.z();
+    break;
   }
 }
 
@@ -113,6 +173,9 @@ void VolumeSlice::update()
     assert( false );
     break;
   }
+
+  // TODO: remove this. It's for testing only
+  this->slice_number_ = this->number_of_slices_ / 2;
 }
 
 } // end namespace Utils

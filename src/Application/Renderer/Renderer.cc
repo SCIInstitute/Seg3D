@@ -29,6 +29,9 @@
 #include <cstdlib>
 
 // application includes
+#include <Application/Layer/DataLayer.h>
+#include <Application/Layer/MaskLayer.h>
+#include <Application/LayerManager/LayerManager.h>
 #include <Application/Renderer/Renderer.h>
 #include <Application/Renderer/RenderResources.h>
 #include <Application/ViewerManager/ViewerManager.h>
@@ -75,6 +78,7 @@ Renderer::Renderer() :
 
 Renderer::~Renderer()
 {
+  this->disconnect_all();
 }
 
 void Renderer::initialize()
@@ -87,13 +91,13 @@ void Renderer::initialize()
   // rendering thread. If created in a different thread, these objects might not
   // be ready when the rendering thread uses them the first time, which caused
   // the scene to be blank sometimes.
-  if (!is_eventhandler_thread())
+  if ( !is_eventhandler_thread() )
   {
-    if (!RenderResources::Instance()->create_render_context(context_))
+    if ( !RenderResources::Instance()->create_render_context( context_ ) )
     {
-      SCI_THROW_EXCEPTION("Failed to create a valid rendering context");
+      SCI_THROW_EXCEPTION( "Failed to create a valid rendering context" );
     }
-    post_event(boost::bind(&Renderer::initialize, this));
+    post_event( boost::bind( &Renderer::initialize, this ) );
     start_eventhandler();
     return;
   }
@@ -116,7 +120,6 @@ void Renderer::initialize()
   // thread, this call is only needed once.
   this->context_->make_current();
 
-  glEnable( GL_DEPTH_TEST );
   //glEnable(GL_CULL_FACE);
 
   // lock the shared render context
@@ -132,18 +135,18 @@ void Renderer::initialize()
   // release the lock
   lock.unlock();
 
-  ViewerManager::Instance()->get_viewer( this->viewer_id_ ) ->redraw_signal_.connect(
-      boost::bind( &Renderer::redraw, this ) );
+  this->add_connection( ViewerManager::Instance()->get_viewer( this->viewer_id_ )
+    ->redraw_signal_.connect( boost::bind( &Renderer::redraw, this ) ) );
 }
 
 void Renderer::redraw()
 {
 #if defined(WIN32) || defined(APPLE) || defined(X11_THREADSAFE)
-  if (!is_eventhandler_thread())
+  if ( !is_eventhandler_thread() )
   {
-    boost::unique_lock<boost::recursive_mutex> lock(redraw_needed_mutex_);
-    redraw_needed_ = true;
-    post_event(boost::bind(&Renderer::redraw, this));
+    boost::unique_lock<boost::recursive_mutex> lock( this->redraw_needed_mutex_ );
+    this->redraw_needed_ = true;
+    this->post_event( boost::bind( &Renderer::redraw, this ) );
     return;
   }
 #else
@@ -157,35 +160,39 @@ void Renderer::redraw()
 #endif
 
   {
-    boost::unique_lock< boost::recursive_mutex > lock( redraw_needed_mutex_ );
-    redraw_needed_ = false;
+    boost::unique_lock< boost::recursive_mutex > lock( this->redraw_needed_mutex_ );
+    this->redraw_needed_ = false;
   }
 
   {
-    boost::unique_lock< boost::recursive_mutex > lock( redraw_needed_mutex_ );
-    if ( redraw_needed_ )
+    boost::unique_lock< boost::recursive_mutex > lock( this->redraw_needed_mutex_ );
+    if ( this->redraw_needed_ )
     {
       return;
     }
   }
 
-  // lock the active render texture
-  Utils::Texture::lock_type texture_lock( textures_[ active_render_texture_ ]->get_mutex() );
-
 #if !defined(WIN32) && !defined(APPLE) && !defined(X11_THREADSAFE)
   this->context_->make_current();
 #endif
 
-  frame_buffer_->attach_texture( textures_[ active_render_texture_ ] );
+  // lock the active render texture
+  Utils::Texture::lock_type texture_lock( this->textures_[ this->active_render_texture_ ]->get_mutex() );
+
+  // bind the framebuffer object
+  this->frame_buffer_->enable();
+
+  // attach texture
+  this->frame_buffer_->attach_texture( this->textures_[ this->active_render_texture_ ] );
 
   SCI_CHECK_OPENGL_ERROR();
 
-  // bind the framebuffer object
-  frame_buffer_->enable();
-  if ( !frame_buffer_->check_status() )
+  if ( !this->frame_buffer_->check_status() )
   {
+    this->frame_buffer_->disable();
     return;
   }
+
   //glDrawBuffer(GL_COLOR_ATTACHMENT0_EXT);
   SCI_CHECK_OPENGL_ERROR();
 
@@ -199,41 +206,106 @@ void Renderer::redraw()
   //glEnable(GL_DEPTH_TEST);
   //glEnable(GL_CULL_FACE);
   //glCullFace(GL_FRONT);
-  glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
   ViewerHandle viewer = ViewerManager::Instance()->get_viewer( this->viewer_id_ );
   glMatrixMode( GL_PROJECTION );
   glLoadIdentity();
+
+  // Lock the state engine
+  StateEngine::lock_type state_lock( StateEngine::Instance()->get_mutex() );
+
+  // Lock the viewer
+  Viewer::lock_type viewer_lock( viewer->get_mutex() );
+
+  // Get a snapshot of current layers
+  LayerSceneHandle layer_scene = LayerManager::Instance()->compose_layer_scene( this->viewer_id_ );
+
   if ( viewer->is_volume_view() )
   {
-    StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
     Utils::View3D view3d( viewer->volume_view_state_->get() );
-    lock.unlock();
+
+    state_lock.unlock();
+    viewer_lock.unlock();
+
+    glEnable( GL_DEPTH_TEST );
+    glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+
     gluPerspective( view3d.fov(), width_ / ( 1.0 * height_ ), 0.1, 5.0 );
     glMatrixMode( GL_MODELVIEW );
     glLoadIdentity();
     gluLookAt( view3d.eyep().x(), view3d.eyep().y(), view3d.eyep().z(), view3d.lookat().x(),
         view3d.lookat().y(), view3d.lookat().z(), view3d.up().x(), view3d.up().y(),
         view3d.up().z() );
+
+    glRotatef( 25.0f * ( this->viewer_id_ + 1 ), 1, 0, 1 );
+    glScalef( 0.5f, 0.5f, 0.5f );
+    glTranslatef( -0.5f, -0.5f, -0.5f );
+    this->cube_->draw();
   }
   else
   {
-    StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
+    // Copy slices from viewer
+    {
+      RenderResources::lock_type lock( RenderResources::Instance()->shared_context_mutex() );
+      this->process_slices( layer_scene, viewer );
+    }
     Utils::View2D view2d(
         dynamic_cast< StateView2D* > ( viewer->get_active_view_state().get() )->get() );
-    lock.unlock();
+
+    state_lock.unlock();
+    viewer_lock.unlock();
+
+    glDisable( GL_DEPTH_TEST );
+    glDisable( GL_CULL_FACE );
+    glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+
     double left, right, top, bottom;
     this->compute_2d_clipping_planes( view2d, left, right, bottom, top );
     gluOrtho2D( left, right, bottom, top );
     glMatrixMode( GL_MODELVIEW );
     glLoadIdentity();
+
+    for ( size_t group_num = 0; group_num < layer_scene->size(); group_num++ )
+    {
+      LayerGroupSceneItemHandle layer_group_item = ( *layer_scene )[ group_num ];
+      for ( size_t layer_num = 0; layer_num < layer_group_item->size(); layer_num++ )
+      {
+        LayerSceneItemHandle layer_item = ( *layer_group_item )[ layer_num ];
+        switch ( layer_item->type() )
+        {
+        case Utils::VolumeType::DATA_E:
+          {
+            DataLayerSceneItem* data_layer_item = 
+              dynamic_cast< DataLayerSceneItem* >( layer_item.get() );
+            data_layer_item->data_volume_slice_->get_world_space_boundary_2d(
+              left, right, bottom, top );
+            Utils::TextureHandle slice_tex = data_layer_item->data_volume_slice_->get_texture();
+            Utils::Texture::lock_type slice_tex_lock( slice_tex->get_mutex() );
+            slice_tex->enable();
+            glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+            glBegin( GL_QUADS );
+            glTexCoord2f( 0.0f, 0.0f );
+            glVertex2d( left, bottom );
+            glTexCoord2f( 1.0f, 0.0f );
+            glVertex2d( right, bottom );
+            glTexCoord2f( 1.0f, 1.0f );
+            glVertex2d( right, top );
+            glTexCoord2f( 0.0f, 1.0f );
+            glVertex2d( left, top );
+            glEnd();
+            slice_tex->disable();
+          }
+          break;
+        case Utils::VolumeType::MASK_E:
+          break;
+        }
+      }
+    }
+
   }
 
+
   SCI_CHECK_OPENGL_ERROR();
-  glRotatef( 25.0f * ( this->viewer_id_ + 1 ), 1, 0, 1 );
-  glScalef( 0.5f, 0.5f, 0.5f );
-  glTranslatef( -0.5f, -0.5f, -0.5f );
-  this->cube_->draw();
 
   SCI_CHECK_OPENGL_ERROR();
   //glBegin(GL_TRIANGLES);
@@ -260,7 +332,7 @@ void Renderer::redraw()
    }
    */
 
-  frame_buffer_->disable();
+  this->frame_buffer_->disable();
 
   // release the lock on the active render texture
   texture_lock.unlock();
@@ -268,18 +340,18 @@ void Renderer::redraw()
   glFinish();
 
   // signal rendering completed
-  rendering_completed_signal( textures_[ active_render_texture_ ] );
+  this->rendering_completed_signal_( textures_[ active_render_texture_ ] );
 
   // swap render textures 
-  active_render_texture_ = ( ~active_render_texture_ ) & 1;
+  this->active_render_texture_ = ( ~this->active_render_texture_ ) & 1;
 }
 
 void Renderer::resize( int width, int height )
 {
 #if defined(WIN32) || defined(APPLE) || defined(X11_THREADSAFE)
-  if (!is_eventhandler_thread())
+  if ( !is_eventhandler_thread() )
   {
-    post_event(boost::bind(&Renderer::resize, this, width, height));
+    this->post_event( boost::bind( &Renderer::resize, this, width, height ) );
     return;
   }
 #else
@@ -321,6 +393,51 @@ void Renderer::compute_2d_clipping_planes( const Utils::View2D& view2d, double& 
   right = view2d.center().x() + clipping_width;
   bottom = view2d.center().y() - clipping_height;
   top = view2d.center().y() + clipping_height;
+}
+
+void Renderer::process_slices( LayerSceneHandle& layer_scene, ViewerHandle& viewer )
+{
+  for ( size_t group_num = 0; group_num < layer_scene->size(); group_num++ )
+  {
+    LayerGroupSceneItemHandle layer_group_item = ( *layer_scene )[ group_num ];
+    for ( size_t layer_num = 0; layer_num < layer_group_item->size(); layer_num++ )
+    {
+      LayerSceneItemHandle layer_item = ( *layer_group_item )[ layer_num ];
+      switch ( layer_item->type() )
+      {
+      case Utils::VolumeType::DATA_E:
+        {
+          DataLayerSceneItem* data_layer_item = 
+            dynamic_cast< DataLayerSceneItem* >( layer_item.get() );
+          Utils::DataVolumeSliceHandle data_volume_slice = 
+            viewer->get_data_volume_slice( layer_item->layer_id_ );
+          if ( data_volume_slice )
+          {
+            data_volume_slice->initialize_texture();
+            data_volume_slice->upload_texture();
+            data_layer_item->data_volume_slice_ = 
+              Utils::DataVolumeSliceHandle( new Utils::DataVolumeSlice( *data_volume_slice ) );
+          }
+        }
+        break;
+      case Utils::VolumeType::MASK_E:
+        {
+          MaskLayerSceneItem* mask_layer_item = 
+            dynamic_cast< MaskLayerSceneItem* >( layer_item.get() );
+          Utils::MaskVolumeSliceHandle mask_volume_slice = 
+            viewer->get_mask_volume_slice( layer_item->layer_id_ );
+          if ( mask_volume_slice )
+          {
+            mask_volume_slice->initialize_texture();
+            mask_volume_slice->upload_texture();
+            mask_layer_item->mask_volume_slice_ = 
+              Utils::MaskVolumeSliceHandle( new Utils::MaskVolumeSlice( *mask_volume_slice ) );
+          }
+        }
+        break;
+      }
+    }
+  }
 }
 
 } // end namespace Seg3D

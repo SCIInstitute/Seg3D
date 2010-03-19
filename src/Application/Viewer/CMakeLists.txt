@@ -49,6 +49,8 @@ ADD_LIBRARY(Application_Viewer STATIC
             
 TARGET_LINK_LIBRARIES(Application_Viewer
                       Utils_Core
+            Utils_DataBlock
+            Utils_Volume
                       Application_Application
                       Application_Interface
                       Application_Action

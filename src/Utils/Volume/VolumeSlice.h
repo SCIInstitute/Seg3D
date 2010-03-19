@@ -35,6 +35,7 @@
 #include <Utils/Core/ConnectionHandler.h>
 #include <Utils/Core/EnumClass.h>
 #include <Utils/Geometry/Point.h>
+#include <Utils/Graphics/Texture.h>
 #include <Utils/Volume/Volume.h>
 
 namespace Utils
@@ -57,12 +58,20 @@ typedef boost::shared_ptr< VolumeSlice > VolumeSliceHandle;
 class VolumeSlice : protected ConnectionHandler
 {
 public:
-  typedef std::vector<size_t> full_index_type;
+  typedef Point full_index_type;
   typedef Volume::mutex_type mutex_type;
   typedef Volume::lock_type lock_type;
 
 protected:
   VolumeSlice( const VolumeHandle& volume, VolumeSliceType type, size_t slice_num );
+
+  // Copy Constructor
+  // NOTE: This is provided for the purpose of taking a snapshot of current status of a 
+  // VolumeSlice, which will then be used for rendering. The copy constructor shouldn't
+  // connect to any signals so its state won't be changed after construction.
+  // NOTE: The copy-constructed object will share the same texture object with the old one.
+  VolumeSlice( const VolumeSlice& copy );
+
   virtual ~VolumeSlice();
 
 public:
@@ -123,9 +132,28 @@ public:
     return this->volume_->apply_inverse_grid_transform( pt );
   }
 
-  mutex_type& get_mutex()
+  void get_world_space_boundary_2d( double& left, double& right, 
+    double& bottom, double& top  ) const;
+
+  void get_world_space_boundary_3d( Point& bottom_left, Point& bottom_right, 
+    Point& top_right, Point& top_left  ) const;
+  
+  inline mutex_type& get_mutex()
   {
     return this->volume_->get_mutex();
+  }
+
+  // Create the texture object
+  virtual void initialize_texture() = 0;
+
+  // Upload the volume slice to texture.
+  // NOTE: This function allocates resources on the GPU, so the caller should
+  // acquire a lock on the RenderResources before calling this function.
+  virtual void upload_texture() = 0;
+
+  inline TextureHandle get_texture()
+  {
+    return this->texture_;
   }
 
 private:
@@ -154,10 +182,9 @@ private:
 
   inline void make_full_index( size_t x, size_t y, size_t z, full_index_type& index ) const
   {
-    index.resize(3);
-    index[0] = x;
-    index[1] = y;
-    index[2] = z;
+    index[0] = static_cast<double>( x );
+    index[1] = static_cast<double>( y );
+    index[2] = static_cast<double>( z );
   }
 
   inline int extract_slice_number( int num ) const
@@ -173,11 +200,19 @@ protected:
   size_t height_;
   size_t number_of_slices_;
 
+  Texture2DHandle texture_;
+
+  // Mutex for thread-safe access on member variables. 
+  // NOTE: Member variables are completely independent of the underlying volume, so it's
+  // better to have a separate mutex.
+  typedef boost::recursive_mutex internal_mutex_type;
+  typedef boost::unique_lock< internal_mutex_type > internal_lock_type;
+  boost::recursive_mutex internal_mutex_;
+
 private:
   VolumeHandle volume_;
   VolumeSliceType slice_type_;
   size_t slice_number_;
-
 
 };
 

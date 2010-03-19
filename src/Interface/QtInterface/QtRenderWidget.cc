@@ -47,7 +47,7 @@ QtRenderWidget::QtRenderWidget( const QGLFormat& format, QWidget* parent, QtRend
   QGLWidget( format, parent, share )
 {
   this->renderer_ = RendererHandle( new Renderer() );
-  this->rendering_completed_connection_ = renderer_->rendering_completed_signal.connect(
+  this->rendering_completed_connection_ = renderer_->rendering_completed_signal_.connect(
       boost::bind( &QtRenderWidget::rendering_completed_slot, this, _1 ) );
 
   setAutoFillBackground( false );

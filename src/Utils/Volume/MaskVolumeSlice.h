@@ -29,7 +29,6 @@
 #ifndef UTILS_VOLUME_MASKVOLUMESLICE_H
 #define UTILS_VOLUME_MASKVOLUMESLICE_H
 
-#include <Utils/Graphics/Texture.h>
 #include <Utils/Graphics/PixelBufferObject.h>
 #include <Utils/Volume/MaskVolume.h>
 #include <Utils/Volume/VolumeSlice.h>
@@ -45,6 +44,7 @@ class MaskVolumeSlice : public VolumeSlice
 public:
   MaskVolumeSlice( const MaskVolumeHandle& mask_volume, 
     VolumeSliceType type = VolumeSliceType::AXIAL_E, size_t slice_num = 0 );
+  MaskVolumeSlice( const MaskVolumeSlice& copy );
   virtual ~MaskVolumeSlice() {}
 
   inline bool get_mask_at( size_t i, size_t j ) const
@@ -62,18 +62,18 @@ public:
     this->mask_data_block_->clear_mask_at( this->to_index( i, j ) );
   }
 
+  // Create the texture object
+  virtual void initialize_texture();
+
   // Upload the mask slice to graphics texture.
   // NOTE: This function allocates resources on the GPU, so the caller should
-  // acquire a lock on the RenderResources before calling this function. The caller should
-  // also lock the MaskDataSlice object for data consistency.
-  void upload_texture();
+  // acquire a lock on the RenderResources before calling this function. 
+  virtual void upload_texture();
 
 private:
   // Pointer to the mask data block. The base class keeps a handle of the volume,
   // so it's safe to use a pointer here.
   MaskDataBlock* mask_data_block_;
-
-  Texture2DHandle texture_;
 
   PixelBufferObjectHandle pixel_buffer_;
 

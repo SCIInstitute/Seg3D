@@ -38,8 +38,10 @@
 
 // Application includes
 #include <Application/Renderer/RenderContext.h>
+#include <Application/Viewer/Viewer.h>
 #include <Application/Viewer/ViewerRenderer.h>
 
+#include <Utils/Core/ConnectionHandler.h>
 #include <Utils/EventHandler/EventHandler.h>
 #include <Utils/Geometry/View2D.h>
 #include <Utils/Graphics/FramebufferObject.h>
@@ -55,7 +57,8 @@ class Renderer;
 typedef boost::shared_ptr< Renderer > RendererHandle;
 
 // Class definitions
-class Renderer : public ViewerRenderer, private Utils::EventHandler
+class Renderer : public ViewerRenderer, private Utils::EventHandler, 
+  private Utils::ConnectionHandler
 {
 
   // -- constructor/destructor --
@@ -67,13 +70,14 @@ public:
 
   virtual void initialize();
   virtual void redraw();
-
   virtual void resize( int width, int height );
 
 private:
 
   void compute_2d_clipping_planes( const Utils::View2D& view2d, double& left, double& right,
       double& bottom, double& top );
+
+  void process_slices( LayerSceneHandle& layer_scene, ViewerHandle& viewer );
 
   // Context for rendering images
   RenderContextHandle context_;

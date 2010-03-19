@@ -66,13 +66,13 @@ public:
   // Set the index of the corresponding viewer in the ViewerManager
   inline void set_viewer_id( size_t viewer_id )
   {
-    viewer_id_ = viewer_id;
+    this->viewer_id_ = viewer_id;
   }
 
   // -- signals handling --
 public:
   typedef boost::signals2::signal< void( Utils::TextureHandle ) > rendering_completed_signal_type;
-  rendering_completed_signal_type rendering_completed_signal;
+  rendering_completed_signal_type rendering_completed_signal_;
 
 protected:
   size_t viewer_id_;

@@ -31,6 +31,20 @@
 namespace Utils
 {
 
+const unsigned int DataVolumeSlice::GL_DATA_TYPE_C[] = 
+{
+  GL_BYTE, GL_UNSIGNED_BYTE, GL_SHORT, GL_UNSIGNED_SHORT,
+  GL_INT, GL_UNSIGNED_INT, GL_FLOAT, GL_DOUBLE
+};
+
+const unsigned int DataVolumeSlice::GL_TEXTURE_FORMAT_C[] = 
+{
+  GL_INTENSITY8, GL_INTENSITY8, 
+  GL_INTENSITY16, GL_INTENSITY16,
+  GL_INTENSITY16, GL_INTENSITY16, 
+  GL_INTENSITY16, GL_INTENSITY16
+};
+
 DataVolumeSlice::DataVolumeSlice( const DataVolumeHandle& data_volume, 
                  VolumeSliceType type, size_t slice_num ) :
   VolumeSlice( data_volume, type, slice_num )
@@ -38,6 +52,83 @@ DataVolumeSlice::DataVolumeSlice( const DataVolumeHandle& data_volume,
   this->data_block_ = data_volume->data_block().get();
   this->add_connection( this->data_block_->data_changed_signal_.connect( 
     boost::bind( &VolumeSlice::volume_updated_slot, this ) ) );
+}
+
+DataVolumeSlice::DataVolumeSlice( const DataVolumeSlice &copy ) :
+  VolumeSlice( copy ),
+  data_block_( copy.data_block_ )
+{
+}
+
+void DataVolumeSlice::initialize_texture()
+{
+  if ( !this->texture_ )
+  {
+    internal_lock_type lock( this->internal_mutex_ );
+    if ( !this->texture_ )
+    {
+      this->texture_ = Texture2DHandle( new Texture2D );
+      this->texture_->set_mag_filter( GL_LINEAR );
+      this->texture_->set_min_filter( GL_LINEAR );
+    }
+  }
+}
+
+void DataVolumeSlice::upload_texture()
+{
+  if ( !this->slice_changed_ )
+    return;
+
+  internal_lock_type lock( this->internal_mutex_ );
+
+  if ( !this->slice_changed_ )
+    return;
+
+  // Lock the texture
+  Texture::lock_type tex_lock( this->texture_->get_mutex() );
+
+  if ( this->size_changed_ )
+  {
+    // Make sure there is no pixel unpack buffer bound
+    PixelUnpackBuffer::RestoreDefault();
+
+    this->texture_->set_image( static_cast<int>( this->width_ ), 
+      static_cast<int>( this->height_ ), GL_LUMINANCE );
+    this->size_changed_ = false;
+  }
+  
+  // Step 1. copy the data in the slice to a pixel unpack buffer
+  this->pixel_buffer_ = PixelBufferObjectHandle( new PixelUnpackBuffer );
+  this->pixel_buffer_->bind();
+  this->pixel_buffer_->set_buffer_data( sizeof( unsigned char ) * this->width_ * this->height_,
+    NULL, GL_STREAM_DRAW );
+  unsigned char* buffer = reinterpret_cast<unsigned char*>(
+    this->pixel_buffer_->map_buffer( GL_WRITE_ONLY ) );
+
+  // Lock the volume
+  lock_type volume_lock( this->get_mutex() );
+  for ( size_t j = 0; j < this->height_; j++ )
+  {
+    for ( size_t i = 0; i < this->width_; i++ )
+    {
+      size_t index = this->to_index( i, j );
+      buffer[ j * this->width_ + i ] = static_cast<unsigned char>( this->data_block_->get_data_at( index ) );
+    }
+  }
+  volume_lock.unlock();
+  
+  // Step 2. copy from the pixel buffer to texture
+  this->pixel_buffer_->unmap_buffer();
+  glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+  this->texture_->set_sub_image( 0, 0, static_cast<int>( this->width_ ), 
+    static_cast<int>( this->height_ ), NULL, GL_LUMINANCE, GL_UNSIGNED_BYTE );
+
+  // Step 3. release the pixel unpack buffer
+  // NOTE: The texture streaming will still succeed even if the PBO is deleted.
+  this->pixel_buffer_->unbind();
+  this->pixel_buffer_.reset();
+
+  this->slice_changed_ = false;
 }
 
 } // end namespace Utils

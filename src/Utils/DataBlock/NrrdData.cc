@@ -119,7 +119,7 @@ Transform NrrdData::get_transform() const
     if ( size[ p ] == 1 ) continue;
     rmin[ k ] = min[ p ];
     rmax[ k ] = max[ p ];
-    rsize[ k ] = size[ p ];
+    rsize[ k ] = static_cast<int>( size[ p ] );
     k++;
   }
 
@@ -136,7 +136,7 @@ Transform NrrdData::get_transform() const
   {
     Vector v0, v1, v2;
     v0 = Point( rmax[ 0 ], 0.0, 0.0 ) - Point( rmin[ 0 ], 0.0, 0.0 );
-    v1 = Point( 0.0, rmax[ 0 ], 0.0 ) - Point( 0.0, rmin[ 0 ], 0.0 );
+    v1 = Point( 0.0, rmax[ 1 ], 0.0 ) - Point( 0.0, rmin[ 1 ], 0.0 );
     v2 = Cross( v0, v1 );
     v2.normalize();
 
@@ -148,8 +148,8 @@ Transform NrrdData::get_transform() const
   {
     Vector v0, v1, v2;
     v0 = Point( rmax[ 0 ], 0.0, 0.0 ) - Point( rmin[ 0 ], 0.0, 0.0 );
-    v1 = Point( 0.0, rmax[ 0 ], 0.0 ) - Point( 0.0, rmin[ 0 ], 0.0 );
-    v2 = Point( 0.0, 0.0, rmax[ 0 ] ) - Point( 0.0, 0.0, rmin[ 0 ] );
+    v1 = Point( 0.0, rmax[ 1 ], 0.0 ) - Point( 0.0, rmin[ 1 ], 0.0 );
+    v2 = Point( 0.0, 0.0, rmax[ 2 ] ) - Point( 0.0, 0.0, rmin[ 2 ] );
 
     transform.load_basis( Point( rmin[ 0 ], rmin[ 1 ], rmin[ 2 ] ), v0, v1, v2 );
     transform.post_scale( Vector( 1.0 / static_cast< double > ( rsize[ 0 ] ), 1.0

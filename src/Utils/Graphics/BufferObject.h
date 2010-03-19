@@ -30,6 +30,7 @@
 #define UTILS_GRAPHICS_BUFFEROBJECT_H
 
 #include <boost/shared_ptr.hpp>
+#include <boost/utility.hpp>
 
 #include <GL/glew.h>
 
@@ -39,7 +40,7 @@ namespace Utils
 class BufferObject;
 typedef boost::shared_ptr< BufferObject > BufferObjectHandle;
 
-class BufferObject
+class BufferObject : public boost::noncopyable
 {
 protected:
   // Default constructor
@@ -48,6 +49,8 @@ protected:
   // Copy constructor
   // Allows binding buffer objects to different targets. The destructor will not
   // delete the underlying OpenGL object. It is deleted by the original instance.
+  // NOTE: It takes a handle instead of a reference to the instance so the reference count
+  // can be increased correctly.
   BufferObject( const BufferObjectHandle& bo );
 
   virtual ~BufferObject();
@@ -69,9 +72,6 @@ protected:
 protected:
   GLenum target_;
   GLenum query_target_;
-
-private:
-  BufferObject& operator=( const BufferObject& bo );
 
 private:
   GLuint id_;

@@ -127,9 +127,9 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
   this->private_->scale_adjuster->setObjectName( QString::fromUtf8( "scale_adjuster" ) );
   
   // set some local values for the current size
-  this->private_->current_width = group->get_grid_transform().nx();
-  this->private_->current_height = group->get_grid_transform().ny();
-  this->private_->current_depth = group->get_grid_transform().nz();
+  this->private_->current_width = static_cast<int>( group->get_grid_transform().nx() );
+  this->private_->current_height = static_cast<int>( group->get_grid_transform().ny() );
+  this->private_->current_depth = static_cast<int>( group->get_grid_transform().nz() );
   
   //  connect the gui signals and slots
     connect( this->private_->scale_adjuster, SIGNAL( valueAdjustedContinuously( double ) ), this, SLOT( adjust_new_size_labels( double )) );

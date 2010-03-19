@@ -29,7 +29,7 @@
 #ifndef UTILS_VOLUME_DATAVOLUMESLICE_H
 #define UTILS_VOLUME_DATAVOLUMESLICE_H
 
-#include <Utils/DataBlock/DataBlock.h>
+#include <Utils/Graphics/PixelBufferObject.h>
 #include <Utils/Volume/DataVolume.h>
 #include <Utils/Volume/VolumeSlice.h>
 
@@ -44,6 +44,7 @@ class DataVolumeSlice : public VolumeSlice
 public:
   DataVolumeSlice( const DataVolumeHandle& data_volume, 
     VolumeSliceType type = VolumeSliceType::AXIAL_E, size_t slice_num = 0 );
+  DataVolumeSlice( const DataVolumeSlice& copy );
   virtual ~DataVolumeSlice() {}
 
   inline double get_data_at ( size_t i, size_t j ) const
@@ -56,10 +57,27 @@ public:
     this->data_block_->set_data_at( this->to_index( i, j ), value );
   }
 
+  // Create the texture object
+  virtual void initialize_texture();
+
+  // Upload the data slice to graphics texture.
+  // NOTE: This function allocates resources on the GPU, so the caller should
+  // acquire a lock on the RenderResources before calling this function.
+  virtual void upload_texture();
+
 private:
   // Pointer to the data block. The base class keeps a handle of the volume,
   // so it is safe to use a pointer here.
   DataBlock* data_block_;
+
+  PixelBufferObjectHandle pixel_buffer_;
+
+  // An array of GLenum's for data types, indexed by data_type values
+  const static unsigned int GL_DATA_TYPE_C[];
+
+  // An array of GLenum's for GL internal texture formats, indexed by data_type values.
+  // These formats are picked to best match the data type.
+  const static unsigned int GL_TEXTURE_FORMAT_C[];
 };
 
 } // end namespace Utils

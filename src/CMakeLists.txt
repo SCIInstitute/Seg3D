@@ -89,12 +89,15 @@ ADD_DEFINITIONS(-DQT_NO_KEYWORDS)
 ADD_DEFINITIONS(-DITKSTATIC)
 
 ###########################################
+# Flags for Microsoft Compiler
 # Disable Visual C++ Secure Warnings
+# Enable Intrinsic Functions
 ###########################################
 
 IF (WIN32 AND MSVC)
   ADD_DEFINITIONS(-D_SCL_SECURE_NO_WARNINGS)
   ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
+  SET(CMAKE_CXX_FLAGS "/Oi ${CMAKE_CXX_FLAGS}")
 ENDIF (WIN32 AND MSVC)
 
 ###########################################

@@ -43,7 +43,6 @@
 #include <boost/utility.hpp>
 
 #include <Utils/DataBlock/DataType.h>
-#include <Utils/Graphics/Texture.h>
 
 namespace Utils
 {
@@ -156,10 +155,6 @@ public:
     this->set_data_func_( index, value );
   }
 
-  void upload_texture();
-
-  TextureHandle get_texture();
-
   // -- Pointer to where the data is stored
 protected:
 
@@ -243,15 +238,6 @@ private:
   boost::function<double (size_t)> get_data_func_;
   boost::function<void (size_t, double)> set_data_func_;
 
-  bool data_changed_;
-  Texture3DHandle texture_;
-
-  // An array of GLenum's for data types, indexed by data_type values
-  const static unsigned int GL_DATA_TYPE_C[];
-
-  // An array of GLenum's for GL internal texture formats, indexed by data_type values.
-  // These formats are picked to best match the data type.
-  const static unsigned int GL_TEXTURE_FORMAT_C[];
 };
 
 } // end namespace Utils

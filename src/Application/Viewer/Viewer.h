@@ -40,16 +40,18 @@
 // Boost includes 
 #include <boost/shared_ptr.hpp>
 #include <boost/function.hpp>
+#include <boost/thread.hpp>
 
 // Application includes
+#include <Application/Layer/Layer.h>
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/State/State.h>
 #include <Application/Viewer/ViewerRenderer.h>
 #include <Application/Viewer/ViewManipulator.h>
 
 #include <Utils/Core/EnumClass.h>
-#include <Utils/Volume/MaskVolumeSlice.h>
 #include <Utils/Volume/DataVolumeSlice.h>
+#include <Utils/Volume/MaskVolumeSlice.h>
 
 namespace Seg3D
 {
@@ -151,20 +153,38 @@ public:
   redraw_signal_type redraw_signal_;
 
 private:
+  void change_view_mode( std::string mode, ActionSource source );
+
+  // -- Data structures for keeping track of slices of layers --
+private:
+  typedef std::map< std::string, Utils::MaskVolumeSliceHandle > mask_slices_map_type;
+  typedef std::map< std::string, Utils::DataVolumeSliceHandle > data_slices_map_type;
+
+  mask_slices_map_type mask_slices_;
+  data_slices_map_type data_slices_;
+
   void insert_layer( LayerHandle layer );
   void delete_layer( LayerHandle layer );
 
-  // -- 2D slices of layers --
+  // Adjust the view states when the first data layer is loaded
+  void adjust_view();
+
 public:
   Utils::MaskVolumeSliceHandle get_mask_volume_slice( const std::string& layer_id );
   Utils::DataVolumeSliceHandle get_data_volume_slice( const std::string& layer_id );
-  
-private:
-  typedef std::map< std::string, Utils::MaskVolumeSliceHandle >::iterator mask_slices_iterator_type;
-  typedef std::map< std::string, Utils::DataVolumeSliceHandle >::iterator data_slices_iterator_type;
 
-  std::map< std::string, Utils::MaskVolumeSliceHandle > mask_slices_;
-  std::map< std::string, Utils::DataVolumeSliceHandle > data_slices_;
+  // -- Mutex and lock --
+public: 
+  typedef boost::recursive_mutex mutex_type;
+  typedef boost::unique_lock< mutex_type > lock_type;
+
+  mutex_type& get_mutex()
+  {
+    return this->layer_map_mutex_;
+  }
+
+private:
+  mutex_type layer_map_mutex_;
 
   // -- State information --
 public:

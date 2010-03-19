@@ -31,23 +31,9 @@
 namespace Utils
 {
 
-const unsigned int DataBlock::GL_DATA_TYPE_C[] = 
-{
-  GL_BYTE, GL_UNSIGNED_BYTE, GL_SHORT, GL_UNSIGNED_SHORT,
-  GL_INT, GL_UNSIGNED_INT, GL_FLOAT, GL_DOUBLE
-};
-
-const unsigned int DataBlock::GL_TEXTURE_FORMAT_C[] = 
-{
-  GL_INTENSITY8, GL_INTENSITY8, 
-  GL_INTENSITY16, GL_INTENSITY16,
-  GL_INTENSITY16, GL_INTENSITY16, 
-  GL_INTENSITY16, GL_INTENSITY16
-};
-
 DataBlock::DataBlock() :
   nx_( 0 ), ny_( 0 ), nz_( 0 ), data_type_( DataType::UNKNOWN_E ), 
-  data_( 0 ), data_changed_( true )
+  data_( 0 )
 {
 }
 
@@ -98,32 +84,6 @@ void DataBlock::set_type( DataType type )
     this->set_data_func_ = 0;
     break;
   }
-}
-
-void DataBlock::upload_texture()
-{
-  if ( !this->texture_.get() )
-  {
-    // The texture is not created yet
-    this->texture_ = Texture3DHandle( new Texture3D );
-    this->texture_->set_min_filter( GL_LINEAR );
-    this->texture_->set_mag_filter( GL_LINEAR );
-  }
-
-  if ( this->data_changed_ )
-  {
-    glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
-    this->texture_->set_image( static_cast<int>(this->nx_), static_cast<int>(this->ny_), 
-      static_cast<int>(this->nz_), GL_TEXTURE_FORMAT_C[ this->data_type_ ], this->data_, 
-      GL_INTENSITY, GL_DATA_TYPE_C[ this->data_type_ ] );
-
-    this->data_changed_ = false;
-  }
-}
-
-TextureHandle DataBlock::get_texture()
-{
-  return this->texture_;
 }
 
 } // end namespace Utils

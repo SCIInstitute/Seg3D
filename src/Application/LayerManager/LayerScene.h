@@ -35,7 +35,9 @@
 #include <Application/Layer/Layer.h>
 
 #include <Utils/Volume/DataVolume.h>
+#include <Utils/Volume/DataVolumeSlice.h>
 #include <Utils/Volume/MaskVolume.h>
+#include <Utils/Volume/MaskVolumeSlice.h>
 
 namespace Seg3D
 {
@@ -79,6 +81,7 @@ public:
   double contrast_;
   double brightness_;
   bool volume_rendered_;
+  Utils::DataVolumeSliceHandle data_volume_slice_; // This value is set and used by Renderer
 };
 
 class MaskLayerSceneItem : public LayerSceneItem
@@ -98,6 +101,7 @@ public:
   std::string border_;
   std::string fill_;
   bool show_isosurface_;
+  Utils::MaskVolumeSliceHandle mask_volume_slice_; // This value is set and used by Renderer
 };
 
 } // end namespace Seg3D
