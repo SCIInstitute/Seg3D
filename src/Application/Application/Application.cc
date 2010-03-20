@@ -89,7 +89,8 @@ void Application::parse_command_line_parameters( int argc, char **argv )
 
   for ( int count = 1; count < argc; count++ )
   {
-    tokenizer tokens( std::string ( argv[ count ] ), seperator );
+    std::string arg( argv[ count ] );
+    tokenizer tokens( arg, seperator );
     std::vector< std::string > param_vector;
 
     for ( tokenizer::iterator tok_iter = tokens.begin(); tok_iter != tokens.end(); ++tok_iter )
