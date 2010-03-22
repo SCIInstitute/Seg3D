@@ -94,14 +94,6 @@ void VolumeSlice::set_slice_number( size_t slice_num )
 void VolumeSlice::update_position()
 {
   Point index;
-  this->to_index( 0, 0, index );
-  this->bottom_left_ = this->volume_->apply_grid_transform( index );
-  this->to_index( this->nx_ - 1, 0, index );
-  this->bottom_right_ = this->volume_->apply_grid_transform( index );
-  this->to_index( this->nx_ - 1, this->ny_ - 1, index );
-  this->top_right_ = this->volume_->apply_grid_transform( index );
-  this->to_index( 0, this->ny_ - 1, index );
-  this->top_left_ = this->volume_->apply_grid_transform( index );
 
   switch( this->slice_type_ )
   {
@@ -109,6 +101,14 @@ void VolumeSlice::update_position()
     this->nx_ = this->volume_->nx();
     this->ny_ = this->volume_->ny();
     this->number_of_slices_ = this->volume_->nz();
+    this->to_index( 0, 0, index );
+    this->bottom_left_ = this->volume_->apply_grid_transform( index );
+    this->to_index( this->nx_ - 1, 0, index );
+    this->bottom_right_ = this->volume_->apply_grid_transform( index );
+    this->to_index( this->nx_ - 1, this->ny_ - 1, index );
+    this->top_right_ = this->volume_->apply_grid_transform( index );
+    this->to_index( 0, this->ny_ - 1, index );
+    this->top_left_ = this->volume_->apply_grid_transform( index );
     this->left_ = this->bottom_left_.x();
     this->right_ = this->top_right_.x();
     this->bottom_ = this->bottom_left_.y();
@@ -118,6 +118,14 @@ void VolumeSlice::update_position()
     this->nx_ = this->volume_->nz();
     this->ny_ = this->volume_->nx();
     this->number_of_slices_ = this->volume_->ny();
+    this->to_index( 0, 0, index );
+    this->bottom_left_ = this->volume_->apply_grid_transform( index );
+    this->to_index( this->nx_ - 1, 0, index );
+    this->bottom_right_ = this->volume_->apply_grid_transform( index );
+    this->to_index( this->nx_ - 1, this->ny_ - 1, index );
+    this->top_right_ = this->volume_->apply_grid_transform( index );
+    this->to_index( 0, this->ny_ - 1, index );
+    this->top_left_ = this->volume_->apply_grid_transform( index );
     this->left_ = this->bottom_left_.z();
     this->right_ = this->top_right_.z();
     this->bottom_ = this->bottom_left_.x();
@@ -127,6 +135,14 @@ void VolumeSlice::update_position()
     this->nx_ = this->volume_->ny();
     this->ny_ = this->volume_->nz();
     this->number_of_slices_ = this->volume_->nx();
+    this->to_index( 0, 0, index );
+    this->bottom_left_ = this->volume_->apply_grid_transform( index );
+    this->to_index( this->nx_ - 1, 0, index );
+    this->bottom_right_ = this->volume_->apply_grid_transform( index );
+    this->to_index( this->nx_ - 1, this->ny_ - 1, index );
+    this->top_right_ = this->volume_->apply_grid_transform( index );
+    this->to_index( 0, this->ny_ - 1, index );
+    this->top_left_ = this->volume_->apply_grid_transform( index );
     this->left_ = this->bottom_left_.y();
     this->right_ = this->top_right_.y();
     this->bottom_ = this->bottom_left_.z();
