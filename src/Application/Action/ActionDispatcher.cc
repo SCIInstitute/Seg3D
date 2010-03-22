@@ -149,6 +149,8 @@ void ActionDispatcher::run_action( ActionHandle action, ActionContextHandle acti
   {
     action_context->report_status( ActionStatus::ACTION_ERROR_E );
     action_context->report_done();
+    // actions that fail, are aborted here
+    return;
   }
 
   // Step (4): Set the action result if any was returned.

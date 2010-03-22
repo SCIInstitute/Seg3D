@@ -39,26 +39,22 @@ bool ITKLayerImporter::import_header()
   return false;
 }
 
-bool ITKLayerImporter::import_data()
-{
-  return false;
-}
-
 Utils::GridTransform ITKLayerImporter::get_grid_transform()
 {
-  Utils::GridTransform identity(1,1,1);
-  return identity;
+  return Utils::GridTransform(1,1,1);
+}
+
+Utils::DataType ITKLayerImporter::get_data_type()
+{
+  return Utils::DataType::UNKNOWN_E;
 }
 
 bool ITKLayerImporter::has_importer_mode( LayerImporterMode mode )
 {
-  import_header();
-  
-  return true;
+  return false;
 }
 
-
-bool ITKLayerImporter::import_layer( std::vector<LayerHandle>& layers, LayerImporterMode mode )
+bool ITKLayerImporter::import_layer( LayerImporterMode mode, std::vector<LayerHandle>& layers )
 {
   return false;
 }

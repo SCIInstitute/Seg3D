@@ -43,6 +43,7 @@
 
 #include <Application/Action/Action.h>
 #include <Application/Action/ActionContext.h>
+#include <Application/Action/ActionProgress.h>
 #include <Application/Action/ActionFactory.h>
 
 namespace Seg3D
@@ -116,9 +117,8 @@ public:
   // The type of the main action signal
 
   typedef boost::signals2::signal< void( ActionHandle ) > pre_action_signal_type;
-
-  typedef boost::signals2::signal< void( ActionHandle, ActionResultHandle ) >
-      post_action_signal_type;
+  typedef boost::signals2::signal< void( ActionHandle, ActionResultHandle ) > post_action_signal_type;
+  typedef boost::signals2::signal< void( ActionProgressHandle ) > action_progress_signal_type;
 
   // PRE_ACTION_SIGNAL:
   // Connect an observer that records all the actions in the program before
@@ -138,6 +138,21 @@ public:
   // they are exectuted.
 
   post_action_signal_type post_action_signal_;
+
+  // BEGIN_PROGRESS_SIGNAL:
+  // This signals a slow action that is being processed and progress needs to be reported
+  // This is only in a few instances needed, like loading files, where the load happens inside
+  // the action. The interface can connect to this signal so it can block further input until
+  // the action has been processed
+  action_progress_signal_type begin_progress_signal_;
+
+  // END_PROGRESS_SIGNAL:
+  // This signals the end of the slow action.
+  action_progress_signal_type end_progress_signal_;
+
+  // REPORT_PROGRESS_SIGNAL:
+  // Issued every time when progress can be reported
+  action_progress_signal_type report_progress_signal_;
 
 };
 

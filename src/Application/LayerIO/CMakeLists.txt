@@ -32,10 +32,12 @@
 ##################################################
 
 SET(APPLICATION_LAYERIO_SRCS
-  LayerIO.h
-  LayerIO.cc
   LayerImporter.h
   LayerImporter.cc
+  LayerImporterInfo.h
+  LayerImporterInfo.cc
+  LayerIO.h
+  LayerIO.cc
 )
 
 SET(APPLICATION_LAYERIO_ACTIONS_SRCS

@@ -283,6 +283,12 @@ std::string StateEngine::create_statealias( std::string basealias )
   int number = 1;
   std::string new_statealias;
   
+  new_statealias = basealias;
+  if ( statealias_list_.find( new_statealias ) == statealias_list_.end() )
+  {
+    return new_statealias;
+  }
+  
   do
   {
     new_statealias = basealias + std::string( "_" ) + Utils::to_string( number );

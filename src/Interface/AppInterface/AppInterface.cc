@@ -51,6 +51,8 @@ AppInterface::AppInterface()
   setWindowTitle( QString( "Seg3D Version " ) + SEG3D_VERSION + QString( " " ) + SEG3D_BITS
       + QString( " " ) + SEG3D_DEBUG_VERSION );
   setWindowIconText( QString( "Seg3D" ) );
+
+  // TODO: Do we need this one?
   setDocumentMode( true );
 
   // Tell Qt what size to start up in
@@ -58,17 +60,6 @@ AppInterface::AppInterface()
 
   SplashStart* splash_screen_ = new SplashStart();
   splash_screen_->exec();
-
-  // Enable fullscreen on startup via commandline argument
-  std::string value;
-  if ( Application::Instance()->check_command_line_parameter( "fullscreen", value ) )
-  {
-    if ( boost::lexical_cast< bool >( value ) )
-    {
-      SCI_LOG_MESSAGE("Going full screen based on command line parameter");
-      showFullScreen();
-    }
-  }
   
   // Tell Qt where to doc the toolbars
   setCorner( Qt::TopLeftCorner, Qt::LeftDockWidgetArea );
@@ -96,16 +87,23 @@ AppInterface::AppInterface()
   application_menu_ = new AppMenu( this );
   status_bar_ = new AppStatusBar( this );
 
-  qpointer_type app_interface( this );
 
   InterfaceManager::Instance()->show_window_signal_.connect( boost::bind(
-      &AppInterface::HandleShowWindow, app_interface, _1 ) );
+      &AppInterface::HandleShowWindow, qpointer_type( this ), _1 ) );
 
   InterfaceManager::Instance()->close_window_signal_.connect( boost::bind(
-      &AppInterface::HandleCloseWindow, app_interface, _1 ) );
+      &AppInterface::HandleCloseWindow, qpointer_type( this ), _1 ) );
 
-  // Connect state and reflect the current state
+  ActionDispatcher::Instance()->begin_progress_signal_.connect( boost::bind(
+    &AppInterface::HandleBeginProgress, qpointer_type( this ), _1 ) );
 
+  ActionDispatcher::Instance()->end_progress_signal_.connect( boost::bind(
+    &AppInterface::HandleEndProgress, qpointer_type( this ), _1 ) );
+
+  ActionDispatcher::Instance()->report_progress_signal_.connect( boost::bind(
+    &AppInterface::HandleReportProgress, qpointer_type( this ), _1 ) );
+
+  // NOTE: Connect state and reflect the current state (needs to be atomic, hence the lock)
   {
     // NOTE: State Engine is locked so the application thread cannot make
     // any changes to it
@@ -113,8 +111,9 @@ AppInterface::AppInterface()
 
     // Connect and update full screen state
     set_full_screen( InterfaceManager::Instance()->full_screen_state_->get() );
+    
     InterfaceManager::Instance()->full_screen_state_-> value_changed_signal_.connect(
-        boost::bind( &AppInterface::SetFullScreen, app_interface, _1, _2 ) );
+        boost::bind( &AppInterface::SetFullScreen, qpointer_type( this ), _1, _2 ) );
   }
 }
 
@@ -295,6 +294,28 @@ void AppInterface::close_window( const std::string& windowid )
   }
 }
 
+void AppInterface::begin_progress( ActionProgressHandle handle )
+{
+  // Step (1): delete any out standing progress messages
+  if ( progress_.data() )
+  {
+    progress_->done( 0 );
+  }
+  
+  progress_ = new ProgressWidget( handle, this );
+  progress_->exec();
+}
+
+void AppInterface::end_progress( ActionProgressHandle handle )
+{
+  if (progress_.data() ) progress_->done( 0 );
+}
+
+void AppInterface::report_progress( ActionProgressHandle handle )
+{
+  if (progress_.data() ) progress_->update_progress();
+}
+
 void AppInterface::addDockWidget( Qt::DockWidgetArea area, QDockWidget* dock_widget )
 {
   QMainWindow::addDockWidget( area, dock_widget );
@@ -313,23 +334,40 @@ void AppInterface::addDockWidget( Qt::DockWidgetArea area, QDockWidget* dock_wid
   }
 }
 
-void AppInterface::HandleShowWindow( qpointer_type app_interface, std::string windowid )
+void AppInterface::HandleShowWindow( qpointer_type qpointer, std::string windowid )
 {
-  Interface::PostEvent( CheckQtPointer( app_interface, boost::bind( &AppInterface::show_window,
-      app_interface.data(), windowid ) ) );
+  Interface::PostEvent( CheckQtPointer( qpointer, boost::bind( &AppInterface::show_window,
+      qpointer.data(), windowid ) ) );
 }
 
-void AppInterface::HandleCloseWindow( qpointer_type app_interface, std::string windowid )
+void AppInterface::HandleCloseWindow( qpointer_type qpointer, std::string windowid )
 {
-  Interface::PostEvent( CheckQtPointer( app_interface, boost::bind( &AppInterface::close_window,
-      app_interface.data(), windowid ) ) );
+  Interface::PostEvent( CheckQtPointer( qpointer, boost::bind( &AppInterface::close_window,
+      qpointer.data(), windowid ) ) );
 }
 
-void AppInterface::SetFullScreen( qpointer_type app_interface, bool full_screen,
-    ActionSource action_source )
+void AppInterface::HandleBeginProgress( qpointer_type qpointer, ActionProgressHandle handle )
 {
-  Interface::PostEvent( CheckQtPointer( app_interface, boost::bind(
-      &AppInterface::set_full_screen, app_interface.data(), full_screen ) ) );
+  Interface::PostEvent( CheckQtPointer( qpointer, boost::bind( &AppInterface::begin_progress,
+      qpointer.data(), handle ) ) );
+}
+
+void AppInterface::HandleEndProgress( qpointer_type qpointer, ActionProgressHandle handle )
+{
+  Interface::PostEvent( CheckQtPointer( qpointer, boost::bind( &AppInterface::end_progress,
+      qpointer.data(), handle ) ) );
+}
+
+void AppInterface::HandleReportProgress( qpointer_type qpointer, ActionProgressHandle handle )
+{
+  Interface::PostEvent( CheckQtPointer( qpointer, boost::bind( &AppInterface::report_progress,
+      qpointer.data(), handle ) ) );
+}
+
+void AppInterface::SetFullScreen( qpointer_type qpointer, bool full_screen, ActionSource source )
+{
+  Interface::PostEvent( CheckQtPointer( qpointer, boost::bind(
+      &AppInterface::set_full_screen, qpointer.data(), full_screen ) ) );
 }
 
 } // end namespace Seg3D

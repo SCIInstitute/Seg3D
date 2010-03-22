@@ -28,6 +28,7 @@
 
 // Boost includes
 #include <boost/filesystem.hpp>
+#include <boost/thread.hpp>
 
 // Utils includes
 #include <Utils/Core/Log.h>
@@ -112,27 +113,45 @@ LayerImporterWidget::LayerImporterWidget( LayerImporterHandle importer, QWidget*
   importer_(importer),
   mode_(LayerImporterMode::DATA_E)
 {
-  // Ensure we have all the data of the import process
-  importer->import_header();
-
-  // Ensure it will be the only focus in the pogram
+  // Step (1): Ensure it will be the only focus in the pogram
   setWindowModality(  Qt::ApplicationModal );
 
-  // Make a new LayerImporterWidgetPrivateHandle object
+  // Step (2): Make a new LayerImporterWidgetPrivateHandle object
   private_ = LayerImporterWidgetPrivateHandle( new LayerImporterWidgetPrivate );
   private_->ui_.setupUi( this );
 
-  // Switch off options that this importer does not support
-  if ( !( importer_->has_importer_mode( LayerImporterMode::DATA_E ) ) )
-  {
-    private_->ui_.data_->hide();
-    private_->ui_.data_label_->hide();
-  }
+  // Step (3): Hide the parts of the UI that cannot be used yet
+  
+  private_->ui_.file_info_->hide();
+  private_->ui_.importer_options_->hide();
+  private_->ui_.scanning_file_->show();
+  private_->ui_.import_button_->setEnabled( false );
 
-  if ( !( importer_->has_importer_mode( LayerImporterMode::SINGLE_MASK_E ) ) )
+  // Step (4): Activate the cancel button
+  connect( private_->ui_.cancel_button_, SIGNAL( released() ),
+    this, SLOT( reject() ) );
+
+  // Step (5): Asynchronously scan file, so UI stays interactive
+  boost::thread( boost::bind( &LayerImporterWidget::ScanFile, 
+    qpointer_type( this ), importer_ ) );
+}
+
+LayerImporterWidget::~LayerImporterWidget()
+{
+}
+
+void LayerImporterWidget::list_import_options()
+{
+  // Step (1): Switch off options that this importer does not support
+
+  if ( !( importer_->has_importer_mode( LayerImporterMode::LABEL_MASK_E ) ) )
   {
-    private_->ui_.single_mask_->hide();
-    private_->ui_.single_mask_label_->hide();
+    private_->ui_.label_mask_->hide();
+    private_->ui_.label_mask_label_->hide();
+  }
+  else
+  {
+    mode_ = LayerImporterMode::LABEL_MASK_E;
   }
 
   if ( !( importer_->has_importer_mode( LayerImporterMode::BITPLANE_MASK_E ) ) )
@@ -140,17 +159,35 @@ LayerImporterWidget::LayerImporterWidget( LayerImporterHandle importer, QWidget*
     private_->ui_.bitplane_mask_->hide();
     private_->ui_.bitplane_mask_label_->hide();
   }
-
-  if ( !( importer_->has_importer_mode( LayerImporterMode::LABEL_MASK_E ) ) )
+  else
   {
-    private_->ui_.label_mask_->hide();
-    private_->ui_.label_mask_label_->hide();
+    mode_ = LayerImporterMode::BITPLANE_MASK_E;
   }
 
-  // Switch on the right icons
+  if ( !( importer_->has_importer_mode( LayerImporterMode::SINGLE_MASK_E ) ) )
+  {
+    private_->ui_.single_mask_->hide();
+    private_->ui_.single_mask_label_->hide();
+  }
+  else
+  {
+    mode_ = LayerImporterMode::SINGLE_MASK_E;
+  }
+
+  if ( !( importer_->has_importer_mode( LayerImporterMode::DATA_E ) ) )
+  {
+    private_->ui_.data_->hide();
+    private_->ui_.data_label_->hide();
+  }
+  else
+  {
+    mode_ = LayerImporterMode::DATA_E;
+  }
+
+  // Step (2): Switch on the right icons
   update_icons();
 
-  // Add information to importer
+  // Step (3): Add information from file scan to importer
   boost::filesystem::path full_filename( importer_->get_filename() );
   private_->ui_.filename_->setText( QString::fromStdString( full_filename.filename() ) );
   
@@ -165,8 +202,6 @@ LayerImporterWidget::LayerImporterWidget( LayerImporterHandle importer, QWidget*
   private_->ui_.z_size_->setText( 
     QString::fromStdString( Utils::to_string( grid_transform.nz() ) ) );
 
-  SCI_LOG_DEBUG( std::string( "Transform = " ) + Utils::export_to_string(grid_transform) );
-
   private_->ui_.x_spacing_->setText( 
     QString::fromStdString( Utils::to_string( grid_transform.spacing_x() ) ) );
   private_->ui_.y_spacing_->setText( 
@@ -174,20 +209,7 @@ LayerImporterWidget::LayerImporterWidget( LayerImporterHandle importer, QWidget*
   private_->ui_.z_spacing_->setText( 
     QString::fromStdString( Utils::to_string( grid_transform.spacing_z() ) ) );
 
-  // Create the notes:
-  std::string notes;
-  if ( !( grid_transform.is_axis_aligned() ) )
-  {
-    notes += "Converting data to be axis align."; 
-  }
-  
-  if ( notes == "" )
-  {
-    notes = "No messages.";
-  }
-  
-  private_->ui_.import_notes_->setText( QString::fromStdString(notes) );
-
+  // Step (4): Add connections for selecting and importing the data
   connect( private_->ui_.data_, SIGNAL( released() ), 
     this, SLOT( set_data() ) );
   connect( private_->ui_.single_mask_, SIGNAL( released() ), 
@@ -196,16 +218,21 @@ LayerImporterWidget::LayerImporterWidget( LayerImporterHandle importer, QWidget*
     this, SLOT( set_bitplane_mask() ) );
   connect( private_->ui_.label_mask_, SIGNAL( released() ), 
     this, SLOT( set_label_mask() ) );
-    
+
   connect( private_->ui_.import_button_, SIGNAL( released() ),
     this, SLOT( import() ) );
-  connect( private_->ui_.cancel_button_, SIGNAL( released() ),
-    this, SLOT( reject() ) );
+
+  // Step (5): Swap out visuals to allow the user to select the right option
+  private_->ui_.file_info_->show();
+  private_->ui_.importer_options_->show();
+  private_->ui_.scanning_file_->hide();
+  private_->ui_.import_button_->setEnabled( true );
+  private_->ui_.cancel_button_->setDefault( false );
+  private_->ui_.cancel_button_->setAutoDefault( false );
+  private_->ui_.import_button_->setDefault( true );
+  private_->ui_.import_button_->setAutoDefault( true );
 }
 
-LayerImporterWidget::~LayerImporterWidget()
-{
-}
 
 void LayerImporterWidget::update_icons()
 {
@@ -270,5 +297,52 @@ void LayerImporterWidget::import()
   ActionImportLayer::Dispatch( importer_, mode_ );
   accept();
 }
+
+void LayerImporterWidget::ScanFile( qpointer_type qpointer, LayerImporterHandle importer )
+{
+  // Step (1) : Import the file header or in some cases the full file
+  bool success = importer->import_header();
+  
+  // Step (2) : Update the widget if it still exists
+  if ( success )
+  {
+    Interface::Instance()->post_event( boost::bind( &LayerImporterWidget::ListImportOptions,
+      qpointer, importer ) ); 
+  }
+  else
+  {
+    Interface::Instance()->post_event( boost::bind( &LayerImporterWidget::ReportImportError,
+      qpointer, importer ) );
+  }
+}
+
+void LayerImporterWidget::ListImportOptions( qpointer_type qpointer, LayerImporterHandle importer )
+{
+  if ( qpointer.data() ) qpointer->list_import_options();
+}
+
+void LayerImporterWidget::ReportImportError( qpointer_type qpointer, LayerImporterHandle importer )
+{
+  if ( qpointer.data() )
+  {
+    QWidget* parent = dynamic_cast<QWidget*>( qpointer->parent() );
+    qpointer->reject();
+  
+    std::string error_message = std::string("ERROR: Could not read file '") + 
+      importer->get_filename() + std::string("'.");
+    std::string detailed_message = importer->get_error(); 
+      
+    QMessageBox message_box( parent );
+    message_box.setWindowTitle( "Import Layer..." );
+    message_box.addButton( QMessageBox::Ok );
+    message_box.setIcon( QMessageBox::Critical );
+    message_box.setText( QString::fromStdString( error_message ) );
+    message_box.setDetailedText( QString::fromStdString ( detailed_message ) );
+    message_box.exec();
+    return; 
+  }
+}
+
+
 
 }  // end namespace Seg3D

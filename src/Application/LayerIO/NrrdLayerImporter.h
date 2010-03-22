@@ -46,7 +46,7 @@ namespace Seg3D
 
 class NrrdLayerImporter : public LayerImporter
 {
-  SCI_IMPORTER_TYPE("Teem Importer",".nrrd;.nhdr",10)
+  SCI_IMPORTER_TYPE( "Teem Importer", ".nrrd;.nhdr", 30 )
 
   // -- Constructor/Destructor --
 public:
@@ -61,7 +61,7 @@ public:
   {
   }
 
-  // -- Import a file --
+  // -- Import a file information --
 public:
 
   // IMPORT_HEADER:
@@ -69,13 +69,6 @@ public:
   // necessarily read the whole file. NOTE: Some external packages do not support reading a header
   // and hence these importers should read the full file here.
   virtual bool import_header();
-  
-  // IMPORT_DATA:
-  // Import all the of the file including the data.
-  virtual bool import_data(); 
-
-  // -- Data type information --
-public:
 
   // GET_GRID_TRANSFORM:
   // Get the grid transform of the grid that we are importing
@@ -85,26 +78,19 @@ public:
   // Get the type of data that is being imported
   virtual Utils::DataType get_data_type();
 
-  // --Import the data as a specific type --  
-public: 
   // HAS_IMPORT_MODE:
   // Test whether the importer a specific importer mode
   virtual bool has_importer_mode( LayerImporterMode mode );
+  
+  // --Import the data as a specific type --  
+public: 
 
   // IMPORT_LAYER
   // Import the layer from the file
-  virtual bool import_layer( std::vector<LayerHandle>& layers, LayerImporterMode mode );
+  virtual bool import_layer( LayerImporterMode mode, std::vector<LayerHandle>& layers );
 
 private:
   Utils::NrrdDataHandle nrrd_data_;
-
-  bool import_as_data( std::vector<LayerHandle>& layers );
-
-  bool import_as_single_mask( std::vector<LayerHandle>& layers );
-  
-  bool import_as_bitplane_mask( std::vector<LayerHandle>& layers );
-  
-  bool import_as_label_mask( std::vector<LayerHandle>& layers );
 
 };
 

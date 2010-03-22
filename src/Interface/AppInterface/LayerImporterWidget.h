@@ -56,6 +56,8 @@ Q_OBJECT
 
 //constructor - destructor
 public:
+  typedef QPointer< LayerImporterWidget > qpointer_type;
+
   LayerImporterWidget( LayerImporterHandle importer, QWidget *parent = 0 );
   virtual ~LayerImporterWidget();
 
@@ -88,6 +90,23 @@ private:
   // SET_MODE:
   // Set the mode of the importer
   void set_mode( LayerImporterMode mode );
+  
+  // LIST_IMPORT_OPTIONS:
+  // Prompt for the import options that are available
+  void list_import_options();
+  
+  // SCANFILE:
+  // Function that needs to be run asynchronously to scan the file contents
+  static void ScanFile( qpointer_type qpointer, LayerImporterHandle importer ); 
+
+  // LIST_IMPORT_OPTIONS:
+  // List the import options in the dialog
+  static void ListImportOptions ( qpointer_type qpointer, LayerImporterHandle importer );
+  
+  // REPORT_IMPORT_ERROR:
+  // Close the dialog and show an error dialog
+  static void ReportImportError( qpointer_type qpointer, LayerImporterHandle importer );
+  
 };
 
 } //endnamespace Seg3d

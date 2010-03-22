@@ -97,37 +97,9 @@ std::string LayerImporter::get_base_filename()
   return full_filename.stem() ; 
 }
 
-
-bool LayerImporter::import_header()
+bool LayerImporter::check_header()
 {
-  return false;
-}
-
-bool LayerImporter::import_data()
-{
-  return false;
-}
-
-Utils::GridTransform LayerImporter::get_grid_transform()
-{
-  Utils::GridTransform identity(1,1,1);
-  return identity;
-}
-
-
-Utils::DataType LayerImporter::get_data_type()
-{
-  return Utils::DataType::UNKNOWN_E;
-}
-
-bool LayerImporter::has_importer_mode( LayerImporterMode mode )
-{
-  return false;
-}
-
-bool LayerImporter::import_layer( std::vector<LayerHandle>& layers, LayerImporterMode mode )
-{
-  return false;
+  return true; 
 }
 
 } // end namespace seg3D

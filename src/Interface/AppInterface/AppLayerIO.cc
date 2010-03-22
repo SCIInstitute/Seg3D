@@ -80,30 +80,10 @@ void AppLayerIO::Import( QMainWindow* main_window )
     message_box.exec();
     return;
   }
-
-  // Step (5): Check whether the file can be imported, otherwise inform the user about a
-  // a problem.
-  if ( ! ( importer->import_header() ) )
-  {
-    std::string error_message = std::string("ERROR: Could not import file '") + filename +
-      std::string("'.");
-    std::string detailed_message = importer->get_error(); 
-      
-    QMessageBox message_box( main_window );
-    message_box.setWindowTitle( "Import Layer..." );
-    message_box.addButton( QMessageBox::Ok );
-    message_box.setIcon( QMessageBox::Critical );
-    message_box.setText( QString::fromStdString( error_message ) );
-    message_box.setDetailedText( QString::fromStdString ( detailed_message ) );
-    message_box.exec();
-    return;
-  }
   
-  // Step (6): Open the importer dialog that issues the action to import a data file
+  // Step (5): Open the importer dialog that issues the action to import a data file
   LayerImporterWidget layer_import_dialog( importer, main_window );
   layer_import_dialog.exec();
-  
-  // NOTE: The dialog will have posted the right action, hence we just need to exit here.
 }
   
 void AppLayerIO::Export( QMainWindow* main_window )

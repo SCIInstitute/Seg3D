@@ -112,9 +112,6 @@ public:
   // State that describes which menu is currently shown
   StateOptionHandle edit_mode_state_;
   
-  // The name for the layer that is defined by the user or by the imported file
-  StateStringHandle user_defined_name_state_;
-  
   // State that describes which fill mode is active
   StateOptionHandle fill_mode_state_;
   

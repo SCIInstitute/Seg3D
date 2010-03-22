@@ -82,14 +82,18 @@ bool ActionImportLayer::validate( ActionContextHandle& context )
 
 bool ActionImportLayer::run( ActionContextHandle& context, ActionResultHandle& result )
 {
-  LayerImporterMode mode( LayerImporterMode::DATA_E );
+  std::string message = std::string("Importing '") + layer_importer_->get_filename() +
+    std::string("'");
+  ActionProgressHandle progress = ActionProgressHandle( new ActionProgress( message ) );
+
+  progress->begin_progress_reporting();
+  
+  LayerImporterMode mode = LayerImporterMode::INVALID_E;
   ImportFromString( mode_.value(), mode );
 
   std::vector<LayerHandle> layers;
-  layer_importer_->import_layer( layers, mode );
-  
-  SCI_LOG_DEBUG("Inserting layers");
-  
+  layer_importer_->import_layer( mode, layers );
+    
   for (size_t j = 0; j < layers.size(); j++)
   {
     LayerManager::Instance()->insert_layer( layers[ j ] );
@@ -98,6 +102,8 @@ bool ActionImportLayer::run( ActionContextHandle& context, ActionResultHandle& r
   // As actions are only executed by one thread, modifications can be made. However this needs
   // to be in the part that only involves the execution and not the parameters of the action.
   layer_importer_.reset();
+
+  progress->end_progress_reporting();
 
   return true;
 }

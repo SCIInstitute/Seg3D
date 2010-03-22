@@ -54,12 +54,11 @@ ToolsDockWidget::ToolsDockWidget( QWidget *parent ) :
   setAllowedAreas( Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea );
   setWindowTitle( "Tools/Plugins" );
 
-  resize( 243, 640 );
   QSizePolicy sizePolicy( QSizePolicy::Fixed, QSizePolicy::Preferred );
   sizePolicy.setHorizontalStretch(0);
   sizePolicy.setVerticalStretch(0);
   setSizePolicy( sizePolicy );
-  setMinimumSize( QSize( 243, 313 ) );
+  setMinimumSize( QSize( 260, 300 ) );
     setMaximumSize( QSize( 524287, 524287 ) );
     
   // Create a new ToolBoxWidget that encapsulates all the tool widgets

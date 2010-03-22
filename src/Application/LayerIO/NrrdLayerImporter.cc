@@ -46,12 +46,12 @@ SCI_REGISTER_IMPORTER(NrrdLayerImporter);
 bool NrrdLayerImporter::import_header()
 {
   // Only import the data once
-  if ( ( nrrd_data_ ) ) return true;
+  if ( nrrd_data_ ) return true;
   
   // NOTE: We load the full data set, as Teem does not support reading headers only :(
   // Hence we need to read the full file
   std::string error;
-  if ( ! ( Utils::NrrdData::LoadNrrd( filename_, nrrd_data_, error ) ) )
+  if ( ! ( Utils::NrrdData::LoadNrrd( get_filename() , nrrd_data_, error ) ) )
   {
     set_error( error );
     return false;
@@ -59,76 +59,68 @@ bool NrrdLayerImporter::import_header()
   return true;
 }
 
-bool NrrdLayerImporter::import_data()
-{
-  if ( !( nrrd_data_ ) ) return import_header();
-  return true;
-}
 
 Utils::GridTransform NrrdLayerImporter::get_grid_transform()
 {
   if ( nrrd_data_ )  return nrrd_data_->get_grid_transform();
-  else return LayerImporter::get_grid_transform();
+  else return Utils::GridTransform(1,1,1);
 }
+
 
 Utils::DataType NrrdLayerImporter::get_data_type()
 {
   if ( nrrd_data_ ) return nrrd_data_->get_data_type();
-  else return LayerImporter::get_data_type();
+  else return Utils::DataType::UNKNOWN_E;
 }
+
 
 bool NrrdLayerImporter::has_importer_mode( LayerImporterMode mode )
 {
   Utils::DataType data_type = nrrd_data_->get_data_type();
-   
-  if ( Utils::IsInteger( data_type ) ) return true;
-  else if ( Utils::IsReal( data_type )  && mode == LayerImporterMode::DATA_E ) return true;
+  
+  if ( mode == LayerImporterMode::DATA_E && ( Utils::IsInteger( data_type ) ||
+    Utils::IsReal( data_type ) ) )
+  {
+    return true;
+  }
+  
+  if ( ( mode == LayerImporterMode::SINGLE_MASK_E || mode == LayerImporterMode::BITPLANE_MASK_E ||
+     mode == LayerImporterMode::LABEL_MASK_E ) && Utils::IsInteger( data_type ) ) 
+  {
+    return true;
+  }
+
   return false;
 }
 
-bool NrrdLayerImporter::import_layer( std::vector<LayerHandle>& layers, LayerImporterMode mode )
+
+bool NrrdLayerImporter::import_layer( LayerImporterMode mode, std::vector<LayerHandle>& layers )
 {
+  // ensure that the data has been read
+  if ( ! nrrd_data_ ) import_header();
+  
   switch (mode)
   {
     case LayerImporterMode::DATA_E:
-      return (  import_as_data( layers ) );
+    {
+      layers.resize( 1 );
+          
+      Utils::DataBlockHandle datablock( new Utils::NrrdDataBlock( nrrd_data_ ) );
+      Utils::DataVolumeHandle datavolume( new 
+        Utils::DataVolume( nrrd_data_->get_grid_transform(), datablock ) );
+
+      layers[0] = LayerHandle( new DataLayer( get_base_filename(), datavolume ) );
+      return true;
+    }
     case LayerImporterMode::SINGLE_MASK_E:
-      return (  import_as_single_mask( layers ) );
+      return false;
     case LayerImporterMode::BITPLANE_MASK_E:
-      return (  import_as_bitplane_mask( layers ) );
+      return false;
     case LayerImporterMode::LABEL_MASK_E:
-      return (  import_as_label_mask( layers ) ); 
+      return false; 
     default:
       return false;
   }
 }
-
-bool NrrdLayerImporter::import_as_data( std::vector<LayerHandle>& layers )
-{
-  layers.resize(1);
-  Utils::DataBlockHandle datablock( new Utils::NrrdDataBlock( nrrd_data_) );
-  Utils::DataVolumeHandle datavolume( new 
-    Utils::DataVolume( nrrd_data_->get_grid_transform(), datablock ) );
-
-  layers[0] = LayerHandle( new DataLayer( get_base_filename(), datavolume ) );
-
-  return true;
-}
-
-bool NrrdLayerImporter::import_as_single_mask( std::vector<LayerHandle>& layers )
-{
-  return false;
-}
-
-bool NrrdLayerImporter::import_as_bitplane_mask( std::vector<LayerHandle>& layers )
-{
-  return false;
-}
-
-bool NrrdLayerImporter::import_as_label_mask( std::vector<LayerHandle>& layers )
-{
-  return false;
-}
-
 
 } // end namespace seg3D

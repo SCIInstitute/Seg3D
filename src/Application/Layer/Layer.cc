@@ -66,9 +66,6 @@ Layer::Layer( const std::string& name ) :
   // == Which of the submenus is being editted ==
   add_state( "edit_mode", edit_mode_state_, "none", "none|opacity|color|contrast|appearance" );
   
-  // == The user defined name
-  add_state( "user_defined_name", user_defined_name_state_, name );
-  
   // == Which fill mode is active ==
   add_state( "fill_mode", fill_mode_state_, "none", "none|crosshatch|stipple|solid" );
   

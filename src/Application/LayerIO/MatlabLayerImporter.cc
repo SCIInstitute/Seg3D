@@ -39,28 +39,24 @@ bool MatlabLayerImporter::import_header()
   return false;
 }
 
-bool MatlabLayerImporter::import_data()
-{
-  return false;
-}
-
 Utils::GridTransform MatlabLayerImporter::get_grid_transform()
 {
-  Utils::GridTransform identity(1,1,1);
-  return identity;
+  return Utils::GridTransform(1,1,1);
+}
+
+Utils::DataType MatlabLayerImporter::get_data_type()
+{
+  return Utils::DataType::UNKNOWN_E;
 }
 
 bool MatlabLayerImporter::has_importer_mode( LayerImporterMode mode )
 {
-  import_header();
-  
-  return true;
-}
-
-bool MatlabLayerImporter::import_layer( std::vector<LayerHandle>& layers, LayerImporterMode mode )
-{
   return false;
 }
 
+bool MatlabLayerImporter::import_layer( LayerImporterMode mode, std::vector<LayerHandle>& layers )
+{
+  return false;
+}
 
 } // end namespace seg3D

@@ -44,6 +44,7 @@ SET(INTERFACE_APPINTERFACE_SRCS
   LayerGroupWidget.cc
   LayerManagerDockWidget.cc
   MeasurementDockWidget.cc
+  ProgressWidget.cc
   ProjectDockWidget.cc
   SplashStart.cc
   ToolBoxWidget.cc
@@ -59,21 +60,22 @@ SET(INTERFACE_APPINTERFACE_MOC_SRCS
   AppInterface.h
   AppMenu.h
   AppStatusBar.h
-  ViewerInterface.h
   HistoryDockWidget.h
-  MessageHistoryWidget.h
-  ProjectDockWidget.h
-  ToolsDockWidget.h
-  ToolWidget.h
   LayerWidget.h
   LayerImporterWidget.h
   LayerGroupWidget.h
   LayerManagerWidget.h
   LayerManagerDockWidget.h
-  SplashStart.h
+  MessageHistoryWidget.h
   MeasurementDockWidget.h
-  ViewAction.h
+  ProgressWidget.h
+  ProjectDockWidget.h
   ToolBoxWidget.h
+  ToolsDockWidget.h
+  ToolWidget.h
+  SplashStart.h
+  ViewAction.h
+  ViewerInterface.h
   ViewerWidget.h
 )
 
@@ -89,6 +91,7 @@ SET(INTERFACE_APPINTERFACE_UI_SRCS
   MeasurementDockWidget.ui
   MessageHistoryWidget.ui
   ProjectDockWidget.ui
+  ProgressWidget.ui
   Splash.ui
   ToolBoxPageWidget.ui
   ViewerInterface.ui  

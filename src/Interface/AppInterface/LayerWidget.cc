@@ -62,6 +62,7 @@ public:
 };
 
 LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
+  QWidget( parent ),
   private_( new LayerWidgetPrivate )
 {
   
@@ -72,15 +73,12 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
                      QIcon::Normal, QIcon::Off );
   }
   
-  // Set the parent of the widget for keeping track of it in Qt
-  this->setParent( parent );
-  
   // Add the Ui children onto the QWidget
   this->private_->ui_.setupUi( this );
   
   // Set the defaults
   // this is a default setting until we can get the name of the layer from the file or by some other means
-  this->private_->ui_.label_->setText( QString::fromStdString( layer->user_defined_name_state_->get()) );
+  this->private_->ui_.label_->setText( QString::fromStdString( layer->name_state_->get()) );
   
   // here we set the unique layer_id_ of the layer
   this->private_->layer_id_ = layer->get_layer_id();
@@ -155,7 +153,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   
   QtBridge::Connect( this->private_->opacity_adjuster_, layer->opacity_state_ );
   
-  QtBridge::Connect( this->private_->ui_.label_, layer->user_defined_name_state_ );
+  QtBridge::Connect( this->private_->ui_.label_, layer->name_state_ );
   
   switch( layer->type() )
   {

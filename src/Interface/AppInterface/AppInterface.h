@@ -50,10 +50,11 @@
 
 #include <Interface/AppInterface/ViewerInterface.h>
 #include <Interface/AppInterface/HistoryDockWidget.h>
-#include <Interface/AppInterface/ProjectDockWidget.h>
-#include <Interface/AppInterface/ToolsDockWidget.h>
 #include <Interface/AppInterface/LayerManagerDockWidget.h>
 #include <Interface/AppInterface/MeasurementDockWidget.h>
+#include <Interface/AppInterface/ProgressWidget.h>
+#include <Interface/AppInterface/ProjectDockWidget.h>
+#include <Interface/AppInterface/ToolsDockWidget.h>
 
 #include <Interface/AppInterface/AppMenu.h>
 #include <Interface/AppInterface/AppStatusBar.h>
@@ -100,7 +101,16 @@ private:
   void add_windowids();
   void show_window( const std::string& windowid );
   void close_window( const std::string& windowid );
+  
+  void begin_progress( ActionProgressHandle handle );
+  void end_progress( ActionProgressHandle handle );
+  void report_progress( ActionProgressHandle handle );
 
+  // Overload the default addDockWidget and upgrade it, so docks are added
+  // on top of each other
+  void addDockWidget( Qt::DockWidgetArea area, QDockWidget* dock_widget );
+
+private:
   // Pointer to the main canvas of the main window
   QPointer< ViewerInterface > viewer_interface_;
   QPointer< AppController > controller_interface_;
@@ -111,14 +121,11 @@ private:
   QPointer< ToolsDockWidget > tools_dock_window_;
   QPointer< LayerManagerDockWidget > layer_manager_dock_window_;
   QPointer< MeasurementDockWidget > measurement_dock_window_;
+  QPointer< ProgressWidget > progress_;
 
   // Application menu, statusbar
   QPointer< AppMenu > application_menu_;
   QPointer< AppStatusBar > status_bar_;
-
-  // Overload the default addDockWidget and upgrade it, so docks are added
-  // on top of each other
-  void addDockWidget( Qt::DockWidgetArea area, QDockWidget* dock_widget );
 
   // -- Main Window management functions --
 public:
@@ -131,15 +138,28 @@ public:
 
   // HANDLESHOWWINDOW:
   // Reopen a specific window after the user has closed it
-  static void HandleShowWindow( qpointer_type app_interface, std::string windowid );
+  static void HandleShowWindow( qpointer_type qpointer, std::string windowid );
 
   // HANDLECLOSEWINDOW:
   // Close a dock or a window
-  static void HandleCloseWindow( qpointer_type app_interface, std::string windowid );
+  static void HandleCloseWindow( qpointer_type qpointer, std::string windowid );
+
+  // HANDLEBEGINPROGRESS:
+  // Open a modal window showing progress
+  static void HandleBeginProgress( qpointer_type qpointer, ActionProgressHandle handle);
+
+  // HANDLEENDPROGRESS:
+  // Close the modal window reporting on progress
+  static void HandleEndProgress( qpointer_type qpointer, ActionProgressHandle handle);
+
+  // HANDLEREPORTPROGRESS
+  // Report progress to the modal window
+  static void HandleReportProgress( qpointer_type qpointer, ActionProgressHandle handle);
 
   // SETFULLSCREEN:
   // Set full screen mode of the Main Window
   static void SetFullScreen( qpointer_type app_interface, bool full_screen, ActionSource source );
+  
 };
 
 } //end namespace

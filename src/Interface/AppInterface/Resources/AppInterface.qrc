@@ -10,6 +10,24 @@
         <file>Images/BorderOff.png</file>
         <file>Images/Brightness.png</file>
         <file>Images/BrightnessOff.png</file>
+        <file>Images/Circle0.png</file>
+        <file>Images/Circle20.png</file>
+        <file>Images/Circle40.png</file>
+        <file>Images/Circle60.png</file>
+        <file>Images/Circle80.png</file>
+        <file>Images/Circle100.png</file>
+        <file>Images/Circle120.png</file>
+        <file>Images/Circle140.png</file>
+        <file>Images/Circle160.png</file>
+        <file>Images/Circle180.png</file>
+        <file>Images/Circle200.png</file>
+        <file>Images/Circle220.png</file>
+        <file>Images/Circle240.png</file>
+        <file>Images/Circle260.png</file>
+        <file>Images/Circle280.png</file>
+        <file>Images/Circle300.png</file>
+        <file>Images/Circle320.png</file>
+        <file>Images/Circle340.png</file>
         <file>Images/Close.png</file>
 		<file>Images/CloseWhite.png</file>
         <file>Images/Crop.png</file>

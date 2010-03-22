@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>382</width>
-    <height>475</height>
+    <width>399</width>
+    <height>400</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -19,7 +19,7 @@
   <property name="minimumSize">
    <size>
     <width>0</width>
-    <height>400</height>
+    <height>100</height>
    </size>
   </property>
   <property name="font">
@@ -29,14 +29,19 @@
   </property>
   <property name="styleSheet">
    <string notr="true">QFrame#importer_options_{
-  background-color: rgb(228,228,228);
+  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(241, 241, 241, 255), stop:0.155779 rgba(248, 248, 248, 255), stop:1 rgba(224, 224, 224, 255));
   border: 2px solid rgb(90,90,90);
   border-radius: 4px;
 }
 
+QFrame#scanning_file_{
+  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(241, 241, 241, 255), stop:0.155779 rgba(248, 248, 248, 255), stop:1 rgba(224, 224, 224, 255));
+  border: 2px solid rgb(90,90,90);
+  border-radius: 4px;
+}
 
-QFrame#import_notes_frame_{
-  background-color: rgb(228,228,228);
+QFrame#file_info_{
+  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(241, 241, 241, 255), stop:0.155779 rgba(248, 248, 248, 255), stop:1 rgba(224, 224, 224, 255));
   border: 2px solid rgb(90,90,90);
   border-radius: 4px;
 }
@@ -70,124 +75,44 @@ QFrame#group_frame_{
   border: none;
 }
 
-
-QWidget#group_header_{
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(25, 25, 25, 0), stop:0.753769 rgba(0, 0, 0, 100), stop:1 rgba(0, 0, 0, 84));
-    border-radius: 4px;
-  border: 1px solid black;
+QWidget#main_{
+  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(241, 241, 241, 255), stop:0.155779 rgba(248, 248, 248, 255), stop:1 rgba(224, 224, 224, 255));
 }
-
-QWidget#group_background_{
-  background-color: rgb(255, 128, 0);
-    border-radius: 6px;
-}
-
-QWidget#LayerGroupWidget{
-  background-color: rgb(110, 110, 110);
-  border-radius:6px;
-}
-
-
-QWidget#group_{
-  border-radius: 4px;
-  border: 1px solid rgb(90, 90, 90);
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(161, 161, 161, 255), stop:0.155779 rgba(175, 175, 175, 255), stop:1 rgba(144, 144, 144, 255));
-}</string>
+</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_10">
    <property name="spacing">
     <number>0</number>
    </property>
    <property name="sizeConstraint">
-    <enum>QLayout::SetNoConstraint</enum>
+    <enum>QLayout::SetMinimumSize</enum>
    </property>
    <property name="margin">
     <number>2</number>
    </property>
    <item>
-    <widget class="QWidget" name="group_background_" native="true">
+    <widget class="QWidget" name="main_" native="true">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
      <property name="minimumSize">
       <size>
-       <width>201</width>
-       <height>21</height>
+       <width>0</width>
+       <height>100</height>
       </size>
      </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>21</height>
-      </size>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_13">
-      <property name="spacing">
-       <number>0</number>
-      </property>
-      <property name="margin">
-       <number>0</number>
-      </property>
-      <item>
-       <widget class="QWidget" name="group_header_" native="true">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>215</width>
-          <height>21</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>21</height>
-         </size>
-        </property>
-        <layout class="QHBoxLayout" name="horizontalLayout">
-         <property name="spacing">
-          <number>0</number>
-         </property>
-         <property name="margin">
-          <number>0</number>
-         </property>
-         <item>
-          <widget class="QLabel" name="import_layer_label_">
-           <property name="text">
-            <string>Import Layer ...</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-           <property name="margin">
-            <number>0</number>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QWidget" name="group_" native="true">
      <layout class="QVBoxLayout" name="verticalLayout_9">
       <property name="spacing">
-       <number>0</number>
+       <number>2</number>
       </property>
       <property name="margin">
        <number>2</number>
       </property>
       <item>
-       <widget class="QWidget" name="info_" native="true">
+       <widget class="QFrame" name="file_info_">
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -237,7 +162,7 @@ QWidget#group_{
            <item>
             <widget class="QLabel" name="filename_">
              <property name="text">
-              <string>...</string>
+              <string>-</string>
              </property>
             </widget>
            </item>
@@ -267,7 +192,7 @@ QWidget#group_{
            <item>
             <widget class="QLabel" name="data_type_">
              <property name="text">
-              <string>...</string>
+              <string>-</string>
              </property>
             </widget>
            </item>
@@ -312,7 +237,7 @@ QWidget#group_{
               </font>
              </property>
              <property name="text">
-              <string>X: 300</string>
+              <string>-</string>
              </property>
              <property name="alignment">
               <set>Qt::AlignCenter</set>
@@ -334,7 +259,7 @@ QWidget#group_{
               </font>
              </property>
              <property name="text">
-              <string>Y: 200</string>
+              <string>-</string>
              </property>
              <property name="alignment">
               <set>Qt::AlignCenter</set>
@@ -356,7 +281,7 @@ QWidget#group_{
               </font>
              </property>
              <property name="text">
-              <string>Z: 400</string>
+              <string>-</string>
              </property>
              <property name="alignment">
               <set>Qt::AlignCenter</set>
@@ -395,7 +320,7 @@ QWidget#group_{
            <item>
             <widget class="QLabel" name="x_spacing_">
              <property name="text">
-              <string>X: 300</string>
+              <string>-</string>
              </property>
              <property name="alignment">
               <set>Qt::AlignCenter</set>
@@ -405,7 +330,7 @@ QWidget#group_{
            <item>
             <widget class="QLabel" name="y_spacing_">
              <property name="text">
-              <string>Y: 200</string>
+              <string>-</string>
              </property>
              <property name="alignment">
               <set>Qt::AlignCenter</set>
@@ -415,7 +340,7 @@ QWidget#group_{
            <item>
             <widget class="QLabel" name="z_spacing_">
              <property name="text">
-              <string>Z: 400</string>
+              <string>-</string>
              </property>
              <property name="alignment">
               <set>Qt::AlignCenter</set>
@@ -428,7 +353,35 @@ QWidget#group_{
        </widget>
       </item>
       <item>
-       <widget class="QWidget" name="import_options_" native="true">
+       <widget class="QFrame" name="scanning_file_">
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <property name="spacing">
+          <number>1</number>
+         </property>
+         <property name="margin">
+          <number>4</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="scanning_file_label_">
+           <property name="text">
+            <string>Scanning file ...</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFrame" name="importer_options_">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
           <horstretch>0</horstretch>
@@ -441,334 +394,276 @@ QWidget#group_{
           <height>280</height>
          </size>
         </property>
-        <layout class="QVBoxLayout" name="verticalLayout_23">
-         <property name="spacing">
-          <number>2</number>
-         </property>
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <layout class="QGridLayout" name="gridLayout">
          <property name="sizeConstraint">
           <enum>QLayout::SetMinimumSize</enum>
          </property>
          <property name="margin">
           <number>4</number>
          </property>
-         <item>
-          <widget class="Line" name="line_2">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QFrame" name="importer_options_">
+         <property name="spacing">
+          <number>-1</number>
+         </property>
+         <item row="0" column="0">
+          <widget class="QLabel" name="data_label_">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+            <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
            <property name="minimumSize">
             <size>
-             <width>0</width>
-             <height>280</height>
+             <width>250</width>
+             <height>64</height>
             </size>
            </property>
-           <property name="frameShape">
-            <enum>QFrame::StyledPanel</enum>
+           <property name="maximumSize">
+            <size>
+             <width>16777211</width>
+             <height>16777211</height>
+            </size>
            </property>
-           <property name="frameShadow">
-            <enum>QFrame::Raised</enum>
+           <property name="baseSize">
+            <size>
+             <width>0</width>
+             <height>64</height>
+            </size>
            </property>
-           <layout class="QGridLayout" name="gridLayout">
-            <property name="sizeConstraint">
-             <enum>QLayout::SetMinimumSize</enum>
-            </property>
-            <property name="margin">
-             <number>4</number>
-            </property>
-            <property name="spacing">
-             <number>-1</number>
-            </property>
-            <item row="0" column="0">
-             <widget class="QLabel" name="data_label_">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>250</width>
-                <height>64</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>16777211</width>
-                <height>16777211</height>
-               </size>
-              </property>
-              <property name="baseSize">
-               <size>
-                <width>0</width>
-                <height>64</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Lucida Grande'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Import file as a &lt;span style=&quot; font-weight:600;&quot;&gt;Data Volume&lt;/span&gt;: The data will be displayed as solid volume of gray scale values. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-              </property>
-              <property name="textFormat">
-               <enum>Qt::RichText</enum>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-              </property>
-              <property name="wordWrap">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QToolButton" name="data_">
-              <property name="minimumSize">
-               <size>
-                <width>48</width>
-                <height>48</height>
-               </size>
-              </property>
-              <property name="baseSize">
-               <size>
-                <width>48</width>
-                <height>48</height>
-               </size>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>48</width>
-                <height>48</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="single_mask_label_">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>250</width>
-                <height>64</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+           </property>
+           <property name="textFormat">
+            <enum>Qt::RichText</enum>
+           </property>
+           <property name="scaledContents">
+            <bool>false</bool>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+           </property>
+           <property name="wordWrap">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QToolButton" name="data_">
+           <property name="minimumSize">
+            <size>
+             <width>48</width>
+             <height>48</height>
+            </size>
+           </property>
+           <property name="baseSize">
+            <size>
+             <width>48</width>
+             <height>48</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>48</width>
+             <height>48</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="single_mask_label_">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>250</width>
+             <height>64</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Lucida Grande'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Import file as a &lt;span style=&quot; font-weight:600;&quot;&gt;Single Mask:&lt;/span&gt; The mask will be created by thresholding all the non zero values in the file as selected.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-              </property>
-              <property name="textFormat">
-               <enum>Qt::RichText</enum>
-              </property>
-              <property name="wordWrap">
-               <bool>true</bool>
-              </property>
-              <property name="indent">
-               <number>0</number>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QToolButton" name="single_mask_">
-              <property name="minimumSize">
-               <size>
-                <width>48</width>
-                <height>48</height>
-               </size>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>48</width>
-                <height>48</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0">
-             <widget class="QLabel" name="bitplane_mask_label_">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>250</width>
-                <height>64</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+           </property>
+           <property name="textFormat">
+            <enum>Qt::RichText</enum>
+           </property>
+           <property name="scaledContents">
+            <bool>false</bool>
+           </property>
+           <property name="wordWrap">
+            <bool>true</bool>
+           </property>
+           <property name="indent">
+            <number>0</number>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QToolButton" name="single_mask_">
+           <property name="minimumSize">
+            <size>
+             <width>48</width>
+             <height>48</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>48</width>
+             <height>48</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="bitplane_mask_label_">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>250</width>
+             <height>64</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Lucida Grande'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Import file as a &lt;span style=&quot; font-weight:600;&quot;&gt;Series of Masks:&lt;/span&gt; Each mask is defined by a bit plane in the data file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-              </property>
-              <property name="wordWrap">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="0">
-             <widget class="QLabel" name="label_mask_label_">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>250</width>
-                <height>64</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+           </property>
+           <property name="wordWrap">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_mask_label_">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>250</width>
+             <height>64</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Lucida Grande'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Import file as a &lt;span style=&quot; font-weight:600;&quot;&gt;Series of Masks&lt;/span&gt;: Each unique label in the mask will be given a separate mask.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-              </property>
-              <property name="wordWrap">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="1">
-             <widget class="QToolButton" name="label_mask_">
-              <property name="minimumSize">
-               <size>
-                <width>48</width>
-                <height>48</height>
-               </size>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>48</width>
-                <height>48</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="1">
-             <widget class="QToolButton" name="bitplane_mask_">
-              <property name="minimumSize">
-               <size>
-                <width>48</width>
-                <height>48</height>
-               </size>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>48</width>
-                <height>48</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-           </layout>
+           </property>
+           <property name="wordWrap">
+            <bool>true</bool>
+           </property>
           </widget>
          </item>
-         <item>
-          <widget class="QFrame" name="import_notes_frame_">
-           <property name="frameShape">
-            <enum>QFrame::StyledPanel</enum>
-           </property>
-           <property name="frameShadow">
-            <enum>QFrame::Raised</enum>
-           </property>
-           <layout class="QVBoxLayout" name="verticalLayout_2">
-            <property name="spacing">
-             <number>1</number>
-            </property>
-            <property name="margin">
-             <number>4</number>
-            </property>
-            <item>
-             <widget class="QLabel" name="import_notes_label_">
-              <property name="text">
-               <string>Import notes:</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="import_notes_">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>48</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>...</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-              </property>
-              <property name="wordWrap">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </item>
-         <item>
-          <spacer name="verticalSpacer">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
+         <item row="3" column="1">
+          <widget class="QToolButton" name="label_mask_">
+           <property name="minimumSize">
             <size>
-             <width>20</width>
-             <height>40</height>
+             <width>48</width>
+             <height>48</height>
             </size>
            </property>
-          </spacer>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>48</width>
+             <height>48</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QToolButton" name="bitplane_mask_">
+           <property name="minimumSize">
+            <size>
+             <width>48</width>
+             <height>48</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>48</width>
+             <height>48</height>
+            </size>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_5">
+       <spacer name="vertical_spacer_">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="control_bar_">
         <item>
          <widget class="QPushButton" name="cancel_button_">
           <property name="text">
@@ -777,7 +672,7 @@ p, li { white-space: pre-wrap; }
          </widget>
         </item>
         <item>
-         <spacer name="horizontalSpacer">
+         <spacer name="horizontal_space_">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>

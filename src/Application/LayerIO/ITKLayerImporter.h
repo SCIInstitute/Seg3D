@@ -42,7 +42,7 @@ namespace Seg3D
 
 class ITKLayerImporter : public LayerImporter
 {
-  SCI_IMPORTER_TYPE("ITK Importer","*",5)
+  SCI_IMPORTER_TYPE( "ITK Importer", "*", 5)
 
   // -- Constructor/Destructor --
 public:
@@ -57,7 +57,7 @@ public:
   {
   }
 
-  // -- Import a file --
+  // -- Import a file information --
 public:
 
   // IMPORT_HEADER:
@@ -65,27 +65,25 @@ public:
   // necessarily read the whole file. NOTE: Some external packages do not support reading a header
   // and hence these importers should read the full file here.
   virtual bool import_header();
-  
-  // IMPORT_DATA:
-  // Import all the of the file including the data.
-  virtual bool import_data(); 
-
-  // -- Data type information --
-public:
 
   // GET_GRID_TRANSFORM:
   // Get the grid transform of the grid that we are importing
   virtual Utils::GridTransform get_grid_transform();
 
-  // --Import the data as a specific type --  
-public: 
+  // GET_DATA_TYPE:
+  // Get the type of data that is being imported
+  virtual Utils::DataType get_data_type();
+
   // HAS_IMPORT_MODE:
   // Test whether the importer a specific importer mode
   virtual bool has_importer_mode( LayerImporterMode mode );
+  
+  // --Import the data as a specific type --  
+public: 
 
   // IMPORT_LAYER
   // Import the layer from the file
-  virtual bool import_layer( std::vector<LayerHandle>& layers, LayerImporterMode mode );
+  virtual bool import_layer( LayerImporterMode mode, std::vector<LayerHandle>& layers );
 
 };
 
