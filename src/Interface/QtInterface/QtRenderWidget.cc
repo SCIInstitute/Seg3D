@@ -53,6 +53,7 @@ QtRenderWidget::QtRenderWidget( const QGLFormat& format, QWidget* parent, QtRend
   setAutoFillBackground( false );
   setAttribute( Qt::WA_OpaquePaintEvent );
   setAttribute( Qt::WA_NoSystemBackground );
+  setMouseTracking( true );
 }
 
 QtRenderWidget::~QtRenderWidget()
@@ -176,6 +177,11 @@ void QtRenderWidget::mouseReleaseEvent( QMouseEvent * event )
 
   viewer_->mouse_release_event( this->mouse_history_, event->button(), event->buttons(),
       event->modifiers() );
+}
+
+void QtRenderWidget::wheelEvent( QWheelEvent* event )
+{
+
 }
 
 void QtRenderWidget::set_viewer_id( size_t viewer_id )

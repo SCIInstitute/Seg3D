@@ -40,22 +40,27 @@ VolumeSlice::VolumeSlice( const VolumeHandle& volume,
   slice_type_( type ), 
   slice_number_ ( slice_num )
 {
-  this->update();
+  this->update_position();
   this->slice_number_ = Min( this->slice_number_, this->number_of_slices_ - 1 );
 }
 
 VolumeSlice::VolumeSlice( const VolumeSlice& copy ) :
   slice_changed_( copy.slice_changed_ ),
   size_changed_( copy.size_changed_ ),
-  width_( copy.width_ ),
-  height_( copy.height_ ),
+  nx_( copy.nx_ ),
+  ny_( copy.ny_ ),
   number_of_slices_( copy.number_of_slices_ ),
+  left_( copy.left_ ), right_( copy.right_ ), 
+  bottom_( copy.bottom_ ), top_( copy.top_ ),
+  bottom_left_( copy.bottom_left_ ),
+  bottom_right_( copy.bottom_right_ ),
+  top_left_( copy.top_left_ ),
+  top_right_( copy.top_right_ ),
   texture_( copy.texture_ ),
   volume_( copy.volume_ ),
   slice_type_( copy.slice_type_ ),
   slice_number_( copy.slice_number_ )
 {
-  this->update();
 }
 
 VolumeSlice::~VolumeSlice()
@@ -71,7 +76,7 @@ void VolumeSlice::set_slice_type( VolumeSliceType type )
     this->size_changed_ = true;
     this->slice_type_ = type;
 
-    this->update();
+    this->update_position();
     this->slice_number_ = Min( this->slice_number_, this->number_of_slices_ - 1 );
   }
 }
@@ -86,88 +91,46 @@ void VolumeSlice::set_slice_number( size_t slice_num )
   }
 }
 
-void VolumeSlice::get_world_space_boundary_3d( Point& bottom_left, Point& bottom_right, 
-  Point& top_left, Point& top_right  ) const
+void VolumeSlice::update_position()
 {
-  full_index_type index;
+  Point index;
   this->to_index( 0, 0, index );
-  bottom_left = this->volume_->apply_grid_transform( Point( index[0], index[1], index[2] ) );
-  this->to_index( this->width_ - 1, 0, index );
-  bottom_right = this->volume_->apply_grid_transform( Point( index[0], index[1], index[2] ) );
-  this->to_index( this->width_ - 1, this->height_ - 1, index );
-  top_right = this->volume_->apply_grid_transform( Point( index[0], index[1], index[2] ) );
-  this->to_index( 0, this->height_ - 1, index );
-  top_left = this->volume_->apply_grid_transform( Point( index[0], index[1], index[2] ) );
-}
+  this->bottom_left_ = this->volume_->apply_grid_transform( index );
+  this->to_index( this->nx_ - 1, 0, index );
+  this->bottom_right_ = this->volume_->apply_grid_transform( index );
+  this->to_index( this->nx_ - 1, this->ny_ - 1, index );
+  this->top_right_ = this->volume_->apply_grid_transform( index );
+  this->to_index( 0, this->ny_ - 1, index );
+  this->top_left_ = this->volume_->apply_grid_transform( index );
 
-void VolumeSlice::get_world_space_boundary_2d(double& left, double& right, 
-    double& bottom, double& top  ) const
-{
-  full_index_type index;
-  this->to_index( 0, 0, index );
-  Point bottom_left = this->volume_->apply_grid_transform( Point( index[0], index[1], index[2] ) );
-  this->to_index( this->width_ - 1, this->height_ - 1, index );
-  Point top_right = this->volume_->apply_grid_transform( Point( index[0], index[1], index[2] ) );
-
-  switch ( this->slice_type_ )
-  {
-  case VolumeSliceType::AXIAL_E:
-    left = bottom_left.x();
-    right = top_right.x();
-    bottom = bottom_left.y();
-    top = top_right.y();
-    break;
-  case VolumeSliceType::CORONAL_E:
-    left = bottom_left.z();
-    right = top_right.z();
-    bottom = bottom_left.x();
-    top = top_right.x();
-    break;
-  case VolumeSliceType::SAGITTAL_E:
-    left = bottom_left.y();
-    right = top_right.y();
-    bottom = bottom_left.z();
-    top = top_right.z();
-    break;
-  }
-}
-
-void VolumeSlice::update()
-{
   switch( this->slice_type_ )
   {
   case VolumeSliceType::AXIAL_E:
-    this->width_ = this->volume_->nx();
-    this->height_ = this->volume_->ny();
+    this->nx_ = this->volume_->nx();
+    this->ny_ = this->volume_->ny();
     this->number_of_slices_ = this->volume_->nz();
-    this->index_func_ = boost::bind( &Volume::to_index, this->volume_, 
-      _1, _2, boost::bind( &VolumeSlice::slice_number, this ) );
-    this->full_index_func_ = boost::bind( &VolumeSlice::make_full_index, this,
-      _1, _2, boost::bind( &VolumeSlice::slice_number, this ), _3 );
-    this->extract_slice_number_func_ = boost::bind( 
-      &VolumeSlice::extract_slice_number, this, _3 );
+    this->left_ = this->bottom_left_.x();
+    this->right_ = this->top_right_.x();
+    this->bottom_ = this->bottom_left_.y();
+    this->top_ = this->top_right_.y();
     break;
   case VolumeSliceType::CORONAL_E:
-    this->width_ = this->volume_->nz();
-    this->height_ = this->volume_->nx();
+    this->nx_ = this->volume_->nz();
+    this->ny_ = this->volume_->nx();
     this->number_of_slices_ = this->volume_->ny();
-    this->index_func_ = boost::bind( &Volume::to_index, this->volume_,
-      _2, boost::bind( &VolumeSlice::slice_number, this ), _1 );
-    this->full_index_func_ = boost::bind( &VolumeSlice::make_full_index, this,
-      _2, boost::bind( &VolumeSlice::slice_number, this ), _1, _3 );
-    this->extract_slice_number_func_ = boost::bind( 
-      &VolumeSlice::extract_slice_number, this, _2 );
+    this->left_ = this->bottom_left_.z();
+    this->right_ = this->top_right_.z();
+    this->bottom_ = this->bottom_left_.x();
+    this->top_ = this->top_right_.x();
     break;
   case VolumeSliceType::SAGITTAL_E:
-    this->width_ = this->volume_->ny();
-    this->height_ = this->volume_->nz();
+    this->nx_ = this->volume_->ny();
+    this->ny_ = this->volume_->nz();
     this->number_of_slices_ = this->volume_->nx();
-    this->index_func_ = boost::bind( &Volume::to_index, this->volume_,
-      boost::bind( &VolumeSlice::slice_number, this ), _1, _2 );
-    this->full_index_func_ = boost::bind( &VolumeSlice::make_full_index, this,
-      boost::bind( &VolumeSlice::slice_number, this ), _1, _2, _3 );
-    this->extract_slice_number_func_ = boost::bind( 
-      &VolumeSlice::extract_slice_number, this, _1 );
+    this->left_ = this->bottom_left_.y();
+    this->right_ = this->top_right_.y();
+    this->bottom_ = this->bottom_left_.z();
+    this->top_ = this->top_right_.z();
     break;
   default:
     assert( false );
@@ -176,6 +139,40 @@ void VolumeSlice::update()
 
   // TODO: remove this. It's for testing only
   this->slice_number_ = this->number_of_slices_ / 2;
+}
+
+size_t VolumeSlice::to_index( size_t i, size_t j ) const
+{
+  switch ( this->slice_type_ )
+  {
+  case VolumeSliceType::AXIAL_E:
+    return this->volume_->to_index( i, j, this->slice_number_ );
+  case VolumeSliceType::CORONAL_E:
+    return this->volume_->to_index( j, this->slice_number_, i );
+  default:
+    return this->volume_->to_index( this->slice_number_, i, j );
+  }
+}
+
+void VolumeSlice::to_index( size_t i, size_t j, Point& index ) const
+{
+  switch ( this->slice_type_ )
+  {
+  case VolumeSliceType::AXIAL_E:
+    index[ 0 ] = static_cast<double>( i );
+    index[ 1 ] = static_cast<double>( j );
+    index[ 2 ] = static_cast<double>( this->slice_number_ );
+    break;
+  case VolumeSliceType::CORONAL_E:
+    index[ 0 ] = static_cast<double>( j );
+    index[ 1 ] = static_cast<double>( this->slice_number_ );
+    index[ 2 ] = static_cast<double>( i );
+    break;
+  default:
+    index[ 0 ] = static_cast<double>( this->slice_number_ );
+    index[ 1 ] = static_cast<double>( i );
+    index[ 2 ] = static_cast<double>( j );
+  }
 }
 
 } // end namespace Utils

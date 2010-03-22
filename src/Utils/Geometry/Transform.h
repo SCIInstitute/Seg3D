@@ -92,9 +92,6 @@ public:
   // Returns true if the rotation happened, false otherwise.
   bool rotate( const Vector& from, const Vector& to );
 
-  void perspective( const Point& eyep, const Point& lookat, const Vector& up, double fovy,
-      double znear, double zfar, double aspect );
-
   const Matrix& get_matrix() const;
 
   void get( double* data ) const;
@@ -112,11 +109,17 @@ public:
 
 public:
 
-  static void BuildPermute( Matrix& m, int xmap, int ymap, int zmap, bool pre );
-  static void BuildRotate( Matrix& m, double angle, const Vector& axis );
-  static void BuildShear( Matrix& m, const Vector& s, const Plane& p );
-  static void BuildScale( Matrix& m, const Vector& v );
-  static void BuildTranslate( Matrix& m, const Vector& v );
+  static void BuildPermuteMatrix( Matrix& m, int xmap, int ymap, int zmap, bool pre );
+  static void BuildRotateMatrix( Matrix& m, double angle, const Vector& axis );
+  static void BuildShearMatrix( Matrix& m, const Vector& s, const Plane& p );
+  static void BuildScaleMatrix( Matrix& m, const Vector& v );
+  static void BuildTranslateMatrix( Matrix& m, const Vector& v );
+  static void BuildViewMatrix( Matrix& m, const Point& eyep, const Point& lookat, const Vector& up );
+  static void BuildPerspectiveMatrix( Matrix& m, double fovy, double aspect, 
+          double znear, double zfar );
+  static void BuildOrthoMatrix( Matrix& m, double left, double right, double bottom, 
+          double top, double nearVal, double farVal );
+  static void BuildOrtho2DMatrix( Matrix& m, double left, double right, double bottom, double top );
 
 protected:
   Matrix mat_;

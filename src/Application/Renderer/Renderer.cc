@@ -230,12 +230,11 @@ void Renderer::redraw()
     glEnable( GL_DEPTH_TEST );
     glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
-    gluPerspective( view3d.fov(), width_ / ( 1.0 * height_ ), 0.1, 5.0 );
+    gluPerspective( view3d.fov(), this->width_ / ( 1.0 * this->height_ ), 0.1, 5.0 );
     glMatrixMode( GL_MODELVIEW );
     glLoadIdentity();
     gluLookAt( view3d.eyep().x(), view3d.eyep().y(), view3d.eyep().z(), view3d.lookat().x(),
-        view3d.lookat().y(), view3d.lookat().z(), view3d.up().x(), view3d.up().y(),
-        view3d.up().z() );
+        view3d.lookat().y(), view3d.lookat().z(), view3d.up().x(), view3d.up().y(), view3d.up().z() );
 
     glRotatef( 25.0f * ( this->viewer_id_ + 1 ), 1, 0, 1 );
     glScalef( 0.5f, 0.5f, 0.5f );
@@ -260,10 +259,18 @@ void Renderer::redraw()
     glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
     double left, right, top, bottom;
-    this->compute_2d_clipping_planes( view2d, left, right, bottom, top );
+    view2d.compute_clipping_planes( this->width_ / ( 1.0 * this->height_ ), 
+      left, right, bottom, top );
     gluOrtho2D( left, right, bottom, top );
     glMatrixMode( GL_MODELVIEW );
     glLoadIdentity();
+
+/*
+    glRotatef( 25.0f * ( this->viewer_id_ + 1 ), 1, 0, 1 );
+    glScalef( 0.5f, 0.5f, 0.5f );
+    glTranslatef( -0.5f, -0.5f, -0.5f );
+    this->cube_->draw();
+*/
 
     for ( size_t group_num = 0; group_num < layer_scene->size(); group_num++ )
     {
@@ -277,21 +284,20 @@ void Renderer::redraw()
           {
             DataLayerSceneItem* data_layer_item = 
               dynamic_cast< DataLayerSceneItem* >( layer_item.get() );
-            data_layer_item->data_volume_slice_->get_world_space_boundary_2d(
-              left, right, bottom, top );
+            Utils::DataVolumeSlice* data_slice = data_layer_item->data_volume_slice_.get();
             Utils::TextureHandle slice_tex = data_layer_item->data_volume_slice_->get_texture();
             Utils::Texture::lock_type slice_tex_lock( slice_tex->get_mutex() );
             slice_tex->enable();
             glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
             glBegin( GL_QUADS );
             glTexCoord2f( 0.0f, 0.0f );
-            glVertex2d( left, bottom );
+            glVertex2d( data_slice->left(), data_slice->bottom() );
             glTexCoord2f( 1.0f, 0.0f );
-            glVertex2d( right, bottom );
+            glVertex2d( data_slice->right(), data_slice->bottom() );
             glTexCoord2f( 1.0f, 1.0f );
-            glVertex2d( right, top );
+            glVertex2d( data_slice->right(), data_slice->top() );
             glTexCoord2f( 0.0f, 1.0f );
-            glVertex2d( left, top );
+            glVertex2d( data_slice->left(), data_slice->top() );
             glEnd();
             slice_tex->disable();
           }
@@ -304,21 +310,7 @@ void Renderer::redraw()
 
   }
 
-
   SCI_CHECK_OPENGL_ERROR();
-
-  SCI_CHECK_OPENGL_ERROR();
-  //glBegin(GL_TRIANGLES);
-  //glColor3f(1.0, 0.0, 0.0);
-  //glVertex3f(0.5, -0.5, 0);
-  //glColor3f(0.0, 1.0, 0.0);
-  //glVertex3f(0.0, 0.5, 0);
-  //glColor3f(0.0, 0.0, 1.0);
-  //glVertex3f(-0.5, -0.5, 0);
-  //glEnd();
-
-
-  glFlush();
 
   /*
    unsigned char* pixels = new unsigned char[(width_)*(height_)*3];
@@ -381,18 +373,6 @@ void Renderer::resize( int width, int height )
   height_ = height;
 
   redraw();
-}
-
-void Renderer::compute_2d_clipping_planes( const Utils::View2D& view2d, double& left,
-    double& right, double& bottom, double& top )
-{
-  double dimension = Utils::Min( this->width_, this->height_ );
-  double clipping_width = this->width_ / dimension / view2d.scalex() * 0.5;
-  double clipping_height = this->height_ / dimension / view2d.scaley() * 0.5;
-  left = view2d.center().x() - clipping_width;
-  right = view2d.center().x() + clipping_width;
-  bottom = view2d.center().y() - clipping_height;
-  top = view2d.center().y() + clipping_height;
 }
 
 void Renderer::process_slices( LayerSceneHandle& layer_scene, ViewerHandle& viewer )

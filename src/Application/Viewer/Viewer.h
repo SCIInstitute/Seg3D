@@ -162,9 +162,11 @@ private:
 
   mask_slices_map_type mask_slices_;
   data_slices_map_type data_slices_;
+  Utils::VolumeSliceHandle active_layer_slice_;
 
   void insert_layer( LayerHandle layer );
   void delete_layer( LayerHandle layer );
+  void set_active_layer( LayerHandle layer );
 
   // Adjust the view states when the first data layer is loaded
   void adjust_view();

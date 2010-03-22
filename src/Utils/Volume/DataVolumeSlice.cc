@@ -92,41 +92,52 @@ void DataVolumeSlice::upload_texture()
     // Make sure there is no pixel unpack buffer bound
     PixelUnpackBuffer::RestoreDefault();
 
-    this->texture_->set_image( static_cast<int>( this->width_ ), 
-      static_cast<int>( this->height_ ), GL_LUMINANCE );
+    this->texture_->set_image( static_cast<int>( this->nx_ ), 
+      static_cast<int>( this->ny_ ), GL_LUMINANCE );
     this->size_changed_ = false;
   }
   
   // Step 1. copy the data in the slice to a pixel unpack buffer
-  this->pixel_buffer_ = PixelBufferObjectHandle( new PixelUnpackBuffer );
-  this->pixel_buffer_->bind();
-  this->pixel_buffer_->set_buffer_data( sizeof( unsigned char ) * this->width_ * this->height_,
+  PixelBufferObjectHandle pixel_buffer( new PixelUnpackBuffer );
+  pixel_buffer->bind();
+  pixel_buffer->set_buffer_data( sizeof( unsigned char ) * this->nx_ * this->ny_,
     NULL, GL_STREAM_DRAW );
   unsigned char* buffer = reinterpret_cast<unsigned char*>(
-    this->pixel_buffer_->map_buffer( GL_WRITE_ONLY ) );
+    pixel_buffer->map_buffer( GL_WRITE_ONLY ) );
 
   // Lock the volume
   lock_type volume_lock( this->get_mutex() );
-  for ( size_t j = 0; j < this->height_; j++ )
+  
+  size_t current_index = this->to_index( 0, 0 );
+
+  // Index strides in X and Y direction. Use int instead of size_t because strides might be negative.
+  int x_stride = static_cast<int>( this->to_index( 1, 0 ) - current_index );
+  int y_stride =  static_cast<int>( this->to_index( 0, 1 ) - current_index );
+
+  size_t row_start = current_index;
+  for ( size_t j = 0; j < this->ny_; j++ )
   {
-    for ( size_t i = 0; i < this->width_; i++ )
+    current_index = row_start;
+    for ( size_t i = 0; i < this->nx_; i++ )
     {
-      size_t index = this->to_index( i, j );
-      buffer[ j * this->width_ + i ] = static_cast<unsigned char>( this->data_block_->get_data_at( index ) );
+      buffer[ j * this->nx_ + i ] = 
+        static_cast<unsigned char>( this->data_block_->get_data_at( current_index ) );
+      current_index += x_stride;
     }
+    row_start += y_stride;
   }
+
   volume_lock.unlock();
   
   // Step 2. copy from the pixel buffer to texture
-  this->pixel_buffer_->unmap_buffer();
+  pixel_buffer->unmap_buffer();
   glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
-  this->texture_->set_sub_image( 0, 0, static_cast<int>( this->width_ ), 
-    static_cast<int>( this->height_ ), NULL, GL_LUMINANCE, GL_UNSIGNED_BYTE );
+  this->texture_->set_sub_image( 0, 0, static_cast<int>( this->nx_ ), 
+    static_cast<int>( this->ny_ ), NULL, GL_LUMINANCE, GL_UNSIGNED_BYTE );
 
   // Step 3. release the pixel unpack buffer
   // NOTE: The texture streaming will still succeed even if the PBO is deleted.
-  this->pixel_buffer_->unbind();
-  this->pixel_buffer_.reset();
+  pixel_buffer->unbind();
 
   this->slice_changed_ = false;
 }

@@ -106,7 +106,7 @@ void Transform::pre_mult_matrix( const Matrix& m )
 void Transform::pre_scale( const Vector& v )
 {
   Matrix m;
-  Transform::BuildScale( m, v );
+  Transform::BuildScaleMatrix( m, v );
 
   this->mat_ = m * this->mat_;
 }
@@ -114,7 +114,7 @@ void Transform::pre_scale( const Vector& v )
 void Transform::post_scale( const Vector& v )
 {
   Matrix m;
-  Transform::BuildScale( m, v );
+  Transform::BuildScaleMatrix( m, v );
 
   this->mat_ *= m;
 }
@@ -122,7 +122,7 @@ void Transform::post_scale( const Vector& v )
 void Transform::pre_shear( const Vector& s, const Plane& p )
 {
   Matrix m;
-  Transform::BuildShear( m, s, p );
+  Transform::BuildShearMatrix( m, s, p );
 
   this->mat_ = m * this->mat_;
 }
@@ -130,7 +130,7 @@ void Transform::pre_shear( const Vector& s, const Plane& p )
 void Transform::post_shear( const Vector& s, const Plane& p )
 {
   Matrix m;
-  Transform::BuildShear( m, s, p );
+  Transform::BuildShearMatrix( m, s, p );
 
   this->mat_ *= m;
 }
@@ -138,7 +138,7 @@ void Transform::post_shear( const Vector& s, const Plane& p )
 void Transform::pre_translate( const Vector& v )
 {
   Matrix m;
-  Transform::BuildTranslate( m, v );
+  Transform::BuildTranslateMatrix( m, v );
 
   this->mat_ = m * this->mat_;
 }
@@ -146,7 +146,7 @@ void Transform::pre_translate( const Vector& v )
 void Transform::post_translate( const Vector& v )
 {
   Matrix m;
-  Transform::BuildTranslate( m, v );
+  Transform::BuildTranslateMatrix( m, v );
 
   this->mat_ *= m;
 }
@@ -154,7 +154,7 @@ void Transform::post_translate( const Vector& v )
 void Transform::pre_rotate( double angle, const Vector& axis )
 {
   Matrix m;
-  Transform::BuildRotate( m, angle, axis );
+  Transform::BuildRotateMatrix( m, angle, axis );
 
   this->mat_ = m * this->mat_;
 }
@@ -162,7 +162,7 @@ void Transform::pre_rotate( double angle, const Vector& axis )
 void Transform::post_rotate( double angle, const Vector& axis )
 {
   Matrix m;
-  Transform::BuildRotate( m, angle, axis );
+  Transform::BuildRotateMatrix( m, angle, axis );
 
   this->mat_ *= m;
 }
@@ -208,7 +208,7 @@ bool Transform::rotate( const Vector& from, const Vector& to )
 void Transform::pre_permute( int xmap, int ymap, int zmap )
 {
   Matrix m;
-  Transform::BuildPermute( m, xmap, ymap, zmap, true );
+  Transform::BuildPermuteMatrix( m, xmap, ymap, zmap, true );
 
   this->mat_ = m * this->mat_;
 }
@@ -216,7 +216,7 @@ void Transform::pre_permute( int xmap, int ymap, int zmap )
 void Transform::post_permute( int xmap, int ymap, int zmap )
 {
   Matrix m;
-  Transform::BuildPermute( m, xmap, ymap, zmap, false );
+  Transform::BuildPermuteMatrix( m, xmap, ymap, zmap, false );
 
   this->mat_ *= m;
 }
@@ -268,34 +268,6 @@ Transform Transform::get_inverse()
   return ( inv_transform );
 }
 
-void Transform::perspective( const Point& eyep, const Point& lookat, const Vector& up, double fovy,
-    double znear, double zfar, double aspect )
-{
-  Vector z( eyep - lookat );
-  z.normalize();
-
-  Vector x( Cross( up, z ) );
-  x.normalize();
-
-  Vector y( Cross( z, x ) );
-
-  // View transformation
-  Transform tf( eyep, x, y, z );
-  pre_transform( tf );
-
-  // Perspective projection
-  double f = Cot( fovy * 0.5 );
-
-  Matrix proj = Matrix::ZERO_C;
-  proj( 0, 0 ) = f / aspect;
-  proj( 1, 1 ) = f;
-  proj( 2, 2 ) = ( zfar + znear ) / ( znear - zfar );
-  proj( 2, 3 ) = 2 * zfar * znear / ( znear - zfar );
-  proj( 3, 2 ) = -1;
-
-  this->mat_ = proj * this->mat_;
-}
-
 bool Transform::operator==( const Transform& transform ) const
 {
   return ( transform.mat_ == mat_ );
@@ -340,7 +312,7 @@ bool Transform::is_axis_aligned() const
   return ( found_x_axis && found_y_axis && found_z_axis ); 
 }
 
-void Transform::BuildTranslate( Matrix& m, const Vector& v )
+void Transform::BuildTranslateMatrix( Matrix& m, const Vector& v )
 {
   m = Matrix::IDENTITY_C;
   m( 0, 3 ) = v.x();
@@ -350,7 +322,7 @@ void Transform::BuildTranslate( Matrix& m, const Vector& v )
 
 // rotate into a new frame (z=shear-fixed-plane, y=projected shear vector),
 // shear in y (based on value of z), rotate back to original frame
-void Transform::BuildShear( Matrix& m, const Vector& s, const Plane& p )
+void Transform::BuildShearMatrix( Matrix& m, const Vector& s, const Plane& p )
 {
   m = Matrix::IDENTITY_C;
 
@@ -387,7 +359,7 @@ void Transform::BuildShear( Matrix& m, const Vector& s, const Plane& p )
   m = r_inverse_mat * shear * r.mat_;
 }
 
-void Transform::BuildScale( Matrix& m, const Vector& v )
+void Transform::BuildScaleMatrix( Matrix& m, const Vector& v )
 {
   m = Matrix::IDENTITY_C;
   m( 0, 0 ) = v.x();
@@ -395,7 +367,7 @@ void Transform::BuildScale( Matrix& m, const Vector& v )
   m( 2, 2 ) = v.z();
 }
 
-void Transform::BuildRotate( Matrix& m, double angle, const Vector& axis )
+void Transform::BuildRotateMatrix( Matrix& m, double angle, const Vector& axis )
 {
   double sintheta = Sin( angle );
   double costheta = Cos( angle );
@@ -424,7 +396,7 @@ void Transform::BuildRotate( Matrix& m, double angle, const Vector& axis )
   m( 3, 3 ) = 1.0;
 }
 
-void Transform::BuildPermute( Matrix& m, int xmap, int ymap, int zmap, bool pre )
+void Transform::BuildPermuteMatrix( Matrix& m, int xmap, int ymap, int zmap, bool pre )
 {
   m = Matrix::ZERO_C;
 
@@ -447,6 +419,55 @@ void Transform::BuildPermute( Matrix& m, int xmap, int ymap, int zmap, bool pre 
     m( y, 1 ) = Sign( ymap ) * 1.0;
     m( z, 2 ) = Sign( zmap ) * 1.0;
   }
+}
+
+void Transform::BuildViewMatrix( Matrix& m, const Point& eyep, 
+  const Point& lookat, const Vector& up )
+{
+  Vector z( eyep - lookat );
+  z.normalize();
+
+  Vector x( Cross( up, z ) );
+  x.normalize();
+
+  Vector y( Cross( z, x ) );
+
+  Transform tf( eyep, x, y, z );
+  m = tf.get_matrix();
+}
+
+void Transform::BuildPerspectiveMatrix( Matrix& m, double fovy, double aspect,
+  double znear, double zfar )
+{
+  double f = Cot( DegreeToRadian( fovy ) * 0.5 );
+  m = Matrix::ZERO_C;
+  m( 0, 0 ) = f / aspect;
+  m( 1, 1 ) = f;
+  m( 2, 2 ) = ( zfar + znear ) / ( znear - zfar );
+  m( 2, 3 ) = 2 * zfar * znear / ( znear - zfar );
+  m( 3, 2 ) = -1;
+}
+
+void Transform::BuildOrthoMatrix( Matrix& m, double left, double right, double bottom, 
+  double top, double nearVal, double farVal )
+{
+  m = Matrix::ZERO_C;
+  double width = right - left;
+  double height = top - bottom;
+  double depth = farVal - nearVal;
+  m( 0, 0 ) = 2 / width;
+  m( 0, 3 ) = -( right + left ) / width;
+  m( 1, 1 ) = 2 / height;
+  m( 1, 3 ) = -( top + bottom ) / height;
+  m( 2, 2 ) = -2 / depth;
+  m( 2, 3 ) = -( farVal + nearVal ) / depth;
+  m( 3, 3 ) = 1;
+}
+
+void Transform::BuildOrtho2DMatrix( Matrix& m, double left, double right, 
+  double bottom, double top )
+{
+  Transform::BuildOrthoMatrix( m, left, right, bottom, top, -1, 1 );
 }
 
 Point operator*( const Transform& t, const Point& d )

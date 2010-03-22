@@ -109,4 +109,15 @@ void View2D::flip(FlipDirectionType direction)
   }
 }
 
+void View2D::compute_clipping_planes( double aspect, double& left, double& right, 
+  double& bottom, double& top ) const
+{
+  double clipping_width = aspect / this->scalex_ * 0.5;
+  double clipping_height = 1.0 / this->scaley_ * 0.5;
+  left = this->center_.x() - clipping_width;
+  right = this->center_.x() + clipping_width;
+  bottom = this->center_.y() - clipping_height;
+  top = this->center_.y() + clipping_height;
+}
+
 } // End namespace Utils

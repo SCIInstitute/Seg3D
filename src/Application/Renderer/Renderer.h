@@ -74,9 +74,6 @@ public:
 
 private:
 
-  void compute_2d_clipping_planes( const Utils::View2D& view2d, double& left, double& right,
-      double& bottom, double& top );
-
   void process_slices( LayerSceneHandle& layer_scene, ViewerHandle& viewer );
 
   // Context for rendering images

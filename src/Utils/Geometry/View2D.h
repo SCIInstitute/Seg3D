@@ -102,6 +102,8 @@ public:
   void scale( double ratio );
   void translate( const Vector& offset );
   void flip( FlipDirectionType direction );
+  void compute_clipping_planes( double aspect, double& left, double& right, 
+    double& bottom, double& top ) const;
 
 private:
   // Center point

@@ -75,8 +75,6 @@ private:
   // so it's safe to use a pointer here.
   MaskDataBlock* mask_data_block_;
 
-  PixelBufferObjectHandle pixel_buffer_;
-
 };
 
 } // end namespace Utils

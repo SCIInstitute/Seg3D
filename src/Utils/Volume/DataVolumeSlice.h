@@ -70,8 +70,6 @@ private:
   // so it is safe to use a pointer here.
   DataBlock* data_block_;
 
-  PixelBufferObjectHandle pixel_buffer_;
-
   // An array of GLenum's for data types, indexed by data_type values
   const static unsigned int GL_DATA_TYPE_C[];
 

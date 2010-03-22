@@ -29,7 +29,6 @@
 #ifndef UTILS_VOLUME_VOLUMESLICE_H
 #define UTILS_VOLUME_VOLUMESLICE_H
 
-#include <boost/function.hpp>
 #include <boost/shared_ptr.hpp>
 
 #include <Utils/Core/ConnectionHandler.h>
@@ -58,7 +57,6 @@ typedef boost::shared_ptr< VolumeSlice > VolumeSliceHandle;
 class VolumeSlice : protected ConnectionHandler
 {
 public:
-  typedef Point full_index_type;
   typedef Volume::mutex_type mutex_type;
   typedef Volume::lock_type lock_type;
 
@@ -81,41 +79,24 @@ public:
   void set_slice_number( size_t slice_num );
 
   // Returns the 3D index of the point in the volume
-  inline void to_index( size_t i, size_t j, full_index_type& index ) const
-  {
-    this->full_index_func_( i, j, index );
-  }
+  void to_index( size_t i, size_t j, Point& index ) const;
 
   // Returns the linear index of the point in the volume
-  inline size_t to_index( size_t i, size_t j ) const
-  {
-    return this->index_func_( i, j );
-  }
+  size_t to_index( size_t i, size_t j ) const;
 
-  inline int to_slice_number( int x, int y, int z ) const
-  {
-    return this->extract_slice_number_func_( x, y, z );
-  }
+  inline size_t nx() const { return this->nx_; }
+  inline size_t ny() const { return this->ny_; }
+  inline size_t number_of_slices() const { return this->number_of_slices_; }
 
-  inline size_t width() const
-  {
-    return this->width_;
-  }
+  inline double left() const { return this->left_; }
+  inline double right() const { return this->right_; }
+  inline double bottom() const { return this->bottom_; }
+  inline double top() const { return this->top_; }
 
-  inline size_t height() const
-  {
-    return this->height_;
-  }
-
-  inline size_t number_of_slices() const
-  {
-    return this->number_of_slices_;
-  }
-
-  bool slice_changed() const
-  {
-    return this->slice_changed_;
-  }
+  inline const Point& bottom_left() const { return this->bottom_left_; }
+  inline const Point& bottom_right() const { return this->bottom_right_; }
+  inline const Point& top_left() const { return this->top_left_; }
+  inline const Point& top_right() const { return this->top_right_; }
 
   inline void volume_updated_slot()
   {
@@ -131,12 +112,6 @@ public:
   {
     return this->volume_->apply_inverse_grid_transform( pt );
   }
-
-  void get_world_space_boundary_2d( double& left, double& right, 
-    double& bottom, double& top  ) const;
-
-  void get_world_space_boundary_3d( Point& bottom_left, Point& bottom_right, 
-    Point& top_right, Point& top_left  ) const;
   
   inline mutex_type& get_mutex()
   {
@@ -157,48 +132,30 @@ public:
   }
 
 private:
-  // Boost functions for converting the position of a point in the 2D slice to its
-  // position in the 3D volume. By taking advantage of parameter reordering capability
-  // of boost bind, these functions provide a faster and more convenient approach than
-  // using "switch...case" statements.
-
-  // Convert a 2D coordinate to a 1D index in the volume data.
-  boost::function<size_t ( size_t, size_t )> index_func_;
-
-  // Convert a 2D coordinate in the slice to 3D coordinate in the volume.
-  boost::function<void ( size_t, size_t, full_index_type& )> full_index_func_;
-
-  // Extract the slice number from a 3D coordinate.
-  boost::function<int ( int, int, int )> extract_slice_number_func_;
-
-private:
 
   inline size_t slice_number() const
   {
     return this->slice_number_;
   }
 
-  void update();
-
-  inline void make_full_index( size_t x, size_t y, size_t z, full_index_type& index ) const
-  {
-    index[0] = static_cast<double>( x );
-    index[1] = static_cast<double>( y );
-    index[2] = static_cast<double>( z );
-  }
-
-  inline int extract_slice_number( int num ) const
-  {
-    return num;
-  }
+  void update_position();
 
 protected:
 
   bool slice_changed_;
   bool size_changed_;
-  size_t width_;
-  size_t height_;
+  size_t nx_;
+  size_t ny_;
   size_t number_of_slices_;
+
+  double left_;
+  double right_;
+  double bottom_;
+  double top_;
+  Point bottom_left_;
+  Point bottom_right_;
+  Point top_left_;
+  Point top_right_;
 
   Texture2DHandle texture_;
 

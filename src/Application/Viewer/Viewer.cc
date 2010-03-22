@@ -71,6 +71,8 @@ Viewer::Viewer( const std::string& key ) :
     boost::bind( &Viewer::insert_layer, this, _1 ) ) );
   this->add_connection( LayerManager::Instance()->layer_deleted_signal_.connect(
     boost::bind( &Viewer::delete_layer, this, _1 ) ) );
+  this->add_connection( LayerManager::Instance()->active_layer_changed_signal_.connect(
+    boost::bind( &Viewer::set_active_layer, this, _1 ) ) );
   this->add_connection( this->view_mode_state_->value_changed_signal_.connect(
     boost::bind( &Viewer::change_view_mode, this, _1, _2 ) ) );
 }
@@ -97,6 +99,12 @@ void Viewer::mouse_move_event( const MouseHistory& mouse_history, int button, in
     }
   }
 
+  if ( buttons == MouseButton::NO_BUTTON_E )
+  {
+    // TODO: update status bar here
+    return;
+  }
+  
   // default handling here
   this->view_manipulator_->mouse_move( mouse_history, button, buttons, modifiers );
 }
@@ -157,7 +165,7 @@ void Viewer::reset_mouse_handlers()
 
 void Viewer::state_changed()
 {
-  redraw_signal_();
+  this->redraw_signal_();
 }
 
 bool Viewer::is_volume_view() const
@@ -234,9 +242,15 @@ void Viewer::insert_layer( LayerHandle layer )
     assert( false );
   }
 
+  lock.unlock();
+
   if ( first_layer )
   {
     this->adjust_view();
+  }
+  else
+  {
+    this->redraw_signal_();
   }
 }
 
@@ -264,6 +278,28 @@ void Viewer::delete_layer( LayerHandle layer )
     // Should never reach here.
     assert( false );
   }
+
+  lock.unlock();
+  this->redraw_signal_();
+}
+
+void Viewer::set_active_layer( LayerHandle layer )
+{
+  data_slices_map_type::iterator data_slice_it = this->data_slices_.find( layer->get_layer_id() );
+  if ( data_slice_it != this->data_slices_.end() )
+  {
+    this->active_layer_slice_ = ( *data_slice_it ).second;
+    return;
+  }
+
+  mask_slices_map_type::iterator mask_slice_it = this->mask_slices_.find( layer->get_layer_id() );
+  if ( mask_slice_it != this->mask_slices_.end() )
+  {
+    this->active_layer_slice_ = ( *mask_slice_it ).second;
+    return;
+  }
+
+  assert( false );
 }
 
 Utils::MaskVolumeSliceHandle Viewer::get_mask_volume_slice( const std::string& layer_id )
@@ -328,29 +364,28 @@ void Viewer::change_view_mode( std::string mode, ActionSource source )
 
 void Viewer::adjust_view()
 {
-  Utils::DataVolumeSliceHandle data_volume_slice = Utils::DataVolumeSliceHandle( 
+  Utils::DataVolumeSliceHandle volume_slice = Utils::DataVolumeSliceHandle( 
     new Utils::DataVolumeSlice( *( *this->data_slices_.begin() ).second ) );
 
-  double left, right, bottom, top;
   double scale;
   Utils::Point center;
 
-  data_volume_slice->set_slice_type( Utils::VolumeSliceType::AXIAL_E );
-  data_volume_slice->get_world_space_boundary_2d( left, right, bottom, top );
-  center = Utils::Point( ( left + right ) * 0.5, ( bottom + top ) * 0.5, 0.0 );
-  scale = 1.0 / Utils::Max( Utils::Abs( right - left ), Utils::Abs( top - bottom ) );
+  volume_slice->set_slice_type( Utils::VolumeSliceType::AXIAL_E );
+  center = Utils::Point( ( volume_slice->left() + volume_slice->right() ) * 0.5, 
+    ( volume_slice->bottom() + volume_slice->top() ) * 0.5, 0.0 );
+  scale = 1.0 / Utils::Abs( volume_slice->top() - volume_slice->bottom() );
   ActionSet::Dispatch( this->axial_view_state_, Utils::View2D( center, scale ) );
 
-  data_volume_slice->set_slice_type( Utils::VolumeSliceType::CORONAL_E );
-  data_volume_slice->get_world_space_boundary_2d( left, right, bottom, top );
-  center = Utils::Point( ( left + right ) * 0.5, ( bottom + top ) * 0.5, 0.0 );
-  scale = 1.0 / Utils::Max( Utils::Abs( right - left ), Utils::Abs( top - bottom ) );
+  volume_slice->set_slice_type( Utils::VolumeSliceType::CORONAL_E );
+  center = Utils::Point( ( volume_slice->left() + volume_slice->right() ) * 0.5, 
+    ( volume_slice->bottom() + volume_slice->top() ) * 0.5, 0.0 );
+  scale = 1.0 / Utils::Abs( volume_slice->top() - volume_slice->bottom() );
   ActionSet::Dispatch( this->coronal_view_state_, Utils::View2D( center, scale ) );
 
-  data_volume_slice->set_slice_type( Utils::VolumeSliceType::SAGITTAL_E );
-  data_volume_slice->get_world_space_boundary_2d( left, right, bottom, top );
-  center = Utils::Point( ( left + right ) * 0.5, ( bottom + top ) * 0.5, 0.0 );
-  scale = 1.0 / Utils::Max( Utils::Abs( right - left ), Utils::Abs( top - bottom ) );
+  volume_slice->set_slice_type( Utils::VolumeSliceType::SAGITTAL_E );
+  center = Utils::Point( ( volume_slice->left() + volume_slice->right() ) * 0.5, 
+    ( volume_slice->bottom() + volume_slice->top() ) * 0.5, 0.0 );
+  scale = 1.0 / Utils::Abs( volume_slice->top() - volume_slice->bottom() );
   ActionSet::Dispatch( this->sagittal_view_state_, Utils::View2D( center, scale ) );
 }
 
