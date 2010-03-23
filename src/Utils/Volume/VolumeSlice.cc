@@ -191,4 +191,56 @@ void VolumeSlice::to_index( size_t i, size_t j, Point& index ) const
   }
 }
 
+void VolumeSlice::world_to_index( double x_pos, double y_pos, int& i, int& j ) const
+{
+  Point pos;
+
+  switch ( this->slice_type_ )
+  {
+  case VolumeSliceType::AXIAL_E:
+    pos = this->volume_->apply_inverse_grid_transform( Point( x_pos, y_pos, 0 ) );
+    i = Round( pos.x() );
+    j = Round( pos.y() );
+    break;
+  case VolumeSliceType::CORONAL_E:
+    pos = this->volume_->apply_inverse_grid_transform( Point( y_pos, 0, x_pos ) );
+    i = Round( pos.z() );
+    j = Round( pos.x() );
+    break;
+  case VolumeSliceType::SAGITTAL_E:
+    pos = this->volume_->apply_inverse_grid_transform( Point( 0, x_pos, y_pos ) );
+    i = Round( pos.y() );
+    j = Round( pos.z() );
+    break;
+  default:
+    break;
+  }
+}
+
+bool VolumeSlice::move_slice( const Point& pos )
+{
+  Point index = this->volume_->apply_inverse_grid_transform( pos );
+  int slice_num = -1;
+  switch ( this->slice_type_ )
+  {
+  case VolumeSliceType::AXIAL_E:
+    slice_num = Round( index.z() );
+    break;
+  case VolumeSliceType::CORONAL_E:
+    slice_num = Round( index.y() );
+    break;
+  case VolumeSliceType::SAGITTAL_E:
+    slice_num = Round( index.x() );
+    break;
+  }
+
+  if ( slice_num >= 0 && slice_num < this->number_of_slices_ )
+  {
+    this->set_slice_number( slice_num );
+    return true;
+  }
+
+  return false;
+}
+
 } // end namespace Utils

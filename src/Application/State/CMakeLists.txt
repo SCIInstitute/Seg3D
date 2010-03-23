@@ -65,6 +65,8 @@ SET(APPLICATION_STATE_ACTIONS_SRCS
   Actions/ActionTranslateView.cc
   Actions/ActionFlip.h
   Actions/ActionFlip.cc
+  Actions/ActionSetRange.h
+  Actions/ActionSetRange.cc
   )
 
 ADD_LIBRARY(Application_State STATIC 

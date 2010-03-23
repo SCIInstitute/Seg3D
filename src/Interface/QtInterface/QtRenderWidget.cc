@@ -181,7 +181,16 @@ void QtRenderWidget::mouseReleaseEvent( QMouseEvent * event )
 
 void QtRenderWidget::wheelEvent( QWheelEvent* event )
 {
-
+  int delta = Utils::RoundUp( event->delta() / 120.0 );
+  if ( this->viewer_->wheel_event( delta, event->x(), event->y(), 
+    event->buttons(), event->modifiers() ) )
+  {
+    event->accept();
+  }
+  else
+  {
+    event->ignore();
+  }
 }
 
 void QtRenderWidget::set_viewer_id( size_t viewer_id )

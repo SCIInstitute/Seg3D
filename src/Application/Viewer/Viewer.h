@@ -125,6 +125,7 @@ public:
       int modifiers );
   void mouse_release_event( const MouseHistory& mouse_history, int button, int buttons,
       int modifiers );
+  bool wheel_event( int delta, int x, int y, int buttons, int modifiers );
 
   void set_mouse_move_handler( mouse_event_handler_type func );
   void set_mouse_press_handler( mouse_event_handler_type func );
@@ -132,10 +133,11 @@ public:
   void reset_mouse_handlers();
 
 private:
+  void update_status_bar( int x, int y );
+
   mouse_event_handler_type mouse_move_handler_;
   mouse_event_handler_type mouse_press_handler_;
   mouse_event_handler_type mouse_release_handler_;
-
   ViewManipulatorHandle view_manipulator_;
 
 public:
@@ -154,6 +156,7 @@ public:
 
 private:
   void change_view_mode( std::string mode, ActionSource source );
+  void set_slice_number( int num, ActionSource source );
 
   // -- Data structures for keeping track of slices of layers --
 private:
@@ -188,6 +191,16 @@ public:
 private:
   mutex_type layer_map_mutex_;
 
+  // -- Other functions and variables --
+private:
+  void update_slice_number_state();
+
+private:
+  int width_;
+  int height_;
+  bool ignore_state_changes_;
+  bool updating_states_; // Indicates if it's in the middle of state changes
+
   // -- State information --
 public:
 
@@ -198,9 +211,9 @@ public:
   StateView2DHandle sagittal_view_state_;
   StateView3DHandle volume_view_state_;
 
-  StateRangedIntHandle axial_slice_number_state_;
-  StateRangedIntHandle coronal_slice_number_state_;
-  StateRangedIntHandle sagittal_slice_number_state_;
+  // Stores slice number and range information of the active layer in the selected view mode
+  // NOTE: It copys value from one of the three private state variables
+  StateRangedIntHandle slice_number_state_;
 
   StateBoolHandle slice_lock_state_;
   StateBoolHandle slice_grid_state_;
@@ -211,6 +224,13 @@ public:
   StateBoolHandle volume_isosurfaces_visible_state_;
   StateBoolHandle volume_volume_rendering_visible_state_;
 
+private:
+  int slice_numbers_[ 3 ]; // Cached slice numbers for the three slicing direction
+  //StateRangedIntHandle axial_slice_number_state_;
+  //StateRangedIntHandle coronal_slice_number_state_;
+  //StateRangedIntHandle sagittal_slice_number_state_;
+
+public:
   const static std::string AXIAL_C;
   const static std::string SAGITTAL_C;
   const static std::string CORONAL_C;

@@ -69,15 +69,13 @@ View2D& View2D::operator=(const View2D& copy)
   return *this;
 }
 
-bool
-View2D::operator==(const View2D& copy) const
+bool View2D::operator==(const View2D& copy) const
 {
   return (this->center_ == copy.center_ && this->scalex_ == copy.scalex_ 
     && this->scaley_ == copy.scaley_); 
 }
 
-bool
-View2D::operator!=(const View2D& copy) const
+bool View2D::operator!=(const View2D& copy) const
 {
   return (this->center_ != copy.center_ || this->scalex_ != copy.scalex_ ||
     this->scaley_ != copy.scaley_); 

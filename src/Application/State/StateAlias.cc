@@ -77,7 +77,7 @@ bool StateAlias::set( const std::string& value, ActionSource source )
   StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
 
   std::string new_value = StateEngine::CreateStateAlias( value );
-  if ( new_value != value ) source = ActionSource::ACTION_SOURCE_NONE_E;
+  if ( new_value != value ) source = ActionSource::NONE_E;
 
   if ( StateEngine::Instance()->is_statealias( new_value ) ) return false;
 

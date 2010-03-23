@@ -74,15 +74,33 @@ protected:
 
 public:
 
+  VolumeType volume_type()
+  {
+    return this->volume_->type();
+  }
+
   void set_slice_type( VolumeSliceType type );
 
   void set_slice_number( size_t slice_num );
 
-  // Returns the 3D index of the point in the volume
+  inline size_t get_slice_number() const
+  {
+    return this->slice_number_;
+  }
+
+  // Get the index of the point in the volume
   void to_index( size_t i, size_t j, Point& index ) const;
 
   // Returns the linear index of the point in the volume
   size_t to_index( size_t i, size_t j ) const;
+
+  // Get the index of the point that's closest to the given position in world space
+  // NOTE: the indices returned can be out of the slice boundary.
+  void world_to_index( double i_pos, double j_pos, int& i, int& j ) const;
+
+  // Move the slice to closely match the given point in world space.
+  // Returns true is slice is moved, otherwise false.
+  bool move_slice( const Point& pos );
 
   inline size_t nx() const { return this->nx_; }
   inline size_t ny() const { return this->ny_; }
@@ -132,11 +150,6 @@ public:
   }
 
 private:
-
-  inline size_t slice_number() const
-  {
-    return this->slice_number_;
-  }
 
   void update_position();
 

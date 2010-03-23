@@ -26,62 +26,49 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <Utils/Core/Log.h>
+#ifndef APPLICATION_STATE_ACTIONS_ACTIONSETRANGE_H
+#define APPLICATION_STATE_ACTIONS_ACTIONSETRANGE_H
 
-#include <Application/Action/ActionContext.h>
+#include <boost/smart_ptr.hpp>
+
+#include <Application/Action/Action.h>
+#include <Application/State/StateRangedValue.h>
 
 namespace Seg3D
 {
 
-ActionContext::ActionContext() :
-  status_( ActionStatus::SUCCESS_E )
+class ActionSetRange : public Action
 {
-}
+SCI_ACTION_TYPE("SetRange", "SetRange <state> <min> <max>", ActionPropertiesType::APPLICATION_E)
 
-ActionContext::~ActionContext()
-{
-}
+public:
+  ActionSetRange();
+  virtual ~ActionSetRange() {}
 
-void ActionContext::report_error( const std::string& error )
-{
-  SCI_LOG_ERROR(error);
-}
+  virtual bool validate( ActionContextHandle& context );
+  virtual bool run( ActionContextHandle& context, ActionResultHandle& result );
 
-void ActionContext::report_warning( const std::string& warning )
-{
-  SCI_LOG_WARNING(warning);
-}
+private:
+  ActionParameter< std::string > stateid_;
+  ActionParameter< double > min_value_;
+  ActionParameter< double > max_value_;
 
-void ActionContext::report_message( const std::string& message )
-{
-  SCI_LOG_MESSAGE(message);
-}
+  StateBaseWeakHandle state_weak_handle_;
 
-void ActionContext::report_result( const ActionResultHandle& result )
-{
-}
+public:
+  template< class STATE_HANDLE >
+  static void Dispatch( STATE_HANDLE& state_handle, double min_value, double max_value )
+  {
+    ActionSetRange* action = new ActionSetRange;
+    action->stateid_.value() = state_handle->stateid();
+    action->min_value_.value() = min_value;
+    action->max_value_.value() = max_value;
+    action->state_weak_handle_ = state_handle;
 
-void ActionContext::report_status( ActionStatus status )
-{
-  status_ = status;
-}
-
-void ActionContext::report_need_resource( ResourceLockHandle& resource )
-{
-}
-
-ActionStatus ActionContext::status()
-{
-  return ( status_ );
-}
-
-ActionSource ActionContext::source()
-{
-  return ( ActionSource::COMMANDLINE_E );
-}
-
-void ActionContext::report_done()
-{
-}
+    Interface::PostAction( ActionHandle( action ) );
+  }
+};
 
 } // end namespace Seg3D
+
+#endif

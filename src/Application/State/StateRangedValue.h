@@ -93,7 +93,7 @@ public:
   // IMPORT_FROM_STRING:
   // Set the State from a string
   virtual bool import_from_string( const std::string& str, ActionSource source =
-    ActionSource::ACTION_SOURCE_NONE_E )
+    ActionSource::NONE_E )
   {
     T value;
     if ( !( Utils::ImportFromString( str, value ) ) ) return ( false );
@@ -111,7 +111,7 @@ protected:
   // IMPORT_FROM_VARIANT:
   // Import the state data from a variant parameter.
   virtual bool import_from_variant( ActionParameterVariant& variant, ActionSource source =
-                    ActionSource::ACTION_SOURCE_NONE_E )
+                    ActionSource::NONE_E )
   {
     // Get the value from the action parameter
     T value;
@@ -153,7 +153,8 @@ public:
   // variable normally is represented by a slider and this one records the
   // min and max values so values can be validated correctly
 
-  void set_range( const T& min_value, const T& max_value )
+  void set_range( const T& min_value, const T& max_value,
+    ActionSource source = ActionSource::NONE_E )
   {
     min_value_ = min_value;
     max_value_ = max_value;
@@ -163,24 +164,24 @@ public:
     if ( value_ < min_value_ )
     {
       value_ = min_value_;
-      value_changed_signal_( value_, ActionSource::ACTION_SOURCE_NONE_E );
+      value_changed_signal_( value_, ActionSource::NONE_E );
       state_changed_signal_();
     }
     else if ( value_ > max_value_ )
     {
       value_ = max_value_;
-      value_changed_signal_( value_, ActionSource::ACTION_SOURCE_NONE_E );
+      value_changed_signal_( value_, ActionSource::NONE_E );
       state_changed_signal_();
     }
 
-    range_changed_signal_( min_value_, max_value_ );
+    range_changed_signal_( min_value_, max_value_, source );
   }
 
   // -- access value --
 public:
   // GET:
   // Get the value of the state variable
-  const T& get() const
+  T get() const
   {
     return value_;
   }
@@ -190,7 +191,7 @@ public:
   // NOTE: this function by passes the action mechanism and should only be used
   // to enforce a constraint from another action. Normally use the action
   // mechanism to ensure that the action is recorded correctly.
-  bool set( T& value, ActionSource source = ActionSource::ACTION_SOURCE_NONE_E )
+  bool set( T value, ActionSource source = ActionSource::NONE_E )
   {
     // Lock the state engine so no other thread will be accessing it
     StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
@@ -206,12 +207,12 @@ public:
       if ( value < min_value_ )
       {
         value = min_value_;
-        source = ActionSource::ACTION_SOURCE_NONE_E;
+        source = ActionSource::NONE_E;
       }
       if ( value > max_value_ )
       {
         value = max_value_;
-        source = ActionSource::ACTION_SOURCE_NONE_E;
+        source = ActionSource::NONE_E;
       }
       value_ = value;
       value_changed_signal_( value_, source );

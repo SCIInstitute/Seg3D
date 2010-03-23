@@ -95,7 +95,7 @@ bool StateOption::set( const std::string& input_value, ActionSource source )
 
     if ( option_list_.end() == it )
     {
-      if ( source == ActionSource::ACTION_SOURCE_INTERFACE_E )
+      if ( source == ActionSource::INTERFACE_E )
       {
         // NOTE: This is a special case in which the option requested by the
         // interface does not exist and hence the value may be out of sync and
@@ -183,7 +183,7 @@ void StateOption::set_option_list( const std::vector< std::string >& option_list
       value_ = "";
       this->index_ = -1;
     }
-    value_changed_signal_( value_, ActionSource::ACTION_SOURCE_NONE_E );
+    value_changed_signal_( value_, ActionSource::NONE_E );
     state_changed_signal_();
   }
   else
@@ -226,7 +226,7 @@ void StateOption::set_option_list( const std::string& option_list )
       value_ = "";
       this->index_ = -1;
     }
-    value_changed_signal_( value_, ActionSource::ACTION_SOURCE_NONE_E );
+    value_changed_signal_( value_, ActionSource::NONE_E );
     state_changed_signal_();
   }
   else
@@ -271,7 +271,7 @@ void StateOption::set_option_list( const std::string& option_list, const std::st
       value_ = "";
       this->index_ = -1;
     }
-    value_changed_signal_( value_, ActionSource::ACTION_SOURCE_NONE_E );
+    value_changed_signal_( value_, ActionSource::NONE_E );
     state_changed_signal_();
   }
   else
@@ -280,7 +280,7 @@ void StateOption::set_option_list( const std::string& option_list, const std::st
     if ( value_ != lower_option )
     {
       value_ = lower_option;
-      value_changed_signal_( value_, ActionSource::ACTION_SOURCE_NONE_E );
+      value_changed_signal_( value_, ActionSource::NONE_E );
       state_changed_signal_();
     }
   }

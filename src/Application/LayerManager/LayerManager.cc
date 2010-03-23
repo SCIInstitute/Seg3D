@@ -83,6 +83,10 @@ bool LayerManager::insert_layer( LayerHandle layer )
     {
       ( *it )->insert_layer( layer );
       layer->set_layer_group( *it );
+
+      // NOTE: Unlock ASAP to avoid potential deadlock. It is especially important to unlock
+      // before triggering any signals
+      lock.unlock();
       
       layer_inserted_signal_( layer );
       group_layers_changed_signal_( ( *it ) );
@@ -98,6 +102,10 @@ bool LayerManager::insert_layer( LayerHandle layer )
   new_group->insert_layer( layer );
   group_handle_list_.push_back( new_group );
   
+  // NOTE: Unlock ASAP to avoid potential deadlock. It is especially important to unlock
+  // before triggering any signals
+  lock.unlock();
+
   // Send a signal alerting the UI that we have inserted a layer
   layer_inserted_signal_( layer );
   group_layers_changed_signal_( new_group );

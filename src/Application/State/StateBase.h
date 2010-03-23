@@ -79,7 +79,7 @@ public:
   // IMPORT_FROM_STRING:
   // Set the State from a string
   virtual bool import_from_string( const std::string& str, ActionSource source =
-    ActionSource::ACTION_SOURCE_NONE_E ) = 0;
+    ActionSource::NONE_E ) = 0;
 
 protected:
   friend class ActionSet;
@@ -92,7 +92,7 @@ protected:
   // IMPORT_FROM_VARIANT:
   // Import the state data from a variant parameter.
   virtual bool import_from_variant( ActionParameterVariant& variant, ActionSource source =
-      ActionSource::ACTION_SOURCE_NONE_E ) = 0;
+      ActionSource::NONE_E ) = 0;
 
   // VALIDATE_VARIANT:
   // Validate a variant parameter

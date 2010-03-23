@@ -126,9 +126,9 @@ void ActionDispatcher::run_action( ActionHandle action, ActionContextHandle acti
   if ( !( action->validate( action_context ) ) )
   {
     // The action  context should return unavailable or invalid
-    if ( action_context->status() != ActionStatus::ACTION_UNAVAILABLE_E )
+    if ( action_context->status() != ActionStatus::UNAVAILABLE_E )
     {
-      action_context->report_status( ActionStatus::ACTION_INVALID_E );
+      action_context->report_status( ActionStatus::INVALID_E );
     }
     action_context->report_done();
     return;
@@ -147,7 +147,7 @@ void ActionDispatcher::run_action( ActionHandle action, ActionContextHandle acti
   ActionResultHandle result;
   if ( !( action->run( action_context, result ) ) )
   {
-    action_context->report_status( ActionStatus::ACTION_ERROR_E );
+    action_context->report_status( ActionStatus::ERROR_E );
     action_context->report_done();
     // actions that fail, are aborted here
     return;
@@ -159,7 +159,7 @@ void ActionDispatcher::run_action( ActionHandle action, ActionContextHandle acti
   {
     action_context->report_result( result );
   }
-  action_context->report_status( ActionStatus::ACTION_SUCCESS_E );
+  action_context->report_status( ActionStatus::SUCCESS_E );
   action_context->report_done();
 
   // NOTE: Observers that connect to this signal should not change the state of

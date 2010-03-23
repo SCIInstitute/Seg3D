@@ -57,17 +57,17 @@ SCI_ENUM_CLASS
   ActionStatus,
 
   // ACTION_SUCCESS - Everything went fine and the action was executed
-  ACTION_SUCCESS_E = 0,
+  SUCCESS_E = 0,
 
   // ACTION_ERROR - The action did not execute properly and failed
-  ACTION_ERROR_E = 1,
+  ERROR_E = 1,
 
   // ACTION_INVALID - The action did not get validated
-  ACTION_INVALID_E = 2,
+  INVALID_E = 2,
 
   // ACTION_UNAVAILABLE - The action could not be executed, because
   // resources are not available
-  ACTION_UNAVAILABLE_E = 3
+  UNAVAILABLE_E = 3
 )
 
 // ENUM ActionSource
@@ -81,28 +81,28 @@ SCI_ENUM_CLASS
   ActionSource,
 
   // ACTION_SOURCE_NONE - It did not result from an action.
-  ACTION_SOURCE_NONE_E = 0,
+  NONE_E = 0,
 
   // ACTION_SOURCE_INTERFACE - The action is run from the interface,
   // the interface may not need an update, if the GUI already did the update.
-  ACTION_SOURCE_INTERFACE_E = 1,
+  INTERFACE_E = 1,
 
   // ACTION_SOURCE_SCRIPT -The action is run from a script, which means that
   // the interface needs to be updated and as well that actions need to be
   // queued. Hence for this source the required resource lock needs to be
   // returned, so the script can wait for the action to be completed.
-  ACTION_SOURCE_SCRIPT_E = 2,
+  SCRIPT_E = 2,
 
   // ACTION_SOURCE_COMMANDLINE - This action is run from the command line, it
   // needs to update the interface, but does not allow queuing
-  ACTION_SOURCE_COMMANDLINE_E = 3,
+  COMMANDLINE_E = 3,
 
   // ACTION_SOURCE_PROVENANCE - The action is run from the provenance buffer
   // Hence it should not be recorded again into the provenance buffer
-  ACTION_SOURCE_PROVENANCE_E = 4,
+  PROVENANCE_E = 4,
 
   // ACTION_SOURCE_UNDOBUFFER - The action is run from the undobuffer
-  ACTION_SOURCE_UNDOBUFFER_E = 5
+  UNDOBUFFER_E = 5
 )
 
 class ActionContext;
@@ -156,19 +156,19 @@ public:
 public:
   bool is_success()
   {
-    return status_ == ActionStatus::ACTION_SUCCESS_E;
+    return status_ == ActionStatus::SUCCESS_E;
   }
   bool is_invalid()
   {
-    return status_ == ActionStatus::ACTION_INVALID_E;
+    return status_ == ActionStatus::INVALID_E;
   }
   bool is_unavailable()
   {
-    return status_ == ActionStatus::ACTION_UNAVAILABLE_E;
+    return status_ == ActionStatus::UNAVAILABLE_E;
   }
   bool is_error()
   {
-    return status_ == ActionStatus::ACTION_ERROR_E;
+    return status_ == ActionStatus::ERROR_E;
   }
 
   // -- Status information --

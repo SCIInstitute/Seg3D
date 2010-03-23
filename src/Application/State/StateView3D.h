@@ -77,7 +77,7 @@ public:
   // IMPORT_FROM_STRING:
   // Set the State from a string
   virtual bool import_from_string( const std::string& str, ActionSource source =
-      ActionSource::ACTION_SOURCE_NONE_E );
+      ActionSource::NONE_E );
 
   // Rotate the stored View3D
   void rotate( const Utils::Vector& axis, double angle );
@@ -94,7 +94,7 @@ protected:
   // IMPORT_FROM_VARIANT:
   // Import the state data from a variant parameter.
   virtual bool import_from_variant( ActionParameterVariant& variant, ActionSource source =
-      ActionSource::ACTION_SOURCE_NONE_E );
+      ActionSource::NONE_E );
 
   // VALIDATE_VARIANT:
   // Validate a variant parameter
@@ -129,7 +129,7 @@ public:
   // NOTE: this function by passes the action mechanism and should only be used
   // to enforce a constraint from another action.
   bool set( const Utils::View3D& value, 
-    ActionSource source = ActionSource::ACTION_SOURCE_NONE_E );
+    ActionSource source = ActionSource::NONE_E );
 
   // -- storage of the view --
 protected:

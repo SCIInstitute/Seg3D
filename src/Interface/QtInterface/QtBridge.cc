@@ -55,7 +55,7 @@ void QtSignal( QTPOINTER qpointer, boost::function<void ()> func )
 // -- Checkbox connector --
 void QtCheckBoxSignal( QPointer< QCheckBox > qpointer, bool state, ActionSource source )
 {
-  if ( source != ActionSource::ACTION_SOURCE_INTERFACE_E )
+  if ( source != ActionSource::INTERFACE_E )
   {
     QtSignal( qpointer, boost::bind( &QCheckBox::setChecked, 
       qpointer.data(), state ) ); 
@@ -75,7 +75,7 @@ void QtComboBoxSignal( QComboBox* qcombobox, std::string state )
 
 void QtComboBoxSignal( QPointer< QComboBox > qpointer, std::string state, ActionSource source )
 {
-  if ( source != ActionSource::ACTION_SOURCE_INTERFACE_E )
+  if ( source != ActionSource::INTERFACE_E )
   {
     QtSignal( qpointer, boost::bind( &QtComboBoxSignal, qpointer.data(), state ) );
   }
@@ -83,7 +83,7 @@ void QtComboBoxSignal( QPointer< QComboBox > qpointer, std::string state, Action
 
 void QtToolButtonToggleSignal( QPointer< QToolButton > qpointer, bool state, ActionSource source )
 {
-    if ( source != ActionSource::ACTION_SOURCE_INTERFACE_E )
+    if ( source != ActionSource::INTERFACE_E )
     {
        QtSignal( qpointer, boost::bind( &QToolButton::setChecked, 
       qpointer.data(), state ) ); 
@@ -92,7 +92,7 @@ void QtToolButtonToggleSignal( QPointer< QToolButton > qpointer, bool state, Act
 void QtSliderIntComboRangedIntSignal( QPointer< SliderIntCombo > qpointer, int state,
     ActionSource source )
 {
-  if ( source != ActionSource::ACTION_SOURCE_INTERFACE_E )
+  if ( source != ActionSource::INTERFACE_E )
   {
     QtSignal( qpointer, boost::bind( &SliderIntCombo::setCurrentValue, qpointer.data(), state ) );
   }
@@ -101,7 +101,7 @@ void QtSliderIntComboRangedIntSignal( QPointer< SliderIntCombo > qpointer, int s
 void QtSliderDoubleComboValueChangedSignal( QPointer< SliderDoubleCombo > qpointer, double state,
     ActionSource source )
 {
-  if ( source != ActionSource::ACTION_SOURCE_INTERFACE_E )
+  if ( source != ActionSource::INTERFACE_E )
   {
     QtSignal( qpointer, boost::bind( &SliderDoubleCombo::setCurrentValue, qpointer.data(), state ) );
   }
@@ -111,7 +111,7 @@ void QtSliderDoubleComboValueChangedSignal( QPointer< SliderDoubleCombo > qpoint
 void QtSliderDoubleComboRangeChangedSignal( QPointer< SliderDoubleCombo > qpointer, double min, double max,
     ActionSource source )
 {
-  if ( source != ActionSource::ACTION_SOURCE_INTERFACE_E )
+  if ( source != ActionSource::INTERFACE_E )
   {
     QtSignal( qpointer, boost::bind( &SliderDoubleCombo::setRange, qpointer.data(), min, max ) );
   }
@@ -134,7 +134,7 @@ void QtActionGroupSignal( QActionGroup* qactiongroup, std::string option )
 void QtActionGroupSignal( QPointer< QActionGroup > qpointer, std::string option,
     ActionSource source )
 {
-  if ( source != ActionSource::ACTION_SOURCE_INTERFACE_E )
+  if ( source != ActionSource::INTERFACE_E )
   {
     QtSignal( qpointer, boost::bind( &QtActionGroupSignal, qpointer.data(), option ) );
   }
@@ -143,7 +143,7 @@ void QtActionGroupSignal( QPointer< QActionGroup > qpointer, std::string option,
 
 void QtLineEditSignal( QPointer< QLineEdit > qpointer, std::string state, ActionSource source )
 {
-  if ( source != ActionSource::ACTION_SOURCE_INTERFACE_E )
+  if ( source != ActionSource::INTERFACE_E )
   {
     QtSignal( qpointer, boost::bind( &QLineEdit::setText, qpointer.data(), QString::fromStdString( state ) ) ); 
   }
@@ -152,7 +152,7 @@ void QtLineEditSignal( QPointer< QLineEdit > qpointer, std::string state, Action
 
 void QtDoubleSpinBoxSignal( QPointer< QDoubleSpinBox > qpointer, double state, ActionSource source )
 {
-  if ( source != ActionSource::ACTION_SOURCE_INTERFACE_E )
+  if ( source != ActionSource::INTERFACE_E )
   {
     QtSignal( qpointer, boost::bind( &QDoubleSpinBox::setValue, qpointer.data(), state ) ); 
   }

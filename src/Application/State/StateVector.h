@@ -95,7 +95,7 @@ public:
   // IMPORT_FROM_STRING:
   // Set the State from a string
   virtual bool import_from_string( const std::string& str, ActionSource source =
-    ActionSource::ACTION_SOURCE_NONE_E )
+    ActionSource::NONE_E )
   {
     // Lock the state engine so no other thread will be accessing it
     StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
@@ -165,7 +165,7 @@ public:
   // Set the value of the state variable
   // NOTE: this function by passes the action mechanism and should only be used
   // to enforce a constraint from another action.
-  bool set( const std::vector< T >& value, ActionSource source = ActionSource::ACTION_SOURCE_NONE_E )
+  bool set( const std::vector< T >& value, ActionSource source = ActionSource::NONE_E )
   {
     // Lock the state engine so no other thread will be accessing it
     StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );

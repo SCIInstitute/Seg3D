@@ -224,8 +224,8 @@ void Renderer::redraw()
   {
     Utils::View3D view3d( viewer->volume_view_state_->get() );
 
-    state_lock.unlock();
     viewer_lock.unlock();
+    state_lock.unlock();
 
     glEnable( GL_DEPTH_TEST );
     glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
@@ -251,8 +251,8 @@ void Renderer::redraw()
     Utils::View2D view2d(
         dynamic_cast< StateView2D* > ( viewer->get_active_view_state().get() )->get() );
 
-    state_lock.unlock();
     viewer_lock.unlock();
+    state_lock.unlock();
 
     glDisable( GL_DEPTH_TEST );
     glDisable( GL_CULL_FACE );

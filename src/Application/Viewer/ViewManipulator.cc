@@ -196,9 +196,8 @@ Utils::Vector ViewManipulator::compute_translation( int x0, int y0, int x1, int 
   }
   else
   {
-    double dimension = Utils::Min( this->width_, this->height_ );
-    dx /= dimension;
-    dy /= dimension;
+    dx /= this->height_;
+    dy /= this->height_;
     return Utils::Vector( dx, dy, 0.0 );
   }
 }
