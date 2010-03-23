@@ -137,25 +137,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
         this->private_->opacity_adjuster_->setRange( opacity_min, opacity_max );
         this->private_->opacity_adjuster_->setCurrentValue( layer->opacity_state_->get() );
         
-        // set the defaults for the brightness
-        double brightness_min = 0.0; 
-      double brightness_max = 0.0;
-      double brightness_step = 0.0;
-      layer->brightness_state_->get_step( brightness_step );
-      layer->brightness_state_->get_range( brightness_min, brightness_max );
-      this->private_->brightness_adjuster_->setStep( brightness_step );
-        this->private_->brightness_adjuster_->setRange( brightness_min, brightness_max );
-        this->private_->brightness_adjuster_->setCurrentValue( layer->brightness_state_->get() );
-        
-        // set the defaults for the contrast
-        double contrast_min = 0.0; 
-      double contrast_max = 0.0;
-      double contrast_step = 0.0;
-      layer->contrast_state_->get_step( contrast_step );
-      layer->contrast_state_->get_range( contrast_min, contrast_max );
-      this->private_->contrast_adjuster_->setStep( contrast_step );
-        this->private_->contrast_adjuster_->setRange( contrast_min, contrast_max );
-        this->private_->contrast_adjuster_->setCurrentValue( layer->contrast_state_->get() );
+       
   
   
   // connect the signals and slots
@@ -203,6 +185,27 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
         DataLayer* data_layer = dynamic_cast< DataLayer* >( layer.get() );
         QtBridge::Connect( this->private_->brightness_adjuster_, data_layer->brightness_state_ );
         QtBridge::Connect( this->private_->contrast_adjuster_, data_layer->contrast_state_ );
+        
+        // set the defaults for the brightness
+                double brightness_min = 0.0; 
+                double brightness_max = 0.0;
+                double brightness_step = 0.0;
+                data_layer->brightness_state_->get_step( brightness_step );
+                data_layer->brightness_state_->get_range( brightness_min, brightness_max );
+                this->private_->brightness_adjuster_->setStep( brightness_step );
+                this->private_->brightness_adjuster_->setRange( brightness_min, brightness_max );
+                this->private_->brightness_adjuster_->setCurrentValue( data_layer->brightness_state_->get() );
+                
+                // set the defaults for the contrast
+                double contrast_min = 0.0; 
+                double contrast_max = 0.0;
+                double contrast_step = 0.0;
+                data_layer->contrast_state_->get_step( contrast_step );
+                data_layer->contrast_state_->get_range( contrast_min, contrast_max );
+                this->private_->contrast_adjuster_->setStep( contrast_step );
+                this->private_->contrast_adjuster_->setRange( contrast_min, contrast_max );
+                this->private_->contrast_adjuster_->setCurrentValue( data_layer->contrast_state_->get() );
+        
       }
       break;
     // This is for the Mask Layers  
