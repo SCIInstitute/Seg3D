@@ -67,8 +67,54 @@ bool BooleanFilterInterface::build_widget( QFrame* frame )
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
   BooleanFilter* tool = dynamic_cast< BooleanFilter* > ( base_tool_.get() );
+  
+  //Step 3 - set the values for the tool ui from the state engine
+  
+      //set default falues for the mask a option list 
+      std::vector< std::string > temp_option_list = tool->mask_a_state_->option_list();
+      for( size_t i = 0; i < temp_option_list.size(); i++)
+      {   
+          this->private_->ui_.maskAComboBox->addItem( QString::fromStdString( temp_option_list[i] ) );
+      } 
+        this->private_->ui_.maskAComboBox->setCurrentIndex(tool->mask_a_state_->index());
+      
+      //set default falues for the mask b option list 
+      temp_option_list = tool->mask_b_state_->option_list();
+      for( size_t i = 0; i < temp_option_list.size(); i++)
+      {   
+          this->private_->ui_.maskBComboBox->addItem( QString::fromStdString( temp_option_list[i] ) );
+      } 
+        this->private_->ui_.maskBComboBox->setCurrentIndex(tool->mask_b_state_->index());
+        
+        //set default falues for the mask c option list 
+      temp_option_list = tool->mask_c_state_->option_list();
+      for( size_t i = 0; i < temp_option_list.size(); i++)
+      {   
+          this->private_->ui_.maskCComboBox->addItem( QString::fromStdString( temp_option_list[i] ) );
+      } 
+        this->private_->ui_.maskCComboBox->setCurrentIndex(tool->mask_c_state_->index());
+        
+        //set default falues for the mask d option list 
+      temp_option_list = tool->mask_d_state_->option_list();
+      for( size_t i = 0; i < temp_option_list.size(); i++)
+      {   
+          this->private_->ui_.maskDComboBox->addItem( QString::fromStdString( temp_option_list[i] ) );
+      } 
+        this->private_->ui_.maskDComboBox->setCurrentIndex(tool->mask_d_state_->index());
+        
+        //set default falues for the example list
+        temp_option_list = tool->example_expressions_state_->option_list();
+      for( size_t i = 0; i < temp_option_list.size(); i++)
+      {   
+          this->private_->ui_.exampleExpComboBox->addItem( QString::fromStdString( temp_option_list[i] ) );
+      } 
+        this->private_->ui_.exampleExpComboBox->setCurrentIndex(tool->example_expressions_state_->index());
+        
+        // set the default for the replace state
+        this->private_->ui_.replaceCheckBox->setChecked( tool->replace_state_->get() );
 
-  //Step 3 - connect the gui to the tool through the QtBridge
+
+  //Step 4 - connect the gui to the tool through the QtBridge
   QtBridge::Connect( private_->ui_.maskAComboBox, tool->mask_a_state_ );
   QtBridge::Connect( private_->ui_.maskBComboBox, tool->mask_b_state_ );
   QtBridge::Connect( private_->ui_.maskCComboBox, tool->mask_c_state_ );

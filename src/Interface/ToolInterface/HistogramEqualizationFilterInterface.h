@@ -37,7 +37,6 @@
 
 // Base class of the tool widget
 #include <Interface/AppInterface/ToolWidget.h>
-#include <Interface/ToolInterface/CustomWidgets/SliderSpinComboInt.h>
 
 namespace Seg3D
 {
@@ -54,10 +53,8 @@ public:
   virtual bool build_widget( QFrame* frame );
 
 private:
-  HistogramEqualizationFilterInterfacePrivate* private_;
-  SliderSpinComboInt *upperThresholdAdjuster;
-  SliderSpinComboInt *lowerThresholdAdjuster;
-  SliderSpinComboInt *alphaAdjuster;
+  boost::shared_ptr< HistogramEqualizationFilterInterfacePrivate > private_;
+
 
 };
 

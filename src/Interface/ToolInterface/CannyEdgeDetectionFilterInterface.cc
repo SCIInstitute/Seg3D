@@ -45,6 +45,10 @@ class CannyEdgeDetectionFilterInterfacePrivate
 {
 public:
   Ui::CannyEdgeDetectionFilterInterface ui_;
+  
+  SliderDoubleCombo *variance_;
+  SliderDoubleCombo *max_error_;
+  SliderDoubleCombo *threshold_;
 };
 
 // constructor
@@ -65,24 +69,71 @@ bool CannyEdgeDetectionFilterInterface::build_widget( QFrame* frame )
   private_->ui_.setupUi( frame );
 
   //Add the SliderSpinCombos
-  varianceAdjuster = new SliderSpinComboDouble();
-  private_->ui_.varianceHLayout_bottom->addWidget( varianceAdjuster );
+  private_->variance_ = new SliderDoubleCombo();
+  private_->ui_.varianceHLayout_bottom->addWidget( private_->variance_ );
 
-  errorAdjuster = new SliderSpinComboDouble();
-  private_->ui_.errorHLayout_bottom->addWidget( errorAdjuster );
+  private_->max_error_ = new SliderDoubleCombo();
+  private_->ui_.errorHLayout_bottom->addWidget( private_->max_error_ );
 
-  thresholdAdjuster = new SliderSpinComboDouble();
-  private_->ui_.thresholdHLayout_bottom->addWidget( thresholdAdjuster );
+  private_->threshold_ = new SliderDoubleCombo();
+  private_->ui_.thresholdHLayout_bottom->addWidget( private_->threshold_ );
 
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
   CannyEdgeDetectionFilter* tool = dynamic_cast< CannyEdgeDetectionFilter* > ( base_tool_.get() );
 
-  //Step 3 - connect the gui to the tool through the QtBridge
+    //Step 3 - set the values for the tool ui from the state engine
+  
+      //set default falues for the target option list 
+      std::vector< std::string > temp_option_list = tool->target_layer_state_->option_list();
+      for( size_t i = 0; i < temp_option_list.size(); i++)
+      {   
+          this->private_->ui_.targetComboBox->addItem( QString::fromStdString( temp_option_list[i] ) );
+      } 
+        this->private_->ui_.targetComboBox->setCurrentIndex(tool->target_layer_state_->index());
+  
+      // set the defaults for the variance
+        double variance_min = 0.0; 
+      double variance_max = 0.0;
+      double variance_step = 0.0;
+      tool->variance_state_->get_step( variance_step );
+      tool->variance_state_->get_range( variance_min, variance_max );
+      private_->variance_->setStep( variance_step );
+        private_->variance_->setRange( variance_min, variance_max );
+        private_->variance_->setCurrentValue( tool->variance_state_->get() );
+        
+        // set the defaults for the max error
+        double max_error_min = 0.0; 
+      double max_error_max = 0.0;
+      double max_error_step = 0.0;
+      tool->max_error_state_->get_step( max_error_step );
+      tool->max_error_state_->get_range( max_error_min, max_error_max );
+      private_->max_error_->setStep( max_error_step );
+        private_->max_error_->setRange( max_error_min, max_error_max );
+        private_->max_error_->setCurrentValue( tool->max_error_state_->get() );
+
+        // set the defaults for the threshold
+        double threshold_min = 0.0; 
+      double threshold_max = 0.0;
+      double threshold_step = 0.0;
+      tool->threshold_state_->get_step( threshold_step );
+      tool->threshold_state_->get_range( threshold_min, threshold_max );
+      private_->threshold_->setStep( threshold_step );
+        private_->threshold_->setRange( threshold_min, threshold_max );
+        private_->threshold_->setCurrentValue( tool->threshold_state_->get() );
+        
+        //set the default replace checkbox value
+        this->private_->ui_.replaceCheckBox->setChecked(tool->replace_state_);
+
+
+      
+      
+
+  //Step 4 - connect the gui to the tool through the QtBridge
   QtBridge::Connect( private_->ui_.targetComboBox, tool->target_layer_state_ );
-  QtBridge::Connect( varianceAdjuster, tool->variance_state_ );
-  QtBridge::Connect( errorAdjuster, tool->max_error_state_ );
-  QtBridge::Connect( thresholdAdjuster, tool->threshold_state_ );
+  QtBridge::Connect( private_->variance_, tool->variance_state_ );
+  QtBridge::Connect( private_->max_error_, tool->max_error_state_ );
+  QtBridge::Connect( private_->threshold_, tool->threshold_state_ );
   QtBridge::Connect( private_->ui_.replaceCheckBox, tool->replace_state_ );
 
   //Send a message to the log that we have finised with building the Detection Filter Interface

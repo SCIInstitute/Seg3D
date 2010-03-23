@@ -32,6 +32,10 @@
 //Qt Gui Includes
 #include <Interface/ToolInterface/PaintToolInterface.h>
 #include "ui_PaintToolInterface.h"
+//#include <Interface/ToolInterface/CustomWidgets/SliderIntCombo.h>
+//#include <Interface/ToolInterface/CustomWidgets/SliderDoubleCombo.h>
+//#include <Interface/ToolInterface/CustomWidgets/SliderSpinComboInt.h>
+//#include <Interface/ToolInterface/CustomWidgets/SliderSpinComboDouble.h>
 
 //Application Includes
 #include <Application/Tools/PaintTool.h>
@@ -46,9 +50,9 @@ class PaintToolInterfacePrivate
 public:
   Ui::PaintToolInterface ui_;
 
-  SliderSpinComboInt *brush_radius_;
-  SliderSpinComboDouble *upper_threshold_;
-  SliderSpinComboDouble *lower_threshold_;
+    SliderIntCombo *brush_radius_;
+  SliderDoubleCombo *upper_threshold_;
+  SliderDoubleCombo *lower_threshold_;
 };
 
 // constructor
@@ -69,13 +73,13 @@ bool PaintToolInterface::build_widget( QFrame* frame )
   private_->ui_.setupUi( frame );
 
       //Add the SliderSpinCombos
-      private_->brush_radius_ = new SliderSpinComboInt();
+      private_->brush_radius_ = new SliderIntCombo( this, true );
       private_->ui_.verticalLayout->addWidget( private_->brush_radius_ );
 
-      private_->upper_threshold_ = new SliderSpinComboDouble();
+        private_->upper_threshold_ = new SliderDoubleCombo();
       private_->ui_.upperHLayout_bottom->addWidget( private_->upper_threshold_ );
-
-      private_->lower_threshold_ = new SliderSpinComboDouble();
+      
+      private_->lower_threshold_ = new SliderDoubleCombo();
       private_->ui_.lowerHLayout_bottom->addWidget( private_->lower_threshold_ );
 
   //Step 2 - get a pointer to the tool
@@ -104,22 +108,31 @@ bool PaintToolInterface::build_widget( QFrame* frame )
       // set the defaults for the paint brush size
       int brush_min = 0; 
       int brush_max = 0;
+      int brush_radius_step = 0;
+      tool->brush_radius_state_->get_step( brush_radius_step );
       tool->brush_radius_state_->get_range( brush_min, brush_max );
-        private_->brush_radius_->setRanges( brush_min, brush_max );
+      private_->brush_radius_->setStep( brush_radius_step );
+        private_->brush_radius_->setRange( brush_min, brush_max );
         private_->brush_radius_->setCurrentValue( tool->brush_radius_state_->get() );
         
         // set the defaults for the upper threshold
         double upper_threshold_min = 0.0; 
-      double upper_threshold_max = 1.0;
+      double upper_threshold_max = 0.0;
+      double upper_threshold_step = 0.0;
+      tool->upper_threshold_state_->get_step( upper_threshold_step );
       tool->upper_threshold_state_->get_range( upper_threshold_min, upper_threshold_max );
-        private_->upper_threshold_->setRanges( upper_threshold_min, upper_threshold_max );
+      private_->upper_threshold_->setStep( upper_threshold_step );
+        private_->upper_threshold_->setRange( upper_threshold_min, upper_threshold_max );
         private_->upper_threshold_->setCurrentValue( tool->upper_threshold_state_->get() );
         
         // set the defaults for the lower threshold
         double lower_threshold_min = 0.0; 
-      double lower_threshold_max = 1.0;
+      double lower_threshold_max = 0.0;
+      double lower_threshold_step = 0.0;
+      tool->lower_threshold_state_->get_step( lower_threshold_step );
       tool->lower_threshold_state_->get_range( lower_threshold_min, lower_threshold_max );
-        private_->lower_threshold_->setRanges( lower_threshold_min, lower_threshold_max );
+      private_->lower_threshold_->setStep( lower_threshold_step );
+        private_->lower_threshold_->setRange( lower_threshold_min, lower_threshold_max );
         private_->lower_threshold_->setCurrentValue( tool->lower_threshold_state_->get() );
         
         // set the default setchecked state

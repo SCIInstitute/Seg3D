@@ -87,6 +87,9 @@ public:
   //Insert Layer default
   void process_group_ui( LayerGroupHandle &group );
   
+  //Set the active layer
+  void set_active_layer_ui( LayerHandle &layer );
+  
   //Flip or Rotate Layer
 //  void flip_layer( layer_widget_list_type layers_to_crop_list );
 //  void crop_layer( layer_widget_list_type layers_to_crop_list );
@@ -111,6 +114,7 @@ private:
 public:
   typedef QPointer< LayerManagerDockWidget > qpointer_type;
   
+  static void HandleSetActiveLayer( qpointer_type qpointer, LayerHandle layer );
   static void HandleInsertLayer( qpointer_type qpointer, LayerGroupHandle group );
   static void HandleNewGroup( qpointer_type qpointer, LayerHandle layer );
   static void HandleCloseGroup( qpointer_type qpointer, LayerHandle layer );

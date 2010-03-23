@@ -40,9 +40,9 @@ CannyEdgeDetectionFilter::CannyEdgeDetectionFilter( const std::string& toolid ) 
 {
   // Need to set ranges and default values for all parameters
   add_state( "target", target_layer_state_, "<none>", "<none>" );
-  add_state( "variance", variance_state_, 0.0f, 100.0f, 1.0f, 1.0f );
-  add_state( "max_error", max_error_state_, 0.0f, 100.0f, 1.0f, 1.0f );
-  add_state( "threshold", threshold_state_, 0.0f, 100.0f, 1.0f, 1.0f );
+  add_state( "variance", variance_state_, 0.0f, 0.0f, 100.0f, 1.0f );
+  add_state( "max_error", max_error_state_, 0.0f, 0.0f, 100.0f, 1.0f );
+  add_state( "threshold", threshold_state_, 0.0f, 0.0f, 100.0f, 1.0f );
   add_state( "replace", replace_state_, false );
 
   // Add constaints, so that when the state changes the right ranges of

@@ -53,7 +53,7 @@ public:
   virtual bool build_widget( QFrame* frame );
 
 private:
-  BooleanFilterInterfacePrivate* private_;
+    boost::shared_ptr< BooleanFilterInterfacePrivate > private_;
 
 };
 

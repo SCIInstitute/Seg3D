@@ -53,8 +53,7 @@ public:
   virtual bool build_widget( QFrame* frame );
 
 private:
-  ConnectedComponentFilterInterfacePrivate* private_;
-  void makeConnections();
+  boost::shared_ptr< ConnectedComponentFilterInterfacePrivate > private_;
 
 };
 

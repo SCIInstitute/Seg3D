@@ -1,22 +1,22 @@
 /*
  For more information, please see: http://software.sci.utah.edu
- 
+
  The MIT License
- 
+
  Copyright (c) 2009 Scientific Computing and Imaging Institute,
  University of Utah.
- 
- 
+
+
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
  the rights to use, copy, modify, merge, publish, distribute, sublicense,
  and/or sell copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included
  in all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -26,66 +26,54 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_SLIDERSPINCOMBO_H
-#define INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_SLIDERSPINCOMBO_H
+#ifndef INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_SLIDERINTCOMBO_H
+#define INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_SLIDERINTCOMBO_H
 
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
-# pragma once
-#endif
-
+// QT Includes
 #include <QtGui>
-#include <QWidget>
-#include <QtGui/QSlider>
-#include <QtGui/QDoubleSpinBox>
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QLabel>
 
-namespace Seg3D
+#include <boost/shared_ptr.hpp>
+
+namespace Seg3D 
 {
 
-class SliderSpinCombo : public QWidget
+class SliderIntComboPrivate;
+
+class SliderIntCombo : public QWidget
 {
 Q_OBJECT
 
 Q_SIGNALS:
-//void valueAdjusted(double);
-void valueAdjusted(int);
+  void valueAdjusted( int );
+  void rangeChanged( int );
 
+// -- constructor/destructor --
 public:
-  SliderSpinCombo( QWidget *parent = 0 );
-  SliderSpinCombo( QWidget *parent, double minRange, double maxRange, double startValue,
-      double stepSize );
-  SliderSpinCombo( QWidget *parent, double minRange, double maxRange, double stepSize );
-
-  virtual ~SliderSpinCombo();
-
+    SliderIntCombo( QWidget* parent = 0, bool edit_range = false );
+    virtual ~SliderIntCombo();
+    
 public Q_SLOTS:
-  void setStep(double);
-  void setRanges( double, double );
-  void setCurrentValue( double );
+    void setStep(int);
+  void setRange( int, int );
+  void setCurrentValue( int );
+  void set_all( int min, int max, int value );
 
+    
+// -- widget internals -- 
 private:
-  QVBoxLayout *vLayout;
-  QHBoxLayout *hTopLayout;
-  QHBoxLayout *hBottomLayout;
-
-  QSpacerItem *spacer;
-
-  QLabel *minValueLabel;
-  QLabel *maxValueLabel;
-  QString valueString;
-
-  QSlider *slider;
-  QDoubleSpinBox *spinner;
-
-  void buildWidget();
-  void makeConnections();
-
+    boost::shared_ptr< SliderIntComboPrivate > private_;
+    
 private Q_SLOTS:
-  void setSliderValue(int);
-  void setSpinnerValue( double );
+    void edit_ranges( bool edit );
+    void change_min( int new_min );
+    void change_max( int new_max );
+    void double_range();
+    void half_range();
+    void slider_signal( int value );
+    void spinner_signal( int value );
+  
 };
 
-} // end namespace Seg3D
+}  // end namespace Seg3D
 
-#endif // SLIDERSPINCOMBO_H
+#endif

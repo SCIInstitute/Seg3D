@@ -43,8 +43,8 @@ PaintTool::PaintTool( const std::string& toolid ) :
   add_state( "target", target_layer_state_, "<none>", "<none>" );
   add_state( "mask", mask_layer_state_, "<none>", "<none>" );
   add_state( "brush_radius", brush_radius_state_, 23, 1, 250, 1 );
-  add_state( "upper_threshold", upper_threshold_state_, 0.0f, 01.0f, 200.0f, 1.0f );
-  add_state( "lower_threshold", lower_threshold_state_, 0.0f, 01.0f, 200.0f, 1.0f );
+  add_state( "upper_threshold", upper_threshold_state_, 1.0f, 00.0f, 1.0f, 0.01f );
+  add_state( "lower_threshold", lower_threshold_state_, 0.0f, 00.0f, 1.0f, 0.01f );
   add_state( "erase", erase_state_, false );
 
   // Add constaints, so that when the state changes the right ranges of

@@ -59,9 +59,9 @@ public:
   StateOptionHandle target_layer_state_;
 
   // Variance
-  StateRangedIntHandle variance_state_;
+  StateRangedDoubleHandle variance_state_;
 
-  StateRangedIntHandle maximum_kernel_width_state_;
+  StateRangedDoubleHandle maximum_kernel_width_state_;
 
   StateBoolHandle replace_state_;
 

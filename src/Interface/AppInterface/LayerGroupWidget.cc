@@ -35,8 +35,6 @@
 //Interface Includes
 #include <Interface/QtInterface/QtBridge.h>
 #include <Interface/AppInterface/LayerGroupWidget.h>
-//#include <Interface/ToolInterface/CustomWidgets/SliderSpinComboInt.h>
-//#include <Interface/ToolInterface/CustomWidgets/SliderSpinComboDouble.h>
 
 //UI Includes
 #include "ui_LayerGroupWidget.h"
@@ -55,22 +53,22 @@ class LayerGroupWidgetPrivate
 public:
   Ui::LayerGroupWidget ui_;
   
-  SliderSpinComboDouble* center_x_adjuster_crop;
-  SliderSpinComboDouble* center_y_adjuster_crop;
-  SliderSpinComboDouble* center_z_adjuster_crop;
+  SliderDoubleCombo* center_x_adjuster_crop;
+  SliderDoubleCombo* center_y_adjuster_crop;
+  SliderDoubleCombo* center_z_adjuster_crop;
   
-  SliderSpinComboDouble* size_width_adjuster_crop;
-  SliderSpinComboDouble* size_height_adjuster_crop;
-  SliderSpinComboDouble* size_depth_adjuster_crop;
+  SliderDoubleCombo* size_width_adjuster_crop;
+  SliderDoubleCombo* size_height_adjuster_crop;
+  SliderDoubleCombo* size_depth_adjuster_crop;
   
-    SliderSpinComboDouble* scale_adjuster;
+    SliderDoubleCombo* scale_adjuster;
   
   std::string group_id_;
   Utils::GridTransform grid_transform_;
   int current_height;
   int current_width;
   int current_depth;
-  //LayerGroupWeakHandle group_handle_;
+  
 };
   
 LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
@@ -82,8 +80,6 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
   
   this->private_->group_id_ = group->get_group_id();
 
-  //this->private_->group_handle_ = group;
-  
   // set some values of the GUI
 
   this->private_->ui_.activate_button_->setText( QString::fromStdString( group->get_grid_transform().get_as_string() ) );
@@ -98,31 +94,31 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
   //this->private_->ui_.open_button_->setChecked( true );
   
   // add the slider spinner combo's for the crop
-  this->private_->center_x_adjuster_crop = new SliderSpinComboDouble( this->private_->ui_.widget );
+  this->private_->center_x_adjuster_crop = new SliderDoubleCombo( this->private_->ui_.widget );
   this->private_->ui_.horizontalLayout_11->addWidget( this->private_->center_x_adjuster_crop );
   this->private_->center_x_adjuster_crop->setObjectName( QString::fromUtf8( "center_x_adjuster_crop" ) );
   
-  this->private_->center_y_adjuster_crop = new SliderSpinComboDouble( this->private_->ui_.widget_2 );
+  this->private_->center_y_adjuster_crop = new SliderDoubleCombo( this->private_->ui_.widget_2 );
   this->private_->ui_.horizontalLayout_12->addWidget( this->private_->center_y_adjuster_crop );
   this->private_->center_y_adjuster_crop->setObjectName( QString::fromUtf8( "center_y_adjuster_crop" ) );
   
-  this->private_->center_z_adjuster_crop = new SliderSpinComboDouble( this->private_->ui_.widget_3 );
+  this->private_->center_z_adjuster_crop = new SliderDoubleCombo( this->private_->ui_.widget_3 );
   this->private_->ui_.horizontalLayout_14->addWidget( this->private_->center_z_adjuster_crop );
   this->private_->center_z_adjuster_crop->setObjectName( QString::fromUtf8( "center_z_adjuster_crop" ) );
   
-  this->private_->size_height_adjuster_crop = new SliderSpinComboDouble( this->private_->ui_.widget_4 );
+  this->private_->size_height_adjuster_crop = new SliderDoubleCombo( this->private_->ui_.widget_4 );
   this->private_->ui_.horizontalLayout_7->addWidget( this->private_->size_height_adjuster_crop );
   this->private_->size_height_adjuster_crop->setObjectName( QString::fromUtf8( "size_height_adjuster_crop" ) );
   
-  this->private_->size_width_adjuster_crop = new SliderSpinComboDouble( this->private_->ui_.widget_5 );
+  this->private_->size_width_adjuster_crop = new SliderDoubleCombo( this->private_->ui_.widget_5 );
   this->private_->ui_.horizontalLayout_9->addWidget( this->private_->size_width_adjuster_crop );
   this->private_->size_width_adjuster_crop->setObjectName( QString::fromUtf8( "size_width_adjuster_crop" ) );
   
-  this->private_->size_depth_adjuster_crop = new SliderSpinComboDouble( this->private_->ui_.widget_6 );
+  this->private_->size_depth_adjuster_crop = new SliderDoubleCombo( this->private_->ui_.widget_6 );
   this->private_->ui_.horizontalLayout_10->addWidget( this->private_->size_depth_adjuster_crop );
   this->private_->size_depth_adjuster_crop->setObjectName( QString::fromUtf8( "size_depth_adjuster_crop" ) );
   
-  this->private_->scale_adjuster = new SliderSpinComboDouble( this->private_->ui_.widget_7 );
+  this->private_->scale_adjuster = new SliderDoubleCombo( this->private_->ui_.widget_7 );
   this->private_->ui_.horizontalLayout_15->addWidget( this->private_->scale_adjuster );
   this->private_->scale_adjuster->setObjectName( QString::fromUtf8( "scale_adjuster" ) );
   
@@ -181,6 +177,16 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
         
         this->private_->ui_.resample_replace_checkBox_->setChecked( group->resample_replace_state_->get() );
         
+        // set the defaults for the upper threshold
+        double resample_min = 0.0; 
+      double resample_max = 0.0;
+      double resample_step = 0.0;
+      group->resample_factor_state_->get_step( resample_step );
+      group->resample_factor_state_->get_range( resample_min, resample_max );
+      this->private_->scale_adjuster->setStep( resample_step );
+        this->private_->scale_adjuster->setRange( resample_min, resample_max );
+        this->private_->scale_adjuster->setCurrentValue( group->resample_replace_state_->get() );
+        
          // = make the connections
         QtBridge::Connect( this->private_->scale_adjuster, group->resample_factor_state_ );
       QtBridge::Connect( this->private_->ui_.resample_replace_checkBox_, group->resample_replace_state_ );
@@ -188,17 +194,17 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
         
         // --- CROP ---
         // = set the default values
-        this->private_->size_width_adjuster_crop->setRanges( 0, group->get_grid_transform().nx() );
-        this->private_->size_height_adjuster_crop->setRanges( 0, group->get_grid_transform().ny() );
-        this->private_->size_depth_adjuster_crop->setRanges( 0, group->get_grid_transform().nz() );
+        this->private_->size_width_adjuster_crop->setRange( 0, group->get_grid_transform().nx() );
+        this->private_->size_height_adjuster_crop->setRange( 0, group->get_grid_transform().ny() );
+        this->private_->size_depth_adjuster_crop->setRange( 0, group->get_grid_transform().nz() );
         
         this->private_->size_width_adjuster_crop->setCurrentValue( group->get_grid_transform().nx() );
         this->private_->size_height_adjuster_crop->setCurrentValue( group->get_grid_transform().ny() );
         this->private_->size_depth_adjuster_crop->setCurrentValue( group->get_grid_transform().nz() );
 
-        this->private_->center_x_adjuster_crop->setRanges( 0, group->get_grid_transform().nx() );
-        this->private_->center_y_adjuster_crop->setRanges( 0, group->get_grid_transform().ny() );
-        this->private_->center_z_adjuster_crop->setRanges( 0, group->get_grid_transform().nz() );
+        this->private_->center_x_adjuster_crop->setRange( 0, group->get_grid_transform().nx() );
+        this->private_->center_y_adjuster_crop->setRange( 0, group->get_grid_transform().ny() );
+        this->private_->center_z_adjuster_crop->setRange( 0, group->get_grid_transform().nz() );
         
         this->private_->center_x_adjuster_crop->setCurrentValue( 0 );
         this->private_->center_y_adjuster_crop->setCurrentValue( 0 );
@@ -251,6 +257,7 @@ void LayerGroupWidget::add_layer( LayerHandle layer )
   this->private_->ui_.group_frame_layout_->addWidget( new_layer_handle.data() );
   this->layer_list_.push_back( new_layer_handle );
 }
+
 
 std::string& LayerGroupWidget::get_group_id()
 {

@@ -61,7 +61,7 @@ public:
 
   StateRangedIntHandle order_state_;
 
-  StateRangedIntHandle edge_state_;
+  StateRangedDoubleHandle edge_state_;
 
   StateBoolHandle replace_state_;
 

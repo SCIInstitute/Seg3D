@@ -45,6 +45,8 @@ class MedianFilterInterfacePrivate
 {
 public:
   Ui::MedianFilterInterface ui_;
+  
+  SliderIntCombo *radius_;
 };
 
 // constructor
@@ -62,20 +64,45 @@ MedianFilterInterface::~MedianFilterInterface()
 bool MedianFilterInterface::build_widget( QFrame* frame )
 {
   //Step 1 - build the Qt GUI Widget
-  private_->ui_.setupUi( frame );
+  this->private_->ui_.setupUi( frame );
 
   //add sliderspincombo
-  radiusSizeAdjuster = new SliderSpinComboInt();
-  private_->ui_.radiusHLayout_bottom->addWidget( radiusSizeAdjuster );
+  this->private_->radius_ = new SliderIntCombo();
+  this->private_->ui_.radiusHLayout_bottom->addWidget( this->private_->radius_ );
 
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
   MedianFilter* tool = dynamic_cast< MedianFilter* > ( base_tool_.get() );
+  
+  //Step 3 - set the values for the tool ui from the state engine
+  
+      //set default falues for the target option list 
+      std::vector< std::string > temp_option_list = tool->target_layer_state_->option_list();
+      for( size_t i = 0; i < temp_option_list.size(); i++)
+      {   
+          this->private_->ui_.targetComboBox->addItem( QString::fromStdString( temp_option_list[i] ) );
+      } 
+        this->private_->ui_.targetComboBox->setCurrentIndex(tool->target_layer_state_->index());
+        
+        // set the defaults for the radius
+      int radius_min = 0; 
+      int radius_max = 0;
+      int radius_step = 0;
+      tool->radius_state_->get_step( radius_step );
+      tool->radius_state_->get_range( radius_min, radius_max );
+      this->private_->radius_->setStep( radius_step );
+        this->private_->radius_->setRange( radius_min, radius_max );
+        this->private_->radius_->setCurrentValue( tool->radius_state_->get() );
+        
+        // set the default for the replace state
+        this->private_->ui_.replaceCheckBox->setChecked( tool->replace_state_->get() );
 
-  //Step 3 - connect the gui to the tool through the QtBridge
-  QtBridge::Connect( private_->ui_.targetComboBox, tool->target_layer_state_ );
-  QtBridge::Connect( radiusSizeAdjuster, tool->radius_state_ );
-  QtBridge::Connect( private_->ui_.replaceCheckBox, tool->replace_state_ );
+
+
+  //Step 4 - connect the gui to the tool through the QtBridge
+  QtBridge::Connect( this->private_->ui_.targetComboBox, tool->target_layer_state_ );
+  QtBridge::Connect( this->private_->radius_, tool->radius_state_ );
+  QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
 
   //Send a message to the log that we have finised with building the Median Filter Interface
   SCI_LOG_DEBUG("Finished building an Median Filter Interface");

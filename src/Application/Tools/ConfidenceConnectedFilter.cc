@@ -39,8 +39,8 @@ ConfidenceConnectedFilter::ConfidenceConnectedFilter( const std::string& toolid 
   Tool( toolid )
 {
   add_state( "target", target_layer_state_, "<none>", "<none>" );
-  add_state( "iterations", iterations_state_, 1, 100, 1, 1 );
-  add_state( "threshold_multiplier", threshold_multiplier_state_, 1, 100, 1, 1 );
+  add_state( "iterations", iterations_state_, 1, 1, 100, 1 );
+  add_state( "threshold_multiplier", threshold_multiplier_state_, 1, 1, 100, 1 );
 
   // Add constaints, so that when the state changes the right ranges of
   // parameters are selected

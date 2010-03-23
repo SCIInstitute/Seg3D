@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>257</width>
+    <width>213</width>
     <height>326</height>
    </rect>
   </property>
@@ -71,22 +71,16 @@
      <item>
       <widget class="QComboBox" name="targetComboBox">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>150</width>
-         <height>0</height>
-        </size>
        </property>
        <property name="layoutDirection">
         <enum>Qt::LeftToRight</enum>
        </property>
        <property name="sizeAdjustPolicy">
-        <enum>QComboBox::AdjustToMinimumContentsLengthWithIcon</enum>
+        <enum>QComboBox::AdjustToMinimumContentsLength</enum>
        </property>
        <property name="minimumContentsLength">
         <number>12</number>
@@ -116,19 +110,13 @@
      <item>
       <widget class="QComboBox" name="maskComboBox">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="minimumSize">
-        <size>
-         <width>150</width>
-         <height>0</height>
-        </size>
-       </property>
        <property name="sizeAdjustPolicy">
-        <enum>QComboBox::AdjustToMinimumContentsLengthWithIcon</enum>
+        <enum>QComboBox::AdjustToMinimumContentsLength</enum>
        </property>
        <property name="minimumContentsLength">
         <number>12</number>
@@ -209,10 +197,10 @@
       <enum>QLayout::SetDefaultConstraint</enum>
      </property>
      <property name="leftMargin">
-      <number>4</number>
+      <number>1</number>
      </property>
      <property name="rightMargin">
-      <number>5</number>
+      <number>0</number>
      </property>
     </layout>
    </item>
@@ -235,6 +223,11 @@
        <width>16777215</width>
        <height>171</height>
       </size>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
      </property>
      <property name="title">
       <string>Threshold</string>

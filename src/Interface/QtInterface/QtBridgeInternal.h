@@ -31,8 +31,8 @@
 
 // Qt includes
 #include <QtGui>
-#include <Interface/ToolInterface/CustomWidgets/SliderSpinComboInt.h>
-#include <Interface/ToolInterface/CustomWidgets/SliderSpinComboDouble.h>
+#include <Interface/ToolInterface/CustomWidgets/SliderIntCombo.h>
+#include <Interface/ToolInterface/CustomWidgets/SliderDoubleCombo.h>
 
 // boost includes
 #include <boost/signals2/signal.hpp>
@@ -41,6 +41,8 @@
 // Application includes
 #include <Application/State/State.h>
 #include <Application/State/Actions/ActionSet.h>
+
+
 
 namespace Seg3D
 {
@@ -254,13 +256,13 @@ private:
   StateAliasHandle state_handle_;
 };
 
-class QtSliderSpinComboRangedIntSlot : public QtSlot
+class QtSliderIntComboRangedIntSlot : public QtSlot
 {
   Q_OBJECT
 public:
 
   // Constructor
-  QtSliderSpinComboRangedIntSlot( SliderSpinComboInt* parent, StateRangedIntHandle& state_handle,
+  QtSliderIntComboRangedIntSlot( SliderIntCombo* parent, StateRangedIntHandle& state_handle,
     bool blocking = true ) :
   QtSlot( parent, blocking ), state_handle_( state_handle )
   {
@@ -269,7 +271,7 @@ public:
   }
 
   // Virtual destructor: needed by Qt
-  virtual ~QtSliderSpinComboRangedIntSlot()
+  virtual ~QtSliderIntComboRangedIntSlot()
   {
   }
 
@@ -285,36 +287,44 @@ private:
   StateRangedIntHandle state_handle_;
 };
 
-class QtSliderSpinComboRangedDoubleSlot : public QtSlot
+class QtSliderDoubleComboRangedDoubleSlot : public QtSlot
 {
   Q_OBJECT
 public:
 
   // Constructor
-  QtSliderSpinComboRangedDoubleSlot( SliderSpinComboDouble* parent,
-    StateRangedDoubleHandle& state_handle, bool blocking = true ) :
+  QtSliderDoubleComboRangedDoubleSlot( SliderDoubleCombo* parent, StateRangedDoubleHandle& state_handle,
+    bool blocking = true ) :
   QtSlot( parent, blocking ), state_handle_( state_handle )
   {
     // Qt's connect function
-    connect (parent,SIGNAL(valueAdjusted(double)),this,SLOT(slot(double)));
+    connect( parent, SIGNAL( valueAdjusted( double ) ), this, SLOT( value_slot( double ) ) );
+    connect( parent, SIGNAL( rangeChanged( double, double ) ), this, SLOT( range_slot( double, double ) ) );
   }
 
   // Virtual destructor: needed by Qt
-  virtual ~QtSliderSpinComboRangedDoubleSlot()
-  {}
+  virtual ~QtSliderDoubleComboRangedDoubleSlot()
+  {
+  }
 
 public Q_SLOTS:
   // Slot that Qt will call
-  void slot(double state)
+  void value_slot(double state)
   {
-    if (!blocked_) ActionSet::Dispatch(state_handle_,static_cast<double>(state));
+    if (!blocked_) ActionSet::Dispatch( state_handle_, state );
+  }
+    void range_slot(double min, double max)
+  {
+      
+    //if (!blocked_) ActionSetRange::Dispatch( state_handle_, min, max );
   }
 
 private:
   // Function object
   StateRangedDoubleHandle state_handle_;
-
 };
+
+
 
 class QtComboBoxSlot : public QtSlot
 {

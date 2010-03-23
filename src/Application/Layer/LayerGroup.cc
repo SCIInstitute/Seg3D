@@ -60,7 +60,7 @@ LayerGroup::LayerGroup( Utils::GridTransform grid_transform ) :
   
   
   // = Set Resample state variables =
-  add_state( "resample_factor", resample_factor_state_, 0.0f, 00.0f, 01.0f, .01f );
+  add_state( "resample_factor", resample_factor_state_, 1.0f, 01.0f, 10.0f, .10f );
   add_state( "resample_replace", resample_replace_state_, false );
   
   // = General state settings

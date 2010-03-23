@@ -71,7 +71,14 @@
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="volumeAComboBox"/>
+       <widget class="QComboBox" name="volumeAComboBox">
+        <property name="sizeAdjustPolicy">
+         <enum>QComboBox::AdjustToMinimumContentsLength</enum>
+        </property>
+        <property name="minimumContentsLength">
+         <number>12</number>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -102,7 +109,14 @@
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="volumeBComboBox"/>
+       <widget class="QComboBox" name="volumeBComboBox">
+        <property name="sizeAdjustPolicy">
+         <enum>QComboBox::AdjustToMinimumContentsLength</enum>
+        </property>
+        <property name="minimumContentsLength">
+         <number>12</number>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -133,7 +147,14 @@
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="volumeCComboBox"/>
+       <widget class="QComboBox" name="volumeCComboBox">
+        <property name="sizeAdjustPolicy">
+         <enum>QComboBox::AdjustToMinimumContentsLength</enum>
+        </property>
+        <property name="minimumContentsLength">
+         <number>12</number>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -164,7 +185,14 @@
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="exampleExpComboBox"/>
+       <widget class="QComboBox" name="exampleExpComboBox">
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>23</height>
+         </size>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -234,6 +262,12 @@
       </item>
       <item>
        <widget class="QPushButton" name="invertButton">
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>23</height>
+         </size>
+        </property>
         <property name="text">
          <string>Run Filter</string>
         </property>

@@ -59,9 +59,9 @@ public:
   // Layerid of the target layer
   StateOptionHandle target_layer_state_;
 
-  StateRangedIntHandle upper_threshold_state_;
+  StateRangedDoubleHandle upper_threshold_state_;
 
-  StateRangedIntHandle lower_threshold_state_;
+  StateRangedDoubleHandle lower_threshold_state_;
 
   StateRangedIntHandle alpha_state_;
 

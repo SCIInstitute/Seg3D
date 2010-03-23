@@ -46,7 +46,7 @@
     <number>4</number>
    </property>
    <item>
-    <layout class="QHBoxLayout" name="activeHLayout" stretch="1,2">
+    <layout class="QHBoxLayout" name="activeHLayout" stretch="1,3">
      <property name="spacing">
       <number>0</number>
      </property>
@@ -58,7 +58,20 @@
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="targetComboBox"/>
+      <widget class="QComboBox" name="targetComboBox">
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>23</height>
+        </size>
+       </property>
+       <property name="sizeAdjustPolicy">
+        <enum>QComboBox::AdjustToMinimumContentsLength</enum>
+       </property>
+       <property name="minimumContentsLength">
+        <number>12</number>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
@@ -81,6 +94,11 @@
        <width>16777215</width>
        <height>171</height>
       </size>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
      </property>
      <property name="title">
       <string>Threshold</string>
@@ -192,6 +210,12 @@
      </item>
      <item>
       <widget class="QPushButton" name="runButton">
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>23</height>
+        </size>
+       </property>
        <property name="text">
         <string>Run Filter</string>
        </property>

@@ -44,7 +44,10 @@ SCI_REGISTER_TOOLINTERFACE(BinaryDilateErodeFilterInterface)
 class BinaryDilateErodeFilterInterfacePrivate
 {
 public:
-  Ui::BinaryDialateErodeFilterInterface ui_;
+  Ui::BinaryDilateErodeFilterInterface ui_;
+  
+    SliderIntCombo *erode_;
+  SliderIntCombo *dilate_;
 };
 
 // constructor
@@ -65,20 +68,54 @@ bool BinaryDilateErodeFilterInterface::build_widget( QFrame* frame )
   private_->ui_.setupUi( frame );
 
   // add sliderspinnercombo's
-  erodeAdjuster = new SliderSpinComboInt();
-  private_->ui_.erodeHLayout_bottom->addWidget( erodeAdjuster );
+  private_->erode_ = new SliderIntCombo();
+  private_->ui_.erodeHLayout_bottom->addWidget( private_->erode_ );
 
-  dialateAdjuster = new SliderSpinComboInt();
-  private_->ui_.dialateHLayout_bottom->addWidget( dialateAdjuster );
+  private_->dilate_ = new SliderIntCombo();
+  private_->ui_.dialateHLayout_bottom->addWidget( private_->dilate_ );
 
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
   BinaryDilateErodeFilter* tool = dynamic_cast< BinaryDilateErodeFilter* > ( base_tool_.get() );
+  
+  //Step 3 - set the values for the tool ui from the state engine
+  
+      //set default falues for the target option list 
+      std::vector< std::string > temp_option_list = tool->target_layer_state_->option_list();
+      for( size_t i = 0; i < temp_option_list.size(); i++)
+      {   
+          this->private_->ui_.targetComboBox->addItem( QString::fromStdString( temp_option_list[i] ) );
+      } 
+        this->private_->ui_.targetComboBox->setCurrentIndex(tool->target_layer_state_->index());
+      
+      // set the defaults for erode
+      int erode_min = 0; 
+      int erode_max = 0;
+      int erode_step = 0;
+      tool->erode_state_->get_step( erode_step );
+      tool->erode_state_->get_range( erode_min, erode_max );
+      private_->erode_->setStep( erode_step );
+        private_->erode_->setRange( erode_min, erode_max );
+        private_->erode_->setCurrentValue( tool->erode_state_->get() );
+        
+        // set the defaults for dialate
+      int dilate_min = 0; 
+      int dilate_max = 0;
+      int dilate_step = 0;
+      tool->dilate_state_->get_step( dilate_step );
+      tool->dilate_state_->get_range( dilate_min, dilate_max );
+      private_->dilate_->setStep( dilate_step );
+        private_->dilate_->setRange( dilate_min, dilate_max );
+        private_->dilate_->setCurrentValue( tool->dilate_state_->get() );
 
-  //Step 3 - connect the gui to the tool through the QtBridge
+        // set the default for the replace state
+        this->private_->ui_.replaceCheckBox->setChecked( tool->replace_state_->get() );
+ 
+
+  //Step 4 - connect the gui to the tool through the QtBridge
   QtBridge::Connect( private_->ui_.targetComboBox, tool->target_layer_state_ );
-  QtBridge::Connect( erodeAdjuster, tool->erode_state_ );
-  QtBridge::Connect( dialateAdjuster, tool->dialate_state_ );
+  QtBridge::Connect( private_->erode_, tool->erode_state_ );
+  QtBridge::Connect( private_->dilate_, tool->dilate_state_ );
   QtBridge::Connect( private_->ui_.replaceCheckBox, tool->replace_state_ );
 
   //Send a message to the log that we have finised with building the Binary Dialate Erode Filter Interface

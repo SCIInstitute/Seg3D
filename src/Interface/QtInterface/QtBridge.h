@@ -31,8 +31,9 @@
 
 // QT includes/custom widget
 #include <QtGui>
-#include <Interface/ToolInterface/CustomWidgets/SliderSpinComboInt.h>
-#include <Interface/ToolInterface/CustomWidgets/SliderSpinComboDouble.h>
+
+#include <Interface/ToolInterface/CustomWidgets/SliderIntCombo.h>
+#include <Interface/ToolInterface/CustomWidgets/SliderDoubleCombo.h>
 
 // Application includes
 #include <Application/State/StateValue.h>
@@ -56,12 +57,12 @@ public:
   // Connect a QCheckBox to StateValue<bool>
   static bool Connect( QCheckBox* qcheckbox, StateBoolHandle& state_handle );
 
-  // Connect a SliderSpinCombo to StateRangedIntValue
-  static bool Connect( SliderSpinComboInt* sscombo, StateRangedIntHandle& state_handle );
-
-  // Connect a SliderSpinCombo to StateRangedDoubleValue
-  static bool Connect( SliderSpinComboDouble* sscombo, StateRangedDoubleHandle& state_handle );
-
+  // Coonnect a SliderIntCombo to a StateRangedIntValue
+  static bool Connect( SliderIntCombo* sscombo, StateRangedIntHandle& state_handle );
+  
+  // Coonnect a SliderDoubleCombo to a StateRangedIntValue
+  static bool Connect( SliderDoubleCombo* sscombo, StateRangedDoubleHandle& state_handle );
+  
   // Connect a QDoubleSpinBox to a StateDoubleValue
   static bool Connect( QDoubleSpinBox* qdoublespinbox, StateDoubleHandle& state_handle );
   

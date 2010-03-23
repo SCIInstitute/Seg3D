@@ -883,14 +883,19 @@ QWidget#group_tools_{
                 <property name="minimumSize">
                  <size>
                   <width>0</width>
-                  <height>32</height>
+                  <height>23</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
                   <width>16777215</width>
-                  <height>32</height>
+                  <height>23</height>
                  </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>8</pointsize>
+                 </font>
                 </property>
                 <property name="text">
                  <string>Resample</string>
@@ -1080,7 +1085,7 @@ QWidget#group_tools_{
                 </property>
                 <item>
                  <widget class="QWidget" name="widget_5" native="true">
-                  <layout class="QHBoxLayout" name="horizontalLayout_9">
+                  <layout class="QVBoxLayout" name="horizontalLayout_9">
                    <property name="spacing">
                     <number>2</number>
                    </property>
@@ -1091,7 +1096,7 @@ QWidget#group_tools_{
                     <widget class="QLabel" name="width_label_">
                      <property name="minimumSize">
                       <size>
-                       <width>55</width>
+                       <width>36</width>
                        <height>0</height>
                       </size>
                      </property>
@@ -1105,7 +1110,7 @@ QWidget#group_tools_{
                 </item>
                 <item>
                  <widget class="QWidget" name="widget_4" native="true">
-                  <layout class="QHBoxLayout" name="horizontalLayout_7">
+                  <layout class="QVBoxLayout" name="horizontalLayout_7">
                    <property name="spacing">
                     <number>2</number>
                    </property>
@@ -1116,7 +1121,7 @@ QWidget#group_tools_{
                     <widget class="QLabel" name="height_label_">
                      <property name="minimumSize">
                       <size>
-                       <width>55</width>
+                       <width>36</width>
                        <height>0</height>
                       </size>
                      </property>
@@ -1130,7 +1135,7 @@ QWidget#group_tools_{
                 </item>
                 <item>
                  <widget class="QWidget" name="widget_6" native="true">
-                  <layout class="QHBoxLayout" name="horizontalLayout_10">
+                  <layout class="QVBoxLayout" name="horizontalLayout_10">
                    <property name="spacing">
                     <number>2</number>
                    </property>
@@ -1141,7 +1146,7 @@ QWidget#group_tools_{
                     <widget class="QLabel" name="depth_label_">
                      <property name="minimumSize">
                       <size>
-                       <width>55</width>
+                       <width>36</width>
                        <height>0</height>
                       </size>
                      </property>
@@ -1205,14 +1210,19 @@ QWidget#group_tools_{
                  <property name="minimumSize">
                   <size>
                    <width>0</width>
-                   <height>32</height>
+                   <height>23</height>
                   </size>
                  </property>
                  <property name="maximumSize">
                   <size>
                    <width>16777215</width>
-                   <height>32</height>
+                   <height>23</height>
                   </size>
+                 </property>
+                 <property name="font">
+                  <font>
+                   <pointsize>8</pointsize>
+                  </font>
                  </property>
                  <property name="text">
                   <string>Crop</string>
@@ -1267,7 +1277,7 @@ QWidget#group_tools_{
                </font>
               </property>
               <property name="currentIndex">
-               <number>0</number>
+               <number>1</number>
               </property>
               <widget class="QWidget" name="flip_tab_">
                <property name="minimumSize">
@@ -1297,13 +1307,13 @@ QWidget#group_tools_{
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
-                    <height>32</height>
+                    <height>23</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
                     <width>16777215</width>
-                    <height>32</height>
+                    <height>23</height>
                    </size>
                   </property>
                   <property name="text">
@@ -1322,13 +1332,13 @@ QWidget#group_tools_{
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
-                    <height>32</height>
+                    <height>23</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
                     <width>16777215</width>
-                    <height>32</height>
+                    <height>23</height>
                    </size>
                   </property>
                   <property name="text">
@@ -1347,13 +1357,13 @@ QWidget#group_tools_{
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
-                    <height>32</height>
+                    <height>23</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
                     <width>16777215</width>
-                    <height>32</height>
+                    <height>23</height>
                    </size>
                   </property>
                   <property name="text">
@@ -1391,13 +1401,13 @@ QWidget#group_tools_{
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
-                    <height>32</height>
+                    <height>23</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
                     <width>16777215</width>
-                    <height>32</height>
+                    <height>23</height>
                    </size>
                   </property>
                   <property name="text">
@@ -1416,13 +1426,13 @@ QWidget#group_tools_{
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
-                    <height>32</height>
+                    <height>23</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
                     <width>16777215</width>
-                    <height>32</height>
+                    <height>23</height>
                    </size>
                   </property>
                   <property name="text">
@@ -1441,13 +1451,13 @@ QWidget#group_tools_{
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
-                    <height>32</height>
+                    <height>23</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
                     <width>16777215</width>
-                    <height>32</height>
+                    <height>23</height>
                    </size>
                   </property>
                   <property name="text">
@@ -1731,14 +1741,19 @@ QWidget#group_tools_{
                  <property name="minimumSize">
                   <size>
                    <width>0</width>
-                   <height>32</height>
+                   <height>23</height>
                   </size>
                  </property>
                  <property name="maximumSize">
                   <size>
                    <width>16777215</width>
-                   <height>32</height>
+                   <height>23</height>
                   </size>
+                 </property>
+                 <property name="font">
+                  <font>
+                   <pointsize>8</pointsize>
+                  </font>
                  </property>
                  <property name="text">
                   <string>Transform</string>
@@ -1784,14 +1799,19 @@ QWidget#group_tools_{
                 <property name="minimumSize">
                  <size>
                   <width>0</width>
-                  <height>32</height>
+                  <height>23</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
                   <width>16777215</width>
-                  <height>32</height>
+                  <height>23</height>
                  </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>8</pointsize>
+                 </font>
                 </property>
                 <property name="text">
                  <string>Delete</string>

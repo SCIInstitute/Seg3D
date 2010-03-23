@@ -227,6 +227,11 @@ public:
     min_value = min_value_;
     max_value = max_value_;
   }
+    
+    void get_step( T& step )
+    {
+        step = step_value_;
+    }
 
   // -- signals describing the state --
 
@@ -241,7 +246,7 @@ public:
 
   // RANGE_CHANGED_SIGNAL:
   // This signal is triggered when the range of the state is changed
-  typedef boost::signals2::signal< void( T, T ) > range_changed_signal_type;
+  typedef boost::signals2::signal< void( T, T, ActionSource ) > range_changed_signal_type;
   range_changed_signal_type range_changed_signal_;
 
   // -- internals of StateValue --

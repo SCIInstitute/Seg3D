@@ -74,6 +74,12 @@ QWidget#threshold_histogram_{
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="sizeAdjustPolicy">
+         <enum>QComboBox::AdjustToMinimumContentsLength</enum>
+        </property>
+        <property name="minimumContentsLength">
+         <number>12</number>
+        </property>
        </widget>
       </item>
      </layout>

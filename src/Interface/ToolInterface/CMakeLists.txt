@@ -56,9 +56,8 @@ SET(INTERFACE_TOOLINTERFACE_SRCS
 )
 
 SET(INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_SRCS
-  CustomWidgets/SliderSpinCombo.cc
-  CustomWidgets/SliderSpinComboInt.cc
-  CustomWidgets/SliderSpinComboDouble.cc
+  CustomWidgets/SliderIntCombo.cc
+  CustomWidgets/SliderDoubleCombo.cc
   
 )
 
@@ -84,12 +83,12 @@ SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
   CannyEdgeDetectionFilterInterface.h
   OtsuThresholdFilterInterface.h
   ThresholdSegmentationLSFilterInterface.h
+  
 )
 
 SET(INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_MOC_SRCS
-  CustomWidgets/SliderSpinCombo.h
-  CustomWidgets/SliderSpinComboInt.h
-  CustomWidgets/SliderSpinComboDouble.h
+  CustomWidgets/SliderIntCombo.h
+  CustomWidgets/SliderDoubleCombo.h
 )
 
 SET(INTERFACE_TOOLINTERFACE_NO_MOC_SRCS
@@ -117,6 +116,8 @@ SET(INTERFACE_TOOLINTERFACE_UI_SRCS
   CannyEdgeDetectionFilterInterface.ui
   OtsuThresholdFilterInterface.ui
   ThresholdSegmentationLSFilterInterface.ui
+  SliderIntCombo.ui
+  SliderDoubleCombo.ui
 )
 
 ##################################################

@@ -45,6 +45,8 @@ class ConfidenceConnectedFilterInterfacePrivate
 {
 public:
   Ui::ConfidenceConnectedFilterInterface ui_;
+    SliderIntCombo *iterations_;
+  SliderIntCombo *multiplier_;
 };
 
 // constructor
@@ -65,21 +67,53 @@ bool ConfidenceConnectedFilterInterface::build_widget( QFrame* frame )
   private_->ui_.setupUi( frame );
 
   //Add the SliderSpinCombos
-  iterationsAdjuster = new SliderSpinComboInt();
-  private_->ui_.iterationsHLayout_bottom->addWidget( iterationsAdjuster );
+  private_->iterations_ = new SliderIntCombo();
+  private_->ui_.iterationsHLayout_bottom->addWidget( private_->iterations_ );
 
-  multiplierAdjuster = new SliderSpinComboInt();
-  private_->ui_.multiplierHLayout_bottom->addWidget( multiplierAdjuster );
+  private_->multiplier_ = new SliderIntCombo();
+  private_->ui_.multiplierHLayout_bottom->addWidget( private_->multiplier_ );
 
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
   ConfidenceConnectedFilter* tool =
       dynamic_cast< ConfidenceConnectedFilter* > ( base_tool_.get() );
+      
+  //Step 3 - set the values for the tool ui from the state engine
+  
+      //set default falues for the target option list 
+      std::vector< std::string > temp_option_list = tool->target_layer_state_->option_list();
+      for( size_t i = 0; i < temp_option_list.size(); i++)
+      {   
+          this->private_->ui_.targetComboBox->addItem( QString::fromStdString( temp_option_list[i] ) );
+      } 
+        this->private_->ui_.targetComboBox->setCurrentIndex(tool->target_layer_state_->index());
+        
+        // set the defaults for the iterations
+      int iterations_min = 0; 
+      int iterations_max = 0;
+      int iterations_step = 0;
+      tool->iterations_state_->get_step( iterations_step );
+      tool->iterations_state_->get_range( iterations_min, iterations_max );
+      private_->iterations_->setStep( iterations_step );
+        private_->iterations_->setRange( iterations_min, iterations_max );
+        private_->iterations_->setCurrentValue( tool->iterations_state_->get() );
+        
+        // set the defaults for the multiplier
+      int multiplier_min = 0; 
+      int multiplier_max = 0;
+      int multiplier_step = 0;
+      tool->threshold_multiplier_state_->get_step( multiplier_step );
+      tool->threshold_multiplier_state_->get_range( multiplier_min, multiplier_max );
+      private_->multiplier_->setStep( multiplier_step );
+        private_->multiplier_->setRange( multiplier_min, multiplier_max );
+        private_->multiplier_->setCurrentValue( tool->threshold_multiplier_state_->get() );
+   
+   
 
-  //Step 3 - connect the gui to the tool through the QtBridge
+  //Step 4 - connect the gui to the tool through the QtBridge
   QtBridge::Connect( private_->ui_.targetComboBox, tool->target_layer_state_ );
-  QtBridge::Connect( iterationsAdjuster, tool->iterations_state_ );
-  QtBridge::Connect( multiplierAdjuster, tool->threshold_multiplier_state_ );
+  QtBridge::Connect( private_->iterations_, tool->iterations_state_ );
+  QtBridge::Connect( private_->multiplier_, tool->threshold_multiplier_state_ );
 
   //Send a message to the log that we have finised with building the Confidence Connected Filter Interface
   SCI_LOG_DEBUG("Finished building a Confidence Connected Filter Interface");

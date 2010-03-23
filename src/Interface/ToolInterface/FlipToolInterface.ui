@@ -77,6 +77,12 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="sizeAdjustPolicy">
+        <enum>QComboBox::AdjustToMinimumContentsLength</enum>
+       </property>
+       <property name="minimumContentsLength">
+        <number>12</number>
+       </property>
       </widget>
      </item>
     </layout>
@@ -101,6 +107,11 @@
        <height>134</height>
       </size>
      </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
      <property name="title">
       <string>Flip</string>
      </property>
@@ -124,6 +135,12 @@
         </property>
         <item>
          <widget class="QPushButton" name="flipAxialButton">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>23</height>
+           </size>
+          </property>
           <property name="toolTip">
            <string>Flip across the axial plain</string>
           </property>
@@ -134,6 +151,12 @@
         </item>
         <item>
          <widget class="QPushButton" name="flipCoronalButton">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>23</height>
+           </size>
+          </property>
           <property name="toolTip">
            <string>Flip across the coronal plain</string>
           </property>
@@ -144,6 +167,12 @@
         </item>
         <item>
          <widget class="QPushButton" name="flipSagittalButton">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>23</height>
+           </size>
+          </property>
           <property name="toolTip">
            <string>Flip across the sagittal plain</string>
           </property>
@@ -177,6 +206,11 @@
        <height>134</height>
       </size>
      </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
      <property name="title">
       <string>Rotate</string>
      </property>
@@ -200,6 +234,12 @@
         </property>
         <item>
          <widget class="QPushButton" name="rotateACButton">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>23</height>
+           </size>
+          </property>
           <property name="toolTip">
            <string>Rotate axial to coronal</string>
           </property>
@@ -220,6 +260,12 @@
         </item>
         <item>
          <widget class="QPushButton" name="rotateSAButton">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>23</height>
+           </size>
+          </property>
           <property name="toolTip">
            <string>Rotate sagittal to axial</string>
           </property>

@@ -29,7 +29,7 @@
 #include <Application/Interface/Interface.h>
 #include <Interface/QtInterface/QtBridge.h>
 #include <Interface/QtInterface/QtBridgeInternal.h>
-//#include <Interface/ToolInterface/CustomWidgets/SliderSpinCombo.h>
+
 
 namespace Seg3D
 {
@@ -89,24 +89,34 @@ void QtToolButtonToggleSignal( QPointer< QToolButton > qpointer, bool state, Act
       qpointer.data(), state ) ); 
     }
 }
-
-void QtSliderSpinComboRangedIntSignal( QPointer< SliderSpinComboInt > qpointer, int state,
+void QtSliderIntComboRangedIntSignal( QPointer< SliderIntCombo > qpointer, int state,
     ActionSource source )
 {
   if ( source != ActionSource::ACTION_SOURCE_INTERFACE_E )
   {
-    QtSignal( qpointer, boost::bind( &SliderSpinComboInt::setCurrentValue, qpointer.data(), state ) );
+    QtSignal( qpointer, boost::bind( &SliderIntCombo::setCurrentValue, qpointer.data(), state ) );
   }
 }
 
-void QtSliderSpinComboRangedDoubleSignal( QPointer< SliderSpinComboDouble > qpointer, double state,
+void QtSliderDoubleComboValueChangedSignal( QPointer< SliderDoubleCombo > qpointer, double state,
     ActionSource source )
 {
   if ( source != ActionSource::ACTION_SOURCE_INTERFACE_E )
   {
-    QtSignal( qpointer, boost::bind( &SliderSpinComboDouble::setCurrentValue, qpointer.data(), state ) );
+    QtSignal( qpointer, boost::bind( &SliderDoubleCombo::setCurrentValue, qpointer.data(), state ) );
   }
 }
+
+
+void QtSliderDoubleComboRangeChangedSignal( QPointer< SliderDoubleCombo > qpointer, double min, double max,
+    ActionSource source )
+{
+  if ( source != ActionSource::ACTION_SOURCE_INTERFACE_E )
+  {
+    QtSignal( qpointer, boost::bind( &SliderDoubleCombo::setRange, qpointer.data(), min, max ) );
+  }
+}
+
 
 void QtActionGroupSignal( QActionGroup* qactiongroup, std::string option )
 {
@@ -227,30 +237,35 @@ bool QtBridge::Connect( QComboBox* qcombobox, StateOptionHandle& state_handle )
   return true;
 }
 
-bool QtBridge::Connect( SliderSpinComboInt* sscombo, StateRangedIntHandle& state_handle )
+bool QtBridge::Connect( SliderIntCombo* sscombo, StateRangedIntHandle& state_handle )
 {
-  new QtSliderSpinComboRangedIntSlot( sscombo, state_handle );
+  new QtSliderIntComboRangedIntSlot( sscombo, state_handle );
   
-  QPointer< SliderSpinComboInt > qpointer( sscombo );
+  QPointer< SliderIntCombo > qpointer( sscombo );
 
   // Connect the state signal back to the Qt Variable
   new QtDeleteSlot( sscombo, state_handle->value_changed_signal_.connect(
-      boost::bind( &QtSliderSpinComboRangedIntSignal, qpointer, _1, _2 ) ) );
+      boost::bind( &QtSliderIntComboRangedIntSignal, qpointer, _1, _2 ) ) );
 
   return true;
 }
 
-bool QtBridge::Connect( SliderSpinComboDouble* sscombo, StateRangedDoubleHandle& state_handle )
+bool QtBridge::Connect( SliderDoubleCombo* sscombo, StateRangedDoubleHandle& state_handle )
 {
-  new QtSliderSpinComboRangedDoubleSlot( sscombo, state_handle );
+  new QtSliderDoubleComboRangedDoubleSlot( sscombo, state_handle );
+  
+  QPointer< SliderDoubleCombo > qpointer( sscombo );
 
-    QPointer< SliderSpinComboDouble > qpointer( sscombo );
   // Connect the state signal back to the Qt Variable
-  new QtDeleteSlot( sscombo, state_handle->value_changed_signal_.connect( 
-      boost::bind( &QtSliderSpinComboRangedDoubleSignal, qpointer, _1, _2 ) ) );
+  new QtDeleteSlot( sscombo, state_handle->value_changed_signal_.connect(
+      boost::bind( &QtSliderDoubleComboValueChangedSignal, qpointer, _1, _2 ) ) );
+  
+    new QtDeleteSlot( sscombo, state_handle->range_changed_signal_.connect(
+        boost::bind( &QtSliderDoubleComboRangeChangedSignal, qpointer, _1, _2, _3 ) ) );
 
   return true;
 }
+
 
 bool QtBridge::Connect( QToolButton* qtoolbutton, boost::function< void() > function )
 {

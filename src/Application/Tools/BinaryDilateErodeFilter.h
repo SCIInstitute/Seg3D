@@ -59,7 +59,7 @@ public:
   // Layerid of the target layer
   StateOptionHandle target_layer_state_;
 
-  StateRangedIntHandle dialate_state_;
+  StateRangedIntHandle dilate_state_;
 
   StateRangedIntHandle erode_state_;
 

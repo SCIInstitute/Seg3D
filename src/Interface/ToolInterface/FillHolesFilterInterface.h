@@ -53,7 +53,7 @@ public:
   virtual bool build_widget( QFrame* frame );
 
 private:
-  FillHolesFilterInterfacePrivate* private_;
+  boost::shared_ptr< FillHolesFilterInterfacePrivate > private_;
 
 };
 

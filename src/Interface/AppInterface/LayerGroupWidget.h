@@ -34,7 +34,6 @@
 
 // Application includes
 #include <Application/Layer/LayerGroup.h>
-//#include <Application/Layer/LayerManager.h>
 #include <Interface/AppInterface/LayerWidget.h>
 
 namespace Seg3D
@@ -51,16 +50,6 @@ public:
   LayerGroupWidget( QWidget* parent, LayerGroupHandle group );
   virtual ~LayerGroupWidget();
   
-public:
-  void add_layer( LayerHandle layer );
-  std::string &get_group_id();
-  void clear_all_layers()
-    {
-        this->layer_list_.clear();
-    }
-  
-  
-//TODO - connect these though the state engine
 public Q_SLOTS:
   void show_layers( bool show );
   void show_resample( bool show );
@@ -70,6 +59,14 @@ public Q_SLOTS:
   void show_delete( bool show );
   void show_selection_checkboxes( bool show );
   void enable_delete_button( bool enable );
+  
+public:
+  void add_layer( LayerHandle layer );
+  std::string &get_group_id();
+  void clear_all_layers()
+    {
+        this->layer_list_.clear();
+    }
 
 private Q_SLOTS:
     void adjust_new_size_labels( double scale_factor );

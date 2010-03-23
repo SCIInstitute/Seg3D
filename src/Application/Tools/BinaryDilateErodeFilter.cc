@@ -40,8 +40,8 @@ BinaryDilateErodeFilter::BinaryDilateErodeFilter( const std::string& toolid ) :
 {
   // Need to set ranges and default values for all parameters
   add_state( "target", target_layer_state_, "<none>", "<none>" );
-  add_state( "dialate", dialate_state_, 1, 100, 1, 2 );
-  add_state( "erode", erode_state_, 1, 100, 1, 2 );
+  add_state( "dilate", dilate_state_, 1, 1, 100, 1 );
+  add_state( "erode", erode_state_, 1, 1, 100, 1 );
   add_state( "replace", replace_state_, false );
 
   // Add constaints, so that when the state changes the right ranges of

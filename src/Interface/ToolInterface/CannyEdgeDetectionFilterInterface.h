@@ -38,10 +38,6 @@
 // Base class of the tool widget
 #include <Interface/AppInterface/ToolWidget.h>
 
-// Qt Gui Includes
-#include <Interface/ToolInterface/CustomWidgets/SliderSpinComboInt.h>
-#include <Interface/ToolInterface/CustomWidgets/SliderSpinComboDouble.h>
-
 namespace Seg3D
 {
 
@@ -57,10 +53,8 @@ public:
   virtual bool build_widget( QFrame* frame );
 
 private:
-  CannyEdgeDetectionFilterInterfacePrivate* private_;
-  SliderSpinComboDouble *varianceAdjuster;
-  SliderSpinComboDouble *errorAdjuster;
-  SliderSpinComboDouble *thresholdAdjuster;
+  boost::shared_ptr< CannyEdgeDetectionFilterInterfacePrivate > private_;
+
 
 };
 

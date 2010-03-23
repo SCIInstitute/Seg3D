@@ -45,6 +45,10 @@ class HistogramEqualizationFilterInterfacePrivate
 {
 public:
   Ui::HistogramEqualizationFilterInterface ui_;
+    
+    SliderDoubleCombo *upper_threshold_;
+  SliderDoubleCombo *lower_threshold_;
+  SliderIntCombo *alpha_;
 };
 
 // constructor
@@ -65,25 +69,71 @@ bool HistogramEqualizationFilterInterface::build_widget( QFrame* frame )
   private_->ui_.setupUi( frame );
 
   //Add the SliderSpinCombos
-  upperThresholdAdjuster = new SliderSpinComboInt();
-  private_->ui_.upperHLayout_bottom->addWidget( upperThresholdAdjuster );
+  private_->upper_threshold_ = new SliderDoubleCombo();
+  private_->ui_.upperHLayout_bottom->addWidget( private_->upper_threshold_ );
 
-  lowerThresholdAdjuster = new SliderSpinComboInt();
-  private_->ui_.lowerHLayout_bottom->addWidget( lowerThresholdAdjuster );
+  private_->lower_threshold_ = new SliderDoubleCombo();
+  private_->ui_.lowerHLayout_bottom->addWidget( private_->lower_threshold_ );
 
-  alphaAdjuster = new SliderSpinComboInt();
-  private_->ui_.alphaHLayout_bottom->addWidget( alphaAdjuster );
+  private_->alpha_ = new SliderIntCombo();
+  private_->ui_.alphaHLayout_bottom->addWidget( private_->alpha_ );
 
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
   HistogramEqualizationFilter* tool =
       dynamic_cast< HistogramEqualizationFilter* > ( base_tool_.get() );
+      
+      
+  //Step 3 - set the values for the tool ui from the state engine
+  
+      //set default falues for the target option list 
+      std::vector< std::string > temp_option_list = tool->target_layer_state_->option_list();
+      for( size_t i = 0; i < temp_option_list.size(); i++)
+      {   
+          this->private_->ui_.targetComboBox->addItem( QString::fromStdString( temp_option_list[i] ) );
+      } 
+        this->private_->ui_.targetComboBox->setCurrentIndex(tool->target_layer_state_->index());
+      
+       // set the defaults for the upper threshold
+        double upper_threshold_min = 0.0; 
+      double upper_threshold_max = 0.0;
+      double upper_threshold_step = 0.0;
+      tool->upper_threshold_state_->get_step( upper_threshold_step );
+      tool->upper_threshold_state_->get_range( upper_threshold_min, upper_threshold_max );
+      private_->upper_threshold_->setStep( upper_threshold_step );
+        private_->upper_threshold_->setRange( upper_threshold_min, upper_threshold_max );
+        private_->upper_threshold_->setCurrentValue( tool->upper_threshold_state_->get() );
+        
+        // set the defaults for the lower threshold
+        double lower_threshold_min = 0.0; 
+      double lower_threshold_max = 0.0;
+      double lower_threshold_step = 0.0;
+      tool->lower_threshold_state_->get_step( lower_threshold_step );
+      tool->lower_threshold_state_->get_range( lower_threshold_min, lower_threshold_max );
+      private_->lower_threshold_->setStep( lower_threshold_step );
+        private_->lower_threshold_->setRange( lower_threshold_min, lower_threshold_max );
+        private_->lower_threshold_->setCurrentValue( tool->lower_threshold_state_->get() );
+        
+         // set the defaults for the alpha
+      int alpha_min = 0; 
+      int alpha_max = 0;
+      int alpha_step = 0;
+      tool->alpha_state_->get_step( alpha_step );
+      tool->alpha_state_->get_range( alpha_min, alpha_max );
+      private_->alpha_->setStep( alpha_step );
+        private_->alpha_->setRange( alpha_min, alpha_max );
+        private_->alpha_->setCurrentValue( tool->alpha_state_->get() );
+        
+        // set the default for the replace state
+        this->private_->ui_.replaceCheckBox->setChecked( tool->replace_state_->get() );
+ 
 
-  //Step 3 - connect the gui to the tool through the QtBridge
+
+  //Step 4 - connect the gui to the tool through the QtBridge
   QtBridge::Connect( private_->ui_.targetComboBox, tool->target_layer_state_ );
-  QtBridge::Connect( upperThresholdAdjuster, tool->upper_threshold_state_ );
-  QtBridge::Connect( lowerThresholdAdjuster, tool->lower_threshold_state_ );
-  QtBridge::Connect( alphaAdjuster, tool->alpha_state_ );
+  QtBridge::Connect( private_->upper_threshold_, tool->upper_threshold_state_ );
+  QtBridge::Connect( private_->lower_threshold_, tool->lower_threshold_state_ );
+  QtBridge::Connect( private_->alpha_, tool->alpha_state_ );
   QtBridge::Connect( private_->ui_.replaceCheckBox, tool->replace_state_ );
 
   //Send a message to the log that we have finised with building the Histogram Equalization Filter Interface

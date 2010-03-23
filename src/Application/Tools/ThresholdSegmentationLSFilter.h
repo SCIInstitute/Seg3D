@@ -63,15 +63,15 @@ public:
 
   StateRangedIntHandle iterations_state_;
 
-  StateRangedIntHandle upper_threshold_state_;
+  StateRangedDoubleHandle upper_threshold_state_;
 
-  StateRangedIntHandle lower_threshold_state_;
+  StateRangedDoubleHandle lower_threshold_state_;
 
-  StateRangedIntHandle curvature_state_;
+  StateRangedDoubleHandle curvature_state_;
 
-  StateRangedIntHandle propagation_state_;
+  StateRangedDoubleHandle propagation_state_;
 
-  StateRangedIntHandle edge_state_;
+  StateRangedDoubleHandle edge_state_;
 
   StateBoolHandle replace_state_;
 

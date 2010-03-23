@@ -45,6 +45,8 @@ class OtsuThresholdFilterInterfacePrivate
 {
 public:
   Ui::OtsuThresholdFilterInterface ui_;
+  
+  SliderIntCombo *order_;
 };
 
 // constructor
@@ -62,19 +64,41 @@ OtsuThresholdFilterInterface::~OtsuThresholdFilterInterface()
 bool OtsuThresholdFilterInterface::build_widget( QFrame* frame )
 {
   //Step 1 - build the Qt GUI Widget
-  private_->ui_.setupUi( frame );
+  this->private_->ui_.setupUi( frame );
 
   // add sliderspincombos
-  orderAdjuster = new SliderSpinComboInt();
-  private_->ui_.orderHLayout_bottom->addWidget( orderAdjuster );
+  this->private_->order_ = new SliderIntCombo();
+  private_->ui_.orderHLayout_bottom->addWidget( this->private_->order_ );
 
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
   OtsuThresholdFilter* tool = dynamic_cast< OtsuThresholdFilter* > ( base_tool_.get() );
+  
+  //Step 3 - set the values for the tool ui from the state engine
+  
+      //set default falues for the target option list 
+      std::vector< std::string > temp_option_list = tool->target_layer_state_->option_list();
+      for( size_t i = 0; i < temp_option_list.size(); i++)
+      {   
+          this->private_->ui_.targetComboBox->addItem( QString::fromStdString( temp_option_list[i] ) );
+      } 
+        this->private_->ui_.targetComboBox->setCurrentIndex(tool->target_layer_state_->index());
+        
+        // set the defaults for order
+      int order_min = 0; 
+      int order_max = 0;
+      int order_step = 0;
+      tool->order_state_->get_step( order_step );
+      tool->order_state_->get_range( order_min, order_max );
+      private_->order_->setStep( order_step );
+        private_->order_->setRange( order_min, order_max );
+        private_->order_->setCurrentValue( tool->order_state_->get() );
+        
+        
 
-  //Step 3 - connect the gui to the tool through the QtBridge
+  //Step 4 - connect the gui to the tool through the QtBridge
   QtBridge::Connect( private_->ui_.targetComboBox, tool->target_layer_state_ );
-  QtBridge::Connect( orderAdjuster, tool->order_state_ );
+  QtBridge::Connect( this->private_->order_, tool->order_state_ );
 
   //Send a message to the log that we have finised with building the Otsu Threshold Filter Interface
   SCI_LOG_DEBUG("Finished building an Otsu Threshold Filter Interface");

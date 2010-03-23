@@ -61,7 +61,14 @@
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="maskAComboBox"/>
+      <widget class="QComboBox" name="maskAComboBox">
+       <property name="sizeAdjustPolicy">
+        <enum>QComboBox::AdjustToMinimumContentsLength</enum>
+       </property>
+       <property name="minimumContentsLength">
+        <number>12</number>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
@@ -84,7 +91,14 @@
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="maskBComboBox"/>
+      <widget class="QComboBox" name="maskBComboBox">
+       <property name="sizeAdjustPolicy">
+        <enum>QComboBox::AdjustToMinimumContentsLength</enum>
+       </property>
+       <property name="minimumContentsLength">
+        <number>12</number>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
@@ -107,7 +121,14 @@
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="maskCComboBox"/>
+      <widget class="QComboBox" name="maskCComboBox">
+       <property name="sizeAdjustPolicy">
+        <enum>QComboBox::AdjustToMinimumContentsLength</enum>
+       </property>
+       <property name="minimumContentsLength">
+        <number>12</number>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
@@ -136,6 +157,12 @@
          <width>650</width>
          <height>0</height>
         </size>
+       </property>
+       <property name="sizeAdjustPolicy">
+        <enum>QComboBox::AdjustToMinimumContentsLength</enum>
+       </property>
+       <property name="minimumContentsLength">
+        <number>12</number>
        </property>
       </widget>
      </item>
@@ -231,6 +258,12 @@
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>23</height>
+        </size>
        </property>
        <property name="text">
         <string>Run Filter</string>

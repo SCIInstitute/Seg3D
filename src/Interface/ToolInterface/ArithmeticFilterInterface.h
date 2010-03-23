@@ -54,7 +54,7 @@ public:
   virtual bool build_widget( QFrame* frame );
 
 private:
-  ArithmeticFilterInterfacePrivate* private_;
+  boost::shared_ptr< ArithmeticFilterInterfacePrivate > private_;
 
 };
 

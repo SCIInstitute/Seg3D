@@ -31,7 +31,6 @@
 
 //Qt Gui Includes
 #include <Interface/ToolInterface/ThresholdToolInterface.h>
-#include <Interface/ToolInterface/CustomWidgets/SliderSpinComboDouble.h>
 #include "ui_ThresholdToolInterface.h"
 
 //Application Includes
@@ -47,8 +46,8 @@ class ThresholdToolInterfacePrivate
 public:
   Ui::ThresholdToolInterface ui_;
   
-  SliderSpinComboDouble *upperThresholdAdjuster;
-  SliderSpinComboDouble *lowerThresholdAdjuster;
+  SliderDoubleCombo *upper_threshold_;
+  SliderDoubleCombo *lower_threshold_;
 };
 
 // constructor
@@ -68,11 +67,11 @@ bool ThresholdToolInterface::build_widget( QFrame* frame )
   //Step 1 - build the Qt GUI Widget
   this->private_->ui_.setupUi( frame );
 
-  this->private_->upperThresholdAdjuster = new SliderSpinComboDouble();
-  this->private_->ui_.verticalLayout_2->addWidget( this->private_->upperThresholdAdjuster );
+  this->private_->upper_threshold_ = new SliderDoubleCombo();
+  this->private_->ui_.verticalLayout_2->addWidget( this->private_->upper_threshold_ );
 
-  this->private_->lowerThresholdAdjuster = new SliderSpinComboDouble();
-  this->private_->ui_.verticalLayout_3->addWidget( this->private_->lowerThresholdAdjuster );
+  this->private_->lower_threshold_ = new SliderDoubleCombo();
+  this->private_->ui_.verticalLayout_3->addWidget( this->private_->lower_threshold_ );
 
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
@@ -88,25 +87,31 @@ bool ThresholdToolInterface::build_widget( QFrame* frame )
       } 
         this->private_->ui_.targetComboBox->setCurrentIndex(tool->target_layer_state_->index());
       
-      // set the defaults for the upper threshold
+     // set the defaults for the upper threshold
         double upper_threshold_min = 0.0; 
       double upper_threshold_max = 0.0;
+      double upper_threshold_step = 0.0;
+      tool->upper_threshold_state_->get_step( upper_threshold_step );
       tool->upper_threshold_state_->get_range( upper_threshold_min, upper_threshold_max );
-        this->private_->upperThresholdAdjuster->setRanges( upper_threshold_min, upper_threshold_max );
-        this->private_->upperThresholdAdjuster->setCurrentValue( tool->upper_threshold_state_->get() );
+      private_->upper_threshold_->setStep( upper_threshold_step );
+        private_->upper_threshold_->setRange( upper_threshold_min, upper_threshold_max );
+        private_->upper_threshold_->setCurrentValue( tool->upper_threshold_state_->get() );
         
         // set the defaults for the lower threshold
         double lower_threshold_min = 0.0; 
       double lower_threshold_max = 0.0;
+      double lower_threshold_step = 0.0;
+      tool->lower_threshold_state_->get_step( lower_threshold_step );
       tool->lower_threshold_state_->get_range( lower_threshold_min, lower_threshold_max );
-        this->private_->lowerThresholdAdjuster->setRanges( lower_threshold_min, lower_threshold_max );
-        this->private_->lowerThresholdAdjuster->setCurrentValue( tool->lower_threshold_state_->get() );
+      private_->lower_threshold_->setStep( lower_threshold_step );
+        private_->lower_threshold_->setRange( lower_threshold_min, lower_threshold_max );
+        private_->lower_threshold_->setCurrentValue( tool->lower_threshold_state_->get() );
 
 
   //Step 4 - connect the gui to the tool through the QtBridge
   QtBridge::Connect( private_->ui_.targetComboBox, tool->target_layer_state_ );
-  QtBridge::Connect( this->private_->upperThresholdAdjuster, tool->upper_threshold_state_ );
-  QtBridge::Connect( this->private_->lowerThresholdAdjuster, tool->lower_threshold_state_ );
+  QtBridge::Connect( this->private_->upper_threshold_, tool->upper_threshold_state_ );
+  QtBridge::Connect( this->private_->lower_threshold_, tool->lower_threshold_state_ );
 
   //Send a message to the log that we have finised with building the Threshold Tool Interface
   SCI_LOG_DEBUG("Finished building a Threshold Tool Interface");

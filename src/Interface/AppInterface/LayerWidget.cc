@@ -53,9 +53,9 @@ class LayerWidgetPrivate
 public:
   Ui::LayerWidget ui_;
   
-  SliderSpinComboDouble* opacity_adjuster_;
-  SliderSpinComboDouble* brightness_adjuster_;
-  SliderSpinComboDouble* contrast_adjuster_;
+  SliderDoubleCombo* opacity_adjuster_;
+  SliderDoubleCombo* brightness_adjuster_;
+  SliderDoubleCombo* contrast_adjuster_;
   
   std::string layer_id_;
   Utils::GridTransform grid_transform_;
@@ -95,15 +95,15 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   //this->private_->ui_.dimensions_->hide();
   
   // add the SliderSpinCombo Widgets
-  this->private_->opacity_adjuster_ = new SliderSpinComboDouble( this->private_->ui_.opacity_bar_ );
+  this->private_->opacity_adjuster_ = new SliderDoubleCombo( this->private_->ui_.opacity_bar_ );
   this->private_->ui_.verticalLayout_2->addWidget( this->private_->opacity_adjuster_ );
   this->private_->opacity_adjuster_->setObjectName( QString::fromUtf8( "opacity_adjuster_" ) );
   
-  this->private_->brightness_adjuster_ = new SliderSpinComboDouble( this->private_->ui_.bright_contrast_bar_ );
+  this->private_->brightness_adjuster_ = new SliderDoubleCombo( this->private_->ui_.bright_contrast_bar_ );
   this->private_->ui_.brightness_h_layout_->addWidget( this->private_->brightness_adjuster_ );
   this->private_->brightness_adjuster_->setObjectName( QString::fromUtf8( "brightness_adjuster_" ) );
   
-  this->private_->contrast_adjuster_ = new SliderSpinComboDouble( this->private_->ui_.bright_contrast_bar_ );
+  this->private_->contrast_adjuster_ = new SliderDoubleCombo( this->private_->ui_.bright_contrast_bar_ );
   this->private_->ui_.contrast_h_layout_->addWidget( this->private_->contrast_adjuster_ );
   this->private_->contrast_adjuster_->setObjectName( QString::fromUtf8( "contrast_adjuster_" ) );
   
@@ -125,6 +125,38 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   }
   // Set it's default value
   this->private_->ui_.fill_selection_combo_->setCurrentIndex(layer->fill_mode_state_->index());
+  
+  // set the default values for the slidercombo's
+  // set the defaults for the opacity
+        double opacity_min = 0.0; 
+      double opacity_max = 0.0;
+      double opacity_step = 0.0;
+      layer->opacity_state_->get_step( opacity_step );
+      layer->opacity_state_->get_range( opacity_min, opacity_max );
+      this->private_->opacity_adjuster_->setStep( opacity_step );
+        this->private_->opacity_adjuster_->setRange( opacity_min, opacity_max );
+        this->private_->opacity_adjuster_->setCurrentValue( layer->opacity_state_->get() );
+        
+        // set the defaults for the brightness
+        double brightness_min = 0.0; 
+      double brightness_max = 0.0;
+      double brightness_step = 0.0;
+      layer->brightness_state_->get_step( brightness_step );
+      layer->brightness_state_->get_range( brightness_min, brightness_max );
+      this->private_->brightness_adjuster_->setStep( brightness_step );
+        this->private_->brightness_adjuster_->setRange( brightness_min, brightness_max );
+        this->private_->brightness_adjuster_->setCurrentValue( layer->brightness_state_->get() );
+        
+        // set the defaults for the contrast
+        double contrast_min = 0.0; 
+      double contrast_max = 0.0;
+      double contrast_step = 0.0;
+      layer->contrast_state_->get_step( contrast_step );
+      layer->contrast_state_->get_range( contrast_min, contrast_max );
+      this->private_->contrast_adjuster_->setStep( contrast_step );
+        this->private_->contrast_adjuster_->setRange( contrast_min, contrast_max );
+        this->private_->contrast_adjuster_->setCurrentValue( layer->contrast_state_->get() );
+  
   
   // connect the signals and slots
   connect( this->private_->ui_.opacity_button_, 
@@ -202,6 +234,11 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
 LayerWidget::~LayerWidget()
 {
 
+}
+
+std::string& LayerWidget::get_layer_id()
+{
+  return this->private_->layer_id_;
 }
   
 void LayerWidget::show_selection_checkbox( bool show )

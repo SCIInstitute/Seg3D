@@ -53,8 +53,7 @@ public:
   virtual bool build_widget( QFrame* frame );
 
 private:
-  GradientMagnitudeFilterInterfacePrivate* private_;
-  void makeConnections();
+    boost::shared_ptr< GradientMagnitudeFilterInterfacePrivate > private_;
 
 };
 

@@ -74,7 +74,11 @@ LayerManagerDockWidget::LayerManagerDockWidget( QWidget *parent ) :
   
   add_connection( LayerManager::Instance()->group_layers_changed_signal_.connect( boost::bind(
           &LayerManagerDockWidget::HandleInsertLayer, layer_dock_widget, _1 ) ) );
+          
+  add_connection( LayerManager::Instance()->active_layer_changed_signal_.connect( boost::bind(
+          &LayerManagerDockWidget::HandleSetActiveLayer, layer_dock_widget, _1 ) ) );
   
+    
 
   std::vector< LayerGroupHandle > temporary_layergrouphandle_vector;
   LayerManager::Instance()->return_group_vector( temporary_layergrouphandle_vector );
@@ -94,6 +98,11 @@ LayerManagerDockWidget::~LayerManagerDockWidget()
 void LayerManagerDockWidget::process_group_ui( LayerGroupHandle &group )
 {
   layer_manager_widget_->process_group( group );
+}
+
+void LayerManagerDockWidget::set_active_layer_ui( LayerHandle &layer )
+{
+
 }
   
 void LayerManagerDockWidget::new_group()
@@ -124,6 +133,18 @@ void LayerManagerDockWidget::remove_layer( LayerHandle& layer )
 void LayerManagerDockWidget::insert_above_layer( LayerHandle& below_layer, LayerHandle& above_layer )
 {
   //TODO implement insert layer above function
+}
+
+void LayerManagerDockWidget::HandleSetActiveLayer( qpointer_type qpointer, LayerHandle layer )
+{
+    if ( !( Interface::IsInterfaceThread() ) )
+  {
+    Interface::Instance()->post_event( boost::bind( &LayerManagerDockWidget::HandleSetActiveLayer,
+                             qpointer, layer ) );
+    return;
+  }
+  
+  if ( qpointer.data() ) qpointer->set_active_layer_ui( layer );
 }
   
 void LayerManagerDockWidget::HandleInsertLayer( qpointer_type qpointer, LayerGroupHandle group )

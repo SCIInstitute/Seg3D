@@ -38,9 +38,6 @@
 // Base class of the tool widget
 #include <Interface/AppInterface/ToolWidget.h>
 
-// Qt Gui Includes
-#include <Interface/ToolInterface/CustomWidgets/SliderSpinComboInt.h>
-#include <Interface/ToolInterface/CustomWidgets/SliderSpinComboDouble.h>
 
 namespace Seg3D
 {

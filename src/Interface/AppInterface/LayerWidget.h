@@ -70,6 +70,7 @@ public Q_SLOTS:
   
 public:
   void show_selection_checkbox( bool hideshow );
+  std::string &get_layer_id();
   
 private:
 
