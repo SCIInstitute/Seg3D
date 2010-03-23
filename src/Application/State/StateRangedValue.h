@@ -87,7 +87,7 @@ public:
   // Convert the contents of the State into a string
   virtual std::string export_to_string() const
   {
-    return ( Utils::export_to_string( value_ ) );
+    return ( Utils::ExportToString( value_ ) );
   }
 
   // IMPORT_FROM_STRING:
@@ -96,7 +96,7 @@ public:
     ActionSource::ACTION_SOURCE_NONE_E )
   {
     T value;
-    if ( !( Utils::import_from_string( str, value ) ) ) return ( false );
+    if ( !( Utils::ImportFromString( str, value ) ) ) return ( false );
     return ( set( value, source ) );
   }
 

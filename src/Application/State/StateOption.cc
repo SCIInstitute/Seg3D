@@ -121,7 +121,7 @@ bool StateOption::set( const std::string& input_value, ActionSource source )
 bool StateOption::import_from_string( const std::string& str, ActionSource source )
 {
   std::string value;
-  if ( !( Utils::import_from_string( str, value ) ) ) return ( false );
+  if ( !( Utils::ImportFromString( str, value ) ) ) return ( false );
 
   return ( set( value, source ) );
 }

@@ -89,7 +89,7 @@ public:
   // Convert the contents of the State into a string
   virtual std::string export_to_string() const
   {
-    return ( Utils::export_to_string( values_vector_ ) );
+    return ( Utils::ExportToString( values_vector_ ) );
   }
 
   // IMPORT_FROM_STRING:
@@ -101,7 +101,7 @@ public:
     StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
 
     std::vector< T > value;
-    if ( !( Utils::import_from_string( str, value ) ) ) return ( false );
+    if ( !( Utils::ImportFromString( str, value ) ) ) return ( false );
     if ( value != values_vector_ )
     {
       values_vector_ = value;

@@ -54,123 +54,123 @@ namespace Utils
 {
 
 template< class T >
-std::string export_to_string( const T& value )
+std::string ExportToString( const T& value )
 {
-  SCI_THROW_NOTIMPLEMENTEDERROR(std::string("export_to_string(")+
+  SCI_THROW_NOTIMPLEMENTEDERROR(std::string("ExportToString(")+
     typeid(value).name()+") was not implemented");
 }
 
-std::string export_to_string( const bool& value );
+std::string ExportToString( const bool& value );
 
-std::string export_to_string( const char& value );
-std::string export_to_string(const unsigned char& value);
+std::string ExportToString( const char& value );
+std::string ExportToString(const unsigned char& value);
 
-std::string export_to_string( const short& value );
-std::string export_to_string(const unsigned short& value);
+std::string ExportToString( const short& value );
+std::string ExportToString(const unsigned short& value);
 
-std::string export_to_string( const int& value );
-std::string export_to_string(const unsigned int& value);
+std::string ExportToString( const int& value );
+std::string ExportToString(const unsigned int& value);
 
-std::string export_to_string( const long& value );
-std::string export_to_string(const unsigned long& value);
+std::string ExportToString( const long& value );
+std::string ExportToString(const unsigned long& value);
 
-std::string export_to_string( const long long& value );
-std::string export_to_string( const unsigned long long& value );
+std::string ExportToString( const long long& value );
+std::string ExportToString( const unsigned long long& value );
 
-std::string export_to_string( const float& value );
-std::string export_to_string( const double& value );
+std::string ExportToString( const float& value );
+std::string ExportToString( const double& value );
 
-std::string export_to_string( const std::string& value );
+std::string ExportToString( const std::string& value );
 
-std::string export_to_string( const Point& value );
-std::string export_to_string( const Vector& value );
-std::string export_to_string( const Color& value );
+std::string ExportToString( const Point& value );
+std::string ExportToString( const Vector& value );
+std::string ExportToString( const Color& value );
 
-std::string export_to_string( const BBox& value );
-std::string export_to_string( const Transform& value );
-std::string export_to_string( const GridTransform& value );
+std::string ExportToString( const BBox& value );
+std::string ExportToString( const Transform& value );
+std::string ExportToString( const GridTransform& value );
 
-std::string export_to_string( const Plane& value );
-std::string export_to_string( const Quaternion& value );
+std::string ExportToString( const Plane& value );
+std::string ExportToString( const Quaternion& value );
 
-std::string export_to_string( const View2D& value );
-std::string export_to_string( const View3D& value );
+std::string ExportToString( const View2D& value );
+std::string ExportToString( const View3D& value );
 
-std::string export_to_string( const std::vector< char >& value );
-std::string export_to_string(const std::vector<unsigned char>& value);
+std::string ExportToString( const std::vector< char >& value );
+std::string ExportToString(const std::vector<unsigned char>& value);
 
-std::string export_to_string( const std::vector< short >& value );
-std::string export_to_string(const std::vector<unsigned short>& value);
+std::string ExportToString( const std::vector< short >& value );
+std::string ExportToString(const std::vector<unsigned short>& value);
 
-std::string export_to_string( const std::vector< int >& value );
-std::string export_to_string(const std::vector<unsigned int>& value);
+std::string ExportToString( const std::vector< int >& value );
+std::string ExportToString(const std::vector<unsigned int>& value);
 
-std::string export_to_string( const std::vector< long >& value );
-std::string export_to_string(const std::vector<unsigned long>& value);
+std::string ExportToString( const std::vector< long >& value );
+std::string ExportToString(const std::vector<unsigned long>& value);
 
-std::string export_to_string( const std::vector< float >& value );
-std::string export_to_string( const std::vector< double >& value );
+std::string ExportToString( const std::vector< float >& value );
+std::string ExportToString( const std::vector< double >& value );
 
-std::string export_to_string( const std::vector< Point >& value );
-std::string export_to_string( const std::vector< Vector >& value );
+std::string ExportToString( const std::vector< Point >& value );
+std::string ExportToString( const std::vector< Vector >& value );
 
-// import_from_string:
+// ImportFromString:
 // Function to convert a string back into the data it is representing
 
 template< class T >
-bool import_from_string( const std::string& str, T& value )
+bool ImportFromString( const std::string& str, T& value )
 {
-  SCI_THROW_NOTIMPLEMENTEDERROR(std::string("import_from_string(")+
+  SCI_THROW_NOTIMPLEMENTEDERROR(std::string("ImportFromString(")+
     typeid(value).name()+") was not implemented");
 }
 
-bool import_from_string( const std::string& str, bool& value );
+bool ImportFromString( const std::string& str, bool& value );
 
-bool import_from_string( const std::string& str, char& value );
-bool import_from_string(const std::string& str, unsigned char& value);
+bool ImportFromString( const std::string& str, char& value );
+bool ImportFromString(const std::string& str, unsigned char& value);
 
-bool import_from_string( const std::string& str, short& value );
-bool import_from_string(const std::string& str, unsigned short& value);
+bool ImportFromString( const std::string& str, short& value );
+bool ImportFromString(const std::string& str, unsigned short& value);
 
-bool import_from_string( const std::string& str, int& value );
-bool import_from_string(const std::string& str, unsigned int& value);
+bool ImportFromString( const std::string& str, int& value );
+bool ImportFromString(const std::string& str, unsigned int& value);
 
-bool import_from_string(const std::string& str, long long& value);
-bool import_from_string(const std::string& str, unsigned long long& value);
+bool ImportFromString(const std::string& str, long long& value);
+bool ImportFromString(const std::string& str, unsigned long long& value);
 
-bool import_from_string( const std::string& str, float& value );
-bool import_from_string( const std::string& str, double& value );
+bool ImportFromString( const std::string& str, float& value );
+bool ImportFromString( const std::string& str, double& value );
 
-bool import_from_string( const std::string& str, std::string& value );
+bool ImportFromString( const std::string& str, std::string& value );
 
-bool import_from_string( const std::string& str, Point& value );
-bool import_from_string( const std::string& str, Vector& value );
-bool import_from_string( const std::string& str, Color& value );
-bool import_from_string( const std::string& str, Quaternion& value );
+bool ImportFromString( const std::string& str, Point& value );
+bool ImportFromString( const std::string& str, Vector& value );
+bool ImportFromString( const std::string& str, Color& value );
+bool ImportFromString( const std::string& str, Quaternion& value );
 
-bool import_from_string( const std::string& str, BBox& value );
-bool import_from_string( const std::string& str, Transform& value );
-bool import_from_string( const std::string& str, GridTransform& value );
-bool import_from_string( const std::string& str, View2D& value );
-bool import_from_string( const std::string& str, View3D& value );
+bool ImportFromString( const std::string& str, BBox& value );
+bool ImportFromString( const std::string& str, Transform& value );
+bool ImportFromString( const std::string& str, GridTransform& value );
+bool ImportFromString( const std::string& str, View2D& value );
+bool ImportFromString( const std::string& str, View3D& value );
 
-bool import_from_string( const std::string& str, std::vector< char >& value );
-bool import_from_string(const std::string& str, std::vector<unsigned char>& value);
+bool ImportFromString( const std::string& str, std::vector< char >& value );
+bool ImportFromString(const std::string& str, std::vector<unsigned char>& value);
 
-bool import_from_string( const std::string& str, std::vector< short >& value );
-bool import_from_string(const std::string& str, std::vector<unsigned short>& value);
+bool ImportFromString( const std::string& str, std::vector< short >& value );
+bool ImportFromString(const std::string& str, std::vector<unsigned short>& value);
 
-bool import_from_string( const std::string& str, std::vector< int >& value );
-bool import_from_string(const std::string& str, std::vector<unsigned int>& value);
+bool ImportFromString( const std::string& str, std::vector< int >& value );
+bool ImportFromString(const std::string& str, std::vector<unsigned int>& value);
 
-bool import_from_string(const std::string& str, std::vector<long long>& value);
-bool import_from_string(const std::string& str, std::vector<unsigned long long>& value);
+bool ImportFromString(const std::string& str, std::vector<long long>& value);
+bool ImportFromString(const std::string& str, std::vector<unsigned long long>& value);
 
-bool import_from_string( const std::string& str, std::vector< float >& value );
-bool import_from_string( const std::string& str, std::vector< double >& value );
+bool ImportFromString( const std::string& str, std::vector< float >& value );
+bool ImportFromString( const std::string& str, std::vector< double >& value );
 
-bool import_from_string( const std::string& str, std::vector< Point >& value );
-bool import_from_string( const std::string& str, std::vector< Vector >& value );
+bool ImportFromString( const std::string& str, std::vector< Point >& value );
+bool ImportFromString( const std::string& str, std::vector< Vector >& value );
 
 } // end namespace Utils
 

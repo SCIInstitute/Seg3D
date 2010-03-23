@@ -149,7 +149,7 @@ public:
   // export the contents of the parameter to string
   virtual std::string export_to_string() const
   {
-    return Utils::export_to_string( value_ );
+    return Utils::ExportToString( value_ );
   }
 
   // IMPORT_FROM_STRING
@@ -157,7 +157,7 @@ public:
   // if the import succeeded
   virtual bool import_from_string( const std::string& str )
   {
-    return Utils::import_from_string( str, value_ );
+    return Utils::ImportFromString( str, value_ );
   }
 
 private:
@@ -232,7 +232,7 @@ public:
           dynamic_cast< ActionParameter< T >* > ( typed_value_.get() );
       if ( param_ptr == 0 )
       {
-        if ( !( Utils::import_from_string( typed_value_->export_to_string(), value ) ) )
+        if ( !( Utils::ImportFromString( typed_value_->export_to_string(), value ) ) )
         {
           return ( false );
         }
@@ -275,7 +275,7 @@ public:
       if ( param_ptr == 0 )
       {
         T value;
-        if ( !( Utils::import_from_string( typed_value_->export_to_string(), value ) ) )
+        if ( !( Utils::ImportFromString( typed_value_->export_to_string(), value ) ) )
         {
           return ( false );
         }

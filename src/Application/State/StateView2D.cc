@@ -46,13 +46,13 @@ StateView2D::~StateView2D()
 
 std::string StateView2D::export_to_string() const
 {
-  return ( Utils::export_to_string( value_ ) );
+  return ( Utils::ExportToString( value_ ) );
 }
 
 bool StateView2D::import_from_string( const std::string& str, ActionSource source )
 {
   Utils::View2D value;
-  if ( !( Utils::import_from_string( str, value ) ) ) return ( false );
+  if ( !( Utils::ImportFromString( str, value ) ) ) return ( false );
 
   return ( set( value, source ) );
 }

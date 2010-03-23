@@ -32,110 +32,110 @@
 namespace Utils
 {
 
-std::string export_to_string( const bool& value )
+std::string ExportToString( const bool& value )
 {
   if ( value ) return ( std::string( "true" ) );
   else return ( std::string( "false" ) );
 }
 
-std::string export_to_string( const char& value )
+std::string ExportToString( const char& value )
 {
   return to_string( value );
 }
 
-std::string export_to_string(const unsigned char& value)
+std::string ExportToString(const unsigned char& value)
 {
   return to_string(value);
 }
 
-std::string export_to_string( const short& value )
+std::string ExportToString( const short& value )
 {
   return to_string( value );
 }
 
-std::string export_to_string(const unsigned short& value)
+std::string ExportToString(const unsigned short& value)
 {
   return to_string(value);
 }
 
-std::string export_to_string( const int& value )
+std::string ExportToString( const int& value )
 {
   return to_string( value );
 }
 
-std::string export_to_string(const unsigned int& value)
+std::string ExportToString(const unsigned int& value)
 {
   return to_string(value);
 }
 
-std::string export_to_string( const long& value )
+std::string ExportToString( const long& value )
 {
   return to_string( value );
 }
 
-std::string export_to_string(const unsigned long& value)
+std::string ExportToString(const unsigned long& value)
 {
   return to_string(value);
 }
 
-std::string export_to_string( const long long& value )
+std::string ExportToString( const long long& value )
 {
   return to_string( value );
 }
 
-std::string export_to_string( const unsigned long long& value )
+std::string ExportToString( const unsigned long long& value )
 {
   return to_string( value );
 }
 
-std::string export_to_string( const float& value )
+std::string ExportToString( const float& value )
 {
   return to_string( value );
 }
 
-std::string export_to_string( const double& value )
+std::string ExportToString( const double& value )
 {
   return to_string( value );
 }
 
-std::string export_to_string( const View3D& value )
+std::string ExportToString( const View3D& value )
 {
-  return ( std::string( 1, '[' ) + export_to_string( value.eyep() ) + ' ' + export_to_string(
-      value.lookat() ) + ' ' + export_to_string( value.up() ) + ' ' + export_to_string(
+  return ( std::string( 1, '[' ) + ExportToString( value.eyep() ) + ' ' + ExportToString(
+      value.lookat() ) + ' ' + ExportToString( value.up() ) + ' ' + ExportToString(
       value.fov() ) + ']' );
 }
 
-std::string export_to_string( const View2D& value )
+std::string ExportToString( const View2D& value )
 {
-  return ( std::string( 1, '[' ) + export_to_string( value.center() ) + ' ' + export_to_string(
-      value.scalex() ) + ' ' + export_to_string( value.scaley() ) + ']' );
+  return ( std::string( 1, '[' ) + ExportToString( value.center() ) + ' ' + ExportToString(
+      value.scalex() ) + ' ' + ExportToString( value.scaley() ) + ']' );
 }
 
-std::string export_to_string( const Point& value )
-{
-  return ( std::string( 1, '[' ) + to_string( value.x() ) + ' ' + to_string( value.y() ) + ' '
-      + to_string( value.z() ) + ']' );
-}
-
-std::string export_to_string( const Vector& value )
+std::string ExportToString( const Point& value )
 {
   return ( std::string( 1, '[' ) + to_string( value.x() ) + ' ' + to_string( value.y() ) + ' '
       + to_string( value.z() ) + ']' );
 }
 
-std::string export_to_string( const Color& value )
+std::string ExportToString( const Vector& value )
+{
+  return ( std::string( 1, '[' ) + to_string( value.x() ) + ' ' + to_string( value.y() ) + ' '
+      + to_string( value.z() ) + ']' );
+}
+
+std::string ExportToString( const Color& value )
 {
   return ( std::string( 1, '[' ) + to_string( value.r() ) + ' ' + to_string( value.g() ) + ' '
       + to_string( value.b() ) + ']' );
 }
 
-std::string export_to_string( const BBox& value )
+std::string ExportToString( const BBox& value )
 {
-  return ( std::string( 1, '[' ) + export_to_string( value.min() ) + ' ' + export_to_string(
+  return ( std::string( 1, '[' ) + ExportToString( value.min() ) + ' ' + ExportToString(
       value.max() ) + ']' );
 }
 
-std::string export_to_string( const std::vector< char >& value )
+std::string ExportToString( const std::vector< char >& value )
 {
   std::string result( 1, '[' );
   for ( size_t j = 0; j < value.size(); j++ )
@@ -144,7 +144,7 @@ std::string export_to_string( const std::vector< char >& value )
   return result;
 }
 
-std::string export_to_string(const std::vector<unsigned char>& value)
+std::string ExportToString(const std::vector<unsigned char>& value)
 {
   std::string result(1,'[');
   for (size_t j=0;j<value.size();j++) result += to_string(value[j])+' ';
@@ -152,7 +152,7 @@ std::string export_to_string(const std::vector<unsigned char>& value)
   return result;
 }
 
-std::string export_to_string( const std::vector< short >& value )
+std::string ExportToString( const std::vector< short >& value )
 {
   std::string result( 1, '[' );
   for ( size_t j = 0; j < value.size(); j++ )
@@ -161,7 +161,7 @@ std::string export_to_string( const std::vector< short >& value )
   return result;
 }
 
-std::string export_to_string(const std::vector<unsigned short>& value)
+std::string ExportToString(const std::vector<unsigned short>& value)
 {
   std::string result(1,'[');
   for (size_t j=0;j<value.size();j++) result += to_string(value[j])+' ';
@@ -169,7 +169,7 @@ std::string export_to_string(const std::vector<unsigned short>& value)
   return result;
 }
 
-std::string export_to_string( const std::vector< int >& value )
+std::string ExportToString( const std::vector< int >& value )
 {
   std::string result( 1, '[' );
   for ( size_t j = 0; j < value.size(); j++ )
@@ -178,7 +178,7 @@ std::string export_to_string( const std::vector< int >& value )
   return result;
 }
 
-std::string export_to_string(const std::vector<unsigned int>& value)
+std::string ExportToString(const std::vector<unsigned int>& value)
 {
   std::string result(1,'[');
   for (size_t j=0;j<value.size();j++) result += to_string(value[j])+' ';
@@ -186,7 +186,7 @@ std::string export_to_string(const std::vector<unsigned int>& value)
   return result;
 }
 
-std::string export_to_string(const std::vector<long long>& value)
+std::string ExportToString(const std::vector<long long>& value)
 {
   std::string result(1,'[');
   for (size_t j=0;j<value.size();j++) result += to_string(value[j])+' ';
@@ -194,7 +194,7 @@ std::string export_to_string(const std::vector<long long>& value)
   return result;
 }
 
-std::string export_to_string(const std::vector<unsigned long long>& value)
+std::string ExportToString(const std::vector<unsigned long long>& value)
 {
   std::string result(1,'[');
   for (size_t j=0;j<value.size();j++) result += to_string(value[j])+' ';
@@ -202,7 +202,7 @@ std::string export_to_string(const std::vector<unsigned long long>& value)
   return result;
 }
 
-std::string export_to_string( const std::vector< float >& value )
+std::string ExportToString( const std::vector< float >& value )
 {
   std::string result( 1, '[' );
   for ( size_t j = 0; j < value.size(); j++ )
@@ -211,7 +211,7 @@ std::string export_to_string( const std::vector< float >& value )
   return result;
 }
 
-std::string export_to_string( const std::vector< double >& value )
+std::string ExportToString( const std::vector< double >& value )
 {
   std::string result( 1, '[' );
   for ( size_t j = 0; j < value.size(); j++ )
@@ -220,25 +220,25 @@ std::string export_to_string( const std::vector< double >& value )
   return result;
 }
 
-std::string export_to_string( const std::vector< Point >& value )
+std::string ExportToString( const std::vector< Point >& value )
 {
   std::string result( 1, '[' );
   for ( size_t j = 0; j < value.size(); j++ )
-    result += export_to_string( value[ j ] ) + ' ';
+    result += ExportToString( value[ j ] ) + ' ';
   result[ result.size() - 1 ] = ']';
   return result;
 }
 
-std::string export_to_string( const std::vector< Vector >& value )
+std::string ExportToString( const std::vector< Vector >& value )
 {
   std::string result( 1, '[' );
   for ( size_t j = 0; j < value.size(); j++ )
-    result += export_to_string( value[ j ] ) + ' ';
+    result += ExportToString( value[ j ] ) + ' ';
   result[ result.size() - 1 ] = ']';
   return result;
 }
 
-std::string export_to_string( const std::string& value )
+std::string ExportToString( const std::string& value )
 {
   bool need_quotes = false;
   for ( size_t j = 0; j < value.size(); j++)
@@ -250,7 +250,7 @@ std::string export_to_string( const std::string& value )
   else return value;
 }
 
-std::string export_to_string( const Transform& value )
+std::string ExportToString( const Transform& value )
 {
   std::string result( 1, '[' );
   std::vector< double > trans( 16 );
@@ -261,27 +261,27 @@ std::string export_to_string( const Transform& value )
   return ( result );
 }
 
-std::string export_to_string( const GridTransform& value )
+std::string ExportToString( const GridTransform& value )
 {
-  return ( std::string( 1, '[' ) + export_to_string( value.nx() ) + ' ' + export_to_string(
-      value.ny() ) + ' ' + export_to_string( value.nz() ) + ' ' + export_to_string(
+  return ( std::string( 1, '[' ) + ExportToString( value.nx() ) + ' ' + ExportToString(
+      value.ny() ) + ' ' + ExportToString( value.nz() ) + ' ' + ExportToString(
       value.transform() ) + ']' );
 }
 
-std::string export_to_string( const Plane& value )
+std::string ExportToString( const Plane& value )
 {
-  return ( std::string( 1, '[' ) + export_to_string( value.normal() ) + ' ' + export_to_string(
+  return ( std::string( 1, '[' ) + ExportToString( value.normal() ) + ' ' + ExportToString(
       value.distance() ) + ']' );
 }
 
-std::string export_to_string( const Quaternion& value )
+std::string ExportToString( const Quaternion& value )
 {
-  return ( std::string( 1, '[' ) + export_to_string( value.w() ) + ' ' + export_to_string(
-      value.x() ) + ' ' + export_to_string( value.y() ) + ' ' + export_to_string( value.z() )
+  return ( std::string( 1, '[' ) + ExportToString( value.w() ) + ' ' + ExportToString(
+      value.x() ) + ' ' + ExportToString( value.y() ) + ' ' + ExportToString( value.z() )
       + " ]" );
 }
 
-bool import_from_string( const std::string& str, bool& value )
+bool ImportFromString( const std::string& str, bool& value )
 {
   std::string tmpstr( str );
   strip_surrounding_spaces( tmpstr );
@@ -299,57 +299,57 @@ bool import_from_string( const std::string& str, bool& value )
   return ( false );
 }
 
-bool import_from_string( const std::string& str, char& value )
+bool ImportFromString( const std::string& str, char& value )
 {
   return ( from_string( str, value ) );
 }
 
-bool import_from_string(const std::string& str, unsigned char& value)
+bool ImportFromString(const std::string& str, unsigned char& value)
 {
   return (from_string(str,value));
 }
 
-bool import_from_string( const std::string& str, short& value )
+bool ImportFromString( const std::string& str, short& value )
 {
   return ( from_string( str, value ) );
 }
 
-bool import_from_string(const std::string& str, unsigned short& value)
+bool ImportFromString(const std::string& str, unsigned short& value)
 {
   return (from_string(str,value));
 }
 
-bool import_from_string( const std::string& str, int& value )
+bool ImportFromString( const std::string& str, int& value )
 {
   return ( from_string( str, value ) );
 }
 
-bool import_from_string(const std::string& str, unsigned int& value)
+bool ImportFromString(const std::string& str, unsigned int& value)
 {
   return (from_string(str,value));
 }
 
-bool import_from_string(const std::string& str, long long& value)
+bool ImportFromString(const std::string& str, long long& value)
 {
   return (from_string(str,value));
 }
 
-bool import_from_string(const std::string& str, unsigned long long& value)
+bool ImportFromString(const std::string& str, unsigned long long& value)
 {
   return (from_string(str,value));
 }
 
-bool import_from_string( const std::string& str, float& value )
+bool ImportFromString( const std::string& str, float& value )
 {
   return ( from_string( str, value ) );
 }
 
-bool import_from_string( const std::string& str, double& value )
+bool ImportFromString( const std::string& str, double& value )
 {
   return ( from_string( str, value ) );
 }
 
-bool import_from_string( const std::string& str, Point& value )
+bool ImportFromString( const std::string& str, Point& value )
 {
   std::vector< double > values;
   multiple_from_string( str, values );
@@ -361,7 +361,7 @@ bool import_from_string( const std::string& str, Point& value )
   return ( false );
 }
 
-bool import_from_string( const std::string& str, Quaternion& value )
+bool ImportFromString( const std::string& str, Quaternion& value )
 {
   std::vector< double > values;
   multiple_from_string( str, values );
@@ -373,7 +373,7 @@ bool import_from_string( const std::string& str, Quaternion& value )
   return ( false );
 }
 
-bool import_from_string( const std::string& str, View3D& value )
+bool ImportFromString( const std::string& str, View3D& value )
 {
   std::vector< double > values;
   multiple_from_string( str, values );
@@ -388,7 +388,7 @@ bool import_from_string( const std::string& str, View3D& value )
   return ( false );
 }
 
-bool import_from_string( const std::string& str, View2D& value )
+bool ImportFromString( const std::string& str, View2D& value )
 {
   std::vector< double > values;
   multiple_from_string( str, values );
@@ -400,7 +400,7 @@ bool import_from_string( const std::string& str, View2D& value )
   return ( false );
 }
 
-bool import_from_string( const std::string& str, Vector& value )
+bool ImportFromString( const std::string& str, Vector& value )
 {
   std::vector< double > values;
   multiple_from_string( str, values );
@@ -412,7 +412,7 @@ bool import_from_string( const std::string& str, Vector& value )
   return ( false );
 }
 
-bool import_from_string( const std::string& str, Color& value )
+bool ImportFromString( const std::string& str, Color& value )
 {
   std::vector< double > values;
   multiple_from_string( str, values );
@@ -424,63 +424,63 @@ bool import_from_string( const std::string& str, Color& value )
   return ( false );
 }
 
-bool import_from_string( const std::string& str, std::vector< char >& value )
+bool ImportFromString( const std::string& str, std::vector< char >& value )
 {
   return ( multiple_from_string( str, value ) );
 }
 
-bool import_from_string(const std::string& str, std::vector<unsigned char>& value)
+bool ImportFromString(const std::string& str, std::vector<unsigned char>& value)
 {
   return (multiple_from_string(str,value));
 }
 
-bool import_from_string( const std::string& str, std::vector< short >& value )
+bool ImportFromString( const std::string& str, std::vector< short >& value )
 {
   return ( multiple_from_string( str, value ) );
 }
 
-bool import_from_string(const std::string& str, std::vector<unsigned short>& value)
+bool ImportFromString(const std::string& str, std::vector<unsigned short>& value)
 {
   return (multiple_from_string(str,value));
 }
 
-bool import_from_string( const std::string& str, std::vector< int >& value )
+bool ImportFromString( const std::string& str, std::vector< int >& value )
 {
   return ( multiple_from_string( str, value ) );
 }
 
-bool import_from_string(const std::string& str, std::vector<unsigned int>& value)
+bool ImportFromString(const std::string& str, std::vector<unsigned int>& value)
 {
   return (multiple_from_string(str,value));
 }
 
-bool import_from_string(const std::string& str, std::vector<long long>& value)
+bool ImportFromString(const std::string& str, std::vector<long long>& value)
 {
   return (multiple_from_string(str,value));
 }
 
-bool import_from_string(const std::string& str, std::vector<unsigned long long>& value)
+bool ImportFromString(const std::string& str, std::vector<unsigned long long>& value)
 {
   return (multiple_from_string(str,value));
 }
 
-bool import_from_string( const std::string& str, std::vector< float >& value )
+bool ImportFromString( const std::string& str, std::vector< float >& value )
 {
   return ( multiple_from_string( str, value ) );
 }
 
-bool import_from_string( const std::string& str, std::vector< double >& value )
+bool ImportFromString( const std::string& str, std::vector< double >& value )
 {
   return ( multiple_from_string( str, value ) );
 }
 
-bool import_from_string( const std::string& str, std::string& value )
+bool ImportFromString( const std::string& str, std::string& value )
 {
   value = str;
   return ( true );
 }
 
-bool import_from_string( const std::string& str, std::vector< Point >& value )
+bool ImportFromString( const std::string& str, std::vector< Point >& value )
 {
   std::vector< double > values;
   multiple_from_string( str, values );
@@ -498,7 +498,7 @@ bool import_from_string( const std::string& str, std::vector< Point >& value )
   return ( false );
 }
 
-bool import_from_string( const std::string& str, std::vector< Vector >& value )
+bool ImportFromString( const std::string& str, std::vector< Vector >& value )
 {
   std::vector< double > values;
   multiple_from_string( str, values );
@@ -516,7 +516,7 @@ bool import_from_string( const std::string& str, std::vector< Vector >& value )
   return ( false );
 }
 
-bool import_from_string( const std::string& str, BBox& value )
+bool ImportFromString( const std::string& str, BBox& value )
 {
   std::vector< double > values;
   multiple_from_string( str, values );
@@ -529,7 +529,7 @@ bool import_from_string( const std::string& str, BBox& value )
   return ( false );
 }
 
-bool import_from_string( const std::string& str, Transform& value )
+bool ImportFromString( const std::string& str, Transform& value )
 {
   std::vector< double > values;
   multiple_from_string( str, values );
@@ -541,7 +541,7 @@ bool import_from_string( const std::string& str, Transform& value )
   return ( false );
 }
 
-bool import_from_string( const std::string& str, GridTransform& value )
+bool ImportFromString( const std::string& str, GridTransform& value )
 {
   std::vector< double > values;
   multiple_from_string( str, values );
@@ -556,7 +556,7 @@ bool import_from_string( const std::string& str, GridTransform& value )
   return ( false );
 }
 
-bool import_from_string( const std::string& str, Plane& value )
+bool ImportFromString( const std::string& str, Plane& value )
 {
   std::vector< double > values;
   multiple_from_string( str, values );

@@ -60,13 +60,13 @@ StateAlias::~StateAlias()
 
 std::string StateAlias::export_to_string() const
 {
-  return Utils::export_to_string( value_ );
+  return Utils::ExportToString( value_ );
 }
 
 bool StateAlias::import_from_string( const std::string& str, ActionSource source )
 {
   std::string value;
-  if ( !( Utils::import_from_string( str, value ) ) ) return ( false );
+  if ( !( Utils::ImportFromString( str, value ) ) ) return ( false );
 
   return set( value, source );
 }
