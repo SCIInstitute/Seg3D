@@ -152,9 +152,6 @@ void VolumeSlice::update_position()
     assert( false );
     break;
   }
-
-  // TODO: remove this. It's for testing only
-  this->slice_number_ = this->number_of_slices_ / 2;
 }
 
 size_t VolumeSlice::to_index( size_t i, size_t j ) const

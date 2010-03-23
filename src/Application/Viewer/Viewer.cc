@@ -54,9 +54,6 @@ Viewer::Viewer( const std::string& key ) :
   add_state( "sagittal_view", sagittal_view_state_ );
   add_state( "volume_view", volume_view_state_ );
 
-  //add_state( "axial_slice_number", this->axial_slice_number_state_, 0, 0, 0, 1 );
-  //add_state( "coronal_slice_number", this->coronal_slice_number_state_, 0, 0, 0, 1 );
-  //add_state( "sagittal_slice_number", this->sagittal_slice_number_state_, 0, 0, 0, 1 );
   add_state( "slice_number", this->slice_number_state_, 0, 0, 0, 1 );
   this->slice_numbers_[ 0 ] = this->slice_numbers_[ 1 ] = this->slice_numbers_[ 2 ] = 0;
 
@@ -155,10 +152,9 @@ bool Viewer::wheel_event( int delta, int x, int y, int buttons, int modifiers )
     int slice_num = static_cast<int>( this->active_layer_slice_->get_slice_number() );
     int new_slice = static_cast<int>( slice_num - delta );
     if ( new_slice >= 0 && 
-       static_cast<size_t>( new_slice ) < this->active_layer_slice_->number_of_slices() )
+       static_cast< size_t >( new_slice ) < this->active_layer_slice_->number_of_slices() )
     {
-      this->active_layer_slice_->set_slice_number( static_cast<size_t>( new_slice ) );
-      this->redraw_signal_();
+      ActionSet::Dispatch( this->slice_number_state_, new_slice );
     }
   }
 
@@ -288,8 +284,6 @@ void Viewer::insert_layer( LayerHandle layer )
       Utils::DataVolumeSliceHandle data_volume_slice( 
         new Utils::DataVolumeSlice( data_volume, slice_type, slice_number ) );
       this->data_slices_[ layer->get_layer_id() ] = data_volume_slice;
-      // TODO: remove the following line. Hardcoded for testing.
-      this->active_layer_slice_ = data_volume_slice;
     }
     break;
   case Utils::VolumeType::MASK_E:
@@ -312,6 +306,8 @@ void Viewer::insert_layer( LayerHandle layer )
   {
     this->ignore_state_changes_ = true;
     this->adjust_view();
+    // TODO: remove the following line. Hardcoded for testing.
+    this->set_active_layer( layer );
     this->ignore_state_changes_ = false;
   }
 
@@ -376,11 +372,27 @@ void Viewer::set_active_layer( LayerHandle layer )
     // NOTE: The following state changes are due to internal program logic, 
     // so they should not go through the action mechanism.
 
+    this->updating_states_ = true;
     this->slice_number_state_->set_range(
       0, static_cast< int >( this->active_layer_slice_->number_of_slices() - 1 ) );
+    this->updating_states_ = false;
+    const std::string& view_mode = this->view_mode_state_->get();
+    if ( view_mode == AXIAL_C )
+    {
+      this->slice_number_state_->set( this->slice_numbers_[ 0 ] );
+    }
+    else if ( view_mode == CORONAL_C )
+    {
+      this->slice_number_state_->set( this->slice_numbers_[ 1 ] );
+    }
+    else
+    {
+      this->slice_number_state_->set( this->slice_numbers_[ 2 ] );
+    }
 
     // Enable redraws
     this->ignore_state_changes_ = false;
+    this->redraw_signal_();
   }
 }
 
@@ -449,8 +461,10 @@ void Viewer::change_view_mode( std::string mode, ActionSource source )
     // so they should not go through the action mechanism.
 
     this->ignore_state_changes_ = true;
+    this->updating_states_ = true;
     this->slice_number_state_->set_range(
       0, static_cast< int >( this->active_layer_slice_->number_of_slices() - 1 ) );
+    this->updating_states_ = false;
     this->slice_number_state_->set( this->slice_numbers_[ slice_type ] );
     this->ignore_state_changes_ = false;
   }
@@ -459,7 +473,7 @@ void Viewer::change_view_mode( std::string mode, ActionSource source )
 void Viewer::set_slice_number( int num, ActionSource source )
 {
   const std::string& view_mode = this->view_mode_state_->get();
-  if ( view_mode == VOLUME_C )
+  if ( this->updating_states_ || view_mode == VOLUME_C )
   {
     return;
   }
@@ -478,6 +492,7 @@ void Viewer::set_slice_number( int num, ActionSource source )
     this->slice_numbers_[ 2 ] = num;
   }
 
+  this->active_layer_slice_->set_slice_number( num );
   // Get the world coordinate of the slice in the active layer
   Utils::Point slice_pos;
   this->active_layer_slice_->to_index( 0, 0, slice_pos );
@@ -513,18 +528,21 @@ void Viewer::adjust_view()
     ( volume_slice->bottom() + volume_slice->top() ) * 0.5, 0.0 );
   scale = 1.0 / Utils::Abs( volume_slice->top() - volume_slice->bottom() );
   this->axial_view_state_->set( Utils::View2D( center, scale ) );
+  this->slice_numbers_[ 0 ] = static_cast< int >( volume_slice->number_of_slices() / 2 );
 
   volume_slice->set_slice_type( Utils::VolumeSliceType::CORONAL_E );
   center = Utils::Point( ( volume_slice->left() + volume_slice->right() ) * 0.5, 
     ( volume_slice->bottom() + volume_slice->top() ) * 0.5, 0.0 );
   scale = 1.0 / Utils::Abs( volume_slice->top() - volume_slice->bottom() );
   this->coronal_view_state_->set( Utils::View2D( center, scale ) );
+  this->slice_numbers_[ 1 ] = static_cast< int >( volume_slice->number_of_slices() / 2 );
 
   volume_slice->set_slice_type( Utils::VolumeSliceType::SAGITTAL_E );
   center = Utils::Point( ( volume_slice->left() + volume_slice->right() ) * 0.5, 
     ( volume_slice->bottom() + volume_slice->top() ) * 0.5, 0.0 );
   scale = 1.0 / Utils::Abs( volume_slice->top() - volume_slice->bottom() );
   this->sagittal_view_state_->set( Utils::View2D( center, scale ) );
+  this->slice_numbers_[ 2 ] = static_cast< int >( volume_slice->number_of_slices() / 2 );
 }
 
 } // end namespace Seg3D

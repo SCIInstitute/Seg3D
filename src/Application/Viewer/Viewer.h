@@ -211,8 +211,6 @@ public:
   StateView2DHandle sagittal_view_state_;
   StateView3DHandle volume_view_state_;
 
-  // Stores slice number and range information of the active layer in the selected view mode
-  // NOTE: It copys value from one of the three private state variables
   StateRangedIntHandle slice_number_state_;
 
   StateBoolHandle slice_lock_state_;
@@ -226,9 +224,6 @@ public:
 
 private:
   int slice_numbers_[ 3 ]; // Cached slice numbers for the three slicing direction
-  //StateRangedIntHandle axial_slice_number_state_;
-  //StateRangedIntHandle coronal_slice_number_state_;
-  //StateRangedIntHandle sagittal_slice_number_state_;
 
 public:
   const static std::string AXIAL_C;
