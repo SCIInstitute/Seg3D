@@ -59,12 +59,6 @@ Layer::Layer( const std::string& name ) :
 
   // == The opacity of the layer ==
   add_state( "opacity", opacity_state_, 1.0f, 0.0f, 1.0f, 0.01f );
-  
-  // == The brightness of the layer ==
-  add_state( "brightness", brightness_state_, 50.0f, 0.0f, 100.0f, 1.0f );
-  
-  // == The contrast of the layer ==
-  add_state( "contrast", contrast_state_, 50.0f, 0.0f, 100.0f, 1.0f );
 
   // == Selected by the LayerGroup ==
   add_state( "selected", selected_state_, false );

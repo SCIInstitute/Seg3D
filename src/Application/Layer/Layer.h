@@ -104,12 +104,6 @@ public:
 
   // State that describes the opacity with which the layer is displayed
   StateRangedDoubleHandle opacity_state_;
-  
-  // State that describes the brightness with which the layer is displayed
-  StateRangedDoubleHandle brightness_state_;
-  
-  // State that describes the contrast with which the layer is displayed
-  StateRangedDoubleHandle contrast_state_;
 
   // State of the checkbox that records which layer needs to be processed in
   // the group
