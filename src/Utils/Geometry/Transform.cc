@@ -56,7 +56,7 @@ Transform::Transform( const Point& p, const Vector& i, const Vector& j, const Ve
 void Transform::load_basis( const Point &p, const Vector &x, const Vector &y, const Vector &z )
 {
   load_frame( x, y, z );
-  post_translate( Vector( -p ) );
+  post_translate( Vector( p ) );
 }
 
 void Transform::load_frame( const Vector& x, const Vector& y, const Vector& z )
@@ -66,15 +66,15 @@ void Transform::load_frame( const Vector& x, const Vector& y, const Vector& z )
   mat_( 3, 0 ) = mat_( 3, 1 ) = mat_( 3, 2 ) = 0.0;
 
   mat_( 0, 0 ) = x.x();
-  mat_( 0, 1 ) = x.y();
-  mat_( 0, 2 ) = x.z();
+  mat_( 1, 0 ) = x.y();
+  mat_( 2, 0 ) = x.z();
 
-  mat_( 1, 0 ) = y.x();
+  mat_( 0, 1 ) = y.x();
   mat_( 1, 1 ) = y.y();
-  mat_( 1, 2 ) = y.z();
+  mat_( 2, 1 ) = y.z();
 
-  mat_( 2, 0 ) = z.x();
-  mat_( 2, 1 ) = z.y();
+  mat_( 0, 2 ) = z.x();
+  mat_( 1, 2 ) = z.y();
   mat_( 2, 2 ) = z.z();
 }
 
