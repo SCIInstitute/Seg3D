@@ -56,7 +56,7 @@ Transform::Transform( const Point& p, const Vector& i, const Vector& j, const Ve
 void Transform::load_basis( const Point &p, const Vector &x, const Vector &y, const Vector &z )
 {
   load_frame( x, y, z );
-  post_translate( Vector( p ) );
+  pre_translate( Vector( p ) );
 }
 
 void Transform::load_frame( const Vector& x, const Vector& y, const Vector& z )
@@ -433,6 +433,7 @@ void Transform::BuildViewMatrix( Matrix& m, const Point& eyep,
   Vector y( Cross( z, x ) );
 
   Transform tf( eyep, x, y, z );
+  tf = tf.get_inverse();
   m = tf.get_matrix();
 }
 

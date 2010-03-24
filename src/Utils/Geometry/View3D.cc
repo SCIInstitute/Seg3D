@@ -85,17 +85,18 @@ void View3D::rotate( const Vector& axis, double angle )
   Vector y( Cross( z, x ) );
 
   // Convert the quaternion to matrix
-  Quaternion quat( axis, DegreeToRadian( angle ) );
+  // NOTE: Invert the angle for rotating the eye
+  Quaternion quat( axis, DegreeToRadian( -angle ) );
   Matrix mat;
   quat.to_matrix( mat );
 
   Transform view_trans;
   view_trans.load_frame( x, y, z );
-  view_trans.pre_mult_matrix( mat );
+  view_trans.post_mult_matrix( mat );
   const Matrix& view_mat = view_trans.get_matrix();
 
-  this->up_ = Vector( view_mat( 1, 0 ), view_mat( 1, 1 ), view_mat( 1, 2 ) );
-  this->eyep_ = this->lookat_ + eye_distance * Vector( view_mat( 2, 0 ), view_mat( 2, 1 ),
+  this->up_ = Vector( view_mat( 0, 1 ), view_mat( 1, 1 ), view_mat( 2, 1 ) );
+  this->eyep_ = this->lookat_ + eye_distance * Vector( view_mat( 0, 2 ), view_mat( 1, 2 ),
       view_mat( 2, 2 ) );
 }
 
