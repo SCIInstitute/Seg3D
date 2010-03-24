@@ -76,10 +76,10 @@ bool PaintToolInterface::build_widget( QFrame* frame )
       private_->brush_radius_ = new SliderIntCombo( this, true );
       private_->ui_.verticalLayout->addWidget( private_->brush_radius_ );
 
-        private_->upper_threshold_ = new SliderDoubleCombo();
+        private_->upper_threshold_ = new SliderDoubleCombo( this, true );
       private_->ui_.upperHLayout_bottom->addWidget( private_->upper_threshold_ );
       
-      private_->lower_threshold_ = new SliderDoubleCombo();
+      private_->lower_threshold_ = new SliderDoubleCombo( this, false );
       private_->ui_.lowerHLayout_bottom->addWidget( private_->lower_threshold_ );
 
   //Step 2 - get a pointer to the tool

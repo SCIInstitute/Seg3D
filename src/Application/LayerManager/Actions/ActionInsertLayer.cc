@@ -51,21 +51,16 @@ namespace Seg3D
   
   bool ActionInsertLayer::validate( ActionContextHandle& context )
   {
-    if ( this->layer_handle_ )
-      return true;
+    if ( !this->layer_handle_ )
+      return false;
     
+    if ( !( StateEngine::Instance()->is_stateid( layer_handle_->get_layer_id() ) ) )
+      {
+        context->report_error( std::string( "LayerID '" ) + layer_handle_->get_layer_id() + "' is invalid" );
+        return false;
+      }
     
-    if ( this->layer_group_handle_.lock() )  {
-      return true;
-    }
-    LayerGroupHandle temp_group_handle = LayerManager::Instance()->check_for_group(this->group_id_.value() );
-    
-    if ( temp_group_handle ) {
-      this->layer_group_handle_ = temp_group_handle;
-      return true;
-    }
-    
-    return false;
+    return true;
 
   }
   
@@ -77,14 +72,6 @@ namespace Seg3D
       return true;
     }
       
-    LayerGroupHandle temp_group_handle = this->layer_group_handle_.lock();
-    
-    if ( temp_group_handle )  {
-      LayerManager::Instance()->insert_layer( temp_group_handle );
-      return true;
-    }
-    
-    
     return false;
   }
   
@@ -93,14 +80,6 @@ namespace Seg3D
   {
     ActionInsertLayer* action = new ActionInsertLayer;
     action->layer_handle_ = layer;
-    
-    Interface::PostAction( ActionHandle( action ) );
-  }
-  void ActionInsertLayer::Dispatch( LayerGroupHandle group )
-  {
-    ActionInsertLayer* action = new ActionInsertLayer;
-    action->group_id_.value() = group->get_group_id();
-    action->layer_group_handle_ = group;
     
     Interface::PostAction( ActionHandle( action ) );
   }

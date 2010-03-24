@@ -47,7 +47,7 @@ class LayerGroupWidget : public QWidget
   
   // -- constructor/destructor --
 public:
-  LayerGroupWidget( QWidget* parent, LayerGroupHandle group );
+  LayerGroupWidget( QWidget* parent, LayerHandle layer, boost::function< void() > activate_function );
   virtual ~LayerGroupWidget();
   
 public Q_SLOTS:
@@ -61,8 +61,11 @@ public Q_SLOTS:
   void enable_delete_button( bool enable );
   
 public:
-  void add_layer( LayerHandle layer );
+  void add_layer( LayerHandle layer, boost::function< void() > activate_function );
+  void delete_layer( LayerHandle layer );
   std::string &get_group_id();
+  void set_active( bool active );
+  void set_active_layer( LayerHandle layer );
   void clear_all_layers()
     {
         this->layer_list_.clear();

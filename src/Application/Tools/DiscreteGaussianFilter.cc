@@ -41,8 +41,8 @@ DiscreteGaussianFilter::DiscreteGaussianFilter( const std::string& toolid ) :
 {
   // Need to set ranges and default values for all parameters
   add_state( "target", target_layer_state_, "<none>", "<none>" );
-  add_state( "variance", variance_state_, .10f, .10f, 10.0f, .10f );
-  add_state( "maximum_kernel_width", maximum_kernel_width_state_, .10f, .10f, 10.0f, .10f );
+  add_state( "variance", variance_state_, .10, .10, 10.0, .10 );
+  add_state( "maximum_kernel_width", maximum_kernel_width_state_, .10, .10, 10.0, .10 );
   add_state( "replace", replace_state_, false );
 
   // Add constaints, so that when the state changes the right ranges of

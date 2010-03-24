@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>216</width>
-    <height>732</height>
+    <width>270</width>
+    <height>723</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -211,6 +211,10 @@ QWidget#LayerGroupWidget{
 QWidget#base_{
   background-color: rgb(110, 110, 110);
   border-radius:6px;
+  /*border-top: 3px solid qlineargradient(spread:pad, x1:0.5, y1:1, x2:0.5, y2:0, stop:0 rgba(0, 153, 224, 255), stop:0.247725 rgba(0, 153, 224, 255), stop:1 rgba(255, 255, 255, 0));
+  border-bottom: 3px solid qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(0, 153, 224, 255), stop:0.247725 rgba(0, 153, 224, 255), stop:1 rgba(255, 255, 255, 0));
+  border-right: 3px solid qlineargradient(spread:pad, x1:0, y1:0.5, x2:1, y2:0.5, stop:0 rgba(0, 153, 224, 255), stop:0.247725 rgba(0, 153, 224, 255), stop:1 rgba(255, 255, 255, 0));
+  border-left: 3px solid qlineargradient(spread:pad, x1:1, y1:0.5, x2:0, y2:0.5, stop:0 rgba(0, 153, 224, 255), stop:0.247725 rgba(0, 153, 224, 255), stop:1 rgba(255, 255, 255, 0));*/
 }
 
 QWidget#group_tools_{
@@ -834,7 +838,7 @@ QWidget#group_tools_{
             </item>
             <item>
              <widget class="QWidget" name="widget_7" native="true">
-              <layout class="QHBoxLayout" name="horizontalLayout_15">
+              <layout class="QVBoxLayout" name="horizontalLayout_15">
                <property name="spacing">
                 <number>2</number>
                </property>
@@ -949,7 +953,7 @@ QWidget#group_tools_{
                <enum>QTabWidget::Rounded</enum>
               </property>
               <property name="currentIndex">
-               <number>0</number>
+               <number>1</number>
               </property>
               <property name="elideMode">
                <enum>Qt::ElideNone</enum>

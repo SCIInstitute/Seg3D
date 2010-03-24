@@ -63,6 +63,8 @@ SET(APPLICATION_LAYERMANAGER_ACTIONS_SRCS
   Actions/ActionResampleLayer.cc
   Actions/ActionTransformLayer.h
   Actions/ActionTransformLayer.cc
+  Actions/ActionActivateLayer.h
+  Actions/ActionActivateLayer.cc
   )
 
 

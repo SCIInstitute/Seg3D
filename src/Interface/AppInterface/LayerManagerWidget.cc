@@ -33,8 +33,13 @@
 #include <iostream>
 #include <boost/lexical_cast.hpp>
 
+//Application Includes
+#include <Application/LayerManager/Actions/ActionActivateLayer.h>
+
 //Interface Includes
 #include <Interface/AppInterface/LayerManagerWidget.h>
+
+
 
 
 namespace Seg3D
@@ -71,8 +76,10 @@ LayerManagerWidget::~LayerManagerWidget()
 {
 }
 
-void LayerManagerWidget::process_group( LayerGroupHandle group )
+void LayerManagerWidget::insert_layer( LayerHandle layer )
 {
+    LayerGroupHandle group = layer->get_layer_group();
+    
     // The group is no longer deleted if it exists. Only its layers are deleted and re-added in the proper order
   for ( QList< LayerGroupWidget_handle >::iterator i = this->group_list_.begin(); 
      i  != this->group_list_.end(); i++ )
@@ -82,22 +89,51 @@ void LayerManagerWidget::process_group( LayerGroupHandle group )
         // delete all the existing gui layers
         ( *i )->clear_all_layers();
     
-        // make new ones
+        // make new ones and connect the Activate Action Layer
           layer_list_type temp_layer_list = group->get_layer_list();
           for( layer_list_type::reverse_iterator j = temp_layer_list.rbegin(); j != temp_layer_list.rend(); ++j )
           {
-            ( *i )->add_layer(( *j ));
+            ( *i )->add_layer( ( *j ), boost::bind( &ActionActivateLayer::Dispatch, ( *j )) );
           }
           // exit when we are done.
           return;
         }
       
   }
-  // If the group doesnt exist yet, we make a new one.
-  LayerGroupWidget_handle new_group_handle( new LayerGroupWidget( this->main_, group ));
+    // if there isnt a group for this layer, we make one, add the layer to 
+    // the group and make it the active layer 
+  make_new_group( layer );
+}
+
+void LayerManagerWidget::delete_layer( LayerGroupHandle group )
+{
+    
+    for ( QList< LayerGroupWidget_handle >::iterator i = this->group_list_.begin(); 
+     i  != this->group_list_.end(); i++ )
+  {
+    if ( group->get_group_id() == ( *i )->get_group_id() ) 
+    {
+        // delete all the existing gui layers
+        ( *i )->clear_all_layers();
+    
+        // make new ones and connect the Action Activate Layer
+          layer_list_type temp_layer_list = group->get_layer_list();
+          for( layer_list_type::reverse_iterator j = temp_layer_list.rbegin(); j != temp_layer_list.rend(); ++j )
+          {
+            ( *i )->add_layer( ( *j ), boost::bind( &ActionActivateLayer::Dispatch, ( *j )) );
+          }
+          // exit when we are done
+          return;
+        }   
+  }
+}
+
+
+void LayerManagerWidget::make_new_group( LayerHandle layer )//, boost::function< void() > activate_function )
+{
+    LayerGroupWidget_handle new_group_handle( new LayerGroupWidget( this->main_, layer, boost::bind( &ActionActivateLayer::Dispatch, layer ) ));
   this->group_layout_->addWidget( new_group_handle.data() );
   this->group_list_.push_back( new_group_handle );
-  
 }
   
 void LayerManagerWidget::delete_group( LayerGroupHandle group )
@@ -113,7 +149,37 @@ void LayerManagerWidget::delete_group( LayerGroupHandle group )
     return;
   }
 }
+
+
+void  LayerManagerWidget::set_active_layer( LayerHandle layer )
+{
+    set_active_group( layer->get_layer_group() );   
+    
+    for ( QList< LayerGroupWidget_handle >::iterator i = this->group_list_.begin(); 
+     i  != this->group_list_.end(); i++ )
+  {
+      ( *i )->set_active_layer( layer );
+  }
+}
+
   
+void LayerManagerWidget::set_active_group( LayerGroupHandle group )
+{
+    for ( QList< LayerGroupWidget_handle >::iterator i = this->group_list_.begin(); 
+     i  != this->group_list_.end(); i++ )
+  {
+    if ( group->get_group_id() == ( *i )->get_group_id() ) 
+    {
+        ( *i )->set_active( true );
+    }
+      else
+      {
+          ( *i )->set_active( false );
+      }
+  }
+}
+
+
   
 //void LayerManagerWidget::clean_out_layers( LayerGroupHandle group_to_clean )
 //{

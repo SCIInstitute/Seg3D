@@ -38,11 +38,9 @@
 #include <Application/Layer/LabelLayer.h>
 #include <Application/Interface/Interface.h>
 
-#include <Application/LayerManager/Actions/ActionCloneLayer.h>
+
 #include <Application/LayerManager/Actions/ActionLayer.h>
-#include <Application/LayerManager/Actions/ActionLayerFromFile.h>
-#include <Application/LayerManager/Actions/ActionNewMaskLayer.h>
-#include <Application/LayerManager/Actions/ActionRemoveLayer.h>
+
 
 // Interface includes
 #include <Interface/AppInterface/LayerManagerDockWidget.h>
@@ -65,27 +63,29 @@ LayerManagerDockWidget::LayerManagerDockWidget( QWidget *parent ) :
   this->setMinimumSize( QSize( 280, 313 ) );
     this->setMaximumSize( QSize( 524287, 524287 ) );
   
-  this->layer_manager_widget_ = new LayerManagerWidget( this );
-  this->setWidget( layer_manager_widget_ );
+  this->layer_manager_widget_ = QSharedPointer< LayerManagerWidget > ( new LayerManagerWidget( this ) );
+  this->setWidget( layer_manager_widget_.data() );
   
   LayerManager::lock_type lock( LayerManager::Instance()->get_mutex() );
   
   qpointer_type layer_dock_widget( this );
   
-  add_connection( LayerManager::Instance()->group_layers_changed_signal_.connect( boost::bind(
+  add_connection( LayerManager::Instance()->layer_inserted_signal_.connect( boost::bind(
           &LayerManagerDockWidget::HandleInsertLayer, layer_dock_widget, _1 ) ) );
           
+  add_connection( LayerManager::Instance()->layers_finished_deleting_signal_.connect( boost::bind(
+          &LayerManagerDockWidget::HandleDeleteLayer, layer_dock_widget, _1 ) ) );
+          
   add_connection( LayerManager::Instance()->active_layer_changed_signal_.connect( boost::bind(
-          &LayerManagerDockWidget::HandleSetActiveLayer, layer_dock_widget, _1 ) ) );
+          &LayerManagerDockWidget::HandleActivateLayer, layer_dock_widget, _1 ) ) );
   
-    
 
-  std::vector< LayerGroupHandle > temporary_layergrouphandle_vector;
-  LayerManager::Instance()->return_group_vector( temporary_layergrouphandle_vector );
+  std::vector< LayerHandle > temporary_layerhandle_vector;
+  LayerManager::Instance()->return_layers_vector( temporary_layerhandle_vector );
   
-  for( size_t i = 0; i <  temporary_layergrouphandle_vector.size(); ++i)
+  for( size_t i = 0; i <  temporary_layerhandle_vector.size(); ++i)
   {
-    process_group_ui( temporary_layergrouphandle_vector[i] );
+      insert_layer_ui( temporary_layerhandle_vector[i] );
   }
   
 }
@@ -95,68 +95,57 @@ LayerManagerDockWidget::~LayerManagerDockWidget()
 
 }
 
-void LayerManagerDockWidget::process_group_ui( LayerGroupHandle &group )
+void LayerManagerDockWidget::insert_layer_ui( LayerHandle &layer )
 {
-  layer_manager_widget_->process_group( group );
+  layer_manager_widget_->insert_layer( layer );
 }
 
-void LayerManagerDockWidget::set_active_layer_ui( LayerHandle &layer )
+void LayerManagerDockWidget::delete_layer_ui( LayerGroupHandle &group )
 {
-
-}
-  
-void LayerManagerDockWidget::new_group()
-{
-  //TODO implement new group function
-}
-void LayerManagerDockWidget::close_group()
-{
-  //TODO implement close group function
-}
-void LayerManagerDockWidget::layer_from_file()
-{
-  //TODO implement open data layer function
-}
-void LayerManagerDockWidget::clone_layer( LayerHandle& layer )
-{
-  //TODO implement clone layer function
-}
-void LayerManagerDockWidget::new_mask_layer()
-{
-  //TODO implement new mask layer function
-}
-void LayerManagerDockWidget::remove_layer( LayerHandle& layer )
-{
-  //TODO implement remove layer function
-}
-  
-void LayerManagerDockWidget::insert_above_layer( LayerHandle& below_layer, LayerHandle& above_layer )
-{
-  //TODO implement insert layer above function
+  layer_manager_widget_->delete_layer( group );
 }
 
-void LayerManagerDockWidget::HandleSetActiveLayer( qpointer_type qpointer, LayerHandle layer )
+void LayerManagerDockWidget::activate_layer_ui( LayerHandle &layer )
 {
-    if ( !( Interface::IsInterfaceThread() ) )
-  {
-    Interface::Instance()->post_event( boost::bind( &LayerManagerDockWidget::HandleSetActiveLayer,
-                             qpointer, layer ) );
-    return;
-  }
-  
-  if ( qpointer.data() ) qpointer->set_active_layer_ui( layer );
+    layer_manager_widget_->set_active_layer( layer );
 }
+
   
-void LayerManagerDockWidget::HandleInsertLayer( qpointer_type qpointer, LayerGroupHandle group )
+void LayerManagerDockWidget::HandleInsertLayer( qpointer_type qpointer, LayerHandle layer )
 {
   if ( !( Interface::IsInterfaceThread() ) )
   {
     Interface::Instance()->post_event( boost::bind( &LayerManagerDockWidget::HandleInsertLayer,
+                             qpointer, layer ) );
+    return;
+  }
+  
+  if ( qpointer.data() ) qpointer->insert_layer_ui( layer );
+}
+
+void LayerManagerDockWidget::HandleDeleteLayer( qpointer_type qpointer, LayerGroupHandle group )
+{
+  if ( !( Interface::IsInterfaceThread() ) )
+  {
+    Interface::Instance()->post_event( boost::bind( &LayerManagerDockWidget::HandleDeleteLayer,
                              qpointer, group ) );
     return;
   }
   
-  if ( qpointer.data() ) qpointer->process_group_ui( group );
+  if ( qpointer.data() ) qpointer->delete_layer_ui( group );
+}
+
+
+void LayerManagerDockWidget::HandleActivateLayer( qpointer_type qpointer, LayerHandle layer )
+{
+  if ( !( Interface::IsInterfaceThread() ) )
+  {
+    Interface::Instance()->post_event( boost::bind( &LayerManagerDockWidget::HandleActivateLayer,
+        qpointer, layer ) );
+    return;
+  }
+
+  if ( qpointer.data() ) qpointer->activate_layer_ui( layer );
 }
 
 }  // end namespace Seg3D

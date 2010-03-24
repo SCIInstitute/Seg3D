@@ -71,9 +71,11 @@ public:
   
 };
   
-LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
+LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer, boost::function< void() > activate_function ) :
   private_( new LayerGroupWidgetPrivate )
 {
+    LayerGroupHandle group = layer->get_layer_group();
+
   this->setParent( parent );
   
   this->private_->ui_.setupUi( this );
@@ -128,7 +130,7 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
   this->private_->current_depth = static_cast<int>( group->get_grid_transform().nz() );
   
   //  connect the gui signals and slots
-    connect( this->private_->scale_adjuster, SIGNAL( valueAdjustedContinuously( double ) ), this, SLOT( adjust_new_size_labels( double )) );
+    connect( this->private_->scale_adjuster, SIGNAL( valueAdjusted( double ) ), this, SLOT( adjust_new_size_labels( double )) );
   connect( this->private_->ui_.open_button_, SIGNAL( toggled( bool ) ), this, SLOT( show_layers( bool )) );
   connect( this->private_->ui_.group_resample_button_, SIGNAL( clicked( bool ) ), this, SLOT( show_resample( bool )) );
   connect( this->private_->ui_.group_crop_button_, SIGNAL( clicked( bool ) ), this, SLOT( show_crop( bool )) );
@@ -138,12 +140,9 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
   connect( this->private_->ui_.confirm_delete_checkbox_, SIGNAL( clicked ( bool ) ), this, SLOT( enable_delete_button( bool )) );
 
   
-  // Add all the layers to the group
-  layer_list_type temp_layer_list = group->get_layer_list();
-  for( layer_list_type::reverse_iterator i = temp_layer_list.rbegin(); i != temp_layer_list.rend(); ++i )
-  {
-    this->add_layer(( *i ));
-  }
+  // Add all current layer to the new group
+  this->add_layer( layer, activate_function );
+
   
   //Set the defaulf values for the Group UI and make the connections to the state engine
       // --- GENERAL ---
@@ -185,13 +184,13 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
       group->resample_factor_state_->get_range( resample_min, resample_max );
       this->private_->scale_adjuster->setStep( resample_step );
         this->private_->scale_adjuster->setRange( resample_min, resample_max );
-        this->private_->scale_adjuster->setCurrentValue( group->resample_replace_state_->get() );
+        this->private_->scale_adjuster->setCurrentValue( group->resample_factor_state_->get() );
         
          // = make the connections
         QtBridge::Connect( this->private_->scale_adjuster, group->resample_factor_state_ );
       QtBridge::Connect( this->private_->ui_.resample_replace_checkBox_, group->resample_replace_state_ );
         
-        
+
         // --- CROP ---
         // = set the default values
         this->private_->size_width_adjuster_crop->setRange( 0, group->get_grid_transform().nx() );
@@ -251,11 +250,104 @@ LayerGroupWidget::~LayerGroupWidget()
 {
 }
   
-void LayerGroupWidget::add_layer( LayerHandle layer )
+void LayerGroupWidget::add_layer( LayerHandle layer, boost::function< void() > activate_function )
 {
-  LayerWidget_handle new_layer_handle( new LayerWidget(this->private_->ui_.group_frame_, layer));
+  LayerWidget_handle new_layer_handle( new LayerWidget(this->private_->ui_.group_frame_, layer, activate_function));
   this->private_->ui_.group_frame_layout_->addWidget( new_layer_handle.data() );
   this->layer_list_.push_back( new_layer_handle );
+}
+
+void LayerGroupWidget::delete_layer( LayerHandle layer )
+{
+    for( QVector< LayerWidget_handle >::iterator i = layer_list_.begin(); i != 
+        layer_list_.end(); ++i)
+  {
+        if( layer->get_layer_id() == ( *i )->get_layer_id() )
+      {
+          ( *i )->deleteLater();
+          layer_list_.erase( i );
+          return;
+      }
+  }    
+}
+
+
+void LayerGroupWidget::set_active_layer( LayerHandle layer )
+{
+    for( int i = 0; i < layer_list_.size(); ++i)
+  {
+      if( layer->get_layer_id() == layer_list_[i]->get_layer_id() )
+      {
+          layer_list_[i]->set_active( true );
+      }
+      else
+      {
+          layer_list_[i]->set_active( false );
+      }
+  }
+}
+
+void  LayerGroupWidget::set_active( bool active )
+{
+    if( active )
+    {
+        this->private_->ui_.base_->setStyleSheet( QString::fromUtf8(
+                    "QWidget#base_{"
+                  //"background-color: rgb(157, 78, 0);\n"
+                  "background-color: rgb(150, 150, 150);\n"
+                  "border-radius:6px;\n"
+                  "border: 1px solid rgba(80, 80, 80, 255);\n"
+                  "color: rgb(90,90,90);\n"
+                  "}\n"));
+                  
+    this->private_->ui_.group_background_->setStyleSheet(  QString::fromUtf8(  
+                    "QWidget#group_background_{\n"
+                    "background-color: rgb(255, 128, 0);\n"
+                    "border-radius: 6px;\n"
+                    "color: white;\n"
+                    "}\n"));
+                    
+    this->private_->ui_.activate_button_->setStyleSheet(  QString::fromUtf8(
+                      "QPushButton#activate_button_{\n"
+                      "background-color:rgba(0, 0, 0, 0);\n"
+                      "border-color: rgba(0, 0, 0, 0);\n"
+                      "border: none;\n"
+                      "height: 24px;\n"
+                      "text-align: left;\n"
+                      "color: white;\n"
+                      "margin: 0 0 0 0;\n"
+                      "padding: 0 0 0 0;\n"
+                      "}\n"));  
+    }
+    else
+    {
+        this->private_->ui_.base_->setStyleSheet(QString::fromUtf8(
+                    "QWidget#base_{"
+                  "background-color: rgb(110, 110, 110);\n"
+                  "border-radius:6px;\n"
+                  "border: 1px solid rgb(80, 80, 80);\n"
+                  "}\n"));
+        this->private_->ui_.group_background_->setStyleSheet(  QString::fromUtf8(  
+                    "QWidget#group_background_{\n"
+                    "background-color: rgb(210, 210, 210);\n"
+                    "border-radius: 6px;\n"
+                    "}\n"));
+                    
+      this->private_->ui_.activate_button_->setStyleSheet(  QString::fromUtf8(
+                      "QPushButton#activate_button_{\n"
+                      "background-color:rgba(0, 0, 0, 0);\n"
+                      "border-color: rgba(0, 0, 0, 0);\n"
+                      "border: none;\n"
+                      "height: 24px;\n"
+                      "text-align: left;\n"
+                      "color: rgb( 90, 90, 90 );\n"
+                      "margin: 0 0 0 0;\n"
+                      "padding: 0 0 0 0;\n"
+                      "}\n"));
+                      
+      
+                    
+    }
 }
 
 

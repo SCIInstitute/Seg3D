@@ -31,50 +31,46 @@
 
 #include <Application/Action/Actions.h>
 #include <Application/Interface/Interface.h>
-#include <Application/Layer/LayerGroup.h>
+#include <Application/Layer/Layer.h>
 
 namespace Seg3D
 {
   
-  class ActionInsertLayer : public Action
+class ActionInsertLayer : public Action
+{
+  SCI_ACTION_TYPE( "InsertLayer", "Insert Layer <name>", ActionPropertiesType::LAYER_E )
+  
+  // -- Constructor/Destructor --
+public:
+  ActionInsertLayer()
   {
-    SCI_ACTION_TYPE( "InsertLayer", "Insert Layer <name>", ActionPropertiesType::LAYER_E )
-    
-    // -- Constructor/Destructor --
-  public:
-    ActionInsertLayer()
-    {
-      add_argument( group_id_ );
-    }
-    
-    virtual ~ActionInsertLayer()
-    {
-    }
-    
-    // -- Functions that describe action --
-  public:
-    virtual bool validate( ActionContextHandle& context );
-    virtual bool run( ActionContextHandle& context, ActionResultHandle& result );
-    
-    // -- Action parameters --
-  private:
-    // ToolID that is requested
-    ActionParameter< std::string > group_id_;
-    LayerGroupWeakHandle layer_group_handle_;
-    LayerHandle layer_handle_;
-    
-    // -- Dispatch this action from the interface --
-  public:
-    // CREATE
-    // Create action that moves the layer above
-    static ActionHandle Create( const std::string& name );
-    
-    // DISPATCH
-    // Create and dispatch action that moves the layer above 
-    static void Dispatch( LayerHandle layer );
-    static void Dispatch( LayerGroupHandle group );
-    
-  };
+  }
+  
+  virtual ~ActionInsertLayer()
+  {
+  }
+  
+  // -- Functions that describe action --
+public:
+  virtual bool validate( ActionContextHandle& context );
+  virtual bool run( ActionContextHandle& context, ActionResultHandle& result );
+  
+  // -- Action parameters --
+private:
+  // Layer_handle that is requested
+  LayerHandle layer_handle_;
+  
+  // -- Dispatch this action from the interface --
+public:
+  // CREATE
+  // Create action that moves the layer above
+  static ActionHandle Create( const std::string& name );
+  
+  // DISPATCH
+  // Create and dispatch action that inserts the new layer 
+  static void Dispatch( LayerHandle layer );
+  
+};
   
 } // end namespace Seg3D
 

@@ -47,22 +47,6 @@ namespace Seg3D
 LayerManager::LayerManager() :
   StateHandler( "LayerManager" )
 { 
-  //for( int i = 0; i < 2; i++ )
-  //{
-  //  std::string new_name;
-  //  new_name = "new_layer_" + boost::lexical_cast< std::string >( i );
-
-  //  Utils::GridTransform grid_transform( 256, 640, 480 );
-  //  Utils::MaskDataBlockHandle mask_data_block;
-  //  Utils::MaskVolumeHandle volume0( new Utils::MaskVolume( grid_transform, mask_data_block ) );
-  //  MaskLayerHandle mask_layer_new0;
-  //  
-  //  mask_layer_new0 = MaskLayerHandle ( new MaskLayer( new_name, volume0 ) );
-  //  LayerHandle plain_layer = mask_layer_new0;
-
-  //  ActionInsertLayer::Dispatch( plain_layer );
-  //  
-  //}
 }
 
 LayerManager::~LayerManager()
@@ -71,9 +55,9 @@ LayerManager::~LayerManager()
   
 bool LayerManager::insert_layer( LayerHandle layer )
 {
-  lock_type lock( group_handle_list_mutex_ );
+  lock_type lock( this->group_handle_list_mutex_ );
   
-  SCI_LOG_DEBUG( std::string("Insert new layer: ") + layer->get_layer_id());
+  SCI_LOG_DEBUG( std::string("Insert New Layer: ") + layer->get_layer_id());
   
   for ( group_handle_list_type::iterator it = group_handle_list_.begin(); 
      it != group_handle_list_.end(); ++it )
@@ -89,13 +73,13 @@ bool LayerManager::insert_layer( LayerHandle layer )
       lock.unlock();
       
       layer_inserted_signal_( layer );
-      group_layers_changed_signal_( ( *it ) );
-      connect_layers_changed_signal_();
+      set_active_layer( layer );
+      
       return true;
     }
   }
   
-  //TODO add logic for handling where the layer should good
+  //TODO add logic for handling where the layer should go
   
   LayerGroupHandle new_group = create_group( layer->get_grid_transform() );
   layer->set_layer_group( new_group );
@@ -108,19 +92,31 @@ bool LayerManager::insert_layer( LayerHandle layer )
 
   // Send a signal alerting the UI that we have inserted a layer
   layer_inserted_signal_( layer );
-  group_layers_changed_signal_( new_group );
-  connect_layers_changed_signal_();
-
+  set_active_layer( layer );
   return true;
 }
-  
-bool LayerManager::insert_layer( LayerGroupHandle group )
+
+void LayerManager::set_active_layer( LayerHandle layer )
 {
-    return true;
+    lock_type lock( this->group_handle_list_mutex_ );    
+
+    SCI_LOG_DEBUG( std::string("Set Active Layer: ") + layer->get_layer_id());
+   
+  active_layer_ = layer;
+    
+  // NOTE: Unlock ASAP to avoid potential deadlock. It is especially important to unlock
+  // before triggering any signals
+  lock.unlock();
+  
+  active_layer_changed_signal_( layer );
+  
 }
+
 
 LayerGroupHandle LayerManager::check_for_group( std::string group_id )
 {
+    lock_type lock( this->group_handle_list_mutex_ );
+    
   for( group_handle_list_type::iterator i = group_handle_list_.begin(); 
     i != group_handle_list_.end(); ++i )
   {
@@ -138,19 +134,19 @@ LayerGroupHandle LayerManager::create_group( const Utils::GridTransform&  transf
 
 void LayerManager::return_group_vector( std::vector< LayerGroupHandle > &vector_of_groups )
 {
-    lock_type lock( group_handle_list_mutex_ );
+    lock_type lock( this->group_handle_list_mutex_ );
     
   for( group_handle_list_type::iterator i = group_handle_list_.begin(); 
     i != group_handle_list_.end(); ++i )
   {
     vector_of_groups.push_back( *i );
-  }
+  } 
 }
 
 
-void LayerManager::return_layers_vector( std::vector< std::string > &vector_of_layers )
+void LayerManager::return_layers_vector( std::vector< LayerHandle > &vector_of_layers )
 {
-    lock_type lock( group_handle_list_mutex_ );
+    lock_type lock( this->group_handle_list_mutex_ );
     
   for( group_handle_list_type::iterator i = group_handle_list_.begin(); 
     i != group_handle_list_.end(); ++i )
@@ -158,26 +154,37 @@ void LayerManager::return_layers_vector( std::vector< std::string > &vector_of_l
       for( layer_list_type::iterator j = ( *i )->layer_list_.begin(); 
     j != ( *i )->layer_list_.end(); ++j )
       {
-          vector_of_layers.push_back( (*j)->name_state_->get() );
+          vector_of_layers.push_back( ( *j ) );
       }
   }
-
 }
 
-void LayerManager::set_active_layer( LayerHandle layer )
-{
-  active_layer_ = layer;
-  active_layer_changed_signal_( layer );
-}
 
-void LayerManager::delete_layer( LayerHandle layer )
+void LayerManager::delete_layer( LayerGroupHandle group )
 {
-  LayerGroupHandle group = layer->get_layer_group();
-  if ( group )
-  {
-    group->delete_layer( layer );
+    lock_type lock( this->group_handle_list_mutex_ );  
+    
+    std::vector< LayerHandle > layer_vector;
+  
+  for( layer_list_type::iterator i = group->layer_list_.begin(); 
+      i != group->layer_list_.end(); ++i )
+    {   
+        if( ( *i )->selected_state_->get() )
+        {   
+            SCI_LOG_DEBUG( std::string("Deleting Layer: ") + ( *i )->get_layer_id());
+            layer_vector.push_back(( *i ));
+            group->delete_layer( ( *i ) );
+        }
   }
-  connect_layers_changed_signal_();
+  
+  // NOTE: Unlock ASAP to avoid potential deadlock. It is especially important to unlock
+  // before triggering any signals
+  lock.unlock();
+  
+  // signal the listeners
+  layers_deleted_signal_( layer_vector );
+  layers_finished_deleting_signal_( group );
+  
 } // end delete_layer
 
 

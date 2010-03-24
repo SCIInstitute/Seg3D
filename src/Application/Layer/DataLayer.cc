@@ -43,10 +43,10 @@ DataLayer::DataLayer( const std::string& name, const Utils::DataVolumeHandle& vo
   // Step (1) : Build the layer specific state variables
 
   // == The brightness of the layer ==
-  add_state( "brightness", brightness_state_, 50.0f, 0.0f, 100.0f, 1.0f );
+  add_state( "brightness", brightness_state_, 50.0, 0.0, 100.0, 1.0 );
   
   // == The contrast of the layer ==
-  add_state( "contrast", contrast_state_, 50.0f, 0.0f, 100.0f, 1.0f );
+  add_state( "contrast", contrast_state_, 50.0, 0.0, 100.0, 1.0 );
 
   // == Is this volume rendered through the volume renderer ==
   add_state( "volume_rendered", volume_rendered_state_, false );

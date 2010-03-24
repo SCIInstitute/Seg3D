@@ -26,54 +26,47 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_SLIDERDOUBLECOMBO_H
-#define INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_SLIDERDOUBLECOMBO_H
+#include <Application/LayerManager/LayerManager.h>
+#include <Application/LayerManager/Actions/ActionActivateLayer.h>
 
-// QT Includes
-#include <QtGui>
-
-#include <boost/shared_ptr.hpp>
-
-namespace Seg3D 
+namespace Seg3D
 {
 
-class SliderDoubleComboPrivate;
+// REGISTER ACTION:
+// Define a function that registers the action. The action also needs to be
+// registered in the CMake file.
+SCI_REGISTER_ACTION(ActivateLayer);
 
-class SliderDoubleCombo : public QWidget
+bool ActionActivateLayer::validate( ActionContextHandle& context )
 {
-Q_OBJECT
-
-Q_SIGNALS:
-  void valueAdjusted( double );
-    void rangeChanged( double, double );
-// -- constructor/destructor --
-public:
-    SliderDoubleCombo( QWidget* parent = 0, bool edit_range = false );
-    virtual ~SliderDoubleCombo();
-    
-public Q_SLOTS:
-    void setStep( double );
-  void setRange( double, double );
-  void setCurrentValue( double );
-    
-// -- widget internals -- 
-private:
-    boost::shared_ptr< SliderDoubleComboPrivate > private_;
-    
-private Q_SLOTS:
-    void edit_ranges( bool edit );
-    void change_min( double new_min );
-    void change_max( double new_max );
-    void double_range();
-    void half_range();
-    void slider_signal( int value );
-    void spinner_signal( double value );
-
-private:
-    void block_signals( bool block );    
+    if ( !this->layer_handle_ )
+      return false;
   
-};
+  if ( !( StateEngine::Instance()->is_stateid( layer_handle_->get_layer_id() ) ) )
+  {
+    context->report_error( std::string( "LayerID '" ) + layer_handle_->get_layer_id() + "' is invalid" );
+    return false;
+  }
 
-}  // end namespace Seg3D
+  return true; // validated
+}
 
-#endif
+  bool ActionActivateLayer::run( ActionContextHandle& context, ActionResultHandle& result )
+  {
+    if ( this->layer_handle_ )
+    {
+      LayerManager::Instance()->set_active_layer( layer_handle_ );
+      return true;
+    }
+    
+    return false;
+  }
+  void ActionActivateLayer::Dispatch( LayerHandle layer )
+  {
+    ActionActivateLayer* action = new ActionActivateLayer;
+    action->layer_handle_ = layer;
+    
+    Interface::PostAction( ActionHandle( action ) );
+  }
+
+} // end namespace Seg3D

@@ -63,66 +63,28 @@ public:
   // -- functions that control the layer manager --
 public:
 
-  //Create new group
-  void new_group();
-
-  //Close group
-  void close_group();
-
-  //Open new data layer from file
-  void layer_from_file();
-
-  //Clone layer
-  void clone_layer( LayerHandle& layer );
-
-  //New mask layer
-  void new_mask_layer();
-
-  //Remove layer
-  void remove_layer( LayerHandle& layer );
-  
-  //Move Layer Above
-  void insert_above_layer( LayerHandle& below_layer, LayerHandle &above_layer );
-  
-  //Insert Layer default
-  void process_group_ui( LayerGroupHandle &group );
+  //Insert Layer 
+  void insert_layer_ui( LayerHandle &layer );
   
   //Set the active layer
-  void set_active_layer_ui( LayerHandle &layer );
+  void activate_layer_ui( LayerHandle &layer );
   
-  //Flip or Rotate Layer
-//  void flip_layer( layer_widget_list_type layers_to_crop_list );
-//  void crop_layer( layer_widget_list_type layers_to_crop_list );
-//  void resample_layer( layer_widget_list_type layers_to_crop_list );
-//  void transform_layer( 
+  //Delete a layer
+  void delete_layer_ui( LayerGroupHandle &group );
 
-private:
-
-  boost::signals2::connection new_group_connection_;
-  boost::signals2::connection close_group_connection_;
-  boost::signals2::connection layer_from_file_connection_;
-  boost::signals2::connection clone_layer_connection_;
-  boost::signals2::connection new_mask_layer_connection_;
-  boost::signals2::connection remove_layer_connection_;
-
-  //typedef std::map< std::string, LayerWidget* > layer_widget_list_type;
-  //layer_widget_list_type layer_widget_list_;
-
-  LayerManagerWidget* layer_manager_widget_;
 
   // -- static functions for callbacks into this widget --
 public:
   typedef QPointer< LayerManagerDockWidget > qpointer_type;
   
-  static void HandleSetActiveLayer( qpointer_type qpointer, LayerHandle layer );
-  static void HandleInsertLayer( qpointer_type qpointer, LayerGroupHandle group );
-  static void HandleNewGroup( qpointer_type qpointer, LayerHandle layer );
-  static void HandleCloseGroup( qpointer_type qpointer, LayerHandle layer );
-  static void HandleDataFromFile( qpointer_type qpointer, LayerHandle layer );
-  static void HandleCloneLayer( qpointer_type qpointer, LayerHandle layer );
-  static void HandleNewMaskLayer( qpointer_type qpointer, LayerHandle layer );
-  static void HandleRemoveLayer( qpointer_type qpointer, LayerHandle layer );
+  static void HandleActivateLayer( qpointer_type qpointer, LayerHandle layer );
+  static void HandleInsertLayer( qpointer_type qpointer, LayerHandle layer );
+  static void HandleDeleteLayer( qpointer_type qpointer, LayerGroupHandle group );
 
+  
+private:
+  QSharedPointer< LayerManagerWidget > layer_manager_widget_;
+  
 };
 
 } // end namespace Seg3D

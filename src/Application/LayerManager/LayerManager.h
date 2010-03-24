@@ -76,7 +76,7 @@ public:
 public:
     // Functions for getting a copy of the Layers and Groups with the proper locking
   void return_group_vector( std::vector< LayerGroupHandle > &vector_of_groups );
-  void return_layers_vector( std::vector< std::string > &vector_of_layers );
+  void return_layers_vector( std::vector< LayerHandle > &vector_of_layers );
   
   LayerGroupHandle check_for_group( std::string group_id );
   LayerGroupWeakHandle get_active_group();
@@ -88,13 +88,10 @@ public:
   // Action Functions
 public:
   bool insert_layer( LayerHandle layer );
-  bool insert_layer( LayerGroupHandle group );
-  void delete_layer( LayerHandle layer );
+  void delete_layer( LayerGroupHandle group );
   void set_active_layer( LayerHandle layer );
   
-  
-  
-  friend class ActionInsertLayer;
+  //friend class ActionInsertLayer;
 
 public:
   // Take an atomic snapshot of visual properties of layers for rendering in the specified viewer
@@ -114,10 +111,7 @@ public:
   // -- Signal/Slots --
   typedef boost::signals2::signal< void( LayerHandle ) > layer_signal_type;
   typedef boost::signals2::signal< void( LayerGroupHandle ) > group_signal_type;
-  typedef boost::signals2::signal< void() > signal_type;
-  
-  signal_type connect_layers_changed_signal_;
-  
+  typedef boost::signals2::signal< void( std::vector< LayerHandle > ) > layers_signal_type;
   // ACTIVE_LAYER_CHANGED_SIGNAL:
   // This signal is triggered after the active layer is changed
   layer_signal_type active_layer_changed_signal_; 
@@ -130,23 +124,30 @@ public:
   // This signal is triggered after a layer has been deleted
   layer_signal_type layer_deleted_signal_;
   
-  // This signal is triggered when the groups layers have changed
-  group_signal_type group_layers_changed_signal_;
+  // LAYERS_DELETED_SIGNAL:
+  // This signal is triggered after layers have been deleted and passes a vector of layerhandles
+  layers_signal_type layers_deleted_signal_;
   
-  //group_signal_type layer_inserted_signal_;
-  group_signal_type add_group_signal_;
-  group_signal_type delete_group_signal_;
+  // LAYERS_FINISHED_DELETING_SIGNAL:
+  // This signal is triggered once the layers from a particular group have been deleted
+  group_signal_type layers_finished_deleting_signal_;
+  
+  
+  group_signal_type add_group_signal_; // Probably not needed 
+  group_signal_type delete_group_signal_; // Probably not needed 
   
 private:
   
   // mutex for the group_handle_list
   LayerGroupHandle create_group( const Utils::GridTransform& ) const;
   mutex_type group_handle_list_mutex_; 
-  
+
+    // list of the current groups 
   group_handle_list_type group_handle_list_;
   
+  // currently active layer
   LayerHandle active_layer_;
-  LayerGroupHandle active_group_;
+
     
 };
 

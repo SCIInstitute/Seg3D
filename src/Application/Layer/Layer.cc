@@ -58,7 +58,7 @@ Layer::Layer( const std::string& name ) :
   add_state( "lock", lock_state_, false );
 
   // == The opacity of the layer ==
-  add_state( "opacity", opacity_state_, 1.0f, 0.0f, 1.0f, 0.01f );
+  add_state( "opacity", opacity_state_, 1.0, 0.0, 1.0, 0.01 );
 
   // == Selected by the LayerGroup ==
   add_state( "selected", selected_state_, false );

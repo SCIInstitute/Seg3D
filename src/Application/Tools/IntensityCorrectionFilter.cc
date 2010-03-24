@@ -41,7 +41,7 @@ IntensityCorrectionFilter::IntensityCorrectionFilter( const std::string& toolid 
   // Need to set ranges and default values for all parameters
   add_state( "target", target_layer_state_, "<none>", "<none>" );
   add_state( "order", order_state_, 1, 1, 100, 1 );
-  add_state( "edge", edge_state_, 0.0f, 0.0f, 1.0f, 0.01f );
+  add_state( "edge", edge_state_, 0.0, 0.0, 1.0, 0.01 );
   add_state( "replace", replace_state_, false );
 
   // Add constaints, so that when the state changes the right ranges of

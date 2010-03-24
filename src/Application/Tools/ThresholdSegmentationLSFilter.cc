@@ -42,11 +42,11 @@ ThresholdSegmentationLSFilter::ThresholdSegmentationLSFilter( const std::string&
   add_state( "target_layer", target_layer_state_, "<none>", "<none>" );
   add_state( "mask_layer", mask_layer_state_, "<none>", "<none>" );
   add_state( "iterations", iterations_state_, 1, 100, 1, 2 );
-    add_state( "upper_threshold", upper_threshold_state_, 1.0f, 0.0f, 1.0f, 0.01f );
-  add_state( "lower_threshold", lower_threshold_state_, 0.0f, 0.0f, 1.0f, 0.01f );
-  add_state( "curvature", curvature_state_, 0.0f, 0.0f, 1.0f, 0.01f );
-  add_state( "propagation", propagation_state_, 0.0f, 0.0f, 1.0f, 0.01f );
-  add_state( "edge", edge_state_, 0.0f, 0.0f, 1.0f, 0.01f );
+    add_state( "upper_threshold", upper_threshold_state_, 1.0, 0.0, 1.0, 0.01 );
+  add_state( "lower_threshold", lower_threshold_state_, 0.0, 0.0, 1.0, 0.01 );
+  add_state( "curvature", curvature_state_, 0.0, 0.0, 1.0, 0.01 );
+  add_state( "propagation", propagation_state_, 0.0, 0.0, 1.0, 0.01 );
+  add_state( "edge", edge_state_, 0.0, 0.0, 1.0, 0.01 );
   add_state( "replace", replace_state_, false );
 
   // Add constaints, so that when the state changes the right ranges of

@@ -40,8 +40,8 @@ HistogramEqualizationFilter::HistogramEqualizationFilter( const std::string& too
 {
   // Need to set ranges and default values for all parameters
   add_state( "target", target_layer_state_, "<none>", "<none>" );
-  add_state( "upper_threshold", upper_threshold_state_, 1.0f, 0.0f, 1.0f, 0.01f );
-  add_state( "lower_threshold", lower_threshold_state_, 0.0f, 0.0f, 1.0f, 0.01f );
+  add_state( "upper_threshold", upper_threshold_state_, 1.0, 0.0, 1.0, 0.01 );
+  add_state( "lower_threshold", lower_threshold_state_, 0.0, 0.0, 1.0, 0.01 );
   add_state( "alpha", alpha_state_, 0, 0, 255, 1 );
   add_state( "replace", replace_state_, false );
 

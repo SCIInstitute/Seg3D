@@ -41,6 +41,7 @@
 // Application includes
 #include <Application/State/State.h>
 #include <Application/State/Actions/ActionSet.h>
+#include <Application/State/Actions/ActionSetRange.h>
 
 
 
@@ -256,30 +257,37 @@ private:
   StateAliasHandle state_handle_;
 };
 
-class QtSliderIntComboRangedIntSlot : public QtSlot
+// SLOT FOR CONNECTING THE SliderIntCombo TO THE STATE ENGINE
+class QtSliderIntComboRangedSlot : public QtSlot
 {
   Q_OBJECT
 public:
 
   // Constructor
-  QtSliderIntComboRangedIntSlot( SliderIntCombo* parent, StateRangedIntHandle& state_handle,
+  QtSliderIntComboRangedSlot( SliderIntCombo* parent, StateRangedIntHandle& state_handle,
     bool blocking = true ) :
   QtSlot( parent, blocking ), state_handle_( state_handle )
   {
     // Qt's connect function
     connect( parent, SIGNAL( valueAdjusted( int ) ), this, SLOT( slot( int ) ) );
+    connect( parent, SIGNAL( rangeChanged( int, int ) ), this, SLOT( range_slot( int, int ) ) );
   }
 
   // Virtual destructor: needed by Qt
-  virtual ~QtSliderIntComboRangedIntSlot()
+  virtual ~QtSliderIntComboRangedSlot()
   {
   }
 
 public Q_SLOTS:
   // Slot that Qt will call
-  void slot(int state)
+  void value_slot(int state)
   {
-    if (!blocked_) ActionSet::Dispatch(state_handle_,static_cast<int>(state));
+    if (!blocked_) ActionSet::Dispatch( state_handle_, state );
+  }
+    void range_slot(int min, int max)
+  {
+      
+    if (!blocked_) ActionSetRange::Dispatch( state_handle_, min, max );
   }
 
 private:
@@ -287,13 +295,14 @@ private:
   StateRangedIntHandle state_handle_;
 };
 
-class QtSliderDoubleComboRangedDoubleSlot : public QtSlot
+// SLOT FOR CONNECTING THE SliderDoubleCombo TO THE STATE ENGINE
+class QtSliderDoubleComboRangedSlot : public QtSlot
 {
   Q_OBJECT
 public:
 
   // Constructor
-  QtSliderDoubleComboRangedDoubleSlot( SliderDoubleCombo* parent, StateRangedDoubleHandle& state_handle,
+  QtSliderDoubleComboRangedSlot( SliderDoubleCombo* parent, StateRangedDoubleHandle& state_handle,
     bool blocking = true ) :
   QtSlot( parent, blocking ), state_handle_( state_handle )
   {
@@ -303,7 +312,7 @@ public:
   }
 
   // Virtual destructor: needed by Qt
-  virtual ~QtSliderDoubleComboRangedDoubleSlot()
+  virtual ~QtSliderDoubleComboRangedSlot()
   {
   }
 
@@ -316,7 +325,7 @@ public Q_SLOTS:
     void range_slot(double min, double max)
   {
       
-    //if (!blocked_) ActionSetRange::Dispatch( state_handle_, min, max );
+    if (!blocked_) ActionSetRange::Dispatch( state_handle_, min, max );
   }
 
 private:

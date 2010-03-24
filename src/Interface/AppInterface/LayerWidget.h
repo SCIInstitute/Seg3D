@@ -54,7 +54,7 @@ Q_OBJECT
 
 // -- constructor/destructor --
 public:
-  LayerWidget( QFrame* parent, LayerHandle layer );
+  LayerWidget( QFrame* parent, LayerHandle layer, boost::function< void() > activate_function );
   virtual ~LayerWidget();
     
 // -- widget internals --
@@ -71,6 +71,7 @@ public Q_SLOTS:
 public:
   void show_selection_checkbox( bool hideshow );
   std::string &get_layer_id();
+  void set_active( bool active );
   
 private:
 

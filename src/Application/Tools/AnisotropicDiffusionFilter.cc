@@ -42,7 +42,7 @@ AnisotropicDiffusionFilter::AnisotropicDiffusionFilter( const std::string& tooli
   add_state( "target", target_layer_state_, "<none>", "<none>" );
   add_state( "iterations", iterations_state_, 1, 1, 100, 1 );
   add_state( "steps", steps_state_, 1, 1, 100, 1 );
-  add_state( "conductance", conductance_state_, .10f, .10f, 10.0f, .10f );
+  add_state( "conductance", conductance_state_, .10, .10, 10.0, .10 );
   add_state( "replace", replace_state_, false );
 
   // Add constaints, so that when the state changes the right ranges of

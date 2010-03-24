@@ -71,9 +71,13 @@ public:
 
 
 public:
-  void process_group( LayerGroupHandle group );
+  void insert_layer( LayerHandle layer );
+  void delete_layer( LayerGroupHandle group );
+  void make_new_group( LayerHandle layer );//, boost::function< void() > activate_function  );
   void delete_group( LayerGroupHandle group );
   void show_group( LayerGroupHandle group );
+  void set_active_group( LayerGroupHandle group );
+  void set_active_layer( LayerHandle layer );
   
 
 private:

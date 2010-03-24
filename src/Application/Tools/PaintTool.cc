@@ -43,8 +43,8 @@ PaintTool::PaintTool( const std::string& toolid ) :
   add_state( "target", target_layer_state_, "<none>", "<none>" );
   add_state( "mask", mask_layer_state_, "<none>", "<none>" );
   add_state( "brush_radius", brush_radius_state_, 23, 1, 250, 1 );
-  add_state( "upper_threshold", upper_threshold_state_, 1.0f, 00.0f, 1.0f, 0.01f );
-  add_state( "lower_threshold", lower_threshold_state_, 0.0f, 00.0f, 1.0f, 0.01f );
+  add_state( "upper_threshold", upper_threshold_state_, 1.0, 00.0, 1.0, 0.01 );
+  add_state( "lower_threshold", lower_threshold_state_, 0.0, 00.0, 1.0, 0.01 );
   add_state( "erase", erase_state_, false );
 
   // Add constaints, so that when the state changes the right ranges of
@@ -55,11 +55,14 @@ PaintTool::PaintTool( const std::string& toolid ) :
       this, _1 ) );
 
   // If a layer is added or deleted update the lists
-  LayerManager::Instance()->connect_layers_changed_signal_.connect(
-      boost::bind(&PaintTool::handle_layers_changed,this));
+  LayerManager::Instance()->layers_finished_deleting_signal_.connect(
+      boost::bind( &PaintTool::handle_layers_changed, this ) );
+  
+  LayerManager::Instance()->layer_inserted_signal_.connect(
+      boost::bind( &PaintTool::handle_layers_changed, this ) );
 
   // Trigger a fresh update
-  handle_layers_changed();
+//  handle_layers_changed();
 }
 
 PaintTool::~PaintTool()
@@ -69,11 +72,11 @@ PaintTool::~PaintTool()
 
 void PaintTool::handle_layers_changed()
 {
-    std::vector< std::string > target_layers;
+    std::vector< LayerHandle > target_layers;
     LayerManager::Instance()->return_layers_vector( target_layers );
     
     //TODO need to filter out the layers that are not valid for target
-    target_layer_state_->set_option_list(target_layers);
+    //target_layer_state_->set_option_list(target_layers);
 
   /*
    std::vector<std::string> target_layers;

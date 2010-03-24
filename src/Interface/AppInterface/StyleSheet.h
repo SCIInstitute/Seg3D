@@ -26,54 +26,18 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_SLIDERDOUBLECOMBO_H
-#define INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_SLIDERDOUBLECOMBO_H
+#ifndef INTERFACE_APPINTERFACE_STYLESHEET_H
+#define INTERFACE_APPINTERFACE_STYLESHEET_H
 
-// QT Includes
+//Qt Includes
 #include <QtGui>
 
-#include <boost/shared_ptr.hpp>
-
-namespace Seg3D 
+namespace Seg3D
 {
 
-class SliderDoubleComboPrivate;
-
-class SliderDoubleCombo : public QWidget
-{
-Q_OBJECT
-
-Q_SIGNALS:
-  void valueAdjusted( double );
-    void rangeChanged( double, double );
-// -- constructor/destructor --
-public:
-    SliderDoubleCombo( QWidget* parent = 0, bool edit_range = false );
-    virtual ~SliderDoubleCombo();
     
-public Q_SLOTS:
-    void setStep( double );
-  void setRange( double, double );
-  void setCurrentValue( double );
-    
-// -- widget internals -- 
-private:
-    boost::shared_ptr< SliderDoubleComboPrivate > private_;
-    
-private Q_SLOTS:
-    void edit_ranges( bool edit );
-    void change_min( double new_min );
-    void change_max( double new_max );
-    void double_range();
-    void half_range();
-    void slider_signal( int value );
-    void spinner_signal( double value );
+// TODO
+// this header file will contain all the static QStrings needed for changing style sheets
 
-private:
-    void block_signals( bool block );    
-  
-};
 
 }  // end namespace Seg3D
-
-#endif

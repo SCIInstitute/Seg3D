@@ -59,9 +59,10 @@ public:
   
   std::string layer_id_;
   Utils::GridTransform grid_transform_;
+  int volume_type_;
 };
 
-LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
+LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer, boost::function< void() > activate_function ) :
   QWidget( parent ),
   private_( new LayerWidgetPrivate )
 {
@@ -158,6 +159,8 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   connect( this->private_->ui_.lock_button_, 
       SIGNAL( toggled( bool )), this, 
       SLOT( visual_lock( bool )));
+      
+    QtBridge::Connect( this->private_->ui_.activate_button_, activate_function );
   
   
   // make the default connections, for any layer type, to the state engine
@@ -168,6 +171,8 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   QtBridge::Connect( this->private_->opacity_adjuster_, layer->opacity_state_ );
   
   QtBridge::Connect( this->private_->ui_.label_, layer->name_state_ );
+  
+  
   
   switch( layer->type() )
   {
@@ -180,7 +185,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
         this->private_->ui_.iso_surface_button_->hide();
         this->private_->ui_.typeBackground_->setStyleSheet(
             QString::fromUtf8("QWidget#typeBackground_{ background-color: rgb(166, 12, 73); }"));
-        this->private_->ui_.colorChooseButton_->setIcon(this->data_layer_icon_);
+        this->private_->ui_.activate_button_->setIcon(this->data_layer_icon_);
         
         DataLayer* data_layer = dynamic_cast< DataLayer* >( layer.get() );
         QtBridge::Connect( this->private_->brightness_adjuster_, data_layer->brightness_state_ );
@@ -206,6 +211,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
                 this->private_->contrast_adjuster_->setRange( contrast_min, contrast_max );
                 this->private_->contrast_adjuster_->setCurrentValue( data_layer->contrast_state_->get() );
         
+        this->private_->volume_type_ = 1;
       }
       break;
     // This is for the Mask Layers  
@@ -217,13 +223,14 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
         MaskLayer* mask_layer = dynamic_cast< MaskLayer* >( layer.get() );        
         QtBridge::Connect( this->private_->ui_.iso_surface_button_, mask_layer->show_isosurface_state_ );
         QtBridge::Connect( this->private_->ui_.border_selection_combo_, mask_layer->fill_state_ );
+          this->private_->volume_type_ = 2;
       }
       break;
       
     // This is for the Label Layers
     case Utils::VolumeType::LABEL_E:
         {
-        
+            this->private_->volume_type_ = 3;
         }
       
       break;
@@ -237,6 +244,52 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
 LayerWidget::~LayerWidget()
 {
 
+}
+
+void LayerWidget::set_active( bool active )
+{
+    if( active )
+    {
+        this->private_->ui_.base_->setStyleSheet( QString::fromUtf8(
+               "QWidget#base_{\n"
+               //"background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(239, 244, 249, 255), stop:0.155779 rgba(245, 250, 255, 255), stop:1 rgba(224, 229, 234, 255));"
+             "border-radius: 6px;\n"
+             "border: 1px solid rgb(94, 141, 176);"
+             "background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(216, 238, 245, 255), stop:0.372881 rgba(226, 249, 255, 255), stop:1 rgba(204, 224, 230, 255));"
+               //"border: 4px solid rgb(235, 245, 255);"
+               //"border: 4px solid rgba(166, 198, 218, 100);\n"
+             //"background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(179, 214, 234, 255), stop:0.305085 rgba(195, 230, 252, 255), stop:1 rgba(181, 204, 218, 255));"
+               "}"));
+               
+        this->private_->ui_.label_->setStyleSheet( QString::fromUtf8(
+               "QLineEdit#label_{\n"
+             "text-align: left;\n"
+             "color: black;\n"
+             "margin-right: 3px;\n"
+             "background-color: rgba(216, 238, 245, 1);\n"
+             //"background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(216, 238, 245, 255), stop:1 rgba(226, 249, 255, 255));"
+             "}"));
+
+    }
+    else
+    {
+        this->private_->ui_.base_->setStyleSheet( QString::fromUtf8(
+               "QWidget#base_{\n"
+               //"background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(221, 221, 221, 255), stop:0.155779 rgba(228, 228, 228, 255), stop:1 rgba(204, 204, 204, 255));"
+             "background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(181, 181, 181, 255), stop:0.155779 rgba(195, 195, 195, 255), stop:1 rgba(164, 164, 164, 255));"
+             "border-radius: 6px;\n"
+               "border: 1px solid rgb(90, 90, 90);\n"
+               "}"));
+        this->private_->ui_.label_->setStyleSheet( QString::fromUtf8(
+               "QLineEdit#label_{\n"
+             "text-align: left;\n"
+             "color: black;\n"
+             "margin-right: 3px;\n"
+             //"background-color: rgb(228, 228, 228);\n"
+             "background-color: rgba( 190, 190, 190, 1 );\n"
+             "}"));
+    
+    }
 }
 
 std::string& LayerWidget::get_layer_id()
@@ -375,8 +428,8 @@ void LayerWidget::visual_lock( bool lock )
     
     this->private_->ui_.label_->setStyleSheet( 
       QString::fromUtf8(
-         "QLineEdit#label_{background-color:rgb(208, 208, 208); color: gray;}" ) );
-    this->private_->ui_.colorChooseButton_->setEnabled( false );
+         "QLineEdit#label_{background-color:rgba(208, 208, 208, 1); color: gray;}" ) );
+    this->private_->ui_.activate_button_->setEnabled( false );
     this->private_->ui_.opacity_button_->setEnabled( false );
     this->private_->ui_.visibility_button_->setEnabled( false );
     this->private_->ui_.color_button_->setEnabled( false );
@@ -401,21 +454,50 @@ void LayerWidget::visual_lock( bool lock )
       QString::fromUtf8(
          "QWidget#header_{"
          "background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));}" ) );
-    this->private_->ui_.typeBackground_->setStyleSheet( 
-      QString::fromUtf8(
-          "QWidget#typeBackground_{"
-          "background-color: rgb(255, 128, 0);"
-          "border: 1px solid rgb(141, 141, 141);"
-          "border-radius: 4px;}" ) );
+    switch( this->private_->volume_type_ )
+      {
+        // This if for the Data Layers
+        case Utils::VolumeType::DATA_E:
+        {
+              this->private_->ui_.typeBackground_->setStyleSheet( 
+                QString::fromUtf8(
+                    "QWidget#typeBackground_{"
+                    "background-color: rgb(166, 12, 73);"
+                    "border: 1px solid rgb(141, 141, 141);"
+                    "border-radius: 4px;}" ) );
+                    
+      }
+        break;
+        case Utils::VolumeType::MASK_E:
+      {
+          this->private_->ui_.typeBackground_->setStyleSheet( 
+                QString::fromUtf8(
+                    "QWidget#typeBackground_{"
+                    "background-color: rgb(255, 128, 0);"
+                    "border: 1px solid rgb(141, 141, 141);"
+                    "border-radius: 4px;}" ) );
+      
+      }
+      break;
+      case Utils::VolumeType::LABEL_E:
+      {
+        }
+        break;
+        
+        default:
+      break;
+        
+    
+    }
     this->private_->ui_.label_->setStyleSheet( 
       QString::fromUtf8( 
           "QLineEdit#label_{"
           "text-align: left;"
           "color: black;"
           "margin-right: 3px;"
-          "background-color: rgb(243, 243, 243);}" ) );
+          "background-color: rgba(243, 243, 243, 1);}" ) );
     
-    this->private_->ui_.colorChooseButton_->setEnabled( true );
+    this->private_->ui_.activate_button_->setEnabled( true );
     this->private_->ui_.opacity_button_->setEnabled( true );
     this->private_->ui_.visibility_button_->setEnabled( true );
     this->private_->ui_.color_button_->setEnabled( true );

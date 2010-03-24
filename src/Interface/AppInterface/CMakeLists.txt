@@ -77,6 +77,7 @@ SET(INTERFACE_APPINTERFACE_MOC_SRCS
   ViewAction.h
   ViewerInterface.h
   ViewerWidget.h
+  StyleSheet.h
 )
 
 SET(INTERFACE_APPINTERFACE_NO_MOC_SRCS
