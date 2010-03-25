@@ -131,7 +131,8 @@ void LayerManagerWidget::delete_layer( LayerGroupHandle group )
 
 void LayerManagerWidget::make_new_group( LayerHandle layer )//, boost::function< void() > activate_function )
 {
-    LayerGroupWidget_handle new_group_handle( new LayerGroupWidget( this->main_, layer, boost::bind( &ActionActivateLayer::Dispatch, layer ) ));
+    LayerGroupWidget_handle new_group_handle( new LayerGroupWidget( this->main_, layer, 
+        boost::bind( &ActionActivateLayer::Dispatch, layer ) ));
   this->group_layout_->addWidget( new_group_handle.data() );
   this->group_list_.push_back( new_group_handle );
 }
@@ -145,8 +146,9 @@ void LayerManagerWidget::delete_group( LayerGroupHandle group )
     {
       ( *i )->deleteLater();
       group_list_.erase( i );
+      return;
     }
-    return;
+    
   }
 }
 

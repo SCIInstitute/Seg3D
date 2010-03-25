@@ -73,6 +73,7 @@ public:
 
 private Q_SLOTS:
     void adjust_new_size_labels( double scale_factor );
+    void uncheck_delete_confirm();
   
   
   // -- widget internals --

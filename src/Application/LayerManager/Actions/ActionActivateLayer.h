@@ -57,9 +57,6 @@ public:
 
   // -- Dispatch this action from the interface --
 public:
-  // CREATE
-  // Create action that activates a tool
-  //static ActionHandle Create( const std::string& layer_id );
 
   // DISPATCH
   // Create and dispatch action that activates a layer

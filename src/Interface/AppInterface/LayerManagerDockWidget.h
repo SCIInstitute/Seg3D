@@ -71,7 +71,9 @@ public:
   
   //Delete a layer
   void delete_layer_ui( LayerGroupHandle &group );
-
+  
+  //Delete an empty group
+    void delete_group_ui( LayerGroupHandle &group );
 
   // -- static functions for callbacks into this widget --
 public:
@@ -80,6 +82,7 @@ public:
   static void HandleActivateLayer( qpointer_type qpointer, LayerHandle layer );
   static void HandleInsertLayer( qpointer_type qpointer, LayerHandle layer );
   static void HandleDeleteLayer( qpointer_type qpointer, LayerGroupHandle group );
+  static void HandleGroupDeleted( qpointer_type qpointer, LayerGroupHandle group );
 
   
 private:

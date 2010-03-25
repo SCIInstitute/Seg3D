@@ -165,6 +165,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer, boost::function< vo
   
   // make the default connections, for any layer type, to the state engine
   QtBridge::Connect( this->private_->ui_.selection_checkbox_, layer->selected_state_ );
+  //this->private_->ui_.selection_checkbox_->setChecked( false ); // be sure we start false
   
   QtBridge::Connect( this->private_->ui_.lock_button_, layer->lock_state_ );
   
@@ -306,7 +307,7 @@ void LayerWidget::show_selection_checkbox( bool show )
   else 
   {
     this->private_->ui_.checkbox_widget_->hide();
-    this->private_->ui_.selection_checkbox_->setChecked( false );
+    //this->private_->ui_.selection_checkbox_->setChecked( false );
   }
 }
 

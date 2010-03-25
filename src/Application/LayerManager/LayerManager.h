@@ -88,7 +88,7 @@ public:
   // Action Functions
 public:
   bool insert_layer( LayerHandle layer );
-  void delete_layer( LayerGroupHandle group );
+  void delete_layers( LayerGroupHandle group );
   void set_active_layer( LayerHandle layer );
   
   //friend class ActionInsertLayer;
@@ -134,7 +134,7 @@ public:
   
   
   group_signal_type add_group_signal_; // Probably not needed 
-  group_signal_type delete_group_signal_; // Probably not needed 
+  group_signal_type delete_group_signal_;
   
 private:
   

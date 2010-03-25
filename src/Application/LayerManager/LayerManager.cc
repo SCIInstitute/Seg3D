@@ -160,15 +160,18 @@ void LayerManager::return_layers_vector( std::vector< LayerHandle > &vector_of_l
 }
 
 
-void LayerManager::delete_layer( LayerGroupHandle group )
+void LayerManager::delete_layers( LayerGroupHandle group )
 {
     lock_type lock( this->group_handle_list_mutex_ );  
     
     std::vector< LayerHandle > layer_vector;
+    
+    // get a temporary copy of the list of layers
+    layer_list_type layer_list = group->get_layer_list();
   
-  for( layer_list_type::iterator i = group->layer_list_.begin(); 
-      i != group->layer_list_.end(); ++i )
-    {   
+  for( layer_list_type::iterator i = layer_list.begin(); 
+      i != layer_list.end(); ++i )
+  {
         if( ( *i )->selected_state_->get() )
         {   
             SCI_LOG_DEBUG( std::string("Deleting Layer: ") + ( *i )->get_layer_id());
@@ -177,9 +180,17 @@ void LayerManager::delete_layer( LayerGroupHandle group )
         }
   }
   
-  // NOTE: Unlock ASAP to avoid potential deadlock. It is especially important to unlock
+    // NOTE: Unlock ASAP to avoid potential deadlock. It is especially important to unlock
   // before triggering any signals
   lock.unlock();
+  
+  if( group->get_layer_list().empty() )
+  {   
+      delete_group_signal_( group );
+      group_handle_list_.remove( group );
+  }
+  
+
   
   // signal the listeners
   layers_deleted_signal_( layer_vector );

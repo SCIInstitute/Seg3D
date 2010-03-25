@@ -43,6 +43,8 @@
 #include <Application/Layer/DataLayer.h>
 #include <Application/Layer/MaskLayer.h>
 #include <Application/Layer/LayerGroup.h>
+#include <Application/LayerManager/Actions/ActionDeleteLayers.h>
+
 
 
 namespace Seg3D
@@ -93,6 +95,7 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer, boost::f
   this->private_->ui_.transform_->hide();
   this->private_->ui_.delete_->hide();
   this->private_->ui_.delete_button_->setEnabled( false );
+
   //this->private_->ui_.open_button_->setChecked( true );
   
   // add the slider spinner combo's for the crop
@@ -138,7 +141,7 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer, boost::f
   connect( this->private_->ui_.group_flip_rotate_button_, SIGNAL( clicked ( bool ) ), this, SLOT( show_flip_rotate( bool )) );
   connect( this->private_->ui_.group_delete_button_, SIGNAL( clicked ( bool ) ), this, SLOT( show_delete( bool )) );
   connect( this->private_->ui_.confirm_delete_checkbox_, SIGNAL( clicked ( bool ) ), this, SLOT( enable_delete_button( bool )) );
-
+  connect( this->private_->ui_.delete_button_, SIGNAL( clicked () ), this, SLOT( uncheck_delete_confirm() ) );
   
   // Add all current layer to the new group
   this->add_layer( layer, activate_function );
@@ -151,6 +154,8 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer, boost::f
       
       QtBridge::Connect( this->private_->ui_.open_button_, group->show_layers_state_ );
       QtBridge::Connect( this->private_->ui_.group_visibility_button_, group->visibility_state_ );
+      QtBridge::Connect( this->private_->ui_.delete_button_, boost::bind( &ActionDeleteLayers::Dispatch, group ) );
+      
   
   
       // --- RESAMPLE ---
@@ -377,6 +382,13 @@ void LayerGroupWidget::enable_delete_button( bool enable )
   this->private_->ui_.delete_button_->setEnabled( enable );
 }
 
+void LayerGroupWidget::uncheck_delete_confirm()
+{
+    this->private_->ui_.confirm_delete_checkbox_->setChecked( false );
+    this->private_->ui_.delete_button_->setEnabled( false );
+    show_delete( false );
+}
+
 void LayerGroupWidget::show_layers( bool show )
 {
   if (show) 
@@ -514,6 +526,7 @@ void LayerGroupWidget::show_delete( bool show )
   else
   {
     this->private_->ui_.delete_->hide();
+    this->private_->ui_.group_delete_button_->setChecked( false );
   }
   show_selection_checkboxes( show );
 }
