@@ -34,22 +34,44 @@
 
 namespace Seg3D
 {
-
+   
 class StyleSheet
 {
 
-public:
+private:
+  StyleSheet();
   
-  const static QString LAYER_WIDGET_BASE_ACTIVE_C;
+public:
 
-
-
-
-
-
-
-
+  //Volume Type Colors
+  const static QString DATA_VOLUME_COLOR_C;
+  const static QString MASK_VOLUME_COLOR_C;
+  const static QString LABEL_VOLUME_COLOR_C;
+  
+  // === LayerWidget Styles === //
+    // - ACTIVE - //
+    const static QString LAYER_WIDGET_BASE_ACTIVE_C;
+    const static QString LAYER_WIDGET_LABEL_ACTIVE_C;
+    // - INACTIVE - //
+    const static QString LAYER_WIDGET_BASE_INACTIVE_C;
+    const static QString LAYER_WIDGET_LABEL_INACTIVE_C;
+    // - LOCKED - //
+    const static QString LAYER_WIDGET_HEADER_LOCKED_C;
+    const static QString LAYER_WIDGET_BACKGROUND_LOCKED_C;
+    const static QString LAYER_WIDGET_LABEL_LOCKED_C;
+  
+  // === LayerGroupWidget Styles === //
+    // - ACTIVE - //
+    const static QString GROUP_WIDGET_BASE_ACTIVE_C;
+    const static QString GROUP_WIDGET_BACKGROUND_ACTIVE_C;
+    const static QString GROUP_WIDGET_ACTIVATE_BUTTON_ACTIVE_C;
+    // - INACTIVE - //
+    const static QString GROUP_WIDGET_BASE_INACTIVE_C;
+    const static QString GROUP_WIDGET_BACKGROUND_INACTIVE_C;
+    const static QString GROUP_WIDGET_ACTIVATE_BUTTON_INACTIVE_C;
 
 };    
+
 }  // end namespace Seg3D
+
 #endif
