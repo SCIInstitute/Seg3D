@@ -65,6 +65,8 @@ SET(APPLICATION_LAYERMANAGER_ACTIONS_SRCS
   Actions/ActionTransformLayer.cc
   Actions/ActionActivateLayer.h
   Actions/ActionActivateLayer.cc
+  Actions/ActionDeleteLayers.h
+  Actions/ActionDeleteLayers.cc
   )
 
 
