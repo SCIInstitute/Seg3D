@@ -75,10 +75,8 @@ public:
   // Accessor Functions
 public:
     // Functions for getting a copy of the Layers and Groups with the proper locking
-  
-  // TODO: get_groups() get_layers()
-  void return_group_vector( std::vector< LayerGroupHandle > &vector_of_groups );
-  void return_layers_vector( std::vector< LayerHandle > &vector_of_layers );
+  void get_groups( std::vector< LayerGroupHandle > &vector_of_groups );
+  void get_layers( std::vector< LayerHandle > &vector_of_layers );
   
   LayerGroupHandle check_for_group( std::string group_id );
   
@@ -137,9 +135,13 @@ public:
   // TODO: maybe group_finished_deleting_layers_signal_
   group_signal_type layers_finished_deleting_signal_;
   
-  // TODO: group_inserted_signal_ and group_deleted_signal_
-  group_signal_type add_group_signal_; // Probably not needed 
-  group_signal_type delete_group_signal_;
+  // GROUP_INSERTED_SIGNAL:
+  // This signal is currently not triggered
+  group_signal_type group_inserted_signal_; 
+  
+  // GROUP_DELETED_SIGNAL:
+  // This signal is triggered when a group has been deleted from the layer manager
+  group_signal_type group_deleted_signal_;
   
 private:
     // list of the current groups 

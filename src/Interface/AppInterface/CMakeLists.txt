@@ -77,10 +77,12 @@ SET(INTERFACE_APPINTERFACE_MOC_SRCS
   ViewAction.h
   ViewerInterface.h
   ViewerWidget.h
-  StyleSheet.h
 )
 
+
 SET(INTERFACE_APPINTERFACE_NO_MOC_SRCS
+  StyleSheet.h
+  StyleSheet.cc
 )
 
 SET(INTERFACE_APPINTERFACE_UI_SRCS

@@ -79,12 +79,12 @@ LayerManagerDockWidget::LayerManagerDockWidget( QWidget *parent ) :
   add_connection( LayerManager::Instance()->active_layer_changed_signal_.connect( boost::bind(
           &LayerManagerDockWidget::HandleActivateLayer, layer_dock_widget, _1 ) ) );
   
-  add_connection( LayerManager::Instance()->delete_group_signal_.connect( boost::bind(
+  add_connection( LayerManager::Instance()->group_deleted_signal_.connect( boost::bind(
                   &LayerManagerDockWidget::HandleGroupDeleted, layer_dock_widget, _1 ) ) );
   
 
   std::vector< LayerHandle > temporary_layerhandle_vector;
-  LayerManager::Instance()->return_layers_vector( temporary_layerhandle_vector );
+  LayerManager::Instance()->get_layers( temporary_layerhandle_vector );
   
   for( size_t i = 0; i <  temporary_layerhandle_vector.size(); ++i)
   {

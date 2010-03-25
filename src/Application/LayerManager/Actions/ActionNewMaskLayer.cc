@@ -26,72 +26,49 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-/*
- *****************************************************************************
- *
- *   ActionNewMaskLayer.cc
- *
- *   Also see: Layer, LayerManager
- *
- *   Authors:
- *      Kristen Zygmunt   -- initial attempt      11/19/2009
- *
- *    
- *****************************************************************************
- */
-
-// STL includes
-
-// Boost includes 
-
-// ITK includes
-
-// Application includes
 #include <Application/LayerManager/LayerManager.h>
-#include <Application/Layer/Layer.h>
 #include <Application/LayerManager/Actions/ActionNewMaskLayer.h>
+#include <Application/Layer/MaskLayer.h>
 
 namespace Seg3D
 {
 
-SCI_REGISTER_ACTION(NewMaskLayer)
-;
+// REGISTER ACTION:
+// Define a function that registers the action. The action also needs to be
+// registered in the CMake file.
+SCI_REGISTER_ACTION(NewMaskLayer);
 
-bool ActionNewMaskLayer::check_layer_availability()
+bool ActionNewMaskLayer::validate( ActionContextHandle& context )
 {
-//  bool is_available = false;
-//  LayerHandle layer = LayerManager::Instance()->get_layer( provided_layer_.value() );
-//  if ( layer && !( layer->is_locked() ) )
-//  {
-//    is_available = true;
-//  }
-  return ( true );
+    if ( !this->group_handle_ )
+      return false;
+  
+  if ( !( StateEngine::Instance()->is_stateid( group_handle_->get_group_id() ) ) )
+  {
+    context->report_error( std::string( "GroupID '" ) + group_handle_->get_group_id() + "' is invalid" );
+    return false;
+  }
+
+  return true; // validated
 }
 
-bool ActionNewMaskLayer::lock_layers() const
-{
-//  LayerManager::Instance()->lock_layer( provided_layer_.value() );
-  return ( true );
-}
-
-bool ActionNewMaskLayer::release_layers() const
-{
-//  LayerManager::Instance()->unlock_layer( provided_layer_.value() );
-  return ( true );
-}
-
-bool ActionNewMaskLayer::do_validate( ActionContextHandle& context )
-{
-  // no parameter checking necessary for this action
-  return ( true );
-}
-
-bool ActionNewMaskLayer::execute( ActionContextHandle& context ) const
-{
-  // Create a zeroed out mask layer of the same size as
-  // provided_layer_
-  // Give this new layer to the LayerManager
-  return ( true );
-}
+  bool ActionNewMaskLayer::run( ActionContextHandle& context, ActionResultHandle& result )
+  {
+    if ( this->group_handle_ )
+    {
+        LayerHandle new_mask_layer = LayerHandle( new MaskLayer( "MaskLayer", group_handle_->get_grid_transform() ));
+      LayerManager::Instance()->insert_layer( new_mask_layer );
+      return true;
+    }
+    
+    return false;
+  }
+  void ActionNewMaskLayer::Dispatch( LayerGroupHandle group )
+  {
+    ActionNewMaskLayer* action = new ActionNewMaskLayer;
+    action->group_handle_ = group;
+    
+    Interface::PostAction( ActionHandle( action ) );
+  }
 
 } // end namespace Seg3D

@@ -35,9 +35,21 @@
 namespace Seg3D
 {
 
-    
-// TODO
-// this header file will contain all the static QStrings needed for changing style sheets
+class StyleSheet
+{
+
+public:
+  
+  const static QString LAYER_WIDGET_BASE_ACTIVE_C;
 
 
+
+
+
+
+
+
+
+};    
 }  // end namespace Seg3D
+#endif

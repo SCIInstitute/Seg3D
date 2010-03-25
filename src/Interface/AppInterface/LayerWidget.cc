@@ -35,6 +35,7 @@
 //Interface Includes
 #include <Interface/QtInterface/QtBridge.h>
 #include <Interface/AppInterface/LayerWidget.h>
+#include <Interface/AppInterface/StyleSheet.h>
 
 //UI Includes
 #include "ui_LayerWidget.h"
@@ -43,6 +44,7 @@
 #include <Application/Layer/DataLayer.h>
 #include <Application/Layer/MaskLayer.h>
 #include <Application/Layer/LayerGroup.h>
+#include <Application/LayerManager/Actions/ActionActivateLayer.h>
 
 
 namespace Seg3D
@@ -62,7 +64,7 @@ public:
   int volume_type_;
 };
 
-LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer, boost::function< void() > activate_function ) :
+LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   QWidget( parent ),
   private_( new LayerWidgetPrivate )
 {
@@ -160,7 +162,8 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer, boost::function< vo
       SIGNAL( toggled( bool )), this, 
       SLOT( visual_lock( bool )));
       
-    QtBridge::Connect( this->private_->ui_.activate_button_, activate_function );
+    QtBridge::Connect( this->private_->ui_.activate_button_, 
+    boost::bind( &ActionActivateLayer::Dispatch, layer ) );
   
   
   // make the default connections, for any layer type, to the state engine
@@ -251,45 +254,13 @@ void LayerWidget::set_active( bool active )
 {
     if( active )
     {
-        this->private_->ui_.base_->setStyleSheet( QString::fromUtf8(
-               "QWidget#base_{\n"
-               //"background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(239, 244, 249, 255), stop:0.155779 rgba(245, 250, 255, 255), stop:1 rgba(224, 229, 234, 255));"
-             "border-radius: 6px;\n"
-             "border: 1px solid rgb(94, 141, 176);"
-             "background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(216, 238, 245, 255), stop:0.372881 rgba(226, 249, 255, 255), stop:1 rgba(204, 224, 230, 255));"
-               //"border: 4px solid rgb(235, 245, 255);"
-               //"border: 4px solid rgba(166, 198, 218, 100);\n"
-             //"background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(179, 214, 234, 255), stop:0.305085 rgba(195, 230, 252, 255), stop:1 rgba(181, 204, 218, 255));"
-               "}"));
-               
-        this->private_->ui_.label_->setStyleSheet( QString::fromUtf8(
-               "QLineEdit#label_{\n"
-             "text-align: left;\n"
-             "color: black;\n"
-             "margin-right: 3px;\n"
-             "background-color: rgba(216, 238, 245, 1);\n"
-             //"background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(216, 238, 245, 255), stop:1 rgba(226, 249, 255, 255));"
-             "}"));
-
+        this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_ACTIVE_C );  
+        this->private_->ui_.label_->setStyleSheet( StyleSheet::LAYER_WIDGET_LABEL_ACTIVE_C );
     }
     else
     {
-        this->private_->ui_.base_->setStyleSheet( QString::fromUtf8(
-               "QWidget#base_{\n"
-               //"background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(221, 221, 221, 255), stop:0.155779 rgba(228, 228, 228, 255), stop:1 rgba(204, 204, 204, 255));"
-             "background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(181, 181, 181, 255), stop:0.155779 rgba(195, 195, 195, 255), stop:1 rgba(164, 164, 164, 255));"
-             "border-radius: 6px;\n"
-               "border: 1px solid rgb(90, 90, 90);\n"
-               "}"));
-        this->private_->ui_.label_->setStyleSheet( QString::fromUtf8(
-               "QLineEdit#label_{\n"
-             "text-align: left;\n"
-             "color: black;\n"
-             "margin-right: 3px;\n"
-             //"background-color: rgb(228, 228, 228);\n"
-             "background-color: rgba( 190, 190, 190, 1 );\n"
-             "}"));
-    
+        this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_INACTIVE_C );
+        this->private_->ui_.label_->setStyleSheet( StyleSheet::LAYER_WIDGET_LABEL_INACTIVE_C );
     }
 }
 

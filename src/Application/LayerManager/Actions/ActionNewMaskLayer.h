@@ -1,22 +1,22 @@
 /*
  For more information, please see: http://software.sci.utah.edu
-
+ 
  The MIT License
-
+ 
  Copyright (c) 2009 Scientific Computing and Imaging Institute,
  University of Utah.
-
-
+ 
+ 
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
  the rights to use, copy, modify, merge, publish, distribute, sublicense,
  and/or sell copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following conditions:
-
+ 
  The above copyright notice and this permission notice shall be included
  in all copies or substantial portions of the Software.
-
+ 
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -26,78 +26,49 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-/*
- *****************************************************************************
- *
- *   ActionNewMaskLayer.h
- *
- *   Create a new empty mask layer with same spacing and origin as provided
- *   layer and give it to the layer manager.
- *
- *   Also see: Layer, LayerManager
- *
- *   Authors:
- *      Kristen Zygmunt   -- initial attempt      11/19/2009
- *
- *    
- *****************************************************************************
- */
+#ifndef APPLICATION_TOOL_ACTIONS_ACTIONNEWMASKLAYER_H
+#define APPLICATION_TOOL_ACTIONS_ACTIONNEWMASKLAYER_H
 
-#ifndef APPLICATION_LAYER_ACTIONS_ACTIONNEWMASKLAYER_H
-#define APPLICATION_LAYER_ACTIONS_ACTIONNEWMASKLAYER_H 1
 
-//#ifdef (_MSC_VER) && (_MSC_VER >= 1020)
-//# pragma once
-//#endif
-
-// STL includes
-
-// Boost includes 
-
-// ITK includes
-
-// Application includes 
-#include <Application/LayerManager/Actions/ActionLayer.h>
+#include <Application/Action/Actions.h>
+#include <Application/Interface/Interface.h>
+#include <Application/Layer/LayerGroup.h>
 
 namespace Seg3D
 {
 
-// Forward declarations
-
-// typedefs
-
-// Class declarations
-class ActionNewMaskLayer : public ActionLayer
+class ActionNewMaskLayer : public Action
 {
-SCI_ACTION_TYPE( "NewMaskLayer", "NewMaskLayer", ActionPropertiesType::LAYER_E)
+  SCI_ACTION_TYPE( "NewMaskLayer", "New Mask Layer <name>", ActionPropertiesType::LAYER_E )
+  
+  // -- Constructor/Destructor --
 public:
   ActionNewMaskLayer()
   {
-    add_argument( provided_layer_ );
   }
-
+  
   virtual ~ActionNewMaskLayer()
   {
   }
+  
+// -- Functions that describe action --
+public:
+  virtual bool validate( ActionContextHandle& context );
+  virtual bool run( ActionContextHandle& context, ActionResultHandle& result );
 
-  void set( const std::string& provided_layer )
-  {
-    provided_layer_.value() = provided_layer;
-  }
+  // -- Dispatch this action from the interface --
+public:
 
-  virtual bool do_validate( ActionContextHandle& context );
-  virtual bool check_layer_availability();
-  virtual bool lock_layers() const;
-  virtual bool release_layers() const;
-  virtual bool execute( ActionContextHandle& context ) const;
-
+  // DISPATCH
+  // Create and dispatch action that activates a layer
+  static void Dispatch( LayerGroupHandle group );
+  
 private:
-  ActionParameter< std::string > provided_layer_;
-
+  // Layer_handle that is requested
+  LayerGroupHandle group_handle_;
+  
 };
-
-typedef boost::intrusive_ptr< ActionNewMaskLayer > ActionNewMaskLayerHandle;
-
+  
 } // end namespace Seg3D
 
 #endif

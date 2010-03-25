@@ -347,7 +347,7 @@ QToolButton#color_button_12_:pressed{
        <widget class="QWidget" name="header_" native="true">
         <layout class="QHBoxLayout" name="horizontalLayout_4">
          <property name="spacing">
-          <number>4</number>
+          <number>0</number>
          </property>
          <property name="margin">
           <number>4</number>
@@ -503,7 +503,16 @@ QToolButton#color_button_12_:pressed{
             <property name="spacing">
              <number>2</number>
             </property>
-            <property name="margin">
+            <property name="leftMargin">
+             <number>4</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
              <number>0</number>
             </property>
             <item>
@@ -877,7 +886,7 @@ QToolButton#color_button_12_:pressed{
                  </property>
                  <property name="sizeHint" stdset="0">
                   <size>
-                   <width>40</width>
+                   <width>0</width>
                    <height>20</height>
                   </size>
                  </property>

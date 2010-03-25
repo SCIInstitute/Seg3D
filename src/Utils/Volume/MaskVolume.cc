@@ -27,6 +27,7 @@
  */
 
 #include <Utils/Volume/MaskVolume.h>
+#include <Utils/DataBlock/MaskDataBlockManager.h>
 
 namespace Utils
 {
@@ -37,5 +38,12 @@ MaskVolume::MaskVolume( const GridTransform& grid_transform,
   mask_data_block_( mask_data_block )
 {
 }
+
+MaskVolume::MaskVolume( const GridTransform& grid_transform ) :
+Volume( grid_transform )
+{
+    MaskDataBlockManager::Instance()->create( this->nx(), this->ny(), this->nz(), mask_data_block_ );
+}
+
 
 } // end namespace Utils

@@ -73,7 +73,7 @@ PaintTool::~PaintTool()
 void PaintTool::handle_layers_changed()
 {
     std::vector< LayerHandle > target_layers;
-    LayerManager::Instance()->return_layers_vector( target_layers );
+    LayerManager::Instance()->get_layers( target_layers );
     
     //TODO need to filter out the layers that are not valid for target
     //target_layer_state_->set_option_list(target_layers);

@@ -61,7 +61,7 @@ public Q_SLOTS:
   void enable_delete_button( bool enable );
   
 public:
-  void add_layer( LayerHandle layer, boost::function< void() > activate_function );
+  void add_layer( LayerHandle layer );
   void delete_layer( LayerHandle layer );
   std::string &get_group_id();
   void set_active( bool active );

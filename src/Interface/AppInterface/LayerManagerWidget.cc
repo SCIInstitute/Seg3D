@@ -93,7 +93,7 @@ void LayerManagerWidget::insert_layer( LayerHandle layer )
           layer_list_type temp_layer_list = group->get_layer_list();
           for( layer_list_type::reverse_iterator j = temp_layer_list.rbegin(); j != temp_layer_list.rend(); ++j )
           {
-            ( *i )->add_layer( ( *j ), boost::bind( &ActionActivateLayer::Dispatch, ( *j )) );
+            ( *i )->add_layer( ( *j ) );
           }
           // exit when we are done.
           return;
@@ -120,7 +120,7 @@ void LayerManagerWidget::delete_layer( LayerGroupHandle group )
           layer_list_type temp_layer_list = group->get_layer_list();
           for( layer_list_type::reverse_iterator j = temp_layer_list.rbegin(); j != temp_layer_list.rend(); ++j )
           {
-            ( *i )->add_layer( ( *j ), boost::bind( &ActionActivateLayer::Dispatch, ( *j )) );
+            ( *i )->add_layer( ( *j ) );
           }
           // exit when we are done
           return;
@@ -129,10 +129,10 @@ void LayerManagerWidget::delete_layer( LayerGroupHandle group )
 }
 
 
-void LayerManagerWidget::make_new_group( LayerHandle layer )//, boost::function< void() > activate_function )
+void LayerManagerWidget::make_new_group( LayerHandle layer )
 {
     LayerGroupWidget_handle new_group_handle( new LayerGroupWidget( this->main_, layer, 
-        boost::bind( &ActionActivateLayer::Dispatch, layer ) ));
+        boost::bind( &ActionActivateLayer::Dispatch, layer ) ) );
   this->group_layout_->addWidget( new_group_handle.data() );
   this->group_list_.push_back( new_group_handle );
 }

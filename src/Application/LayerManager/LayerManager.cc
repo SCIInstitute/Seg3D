@@ -92,6 +92,7 @@ bool LayerManager::insert_layer( LayerHandle layer )
   return true;
 }
 
+
 void LayerManager::set_active_layer( LayerHandle layer )
 {
   {
@@ -120,7 +121,7 @@ LayerGroupHandle LayerManager::check_for_group( std::string group_id )
   return LayerGroupHandle();
 }
 
-void LayerManager::return_group_vector( std::vector< LayerGroupHandle > &vector_of_groups )
+void LayerManager::get_groups( std::vector< LayerGroupHandle > &vector_of_groups )
 {
     lock_type lock( this->get_mutex() );
     
@@ -132,7 +133,7 @@ void LayerManager::return_group_vector( std::vector< LayerGroupHandle > &vector_
 }
 
 
-void LayerManager::return_layers_vector( std::vector< LayerHandle > &vector_of_layers )
+void LayerManager::get_layers( std::vector< LayerHandle > &vector_of_layers )
 {
     lock_type lock( this->get_mutex() );
     
@@ -179,7 +180,7 @@ void LayerManager::delete_layers( LayerGroupHandle group )
 
   if( group->get_layer_list().empty() )
   {   
-      delete_group_signal_( group );
+      group_deleted_signal_( group );
   }
   
   // signal the listeners

@@ -44,6 +44,7 @@ class MaskVolume : public Volume
 {
 public:
   MaskVolume( const GridTransform& grid_transform, const MaskDataBlockHandle& mask_data_block );
+  MaskVolume( const GridTransform& grid_transform );
   virtual ~MaskVolume() {}
 
   virtual VolumeType type() const

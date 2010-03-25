@@ -44,6 +44,7 @@
 #include <Application/Layer/MaskLayer.h>
 #include <Application/Layer/LayerGroup.h>
 #include <Application/LayerManager/Actions/ActionDeleteLayers.h>
+#include <Application/LayerManager/Actions/ActionNewMaskLayer.h>
 
 
 
@@ -144,7 +145,7 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer, boost::f
   connect( this->private_->ui_.delete_button_, SIGNAL( clicked () ), this, SLOT( uncheck_delete_confirm() ) );
   
   // Add all current layer to the new group
-  this->add_layer( layer, activate_function );
+  this->add_layer( layer );
 
   
   //Set the defaulf values for the Group UI and make the connections to the state engine
@@ -155,7 +156,7 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer, boost::f
       QtBridge::Connect( this->private_->ui_.open_button_, group->show_layers_state_ );
       QtBridge::Connect( this->private_->ui_.group_visibility_button_, group->visibility_state_ );
       QtBridge::Connect( this->private_->ui_.delete_button_, boost::bind( &ActionDeleteLayers::Dispatch, group ) );
-      
+      QtBridge::Connect( this->private_->ui_.group_new_button_, boost::bind( &ActionNewMaskLayer::Dispatch, group ) );
   
   
       // --- RESAMPLE ---
@@ -255,9 +256,9 @@ LayerGroupWidget::~LayerGroupWidget()
 {
 }
   
-void LayerGroupWidget::add_layer( LayerHandle layer, boost::function< void() > activate_function )
+void LayerGroupWidget::add_layer( LayerHandle layer )
 {
-  LayerWidget_handle new_layer_handle( new LayerWidget(this->private_->ui_.group_frame_, layer, activate_function));
+  LayerWidget_handle new_layer_handle( new LayerWidget(this->private_->ui_.group_frame_, layer ) );
   this->private_->ui_.group_frame_layout_->addWidget( new_layer_handle.data() );
   this->layer_list_.push_back( new_layer_handle );
 }

@@ -31,30 +31,22 @@
 // Boost includes 
 
 #include <Application/Application/Application.h>
+#include <Utils/Volume/MaskVolume.h>
 #include <Application/Layer/MaskLayer.h>
 
 namespace Seg3D
 {
 
 MaskLayer::MaskLayer( const std::string& name, const Utils::MaskVolumeHandle& volume ) :
-  Layer( name), 
-  mask_volume_( volume )
+  Layer( name)//, mask_volume_( volume )
 {
-  // Step (1) : Build the layer specific state variables
+  this->initialize_states();  
+}
 
-  // == Color of the layer ==
-  add_state( "color", color_state_, 0, 0, 9, 1 );
-
-  // == What border is used ==
-  add_state( "border", border_state_, "thick", "none|thin|thick" );
-
-  // == How is the segmentation filled in ==
-  add_state( "fill", fill_state_, "striped", "none|striped|solid" );
-
-  // == Whether the isosurface is shown in the volume display ==
-  add_state( "isosurface", show_isosurface_state_, false );
-  
-  
+MaskLayer::MaskLayer( const std::string& name, const Utils::GridTransform grid_transform ) :
+    Layer( name ), mask_volume_( new Utils::MaskVolume( grid_transform ) )
+{
+    this->initialize_states();
 }
 
 MaskLayer::~MaskLayer()
@@ -62,6 +54,25 @@ MaskLayer::~MaskLayer()
   // Disconnect all current connections
   disconnect_all();
 }
+
+void MaskLayer::initialize_states()
+{
+    // Step (1) : Build the layer specific state variables
+
+    // == Color of the layer ==
+    add_state( "color", color_state_, 0, 0, 9, 1 );
+
+    // == What border is used ==
+    add_state( "border", border_state_, "thick", "none|thin|thick" );
+
+    // == How is the segmentation filled in ==
+    add_state( "fill", fill_state_, "striped", "none|striped|solid" );
+
+    // == Whether the isosurface is shown in the volume display ==
+    add_state( "isosurface", show_isosurface_state_, false );
+    
+}
+
 
 } // end namespace Seg3D
 

@@ -54,7 +54,7 @@ Q_OBJECT
 
 // -- constructor/destructor --
 public:
-  LayerWidget( QFrame* parent, LayerHandle layer, boost::function< void() > activate_function );
+  LayerWidget( QFrame* parent, LayerHandle layer );
   virtual ~LayerWidget();
     
 // -- widget internals --
