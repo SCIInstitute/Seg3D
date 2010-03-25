@@ -120,7 +120,7 @@ void Histogram::compute( const signed char* data, size_t size )
   }
 
   min_ = static_cast<double>( hist_begin ) - static_cast<double>( 0x80 );
-  max_ = static_cast<double>( hist_end ) - static_cast<double_t>( 0x80 );
+  max_ = static_cast<double>( hist_end ) - static_cast<double>( 0x80 );
 
   bin_size_  = 1.0;
   bin_start_ = min_ - 0.5;
@@ -208,7 +208,7 @@ void Histogram::compute( const short* data, size_t size )
   }
 
   min_ = static_cast<double>( hist_begin ) - static_cast<double>( 0x8000 );
-  max_ = static_cast<double>( hist_end ) - static_cast<double_t>( 0x8000 );
+  max_ = static_cast<double>( hist_end ) - static_cast<double>( 0x8000 );
 
   size_t hist_length = hist_end + 1 - hist_begin;
   if ( hist_length > 0x100 ) hist_length = 0x100;
