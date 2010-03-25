@@ -26,6 +26,7 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#include <Application/Interface/Interface.h>
 #include <Application/State/Actions/ActionScaleView.h>
 #include <Application/State/StateView2D.h>
 #include <Application/State/StateView3D.h>
@@ -33,8 +34,7 @@
 namespace Seg3D
 {
 
-SCI_REGISTER_ACTION(ScaleView)
-;
+SCI_REGISTER_ACTION(ScaleView);
 
 ActionScaleView::ActionScaleView()
 {
@@ -55,29 +55,39 @@ bool ActionScaleView::validate( ActionContextHandle& context )
     }
 
     if ( typeid(*state) != typeid(StateView2D) && typeid(*state) != typeid(StateView3D) )
-      {
-        context->report_error( std::string( "State variable '" ) + stateid_.value()
-            + "' doesn't support ActionScaleView" );
-        return false;
-      }
-
-      this->state_weak_handle_ = boost::dynamic_pointer_cast< StateViewBase >( state );
+    {
+      context->report_error( std::string( "State variable '" ) + stateid_.value()
+          + "' doesn't support ActionScaleView" );
+      return false;
     }
 
+    this->state_weak_handle_ = boost::dynamic_pointer_cast< StateViewBase >( state );
+  }
+
+  return true;
+}
+
+bool ActionScaleView::run( ActionContextHandle& context, ActionResultHandle& result )
+{
+  StateViewBaseHandle state = this->state_weak_handle_.lock();
+
+  if ( state )
+  {
+    state->scale( this->scale_ratio_.value() );
     return true;
   }
 
-  bool ActionScaleView::run( ActionContextHandle& context, ActionResultHandle& result )
-  {
-    StateViewBaseHandle state = this->state_weak_handle_.lock();
+  return false;
+}
 
-    if ( state )
-    {
-      state->scale( this->scale_ratio_.value() );
-      return true;
-    }
+void ActionScaleView::Dispatch( StateViewBaseHandle& view_state, double ratio )
+{
+  ActionScaleView* action = new ActionScaleView;
+  action->stateid_ = view_state->stateid();
+  action->scale_ratio_ = ratio;
+  action->state_weak_handle_ = view_state;
 
-    return false;
-  }
+  Interface::PostAction( ActionHandle( action ) );
+}
 
-  } // end namespace Seg3D
+} // end namespace Seg3D

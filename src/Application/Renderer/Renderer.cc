@@ -256,6 +256,8 @@ void Renderer::redraw()
 
     glDisable( GL_DEPTH_TEST );
     glDisable( GL_CULL_FACE );
+    glEnable( GL_BLEND );
+    glBlendFunc( GL_ONE_MINUS_DST_COLOR, GL_ONE_MINUS_SRC_COLOR );
     glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
     double left, right, top, bottom;

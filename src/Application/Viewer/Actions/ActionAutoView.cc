@@ -26,62 +26,56 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-// STL includes
-
-// Boost includes 
-
-// Application includes
-#include <Application/Viewer/Viewer.h> 
-#include <Application/ViewerManager/ViewerManager.h>
 #include <Application/Interface/Interface.h>
+#include <Application/Viewer/Actions/ActionAutoView.h>
+#include <Application/ViewerManager/ViewerManager.h>
 
 namespace Seg3D
 {
 
-ViewerManager::ViewerManager() :
-  StateHandler( "view" )
-{
-  // Step (1)
-  // Set the default state of this element
-  add_state( "layout", layout_state_, "1and3", "single|1and1|1and2|1and3|2and2|2and3|3and3" );
-  add_state( "active_viewer", active_viewer_state_, 0 );
+SCI_REGISTER_ACTION( AutoView );
 
-  // Step (2)
-  // Create the viewers that are part of the application
-  // Currently a maximum of 6 viewers can be created
-  viewers_.resize( 6 );
-  for ( size_t j = 0; j < viewers_.size(); j++ )
+ActionAutoView::ActionAutoView()
+{
+  add_argument( this->viewer_name_ );
+}
+
+bool ActionAutoView::validate( ActionContextHandle& context )
+{
+  ViewerHandle viewer = this->viewer_weak_handle_.lock();
+  if ( !viewer )
   {
-    std::string key = std::string( "viewer" ) + Utils::to_string( j );
-    viewers_[ j ] = ViewerHandle( new Viewer( key ) );
-  }
-}
-
-ViewerManager::~ViewerManager()
-{
-  disconnect_all();
-}
-
-ViewerHandle ViewerManager::get_viewer( size_t idx )
-{
-  ViewerHandle handle;
-  if ( idx < viewers_.size() ) handle = viewers_[ idx ];
-  return handle;
-}
-
-ViewerHandle ViewerManager::get_viewer( const std::string viewer_name )
-{
-  ViewerHandle handle;
-  for ( size_t i = 0; i < this->viewers_.size(); i++ )
-  {
-    if ( this->viewers_[ i ]->get_stateid() == viewer_name )
+    viewer = ViewerManager::Instance()->get_viewer( this->viewer_name_.value() );
+    if ( !viewer )
     {
-      handle = this->viewers_[ i ];
-      break;
+      context->report_error( std::string( "Viewer '" ) + this->viewer_name_.value()
+        + "' does not exist" );
+      return false;
     }
+    this->viewer_weak_handle_ = viewer;
   }
-  return handle;
+
+  return true;
+}
+
+bool ActionAutoView::run( ActionContextHandle& context, ActionResultHandle& result )
+{
+  ViewerHandle viewer = this->viewer_weak_handle_.lock();
+  if ( viewer )
+  {
+    viewer->auto_view();
+    return true;
+  }
+  return false;
+}
+
+void ActionAutoView::Dispatch(  ViewerHandle& viewer )
+{
+  ActionAutoView* action = new ActionAutoView;
+  action->viewer_name_ = viewer->get_stateid();
+  action->viewer_weak_handle_ = viewer;
+
+  Interface::PostAction( ActionHandle( action ) );
 }
 
 } // end namespace Seg3D
-

@@ -44,7 +44,8 @@ const std::string Viewer::VOLUME_C( "volume" );
 
 Viewer::Viewer( const std::string& key ) :
   StateHandler( key ), 
-  ignore_state_changes_( false )
+  ignore_state_changes_( false ),
+  updating_states_( false )
 {
   add_state( "view_mode", view_mode_state_, AXIAL_C, AXIAL_C + StateOption::SPLITTER_C
       + CORONAL_C + StateOption::SPLITTER_C + SAGITTAL_C + StateOption::SPLITTER_C + VOLUME_C );
@@ -54,8 +55,12 @@ Viewer::Viewer( const std::string& key ) :
   add_state( "sagittal_view", sagittal_view_state_ );
   add_state( "volume_view", volume_view_state_ );
 
+  this->view_states_[ 0 ] = this->axial_view_state_;
+  this->view_states_[ 1 ] = this->coronal_view_state_;
+  this->view_states_[ 2 ] = this->sagittal_view_state_;
+  this->view_states_[ 3 ] = this->volume_view_state_;
+
   add_state( "slice_number", this->slice_number_state_, 0, 0, 0, 1 );
-  this->slice_numbers_[ 0 ] = this->slice_numbers_[ 1 ] = this->slice_numbers_[ 2 ] = 0;
 
   add_state( "slice_lock", slice_lock_state_, true );
   add_state( "slice_grid", slice_grid_state_, true );
@@ -233,57 +238,35 @@ bool Viewer::is_volume_view() const
 
 StateViewBaseHandle Viewer::get_active_view_state()
 {
-  std::string view_mode = this->view_mode_state_->get();
-  if ( view_mode == VOLUME_C )
-  {
-    return this->volume_view_state_;
-  }
-  else if ( view_mode == AXIAL_C )
-  {
-    return this->axial_view_state_;
-  }
-  else if ( view_mode == CORONAL_C )
-  {
-    return this->coronal_view_state_;
-  }
-  else
-  {
-    return this->sagittal_view_state_;
-  }
+  return this->view_states_[ this->view_mode_state_->index() ];
 }
 
 void Viewer::insert_layer( LayerHandle layer )
 {
   lock_type lock( this->layer_map_mutex_ );
 
-  bool first_layer = false;
+  Utils::VolumeSliceHandle volume_slice;
 
   Utils::VolumeSliceType slice_type( Utils::VolumeSliceType::AXIAL_E );
-  size_t slice_number = static_cast< size_t >( this->slice_numbers_[ 0 ] );
   if ( this->view_mode_state_->get() == CORONAL_C )
   {
     slice_type = Utils::VolumeSliceType::CORONAL_E;
-    slice_number = static_cast< size_t >( this->slice_numbers_[ 1 ] );
   }
   else if ( this->view_mode_state_->get() == SAGITTAL_C )
   {
     slice_type = Utils::VolumeSliceType::SAGITTAL_E;
-    slice_number = static_cast< size_t >( this->slice_numbers_[ 2 ] );
   }
 
   switch( layer->type() )
   {
   case Utils::VolumeType::DATA_E:
     {
-      if ( this->data_slices_.empty() )
-      {
-        first_layer = true;
-      }
       DataLayer* data_layer = dynamic_cast< DataLayer* >( layer.get() );
       Utils::DataVolumeHandle data_volume = data_layer->get_data_volume();
       Utils::DataVolumeSliceHandle data_volume_slice( 
-        new Utils::DataVolumeSlice( data_volume, slice_type, slice_number ) );
+        new Utils::DataVolumeSlice( data_volume, slice_type ) );
       this->data_slices_[ layer->get_layer_id() ] = data_volume_slice;
+      volume_slice = data_volume_slice;
     }
     break;
   case Utils::VolumeType::MASK_E:
@@ -291,8 +274,9 @@ void Viewer::insert_layer( LayerHandle layer )
       MaskLayer* mask_layer = dynamic_cast< MaskLayer* >( layer.get() );
       Utils::MaskVolumeHandle mask_volume = mask_layer->get_mask_volume();
       Utils::MaskVolumeSliceHandle mask_volume_slice(
-        new Utils::MaskVolumeSlice( mask_volume, slice_type, slice_number ) );
+        new Utils::MaskVolumeSlice( mask_volume, slice_type ) );
       this->mask_slices_[ layer->get_layer_id() ] = mask_volume_slice;
+      volume_slice = mask_volume_slice;
     }
     break;
   default:
@@ -300,17 +284,21 @@ void Viewer::insert_layer( LayerHandle layer )
     assert( false );
   }
 
-  lock.unlock();
-
-  if ( first_layer )
+  // Auto adjust the view and depth if it is the first layer inserted
+  if ( ( this->data_slices_.size() + this->mask_slices_.size() ) == 1 )
   {
+    this->push_ignoring_status();
     this->ignore_state_changes_ = true;
     this->adjust_view();
-    // TODO: remove the following line. Hardcoded for testing.
-    this->set_active_layer( layer );
-    this->ignore_state_changes_ = false;
+    this->adjust_depth();
+    this->pop_ignoring_status();
+  }
+  else
+  {
+    volume_slice->move_slice( this->active_layer_slice_->depth() );
   }
 
+  lock.unlock();
   this->redraw_signal_();
 }
 
@@ -359,7 +347,8 @@ void Viewer::set_active_layer( LayerHandle layer )
     }
     else
     {
-      assert( false );
+      SCI_THROW_LOGICERROR( std::string("Active layer '") 
+        + layer->get_layer_id() + "' could not be found" );
     }
   }
 
@@ -367,6 +356,7 @@ void Viewer::set_active_layer( LayerHandle layer )
   if ( this->active_layer_slice_ && !this->is_volume_view() )
   {
     // Disable redraws triggered by StateBase::state_changed_signal_
+    this->push_ignoring_status();
     this->ignore_state_changes_ = true;
 
     // NOTE: The following state changes are due to internal program logic, 
@@ -376,22 +366,21 @@ void Viewer::set_active_layer( LayerHandle layer )
     this->slice_number_state_->set_range(
       0, static_cast< int >( this->active_layer_slice_->number_of_slices() - 1 ) );
     this->updating_states_ = false;
-    const std::string& view_mode = this->view_mode_state_->get();
-    if ( view_mode == AXIAL_C )
+
+    StateView2D* view2d_state = dynamic_cast< StateView2D* >( this->get_active_view_state().get() );
+    this->active_layer_slice_->move_slice( view2d_state->get().center().z(), true );
+    if ( this->slice_number_state_->get() == this->active_layer_slice_->get_slice_number() )
     {
-      this->slice_number_state_->set( this->slice_numbers_[ 0 ] );
-    }
-    else if ( view_mode == CORONAL_C )
-    {
-      this->slice_number_state_->set( this->slice_numbers_[ 1 ] );
+      this->set_slice_number( static_cast< int >( this->active_layer_slice_->get_slice_number() ) );
     }
     else
     {
-      this->slice_number_state_->set( this->slice_numbers_[ 2 ] );
+      this->slice_number_state_->set( static_cast< int >( 
+        this->active_layer_slice_->get_slice_number() ) );
     }
 
     // Enable redraws
-    this->ignore_state_changes_ = false;
+    this->pop_ignoring_status();
     this->redraw_signal_();
   }
 }
@@ -460,13 +449,27 @@ void Viewer::change_view_mode( std::string mode, ActionSource source )
     // NOTE: The following state changes are due to internal program logic, 
     // so they should not go through the action mechanism.
 
+    this->push_ignoring_status();
     this->ignore_state_changes_ = true;
     this->updating_states_ = true;
     this->slice_number_state_->set_range(
       0, static_cast< int >( this->active_layer_slice_->number_of_slices() - 1 ) );
     this->updating_states_ = false;
-    this->slice_number_state_->set( this->slice_numbers_[ slice_type ] );
-    this->ignore_state_changes_ = false;
+
+    StateView2D* view2d_state = dynamic_cast< StateView2D* >( this->get_active_view_state().get() );
+    this->active_layer_slice_->move_slice( view2d_state->get().center().z(), true );
+    // Enforce an update even if the slice number is the same
+    if ( this->slice_number_state_->get() == this->active_layer_slice_->get_slice_number() )
+    {
+      this->set_slice_number( static_cast< int >( this->active_layer_slice_->get_slice_number() ) );
+    }
+    else
+    {
+      this->slice_number_state_->set( static_cast< int >( 
+        this->active_layer_slice_->get_slice_number() ) );
+    }
+
+    this->pop_ignoring_status();
   }
 }
 
@@ -478,25 +481,15 @@ void Viewer::set_slice_number( int num, ActionSource source )
     return;
   }
 
-  // Update the cached slice number
-  if ( view_mode == AXIAL_C )
-  {
-    this->slice_numbers_[ 0 ] = num;
-  }
-  else if ( view_mode == CORONAL_C )
-  {
-    this->slice_numbers_[ 1 ] = num;
-  }
-  else
-  {
-    this->slice_numbers_[ 2 ] = num;
-  }
-
   this->active_layer_slice_->set_slice_number( num );
-  // Get the world coordinate of the slice in the active layer
-  Utils::Point slice_pos;
-  this->active_layer_slice_->to_index( 0, 0, slice_pos );
-  slice_pos = this->active_layer_slice_->apply_grid_transform( slice_pos );
+  this->push_ignoring_status();
+  this->ignore_state_changes_ = true;
+
+  // Update the depth info
+  StateView2D* view2d_state = dynamic_cast< StateView2D* >( this->get_active_view_state().get() );
+  Utils::View2D view2d( view2d_state->get() );
+  view2d.center().z( this->active_layer_slice_->depth() );
+  view2d_state->set( view2d ) ;
 
   // Move other layer slices to the new position
   mask_slices_map_type::iterator mask_slice_it = this->mask_slices_.begin();
@@ -504,45 +497,126 @@ void Viewer::set_slice_number( int num, ActionSource source )
   {
     if ( ( *mask_slice_it ).second == this->active_layer_slice_ )
       continue;
-    ( *mask_slice_it ).second->move_slice( slice_pos );
+    ( *mask_slice_it ).second->move_slice( this->active_layer_slice_->depth() );
   }
   data_slices_map_type::iterator data_slice_it = this->data_slices_.begin();
   for ( ; data_slice_it != this->data_slices_.end(); data_slice_it++ )
   {
     if ( ( *data_slice_it ).second == this->active_layer_slice_ )
       continue;
-    ( *data_slice_it ).second->move_slice( slice_pos );
+    ( *data_slice_it ).second->move_slice( this->active_layer_slice_->depth() );
   }
+
+  this->pop_ignoring_status();
 }
 
 void Viewer::adjust_view()
 {
-  Utils::DataVolumeSliceHandle volume_slice = Utils::DataVolumeSliceHandle( 
-    new Utils::DataVolumeSlice( *( *this->data_slices_.begin() ).second ) );
+  Utils::VolumeSliceHandle volume_slice;
+  if ( this->active_layer_slice_ )
+  {
+    if ( this->active_layer_slice_->volume_type() == Utils::VolumeType::DATA_E )
+    {
+      volume_slice = Utils::VolumeSliceHandle( new Utils::DataVolumeSlice( 
+        *dynamic_cast< Utils::DataVolumeSlice* >( this->active_layer_slice_.get() ) ) );
+    }
+    else
+    {
+      volume_slice = Utils::VolumeSliceHandle( new Utils::MaskVolumeSlice( 
+        *dynamic_cast< Utils::MaskVolumeSlice* >( this->active_layer_slice_.get() ) ) );
+    }
+  }
+  else if ( !this->data_slices_.empty() )
+  {
+    volume_slice = Utils::DataVolumeSliceHandle( 
+      new Utils::DataVolumeSlice( *( *this->data_slices_.begin() ).second ) );
+  }
+  else
+  {
+    return;
+  }
 
+  double aspect = this->width_ * 1.0 / this->height_;
   double scale;
   Utils::Point center;
 
   volume_slice->set_slice_type( Utils::VolumeSliceType::AXIAL_E );
   center = Utils::Point( ( volume_slice->left() + volume_slice->right() ) * 0.5, 
-    ( volume_slice->bottom() + volume_slice->top() ) * 0.5, 0.0 );
-  scale = 1.0 / Utils::Abs( volume_slice->top() - volume_slice->bottom() );
+                  ( volume_slice->bottom() + volume_slice->top() ) * 0.5, 
+                  this->axial_view_state_->get().center().z() );
+  scale = 1.0 / Utils::Max( Utils::Abs( volume_slice->top() - volume_slice->bottom() ),
+    Utils::Abs( volume_slice->right() - volume_slice->left() ) / aspect );;
   this->axial_view_state_->set( Utils::View2D( center, scale ) );
-  this->slice_numbers_[ 0 ] = static_cast< int >( volume_slice->number_of_slices() / 2 );
 
   volume_slice->set_slice_type( Utils::VolumeSliceType::CORONAL_E );
   center = Utils::Point( ( volume_slice->left() + volume_slice->right() ) * 0.5, 
-    ( volume_slice->bottom() + volume_slice->top() ) * 0.5, 0.0 );
-  scale = 1.0 / Utils::Abs( volume_slice->top() - volume_slice->bottom() );
+                  ( volume_slice->bottom() + volume_slice->top() ) * 0.5, 
+                  this->coronal_view_state_->get().center().z() );
+  scale = 1.0 / Utils::Max( Utils::Abs( volume_slice->top() - volume_slice->bottom() ),
+    Utils::Abs( volume_slice->right() - volume_slice->left() ) / aspect );;
   this->coronal_view_state_->set( Utils::View2D( center, scale ) );
-  this->slice_numbers_[ 1 ] = static_cast< int >( volume_slice->number_of_slices() / 2 );
 
   volume_slice->set_slice_type( Utils::VolumeSliceType::SAGITTAL_E );
   center = Utils::Point( ( volume_slice->left() + volume_slice->right() ) * 0.5, 
-    ( volume_slice->bottom() + volume_slice->top() ) * 0.5, 0.0 );
-  scale = 1.0 / Utils::Abs( volume_slice->top() - volume_slice->bottom() );
+                  ( volume_slice->bottom() + volume_slice->top() ) * 0.5, 
+                  this->sagittal_view_state_->get().center().z() );
+  scale = 1.0 / Utils::Max( Utils::Abs( volume_slice->top() - volume_slice->bottom() ),
+    Utils::Abs( volume_slice->right() - volume_slice->left() ) / aspect );;
   this->sagittal_view_state_->set( Utils::View2D( center, scale ) );
-  this->slice_numbers_[ 2 ] = static_cast< int >( volume_slice->number_of_slices() / 2 );
+}
+
+void Viewer::adjust_depth()
+{
+  Utils::VolumeSliceHandle volume_slice;
+  if ( this->active_layer_slice_ )
+  {
+    if ( this->active_layer_slice_->volume_type() == Utils::VolumeType::DATA_E )
+    {
+      volume_slice = Utils::VolumeSliceHandle( new Utils::DataVolumeSlice( 
+        *dynamic_cast< Utils::DataVolumeSlice* >( this->active_layer_slice_.get() ) ) );
+    }
+    else
+    {
+      volume_slice = Utils::VolumeSliceHandle( new Utils::MaskVolumeSlice( 
+        *dynamic_cast< Utils::MaskVolumeSlice* >( this->active_layer_slice_.get() ) ) );
+    }
+  }
+  else if ( !this->data_slices_.empty() )
+  {
+    volume_slice = Utils::DataVolumeSliceHandle( 
+      new Utils::DataVolumeSlice( *( *this->data_slices_.begin() ).second ) );
+  }
+  else
+  {
+    return;
+  }
+
+  volume_slice->set_slice_type( Utils::VolumeSliceType::AXIAL_E );
+  volume_slice->set_slice_number( volume_slice->number_of_slices() / 2 );
+  Utils::View2D view2d( this->axial_view_state_->get() );
+  view2d.center().z( volume_slice->depth() );
+  this->axial_view_state_->set( view2d );
+
+  volume_slice->set_slice_type( Utils::VolumeSliceType::CORONAL_E );
+  volume_slice->set_slice_number( volume_slice->number_of_slices() / 2 );
+  view2d = this->coronal_view_state_->get();
+  view2d.center().z( volume_slice->depth() );
+  this->coronal_view_state_->set( view2d );
+
+  volume_slice->set_slice_type( Utils::VolumeSliceType::SAGITTAL_E );
+  volume_slice->set_slice_number( volume_slice->number_of_slices() / 2 );
+  view2d = this->sagittal_view_state_->get();
+  view2d.center().z( volume_slice->depth() );
+  this->sagittal_view_state_->set( view2d );
+}
+
+void Viewer::auto_view()
+{
+  this->push_ignoring_status();
+  this->ignore_state_changes_ = true;
+  this->adjust_view();
+  this->pop_ignoring_status();
+  this->redraw_signal_();
 }
 
 } // end namespace Seg3D

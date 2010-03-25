@@ -30,7 +30,6 @@
 #define APPLICATION_STATE_ACTIONS_ACTIONSCALEVIEW_H
 
 #include <Application/Action/Action.h>
-#include <Application/Interface/Interface.h>
 #include <Application/State/StateViewBase.h>
 
 namespace Seg3D
@@ -57,20 +56,8 @@ private:
   StateViewBaseWeakHandle state_weak_handle_;
 
 public:
-  template< class VIEWSTATEHANDLE >
-  static void Dispatch( VIEWSTATEHANDLE& view_state, double ratio );
+  static void Dispatch( StateViewBaseHandle& view_state, double ratio );
 };
-
-template< class VIEWSTATEHANDLE >
-void ActionScaleView::Dispatch( VIEWSTATEHANDLE& view_state, double ratio )
-{
-  ActionScaleView* action = new ActionScaleView;
-  action->stateid_ = view_state->stateid();
-  action->scale_ratio_ = ratio;
-  action->state_weak_handle_ = view_state;
-
-  Interface::PostAction( ActionHandle( action ) );
-}
 
 } // end namespace Seg3D
 

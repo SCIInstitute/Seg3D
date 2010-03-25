@@ -41,6 +41,8 @@ SET(APPLICATION_VIEW_SRCS
   )
 
 SET(APPLICATION_VIEW_ACTIONS_SRCS
+  Actions/ActionAutoView.h
+  Actions/ActionAutoView.cc
   )
 
 ADD_LIBRARY(Application_Viewer STATIC 

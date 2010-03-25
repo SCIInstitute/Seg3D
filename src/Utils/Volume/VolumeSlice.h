@@ -99,17 +99,23 @@ public:
   void world_to_index( double i_pos, double j_pos, int& i, int& j ) const;
 
   // Move the slice to closely match the given point in world space.
-  // Returns true is slice is moved, otherwise false.
-  bool move_slice( const Point& pos );
+  // Returns true if slice is moved, otherwise false.
+  void move_slice( const Point& pos, bool fail_safe = false );
+
+  // Move the slice to the specified depth in world space.
+  // Returns true if the slice is moved successfully, otherwise false.
+  void move_slice( double depth, bool fail_safe = false );
 
   inline size_t nx() const { return this->nx_; }
   inline size_t ny() const { return this->ny_; }
   inline size_t number_of_slices() const { return this->number_of_slices_; }
+  inline bool out_of_boundary() const { return this->out_of_bound_; }
 
   inline double left() const { return this->left_; }
   inline double right() const { return this->right_; }
   inline double bottom() const { return this->bottom_; }
   inline double top() const { return this->top_; }
+  inline double depth() const { return this->depth_; }
 
   inline const Point& bottom_left() const { return this->bottom_left_; }
   inline const Point& bottom_right() const { return this->bottom_right_; }
@@ -160,11 +166,13 @@ protected:
   size_t nx_;
   size_t ny_;
   size_t number_of_slices_;
+  bool out_of_bound_;
 
   double left_;
   double right_;
   double bottom_;
   double top_;
+  double depth_;
   Point bottom_left_;
   Point bottom_right_;
   Point top_left_;

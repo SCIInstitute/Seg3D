@@ -26,62 +26,35 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_VIEWER_VIEWERMANAGER_H
-#define APPLICATION_VIEWER_VIEWERMANAGER_H 1
+#ifndef APPLICATION_VIEWER_ACTIONS_ACTIONAUTO_VIEW_H
+#define APPLICATION_VIEWER_ACTIONS_ACTIONAUTO_VIEW_H
 
-//#ifdef (_MSC_VER) && (_MSC_VER >= 1020)
-//# pragma once
-//#endif
-
-// STL includes
-#include <string>
-#include <vector>
-
-// Boost includes 
-#include <boost/unordered_map.hpp>
-#include <boost/signals2.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/utility.hpp>
-#include <boost/thread/mutex.hpp>
-
-// Application includes
-#include <Utils/Singleton/Singleton.h>
+#include <Application/Action/Action.h>
 #include <Application/Viewer/Viewer.h>
-#include <Application/State/State.h>
 
 namespace Seg3D
 {
 
-// Forward declarations
-class ViewerManager;
-
-// typedefs
-class ViewerManager : public StateHandler, public Utils::Singleton< ViewerManager >
+class ActionAutoView : public Action
 {
 
-  // -- Constructor/Destructor --
-private:
-  friend class Utils::Singleton< ViewerManager >;
-  ViewerManager();
-  virtual ~ViewerManager();
-
-  // -- Getting information from manager --
+SCI_ACTION_TYPE("AutoView", "AutoView <viewer_id>", ActionPropertiesType::APPLICATION_E)
 
 public:
-  ViewerHandle get_viewer( size_t idx );
-  ViewerHandle get_viewer( const std::string viewer_name );
+  ActionAutoView();
+  virtual ~ActionAutoView() {}
 
-  // -- State information --
-public:
-  StateOptionHandle layout_state_;
-  StateIntHandle active_viewer_state_;
+  virtual bool validate( ActionContextHandle& context );
+  virtual bool run( ActionContextHandle& context, ActionResultHandle& result );
 
-  // -- Viewer information --
 private:
+  ActionParameter< std::string > viewer_name_;
 
-  std::vector< ViewerHandle > viewers_;
+  ViewerWeakHandle viewer_weak_handle_;
 
-}; // class ViewerManager
+public:
+  static void Dispatch( ViewerHandle& viewer );
+};
 
 } // end namespace Seg3D
 

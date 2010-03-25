@@ -171,7 +171,7 @@ protected:
     // default function is to do nothing
   }
 
-  std::string stateid() const
+  const std::string& stateid() const
   {
     return ( stateid_prefix_ );
   }

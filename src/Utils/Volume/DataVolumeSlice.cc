@@ -60,6 +60,11 @@ DataVolumeSlice::DataVolumeSlice( const DataVolumeSlice &copy ) :
 {
 }
 
+DataVolumeSlice::~DataVolumeSlice()
+{
+  this->disconnect_all();
+}
+
 void DataVolumeSlice::initialize_texture()
 {
   if ( !this->texture_ )

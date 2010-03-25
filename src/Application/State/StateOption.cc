@@ -88,15 +88,16 @@ bool StateOption::set( const std::string& input_value, ActionSource source )
   StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
 
   std::string value = Utils::string_to_lower( input_value );
-  if ( value != value_ )
+  if ( value != this->value_ )
   {
     option_list_iterator_type it = 
-      std::find( this->option_list_.begin(), this->option_list_.end(), this->value_ );
+      std::find( this->option_list_.begin(), this->option_list_.end(), value );
 
-    if ( option_list_.end() == it )
+    if ( this->option_list_.end() == it )
     {
       if ( source == ActionSource::INTERFACE_E )
       {
+        lock.unlock();
         // NOTE: This is a special case in which the option requested by the
         // interface does not exist and hence the value may be out of sync and
         // hence needs to be set to the correct value. Hence we generate the
@@ -104,16 +105,17 @@ bool StateOption::set( const std::string& input_value, ActionSource source )
 
         // Any other sources are fine as they do not reflect a different value
         // and are validated before the code can reach this point.
-        value_changed_signal_( value_, source );
-        state_changed_signal_();
+        this->value_changed_signal_( value_, source );
+        this->state_changed_signal_();
       }
       return ( false );
     }
-    value_ = value;
+    this->value_ = value;
     this->index_ = static_cast<int>( it - this->option_list_.begin() );
 
-    value_changed_signal_( value_, source );
-    state_changed_signal_();
+    lock.unlock();
+    this->value_changed_signal_( value_, source );
+    this->state_changed_signal_();
   }
   return ( true );
 }

@@ -45,7 +45,7 @@ public:
   DataVolumeSlice( const DataVolumeHandle& data_volume, 
     VolumeSliceType type = VolumeSliceType::AXIAL_E, size_t slice_num = 0 );
   DataVolumeSlice( const DataVolumeSlice& copy );
-  virtual ~DataVolumeSlice() {}
+  virtual ~DataVolumeSlice();
 
   inline double get_data_at ( size_t i, size_t j ) const
   {

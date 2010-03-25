@@ -63,13 +63,14 @@ public:
   bool operator==( const View2D& ) const;
   bool operator!=( const View2D& ) const;
 
-  inline Point center() const
+  inline const Point& center() const
   {
-    return center_;
+    return this->center_;
   }
-  inline void center( const Point& center )
+
+  inline Point& center()
   {
-    center_ = center;
+    return this->center_;
   }
 
   inline double scalex() const

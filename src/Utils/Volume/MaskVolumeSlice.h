@@ -45,7 +45,7 @@ public:
   MaskVolumeSlice( const MaskVolumeHandle& mask_volume, 
     VolumeSliceType type = VolumeSliceType::AXIAL_E, size_t slice_num = 0 );
   MaskVolumeSlice( const MaskVolumeSlice& copy );
-  virtual ~MaskVolumeSlice() {}
+  virtual ~MaskVolumeSlice();
 
   inline bool get_mask_at( size_t i, size_t j ) const
   {

@@ -38,7 +38,7 @@
 #include <vector>
 
 // Boost includes 
-#include <boost/shared_ptr.hpp>
+#include <boost/smart_ptr.hpp>
 #include <boost/function.hpp>
 #include <boost/thread.hpp>
 
@@ -104,6 +104,7 @@ public:
 class ViewManipulator;
 class Viewer;
 typedef boost::shared_ptr< Viewer > ViewerHandle;
+typedef boost::weak_ptr< Viewer > ViewerWeakHandle;
 
 // Class definition
 class Viewer : public StateHandler
@@ -156,7 +157,7 @@ public:
 
 private:
   void change_view_mode( std::string mode, ActionSource source );
-  void set_slice_number( int num, ActionSource source );
+  void set_slice_number( int num, ActionSource source = ActionSource::NONE_E );
 
   // -- Data structures for keeping track of slices of layers --
 private:
@@ -170,9 +171,6 @@ private:
   void insert_layer( LayerHandle layer );
   void delete_layer( LayerHandle layer );
   void set_active_layer( LayerHandle layer );
-
-  // Adjust the view states when the first data layer is loaded
-  void adjust_view();
 
 public:
   Utils::MaskVolumeSliceHandle get_mask_volume_slice( const std::string& layer_id );
@@ -192,13 +190,40 @@ private:
   mutex_type layer_map_mutex_;
 
   // -- Other functions and variables --
+public:
+  // Auto adjust the view for the active layer
+  void auto_view();
+
+  // Get the stateid prefix of the viewer
+  const std::string& get_stateid() const
+  {
+    return this->stateid();
+  }
+
 private:
-  void update_slice_number_state();
+  
+  // Auto adjust the view states so the slices are fully visible
+  void adjust_view();
+
+  // Move the active slices to the center of the volume
+  void adjust_depth();
+
+  void push_ignoring_status() 
+  { 
+    this->ignoring_status_stack_.push_back( this->ignore_state_changes_ ); 
+  }
+
+  void pop_ignoring_status()
+  {
+    this->ignore_state_changes_ = this->ignoring_status_stack_.back();
+    this->ignoring_status_stack_.pop_back();
+  }
 
 private:
   int width_;
   int height_;
   bool ignore_state_changes_;
+  std::vector< bool > ignoring_status_stack_;
   bool updating_states_; // Indicates if it's in the middle of state changes
 
   // -- State information --
@@ -223,7 +248,8 @@ public:
   StateBoolHandle volume_volume_rendering_visible_state_;
 
 private:
-  int slice_numbers_[ 3 ]; // Cached slice numbers for the three slicing direction
+  // Indexed view state variables for quick access
+  StateViewBaseHandle view_states_[ 4 ];
 
 public:
   const static std::string AXIAL_C;

@@ -46,6 +46,11 @@ MaskVolumeSlice::MaskVolumeSlice( const MaskVolumeSlice& copy ) :
 {
 }
 
+MaskVolumeSlice::~MaskVolumeSlice()
+{
+  this->disconnect_all();
+}
+
 void MaskVolumeSlice::initialize_texture()
 {
   if ( !this->texture_ )

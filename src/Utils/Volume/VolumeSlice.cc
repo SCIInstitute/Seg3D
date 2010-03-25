@@ -38,7 +38,8 @@ VolumeSlice::VolumeSlice( const VolumeHandle& volume,
   size_changed_( true ),
   volume_( volume ), 
   slice_type_( type ), 
-  slice_number_ ( slice_num )
+  slice_number_ ( slice_num ),
+  out_of_bound_( false )
 {
   this->update_position();
   this->slice_number_ = Min( this->slice_number_, this->number_of_slices_ - 1 );
@@ -50,6 +51,7 @@ VolumeSlice::VolumeSlice( const VolumeSlice& copy ) :
   nx_( copy.nx_ ),
   ny_( copy.ny_ ),
   number_of_slices_( copy.number_of_slices_ ),
+  out_of_bound_( copy.out_of_bound_ ),
   left_( copy.left_ ), right_( copy.right_ ), 
   bottom_( copy.bottom_ ), top_( copy.top_ ),
   bottom_left_( copy.bottom_left_ ),
@@ -76,18 +78,20 @@ void VolumeSlice::set_slice_type( VolumeSliceType type )
     this->size_changed_ = true;
     this->slice_type_ = type;
 
-    this->update_position();
     this->slice_number_ = Min( this->slice_number_, this->number_of_slices_ - 1 );
+    this->update_position();
   }
 }
 
 void VolumeSlice::set_slice_number( size_t slice_num )
 {
   slice_num = Min( slice_num, this->number_of_slices_ - 1 );
+  this->out_of_bound_ = false;
   if ( this->slice_number_ != slice_num )
   {
     this->slice_number_ = slice_num;
     this->slice_changed_ = true;
+    this->update_position();
   }
 }
 
@@ -113,6 +117,7 @@ void VolumeSlice::update_position()
     this->right_ = this->top_right_.x();
     this->bottom_ = this->bottom_left_.y();
     this->top_ = this->top_right_.y();
+    this->depth_ = this->bottom_left_.z();
     break;
   case VolumeSliceType::CORONAL_E:
     this->nx_ = this->volume_->nz();
@@ -130,6 +135,7 @@ void VolumeSlice::update_position()
     this->right_ = this->top_right_.z();
     this->bottom_ = this->bottom_left_.x();
     this->top_ = this->top_right_.x();
+    this->depth_ = this->bottom_left_.y();
     break;
   case VolumeSliceType::SAGITTAL_E:
     this->nx_ = this->volume_->ny();
@@ -147,6 +153,7 @@ void VolumeSlice::update_position()
     this->right_ = this->top_right_.y();
     this->bottom_ = this->bottom_left_.z();
     this->top_ = this->top_right_.z();
+    this->depth_ = this->bottom_left_.x();
     break;
   default:
     assert( false );
@@ -214,7 +221,7 @@ void VolumeSlice::world_to_index( double x_pos, double y_pos, int& i, int& j ) c
   }
 }
 
-bool VolumeSlice::move_slice( const Point& pos )
+void VolumeSlice::move_slice( const Point& pos, bool fail_safe )
 {
   Point index = this->volume_->apply_inverse_grid_transform( pos );
   int slice_num = -1;
@@ -231,13 +238,36 @@ bool VolumeSlice::move_slice( const Point& pos )
     break;
   }
 
-  if ( slice_num >= 0 && slice_num < static_cast<int>( this->number_of_slices_ ) )
+  if ( ( slice_num < 0 || slice_num >= static_cast< int >( this->number_of_slices_ ) ) && 
+     !fail_safe )
   {
-    this->set_slice_number( slice_num );
-    return true;
+    this->out_of_bound_ = true;
+    return;
   }
 
-  return false;
+  slice_num = Max( 0, slice_num );
+  slice_num = Min( slice_num, static_cast< int >( this->number_of_slices_ - 1 ) );
+
+  this->set_slice_number( static_cast< size_t >( slice_num ) );
+}
+
+void VolumeSlice::move_slice( double depth, bool fail_safe )
+{
+  Point index;
+  switch ( this->slice_type_ )
+  {
+  case VolumeSliceType::AXIAL_E:
+    index = Point( 0, 0, depth );
+    break;
+  case VolumeSliceType::CORONAL_E:
+    index = Point( 0, depth, 0 );
+    break;
+  case VolumeSliceType::SAGITTAL_E:
+    index = Point( depth, 0, 0 );
+    break;
+  }
+
+  this->move_slice( index, fail_safe );
 }
 
 } // end namespace Utils

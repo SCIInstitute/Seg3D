@@ -130,7 +130,7 @@ Transform NrrdData::get_transform() const
     v0.find_orthogonal( v1, v2 );
 
     transform.load_basis( Point( rmin[ 0 ], 0.0, 0.0 ), v0, v1, v2 );
-    transform.post_scale( Vector( 1.0 / static_cast< double > ( rsize[ 0 ] ), 1.0, 1.0 ) );
+    transform.post_scale( Vector( 1.0 / static_cast< double > ( rsize[ 0 ] - 1 ), 1.0, 1.0 ) );
   }
   else if ( rdim == 2 )
   {
@@ -141,8 +141,8 @@ Transform NrrdData::get_transform() const
     v2.normalize();
 
     transform.load_basis( Point( rmin[ 0 ], rmin[ 1 ], 0.0 ), v0, v1, v2 );
-    transform.post_scale( Vector( 1.0 / static_cast< double > ( rsize[ 0 ] ), 1.0
-        / static_cast< double > ( rsize[ 1 ] ), 1.0 ) );
+    transform.post_scale( Vector( 1.0 / static_cast< double > ( rsize[ 0 ] - 1 ), 1.0
+        / static_cast< double > ( rsize[ 1 ] - 1 ), 1.0 ) );
   }
   else if ( rdim > 2 )
   {
@@ -152,8 +152,8 @@ Transform NrrdData::get_transform() const
     v2 = Point( 0.0, 0.0, rmax[ 2 ] ) - Point( 0.0, 0.0, rmin[ 2 ] );
 
     transform.load_basis( Point( rmin[ 0 ], rmin[ 1 ], rmin[ 2 ] ), v0, v1, v2 );
-    transform.post_scale( Vector( 1.0 / static_cast< double > ( rsize[ 0 ] ), 1.0
-        / static_cast< double > ( rsize[ 1 ] ), 1.0 / static_cast< double > ( rsize[ 2 ] ) ) );
+    transform.post_scale( Vector( 1.0 / static_cast< double > ( rsize[ 0 ] - 1 ), 1.0
+        / static_cast< double > ( rsize[ 1 ] - 1 ), 1.0 / static_cast< double > ( rsize[ 2 ] - 1 ) ) );
   }
 
   if ( nrrd_->spaceDim > 0 )

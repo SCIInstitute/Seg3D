@@ -70,6 +70,7 @@ public Q_SLOTS:
   void change_view_type( QAction* );
   void flip_view_horiz( bool );
   void flip_view_vert( bool );
+  void auto_view( bool );
 
 private:
   // Internals of the viewer widget, so most dependencies do not need to

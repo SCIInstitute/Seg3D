@@ -30,6 +30,7 @@
 #include <Utils/Core/Log.h>
 
 #include <Application/State/Actions/ActionFlip.h>
+#include <Application/Viewer/Actions/ActionAutoView.h>
 #include <Application/ViewerManager/ViewerManager.h>
 
 // Qt Interface support classes
@@ -385,6 +386,8 @@ ViewerWidget::ViewerWidget( int viewer_id, QWidget *parent ) :
     SLOT( flip_view_horiz( bool ) ) );
   this->connect( this->private_->flip_vert_, SIGNAL( triggered( bool ) ),
     SLOT( flip_view_vert( bool ) ) );
+  this->connect( this->private_->auto_view_, SIGNAL( triggered( bool ) ),
+    SLOT( auto_view( bool ) ) );
 }
 
 ViewerWidget::~ViewerWidget()
@@ -445,6 +448,12 @@ void ViewerWidget::flip_view_vert( bool flip )
       boost::dynamic_pointer_cast<StateView2D>( viewer->get_active_view_state() );
     ActionFlip::Dispatch( view2d_state, Utils::FlipDirectionType::VERTICAL_E );
   }
+}
+
+void ViewerWidget::auto_view( bool /* checked*/)
+{
+  ViewerHandle viewer = ViewerManager::Instance()->get_viewer( this->viewer_id_ );
+  ActionAutoView::Dispatch( viewer );
 }
 
 } // end namespace Seg3D
