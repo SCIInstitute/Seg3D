@@ -131,9 +131,8 @@ std::string ExportToString( DataType data_type )
 bool IsInteger( const DataType& data_type )
 {
   return ( data_type == DataType::CHAR_E || data_type == DataType::UCHAR_E ||
-    data_type == DataType::SHORT_E || data_type == DataType::USHORT_E ||
-    data_type == DataType::INT_E || data_type == DataType::UINT_E ||
-    data_type == DataType::LONGLONG_E || data_type == DataType::ULONGLONG_E );
+      data_type == DataType::SHORT_E || data_type == DataType::USHORT_E ||
+      data_type == DataType::INT_E || data_type == DataType::UINT_E );
 }
 
 bool IsReal( const DataType& data_type )

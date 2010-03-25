@@ -34,15 +34,15 @@
 #endif 
 
 // Boost includes
-#include <boost/function.hpp>
 #include <boost/signals2/signal.hpp>
 #include <boost/smart_ptr.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/recursive_mutex.hpp>
-#include <boost/thread/thread.hpp>
 #include <boost/utility.hpp>
 
 #include <Utils/DataBlock/DataType.h>
+#include <Utils/DataBlock/Histogram.h>
+
 
 namespace Utils
 {
@@ -97,6 +97,8 @@ public:
     return nx_ * ny_ * nz_;
   }
 
+  // TO_INDEX:
+  // Compute the real index based on the coordinates in index space
   inline size_t to_index( size_t x, size_t y, size_t z ) const
   {
     assert( x < this->nx_ && y < this->ny_ && z < this->nz_ );
@@ -107,14 +109,14 @@ public:
   // The type of the data
   DataType type() const
   {
-    return data_type_;
+    return this->data_type_;
   }
 
   // DATA:
   // Pointer to the block of data
   void* data()
   {
-    return data_;
+    return this->data_;
   }
 
   inline float* float_data()
@@ -135,25 +137,36 @@ public:
     return 0;
   }
 
-  double get_data_at( size_t x, size_t y, size_t z ) const
+  inline double get_data_at( size_t x, size_t y, size_t z ) const
   {
-    return this->get_data_at( this->to_index( x, y, z ) );
+    return get_data_at( this->to_index( x, y, z ) );
+  }
+  
+  double get_data_at( size_t index ) const;
+  
+  inline void set_data_at( size_t x, size_t y, size_t z, double value )
+  {
+    set_data_at( this->to_index( x, y, z ), value );
   }
 
-  double get_data_at( size_t index ) const
+  void set_data_at( size_t index, double value );
+
+  inline double get_max() const
   {
-    return this->get_data_func_( index );
+    return this->histogram_.get_max();
   }
 
-  void set_data_at( size_t x, size_t y, size_t z, double value )
+  inline double get_min() const
   {
-    this->set_data_at( this->to_index( x, y, z ), value );
+    return this->histogram_.get_min();
   }
 
-  void set_data_at( size_t index, double value )
+  Histogram get_histogram() const
   {
-    this->set_data_func_( index, value );
+    return this->histogram_;
   }
+
+  void update_histogram();
 
   // -- Pointer to where the data is stored
 protected:
@@ -181,7 +194,7 @@ protected:
   // Set the data pointer of the data
   void set_data( void* data )
   {
-    data_ = data;
+    this->data_ = data;
   }
 
   // -- Locking of the datablock --
@@ -191,7 +204,7 @@ public:
   // Get the mutex that locks the datablock
   mutex_type& get_mutex()
   {
-    return mutex_;
+    return this->mutex_;
   }
 
   // -- Signals and slots --
@@ -202,22 +215,6 @@ public:
 
   // -- internals of the DataBlock --
 private:
-
-  // Access the data at the specified index, and return the value in a void pointer.
-  // NOTE: This will only work for integer types
-  template<class DATA_TYPE>
-  inline DATA_TYPE internal_get_data( size_t index ) const
-  {
-    DATA_TYPE* data_ptr = reinterpret_cast<DATA_TYPE*>( this->data_ );
-    return data_ptr[ index ];
-  }
-
-  template<class DATA_TYPE>
-  inline void internal_set_data( size_t index, double value )
-  {
-    DATA_TYPE* data_ptr = reinterpret_cast<DATA_TYPE*>( this->data_ );
-    data_ptr[ index ] = static_cast<DATA_TYPE>( value );
-  }
 
   // The dimensions of the datablock
   size_t nx_;
@@ -235,8 +232,8 @@ private:
   // Pointer to the data
   void* data_;
 
-  boost::function<double (size_t)> get_data_func_;
-  boost::function<void (size_t, double)> set_data_func_;
+  // Histogram information for this data block
+  Histogram histogram_;
 
 };
 

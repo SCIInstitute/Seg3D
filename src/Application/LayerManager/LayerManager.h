@@ -75,11 +75,15 @@ public:
   // Accessor Functions
 public:
     // Functions for getting a copy of the Layers and Groups with the proper locking
+  
+  // TODO: get_groups() get_layers()
   void return_group_vector( std::vector< LayerGroupHandle > &vector_of_groups );
   void return_layers_vector( std::vector< LayerHandle > &vector_of_layers );
   
   LayerGroupHandle check_for_group( std::string group_id );
-  LayerGroupWeakHandle get_active_group();
+  
+  LayerGroupHandle get_active_group();
+
   LayerHandle get_active_layer()
     {
         return active_layer_;
@@ -130,18 +134,14 @@ public:
   
   // LAYERS_FINISHED_DELETING_SIGNAL:
   // This signal is triggered once the layers from a particular group have been deleted
+  // TODO: maybe group_finished_deleting_layers_signal_
   group_signal_type layers_finished_deleting_signal_;
   
-  
+  // TODO: group_inserted_signal_ and group_deleted_signal_
   group_signal_type add_group_signal_; // Probably not needed 
   group_signal_type delete_group_signal_;
   
 private:
-  
-  // mutex for the group_handle_list
-  LayerGroupHandle create_group( const Utils::GridTransform& ) const;
-  mutex_type group_handle_list_mutex_; 
-
     // list of the current groups 
   group_handle_list_type group_handle_list_;
   

@@ -36,6 +36,8 @@ SET(UTILS_DATABLOCK_SRCS
   DataType.cc
   DataBlock.h
   DataBlock.cc
+  Histogram.h
+  Histogram.cc
   MaskDataBlock.h
   MaskDataBlock.cc
   MaskDataBlockManager.h

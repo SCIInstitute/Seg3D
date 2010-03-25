@@ -33,6 +33,7 @@
 
 #include <Application/Action/Action.h>
 #include <Application/State/StateRangedValue.h>
+#include <Application/Interface/Interface.h>
 
 namespace Seg3D
 {

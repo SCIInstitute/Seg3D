@@ -231,7 +231,7 @@ bool VolumeSlice::move_slice( const Point& pos )
     break;
   }
 
-  if ( slice_num >= 0 && slice_num < this->number_of_slices_ )
+  if ( slice_num >= 0 && slice_num < static_cast<int>( this->number_of_slices_ ) )
   {
     this->set_slice_number( slice_num );
     return true;

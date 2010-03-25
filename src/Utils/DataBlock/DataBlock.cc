@@ -32,7 +32,10 @@ namespace Utils
 {
 
 DataBlock::DataBlock() :
-  nx_( 0 ), ny_( 0 ), nz_( 0 ), data_type_( DataType::UNKNOWN_E ), 
+  nx_( 0 ), 
+  ny_( 0 ), 
+  nz_( 0 ), 
+  data_type_( DataType::UNKNOWN_E ), 
   data_( 0 )
 {
 }
@@ -41,48 +44,149 @@ DataBlock::~DataBlock()
 {
 }
 
+
+double DataBlock::get_data_at( size_t index ) const
+{
+  switch( this->data_type_ )
+  {
+  case DataType::CHAR_E:
+    {
+      signed char* data = reinterpret_cast<signed char*>( this->data_ );
+      return static_cast<double>( data[ index ] );
+    }     
+  case DataType::UCHAR_E:
+    {
+      unsigned char* data = reinterpret_cast<unsigned char*>( this->data_ );
+      return static_cast<double>( data[ index ] );
+    }     
+  case DataType::SHORT_E:
+    {
+      short* data = reinterpret_cast<short*>( this->data_ );
+      return static_cast<double>( data[ index ] );
+    }     
+  case DataType::USHORT_E:
+    {
+      unsigned short* data = reinterpret_cast<unsigned short*>( this->data_ );
+      return static_cast<double>( data[ index ] );
+    }
+  case DataType::INT_E:
+    {
+      int* data = reinterpret_cast<int*>( this->data_ );
+      return static_cast<double>( data[ index ] );
+    }     
+  case DataType::UINT_E:
+    {
+      unsigned int* data = reinterpret_cast<unsigned int*>( this->data_ );
+      return static_cast<double>( data[ index ] );
+    }       
+  case DataType::FLOAT_E:
+    {
+      float* data = reinterpret_cast<float*>( this->data_ );
+      return static_cast<double>( data[ index ] );
+    }     
+  case DataType::DOUBLE_E:
+    {
+      double* data = reinterpret_cast<double*>( this->data_ );
+      return data[ index ];
+    }     
+  }
+  
+  return 0.0;
+}
+
+void DataBlock::set_data_at( size_t index, double value )
+{
+  switch( this->data_type_ )
+  {
+  case DataType::CHAR_E:
+    {
+      signed char* data = reinterpret_cast<signed char*>( this->data_ );
+      data[ index ] = static_cast<signed char>( value );
+      return;
+    }     
+  case DataType::UCHAR_E:
+    {
+      unsigned char* data = reinterpret_cast<unsigned char*>( this->data_ );
+      data[ index ] = static_cast<unsigned char>( value );
+      return;
+    }     
+  case DataType::SHORT_E:
+    {
+      short* data = reinterpret_cast<short*>( this->data_ );
+      data[ index ] = static_cast<short>( value );
+      return;
+    }     
+  case DataType::USHORT_E:
+    {
+      unsigned short* data = reinterpret_cast<unsigned short*>( this->data_ );
+      data[ index ] = static_cast<unsigned short>( value );
+      return;
+    } 
+  case DataType::INT_E:
+    {
+      int* data = reinterpret_cast<int*>( this->data_ );
+      data[ index ] = static_cast<int>( value );
+      return;
+    }     
+  case DataType::UINT_E:
+    {
+      unsigned int* data = reinterpret_cast<unsigned int*>( this->data_ );
+      data[ index ] = static_cast<unsigned int>( value );
+      return;
+    } 
+  case DataType::FLOAT_E:
+    {
+      float* data = reinterpret_cast<float*>( this->data_ );
+      data[ index ] = static_cast<float>( value );
+      return;
+    }     
+  case DataType::DOUBLE_E:
+    {
+      double* data = reinterpret_cast<double*>( this->data_ );
+      data[ index ] = value;
+      return;
+    }
+  }
+}
+
+
+
 void DataBlock::set_type( DataType type )
 {
   this->data_type_ = type;
+}
 
-  switch( data_type_ )
+
+void DataBlock::update_histogram()
+{
+  lock_type lock( get_mutex() );
+
+  switch( this->data_type_ )
   {
-  case DataType::CHAR_E:
-    this->get_data_func_ = boost::bind( &DataBlock::internal_get_data<char>, this, _1 );
-    this->set_data_func_ = boost::bind( &DataBlock::internal_set_data<char>, this, _1, _2 );
-    break;
-  case DataType::UCHAR_E:
-    this->get_data_func_ = boost::bind( &DataBlock::internal_get_data<unsigned char>, this, _1 ); 
-    this->set_data_func_ = boost::bind( &DataBlock::internal_set_data<unsigned char>, this, _1, _2 );
-    break;
-  case DataType::SHORT_E:
-    this->get_data_func_ = boost::bind( &DataBlock::internal_get_data<short>, this, _1 );
-    this->set_data_func_ = boost::bind( &DataBlock::internal_set_data<short>, this, _1, _2 );
-    break;
-  case DataType::USHORT_E:
-    this->get_data_func_ = boost::bind( &DataBlock::internal_get_data<unsigned short>, this, _1 ); 
-    this->set_data_func_ = boost::bind( &DataBlock::internal_set_data<unsigned short>, this, _1, _2 );
-    break;
-  case DataType::INT_E:
-    this->get_data_func_ = boost::bind( &DataBlock::internal_get_data<int>, this, _1 );
-    this->set_data_func_ = boost::bind( &DataBlock::internal_set_data<int>, this, _1, _2 );
-    break;
-  case DataType::UINT_E:
-    this->get_data_func_ = boost::bind( &DataBlock::internal_get_data<unsigned int>, this, _1 ); 
-    this->set_data_func_ = boost::bind( &DataBlock::internal_set_data<unsigned int>, this, _1, _2 );
-    break;
-  case DataType::FLOAT_E:
-    this->get_data_func_ = boost::bind( &DataBlock::internal_get_data<float>, this, _1 );
-    this->set_data_func_ = boost::bind( &DataBlock::internal_set_data<float>, this, _1, _2 );
-    break;
-  case DataType::DOUBLE_E:
-    this->get_data_func_ = boost::bind( &DataBlock::internal_get_data<double>, this, _1 );
-    this->set_data_func_ = boost::bind( &DataBlock::internal_set_data<double>, this, _1, _2 );
-    break;
-  default:
-    this->get_data_func_ = 0;
-    this->set_data_func_ = 0;
-    break;
+    case DataType::CHAR_E:
+      this->histogram_.compute( reinterpret_cast<signed char*>( this->data_ ), size() );
+      break;
+    case DataType::UCHAR_E:
+      this->histogram_.compute( reinterpret_cast<unsigned char*>( this->data_ ), size() );
+      break;
+    case DataType::SHORT_E:
+      this->histogram_.compute( reinterpret_cast<short*>( this->data_ ), size() );
+      break;
+    case DataType::USHORT_E:
+      this->histogram_.compute( reinterpret_cast<unsigned short*>( this->data_ ), size() );
+      break;
+    case DataType::INT_E:
+      this->histogram_.compute( reinterpret_cast<int*>( this->data_ ), size() );
+      break;
+    case DataType::UINT_E:
+      this->histogram_.compute( reinterpret_cast<unsigned int*>( this->data_ ), size() );
+      break;
+    case DataType::FLOAT_E:
+      this->histogram_.compute( reinterpret_cast<float*>( this->data_ ), size() );
+      break;
+    case DataType::DOUBLE_E:
+      this->histogram_.compute( reinterpret_cast<double*>( this->data_ ), size() );
+      break;
   }
 }
 
