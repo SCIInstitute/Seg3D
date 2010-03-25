@@ -165,12 +165,12 @@ Transform NrrdData::get_transform() const
     {
       rmin[ p ] = 0.0;
       rmax[ p ] = static_cast< double > ( rsize[ p ] );
-      if ( nrrd_->axis[ p ].center == 1 )
-      {
-        double cor = ( rmax[ p ] - rmin[ p ] ) / ( 2 * rsize[ p ] );
-        rmin[ p ] -= cor;
-        rmax[ p ] -= cor;
-      }
+//      if ( nrrd_->axis[ p ].center == nrrdCenterCell )
+//      {
+//        double cor = ( rmax[ p ] - rmin[ p ] ) / ( 2 * rsize[ p ] );
+//        rmin[ p ] -= cor;
+//        rmax[ p ] -= cor;
+//      }
     }
 
     if ( nrrd_->spaceDim > 0 )
