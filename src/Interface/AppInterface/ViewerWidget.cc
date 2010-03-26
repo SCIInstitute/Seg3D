@@ -45,6 +45,7 @@
 
 // Interface includes
 #include <Interface/AppInterface/ViewerWidget.h>
+#include <Interface/AppInterface/StyleSheet.h>
 
 namespace Seg3D
 {
@@ -120,6 +121,8 @@ ViewerWidgetPrivate::ViewerWidgetPrivate( QWidget *parent )
 {
   // ensure viewer selection is mutual exclusive
   viewer_selection_ = new QActionGroup( parent );
+  
+  
 
   QIcon sagittal_icon;
   sagittal_icon.addPixmap( QPixmap( ":/Images/Xview.png" ), QIcon::Normal, QIcon::Off );
@@ -272,9 +275,14 @@ ViewerWidgetPrivate::ViewerWidgetPrivate( QWidget *parent )
   // Generate button bar at the bottom of
   // the Viewer widget
   SCI_LOG_DEBUG("Create button bar for ViewWidget");
+  
+  
 
   buttonbar_ = new QFrame( parent );
-
+  
+  // Add the stylesheet to the Buttons
+  buttonbar_->setStyleSheet( StyleSheet::VIEWERWIDGET_TOOLBAR_C );
+  
   buttonbar_layout_ = new QHBoxLayout( buttonbar_ );
   buttonbar_layout_->setContentsMargins( 0, 0, 0, 0 );
   buttonbar_layout_->setSpacing( 0 );

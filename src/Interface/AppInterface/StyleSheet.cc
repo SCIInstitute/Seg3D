@@ -31,54 +31,106 @@
 
 namespace Seg3D
 {
-
-//Volume Type Colors
-const QString StyleSheet::DATA_VOLUME_COLOR_C = QString::fromUtf8(
-  "QWidget#typeBackground_{ background-color: rgb(166, 12, 73); }");
+  // === ViewerWidget Styles === //
   
-const QString StyleSheet::MASK_VOLUME_COLOR_C = QString::fromUtf8(
-  "QWidget#typeBackground_{ background-color: rgb(255, 128, 0); ]");
+  const QString StyleSheet::VIEWERWIDGET_TOOLBAR_C = QString::fromUtf8(
+    "QToolButton {"
+    " border: 1px solid rgba( 0, 0, 0, 0 );"
+    "}"
+    "QFrame {"
+    " background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227,"
+    "   stop:0 rgba(241, 241, 241, 255),"
+    "   stop:0.155779 rgba(248, 248, 248,255),"
+    "   stop:1 rgba(224, 224, 224, 255));"
+    "}");
+
+  //Volume Type Colors
+  const QString StyleSheet::DATA_VOLUME_COLOR_C = QString::fromUtf8(
+    "QWidget#typeBackground_{"
+    " background-color: rgb(166, 12, 73);"
+    "}");
+    
+  const QString StyleSheet::MASK_VOLUME_COLOR_C = QString::fromUtf8(
+    "QWidget#typeBackground_{"
+    " background-color: rgb(255, 128, 0);"
+    "}");
+    
+  const QString StyleSheet::LABEL_VOLUME_COLOR_C = QString::fromUtf8(
+    "QWidget#typeBackground_{ background-color: rgb(90, 90, 90);"
+    "}");
   
-const QString StyleSheet::LABEL_VOLUME_COLOR_C = QString::fromUtf8(
-  "QWidget#typeBackground_{ background-color: rgb(90, 90, 90); ]");
-
-// === LayerWidget Styles === //
-const QString StyleSheet::LAYER_WIDGET_BASE_ACTIVE_C = QString::fromUtf8(
-  "QWidget#base_{"
-  " border-radius: 6px;"
-  " border: 1px solid rgb(94, 141, 176);"
-  " background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1," 
-  "   stop:0 rgba(216, 238, 245, 255),"
-  "   stop:0.372881 rgba(226, 249, 255, 255),"
-  "   stop:1 rgba(204, 224, 230, 255));"
-  "}");
-
-const QString StyleSheet::LAYER_WIDGET_LABEL_ACTIVE_C = QString::fromUtf8(
-  "QLineEdit#label_{"
-  " text-align: left;"
-  " color: black;"
-  " margin-right: 3px;"
-  " background-color: rgba(216, 238, 245, 1);"
-  "}");
-
-const QString StyleSheet::LAYER_WIDGET_BASE_INACTIVE_C = QString::fromUtf8(
-  "QWidget#base_{"
-  " background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227,"
-  "   stop:0 rgba(181, 181, 181, 255),"
-  "   stop:0.155779 rgba(195, 195, 195, 255),"
-  "   stop:1 rgba(164, 164, 164, 255));"
-  " border-radius: 6px;"
-  " border: 1px solid rgb(90, 90, 90);"
-  "}");
-
-const QString StyleSheet::LAYER_WIDGET_LABEL_INACTIVE_C = QString::fromUtf8(
-  "QLineEdit#label_{"
-  " text-align: left;"
-  " color: black;"
-  " margin-right: 3px;"
-  " background-color: rgba( 190, 190, 190, 1 );"
-  "}");
-
+  // === LayerWidget Styles === //
+  // - ACTIVE - //
+  const QString StyleSheet::LAYER_WIDGET_BASE_ACTIVE_C = QString::fromUtf8(
+    "QWidget#base_{"
+    " border-radius: 6px;"
+    " border: 1px solid rgb(94, 141, 176);"
+    " background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1," 
+    "   stop:0 rgba(216, 238, 245, 255),"
+    "   stop:0.372881 rgba(226, 249, 255, 255),"
+    "   stop:1 rgba(204, 224, 230, 255));"
+    "}");
+  
+  const QString StyleSheet::LAYER_WIDGET_LABEL_ACTIVE_C = QString::fromUtf8(
+    "QLineEdit#label_{"
+    " text-align: left;"
+    " color: black;"
+    " margin-right: 3px;"
+    " background-color: rgba(216, 238, 245, 1);"
+    "}");
+    
+  // - INACTIVE - //
+  const QString StyleSheet::LAYER_WIDGET_BASE_INACTIVE_C = QString::fromUtf8(
+    "QWidget#base_{"
+    " background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227,"
+    "   stop:0 rgba(211, 211, 211, 255),"
+    "   stop:0.155779 rgba(225, 225, 225, 215),"
+    "   stop:1 rgba(194, 194, 194, 255));"
+    " border-radius: 6px;"
+    " border: 1px solid rgb(90, 90, 90);"
+    "}");
+  
+  const QString StyleSheet::LAYER_WIDGET_LABEL_INACTIVE_C = QString::fromUtf8(
+    "QLineEdit#label_{"
+    " text-align: left;"
+    " color: black;"
+    " margin-right: 3px;"
+    " background-color: rgba( 190, 190, 190, 1 );"
+    "}");
+    
+  // - LOCKED - //
+  const QString StyleSheet::LAYER_WIDGET_BASE_LOCKED_C = QString::fromUtf8(
+    "QWidget#base_{"
+    " background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227," 
+    "   stop:0 rgba(201, 201, 201, 255),"
+    "   stop:0.155779 rgba(208, 208, 208, 255),"
+    "   stop:1 rgba(184, 184, 184, 255));"
+    " border-radius: 6px;"
+    " border: 1px solid rgb(120, 120, 120);"
+    "}");
+    
+  const QString StyleSheet::LAYER_WIDGET_BACKGROUND_LOCKED_C = QString::fromUtf8(
+    "QWidget#typeBackground_{"
+    " background-color: gray;"
+    " border: 1px solid rgb(141, 141, 141);"
+    " border-radius: 4px;"
+    "}");
+    
+  const QString StyleSheet::LAYER_WIDGET_LABEL_LOCKED_C = QString::fromUtf8(
+    "QLineEdit#label_{"
+    " background-color:rgba(208, 208, 208, 1);"
+    " color: gray;"
+    "}");
+  
+  // === LayerGroupWidget Styles === //
+  // - ACTIVE - //
+  const QString StyleSheet::GROUP_WIDGET_BASE_ACTIVE_C = "";
+  const QString StyleSheet::GROUP_WIDGET_BACKGROUND_ACTIVE_C = "";
+  const QString StyleSheet::GROUP_WIDGET_ACTIVATE_BUTTON_ACTIVE_C = "";
+  // - INACTIVE - //
+  const QString StyleSheet::GROUP_WIDGET_BASE_INACTIVE_C = "";
+  const QString StyleSheet::GROUP_WIDGET_BACKGROUND_INACTIVE_C = "";
+  const QString StyleSheet::GROUP_WIDGET_ACTIVATE_BUTTON_INACTIVE_C = "";
 
 StyleSheet::StyleSheet()
 {

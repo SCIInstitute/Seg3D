@@ -269,7 +269,7 @@ public:
   QtSlot( parent, blocking ), state_handle_( state_handle )
   {
     // Qt's connect function
-    connect( parent, SIGNAL( valueAdjusted( int ) ), this, SLOT( slot( int ) ) );
+    connect( parent, SIGNAL( valueAdjusted( int ) ), this, SLOT( value_slot( int ) ) );
     connect( parent, SIGNAL( rangeChanged( int, int ) ), this, SLOT( range_slot( int, int ) ) );
   }
 

@@ -56,19 +56,19 @@ SliderIntCombo::SliderIntCombo( QWidget* parent, bool edit_range ) :
         this->private_->ui_.edit_button_->hide();
     }
     
-    connect( this->private_->ui_.edit_button_, SIGNAL(clicked( bool )), this, SLOT(edit_ranges(bool)));
-    connect( this->private_->ui_.decrease_range_button_, SIGNAL(clicked()), this, SLOT(half_range()));
-    connect( this->private_->ui_.increase_range_button_, SIGNAL(clicked()), this, SLOT(double_range()));
+    connect( this->private_->ui_.edit_button_, SIGNAL( clicked( bool ) ), this, SLOT( edit_ranges(bool ) ) );
+    connect( this->private_->ui_.decrease_range_button_, SIGNAL( clicked() ), this, SLOT( half_range() ) );
+    connect( this->private_->ui_.increase_range_button_, SIGNAL( clicked()), this, SLOT( double_range() ) );
     
-    connect( this->private_->ui_.horizontalSlider, SIGNAL(valueChanged(int)), this, SLOT(slider_signal( int )));
-    connect( this->private_->ui_.spinBox, SIGNAL(valueChanged(int)), this, SLOT(spinner_signal( int )));
+    connect( this->private_->ui_.horizontalSlider, SIGNAL( valueChanged( int ) ), this, SLOT( slider_signal( int ) ) );
+    connect( this->private_->ui_.spinBox, SIGNAL( valueChanged( int ) ), this, SLOT( spinner_signal( int ) ) );
 }
 
 SliderIntCombo::~SliderIntCombo()
 {
 }
 
-void SliderIntCombo::slider_signal( int value )
+void SliderIntCombo::spinner_signal( int value )
 {
     this->private_->ui_.horizontalSlider->blockSignals( true );
     this->private_->ui_.horizontalSlider->setValue( value );
@@ -76,7 +76,7 @@ void SliderIntCombo::slider_signal( int value )
   this->private_->ui_.horizontalSlider->blockSignals( false );
 }
 
-void SliderIntCombo::spinner_signal( int value )
+void SliderIntCombo::slider_signal( int value )
 {
     this->private_->ui_.spinBox->blockSignals( true );
     this->private_->ui_.spinBox->setValue( value );
@@ -87,11 +87,14 @@ void SliderIntCombo::spinner_signal( int value )
 
 void SliderIntCombo::setStep(int step)
 {
+  block_signals( true );
     this->private_->ui_.horizontalSlider->setSingleStep( step );
     this->private_->ui_.spinBox->setSingleStep( step );
+    block_signals( false );
 }
 void SliderIntCombo::setRange( int min, int max)
 {
+  block_signals( true );
     this->private_->ui_.horizontalSlider->setRange( min, max );
     this->private_->ui_.spinBox->setRange( min, max );
     this->private_->ui_.min_->setNum( min );
@@ -99,70 +102,70 @@ void SliderIntCombo::setRange( int min, int max)
     
     int tick = (max - min)/10;
     this->private_->ui_.horizontalSlider->setTickInterval( tick );
+    block_signals( false );
 }
 void SliderIntCombo::setCurrentValue( int value )
 {
+  block_signals( true );
     this->private_->ui_.horizontalSlider->setValue( value );
     this->private_->ui_.spinBox->setValue( value );
+    block_signals( false );
 }
 
-void SliderIntCombo::edit_ranges( bool edit )
-{
-    if( edit )
-    {
-        this->private_->ui_.decrease_range_button_->show();
-        this->private_->ui_.increase_range_button_->show();
-    }
-    else
-    {
-        this->private_->ui_.decrease_range_button_->hide();
-        this->private_->ui_.increase_range_button_->hide();
-    }
-}
 
 void SliderIntCombo::change_min( int new_min )
 {
+  block_signals( true );
     this->private_->ui_.horizontalSlider->setMinimum( new_min );
     this->private_->ui_.spinBox->setMinimum( new_min );
     this->private_->ui_.min_->setNum(new_min);
     int tick = (this->private_->ui_.max_->text().toInt() - this->private_->ui_.min_->text().toInt())/10;
     this->private_->ui_.horizontalSlider->setTickInterval( tick );
+    block_signals( false );
 }
 
 void SliderIntCombo::change_max( int new_max )
 {
+  block_signals( true );
     this->private_->ui_.horizontalSlider->setMaximum( new_max );
     this->private_->ui_.spinBox->setMaximum( new_max );
     this->private_->ui_.max_->setNum( new_max );
     int tick = (this->private_->ui_.max_->text().toInt() - this->private_->ui_.min_->text().toInt())/10;
     this->private_->ui_.horizontalSlider->setTickInterval( tick );
-}
-
-void SliderIntCombo::set_all( int min, int max, int value )
-{
-    int tick = (max - min)/10;
-
-    this->private_->ui_.horizontalSlider->setRange(min, max);
-    this->private_->ui_.horizontalSlider->setValue( value );
-    this->private_->ui_.horizontalSlider->setTickInterval( tick );
-    this->private_->ui_.spinBox->setRange(min, max);
-    this->private_->ui_.spinBox->setValue( value );
-    this->private_->ui_.min_->setNum( min );
-    this->private_->ui_.max_->setNum( max );
-
+    block_signals( false );
 }
 
 void SliderIntCombo::double_range()
 {
     int new_max = this->private_->ui_.max_->text().toInt() * 2;
     change_max( new_max );
-    rangeChanged( new_max );
+    rangeChanged( this->private_->ui_.min_->text().toInt(), new_max );
 }
 void SliderIntCombo::half_range()
 {
     int new_max = this->private_->ui_.max_->text().toInt() / 2;
     change_max( new_max );
-    rangeChanged( new_max );
+    rangeChanged( this->private_->ui_.min_->text().toInt(), new_max );
+}
+
+void SliderIntCombo::edit_ranges( bool edit )
+{
+  if( edit )
+  {
+    this->private_->ui_.decrease_range_button_->show();
+    this->private_->ui_.increase_range_button_->show();
+  }
+  else
+  {
+    this->private_->ui_.decrease_range_button_->hide();
+    this->private_->ui_.increase_range_button_->hide();
+  }
+}
+
+void SliderIntCombo::block_signals( bool block )
+{
+  this->private_->ui_.horizontalSlider->blockSignals( block );
+  this->private_->ui_.spinBox->blockSignals( block ); 
 }
 
 

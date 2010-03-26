@@ -84,7 +84,6 @@ void SliderDoubleCombo::slider_signal( int value )
 {
     this->private_->ui_.spinBox->blockSignals( true );
     double double_version = (double)value / 100;
-    //double_version = double_version );
     this->private_->ui_.spinBox->setValue( double_version );
     Q_EMIT valueAdjusted( double_version );
   this->private_->ui_.spinBox->blockSignals( false );

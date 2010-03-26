@@ -45,7 +45,7 @@ Q_OBJECT
 
 Q_SIGNALS:
   void valueAdjusted( int );
-  void rangeChanged( int );
+  void rangeChanged( int, int );
 
 // -- constructor/destructor --
 public:
@@ -56,9 +56,7 @@ public Q_SLOTS:
     void setStep(int);
   void setRange( int, int );
   void setCurrentValue( int );
-  void set_all( int min, int max, int value );
 
-    
 // -- widget internals -- 
 private:
     boost::shared_ptr< SliderIntComboPrivate > private_;
@@ -71,6 +69,9 @@ private Q_SLOTS:
     void half_range();
     void slider_signal( int value );
     void spinner_signal( int value );
+    
+private:
+  void block_signals( bool block );
   
 };
 

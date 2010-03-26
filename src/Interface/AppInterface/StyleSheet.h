@@ -43,12 +43,20 @@ private:
   
 public:
 
-  //Volume Type Colors
-  const static QString DATA_VOLUME_COLOR_C;
-  const static QString MASK_VOLUME_COLOR_C;
-  const static QString LABEL_VOLUME_COLOR_C;
+  // === ViewerWidget Styles === //
+  
+  const static QString VIEWERWIDGET_TOOLBAR_C;
+
+
   
   // === LayerWidget Styles === //
+    
+    //Volume Type Colors
+    const static QString DATA_VOLUME_COLOR_C;
+    const static QString MASK_VOLUME_COLOR_C;
+    const static QString LABEL_VOLUME_COLOR_C;
+  
+  
     // - ACTIVE - //
     const static QString LAYER_WIDGET_BASE_ACTIVE_C;
     const static QString LAYER_WIDGET_LABEL_ACTIVE_C;
@@ -56,7 +64,7 @@ public:
     const static QString LAYER_WIDGET_BASE_INACTIVE_C;
     const static QString LAYER_WIDGET_LABEL_INACTIVE_C;
     // - LOCKED - //
-    const static QString LAYER_WIDGET_HEADER_LOCKED_C;
+    const static QString LAYER_WIDGET_BASE_LOCKED_C;
     const static QString LAYER_WIDGET_BACKGROUND_LOCKED_C;
     const static QString LAYER_WIDGET_LABEL_LOCKED_C;
   

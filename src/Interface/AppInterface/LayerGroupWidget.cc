@@ -299,7 +299,6 @@ void  LayerGroupWidget::set_active( bool active )
     {
         this->private_->ui_.base_->setStyleSheet( QString::fromUtf8(
                     "QWidget#base_{"
-                  //"background-color: rgb(157, 78, 0);\n"
                   "background-color: rgb(150, 150, 150);\n"
                   "border-radius:6px;\n"
                   "border: 1px solid rgba(80, 80, 80, 255);\n"

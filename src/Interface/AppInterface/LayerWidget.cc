@@ -62,6 +62,7 @@ public:
   std::string layer_id_;
   Utils::GridTransform grid_transform_;
   int volume_type_;
+  bool active_;
 };
 
 LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
@@ -95,9 +96,9 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   this->private_->ui_.opacity_bar_->hide();
   this->private_->ui_.progress_bar_bar_->hide();
   this->private_->ui_.border_bar_->hide();
-  //this->private_->ui_.dimensions_->hide();
+
   
-  // add the SliderSpinCombo Widgets
+  // add the SliderCombo Widgets
   this->private_->opacity_adjuster_ = new SliderDoubleCombo( this->private_->ui_.opacity_bar_ );
   this->private_->ui_.verticalLayout_2->addWidget( this->private_->opacity_adjuster_ );
   this->private_->opacity_adjuster_->setObjectName( QString::fromUtf8( "opacity_adjuster_" ) );
@@ -139,11 +140,9 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
       this->private_->opacity_adjuster_->setStep( opacity_step );
         this->private_->opacity_adjuster_->setRange( opacity_min, opacity_max );
         this->private_->opacity_adjuster_->setCurrentValue( layer->opacity_state_->get() );
-        
-       
-  
-  
-  // connect the signals and slots
+
+
+  // connect the GUI signals and slots
   connect( this->private_->ui_.opacity_button_, 
       SIGNAL( clicked( bool )), this, 
       SLOT( show_opacity_bar( bool )));
@@ -168,16 +167,11 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   
   // make the default connections, for any layer type, to the state engine
   QtBridge::Connect( this->private_->ui_.selection_checkbox_, layer->selected_state_ );
-  //this->private_->ui_.selection_checkbox_->setChecked( false ); // be sure we start false
-  
   QtBridge::Connect( this->private_->ui_.lock_button_, layer->lock_state_ );
-  
   QtBridge::Connect( this->private_->opacity_adjuster_, layer->opacity_state_ );
-  
   QtBridge::Connect( this->private_->ui_.label_, layer->name_state_ );
   
-  
-  
+    
   switch( layer->type() )
   {
     // This if for the Data Layers
@@ -187,8 +181,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
         this->private_->ui_.compute_iso_surface_button_->hide();
         this->private_->ui_.fill_border_button_->hide();
         this->private_->ui_.iso_surface_button_->hide();
-        this->private_->ui_.typeBackground_->setStyleSheet(
-            QString::fromUtf8("QWidget#typeBackground_{ background-color: rgb(166, 12, 73); }"));
+        this->private_->ui_.typeBackground_->setStyleSheet( StyleSheet::DATA_VOLUME_COLOR_C );
         this->private_->ui_.activate_button_->setIcon(this->data_layer_icon_);
         
         DataLayer* data_layer = dynamic_cast< DataLayer* >( layer.get() );
@@ -215,6 +208,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
                 this->private_->contrast_adjuster_->setRange( contrast_min, contrast_max );
                 this->private_->contrast_adjuster_->setCurrentValue( data_layer->contrast_state_->get() );
         
+        // keep track locally of what type we are
         this->private_->volume_type_ = 1;
       }
       break;
@@ -223,10 +217,12 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
       {
         this->private_->ui_.brightness_contrast_button_->hide();
         this->private_->ui_.volume_rendered_button_->hide();
-        
+        this->private_->ui_.typeBackground_->setStyleSheet( StyleSheet::MASK_VOLUME_COLOR_C );
         MaskLayer* mask_layer = dynamic_cast< MaskLayer* >( layer.get() );        
         QtBridge::Connect( this->private_->ui_.iso_surface_button_, mask_layer->show_isosurface_state_ );
         QtBridge::Connect( this->private_->ui_.border_selection_combo_, mask_layer->fill_state_ );
+
+          // keep track locally of what type we are
           this->private_->volume_type_ = 2;
       }
       break;
@@ -234,7 +230,11 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
     // This is for the Label Layers
     case Utils::VolumeType::LABEL_E:
         {
+        this->private_->ui_.typeBackground_->setStyleSheet( StyleSheet::LABEL_VOLUME_COLOR_C );
+        
+        // keep track locally of what type we are
             this->private_->volume_type_ = 3;
+            
         }
       
       break;
@@ -247,11 +247,13 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   
 LayerWidget::~LayerWidget()
 {
-
 }
 
 void LayerWidget::set_active( bool active )
 {
+  // keep track locally if we are an active layer or not so we know what color to revert to if locked
+  this->private_->active_ = active;
+  
     if( active )
     {
         this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_ACTIVE_C );  
@@ -278,7 +280,6 @@ void LayerWidget::show_selection_checkbox( bool show )
   else 
   {
     this->private_->ui_.checkbox_widget_->hide();
-    //this->private_->ui_.selection_checkbox_->setChecked( false );
   }
 }
 
@@ -287,16 +288,12 @@ void LayerWidget::show_opacity_bar( bool show )
   if ( show )
   {
     this->private_->ui_.opacity_bar_->show();
-    
     this->private_->ui_.bright_contrast_bar_->hide();
     this->private_->ui_.brightness_contrast_button_->setChecked( false );
-    
     this->private_->ui_.color_bar_->hide();
     this->private_->ui_.color_button_->setChecked( false );
-    
     this->private_->ui_.border_bar_->hide();
     this->private_->ui_.fill_border_button_->setChecked( false );
-
   }
   else
   {
@@ -309,16 +306,12 @@ void LayerWidget::show_brightness_contrast_bar( bool show )
   if ( show )
   {
     this->private_->ui_.bright_contrast_bar_->show();
-    
     this->private_->ui_.opacity_bar_->hide();
     this->private_->ui_.opacity_button_->setChecked( false );
-    
     this->private_->ui_.color_bar_->hide();
     this->private_->ui_.color_button_->setChecked( false );
-    
     this->private_->ui_.border_bar_->hide();
     this->private_->ui_.fill_border_button_->setChecked( false );
-
   }
   else
   {
@@ -331,16 +324,12 @@ void LayerWidget::show_border_fill_bar( bool show )
   if ( show )
   {
     this->private_->ui_.border_bar_->show();
-    
     this->private_->ui_.opacity_bar_->hide();
     this->private_->ui_.opacity_button_->setChecked( false );
-    
     this->private_->ui_.color_bar_->hide();
     this->private_->ui_.color_button_->setChecked( false );
-    
     this->private_->ui_.bright_contrast_bar_->hide();
     this->private_->ui_.brightness_contrast_button_->setChecked( false );
-    
   }
   else
   {
@@ -353,16 +342,12 @@ void LayerWidget::show_color_bar( bool show )
   if ( show )
   {
     this->private_->ui_.color_bar_->show();
-    
     this->private_->ui_.opacity_bar_->hide();
     this->private_->ui_.opacity_button_->setChecked( false );
-    
     this->private_->ui_.border_bar_->hide();
     this->private_->ui_.fill_border_button_->setChecked( false );
-    
     this->private_->ui_.bright_contrast_bar_->hide();
     this->private_->ui_.brightness_contrast_button_->setChecked( false );
-    
   }
   else
   {
@@ -386,21 +371,9 @@ void LayerWidget::visual_lock( bool lock )
 {
   if ( lock )
   {
-    this->private_->ui_.header_->setStyleSheet(
-      QString::fromUtf8(
-         "QWidget#header_{"
-         "background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(201, 201, 201, 255), stop:0.155779 rgba(208, 208, 208, 255), stop:1 rgba(184, 184, 184, 255));"
-         "border-radius: 6px;}" ) );
-    this->private_->ui_.typeBackground_->setStyleSheet( 
-      QString::fromUtf8(
-         "QWidget#typeBackground_{"
-         "background-color: gray;"
-         "border: 1px solid rgb(141, 141, 141);"
-         "border-radius: 4px;}" ) );
-    
-    this->private_->ui_.label_->setStyleSheet( 
-      QString::fromUtf8(
-         "QLineEdit#label_{background-color:rgba(208, 208, 208, 1); color: gray;}" ) );
+    this->private_->ui_.header_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_LOCKED_C );
+    this->private_->ui_.typeBackground_->setStyleSheet( StyleSheet::LAYER_WIDGET_BACKGROUND_LOCKED_C );
+    this->private_->ui_.label_->setStyleSheet( StyleSheet::LAYER_WIDGET_LABEL_LOCKED_C );
     this->private_->ui_.activate_button_->setEnabled( false );
     this->private_->ui_.opacity_button_->setEnabled( false );
     this->private_->ui_.visibility_button_->setEnabled( false );
@@ -417,58 +390,43 @@ void LayerWidget::visual_lock( bool lock )
     this->private_->ui_.border_bar_->hide();
     this->private_->ui_.opacity_bar_->hide();
     this->private_->ui_.bright_contrast_bar_->hide();
-    
-    
   }
   else
   {
-    this->private_->ui_.header_->setStyleSheet(
-      QString::fromUtf8(
-         "QWidget#header_{"
-         "background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.512563 rgba(255, 255, 255, 0));}" ) );
     switch( this->private_->volume_type_ )
       {
-        // This if for the Data Layers
         case Utils::VolumeType::DATA_E:
         {
-              this->private_->ui_.typeBackground_->setStyleSheet( 
-                QString::fromUtf8(
-                    "QWidget#typeBackground_{"
-                    "background-color: rgb(166, 12, 73);"
-                    "border: 1px solid rgb(141, 141, 141);"
-                    "border-radius: 4px;}" ) );
-                    
+              this->private_->ui_.typeBackground_->setStyleSheet( StyleSheet::DATA_VOLUME_COLOR_C );
       }
         break;
         case Utils::VolumeType::MASK_E:
       {
-          this->private_->ui_.typeBackground_->setStyleSheet( 
-                QString::fromUtf8(
-                    "QWidget#typeBackground_{"
-                    "background-color: rgb(255, 128, 0);"
-                    "border: 1px solid rgb(141, 141, 141);"
-                    "border-radius: 4px;}" ) );
-      
+        this->private_->ui_.typeBackground_->setStyleSheet( StyleSheet::MASK_VOLUME_COLOR_C );
       }
       break;
       case Utils::VolumeType::LABEL_E:
       {
+        this->private_->ui_.typeBackground_->setStyleSheet( StyleSheet::LABEL_VOLUME_COLOR_C );
         }
         break;
         
         default:
       break;
-        
-    
     }
-    this->private_->ui_.label_->setStyleSheet( 
-      QString::fromUtf8( 
-          "QLineEdit#label_{"
-          "text-align: left;"
-          "color: black;"
-          "margin-right: 3px;"
-          "background-color: rgba(243, 243, 243, 1);}" ) );
     
+    if( this->private_->active_ )
+    {
+      this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_ACTIVE_C );  
+      this->private_->ui_.label_->setStyleSheet( StyleSheet::LAYER_WIDGET_LABEL_ACTIVE_C );
+    }
+    else
+    {
+      this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_INACTIVE_C );
+      this->private_->ui_.label_->setStyleSheet( StyleSheet::LAYER_WIDGET_LABEL_INACTIVE_C );
+
+    }
+
     this->private_->ui_.activate_button_->setEnabled( true );
     this->private_->ui_.opacity_button_->setEnabled( true );
     this->private_->ui_.visibility_button_->setEnabled( true );
