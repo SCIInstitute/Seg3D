@@ -214,9 +214,6 @@ void Renderer::redraw()
   // Lock the state engine
   StateEngine::lock_type state_lock( StateEngine::Instance()->get_mutex() );
 
-  // Lock the viewer
-  Viewer::lock_type viewer_lock( viewer->get_mutex() );
-
   // Get a snapshot of current layers
   LayerSceneHandle layer_scene = LayerManager::Instance()->compose_layer_scene( this->viewer_id_ );
 
@@ -224,7 +221,6 @@ void Renderer::redraw()
   {
     Utils::View3D view3d( viewer->volume_view_state_->get() );
 
-    viewer_lock.unlock();
     state_lock.unlock();
 
     glEnable( GL_DEPTH_TEST );
@@ -251,7 +247,6 @@ void Renderer::redraw()
     Utils::View2D view2d(
         dynamic_cast< StateView2D* > ( viewer->get_active_view_state().get() )->get() );
 
-    viewer_lock.unlock();
     state_lock.unlock();
 
     glDisable( GL_DEPTH_TEST );
@@ -274,41 +269,38 @@ void Renderer::redraw()
     this->cube_->draw();
 */
 
-    for ( size_t group_num = 0; group_num < layer_scene->size(); group_num++ )
+    for ( size_t layer_num = 0; layer_num < layer_scene->size(); layer_num++ )
     {
-      LayerGroupSceneItemHandle layer_group_item = ( *layer_scene )[ group_num ];
-      for ( size_t layer_num = 0; layer_num < layer_group_item->size(); layer_num++ )
+      LayerSceneItemHandle layer_item = ( *layer_scene )[ layer_num ];
+      switch ( layer_item->type() )
       {
-        LayerSceneItemHandle layer_item = ( *layer_group_item )[ layer_num ];
-        switch ( layer_item->type() )
+      case Utils::VolumeType::DATA_E:
         {
-        case Utils::VolumeType::DATA_E:
-          {
-            DataLayerSceneItem* data_layer_item = 
-              dynamic_cast< DataLayerSceneItem* >( layer_item.get() );
-            Utils::DataVolumeSlice* data_slice = data_layer_item->data_volume_slice_.get();
-            Utils::TextureHandle slice_tex = data_layer_item->data_volume_slice_->get_texture();
-            Utils::Texture::lock_type slice_tex_lock( slice_tex->get_mutex() );
-            slice_tex->enable();
-            glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
-            glBegin( GL_QUADS );
-            glTexCoord2f( 0.0f, 0.0f );
-            glVertex2d( data_slice->left(), data_slice->bottom() );
-            glTexCoord2f( 1.0f, 0.0f );
-            glVertex2d( data_slice->right(), data_slice->bottom() );
-            glTexCoord2f( 1.0f, 1.0f );
-            glVertex2d( data_slice->right(), data_slice->top() );
-            glTexCoord2f( 0.0f, 1.0f );
-            glVertex2d( data_slice->left(), data_slice->top() );
-            glEnd();
-            slice_tex->disable();
-          }
-          break;
-        case Utils::VolumeType::MASK_E:
-          break;
+          DataLayerSceneItem* data_layer_item = 
+            dynamic_cast< DataLayerSceneItem* >( layer_item.get() );
+          Utils::DataVolumeSlice* data_slice = data_layer_item->data_volume_slice_.get();
+          if ( !data_slice ) continue;
+          Utils::TextureHandle slice_tex = data_layer_item->data_volume_slice_->get_texture();
+          Utils::Texture::lock_type slice_tex_lock( slice_tex->get_mutex() );
+          slice_tex->enable();
+          glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+          glBegin( GL_QUADS );
+          glTexCoord2f( 0.0f, 0.0f );
+          glVertex2d( data_slice->left(), data_slice->bottom() );
+          glTexCoord2f( 1.0f, 0.0f );
+          glVertex2d( data_slice->right(), data_slice->bottom() );
+          glTexCoord2f( 1.0f, 1.0f );
+          glVertex2d( data_slice->right(), data_slice->top() );
+          glTexCoord2f( 0.0f, 1.0f );
+          glVertex2d( data_slice->left(), data_slice->top() );
+          glEnd();
+          slice_tex->disable();
         }
-      }
-    }
+        break;
+      case Utils::VolumeType::MASK_E:
+        break;
+      } // end switch
+    } // end for
 
   }
 
@@ -379,47 +371,43 @@ void Renderer::resize( int width, int height )
 
 void Renderer::process_slices( LayerSceneHandle& layer_scene, ViewerHandle& viewer )
 {
-  for ( size_t group_num = 0; group_num < layer_scene->size(); group_num++ )
+  for ( size_t layer_num = 0; layer_num < layer_scene->size(); layer_num++ )
   {
-    LayerGroupSceneItemHandle layer_group_item = ( *layer_scene )[ group_num ];
-    for ( size_t layer_num = 0; layer_num < layer_group_item->size(); layer_num++ )
+    LayerSceneItemHandle layer_item = ( *layer_scene )[ layer_num ];
+    switch ( layer_item->type() )
     {
-      LayerSceneItemHandle layer_item = ( *layer_group_item )[ layer_num ];
-      switch ( layer_item->type() )
+    case Utils::VolumeType::DATA_E:
       {
-      case Utils::VolumeType::DATA_E:
+        DataLayerSceneItem* data_layer_item = 
+          dynamic_cast< DataLayerSceneItem* >( layer_item.get() );
+        Utils::DataVolumeSliceHandle data_volume_slice = 
+          viewer->get_data_volume_slice( layer_item->layer_id_ );
+        if ( data_volume_slice && !data_volume_slice->out_of_boundary() )
         {
-          DataLayerSceneItem* data_layer_item = 
-            dynamic_cast< DataLayerSceneItem* >( layer_item.get() );
-          Utils::DataVolumeSliceHandle data_volume_slice = 
-            viewer->get_data_volume_slice( layer_item->layer_id_ );
-          if ( data_volume_slice )
-          {
-            data_volume_slice->initialize_texture();
-            data_volume_slice->upload_texture();
-            data_layer_item->data_volume_slice_ = 
-              Utils::DataVolumeSliceHandle( new Utils::DataVolumeSlice( *data_volume_slice ) );
-          }
+          data_volume_slice->initialize_texture();
+          data_volume_slice->upload_texture();
+          data_layer_item->data_volume_slice_ = 
+            Utils::DataVolumeSliceHandle( new Utils::DataVolumeSlice( *data_volume_slice ) );
         }
-        break;
-      case Utils::VolumeType::MASK_E:
-        {
-          MaskLayerSceneItem* mask_layer_item = 
-            dynamic_cast< MaskLayerSceneItem* >( layer_item.get() );
-          Utils::MaskVolumeSliceHandle mask_volume_slice = 
-            viewer->get_mask_volume_slice( layer_item->layer_id_ );
-          if ( mask_volume_slice )
-          {
-            mask_volume_slice->initialize_texture();
-            mask_volume_slice->upload_texture();
-            mask_layer_item->mask_volume_slice_ = 
-              Utils::MaskVolumeSliceHandle( new Utils::MaskVolumeSlice( *mask_volume_slice ) );
-          }
-        }
-        break;
       }
-    }
-  }
+      break;
+    case Utils::VolumeType::MASK_E:
+      {
+        MaskLayerSceneItem* mask_layer_item = 
+          dynamic_cast< MaskLayerSceneItem* >( layer_item.get() );
+        Utils::MaskVolumeSliceHandle mask_volume_slice = 
+          viewer->get_mask_volume_slice( layer_item->layer_id_ );
+        if ( mask_volume_slice && !mask_volume_slice->out_of_boundary() )
+        {
+          mask_volume_slice->initialize_texture();
+          mask_volume_slice->upload_texture();
+          mask_layer_item->mask_volume_slice_ = 
+            Utils::MaskVolumeSliceHandle( new Utils::MaskVolumeSlice( *mask_volume_slice ) );
+        }
+      }
+      break;
+    } // end switch
+  } // end for
 }
 
 } // end namespace Seg3D

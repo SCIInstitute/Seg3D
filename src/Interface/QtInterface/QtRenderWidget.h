@@ -52,8 +52,6 @@ public:
   QtRenderWidget( const QGLFormat& format, QWidget* parent, QtRenderWidget* share );
   virtual ~QtRenderWidget();
 
-  void rendering_completed_slot( Utils::TextureHandle texture );
-
   void set_viewer_id( size_t viewer_id );
 
 protected:
@@ -72,15 +70,7 @@ protected:
 
 private:
 
-  inline int convert_qt_mousebuttons_to_viewer( Qt::MouseButtons buttons )
-  {
-    return int( buttons );
-  }
-
-  inline int convert_qt_keymodifiers_to_viewer( Qt::KeyboardModifiers modifiers )
-  {
-    return int( modifiers );
-  }
+  void update_texture( Utils::TextureHandle texture );
 
   RendererHandle renderer_;
   Utils::TextureHandle renderer_texture_;

@@ -109,7 +109,7 @@ public:
   inline size_t nx() const { return this->nx_; }
   inline size_t ny() const { return this->ny_; }
   inline size_t number_of_slices() const { return this->number_of_slices_; }
-  inline bool out_of_boundary() const { return this->out_of_bound_; }
+  inline bool out_of_boundary() const { return this->out_of_boundary_; }
 
   inline double left() const { return this->left_; }
   inline double right() const { return this->right_; }
@@ -166,7 +166,7 @@ protected:
   size_t nx_;
   size_t ny_;
   size_t number_of_slices_;
-  bool out_of_bound_;
+  bool out_of_boundary_;
 
   double left_;
   double right_;

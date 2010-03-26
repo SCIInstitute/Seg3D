@@ -39,7 +39,7 @@ VolumeSlice::VolumeSlice( const VolumeHandle& volume,
   volume_( volume ), 
   slice_type_( type ), 
   slice_number_ ( slice_num ),
-  out_of_bound_( false )
+  out_of_boundary_( false )
 {
   this->update_position();
   this->slice_number_ = Min( this->slice_number_, this->number_of_slices_ - 1 );
@@ -51,7 +51,7 @@ VolumeSlice::VolumeSlice( const VolumeSlice& copy ) :
   nx_( copy.nx_ ),
   ny_( copy.ny_ ),
   number_of_slices_( copy.number_of_slices_ ),
-  out_of_bound_( copy.out_of_bound_ ),
+  out_of_boundary_( copy.out_of_boundary_ ),
   left_( copy.left_ ), right_( copy.right_ ), 
   bottom_( copy.bottom_ ), top_( copy.top_ ),
   bottom_left_( copy.bottom_left_ ),
@@ -86,7 +86,7 @@ void VolumeSlice::set_slice_type( VolumeSliceType type )
 void VolumeSlice::set_slice_number( size_t slice_num )
 {
   slice_num = Min( slice_num, this->number_of_slices_ - 1 );
-  this->out_of_bound_ = false;
+  this->out_of_boundary_ = false;
   if ( this->slice_number_ != slice_num )
   {
     this->slice_number_ = slice_num;
@@ -241,7 +241,7 @@ void VolumeSlice::move_slice( const Point& pos, bool fail_safe )
   if ( ( slice_num < 0 || slice_num >= static_cast< int >( this->number_of_slices_ ) ) && 
      !fail_safe )
   {
-    this->out_of_bound_ = true;
+    this->out_of_boundary_ = true;
     return;
   }
 

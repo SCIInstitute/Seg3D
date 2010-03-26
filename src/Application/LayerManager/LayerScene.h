@@ -45,10 +45,7 @@ namespace Seg3D
 class LayerSceneItem;
 typedef boost::shared_ptr< LayerSceneItem > LayerSceneItemHandle;
 
-typedef std::vector< LayerSceneItemHandle > LayerGroupSceneItem;
-typedef boost::shared_ptr< LayerGroupSceneItem > LayerGroupSceneItemHandle;
-
-typedef std::vector< LayerGroupSceneItemHandle > LayerScene;
+typedef std::vector< LayerSceneItemHandle > LayerScene;
 typedef boost::shared_ptr< LayerScene > LayerSceneHandle;
 
 class LayerSceneItem

@@ -48,7 +48,7 @@ QtRenderWidget::QtRenderWidget( const QGLFormat& format, QWidget* parent, QtRend
 {
   this->renderer_ = RendererHandle( new Renderer() );
   this->rendering_completed_connection_ = renderer_->rendering_completed_signal_.connect(
-      boost::bind( &QtRenderWidget::rendering_completed_slot, this, _1 ) );
+      boost::bind( &QtRenderWidget::update_texture, this, _1 ) );
 
   setAutoFillBackground( false );
   setAttribute( Qt::WA_OpaquePaintEvent );
@@ -61,13 +61,13 @@ QtRenderWidget::~QtRenderWidget()
   rendering_completed_connection_.disconnect();
 }
 
-void QtRenderWidget::rendering_completed_slot( Utils::TextureHandle texture )
+void QtRenderWidget::update_texture( Utils::TextureHandle texture )
 {
   // if not in the interface thread, post an event to the interface thread
   if ( !Interface::IsInterfaceThread() )
   {
     Interface::PostEvent(
-        boost::bind( &QtRenderWidget::rendering_completed_slot, this, texture ) );
+        boost::bind( &QtRenderWidget::update_texture, this, texture ) );
     return;
   }
 

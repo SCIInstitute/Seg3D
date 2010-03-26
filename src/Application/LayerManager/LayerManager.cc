@@ -212,11 +212,10 @@ LayerSceneHandle LayerManager::compose_layer_scene( size_t viewer_id )
 
   LayerSceneHandle layer_scene( new LayerScene );
 
-  // For each group, generate a LayerGroupSceneItem
+  // For each layer group
   group_handle_list_type::iterator group_iterator = this->group_handle_list_.begin();
   for ( ; group_iterator != this->group_handle_list_.end(); group_iterator++)
   {
-    LayerGroupSceneItemHandle layer_group_scene_item( new LayerGroupSceneItem );
     layer_list_type layer_list = ( *group_iterator )->get_layer_list();
 
     layer_list_type::iterator layer_iterator = layer_list.begin();
@@ -259,8 +258,7 @@ LayerSceneHandle LayerManager::compose_layer_scene( size_t viewer_id )
         }
         break;
       default:
-      // TODO: throw an exception
-        assert( false );
+        SCI_THROW_LOGICERROR("Unknow layer type");
         break;
       } // end switch
 
@@ -268,14 +266,8 @@ LayerSceneHandle LayerManager::compose_layer_scene( size_t viewer_id )
       layer_scene_item->opacity_ = layer->opacity_state_->get();
       layer_scene_item->grid_transform_ = layer->get_grid_transform();
 
-      layer_group_scene_item->push_back( layer_scene_item );
+      layer_scene->push_back( layer_scene_item );
     } // end for each layer
-
-    // only added the group to the scene if its number of visible layers isn't 0
-    if ( layer_group_scene_item->size() > 0 )
-    {
-      layer_scene->push_back( layer_group_scene_item );
-    }
 
   } // end for each group
 

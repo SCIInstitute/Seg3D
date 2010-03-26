@@ -169,7 +169,7 @@ private:
   Utils::VolumeSliceHandle active_layer_slice_;
 
   void insert_layer( LayerHandle layer );
-  void delete_layer( LayerHandle layer );
+  void delete_layers( std::vector< LayerHandle > layers );
   void set_active_layer( LayerHandle layer );
 
 public:
