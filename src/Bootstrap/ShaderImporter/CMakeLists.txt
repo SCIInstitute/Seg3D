@@ -1,4 +1,3 @@
-
 #
 #  For more information, please see: http://software.sci.utah.edu
 # 
@@ -26,39 +25,9 @@
 #  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 #  DEALINGS IN THE SOFTWARE.
 #
-#
 
-ADD_CUSTOM_COMMAND(
-  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/glsl_shader.h
-  COMMAND ShaderImporter ${CMAKE_CURRENT_SOURCE_DIR}/glsl_shader ${CMAKE_CURRENT_BINARY_DIR}/glsl_shader.h
-  DEPENDS ShaderImporter
+SET(SHADER_IMPORTER_SRCS
+  main.cc
 )
-   
-##################################################
-# Set sources
-##################################################
 
-SET(APPLICATION_RENDERER_SRCS
-  RenderResources.h
-  RenderResources.cc
-  RenderResourcesContext.h
-  RenderResourcesContext.cc
-  RenderContext.h
-  RenderContext.cc
-  Renderer.h
-  Renderer.cc
-  ${CMAKE_CURRENT_BINARY_DIR}/glsl_shader.h
-  )
-
-
-ADD_LIBRARY(Application_Renderer STATIC 
-            ${APPLICATION_RENDERER_SRCS} )
-            
-TARGET_LINK_LIBRARIES(Application_Renderer
-                      Utils_Core
-                      Utils_EventHandler
-            Utils_Graphics
-                      Application_Viewer
-                      ${SCI_GLEW_LIBRARY}
-                      ${SCI_BOOST_LIBRARY})
-
+ADD_EXECUTABLE(ShaderImporter ${SHADER_IMPORTER_SRCS})

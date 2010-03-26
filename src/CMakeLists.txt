@@ -152,6 +152,8 @@ ENDIF(SEG3D_BUILD_INTERFACE)
 
 ADD_SUBDIRECTORY(Externals)
 
+ADD_SUBDIRECTORY(Bootstrap)
+
 ###########################################
 # SETUP FOR DEBUG BUILDS
 # enable any extra compile warnings and 
