@@ -26,13 +26,16 @@
 #  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 #  DEALINGS IN THE SOFTWARE.
 #
-#
+
+##################################################
+# Import shaders into source files
+##################################################
 
 ADD_CUSTOM_COMMAND(
-  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/glsl_shader.h
-  COMMAND ShaderImporter ${CMAKE_CURRENT_SOURCE_DIR}/glsl_shader ${CMAKE_CURRENT_BINARY_DIR}/glsl_shader.h
-  DEPENDS ShaderImporter
-)
+  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/SliceShaderFrag
+  COMMAND ShaderImporter ${CMAKE_CURRENT_SOURCE_DIR}/SliceShader.frag ${CMAKE_CURRENT_BINARY_DIR}/SliceShaderFrag
+  DEPENDS ShaderImporter ${CMAKE_CURRENT_SOURCE_DIR}/SliceShader.frag
+  )
    
 ##################################################
 # Set sources
@@ -47,12 +50,23 @@ SET(APPLICATION_RENDERER_SRCS
   RenderContext.cc
   Renderer.h
   Renderer.cc
-  ${CMAKE_CURRENT_BINARY_DIR}/glsl_shader.h
+  SliceShader.h
+  SliceShader.cc
+  )
+  
+SET(APPLICATION_RENDERER_SHADER_RAW_SRCS
+  SliceShader.frag
+  )
+
+SET(APPLICATION_RENDERER_SHADER_SRCS
+  SliceShaderFrag
   )
 
 
 ADD_LIBRARY(Application_Renderer STATIC 
-            ${APPLICATION_RENDERER_SRCS} )
+            ${APPLICATION_RENDERER_SRCS}
+      ${APPLICATION_RENDERER_SHADER_RAW_SRCS}
+      ${APPLICATION_RENDERER_SHADER_SRCS})
             
 TARGET_LINK_LIBRARIES(Application_Renderer
                       Utils_Core

@@ -38,6 +38,7 @@
 
 // Application includes
 #include <Application/Renderer/RenderContext.h>
+#include <Application/Renderer/SliceShader.h>
 #include <Application/Viewer/Viewer.h>
 #include <Application/Viewer/ViewerRenderer.h>
 
@@ -83,6 +84,7 @@ private:
   Utils::RenderbufferHandle depth_buffer_;
   Utils::FramebufferObjectHandle frame_buffer_;
   Utils::UnitCubeHandle cube_;
+  SliceShaderHandle slice_shader_;
 
   int active_render_texture_;
 

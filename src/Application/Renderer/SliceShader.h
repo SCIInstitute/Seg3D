@@ -26,53 +26,50 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef UTILS_GRAPHICS_GLSLPROGRAM_H
-#define UTILS_GRAPHICS_GLSLPROGRAM_H
-
-#include <string>
+#ifndef APPLICATION_RENDERER_SLICESHADER_H
+#define APPLICATION_RENDERER_SLICESHADER_H
 
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
 
-#include <GL/glew.h>
+#include <Utils/Graphics/GLSLProgram.h>
 
-#include <Utils/Graphics/GLSLShader.h>
-
-namespace Utils
+namespace Seg3D
 {
 
-class GLSLProgram;
-typedef boost::shared_ptr< GLSLProgram > GLSLProgramHandle;
+class SliceShader;
+typedef boost::shared_ptr< SliceShader > SliceShaderHandle;
 
-class GLSLProgram : public boost::noncopyable
+class SliceShader : public boost::noncopyable
 {
 public:
-  GLSLProgram();
-  ~GLSLProgram();
+  SliceShader();
+  ~SliceShader();
 
-  void attach_shader( GLSLShaderHandle shader );
-  void detach_shader( GLSLShaderHandle shader );
-
-  int get_uniform_location( const char* name );
-
-  // Link the program. Returns true if successful, otherwise false.
-  // Additional information can be acquired by calling "get_info_log".
-  bool link();
-
-  // Validate the program against the current OpenGL state. 
-  // Returns true if successful, otherwise false. 
-  // Additional information can be acquired by calling "get_info_log".
-  bool validate();
-
-  std::string get_info_log();
-
+  bool initialize();
   void enable();
   void disable();
+  void set_texture( int tex_unit );
+  void set_mask_mode( bool mask_mode );
+  void set_opacity( float opacity );
+  void set_contrast( float contrast );
+  void set_brightness( float brightness );
 
 private:
-  GLuint program_id_;
+
+  bool valid_;
+
+  Utils::GLSLProgramHandle glsl_prog_;
+  Utils::GLSLShaderHandle glsl_frag_shader_;
+
+  int tex_loc_;
+  int mask_mode_loc_;
+  int opacity_loc_;
+  int contrast_loc_;
+  int brightness_loc_;
+
+  const static char* FRAG_SHADER_SOURCE_C[];
 };
 
-} // end namespace Utils
-
+} // end namespace Seg3D
 #endif

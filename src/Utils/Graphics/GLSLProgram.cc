@@ -52,6 +52,11 @@ void GLSLProgram::detach_shader( GLSLShaderHandle shader )
   glDetachShader( this->program_id_, shader->shader_id_ );
 }
 
+int GLSLProgram::get_uniform_location( const char* name )
+{
+  return glGetUniformLocation( this->program_id_, name );
+}
+
 bool GLSLProgram::link()
 {
   glLinkProgram( this->program_id_ );

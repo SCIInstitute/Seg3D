@@ -390,7 +390,8 @@ void Viewer::set_active_layer( LayerHandle layer )
 
     StateView2D* view2d_state = dynamic_cast< StateView2D* >( this->get_active_view_state().get() );
     this->active_layer_slice_->move_slice( view2d_state->get().center().z(), true );
-    if ( this->slice_number_state_->get() == this->active_layer_slice_->get_slice_number() )
+    if ( this->slice_number_state_->get() == 
+      static_cast< int >( this->active_layer_slice_->get_slice_number() ) )
     {
       this->set_slice_number( static_cast< int >( this->active_layer_slice_->get_slice_number() ) );
     }
@@ -476,7 +477,8 @@ void Viewer::change_view_mode( std::string mode, ActionSource source )
     StateView2D* view2d_state = dynamic_cast< StateView2D* >( this->get_active_view_state().get() );
     this->active_layer_slice_->move_slice( view2d_state->get().center().z(), true );
     // Enforce an update even if the slice number is the same
-    if ( this->slice_number_state_->get() == this->active_layer_slice_->get_slice_number() )
+    if ( this->slice_number_state_->get() == 
+      static_cast< int >( this->active_layer_slice_->get_slice_number() ) )
     {
       this->set_slice_number( static_cast< int >( this->active_layer_slice_->get_slice_number() ) );
     }

@@ -35,7 +35,6 @@ SET(APPLICATION_LAYERMANAGER_SRCS
     LayerManager.h
     LayerManager.cc
   LayerScene.h
-  LayerScene.cc
   )
 
 SET(APPLICATION_LAYERMANAGER_ACTIONS_SRCS

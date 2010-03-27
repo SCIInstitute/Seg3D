@@ -70,6 +70,11 @@ bool GLSLShader::set_source( const std::string& file_name )
   return true;
 }
 
+void GLSLShader::set_source( GLsizei count, const char** str, const int* length )
+{
+  glShaderSource( this->shader_id_, count, str, length );
+}
+
 bool GLSLShader::compile()
 {
   glCompileShader( this->shader_id_ );

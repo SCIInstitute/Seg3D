@@ -71,8 +71,13 @@ public:
 };
 
 Renderer::Renderer() :
-  ViewerRenderer(), EventHandler(), active_render_texture_( 0 ), width_( 0 ), height_( 0 ),
-      redraw_needed_( false )
+  ViewerRenderer(), 
+  EventHandler(), 
+  slice_shader_( new SliceShader ),
+  active_render_texture_( 0 ), 
+  width_( 0 ), 
+  height_( 0 ),
+  redraw_needed_( false )
 {
 }
 
@@ -131,6 +136,7 @@ void Renderer::initialize()
   frame_buffer_ = Utils::FramebufferObjectHandle( new Utils::FramebufferObject() );
   frame_buffer_->attach_renderbuffer( depth_buffer_, GL_DEPTH_ATTACHMENT_EXT );
   this->cube_ = Utils::UnitCubeHandle( new Utils::UnitCube() );
+  this->slice_shader_->initialize();
 
   // release the lock
   lock.unlock();
@@ -252,7 +258,7 @@ void Renderer::redraw()
     glDisable( GL_DEPTH_TEST );
     glDisable( GL_CULL_FACE );
     glEnable( GL_BLEND );
-    glBlendFunc( GL_ONE_MINUS_DST_COLOR, GL_ONE_MINUS_SRC_COLOR );
+    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
     glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
     double left, right, top, bottom;
@@ -268,7 +274,10 @@ void Renderer::redraw()
     glTranslatef( -0.5f, -0.5f, -0.5f );
     this->cube_->draw();
 */
+    this->slice_shader_->enable();
+    this->slice_shader_->set_texture( 0 );
 
+    Utils::VolumeSlice* volume_slice = 0;
     for ( size_t layer_num = 0; layer_num < layer_scene->size(); layer_num++ )
     {
       LayerSceneItemHandle layer_item = ( *layer_scene )[ layer_num ];
@@ -280,28 +289,48 @@ void Renderer::redraw()
             dynamic_cast< DataLayerSceneItem* >( layer_item.get() );
           Utils::DataVolumeSlice* data_slice = data_layer_item->data_volume_slice_.get();
           if ( !data_slice ) continue;
-          Utils::TextureHandle slice_tex = data_layer_item->data_volume_slice_->get_texture();
-          Utils::Texture::lock_type slice_tex_lock( slice_tex->get_mutex() );
-          slice_tex->enable();
-          glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
-          glBegin( GL_QUADS );
-          glTexCoord2f( 0.0f, 0.0f );
-          glVertex2d( data_slice->left(), data_slice->bottom() );
-          glTexCoord2f( 1.0f, 0.0f );
-          glVertex2d( data_slice->right(), data_slice->bottom() );
-          glTexCoord2f( 1.0f, 1.0f );
-          glVertex2d( data_slice->right(), data_slice->top() );
-          glTexCoord2f( 0.0f, 1.0f );
-          glVertex2d( data_slice->left(), data_slice->top() );
-          glEnd();
-          slice_tex->disable();
+          volume_slice = data_slice;
+          this->slice_shader_->set_mask_mode( false );
+          this->slice_shader_->set_contrast( static_cast< float >( data_layer_item->contrast_ ) );
+          this->slice_shader_->set_brightness( 
+            static_cast< float >( data_layer_item->brightness_ / 50 ) );
         }
         break;
       case Utils::VolumeType::MASK_E:
+        {
+          MaskLayerSceneItem* mask_layer_item = 
+            dynamic_cast< MaskLayerSceneItem* >( layer_item.get() );
+          Utils::MaskVolumeSlice* mask_slice = mask_layer_item->mask_volume_slice_.get();
+          if ( !mask_slice ) continue;
+          volume_slice = mask_slice;
+          this->slice_shader_->set_mask_mode( true );
+        }
         break;
+      default:
+        assert( false );
+        continue;
       } // end switch
+
+      this->slice_shader_->set_opacity( static_cast< float >( layer_item->opacity_ ) );
+      Utils::TextureHandle slice_tex = volume_slice->get_texture();
+      Utils::Texture::lock_type slice_tex_lock( slice_tex->get_mutex() );
+      slice_tex->enable();
+      glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+      glBegin( GL_QUADS );
+      glTexCoord2f( 0.0f, 0.0f );
+      glVertex2d( volume_slice->left(), volume_slice->bottom() );
+      glTexCoord2f( 1.0f, 0.0f );
+      glVertex2d( volume_slice->right(), volume_slice->bottom() );
+      glTexCoord2f( 1.0f, 1.0f );
+      glVertex2d( volume_slice->right(), volume_slice->top() );
+      glTexCoord2f( 0.0f, 1.0f );
+      glVertex2d( volume_slice->left(), volume_slice->top() );
+      glEnd();
+      slice_tex->disable();
+
     } // end for
 
+    this->slice_shader_->disable();
   }
 
   SCI_CHECK_OPENGL_ERROR();
@@ -318,12 +347,13 @@ void Renderer::redraw()
    }
    */
 
+  glFinish();
+
   this->frame_buffer_->disable();
 
   // release the lock on the active render texture
   texture_lock.unlock();
 
-  glFinish();
 
   // signal rendering completed
   this->rendering_completed_signal_( textures_[ active_render_texture_ ] );
@@ -408,6 +438,12 @@ void Renderer::process_slices( LayerSceneHandle& layer_scene, ViewerHandle& view
       break;
     } // end switch
   } // end for
+
+  // Make the bottom layer fully opaque
+  if ( layer_scene->size() != 0 )
+  {
+    ( *layer_scene )[ 0 ]->opacity_ = 1.0;
+  }
 }
 
 } // end namespace Seg3D
