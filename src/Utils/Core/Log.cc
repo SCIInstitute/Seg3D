@@ -32,6 +32,7 @@
 #include <boost/bind.hpp>
 #include <boost/thread.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 #include <Utils/Core/Log.h>
 #include <Utils/Core/StringUtil.h>
@@ -46,11 +47,14 @@ Log::Log()
 std::string Log::header( const int line, const char* file ) const
 {
   boost::filesystem::path filename( file );
-  std::ostringstream oss;
-  oss << boost::this_thread::get_id();
-  std::string header_string = std::string( "[T" ) + oss.str()
-      + std::string( ":" ) + filename.filename() + std::string( ":" ) + to_string( line )
-      + std::string( "]" );
+//  std::ostringstream oss;
+//  oss << boost::this_thread::get_id();
+
+  boost::posix_time::ptime timestamp( boost::posix_time::second_clock::local_time() );
+
+  std::string header_string = std::string( "[" ) + boost::posix_time::to_simple_string( timestamp ) + 
+    std::string("|") + filename.filename() +  std::string( "|" ) + to_string( line ) + 
+    std::string( "]" );
   //  if (header_string.size() < 60) header_string += std::string(60-header_string.size(),' ');
   //  else header_string = header_string.substr(0,60);
   return header_string;

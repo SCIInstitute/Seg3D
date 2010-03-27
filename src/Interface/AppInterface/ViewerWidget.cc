@@ -121,8 +121,6 @@ ViewerWidgetPrivate::ViewerWidgetPrivate( QWidget *parent )
 {
   // ensure viewer selection is mutual exclusive
   viewer_selection_ = new QActionGroup( parent );
-  
-  
 
   QIcon sagittal_icon;
   sagittal_icon.addPixmap( QPixmap( ":/Images/Xview.png" ), QIcon::Normal, QIcon::Off );
@@ -275,8 +273,6 @@ ViewerWidgetPrivate::ViewerWidgetPrivate( QWidget *parent )
   // Generate button bar at the bottom of
   // the Viewer widget
   SCI_LOG_DEBUG("Create button bar for ViewWidget");
-  
-  
 
   buttonbar_ = new QFrame( parent );
   
@@ -301,6 +297,7 @@ ViewerWidgetPrivate::ViewerWidgetPrivate( QWidget *parent )
   viewer_type_button_->setFixedHeight( 20 );
   viewer_type_button_->setFixedWidth( 80 );
   viewer_type_button_->setMenu( viewer_menu_ );
+  viewer_type_button_->setArrowType( Qt::NoArrow );
 
   lock_button_ = new QToolButton( buttonbar_ );
   lock_button_->setToolButtonStyle( Qt::ToolButtonIconOnly );

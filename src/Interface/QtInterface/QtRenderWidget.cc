@@ -74,6 +74,7 @@ void QtRenderWidget::update_texture( Utils::TextureHandle texture )
   SCI_LOG_DEBUG(std::string("QtRenderWidget ") + Utils::to_string(this->viewer_id_)
     + ": received new texture");
   renderer_texture_ = texture;
+  
   updateGL();
 }
 
@@ -86,13 +87,17 @@ void QtRenderWidget::initializeGL()
 
 void QtRenderWidget::paintGL()
 {
-  if ( !renderer_texture_.get() )
+  SCI_LOG_DEBUG("Start of paintGL");
+  if ( !( this->renderer_texture_ ) )
   {
+    glClearColor( 0.5 , 0.5 , 0.5, 1.0 );
     glClear( GL_COLOR_BUFFER_BIT );
     return;
   }
 
   Utils::Texture::lock_type lock( renderer_texture_->get_mutex() );
+
+  SCI_LOG_DEBUG("Painting texture");
 
   // draw a window size quad and map the render texture onto it
   QSize view_size = QWidget::size();

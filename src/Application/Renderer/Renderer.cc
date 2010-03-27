@@ -26,7 +26,7 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <cstdlib>
+#include <Utils/Core/Log.h>
 
 // application includes
 #include <Application/Layer/DataLayer.h>
@@ -151,15 +151,18 @@ void Renderer::redraw()
   if ( !is_eventhandler_thread() )
   {
     boost::unique_lock<boost::recursive_mutex> lock( this->redraw_needed_mutex_ );
+
     this->redraw_needed_ = true;
     this->post_event( boost::bind( &Renderer::redraw, this ) );
+    
     return;
   }
 #else
   if ( !Interface::IsInterfaceThread() )
   {
     boost::unique_lock< boost::recursive_mutex > lock( redraw_needed_mutex_ );
-    redraw_needed_ = true;
+
+    this->redraw_needed_ = true;
     Interface::PostEvent( boost::bind( &Renderer::redraw, this ) );
     return;
   }
@@ -167,16 +170,28 @@ void Renderer::redraw()
 
   {
     boost::unique_lock< boost::recursive_mutex > lock( this->redraw_needed_mutex_ );
+    if ( this->redraw_needed_ == false )
+    {
+      return;
+    }
+    this->redraw_needed_ = false;
+  }
+/*
+  {
+    boost::unique_lock< boost::recursive_mutex > lock( this->redraw_needed_mutex_ );
+
     this->redraw_needed_ = false;
   }
 
   {
     boost::unique_lock< boost::recursive_mutex > lock( this->redraw_needed_mutex_ );
-    if ( this->redraw_needed_ )
+
+    if ( this->redraw_needed_ == true )
     {
       return;
     }
   }
+*/
 
 #if !defined(WIN32) && !defined(APPLE) && !defined(X11_THREADSAFE)
   this->context_->make_current();
@@ -356,7 +371,7 @@ void Renderer::redraw()
 
 
   // signal rendering completed
-  this->rendering_completed_signal_( textures_[ active_render_texture_ ] );
+  this->rendering_completed_signal_( this->textures_[ this->active_render_texture_ ] );
 
   // swap render textures 
   this->active_render_texture_ = ( ~this->active_render_texture_ ) & 1;
@@ -395,6 +410,12 @@ void Renderer::resize( int width, int height )
 
   width_ = width;
   height_ = height;
+
+  {
+    boost::unique_lock< boost::recursive_mutex > lock( this->redraw_needed_mutex_ );
+    this->redraw_needed_ = true;
+  }
+
 
   redraw();
 }
