@@ -36,9 +36,9 @@ VolumeSlice::VolumeSlice( const VolumeHandle& volume,
              VolumeSliceType type, size_t slice_num ) :
   slice_changed_( true ), 
   size_changed_( true ),
+  out_of_boundary_( false ),
   volume_( volume ), 
   slice_type_( type ), 
-  out_of_boundary_( false ),
   slice_number_ ( slice_num )
 {
   this->update_position();

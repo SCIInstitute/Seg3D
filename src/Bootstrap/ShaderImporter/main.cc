@@ -74,6 +74,10 @@ int main( int argc, char** argv )
       {
         ofile << '\\' << buffer[ i ];
       }
+      else if ( buffer[ i ] == '\r' )
+      {
+        continue;
+      }
       else
       {
         ofile << buffer[ i ];
