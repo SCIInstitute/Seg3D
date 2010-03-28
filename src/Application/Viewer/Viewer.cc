@@ -563,32 +563,42 @@ void Viewer::adjust_view()
   }
 
   double aspect = this->width_ * 1.0 / this->height_;
-  double scale;
+  if ( this->width_ == 0 || this->height_ == 0 ) 
+  {
+    aspect = 1.0;
+  }
+  double scale, scalex, scaley;
   Utils::Point center;
 
   volume_slice->set_slice_type( Utils::VolumeSliceType::AXIAL_E );
   center = Utils::Point( ( volume_slice->left() + volume_slice->right() ) * 0.5, 
-                  ( volume_slice->bottom() + volume_slice->top() ) * 0.5, 
-                  this->axial_view_state_->get().center().z() );
+              ( volume_slice->bottom() + volume_slice->top() ) * 0.5, 
+              this->axial_view_state_->get().center().z() );
   scale = 1.0 / Utils::Max( Utils::Abs( volume_slice->top() - volume_slice->bottom() ),
-    Utils::Abs( volume_slice->right() - volume_slice->left() ) / aspect );;
-  this->axial_view_state_->set( Utils::View2D( center, scale ) );
+    Utils::Abs( volume_slice->right() - volume_slice->left() ) / aspect );
+  scalex = scale * Utils::Sign( this->axial_view_state_->get().scalex() );
+  scaley = scale * Utils::Sign( this->axial_view_state_->get().scaley() );
+  this->axial_view_state_->set( Utils::View2D( center, scalex, scaley ) );
 
   volume_slice->set_slice_type( Utils::VolumeSliceType::CORONAL_E );
   center = Utils::Point( ( volume_slice->left() + volume_slice->right() ) * 0.5, 
-                  ( volume_slice->bottom() + volume_slice->top() ) * 0.5, 
-                  this->coronal_view_state_->get().center().z() );
+              ( volume_slice->bottom() + volume_slice->top() ) * 0.5, 
+              this->coronal_view_state_->get().center().z() );
   scale = 1.0 / Utils::Max( Utils::Abs( volume_slice->top() - volume_slice->bottom() ),
-    Utils::Abs( volume_slice->right() - volume_slice->left() ) / aspect );;
-  this->coronal_view_state_->set( Utils::View2D( center, scale ) );
+    Utils::Abs( volume_slice->right() - volume_slice->left() ) / aspect );
+  scalex = scale * Utils::Sign( this->coronal_view_state_->get().scalex() );
+  scaley = scale * Utils::Sign( this->coronal_view_state_->get().scaley() );
+  this->coronal_view_state_->set( Utils::View2D( center, scalex, scaley ) );
 
   volume_slice->set_slice_type( Utils::VolumeSliceType::SAGITTAL_E );
   center = Utils::Point( ( volume_slice->left() + volume_slice->right() ) * 0.5, 
-                  ( volume_slice->bottom() + volume_slice->top() ) * 0.5, 
-                  this->sagittal_view_state_->get().center().z() );
+              ( volume_slice->bottom() + volume_slice->top() ) * 0.5, 
+              this->sagittal_view_state_->get().center().z() );
   scale = 1.0 / Utils::Max( Utils::Abs( volume_slice->top() - volume_slice->bottom() ),
-    Utils::Abs( volume_slice->right() - volume_slice->left() ) / aspect );;
-  this->sagittal_view_state_->set( Utils::View2D( center, scale ) );
+    Utils::Abs( volume_slice->right() - volume_slice->left() ) / aspect );
+  scalex = scale * Utils::Sign( this->sagittal_view_state_->get().scalex() );
+  scaley = scale * Utils::Sign( this->sagittal_view_state_->get().scaley() );
+  this->sagittal_view_state_->set( Utils::View2D( center, scalex, scaley ) );
 }
 
 void Viewer::adjust_depth()
