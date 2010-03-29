@@ -170,6 +170,8 @@ double ViewManipulator::compute_scaling( int x0, int y0, int x1, int y1 ) const
 
   double len = Utils::Sqrt( delta_x * delta_x + delta_y * delta_y );
   double scale = Utils::Abs( delta_x ) > Utils::Abs( delta_y ) ? delta_x : delta_y;
+  //double len = Utils::Abs( delta_y );
+  //double scale = delta_y;
 
   if ( scale > 0 )
   {

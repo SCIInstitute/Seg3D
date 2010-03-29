@@ -75,6 +75,8 @@ void DataVolumeSlice::initialize_texture()
       this->texture_ = Texture2DHandle( new Texture2D );
       this->texture_->set_mag_filter( GL_LINEAR );
       this->texture_->set_min_filter( GL_LINEAR );
+      this->texture_->set_wrap_s( GL_CLAMP_TO_EDGE );
+      this->texture_->set_wrap_t( GL_CLAMP_TO_EDGE );
     }
   }
 }

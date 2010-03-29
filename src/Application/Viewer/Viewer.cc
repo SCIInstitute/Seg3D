@@ -562,10 +562,10 @@ void Viewer::adjust_view()
     return;
   }
 
-  double aspect = this->width_ * 1.0 / this->height_;
-  if ( this->width_ == 0 || this->height_ == 0 ) 
+  double aspect = 1.0;
+  if ( this->width_ != 0 && this->height_ != 0 ) 
   {
-    aspect = 1.0;
+    aspect = this->width_ * 1.0 / this->height_;
   }
   double scale, scalex, scaley;
   Utils::Point center;
