@@ -44,7 +44,7 @@
 
 // Utils includes
 #include <Utils/Core/StringUtil.h>
-#include <Utils/Singleton/Singleton.h>
+#include <Utils/Core/Singleton.h>
 
 // Application includes
 #include <Application/Tool/Tool.h>

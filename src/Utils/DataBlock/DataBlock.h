@@ -70,6 +70,15 @@ public:
   typedef boost::recursive_mutex mutex_type;
   typedef boost::unique_lock< mutex_type > lock_type;
 
+  // index/size types
+#ifdef SCI_64BITS
+  typedef unsigned long long  size_type;
+  typedef long long     index_type;
+#else
+  typedef unsigned int    size_type;
+  typedef int         index_type;
+#endif  
+
   // -- Constructor/destructor --
 public:
   DataBlock();
@@ -78,21 +87,21 @@ public:
   // -- Access properties of data block --
 public:
 
-  // NX, NY, NZ, SIZE
+  // GET_NX, GET_NY, GET_NZ, GET_SIZE
   // The dimensions of the datablock
-  size_t nx() const
+  size_t get_nx() const
   {
     return nx_;
   }
-  size_t ny() const
+  size_t get_ny() const
   {
     return ny_;
   }
-  size_t nz() const
+  size_t get_nz() const
   {
     return nz_;
   }
-  size_t size() const
+  size_t get_size() const
   {
     return nx_ * ny_ * nz_;
   }
@@ -107,68 +116,67 @@ public:
 
   // TYPE
   // The type of the data
-  DataType type() const
+  DataType get_type() const
   {
     return this->data_type_;
   }
 
   // DATA:
   // Pointer to the block of data
-  void* data()
+  void* get_data()
   {
     return this->data_;
   }
 
-  inline float* float_data()
-  {
-    if ( this->data_type_ == DataType::FLOAT_E )
-    {
-      return reinterpret_cast<float*>( this->data_ );
-    }
-    return 0;
-  }
-
-  inline unsigned char* uchar_data()
-  {
-    if ( this->data_type_ == DataType::UCHAR_E )
-    {
-      return reinterpret_cast<unsigned char*>( this->data_ );
-    }
-    return 0;
-  }
-
+  // GET_DATA_AT:
+  // Get data at a certain location in the data block
   inline double get_data_at( size_t x, size_t y, size_t z ) const
   {
     return get_data_at( this->to_index( x, y, z ) );
   }
   
+  // GET_DATA_AT:
+  // Get data at a certain index location in the data block
   double get_data_at( size_t index ) const;
   
+  // SET_DATA_AT:
+  // Set data at a certain location in the data block
   inline void set_data_at( size_t x, size_t y, size_t z, double value )
   {
     set_data_at( this->to_index( x, y, z ), value );
   }
 
+  // SET_DATA_AT:
+  // Set data at a certain index location in the data block
   void set_data_at( size_t index, double value );
 
+  // GET_MAX:
+  // Get the maximum value of the data
+  // NOTE: update_histogram needs to be called to ensure the data is accurate
   inline double get_max() const
   {
     return this->histogram_.get_max();
   }
 
+  // GET_MIN:
+  // Get the minimum value of the data
+  // NOTE: update_histogram needs to be called to ensure the data is accurate
   inline double get_min() const
   {
     return this->histogram_.get_min();
   }
 
+  // GET_HISTOGRAM:
+  // Get the histogram of the underlying data
   Histogram get_histogram() const
   {
     return this->histogram_;
   }
 
+  // UPDATE_HISTOGRAM:
+  // Recompute the histogram. This needs to be triggered each time the data is updated
   void update_histogram();
 
-  // -- Pointer to where the data is stored
 protected:
 
   // SET_NX, SET_NY, SET_NZ
@@ -234,6 +242,20 @@ private:
 
   // Histogram information for this data block
   Histogram histogram_;
+
+public:
+
+  // CONVERTDATATYPE:
+  // Convert the data to a specific format
+  bool ConvertDataType( const DataBlockHandle& src_data_block, DataBlockHandle& dst_data_block, 
+    DataType new_data_type );
+    
+  // PERMUTEDATABLOCK:
+  // Reorder the data by shuffling the axis, the permutation is a vector of three components
+  // that specify -1, 1 , and -2, 2, and -3, 3 for each of the axis, where the negative number
+  // indicates an inverted axis.
+  bool PermuteDataBlock( const DataBlockHandle& src_data_block, DataBlockHandle& dst_data_block,
+    std::vector<int> permutation );
 
 };
 

@@ -70,9 +70,11 @@ INCLUDE(CMakeBackwardCompatibilityCXX)
 IF (CMAKE_SIZEOF_VOID_P MATCHES 8)
   SET(SEG3D_BITS "64bit")
   SET(MSVC90_BUILD "amd64")
+  ADD_DEFINITIONS(-DSCI_32BITS)
 ELSE (CMAKE_SIZEOF_VOID_P MATCHES 8)
   SET(SEG3D_BITS "32bit")
   SET(MSVC90_BUILD "x86")
+  ADD_DEFINITIONS(-DSCI_64BITS)
 ENDIF (CMAKE_SIZEOF_VOID_P MATCHES 8)
 
 ###########################################
@@ -151,7 +153,6 @@ ENDIF(SEG3D_BUILD_INTERFACE)
 ###########################################
 
 ADD_SUBDIRECTORY(Externals)
-
 ADD_SUBDIRECTORY(Bootstrap)
 
 ###########################################
@@ -167,7 +168,6 @@ ADD_SUBDIRECTORY(Bootstrap)
 ###########################################
 
 IF(CMAKE_BUILD_TYPE MATCHES "Debug")
-  ADD_DEFINITIONS(-DDEBUG)
   SET(SEG3D_DEBUG_VERSION "\"(Debug)\"")
 ELSE(CMAKE_BUILD_TYPE MATCHES "Debug")
   SET(SEG3D_DEBUG_VERSION "\"\"")

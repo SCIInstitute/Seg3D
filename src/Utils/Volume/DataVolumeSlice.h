@@ -47,6 +47,11 @@ public:
   DataVolumeSlice( const DataVolumeSlice& copy );
   virtual ~DataVolumeSlice();
 
+  inline DataBlock* get_data_block() const
+  {
+    return this->data_block_;
+  }
+
   inline double get_data_at ( size_t i, size_t j ) const
   {
     return this->data_block_->get_data_at( this->to_index( i, j ) );

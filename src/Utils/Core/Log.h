@@ -34,7 +34,7 @@
 #endif 
 
 #include <Utils/Core/EnumClass.h>
-#include <Utils/Singleton/Singleton.h>
+#include <Utils/Core/Singleton.h>
 
 // STL includes
 #include <string>

@@ -26,10 +26,11 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-// Need instance of main application for inserting events into main application
-// thread.
-#include <Application/Application/Application.h>
+// Utils includs
+#include <Utils/Core/Log.h>
 
+// Application includes
+#include <Application/Application/Application.h>
 #include <Application/Action/ActionProgress.h>
 #include <Application/Action/ActionDispatcher.h>
 
@@ -44,10 +45,12 @@ ActionProgress::ActionProgress( const std::string& message,
   interrupt_( false ),
   progress_( 0.0 )
 {
+  SCI_LOG_DEBUG("Start reporting progress");
 }
 
 ActionProgress::~ActionProgress()
 {
+  SCI_LOG_DEBUG("Done reporting progress");
 }
 
 void ActionProgress::begin_progress_reporting()

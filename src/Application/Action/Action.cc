@@ -102,7 +102,7 @@ bool Action::import_from_string( const std::string& action, std::string& error )
   SCI_LOG_DEBUG(std::string("action = ")+action);
 
   // First part of the string is the command
-  if ( !( Utils::scan_command( action, pos, command, error ) ) )
+  if ( !( Utils::ScanCommand( action, pos, command, error ) ) )
   {
     error = std::string( "SYNTAX ERROR: " ) + error;
     return ( false );
@@ -116,7 +116,7 @@ bool Action::import_from_string( const std::string& action, std::string& error )
 
   for ( size_t j = 0; j < arguments_.size(); j++ )
   {
-    if ( !( Utils::scan_value( action, pos, value, error ) ) )
+    if ( !( Utils::ScanValue( action, pos, value, error ) ) )
     {
       error = std::string( "SYNTAX ERROR: " ) + error;
     }
@@ -140,7 +140,7 @@ bool Action::import_from_string( const std::string& action, std::string& error )
 
   while ( 1 )
   {
-    if ( !( Utils::scan_keyvaluepair( action, pos, key, value, error ) ) )
+    if ( !( Utils::ScanKeyValuePair( action, pos, key, value, error ) ) )
     {
       error = std::string( "SYNTAX ERROR: " ) + error;
       return ( false );

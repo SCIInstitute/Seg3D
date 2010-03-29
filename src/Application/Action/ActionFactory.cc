@@ -54,7 +54,7 @@ bool ActionFactory::create_action( const std::string& action_string, ActionHandl
   usage = "";
 
   // Scan for the command that needs to be instanted.
-  if ( !( Utils::scan_command( action_string, pos, command, error ) ) )
+  if ( !( Utils::ScanCommand( action_string, pos, command, error ) ) )
   {
     error = std::string( "SYNTAX ERROR: " ) + error;
     return ( false );

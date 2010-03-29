@@ -40,7 +40,7 @@
 
 #include <Utils/Core/Log.h>
 #include <Utils/Core/IntrusiveBase.h>
-#include <Utils/Singleton/Singleton.h>
+#include <Utils/Core/Singleton.h>
 
 #include <Application/Action/Action.h>
 

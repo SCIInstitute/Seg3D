@@ -170,7 +170,6 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   QtBridge::Connect( this->private_->ui_.lock_button_, layer->lock_state_ );
   QtBridge::Connect( this->private_->opacity_adjuster_, layer->opacity_state_ );
   QtBridge::Connect( this->private_->ui_.label_, layer->name_state_ );
-  
     
   switch( layer->type() )
   {

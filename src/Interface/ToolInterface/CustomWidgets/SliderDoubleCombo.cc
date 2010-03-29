@@ -44,7 +44,8 @@ public:
 };
 
 SliderDoubleCombo::SliderDoubleCombo( QWidget* parent, bool edit_range ) :
-    private_( new SliderDoubleComboPrivate ), QWidget( parent )
+  QWidget( parent ),
+    private_( new SliderDoubleComboPrivate )
 {
     this->private_->ui_.setupUi( this );
     

@@ -33,7 +33,7 @@
 namespace Utils
 {
 
-bool scan_command( const std::string& str, std::string::size_type& start, std::string& command,
+bool ScanCommand( const std::string& str, std::string::size_type& start, std::string& command,
     std::string& error )
 {
   // Scan for where the command starts
@@ -76,7 +76,7 @@ bool scan_command( const std::string& str, std::string::size_type& start, std::s
   return ( true );
 }
 
-bool scan_value( const std::string& str, std::string::size_type& start, std::string& value,
+bool ScanValue( const std::string& str, std::string::size_type& start, std::string& value,
     std::string& error )
 {
   // Scan for where the key starts
@@ -219,7 +219,7 @@ bool scan_value( const std::string& str, std::string::size_type& start, std::str
   }
 }
 
-bool scan_keyvaluepair( const std::string& str, std::string::size_type& start, std::string& key,
+bool ScanKeyValuePair( const std::string& str, std::string::size_type& start, std::string& key,
     std::string& value, std::string& error )
 {
   // Scan for where the key starts

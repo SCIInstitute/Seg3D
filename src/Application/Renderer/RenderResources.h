@@ -38,7 +38,7 @@
 // Utils includes
 #include <Utils/Core/Exception.h>
 #include <Utils/Core/Log.h>
-#include <Utils/Singleton/Singleton.h>
+#include <Utils/Core/Singleton.h>
 
 // Application includes
 #include <Application/Renderer/RenderContext.h>

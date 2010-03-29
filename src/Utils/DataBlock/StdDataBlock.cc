@@ -40,63 +40,72 @@ StdDataBlock::StdDataBlock( size_t nx, size_t ny, size_t nz, DataType dtype )
   set_type( dtype );
 
   // Allocate the memory block through C++'s std library
-  switch( type() )
+  switch( get_type() )
   {
   case DataType::UNKNOWN_E:
+    set_nx( 0 );
+    set_ny( 0 );
+    set_nz( 0 );
     set_data( 0 );
     break;
   case DataType::CHAR_E:
-    set_data( reinterpret_cast< void* > ( new char[ size() ] ) );
+    set_data( reinterpret_cast< void* > ( new char[ get_size() ] ) );
     break;
   case DataType::UCHAR_E:
-    set_data(reinterpret_cast<void*>(new unsigned char[size()])); break;
+    set_data( reinterpret_cast<void*>( new unsigned char[ get_size() ] ) ); 
+    break;
   case DataType::SHORT_E:
-    set_data( reinterpret_cast< void* > ( new short[ size() ] ) );
+    set_data( reinterpret_cast< void* > ( new short[ get_size() ] ) );
     break;
   case DataType::USHORT_E:
-    set_data(reinterpret_cast<void*>(new unsigned short[size()])); break;
+    set_data(reinterpret_cast<void*>( new unsigned short[ get_size() ] ) ); 
+    break;
   case DataType::INT_E:
-    set_data( reinterpret_cast< void* > ( new int[ size() ] ) );
+    set_data( reinterpret_cast< void* > ( new int[ get_size() ] ) );
     break;
   case DataType::UINT_E:
-    set_data(reinterpret_cast<void*>(new unsigned int[size()])); break;
+    set_data( reinterpret_cast<void*>( new unsigned int[ get_size() ] ) ); 
+    break;
   case DataType::FLOAT_E:
-    set_data( reinterpret_cast< void* > ( new float[ size() ] ) );
+    set_data( reinterpret_cast< void* > ( new float[ get_size() ] ) );
     break;
   case DataType::DOUBLE_E:
-    set_data( reinterpret_cast< void* > ( new double[ size() ] ) );
+    set_data( reinterpret_cast< void* > ( new double[ get_size() ] ) );
     break;
   }
 }
 
 StdDataBlock::~StdDataBlock()
 {
-  if ( data() )
+  if ( get_data() )
   {
-    switch( type() )
+    switch( get_type() )
     {
     case DataType::UNKNOWN_E:
       break;
     case DataType::CHAR_E:
-      delete[] reinterpret_cast< char* > ( data() );
+      delete[] reinterpret_cast< char* > ( get_data() );
       break;
     case DataType::UCHAR_E:
-      delete[] reinterpret_cast<unsigned char*>(data()); break;
+      delete[] reinterpret_cast<unsigned char*>( get_data() ); 
+      break;
     case DataType::SHORT_E:
-      delete[] reinterpret_cast< short* > ( data() );
+      delete[] reinterpret_cast< short* > ( get_data() );
       break;
     case DataType::USHORT_E:
-      delete[] reinterpret_cast<unsigned short*>(data()); break;
+      delete[] reinterpret_cast<unsigned short*>( get_data() ); 
+      break;
     case DataType::INT_E:
-      delete[] reinterpret_cast< int* > ( data() );
+      delete[] reinterpret_cast< int* > ( get_data() );
       break;
     case DataType::UINT_E:
-      delete[] reinterpret_cast<unsigned int*>(data()); break;
+      delete[] reinterpret_cast<unsigned int*>( get_data() ); 
+      break;
     case DataType::FLOAT_E:
-      delete[] reinterpret_cast< float* > ( data() );
+      delete[] reinterpret_cast< float* > ( get_data() );
       break;
     case DataType::DOUBLE_E:
-      delete[] reinterpret_cast< double* > ( data() );
+      delete[] reinterpret_cast< double* > ( get_data() );
       break;
     }
   }

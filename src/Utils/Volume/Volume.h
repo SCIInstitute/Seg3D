@@ -86,24 +86,24 @@ public:
     return this->grid_transform_;
   }
 
-  // NX, NY, NZ, SIZE
+  // GET_NX, GET_NY, GET_NZ, GET_SIZE
   // The volume dimensions
-  inline size_t nx() const
+  inline size_t get_nx() const
   {
     return this->nx_;
   }
 
-  inline size_t ny() const
+  inline size_t get_ny() const
   {
     return this->ny_;
   }
 
-  inline size_t nz() const
+  inline size_t get_nz() const
   {
     return this->nz_;
   }
 
-  inline size_t size() const
+  inline size_t get_size() const
   {
     return this->nx_ * this->ny_ * this->nz_;
   }

@@ -41,7 +41,7 @@
 
 // Core includes
 #include <Utils/Core/StringUtil.h>
-#include <Utils/Singleton/Singleton.h>
+#include <Utils/Core/Singleton.h>
 #include <Utils/Core/Log.h>
 #include <Utils/Core/Exception.h>
 

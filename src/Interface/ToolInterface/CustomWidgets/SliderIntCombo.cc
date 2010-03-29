@@ -43,7 +43,8 @@ public:
 };
 
 SliderIntCombo::SliderIntCombo( QWidget* parent, bool edit_range ) :
-    private_( new SliderIntComboPrivate ), QWidget( parent )
+     QWidget( parent ),
+  private_( new SliderIntComboPrivate )
 {
     this->private_->ui_.setupUi( this );
     

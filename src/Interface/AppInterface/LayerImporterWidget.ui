@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>396</width>
-    <height>439</height>
+    <height>400</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -396,7 +396,7 @@ QWidget#main_{
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>280</height>
+          <height>64</height>
          </size>
         </property>
         <property name="frameShape">

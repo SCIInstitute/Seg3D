@@ -41,31 +41,28 @@
 namespace Utils
 {
 
-// SCAN_COMMAND:
+// SCANCOMMAND:
 // Scan for the first command in the string str starting at start
 // the function will return true if it success and other wise returns
 // an error. It returns the next scan point in start
 
-bool
-scan_command( const std::string& str, std::string::size_type& start, std::string& command,
+bool ScanCommand( const std::string& str, std::string::size_type& start, std::string& command,
     std::string& error );
 
-// SCAN_VALUE:
+// SCANVALUE:
 // Scan for the first value in the string str starting at start
 // the function will return true if it success and other wise returns
 // an error. It returns the next scan point in start
 
-bool
-scan_value( const std::string& str, std::string::size_type& start, std::string& value,
+bool ScanValue( const std::string& str, std::string::size_type& start, std::string& value,
     std::string& error );
 
-// SCAN_KEYVALUEPAIR:
+// SCANKEYVALUEPAIR:
 // Scan for the first key value pair in the string str starting at start
 // the function will return true if it success and other wise returns
 // an error. It returns the next scan point in start
 
-bool
-scan_keyvaluepair( const std::string& str, std::string::size_type& start, std::string& key,
+bool ScanKeyValuePair( const std::string& str, std::string::size_type& start, std::string& key,
     std::string& value, std::string& error );
 
 } // end namespace Utils

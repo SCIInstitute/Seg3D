@@ -40,7 +40,7 @@
 #include <boost/utility.hpp>
 
 // Utils includes
-#include <Utils/Singleton/Singleton.h>
+#include <Utils/Core/Singleton.h>
 
 // Application includes
 #include <Application/State/StateHandler.h>

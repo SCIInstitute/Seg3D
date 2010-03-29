@@ -50,17 +50,17 @@ bool MaskDataBlockManager::create( size_t nx, size_t ny, size_t nz, MaskDataBloc
   for (size_t j=0; j<mask_list_.size(); j++)
   {
     // Find an empty location
-    if ( (nx == mask_list_[j].data_block_->nx()) &&
-      (ny == mask_list_[j].data_block_->ny()) &&
-      (nz == mask_list_[j].data_block_->nz()) &&
-      (mask_list_[j].bits_used_.count() != 8))
+    if ( ( nx == mask_list_[ j ].data_block_->get_nx() ) &&
+      ( ny == mask_list_[ j ].data_block_->get_ny() ) &&
+      ( nz == mask_list_[ j ].data_block_->get_nz() ) &&
+      ( mask_list_[ j ].bits_used_.count() != 8 ) )
     {
-      data_block = mask_list_[j].data_block_;
+      data_block = mask_list_[ j ].data_block_;
       mask_entry_index = j;
 
-      for (size_t k = 0; k < 8; k++)
+      for ( size_t k = 0; k < 8; k++) 
       {
-        if (!(mask_list_[j].bits_used_.test(k)))
+        if ( !( mask_list_[j].bits_used_.test( k ) ) )
         {
           mask_bit = static_cast<unsigned int>( k );
           // drop out of for loop
@@ -94,18 +94,18 @@ bool MaskDataBlockManager::create( size_t nx, size_t ny, size_t nz, MaskDataBloc
 void
 MaskDataBlockManager::release(DataBlockHandle& datablock, unsigned int mask_bit)
 {
-  lock_type lock(get_mutex());
+  lock_type lock( get_mutex() );
 
   // Remove the MaskDataBlock from the list
-  for (size_t j=0; j<mask_list_.size(); j++)
+  for ( size_t j = 0 ; j < mask_list_.size() ; j++ )
   {
-    if ( mask_list_[j].data_block_ == datablock )
+    if ( mask_list_[ j ].data_block_ == datablock )
     {
-      mask_list_[j].bits_used_[mask_bit] = 0;
-      mask_list_[j].data_masks_[mask_bit].reset();
+      mask_list_[ j ].bits_used_[mask_bit] = 0;
+      mask_list_[ j ].data_masks_[mask_bit].reset();
 
       // If the DataBlock is not used any more clear it
-      if (mask_list_[j].bits_used_.count() == 0)
+      if (mask_list_[ j ].bits_used_.count() == 0)
       {
         mask_list_.erase( mask_list_.begin() + j);
       }

@@ -39,7 +39,7 @@
 #include <boost/shared_ptr.hpp>
 
 #include <Utils/Core/Log.h>
-#include <Utils/Singleton/Singleton.h>
+#include <Utils/Core/Singleton.h>
 
 #include <Application/Action/Action.h>
 #include <Application/Action/ActionContext.h>

@@ -42,7 +42,7 @@
 #include <boost/smart_ptr.hpp>
 
 // Utils includes
-#include <Utils/Singleton/Singleton.h>
+#include <Utils/Core/Singleton.h>
 #include <Utils/DataBlock/DataBlock.h>
 #include <Utils/DataBlock/StdDataBlock.h>
 #include <Utils/DataBlock/MaskDataBlock.h>

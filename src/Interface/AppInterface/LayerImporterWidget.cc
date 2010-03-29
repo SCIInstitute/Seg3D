@@ -103,7 +103,6 @@ public:
       "background-color: rgb(150, 150, 150);"\
       "border-radius: 3px;"\
       "border: 2px solid rgb(30, 30, 30);}" );
-      
   }
 
 };
@@ -115,7 +114,9 @@ LayerImporterWidget::LayerImporterWidget( LayerImporterHandle importer, QWidget*
 {
   // Step (1): Ensure it will be the only focus in the pogram
   setWindowModality(  Qt::ApplicationModal );
-
+  setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred );
+  setMinimumHeight( 100 );
+  
   // Step (2): Make a new LayerImporterWidgetPrivateHandle object
   private_ = LayerImporterWidgetPrivateHandle( new LayerImporterWidgetPrivate );
   private_->ui_.setupUi( this );
@@ -126,6 +127,8 @@ LayerImporterWidget::LayerImporterWidget( LayerImporterHandle importer, QWidget*
   private_->ui_.importer_options_->hide();
   private_->ui_.scanning_file_->show();
   private_->ui_.import_button_->setEnabled( false );
+
+  adjustSize();
 
   // Step (4): Activate the cancel button
   connect( private_->ui_.cancel_button_, SIGNAL( released() ),
@@ -196,11 +199,11 @@ void LayerImporterWidget::list_import_options()
   
   Utils::GridTransform grid_transform = importer_->get_grid_transform();
   private_->ui_.x_size_->setText( 
-    QString::fromStdString( Utils::to_string( grid_transform.nx() ) ) );
+    QString::fromStdString( Utils::to_string( grid_transform.get_nx() ) ) );
   private_->ui_.y_size_->setText( 
-    QString::fromStdString( Utils::to_string( grid_transform.ny() ) ) );
+    QString::fromStdString( Utils::to_string( grid_transform.get_ny() ) ) );
   private_->ui_.z_size_->setText( 
-    QString::fromStdString( Utils::to_string( grid_transform.nz() ) ) );
+    QString::fromStdString( Utils::to_string( grid_transform.get_nz() ) ) );
 
   private_->ui_.x_spacing_->setText( 
     QString::fromStdString( Utils::to_string( grid_transform.spacing_x() ) ) );
@@ -231,6 +234,8 @@ void LayerImporterWidget::list_import_options()
   private_->ui_.cancel_button_->setAutoDefault( false );
   private_->ui_.import_button_->setDefault( true );
   private_->ui_.import_button_->setAutoDefault( true );
+  
+  adjustSize();
 }
 
 

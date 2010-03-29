@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef UTILS_SINGLETON_SINGLETON_H
-#define UTILS_SINGLETON_SINGLETON_H
+#ifndef UTILS_CORE_SINGLETON_H
+#define UTILS_CORE_SINGLETON_H
 
 // Boost includes
 #include <boost/thread/mutex.hpp>

@@ -73,19 +73,23 @@ public:
 
   // -- accessors --
 public:
-  size_t nx() const
+  // GET_NX, GET_NY, GET_NZ, GET_SIZE
+  // Get the dimensions of the grid this class describes
+  size_t get_nx() const
   {
     return nx_;
   }
-  size_t ny() const
+  size_t get_ny() const
   {
     return ny_;
   }
-  size_t nz() const
+  size_t get_nz() const
   {
     return nz_;
   }
 
+  // SPACING_X, SPACING_Y, SPACING_Z
+  // The spacing in each of directions
   double spacing_x() const
   {
     return project( Vector(1.0,0.0,0.0) ).length();
@@ -101,21 +105,23 @@ public:
     return project( Vector(0.0,0.0,1.0) ).length();
   }
 
-  void nx( size_t nx )
+  // SET_NX, SET_NY, SET_NY
+  // Set the size of the grid
+  void set_nx( size_t nx )
   {
     nx_ = nx;
   }
-  void ny( size_t ny )
+  void set_ny( size_t ny )
   {
     ny_ = ny;
   }
-  void nz( size_t nz )
+  void set_nz( size_t nz )
   {
     nz_ = nz;
   }
   
-  std::string get_as_string();
-
+  // TRANSFORM:
+  // Get the underlying transform
   Transform transform() const;
 
   // -- internal representation --

@@ -26,11 +26,11 @@
  DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_LAYERMANAGER_LAYERIO_H
-#define APPLICATION_LAYERMANAGER_LAYERIO_H
+#ifndef APPLICATION_LAYERIO_LAYERIO_H
+#define APPLICATION_LAYERIO_LAYERIO_H
 
 // Utils includes
-#include <Utils/Singleton/Singleton.h>
+#include <Utils/Core/Singleton.h>
 
 // Application includes
 #include <Application/Layer/Layer.h>

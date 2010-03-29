@@ -45,7 +45,7 @@
 #include <boost/thread/mutex.hpp>
 
 // Application includes
-#include <Utils/Singleton/Singleton.h>
+#include <Utils/Core/Singleton.h>
 #include <Application/Viewer/Viewer.h>
 #include <Application/State/State.h>
 

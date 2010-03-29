@@ -42,7 +42,7 @@
 
 #include <Utils/Core/Log.h>
 #include <Utils/Core/Exception.h>
-#include <Utils/Singleton/Singleton.h>
+#include <Utils/Core/Singleton.h>
 
 #include <Application/State/StateBase.h>
 

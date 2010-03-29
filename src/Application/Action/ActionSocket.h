@@ -32,14 +32,15 @@
 // STL includes
 #include <iostream>
 
-// Utils includes
-#include <Utils/Singleton/Singleton.h>
-
 // Boost includes
 #include <boost/utility.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/signals2/signal.hpp>
 
+// Utils includes
+#include <Utils/Core/Singleton.h>
+
+// Application includes
 #include <Application/Action/Action.h>
 #include <Application/Action/ActionDispatcher.h>
 

@@ -45,7 +45,7 @@
 
 // Utils includes
 #include <Utils/Core/Log.h>
-#include <Utils/Singleton/Singleton.h>
+#include <Utils/Core/Singleton.h>
 
 namespace Utils
 {

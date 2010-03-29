@@ -155,6 +155,7 @@ void LayerManagerWidget::delete_group( LayerGroupHandle group )
 
 void  LayerManagerWidget::set_active_layer( LayerHandle layer )
 {
+  setUpdatesEnabled( false );
     set_active_group( layer->get_layer_group() );   
     
     for ( QList< LayerGroupWidget_handle >::iterator i = this->group_list_.begin(); 
@@ -162,6 +163,9 @@ void  LayerManagerWidget::set_active_layer( LayerHandle layer )
   {
       ( *i )->set_active_layer( layer );
   }
+
+  setUpdatesEnabled( true );
+  update();
 }
 
   

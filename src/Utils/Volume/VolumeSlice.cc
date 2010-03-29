@@ -102,9 +102,9 @@ void VolumeSlice::update_position()
   switch( this->slice_type_ )
   {
   case VolumeSliceType::AXIAL_E:
-    this->nx_ = this->volume_->nx();
-    this->ny_ = this->volume_->ny();
-    this->number_of_slices_ = this->volume_->nz();
+    this->nx_ = this->volume_->get_nx();
+    this->ny_ = this->volume_->get_ny();
+    this->number_of_slices_ = this->volume_->get_nz();
     this->to_index( 0, 0, index );
     this->bottom_left_ = this->volume_->apply_grid_transform( index );
     this->to_index( this->nx_ - 1, 0, index );
@@ -120,9 +120,9 @@ void VolumeSlice::update_position()
     this->depth_ = this->bottom_left_.z();
     break;
   case VolumeSliceType::CORONAL_E:
-    this->nx_ = this->volume_->nz();
-    this->ny_ = this->volume_->nx();
-    this->number_of_slices_ = this->volume_->ny();
+    this->nx_ = this->volume_->get_nz();
+    this->ny_ = this->volume_->get_nx();
+    this->number_of_slices_ = this->volume_->get_ny();
     this->to_index( 0, 0, index );
     this->bottom_left_ = this->volume_->apply_grid_transform( index );
     this->to_index( this->nx_ - 1, 0, index );
@@ -138,9 +138,9 @@ void VolumeSlice::update_position()
     this->depth_ = this->bottom_left_.y();
     break;
   case VolumeSliceType::SAGITTAL_E:
-    this->nx_ = this->volume_->ny();
-    this->ny_ = this->volume_->nz();
-    this->number_of_slices_ = this->volume_->nx();
+    this->nx_ = this->volume_->get_ny();
+    this->ny_ = this->volume_->get_nz();
+    this->number_of_slices_ = this->volume_->get_nx();
     this->to_index( 0, 0, index );
     this->bottom_left_ = this->volume_->apply_grid_transform( index );
     this->to_index( this->nx_ - 1, 0, index );

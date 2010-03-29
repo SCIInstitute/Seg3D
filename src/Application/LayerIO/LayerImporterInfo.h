@@ -26,11 +26,9 @@
  DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_LAYERMANAGER_LAYERIMPORTERINFO_H
-#define APPLICATION_LAYERMANAGER_LAYERIMPORTERINFO_H
+#ifndef APPLICATION_LAYERIO_LAYERIMPORTERINFO_H
+#define APPLICATION_LAYERIO_LAYERIMPORTERINFO_H
 
-// Utils includes
-#include <Utils/Singleton/Singleton.h>
 
 // Application includes
 #include <Application/Layer/Layer.h>

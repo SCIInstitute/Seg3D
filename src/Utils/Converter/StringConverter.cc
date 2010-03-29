@@ -263,8 +263,8 @@ std::string ExportToString( const Transform& value )
 
 std::string ExportToString( const GridTransform& value )
 {
-  return ( std::string( 1, '[' ) + ExportToString( value.nx() ) + ' ' + ExportToString(
-      value.ny() ) + ' ' + ExportToString( value.nz() ) + ' ' + ExportToString(
+  return ( std::string( 1, '[' ) + ExportToString( value.get_nx() ) + ' ' + ExportToString(
+      value.get_ny() ) + ' ' + ExportToString( value.get_nz() ) + ' ' + ExportToString(
       value.transform() ) + ']' );
 }
 
@@ -547,9 +547,9 @@ bool ImportFromString( const std::string& str, GridTransform& value )
   multiple_from_string( str, values );
   if ( values.size() == 19 )
   {
-    value.nx( static_cast< size_t > ( values[ 0 ] ) );
-    value.ny( static_cast< size_t > ( values[ 1 ] ) );
-    value.nz( static_cast< size_t > ( values[ 2 ] ) );
+    value.set_nx( static_cast< size_t > ( values[ 0 ] ) );
+    value.set_ny( static_cast< size_t > ( values[ 1 ] ) );
+    value.set_nz( static_cast< size_t > ( values[ 2 ] ) );
     value.transform().set( &values[ 3 ] );
     return ( true );
   }

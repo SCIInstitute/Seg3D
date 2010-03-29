@@ -34,9 +34,9 @@ namespace Utils
 Volume::Volume( const GridTransform& grid_transform ) :
   grid_transform_( grid_transform )
 {
-  this->nx_ = this->grid_transform_.nx();
-  this->ny_ = this->grid_transform_.ny();
-  this->nz_ = this->grid_transform_.nz();
+  this->nx_ = this->grid_transform_.get_nx();
+  this->ny_ = this->grid_transform_.get_ny();
+  this->nz_ = this->grid_transform_.get_nz();
 
   this->inverse_grid_transform_ = this->grid_transform_.transform().get_inverse();
 }

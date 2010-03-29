@@ -81,6 +81,35 @@ void DataVolumeSlice::initialize_texture()
   }
 }
 
+
+template<class DATA1, class DATA2>
+void CopyTypedData( DataVolumeSlice* slice, DATA1* buffer )
+{
+  size_t current_index = slice->to_index( 0, 0 );
+
+  // Index strides in X and Y direction. Use int instead of size_t because strides might be negative.
+  int x_stride = static_cast<int>( slice->to_index( 1, 0 ) - current_index );
+  int y_stride =  static_cast<int>( slice->to_index( 0, 1 ) - current_index );
+
+    size_t nx = slice->nx();
+    size_t ny = slice->ny();
+  
+  DATA2* data = static_cast<DATA2*>( slice->get_data_block()->get_data() );
+  size_t row_start = current_index;
+  for ( size_t j = 0; j < ny; j++ )
+  {
+    current_index = row_start;
+    for ( size_t i = 0; i < nx; i++ )
+    {
+      buffer[ j * nx + i ] = 
+        static_cast<DATA1>( data[ current_index ] );
+      current_index += x_stride;
+    }
+    row_start += y_stride;
+  }
+}
+
+
 void DataVolumeSlice::upload_texture()
 {
   if ( !this->slice_changed_ )
@@ -115,23 +144,32 @@ void DataVolumeSlice::upload_texture()
   // Lock the volume
   lock_type volume_lock( this->get_mutex() );
   
-  size_t current_index = this->to_index( 0, 0 );
-
-  // Index strides in X and Y direction. Use int instead of size_t because strides might be negative.
-  int x_stride = static_cast<int>( this->to_index( 1, 0 ) - current_index );
-  int y_stride =  static_cast<int>( this->to_index( 0, 1 ) - current_index );
-
-  size_t row_start = current_index;
-  for ( size_t j = 0; j < this->ny_; j++ )
+  switch ( this->data_block_->get_type() )
   {
-    current_index = row_start;
-    for ( size_t i = 0; i < this->nx_; i++ )
-    {
-      buffer[ j * this->nx_ + i ] = 
-        static_cast<unsigned char>( this->data_block_->get_data_at( current_index ) );
-      current_index += x_stride;
-    }
-    row_start += y_stride;
+    case DataType::CHAR_E:
+      CopyTypedData<unsigned char, signed char>( this, buffer );
+      break;
+    case DataType::UCHAR_E:
+      CopyTypedData<unsigned char, unsigned char>( this, buffer );
+      break;
+    case DataType::SHORT_E:
+      CopyTypedData<unsigned char, short>( this, buffer );
+      break;
+    case DataType::USHORT_E:
+      CopyTypedData<unsigned char, unsigned short>( this, buffer );
+      break;
+    case DataType::INT_E:
+      CopyTypedData<unsigned char, int>( this, buffer );
+      break;
+    case DataType::UINT_E:
+      CopyTypedData<unsigned char, unsigned int>( this, buffer );
+      break;
+    case DataType::FLOAT_E:
+      CopyTypedData<unsigned char, float>( this, buffer );
+      break;
+    case DataType::DOUBLE_E:
+      CopyTypedData<unsigned char, double>( this, buffer );
+      break;
   }
 
   volume_lock.unlock();

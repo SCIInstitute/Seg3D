@@ -74,21 +74,21 @@ public:
   // -- Access properties of data block --
 public:
 
-  // NX, NY, NZ, SIZE
+  // GET_NX, GET_NY, GET_NZ, GET_SIZE
   // The dimensions of the datablock
-  size_t nx() const
+  size_t get_nx() const
   {
     return nx_;
   }
-  size_t ny() const
+  size_t get_ny() const
   {
     return ny_;
   }
-  size_t nz() const
+  size_t get_nz() const
   {
     return nz_;
   }
-  size_t size() const
+  size_t get_size() const
   {
     return nx_ * ny_ * nz_;
   }
@@ -100,7 +100,7 @@ public:
 
   // DATA
   // Pointer to the block of data
-  unsigned  char* data()
+  unsigned char* data()
   {
     return  this->data_;
   }

@@ -87,7 +87,10 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer, boost::f
 
   // set some values of the GUI
 
-  this->private_->ui_.activate_button_->setText( QString::fromStdString( group->get_grid_transform().get_as_string() ) );
+  std::string group_name = Utils::to_string( group->get_grid_transform().get_nx() ) + " x " +
+    Utils::to_string( group->get_grid_transform().get_ny() ) + " x " +
+    Utils::to_string( group->get_grid_transform().get_nz() );
+  this->private_->ui_.activate_button_->setText( QString::fromStdString( group_name ) );
 
   // hide the tool bars 
   this->private_->ui_.roi_->hide();
@@ -129,9 +132,9 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer, boost::f
   this->private_->scale_adjuster->setObjectName( QString::fromUtf8( "scale_adjuster" ) );
   
   // set some local values for the current size
-  this->private_->current_width = static_cast<int>( group->get_grid_transform().nx() );
-  this->private_->current_height = static_cast<int>( group->get_grid_transform().ny() );
-  this->private_->current_depth = static_cast<int>( group->get_grid_transform().nz() );
+  this->private_->current_width = static_cast<int>( group->get_grid_transform().get_nx() );
+  this->private_->current_height = static_cast<int>( group->get_grid_transform().get_ny() );
+  this->private_->current_depth = static_cast<int>( group->get_grid_transform().get_nz() );
   
   //  connect the gui signals and slots
     connect( this->private_->scale_adjuster, SIGNAL( valueAdjusted( double ) ), this, SLOT( adjust_new_size_labels( double )) );
@@ -161,13 +164,19 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer, boost::f
   
       // --- RESAMPLE ---
       // = set the default values
-      this->private_->ui_.x_axis_label_current_->setText( QString::fromUtf8("X: ") + QString::number(group->get_grid_transform().nx()) );
-      this->private_->ui_.y_axis_label_current_->setText( QString::fromUtf8("Y: ") + QString::number(group->get_grid_transform().ny()) );
-      this->private_->ui_.z_axis_label_current_->setText( QString::fromUtf8("Z: ") + QString::number(group->get_grid_transform().nz()) );
+      this->private_->ui_.x_axis_label_current_->setText( QString::fromUtf8("X: ") + 
+      QString::number(group->get_grid_transform().get_nx()) );
+      this->private_->ui_.y_axis_label_current_->setText( QString::fromUtf8("Y: ") + 
+      QString::number(group->get_grid_transform().get_ny()) );
+      this->private_->ui_.z_axis_label_current_->setText( QString::fromUtf8("Z: ") + 
+      QString::number(group->get_grid_transform().get_nz()) );
       
-      this->private_->ui_.x_axis_label_new_->setText( QString::fromUtf8("X: ") + QString::number(group->get_grid_transform().nx()) );
-      this->private_->ui_.y_axis_label_new_->setText( QString::fromUtf8("Y: ") + QString::number(group->get_grid_transform().ny()) );
-      this->private_->ui_.z_axis_label_new_->setText( QString::fromUtf8("Z: ") + QString::number(group->get_grid_transform().nz()) );
+      this->private_->ui_.x_axis_label_new_->setText( QString::fromUtf8("X: ") + 
+      QString::number(group->get_grid_transform().get_nx()) );
+      this->private_->ui_.y_axis_label_new_->setText( QString::fromUtf8("Y: ") + 
+      QString::number(group->get_grid_transform().get_ny()) );
+      this->private_->ui_.z_axis_label_new_->setText( QString::fromUtf8("Z: ") + 
+      QString::number(group->get_grid_transform().get_nz()) );
       
       QFont font;
         font.setPointSize(8);
@@ -180,7 +189,8 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer, boost::f
         this->private_->ui_.y_axis_label_new_->setFont(font);
         this->private_->ui_.z_axis_label_new_->setFont(font);
         
-        this->private_->ui_.resample_replace_checkBox_->setChecked( group->resample_replace_state_->get() );
+        this->private_->ui_.resample_replace_checkBox_->setChecked( 
+      group->resample_replace_state_->get() );
         
         // set the defaults for the upper threshold
         double resample_min = 0.0; 
@@ -194,22 +204,29 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer, boost::f
         
          // = make the connections
         QtBridge::Connect( this->private_->scale_adjuster, group->resample_factor_state_ );
-      QtBridge::Connect( this->private_->ui_.resample_replace_checkBox_, group->resample_replace_state_ );
+      QtBridge::Connect( this->private_->ui_.resample_replace_checkBox_, 
+      group->resample_replace_state_ );
         
 
         // --- CROP ---
         // = set the default values
-        this->private_->size_width_adjuster_crop->setRange( 0, group->get_grid_transform().nx() );
-        this->private_->size_height_adjuster_crop->setRange( 0, group->get_grid_transform().ny() );
-        this->private_->size_depth_adjuster_crop->setRange( 0, group->get_grid_transform().nz() );
+        this->private_->size_width_adjuster_crop->setRange( 0, 
+      group->get_grid_transform().get_nx() );
+        this->private_->size_height_adjuster_crop->setRange( 0, 
+      group->get_grid_transform().get_ny() );
+        this->private_->size_depth_adjuster_crop->setRange( 0, 
+      group->get_grid_transform().get_nz() );
         
-        this->private_->size_width_adjuster_crop->setCurrentValue( group->get_grid_transform().nx() );
-        this->private_->size_height_adjuster_crop->setCurrentValue( group->get_grid_transform().ny() );
-        this->private_->size_depth_adjuster_crop->setCurrentValue( group->get_grid_transform().nz() );
+        this->private_->size_width_adjuster_crop->setCurrentValue( 
+      group->get_grid_transform().get_nx() );
+        this->private_->size_height_adjuster_crop->setCurrentValue( 
+      group->get_grid_transform().get_ny() );
+        this->private_->size_depth_adjuster_crop->setCurrentValue( 
+      group->get_grid_transform().get_nz() );
 
-        this->private_->center_x_adjuster_crop->setRange( 0, group->get_grid_transform().nx() );
-        this->private_->center_y_adjuster_crop->setRange( 0, group->get_grid_transform().ny() );
-        this->private_->center_z_adjuster_crop->setRange( 0, group->get_grid_transform().nz() );
+        this->private_->center_x_adjuster_crop->setRange( 0, group->get_grid_transform().get_nx() );
+        this->private_->center_y_adjuster_crop->setRange( 0, group->get_grid_transform().get_ny() );
+        this->private_->center_z_adjuster_crop->setRange( 0, group->get_grid_transform().get_nz() );
         
         this->private_->center_x_adjuster_crop->setCurrentValue( 0 );
         this->private_->center_y_adjuster_crop->setCurrentValue( 0 );
@@ -231,9 +248,9 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer, boost::f
         
         // --- TRANSFORM ---
         // = set the default values
-        this->private_->ui_.spacing_x_spinbox_->setValue( group->get_grid_transform().nx() );
-        this->private_->ui_.spacing_y_spinbox_->setValue( group->get_grid_transform().ny() );
-        this->private_->ui_.spacing_z_spinbox_->setValue( group->get_grid_transform().nz() );
+        this->private_->ui_.spacing_x_spinbox_->setValue( group->get_grid_transform().get_nx() );
+        this->private_->ui_.spacing_y_spinbox_->setValue( group->get_grid_transform().get_ny() );
+        this->private_->ui_.spacing_z_spinbox_->setValue( group->get_grid_transform().get_nz() );
         
         this->private_->ui_.transform_replace_checkBox_->setChecked( group->resample_replace_state_->get() );
         

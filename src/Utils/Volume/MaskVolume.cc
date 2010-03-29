@@ -40,9 +40,9 @@ MaskVolume::MaskVolume( const GridTransform& grid_transform,
 }
 
 MaskVolume::MaskVolume( const GridTransform& grid_transform ) :
-Volume( grid_transform )
+  Volume( grid_transform )
 {
-    MaskDataBlockManager::Instance()->create( this->nx(), this->ny(), this->nz(), mask_data_block_ );
+    MaskDataBlockManager::Instance()->create( get_nx(), get_ny(), get_nz(), mask_data_block_ );
 }
 
 
