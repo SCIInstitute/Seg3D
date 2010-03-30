@@ -303,7 +303,6 @@ void Renderer::redraw()
           DataLayerSceneItem* data_layer_item = 
             dynamic_cast< DataLayerSceneItem* >( layer_item.get() );
           Utils::DataVolumeSlice* data_slice = data_layer_item->data_volume_slice_.get();
-          if ( !data_slice ) continue;
           volume_slice = data_slice;
           this->slice_shader_->set_mask_mode( false );
           this->slice_shader_->set_contrast( static_cast< float >( data_layer_item->contrast_ ) );
@@ -316,7 +315,6 @@ void Renderer::redraw()
           MaskLayerSceneItem* mask_layer_item = 
             dynamic_cast< MaskLayerSceneItem* >( layer_item.get() );
           Utils::MaskVolumeSlice* mask_slice = mask_layer_item->mask_volume_slice_.get();
-          if ( !mask_slice ) continue;
           volume_slice = mask_slice;
           this->slice_shader_->set_mask_mode( true );
         }
@@ -440,6 +438,11 @@ void Renderer::process_slices( LayerSceneHandle& layer_scene, ViewerHandle& view
           data_layer_item->data_volume_slice_ = 
             Utils::DataVolumeSliceHandle( new Utils::DataVolumeSlice( *data_volume_slice ) );
         }
+        else
+        {
+          layer_scene->erase( layer_scene->begin() + layer_num );
+          layer_num--;
+        }
       }
       break;
     case Utils::VolumeType::MASK_E:
@@ -454,6 +457,11 @@ void Renderer::process_slices( LayerSceneHandle& layer_scene, ViewerHandle& view
           mask_volume_slice->upload_texture();
           mask_layer_item->mask_volume_slice_ = 
             Utils::MaskVolumeSliceHandle( new Utils::MaskVolumeSlice( *mask_volume_slice ) );
+        }
+        else
+        {
+          layer_scene->erase( layer_scene->begin() + layer_num );
+          layer_num--;
         }
       }
       break;

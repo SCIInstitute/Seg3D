@@ -36,6 +36,8 @@ SET(APPLICATION_INTERFACE_SRCS
   InterfaceActionContext.cc
   Interface.h
   Interface.cc
+  StatusBar.h
+  StatusBar.cc
   )
 
 

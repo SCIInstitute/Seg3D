@@ -26,62 +26,62 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-// STL includes
-
-// Boost includes 
-
-// Application includes
-#include <Application/Viewer/Viewer.h> 
-#include <Application/ViewerManager/ViewerManager.h>
 #include <Application/Interface/Interface.h>
+#include <Application/Interface/StatusBar.h>
 
 namespace Seg3D
 {
 
-ViewerManager::ViewerManager() :
-  StateHandler( "view" )
+DataPointInfo::DataPointInfo() :
+  index_coord_( 0, 0, 0 ),
+  world_coord_( 0, 0, 0 ),
+  value_( 0 )
 {
-  // Step (1)
-  // Set the default state of this element
-  add_state( "layout", layout_state_, "1and3", "single|1and1|1and2|1and3|2and2|2and3|3and3" );
-  add_state( "active_viewer", active_viewer_state_, 0 );
-
-  // Step (2)
-  // Create the viewers that are part of the application
-  // Currently a maximum of 6 viewers can be created
-  viewers_.resize( 6 );
-  for ( size_t j = 0; j < viewers_.size(); j++ )
-  {
-    std::string key = std::string( "viewer" ) + Utils::to_string( j );
-    viewers_[ j ] = ViewerHandle( new Viewer( key, j ) );
-  }
 }
 
-ViewerManager::~ViewerManager()
+DataPointInfo::DataPointInfo( const Utils::Point& index_coord, 
+  const Utils::Point& world_coord, double value ) :
+  index_coord_( index_coord ),
+  world_coord_( world_coord ),
+  value_( value )
 {
-  disconnect_all();
 }
 
-ViewerHandle ViewerManager::get_viewer( size_t idx )
+DataPointInfo::DataPointInfo( const DataPointInfo& copy ) :
+  index_coord_( copy.index_coord_ ),
+  world_coord_( copy.world_coord_ ),
+  value_( copy.value_ )
 {
-  ViewerHandle handle;
-  if ( idx < viewers_.size() ) handle = viewers_[ idx ];
-  return handle;
 }
 
-ViewerHandle ViewerManager::get_viewer( const std::string viewer_name )
+DataPointInfo& DataPointInfo::operator=( const DataPointInfo& copy )
 {
-  ViewerHandle handle;
-  for ( size_t i = 0; i < this->viewers_.size(); i++ )
-  {
-    if ( this->viewers_[ i ]->get_stateid() == viewer_name )
-    {
-      handle = this->viewers_[ i ];
-      break;
-    }
-  }
-  return handle;
+  this->index_coord_ = copy.index_coord_;
+  this->world_coord_ = copy.world_coord_;
+  this->value_ = copy.value_;
+
+  return ( *this );
+}
+
+StatusBar::StatusBar()
+{
+  this->add_connection( Interface::Instance()->interface_action_context()->
+    action_message_signal_.connect( boost::bind( &StatusBar::set_message, this, _1, _2 ) ) );
+}
+
+StatusBar::~StatusBar()
+{
+  this->disconnect_all();
+}
+
+void StatusBar::set_data_point_info( DataPointInfoHandle data_point )
+{
+  this->data_point_info_updated_signal_( data_point );
+}
+
+void StatusBar::set_message( int msg_type, std::string message )
+{
+  this->message_updated_signal_( msg_type, message );
 }
 
 } // end namespace Seg3D
-

@@ -41,14 +41,14 @@
 #include <QtGui>
 
 // Application includes
-#include <Utils/Core/Log.h>
+#include <Application/Interface/StatusBar.h>
 #include <Interface/AppInterface/MessageHistoryWidget.h>
-//#include <Application/Action/ActionDispatcher.h>
+#include <Utils/Core/ConnectionHandler.h>
 
 namespace Seg3D
 {
 
-class AppStatusBar : public QObject
+class AppStatusBar : public QObject, private Utils::ConnectionHandler
 {
 Q_OBJECT
 
@@ -57,9 +57,8 @@ public:
   AppStatusBar( QMainWindow* parent = 0 );
   virtual ~AppStatusBar();
 
-public Q_SLOTS:
-  void set_coordinates_label( int y, int x, int z );
-  void set_coordinates_mode( bool is_local_ );
+private Q_SLOTS:
+  void set_coordinates_mode( bool is_world );
   void set_status_report_label( std::string& report );
   void activate_history( bool is_active_ );
 
@@ -69,6 +68,10 @@ private:
   void build_status_report_label();
   void build_buttons();
 
+  void update_data_point_info( DataPointInfoHandle data_point );
+  void update_data_point_label();
+  void set_message( int msg_type, std::string message );
+
   // -- status bar components -- //
 private:
   QLabel* coordinates_label_;
@@ -77,17 +80,14 @@ private:
   QToolButton* info_button_;
 
   MessageHistoryWidget* history_widget_;
-  int coordinates_mode_;
+  bool show_world_coord_;
   QIcon world_icon_;
   QIcon text_icon_;
 
+  DataPointInfo data_point_info_;
+
 private Q_SLOTS:
-void fix_icon_status();
-
-public:
-  typedef QPointer< AppStatusBar > qpointer_type;
-
-  static void UpdateStatusBar( qpointer_type statusbar, int message_type, std::string message );
+  void fix_icon_status();
 
 };
 

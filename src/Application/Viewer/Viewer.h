@@ -112,7 +112,7 @@ class Viewer : public StateHandler
 
   // -- constructor/destructor --
 public:
-  Viewer( const std::string& key );
+  Viewer( const std::string& key, size_t viewer_id );
   virtual ~Viewer();
 
   // -- mouse events handling --
@@ -219,12 +219,18 @@ private:
     this->ignoring_status_stack_.pop_back();
   }
 
+  void layer_state_changed( bool volume_view );
+
 private:
+  size_t viewer_id_;
   int width_;
   int height_;
   bool ignore_state_changes_;
   std::vector< bool > ignoring_status_stack_;
   bool updating_states_; // Indicates if it's in the middle of state changes
+
+  typedef std::multimap< std::string, boost::signals2::connection > connection_map_type;
+  connection_map_type layer_connection_map_;
 
   // -- State information --
 public:

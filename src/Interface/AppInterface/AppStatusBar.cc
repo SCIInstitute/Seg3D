@@ -29,13 +29,15 @@
 #include <QStatusBar>
 
 //  Application includes
+#include <Application/Interface/Interface.h>
 #include <Application/Tool/ToolFactory.h>
 #include <Application/ToolManager/ToolManager.h>
 
 // Interface includes
 #include <Interface/QtInterface/QtBridge.h>
 #include <Interface/AppInterface/AppStatusBar.h>
-#include <Application/Interface/Interface.h>
+
+#include <Utils/Core/Log.h>
 
 // boost includes
 #include<boost/tokenizer.hpp>
@@ -44,7 +46,7 @@ namespace Seg3D
 {
 
 AppStatusBar::AppStatusBar( QMainWindow* parent ) :
-  QObject( parent )
+  QObject( parent ), show_world_coord_( false )
 {
 
   { // setup the icons
@@ -65,8 +67,6 @@ AppStatusBar::AppStatusBar( QMainWindow* parent ) :
   build_status_report_label();
   build_buttons();
 
-  qpointer_type statusbar_pointer( this );
-
   statusbar->setContentsMargins( 4, 0, 0, 0 );
   statusbar->addWidget( info_button_, 0 );
   statusbar->addWidget( status_report_label_, 5 );
@@ -81,19 +81,22 @@ AppStatusBar::AppStatusBar( QMainWindow* parent ) :
             " border: 1px solid  qlineargradient(spread:pad, x1:0.5, y1:0.733364, x2:0.5, y2:0, stop:0 rgba(25, 25, 25, 0), stop:1 rgba(136, 0, 0, 0));\n"
             " \n}" ) );
 
-  Seg3D::Interface::Instance()->interface_action_context()->action_message_signal_.connect(
-      boost::bind( &AppStatusBar::UpdateStatusBar, statusbar_pointer, _1, _2 ) );
   connect(this->info_button_, SIGNAL(clicked(bool)), this, SLOT(activate_history(bool)));
   connect(this->history_widget_, SIGNAL( destroyed() ), this, SLOT( fix_icon_status() ) );
   connect(this->world_button_, SIGNAL(clicked(bool)), this, SLOT(set_coordinates_mode(bool)));
 
-  set_coordinates_mode( 1 );
-  set_coordinates_label( 234, 232, 100 );
+  this->update_data_point_label();
+
+  this->add_connection( StatusBar::Instance()->data_point_info_updated_signal_.connect( 
+    boost::bind( &AppStatusBar::update_data_point_info, this, _1 ) ) );
+  this->add_connection( StatusBar::Instance()->message_updated_signal_.connect( 
+    boost::bind( &AppStatusBar::set_message, this, _1, _2 ) ) );
 
 }
 
 AppStatusBar::~AppStatusBar()
 {
+  this->disconnect_all();
   this->history_widget_->close();
 }
 
@@ -117,10 +120,10 @@ void AppStatusBar::build_buttons()
 
 void AppStatusBar::build_coordinates_label()
 {
-  this->coordinates_label_ = new QLabel( "x: 0000  y: 0000 z: 0000" );
+  this->coordinates_label_ = new QLabel( "x: 0000  y: 0000 z: 0000 value: 0000" );
   this->coordinates_label_->setObjectName( QString::fromUtf8( "coordinates_label_" ) );
   this->coordinates_label_->setContentsMargins( 0, 0, 0, 0 );
-  this->coordinates_label_->setLayoutDirection(Qt::RightToLeft);
+  this->coordinates_label_->setLayoutDirection( Qt::LeftToRight );
   this->coordinates_label_->setStyleSheet(
       QString::fromUtf8(
           "QStatusBar QLabel#coordinates_label_{ \n"
@@ -143,16 +146,9 @@ void AppStatusBar::build_status_report_label()
 
 // -- public slots -- //
 
-void AppStatusBar::set_coordinates_label( int x_coord_, int y_coord_, int z_coord_ )
+void AppStatusBar::set_coordinates_mode( bool is_world )
 {
-  QString mouseLocation = QString().sprintf( "x: %04d  y: %04d z: %04d\t", x_coord_, y_coord_,
-      z_coord_ );
-  this->coordinates_label_->setText( mouseLocation );
-}
-
-void AppStatusBar::set_coordinates_mode( bool is_local_ )
-{
-  if ( is_local_ )
+  if ( !is_world )
   {
     this->coordinates_label_->setToolTip( QString::fromUtf8(
         "Coordinate mode is set to Local, click to toggle to Global" ) );
@@ -163,8 +159,8 @@ void AppStatusBar::set_coordinates_mode( bool is_local_ )
         "Coordinate mode is set to Global, click to toggle to Local" ) );
   }
 
-  this->coordinates_mode_ = is_local_;
-
+  this->show_world_coord_ = is_world;
+  this->update_data_point_label();
 }
 
 void AppStatusBar::set_status_report_label( std::string& status )
@@ -192,76 +188,124 @@ void AppStatusBar::fix_icon_status()
   this->status_report_label_->setText( QString::fromUtf8( "Status = true " ) );
 }
 
-void AppStatusBar::UpdateStatusBar( qpointer_type statusbar_pointer, int message_type,
-    std::string message )
+void AppStatusBar::update_data_point_info( DataPointInfoHandle data_point )
 {
   if ( !Interface::IsInterfaceThread() )
   {
-    Interface::PostEvent( boost::bind( &AppStatusBar::UpdateStatusBar, statusbar_pointer,
-        message_type, message ) );
+    Interface::PostEvent( boost::bind( &AppStatusBar::update_data_point_info, this, data_point ) );
     return;
   }
 
-  // Protect controller pointer, so we do not execute if controller does not
-  // exist anymore
-  if ( statusbar_pointer.data() )
+  this->data_point_info_ = *data_point;
+  this->update_data_point_label();
+}
+
+void AppStatusBar::update_data_point_label()
+{
+  QString x_str, y_str, z_str, value_str;
+  QTextStream text_stream( &x_str );
+  text_stream.setFieldWidth( 20 );
+  text_stream.setRealNumberPrecision( 4 );
+  text_stream.setFieldAlignment( QTextStream::AlignLeft );
+  text_stream.setRealNumberNotation( QTextStream::FixedNotation );
+
+  if ( this->show_world_coord_ )
   {
-    
-    QColor color_ = QColor(255, 255, 255);
-    std::string status_message = message;
-    boost::char_separator< char > separater( " " );
-    boost::tokenizer< boost::char_separator< char > > tok( message, separater );
-
-    for ( boost::tokenizer< boost::char_separator< char > >::iterator beg = ++tok.begin(); beg
-        != tok.end(); ++beg )
-    {
-      status_message = status_message + " " + *beg;
-    }
-
-    switch( message_type )
-    {
-    case 0x01:
-      statusbar_pointer->status_report_label_->setStyleSheet( QString::fromUtf8(
-          "QLabel#status_report_label_{\n"
-            " text-align: left;\n"
-            " color: rgb(121, 0, 0);\n"
-            " font: bold; }\n" ) );
-      color_ = QColor(121, 0, 0);
-      break;
-
-    case 0x02:
-      statusbar_pointer->status_report_label_->setStyleSheet( QString::fromUtf8(
-          "QLabel#status_report_label_{\n"
-            " text-align: left;\n"
-            " color: rgb(165, 161, 34);\n"
-            " font: bold; }\n" ) );
-      color_ = QColor(165, 161, 34);
-      break;
-    case 0x04:
-      statusbar_pointer->status_report_label_->setStyleSheet( QString::fromUtf8(
-          "QLabel#status_report_label_{\n"
-            " text-align: left;\n"
-            " color: rgb(3, 86, 2);\n"
-            " font: bold; \n}" ) );
-      color_ = QColor(3, 86, 2);
-      break;
-
-    case 0x08:
-      statusbar_pointer->status_report_label_->setStyleSheet( QString::fromUtf8(
-          "QLabel#status_report_label_{\n"
-            " text-align: left;\n"
-            " color: purple;\n"
-            " font: bold; }\n" ) );
-      color_ = QColor("purple");
-      break;
-    default:
-      break;
-    }
-
-    statusbar_pointer->status_report_label_->setText( QString::fromStdString( message ) );
-    statusbar_pointer->history_widget_->add_history_item( QString::fromStdString( message ), color_ );
-
+    text_stream << this->data_point_info_.world_coord().x();
+    text_stream.setString( &y_str );
+    text_stream.setFieldWidth( 20 );
+    text_stream.setFieldAlignment( QTextStream::AlignLeft );
+    text_stream << this->data_point_info_.world_coord().y();
+    text_stream.setString( &z_str );
+    text_stream.setFieldWidth( 20 );
+    text_stream.setFieldAlignment( QTextStream::AlignLeft );
+    text_stream << this->data_point_info_.world_coord().z();
   }
+  else
+  {
+    text_stream << static_cast< int >( this->data_point_info_.index_coord().x() );
+    text_stream.setString( &y_str );
+    text_stream.setFieldWidth( 20 );
+    text_stream.setFieldAlignment( QTextStream::AlignLeft );
+    text_stream << static_cast< int >( this->data_point_info_.index_coord().y() );
+    text_stream.setString( &z_str );
+    text_stream.setFieldWidth( 20 );
+    text_stream.setFieldAlignment( QTextStream::AlignLeft );
+    text_stream << static_cast< int >( this->data_point_info_.index_coord().z() );
+  }
+
+  text_stream.setString( &value_str );
+  text_stream.setRealNumberNotation( QTextStream::SmartNotation );
+  text_stream.setFieldWidth( 20 );
+  text_stream.setFieldAlignment( QTextStream::AlignLeft );
+  text_stream << this->data_point_info_.value();
+
+  this->coordinates_label_->setText( QString( "X: %1 Y: %2 Z: %3 Value: %4\t" )
+    .arg( x_str, -25 ).arg( y_str, -25 ).arg( z_str, -25 ).arg( value_str, -25 ) );
+}
+
+void AppStatusBar::set_message( int msg_type, std::string message )
+{
+  if ( !Interface::IsInterfaceThread() )
+  {
+    Interface::PostEvent( boost::bind( &AppStatusBar::set_message, this,
+        msg_type, message ) );
+    return;
+  }
+
+  QColor color_ = QColor(255, 255, 255);
+  std::string status_message = message;
+  boost::char_separator< char > separater( " " );
+  boost::tokenizer< boost::char_separator< char > > tok( message, separater );
+
+  for ( boost::tokenizer< boost::char_separator< char > >::iterator beg = ++tok.begin(); beg
+      != tok.end(); ++beg )
+  {
+    status_message = status_message + " " + *beg;
+  }
+
+  switch( msg_type )
+  {
+  case Utils::LogMessageType::ERROR_E:
+    this->status_report_label_->setStyleSheet( QString::fromUtf8(
+        "QLabel#status_report_label_{\n"
+          " text-align: left;\n"
+          " color: rgb(121, 0, 0);\n"
+          " font: bold; }\n" ) );
+    color_ = QColor(121, 0, 0);
+    break;
+
+  case Utils::LogMessageType::WARNING_E:
+    this->status_report_label_->setStyleSheet( QString::fromUtf8(
+        "QLabel#status_report_label_{\n"
+          " text-align: left;\n"
+          " color: rgb(165, 161, 34);\n"
+          " font: bold; }\n" ) );
+    color_ = QColor(165, 161, 34);
+    break;
+  case Utils::LogMessageType::MESSAGE_E:
+    this->status_report_label_->setStyleSheet( QString::fromUtf8(
+        "QLabel#status_report_label_{\n"
+          " text-align: left;\n"
+          " color: rgb(3, 86, 2);\n"
+          " font: bold; \n}" ) );
+    color_ = QColor(3, 86, 2);
+    break;
+
+  case Utils::LogMessageType::DEBUG_E:
+    this->status_report_label_->setStyleSheet( QString::fromUtf8(
+        "QLabel#status_report_label_{\n"
+          " text-align: left;\n"
+          " color: purple;\n"
+          " font: bold; }\n" ) );
+    color_ = QColor("purple");
+    break;
+  default:
+    break;
+  }
+
+  this->status_report_label_->setText( QString::fromStdString( message ) );
+  this->history_widget_->add_history_item( QString::fromStdString( message ), color_ );
 }
 
 } // end namespace Seg3D

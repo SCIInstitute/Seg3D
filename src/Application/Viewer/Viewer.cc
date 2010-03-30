@@ -27,6 +27,7 @@
  */
 
 // Application includes
+#include <Application/Interface/StatusBar.h>
 #include <Application/Layer/DataLayer.h>
 #include <Application/Layer/MaskLayer.h>
 #include <Application/LayerManager/LayerManager.h>
@@ -42,8 +43,9 @@ const std::string Viewer::SAGITTAL_C( "sagittal" );
 const std::string Viewer::CORONAL_C( "coronal" );
 const std::string Viewer::VOLUME_C( "volume" );
 
-Viewer::Viewer( const std::string& key ) :
+Viewer::Viewer( const std::string& key, size_t viewer_id ) :
   StateHandler( key ), 
+  viewer_id_( viewer_id ),
   ignore_state_changes_( false ),
   updating_states_( false )
 {
@@ -190,7 +192,12 @@ void Viewer::reset_mouse_handlers()
 
 void Viewer::update_status_bar( int x, int y )
 {
-  // TODO: update status bar here
+  if ( !Application::IsApplicationThread() )
+  {
+    Application::PostEvent( boost::bind( &Viewer::update_status_bar, this, x, y ) );
+    return;
+  }
+
   if ( !this->is_volume_view() && this->active_layer_slice_ &&
      this->active_layer_slice_->volume_type() == Utils::VolumeType::DATA_E )
   {
@@ -216,9 +223,13 @@ void Viewer::update_status_bar( int x, int y )
       data_slice->to_index( static_cast<size_t>( i ), static_cast<size_t>( j ), index );
       Utils::Point world_pos = data_slice->apply_grid_transform( index );
       double value = data_slice->get_data_at( static_cast<size_t>( i ), static_cast<size_t>( j ) );
-      SCI_LOG_DEBUG( std::string( "Index: " ) + Utils::to_string( index ) 
-        + " World Pos: " + Utils::to_string( world_pos ) 
-        + " Value: " + Utils::to_string( value ) );
+      DataPointInfoHandle data_point( new DataPointInfo( index, world_pos, value ) );
+      StatusBar::Instance()->set_data_point_info( data_point );
+    }
+    else
+    {
+      DataPointInfoHandle data_point( new DataPointInfo );
+      StatusBar::Instance()->set_data_point_info( data_point );
     }
   }
 }
@@ -257,6 +268,13 @@ void Viewer::insert_layer( LayerHandle layer )
     slice_type = Utils::VolumeSliceType::SAGITTAL_E;
   }
 
+  this->layer_connection_map_.insert( connection_map_type::value_type( layer->get_layer_id(),
+    layer->opacity_state_->state_changed_signal_.connect( 
+    boost::bind( &Viewer::layer_state_changed, this, false ) ) ) );
+  this->layer_connection_map_.insert( connection_map_type::value_type( layer->get_layer_id(),
+    layer->visible_state_[ this->viewer_id_ ]->state_changed_signal_.connect(
+    boost::bind( &Viewer::layer_state_changed, this, false ) ) ) );
+
   switch( layer->type() )
   {
   case Utils::VolumeType::DATA_E:
@@ -267,6 +285,18 @@ void Viewer::insert_layer( LayerHandle layer )
         new Utils::DataVolumeSlice( data_volume, slice_type ) );
       this->data_slices_[ layer->get_layer_id() ] = data_volume_slice;
       volume_slice = data_volume_slice;
+      this->layer_connection_map_.insert( 
+        connection_map_type::value_type( layer->get_layer_id(),
+        data_layer->contrast_state_->state_changed_signal_.connect(
+        boost::bind( &Viewer::layer_state_changed, this, false ) ) ) );
+      this->layer_connection_map_.insert( 
+        connection_map_type::value_type( layer->get_layer_id(),
+        data_layer->brightness_state_->state_changed_signal_.connect(
+        boost::bind( &Viewer::layer_state_changed, this, false ) ) ) );
+      this->layer_connection_map_.insert( 
+        connection_map_type::value_type( layer->get_layer_id(),
+        data_layer->volume_rendered_state_->state_changed_signal_.connect(
+        boost::bind( &Viewer::layer_state_changed, this, true ) ) ) );
     }
     break;
   case Utils::VolumeType::MASK_E:
@@ -277,6 +307,22 @@ void Viewer::insert_layer( LayerHandle layer )
         new Utils::MaskVolumeSlice( mask_volume, slice_type ) );
       this->mask_slices_[ layer->get_layer_id() ] = mask_volume_slice;
       volume_slice = mask_volume_slice;
+      this->layer_connection_map_.insert( 
+        connection_map_type::value_type( layer->get_layer_id(),
+        mask_layer->color_state_->state_changed_signal_.connect(
+        boost::bind( &Viewer::layer_state_changed, this, false ) ) ) );
+      this->layer_connection_map_.insert( 
+        connection_map_type::value_type( layer->get_layer_id(),
+        mask_layer->border_state_->state_changed_signal_.connect(
+        boost::bind( &Viewer::layer_state_changed, this, false ) ) ) );
+      this->layer_connection_map_.insert( 
+        connection_map_type::value_type( layer->get_layer_id(),
+        mask_layer->fill_state_->state_changed_signal_.connect(
+        boost::bind( &Viewer::layer_state_changed, this, false ) ) ) );
+      this->layer_connection_map_.insert( 
+        connection_map_type::value_type( layer->get_layer_id(),
+        mask_layer->show_isosurface_state_->state_changed_signal_.connect(
+        boost::bind( &Viewer::layer_state_changed, this, true ) ) ) );
     }
     break;
   default:
@@ -318,6 +364,16 @@ void Viewer::delete_layers( std::vector< LayerHandle > layers )
   for ( size_t i = 0; i < layers.size(); i++ )
   {
     LayerHandle layer = layers[ i ];
+    
+    // Disconnect from the signals of the layer states
+    std::pair< connection_map_type::iterator, connection_map_type::iterator > range = 
+      this->layer_connection_map_.equal_range( layer->get_layer_id() );
+    for ( connection_map_type::iterator it = range.first; it != range.second; it++ )
+    {
+      ( *it ).second.disconnect();
+    }
+    this->layer_connection_map_.erase( layer->get_layer_id() );
+
     switch( layer->type() )
     {
     case Utils::VolumeType::DATA_E:
@@ -658,6 +714,14 @@ void Viewer::auto_view()
   this->adjust_view();
   this->pop_ignoring_status();
   this->redraw_signal_();
+}
+
+void Viewer::layer_state_changed( bool volume_view )
+{
+  if ( volume_view == this->is_volume_view() )
+  {
+    this->redraw_signal_();
+  }
 }
 
 } // end namespace Seg3D
