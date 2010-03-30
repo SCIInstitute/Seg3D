@@ -26,49 +26,59 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_RENDER_RENDERRESOURCESCONTEXT_H
-#define APPLICATION_RENDER_RENDERRESOURCESCONTEXT_H
+#ifndef UTILS_RENDERRESOURCES_RENDERRESOURCESEVENTHANDLER_H
+#define UTILS_RENDERRESOURCES_RENDERRESOURCESEVENTHANDLER_H
 
 // Boost includes
 #include <boost/thread/mutex.hpp>
+#include <boost/thread/recursive_mutex.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
 
 // Utils includes
+#include <Utils/Core/Exception.h>
 #include <Utils/Core/Log.h>
-#include <Application/Renderer/RenderContext.h>
+#include <Utils/Core/Singleton.h>
+#include <Utils/EventHandler/EventHandler.h>
+#include <Utils/RenderResources/RenderResources.h>
 
-namespace Seg3D
+namespace Utils
 {
 
-// Forward declarations
-class RenderResourcesContext;
-typedef boost::shared_ptr< RenderResourcesContext > RenderResourcesContextHandle;
+class RenderResourcesEventHandler;
+typedef boost::shared_ptr<RenderResourcesEventHandler> RenderResourcesEventHandlerHandle;
 
-// Class definitions
-
-class RenderResourcesContext : public boost::noncopyable
+class RenderResourcesEventHandler : public Singleton< RenderResourcesEventHandler >,
+  public EventHandler
 {
+  // -- constructor --
+private:
+  friend class Singleton< RenderResourcesEventHandler >;
+  RenderResourcesEventHandler();
+  virtual ~RenderResourcesEventHandler();
 
-  // -- constructor/ destructor --
+  virtual void initialize_eventhandler();
+  
 public:
-  RenderResourcesContext();
-  virtual ~RenderResourcesContext();
+  
+  // DELETE_TEXTURE:
+  // Delete a texture within the right context
+  void delete_texture( unsigned int texture_id );
+  
+  // DELETE_BUFFER_OBJECT:
+  // Delete a buffer object within the right context
+  void delete_buffer_object( unsigned int buffer_id );
 
-  // -- functions implemented by GUI system --
+  // DELETE_FRAMEBUFFER_OBJECT:
+  // Delete a framebuffer object within the right context
+  void delete_framebuffer_object( unsigned int framebuffer_id );
 
-protected:
+  // DELETE_RENDERBUFFER:
+  // Delete a renderbuffer within the right context
+  void delete_renderbuffer( unsigned int renderbuffer_id );
 
-  friend class RenderResources;
-
-  // CREATE_RENDER_CONTEXT:
-  // Generate a render context for one of the viewers
-  virtual bool create_render_context( RenderContextHandle& context ) = 0;
-
-  // VALID_RENDER_RESOURCES:
-  // Check whether valid render resources were installed
-  virtual bool valid_render_resources() = 0;
-
+private:
+  RenderContextHandle context_;
 };
 
 } // end namespace Utils

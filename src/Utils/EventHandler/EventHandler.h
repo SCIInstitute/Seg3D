@@ -103,6 +103,12 @@ public:
   // The main functions that processes all the incoming events.
   virtual void run_eventhandler();
 
+protected:
+  // INITIALIZE_EVENTHANDLER:
+  // This function will be called on the event handler thread before it will start
+  // processing events
+  virtual void initialize_eventhandler();
+
 private:
 
   friend void TerminateEventHandlerThread( EventHandlerHandle handle );

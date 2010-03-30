@@ -27,6 +27,7 @@
  */
 
 #include <Utils/Graphics/Texture.h>
+#include <Utils/RenderResources/RenderResourcesEventHandler.h>
 
 namespace Utils
 {
@@ -38,7 +39,9 @@ Texture::Texture()
 
 Texture::~Texture()
 {
-  glDeleteTextures( 1, &this->texture_id_ );
+  // NOTE: This object can be owned by any thread, however it needs to be deleted in the
+  // right context. This function will do this for us.
+  RenderResourcesEventHandler::Instance()->delete_texture( this->texture_id_ );
 }
 
 void Texture::enable()

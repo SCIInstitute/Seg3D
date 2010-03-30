@@ -54,6 +54,8 @@ bool EventHandler::is_eventhandler_thread() const
 
 void EventHandler::run_eventhandler()
 {
+  initialize_eventhandler();
+  
   try
   {
     while ( !( wait_and_process_events() ) )
@@ -63,6 +65,10 @@ void EventHandler::run_eventhandler()
   {
     SCI_LOG_ERROR(e.message());
   }
+}
+
+void EventHandler::initialize_eventhandler()
+{
 }
 
 void EventHandler::install_eventhandler_context( EventHandlerContextHandle& context )

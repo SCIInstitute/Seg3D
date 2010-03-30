@@ -29,6 +29,8 @@
 #include <Utils/Core/StringUtil.h>
 #include <Utils/Core/Exception.h>
 
+#include <Application/Interface/Interface.h>
+
 #include <Interface/QtInterface/QtRenderResources.h>
 
 namespace Seg3D
@@ -79,7 +81,7 @@ QtRenderResourcesContext::~QtRenderResourcesContext()
   // Nothing to clean up, everything is handled by smart pointers
 }
 
-bool QtRenderResourcesContext::create_render_context( RenderContextHandle& context )
+bool QtRenderResourcesContext::create_render_context( Utils::RenderContextHandle& context )
 {
   if ( !( shared_widget_.data() ) )
   {
@@ -91,10 +93,10 @@ bool QtRenderResourcesContext::create_render_context( RenderContextHandle& conte
       shared_widget_->context()->device() ) );
   qt_context->create( shared_widget_->context() );
 
-  SCI_LOG_DEBUG(std::string("qt_context->valid = ")+Utils::to_string(qt_context->isValid()));
+  SCI_LOG_DEBUG( std::string("qt_context->valid = ") + Utils::to_string( qt_context->isValid() ) );
 
   // Bind the new context in the GUI independent wrapper class
-  context = RenderContextHandle( new QtRenderContext( qt_context ) );
+  context = Utils::RenderContextHandle( new QtRenderContext( qt_context ) );
 
   return ( context->is_valid() );
 }
@@ -105,14 +107,14 @@ QtRenderResourcesContext::create_qt_render_widget( QWidget* parent )
   if ( !( shared_widget_.data() ) )
   {
     // Create the first shared widget
-    SCI_LOG_DEBUG("Create the shared OpenGL widget");
+    SCI_LOG_DEBUG( "Create the shared OpenGL widget" );
     shared_widget_ = new QtRenderWidget( format_, parent, 0 );
     return ( shared_widget_.data() );
   }
   else
   {
     // Create a sibling widget
-    SCI_LOG_DEBUG("Create OpenGL widget");
+    SCI_LOG_DEBUG( "Create OpenGL widget" );
     return ( new QtRenderWidget( format_, parent, shared_widget_.data() ) );
   }
 }

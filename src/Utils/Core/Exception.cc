@@ -199,4 +199,19 @@ std::string UnderflowError::what() const
   return std::string( "UnderflowError" );
 }
 
+OpenGLException::OpenGLException( std::string message,
+  unsigned int line, const char* file ) :
+  Exception( message, line, file )
+{
+}
+
+OpenGLException::~OpenGLException()
+{
+}
+
+std::string OpenGLException::what() const
+{
+  return std::string( "OpenGLException" );
+}
+
 } // end namespace Utils

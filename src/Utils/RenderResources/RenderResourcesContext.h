@@ -26,18 +26,51 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <Application/Renderer/RenderResourcesContext.h>
+#ifndef UTILS_RENDERRESOURCES_RENDERRESOURCESCONTEXT_H
+#define UTILS_RENDERRESOURCES_RENDERRESOURCESCONTEXT_H
 
-namespace Seg3D
+// Boost includes
+#include <boost/thread/mutex.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/utility.hpp>
+
+// Utils includes
+#include <Utils/Core/Log.h>
+#include <Utils/RenderResources/RenderContext.h>
+
+namespace Utils
 {
 
-RenderResourcesContext::RenderResourcesContext()
+// Forward declarations
+class RenderResourcesContext;
+typedef boost::shared_ptr< RenderResourcesContext > RenderResourcesContextHandle;
+
+// Class definitions
+
+class RenderResourcesContext : public boost::noncopyable
 {
-}
 
-RenderResourcesContext::~RenderResourcesContext()
-{
-}
+  // -- constructor/ destructor --
+public:
+  RenderResourcesContext();
+  virtual ~RenderResourcesContext();
 
-} // end namespace Seg3D
+  // -- functions implemented by GUI system --
 
+protected:
+
+  friend class RenderResources;
+
+  // CREATE_RENDER_CONTEXT:
+  // Generate a render context for one of the viewers
+  virtual bool create_render_context( RenderContextHandle& context ) = 0;
+
+  // VALID_RENDER_RESOURCES:
+  // Check whether valid render resources were installed
+  virtual bool valid_render_resources() = 0;
+
+};
+
+} // end namespace Utils
+
+#endif

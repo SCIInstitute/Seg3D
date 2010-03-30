@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_RENDERER_RENDERRESOURCES_H
-#define APPLICATION_RENDERER_RENDERRESOURCES_H
+#ifndef UTILS_RENDERRESOURCES_RENDERRESOURCES_H
+#define UTILS_RENDERRESOURCES_RENDERRESOURCES_H
 
 // Boost includes
 #include <boost/thread/mutex.hpp>
@@ -39,12 +39,11 @@
 #include <Utils/Core/Exception.h>
 #include <Utils/Core/Log.h>
 #include <Utils/Core/Singleton.h>
+#include <Utils/RenderResources/RenderContext.h>
+#include <Utils/RenderResources/RenderResourcesContext.h>
 
-// Application includes
-#include <Application/Renderer/RenderContext.h>
-#include <Application/Renderer/RenderResourcesContext.h>
 
-namespace Seg3D
+namespace Utils
 {
 
 // CLASS RENDERRESOURCES
@@ -54,12 +53,12 @@ namespace Seg3D
 class RenderResources;
 
 // Class definition
-class RenderResources : public Utils::Singleton< RenderResources >
+class RenderResources : public Singleton< RenderResources > 
 {
 
   // -- constructor --
 private:
-  friend class Utils::Singleton< RenderResources >;
+  friend class Singleton< RenderResources >;
   RenderResources();
   virtual ~RenderResources();
 
@@ -89,29 +88,17 @@ public:
   typedef boost::recursive_mutex mutex_type;
   typedef boost::unique_lock< mutex_type > lock_type;
 
-  // LOCK_SHARED_CONTEXT:
-  void lock_shared_context()
-  {
-    shared_context_mutex_.lock();
-  }
-
-  // LOCK_SHARED_CONTEXT:
-  void unlock_shared_context()
-  {
-    shared_context_mutex_.unlock();
-  }
-
-  // SHARED_CONTEXT_MUTEX:
+  // GET_MUTEX:
   // reference to the mutex that protects the common pool of textures
-  mutex_type& shared_context_mutex()
+  mutex_type& get_mutex()
   {
-    return shared_context_mutex_;
+    return mutex_;
   }
 
 private:
   // We need a lock that protects against multiple threads reserving
   // OpenGL resources at the same time
-  mutex_type shared_context_mutex_;
+  mutex_type mutex_;
 
   // -- OpenGL initialization --
 public:
@@ -123,21 +110,17 @@ private:
 
   // State variable indicating whether the OpenGL environment has been initialized
   bool gl_initialized_;
-
-};
-
-class OpenGLException : public Utils::Exception
-{
+  
 public:
-  OpenGLException(std::string message, unsigned int line, const char* file);
-  virtual ~OpenGLException();
+  // GETMUTEX:
+  // Get the shared mutex for the opengl resources
+  static mutex_type& GetMutex() 
+  { 
+    return Instance()->get_mutex(); 
+  }
 
-  virtual std::string what() const;
 };
 
-#define SCI_THROW_OPENGLEXCEPTION(message)\
-throw OpenGLException(message, __LINE__, __FILE__)
-
-} // end namespace Seg3D
+} // end namespace Utils
 
 #endif

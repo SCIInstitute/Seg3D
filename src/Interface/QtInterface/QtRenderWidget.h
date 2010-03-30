@@ -33,10 +33,13 @@
 # pragma once
 #endif 
 
-#include <Application/Renderer/RenderResources.h> 
-#include <Application/Renderer/Renderer.h>
+// Utils includes
+#include <Utils/RenderResources/RenderResources.h> 
+
+// Applications includes
 #include <Application/Viewer/ViewerRenderer.h>
 #include <Application/Viewer/Viewer.h>
+#include <Application/Renderer/Renderer.h>
 
 #include <QtOpenGL>
 

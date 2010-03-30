@@ -29,6 +29,8 @@
 #include <boost/bind.hpp>
 
 #include <Utils/Graphics/BufferObject.h>
+#include <Utils/RenderResources/RenderResourcesEventHandler.h>
+
 
 namespace Utils
 {
@@ -48,7 +50,9 @@ BufferObject::~BufferObject()
 {
   if ( !this->copy_constructed_ )
   {
-    glDeleteBuffers( 1, &( this->id_ ) );
+    // NOTE: This object can be owned by any thread, however it needs to be deleted in the
+    // right context. This function will do this for us.
+    RenderResourcesEventHandler::Instance()->delete_buffer_object( this->id_ );
   }
 }
 

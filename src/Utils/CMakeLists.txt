@@ -32,4 +32,7 @@ ADD_SUBDIRECTORY(DataBlock)
 ADD_SUBDIRECTORY(EventHandler)
 ADD_SUBDIRECTORY(Geometry)
 ADD_SUBDIRECTORY(Volume)
+
+# These next two depend on OpenGL and should only be compiled when the renderer is compiled
 ADD_SUBDIRECTORY(Graphics)
+ADD_SUBDIRECTORY(RenderResources)

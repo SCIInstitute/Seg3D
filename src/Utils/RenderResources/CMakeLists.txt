@@ -31,33 +31,21 @@
 # Set sources
 ##################################################
 
-SET(UTILS_GRAPHICS_SRCS
-  Texture.h
-  Texture.cc
-  Renderbuffer.h
-  Renderbuffer.cc
-  FramebufferObject.h
-  FramebufferObject.cc
-  BufferObject.h
-  BufferObject.cc
-  VertexBufferObject.h
-  VertexBufferObject.cc
-  PixelBufferObject.h
-  PixelBufferObject.cc
-  UnitCube.h
-  UnitCube.cc
-  GLSLShader.h
-  GLSLShader.cc
-  GLSLProgram.h
-  GLSLProgram.cc
+SET(UTILS_RENDERRESOURCES_SRCS
+  RenderResourcesEventHandler.h
+  RenderResourcesEventHandler.cc
+  RenderResources.h
+  RenderResources.cc
+  RenderResourcesContext.h
+  RenderResourcesContext.cc
+  RenderContext.h
+  RenderContext.cc
   )
 
-
-ADD_LIBRARY(Utils_Graphics STATIC 
-            ${UTILS_GRAPHICS_SRCS} )
+ADD_LIBRARY(Utils_RenderResources STATIC 
+            ${UTILS_RENDERRESOURCES_SRCS})
             
-TARGET_LINK_LIBRARIES(Utils_Graphics
-            Utils_RenderResources
+TARGET_LINK_LIBRARIES(Utils_RenderResources
                       ${SCI_GLEW_LIBRARY}
                       ${SCI_BOOST_LIBRARY})
 

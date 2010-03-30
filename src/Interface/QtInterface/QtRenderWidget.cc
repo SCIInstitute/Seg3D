@@ -80,7 +80,7 @@ void QtRenderWidget::update_texture( Utils::TextureHandle texture )
 
 void QtRenderWidget::initializeGL()
 {
-  RenderResources::Instance()->init_gl();
+  Utils::RenderResources::Instance()->init_gl();
   glClearColor( 0.5, 0.5, 0.5, 1.0 );
   renderer_->initialize();
 }

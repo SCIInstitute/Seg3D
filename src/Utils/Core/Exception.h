@@ -208,6 +208,20 @@ public:
   virtual std::string what() const;
 };
 
+class OpenGLException : public Utils::Exception
+{
+public:
+  OpenGLException(std::string message, 
+    unsigned int line, 
+    const char* file);
+  
+  // Constructor/destructor
+  virtual ~OpenGLException();
+
+  // Description of the type of exception
+  virtual std::string what() const;
+};
+
 // MACROS FOR AUTOMATICALLY INCLUDING LINE NUMBER AND FILE IN THE
 // EXCEPTION THAT WAS THROWN
 
@@ -240,6 +254,9 @@ throw Utils::OverflowError(message,__LINE__,__FILE__)
 
 #define SCI_THROW_UNDERFLOWERROR(message)\
 throw Utils::UnderflowError(message,__LINE__,__FILE__)
+
+#define SCI_THROW_OPENGLEXCEPTION(message)\
+throw OpenGLException(message, __LINE__, __FILE__)
 
 } // end namespace Utils
 

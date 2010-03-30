@@ -153,32 +153,29 @@ void LayerManager::delete_layers( LayerGroupHandle group )
 {
   std::vector< LayerHandle > layer_vector;
 
-  // NOTE: This function is called from the Application Thread, hence we do not need to lock the
-  // state engine explicitly for now.
   {
     lock_type lock( get_mutex() );  
     
     // get a temporary copy of the list of layers
     layer_list_type layer_list = group->get_layer_list();
     
-    for( layer_list_type::iterator i = layer_list.begin(); 
-      i != layer_list.end(); ++i )
+    for( layer_list_type::iterator it = layer_list.begin(); it != layer_list.end(); ++it )
     {
-      if( ( *i )->selected_state_->get() )
+      if( ( *it )->selected_state_->get() )
       {   
-        SCI_LOG_DEBUG( std::string("Deleting Layer: ") + ( *i )->get_layer_id());
-        layer_vector.push_back(( *i ));
-        group->delete_layer( ( *i ) );
+        SCI_LOG_DEBUG( std::string("Deleting Layer: ") + ( *it )->get_layer_id() );
+        layer_vector.push_back( *it );
+        group->delete_layer( *it );
       }
     }
     
-    if( group->get_layer_list().empty() )
+    if( group->is_empty() )
     {   
       group_handle_list_.remove( group );
     }
   } // Unlocked from here:
 
-  if( group->get_layer_list().empty() )
+  if( group->is_empty() )
   {   
       group_deleted_signal_( group );
   }

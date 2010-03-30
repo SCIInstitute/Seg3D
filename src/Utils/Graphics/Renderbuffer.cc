@@ -27,6 +27,8 @@
  */
 
 #include <Utils/Graphics/Renderbuffer.h>
+#include <Utils/RenderResources/RenderResourcesEventHandler.h>
+
 
 namespace Utils
 {
@@ -43,7 +45,9 @@ Renderbuffer::Renderbuffer()
 
 Renderbuffer::~Renderbuffer()
 {
-  glDeleteRenderbuffersEXT( 1, &id_ );
+  // NOTE: This object can be owned by any thread, however it needs to be deleted in the
+  // right context. This function will do this for us.
+  RenderResourcesEventHandler::Instance()->delete_renderbuffer( this->id_ );
 }
 
 void Renderbuffer::bind()

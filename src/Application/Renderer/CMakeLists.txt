@@ -42,12 +42,6 @@ ADD_CUSTOM_COMMAND(
 ##################################################
 
 SET(APPLICATION_RENDERER_SRCS
-  RenderResources.h
-  RenderResources.cc
-  RenderResourcesContext.h
-  RenderResourcesContext.cc
-  RenderContext.h
-  RenderContext.cc
   Renderer.h
   Renderer.cc
   SliceShader.h
@@ -72,6 +66,7 @@ TARGET_LINK_LIBRARIES(Application_Renderer
                       Utils_Core
                       Utils_EventHandler
             Utils_Graphics
+            Utils_RenderResources
                       Application_Viewer
                       ${SCI_GLEW_LIBRARY}
                       ${SCI_BOOST_LIBRARY})

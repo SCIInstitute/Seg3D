@@ -26,19 +26,19 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// Utils includes
 #include <Utils/Core/Log.h>
+#include <Utils/RenderResources/RenderResources.h>
+#include <Utils/EventHandler/DefaultEventHandlerContext.h>
+#include <Utils/Geometry/View3D.h>
+#include <Utils/Graphics/UnitCube.h>
 
-// application includes
+// Application includes
 #include <Application/Layer/DataLayer.h>
 #include <Application/Layer/MaskLayer.h>
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/Renderer/Renderer.h>
-#include <Application/Renderer/RenderResources.h>
 #include <Application/ViewerManager/ViewerManager.h>
-
-#include <Utils/EventHandler/DefaultEventHandlerContext.h>
-#include <Utils/Geometry/View3D.h>
-#include <Utils/Graphics/UnitCube.h>
 
 namespace Seg3D
 {
@@ -98,7 +98,7 @@ void Renderer::initialize()
   // the scene to be blank sometimes.
   if ( !is_eventhandler_thread() )
   {
-    if ( !RenderResources::Instance()->create_render_context( context_ ) )
+    if ( !Utils::RenderResources::Instance()->create_render_context( context_ ) )
     {
       SCI_THROW_EXCEPTION( "Failed to create a valid rendering context" );
     }
@@ -112,7 +112,7 @@ void Renderer::initialize()
     Interface::PostEvent( boost::bind( &Renderer::initialize, this ) );
     return;
   }
-  if ( !RenderResources::Instance()->create_render_context( context_ ) )
+  if ( !Utils::RenderResources::Instance()->create_render_context( context_ ) )
   {
     SCI_THROW_EXCEPTION("Failed to create a valid rendering context");
   }
@@ -128,7 +128,7 @@ void Renderer::initialize()
   //glEnable(GL_CULL_FACE);
 
   // lock the shared render context
-  RenderResources::lock_type lock( RenderResources::Instance()->shared_context_mutex() );
+  Utils::RenderResources::lock_type lock( Utils::RenderResources::GetMutex() );
 
   textures_[ 0 ] = Utils::Texture2DHandle( new Utils::Texture2D() );
   textures_[ 1 ] = Utils::Texture2DHandle( new Utils::Texture2D() );
@@ -176,22 +176,6 @@ void Renderer::redraw()
     }
     this->redraw_needed_ = false;
   }
-/*
-  {
-    boost::unique_lock< boost::recursive_mutex > lock( this->redraw_needed_mutex_ );
-
-    this->redraw_needed_ = false;
-  }
-
-  {
-    boost::unique_lock< boost::recursive_mutex > lock( this->redraw_needed_mutex_ );
-
-    if ( this->redraw_needed_ == true )
-    {
-      return;
-    }
-  }
-*/
 
 #if !defined(WIN32) && !defined(APPLE) && !defined(X11_THREADSAFE)
   this->context_->make_current();
@@ -262,7 +246,7 @@ void Renderer::redraw()
   {
     // Copy slices from viewer
     {
-      RenderResources::lock_type lock( RenderResources::Instance()->shared_context_mutex() );
+      Utils::RenderResources::lock_type lock( Utils::RenderResources::GetMutex() );
       this->process_slices( layer_scene, viewer );
     }
     Utils::View2D view2d(
@@ -348,18 +332,6 @@ void Renderer::redraw()
 
   SCI_CHECK_OPENGL_ERROR();
 
-  /*
-   unsigned char* pixels = new unsigned char[(width_)*(height_)*3];
-   glPixelStorei(GL_PACK_ALIGNMENT, 1);
-   glReadPixels(0, 0, width_, height_, GL_RGB, GL_UNSIGNED_BYTE, (GLvoid*)pixels);
-   unsigned char val = pixels[width_*height_+1];
-
-   if (pixels != NULL)
-   {
-   delete[] pixels;
-   }
-   */
-
   glFinish();
 
   this->frame_buffer_->disable();
@@ -397,7 +369,7 @@ void Renderer::resize( int width, int height )
   }
 
   {
-    RenderResources::lock_type lock( RenderResources::Instance()->shared_context_mutex() );
+    Utils::RenderResources::lock_type lock( Utils::RenderResources::GetMutex() );
     textures_[ 0 ] = Utils::Texture2DHandle( new Utils::Texture2D() );
     textures_[ 1 ] = Utils::Texture2DHandle( new Utils::Texture2D() );
     textures_[ 0 ]->set_image( width, height, GL_RGBA );

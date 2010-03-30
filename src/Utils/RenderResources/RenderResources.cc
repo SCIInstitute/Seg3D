@@ -26,10 +26,11 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <Application/Renderer/RenderResources.h>
 #include <GL/glew.h>
+#include <Utils/RenderResources/RenderResources.h>
+#include <Utils/RenderResources/RenderResourcesEventHandler.h>
 
-namespace Seg3D
+namespace Utils
 {
 
 RenderResources::RenderResources() :
@@ -74,37 +75,22 @@ void RenderResources::init_gl()
 {
   if ( !gl_initialized_ )
   {
-    boost::unique_lock< mutex_type > lock( this->shared_context_mutex_ );
+    boost::unique_lock< mutex_type > lock( this->get_mutex() );
     if ( !gl_initialized_ )
     {
       glewInit();
       gl_initialized_ = true;
       if ( !GLEW_VERSION_2_1 )
       {
-        SCI_THROW_OPENGLEXCEPTION("Minimum OpenGL version 2.1 required.");
+        SCI_THROW_OPENGLEXCEPTION( "Minimum OpenGL version 2.1 required." );
       }
       if ( !GLEW_EXT_framebuffer_object )
       {
-        SCI_THROW_OPENGLEXCEPTION("GL_EXT_framebuffer_object not found.");
+        SCI_THROW_OPENGLEXCEPTION( "GL_EXT_framebuffer_object not found." );
       }
     }
   }
 }
 
-OpenGLException::OpenGLException( std::string message,
-  unsigned int line, const char* file ) :
-Utils::Exception(message, line, file)
-{
-}
-
-OpenGLException::~OpenGLException()
-{
-}
-
-std::string OpenGLException::what() const
-{
-  return std::string( "OpenGLException" );
-}
-
-} // end namespace Seg3D
+} // end namespace Utils
 

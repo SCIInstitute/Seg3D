@@ -174,9 +174,15 @@ public:
   {
     return layer_list_;
   }
+  
   size_t get_list_size()
   {
     return layer_list_.size();
+  }
+  
+  bool is_empty()
+  {
+    return layer_list_.empty();
   }
   
 private:

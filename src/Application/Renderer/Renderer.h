@@ -37,7 +37,6 @@
 #include <boost/thread/mutex.hpp>
 
 // Application includes
-#include <Application/Renderer/RenderContext.h>
 #include <Application/Renderer/SliceShader.h>
 #include <Application/Viewer/Viewer.h>
 #include <Application/Viewer/ViewerRenderer.h>
@@ -49,6 +48,7 @@
 #include <Utils/Graphics/Renderbuffer.h>
 #include <Utils/Graphics/Texture.h>
 #include <Utils/Graphics/UnitCube.h>
+#include <Utils/RenderResources/RenderContext.h>
 
 namespace Seg3D
 {
@@ -78,7 +78,7 @@ private:
   void process_slices( LayerSceneHandle& layer_scene, ViewerHandle& viewer );
 
   // Context for rendering images
-  RenderContextHandle context_;
+  Utils::RenderContextHandle context_;
 
   Utils::Texture2DHandle textures_[ 2 ];
   Utils::RenderbufferHandle depth_buffer_;

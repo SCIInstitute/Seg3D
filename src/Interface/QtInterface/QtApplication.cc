@@ -28,11 +28,11 @@
 
 // Core includes
 #include <Utils/Core/Log.h>
+#include <Utils/RenderResources/RenderResources.h>
 
 // Application Layer includes
 #include <Application/Application/Application.h>
 #include <Application/Interface/Interface.h>
-#include <Application/Renderer/RenderResources.h>
 
 // Interface includes
 #include <Interface/QtInterface/QtApplication.h>
@@ -70,7 +70,7 @@ bool QtApplication::setup( int argc, char **argv )
 
     SCI_LOG_DEBUG("Install the QtRenderResources into the Interface layer");
     // Step 5: Insert the render resources class into the application layer
-    RenderResources::Instance()->install_resources_context( qt_renderresources_context_ );
+    Utils::RenderResources::Instance()->install_resources_context( qt_renderresources_context_ );
 
   }
   catch ( ... )
