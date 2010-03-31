@@ -28,7 +28,6 @@
 
 #include <GL/glew.h>
 #include <Utils/RenderResources/RenderResources.h>
-#include <Utils/RenderResources/RenderResourcesEventHandler.h>
 
 namespace Utils
 {
