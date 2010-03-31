@@ -40,36 +40,42 @@ namespace Seg3D
   
   bool ActionInsertLayerAbove::validate( ActionContextHandle& context )
   {
-    if ( !( StateEngine::Instance()->is_stateid( name_.value() ) ) )
+
+    if ( !( StateEngine::Instance()->is_stateid( layer_to_insert_id_ ) ) )
     {
-      context->report_error( std::string( "Layer: '" ) + name_.value() + "' is invalid" );
+      context->report_error( std::string( "LayerID '" ) + layer_to_insert_id_ + "' is invalid" );
       return false;
     }
     
-    return true; // validated
+    if ( !( StateEngine::Instance()->is_stateid( layer_below_id_ ) ) )
+    {
+      context->report_error( std::string( "LayerID '" ) + layer_below_id_ + "' is invalid" );
+      return false;
+    }
+
+    return true;
   }
   
   bool ActionInsertLayerAbove::run( ActionContextHandle& context, ActionResultHandle& result )
   {
-    //LayerManager::Instance()->insert_layer_above( layerid_.value() );
-    return true; // success
+    if ( ( StateEngine::Instance()->is_stateid( layer_to_insert_id_ ) ) && 
+      ( StateEngine::Instance()->is_stateid( layer_below_id_ ) ) )
+    {
+      LayerManager::Instance()->insert_layer_above( this->layer_to_insert_id_, this->layer_below_id_ );
+      return true;
+    }
+
+    return false;
   }
   
-  ActionHandle ActionInsertLayerAbove::Create( const std::string& name )
+
+  void ActionInsertLayerAbove::Dispatch( std::string layer_to_insert_id, std::string layer_below_id )
   {
-    // Create new action
     ActionInsertLayerAbove* action = new ActionInsertLayerAbove;
-    
-    // Set action parameters
-    action->name_.value() = name;
-    
-    // Post the new action
-    return ActionHandle( action );
-  }
+    action->layer_below_id_ = layer_below_id;
+    action->layer_to_insert_id_ = layer_to_insert_id;
   
-  void ActionInsertLayerAbove::Dispatch( const std::string& name )
-  {
-    Interface::PostAction( Create( name ) );
+    Interface::PostAction( ActionHandle( action ) );
   }
   
 } // end namespace Seg3D

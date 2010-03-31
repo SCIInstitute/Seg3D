@@ -83,7 +83,13 @@ bool LayerManager::insert_layer( LayerHandle layer )
     layer->set_layer_group( group_handle );
       
     SCI_LOG_DEBUG( std::string("Set Active Layer: ") + layer->get_layer_id());
+    
+    // deactivate the previous active layer
+    if ( active_layer_ )
+      active_layer_->set_active( false ); 
+      
     active_layer_ = layer;
+    active_layer_->set_active( true );
   }
 
   layer_inserted_signal_( layer );  
@@ -92,21 +98,77 @@ bool LayerManager::insert_layer( LayerHandle layer )
   return true;
 }
 
+bool LayerManager::insert_layer_above( std::string layer_to_insert_id, std::string layer_below_id )
+{
+  LayerHandle layer_above = this->get_LayerHandle_from_layer_id( layer_to_insert_id );
+  LayerHandle layer_below = this->get_LayerHandle_from_layer_id( layer_below_id );
+  
+  if( layer_above && layer_below )
+  {
+    if( layer_above->get_layer_group() == layer_below->get_layer_group() )
+    {
+      if( ( layer_above->type() == Utils::VolumeType::DATA_E ) && ( layer_below->type() != Utils::VolumeType::DATA_E ) )
+      {
+        return false;
+      }
+      LayerGroupHandle group = layer_above->get_layer_group();
+      group->delete_layer( layer_above );
+      group->insert_layer_above( layer_above, layer_below );
+      group_changed_signal_( group );
+      return true;
+    }
+    else
+    {
+    
+      //TODO - need popup dialog to confirm resample
+      if( ( layer_above->type() == Utils::VolumeType::DATA_E ) && ( layer_below->type() != Utils::VolumeType::DATA_E ) )
+      {
+        return false;
+      }
+      LayerGroupHandle group_above = layer_above->get_layer_group();
+      LayerGroupHandle group_below = layer_below->get_layer_group();
+      
+      group_above->delete_layer( layer_above );
+      
+      if( group_above->get_layer_list().empty() )
+      {   
+        group_handle_list_.remove( group_above );
+        group_deleted_signal_( group_above );
+      }
+      else
+      {
+        group_changed_signal_( group_above );
+      }
+      
+      group_below->insert_layer_above( layer_above, layer_below );
+      layer_above->set_layer_group( group_below );
+      group_changed_signal_( group_below );
+      return true;
+    }
+  }
+  return false;
+
+}
+
 
 void LayerManager::set_active_layer( LayerHandle layer )
 {
   {
     lock_type lock( this->get_mutex() );    
-
+    
+    active_layer_->set_active( false );
+  
     SCI_LOG_DEBUG( std::string("Set Active Layer: ") + layer->get_layer_id());
+    
     active_layer_ = layer;
+    active_layer_->set_active( true );
   }
 
   active_layer_changed_signal_( layer );  
 }
 
 
-LayerGroupHandle LayerManager::check_for_group( std::string group_id )
+LayerGroupHandle LayerManager::get_LayerGroupHandle_from_group_id( std::string group_id )
 {
     lock_type lock( this->get_mutex() );
     
@@ -119,6 +181,44 @@ LayerGroupHandle LayerManager::check_for_group( std::string group_id )
     }
   }
   return LayerGroupHandle();
+}
+
+LayerHandle LayerManager::get_LayerHandle_from_layer_id( std::string layer_id )
+{
+  lock_type lock( this->get_mutex() );
+
+  for( group_handle_list_type::iterator i = group_handle_list_.begin(); 
+    i != group_handle_list_.end(); ++i )
+  {
+    for( layer_list_type::iterator j = ( *i )->layer_list_.begin(); 
+      j != ( *i )->layer_list_.end(); ++j )
+    {
+      if( ( *j )->get_layer_id() == layer_id )
+      {
+        return ( *j );
+      }
+    }
+  }
+  return LayerHandle();
+}
+
+LayerHandle LayerManager::get_LayerHandle_from_layer_name( std::string layer_name )
+{
+  lock_type lock( this->get_mutex() );
+
+  for( group_handle_list_type::iterator i = group_handle_list_.begin(); 
+    i != group_handle_list_.end(); ++i )
+  {
+    for( layer_list_type::iterator j = ( *i )->layer_list_.begin(); 
+      j != ( *i )->layer_list_.end(); ++j )
+    {
+      if( ( *j )->get_layer_name() == layer_name )
+      {
+        return ( *j );
+      }
+    }
+  }
+  return LayerHandle();
 }
 
 void LayerManager::get_groups( std::vector< LayerGroupHandle > &vector_of_groups )
@@ -147,7 +247,6 @@ void LayerManager::get_layers( std::vector< LayerHandle > &vector_of_layers )
       }
   }
 }
-
 
 void LayerManager::delete_layers( LayerGroupHandle group )
 {

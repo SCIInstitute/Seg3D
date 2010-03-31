@@ -45,6 +45,7 @@
 #include <Application/Layer/LayerGroup.h>
 #include <Application/LayerManager/Actions/ActionDeleteLayers.h>
 #include <Application/LayerManager/Actions/ActionNewMaskLayer.h>
+#include <Application/LayerManager/Actions/ActionInsertLayerAbove.h>
 
 
 
@@ -74,7 +75,7 @@ public:
   
 };
   
-LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer, boost::function< void() > activate_function ) :
+LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
   private_( new LayerGroupWidgetPrivate )
 {
     LayerGroupHandle group = layer->get_layer_group();
@@ -84,9 +85,14 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer, boost::f
   this->private_->ui_.setupUi( this );
   
   this->private_->group_id_ = group->get_group_id();
+  
+  // Set up the Drag and Drop
+  this->setAcceptDrops( true );
+  //this->dragged_layer_ = " ";
 
   // set some values of the GUI
 
+  //this->private_->ui_.activate_button_->setText( QString::fromStdString( group->get_grid_transform().get_as_string() ) );
   std::string group_name = Utils::to_string( group->get_grid_transform().get_nx() ) + " x " +
     Utils::to_string( group->get_grid_transform().get_ny() ) + " x " +
     Utils::to_string( group->get_grid_transform().get_nz() );
@@ -277,6 +283,7 @@ void LayerGroupWidget::add_layer( LayerHandle layer )
 {
   LayerWidget_handle new_layer_handle( new LayerWidget(this->private_->ui_.group_frame_, layer ) );
   this->private_->ui_.group_frame_layout_->addWidget( new_layer_handle.data() );
+  new_layer_handle->set_active( layer->get_active() );
   this->layer_list_.push_back( new_layer_handle );
 }
 
@@ -289,6 +296,7 @@ void LayerGroupWidget::delete_layer( LayerHandle layer )
       {
           ( *i )->deleteLater();
           layer_list_.erase( i );
+          this->repaint();
           return;
       }
   }    
@@ -308,6 +316,7 @@ void LayerGroupWidget::set_active_layer( LayerHandle layer )
           layer_list_[i]->set_active( false );
       }
   }
+  this->repaint();
 }
 
 void  LayerGroupWidget::set_active( bool active )
@@ -546,6 +555,134 @@ void LayerGroupWidget::show_delete( bool show )
     this->private_->ui_.group_delete_button_->setChecked( false );
   }
   show_selection_checkboxes( show );
+}
+
+
+void LayerGroupWidget::mousePressEvent(QMouseEvent *event)
+{
+
+  if ( !( ( event->button() == Qt::LeftButton ) && ( validate_location( event->pos() ) ) ) )
+  { 
+    return;
+  }
+
+
+  LayerWidget *child = static_cast<LayerWidget*>( 
+    get_layerwidget_from_child( childAt( event->pos() ) ) );
+
+  if(!child)
+    return;
+
+  QPoint event_position = event->pos();
+  QPoint child_position = child->pos();
+  QPoint header_difference = QPoint(2, 25);
+  
+  QPoint hotSpot = event_position - header_difference - child_position;
+
+  QByteArray itemData;
+  itemData = ( QString::fromStdString( child->get_layer_id() ) ).toAscii();
+  QDataStream dataStream(&itemData, QIODevice::WriteOnly);
+  dataStream << QPoint(hotSpot);
+
+  QMimeData *mimeData = new QMimeData;
+  mimeData->setData( "layer_id", itemData );
+  mimeData->setText( QString::fromStdString( child->get_layer_id()));
+  
+  QDrag *drag = new QDrag(this);
+  drag->setMimeData(mimeData);
+  drag->setPixmap(QPixmap::grabWidget(child));
+  drag->setHotSpot(hotSpot);
+
+  child->hide();
+  
+
+  if (drag->exec(Qt::MoveAction | Qt::CopyAction, Qt::CopyAction) == Qt::MoveAction)
+    child->close();
+  else
+    child->show();
+}
+
+
+void LayerGroupWidget::mouseDragEvent(QDragMoveEvent* event)
+{
+  if (event->mimeData()->hasFormat("layer_id")) 
+  {
+    event->acceptProposedAction();
+  }
+  else 
+  {
+    event->ignore();
+  }
+}
+
+
+void LayerGroupWidget::dragEnterEvent(QDragEnterEvent* event)
+{
+  if( !this->childAt(event->pos()))
+    return;
+    
+  if (event->mimeData()->hasFormat("layer_id")) 
+  { 
+    if( validate_location( event->pos() ))
+    {   
+      event->acceptProposedAction();
+    }
+  }
+  else 
+  {
+    event->ignore();
+  }
+}
+
+
+
+void LayerGroupWidget::dropEvent(QDropEvent* event)
+{
+  if( !this->childAt(event->pos()))
+    return;
+  
+  if ( validate_location( event->pos()) )
+  {
+    LayerWidget *endLayer = static_cast<LayerWidget*>(get_layerwidget_from_child(childAt(event->pos())));
+    //QString *layer_above_id =  qobject_cast< QString* >(event->mimeData());
+    //ActionInsertLayerAbove::Dispatch( "garbage", endLayer->get_layer_id() );
+    ActionInsertLayerAbove::Dispatch( event->mimeData()->text().toStdString(), endLayer->get_layer_id() );
+
+  }
+  
+}
+
+bool LayerGroupWidget::validate_location(const QPoint &point )
+{
+  QPoint header_difference = QPoint(2, 25);
+  QRect rectangle;
+  for( size_t i = 0; i < this->layer_list_.size(); ++i )
+  {
+    rectangle = this->layer_list_[i]->geometry();
+    rectangle.setTopLeft( rectangle.topLeft() + header_difference );
+    rectangle.setTopRight( rectangle.topRight() + header_difference );
+    rectangle.setBottomLeft( rectangle.bottomLeft() + header_difference );
+    rectangle.setBottomRight( rectangle.bottomRight() + header_difference );
+    if( rectangle.contains( point ) )
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
+LayerWidget* LayerGroupWidget::get_layerwidget_from_child(QObject *child)
+{
+  QObject *temp;
+  QString name = child->objectName();
+
+  while( name != "LayerWidget" )
+  {
+    temp = child->parent();
+    name = temp->objectName();
+    child = temp;
+  }
+  return static_cast<LayerWidget*>(child);
 }
   
 }  //end namespace Seg3D

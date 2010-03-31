@@ -73,7 +73,8 @@ public:
 public:
   void insert_layer( LayerHandle layer );
   void delete_layer( LayerGroupHandle group );
-  void make_new_group( LayerHandle layer );//, boost::function< void() > activate_function  );
+  bool refresh_group( LayerGroupHandle group );
+  void make_new_group( LayerHandle layer );
   void delete_group( LayerGroupHandle group );
   void show_group( LayerGroupHandle group );
   void set_active_group( LayerGroupHandle group );
@@ -86,6 +87,7 @@ private:
   QVBoxLayout* main_layout_;
   QVBoxLayout* group_layout_;
   
+
 
 private:
   QList< LayerGroupWidget_handle > group_list_;

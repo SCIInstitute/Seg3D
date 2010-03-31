@@ -97,7 +97,8 @@ SET(INTERFACE_APPINTERFACE_UI_SRCS
   ProgressWidget.ui
   Splash.ui
   ToolBoxPageWidget.ui
-  ViewerInterface.ui  
+  ViewerInterface.ui
+  StatusBar.ui
 )
 
 SET(INTERFACE_APPINTERFACE_RCC_SRCS

@@ -48,7 +48,20 @@ namespace Seg3D
     "   stop:0 rgba(241, 241, 241, 255),"
     "   stop:0.155779 rgba(248, 248, 248,255),"
     "   stop:1 rgba(224, 224, 224, 255));"
-    "}");
+    "}" );
+
+  // === StatusBar === //
+
+  const QString StyleSheet::STATUSBAR_C = QString::fromUtf8(
+    //"QStatusBar {"
+    //" border: 2px solid black; }"
+    "QStatusBar::item {"
+    " border: none; }"
+    "QStatusBar QToolButton {"
+    " background-color: rgba( 0, 0, 0, 0 );"
+    " border: 1px solid  rgba( 0, 0, 0, 0 );"
+    "}" );
+
 
   //Volume Type Colors
   const QString StyleSheet::DATA_VOLUME_COLOR_C = QString::fromUtf8(
@@ -77,14 +90,6 @@ namespace Seg3D
     "   stop:1 rgba(204, 224, 230, 255));"
     "}");
   
-  const QString StyleSheet::LAYER_WIDGET_LABEL_ACTIVE_C = QString::fromUtf8(
-    "QLineEdit#label_{"
-    " text-align: left;"
-    " color: black;"
-    " margin-right: 3px;"
-    " background-color: rgba(216, 238, 245, 1);"
-    "}");
-    
   // - INACTIVE - //
   const QString StyleSheet::LAYER_WIDGET_BASE_INACTIVE_C = QString::fromUtf8(
     "QWidget#base_{"
@@ -96,12 +101,23 @@ namespace Seg3D
     " border: 1px solid rgb(90, 90, 90);"
     "}");
   
-  const QString StyleSheet::LAYER_WIDGET_LABEL_INACTIVE_C = QString::fromUtf8(
+  const QString StyleSheet::LAYER_WIDGET_LABEL_C = QString::fromUtf8(
     "QLineEdit#label_{"
     " text-align: left;"
     " color: black;"
     " margin-right: 3px;"
     " background-color: rgba( 190, 190, 190, 1 );"
+    "}");
+    
+  // - DROP - //
+  const QString StyleSheet::LAYER_WIDGET_BASE_DROP_C = QString::fromUtf8(
+    "QWidget#base_{"
+    " background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227,"
+    "   stop:0 rgba(211, 155, 211, 255),"
+    "   stop:0.155779 rgba(225, 155, 225, 215),"
+    "   stop:1 rgba(194, 194, 155, 255));"
+    " border-radius: 6px;"
+    " border: 1px solid rgb(90, 90, 90);"
     "}");
     
   // - LOCKED - //

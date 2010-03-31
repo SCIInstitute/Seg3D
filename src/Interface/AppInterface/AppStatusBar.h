@@ -48,6 +48,8 @@
 namespace Seg3D
 {
 
+class AppStatusBarPrivate;
+
 class AppStatusBar : public QObject, private Utils::ConnectionHandler
 {
 Q_OBJECT
@@ -72,17 +74,16 @@ private:
   void update_data_point_label();
   void set_message( int msg_type, std::string message );
 
+private:
+  QStatusBar* statusbar_;
+  QWidget *statusbar_widget_;
+  boost::shared_ptr< AppStatusBarPrivate > private_;
+
   // -- status bar components -- //
 private:
-  QLabel* coordinates_label_;
-  QLabel* status_report_label_;
-  QToolButton* world_button_;
-  QToolButton* info_button_;
-
   MessageHistoryWidget* history_widget_;
   bool show_world_coord_;
-  QIcon world_icon_;
-  QIcon text_icon_;
+  
 
   DataPointInfo data_point_info_;
 

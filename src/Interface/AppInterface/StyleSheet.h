@@ -45,7 +45,11 @@ public:
 
   // === ViewerWidget Styles === //
   
-  const static QString VIEWERWIDGET_TOOLBAR_C;
+    const static QString VIEWERWIDGET_TOOLBAR_C;
+  
+  // === StatusBar === //
+    
+    const static QString STATUSBAR_C;
 
 
   
@@ -59,10 +63,11 @@ public:
   
     // - ACTIVE - //
     const static QString LAYER_WIDGET_BASE_ACTIVE_C;
-    const static QString LAYER_WIDGET_LABEL_ACTIVE_C;
     // - INACTIVE - //
     const static QString LAYER_WIDGET_BASE_INACTIVE_C;
-    const static QString LAYER_WIDGET_LABEL_INACTIVE_C;
+    const static QString LAYER_WIDGET_LABEL_C;
+    // - DROP - //
+    const static QString LAYER_WIDGET_BASE_DROP_C;
     // - LOCKED - //
     const static QString LAYER_WIDGET_BASE_LOCKED_C;
     const static QString LAYER_WIDGET_BACKGROUND_LOCKED_C;
@@ -77,6 +82,8 @@ public:
     const static QString GROUP_WIDGET_BASE_INACTIVE_C;
     const static QString GROUP_WIDGET_BACKGROUND_INACTIVE_C;
     const static QString GROUP_WIDGET_ACTIVATE_BUTTON_INACTIVE_C;
+    
+  
 
 };    
 

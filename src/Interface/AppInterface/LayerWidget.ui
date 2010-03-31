@@ -14,18 +14,25 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QWidget#base_{
+   <string notr="true">QWidget#LayerWidget{
+  background-color: rgba(255,255,255,0);
+  border-radius: 6px;
+}
+QWidget#header_{
+  background-color: rgba(255,255,255,0);
+}
+
+QWidget#base_{
   background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(241, 241, 241, 255), stop:0.155779 rgba(248, 248, 248, 255), stop:1 rgba(224, 224, 224, 255));
   border-radius: 6px;
   border: 1px solid rgb(90, 90, 90);
-  /*border: 3px solid rgb(253, 255, 101);*/
 }
 
 QLineEdit#label_{
   text-align: left;
   color: black;
   margin-right: 3px;
-  background-color: rgb(243, 243, 243);
+  background-color: rgba(243, 243, 243, 0);
 }
 
 QToolButton#activate_button_{
@@ -415,6 +422,9 @@ QToolButton#color_button_12_:pressed{
              <height>42</height>
             </size>
            </property>
+           <property name="mouseTracking">
+            <bool>true</bool>
+           </property>
            <layout class="QHBoxLayout" name="horizontalLayout">
             <property name="spacing">
              <number>0</number>
@@ -441,6 +451,9 @@ QToolButton#color_button_12_:pressed{
                 <width>31</width>
                 <height>42</height>
                </size>
+              </property>
+              <property name="mouseTracking">
+               <bool>true</bool>
               </property>
               <layout class="QHBoxLayout" name="horizontalLayout_9">
                <property name="spacing">
@@ -469,6 +482,9 @@ QToolButton#color_button_12_:pressed{
                    <weight>75</weight>
                    <bold>true</bold>
                   </font>
+                 </property>
+                 <property name="mouseTracking">
+                  <bool>true</bool>
                  </property>
                  <property name="text">
                   <string/>

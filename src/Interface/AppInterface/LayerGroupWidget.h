@@ -47,7 +47,7 @@ class LayerGroupWidget : public QWidget
   
   // -- constructor/destructor --
 public:
-  LayerGroupWidget( QWidget* parent, LayerHandle layer, boost::function< void() > activate_function );
+  LayerGroupWidget( QWidget* parent, LayerHandle layer );
   virtual ~LayerGroupWidget();
   
 public Q_SLOTS:
@@ -74,6 +74,17 @@ public:
 private Q_SLOTS:
     void adjust_new_size_labels( double scale_factor );
     void uncheck_delete_confirm();
+    
+  // private drag and drop functionality
+private:
+  void dropEvent(QDropEvent* event);
+  void mousePressEvent(QMouseEvent *event);
+  void mouseDragEvent(QDragMoveEvent* event);
+  void dragEnterEvent(QDragEnterEvent* event);
+  bool validate_location( const QPoint& point );
+  LayerWidget* get_layerwidget_from_child(QObject *child);
+  //QPoint start_position_;
+  //static std::string dragged_layer_;
   
   
   // -- widget internals --

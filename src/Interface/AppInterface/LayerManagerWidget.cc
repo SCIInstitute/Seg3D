@@ -70,6 +70,8 @@ LayerManagerWidget::LayerManagerWidget( QWidget* parent ) :
   this->main_->setLayout( this->main_layout_ );
   this->main_->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Preferred );
 
+  this->main_->setAcceptDrops( true );
+
 }
 // destructor
 LayerManagerWidget::~LayerManagerWidget()
@@ -80,62 +82,54 @@ void LayerManagerWidget::insert_layer( LayerHandle layer )
 {
     LayerGroupHandle group = layer->get_layer_group();
     
-    // The group is no longer deleted if it exists. Only its layers are deleted and re-added in the proper order
-  for ( QList< LayerGroupWidget_handle >::iterator i = this->group_list_.begin(); 
-     i  != this->group_list_.end(); i++ )
+  if (!this->refresh_group( group ))
   {
-    if ( group->get_group_id() == ( *i )->get_group_id() ) 
-    {
-        // delete all the existing gui layers
-        ( *i )->clear_all_layers();
-    
-        // make new ones and connect the Activate Action Layer
-          layer_list_type temp_layer_list = group->get_layer_list();
-          for( layer_list_type::reverse_iterator j = temp_layer_list.rbegin(); j != temp_layer_list.rend(); ++j )
-          {
-            ( *i )->add_layer( ( *j ) );
-          }
-          // exit when we are done.
-          return;
-        }
-      
-  }
     // if there isnt a group for this layer, we make one, add the layer to 
     // the group and make it the active layer 
-  make_new_group( layer );
+    make_new_group( layer );
+  }
 }
 
 void LayerManagerWidget::delete_layer( LayerGroupHandle group )
 {
-    
-    for ( QList< LayerGroupWidget_handle >::iterator i = this->group_list_.begin(); 
-     i  != this->group_list_.end(); i++ )
-  {
-    if ( group->get_group_id() == ( *i )->get_group_id() ) 
-    {
-        // delete all the existing gui layers
-        ( *i )->clear_all_layers();
-    
-        // make new ones and connect the Action Activate Layer
-          layer_list_type temp_layer_list = group->get_layer_list();
-          for( layer_list_type::reverse_iterator j = temp_layer_list.rbegin(); j != temp_layer_list.rend(); ++j )
-          {
-            ( *i )->add_layer( ( *j ) );
-          }
-          // exit when we are done
-          return;
-        }   
-  }
+    this->refresh_group( group );
 }
 
 
 void LayerManagerWidget::make_new_group( LayerHandle layer )
 {
-    LayerGroupWidget_handle new_group_handle( new LayerGroupWidget( this->main_, layer, 
-        boost::bind( &ActionActivateLayer::Dispatch, layer ) ) );
+    LayerGroupWidget_handle new_group_handle( new LayerGroupWidget( this->main_, layer ) );
   this->group_layout_->addWidget( new_group_handle.data() );
+  new_group_handle->repaint();
   this->group_list_.push_back( new_group_handle );
 }
+
+
+bool LayerManagerWidget::refresh_group( LayerGroupHandle group )
+{
+  for ( QList< LayerGroupWidget_handle >::iterator i = this->group_list_.begin(); 
+    i  != this->group_list_.end(); i++ )
+  {
+    if ( group->get_group_id() == ( *i )->get_group_id() ) 
+    {
+      // delete all the existing gui layers
+      ( *i )->clear_all_layers();
+
+      // make new ones 
+      layer_list_type temp_layer_list = group->get_layer_list();
+      for( layer_list_type::reverse_iterator j = temp_layer_list.rbegin(); j != temp_layer_list.rend(); ++j )
+      { 
+        ( *i )->add_layer( ( *j ) );
+      }
+      // exit when we are done
+      ( *i )->repaint();
+      return true;
+    }   
+  }
+  return false;
+}
+
+
   
 void LayerManagerWidget::delete_group( LayerGroupHandle group )
 {
@@ -148,7 +142,6 @@ void LayerManagerWidget::delete_group( LayerGroupHandle group )
       group_list_.erase( i );
       return;
     }
-    
   }
 }
 
@@ -184,39 +177,6 @@ void LayerManagerWidget::set_active_group( LayerGroupHandle group )
       }
   }
 }
-
-
-  
-//void LayerManagerWidget::clean_out_layers( LayerGroupHandle group_to_clean )
-//{
-//  for ( GroupList_type::iterator i = this->private_->group_list_.begin(); i
-//     != this->private_->group_list_.end(); i++ )
-//  {
-//    if ( ( *i )->activate_button_->text() == QString::fromStdString( group_to_clean->get_grid_transform().get_as_string() ) )
-//    {
-//      int count_ = 0;
-//      QString grid = ( *i )->activate_button_->text();
-//      QLayoutItem *layer_to_delete;
-//      while ((layer_to_delete = ( *i )->group_frame_layout_->takeAt(0))) 
-//      {
-//        count_++;
-//        delete layer_to_delete;
-//      }
-//      ( *i )->group_frame_->hide();
-//      
-//      for( LayerList_type::iterator j = this->private_->layer_list_.begin(); 
-//         j != this->private_->layer_list_.end(); j++ )
-//      {
-//        if( grid == ( *j )->dimensions_->text())
-//        {
-//          this->private_->layer_list_.erase(j);
-//          //(*j).get()->deleteLater();
-//        }
-//      }
-//      
-//    }
-//  }
-//}
 
 
 

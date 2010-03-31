@@ -44,7 +44,6 @@ SCI_ACTION_TYPE("InsertLayerAbove","Insert Layer Above <name>",
 public:
   ActionInsertLayerAbove()
   {
-    add_argument( name_ );
   }
   
   virtual ~ActionInsertLayerAbove()
@@ -58,18 +57,16 @@ public:
   
   // -- Action parameters --
 private:
-  // ToolID that is requested
-  ActionParameter< std::string > name_;
+  // Layer_handle that is requested
+  std::string layer_below_id_;
+  std::string layer_to_insert_id_;
   
   // -- Dispatch this action from the interface --
 public:
-  // CREATE
-  // Create action that moves the layer above
-  static ActionHandle Create( const std::string& name );
   
   // DISPATCH
   // Create and dispatch action that moves the layer above 
-  static void Dispatch( const std::string& name );
+  static void Dispatch( std::string layer_to_insert_id, std::string layer_below_id );
   
 };
   

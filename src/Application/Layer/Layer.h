@@ -140,10 +140,24 @@ public:
     return stateid();
   }
   
+  bool get_active()
+  {
+    return active_;
+  }
+  void set_active( bool active )
+  {
+    active_ = active;
+  }
+  std::string get_layer_name()
+  {
+    return this->name_state_->get();
+  }
+  
 private:  
   // The unique ID of the layer
 
   LayerGroupWeakHandle layer_group_;
+  bool active_;
 
   // GETMUTEX
 public:

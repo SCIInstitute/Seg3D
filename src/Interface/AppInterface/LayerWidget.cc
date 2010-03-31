@@ -78,11 +78,17 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   }
   
   // Add the Ui children onto the QWidget
+  this->setObjectName(QString::fromUtf8("LayerWidget"));
   this->private_->ui_.setupUi( this );
+  
+  
+  // set some Drag and Drop stuff
+  //this->setAcceptDrops( true );
   
   // Set the defaults
   // this is a default setting until we can get the name of the layer from the file or by some other means
   this->private_->ui_.label_->setText( QString::fromStdString( layer->name_state_->get()) );
+  this->private_->ui_.label_->setAcceptDrops( false );
   
   // here we set the unique layer_id_ of the layer
   this->private_->layer_id_ = layer->get_layer_id();
@@ -256,12 +262,10 @@ void LayerWidget::set_active( bool active )
     if( active )
     {
         this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_ACTIVE_C );  
-        this->private_->ui_.label_->setStyleSheet( StyleSheet::LAYER_WIDGET_LABEL_ACTIVE_C );
     }
     else
     {
         this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_INACTIVE_C );
-        this->private_->ui_.label_->setStyleSheet( StyleSheet::LAYER_WIDGET_LABEL_INACTIVE_C );
     }
 }
 
@@ -417,15 +421,14 @@ void LayerWidget::visual_lock( bool lock )
     if( this->private_->active_ )
     {
       this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_ACTIVE_C );  
-      this->private_->ui_.label_->setStyleSheet( StyleSheet::LAYER_WIDGET_LABEL_ACTIVE_C );
     }
     else
     {
       this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_INACTIVE_C );
-      this->private_->ui_.label_->setStyleSheet( StyleSheet::LAYER_WIDGET_LABEL_INACTIVE_C );
-
     }
-
+    
+    this->private_->ui_.label_->setStyleSheet( StyleSheet::LAYER_WIDGET_LABEL_C );
+    
     this->private_->ui_.activate_button_->setEnabled( true );
     this->private_->ui_.opacity_button_->setEnabled( true );
     this->private_->ui_.visibility_button_->setEnabled( true );
@@ -438,6 +441,33 @@ void LayerWidget::visual_lock( bool lock )
     this->private_->ui_.label_->setEnabled( true );
     
   }
+}
+
+void LayerWidget::set_drop( bool drop )
+{
+  if( drop )
+  {
+    this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_DROP_C );
+    
+  }
+  else
+  {
+    if( this->private_->active_ )
+    {
+      this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_ACTIVE_C );  
+      
+    }
+    else
+    {
+      this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_INACTIVE_C );
+    }
+  }
+
+}
+
+void LayerWidget::dragLeaveEvent(QDragLeaveEvent* event)
+{
+  set_drop( false );
 }
   
 } //end namespace Seg3D

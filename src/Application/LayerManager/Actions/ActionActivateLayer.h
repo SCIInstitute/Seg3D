@@ -38,12 +38,13 @@ namespace Seg3D
 
 class ActionActivateLayer : public Action
 {
-SCI_ACTION_TYPE("ActivateLayer", "ActivateLayer <name>", ActionPropertiesType::LAYER_E)
+SCI_ACTION_TYPE("ActivateLayer", "ActivateLayer <layer_name>", ActionPropertiesType::LAYER_E)
 
   // -- Constructor/Destructor --
 public:
   ActionActivateLayer()
   {
+    add_argument( layer_name_ );
   }
 
   virtual ~ActionActivateLayer()
@@ -54,15 +55,21 @@ public:
 public:
   virtual bool validate( ActionContextHandle& context );
   virtual bool run( ActionContextHandle& context, ActionResultHandle& result );
-
+  
+  
   // -- Dispatch this action from the interface --
 public:
 
   // DISPATCH
-  // Create and dispatch action that activates a layer
-  static void Dispatch( LayerHandle layer );
+  // Dispatch an action that activates a layer
+  static void Dispatch( const LayerHandle layer );
+  
+  // CREATE
+  // Create an action that activates a layer
+  static ActionHandle Create( const LayerHandle layer );
   
 private:
+  ActionParameter< std::string > layer_name_;
     LayerHandle layer_handle_;
 
 };

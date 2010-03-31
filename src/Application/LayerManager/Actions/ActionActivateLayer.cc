@@ -39,12 +39,14 @@ SCI_REGISTER_ACTION(ActivateLayer);
 
 bool ActionActivateLayer::validate( ActionContextHandle& context )
 {
-    if ( !this->layer_handle_ )
-      return false;
-  
-  if ( !( StateEngine::Instance()->is_stateid( layer_handle_->get_layer_id() ) ) )
+    if ( this->layer_handle_ )
   {
-    context->report_error( std::string( "LayerID '" ) + layer_handle_->get_layer_id() + "' is invalid" );
+    return true;
+  }   
+  
+  if ( !( StateEngine::Instance()->is_statealias( this->layer_name_.value() ) ) )
+  {
+    context->report_error( std::string( "LayerName: '" ) + this->layer_name_.value() + "' is invalid" );
     return false;
   }
 
@@ -53,20 +55,46 @@ bool ActionActivateLayer::validate( ActionContextHandle& context )
 
   bool ActionActivateLayer::run( ActionContextHandle& context, ActionResultHandle& result )
   {
-    if ( this->layer_handle_ )
+    if( this->layer_handle_ )
     {
       LayerManager::Instance()->set_active_layer( layer_handle_ );
       return true;
     }
     
+    if( StateEngine::Instance()->is_statealias( this->layer_name_.value() ) )
+    {
+      LayerManager::Instance()->set_active_layer( 
+        LayerManager::Instance()->get_LayerHandle_from_layer_name( this->layer_name_.value() ) );
+      return true;
+    }
     return false;
   }
-  void ActionActivateLayer::Dispatch( LayerHandle layer )
+
+  ActionHandle ActionActivateLayer::Create( const LayerHandle layer )
   {
     ActionActivateLayer* action = new ActionActivateLayer;
     action->layer_handle_ = layer;
+    action->layer_name_ = layer->name_state_->get();
     
-    Interface::PostAction( ActionHandle( action ) );
+    return ActionHandle( action );
   }
+  
+  void ActionActivateLayer::Dispatch( const LayerHandle layer )
+  {
+    Interface::PostAction( Create( layer ) );
+  }
+
+  
+  
+  //void ActionActivateLayer::Dispatch( const std::string& layer_name )
+  //{
+  //  ActionActivateLayer* action = new ActionActivateLayer;
+  //  action->layer_handle_ = LayerManager::Instance()->get_LayerHandle_from_layer_name( layer_name );
+  //  action->layer_name_.value() = layer_name;
+
+  //  Interface::PostAction( ActionHandle( action ) );
+  //}
+  
+  
 
 } // end namespace Seg3D

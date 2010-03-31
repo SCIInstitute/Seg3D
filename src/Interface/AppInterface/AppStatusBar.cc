@@ -28,69 +28,72 @@
 
 #include <QStatusBar>
 
+
+// boost includes
+#include<boost/tokenizer.hpp>
+
+//Core Includes - for logging
+#include <Utils/Core/Log.h>
+
+// Interface includes
+#include <Interface/QtInterface/QtBridge.h>
+#include <Interface/AppInterface/AppStatusBar.h>
+#include <Interface/AppInterface/StyleSheet.h>
+
+//UI Includes
+#include "ui_StatusBar.h"
+
+
 //  Application includes
 #include <Application/Interface/Interface.h>
 #include <Application/Tool/ToolFactory.h>
 #include <Application/ToolManager/ToolManager.h>
 
-// Interface includes
-#include <Interface/QtInterface/QtBridge.h>
-#include <Interface/AppInterface/AppStatusBar.h>
-
-#include <Utils/Core/Log.h>
-
-// boost includes
-#include<boost/tokenizer.hpp>
 
 namespace Seg3D
 {
 
-AppStatusBar::AppStatusBar( QMainWindow* parent ) :
-  QObject( parent ), show_world_coord_( false )
+class AppStatusBarPrivate
 {
+public:
+  Ui::StatusBar ui_;
 
-  { // setup the icons
-    world_icon_.addFile( QString::fromUtf8( ":/Images/WorldOff.png" ), QSize(), QIcon::Normal,
-        QIcon::Off );
-    world_icon_.addFile( QString::fromUtf8( ":/Images/World.png" ), QSize(), QIcon::Normal,
-        QIcon::On );
-    text_icon_.addFile( QString::fromUtf8( ":/Images/TextOff.png" ), QSize(), QIcon::Normal,
-        QIcon::Off );
-    text_icon_.addFile( QString::fromUtf8( ":/Images/Text.png" ), QSize(), QIcon::Normal,
-        QIcon::On );
-  }
+};
 
-  QStatusBar* statusbar = parent->statusBar();
-  this->history_widget_ = new MessageHistoryWidget(parent);
+AppStatusBar::AppStatusBar( QMainWindow* parent ) :
+  QObject( parent ), 
+  show_world_coord_( false ), 
+  private_( new AppStatusBarPrivate )
+{
+  this->statusbar_ = parent->statusBar();
+  this->statusbar_widget_ = new QWidget( statusbar_ );
+  
+  this->private_->ui_.setupUi( statusbar_widget_ );
+  
+  
+  this->history_widget_ = new MessageHistoryWidget( parent );
 
-  build_coordinates_label();
-  build_status_report_label();
-  build_buttons();
+  statusbar_->setContentsMargins( 0, 0, 0, 0 );
 
-  statusbar->setContentsMargins( 4, 0, 0, 0 );
-  statusbar->addWidget( info_button_, 0 );
-  statusbar->addWidget( status_report_label_, 5 );
-  statusbar->addWidget( coordinates_label_, 1 );
-  statusbar->addWidget( world_button_, 0 );
-  statusbar->setStyleSheet(
-      QString::fromUtf8(
-          "QStatusBar::item { \n"
-            " border: none; }"
-            "QStatusBar QToolButton { \n"
-            " background-color: qlineargradient(spread:pad, x1:0.5, y1:0.733364, x2:0.5, y2:0, stop:0 rgba(25, 25, 25, 0), stop:1 rgba(136, 0, 0, 0));\n"
-            " border: 1px solid  qlineargradient(spread:pad, x1:0.5, y1:0.733364, x2:0.5, y2:0, stop:0 rgba(25, 25, 25, 0), stop:1 rgba(136, 0, 0, 0));\n"
-            " \n}" ) );
+  statusbar_->addWidget( this->statusbar_widget_, 1 );
+  
+  statusbar_->setStyleSheet( StyleSheet::STATUSBAR_C );
+  
+  connect(this->private_->ui_.info_button_, 
+    SIGNAL(clicked(bool)), this, SLOT(activate_history(bool)));
+  connect(this->history_widget_, 
+    SIGNAL( destroyed() ), this, SLOT( fix_icon_status() ) );
+  connect(this->private_->ui_.world_button_, 
+    SIGNAL(clicked(bool)), this, SLOT(set_coordinates_mode(bool)));
 
-  connect(this->info_button_, SIGNAL(clicked(bool)), this, SLOT(activate_history(bool)));
-  connect(this->history_widget_, SIGNAL( destroyed() ), this, SLOT( fix_icon_status() ) );
-  connect(this->world_button_, SIGNAL(clicked(bool)), this, SLOT(set_coordinates_mode(bool)));
-
-  this->update_data_point_label();
+  //this->update_data_point_label();
 
   this->add_connection( StatusBar::Instance()->data_point_info_updated_signal_.connect( 
     boost::bind( &AppStatusBar::update_data_point_info, this, _1 ) ) );
   this->add_connection( StatusBar::Instance()->message_updated_signal_.connect( 
     boost::bind( &AppStatusBar::set_message, this, _1, _2 ) ) );
+
+  
 
 }
 
@@ -100,62 +103,18 @@ AppStatusBar::~AppStatusBar()
   this->history_widget_->close();
 }
 
-// -- build status bar widgets -- //
-
-void AppStatusBar::build_buttons()
-{
-  this->world_button_ = new QToolButton;
-  this->world_button_->setCheckable( true );
-  this->world_button_->setIcon( this->world_icon_ );
-  this->world_button_->setIconSize( QSize( 16, 16 ) );
-  this->world_button_->setContentsMargins( 0, 0, 0, 0 );
-
-  this->info_button_ = new QToolButton;
-  this->info_button_->setCheckable( true );
-  this->info_button_->setIcon( this->text_icon_ );
-  this->info_button_->setIconSize( QSize( 16, 16 ) );
-  this->info_button_->setContentsMargins( 0, 0, 0, 0 );
-
-}
-
-void AppStatusBar::build_coordinates_label()
-{
-  this->coordinates_label_ = new QLabel( "x: 0000  y: 0000 z: 0000 value: 0000" );
-  this->coordinates_label_->setObjectName( QString::fromUtf8( "coordinates_label_" ) );
-  this->coordinates_label_->setContentsMargins( 0, 0, 0, 0 );
-  this->coordinates_label_->setLayoutDirection( Qt::LeftToRight );
-  this->coordinates_label_->setStyleSheet(
-      QString::fromUtf8(
-          "QStatusBar QLabel#coordinates_label_{ \n"
-            " background-color: qlineargradient(spread:pad, x1:0.5, y1:0.733364, x2:0.5, y2:0, stop:0 rgba(25, 25, 25, 0), stop:1 rgba(136, 0, 0, 0));\n"
-            " border: 1px solid  qlineargradient(spread:pad, x1:0.5, y1:0.733364, x2:0.5, y2:0, stop:0 rgba(25, 25, 25, 0), stop:1 rgba(136, 0, 0, 0));\n"
-            "  color: black; \n"
-            "  text-align: center; \n}" ) );
-}
-
-void AppStatusBar::build_status_report_label()
-{
-  this->status_report_label_ = new QLabel();
-  this->status_report_label_->setObjectName( QString::fromUtf8( "status_report_label_" ) );
-  this->status_report_label_->setContentsMargins( 0, 0, 0, 0 );
-  this->status_report_label_->setStyleSheet( QString::fromUtf8( "QLabel#status_report_label_{\n"
-    " text-align: left;\n"
-    " font: bold; }\n" ) );
-
-}
-
 // -- public slots -- //
 
 void AppStatusBar::set_coordinates_mode( bool is_world )
 {
   if ( !is_world )
   {
-    this->coordinates_label_->setToolTip( QString::fromUtf8(
+    this->private_->ui_.world_button_->setToolTip( QString::fromUtf8(
         "Coordinate mode is set to Local, click to toggle to Global" ) );
   }
   else
   {
-    this->coordinates_label_->setToolTip( QString::fromUtf8(
+    this->private_->ui_.world_button_->setToolTip( QString::fromUtf8(
         "Coordinate mode is set to Global, click to toggle to Local" ) );
   }
 
@@ -166,7 +125,7 @@ void AppStatusBar::set_coordinates_mode( bool is_world )
 void AppStatusBar::set_status_report_label( std::string& status )
 {
   QString report = QString::fromStdString( status );
-  this->status_report_label_->setText( QString::fromUtf8( "Status: " ) + report );
+  this->private_->ui_.status_report_label_->setText( QString::fromUtf8( "Status: " ) + report );
 
 }
 
@@ -185,14 +144,16 @@ void AppStatusBar::activate_history( bool is_active_ )
   
 void AppStatusBar::fix_icon_status()
 {
-  this->status_report_label_->setText( QString::fromUtf8( "Status = true " ) );
+  this->private_->ui_.status_report_label_->setText( 
+    QString::fromUtf8( "Status = true " ) );
 }
 
 void AppStatusBar::update_data_point_info( DataPointInfoHandle data_point )
 {
   if ( !Interface::IsInterfaceThread() )
   {
-    Interface::PostEvent( boost::bind( &AppStatusBar::update_data_point_info, this, data_point ) );
+    Interface::PostEvent( boost::bind( 
+      &AppStatusBar::update_data_point_info, this, data_point ) );
     return;
   }
 
@@ -202,46 +163,74 @@ void AppStatusBar::update_data_point_info( DataPointInfoHandle data_point )
 
 void AppStatusBar::update_data_point_label()
 {
-  QString x_str, y_str, z_str, value_str;
-  QTextStream text_stream( &x_str );
-  text_stream.setFieldWidth( 20 );
-  text_stream.setRealNumberPrecision( 4 );
-  text_stream.setFieldAlignment( QTextStream::AlignLeft );
-  text_stream.setRealNumberNotation( QTextStream::FixedNotation );
-
-  if ( this->show_world_coord_ )
-  {
-    text_stream << this->data_point_info_.world_coord().x();
-    text_stream.setString( &y_str );
-    text_stream.setFieldWidth( 20 );
-    text_stream.setFieldAlignment( QTextStream::AlignLeft );
-    text_stream << this->data_point_info_.world_coord().y();
-    text_stream.setString( &z_str );
-    text_stream.setFieldWidth( 20 );
-    text_stream.setFieldAlignment( QTextStream::AlignLeft );
-    text_stream << this->data_point_info_.world_coord().z();
+  
+  // get some local copies of the data
+  double world_x = this->data_point_info_.world_coord().x();
+  double world_y = this->data_point_info_.world_coord().y();
+  double world_z = this->data_point_info_.world_coord().z();
+  
+  double index_x = this->data_point_info_.index_coord().x();
+  double index_y = this->data_point_info_.index_coord().y();
+  double index_z = this->data_point_info_.index_coord().z();
+  
+  // In the case that all the coordinates are 0 then show nice 0's.
+  if( ( world_x == 0 ) && ( world_y == 0 ) && ( world_z == 0 ) )
+  { 
+    this->private_->ui_.x_->setText( QString::fromUtf8("0.000") );
+    this->private_->ui_.y_->setText( QString::fromUtf8("0.000") );
+    this->private_->ui_.z_->setText( QString::fromUtf8("0.000") );
   }
+  // In the case that the coordinates are outside of .0001-1000.00,
+  // format them with scientific notation.
+  else if( ( world_x > 1000 ) || ( world_x < 0.0001 ) ||
+    ( world_y > 1000 ) || ( world_y < 0.0001 ) ||
+    ( world_z > 1000 ) || ( world_z < 0.0001 ) )
+  {
+    if( this->show_world_coord_ )
+    {
+      this->private_->ui_.x_->setText( QString( "%1" ).arg( 
+        this->data_point_info_.world_coord().x(), 0, 'e', 3 ) );
+      this->private_->ui_.y_->setText( QString( "%1" ).arg( 
+        this->data_point_info_.world_coord().y(), 0, 'e', 3 ) );
+      this->private_->ui_.z_->setText( QString( "%1" ).arg( 
+        this->data_point_info_.world_coord().z(), 0, 'e', 3 ) );
+    }
+    else
+    {
+      this->private_->ui_.x_->setText( QString( "%1" ).arg( 
+        this->data_point_info_.index_coord().x(), 0, 'e', 3 ) );
+      this->private_->ui_.y_->setText( QString( "%1" ).arg( 
+        this->data_point_info_.index_coord().y(), 0, 'e', 3 ) );
+      this->private_->ui_.z_->setText( QString( "%1" ).arg( 
+        this->data_point_info_.index_coord().z(), 0, 'e', 3 ) );
+    }
+    this->private_->ui_.value_->setText( QString( "%1" ).arg( 
+      this->data_point_info_.value(), 0, 'e', 3 ) );
+  }
+  // Otherwise format them normally.
   else
-  {
-    text_stream << static_cast< int >( this->data_point_info_.index_coord().x() );
-    text_stream.setString( &y_str );
-    text_stream.setFieldWidth( 20 );
-    text_stream.setFieldAlignment( QTextStream::AlignLeft );
-    text_stream << static_cast< int >( this->data_point_info_.index_coord().y() );
-    text_stream.setString( &z_str );
-    text_stream.setFieldWidth( 20 );
-    text_stream.setFieldAlignment( QTextStream::AlignLeft );
-    text_stream << static_cast< int >( this->data_point_info_.index_coord().z() );
+  { 
+    if( this->show_world_coord_ )
+    {
+      this->private_->ui_.x_->setText( QString( "%1" ).arg( 
+        this->data_point_info_.world_coord().x(), 0, 'f', 3 ) );
+      this->private_->ui_.y_->setText( QString( "%1" ).arg( 
+        this->data_point_info_.world_coord().y(), 0, 'f', 3 ) );
+      this->private_->ui_.z_->setText( QString( "%1" ).arg( 
+        this->data_point_info_.world_coord().z(), 0, 'f', 3 ) );
+    }
+    else
+    {
+      this->private_->ui_.x_->setText( QString( "%1" ).arg( 
+        this->data_point_info_.index_coord().x(), 0, 'f', 3 ) );
+      this->private_->ui_.y_->setText( QString( "%1" ).arg( 
+        this->data_point_info_.index_coord().y(), 0, 'f', 3 ) );
+      this->private_->ui_.z_->setText( QString( "%1" ).arg( 
+        this->data_point_info_.index_coord().z(), 0, 'f', 3 ) );
+    }
+    this->private_->ui_.value_->setText( QString( "%1" ).arg( 
+      this->data_point_info_.value(), 0, 'f', 3 ) );
   }
-
-  text_stream.setString( &value_str );
-  text_stream.setRealNumberNotation( QTextStream::SmartNotation );
-  text_stream.setFieldWidth( 20 );
-  text_stream.setFieldAlignment( QTextStream::AlignLeft );
-  text_stream << this->data_point_info_.value();
-
-  this->coordinates_label_->setText( QString( "X: %1 Y: %2 Z: %3 Value: %4\t" )
-    .arg( x_str, -25 ).arg( y_str, -25 ).arg( z_str, -25 ).arg( value_str, -25 ) );
 }
 
 void AppStatusBar::set_message( int msg_type, std::string message )
@@ -267,7 +256,7 @@ void AppStatusBar::set_message( int msg_type, std::string message )
   switch( msg_type )
   {
   case Utils::LogMessageType::ERROR_E:
-    this->status_report_label_->setStyleSheet( QString::fromUtf8(
+    this->private_->ui_.status_report_label_->setStyleSheet( QString::fromUtf8(
         "QLabel#status_report_label_{\n"
           " text-align: left;\n"
           " color: rgb(121, 0, 0);\n"
@@ -276,7 +265,7 @@ void AppStatusBar::set_message( int msg_type, std::string message )
     break;
 
   case Utils::LogMessageType::WARNING_E:
-    this->status_report_label_->setStyleSheet( QString::fromUtf8(
+    this->private_->ui_.status_report_label_->setStyleSheet( QString::fromUtf8(
         "QLabel#status_report_label_{\n"
           " text-align: left;\n"
           " color: rgb(165, 161, 34);\n"
@@ -284,7 +273,7 @@ void AppStatusBar::set_message( int msg_type, std::string message )
     color_ = QColor(165, 161, 34);
     break;
   case Utils::LogMessageType::MESSAGE_E:
-    this->status_report_label_->setStyleSheet( QString::fromUtf8(
+    this->private_->ui_.status_report_label_->setStyleSheet( QString::fromUtf8(
         "QLabel#status_report_label_{\n"
           " text-align: left;\n"
           " color: rgb(3, 86, 2);\n"
@@ -293,7 +282,7 @@ void AppStatusBar::set_message( int msg_type, std::string message )
     break;
 
   case Utils::LogMessageType::DEBUG_E:
-    this->status_report_label_->setStyleSheet( QString::fromUtf8(
+    this->private_->ui_.status_report_label_->setStyleSheet( QString::fromUtf8(
         "QLabel#status_report_label_{\n"
           " text-align: left;\n"
           " color: purple;\n"
@@ -304,7 +293,7 @@ void AppStatusBar::set_message( int msg_type, std::string message )
     break;
   }
 
-  this->status_report_label_->setText( QString::fromStdString( message ) );
+  this->private_->ui_.status_report_label_->setText( QString::fromStdString( message ) );
   this->history_widget_->add_history_item( QString::fromStdString( message ), color_ );
 }
 

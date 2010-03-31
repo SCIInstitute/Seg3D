@@ -86,9 +86,17 @@ void LayerGroup::insert_layer( LayerHandle new_layer )
   layer_list_.push_back( new_layer );
 }
 
-void LayerGroup::insert_layer_above( LayerHandle layer, LayerHandle layer_below )
+void LayerGroup::insert_layer_above( LayerHandle layer_above, LayerHandle layer_below )
 {
-  
+  for( layer_list_type::iterator i = this->layer_list_.begin(); 
+    i != this->layer_list_.end(); ++i )
+  {
+    if( ( *i ) == layer_below )
+    {
+      layer_list_.insert( ++i, layer_above );
+      return;
+    }
+  }
 }
 
 void LayerGroup::delete_layer( LayerHandle layer )

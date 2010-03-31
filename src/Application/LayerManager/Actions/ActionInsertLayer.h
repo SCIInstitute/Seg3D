@@ -62,10 +62,7 @@ private:
   
   // -- Dispatch this action from the interface --
 public:
-  // CREATE
-  // Create action that moves the layer above
-  static ActionHandle Create( const std::string& name );
-  
+    
   // DISPATCH
   // Create and dispatch action that inserts the new layer 
   static void Dispatch( LayerHandle layer );

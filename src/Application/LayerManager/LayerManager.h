@@ -78,7 +78,9 @@ public:
   void get_groups( std::vector< LayerGroupHandle > &vector_of_groups );
   void get_layers( std::vector< LayerHandle > &vector_of_layers );
   
-  LayerGroupHandle check_for_group( std::string group_id );
+  LayerGroupHandle get_LayerGroupHandle_from_group_id( std::string group_id );
+  LayerHandle get_LayerHandle_from_layer_id( std::string layer_id );
+  LayerHandle get_LayerHandle_from_layer_name( std::string layer_name );
   
   LayerGroupHandle get_active_group();
 
@@ -90,6 +92,7 @@ public:
   // Action Functions
 public:
   bool insert_layer( LayerHandle layer );
+  bool insert_layer_above( std::string layer_to_insert_id_, std::string layer_below_id_ );
   void delete_layers( LayerGroupHandle group );
   void set_active_layer( LayerHandle layer );
   
@@ -142,6 +145,10 @@ public:
   // GROUP_DELETED_SIGNAL:
   // This signal is triggered when a group has been deleted from the layer manager
   group_signal_type group_deleted_signal_;
+  
+  // GROUP_CHANGED_SIGNAL:
+  // This signal is triggered when a group has been changed
+  group_signal_type group_changed_signal_;
   
 private:
     // list of the current groups 
