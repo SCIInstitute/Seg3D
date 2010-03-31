@@ -345,6 +345,7 @@ void Viewer::insert_layer( LayerHandle layer )
     {
       volume_slice->move_slice( this->active_layer_slice_->depth() );
     }
+    // TODO: remove when there is always an active layer
     else
     {
       StateView2D* view2d_state = dynamic_cast< StateView2D* >(

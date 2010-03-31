@@ -40,7 +40,7 @@ StateHandler::StateHandler( const std::string& stateid_prefix ) :
 
 StateHandler::~StateHandler()
 {
-  StateEngine::Instance()->remove_stateid( stateid_prefix_ );
+  StateEngine::Instance()->remove_state( stateid_prefix_ );
 }
     
 
