@@ -42,6 +42,11 @@ RenderResources::~RenderResources()
 {
 }
 
+void RenderResources::initialize_eventhandler()
+{
+  this->render_context_->make_current();
+}
+
 bool RenderResources::create_render_context( RenderContextHandle& context )
 {
   // The context gets setup through the GUI system and is GUI dependent
@@ -71,15 +76,72 @@ bool RenderResources::valid_render_resources()
   return ( resources_context_.get() && resources_context_->valid_render_resources() );
 }
 
+void RenderResources::delete_texture( unsigned int texture_id )
+{
+  if ( ! (is_eventhandler_thread() ) )
+  {
+    post_event( boost::bind( &RenderResources::delete_texture, this, texture_id ) );
+    return;
+  }
+  
+  lock_type lock( RenderResources::GetMutex() );
+  glDeleteTextures( 1, &texture_id );
+}
+
+void RenderResources::delete_renderbuffer( unsigned int renderbuffer_id )
+{
+  if ( ! (is_eventhandler_thread() ) )
+  {
+    post_event( boost::bind( &RenderResources::delete_renderbuffer, this, 
+      renderbuffer_id ) );
+    return;
+  }
+  
+  lock_type lock( RenderResources::GetMutex() );
+  glDeleteRenderbuffersEXT( 1, &renderbuffer_id );
+}
+
+void RenderResources::delete_buffer_object( unsigned int buffer_object_id )
+{
+  if ( ! (is_eventhandler_thread() ) )
+  {
+    post_event( boost::bind( &RenderResources::delete_buffer_object, this, 
+      buffer_object_id ) );
+    return;
+  }
+  
+  lock_type lock( RenderResources::GetMutex() );
+  glDeleteBuffers( 1, &buffer_object_id );
+}
+
+void RenderResources::delete_framebuffer_object( unsigned int framebuffer_object_id )
+{
+  if ( ! (is_eventhandler_thread() ) )
+  {
+    post_event( boost::bind( &RenderResources::delete_framebuffer_object, this, 
+      framebuffer_object_id ) );
+    return;
+  }
+  
+  lock_type lock( RenderResources::GetMutex() );
+  glDeleteFramebuffersEXT( 1, &framebuffer_object_id );
+}
+
 void RenderResources::init_gl()
 {
-  if ( !gl_initialized_ )
+  if ( !this->gl_initialized_ )
   {
-    boost::unique_lock< mutex_type > lock( this->get_mutex() );
-    if ( !gl_initialized_ )
+    lock_type lock( this->get_mutex() );
+    if ( !this->gl_initialized_ )
     {
       glewInit();
-      gl_initialized_ = true;
+      this->gl_initialized_ = true;
+
+      // Create GL context for the event handler thread and start it
+      this->create_render_context( this->render_context_ );
+      this->start_eventhandler();
+
+      // Check OpenGL capabilities
       if ( !GLEW_VERSION_2_1 )
       {
         SCI_THROW_OPENGLEXCEPTION( "Minimum OpenGL version 2.1 required." );

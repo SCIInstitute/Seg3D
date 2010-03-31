@@ -39,6 +39,7 @@
 #include <Utils/Core/Exception.h>
 #include <Utils/Core/Log.h>
 #include <Utils/Core/Singleton.h>
+#include <Utils/EventHandler/EventHandler.h>
 #include <Utils/RenderResources/RenderContext.h>
 #include <Utils/RenderResources/RenderResourcesContext.h>
 
@@ -53,7 +54,7 @@ namespace Utils
 class RenderResources;
 
 // Class definition
-class RenderResources : public Singleton< RenderResources > 
+class RenderResources : public Singleton< RenderResources >, private EventHandler
 {
 
   // -- constructor --
@@ -61,6 +62,8 @@ private:
   friend class Singleton< RenderResources >;
   RenderResources();
   virtual ~RenderResources();
+
+  virtual void initialize_eventhandler();
 
   // -- context handling --
 public:
@@ -77,10 +80,28 @@ public:
   // Check whether valid render resources have been installed
   bool valid_render_resources();
 
+  // DELETE_TEXTURE:
+  // Delete a texture within the right context
+  void delete_texture( unsigned int texture_id );
+  
+  // DELETE_BUFFER_OBJECT:
+  // Delete a buffer object within the right context
+  void delete_buffer_object( unsigned int buffer_id );
+
+  // DELETE_FRAMEBUFFER_OBJECT:
+  // Delete a framebuffer object within the right context
+  void delete_framebuffer_object( unsigned int framebuffer_id );
+
+  // DELETE_RENDERBUFFER:
+  // Delete a renderbuffer within the right context
+  void delete_renderbuffer( unsigned int renderbuffer_id );
+
 private:
 
   // A Handle to resource that generated the contexts
   RenderResourcesContextHandle resources_context_;
+
+  RenderContextHandle render_context_;
 
   // -- render locks --
 public:

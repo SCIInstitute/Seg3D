@@ -32,8 +32,6 @@
 ##################################################
 
 SET(UTILS_RENDERRESOURCES_SRCS
-  RenderResourcesEventHandler.h
-  RenderResourcesEventHandler.cc
   RenderResources.h
   RenderResources.cc
   RenderResourcesContext.h

@@ -27,7 +27,7 @@
  */
 
 #include <Utils/Graphics/Renderbuffer.h>
-#include <Utils/RenderResources/RenderResourcesEventHandler.h>
+#include <Utils/RenderResources/RenderResources.h>
 
 
 namespace Utils
@@ -47,7 +47,7 @@ Renderbuffer::~Renderbuffer()
 {
   // NOTE: This object can be owned by any thread, however it needs to be deleted in the
   // right context. This function will do this for us.
-  RenderResourcesEventHandler::Instance()->delete_renderbuffer( this->id_ );
+  RenderResources::Instance()->delete_renderbuffer( this->id_ );
 }
 
 void Renderbuffer::bind()

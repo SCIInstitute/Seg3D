@@ -29,7 +29,7 @@
 #include <boost/bind.hpp>
 
 #include <Utils/Graphics/BufferObject.h>
-#include <Utils/RenderResources/RenderResourcesEventHandler.h>
+#include <Utils/RenderResources/RenderResources.h>
 
 
 namespace Utils
@@ -52,7 +52,7 @@ BufferObject::~BufferObject()
   {
     // NOTE: This object can be owned by any thread, however it needs to be deleted in the
     // right context. This function will do this for us.
-    RenderResourcesEventHandler::Instance()->delete_buffer_object( this->id_ );
+    RenderResources::Instance()->delete_buffer_object( this->id_ );
   }
 }
 
