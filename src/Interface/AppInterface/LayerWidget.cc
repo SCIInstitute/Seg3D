@@ -254,6 +254,11 @@ LayerWidget::~LayerWidget()
 {
 }
 
+int LayerWidget::get_volume_type()
+{
+  return this->private_->volume_type_;
+}
+
 void LayerWidget::set_active( bool active )
 {
   // keep track locally if we are an active layer or not so we know what color to revert to if locked

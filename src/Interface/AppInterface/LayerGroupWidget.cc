@@ -389,11 +389,11 @@ std::string& LayerGroupWidget::get_group_id()
 
 LayerWidget_handle LayerGroupWidget::check_for_layer( const std::string &layer )
 {
-  for( size_t i = 0; i < layer_list_.size(); ++i )
+  for( int i = 0; i < static_cast< int >( this->layer_list_.size() ); ++i )
   {
-    if( layer_list_[i]->get_layer_id() == layer )
+    if( this->layer_list_[i]->get_layer_id() == layer )
     {
-      return layer_list_[i];
+      return this->layer_list_[i];
     }
   }
   return LayerWidget_handle();
@@ -609,7 +609,7 @@ void LayerGroupWidget::mousePressEvent(QMouseEvent *event)
   layer_to_drag->hide();
   
   // Here we either close the layer if we are successful with our drag, 
-  //  or show it again if we aren'
+  //  or show it again if we aren't
   if (drag->exec(Qt::MoveAction | Qt::CopyAction, Qt::CopyAction) == Qt::MoveAction)
   { 
     layer_to_drag->close();
@@ -619,10 +619,10 @@ void LayerGroupWidget::mousePressEvent(QMouseEvent *event)
     layer_to_drag->show();
     
     // Set the style sheets back to what they should be
-    for( size_t i = 0; i < layer_list_.size(); ++i )
+    for( int i = 0; i < static_cast< int >( this->layer_list_.size() ); ++i )
     {           
       {
-        layer_list_[i]->set_drop( false );
+        this->layer_list_[i]->set_drop( false );
       }
     }
   }
@@ -637,16 +637,17 @@ void LayerGroupWidget::dragEnterEvent(QDragEnterEvent* event)
   // If its a valid dropsite then we color the LayerWidget appropriately
   if ( potential_drop_site  && event->mimeData()->hasFormat("layer_id") ) 
   { 
-    for( size_t i = 0; i < layer_list_.size(); ++i )
+    for( int i = 0; i < static_cast< int >( this->layer_list_.size() ); ++i )
     {
-      if( layer_list_[i] == potential_drop_site )
+      if( this->layer_list_[i] == potential_drop_site ) 
       {
-        layer_list_[i]->set_drop( true );
+        //TODO: we need to add logic to prevent certain illegal drag and drop.
+        this->layer_list_[i]->set_drop( true );
         found_valid_layer = true;
       }
       else
       {
-        layer_list_[i]->set_drop( false );
+        this->layer_list_[i]->set_drop( false );
       }
     }
     if( found_valid_layer )
@@ -658,13 +659,20 @@ void LayerGroupWidget::dragEnterEvent(QDragEnterEvent* event)
   
   // If they aren't dragging a valid widget we ignore it
   event->ignore();
-  
+}
+
+void LayerGroupWidget::dragLeaveEvent( QDragLeaveEvent * event )
+{
+  for( int i = 0; i < static_cast< int >( this->layer_list_.size() ); ++i )
+  {
+    this->layer_list_[i]->set_drop( false );
+  }
+
 }
 
 
 void LayerGroupWidget::dropEvent(QDropEvent* event)
 {
-
   // First we validate the location
   LayerWidget_handle drop_site = validate_location( event->pos());
   
@@ -704,10 +712,10 @@ void LayerGroupWidget::dropEvent(QDropEvent* event)
         default:
           // Anything else we just make sure that none of the layers are colored as drop
           //  zones.
-          for( size_t i = 0; i < layer_list_.size(); ++i )
+          for( int i = 0; i < static_cast< int >( this->layer_list_.size() ); ++i )
           {           
             {
-              layer_list_[i]->set_drop( false );
+              this->layer_list_[i]->set_drop( false );
             }
           }
           break;
@@ -732,7 +740,7 @@ LayerWidget_handle LayerGroupWidget::validate_location(const QPoint &point )
   QRect rectangle;
   
   // Check all the layers in the list and see if our point is inside
-  for( size_t i = 0; i < this->layer_list_.size(); ++i )
+  for( int i = 0; i < static_cast< int >( this->layer_list_.size() ); ++i )
   {
     rectangle = this->layer_list_[i]->geometry();
     rectangle.setTopLeft( rectangle.topLeft() + header_difference );
@@ -741,7 +749,7 @@ LayerWidget_handle LayerGroupWidget::validate_location(const QPoint &point )
     rectangle.setBottomRight( rectangle.bottomRight() + header_difference );
     if( rectangle.contains( point ) )
     {
-      return layer_list_[i];
+      return this->layer_list_[i];
     }
   }
   return LayerWidget_handle();

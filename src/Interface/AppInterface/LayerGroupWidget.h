@@ -81,6 +81,7 @@ private:
   void dropEvent(QDropEvent* event);
   void mousePressEvent(QMouseEvent *event);
   void dragEnterEvent(QDragEnterEvent* event);
+  void dragLeaveEvent( QDragLeaveEvent * event );
   
   // Validate that the event location is a LayerWidget and return a handle to it
   LayerWidget_handle validate_location( const QPoint& point );

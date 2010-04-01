@@ -160,12 +160,12 @@ bool LayerManager::insert_layer_above( std::string layer_to_insert_id, std::stri
 bool LayerManager::validate_layer_move( LayerHandle layer_above, LayerHandle layer_below )
 {
   // Validate the most common move
-  if ( ( layer_above->type() == Utils::VolumeType::MASK_E ) && ( layer_below->type() == Utils::VolumeType::MASK_E ) )
+  if ( layer_above->type() == layer_below->type() )
     return true;
     
-  // Another Easy one
-  if ( ( layer_above->type() == Utils::VolumeType::DATA_E ) && ( layer_below->type() == Utils::VolumeType::DATA_E ) )
-    return true;
+//  Another Easy one
+//      if ( ( layer_above->type() == Utils::VolumeType::DATA_E ) && ( layer_below->type() == Utils::VolumeType::DATA_E ) )
+//        return true;
   
   return false;
 }

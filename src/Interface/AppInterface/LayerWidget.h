@@ -71,6 +71,7 @@ public Q_SLOTS:
 public:
   void show_selection_checkbox( bool hideshow );
   std::string &get_layer_id();
+  int get_volume_type();
   void set_active( bool active );
   void set_drop( bool drop );
   
