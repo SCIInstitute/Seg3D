@@ -52,8 +52,8 @@ public:
   void set_texture( int tex_unit );
   void set_mask_mode( bool mask_mode );
   void set_opacity( float opacity );
-  void set_contrast( float contrast );
-  void set_brightness( float brightness );
+  void set_scale( float scale );
+  void set_bias( float bias );
 
 private:
 
@@ -65,8 +65,8 @@ private:
   int tex_loc_;
   int mask_mode_loc_;
   int opacity_loc_;
-  int contrast_loc_;
-  int brightness_loc_;
+  int scale_loc_;
+  int bias_loc_;
 
   const static char* FRAG_SHADER_SOURCE_C[];
 };

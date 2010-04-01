@@ -75,8 +75,8 @@ bool SliceShader::initialize()
   this->tex_loc_ = this->glsl_prog_->get_uniform_location( "tex" );
   this->opacity_loc_ = this->glsl_prog_->get_uniform_location( "opacity" );
   this->mask_mode_loc_ = this->glsl_prog_->get_uniform_location( "mask_mode" );
-  this->contrast_loc_ = this->glsl_prog_->get_uniform_location( "contrast" );
-  this->brightness_loc_ = this->glsl_prog_->get_uniform_location( "brightness" );
+  this->scale_loc_ = this->glsl_prog_->get_uniform_location( "scale" );
+  this->bias_loc_ = this->glsl_prog_->get_uniform_location( "bias" );
   this->glsl_prog_->disable();
 
   this->valid_ = true;
@@ -110,14 +110,14 @@ void SliceShader::set_mask_mode( bool mask_mode )
   glUniform1i( this->mask_mode_loc_, mask_mode );
 }
 
-void SliceShader::set_contrast( float contrast )
+void SliceShader::set_scale( float scale )
 {
-  glUniform1f( this->contrast_loc_, contrast );
+  glUniform1f( this->scale_loc_, scale );
 }
 
-void SliceShader::set_brightness( float brightness )
+void SliceShader::set_bias( float bias )
 {
-  glUniform1f( this->brightness_loc_, brightness );
+  glUniform1f( this->bias_loc_, bias );
 }
 
 } // end namespace Seg3D

@@ -52,8 +52,7 @@ ViewerManager::ViewerManager() :
   viewers_.resize( 6 );
   for ( size_t j = 0; j < viewers_.size(); j++ )
   {
-    std::string key = std::string( "viewer" ) + Utils::to_string( j );
-    viewers_[ j ] = ViewerHandle( new Viewer( key, j ) );
+    viewers_[ j ] = ViewerHandle( new Viewer( j ) );
   }
 }
 

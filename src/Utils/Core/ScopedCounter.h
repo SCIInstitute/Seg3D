@@ -26,38 +26,38 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-// STL includes
+#ifndef UTILS_CORE_SCOPEDCOUNTER_H
+#define UTILS_CORE_SCOPEDCOUNTER_H
 
-// Boost includes 
+#include <cassert>
 
-#include <Application/Application/Application.h>
-#include <Application/Layer/DataLayer.h>
+#include <boost/utility.hpp>
 
-namespace Seg3D
+namespace Utils
 {
 
-DataLayer::DataLayer( const std::string& name, const Utils::DataVolumeHandle& volume ) :
-  Layer( name ), 
-  data_volume_( volume )
+// CLASS ScopedCounter
+// It increases the given number by 1 on construction, and decrease it on destruction.
+class ScopedCounter : public boost::noncopyable
 {
-  // Step (1) : Build the layer specific state variables
+public:
+  ScopedCounter( size_t& count ) :
+    count_( count )
+  {
+    this->count_++;
+  }
 
-  // == The brightness of the layer ==
-  add_state( "brightness", brightness_state_, 50.0, 0.0, 100.0, 0.1 );
-  
-  // == The contrast of the layer ==
-  add_state( "contrast", contrast_state_, 0.0, 0.0, 100.0, 0.1 );
+  ~ScopedCounter()
+  {
+    assert( this->count_ > 0 );
+    this->count_--;
+  }
 
-  // == Is this volume rendered through the volume renderer ==
-  add_state( "volume_rendered", volume_rendered_state_, false );
-  
-}
+private:
+  size_t& count_;
+};
 
-DataLayer::~DataLayer()
-{
-  // Disconnect all current connections
-  disconnect_all();
-}
 
-} // end namespace Seg3D
+} // end namespace Utils
 
+#endif

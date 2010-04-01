@@ -3,14 +3,15 @@
 uniform sampler2D tex;
 uniform bool mask_mode;
 uniform float opacity;
-uniform float contrast;
-uniform float brightness;
+uniform float scale;
+uniform float bias;
 uniform int color_index;
 
 vec4 shade_data_slice()
 {
-  vec3 color = texture2D( tex, gl_TexCoord[0].st ).rgb * brightness;
-  return vec4( color, opacity );
+  float value = texture2D( tex, gl_TexCoord[0].st ).r;
+  value = value * scale + bias;
+  return vec4( vec3( value ), opacity );
 }
 
 vec4 shade_mask_slice()

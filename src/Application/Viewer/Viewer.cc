@@ -26,6 +26,9 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// Utils includes
+#include <Utils/Core/ScopedCounter.h>
+
 // Application includes
 #include <Application/Interface/StatusBar.h>
 #include <Application/Layer/DataLayer.h>
@@ -43,11 +46,11 @@ const std::string Viewer::SAGITTAL_C( "sagittal" );
 const std::string Viewer::CORONAL_C( "coronal" );
 const std::string Viewer::VOLUME_C( "volume" );
 
-Viewer::Viewer( const std::string& key, size_t viewer_id ) :
-  StateHandler( key ), 
+Viewer::Viewer( size_t viewer_id ) :
+  StateHandler( std::string( "viewer" ) + Utils::to_string( viewer_id ) ), 
   viewer_id_( viewer_id ),
-  ignore_state_changes_( false ),
-  updating_states_( false )
+  redraw_block_count_( 0 ),
+  slice_lock_count_( 0 )
 {
   add_state( "view_mode", view_mode_state_, AXIAL_C, AXIAL_C + StateOption::SPLITTER_C
       + CORONAL_C + StateOption::SPLITTER_C + SAGITTAL_C + StateOption::SPLITTER_C + VOLUME_C );
@@ -236,7 +239,7 @@ void Viewer::update_status_bar( int x, int y )
 
 void Viewer::state_changed()
 {
-  if ( !this->ignore_state_changes_ )
+  if ( this->redraw_block_count_ == 0 )
   {
     this->redraw_signal_();
   }
@@ -333,11 +336,9 @@ void Viewer::insert_layer( LayerHandle layer )
   // Auto adjust the view and depth if it is the first layer inserted
   if ( ( this->data_slices_.size() + this->mask_slices_.size() ) == 1 )
   {
-    this->push_ignoring_status();
-    this->ignore_state_changes_ = true;
+    Utils::ScopedCounter block_counter( this->redraw_block_count_ );
     this->adjust_view();
     this->adjust_depth();
-    this->pop_ignoring_status();
   }
   else if ( !this->is_volume_view() )
   { 
@@ -433,33 +434,32 @@ void Viewer::set_active_layer( LayerHandle layer )
   // Update slice number ranges
   if ( this->active_layer_slice_ && !this->is_volume_view() )
   {
-    // Disable redraws triggered by StateBase::state_changed_signal_
-    this->push_ignoring_status();
-    this->ignore_state_changes_ = true;
-
-    // NOTE: The following state changes are due to internal program logic, 
-    // so they should not go through the action mechanism.
-
-    this->updating_states_ = true;
-    this->slice_number_state_->set_range(
-      0, static_cast< int >( this->active_layer_slice_->number_of_slices() - 1 ) );
-    this->updating_states_ = false;
-
-    StateView2D* view2d_state = dynamic_cast< StateView2D* >( this->get_active_view_state().get() );
-    this->active_layer_slice_->move_slice( view2d_state->get().center().z(), true );
-    if ( this->slice_number_state_->get() == 
-      static_cast< int >( this->active_layer_slice_->get_slice_number() ) )
     {
-      this->set_slice_number( static_cast< int >( this->active_layer_slice_->get_slice_number() ) );
-    }
-    else
-    {
-      this->slice_number_state_->set( static_cast< int >( 
-        this->active_layer_slice_->get_slice_number() ) );
+      // Disable redraws triggered by StateBase::state_changed_signal_
+      Utils::ScopedCounter block_counter( this->redraw_block_count_ );
+
+      // NOTE: The following state changes are due to internal program logic, 
+      // so they should not go through the action mechanism.
+
+      {
+        Utils::ScopedCounter slice_lock_counter( this->slice_lock_count_ );
+        this->slice_number_state_->set_range(
+          0, static_cast< int >( this->active_layer_slice_->number_of_slices() - 1 ) );
+      }
+      StateView2D* view2d_state = dynamic_cast< StateView2D* >( this->get_active_view_state().get() );
+      this->active_layer_slice_->move_slice( view2d_state->get().center().z(), true );
+      if ( this->slice_number_state_->get() == 
+        static_cast< int >( this->active_layer_slice_->get_slice_number() ) )
+      {
+        this->set_slice_number( static_cast< int >( this->active_layer_slice_->get_slice_number() ) );
+      }
+      else
+      {
+        this->slice_number_state_->set( static_cast< int >( 
+          this->active_layer_slice_->get_slice_number() ) );
+      }
     }
 
-    // Enable redraws
-    this->pop_ignoring_status();
     this->redraw_signal_();
   }
 }
@@ -524,12 +524,13 @@ void Viewer::change_view_mode( std::string mode, ActionSource source )
     // NOTE: The following state changes are due to internal program logic, 
     // so they should not go through the action mechanism.
 
-    this->push_ignoring_status();
-    this->ignore_state_changes_ = true;
-    this->updating_states_ = true;
-    this->slice_number_state_->set_range(
-      0, static_cast< int >( this->active_layer_slice_->number_of_slices() - 1 ) );
-    this->updating_states_ = false;
+    Utils::ScopedCounter block_counter( this->redraw_block_count_ );
+
+    {
+      Utils::ScopedCounter slice_lock_counter( this->slice_lock_count_ );
+      this->slice_number_state_->set_range(
+        0, static_cast< int >( this->active_layer_slice_->number_of_slices() - 1 ) );
+    }
 
     StateView2D* view2d_state = dynamic_cast< StateView2D* >( this->get_active_view_state().get() );
     this->active_layer_slice_->move_slice( view2d_state->get().center().z(), true );
@@ -544,15 +545,13 @@ void Viewer::change_view_mode( std::string mode, ActionSource source )
       this->slice_number_state_->set( static_cast< int >( 
         this->active_layer_slice_->get_slice_number() ) );
     }
-
-    this->pop_ignoring_status();
-  }
+  } // end if ( this->active_layer_slice_ )
 }
 
 void Viewer::set_slice_number( int num, ActionSource source )
 {
   const std::string& view_mode = this->view_mode_state_->get();
-  if ( this->updating_states_ || 
+  if ( this->slice_lock_count_ > 0 || 
      view_mode == VOLUME_C || 
      !this->active_layer_slice_ )
   {
@@ -560,8 +559,8 @@ void Viewer::set_slice_number( int num, ActionSource source )
   }
 
   this->active_layer_slice_->set_slice_number( num );
-  this->push_ignoring_status();
-  this->ignore_state_changes_ = true;
+
+  Utils::ScopedCounter block_counter( this->redraw_block_count_ );
 
   // Update the depth info
   StateView2D* view2d_state = dynamic_cast< StateView2D* >( this->get_active_view_state().get() );
@@ -584,8 +583,6 @@ void Viewer::set_slice_number( int num, ActionSource source )
       continue;
     ( *data_slice_it ).second->move_slice( this->active_layer_slice_->depth() );
   }
-
-  this->pop_ignoring_status();
 }
 
 void Viewer::adjust_view()
@@ -710,10 +707,10 @@ void Viewer::adjust_depth()
 
 void Viewer::auto_view()
 {
-  this->push_ignoring_status();
-  this->ignore_state_changes_ = true;
-  this->adjust_view();
-  this->pop_ignoring_status();
+  {
+    Utils::ScopedCounter block_counter( this->redraw_block_count_ );
+    this->adjust_view();
+  }
   this->redraw_signal_();
 }
 

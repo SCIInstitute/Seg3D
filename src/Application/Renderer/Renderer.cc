@@ -289,9 +289,25 @@ void Renderer::redraw()
           Utils::DataVolumeSlice* data_slice = data_layer_item->data_volume_slice_.get();
           volume_slice = data_slice;
           this->slice_shader_->set_mask_mode( false );
-          this->slice_shader_->set_contrast( static_cast< float >( data_layer_item->contrast_ ) );
-          this->slice_shader_->set_brightness( 
-            static_cast< float >( data_layer_item->brightness_ / 50 ) );
+
+          // Convert contrast to range ( 0, 1 ] and brightness to [ -1, 1 ]
+          double contrast = ( 1 - data_layer_item->contrast_ / 101 );
+          double brightness = data_layer_item->brightness_ / 50 - 1.0;
+
+          // NOTE: The equations for computing scale and bias are as follows:
+          //
+          // double scale = numeric_range / ( contrast * value_range );
+          // double window_max = -brightness * ( value_max - value_min ) + value_max;
+          // double bias = ( numeric_max - window_max * scale ) / numeric_max;
+          //
+          // However, since we always rescale the data to unsigned short when uploading
+          // textures, numeric_range and value_range are the same, 
+          // and thus the computation can be simplified.
+          
+          double scale = 1.0 / contrast;
+          double bias = 1.0 - ( 1.0 - brightness ) * scale;
+          this->slice_shader_->set_scale( static_cast< float >( scale ) );
+          this->slice_shader_->set_bias( static_cast< float >( bias ) );
         }
         break;
       case Utils::VolumeType::MASK_E:

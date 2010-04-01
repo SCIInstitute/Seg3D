@@ -112,7 +112,7 @@ class Viewer : public StateHandler
 
   // -- constructor/destructor --
 public:
-  Viewer( const std::string& key, size_t viewer_id );
+  Viewer( size_t viewer_id );
   virtual ~Viewer();
 
   // -- mouse events handling --
@@ -208,26 +208,18 @@ private:
   // Move the active slices to the center of the volume
   void adjust_depth();
 
-  void push_ignoring_status() 
-  { 
-    this->ignoring_status_stack_.push_back( this->ignore_state_changes_ ); 
-  }
-
-  void pop_ignoring_status()
-  {
-    this->ignore_state_changes_ = this->ignoring_status_stack_.back();
-    this->ignoring_status_stack_.pop_back();
-  }
-
   void layer_state_changed( bool volume_view );
 
 private:
   size_t viewer_id_;
   int width_;
   int height_;
-  bool ignore_state_changes_;
-  std::vector< bool > ignoring_status_stack_;
-  bool updating_states_; // Indicates if it's in the middle of state changes
+
+  // Counts the number of times redraw signal is blocked
+  size_t redraw_block_count_;
+
+  // Counts the number of times the slice number is locked (unchangeable)
+  size_t slice_lock_count_;
 
   typedef std::multimap< std::string, boost::signals2::connection > connection_map_type;
   connection_map_type layer_connection_map_;

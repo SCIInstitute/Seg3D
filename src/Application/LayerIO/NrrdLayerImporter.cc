@@ -106,6 +106,7 @@ bool NrrdLayerImporter::import_layer( LayerImporterMode mode, std::vector<LayerH
       layers.resize( 1 );
           
       Utils::DataBlockHandle datablock( new Utils::NrrdDataBlock( nrrd_data_ ) );
+      datablock->update_histogram();
       Utils::DataVolumeHandle datavolume( new 
         Utils::DataVolume( nrrd_data_->get_grid_transform(), datablock ) );
 

@@ -26,24 +26,19 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#include <limits>
+
 #include <Utils/Volume/DataVolumeSlice.h>
 
 namespace Utils
 {
 
-const unsigned int DataVolumeSlice::GL_DATA_TYPE_C[] = 
-{
-  GL_BYTE, GL_UNSIGNED_BYTE, GL_SHORT, GL_UNSIGNED_SHORT,
-  GL_INT, GL_UNSIGNED_INT, GL_FLOAT, GL_DOUBLE
-};
+const unsigned int DataVolumeSlice::TEXTURE_DATA_TYPE_C = GL_UNSIGNED_SHORT;
 
-const unsigned int DataVolumeSlice::GL_TEXTURE_FORMAT_C[] = 
-{
-  GL_INTENSITY8, GL_INTENSITY8, 
-  GL_INTENSITY16, GL_INTENSITY16,
-  GL_INTENSITY16, GL_INTENSITY16, 
-  GL_INTENSITY16, GL_INTENSITY16
-};
+const unsigned int DataVolumeSlice::TEXTURE_FORMAT_C = GL_LUMINANCE16;
+
+const DataVolumeSlice::texture_data_type DataVolumeSlice::TEXTURE_VALUE_MAX_C =
+  std::numeric_limits< DataVolumeSlice::texture_data_type >::max();
 
 DataVolumeSlice::DataVolumeSlice( const DataVolumeHandle& data_volume, 
                  VolumeSliceType type, size_t slice_num ) :
@@ -85,14 +80,22 @@ void DataVolumeSlice::initialize_texture()
 template<class DATA1, class DATA2>
 void CopyTypedData( DataVolumeSlice* slice, DATA1* buffer )
 {
+  const DATA1 numeric_min = std::numeric_limits< DATA1 >::min();
+  const DATA1 numeric_max = std::numeric_limits< DATA1 >::max();
+  const DATA1 numeric_range = numeric_max - numeric_min;
+  const double value_min = slice->get_data_block()->get_min();
+  const double value_max = slice->get_data_block()->get_max();
+  const double value_range = value_max - value_min;
+  const double inv_value_range = 1.0 / value_range;
+
   size_t current_index = slice->to_index( 0, 0 );
 
   // Index strides in X and Y direction. Use int instead of size_t because strides might be negative.
-  int x_stride = static_cast<int>( slice->to_index( 1, 0 ) - current_index );
-  int y_stride =  static_cast<int>( slice->to_index( 0, 1 ) - current_index );
+  const int x_stride = static_cast<int>( slice->to_index( 1, 0 ) - current_index );
+  const int y_stride =  static_cast<int>( slice->to_index( 0, 1 ) - current_index );
 
-    size_t nx = slice->nx();
-    size_t ny = slice->ny();
+  const size_t nx = slice->nx();
+  const size_t ny = slice->ny();
   
   DATA2* data = static_cast<DATA2*>( slice->get_data_block()->get_data() );
   size_t row_start = current_index;
@@ -101,8 +104,8 @@ void CopyTypedData( DataVolumeSlice* slice, DATA1* buffer )
     current_index = row_start;
     for ( size_t i = 0; i < nx; i++ )
     {
-      buffer[ j * nx + i ] = 
-        static_cast<DATA1>( data[ current_index ] );
+      buffer[ j * nx + i ] = static_cast<DATA1>(  ( data[ current_index ] - value_min ) 
+        * inv_value_range * numeric_range + numeric_min );
       current_index += x_stride;
     }
     row_start += y_stride;
@@ -128,17 +131,17 @@ void DataVolumeSlice::upload_texture()
     // Make sure there is no pixel unpack buffer bound
     PixelUnpackBuffer::RestoreDefault();
 
-    this->texture_->set_image( static_cast<int>( this->nx_ ), 
-      static_cast<int>( this->ny_ ), GL_LUMINANCE );
+    this->texture_->set_image( static_cast< int >( this->nx_ ), 
+      static_cast< int >( this->ny_ ), TEXTURE_FORMAT_C );
     this->size_changed_ = false;
   }
   
   // Step 1. copy the data in the slice to a pixel unpack buffer
   PixelBufferObjectHandle pixel_buffer( new PixelUnpackBuffer );
   pixel_buffer->bind();
-  pixel_buffer->set_buffer_data( sizeof( unsigned char ) * this->nx_ * this->ny_,
+  pixel_buffer->set_buffer_data( sizeof( texture_data_type ) * this->nx_ * this->ny_,
     NULL, GL_STREAM_DRAW );
-  unsigned char* buffer = reinterpret_cast<unsigned char*>(
+  texture_data_type* buffer = reinterpret_cast< texture_data_type* >(
     pixel_buffer->map_buffer( GL_WRITE_ONLY ) );
 
   // Lock the volume
@@ -147,28 +150,28 @@ void DataVolumeSlice::upload_texture()
   switch ( this->data_block_->get_type() )
   {
     case DataType::CHAR_E:
-      CopyTypedData<unsigned char, signed char>( this, buffer );
+      CopyTypedData< texture_data_type, signed char >( this, buffer );
       break;
     case DataType::UCHAR_E:
-      CopyTypedData<unsigned char, unsigned char>( this, buffer );
+      CopyTypedData< texture_data_type, unsigned char >( this, buffer );
       break;
     case DataType::SHORT_E:
-      CopyTypedData<unsigned char, short>( this, buffer );
+      CopyTypedData< texture_data_type, short >( this, buffer );
       break;
     case DataType::USHORT_E:
-      CopyTypedData<unsigned char, unsigned short>( this, buffer );
+      CopyTypedData< texture_data_type, unsigned short >( this, buffer );
       break;
     case DataType::INT_E:
-      CopyTypedData<unsigned char, int>( this, buffer );
+      CopyTypedData< texture_data_type, int >( this, buffer );
       break;
     case DataType::UINT_E:
-      CopyTypedData<unsigned char, unsigned int>( this, buffer );
+      CopyTypedData< texture_data_type, unsigned int >( this, buffer );
       break;
     case DataType::FLOAT_E:
-      CopyTypedData<unsigned char, float>( this, buffer );
+      CopyTypedData< texture_data_type, float >( this, buffer );
       break;
     case DataType::DOUBLE_E:
-      CopyTypedData<unsigned char, double>( this, buffer );
+      CopyTypedData< texture_data_type, double >( this, buffer );
       break;
   }
 
@@ -178,7 +181,7 @@ void DataVolumeSlice::upload_texture()
   pixel_buffer->unmap_buffer();
   glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
   this->texture_->set_sub_image( 0, 0, static_cast<int>( this->nx_ ), 
-    static_cast<int>( this->ny_ ), NULL, GL_LUMINANCE, GL_UNSIGNED_BYTE );
+    static_cast<int>( this->ny_ ), NULL, GL_LUMINANCE, TEXTURE_DATA_TYPE_C );
 
   // Step 3. release the pixel unpack buffer
   // NOTE: The texture streaming will still succeed even if the PBO is deleted.
