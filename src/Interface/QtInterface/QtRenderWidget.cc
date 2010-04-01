@@ -83,6 +83,10 @@ void QtRenderWidget::initializeGL()
   Utils::RenderResources::Instance()->init_gl();
   glClearColor( 0.5, 0.5, 0.5, 1.0 );
   renderer_->initialize();
+  // Make sure the GL context of the widget is the current one of this thread,
+  // because in the single threaded rendering mode, the renderer will make its own context
+  // the current one of the Qt thread.
+  this->makeCurrent();
 }
 
 void QtRenderWidget::paintGL()
@@ -137,6 +141,10 @@ void QtRenderWidget::resizeGL( int width, int height )
     SCI_LOG_DEBUG(std::string("QtRenderWidget ") + Utils::to_string(this->viewer_id_)
       + ": sending resize event to renderer");
     renderer_->resize( width, height );
+    // Make sure the GL context of the widget is the current one of this thread,
+    // because in the single threaded rendering mode, the renderer will make its own context
+    // the current one of the Qt thread.
+    this->makeCurrent();
   }
 }
 

@@ -40,6 +40,12 @@
 #include <Application/Renderer/Renderer.h>
 #include <Application/ViewerManager/ViewerManager.h>
 
+#if defined(_WIN32) || defined(__APPLE__) || defined(X11_THREADSAFE)
+#define MULTITHREADED_RENDERING 1
+#else
+#define MULTITHREADED_RENDERING 0
+#endif
+
 namespace Seg3D
 {
 
@@ -88,84 +94,85 @@ Renderer::~Renderer()
 
 void Renderer::initialize()
 {
-#if defined(WIN32) || defined(APPLE) || defined(X11_THREADSAFE)
-#ifdef X11_THREADSAFE
-  SCI_LOG_DEBUG(std::string("Multithreaded rendering enabled on X-Window"));
-#endif
+#if MULTITHREADED_RENDERING
   // NOTE: it is important to postpone the allocation of OpenGL objects to the 
   // rendering thread. If created in a different thread, these objects might not
   // be ready when the rendering thread uses them the first time, which caused
   // the scene to be blank sometimes.
   if ( !is_eventhandler_thread() )
   {
-    if ( !Utils::RenderResources::Instance()->create_render_context( context_ ) )
+    if ( !Utils::RenderResources::Instance()->create_render_context( this->context_ ) )
     {
       SCI_THROW_EXCEPTION( "Failed to create a valid rendering context" );
     }
-    post_event( boost::bind( &Renderer::initialize, this ) );
-    start_eventhandler();
+    this->post_event( boost::bind( &Renderer::initialize, this ) );
+    this->start_eventhandler();
     return;
   }
+
+  SCI_LOG_DEBUG( "Initializing renderer in a separate thread" );
+
 #else
   if ( !Interface::IsInterfaceThread() )
   {
     Interface::PostEvent( boost::bind( &Renderer::initialize, this ) );
     return;
   }
-  if ( !Utils::RenderResources::Instance()->create_render_context( context_ ) )
+
+  SCI_LOG_DEBUG( "Initializing renderer in the interface thread" );
+
+  if ( !Utils::RenderResources::Instance()->create_render_context( this->context_ ) )
   {
     SCI_THROW_EXCEPTION("Failed to create a valid rendering context");
   }
 #endif
 
-  SCI_LOG_DEBUG(std::string("Renderer ") + Utils::to_string(this->viewer_id_)
-    + ": initializing");
-
-  // Make the GL context current. Since it is the only context in the rendering
-  // thread, this call is only needed once.
+  // Make the GL context current. In multi-threaded rendering mode,
+  // this call is only needed once.
   this->context_->make_current();
 
-  //glEnable(GL_CULL_FACE);
+  glClearColor( 0.3f, 0.3f, 0.3f, 1.0f );
 
-  // lock the shared render context
-  Utils::RenderResources::lock_type lock( Utils::RenderResources::GetMutex() );
+  {
+    // lock the shared render context
+    Utils::RenderResources::lock_type lock( Utils::RenderResources::GetMutex() );
 
-  textures_[ 0 ] = Utils::Texture2DHandle( new Utils::Texture2D() );
-  textures_[ 1 ] = Utils::Texture2DHandle( new Utils::Texture2D() );
-  depth_buffer_ = Utils::RenderbufferHandle( new Utils::Renderbuffer() );
-  frame_buffer_ = Utils::FramebufferObjectHandle( new Utils::FramebufferObject() );
-  frame_buffer_->attach_renderbuffer( depth_buffer_, GL_DEPTH_ATTACHMENT_EXT );
-  this->cube_ = Utils::UnitCubeHandle( new Utils::UnitCube() );
-  this->slice_shader_->initialize();
-
-  // release the lock
-  lock.unlock();
+    this->textures_[ 0 ] = Utils::Texture2DHandle( new Utils::Texture2D() );
+    this->textures_[ 1 ] = Utils::Texture2DHandle( new Utils::Texture2D() );
+    this->depth_buffer_ = Utils::RenderbufferHandle( new Utils::Renderbuffer() );
+    this->frame_buffer_ = Utils::FramebufferObjectHandle( new Utils::FramebufferObject() );
+    this->frame_buffer_->attach_renderbuffer( depth_buffer_, GL_DEPTH_ATTACHMENT_EXT );
+    this->cube_ = Utils::UnitCubeHandle( new Utils::UnitCube() );
+    this->slice_shader_->initialize();
+  }
 
   this->add_connection( ViewerManager::Instance()->get_viewer( this->viewer_id_ )
     ->redraw_signal_.connect( boost::bind( &Renderer::redraw, this ) ) );
+
+  SCI_LOG_DEBUG( std::string("Renderer ") + Utils::to_string( this->viewer_id_ ) 
+    + " initialized" );
 }
 
 void Renderer::redraw()
 {
-#if defined(WIN32) || defined(APPLE) || defined(X11_THREADSAFE)
+#if MULTITHREADED_RENDERING
   if ( !is_eventhandler_thread() )
   {
     boost::unique_lock<boost::recursive_mutex> lock( this->redraw_needed_mutex_ );
-
     this->redraw_needed_ = true;
     this->post_event( boost::bind( &Renderer::redraw, this ) );
-    
     return;
   }
 #else
   if ( !Interface::IsInterfaceThread() )
   {
     boost::unique_lock< boost::recursive_mutex > lock( redraw_needed_mutex_ );
-
     this->redraw_needed_ = true;
     Interface::PostEvent( boost::bind( &Renderer::redraw, this ) );
     return;
   }
+  // Make the GL context current in the interface thread
+  this->context_->make_current();
 #endif
 
   {
@@ -177,9 +184,8 @@ void Renderer::redraw()
     this->redraw_needed_ = false;
   }
 
-#if !defined(WIN32) && !defined(APPLE) && !defined(X11_THREADSAFE)
-  this->context_->make_current();
-#endif
+  SCI_LOG_DEBUG( std::string("Renderer ") + Utils::to_string( this->viewer_id_ ) 
+    + ": starting redraw" );
 
   // lock the active render texture
   Utils::Texture::lock_type texture_lock( this->textures_[ this->active_render_texture_ ]->get_mutex() );
@@ -198,34 +204,24 @@ void Renderer::redraw()
     return;
   }
 
-  //glDrawBuffer(GL_COLOR_ATTACHMENT0_EXT);
   SCI_CHECK_OPENGL_ERROR();
 
-  glViewport( 0, 0, width_, height_ );
-  glClearColor( 0.3f, 0.3f, 0.3f, 1.0f );
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-  SCI_CHECK_OPENGL_ERROR();
-  // do some rendering
-  // ...
-  // ...
-  //glEnable(GL_DEPTH_TEST);
-  //glEnable(GL_CULL_FACE);
-  //glCullFace(GL_FRONT);
-
-  ViewerHandle viewer = ViewerManager::Instance()->get_viewer( this->viewer_id_ );
   glMatrixMode( GL_PROJECTION );
   glLoadIdentity();
 
   // Lock the state engine
   StateEngine::lock_type state_lock( StateEngine::Instance()->get_mutex() );
-
   // Get a snapshot of current layers
   LayerSceneHandle layer_scene = LayerManager::Instance()->compose_layer_scene( this->viewer_id_ );
+
+  ViewerHandle viewer = ViewerManager::Instance()->get_viewer( this->viewer_id_ );
 
   if ( viewer->is_volume_view() )
   {
     Utils::View3D view3d( viewer->volume_view_state_->get() );
 
+    // We have got everything we want from the state engine, unlock before we do any rendering
     state_lock.unlock();
 
     glEnable( GL_DEPTH_TEST );
@@ -249,9 +245,11 @@ void Renderer::redraw()
       Utils::RenderResources::lock_type lock( Utils::RenderResources::GetMutex() );
       this->process_slices( layer_scene, viewer );
     }
+
     Utils::View2D view2d(
         dynamic_cast< StateView2D* > ( viewer->get_active_view_state().get() )->get() );
 
+    // We have got everything we want from the state engine, unlock before we do any rendering
     state_lock.unlock();
 
     glDisable( GL_DEPTH_TEST );
@@ -267,12 +265,6 @@ void Renderer::redraw()
     glMatrixMode( GL_MODELVIEW );
     glLoadIdentity();
 
-/*
-    glRotatef( 25.0f * ( this->viewer_id_ + 1 ), 1, 0, 1 );
-    glScalef( 0.5f, 0.5f, 0.5f );
-    glTranslatef( -0.5f, -0.5f, -0.5f );
-    this->cube_->draw();
-*/
     this->slice_shader_->enable();
     this->slice_shader_->set_texture( 0 );
 
@@ -355,6 +347,8 @@ void Renderer::redraw()
   // release the lock on the active render texture
   texture_lock.unlock();
 
+  SCI_LOG_DEBUG( std::string("Renderer ") + Utils::to_string( this->viewer_id_ ) 
+    + ": done redraw" );
 
   // signal rendering completed
   this->rendering_completed_signal_( this->textures_[ this->active_render_texture_ ] );
@@ -365,7 +359,7 @@ void Renderer::redraw()
 
 void Renderer::resize( int width, int height )
 {
-#if defined(WIN32) || defined(APPLE) || defined(X11_THREADSAFE)
+#if MULTITHREADED_RENDERING
   if ( !is_eventhandler_thread() )
   {
     this->post_event( boost::bind( &Renderer::resize, this, width, height ) );
@@ -377,33 +371,35 @@ void Renderer::resize( int width, int height )
     Interface::PostEvent( boost::bind( &Renderer::resize, this, width, height ) );
     return;
   }
+  // Make the GL context current in the interface thread
+  this->context_->make_current();
 #endif
 
-  if ( width == 0 || height == 0 || ( width_ == width && height_ == height ) )
+  if ( width == 0 || height == 0 || ( this->width_ == width && this->height_ == height ) )
   {
     return;
   }
 
   {
     Utils::RenderResources::lock_type lock( Utils::RenderResources::GetMutex() );
-    textures_[ 0 ] = Utils::Texture2DHandle( new Utils::Texture2D() );
-    textures_[ 1 ] = Utils::Texture2DHandle( new Utils::Texture2D() );
-    textures_[ 0 ]->set_image( width, height, GL_RGBA );
-    textures_[ 1 ]->set_image( width, height, GL_RGBA );
-
-    depth_buffer_->set_storage( width, height, GL_DEPTH_COMPONENT );
+    this->textures_[ 0 ] = Utils::Texture2DHandle( new Utils::Texture2D() );
+    this->textures_[ 1 ] = Utils::Texture2DHandle( new Utils::Texture2D() );
+    this->textures_[ 0 ]->set_image( width, height, GL_RGBA );
+    this->textures_[ 1 ]->set_image( width, height, GL_RGBA );
+    this->depth_buffer_->set_storage( width, height, GL_DEPTH_COMPONENT );
   }
 
-  width_ = width;
-  height_ = height;
+  this->width_ = width;
+  this->height_ = height;
+
+  glViewport( 0, 0, this->width_, this->height_ );
 
   {
     boost::unique_lock< boost::recursive_mutex > lock( this->redraw_needed_mutex_ );
     this->redraw_needed_ = true;
   }
 
-
-  redraw();
+  this->redraw();
 }
 
 void Renderer::process_slices( LayerSceneHandle& layer_scene, ViewerHandle& viewer )

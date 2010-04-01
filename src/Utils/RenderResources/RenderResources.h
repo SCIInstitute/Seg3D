@@ -101,6 +101,7 @@ private:
   // A Handle to resource that generated the contexts
   RenderResourcesContextHandle resources_context_;
 
+  // An GL context for deleting objects
   RenderContextHandle render_context_;
 
   // -- render locks --
