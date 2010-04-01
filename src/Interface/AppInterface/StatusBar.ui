@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>980</width>
+    <width>1024</width>
     <height>20</height>
    </rect>
   </property>
@@ -15,6 +15,11 @@
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
+  </property>
+  <property name="font">
+   <font>
+    <pointsize>10</pointsize>
+   </font>
   </property>
   <property name="windowTitle">
    <string>Form</string>
@@ -55,6 +60,11 @@
        <height>20</height>
       </size>
      </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
      <layout class="QHBoxLayout" name="horizontalLayout_8">
       <property name="spacing">
        <number>0</number>
@@ -75,6 +85,11 @@
           <width>16</width>
           <height>16</height>
          </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>10</pointsize>
+         </font>
         </property>
         <property name="text">
          <string/>
@@ -118,6 +133,11 @@
        <height>20</height>
       </size>
      </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
      <layout class="QHBoxLayout" name="horizontalLayout_6">
       <property name="spacing">
        <number>0</number>
@@ -136,6 +156,11 @@
       </property>
       <item>
        <widget class="QLabel" name="status_report_label_">
+        <property name="font">
+         <font>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
         <property name="text">
          <string>Message</string>
         </property>
@@ -163,6 +188,11 @@
        <width>20</width>
        <height>20</height>
       </size>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_7">
       <property name="spacing">
@@ -198,6 +228,11 @@
           <height>16</height>
          </size>
         </property>
+        <property name="font">
+         <font>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -230,15 +265,20 @@
      </property>
      <property name="minimumSize">
       <size>
-       <width>336</width>
+       <width>342</width>
        <height>20</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
-       <width>360</width>
+       <width>342</width>
        <height>20</height>
       </size>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="4,4,4,5">
       <property name="spacing">
@@ -261,6 +301,11 @@
           <height>16777215</height>
          </size>
         </property>
+        <property name="font">
+         <font>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
         <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
          <property name="spacing">
           <number>0</number>
@@ -269,7 +314,7 @@
           <number>4</number>
          </property>
          <property name="topMargin">
-          <number>1</number>
+          <number>2</number>
          </property>
          <property name="rightMargin">
           <number>4</number>
@@ -293,6 +338,7 @@
            </property>
            <property name="font">
             <font>
+             <pointsize>10</pointsize>
              <weight>75</weight>
              <bold>true</bold>
             </font>
@@ -316,6 +362,11 @@
              <height>16777215</height>
             </size>
            </property>
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -338,6 +389,11 @@
           <height>16777215</height>
          </size>
         </property>
+        <property name="font">
+         <font>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
         <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1">
          <property name="spacing">
           <number>0</number>
@@ -346,7 +402,7 @@
           <number>4</number>
          </property>
          <property name="topMargin">
-          <number>1</number>
+          <number>2</number>
          </property>
          <property name="rightMargin">
           <number>4</number>
@@ -370,6 +426,7 @@
            </property>
            <property name="font">
             <font>
+             <pointsize>10</pointsize>
              <weight>75</weight>
              <bold>true</bold>
             </font>
@@ -393,6 +450,11 @@
              <height>16777215</height>
             </size>
            </property>
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -415,6 +477,11 @@
           <height>16777215</height>
          </size>
         </property>
+        <property name="font">
+         <font>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
         <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,1">
          <property name="spacing">
           <number>0</number>
@@ -423,7 +490,7 @@
           <number>4</number>
          </property>
          <property name="topMargin">
-          <number>1</number>
+          <number>2</number>
          </property>
          <property name="rightMargin">
           <number>4</number>
@@ -447,6 +514,7 @@
            </property>
            <property name="font">
             <font>
+             <pointsize>10</pointsize>
              <weight>75</weight>
              <bold>true</bold>
             </font>
@@ -470,6 +538,11 @@
              <height>16777215</height>
             </size>
            </property>
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -482,15 +555,20 @@
        <widget class="QWidget" name="widget" native="true">
         <property name="minimumSize">
          <size>
-          <width>96</width>
+          <width>102</width>
           <height>0</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>96</width>
+          <width>102</width>
           <height>16777215</height>
          </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>10</pointsize>
+         </font>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,1">
          <property name="spacing">
@@ -500,30 +578,31 @@
           <number>4</number>
          </property>
          <property name="topMargin">
-          <number>0</number>
+          <number>2</number>
          </property>
          <property name="rightMargin">
           <number>4</number>
          </property>
          <property name="bottomMargin">
-          <number>0</number>
+          <number>1</number>
          </property>
          <item>
           <widget class="QLabel" name="value_label_">
            <property name="minimumSize">
             <size>
-             <width>38</width>
+             <width>36</width>
              <height>0</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>38</width>
+             <width>36</width>
              <height>16777215</height>
             </size>
            </property>
            <property name="font">
             <font>
+             <pointsize>10</pointsize>
              <weight>75</weight>
              <bold>true</bold>
             </font>
@@ -546,6 +625,11 @@
              <width>58</width>
              <height>16777215</height>
             </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
            </property>
            <property name="text">
             <string/>

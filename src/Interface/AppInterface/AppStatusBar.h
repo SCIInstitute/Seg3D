@@ -66,10 +66,8 @@ private Q_SLOTS:
 
   // -- build status bar widgets -- //
 private:
-  void build_coordinates_label();
-  void build_status_report_label();
-  void build_buttons();
-
+  MessageHistoryWidget* history_widget_;
+  bool show_world_coord_;
   void update_data_point_info( DataPointInfoHandle data_point );
   void update_data_point_label();
   void set_message( int msg_type, std::string message );
@@ -78,13 +76,6 @@ private:
   QStatusBar* statusbar_;
   QWidget *statusbar_widget_;
   boost::shared_ptr< AppStatusBarPrivate > private_;
-
-  // -- status bar components -- //
-private:
-  MessageHistoryWidget* history_widget_;
-  bool show_world_coord_;
-  
-
   DataPointInfo data_point_info_;
 
 private Q_SLOTS:

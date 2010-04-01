@@ -188,21 +188,15 @@ void AppStatusBar::update_data_point_label()
   {
     if( this->show_world_coord_ )
     {
-      this->private_->ui_.x_->setText( QString( "%1" ).arg( 
-        this->data_point_info_.world_coord().x(), 0, 'e', 3 ) );
-      this->private_->ui_.y_->setText( QString( "%1" ).arg( 
-        this->data_point_info_.world_coord().y(), 0, 'e', 3 ) );
-      this->private_->ui_.z_->setText( QString( "%1" ).arg( 
-        this->data_point_info_.world_coord().z(), 0, 'e', 3 ) );
+      this->private_->ui_.x_->setText( QString( "%1" ).arg( world_x, 0, 'e', 3 ) );
+      this->private_->ui_.y_->setText( QString( "%1" ).arg( world_y, 0, 'e', 3 ) );
+      this->private_->ui_.z_->setText( QString( "%1" ).arg( world_z, 0, 'e', 3 ) );
     }
     else
     {
-      this->private_->ui_.x_->setText( QString( "%1" ).arg( 
-        this->data_point_info_.index_coord().x(), 0, 'e', 3 ) );
-      this->private_->ui_.y_->setText( QString( "%1" ).arg( 
-        this->data_point_info_.index_coord().y(), 0, 'e', 3 ) );
-      this->private_->ui_.z_->setText( QString( "%1" ).arg( 
-        this->data_point_info_.index_coord().z(), 0, 'e', 3 ) );
+      this->private_->ui_.x_->setText( QString( "%1" ).arg( index_x, 0, 'e', 0 ) );
+      this->private_->ui_.y_->setText( QString( "%1" ).arg( index_x, 0, 'e', 0 ) );
+      this->private_->ui_.z_->setText( QString( "%1" ).arg( index_x, 0, 'e', 0 ) );
     }
     this->private_->ui_.value_->setText( QString( "%1" ).arg( 
       this->data_point_info_.value(), 0, 'e', 3 ) );
@@ -212,24 +206,18 @@ void AppStatusBar::update_data_point_label()
   { 
     if( this->show_world_coord_ )
     {
-      this->private_->ui_.x_->setText( QString( "%1" ).arg( 
-        this->data_point_info_.world_coord().x(), 0, 'f', 3 ) );
-      this->private_->ui_.y_->setText( QString( "%1" ).arg( 
-        this->data_point_info_.world_coord().y(), 0, 'f', 3 ) );
-      this->private_->ui_.z_->setText( QString( "%1" ).arg( 
-        this->data_point_info_.world_coord().z(), 0, 'f', 3 ) );
+      this->private_->ui_.x_->setText( QString( "%1" ).arg( world_x, 0, 'f', 3 ) );
+      this->private_->ui_.y_->setText( QString( "%1" ).arg( world_y, 0, 'f', 3 ) );
+      this->private_->ui_.z_->setText( QString( "%1" ).arg( world_z, 0, 'f', 3 ) );
     }
     else
     {
-      this->private_->ui_.x_->setText( QString( "%1" ).arg( 
-        this->data_point_info_.index_coord().x(), 0, 'f', 3 ) );
-      this->private_->ui_.y_->setText( QString( "%1" ).arg( 
-        this->data_point_info_.index_coord().y(), 0, 'f', 3 ) );
-      this->private_->ui_.z_->setText( QString( "%1" ).arg( 
-        this->data_point_info_.index_coord().z(), 0, 'f', 3 ) );
+      this->private_->ui_.x_->setText( QString( "%1" ).arg( index_x, 0, 'f', 0 ) );
+      this->private_->ui_.y_->setText( QString( "%1" ).arg( index_y, 0, 'f', 0 ) );
+      this->private_->ui_.z_->setText( QString( "%1" ).arg( index_z, 0, 'f', 0 ) );
     }
     this->private_->ui_.value_->setText( QString( "%1" ).arg( 
-      this->data_point_info_.value(), 0, 'f', 3 ) );
+      this->data_point_info_.value(), 0, 'f', 0 ) );
   }
 }
 
