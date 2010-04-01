@@ -114,9 +114,10 @@ void Histogram::compute( const signed char* data, size_t size )
     if ( histogram[ j ] > 0 ) hist_end = j;
   }
 
-  for ( size_t j = 0 ; j < histogram.size() ; j++ )
+    size_t hsize = histogram.size();
+  for ( size_t j = 0 ; j < hsize; j++ )
   {
-    if ( histogram[ size - 1 - j ] > 0 ) hist_begin = size - 1 - j;
+    if ( histogram[ hsize - 1 - j ] > 0 ) hist_begin = hsize - 1 - j;
   }
 
   min_ = static_cast<double>( hist_begin ) - static_cast<double>( 0x80 );
@@ -158,10 +159,12 @@ void Histogram::compute( const unsigned char* data, size_t size )
     if ( histogram[ j ] > 0 ) hist_end = j;
   }
 
-  for ( size_t j = 0 ; j < histogram.size() ; j++ )
+    size_t hsize = histogram.size();
+  for ( size_t j = 0 ; j < hsize; j++ )
   {
-    if ( histogram[ size - 1 - j ] > 0 ) hist_begin = size - 1 - j;
+    if ( histogram[ hsize - 1 - j ] > 0 ) hist_begin = hsize - 1 - j;
   }
+
 
   min_ = static_cast<double>( hist_begin );
   max_ = static_cast<double>( hist_end );
@@ -202,9 +205,10 @@ void Histogram::compute( const short* data, size_t size )
     if ( histogram[ j ] > 0 ) hist_end = j;
   }
 
-  for ( size_t j = 0 ; j < histogram.size() ; j++ )
+    size_t hsize = histogram.size();
+  for ( size_t j = 0 ; j < hsize; j++ )
   {
-    if ( histogram[ size - 1 - j ] > 0 ) hist_begin = size - 1 - j;
+    if ( histogram[ hsize - 1 - j ] > 0 ) hist_begin = hsize - 1 - j;
   }
 
   min_ = static_cast<double>( hist_begin ) - static_cast<double>( 0x8000 );
@@ -268,10 +272,12 @@ void Histogram::compute( const unsigned short* data, size_t size )
     if ( histogram[ j ] > 0 ) hist_end = j;
   }
 
-  for ( size_t j = 0 ; j < histogram.size() ; j++ )
+    size_t hsize = histogram.size();
+  for ( size_t j = 0 ; j < hsize; j++ )
   {
-    if ( histogram[ size - 1 - j ] > 0 ) hist_begin = size - 1 - j;
+    if ( histogram[ hsize - 1 - j ] > 0 ) hist_begin = hsize - 1 - j;
   }
+
 
   min_ = static_cast<double>( hist_begin );
   max_ = static_cast<double>( hist_end );
