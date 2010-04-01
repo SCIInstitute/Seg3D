@@ -92,8 +92,9 @@ void LayerGroup::insert_layer_above( LayerHandle layer_above, LayerHandle layer_
     i != this->layer_list_.end(); ++i )
   {
     if( ( *i ) == layer_below )
-    {
-      layer_list_.insert( ++i, layer_above );
+    { 
+      //layer_above->set_layer_group( this );
+      this->layer_list_.insert( ++i, layer_above );
       return;
     }
   }

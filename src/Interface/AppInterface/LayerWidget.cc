@@ -465,10 +465,5 @@ void LayerWidget::set_drop( bool drop )
 
 }
 
-void LayerWidget::dragLeaveEvent(QDragLeaveEvent* event)
-{
-  set_drop( false );
-}
-  
 } //end namespace Seg3D
 

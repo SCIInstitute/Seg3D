@@ -100,54 +100,74 @@ bool LayerManager::insert_layer( LayerHandle layer )
 
 bool LayerManager::insert_layer_above( std::string layer_to_insert_id, std::string layer_below_id )
 {
-  LayerHandle layer_above = this->get_LayerHandle_from_layer_id( layer_to_insert_id );
-  LayerHandle layer_below = this->get_LayerHandle_from_layer_id( layer_below_id );
+  bool group_above_has_been_deleted = false;
+  LayerGroupHandle group_above;
+  LayerGroupHandle group_below;
   
-  if( layer_above && layer_below )
   {
-    if( layer_above->get_layer_group() == layer_below->get_layer_group() )
-    {
-      if( ( layer_above->type() == Utils::VolumeType::DATA_E ) && ( layer_below->type() != Utils::VolumeType::DATA_E ) )
-      {
-        return false;
-      }
-      LayerGroupHandle group = layer_above->get_layer_group();
-      group->delete_layer( layer_above );
-      group->insert_layer_above( layer_above, layer_below );
-      group_changed_signal_( group );
-      return true;
-    }
-    else
-    {
+    // Get the Lock
+    lock_type lock( this->get_mutex() );
+  
+    // First we get LayerHandles for the Layers
+    LayerHandle layer_above = this->get_LayerHandle_from_layer_id( layer_to_insert_id );
+    LayerHandle layer_below = this->get_LayerHandle_from_layer_id( layer_below_id );
     
-      //TODO - need popup dialog to confirm resample
-      if( ( layer_above->type() == Utils::VolumeType::DATA_E ) && ( layer_below->type() != Utils::VolumeType::DATA_E ) )
-      {
-        return false;
-      }
-      LayerGroupHandle group_above = layer_above->get_layer_group();
-      LayerGroupHandle group_below = layer_below->get_layer_group();
-      
-      group_above->delete_layer( layer_above );
-      
+    if ( !validate_layer_move( layer_above, layer_below ) )
+      return false;
+    
+    if( !layer_above || !layer_below )
+      return false;
+    
+    group_above = layer_above->get_layer_group();
+    group_below = layer_below->get_layer_group();
+    
+    // First we Delete the Layer from its list of layers
+    group_above->delete_layer( layer_above );
+    group_below->insert_layer_above( layer_above, layer_below );
+    
+    // If they are in the same group ---
+    if( group_above != group_below )
+    {
+      // If the group we are removing the layer from is empty we remove it
+      //  from the list of groups and signal the GUI
       if( group_above->get_layer_list().empty() )
       {   
         group_handle_list_.remove( group_above );
-        group_deleted_signal_( group_above );
+        group_above_has_been_deleted = true;
+        
       }
-      else
-      {
-        group_changed_signal_( group_above );
-      }
-      
-      group_below->insert_layer_above( layer_above, layer_below );
+      // Set the weak handle in the layer we've inserted to the proper group
       layer_above->set_layer_group( group_below );
-      group_changed_signal_( group_below );
-      return true;
     }
+  
+  } // We release the lock  here.
+  
+  if( group_above_has_been_deleted )
+  {
+    group_deleted_signal_( group_above );
+  } 
+  else
+  {
+    group_changed_signal_( group_above );
   }
-  return false;
+  
+  group_changed_signal_( group_below );
+  return true;
+  
+}
 
+// Here is the logic for inserting a layer
+bool LayerManager::validate_layer_move( LayerHandle layer_above, LayerHandle layer_below )
+{
+  // Validate the most common move
+  if ( ( layer_above->type() == Utils::VolumeType::MASK_E ) && ( layer_below->type() == Utils::VolumeType::MASK_E ) )
+    return true;
+    
+  // Another Easy one
+  if ( ( layer_above->type() == Utils::VolumeType::DATA_E ) && ( layer_below->type() == Utils::VolumeType::DATA_E ) )
+    return true;
+  
+  return false;
 }
 
 

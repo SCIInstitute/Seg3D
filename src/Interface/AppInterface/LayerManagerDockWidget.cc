@@ -84,8 +84,7 @@ LayerManagerDockWidget::LayerManagerDockWidget( QWidget *parent ) :
                   
   add_connection( LayerManager::Instance()->group_changed_signal_.connect( boost::bind(
           &LayerManagerDockWidget::HandleGroupChanged, layer_dock_widget, _1 ) ) );
-  
-
+          
   std::vector< LayerHandle > temporary_layerhandle_vector;
   LayerManager::Instance()->get_layers( temporary_layerhandle_vector );
   
@@ -186,5 +185,6 @@ void LayerManagerDockWidget::HandleGroupChanged( qpointer_type qpointer, LayerGr
 
   if ( qpointer.data() ) qpointer->refresh_group_ui( group );
 }
+
 
 }  // end namespace Seg3D

@@ -386,6 +386,19 @@ std::string& LayerGroupWidget::get_group_id()
 {
   return this->private_->group_id_;
 }
+
+LayerWidget_handle LayerGroupWidget::check_for_layer( const std::string &layer )
+{
+  for( size_t i = 0; i < layer_list_.size(); ++i )
+  {
+    if( layer_list_[i]->get_layer_id() == layer )
+    {
+      return layer_list_[i];
+    }
+  }
+  return LayerWidget_handle();
+}
+  
   
 void LayerGroupWidget::show_selection_checkboxes( bool show )
 {
@@ -561,101 +574,164 @@ void LayerGroupWidget::show_delete( bool show )
 void LayerGroupWidget::mousePressEvent(QMouseEvent *event)
 {
 
-  if ( !( ( event->button() == Qt::LeftButton ) && ( validate_location( event->pos() ) ) ) )
+  // First we try and get a LayerWidget_handle from the location
+  LayerWidget_handle layer_to_drag = validate_location( event->pos());
+  
+  // Exit immediately if they are no longer holding the button the press event isnt valid
+  if ( ( event->button() != Qt::LeftButton ) ||  !layer_to_drag )
   { 
     return;
   }
-
-
-  LayerWidget *child = static_cast<LayerWidget*>( 
-    get_layerwidget_from_child( childAt( event->pos() ) ) );
-
-  if(!child)
-    return;
-
-  QPoint event_position = event->pos();
-  QPoint child_position = child->pos();
-  QPoint header_difference = QPoint(2, 25);
   
-  QPoint hotSpot = event_position - header_difference - child_position;
-
+  // Calculate the location on the widget for the mouse to be holding
+  // We have to account for the offset of the header in the GroupLayerWidget
+  QPoint hotSpot = event->pos() - QPoint( 2, 25 ) - layer_to_drag->pos();
+  
+  // Create some Item data. - THIS IS CURRENTLY NOT REALLY BEING USED
   QByteArray itemData;
-  itemData = ( QString::fromStdString( child->get_layer_id() ) ).toAscii();
+  itemData = ( QString::fromStdString( layer_to_drag->get_layer_id() ) ).toAscii();
   QDataStream dataStream(&itemData, QIODevice::WriteOnly);
   dataStream << QPoint(hotSpot);
 
+  // Make up some mimedata containing the layer_id of the layer
   QMimeData *mimeData = new QMimeData;
   mimeData->setData( "layer_id", itemData );
-  mimeData->setText( QString::fromStdString( child->get_layer_id()));
+  mimeData->setText( QString::fromStdString( layer_to_drag->get_layer_id() ) );
   
-  QDrag *drag = new QDrag(this);
-  drag->setMimeData(mimeData);
-  drag->setPixmap(QPixmap::grabWidget(child));
-  drag->setHotSpot(hotSpot);
+  // Create a drag object and insert the hotspot, and mimedata
+  QDrag *drag = new QDrag( this );
+  drag->setMimeData( mimeData );
+  // here we add basically a screenshot of the widget
+  drag->setPixmap( QPixmap::grabWidget( layer_to_drag.data()  ));
+  drag->setHotSpot( hotSpot );
 
-  child->hide();
+  // Next we hide the LayerWidget that we are going to be dragging.
+  layer_to_drag->hide();
   
-
+  // Here we either close the layer if we are successful with our drag, 
+  //  or show it again if we aren'
   if (drag->exec(Qt::MoveAction | Qt::CopyAction, Qt::CopyAction) == Qt::MoveAction)
-    child->close();
-  else
-    child->show();
-}
-
-
-void LayerGroupWidget::mouseDragEvent(QDragMoveEvent* event)
-{
-  if (event->mimeData()->hasFormat("layer_id")) 
-  {
-    event->acceptProposedAction();
+  { 
+    layer_to_drag->close();
   }
-  else 
+  else
   {
-    event->ignore();
+    layer_to_drag->show();
+    
+    // Set the style sheets back to what they should be
+    for( size_t i = 0; i < layer_list_.size(); ++i )
+    {           
+      {
+        layer_list_[i]->set_drop( false );
+      }
+    }
   }
 }
 
 
 void LayerGroupWidget::dragEnterEvent(QDragEnterEvent* event)
 {
-  if( !this->childAt(event->pos()))
-    return;
-    
-  if (event->mimeData()->hasFormat("layer_id")) 
+  LayerWidget_handle potential_drop_site = validate_location( event->pos());
+  bool found_valid_layer = false;
+  
+  // If its a valid dropsite then we color the LayerWidget appropriately
+  if ( potential_drop_site  && event->mimeData()->hasFormat("layer_id") ) 
   { 
-    if( validate_location( event->pos() ))
-    {   
+    for( size_t i = 0; i < layer_list_.size(); ++i )
+    {
+      if( layer_list_[i] == potential_drop_site )
+      {
+        layer_list_[i]->set_drop( true );
+        found_valid_layer = true;
+      }
+      else
+      {
+        layer_list_[i]->set_drop( false );
+      }
+    }
+    if( found_valid_layer )
+    {
       event->acceptProposedAction();
+      return;
     }
   }
-  else 
-  {
-    event->ignore();
-  }
+  
+  // If they aren't dragging a valid widget we ignore it
+  event->ignore();
+  
 }
-
 
 
 void LayerGroupWidget::dropEvent(QDropEvent* event)
 {
-  if( !this->childAt(event->pos()))
-    return;
-  
-  if ( validate_location( event->pos()) )
-  {
-    LayerWidget *endLayer = static_cast<LayerWidget*>(get_layerwidget_from_child(childAt(event->pos())));
-    //QString *layer_above_id =  qobject_cast< QString* >(event->mimeData());
-    //ActionInsertLayerAbove::Dispatch( "garbage", endLayer->get_layer_id() );
-    ActionInsertLayerAbove::Dispatch( event->mimeData()->text().toStdString(), endLayer->get_layer_id() );
 
-  }
+  // First we validate the location
+  LayerWidget_handle drop_site = validate_location( event->pos());
   
+  if ( drop_site)
+  {
+    // Here we see if the LayerWidget they are dragging is from the current layer
+    LayerWidget_handle layer = this->check_for_layer( event->mimeData()->text().toStdString() );
+
+    // if it's not we ask them if they want to resample the layer they are dragging
+    if ( !layer )
+    {
+      // Make a messagebox that gets their resample response
+      QMessageBox confirm_resample_messagebox;
+      confirm_resample_messagebox.setText( QString::fromUtf8( 
+        "\nMoving the file will resample the layer to " )
+        + QString::number( this->private_->current_height ) 
+        + QString::fromUtf8( " x " ) 
+        + QString::number( this->private_->current_width )
+        + QString::fromUtf8( " x " )
+        + QString::number( this->private_->current_depth )
+        + QString::fromUtf8( ".\t" ) );
+
+      confirm_resample_messagebox.setInformativeText( QString::fromUtf8( 
+        "Do you really want to do this?" ) );
+      confirm_resample_messagebox.setStandardButtons( QMessageBox::Yes | QMessageBox::Cancel );
+      confirm_resample_messagebox.setDefaultButton( QMessageBox::Cancel );
+
+      switch( confirm_resample_messagebox.exec() )
+      {
+        // If they do want to resample, we dispatch the move function
+        // TODO: we need to actually resample the layer
+        case QMessageBox::Yes:
+          ActionInsertLayerAbove::Dispatch( event->mimeData()->text().toStdString(), 
+            drop_site->get_layer_id() );
+          break;
+
+        default:
+          // Anything else we just make sure that none of the layers are colored as drop
+          //  zones.
+          for( size_t i = 0; i < layer_list_.size(); ++i )
+          {           
+            {
+              layer_list_[i]->set_drop( false );
+            }
+          }
+          break;
+      }
+    }
+    else
+    {
+      // If they are just reordering the layers within the group we just do it.
+      ActionInsertLayerAbove::Dispatch( event->mimeData()->text().toStdString(), 
+        drop_site->get_layer_id() );
+    }
+  }
 }
 
-bool LayerGroupWidget::validate_location(const QPoint &point )
+
+
+LayerWidget_handle LayerGroupWidget::validate_location(const QPoint &point )
 {
+  // because the header counts as part of the group we need to account for its offset
   QPoint header_difference = QPoint(2, 25);
+  // we create a temporary rectangle to represent the size of the widget
   QRect rectangle;
+  
+  // Check all the layers in the list and see if our point is inside
   for( size_t i = 0; i < this->layer_list_.size(); ++i )
   {
     rectangle = this->layer_list_[i]->geometry();
@@ -665,24 +741,10 @@ bool LayerGroupWidget::validate_location(const QPoint &point )
     rectangle.setBottomRight( rectangle.bottomRight() + header_difference );
     if( rectangle.contains( point ) )
     {
-      return true;
+      return layer_list_[i];
     }
   }
-  return false;
-}
-
-LayerWidget* LayerGroupWidget::get_layerwidget_from_child(QObject *child)
-{
-  QObject *temp;
-  QString name = child->objectName();
-
-  while( name != "LayerWidget" )
-  {
-    temp = child->parent();
-    name = temp->objectName();
-    child = temp;
-  }
-  return static_cast<LayerWidget*>(child);
+  return LayerWidget_handle();
 }
   
 }  //end namespace Seg3D

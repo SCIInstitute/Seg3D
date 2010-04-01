@@ -78,6 +78,7 @@ public:
     //Refresh a changed layer
     void refresh_group_ui( LayerGroupHandle &group );
 
+
   // -- static functions for callbacks into this widget --
 public:
   typedef QPointer< LayerManagerDockWidget > qpointer_type;
@@ -87,7 +88,7 @@ public:
   static void HandleDeleteLayer( qpointer_type qpointer, LayerGroupHandle group );
   static void HandleGroupDeleted( qpointer_type qpointer, LayerGroupHandle group );
   static void HandleGroupChanged( qpointer_type qpointer, LayerGroupHandle group );
-
+  
   
 private:
   QSharedPointer< LayerManagerWidget > layer_manager_widget_;

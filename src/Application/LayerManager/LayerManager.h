@@ -96,7 +96,8 @@ public:
   void delete_layers( LayerGroupHandle group );
   void set_active_layer( LayerHandle layer );
   
-  //friend class ActionInsertLayer;
+private:
+  bool validate_layer_move( LayerHandle layer_above, LayerHandle layer_below );
 
 public:
   // Take an atomic snapshot of visual properties of layers for rendering in the specified viewer
