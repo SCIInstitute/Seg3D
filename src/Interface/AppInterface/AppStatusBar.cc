@@ -174,17 +174,19 @@ void AppStatusBar::update_data_point_label()
   double index_z = this->data_point_info_.index_coord().z();
   
   // In the case that all the coordinates are 0 then show nice 0's.
-  if( ( world_x == 0 ) && ( world_y == 0 ) && ( world_z == 0 ) )
+  if( ( world_x == 0 ) && ( world_y == 0 ) && ( world_z == 0 ) && 
+    ( this->data_point_info_.value() == 0 ) )
   { 
     this->private_->ui_.x_->setText( QString::fromUtf8("0.000") );
     this->private_->ui_.y_->setText( QString::fromUtf8("0.000") );
     this->private_->ui_.z_->setText( QString::fromUtf8("0.000") );
+    this->private_->ui_.value_->setText( QString::fromUtf8("0.000") );
   }
   // In the case that the coordinates are outside of .0001-1000.00,
   // format them with scientific notation.
-  else if( ( world_x > 1000 ) || ( world_x < 0.0001 ) ||
-    ( world_y > 1000 ) || ( world_y < 0.0001 ) ||
-    ( world_z > 1000 ) || ( world_z < 0.0001 ) )
+  else if( ( world_x > 1000 ) || ( world_x > 0.0 && world_x < 0.0001 ) ||
+    ( world_y > 1000 ) || ( world_y > 0.0 && world_y < 0.0001 ) ||
+    ( world_z > 1000 ) || ( world_z > 0.0 && world_z < 0.0001 ) )
   {
     if( this->show_world_coord_ )
     {

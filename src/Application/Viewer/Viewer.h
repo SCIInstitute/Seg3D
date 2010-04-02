@@ -222,8 +222,6 @@ private:
   // Counts the number of times the slice number is locked (unchangeable)
   size_t slice_lock_count_;
 
-  MousePositionHandle wheel_position_;
-
   typedef std::multimap< std::string, boost::signals2::connection > connection_map_type;
   connection_map_type layer_connection_map_;
 

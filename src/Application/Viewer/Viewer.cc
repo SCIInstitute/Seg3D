@@ -164,11 +164,11 @@ bool Viewer::wheel_event( int delta, int x, int y, int buttons, int modifiers )
     if ( new_slice >= 0 && 
        static_cast< size_t >( new_slice ) < this->active_layer_slice_->number_of_slices() )
     {
-      {
-        lock_type lock( this->get_mutex() );
-        this->wheel_position_ = MousePositionHandle( new MousePosition( x, y ) );
-      }
       ActionSet::Dispatch( this->slice_number_state_, new_slice );
+      // Update the status bar display.
+      // 'update_status_bar' reposts itself to the application thread, so it's guaranteed that 
+      // by the time it actually runs, the slice number has been updated.
+      this->update_status_bar( x, y );
     }
   }
 
@@ -586,15 +586,6 @@ void Viewer::set_slice_number( int num, ActionSource source )
     if ( ( *data_slice_it ).second == this->active_layer_slice_ )
       continue;
     ( *data_slice_it ).second->move_slice( this->active_layer_slice_->depth() );
-  }
-
-  {
-    lock_type lock( this->get_mutex() );
-    if ( this->wheel_position_ )
-    {
-      this->update_status_bar( this->wheel_position_->x, this->wheel_position_->y );
-      this->wheel_position_.reset();
-    }
   }
 }
 
