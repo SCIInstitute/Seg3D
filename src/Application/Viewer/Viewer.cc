@@ -164,6 +164,10 @@ bool Viewer::wheel_event( int delta, int x, int y, int buttons, int modifiers )
     if ( new_slice >= 0 && 
        static_cast< size_t >( new_slice ) < this->active_layer_slice_->number_of_slices() )
     {
+      {
+        lock_type lock( this->get_mutex() );
+        this->wheel_position_ = MousePositionHandle( new MousePosition( x, y ) );
+      }
       ActionSet::Dispatch( this->slice_number_state_, new_slice );
     }
   }
@@ -257,7 +261,7 @@ StateViewBaseHandle Viewer::get_active_view_state()
 
 void Viewer::insert_layer( LayerHandle layer )
 {
-  lock_type lock( this->layer_map_mutex_ );
+  lock_type lock( this->get_mutex() );
 
   Utils::VolumeSliceHandle volume_slice;
 
@@ -361,7 +365,7 @@ void Viewer::insert_layer( LayerHandle layer )
 
 void Viewer::delete_layers( std::vector< LayerHandle > layers )
 {
-  lock_type lock( this->layer_map_mutex_ );
+  lock_type lock( this->get_mutex() );
 
   for ( size_t i = 0; i < layers.size(); i++ )
   {
@@ -582,6 +586,15 @@ void Viewer::set_slice_number( int num, ActionSource source )
     if ( ( *data_slice_it ).second == this->active_layer_slice_ )
       continue;
     ( *data_slice_it ).second->move_slice( this->active_layer_slice_->depth() );
+  }
+
+  {
+    lock_type lock( this->get_mutex() );
+    if ( this->wheel_position_ )
+    {
+      this->update_status_bar( this->wheel_position_->x, this->wheel_position_->y );
+      this->wheel_position_.reset();
+    }
   }
 }
 

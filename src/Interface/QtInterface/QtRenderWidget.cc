@@ -206,6 +206,22 @@ void QtRenderWidget::wheelEvent( QWheelEvent* event )
   }
 }
 
+void QtRenderWidget::hideEvent( QHideEvent* event )
+{
+  if ( !event->spontaneous() )
+  {
+    this->renderer_->deactivate();
+  }
+}
+
+void QtRenderWidget::showEvent( QShowEvent* event )
+{
+  if ( !event->spontaneous() )
+  {
+    this->renderer_->activate();
+  }
+}
+
 void QtRenderWidget::set_viewer_id( size_t viewer_id )
 {
   this->viewer_id_ = viewer_id;

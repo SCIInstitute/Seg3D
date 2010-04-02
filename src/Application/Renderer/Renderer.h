@@ -33,9 +33,6 @@
 # pragma once
 #endif
 
-// boost includes
-#include <boost/thread/mutex.hpp>
-
 // Application includes
 #include <Application/Renderer/SliceShader.h>
 #include <Application/Viewer/Viewer.h>
@@ -77,7 +74,7 @@ private:
 
   void process_slices( LayerSceneHandle& layer_scene, ViewerHandle& viewer );
 
-  // Context for rendering images
+  // GL context for rendering
   Utils::RenderContextHandle context_;
 
   Utils::Texture2DHandle textures_[ 2 ];
@@ -92,8 +89,8 @@ private:
   int height_;
   bool redraw_needed_;
 
-  boost::recursive_mutex redraw_needed_mutex_;
-
+  // Mutex for protecting the "redraw_needed_" member variable
+  mutex_type redraw_needed_mutex_;
 };
 
 #ifdef NDEBUG

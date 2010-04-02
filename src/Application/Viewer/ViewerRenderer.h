@@ -36,6 +36,7 @@
 // Boost includes 
 #include <boost/shared_ptr.hpp>
 #include <boost/signals2/signal.hpp>
+#include <boost/thread.hpp>
 #include <boost/utility.hpp>
 
 #include <Utils/Graphics/Texture.h>
@@ -69,6 +70,27 @@ public:
     this->viewer_id_ = viewer_id;
   }
 
+  // Activate the renderer
+  inline void activate() 
+  { 
+    lock_type lock( this->active_mutex_ );
+    this->active_ = true; 
+  }
+
+  // Deactivate the renderer
+  inline void deactivate()  
+  {
+    lock_type lock( this->active_mutex_ );
+    this->active_ = false; 
+  }
+
+  // Return the status of the renderer
+  inline bool is_active() 
+  { 
+    lock_type lock( this->active_mutex_ );
+    return this->active_; 
+  }
+
   // -- signals handling --
 public:
   typedef boost::signals2::signal< void( Utils::TextureHandle ) > rendering_completed_signal_type;
@@ -76,6 +98,15 @@ public:
 
 protected:
   size_t viewer_id_;
+
+  typedef boost::mutex mutex_type;
+  typedef boost::unique_lock< mutex_type > lock_type;
+
+private:
+  // Indicates whether the renderer is active. It's set to false in the constructor.
+  bool active_;
+  // Mutex for protecting the active status
+  mutex_type active_mutex_;
 };
 
 } // end namespace Seg3D

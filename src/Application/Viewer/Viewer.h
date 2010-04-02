@@ -81,14 +81,15 @@ SCI_ENUM_CLASS
 class MousePosition
 {
 public:
-  MousePosition() :
-    x( 0 ), y( 0 )
+  MousePosition( int x_in = 0, int y_in = 0 ) :
+    x( x_in ), y( y_in )
   {
   }
 
   int x;
   int y;
 };
+typedef boost::shared_ptr< MousePosition > MousePositionHandle;
 
 class MouseHistory
 {
@@ -177,17 +178,17 @@ public:
   Utils::DataVolumeSliceHandle get_data_volume_slice( const std::string& layer_id );
 
   // -- Mutex and lock --
-public: 
+private:
+
   typedef boost::recursive_mutex mutex_type;
   typedef boost::unique_lock< mutex_type > lock_type;
 
-  mutex_type& get_mutex()
+  inline mutex_type& get_mutex()
   {
-    return this->layer_map_mutex_;
+    return this->internal_mutex_;
   }
 
-private:
-  mutex_type layer_map_mutex_;
+  mutex_type internal_mutex_;
 
   // -- Other functions and variables --
 public:
@@ -220,6 +221,8 @@ private:
 
   // Counts the number of times the slice number is locked (unchangeable)
   size_t slice_lock_count_;
+
+  MousePositionHandle wheel_position_;
 
   typedef std::multimap< std::string, boost::signals2::connection > connection_map_type;
   connection_map_type layer_connection_map_;

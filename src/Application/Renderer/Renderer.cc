@@ -155,10 +155,15 @@ void Renderer::initialize()
 
 void Renderer::redraw()
 {
+  if ( !this->is_active() )
+  {
+    return;
+  }
+
 #if MULTITHREADED_RENDERING
   if ( !is_eventhandler_thread() )
   {
-    boost::unique_lock<boost::recursive_mutex> lock( this->redraw_needed_mutex_ );
+    lock_type lock( this->redraw_needed_mutex_ );
     this->redraw_needed_ = true;
     this->post_event( boost::bind( &Renderer::redraw, this ) );
     return;
@@ -166,7 +171,7 @@ void Renderer::redraw()
 #else
   if ( !Interface::IsInterfaceThread() )
   {
-    boost::unique_lock< boost::recursive_mutex > lock( redraw_needed_mutex_ );
+    lock_type lock( this->redraw_needed_mutex_ );
     this->redraw_needed_ = true;
     Interface::PostEvent( boost::bind( &Renderer::redraw, this ) );
     return;
@@ -176,8 +181,8 @@ void Renderer::redraw()
 #endif
 
   {
-    boost::unique_lock< boost::recursive_mutex > lock( this->redraw_needed_mutex_ );
-    if ( this->redraw_needed_ == false )
+    lock_type lock( this->redraw_needed_mutex_ );
+    if ( !this->redraw_needed_ )
     {
       return;
     }
@@ -395,10 +400,12 @@ void Renderer::resize( int width, int height )
   glViewport( 0, 0, this->width_, this->height_ );
 
   {
-    boost::unique_lock< boost::recursive_mutex > lock( this->redraw_needed_mutex_ );
+    lock_type lock( this->redraw_needed_mutex_ );
     this->redraw_needed_ = true;
   }
 
+  // Getting here means the size is valid, make sure that the renderer is active
+  this->activate();
   this->redraw();
 }
 
