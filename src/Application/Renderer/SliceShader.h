@@ -49,11 +49,11 @@ public:
   bool initialize();
   void enable();
   void disable();
-  void set_texture( int tex_unit );
+  void set_slice_texture( int tex_unit );
+  void set_pattern_texture( int tex_unit );
   void set_mask_mode( bool mask_mode );
   void set_opacity( float opacity );
-  void set_scale( float scale );
-  void set_bias( float bias );
+  void set_scale_bias( float scale, float bias );
 
 private:
 
@@ -62,11 +62,11 @@ private:
   Utils::GLSLProgramHandle glsl_prog_;
   Utils::GLSLShaderHandle glsl_frag_shader_;
 
-  int tex_loc_;
+  int slice_tex_loc_;
+  int pattern_tex_loc_;
   int mask_mode_loc_;
   int opacity_loc_;
-  int scale_loc_;
-  int bias_loc_;
+  int scale_bias_loc_;
 
   const static char* FRAG_SHADER_SOURCE_C[];
 };

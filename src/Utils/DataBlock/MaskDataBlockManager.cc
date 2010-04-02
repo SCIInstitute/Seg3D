@@ -83,6 +83,13 @@ bool MaskDataBlockManager::create( size_t nx, size_t ny, size_t nz, MaskDataBloc
 
   // Generate the new mask
   mask = MaskDataBlockHandle( new MaskDataBlock( data_block, mask_bit ) );
+  // Clear the mask before using it
+  // TODO: we might want to put this logic in the constructor of MaskVolume
+  size_t data_size = nx * ny * nz;
+  for ( size_t i = 0; i< data_size; i++ )
+  {
+    mask->clear_mask_at( i );
+  }
 
   // Mark the bitplane as being used before returning the mask
   mask_list_[ mask_entry_index ].bits_used_[ mask_bit ] = 1;
@@ -92,7 +99,7 @@ bool MaskDataBlockManager::create( size_t nx, size_t ny, size_t nz, MaskDataBloc
 }
 
 void
-MaskDataBlockManager::release(DataBlockHandle& datablock, unsigned int mask_bit)
+MaskDataBlockManager::release( DataBlockHandle& datablock, unsigned int mask_bit )
 {
   lock_type lock( get_mutex() );
 

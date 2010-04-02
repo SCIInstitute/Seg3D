@@ -76,6 +76,16 @@ public:
   }
 };
 
+static const unsigned char MASK_PATTERNS_C[][ 8 ][ 8 ] =
+{
+  { { 0, 0, 0, 255, 255, 255, 0, 0 }, { 0, 0, 0, 0, 255, 255, 255, 0 }, 
+    { 0, 0, 0, 0, 0, 255, 255, 255 }, { 255, 0, 0, 0, 0, 0, 255, 255 },
+    { 255, 255, 0, 0, 0, 0, 0, 255 }, { 255, 255, 255, 0, 0, 0, 0, 0 },
+    { 0, 255, 255, 255, 0, 0, 0, 0 }, { 0, 0, 255, 255, 255, 0, 0, 0 } }
+};
+
+static const int NUM_OF_PATTERNS_C = sizeof( MASK_PATTERNS_C ) / 64;
+
 Renderer::Renderer() :
   ViewerRenderer(), 
   EventHandler(), 
@@ -144,7 +154,27 @@ void Renderer::initialize()
     this->frame_buffer_->attach_renderbuffer( depth_buffer_, GL_DEPTH_ATTACHMENT_EXT );
     this->cube_ = Utils::UnitCubeHandle( new Utils::UnitCube() );
     this->slice_shader_->initialize();
+    this->pattern_texture_ = Utils::Texture3DHandle( new Utils::Texture3D );
+    this->pattern_texture_->set_image( 8, 8, NUM_OF_PATTERNS_C, GL_ALPHA, 
+      MASK_PATTERNS_C, GL_ALPHA, GL_UNSIGNED_BYTE );
   }
+
+  SCI_CHECK_OPENGL_ERROR();
+
+  this->slice_shader_->enable();
+  this->slice_shader_->set_slice_texture( 0 );
+  this->slice_shader_->set_pattern_texture( 1 );
+  this->slice_shader_->disable();
+  Utils::Texture::SetActiveTextureUnit( 1 );
+  this->pattern_texture_->bind();
+  this->pattern_texture_->set_mag_filter( GL_LINEAR );
+  this->pattern_texture_->set_min_filter( GL_LINEAR );
+  this->pattern_texture_->set_wrap_s( GL_REPEAT );
+  this->pattern_texture_->set_wrap_t( GL_REPEAT );
+  this->pattern_texture_->set_wrap_r( GL_CLAMP );
+  Utils::Texture::SetActiveTextureUnit( 0 );
+
+  SCI_CHECK_OPENGL_ERROR();
 
   this->add_connection( ViewerManager::Instance()->get_viewer( this->viewer_id_ )
     ->redraw_signal_.connect( boost::bind( &Renderer::redraw, this ) ) );
@@ -266,12 +296,13 @@ void Renderer::redraw()
     double left, right, top, bottom;
     view2d.compute_clipping_planes( this->width_ / ( 1.0 * this->height_ ), 
       left, right, bottom, top );
-    gluOrtho2D( left, right, bottom, top );
+    Utils::Matrix proj_mat;
+    Utils::Transform::BuildOrtho2DMatrix( proj_mat, left, right, bottom, top );
+    glMultMatrixd( proj_mat.data() );
     glMatrixMode( GL_MODELVIEW );
     glLoadIdentity();
 
     this->slice_shader_->enable();
-    this->slice_shader_->set_texture( 0 );
 
     Utils::VolumeSlice* volume_slice = 0;
     for ( size_t layer_num = 0; layer_num < layer_scene->size(); layer_num++ )
@@ -303,8 +334,7 @@ void Renderer::redraw()
           
           double scale = 1.0 / contrast;
           double bias = 1.0 - ( 1.0 - brightness ) * scale;
-          this->slice_shader_->set_scale( static_cast< float >( scale ) );
-          this->slice_shader_->set_bias( static_cast< float >( bias ) );
+          this->slice_shader_->set_scale_bias( scale, bias );
         }
         break;
       case Utils::VolumeType::MASK_E:
@@ -321,22 +351,31 @@ void Renderer::redraw()
         continue;
       } // end switch
 
+      // Compute the size of the slice on screen
+      Utils::Vector slice_x( volume_slice->right() - volume_slice->left(), 0.0, 0.0 );
+      slice_x = proj_mat * slice_x;
+      double slice_screen_width = slice_x.x() / 2.0 * this->width_;
+      double slice_screen_height = ( volume_slice->top() - volume_slice->bottom() ) / 
+        ( volume_slice->right() - volume_slice->left() ) * slice_screen_width;
+
       this->slice_shader_->set_opacity( static_cast< float >( layer_item->opacity_ ) );
       Utils::TextureHandle slice_tex = volume_slice->get_texture();
       Utils::Texture::lock_type slice_tex_lock( slice_tex->get_mutex() );
-      slice_tex->enable();
-      glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+      slice_tex->bind();
       glBegin( GL_QUADS );
-      glTexCoord2f( 0.0f, 0.0f );
+      glMultiTexCoord2f( GL_TEXTURE0, 0.0f, 0.0f );
+      glMultiTexCoord3f( GL_TEXTURE1, 0.0f, 0.0f, 0.0f );
       glVertex2d( volume_slice->left(), volume_slice->bottom() );
-      glTexCoord2f( 1.0f, 0.0f );
+      glMultiTexCoord2f( GL_TEXTURE0, 1.0f, 0.0f );
+      glMultiTexCoord3f( GL_TEXTURE1, slice_screen_width / 8.0f, 0.0f, 0.0f );
       glVertex2d( volume_slice->right(), volume_slice->bottom() );
-      glTexCoord2f( 1.0f, 1.0f );
+      glMultiTexCoord2f( GL_TEXTURE0, 1.0f, 1.0f );
+      glMultiTexCoord3f( GL_TEXTURE1, slice_screen_width / 8.0f, slice_screen_height / 8.0f, 0.0f );
       glVertex2d( volume_slice->right(), volume_slice->top() );
-      glTexCoord2f( 0.0f, 1.0f );
+      glMultiTexCoord2f( GL_TEXTURE0, 0.0f, 1.0f );
+      glMultiTexCoord3f( GL_TEXTURE1, 0.0f, slice_screen_height / 8.0f, 0.0f );
       glVertex2d( volume_slice->left(), volume_slice->top() );
       glEnd();
-      slice_tex->disable();
 
     } // end for
 

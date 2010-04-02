@@ -107,9 +107,14 @@ public:
 
   // MASK_BIT
   // Get the bit that describes the mask
-  unsigned int mask_bit()
+  unsigned int mask_bit() const
   {
     return this->mask_bit_;
+  }
+
+  inline unsigned char mask_tester() const
+  {
+    return this->bit_tester_;
   }
 
   // DATA_BLOCK
@@ -123,7 +128,7 @@ public:
     return data_block_;
   }
 
-  inline unsigned char get_mask_at( size_t x, size_t y, size_t z ) const
+  inline bool get_mask_at( size_t x, size_t y, size_t z ) const
   {
     return this->get_mask_at( this->to_index( x, y, z ) );
   }

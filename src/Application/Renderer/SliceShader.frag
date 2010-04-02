@@ -1,24 +1,26 @@
 // GLSL fragment shader for rendering a slice
 
-uniform sampler2D tex;
+uniform sampler2D slice_tex;
+uniform sampler3D pattern_tex;
 uniform bool mask_mode;
 uniform float opacity;
-uniform float scale;
-uniform float bias;
+uniform vec2 scale_bias;
+uniform ivec2 size;
 uniform int color_index;
 
 vec4 shade_data_slice()
 {
-  float value = texture2D( tex, gl_TexCoord[0].st ).r;
-  value = value * scale + bias;
+  float value = texture2D( slice_tex, gl_TexCoord[0].st ).r;
+  value = value * scale_bias[0] + scale_bias[1];
   return vec4( vec3( value ), opacity );
 }
 
 vec4 shade_mask_slice()
 {
-  float alpha = texture2D( tex, gl_TexCoord[0].st ).a;
-  if ( alpha == 0.0 ) discard;
-  return vec4( 0.0, 0.5, 0.5, alpha * opacity );
+  float mask = texture2D( slice_tex, gl_TexCoord[0].st ).a;
+  if ( mask == 0.0 ) discard;
+  float pattern = texture3D( pattern_tex, gl_TexCoord[1].stp ).a;
+  return vec4( 1.0, 0.6, 0.0, pattern * opacity );
 }
 
 void main()

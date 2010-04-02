@@ -62,6 +62,7 @@ protected:
 public:
   void enable();
   void disable();
+  void bind();
   
   void set_parameter(unsigned int param_name, int param_value);
   void set_mag_filter( int filter );

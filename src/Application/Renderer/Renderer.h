@@ -82,6 +82,7 @@ private:
   Utils::FramebufferObjectHandle frame_buffer_;
   Utils::UnitCubeHandle cube_;
   SliceShaderHandle slice_shader_;
+  Utils::Texture3DHandle pattern_texture_;
 
   int active_render_texture_;
 

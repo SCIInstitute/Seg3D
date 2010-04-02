@@ -72,11 +72,11 @@ bool SliceShader::initialize()
   }
 
   this->glsl_prog_->enable();
-  this->tex_loc_ = this->glsl_prog_->get_uniform_location( "tex" );
+  this->slice_tex_loc_ = this->glsl_prog_->get_uniform_location( "slice_tex" );
+  this->pattern_tex_loc_ = this->glsl_prog_->get_uniform_location( "pattern_tex" );
   this->opacity_loc_ = this->glsl_prog_->get_uniform_location( "opacity" );
   this->mask_mode_loc_ = this->glsl_prog_->get_uniform_location( "mask_mode" );
-  this->scale_loc_ = this->glsl_prog_->get_uniform_location( "scale" );
-  this->bias_loc_ = this->glsl_prog_->get_uniform_location( "bias" );
+  this->scale_bias_loc_ = this->glsl_prog_->get_uniform_location( "scale_bias" );
   this->glsl_prog_->disable();
 
   this->valid_ = true;
@@ -95,9 +95,14 @@ void SliceShader::disable()
   this->glsl_prog_->disable();
 }
 
-void SliceShader::set_texture( int tex_unit )
+void SliceShader::set_slice_texture( int tex_unit )
 {
-  glUniform1i( this->tex_loc_, tex_unit );
+  glUniform1i( this->slice_tex_loc_, tex_unit );
+}
+
+void SliceShader::set_pattern_texture( int tex_unit )
+{
+  glUniform1i( this->pattern_tex_loc_, tex_unit );
 }
 
 void SliceShader::set_opacity( float opacity )
@@ -110,14 +115,9 @@ void SliceShader::set_mask_mode( bool mask_mode )
   glUniform1i( this->mask_mode_loc_, mask_mode );
 }
 
-void SliceShader::set_scale( float scale )
+void SliceShader::set_scale_bias( float scale, float bias )
 {
-  glUniform1f( this->scale_loc_, scale );
-}
-
-void SliceShader::set_bias( float bias )
-{
-  glUniform1f( this->bias_loc_, bias );
+  glUniform2f( this->scale_bias_loc_, scale, bias );
 }
 
 } // end namespace Seg3D
