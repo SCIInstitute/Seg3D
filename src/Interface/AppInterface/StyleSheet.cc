@@ -95,7 +95,7 @@ namespace Seg3D
     "QWidget#base_{"
     " background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227,"
     "   stop:0 rgba(211, 211, 211, 255),"
-    "   stop:0.155779 rgba(225, 225, 225, 215),"
+    "   stop:0.155779 rgba(225, 225, 225, 255),"
     "   stop:1 rgba(194, 194, 194, 255));"
     " border-radius: 6px;"
     " border: 1px solid rgb(90, 90, 90);"

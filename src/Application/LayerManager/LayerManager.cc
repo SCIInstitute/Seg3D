@@ -100,7 +100,11 @@ bool LayerManager::insert_layer( LayerHandle layer )
 
 bool LayerManager::insert_layer_above( std::string layer_to_insert_id, std::string layer_below_id )
 {
+  // we will need to keep track of a few things outside of the locked scope
+  // This keeps track of whether or not we delete the group we are moving from
   bool group_above_has_been_deleted = false;
+  
+  // These handles will let us send signals after we make the moves
   LayerGroupHandle group_above;
   LayerGroupHandle group_below;
   
@@ -151,7 +155,9 @@ bool LayerManager::insert_layer_above( std::string layer_to_insert_id, std::stri
     group_changed_signal_( group_above );
   }
   
-  group_changed_signal_( group_below );
+  if( group_above != group_below )
+    group_changed_signal_( group_below );
+  
   return true;
   
 }

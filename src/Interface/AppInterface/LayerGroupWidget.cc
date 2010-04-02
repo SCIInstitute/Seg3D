@@ -77,7 +77,9 @@ public:
   
 LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
   private_( new LayerGroupWidgetPrivate )
-{
+{ 
+  this->setUpdatesEnabled( false );
+  
     LayerGroupHandle group = layer->get_layer_group();
 
   this->setParent( parent );
@@ -271,7 +273,7 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
         
         QtBridge::Connect( this->private_->ui_.transform_replace_checkBox_, group->transform_replace_state_ );
         
-        
+        this->setUpdatesEnabled( true );
 
 }
   
@@ -294,9 +296,10 @@ void LayerGroupWidget::delete_layer( LayerHandle layer )
   {
         if( layer->get_layer_id() == ( *i )->get_layer_id() )
       {
+      this->setUpdatesEnabled( false );
           ( *i )->deleteLater();
           layer_list_.erase( i );
-          this->repaint();
+      this->setUpdatesEnabled( true );
           return;
       }
   }    
@@ -305,6 +308,7 @@ void LayerGroupWidget::delete_layer( LayerHandle layer )
 
 void LayerGroupWidget::set_active_layer( LayerHandle layer )
 {
+  this->setUpdatesEnabled( false );
     for( int i = 0; i < layer_list_.size(); ++i)
   {
       if( layer->get_layer_id() == layer_list_[i]->get_layer_id() )
@@ -316,7 +320,7 @@ void LayerGroupWidget::set_active_layer( LayerHandle layer )
           layer_list_[i]->set_active( false );
       }
   }
-  this->repaint();
+  this->setUpdatesEnabled( true );
 }
 
 void  LayerGroupWidget::set_active( bool active )
@@ -410,9 +414,12 @@ void LayerGroupWidget::show_selection_checkboxes( bool show )
 
 void LayerGroupWidget::adjust_new_size_labels( double scale_factor )
 {
-    this->private_->ui_.x_axis_label_new_->setText( QString::fromUtf8("X: ") + QString::number(this->private_->current_width * scale_factor ) );
-  this->private_->ui_.y_axis_label_new_->setText( QString::fromUtf8("Y: ") + QString::number(this->private_->current_height * scale_factor ) );
-  this->private_->ui_.z_axis_label_new_->setText( QString::fromUtf8("Z: ") + QString::number(this->private_->current_depth * scale_factor ) );
+    this->private_->ui_.x_axis_label_new_->setText( QString::fromUtf8("X: ") + 
+    QString::number(this->private_->current_width * scale_factor ) );
+  this->private_->ui_.y_axis_label_new_->setText( QString::fromUtf8("Y: ") + 
+    QString::number(this->private_->current_height * scale_factor ) );
+  this->private_->ui_.z_axis_label_new_->setText( QString::fromUtf8("Z: ") + 
+    QString::number(this->private_->current_depth * scale_factor ) );
 }
   
   
@@ -585,7 +592,7 @@ void LayerGroupWidget::mousePressEvent(QMouseEvent *event)
   
   // Calculate the location on the widget for the mouse to be holding
   // We have to account for the offset of the header in the GroupLayerWidget
-  QPoint hotSpot = event->pos() - QPoint( 2, 25 ) - layer_to_drag->pos();
+  QPoint hotSpot = event->pos() - this->private_->ui_.group_frame_->pos() - layer_to_drag->pos();
   
   // Create some Item data. - THIS IS CURRENTLY NOT REALLY BEING USED
   QByteArray itemData;
@@ -595,7 +602,23 @@ void LayerGroupWidget::mousePressEvent(QMouseEvent *event)
 
   // Make up some mimedata containing the layer_id of the layer
   QMimeData *mimeData = new QMimeData;
-  mimeData->setData( "layer_id", itemData );
+  
+  switch ( layer_to_drag->get_volume_type() ) 
+  {
+    case Utils::VolumeType::DATA_E:
+      mimeData->setData( "data_layer_id", itemData );
+      break;
+    case Utils::VolumeType::MASK_E:
+      mimeData->setData( "mask_layer_id", itemData );
+      break;
+    case Utils::VolumeType::LABEL_E:
+      mimeData->setData( "label_layer_id", itemData );
+      break;
+    default:
+      break;
+  }
+  
+  //mimeData->setData( "layer_id", itemData );
   mimeData->setText( QString::fromStdString( layer_to_drag->get_layer_id() ) );
   
   // Create a drag object and insert the hotspot, and mimedata
@@ -608,24 +631,11 @@ void LayerGroupWidget::mousePressEvent(QMouseEvent *event)
   // Next we hide the LayerWidget that we are going to be dragging.
   layer_to_drag->hide();
   
-  // Here we either close the layer if we are successful with our drag, 
-  //  or show it again if we aren't
-  if (drag->exec(Qt::MoveAction | Qt::CopyAction, Qt::CopyAction) == Qt::MoveAction)
-  { 
-    layer_to_drag->close();
-  }
-  else
-  {
+  Qt::DropActions test = drag->exec( Qt::CopyAction, Qt::CopyAction );
+  
+  if ( this->check_for_layer( layer_to_drag->get_layer_id() ) )
     layer_to_drag->show();
-    
-    // Set the style sheets back to what they should be
-    for( int i = 0; i < static_cast< int >( this->layer_list_.size() ); ++i )
-    {           
-      {
-        this->layer_list_[i]->set_drop( false );
-      }
-    }
-  }
+
 }
 
 
@@ -635,15 +645,23 @@ void LayerGroupWidget::dragEnterEvent(QDragEnterEvent* event)
   bool found_valid_layer = false;
   
   // If its a valid dropsite then we color the LayerWidget appropriately
-  if ( potential_drop_site  && event->mimeData()->hasFormat("layer_id") ) 
+  if ( potential_drop_site ) 
   { 
     for( int i = 0; i < static_cast< int >( this->layer_list_.size() ); ++i )
     {
       if( this->layer_list_[i] == potential_drop_site ) 
       {
         //TODO: we need to add logic to prevent certain illegal drag and drop.
-        this->layer_list_[i]->set_drop( true );
-        found_valid_layer = true;
+        if( ( ( potential_drop_site->get_volume_type() == Utils::VolumeType::DATA_E ) &&
+            ( event->mimeData()->hasFormat("data_layer_id") ) ) ||
+           ( ( potential_drop_site->get_volume_type() == Utils::VolumeType::MASK_E ) &&
+            ( event->mimeData()->hasFormat("mask_layer_id") ) ) ||
+           ( ( potential_drop_site->get_volume_type() == Utils::VolumeType::LABEL_E ) &&
+            ( event->mimeData()->hasFormat("label_layer_id") ) ) )
+        {
+          this->layer_list_[i]->set_drop( true );
+          found_valid_layer = true;
+        }
       }
       else
       {
@@ -678,7 +696,7 @@ void LayerGroupWidget::dropEvent(QDropEvent* event)
   
   if ( drop_site)
   {
-    // Here we see if the LayerWidget they are dragging is from the current layer
+    // Here we see if the LayerWidget they are dragging is from the current group
     LayerWidget_handle layer = this->check_for_layer( event->mimeData()->text().toStdString() );
 
     // if it's not we ask them if they want to resample the layer they are dragging
@@ -689,7 +707,7 @@ void LayerGroupWidget::dropEvent(QDropEvent* event)
       confirm_resample_messagebox.setText( QString::fromUtf8( 
         "\nMoving the file will resample the layer to " )
         + QString::number( this->private_->current_height ) 
-        + QString::fromUtf8( " x " ) 
+        + QString::fromUtf8( " x " )
         + QString::number( this->private_->current_width )
         + QString::fromUtf8( " x " )
         + QString::number( this->private_->current_depth )
@@ -728,6 +746,7 @@ void LayerGroupWidget::dropEvent(QDropEvent* event)
         drop_site->get_layer_id() );
     }
   }
+  event->ignore();
 }
 
 
@@ -735,7 +754,7 @@ void LayerGroupWidget::dropEvent(QDropEvent* event)
 LayerWidget_handle LayerGroupWidget::validate_location(const QPoint &point )
 {
   // because the header counts as part of the group we need to account for its offset
-  QPoint header_difference = QPoint(2, 25);
+  QPoint header_difference = this->private_->ui_.group_frame_->pos();
   // we create a temporary rectangle to represent the size of the widget
   QRect rectangle;
   
@@ -744,8 +763,6 @@ LayerWidget_handle LayerGroupWidget::validate_location(const QPoint &point )
   {
     rectangle = this->layer_list_[i]->geometry();
     rectangle.setTopLeft( rectangle.topLeft() + header_difference );
-    rectangle.setTopRight( rectangle.topRight() + header_difference );
-    rectangle.setBottomLeft( rectangle.bottomLeft() + header_difference );
     rectangle.setBottomRight( rectangle.bottomRight() + header_difference );
     if( rectangle.contains( point ) )
     {

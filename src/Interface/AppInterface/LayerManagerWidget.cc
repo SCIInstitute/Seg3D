@@ -98,9 +98,10 @@ void LayerManagerWidget::delete_layer( LayerGroupHandle group )
 
 void LayerManagerWidget::make_new_group( LayerHandle layer )
 {
+  this->setUpdatesEnabled( false );
     LayerGroupWidget_handle new_group_handle( new LayerGroupWidget( this->main_, layer ) );
   this->group_layout_->addWidget( new_group_handle.data() );
-  new_group_handle->repaint();
+  this->setUpdatesEnabled( true );
   this->group_list_.push_back( new_group_handle );
 }
 
@@ -112,6 +113,9 @@ bool LayerManagerWidget::refresh_group( LayerGroupHandle group )
   {
     if ( group->get_group_id() == ( *i )->get_group_id() ) 
     {
+      // turn off visual updates
+      ( *i )->setUpdatesEnabled( false );
+      
       // delete all the existing gui layers
       ( *i )->clear_all_layers();
 
@@ -121,13 +125,51 @@ bool LayerManagerWidget::refresh_group( LayerGroupHandle group )
       { 
         ( *i )->add_layer( ( *j ) );
       }
-      // exit when we are done
-      ( *i )->repaint();
+      
+      // turn them back on when we are done.
+      ( *i )->setUpdatesEnabled( true );
+      this->setUpdatesEnabled( true );
+      this->main_->parentWidget()->repaint( this->main_->parentWidget()->rect() );
+
       return true;
     }   
   }
   return false;
 }
+  
+//bool LayerManagerWidget::refresh_group( LayerGroupHandle group )
+//{
+//  this->setUpdatesEnabled( false );
+//  
+//  delete_group( group );
+//  layer_list_type temp_layer_list = group->get_layer_list();
+//  
+//  make_new_group( *(temp_layer_list.rbegin()) );
+//  
+//  for ( QList< LayerGroupWidget_handle >::iterator i = this->group_list_.begin(); 
+//     i  != this->group_list_.end(); i++ )
+//  {
+//    if ( group->get_group_id() == ( *i )->get_group_id() ) 
+//    {
+//      // turn off visual updates
+//      ( *i )->setUpdatesEnabled( false );
+//      
+//      for( layer_list_type::reverse_iterator j = ++temp_layer_list.rbegin(); j != temp_layer_list.rend(); ++j )
+//      { 
+//        ( *i )->add_layer( ( *j ) );
+//      }
+//      
+//      // turn them back on when we are done.
+//      ( *i )->setUpdatesEnabled( true );
+//      this->setUpdatesEnabled( true );
+//      this->main_->parentWidget()->repaint( this->main_->parentWidget()->rect() );
+//      
+//      return true;
+//    }   
+//  }
+//  this->setUpdatesEnabled( true );
+//  return false;
+//}
 
 
   
@@ -148,7 +190,7 @@ void LayerManagerWidget::delete_group( LayerGroupHandle group )
 
 void  LayerManagerWidget::set_active_layer( LayerHandle layer )
 {
-  setUpdatesEnabled( false );
+  this->setUpdatesEnabled( false );
     set_active_group( layer->get_layer_group() );   
     
     for ( QList< LayerGroupWidget_handle >::iterator i = this->group_list_.begin(); 
@@ -157,13 +199,14 @@ void  LayerManagerWidget::set_active_layer( LayerHandle layer )
       ( *i )->set_active_layer( layer );
   }
 
-  setUpdatesEnabled( true );
+  this->setUpdatesEnabled( true );
   update();
 }
 
   
 void LayerManagerWidget::set_active_group( LayerGroupHandle group )
 {
+
     for ( QList< LayerGroupWidget_handle >::iterator i = this->group_list_.begin(); 
      i  != this->group_list_.end(); i++ )
   {

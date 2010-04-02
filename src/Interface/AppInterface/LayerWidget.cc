@@ -247,6 +247,9 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
     default:
       break;
   }
+  
+  this->setUpdatesEnabled( true );
+  
 }
   
   
