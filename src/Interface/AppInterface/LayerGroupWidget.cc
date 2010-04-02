@@ -590,6 +590,11 @@ void LayerGroupWidget::mousePressEvent(QMouseEvent *event)
     return;
   }
   
+  if( validate_location( event->pos()) )
+  {
+    
+  }
+  
   // Calculate the location on the widget for the mouse to be holding
   // We have to account for the offset of the header in the GroupLayerWidget
   QPoint hotSpot = event->pos() - this->private_->ui_.group_frame_->pos() - layer_to_drag->pos();
@@ -692,9 +697,15 @@ void LayerGroupWidget::dragLeaveEvent( QDragLeaveEvent * event )
 void LayerGroupWidget::dropEvent(QDropEvent* event)
 {
   // First we validate the location
-  LayerWidget_handle drop_site = validate_location( event->pos());
+  LayerWidget_handle drop_site = validate_location( event->pos() );
   
-  if ( drop_site)
+  if( drop_site->get_layer_id() == event->mimeData()->text().toStdString() )
+  {
+    event->ignore();
+    return;
+  }
+  
+  if ( drop_site )
   {
     // Here we see if the LayerWidget they are dragging is from the current group
     LayerWidget_handle layer = this->check_for_layer( event->mimeData()->text().toStdString() );
@@ -723,6 +734,7 @@ void LayerGroupWidget::dropEvent(QDropEvent* event)
         // If they do want to resample, we dispatch the move function
         // TODO: we need to actually resample the layer
         case QMessageBox::Yes:
+          event->accept();
           ActionInsertLayerAbove::Dispatch( event->mimeData()->text().toStdString(), 
             drop_site->get_layer_id() );
           break;
@@ -741,6 +753,7 @@ void LayerGroupWidget::dropEvent(QDropEvent* event)
     }
     else
     {
+      event->accept();
       // If they are just reordering the layers within the group we just do it.
       ActionInsertLayerAbove::Dispatch( event->mimeData()->text().toStdString(), 
         drop_site->get_layer_id() );
