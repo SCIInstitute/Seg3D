@@ -63,6 +63,7 @@ DataVolumeSlice::~DataVolumeSlice()
 
 void DataVolumeSlice::initialize_texture()
 {
+/*
   if ( !this->texture_ )
   {
     internal_lock_type lock( this->internal_mutex_ );
@@ -75,6 +76,7 @@ void DataVolumeSlice::initialize_texture()
       this->texture_->set_wrap_t( GL_CLAMP_TO_EDGE );
     }
   }
+*/
 }
 
 
@@ -124,16 +126,23 @@ void DataVolumeSlice::upload_texture()
   if ( !this->slice_changed_ )
     return;
 
+  this->texture_ = Texture2DHandle( new Texture2D );
+  this->texture_->enable();
+  this->texture_->set_mag_filter( GL_LINEAR );
+  this->texture_->set_min_filter( GL_LINEAR );
+  this->texture_->set_wrap_s( GL_CLAMP_TO_EDGE );
+  this->texture_->set_wrap_t( GL_CLAMP_TO_EDGE );
+
   // Lock the texture
   Texture::lock_type tex_lock( this->texture_->get_mutex() );
 
   //if ( this->size_changed_ )
   //{
   //  // Make sure there is no pixel unpack buffer bound
-  //  PixelUnpackBuffer::RestoreDefault();
+    PixelUnpackBuffer::RestoreDefault();
 
-  //  this->texture_->set_image( static_cast< int >( this->nx_ ), 
-  //    static_cast< int >( this->ny_ ), TEXTURE_FORMAT_C );
+    this->texture_->set_image( static_cast< int >( this->nx_ ), 
+      static_cast< int >( this->ny_ ), TEXTURE_FORMAT_C );
   //  this->size_changed_ = false;
   //}
   
@@ -186,10 +195,10 @@ void DataVolumeSlice::upload_texture()
   pixel_buffer->unmap_buffer();
   SCI_CHECK_OPENGL_ERROR();
   glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
-  //this->texture_->set_sub_image( 0, 0, static_cast<int>( this->nx_ ), 
-  //  static_cast<int>( this->ny_ ), NULL, GL_LUMINANCE, TEXTURE_DATA_TYPE_C );
-  this->texture_->set_image( static_cast<int>( this->nx_ ), static_cast<int>( this->ny_ ),
-    TEXTURE_FORMAT_C, NULL, GL_LUMINANCE, TEXTURE_DATA_TYPE_C );
+  this->texture_->set_sub_image( 0, 0, static_cast<int>( this->nx_ ), 
+    static_cast<int>( this->ny_ ), NULL, GL_LUMINANCE, TEXTURE_DATA_TYPE_C );
+  //this->texture_->set_image( static_cast<int>( this->nx_ ), static_cast<int>( this->ny_ ),
+  //  TEXTURE_FORMAT_C, NULL, GL_LUMINANCE, TEXTURE_DATA_TYPE_C );
   //PixelUnpackBuffer::RestoreDefault();
   //this->texture_->set_sub_image( 0, 0, static_cast<int>( this->nx_ ), 
   //    static_cast<int>( this->ny_ ), buffer, GL_LUMINANCE, TEXTURE_DATA_TYPE_C );
@@ -198,6 +207,7 @@ void DataVolumeSlice::upload_texture()
   // Step 3. release the pixel unpack buffer
   // NOTE: The texture streaming will still succeed even if the PBO is deleted.
   pixel_buffer->unbind();
+  this->texture_->disable();
 
   this->slice_changed_ = false;
 }
