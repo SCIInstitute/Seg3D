@@ -46,22 +46,50 @@
 namespace Seg3D
 {
 
+// Forward declaration for class describing the internals of the ImporterWidget
 class LayerImporterWidgetPrivate;
 typedef boost::shared_ptr< LayerImporterWidgetPrivate > LayerImporterWidgetPrivateHandle;
+
+// CLASS LAYERIMPORTERWIDGET:
+// Dialog that is opened after the user has selected a filename
 
 class LayerImporterWidget : public QDialog
 {
   // Needed to make it a Qt object
 Q_OBJECT
 
-//constructor - destructor
+  // -- constructor/destructor --
 public:
   typedef QPointer< LayerImporterWidget > qpointer_type;
 
   LayerImporterWidget( LayerImporterHandle importer, QWidget *parent = 0 );
   virtual ~LayerImporterWidget();
+    
+private Q_SLOTS:
 
+  // SLOTS: These functions connect to the buttons for importing the data as a specific
+  // layer type.
+  void set_data();
+  void set_single_mask();
+  void set_bitplane_mask();
+  void set_label_mask();
 
+  // SLOT IMPORT: execute this function when the import button is selected
+  void import();
+  
+private:
+  // UPDATE_ICONS:
+  // Update the icons to reflect active mode
+  void update_icons();
+
+  // SET_MODE:
+  // Set the mode of the importer
+  void set_mode( LayerImporterMode mode );
+  
+  // LIST_IMPORT_OPTIONS:
+  // Prompt for the import options that are available
+  void list_import_options();
+  
 private:
   // The importer that was chosen in the filedialog
   LayerImporterHandle importer_;
@@ -72,29 +100,7 @@ private:
   // The current active mode
   LayerImporterMode mode_;
   
-  // Update the icons to reflect active mode
-  void update_icons();
-  
-private Q_SLOTS:
-
-  // SLOTS: These functions connect to the buttons for importing the data as a specific
-  // layer type.
-  void set_data() { set_mode( LayerImporterMode::DATA_E ); }
-  void set_single_mask() { set_mode( LayerImporterMode::SINGLE_MASK_E ); }
-  void set_bitplane_mask() { set_mode( LayerImporterMode::BITPLANE_MASK_E ); }
-  void set_label_mask() { set_mode( LayerImporterMode::LABEL_MASK_E ); }
-
-  void import();
-  
-private:
-  // SET_MODE:
-  // Set the mode of the importer
-  void set_mode( LayerImporterMode mode );
-  
-  // LIST_IMPORT_OPTIONS:
-  // Prompt for the import options that are available
-  void list_import_options();
-  
+private:  
   // SCANFILE:
   // Function that needs to be run asynchronously to scan the file contents
   static void ScanFile( qpointer_type qpointer, LayerImporterHandle importer ); 

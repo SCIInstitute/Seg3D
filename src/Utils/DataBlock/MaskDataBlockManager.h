@@ -44,34 +44,17 @@
 // Utils includes
 #include <Utils/Core/Singleton.h>
 #include <Utils/DataBlock/DataBlock.h>
-#include <Utils/DataBlock/StdDataBlock.h>
 #include <Utils/DataBlock/MaskDataBlock.h>
 
 namespace Utils
 {
 
-class MaskDataBlockEntry
-{
-public:
-  MaskDataBlockEntry( DataBlockHandle data_block ) :
-    data_block_( data_block ), data_masks_( 8 )
-  {
-  }
-
-  // The datablock that holds the masks
-  DataBlockHandle data_block_;
-
-  // Accounting which bits are used
-  std::bitset< 8 > bits_used_;
-
-  // Pointers to th MaskDataBlocks that represent these bitplanes
-  std::vector< MaskDataBlockWeakHandle > data_masks_;
-};
-
 // CLASS SharedDataBlockManager
 
 // Forward Declaration
 class MaskDataBlockManager;
+class MaskDataBlockManagerInternal;
+typedef boost::shared_ptr<MaskDataBlockManagerInternal> MaskDataBlockManagerInternalHandle;
 
 // Class definition
 class MaskDataBlockManager : public Utils::Singleton<MaskDataBlockManager>
@@ -80,8 +63,8 @@ class MaskDataBlockManager : public Utils::Singleton<MaskDataBlockManager>
   // -- typedefs --
 public:
   // Lock types
-  typedef boost::recursive_mutex mutex_type;
-  typedef boost::unique_lock< mutex_type > lock_type;
+  typedef boost::recursive_mutex  mutex_type;
+  typedef mutex_type::scoped_lock lock_type;
 
   // -- Constructor/destructor --
 private:
@@ -109,40 +92,35 @@ protected:
   // Function that is called by the destructor of the MaskDataBlock to
   // inform that a bitplane can be reused or that a DataBlock can be
   // released
-  void release(DataBlockHandle& datablock, unsigned int mask_bit);
+  void release( DataBlockHandle& datablock, unsigned int mask_bit );
 
-// -- Locking of the datablock --
+  // -- Locking of the datablock --
 public:
-
-  // LOCK:
-  // Lock the datablock
-  void lock()
-  {
-    mutex_.lock();
-  }
-
-  // UNLOCK:
-  // Unlock the datablock
-  void unlock()
-  {
-    mutex_.unlock();
-  }
 
   // GETMUTEX:
   // Get the mutex that locks the datablock
-  mutex_type& get_mutex()
-  {
-    return mutex_;
-  }
+  mutex_type& get_mutex();
 
-  // -- internals of the SharedDataBlockManager --
 private:
-  // List that maintains a list of which bits are used in
-  typedef std::vector< MaskDataBlockEntry > mask_list_type;
-  mask_list_type mask_list_;
+   MaskDataBlockManagerInternalHandle private_;
 
-  // Mutex that protects the list
-  mutex_type mutex_;
+  // -- functions for creating MaskDataBlocks --
+public: 
+  
+  // CREATEMASKFROMNONZERODATA:
+  // Create a mask from the non zero data contained in a datablock
+  static bool CreateMaskFromNonZeroData( const DataBlockHandle data, 
+    MaskDataBlockHandle& mask );
+
+  // CREATEMASKFROMBITPLANEDATA:
+  // Create a mask from each bitplane in integer data
+  static bool CreateMaskFromBitPlaneData( const DataBlockHandle data, 
+    std::vector<MaskDataBlockHandle>& mask );
+
+  // CREATEMASKFROMLABELDATA:
+  // Create a mask from each label in integer data
+  static bool CreateMaskFromLabelData( const DataBlockHandle data, 
+    std::vector<MaskDataBlockHandle>& mask, bool reuse_data = false );
 
 };
 

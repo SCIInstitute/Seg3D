@@ -52,7 +52,6 @@ namespace Utils
 // This class records a log entry and pushes it onto a signal so more than
 // one recorder can record the log entries.
 
-
 // Forward declaration
 class Log;
 

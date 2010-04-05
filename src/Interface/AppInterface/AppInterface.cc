@@ -296,19 +296,26 @@ void AppInterface::close_window( const std::string& windowid )
 
 void AppInterface::begin_progress( ActionProgressHandle handle )
 {
+
   // Step (1): delete any out standing progress messages
   if ( progress_.data() )
   {
     progress_->done( 0 );
   }
   
+  SCI_LOG_DEBUG( "Start progress widget" );
   progress_ = new ProgressWidget( handle, this );
   progress_->exec();
 }
 
 void AppInterface::end_progress( ActionProgressHandle handle )
 {
-  if (progress_.data() ) progress_->done( 0 );
+  SCI_LOG_DEBUG( "Finish progress widget" );
+
+  if (progress_.data() ) 
+  {
+    progress_->done( 0 );
+  }
 }
 
 void AppInterface::report_progress( ActionProgressHandle handle )

@@ -100,21 +100,23 @@ public:
 
   // DATA
   // Pointer to the block of data
-  unsigned char* data()
+  unsigned char* get_mask_data()
   {
     return  this->data_;
   }
 
-  // MASK_BIT
+  // GET_MASK_BIT:
   // Get the bit that describes the mask
-  unsigned int mask_bit() const
+  unsigned int get_mask_bit()
   {
     return this->mask_bit_;
   }
 
-  inline unsigned char mask_tester() const
+  // MASK_VALUE
+  // Get the value at which the mask is stored
+  unsigned char get_mask_value()
   {
-    return this->bit_tester_;
+    return this->mask_value_;
   }
 
   // DATA_BLOCK
@@ -123,7 +125,7 @@ public:
   // graphics card. As masks are shared the Texture will be shared
   // hence access to the datablock is needed to see whether this one
   // has already been uploaded
-  DataBlockHandle data_block()
+  DataBlockHandle get_data_block()
   {
     return data_block_;
   }
@@ -135,7 +137,7 @@ public:
 
   inline bool get_mask_at( size_t index ) const
   {
-    return ( this->data_[ index ] & this->bit_tester_ ) != 0;
+    return ( this->data_[ index ] & this->mask_value_ ) != 0;
   }
 
   inline void set_mask_at( size_t x, size_t y, size_t z )
@@ -145,7 +147,7 @@ public:
 
   inline void set_mask_at( size_t index )
   {
-    this->data_[ index ] |= this->bit_tester_;
+    this->data_[ index ] |= this->mask_value_;
   }
 
   inline void clear_mask_at( size_t x, size_t y, size_t z )
@@ -155,7 +157,7 @@ public:
 
   inline void clear_mask_at( size_t index )
   {
-    this->data_[ index ] &= ~( this->bit_tester_ );
+    this->data_[ index ] &= ~( this->mask_value_ );
   }
 
 // -- Locking of the datablock --
@@ -179,7 +181,7 @@ public:
   // this signal after modification is done.
   boost::signals2::signal<void ()> mask_updated_signal_;
 
-// -- internals of the DataBlock --
+  // -- internals of the DataBlock --
 private:
   // The dimensions of the datablock
   size_t nx_;
@@ -192,10 +194,11 @@ private:
   // The bit that is used for this mask
   const unsigned int mask_bit_;
 
-  const unsigned char bit_tester_;
+  const unsigned char mask_value_;
 
   // Cached data pointer of the underlying DataBlock
   unsigned char* data_;
+
 };
 
 } // end namespace Utils

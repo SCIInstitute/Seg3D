@@ -114,7 +114,7 @@ bool LayerManagerWidget::refresh_group( LayerGroupHandle group )
     if ( group->get_group_id() == ( *i )->get_group_id() ) 
     {
       // turn off visual updates
-      ( *i )->setUpdatesEnabled( false );
+      // ( *i )->setUpdatesEnabled( false );
       
       // delete all the existing gui layers
       ( *i )->clear_all_layers();
@@ -127,9 +127,9 @@ bool LayerManagerWidget::refresh_group( LayerGroupHandle group )
       }
       
       // turn them back on when we are done.
-      ( *i )->setUpdatesEnabled( true );
-      this->setUpdatesEnabled( true );
-      this->main_->parentWidget()->repaint( this->main_->parentWidget()->rect() );
+      // ( *i )->setUpdatesEnabled( true );
+      // this->setUpdatesEnabled( true );
+      this->main_->parentWidget()->update();
 
       return true;
     }   

@@ -104,13 +104,12 @@ public:
       "border-radius: 3px;"\
       "border: 2px solid rgb(30, 30, 30);}" );
   }
-
 };
 
 LayerImporterWidget::LayerImporterWidget( LayerImporterHandle importer, QWidget* parent ) :
   QDialog( parent ),
   importer_(importer),
-  mode_(LayerImporterMode::DATA_E)
+  mode_(LayerImporterMode::INVALID_E)
 {
   // Step (1): Ensure it will be the only focus in the pogram
   setWindowModality(  Qt::ApplicationModal );
@@ -146,45 +145,54 @@ LayerImporterWidget::~LayerImporterWidget()
 void LayerImporterWidget::list_import_options()
 {
   // Step (1): Switch off options that this importer does not support
+  int importer_modes = importer_->get_importer_modes();
 
-  if ( !( importer_->has_importer_mode( LayerImporterMode::LABEL_MASK_E ) ) )
+  if ( importer_modes & LayerImporterMode::LABEL_MASK_E )
+  {
+    private_->ui_.label_mask_->show();
+    private_->ui_.label_mask_label_->show();
+    mode_ = LayerImporterMode::LABEL_MASK_E;
+  }
+  else
   {
     private_->ui_.label_mask_->hide();
     private_->ui_.label_mask_label_->hide();
   }
-  else
-  {
-    mode_ = LayerImporterMode::LABEL_MASK_E;
-  }
 
-  if ( !( importer_->has_importer_mode( LayerImporterMode::BITPLANE_MASK_E ) ) )
+  if ( importer_modes & LayerImporterMode::BITPLANE_MASK_E )
+  {
+    private_->ui_.bitplane_mask_->show();
+    private_->ui_.bitplane_mask_label_->show();
+    mode_ = LayerImporterMode::BITPLANE_MASK_E;
+  }
+  else
   {
     private_->ui_.bitplane_mask_->hide();
     private_->ui_.bitplane_mask_label_->hide();
   }
-  else
-  {
-    mode_ = LayerImporterMode::BITPLANE_MASK_E;
-  }
 
-  if ( !( importer_->has_importer_mode( LayerImporterMode::SINGLE_MASK_E ) ) )
+  if ( importer_modes & LayerImporterMode::SINGLE_MASK_E )
+  {
+    private_->ui_.single_mask_->show();
+    private_->ui_.single_mask_label_->show();
+    mode_ = LayerImporterMode::SINGLE_MASK_E;
+  }
+  else
   {
     private_->ui_.single_mask_->hide();
     private_->ui_.single_mask_label_->hide();
   }
-  else
-  {
-    mode_ = LayerImporterMode::SINGLE_MASK_E;
-  }
 
-  if ( !( importer_->has_importer_mode( LayerImporterMode::DATA_E ) ) )
+  if ( importer_modes &  LayerImporterMode::DATA_E )
+  {
+    private_->ui_.data_->show();
+    private_->ui_.data_label_->show();
+    mode_ = LayerImporterMode::DATA_E;
+  }
+  else
   {
     private_->ui_.data_->hide();
     private_->ui_.data_label_->hide();
-  }
-  else
-  {
-    mode_ = LayerImporterMode::DATA_E;
   }
 
   // Step (2): Switch on the right icons
@@ -215,10 +223,13 @@ void LayerImporterWidget::list_import_options()
   // Step (4): Add connections for selecting and importing the data
   connect( private_->ui_.data_, SIGNAL( released() ), 
     this, SLOT( set_data() ) );
+    
   connect( private_->ui_.single_mask_, SIGNAL( released() ), 
     this, SLOT( set_single_mask() ) );
+    
   connect( private_->ui_.bitplane_mask_, SIGNAL( released() ), 
     this, SLOT( set_bitplane_mask() ) );
+    
   connect( private_->ui_.label_mask_, SIGNAL( released() ), 
     this, SLOT( set_label_mask() ) );
 
@@ -229,6 +240,8 @@ void LayerImporterWidget::list_import_options()
   private_->ui_.file_info_->show();
   private_->ui_.importer_options_->show();
   private_->ui_.scanning_file_->hide();
+  
+  // Step (6): Make the import button the default option
   private_->ui_.import_button_->setEnabled( true );
   private_->ui_.cancel_button_->setDefault( false );
   private_->ui_.cancel_button_->setAutoDefault( false );
@@ -288,13 +301,35 @@ void LayerImporterWidget::update_icons()
   }
   
   setUpdatesEnabled( true );
+  
+  // issue an update onto the Qt event queue
+  update(); 
+}
+
+void LayerImporterWidget::set_data() 
+{ 
+  set_mode( LayerImporterMode::DATA_E ); 
+}
+
+void LayerImporterWidget::set_single_mask() 
+{ 
+  set_mode( LayerImporterMode::SINGLE_MASK_E );
+}
+
+void LayerImporterWidget::set_bitplane_mask() 
+{ 
+  set_mode( LayerImporterMode::BITPLANE_MASK_E ); 
+}
+
+void LayerImporterWidget::set_label_mask() 
+{ 
+  set_mode( LayerImporterMode::LABEL_MASK_E ); 
 }
 
 void LayerImporterWidget::set_mode( LayerImporterMode mode )
 {
   mode_ = mode;
   update_icons();
-  update(); 
 }
 
 void LayerImporterWidget::import()
@@ -307,6 +342,10 @@ void LayerImporterWidget::ScanFile( qpointer_type qpointer, LayerImporterHandle 
 {
   // Step (1) : Import the file header or in some cases the full file
   bool success = importer->import_header();
+  
+  // Step (1a): If import was a success but no import modes are available we cannot proceed
+  // hence success of scanning is false.
+  if ( importer->get_importer_modes() == 0) success = false;
   
   // Step (2) : Update the widget if it still exists
   if ( success )
@@ -323,7 +362,10 @@ void LayerImporterWidget::ScanFile( qpointer_type qpointer, LayerImporterHandle 
 
 void LayerImporterWidget::ListImportOptions( qpointer_type qpointer, LayerImporterHandle importer )
 {
-  if ( qpointer.data() ) qpointer->list_import_options();
+  if ( qpointer.data() ) 
+  {
+    qpointer->list_import_options();
+  }
 }
 
 void LayerImporterWidget::ReportImportError( qpointer_type qpointer, LayerImporterHandle importer )
@@ -347,7 +389,5 @@ void LayerImporterWidget::ReportImportError( qpointer_type qpointer, LayerImport
     return; 
   }
 }
-
-
 
 }  // end namespace Seg3D

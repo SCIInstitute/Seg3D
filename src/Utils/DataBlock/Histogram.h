@@ -65,36 +65,17 @@ public:
   void compute( const float* data, size_t size );
   void compute( const double* data, size_t size );
   
-  inline double get_min() const
-  { 
-    return this->min_;
-  }
+  double get_min() const;
+  double get_max() const;
   
-  inline double get_max() const
-  { 
-    return this->max_; 
-  }
+  double get_bin_size() const;
+  double get_bin_start( size_t idx = 0) const;
+  double get_bin_end( size_t idx = 0) const;
   
-  inline double get_bin_size() const
-  {
-    return this->bin_size_;
-  }
+  std::vector<size_t> get_bins() const;
   
-  inline double get_bin_start( size_t idx = 0) const
-  {
-    return this->bin_start_ + idx * this->bin_size_;
-  }
-
-  inline double get_bin_end( size_t idx = 0) const
-  {
-    return this->bin_start_ + ( idx + 1 ) * this->bin_size_;
-  }
-  
-  inline std::vector<size_t> get_bins() const
-  {
-    return this->histogram_;
-  }
-    
+  bool is_valid() const;
+        
 private:
 
   double min_;

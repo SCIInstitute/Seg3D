@@ -38,7 +38,7 @@ namespace Seg3D
 {
 
 MaskLayer::MaskLayer( const std::string& name, const Utils::MaskVolumeHandle& volume ) :
-  Layer( name)//, mask_volume_( volume )
+  Layer( name ), mask_volume_( volume )
 {
   this->initialize_states();  
 }

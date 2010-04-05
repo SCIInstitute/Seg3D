@@ -49,9 +49,9 @@ Utils::DataType ITKLayerImporter::get_data_type()
   return Utils::DataType::UNKNOWN_E;
 }
 
-bool ITKLayerImporter::has_importer_mode( LayerImporterMode mode )
+int ITKLayerImporter::get_importer_modes()
 {
-  return false;
+  return 0;
 }
 
 bool ITKLayerImporter::import_layer( LayerImporterMode mode, std::vector<LayerHandle>& layers )

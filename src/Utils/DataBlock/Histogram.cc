@@ -501,4 +501,41 @@ void Histogram::compute( const double* data, size_t size )
   }
 }
 
+double Histogram::get_min() const
+{ 
+  return this->min_;
+}
+
+double Histogram::get_max() const
+{ 
+  return this->max_; 
+}
+
+double Histogram::get_bin_size() const
+{
+  return this->bin_size_;
+}
+
+double Histogram::get_bin_start( size_t idx ) const
+{
+  return this->bin_start_ + idx * this->bin_size_;
+}
+
+double Histogram::get_bin_end( size_t idx ) const
+{
+  return this->bin_start_ + ( idx + 1 ) * this->bin_size_;
+}
+
+std::vector<size_t> Histogram::get_bins() const
+{
+  return this->histogram_;
+}
+
+bool Histogram::is_valid() const
+{
+  return !( IsNan( min_ ) || IsNan( max_ ) );
+}
+
+
+
 } // end namespace Utils

@@ -134,7 +134,9 @@ void LayerManagerDockWidget::HandleInsertLayer( qpointer_type qpointer, LayerHan
     return;
   }
   
+  SCI_LOG_DEBUG( "HandleInsertLayer started" );
   if ( qpointer.data() ) qpointer->insert_layer_ui( layer );
+  SCI_LOG_DEBUG( "HandleInsertLayer done" );
 }
 
 void LayerManagerDockWidget::HandleDeleteLayer( qpointer_type qpointer, LayerGroupHandle group )
@@ -146,7 +148,10 @@ void LayerManagerDockWidget::HandleDeleteLayer( qpointer_type qpointer, LayerGro
     return;
   }
   
+  SCI_LOG_DEBUG( "HandleDeleteLayer started" );
   if ( qpointer.data() ) qpointer->delete_layer_ui( group );
+  SCI_LOG_DEBUG( "HandleDeleteLayer done" );
+
 }
 
 
@@ -159,7 +164,9 @@ void LayerManagerDockWidget::HandleActivateLayer( qpointer_type qpointer, LayerH
     return;
   }
 
+  SCI_LOG_DEBUG( "HandleActivateLayer started" );
   if ( qpointer.data() ) qpointer->activate_layer_ui( layer );
+  SCI_LOG_DEBUG( "HandleActivateLayer done" );
 }
 
 void LayerManagerDockWidget::HandleGroupDeleted( qpointer_type qpointer, LayerGroupHandle group )
@@ -171,7 +178,9 @@ void LayerManagerDockWidget::HandleGroupDeleted( qpointer_type qpointer, LayerGr
     return;
   }
   
+  SCI_LOG_DEBUG( "HandleGroupDeleted started" );
   if ( qpointer.data() ) qpointer->delete_group_ui( group );
+  SCI_LOG_DEBUG( "HandleGroupDeleted done" );
 }
 
 void LayerManagerDockWidget::HandleGroupChanged( qpointer_type qpointer, LayerGroupHandle group )
@@ -183,7 +192,9 @@ void LayerManagerDockWidget::HandleGroupChanged( qpointer_type qpointer, LayerGr
     return;
   }
 
+  SCI_LOG_DEBUG( "HandleGroupChanged started" );
   if ( qpointer.data() ) qpointer->refresh_group_ui( group );
+  SCI_LOG_DEBUG( "HandleGroupChanged done" );
 }
 
 

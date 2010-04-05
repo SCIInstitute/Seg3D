@@ -28,7 +28,9 @@
 
 // Utils includes
 #include <Utils/DataBlock/NrrdData.h>
+#include <Utils/DataBlock/MaskDataBlock.h>
 #include <Utils/DataBlock/NrrdDataBlock.h>
+#include <Utils/DataBlock/MaskDataBlockManager.h>
 #include <Utils/Volume/DataVolume.h>
 #include <Utils/Volume/MaskVolume.h>
 
@@ -74,28 +76,30 @@ Utils::DataType NrrdLayerImporter::get_data_type()
 }
 
 
-bool NrrdLayerImporter::has_importer_mode( LayerImporterMode mode )
+int NrrdLayerImporter::get_importer_modes()
 {
   Utils::DataType data_type = nrrd_data_->get_data_type();
   
-  if ( mode == LayerImporterMode::DATA_E && ( Utils::IsInteger( data_type ) ||
-    Utils::IsReal( data_type ) ) )
+  int importer_modes = 0;
+  if ( Utils::IsReal( data_type ) )
   {
-    return true;
+    importer_modes |= LayerImporterMode::DATA_E;
   }
   
-  if ( ( mode == LayerImporterMode::SINGLE_MASK_E || mode == LayerImporterMode::BITPLANE_MASK_E ||
-     mode == LayerImporterMode::LABEL_MASK_E ) && Utils::IsInteger( data_type ) ) 
+  if ( Utils::IsInteger( data_type ) ) 
   {
-    return true;
+    importer_modes |= LayerImporterMode::SINGLE_MASK_E | LayerImporterMode::BITPLANE_MASK_E |
+      LayerImporterMode::LABEL_MASK_E | LayerImporterMode::DATA_E;
   }
-
-  return false;
+  
+  return importer_modes;
 }
 
 
 bool NrrdLayerImporter::import_layer( LayerImporterMode mode, std::vector<LayerHandle>& layers )
 {
+  layers.clear();
+  
   // ensure that the data has been read
   if ( ! nrrd_data_ ) import_header();
   
@@ -103,23 +107,96 @@ bool NrrdLayerImporter::import_layer( LayerImporterMode mode, std::vector<LayerH
   {
     case LayerImporterMode::DATA_E:
     {
-      layers.resize( 1 );
+      SCI_LOG_DEBUG( std::string("Importing data layer: ") + get_base_filename() );
           
       Utils::DataBlockHandle datablock( new Utils::NrrdDataBlock( nrrd_data_ ) );
       datablock->update_histogram();
-      Utils::DataVolumeHandle datavolume( new 
-        Utils::DataVolume( nrrd_data_->get_grid_transform(), datablock ) );
+      
+      Utils::DataVolumeHandle datavolume( new Utils::DataVolume( 
+        nrrd_data_->get_grid_transform(), datablock ) );
 
+      layers.resize( 1 );
       layers[0] = LayerHandle( new DataLayer( get_base_filename(), datavolume ) );
+
+      SCI_LOG_DEBUG( std::string("Successfully imported: ") + get_base_filename() );
       return true;
     }
     case LayerImporterMode::SINGLE_MASK_E:
-      return false;
+    {
+      SCI_LOG_DEBUG( std::string("Importing mask layer: ") + get_base_filename() );
+
+
+      Utils::DataBlockHandle datablock( new Utils::NrrdDataBlock( nrrd_data_ ) );
+      Utils::MaskDataBlockHandle maskdatablock;
+      
+      if ( !( Utils::MaskDataBlockManager::CreateMaskFromNonZeroData( 
+        datablock, maskdatablock ) ) ) 
+      {
+        return false;
+      }
+
+      Utils::MaskVolumeHandle maskvolume( new Utils::MaskVolume( 
+        nrrd_data_->get_grid_transform(), maskdatablock ) );
+      
+      layers.resize( 1 );
+      layers[0] = LayerHandle( new MaskLayer( get_base_filename(), maskvolume ) );
+
+      SCI_LOG_DEBUG( std::string("Successfully imported: ") + get_base_filename() );
+      return true;
+    }
+    
     case LayerImporterMode::BITPLANE_MASK_E:
-      return false;
+    {
+      SCI_LOG_DEBUG( std::string("Importing mask layer: ") + get_base_filename() );
+
+
+      Utils::DataBlockHandle datablock( new Utils::NrrdDataBlock( nrrd_data_ ) );
+      std::vector<Utils::MaskDataBlockHandle> maskdatablocks;
+      
+      if ( !( Utils::MaskDataBlockManager::CreateMaskFromBitPlaneData( 
+        datablock, maskdatablocks ) ) ) 
+      {
+        return false;
+      }
+
+      layers.resize( maskdatablocks.size() );
+
+      for ( size_t j = 0; j < layers.size(); j++ )
+      {
+        Utils::MaskVolumeHandle maskvolume( new Utils::MaskVolume( 
+          nrrd_data_->get_grid_transform(), maskdatablocks[j] ) );
+        layers[j] = LayerHandle( new MaskLayer( get_base_filename(), maskvolume ) );
+      }
+      
+      SCI_LOG_DEBUG( std::string("Successfully imported: ") + get_base_filename() );
+      return true;
+    }
     case LayerImporterMode::LABEL_MASK_E:
-      return false; 
-    default:
+    {
+      SCI_LOG_DEBUG( std::string("Importing mask layer: ") + get_base_filename() );
+
+
+      Utils::DataBlockHandle datablock( new Utils::NrrdDataBlock( nrrd_data_ ) );
+      std::vector<Utils::MaskDataBlockHandle> maskdatablocks;
+      
+      if ( !( Utils::MaskDataBlockManager::CreateMaskFromLabelData( 
+        datablock, maskdatablocks ) ) ) 
+      {
+        return false;
+      }
+
+      layers.resize( maskdatablocks.size() );
+
+      for ( size_t j = 0; j < layers.size(); j++ )
+      {
+        Utils::MaskVolumeHandle maskvolume( new Utils::MaskVolume( 
+          nrrd_data_->get_grid_transform(), maskdatablocks[j] ) );
+        layers[j] = LayerHandle( new MaskLayer( get_base_filename(), maskvolume ) );
+      }
+      
+      SCI_LOG_DEBUG( std::string("Successfully imported: ") + get_base_filename() );
+      return true;
+    }   default:
       return false;
   }
 }

@@ -102,6 +102,7 @@ IF (WIN32 AND MSVC)
   SET(CMAKE_CXX_FLAGS "/Oi ${CMAKE_CXX_FLAGS}")
 ENDIF (WIN32 AND MSVC)
 
+
 ###########################################
 # RPATH settings for Linux
 ###########################################
@@ -153,7 +154,6 @@ ENDIF(SEG3D_BUILD_INTERFACE)
 ###########################################
 
 ADD_SUBDIRECTORY(Externals)
-ADD_SUBDIRECTORY(Bootstrap)
 
 ###########################################
 # SETUP FOR DEBUG BUILDS
@@ -283,6 +283,7 @@ BUILD_REGISTER_QTRESOURCES_LIBRARY()
 ###########################################
 
 ADD_SUBDIRECTORY(Init)
+ADD_SUBDIRECTORY(Bootstrap)
 
 ###########################################
 # Packaging:

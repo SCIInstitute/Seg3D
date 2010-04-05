@@ -168,7 +168,7 @@ public:
 
   // GET_HISTOGRAM:
   // Get the histogram of the underlying data
-  Histogram get_histogram() const
+  const Histogram& get_histogram() const
   {
     return this->histogram_;
   }
@@ -203,6 +203,11 @@ protected:
   void set_data( void* data )
   {
     this->data_ = data;
+  }
+
+  void set_histogram( const Histogram& histogram )
+  {
+    this->histogram_ = histogram;
   }
 
   // -- Locking of the datablock --
@@ -247,16 +252,26 @@ public:
 
   // CONVERTDATATYPE:
   // Convert the data to a specific format
-  bool ConvertDataType( const DataBlockHandle& src_data_block, DataBlockHandle& dst_data_block, 
-    DataType new_data_type );
+  static bool ConvertDataType( const DataBlockHandle& src_data_block, 
+    DataBlockHandle& dst_data_block, DataType new_data_type );
     
-  // PERMUTEDATABLOCK:
+  // PERMUTEDATA:
   // Reorder the data by shuffling the axis, the permutation is a vector of three components
   // that specify -1, 1 , and -2, 2, and -3, 3 for each of the axis, where the negative number
   // indicates an inverted axis.
-  bool PermuteDataBlock( const DataBlockHandle& src_data_block, DataBlockHandle& dst_data_block,
-    std::vector<int> permutation );
+  static bool PermuteData( const DataBlockHandle& src_data_block, 
+    DataBlockHandle& dst_data_block, std::vector<int> permutation );
+    
+  // QUANTIZEDATA:
+  // Quantize the data based on its min and max value
+  // NOTE: This function assumes that the histogram has been actualized
+  static bool QuantizeData( const DataBlockHandle& src_data_block, 
+    DataBlockHandle& dst_data_block, DataType new_data_type );
 
+  // CLONE:
+  static bool Clone( const DataBlockHandle& src_data_block, 
+    DataBlockHandle& dst_data_block ); 
+  
 };
 
 } // end namespace Utils

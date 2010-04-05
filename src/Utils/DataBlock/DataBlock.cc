@@ -189,7 +189,7 @@ void DataBlock::update_histogram()
 
 
 template<class DATA>
-bool ConvertDataTypeInternal( DATA* src, DataBlockHandle& dst_data_block )
+static bool ConvertDataTypeInternal( DATA* src, DataBlockHandle& dst_data_block )
 {
   size_t size = dst_data_block->get_size();
   switch ( dst_data_block->get_type() )
@@ -254,6 +254,9 @@ bool ConvertDataTypeInternal( DATA* src, DataBlockHandle& dst_data_block )
 bool DataBlock::ConvertDataType( const DataBlockHandle& src_data_block, 
   DataBlockHandle& dst_data_block, DataType new_data_type )
 {
+  dst_data_block.reset();
+  if ( !src_data_block ) return false;
+
   lock_type lock( src_data_block->get_mutex( ) );
 
   dst_data_block = DataBlockHandle( new StdDataBlock( src_data_block->get_nx(),
@@ -297,7 +300,7 @@ bool DataBlock::ConvertDataType( const DataBlockHandle& src_data_block,
 }
 
 template<class DATA>
-bool PermuteDataBlockInternal( const DataBlockHandle& src_data_block, 
+static bool PermuteDataInternal( const DataBlockHandle& src_data_block, 
   DataBlockHandle& dst_data_block, std::vector<int>& permutation )
 {
   DATA* src = reinterpret_cast<DATA*>( src_data_block->get_data() );
@@ -373,9 +376,12 @@ bool PermuteDataBlockInternal( const DataBlockHandle& src_data_block,
 }
 
 
-bool DataBlock::PermuteDataBlock( const DataBlockHandle& src_data_block, 
+bool DataBlock::PermuteData( const DataBlockHandle& src_data_block, 
   DataBlockHandle& dst_data_block, std::vector<int> permutation )
 {
+  dst_data_block.reset();
+  if ( !src_data_block ) return false;
+
   lock_type lock( src_data_block->get_mutex( ) );
 
   if ( permutation.size() != 3 )
@@ -404,33 +410,255 @@ bool DataBlock::PermuteDataBlock( const DataBlockHandle& src_data_block,
   switch( src_data_block->get_type() )
   {
     case DataType::CHAR_E:
-      return PermuteDataBlockInternal<signed char>( src_data_block, dst_data_block, 
+      return PermuteDataInternal<signed char>( src_data_block, dst_data_block, 
         permutation );
     case DataType::UCHAR_E:
-      return PermuteDataBlockInternal<unsigned char>( src_data_block, dst_data_block, 
+      return PermuteDataInternal<unsigned char>( src_data_block, dst_data_block, 
         permutation );
     case DataType::SHORT_E:
-      return PermuteDataBlockInternal<short>( src_data_block, dst_data_block, 
+      return PermuteDataInternal<short>( src_data_block, dst_data_block, 
         permutation );
     case DataType::USHORT_E:
-      return PermuteDataBlockInternal<unsigned short>( src_data_block, dst_data_block, 
+      return PermuteDataInternal<unsigned short>( src_data_block, dst_data_block, 
         permutation );
     case DataType::INT_E:
-      return PermuteDataBlockInternal<int>( src_data_block, dst_data_block, 
+      return PermuteDataInternal<int>( src_data_block, dst_data_block, 
         permutation );
     case DataType::UINT_E:
-      return PermuteDataBlockInternal<unsigned int>( src_data_block, dst_data_block, 
+      return PermuteDataInternal<unsigned int>( src_data_block, dst_data_block, 
         permutation );
     case DataType::FLOAT_E:
-      return PermuteDataBlockInternal<float>( src_data_block, dst_data_block, 
+      return PermuteDataInternal<float>( src_data_block, dst_data_block, 
         permutation );
     case DataType::DOUBLE_E:
-      return PermuteDataBlockInternal<double>( src_data_block, dst_data_block, 
+      return PermuteDataInternal<double>( src_data_block, dst_data_block, 
         permutation );
     default:
-      dst_data_block.reset();
       return false;
   }
+}
+
+
+template<class DATA>
+static bool QuantizeDataInternal( double min, double max, DATA* src, DataBlockHandle& dst_data_block )
+{
+  float fmin = static_cast<float>( min );
+  float fmax = static_cast<float>( max );
+  
+  size_t size = dst_data_block->get_size();
+  switch ( dst_data_block->get_type() )
+  {
+    case DataType::CHAR_E:  
+    {
+      signed char* dst = reinterpret_cast<signed char*>( dst_data_block->get_data() );
+
+      float offset = 0.5f - static_cast<float>( 0x80 );
+      float multiplier = 0.0f;
+      if ( fmax > fmin ) multiplier = static_cast<float>( 0x100 ) / (fmax - fmin);
+      
+      for ( size_t j = 0 ; j < size; j++ )
+      {
+        dst[ j ] = static_cast<signed char>( multiplier * 
+          (static_cast<float>( src[ j ] ) - fmin)  + offset );
+      }
+      
+      return true;
+    }
+    case DataType::UCHAR_E: 
+    {
+      unsigned char* dst = reinterpret_cast<unsigned char*>( dst_data_block->get_data() );
+      
+      float offset = 0.5f;
+      float multiplier = 0.0f;
+      if ( fmax > fmin ) multiplier = static_cast<float>( 0x100 ) / (fmax - fmin);
+             
+      for ( size_t j = 0 ; j < size; j++ )
+      {
+        dst[ j ] = static_cast<unsigned char>( multiplier * 
+          (static_cast<float>( src[ j ] ) - fmin)  + offset );
+      }
+      return true;
+    }
+    case DataType::SHORT_E: 
+    {
+      short* dst = reinterpret_cast<short*>( dst_data_block->get_data() );
+
+      float offset = 0.5f - static_cast<float>( 0x8000 );
+      float multiplier = 0.0f;
+      if ( fmax > fmin ) multiplier = static_cast<float>( 0x10000 ) / (fmax - fmin);
+      
+      for ( size_t j = 0 ; j < size; j++ )
+      {
+        dst[ j ] = static_cast<short>( multiplier * 
+          (static_cast<float>( src[ j ] ) - fmin)  + offset );
+      }
+      
+      return true;
+    }
+    case DataType::USHORT_E:  
+    {
+      unsigned short* dst = reinterpret_cast<unsigned short*>( dst_data_block->get_data() );
+
+      float offset = 0.5f;
+      float multiplier = 0.0f;
+      if ( fmax > fmin ) multiplier = static_cast<float>( 0x10000 ) / (fmax - fmin);
+      
+      for ( size_t j = 0 ; j < size; j++ )
+      {
+        dst[ j ] = static_cast<unsigned short>( multiplier * 
+          (static_cast<float>( src[ j ] ) - fmin)  + offset);
+      }
+      
+      return true;
+    }
+    case DataType::INT_E: 
+    {
+      int* dst = reinterpret_cast<int*>( dst_data_block->get_data() );
+
+      double offset = 0.5 -  static_cast<double>( 0x80000000 );
+      double multiplier = 0.0;
+      if ( max > min ) multiplier = static_cast<double>( 0x100000000ul ) / (max - min);
+      
+      for ( size_t j = 0 ; j < size; j++ )
+      {
+        dst[ j ] = static_cast<int>( multiplier * 
+          (static_cast<double>( src[ j ] ) - min)  + offset);
+      }
+      
+      return true;
+    }
+    case DataType::UINT_E:  
+    {
+      unsigned int* dst = reinterpret_cast<unsigned int*>( dst_data_block->get_data() );
+
+      double offset = 0.5;
+      double multiplier = 0.0;
+      if ( max > min ) multiplier = static_cast<double>( 0x100000000ul ) / (max - min);
+      
+      for ( size_t j = 0 ; j < size; j++ )
+      {
+        dst[ j ] = static_cast<unsigned int>( multiplier * 
+          (static_cast<double>( src[ j ] ) - min)  + offset);
+      }
+      
+      return true;
+    }
+    default:
+    {
+      dst_data_block.reset();
+      return false;
+    }
+  }
+}
+
+bool DataBlock::QuantizeData( const DataBlockHandle& src_data_block, 
+  DataBlockHandle& dst_data_block, DataType new_data_type )
+{
+  dst_data_block.reset();
+  if ( !src_data_block ) return false;
+  
+  lock_type lock( src_data_block->get_mutex( ) );
+
+  if ( new_data_type != DataType::CHAR_E && new_data_type != DataType::UCHAR_E &&
+    new_data_type != DataType::SHORT_E && new_data_type != DataType::USHORT_E &&
+    new_data_type != DataType::INT_E && new_data_type != DataType::UINT_E )
+  {
+    return false;
+  } 
+
+  dst_data_block = DataBlockHandle( new StdDataBlock( src_data_block->get_nx(),
+    src_data_block->get_ny(), src_data_block->get_nz(), new_data_type ) );
+    
+  if ( !dst_data_block )
+  {
+    return false;
+  }
+  
+  double min = src_data_block->get_min();
+  double max = src_data_block->get_max();
+  
+  switch( src_data_block->get_type() )
+  {
+    case DataType::CHAR_E:
+      return QuantizeDataInternal<signed char>( min, max, 
+        reinterpret_cast<signed char*>( src_data_block->get_data() ), dst_data_block );
+    case DataType::UCHAR_E:
+      return QuantizeDataInternal<unsigned char>( min, max, 
+        reinterpret_cast<unsigned char*>( src_data_block->get_data() ), dst_data_block );
+    case DataType::SHORT_E:
+      return QuantizeDataInternal<short>( min, max,
+        reinterpret_cast<short*>( src_data_block->get_data() ), dst_data_block );
+    case DataType::USHORT_E:
+      return QuantizeDataInternal<unsigned short>( min, max,
+        reinterpret_cast<unsigned short*>( src_data_block->get_data() ), dst_data_block );
+    case DataType::INT_E:
+      return QuantizeDataInternal<int>( min, max,
+        reinterpret_cast<int*>( src_data_block->get_data() ), dst_data_block );
+    case DataType::UINT_E:
+      return QuantizeDataInternal<unsigned int>( min, max,
+        reinterpret_cast<unsigned int*>( src_data_block->get_data() ), dst_data_block );
+    case DataType::FLOAT_E:
+      return QuantizeDataInternal<float>( min, max,
+        reinterpret_cast<float*>( src_data_block->get_data() ), dst_data_block );
+    case DataType::DOUBLE_E:
+      return QuantizeDataInternal<double>( min, max,
+        reinterpret_cast<double*>( src_data_block->get_data() ), dst_data_block );
+    default:
+      return false;
+  }
+}
+
+bool DataBlock::Clone( const DataBlockHandle& src_data_block, 
+    DataBlockHandle& dst_data_block )
+{
+  // Step (1) : Check whether there is a source data block
+  dst_data_block.reset();
+  if ( !src_data_block ) return false;
+
+  // Step (2) : Lock the source
+  lock_type lock( src_data_block->get_mutex( ) );
+
+  // Step (3): Generate a new data block with the right type
+  dst_data_block = DataBlockHandle( new StdDataBlock( src_data_block->get_nx(),
+    src_data_block->get_ny(), src_data_block->get_nz(), src_data_block->get_type() ) );
+    
+  // Step (4): Copy the data  
+  size_t mem_size = src_data_block->get_size(); 
+  switch( src_data_block->get_type() )
+  {
+    case DataType::CHAR_E:
+      mem_size *= sizeof( signed char );
+      break;
+    case DataType::UCHAR_E:
+      mem_size *= sizeof( unsigned char );
+      break;
+    case DataType::SHORT_E:
+      mem_size *= sizeof( short );
+      break;
+    case DataType::USHORT_E:
+      mem_size *= sizeof( unsigned short );
+      break;
+    case DataType::INT_E:
+      mem_size *= sizeof( int );
+      break;
+    case DataType::UINT_E:
+      mem_size *= sizeof( unsigned int );
+      break;
+    case DataType::FLOAT_E:
+      mem_size *= sizeof( float );
+      break;
+    case DataType::DOUBLE_E:
+      mem_size *= sizeof( double );
+      break;
+    default:
+      return false;
+  }
+  std::memcpy( dst_data_block->get_data(), src_data_block->get_data(), mem_size );
+  
+  // Step (5) : Copy the histogram
+  dst_data_block->set_histogram( src_data_block->get_histogram() );
+
+  return true;
 }
 
 } // end namespace Utils

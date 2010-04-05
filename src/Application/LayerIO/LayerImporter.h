@@ -195,10 +195,10 @@ public:
   // GET_DATA_TYPE:
   // Get the type of data that is being imported
   virtual Utils::DataType get_data_type() = 0;
-
-  // HAS_IMPORTER_MODE:
-  // Test whether the importer a specific importer mode
-  virtual bool has_importer_mode( LayerImporterMode mode ) = 0;
+  
+  // GET_IMPORTER_MODES
+  // Get then supported importer modes
+  virtual int get_importer_modes() = 0;
   
   // -- Import the data as a specific type -- 
 public: 

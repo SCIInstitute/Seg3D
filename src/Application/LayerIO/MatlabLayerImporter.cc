@@ -49,9 +49,9 @@ Utils::DataType MatlabLayerImporter::get_data_type()
   return Utils::DataType::UNKNOWN_E;
 }
 
-bool MatlabLayerImporter::has_importer_mode( LayerImporterMode mode )
+int MatlabLayerImporter::get_importer_modes()
 {
-  return false;
+  return 0;
 }
 
 bool MatlabLayerImporter::import_layer( LayerImporterMode mode, std::vector<LayerHandle>& layers )

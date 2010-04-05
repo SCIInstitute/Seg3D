@@ -62,7 +62,7 @@ bool ActionImportLayer::validate( ActionContextHandle& context )
     } 
   }
 
-  LayerImporterMode mode = LayerImporterMode::DATA_E;
+  LayerImporterMode mode = LayerImporterMode::INVALID_E;
   if ( !( ImportFromString( mode_.value(), mode ) ) )
   {
     context->report_error( std::string( "Import mode '") +  mode_.value() + 
@@ -70,7 +70,7 @@ bool ActionImportLayer::validate( ActionContextHandle& context )
     return false;
   }
 
-  if ( !( layer_importer_->has_importer_mode( mode ) ) )
+  if ( !( layer_importer_->get_importer_modes() & mode ) )
   {
     context->report_error( std::string( "Import mode '") +  mode_.value() + 
       "' is not available for this importer." );
@@ -96,7 +96,7 @@ bool ActionImportLayer::run( ActionContextHandle& context, ActionResultHandle& r
     
   for (size_t j = 0; j < layers.size(); j++)
   {
-    LayerManager::Instance()->insert_layer( layers[ j ] );
+    if ( layers[ j ] ) LayerManager::Instance()->insert_layer( layers[ j ] );
   }
 
   // As actions are only executed by one thread, modifications can be made. However this needs
