@@ -121,6 +121,14 @@ namespace Seg3D
     "}");
     
   // - LOCKED - //
+  const QString StyleSheet::LAYER_WIDGET_BASE_PICKED_UP_C = QString::fromUtf8(
+    "QWidget#base_{"
+    " background-color: rgba( 0, 0, 0, 0 );"
+    " border-radius: 6px;"
+    " border: 1px solid rgba( 0, 0, 0, 0 );"
+    "}");
+    
+  // - LOCKED - //
   const QString StyleSheet::LAYER_WIDGET_BASE_LOCKED_C = QString::fromUtf8(
     "QWidget#base_{"
     " background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227," 

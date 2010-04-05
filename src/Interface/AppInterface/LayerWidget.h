@@ -74,6 +74,8 @@ public:
   int get_volume_type();
   void set_active( bool active );
   void set_drop( bool drop );
+  void set_picked_up( bool up );
+  void seethrough( bool see );
   
 private:
     boost::shared_ptr< LayerWidgetPrivate > private_;

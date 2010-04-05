@@ -68,6 +68,8 @@ public:
     const static QString LAYER_WIDGET_LABEL_C;
     // - DROP - //
     const static QString LAYER_WIDGET_BASE_DROP_C;
+    // - PICKED-UP - //
+    const static QString LAYER_WIDGET_BASE_PICKED_UP_C;
     // - LOCKED - //
     const static QString LAYER_WIDGET_BASE_LOCKED_C;
     const static QString LAYER_WIDGET_BACKGROUND_LOCKED_C;

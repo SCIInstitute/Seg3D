@@ -78,24 +78,29 @@ bool LayerManager::insert_layer( LayerHandle layer )
       //TODO add logic for handling where the layer should go
       group_handle = LayerGroupHandle( new LayerGroup(  layer->get_grid_transform() ) );
       group_handle_list_.push_back( group_handle );
+      
+      SCI_LOG_DEBUG( std::string("Set Active Layer: ") + layer->get_layer_id());
+
+      // deactivate the previous active layer
+      if ( active_layer_ )
+        active_layer_->set_active( false ); 
+
+      active_layer_ = layer;
+      active_layer_->set_active( true );
+      
+      active_layer_changed = true;
+      
     }
       
     group_handle->insert_layer( layer );
     layer->set_layer_group( group_handle );
       
-    
-    // Set the new layer to be active if there is none yet
-    if ( !this->active_layer_ )
-    {
-      SCI_LOG_DEBUG( std::string("Set Active Layer: ") + layer->get_layer_id());
-      this->active_layer_ = layer;
-      layer->set_active( true );
-      active_layer_changed = true;
-    }
   }
 
   layer_inserted_signal_( layer );  
-  if ( active_layer_changed )
+
+  
+  if( active_layer_changed )
   {
     active_layer_changed_signal_( layer );
   }

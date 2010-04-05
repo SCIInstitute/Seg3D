@@ -35,6 +35,7 @@
 //Interface Includes
 #include <Interface/QtInterface/QtBridge.h>
 #include <Interface/AppInterface/LayerGroupWidget.h>
+#include <Interface/AppInterface/StyleSheet.h>
 
 //UI Includes
 #include "ui_LayerGroupWidget.h"
@@ -634,12 +635,21 @@ void LayerGroupWidget::mousePressEvent(QMouseEvent *event)
   drag->setHotSpot( hotSpot );
 
   // Next we hide the LayerWidget that we are going to be dragging.
-  layer_to_drag->hide();
+  layer_to_drag->seethrough( true );
+  layer_to_drag->set_picked_up( true );
+  //layer_to_drag->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_PICKED_UP_C );
   
   Qt::DropActions test = drag->exec( Qt::CopyAction, Qt::CopyAction );
   
   if ( this->check_for_layer( layer_to_drag->get_layer_id() ) )
-    layer_to_drag->show();
+  {
+    layer_to_drag->seethrough( false );
+    layer_to_drag->set_picked_up( false );
+  }
+  else
+  {
+    layer_to_drag->close();
+  }
 
 }
 
@@ -657,12 +667,13 @@ void LayerGroupWidget::dragEnterEvent(QDragEnterEvent* event)
       if( this->layer_list_[i] == potential_drop_site ) 
       {
         //TODO: we need to add logic to prevent certain illegal drag and drop.
-        if( ( ( potential_drop_site->get_volume_type() == Utils::VolumeType::DATA_E ) &&
+        if( ( ( ( potential_drop_site->get_volume_type() == Utils::VolumeType::DATA_E ) &&
             ( event->mimeData()->hasFormat("data_layer_id") ) ) ||
            ( ( potential_drop_site->get_volume_type() == Utils::VolumeType::MASK_E ) &&
             ( event->mimeData()->hasFormat("mask_layer_id") ) ) ||
            ( ( potential_drop_site->get_volume_type() == Utils::VolumeType::LABEL_E ) &&
-            ( event->mimeData()->hasFormat("label_layer_id") ) ) )
+            ( event->mimeData()->hasFormat("label_layer_id") ) ) ) && 
+            ( potential_drop_site->get_layer_id() != event->mimeData()->text().toStdString() ) )
         {
           this->layer_list_[i]->set_drop( true );
           found_valid_layer = true;
@@ -670,16 +681,17 @@ void LayerGroupWidget::dragEnterEvent(QDragEnterEvent* event)
       }
       else
       {
-        this->layer_list_[i]->set_drop( false );
+        if( ( potential_drop_site->get_layer_id() != event->mimeData()->text().toStdString() ) ) 
+          this->layer_list_[i]->set_drop( false );
       }
     }
     if( found_valid_layer )
     {
-      event->acceptProposedAction();
+      event->setDropAction(Qt::MoveAction);
+      event->accept();
       return;
     }
   }
-  
   // If they aren't dragging a valid widget we ignore it
   event->ignore();
 }
@@ -734,6 +746,7 @@ void LayerGroupWidget::dropEvent(QDropEvent* event)
         // If they do want to resample, we dispatch the move function
         // TODO: we need to actually resample the layer
         case QMessageBox::Yes:
+          event->setDropAction(Qt::MoveAction);
           event->accept();
           ActionInsertLayerAbove::Dispatch( event->mimeData()->text().toStdString(), 
             drop_site->get_layer_id() );
@@ -753,6 +766,7 @@ void LayerGroupWidget::dropEvent(QDropEvent* event)
     }
     else
     {
+      event->setDropAction(Qt::MoveAction);
       event->accept();
       // If they are just reordering the layers within the group we just do it.
       ActionInsertLayerAbove::Dispatch( event->mimeData()->text().toStdString(), 

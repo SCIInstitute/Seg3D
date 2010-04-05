@@ -343,6 +343,12 @@ QToolButton#color_button_12_:pressed{
    </property>
    <item>
     <widget class="QWidget" name="base_" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>51</height>
+      </size>
+     </property>
      <layout class="QVBoxLayout" name="verticalLayout_10">
       <property name="spacing">
        <number>0</number>
