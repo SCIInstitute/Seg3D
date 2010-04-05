@@ -44,44 +44,44 @@
 namespace Seg3D
 {
   
-  // REGISTER ACTION:
-  // Define a function that registers the action. The action also needs to be
-  // registered in the CMake file.
-  SCI_REGISTER_ACTION(InsertLayer);
-  
-  bool ActionInsertLayer::validate( ActionContextHandle& context )
-  {
-    if ( !this->layer_handle_ )
-      return false;
-    
-    if ( !( StateEngine::Instance()->is_stateid( layer_handle_->get_layer_id() ) ) )
-      {
-        context->report_error( std::string( "LayerID '" ) + layer_handle_->get_layer_id() + "' is invalid" );
-        return false;
-      }
-    
-    return true;
+// REGISTER ACTION:
+// Define a function that registers the action. The action also needs to be
+// registered in the CMake file.
+SCI_REGISTER_ACTION(InsertLayer);
 
-  }
-  
-  bool ActionInsertLayer::run( ActionContextHandle& context, ActionResultHandle& result )
-  {
-    if ( this->layer_handle_ )
-    {
-      LayerManager::Instance()->insert_layer( layer_handle_ );
-      return true;
-    }
-      
+bool ActionInsertLayer::validate( ActionContextHandle& context )
+{
+  if ( !this->layer_handle_ )
     return false;
-  }
   
+  if ( !( StateEngine::Instance()->is_stateid( layer_handle_->get_layer_id() ) ) )
+    {
+      context->report_error( std::string( "LayerID '" ) + layer_handle_->get_layer_id() + "' is invalid" );
+      return false;
+    }
   
-  void ActionInsertLayer::Dispatch( LayerHandle layer )
+  return true;
+
+}
+
+bool ActionInsertLayer::run( ActionContextHandle& context, ActionResultHandle& result )
+{
+  if ( this->layer_handle_ )
   {
-    ActionInsertLayer* action = new ActionInsertLayer;
-    action->layer_handle_ = layer;
-    
-    Interface::PostAction( ActionHandle( action ) );
+    LayerManager::Instance()->insert_layer( layer_handle_ );
+    return true;
   }
+    
+  return false;
+}
+
+
+void ActionInsertLayer::Dispatch( LayerHandle layer )
+{
+  ActionInsertLayer* action = new ActionInsertLayer;
+  action->layer_handle_ = layer;
+  
+  Interface::PostAction( ActionHandle( action ) );
+}
   
 } // end namespace Seg3D

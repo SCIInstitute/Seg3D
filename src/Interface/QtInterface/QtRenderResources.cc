@@ -45,7 +45,7 @@ QtRenderContext::~QtRenderContext()
 {
 }
 
-bool QtRenderContext::is_valid()
+bool QtRenderContext::is_valid() const
 {
   return ( context_->isValid() );
 }
@@ -60,9 +60,16 @@ void QtRenderContext::done_current()
   context_->doneCurrent();
 }
 
-void QtRenderContext::swap_buffers()
+void QtRenderContext::swap_buffers() const
 {
   context_->swapBuffers();
+}
+
+std::string QtRenderContext::to_string() const
+{
+  std::ostringstream oss;
+  oss << this->context_.get();
+  return oss.str();
 }
 
 QtRenderResourcesContext::QtRenderResourcesContext() :
@@ -122,6 +129,13 @@ QtRenderResourcesContext::create_qt_render_widget( QWidget* parent )
 bool QtRenderResourcesContext::valid_render_resources()
 {
   return ( shared_widget_.data() && shared_widget_->isValid() );
+}
+
+std::string QtRenderResourcesContext::get_current_context_string()
+{
+  std::ostringstream oss;
+  oss << QGLContext::currentContext();
+  return oss.str();
 }
 
 } // end namespace Seg3D

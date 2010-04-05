@@ -61,7 +61,6 @@ typedef boost::shared_ptr< QGLContext > QGLContextHandle;
 
 class QtRenderContext : public Utils::RenderContext
 {
-
   // -- constructor/ destructor --
 public:
   QtRenderContext( QGLContextHandle& context );
@@ -70,7 +69,7 @@ public:
   // -- context functions --
   // IS_VALID:
   // Test whether the context is valid
-  virtual bool is_valid();
+  virtual bool is_valid() const;
 
   // MAKE_CURRENT:
   // Set the rendering context current to this thread
@@ -82,7 +81,9 @@ public:
 
   // SWAP_BUFFERS:
   // Swap the front and back buffers
-  virtual void swap_buffers();
+  virtual void swap_buffers() const;
+
+  virtual std::string to_string() const;
 
 private:
   QGLContextHandle context_;
@@ -108,6 +109,8 @@ public:
   // VALID_RENDER_RESOURCES:
   // Check whether valid render resources were installed
   virtual bool valid_render_resources();
+
+  virtual std::string get_current_context_string();
 
 private:
   // The Qt render context format options

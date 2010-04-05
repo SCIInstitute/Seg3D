@@ -32,43 +32,43 @@
 namespace Seg3D
 {
   
-  // REGISTER ACTION:
-  // Define a function that registers the action. The action also needs to be
-  // registered in the CMake file.
-  SCI_REGISTER_ACTION(FlipLayer);
-  
-  bool ActionFlipLayer::validate( ActionContextHandle& context )
+// REGISTER ACTION:
+// Define a function that registers the action. The action also needs to be
+// registered in the CMake file.
+SCI_REGISTER_ACTION(FlipLayer);
+
+bool ActionFlipLayer::validate( ActionContextHandle& context )
+{
+  if ( !( StateEngine::Instance()->is_stateid( name_.value() ) ) )
   {
-    if ( !( StateEngine::Instance()->is_stateid( name_.value() ) ) )
-    {
-      context->report_error( std::string( "Layer: '" ) + name_.value() + "' is invalid" );
-      return false;
-    }
-    
-    return true; // validated
+    context->report_error( std::string( "Layer: '" ) + name_.value() + "' is invalid" );
+    return false;
   }
   
-  bool ActionFlipLayer::run( ActionContextHandle& context, ActionResultHandle& result )
-  {
-    //LayerManager::Instance()->flip_layer( layerid_.value() );
-    return true; // success
-  }
+  return true; // validated
+}
+
+bool ActionFlipLayer::run( ActionContextHandle& context, ActionResultHandle& result )
+{
+  //LayerManager::Instance()->flip_layer( layerid_.value() );
+  return true; // success
+}
+
+ActionHandle ActionFlipLayer::Create( const std::string& name )
+{
+  // Create new action
+  ActionFlipLayer* action = new ActionFlipLayer;
   
-  ActionHandle ActionFlipLayer::Create( const std::string& name )
-  {
-    // Create new action
-    ActionFlipLayer* action = new ActionFlipLayer;
-    
-    // Set action parameters
-    action->name_.value() = name;
-    
-    // Post the new action
-    return ActionHandle( action );
-  }
+  // Set action parameters
+  action->name_.value() = name;
   
-  void ActionFlipLayer::Dispatch( const std::string& name )
-  {
-    Interface::PostAction( Create( name ) );
-  }
+  // Post the new action
+  return ActionHandle( action );
+}
+
+void ActionFlipLayer::Dispatch( const std::string& name )
+{
+  Interface::PostAction( Create( name ) );
+}
   
 } // end namespace Seg3D

@@ -39,6 +39,7 @@
 #include <Utils/Core/Exception.h>
 #include <Utils/Core/Log.h>
 #include <Utils/Core/Singleton.h>
+#include <Utils/Core/StringUtil.h>
 #include <Utils/EventHandler/EventHandler.h>
 #include <Utils/RenderResources/RenderContext.h>
 #include <Utils/RenderResources/RenderResourcesContext.h>
@@ -96,6 +97,8 @@ public:
   // Delete a renderbuffer within the right context
   void delete_renderbuffer( unsigned int renderbuffer_id );
 
+  std::string get_current_context_string();
+
 private:
 
   // A Handle to resource that generated the contexts
@@ -142,6 +145,16 @@ public:
   }
 
 };
+
+#define SCI_CHECK_OPENGL_ERROR()\
+{\
+  GLenum err = glGetError();\
+  if (err != GL_NO_ERROR)\
+  {\
+    SCI_LOG_ERROR(std::string("OpenGL error ") + Utils::to_string(err) + ": " + \
+      reinterpret_cast<const char*>(gluErrorString(err)));\
+  }\
+}
 
 } // end namespace Utils
 

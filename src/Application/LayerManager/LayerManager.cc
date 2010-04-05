@@ -55,6 +55,7 @@ LayerManager::~LayerManager()
   
 bool LayerManager::insert_layer( LayerHandle layer )
 {
+  bool active_layer_changed = false;
   {
     lock_type lock( this->get_mutex() );
     
@@ -82,18 +83,22 @@ bool LayerManager::insert_layer( LayerHandle layer )
     group_handle->insert_layer( layer );
     layer->set_layer_group( group_handle );
       
-    SCI_LOG_DEBUG( std::string("Set Active Layer: ") + layer->get_layer_id());
     
-    // deactivate the previous active layer
-    if ( active_layer_ )
-      active_layer_->set_active( false ); 
-      
-    active_layer_ = layer;
-    active_layer_->set_active( true );
+    // Set the new layer to be active if there is none yet
+    if ( !this->active_layer_ )
+    {
+      SCI_LOG_DEBUG( std::string("Set Active Layer: ") + layer->get_layer_id());
+      this->active_layer_ = layer;
+      layer->set_active( true );
+      active_layer_changed = true;
+    }
   }
 
   layer_inserted_signal_( layer );  
-  active_layer_changed_signal_( layer );
+  if ( active_layer_changed )
+  {
+    active_layer_changed_signal_( layer );
+  }
   
   return true;
 }
@@ -113,8 +118,8 @@ bool LayerManager::insert_layer_above( std::string layer_to_insert_id, std::stri
     lock_type lock( this->get_mutex() );
   
     // First we get LayerHandles for the Layers
-    LayerHandle layer_above = this->get_LayerHandle_from_layer_id( layer_to_insert_id );
-    LayerHandle layer_below = this->get_LayerHandle_from_layer_id( layer_below_id );
+    LayerHandle layer_above = this->get_layer_by_id( layer_to_insert_id );
+    LayerHandle layer_below = this->get_layer_by_id( layer_below_id );
     
     if ( !validate_layer_move( layer_above, layer_below ) )
       return false;
@@ -182,6 +187,12 @@ void LayerManager::set_active_layer( LayerHandle layer )
   {
     lock_type lock( this->get_mutex() );    
     
+    // Do nothing if this layer is already the active one
+    if ( this->active_layer_ == layer )
+    {
+      return;
+    }
+    
     active_layer_->set_active( false );
   
     SCI_LOG_DEBUG( std::string("Set Active Layer: ") + layer->get_layer_id());
@@ -209,7 +220,7 @@ LayerGroupHandle LayerManager::get_LayerGroupHandle_from_group_id( std::string g
   return LayerGroupHandle();
 }
 
-LayerHandle LayerManager::get_LayerHandle_from_layer_id( std::string layer_id )
+Seg3D::LayerHandle LayerManager::get_layer_by_id( const std::string& layer_id )
 {
   lock_type lock( this->get_mutex() );
 
@@ -228,7 +239,7 @@ LayerHandle LayerManager::get_LayerHandle_from_layer_id( std::string layer_id )
   return LayerHandle();
 }
 
-LayerHandle LayerManager::get_LayerHandle_from_layer_name( std::string layer_name )
+Seg3D::LayerHandle LayerManager::get_layer_by_name( const std::string& layer_name )
 {
   lock_type lock( this->get_mutex() );
 
@@ -277,13 +288,14 @@ void LayerManager::get_layers( std::vector< LayerHandle > &vector_of_layers )
 void LayerManager::delete_layers( LayerGroupHandle group )
 {
   std::vector< LayerHandle > layer_vector;
-
+  bool active_layer_changed = false;
   {
     lock_type lock( get_mutex() );  
     
     // get a temporary copy of the list of layers
     layer_list_type layer_list = group->get_layer_list();
     
+    bool active_layer_deleted = false;
     for( layer_list_type::iterator it = layer_list.begin(); it != layer_list.end(); ++it )
     {
       if( ( *it )->selected_state_->get() )
@@ -291,6 +303,10 @@ void LayerManager::delete_layers( LayerGroupHandle group )
         SCI_LOG_DEBUG( std::string("Deleting Layer: ") + ( *it )->get_layer_id() );
         layer_vector.push_back( *it );
         group->delete_layer( *it );
+        if ( *it == this->active_layer_ )
+        {
+          active_layer_deleted = true;
+        }
       }
     }
     
@@ -298,6 +314,18 @@ void LayerManager::delete_layers( LayerGroupHandle group )
     {   
       group_handle_list_.remove( group );
     }
+
+    if ( active_layer_deleted )
+    {
+      this->active_layer_.reset();
+      if ( this->group_handle_list_.size() > 0 )
+      {
+        this->active_layer_ = this->group_handle_list_.front()->layer_list_.back();
+        this->active_layer_->set_active( true );
+        active_layer_changed = true;
+      }
+    }
+    
   } // Unlocked from here:
 
   if( group->is_empty() )
@@ -308,13 +336,22 @@ void LayerManager::delete_layers( LayerGroupHandle group )
   // signal the listeners
   layers_deleted_signal_( layer_vector );
   layers_finished_deleting_signal_( group );
-  
+  if ( active_layer_changed )
+  {
+    this->active_layer_changed_signal_( this->active_layer_ );
+  }
 } // end delete_layer
 
 LayerGroupHandle LayerManager::get_active_group()
 {
   lock_type lock( this->get_mutex() );  
-  return active_layer_->get_layer_group();
+  return this->active_layer_->get_layer_group();
+}
+
+Seg3D::LayerHandle LayerManager::get_active_layer()
+{
+  lock_type lock( this->get_mutex() );  
+  return this->active_layer_;
 }
 
 LayerManager::mutex_type& LayerManager::get_mutex()

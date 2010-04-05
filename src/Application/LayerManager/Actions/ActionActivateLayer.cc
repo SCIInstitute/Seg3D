@@ -39,62 +39,51 @@ SCI_REGISTER_ACTION(ActivateLayer);
 
 bool ActionActivateLayer::validate( ActionContextHandle& context )
 {
-    if ( this->layer_handle_ )
+  LayerHandle layer( this->layer_weak_handle_.lock() );
+    if ( !layer )
   {
-    return true;
+    layer = LayerManager::Instance()->get_layer_by_name( this->layer_name_.value() );
+    if ( !layer )
+    {
+      layer = LayerManager::Instance()->get_layer_by_id( this->layer_name_.value() );
+      if ( !layer )
+      {
+        context->report_error( std::string( "LayerName: '" ) + 
+          this->layer_name_.value() + "' is invalid" );
+        return false;
+      }
+    }
+
+    this->layer_weak_handle_ = layer;
   }   
   
-  if ( !( StateEngine::Instance()->is_statealias( this->layer_name_.value() ) ) )
-  {
-    context->report_error( std::string( "LayerName: '" ) + this->layer_name_.value() + "' is invalid" );
-    return false;
-  }
-
   return true; // validated
 }
 
-  bool ActionActivateLayer::run( ActionContextHandle& context, ActionResultHandle& result )
+bool ActionActivateLayer::run( ActionContextHandle& context, ActionResultHandle& result )
+{
+  LayerHandle layer( this->layer_weak_handle_.lock() );
+  if( layer )
   {
-    if( this->layer_handle_ )
-    {
-      LayerManager::Instance()->set_active_layer( layer_handle_ );
-      return true;
-    }
-    
-    if( StateEngine::Instance()->is_statealias( this->layer_name_.value() ) )
-    {
-      LayerManager::Instance()->set_active_layer( 
-        LayerManager::Instance()->get_LayerHandle_from_layer_name( this->layer_name_.value() ) );
-      return true;
-    }
-    return false;
+    LayerManager::Instance()->set_active_layer( layer );
+    return true;
   }
 
-  ActionHandle ActionActivateLayer::Create( const LayerHandle layer )
-  {
-    ActionActivateLayer* action = new ActionActivateLayer;
-    action->layer_handle_ = layer;
-    action->layer_name_ = layer->name_state_->get();
-    
-    return ActionHandle( action );
-  }
-  
-  void ActionActivateLayer::Dispatch( const LayerHandle layer )
-  {
-    Interface::PostAction( Create( layer ) );
-  }
+  return false;
+}
 
+ActionHandle ActionActivateLayer::Create( const LayerHandle layer )
+{
+  ActionActivateLayer* action = new ActionActivateLayer;
+  action->layer_weak_handle_ = layer;
+  action->layer_name_ = layer->name_state_->get();
   
-  
-  //void ActionActivateLayer::Dispatch( const std::string& layer_name )
-  //{
-  //  ActionActivateLayer* action = new ActionActivateLayer;
-  //  action->layer_handle_ = LayerManager::Instance()->get_LayerHandle_from_layer_name( layer_name );
-  //  action->layer_name_.value() = layer_name;
+  return ActionHandle( action );
+}
 
-  //  Interface::PostAction( ActionHandle( action ) );
-  //}
-  
-  
+void ActionActivateLayer::Dispatch( const LayerHandle layer )
+{
+  Interface::PostAction( Create( layer ) );
+}
 
 } // end namespace Seg3D

@@ -85,6 +85,7 @@ void RenderResources::delete_texture( unsigned int texture_id )
   
   lock_type lock( RenderResources::GetMutex() );
   glDeleteTextures( 1, &texture_id );
+  SCI_CHECK_OPENGL_ERROR();
 }
 
 void RenderResources::delete_renderbuffer( unsigned int renderbuffer_id )
@@ -98,6 +99,7 @@ void RenderResources::delete_renderbuffer( unsigned int renderbuffer_id )
   
   lock_type lock( RenderResources::GetMutex() );
   glDeleteRenderbuffersEXT( 1, &renderbuffer_id );
+  SCI_CHECK_OPENGL_ERROR();
 }
 
 void RenderResources::delete_buffer_object( unsigned int buffer_object_id )
@@ -111,6 +113,7 @@ void RenderResources::delete_buffer_object( unsigned int buffer_object_id )
   
   lock_type lock( RenderResources::GetMutex() );
   glDeleteBuffers( 1, &buffer_object_id );
+  SCI_CHECK_OPENGL_ERROR();
 }
 
 void RenderResources::delete_framebuffer_object( unsigned int framebuffer_object_id )
@@ -124,6 +127,16 @@ void RenderResources::delete_framebuffer_object( unsigned int framebuffer_object
   
   lock_type lock( RenderResources::GetMutex() );
   glDeleteFramebuffersEXT( 1, &framebuffer_object_id );
+  SCI_CHECK_OPENGL_ERROR();
+}
+
+std::string RenderResources::get_current_context_string()
+{
+  if ( this->resources_context_ )
+  {
+    return this->resources_context_->get_current_context_string();
+  }
+  return std::string("");
 }
 
 void RenderResources::init_gl()

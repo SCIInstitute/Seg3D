@@ -92,10 +92,9 @@ void QtRenderWidget::initializeGL()
 void QtRenderWidget::paintGL()
 {
   SCI_LOG_DEBUG("Start of paintGL");
+  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
   if ( !( this->renderer_texture_ ) )
   {
-    glClearColor( 0.5 , 0.5 , 0.5, 1.0 );
-    glClear( GL_COLOR_BUFFER_BIT );
     return;
   }
 

@@ -180,7 +180,7 @@ void Renderer::initialize()
     ->redraw_signal_.connect( boost::bind( &Renderer::redraw, this ) ) );
 
   SCI_LOG_DEBUG( std::string("Renderer ") + Utils::to_string( this->viewer_id_ ) 
-    + " initialized" );
+    + " initialized with context " + this->context_->to_string() );
 }
 
 void Renderer::redraw()
@@ -239,8 +239,6 @@ void Renderer::redraw()
     return;
   }
 
-  SCI_CHECK_OPENGL_ERROR();
-
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
   glMatrixMode( GL_PROJECTION );
   glLoadIdentity();
@@ -280,6 +278,8 @@ void Renderer::redraw()
       Utils::RenderResources::lock_type lock( Utils::RenderResources::GetMutex() );
       this->process_slices( layer_scene, viewer );
     }
+    //glFinish();
+    SCI_CHECK_OPENGL_ERROR();
 
     Utils::View2D view2d(
         dynamic_cast< StateView2D* > ( viewer->get_active_view_state().get() )->get() );

@@ -337,30 +337,25 @@ void Viewer::insert_layer( LayerHandle layer )
     assert( false );
   }
 
+  lock.unlock();
+
   // Auto adjust the view and depth if it is the first layer inserted
-  if ( ( this->data_slices_.size() + this->mask_slices_.size() ) == 1 )
+  if ( !this->active_layer_slice_ )
   {
     Utils::ScopedCounter block_counter( this->redraw_block_count_ );
-    this->adjust_view();
-    this->adjust_depth();
+    this->adjust_view( volume_slice );
+    this->adjust_depth( volume_slice );
+    this->set_active_layer( layer );
   }
   else if ( !this->is_volume_view() )
   { 
-    if ( this->active_layer_slice_ )
-    {
-      volume_slice->move_slice( this->active_layer_slice_->depth() );
-    }
-    // TODO: remove when there is always an active layer
-    else
-    {
-      StateView2D* view2d_state = dynamic_cast< StateView2D* >(
-        this->get_active_view_state().get() );
-      volume_slice->move_slice( view2d_state->get().center().z() );
-    }
+    volume_slice->move_slice( this->active_layer_slice_->depth() );
   }
 
-  lock.unlock();
-  this->redraw_signal_();
+  if ( this->redraw_block_count_ == 0 )
+  {
+    this->redraw_signal_();
+  }
 }
 
 void Viewer::delete_layers( std::vector< LayerHandle > layers )
@@ -411,22 +406,28 @@ void Viewer::delete_layers( std::vector< LayerHandle > layers )
   }
 
   lock.unlock();
-  this->redraw_signal_();
+  
+  if ( this->redraw_block_count_ == 0 )
+  {
+    this->redraw_signal_();
+  }
 }
 
 void Viewer::set_active_layer( LayerHandle layer )
 {
+  Utils::VolumeSliceHandle new_active_slice;
+
   data_slices_map_type::iterator data_slice_it = this->data_slices_.find( layer->get_layer_id() );
   if ( data_slice_it != this->data_slices_.end() )
   {
-    this->active_layer_slice_ = ( *data_slice_it ).second;
+    new_active_slice = ( *data_slice_it ).second;
   }
   else
   {
     mask_slices_map_type::iterator mask_slice_it = this->mask_slices_.find( layer->get_layer_id() );
     if ( mask_slice_it != this->mask_slices_.end() )
     {
-      this->active_layer_slice_ = ( *mask_slice_it ).second;
+      new_active_slice = ( *mask_slice_it ).second;
     }
     else
     {
@@ -435,8 +436,14 @@ void Viewer::set_active_layer( LayerHandle layer )
     }
   }
 
+  if ( this->active_layer_slice_ == new_active_slice )
+  {
+    return;
+  }
+  this->active_layer_slice_ = new_active_slice;
+
   // Update slice number ranges
-  if ( this->active_layer_slice_ && !this->is_volume_view() )
+  if ( !this->is_volume_view() )
   {
     {
       // Disable redraws triggered by StateBase::state_changed_signal_
@@ -464,7 +471,10 @@ void Viewer::set_active_layer( LayerHandle layer )
       }
     }
 
-    this->redraw_signal_();
+    if ( this->redraw_block_count_ == 0 )
+    {
+      this->redraw_signal_();
+    }
   }
 }
 
@@ -589,35 +599,24 @@ void Viewer::set_slice_number( int num, ActionSource source )
   }
 }
 
-void Viewer::adjust_view()
+void Viewer::adjust_view( Utils::VolumeSliceHandle target_slice )
 {
+  if ( !target_slice )
+  {
+    SCI_LOG_ERROR( "Invalid volume slice handle" );
+    return;
+  }
+
   Utils::VolumeSliceHandle volume_slice;
-  if ( this->active_layer_slice_ )
+  if ( target_slice->volume_type() == Utils::VolumeType::DATA_E )
   {
-    if ( this->active_layer_slice_->volume_type() == Utils::VolumeType::DATA_E )
-    {
-      volume_slice = Utils::VolumeSliceHandle( new Utils::DataVolumeSlice( 
-        *dynamic_cast< Utils::DataVolumeSlice* >( this->active_layer_slice_.get() ) ) );
-    }
-    else
-    {
-      volume_slice = Utils::VolumeSliceHandle( new Utils::MaskVolumeSlice( 
-        *dynamic_cast< Utils::MaskVolumeSlice* >( this->active_layer_slice_.get() ) ) );
-    }
-  }
-  else if ( !this->data_slices_.empty() )
-  {
-    volume_slice = Utils::DataVolumeSliceHandle( 
-      new Utils::DataVolumeSlice( *( *this->data_slices_.begin() ).second ) );
-  }
-  else if ( !this->mask_slices_.empty() )
-  {
-    volume_slice = Utils::MaskVolumeSliceHandle( 
-      new Utils::MaskVolumeSlice( *( *this->mask_slices_.begin() ).second ) );
+    volume_slice = Utils::VolumeSliceHandle( new Utils::DataVolumeSlice( 
+      *dynamic_cast< Utils::DataVolumeSlice* >( target_slice.get() ) ) );
   }
   else
   {
-    return;
+    volume_slice = Utils::VolumeSliceHandle( new Utils::MaskVolumeSlice( 
+      *dynamic_cast< Utils::MaskVolumeSlice* >( target_slice.get() ) ) );
   }
 
   double aspect = 1.0;
@@ -659,35 +658,24 @@ void Viewer::adjust_view()
   this->sagittal_view_state_->set( Utils::View2D( center, scalex, scaley ) );
 }
 
-void Viewer::adjust_depth()
+void Viewer::adjust_depth( Utils::VolumeSliceHandle target_slice )
 {
+  if ( !target_slice )
+  {
+    SCI_LOG_ERROR( "Invalid volume slice handle" );
+    return;
+  }
+
   Utils::VolumeSliceHandle volume_slice;
-  if ( this->active_layer_slice_ )
+  if ( target_slice->volume_type() == Utils::VolumeType::DATA_E )
   {
-    if ( this->active_layer_slice_->volume_type() == Utils::VolumeType::DATA_E )
-    {
-      volume_slice = Utils::VolumeSliceHandle( new Utils::DataVolumeSlice( 
-        *dynamic_cast< Utils::DataVolumeSlice* >( this->active_layer_slice_.get() ) ) );
-    }
-    else
-    {
-      volume_slice = Utils::VolumeSliceHandle( new Utils::MaskVolumeSlice( 
-        *dynamic_cast< Utils::MaskVolumeSlice* >( this->active_layer_slice_.get() ) ) );
-    }
-  }
-  else if ( !this->data_slices_.empty() )
-  {
-    volume_slice = Utils::DataVolumeSliceHandle( 
-      new Utils::DataVolumeSlice( *( *this->data_slices_.begin() ).second ) );
-  }
-  else if ( !this->mask_slices_.empty() )
-  {
-    volume_slice = Utils::MaskVolumeSliceHandle( 
-      new Utils::MaskVolumeSlice( *( *this->mask_slices_.begin() ).second ) );
+    volume_slice = Utils::VolumeSliceHandle( new Utils::DataVolumeSlice( 
+      *dynamic_cast< Utils::DataVolumeSlice* >( target_slice.get() ) ) );
   }
   else
   {
-    return;
+    volume_slice = Utils::VolumeSliceHandle( new Utils::MaskVolumeSlice( 
+      *dynamic_cast< Utils::MaskVolumeSlice* >( target_slice.get() ) ) );
   }
 
   volume_slice->set_slice_type( Utils::VolumeSliceType::AXIAL_E );
@@ -711,9 +699,14 @@ void Viewer::adjust_depth()
 
 void Viewer::auto_view()
 {
+  if ( !this->active_layer_slice_ )
+  {
+    return;
+  }
+  
   {
     Utils::ScopedCounter block_counter( this->redraw_block_count_ );
-    this->adjust_view();
+    this->adjust_view( this->active_layer_slice_ );
   }
   this->redraw_signal_();
 }

@@ -44,7 +44,7 @@ SCI_ACTION_TYPE("ActivateLayer", "ActivateLayer <layer_name>", ActionPropertiesT
 public:
   ActionActivateLayer()
   {
-    add_argument( layer_name_ );
+    add_argument( this->layer_name_ );
   }
 
   virtual ~ActionActivateLayer()
@@ -70,7 +70,7 @@ public:
   
 private:
   ActionParameter< std::string > layer_name_;
-    LayerHandle layer_handle_;
+    LayerWeakHandle layer_weak_handle_;
 
 };
 

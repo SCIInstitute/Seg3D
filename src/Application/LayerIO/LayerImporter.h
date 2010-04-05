@@ -112,6 +112,7 @@ bool ImportFromString( const std::string& import_type_string, LayerImporterMode&
 // forward declaration
 class LayerImporter;
 typedef boost::shared_ptr< LayerImporter > LayerImporterHandle;
+typedef boost::weak_ptr< LayerImporter > LayerImporterWeakHandle;
 
 // class definition
 class LayerImporter : public boost::noncopyable

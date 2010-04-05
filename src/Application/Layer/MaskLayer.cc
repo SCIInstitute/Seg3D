@@ -43,7 +43,7 @@ MaskLayer::MaskLayer( const std::string& name, const Utils::MaskVolumeHandle& vo
   this->initialize_states();  
 }
 
-MaskLayer::MaskLayer( const std::string& name, const Utils::GridTransform grid_transform ) :
+MaskLayer::MaskLayer( const std::string& name, const Utils::GridTransform& grid_transform ) :
     Layer( name ), mask_volume_( new Utils::MaskVolume( grid_transform ) )
 {
     this->initialize_states();

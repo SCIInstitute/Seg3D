@@ -52,7 +52,7 @@ class LayerSceneItem
 {
 public:
   LayerSceneItem() {}
-  ~LayerSceneItem() {}
+  virtual ~LayerSceneItem() {}
 
   virtual Utils::VolumeType type() = 0;
 
@@ -66,7 +66,7 @@ class DataLayerSceneItem : public LayerSceneItem
 {
 public:
   DataLayerSceneItem() {}
-  ~DataLayerSceneItem() {}
+  virtual ~DataLayerSceneItem() {}
 
   virtual Utils::VolumeType type()
   {
@@ -85,7 +85,7 @@ class MaskLayerSceneItem : public LayerSceneItem
 {
 public:
   MaskLayerSceneItem() {}
-  ~MaskLayerSceneItem() {}
+  virtual ~MaskLayerSceneItem() {}
 
   virtual Utils::VolumeType type()
   {

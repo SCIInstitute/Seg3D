@@ -69,6 +69,7 @@ private:
   ActionParameter< std::string > mode_;
   ActionParameter< std::string > importer_;
   
+  // TODO: possible memory leak here ...
   LayerImporterHandle layer_importer_;
   
   // -- Dispatch this action from the interface --

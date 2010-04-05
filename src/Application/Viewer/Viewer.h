@@ -204,10 +204,10 @@ public:
 private:
   
   // Auto adjust the view states so the slices are fully visible
-  void adjust_view();
+  void adjust_view( Utils::VolumeSliceHandle target_slice );
 
   // Move the active slices to the center of the volume
-  void adjust_depth();
+  void adjust_depth( Utils::VolumeSliceHandle target_slice );
 
   void layer_state_changed( bool volume_view );
 

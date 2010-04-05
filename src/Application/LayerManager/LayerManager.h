@@ -79,15 +79,12 @@ public:
   void get_layers( std::vector< LayerHandle > &vector_of_layers );
   
   LayerGroupHandle get_LayerGroupHandle_from_group_id( std::string group_id );
-  LayerHandle get_LayerHandle_from_layer_id( std::string layer_id );
-  LayerHandle get_LayerHandle_from_layer_name( std::string layer_name );
+  LayerHandle get_layer_by_id( const std::string& layer_id );
+  LayerHandle get_layer_by_name( const std::string& layer_name );
   
   LayerGroupHandle get_active_group();
 
-  LayerHandle get_active_layer()
-    {
-        return active_layer_;
-    }
+  LayerHandle get_active_layer();
   
   // Action Functions
 public:

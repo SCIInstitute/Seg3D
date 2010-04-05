@@ -28,6 +28,7 @@
 
 #include <limits>
 
+#include <Utils/RenderResources/RenderResources.h>
 #include <Utils/Volume/DataVolumeSlice.h>
 
 namespace Utils
@@ -126,15 +127,15 @@ void DataVolumeSlice::upload_texture()
   // Lock the texture
   Texture::lock_type tex_lock( this->texture_->get_mutex() );
 
-  if ( this->size_changed_ )
-  {
-    // Make sure there is no pixel unpack buffer bound
-    PixelUnpackBuffer::RestoreDefault();
+  //if ( this->size_changed_ )
+  //{
+  //  // Make sure there is no pixel unpack buffer bound
+  //  PixelUnpackBuffer::RestoreDefault();
 
-    this->texture_->set_image( static_cast< int >( this->nx_ ), 
-      static_cast< int >( this->ny_ ), TEXTURE_FORMAT_C );
-    this->size_changed_ = false;
-  }
+  //  this->texture_->set_image( static_cast< int >( this->nx_ ), 
+  //    static_cast< int >( this->ny_ ), TEXTURE_FORMAT_C );
+  //  this->size_changed_ = false;
+  //}
   
   // Step 1. copy the data in the slice to a pixel unpack buffer
   PixelBufferObjectHandle pixel_buffer( new PixelUnpackBuffer );
@@ -143,6 +144,10 @@ void DataVolumeSlice::upload_texture()
     NULL, GL_STREAM_DRAW );
   texture_data_type* buffer = reinterpret_cast< texture_data_type* >(
     pixel_buffer->map_buffer( GL_WRITE_ONLY ) );
+  SCI_CHECK_OPENGL_ERROR();
+
+  //std::vector< texture_data_type > buffer_vector( this->nx_ * this->ny_ );
+  //texture_data_type* buffer = &buffer_vector[0];
 
   // Lock the volume
   lock_type volume_lock( this->get_mutex() );
@@ -179,9 +184,16 @@ void DataVolumeSlice::upload_texture()
   
   // Step 2. copy from the pixel buffer to texture
   pixel_buffer->unmap_buffer();
+  SCI_CHECK_OPENGL_ERROR();
   glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
-  this->texture_->set_sub_image( 0, 0, static_cast<int>( this->nx_ ), 
-    static_cast<int>( this->ny_ ), NULL, GL_LUMINANCE, TEXTURE_DATA_TYPE_C );
+  //this->texture_->set_sub_image( 0, 0, static_cast<int>( this->nx_ ), 
+  //  static_cast<int>( this->ny_ ), NULL, GL_LUMINANCE, TEXTURE_DATA_TYPE_C );
+  this->texture_->set_image( static_cast<int>( this->nx_ ), static_cast<int>( this->ny_ ),
+    TEXTURE_FORMAT_C, NULL, GL_LUMINANCE, TEXTURE_DATA_TYPE_C );
+  //PixelUnpackBuffer::RestoreDefault();
+  //this->texture_->set_sub_image( 0, 0, static_cast<int>( this->nx_ ), 
+  //    static_cast<int>( this->ny_ ), buffer, GL_LUMINANCE, TEXTURE_DATA_TYPE_C );
+  SCI_CHECK_OPENGL_ERROR();
 
   // Step 3. release the pixel unpack buffer
   // NOTE: The texture streaming will still succeed even if the PBO is deleted.

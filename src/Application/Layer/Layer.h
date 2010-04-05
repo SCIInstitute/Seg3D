@@ -66,6 +66,7 @@ typedef std::list < LayerGroupHandle > group_handle_list_type;
   
 class Layer;
 typedef boost::shared_ptr< Layer > LayerHandle;
+typedef boost::weak_ptr< Layer > LayerWeakHandle;
 typedef std::list< LayerHandle > layer_list_type;
 
 

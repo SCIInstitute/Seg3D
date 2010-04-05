@@ -55,7 +55,7 @@ public:
   // -- context functions --
   // IS_VALID:
   // Test whether the context is valid
-  virtual bool is_valid() = 0;
+  virtual bool is_valid() const = 0;
 
   // MAKE_CURRENT:
   // Set the rendering context current to this thread
@@ -67,8 +67,9 @@ public:
 
   // SWAP_BUFFERS:
   // Swap the front and back buffers
-  virtual void swap_buffers() = 0;
+  virtual void swap_buffers() const = 0;
 
+  virtual std::string to_string() const = 0;
 };
 
 } // end namespace Seg3D

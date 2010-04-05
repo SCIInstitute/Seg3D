@@ -69,6 +69,7 @@ protected:
   // Check whether valid render resources were installed
   virtual bool valid_render_resources() = 0;
 
+  virtual std::string get_current_context_string() = 0;
 };
 
 } // end namespace Utils

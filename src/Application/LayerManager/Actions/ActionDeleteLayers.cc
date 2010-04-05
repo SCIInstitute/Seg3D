@@ -39,34 +39,40 @@ SCI_REGISTER_ACTION(DeleteLayers);
 
 bool ActionDeleteLayers::validate( ActionContextHandle& context )
 {
-    if ( !this->group_handle_ )
-      return false;
-  
-  if ( !( StateEngine::Instance()->is_stateid( group_handle_->get_group_id() ) ) )
+  LayerGroupHandle layer_group( this->group_weak_handle_.lock() );
+  if ( !layer_group )
   {
-    context->report_error( std::string( "GroupID '" ) + group_handle_->get_group_id() + "' is invalid" );
     return false;
   }
+  
+  // TODO: fix it
+  //if ( !( StateEngine::Instance()->is_stateid( group_weak_handle_->get_group_id() ) ) )
+  //{
+  //  context->report_error( std::string( "GroupID '" ) + group_weak_handle_->get_group_id() + "' is invalid" );
+  //  return false;
+  //}
 
   return true; // validated
 }
 
-  bool ActionDeleteLayers::run( ActionContextHandle& context, ActionResultHandle& result )
+bool ActionDeleteLayers::run( ActionContextHandle& context, ActionResultHandle& result )
+{
+  LayerGroupHandle layer_group( this->group_weak_handle_.lock() );
+  if ( layer_group )
   {
-    if ( this->group_handle_ )
-    {
-      LayerManager::Instance()->delete_layers( group_handle_ );
-      return true;
-    }
-    
-    return false;
+    LayerManager::Instance()->delete_layers( layer_group );
+    return true;
   }
-  void ActionDeleteLayers::Dispatch( LayerGroupHandle group )
-  {
-    ActionDeleteLayers* action = new ActionDeleteLayers;
-    action->group_handle_ = group;
-    
-    Interface::PostAction( ActionHandle( action ) );
-  }
+  
+  return false;
+}
+
+void ActionDeleteLayers::Dispatch( LayerGroupHandle group )
+{
+  ActionDeleteLayers* action = new ActionDeleteLayers;
+  action->group_weak_handle_ = group;
+  
+  Interface::PostAction( ActionHandle( action ) );
+}
 
 } // end namespace Seg3D

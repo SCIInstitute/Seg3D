@@ -65,7 +65,7 @@ public:
   
 private:
   // Layer_handle that is requested
-  LayerGroupHandle group_handle_;
+  LayerGroupWeakHandle group_weak_handle_;
   
 };
   
