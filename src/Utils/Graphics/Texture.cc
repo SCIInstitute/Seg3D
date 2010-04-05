@@ -67,6 +67,11 @@ void Texture::bind()
   glBindTexture( this->target_, this->texture_id_ );
 }
 
+void Texture::unbind()
+{
+  glBindTexture( this->target_, 0 );
+}
+  
 void Texture::set_parameter(unsigned int param_name, int param_value)
 {
   this->safe_bind();

@@ -376,6 +376,7 @@ void Renderer::redraw()
       glMultiTexCoord3f( GL_TEXTURE1, 0.0f, slice_screen_height / 8.0f, 0.0f );
       glVertex2d( volume_slice->left(), volume_slice->top() );
       glEnd();
+      slice_tex->unbind();
 
     } // end for
 
