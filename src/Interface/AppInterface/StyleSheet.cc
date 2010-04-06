@@ -53,8 +53,6 @@ namespace Seg3D
   // === StatusBar === //
 
   const QString StyleSheet::STATUSBAR_C = QString::fromUtf8(
-    //"QStatusBar {"
-    //" border: 2px solid black; }"
     "QStatusBar::item {"
     " border: none; }"
     "QStatusBar QToolButton {"
@@ -138,29 +136,70 @@ namespace Seg3D
     " border-radius: 6px;"
     " border: 1px solid rgb(120, 120, 120);"
     "}");
-    
   const QString StyleSheet::LAYER_WIDGET_BACKGROUND_LOCKED_C = QString::fromUtf8(
     "QWidget#typeBackground_{"
     " background-color: gray;"
     " border: 1px solid rgb(141, 141, 141);"
     " border-radius: 4px;"
     "}");
-    
   const QString StyleSheet::LAYER_WIDGET_LABEL_LOCKED_C = QString::fromUtf8(
     "QLineEdit#label_{"
     " background-color:rgba(208, 208, 208, 1);"
     " color: gray;"
     "}");
   
+  
   // === LayerGroupWidget Styles === //
   // - ACTIVE - //
-  const QString StyleSheet::GROUP_WIDGET_BASE_ACTIVE_C = "";
-  const QString StyleSheet::GROUP_WIDGET_BACKGROUND_ACTIVE_C = "";
-  const QString StyleSheet::GROUP_WIDGET_ACTIVATE_BUTTON_ACTIVE_C = "";
+  const QString StyleSheet::GROUP_WIDGET_BASE_ACTIVE_C = QString::fromUtf8(
+    "QWidget#base_{"
+    " background-color: rgb(150, 150, 150);"
+    " border-radius:6px;"
+    " border: 1px solid rgba(80, 80, 80, 255);"
+    " color: rgb(90,90,90);"
+    "}");
+  const QString StyleSheet::GROUP_WIDGET_BACKGROUND_ACTIVE_C = QString::fromUtf8(  
+    "QWidget#group_background_{"
+    " background-color: rgb(255, 128, 0);"
+    " border-radius: 6px;"
+    " color: white;"
+    "}");
+  const QString StyleSheet::GROUP_WIDGET_ACTIVATE_BUTTON_ACTIVE_C = QString::fromUtf8(
+    "QPushButton#activate_button_{"
+    " background-color:rgba(0, 0, 0, 0);"
+    " border-color: rgba(0, 0, 0, 0);"
+    " border: none;"
+    " height: 24px;"
+    " text-align: left;"
+    " color: white;"
+    " margin: 0 0 0 0;"
+    " padding: 0 0 0 0;"
+    "}");
+    
   // - INACTIVE - //
-  const QString StyleSheet::GROUP_WIDGET_BASE_INACTIVE_C = "";
-  const QString StyleSheet::GROUP_WIDGET_BACKGROUND_INACTIVE_C = "";
-  const QString StyleSheet::GROUP_WIDGET_ACTIVATE_BUTTON_INACTIVE_C = "";
+  const QString StyleSheet::GROUP_WIDGET_BASE_INACTIVE_C = QString::fromUtf8(
+    "QWidget#base_{"
+    " background-color: rgb(110, 110, 110);"
+    " border-radius:6px;"
+    " border: 1px solid rgb(80, 80, 80);"
+    "}");
+    
+  const QString StyleSheet::GROUP_WIDGET_BACKGROUND_INACTIVE_C = QString::fromUtf8(  
+    "QWidget#group_background_{\n"
+    " background-color: rgb(210, 210, 210);\n"
+    " border-radius: 6px;\n"
+    "}\n");
+  const QString StyleSheet::GROUP_WIDGET_ACTIVATE_BUTTON_INACTIVE_C = QString::fromUtf8(
+    "QPushButton#activate_button_{"
+    " background-color:rgba(0, 0, 0, 0);"
+    " border-color: rgba(0, 0, 0, 0);"
+    " border: none;"
+    " height: 24px;"
+    " text-align: left;"
+    " color: rgb( 90, 90, 90 );"
+    " margin: 0 0 0 0;"
+    " padding: 0 0 0 0;"
+    "}");
 
 StyleSheet::StyleSheet()
 {

@@ -79,8 +79,6 @@ public:
 LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
   private_( new LayerGroupWidgetPrivate )
 { 
-  this->setUpdatesEnabled( false );
-  
     LayerGroupHandle group = layer->get_layer_group();
 
   this->setParent( parent );
@@ -157,7 +155,7 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
   connect( this->private_->ui_.delete_button_, SIGNAL( clicked () ), this, SLOT( uncheck_delete_confirm() ) );
   
   // Add all current layer to the new group
-  this->add_layer( layer );
+  this->insert_layer( layer );
 
   
   //Set the defaulf values for the Group UI and make the connections to the state engine
@@ -273,8 +271,6 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
       QtBridge::Connect( this->private_->ui_.spacing_z_spinbox_, group->transform_spacing_z_state_ );
         
         QtBridge::Connect( this->private_->ui_.transform_replace_checkBox_, group->transform_replace_state_ );
-        
-        this->setUpdatesEnabled( true );
 
 }
   
@@ -282,107 +278,70 @@ LayerGroupWidget::~LayerGroupWidget()
 {
 }
   
-void LayerGroupWidget::add_layer( LayerHandle layer )
+void LayerGroupWidget::insert_layer( LayerHandle layer )
 {
   LayerWidget_handle new_layer_handle( new LayerWidget(this->private_->ui_.group_frame_, layer ) );
-  this->private_->ui_.group_frame_layout_->addWidget( new_layer_handle.data() );
-  new_layer_handle->set_active( layer->get_active() );
+  // If the layer is a data layer, put it on the bottom.
+  if( new_layer_handle->get_volume_type() == Utils::VolumeType::DATA_E )
+    this->private_->ui_.group_frame_layout_->insertWidget( -1, new_layer_handle.data() );
+  else
+    this->private_->ui_.group_frame_layout_->insertWidget( 0, new_layer_handle.data() );
   this->layer_list_.push_back( new_layer_handle );
 }
 
-void LayerGroupWidget::delete_layer( LayerHandle layer )
-{
+bool LayerGroupWidget::delete_layer( LayerHandle layer )
+{ 
     for( QVector< LayerWidget_handle >::iterator i = layer_list_.begin(); i != 
         layer_list_.end(); ++i)
   {
         if( layer->get_layer_id() == ( *i )->get_layer_id() )
       {
-      this->setUpdatesEnabled( false );
           ( *i )->deleteLater();
           layer_list_.erase( i );
-      this->setUpdatesEnabled( true );
-          return;
+          return true;
       }
-  }    
+  }  
+  return false;  
 }
 
 
-void LayerGroupWidget::set_active_layer( LayerHandle layer )
+LayerWidget_handle LayerGroupWidget::set_active_layer( LayerHandle layer )
 {
-  this->setUpdatesEnabled( false );
+  std::string layer_id = layer->get_layer_id();
     for( int i = 0; i < layer_list_.size(); ++i)
   {
-      if( layer->get_layer_id() == layer_list_[i]->get_layer_id() )
+      if( layer_id == layer_list_[i]->get_layer_id() )
       {
           layer_list_[i]->set_active( true );
-      }
-      else
-      {
-          layer_list_[i]->set_active( false );
+      return layer_list_[i];
       }
   }
-  this->setUpdatesEnabled( true );
+  return LayerWidget_handle();
 }
 
 void  LayerGroupWidget::set_active( bool active )
 {
     if( active )
     {
-        this->private_->ui_.base_->setStyleSheet( QString::fromUtf8(
-                    "QWidget#base_{"
-                  "background-color: rgb(150, 150, 150);\n"
-                  "border-radius:6px;\n"
-                  "border: 1px solid rgba(80, 80, 80, 255);\n"
-                  "color: rgb(90,90,90);\n"
-                  "}\n"));
+        this->private_->ui_.base_->setStyleSheet( 
+      StyleSheet::GROUP_WIDGET_BASE_ACTIVE_C );
                   
-    this->private_->ui_.group_background_->setStyleSheet(  QString::fromUtf8(  
-                    "QWidget#group_background_{\n"
-                    "background-color: rgb(255, 128, 0);\n"
-                    "border-radius: 6px;\n"
-                    "color: white;\n"
-                    "}\n"));
+    this->private_->ui_.group_background_->setStyleSheet( 
+      StyleSheet::GROUP_WIDGET_BACKGROUND_ACTIVE_C );
                     
-    this->private_->ui_.activate_button_->setStyleSheet(  QString::fromUtf8(
-                      "QPushButton#activate_button_{\n"
-                      "background-color:rgba(0, 0, 0, 0);\n"
-                      "border-color: rgba(0, 0, 0, 0);\n"
-                      "border: none;\n"
-                      "height: 24px;\n"
-                      "text-align: left;\n"
-                      "color: white;\n"
-                      "margin: 0 0 0 0;\n"
-                      "padding: 0 0 0 0;\n"
-                      "}\n"));  
+    this->private_->ui_.activate_button_->setStyleSheet( 
+      StyleSheet::GROUP_WIDGET_ACTIVATE_BUTTON_ACTIVE_C); 
     }
     else
     {
-        this->private_->ui_.base_->setStyleSheet(QString::fromUtf8(
-                    "QWidget#base_{"
-                  "background-color: rgb(110, 110, 110);\n"
-                  "border-radius:6px;\n"
-                  "border: 1px solid rgb(80, 80, 80);\n"
-                  "}\n"));
-        this->private_->ui_.group_background_->setStyleSheet(  QString::fromUtf8(  
-                    "QWidget#group_background_{\n"
-                    "background-color: rgb(210, 210, 210);\n"
-                    "border-radius: 6px;\n"
-                    "}\n"));
-                    
-      this->private_->ui_.activate_button_->setStyleSheet(  QString::fromUtf8(
-                      "QPushButton#activate_button_{\n"
-                      "background-color:rgba(0, 0, 0, 0);\n"
-                      "border-color: rgba(0, 0, 0, 0);\n"
-                      "border: none;\n"
-                      "height: 24px;\n"
-                      "text-align: left;\n"
-                      "color: rgb( 90, 90, 90 );\n"
-                      "margin: 0 0 0 0;\n"
-                      "padding: 0 0 0 0;\n"
-                      "}\n"));
-                      
-      
-                    
+        this->private_->ui_.base_->setStyleSheet( 
+      StyleSheet::GROUP_WIDGET_BASE_INACTIVE_C );
+        
+        this->private_->ui_.group_background_->setStyleSheet( 
+      StyleSheet::GROUP_WIDGET_BACKGROUND_INACTIVE_C );
+                  
+      this->private_->ui_.activate_button_->setStyleSheet( 
+      StyleSheet::GROUP_WIDGET_ACTIVATE_BUTTON_INACTIVE_C );               
     }
 }
 
@@ -576,6 +535,7 @@ void LayerGroupWidget::show_delete( bool show )
     this->private_->ui_.group_delete_button_->setChecked( false );
   }
   show_selection_checkboxes( show );
+  this->update();
 }
 
 
@@ -590,12 +550,7 @@ void LayerGroupWidget::mousePressEvent(QMouseEvent *event)
   { 
     return;
   }
-  
-  if( validate_location( event->pos()) )
-  {
-    
-  }
-  
+
   // Calculate the location on the widget for the mouse to be holding
   // We have to account for the offset of the header in the GroupLayerWidget
   QPoint hotSpot = event->pos() - this->private_->ui_.group_frame_->pos() - layer_to_drag->pos();
@@ -637,7 +592,6 @@ void LayerGroupWidget::mousePressEvent(QMouseEvent *event)
   // Next we hide the LayerWidget that we are going to be dragging.
   layer_to_drag->seethrough( true );
   layer_to_drag->set_picked_up( true );
-  //layer_to_drag->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_PICKED_UP_C );
   
   Qt::DropActions test = drag->exec( Qt::CopyAction, Qt::CopyAction );
   
@@ -702,7 +656,6 @@ void LayerGroupWidget::dragLeaveEvent( QDragLeaveEvent * event )
   {
     this->layer_list_[i]->set_drop( false );
   }
-
 }
 
 

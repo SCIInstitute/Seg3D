@@ -61,11 +61,12 @@ public Q_SLOTS:
   void enable_delete_button( bool enable );
   
 public:
-  void add_layer( LayerHandle layer );
-  void delete_layer( LayerHandle layer );
+  //void add_layer( LayerHandle layer );
+  void insert_layer( LayerHandle layer );
+  bool delete_layer( LayerHandle layer );
   std::string &get_group_id();
   void set_active( bool active );
-  void set_active_layer( LayerHandle layer );
+  LayerWidget_handle set_active_layer( LayerHandle layer );
   void clear_all_layers()
     {
         this->layer_list_.clear();

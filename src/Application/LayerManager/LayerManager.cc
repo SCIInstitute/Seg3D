@@ -333,14 +333,15 @@ void LayerManager::delete_layers( LayerGroupHandle group )
     
   } // Unlocked from here:
 
+// signal the listeners
   if( group->is_empty() )
   {   
       group_deleted_signal_( group );
   }
   
-  // signal the listeners
+  
   layers_deleted_signal_( layer_vector );
-  layers_finished_deleting_signal_( group );
+  
   if ( active_layer_changed )
   {
     this->active_layer_changed_signal_( this->active_layer_ );

@@ -265,13 +265,13 @@
      </property>
      <property name="minimumSize">
       <size>
-       <width>342</width>
+       <width>344</width>
        <height>20</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
-       <width>342</width>
+       <width>344</width>
        <height>20</height>
       </size>
      </property>
@@ -555,13 +555,13 @@
        <widget class="QWidget" name="widget" native="true">
         <property name="minimumSize">
          <size>
-          <width>102</width>
+          <width>104</width>
           <height>0</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>102</width>
+          <width>104</width>
           <height>16777215</height>
          </size>
         </property>
@@ -590,13 +590,13 @@
           <widget class="QLabel" name="value_label_">
            <property name="minimumSize">
             <size>
-             <width>36</width>
+             <width>40</width>
              <height>0</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>36</width>
+             <width>40</width>
              <height>16777215</height>
             </size>
            </property>

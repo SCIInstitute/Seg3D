@@ -54,21 +54,16 @@ class LayerWidgetPrivate
 {
 public:
   Ui::LayerWidget ui_;
-  
   SliderDoubleCombo* opacity_adjuster_;
   SliderDoubleCombo* brightness_adjuster_;
   SliderDoubleCombo* contrast_adjuster_;
-  
-  std::string layer_id_;
-  Utils::GridTransform grid_transform_;
-  int volume_type_;
-  bool active_;
-  bool picked_up_;
 };
 
 LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   QWidget( parent ),
-  private_( new LayerWidgetPrivate )
+  private_( new LayerWidgetPrivate ),
+  picked_up_( false ),
+  active_( false )
 {
   
   {// Prepare the icons!!
@@ -82,8 +77,6 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   this->setObjectName(QString::fromUtf8("LayerWidget"));
   this->private_->ui_.setupUi( this );
   
-  this->set_picked_up( false );
-  
   // set some Drag and Drop stuff
   //this->setAcceptDrops( true );
   
@@ -93,8 +86,8 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   this->private_->ui_.label_->setAcceptDrops( false );
   
   // here we set the unique layer_id_ of the layer
-  this->private_->layer_id_ = layer->get_layer_id();
-  this->private_->grid_transform_ = layer->get_grid_transform();
+  this->layer_id_ = layer->get_layer_id();
+  this->grid_transform_ = layer->get_grid_transform();
   
   // hide the toolbars and the selection check box
   // hide the tool bars and the selection checkbox
@@ -216,7 +209,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
                 this->private_->contrast_adjuster_->setCurrentValue( data_layer->contrast_state_->get() );
         
         // keep track locally of what type we are
-        this->private_->volume_type_ = 1;
+        this->volume_type_ = 1;
       }
       break;
     // This is for the Mask Layers  
@@ -230,7 +223,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
         QtBridge::Connect( this->private_->ui_.border_selection_combo_, mask_layer->fill_state_ );
 
           // keep track locally of what type we are
-          this->private_->volume_type_ = 2;
+          this->volume_type_ = 2;
       }
       break;
       
@@ -240,7 +233,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
         this->private_->ui_.typeBackground_->setStyleSheet( StyleSheet::LABEL_VOLUME_COLOR_C );
         
         // keep track locally of what type we are
-            this->private_->volume_type_ = 3;
+            this->volume_type_ = 3;
             
         }
       
@@ -259,21 +252,10 @@ LayerWidget::~LayerWidget()
 {
 }
 
-int LayerWidget::get_volume_type()
-{
-  return this->private_->volume_type_;
-}
-
-void LayerWidget::set_picked_up( bool up )
-{
-  this->private_->picked_up_ = up;
-}
-
-
 void LayerWidget::set_active( bool active )
 {
   // keep track locally if we are an active layer or not so we know what color to revert to if locked
-  this->private_->active_ = active;
+  this->active_ = active;
   
     if( active )
     {
@@ -303,7 +285,7 @@ void LayerWidget::seethrough( bool see )
     
     this->setUpdatesEnabled( false );
     this->private_->ui_.header_->show();
-    if( this->private_->active_ ) 
+    if( this->active_ ) 
       this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_ACTIVE_C );
     else
       this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_INACTIVE_C );
@@ -312,10 +294,7 @@ void LayerWidget::seethrough( bool see )
   }
 }
 
-std::string& LayerWidget::get_layer_id()
-{
-  return this->private_->layer_id_;
-}
+
   
 void LayerWidget::show_selection_checkbox( bool show )
 {
@@ -439,7 +418,7 @@ void LayerWidget::visual_lock( bool lock )
   }
   else
   {
-    switch( this->private_->volume_type_ )
+    switch( this->volume_type_ )
       {
         case Utils::VolumeType::DATA_E:
         {
@@ -461,7 +440,7 @@ void LayerWidget::visual_lock( bool lock )
       break;
     }
     
-    if( this->private_->active_ )
+    if( this->active_ )
     {
       this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_ACTIVE_C );  
     }
@@ -471,7 +450,6 @@ void LayerWidget::visual_lock( bool lock )
     }
     
     this->private_->ui_.label_->setStyleSheet( StyleSheet::LAYER_WIDGET_LABEL_C );
-    
     this->private_->ui_.activate_button_->setEnabled( true );
     this->private_->ui_.opacity_button_->setEnabled( true );
     this->private_->ui_.visibility_button_->setEnabled( true );
@@ -488,25 +466,19 @@ void LayerWidget::visual_lock( bool lock )
 
 void LayerWidget::set_drop( bool drop )
 {
-  if( private_->picked_up_ )
+  // First we check to see if it is picked up if so, we set change the way it looks
+  if( this->picked_up_ )
   {
     this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_PICKED_UP_C );  
   }
-  
+  // If its not picked up, we set its color to indicate whether or not its a potential drop site
   else if( drop )
   {
     this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_DROP_C );
-    
   }
   else
   {
-//    if( this->private_->picked_up_ )
-//    {
-//      this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_PICKED_UP_C );  
-//    }
-//    
-//    else 
-    if( this->private_->active_ )
+    if( this->active_ )
     {
       this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_ACTIVE_C );  
       
@@ -516,7 +488,6 @@ void LayerWidget::set_drop( bool drop )
       this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_INACTIVE_C );
     }
   }
-
 }
 
 } //end namespace Seg3D

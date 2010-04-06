@@ -58,8 +58,6 @@ public:
   virtual ~LayerWidget();
     
 // -- widget internals --
-  
-//TODO connect to state engine
 public Q_SLOTS:
   void show_opacity_bar( bool show );
   void show_brightness_contrast_bar( bool show );
@@ -70,11 +68,8 @@ public Q_SLOTS:
   
 public:
   void show_selection_checkbox( bool hideshow );
-  std::string &get_layer_id();
-  int get_volume_type();
   void set_active( bool active );
   void set_drop( bool drop );
-  void set_picked_up( bool up );
   void seethrough( bool see );
   
 private:
@@ -84,6 +79,18 @@ private:
   // icons to represent the layer types
   QIcon data_layer_icon_;
   QIcon label_layer_icon_;
+  
+  std::string layer_id_;
+  Utils::GridTransform grid_transform_;
+  int volume_type_;
+  bool active_;
+  bool picked_up_;
+
+public:
+  int get_volume_type(){ return this->volume_type_; }
+  std::string& get_layer_id(){ return this->layer_id_; }
+  void set_picked_up( bool up ){ this->picked_up_ = up; }
+  
 
 };
 
