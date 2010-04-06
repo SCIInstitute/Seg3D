@@ -73,8 +73,6 @@ Layer::Layer( const std::string& name ) :
   // == Which border mode is active ==
   add_state( "border_mode", border_mode_state_, "none", "none|solid|dashed|dotted" );
 
-  active_ = false;
-
 }
   
 Layer::~Layer()

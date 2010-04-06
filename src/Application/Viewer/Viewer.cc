@@ -205,11 +205,9 @@ void Viewer::update_status_bar( int x, int y )
     return;
   }
 
-  if ( !this->is_volume_view() && this->active_layer_slice_ &&
-     this->active_layer_slice_->volume_type() == Utils::VolumeType::DATA_E )
+  if ( !this->is_volume_view() && this->active_layer_slice_ )
   {
-    Utils::DataVolumeSlice* data_slice = dynamic_cast< Utils::DataVolumeSlice* >(
-      this->active_layer_slice_.get() );
+    Utils::VolumeSlice* volume_slice = this->active_layer_slice_.get();
     // Scale the mouse position to [-1, 1]
     double xpos = x * 2.0 / ( this->width_ - 1 ) - 1.0;
     double ypos = ( this->height_ - 1 - y ) * 2.0 / ( this->height_ - 1 ) - 1.0;
@@ -222,14 +220,24 @@ void Viewer::update_status_bar( int x, int y )
     Utils::Point pos( xpos, ypos, 0 );
     pos = inv_proj * pos;
     int i, j;
-    data_slice->world_to_index( pos.x(), pos.y(), i, j );
+    volume_slice->world_to_index( pos.x(), pos.y(), i, j );
     Utils::Point index;
-    if ( i >= 0 && static_cast<size_t>( i ) < data_slice->nx() && 
-       j >= 0 && static_cast<size_t>( j ) < data_slice->ny() )
+    if ( i >= 0 && static_cast<size_t>( i ) < volume_slice->nx() && 
+       j >= 0 && static_cast<size_t>( j ) < volume_slice->ny() )
     {
-      data_slice->to_index( static_cast<size_t>( i ), static_cast<size_t>( j ), index );
-      Utils::Point world_pos = data_slice->apply_grid_transform( index );
-      double value = data_slice->get_data_at( static_cast<size_t>( i ), static_cast<size_t>( j ) );
+      volume_slice->to_index( static_cast<size_t>( i ), static_cast<size_t>( j ), index );
+      Utils::Point world_pos = volume_slice->apply_grid_transform( index );
+      double value = 0.0;
+      if ( volume_slice->volume_type() == Utils::VolumeType::DATA_E )
+      {
+        Utils::DataVolumeSlice* data_slice = dynamic_cast< Utils::DataVolumeSlice* >( volume_slice );
+        value = data_slice->get_data_at( static_cast<size_t>( i ), static_cast<size_t>( j ) );
+      }
+      else
+      {
+        Utils::MaskVolumeSlice* mask_slice = dynamic_cast< Utils::MaskVolumeSlice* >( volume_slice );
+        value = mask_slice->get_mask_at( static_cast<size_t>( i ), static_cast<size_t>( j ) );
+      }
       DataPointInfoHandle data_point( new DataPointInfo( index, world_pos, value ) );
       StatusBar::Instance()->set_data_point_info( data_point );
     }

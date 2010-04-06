@@ -54,6 +54,8 @@ public:
   void set_mask_mode( bool mask_mode );
   void set_opacity( float opacity );
   void set_scale_bias( float scale, float bias );
+  void set_pixel_size( float width, float height );
+  void set_border_width( int width );
 
 private:
 
@@ -67,6 +69,8 @@ private:
   int mask_mode_loc_;
   int opacity_loc_;
   int scale_bias_loc_;
+  int pixel_size_loc_;
+  int border_width_loc_;
 
   const static char* FRAG_SHADER_SOURCE_C[];
 };

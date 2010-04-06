@@ -35,7 +35,6 @@
 
 // STL includes
 #include <vector>
-#include <bitset>
 
 // Boost includes
 #include <boost/utility.hpp>

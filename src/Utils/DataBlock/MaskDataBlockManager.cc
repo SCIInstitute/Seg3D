@@ -26,9 +26,15 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <Utils/DataBlock/StdDataBlock.h>
+#if defined(_MSC_VER) && (_MSC_VER >= 1600)
+#define _HAS_CPP0X 0
+#endif
+
+#include <bitset>
 
 #include <Utils/DataBlock/MaskDataBlockManager.h>
+#include <Utils/DataBlock/StdDataBlock.h>
+
 
 namespace Utils
 {
@@ -258,7 +264,7 @@ static bool CreateMaskFromBitPlaneDataInternal( const DataBlockHandle& data,
     used_bits |= src[ j ];
   }
 
-  std::bitset<32> bits( used_bits );
+  std::bitset< sizeof( DATA ) > bits( used_bits );
   
   masks.resize( bits.count() );
   for ( size_t j = 0; j < bits.count(); j++ )

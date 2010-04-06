@@ -69,7 +69,7 @@ void FramebufferObject::attach_renderbuffer(RenderbufferHandle renderbuffer, uns
 
 void FramebufferObject::attach_texture(TextureHandle texture, unsigned int attachment, int level, int layer)
 {
-  safe_bind();
+  this->safe_bind();
 
   unsigned int texture_target = texture->get_target();
   switch (texture_target)
@@ -84,7 +84,27 @@ void FramebufferObject::attach_texture(TextureHandle texture, unsigned int attac
     glFramebufferTexture2DEXT(TARGET_C, attachment, texture_target, texture->get_id(), level);
   }
 
-  safe_unbind();
+  this->safe_unbind();
+}
+
+void FramebufferObject::detach_texture( TextureHandle texture, unsigned int attachment )
+{
+  this->safe_bind();
+
+  unsigned int texture_target = texture->get_target();
+  switch (texture_target)
+  {
+  case GL_TEXTURE_1D:
+    glFramebufferTexture1DEXT( TARGET_C, attachment, texture_target, 0, 0 );
+    break;
+  case GL_TEXTURE_3D:
+    glFramebufferTexture3DEXT( TARGET_C, attachment, texture_target, 0, 0, 0);
+    break;
+  default:
+    glFramebufferTexture2DEXT( TARGET_C, attachment, texture_target, 0, 0 );
+  }
+
+  this->safe_unbind();
 }
 
 bool FramebufferObject::check_status( GLenum* status )

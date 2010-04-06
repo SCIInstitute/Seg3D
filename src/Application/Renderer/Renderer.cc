@@ -76,15 +76,26 @@ public:
   }
 };
 
-static const unsigned char MASK_PATTERNS_C[][ 8 ][ 8 ] =
+static const unsigned int PATTERN_SIZE_C = 6;
+static const unsigned char MASK_PATTERNS_C[][ PATTERN_SIZE_C ][ PATTERN_SIZE_C ] =
 {
-  { { 0, 0, 0, 255, 255, 255, 0, 0 }, { 0, 0, 0, 0, 255, 255, 255, 0 }, 
-    { 0, 0, 0, 0, 0, 255, 255, 255 }, { 255, 0, 0, 0, 0, 0, 255, 255 },
-    { 255, 255, 0, 0, 0, 0, 0, 255 }, { 255, 255, 255, 0, 0, 0, 0, 0 },
-    { 0, 255, 255, 255, 0, 0, 0, 0 }, { 0, 0, 255, 255, 255, 0, 0, 0 } }
+  //{ { 0, 0, 0, 255, 255, 255, 0, 0 }, { 0, 0, 0, 0, 255, 255, 255, 0 }, 
+  //  { 0, 0, 0, 0, 0, 255, 255, 255 }, { 255, 0, 0, 0, 0, 0, 255, 255 },
+  //  { 255, 255, 0, 0, 0, 0, 0, 255 }, { 255, 255, 255, 0, 0, 0, 0, 0 },
+  //  { 0, 255, 255, 255, 0, 0, 0, 0 }, { 0, 0, 255, 255, 255, 0, 0, 0 } },
+
+  //{ { 0, 0, 0, 255, 255, 0, 0, 0 }, { 0, 0, 0, 0, 255, 255, 0, 0 }, 
+  //  { 0, 0, 0, 0, 0, 255, 255, 0 }, { 0, 0, 0, 0, 0, 0, 255, 255 },
+  //  { 255, 0, 0, 0, 0, 0, 0, 255 }, { 255, 255, 0, 0, 0, 0, 0, 0 },
+  //  { 0, 255, 255, 0, 0, 0, 0, 0 }, { 0, 0, 255, 255, 0, 0, 0, 0 } }
+
+  { { 0, 0, 0, 255, 0, 0 }, { 0, 0, 0, 0, 255, 0 }, 
+    { 0, 0, 0, 0, 0, 255 }, { 255, 0, 0, 0, 0, 0 },
+    { 0, 255, 0, 0, 0, 0 }, { 0, 0, 255, 0, 0, 0 } }
 };
 
-static const int NUM_OF_PATTERNS_C = sizeof( MASK_PATTERNS_C ) / 64;
+static const int NUM_OF_PATTERNS_C = 
+  sizeof( MASK_PATTERNS_C ) / ( PATTERN_SIZE_C * PATTERN_SIZE_C );
 
 Renderer::Renderer() :
   ViewerRenderer(), 
@@ -142,6 +153,7 @@ void Renderer::initialize()
   this->context_->make_current();
 
   glClearColor( 0.3f, 0.3f, 0.3f, 1.0f );
+  glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
 
   {
     // lock the shared render context
@@ -155,8 +167,8 @@ void Renderer::initialize()
     this->cube_ = Utils::UnitCubeHandle( new Utils::UnitCube() );
     this->slice_shader_->initialize();
     this->pattern_texture_ = Utils::Texture3DHandle( new Utils::Texture3D );
-    this->pattern_texture_->set_image( 8, 8, NUM_OF_PATTERNS_C, GL_ALPHA, 
-      MASK_PATTERNS_C, GL_ALPHA, GL_UNSIGNED_BYTE );
+    this->pattern_texture_->set_image( PATTERN_SIZE_C, PATTERN_SIZE_C, NUM_OF_PATTERNS_C, 
+      GL_ALPHA, MASK_PATTERNS_C, GL_ALPHA, GL_UNSIGNED_BYTE );
   }
 
   SCI_CHECK_OPENGL_ERROR();
@@ -227,11 +239,8 @@ void Renderer::redraw()
 
   // bind the framebuffer object
   this->frame_buffer_->enable();
-
   // attach texture
   this->frame_buffer_->attach_texture( this->textures_[ this->active_render_texture_ ] );
-
-  SCI_CHECK_OPENGL_ERROR();
 
   if ( !this->frame_buffer_->check_status() )
   {
@@ -278,8 +287,6 @@ void Renderer::redraw()
       Utils::RenderResources::lock_type lock( Utils::RenderResources::GetMutex() );
       this->process_slices( layer_scene, viewer );
     }
-    //glFinish();
-    SCI_CHECK_OPENGL_ERROR();
 
     Utils::View2D view2d(
         dynamic_cast< StateView2D* > ( viewer->get_active_view_state().get() )->get() );
@@ -303,6 +310,7 @@ void Renderer::redraw()
     glLoadIdentity();
 
     this->slice_shader_->enable();
+    this->slice_shader_->set_border_width( 1 );
 
     Utils::VolumeSlice* volume_slice = 0;
     for ( size_t layer_num = 0; layer_num < layer_scene->size(); layer_num++ )
@@ -357,8 +365,11 @@ void Renderer::redraw()
       double slice_screen_width = slice_x.x() / 2.0 * this->width_;
       double slice_screen_height = ( volume_slice->top() - volume_slice->bottom() ) / 
         ( volume_slice->right() - volume_slice->left() ) * slice_screen_width;
+      float pattern_repeats_x = static_cast< float >( slice_screen_width / PATTERN_SIZE_C );
+      float pattern_repeats_y = static_cast< float >( slice_screen_height / PATTERN_SIZE_C );
 
       this->slice_shader_->set_opacity( static_cast< float >( layer_item->opacity_ ) );
+      this->slice_shader_->set_pixel_size( 1.0f / slice_screen_width, 1.0f /slice_screen_height );
       Utils::TextureHandle slice_tex = volume_slice->get_texture();
       Utils::Texture::lock_type slice_tex_lock( slice_tex->get_mutex() );
       slice_tex->bind();
@@ -367,15 +378,19 @@ void Renderer::redraw()
       glMultiTexCoord3f( GL_TEXTURE1, 0.0f, 0.0f, 0.0f );
       glVertex2d( volume_slice->left(), volume_slice->bottom() );
       glMultiTexCoord2f( GL_TEXTURE0, 1.0f, 0.0f );
-      glMultiTexCoord3f( GL_TEXTURE1, slice_screen_width / 8.0f, 0.0f, 0.0f );
+      glMultiTexCoord3f( GL_TEXTURE1, pattern_repeats_x, 0.0f, 0.0f );
       glVertex2d( volume_slice->right(), volume_slice->bottom() );
       glMultiTexCoord2f( GL_TEXTURE0, 1.0f, 1.0f );
-      glMultiTexCoord3f( GL_TEXTURE1, slice_screen_width / 8.0f, slice_screen_height / 8.0f, 0.0f );
+      glMultiTexCoord3f( GL_TEXTURE1, pattern_repeats_x, pattern_repeats_y, 0.0f );
       glVertex2d( volume_slice->right(), volume_slice->top() );
       glMultiTexCoord2f( GL_TEXTURE0, 0.0f, 1.0f );
-      glMultiTexCoord3f( GL_TEXTURE1, 0.0f, slice_screen_height / 8.0f, 0.0f );
+      glMultiTexCoord3f( GL_TEXTURE1, 0.0f, pattern_repeats_y, 0.0f );
       glVertex2d( volume_slice->left(), volume_slice->top() );
       glEnd();
+      // NOTE: Always unbind, because we are deleting textures in a separate thread/context.
+      // In this case texture binding of the rendering thread won't be reverted to 0, which
+      // will cause problem when a new texture with the same ID is generated and bound to
+      // this context, because the driver would think it's already bound.
       slice_tex->unbind();
 
     } // end for
@@ -387,6 +402,7 @@ void Renderer::redraw()
 
   glFinish();
 
+  this->frame_buffer_->detach_texture( this->textures_[ this->active_render_texture_ ] );
   this->frame_buffer_->disable();
 
   // release the lock on the active render texture

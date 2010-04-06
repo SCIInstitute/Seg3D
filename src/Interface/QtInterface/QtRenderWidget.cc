@@ -82,6 +82,7 @@ void QtRenderWidget::initializeGL()
 {
   Utils::RenderResources::Instance()->init_gl();
   glClearColor( 0.5, 0.5, 0.5, 1.0 );
+  glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
   renderer_->initialize();
   // Make sure the GL context of the widget is the current one of this thread,
   // because in the single threaded rendering mode, the renderer will make its own context
@@ -98,7 +99,6 @@ void QtRenderWidget::paintGL()
     return;
   }
 
-  Utils::Texture::lock_type lock( renderer_texture_->get_mutex() );
 
   SCI_LOG_DEBUG("Painting texture");
 
@@ -109,10 +109,8 @@ void QtRenderWidget::paintGL()
 
   glMatrixMode( GL_MODELVIEW );
   glLoadIdentity();
+  Utils::Texture::lock_type lock( renderer_texture_->get_mutex() );
   renderer_texture_->enable();
-  glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
-  //GLenum err = glGetError();
-  //const GLubyte* err_str = gluErrorString(err);
   glBegin( GL_QUADS );
   glColor3f( 0.5f, 0.5f, 1.f );
   glTexCoord2f( 0.0f, 0.0f );
