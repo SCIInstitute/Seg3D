@@ -61,7 +61,7 @@ namespace Seg3D
     if ( ( StateEngine::Instance()->is_stateid( layer_to_insert_id_ ) ) && 
       ( StateEngine::Instance()->is_stateid( layer_below_id_ ) ) )
     {
-      LayerManager::Instance()->insert_layer_above( this->layer_to_insert_id_, this->layer_below_id_ );
+      LayerManager::Instance()->move_layer_above( this->layer_to_insert_id_, this->layer_below_id_ );
       return true;
     }
 

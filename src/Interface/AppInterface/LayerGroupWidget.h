@@ -62,11 +62,11 @@ public Q_SLOTS:
   
 public:
   //void add_layer( LayerHandle layer );
-  void insert_layer( LayerHandle layer );
+  void insert_layer( LayerHandle layer, int index );
   bool delete_layer( LayerHandle layer );
   std::string &get_group_id();
   void set_active( bool active );
-  LayerWidget_handle set_active_layer( LayerHandle layer );
+  LayerWidgetQWeakHandle set_active_layer( LayerHandle layer );
   void clear_all_layers()
     {
         this->layer_list_.clear();
@@ -85,16 +85,16 @@ private:
   void dragLeaveEvent( QDragLeaveEvent * event );
   
   // Validate that the event location is a LayerWidget and return a handle to it
-  LayerWidget_handle validate_location( const QPoint& point );
+  LayerWidgetQHandle validate_location( const QPoint& point );
   
   // Check to see if the layer_id is currently in the group
-  LayerWidget_handle check_for_layer( const std::string &layer );
+  LayerWidgetQHandle check_for_layer( const std::string &layer );
 
   
   // -- widget internals --
 private:
     boost::shared_ptr< LayerGroupWidgetPrivate > private_;
-    QVector< LayerWidget_handle > layer_list_;
+    QVector< LayerWidgetQHandle > layer_list_;
       
 };
     

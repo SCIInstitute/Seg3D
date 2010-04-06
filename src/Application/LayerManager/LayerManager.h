@@ -89,7 +89,7 @@ public:
   // Action Functions
 public:
   bool insert_layer( LayerHandle layer );
-  bool insert_layer_above( std::string layer_to_insert_id_, std::string layer_below_id_ );
+  bool move_layer_above( std::string layer_to_insert_id_, std::string layer_below_id_ );
   void delete_layers( LayerGroupHandle group );
   void set_active_layer( LayerHandle layer );
   
@@ -113,6 +113,7 @@ public:
 public:
   // -- Signal/Slots --
   typedef boost::signals2::signal< void( LayerHandle ) > layer_signal_type;
+  typedef boost::signals2::signal< void( LayerHandle, int ) > layer_at_signal_type;
   typedef boost::signals2::signal< void( LayerGroupHandle ) > group_signal_type;
   typedef boost::signals2::signal< void( std::vector< LayerHandle > ) > layers_signal_type;
   // ACTIVE_LAYER_CHANGED_SIGNAL:
@@ -122,6 +123,10 @@ public:
   // LAYER_INSERTED_SIGNAL:
   // This signal is triggered after a layer has been inserted
   layer_signal_type layer_inserted_signal_;
+  
+  // LAYER_INSERTED_AT_SIGNAL:
+  // This signal is triggered after a layer has been inserted
+  layer_at_signal_type layer_inserted_at_signal_;
   
   // LAYER_DELETED_SIGNAL:
   // This signal is triggered after a layer has been deleted

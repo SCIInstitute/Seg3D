@@ -72,7 +72,8 @@ public:
 
 public:
   void insert_layer( LayerHandle layer );
-  //void delete_layer( LayerGroupHandle group );
+  void insert_layer( LayerHandle layer, int index );
+  void delete_layer( LayerHandle layer );
   void delete_layers( std::vector< LayerHandle > layers );
   bool refresh_group( LayerGroupHandle group );
   void make_new_group( LayerHandle layer );
@@ -87,11 +88,11 @@ private:
   QWidget* main_;
   QVBoxLayout* main_layout_;
   QVBoxLayout* group_layout_;
-  LayerWidget_handle active_layer_;
+  LayerWidgetQWeakHandle active_layer_;
 
 
 private:
-  QList< LayerGroupWidget_handle > group_list_;
+  QList< LayerGroupWidgetQHandle > group_list_;
 };
 
 } //endnamespace Seg3d

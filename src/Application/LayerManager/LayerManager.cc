@@ -56,6 +56,7 @@ LayerManager::~LayerManager()
 bool LayerManager::insert_layer( LayerHandle layer )
 {
   bool active_layer_changed = false;
+  
   {
     lock_type lock( this->get_mutex() );
     
@@ -95,11 +96,10 @@ bool LayerManager::insert_layer( LayerHandle layer )
     group_handle->insert_layer( layer );
     layer->set_layer_group( group_handle );
       
-  }
+  } // unlocked from here
 
   layer_inserted_signal_( layer );  
 
-  
   if( active_layer_changed )
   {
     active_layer_changed_signal_( layer );
@@ -108,28 +108,35 @@ bool LayerManager::insert_layer( LayerHandle layer )
   return true;
 }
 
-bool LayerManager::insert_layer_above( std::string layer_to_insert_id, std::string layer_below_id )
+bool LayerManager::move_layer_above( std::string layer_to_insert_id, std::string layer_below_id )
 {
   // we will need to keep track of a few things outside of the locked scope
   // This keeps track of whether or not we delete the group we are moving from
   bool group_above_has_been_deleted = false;
   
+  // This is the index we will send to tell the GUI where to put the layer
+  int index;
+  
   // These handles will let us send signals after we make the moves
   LayerGroupHandle group_above;
   LayerGroupHandle group_below;
+  LayerHandle layer_above;
+  LayerHandle layer_below;
+
+  
   
   {
     // Get the Lock
     lock_type lock( this->get_mutex() );
   
     // First we get LayerHandles for the Layers
-    LayerHandle layer_above = this->get_layer_by_id( layer_to_insert_id );
-    LayerHandle layer_below = this->get_layer_by_id( layer_below_id );
-    
-    if ( !validate_layer_move( layer_above, layer_below ) )
-      return false;
+    layer_above = this->get_layer_by_id( layer_to_insert_id );
+    layer_below = this->get_layer_by_id( layer_below_id );
     
     if( !layer_above || !layer_below )
+      return false;
+    
+    if ( !validate_layer_move( layer_above, layer_below ) )
       return false;
     
     group_above = layer_above->get_layer_group();
@@ -137,7 +144,7 @@ bool LayerManager::insert_layer_above( std::string layer_to_insert_id, std::stri
     
     // First we Delete the Layer from its list of layers
     group_above->delete_layer( layer_above );
-    group_below->insert_layer_above( layer_above, layer_below );
+    index = group_below->insert_layer_above( layer_above, layer_below );
     
     // If they are in the same group ---
     if( group_above != group_below )
@@ -162,14 +169,12 @@ bool LayerManager::insert_layer_above( std::string layer_to_insert_id, std::stri
   } 
   else
   {
-    group_changed_signal_( group_above );
+    layer_deleted_signal_( layer_above );
   }
   
-  if( group_above != group_below )
-    group_changed_signal_( group_below );
+  layer_inserted_at_signal_( layer_above, index );
   
-  return true;
-  
+  return true;  
 }
 
 // Here is the logic for inserting a layer
@@ -178,10 +183,6 @@ bool LayerManager::validate_layer_move( LayerHandle layer_above, LayerHandle lay
   // Validate the most common move
   if ( layer_above->type() == layer_below->type() )
     return true;
-    
-//  Another Easy one
-//      if ( ( layer_above->type() == Utils::VolumeType::DATA_E ) && ( layer_below->type() == Utils::VolumeType::DATA_E ) )
-//        return true;
   
   return false;
 }
@@ -294,7 +295,8 @@ void LayerManager::delete_layers( LayerGroupHandle group )
 {
   std::vector< LayerHandle > layer_vector;
   bool active_layer_changed = false;
-  {
+  
+  { // start the lock scope
     lock_type lock( get_mutex() );  
     
     // get a temporary copy of the list of layers
@@ -330,7 +332,6 @@ void LayerManager::delete_layers( LayerGroupHandle group )
         active_layer_changed = true;
       }
     }
-    
   } // Unlocked from here:
 
 // signal the listeners
@@ -339,13 +340,13 @@ void LayerManager::delete_layers( LayerGroupHandle group )
       group_deleted_signal_( group );
   }
   
-  
   layers_deleted_signal_( layer_vector );
   
   if ( active_layer_changed )
   {
     this->active_layer_changed_signal_( this->active_layer_ );
   }
+  
 } // end delete_layer
 
 LayerGroupHandle LayerManager::get_active_group()

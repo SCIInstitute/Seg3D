@@ -155,7 +155,7 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
   connect( this->private_->ui_.delete_button_, SIGNAL( clicked () ), this, SLOT( uncheck_delete_confirm() ) );
   
   // Add all current layer to the new group
-  this->insert_layer( layer );
+  this->insert_layer( layer, -1 );
 
   
   //Set the defaulf values for the Group UI and make the connections to the state engine
@@ -278,20 +278,28 @@ LayerGroupWidget::~LayerGroupWidget()
 {
 }
   
-void LayerGroupWidget::insert_layer( LayerHandle layer )
+void LayerGroupWidget::insert_layer( LayerHandle layer, int index )
 {
-  LayerWidget_handle new_layer_handle( new LayerWidget(this->private_->ui_.group_frame_, layer ) );
-  // If the layer is a data layer, put it on the bottom.
-  if( new_layer_handle->get_volume_type() == Utils::VolumeType::DATA_E )
-    this->private_->ui_.group_frame_layout_->insertWidget( -1, new_layer_handle.data() );
+  LayerWidgetQHandle new_layer_handle( new LayerWidget(this->private_->ui_.group_frame_, layer ) );
+  
+  if( index == -1 )
+  {
+    // If the layer is a data layer, put it on the bottom.
+    if( new_layer_handle->get_volume_type() == Utils::VolumeType::DATA_E )
+      this->private_->ui_.group_frame_layout_->insertWidget( -1, new_layer_handle.data() );
+    else
+      this->private_->ui_.group_frame_layout_->insertWidget( 0, new_layer_handle.data() );
+  }
   else
-    this->private_->ui_.group_frame_layout_->insertWidget( 0, new_layer_handle.data() );
+  {
+    this->private_->ui_.group_frame_layout_->insertWidget( index, new_layer_handle.data() );
+  }
   this->layer_list_.push_back( new_layer_handle );
 }
 
 bool LayerGroupWidget::delete_layer( LayerHandle layer )
 { 
-    for( QVector< LayerWidget_handle >::iterator i = layer_list_.begin(); i != 
+    for( QVector< LayerWidgetQHandle >::iterator i = layer_list_.begin(); i != 
         layer_list_.end(); ++i)
   {
         if( layer->get_layer_id() == ( *i )->get_layer_id() )
@@ -305,7 +313,7 @@ bool LayerGroupWidget::delete_layer( LayerHandle layer )
 }
 
 
-LayerWidget_handle LayerGroupWidget::set_active_layer( LayerHandle layer )
+LayerWidgetQWeakHandle LayerGroupWidget::set_active_layer( LayerHandle layer )
 {
   std::string layer_id = layer->get_layer_id();
     for( int i = 0; i < layer_list_.size(); ++i)
@@ -316,7 +324,7 @@ LayerWidget_handle LayerGroupWidget::set_active_layer( LayerHandle layer )
       return layer_list_[i];
       }
   }
-  return LayerWidget_handle();
+  return LayerWidgetQWeakHandle();
 }
 
 void  LayerGroupWidget::set_active( bool active )
@@ -351,7 +359,7 @@ std::string& LayerGroupWidget::get_group_id()
   return this->private_->group_id_;
 }
 
-LayerWidget_handle LayerGroupWidget::check_for_layer( const std::string &layer )
+LayerWidgetQHandle LayerGroupWidget::check_for_layer( const std::string &layer )
 {
   for( int i = 0; i < static_cast< int >( this->layer_list_.size() ); ++i )
   {
@@ -360,7 +368,7 @@ LayerWidget_handle LayerGroupWidget::check_for_layer( const std::string &layer )
       return this->layer_list_[i];
     }
   }
-  return LayerWidget_handle();
+  return LayerWidgetQHandle();
 }
   
   
@@ -543,7 +551,7 @@ void LayerGroupWidget::mousePressEvent(QMouseEvent *event)
 {
 
   // First we try and get a LayerWidget_handle from the location
-  LayerWidget_handle layer_to_drag = validate_location( event->pos());
+  LayerWidgetQHandle layer_to_drag = validate_location( event->pos());
   
   // Exit immediately if they are no longer holding the button the press event isnt valid
   if ( ( event->button() != Qt::LeftButton ) ||  !layer_to_drag )
@@ -610,7 +618,7 @@ void LayerGroupWidget::mousePressEvent(QMouseEvent *event)
 
 void LayerGroupWidget::dragEnterEvent(QDragEnterEvent* event)
 {
-  LayerWidget_handle potential_drop_site = validate_location( event->pos());
+  LayerWidgetQHandle potential_drop_site = validate_location( event->pos());
   bool found_valid_layer = false;
   
   // If its a valid dropsite then we color the LayerWidget appropriately
@@ -662,7 +670,7 @@ void LayerGroupWidget::dragLeaveEvent( QDragLeaveEvent * event )
 void LayerGroupWidget::dropEvent(QDropEvent* event)
 {
   // First we validate the location
-  LayerWidget_handle drop_site = validate_location( event->pos() );
+  LayerWidgetQHandle drop_site = validate_location( event->pos() );
   
   if( drop_site->get_layer_id() == event->mimeData()->text().toStdString() )
   {
@@ -673,7 +681,7 @@ void LayerGroupWidget::dropEvent(QDropEvent* event)
   if ( drop_site )
   {
     // Here we see if the LayerWidget they are dragging is from the current group
-    LayerWidget_handle layer = this->check_for_layer( event->mimeData()->text().toStdString() );
+    LayerWidgetQHandle layer = this->check_for_layer( event->mimeData()->text().toStdString() );
 
     // if it's not we ask them if they want to resample the layer they are dragging
     if ( !layer )
@@ -731,7 +739,7 @@ void LayerGroupWidget::dropEvent(QDropEvent* event)
 
 
 
-LayerWidget_handle LayerGroupWidget::validate_location(const QPoint &point )
+LayerWidgetQHandle LayerGroupWidget::validate_location(const QPoint &point )
 {
   // because the header counts as part of the group we need to account for its offset
   QPoint header_difference = this->private_->ui_.group_frame_->pos();
@@ -749,7 +757,7 @@ LayerWidget_handle LayerGroupWidget::validate_location(const QPoint &point )
       return this->layer_list_[i];
     }
   }
-  return LayerWidget_handle();
+  return LayerWidgetQHandle();
 }
   
 }  //end namespace Seg3D

@@ -40,10 +40,11 @@ namespace Seg3D
 {
   
 class LayerGroupWidget;
-typedef QSharedPointer< LayerGroupWidget > LayerGroupWidget_handle;
+typedef QSharedPointer< LayerGroupWidget > LayerGroupWidgetQHandle;
   
 class LayerWidget;
-typedef QSharedPointer< LayerWidget > LayerWidget_handle;
+typedef QSharedPointer< LayerWidget > LayerWidgetQHandle;
+typedef QWeakPointer< LayerWidget > LayerWidgetQWeakHandle;
 
 
 class LayerWidgetPrivate;

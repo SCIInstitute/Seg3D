@@ -38,35 +38,19 @@ SET(APPLICATION_LAYERMANAGER_SRCS
   )
 
 SET(APPLICATION_LAYERMANAGER_ACTIONS_SRCS
-  Actions/ActionInsertLayer.h
-  Actions/ActionInsertLayer.cc
-  Actions/ActionInsertLayerAbove.h
-  Actions/ActionInsertLayerAbove.cc
-  Actions/ActionCloneLayer.h
-  Actions/ActionCloneLayer.cc
-  Actions/ActionCrop.h
-  Actions/ActionCrop.cc
-  Actions/ActionFlipLayer.h
-  Actions/ActionFlipLayer.cc
-  Actions/ActionImportLayer.h
-  Actions/ActionImportLayer.cc
-  Actions/ActionLayer.h
-  Actions/ActionLayer.cc
-  Actions/ActionLayerFromFile.h
-  Actions/ActionLayerFromFile.cc
-  Actions/ActionNewMaskLayer.h
-  Actions/ActionNewMaskLayer.cc
-  Actions/ActionRemoveLayer.h
-  Actions/ActionRemoveLayer.cc
-  Actions/ActionResampleLayer.h
-  Actions/ActionResampleLayer.cc
-  Actions/ActionTransformLayer.h
-  Actions/ActionTransformLayer.cc
   Actions/ActionActivateLayer.h
   Actions/ActionActivateLayer.cc
   Actions/ActionDeleteLayers.h
   Actions/ActionDeleteLayers.cc
-  )
+  Actions/ActionImportLayer.h
+  Actions/ActionImportLayer.cc
+  Actions/ActionInsertLayer.h
+  Actions/ActionInsertLayer.cc
+  Actions/ActionInsertLayerAbove.h
+  Actions/ActionInsertLayerAbove.cc
+  Actions/ActionNewMaskLayer.h
+  Actions/ActionNewMaskLayer.cc
+)
 
 
 ADD_LIBRARY(Application_LayerManager STATIC 

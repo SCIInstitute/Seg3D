@@ -132,7 +132,7 @@ protected:
 
   // INSERT_LAYER_ABOVE:
   // Inserts a layer above a certain layer
-    void insert_layer_above( LayerHandle layer, LayerHandle layer_below );
+    int insert_layer_above( LayerHandle layer, LayerHandle  layer_below );
   
   // DELETE_LAYER:
   // Delete a layer from the list

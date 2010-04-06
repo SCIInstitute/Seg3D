@@ -86,18 +86,28 @@ void LayerGroup::insert_layer( LayerHandle new_layer )
   layer_list_.push_back( new_layer );
 }
 
-void LayerGroup::insert_layer_above( LayerHandle layer_above, LayerHandle layer_below )
+int LayerGroup::insert_layer_above( LayerHandle layer_above, LayerHandle layer_below )
 {
+  int index = 0;
+  
   for( layer_list_type::iterator i = this->layer_list_.begin(); 
     i != this->layer_list_.end(); ++i )
   {
     if( ( *i ) == layer_below )
     { 
-      //layer_above->set_layer_group( this );
+      // First we get the size of the list before the insert
+      int list_size = static_cast< int >(this->layer_list_.size());
+      
+      // Second we insert the layer
       this->layer_list_.insert( ++i, layer_above );
-      return;
+      
+      // Finally we return the proper location for the gui to insert the layer
+      return abs( index - list_size ) - 1;
     }
+    index++;
   }
+  // if things didnt work out, we return -1
+  return -1 ;
 }
 
 void LayerGroup::delete_layer( LayerHandle layer )

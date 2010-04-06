@@ -66,11 +66,14 @@ public:
   //Insert Layer 
   void insert_layer_ui( LayerHandle &layer );
   
+  //Insert Layer at
+  void insert_layer_at_ui( LayerHandle &layer, int index );
+  
   //Set the active layer
   void activate_layer_ui( LayerHandle &layer );
   
   //Delete a layer
-  //void delete_layer_ui( LayerGroupHandle &group );
+  void delete_layer_ui( LayerHandle &layer );
   
   //Delete a layer
   void delete_layers_ui( std::vector< LayerHandle > layers );
@@ -88,7 +91,8 @@ public:
   
   static void HandleActivateLayer( qpointer_type qpointer, LayerHandle layer );
   static void HandleInsertLayer( qpointer_type qpointer, LayerHandle layer );
-  static void HandleDeleteLayer( qpointer_type qpointer, LayerGroupHandle group );
+  static void HandleInsertLayerAt( qpointer_type qpointer, LayerHandle layer, int index );
+  static void HandleDeleteLayer( qpointer_type qpointer, LayerHandle layer );
   static void HandleDeleteLayers( qpointer_type qpointer, std::vector< LayerHandle > layers );
   static void HandleGroupDeleted( qpointer_type qpointer, LayerGroupHandle group );
   static void HandleGroupChanged( qpointer_type qpointer, LayerGroupHandle group );
