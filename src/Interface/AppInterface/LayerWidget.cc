@@ -62,8 +62,8 @@ public:
 LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   QWidget( parent ),
   private_( new LayerWidgetPrivate ),
-  picked_up_( false ),
-  active_( false )
+  active_( false ),
+  picked_up_( false )
 {
   
   {// Prepare the icons!!

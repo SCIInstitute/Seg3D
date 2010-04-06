@@ -20,7 +20,12 @@ vec4 shade_data_slice()
 bool edge_test()
 {
   vec2 tex_coord = gl_TexCoord[0].st;
-  vec2 offset = pixel_size * border_width;
+  vec2 offset = pixel_size * float( border_width );
+  
+  // test for texture boundary
+  if ( tex_coord.s - offset[0] <= 0.0 || tex_coord.s + offset[0] >= 1.0 ||
+    tex_coord.t - offset[1] <= 0.0 || tex_coord.t + offset[1] >= 1.0 )
+    return true;
   
   // test the pixel to the left
   tex_coord.s -= offset[0];
@@ -44,7 +49,7 @@ bool edge_test()
     return true;
 
   // test the pixel on the bottom left corner
-  tex_coord = gl_TexCoord[0] - offset;
+  tex_coord = gl_TexCoord[0].st - offset;
   if ( texture2D( slice_tex, tex_coord ).a == 0.0 )
     return true;
 
