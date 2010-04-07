@@ -358,11 +358,9 @@ LayerWidgetQWeakHandle LayerGroupWidget::check_for_layer( const std::string &lay
 {
   for( int i = 0; i < static_cast< int >( this->layer_list_.size() ); ++i )
   {
-    QVector< LayerWidgetQHandle > temp_list = layer_list_;
-    //if( this->layer_list_[i]->get_layer_id() == layer )
-    if( temp_list[i]->get_layer_id() == layer )
+    if( this->layer_list_[i]->get_layer_id() == layer )
     {
-      return temp_list[i];
+      return this->layer_list_[i];
     }
   }
   return LayerWidgetQWeakHandle();
