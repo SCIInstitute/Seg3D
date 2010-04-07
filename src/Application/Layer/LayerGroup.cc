@@ -81,10 +81,16 @@ void LayerGroup::create_mask_layer()
   
 }
 
-void LayerGroup::insert_layer( LayerHandle new_layer )
+void LayerGroup::insert_layer_back( LayerHandle new_layer )
 {
   layer_list_.push_back( new_layer );
 }
+
+void LayerGroup::insert_layer_front( LayerHandle new_layer )
+{
+  layer_list_.push_front( new_layer );
+}
+
 
 int LayerGroup::insert_layer_above( LayerHandle layer_above, LayerHandle layer_below )
 {

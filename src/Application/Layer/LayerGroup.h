@@ -126,9 +126,13 @@ protected:
   // Creates a new layer in the correct position
   void create_mask_layer();
 
-  // INSERT_NEW_LAYER:
+  // INSERT_NEW_LAYER_BACK:
   // Inserts a layer in the top most position
-  void insert_layer( LayerHandle new_layer );
+  void insert_layer_back( LayerHandle new_layer );
+  
+  // INSERT_NEW_LAYER_FRONT:
+  // Inserts a layer in the top most position
+  void insert_layer_front( LayerHandle new_layer );
 
   // INSERT_LAYER_ABOVE:
   // Inserts a layer above a certain layer

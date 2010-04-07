@@ -26,19 +26,24 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <Application/Application/Application.h>
-#include <Application/Interface/Interface.h>
-
-#include <boost/lexical_cast.hpp>
+// STL includes
 #include <vector>
 
-#include <Application/LayerManager/Actions/ActionInsertLayer.h>
+// Boost includes 
+#include <boost/lexical_cast.hpp>
+
+// Volume includes
+#include <Utils/Volume/Volume.h>
+
+// Application includes
 #include <Application/LayerManager/LayerManager.h>
-#include <Application/LayerManager/LayerScene.h>
-
-
+#include <Application/Application/Application.h>
+#include <Application/Interface/Interface.h>
 #include <Application/Layer/MaskLayer.h>
 #include <Application/Layer/DataLayer.h>
+
+// Application action includes
+#include <Application/LayerManager/Actions/ActionInsertLayer.h>
 
 
 namespace Seg3D
@@ -92,8 +97,11 @@ bool LayerManager::insert_layer( LayerHandle layer )
       active_layer_changed = true;
       
     }
+    if( layer->type() == Utils::VolumeType::DATA_E )
+      group_handle->insert_layer_front( layer );
+    else 
+      group_handle->insert_layer_back( layer );
       
-    group_handle->insert_layer( layer );
     layer->set_layer_group( group_handle );
       
   } // unlocked from here
