@@ -91,7 +91,10 @@ void LayerManagerWidget::insert_layer( LayerHandle layer )
   {
     if ( group_id == ( *i )->get_group_id() ) 
     {
+      ( *i )->setUpdatesEnabled( false );
       ( *i )->insert_layer( layer, -1 );
+      ( *i )->setUpdatesEnabled( true );
+      ( *i )->update();
       inserted = true;
       break;
     } 
@@ -106,12 +109,16 @@ void LayerManagerWidget::insert_layer( LayerHandle layer, int index )
 {
   std::string group_id = layer->get_layer_group()->get_group_id();
 
+
   for ( QList< LayerGroupWidgetQHandle >::iterator i = this->group_list_.begin(); 
     i  != this->group_list_.end(); i++ )
   {
     if ( group_id == ( *i )->get_group_id() ) 
-    {
+    { 
+      ( *i )->setUpdatesEnabled( false );
       ( *i )->insert_layer( layer, index );
+      ( *i )->setUpdatesEnabled( true );
+      ( *i )->update();
       break;
     } 
   }
@@ -144,7 +151,7 @@ void LayerManagerWidget::delete_layer( LayerHandle layer )
   for ( QList< LayerGroupWidgetQHandle >::iterator i = this->group_list_.begin(); 
     i  != this->group_list_.end(); i++ )
   {
-
+    
     if( ( *i )->delete_layer( layer ) )
       break;
   }   
@@ -164,35 +171,6 @@ void LayerManagerWidget::make_new_group( LayerHandle layer )
 }
 
 
-bool LayerManagerWidget::refresh_group( LayerGroupHandle group )
-{
-  for ( QList< LayerGroupWidgetQHandle >::iterator i = this->group_list_.begin(); 
-    i  != this->group_list_.end(); i++ )
-  {
-    if ( group->get_group_id() == ( *i )->get_group_id() ) 
-    {
-      // turn off visual updates
-      // ( *i )->setUpdatesEnabled( false );
-      
-      // delete all the existing gui layers
-      ( *i )->clear_all_layers();
-
-      // make new ones 
-      layer_list_type temp_layer_list = group->get_layer_list();
-      for( layer_list_type::iterator j = temp_layer_list.begin(); j != temp_layer_list.end(); ++j )
-      { 
-        ( *i )->insert_layer( ( *j ), -1 );
-      }
-      
-      // turn them back on when we are done.
-      ( *i )->setUpdatesEnabled( true );
-      this->setUpdatesEnabled( true );
-      return true;
-    }   
-  }
-  return false;
-}
-
   
 void LayerManagerWidget::delete_group( LayerGroupHandle group )
 {
@@ -206,7 +184,6 @@ void LayerManagerWidget::delete_group( LayerGroupHandle group )
       return;
     }
   }
-  
 }
 
 

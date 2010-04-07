@@ -80,10 +80,6 @@ public:
   
   //Delete an empty group
     void delete_group_ui( LayerGroupHandle &group );
-    
-    //Refresh a changed layer
-    void refresh_group_ui( LayerGroupHandle &group );
-
 
   // -- static functions for callbacks into this widget --
 public:
@@ -95,7 +91,6 @@ public:
   static void HandleDeleteLayer( qpointer_type qpointer, LayerHandle layer );
   static void HandleDeleteLayers( qpointer_type qpointer, std::vector< LayerHandle > layers );
   static void HandleGroupDeleted( qpointer_type qpointer, LayerGroupHandle group );
-  static void HandleGroupChanged( qpointer_type qpointer, LayerGroupHandle group );
   
   
 private:

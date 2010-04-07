@@ -89,11 +89,8 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
   
   // Set up the Drag and Drop
   this->setAcceptDrops( true );
-  //this->dragged_layer_ = " ";
 
   // set some values of the GUI
-
-  //this->private_->ui_.activate_button_->setText( QString::fromStdString( group->get_grid_transform().get_as_string() ) );
   std::string group_name = Utils::to_string( group->get_grid_transform().get_nx() ) + " x " +
     Utils::to_string( group->get_grid_transform().get_ny() ) + " x " +
     Utils::to_string( group->get_grid_transform().get_nz() );
@@ -106,8 +103,6 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
   this->private_->ui_.transform_->hide();
   this->private_->ui_.delete_->hide();
   this->private_->ui_.delete_button_->setEnabled( false );
-
-  //this->private_->ui_.open_button_->setChecked( true );
   
   // add the slider spinner combo's for the crop
   this->private_->center_x_adjuster_crop = new SliderDoubleCombo( this->private_->ui_.widget );

@@ -70,22 +70,19 @@ LayerManagerDockWidget::LayerManagerDockWidget( QWidget *parent ) :
           &LayerManagerDockWidget::HandleInsertLayer, layer_dock_widget, _1 ) ) );
           
   add_connection( LayerManager::Instance()->layer_inserted_at_signal_.connect( boost::bind(
-    &LayerManagerDockWidget::HandleInsertLayerAt, layer_dock_widget, _1, _2 ) ) );
+          LayerManagerDockWidget::HandleInsertLayerAt, layer_dock_widget, _1, _2 ) ) );
           
   add_connection( LayerManager::Instance()->layer_deleted_signal_.connect( boost::bind(
           &LayerManagerDockWidget::HandleDeleteLayer, layer_dock_widget, _1 ) ) );
           
   add_connection( LayerManager::Instance()->layers_deleted_signal_.connect( boost::bind(
-    &LayerManagerDockWidget::HandleDeleteLayers, layer_dock_widget, _1 ) ) );
+          &LayerManagerDockWidget::HandleDeleteLayers, layer_dock_widget, _1 ) ) );
           
   add_connection( LayerManager::Instance()->active_layer_changed_signal_.connect( boost::bind(
           &LayerManagerDockWidget::HandleActivateLayer, layer_dock_widget, _1 ) ) );
   
   add_connection( LayerManager::Instance()->group_deleted_signal_.connect( boost::bind(
                   &LayerManagerDockWidget::HandleGroupDeleted, layer_dock_widget, _1 ) ) );
-                  
-  add_connection( LayerManager::Instance()->group_changed_signal_.connect( boost::bind(
-          &LayerManagerDockWidget::HandleGroupChanged, layer_dock_widget, _1 ) ) );
           
   std::vector< LayerHandle > temporary_layerhandle_vector;
   LayerManager::Instance()->get_layers( temporary_layerhandle_vector );
@@ -132,10 +129,6 @@ void LayerManagerDockWidget::delete_group_ui( LayerGroupHandle &group )
   layer_manager_widget_->delete_group( group );
 }
 
-void LayerManagerDockWidget::refresh_group_ui( LayerGroupHandle &group )
-{
-  layer_manager_widget_->refresh_group( group );
-}
   
 void LayerManagerDockWidget::HandleInsertLayer( qpointer_type qpointer, LayerHandle layer )
 {
@@ -174,7 +167,9 @@ void LayerManagerDockWidget::HandleDeleteLayer( qpointer_type qpointer, LayerHan
     return;
   }
   
+  SCI_LOG_DEBUG( "HandleDeleteLayer started" );
   if ( qpointer.data() ) qpointer->delete_layer_ui( layer );
+  SCI_LOG_DEBUG( "HandleDeleteLayer done" );
 }
 
 void LayerManagerDockWidget::HandleDeleteLayers( qpointer_type qpointer, std::vector< LayerHandle > layers)
@@ -221,20 +216,5 @@ void LayerManagerDockWidget::HandleGroupDeleted( qpointer_type qpointer, LayerGr
   if ( qpointer.data() ) qpointer->delete_group_ui( group );
   SCI_LOG_DEBUG( "HandleGroupDeleted done" );
 }
-
-void LayerManagerDockWidget::HandleGroupChanged( qpointer_type qpointer, LayerGroupHandle group )
-{
-  if ( !( Interface::IsInterfaceThread() ) )
-  {
-    Interface::Instance()->post_event( boost::bind( &LayerManagerDockWidget::HandleGroupChanged,
-      qpointer, group ) );
-    return;
-  }
-
-  SCI_LOG_DEBUG( "HandleGroupChanged started" );
-  if ( qpointer.data() ) qpointer->refresh_group_ui( group );
-  SCI_LOG_DEBUG( "HandleGroupChanged done" );
-}
-
 
 }  // end namespace Seg3D
