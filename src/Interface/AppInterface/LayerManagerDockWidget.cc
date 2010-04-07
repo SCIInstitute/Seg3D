@@ -118,7 +118,6 @@ void LayerManagerDockWidget::delete_layers_ui( std::vector< LayerHandle > layers
   layer_manager_widget_->delete_layers( layers );
 }
 
-
 void LayerManagerDockWidget::activate_layer_ui( LayerHandle &layer )
 {
     layer_manager_widget_->set_active_layer( layer );

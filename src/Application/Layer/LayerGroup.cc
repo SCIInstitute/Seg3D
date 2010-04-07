@@ -92,7 +92,7 @@ void LayerGroup::insert_layer_front( LayerHandle new_layer )
 }
 
 
-int LayerGroup::insert_layer_above( LayerHandle layer_above, LayerHandle layer_below )
+int LayerGroup::move_layer_above( LayerHandle layer_above, LayerHandle layer_below )
 {
   int index = 0;
   

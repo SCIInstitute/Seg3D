@@ -152,7 +152,7 @@ bool LayerManager::move_layer_above( std::string layer_to_insert_id, std::string
     
     // First we Delete the Layer from its list of layers
     group_above->delete_layer( layer_above );
-    index = group_below->insert_layer_above( layer_above, layer_below );
+    index = group_below->move_layer_above( layer_above, layer_below );
     
     // If they are in the same group ---
     if( group_above != group_below )

@@ -619,6 +619,7 @@ void LayerGroupWidget::dragEnterEvent(QDragEnterEvent* event)
   // If its a valid dropsite then we color the LayerWidget appropriately
   if ( potential_drop_site ) 
   { 
+    this->setUpdatesEnabled( false ); 
     for( int i = 0; i < static_cast< int >( this->layer_list_.size() ); ++i )
     {
       if( this->layer_list_[i] == potential_drop_site ) 
@@ -633,15 +634,18 @@ void LayerGroupWidget::dragEnterEvent(QDragEnterEvent* event)
             ( potential_drop_site->get_layer_id() != event->mimeData()->text().toStdString() ) )
         {
           this->layer_list_[i]->set_drop( true );
+          this->update();
           found_valid_layer = true;
         }
       }
       else
       {
-        if( ( potential_drop_site->get_layer_id() != event->mimeData()->text().toStdString() ) ) 
-          this->layer_list_[i]->set_drop( false );
+        this->layer_list_[i]->set_drop( false );
       }
     }
+    this->setUpdatesEnabled( true );
+    this->update(); 
+    
     if( found_valid_layer )
     {
       event->setDropAction(Qt::MoveAction);
@@ -655,10 +659,13 @@ void LayerGroupWidget::dragEnterEvent(QDragEnterEvent* event)
 
 void LayerGroupWidget::dragLeaveEvent( QDragLeaveEvent * event )
 {
+  this->setUpdatesEnabled( false ); 
   for( int i = 0; i < static_cast< int >( this->layer_list_.size() ); ++i )
   {
     this->layer_list_[i]->set_drop( false );
   }
+  this->setUpdatesEnabled( true );
+  this->update(); 
 }
 
 
@@ -709,14 +716,6 @@ void LayerGroupWidget::dropEvent(QDropEvent* event)
           break;
 
         default:
-          // Anything else we just make sure that none of the layers are colored as drop
-          //  zones.
-          for( int i = 0; i < static_cast< int >( this->layer_list_.size() ); ++i )
-          {           
-            {
-              this->layer_list_[i]->set_drop( false );
-            }
-          }
           break;
       }
     }
@@ -728,8 +727,20 @@ void LayerGroupWidget::dropEvent(QDropEvent* event)
       ActionInsertLayerAbove::Dispatch( event->mimeData()->text().toStdString(), 
         drop_site->get_layer_id() );
     }
+  
+    // Regardless of what we do, we need to reset all the colors to normal when we are done
+    this->setUpdatesEnabled( false ); 
+    for( int i = 0; i < static_cast< int >( this->layer_list_.size() ); ++i )
+    {         
+      this->layer_list_[i]->set_drop( false );
+    }
+    this->setUpdatesEnabled( true );
+    this->update();
   }
-  event->ignore();
+  else
+  {
+    event->ignore();
+  }
 }
 
 
