@@ -47,8 +47,10 @@ QtRenderWidget::QtRenderWidget( const QGLFormat& format, QWidget* parent, QtRend
   QGLWidget( format, parent, share )
 {
   this->renderer_ = RendererHandle( new Renderer() );
-  this->rendering_completed_connection_ = renderer_->rendering_completed_signal_.connect(
-      boost::bind( &QtRenderWidget::update_texture, this, _1 ) );
+  this->add_connection( renderer_->rendering_completed_signal_.connect(
+      boost::bind( &QtRenderWidget::update_texture, this, _1 ) ) );
+  this->add_connection( renderer_->redraw_overlay_completed_signal_.connect(
+      boost::bind( &QtRenderWidget::update_overlay_texture, this, _1 ) ) );
 
   setAutoFillBackground( false );
   setAttribute( Qt::WA_OpaquePaintEvent );
@@ -58,7 +60,7 @@ QtRenderWidget::QtRenderWidget( const QGLFormat& format, QWidget* parent, QtRend
 
 QtRenderWidget::~QtRenderWidget()
 {
-  rendering_completed_connection_.disconnect();
+  this->disconnect_all();
 }
 
 void QtRenderWidget::update_texture( Utils::TextureHandle texture )
@@ -78,11 +80,32 @@ void QtRenderWidget::update_texture( Utils::TextureHandle texture )
   updateGL();
 }
 
+void QtRenderWidget::update_overlay_texture( Utils::TextureHandle texture )
+{
+  // if not in the interface thread, post an event to the interface thread
+  if ( !Interface::IsInterfaceThread() )
+  {
+    Interface::PostEvent(
+        boost::bind( &QtRenderWidget::update_overlay_texture, this, texture ) );
+    return;
+  }
+
+  SCI_LOG_DEBUG(std::string("QtRenderWidget ") + Utils::to_string(this->viewer_id_)
+    + ": received new overlay texture");
+  this->overlay_texture_ = texture;
+  
+  updateGL();
+}
+
 void QtRenderWidget::initializeGL()
 {
   Utils::RenderResources::Instance()->init_gl();
   glClearColor( 0.5, 0.5, 0.5, 1.0 );
+  Utils::Texture::SetActiveTextureUnit( 0 );
   glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+  Utils::Texture::SetActiveTextureUnit( 1 );
+  glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL );
+
   renderer_->initialize();
   // Make sure the GL context of the widget is the current one of this thread,
   // because in the single threaded rendering mode, the renderer will make its own context
@@ -94,7 +117,7 @@ void QtRenderWidget::paintGL()
 {
   SCI_LOG_DEBUG("Start of paintGL");
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-  if ( !( this->renderer_texture_ ) )
+  if ( !this->renderer_texture_ || !this->overlay_texture_ )
   {
     return;
   }
@@ -109,20 +132,30 @@ void QtRenderWidget::paintGL()
 
   glMatrixMode( GL_MODELVIEW );
   glLoadIdentity();
-  Utils::Texture::lock_type lock( renderer_texture_->get_mutex() );
-  renderer_texture_->enable();
+  Utils::Texture::lock_type lock( this->renderer_texture_->get_mutex() );
+  Utils::Texture::lock_type overlay_tex_lock( this->overlay_texture_->get_mutex() );
+  Utils::Texture::SetActiveTextureUnit( 0 );
+  this->renderer_texture_->enable();
+  Utils::Texture::SetActiveTextureUnit( 1 );
+  this->overlay_texture_->enable();
   glBegin( GL_QUADS );
   glColor3f( 0.5f, 0.5f, 1.f );
-  glTexCoord2f( 0.0f, 0.0f );
+  glMultiTexCoord2f( GL_TEXTURE0, 0.0f, 0.0f );
+  glMultiTexCoord2f( GL_TEXTURE1, 0.0f, 0.0f );
   glVertex2f( 0.0f, 0.0f );
-  glTexCoord2f( 1.0f, 0.0f );
+  glMultiTexCoord2f( GL_TEXTURE0, 1.0f, 0.0f );
+  glMultiTexCoord2f( GL_TEXTURE1, 1.0f, 0.0f );
   glVertex2f( width, 0.0f );
-  glTexCoord2f( 1.0f, 1.0f );
+  glMultiTexCoord2f( GL_TEXTURE0, 1.0f, 1.0f );
+  glMultiTexCoord2f( GL_TEXTURE1, 1.0f, 1.0f );
   glVertex2f( width, height );
-  glTexCoord2f( 0.0f, 1.0f );
+  glMultiTexCoord2f( GL_TEXTURE0, 0.0f, 1.0f );
+  glMultiTexCoord2f( GL_TEXTURE1, 0.0f, 1.0f );
   glVertex2f( 0.0f, height );
   glEnd();
-  renderer_texture_->disable();
+  this->overlay_texture_->disable();
+  Utils::Texture::SetActiveTextureUnit( 0 );
+  this->renderer_texture_->disable();
 }
 
 void QtRenderWidget::resizeGL( int width, int height )

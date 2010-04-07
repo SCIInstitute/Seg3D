@@ -155,6 +155,7 @@ public:
 
   typedef boost::signals2::signal< void() > redraw_signal_type;
   redraw_signal_type redraw_signal_;
+  redraw_signal_type redraw_overlay_signal_;
 
 private:
   void change_view_mode( std::string mode, ActionSource source );

@@ -69,6 +69,9 @@ public:
   virtual void initialize();
   virtual void redraw();
   virtual void resize( int width, int height );
+  void redraw_overlay();
+
+  rendering_completed_signal_type redraw_overlay_completed_signal_;
 
 private:
 
@@ -77,7 +80,7 @@ private:
   // GL context for rendering
   Utils::RenderContextHandle context_;
 
-  Utils::Texture2DHandle textures_[ 2 ];
+  Utils::Texture2DHandle textures_[ 4 ];
   Utils::RenderbufferHandle depth_buffer_;
   Utils::FramebufferObjectHandle frame_buffer_;
   Utils::UnitCubeHandle cube_;
@@ -85,6 +88,7 @@ private:
   Utils::Texture3DHandle pattern_texture_;
 
   int active_render_texture_;
+  int active_overlay_texture_;
 
   int width_;
   int height_;

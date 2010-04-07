@@ -453,6 +453,9 @@ void Viewer::set_active_layer( LayerHandle layer )
   // Update slice number ranges
   if ( !this->is_volume_view() )
   {
+    // Only needs redraw when the new active slice was out of boundary
+    bool needs_redraw = this->active_layer_slice_->out_of_boundary();
+
     {
       // Disable redraws triggered by StateBase::state_changed_signal_
       Utils::ScopedCounter block_counter( this->redraw_block_count_ );
@@ -479,7 +482,7 @@ void Viewer::set_active_layer( LayerHandle layer )
       }
     }
 
-    if ( this->redraw_block_count_ == 0 )
+    if ( this->redraw_block_count_ == 0 && needs_redraw )
     {
       this->redraw_signal_();
     }

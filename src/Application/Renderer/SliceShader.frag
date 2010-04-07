@@ -19,53 +19,46 @@ vec4 shade_data_slice()
 // Test for mask edges
 bool edge_test()
 {
-  vec2 tex_coord = gl_TexCoord[0].st;
   vec2 offset = pixel_size * float( border_width );
+  float left = gl_TexCoord[0].s - offset[0];
+  float right = gl_TexCoord[0].s + offset[0];
+  float bottom = gl_TexCoord[0].t - offset[1];
+  float top = gl_TexCoord[0].t + offset[1];
   
   // test for texture boundary
-  if ( tex_coord.s - offset[0] <= 0.0 || tex_coord.s + offset[0] >= 1.0 ||
-    tex_coord.t - offset[1] <= 0.0 || tex_coord.t + offset[1] >= 1.0 )
+  if ( left < 0.0 || right > 1.0 || bottom < 0.0 || top > 1.0 )
     return true;
   
   // test the pixel to the left
-  tex_coord.s -= offset[0];
-  if ( texture2D( slice_tex, tex_coord ).a == 0.0 )
+  if ( texture2D( slice_tex, vec2( left,  gl_TexCoord[0].t ) ).a == 0.0 )
     return true;
 
   // test the pixel to the right
-  tex_coord.s = gl_TexCoord[0].s + offset[0];
-  if ( texture2D( slice_tex, tex_coord ).a == 0.0 )
+  if ( texture2D( slice_tex, vec2( right,  gl_TexCoord[0].t ) ).a == 0.0 )
     return true;
 
   // test the pixel below
-  tex_coord.s = gl_TexCoord[0].s;
-  tex_coord.t -= offset[1];
-  if ( texture2D( slice_tex, tex_coord ).a == 0.0 )
+  if ( texture2D( slice_tex, vec2( gl_TexCoord[0].s, bottom ) ).a == 0.0 )
     return true;
 
   // test the pixel above
-  tex_coord.t = gl_TexCoord[0].t + offset[1];
-  if ( texture2D( slice_tex, tex_coord ).a == 0.0 )
+  if ( texture2D( slice_tex, vec2( gl_TexCoord[0].s, top ) ).a == 0.0 )
     return true;
 
   // test the pixel on the bottom left corner
-  tex_coord = gl_TexCoord[0].st - offset;
-  if ( texture2D( slice_tex, tex_coord ).a == 0.0 )
+  if ( texture2D( slice_tex, vec2( left, bottom ) ).a == 0.0 )
     return true;
 
   // test the pixel on the bottom right corner
-  tex_coord.s = gl_TexCoord[0].s + offset[0];
-  if ( texture2D( slice_tex, tex_coord ).a == 0.0 )
+  if ( texture2D( slice_tex, vec2( right, bottom ) ).a == 0.0 )
     return true;
 
   // test the pixel on the top right corner
-  tex_coord.t = gl_TexCoord[0].t + offset[1];
-  if ( texture2D( slice_tex, tex_coord ).a == 0.0 )
+  if ( texture2D( slice_tex, vec2( right, top ) ).a == 0.0 )
     return true;
 
   // test the pixel on the top left corner
-  tex_coord.s = gl_TexCoord[0].s - offset[0];
-  if ( texture2D( slice_tex, tex_coord ).a == 0.0 )
+  if ( texture2D( slice_tex, vec2( left, top ) ).a == 0.0 )
     return true;
 
   return false;

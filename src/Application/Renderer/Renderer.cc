@@ -102,6 +102,7 @@ Renderer::Renderer() :
   EventHandler(), 
   slice_shader_( new SliceShader ),
   active_render_texture_( 0 ), 
+  active_overlay_texture_( 2 ),
   width_( 0 ), 
   height_( 0 ),
   redraw_needed_( false )
@@ -152,17 +153,14 @@ void Renderer::initialize()
   // this call is only needed once.
   this->context_->make_current();
 
-  glClearColor( 0.3f, 0.3f, 0.3f, 1.0f );
   glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
 
   {
     // lock the shared render context
     Utils::RenderResources::lock_type lock( Utils::RenderResources::GetMutex() );
 
-    this->textures_[ 0 ] = Utils::Texture2DHandle( new Utils::Texture2D() );
-    this->textures_[ 1 ] = Utils::Texture2DHandle( new Utils::Texture2D() );
-    this->depth_buffer_ = Utils::RenderbufferHandle( new Utils::Renderbuffer() );
-    this->frame_buffer_ = Utils::FramebufferObjectHandle( new Utils::FramebufferObject() );
+    this->depth_buffer_ = Utils::RenderbufferHandle( new Utils::Renderbuffer );
+    this->frame_buffer_ = Utils::FramebufferObjectHandle( new Utils::FramebufferObject );
     this->frame_buffer_->attach_renderbuffer( depth_buffer_, GL_DEPTH_ATTACHMENT_EXT );
     this->cube_ = Utils::UnitCubeHandle( new Utils::UnitCube() );
     this->slice_shader_->initialize();
@@ -197,11 +195,6 @@ void Renderer::initialize()
 
 void Renderer::redraw()
 {
-  if ( !this->is_active() )
-  {
-    return;
-  }
-
 #if MULTITHREADED_RENDERING
   if ( !is_eventhandler_thread() )
   {
@@ -221,6 +214,11 @@ void Renderer::redraw()
   // Make the GL context current in the interface thread
   this->context_->make_current();
 #endif
+
+  if ( !this->is_active() || this->width_ == 0 || this->height_ == 0 )
+  {
+    return;
+  }
 
   {
     lock_type lock( this->redraw_needed_mutex_ );
@@ -248,6 +246,7 @@ void Renderer::redraw()
     return;
   }
 
+  glClearColor( 0.3f, 0.3f, 0.3f, 1.0f );
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
   glMatrixMode( GL_PROJECTION );
   glLoadIdentity();
@@ -418,6 +417,100 @@ void Renderer::redraw()
   this->active_render_texture_ = ( ~this->active_render_texture_ ) & 1;
 }
 
+void Renderer::redraw_overlay()
+{
+#if MULTITHREADED_RENDERING
+  if ( !is_eventhandler_thread() )
+  {
+    this->post_event( boost::bind( &Renderer::redraw_overlay, this ) );
+    return;
+  }
+#else
+  if ( !Interface::IsInterfaceThread() )
+  {
+    Interface::PostEvent( boost::bind( &Renderer::redraw_overlay, this ) );
+    return;
+  }
+  // Make the GL context current in the interface thread
+  this->context_->make_current();
+#endif
+
+  if ( !this->is_active() || this->width_ == 0 || this->height_ == 0 )
+  {
+    return;
+  }
+
+  SCI_LOG_DEBUG( std::string("Renderer ") + Utils::to_string( this->viewer_id_ ) 
+    + ": starting redraw overlay" );
+
+  // lock the active render texture
+  Utils::Texture::lock_type texture_lock( this->textures_[ this->active_overlay_texture_ ]->get_mutex() );
+
+  // bind the framebuffer object
+  this->frame_buffer_->enable();
+  // attach texture
+  this->frame_buffer_->attach_texture( this->textures_[ this->active_overlay_texture_ ] );
+
+  if ( !this->frame_buffer_->check_status() )
+  {
+    this->frame_buffer_->disable();
+    return;
+  }
+
+  glClearColor( 1.0f, 0.5f, 0.0f, 0.3f );
+  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+  glMatrixMode( GL_PROJECTION );
+  glLoadIdentity();
+
+  // Lock the state engine
+  StateEngine::lock_type state_lock( StateEngine::Instance()->get_mutex() );
+
+  ViewerHandle viewer = ViewerManager::Instance()->get_viewer( this->viewer_id_ );
+
+  if ( viewer->is_volume_view() )
+  {
+    state_lock.unlock();
+  }
+  else
+  {
+    Utils::View2D view2d(
+        dynamic_cast< StateView2D* > ( viewer->get_active_view_state().get() )->get() );
+
+    // We have got everything we want from the state engine, unlock before we do any rendering
+    state_lock.unlock();
+
+    double left, right, top, bottom;
+    view2d.compute_clipping_planes( this->width_ / ( 1.0 * this->height_ ), 
+      left, right, bottom, top );
+    Utils::Matrix proj_mat;
+    Utils::Transform::BuildOrtho2DMatrix( proj_mat, left, right, bottom, top );
+    glMultMatrixd( proj_mat.data() );
+    glMatrixMode( GL_MODELVIEW );
+    glLoadIdentity();
+
+    // Render the overlay stuff here
+  }
+
+  SCI_CHECK_OPENGL_ERROR();
+
+  glFinish();
+
+  this->frame_buffer_->detach_texture( this->textures_[ this->active_overlay_texture_ ] );
+  this->frame_buffer_->disable();
+
+  // release the lock on the active render texture
+  texture_lock.unlock();
+
+  SCI_LOG_DEBUG( std::string("Renderer ") + Utils::to_string( this->viewer_id_ ) 
+    + ": done redraw overlay" );
+
+  // signal rendering completed
+  this->redraw_overlay_completed_signal_( this->textures_[ this->active_overlay_texture_ ] );
+
+  // swap render textures 
+  this->active_overlay_texture_ = ( ~( this->active_overlay_texture_ - 2 ) ) & 1 + 2;
+}
+
 void Renderer::resize( int width, int height )
 {
 #if MULTITHREADED_RENDERING
@@ -443,10 +536,14 @@ void Renderer::resize( int width, int height )
 
   {
     Utils::RenderResources::lock_type lock( Utils::RenderResources::GetMutex() );
-    this->textures_[ 0 ] = Utils::Texture2DHandle( new Utils::Texture2D() );
-    this->textures_[ 1 ] = Utils::Texture2DHandle( new Utils::Texture2D() );
+    this->textures_[ 0 ] = Utils::Texture2DHandle( new Utils::Texture2D );
+    this->textures_[ 1 ] = Utils::Texture2DHandle( new Utils::Texture2D );
+    this->textures_[ 2 ] = Utils::Texture2DHandle( new Utils::Texture2D );
+    this->textures_[ 3 ] = Utils::Texture2DHandle( new Utils::Texture2D );
     this->textures_[ 0 ]->set_image( width, height, GL_RGBA );
     this->textures_[ 1 ]->set_image( width, height, GL_RGBA );
+    this->textures_[ 2 ]->set_image( width, height, GL_RGBA );
+    this->textures_[ 3 ]->set_image( width, height, GL_RGBA );
     this->depth_buffer_->set_storage( width, height, GL_DEPTH_COMPONENT );
   }
 
@@ -463,6 +560,7 @@ void Renderer::resize( int width, int height )
   // Getting here means the size is valid, make sure that the renderer is active
   this->activate();
   this->redraw();
+  this->redraw_overlay();
 }
 
 void Renderer::process_slices( LayerSceneHandle& layer_scene, ViewerHandle& viewer )

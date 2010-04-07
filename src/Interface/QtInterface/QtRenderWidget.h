@@ -34,6 +34,7 @@
 #endif 
 
 // Utils includes
+#include <Utils/Core/ConnectionHandler.h>
 #include <Utils/RenderResources/RenderResources.h> 
 
 // Applications includes
@@ -46,7 +47,7 @@
 namespace Seg3D
 {
 
-class QtRenderWidget : public QGLWidget
+class QtRenderWidget : public QGLWidget, private Utils::ConnectionHandler
 {
 Q_OBJECT
 
@@ -75,11 +76,11 @@ protected:
 private:
 
   void update_texture( Utils::TextureHandle texture );
+  void update_overlay_texture( Utils::TextureHandle texture );
 
   RendererHandle renderer_;
   Utils::TextureHandle renderer_texture_;
-
-  boost::signals2::connection rendering_completed_connection_;
+  Utils::TextureHandle overlay_texture_;
 
   ViewerHandle viewer_;
   size_t viewer_id_;
