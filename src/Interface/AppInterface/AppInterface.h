@@ -105,6 +105,7 @@ private:
   void begin_progress( ActionProgressHandle handle );
   void end_progress( ActionProgressHandle handle );
   void report_progress( ActionProgressHandle handle );
+  void center_seg3d_gui_on_screen( QWidget *widget ); 
 
   // Overload the default addDockWidget and upgrade it, so docks are added
   // on top of each other

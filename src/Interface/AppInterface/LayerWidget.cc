@@ -45,6 +45,7 @@
 #include <Application/Layer/MaskLayer.h>
 #include <Application/Layer/LayerGroup.h>
 #include <Application/LayerManager/Actions/ActionActivateLayer.h>
+#include <Application/LayerManager/Actions/ActionInsertLayerAbove.h>
 
 
 namespace Seg3D
@@ -78,7 +79,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   this->private_->ui_.setupUi( this );
   
   // set some Drag and Drop stuff
-  //this->setAcceptDrops( true );
+  this->setAcceptDrops( true );
   
   // Set the defaults
   // this is a default setting until we can get the name of the layer from the file or by some other means
@@ -251,6 +252,113 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
 LayerWidget::~LayerWidget()
 {
 }
+
+void LayerWidget::mousePressEvent(QMouseEvent *event)
+{
+
+  // Exit immediately if they are no longer holding the button the press event isnt valid
+  if ( event->button() != Qt::LeftButton )
+  { 
+    return;
+  }
+
+  // Calculate the location on the widget for the mouse to be holding
+  // We have to account for the offset of the header in the GroupLayerWidget
+  QPoint hotSpot = event->pos();// - this->pos();
+
+  // Create some Item data. - THIS IS CURRENTLY NOT REALLY BEING USED
+  QByteArray itemData;
+  itemData = ( QString::fromStdString( this->get_layer_id() ) ).toAscii();
+  QDataStream dataStream(&itemData, QIODevice::WriteOnly);
+  dataStream << QPoint(hotSpot);
+
+  // Make up some mimedata containing the layer_id of the layer
+  QMimeData *mimeData = new QMimeData;
+
+  switch ( this->get_volume_type() ) 
+  {
+  case Utils::VolumeType::DATA_E:
+    mimeData->setData( "data_layer_id", itemData );
+    break;
+  case Utils::VolumeType::MASK_E:
+    mimeData->setData( "mask_layer_id", itemData );
+    break;
+  case Utils::VolumeType::LABEL_E:
+    mimeData->setData( "label_layer_id", itemData );
+    break;
+  default:
+    break;
+  }
+
+  //mimeData->setData( "layer_id", itemData );
+  mimeData->setText( QString::fromStdString( this->get_layer_id() ) );
+
+  // Create a drag object and insert the hotspot, and mimedata
+  QDrag *drag = new QDrag( this );
+  drag->setMimeData( mimeData );
+  // here we add basically a screenshot of the widget
+  drag->setPixmap( QPixmap::grabWidget( this ));
+  drag->setHotSpot( hotSpot );
+
+  // Next we hide the LayerWidget that we are going to be dragging.
+  this->seethrough( true );
+  this->set_picked_up( true );
+
+  // Next we execute our drag!
+  Qt::DropAction drop = drag->exec(Qt::MoveAction, Qt::MoveAction);
+
+  // Finally if our drag was aborted then we reset the layers styles to be visible
+  if( drop != Qt::MoveAction )
+  {
+    this->seethrough( false );
+    this->set_picked_up( false );
+  }
+
+}
+
+
+
+void LayerWidget::dropEvent( QDropEvent* event )
+{
+  if( this->get_layer_id() == event->mimeData()->text().toStdString() )
+  {
+    event->ignore();
+    return;
+  }
+
+  event->setDropAction(Qt::MoveAction);
+  event->accept();
+  ActionInsertLayerAbove::Dispatch( event->mimeData()->text().toStdString(), 
+    this->get_layer_id() ); 
+
+  this->set_drop( false );
+}
+
+void LayerWidget::dragEnterEvent( QDragEnterEvent* event)
+{
+  if( ( ( ( this->get_volume_type() == Utils::VolumeType::DATA_E ) &&
+    ( event->mimeData()->hasFormat("data_layer_id") ) ) ||
+    ( ( this->get_volume_type() == Utils::VolumeType::MASK_E ) &&
+    ( event->mimeData()->hasFormat("mask_layer_id") ) ) ||
+    ( ( this->get_volume_type() == Utils::VolumeType::LABEL_E ) &&
+    ( event->mimeData()->hasFormat("label_layer_id") ) ) ) && 
+    ( this->get_layer_id() != event->mimeData()->text().toStdString() ) )
+  {
+    this->set_drop( true );
+    event->setDropAction(Qt::MoveAction);
+    event->accept();
+  }
+  else
+  {
+    event->ignore();
+  }
+}
+
+void LayerWidget::dragLeaveEvent( QDragLeaveEvent* event )
+{
+  this->set_drop( false );
+}
+
 
 void LayerWidget::set_active( bool active )
 {

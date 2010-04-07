@@ -115,6 +115,14 @@ AppInterface::AppInterface()
     InterfaceManager::Instance()->full_screen_state_-> value_changed_signal_.connect(
         boost::bind( &AppInterface::SetFullScreen, qpointer_type( this ), _1, _2 ) );
   }
+  this->center_seg3d_gui_on_screen( this );
+}
+
+void AppInterface::center_seg3d_gui_on_screen( QWidget *widget ) 
+{
+  QRect rect = QApplication::desktop()->availableGeometry();
+
+  widget->move( rect.center() - widget->rect().center() );
 }
 
 void AppInterface::set_full_screen( bool full_screen )

@@ -86,6 +86,11 @@ private:
   int volume_type_;
   bool active_;
   bool picked_up_;
+  
+  void mousePressEvent( QMouseEvent* event );
+  void dropEvent( QDropEvent* event );
+  void dragEnterEvent( QDragEnterEvent* event );
+  void dragLeaveEvent( QDragLeaveEvent* event );
 
 public:
   int get_volume_type(){ return this->volume_type_; }

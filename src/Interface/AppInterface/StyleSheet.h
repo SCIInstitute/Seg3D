@@ -50,17 +50,20 @@ public:
   // === StatusBar === //
     
     const static QString STATUSBAR_C;
-
+    
+  // === LayerImporterWidget === //
+  
+    // - Buttons - //
+    const static QString LAYERIMPORTERWIDGET_ACTIVE_BUTTON_C;
+    const static QString LAYERIMPORTERWIDGET_INACTIVE_BUTTON_C;
 
   
   // === LayerWidget Styles === //
     
-    //Volume Type Colors
+    // - Volume Type Colors - //
     const static QString DATA_VOLUME_COLOR_C;
     const static QString MASK_VOLUME_COLOR_C;
     const static QString LABEL_VOLUME_COLOR_C;
-  
-  
     // - ACTIVE - //
     const static QString LAYER_WIDGET_BASE_ACTIVE_C;
     // - INACTIVE - //

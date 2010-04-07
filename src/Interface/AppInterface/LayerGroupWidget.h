@@ -78,15 +78,6 @@ private Q_SLOTS:
     
 private:
 
-  // Drag and drop functions
-  void dropEvent(QDropEvent* event);
-  void mousePressEvent(QMouseEvent *event);
-  void dragEnterEvent(QDragEnterEvent* event);
-  void dragLeaveEvent( QDragLeaveEvent * event );
-  
-  // Validate that the event location is a LayerWidget and return a handle to it
-  LayerWidgetQWeakHandle validate_location( const QPoint& point );
-  
   // Check to see if the layer_id is currently in the group
   LayerWidgetQWeakHandle check_for_layer( const std::string &layer );
 

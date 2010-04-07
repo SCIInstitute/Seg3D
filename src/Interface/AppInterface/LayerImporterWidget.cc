@@ -38,6 +38,7 @@
 
 //Interface Includes
 #include <Interface/QtInterface/QtBridge.h>
+#include <Interface/AppInterface/StyleSheet.h>
 #include <Interface/AppInterface/LayerImporterWidget.h>
 
 // Qt Gui Includes
@@ -60,9 +61,6 @@ public:
   QIcon single_mask_off_icon_;
   QIcon bitplane_mask_off_icon_;
   QIcon label_mask_off_icon_;
-  
-  QString active_button_style_;
-  QString inactive_button_style_;
   
   LayerImporterWidgetPrivate()
   {
@@ -93,17 +91,8 @@ public:
     this->label_mask_off_icon_.addFile( 
       QString::fromUtf8( ":/Images/LabelMaskOff.png" ), 
       QSize(48,48), QIcon::Normal, QIcon::Off );  
-
-    this->active_button_style_ = QString( "QToolButton{"\
-      "background-color: rgb(233, 111, 53);"\
-      "border-radius: 3px;"\
-      "border: 2px solid rgb(142, 67, 32);}" );
-
-    this->inactive_button_style_ = QString( "QToolButton{"\
-      "background-color: rgb(150, 150, 150);"\
-      "border-radius: 3px;"\
-      "border: 2px solid rgb(30, 30, 30);}" );
   }
+
 };
 
 LayerImporterWidget::LayerImporterWidget( LayerImporterHandle importer, QWidget* parent ) :
@@ -261,7 +250,7 @@ void LayerImporterWidget::center_widget_on_screen( QWidget *widget )
 {
   QRect rect = QApplication::desktop()->availableGeometry();
   
-  widget->move(rect.center() - widget->rect().center());
+  widget->move( rect.center() - widget->rect().center() );
 }
   
 
@@ -273,45 +262,53 @@ void LayerImporterWidget::update_icons()
   if ( mode_ == LayerImporterMode::DATA_E )
   {
     private_->ui_.data_->setIcon( private_->data_icon_ ); 
-    private_->ui_.data_->setStyleSheet( private_->active_button_style_ );
+    private_->ui_.data_->setStyleSheet( 
+      StyleSheet::LAYERIMPORTERWIDGET_ACTIVE_BUTTON_C );
   }
   else
   {
     private_->ui_.data_->setIcon( private_->data_off_icon_ );
-    private_->ui_.data_->setStyleSheet( private_->inactive_button_style_ );
+    private_->ui_.data_->setStyleSheet( 
+      StyleSheet::LAYERIMPORTERWIDGET_INACTIVE_BUTTON_C );
   }
   
   if ( mode_ == LayerImporterMode::SINGLE_MASK_E )
   {
     private_->ui_.single_mask_->setIcon( private_->single_mask_icon_ );
-    private_->ui_.single_mask_->setStyleSheet( private_->active_button_style_ );
+    private_->ui_.single_mask_->setStyleSheet( 
+      StyleSheet::LAYERIMPORTERWIDGET_ACTIVE_BUTTON_C );
   }
   else
   {
     private_->ui_.single_mask_->setIcon( private_->single_mask_off_icon_ );
-    private_->ui_.single_mask_->setStyleSheet( private_->inactive_button_style_ );
+    private_->ui_.single_mask_->setStyleSheet( 
+      StyleSheet::LAYERIMPORTERWIDGET_INACTIVE_BUTTON_C );
   }
   
   if ( mode_ == LayerImporterMode::BITPLANE_MASK_E )
   {
     private_->ui_.bitplane_mask_->setIcon( private_->bitplane_mask_icon_ );
-    private_->ui_.bitplane_mask_->setStyleSheet( private_->active_button_style_ );
+    private_->ui_.bitplane_mask_->setStyleSheet( 
+      StyleSheet::LAYERIMPORTERWIDGET_ACTIVE_BUTTON_C );
   }
   else
   {
     private_->ui_.bitplane_mask_->setIcon( private_->bitplane_mask_off_icon_ );
-    private_->ui_.bitplane_mask_->setStyleSheet( private_->inactive_button_style_ );
+    private_->ui_.bitplane_mask_->setStyleSheet( 
+      StyleSheet::LAYERIMPORTERWIDGET_INACTIVE_BUTTON_C );
   }
   
   if ( mode_ == LayerImporterMode::LABEL_MASK_E )
   {
     private_->ui_.label_mask_->setIcon( private_->label_mask_icon_ );
-    private_->ui_.label_mask_->setStyleSheet( private_->active_button_style_ );
+    private_->ui_.label_mask_->setStyleSheet( 
+      StyleSheet::LAYERIMPORTERWIDGET_ACTIVE_BUTTON_C );
   }
   else
   {
     private_->ui_.label_mask_->setIcon( private_->label_mask_off_icon_ );
-    private_->ui_.label_mask_->setStyleSheet( private_->inactive_button_style_ );
+    private_->ui_.label_mask_->setStyleSheet( 
+      StyleSheet::LAYERIMPORTERWIDGET_INACTIVE_BUTTON_C );
   }
   
   setUpdatesEnabled( true );

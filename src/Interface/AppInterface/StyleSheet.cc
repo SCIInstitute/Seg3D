@@ -59,24 +59,39 @@ namespace Seg3D
     " background-color: rgba( 0, 0, 0, 0 );"
     " border: 1px solid  rgba( 0, 0, 0, 0 );"
     "}" );
+    
+  const QString StyleSheet::LAYERIMPORTERWIDGET_ACTIVE_BUTTON_C = QString( 
+    "QToolButton{"
+    " background-color: rgb(233, 111, 53);"
+    " border-radius: 3px;"
+    " border: 2px solid rgb(142, 67, 32);"
+    "}" );
+    
+  const QString StyleSheet::LAYERIMPORTERWIDGET_INACTIVE_BUTTON_C = QString( 
+    "QToolButton{"
+    " background-color: rgb(150, 150, 150);"
+    " border-radius: 3px;"
+    " border: 2px solid rgb(30, 30, 30);"
+    "}" );
 
 
-  //Volume Type Colors
+  // === LayerWidget Styles === //
+
+  // - Volume Type Colors - //
   const QString StyleSheet::DATA_VOLUME_COLOR_C = QString::fromUtf8(
     "QWidget#typeBackground_{"
     " background-color: rgb(166, 12, 73);"
     "}");
-    
+
   const QString StyleSheet::MASK_VOLUME_COLOR_C = QString::fromUtf8(
     "QWidget#typeBackground_{"
     " background-color: rgb(255, 128, 0);"
     "}");
-    
+
   const QString StyleSheet::LABEL_VOLUME_COLOR_C = QString::fromUtf8(
     "QWidget#typeBackground_{ background-color: rgb(90, 90, 90);"
     "}");
-  
-  // === LayerWidget Styles === //
+
   // - ACTIVE - //
   const QString StyleSheet::LAYER_WIDGET_BASE_ACTIVE_C = QString::fromUtf8(
     "QWidget#base_{"
