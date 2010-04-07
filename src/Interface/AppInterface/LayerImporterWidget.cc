@@ -144,6 +144,8 @@ LayerImporterWidget::~LayerImporterWidget()
 
 void LayerImporterWidget::list_import_options()
 {
+  this->setUpdatesEnabled( false );
+  
   // Step (1): Switch off options that this importer does not support
   int importer_modes = importer_->get_importer_modes();
 
@@ -248,8 +250,20 @@ void LayerImporterWidget::list_import_options()
   private_->ui_.import_button_->setDefault( true );
   private_->ui_.import_button_->setAutoDefault( true );
   
-  adjustSize();
+  this->adjustSize();
+  this->center_widget_on_screen( this );
+  this->setUpdatesEnabled( true );
+  this->update();
 }
+
+  
+void LayerImporterWidget::center_widget_on_screen( QWidget *widget ) 
+{
+  QRect rect = QApplication::desktop()->availableGeometry();
+  
+  widget->move(rect.center() - widget->rect().center());
+}
+  
 
 
 void LayerImporterWidget::update_icons()

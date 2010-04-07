@@ -85,10 +85,10 @@ private:
   void dragLeaveEvent( QDragLeaveEvent * event );
   
   // Validate that the event location is a LayerWidget and return a handle to it
-  LayerWidgetQHandle validate_location( const QPoint& point );
+  LayerWidgetQWeakHandle validate_location( const QPoint& point );
   
   // Check to see if the layer_id is currently in the group
-  LayerWidgetQHandle check_for_layer( const std::string &layer );
+  LayerWidgetQWeakHandle check_for_layer( const std::string &layer );
 
   
   // -- widget internals --

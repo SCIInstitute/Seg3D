@@ -124,8 +124,6 @@ void LayerManagerWidget::insert_layer( LayerHandle layer, int index )
   }
 }
 
-
-
 void LayerManagerWidget::delete_layers( std::vector< LayerHandle > layers )
 {
   this->setUpdatesEnabled( false );

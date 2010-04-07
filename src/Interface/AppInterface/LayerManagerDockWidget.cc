@@ -66,6 +66,8 @@ LayerManagerDockWidget::LayerManagerDockWidget( QWidget *parent ) :
   
   qpointer_type layer_dock_widget( this );
   
+  
+  // Connect the signals from the LayerManager to the GUI
   add_connection( LayerManager::Instance()->layer_inserted_signal_.connect( boost::bind(
           &LayerManagerDockWidget::HandleInsertLayer, layer_dock_widget, _1 ) ) );
           
@@ -83,7 +85,9 @@ LayerManagerDockWidget::LayerManagerDockWidget( QWidget *parent ) :
   
   add_connection( LayerManager::Instance()->group_deleted_signal_.connect( boost::bind(
                   &LayerManagerDockWidget::HandleGroupDeleted, layer_dock_widget, _1 ) ) );
-          
+  
+  
+  // Add any layers that may have been added before the GUI was initialized
   std::vector< LayerHandle > temporary_layerhandle_vector;
   LayerManager::Instance()->get_layers( temporary_layerhandle_vector );
   
@@ -101,31 +105,31 @@ LayerManagerDockWidget::~LayerManagerDockWidget()
 
 void LayerManagerDockWidget::insert_layer_ui( LayerHandle &layer )
 {
-  layer_manager_widget_->insert_layer( layer );
+  this->layer_manager_widget_->insert_layer( layer );
 }
 void LayerManagerDockWidget::insert_layer_at_ui( LayerHandle &layer, int index )
 {
-  layer_manager_widget_->insert_layer( layer, index );
+  this->layer_manager_widget_->insert_layer( layer, index );
 }
 
 void LayerManagerDockWidget::delete_layer_ui( LayerHandle &layer )
 {
-  layer_manager_widget_->delete_layer( layer );
+  this->layer_manager_widget_->delete_layer( layer );
 }
 
 void LayerManagerDockWidget::delete_layers_ui( std::vector< LayerHandle > layers )
 {
-  layer_manager_widget_->delete_layers( layers );
+  this->layer_manager_widget_->delete_layers( layers );
 }
 
 void LayerManagerDockWidget::activate_layer_ui( LayerHandle &layer )
 {
-    layer_manager_widget_->set_active_layer( layer );
+    this->layer_manager_widget_->set_active_layer( layer );
 }
 
 void LayerManagerDockWidget::delete_group_ui( LayerGroupHandle &group )
 {
-  layer_manager_widget_->delete_group( group );
+  this->layer_manager_widget_->delete_group( group );
 }
 
   

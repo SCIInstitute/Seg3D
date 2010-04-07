@@ -354,16 +354,18 @@ std::string& LayerGroupWidget::get_group_id()
   return this->private_->group_id_;
 }
 
-LayerWidgetQHandle LayerGroupWidget::check_for_layer( const std::string &layer )
+LayerWidgetQWeakHandle LayerGroupWidget::check_for_layer( const std::string &layer )
 {
   for( int i = 0; i < static_cast< int >( this->layer_list_.size() ); ++i )
   {
-    if( this->layer_list_[i]->get_layer_id() == layer )
+    QVector< LayerWidgetQHandle > temp_list = layer_list_;
+    //if( this->layer_list_[i]->get_layer_id() == layer )
+    if( temp_list[i]->get_layer_id() == layer )
     {
-      return this->layer_list_[i];
+      return temp_list[i];
     }
   }
-  return LayerWidgetQHandle();
+  return LayerWidgetQWeakHandle();
 }
   
   
@@ -596,18 +598,16 @@ void LayerGroupWidget::mousePressEvent(QMouseEvent *event)
   layer_to_drag->seethrough( true );
   layer_to_drag->set_picked_up( true );
   
-  Qt::DropActions test = drag->exec( Qt::CopyAction, Qt::CopyAction );
+  // Next we execute our drag!
+  Qt::DropAction drop = drag->exec(Qt::MoveAction, Qt::MoveAction);
   
-  if ( this->check_for_layer( layer_to_drag->get_layer_id() ) )
+  // Finally if our drag was aborted then we reset the layers styles to be visible
+  if( drop != Qt::MoveAction )
   {
     layer_to_drag->seethrough( false );
     layer_to_drag->set_picked_up( false );
   }
-  else
-  {
-    layer_to_drag->close();
-  }
-
+  
 }
 
 
@@ -659,13 +659,13 @@ void LayerGroupWidget::dragEnterEvent(QDragEnterEvent* event)
 
 void LayerGroupWidget::dragLeaveEvent( QDragLeaveEvent * event )
 {
-  this->setUpdatesEnabled( false ); 
-  for( int i = 0; i < static_cast< int >( this->layer_list_.size() ); ++i )
-  {
-    this->layer_list_[i]->set_drop( false );
-  }
-  this->setUpdatesEnabled( true );
-  this->update(); 
+//  this->setUpdatesEnabled( false ); 
+//  for( int i = 0; i < static_cast< int >( this->layer_list_.size() ); ++i )
+//  {
+//    this->layer_list_[i]->set_drop( false );
+//  }
+//  this->setUpdatesEnabled( true );
+//  this->update(); 
 }
 
 
@@ -691,7 +691,7 @@ void LayerGroupWidget::dropEvent(QDropEvent* event)
       // Make a messagebox that gets their resample response
       QMessageBox confirm_resample_messagebox;
       confirm_resample_messagebox.setText( QString::fromUtf8( 
-        "\nMoving the file will resample the layer to " )
+        "\nMoving the file will resample the layer.\n The new size will be: " )
         + QString::number( this->private_->current_height ) 
         + QString::fromUtf8( " x " )
         + QString::number( this->private_->current_width )
@@ -745,7 +745,7 @@ void LayerGroupWidget::dropEvent(QDropEvent* event)
 
 
 
-LayerWidgetQHandle LayerGroupWidget::validate_location(const QPoint &point )
+LayerWidgetQWeakHandle LayerGroupWidget::validate_location(const QPoint &point )
 {
   // because the header counts as part of the group we need to account for its offset
   QPoint header_difference = this->private_->ui_.group_frame_->pos();
@@ -753,6 +753,9 @@ LayerWidgetQHandle LayerGroupWidget::validate_location(const QPoint &point )
   QRect rectangle;
   
   // Check all the layers in the list and see if our point is inside
+  //QVector< LayerWidgetQHandle > temp_list = layer_list_;
+  
+  
   for( int i = 0; i < static_cast< int >( this->layer_list_.size() ); ++i )
   {
     rectangle = this->layer_list_[i]->geometry();
@@ -763,7 +766,7 @@ LayerWidgetQHandle LayerGroupWidget::validate_location(const QPoint &point )
       return this->layer_list_[i];
     }
   }
-  return LayerWidgetQHandle();
+  return LayerWidgetQWeakHandle();
 }
   
 }  //end namespace Seg3D

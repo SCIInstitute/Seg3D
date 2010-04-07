@@ -113,6 +113,9 @@ private:
   // Close the dialog and show an error dialog
   static void ReportImportError( qpointer_type qpointer, LayerImporterHandle importer );
   
+  // CENTER
+  void center_widget_on_screen( QWidget *widget );
+  
 };
 
 } //endnamespace Seg3d

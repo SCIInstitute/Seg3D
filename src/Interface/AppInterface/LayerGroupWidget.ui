@@ -62,6 +62,9 @@ QTabBar::tab:last:selected {
   margin-right: 0; /* the last selected tab has nothing to overlap with on the right */
 }
 
+QPushButton#delete_button_{
+
+}
 
 
 QToolButton#group_crop_button_{
@@ -898,7 +901,7 @@ QWidget#group_tools_{
                 </property>
                 <property name="font">
                  <font>
-                  <pointsize>8</pointsize>
+                  <pointsize>10</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -953,10 +956,10 @@ QWidget#group_tools_{
                <enum>QTabWidget::Rounded</enum>
               </property>
               <property name="currentIndex">
-               <number>1</number>
+               <number>0</number>
               </property>
               <property name="elideMode">
-               <enum>Qt::ElideNone</enum>
+               <enum>Qt::ElideRight</enum>
               </property>
               <widget class="QWidget" name="tab">
                <property name="minimumSize">
@@ -1214,18 +1217,18 @@ QWidget#group_tools_{
                  <property name="minimumSize">
                   <size>
                    <width>0</width>
-                   <height>23</height>
+                   <height>25</height>
                   </size>
                  </property>
                  <property name="maximumSize">
                   <size>
                    <width>16777215</width>
-                   <height>23</height>
+                   <height>25</height>
                   </size>
                  </property>
                  <property name="font">
                   <font>
-                   <pointsize>8</pointsize>
+                   <pointsize>10</pointsize>
                   </font>
                  </property>
                  <property name="text">
@@ -1756,7 +1759,7 @@ QWidget#group_tools_{
                  </property>
                  <property name="font">
                   <font>
-                   <pointsize>8</pointsize>
+                   <pointsize>10</pointsize>
                   </font>
                  </property>
                  <property name="text">
@@ -1793,6 +1796,11 @@ QWidget#group_tools_{
               </property>
               <item>
                <widget class="QCheckBox" name="confirm_delete_checkbox_">
+                <property name="font">
+                 <font>
+                  <pointsize>11</pointsize>
+                 </font>
+                </property>
                 <property name="text">
                  <string>Confirm Delete</string>
                 </property>
@@ -1814,7 +1822,7 @@ QWidget#group_tools_{
                 </property>
                 <property name="font">
                  <font>
-                  <pointsize>8</pointsize>
+                  <pointsize>10</pointsize>
                  </font>
                 </property>
                 <property name="text">
