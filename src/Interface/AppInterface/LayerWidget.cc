@@ -36,6 +36,7 @@
 #include <Interface/QtInterface/QtBridge.h>
 #include <Interface/AppInterface/LayerWidget.h>
 #include <Interface/AppInterface/StyleSheet.h>
+#include <Interface/AppInterface/PushDragButton.h>
 
 //UI Includes
 #include "ui_LayerWidget.h"
@@ -43,7 +44,7 @@
 //Application Includes
 #include <Application/Layer/DataLayer.h>
 #include <Application/Layer/MaskLayer.h>
-#include <Application/Layer/LayerGroup.h>
+#include <Application/LayerManager/LayerManager.h>
 #include <Application/LayerManager/Actions/ActionActivateLayer.h>
 #include <Application/LayerManager/Actions/ActionInsertLayerAbove.h>
 
@@ -58,6 +59,7 @@ public:
   SliderDoubleCombo* opacity_adjuster_;
   SliderDoubleCombo* brightness_adjuster_;
   SliderDoubleCombo* contrast_adjuster_;
+  PushDragButton* activate_button_;
 };
 
 LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
@@ -72,10 +74,13 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
                     QSize(), QIcon::Normal, QIcon::Off );
     this->data_layer_icon_.addFile( QString::fromUtf8( ":/Images/DataWhite.png" ), QSize(),
                      QIcon::Normal, QIcon::Off );
+    this->mask_layer_icon_.addFile( QString::fromUtf8( ":/Images/MaskWhite_shadow.png" ), QSize(),
+      QIcon::Normal, QIcon::Off );
   }
   
   // Add the Ui children onto the QWidget
-  this->setObjectName(QString::fromUtf8("LayerWidget"));
+  this->setObjectName( QString::fromUtf8( "LayerWidget" ) );
+  this->setStyleSheet( StyleSheet::LAYERWIDGET_C );
   this->private_->ui_.setupUi( this );
   
   // set some Drag and Drop stuff
@@ -83,7 +88,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   
   // Set the defaults
   // this is a default setting until we can get the name of the layer from the file or by some other means
-  this->private_->ui_.label_->setText( QString::fromStdString( layer->name_state_->get()) );
+  this->private_->ui_.label_->setText( QString::fromStdString( layer->name_state_->get() ) );
   this->private_->ui_.label_->setAcceptDrops( false );
   
   // here we set the unique layer_id_ of the layer
@@ -98,7 +103,15 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   this->private_->ui_.opacity_bar_->hide();
   this->private_->ui_.progress_bar_bar_->hide();
   this->private_->ui_.border_bar_->hide();
-
+  
+  // add the PushDragButton
+  this->private_->activate_button_ = new PushDragButton( this->private_->ui_.typeGradient_ );
+  this->private_->activate_button_->setObjectName( QString::fromUtf8( "activate_button_" ) );
+  this->private_->activate_button_->setStyleSheet( StyleSheet::PUSHDRAGBUTTON_C );
+  this->private_->activate_button_->setMinimumHeight( 42 );
+  this->private_->activate_button_->setMinimumWidth( 31 );
+  this->private_->activate_button_->setIconSize( QSize( 25, 25 ) );
+  this->private_->ui_.horizontalLayout_9->addWidget( this->private_->activate_button_ );
   
   // add the SliderCombo Widgets
   this->private_->opacity_adjuster_ = new SliderDoubleCombo( this->private_->ui_.opacity_bar_ );
@@ -163,7 +176,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
       SIGNAL( toggled( bool )), this, 
       SLOT( visual_lock( bool )));
       
-    QtBridge::Connect( this->private_->ui_.activate_button_, 
+    QtBridge::Connect( this->private_->activate_button_, 
     boost::bind( &ActionActivateLayer::Dispatch, layer ) );
   
   
@@ -183,7 +196,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
         this->private_->ui_.fill_border_button_->hide();
         this->private_->ui_.iso_surface_button_->hide();
         this->private_->ui_.typeBackground_->setStyleSheet( StyleSheet::DATA_VOLUME_COLOR_C );
-        this->private_->ui_.activate_button_->setIcon(this->data_layer_icon_);
+        this->private_->activate_button_->setIcon(this->data_layer_icon_);
         
         DataLayer* data_layer = dynamic_cast< DataLayer* >( layer.get() );
         QtBridge::Connect( this->private_->brightness_adjuster_, data_layer->brightness_state_ );
@@ -219,6 +232,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
         this->private_->ui_.brightness_contrast_button_->hide();
         this->private_->ui_.volume_rendered_button_->hide();
         this->private_->ui_.typeBackground_->setStyleSheet( StyleSheet::MASK_VOLUME_COLOR_C );
+        this->private_->activate_button_->setIcon(this->mask_layer_icon_);
         MaskLayer* mask_layer = dynamic_cast< MaskLayer* >( layer.get() );        
         QtBridge::Connect( this->private_->ui_.iso_surface_button_, mask_layer->show_isosurface_state_ );
         QtBridge::Connect( this->private_->ui_.border_selection_combo_, mask_layer->fill_state_ );
@@ -232,7 +246,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
     case Utils::VolumeType::LABEL_E:
         {
         this->private_->ui_.typeBackground_->setStyleSheet( StyleSheet::LABEL_VOLUME_COLOR_C );
-        
+        this->private_->activate_button_->setIcon(this->label_layer_icon_);
         // keep track locally of what type we are
             this->volume_type_ = 3;
             
@@ -253,18 +267,19 @@ LayerWidget::~LayerWidget()
 {
 }
 
-void LayerWidget::mousePressEvent(QMouseEvent *event)
+void LayerWidget::mousePressEvent( QMouseEvent *event )
 {
-
+// 
+//  if ( !(event->buttons() & Qt::LeftButton) )
+//    return;
+ 
   // Exit immediately if they are no longer holding the button the press event isnt valid
   if ( event->button() != Qt::LeftButton )
   { 
     return;
   }
 
-  // Calculate the location on the widget for the mouse to be holding
-  // We have to account for the offset of the header in the GroupLayerWidget
-  QPoint hotSpot = event->pos();// - this->pos();
+  QPoint hotSpot = event->pos();
 
   // Create some Item data. - THIS IS CURRENTLY NOT REALLY BEING USED
   QByteArray itemData;
@@ -312,10 +327,10 @@ void LayerWidget::mousePressEvent(QMouseEvent *event)
   {
     this->seethrough( false );
     this->set_picked_up( false );
+    this->update();
   }
 
 }
-
 
 
 void LayerWidget::dropEvent( QDropEvent* event )
@@ -325,13 +340,41 @@ void LayerWidget::dropEvent( QDropEvent* event )
     event->ignore();
     return;
   }
-
-  event->setDropAction(Qt::MoveAction);
-  event->accept();
-  ActionInsertLayerAbove::Dispatch( event->mimeData()->text().toStdString(), 
-    this->get_layer_id() ); 
-
+  
+  if( !LayerManager::Instance()->check_for_same_group(
+    event->mimeData()->text().toStdString(), this->get_layer_id() ) )
+  {
+    QMessageBox message_box;
+    message_box.setText( QString::fromUtf8( "This move will modify the layer.\n"
+        "The new size of the layer will be: " )
+        + QString::number( this->grid_transform_.get_nx() ) + QString::fromUtf8( " x " )
+        + QString::number( this->grid_transform_.get_ny() ) + QString::fromUtf8( " x " ) 
+        + QString::number( this->grid_transform_.get_nz() ) );
+    message_box.setInformativeText( QString::fromUtf8( "Are you sure you want to do this?" ) );
+    message_box.setStandardButtons( QMessageBox::Yes | QMessageBox::No );
+    message_box.setDefaultButton( QMessageBox::No );
+    if( message_box.exec() )
+    {
+      event->setDropAction(Qt::MoveAction);
+      event->accept();
+      ActionInsertLayerAbove::Dispatch( event->mimeData()->text().toStdString(), 
+        this->get_layer_id() );
+    }
+    else
+    {
+      event->ignore();
+    }
+  }
+  else
+  {
+    event->setDropAction(Qt::MoveAction);
+    event->accept();
+    ActionInsertLayerAbove::Dispatch( event->mimeData()->text().toStdString(), 
+      this->get_layer_id() );
+  }
+  
   this->set_drop( false );
+  this->update();
 }
 
 void LayerWidget::dragEnterEvent( QDragEnterEvent* event)
@@ -432,6 +475,7 @@ void LayerWidget::show_opacity_bar( bool show )
   {
     this->private_->ui_.opacity_bar_->hide();
   }
+  this->update();
 }
 
 void LayerWidget::show_brightness_contrast_bar( bool show )
@@ -450,6 +494,7 @@ void LayerWidget::show_brightness_contrast_bar( bool show )
   {
     this->private_->ui_.bright_contrast_bar_->hide();
   }
+  this->update();
 }
 
 void LayerWidget::show_border_fill_bar( bool show )
@@ -468,6 +513,7 @@ void LayerWidget::show_border_fill_bar( bool show )
   {
     this->private_->ui_.border_bar_->hide();
   }
+  this->update();
 }
 
 void LayerWidget::show_color_bar( bool show )
@@ -486,6 +532,7 @@ void LayerWidget::show_color_bar( bool show )
   {
     this->private_->ui_.color_bar_->hide();
   }
+  this->update();
 }
 
 void LayerWidget::show_progress_bar( bool show )
@@ -498,6 +545,7 @@ void LayerWidget::show_progress_bar( bool show )
   {
     this->private_->ui_.progress_bar_bar_->hide();
   }
+  this->update();
 }
 
 void LayerWidget::visual_lock( bool lock )
@@ -507,7 +555,7 @@ void LayerWidget::visual_lock( bool lock )
     this->private_->ui_.header_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_LOCKED_C );
     this->private_->ui_.typeBackground_->setStyleSheet( StyleSheet::LAYER_WIDGET_BACKGROUND_LOCKED_C );
     this->private_->ui_.label_->setStyleSheet( StyleSheet::LAYER_WIDGET_LABEL_LOCKED_C );
-    this->private_->ui_.activate_button_->setEnabled( false );
+    this->private_->activate_button_->setEnabled( false );
     this->private_->ui_.opacity_button_->setEnabled( false );
     this->private_->ui_.visibility_button_->setEnabled( false );
     this->private_->ui_.color_button_->setEnabled( false );
@@ -558,7 +606,7 @@ void LayerWidget::visual_lock( bool lock )
     }
     
     this->private_->ui_.label_->setStyleSheet( StyleSheet::LAYER_WIDGET_LABEL_C );
-    this->private_->ui_.activate_button_->setEnabled( true );
+    this->private_->activate_button_->setEnabled( true );
     this->private_->ui_.opacity_button_->setEnabled( true );
     this->private_->ui_.visibility_button_->setEnabled( true );
     this->private_->ui_.color_button_->setEnabled( true );
@@ -570,6 +618,7 @@ void LayerWidget::visual_lock( bool lock )
     this->private_->ui_.label_->setEnabled( true );
     
   }
+  this->update();
 }
 
 void LayerWidget::set_drop( bool drop )

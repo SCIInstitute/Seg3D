@@ -169,6 +169,7 @@ QPushButton#activate_button_{
   color: white;
   margin: 0 0 0 0;
   padding: 0 0 0 0;
+  font: bold;
 }
 
 QPushButton#activate_button_:pressed{
@@ -197,14 +198,14 @@ QToolButton#close_button_{
 }
 
 QWidget#group_header_{
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(25, 25, 25, 0), stop:0.753769 rgba(0, 0, 0, 100), stop:1 rgba(0, 0, 0, 84));
-    border-radius: 4px;
-  border: 1px solid black;
+  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(0, 0, 0, 0), stop:0.45 rgba(0, 0, 0, 30), stop:1 rgba(0, 0, 0, 25));
+    border-radius: 3px;
 }
 
 QWidget#group_background_{
-  background-color: rgb(255, 128, 0);
-    border-radius: 6px;
+  background-color: rgb(232, 145, 32);
+    border-radius: 3px;
+  border: 1px solid rgb(90, 90, 90);
 }
 
 QWidget#LayerGroupWidget{
@@ -266,7 +267,16 @@ QWidget#group_tools_{
          <property name="spacing">
           <number>0</number>
          </property>
-         <property name="margin">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>1</number>
+         </property>
+         <property name="bottomMargin">
           <number>0</number>
          </property>
          <item>
@@ -959,7 +969,7 @@ QWidget#group_tools_{
                <number>0</number>
               </property>
               <property name="elideMode">
-               <enum>Qt::ElideRight</enum>
+               <enum>Qt::ElideNone</enum>
               </property>
               <widget class="QWidget" name="tab">
                <property name="minimumSize">

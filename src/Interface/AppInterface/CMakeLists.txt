@@ -46,6 +46,7 @@ SET(INTERFACE_APPINTERFACE_SRCS
   MeasurementDockWidget.cc
   ProgressWidget.cc
   ProjectDockWidget.cc
+  PushDragButton.cc
   SplashStart.cc
   ToolBoxWidget.cc
   ToolsDockWidget.cc
@@ -70,6 +71,7 @@ SET(INTERFACE_APPINTERFACE_MOC_SRCS
   MeasurementDockWidget.h
   ProgressWidget.h
   ProjectDockWidget.h
+  PushDragButton.h
   ToolBoxWidget.h
   ToolsDockWidget.h
   ToolWidget.h

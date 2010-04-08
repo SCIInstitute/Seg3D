@@ -80,6 +80,7 @@ private:
   // icons to represent the layer types
   QIcon data_layer_icon_;
   QIcon label_layer_icon_;
+  QIcon mask_layer_icon_;
   
   std::string layer_id_;
   Utils::GridTransform grid_transform_;
@@ -88,6 +89,7 @@ private:
   bool picked_up_;
   
   void mousePressEvent( QMouseEvent* event );
+  //void mouseMoveEvent( QMouseEvent * event );
   void dropEvent( QDropEvent* event );
   void dragEnterEvent( QDragEnterEvent* event );
   void dragLeaveEvent( QDragLeaveEvent* event );

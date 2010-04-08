@@ -75,7 +75,6 @@ public:
   void insert_layer( LayerHandle layer, int index );
   void delete_layer( LayerHandle layer );
   void delete_layers( std::vector< LayerHandle > layers );
-//  bool refresh_group( LayerGroupHandle group );
   void make_new_group( LayerHandle layer );
   void delete_group( LayerGroupHandle group );
   void show_group( LayerGroupHandle group );

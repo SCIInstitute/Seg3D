@@ -59,6 +59,9 @@ public:
 
   
   // === LayerWidget Styles === //
+  
+    // - LayerWidget - //
+    const static QString LAYERWIDGET_C;
     
     // - Volume Type Colors - //
     const static QString DATA_VOLUME_COLOR_C;
@@ -87,6 +90,9 @@ public:
     const static QString GROUP_WIDGET_BASE_INACTIVE_C;
     const static QString GROUP_WIDGET_BACKGROUND_INACTIVE_C;
     const static QString GROUP_WIDGET_ACTIVATE_BUTTON_INACTIVE_C;
+    
+  // === PushDragButton === //
+    const static QString PUSHDRAGBUTTON_C;
     
   
 

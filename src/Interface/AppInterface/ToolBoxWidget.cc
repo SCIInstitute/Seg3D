@@ -156,7 +156,7 @@ void ToolBoxWidget::set_active_tool( QWidget *tool )
       {
         this->private_->page_list_[ i ].ui_.page_background_->setStyleSheet( 
           QString::fromUtf8(
-            " QWidget#page_background_ { background-color: rgb(220, 220, 220); }" ) );
+            " QWidget#page_background_ { background-color: rgb(200, 200, 200); }" ) );
         this->private_->page_list_[ i ].ui_.activate_button_->setStyleSheet(
             QString::fromUtf8( "QPushButton#activate_button_{\n"
               " margin-right: 7px;\n"
@@ -187,8 +187,8 @@ void ToolBoxWidget::set_active_tool( QWidget *tool )
       {
         this->private_->page_list_[ i ].ui_.page_background_->setStyleSheet(
             QString::fromUtf8(
-                "QWidget#page_background_ { background-color: rgb(255, 128, 0); }" ) );
-
+                //"QWidget#page_background_ { background-color: rgb(255, 128, 0); }" ) );
+            "QWidget#page_background_ { background-color: rgb( 237, 149, 31 ); }" ) );
         this->private_->page_list_[ i ].ui_.activate_button_->setStyleSheet(
             QString::fromUtf8( "QPushButton#activate_button_{\n"
               " margin-right: 7px;\n"

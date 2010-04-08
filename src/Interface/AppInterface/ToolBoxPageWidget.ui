@@ -31,14 +31,9 @@
 QPushButton#activate_button_:pressed{
   background-color:rgba(0, 0, 0, 0);
   border-color: rgba(0, 0, 0, 0);
-  padding-left:4px;
+  padding-left: 4px;
   border: none;
   color:  rgb(68, 68, 68);
-}
-
-QFrame#page_frame_{
-  border-radius: 4px;
-  border: 1px solid gray;
 }
 
 QToolButton#close_button_{
@@ -62,19 +57,21 @@ QToolButton#help_button_:pressed{
 }
 
 QWidget#page_header_{
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(25, 25, 25, 0), stop:0.753769 rgba(0, 0, 0, 100), stop:1 rgba(0, 0, 0, 84));
-    border-radius: 4px;
+  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(0, 0, 0, 0), stop:0.45 rgba(0, 0, 0,30), stop:1 rgba(0, 0, 0, 25));
+  /*background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(25, 25, 25, 0), stop:0.753769 rgba(0, 0, 0, 100), stop:1 rgba(0, 0, 0, 84));*/
+    border-radius: 3px;
   border: 1px solid black;
 }
 
 QWidget#page_background_{
-  background-color: rgb(255, 128, 0);
-    border-radius: 6px;
+  /*background-color: rgb(255, 128, 0);*/
+  background-color: rgb( 237, 149, 31 );
+    border-radius: 3px;
 }
 
 QWidget#ToolBoxPageWidget{
   background-color: gray;
-  border-radius:6px;
+  border-radius:4px;
 }
 
 QWidget#tool_frame_{
@@ -142,7 +139,16 @@ QWidget#tool_frame_{
          <property name="spacing">
           <number>0</number>
          </property>
-         <property name="margin">
+         <property name="leftMargin">
+          <number>2</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
           <number>0</number>
          </property>
          <item>

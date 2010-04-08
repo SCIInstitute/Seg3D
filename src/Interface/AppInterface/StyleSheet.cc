@@ -77,6 +77,14 @@ namespace Seg3D
 
   // === LayerWidget Styles === //
 
+  // - LayerWidget - //
+  const QString StyleSheet::LAYERWIDGET_C = QString::fromUtf8(
+    "QWidget#LayerWidget{"
+    " background-color: rgba( 0, 0, 0, 0 );"
+    " border-radius: 3px;"
+    "}");
+  
+
   // - Volume Type Colors - //
   const QString StyleSheet::DATA_VOLUME_COLOR_C = QString::fromUtf8(
     "QWidget#typeBackground_{"
@@ -95,7 +103,7 @@ namespace Seg3D
   // - ACTIVE - //
   const QString StyleSheet::LAYER_WIDGET_BASE_ACTIVE_C = QString::fromUtf8(
     "QWidget#base_{"
-    " border-radius: 6px;"
+    " border-radius: 3px;"
     " border: 1px solid rgb(94, 141, 176);"
     " background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1," 
     "   stop:0 rgba(216, 238, 245, 255),"
@@ -110,7 +118,7 @@ namespace Seg3D
     "   stop:0 rgba(211, 211, 211, 255),"
     "   stop:0.155779 rgba(225, 225, 225, 255),"
     "   stop:1 rgba(194, 194, 194, 255));"
-    " border-radius: 6px;"
+    " border-radius: 3px;"
     " border: 1px solid rgb(90, 90, 90);"
     "}");
   
@@ -129,7 +137,7 @@ namespace Seg3D
     "   stop:0 rgba(241, 249, 205, 255),"
     "   stop:0.372881 rgba(248, 255, 212, 255),"
     "   stop:1 rgba(255, 253, 185, 255));"
-    " border-radius: 6px;"
+    " border-radius: 3px;"
     " border: 1px solid rgb(90, 90, 90);"
     "}");
     
@@ -137,7 +145,7 @@ namespace Seg3D
   const QString StyleSheet::LAYER_WIDGET_BASE_PICKED_UP_C = QString::fromUtf8(
     "QWidget#base_{"
     " background-color: rgba( 0, 0, 0, 0 );"
-    " border-radius: 6px;"
+    " border-radius: 3px;"
     " border: 1px solid rgba( 0, 0, 0, 0 );"
     "}");
     
@@ -148,7 +156,7 @@ namespace Seg3D
     "   stop:0 rgba(201, 201, 201, 255),"
     "   stop:0.155779 rgba(208, 208, 208, 255),"
     "   stop:1 rgba(184, 184, 184, 255));"
-    " border-radius: 6px;"
+    " border-radius: 3px;"
     " border: 1px solid rgb(120, 120, 120);"
     "}");
   const QString StyleSheet::LAYER_WIDGET_BACKGROUND_LOCKED_C = QString::fromUtf8(
@@ -162,21 +170,28 @@ namespace Seg3D
     " background-color:rgba(208, 208, 208, 1);"
     " color: gray;"
     "}");
+    
+    
   
   
+
+  
+
   // === LayerGroupWidget Styles === //
+  
   // - ACTIVE - //
   const QString StyleSheet::GROUP_WIDGET_BASE_ACTIVE_C = QString::fromUtf8(
     "QWidget#base_{"
     " background-color: rgb(150, 150, 150);"
-    " border-radius:6px;"
+    " border-radius:3px;"
     " border: 1px solid rgba(80, 80, 80, 255);"
     " color: rgb(90,90,90);"
     "}");
   const QString StyleSheet::GROUP_WIDGET_BACKGROUND_ACTIVE_C = QString::fromUtf8(  
     "QWidget#group_background_{"
-    " background-color: rgb(255, 128, 0);"
-    " border-radius: 6px;"
+    " background-color: rgb(237, 149, 31);"
+    " border: 1px solid rgb(90, 90, 90);"
+    " border-radius: 3px;"
     " color: white;"
     "}");
   const QString StyleSheet::GROUP_WIDGET_ACTIVATE_BUTTON_ACTIVE_C = QString::fromUtf8(
@@ -189,20 +204,22 @@ namespace Seg3D
     " color: white;"
     " margin: 0 0 0 0;"
     " padding: 0 0 0 0;"
+    " font: bold;"
     "}");
     
   // - INACTIVE - //
   const QString StyleSheet::GROUP_WIDGET_BASE_INACTIVE_C = QString::fromUtf8(
     "QWidget#base_{"
     " background-color: rgb(110, 110, 110);"
-    " border-radius:6px;"
+    " border-radius:3px;"
     " border: 1px solid rgb(80, 80, 80);"
     "}");
     
   const QString StyleSheet::GROUP_WIDGET_BACKGROUND_INACTIVE_C = QString::fromUtf8(  
-    "QWidget#group_background_{\n"
-    " background-color: rgb(210, 210, 210);\n"
-    " border-radius: 6px;\n"
+    "QWidget#group_background_{"
+    " background-color: rgb(200, 200, 200);"
+    " border: 1px solid rgb(90, 90, 90);"
+    " border-radius: 3px;"
     "}\n");
   const QString StyleSheet::GROUP_WIDGET_ACTIVATE_BUTTON_INACTIVE_C = QString::fromUtf8(
     "QPushButton#activate_button_{"
@@ -214,6 +231,16 @@ namespace Seg3D
     " color: rgb( 90, 90, 90 );"
     " margin: 0 0 0 0;"
     " padding: 0 0 0 0;"
+    "}");
+    
+  // - PushDragButton - //  
+  const QString StyleSheet::PUSHDRAGBUTTON_C = QString::fromUtf8(
+    "QPushButton#activate_button_{"
+    " background-color: rgba(0, 0, 0, 0);"
+    " border: 1px solid rgba(0, 0, 0, 0);"
+    " border-radius: 3px;"
+    //" margin-right: 0px;"
+    " color: white;"
     "}");
 
 StyleSheet::StyleSheet()

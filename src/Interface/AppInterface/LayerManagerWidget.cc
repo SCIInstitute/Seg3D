@@ -94,6 +94,8 @@ void LayerManagerWidget::insert_layer( LayerHandle layer )
       ( *i )->setUpdatesEnabled( false );
       ( *i )->insert_layer( layer, -1 );
       ( *i )->setUpdatesEnabled( true );
+      if( layer->get_active() )
+        this->set_active_layer( layer );
       ( *i )->update();
       inserted = true;
       break;
@@ -118,6 +120,8 @@ void LayerManagerWidget::insert_layer( LayerHandle layer, int index )
       ( *i )->setUpdatesEnabled( false );
       ( *i )->insert_layer( layer, index );
       ( *i )->setUpdatesEnabled( true );
+      if( layer->get_active() )
+        this->set_active_layer( layer );
       ( *i )->update();
       break;
     } 
@@ -179,6 +183,7 @@ void LayerManagerWidget::delete_group( LayerGroupHandle group )
     {
       ( *i )->deleteLater();
       group_list_.erase( i );
+      this->set_active_group( LayerManager::Instance()->get_active_group() );
       return;
     }
   }
