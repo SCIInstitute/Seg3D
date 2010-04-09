@@ -369,7 +369,7 @@ void LayerWidget::dropEvent( QDropEvent* event )
   }
   
   this->set_drop( false );
-  this->update();
+  this->repaint();
 }
 
 void LayerWidget::dragEnterEvent( QDragEnterEvent* event)
@@ -390,11 +390,13 @@ void LayerWidget::dragEnterEvent( QDragEnterEvent* event)
   {
     event->ignore();
   }
+  this->update();
 }
 
 void LayerWidget::dragLeaveEvent( QDragLeaveEvent* event )
 {
   this->set_drop( false );
+  this->update();
 }
 
 
@@ -411,6 +413,7 @@ void LayerWidget::set_active( bool active )
     {
         this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_INACTIVE_C );
     }
+    this->repaint();
 }
 
 void LayerWidget::seethrough( bool see )
@@ -438,6 +441,7 @@ void LayerWidget::seethrough( bool see )
 
     this->setUpdatesEnabled( true );
   }
+  this->repaint();
 }
 
   
@@ -469,7 +473,7 @@ void LayerWidget::show_opacity_bar( bool show )
   {
     this->private_->ui_.opacity_bar_->hide();
   }
-  this->update();
+  this->repaint();
 }
 
 void LayerWidget::show_brightness_contrast_bar( bool show )
@@ -488,7 +492,7 @@ void LayerWidget::show_brightness_contrast_bar( bool show )
   {
     this->private_->ui_.bright_contrast_bar_->hide();
   }
-  this->update();
+  this->repaint();
 }
 
 void LayerWidget::show_border_fill_bar( bool show )
@@ -507,7 +511,7 @@ void LayerWidget::show_border_fill_bar( bool show )
   {
     this->private_->ui_.border_bar_->hide();
   }
-  this->update();
+  this->repaint();
 }
 
 void LayerWidget::show_color_bar( bool show )
@@ -526,7 +530,7 @@ void LayerWidget::show_color_bar( bool show )
   {
     this->private_->ui_.color_bar_->hide();
   }
-  this->update();
+  this->repaint();
 }
 
 void LayerWidget::show_progress_bar( bool show )
@@ -539,7 +543,7 @@ void LayerWidget::show_progress_bar( bool show )
   {
     this->private_->ui_.progress_bar_bar_->hide();
   }
-  this->update();
+  this->repaint();
 }
 
 void LayerWidget::visual_lock( bool lock )
@@ -612,7 +616,7 @@ void LayerWidget::visual_lock( bool lock )
     this->private_->ui_.label_->setEnabled( true );
     
   }
-  this->update();
+  this->repaint();
 }
 
 void LayerWidget::set_drop( bool drop )

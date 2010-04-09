@@ -192,29 +192,34 @@ void LayerManagerWidget::delete_group( LayerGroupHandle group )
 
 void  LayerManagerWidget::set_active_layer( LayerHandle layer )
 {
-  
+  //SCI_LOG_DEBUG( "LayerManagerWidget set_active_layer started" );
+    
   if( active_layer_ )
     this->active_layer_.data()->set_active( false );
   
-    this->set_active_group( layer->get_layer_group() );   
+    //this->set_active_group( layer->get_layer_group() );   
     
     for ( QList< LayerGroupWidgetQHandle >::iterator i = this->group_list_.begin(); 
      i  != this->group_list_.end(); i++ )
   {
+    //SCI_LOG_DEBUG( "LayerGroupWidget set_active_layer started" );
     LayerWidgetQWeakHandle temp_layer = ( *i )->set_active_layer( layer );
+    //SCI_LOG_DEBUG( "LayerGroupWidget set_active_layer ended" );
       if( temp_layer )
       {
       active_layer_ = temp_layer;
       break;
     }
   }
-  this->update();
+  
+  //SCI_LOG_DEBUG( "LayerManagerWidget set_active_layer ended" );
 }
 
 
   
 void LayerManagerWidget::set_active_group( LayerGroupHandle group )
 {
+  SCI_LOG_DEBUG( "LayerManagerWidget set_active_group started" );
 
     for ( QList< LayerGroupWidgetQHandle >::iterator i = this->group_list_.begin(); 
      i  != this->group_list_.end(); i++ )
@@ -228,6 +233,8 @@ void LayerManagerWidget::set_active_group( LayerGroupHandle group )
           ( *i )->set_active( false );
       }
   }
+  
+  SCI_LOG_DEBUG( "LayerManagerWidget set_active_group ended" );
 }
 
 

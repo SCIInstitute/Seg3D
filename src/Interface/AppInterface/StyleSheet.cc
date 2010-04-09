@@ -38,7 +38,7 @@ namespace Seg3D
     " border: 1px solid rgba( 0, 0, 0, 0 );"
     "}"
     "QToolButton:hover {"
-    " background-color: rgba( 150, 150, 150, 70 );"
+    " background-color: rgba( 140, 140, 140, 70 );"
     "}"
     "QToolButton:pressed {"
     " background-color: rgba( 255, 255, 210, 140 );"
@@ -104,12 +104,12 @@ namespace Seg3D
   // - page_background_ - //
   const QString StyleSheet::TOOLBOXPAGEWIDGET_PAGE_BACKGROUND_ACTIVE_C = QString( 
     "QWidget#page_background_ {"
-    " background-color: rgb( 200, 200, 200 );"
+    " background-color: rgb( 237, 148, 31 );"
     " border-radius: 3px;"
     "}" );
   const QString StyleSheet::TOOLBOXPAGEWIDGET_PAGE_BACKGROUND_INACTIVE_C = QString( 
     "QWidget#page_background_ {"
-    " background-color: rgb( 237, 149, 31 );"
+    " background-color: rgb( 200, 200, 200 );"
     " border-radius: 3px;"
     "}" );
     
@@ -232,13 +232,13 @@ namespace Seg3D
     "QWidget#base_{"
     " background-color: rgb(150, 150, 150);"
     " border-radius:3px;"
-    " border: 1px solid rgba(80, 80, 80, 255);"
+    " border: 1px solid rgb( 60, 60, 60 );"
     " color: rgb(90,90,90);"
     "}");
   const QString StyleSheet::GROUP_WIDGET_BACKGROUND_ACTIVE_C = QString::fromUtf8(  
     "QWidget#group_background_{"
     " background-color: rgb(237, 149, 31);"
-    " border: 1px solid rgb(90, 90, 90);"
+    " border: 1px solid rgb(60, 60, 60);"
     " border-radius: 3px;"
     " color: white;"
     "}");
@@ -258,14 +258,14 @@ namespace Seg3D
   // - INACTIVE - //
   const QString StyleSheet::GROUP_WIDGET_BASE_INACTIVE_C = QString::fromUtf8(
     "QWidget#base_{"
-    " background-color: rgb(110, 110, 110);"
+    " background-color: rgb( 110, 110, 110 );"
     " border-radius:3px;"
-    " border: 1px solid rgb(80, 80, 80);"
+    " border: 1px solid rgb( 60, 60,60 );"
     "}");
   const QString StyleSheet::GROUP_WIDGET_BACKGROUND_INACTIVE_C = QString::fromUtf8(  
     "QWidget#group_background_{"
-    " background-color: rgb(200, 200, 200);"
-    " border: 1px solid rgb(90, 90, 90);"
+    " background-color: rgb( 200, 200, 200 );"
+    " border: 1px solid rgb( 60, 60, 60 );"
     " border-radius: 3px;"
     "}\n");
   const QString StyleSheet::GROUP_WIDGET_ACTIVATE_BUTTON_INACTIVE_C = QString::fromUtf8(

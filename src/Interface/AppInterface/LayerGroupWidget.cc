@@ -290,7 +290,7 @@ void LayerGroupWidget::insert_layer( LayerHandle layer, int index )
     this->private_->ui_.group_frame_layout_->insertWidget( index, new_layer_handle.data() );
   }
   this->layer_list_.push_back( new_layer_handle );
-  this->update();
+  this->repaint();
 }
 
 
@@ -318,14 +318,17 @@ LayerWidgetQWeakHandle LayerGroupWidget::set_active_layer( LayerHandle layer )
       if( layer_id == layer_list_[i]->get_layer_id() )
       {
           layer_list_[i]->set_active( true );
+          this->set_active( true );
       return layer_list_[i];
       }
   }
   return LayerWidgetQWeakHandle();
+  
 }
 
 void  LayerGroupWidget::set_active( bool active )
 {
+  //SCI_LOG_DEBUG( "LayerGroupWidget set_active started" );
     if( active )
     {
         this->private_->ui_.base_->setStyleSheet( 
@@ -348,6 +351,7 @@ void  LayerGroupWidget::set_active( bool active )
       this->private_->ui_.activate_button_->setStyleSheet( 
       StyleSheet::GROUP_WIDGET_ACTIVATE_BUTTON_INACTIVE_C );               
     }
+    //SCI_LOG_DEBUG( "LayerGroupWidget set_active ended" );
 }
 
 
@@ -439,6 +443,7 @@ void LayerGroupWidget::show_resample( bool show )
     this->private_->ui_.resample_->hide();
   }
   show_selection_checkboxes( show );
+  this->repaint();
 }
 
 void LayerGroupWidget::show_transform( bool show )
@@ -464,6 +469,7 @@ void LayerGroupWidget::show_transform( bool show )
     this->private_->ui_.transform_->hide();
   }
   show_selection_checkboxes( show );
+  this->repaint();
 }
 
 void LayerGroupWidget::show_crop( bool show )
@@ -489,6 +495,7 @@ void LayerGroupWidget::show_crop( bool show )
     this->private_->ui_.roi_->hide();
   }
   show_selection_checkboxes( show );
+  this->repaint();
 }
 
 void LayerGroupWidget::show_flip_rotate( bool show )
@@ -514,6 +521,7 @@ void LayerGroupWidget::show_flip_rotate( bool show )
     this->private_->ui_.flip_rotate_->hide();
   }
   show_selection_checkboxes( show );
+  this->repaint();
 }
 
 void LayerGroupWidget::show_delete( bool show )
@@ -540,7 +548,7 @@ void LayerGroupWidget::show_delete( bool show )
     this->private_->ui_.group_delete_button_->setChecked( false );
   }
   show_selection_checkboxes( show );
-  this->update();
+  this->repaint();
 }
 
   
