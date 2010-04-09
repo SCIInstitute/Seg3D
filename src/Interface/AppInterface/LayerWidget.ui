@@ -43,6 +43,9 @@ QPushButton#activate_button_{
   color: white;
 }
 
+QToolButton:hover{
+  background-color: rgba( 150, 150, 150, 70 );
+}
 
 QWidget#typeBackground_{
   background-color: rgb(255, 128, 0);

@@ -246,37 +246,19 @@ void AppStatusBar::set_message( int msg_type, std::string message )
   switch( msg_type )
   {
   case Utils::LogMessageType::ERROR_E:
-    this->private_->ui_.status_report_label_->setStyleSheet( QString::fromUtf8(
-        "QLabel#status_report_label_{\n"
-          " text-align: left;\n"
-          " color: rgb(121, 0, 0);\n"
-          " font: bold; }\n" ) );
+    this->private_->ui_.status_report_label_->setStyleSheet( StyleSheet::STATUSBAR_ERROR_C );
     color_ = QColor(121, 0, 0);
     break;
-
   case Utils::LogMessageType::WARNING_E:
-    this->private_->ui_.status_report_label_->setStyleSheet( QString::fromUtf8(
-        "QLabel#status_report_label_{\n"
-          " text-align: left;\n"
-          " color: rgb(165, 161, 34);\n"
-          " font: bold; }\n" ) );
+    this->private_->ui_.status_report_label_->setStyleSheet( StyleSheet::STATUSBAR_WARNING_C );
     color_ = QColor(165, 161, 34);
     break;
   case Utils::LogMessageType::MESSAGE_E:
-    this->private_->ui_.status_report_label_->setStyleSheet( QString::fromUtf8(
-        "QLabel#status_report_label_{\n"
-          " text-align: left;\n"
-          " color: rgb(3, 86, 2);\n"
-          " font: bold; \n}" ) );
+    this->private_->ui_.status_report_label_->setStyleSheet( StyleSheet::STATUSBAR_MESSAGE_C );
     color_ = QColor(3, 86, 2);
     break;
-
   case Utils::LogMessageType::DEBUG_E:
-    this->private_->ui_.status_report_label_->setStyleSheet( QString::fromUtf8(
-        "QLabel#status_report_label_{\n"
-          " text-align: left;\n"
-          " color: purple;\n"
-          " font: bold; }\n" ) );
+    this->private_->ui_.status_report_label_->setStyleSheet( StyleSheet::STATUSBAR_DEBUG_C );
     color_ = QColor("purple");
     break;
   default:

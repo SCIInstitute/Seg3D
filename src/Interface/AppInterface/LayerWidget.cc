@@ -156,7 +156,6 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
         this->private_->opacity_adjuster_->setRange( opacity_min, opacity_max );
         this->private_->opacity_adjuster_->setCurrentValue( layer->opacity_state_->get() );
 
-
   // connect the GUI signals and slots
   connect( this->private_->ui_.opacity_button_, 
       SIGNAL( clicked( bool )), this, 
@@ -178,7 +177,6 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
       
     QtBridge::Connect( this->private_->activate_button_, 
     boost::bind( &ActionActivateLayer::Dispatch, layer ) );
-  
   
   // make the default connections, for any layer type, to the state engine
   QtBridge::Connect( this->private_->ui_.selection_checkbox_, layer->selected_state_ );
@@ -249,9 +247,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
         this->private_->activate_button_->setIcon(this->label_layer_icon_);
         // keep track locally of what type we are
             this->volume_type_ = 3;
-            
         }
-      
       break;
       
     default:
@@ -259,7 +255,6 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   }
   
   this->setUpdatesEnabled( true );
-  
 }
   
   
@@ -346,7 +341,7 @@ void LayerWidget::dropEvent( QDropEvent* event )
   {
     QMessageBox message_box;
     message_box.setText( QString::fromUtf8( "This move will modify the layer.\n"
-        "The new size of the layer will be: " )
+        "The new size of the layer will be: \t" )
         + QString::number( this->grid_transform_.get_nx() ) + QString::fromUtf8( " x " )
         + QString::number( this->grid_transform_.get_ny() ) + QString::fromUtf8( " x " ) 
         + QString::number( this->grid_transform_.get_nz() ) );
@@ -444,7 +439,6 @@ void LayerWidget::seethrough( bool see )
     this->setUpdatesEnabled( true );
   }
 }
-
 
   
 void LayerWidget::show_selection_checkbox( bool show )

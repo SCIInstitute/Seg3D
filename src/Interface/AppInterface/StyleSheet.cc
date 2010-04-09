@@ -31,17 +31,17 @@
 
 namespace Seg3D
 {
-  // === ViewerWidget Styles === //
+// === ViewerWidget Styles === //
   
   const QString StyleSheet::VIEWERWIDGET_TOOLBAR_C = QString::fromUtf8(
     "QToolButton {"
     " border: 1px solid rgba( 0, 0, 0, 0 );"
     "}"
     "QToolButton:hover {"
-    " background-color: rgba( 150, 150, 150, 70 )"
+    " background-color: rgba( 150, 150, 150, 70 );"
     "}"
     "QToolButton:pressed {"
-    " background-color: rgba( 255, 255, 210, 140 )"
+    " background-color: rgba( 255, 255, 210, 140 );"
     "}"
     "QFrame {"
     " background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227,"
@@ -50,8 +50,7 @@ namespace Seg3D
     "   stop:1 rgba(224, 224, 224, 255));"
     "}" );
 
-  // === StatusBar === //
-
+// === StatusBar === //
   const QString StyleSheet::STATUSBAR_C = QString::fromUtf8(
     "QStatusBar::item {"
     " border: none; }"
@@ -59,14 +58,41 @@ namespace Seg3D
     " background-color: rgba( 0, 0, 0, 0 );"
     " border: 1px solid  rgba( 0, 0, 0, 0 );"
     "}" );
+  
+  const QString StyleSheet::STATUSBAR_ERROR_C = QString::fromUtf8(
+    "QLabel#status_report_label_{"
+    " text-align: left;"
+    " color: rgb(121, 0, 0);"
+    " font: bold;"
+    "}" );
+  
+  const QString StyleSheet::STATUSBAR_WARNING_C = QString::fromUtf8(
+    "QLabel#status_report_label_{"
+    " text-align: left;"
+    " color: rgb(165, 161, 34);"
+    " font: bold;"
+    "}" );
     
+  const QString StyleSheet::STATUSBAR_MESSAGE_C = QString::fromUtf8(
+    "QLabel#status_report_label_{"
+    " text-align: left;"
+    " color: rgb(3, 86, 2);"
+    " font: bold;"
+    "}" );
+  const QString StyleSheet::STATUSBAR_DEBUG_C = QString::fromUtf8(
+    "QLabel#status_report_label_{"
+    " text-align: left;"
+    " color: purple;"
+    " font: bold;"
+    "}" );
+    
+// === LayerImporterWidget === //
   const QString StyleSheet::LAYERIMPORTERWIDGET_ACTIVE_BUTTON_C = QString( 
     "QToolButton{"
     " background-color: rgb(233, 111, 53);"
     " border-radius: 3px;"
     " border: 2px solid rgb(142, 67, 32);"
     "}" );
-    
   const QString StyleSheet::LAYERIMPORTERWIDGET_INACTIVE_BUTTON_C = QString( 
     "QToolButton{"
     " background-color: rgb(150, 150, 150);"
@@ -74,9 +100,41 @@ namespace Seg3D
     " border: 2px solid rgb(30, 30, 30);"
     "}" );
 
+// === ToolBoxPageWidget Styles === //
+  // - page_background_ - //
+  const QString StyleSheet::TOOLBOXPAGEWIDGET_PAGE_BACKGROUND_ACTIVE_C = QString( 
+    "QWidget#page_background_ {"
+    " background-color: rgb( 200, 200, 200 );"
+    " border-radius: 3px;"
+    "}" );
+  const QString StyleSheet::TOOLBOXPAGEWIDGET_PAGE_BACKGROUND_INACTIVE_C = QString( 
+    "QWidget#page_background_ {"
+    " background-color: rgb( 237, 149, 31 );"
+    " border-radius: 3px;"
+    "}" );
+    
+  // - activate_button_ - //
+  const QString StyleSheet::TOOLBOXPAGEWIDGET_ACTIVATE_BUTTON_ACTIVE_C = QString( 
+    "QPushButton#activate_button_{"
+    " margin-right: 7px;"
+    " height: 24px;"
+    " text-align: left;"
+    " padding-left: 4px;"
+    " color: white;"
+    " font: bold;"
+    "}" );
+  const QString StyleSheet::TOOLBOXPAGEWIDGET_ACTIVATE_BUTTON_INACTIVE_C = QString( 
+    "QPushButton#activate_button_{"
+    " margin-right: 7px;"
+    " height: 24px;"
+    " text-align: left;"
+    " padding-left: 4px;"
+    " color: rgb(25, 25, 25);"
+    " font: normal;"
+    "}" );
+  
 
-  // === LayerWidget Styles === //
-
+// === LayerWidget Styles === //
   // - LayerWidget - //
   const QString StyleSheet::LAYERWIDGET_C = QString::fromUtf8(
     "QWidget#LayerWidget{"
@@ -84,18 +142,15 @@ namespace Seg3D
     " border-radius: 3px;"
     "}");
   
-
   // - Volume Type Colors - //
   const QString StyleSheet::DATA_VOLUME_COLOR_C = QString::fromUtf8(
     "QWidget#typeBackground_{"
     " background-color: rgb(166, 12, 73);"
     "}");
-
   const QString StyleSheet::MASK_VOLUME_COLOR_C = QString::fromUtf8(
     "QWidget#typeBackground_{"
     " background-color: rgb(255, 128, 0);"
     "}");
-
   const QString StyleSheet::LABEL_VOLUME_COLOR_C = QString::fromUtf8(
     "QWidget#typeBackground_{ background-color: rgb(90, 90, 90);"
     "}");
@@ -121,7 +176,6 @@ namespace Seg3D
     " border-radius: 3px;"
     " border: 1px solid rgb(90, 90, 90);"
     "}");
-  
   const QString StyleSheet::LAYER_WIDGET_LABEL_C = QString::fromUtf8(
     "QLineEdit#label_{"
     " text-align: left;"
@@ -171,14 +225,8 @@ namespace Seg3D
     " color: gray;"
     "}");
     
-    
-  
-  
 
-  
-
-  // === LayerGroupWidget Styles === //
-  
+// === LayerGroupWidget Styles === //
   // - ACTIVE - //
   const QString StyleSheet::GROUP_WIDGET_BASE_ACTIVE_C = QString::fromUtf8(
     "QWidget#base_{"
@@ -214,7 +262,6 @@ namespace Seg3D
     " border-radius:3px;"
     " border: 1px solid rgb(80, 80, 80);"
     "}");
-    
   const QString StyleSheet::GROUP_WIDGET_BACKGROUND_INACTIVE_C = QString::fromUtf8(  
     "QWidget#group_background_{"
     " background-color: rgb(200, 200, 200);"
@@ -231,6 +278,7 @@ namespace Seg3D
     " color: rgb( 90, 90, 90 );"
     " margin: 0 0 0 0;"
     " padding: 0 0 0 0;"
+    " font: normal;"
     "}");
     
   // - PushDragButton - //  
@@ -239,7 +287,6 @@ namespace Seg3D
     " background-color: rgba(0, 0, 0, 0);"
     " border: 1px solid rgba(0, 0, 0, 0);"
     " border-radius: 3px;"
-    //" margin-right: 0px;"
     " color: white;"
     "}");
 

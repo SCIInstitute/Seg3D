@@ -33,7 +33,11 @@
 #include <iostream>
 #include <boost/lexical_cast.hpp>
 
+// Interface includes
 #include <Interface/QtInterface/QtBridge.h>
+
+// Application includes
+#include <Interface/AppInterface/StyleSheet.h>
 
 // Qt includes
 #include <QUrl>
@@ -155,17 +159,9 @@ void ToolBoxWidget::set_active_tool( QWidget *tool )
       if ( !( this->private_->page_list_[ i ].ui_.tool_frame_->isHidden() ) )
       {
         this->private_->page_list_[ i ].ui_.page_background_->setStyleSheet( 
-          QString::fromUtf8(
-            " QWidget#page_background_ { background-color: rgb(200, 200, 200); }" ) );
+          StyleSheet::TOOLBOXPAGEWIDGET_PAGE_BACKGROUND_INACTIVE_C );
         this->private_->page_list_[ i ].ui_.activate_button_->setStyleSheet(
-            QString::fromUtf8( "QPushButton#activate_button_{\n"
-              " margin-right: 7px;\n"
-              " height: 24px;\n"
-              " text-align: left;\n"
-              " padding-left: 4px;\n"
-              " color: rgb(25, 25, 25);\n"
-              " font: normal;\n"
-              "}\n" ) );
+            StyleSheet::TOOLBOXPAGEWIDGET_ACTIVATE_BUTTON_INACTIVE_C );
         this->private_->page_list_[ i ].ui_.close_button_->setIcon(
             inactive_close_icon_ );
         this->private_->page_list_[ i ].ui_.help_button_->setIcon(
@@ -186,18 +182,9 @@ void ToolBoxWidget::set_active_tool( QWidget *tool )
       if ( this->private_->page_list_[ i ].ui_.tool_frame_->isHidden() )
       {
         this->private_->page_list_[ i ].ui_.page_background_->setStyleSheet(
-            QString::fromUtf8(
-                //"QWidget#page_background_ { background-color: rgb(255, 128, 0); }" ) );
-            "QWidget#page_background_ { background-color: rgb( 237, 149, 31 ); }" ) );
+            StyleSheet::TOOLBOXPAGEWIDGET_PAGE_BACKGROUND_ACTIVE_C );
         this->private_->page_list_[ i ].ui_.activate_button_->setStyleSheet(
-            QString::fromUtf8( "QPushButton#activate_button_{\n"
-              " margin-right: 7px;\n"
-              " height: 24px;\n"
-              " text-align: left;\n"
-              " padding-left: 4px;\n"
-              " color: white;\n"
-              " font: bold;\n"
-              "}\n" ) );
+            StyleSheet::TOOLBOXPAGEWIDGET_ACTIVATE_BUTTON_ACTIVE_C );
         this->private_->page_list_[ i ].ui_.close_button_->setIcon(
             active_close_icon_ );
         this->private_->page_list_[ i ].ui_.help_button_->setIcon(

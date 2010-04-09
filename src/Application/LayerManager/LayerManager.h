@@ -46,7 +46,6 @@
 #include <Utils/Core/Exception.h>
 
 // Application includes
-#include <Application/Layer/Layer.h>
 #include <Application/Layer/LayerGroup.h>
 #include <Application/LayerManager/LayerScene.h>
 #include <Application/State/StateHandler.h>
@@ -77,19 +76,19 @@ public:
     // Functions for getting a copy of the Layers and Groups with the proper locking
   void get_groups( std::vector< LayerGroupHandle > &vector_of_groups );
   void get_layers( std::vector< LayerHandle > &vector_of_layers );
+  bool check_for_same_group( const std::string& layer_to_insert_id, const std::string& layer_below_id );
   
   LayerGroupHandle get_LayerGroupHandle_from_group_id( std::string group_id );
   LayerHandle get_layer_by_id( const std::string& layer_id );
   LayerHandle get_layer_by_name( const std::string& layer_name );
-  
   LayerGroupHandle get_active_group();
-
   LayerHandle get_active_layer();
+  
   
   // Action Functions
 public:
   bool insert_layer( LayerHandle layer );
-  bool move_layer_above( std::string layer_to_insert_id_, std::string layer_below_id_ );
+  bool move_layer_above( std::string& layer_to_insert_id, std::string& layer_below_id );
   void delete_layers( LayerGroupHandle group );
   void set_active_layer( LayerHandle layer );
   

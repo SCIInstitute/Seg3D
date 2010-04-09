@@ -44,25 +44,32 @@ private:
 public:
 
   // === ViewerWidget Styles === //
-  
     const static QString VIEWERWIDGET_TOOLBAR_C;
   
   // === StatusBar === //
-    
     const static QString STATUSBAR_C;
+    const static QString STATUSBAR_ERROR_C;
+    const static QString STATUSBAR_WARNING_C;
+    const static QString STATUSBAR_MESSAGE_C;
+    const static QString STATUSBAR_DEBUG_C;
+    
+  // === ToolBoxPageWidget Styles === //
+    // - page_background_ - //
+    const static QString TOOLBOXPAGEWIDGET_PAGE_BACKGROUND_ACTIVE_C;
+    const static QString TOOLBOXPAGEWIDGET_PAGE_BACKGROUND_INACTIVE_C;
+    // - activate_button_ - //
+    const static QString TOOLBOXPAGEWIDGET_ACTIVATE_BUTTON_ACTIVE_C;
+    const static QString TOOLBOXPAGEWIDGET_ACTIVATE_BUTTON_INACTIVE_C;
     
   // === LayerImporterWidget === //
-  
     // - Buttons - //
     const static QString LAYERIMPORTERWIDGET_ACTIVE_BUTTON_C;
     const static QString LAYERIMPORTERWIDGET_INACTIVE_BUTTON_C;
 
   
   // === LayerWidget Styles === //
-  
     // - LayerWidget - //
     const static QString LAYERWIDGET_C;
-    
     // - Volume Type Colors - //
     const static QString DATA_VOLUME_COLOR_C;
     const static QString MASK_VOLUME_COLOR_C;
