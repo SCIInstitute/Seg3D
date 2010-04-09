@@ -56,7 +56,6 @@ SET(APPLICATION_RENDERER_SHADER_SRCS
   SliceShaderFrag
   )
 
-
 ADD_LIBRARY(Application_Renderer STATIC 
             ${APPLICATION_RENDERER_SRCS}
       ${APPLICATION_RENDERER_SHADER_RAW_SRCS}
@@ -65,6 +64,7 @@ ADD_LIBRARY(Application_Renderer STATIC
 TARGET_LINK_LIBRARIES(Application_Renderer
                       Utils_Core
                       Utils_EventHandler
+            Utils_TextRenderer
             Utils_Graphics
             Utils_RenderResources
                       Application_Viewer

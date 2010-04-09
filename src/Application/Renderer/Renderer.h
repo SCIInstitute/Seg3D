@@ -46,6 +46,7 @@
 #include <Utils/Graphics/Texture.h>
 #include <Utils/Graphics/UnitCube.h>
 #include <Utils/RenderResources/RenderContext.h>
+#include <Utils/TextRenderer/TextRenderer.h>
 
 namespace Seg3D
 {
@@ -86,6 +87,8 @@ private:
   Utils::UnitCubeHandle cube_;
   SliceShaderHandle slice_shader_;
   Utils::Texture3DHandle pattern_texture_;
+
+  Utils::TextRendererHandle text_renderer_;
 
   int active_render_texture_;
   int active_overlay_texture_;

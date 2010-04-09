@@ -48,6 +48,7 @@ SET(UTILS_CORE_SRCS
   StringUtil.cc
   EnumClass.h
   ScopedCounter.h
+  Lockable.h
 )
 
 ##################################################

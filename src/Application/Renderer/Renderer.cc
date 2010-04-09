@@ -101,6 +101,7 @@ Renderer::Renderer() :
   ViewerRenderer(), 
   EventHandler(), 
   slice_shader_( new SliceShader ),
+  text_renderer_( new Utils::TextRenderer ),
   active_render_texture_( 0 ), 
   active_overlay_texture_( 2 ),
   width_( 0 ), 
@@ -445,7 +446,7 @@ void Renderer::redraw_overlay()
 
   // lock the active render texture
   Utils::Texture::lock_type texture_lock( this->textures_[ this->active_overlay_texture_ ]->get_mutex() );
-
+/*
   // bind the framebuffer object
   this->frame_buffer_->enable();
   // attach texture
@@ -497,7 +498,24 @@ void Renderer::redraw_overlay()
 
   this->frame_buffer_->detach_texture( this->textures_[ this->active_overlay_texture_ ] );
   this->frame_buffer_->disable();
-
+  */
+  {
+    Utils::RenderResources::lock_type lock( Utils::RenderResources::GetMutex() );
+    Utils::PixelBufferObjectHandle pbo( new Utils::PixelUnpackBuffer );
+    pbo->bind();
+    pbo->set_buffer_data( this->width_ * this->height_ * 4, 0, GL_STREAM_DRAW );
+    lock.unlock();
+    unsigned char* buffer = reinterpret_cast< unsigned char* >(
+      pbo->map_buffer( GL_READ_WRITE ) );
+    memset( buffer, 0, this->width_ * this->height_ * 4 );
+    this->text_renderer_->render( "NUMIRA", buffer, this->width_, this->height_, 20, 20, 24,
+      1.0f, 1.0f, 1.0f, 0.8f, true );
+    pbo->unmap_buffer();
+    this->textures_[ this->active_overlay_texture_ ]->set_sub_image( 0, 0, this->width_, this->height_,
+      0, GL_RGBA, GL_UNSIGNED_BYTE );
+    pbo->unbind();
+  }
+  glFinish();
   // release the lock on the active render texture
   texture_lock.unlock();
 

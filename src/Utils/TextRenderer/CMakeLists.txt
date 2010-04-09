@@ -1,3 +1,4 @@
+
 #
 #  For more information, please see: http://software.sci.utah.edu
 # 
@@ -26,14 +27,26 @@
 #  DEALINGS IN THE SOFTWARE.
 #
 
-ADD_SUBDIRECTORY(Converter)
-ADD_SUBDIRECTORY(Core)
-ADD_SUBDIRECTORY(DataBlock)
-ADD_SUBDIRECTORY(EventHandler)
-ADD_SUBDIRECTORY(Geometry)
-ADD_SUBDIRECTORY(Volume)
-ADD_SUBDIRECTORY(TextRenderer)
+##################################################
+# Set sources
+##################################################
 
-# These next two depend on OpenGL and should only be compiled when the renderer is compiled
-ADD_SUBDIRECTORY(Graphics)
-ADD_SUBDIRECTORY(RenderResources)
+SET(UTILS_TEXTRENDERER_SRCS
+  FreeTypeLibrary.h
+  FreeTypeLibrary.cc
+  FreeTypeFace.h
+  FreeTypeFace.cc
+  FreeTypeGlyph.h
+  FreeTypeGlyph.cc
+  TextRenderer.h
+  TextRenderer.cc
+  )
+
+  
+ADD_LIBRARY(Utils_TextRenderer STATIC
+      ${UTILS_TEXTRENDERER_SRCS})
+      
+TARGET_LINK_LIBRARIES(Utils_TextRenderer
+            Utils_Core
+            ${SCI_FREETYPE_LIBRARY}
+            ${SCI_BOOST_LIBRARY})
