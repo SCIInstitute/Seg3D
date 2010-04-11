@@ -41,6 +41,7 @@
 #include <Utils/Core/Log.h>
 #include <Utils/Core/IntrusiveBase.h>
 #include <Utils/Core/Singleton.h>
+#include <Utils/Core/Lockable.h>
 
 #include <Application/Action/Action.h>
 
@@ -56,7 +57,7 @@ class ActionProgress;
 typedef boost::intrusive_ptr< ActionProgress > ActionProgressHandle;
 
 // Class defintion
-class ActionProgress : public Utils::IntrusiveBase
+class ActionProgress : public Utils::IntrusiveBase, public Utils::Lockable
 {
   // -- Constructor / Destructor --
 public:
@@ -107,10 +108,6 @@ public:
   
   // -- Internals of the progress reporter --
 private:
-  typedef boost::mutex mutex_type;
-  typedef boost::unique_lock< mutex_type > lock_type;
-
-  mutex_type mutex_;
 
   std::string message_;
   bool    is_interruptable_;

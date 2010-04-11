@@ -62,13 +62,13 @@ typedef boost::shared_ptr< Tool > ToolHandle;
 class ToolManager;
 
 // Class definition
-class ToolManager : public StateHandler, public Utils::Singleton< ToolManager >
+class ToolManager : public StateHandler
 {
-
+  CORE_SINGLETON( ToolManager );
+  
   // -- constructor/destructor --
 private:
   // NOTE: Constructor is private: use Instance() to generate this singleton
-  friend class Utils::Singleton< ToolManager >;
   ToolManager();
   virtual ~ToolManager();
 

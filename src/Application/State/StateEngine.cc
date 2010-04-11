@@ -38,6 +38,8 @@
 namespace Seg3D
 {
 
+CORE_SINGLETON_IMPLEMENTATION( StateEngine );
+
 StateEngine::StateEngine()
 {
 }
@@ -48,7 +50,7 @@ StateEngine::~StateEngine()
 
 bool StateEngine::add_state( const std::string& state_id, StateBaseHandle& state )
 {
-  lock_type lock( mutex_ );
+  lock_type lock( get_mutex() );
 
   state_map_type::iterator it = state_map_.find( state_id );
 
@@ -68,7 +70,7 @@ bool StateEngine::add_state( const std::string& state_id, StateBaseHandle& state
 
 bool StateEngine::get_state( const std::string& state_id, StateBaseHandle& state )
 {
-  lock_type lock( mutex_ );
+  lock_type lock( get_mutex() );
 
   state_map_type::const_iterator it;
   if ( state_id.size() > 0 && state_id[ 0 ] == '$' )
@@ -102,7 +104,7 @@ bool StateEngine::get_state( const std::string& state_id, StateBaseHandle& state
 
 void StateEngine::remove_state( const std::string& remove_state_id )
 {
-  lock_type lock( mutex_ );
+  lock_type lock( get_mutex() );
 
   // ensure that we can change it
   std::string state_id = remove_state_id;
@@ -191,7 +193,7 @@ void StateEngine::add_stateid( const std::string& stateid )
 
 void StateEngine::remove_stateid( const std::string& stateid )
 {
-  lock_type lock( mutex_ );
+  lock_type lock( get_mutex() );
   stateid_list_.erase( stateid );
 }
 
@@ -238,7 +240,7 @@ std::string StateEngine::create_stateid( std::string baseid )
 
 void StateEngine::add_statealias( const std::string& statealias, const std::string& stateid )
 {
-  lock_type lock( mutex_ );
+  lock_type lock( get_mutex() );
   if ( statealias_list_.find( statealias ) != statealias_list_.end() )
   {
     SCI_THROW_LOGICERROR( std::string("Trying to add statealias '") +
@@ -249,13 +251,13 @@ void StateEngine::add_statealias( const std::string& statealias, const std::stri
 
 void StateEngine::remove_statealias( const std::string& statealias )
 {
-  lock_type lock( mutex_ );
+  lock_type lock( get_mutex() );
   statealias_list_.erase( statealias );
 }
 
 bool StateEngine::is_statealias( const std::string& statealias )
 {
-  lock_type lock( mutex_ );
+  lock_type lock( get_mutex() );
   return ( statealias_list_.find( statealias ) != statealias_list_.end() );
 }
 

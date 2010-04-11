@@ -36,7 +36,7 @@ namespace Seg3D
 
 class ActionUndo : public Action
 {
-SCI_ACTION_TYPE("Undo","Undo", ActionPropertiesType::APPLICATION_E)
+  CORE_ACTION("Undo","Undo");
 
   // -- Constructor/Destructor --
 public:

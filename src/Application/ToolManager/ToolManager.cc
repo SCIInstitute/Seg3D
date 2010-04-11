@@ -39,6 +39,8 @@
 namespace Seg3D
 {
 
+CORE_SINGLETON_IMPLEMENTATION( ToolManager );
+
 ToolManager::ToolManager() :
   StateHandler( "ToolManager" )
 {

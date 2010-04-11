@@ -197,12 +197,12 @@ private:
 class ToolFactory;
 
 // Class definition
-class ToolFactory : public Utils::Singleton<ToolFactory>
+class ToolFactory : public boost::noncopyable
 {
+  CORE_SINGLETON( ToolFactory );
 
 // -- Constructor --
 private:
-  friend class Utils::Singleton<ToolFactory>;
   ToolFactory();
   virtual ~ToolFactory();
 

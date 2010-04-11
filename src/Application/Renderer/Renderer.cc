@@ -498,7 +498,6 @@ void Renderer::redraw_overlay()
 
   this->frame_buffer_->detach_texture( this->textures_[ this->active_overlay_texture_ ] );
   this->frame_buffer_->disable();
-  */
   {
     Utils::RenderResources::lock_type lock( Utils::RenderResources::GetMutex() );
     Utils::PixelBufferObjectHandle pbo( new Utils::PixelUnpackBuffer );
@@ -515,6 +514,7 @@ void Renderer::redraw_overlay()
       0, GL_RGBA, GL_UNSIGNED_BYTE );
     pbo->unbind();
   }
+
   glFinish();
   // release the lock on the active render texture
   texture_lock.unlock();
@@ -527,6 +527,8 @@ void Renderer::redraw_overlay()
 
   // swap render textures 
   this->active_overlay_texture_ = ( ~( this->active_overlay_texture_ - 2 ) ) & 1 + 2;
+
+  */
 }
 
 void Renderer::resize( int width, int height )

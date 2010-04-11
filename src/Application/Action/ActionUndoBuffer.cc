@@ -32,6 +32,8 @@
 namespace Seg3D
 {
 
+CORE_SINGLETON_IMPLEMENTATION( ActionUndoBuffer );
+  
 ActionUndoBuffer::ActionUndoBuffer() :
   undo_buffer_size_( 500 )
 {

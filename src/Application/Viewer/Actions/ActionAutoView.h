@@ -37,8 +37,7 @@ namespace Seg3D
 
 class ActionAutoView : public Action
 {
-
-SCI_ACTION_TYPE("AutoView", "AutoView <viewer_id>", ActionPropertiesType::APPLICATION_E)
+  CORE_ACTION( "AutoView", "AutoView <viewer_id>" );
 
 public:
   ActionAutoView();

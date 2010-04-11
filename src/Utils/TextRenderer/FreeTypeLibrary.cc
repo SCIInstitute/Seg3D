@@ -70,6 +70,8 @@ FreeTypeFaceHandle FreeTypeLibrary::new_face_frome_buffer( const unsigned char* 
   return FreeTypeFaceHandle();
 }
 
+CORE_SINGLETON_IMPLEMENTATION( FreeTypeLibraryFactory );
+
 FreeTypeLibraryFactory::FreeTypeLibraryFactory()
 {
 }

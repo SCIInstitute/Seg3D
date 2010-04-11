@@ -55,12 +55,11 @@ namespace Utils
 class RenderResources;
 
 // Class definition
-class RenderResources : public Singleton< RenderResources >, private EventHandler
+class RenderResources : private EventHandler
 {
-
+  CORE_SINGLETON( RenderResources );
   // -- constructor --
 private:
-  friend class Singleton< RenderResources >;
   RenderResources();
   virtual ~RenderResources();
 

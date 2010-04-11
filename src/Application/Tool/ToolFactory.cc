@@ -35,6 +35,8 @@
 namespace Seg3D
 {
 
+CORE_SINGLETON_IMPLEMENTATION( ToolFactory );
+
 ToolFactory::ToolFactory()
 {
 }

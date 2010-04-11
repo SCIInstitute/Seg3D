@@ -36,7 +36,7 @@ namespace Seg3D
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
-SCI_REGISTER_ACTION(Get)
+CORE_REGISTER_ACTION( Get );
 ;
 
 bool ActionGet::validate( ActionContextHandle& context )

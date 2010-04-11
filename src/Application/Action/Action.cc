@@ -26,14 +26,17 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// STD includes
 #include <iostream>
 
+// Boost includes
 #include <boost/algorithm/string.hpp>
 
-// For the conversion code
+// Utils includes
 #include <Utils/Core/StringUtil.h>
 #include <Utils/Converter/StringParser.h>
 
+// Application includes
 #include <Application/Action/ActionParameter.h>
 #include <Application/Action/Action.h>
 
@@ -61,6 +64,11 @@ void Action::add_argument_ptr( ActionParameterBase* param )
 void Action::add_parameter_ptr( const std::string& key, ActionParameterBase* param )
 {
   parameters_[ boost::to_lower_copy( key ) ] = param;
+}
+
+void Action::add_cached_handle_ptr( ActionCachedHandleBase* handle )
+{
+  cached_handles_.push_back( handle );
 }
 
 std::string Action::export_to_string() const

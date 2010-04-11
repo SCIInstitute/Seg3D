@@ -100,6 +100,8 @@ private:
   std::string message_;
 };
 
+CORE_SINGLETON_IMPLEMENTATION( ActionSocket );
+
 ActionSocket::ActionSocket() :
   action_socket_thread_( 0 )
 {

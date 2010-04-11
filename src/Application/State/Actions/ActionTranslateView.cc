@@ -33,8 +33,7 @@
 namespace Seg3D
 {
 
-SCI_REGISTER_ACTION(TranslateView)
-;
+CORE_REGISTER_ACTION( TranslateView );
 
 ActionTranslateView::ActionTranslateView()
 {

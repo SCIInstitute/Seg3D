@@ -43,6 +43,7 @@
 // Core includes
 #include <Utils/Core/StringUtil.h>
 #include <Utils/Core/Singleton.h>
+#include <Utils/Core/Lockable.h>
 
 // Application includes
 #include <Application/Action/Action.h>
@@ -81,7 +82,9 @@ public:
   
   // The actual builder call
   virtual ActionHandle build()
-  { return ActionHandle( new ACTION );}
+  { 
+    return ActionHandle( new ACTION );
+  }
 };
 
 // ------------------------------
@@ -90,64 +93,28 @@ public:
 // The factory object that instantiates the actions for the scripting and 
 // and playback systems in the application.
 
-class ActionFactory : public Utils::Singleton<ActionFactory>
-{
+// Forward declaration of the private pieces of this class
+class ActionFactoryPrivate;
+typedef boost::shared_ptr< ActionFactoryPrivate > ActionFactoryPrivateHandle;
 
+
+class ActionFactory : public Utils::Lockable
+{
+  CORE_SINGLETON( ActionFactory );
   // -- Constructor / Destructor --
 private:
-  friend class Utils::Singleton<ActionFactory>;
   ActionFactory();
   virtual ~ActionFactory();
-
-  // -- Action registration --
+  
 public:
-  // REGISTER_ACTION:
-  // Register an action so that it can be automatically build in the action
-  // factory.
-
-  template <class ACTION>
-  void register_action()
-  {
-    // get the name of the action
-    std::string action_name = ACTION::action_type();
-    boost::to_lower(action_name);
-
-    // Lock the factory
-    lock_type lock(mutex_);
-
-    // Test is action was registered before.
-    if (action_builders_.find(action_name) != action_builders_.end())
-    {
-      // Actions that are registered twice, will cause problems
-      // Hence the program will throw an exception.
-      // As registration is done on startup, this will cause a
-      // faulty program to fail always on startup.
-      SCI_THROW_LOGICERROR(std::string("Action '")+action_name+"' was registered twice");
-    }
-
-    // Register the action
-    action_builders_[action_name] = new ActionBuilder<ACTION>;
-    SCI_LOG_DEBUG(std::string("Registering action : ") + action_name);
-  }
-
-public:
-  typedef boost::mutex mutex_type;
-  typedef boost::unique_lock<mutex_type> lock_type;
-  typedef std::vector<std::string> action_list_type;
-
   // ACTION_LIST:
   // Retrieve the full list of registered actions
+  typedef std::vector<std::string> action_list_type;
   bool action_list(action_list_type& action_list);
 
+  // -- implementation details --
 private:
-
-  // Mutex protecting the singleton interface
-  typedef boost::unordered_map<std::string,ActionBuilderBase*> action_map_type;
-  // List with builders that can be called to generate a new object
-  action_map_type action_builders_;
-  
-  // Mutex for protecting registration
-  mutex_type mutex_;
+  ActionFactoryPrivateHandle private_;
 
   // -- Instantiate actions --
 public:
@@ -159,6 +126,13 @@ public:
     ActionHandle& action,
     std::string& error,
     std::string& usage);
+
+  // -- Action registration --
+public:
+  // REGISTER_ACTION:
+  // Register an action so that it can be automatically build in the action
+  // factory.
+  void register_action( ActionBuilderBase* builder, std::string type );
 
   // -- Shortcuts for creating actions --
 public:
@@ -183,10 +157,10 @@ public:
 // Note these functions will be called in the init
 // call of the program.
 
-#define SCI_REGISTER_ACTION(name)\
+#define CORE_REGISTER_ACTION(name)\
 void register_Action##name()\
 {\
-  ActionFactory::Instance()->register_action<Action##name>();\
+  ActionFactory::Instance()->register_action( new ActionBuilder<Action##name>, Action##name::Type() );\
 } 
 
 } // end namespace seg3D

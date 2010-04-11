@@ -49,18 +49,15 @@ template< class T >
 class Singleton : public boost::noncopyable
 {
 
-protected:
-  // SINGLETON:
+  // -- constructor --
+public:
   Singleton() :
     initialized_( false ), instance_( 0 )
   {
   }
 
-  virtual ~Singleton()
-  {
-  }
-
-private:
+  // -- obtain singleton pointer --
+public:
   // INSTANCE:
   // Get the singleton pointer to the application
 
@@ -88,23 +85,26 @@ private:
     return this->instance_;
   }
 
+  // -- internals of the singleton --
 private:
-
   // Mutex protecting the singleton interface
   boost::mutex instance_mutex_;
   // Initialized or not?
   bool initialized_;
   // Pointer that contains the singleton interface to this class
   T* instance_;
-
-public:
-  static T* Instance()
-  {
-    static Singleton<T> instance_s;
-    return instance_s.instance();
-  }
-
 };
+
+#define CORE_SINGLETON(name)\
+public:\
+  friend class Utils::Singleton<name>;\
+  static name* Instance() { return instance_.instance(); }\
+\
+private:\
+  static Utils::Singleton<name> instance_;\
+  
+#define CORE_SINGLETON_IMPLEMENTATION(name)\
+Utils::Singleton<name> name::instance_;
 
 } // end namespace Utils
 

@@ -38,7 +38,7 @@ namespace Seg3D
   
 class ActionInsertLayer : public Action
 {
-  SCI_ACTION_TYPE( "InsertLayer", "Insert Layer <name>", ActionPropertiesType::LAYER_E )
+  CORE_ACTION( "InsertLayer", "Insert Layer <name>" );
   
   // -- Constructor/Destructor --
 public:

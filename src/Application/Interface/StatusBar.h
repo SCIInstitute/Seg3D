@@ -63,10 +63,11 @@ private:
   double value_;
 };
 
-class StatusBar : public Utils::Singleton< StatusBar >, private Utils::ConnectionHandler
+class StatusBar : private Utils::ConnectionHandler
 {
+  CORE_SINGLETON( StatusBar );
+  
 private:
-  friend class Utils::Singleton< StatusBar >;
   StatusBar();
   virtual ~StatusBar();
 

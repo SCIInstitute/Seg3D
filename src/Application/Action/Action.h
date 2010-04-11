@@ -51,6 +51,7 @@
 // Application includes
 #include <Application/Action/ActionContext.h>
 #include <Application/Action/ActionParameter.h>
+#include <Application/Action/ActionCachedHandle.h>
 #include <Application/Action/ActionResult.h>
 
 namespace Seg3D
@@ -59,37 +60,6 @@ namespace Seg3D
 class Action;
 typedef boost::intrusive_ptr< Action > ActionHandle;
 typedef std::vector< ActionHandle > ActionHandleList;
-
-// Action types/properties
-SCI_ENUM_CLASS
-(
-  ActionPropertiesType,
-
-  // APPLICATION ACTION - For now all actions that are no layer actions are
-  // classified as application actions.
-  APPLICATION_E = 0x0001,
-
-  // LAYER ACTION - Layer actions affect layers/layer manager and are currently
-  // the only actions that can be undone.
-  LAYER_E = 0x0002,
-
-  // INTERFACE ACTION - Layer actions only affect the interface
-  INTERFACE_E = 0x0004,
-
-  // ASYNCHRONOUS ACTIONS - These actions do not complete on the main
-  // application thread and run while new actions can be issued
-  ASYNCHRONOUS_E = 0x20000,
-
-  // COLLAPSEABLE ACTIONS - These actions can be inserted on top of each
-  // other. Their undo/redo action consist of only one action in each
-  // direction and they can be combined by taking the the last redo and
-  // the first undo
-  COLLAPSEABLE_E = 0x40000,
-
-  // QUERY ACTIONS - These actions do not alter the state of the program
-  // but query state. They do not need to be recorded in a playback script.
-  QUERY_E = 0x1000000
-)
 
 // CLASS ACTION:
 // Main class that defines an action in the program
@@ -110,10 +80,8 @@ public:
   // by the SCI_ACTION_TYPE macro
   virtual std::string type() const = 0;
   virtual std::string usage() const = 0;
-  virtual int properties() const = 0;
 
   // -- Run/Validate interface --
-
 public:
 
   // VALIDATE:
@@ -163,6 +131,15 @@ public:
     add_parameter_ptr( key, &param );
   }
 
+  // ADD_CACHEDHANDLE:
+  // A cached handle needs to be registered so they can be deleted
+  // once the action has been completed.
+  template< class CACHEDHANDLE >
+  void add_cachedhandle( CACHEDHANDLE& handle )
+  {
+    add_cached_handle_ptr( &handle );
+  }
+
   // EXPORT_TO_STRING:
   // Export the action command into a string, so it can stored
   // The action factory can recreate the action from this string
@@ -173,29 +150,40 @@ public:
   // ActionFactory.
   bool import_from_string( const std::string& action, std::string& error );
 
+  // IMPORT_ACTION_FROM_STRING:
+  // Same as function above, but without the error report
   bool import_from_string( const std::string& action );
+
+  // CLEAR_CACHE:
+  // Clear any objects that were given as a short cut to improve performance.
+  void clear_cache();
 
 private:
 
-  // IMPLEMENTATION OF ADD_PARAMETER, ADD_ARGUMENT AND ADD_RESULT
+  // IMPLEMENTATION OF ADD_PARAMETER, ADD_ARGUMENT AND ADD_CACHEDHANDLE:
   // These take pointers to the base class, the ones defined above work
   // with references of the parameters for more convenience.
   void add_argument_ptr( ActionParameterBase* param );
   void add_parameter_ptr( const std::string& key, ActionParameterBase* param );
+  void add_cached_handle_ptr( ActionCachedHandleBase* handle );
 
   // Typedefs
   typedef std::vector< ActionParameterBase* > argument_vector_type;
   typedef std::map< std::string, ActionParameterBase* > parameter_map_type;
+  typedef std::vector< ActionCachedHandleBase* > cached_handle_vector_type;
 
   // Vector that stores the required arguments of the action.
   argument_vector_type arguments_;
 
   // Map that stores the location of the parameters in the action.
   parameter_map_type parameters_;
+  
+  // Vector that stores shared pointers to temporary objects
+  cached_handle_vector_type cached_handles_;
 
 };
 
-// SCI_ACTION_TYPE:
+// CORE_ACTION:
 // Action type should be defined at the top of each action. It renders code that
 // allows both the class as well as the Action object to determine what its 
 // properties are. By defining class specific static functions the class 
@@ -207,16 +195,13 @@ private:
 // Note: one would expect to use virtual static functions, but those are not
 // allowed in C++
 
-#define SCI_ACTION_TYPE(type_string,usage_string,properties_mask) \
+#define CORE_ACTION(type_string,usage_string) \
   public: \
-    static std::string action_type()  { return type_string; }\
-    static std::string action_usage() { return usage_string; }\
-    static int         action_properties() { return properties_mask; }\
+    static std::string Type()  { return type_string; }\
+    static std::string Usage() { return usage_string; }\
     \
-    virtual std::string   type() const  { return action_type(); } \
-    virtual std::string   usage() const { return action_usage(); } \
-    virtual int           properties() const { return action_properties(); }
-
+    virtual std::string type() const  { return Type(); } \
+    virtual std::string usage() const { return Usage(); }
 } // end namespace seg3D
 
 #endif

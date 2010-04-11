@@ -26,56 +26,13 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <Application/Interface/Interface.h>
-#include <Application/Viewer/Actions/ActionAutoView.h>
-#include <Application/ViewerManager/ViewerManager.h>
+#include <Application/Action/ActionCachedHandle.h>
 
 namespace Seg3D
 {
 
-CORE_REGISTER_ACTION( AutoView );
-
-ActionAutoView::ActionAutoView()
+ActionCachedHandleBase::~ActionCachedHandleBase()
 {
-  add_argument( this->viewer_name_ );
 }
 
-bool ActionAutoView::validate( ActionContextHandle& context )
-{
-  ViewerHandle viewer = this->viewer_weak_handle_.lock();
-  if ( !viewer )
-  {
-    viewer = ViewerManager::Instance()->get_viewer( this->viewer_name_.value() );
-    if ( !viewer )
-    {
-      context->report_error( std::string( "Viewer '" ) + this->viewer_name_.value()
-        + "' does not exist" );
-      return false;
-    }
-    this->viewer_weak_handle_ = viewer;
-  }
-
-  return true;
-}
-
-bool ActionAutoView::run( ActionContextHandle& context, ActionResultHandle& result )
-{
-  ViewerHandle viewer = this->viewer_weak_handle_.lock();
-  if ( viewer )
-  {
-    viewer->auto_view();
-    return true;
-  }
-  return false;
-}
-
-void ActionAutoView::Dispatch(  ViewerHandle& viewer )
-{
-  ActionAutoView* action = new ActionAutoView;
-  action->viewer_name_ = viewer->get_stateid();
-  action->viewer_weak_handle_ = viewer;
-
-  Interface::PostAction( ActionHandle( action ) );
-}
-
-} // end namespace Seg3D
+} // namespace Seg3D

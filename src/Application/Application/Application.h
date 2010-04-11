@@ -49,12 +49,12 @@ namespace Seg3D
 
 class Application;
 
-class Application : public Utils::EventHandler, public Utils::Singleton< Application >
+class Application : public Utils::EventHandler
 {
+  CORE_SINGLETON( Application );
 
   // -- Constructor/Destructor --
 private:
-  friend class Utils::Singleton< Application >;
   Application();
   virtual ~Application();
 

@@ -51,10 +51,10 @@ class ActionHistory;
 // Class defintion
 class ActionHistory : public Utils::Singleton< ActionHistory >
 {
+  CORE_SINGLETON( ActionHistory );
 
   // -- Constructor/Destructor --
 private:
-  friend class Utils::Singleton< ActionHistory >;
   ActionHistory();
   virtual ~ActionHistory();
 

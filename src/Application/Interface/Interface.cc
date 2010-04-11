@@ -31,6 +31,8 @@
 namespace Seg3D
 {
 
+CORE_SINGLETON_IMPLEMENTATION( Interface );
+
 Interface::Interface() :
   context_( new InterfaceActionContext )
 {

@@ -276,15 +276,18 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
 
   QPoint hotSpot = event->pos();
 
+  /*
   // Create some Item data. - THIS IS CURRENTLY NOT REALLY BEING USED
   QByteArray itemData;
   itemData = ( QString::fromStdString( this->get_layer_id() ) ).toAscii();
   QDataStream dataStream(&itemData, QIODevice::WriteOnly);
   dataStream << QPoint(hotSpot);
-
+  */
+  
   // Make up some mimedata containing the layer_id of the layer
   QMimeData *mimeData = new QMimeData;
 
+  /*
   switch ( this->get_volume_type() ) 
   {
   case Utils::VolumeType::DATA_E:
@@ -299,7 +302,8 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
   default:
     break;
   }
-
+  */
+  
   //mimeData->setData( "layer_id", itemData );
   mimeData->setText( QString::fromStdString( this->get_layer_id() ) );
 

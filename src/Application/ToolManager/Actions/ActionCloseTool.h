@@ -37,7 +37,7 @@ namespace Seg3D
 
 class ActionCloseTool : public Action
 {
-SCI_ACTION_TYPE("CloseTool", "CloseTool <toolid>", ActionPropertiesType::APPLICATION_E)
+  CORE_ACTION( "CloseTool", "CloseTool <toolid>" );
 
   // -- Constructor/Destructor --
 public:

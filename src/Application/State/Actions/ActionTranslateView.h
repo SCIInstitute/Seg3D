@@ -40,7 +40,7 @@ namespace Seg3D
 
 class ActionTranslateView : public Action
 {
-SCI_ACTION_TYPE("Translate", "Translate <key> <offset>", ActionPropertiesType::APPLICATION_E)
+  CORE_ACTION( "Translate", "Translate <key> <offset>" );
 
 public:
   ActionTranslateView();

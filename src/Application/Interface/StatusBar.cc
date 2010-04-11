@@ -63,6 +63,8 @@ DataPointInfo& DataPointInfo::operator=( const DataPointInfo& copy )
   return ( *this );
 }
 
+CORE_SINGLETON_IMPLEMENTATION( StatusBar );
+
 StatusBar::StatusBar()
 {
   this->add_connection( Interface::Instance()->interface_action_context()->

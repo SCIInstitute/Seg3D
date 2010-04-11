@@ -37,7 +37,7 @@ namespace Seg3D
 {
 class ActionFlip : public Action
 {
-SCI_ACTION_TYPE("Flip", "Flip <key> <direction>", ActionPropertiesType::APPLICATION_E)
+  CORE_ACTION( "Flip", "Flip <key> <direction>" );
 
 public:
   ActionFlip();

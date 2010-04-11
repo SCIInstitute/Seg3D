@@ -60,12 +60,12 @@ namespace Seg3D
 class InterfaceManager;
 
 // Class Definition
-class InterfaceManager : public StateHandler, public Utils::Singleton< InterfaceManager >
+class InterfaceManager : public StateHandler
 {
+  CORE_SINGLETON( InterfaceManager );
 
   // -- constructor/destructor --
 private:
-  friend class Utils::Singleton< InterfaceManager >;
   InterfaceManager();
   virtual ~InterfaceManager();
 

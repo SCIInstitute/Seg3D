@@ -62,12 +62,12 @@ namespace Seg3D
 class QtApplication;
 
 // Class definition
-class QtApplication : public Utils::Singleton< QtApplication >
+class QtApplication : public boost::noncopyable
 {
-
+  CORE_SINGLETON( QtApplication );
+  
   // -- constuctor --
 private:
-  friend class Utils::Singleton< QtApplication >;
   QtApplication();
 
   // -- entry point --

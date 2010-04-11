@@ -54,12 +54,12 @@ namespace Seg3D
 class AtionSocket;
 
 // Class defintion
-class ActionSocket : public Utils::Singleton< ActionSocket >
+class ActionSocket : public boost::noncopyable
 {
-
+  CORE_SINGLETON( ActionSocket );
+  
   // -- Constructor/Destructor --
 private:
-  friend class Utils::Singleton< ActionSocket >;
   ActionSocket();
   virtual ~ActionSocket();
 

@@ -39,7 +39,7 @@ namespace Seg3D
 
 class ActionDeleteLayers : public Action
 {
-  SCI_ACTION_TYPE( "DeleteLayers", "Delete Layers <name>", ActionPropertiesType::LAYER_E )
+  CORE_ACTION( "DeleteLayers", "Delete Layers <name>" );
   
   // -- Constructor/Destructor --
 public:

@@ -59,13 +59,12 @@ namespace Seg3D
 class ActionUndoBuffer;
 
 // Class definition
-class ActionUndoBuffer : public Utils::Singleton< ActionUndoBuffer >
+class ActionUndoBuffer
 {
+  CORE_SINGLETON( ActionUndoBuffer );
 
   // -- Constructor --
-
 private:
-  friend class Utils::Singleton< ActionUndoBuffer >;
   ActionUndoBuffer();
   virtual ~ActionUndoBuffer();
 

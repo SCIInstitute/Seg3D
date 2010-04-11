@@ -36,7 +36,7 @@ namespace Seg3D
 
 class ActionCloseWindow : public Action
 {
-SCI_ACTION_TYPE("CloseWindow","CloseWindow <windowid>",   ActionPropertiesType::INTERFACE_E)
+  CORE_ACTION( "CloseWindow","CloseWindow <windowid>" );
 
   // -- Constructor/Destructor --
 public:

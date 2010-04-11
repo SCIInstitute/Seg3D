@@ -37,7 +37,7 @@ namespace Seg3D
 
 class ActionScaleView : public Action
 {
-SCI_ACTION_TYPE("Scale", "Scale <key> <ratio>", ActionPropertiesType::APPLICATION_E)
+  CORE_ACTION( "Scale", "Scale <key> <ratio>" );
 
 public:
   ActionScaleView();

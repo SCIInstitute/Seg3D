@@ -65,26 +65,26 @@ void ActionProgress::end_progress_reporting()
 
 void ActionProgress::set_interrupt( bool interrupt )
 {
-  lock_type lock( mutex_ );
+  lock_type lock( get_mutex() );
   interrupt_ = interrupt;
 }
 
 bool ActionProgress::get_interrupt()
 {
-  lock_type lock( mutex_ );
+  lock_type lock( get_mutex() );
   return interrupt_;
 }
 
 void ActionProgress::set_progress( double progress )
 {
-  lock_type lock( mutex_ );
+  lock_type lock( get_mutex() );
   progress_ = progress;
   ActionDispatcher::Instance()->report_progress_signal_( ActionProgressHandle( this ) ); 
 }
 
 double ActionProgress::get_progress()
 {
-  lock_type lock( mutex_ );
+  lock_type lock( get_mutex() );
   return progress_;
 }
 

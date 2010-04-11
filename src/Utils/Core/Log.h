@@ -66,12 +66,11 @@ SCI_ENUM_CLASS
  )
 
 // Class definition
-class Log : public Singleton< Log >
+class Log : public boost::noncopyable
 {
-
+  CORE_SINGLETON( Log );
   // -- constructor / destructor --
 private:
-  friend class Singleton< Log > ;
   Log();
 
   // -- functions for logging --

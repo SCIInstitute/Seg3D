@@ -41,7 +41,7 @@ namespace Seg3D
 
 class ActionSet : public Action
 {
-SCI_ACTION_TYPE("Set", "Set <state> <value>", ActionPropertiesType::APPLICATION_E)
+  CORE_ACTION( "Set", "Set <state> <value>" );
 
   // -- Constructor/Destructor --
 public:

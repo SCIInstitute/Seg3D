@@ -57,13 +57,12 @@ namespace Seg3D
 class LayerManager;
 
 // Class definition
-class LayerManager : public StateHandler, public Utils::Singleton< LayerManager >
+class LayerManager : public StateHandler
 {
+  CORE_SINGLETON( LayerManager );
 
   // -- Constructor/Destructor --
-
 private:
-  friend class Utils::Singleton< LayerManager >;
   LayerManager();
   virtual ~LayerManager();
 

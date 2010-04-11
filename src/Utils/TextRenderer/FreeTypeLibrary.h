@@ -66,11 +66,11 @@ private:
   FT_Library library_;
 };
 
-class FreeTypeLibraryFactory : public Singleton< FreeTypeLibraryFactory >, 
-                         private RecursiveLockable
+class FreeTypeLibraryFactory : private RecursiveLockable
 {
+  CORE_SINGLETON( FreeTypeLibraryFactory );
+
 private:
-  friend class Singleton< FreeTypeLibraryFactory >;
   friend class FreeTypeLibrary;
   FreeTypeLibraryFactory();
   virtual ~FreeTypeLibraryFactory();

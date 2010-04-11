@@ -31,7 +31,7 @@
 namespace Seg3D
 {
 
-SCI_REGISTER_ACTION(Flip)
+CORE_REGISTER_ACTION( Flip );
 
 ActionFlip::ActionFlip()
 {

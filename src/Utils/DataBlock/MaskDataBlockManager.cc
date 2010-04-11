@@ -39,6 +39,8 @@
 namespace Utils
 {
 
+CORE_SINGLETON_IMPLEMENTATION( MaskDataBlockManager );
+
 // CLASS MaskDataBlockEntry
 // Helper class with information of each data block that is used for masked layers
 
@@ -70,9 +72,6 @@ public:
   // List that maintains a list of which bits are used in
   typedef std::vector< MaskDataBlockEntry > mask_list_type;
   mask_list_type mask_list_;
-
-  // Mutex that protects the list
-  MaskDataBlockManager::mutex_type mutex_;  
 };
 
 
@@ -172,11 +171,6 @@ void MaskDataBlockManager::release(DataBlockHandle& datablock, unsigned int mask
   }
 }
 
-MaskDataBlockManager::mutex_type& MaskDataBlockManager::get_mutex()
-{
-  return private_->mutex_;
-}
-
 bool MaskDataBlockManager::compact()
 {
   // TODO: Need to implement this
@@ -192,10 +186,12 @@ static bool CreateMaskFromNonZeroDataInternal( const DataBlockHandle& data,
 
   unsigned char* mask_data  = mask->get_mask_data();
   unsigned char  mask_value = mask->get_mask_value();
+  unsigned char  not_mask_value = ~( mask->get_mask_value() );
 
   for ( size_t j = 0; j < size; j++ )
   {
     if ( src[ j ] ) mask_data[ j ] |= mask_value;
+    else mask_data[ j ] &= not_mask_value;
   }
   
   return true;
@@ -267,9 +263,6 @@ static bool CreateMaskFromBitPlaneDataInternal( const DataBlockHandle& data,
   std::bitset< sizeof( DATA ) > bits( used_bits );
   
   masks.resize( bits.count() );
-  for ( size_t j = 0; j < bits.count(); j++ )
-  {
-  }
   
   for ( size_t k = 0; k < bits.size(); k++ )
   {
@@ -285,12 +278,14 @@ static bool CreateMaskFromBitPlaneDataInternal( const DataBlockHandle& data,
 
       unsigned char* mask_data  = mask->get_mask_data();
       unsigned char  mask_value = mask->get_mask_value();
-      
+      unsigned char  not_mask_value = ~( mask->get_mask_value() );
+
       DATA test_value( 1 << k );
       
       for ( size_t j = 0; j < size; j++ )
       {
         if ( src[ j ] & test_value ) mask_data[ j ] |= mask_value;
+        else mask_data[ j ] &= not_mask_value;
       }
     }
   }
@@ -362,6 +357,7 @@ static bool CreateMaskFromLabelDataInternal( const DataBlockHandle& data,
 
       unsigned char* mask_data  = mask->get_mask_data();
       unsigned char  mask_value = mask->get_mask_value();
+      unsigned char  not_mask_value = ~( mask->get_mask_value() );
       label = src[ next_label_index ];
 
       // Lock the mask layer as it may contain additional masks that are currently in use
@@ -374,6 +370,10 @@ static bool CreateMaskFromLabelDataInternal( const DataBlockHandle& data,
         {
           src[ j ] = zero_label;
           mask_data[ j ] |= mask_value;
+        }
+        else
+        {
+          mask_data[ j ] &= not_mask_value;
         }
       }
       

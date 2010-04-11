@@ -35,8 +35,7 @@ namespace Seg3D
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
-SCI_REGISTER_ACTION(Undo)
-;
+CORE_REGISTER_ACTION( Undo );
 
 bool ActionUndo::validate( ActionContextHandle& context )
 {

@@ -33,7 +33,7 @@
 namespace Seg3D
 {
 
-SCI_REGISTER_ACTION(SetRange);
+CORE_REGISTER_ACTION( SetRange );
 
 ActionSetRange::ActionSetRange()
 {

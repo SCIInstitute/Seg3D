@@ -43,6 +43,7 @@
 #include <Utils/Core/Log.h>
 #include <Utils/Core/Exception.h>
 #include <Utils/Core/Singleton.h>
+#include <Utils/Core/Lockable.h>
 
 #include <Application/State/StateBase.h>
 
@@ -55,12 +56,12 @@ namespace Seg3D
 class StateEngine;
 
 // Class definition
-class StateEngine : public Utils::Singleton< StateEngine >
+class StateEngine : public Utils::RecursiveLockable
 {
-
+  CORE_SINGLETON( StateEngine );
+  
   // -- Constructor/destructor --
 private:
-  friend class Utils::Singleton< StateEngine >;
   StateEngine();
   virtual ~StateEngine();
 
@@ -133,24 +134,6 @@ public:
 public:
   typedef boost::signals2::signal<void ()> state_changed_signal_type;
   state_changed_signal_type state_changed_signal_;
-
-  // -- state engine locking interface --
-public:
-  // Mutex protecting the StateEngine
-  typedef boost::recursive_mutex  mutex_type;
-  typedef boost::unique_lock< mutex_type > lock_type;
-
-  // GET_MUTEX:
-  // Get the mutex that controls whether changes can be made to the
-  // state engine.
-  inline mutex_type& get_mutex()
-  {
-    return mutex_;
-  }
-
-private:
-  // Lock that controls whether changes can be made to the state engine
-  mutex_type mutex_;
 
   // -- state database --
 private:

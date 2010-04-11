@@ -49,6 +49,8 @@
 namespace Seg3D
 {
 
+CORE_SINGLETON_IMPLEMENTATION( LayerManager );
+
 LayerManager::LayerManager() :
   StateHandler( "LayerManager" )
 { 

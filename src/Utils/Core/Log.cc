@@ -40,6 +40,8 @@
 namespace Utils
 {
 
+CORE_SINGLETON_IMPLEMENTATION( Log );
+
 Log::Log()
 {
 }

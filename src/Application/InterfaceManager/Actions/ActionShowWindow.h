@@ -36,7 +36,7 @@ namespace Seg3D
 
 class ActionShowWindow : public Action
 {
-SCI_ACTION_TYPE("ShowWindow", "ShowWindow <windowid>", ActionPropertiesType::INTERFACE_E)
+  CORE_ACTION( "ShowWindow", "ShowWindow <windowid>" );
 
   // -- Constructor/Destructor --
 public:

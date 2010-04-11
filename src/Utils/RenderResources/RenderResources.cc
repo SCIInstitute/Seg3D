@@ -32,6 +32,8 @@
 namespace Utils
 {
 
+CORE_SINGLETON_IMPLEMENTATION( RenderResources );
+
 RenderResources::RenderResources() :
   gl_initialized_( false )
 {

@@ -40,7 +40,7 @@ namespace Seg3D
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
-SCI_REGISTER_ACTION(ImportLayer);
+CORE_REGISTER_ACTION( ImportLayer );
 
 bool ActionImportLayer::validate( ActionContextHandle& context )
 {

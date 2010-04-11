@@ -42,6 +42,8 @@
 
 // Utils includes
 #include <Utils/Core/Singleton.h>
+#include <Utils/Core/Lockable.h>
+
 #include <Utils/DataBlock/DataBlock.h>
 #include <Utils/DataBlock/MaskDataBlock.h>
 
@@ -56,18 +58,12 @@ class MaskDataBlockManagerInternal;
 typedef boost::shared_ptr<MaskDataBlockManagerInternal> MaskDataBlockManagerInternalHandle;
 
 // Class definition
-class MaskDataBlockManager : public Utils::Singleton<MaskDataBlockManager>
+class MaskDataBlockManager : public RecursiveLockable
 {
-
-  // -- typedefs --
-public:
-  // Lock types
-  typedef boost::recursive_mutex  mutex_type;
-  typedef mutex_type::scoped_lock lock_type;
+  CORE_SINGLETON( MaskDataBlockManager );
 
   // -- Constructor/destructor --
 private:
-  friend class Utils::Singleton<MaskDataBlockManager>;
   MaskDataBlockManager();
   virtual ~MaskDataBlockManager();
 
@@ -93,13 +89,6 @@ protected:
   // released
   void release( DataBlockHandle& datablock, unsigned int mask_bit );
 
-  // -- Locking of the datablock --
-public:
-
-  // GETMUTEX:
-  // Get the mutex that locks the datablock
-  mutex_type& get_mutex();
-
 private:
    MaskDataBlockManagerInternalHandle private_;
 
@@ -121,6 +110,9 @@ public:
   static bool CreateMaskFromLabelData( const DataBlockHandle data, 
     std::vector<MaskDataBlockHandle>& mask, bool reuse_data = false );
 
+  // CREATEEMPTYMASK:
+  // Create an empty mask with given dimensions.
+  static bool CreateEmptyMask( size_t nx, size_t ny, size_t nz, MaskDataBlockHandle& mask );
 };
 
 } // end namespace Utils

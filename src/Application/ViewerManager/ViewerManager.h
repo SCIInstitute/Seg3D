@@ -56,12 +56,12 @@ namespace Seg3D
 class ViewerManager;
 
 // typedefs
-class ViewerManager : public StateHandler, public Utils::Singleton< ViewerManager >
+class ViewerManager : public StateHandler
 {
+  CORE_SINGLETON( ViewerManager );
 
   // -- Constructor/Destructor --
 private:
-  friend class Utils::Singleton< ViewerManager >;
   ViewerManager();
   virtual ~ViewerManager();
 

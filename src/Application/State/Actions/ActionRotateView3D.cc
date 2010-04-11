@@ -31,7 +31,7 @@
 namespace Seg3D
 {
 
-SCI_REGISTER_ACTION(RotateView3D);
+CORE_REGISTER_ACTION( RotateView3D );
 
 ActionRotateView3D::ActionRotateView3D()
 {

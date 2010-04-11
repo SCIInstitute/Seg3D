@@ -41,6 +41,8 @@
 namespace Seg3D
 {
 
+CORE_SINGLETON_IMPLEMENTATION( QtApplication );
+
 QtApplication::QtApplication() :
   qt_application_( 0 )
 {

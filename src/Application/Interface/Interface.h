@@ -59,12 +59,12 @@ namespace Seg3D
 class Interface;
 
 // Class defintion
-class Interface : public Utils::EventHandler, public Utils::Singleton< Interface >
+class Interface : public Utils::EventHandler
 {
+  CORE_SINGLETON( Interface );
 
   // -- Constructor/Destructor --
 private:
-  friend class Utils::Singleton< Interface >;
   Interface();
   virtual ~Interface();
 

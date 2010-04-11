@@ -40,7 +40,7 @@ namespace Seg3D
 
 class ActionRotateView3D : public Action
 {
-SCI_ACTION_TYPE("Rotate", "Rotate <key> <axis> <angle>", ActionPropertiesType::APPLICATION_E)
+  CORE_ACTION("Rotate", "Rotate <key> <axis> <angle>");
 
 public:
   ActionRotateView3D();

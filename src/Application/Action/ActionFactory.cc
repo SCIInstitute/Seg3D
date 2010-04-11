@@ -36,7 +36,28 @@
 namespace Seg3D
 {
 
-ActionFactory::ActionFactory()
+CORE_SINGLETON_IMPLEMENTATION( ActionFactory );
+
+// Definition of the internals of the class
+class ActionFactoryPrivate
+{
+public:
+  // Types used internally
+  typedef boost::mutex mutex_type;
+  typedef boost::unique_lock<mutex_type> lock_type;
+
+  // Mutex protecting the singleton interface
+  typedef boost::unordered_map<std::string,ActionBuilderBase*> action_map_type;
+  // List with builders that can be called to generate a new object
+  action_map_type action_builders_;
+  
+  // Mutex for protecting registration
+  mutex_type mutex_;
+};
+  
+
+ActionFactory::ActionFactory() :
+  private_( new ActionFactoryPrivate )
 {
 }
 
@@ -44,10 +65,33 @@ ActionFactory::~ActionFactory()
 {
 }
 
+void ActionFactory::register_action( ActionBuilderBase* builder, std::string name )
+{
+  // Lock the factory
+  lock_type lock( get_mutex() );
+
+  // Ensure the name will be treaded case insensitive
+  boost::to_lower( name );
+
+  // Test is action was registered before.
+  if ( private_->action_builders_.find( name ) != private_->action_builders_.end() )
+  {
+    // Actions that are registered twice, will cause problems
+    // Hence the program will throw an exception.
+    // As registration is done on startup, this will cause a
+    // faulty program to fail always on startup.
+    SCI_THROW_LOGICERROR( std::string( "Action '" ) + name + "' was registered twice" );
+  }
+
+  // Register the action
+  private_->action_builders_[ name ] = builder;
+  SCI_LOG_DEBUG( std::string("Registering action : ") +  name );  
+}
+
 bool ActionFactory::create_action( const std::string& action_string, ActionHandle& action,
     std::string& error, std::string& usage )
 {
-  lock_type lock( mutex_ );
+  ActionFactoryPrivate::lock_type lock( private_->mutex_ );
   std::string command;
   std::string::size_type pos = 0;
 
@@ -63,10 +107,10 @@ bool ActionFactory::create_action( const std::string& action_string, ActionHandl
   boost::to_lower( command );
   // NOTE: Factory is not locked as we assume that all actions are already
   // inserted.
-  action_map_type::const_iterator it = action_builders_.find( command );
+  ActionFactoryPrivate::action_map_type::const_iterator it = private_->action_builders_.find( command );
 
   // If we cannot find the maker report error.
-  if ( it == action_builders_.end() )
+  if ( it == private_->action_builders_.end() )
   {
     error = std::string( "SYNTAX ERROR: Unknown command '" + command + "'" );
     return ( false );
@@ -91,10 +135,10 @@ bool ActionFactory::create_action( const std::string& action_string, ActionHandl
 
 bool ActionFactory::action_list( action_list_type& action_list )
 {
-  lock_type lock( mutex_ );
+  ActionFactoryPrivate::lock_type lock( private_->mutex_ );
 
-  action_map_type::iterator it = action_builders_.begin();
-  action_map_type::iterator it_end = action_builders_.end();
+  ActionFactoryPrivate::action_map_type::iterator it = private_->action_builders_.begin();
+  ActionFactoryPrivate::action_map_type::iterator it_end = private_->action_builders_.end();
 
   while ( it != it_end )
   {

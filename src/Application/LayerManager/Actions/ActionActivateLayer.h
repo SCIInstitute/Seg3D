@@ -38,7 +38,7 @@ namespace Seg3D
 
 class ActionActivateLayer : public Action
 {
-SCI_ACTION_TYPE("ActivateLayer", "ActivateLayer <layer_name>", ActionPropertiesType::LAYER_E)
+  CORE_ACTION( "ActivateLayer", "ActivateLayer <layer_name>" );
 
   // -- Constructor/Destructor --
 public:

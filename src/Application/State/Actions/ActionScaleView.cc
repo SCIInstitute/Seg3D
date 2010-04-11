@@ -34,7 +34,7 @@
 namespace Seg3D
 {
 
-SCI_REGISTER_ACTION(ScaleView);
+CORE_REGISTER_ACTION( ScaleView );
 
 ActionScaleView::ActionScaleView()
 {

@@ -1,15 +1,4 @@
 /*
- *  ActionInsertLayer.cc
- *  Seg3D
- *
- *  Created by Wes Christiansen on 3/9/10.
- *  Copyright 2010 Numira Biosciences. All rights reserved.
- *
- */
-
-#include "ActionInsertLayer.h"
-
-/*
  For more information, please see: http://software.sci.utah.edu
  
  The MIT License
@@ -47,7 +36,7 @@ namespace Seg3D
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
-SCI_REGISTER_ACTION(InsertLayer);
+CORE_REGISTER_ACTION( InsertLayer );
 
 bool ActionInsertLayer::validate( ActionContextHandle& context )
 {

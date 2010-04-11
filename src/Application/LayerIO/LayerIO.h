@@ -49,8 +49,9 @@ namespace Seg3D
 class LayerIO;
 
 // Class definition
-class LayerIO : public Utils::Singleton<LayerIO>
+class LayerIO
 {
+  CORE_SINGLETON( LayerIO );
   // -- typedefs --
 public:
   typedef boost::mutex mutex_type;
@@ -60,7 +61,6 @@ public:
 
   // -- constructor / destructor --
 private:
-  friend class Utils::Singleton<LayerIO>;
   LayerIO();
   virtual ~LayerIO();
 

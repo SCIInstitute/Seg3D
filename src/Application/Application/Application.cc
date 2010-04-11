@@ -40,13 +40,14 @@
 namespace Seg3D
 {
 
+CORE_SINGLETON_IMPLEMENTATION( Application );
+
 Application::Application()
 {
   // The event handler needs to be started manually
   // This event handler will execute all the functions
   // that are send to it on the main application thread.
   start_eventhandler();
-
 }
 
 Application::~Application()

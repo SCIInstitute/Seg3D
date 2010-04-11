@@ -38,6 +38,8 @@ SET(APPLICATION_ACTION_SRCS
   ActionContext.cc
   ActionParameter.h
   ActionParameter.cc
+  ActionCachedHandle.h
+  ActionCachedHandle.cc
   ActionProgress.h
   ActionProgress.cc
   ActionDispatcher.h

@@ -31,6 +31,8 @@
 namespace Seg3D
 {
 
+CORE_SINGLETON_IMPLEMENTATION( ActionHistory );
+
 ActionHistory::ActionHistory() :
   action_history_max_size_( 0 )
 {

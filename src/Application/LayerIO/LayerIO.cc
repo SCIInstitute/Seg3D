@@ -38,6 +38,8 @@
 namespace Seg3D
 {
 
+CORE_SINGLETON_IMPLEMENTATION( LayerIO );
+
 LayerIO::LayerIO()
 {
 }

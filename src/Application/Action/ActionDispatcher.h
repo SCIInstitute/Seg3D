@@ -56,12 +56,12 @@ namespace Seg3D
 class ActionDispatcher;
 
 // Class defintion
-class ActionDispatcher : public Utils::Singleton< ActionDispatcher >
+class ActionDispatcher : public boost::noncopyable
 {
+  CORE_SINGLETON( ActionDispatcher );
 
   // -- Constructor
 private:
-  friend class Utils::Singleton< ActionDispatcher >;
   ActionDispatcher();
   virtual ~ActionDispatcher();
 

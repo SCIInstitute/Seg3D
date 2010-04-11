@@ -34,6 +34,8 @@
 namespace Seg3D
 {
 
+CORE_SINGLETON_IMPLEMENTATION( InterfaceManager );
+
 InterfaceManager::InterfaceManager() :
   StateHandler( "interface" )
 {

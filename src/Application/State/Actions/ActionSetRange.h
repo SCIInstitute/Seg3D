@@ -40,7 +40,7 @@ namespace Seg3D
 
 class ActionSetRange : public Action
 {
-SCI_ACTION_TYPE("SetRange", "SetRange <state> <min> <max>", ActionPropertiesType::APPLICATION_E)
+  CORE_ACTION( "SetRange", "SetRange <state> <min> <max>" );
 
 public:
   ActionSetRange();
