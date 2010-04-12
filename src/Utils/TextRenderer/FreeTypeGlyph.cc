@@ -108,14 +108,19 @@ void FreeTypeBitmapGlyph::draw( unsigned char* target, const int width, const in
       if ( blend )
       {
         float dst_factor = 1 - src_alpha;
-        target[ pixel_pos ] = static_cast< unsigned char >( 
-          ( red * src_alpha + target[ pixel_pos ] / 255.0 * dst_factor ) * 255 );
-        target[ pixel_pos + 1 ] = static_cast< unsigned char >( 
-          ( green * src_alpha + target[ pixel_pos + 1 ] / 255.0 * dst_factor ) * 255 );
-        target[ pixel_pos + 2 ] = static_cast< unsigned char >( 
-          ( blue * src_alpha + target[ pixel_pos + 2 ] / 255.0 * dst_factor ) * 255 );
+//        target[ pixel_pos ] = static_cast< unsigned char >( 
+//          ( red * src_alpha + target[ pixel_pos ] / 255.0 * dst_factor ) * 255 );
+//        target[ pixel_pos + 1 ] = static_cast< unsigned char >( 
+//          ( green * src_alpha + target[ pixel_pos + 1 ] / 255.0 * dst_factor ) * 255 );
+//        target[ pixel_pos + 2 ] = static_cast< unsigned char >( 
+//          ( blue * src_alpha + target[ pixel_pos + 2 ] / 255.0 * dst_factor ) * 255 );
+//        target[ pixel_pos + 3 ] = static_cast< unsigned char >( 
+//          ( 1 - dst_factor * ( 1 - target[ pixel_pos + 3 ] / 255.0 ) ) * 255 );
+        target[ pixel_pos ] = static_cast< unsigned char >( red * 255 );
+        target[ pixel_pos + 1 ] = static_cast< unsigned char >( green * 255 );
+        target[ pixel_pos + 2 ] = static_cast< unsigned char >( blue * 255 );
         target[ pixel_pos + 3 ] = static_cast< unsigned char >( 
-          ( 1 - dst_factor * ( 1 - target[ pixel_pos + 3 ] / 255.0 ) ) * 255 );
+          ( gray_scale + dst_factor * target[ pixel_pos + 3 ] / 255.0 ) * 255 );
       }
       else
       {

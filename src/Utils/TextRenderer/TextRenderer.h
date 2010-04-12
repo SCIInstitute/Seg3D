@@ -63,6 +63,7 @@ private:
   face_map_type face_map_;
 
   std::string font_file_;
+  long face_index_;
   bool valid_;
 };
 

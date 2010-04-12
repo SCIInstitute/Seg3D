@@ -498,6 +498,7 @@ void Renderer::redraw_overlay()
 
   this->frame_buffer_->detach_texture( this->textures_[ this->active_overlay_texture_ ] );
   this->frame_buffer_->disable();
+  */
   {
     Utils::RenderResources::lock_type lock( Utils::RenderResources::GetMutex() );
     Utils::PixelBufferObjectHandle pbo( new Utils::PixelUnpackBuffer );
@@ -508,18 +509,17 @@ void Renderer::redraw_overlay()
       pbo->map_buffer( GL_READ_WRITE ) );
     memset( buffer, 0, this->width_ * this->height_ * 4 );
     this->text_renderer_->render( "NUMIRA", buffer, this->width_, this->height_, 20, 20, 24,
-      1.0f, 1.0f, 1.0f, 0.8f, true );
+      1.0f, 1.0f, 1.0f, 1.0f, false );
     pbo->unmap_buffer();
     this->textures_[ this->active_overlay_texture_ ]->set_sub_image( 0, 0, this->width_, this->height_,
       0, GL_RGBA, GL_UNSIGNED_BYTE );
     pbo->unbind();
   }
-
   glFinish();
   // release the lock on the active render texture
   texture_lock.unlock();
 
-  SCI_LOG_DEBUG( std::string("Renderer ") + Utils::to_string( this->viewer_id_ ) 
+  SCI_LOG_DEBUG( std::string("Renderer ") + Utils::ToString( this->viewer_id_ ) 
     + ": done redraw overlay" );
 
   // signal rendering completed
@@ -527,8 +527,6 @@ void Renderer::redraw_overlay()
 
   // swap render textures 
   this->active_overlay_texture_ = ( ~( this->active_overlay_texture_ - 2 ) ) & 1 + 2;
-
-  */
 }
 
 void Renderer::resize( int width, int height )
@@ -549,7 +547,7 @@ void Renderer::resize( int width, int height )
   this->context_->make_current();
 #endif
 
-  if ( width == 0 || height == 0 || ( this->width_ == width && this->height_ == height ) )
+  if ( width <= 0 || height <= 0 || ( this->width_ == width && this->height_ == height ) )
   {
     return;
   }

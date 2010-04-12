@@ -47,8 +47,10 @@ TextRenderer::TextRenderer() :
   GetWindowsDirectory( &buffer[0], MAX_PATH );
   this->font_file_.assign( &buffer[0] );
   this->font_file_ += "\\fonts\\arial.ttf";
+  this->face_index_ = 0;
 #elif defined( __APPLE__ )
-  this->font_file_.assign( "/System/Library/Fonts/Courier.dfont" );
+  this->font_file_.assign( "/System/Library/Fonts/Helvetica.dfont" );
+  this->face_index_ = 2;
 #endif
 }
 
@@ -79,7 +81,7 @@ void TextRenderer::render( const std::string& text, unsigned char* buffer, int w
   }
   else
   {
-    face = this->ft_library_->new_face_from_file( this->font_file_.c_str() );
+    face = this->ft_library_->new_face_from_file( this->font_file_.c_str(), this->face_index_ );
     if ( !face )
     {
       this->valid_ = false;
