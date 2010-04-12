@@ -46,7 +46,7 @@
 #include <Application/Layer/MaskLayer.h>
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/LayerManager/Actions/ActionActivateLayer.h>
-#include <Application/LayerManager/Actions/ActionInsertLayerAbove.h>
+#include <Application/LayerManager/Actions/ActionMoveLayerAbove.h>
 
 
 namespace Seg3D
@@ -112,6 +112,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   this->private_->activate_button_->setMinimumWidth( 31 );
   this->private_->activate_button_->setIconSize( QSize( 25, 25 ) );
   this->private_->ui_.horizontalLayout_9->addWidget( this->private_->activate_button_ );
+  this->private_->activate_button_->setAcceptDrops( false );
   
   // add the SliderCombo Widgets
   this->private_->opacity_adjuster_ = new SliderDoubleCombo( this->private_->ui_.opacity_bar_ );
@@ -159,17 +160,17 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
 
   // connect the GUI signals and slots
   connect( this->private_->ui_.opacity_button_, 
-      SIGNAL( clicked( bool )), this, 
-      SLOT( show_opacity_bar( bool )));
+      SIGNAL( clicked( bool ) ), this, 
+      SLOT( show_opacity_bar( bool ) ) );
   connect( this->private_->ui_.brightness_contrast_button_, 
-      SIGNAL( clicked( bool )), this, 
-      SLOT( show_brightness_contrast_bar( bool )));
+      SIGNAL( clicked( bool ) ), this, 
+      SLOT( show_brightness_contrast_bar( bool ) ) );
   connect( this->private_->ui_.fill_border_button_, 
-      SIGNAL( clicked( bool )), this, 
-      SLOT( show_border_fill_bar ( bool )));
+      SIGNAL( clicked( bool ) ), this, 
+      SLOT( show_border_fill_bar ( bool ) ) );
   connect( this->private_->ui_.color_button_, 
-      SIGNAL( clicked( bool )), this, 
-      SLOT( show_color_bar( bool )));
+      SIGNAL( clicked( bool ) ), this, 
+      SLOT( show_color_bar( bool ) ) );
   
   // this is only for testing until we have this hooked up through the state manager
   connect( this->private_->ui_.lock_button_, 
@@ -307,18 +308,27 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
   this->set_picked_up( true );
 
   // Next we execute our drag!
-  Qt::DropAction drop = drag->exec(Qt::MoveAction, Qt::MoveAction);
+  //Qt::DropAction drop = drag->exec(Qt::MoveAction, Qt::MoveAction);
 
   // Finally if our drag was aborted then we reset the layers styles to be visible
-  if( drop != Qt::MoveAction )
+  if( ( drag->exec(Qt::MoveAction, Qt::MoveAction) ) != Qt::MoveAction )
   {
     this->seethrough( false );
     this->set_picked_up( false );
     this->update();
   }
-
+  // Otherwise we dispatch our move function
+  else 
+  { 
+    ActionMoveLayerAbove::Dispatch( this->get_layer_id(), this->drop_layer_->get_layer_id() );
+  }
 }
 
+void LayerWidget::set_drop_target( LayerWidget* target_layer )
+{
+  this->drop_layer_ = target_layer;
+}
+  
 
 void LayerWidget::dropEvent( QDropEvent* event )
 {
@@ -332,12 +342,14 @@ void LayerWidget::dropEvent( QDropEvent* event )
     return;
   }
   
+  bool good_to_go = false;
+  
   if( !LayerManager::Instance()->check_for_same_group(
     mime_data[ 1 ], this->get_layer_id() ) )
   {
     QMessageBox message_box;
-    message_box.setText( QString::fromUtf8( "This move will modify the layer.\n"
-        "The new size of the layer will be: \t" )
+    message_box.setText( QString::fromUtf8( "This move will modify the layer."
+        "The new size of the layer will be: \t\n" )
         + QString::number( this->grid_transform_.get_nx() ) + QString::fromUtf8( " x " )
         + QString::number( this->grid_transform_.get_ny() ) + QString::fromUtf8( " x " ) 
         + QString::number( this->grid_transform_.get_nz() ) );
@@ -346,22 +358,24 @@ void LayerWidget::dropEvent( QDropEvent* event )
     message_box.setDefaultButton( QMessageBox::No );
     if( message_box.exec() )
     {
-      event->setDropAction(Qt::MoveAction);
-      event->accept();
-      ActionInsertLayerAbove::Dispatch( mime_data[ 1 ], 
-        this->get_layer_id() );
-    }
-    else
-    {
-      event->ignore();
+      good_to_go = true;
     }
   }
   else
   {
+    good_to_go = true;
+    
+  }
+  
+  if( good_to_go )
+  {
+    dynamic_cast< LayerWidget* >( event->source() )->set_drop_target( this ); 
     event->setDropAction(Qt::MoveAction);
     event->accept();
-    ActionInsertLayerAbove::Dispatch( mime_data[ 1 ], 
-      this->get_layer_id() );
+  }
+  else
+  {
+    event->ignore();
   }
   
   this->set_drop( false );

@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_TOOL_ACTIONS_ACTIONINSERTLAYERABOVE_H
-#define APPLICATION_TOOL_ACTIONS_ACTIONINSERTLAYERABOVE_H
+#ifndef APPLICATION_TOOL_ACTIONS_ACTIONMOVELAYERABOVE_H
+#define APPLICATION_TOOL_ACTIONS_ACTIONMOVELAYERABOVE_H
 
 #include <Application/Action/Actions.h>
 #include <Application/Interface/Interface.h>
@@ -35,17 +35,17 @@
 namespace Seg3D
 {
 
-class ActionInsertLayerAbove : public Action
+class ActionMoveLayerAbove : public Action
 {
-  CORE_ACTION( "InsertLayerAbove","Insert Layer Above <name>" );
+  CORE_ACTION( "MoveLayerAbove","Move Layer Above <name>" );
   
   // -- Constructor/Destructor --
 public:
-  ActionInsertLayerAbove()
+  ActionMoveLayerAbove()
   {
   }
   
-  virtual ~ActionInsertLayerAbove()
+  virtual ~ActionMoveLayerAbove()
   {
   }
   
@@ -58,14 +58,14 @@ public:
 private:
   // Layer_handle that is requested
   std::string layer_below_id_;
-  std::string layer_to_insert_id_;
+  std::string layer_to_move_id_;
   
   // -- Dispatch this action from the interface --
 public:
   
   // DISPATCH
   // Create and dispatch action that moves the layer above 
-  static void Dispatch( std::string layer_to_insert_id, std::string layer_below_id );
+  static void Dispatch( std::string layer_to_move_id, std::string layer_below_id );
   
 };
   

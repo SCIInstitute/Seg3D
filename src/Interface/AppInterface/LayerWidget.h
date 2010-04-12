@@ -87,7 +87,9 @@ private:
   int volume_type_;
   bool active_;
   bool picked_up_;
-  
+  LayerWidget* drop_layer_;
+
+  void set_drop_target( LayerWidget* target_layer );
   void mousePressEvent( QMouseEvent* event );
   //void mouseMoveEvent( QMouseEvent * event );
   void dropEvent( QDropEvent* event );
@@ -98,7 +100,7 @@ public:
   int get_volume_type(){ return this->volume_type_; }
   std::string& get_layer_id(){ return this->layer_id_; }
   void set_picked_up( bool up ){ this->picked_up_ = up; }
-  
+
 
 };
 

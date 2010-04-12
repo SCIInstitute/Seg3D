@@ -28,7 +28,7 @@
 
 
 #include <Application/LayerManager/LayerManager.h>
-#include <Application/LayerManager/Actions/ActionInsertLayerAbove.h>
+#include <Application/LayerManager/Actions/ActionMoveLayerAbove.h>
 
 namespace Seg3D
 {
@@ -36,14 +36,14 @@ namespace Seg3D
   // REGISTER ACTION:
   // Define a function that registers the action. The action also needs to be
   // registered in the CMake file.
-  CORE_REGISTER_ACTION( InsertLayerAbove );
+  CORE_REGISTER_ACTION( MoveLayerAbove );
   
-  bool ActionInsertLayerAbove::validate( ActionContextHandle& context )
+  bool ActionMoveLayerAbove::validate( ActionContextHandle& context )
   {
 
-    if ( !( StateEngine::Instance()->is_stateid( layer_to_insert_id_ ) ) )
+    if ( !( StateEngine::Instance()->is_stateid( layer_to_move_id_ ) ) )
     {
-      context->report_error( std::string( "LayerID '" ) + layer_to_insert_id_ + "' is invalid" );
+      context->report_error( std::string( "LayerID '" ) + layer_to_move_id_ + "' is invalid" );
       return false;
     }
     
@@ -56,12 +56,12 @@ namespace Seg3D
     return true;
   }
   
-  bool ActionInsertLayerAbove::run( ActionContextHandle& context, ActionResultHandle& result )
+  bool ActionMoveLayerAbove::run( ActionContextHandle& context, ActionResultHandle& result )
   {
-    if ( ( StateEngine::Instance()->is_stateid( layer_to_insert_id_ ) ) && 
+    if ( ( StateEngine::Instance()->is_stateid( layer_to_move_id_ ) ) && 
       ( StateEngine::Instance()->is_stateid( layer_below_id_ ) ) )
     {
-      LayerManager::Instance()->move_layer_above( this->layer_to_insert_id_, this->layer_below_id_ );
+      LayerManager::Instance()->move_layer_above( this->layer_to_move_id_, this->layer_below_id_ );
       return true;
     }
 
@@ -69,11 +69,11 @@ namespace Seg3D
   }
   
 
-  void ActionInsertLayerAbove::Dispatch( std::string layer_to_insert_id, std::string layer_below_id )
+  void ActionMoveLayerAbove::Dispatch( std::string layer_to_move_id, std::string layer_below_id )
   {
-    ActionInsertLayerAbove* action = new ActionInsertLayerAbove;
+    ActionMoveLayerAbove* action = new ActionMoveLayerAbove;
     action->layer_below_id_ = layer_below_id;
-    action->layer_to_insert_id_ = layer_to_insert_id;
+    action->layer_to_move_id_ = layer_to_move_id;
   
     Interface::PostAction( ActionHandle( action ) );
   }

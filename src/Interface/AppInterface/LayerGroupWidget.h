@@ -67,14 +67,11 @@ public:
   std::string &get_group_id();
   void set_active( bool active );
   LayerWidgetQWeakHandle set_active_layer( LayerHandle layer );
-  void clear_all_layers()
-    {
-        this->layer_list_.clear();
-    }
-
+  
 private Q_SLOTS:
     void adjust_new_size_labels( double scale_factor );
     void uncheck_delete_confirm();
+  
     
 private:
 

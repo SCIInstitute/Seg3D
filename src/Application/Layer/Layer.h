@@ -145,10 +145,12 @@ public:
   {
     return active_;
   }
+  
   void set_active( bool active )
   {
     active_ = active;
   }
+  
   std::string get_layer_name()
   {
     return this->name_state_->get();

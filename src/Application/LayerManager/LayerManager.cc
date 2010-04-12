@@ -118,21 +118,17 @@ bool LayerManager::insert_layer( LayerHandle layer )
   return true;
 }
 
-bool LayerManager::check_for_same_group( const std::string& layer_to_insert_id, 
-  const std::string& layer_below_id )
+bool LayerManager::check_for_same_group( const std::string layer_to_insert_id, 
+  const std::string layer_below_id )
 {
   lock_type lock( this->get_mutex() );
+  LayerGroupHandle top_group = this->get_layer_by_id( layer_to_insert_id )->get_layer_group();
+  LayerGroupHandle bottom_group = this->get_layer_by_id( layer_below_id )->get_layer_group();
   
-  LayerHandle layer_above = this->get_layer_by_id( layer_to_insert_id );
-  LayerHandle layer_below = this->get_layer_by_id( layer_below_id );
-  
-  LayerGroupHandle group_above = layer_above->get_layer_group();
-  LayerGroupHandle group_below = layer_below->get_layer_group();
-  
-  return ( group_above == group_below );
+  return ( top_group == bottom_group );
 }
 
-bool LayerManager::move_layer_above( std::string& layer_to_insert_id, std::string& layer_below_id )
+bool LayerManager::move_layer_above( std::string layer_to_move_id, std::string layer_below_id )
 {
   // we will need to keep track of a few things outside of the locked scope
   // This keeps track of whether or not we delete the group we are moving from
@@ -152,7 +148,7 @@ bool LayerManager::move_layer_above( std::string& layer_to_insert_id, std::strin
     lock_type lock( this->get_mutex() );
   
     // First we get LayerHandles for the Layers
-    layer_above = this->get_layer_by_id( layer_to_insert_id );
+    layer_above = this->get_layer_by_id( layer_to_move_id );
     layer_below = this->get_layer_by_id( layer_below_id );
     
     if( !layer_above || !layer_below )

@@ -46,7 +46,6 @@
 #include <Application/Layer/LayerGroup.h>
 #include <Application/LayerManager/Actions/ActionDeleteLayers.h>
 #include <Application/LayerManager/Actions/ActionNewMaskLayer.h>
-#include <Application/LayerManager/Actions/ActionInsertLayerAbove.h>
 
 
 
@@ -294,21 +293,34 @@ void LayerGroupWidget::insert_layer( LayerHandle layer, int index )
 }
 
 
+//bool LayerGroupWidget::delete_layer( LayerHandle layer )
+//{ 
+//  for( int i = 0; i < layer_list_.size(); ++i)
+//  {
+//        if( layer->get_layer_id() == layer_list_[i]->get_layer_id() )
+//      {
+//      //layer_list_[i]->needs_deleted_ = true;
+//          return true;
+//      }
+//  }  
+//  return false;  
+//}
+  
 bool LayerGroupWidget::delete_layer( LayerHandle layer )
 { 
-    for( QVector< LayerWidgetQHandle >::iterator i = layer_list_.begin(); i != 
-        layer_list_.end(); ++i)
+  for( QVector< LayerWidgetQHandle >::iterator i = layer_list_.begin(); i != 
+    layer_list_.end(); ++i)
   {
-        if( layer->get_layer_id() == ( *i )->get_layer_id() )
-      {
-          ( *i )->deleteLater();
-          layer_list_.erase( i );
-          return true;
-      }
-  }  
+    if( ( *i )->get_layer_id() == layer->get_layer_id() )
+    {
+      ( *i )->deleteLater();
+      layer_list_.erase( i );
+      return true;
+    }
+  }
   return false;  
 }
-
+  
 
 LayerWidgetQWeakHandle LayerGroupWidget::set_active_layer( LayerHandle layer )
 {
