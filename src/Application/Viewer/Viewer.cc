@@ -47,7 +47,7 @@ const std::string Viewer::CORONAL_C( "coronal" );
 const std::string Viewer::VOLUME_C( "volume" );
 
 Viewer::Viewer( size_t viewer_id ) :
-  StateHandler( std::string( "viewer" ) + Utils::to_string( viewer_id ) ), 
+  StateHandler( std::string( "viewer" ) + Utils::ToString( viewer_id ) ), 
   viewer_id_( viewer_id ),
   redraw_block_count_( 0 ),
   slice_lock_count_( 0 )

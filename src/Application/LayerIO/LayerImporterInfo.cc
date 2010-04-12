@@ -44,7 +44,7 @@ LayerImporterInfo::LayerImporterInfo( LayerImporterBuilderBaseHandle builder,
   const unsigned int priority ) :
   builder_( builder ),
   name_( name ),
-  file_types_( Utils::split_string( file_type_string, ";" ) ),
+  file_types_( Utils::SplitString( file_type_string, ";" ) ),
   any_type_(false),
   priority_( priority )
 {

@@ -134,7 +134,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
       this->private_->ui_.border_selection_combo_->addItem( QString::fromStdString( temp_option_list[i] ) );
   }
   // Set it's default value
-  this->private_->ui_.border_selection_combo_->setCurrentIndex(layer->border_mode_state_->index());
+  this->private_->ui_.border_selection_combo_->setCurrentIndex( layer->border_mode_state_->index() );
   
   // -- set the fill selection combo box's values 
   temp_option_list = layer->fill_mode_state_->option_list();
@@ -142,6 +142,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   {   
       this->private_->ui_.fill_selection_combo_->addItem( QString::fromStdString( temp_option_list[i] ) );
   }
+  
   // Set it's default value
   this->private_->ui_.fill_selection_combo_->setCurrentIndex(layer->fill_mode_state_->index());
   
@@ -264,9 +265,6 @@ LayerWidget::~LayerWidget()
 
 void LayerWidget::mousePressEvent( QMouseEvent *event )
 {
-// 
-//  if ( !(event->buttons() & Qt::LeftButton) )
-//    return;
  
   // Exit immediately if they are no longer holding the button the press event isnt valid
   if ( event->button() != Qt::LeftButton )
@@ -275,37 +273,27 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
   }
 
   QPoint hotSpot = event->pos();
-
-  /*
-  // Create some Item data. - THIS IS CURRENTLY NOT REALLY BEING USED
-  QByteArray itemData;
-  itemData = ( QString::fromStdString( this->get_layer_id() ) ).toAscii();
-  QDataStream dataStream(&itemData, QIODevice::WriteOnly);
-  dataStream << QPoint(hotSpot);
-  */
   
   // Make up some mimedata containing the layer_id of the layer
   QMimeData *mimeData = new QMimeData;
 
-  /*
   switch ( this->get_volume_type() ) 
   {
   case Utils::VolumeType::DATA_E:
-    mimeData->setData( "data_layer_id", itemData );
+    mimeData->setText( QString::fromStdString( std::string("data|") + this->get_layer_id() ) );
     break;
   case Utils::VolumeType::MASK_E:
-    mimeData->setData( "mask_layer_id", itemData );
+    mimeData->setText( QString::fromStdString( std::string("mask|") + this->get_layer_id() ) );
     break;
   case Utils::VolumeType::LABEL_E:
-    mimeData->setData( "label_layer_id", itemData );
+    mimeData->setText( QString::fromStdString( std::string("label|") + this->get_layer_id() ) );
     break;
   default:
     break;
   }
-  */
   
   //mimeData->setData( "layer_id", itemData );
-  mimeData->setText( QString::fromStdString( this->get_layer_id() ) );
+  //mimeData->setText( QString::fromStdString( this->get_layer_id() ) );
 
   // Create a drag object and insert the hotspot, and mimedata
   QDrag *drag = new QDrag( this );
@@ -334,14 +322,18 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
 
 void LayerWidget::dropEvent( QDropEvent* event )
 {
-  if( this->get_layer_id() == event->mimeData()->text().toStdString() )
+  std::vector<std::string> mime_data = 
+    Utils::SplitString( event->mimeData()->text().toStdString(), "|" );
+  if ( mime_data.size() < 2 ) return;
+
+  if( this->get_layer_id() == mime_data[ 1 ] )
   {
     event->ignore();
     return;
   }
   
   if( !LayerManager::Instance()->check_for_same_group(
-    event->mimeData()->text().toStdString(), this->get_layer_id() ) )
+    mime_data[ 1 ], this->get_layer_id() ) )
   {
     QMessageBox message_box;
     message_box.setText( QString::fromUtf8( "This move will modify the layer.\n"
@@ -356,7 +348,7 @@ void LayerWidget::dropEvent( QDropEvent* event )
     {
       event->setDropAction(Qt::MoveAction);
       event->accept();
-      ActionInsertLayerAbove::Dispatch( event->mimeData()->text().toStdString(), 
+      ActionInsertLayerAbove::Dispatch( mime_data[ 1 ], 
         this->get_layer_id() );
     }
     else
@@ -368,7 +360,7 @@ void LayerWidget::dropEvent( QDropEvent* event )
   {
     event->setDropAction(Qt::MoveAction);
     event->accept();
-    ActionInsertLayerAbove::Dispatch( event->mimeData()->text().toStdString(), 
+    ActionInsertLayerAbove::Dispatch( mime_data[ 1 ], 
       this->get_layer_id() );
   }
   
@@ -378,13 +370,17 @@ void LayerWidget::dropEvent( QDropEvent* event )
 
 void LayerWidget::dragEnterEvent( QDragEnterEvent* event)
 {
-  if( ( ( ( this->get_volume_type() == Utils::VolumeType::DATA_E ) &&
-    ( event->mimeData()->hasFormat("data_layer_id") ) ) ||
+  std::vector<std::string> mime_data = 
+    Utils::SplitString( event->mimeData()->text().toStdString(), "|" );
+  if ( mime_data.size() < 2 ) return;
+
+  if ( ( ( ( this->get_volume_type() == Utils::VolumeType::DATA_E ) &&
+    ( mime_data[ 0 ] == "data" ) ) ||
     ( ( this->get_volume_type() == Utils::VolumeType::MASK_E ) &&
-    ( event->mimeData()->hasFormat("mask_layer_id") ) ) ||
+    ( mime_data[ 0 ] =="mask" ) ) ||
     ( ( this->get_volume_type() == Utils::VolumeType::LABEL_E ) &&
-    ( event->mimeData()->hasFormat("label_layer_id") ) ) ) && 
-    ( this->get_layer_id() != event->mimeData()->text().toStdString() ) )
+    ( mime_data[ 0 ] == "label") ) ) && 
+    ( this->get_layer_id() != mime_data[ 1 ] ) )
   {
     this->set_drop( true );
     event->setDropAction(Qt::MoveAction);

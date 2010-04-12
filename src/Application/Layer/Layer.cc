@@ -51,7 +51,7 @@ Layer::Layer( const std::string& name ) :
 
   for ( size_t j = 0; j < visible_state_.size(); j++ )
   {
-    std::string key = std::string( "visible" ) + Utils::to_string( j );
+    std::string key = std::string( "visible" ) + Utils::ToString( j );
     add_state( key, visible_state_[ j ], true );
   }
 

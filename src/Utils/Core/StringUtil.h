@@ -46,16 +46,13 @@
 #include <sstream>
 #include <fstream>
 
-// Boost includes
-#include <boost/thread.hpp>
-
 namespace Utils
 {
 
 // Convert multiple values in a string into a vector with numbers
 
 template< class T >
-bool multiple_from_string( const std::string &str, std::vector< T > &values )
+bool MultipleFromString( const std::string &str, std::vector< T > &values )
 {
   values.clear();
 
@@ -82,7 +79,7 @@ bool multiple_from_string( const std::string &str, std::vector< T > &values )
 
     // Extract the number
     T value;
-    if ( from_string( data.substr( p, next_space - p ), value ) ) values.push_back( value );
+    if ( FromString( data.substr( p, next_space - p ), value ) ) values.push_back( value );
     p = next_space;
 
     if ( p >= data.size() ) break;
@@ -96,7 +93,7 @@ bool multiple_from_string( const std::string &str, std::vector< T > &values )
 // Convert a value into a string
 
 template< class T >
-bool from_string( const std::string &str, T &value )
+bool FromString( const std::string &str, T &value )
 {
   std::string data = str + " ";
   for ( size_t j = 0; j < data.size(); j++ )
@@ -117,26 +114,10 @@ bool from_string( const std::string &str, T &value )
   }
 }
 
-template< class T >
-bool from_string_internal( const std::string &str, T &value )
-{
-  std::istringstream iss( str );
-  iss.exceptions( std::ifstream::eofbit | std::ifstream::failbit | std::ifstream::badbit );
-  try
-  {
-    iss >> value;
-    return ( true );
-  }
-  catch ( ... )
-  {
-    return ( false );
-  }
-}
 
 // Export a value to a string
-
 template< class T >
-std::string to_string( T val )
+std::string ToString( T val )
 {
   std::ostringstream oss;
   oss << val;
@@ -146,7 +127,7 @@ std::string to_string( T val )
 // Export a value to a string with percision control
 
 template< class T >
-std::string to_string( T val, int precision )
+std::string ToString( T val, int precision )
 {
   std::ostringstream oss;
   oss.precision( precision );
@@ -155,23 +136,20 @@ std::string to_string( T val, int precision )
 }
 
 // Convert string to upper or lower case 
-std::string string_to_upper( std::string );
-std::string string_to_lower( std::string );
+std::string StringToUpper( std::string );
+std::string StringToLower( std::string );
 
 // Special cases that need additional rules to deal with inf and nan
-bool from_string( const std::string &str, double &value );
-bool from_string( const std::string &str, float &value );
-
-bool from_string_internal( const std::string &str, double &value );
-bool from_string_internal( const std::string &str, float &value );
+bool FromString( const std::string &str, double &value );
+bool FromString( const std::string &str, float &value );
 
 // Functions to strip out spaces at the start or at both ends of the string
-void strip_spaces( std::string& str );
-void strip_surrounding_spaces( std::string& str );
+void StripSpaces( std::string& str );
+void StripSurroundingSpaces( std::string& str );
 
 // Function to split a list of options delimited by a characher into a vector of
 // strings
-std::vector<std::string> split_string( const std::string& str, const std::string& delimiter );
+std::vector<std::string> SplitString( const std::string& str, const std::string& delimiter );
 
 } // End namespace Utils
 

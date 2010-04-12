@@ -40,7 +40,7 @@ StateOption::StateOption( const std::string& stateid, const std::string& default
   value_( default_value )
 {
   // Unwrap the option lists
-  this->option_list_ = Utils::split_string( Utils::string_to_lower( option_list), "|" );
+  this->option_list_ = Utils::SplitString( Utils::StringToLower( option_list), "|" );
 
   option_list_iterator_type it = 
     std::find( this->option_list_.begin(), this->option_list_.end(), this->value_ );
@@ -60,7 +60,7 @@ StateOption::StateOption( const std::string& stateid, const std::string& default
   option_list_.resize( option_list.size() );
   for ( size_t j = 0; j < option_list.size(); j++ )
   {
-    option_list_[ j ] = Utils::string_to_lower( option_list[ j ] );
+    option_list_[ j ] = Utils::StringToLower( option_list[ j ] );
   }
 
   option_list_iterator_type it = 
@@ -87,7 +87,7 @@ bool StateOption::set( const std::string& input_value, ActionSource source )
   // Lock the state engine so no other thread will be accessing it
   StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
 
-  std::string value = Utils::string_to_lower( input_value );
+  std::string value = Utils::StringToLower( input_value );
   if ( value != this->value_ )
   {
     option_list_iterator_type it = 
@@ -150,7 +150,7 @@ bool StateOption::validate_variant( ActionParameterVariant& variant, std::string
     return ( false );
   }
 
-  value = Utils::string_to_lower( value );
+  value = Utils::StringToLower( value );
   if ( option_list_.end() == std::find( option_list_.begin(), option_list_.end(), value ) )
   {
     error = "Option '" + value + "' is not a valid option";
@@ -164,7 +164,7 @@ bool StateOption::validate_variant( ActionParameterVariant& variant, std::string
 bool StateOption::is_option( const std::string& option )
 {
   if ( option_list_.end() == std::find( option_list_.begin(), option_list_.end(),
-      Utils::string_to_lower( option ) ) ) return ( false );
+      Utils::StringToLower( option ) ) ) return ( false );
   return ( true );
 }
 
@@ -199,7 +199,7 @@ void StateOption::set_option_list( const std::vector< std::string >& option_list
 void StateOption::set_option_list( const std::string& option_list )
 {
   // Unwrap the option lists
-  std::string option_list_string = Utils::string_to_lower( option_list );
+  std::string option_list_string = Utils::StringToLower( option_list );
 
   option_list_.clear();
   while ( 1 )
@@ -242,7 +242,7 @@ void StateOption::set_option_list( const std::string& option_list )
 void StateOption::set_option_list( const std::string& option_list, const std::string& option )
 {
   // Unwrap the option lists
-  std::string option_list_string = Utils::string_to_lower( option_list );
+  std::string option_list_string = Utils::StringToLower( option_list );
 
   option_list_.clear();
   while ( 1 )
@@ -257,7 +257,7 @@ void StateOption::set_option_list( const std::string& option_list, const std::st
     option_list_string = option_list_string.substr( loc + 1 );
   }
 
-  std::string lower_option = Utils::string_to_lower( option );
+  std::string lower_option = Utils::StringToLower( option );
 
   option_list_iterator_type it = 
     std::find( this->option_list_.begin(), this->option_list_.end(), lower_option );

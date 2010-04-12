@@ -100,7 +100,7 @@ bool QtRenderResourcesContext::create_render_context( Utils::RenderContextHandle
       shared_widget_->context()->device() ) );
   qt_context->create( shared_widget_->context() );
 
-  SCI_LOG_DEBUG( std::string("qt_context->valid = ") + Utils::to_string( qt_context->isValid() ) );
+  SCI_LOG_DEBUG( std::string("qt_context->valid = ") + Utils::ToString( qt_context->isValid() ) );
 
   // Bind the new context in the GUI independent wrapper class
   context = Utils::RenderContextHandle( new QtRenderContext( qt_context ) );

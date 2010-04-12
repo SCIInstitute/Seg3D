@@ -190,7 +190,7 @@ void Renderer::initialize()
   this->add_connection( ViewerManager::Instance()->get_viewer( this->viewer_id_ )
     ->redraw_signal_.connect( boost::bind( &Renderer::redraw, this ) ) );
 
-  SCI_LOG_DEBUG( std::string("Renderer ") + Utils::to_string( this->viewer_id_ ) 
+  SCI_LOG_DEBUG( std::string("Renderer ") + Utils::ToString( this->viewer_id_ ) 
     + " initialized with context " + this->context_->to_string() );
 }
 
@@ -230,7 +230,7 @@ void Renderer::redraw()
     this->redraw_needed_ = false;
   }
 
-  SCI_LOG_DEBUG( std::string("Renderer ") + Utils::to_string( this->viewer_id_ ) 
+  SCI_LOG_DEBUG( std::string("Renderer ") + Utils::ToString( this->viewer_id_ ) 
     + ": starting redraw" );
 
   // lock the active render texture
@@ -408,7 +408,7 @@ void Renderer::redraw()
   // release the lock on the active render texture
   texture_lock.unlock();
 
-  SCI_LOG_DEBUG( std::string("Renderer ") + Utils::to_string( this->viewer_id_ ) 
+  SCI_LOG_DEBUG( std::string("Renderer ") + Utils::ToString( this->viewer_id_ ) 
     + ": done redraw" );
 
   // signal rendering completed
@@ -441,7 +441,7 @@ void Renderer::redraw_overlay()
     return;
   }
 
-  SCI_LOG_DEBUG( std::string("Renderer ") + Utils::to_string( this->viewer_id_ ) 
+  SCI_LOG_DEBUG( std::string("Renderer ") + Utils::ToString( this->viewer_id_ ) 
     + ": starting redraw overlay" );
 
   // lock the active render texture

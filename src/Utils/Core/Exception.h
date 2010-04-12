@@ -55,9 +55,7 @@ class Exception
 
 public:
   // Constructor/destructor
-  Exception(std::string message,
-    unsigned int line,
-    const char* file);
+  Exception( std::string message, unsigned int line, const char* file );
 
   virtual ~Exception();
 
@@ -78,9 +76,7 @@ class LogicError : public Exception
 
 public:
   // Constructor/destructor
-  LogicError(std::string message,
-    unsigned int line,
-    const char* file);
+  LogicError( std::string message, unsigned int line, const char* file );
 
   virtual ~LogicError();
 
@@ -93,9 +89,7 @@ class RunTimeError : public Exception
 
 public:
   // Constructor/destructor
-  RunTimeError(std::string message,
-    unsigned int line,
-    const char* file);
+  RunTimeError( std::string message, unsigned int line, const char* file );
 
   virtual ~RunTimeError();
 
@@ -108,9 +102,7 @@ class NotImplementedError : public Exception
 
 public:
   // Constructor/destructor
-  NotImplementedError(std::string message,
-    unsigned int line,
-    const char* file);
+  NotImplementedError( std::string message, unsigned int line, const char* file );
 
   virtual ~NotImplementedError();
 
@@ -123,9 +115,7 @@ class InvalidArgument : public LogicError
 
 public:
   // Constructor/destructor
-  InvalidArgument(std::string message,
-    unsigned int line,
-    const char* file);
+  InvalidArgument( std::string message, unsigned int line, const char* file );
 
   virtual ~InvalidArgument();
 
@@ -138,9 +128,7 @@ class LengthError : public LogicError
 
 public:
   // Constructor/destructor
-  LengthError(std::string message,
-    unsigned int line,
-    const char* file);
+  LengthError( std::string message, unsigned int line, const char* file );
 
   virtual ~LengthError();
 
@@ -153,9 +141,7 @@ class OutOfRange : public LogicError
 
 public:
   // Constructor/destructor
-  OutOfRange(std::string message,
-    unsigned int line,
-    const char* file);
+  OutOfRange( std::string message, unsigned int line, const char* file );
 
   virtual ~OutOfRange();
 
@@ -168,9 +154,7 @@ class RangeError : public RunTimeError
 
 public:
   // Constructor/destructor
-  RangeError(std::string message,
-    unsigned int line,
-    const char* file);
+  RangeError( std::string message, unsigned int line, const char* file );
 
   virtual ~RangeError();
 
@@ -183,9 +167,7 @@ class OverflowError : public RunTimeError
 
 public:
   // Constructor/destructor
-  OverflowError(std::string message,
-    unsigned int line,
-    const char* file);
+  OverflowError( std::string message, unsigned int line, const char* file );
 
   virtual ~OverflowError();
 
@@ -198,9 +180,7 @@ class UnderflowError : public RunTimeError
 
 public:
   // Constructor/destructor
-  UnderflowError(std::string message,
-    unsigned int line,
-    const char* file);
+  UnderflowError( std::string message, unsigned int line, const char* file );
 
   virtual ~UnderflowError();
 
@@ -211,9 +191,7 @@ public:
 class OpenGLException : public Utils::Exception
 {
 public:
-  OpenGLException(std::string message, 
-    unsigned int line, 
-    const char* file);
+  OpenGLException( std::string message, unsigned int line, const char* file );
   
   // Constructor/destructor
   virtual ~OpenGLException();

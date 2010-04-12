@@ -54,11 +54,10 @@ std::string Log::header( const int line, const char* file ) const
 
   boost::posix_time::ptime timestamp( boost::posix_time::second_clock::local_time() );
 
-  std::string header_string = std::string( "[" ) + boost::posix_time::to_simple_string( timestamp ) + 
-    std::string("|") + filename.filename() +  std::string( "|" ) + to_string( line ) + 
-    std::string( "]" );
-  //  if (header_string.size() < 60) header_string += std::string(60-header_string.size(),' ');
-  //  else header_string = header_string.substr(0,60);
+  std::string header_string = std::string( "[" ) + 
+    boost::posix_time::to_simple_string( timestamp ) + 
+    std::string("|") + filename.filename() +  
+    std::string( "|" ) + ToString( line ) + std::string( "]" );
   return header_string;
 }
 

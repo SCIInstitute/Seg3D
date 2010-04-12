@@ -137,8 +137,8 @@ protected:
     variant.get_value( value );
     if ( value < min_value_ || value > max_value_ )
     {
-      error = "Value " + Utils::to_string( value ) + "is out of range [" + Utils::to_string(
-          min_value_ ) + "," + Utils::to_string( max_value_ ) + "]";
+      error = "Value " + Utils::ToString( value ) + "is out of range [" + Utils::ToString(
+          min_value_ ) + "," + Utils::ToString( max_value_ ) + "]";
       return ( false );
     }
     error = "";

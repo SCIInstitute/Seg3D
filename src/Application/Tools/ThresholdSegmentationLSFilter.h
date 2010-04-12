@@ -37,8 +37,7 @@ namespace Seg3D
 class ThresholdSegmentationLSFilter : public Tool
 {
 SCI_TOOL_TYPE( "ThresholdSegmentationLSFilter", "Segmentation Level Set", "Alt+L",
-  ToolGroupType::DATATOMASK_E|ToolGroupType::FILTER_E,
-  "http://seg3d.org/")
+  ToolGroupType::DATATOMASK_E|ToolGroupType::FILTER_E, "http://seg3d.org/")
 
 public:
   ThresholdSegmentationLSFilter( const std::string& toolid );

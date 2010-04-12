@@ -184,7 +184,7 @@ void AppInterface::add_windowids()
 
 void AppInterface::show_window( const std::string& windowid )
 {
-  std::string lower_windowid = Utils::string_to_lower( windowid );
+  std::string lower_windowid = Utils::StringToLower( windowid );
   if ( lower_windowid == "controller" )
   {
     if ( controller_interface_.isNull() )
@@ -272,7 +272,7 @@ void AppInterface::show_window( const std::string& windowid )
 
 void AppInterface::close_window( const std::string& windowid )
 {
-  std::string lower_windowid = Utils::string_to_lower( windowid );
+  std::string lower_windowid = Utils::StringToLower( windowid );
   if ( lower_windowid == "controller" )
   {
     if ( !( controller_interface_.isNull() ) )

@@ -158,7 +158,7 @@ public:
   bool set( const T& value, ActionSource source = ActionSource::NONE_E )
   {
     SCI_LOG_DEBUG(std::string("Set Value ")+ stateid() +
-      std::string(" ") + Utils::to_string(value));
+      std::string(" ") + Utils::ToString(value));
 
     // Lock the state engine so no other thread will be accessing it
     StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );

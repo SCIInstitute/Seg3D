@@ -36,7 +36,7 @@ Texture::Texture()
 {
   glGenTextures( 1, &this->texture_id_ );
   SCI_LOG_DEBUG( std::string( "Texture generated: " ) + 
-    Utils::to_string( this->texture_id_ ) + " in context " + 
+    Utils::ToString( this->texture_id_ ) + " in context " + 
     RenderResources::Instance()->get_current_context_string() );
   if ( this->texture_id_ == 0 )
   {

@@ -73,7 +73,7 @@ void QtRenderWidget::update_texture( Utils::TextureHandle texture )
     return;
   }
 
-  SCI_LOG_DEBUG(std::string("QtRenderWidget ") + Utils::to_string(this->viewer_id_)
+  SCI_LOG_DEBUG(std::string("QtRenderWidget ") + Utils::ToString(this->viewer_id_)
     + ": received new texture");
   renderer_texture_ = texture;
   
@@ -90,7 +90,7 @@ void QtRenderWidget::update_overlay_texture( Utils::TextureHandle texture )
     return;
   }
 
-  SCI_LOG_DEBUG(std::string("QtRenderWidget ") + Utils::to_string(this->viewer_id_)
+  SCI_LOG_DEBUG(std::string("QtRenderWidget ") + Utils::ToString(this->viewer_id_)
     + ": received new overlay texture");
   this->overlay_texture_ = texture;
   
@@ -168,7 +168,7 @@ void QtRenderWidget::resizeGL( int width, int height )
   this->viewer_->resize( width, height );
   if ( renderer_.get() )
   {
-    SCI_LOG_DEBUG(std::string("QtRenderWidget ") + Utils::to_string(this->viewer_id_)
+    SCI_LOG_DEBUG(std::string("QtRenderWidget ") + Utils::ToString(this->viewer_id_)
       + ": sending resize event to renderer");
     renderer_->resize( width, height );
     // Make sure the GL context of the widget is the current one of this thread,

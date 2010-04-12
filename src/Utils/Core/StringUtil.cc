@@ -35,7 +35,7 @@
 namespace Utils
 {
 
-std::string string_to_upper( std::string str )
+std::string StringToUpper( std::string str )
 {
   std::string::iterator iter = str.begin();
   std::string::iterator iend = str.end();
@@ -44,7 +44,7 @@ std::string string_to_upper( std::string str )
   return str;
 }
 
-std::string string_to_lower( std::string str )
+std::string StringToLower( std::string str )
 {
   std::string::iterator iter = str.begin();
   std::string::iterator iend = str.end();
@@ -53,7 +53,7 @@ std::string string_to_lower( std::string str )
   return str;
 }
 
-bool from_string( const std::string &str, double &value )
+bool FromString( const std::string &str, double &value )
 {
   // Clear out any markup of the numbers that make it easier to read and
   // replace it all with spaces.
@@ -113,56 +113,7 @@ bool from_string( const std::string &str, double &value )
   }
 }
 
-// interal version skips the cleanup phase
-bool from_string_internal( const std::string &data, double &value )
-{
-  // Handle special cases: nan, inf, and -inf
-
-  // handle nan
-  if ( data.size() > 2 && ( data[ 0 ] == 'n' || data[ 0 ] == 'N' ) && ( data[ 1 ] == 'A'
-      || data[ 1 ] == 'A' ) && ( data[ 2 ] == 'n' || data[ 2 ] == 'N' ) )
-  {
-    value = std::numeric_limits< double >::quiet_NaN();
-    return ( true );
-  }
-  // handle inf
-  else if ( data.size() > 2 && ( data[ 0 ] == 'i' || data[ 0 ] == 'I' ) && ( data[ 1 ] == 'n'
-      || data[ 1 ] == 'N' ) && ( data[ 2 ] == 'f' || data[ 2 ] == 'F' ) )
-  {
-    value = std::numeric_limits< double >::infinity();
-    return ( true );
-  }
-  // handle +inf and -inf
-  else if ( data.size() > 3 && ( data[ 0 ] == '-' || data[ 0 ] == '+' ) && ( data[ 1 ] == 'i'
-      || data[ 1 ] == 'I' ) && ( data[ 2 ] == 'n' || data[ 2 ] == 'N' ) && ( data[ 3 ] == 'f'
-      || data[ 3 ] == 'F' ) )
-  {
-    if ( data[ 0 ] == '-' )
-    {
-      value = -std::numeric_limits< double >::infinity();
-    }
-    else
-    {
-      value = std::numeric_limits< double >::infinity();
-    }
-
-    return ( true );
-  }
-
-  std::istringstream iss( data );
-  iss.exceptions( std::ifstream::eofbit | std::ifstream::failbit | std::ifstream::badbit );
-  try
-  {
-    iss >> value;
-    return ( true );
-  }
-  catch ( ... )
-  {
-    return ( false );
-  }
-}
-
-bool from_string( const std::string &str, float &value )
+bool FromString( const std::string &str, float &value )
 {
   // Clear out any markup of the numbers that make it easier to read and
   // replace it all with spaces.
@@ -222,112 +173,8 @@ bool from_string( const std::string &str, float &value )
   }
 }
 
-// internal version skips the cleanup
-bool from_string_internal( const std::string &data, float &value )
-{
-  // Handle special cases: nan, inf, and -inf
-  // Handle special cases: nan, inf, and -inf
-
-  // handle nan
-  if ( data.size() > 2 && ( data[ 0 ] == 'n' || data[ 0 ] == 'N' ) && ( data[ 1 ] == 'A'
-      || data[ 1 ] == 'A' ) && ( data[ 2 ] == 'n' || data[ 2 ] == 'N' ) )
-  {
-    value = std::numeric_limits< float >::quiet_NaN();
-    return ( true );
-  }
-  // handle inf
-  else if ( data.size() > 2 && ( data[ 0 ] == 'i' || data[ 0 ] == 'I' ) && ( data[ 1 ] == 'n'
-      || data[ 1 ] == 'N' ) && ( data[ 2 ] == 'f' || data[ 2 ] == 'F' ) )
-  {
-    value = std::numeric_limits< float >::infinity();
-    return ( true );
-  }
-  // handle +inf and -inf
-  else if ( data.size() > 3 && ( data[ 0 ] == '-' || data[ 0 ] == '+' ) && ( data[ 1 ] == 'i'
-      || data[ 1 ] == 'I' ) && ( data[ 2 ] == 'n' || data[ 2 ] == 'N' ) && ( data[ 3 ] == 'f'
-      || data[ 3 ] == 'F' ) )
-  {
-    if ( data[ 0 ] == '-' )
-    {
-      value = -std::numeric_limits< float >::infinity();
-    }
-    else
-    {
-      value = std::numeric_limits< float >::infinity();
-    }
-
-    return ( true );
-  }
-
-  std::istringstream iss( data );
-  iss.exceptions( std::ifstream::eofbit | std::ifstream::failbit | std::ifstream::badbit );
-  try
-  {
-    iss >> value;
-    return ( true );
-  }
-  catch ( ... )
-  {
-    return ( false );
-  }
-}
-
-bool from_string( const std::string &str, int &value )
-{
-  std::string dstr = str + "\0";
-  char *eptr = 0;
-  value = static_cast< int > ( strtol( &( dstr[ 0 ] ), &eptr, 0 ) );
-  if ( eptr == &( dstr[ 0 ] ) ) return ( false );
-  return ( true );
-}
-
-bool from_string(const std::string &str, unsigned int &value)
-{
-  std::string dstr = str+ "\0";
-  char *eptr = 0;
-  value = static_cast<unsigned int>(strtol(&(dstr[0]),&eptr,0));
-  if (eptr == &(dstr[0])) return (false);
-  return (true);
-}
-
-bool from_string( const std::string &str, long &value )
-{
-  std::string dstr = str + "\0";
-  char *eptr = 0;
-  value = static_cast< long > ( strtol( &( dstr[ 0 ] ), &eptr, 0 ) );
-  if ( eptr == &( dstr[ 0 ] ) ) return ( false );
-  return ( true );
-}
-
-bool from_string(const std::string &str, unsigned long &value)
-{
-  std::string dstr = str+ "\0";
-  char *eptr;
-  value = static_cast<unsigned long>(strtol(&(dstr[0]),&eptr,0));
-  if (eptr == &(dstr[0])) return (false);
-  return (true);
-}
-
-bool from_string(const std::string &str, long long &value)
-{
-  std::string dstr = str+ "\0";
-  char *eptr;
-  value = static_cast<long long>(strtol(&(dstr[0]),&eptr,0));
-  if (eptr == &(dstr[0])) return (false);
-  return (true);
-}
-
-bool from_string(const std::string &str, unsigned long long &value)
-{
-  std::string dstr = str+ "\0";
-  char *eptr;
-  value = static_cast<unsigned long long>(strtol(&(dstr[0]),&eptr,0));
-  if (eptr == &(dstr[0])) return (false);
-  return (true);
-}
-
 // Strip out space at the start and at the end of the string
-void strip_spaces( std::string& str )
+void StripSpaces( std::string& str )
 {
   size_t esize = str.size();
   size_t idx = 0;
@@ -342,7 +189,7 @@ void strip_spaces( std::string& str )
 }
 
 // Strip out space at the start and at the end of the string
-void strip_surrounding_spaces( std::string& str )
+void StripSurroundingSpaces( std::string& str )
 {
   size_t esize = str.size();
   size_t idx = 0;
@@ -366,7 +213,7 @@ void strip_surrounding_spaces( std::string& str )
 
 // Function to split a list of options delimited by a characher into a vector of
 // strings
-std::vector<std::string> split_string(const std::string& str, const std::string& delimiter)
+std::vector<std::string> SplitString(const std::string& str, const std::string& delimiter)
 {
   std::string option_list_string = str;
   std::vector<std::string> option_list;

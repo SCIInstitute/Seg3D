@@ -198,18 +198,18 @@ void LayerImporterWidget::list_import_options()
   
   Utils::GridTransform grid_transform = importer_->get_grid_transform();
   private_->ui_.x_size_->setText( 
-    QString::fromStdString( Utils::to_string( grid_transform.get_nx() ) ) );
+    QString::fromStdString( Utils::ToString( grid_transform.get_nx() ) ) );
   private_->ui_.y_size_->setText( 
-    QString::fromStdString( Utils::to_string( grid_transform.get_ny() ) ) );
+    QString::fromStdString( Utils::ToString( grid_transform.get_ny() ) ) );
   private_->ui_.z_size_->setText( 
-    QString::fromStdString( Utils::to_string( grid_transform.get_nz() ) ) );
+    QString::fromStdString( Utils::ToString( grid_transform.get_nz() ) ) );
 
   private_->ui_.x_spacing_->setText( 
-    QString::fromStdString( Utils::to_string( grid_transform.spacing_x() ) ) );
+    QString::fromStdString( Utils::ToString( grid_transform.spacing_x() ) ) );
   private_->ui_.y_spacing_->setText( 
-    QString::fromStdString( Utils::to_string( grid_transform.spacing_y() ) ) );
+    QString::fromStdString( Utils::ToString( grid_transform.spacing_y() ) ) );
   private_->ui_.z_spacing_->setText( 
-    QString::fromStdString( Utils::to_string( grid_transform.spacing_z() ) ) );
+    QString::fromStdString( Utils::ToString( grid_transform.spacing_z() ) ) );
 
   // Step (4): Add connections for selecting and importing the data
   connect( private_->ui_.data_, SIGNAL( released() ), 

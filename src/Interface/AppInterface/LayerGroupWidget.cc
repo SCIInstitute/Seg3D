@@ -91,9 +91,9 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
   this->setAcceptDrops( true );
 
   // set some values of the GUI
-  std::string group_name = Utils::to_string( group->get_grid_transform().get_nx() ) + " x " +
-    Utils::to_string( group->get_grid_transform().get_ny() ) + " x " +
-    Utils::to_string( group->get_grid_transform().get_nz() );
+  std::string group_name = Utils::ToString( group->get_grid_transform().get_nx() ) + " x " +
+    Utils::ToString( group->get_grid_transform().get_ny() ) + " x " +
+    Utils::ToString( group->get_grid_transform().get_nz() );
   this->private_->ui_.activate_button_->setText( QString::fromStdString( group_name ) );
 
   // hide the tool bars 

@@ -95,11 +95,11 @@ int main( int argc, char **argv )
   if ( Application::Instance()->check_command_line_parameter( "socket", port_number_string ) )
   {
     int port_number;
-    if ( Utils::from_string( port_number_string, port_number) )
+    if ( Utils::FromString( port_number_string, port_number) )
     {
       // -- Add a socket for receiving actions --
       SCI_LOG_DEBUG( std::string("Starting a socket on port: ") + 
-        Utils::to_string( port_number ) );
+        Utils::ToString( port_number ) );
       ActionSocket::Instance()->start( port_number );
     }
   }

@@ -37,8 +37,8 @@ Exception::Exception(std::string message,
   unsigned int line,
   const char* file)
 {
-  message_ = std::string("[")+file+std::string(":")+to_string(line)+
-  std::string("] ERROR: ")+message;
+  message_ = std::string("[") + file + std::string(":") + ToString(line) + 
+    std::string("] ERROR: ") + message;
 }
 
 Exception::~Exception()
@@ -55,10 +55,8 @@ std::string Exception::message() const
   return message_;
 }
 
-NotImplementedError::NotImplementedError(std::string message,
-  unsigned int line,
-  const char* file) :
-Exception(message,line,file)
+NotImplementedError::NotImplementedError( std::string message, unsigned int line, const char* file) :
+  Exception(message,line,file)
 {
 }
 
@@ -71,10 +69,8 @@ std::string NotImplementedError::what() const
   return std::string( "NotImplemented" );
 }
 
-LogicError::LogicError(std::string message,
-  unsigned int line,
-  const char* file) :
-Exception(message,line,file)
+LogicError::LogicError( std::string message, unsigned int line, const char* file) :
+  Exception(message,line,file)
 {
 }
 
@@ -87,10 +83,8 @@ std::string LogicError::what() const
   return std::string( "LogicError" );
 }
 
-RunTimeError::RunTimeError(std::string message,
-  unsigned int line,
-  const char* file) :
-Exception(message,line,file)
+RunTimeError::RunTimeError( std::string message, unsigned int line, const char* file) :
+  Exception(message,line,file)
 {
 }
 
@@ -103,10 +97,8 @@ std::string RunTimeError::what() const
   return std::string( "RunTimeError" );
 }
 
-InvalidArgument::InvalidArgument(std::string message,
-  unsigned int line,
-  const char* file) :
-LogicError(message,line,file)
+InvalidArgument::InvalidArgument( std::string message, unsigned int line, const char* file) :
+  LogicError(message,line,file)
 {
 }
 
@@ -119,10 +111,8 @@ std::string InvalidArgument::what() const
   return std::string( "InvalidArgument" );
 }
 
-LengthError::LengthError(std::string message,
-  unsigned int line,
-  const char* file) :
-LogicError(message,line,file)
+LengthError::LengthError( std::string message, unsigned int line, const char* file) :
+  LogicError(message,line,file)
 {
 }
 
@@ -135,10 +125,8 @@ std::string LengthError::what() const
   return std::string( "LengthError" );
 }
 
-OutOfRange::OutOfRange(std::string message,
-  unsigned int line,
-  const char* file) :
-LogicError(message,line,file)
+OutOfRange::OutOfRange( std::string message, unsigned int line, const char* file ) :
+  LogicError(message,line,file)
 {
 }
 
@@ -151,10 +139,8 @@ std::string OutOfRange::what() const
   return std::string( "OutOfRange" );
 }
 
-RangeError::RangeError(std::string message,
-  unsigned int line,
-  const char* file) :
-RunTimeError(message,line,file)
+RangeError::RangeError( std::string message, unsigned int line, const char* file ) :
+  RunTimeError(message,line,file)
 {
 }
 
@@ -167,10 +153,8 @@ std::string RangeError::what() const
   return std::string( "RangeError" );
 }
 
-OverflowError::OverflowError(std::string message,
-  unsigned int line,
-  const char* file) :
-RunTimeError(message,line,file)
+OverflowError::OverflowError( std::string message, unsigned int line, const char* file ) :
+  RunTimeError(message,line,file)
 {
 }
 
@@ -183,10 +167,8 @@ std::string OverflowError::what() const
   return std::string( "OverflowError" );
 }
 
-UnderflowError::UnderflowError(std::string message,
-  unsigned int line,
-  const char* file) :
-RunTimeError(message,line,file)
+UnderflowError::UnderflowError( std::string message, unsigned int line, const char* file ) :
+  RunTimeError(message,line,file)
 {
 }
 
@@ -199,8 +181,7 @@ std::string UnderflowError::what() const
   return std::string( "UnderflowError" );
 }
 
-OpenGLException::OpenGLException( std::string message,
-  unsigned int line, const char* file ) :
+OpenGLException::OpenGLException( std::string message, unsigned int line, const char* file ) :
   Exception( message, line, file )
 {
 }

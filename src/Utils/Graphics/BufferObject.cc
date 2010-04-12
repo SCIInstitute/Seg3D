@@ -40,7 +40,7 @@ BufferObject::BufferObject() :
 {
   glGenBuffers( 1, &( this->id_ ) );
   SCI_LOG_DEBUG( std::string( "Buffer object generated: " ) + 
-    Utils::to_string( this->id_ ) );
+    Utils::ToString( this->id_ ) );
 }
 
 BufferObject::BufferObject( const BufferObjectHandle& bo ) :

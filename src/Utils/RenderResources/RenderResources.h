@@ -150,7 +150,7 @@ public:
   GLenum err = glGetError();\
   if (err != GL_NO_ERROR)\
   {\
-    SCI_LOG_ERROR(std::string("OpenGL error ") + Utils::to_string(err) + ": " + \
+    SCI_LOG_ERROR(std::string("OpenGL error ") + Utils::ToString(err) + ": " + \
       reinterpret_cast<const char*>(gluErrorString(err)));\
   }\
 }

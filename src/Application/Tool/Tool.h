@@ -129,7 +129,7 @@ public:
 
 #define SCI_TOOL_TYPE(type_string,menu_name_string,shortcut_key_string,properties_mask,help_url) \
   public: \
-    static std::string Type() { return Utils::string_to_lower(type_string); } \
+    static std::string Type() { return Utils::StringToLower(type_string); } \
     static std::string MenuName() { return menu_name_string; } \
     static std::string ShortcutKey() { return shortcut_key_string; } \
     static int         Properties() { return properties_mask; } \

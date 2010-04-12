@@ -219,7 +219,7 @@ void register_tool()
   lock_type lock( mutex_ );
 
   // Get the type of the tool
-  std::string tool_type = Utils::string_to_lower( TOOL::Type() );
+  std::string tool_type = Utils::StringToLower( TOOL::Type() );
 
   // Test is tool was registered before.
   if ( tools_.find( tool_type ) != tools_.end() )
