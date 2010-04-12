@@ -180,7 +180,7 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
       QString::number(group->get_grid_transform().get_nz()) );
       
       QFont font;
-        font.setPointSize(8);
+        font.setPointSize(10);
         this->private_->ui_.x_axis_label_current_->setFont(font);
         this->private_->ui_.y_axis_label_current_->setFont(font);
         this->private_->ui_.z_axis_label_current_->setFont(font);
@@ -292,19 +292,6 @@ void LayerGroupWidget::insert_layer( LayerHandle layer, int index )
   this->repaint();
 }
 
-
-//bool LayerGroupWidget::delete_layer( LayerHandle layer )
-//{ 
-//  for( int i = 0; i < layer_list_.size(); ++i)
-//  {
-//        if( layer->get_layer_id() == layer_list_[i]->get_layer_id() )
-//      {
-//      //layer_list_[i]->needs_deleted_ = true;
-//          return true;
-//      }
-//  }  
-//  return false;  
-//}
   
 bool LayerGroupWidget::delete_layer( LayerHandle layer )
 { 
@@ -390,6 +377,7 @@ void LayerGroupWidget::show_selection_checkboxes( bool show )
   for( int i = 0; i < layer_list_.size(); ++i)
   {
     layer_list_[i]->show_selection_checkbox( show );
+    layer_list_[i]->set_group_menu_status( show );
   }
 }
 

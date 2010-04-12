@@ -911,7 +911,7 @@ QWidget#group_tools_{
                 </property>
                 <property name="font">
                  <font>
-                  <pointsize>10</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -966,10 +966,10 @@ QWidget#group_tools_{
                <enum>QTabWidget::Rounded</enum>
               </property>
               <property name="currentIndex">
-               <number>0</number>
+               <number>1</number>
               </property>
               <property name="elideMode">
-               <enum>Qt::ElideNone</enum>
+               <enum>Qt::ElideRight</enum>
               </property>
               <widget class="QWidget" name="tab">
                <property name="minimumSize">
@@ -999,7 +999,7 @@ QWidget#group_tools_{
                 </property>
                 <item>
                  <widget class="QWidget" name="widget" native="true">
-                  <layout class="QHBoxLayout" name="horizontalLayout_11">
+                  <layout class="QVBoxLayout" name="horizontalLayout_11">
                    <property name="spacing">
                     <number>2</number>
                    </property>
@@ -1014,6 +1014,11 @@ QWidget#group_tools_{
                        <height>0</height>
                       </size>
                      </property>
+                     <property name="font">
+                      <font>
+                       <pointsize>11</pointsize>
+                      </font>
+                     </property>
                      <property name="text">
                       <string>X:</string>
                      </property>
@@ -1024,7 +1029,7 @@ QWidget#group_tools_{
                 </item>
                 <item>
                  <widget class="QWidget" name="widget_2" native="true">
-                  <layout class="QHBoxLayout" name="horizontalLayout_12">
+                  <layout class="QVBoxLayout" name="horizontalLayout_12">
                    <property name="spacing">
                     <number>2</number>
                    </property>
@@ -1039,6 +1044,11 @@ QWidget#group_tools_{
                        <height>0</height>
                       </size>
                      </property>
+                     <property name="font">
+                      <font>
+                       <pointsize>11</pointsize>
+                      </font>
+                     </property>
                      <property name="text">
                       <string>Y:</string>
                      </property>
@@ -1049,7 +1059,7 @@ QWidget#group_tools_{
                 </item>
                 <item>
                  <widget class="QWidget" name="widget_3" native="true">
-                  <layout class="QHBoxLayout" name="horizontalLayout_14">
+                  <layout class="QVBoxLayout" name="horizontalLayout_14">
                    <property name="spacing">
                     <number>2</number>
                    </property>
@@ -1063,6 +1073,11 @@ QWidget#group_tools_{
                        <width>10</width>
                        <height>0</height>
                       </size>
+                     </property>
+                     <property name="font">
+                      <font>
+                       <pointsize>11</pointsize>
+                      </font>
                      </property>
                      <property name="text">
                       <string>Z:</string>
@@ -1117,6 +1132,11 @@ QWidget#group_tools_{
                        <height>0</height>
                       </size>
                      </property>
+                     <property name="font">
+                      <font>
+                       <pointsize>11</pointsize>
+                      </font>
+                     </property>
                      <property name="text">
                       <string>Width:</string>
                      </property>
@@ -1142,6 +1162,11 @@ QWidget#group_tools_{
                        <height>0</height>
                       </size>
                      </property>
+                     <property name="font">
+                      <font>
+                       <pointsize>11</pointsize>
+                      </font>
+                     </property>
                      <property name="text">
                       <string>Height:</string>
                      </property>
@@ -1166,6 +1191,11 @@ QWidget#group_tools_{
                        <width>36</width>
                        <height>0</height>
                       </size>
+                     </property>
+                     <property name="font">
+                      <font>
+                       <pointsize>11</pointsize>
+                      </font>
                      </property>
                      <property name="text">
                       <string>Depth:</string>
@@ -1208,6 +1238,11 @@ QWidget#group_tools_{
                    <height>0</height>
                   </size>
                  </property>
+                 <property name="font">
+                  <font>
+                   <pointsize>12</pointsize>
+                  </font>
+                 </property>
                  <property name="toolTip">
                   <string>Check this box to replace the current layer with the cropped one</string>
                  </property>
@@ -1238,7 +1273,7 @@ QWidget#group_tools_{
                  </property>
                  <property name="font">
                   <font>
-                   <pointsize>10</pointsize>
+                   <pointsize>12</pointsize>
                   </font>
                  </property>
                  <property name="text">
@@ -1294,7 +1329,7 @@ QWidget#group_tools_{
                </font>
               </property>
               <property name="currentIndex">
-               <number>1</number>
+               <number>0</number>
               </property>
               <widget class="QWidget" name="flip_tab_">
                <property name="minimumSize">
@@ -1333,6 +1368,11 @@ QWidget#group_tools_{
                     <height>23</height>
                    </size>
                   </property>
+                  <property name="font">
+                   <font>
+                    <pointsize>12</pointsize>
+                   </font>
+                  </property>
                   <property name="text">
                    <string>Axial</string>
                   </property>
@@ -1358,6 +1398,11 @@ QWidget#group_tools_{
                     <height>23</height>
                    </size>
                   </property>
+                  <property name="font">
+                   <font>
+                    <pointsize>12</pointsize>
+                   </font>
+                  </property>
                   <property name="text">
                    <string>Coronal</string>
                   </property>
@@ -1382,6 +1427,11 @@ QWidget#group_tools_{
                     <width>16777215</width>
                     <height>23</height>
                    </size>
+                  </property>
+                  <property name="font">
+                   <font>
+                    <pointsize>12</pointsize>
+                   </font>
                   </property>
                   <property name="text">
                    <string>Sagittal</string>
@@ -1427,6 +1477,11 @@ QWidget#group_tools_{
                     <height>23</height>
                    </size>
                   </property>
+                  <property name="font">
+                   <font>
+                    <pointsize>12</pointsize>
+                   </font>
+                  </property>
                   <property name="text">
                    <string>Axial - Coronal</string>
                   </property>
@@ -1452,6 +1507,11 @@ QWidget#group_tools_{
                     <height>23</height>
                    </size>
                   </property>
+                  <property name="font">
+                   <font>
+                    <pointsize>12</pointsize>
+                   </font>
+                  </property>
                   <property name="text">
                    <string>Axial - Sagittal</string>
                   </property>
@@ -1476,6 +1536,11 @@ QWidget#group_tools_{
                     <width>16777215</width>
                     <height>23</height>
                    </size>
+                  </property>
+                  <property name="font">
+                   <font>
+                    <pointsize>12</pointsize>
+                   </font>
                   </property>
                   <property name="text">
                    <string>Sagittal - Axial</string>
@@ -1562,6 +1627,11 @@ QWidget#group_tools_{
                        <height>0</height>
                       </size>
                      </property>
+                     <property name="font">
+                      <font>
+                       <pointsize>11</pointsize>
+                      </font>
+                     </property>
                      <property name="text">
                       <string>X:</string>
                      </property>
@@ -1582,6 +1652,11 @@ QWidget#group_tools_{
                        <height>0</height>
                       </size>
                      </property>
+                     <property name="font">
+                      <font>
+                       <pointsize>11</pointsize>
+                      </font>
+                     </property>
                      <property name="text">
                       <string>Y:</string>
                      </property>
@@ -1601,6 +1676,11 @@ QWidget#group_tools_{
                        <width>10</width>
                        <height>0</height>
                       </size>
+                     </property>
+                     <property name="font">
+                      <font>
+                       <pointsize>11</pointsize>
+                      </font>
                      </property>
                      <property name="text">
                       <string>Z:</string>
@@ -1649,6 +1729,11 @@ QWidget#group_tools_{
                        <height>0</height>
                       </size>
                      </property>
+                     <property name="font">
+                      <font>
+                       <pointsize>11</pointsize>
+                      </font>
+                     </property>
                      <property name="text">
                       <string>X:</string>
                      </property>
@@ -1669,6 +1754,11 @@ QWidget#group_tools_{
                        <height>0</height>
                       </size>
                      </property>
+                     <property name="font">
+                      <font>
+                       <pointsize>11</pointsize>
+                      </font>
+                     </property>
                      <property name="text">
                       <string>Y:</string>
                      </property>
@@ -1688,6 +1778,11 @@ QWidget#group_tools_{
                        <width>0</width>
                        <height>0</height>
                       </size>
+                     </property>
+                     <property name="font">
+                      <font>
+                       <pointsize>11</pointsize>
+                      </font>
                      </property>
                      <property name="text">
                       <string>Z:</string>
@@ -1739,6 +1834,11 @@ QWidget#group_tools_{
                    <height>0</height>
                   </size>
                  </property>
+                 <property name="font">
+                  <font>
+                   <pointsize>12</pointsize>
+                  </font>
+                 </property>
                  <property name="toolTip">
                   <string>Check this box to replace the current layer with the transformed one</string>
                  </property>
@@ -1769,7 +1869,7 @@ QWidget#group_tools_{
                  </property>
                  <property name="font">
                   <font>
-                   <pointsize>10</pointsize>
+                   <pointsize>12</pointsize>
                   </font>
                  </property>
                  <property name="text">
@@ -1808,7 +1908,7 @@ QWidget#group_tools_{
                <widget class="QCheckBox" name="confirm_delete_checkbox_">
                 <property name="font">
                  <font>
-                  <pointsize>11</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -1832,7 +1932,7 @@ QWidget#group_tools_{
                 </property>
                 <property name="font">
                  <font>
-                  <pointsize>10</pointsize>
+                  <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">

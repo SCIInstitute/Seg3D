@@ -145,11 +145,13 @@ namespace Seg3D
   // - Volume Type Colors - //
   const QString StyleSheet::DATA_VOLUME_COLOR_C = QString::fromUtf8(
     "QWidget#typeBackground_{"
-    " background-color: rgb(166, 12, 73);"
+    " background-color: rgb(131, 174, 255);"
+    //" background-color: rgb(166, 12, 73);"
     "}");
   const QString StyleSheet::MASK_VOLUME_COLOR_C = QString::fromUtf8(
     "QWidget#typeBackground_{"
-    " background-color: rgb(255, 128, 0);"
+    " background-color: rgb(237, 149, 31);"
+    //" background-color: rgb(255, 128, 0);"
     "}");
   const QString StyleSheet::LABEL_VOLUME_COLOR_C = QString::fromUtf8(
     "QWidget#typeBackground_{ background-color: rgb(90, 90, 90);"
@@ -158,12 +160,14 @@ namespace Seg3D
   // - ACTIVE - //
   const QString StyleSheet::LAYER_WIDGET_BASE_ACTIVE_C = QString::fromUtf8(
     "QWidget#base_{"
-    " border-radius: 3px;"
-    " border: 1px solid rgb(94, 141, 176);"
-    " background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1," 
-    "   stop:0 rgba(216, 238, 245, 255),"
-    "   stop:0.372881 rgba(226, 249, 255, 255),"
-    "   stop:1 rgba(204, 224, 230, 255));"
+    " border-radius: 4px;"
+    " border:2px solid rgb(131, 174, 255);"
+      "background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(193, 215, 255, 255), stop:0.353234 rgba(204, 222, 255, 255), stop:1 rgba(164, 196, 255, 255));"
+    //" border: 1px solid rgb(100, 213, 247);"
+    //" background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1," 
+    //"   stop:0 rgba(216, 238, 245, 255),"
+    ////"   stop:0.372881 rgba(226, 249, 255, 255),"
+    //"   stop:1 rgba(204, 224, 230, 255));"
     "}");
   
   // - INACTIVE - //

@@ -72,6 +72,8 @@ public:
   void set_active( bool active );
   void set_drop( bool drop );
   void seethrough( bool see );
+  void set_group_menu_status( bool status );
+
   
 private:
     boost::shared_ptr< LayerWidgetPrivate > private_;
@@ -87,6 +89,7 @@ private:
   int volume_type_;
   bool active_;
   bool picked_up_;
+  bool group_menus_open_;
   LayerWidget* drop_layer_;
 
   void set_drop_target( LayerWidget* target_layer );

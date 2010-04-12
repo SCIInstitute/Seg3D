@@ -136,12 +136,12 @@ protected:
 
   // INSERT_LAYER_ABOVE:
   // Inserts a layer above a certain layer
-    int move_layer_above( LayerHandle layer, LayerHandle  layer_below );
+    int move_layer_above( LayerHandle layer_above, LayerHandle layer_below );
   
   // DELETE_LAYER:
   // Delete a layer from the list
   void delete_layer( LayerHandle layer );
-    
+  
   // CROP_LAYER:
   // Crops the selected layers based on the state of the crop panel
   void crop_layer();

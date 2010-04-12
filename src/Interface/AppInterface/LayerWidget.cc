@@ -66,7 +66,8 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   QWidget( parent ),
   private_( new LayerWidgetPrivate ),
   active_( false ),
-  picked_up_( false )
+  picked_up_( false ),
+  group_menus_open_( false )
 {
   
   {// Prepare the icons!!
@@ -264,6 +265,11 @@ LayerWidget::~LayerWidget()
 {
 }
 
+void LayerWidget::set_group_menu_status( bool status )
+{
+  group_menus_open_ = status;
+}
+  
 void LayerWidget::mousePressEvent( QMouseEvent *event )
 {
  
@@ -272,6 +278,9 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
   { 
     return;
   }
+  
+  if ( group_menus_open_ )
+    return;
 
   QPoint hotSpot = event->pos();
   
@@ -342,14 +351,17 @@ void LayerWidget::dropEvent( QDropEvent* event )
     return;
   }
   
+  if ( group_menus_open_ )
+    return;
+  
   bool good_to_go = false;
   
   if( !LayerManager::Instance()->check_for_same_group(
     mime_data[ 1 ], this->get_layer_id() ) )
   {
     QMessageBox message_box;
-    message_box.setText( QString::fromUtf8( "This move will modify the layer."
-        "The new size of the layer will be: \t\n" )
+    message_box.setText( QString::fromUtf8( "This move will modify the layer.  "
+        "The new size of the layer will be: \n" )
         + QString::number( this->grid_transform_.get_nx() ) + QString::fromUtf8( " x " )
         + QString::number( this->grid_transform_.get_ny() ) + QString::fromUtf8( " x " ) 
         + QString::number( this->grid_transform_.get_nz() ) );
