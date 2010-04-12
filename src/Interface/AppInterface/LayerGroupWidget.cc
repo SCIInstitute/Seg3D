@@ -378,6 +378,7 @@ void LayerGroupWidget::show_selection_checkboxes( bool show )
   {
     layer_list_[i]->show_selection_checkbox( show );
     layer_list_[i]->set_group_menu_status( show );
+    layer_list_[i]->setAcceptDrops( !show ); 
   }
 }
 

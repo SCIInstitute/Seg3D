@@ -361,7 +361,7 @@ void LayerWidget::dropEvent( QDropEvent* event )
   {
     QMessageBox message_box;
     message_box.setText( QString::fromUtf8( "This move will modify the layer.  "
-        "The new size of the layer will be: \n" )
+        "The new size of the layer will be: " )
         + QString::number( this->grid_transform_.get_nx() ) + QString::fromUtf8( " x " )
         + QString::number( this->grid_transform_.get_ny() ) + QString::fromUtf8( " x " ) 
         + QString::number( this->grid_transform_.get_nz() ) );

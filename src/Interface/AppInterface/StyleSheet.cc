@@ -38,7 +38,7 @@ namespace Seg3D
     " border: 1px solid rgba( 0, 0, 0, 0 );"
     "}"
     "QToolButton:hover {"
-    " background-color: rgba( 140, 140, 140, 70 );"
+    " background-color: rgba( 140, 140, 140, 90 );"
     "}"
     "QToolButton:pressed {"
     " background-color: rgba( 255, 255, 210, 140 );"
@@ -160,14 +160,12 @@ namespace Seg3D
   // - ACTIVE - //
   const QString StyleSheet::LAYER_WIDGET_BASE_ACTIVE_C = QString::fromUtf8(
     "QWidget#base_{"
-    " border-radius: 4px;"
-    " border:2px solid rgb(131, 174, 255);"
-      "background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(193, 215, 255, 255), stop:0.353234 rgba(204, 222, 255, 255), stop:1 rgba(164, 196, 255, 255));"
-    //" border: 1px solid rgb(100, 213, 247);"
-    //" background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1," 
-    //"   stop:0 rgba(216, 238, 245, 255),"
-    ////"   stop:0.372881 rgba(226, 249, 255, 255),"
-    //"   stop:1 rgba(204, 224, 230, 255));"
+    " border-radius: 7px;"
+    " border:1px solid rgb(83, 111, 165);"
+    " background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1,"
+    "   stop:0 rgba(193, 215, 255, 255),"
+    "   stop:0.353234 rgba(204, 222, 255, 255),"
+    "   stop:1 rgba(164, 196, 255, 255));"
     "}");
   
   // - INACTIVE - //

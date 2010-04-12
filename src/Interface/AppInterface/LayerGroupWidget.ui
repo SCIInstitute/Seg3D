@@ -73,6 +73,9 @@ QToolButton#group_crop_button_{
   margin: 0 0 0 0;
   padding: 0 0 0 0;
 }
+QToolButton#group_crop_button_:hover{
+  background-color: rgba( 0, 0, 0, 30 ); border-radius: 3px;
+}
 QToolButton#group_crop_button_:checked{
   background-color: rgb(233, 111, 53);
   border-radius: 3px;
@@ -86,6 +89,9 @@ QToolButton#group_flip_rotate_button_{
   border: 1px solid rgba(0, 0, 0, 0);
   margin: 0 0 0 0;
   padding: 0 0 0 0;
+}
+QToolButton#group_flip_rotate_button_:hover{
+  background-color: rgba( 0, 0, 0, 30 ); border-radius: 3px;
 }
 QToolButton#group_flip_rotate_button_:checked{
   background-color: rgb(233, 111, 53);
@@ -101,6 +107,9 @@ QToolButton#group_new_button_{
   margin: 0 0 0 0;
   padding: 0 0 0 0;
 }
+QToolButton#group_new_button_:hover{
+  background-color: rgba( 0, 0, 0, 30 ); border-radius: 3px;
+}
 QToolButton#group_new_button_:pressed{
   background-color: rgb(233, 111, 53);
   border-radius: 3px;
@@ -114,6 +123,9 @@ QToolButton#group_delete_button_{
   border: 1px solid rgba(0, 0, 0, 0);
   margin: 0 0 0 0;
   padding: 0 0 0 0;
+}
+QToolButton#group_delete_button_:hover{
+  background-color: rgba( 0, 0, 0, 30 ); border-radius: 3px;
 }
 QToolButton#group_delete_button_:checked{
   background-color: rgb(233, 111, 53);
@@ -130,6 +142,9 @@ QToolButton#group_resample_button_{
   margin: 0 0 0 0;
   padding: 0 0 0 0;
 }
+QToolButton#group_resample_button_:hover{
+  background-color: rgba( 0, 0, 0, 30 ); border-radius: 3px;
+}
 QToolButton#group_resample_button_:checked{
   background-color: rgb(233, 111, 53);
   border-radius: 3px;
@@ -143,6 +158,9 @@ QToolButton#group_transform_button_{
   border: 1px solid rgba(0, 0, 0, 0);
   margin: 0 0 0 0;
   padding: 0 0 0 0;
+}
+QToolButton#group_transform_button_:hover{
+  background-color: rgba( 0, 0, 0, 30 ); border-radius: 3px;
 }
 QToolButton#group_transform_button_:checked{
   background-color: rgb(233, 111, 53);
@@ -158,7 +176,9 @@ QToolButton#group_visibility_button_{
   margin: 0 0 0 0;
   padding: 0 0 0 0;
 }
-
+QToolButton#group_visibility_button_:hover{
+  background-color: rgba( 0, 0, 0, 30 ); border-radius: 3px;
+}
 
 QPushButton#activate_button_{
   background-color:rgba(0, 0, 0, 0);
@@ -225,7 +245,8 @@ QWidget#group_tools_{
   border-radius: 4px;
   border: 1px solid rgb(90, 90, 90);
   background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(161, 161, 161, 255), stop:0.155779 rgba(175, 175, 175, 255), stop:1 rgba(144, 144, 144, 255));
-}</string>
+}
+</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout_24">
    <property name="spacing">
