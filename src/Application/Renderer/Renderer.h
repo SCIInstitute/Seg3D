@@ -68,11 +68,12 @@ public:
 public:
 
   virtual void initialize();
-  virtual void redraw();
+  virtual void redraw( bool delay_update = false );
   virtual void resize( int width, int height );
   void redraw_overlay();
 
-  rendering_completed_signal_type redraw_overlay_completed_signal_;
+  typedef boost::signals2::signal< void ( Utils::TextureHandle ) > update_overlay_signal_type;
+  update_overlay_signal_type redraw_overlay_completed_signal_;
 
 private:
 
@@ -89,6 +90,7 @@ private:
   Utils::Texture3DHandle pattern_texture_;
 
   Utils::TextRendererHandle text_renderer_;
+  Utils::Texture2DHandle text_texture_;
 
   int active_render_texture_;
   int active_overlay_texture_;

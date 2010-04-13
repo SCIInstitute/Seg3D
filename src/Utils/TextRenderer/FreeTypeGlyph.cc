@@ -83,8 +83,7 @@ FreeTypeBitmapGlyph::~FreeTypeBitmapGlyph()
 }
 
 void FreeTypeBitmapGlyph::draw( unsigned char* target, const int width, const int height, 
-  const int x_offset, const int y_offset, const float red, const float green, 
-  const float blue, const float alpha, bool blend )
+  const int x_offset, const int y_offset )
 {
   FT_Bitmap& bitmap = this->glyph_bitmap_->bitmap;
   assert( bitmap.pixel_mode == FT_PIXEL_MODE_GRAY );
@@ -103,32 +102,11 @@ void FreeTypeBitmapGlyph::draw( unsigned char* target, const int width, const in
       if ( pen_x >= width ) break;
 
       float gray_scale = pixels[ j ] / float( bitmap.num_grays - 1 );
-      float src_alpha = alpha * gray_scale;
-      int pixel_pos = ( pen_y * width + pen_x ) * 4;
-      if ( blend )
-      {
-        float dst_factor = 1 - src_alpha;
-//        target[ pixel_pos ] = static_cast< unsigned char >( 
-//          ( red * src_alpha + target[ pixel_pos ] / 255.0 * dst_factor ) * 255 );
-//        target[ pixel_pos + 1 ] = static_cast< unsigned char >( 
-//          ( green * src_alpha + target[ pixel_pos + 1 ] / 255.0 * dst_factor ) * 255 );
-//        target[ pixel_pos + 2 ] = static_cast< unsigned char >( 
-//          ( blue * src_alpha + target[ pixel_pos + 2 ] / 255.0 * dst_factor ) * 255 );
-//        target[ pixel_pos + 3 ] = static_cast< unsigned char >( 
-//          ( 1 - dst_factor * ( 1 - target[ pixel_pos + 3 ] / 255.0 ) ) * 255 );
-        target[ pixel_pos ] = static_cast< unsigned char >( red * 255 );
-        target[ pixel_pos + 1 ] = static_cast< unsigned char >( green * 255 );
-        target[ pixel_pos + 2 ] = static_cast< unsigned char >( blue * 255 );
-        target[ pixel_pos + 3 ] = static_cast< unsigned char >( 
-          ( gray_scale + dst_factor * target[ pixel_pos + 3 ] / 255.0 ) * 255 );
-      }
-      else
-      {
-        target[ pixel_pos ] = static_cast< unsigned char >( red * 255 );
-        target[ pixel_pos + 1 ] = static_cast< unsigned char >( green * 255 );
-        target[ pixel_pos + 2 ] = static_cast< unsigned char >( blue * 255 );
-        target[ pixel_pos + 3 ] = static_cast< unsigned char >( src_alpha * 255 );
-      }
+      int pixel_pos = ( pen_y * width + pen_x );
+      float dst_factor = 1 - gray_scale;
+
+      target[ pixel_pos ] = static_cast< unsigned char >( 
+        ( gray_scale + dst_factor * target[ pixel_pos ] / 255.0 ) * 255 );
     }
     pixels += bitmap.pitch;
   }

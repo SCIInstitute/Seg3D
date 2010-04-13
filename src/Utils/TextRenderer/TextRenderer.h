@@ -51,9 +51,23 @@ public:
   TextRenderer();
   ~TextRenderer();
 
-  void render( const std::string& text, unsigned char* buffer, int width, 
-    int height, int x_offset, int y_offset, unsigned int font_size, 
-    float red, float green, float blue, float alpha, bool blend = false );
+  // RENDER
+  // Renders the given text to the target buffer with the specified font size. 
+  // The result in the buffer is a 1-channel 8-bit gray scale bitmap.
+  void render( const std::string& text, unsigned char* buffer, int width,
+    int height, int x_offset, int y_offset, unsigned int font_size );
+
+  // RENDER
+  // Render multiple lines of text onto the buffer, with the specified line spacing.
+  void render( const std::vector< std::string >& text, unsigned char* buffer, int width,
+    int height, int x_offset, int y_offset, unsigned int font_size, int line_spacing );
+
+private:
+
+  FreeTypeFaceHandle get_face( unsigned int font_size );
+
+  void render( const std::string& text, unsigned char* buffer, int width,
+    int height, int x_offset, int y_offset, FreeTypeFaceHandle face );
 
 private:
   FreeTypeLibraryHandle ft_library_;

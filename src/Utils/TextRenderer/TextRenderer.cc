@@ -59,8 +59,7 @@ TextRenderer::~TextRenderer()
 }
 
 void TextRenderer::render( const std::string& text, unsigned char* buffer, int width, 
-    int height, int x_offset, int y_offset, unsigned int font_size, 
-    float red, float green, float blue, float alpha, bool blend )
+    int height, int x_offset, int y_offset, unsigned int font_size )
 {
   assert( width > 0 && height > 0 );
 
@@ -73,7 +72,46 @@ void TextRenderer::render( const std::string& text, unsigned char* buffer, int w
     return;
   }
 
+  FreeTypeFaceHandle face = this->get_face( font_size );
+  if ( !face )
+  {
+    return;
+  }
+
+  this->render( text, buffer, width, height, x_offset, y_offset, face );
+}
+
+void TextRenderer::render( const std::vector< std::string >& text, unsigned char* buffer, 
+  int width, int height, int x_offset, int y_offset, unsigned int font_size, int line_spacing )
+{
+  assert( width > 0 && height > 0 );
+
+  if ( !this->valid_ )
+    return;
+
+  size_t num_of_strings = text.size();
+  if ( num_of_strings == 0 )
+  {
+    return;
+  }
+
+  FreeTypeFaceHandle face = this->get_face( font_size );
+  if ( !face )
+  {
+    return;
+  }
+
+  for ( size_t i = 0; i < num_of_strings; i++ )
+  {
+    this->render( text[ i ], buffer, width, height, x_offset, y_offset, face );
+    y_offset -= ( ( face->face_->size->metrics.height >> 6 ) + line_spacing );
+  }
+}
+
+FreeTypeFaceHandle TextRenderer::get_face( unsigned int font_size )
+{
   FreeTypeFaceHandle face;
+
   face_map_type::iterator it = this->face_map_.find( font_size );
   if ( it != this->face_map_.end() )
   {
@@ -85,12 +123,26 @@ void TextRenderer::render( const std::string& text, unsigned char* buffer, int w
     if ( !face )
     {
       this->valid_ = false;
-      return;
     }
-    face->set_pixel_sizes( font_size, font_size );
-    this->face_map_[ font_size ] = face;
+    else
+    {
+      face->set_pixel_sizes( font_size, font_size );
+      this->face_map_[ font_size ] = face;
+    }
   }
 
+  return face;
+}
+
+void TextRenderer::render( const std::string& text, unsigned char* buffer, int width,
+    int height, int x_offset, int y_offset, FreeTypeFaceHandle face )
+{
+  size_t text_len = text.size();
+  if ( text_len == 0 )
+  {
+    return;
+  }
+  
   int pen_x = x_offset;
   int pen_y = y_offset;
   unsigned int previous_index = 0;
@@ -111,7 +163,7 @@ void TextRenderer::render( const std::string& text, unsigned char* buffer, int w
       pen_x += ( delta.x >> 6 );
     }
     FreeTypeBitmapGlyphHandle glyph_bitmap = glyph->render_to_bitmap();
-    glyph_bitmap->draw( buffer, width, height, pen_x, pen_y, red, green, blue, alpha, blend );
+    glyph_bitmap->draw( buffer, width, height, pen_x, pen_y );
     pen_x += glyph->glyph_->advance.x >> 16;
     previous_index = glyph_index;
   }

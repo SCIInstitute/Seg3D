@@ -60,7 +60,7 @@ public:
 
   // Functions for drawing content
   virtual void initialize();
-  virtual void redraw();
+  virtual void redraw( bool delay_update );
 
   virtual void resize( int width, int height );
 
@@ -93,7 +93,7 @@ public:
 
   // -- signals handling --
 public:
-  typedef boost::signals2::signal< void( Utils::TextureHandle ) > rendering_completed_signal_type;
+  typedef boost::signals2::signal< void( Utils::TextureHandle, bool ) > rendering_completed_signal_type;
   rendering_completed_signal_type rendering_completed_signal_;
 
 protected:

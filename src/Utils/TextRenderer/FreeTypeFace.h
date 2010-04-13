@@ -55,6 +55,7 @@ class FreeTypeFace
 {
 private:
   friend class FreeTypeLibrary;
+  friend class TextRenderer;
   FreeTypeFace( FT_Face face );
 
 public:

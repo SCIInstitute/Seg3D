@@ -83,8 +83,7 @@ public:
   ~FreeTypeBitmapGlyph();
 
   void draw( unsigned char* target, const int width, const int height, 
-    const int x_offset, const int y_offset, const float red, const float green, 
-    const float blue, const float alpha, bool blend );
+    const int x_offset, const int y_offset );
 
 private:
   FT_BitmapGlyph glyph_bitmap_;

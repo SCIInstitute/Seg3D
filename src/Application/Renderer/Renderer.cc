@@ -155,6 +155,7 @@ void Renderer::initialize()
   this->context_->make_current();
 
   glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+  glPixelStorei( GL_PACK_ALIGNMENT, 1 );
 
   {
     // lock the shared render context
@@ -168,6 +169,7 @@ void Renderer::initialize()
     this->pattern_texture_ = Utils::Texture3DHandle( new Utils::Texture3D );
     this->pattern_texture_->set_image( PATTERN_SIZE_C, PATTERN_SIZE_C, NUM_OF_PATTERNS_C, 
       GL_ALPHA, MASK_PATTERNS_C, GL_ALPHA, GL_UNSIGNED_BYTE );
+    this->text_texture_ = Utils::Texture2DHandle( new Utils::Texture2D );
   }
 
   SCI_CHECK_OPENGL_ERROR();
@@ -188,20 +190,20 @@ void Renderer::initialize()
   SCI_CHECK_OPENGL_ERROR();
 
   this->add_connection( ViewerManager::Instance()->get_viewer( this->viewer_id_ )
-    ->redraw_signal_.connect( boost::bind( &Renderer::redraw, this ) ) );
+    ->redraw_signal_.connect( boost::bind( &Renderer::redraw, this, false ) ) );
 
   SCI_LOG_DEBUG( std::string("Renderer ") + Utils::ToString( this->viewer_id_ ) 
     + " initialized with context " + this->context_->to_string() );
 }
 
-void Renderer::redraw()
+void Renderer::redraw( bool delay_update )
 {
 #if MULTITHREADED_RENDERING
   if ( !is_eventhandler_thread() )
   {
     lock_type lock( this->redraw_needed_mutex_ );
     this->redraw_needed_ = true;
-    this->post_event( boost::bind( &Renderer::redraw, this ) );
+    this->post_event( boost::bind( &Renderer::redraw, this, delay_update ) );
     return;
   }
 #else
@@ -209,7 +211,7 @@ void Renderer::redraw()
   {
     lock_type lock( this->redraw_needed_mutex_ );
     this->redraw_needed_ = true;
-    Interface::PostEvent( boost::bind( &Renderer::redraw, this ) );
+    Interface::PostEvent( boost::bind( &Renderer::redraw, this, delay_update ) );
     return;
   }
   // Make the GL context current in the interface thread
@@ -396,6 +398,7 @@ void Renderer::redraw()
     } // end for
 
     this->slice_shader_->disable();
+    glDisable( GL_BLEND );
   }
 
   SCI_CHECK_OPENGL_ERROR();
@@ -412,7 +415,7 @@ void Renderer::redraw()
     + ": done redraw" );
 
   // signal rendering completed
-  this->rendering_completed_signal_( this->textures_[ this->active_render_texture_ ] );
+  this->rendering_completed_signal_( this->textures_[ this->active_render_texture_ ], delay_update );
 
   // swap render textures 
   this->active_render_texture_ = ( ~this->active_render_texture_ ) & 1;
@@ -446,7 +449,7 @@ void Renderer::redraw_overlay()
 
   // lock the active render texture
   Utils::Texture::lock_type texture_lock( this->textures_[ this->active_overlay_texture_ ]->get_mutex() );
-/*
+
   // bind the framebuffer object
   this->frame_buffer_->enable();
   // attach texture
@@ -458,7 +461,7 @@ void Renderer::redraw_overlay()
     return;
   }
 
-  glClearColor( 1.0f, 0.5f, 0.0f, 0.3f );
+  glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
   glMatrixMode( GL_PROJECTION );
   glLoadIdentity();
@@ -474,22 +477,79 @@ void Renderer::redraw_overlay()
   }
   else
   {
-    Utils::View2D view2d(
-        dynamic_cast< StateView2D* > ( viewer->get_active_view_state().get() )->get() );
+    bool show_grid = viewer->slice_grid_state_->get();
 
     // We have got everything we want from the state engine, unlock before we do any rendering
     state_lock.unlock();
 
-    double left, right, top, bottom;
-    view2d.compute_clipping_planes( this->width_ / ( 1.0 * this->height_ ), 
-      left, right, bottom, top );
-    Utils::Matrix proj_mat;
-    Utils::Transform::BuildOrtho2DMatrix( proj_mat, left, right, bottom, top );
-    glMultMatrixd( proj_mat.data() );
+    // Enable blending
+    glEnable( GL_BLEND );
+    // NOTE: The result of the following blend function is that, color channels contains
+    // colors modulated by alpha, alpha channel stores the value of "1-alpha"
+    glBlendFuncSeparate( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA , 
+      GL_ZERO, GL_ONE_MINUS_SRC_ALPHA  );
+
+    gluOrtho2D( 0, this->width_, 0, this->height_ );
     glMatrixMode( GL_MODELVIEW );
     glLoadIdentity();
 
-    // Render the overlay stuff here
+    // Render the grid
+    if ( show_grid )
+    {
+      glColor4f( 0.1f, 0.1f, 0.1f, 0.75f );
+      int grid_spacing = 50;
+      int center_x = this->width_ / 2;
+      int center_y = this->height_ / 2;
+      int vertical_lines = center_x / grid_spacing;
+      int horizontal_lines = center_y / grid_spacing;
+      glBegin( GL_LINES );
+      glVertex2i( center_x, 0 );
+      glVertex2i( center_x, this->height_ );
+      for ( int i = 1; i <= vertical_lines; i++ )
+      {
+        glVertex2i( center_x - grid_spacing * i, 0 );
+        glVertex2i( center_x - grid_spacing * i, this->height_ );
+        glVertex2i( center_x + grid_spacing * i, 0 );
+        glVertex2i( center_x + grid_spacing * i, this->height_ );
+      }
+      glVertex2i( 0, center_y );
+      glVertex2i( this->width_, center_y );
+      for ( int i = 0; i <= horizontal_lines; i++ )
+      {
+        glVertex2i( 0, center_y - grid_spacing * i );
+        glVertex2i( this->width_, center_y - grid_spacing * i );
+        glVertex2i( 0, center_y + grid_spacing * i );
+        glVertex2i( this->width_, center_y + grid_spacing * i );
+      }
+      glEnd();
+    }
+    
+    // Render the text
+    std::vector< unsigned char > buffer( this->width_ * this->height_, 0 );
+    std::vector< std::string > text;
+    text.push_back( std::string( "Hello World" ) );
+    text.push_back( std::string( "NUMIRA" ) );
+    this->text_renderer_->render( text, &buffer[ 0 ], this->width_, this->height_, 5, 30, 14, 0 );
+    this->text_texture_->enable();
+    this->text_texture_->set_sub_image( 0, 0, this->width_, this->height_,
+        &buffer[ 0 ], GL_ALPHA, GL_UNSIGNED_BYTE );
+
+    // Blend the text onto the framebuffer
+    glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_ADD );
+    glBegin( GL_QUADS );
+    glColor4f( 0.0f, 1.0f, 1.0f, 1.0f );
+    glTexCoord2f( 0.0f, 0.0f );
+    glVertex2f( 0.0f, 0.0f );
+    glTexCoord2f( 1.0f, 0.0f );
+    glVertex2f( this->width_, 0.0f );
+    glTexCoord2f( 1.0f, 1.0f );
+    glVertex2f( this->width_, this->height_ );
+    glTexCoord2f( 0.0f, 1.0f );
+    glVertex2f( 0.0f, this->height_ );
+    glEnd();
+    this->text_texture_->disable();
+
+    glDisable( GL_BLEND );
   }
 
   SCI_CHECK_OPENGL_ERROR();
@@ -498,24 +558,7 @@ void Renderer::redraw_overlay()
 
   this->frame_buffer_->detach_texture( this->textures_[ this->active_overlay_texture_ ] );
   this->frame_buffer_->disable();
-  */
-  {
-    Utils::RenderResources::lock_type lock( Utils::RenderResources::GetMutex() );
-    Utils::PixelBufferObjectHandle pbo( new Utils::PixelUnpackBuffer );
-    pbo->bind();
-    pbo->set_buffer_data( this->width_ * this->height_ * 4, 0, GL_STREAM_DRAW );
-    lock.unlock();
-    unsigned char* buffer = reinterpret_cast< unsigned char* >(
-      pbo->map_buffer( GL_READ_WRITE ) );
-    memset( buffer, 0, this->width_ * this->height_ * 4 );
-    this->text_renderer_->render( "NUMIRA", buffer, this->width_, this->height_, 20, 20, 24,
-      1.0f, 1.0f, 1.0f, 1.0f, false );
-    pbo->unmap_buffer();
-    this->textures_[ this->active_overlay_texture_ ]->set_sub_image( 0, 0, this->width_, this->height_,
-      0, GL_RGBA, GL_UNSIGNED_BYTE );
-    pbo->unbind();
-  }
-  glFinish();
+
   // release the lock on the active render texture
   texture_lock.unlock();
 
@@ -563,6 +606,7 @@ void Renderer::resize( int width, int height )
     this->textures_[ 2 ]->set_image( width, height, GL_RGBA );
     this->textures_[ 3 ]->set_image( width, height, GL_RGBA );
     this->depth_buffer_->set_storage( width, height, GL_DEPTH_COMPONENT );
+    this->text_texture_->set_image( width, height, GL_RGBA );
   }
 
   this->width_ = width;
@@ -577,7 +621,7 @@ void Renderer::resize( int width, int height )
 
   // Getting here means the size is valid, make sure that the renderer is active
   this->activate();
-  this->redraw();
+  this->redraw( true );
   this->redraw_overlay();
 }
 

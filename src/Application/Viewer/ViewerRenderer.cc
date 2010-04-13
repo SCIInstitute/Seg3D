@@ -45,7 +45,7 @@ void ViewerRenderer::initialize()
 {
 }
 
-void ViewerRenderer::redraw()
+void ViewerRenderer::redraw( bool delay_update )
 {
 }
 
