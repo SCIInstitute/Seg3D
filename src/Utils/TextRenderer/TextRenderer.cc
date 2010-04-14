@@ -27,12 +27,22 @@
  */
 
 #include <cassert>
+#include <numeric>
 
 #ifdef _WIN32
 #include <Windows.h>
 #endif
 
+#include <Utils/Math/MathFunctions.h>
 #include <Utils/TextRenderer/TextRenderer.h>
+
+#ifdef min
+#undef min
+#endif
+
+#ifdef max
+#undef max
+#endif
 
 namespace Utils
 {
@@ -108,6 +118,93 @@ void TextRenderer::render( const std::vector< std::string >& text, unsigned char
   }
 }
 
+void TextRenderer::render_aligned( const std::string& text, unsigned char* buffer, int width, int height, 
+  unsigned int font_size, TextHAlignmentType halign, TextVAlignmentType valign )
+{
+  assert( width > 0 && height > 0 );
+
+  if ( !this->valid_ )
+    return;
+
+  size_t text_len = text.size();
+  if ( text_len == 0 )
+  {
+    return;
+  }
+
+  FreeTypeFaceHandle face = this->get_face( font_size );
+  if ( !face )
+  {
+    return;
+  }
+
+  int x_offset;
+  int y_offset;
+  FT_BBox bbox;
+  this->compute_bbox( text, face, bbox );
+  int text_width = static_cast< int >( bbox.xMax - bbox.xMin );
+  int text_height = static_cast< int >( bbox.yMax - bbox.yMin );
+
+  switch( halign )
+  {
+  case TextHAlignmentType::LEFT_E:
+    x_offset = -bbox.xMin;
+    break;
+  case TextHAlignmentType::RIGHT_E:
+    x_offset = width - text_width - bbox.xMin;
+    break;
+  case TextHAlignmentType::CENTER_E:
+    x_offset = ( width - text_width ) / 2 - bbox.xMin;
+    break;
+  default:
+    assert( false );
+    break;
+  }
+
+  switch( valign )
+  {
+  case TextVAlignmentType::BOTTOM_E:
+    y_offset = -bbox.yMin;
+    break;
+  case TextVAlignmentType::TOP_E:
+    y_offset = height - text_height - bbox.yMin;
+    break;
+  case TextVAlignmentType::CENTER_E:
+    y_offset = ( height - text_height ) / 2 - bbox.yMin;
+    break;
+  default:
+    assert( false );
+    break;
+  }
+
+  this->render( text, buffer, width, height, x_offset, y_offset, face );
+}
+
+void TextRenderer::compute_size( const std::string& text, unsigned int font_size, 
+  int& width, int& height, int& x_offset, int& y_offset )
+{
+  size_t text_len = text.size();
+  if ( !this->valid_ || text_len == 0 )
+  {
+    width = height = 0;
+    return;
+  }
+
+  FreeTypeFaceHandle face = this->get_face( font_size );
+  if ( !face )
+  {
+    width = height = 0;
+    return;
+  }
+
+  FT_BBox string_bbox;
+  this->compute_bbox( text, face, string_bbox );
+  width = static_cast< int >( string_bbox.xMax - string_bbox.xMin );
+  height = static_cast< int >( string_bbox.yMax - string_bbox.yMin );
+  x_offset = static_cast< int >( -string_bbox.xMin );
+  y_offset = static_cast< int >( -string_bbox.yMin );
+}
+
 FreeTypeFaceHandle TextRenderer::get_face( unsigned int font_size )
 {
   FreeTypeFaceHandle face;
@@ -166,6 +263,58 @@ void TextRenderer::render( const std::string& text, unsigned char* buffer, int w
     glyph_bitmap->draw( buffer, width, height, pen_x, pen_y );
     pen_x += glyph->glyph_->advance.x >> 16;
     previous_index = glyph_index;
+  }
+}
+
+void TextRenderer::compute_bbox( const std::string& text, FreeTypeFaceHandle face, 
+  FT_BBox& bbox )
+{
+  bbox.xMax = bbox.yMax = std::numeric_limits< FT_Pos >::min();
+  bbox.xMin = bbox.yMin = std::numeric_limits< FT_Pos >::max();
+
+  size_t text_len = text.size();
+  int pen_x = 0;
+  int pen_y = 0;
+  unsigned int previous_index = 0;
+  bool use_kerning = face->has_kerning();
+  for ( size_t i = 0; i < text_len; i++ )
+  {
+    unsigned int glyph_index = face->get_char_index( text[ i ] );
+    FreeTypeGlyphHandle glyph = face->get_glyph_by_index( glyph_index );
+    if ( !glyph )
+    {
+      continue;
+    }
+
+    if ( use_kerning && previous_index != 0 && glyph_index != 0 )
+    {
+      FT_Vector delta;
+      face->get_kerning( previous_index, glyph_index, FT_KERNING_DEFAULT, &delta );
+      pen_x += ( delta.x >> 6 );
+    }
+
+    FT_BBox glyph_bbox;
+    glyph->get_cbox( &glyph_bbox );
+    glyph_bbox.xMin += pen_x;
+    glyph_bbox.xMax += pen_x;
+    glyph_bbox.yMin += pen_y;
+    glyph_bbox.yMax += pen_y;
+
+    bbox.xMin = Utils::Min( bbox.xMin, glyph_bbox.xMin );
+    bbox.xMax = Utils::Max( bbox.xMax, glyph_bbox.xMax );
+    bbox.yMin = Utils::Min( bbox.yMin, glyph_bbox.yMin );
+    bbox.yMax = Utils::Max( bbox.yMax, glyph_bbox.yMax );
+    
+    pen_x += glyph->glyph_->advance.x >> 16;
+    previous_index = glyph_index;
+  }
+
+  if ( bbox.xMin > bbox.xMax )
+  {
+    bbox.xMin = 0;
+    bbox.yMin = 0;
+    bbox.xMax = 0;
+    bbox.yMax = 0;
   }
 }
 

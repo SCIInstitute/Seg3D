@@ -37,6 +37,7 @@
 #include <boost/smart_ptr.hpp>
 #include <boost/utility.hpp>
 
+#include <Utils/Core/EnumClass.h>
 #include <Utils/TextRenderer/FreeTypeLibrary.h>
 
 namespace Utils
@@ -44,6 +45,22 @@ namespace Utils
 
 class TextRenderer;
 typedef boost::shared_ptr< TextRenderer > TextRendererHandle;
+
+SCI_ENUM_CLASS
+(
+  TextHAlignmentType,
+  LEFT_E,
+  RIGHT_E,
+  CENTER_E
+)
+
+SCI_ENUM_CLASS
+(
+  TextVAlignmentType,
+  BOTTOM_E,
+  TOP_E,
+  CENTER_E
+)
 
 class TextRenderer : public boost::noncopyable
 {
@@ -62,12 +79,25 @@ public:
   void render( const std::vector< std::string >& text, unsigned char* buffer, int width,
     int height, int x_offset, int y_offset, unsigned int font_size, int line_spacing );
 
+  // RENDER
+  // Render the given text to the target buffer with the specified font size and alignment
+  void render_aligned( const std::string& text, unsigned char* buffer, int width, int height, 
+    unsigned int font_size, TextHAlignmentType halign = TextHAlignmentType::LEFT_E,
+    TextVAlignmentType valign = TextVAlignmentType::BOTTOM_E );
+
+  // COMPUTE_SIZE
+  // Compute the size of the given text string when rendered in the specified font size
+  void compute_size( const std::string& text, unsigned int font_size, 
+    int& width, int& height, int& x_offset, int& y_offset );
+
 private:
 
   FreeTypeFaceHandle get_face( unsigned int font_size );
 
   void render( const std::string& text, unsigned char* buffer, int width,
     int height, int x_offset, int y_offset, FreeTypeFaceHandle face );
+
+  void compute_bbox( const std::string& text, FreeTypeFaceHandle face, FT_BBox& bbox );
 
 private:
   FreeTypeLibraryHandle ft_library_;

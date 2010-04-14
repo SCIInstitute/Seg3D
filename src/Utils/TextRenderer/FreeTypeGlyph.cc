@@ -55,6 +55,11 @@ void FreeTypeGlyph::transform( FT_Matrix* matrix, FT_Vector* delta )
   FT_Glyph_Transform( this->glyph_, matrix, delta );
 }
 
+void FreeTypeGlyph::get_cbox( FT_BBox* cbox )
+{
+  FT_Glyph_Get_CBox( this->glyph_, FT_GLYPH_BBOX_PIXELS, cbox );
+}
+
 FreeTypeBitmapGlyphHandle FreeTypeGlyph::render_to_bitmap( FT_Vector* origin )
 {
   FT_Glyph glyph;
@@ -88,7 +93,7 @@ void FreeTypeBitmapGlyph::draw( unsigned char* target, const int width, const in
   FT_Bitmap& bitmap = this->glyph_bitmap_->bitmap;
   assert( bitmap.pixel_mode == FT_PIXEL_MODE_GRAY );
 
-  int pen_y = y_offset + this->glyph_bitmap_->top;
+  int pen_y = y_offset + this->glyph_bitmap_->top - 1;
   unsigned char* pixels = bitmap.buffer;
   for ( int i = 0; i < bitmap.rows; i++, pen_y-- )
   {
