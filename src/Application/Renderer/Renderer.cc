@@ -529,10 +529,10 @@ void Renderer::redraw_overlay()
     std::vector< std::string > text;
     text.push_back( std::string( "Hello World" ) );
     text.push_back( std::string( "NUMIRA" ) );
-    text.push_back( std::string( "Seg3D 2.0" ) );
+    text.push_back( std::string( "WAVE" ) );
     //this->text_renderer_->render( text, &buffer[ 0 ], this->width_, this->height_, 5, 30, 14, 0 );
-    this->text_renderer_->render_aligned( text[ 1 ], &buffer[ 0 ], this->width_, this->height_, 32,
-      Utils::TextHAlignmentType::CENTER_E, Utils::TextVAlignmentType::CENTER_E );
+    this->text_renderer_->render_aligned( text[ 1 ], &buffer[ 0 ], this->width_, this->height_, 48,
+      60, Utils::TextHAlignmentType::CENTER_E, Utils::TextVAlignmentType::CENTER_E );
     this->text_texture_->enable();
     this->text_texture_->set_sub_image( 0, 0, this->width_, this->height_,
         &buffer[ 0 ], GL_ALPHA, GL_UNSIGNED_BYTE );

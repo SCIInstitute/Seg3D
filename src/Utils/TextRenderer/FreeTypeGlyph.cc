@@ -95,7 +95,7 @@ void FreeTypeBitmapGlyph::draw( unsigned char* target, const int width, const in
 
   int pen_y = y_offset + this->glyph_bitmap_->top - 1;
   unsigned char* pixels = bitmap.buffer;
-  for ( int i = 0; i < bitmap.rows; i++, pen_y-- )
+  for ( int i = 0; i < bitmap.rows; i++, pen_y--, pixels += bitmap.pitch )
   {
     if ( pen_y >= height ) continue;
     if ( pen_y < 0 ) break;
@@ -113,7 +113,6 @@ void FreeTypeBitmapGlyph::draw( unsigned char* target, const int width, const in
       target[ pixel_pos ] = static_cast< unsigned char >( 
         ( gray_scale + dst_factor * target[ pixel_pos ] / 255.0 ) * 255 );
     }
-    pixels += bitmap.pitch;
   }
 }
 

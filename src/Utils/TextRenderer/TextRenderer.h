@@ -69,7 +69,7 @@ public:
   ~TextRenderer();
 
   // RENDER
-  // Renders the given text to the target buffer with the specified font size. 
+  // Render the given text to the target buffer with the specified font size. 
   // The result in the buffer is a 1-channel 8-bit gray scale bitmap.
   void render( const std::string& text, unsigned char* buffer, int width,
     int height, int x_offset, int y_offset, unsigned int font_size );
@@ -79,10 +79,17 @@ public:
   void render( const std::vector< std::string >& text, unsigned char* buffer, int width,
     int height, int x_offset, int y_offset, unsigned int font_size, int line_spacing );
 
-  // RENDER
-  // Render the given text to the target buffer with the specified font size and alignment
+  // RENDER_ALIGNED
+  // Render the given text to the target buffer with the specified font size and alignment.
   void render_aligned( const std::string& text, unsigned char* buffer, int width, int height, 
     unsigned int font_size, TextHAlignmentType halign = TextHAlignmentType::LEFT_E,
+    TextVAlignmentType valign = TextVAlignmentType::BOTTOM_E );
+
+  // RENDER_ALIGNED
+  // Render the given text to the target buffer with the specified font size and alignment,
+  // after rotating the text by the given angle.
+  void render_aligned( const std::string& text, unsigned char* buffer, int width, int height,
+    unsigned int font_size, double angle, TextHAlignmentType halign = TextHAlignmentType::LEFT_E,
     TextVAlignmentType valign = TextVAlignmentType::BOTTOM_E );
 
   // COMPUTE_SIZE
@@ -98,6 +105,9 @@ private:
     int height, int x_offset, int y_offset, FreeTypeFaceHandle face );
 
   void compute_bbox( const std::string& text, FreeTypeFaceHandle face, FT_BBox& bbox );
+
+  void compute_bbox( const std::string& text, FreeTypeFaceHandle face, double angle,
+    FT_BBox& bbox, std::vector< FreeTypeGlyphHandle >& glyphs );
 
 private:
   FreeTypeLibraryHandle ft_library_;
