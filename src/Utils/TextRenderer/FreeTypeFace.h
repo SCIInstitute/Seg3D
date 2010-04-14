@@ -70,8 +70,8 @@ public:
 
 public:
   unsigned int get_char_index( unsigned long charcode );
-  FreeTypeGlyphHandle get_glyph_by_char( unsigned long charcode );
-  FreeTypeGlyphHandle get_glyph_by_index( unsigned int index );
+  FreeTypeGlyphConstHandle get_glyph_by_char( unsigned long charcode );
+  FreeTypeGlyphConstHandle get_glyph_by_index( unsigned int index );
 
   bool has_kerning();
   void get_kerning( unsigned int left_index, unsigned int right_index,

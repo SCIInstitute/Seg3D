@@ -47,11 +47,13 @@ void FreeTypeFace::set_char_size( FT_F26Dot6 width, FT_F26Dot6 height,
     unsigned int horz_resolution, unsigned int vert_resolution )
 {
   FT_Set_Char_Size( this->face_, width, height, horz_resolution, vert_resolution );
+  this->glyph_map_.clear();
 }
 
 void FreeTypeFace::set_pixel_sizes( unsigned int width, unsigned int height )
 {
   FT_Set_Pixel_Sizes( this->face_, width, height );
+  this->glyph_map_.clear();
 }
 
 unsigned int FreeTypeFace::get_char_index( unsigned long charcode )
@@ -59,12 +61,12 @@ unsigned int FreeTypeFace::get_char_index( unsigned long charcode )
   return FT_Get_Char_Index( this->face_, charcode );
 }
 
-FreeTypeGlyphHandle FreeTypeFace::get_glyph_by_char( unsigned long charcode )
+FreeTypeGlyphConstHandle FreeTypeFace::get_glyph_by_char( unsigned long charcode )
 {
   return this->get_glyph_by_index( this->get_char_index( charcode ) );
 }
 
-FreeTypeGlyphHandle FreeTypeFace::get_glyph_by_index( unsigned int index )
+FreeTypeGlyphConstHandle FreeTypeFace::get_glyph_by_index( unsigned int index )
 {
   glyph_map_type::iterator it = this->glyph_map_.find( index );
   if ( it != this->glyph_map_.end() )

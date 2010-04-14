@@ -88,7 +88,34 @@ void TextRenderer::render( const std::string& text, unsigned char* buffer, int w
     return;
   }
 
-  this->render( text, buffer, width, height, x_offset, y_offset, face );
+  std::vector< FreeTypeGlyphHandle > glyphs;
+  this->get_glyphs( text, face, glyphs );
+  this->render( glyphs, buffer, width, height, x_offset, y_offset );
+}
+
+void TextRenderer::render( const std::string& text, unsigned char* buffer, int width,
+  int height, int x_offset, int y_offset, unsigned int font_size, double angle )
+{
+  assert( width > 0 && height > 0 );
+
+  if ( !this->valid_ )
+    return;
+
+  size_t text_len = text.size();
+  if ( text_len == 0 )
+  {
+    return;
+  }
+
+  FreeTypeFaceHandle face = this->get_face( font_size );
+  if ( !face )
+  {
+    return;
+  }
+
+  std::vector< FreeTypeGlyphHandle > glyphs;
+  this->get_glyphs( text, face, angle, glyphs );
+  this->render( glyphs, buffer, width, height, x_offset, y_offset );
 }
 
 void TextRenderer::render( const std::vector< std::string >& text, unsigned char* buffer, 
@@ -113,7 +140,9 @@ void TextRenderer::render( const std::vector< std::string >& text, unsigned char
 
   for ( size_t i = 0; i < num_of_strings; i++ )
   {
-    this->render( text[ i ], buffer, width, height, x_offset, y_offset, face );
+    std::vector< FreeTypeGlyphHandle > glyphs;
+    this->get_glyphs( text[ i ], face, glyphs );
+    this->render( glyphs, buffer, width, height, x_offset, y_offset );
     y_offset -= ( ( face->face_->size->metrics.height >> 6 ) + line_spacing );
   }
 }
@@ -139,46 +168,15 @@ void TextRenderer::render_aligned( const std::string& text, unsigned char* buffe
     return;
   }
 
+  std::vector< FreeTypeGlyphHandle > glyphs;
+  FT_BBox bbox;
+  this->get_glyphs( text, face, glyphs );
+  this->compute_bbox( glyphs, bbox );
+
   int x_offset;
   int y_offset;
-  FT_BBox bbox;
-  this->compute_bbox( text, face, bbox );
-  int text_width = static_cast< int >( bbox.xMax - bbox.xMin );
-  int text_height = static_cast< int >( bbox.yMax - bbox.yMin );
-
-  switch( halign )
-  {
-  case TextHAlignmentType::LEFT_E:
-    x_offset = -bbox.xMin;
-    break;
-  case TextHAlignmentType::RIGHT_E:
-    x_offset = width - text_width - bbox.xMin;
-    break;
-  case TextHAlignmentType::CENTER_E:
-    x_offset = ( width - text_width ) / 2 - bbox.xMin;
-    break;
-  default:
-    assert( false );
-    break;
-  }
-
-  switch( valign )
-  {
-  case TextVAlignmentType::BOTTOM_E:
-    y_offset = -bbox.yMin;
-    break;
-  case TextVAlignmentType::TOP_E:
-    y_offset = height - text_height - bbox.yMin;
-    break;
-  case TextVAlignmentType::CENTER_E:
-    y_offset = ( height - text_height ) / 2 - bbox.yMin;
-    break;
-  default:
-    assert( false );
-    break;
-  }
-
-  this->render( text, buffer, width, height, x_offset, y_offset, face );
+  this->compute_offset( width, height, bbox, halign, valign, x_offset, y_offset );
+  this->render( glyphs, buffer, width, height, x_offset, y_offset );
 }
 
 void TextRenderer::render_aligned( const std::string& text, unsigned char* buffer, 
@@ -202,53 +200,16 @@ void TextRenderer::render_aligned( const std::string& text, unsigned char* buffe
     return;
   }
 
-  int x_offset;
-  int y_offset;
   FT_BBox bbox;
   std::vector< FreeTypeGlyphHandle > glyphs;
-  this->compute_bbox( text, face, angle, bbox, glyphs );
-  int text_width = static_cast< int >( bbox.xMax - bbox.xMin );
-  int text_height = static_cast< int >( bbox.yMax - bbox.yMin );
+  this->get_glyphs( text, face, angle, glyphs );
+  this->compute_bbox( glyphs, bbox );
 
-  switch( halign )
-  {
-  case TextHAlignmentType::LEFT_E:
-    x_offset = -bbox.xMin;
-    break;
-  case TextHAlignmentType::RIGHT_E:
-    x_offset = width - text_width - bbox.xMin;
-    break;
-  case TextHAlignmentType::CENTER_E:
-    x_offset = ( width - text_width ) / 2 - bbox.xMin;
-    break;
-  default:
-    assert( false );
-    break;
-  }
+  int x_offset;
+  int y_offset;
+  this->compute_offset( width, height, bbox, halign, valign, x_offset, y_offset );
 
-  switch( valign )
-  {
-  case TextVAlignmentType::BOTTOM_E:
-    y_offset = -bbox.yMin;
-    break;
-  case TextVAlignmentType::TOP_E:
-    y_offset = height - text_height - bbox.yMin;
-    break;
-  case TextVAlignmentType::CENTER_E:
-    y_offset = ( height - text_height ) / 2 - bbox.yMin;
-    break;
-  default:
-    assert( false );
-    break;
-  }
-
-  size_t num_of_glyphs = glyphs.size();
-  for ( size_t i = 0; i < num_of_glyphs; i++ )
-  {
-    FreeTypeGlyphHandle glyph = glyphs[ i ];
-    FreeTypeBitmapGlyphHandle glyph_bitmap = glyph->render_to_bitmap();
-    glyph_bitmap->draw( buffer, width, height, x_offset, y_offset );
-  }
+  this->render( glyphs, buffer, width, height, x_offset, y_offset );
 }
 
 void TextRenderer::compute_size( const std::string& text, unsigned int font_size, 
@@ -268,8 +229,12 @@ void TextRenderer::compute_size( const std::string& text, unsigned int font_size
     return;
   }
 
+  std::vector< FreeTypeGlyphHandle > glyphs;
+  this->get_glyphs( text, face, glyphs );
+
   FT_BBox string_bbox;
-  this->compute_bbox( text, face, string_bbox );
+  this->compute_bbox( glyphs, string_bbox );
+
   width = static_cast< int >( string_bbox.xMax - string_bbox.xMin );
   height = static_cast< int >( string_bbox.yMax - string_bbox.yMin );
   x_offset = static_cast< int >( -string_bbox.xMin );
@@ -302,8 +267,8 @@ FreeTypeFaceHandle TextRenderer::get_face( unsigned int font_size )
   return face;
 }
 
-void TextRenderer::render( const std::string& text, unsigned char* buffer, int width,
-    int height, int x_offset, int y_offset, FreeTypeFaceHandle face )
+void TextRenderer::get_glyphs( const std::string& text, FreeTypeFaceHandle face,
+  std::vector< FreeTypeGlyphHandle >& glyphs )
 {
   size_t text_len = text.size();
   if ( text_len == 0 )
@@ -311,14 +276,16 @@ void TextRenderer::render( const std::string& text, unsigned char* buffer, int w
     return;
   }
   
-  int pen_x = x_offset;
-  int pen_y = y_offset;
+  FT_Vector pen_pos;
+  pen_pos.x = 0;
+  pen_pos.y = 0;
+
   unsigned int previous_index = 0;
   bool use_kerning = face->has_kerning();
   for ( size_t i = 0; i < text_len; i++ )
   {
     unsigned int glyph_index = face->get_char_index( text[ i ] );
-    FreeTypeGlyphHandle glyph = face->get_glyph_by_index( glyph_index );
+    FreeTypeGlyphConstHandle glyph = face->get_glyph_by_index( glyph_index );
     if ( !glyph )
     {
       continue;
@@ -328,73 +295,27 @@ void TextRenderer::render( const std::string& text, unsigned char* buffer, int w
     {
       FT_Vector delta;
       face->get_kerning( previous_index, glyph_index, FT_KERNING_DEFAULT, &delta );
-      pen_x += ( delta.x >> 6 );
+      pen_pos.x += delta.x;
     }
-    FreeTypeBitmapGlyphHandle glyph_bitmap = glyph->render_to_bitmap();
-    glyph_bitmap->draw( buffer, width, height, pen_x, pen_y );
-    pen_x += glyph->glyph_->advance.x >> 16;
+
+    FreeTypeGlyphHandle tmp_glyph = FreeTypeGlyphHandle( new FreeTypeGlyph( *glyph ) );
+    tmp_glyph->transform( 0, &pen_pos );
+    glyphs.push_back( tmp_glyph );
+
+    pen_pos.x += tmp_glyph->glyph_->advance.x >> 10;
     previous_index = glyph_index;
   }
 }
 
-void TextRenderer::compute_bbox( const std::string& text, FreeTypeFaceHandle face, 
-  FT_BBox& bbox )
+void TextRenderer::get_glyphs( const std::string& text, FreeTypeFaceHandle face,
+  double angle, std::vector< FreeTypeGlyphHandle >& glyphs )
 {
-  bbox.xMax = bbox.yMax = std::numeric_limits< FT_Pos >::min();
-  bbox.xMin = bbox.yMin = std::numeric_limits< FT_Pos >::max();
-
   size_t text_len = text.size();
-  int pen_x = 0;
-  int pen_y = 0;
-  unsigned int previous_index = 0;
-  bool use_kerning = face->has_kerning();
-  for ( size_t i = 0; i < text_len; i++ )
+  if ( text_len == 0 )
   {
-    unsigned int glyph_index = face->get_char_index( text[ i ] );
-    FreeTypeGlyphHandle glyph = face->get_glyph_by_index( glyph_index );
-    if ( !glyph )
-    {
-      continue;
-    }
-
-    if ( use_kerning && previous_index != 0 && glyph_index != 0 )
-    {
-      FT_Vector delta;
-      face->get_kerning( previous_index, glyph_index, FT_KERNING_DEFAULT, &delta );
-      pen_x += ( delta.x >> 6 );
-    }
-
-    FT_BBox glyph_bbox;
-    glyph->get_cbox( &glyph_bbox );
-    glyph_bbox.xMin += pen_x;
-    glyph_bbox.xMax += pen_x;
-    glyph_bbox.yMin += pen_y;
-    glyph_bbox.yMax += pen_y;
-
-    bbox.xMin = Utils::Min( bbox.xMin, glyph_bbox.xMin );
-    bbox.xMax = Utils::Max( bbox.xMax, glyph_bbox.xMax );
-    bbox.yMin = Utils::Min( bbox.yMin, glyph_bbox.yMin );
-    bbox.yMax = Utils::Max( bbox.yMax, glyph_bbox.yMax );
-    
-    pen_x += glyph->glyph_->advance.x >> 16;
-    previous_index = glyph_index;
+    return;
   }
-
-  if ( bbox.xMin > bbox.xMax )
-  {
-    bbox.xMin = 0;
-    bbox.yMin = 0;
-    bbox.xMax = 0;
-    bbox.yMax = 0;
-  }
-}
-
-void TextRenderer::compute_bbox( const std::string &text, Utils::FreeTypeFaceHandle face,
-  double angle, FT_BBox &bbox, std::vector<FreeTypeGlyphHandle>& glyphs )
-{
-  bbox.xMax = bbox.yMax = std::numeric_limits< FT_Pos >::min();
-  bbox.xMin = bbox.yMin = std::numeric_limits< FT_Pos >::max();
-
+  
   angle = Utils::DegreeToRadian( angle );
   double sin_angle = Utils::Sin( angle );
   double cos_angle = Utils::Cos( angle );
@@ -409,14 +330,12 @@ void TextRenderer::compute_bbox( const std::string &text, Utils::FreeTypeFaceHan
   pen_pos.x = 0;
   pen_pos.y = 0;
 
-  glyphs.clear();
-  size_t text_len = text.size();
   unsigned int previous_index = 0;
   bool use_kerning = face->has_kerning();
   for ( size_t i = 0; i < text_len; i++ )
   {
     unsigned int glyph_index = face->get_char_index( text[ i ] );
-    FreeTypeGlyphHandle glyph = face->get_glyph_by_index( glyph_index );
+    FreeTypeGlyphConstHandle glyph = face->get_glyph_by_index( glyph_index );
     if ( !glyph )
     {
       continue;
@@ -429,28 +348,51 @@ void TextRenderer::compute_bbox( const std::string &text, Utils::FreeTypeFaceHan
       FT_Vector rotated_delta;
       rotated_delta.x = static_cast< FT_Pos >( cos_angle * delta.x - sin_angle * delta.y );
       rotated_delta.y = static_cast< FT_Pos >( sin_angle * delta.x + cos_angle * delta.y );
-      pen_pos.x += ( rotated_delta.x );
-      pen_pos.y += ( rotated_delta.y );
+      pen_pos.x += rotated_delta.x;
+      pen_pos.y += rotated_delta.y;
     }
 
     // Make a copy of the glyph so the original one remains untouched.
     FreeTypeGlyphHandle tmp_glyph = FreeTypeGlyphHandle( new FreeTypeGlyph( *glyph ) );
-    // Transform the glyph
+    // Transform the glyph: rotation plus translating the glyph to the current pen position
     tmp_glyph->transform( &rot_mat, &pen_pos );
 
     glyphs.push_back( tmp_glyph );
 
+    pen_pos.x += tmp_glyph->glyph_->advance.x >> 10;
+    pen_pos.y += tmp_glyph->glyph_->advance.y >> 10;
+    previous_index = glyph_index;
+  }
+}
+
+void TextRenderer::render( const std::vector< FreeTypeGlyphHandle >& glyphs, 
+  unsigned char* buffer, int width, int height, int x_offset, int y_offset )
+{
+  size_t num_of_glyphs = glyphs.size();
+  for ( size_t i = 0; i < num_of_glyphs; i++ )
+  {
+    FreeTypeGlyphHandle glyph = glyphs[ i ];
+    FreeTypeBitmapGlyphHandle glyph_bitmap = glyph->render_to_bitmap();
+    glyph_bitmap->draw( buffer, width, height, x_offset, y_offset );
+  }
+}
+
+void TextRenderer::compute_bbox( const std::vector< FreeTypeGlyphHandle >& glyphs, 
+  FT_BBox& bbox )
+{
+  bbox.xMax = bbox.yMax = std::numeric_limits< FT_Pos >::min();
+  bbox.xMin = bbox.yMin = std::numeric_limits< FT_Pos >::max();
+
+  size_t num_of_glyphs = glyphs.size();
+  for ( size_t i = 0; i < num_of_glyphs; i++ )
+  {
     FT_BBox glyph_bbox;
-    tmp_glyph->get_cbox( &glyph_bbox );
+    glyphs[ i ]->get_cbox( &glyph_bbox );
 
     bbox.xMin = Utils::Min( bbox.xMin, glyph_bbox.xMin );
     bbox.xMax = Utils::Max( bbox.xMax, glyph_bbox.xMax );
     bbox.yMin = Utils::Min( bbox.yMin, glyph_bbox.yMin );
     bbox.yMax = Utils::Max( bbox.yMax, glyph_bbox.yMax );
-
-    pen_pos.x += tmp_glyph->glyph_->advance.x >> 10;
-    pen_pos.y += tmp_glyph->glyph_->advance.y >> 10;
-    previous_index = glyph_index;
   }
 
   if ( bbox.xMin > bbox.xMax )
@@ -459,6 +401,42 @@ void TextRenderer::compute_bbox( const std::string &text, Utils::FreeTypeFaceHan
     bbox.yMin = 0;
     bbox.xMax = 0;
     bbox.yMax = 0;
+  }
+}
+
+void TextRenderer::compute_offset( int width, int height, const FT_BBox& bbox, 
+  TextHAlignmentType halign, TextVAlignmentType valign, int& x_offset, int& y_offset )
+{
+  switch( halign )
+  {
+  case TextHAlignmentType::LEFT_E:
+    x_offset = -bbox.xMin;
+    break;
+  case TextHAlignmentType::RIGHT_E:
+    x_offset = width - bbox.xMax;
+    break;
+  case TextHAlignmentType::CENTER_E:
+    x_offset = ( width - bbox.xMax - bbox.xMin ) / 2;
+    break;
+  default:
+    assert( false );
+    break;
+  }
+
+  switch( valign )
+  {
+  case TextVAlignmentType::BOTTOM_E:
+    y_offset = -bbox.yMin;
+    break;
+  case TextVAlignmentType::TOP_E:
+    y_offset = height - bbox.yMax;
+    break;
+  case TextVAlignmentType::CENTER_E:
+    y_offset = ( height - bbox.yMax - bbox.yMin ) / 2;
+    break;
+  default:
+    assert( false );
+    break;
   }
 }
 

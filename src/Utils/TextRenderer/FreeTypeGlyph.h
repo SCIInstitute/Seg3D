@@ -48,6 +48,7 @@ namespace Utils
 class FreeTypeGlyph;
 class FreeTypeBitmapGlyph;
 typedef boost::shared_ptr< FreeTypeGlyph > FreeTypeGlyphHandle;
+typedef boost::shared_ptr< const FreeTypeGlyph > FreeTypeGlyphConstHandle;
 typedef boost::shared_ptr< FreeTypeBitmapGlyph > FreeTypeBitmapGlyphHandle;
 
 class FreeTypeGlyph
@@ -64,10 +65,10 @@ public:
   void transform( FT_Matrix* matrix, FT_Vector* delta );
 
   // Get the CBox of the glyph in pixel coordinates
-  void get_cbox( FT_BBox* cbox );
+  void get_cbox( FT_BBox* cbox ) const;
 
   // Render the glyph to a 8-bit anti-aliased bitmap
-  FreeTypeBitmapGlyphHandle render_to_bitmap( FT_Vector* origin = 0 );
+  FreeTypeBitmapGlyphHandle render_to_bitmap( FT_Vector* origin = 0 ) const;
 
 private:
   FreeTypeGlyph& operator=(  const FreeTypeGlyph& copy );
@@ -86,7 +87,7 @@ public:
   ~FreeTypeBitmapGlyph();
 
   void draw( unsigned char* target, const int width, const int height, 
-    const int x_offset, const int y_offset );
+    const int x_offset, const int y_offset ) const;
 
 private:
   FT_BitmapGlyph glyph_bitmap_;
