@@ -42,6 +42,8 @@ ADD_CUSTOM_COMMAND(
 ##################################################
 
 SET(APPLICATION_RENDERER_SRCS
+  RendererBase.h
+  RendererBase.cc
   Renderer.h
   Renderer.cc
   SliceShader.h

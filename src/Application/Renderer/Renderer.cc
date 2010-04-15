@@ -29,52 +29,20 @@
 // Utils includes
 #include <Utils/Core/Log.h>
 #include <Utils/RenderResources/RenderResources.h>
-#include <Utils/EventHandler/DefaultEventHandlerContext.h>
 #include <Utils/Geometry/View3D.h>
 #include <Utils/Graphics/UnitCube.h>
 
 // Application includes
+#include <Application/Application/Application.h>
 #include <Application/Layer/DataLayer.h>
 #include <Application/Layer/MaskLayer.h>
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/Renderer/Renderer.h>
 #include <Application/ViewerManager/ViewerManager.h>
 
-#if defined(_WIN32) || defined(__APPLE__) || defined(X11_THREADSAFE)
-#define MULTITHREADED_RENDERING 1
-#else
-#define MULTITHREADED_RENDERING 0
-#endif
 
 namespace Seg3D
 {
-
-class RendererEventHandlerContext : public Utils::DefaultEventHandlerContext
-{
-public:
-
-  RendererEventHandlerContext() :
-    DefaultEventHandlerContext()
-  {
-  }
-  virtual ~RendererEventHandlerContext()
-  {
-  }
-
-  virtual void post_event( Utils::EventHandle& event )
-  {
-    boost::unique_lock< boost::mutex > lock( event_queue_mutex_ );
-
-    // discard the previous rendering event
-    //if (!event_queue_.empty())
-    //{
-    //  event_queue_.pop();
-    //}
-
-    event_queue_.push( event );
-    event_queue_new_event_.notify_all();
-  }
-};
 
 static const unsigned int PATTERN_SIZE_C = 6;
 static const unsigned char MASK_PATTERNS_C[][ PATTERN_SIZE_C ][ PATTERN_SIZE_C ] =
@@ -98,15 +66,10 @@ static const int NUM_OF_PATTERNS_C =
   sizeof( MASK_PATTERNS_C ) / ( PATTERN_SIZE_C * PATTERN_SIZE_C );
 
 Renderer::Renderer() :
-  ViewerRenderer(), 
-  EventHandler(), 
+  RendererBase(), 
+  ConnectionHandler(), 
   slice_shader_( new SliceShader ),
-  text_renderer_( new Utils::TextRenderer ),
-  active_render_texture_( 0 ), 
-  active_overlay_texture_( 2 ),
-  width_( 0 ), 
-  height_( 0 ),
-  redraw_needed_( false )
+  text_renderer_( new Utils::TextRenderer )
 {
 }
 
@@ -115,45 +78,8 @@ Renderer::~Renderer()
   this->disconnect_all();
 }
 
-void Renderer::initialize()
+void Renderer::post_initialize()
 {
-#if MULTITHREADED_RENDERING
-  // NOTE: it is important to postpone the allocation of OpenGL objects to the 
-  // rendering thread. If created in a different thread, these objects might not
-  // be ready when the rendering thread uses them the first time, which caused
-  // the scene to be blank sometimes.
-  if ( !is_eventhandler_thread() )
-  {
-    if ( !Utils::RenderResources::Instance()->create_render_context( this->context_ ) )
-    {
-      SCI_THROW_EXCEPTION( "Failed to create a valid rendering context" );
-    }
-    this->post_event( boost::bind( &Renderer::initialize, this ) );
-    this->start_eventhandler();
-    return;
-  }
-
-  SCI_LOG_DEBUG( "Initializing renderer in a separate thread" );
-
-#else
-  if ( !Interface::IsInterfaceThread() )
-  {
-    Interface::PostEvent( boost::bind( &Renderer::initialize, this ) );
-    return;
-  }
-
-  SCI_LOG_DEBUG( "Initializing renderer in the interface thread" );
-
-  if ( !Utils::RenderResources::Instance()->create_render_context( this->context_ ) )
-  {
-    SCI_THROW_EXCEPTION("Failed to create a valid rendering context");
-  }
-#endif
-
-  // Make the GL context current. In multi-threaded rendering mode,
-  // this call is only needed once.
-  this->context_->make_current();
-
   glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
   glPixelStorei( GL_PACK_ALIGNMENT, 1 );
 
@@ -161,9 +87,6 @@ void Renderer::initialize()
     // lock the shared render context
     Utils::RenderResources::lock_type lock( Utils::RenderResources::GetMutex() );
 
-    this->depth_buffer_ = Utils::RenderbufferHandle( new Utils::Renderbuffer );
-    this->frame_buffer_ = Utils::FramebufferObjectHandle( new Utils::FramebufferObject );
-    this->frame_buffer_->attach_renderbuffer( depth_buffer_, GL_DEPTH_ATTACHMENT_EXT );
     this->cube_ = Utils::UnitCubeHandle( new Utils::UnitCube() );
     this->slice_shader_->initialize();
     this->pattern_texture_ = Utils::Texture3DHandle( new Utils::Texture3D );
@@ -171,8 +94,6 @@ void Renderer::initialize()
       GL_ALPHA, MASK_PATTERNS_C, GL_ALPHA, GL_UNSIGNED_BYTE );
     this->text_texture_ = Utils::Texture2DHandle( new Utils::Texture2D );
   }
-
-  SCI_CHECK_OPENGL_ERROR();
 
   this->slice_shader_->enable();
   this->slice_shader_->set_slice_texture( 0 );
@@ -187,67 +108,27 @@ void Renderer::initialize()
   this->pattern_texture_->set_wrap_r( GL_CLAMP );
   Utils::Texture::SetActiveTextureUnit( 0 );
 
-  SCI_CHECK_OPENGL_ERROR();
+  ViewerHandle viewer = ViewerManager::Instance()->get_viewer( this->viewer_id_ );
+  this->add_connection( viewer->redraw_signal_.connect( 
+    boost::bind( &Renderer::redraw, this, false ) ) );
+  this->add_connection( viewer->redraw_overlay_signal_.connect( 
+    boost::bind( &Renderer::redraw_overlay, this ) ) );
 
-  this->add_connection( ViewerManager::Instance()->get_viewer( this->viewer_id_ )
-    ->redraw_signal_.connect( boost::bind( &Renderer::redraw, this, false ) ) );
-
-  SCI_LOG_DEBUG( std::string("Renderer ") + Utils::ToString( this->viewer_id_ ) 
-    + " initialized with context " + this->context_->to_string() );
+  //size_t num_of_viewers = Application::Instance()->number_of_viewers();
+  //for ( size_t i = 0; i < num_of_viewers; i++ )
+  //{
+  //  if ( i != this->viewer_id_ )
+  //  {
+  //    this->add_connection( ViewerManager::Instance()->get_viewer( i )->
+  //      content_changed_signal_.connect( boost::bind( &Renderer::redraw_overlay, this ) ) );
+  //  }
+  //}
 }
 
-void Renderer::redraw( bool delay_update )
+bool Renderer::render()
 {
-#if MULTITHREADED_RENDERING
-  if ( !is_eventhandler_thread() )
-  {
-    lock_type lock( this->redraw_needed_mutex_ );
-    this->redraw_needed_ = true;
-    this->post_event( boost::bind( &Renderer::redraw, this, delay_update ) );
-    return;
-  }
-#else
-  if ( !Interface::IsInterfaceThread() )
-  {
-    lock_type lock( this->redraw_needed_mutex_ );
-    this->redraw_needed_ = true;
-    Interface::PostEvent( boost::bind( &Renderer::redraw, this, delay_update ) );
-    return;
-  }
-  // Make the GL context current in the interface thread
-  this->context_->make_current();
-#endif
-
-  if ( !this->is_active() || this->width_ == 0 || this->height_ == 0 )
-  {
-    return;
-  }
-
-  {
-    lock_type lock( this->redraw_needed_mutex_ );
-    if ( !this->redraw_needed_ )
-    {
-      return;
-    }
-    this->redraw_needed_ = false;
-  }
-
   SCI_LOG_DEBUG( std::string("Renderer ") + Utils::ToString( this->viewer_id_ ) 
     + ": starting redraw" );
-
-  // lock the active render texture
-  Utils::Texture::lock_type texture_lock( this->textures_[ this->active_render_texture_ ]->get_mutex() );
-
-  // bind the framebuffer object
-  this->frame_buffer_->enable();
-  // attach texture
-  this->frame_buffer_->attach_texture( this->textures_[ this->active_render_texture_ ] );
-
-  if ( !this->frame_buffer_->check_status() )
-  {
-    this->frame_buffer_->disable();
-    return;
-  }
 
   glClearColor( 0.3f, 0.3f, 0.3f, 1.0f );
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -401,65 +282,16 @@ void Renderer::redraw( bool delay_update )
     glDisable( GL_BLEND );
   }
 
-  SCI_CHECK_OPENGL_ERROR();
-
-  glFinish();
-
-  this->frame_buffer_->detach_texture( this->textures_[ this->active_render_texture_ ] );
-  this->frame_buffer_->disable();
-
-  // release the lock on the active render texture
-  texture_lock.unlock();
-
   SCI_LOG_DEBUG( std::string("Renderer ") + Utils::ToString( this->viewer_id_ ) 
     + ": done redraw" );
 
-  // signal rendering completed
-  this->rendering_completed_signal_( this->textures_[ this->active_render_texture_ ], delay_update );
-
-  // swap render textures 
-  this->active_render_texture_ = ( ~this->active_render_texture_ ) & 1;
+  return true;
 }
 
-void Renderer::redraw_overlay()
+bool Renderer::render_overlay()
 {
-#if MULTITHREADED_RENDERING
-  if ( !is_eventhandler_thread() )
-  {
-    this->post_event( boost::bind( &Renderer::redraw_overlay, this ) );
-    return;
-  }
-#else
-  if ( !Interface::IsInterfaceThread() )
-  {
-    Interface::PostEvent( boost::bind( &Renderer::redraw_overlay, this ) );
-    return;
-  }
-  // Make the GL context current in the interface thread
-  this->context_->make_current();
-#endif
-
-  if ( !this->is_active() || this->width_ == 0 || this->height_ == 0 )
-  {
-    return;
-  }
-
   SCI_LOG_DEBUG( std::string("Renderer ") + Utils::ToString( this->viewer_id_ ) 
     + ": starting redraw overlay" );
-
-  // lock the active render texture
-  Utils::Texture::lock_type texture_lock( this->textures_[ this->active_overlay_texture_ ]->get_mutex() );
-
-  // bind the framebuffer object
-  this->frame_buffer_->enable();
-  // attach texture
-  this->frame_buffer_->attach_texture( this->textures_[ this->active_overlay_texture_ ] );
-
-  if ( !this->frame_buffer_->check_status() )
-  {
-    this->frame_buffer_->disable();
-    return;
-  }
 
   glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -482,6 +314,9 @@ void Renderer::redraw_overlay()
     // We have got everything we want from the state engine, unlock before we do any rendering
     state_lock.unlock();
 
+    glDisable( GL_DEPTH_TEST );
+    glDisable( GL_CULL_FACE );
+    glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
     // Enable blending
     glEnable( GL_BLEND );
     // NOTE: The result of the following blend function is that, color channels contains
@@ -554,77 +389,18 @@ void Renderer::redraw_overlay()
     glDisable( GL_BLEND );
   }
 
-  SCI_CHECK_OPENGL_ERROR();
-
-  glFinish();
-
-  this->frame_buffer_->detach_texture( this->textures_[ this->active_overlay_texture_ ] );
-  this->frame_buffer_->disable();
-
-  // release the lock on the active render texture
-  texture_lock.unlock();
-
   SCI_LOG_DEBUG( std::string("Renderer ") + Utils::ToString( this->viewer_id_ ) 
     + ": done redraw overlay" );
 
-  // signal rendering completed
-  this->redraw_overlay_completed_signal_( this->textures_[ this->active_overlay_texture_ ] );
-
-  // swap render textures 
-  this->active_overlay_texture_ = ( ~( this->active_overlay_texture_ - 2 ) ) & 1 + 2;
+  return true;
 }
 
-void Renderer::resize( int width, int height )
+void Renderer::post_resize()
 {
-#if MULTITHREADED_RENDERING
-  if ( !is_eventhandler_thread() )
-  {
-    this->post_event( boost::bind( &Renderer::resize, this, width, height ) );
-    return;
-  }
-#else
-  if ( !Interface::IsInterfaceThread() )
-  {
-    Interface::PostEvent( boost::bind( &Renderer::resize, this, width, height ) );
-    return;
-  }
-  // Make the GL context current in the interface thread
-  this->context_->make_current();
-#endif
-
-  if ( width <= 0 || height <= 0 || ( this->width_ == width && this->height_ == height ) )
-  {
-    return;
-  }
-
   {
     Utils::RenderResources::lock_type lock( Utils::RenderResources::GetMutex() );
-    this->textures_[ 0 ] = Utils::Texture2DHandle( new Utils::Texture2D );
-    this->textures_[ 1 ] = Utils::Texture2DHandle( new Utils::Texture2D );
-    this->textures_[ 2 ] = Utils::Texture2DHandle( new Utils::Texture2D );
-    this->textures_[ 3 ] = Utils::Texture2DHandle( new Utils::Texture2D );
-    this->textures_[ 0 ]->set_image( width, height, GL_RGBA );
-    this->textures_[ 1 ]->set_image( width, height, GL_RGBA );
-    this->textures_[ 2 ]->set_image( width, height, GL_RGBA );
-    this->textures_[ 3 ]->set_image( width, height, GL_RGBA );
-    this->depth_buffer_->set_storage( width, height, GL_DEPTH_COMPONENT );
-    this->text_texture_->set_image( width, height, GL_RGBA );
+    this->text_texture_->set_image( this->width_, this->height_, GL_RGBA );
   }
-
-  this->width_ = width;
-  this->height_ = height;
-
-  glViewport( 0, 0, this->width_, this->height_ );
-
-  {
-    lock_type lock( this->redraw_needed_mutex_ );
-    this->redraw_needed_ = true;
-  }
-
-  // Getting here means the size is valid, make sure that the renderer is active
-  this->activate();
-  this->redraw( true );
-  this->redraw_overlay();
 }
 
 void Renderer::process_slices( LayerSceneHandle& layer_scene, ViewerHandle& viewer )

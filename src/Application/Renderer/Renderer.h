@@ -34,18 +34,13 @@
 #endif
 
 // Application includes
+#include <Application/Renderer/RendererBase.h>
 #include <Application/Renderer/SliceShader.h>
 #include <Application/Viewer/Viewer.h>
-#include <Application/Viewer/ViewerRenderer.h>
 
 #include <Utils/Core/ConnectionHandler.h>
-#include <Utils/EventHandler/EventHandler.h>
-#include <Utils/Geometry/View2D.h>
-#include <Utils/Graphics/FramebufferObject.h>
-#include <Utils/Graphics/Renderbuffer.h>
 #include <Utils/Graphics/Texture.h>
 #include <Utils/Graphics/UnitCube.h>
-#include <Utils/RenderResources/RenderContext.h>
 #include <Utils/TextRenderer/TextRenderer.h>
 
 namespace Seg3D
@@ -56,8 +51,7 @@ class Renderer;
 typedef boost::shared_ptr< Renderer > RendererHandle;
 
 // Class definitions
-class Renderer : public ViewerRenderer, private Utils::EventHandler, 
-  private Utils::ConnectionHandler
+class Renderer : public RendererBase, private Utils::ConnectionHandler
 {
 
   // -- constructor/destructor --
@@ -65,42 +59,29 @@ public:
   Renderer();
   virtual ~Renderer();
 
-public:
+  void set_viewer_id( size_t viewer_id )
+  {
+    this->viewer_id_ = viewer_id;
+  }
 
-  virtual void initialize();
-  virtual void redraw( bool delay_update = false );
-  virtual void resize( int width, int height );
-  void redraw_overlay();
-
-  typedef boost::signals2::signal< void ( Utils::TextureHandle ) > update_overlay_signal_type;
-  update_overlay_signal_type redraw_overlay_completed_signal_;
+protected:
+  virtual void post_initialize();
+  virtual void post_resize();
+  virtual bool render();
+  virtual bool render_overlay();
 
 private:
 
   void process_slices( LayerSceneHandle& layer_scene, ViewerHandle& viewer );
 
-  // GL context for rendering
-  Utils::RenderContextHandle context_;
-
-  Utils::Texture2DHandle textures_[ 4 ];
-  Utils::RenderbufferHandle depth_buffer_;
-  Utils::FramebufferObjectHandle frame_buffer_;
   Utils::UnitCubeHandle cube_;
   SliceShaderHandle slice_shader_;
   Utils::Texture3DHandle pattern_texture_;
 
   Utils::TextRendererHandle text_renderer_;
   Utils::Texture2DHandle text_texture_;
-
-  int active_render_texture_;
-  int active_overlay_texture_;
-
-  int width_;
-  int height_;
-  bool redraw_needed_;
-
-  // Mutex for protecting the "redraw_needed_" member variable
-  mutex_type redraw_needed_mutex_;
+  
+  size_t viewer_id_;
 };
 
 } // end namespace Seg3D

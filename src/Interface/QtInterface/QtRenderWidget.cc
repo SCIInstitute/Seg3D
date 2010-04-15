@@ -34,6 +34,7 @@
 #include <Utils/Core/Log.h>
 
 // Application includes
+#include <Application/State/Actions/ActionSet.h>
 #include <Application/Interface/Interface.h>
 #include <Application/ViewerManager/ViewerManager.h>
 
@@ -47,7 +48,7 @@ QtRenderWidget::QtRenderWidget( const QGLFormat& format, QWidget* parent, QtRend
   QGLWidget( format, parent, share )
 {
   this->renderer_ = RendererHandle( new Renderer() );
-  this->add_connection( renderer_->rendering_completed_signal_.connect(
+  this->add_connection( renderer_->redraw_completed_signal_.connect(
       boost::bind( &QtRenderWidget::update_texture, this, _1, _2 ) ) );
   this->add_connection( renderer_->redraw_overlay_completed_signal_.connect(
       boost::bind( &QtRenderWidget::update_overlay_texture, this, _1 ) ) );
@@ -151,8 +152,8 @@ void QtRenderWidget::paintGL()
   this->renderer_texture_->disable();
 
   // Enable blending to render the overlay texture.
-  // NOTE: The overlay texture can NOT be simply rendered using multi-textureing because
-  // its color channals already reflect the effect of transparency, and its alpha channal 
+  // NOTE: The overlay texture can NOT be simply rendered using multi-texturing because
+  // its color channels already reflect the effect of transparency, and its alpha channel 
   // actually stores the value of "1-alpha"
   glEnable( GL_BLEND );
   glBlendFunc( GL_ONE, GL_SRC_ALPHA );
@@ -254,6 +255,7 @@ void QtRenderWidget::hideEvent( QHideEvent* event )
 {
   if ( !event->spontaneous() )
   {
+    ActionSet::Dispatch( this->viewer_->viewer_visible_state_, false );
     this->renderer_->deactivate();
   }
 }
@@ -262,6 +264,7 @@ void QtRenderWidget::showEvent( QShowEvent* event )
 {
   if ( !event->spontaneous() )
   {
+    ActionSet::Dispatch( this->viewer_->viewer_visible_state_, true );
     this->renderer_->activate();
   }
 }

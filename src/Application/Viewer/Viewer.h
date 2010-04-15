@@ -157,9 +157,13 @@ public:
   redraw_signal_type redraw_signal_;
   redraw_signal_type redraw_overlay_signal_;
 
+  typedef boost::signals2::signal< void ( size_t ) > content_changed_signal_type;
+  content_changed_signal_type content_changed_signal_;
+
 private:
   void change_view_mode( std::string mode, ActionSource source );
   void set_slice_number( int num, ActionSource source = ActionSource::NONE_E );
+  void change_visibility( bool visible, ActionSource source );
 
   // -- Data structures for keeping track of slices of layers --
 private:
@@ -213,7 +217,7 @@ private:
   void layer_state_changed( bool volume_view );
 
 private:
-  size_t viewer_id_;
+  const size_t viewer_id_;
   int width_;
   int height_;
 
@@ -246,6 +250,8 @@ public:
   StateBoolHandle volume_slices_visible_state_;
   StateBoolHandle volume_isosurfaces_visible_state_;
   StateBoolHandle volume_volume_rendering_visible_state_;
+
+  StateBoolHandle viewer_visible_state_;
 
 private:
   // Indexed view state variables for quick access

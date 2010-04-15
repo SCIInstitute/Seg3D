@@ -75,7 +75,7 @@ bool QtEventFilter::eventFilter( QObject* obj, QEvent* event )
       QMessageBox::critical( 0, QString( "Fatal Error" ), 
         QString::fromStdString( error_message) );
       QCoreApplication::exit( -1 );
-      return ( false );
+      return ( true );
     }
     catch ( std::exception& except )
     {
@@ -88,7 +88,7 @@ bool QtEventFilter::eventFilter( QObject* obj, QEvent* event )
       QMessageBox::critical( 0, QString( "Fatal Error" ),  
         QString::fromStdString( error_message) );
       QCoreApplication::exit( -1 );
-      return ( false );
+      return ( true );
     }
     catch ( ... )
     {
@@ -100,10 +100,10 @@ bool QtEventFilter::eventFilter( QObject* obj, QEvent* event )
       QMessageBox::critical( 0, QString( "Fatal Error" ),  
         QString::fromStdString( error_message) );
       QCoreApplication::exit( -1 );
-      return ( false );
+      return ( true );
     }
 
-    return ( false );
+    return ( true );
   }
   else
   {

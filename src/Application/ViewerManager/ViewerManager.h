@@ -76,6 +76,14 @@ public:
   StateOptionHandle layout_state_;
   StateIntHandle active_viewer_state_;
 
+  // -- Signals and slots --
+private:
+  void viewer_content_changed( size_t viewer_id );
+
+public:
+  typedef boost::signals2::signal< void ( size_t viewer_id ) > viewer_content_changed_signal_type;
+  viewer_content_changed_signal_type viewer_content_changed_signal_;
+
   // -- Viewer information --
 private:
 

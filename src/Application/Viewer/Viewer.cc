@@ -76,6 +76,8 @@ Viewer::Viewer( size_t viewer_id ) :
   add_state( "volume_isosurfaces_visible", volume_isosurfaces_visible_state_, true );
   add_state( "volume_volume_rendering_visible", volume_volume_rendering_visible_state_, false );
 
+  add_state( "viewer_visible", this->viewer_visible_state_, false );
+
   this->view_manipulator_ = ViewManipulatorHandle( new ViewManipulator( this ) );
   this->add_connection( LayerManager::Instance()->layer_inserted_signal_.connect( 
     boost::bind( &Viewer::insert_layer, this, _1 ) ) );
@@ -87,6 +89,8 @@ Viewer::Viewer( size_t viewer_id ) :
     boost::bind( &Viewer::change_view_mode, this, _1, _2 ) ) );
   this->add_connection( this->slice_number_state_->value_changed_signal_.connect(
     boost::bind( &Viewer::set_slice_number, this, _1, _2 ) ) );
+  this->add_connection( this->viewer_visible_state_->value_changed_signal_.connect(
+    boost::bind( &Viewer::change_visibility, this, _1, _2 ) ) );
 }
 
 Viewer::~Viewer()
@@ -470,7 +474,7 @@ void Viewer::set_active_layer( LayerHandle layer )
       }
       StateView2D* view2d_state = dynamic_cast< StateView2D* >( this->get_active_view_state().get() );
       this->active_layer_slice_->move_slice( view2d_state->get().center().z(), true );
-      if ( this->slice_number_state_->get() == 
+      if ( needs_redraw && this->slice_number_state_->get() == 
         static_cast< int >( this->active_layer_slice_->get_slice_number() ) )
       {
         this->set_slice_number( static_cast< int >( this->active_layer_slice_->get_slice_number() ) );
@@ -519,6 +523,12 @@ void Viewer::change_view_mode( std::string mode, ActionSource source )
 {
   if ( mode == VOLUME_C )
   {
+    if ( this->viewer_visible_state_->get() )
+    {
+      this->redraw_overlay_signal_();
+      this->content_changed_signal_( this->viewer_id_ );
+    }
+    
     return;
   }
 
@@ -559,7 +569,7 @@ void Viewer::change_view_mode( std::string mode, ActionSource source )
 
     StateView2D* view2d_state = dynamic_cast< StateView2D* >( this->get_active_view_state().get() );
     this->active_layer_slice_->move_slice( view2d_state->get().center().z(), true );
-    // Enforce an update even if the slice number is the same
+    // Force an update even if the slice number is the same
     if ( this->slice_number_state_->get() == 
       static_cast< int >( this->active_layer_slice_->get_slice_number() ) )
     {
@@ -571,6 +581,8 @@ void Viewer::change_view_mode( std::string mode, ActionSource source )
         this->active_layer_slice_->get_slice_number() ) );
     }
   } // end if ( this->active_layer_slice_ )
+
+  this->redraw_overlay_signal_();
 }
 
 void Viewer::set_slice_number( int num, ActionSource source )
@@ -608,6 +620,16 @@ void Viewer::set_slice_number( int num, ActionSource source )
       continue;
     ( *data_slice_it ).second->move_slice( this->active_layer_slice_->depth() );
   }
+
+  if ( this->viewer_visible_state_->get() )
+  {
+    this->content_changed_signal_( this->viewer_id_ );
+  }
+}
+
+void Viewer::change_visibility( bool /*visible*/, ActionSource /*source*/ )
+{
+  this->content_changed_signal_( this->viewer_id_ );
 }
 
 void Viewer::adjust_view( Utils::VolumeSliceHandle target_slice )

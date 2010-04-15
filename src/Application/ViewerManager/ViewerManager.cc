@@ -45,16 +45,19 @@ ViewerManager::ViewerManager() :
 {
   // Step (1)
   // Set the default state of this element
-  add_state( "layout", layout_state_, "1and3", "single|1and1|1and2|1and3|2and2|2and3|3and3" );
-  add_state( "active_viewer", active_viewer_state_, 0 );
+  this->add_state( "layout", this->layout_state_, "1and3", 
+    "single|1and1|1and2|1and3|2and2|2and3|3and3" );
+  this->add_state( "active_viewer", this->active_viewer_state_, 0 );
 
   // Step (2)
   // Create the viewers that are part of the application
   // Currently a maximum of 6 viewers can be created
-  viewers_.resize( 6 );
+  this->viewers_.resize( 6 );
   for ( size_t j = 0; j < viewers_.size(); j++ )
   {
-    viewers_[ j ] = ViewerHandle( new Viewer( j ) );
+    this->viewers_[ j ] = ViewerHandle( new Viewer( j ) );
+    this->add_connection( this->viewers_[ j ]->content_changed_signal_.connect(
+      boost::bind( &ViewerManager::viewer_content_changed, this, _1 ) ) );
   }
 }
 
@@ -66,7 +69,7 @@ ViewerManager::~ViewerManager()
 ViewerHandle ViewerManager::get_viewer( size_t idx )
 {
   ViewerHandle handle;
-  if ( idx < viewers_.size() ) handle = viewers_[ idx ];
+  if ( idx < this->viewers_.size() ) handle = this->viewers_[ idx ];
   return handle;
 }
 
@@ -82,6 +85,11 @@ ViewerHandle ViewerManager::get_viewer( const std::string viewer_name )
     }
   }
   return handle;
+}
+
+void ViewerManager::viewer_content_changed(size_t viewer_id)
+{
+  this->viewer_content_changed_signal_( viewer_id );
 }
 
 } // end namespace Seg3D
