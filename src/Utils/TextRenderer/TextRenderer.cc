@@ -61,6 +61,9 @@ TextRenderer::TextRenderer() :
 #elif defined( __APPLE__ )
   this->font_file_.assign( "/System/Library/Fonts/Helvetica.dfont" );
   this->face_index_ = 2;
+#else
+  this->font_file_.assign( "/usr/share/fonts/truetype/freefont/FreeSerif.ttf" );
+  this->face_index_ = 0;
 #endif
 }
 

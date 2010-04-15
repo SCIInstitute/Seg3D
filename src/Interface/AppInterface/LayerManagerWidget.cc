@@ -195,7 +195,7 @@ void  LayerManagerWidget::set_active_layer( LayerHandle layer )
   //SCI_LOG_DEBUG( "LayerManagerWidget set_active_layer started" );
     
   if( active_layer_ )
-    this->active_layer_.data()->set_active( false );
+    this->active_layer_.toStrongRef()->set_active( false );
   
     //this->set_active_group( layer->get_layer_group() );   
     
