@@ -26,8 +26,10 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// Application includes
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/ThresholdSegmentationLSFilter.h>
+#include <Application/LayerManager/LayerManager.h>
 
 namespace Seg3D
 {
@@ -39,8 +41,8 @@ ThresholdSegmentationLSFilter::ThresholdSegmentationLSFilter( const std::string&
   Tool( toolid )
 {
   // add default values for the the states
-  add_state( "target_layer", target_layer_state_, "<none>", "<none>" );
-  add_state( "mask_layer", mask_layer_state_, "<none>", "<none>" );
+  add_state( "target_layer", target_layer_state_, "<none>" );
+  add_state( "mask_layer", mask_layer_state_, "<none>" );
   add_state( "iterations", iterations_state_, 1, 100, 1, 2 );
     add_state( "upper_threshold", upper_threshold_state_, 1.0, 0.0, 1.0, 0.01 );
   add_state( "lower_threshold", lower_threshold_state_, 0.0, 0.0, 1.0, 0.01 );
@@ -55,18 +57,45 @@ ThresholdSegmentationLSFilter::ThresholdSegmentationLSFilter( const std::string&
       &ThresholdSegmentationLSFilter::target_constraint, this, _1 ) );
   mask_layer_state_->value_changed_signal_.connect( boost::bind(
       &ThresholdSegmentationLSFilter::target_constraint, this, _1 ) );
+  
+  LayerManager::Instance()->layers_changed_signal_.connect(
+    boost::bind( &ThresholdSegmentationLSFilter::handle_layers_changed, this ) );
 
-}
-
-void ThresholdSegmentationLSFilter::target_constraint( std::string layerid )
-{
 }
 
 ThresholdSegmentationLSFilter::~ThresholdSegmentationLSFilter()
 {
   disconnect_all();
 }
+  
+void ThresholdSegmentationLSFilter::handle_layers_changed()
+{
+  std::vector< LayerHandle > target_layers;
+  LayerManager::Instance()->get_layers( target_layers );
+  bool target_found = false;
+  bool mask_found = false;
+  
+  for( int i = 0; i < static_cast< int >( target_layers.size() ); ++i )
+  {
+    if( target_layers[i]->get_layer_name() == target_layer_state_->get() ) 
+      target_found = true;
+    
+    if( target_layers[i]->get_layer_name() == mask_layer_state_->get() )
+      mask_found = true;
+  }
+  
+  if( !target_found )
+    target_layer_state_->set( "", ActionSource::NONE_E );
+  
+  if( !mask_found )
+    mask_layer_state_->set( "", ActionSource::NONE_E );
+  
+} 
 
+void ThresholdSegmentationLSFilter::target_constraint( std::string layerid )
+{
+} 
+  
 void ThresholdSegmentationLSFilter::activate()
 {
 }

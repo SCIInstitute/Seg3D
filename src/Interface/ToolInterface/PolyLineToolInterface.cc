@@ -26,8 +26,10 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+
 //Interface Includes
 #include <Interface/QtInterface/QtBridge.h>
+#include <Interface/ToolInterface/CustomWidgets/TargetComboBox.h>
 
 //Qt Gui Includes
 #include <Interface/ToolInterface/PolyLineToolInterface.h>
@@ -45,6 +47,7 @@ class PolyLineToolInterfacePrivate
 {
 public:
   Ui::PolyLineToolInterface ui_;
+  TargetComboBox *target_;
 };
 
 // constructor
@@ -63,6 +66,9 @@ bool PolyLineToolInterface::build_widget( QFrame* frame )
 {
   //Step 1 - build the Qt GUI Widget
   this->private_->ui_.setupUi( frame );
+  
+    this->private_->target_ = new TargetComboBox( this );
+    this->private_->ui_.activeHLayout->addWidget( this->private_->target_ );
 
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
@@ -70,16 +76,10 @@ bool PolyLineToolInterface::build_widget( QFrame* frame )
 
     //Step 3 - set the values for the tool ui from the state engine
         
-        //set default falues for the target option list
-        std::vector< std::string > temp_option_list = tool->target_layer_state_->option_list();
-      for( size_t i = 0; i < temp_option_list.size(); i++)
-      {   
-          this->private_->ui_.targetComboBox->addItem( QString::fromStdString( temp_option_list[i] ) );
-      } 
-        this->private_->ui_.targetComboBox->setCurrentIndex(tool->target_layer_state_->index());
+    // N/A
 
   //Step 4 - connect the gui to the tool through the QtBridge
-  QtBridge::Connect( this->private_->ui_.targetComboBox, tool->target_layer_state_ );
+  QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
 
   //Send a message to the log that we have finised with building the Polyline Tool Interface
   SCI_LOG_MESSAGE("Finished building a PolyLine Tool Interface");

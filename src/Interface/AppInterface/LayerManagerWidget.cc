@@ -93,10 +93,10 @@ void LayerManagerWidget::insert_layer( LayerHandle layer )
     {
       ( *i )->setUpdatesEnabled( false );
       ( *i )->insert_layer( layer, -1 );
-      ( *i )->setUpdatesEnabled( true );
       if( layer->get_active() )
         this->set_active_layer( layer );
-      ( *i )->update();
+      ( *i )->setUpdatesEnabled( true );
+      ( *i )->repaint();
       inserted = true;
       break;
     } 
@@ -111,7 +111,6 @@ void LayerManagerWidget::insert_layer( LayerHandle layer, int index )
 {
   std::string group_id = layer->get_layer_group()->get_group_id();
 
-
   for ( QList< LayerGroupWidgetQHandle >::iterator i = this->group_list_.begin(); 
     i  != this->group_list_.end(); i++ )
   {
@@ -119,10 +118,10 @@ void LayerManagerWidget::insert_layer( LayerHandle layer, int index )
     { 
       ( *i )->setUpdatesEnabled( false );
       ( *i )->insert_layer( layer, index );
-      ( *i )->setUpdatesEnabled( true );
       if( layer->get_active() )
         this->set_active_layer( layer );
-      ( *i )->update();
+      ( *i )->setUpdatesEnabled( true );
+      ( *i )->repaint();
       break;
     } 
   }
@@ -143,7 +142,7 @@ void LayerManagerWidget::delete_layers( std::vector< LayerHandle > layers )
     }   
   }
   this->setUpdatesEnabled( true );
-  this->update();
+  this->repaint();
 }
 
 void LayerManagerWidget::delete_layer( LayerHandle layer )
@@ -159,7 +158,7 @@ void LayerManagerWidget::delete_layer( LayerHandle layer )
   }   
 
   this->setUpdatesEnabled( true );
-  this->update();
+  this->repaint();
 }
 
 
@@ -183,7 +182,6 @@ void LayerManagerWidget::delete_group( LayerGroupHandle group )
     {
       ( *i )->deleteLater();
       group_list_.erase( i );
-      this->set_active_group( LayerManager::Instance()->get_active_group() );
       return;
     }
   }
@@ -192,8 +190,6 @@ void LayerManagerWidget::delete_group( LayerGroupHandle group )
 
 void  LayerManagerWidget::set_active_layer( LayerHandle layer )
 {
-  //SCI_LOG_DEBUG( "LayerManagerWidget set_active_layer started" );
-    
   if( active_layer_ )
     this->active_layer_.toStrongRef()->set_active( false );
   
@@ -202,40 +198,15 @@ void  LayerManagerWidget::set_active_layer( LayerHandle layer )
     for ( QList< LayerGroupWidgetQHandle >::iterator i = this->group_list_.begin(); 
      i  != this->group_list_.end(); i++ )
   {
-    //SCI_LOG_DEBUG( "LayerGroupWidget set_active_layer started" );
     LayerWidgetQWeakHandle temp_layer = ( *i )->set_active_layer( layer );
-    //SCI_LOG_DEBUG( "LayerGroupWidget set_active_layer ended" );
       if( temp_layer )
       {
       active_layer_ = temp_layer;
       break;
     }
   }
-  
-  //SCI_LOG_DEBUG( "LayerManagerWidget set_active_layer ended" );
 }
 
-
-  
-void LayerManagerWidget::set_active_group( LayerGroupHandle group )
-{
-  SCI_LOG_DEBUG( "LayerManagerWidget set_active_group started" );
-
-    for ( QList< LayerGroupWidgetQHandle >::iterator i = this->group_list_.begin(); 
-     i  != this->group_list_.end(); i++ )
-  {
-    if ( group->get_group_id() == ( *i )->get_group_id() ) 
-    {
-        ( *i )->set_active( true );
-    }
-      else
-      {
-          ( *i )->set_active( false );
-      }
-  }
-  
-  SCI_LOG_DEBUG( "LayerManagerWidget set_active_group ended" );
-}
 
 
 

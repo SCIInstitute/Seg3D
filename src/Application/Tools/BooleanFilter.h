@@ -53,17 +53,21 @@ public:
 
   virtual void activate();
   virtual void deactivate();
+  
+private:
+  // -- handle updates from layermanager --
+  void handle_layers_changed();
 
   // -- state --
 public:
   // Layerid of the target layer
-  StateOptionHandle mask_a_state_;
+  StateStringHandle mask_a_state_;
 
-  StateOptionHandle mask_b_state_;
+  StateStringHandle mask_b_state_;
 
-  StateOptionHandle mask_c_state_;
+  StateStringHandle mask_c_state_;
 
-  StateOptionHandle mask_d_state_;
+  StateStringHandle mask_d_state_;
 
   StateOptionHandle example_expressions_state_;
 

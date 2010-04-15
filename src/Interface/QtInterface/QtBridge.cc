@@ -206,6 +206,20 @@ bool QtBridge::Connect( QLineEdit* qlineedit, StateAliasHandle& state_handle )
 
           return true;
         }
+    bool QtBridge::Connect( QComboBox* qcombobox, StateStringHandle& state_handle )
+    {
+      // Connect the dispatch into the StateVariable (with auxiliary object)
+      // Link the slot to the parent widget, so Qt's memory manager will
+      // manage this one.
+      new QtComboBoxSlot( qcombobox, state_handle );
+      QPointer< QComboBox > qpointer( qcombobox );
+      
+      // Connect the state signal back to the Qt Variable
+      new QtDeleteSlot( qcombobox, state_handle->value_changed_signal_.connect( 
+        boost::bind( &QtComboBoxSignal, qpointer, _1, _2 ) ) );
+      
+      return true;
+    }
     // -- END CONNECT FUNCTION -- //
 ///// ====  END QComboBox FUNCTIONS ==== /////
 

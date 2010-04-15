@@ -66,12 +66,7 @@ public:
   SliderDoubleCombo* size_depth_adjuster_crop;
   
     SliderDoubleCombo* scale_adjuster;
-  
-  std::string group_id_;
-  Utils::GridTransform grid_transform_;
-  int current_height;
-  int current_width;
-  int current_depth;
+
   
 };
   
@@ -84,7 +79,7 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
   
   this->private_->ui_.setupUi( this );
   
-  this->private_->group_id_ = group->get_group_id();
+  this->group_id_ = group->get_group_id();
   
   // Set up the Drag and Drop
   this->setAcceptDrops( true );
@@ -133,9 +128,9 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
   this->private_->scale_adjuster->setObjectName( QString::fromUtf8( "scale_adjuster" ) );
   
   // set some local values for the current size
-  this->private_->current_width = static_cast<int>( group->get_grid_transform().get_nx() );
-  this->private_->current_height = static_cast<int>( group->get_grid_transform().get_ny() );
-  this->private_->current_depth = static_cast<int>( group->get_grid_transform().get_nz() );
+  this->current_width = static_cast<int>( group->get_grid_transform().get_nx() );
+  this->current_height = static_cast<int>( group->get_grid_transform().get_ny() );
+  this->current_depth = static_cast<int>( group->get_grid_transform().get_nz() );
   
   //  connect the gui signals and slots
     connect( this->private_->scale_adjuster, SIGNAL( valueAdjusted( double ) ), this, SLOT( adjust_new_size_labels( double )) );
@@ -274,6 +269,7 @@ LayerGroupWidget::~LayerGroupWidget()
   
 void LayerGroupWidget::insert_layer( LayerHandle layer, int index )
 {
+  
   LayerWidgetQHandle new_layer_handle( new LayerWidget(this->private_->ui_.group_frame_, layer ) );
   
   if( index == -1 )
@@ -289,7 +285,6 @@ void LayerGroupWidget::insert_layer( LayerHandle layer, int index )
     this->private_->ui_.group_frame_layout_->insertWidget( index, new_layer_handle.data() );
   }
   this->layer_list_.push_back( new_layer_handle );
-  this->repaint();
 }
 
   
@@ -327,8 +322,7 @@ LayerWidgetQWeakHandle LayerGroupWidget::set_active_layer( LayerHandle layer )
 
 void  LayerGroupWidget::set_active( bool active )
 {
-  //SCI_LOG_DEBUG( "LayerGroupWidget set_active started" );
-    if( active )
+  if( active )
     {
         this->private_->ui_.base_->setStyleSheet( 
       StyleSheet::GROUP_WIDGET_BASE_ACTIVE_C );
@@ -350,27 +344,14 @@ void  LayerGroupWidget::set_active( bool active )
       this->private_->ui_.activate_button_->setStyleSheet( 
       StyleSheet::GROUP_WIDGET_ACTIVATE_BUTTON_INACTIVE_C );               
     }
-    //SCI_LOG_DEBUG( "LayerGroupWidget set_active ended" );
 }
 
 
-std::string& LayerGroupWidget::get_group_id()
+const std::string& LayerGroupWidget::get_group_id()
 {
-  return this->private_->group_id_;
+  return this->group_id_;
 }
 
-LayerWidgetQWeakHandle LayerGroupWidget::check_for_layer( const std::string &layer )
-{
-  for( int i = 0; i < static_cast< int >( this->layer_list_.size() ); ++i )
-  {
-    if( this->layer_list_[i]->get_layer_id() == layer )
-    {
-      return this->layer_list_[i];
-    }
-  }
-  return LayerWidgetQWeakHandle();
-}
-  
   
 void LayerGroupWidget::show_selection_checkboxes( bool show )
 {
@@ -385,11 +366,11 @@ void LayerGroupWidget::show_selection_checkboxes( bool show )
 void LayerGroupWidget::adjust_new_size_labels( double scale_factor )
 {
     this->private_->ui_.x_axis_label_new_->setText( QString::fromUtf8("X: ") + 
-    QString::number(this->private_->current_width * scale_factor ) );
+    QString::number(this->current_width * scale_factor ) );
   this->private_->ui_.y_axis_label_new_->setText( QString::fromUtf8("Y: ") + 
-    QString::number(this->private_->current_height * scale_factor ) );
+    QString::number(this->current_height * scale_factor ) );
   this->private_->ui_.z_axis_label_new_->setText( QString::fromUtf8("Z: ") + 
-    QString::number(this->private_->current_depth * scale_factor ) );
+    QString::number(this->current_depth * scale_factor ) );
 }
   
   

@@ -66,8 +66,10 @@ public:
   // Connect a QDoubleSpinBox to a StateDoubleValue
   static bool Connect( QDoubleSpinBox* qdoublespinbox, StateDoubleHandle& state_handle );
   
-  // Connect a QComboBox to StateValue<int>
+  // Connect a QComboBox to StateOptionHandle
   static bool Connect( QComboBox* qcombobox, StateOptionHandle& state_handle );
+  
+  static bool Connect( QComboBox* qcombobox, StateStringHandle& state_handle );
 
   // Connect QToolButton & QPushButtons
   static bool Connect( QToolButton* qtoolbutton, StateBoolHandle& state_handle );

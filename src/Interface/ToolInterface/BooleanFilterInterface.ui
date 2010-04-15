@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>200</width>
+    <width>225</width>
     <height>331</height>
    </rect>
   </property>
@@ -46,7 +46,7 @@
     <number>4</number>
    </property>
    <item>
-    <layout class="QHBoxLayout" name="maskAHLayout" stretch="1,3">
+    <layout class="QHBoxLayout" name="maskAHLayout" stretch="1">
      <property name="spacing">
       <number>4</number>
      </property>
@@ -55,25 +55,27 @@
      </property>
      <item>
       <widget class="QLabel" name="maskALabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>50</width>
+         <height>0</height>
+        </size>
+       </property>
        <property name="text">
         <string>Mask A:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QComboBox" name="maskAComboBox">
-       <property name="sizeAdjustPolicy">
-        <enum>QComboBox::AdjustToMinimumContentsLength</enum>
-       </property>
-       <property name="minimumContentsLength">
-        <number>12</number>
        </property>
       </widget>
      </item>
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="maskBHLayout" stretch="1,3">
+    <layout class="QHBoxLayout" name="maskBHLayout" stretch="1">
      <property name="spacing">
       <number>4</number>
      </property>
@@ -85,25 +87,27 @@
      </property>
      <item>
       <widget class="QLabel" name="maskBLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>50</width>
+         <height>0</height>
+        </size>
+       </property>
        <property name="text">
         <string>Mask B:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QComboBox" name="maskBComboBox">
-       <property name="sizeAdjustPolicy">
-        <enum>QComboBox::AdjustToMinimumContentsLength</enum>
-       </property>
-       <property name="minimumContentsLength">
-        <number>12</number>
        </property>
       </widget>
      </item>
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="maskCHLayout" stretch="1,3">
+    <layout class="QHBoxLayout" name="maskCHLayout" stretch="1">
      <property name="spacing">
       <number>4</number>
      </property>
@@ -115,25 +119,27 @@
      </property>
      <item>
       <widget class="QLabel" name="maskCLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>50</width>
+         <height>0</height>
+        </size>
+       </property>
        <property name="text">
         <string>Mask C:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QComboBox" name="maskCComboBox">
-       <property name="sizeAdjustPolicy">
-        <enum>QComboBox::AdjustToMinimumContentsLength</enum>
-       </property>
-       <property name="minimumContentsLength">
-        <number>12</number>
        </property>
       </widget>
      </item>
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="maskDHLayout" stretch="1,3">
+    <layout class="QHBoxLayout" name="maskDHLayout" stretch="1">
      <property name="spacing">
       <number>4</number>
      </property>
@@ -145,24 +151,20 @@
      </property>
      <item>
       <widget class="QLabel" name="maskDCLabel">
-       <property name="text">
-        <string>Mask D:</string>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
        </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QComboBox" name="maskDComboBox">
-       <property name="baseSize">
+       <property name="minimumSize">
         <size>
-         <width>650</width>
+         <width>50</width>
          <height>0</height>
         </size>
        </property>
-       <property name="sizeAdjustPolicy">
-        <enum>QComboBox::AdjustToMinimumContentsLength</enum>
-       </property>
-       <property name="minimumContentsLength">
-        <number>12</number>
+       <property name="text">
+        <string>Mask D:</string>
        </property>
       </widget>
      </item>
@@ -243,6 +245,12 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>32</height>
+        </size>
+       </property>
        <property name="text">
         <string>Replace A</string>
        </property>
@@ -259,10 +267,16 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>32</height>
+        </size>
+       </property>
        <property name="maximumSize">
         <size>
          <width>16777215</width>
-         <height>23</height>
+         <height>32</height>
         </size>
        </property>
        <property name="text">

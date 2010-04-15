@@ -53,12 +53,16 @@ public:
 
   virtual void activate();
   virtual void deactivate();
+  
+private:
+  // -- handle updates from layermanager --
+  void handle_layers_changed();
 
   // -- state --
 public:
 
   // Layerid of the target layer
-  StateOptionHandle target_layer_state_;
+  StateStringHandle target_layer_state_;
   StateRangedIntHandle iterations_state_;
   StateRangedIntHandle threshold_multiplier_state_;
 

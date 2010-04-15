@@ -34,8 +34,6 @@
 SET(APPLICATION_TOOLS_SRCS
   PaintTool.h
   PaintTool.cc
-  FlipTool.h
-  FlipTool.cc
   InvertTool.h
   InvertTool.cc
   PolylineTool.h

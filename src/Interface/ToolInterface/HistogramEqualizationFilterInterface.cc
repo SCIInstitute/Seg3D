@@ -28,6 +28,7 @@
 
 //Interface Includes
 #include <Interface/QtInterface/QtBridge.h>
+#include <Interface/ToolInterface/CustomWidgets/TargetComboBox.h>
 
 //Qt Gui Includes
 #include <Interface/ToolInterface/HistogramEqualizationFilterInterface.h>
@@ -49,6 +50,7 @@ public:
     SliderDoubleCombo *upper_threshold_;
   SliderDoubleCombo *lower_threshold_;
   SliderIntCombo *alpha_;
+  TargetComboBox *target_;
 };
 
 // constructor
@@ -66,17 +68,20 @@ HistogramEqualizationFilterInterface::~HistogramEqualizationFilterInterface()
 bool HistogramEqualizationFilterInterface::build_widget( QFrame* frame )
 {
   //Step 1 - build the Qt GUI Widget
-  private_->ui_.setupUi( frame );
+  this->private_->ui_.setupUi( frame );
 
-  //Add the SliderSpinCombos
-  private_->upper_threshold_ = new SliderDoubleCombo();
-  private_->ui_.upperHLayout_bottom->addWidget( private_->upper_threshold_ );
+    //Add the SliderSpinCombos
+    this->private_->upper_threshold_ = new SliderDoubleCombo();
+    this->private_->ui_.upperHLayout_bottom->addWidget( this->private_->upper_threshold_ );
 
-  private_->lower_threshold_ = new SliderDoubleCombo();
-  private_->ui_.lowerHLayout_bottom->addWidget( private_->lower_threshold_ );
+    this->private_->lower_threshold_ = new SliderDoubleCombo();
+    this->private_->ui_.lowerHLayout_bottom->addWidget( this->private_->lower_threshold_ );
 
-  private_->alpha_ = new SliderIntCombo();
-  private_->ui_.alphaHLayout_bottom->addWidget( private_->alpha_ );
+    this->private_->alpha_ = new SliderIntCombo();
+    this->private_->ui_.alphaHLayout_bottom->addWidget( this->private_->alpha_ );
+    
+    this->private_->target_ = new TargetComboBox( this );
+    this->private_->ui_.activeHLayout->addWidget( this->private_->target_ );
 
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
@@ -85,14 +90,7 @@ bool HistogramEqualizationFilterInterface::build_widget( QFrame* frame )
       
       
   //Step 3 - set the values for the tool ui from the state engine
-  
-      //set default falues for the target option list 
-      std::vector< std::string > temp_option_list = tool->target_layer_state_->option_list();
-      for( size_t i = 0; i < temp_option_list.size(); i++)
-      {   
-          this->private_->ui_.targetComboBox->addItem( QString::fromStdString( temp_option_list[i] ) );
-      } 
-        this->private_->ui_.targetComboBox->setCurrentIndex(tool->target_layer_state_->index());
+
       
        // set the defaults for the upper threshold
         double upper_threshold_min = 0.0; 
@@ -100,9 +98,9 @@ bool HistogramEqualizationFilterInterface::build_widget( QFrame* frame )
       double upper_threshold_step = 0.0;
       tool->upper_threshold_state_->get_step( upper_threshold_step );
       tool->upper_threshold_state_->get_range( upper_threshold_min, upper_threshold_max );
-      private_->upper_threshold_->setStep( upper_threshold_step );
-        private_->upper_threshold_->setRange( upper_threshold_min, upper_threshold_max );
-        private_->upper_threshold_->setCurrentValue( tool->upper_threshold_state_->get() );
+      this->private_->upper_threshold_->setStep( upper_threshold_step );
+        this->private_->upper_threshold_->setRange( upper_threshold_min, upper_threshold_max );
+        this->private_->upper_threshold_->setCurrentValue( tool->upper_threshold_state_->get() );
         
         // set the defaults for the lower threshold
         double lower_threshold_min = 0.0; 
@@ -110,9 +108,9 @@ bool HistogramEqualizationFilterInterface::build_widget( QFrame* frame )
       double lower_threshold_step = 0.0;
       tool->lower_threshold_state_->get_step( lower_threshold_step );
       tool->lower_threshold_state_->get_range( lower_threshold_min, lower_threshold_max );
-      private_->lower_threshold_->setStep( lower_threshold_step );
-        private_->lower_threshold_->setRange( lower_threshold_min, lower_threshold_max );
-        private_->lower_threshold_->setCurrentValue( tool->lower_threshold_state_->get() );
+      this->private_->lower_threshold_->setStep( lower_threshold_step );
+        this->private_->lower_threshold_->setRange( lower_threshold_min, lower_threshold_max );
+        this->private_->lower_threshold_->setCurrentValue( tool->lower_threshold_state_->get() );
         
          // set the defaults for the alpha
       int alpha_min = 0; 
@@ -120,9 +118,9 @@ bool HistogramEqualizationFilterInterface::build_widget( QFrame* frame )
       int alpha_step = 0;
       tool->alpha_state_->get_step( alpha_step );
       tool->alpha_state_->get_range( alpha_min, alpha_max );
-      private_->alpha_->setStep( alpha_step );
-        private_->alpha_->setRange( alpha_min, alpha_max );
-        private_->alpha_->setCurrentValue( tool->alpha_state_->get() );
+      this->private_->alpha_->setStep( alpha_step );
+        this->private_->alpha_->setRange( alpha_min, alpha_max );
+        this->private_->alpha_->setCurrentValue( tool->alpha_state_->get() );
         
         // set the default for the replace state
         this->private_->ui_.replaceCheckBox->setChecked( tool->replace_state_->get() );
@@ -130,11 +128,11 @@ bool HistogramEqualizationFilterInterface::build_widget( QFrame* frame )
 
 
   //Step 4 - connect the gui to the tool through the QtBridge
-  QtBridge::Connect( private_->ui_.targetComboBox, tool->target_layer_state_ );
-  QtBridge::Connect( private_->upper_threshold_, tool->upper_threshold_state_ );
-  QtBridge::Connect( private_->lower_threshold_, tool->lower_threshold_state_ );
-  QtBridge::Connect( private_->alpha_, tool->alpha_state_ );
-  QtBridge::Connect( private_->ui_.replaceCheckBox, tool->replace_state_ );
+  QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
+  QtBridge::Connect( this->private_->upper_threshold_, tool->upper_threshold_state_ );
+  QtBridge::Connect( this->private_->lower_threshold_, tool->lower_threshold_state_ );
+  QtBridge::Connect( this->private_->alpha_, tool->alpha_state_ );
+  QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
 
   //Send a message to the log that we have finised with building the Histogram Equalization Filter Interface
   SCI_LOG_DEBUG("Finished building a Histogram Equalization Filter Interface");

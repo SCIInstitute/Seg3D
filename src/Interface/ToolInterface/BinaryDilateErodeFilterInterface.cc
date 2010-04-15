@@ -28,6 +28,7 @@
 
 //Interface Includes
 #include <Interface/QtInterface/QtBridge.h>
+#include <Interface/ToolInterface/CustomWidgets/TargetComboBox.h>
 
 //Qt Gui Includes
 #include <Interface/ToolInterface/BinaryDilateErodeFilterInterface.h>
@@ -48,6 +49,7 @@ public:
   
     SliderIntCombo *erode_;
   SliderIntCombo *dilate_;
+  TargetComboBox *target_;
 };
 
 // constructor
@@ -65,14 +67,18 @@ BinaryDilateErodeFilterInterface::~BinaryDilateErodeFilterInterface()
 bool BinaryDilateErodeFilterInterface::build_widget( QFrame* frame )
 {
   //Step 1 - build the Qt GUI Widget
-  private_->ui_.setupUi( frame );
+  this->private_->ui_.setupUi( frame );
 
   // add sliderspinnercombo's
-  private_->erode_ = new SliderIntCombo();
-  private_->ui_.erodeHLayout_bottom->addWidget( private_->erode_ );
+  this->private_->erode_ = new SliderIntCombo();
+  this->private_->ui_.erodeHLayout_bottom->addWidget( this->private_->erode_ );
 
-  private_->dilate_ = new SliderIntCombo();
-  private_->ui_.dialateHLayout_bottom->addWidget( private_->dilate_ );
+  this->private_->dilate_ = new SliderIntCombo();
+  this->private_->ui_.dialateHLayout_bottom->addWidget( this->private_->dilate_ );
+  
+  this->private_->target_ = new TargetComboBox( this );
+  this->private_->ui_.activeHLayout->addWidget( this->private_->target_ );
+
 
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
@@ -80,23 +86,15 @@ bool BinaryDilateErodeFilterInterface::build_widget( QFrame* frame )
   
   //Step 3 - set the values for the tool ui from the state engine
   
-      //set default falues for the target option list 
-      std::vector< std::string > temp_option_list = tool->target_layer_state_->option_list();
-      for( size_t i = 0; i < temp_option_list.size(); i++)
-      {   
-          this->private_->ui_.targetComboBox->addItem( QString::fromStdString( temp_option_list[i] ) );
-      } 
-        this->private_->ui_.targetComboBox->setCurrentIndex(tool->target_layer_state_->index());
-      
       // set the defaults for erode
       int erode_min = 0; 
       int erode_max = 0;
       int erode_step = 0;
       tool->erode_state_->get_step( erode_step );
       tool->erode_state_->get_range( erode_min, erode_max );
-      private_->erode_->setStep( erode_step );
-        private_->erode_->setRange( erode_min, erode_max );
-        private_->erode_->setCurrentValue( tool->erode_state_->get() );
+      this->private_->erode_->setStep( erode_step );
+        this->private_->erode_->setRange( erode_min, erode_max );
+        this->private_->erode_->setCurrentValue( tool->erode_state_->get() );
         
         // set the defaults for dialate
       int dilate_min = 0; 
@@ -104,19 +102,19 @@ bool BinaryDilateErodeFilterInterface::build_widget( QFrame* frame )
       int dilate_step = 0;
       tool->dilate_state_->get_step( dilate_step );
       tool->dilate_state_->get_range( dilate_min, dilate_max );
-      private_->dilate_->setStep( dilate_step );
-        private_->dilate_->setRange( dilate_min, dilate_max );
-        private_->dilate_->setCurrentValue( tool->dilate_state_->get() );
+      this->private_->dilate_->setStep( dilate_step );
+        this->private_->dilate_->setRange( dilate_min, dilate_max );
+        this->private_->dilate_->setCurrentValue( tool->dilate_state_->get() );
 
         // set the default for the replace state
         this->private_->ui_.replaceCheckBox->setChecked( tool->replace_state_->get() );
  
 
   //Step 4 - connect the gui to the tool through the QtBridge
-  QtBridge::Connect( private_->ui_.targetComboBox, tool->target_layer_state_ );
-  QtBridge::Connect( private_->erode_, tool->erode_state_ );
-  QtBridge::Connect( private_->dilate_, tool->dilate_state_ );
-  QtBridge::Connect( private_->ui_.replaceCheckBox, tool->replace_state_ );
+  QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
+  QtBridge::Connect( this->private_->erode_, tool->erode_state_ );
+  QtBridge::Connect( this->private_->dilate_, tool->dilate_state_ );
+  QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
 
   //Send a message to the log that we have finised with building the Binary Dialate Erode Filter Interface
   SCI_LOG_DEBUG("Finished building a Binary Dilate Erode Filter Interface");

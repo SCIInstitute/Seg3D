@@ -43,7 +43,6 @@ SCI_TOOL_TYPE( "BinaryDilateErodeFilter", "Binary Dialate -> Erode", "Alt+Shift+
 public:
   BinaryDilateErodeFilter( const std::string& toolid );
   virtual ~BinaryDilateErodeFilter();
-
   // -- constraint parameters --
 
   // Constrain viewer to right painting tool when layer is selected
@@ -54,10 +53,13 @@ public:
   virtual void activate();
   virtual void deactivate();
 
+private:
+  void handle_layers_changed();
+
   // -- state --
 public:
   // Layerid of the target layer
-  StateOptionHandle target_layer_state_;
+  StateStringHandle target_layer_state_;
 
   StateRangedIntHandle dilate_state_;
 

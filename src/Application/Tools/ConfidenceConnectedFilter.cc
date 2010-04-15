@@ -26,8 +26,10 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// Application includes
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/ConfidenceConnectedFilter.h>
+#include <Application/LayerManager/LayerManager.h>
 
 namespace Seg3D
 {
@@ -38,7 +40,7 @@ SCI_REGISTER_TOOL(ConfidenceConnectedFilter)
 ConfidenceConnectedFilter::ConfidenceConnectedFilter( const std::string& toolid ) :
   Tool( toolid )
 {
-  add_state( "target", target_layer_state_, "<none>", "<none>" );
+  add_state( "target", target_layer_state_, "<none>" );
   add_state( "iterations", iterations_state_, 1, 1, 100, 1 );
   add_state( "threshold_multiplier", threshold_multiplier_state_, 1, 1, 100, 1 );
 
@@ -46,16 +48,40 @@ ConfidenceConnectedFilter::ConfidenceConnectedFilter( const std::string& toolid 
   // parameters are selected
   target_layer_state_->value_changed_signal_.connect( boost::bind(
       &ConfidenceConnectedFilter::target_constraint, this, _1 ) );
+  
+  LayerManager::Instance()->layers_changed_signal_.connect(
+    boost::bind( &ConfidenceConnectedFilter::handle_layers_changed, this ) );
 
-}
-
-void ConfidenceConnectedFilter::target_constraint( std::string layerid )
-{
 }
 
 ConfidenceConnectedFilter::~ConfidenceConnectedFilter()
 {
   disconnect_all();
+}
+  
+void ConfidenceConnectedFilter::handle_layers_changed()
+{
+  std::vector< LayerHandle > target_layers;
+  LayerManager::Instance()->get_layers( target_layers );
+  bool target_found = false;
+  
+  for( int i = 0; i < static_cast< int >( target_layers.size() ); ++i )
+  {
+    if( target_layers[i]->get_layer_name() == target_layer_state_->get() ) 
+    { 
+      target_found = true;
+      break;
+    }
+  }
+  
+  if( !target_found )
+    target_layer_state_->set( "", ActionSource::NONE_E );
+  
+}
+  
+
+void ConfidenceConnectedFilter::target_constraint( std::string layerid )
+{
 }
 
 void ConfidenceConnectedFilter::activate()

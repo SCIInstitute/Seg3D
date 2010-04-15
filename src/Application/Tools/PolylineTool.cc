@@ -26,9 +26,10 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// Application includes
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/PolylineTool.h>
-// #include <Application/LayerManager/LayerManager.h>
+#include <Application/LayerManager/LayerManager.h>
 
 namespace Seg3D
 {
@@ -40,16 +41,13 @@ PolylineTool::PolylineTool( const std::string& toolid ) :
   Tool( toolid )
 {
   // Need to set ranges and default values for all parameters
-  add_state( "target", target_layer_state_, "<none>", "<none>" );
+  add_state( "target", target_layer_state_, "<none>" );
 
   // No constraints are needed for this tool
 
-  // If a layer is added or deleted update the lists
-  //  add_connection(LayerManager::instance()->connect_layers_changed(
-  //    boost:bind(&PaintTool::handle_layers_changed,this)));
+  LayerManager::Instance()->layers_changed_signal_.connect(
+    boost::bind( &PolylineTool::handle_layers_changed, this ) );
 
-  // Trigger a fresh update
-  handle_layers_changed();
 }
 
 PolylineTool::~PolylineTool()
@@ -59,17 +57,21 @@ PolylineTool::~PolylineTool()
 
 void PolylineTool::handle_layers_changed()
 {
-  /*
-   std::vector<std::string> target_layers;
-   LayerManager::instance()->get_layers(LayerManager::DATALAYER_E|
-   LayerManager::MASKLAYER_E|
-   LayerManager::ACTIVE_E|
-   LayerManager::NONE_E,
-   target_layers );
-
-   target_layer_->set_option_list(target_layers);
-
-   */
+  std::vector< LayerHandle > target_layers;
+  LayerManager::Instance()->get_layers( target_layers );
+  bool target_found = false;
+  
+  for( int i = 0; i < static_cast< int >( target_layers.size() ); ++i )
+  {
+    if( target_layers[i]->get_layer_name() == target_layer_state_->get() ) {
+      target_found = true;
+      break;
+    }
+  }
+  
+  if( !target_found )
+    target_layer_state_->set( "", ActionSource::NONE_E );
+  
 }
 
 void PolylineTool::activate()

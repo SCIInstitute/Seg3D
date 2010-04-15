@@ -26,8 +26,10 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// Application includes
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/OtsuThresholdFilter.h>
+#include <Application/LayerManager/LayerManager.h>
 
 namespace Seg3D
 {
@@ -39,18 +41,17 @@ OtsuThresholdFilter::OtsuThresholdFilter( const std::string& toolid ) :
   Tool( toolid )
 {
   // Need to set ranges and default values for all parameters
-  add_state( "target", target_layer_state_, "<none>", "<none>" );
+  add_state( "target", target_layer_state_, "<none>" );
   add_state( "order", order_state_, 1, 1, 100, 1 );
 
   // Add constraints, so that when the state changes the right ranges of
   // parameters are selected
   target_layer_state_->value_changed_signal_.connect( boost::bind(
       &OtsuThresholdFilter::target_constraint, this, _1 ) );
+  
+  LayerManager::Instance()->layers_changed_signal_.connect(
+    boost::bind( &OtsuThresholdFilter::handle_layers_changed, this ) );
 
-}
-
-void OtsuThresholdFilter::target_constraint( std::string layerid )
-{
 }
 
 OtsuThresholdFilter::~OtsuThresholdFilter()
@@ -58,6 +59,29 @@ OtsuThresholdFilter::~OtsuThresholdFilter()
   disconnect_all();
 }
 
+void OtsuThresholdFilter::handle_layers_changed()
+{
+  std::vector< LayerHandle > target_layers;
+  LayerManager::Instance()->get_layers( target_layers );
+  bool target_found = false;
+  
+  for( int i = 0; i < static_cast< int >( target_layers.size() ); ++i )
+  {
+    if( target_layers[i]->get_layer_name() == target_layer_state_->get() ) {
+      target_found = true;
+      break;
+    }
+  }
+  
+  if( !target_found )
+    target_layer_state_->set( "", ActionSource::NONE_E );
+  
+}
+
+void OtsuThresholdFilter::target_constraint( std::string layerid )
+{
+}
+  
 void OtsuThresholdFilter::activate()
 {
 }

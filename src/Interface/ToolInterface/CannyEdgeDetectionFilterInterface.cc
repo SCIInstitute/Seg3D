@@ -28,6 +28,7 @@
 
 //Interface Includes
 #include <Interface/QtInterface/QtBridge.h>
+#include <Interface/ToolInterface/CustomWidgets/TargetComboBox.h>
 
 //Qt Gui Includes
 #include <Interface/ToolInterface/CannyEdgeDetectionFilterInterface.h>
@@ -49,6 +50,7 @@ public:
   SliderDoubleCombo *variance_;
   SliderDoubleCombo *max_error_;
   SliderDoubleCombo *threshold_;
+  TargetComboBox *target_;
 };
 
 // constructor
@@ -66,31 +68,28 @@ CannyEdgeDetectionFilterInterface::~CannyEdgeDetectionFilterInterface()
 bool CannyEdgeDetectionFilterInterface::build_widget( QFrame* frame )
 {
   //Step 1 - build the Qt GUI Widget
-  private_->ui_.setupUi( frame );
+  this->private_->ui_.setupUi( frame );
 
-  //Add the SliderSpinCombos
-  private_->variance_ = new SliderDoubleCombo();
-  private_->ui_.varianceHLayout_bottom->addWidget( private_->variance_ );
+    //Add the SliderSpinCombos
+    this->private_->variance_ = new SliderDoubleCombo();
+    this->private_->ui_.varianceHLayout_bottom->addWidget( this->private_->variance_ );
 
-  private_->max_error_ = new SliderDoubleCombo();
-  private_->ui_.errorHLayout_bottom->addWidget( private_->max_error_ );
+    this->private_->max_error_ = new SliderDoubleCombo();
+    this->private_->ui_.errorHLayout_bottom->addWidget( this->private_->max_error_ );
 
-  private_->threshold_ = new SliderDoubleCombo();
-  private_->ui_.thresholdHLayout_bottom->addWidget( private_->threshold_ );
+    this->private_->threshold_ = new SliderDoubleCombo();
+    this->private_->ui_.thresholdHLayout_bottom->addWidget( this->private_->threshold_ );
+    
+    this->private_->target_ = new TargetComboBox( this );
+    this->private_->ui_.activeHLayout->addWidget( this->private_->target_ );
+
 
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
   CannyEdgeDetectionFilter* tool = dynamic_cast< CannyEdgeDetectionFilter* > ( base_tool_.get() );
 
     //Step 3 - set the values for the tool ui from the state engine
-  
-      //set default falues for the target option list 
-      std::vector< std::string > temp_option_list = tool->target_layer_state_->option_list();
-      for( size_t i = 0; i < temp_option_list.size(); i++)
-      {   
-          this->private_->ui_.targetComboBox->addItem( QString::fromStdString( temp_option_list[i] ) );
-      } 
-        this->private_->ui_.targetComboBox->setCurrentIndex(tool->target_layer_state_->index());
+
   
       // set the defaults for the variance
         double variance_min = 0.0; 
@@ -98,9 +97,9 @@ bool CannyEdgeDetectionFilterInterface::build_widget( QFrame* frame )
       double variance_step = 0.0;
       tool->variance_state_->get_step( variance_step );
       tool->variance_state_->get_range( variance_min, variance_max );
-      private_->variance_->setStep( variance_step );
-        private_->variance_->setRange( variance_min, variance_max );
-        private_->variance_->setCurrentValue( tool->variance_state_->get() );
+      this->private_->variance_->setStep( variance_step );
+        this->private_->variance_->setRange( variance_min, variance_max );
+        this->private_->variance_->setCurrentValue( tool->variance_state_->get() );
         
         // set the defaults for the max error
         double max_error_min = 0.0; 
@@ -108,9 +107,9 @@ bool CannyEdgeDetectionFilterInterface::build_widget( QFrame* frame )
       double max_error_step = 0.0;
       tool->max_error_state_->get_step( max_error_step );
       tool->max_error_state_->get_range( max_error_min, max_error_max );
-      private_->max_error_->setStep( max_error_step );
-        private_->max_error_->setRange( max_error_min, max_error_max );
-        private_->max_error_->setCurrentValue( tool->max_error_state_->get() );
+      this->private_->max_error_->setStep( max_error_step );
+        this->private_->max_error_->setRange( max_error_min, max_error_max );
+        this->private_->max_error_->setCurrentValue( tool->max_error_state_->get() );
 
         // set the defaults for the threshold
         double threshold_min = 0.0; 
@@ -118,23 +117,19 @@ bool CannyEdgeDetectionFilterInterface::build_widget( QFrame* frame )
       double threshold_step = 0.0;
       tool->threshold_state_->get_step( threshold_step );
       tool->threshold_state_->get_range( threshold_min, threshold_max );
-      private_->threshold_->setStep( threshold_step );
-        private_->threshold_->setRange( threshold_min, threshold_max );
-        private_->threshold_->setCurrentValue( tool->threshold_state_->get() );
+      this->private_->threshold_->setStep( threshold_step );
+        this->private_->threshold_->setRange( threshold_min, threshold_max );
+        this->private_->threshold_->setCurrentValue( tool->threshold_state_->get() );
         
         //set the default replace checkbox value
         this->private_->ui_.replaceCheckBox->setChecked(tool->replace_state_);
 
-
-      
-      
-
   //Step 4 - connect the gui to the tool through the QtBridge
-  QtBridge::Connect( private_->ui_.targetComboBox, tool->target_layer_state_ );
-  QtBridge::Connect( private_->variance_, tool->variance_state_ );
-  QtBridge::Connect( private_->max_error_, tool->max_error_state_ );
-  QtBridge::Connect( private_->threshold_, tool->threshold_state_ );
-  QtBridge::Connect( private_->ui_.replaceCheckBox, tool->replace_state_ );
+  QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
+  QtBridge::Connect( this->private_->variance_, tool->variance_state_ );
+  QtBridge::Connect( this->private_->max_error_, tool->max_error_state_ );
+  QtBridge::Connect( this->private_->threshold_, tool->threshold_state_ );
+  QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
 
   //Send a message to the log that we have finised with building the Detection Filter Interface
   SCI_LOG_DEBUG("Finished building a Canny Edge Detection Filter Interface");

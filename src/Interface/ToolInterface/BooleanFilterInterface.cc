@@ -28,6 +28,7 @@
 
 //Interface Includes
 #include <Interface/QtInterface/QtBridge.h>
+#include <Interface/ToolInterface/CustomWidgets/MaskComboBox.h>
 
 //Qt Gui Includes
 #include <Interface/ToolInterface/BooleanFilterInterface.h>
@@ -45,6 +46,10 @@ class BooleanFilterInterfacePrivate
 {
 public:
   Ui::BooleanFilterInterface ui_;
+  MaskComboBox *mask_a_;
+  MaskComboBox *mask_b_;
+  MaskComboBox *mask_c_;
+  MaskComboBox *mask_d_;
 };
 
 // constructor
@@ -62,7 +67,25 @@ BooleanFilterInterface::~BooleanFilterInterface()
 bool BooleanFilterInterface::build_widget( QFrame* frame )
 {
   //Step 1 - build the Qt GUI Widget
-  private_->ui_.setupUi( frame );
+  this->private_->ui_.setupUi( frame );
+  
+    // Add the MaskComboBoxes
+    this->private_->mask_a_ = new MaskComboBox( this );
+    this->private_->mask_a_->setMinimumHeight( 26 );
+    this->private_->ui_.maskAHLayout->addWidget( this->private_->mask_a_ );
+    this->private_->ui_.maskAHLayout->setStretch(1, 3);
+    
+    this->private_->mask_b_ = new MaskComboBox( this );
+    this->private_->mask_b_->setMinimumHeight( 26 );
+    this->private_->ui_.maskBHLayout->addWidget( this->private_->mask_b_ );
+    
+    this->private_->mask_c_ = new MaskComboBox( this );
+    this->private_->mask_c_->setMinimumHeight( 26 );
+    this->private_->ui_.maskCHLayout->addWidget( this->private_->mask_c_ );
+    
+    this->private_->mask_d_ = new MaskComboBox( this );
+    this->private_->mask_d_->setMinimumHeight( 26 );
+    this->private_->ui_.maskDHLayout->addWidget( this->private_->mask_d_ );
 
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
@@ -70,40 +93,8 @@ bool BooleanFilterInterface::build_widget( QFrame* frame )
   
   //Step 3 - set the values for the tool ui from the state engine
   
-      //set default falues for the mask a option list 
-      std::vector< std::string > temp_option_list = tool->mask_a_state_->option_list();
-      for( size_t i = 0; i < temp_option_list.size(); i++)
-      {   
-          this->private_->ui_.maskAComboBox->addItem( QString::fromStdString( temp_option_list[i] ) );
-      } 
-        this->private_->ui_.maskAComboBox->setCurrentIndex(tool->mask_a_state_->index());
-      
-      //set default falues for the mask b option list 
-      temp_option_list = tool->mask_b_state_->option_list();
-      for( size_t i = 0; i < temp_option_list.size(); i++)
-      {   
-          this->private_->ui_.maskBComboBox->addItem( QString::fromStdString( temp_option_list[i] ) );
-      } 
-        this->private_->ui_.maskBComboBox->setCurrentIndex(tool->mask_b_state_->index());
-        
-        //set default falues for the mask c option list 
-      temp_option_list = tool->mask_c_state_->option_list();
-      for( size_t i = 0; i < temp_option_list.size(); i++)
-      {   
-          this->private_->ui_.maskCComboBox->addItem( QString::fromStdString( temp_option_list[i] ) );
-      } 
-        this->private_->ui_.maskCComboBox->setCurrentIndex(tool->mask_c_state_->index());
-        
-        //set default falues for the mask d option list 
-      temp_option_list = tool->mask_d_state_->option_list();
-      for( size_t i = 0; i < temp_option_list.size(); i++)
-      {   
-          this->private_->ui_.maskDComboBox->addItem( QString::fromStdString( temp_option_list[i] ) );
-      } 
-        this->private_->ui_.maskDComboBox->setCurrentIndex(tool->mask_d_state_->index());
-        
-        //set default falues for the example list
-        temp_option_list = tool->example_expressions_state_->option_list();
+      //set default falues for the example list
+    std::vector< std::string > temp_option_list = tool->example_expressions_state_->option_list();
       for( size_t i = 0; i < temp_option_list.size(); i++)
       {   
           this->private_->ui_.exampleExpComboBox->addItem( QString::fromStdString( temp_option_list[i] ) );
@@ -115,12 +106,12 @@ bool BooleanFilterInterface::build_widget( QFrame* frame )
 
 
   //Step 4 - connect the gui to the tool through the QtBridge
-  QtBridge::Connect( private_->ui_.maskAComboBox, tool->mask_a_state_ );
-  QtBridge::Connect( private_->ui_.maskBComboBox, tool->mask_b_state_ );
-  QtBridge::Connect( private_->ui_.maskCComboBox, tool->mask_c_state_ );
-  QtBridge::Connect( private_->ui_.maskDComboBox, tool->mask_d_state_ );
-  QtBridge::Connect( private_->ui_.exampleExpComboBox, tool->example_expressions_state_ );
-  QtBridge::Connect( private_->ui_.replaceCheckBox, tool->replace_state_ );
+  QtBridge::Connect( this->private_->mask_a_, tool->mask_a_state_ );
+  QtBridge::Connect( this->private_->mask_b_, tool->mask_b_state_ );
+  QtBridge::Connect( this->private_->mask_c_, tool->mask_c_state_ );
+  QtBridge::Connect( this->private_->mask_d_, tool->mask_d_state_ );
+  QtBridge::Connect( this->private_->ui_.exampleExpComboBox, tool->example_expressions_state_ );
+  QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
 
   //Send a message to the log that we have finised with building the Boolean Filter Interface
   SCI_LOG_DEBUG("Finished building a Boolean Filter Interface");

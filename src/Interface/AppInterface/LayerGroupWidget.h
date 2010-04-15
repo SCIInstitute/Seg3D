@@ -64,7 +64,7 @@ public:
   //void add_layer( LayerHandle layer );
   void insert_layer( LayerHandle layer, int index );
   bool delete_layer( LayerHandle layer );
-  std::string &get_group_id();
+  const std::string &get_group_id();
   void set_active( bool active );
   LayerWidgetQWeakHandle set_active_layer( LayerHandle layer );
   
@@ -74,15 +74,17 @@ private Q_SLOTS:
   
     
 private:
-
-  // Check to see if the layer_id is currently in the group
-  LayerWidgetQWeakHandle check_for_layer( const std::string &layer );
-
+  std::string group_id_;
+  int current_height;
+  int current_width;
+  int current_depth;
   
   // -- widget internals --
 private:
     boost::shared_ptr< LayerGroupWidgetPrivate > private_;
     QVector< LayerWidgetQHandle > layer_list_;
+  
+
       
 };
     

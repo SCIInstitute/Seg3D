@@ -26,8 +26,10 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// Application includes
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/ArithmeticFilter.h>
+#include <Application/LayerManager/LayerManager.h>
 
 namespace Seg3D
 {
@@ -40,9 +42,9 @@ ArithmeticFilter::ArithmeticFilter( const std::string& toolid ) :
   Tool( toolid )
 {
   // add default values for the the states
-  add_state( "volume_a", volume_a_state_, "<none>", "<none>" );
-  add_state( "volume_b", volume_b_state_, "<none>", "<none>" );
-  add_state( "volume_c", volume_c_state_, "<none>", "<none>" );
+  add_state( "volume_a", volume_a_state_, "<none>" );
+  add_state( "volume_b", volume_b_state_, "<none>" );
+  add_state( "volume_c", volume_c_state_, "<none>" );
   add_state( "example_expressions", example_expressions_state_, "<none>", "<none>" );
   add_state( "replace", replace_state_, false );
 
@@ -54,18 +56,52 @@ ArithmeticFilter::ArithmeticFilter( const std::string& toolid ) :
       &ArithmeticFilter::target_constraint, this, _1 ) );
   volume_c_state_->value_changed_signal_.connect( boost::bind(
       &ArithmeticFilter::target_constraint, this, _1 ) );
+  
+  LayerManager::Instance()->layers_changed_signal_.connect(
+    boost::bind( &ArithmeticFilter::handle_layers_changed, this ) );
 
 } // end constructor
-
-void ArithmeticFilter::target_constraint( std::string layerid )
-{
-}
 
 ArithmeticFilter::~ArithmeticFilter()
 {
   disconnect_all();
 }
+  
+void ArithmeticFilter::handle_layers_changed()
+{
+  std::vector< LayerHandle > target_layers;
+  LayerManager::Instance()->get_layers( target_layers );
+  bool volume_a_found = false;
+  bool volume_b_found = false;
+  bool volume_c_found = false;
+  
+  for( int i = 0; i < static_cast< int >( target_layers.size() ); ++i )
+  {
+    if( target_layers[i]->get_layer_name() == volume_a_state_->get() ) 
+      volume_a_found = true;
+    
+    if( target_layers[i]->get_layer_name() == volume_b_state_->get() )
+      volume_b_found = true;
+    
+    if( target_layers[i]->get_layer_name() == volume_c_state_->get() )
+      volume_c_found = true;
+  }
+  
+  if( !volume_a_found )
+    volume_a_state_->set( "", ActionSource::NONE_E );
+  
+  if( !volume_b_found )
+    volume_b_state_->set( "", ActionSource::NONE_E );
+  
+  if( !volume_c_found )
+    volume_c_state_->set( "", ActionSource::NONE_E );
+  
+}
 
+void ArithmeticFilter::target_constraint( std::string layerid )
+{
+}
+  
 void ArithmeticFilter::activate()
 {
 }

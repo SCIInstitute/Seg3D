@@ -58,7 +58,8 @@ SET(INTERFACE_TOOLINTERFACE_SRCS
 SET(INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_SRCS
   CustomWidgets/SliderIntCombo.cc
   CustomWidgets/SliderDoubleCombo.cc
-  
+  CustomWidgets/TargetComboBox.cc
+  CustomWidgets/MaskComboBox.cc
 )
 
 SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
@@ -89,6 +90,8 @@ SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
 SET(INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_MOC_SRCS
   CustomWidgets/SliderIntCombo.h
   CustomWidgets/SliderDoubleCombo.h
+  CustomWidgets/TargetComboBox.h
+  CustomWidgets/MaskComboBox.h
 )
 
 SET(INTERFACE_TOOLINTERFACE_NO_MOC_SRCS

@@ -42,12 +42,8 @@ public:
   InvertTool( const std::string& toolid );
   virtual ~InvertTool();
 
-  // -- handle updates from layermanager --
-
-  void handle_layers_changed();
 
   // -- activate/deactivate tool --
-
   virtual void activate();
   virtual void deactivate();
 
@@ -55,10 +51,14 @@ public:
 
   void dispatch_invert() const;
 
+private:
+  // -- handle updates from layermanager --
+  void handle_layers_changed();
+
   // -- state --
 public:
   // Layerid of the target layer
-  StateOptionHandle target_layer_state_;
+  StateStringHandle target_layer_state_;
 
   // Replace data
   StateBoolHandle replace_state_;

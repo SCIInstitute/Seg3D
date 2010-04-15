@@ -28,6 +28,7 @@
 
 //Interface Includes
 #include <Interface/QtInterface/QtBridge.h>
+#include <Interface/ToolInterface/CustomWidgets/TargetComboBox.h>
 
 //Qt Gui Includes
 #include <Interface/ToolInterface/IntensityCorrectionFilterInterface.h>
@@ -48,6 +49,7 @@ public:
   
     SliderIntCombo *order_;
   SliderDoubleCombo *edge_;
+  TargetComboBox *target_;
 };
 
 // constructor
@@ -65,14 +67,17 @@ IntensityCorrectionFilterInterface::~IntensityCorrectionFilterInterface()
 bool IntensityCorrectionFilterInterface::build_widget( QFrame* frame )
 {
   //Step 1 - build the Qt GUI Widget
-  private_->ui_.setupUi( frame );
+  this->private_->ui_.setupUi( frame );
 
-  //Add the SliderSpinCombos
-  this->private_->order_ = new SliderIntCombo();
-  private_->ui_.orderHLayout_bottom->addWidget( this->private_->order_ );
+    //Add the SliderSpinCombos
+    this->private_->order_ = new SliderIntCombo();
+    this->private_->ui_.orderHLayout_bottom->addWidget( this->private_->order_ );
 
-  this->private_->edge_ = new SliderDoubleCombo();
-  private_->ui_.edgeHLayout_bottom->addWidget( this->private_->edge_ );
+    this->private_->edge_ = new SliderDoubleCombo();
+    this->private_->ui_.edgeHLayout_bottom->addWidget( this->private_->edge_ );
+    
+    this->private_->target_ = new TargetComboBox( this );
+    this->private_->ui_.activeHLayout->addWidget( this->private_->target_ );
 
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
@@ -80,14 +85,6 @@ bool IntensityCorrectionFilterInterface::build_widget( QFrame* frame )
       dynamic_cast< IntensityCorrectionFilter* > ( base_tool_.get() );
     
     //Step 3 - set the values for the tool ui from the state engine
-  
-      //set default falues for the target option list 
-      std::vector< std::string > temp_option_list = tool->target_layer_state_->option_list();
-      for( size_t i = 0; i < temp_option_list.size(); i++)
-      {   
-          this->private_->ui_.targetComboBox->addItem( QString::fromStdString( temp_option_list[i] ) );
-      } 
-        this->private_->ui_.targetComboBox->setCurrentIndex(tool->target_layer_state_->index());
         
         // set the defaults for order
       int order_min = 0; 
@@ -95,9 +92,9 @@ bool IntensityCorrectionFilterInterface::build_widget( QFrame* frame )
       int order_step = 0;
       tool->order_state_->get_step( order_step );
       tool->order_state_->get_range( order_min, order_max );
-      private_->order_->setStep( order_step );
-        private_->order_->setRange( order_min, order_max );
-        private_->order_->setCurrentValue( tool->order_state_->get() );
+      this->private_->order_->setStep( order_step );
+        this->private_->order_->setRange( order_min, order_max );
+        this->private_->order_->setCurrentValue( tool->order_state_->get() );
         
         // set the defaults for edge
         double edge_min = 0.0; 
@@ -105,15 +102,15 @@ bool IntensityCorrectionFilterInterface::build_widget( QFrame* frame )
       double edge_step = 0.0;
       tool->edge_state_->get_step( edge_step );
       tool->edge_state_->get_range( edge_min, edge_max );
-      private_->edge_->setStep( edge_step );
-        private_->edge_->setRange( edge_min, edge_max );
-        private_->edge_->setCurrentValue( tool->edge_state_->get() ); 
+      this->private_->edge_->setStep( edge_step );
+        this->private_->edge_->setRange( edge_min, edge_max );
+        this->private_->edge_->setCurrentValue( tool->edge_state_->get() ); 
         
         this->private_->ui_.replaceCheckBox->setChecked( tool->replace_state_->get() );
 
 
   //Step 4 - connect the gui to the tool through the QtBridge
-  QtBridge::Connect( this->private_->ui_.targetComboBox, tool->target_layer_state_ );
+  QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
   QtBridge::Connect( this->private_->order_, tool->order_state_ );
   QtBridge::Connect( this->private_->edge_, tool->edge_state_ );
   QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );

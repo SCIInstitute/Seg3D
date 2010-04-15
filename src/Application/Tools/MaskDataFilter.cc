@@ -26,8 +26,10 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// Application includes
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/MaskDataFilter.h>
+#include <Application/LayerManager/LayerManager.h>
 
 namespace Seg3D
 {
@@ -39,8 +41,8 @@ MaskDataFilter::MaskDataFilter( const std::string& toolid ) :
   Tool( toolid )
 {
   // add default values for the the states
-  add_state( "target_layer", target_layer_state_, "<none>", "<none>" );
-  add_state( "mask_layer", mask_layer_state_, "<none>", "<none>" );
+  add_state( "target_layer", target_layer_state_, "<none>" );
+  add_state( "mask_layer", mask_layer_state_, "<none>" );
   add_state( "replace_with", replace_with_state_, "<none>", "<none>" );
   add_state( "replace", replace_state_, false );
 
@@ -52,17 +54,45 @@ MaskDataFilter::MaskDataFilter( const std::string& toolid ) :
       &MaskDataFilter::target_constraint, this, _1 ) );
   replace_with_state_->value_changed_signal_.connect( boost::bind(
       &MaskDataFilter::target_constraint, this, _1 ) );
+  
+  LayerManager::Instance()->layers_changed_signal_.connect(
+    boost::bind( &MaskDataFilter::handle_layers_changed, this ) );
 
+}
+  
+MaskDataFilter::~MaskDataFilter()
+{
+  disconnect_all();
+}
+
+void MaskDataFilter::handle_layers_changed()
+{
+  std::vector< LayerHandle > target_layers;
+  LayerManager::Instance()->get_layers( target_layers );
+  bool target_found = false;
+  bool mask_found = false;
+  
+  for( int i = 0; i < static_cast< int >( target_layers.size() ); ++i )
+  {
+    if( target_layers[i]->get_layer_name() == target_layer_state_->get() ) 
+      target_found = true;
+    
+    if( target_layers[i]->get_layer_name() == mask_layer_state_->get() )
+      mask_found = true;
+  }
+  
+  if( !target_found )
+    target_layer_state_->set( "", ActionSource::NONE_E );
+  
+  if( !mask_found )
+    mask_layer_state_->set( "", ActionSource::NONE_E );
+  
 }
 
 void MaskDataFilter::target_constraint( std::string layerid )
 {
 }
 
-MaskDataFilter::~MaskDataFilter()
-{
-  disconnect_all();
-}
 
 void MaskDataFilter::activate()
 {

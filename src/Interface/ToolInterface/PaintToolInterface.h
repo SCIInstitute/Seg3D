@@ -52,10 +52,9 @@ Q_OBJECT
 public:
   PaintToolInterface();
   virtual ~PaintToolInterface();
-
   virtual bool build_widget( QFrame* frame );
 
-  // -- private structure wwith widget classes --
+  // -- private structure with widget classes --
 private:
   boost::shared_ptr< PaintToolInterfacePrivate > private_;
 

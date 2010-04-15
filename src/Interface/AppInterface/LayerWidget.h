@@ -91,18 +91,23 @@ private:
   bool picked_up_;
   bool group_menus_open_;
   LayerWidget* drop_layer_;
-
+  QTimer *timer;
+  
   void set_drop_target( LayerWidget* target_layer );
   void mousePressEvent( QMouseEvent* event );
-  //void mouseMoveEvent( QMouseEvent * event );
   void dropEvent( QDropEvent* event );
   void dragEnterEvent( QDragEnterEvent* event );
   void dragLeaveEvent( QDragLeaveEvent* event );
+
+private Q_SLOTS:
+  void shrink();
+  void grow();
 
 public:
   int get_volume_type(){ return this->volume_type_; }
   std::string& get_layer_id(){ return this->layer_id_; }
   void set_picked_up( bool up ){ this->picked_up_ = up; }
+  
 
 
 };

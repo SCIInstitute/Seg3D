@@ -28,6 +28,8 @@
 
 //Interface Includes
 #include <Interface/QtInterface/QtBridge.h>
+#include <Interface/ToolInterface/CustomWidgets/TargetComboBox.h>
+#include <Interface/ToolInterface/CustomWidgets/MaskComboBox.h>
 
 //Qt Gui Includes
 #include <Interface/ToolInterface/MaskDataFilterInterface.h>
@@ -45,6 +47,8 @@ class MaskDataFilterInterfacePrivate
 {
 public:
   Ui::MaskDataFilterInterface ui_;
+  TargetComboBox *target_;
+  MaskComboBox *mask_;
 };
 
 // constructor
@@ -62,47 +66,39 @@ MaskDataFilterInterface::~MaskDataFilterInterface()
 bool MaskDataFilterInterface::build_widget( QFrame* frame )
 {
   //Step 1 - build the Qt GUI Widget
-  private_->ui_.setupUi( frame );
+  this->private_->ui_.setupUi( frame );
+  
+    // Add the combo boxes
+    this->private_->target_ = new TargetComboBox( this );
+    this->private_->ui_.targetHLayout->addWidget( this->private_->target_ );
+      
+    this->private_->mask_ = new MaskComboBox( this );
+    this->private_->ui_.maskHLayout->addWidget( this->private_->mask_ );
 
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
   MaskDataFilter* tool = dynamic_cast< MaskDataFilter* > ( base_tool_.get() );
   
   //Step 3 - set the values for the tool ui from the state engine
-  
-      //set default falues for the target option list 
-      std::vector< std::string > temp_option_list = tool->target_layer_state_->option_list();
-      for( size_t i = 0; i < temp_option_list.size(); i++)
-      {   
-          this->private_->ui_.targetComboBox->addItem( QString::fromStdString( temp_option_list[i] ) );
-      } 
-        this->private_->ui_.targetComboBox->setCurrentIndex(tool->target_layer_state_->index());
       
-      //set default falues for the mask option list 
-      temp_option_list = tool->mask_layer_state_->option_list();
-      for( size_t i = 0; i < temp_option_list.size(); i++)
-      {   
-          this->private_->ui_.maskComboBox->addItem( QString::fromStdString( temp_option_list[i] ) );
-      } 
-        this->private_->ui_.maskComboBox->setCurrentIndex(tool->target_layer_state_->index());
-        
-        //set default falues for the replace with option list 
-        temp_option_list = tool->replace_with_state_->option_list();
+        //set default falues for the replace with option list
+    
+    std::vector< std::string >temp_option_list = tool->replace_with_state_->option_list();
       for( size_t i = 0; i < temp_option_list.size(); i++)
       {   
           this->private_->ui_.replaceComboBox->addItem( QString::fromStdString( temp_option_list[i] ) );
       } 
-        this->private_->ui_.replaceComboBox->setCurrentIndex(tool->target_layer_state_->index());
+        this->private_->ui_.replaceComboBox->setCurrentIndex(tool->replace_with_state_->index());
         
         // set the default for the replace state
         this->private_->ui_.replaceCheckBox->setChecked( tool->replace_state_->get() );
 
 
   //Step 4 - connect the gui to the tool through the QtBridge
-  QtBridge::Connect( private_->ui_.targetComboBox, tool->target_layer_state_ );
-  QtBridge::Connect( private_->ui_.maskComboBox, tool->mask_layer_state_ );
-  QtBridge::Connect( private_->ui_.replaceComboBox, tool->replace_with_state_ );
-  QtBridge::Connect( private_->ui_.replaceCheckBox, tool->replace_state_ );
+  QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
+  QtBridge::Connect( this->private_->mask_, tool->mask_layer_state_ );
+  QtBridge::Connect( this->private_->ui_.replaceComboBox, tool->replace_with_state_ );
+  QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
 
   //Send a message to the log that we have finised with building the Mask Data Filter Interface
   SCI_LOG_DEBUG("Finished building a Mask Data Filter Interface");

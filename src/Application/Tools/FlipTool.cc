@@ -40,16 +40,8 @@ FlipTool::FlipTool( const std::string& toolid ) :
   Tool( toolid )
 {
   // Need to set ranges and default values for all parameters
-  add_state( "target", target_layer_state_, "<none>", "<none>" );
+  add_state( "target", target_layer_state_, "<none>" );
 
-  // No constraints are needed for this tool
-
-  // If a layer is added or deleted update the lists
-  //  add_connection(LayerManager::instance()->connect_layers_changed(
-  //    boost:bind(&PaintTool::handle_layers_changed,this)));
-
-  // Trigger a fresh update
-  handle_layers_changed();
 }
 
 FlipTool::~FlipTool()
@@ -59,17 +51,6 @@ FlipTool::~FlipTool()
 
 void FlipTool::handle_layers_changed()
 {
-  /*
-   std::vector<std::string> target_layers;
-   LayerManager::instance()->get_layers(LayerManager::DATALAYER_E|
-   LayerManager::MASKLAYER_E|
-   LayerManager::ACTIVE_E|
-   LayerManager::NONE_E,
-   target_layers );
-
-   target_layer_->set_option_list(target_layers);
-
-   */
 }
 
 void FlipTool::activate()

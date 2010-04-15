@@ -341,14 +341,21 @@ class QtComboBoxSlot : public QtSlot
 public:
 
   // Constructor
-  QtComboBoxSlot( QComboBox* parent,
-                StateOptionHandle& state_handle,
-                bool blocking = true) :
+  QtComboBoxSlot( QComboBox* parent, StateOptionHandle& state_handle, bool blocking = true) :
     QtSlot(parent,blocking),
     state_handle_(state_handle)
   {
     // Qt's connect function
-    connect( parent, SIGNAL( currentIndexChanged( QString )), this,SLOT( slot( QString ) ));
+    connect( parent, SIGNAL( currentIndexChanged( QString )), this,SLOT( option_slot( QString ) ));
+    
+  }
+  
+  QtComboBoxSlot( QComboBox* parent, StateStringHandle& state_handle, bool blocking = true) :
+  QtSlot(parent,blocking),
+  state_string_handle_(state_handle)
+  {
+    // Qt's connect function
+    connect( parent, SIGNAL( currentIndexChanged( QString )), this,SLOT( string_slot( QString ) ));
     
   }
 
@@ -358,14 +365,19 @@ public:
 
 public Q_SLOTS:
   // Slot that Qt will call
-  void slot(QString state)
+  void option_slot(QString state)
   {
     if (!blocked_) ActionSet::Dispatch(state_handle_,state.toStdString());
+  }
+  void string_slot(QString state)
+  {
+    if (!blocked_) ActionSet::Dispatch(state_string_handle_,state.toStdString());
   }
 
 private:
   // Function object
   StateOptionHandle state_handle_;
+  StateStringHandle state_string_handle_;
 };
 
 class QtActionSlot : public QObject

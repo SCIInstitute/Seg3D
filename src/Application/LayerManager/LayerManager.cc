@@ -108,7 +108,8 @@ bool LayerManager::insert_layer( LayerHandle layer )
       
   } // unlocked from here
 
-  layer_inserted_signal_( layer );  
+  layer_inserted_signal_( layer );
+  layers_changed_signal_();
 
   if( active_layer_changed )
   {
@@ -191,6 +192,7 @@ bool LayerManager::move_layer_above( std::string layer_to_move_id, std::string l
   }
   
   layer_inserted_at_signal_( layer_above, index );
+  layers_changed_signal_();
   
   return true;  
 }
@@ -359,6 +361,7 @@ void LayerManager::delete_layers( LayerGroupHandle group )
   }
   
   layers_deleted_signal_( layer_vector );
+  layers_changed_signal_();
   
   if ( active_layer_changed )
   {
@@ -366,12 +369,6 @@ void LayerManager::delete_layers( LayerGroupHandle group )
   }
   
 } // end delete_layer
-
-LayerGroupHandle LayerManager::get_active_group()
-{
-  lock_type lock( this->get_mutex() );  
-  return this->active_layer_->get_layer_group();
-}
 
 Seg3D::LayerHandle LayerManager::get_active_layer()
 {
@@ -389,10 +386,6 @@ LayerSceneHandle LayerManager::compose_layer_scene( size_t viewer_id )
   // NOTE: This functions is called from the Rendering Thread
   // Lock the LayerManager
   lock_type lock( this->get_mutex() );
-  
-  // NOTE: Need to lock the state engine to prevetn the application thread from making any changes
-  // to the current state of the layers and layer groups. 
-  // StateEngine::lock_type state_lock( StateEngine::GetMutex() ) ;
 
   LayerSceneHandle layer_scene( new LayerScene );
 

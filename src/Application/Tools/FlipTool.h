@@ -70,7 +70,7 @@ public:
 public:
 
   // Layerid of the target layer
-  StateOptionHandle target_layer_state_;
+  StateStringHandle target_layer_state_;
 
 };
 

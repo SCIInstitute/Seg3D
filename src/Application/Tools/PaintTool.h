@@ -50,21 +50,23 @@ public:
   // Constrain state to right options when mask layer is selected
   void mask_constraint( std::string layerid );
 
-  // -- handle updates from layermanager --
-  void handle_layers_changed();
-
   // -- activate/deactivate tool --
 
   virtual void activate();
   virtual void deactivate();
+  
+private:
+  // -- handle updates from layermanager --
+  void handle_layers_changed();
 
   // -- state --
 public:
   // Layerid of the target layer
-  StateOptionHandle target_layer_state_;
+  StateStringHandle target_layer_state_;
+  
   // Layerid of the masking layer
-  StateOptionHandle mask_layer_state_;
-
+  StateStringHandle mask_layer_state_;
+  
   // Radius of the brush
   StateRangedIntHandle brush_radius_state_;
 

@@ -104,6 +104,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   this->private_->ui_.opacity_bar_->hide();
   this->private_->ui_.progress_bar_bar_->hide();
   this->private_->ui_.border_bar_->hide();
+  this->private_->ui_.insert_space_->hide();
   
   // add the PushDragButton
   this->private_->activate_button_ = new PushDragButton( this->private_->ui_.typeGradient_ );
@@ -302,10 +303,7 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
     break;
   }
   
-  //mimeData->setData( "layer_id", itemData );
-  //mimeData->setText( QString::fromStdString( this->get_layer_id() ) );
-
-  // Create a drag object and insert the hotspot, and mimedata
+  // Create a drag object and insert the hotspot
   QDrag *drag = new QDrag( this );
   drag->setMimeData( mimeData );
   // here we add basically a screenshot of the widget
@@ -316,15 +314,12 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
   this->seethrough( true );
   this->set_picked_up( true );
 
-  // Next we execute our drag!
-  //Qt::DropAction drop = drag->exec(Qt::MoveAction, Qt::MoveAction);
-
   // Finally if our drag was aborted then we reset the layers styles to be visible
   if( ( drag->exec(Qt::MoveAction, Qt::MoveAction) ) != Qt::MoveAction )
   {
     this->seethrough( false );
     this->set_picked_up( false );
-    this->update();
+    this->repaint();
   }
   // Otherwise we dispatch our move function
   else 
@@ -391,7 +386,7 @@ void LayerWidget::dropEvent( QDropEvent* event )
   }
   
   this->set_drop( false );
-  this->repaint();
+  //this->repaint();
 }
 
 void LayerWidget::dragEnterEvent( QDragEnterEvent* event)
@@ -655,21 +650,50 @@ void LayerWidget::set_drop( bool drop )
   // If its not picked up, we set its color to indicate whether or not its a potential drop site
   else if( drop )
   {
-    this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_DROP_C );
+    this->private_->ui_.insert_space_->show();
+    //this->timer = new QTimer( this );
+//    connect( this->timer, SIGNAL( timeout() ), this, SLOT( grow() ) );
+//    this->timer->start( 1 );
+    
+    //this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_DROP_C );
   }
   else
   {
-    if( this->active_ )
-    {
-      this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_ACTIVE_C );  
-      
-    }
-    else
-    {
-      this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_INACTIVE_C );
-    }
+    //this->private_->ui_.insert_space_->setMinimumHeight( 0 );
+    this->private_->ui_.insert_space_->hide();
+    //this->timer = new QTimer( this );
+    //connect( this->timer, SIGNAL( timeout() ), this, SLOT( shrink() ) );
+    //this->timer->start( 1 );
+    //if( this->active_ )
+//    {
+//      this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_ACTIVE_C );  
+//      
+//    }
+//    else
+//    {
+//      this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_INACTIVE_C );
+//    }
   }
 }
+  
+  void LayerWidget::grow()
+  {
+    if( this->private_->ui_.insert_space_->minimumHeight() <= 46 )
+      this->private_->ui_.insert_space_->setMinimumHeight( ( this->private_->ui_.insert_space_->minimumHeight() + 5 ) );
+    else
+      this->timer->stop();
+  }
+  
+  void LayerWidget::shrink()
+  {
+    if( this->private_->ui_.insert_space_->minimumHeight() != 0 )
+      this->private_->ui_.insert_space_->setMinimumHeight( ( this->private_->ui_.insert_space_->minimumHeight() - 1 ) );
+    else
+    { 
+      this->timer->stop();
+      this->private_->ui_.insert_space_->hide();
+    }
+  }
 
 } //end namespace Seg3D
 

@@ -26,6 +26,7 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// Application includes
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/PaintTool.h>
 #include <Application/LayerManager/LayerManager.h>
@@ -40,8 +41,8 @@ PaintTool::PaintTool( const std::string& toolid ) :
   Tool( toolid )
 {
   // Need to set ranges and default values for all parameters
-  add_state( "target", target_layer_state_, "<none>", "<none>" );
-  add_state( "mask", mask_layer_state_, "<none>", "<none>" );
+  add_state( "target", target_layer_state_, "<none>" );
+  add_state( "mask", mask_layer_state_, "<none>" );
   add_state( "brush_radius", brush_radius_state_, 23, 1, 250, 1 );
   add_state( "upper_threshold", upper_threshold_state_, 1.0, 00.0, 1.0, 0.01 );
   add_state( "lower_threshold", lower_threshold_state_, 0.0, 00.0, 1.0, 0.01 );
@@ -53,16 +54,10 @@ PaintTool::PaintTool( const std::string& toolid ) :
       this, _1 ) );
   mask_layer_state_->value_changed_signal_.connect( boost::bind( &PaintTool::mask_constraint,
       this, _1 ) );
-
-  // If a layer is added or deleted update the lists
-  LayerManager::Instance()->layers_finished_deleting_signal_.connect(
-      boost::bind( &PaintTool::handle_layers_changed, this ) );
   
-  LayerManager::Instance()->layer_inserted_signal_.connect(
-      boost::bind( &PaintTool::handle_layers_changed, this ) );
+  LayerManager::Instance()->layers_changed_signal_.connect(
+    boost::bind( &PaintTool::handle_layers_changed, this ) );
 
-  // Trigger a fresh update
-//  handle_layers_changed();
 }
 
 PaintTool::~PaintTool()
@@ -72,29 +67,26 @@ PaintTool::~PaintTool()
 
 void PaintTool::handle_layers_changed()
 {
-    std::vector< LayerHandle > target_layers;
-    LayerManager::Instance()->get_layers( target_layers );
+  std::vector< LayerHandle > target_layers;
+  LayerManager::Instance()->get_layers( target_layers );
+  bool target_found = false;
+  bool mask_found = false;
+  
+  for( int i = 0; i < static_cast< int >( target_layers.size() ); ++i )
+  {
+    if( target_layers[i]->get_layer_name() == target_layer_state_->get() ) 
+      target_found = true;
+  
+    if( target_layers[i]->get_layer_name() == mask_layer_state_->get() )
+      mask_found = true;
+  }
     
-    //TODO need to filter out the layers that are not valid for target
-    //target_layer_state_->set_option_list(target_layers);
+  if( !target_found )
+    target_layer_state_->set( "", ActionSource::NONE_E );
+  
+  if( !mask_found )
+    mask_layer_state_->set( "", ActionSource::NONE_E );
 
-  /*
-   std::vector<std::string> target_layers;
-   LayerManager::instance()->get_layers(LayerManager::MASKLAYER_E|
-   LayerManager::ACTIVE_E|
-   LayerManager::NONE_E,
-   target_layers );
-
-   target_layer_->set_option_list(target_layers);
-
-   std::vector<std::string> mask_layers;
-   LayerManager::instance()->get_layers(LayerManager::MASKLAYER_E|
-   LayerManager::DATALAYER_E|
-   LayerManager::NONE_E,
-   mask_layers );
-
-   mask_layer_->set_option_list(mask_layers);
-   */
 }
 
 void PaintTool::target_constraint( std::string layerid )

@@ -80,7 +80,6 @@ public:
   LayerGroupHandle get_LayerGroupHandle_from_group_id( std::string group_id );
   LayerHandle get_layer_by_id( const std::string& layer_id );
   LayerHandle get_layer_by_name( const std::string& layer_name );
-  LayerGroupHandle get_active_group();
   LayerHandle get_active_layer();
   
   
@@ -114,6 +113,7 @@ public:
   typedef boost::signals2::signal< void( LayerHandle, int ) > layer_at_signal_type;
   typedef boost::signals2::signal< void( LayerGroupHandle ) > group_signal_type;
   typedef boost::signals2::signal< void( std::vector< LayerHandle > ) > layers_signal_type;
+  typedef boost::signals2::signal< void() > layers_changed_type;
   // ACTIVE_LAYER_CHANGED_SIGNAL:
   // This signal is triggered after the active layer is changed
   layer_signal_type active_layer_changed_signal_; 
@@ -150,6 +150,10 @@ public:
   // GROUP_CHANGED_SIGNAL:
   // This signal is triggered when a group has been changed
   group_signal_type group_changed_signal_;
+  
+  // SOMETHING_CHANGED_SIGNAL:
+  // This gets signaled when we 
+  layers_changed_type layers_changed_signal_;
   
 private:
     // list of the current groups 

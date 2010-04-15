@@ -149,15 +149,15 @@ void ToolBoxWidget::add_tool( QWidget * tool, const QString &label,
 
 void ToolBoxWidget::set_active_tool( QWidget *tool )
 {
-  this->main_->setUpdatesEnabled( false );
+  this->setUpdatesEnabled( false );
   
   for ( size_t i = 0; i < this->private_->page_list_.size(); i++ )
   {
     // first we deactivate the inactive tools
-    if ( this->private_->page_list_[ i ].tool_ != tool )
-    {
-      if ( !( this->private_->page_list_[ i ].ui_.tool_frame_->isHidden() ) )
-      {
+//    if ( this->private_->page_list_[ i ].tool_ != tool )
+//    {
+//      if ( !( this->private_->page_list_[ i ].ui_.tool_frame_->isHidden() ) )
+//      {
         this->private_->page_list_[ i ].ui_.page_background_->setStyleSheet( 
           StyleSheet::TOOLBOXPAGEWIDGET_PAGE_BACKGROUND_INACTIVE_C );
         this->private_->page_list_[ i ].ui_.activate_button_->setStyleSheet(
@@ -167,8 +167,8 @@ void ToolBoxWidget::set_active_tool( QWidget *tool )
         this->private_->page_list_[ i ].ui_.help_button_->setIcon(
             inactive_help_icon_ );
         this->private_->page_list_[ i ].ui_.tool_frame_->hide();
-      }
-    }
+//      }
+//    }
   }
   
     // then, we activate the active one.
@@ -195,7 +195,8 @@ void ToolBoxWidget::set_active_tool( QWidget *tool )
     }
   }
   
-  this->main_->setUpdatesEnabled( true );
+  this->setUpdatesEnabled( true );
+  this->repaint();
 }
 
 int ToolBoxWidget::index_of( QWidget *tool )

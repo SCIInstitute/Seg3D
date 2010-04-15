@@ -28,6 +28,7 @@
 
 //Interface Includes
 #include <Interface/QtInterface/QtBridge.h>
+#include <Interface/ToolInterface/CustomWidgets/TargetComboBox.h>
 
 //Qt Gui Includes
 #include <Interface/ToolInterface/ArithmeticFilterInterface.h>
@@ -45,6 +46,9 @@ class ArithmeticFilterInterfacePrivate
 {
 public:
   Ui::ArithmeticFilterInterface ui_;
+  TargetComboBox *volume_a_;
+  TargetComboBox *volume_b_;
+  TargetComboBox *volume_c_;
 };
 
 // constructor
@@ -62,18 +66,30 @@ ArithmeticFilterInterface::~ArithmeticFilterInterface()
 bool ArithmeticFilterInterface::build_widget( QFrame* frame )
 {
   //Step 1 - build the Qt GUI Widget
-  private_->ui_.setupUi( frame );
+  this->private_->ui_.setupUi( frame );
+  
+    this->private_->volume_a_ = new TargetComboBox( this );
+    this->private_->volume_a_->setMinimumHeight( 26 );
+    this->private_->ui_.volumeALayout->addWidget( this->private_->volume_a_ );
+    
+    this->private_->volume_b_ = new TargetComboBox( this );
+    this->private_->volume_b_->setMinimumHeight( 26 );
+    this->private_->ui_.volumeBLayout->addWidget( this->private_->volume_b_ );
+  
+    this->private_->volume_c_ = new TargetComboBox( this );
+    this->private_->volume_c_->setMinimumHeight( 26 );
+    this->private_->ui_.volumeCLayout->addWidget( this->private_->volume_c_ );
 
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
   ArithmeticFilter* tool = dynamic_cast< ArithmeticFilter* > ( base_tool_.get() );
 
   //Step 3 - connect the gui to the tool through the QtBridge
-  QtBridge::Connect( private_->ui_.volumeAComboBox, tool->volume_a_state_ );
-  QtBridge::Connect( private_->ui_.volumeBComboBox, tool->volume_b_state_ );
-  QtBridge::Connect( private_->ui_.volumeCComboBox, tool->volume_c_state_ );
-  QtBridge::Connect( private_->ui_.exampleExpComboBox, tool->example_expressions_state_ );
-  QtBridge::Connect( private_->ui_.replaceCheckBox, tool->replace_state_ );
+  QtBridge::Connect( this->private_->volume_a_, tool->volume_a_state_ );
+  QtBridge::Connect( this->private_->volume_b_, tool->volume_b_state_ );
+  QtBridge::Connect( this->private_->volume_c_, tool->volume_c_state_ );
+  QtBridge::Connect( this->private_->ui_.exampleExpComboBox, tool->example_expressions_state_ );
+  QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
 
   //Send a message to the log that we have finised with building the Arithmetic Filter
   SCI_LOG_DEBUG("Finished building an Arithmetic Filter Interface");

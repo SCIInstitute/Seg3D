@@ -25,8 +25,8 @@
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
  */
-//#include <Boost/bind.hpp>
 
+// Application includes
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/InvertTool.h>
 #include <Application/LayerManager/LayerManager.h>
@@ -42,16 +42,12 @@ InvertTool::InvertTool( const std::string& toolid ) :
   Tool( toolid )
 {
   // Need to set ranges and default values for all parameters
-  add_state( "target", target_layer_state_, "<none>", "<none>" );
+  add_state( "target", target_layer_state_, "<none>" );
   add_state( "replace", replace_state_, false );
+  
+  LayerManager::Instance()->layers_changed_signal_.connect(
+    boost::bind( &InvertTool::handle_layers_changed, this ) );
 
-  // If a layer is added or deleted update the lists
-    //add_connection( LayerManager::Instance()->connect_layers_changed_signal_(
-    //  boost::bind(&InvertTool::handle_layers_changed )) );
-
-    
-  // Trigger a fresh update
-  handle_layers_changed();
 }
 
 InvertTool::~InvertTool()
@@ -61,17 +57,21 @@ InvertTool::~InvertTool()
 
 void InvertTool::handle_layers_changed()
 {
+  std::vector< LayerHandle > target_layers;
+  LayerManager::Instance()->get_layers( target_layers );
+  bool target_found = false;
   
-   //std::vector< LayerHandle > target_layers;
-   //LayerManager::Instance()->return_layers_vector( target_layers );
-    /*
-   target_layer_->set_option_list(target_layers);
-
-   std::vector<std::string> mask_layers;
-   LayerManager::instance()->get_layers(LayerManager::MASKLAYER_E | LayerManager::DATALAYER_E | LayerManager::NONE_E, mask_layers );
-
-   mask_layer_->set_option_list(mask_layers);
-   */
+  for( int i = 0; i < static_cast< int >( target_layers.size() ); ++i )
+  {
+    if( target_layers[i]->get_layer_name() == target_layer_state_->get() ) {
+      target_found = true;
+      break;
+    }
+  }
+  
+  if( !target_found )
+  target_layer_state_->set( "", ActionSource::NONE_E );
+    
 }
 
 void InvertTool::activate()

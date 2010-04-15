@@ -44,10 +44,6 @@ public:
   PolylineTool( const std::string& toolid );
   virtual ~PolylineTool();
 
-  // -- handle updates from layermanager --
-
-  void handle_layers_changed();
-
   // -- activate/deactivate tool --
 
   virtual void activate();
@@ -58,11 +54,15 @@ public:
   void dispatch_fill_within_polyline() const;
   void dispatch_erase_within_polyline() const;
   void dispatch_reset_polyline() const;
+  
+private:
+  // -- handle updates from layermanager --
+  void handle_layers_changed();
 
   // -- state --
 public:
   // Layerid of the target layer
-  StateOptionHandle target_layer_state_;
+  StateStringHandle target_layer_state_;
 
   // Polyline data
   // StateVector<Point>              polyline_;

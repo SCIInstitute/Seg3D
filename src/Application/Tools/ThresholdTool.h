@@ -47,10 +47,6 @@ public:
   // Constrain viewer to right painting tool when layer is selected
   void target_constraint( std::string layerid );
 
-  // -- handle updates from layermanager --
-
-  void handle_layers_changed();
-
   // -- activate/deactivate tool --
 
   virtual void activate();
@@ -60,11 +56,15 @@ public:
 
   void dispatch_clear_seed_points() const;
   void dispatch_create_threshold_layer() const;
+  
+private:
+  // -- handle updates from layermanager --
+  void handle_layers_changed();
 
   // -- state --
 public:
   // Layerid of the target layer
-  StateOptionHandle target_layer_state_;
+  StateStringHandle target_layer_state_;
 
   // Upper threshold for painting
   StateRangedDoubleHandle upper_threshold_state_;

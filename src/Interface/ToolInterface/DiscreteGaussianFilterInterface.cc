@@ -28,6 +28,7 @@
 
 //Interface Includes
 #include <Interface/QtInterface/QtBridge.h>
+#include <Interface/ToolInterface/CustomWidgets/TargetComboBox.h>
 
 //Qt Gui Includes
 #include <Interface/ToolInterface/DiscreteGaussianFilterInterface.h>
@@ -45,9 +46,9 @@ class DiscreteGaussianFilterInterfacePrivate
 {
 public:
   Ui::DiscreteGaussianFilterInterface ui_;
-    
     SliderDoubleCombo *variance_;
   SliderDoubleCombo *kernel_width_;
+  TargetComboBox *target_;
 };
 
 // constructor
@@ -65,28 +66,23 @@ DiscreteGaussianFilterInterface::~DiscreteGaussianFilterInterface()
 bool DiscreteGaussianFilterInterface::build_widget( QFrame* frame )
 {
   //Step 1 - build the Qt GUI Widget
-  private_->ui_.setupUi( frame );
+  this->private_->ui_.setupUi( frame );
 
-  //Add the SliderSpinCombos
-  private_->variance_ = new SliderDoubleCombo();
-  private_->ui_.varianceHLayout_bottom->addWidget( private_->variance_ );
+    //Add the SliderSpinCombos
+    this->private_->variance_ = new SliderDoubleCombo();
+    this->private_->ui_.varianceHLayout_bottom->addWidget( this->private_->variance_ );
 
-  private_->kernel_width_ = new SliderDoubleCombo();
-  private_->ui_.kernelHLayout_bottom->addWidget( private_->kernel_width_ );
+    this->private_->kernel_width_ = new SliderDoubleCombo();
+    this->private_->ui_.kernelHLayout_bottom->addWidget( this->private_->kernel_width_ );
+    
+    this->private_->target_ = new TargetComboBox( this );
+    this->private_->ui_.activeHLayout->addWidget( this->private_->target_ );
 
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
   DiscreteGaussianFilter* tool = dynamic_cast< DiscreteGaussianFilter* > ( base_tool_.get() );
 
     //Step 3 - set the values for the tool ui from the state engine
-  
-      //set default falues for the target option list 
-      std::vector< std::string > temp_option_list = tool->target_layer_state_->option_list();
-      for( size_t i = 0; i < temp_option_list.size(); i++)
-      {   
-          this->private_->ui_.targetComboBox->addItem( QString::fromStdString( temp_option_list[i] ) );
-      } 
-        this->private_->ui_.targetComboBox->setCurrentIndex(tool->target_layer_state_->index());
         
         // set the defaults for the variance
       double variance_min = 0.0; 
@@ -94,9 +90,9 @@ bool DiscreteGaussianFilterInterface::build_widget( QFrame* frame )
       double variance_step = 0.0;
       tool->variance_state_->get_step( variance_step );
       tool->variance_state_->get_range( variance_min, variance_max );
-      private_->variance_->setStep( variance_step );
-        private_->variance_->setRange( variance_min, variance_max );
-        private_->variance_->setCurrentValue( tool->variance_state_->get() );
+      this->private_->variance_->setStep( variance_step );
+        this->private_->variance_->setRange( variance_min, variance_max );
+        this->private_->variance_->setCurrentValue( tool->variance_state_->get() );
         
         // set the defaults for the kernel width
         double kernel_width_min = 0.0; 
@@ -104,19 +100,19 @@ bool DiscreteGaussianFilterInterface::build_widget( QFrame* frame )
       double kernel_width_step = 0.0;
       tool->maximum_kernel_width_state_->get_step( kernel_width_step );
       tool->maximum_kernel_width_state_->get_range( kernel_width_min, kernel_width_max );
-      private_->kernel_width_->setStep( kernel_width_step );
-        private_->kernel_width_->setRange( kernel_width_min, kernel_width_max );
-        private_->kernel_width_->setCurrentValue( tool->maximum_kernel_width_state_->get() );
+      this->private_->kernel_width_->setStep( kernel_width_step );
+        this->private_->kernel_width_->setRange( kernel_width_min, kernel_width_max );
+        this->private_->kernel_width_->setCurrentValue( tool->maximum_kernel_width_state_->get() );
         
         //set the default replace checkbox value
         this->private_->ui_.replaceCheckBox->setChecked(tool->replace_state_);
         
     
   //Step 4 - connect the gui to the tool through the QtBridge
-  QtBridge::Connect( private_->ui_.targetComboBox, tool->target_layer_state_ );
-  QtBridge::Connect( private_->variance_, tool->variance_state_ );
-  QtBridge::Connect( private_->kernel_width_, tool->maximum_kernel_width_state_ );
-  QtBridge::Connect( private_->ui_.replaceCheckBox, tool->replace_state_ );
+  QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
+  QtBridge::Connect( this->private_->variance_, tool->variance_state_ );
+  QtBridge::Connect( this->private_->kernel_width_, tool->maximum_kernel_width_state_ );
+  QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
 
   //Send a message to the log that we have finised with building the Discrete Gaussian Filter Interface
   SCI_LOG_DEBUG("Finished building a Discrete Gaussian Filter Interface");

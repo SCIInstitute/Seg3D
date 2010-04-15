@@ -78,7 +78,6 @@ public:
   void make_new_group( LayerHandle layer );
   void delete_group( LayerGroupHandle group );
   void show_group( LayerGroupHandle group );
-  void set_active_group( LayerGroupHandle group );
   void set_active_layer( LayerHandle layer );
   
 

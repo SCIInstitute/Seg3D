@@ -109,7 +109,7 @@ namespace Seg3D
     "}" );
   const QString StyleSheet::TOOLBOXPAGEWIDGET_PAGE_BACKGROUND_INACTIVE_C = QString( 
     "QWidget#page_background_ {"
-    " background-color: rgb( 200, 200, 200 );"
+    " background-color: rgb( 150, 150, 150 );"
     " border-radius: 3px;"
     "}" );
     
@@ -176,14 +176,14 @@ namespace Seg3D
     "   stop:0.155779 rgba(225, 225, 225, 255),"
     "   stop:1 rgba(194, 194, 194, 255));"
     " border-radius: 3px;"
-    " border: 1px solid rgb(90, 90, 90);"
+    " border: 1px solid rgb(80, 80, 80);"
     "}");
   const QString StyleSheet::LAYER_WIDGET_LABEL_C = QString::fromUtf8(
     "QLineEdit#label_{"
     " text-align: left;"
     " color: black;"
     " margin-right: 3px;"
-    " background-color: rgba( 190, 190, 190, 1 );"
+    " background-color: rgba( 255, 255, 255, 1 );"
     "}");
     
   // - DROP - //
@@ -223,7 +223,7 @@ namespace Seg3D
     "}");
   const QString StyleSheet::LAYER_WIDGET_LABEL_LOCKED_C = QString::fromUtf8(
     "QLineEdit#label_{"
-    " background-color:rgba(208, 208, 208, 1);"
+    " background-color:rgba(255, 255, 255, 1);"
     " color: gray;"
     "}");
     
@@ -232,7 +232,11 @@ namespace Seg3D
   // - ACTIVE - //
   const QString StyleSheet::GROUP_WIDGET_BASE_ACTIVE_C = QString::fromUtf8(
     "QWidget#base_{"
-    " background-color: rgb(150, 150, 150);"
+    " background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1,"
+    "   stop:0 rgba(120, 120, 120, 255),"
+    "   stop:0.35 rgba(100, 100, 100, 255)," 
+    "   stop:0.65 rgba(100, 100, 100, 255),"
+    "   stop:1 rgba(120, 120, 120, 255));"
     " border-radius:3px;"
     " border: 1px solid rgb( 60, 60, 60 );"
     " color: rgb(90,90,90);"
@@ -240,7 +244,7 @@ namespace Seg3D
   const QString StyleSheet::GROUP_WIDGET_BACKGROUND_ACTIVE_C = QString::fromUtf8(  
     "QWidget#group_background_{"
     " background-color: rgb(237, 149, 31);"
-    " border: 1px solid rgb(60, 60, 60);"
+    " border: 1px solid rgb(90, 90, 90);"
     " border-radius: 3px;"
     " color: white;"
     "}");

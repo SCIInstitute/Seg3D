@@ -28,6 +28,7 @@
 
 //Interface Includes
 #include <Interface/QtInterface/QtBridge.h>
+#include <Interface/ToolInterface/CustomWidgets/TargetComboBox.h>
 
 //Qt Gui Includes
 #include <Interface/ToolInterface/AnisotropicDiffusionFilterInterface.h>
@@ -48,6 +49,7 @@ public:
   SliderIntCombo *iterations_;
   SliderIntCombo *step_;
   SliderDoubleCombo *conductance_;
+  TargetComboBox *target_;
 };
 
 // constructor
@@ -75,6 +77,9 @@ bool AnisotropicDiffusionFilterInterface::build_widget( QFrame* frame )
 
   this->private_->conductance_ = new SliderDoubleCombo();
   this->private_->ui_.conductanceHLayout_bottom->addWidget( this->private_->conductance_ );
+  
+  private_->target_ = new TargetComboBox( this );
+  private_->ui_.activeHLayout->addWidget( private_->target_ );
 
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
@@ -82,14 +87,6 @@ bool AnisotropicDiffusionFilterInterface::build_widget( QFrame* frame )
       dynamic_cast< AnisotropicDiffusionFilter* > ( base_tool_.get() );
 
     //Step 3 - set the values for the tool ui from the state engine
-  
-      //set default falues for the target option list 
-      std::vector< std::string > temp_option_list = tool->target_layer_state_->option_list();
-      for( size_t i = 0; i < temp_option_list.size(); i++)
-      {   
-          this->private_->ui_.targetComboBox->addItem( QString::fromStdString( temp_option_list[i] ) );
-      } 
-        this->private_->ui_.targetComboBox->setCurrentIndex(tool->target_layer_state_->index());
       
       // set the defaults for the iterations from the state variables
         int iterations_min = 0; 
@@ -127,7 +124,7 @@ bool AnisotropicDiffusionFilterInterface::build_widget( QFrame* frame )
       
 
   //Step 4 - connect the gui to the tool through the QtBridge
-  QtBridge::Connect( this->private_->ui_.targetComboBox, tool->target_layer_state_ );
+  QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
   QtBridge::Connect( this->private_->iterations_, tool->iterations_state_ );
   QtBridge::Connect( this->private_->step_, tool->steps_state_ );
   QtBridge::Connect( this->private_->conductance_, tool->conductance_state_ );

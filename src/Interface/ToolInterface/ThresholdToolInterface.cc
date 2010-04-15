@@ -28,6 +28,7 @@
 
 //Interface Includes
 #include <Interface/QtInterface/QtBridge.h>
+#include <Interface/ToolInterface/CustomWidgets/TargetComboBox.h>
 
 //Qt Gui Includes
 #include <Interface/ToolInterface/ThresholdToolInterface.h>
@@ -48,6 +49,7 @@ public:
   
   SliderDoubleCombo *upper_threshold_;
   SliderDoubleCombo *lower_threshold_;
+  TargetComboBox *target_;
 };
 
 // constructor
@@ -67,25 +69,22 @@ bool ThresholdToolInterface::build_widget( QFrame* frame )
   //Step 1 - build the Qt GUI Widget
   this->private_->ui_.setupUi( frame );
 
-  this->private_->upper_threshold_ = new SliderDoubleCombo();
-  this->private_->ui_.verticalLayout_2->addWidget( this->private_->upper_threshold_ );
+    // Add the SliderSpinner Combos
+    this->private_->upper_threshold_ = new SliderDoubleCombo();
+    this->private_->ui_.verticalLayout_2->addWidget( this->private_->upper_threshold_ );
 
-  this->private_->lower_threshold_ = new SliderDoubleCombo();
-  this->private_->ui_.verticalLayout_3->addWidget( this->private_->lower_threshold_ );
+    this->private_->lower_threshold_ = new SliderDoubleCombo();
+    this->private_->ui_.verticalLayout_3->addWidget( this->private_->lower_threshold_ );
+    
+    // add the TargetComboBox
+    this->private_->target_ = new TargetComboBox( this );
+    this->private_->ui_.activeHLayout->addWidget( this->private_->target_ );
 
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
   ThresholdTool* tool = dynamic_cast< ThresholdTool* > ( base_tool_.get() );
   
   //Step 3 - set the values for the tool ui from the state engine
-  
-      //set default falues for the target option list 
-      std::vector< std::string > temp_option_list = tool->target_layer_state_->option_list();
-      for( size_t i = 0; i < temp_option_list.size(); i++)
-      {   
-          this->private_->ui_.targetComboBox->addItem( QString::fromStdString( temp_option_list[i] ) );
-      } 
-        this->private_->ui_.targetComboBox->setCurrentIndex(tool->target_layer_state_->index());
       
      // set the defaults for the upper threshold
         double upper_threshold_min = 0.0; 
@@ -93,9 +92,9 @@ bool ThresholdToolInterface::build_widget( QFrame* frame )
       double upper_threshold_step = 0.0;
       tool->upper_threshold_state_->get_step( upper_threshold_step );
       tool->upper_threshold_state_->get_range( upper_threshold_min, upper_threshold_max );
-      private_->upper_threshold_->setStep( upper_threshold_step );
-        private_->upper_threshold_->setRange( upper_threshold_min, upper_threshold_max );
-        private_->upper_threshold_->setCurrentValue( tool->upper_threshold_state_->get() );
+      this->private_->upper_threshold_->setStep( upper_threshold_step );
+        this->private_->upper_threshold_->setRange( upper_threshold_min, upper_threshold_max );
+        this->private_->upper_threshold_->setCurrentValue( tool->upper_threshold_state_->get() );
         
         // set the defaults for the lower threshold
         double lower_threshold_min = 0.0; 
@@ -103,13 +102,13 @@ bool ThresholdToolInterface::build_widget( QFrame* frame )
       double lower_threshold_step = 0.0;
       tool->lower_threshold_state_->get_step( lower_threshold_step );
       tool->lower_threshold_state_->get_range( lower_threshold_min, lower_threshold_max );
-      private_->lower_threshold_->setStep( lower_threshold_step );
-        private_->lower_threshold_->setRange( lower_threshold_min, lower_threshold_max );
-        private_->lower_threshold_->setCurrentValue( tool->lower_threshold_state_->get() );
+      this->private_->lower_threshold_->setStep( lower_threshold_step );
+        this->private_->lower_threshold_->setRange( lower_threshold_min, lower_threshold_max );
+        this->private_->lower_threshold_->setCurrentValue( tool->lower_threshold_state_->get() );
 
 
   //Step 4 - connect the gui to the tool through the QtBridge
-  QtBridge::Connect( private_->ui_.targetComboBox, tool->target_layer_state_ );
+  QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
   QtBridge::Connect( this->private_->upper_threshold_, tool->upper_threshold_state_ );
   QtBridge::Connect( this->private_->lower_threshold_, tool->lower_threshold_state_ );
 
