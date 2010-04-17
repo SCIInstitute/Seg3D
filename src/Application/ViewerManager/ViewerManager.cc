@@ -31,6 +31,7 @@
 // Boost includes 
 
 // Application includes
+#include <Application/LayerManager/LayerManager.h>
 #include <Application/Viewer/Viewer.h> 
 #include <Application/ViewerManager/ViewerManager.h>
 #include <Application/Interface/Interface.h>
@@ -63,7 +64,7 @@ ViewerManager::ViewerManager() :
 
 ViewerManager::~ViewerManager()
 {
-  disconnect_all();
+  this->disconnect_all();
 }
 
 ViewerHandle ViewerManager::get_viewer( size_t idx )
@@ -85,6 +86,28 @@ ViewerHandle ViewerManager::get_viewer( const std::string viewer_name )
     }
   }
   return handle;
+}
+
+void ViewerManager::get_2d_viewers_info( ViewerInfoList viewers[ 3 ] )
+{
+  StateEngine::lock_type lock( StateEngine::GetMutex() );
+  if ( !LayerManager::Instance()->get_active_layer() )
+  {
+    return;
+  }
+  for ( size_t i = 0; i < 6; i++ )
+  {
+    ViewerHandle viewer = this->viewers_[ i ];
+    if ( viewer->viewer_visible_state_->get() && !viewer->is_volume_view() )
+    {
+      StateView2D* view2d = static_cast< StateView2D* >( viewer->get_active_view_state().get() );
+      ViewerInfoHandle viewer_info( new ViewerInfo );
+      viewer_info->viewer_id_ = i;
+      viewer_info->view_mode_ = viewer->view_mode_state_->index();
+      viewer_info->depth_ = view2d->get().center().z();
+      viewers[ viewer_info->view_mode_ ].push_back( viewer_info );
+    }
+  }
 }
 
 void ViewerManager::viewer_content_changed(size_t viewer_id)

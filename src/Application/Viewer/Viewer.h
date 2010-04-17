@@ -153,7 +153,7 @@ protected:
   // -- Signals and Slots --
 public:
 
-  typedef boost::signals2::signal< void() > redraw_signal_type;
+  typedef boost::signals2::signal< void( bool ) > redraw_signal_type;
   redraw_signal_type redraw_signal_;
   redraw_signal_type redraw_overlay_signal_;
 
@@ -164,6 +164,8 @@ private:
   void change_view_mode( std::string mode, ActionSource source );
   void set_slice_number( int num, ActionSource source = ActionSource::NONE_E );
   void change_visibility( bool visible, ActionSource source );
+  void trigger_redraw( bool delay_update );
+  void trigger_redraw_overlay( bool delay_update );
 
   // -- Data structures for keeping track of slices of layers --
 private:

@@ -91,6 +91,34 @@ Viewer::Viewer( size_t viewer_id ) :
     boost::bind( &Viewer::set_slice_number, this, _1, _2 ) ) );
   this->add_connection( this->viewer_visible_state_->value_changed_signal_.connect(
     boost::bind( &Viewer::change_visibility, this, _1, _2 ) ) );
+
+  // Connect state variables that should trigger redraw.
+  // For those state variables that will trigger both redraw and redraw_overlay, 
+  // "delay_update" is set to true for redraw.
+  this->add_connection( this->view_mode_state_->state_changed_signal_.connect(
+    boost::bind( &Viewer::trigger_redraw, this, true ) ) );
+  this->add_connection( this->axial_view_state_->state_changed_signal_.connect(
+    boost::bind( &Viewer::trigger_redraw, this, true ) ) );
+  this->add_connection( this->coronal_view_state_->state_changed_signal_.connect(
+    boost::bind( &Viewer::trigger_redraw, this, true ) ) );
+  this->add_connection( this->sagittal_view_state_->state_changed_signal_.connect(
+    boost::bind( &Viewer::trigger_redraw, this, true ) ) );
+  this->add_connection( this->volume_view_state_->state_changed_signal_.connect(
+    boost::bind( &Viewer::trigger_redraw, this, false ) ) );
+  this->add_connection( this->slice_number_state_->state_changed_signal_.connect(
+    boost::bind( &Viewer::trigger_redraw, this, false ) ) );
+
+  // Connect state variables that should trigger redraw_overlay
+  this->add_connection( this->view_mode_state_->state_changed_signal_.connect(
+    boost::bind( &Viewer::trigger_redraw_overlay, this, false ) ) );
+  this->add_connection( this->axial_view_state_->state_changed_signal_.connect(
+    boost::bind( &Viewer::trigger_redraw_overlay, this, false ) ) );
+  this->add_connection( this->coronal_view_state_->state_changed_signal_.connect(
+    boost::bind( &Viewer::trigger_redraw_overlay, this, false ) ) );
+  this->add_connection( this->sagittal_view_state_->state_changed_signal_.connect(
+    boost::bind( &Viewer::trigger_redraw_overlay, this, false ) ) );
+  this->add_connection( this->slice_grid_state_->state_changed_signal_.connect(
+    boost::bind( &Viewer::trigger_redraw_overlay, this, false ) ) );
 }
 
 Viewer::~Viewer()
@@ -255,10 +283,11 @@ void Viewer::update_status_bar( int x, int y )
 
 void Viewer::state_changed()
 {
-  if ( this->redraw_block_count_ == 0 )
-  {
-    this->redraw_signal_();
-  }
+  //if ( this->redraw_block_count_ == 0 )
+  //{
+  //  this->redraw_overlay_signal_( true );
+  //  this->redraw_signal_( false );
+  //}
 }
 
 bool Viewer::is_volume_view() const
@@ -364,10 +393,7 @@ void Viewer::insert_layer( LayerHandle layer )
     volume_slice->move_slice( this->active_layer_slice_->depth() );
   }
 
-  if ( this->redraw_block_count_ == 0 )
-  {
-    this->redraw_signal_();
-  }
+  this->trigger_redraw( false );
 }
 
 void Viewer::delete_layers( std::vector< LayerHandle > layers )
@@ -419,10 +445,7 @@ void Viewer::delete_layers( std::vector< LayerHandle > layers )
 
   lock.unlock();
   
-  if ( this->redraw_block_count_ == 0 )
-  {
-    this->redraw_signal_();
-  }
+  this->trigger_redraw( false );
 }
 
 void Viewer::set_active_layer( LayerHandle layer )
@@ -486,9 +509,9 @@ void Viewer::set_active_layer( LayerHandle layer )
       }
     }
 
-    if ( this->redraw_block_count_ == 0 && needs_redraw )
+    if ( needs_redraw )
     {
-      this->redraw_signal_();
+      this->trigger_redraw( false );
     }
   }
 }
@@ -525,7 +548,6 @@ void Viewer::change_view_mode( std::string mode, ActionSource source )
   {
     if ( this->viewer_visible_state_->get() )
     {
-      this->redraw_overlay_signal_();
       this->content_changed_signal_( this->viewer_id_ );
     }
     
@@ -581,8 +603,6 @@ void Viewer::change_view_mode( std::string mode, ActionSource source )
         this->active_layer_slice_->get_slice_number() ) );
     }
   } // end if ( this->active_layer_slice_ )
-
-  this->redraw_overlay_signal_();
 }
 
 void Viewer::set_slice_number( int num, ActionSource source )
@@ -630,6 +650,22 @@ void Viewer::set_slice_number( int num, ActionSource source )
 void Viewer::change_visibility( bool /*visible*/, ActionSource /*source*/ )
 {
   this->content_changed_signal_( this->viewer_id_ );
+}
+
+void Viewer::trigger_redraw( bool delay_update )
+{
+  if ( this->redraw_block_count_ == 0 )
+  {
+    this->redraw_signal_( delay_update );
+  }
+}
+
+void Viewer::trigger_redraw_overlay( bool delay_update )
+{
+  if ( this->redraw_block_count_ == 0 )
+  {
+    this->redraw_overlay_signal_( delay_update );
+  }
 }
 
 void Viewer::adjust_view( Utils::VolumeSliceHandle target_slice )
@@ -741,14 +777,15 @@ void Viewer::auto_view()
     Utils::ScopedCounter block_counter( this->redraw_block_count_ );
     this->adjust_view( this->active_layer_slice_ );
   }
-  this->redraw_signal_();
+  this->trigger_redraw( true );
+  this->trigger_redraw_overlay( false );
 }
 
 void Viewer::layer_state_changed( bool volume_view )
 {
   if ( volume_view == this->is_volume_view() )
   {
-    this->redraw_signal_();
+    this->trigger_redraw( false );
   }
 }
 

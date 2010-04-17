@@ -74,7 +74,7 @@ public:
   // REDRAW_OVERLAY:
   // Calls the "render_overlay" function to render the overlay onto the FBO.
   // It triggers the "redraw_overlay_completed_signal_" at the end.
-  void redraw_overlay();
+  void redraw_overlay( bool delay_update = false );
 
   // Activate the renderer
   void activate() 
@@ -109,9 +109,7 @@ public:
   // REDRAW_OVERLAY_COMPLETED_SIGNAL_
   // Triggered when redraw_overlay is done.
   // The parameter is a handle to the texture containing the overlay.
-  typedef boost::signals2::signal< void ( Utils::TextureHandle ) > 
-    redraw_overlay_completed_signal_type;
-  redraw_overlay_completed_signal_type redraw_overlay_completed_signal_;
+  redraw_completed_signal_type redraw_overlay_completed_signal_;
 
 protected:
 

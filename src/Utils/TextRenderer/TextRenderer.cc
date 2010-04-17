@@ -176,8 +176,8 @@ void TextRenderer::render_aligned( const std::string& text, unsigned char* buffe
   this->get_glyphs( text, face, glyphs );
   this->compute_bbox( glyphs, bbox );
 
-  int x_offset;
-  int y_offset;
+  int x_offset = 0;
+  int y_offset = 0;
   this->compute_offset( width, height, bbox, halign, valign, x_offset, y_offset );
   this->render( glyphs, buffer, width, height, x_offset, y_offset );
 }
@@ -208,8 +208,8 @@ void TextRenderer::render_aligned( const std::string& text, unsigned char* buffe
   this->get_glyphs( text, face, angle, glyphs );
   this->compute_bbox( glyphs, bbox );
 
-  int x_offset;
-  int y_offset;
+  int x_offset = 0;
+  int y_offset = 0;
   this->compute_offset( width, height, bbox, halign, valign, x_offset, y_offset );
 
   this->render( glyphs, buffer, width, height, x_offset, y_offset );

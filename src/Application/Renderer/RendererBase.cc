@@ -181,20 +181,21 @@ void RendererBase::redraw( bool delay_update )
   texture_lock.unlock();
 
   // signal rendering completed
-  this->redraw_completed_signal_( this->textures_[ this->active_render_texture_ ], delay_update );
+  this->redraw_completed_signal_( 
+    this->textures_[ this->active_render_texture_ ], delay_update );
 
   // swap render textures 
   this->active_render_texture_ = ( ~this->active_render_texture_ ) & 1;
 }
 
-void RendererBase::redraw_overlay()
+void RendererBase::redraw_overlay( bool delay_update )
 {
 #if MULTITHREADED_RENDERING
   if ( !is_eventhandler_thread() )
   {
     lock_type lock( this->get_mutex() );
     this->redraw_overlay_needed_ = true;
-    this->post_event( boost::bind( &RendererBase::redraw_overlay, this ) );
+    this->post_event( boost::bind( &RendererBase::redraw_overlay, this, delay_update ) );
     return;
   }
 #else
@@ -202,7 +203,7 @@ void RendererBase::redraw_overlay()
   {
     lock_type lock( this->get_mutex() );
     this->redraw_overlay_needed_ = true;
-    Interface::PostEvent( boost::bind( &RendererBase::redraw_overlay, this ) );
+    Interface::PostEvent( boost::bind( &RendererBase::redraw_overlay, this, delay_update ) );
     return;
   }
   // Make the GL context current in the interface thread
@@ -252,7 +253,8 @@ void RendererBase::redraw_overlay()
   texture_lock.unlock();
 
   // signal rendering completed
-  this->redraw_overlay_completed_signal_( this->textures_[ this->active_overlay_texture_ ] );
+  this->redraw_overlay_completed_signal_( 
+    this->textures_[ this->active_overlay_texture_ ], delay_update );
 
   // swap render textures 
   this->active_overlay_texture_ = ( ~( this->active_overlay_texture_ - 2 ) ) & 1 + 2;

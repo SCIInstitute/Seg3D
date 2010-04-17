@@ -110,19 +110,19 @@ void Renderer::post_initialize()
 
   ViewerHandle viewer = ViewerManager::Instance()->get_viewer( this->viewer_id_ );
   this->add_connection( viewer->redraw_signal_.connect( 
-    boost::bind( &Renderer::redraw, this, false ) ) );
+    boost::bind( &Renderer::redraw, this, _1 ) ) );
   this->add_connection( viewer->redraw_overlay_signal_.connect( 
-    boost::bind( &Renderer::redraw_overlay, this ) ) );
+    boost::bind( &Renderer::redraw_overlay, this, _1 ) ) );
 
-  //size_t num_of_viewers = Application::Instance()->number_of_viewers();
-  //for ( size_t i = 0; i < num_of_viewers; i++ )
-  //{
-  //  if ( i != this->viewer_id_ )
-  //  {
-  //    this->add_connection( ViewerManager::Instance()->get_viewer( i )->
-  //      content_changed_signal_.connect( boost::bind( &Renderer::redraw_overlay, this ) ) );
-  //  }
-  //}
+  size_t num_of_viewers = Application::Instance()->number_of_viewers();
+  for ( size_t i = 0; i < num_of_viewers; i++ )
+  {
+    if ( i != this->viewer_id_ )
+    {
+      this->add_connection( ViewerManager::Instance()->get_viewer( i )->
+        content_changed_signal_.connect( boost::bind( &Renderer::viewer_content_changed, this, _1 ) ) );
+    }
+  }
 }
 
 bool Renderer::render()
@@ -299,7 +299,7 @@ bool Renderer::render_overlay()
   glLoadIdentity();
 
   // Lock the state engine
-  StateEngine::lock_type state_lock( StateEngine::Instance()->get_mutex() );
+  StateEngine::lock_type state_lock( StateEngine::GetMutex() );
 
   ViewerHandle viewer = ViewerManager::Instance()->get_viewer( this->viewer_id_ );
 
@@ -310,9 +310,21 @@ bool Renderer::render_overlay()
   else
   {
     bool show_grid = viewer->slice_grid_state_->get();
+    Utils::View2D view2d(
+      static_cast< StateView2D* > ( viewer->get_active_view_state().get() )->get() );
+    int view_mode = viewer->view_mode_state_->index();
+    ViewerInfoList viewers_info[ 3 ];
+    ViewerManager::Instance()->get_2d_viewers_info( viewers_info );
 
     // We have got everything we want from the state engine, unlock before we do any rendering
     state_lock.unlock();
+
+    double left, right, top, bottom;
+    view2d.compute_clipping_planes( this->width_ / ( 1.0 * this->height_ ), 
+      left, right, bottom, top );
+    Utils::Matrix proj_mat, inv_proj_mat;
+    Utils::Transform::BuildOrtho2DMatrix( proj_mat, left, right, bottom, top );
+    Utils::Invert( proj_mat, inv_proj_mat );
 
     glDisable( GL_DEPTH_TEST );
     glDisable( GL_CULL_FACE );
@@ -359,6 +371,33 @@ bool Renderer::render_overlay()
       glEnd();
     }
     
+    // Render the positions of slices in other viewers
+    glColor4f( 1.0f, 0.1f, 0.1f, 0.75f );
+    int vert_slice_mode = ( view_mode + 2 ) % 3;
+    int hori_slice_mode = ( view_mode + 1 ) % 3;
+    size_t num_of_vert_slices = viewers_info[ vert_slice_mode ].size();
+    size_t num_of_hori_slices = viewers_info[ hori_slice_mode ].size();
+    for ( size_t i = 0; i < num_of_vert_slices; i++ )
+    {
+      Utils::Point pt( viewers_info[ vert_slice_mode ][ i ]->depth_, 0, 0 );
+      pt = proj_mat * pt;
+      int slice_pos = Utils::Round( ( pt.x() + 1.0 ) / 2.0 * ( this->width_ ) ) + 1;
+      glBegin( GL_LINES );
+      glVertex2i( slice_pos, 0 );
+      glVertex2i( slice_pos, this->height_ );
+      glEnd();
+    }
+    for ( size_t i = 0; i < num_of_hori_slices; i++ )
+    {
+      Utils::Point pt( 0, viewers_info[ hori_slice_mode ][ i ]->depth_, 0 );
+      pt = proj_mat * pt;
+      int slice_pos = Utils::Round( ( pt.y() + 1.0 ) / 2.0 * ( this->height_ ) ) + 1;
+      glBegin( GL_LINES );
+      glVertex2i( 0, slice_pos);
+      glVertex2i( this->width_, slice_pos );
+      glEnd();
+    }
+
     // Render the text
     std::vector< unsigned char > buffer( this->width_ * this->height_, 0 );
     std::vector< std::string > text;
@@ -457,6 +496,18 @@ void Renderer::process_slices( LayerSceneHandle& layer_scene, ViewerHandle& view
   if ( layer_scene->size() != 0 )
   {
     ( *layer_scene )[ 0 ]->opacity_ = 1.0;
+  }
+}
+
+void Renderer::viewer_content_changed( size_t viewer_id )
+{
+  StateEngine::lock_type lock( StateEngine::GetMutex() );
+  ViewerHandle self_viewer = ViewerManager::Instance()->get_viewer( this->viewer_id_ );
+  ViewerHandle updated_viewer = ViewerManager::Instance()->get_viewer( viewer_id );
+  if ( self_viewer->view_mode_state_->index() !=
+    updated_viewer->view_mode_state_->index() )
+  {
+    this->redraw_overlay();
   }
 }
 

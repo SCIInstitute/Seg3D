@@ -54,6 +54,17 @@ namespace Seg3D
 
 // Forward declarations
 class ViewerManager;
+class ViewerInfo;
+typedef boost::shared_ptr< ViewerInfo > ViewerInfoHandle;
+typedef std::vector< ViewerInfoHandle > ViewerInfoList;
+
+class ViewerInfo
+{
+public:
+  size_t viewer_id_;
+  int view_mode_;
+  double depth_;
+};
 
 // typedefs
 class ViewerManager : public StateHandler
@@ -70,6 +81,8 @@ private:
 public:
   ViewerHandle get_viewer( size_t idx );
   ViewerHandle get_viewer( const std::string viewer_name );
+
+  void get_2d_viewers_info( ViewerInfoList viewers[ 3 ] );
 
   // -- State information --
 public:

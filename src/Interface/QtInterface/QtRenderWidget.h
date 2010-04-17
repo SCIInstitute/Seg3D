@@ -76,7 +76,7 @@ protected:
 private:
 
   void update_texture( Utils::TextureHandle texture, bool delay_update );
-  void update_overlay_texture( Utils::TextureHandle texture );
+  void update_overlay_texture( Utils::TextureHandle texture, bool delay_update );
 
   RendererHandle renderer_;
   Utils::TextureHandle renderer_texture_;

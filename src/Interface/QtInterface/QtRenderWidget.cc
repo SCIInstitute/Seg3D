@@ -51,7 +51,7 @@ QtRenderWidget::QtRenderWidget( const QGLFormat& format, QWidget* parent, QtRend
   this->add_connection( renderer_->redraw_completed_signal_.connect(
       boost::bind( &QtRenderWidget::update_texture, this, _1, _2 ) ) );
   this->add_connection( renderer_->redraw_overlay_completed_signal_.connect(
-      boost::bind( &QtRenderWidget::update_overlay_texture, this, _1 ) ) );
+      boost::bind( &QtRenderWidget::update_overlay_texture, this, _1, _2 ) ) );
 
   setAutoFillBackground( false );
   setAttribute( Qt::WA_OpaquePaintEvent );
@@ -84,13 +84,13 @@ void QtRenderWidget::update_texture( Utils::TextureHandle texture, bool delay_up
   }
 }
 
-void QtRenderWidget::update_overlay_texture( Utils::TextureHandle texture )
+void QtRenderWidget::update_overlay_texture( Utils::TextureHandle texture, bool delay_update )
 {
   // if not in the interface thread, post an event to the interface thread
   if ( !Interface::IsInterfaceThread() )
   {
     Interface::PostEvent(
-        boost::bind( &QtRenderWidget::update_overlay_texture, this, texture ) );
+        boost::bind( &QtRenderWidget::update_overlay_texture, this, texture, delay_update ) );
     return;
   }
 
@@ -98,7 +98,10 @@ void QtRenderWidget::update_overlay_texture( Utils::TextureHandle texture )
     + ": received new overlay texture");
   this->overlay_texture_ = texture;
   
-  this->updateGL();
+  if ( !delay_update )
+  {
+    this->updateGL();
+  }
 }
 
 void QtRenderWidget::initializeGL()
