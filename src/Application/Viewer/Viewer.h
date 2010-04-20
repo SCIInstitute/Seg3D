@@ -136,6 +136,7 @@ public:
 
 private:
   void update_status_bar( int x, int y );
+  void pick_point( int x, int y );
 
   mouse_event_handler_type mouse_move_handler_;
   mouse_event_handler_type mouse_press_handler_;
@@ -157,8 +158,8 @@ public:
   redraw_signal_type redraw_signal_;
   redraw_signal_type redraw_overlay_signal_;
 
-  typedef boost::signals2::signal< void ( size_t ) > content_changed_signal_type;
-  content_changed_signal_type content_changed_signal_;
+  typedef boost::signals2::signal< void ( size_t ) > slice_changed_signal_type;
+  slice_changed_signal_type slice_changed_signal_;
 
 private:
   void change_view_mode( std::string mode, ActionSource source );
@@ -208,6 +209,8 @@ public:
     return this->stateid();
   }
 
+  void move_slice( const Utils::Point& pt );
+
 private:
   
   // Auto adjust the view states so the slices are fully visible
@@ -254,6 +257,7 @@ public:
   StateBoolHandle volume_volume_rendering_visible_state_;
 
   StateBoolHandle viewer_visible_state_;
+  StateBoolHandle is_picking_target_state_;
 
 private:
   // Indexed view state variables for quick access

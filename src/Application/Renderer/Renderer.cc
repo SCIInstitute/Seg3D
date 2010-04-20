@@ -120,7 +120,9 @@ void Renderer::post_initialize()
     if ( i != this->viewer_id_ )
     {
       this->add_connection( ViewerManager::Instance()->get_viewer( i )->
-        content_changed_signal_.connect( boost::bind( &Renderer::viewer_content_changed, this, _1 ) ) );
+        slice_changed_signal_.connect( boost::bind( &Renderer::viewer_slice_changed, this, _1 ) ) );
+      this->add_connection( ViewerManager::Instance()->get_viewer( i )->view_mode_state_->
+        state_changed_signal_.connect( boost::bind( &Renderer::viewer_mode_changed, this, i ) ) );
     }
   }
 }
@@ -322,9 +324,8 @@ bool Renderer::render_overlay()
     double left, right, top, bottom;
     view2d.compute_clipping_planes( this->width_ / ( 1.0 * this->height_ ), 
       left, right, bottom, top );
-    Utils::Matrix proj_mat, inv_proj_mat;
+    Utils::Matrix proj_mat;
     Utils::Transform::BuildOrtho2DMatrix( proj_mat, left, right, bottom, top );
-    Utils::Invert( proj_mat, inv_proj_mat );
 
     glDisable( GL_DEPTH_TEST );
     glDisable( GL_CULL_FACE );
@@ -372,7 +373,7 @@ bool Renderer::render_overlay()
     }
     
     // Render the positions of slices in other viewers
-    glColor4f( 1.0f, 0.1f, 0.1f, 0.75f );
+    glLineStipple( 1, 0x1C47 );
     int vert_slice_mode = ( view_mode + 2 ) % 3;
     int hori_slice_mode = ( view_mode + 1 ) % 3;
     size_t num_of_vert_slices = viewers_info[ vert_slice_mode ].size();
@@ -381,7 +382,20 @@ bool Renderer::render_overlay()
     {
       Utils::Point pt( viewers_info[ vert_slice_mode ][ i ]->depth_, 0, 0 );
       pt = proj_mat * pt;
-      int slice_pos = Utils::Round( ( pt.x() + 1.0 ) / 2.0 * ( this->width_ ) ) + 1;
+      int slice_pos = Utils::Round( ( pt.x() + 1.0 ) / 2.0 * ( this->width_ ) );
+      float color[ 4 ] = { 0.0f, 0.0f, 0.0f, 1.0f };
+      color[ vert_slice_mode ] = 1.0f;
+      if ( viewers_info[ vert_slice_mode ][ i ]->is_picking_target_ )
+      {
+        glDisable( GL_LINE_STIPPLE );
+      }
+      else
+      {
+        glEnable( GL_LINE_STIPPLE );
+        color[ 3 ] = 0.5f;
+      }
+      //color[ 3 ] = viewers_info[ vert_slice_mode ][ i ]->is_picking_target_ ? 0.75f : 0.3f;
+      glColor4fv( color );
       glBegin( GL_LINES );
       glVertex2i( slice_pos, 0 );
       glVertex2i( slice_pos, this->height_ );
@@ -391,12 +405,26 @@ bool Renderer::render_overlay()
     {
       Utils::Point pt( 0, viewers_info[ hori_slice_mode ][ i ]->depth_, 0 );
       pt = proj_mat * pt;
-      int slice_pos = Utils::Round( ( pt.y() + 1.0 ) / 2.0 * ( this->height_ ) ) + 1;
+      int slice_pos = Utils::Round( ( pt.y() + 1.0 ) / 2.0 * ( this->height_ ) );
+      float color[ 4 ] = { 0.0f, 0.0f, 0.0f, 1.0f };
+      color[ hori_slice_mode ] = 1.0f;
+      if ( viewers_info[ hori_slice_mode ][ i ]->is_picking_target_ )
+      {
+        glDisable( GL_LINE_STIPPLE );
+      }
+      else
+      {
+        glEnable( GL_LINE_STIPPLE );
+        color[ 3 ] = 0.5f;
+      }
+      //color[ 3 ] = viewers_info[ hori_slice_mode ][ i ]->is_picking_target_ ? 0.75f : 0.3f;
+      glColor4fv( color );    
       glBegin( GL_LINES );
       glVertex2i( 0, slice_pos);
       glVertex2i( this->width_, slice_pos );
       glEnd();
     }
+    glDisable( GL_LINE_STIPPLE );
 
     // Render the text
     std::vector< unsigned char > buffer( this->width_ * this->height_, 0 );
@@ -404,8 +432,8 @@ bool Renderer::render_overlay()
     text.push_back( std::string( "Hello World" ) );
     text.push_back( std::string( "NUMIRA" ) );
     this->text_renderer_->render( text, &buffer[ 0 ], this->width_, this->height_, 5, 20, 10, -1 );
-    this->text_renderer_->render_aligned( text[ 1 ], &buffer[ 0 ], this->width_, this->height_, 48,
-      50, Utils::TextHAlignmentType::CENTER_E, Utils::TextVAlignmentType::CENTER_E );
+    //this->text_renderer_->render_aligned( text[ 1 ], &buffer[ 0 ], this->width_, this->height_, 48,
+    //  50, Utils::TextHAlignmentType::CENTER_E, Utils::TextVAlignmentType::CENTER_E );
     this->text_texture_->enable();
     this->text_texture_->set_sub_image( 0, 0, this->width_, this->height_,
         &buffer[ 0 ], GL_ALPHA, GL_UNSIGNED_BYTE );
@@ -438,7 +466,7 @@ void Renderer::post_resize()
 {
   {
     Utils::RenderResources::lock_type lock( Utils::RenderResources::GetMutex() );
-    this->text_texture_->set_image( this->width_, this->height_, GL_RGBA );
+    this->text_texture_->set_image( this->width_, this->height_, GL_ALPHA );
   }
 }
 
@@ -499,13 +527,22 @@ void Renderer::process_slices( LayerSceneHandle& layer_scene, ViewerHandle& view
   }
 }
 
-void Renderer::viewer_content_changed( size_t viewer_id )
+void Renderer::viewer_slice_changed( size_t viewer_id )
 {
   StateEngine::lock_type lock( StateEngine::GetMutex() );
   ViewerHandle self_viewer = ViewerManager::Instance()->get_viewer( this->viewer_id_ );
   ViewerHandle updated_viewer = ViewerManager::Instance()->get_viewer( viewer_id );
   if ( self_viewer->view_mode_state_->index() !=
     updated_viewer->view_mode_state_->index() )
+  {
+    this->redraw_overlay();
+  }
+}
+
+void Renderer::viewer_mode_changed( size_t viewer_id )
+{
+  StateEngine::lock_type lock( StateEngine::GetMutex() );
+  if ( ViewerManager::Instance()->get_viewer( viewer_id )->viewer_visible_state_->get() )
   {
     this->redraw_overlay();
   }

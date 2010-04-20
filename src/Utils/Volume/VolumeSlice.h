@@ -98,6 +98,9 @@ public:
   // NOTE: the indices returned can be out of the slice boundary.
   void world_to_index( double i_pos, double j_pos, int& i, int& j ) const;
 
+  // Get the 3D world coordinate of the point
+  void get_world_coord( double i_pos, double j_pos, Point& world_coord ) const;
+
   // Move the slice to closely match the given point in world space.
   // Returns true if slice is moved, otherwise false.
   void move_slice( const Point& pos, bool fail_safe = false );

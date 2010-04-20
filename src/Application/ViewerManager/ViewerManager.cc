@@ -36,13 +36,20 @@
 #include <Application/ViewerManager/ViewerManager.h>
 #include <Application/Interface/Interface.h>
 
+// Utils includes
+#include <Utils/Core/ScopedCounter.h>
+
 namespace Seg3D
 {
 
 CORE_SINGLETON_IMPLEMENTATION( ViewerManager );
 
 ViewerManager::ViewerManager() :
-  StateHandler( "view" )
+  StateHandler( "view" ),
+  active_axial_viewer_( -1 ),
+  active_coronal_viewer_( -1 ),
+  active_sagittal_viewer_( -1 ),
+  signal_block_count_( 0 )
 {
   // Step (1)
   // Set the default state of this element
@@ -57,8 +64,14 @@ ViewerManager::ViewerManager() :
   for ( size_t j = 0; j < viewers_.size(); j++ )
   {
     this->viewers_[ j ] = ViewerHandle( new Viewer( j ) );
-    this->add_connection( this->viewers_[ j ]->content_changed_signal_.connect(
-      boost::bind( &ViewerManager::viewer_content_changed, this, _1 ) ) );
+
+    // NOTE: ViewerManager needs to process these signals first
+    this->add_connection( this->viewers_[ j ]->view_mode_state_->value_changed_signal_.
+      connect( boost::bind( &ViewerManager::viewer_mode_changed, this, j ), boost::signals2::at_front ) );
+    this->add_connection( this->viewers_[ j ]->viewer_visible_state_->value_changed_signal_.
+      connect( boost::bind( &ViewerManager::viewer_visibility_changed, this, j ), boost::signals2::at_front ) );
+    this->add_connection( this->viewers_[ j ]->is_picking_target_state_->value_changed_signal_.
+      connect( boost::bind( &ViewerManager::viewer_became_picking_target, this, j ), boost::signals2::at_front ) );
   }
 }
 
@@ -105,14 +118,176 @@ void ViewerManager::get_2d_viewers_info( ViewerInfoList viewers[ 3 ] )
       viewer_info->viewer_id_ = i;
       viewer_info->view_mode_ = viewer->view_mode_state_->index();
       viewer_info->depth_ = view2d->get().center().z();
+      viewer_info->is_picking_target_ = viewer->is_picking_target_state_->get();
       viewers[ viewer_info->view_mode_ ].push_back( viewer_info );
     }
   }
 }
 
-void ViewerManager::viewer_content_changed(size_t viewer_id)
+void ViewerManager::viewer_mode_changed( size_t viewer_id )
 {
-  this->viewer_content_changed_signal_( viewer_id );
+  StateEngine::lock_type lock( StateEngine::GetMutex() );
+  Utils::ScopedCounter signal_block_counter( this->signal_block_count_ );
+
+  if ( this->active_axial_viewer_ == static_cast< int >( viewer_id ) )
+  {
+    this->active_axial_viewer_ = -1;
+  }
+  else if ( this->active_coronal_viewer_ == static_cast< int >( viewer_id ) )
+  {
+    this->active_coronal_viewer_ = -1;
+  }
+  else if ( this->active_sagittal_viewer_ == static_cast< int >( viewer_id ) )
+  {
+    this->active_sagittal_viewer_ = -1;
+  }
+  
+  this->viewers_[ viewer_id ]->is_picking_target_state_->set( false );
+  this->update_picking_targets();
+}
+
+void ViewerManager::viewer_visibility_changed( size_t viewer_id )
+{
+  StateEngine::lock_type lock( StateEngine::GetMutex() );
+  Utils::ScopedCounter signal_block_counter( this->signal_block_count_ );
+
+  if ( !this->viewers_[ viewer_id ]->viewer_visible_state_->get() )
+  {
+    if ( this->active_axial_viewer_ == static_cast< int >( viewer_id ) )
+    {
+      this->active_axial_viewer_ = -1;
+    }
+    else if ( this->active_coronal_viewer_ == static_cast< int >( viewer_id ) )
+    {
+      this->active_coronal_viewer_ = -1;
+    }
+    else if ( this->active_sagittal_viewer_ == static_cast< int >( viewer_id ) )
+    {
+      this->active_sagittal_viewer_ = -1;
+    }
+
+    this->viewers_[ viewer_id ]->is_picking_target_state_->set( false );
+  }
+
+  this->update_picking_targets();
+}
+
+void ViewerManager::viewer_became_picking_target( size_t viewer_id )
+{
+  if ( this->signal_block_count_ > 0 )
+  {
+    return;
+  }
+  
+  StateEngine::lock_type lock( StateEngine::GetMutex() );
+
+  ViewerHandle viewer = this->viewers_[ viewer_id ];
+  if ( !viewer->is_picking_target_state_->get() )
+  {
+    return;
+  }
+
+  Utils::ScopedCounter signal_block_counter( this->signal_block_count_ );
+  
+  if ( viewer->view_mode_state_->get() == Viewer::AXIAL_C )
+  {
+    if ( this->active_axial_viewer_ >= 0 )
+    {
+      this->viewers_[ this->active_axial_viewer_ ]->is_picking_target_state_->set( false );
+    }
+    this->active_axial_viewer_ = static_cast< int >( viewer_id );
+  }
+  else if ( viewer->view_mode_state_->get() == Viewer::CORONAL_C )
+  {
+    if ( this->active_coronal_viewer_ >= 0 )
+    {
+      this->viewers_[ this->active_coronal_viewer_ ]->is_picking_target_state_->set( false );
+    }
+    this->active_coronal_viewer_ = static_cast< int >( viewer_id );
+  }
+  else if ( viewer->view_mode_state_->get() == Viewer::SAGITTAL_C )
+  {
+    if ( this->active_sagittal_viewer_ >= 0 )
+    {
+      this->viewers_[ this->active_sagittal_viewer_ ]->is_picking_target_state_->set( false );
+    }
+    this->active_sagittal_viewer_ = static_cast< int >( viewer_id );
+  }
+  else
+  {
+    assert( false );
+  }
+
+  this->picking_target_changed_signal_( viewer_id );
+}
+
+void ViewerManager::update_picking_targets()
+{
+  for ( size_t i = 0; i < 6; i++ )
+  {
+    ViewerHandle viewer = this->viewers_[ i ];
+    if ( !viewer->viewer_visible_state_->get() )
+    {
+      continue;
+    }
+    
+    if ( viewer->view_mode_state_->get() == Viewer::AXIAL_C )
+    {
+      if ( this->active_axial_viewer_ < 0 )
+      {
+        this->active_axial_viewer_ = static_cast< int >( i );
+        viewer->is_picking_target_state_->set( true );
+      }
+    }
+    else if ( viewer->view_mode_state_->get() == Viewer::CORONAL_C )
+    {
+      if ( this->active_coronal_viewer_ < 0 )
+      {
+        this->active_coronal_viewer_ = static_cast< int >( i );
+        viewer->is_picking_target_state_->set( true );
+      }
+    }
+    else if ( viewer->view_mode_state_->get() == Viewer::SAGITTAL_C )
+    {
+      if ( this->active_sagittal_viewer_ < 0 )
+      {
+        this->active_sagittal_viewer_ = static_cast< int >( i );
+        viewer->is_picking_target_state_->set( true );
+      }
+    }
+  }
+}
+
+void ViewerManager::pick_point( size_t source_viewer, const Utils::Point& pt )
+{
+  ViewerHandle src_viewer = this->viewers_[ source_viewer ];
+  if ( this->active_axial_viewer_ >= 0 && 
+    this->active_axial_viewer_ != static_cast< int >( source_viewer ) )
+  {
+    ViewerHandle viewer = this->viewers_[ this->active_axial_viewer_ ];
+    if ( viewer->view_mode_state_->get() != src_viewer->view_mode_state_->get() )
+    {
+      viewer->move_slice( pt );
+    }
+  }
+  if ( this->active_coronal_viewer_ >= 0 && 
+    this->active_coronal_viewer_ != static_cast< int >( source_viewer ) )
+  {
+    ViewerHandle viewer = this->viewers_[ this->active_coronal_viewer_ ];
+    if ( viewer->view_mode_state_->get() != src_viewer->view_mode_state_->get() )
+    {
+      viewer->move_slice( pt );
+    }
+  }
+  if ( this->active_sagittal_viewer_ >= 0 && 
+    this->active_sagittal_viewer_ != static_cast< int >( source_viewer ) )
+  {
+    ViewerHandle viewer = this->viewers_[ this->active_sagittal_viewer_ ];
+    if ( viewer->view_mode_state_->get() != src_viewer->view_mode_state_->get() )
+    {
+      viewer->move_slice( pt );
+    }
+  }
 }
 
 } // end namespace Seg3D

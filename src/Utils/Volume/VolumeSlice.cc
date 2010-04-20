@@ -221,6 +221,31 @@ void VolumeSlice::world_to_index( double x_pos, double y_pos, int& i, int& j ) c
   }
 }
 
+void VolumeSlice::get_world_coord( double i_pos, double j_pos, Point& world_coord ) const
+{
+  switch( this->slice_type_ )
+  {
+  case VolumeSliceType::AXIAL_E:
+    world_coord[ 0 ] = i_pos;
+    world_coord[ 1 ] = j_pos;
+    world_coord[ 2 ] = this->depth_;
+    break;
+  case VolumeSliceType::CORONAL_E:
+    world_coord[ 2 ] = i_pos;
+    world_coord[ 0 ] = j_pos;
+    world_coord[ 1 ] = this->depth_;
+    break;
+  case VolumeSliceType::SAGITTAL_E:
+    world_coord[ 1 ] = i_pos;
+    world_coord[ 2 ] = j_pos;
+    world_coord[ 0 ] = this->depth_;
+    break;
+  default:
+    assert( false );
+    break;
+  }
+}
+
 void VolumeSlice::move_slice( const Point& pos, bool fail_safe )
 {
   Point index = this->volume_->apply_inverse_grid_transform( pos );

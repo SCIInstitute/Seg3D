@@ -37,6 +37,8 @@ SET(APPLICATION_VIEWMANAGER_SRCS
   )
 
 SET(APPLICATION_VIEWMANAGER_ACTIONS_SRCS
+  Actions/ActionPickPoint.h
+  Actions/ActionPickPoint.cc  
   )
 
 ADD_LIBRARY(Application_ViewerManager STATIC 

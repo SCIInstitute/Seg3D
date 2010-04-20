@@ -27,11 +27,11 @@
  */
 
 #ifndef APPLICATION_VIEWER_VIEWERMANAGER_H
-#define APPLICATION_VIEWER_VIEWERMANAGER_H 1
+#define APPLICATION_VIEWER_VIEWERMANAGER_H
 
-//#ifdef (_MSC_VER) && (_MSC_VER >= 1020)
-//# pragma once
-//#endif
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+# pragma once
+#endif
 
 // STL includes
 #include <string>
@@ -64,6 +64,7 @@ public:
   size_t viewer_id_;
   int view_mode_;
   double depth_;
+  bool is_picking_target_;
 };
 
 // typedefs
@@ -83,6 +84,7 @@ public:
   ViewerHandle get_viewer( const std::string viewer_name );
 
   void get_2d_viewers_info( ViewerInfoList viewers[ 3 ] );
+  void pick_point( size_t source_viewer, const Utils::Point& pt );
 
   // -- State information --
 public:
@@ -91,16 +93,25 @@ public:
 
   // -- Signals and slots --
 private:
-  void viewer_content_changed( size_t viewer_id );
+  void viewer_mode_changed( size_t viewer_id );
+  void viewer_visibility_changed( size_t viewer_id );
+  void viewer_became_picking_target( size_t viewer_id );
+  void update_picking_targets();
 
 public:
-  typedef boost::signals2::signal< void ( size_t viewer_id ) > viewer_content_changed_signal_type;
-  viewer_content_changed_signal_type viewer_content_changed_signal_;
+  typedef boost::signals2::signal< void ( size_t ) > picking_target_changed_signal_type;
+  picking_target_changed_signal_type picking_target_changed_signal_;
 
   // -- Viewer information --
 private:
 
   std::vector< ViewerHandle > viewers_;
+
+  int active_axial_viewer_;
+  int active_coronal_viewer_;
+  int active_sagittal_viewer_;
+
+  size_t signal_block_count_;
 
 }; // class ViewerManager
 

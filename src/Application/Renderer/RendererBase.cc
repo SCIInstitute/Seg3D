@@ -46,10 +46,10 @@ namespace Seg3D
 
 RendererBase::RendererBase() :
   EventHandler(), 
-  active_render_texture_( 0 ), 
-  active_overlay_texture_( 2 ),
   width_( 0 ), 
   height_( 0 ),
+  active_render_texture_( 0 ), 
+  active_overlay_texture_( 2 ),
   redraw_needed_( false ),
   redraw_overlay_needed_( false ),
   active_( false )

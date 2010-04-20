@@ -73,7 +73,8 @@ protected:
 private:
 
   void process_slices( LayerSceneHandle& layer_scene, ViewerHandle& viewer );
-  void viewer_content_changed( size_t viewer_id );
+  void viewer_slice_changed( size_t viewer_id );
+  void viewer_mode_changed( size_t viewer_id );
 
   Utils::UnitCubeHandle cube_;
   SliceShaderHandle slice_shader_;
