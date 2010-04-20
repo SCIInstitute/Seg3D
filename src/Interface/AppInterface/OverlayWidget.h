@@ -26,28 +26,25 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <Interface/AppInterface/PushDragButton.h>
+#ifndef INTERFACE_APPINTERFACE_OVERLAYWIDGET_H
+#define INTERFACE_APPINTERFACE_OVERLAYWIDGET_H
+
+
+#include <QtGui/QWidget>
 
 namespace Seg3D
 {
-
-
-PushDragButton::PushDragButton( QWidget *parent )
+  
+class OverlayWidget : public QWidget 
 {
-  this->setParent( parent );
-}
+  Q_OBJECT
+  
+public:
+  OverlayWidget( QWidget *parent );
+  virtual ~OverlayWidget();
+    
+};
+  
+} // end namespace
 
-PushDragButton::~PushDragButton()
-{
-}
-
-void PushDragButton::mousePressEvent( QMouseEvent *event )
-{
-  if( ( event->modifiers() == Qt::ControlModifier ) || ( event->modifiers() == Qt::ShiftModifier ) )
-    Q_EMIT clicked();
-  else
-    event->ignore();
-}
-
-
-} // end namespace Seg3D
+#endif  //INTERFACE_APPINTERFACE_OverlayWidget_H

@@ -261,6 +261,8 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
         
         QtBridge::Connect( this->private_->ui_.transform_replace_checkBox_, group->transform_replace_state_ );
 
+  this->private_->ui_.group_frame_layout_->setAlignment( Qt::AlignTop );
+
 }
   
 LayerGroupWidget::~LayerGroupWidget()
@@ -285,6 +287,7 @@ void LayerGroupWidget::insert_layer( LayerHandle layer, int index )
     this->private_->ui_.group_frame_layout_->insertWidget( index, new_layer_handle.data() );
   }
   this->layer_list_.push_back( new_layer_handle );
+  
 }
 
   

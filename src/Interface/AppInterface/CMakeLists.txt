@@ -54,6 +54,8 @@ SET(INTERFACE_APPINTERFACE_SRCS
   ViewAction.cc
   ViewerInterface.cc
   ViewerWidget.cc
+  DropSpaceWidget.cc
+  OverlayWidget.cc
   
 )
 
@@ -79,6 +81,8 @@ SET(INTERFACE_APPINTERFACE_MOC_SRCS
   ViewAction.h
   ViewerInterface.h
   ViewerWidget.h
+  DropSpaceWidget.h
+  OverlayWidget.h
 )
 
 

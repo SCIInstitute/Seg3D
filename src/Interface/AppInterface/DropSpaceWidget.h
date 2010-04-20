@@ -24,30 +24,45 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
- */
+*/
 
-#include <Interface/AppInterface/PushDragButton.h>
+#ifndef INTERFACE_APPINTERFACE_DropSpaceWidgetWIDGET_H
+#define INTERFACE_APPINTERFACE_DropSpaceWidgetWIDGET_H
+
+// QT includes
+#include <QtGui>
+
 
 namespace Seg3D
 {
-
-
-PushDragButton::PushDragButton( QWidget *parent )
+  
+class DropSpaceWidget :
+public QWidget
 {
-  this->setParent( parent );
-}
+  Q_OBJECT
+  
+public:
+  DropSpaceWidget( QWidget *parent );
+  virtual ~DropSpaceWidget();
 
-PushDragButton::~PushDragButton()
-{
-}
+public:
+  void hide();
+  void show();
 
-void PushDragButton::mousePressEvent( QMouseEvent *event )
-{
-  if( ( event->modifiers() == Qt::ControlModifier ) || ( event->modifiers() == Qt::ShiftModifier ) )
-    Q_EMIT clicked();
-  else
-    event->ignore();
-}
-
-
+  
+private Q_SLOTS:
+  void change_size();
+  
+private:
+  QTimer *timer_;
+  //QTimer *shrink_timer_;
+  bool changing_size_;
+  bool open_;
+  int height_;
+  QWidget* parent_;
+  
+};
+  
 } // end namespace Seg3D
+
+#endif //INTERFACE_APPINTERFACE_DropSpaceWidget_H

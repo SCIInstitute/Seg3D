@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>301</width>
-    <height>283</height>
+    <height>231</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -15,6 +15,9 @@
     <width>0</width>
     <height>0</height>
    </size>
+  </property>
+  <property name="mouseTracking">
+   <bool>false</bool>
   </property>
   <property name="windowTitle">
    <string>Form</string>
@@ -45,7 +48,6 @@ QLineEdit#label_:focus{
 }
 
 QWidget#insert_space_{
-  border-radius: 3px;
   margin-top: 0;
   margin-bottom: 0;
   padding-top: 0;
@@ -370,33 +372,21 @@ QToolButton#color_button_12_:pressed{
 }
 </string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_3">
+  <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0">
    <property name="spacing">
-    <number>3</number>
+    <number>0</number>
    </property>
    <property name="margin">
     <number>0</number>
    </property>
    <item>
-    <widget class="QWidget" name="insert_space_" native="true">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>45</height>
-      </size>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_10">
-      <property name="spacing">
-       <number>0</number>
-      </property>
-      <property name="margin">
-       <number>0</number>
-      </property>
-     </layout>
-    </widget>
-   </item>
-   <item>
     <widget class="QWidget" name="base_" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="minimumSize">
       <size>
        <width>0</width>

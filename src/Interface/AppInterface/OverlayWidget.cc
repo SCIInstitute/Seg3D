@@ -26,28 +26,26 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <Interface/AppInterface/PushDragButton.h>
+//Qt includes
+#include <QtGui/QPainter>
+#include <QtGui/QPen>
+
+// Interface includes
+#include <Interface/AppInterface/OverlayWidget.h>
 
 namespace Seg3D
 {
 
-
-PushDragButton::PushDragButton( QWidget *parent )
+OverlayWidget::OverlayWidget( QWidget *parent ) 
+  : QWidget(parent)
 {
-  this->setParent( parent );
+  setPalette( Qt::transparent );
+  QSizePolicy size_policy( QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding );
+  this->setSizePolicy( size_policy );
 }
 
-PushDragButton::~PushDragButton()
+OverlayWidget::~OverlayWidget()
 {
 }
-
-void PushDragButton::mousePressEvent( QMouseEvent *event )
-{
-  if( ( event->modifiers() == Qt::ControlModifier ) || ( event->modifiers() == Qt::ShiftModifier ) )
-    Q_EMIT clicked();
-  else
-    event->ignore();
-}
-
-
+    
 } // end namespace Seg3D
