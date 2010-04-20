@@ -74,6 +74,8 @@
         <file>Images/NextSliceOff.png</file>
 		<file>Images/Opacity.png</file>
 		<file>Images/OpacityOff.png</file>
+        <file>Images/Picking.png</file>
+        <file>Images/PickingOff.png</file>
         <file>Images/PreviousSlice.png</file>
         <file>Images/PreviousSliceOff.png</file>
         <file>Images/Resample.png</file>
