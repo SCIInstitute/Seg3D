@@ -424,7 +424,7 @@ public:
     state_handle_( state_handle )
   {
     // Qt's connect function
-    connect( parent,SIGNAL(  toggled( bool ) ),this,SLOT( slot( bool ) ) );
+    connect( parent, SIGNAL(  toggled( bool ) ), this, SLOT( slot( bool ) ) );
   }
 
   // Virtual destructor: needed by Qt

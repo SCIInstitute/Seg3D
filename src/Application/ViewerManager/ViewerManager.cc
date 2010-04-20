@@ -179,43 +179,45 @@ void ViewerManager::viewer_became_picking_target( size_t viewer_id )
     return;
   }
   
-  StateEngine::lock_type lock( StateEngine::GetMutex() );
+  {
+    StateEngine::lock_type lock( StateEngine::GetMutex() );
 
-  ViewerHandle viewer = this->viewers_[ viewer_id ];
-  if ( !viewer->is_picking_target_state_->get() )
-  {
-    return;
-  }
+    ViewerHandle viewer = this->viewers_[ viewer_id ];
+    if ( !viewer->is_picking_target_state_->get() )
+    {
+      return;
+    }
 
-  Utils::ScopedCounter signal_block_counter( this->signal_block_count_ );
-  
-  if ( viewer->view_mode_state_->get() == Viewer::AXIAL_C )
-  {
-    if ( this->active_axial_viewer_ >= 0 )
+    Utils::ScopedCounter signal_block_counter( this->signal_block_count_ );
+
+    if ( viewer->view_mode_state_->get() == Viewer::AXIAL_C )
     {
-      this->viewers_[ this->active_axial_viewer_ ]->is_picking_target_state_->set( false );
+      if ( this->active_axial_viewer_ >= 0 )
+      {
+        this->viewers_[ this->active_axial_viewer_ ]->is_picking_target_state_->set( false );
+      }
+      this->active_axial_viewer_ = static_cast< int >( viewer_id );
     }
-    this->active_axial_viewer_ = static_cast< int >( viewer_id );
-  }
-  else if ( viewer->view_mode_state_->get() == Viewer::CORONAL_C )
-  {
-    if ( this->active_coronal_viewer_ >= 0 )
+    else if ( viewer->view_mode_state_->get() == Viewer::CORONAL_C )
     {
-      this->viewers_[ this->active_coronal_viewer_ ]->is_picking_target_state_->set( false );
+      if ( this->active_coronal_viewer_ >= 0 )
+      {
+        this->viewers_[ this->active_coronal_viewer_ ]->is_picking_target_state_->set( false );
+      }
+      this->active_coronal_viewer_ = static_cast< int >( viewer_id );
     }
-    this->active_coronal_viewer_ = static_cast< int >( viewer_id );
-  }
-  else if ( viewer->view_mode_state_->get() == Viewer::SAGITTAL_C )
-  {
-    if ( this->active_sagittal_viewer_ >= 0 )
+    else if ( viewer->view_mode_state_->get() == Viewer::SAGITTAL_C )
     {
-      this->viewers_[ this->active_sagittal_viewer_ ]->is_picking_target_state_->set( false );
+      if ( this->active_sagittal_viewer_ >= 0 )
+      {
+        this->viewers_[ this->active_sagittal_viewer_ ]->is_picking_target_state_->set( false );
+      }
+      this->active_sagittal_viewer_ = static_cast< int >( viewer_id );
     }
-    this->active_sagittal_viewer_ = static_cast< int >( viewer_id );
-  }
-  else
-  {
-    assert( false );
+    else
+    {
+      assert( false );
+    }
   }
 
   this->picking_target_changed_signal_( viewer_id );

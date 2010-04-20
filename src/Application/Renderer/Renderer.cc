@@ -125,6 +125,8 @@ void Renderer::post_initialize()
         state_changed_signal_.connect( boost::bind( &Renderer::viewer_mode_changed, this, i ) ) );
     }
   }
+  this->add_connection( ViewerManager::Instance()->picking_target_changed_signal_.connect(
+    boost::bind( &Renderer::picking_target_changed, this, _1 ) ) );
 }
 
 bool Renderer::render()
@@ -543,6 +545,22 @@ void Renderer::viewer_mode_changed( size_t viewer_id )
 {
   StateEngine::lock_type lock( StateEngine::GetMutex() );
   if ( ViewerManager::Instance()->get_viewer( viewer_id )->viewer_visible_state_->get() )
+  {
+    this->redraw_overlay();
+  }
+}
+
+void Renderer::picking_target_changed( size_t viewer_id )
+{
+  if ( this->viewer_id_ == viewer_id )
+  {
+    return;
+  }
+  StateEngine::lock_type lock( StateEngine::GetMutex() );
+  ViewerHandle self_viewer = ViewerManager::Instance()->get_viewer( this->viewer_id_ );
+  ViewerHandle updated_viewer = ViewerManager::Instance()->get_viewer( viewer_id );
+  if ( self_viewer->view_mode_state_->index() !=
+    updated_viewer->view_mode_state_->index() )
   {
     this->redraw_overlay();
   }

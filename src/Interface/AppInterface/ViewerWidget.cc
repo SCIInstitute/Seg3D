@@ -44,8 +44,9 @@
 #include <QtOpenGL>
 
 // Interface includes
-#include <Interface/AppInterface/ViewerWidget.h>
+#include <Interface/AppInterface/SingleShotToolButton.h>
 #include <Interface/AppInterface/StyleSheet.h>
+#include <Interface/AppInterface/ViewerWidget.h>
 
 namespace Seg3D
 {
@@ -70,8 +71,10 @@ public:
   QToolButton* flip_horiz_button_;
   QToolButton* flip_vert_button_;
 
-  QToolButton* next_slice_button_;
-  QToolButton* previous_slice_button_;
+  //QToolButton* next_slice_button_;
+  //QToolButton* previous_slice_button_;
+
+  QToolButton* picking_button_;
 
   QToolButton* slice_visible_button_;
 
@@ -87,7 +90,7 @@ public:
 
   // Autoview a specific viewer
   QAction* auto_view_;
-  // Switch on grif in 2D viewer
+  // Switch on grid in 2D viewer
   QAction* grid_;
 
   // Lock zoom/pan/slice advance etc with viewers of the same type
@@ -95,8 +98,10 @@ public:
 
   // Buttons for next and previous slice in
   // slice viewer
-  QAction* next_slice_;
-  QAction* previous_slice_;
+  //QAction* next_slice_;
+  //QAction* previous_slice_;
+
+  QAction* picking_;
 
   // Flip the viewer horizontally / vertically
   QAction* flip_horiz_;
@@ -137,12 +142,9 @@ ViewerWidgetPrivate::ViewerWidgetPrivate( QWidget *parent )
   QIcon auto_view_icon;
   auto_view_icon.addPixmap( QPixmap( ":/Images/AutoViewOff.png" ), QIcon::Normal, QIcon::Off );
 
-  QIcon next_slice_icon;
-  next_slice_icon.addPixmap( QPixmap( ":/Images/NextSliceOff.png" ), QIcon::Normal, QIcon::Off );
-
-  QIcon previous_slice_icon;
-  previous_slice_icon.addPixmap( QPixmap( ":/Images/PreviousSliceOff.png" ), QIcon::Normal,
-      QIcon::Off );
+  QIcon picking_icon;
+  picking_icon.addPixmap( QPixmap( ":/Images/Picking.png" ), QIcon::Normal, QIcon::On );
+  picking_icon.addPixmap( QPixmap( ":/Images/PickingOff.png" ), QIcon::Normal, QIcon::Off );
 
   QIcon flipvert_icon;
   flipvert_icon.addPixmap( QPixmap( ":/Images/FlipVert.png" ), QIcon::Normal, QIcon::On );
@@ -202,17 +204,12 @@ ViewerWidgetPrivate::ViewerWidgetPrivate( QWidget *parent )
   auto_view_->setToolTip( QString( "Zoom and Translate to see the full dataset" ) );
   auto_view_->setIconVisibleInMenu( true );
 
-  next_slice_ = new QAction( parent );
-  next_slice_->setIcon( next_slice_icon );
-  next_slice_->setText( QString( "NextSlice" ) );
-  next_slice_->setToolTip( QString( "Go to the next slice" ) );
-  next_slice_->setIconVisibleInMenu( true );
-
-  previous_slice_ = new QAction( parent );
-  previous_slice_->setIcon( previous_slice_icon );
-  previous_slice_->setText( QString( "PreviousSlice" ) );
-  previous_slice_->setToolTip( QString( "Go to the previous slice" ) );
-  previous_slice_->setIconVisibleInMenu( true );
+  picking_ = new QAction( parent );
+  picking_->setIcon( picking_icon );
+  picking_->setText( QString( "Picking" ) );
+  picking_->setToolTip( QString( "Make the viewer a target for picking" ) );
+  picking_->setIconVisibleInMenu( true );
+  this->picking_->setCheckable( true );
 
   slice_visible_ = new QAction( parent );
   slice_visible_->setCheckable( true );
@@ -328,6 +325,7 @@ ViewerWidgetPrivate::ViewerWidgetPrivate( QWidget *parent )
   grid_button_->setDefaultAction( grid_ );
   grid_button_->setFixedHeight( 20 );
   grid_button_->setFixedWidth( 20 );
+  grid_button_->setCheckable( true );
 
   slice_visible_button_ = new QToolButton( buttonbar_ );
   slice_visible_button_->setToolButtonStyle( Qt::ToolButtonIconOnly );
@@ -335,17 +333,11 @@ ViewerWidgetPrivate::ViewerWidgetPrivate( QWidget *parent )
   slice_visible_button_->setFixedHeight( 20 );
   slice_visible_button_->setFixedWidth( 20 );
 
-  next_slice_button_ = new QToolButton( buttonbar_ );
-  next_slice_button_->setToolButtonStyle( Qt::ToolButtonIconOnly );
-  next_slice_button_->setDefaultAction( next_slice_ );
-  next_slice_button_->setFixedHeight( 20 );
-  next_slice_button_->setFixedWidth( 20 );
-
-  previous_slice_button_ = new QToolButton( buttonbar_ );
-  previous_slice_button_->setToolButtonStyle( Qt::ToolButtonIconOnly );
-  previous_slice_button_->setDefaultAction( previous_slice_ );
-  previous_slice_button_->setFixedHeight( 20 );
-  previous_slice_button_->setFixedWidth( 20 );
+  this->picking_button_ = new SingleShotToolButton( this->buttonbar_ );
+  this->picking_button_->setToolButtonStyle( Qt::ToolButtonIconOnly );
+  this->picking_button_->setDefaultAction( this->picking_ );
+  this->picking_button_->setFixedHeight( 20 );
+  this->picking_button_->setFixedWidth( 20 );
 
   buttonbar_layout_->addWidget( viewer_type_button_ );
   buttonbar_layout_->addWidget( auto_view_button_ );
@@ -354,8 +346,7 @@ ViewerWidgetPrivate::ViewerWidgetPrivate( QWidget *parent )
   buttonbar_layout_->addWidget( slice_visible_button_ );
   buttonbar_layout_->addWidget( flip_horiz_button_ );
   buttonbar_layout_->addWidget( flip_vert_button_ );
-  buttonbar_layout_->addWidget( next_slice_button_ );
-  buttonbar_layout_->addWidget( previous_slice_button_ );
+  this->buttonbar_layout_->addWidget( this->picking_button_ );
   buttonbar_layout_->addStretch();
 
   layout_->addWidget( viewer_ );
@@ -378,8 +369,12 @@ ViewerWidget::ViewerWidget( int viewer_id, QWidget *parent ) :
 
   private_->viewer_->set_viewer_id( viewer_id_ );
 
-  QtBridge::Connect( this->private_->viewer_selection_, 
-    ViewerManager::Instance()->get_viewer( this->viewer_id_  )->view_mode_state_ );
+  ViewerHandle viewer = ViewerManager::Instance()->get_viewer( this->viewer_id_  );
+  this->private_->grid_->setChecked( viewer->slice_grid_state_->get() );
+  QtBridge::Connect( this->private_->viewer_selection_, viewer->view_mode_state_ );
+  QtBridge::Connect( this->private_->picking_button_, viewer->is_picking_target_state_ );
+  QtBridge::Connect( this->private_->grid_button_, viewer->slice_grid_state_ );
+  QtBridge::Connect( this->private_->lock_button_, viewer->slice_lock_state_ );
 
   this->connect( this->private_->viewer_selection_, SIGNAL( triggered( QAction* ) ),
     this->private_->viewer_type_button_, SLOT( setDefaultAction( QAction* ) ) );
@@ -393,6 +388,7 @@ ViewerWidget::ViewerWidget( int viewer_id, QWidget *parent ) :
     SLOT( flip_view_vert( bool ) ) );
   this->connect( this->private_->auto_view_, SIGNAL( triggered( bool ) ),
     SLOT( auto_view( bool ) ) );
+
 }
 
 ViewerWidget::~ViewerWidget()
@@ -421,10 +417,13 @@ void ViewerWidget::change_view_type( QAction* viewer_type )
 
   StateEngine::lock_type lock( StateEngine::GetMutex() );
 
-  this->private_->flip_horiz_button_->setVisible( !viewer->is_volume_view() );
-  this->private_->flip_vert_button_->setVisible( !viewer->is_volume_view() );
+  bool is_volume_view = viewer->is_volume_view();
+  this->private_->flip_horiz_button_->setVisible( !is_volume_view );
+  this->private_->flip_vert_button_->setVisible( !is_volume_view );
+  this->private_->grid_button_->setVisible( !is_volume_view );
+  this->private_->picking_button_->setVisible( !is_volume_view );
 
-  if ( !viewer->is_volume_view() )
+  if ( !is_volume_view )
   {
     StateView2DHandle view2d_state = 
       boost::dynamic_pointer_cast<StateView2D>( viewer->get_active_view_state() );

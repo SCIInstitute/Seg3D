@@ -56,7 +56,7 @@ SET(INTERFACE_APPINTERFACE_SRCS
   ViewerWidget.cc
   DropSpaceWidget.cc
   OverlayWidget.cc
-  
+  SingleShotToolButton.cc
 )
 
 SET(INTERFACE_APPINTERFACE_MOC_SRCS
@@ -83,6 +83,7 @@ SET(INTERFACE_APPINTERFACE_MOC_SRCS
   ViewerWidget.h
   DropSpaceWidget.h
   OverlayWidget.h
+  SingleShotToolButton.h
 )
 
 
