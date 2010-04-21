@@ -262,7 +262,14 @@ inline int RoundUp( T value )
 template< class T >
 inline int Round( T value )
 {
-  return static_cast< int > ( value + T( 0.5 ) );
+  if ( value >= T( 0 ) )
+  {
+    return static_cast< int > ( value + T( 0.5 ) );
+  }
+  else
+  {
+    return static_cast< int >( value - T( 0.5 ) );
+  }
 }
 
 template< class T >

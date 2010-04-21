@@ -113,6 +113,7 @@ class Viewer : public StateHandler
 
   // -- constructor/destructor --
 public:
+  friend class ViewManipulator;
   Viewer( size_t viewer_id );
   virtual ~Viewer();
 
@@ -137,11 +138,13 @@ public:
 private:
   void update_status_bar( int x, int y );
   void pick_point( int x, int y );
+  void adjust_contrast_brightness( int dx, int dy );
 
   mouse_event_handler_type mouse_move_handler_;
   mouse_event_handler_type mouse_press_handler_;
   mouse_event_handler_type mouse_release_handler_;
   ViewManipulatorHandle view_manipulator_;
+  bool adjusting_contrast_brightness_;
 
 public:
   void resize( int width, int height );
@@ -158,6 +161,9 @@ public:
   redraw_signal_type redraw_signal_;
   redraw_signal_type redraw_overlay_signal_;
 
+  // SLICE_CHANGED_SIGNAL_:
+  // Triggered when slice number or viewer visibility is changed.
+  // Renderers of other viewers connect to this signal to update the overlay.
   typedef boost::signals2::signal< void ( size_t ) > slice_changed_signal_type;
   slice_changed_signal_type slice_changed_signal_;
 
@@ -165,8 +171,8 @@ private:
   void change_view_mode( std::string mode, ActionSource source );
   void set_slice_number( int num, ActionSource source = ActionSource::NONE_E );
   void change_visibility( bool visible, ActionSource source );
-  void trigger_redraw( bool delay_update );
-  void trigger_redraw_overlay( bool delay_update );
+  void viewer_lock_state_changed( bool locked );
+  void layer_state_changed( bool volume_view );
 
   // -- Data structures for keeping track of slices of layers --
 private:
@@ -209,7 +215,9 @@ public:
     return this->stateid();
   }
 
-  void move_slice( const Utils::Point& pt );
+  // MOVE_SLICE_TO:
+  // Move the slice to the given world coordinate. Used for picking.
+  void move_slice_to( const Utils::Point& pt );
 
 private:
   
@@ -219,15 +227,32 @@ private:
   // Move the active slices to the center of the volume
   void adjust_depth( Utils::VolumeSliceHandle target_slice );
 
-  void layer_state_changed( bool volume_view );
+  void trigger_redraw( bool delay_update );
+  void trigger_redraw_overlay( bool delay_update );
+  
+  // OFFSET_SLICE:
+  // Offset the slice number by the given value.
+  void offset_slice( int delta );
+
+  // MOVE_SLICE_BY:
+  // Move the active slice by the given offset in world coordinates.
+  // Called when the viewer is locked to other viewers of the same mode.
+  void move_slice_by( double depth_offset );
+
+  // RESET_ACTIVE_SLICE:
+  // Bring the active slice into boundary ( if it's out of boundary ).
+  // The active slice can only go out of boundary when the viewer is locked to other viewers.
+  void reset_active_slice();
 
 private:
   const size_t viewer_id_;
   int width_;
   int height_;
 
-  // Counts the number of times redraw signal is blocked
-  size_t redraw_block_count_;
+  // SIGNALS_BLOCK_COUNT_:
+  // Counts the number of times state change signals are blocked
+  // Used when state variables are being changed due to internal program logic.
+  size_t signals_block_count_;
 
   // Counts the number of times the slice number is locked (unchangeable)
   size_t slice_lock_count_;
@@ -247,15 +272,14 @@ public:
 
   StateRangedIntHandle slice_number_state_;
 
-  StateBoolHandle slice_lock_state_;
   StateBoolHandle slice_grid_state_;
   StateBoolHandle slice_visible_state_;
 
-  StateBoolHandle volume_lock_state_;
   StateBoolHandle volume_slices_visible_state_;
   StateBoolHandle volume_isosurfaces_visible_state_;
   StateBoolHandle volume_volume_rendering_visible_state_;
 
+  StateBoolHandle viewer_lock_state_;
   StateBoolHandle viewer_visible_state_;
   StateBoolHandle is_picking_target_state_;
 

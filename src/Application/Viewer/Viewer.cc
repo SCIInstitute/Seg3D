@@ -38,6 +38,7 @@
 #include <Application/Viewer/Viewer.h>
 #include <Application/Viewer/ViewManipulator.h>
 #include <Application/ViewerManager/Actions/ActionPickPoint.h>
+#include <Application/ViewerManager/ViewerManager.h>
 
 namespace Seg3D
 {
@@ -48,9 +49,10 @@ const std::string Viewer::CORONAL_C( "coronal" );
 const std::string Viewer::VOLUME_C( "volume" );
 
 Viewer::Viewer( size_t viewer_id ) :
-  StateHandler( std::string( "viewer" ) + Utils::ToString( viewer_id ) ), 
+  StateHandler( std::string( "viewer" ) + Utils::ToString( viewer_id ) ),
+  adjusting_contrast_brightness_( false ),
   viewer_id_( viewer_id ),
-  redraw_block_count_( 0 ),
+  signals_block_count_( 0 ),
   slice_lock_count_( 0 )
 {
   add_state( "view_mode", view_mode_state_, AXIAL_C, AXIAL_C + StateOption::SPLITTER_C
@@ -68,11 +70,10 @@ Viewer::Viewer( size_t viewer_id ) :
 
   add_state( "slice_number", this->slice_number_state_, 0, 0, 0, 1 );
 
-  add_state( "slice_lock", slice_lock_state_, true );
+  add_state( "slice_lock", viewer_lock_state_, false );
   add_state( "slice_grid", slice_grid_state_, true );
   add_state( "slice_visible", slice_visible_state_, true );
 
-  add_state( "volume_lock", volume_lock_state_, true );
   add_state( "volume_slices_visible", volume_slices_visible_state_, true );
   add_state( "volume_isosurfaces_visible", volume_isosurfaces_visible_state_, true );
   add_state( "volume_volume_rendering_visible", volume_volume_rendering_visible_state_, false );
@@ -93,6 +94,8 @@ Viewer::Viewer( size_t viewer_id ) :
     boost::bind( &Viewer::set_slice_number, this, _1, _2 ) ) );
   this->add_connection( this->viewer_visible_state_->value_changed_signal_.connect(
     boost::bind( &Viewer::change_visibility, this, _1, _2 ) ) );
+  this->add_connection( this->viewer_lock_state_->value_changed_signal_.connect(
+    boost::bind( &Viewer::viewer_lock_state_changed, this, _1 ) ) );
 
   // Connect state variables that should trigger redraw.
   // For those state variables that will trigger both redraw and redraw_overlay, 
@@ -152,6 +155,13 @@ void Viewer::mouse_move_event( const MouseHistory& mouse_history, int button, in
     this->update_status_bar( mouse_history.current.x, mouse_history.current.y );
     return;
   }
+
+  if ( this->adjusting_contrast_brightness_ )
+  {
+    this->adjust_contrast_brightness( mouse_history.current.x - mouse_history.previous.x,
+      mouse_history.previous.y - mouse_history.current.y );
+    return;
+  }
   
   // default handling here
   this->view_manipulator_->mouse_move( mouse_history, button, buttons, modifiers );
@@ -169,10 +179,19 @@ void Viewer::mouse_press_event( const MouseHistory& mouse_history, int button, i
     }
   }
 
-  if ( button == MouseButton::MID_BUTTON_E &&
+  if ( button == MouseButton::RIGHT_BUTTON_E &&
+    modifiers == KeyModifier::NO_MODIFIER_E &&
     !this->is_volume_view() )
   {
     this->pick_point( mouse_history.current.x, mouse_history.current.y );
+    return;
+  }
+
+  if ( button == MouseButton::LEFT_BUTTON_E &&
+    modifiers == KeyModifier::NO_MODIFIER_E &&
+    !this->is_volume_view() )
+  {
+    this->adjusting_contrast_brightness_ = true;
     return;
   }
   
@@ -192,27 +211,24 @@ void Viewer::mouse_release_event( const MouseHistory& mouse_history, int button,
     }
   }
 
+  if ( button == MouseButton::LEFT_BUTTON_E )
+  {
+    this->adjusting_contrast_brightness_ = false;
+  }
+  
   // default handling here
   this->view_manipulator_->mouse_release( mouse_history, button, buttons, modifiers );
 }
 
 bool Viewer::wheel_event( int delta, int x, int y, int buttons, int modifiers )
 {
-  if ( !this->is_volume_view() && delta != 0 && this->active_layer_slice_ )
-  {
-    int slice_num = static_cast<int>( this->active_layer_slice_->get_slice_number() );
-    int new_slice = static_cast<int>( slice_num - delta );
-    if ( new_slice >= 0 && 
-       static_cast< size_t >( new_slice ) < this->active_layer_slice_->number_of_slices() )
-    {
-      ActionSet::Dispatch( this->slice_number_state_, new_slice );
-      // Update the status bar display.
-      // 'update_status_bar' reposts itself to the application thread, so it's guaranteed that 
-      // by the time it actually runs, the slice number has been updated.
-      this->update_status_bar( x, y );
-    }
-  }
+  this->offset_slice( -delta );
 
+  // Update the status bar display.
+  // 'update_status_bar' reposts itself to the application thread, so it's guaranteed that 
+  // by the time it actually runs, the slice number has been updated.
+  this->update_status_bar( x, y );
+  
   return true;
 }
 
@@ -246,7 +262,9 @@ void Viewer::update_status_bar( int x, int y )
     return;
   }
 
-  if ( !this->is_volume_view() && this->active_layer_slice_ )
+  if ( !this->is_volume_view() && 
+    this->active_layer_slice_ &&
+    !this->active_layer_slice_->out_of_boundary() )
   {
     Utils::VolumeSlice* volume_slice = this->active_layer_slice_.get();
     // Scale the mouse position to [-1, 1]
@@ -320,11 +338,6 @@ void Viewer::pick_point( int x, int y )
 
 void Viewer::state_changed()
 {
-  //if ( this->redraw_block_count_ == 0 )
-  //{
-  //  this->redraw_overlay_signal_( true );
-  //  this->redraw_signal_( false );
-  //}
 }
 
 bool Viewer::is_volume_view() const
@@ -420,14 +433,14 @@ void Viewer::insert_layer( LayerHandle layer )
   // Auto adjust the view and depth if it is the first layer inserted
   if ( !this->active_layer_slice_ )
   {
-    Utils::ScopedCounter block_counter( this->redraw_block_count_ );
+    Utils::ScopedCounter block_counter( this->signals_block_count_ );
     this->adjust_view( volume_slice );
     this->adjust_depth( volume_slice );
     this->set_active_layer( layer );
   }
   else if ( !this->is_volume_view() )
   { 
-    volume_slice->move_slice( this->active_layer_slice_->depth() );
+    volume_slice->move_slice_to( this->active_layer_slice_->depth() );
   }
 
   this->trigger_redraw( false );
@@ -531,7 +544,7 @@ void Viewer::set_active_layer( LayerHandle layer )
 
     {
       // Disable redraws triggered by StateBase::state_changed_signal_
-      Utils::ScopedCounter block_counter( this->redraw_block_count_ );
+      Utils::ScopedCounter block_counter( this->signals_block_count_ );
 
       // NOTE: The following state changes are due to internal program logic, 
       // so they should not go through the action mechanism.
@@ -542,7 +555,7 @@ void Viewer::set_active_layer( LayerHandle layer )
           0, static_cast< int >( this->active_layer_slice_->number_of_slices() - 1 ) );
       }
       StateView2D* view2d_state = dynamic_cast< StateView2D* >( this->get_active_view_state().get() );
-      this->active_layer_slice_->move_slice( view2d_state->get().center().z(), true );
+      this->active_layer_slice_->move_slice_to( view2d_state->get().center().z(), true );
       if ( needs_redraw && this->slice_number_state_->get() == 
         static_cast< int >( this->active_layer_slice_->get_slice_number() ) )
       {
@@ -594,6 +607,11 @@ Utils::DataVolumeSliceHandle Viewer::get_data_volume_slice( const std::string& l
 
 void Viewer::change_view_mode( std::string mode, ActionSource source )
 {
+  {
+    Utils::ScopedCounter block_counter( this->signals_block_count_ );
+    this->viewer_lock_state_->set( false );
+  }
+
   if ( mode == VOLUME_C )
   {   
     return;
@@ -626,7 +644,7 @@ void Viewer::change_view_mode( std::string mode, ActionSource source )
     // NOTE: The following state changes are due to internal program logic, 
     // so they should not go through the action mechanism.
 
-    Utils::ScopedCounter block_counter( this->redraw_block_count_ );
+    Utils::ScopedCounter block_counter( this->signals_block_count_ );
 
     {
       Utils::ScopedCounter slice_lock_counter( this->slice_lock_count_ );
@@ -635,7 +653,7 @@ void Viewer::change_view_mode( std::string mode, ActionSource source )
     }
 
     StateView2D* view2d_state = dynamic_cast< StateView2D* >( this->get_active_view_state().get() );
-    this->active_layer_slice_->move_slice( view2d_state->get().center().z(), true );
+    this->active_layer_slice_->move_slice_to( view2d_state->get().center().z(), true );
     // Force an update even if the slice number is the same
     if ( this->slice_number_state_->get() == 
       static_cast< int >( this->active_layer_slice_->get_slice_number() ) )
@@ -661,13 +679,15 @@ void Viewer::set_slice_number( int num, ActionSource source )
   }
 
   this->active_layer_slice_->set_slice_number( num );
+  double depth_offset = 0;
 
   {
-    Utils::ScopedCounter block_counter( this->redraw_block_count_ );
+    Utils::ScopedCounter block_counter( this->signals_block_count_ );
 
     // Update the depth info
     StateView2D* view2d_state = dynamic_cast< StateView2D* >( this->get_active_view_state().get() );
     Utils::View2D view2d( view2d_state->get() );
+    depth_offset = this->active_layer_slice_->depth() - view2d.center().z();
     view2d.center().z( this->active_layer_slice_->depth() );
     view2d_state->set( view2d ) ;
 
@@ -677,31 +697,61 @@ void Viewer::set_slice_number( int num, ActionSource source )
     {
       if ( ( *mask_slice_it ).second == this->active_layer_slice_ )
         continue;
-      ( *mask_slice_it ).second->move_slice( this->active_layer_slice_->depth() );
+      ( *mask_slice_it ).second->move_slice_to( this->active_layer_slice_->depth() );
     }
     data_slices_map_type::iterator data_slice_it = this->data_slices_.begin();
     for ( ; data_slice_it != this->data_slices_.end(); data_slice_it++ )
     {
       if ( ( *data_slice_it ).second == this->active_layer_slice_ )
         continue;
-      ( *data_slice_it ).second->move_slice( this->active_layer_slice_->depth() );
+      ( *data_slice_it ).second->move_slice_to( this->active_layer_slice_->depth() );
     }
   }
 
-  if ( this->viewer_visible_state_->get() && this->redraw_block_count_ == 0 )
+  if ( this->viewer_lock_state_->get() )
+  {
+    std::vector< size_t > locked_viewers = ViewerManager::Instance()->
+      get_locked_viewers( this->view_mode_state_->index() );
+    for ( size_t i = 0; i < locked_viewers.size(); i++ )
+    {
+      size_t viewer_id = locked_viewers[ i ];
+      if ( this->viewer_id_ != viewer_id )
+      {
+        ViewerHandle viewer = ViewerManager::Instance()->get_viewer( viewer_id );
+        viewer->move_slice_by( depth_offset );
+      }
+    }
+  }
+
+  if ( this->viewer_visible_state_->get() && this->signals_block_count_ == 0 )
   {
     this->slice_changed_signal_( this->viewer_id_ );
   }
 }
 
-void Viewer::change_visibility( bool /*visible*/, ActionSource /*source*/ )
+void Viewer::change_visibility( bool visible, ActionSource /*source*/ )
 {
+  if ( !visible && this->viewer_lock_state_->get() )
+  {
+    this->viewer_lock_state_->set( false );
+  }
+  
   this->slice_changed_signal_( this->viewer_id_ );
+}
+
+void Viewer::viewer_lock_state_changed( bool locked )
+{
+  if ( this->signals_block_count_ > 0 || locked )
+  {
+    return;
+  }
+  
+  this->reset_active_slice();
 }
 
 void Viewer::trigger_redraw( bool delay_update )
 {
-  if ( this->redraw_block_count_ == 0 )
+  if ( this->signals_block_count_ == 0 )
   {
     this->redraw_signal_( delay_update );
   }
@@ -709,7 +759,7 @@ void Viewer::trigger_redraw( bool delay_update )
 
 void Viewer::trigger_redraw_overlay( bool delay_update )
 {
-  if ( this->redraw_block_count_ == 0 )
+  if ( this->signals_block_count_ == 0 )
   {
     this->redraw_overlay_signal_( delay_update );
   }
@@ -821,7 +871,7 @@ void Viewer::auto_view()
   }
   
   {
-    Utils::ScopedCounter block_counter( this->redraw_block_count_ );
+    Utils::ScopedCounter block_counter( this->signals_block_count_ );
     this->adjust_view( this->active_layer_slice_ );
   }
   this->trigger_redraw( true );
@@ -836,13 +886,139 @@ void Viewer::layer_state_changed( bool volume_view )
   }
 }
 
-void Viewer::move_slice( const Utils::Point& pt )
+void Viewer::move_slice_to( const Utils::Point& pt )
 {
   if ( !this->is_volume_view() && this->active_layer_slice_ )
   {
-    this->active_layer_slice_->move_slice( pt, true );
+    this->active_layer_slice_->move_slice_to( pt, true );
     this->slice_number_state_->set( static_cast< int >( 
       this->active_layer_slice_->get_slice_number() ) );
+  }
+}
+
+void Viewer::offset_slice( int delta )
+{
+  StateEngine::lock_type lock( StateEngine::GetMutex() );
+  
+  if ( !this->is_volume_view() && delta != 0 && this->active_layer_slice_ )
+  {
+    if ( this->active_layer_slice_->out_of_boundary() )
+    {
+      this->reset_active_slice();
+      return;
+    }
+
+    int slice_num = static_cast<int>( this->active_layer_slice_->get_slice_number() );
+    int new_slice = static_cast<int>( slice_num + delta );
+    if ( new_slice >= 0 && 
+      static_cast< size_t >( new_slice ) < this->active_layer_slice_->number_of_slices() )
+    {
+      ActionSet::Dispatch( this->slice_number_state_, new_slice );
+    }
+  }
+}
+
+void Viewer::move_slice_by( double depth_offset )
+{
+  if ( depth_offset == 0.0 || 
+    this->is_volume_view() || 
+    !this->active_layer_slice_ )
+  {
+    return;
+  }
+
+  {
+    Utils::ScopedCounter block_counter( this->signals_block_count_ );
+
+    StateView2D* view2d_state = dynamic_cast< StateView2D* >( this->get_active_view_state().get() );
+    Utils::View2D view2d( view2d_state->get() );
+    double depth = view2d.center().z();
+    depth += depth_offset;
+    view2d.center().z( depth );
+    view2d_state->set( view2d ) ;
+
+    // Move all the slices to the new position
+    mask_slices_map_type::iterator mask_slice_it = this->mask_slices_.begin();
+    for ( ; mask_slice_it != this->mask_slices_.end(); mask_slice_it++ )
+    {
+      ( *mask_slice_it ).second->move_slice_to( depth );
+    }
+    data_slices_map_type::iterator data_slice_it = this->data_slices_.begin();
+    for ( ; data_slice_it != this->data_slices_.end(); data_slice_it++ )
+    {
+      ( *data_slice_it ).second->move_slice_to( depth );
+    }
+
+    if ( !this->active_layer_slice_->out_of_boundary() )
+    {
+      Utils::ScopedCounter slice_lock_counter( this->slice_lock_count_ );
+      this->slice_number_state_->set( static_cast< int >( 
+        this->active_layer_slice_->get_slice_number() ) );
+    }
+  }
+  
+  this->trigger_redraw( false );
+
+  // NOTE: No need to trigger slice_changed_signal_ here because the viewer that caused
+  // the slice change will trigger it.
+
+}
+
+void Viewer::reset_active_slice()
+{
+  if ( !this->is_volume_view() && 
+    this->active_layer_slice_ &&
+    this->active_layer_slice_->out_of_boundary() )
+  {
+    StateView2D* view2d_state = 
+      dynamic_cast< StateView2D* >( this->get_active_view_state().get() );
+    this->active_layer_slice_->move_slice_to( view2d_state->get().center().z(), true );
+    if ( this->active_layer_slice_->get_slice_number() ==
+      static_cast< size_t >( this->slice_number_state_->get() ) )
+    {
+      this->set_slice_number( this->slice_number_state_->get() );
+      this->trigger_redraw( false );
+    }
+    else
+    {
+      this->slice_number_state_->set( static_cast< int >( 
+        this->active_layer_slice_->get_slice_number() ) );
+    }
+  }
+}
+
+void Viewer::adjust_contrast_brightness( int dx, int dy )
+{
+  StateEngine::lock_type lock( StateEngine::GetMutex() );
+  LayerHandle active_layer = LayerManager::Instance()->get_active_layer();
+  if ( !active_layer || active_layer->type() != Utils::VolumeType::DATA_E )
+  {
+    return;
+  }
+  
+  DataLayer* data_layer = static_cast< DataLayer* >( active_layer.get() );
+  const double old_contrast = data_layer->contrast_state_->get();
+  double contrast_min, contrast_max, contrast_step;
+  data_layer->contrast_state_->get_range( contrast_min, contrast_max );
+  data_layer->contrast_state_->get_step( contrast_step );
+  double contrast = old_contrast + dy * contrast_step;
+  contrast = Utils::Max( contrast_min, contrast );
+  contrast = Utils::Min( contrast_max, contrast );
+  if ( contrast != old_contrast )
+  {
+    ActionSet::Dispatch( data_layer->contrast_state_, contrast );
+  }
+  
+  const double old_brightness = data_layer->brightness_state_->get();
+  double brightness_min, brightness_max, brightness_step;
+  data_layer->brightness_state_->get_range( brightness_min, brightness_max );
+  data_layer->brightness_state_->get_step( brightness_step );
+  double brightness = old_brightness + dx * brightness_step;
+  brightness = Utils::Max( brightness_min, brightness );
+  brightness = Utils::Min( brightness_max, brightness );
+  if ( brightness != old_brightness )
+  {
+    ActionSet::Dispatch( data_layer->brightness_state_, brightness );
   }
 }
 

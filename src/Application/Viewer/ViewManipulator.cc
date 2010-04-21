@@ -34,6 +34,7 @@
 #include <Application/State/Actions/ActionTranslateView.h>
 #include <Application/Viewer/Viewer.h>
 #include <Application/Viewer/ViewManipulator.h>
+#include <Application/ViewerManager/ViewerManager.h>
 
 namespace Seg3D
 {
@@ -101,6 +102,21 @@ void ViewManipulator::mouse_move( const MouseHistory& mouse_history, int button,
         this->viewer_->is_volume_view() );
     StateViewBaseHandle view_state = this->viewer_->get_active_view_state();
     ActionTranslateView::Dispatch( view_state, offset );
+    if ( this->viewer_->viewer_lock_state_->get() )
+    {
+      std::vector< size_t > locked_viewers = ViewerManager::Instance()->
+        get_locked_viewers( this->viewer_->view_mode_state_->index() );
+      for ( size_t i = 0; i < locked_viewers.size(); i++ )
+      {
+        size_t viewer_id = locked_viewers[ i ];
+        if ( this->viewer_->viewer_id_ != viewer_id )
+        {
+          ViewerHandle viewer = ViewerManager::Instance()->get_viewer( viewer_id );
+          StateViewBaseHandle view_state = viewer->get_active_view_state();       
+          ActionTranslateView::Dispatch( view_state, offset );
+        }
+      }
+    }
   }
   else if ( this->scale_active_ )
   {
@@ -108,6 +124,21 @@ void ViewManipulator::mouse_move( const MouseHistory& mouse_history, int button,
         mouse_history.previous.y, mouse_history.current.x, mouse_history.current.y );
     StateViewBaseHandle view_state = this->viewer_->get_active_view_state();
     ActionScaleView::Dispatch( view_state, scale_ratio );
+    if ( this->viewer_->viewer_lock_state_->get() )
+    {
+      std::vector< size_t > locked_viewers = ViewerManager::Instance()->
+        get_locked_viewers( this->viewer_->view_mode_state_->index() );
+      for ( size_t i = 0; i < locked_viewers.size(); i++ )
+      {
+        size_t viewer_id = locked_viewers[ i ];
+        if ( this->viewer_->viewer_id_ != viewer_id )
+        {
+          ViewerHandle viewer = ViewerManager::Instance()->get_viewer( viewer_id );
+          StateViewBaseHandle view_state = viewer->get_active_view_state();       
+          ActionScaleView::Dispatch( view_state, scale_ratio );
+        }
+      }
+    }
   }
   else if ( this->rotate_active_ )
   {
@@ -118,6 +149,20 @@ void ViewManipulator::mouse_move( const MouseHistory& mouse_history, int button,
     {
       // dispatch an ActionRotateView3D
       ActionRotateView3D::Dispatch( this->viewer_->volume_view_state_, axis, angle );
+      if ( this->viewer_->viewer_lock_state_->get() )
+      {
+        std::vector< size_t > locked_viewers = ViewerManager::Instance()->
+          get_locked_viewers( this->viewer_->view_mode_state_->index() );
+        for ( size_t i = 0; i < locked_viewers.size(); i++ )
+        {
+          size_t viewer_id = locked_viewers[ i ];
+          if ( this->viewer_->viewer_id_ != viewer_id )
+          {
+            ViewerHandle viewer = ViewerManager::Instance()->get_viewer( viewer_id );
+            ActionRotateView3D::Dispatch( viewer->volume_view_state_, axis, angle );
+          }
+        }
+      }
     }
   }
 }

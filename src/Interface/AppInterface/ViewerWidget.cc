@@ -374,7 +374,7 @@ ViewerWidget::ViewerWidget( int viewer_id, QWidget *parent ) :
   QtBridge::Connect( this->private_->viewer_selection_, viewer->view_mode_state_ );
   QtBridge::Connect( this->private_->picking_button_, viewer->is_picking_target_state_ );
   QtBridge::Connect( this->private_->grid_button_, viewer->slice_grid_state_ );
-  QtBridge::Connect( this->private_->lock_button_, viewer->slice_lock_state_ );
+  QtBridge::Connect( this->private_->lock_button_, viewer->viewer_lock_state_ );
 
   this->connect( this->private_->viewer_selection_, SIGNAL( triggered( QAction* ) ),
     this->private_->viewer_type_button_, SLOT( setDefaultAction( QAction* ) ) );

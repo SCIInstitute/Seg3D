@@ -103,11 +103,11 @@ public:
 
   // Move the slice to closely match the given point in world space.
   // Returns true if slice is moved, otherwise false.
-  void move_slice( const Point& pos, bool fail_safe = false );
+  void move_slice_to( const Point& pos, bool fail_safe = false );
 
   // Move the slice to the specified depth in world space.
   // Returns true if the slice is moved successfully, otherwise false.
-  void move_slice( double depth, bool fail_safe = false );
+  void move_slice_to( double depth, bool fail_safe = false );
 
   inline size_t nx() const { return this->nx_; }
   inline size_t ny() const { return this->ny_; }

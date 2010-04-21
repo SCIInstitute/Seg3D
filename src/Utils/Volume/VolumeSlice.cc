@@ -246,7 +246,7 @@ void VolumeSlice::get_world_coord( double i_pos, double j_pos, Point& world_coor
   }
 }
 
-void VolumeSlice::move_slice( const Point& pos, bool fail_safe )
+void VolumeSlice::move_slice_to( const Point& pos, bool fail_safe )
 {
   Point index = this->volume_->apply_inverse_grid_transform( pos );
   int slice_num = -1;
@@ -276,7 +276,7 @@ void VolumeSlice::move_slice( const Point& pos, bool fail_safe )
   this->set_slice_number( static_cast< size_t >( slice_num ) );
 }
 
-void VolumeSlice::move_slice( double depth, bool fail_safe )
+void VolumeSlice::move_slice_to( double depth, bool fail_safe )
 {
   Point index;
   switch ( this->slice_type_ )
@@ -292,7 +292,7 @@ void VolumeSlice::move_slice( double depth, bool fail_safe )
     break;
   }
 
-  this->move_slice( index, fail_safe );
+  this->move_slice_to( index, fail_safe );
 }
 
 } // end namespace Utils

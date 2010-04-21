@@ -85,6 +85,7 @@ public:
 
   void get_2d_viewers_info( ViewerInfoList viewers[ 3 ] );
   void pick_point( size_t source_viewer, const Utils::Point& pt );
+  std::vector< size_t > get_locked_viewers( int mode_index );
 
   // -- State information --
 public:
@@ -96,6 +97,7 @@ private:
   void viewer_mode_changed( size_t viewer_id );
   void viewer_visibility_changed( size_t viewer_id );
   void viewer_became_picking_target( size_t viewer_id );
+  void viewer_lock_state_changed( size_t viewer_id );
   void update_picking_targets();
 
 public:
@@ -106,6 +108,7 @@ public:
 private:
 
   std::vector< ViewerHandle > viewers_;
+  std::vector< size_t > locked_viewers_[ 4 ];
 
   int active_axial_viewer_;
   int active_coronal_viewer_;

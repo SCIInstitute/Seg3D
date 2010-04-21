@@ -63,7 +63,19 @@ bool ActionAutoView::run( ActionContextHandle& context, ActionResultHandle& resu
   ViewerHandle viewer = this->viewer_weak_handle_.lock();
   if ( viewer )
   {
-    viewer->auto_view();
+    if ( viewer->viewer_lock_state_->get() )
+    {
+      std::vector< size_t > locked_viewers = ViewerManager::Instance()->
+        get_locked_viewers( viewer->view_mode_state_->index() );
+      for ( size_t i = 0; i < locked_viewers.size(); i++ )
+      {
+        ViewerManager::Instance()->get_viewer( locked_viewers[ i ] )->auto_view();
+      }
+    }
+    else
+    {
+      viewer->auto_view();
+    }
     return true;
   }
   return false;

@@ -67,11 +67,17 @@ ViewerManager::ViewerManager() :
 
     // NOTE: ViewerManager needs to process these signals first
     this->add_connection( this->viewers_[ j ]->view_mode_state_->value_changed_signal_.
-      connect( boost::bind( &ViewerManager::viewer_mode_changed, this, j ), boost::signals2::at_front ) );
+      connect( boost::bind( &ViewerManager::viewer_mode_changed, this, j ), 
+      boost::signals2::at_front ) );
     this->add_connection( this->viewers_[ j ]->viewer_visible_state_->value_changed_signal_.
-      connect( boost::bind( &ViewerManager::viewer_visibility_changed, this, j ), boost::signals2::at_front ) );
+      connect( boost::bind( &ViewerManager::viewer_visibility_changed, this, j ), 
+      boost::signals2::at_front ) );
     this->add_connection( this->viewers_[ j ]->is_picking_target_state_->value_changed_signal_.
-      connect( boost::bind( &ViewerManager::viewer_became_picking_target, this, j ), boost::signals2::at_front ) );
+      connect( boost::bind( &ViewerManager::viewer_became_picking_target, this, j ), 
+      boost::signals2::at_front ) );
+    this->add_connection( this->viewers_[ j ]->viewer_lock_state_->value_changed_signal_.
+      connect( boost::bind( &ViewerManager::viewer_lock_state_changed, this, j ), 
+      boost::signals2::at_front ) );
   }
 }
 
@@ -126,7 +132,6 @@ void ViewerManager::get_2d_viewers_info( ViewerInfoList viewers[ 3 ] )
 
 void ViewerManager::viewer_mode_changed( size_t viewer_id )
 {
-  StateEngine::lock_type lock( StateEngine::GetMutex() );
   Utils::ScopedCounter signal_block_counter( this->signal_block_count_ );
 
   if ( this->active_axial_viewer_ == static_cast< int >( viewer_id ) )
@@ -148,7 +153,6 @@ void ViewerManager::viewer_mode_changed( size_t viewer_id )
 
 void ViewerManager::viewer_visibility_changed( size_t viewer_id )
 {
-  StateEngine::lock_type lock( StateEngine::GetMutex() );
   Utils::ScopedCounter signal_block_counter( this->signal_block_count_ );
 
   if ( !this->viewers_[ viewer_id ]->viewer_visible_state_->get() )
@@ -179,15 +183,13 @@ void ViewerManager::viewer_became_picking_target( size_t viewer_id )
     return;
   }
   
+  ViewerHandle viewer = this->viewers_[ viewer_id ];
+  if ( !viewer->is_picking_target_state_->get() )
   {
-    StateEngine::lock_type lock( StateEngine::GetMutex() );
+    return;
+  }
 
-    ViewerHandle viewer = this->viewers_[ viewer_id ];
-    if ( !viewer->is_picking_target_state_->get() )
-    {
-      return;
-    }
-
+  {
     Utils::ScopedCounter signal_block_counter( this->signal_block_count_ );
 
     if ( viewer->view_mode_state_->get() == Viewer::AXIAL_C )
@@ -269,7 +271,7 @@ void ViewerManager::pick_point( size_t source_viewer, const Utils::Point& pt )
     ViewerHandle viewer = this->viewers_[ this->active_axial_viewer_ ];
     if ( viewer->view_mode_state_->get() != src_viewer->view_mode_state_->get() )
     {
-      viewer->move_slice( pt );
+      viewer->move_slice_to( pt );
     }
   }
   if ( this->active_coronal_viewer_ >= 0 && 
@@ -278,7 +280,7 @@ void ViewerManager::pick_point( size_t source_viewer, const Utils::Point& pt )
     ViewerHandle viewer = this->viewers_[ this->active_coronal_viewer_ ];
     if ( viewer->view_mode_state_->get() != src_viewer->view_mode_state_->get() )
     {
-      viewer->move_slice( pt );
+      viewer->move_slice_to( pt );
     }
   }
   if ( this->active_sagittal_viewer_ >= 0 && 
@@ -287,8 +289,46 @@ void ViewerManager::pick_point( size_t source_viewer, const Utils::Point& pt )
     ViewerHandle viewer = this->viewers_[ this->active_sagittal_viewer_ ];
     if ( viewer->view_mode_state_->get() != src_viewer->view_mode_state_->get() )
     {
-      viewer->move_slice( pt );
+      viewer->move_slice_to( pt );
     }
+  }
+}
+
+std::vector< size_t > ViewerManager::get_locked_viewers( int mode_index )
+{
+  return this->locked_viewers_[ mode_index ];
+}
+
+void ViewerManager::viewer_lock_state_changed( size_t viewer_id )
+{
+  ViewerHandle viewer = this->viewers_[ viewer_id ];
+  bool locked = viewer->viewer_lock_state_->get();
+  if ( locked )
+  {
+    this->locked_viewers_[ viewer->view_mode_state_->index() ].push_back( viewer_id );
+  }
+  else
+  {
+    // We need to go over the locked viewer list for all modes because a viewer can become
+    // unlocked due to change of mode.
+    bool found = false;
+    for ( int i = 0; i < 4; i++ )
+    {
+      for ( size_t j = 0; j < this->locked_viewers_[ i ].size(); j++ )
+      {
+        if ( this->locked_viewers_[ i ][ j ] == viewer_id )
+        {
+          this->locked_viewers_[ i ].erase( this->locked_viewers_[ i ].begin() + j );
+          found =  true;
+          break;
+        }
+      }
+      if ( found )
+      {
+        break;
+      }
+    }
+    assert( found );
   }
 }
 
