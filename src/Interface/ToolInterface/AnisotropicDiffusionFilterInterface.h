@@ -34,6 +34,7 @@
 
 // Application includes
 #include <Application/Tool/ToolFactory.h>
+#include <Application/Tools/AnisotropicDiffusionFilter.h>
 
 // Base class of the tool widget
 #include <Interface/AppInterface/ToolWidget.h>
@@ -55,9 +56,11 @@ public:
 
   virtual bool build_widget( QFrame* frame );
 
+private Q_SLOTS:
+  void execute_filter();
+
 private:
   boost::shared_ptr< AnisotropicDiffusionFilterInterfacePrivate > private_;
-  
 };
 
 } // namespace Seg3D

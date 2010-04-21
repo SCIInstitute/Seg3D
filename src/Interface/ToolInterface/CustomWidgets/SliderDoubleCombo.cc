@@ -78,6 +78,7 @@ void SliderDoubleCombo::spinner_signal( double value )
     this->private_->ui_.horizontalSlider->setValue( int_version );
     Q_EMIT valueAdjusted( value );
   this->private_->ui_.horizontalSlider->blockSignals( false );
+  value_ = value;
 }
 
 // signal from the slider
@@ -88,6 +89,7 @@ void SliderDoubleCombo::slider_signal( int value )
     this->private_->ui_.spinBox->setValue( double_version );
     Q_EMIT valueAdjusted( double_version );
   this->private_->ui_.spinBox->blockSignals( false );
+  value_ = value;
 }
 
 void SliderDoubleCombo::setStep(double step)

@@ -75,6 +75,7 @@ void SliderIntCombo::spinner_signal( int value )
     this->private_->ui_.horizontalSlider->setValue( value );
     Q_EMIT valueAdjusted( value );
   this->private_->ui_.horizontalSlider->blockSignals( false );
+  this->value_ = value;
 }
 
 void SliderIntCombo::slider_signal( int value )
@@ -83,6 +84,7 @@ void SliderIntCombo::slider_signal( int value )
     this->private_->ui_.spinBox->setValue( value );
     Q_EMIT valueAdjusted( value );
   this->private_->ui_.spinBox->blockSignals( false );
+  this->value_ = value;
 }
 
 

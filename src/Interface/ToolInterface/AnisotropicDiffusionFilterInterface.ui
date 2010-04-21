@@ -177,7 +177,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="invertButton">
+      <widget class="QPushButton" name="runFilterButton">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -198,7 +198,7 @@
     </layout>
    </item>
    <item>
-    <widget class="QPushButton" name="pushButton">
+    <widget class="QPushButton" name="setToDefaultPushButton">
      <property name="minimumSize">
       <size>
        <width>0</width>

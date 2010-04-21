@@ -58,7 +58,7 @@ void TargetComboBox::sync_layers()
   std::vector< LayerHandle > target_layers;
   LayerManager::Instance()->get_layers( target_layers );
   
-  QString current_target = this->currentText();
+  value_ = this->currentText().toStdString();
     
   this->clear();
   for( int i = ( static_cast< int >( target_layers.size() ) - 1 ); i > -1; i-- )
@@ -68,11 +68,12 @@ void TargetComboBox::sync_layers()
       this->addItem( QString::fromStdString( target_layers[i]->get_layer_name() ) );
     } } 
   
-  if( current_target != "" ) 
+  if( value_ != "" ) 
   {
-    int index = this->findText( current_target, Qt::MatchFlags( Qt::CaseInsensitive ) );
+    int index = this->findText( QString::fromStdString( value_ ), Qt::MatchFlags( Qt::CaseInsensitive ) );
     this->setCurrentIndex( index );
   }
+  
   this->update();
 } 
 

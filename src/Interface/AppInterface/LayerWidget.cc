@@ -454,7 +454,7 @@ void LayerWidget::seethrough( bool see )
   this->setUpdatesEnabled( false );
   if( see )
   {
-    this->hide();
+    //this->hide();
     this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_PICKED_UP_C );
     this->private_->ui_.header_->hide();
     this->private_->ui_.border_bar_->hide();
@@ -464,7 +464,7 @@ void LayerWidget::seethrough( bool see )
   }
   else
   {
-    this->show();
+    //this->show();
     this->private_->ui_.header_->show();
     if( this->active_ ) 
       this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_ACTIVE_C );

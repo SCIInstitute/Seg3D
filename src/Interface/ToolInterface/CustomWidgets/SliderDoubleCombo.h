@@ -55,6 +55,9 @@ public Q_SLOTS:
     void setStep( double );
   void setRange( double, double );
   void setCurrentValue( double );
+
+public:
+  double get_value(){ return value_; }
     
 // -- widget internals -- 
 private:
@@ -71,6 +74,7 @@ private Q_SLOTS:
 
 private:
     void block_signals( bool block );    
+    double value_;
   
 };
 

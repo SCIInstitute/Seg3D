@@ -45,8 +45,12 @@ public:
   TargetComboBox( QWidget *parent );
   virtual ~TargetComboBox();
   
+public:
+  std::string get_value(){ return value_; }
+  
 private:
   void sync_layers();
+  std::string value_;
   
   
 };

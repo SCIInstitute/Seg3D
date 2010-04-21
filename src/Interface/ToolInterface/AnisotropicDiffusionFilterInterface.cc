@@ -35,7 +35,7 @@
 #include "ui_AnisotropicDiffusionFilterInterface.h"
 
 //Application Includes
-#include <Application/Tools/AnisotropicDiffusionFilter.h>
+#include <Application/Filters/Actions/ActionAnisotropicDiffusion.h>
 
 namespace Seg3D
 {
@@ -56,6 +56,7 @@ public:
 AnisotropicDiffusionFilterInterface::AnisotropicDiffusionFilterInterface() :
   private_( new AnisotropicDiffusionFilterInterfacePrivate )
 {
+  //this->tool_ = boost::shared_dynamic_cast< boost::shared_ptr< AnisotropicDiffusionFilter > >( tool() );
 }
 
 // destructor
@@ -78,14 +79,14 @@ bool AnisotropicDiffusionFilterInterface::build_widget( QFrame* frame )
   this->private_->conductance_ = new SliderDoubleCombo();
   this->private_->ui_.conductanceHLayout_bottom->addWidget( this->private_->conductance_ );
   
-  private_->target_ = new TargetComboBox( this );
-  private_->ui_.activeHLayout->addWidget( private_->target_ );
+  this->private_->target_ = new TargetComboBox( this );
+  this->private_->ui_.activeHLayout->addWidget( private_->target_ );
 
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
   AnisotropicDiffusionFilter* tool =
       dynamic_cast< AnisotropicDiffusionFilter* > ( base_tool_.get() );
-
+  
     //Step 3 - set the values for the tool ui from the state engine
       
       // set the defaults for the iterations from the state variables
@@ -119,7 +120,7 @@ bool AnisotropicDiffusionFilterInterface::build_widget( QFrame* frame )
         this->private_->conductance_->setCurrentValue( tool->conductance_state_->get() );
         
         //set the default replace checkbox value
-        this->private_->ui_.replaceCheckBox->setChecked(tool->replace_state_);
+        this->private_->ui_.replaceCheckBox->setChecked(tool->replace_state_->get());
 
       
 
@@ -129,12 +130,26 @@ bool AnisotropicDiffusionFilterInterface::build_widget( QFrame* frame )
   QtBridge::Connect( this->private_->step_, tool->steps_state_ );
   QtBridge::Connect( this->private_->conductance_, tool->conductance_state_ );
   QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
+  
+  connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), this, SLOT( execute_filter() ) );
 
   //Send a message to the log that we have finised with building the Anisotropic Diffusion Filter Interface
   SCI_LOG_DEBUG("Finished building an Anisotropic Diffusion Filter Interface");
 
   return ( true );
 } // end build_widget
+
+void AnisotropicDiffusionFilterInterface::execute_filter()
+{
+  ToolHandle base_tool_ = tool();
+  AnisotropicDiffusionFilter* tool =
+    dynamic_cast< AnisotropicDiffusionFilter* > ( base_tool_.get() );
+
+  ActionAnisotropicDiffusion::Dispatch( tool->target_layer_state_->export_to_string(), 
+    tool->iterations_state_->get(), tool->steps_state_->get(),
+    tool->conductance_state_->get(), tool->replace_state_->get() ); 
+}
+
 
 } // end namespace Seg3D
 

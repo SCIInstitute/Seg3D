@@ -96,7 +96,7 @@ DropSpaceWidget::~DropSpaceWidget()
         this->setVisible( true );
       }
       if ( this->height() < 45 ) {
-        this->setFixedHeight( ( this->height() + 15 ) );
+        this->setFixedHeight( ( this->height() + 5 ) );
         this->updateGeometry();
         this->timer_->start(10);
       }
@@ -105,7 +105,7 @@ DropSpaceWidget::~DropSpaceWidget()
     {
       if ( this->height() > 0 ) 
       {
-        this->setFixedHeight( ( this->height() - 45 ) );
+        this->setFixedHeight( ( this->height() - 15 ) );
         this->updateGeometry();
         this->timer_->start(10);
       }
