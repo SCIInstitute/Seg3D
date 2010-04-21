@@ -46,6 +46,9 @@ AnisotropicDiffusionFilter::AnisotropicDiffusionFilter( const std::string& tooli
   add_state( "steps", steps_state_, 1, 1, 100, 1 );
   add_state( "conductance", conductance_state_, .10, .10, 10.0, .10 );
   add_state( "replace", replace_state_, false );
+  
+  
+  this->handle_layers_changed();
 
   // Add constaints, so that when the state changes the right ranges of
   // parameters are selected
@@ -54,6 +57,7 @@ AnisotropicDiffusionFilter::AnisotropicDiffusionFilter( const std::string& tooli
   
   LayerManager::Instance()->layers_changed_signal_.connect(
     boost::bind( &AnisotropicDiffusionFilter::handle_layers_changed, this ) );
+    
 }
 
 void AnisotropicDiffusionFilter::handle_layers_changed()
@@ -64,6 +68,12 @@ void AnisotropicDiffusionFilter::handle_layers_changed()
   
   for( int i = 0; i < static_cast< int >( target_layers.size() ); ++i )
   {
+    if( target_layer_state_->get() == "<none>" )
+    {
+      target_layer_state_->set( target_layers[i]->get_layer_name(), ActionSource::NONE_E );
+      target_found = true;
+      break;
+    }
     if( target_layers[i]->get_layer_name() == target_layer_state_->get() ) 
     { 
       target_found = true;

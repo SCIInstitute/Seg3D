@@ -1,3 +1,4 @@
+
 #
 #  For more information, please see: http://software.sci.utah.edu
 # 
@@ -26,20 +27,40 @@
 #  DEALINGS IN THE SOFTWARE.
 #
 
-ADD_SUBDIRECTORY(Action)
-ADD_SUBDIRECTORY(ActionManager)
-ADD_SUBDIRECTORY(Application)
-ADD_SUBDIRECTORY(Filters)
-ADD_SUBDIRECTORY(Interface)
-ADD_SUBDIRECTORY(InterfaceManager)
-ADD_SUBDIRECTORY(Layer)
-ADD_SUBDIRECTORY(LayerIO)
-ADD_SUBDIRECTORY(LayerManager)
-ADD_SUBDIRECTORY(Renderer)
-ADD_SUBDIRECTORY(State)
-ADD_SUBDIRECTORY(StateManager)
-ADD_SUBDIRECTORY(Tool)
-ADD_SUBDIRECTORY(ToolManager)
-ADD_SUBDIRECTORY(Tools)
-ADD_SUBDIRECTORY(Viewer)
-ADD_SUBDIRECTORY(ViewerManager)
+##################################################
+# Set sources
+##################################################
+
+SET(APPLICATION_FILTERS_SRCS
+)
+
+SET(APPLICATION_FILTERS_ACTIONS_SRCS
+  Actions/ActionAnisotropicDiffusion.h
+  Actions/ActionAnisotropicDiffusion.cc
+  Actions/ActionBinaryDialateErode.h
+  Actions/ActionBinaryDialateErode.cc
+  Actions/ActionDiscreteGaussian.h
+  Actions/ActionDiscreteGaussian.cc
+  )
+
+ADD_LIBRARY(Application_Filters STATIC 
+            ${APPLICATION_FILTERS_SRCS}
+            ${APPLICATION_FILTERS_ACTIONS_SRCS} )
+            
+TARGET_LINK_LIBRARIES(Application_Filters
+                      Utils_Converter
+                      Utils_Core
+                      Utils_EventHandler
+                      Application_Application
+                      Application_Interface
+                      Application_Action
+                      Application_State
+                      Application_StateManager
+                      Application_Layer
+                      Application_LayerManager
+                      ${SCI_BOOST_LIBRARY})
+
+# Register actions
+ADD_LIBRARY_ACTIONS(Application_Filters
+                    ${APPLICATION_FILTERS_ACTIONS_SRCS})
+                    
