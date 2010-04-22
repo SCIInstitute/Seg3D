@@ -38,7 +38,7 @@ namespace Seg3D
   
 class ActionBoolean : public Action
 {
-CORE_ACTION( "Arithmetic", "Run Arithmetic Filter on: <name>" );
+CORE_ACTION( "Boolean", "Run Boolean Filter on: <name>" );
   
   // -- Constructor/Destructor --
 public:
