@@ -96,13 +96,6 @@ public:
   // Lock zoom/pan/slice advance etc with viewers of the same type
   QAction* lock_;
 
-  // Buttons for next and previous slice in
-  // slice viewer
-  //QAction* next_slice_;
-  //QAction* previous_slice_;
-
-  QAction* picking_;
-
   // Flip the viewer horizontally / vertically
   QAction* flip_horiz_;
   QAction* flip_vert_;
@@ -203,13 +196,6 @@ ViewerWidgetPrivate::ViewerWidgetPrivate( QWidget *parent )
   auto_view_->setText( QString( "AutoView" ) );
   auto_view_->setToolTip( QString( "Zoom and Translate to see the full dataset" ) );
   auto_view_->setIconVisibleInMenu( true );
-
-  picking_ = new QAction( parent );
-  picking_->setIcon( picking_icon );
-  picking_->setText( QString( "Picking" ) );
-  picking_->setToolTip( QString( "Make the viewer a target for picking" ) );
-  picking_->setIconVisibleInMenu( true );
-  this->picking_->setCheckable( true );
 
   slice_visible_ = new QAction( parent );
   slice_visible_->setCheckable( true );
@@ -335,7 +321,9 @@ ViewerWidgetPrivate::ViewerWidgetPrivate( QWidget *parent )
 
   this->picking_button_ = new SingleShotToolButton( this->buttonbar_ );
   this->picking_button_->setToolButtonStyle( Qt::ToolButtonIconOnly );
-  this->picking_button_->setDefaultAction( this->picking_ );
+  this->picking_button_->setIcon( picking_icon );
+  this->picking_button_->setText( QString( "Picking" ) );
+  this->picking_button_->setToolTip( QString( "Make the viewer a target for picking" ) );
   this->picking_button_->setFixedHeight( 20 );
   this->picking_button_->setFixedWidth( 20 );
 
@@ -377,7 +365,7 @@ ViewerWidget::ViewerWidget( int viewer_id, QWidget *parent ) :
   // NOTE: Connect StateBool to QAction instead of QToolButton, because calling 
   // setChecked on QToolButton won't change the underlying QAction.
   
-  QtBridge::Connect( this->private_->picking_, viewer->is_picking_target_state_ );
+  QtBridge::Connect( this->private_->picking_button_, viewer->is_picking_target_state_ );
   QtBridge::Connect( this->private_->grid_, viewer->slice_grid_state_ );
   QtBridge::Connect( this->private_->lock_, viewer->viewer_lock_state_ );
 

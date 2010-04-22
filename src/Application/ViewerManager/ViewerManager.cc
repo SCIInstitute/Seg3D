@@ -196,7 +196,7 @@ void ViewerManager::viewer_became_picking_target( size_t viewer_id )
     {
       if ( this->active_axial_viewer_ >= 0 )
       {
-        assert( this->active_axial_viewer_ != viewer_id );
+        assert( this->active_axial_viewer_ != static_cast< int >( viewer_id ) );
         this->viewers_[ this->active_axial_viewer_ ]->is_picking_target_state_->set( false );
       }
       this->active_axial_viewer_ = static_cast< int >( viewer_id );
@@ -205,7 +205,7 @@ void ViewerManager::viewer_became_picking_target( size_t viewer_id )
     {
       if ( this->active_coronal_viewer_ >= 0 )
       {
-        assert( this->active_coronal_viewer_ != viewer_id );
+        assert( this->active_coronal_viewer_ != static_cast< int >( viewer_id ) );
         this->viewers_[ this->active_coronal_viewer_ ]->is_picking_target_state_->set( false );
       }
       this->active_coronal_viewer_ = static_cast< int >( viewer_id );
@@ -214,7 +214,7 @@ void ViewerManager::viewer_became_picking_target( size_t viewer_id )
     {
       if ( this->active_sagittal_viewer_ >= 0 )
       {
-        assert( this->active_sagittal_viewer_ != viewer_id );
+        assert( this->active_sagittal_viewer_ != static_cast< int >( viewer_id ) );
         this->viewers_[ this->active_sagittal_viewer_ ]->is_picking_target_state_->set( false );
       }
       this->active_sagittal_viewer_ = static_cast< int >( viewer_id );

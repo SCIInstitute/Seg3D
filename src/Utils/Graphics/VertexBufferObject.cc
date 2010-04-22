@@ -93,15 +93,15 @@ void VertexAttribArrayBuffer::set_array( VertexAttribArrayType array_type, GLint
   switch(array_type)
   {
   case VertexAttribArrayType::VERTEX_E:
-    array_info->gl_array_pointer_func_ = boost::bind( &glVertexPointer, vertex_size,
+    array_info->gl_array_pointer_func_ = boost::bind( glVertexPointer, vertex_size,
       data_type, stride, reinterpret_cast<void*>( offset ) );
     break;
   case VertexAttribArrayType::COLOR_E:
-    array_info->gl_array_pointer_func_ = boost::bind( &glColorPointer, vertex_size,
+    array_info->gl_array_pointer_func_ = boost::bind( glColorPointer, vertex_size,
       data_type, stride, reinterpret_cast<void*>( offset ) );
     break;
   case VertexAttribArrayType::TEXTURE_COORD_E:
-    array_info->gl_array_pointer_func_ = boost::bind( &glTexCoordPointer, vertex_size,
+    array_info->gl_array_pointer_func_ = boost::bind( glTexCoordPointer, vertex_size,
       data_type, stride, reinterpret_cast<void*>( offset ) );
     break;
   case  VertexAttribArrayType::SECONDARY_COLOR_E:
@@ -126,7 +126,7 @@ void VertexAttribArrayBuffer::set_array( VertexAttribArrayType array_type,
   switch( array_type )
   {
   case VertexAttribArrayType::NORMAL_E:
-    array_info->gl_array_pointer_func_ = boost::bind( &glNormalPointer, data_type,
+    array_info->gl_array_pointer_func_ = boost::bind( glNormalPointer, data_type,
       stride, reinterpret_cast<void*>( offset ) );
     break;
   case VertexAttribArrayType::FOG_COORD_E:
@@ -134,7 +134,7 @@ void VertexAttribArrayBuffer::set_array( VertexAttribArrayType array_type,
       stride, reinterpret_cast<void*>( offset ) );
     break;
   case VertexAttribArrayType::INDEX_E:
-    array_info->gl_array_pointer_func_ = boost::bind( &glIndexPointer, data_type,
+    array_info->gl_array_pointer_func_ = boost::bind( glIndexPointer, data_type,
       stride, reinterpret_cast<void*>( offset ) );
     break;
   default:
@@ -154,7 +154,7 @@ void VertexAttribArrayBuffer::set_array( VertexAttribArrayType array_type, GLsiz
   switch( array_type )
   {
   case VertexAttribArrayType::EDGE_FLAG_E:
-    array_info->gl_array_pointer_func_ = boost::bind( &glEdgeFlagPointer, stride,
+    array_info->gl_array_pointer_func_ = boost::bind( glEdgeFlagPointer, stride,
       reinterpret_cast<void*>( offset ) );
     break;
   default:

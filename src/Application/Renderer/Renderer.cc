@@ -384,7 +384,7 @@ bool Renderer::render_overlay()
     {
       Utils::Point pt( viewers_info[ vert_slice_mode ][ i ]->depth_, 0, 0 );
       pt = proj_mat * pt;
-      int slice_pos = Utils::Round( ( pt.x() + 1.0 ) / 2.0 * ( this->width_ ) );
+      int slice_pos = Utils::Round( ( pt.x() + 1.0 ) / 2.0 * ( this->width_ - 1 ) ) + 1;
       float color[ 4 ] = { 0.0f, 0.0f, 0.0f, 1.0f };
       color[ vert_slice_mode ] = 1.0f;
       if ( viewers_info[ vert_slice_mode ][ i ]->is_picking_target_ )
@@ -407,7 +407,7 @@ bool Renderer::render_overlay()
     {
       Utils::Point pt( 0, viewers_info[ hori_slice_mode ][ i ]->depth_, 0 );
       pt = proj_mat * pt;
-      int slice_pos = Utils::Round( ( pt.y() + 1.0 ) / 2.0 * ( this->height_ ) );
+      int slice_pos = Utils::Round( ( pt.y() + 1.0 ) / 2.0 * ( this->height_ - 1 ) ) + 1;
       float color[ 4 ] = { 0.0f, 0.0f, 0.0f, 1.0f };
       color[ hori_slice_mode ] = 1.0f;
       if ( viewers_info[ hori_slice_mode ][ i ]->is_picking_target_ )
