@@ -46,8 +46,7 @@ AnisotropicDiffusionFilter::AnisotropicDiffusionFilter( const std::string& tooli
   add_state( "steps", steps_state_, 1, 1, 100, 1 );
   add_state( "conductance", conductance_state_, .10, .10, 10.0, .10 );
   add_state( "replace", replace_state_, false );
-  
-  
+    
   this->handle_layers_changed();
 
   // Add constaints, so that when the state changes the right ranges of
@@ -59,6 +58,11 @@ AnisotropicDiffusionFilter::AnisotropicDiffusionFilter( const std::string& tooli
     boost::bind( &AnisotropicDiffusionFilter::handle_layers_changed, this ) );
     
 }
+
+AnisotropicDiffusionFilter::~AnisotropicDiffusionFilter()
+{
+  disconnect_all();
+} 
 
 void AnisotropicDiffusionFilter::handle_layers_changed()
 {
@@ -89,11 +93,6 @@ void AnisotropicDiffusionFilter::handle_layers_changed()
 void AnisotropicDiffusionFilter::target_constraint( std::string layerid )
 {
 
-}
-
-AnisotropicDiffusionFilter::~AnisotropicDiffusionFilter()
-{
-  disconnect_all();
 }
 
 void AnisotropicDiffusionFilter::activate()

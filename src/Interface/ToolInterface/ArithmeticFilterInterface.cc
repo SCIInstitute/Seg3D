@@ -36,6 +36,7 @@
 
 //Application Includes
 #include <Application/Tools/ArithmeticFilter.h>
+#include <Application/Filters/Actions/ActionArithmetic.h>
 
 namespace Seg3D
 {
@@ -88,13 +89,40 @@ bool ArithmeticFilterInterface::build_widget( QFrame* frame )
   QtBridge::Connect( this->private_->volume_a_, tool->volume_a_state_ );
   QtBridge::Connect( this->private_->volume_b_, tool->volume_b_state_ );
   QtBridge::Connect( this->private_->volume_c_, tool->volume_c_state_ );
+  connect( this->private_->volume_a_, SIGNAL( valid( bool ) ), this, SLOT( enable_run_filter( bool ) ) );
+  
   QtBridge::Connect( this->private_->ui_.exampleExpComboBox, tool->example_expressions_state_ );
   QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
+  
+  connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), this, SLOT( execute_filter() ) );
+  
+  this->private_->volume_a_->sync_layers();
+  this->private_->volume_b_->sync_layers();
+  this->private_->volume_c_->sync_layers();
 
   //Send a message to the log that we have finised with building the Arithmetic Filter
   SCI_LOG_DEBUG("Finished building an Arithmetic Filter Interface");
 
   return ( true );
 } // end build_widget
+
+void ArithmeticFilterInterface::enable_run_filter( bool valid )
+{
+  if( valid )
+    this->private_->ui_.runFilterButton->setEnabled( true );
+  else
+    this->private_->ui_.runFilterButton->setEnabled( false );
+}
+
+void ArithmeticFilterInterface::execute_filter()
+{
+  ToolHandle base_tool_ = tool();
+  ArithmeticFilter* tool =
+    dynamic_cast< ArithmeticFilter* > ( base_tool_.get() );
+
+  ActionArithmetic::Dispatch( tool->volume_a_state_->export_to_string(), 
+    tool->volume_b_state_->export_to_string(), tool->volume_c_state_->export_to_string(),
+    tool->example_expressions_state_->get(), tool->replace_state_->get() ); 
+}
 
 } //end seg3d

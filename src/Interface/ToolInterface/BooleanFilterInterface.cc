@@ -36,6 +36,7 @@
 
 //Application Includes
 #include <Application/Tools/BooleanFilter.h>
+#include <Application/Filters/Actions/ActionBoolean.h>
 
 namespace Seg3D
 {
@@ -110,13 +111,43 @@ bool BooleanFilterInterface::build_widget( QFrame* frame )
   QtBridge::Connect( this->private_->mask_b_, tool->mask_b_state_ );
   QtBridge::Connect( this->private_->mask_c_, tool->mask_c_state_ );
   QtBridge::Connect( this->private_->mask_d_, tool->mask_d_state_ );
+  connect( this->private_->mask_a_, SIGNAL( valid( bool ) ), this, SLOT( enable_run_filter( bool ) ) );
+  
   QtBridge::Connect( this->private_->ui_.exampleExpComboBox, tool->example_expressions_state_ );
   QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
+  
+  connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), this, SLOT( execute_filter() ) );
+  
+  this->private_->mask_a_->sync_layers();
+  this->private_->mask_b_->sync_layers();
+  this->private_->mask_c_->sync_layers();
+  this->private_->mask_d_->sync_layers();
 
   //Send a message to the log that we have finised with building the Boolean Filter Interface
   SCI_LOG_DEBUG("Finished building a Boolean Filter Interface");
   return ( true );
 
 }// end build_widget
+
+void BooleanFilterInterface::enable_run_filter( bool valid )
+{
+  if( valid )
+    this->private_->ui_.runFilterButton->setEnabled( true );
+  else
+    this->private_->ui_.runFilterButton->setEnabled( false );
+}
+
+void BooleanFilterInterface::execute_filter()
+{
+  ToolHandle base_tool_ = tool();
+  BooleanFilter* tool =
+    dynamic_cast< BooleanFilter* > ( base_tool_.get() );
+
+  ActionBoolean::Dispatch( tool->mask_a_state_->export_to_string(), 
+    tool->mask_b_state_->export_to_string(), tool->mask_c_state_->export_to_string(),
+    tool->mask_d_state_->export_to_string(), tool->example_expressions_state_->get(), 
+    tool->replace_state_->get() ); 
+}
+
 
 } // end namespace Seg3D

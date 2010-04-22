@@ -77,6 +77,12 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>26</height>
+        </size>
+       </property>
        <property name="sizeAdjustPolicy">
         <enum>QComboBox::AdjustToMinimumContentsLength</enum>
        </property>
@@ -135,10 +141,16 @@
         </property>
         <item>
          <widget class="QPushButton" name="flipAxialButton">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>28</height>
+           </size>
+          </property>
           <property name="maximumSize">
            <size>
             <width>16777215</width>
-            <height>23</height>
+            <height>28</height>
            </size>
           </property>
           <property name="toolTip">
@@ -151,10 +163,16 @@
         </item>
         <item>
          <widget class="QPushButton" name="flipCoronalButton">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>28</height>
+           </size>
+          </property>
           <property name="maximumSize">
            <size>
             <width>16777215</width>
-            <height>23</height>
+            <height>28</height>
            </size>
           </property>
           <property name="toolTip">
@@ -167,10 +185,16 @@
         </item>
         <item>
          <widget class="QPushButton" name="flipSagittalButton">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>28</height>
+           </size>
+          </property>
           <property name="maximumSize">
            <size>
             <width>16777215</width>
-            <height>23</height>
+            <height>28</height>
            </size>
           </property>
           <property name="toolTip">
@@ -234,10 +258,16 @@
         </property>
         <item>
          <widget class="QPushButton" name="rotateACButton">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>28</height>
+           </size>
+          </property>
           <property name="maximumSize">
            <size>
             <width>16777215</width>
-            <height>23</height>
+            <height>28</height>
            </size>
           </property>
           <property name="toolTip">
@@ -250,6 +280,18 @@
         </item>
         <item>
          <widget class="QPushButton" name="rotateASButton">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>28</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>28</height>
+           </size>
+          </property>
           <property name="toolTip">
            <string>Rotate axial to sagittal</string>
           </property>
@@ -260,10 +302,16 @@
         </item>
         <item>
          <widget class="QPushButton" name="rotateSAButton">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>28</height>
+           </size>
+          </property>
           <property name="maximumSize">
            <size>
             <width>16777215</width>
-            <height>23</height>
+            <height>28</height>
            </size>
           </property>
           <property name="toolTip">

@@ -28,7 +28,7 @@
 
 
 #include <Application/LayerManager/LayerManager.h>
-#include <Application/Filters/Actions/ActionDiscreteGaussian.h>
+#include <Application/Filters/Actions/ActionArithmetic.h>
 
 namespace Seg3D
 {
@@ -36,33 +36,39 @@ namespace Seg3D
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
-CORE_REGISTER_ACTION( DiscreteGaussian );
+CORE_REGISTER_ACTION( Arithmetic );
 
-bool ActionDiscreteGaussian::validate( ActionContextHandle& context )
+bool ActionArithmetic::validate( ActionContextHandle& context )
 {
-  if( !( StateEngine::Instance()->is_statealias( this->layer_alias_ ) ) )
+  if( !( StateEngine::Instance()->is_statealias( this->layer_a_alias_ ) ) )
   {
-    context->report_error( std::string( "LayerID '" ) + this->layer_alias_ + "' is invalid" );
+    context->report_error( std::string( "LayerID '" ) + this->layer_a_alias_ + "' is invalid" );
     return false;
   }
-  if( this->variance_ < 0 )
+  
+  if( !( StateEngine::Instance()->is_statealias( this->layer_b_alias_ ) ) )
   {
+    context->report_error( std::string( "LayerID '" ) + this->layer_b_alias_ + "' is invalid" );
     return false;
   }
-  if( this->kernelwidth_ < 0 )
+  
+  if( !( StateEngine::Instance()->is_statealias( this->layer_c_alias_ ) ) )
   {
+    context->report_error( std::string( "LayerID '" ) + this->layer_c_alias_ + "' is invalid" );
     return false;
   }
+  
   return true;
 }
 
-bool ActionDiscreteGaussian::run( ActionContextHandle& context, ActionResultHandle& result )
+bool ActionArithmetic::run( ActionContextHandle& context, ActionResultHandle& result )
 {
-  if ( StateEngine::Instance()->is_statealias( this->layer_alias_ ) )
+  if ( StateEngine::Instance()->is_statealias( this->layer_a_alias_ ) )
   {
     // TODO: run filter
-    context->report_message( "The Discrete Gaussian Filter has been triggered "
-      "successfully on: "  + this->layer_alias_ );
+    context->report_message( "The Arithmetic Filter has been triggered "
+      "successfully on: "  + this->layer_a_alias_ + ", " + this->layer_b_alias_
+      + ", and " + this->layer_c_alias_ );
     
     return true;
   }
@@ -71,12 +77,14 @@ bool ActionDiscreteGaussian::run( ActionContextHandle& context, ActionResultHand
 }
 
 
-void ActionDiscreteGaussian::Dispatch( std::string layer_alias, double variance, double kernelwidth, bool replace )
+void ActionArithmetic::Dispatch( std::string layer_a_alias, std::string layer_b_alias, 
+                std::string layer_c_alias, std::string expression, bool replace )
 {
-  ActionDiscreteGaussian* action = new ActionDiscreteGaussian;
-  action->layer_alias_ = layer_alias;
-  action->variance_ = variance;
-  action->kernelwidth_ = kernelwidth;
+  ActionArithmetic* action = new ActionArithmetic;
+  action->layer_a_alias_ = layer_a_alias;
+  action->layer_b_alias_ = layer_b_alias;
+  action->layer_c_alias_ = layer_c_alias;
+  action->expression_ = expression;
   action->replace_ = replace;
   
   Interface::PostAction( ActionHandle( action ) );

@@ -28,7 +28,7 @@
 
 
 #include <Application/LayerManager/LayerManager.h>
-#include <Application/Filters/Actions/ActionDiscreteGaussian.h>
+#include <Application/Filters/Actions/ActionCannyEdgeDetection.h>
 
 namespace Seg3D
 {
@@ -36,9 +36,9 @@ namespace Seg3D
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
-CORE_REGISTER_ACTION( DiscreteGaussian );
+CORE_REGISTER_ACTION( CannyEdgeDetection );
 
-bool ActionDiscreteGaussian::validate( ActionContextHandle& context )
+bool ActionCannyEdgeDetection::validate( ActionContextHandle& context )
 {
   if( !( StateEngine::Instance()->is_statealias( this->layer_alias_ ) ) )
   {
@@ -49,21 +49,24 @@ bool ActionDiscreteGaussian::validate( ActionContextHandle& context )
   {
     return false;
   }
-  if( this->kernelwidth_ < 0 )
+  if( this->max_error_ < 0 )
+  {
+    return false;
+  }
+  if( this->threshold_ < 0 )
   {
     return false;
   }
   return true;
 }
 
-bool ActionDiscreteGaussian::run( ActionContextHandle& context, ActionResultHandle& result )
+bool ActionCannyEdgeDetection::run( ActionContextHandle& context, ActionResultHandle& result )
 {
   if ( StateEngine::Instance()->is_statealias( this->layer_alias_ ) )
   {
     // TODO: run filter
-    context->report_message( "The Discrete Gaussian Filter has been triggered "
-      "successfully on: "  + this->layer_alias_ );
-    
+    context->report_message( "The Canny Edge Detection Filter has been triggered "
+                 "successfully on: "  + this->layer_alias_ );
     return true;
   }
     
@@ -71,12 +74,14 @@ bool ActionDiscreteGaussian::run( ActionContextHandle& context, ActionResultHand
 }
 
 
-void ActionDiscreteGaussian::Dispatch( std::string layer_alias, double variance, double kernelwidth, bool replace )
+void ActionCannyEdgeDetection::Dispatch( std::string layer_alias, double variance, 
+                double max_error, double threshold, bool replace )
 {
-  ActionDiscreteGaussian* action = new ActionDiscreteGaussian;
+  ActionCannyEdgeDetection* action = new ActionCannyEdgeDetection;
   action->layer_alias_ = layer_alias;
   action->variance_ = variance;
-  action->kernelwidth_ = kernelwidth;
+  action->max_error_ = max_error;
+  action->threshold_ = threshold;
   action->replace_ = replace;
   
   Interface::PostAction( ActionHandle( action ) );

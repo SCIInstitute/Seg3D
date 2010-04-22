@@ -45,6 +45,8 @@ DiscreteGaussianFilter::DiscreteGaussianFilter( const std::string& toolid ) :
   add_state( "variance", variance_state_, .10, .10, 10.0, .10 );
   add_state( "maximum_kernel_width", maximum_kernel_width_state_, .10, .10, 10.0, .10 );
   add_state( "replace", replace_state_, false );
+  
+  this->handle_layers_changed();
 
   // Add constaints, so that when the state changes the right ranges of
   // parameters are selected
@@ -69,6 +71,12 @@ void DiscreteGaussianFilter::handle_layers_changed()
   
   for( int i = 0; i < static_cast< int >( target_layers.size() ); ++i )
   {
+    if( target_layer_state_->get() == "<none>" )
+    {
+      target_layer_state_->set( target_layers[i]->get_layer_name(), ActionSource::NONE_E );
+      target_found = true;
+      break;
+    }
     if( target_layers[i]->get_layer_name() == target_layer_state_->get() ) {
       target_found = true;
       break;

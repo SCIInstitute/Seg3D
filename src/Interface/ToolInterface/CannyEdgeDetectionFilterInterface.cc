@@ -36,6 +36,7 @@
 
 //Application Includes
 #include <Application/Tools/CannyEdgeDetectionFilter.h>
+#include <Application/Filters/Actions/ActionCannyEdgeDetection.h>
 
 namespace Seg3D
 {
@@ -126,15 +127,39 @@ bool CannyEdgeDetectionFilterInterface::build_widget( QFrame* frame )
 
   //Step 4 - connect the gui to the tool through the QtBridge
   QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
+  connect( this->private_->target_, SIGNAL( valid( bool ) ), this, SLOT( enable_run_filter( bool ) ) );
   QtBridge::Connect( this->private_->variance_, tool->variance_state_ );
   QtBridge::Connect( this->private_->max_error_, tool->max_error_state_ );
   QtBridge::Connect( this->private_->threshold_, tool->threshold_state_ );
   QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
+  
+  connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), this, SLOT( execute_filter() ) );
+
+  this->private_->target_->sync_layers();
 
   //Send a message to the log that we have finised with building the Detection Filter Interface
   SCI_LOG_DEBUG("Finished building a Canny Edge Detection Filter Interface");
 
   return ( true );
+}
+
+void CannyEdgeDetectionFilterInterface::enable_run_filter( bool valid )
+{
+  if( valid )
+    this->private_->ui_.runFilterButton->setEnabled( true );
+  else
+    this->private_->ui_.runFilterButton->setEnabled( false );
+}
+
+void CannyEdgeDetectionFilterInterface::execute_filter()
+{
+  ToolHandle base_tool_ = tool();
+  CannyEdgeDetectionFilter* tool =
+    dynamic_cast< CannyEdgeDetectionFilter* > ( base_tool_.get() );
+
+  ActionCannyEdgeDetection::Dispatch( tool->target_layer_state_->export_to_string(), 
+    tool->variance_state_->get(), tool->max_error_state_->get(),
+    tool->threshold_state_->get(), tool->replace_state_->get() ); 
 }
 
 } // namespace Seg3D

@@ -434,6 +434,7 @@ void LayerWidget::dragEnterEvent( QDragEnterEvent* event)
   else
   {
     this->set_drop( false );
+    this->private_->overlay_->hide();
     event->ignore();
   }
 }

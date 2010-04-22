@@ -36,6 +36,7 @@
 
 //Application Includes
 #include <Application/Tools/DiscreteGaussianFilter.h>
+#include <Application/Filters/Actions/ActionDiscreteGaussian.h>
 
 namespace Seg3D
 {
@@ -105,18 +106,43 @@ bool DiscreteGaussianFilterInterface::build_widget( QFrame* frame )
         this->private_->kernel_width_->setCurrentValue( tool->maximum_kernel_width_state_->get() );
         
         //set the default replace checkbox value
-        this->private_->ui_.replaceCheckBox->setChecked(tool->replace_state_);
+        this->private_->ui_.replaceCheckBox->setChecked( tool->replace_state_->get() );
         
     
   //Step 4 - connect the gui to the tool through the QtBridge
   QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
+  connect( this->private_->target_, SIGNAL( valid( bool ) ), this, SLOT( enable_run_filter( bool ) ) );
   QtBridge::Connect( this->private_->variance_, tool->variance_state_ );
   QtBridge::Connect( this->private_->kernel_width_, tool->maximum_kernel_width_state_ );
   QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
+  
+  connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), this, SLOT( execute_filter() ) );
+
+  this->private_->target_->sync_layers();
 
   //Send a message to the log that we have finised with building the Discrete Gaussian Filter Interface
   SCI_LOG_DEBUG("Finished building a Discrete Gaussian Filter Interface");
   return ( true );
 } // end build_widget
+
+void DiscreteGaussianFilterInterface::enable_run_filter( bool valid )
+{
+  if( valid )
+    this->private_->ui_.runFilterButton->setEnabled( true );
+  else
+    this->private_->ui_.runFilterButton->setEnabled( false );
+}
+
+void DiscreteGaussianFilterInterface::execute_filter()
+{
+  ToolHandle base_tool_ = tool();
+  DiscreteGaussianFilter* tool =
+    dynamic_cast< DiscreteGaussianFilter* > ( base_tool_.get() );
+
+  ActionDiscreteGaussian::Dispatch( tool->target_layer_state_->export_to_string(), 
+    tool->variance_state_->get(), tool->maximum_kernel_width_state_->get(),
+    tool->replace_state_->get() ); 
+}
+
 
 } // end namespace Seg3D

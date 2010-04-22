@@ -36,6 +36,7 @@
 
 //Application Includes
 #include <Application/Tools/BinaryDilateErodeFilter.h>
+#include <Application/Filters/Actions/ActionBinaryDilateErode.h>
 
 namespace Seg3D
 {
@@ -112,14 +113,37 @@ bool BinaryDilateErodeFilterInterface::build_widget( QFrame* frame )
 
   //Step 4 - connect the gui to the tool through the QtBridge
   QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
+  connect( this->private_->target_, SIGNAL( valid( bool ) ), this, SLOT( enable_run_filter( bool ) ) );
   QtBridge::Connect( this->private_->erode_, tool->erode_state_ );
   QtBridge::Connect( this->private_->dilate_, tool->dilate_state_ );
   QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
+  
+  connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), this, SLOT( execute_filter() ) );
+  
+  this->private_->target_->sync_layers();
 
   //Send a message to the log that we have finised with building the Binary Dialate Erode Filter Interface
   SCI_LOG_DEBUG("Finished building a Binary Dilate Erode Filter Interface");
   return ( true );
 
 } // end build_widget
+
+void BinaryDilateErodeFilterInterface::enable_run_filter( bool valid )
+{
+  if( valid )
+    this->private_->ui_.runFilterButton->setEnabled( true );
+  else
+    this->private_->ui_.runFilterButton->setEnabled( false );
+}
+
+void BinaryDilateErodeFilterInterface::execute_filter()
+{
+  ToolHandle base_tool_ = tool();
+  BinaryDilateErodeFilter* tool =
+    dynamic_cast< BinaryDilateErodeFilter* > ( base_tool_.get() );
+
+  ActionBinaryDilateErode::Dispatch( tool->target_layer_state_->export_to_string(), 
+    tool->dilate_state_->get(), tool->erode_state_->get(), tool->replace_state_->get() ); 
+}
 
 } // end namespace Seg3D

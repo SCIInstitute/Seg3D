@@ -39,6 +39,7 @@ namespace Seg3D
 TargetComboBox::TargetComboBox( QWidget *parent )
 {
   this->setParent( parent );
+  this->setMinimumHeight( 26 );
   
   QSizePolicy size_policy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
   this->setSizePolicy( size_policy );
@@ -57,22 +58,28 @@ void TargetComboBox::sync_layers()
 {
   std::vector< LayerHandle > target_layers;
   LayerManager::Instance()->get_layers( target_layers );
+  bool has_layers = false;
   
-  value_ = this->currentText().toStdString();
+  this->value_ = this->currentText().toStdString();
     
   this->clear();
   for( int i = ( static_cast< int >( target_layers.size() ) - 1 ); i > -1; i-- )
   {   
+    has_layers = true;
     if ( target_layers[i]->type() == Utils::VolumeType::DATA_E ) 
     {
       this->addItem( QString::fromStdString( target_layers[i]->get_layer_name() ) );
-    } } 
+    } 
+  } 
   
-  if( value_ != "" ) 
+  if( this->value_ != "" ) 
   {
-    int index = this->findText( QString::fromStdString( value_ ), Qt::MatchFlags( Qt::CaseInsensitive ) );
+    int index = this->findText( QString::fromStdString( this->value_ ), 
+      Qt::MatchFlags( Qt::CaseInsensitive ) );
     this->setCurrentIndex( index );
   }
+  
+  Q_EMIT valid( has_layers );
   
   this->update();
 } 

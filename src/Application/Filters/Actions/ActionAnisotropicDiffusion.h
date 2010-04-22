@@ -38,7 +38,7 @@ namespace Seg3D
   
 class ActionAnisotropicDiffusion : public Action
 {
-CORE_ACTION( "AnisotropicDiffusion", "Run Anisotropic Diffusion on: <name>" );
+CORE_ACTION( "AnisotropicDiffusion", "Run Anisotropic Diffusion Filter on: <name>" );
   
   // -- Constructor/Destructor --
 public:

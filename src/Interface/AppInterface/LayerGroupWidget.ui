@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>270</width>
-    <height>723</height>
+    <height>732</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -903,6 +903,18 @@ QWidget#group_tools_{
               </property>
               <item>
                <widget class="QCheckBox" name="resample_replace_checkBox_">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>32</height>
+                 </size>
+                </property>
                 <property name="toolTip">
                  <string>Check this box to replace the current layer with the resampled one</string>
                 </property>
@@ -922,18 +934,18 @@ QWidget#group_tools_{
                 <property name="minimumSize">
                  <size>
                   <width>0</width>
-                  <height>23</height>
+                  <height>28</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
                   <width>16777215</width>
-                  <height>23</height>
+                  <height>28</height>
                  </size>
                 </property>
                 <property name="font">
                  <font>
-                  <pointsize>12</pointsize>
+                  <pointsize>11</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -988,10 +1000,10 @@ QWidget#group_tools_{
                <enum>QTabWidget::Rounded</enum>
               </property>
               <property name="currentIndex">
-               <number>1</number>
+               <number>0</number>
               </property>
               <property name="elideMode">
-               <enum>Qt::ElideRight</enum>
+               <enum>Qt::ElideNone</enum>
               </property>
               <widget class="QWidget" name="tab">
                <property name="minimumSize">
@@ -1257,12 +1269,18 @@ QWidget#group_tools_{
                  <property name="minimumSize">
                   <size>
                    <width>80</width>
-                   <height>0</height>
+                   <height>32</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>32</height>
                   </size>
                  </property>
                  <property name="font">
                   <font>
-                   <pointsize>12</pointsize>
+                   <pointsize>8</pointsize>
                   </font>
                  </property>
                  <property name="toolTip">
@@ -1284,18 +1302,18 @@ QWidget#group_tools_{
                  <property name="minimumSize">
                   <size>
                    <width>0</width>
-                   <height>25</height>
+                   <height>28</height>
                   </size>
                  </property>
                  <property name="maximumSize">
                   <size>
                    <width>16777215</width>
-                   <height>25</height>
+                   <height>28</height>
                   </size>
                  </property>
                  <property name="font">
                   <font>
-                   <pointsize>12</pointsize>
+                   <pointsize>11</pointsize>
                   </font>
                  </property>
                  <property name="text">
@@ -1381,18 +1399,18 @@ QWidget#group_tools_{
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
-                    <height>23</height>
+                    <height>28</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
                     <width>16777215</width>
-                    <height>23</height>
+                    <height>28</height>
                    </size>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>12</pointsize>
+                    <pointsize>11</pointsize>
                    </font>
                   </property>
                   <property name="text">
@@ -1411,18 +1429,18 @@ QWidget#group_tools_{
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
-                    <height>23</height>
+                    <height>28</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
                     <width>16777215</width>
-                    <height>23</height>
+                    <height>28</height>
                    </size>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>12</pointsize>
+                    <pointsize>11</pointsize>
                    </font>
                   </property>
                   <property name="text">
@@ -1441,18 +1459,18 @@ QWidget#group_tools_{
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
-                    <height>23</height>
+                    <height>28</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
                     <width>16777215</width>
-                    <height>23</height>
+                    <height>28</height>
                    </size>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>12</pointsize>
+                    <pointsize>11</pointsize>
                    </font>
                   </property>
                   <property name="text">
@@ -1490,18 +1508,18 @@ QWidget#group_tools_{
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
-                    <height>23</height>
+                    <height>28</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
                     <width>16777215</width>
-                    <height>23</height>
+                    <height>28</height>
                    </size>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>12</pointsize>
+                    <pointsize>11</pointsize>
                    </font>
                   </property>
                   <property name="text">
@@ -1520,18 +1538,18 @@ QWidget#group_tools_{
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
-                    <height>23</height>
+                    <height>28</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
                     <width>16777215</width>
-                    <height>23</height>
+                    <height>28</height>
                    </size>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>12</pointsize>
+                    <pointsize>11</pointsize>
                    </font>
                   </property>
                   <property name="text">
@@ -1550,18 +1568,18 @@ QWidget#group_tools_{
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
-                    <height>23</height>
+                    <height>28</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
                     <width>16777215</width>
-                    <height>23</height>
+                    <height>28</height>
                    </size>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>12</pointsize>
+                    <pointsize>11</pointsize>
                    </font>
                   </property>
                   <property name="text">
@@ -1847,18 +1865,18 @@ QWidget#group_tools_{
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                    <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
+                   <verstretch>32</verstretch>
                   </sizepolicy>
                  </property>
                  <property name="minimumSize">
                   <size>
                    <width>80</width>
-                   <height>0</height>
+                   <height>32</height>
                   </size>
                  </property>
                  <property name="font">
                   <font>
-                   <pointsize>12</pointsize>
+                   <pointsize>8</pointsize>
                   </font>
                  </property>
                  <property name="toolTip">
@@ -1880,18 +1898,18 @@ QWidget#group_tools_{
                  <property name="minimumSize">
                   <size>
                    <width>0</width>
-                   <height>23</height>
+                   <height>28</height>
                   </size>
                  </property>
                  <property name="maximumSize">
                   <size>
                    <width>16777215</width>
-                   <height>23</height>
+                   <height>28</height>
                   </size>
                  </property>
                  <property name="font">
                   <font>
-                   <pointsize>12</pointsize>
+                   <pointsize>11</pointsize>
                   </font>
                  </property>
                  <property name="text">
@@ -1928,9 +1946,21 @@ QWidget#group_tools_{
               </property>
               <item>
                <widget class="QCheckBox" name="confirm_delete_checkbox_">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>32</height>
+                 </size>
+                </property>
                 <property name="font">
                  <font>
-                  <pointsize>12</pointsize>
+                  <pointsize>8</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -1943,18 +1973,18 @@ QWidget#group_tools_{
                 <property name="minimumSize">
                  <size>
                   <width>0</width>
-                  <height>23</height>
+                  <height>28</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
                   <width>16777215</width>
-                  <height>23</height>
+                  <height>28</height>
                  </size>
                 </property>
                 <property name="font">
                  <font>
-                  <pointsize>12</pointsize>
+                  <pointsize>11</pointsize>
                  </font>
                 </property>
                 <property name="text">

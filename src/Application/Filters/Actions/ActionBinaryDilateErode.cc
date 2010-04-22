@@ -28,7 +28,7 @@
 
 
 #include <Application/LayerManager/LayerManager.h>
-#include <Application/Filters/Actions/ActionDiscreteGaussian.h>
+#include <Application/Filters/Actions/ActionBinaryDilateErode.h>
 
 namespace Seg3D
 {
@@ -36,32 +36,32 @@ namespace Seg3D
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
-CORE_REGISTER_ACTION( DiscreteGaussian );
+CORE_REGISTER_ACTION( BinaryDilateErode );
 
-bool ActionDiscreteGaussian::validate( ActionContextHandle& context )
+bool ActionBinaryDilateErode::validate( ActionContextHandle& context )
 {
   if( !( StateEngine::Instance()->is_statealias( this->layer_alias_ ) ) )
   {
     context->report_error( std::string( "LayerID '" ) + this->layer_alias_ + "' is invalid" );
     return false;
   }
-  if( this->variance_ < 0 )
+  if( this->dialate_ < 0 )
   {
     return false;
   }
-  if( this->kernelwidth_ < 0 )
+  if( this->erode_ < 0 )
   {
     return false;
   }
   return true;
 }
 
-bool ActionDiscreteGaussian::run( ActionContextHandle& context, ActionResultHandle& result )
+bool ActionBinaryDilateErode::run( ActionContextHandle& context, ActionResultHandle& result )
 {
   if ( StateEngine::Instance()->is_statealias( this->layer_alias_ ) )
   {
     // TODO: run filter
-    context->report_message( "The Discrete Gaussian Filter has been triggered "
+    context->report_message( "The Binary Dilate Erode Filter has been triggered "
       "successfully on: "  + this->layer_alias_ );
     
     return true;
@@ -71,12 +71,12 @@ bool ActionDiscreteGaussian::run( ActionContextHandle& context, ActionResultHand
 }
 
 
-void ActionDiscreteGaussian::Dispatch( std::string layer_alias, double variance, double kernelwidth, bool replace )
+void ActionBinaryDilateErode::Dispatch(  std::string layer_alias, int dialate, int erode, bool replace  )
 {
-  ActionDiscreteGaussian* action = new ActionDiscreteGaussian;
+  ActionBinaryDilateErode* action = new ActionBinaryDilateErode;
   action->layer_alias_ = layer_alias;
-  action->variance_ = variance;
-  action->kernelwidth_ = kernelwidth;
+  action->dialate_ = dialate;
+  action->erode_ = erode;
   action->replace_ = replace;
   
   Interface::PostAction( ActionHandle( action ) );

@@ -40,7 +40,7 @@ CORE_REGISTER_ACTION( AnisotropicDiffusion );
 
 bool ActionAnisotropicDiffusion::validate( ActionContextHandle& context )
 {
-  if( !( StateEngine::Instance()->is_stateid( this->layer_alias_ ) ) )
+  if( !( StateEngine::Instance()->is_statealias( this->layer_alias_ ) ) )
   {
     context->report_error( std::string( "LayerID '" ) + this->layer_alias_ + "' is invalid" );
     return false;
@@ -55,16 +55,18 @@ bool ActionAnisotropicDiffusion::validate( ActionContextHandle& context )
   }
   if( this->conductance_ < 0 )
   {
-  
+    return false;
   }
   return true;
 }
 
 bool ActionAnisotropicDiffusion::run( ActionContextHandle& context, ActionResultHandle& result )
 {
-  if ( StateEngine::Instance()->is_stateid( this->layer_alias_ ) )
+  if ( StateEngine::Instance()->is_statealias( this->layer_alias_ ) )
   {
     // TODO: run filter
+    context->report_message( "The Anisotropic Diffusion Filter has been triggered "
+                 "successfully on: "  + this->layer_alias_ );
     return true;
   }
     

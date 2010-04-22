@@ -34,7 +34,6 @@
 
 // Application includes
 #include <Application/Tool/ToolFactory.h>
-#include <Application/Tools/AnisotropicDiffusionFilter.h>
 
 // Base class of the tool widget
 #include <Interface/AppInterface/ToolWidget.h>
@@ -53,11 +52,11 @@ Q_OBJECT
 public:
   AnisotropicDiffusionFilterInterface();
   virtual ~AnisotropicDiffusionFilterInterface();
-
   virtual bool build_widget( QFrame* frame );
 
 private Q_SLOTS:
   void execute_filter();
+  void enable_run_filter( bool valid );
 
 private:
   boost::shared_ptr< AnisotropicDiffusionFilterInterfacePrivate > private_;

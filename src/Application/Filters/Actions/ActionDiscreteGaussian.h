@@ -38,7 +38,7 @@ namespace Seg3D
   
 class ActionDiscreteGaussian : public Action
 {
-CORE_ACTION( "DiscreteGaussian", "Run Discrete Gaussian on: <name>" );
+CORE_ACTION( "DiscreteGaussian", "Run Discrete Gaussian Filter on: <name>" );
   
   // -- Constructor/Destructor --
 public:

@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_TOOL_ACTIONS_ACTIONBINARYDIALATEERODE_H
-#define APPLICATION_TOOL_ACTIONS_ACTIONBINARYDIALATEERODE_H
+#ifndef APPLICATION_TOOL_ACTIONS_ACTIONBINARYDILATEERODE_H
+#define APPLICATION_TOOL_ACTIONS_ACTIONBINARYDILATEERODE_H
 
 #include <Application/Action/Actions.h>
 #include <Application/Interface/Interface.h>
@@ -36,17 +36,17 @@
 namespace Seg3D
 {
   
-class ActionBinaryDialateErode : public Action
+class ActionBinaryDilateErode : public Action
 {
-CORE_ACTION( "BinaryDialateErode", "Run Binary Dialate Erode on: <name>" );
+CORE_ACTION( "BinaryDialateErode", "Run Binary Dialate Erode Filter on: <name>" );
   
   // -- Constructor/Destructor --
 public:
-  ActionBinaryDialateErode()
+  ActionBinaryDilateErode()
   {
   }
   
-  virtual ~ActionBinaryDialateErode()
+  virtual ~ActionBinaryDilateErode()
   {
   }
   

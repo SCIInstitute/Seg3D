@@ -37,8 +37,14 @@ SET(APPLICATION_FILTERS_SRCS
 SET(APPLICATION_FILTERS_ACTIONS_SRCS
   Actions/ActionAnisotropicDiffusion.h
   Actions/ActionAnisotropicDiffusion.cc
-  Actions/ActionBinaryDialateErode.h
-  Actions/ActionBinaryDialateErode.cc
+  Actions/ActionArithmetic.h
+  Actions/ActionArithmetic.cc
+  Actions/ActionBinaryDilateErode.h
+  Actions/ActionBinaryDilateErode.cc
+  Actions/ActionBoolean.h
+  Actions/ActionBoolean.cc
+  Actions/ActionCannyEdgeDetection.h
+  Actions/ActionCannyEdgeDetection.cc
   Actions/ActionDiscreteGaussian.h
   Actions/ActionDiscreteGaussian.cc
   )

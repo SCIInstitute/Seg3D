@@ -40,6 +40,9 @@ class TargetComboBox :
 public QComboBox
 {
   Q_OBJECT
+
+Q_SIGNALS:
+  void valid( bool );
   
 public:
   TargetComboBox( QWidget *parent );
@@ -47,9 +50,9 @@ public:
   
 public:
   std::string get_value(){ return value_; }
+  void sync_layers();
   
 private:
-  void sync_layers();
   std::string value_;
   
   

@@ -26,57 +26,53 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#ifndef APPLICATION_TOOL_ACTIONS_ACTIONCANNYEDGEDETECTION_H
+#define APPLICATION_TOOL_ACTIONS_ACTIONCANNYEDGEDETECTION_H
 
-#include <Application/LayerManager/LayerManager.h>
-#include <Application/Filters/Actions/ActionBinaryDialateErode.h>
+#include <Application/Action/Actions.h>
+#include <Application/Interface/Interface.h>
+#include <Application/Layer/Layer.h>
 
 namespace Seg3D
 {
   
-// REGISTER ACTION:
-// Define a function that registers the action. The action also needs to be
-// registered in the CMake file.
-CORE_REGISTER_ACTION( BinaryDialateErode );
-
-bool ActionBinaryDialateErode::validate( ActionContextHandle& context )
+class ActionCannyEdgeDetection : public Action
 {
-  if( !( StateEngine::Instance()->is_stateid( this->layer_alias_ ) ) )
-  {
-    context->report_error( std::string( "LayerID '" ) + this->layer_alias_ + "' is invalid" );
-    return false;
-  }
-  if( this->dialate_ < 0 )
-  {
-    return false;
-  }
-  if( this->erode_ < 0 )
-  {
-    return false;
-  }
-  return true;
-}
-
-bool ActionBinaryDialateErode::run( ActionContextHandle& context, ActionResultHandle& result )
-{
-  if ( StateEngine::Instance()->is_stateid( this->layer_alias_ ) )
-  {
-    // TODO: run filter
-    return true;
-  }
-    
-  return false;
-}
-
-
-void ActionBinaryDialateErode::Dispatch(  std::string layer_alias, int dialate, int erode, bool replace  )
-{
-  ActionBinaryDialateErode* action = new ActionBinaryDialateErode;
-  action->layer_alias_ = layer_alias;
-  action->dialate_ = dialate;
-  action->erode_ = erode;
-  action->replace_ = replace;
+CORE_ACTION( "CannyEdgeDetection", "Run Canny Edge Detection Filter on: <name>" );
   
-  Interface::PostAction( ActionHandle( action ) );
-}
+  // -- Constructor/Destructor --
+public:
+  ActionCannyEdgeDetection()
+  {
+  }
+  
+  virtual ~ActionCannyEdgeDetection()
+  {
+  }
+  
+  // -- Functions that describe action --
+public:
+  virtual bool validate( ActionContextHandle& context );
+  virtual bool run( ActionContextHandle& context, ActionResultHandle& result );
+  
+  // -- Action parameters --
+private:
+  // Layer_handle that is requested
+  std::string layer_alias_;
+  double variance_;
+  double max_error_;
+  double threshold_;
+  bool replace_;
+  
+  // -- Dispatch this action from the interface --
+public:
+    
+  // DISPATCH
+  // Create and dispatch action that inserts the new layer 
+  static void Dispatch( std::string layer_alias, double variance, double max_error, double threshold, bool replace );
+  
+};
   
 } // end namespace Seg3D
+
+#endif

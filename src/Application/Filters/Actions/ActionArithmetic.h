@@ -26,42 +26,54 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_TOOLINTERFACE_CANNYEDGEDETECTIONFILTERINTERFACE_H
-#define INTERFACE_TOOLINTERFACE_CANNYEDGEDETECTIONFILTERINTERFACE_H
+#ifndef APPLICATION_TOOL_ACTIONS_ACTIONARITHMETIC_H
+#define APPLICATION_TOOL_ACTIONS_ACTIONARITHMETIC_H
 
-// Utils includes
-#include <Utils/Core/Log.h>
-
-// Application includes
-#include <Application/Tool/ToolFactory.h>
-
-// Base class of the tool widget
-#include <Interface/AppInterface/ToolWidget.h>
+#include <Application/Action/Actions.h>
+#include <Application/Interface/Interface.h>
+#include <Application/Layer/Layer.h>
 
 namespace Seg3D
 {
-
-class CannyEdgeDetectionFilterInterfacePrivate;
-
-class CannyEdgeDetectionFilterInterface : public ToolWidget
-{
-Q_OBJECT
-
-public:
-  CannyEdgeDetectionFilterInterface();
-  virtual ~CannyEdgeDetectionFilterInterface();
-  virtual bool build_widget( QFrame* frame );
   
-private Q_SLOTS:
-  void execute_filter();
-  void enable_run_filter( bool valid );
-
+class ActionArithmetic : public Action
+{
+CORE_ACTION( "Arithmetic", "Run Arithmetic Filter on: <name>" );
+  
+  // -- Constructor/Destructor --
+public:
+  ActionArithmetic()
+  {
+  }
+  
+  virtual ~ActionArithmetic()
+  {
+  }
+  
+  // -- Functions that describe action --
+public:
+  virtual bool validate( ActionContextHandle& context );
+  virtual bool run( ActionContextHandle& context, ActionResultHandle& result );
+  
+  // -- Action parameters --
 private:
-  boost::shared_ptr< CannyEdgeDetectionFilterInterfacePrivate > private_;
-
-
+  // Layer_handle that is requested
+  std::string layer_a_alias_;
+  std::string layer_b_alias_;
+  std::string layer_c_alias_;
+  std::string expression_;
+  bool replace_;
+  
+  // -- Dispatch this action from the interface --
+public:
+    
+  // DISPATCH
+  // Create and dispatch action that inserts the new layer 
+  static void Dispatch( std::string layer_a_alias, std::string layer_b_alias, 
+    std::string layer_c_alias, std::string expression, bool replace );
+  
 };
-
-} // namespace Seg3D
+  
+} // end namespace Seg3D
 
 #endif

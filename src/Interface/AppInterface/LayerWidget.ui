@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>301</width>
-    <height>231</height>
+    <width>273</width>
+    <height>257</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -1001,19 +1001,19 @@ QToolButton#color_button_12_:pressed{
               </property>
               <property name="minimumSize">
                <size>
-                <width>58</width>
+                <width>0</width>
                 <height>0</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>58</width>
+                <width>16777215</width>
                 <height>16777215</height>
                </size>
               </property>
               <property name="font">
                <font>
-                <pointsize>11</pointsize>
+                <pointsize>10</pointsize>
                </font>
               </property>
               <property name="text">
@@ -1043,19 +1043,19 @@ QToolButton#color_button_12_:pressed{
               </property>
               <property name="minimumSize">
                <size>
-                <width>58</width>
+                <width>0</width>
                 <height>0</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>58</width>
+                <width>16777215</width>
                 <height>16777215</height>
                </size>
               </property>
               <property name="font">
                <font>
-                <pointsize>11</pointsize>
+                <pointsize>10</pointsize>
                </font>
               </property>
               <property name="text">
@@ -1489,7 +1489,7 @@ QToolButton#color_button_12_:pressed{
               </property>
               <property name="font">
                <font>
-                <pointsize>12</pointsize>
+                <pointsize>10</pointsize>
                </font>
               </property>
               <property name="text">
@@ -1633,9 +1633,21 @@ QToolButton#color_button_12_:pressed{
             </property>
             <item>
              <widget class="QLabel" name="label">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>30</height>
+               </size>
+              </property>
               <property name="font">
                <font>
-                <pointsize>12</pointsize>
+                <pointsize>11</pointsize>
                </font>
               </property>
               <property name="text">
@@ -1644,7 +1656,14 @@ QToolButton#color_button_12_:pressed{
              </widget>
             </item>
             <item>
-             <widget class="QComboBox" name="fill_selection_combo_"/>
+             <widget class="QComboBox" name="fill_selection_combo_">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>24</height>
+               </size>
+              </property>
+             </widget>
             </item>
            </layout>
           </widget>
@@ -1660,9 +1679,21 @@ QToolButton#color_button_12_:pressed{
             </property>
             <item>
              <widget class="QLabel" name="label_2">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>30</height>
+               </size>
+              </property>
               <property name="font">
                <font>
-                <pointsize>12</pointsize>
+                <pointsize>11</pointsize>
                </font>
               </property>
               <property name="text">
@@ -1671,7 +1702,14 @@ QToolButton#color_button_12_:pressed{
              </widget>
             </item>
             <item>
-             <widget class="QComboBox" name="border_selection_combo_"/>
+             <widget class="QComboBox" name="border_selection_combo_">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>24</height>
+               </size>
+              </property>
+             </widget>
             </item>
            </layout>
           </widget>

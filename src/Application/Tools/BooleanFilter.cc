@@ -48,6 +48,8 @@ BooleanFilter::BooleanFilter( const std::string& toolid ) :
   add_state( "example_expressions", example_expressions_state_, "<none>", "<none>" );
   add_state( "replace", replace_state_, false );
 
+  this->handle_layers_changed();
+  
   // Add constaints, so that when the state changes the right ranges of
   // parameters are selected
   mask_a_state_->value_changed_signal_.connect( boost::bind( &BooleanFilter::target_constraint,
@@ -80,6 +82,11 @@ void BooleanFilter::handle_layers_changed()
   
   for( int i = 0; i < static_cast< int >( target_layers.size() ); ++i )
   {
+    if( mask_a_state_->get() == "<none>" )
+    {
+      mask_a_state_->set( target_layers[i]->get_layer_name(), ActionSource::NONE_E );
+    }
+  
     if( target_layers[i]->get_layer_name() == mask_a_state_->get() ) 
       mask_a_found = true;
     

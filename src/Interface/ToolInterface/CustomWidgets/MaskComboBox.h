@@ -41,13 +41,19 @@ public QComboBox
 {
   Q_OBJECT
   
+Q_SIGNALS:
+  void valid( bool );
+  
 public:
   MaskComboBox( QWidget *parent );
   virtual ~MaskComboBox();
   
-private:
+public:
+  std::string get_value(){ return value_; }
   void sync_layers();
-  
+
+private:
+  std::string value_;
   
 };
   
