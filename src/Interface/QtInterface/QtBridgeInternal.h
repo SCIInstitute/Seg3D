@@ -412,7 +412,7 @@ private:
   boost::function<void ()> function_;
 };
 
-class QtActionToggleSlot : public QObject
+class QtActionToggleSlot : public QtSlot
 {
   Q_OBJECT
 
@@ -420,7 +420,7 @@ public:
 
   // Constructor
   QtActionToggleSlot( QAction* parent, StateBoolHandle& state_handle ) :
-    QObject(parent),
+    QtSlot( parent ),
     state_handle_( state_handle )
   {
     // Qt's connect function
@@ -435,7 +435,10 @@ public Q_SLOTS:
   // Slot that Qt will call
   void slot(bool state)
   {
-    ActionSet::Dispatch(state_handle_,state);
+    if ( !this->blocked_ )
+    {
+      ActionSet::Dispatch(state_handle_,state);
+    }
   }
 
 private:

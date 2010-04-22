@@ -733,7 +733,13 @@ void Viewer::change_visibility( bool visible, ActionSource /*source*/ )
 {
   if ( !visible && this->viewer_lock_state_->get() )
   {
+    Utils::ScopedCounter block_counter( this->signals_block_count_ );
     this->viewer_lock_state_->set( false );
+  }
+
+  if ( visible)
+  {
+    this->reset_active_slice();
   }
   
   this->slice_changed_signal_( this->viewer_id_ );

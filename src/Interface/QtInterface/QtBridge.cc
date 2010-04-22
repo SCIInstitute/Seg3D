@@ -377,6 +377,14 @@ bool QtBridge::Connect( QAction* qaction, boost::function< void() > function )
 }
 // -- END CONNECT FUNCTION -- //
 
+void QtActionToggledSignal( QPointer< QAction > qpointer, bool state, ActionSource source )
+{
+  if ( source != ActionSource::INTERFACE_E )
+  {
+    QtSignal( qpointer, boost::bind( &QAction::setChecked, qpointer.data(), state ) );
+  }
+}
+
 // -- BEGIN CONNECT FUNCTION FOR CONNECTING QAction's TO StateBoolHandle's -- //
 bool QtBridge::Connect( QAction* qaction, StateBoolHandle& state_handle )
 {
@@ -384,7 +392,9 @@ bool QtBridge::Connect( QAction* qaction, StateBoolHandle& state_handle )
   // manage this one.
   new QtActionToggleSlot( qaction, state_handle );
 
-    // TODO: Check whether there needs to be signal
+  QPointer< QAction > qpointer( qaction );
+  new QtDeleteSlot( qaction, state_handle->value_changed_signal_.connect( 
+    boost::bind( &QtActionToggledSignal, qpointer, _1, _2 ) ) );
 
   return true;
 }

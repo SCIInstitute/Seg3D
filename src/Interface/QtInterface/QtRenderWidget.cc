@@ -267,8 +267,9 @@ void QtRenderWidget::showEvent( QShowEvent* event )
 {
   if ( !event->spontaneous() )
   {
-    ActionSet::Dispatch( this->viewer_->viewer_visible_state_, true );
+    // NOTE: Activate the renderer before setting the viewer to visible.
     this->renderer_->activate();
+    ActionSet::Dispatch( this->viewer_->viewer_visible_state_, true );
   }
 }
 
