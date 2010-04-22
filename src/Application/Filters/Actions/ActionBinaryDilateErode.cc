@@ -71,7 +71,7 @@ bool ActionBinaryDilateErode::run( ActionContextHandle& context, ActionResultHan
 }
 
 
-void ActionBinaryDilateErode::Dispatch(  std::string layer_alias, int dialate, int erode, bool replace  )
+void ActionBinaryDilateErode::Dispatch( std::string layer_alias, int dialate, int erode, bool replace )
 {
   ActionBinaryDilateErode* action = new ActionBinaryDilateErode;
   action->layer_alias_ = layer_alias;
