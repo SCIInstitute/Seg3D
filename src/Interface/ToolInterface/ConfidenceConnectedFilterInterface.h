@@ -51,6 +51,10 @@ public:
   ConfidenceConnectedFilterInterface();
   virtual ~ConfidenceConnectedFilterInterface();
   virtual bool build_widget( QFrame* frame );
+  
+private Q_SLOTS:
+  void execute_filter();
+  void enable_run_filter( bool valid );
 
 private:
   boost::shared_ptr< ConfidenceConnectedFilterInterfacePrivate > private_;

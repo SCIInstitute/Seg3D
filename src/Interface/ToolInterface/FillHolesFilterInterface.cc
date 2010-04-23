@@ -36,6 +36,7 @@
 
 //Application Includes
 #include <Application/Tools/FillHolesFilter.h>
+#include <Application/Filters/Actions/ActionFillHoles.h>
 
 namespace Seg3D
 {
@@ -81,10 +82,32 @@ bool FillHolesFilterInterface::build_widget( QFrame* frame )
 
   //Step 4 - connect the gui to the tool through the QtBridge
   QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
-
+  connect( this->private_->target_, SIGNAL( valid( bool ) ), this, SLOT( enable_run_filter( bool ) ) );
+  
+  connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), this, SLOT( execute_filter() ) );
+  
+  this->private_->target_->sync_layers();
+  
   //Send a message to the log that we have finised with building the Fill Holes Filter Interface"
   SCI_LOG_DEBUG("Finished building a Fill Holes Filter Interface");
   return ( true );
 } // end build_widget
+  
+void FillHolesFilterInterface::enable_run_filter( bool valid )
+{
+  if( valid )
+    this->private_->ui_.runFilterButton->setEnabled( true );
+  else
+    this->private_->ui_.runFilterButton->setEnabled( false );
+}
+
+void FillHolesFilterInterface::execute_filter()
+{
+  ToolHandle base_tool_ = tool();
+  FillHolesFilter* tool =
+  dynamic_cast< FillHolesFilter* > ( base_tool_.get() );
+  
+  ActionFillHoles::Dispatch( tool->target_layer_state_->export_to_string() ); 
+}
 
 } // end namespace Seg3D

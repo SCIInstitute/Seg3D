@@ -1,4 +1,3 @@
-
 /*
  For more information, please see: http://software.sci.utah.edu
  
@@ -27,41 +26,51 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_TOOLINTERFACE_FILLHOLESFILTERINTERFACE_H
-#define INTERFACE_TOOLINTERFACE_FILLHOLESFILTERINTERFACE_H
+#ifndef APPLICATION_TOOL_ACTIONS_ACTIONCONFIDENCECONNECTED_H
+#define APPLICATION_TOOL_ACTIONS_ACTIONCONFIDENCECONNECTED_H
 
-// Utils includes
-#include <Utils/Core/Log.h>
-
-// Application includes
-#include <Application/Tool/ToolFactory.h>
-
-// Base class of the tool widget
-#include <Interface/AppInterface/ToolWidget.h>
+#include <Application/Action/Actions.h>
+#include <Application/Interface/Interface.h>
+#include <Application/Layer/Layer.h>
 
 namespace Seg3D
 {
-
-class FillHolesFilterInterfacePrivate;
-
-class FillHolesFilterInterface : public ToolWidget
-{
-Q_OBJECT
-
-public:
-  FillHolesFilterInterface();
-  virtual ~FillHolesFilterInterface();
-  virtual bool build_widget( QFrame* frame );
   
-private Q_SLOTS:
-  void execute_filter();
-  void enable_run_filter( bool valid );
-
+class ActionConfidenceConnected : public Action
+{
+CORE_ACTION( "ConfidenceConnected", "Run Confidence Connected Filter on: <name>" );
+  
+  // -- Constructor/Destructor --
+public:
+  ActionConfidenceConnected()
+  {
+  }
+  
+  virtual ~ActionConfidenceConnected()
+  {
+  }
+  
+  // -- Functions that describe action --
+public:
+  virtual bool validate( ActionContextHandle& context );
+  virtual bool run( ActionContextHandle& context, ActionResultHandle& result );
+  
+  // -- Action parameters --
 private:
-  boost::shared_ptr< FillHolesFilterInterfacePrivate > private_;
-
+  // Layer_handle that is requested
+  std::string layer_alias_;
+  int iterations_;
+  int multiplier_;
+  
+  // -- Dispatch this action from the interface --
+public:
+    
+  // DISPATCH
+  // Create and dispatch action that inserts the new layer 
+  static void Dispatch( std::string layer_alias, int iterations, int multiplier );
+  
 };
-
+  
 } // end namespace Seg3D
 
 #endif

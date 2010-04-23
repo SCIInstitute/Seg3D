@@ -62,7 +62,6 @@ private:
 public:
   // Layerid of the target layer
   StateStringHandle target_layer_state_;
-
   StateBoolHandle replace_state_;
 
 };

@@ -45,8 +45,16 @@ SET(APPLICATION_FILTERS_ACTIONS_SRCS
   Actions/ActionBoolean.cc
   Actions/ActionCannyEdgeDetection.h
   Actions/ActionCannyEdgeDetection.cc
+  Actions/ActionConfidenceConnected.h
+  Actions/ActionConfidenceConnected.cc
+  Actions/ActionConnectedComponent.h
+  Actions/ActionConnectedComponent.cc
   Actions/ActionDiscreteGaussian.h
   Actions/ActionDiscreteGaussian.cc
+  Actions/ActionFillHoles.h
+  Actions/ActionFillHoles.cc
+  Actions/ActionGradientMagnitude.h
+  Actions/ActionGradientMagnitude.cc
   )
 
 ADD_LIBRARY(Application_Filters STATIC 

@@ -1,4 +1,3 @@
-
 /*
  For more information, please see: http://software.sci.utah.edu
  
@@ -27,41 +26,50 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_TOOLINTERFACE_FILLHOLESFILTERINTERFACE_H
-#define INTERFACE_TOOLINTERFACE_FILLHOLESFILTERINTERFACE_H
 
-// Utils includes
-#include <Utils/Core/Log.h>
-
-// Application includes
-#include <Application/Tool/ToolFactory.h>
-
-// Base class of the tool widget
-#include <Interface/AppInterface/ToolWidget.h>
+#include <Application/LayerManager/LayerManager.h>
+#include <Application/Filters/Actions/ActionConnectedComponent.h>
 
 namespace Seg3D
 {
-
-class FillHolesFilterInterfacePrivate;
-
-class FillHolesFilterInterface : public ToolWidget
-{
-Q_OBJECT
-
-public:
-  FillHolesFilterInterface();
-  virtual ~FillHolesFilterInterface();
-  virtual bool build_widget( QFrame* frame );
   
-private Q_SLOTS:
-  void execute_filter();
-  void enable_run_filter( bool valid );
+// REGISTER ACTION:
+// Define a function that registers the action. The action also needs to be
+// registered in the CMake file.
+CORE_REGISTER_ACTION( ConnectedComponent );
 
-private:
-  boost::shared_ptr< FillHolesFilterInterfacePrivate > private_;
+bool ActionConnectedComponent::validate( ActionContextHandle& context )
+{
+  if( !( StateEngine::Instance()->is_statealias( this->layer_alias_ ) ) )
+  {
+    context->report_error( std::string( "LayerID '" ) + this->layer_alias_ + "' is invalid" );
+    return false;
+  }
 
-};
+  return true;
+}
 
+bool ActionConnectedComponent::run( ActionContextHandle& context, ActionResultHandle& result )
+{
+  if ( StateEngine::Instance()->is_statealias( this->layer_alias_ ) )
+  {
+    // TODO: run filter
+    context->report_message( "The Connected Component Filter has been triggered "
+      "successfully on: "  + this->layer_alias_ );
+    
+    return true;
+  }
+    
+  return false;
+}
+
+
+void ActionConnectedComponent::Dispatch( std::string layer_alias )
+{
+  ActionConnectedComponent* action = new ActionConnectedComponent;
+  action->layer_alias_ = layer_alias;
+  
+  Interface::PostAction( ActionHandle( action ) );
+}
+  
 } // end namespace Seg3D
-
-#endif

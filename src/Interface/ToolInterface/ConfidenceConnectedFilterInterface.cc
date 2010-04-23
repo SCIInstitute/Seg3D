@@ -36,6 +36,7 @@
 
 //Application Includes
 #include <Application/Tools/ConfidenceConnectedFilter.h>
+#include <Application/Filters/Actions/ActionConfidenceConnected.h>
 
 namespace Seg3D
 {
@@ -106,18 +107,40 @@ bool ConfidenceConnectedFilterInterface::build_widget( QFrame* frame )
         this->private_->multiplier_->setRange( multiplier_min, multiplier_max );
         this->private_->multiplier_->setCurrentValue( tool->threshold_multiplier_state_->get() );
    
-   
 
   //Step 4 - connect the gui to the tool through the QtBridge
   QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
+  connect( this->private_->target_, SIGNAL( valid( bool ) ), this, SLOT( enable_run_filter( bool ) ) );
   QtBridge::Connect( this->private_->iterations_, tool->iterations_state_ );
   QtBridge::Connect( this->private_->multiplier_, tool->threshold_multiplier_state_ );
 
+  connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), this, SLOT( execute_filter() ) );
+  
+  this->private_->target_->sync_layers();
+  
   //Send a message to the log that we have finised with building the Confidence Connected Filter Interface
   SCI_LOG_DEBUG("Finished building a Confidence Connected Filter Interface");
   return ( true );
 
 } // end build_widget
+  
+void ConfidenceConnectedFilterInterface::enable_run_filter( bool valid )
+{
+  if( valid )
+    this->private_->ui_.runFilterButton->setEnabled( true );
+  else
+    this->private_->ui_.runFilterButton->setEnabled( false );
+}
+
+void ConfidenceConnectedFilterInterface::execute_filter()
+{
+  ToolHandle base_tool_ = tool();
+  ConfidenceConnectedFilter* tool =
+  dynamic_cast< ConfidenceConnectedFilter* > ( base_tool_.get() );
+  
+  ActionConfidenceConnected::Dispatch( tool->target_layer_state_->export_to_string(), 
+            tool->iterations_state_->get(), tool->threshold_multiplier_state_->get() ); 
+}
 
 
 } // end namespace Seg3D
