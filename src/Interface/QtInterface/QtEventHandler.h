@@ -63,44 +63,10 @@ class QtEventHandlerObject;
 // functor call back classes and hide all the QT handling behind
 // a cleaner interface.
 
-// CLASS QtUserQEvent:
-// The user event class that is send to QT, it wraps around the 
-// ApplicationEvent class, and thence only needs a handle to that
-// class.
-
-class QtUserEvent : public QEvent
-{
-
-public:
-  // constructor for a wrapper around the ApplicationEvent class
-  QtUserEvent( Utils::EventHandle& event_handle );
-
-  virtual ~QtUserEvent();
-
-  // As QT takes on ownership of the QEvent, we use smart
-  // pointers to share resources between the different threads
-  // As long as one of the threads has a handle the object will
-  // persist.
-  Utils::EventHandle event_handle_;
-};
-
-// CLASS QtEventFilter:
-// This class is the filter that needs to be installed into the main QT
-// event handler. 
-
-class QtEventFilter : public QObject
-{
-Q_OBJECT
-
-public:
-  QtEventFilter( QObject* parent = 0 ) :
-    QObject( parent )
-  {
-  }
-
-protected:
-  bool eventFilter( QObject* obj, QEvent* event );
-};
+// CLASS QtEventHandlerObject:
+// This is a helper class for QtEventHandlerContext. It installs an event filter and a timer
+// to the main Qt thread, which will trigger QtEventHandlerContext::process_events in
+// the Qt thread.
 
 class QtEventHandlerObject : public QObject
 {
@@ -119,7 +85,6 @@ private Q_SLOTS:
 private:
   QApplication* parent_;
   QtEventHandlerContext* event_handler_context_;
-  bool event_filter_enabled_;
   int timer_id_;
 };
 
@@ -133,7 +98,7 @@ class QtEventHandlerContext : public Utils::EventHandlerContext
 
 public:
 
-  // Constuctor and destructor
+  // Constructor and destructor
   QtEventHandlerContext( QApplication* qt_application );
   virtual ~QtEventHandlerContext();
 
@@ -172,6 +137,8 @@ public:
   // Terminate the eventhandler
   virtual void terminate_eventhandler();
 
+  // EMPTY_EVENT_QUEUE:
+  // Purge all the events in the queue.
   void empty_event_queue();
 
 private:

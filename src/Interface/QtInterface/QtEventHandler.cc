@@ -39,89 +39,16 @@
 namespace Seg3D
 {
 
-// CLASS QtUserEvent:
-
-QtUserEvent::QtUserEvent( Utils::EventHandle& event_handle ) :
-  QEvent( QEvent::User ), event_handle_( event_handle )
-{
-}
-
-QtUserEvent::~QtUserEvent()
-{
-}
-
-// CLASS QtEventFilter:
-
-bool QtEventFilter::eventFilter( QObject* obj, QEvent* event )
-{
-  if ( event->type() == QEvent::User )
-  {
-    // Cast to the right type
-    QtUserEvent *user_event = dynamic_cast< QtUserEvent * > ( event );
-
-    // Run the code that was send to us
-    try
-    {
-      user_event->event_handle_->handle_event();
-    }
-    catch ( Utils::Exception& except )
-    {
-      // Catch any Seg3D generated exceptions and display there message in the log file
-      std::string error_message = 
-        std::string( "Interface event loop crashed by throwing an exception: " ) + 
-        except.message();
-        
-      SCI_LOG_ERROR( error_message );
-      QMessageBox::critical( 0, QString( "Fatal Error" ), 
-        QString::fromStdString( error_message) );
-      QCoreApplication::exit( -1 );
-      return ( true );
-    }
-    catch ( std::exception& except )
-    {
-      // For any other exception
-      std::string error_message = 
-        std::string( "Interface event loop crashed by throwing an exception: " ) + 
-        except.what();
-        
-      SCI_LOG_ERROR( error_message );
-      QMessageBox::critical( 0, QString( "Fatal Error" ),  
-        QString::fromStdString( error_message) );
-      QCoreApplication::exit( -1 );
-      return ( true );
-    }
-    catch ( ... )
-    {
-      // For any other exception
-      std::string error_message =  
-        std::string( "Interface event loop crashed by throwing an unknown exception" );
-
-      SCI_LOG_ERROR( error_message );
-      QMessageBox::critical( 0, QString( "Fatal Error" ),  
-        QString::fromStdString( error_message) );
-      QCoreApplication::exit( -1 );
-      return ( true );
-    }
-
-    return ( true );
-  }
-  else
-  {
-    return ( QObject::eventFilter( obj, event ) );
-  }
-}
-
 // CLASS QtEventHandlerObject
 
 QtEventHandlerObject::QtEventHandlerObject( QApplication* parent, 
   QtEventHandlerContext* context ) :
   QObject( parent ),
   parent_( parent ),
-  event_handler_context_( context ),
-  event_filter_enabled_( false )
+  event_handler_context_( context )
 {
   this->connect( parent, SIGNAL( aboutToQuit() ), SLOT( cleanup() ) );
-  this->timer_id_ = this->startTimer( 50 );
+  this->timer_id_ = this->startTimer( 100 );
   this->parent_->installEventFilter( this );
 }
 
@@ -129,10 +56,7 @@ bool QtEventHandlerObject::eventFilter( QObject* watched, QEvent* event )
 {
   if ( event->type() == QEvent::User )
   {
-    if ( event_filter_enabled_ )
-    {
-      this->event_handler_context_->process_events();
-    }
+    this->event_handler_context_->process_events();
     return true;
   }
   
@@ -142,7 +66,6 @@ bool QtEventHandlerObject::eventFilter( QObject* watched, QEvent* event )
 void QtEventHandlerObject::timerEvent( QTimerEvent* event )
 {
   this->event_handler_context_->process_events();
-  this->event_filter_enabled_ = true;
 }
 
 void QtEventHandlerObject::cleanup()
@@ -168,22 +91,16 @@ QtEventHandlerContext::~QtEventHandlerContext()
 
 void QtEventHandlerContext::post_event( Utils::EventHandle& event )
 {
-  {
-  }
-
-  // Generate a new event message for QT
-  // This is an ordinary pointer as QT will
-  // take ownership of it and delete it.
-
-  //QtUserEvent* qevent = new QtUserEvent( event );
-
-  // Insert call into the QT event loop
   if ( !QCoreApplication::closingDown() )
   {
     {
       lock_type lock( this->mutex_ );
       this->events_.push( event );
     }
+    // Generate an empty Qt user event and insert it to the Qt main event loop.
+    // The QtEventHandlerObject event filter will filter this event out and trigger
+    // process_events.
+    // This is an ordinary pointer as QT will take ownership of it and delete it.
     QCoreApplication::postEvent( qapplication_, new QEvent( QEvent::User ) );
   }
 }
@@ -197,15 +114,17 @@ void QtEventHandlerContext::post_and_wait_event( Utils::EventHandle& event )
   // of the synchronization
   event->sync_handle() = sync;
 
-  // Generate a new event message for QT:
-  // This is an ordinary pointer as QT will take ownership of it and delete it.
-  QtUserEvent* qevent = new QtUserEvent( event );
-
   // Handshaking for communication with QT
   boost::unique_lock< boost::mutex > lock( sync->lock_ );
 
-  // Insert call into the QT event loop
-  QApplication::postEvent( qapplication_, qevent );
+  // Add the event to the queue
+  {
+    lock_type lock( this->mutex_ );
+    this->events_.push( event );
+  }
+
+  //Post a user event to the QT event loop
+  QCoreApplication::postEvent( qapplication_, new QEvent( QEvent::User ) );
 
   // Wait for QT to handle the event
   sync->condition_.wait( lock );
@@ -217,7 +136,6 @@ bool QtEventHandlerContext::process_events()
   {
     SCI_THROW_LOGICERROR( "Cannot process events from outside the Qt thread" );
   }
-
 
   lock_type lock( this->mutex_ );
 
@@ -280,9 +198,8 @@ bool QtEventHandlerContext::wait_and_process_events()
 
 bool QtEventHandlerContext::start_eventhandler( Utils::EventHandler* eventhandler )
 {
-  // Allow Qt to intercept the actions in its main event loop
-  QtEventHandlerObject* event_handler_obj = 
-    new QtEventHandlerObject( this->qapplication_, this );
+  // Allow Qt to intercept the actions in its main event loop 
+  new QtEventHandlerObject( this->qapplication_, this );
 
   return ( true );
 }
