@@ -46,24 +46,24 @@ bool ActionBoolean::validate( ActionContextHandle& context )
     return false;
   }
   
-  if( !( StateEngine::Instance()->is_statealias( this->mask_b_alias_ ) ) )
-  {
-    context->report_error( std::string( "LayerID '" ) + this->mask_b_alias_ + "' is invalid" );
-    return false;
-  }
-  
-  if( !( StateEngine::Instance()->is_statealias( this->mask_c_alias_ ) ) )
-  {
-    context->report_error( std::string( "LayerID '" ) + this->mask_c_alias_ + "' is invalid" );
-    return false;
-  }
-  
-  if( !( StateEngine::Instance()->is_statealias( this->mask_d_alias_ ) ) )
-  {
-    context->report_error( std::string( "LayerID '" ) + this->mask_d_alias_ + "' is invalid" );
-    return false;
-  }
-  
+//  if( !( StateEngine::Instance()->is_statealias( this->mask_b_alias_ ) ) )
+//  {
+//    context->report_error( std::string( "LayerID '" ) + this->mask_b_alias_ + "' is invalid" );
+//    return false;
+//  }
+//  
+//  if( !( StateEngine::Instance()->is_statealias( this->mask_c_alias_ ) ) )
+//  {
+//    context->report_error( std::string( "LayerID '" ) + this->mask_c_alias_ + "' is invalid" );
+//    return false;
+//  }
+//  
+//  if( !( StateEngine::Instance()->is_statealias( this->mask_d_alias_ ) ) )
+//  {
+//    context->report_error( std::string( "LayerID '" ) + this->mask_d_alias_ + "' is invalid" );
+//    return false;
+//  }
+//  
   return true;
 }
 

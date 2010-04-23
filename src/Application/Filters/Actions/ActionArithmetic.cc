@@ -46,17 +46,17 @@ bool ActionArithmetic::validate( ActionContextHandle& context )
     return false;
   }
   
-  if( !( StateEngine::Instance()->is_statealias( this->layer_b_alias_ ) ) )
-  {
-    context->report_error( std::string( "LayerID '" ) + this->layer_b_alias_ + "' is invalid" );
-    return false;
-  }
-  
-  if( !( StateEngine::Instance()->is_statealias( this->layer_c_alias_ ) ) )
-  {
-    context->report_error( std::string( "LayerID '" ) + this->layer_c_alias_ + "' is invalid" );
-    return false;
-  }
+//  if( !( StateEngine::Instance()->is_statealias( this->layer_b_alias_ ) ) )
+//  {
+//    context->report_error( std::string( "LayerID '" ) + this->layer_b_alias_ + "' is invalid" );
+//    return false;
+//  }
+//  
+//  if( !( StateEngine::Instance()->is_statealias( this->layer_c_alias_ ) ) )
+//  {
+//    context->report_error( std::string( "LayerID '" ) + this->layer_c_alias_ + "' is invalid" );
+//    return false;
+//  }
   
   return true;
 }

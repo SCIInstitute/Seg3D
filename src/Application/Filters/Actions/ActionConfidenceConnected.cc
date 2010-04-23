@@ -61,7 +61,7 @@ bool ActionConfidenceConnected::run( ActionContextHandle& context, ActionResultH
   if ( StateEngine::Instance()->is_statealias( this->layer_alias_ ) )
   {
     // TODO: run filter
-    context->report_message( "The Discrete Gaussian Filter has been triggered "
+    context->report_message( "The Confidence Connected Filter has been triggered "
       "successfully on: "  + this->layer_alias_ );
     
     return true;

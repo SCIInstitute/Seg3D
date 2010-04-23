@@ -44,14 +44,15 @@ TargetComboBox::TargetComboBox( QWidget *parent )
   QSizePolicy size_policy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
   this->setSizePolicy( size_policy );
   
-  LayerManager::Instance()->layers_changed_signal_.connect(
-    boost::bind( &TargetComboBox::sync_layers, this ) );
+  this->add_connection( LayerManager::Instance()->layers_changed_signal_.connect(
+    boost::bind( &TargetComboBox::sync_layers, this ) ) );
   
   this->sync_layers();
 }
 
 TargetComboBox::~TargetComboBox()
 {
+  this->disconnect_all();
 }
   
 void TargetComboBox::sync_layers()

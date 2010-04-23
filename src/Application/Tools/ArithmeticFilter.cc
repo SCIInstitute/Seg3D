@@ -52,15 +52,15 @@ ArithmeticFilter::ArithmeticFilter( const std::string& toolid ) :
 
   // Add constaints, so that when the state changes the right ranges of
   // parameters are selected
-  volume_a_state_->value_changed_signal_.connect( boost::bind(
-      &ArithmeticFilter::target_constraint, this, _1 ) );
-  volume_b_state_->value_changed_signal_.connect( boost::bind(
-      &ArithmeticFilter::target_constraint, this, _1 ) );
-  volume_c_state_->value_changed_signal_.connect( boost::bind(
-      &ArithmeticFilter::target_constraint, this, _1 ) );
+  this->add_connection ( this->volume_a_state_->value_changed_signal_.connect( boost::bind(
+      &ArithmeticFilter::target_constraint, this, _1 ) ) );
+  this->add_connection ( this->volume_b_state_->value_changed_signal_.connect( boost::bind(
+      &ArithmeticFilter::target_constraint, this, _1 ) ) );
+  this->add_connection ( this->volume_c_state_->value_changed_signal_.connect( boost::bind(
+      &ArithmeticFilter::target_constraint, this, _1 ) ) );
   
-  LayerManager::Instance()->layers_changed_signal_.connect(
-    boost::bind( &ArithmeticFilter::handle_layers_changed, this ) );
+  this->add_connection ( LayerManager::Instance()->layers_changed_signal_.connect(
+    boost::bind( &ArithmeticFilter::handle_layers_changed, this ) ) );
 
 } // end constructor
 

@@ -52,17 +52,17 @@ BooleanFilter::BooleanFilter( const std::string& toolid ) :
   
   // Add constaints, so that when the state changes the right ranges of
   // parameters are selected
-  mask_a_state_->value_changed_signal_.connect( boost::bind( &BooleanFilter::target_constraint,
-      this, _1 ) );
-  mask_b_state_->value_changed_signal_.connect( boost::bind( &BooleanFilter::target_constraint,
-      this, _1 ) );
-  mask_c_state_->value_changed_signal_.connect( boost::bind( &BooleanFilter::target_constraint,
-      this, _1 ) );
-  mask_d_state_->value_changed_signal_.connect( boost::bind( &BooleanFilter::target_constraint,
-      this, _1 ) );
+  this->add_connection ( this->mask_a_state_->value_changed_signal_.connect( boost::bind( 
+    &BooleanFilter::target_constraint, this, _1 ) ) );
+  this->add_connection ( this->mask_b_state_->value_changed_signal_.connect( boost::bind( 
+    &BooleanFilter::target_constraint, this, _1 ) ) );
+  this->add_connection ( this->mask_c_state_->value_changed_signal_.connect( boost::bind( 
+    &BooleanFilter::target_constraint, this, _1 ) ) );
+  this->add_connection ( this->mask_d_state_->value_changed_signal_.connect( boost::bind( 
+    &BooleanFilter::target_constraint,this, _1 ) ) );
   
-  LayerManager::Instance()->layers_changed_signal_.connect(
-    boost::bind( &BooleanFilter::handle_layers_changed, this ) );
+  this->add_connection ( LayerManager::Instance()->layers_changed_signal_.connect(
+    boost::bind( &BooleanFilter::handle_layers_changed, this ) ) );
 }
 
 

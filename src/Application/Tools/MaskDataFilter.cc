@@ -48,15 +48,15 @@ MaskDataFilter::MaskDataFilter( const std::string& toolid ) :
 
   // Add constaints, so that when the state changes the right ranges of
   // parameters are selected
-  target_layer_state_->value_changed_signal_.connect( boost::bind(
-      &MaskDataFilter::target_constraint, this, _1 ) );
-  mask_layer_state_->value_changed_signal_.connect( boost::bind(
-      &MaskDataFilter::target_constraint, this, _1 ) );
-  replace_with_state_->value_changed_signal_.connect( boost::bind(
-      &MaskDataFilter::target_constraint, this, _1 ) );
+  this->add_connection ( this->target_layer_state_->value_changed_signal_.connect( boost::bind(
+      &MaskDataFilter::target_constraint, this, _1 ) ) );
+  this->add_connection ( this->mask_layer_state_->value_changed_signal_.connect( boost::bind(
+      &MaskDataFilter::target_constraint, this, _1 ) ) );
+  this->add_connection ( this->replace_with_state_->value_changed_signal_.connect( boost::bind(
+      &MaskDataFilter::target_constraint, this, _1 ) ) );
   
-  LayerManager::Instance()->layers_changed_signal_.connect(
-    boost::bind( &MaskDataFilter::handle_layers_changed, this ) );
+  this->add_connection ( LayerManager::Instance()->layers_changed_signal_.connect(
+    boost::bind( &MaskDataFilter::handle_layers_changed, this ) ) );
 
 }
   

@@ -45,11 +45,11 @@ NeighborhoodConnectedFilter::NeighborhoodConnectedFilter( const std::string& too
 
   // Add constaints, so that when the state changes the right ranges of
   // parameters are selected
-  target_layer_state_->value_changed_signal_.connect( boost::bind(
-      &NeighborhoodConnectedFilter::target_constraint, this, _1 ) );
+  this->add_connection ( this->target_layer_state_->value_changed_signal_.connect( boost::bind(
+      &NeighborhoodConnectedFilter::target_constraint, this, _1 ) ) );
   
-  LayerManager::Instance()->layers_changed_signal_.connect(
-    boost::bind( &NeighborhoodConnectedFilter::handle_layers_changed, this ) );
+  this->add_connection ( LayerManager::Instance()->layers_changed_signal_.connect(
+    boost::bind( &NeighborhoodConnectedFilter::handle_layers_changed, this ) ) );
 
 }
 

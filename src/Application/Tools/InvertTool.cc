@@ -45,8 +45,8 @@ InvertTool::InvertTool( const std::string& toolid ) :
   add_state( "target", target_layer_state_, "<none>" );
   add_state( "replace", replace_state_, false );
   
-  LayerManager::Instance()->layers_changed_signal_.connect(
-    boost::bind( &InvertTool::handle_layers_changed, this ) );
+  this->add_connection ( LayerManager::Instance()->layers_changed_signal_.connect(
+    boost::bind( &InvertTool::handle_layers_changed, this ) ) );
 
 }
 

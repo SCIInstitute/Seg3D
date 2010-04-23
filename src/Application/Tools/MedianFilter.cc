@@ -47,11 +47,11 @@ MedianFilter::MedianFilter( const std::string& toolid ) :
 
   // Add constaints, so that when the state changes the right ranges of
   // parameters are selected
-  target_layer_state_->value_changed_signal_.connect( boost::bind(
-      &MedianFilter::target_constraint, this, _1 ) );
+  this->add_connection ( this->target_layer_state_->value_changed_signal_.connect( boost::bind(
+      &MedianFilter::target_constraint, this, _1 ) ) );
   
-  LayerManager::Instance()->layers_changed_signal_.connect(
-    boost::bind( &MedianFilter::handle_layers_changed, this ) );
+  this->add_connection ( LayerManager::Instance()->layers_changed_signal_.connect(
+    boost::bind( &MedianFilter::handle_layers_changed, this ) ) );
 
 }
 

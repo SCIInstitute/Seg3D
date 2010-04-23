@@ -45,8 +45,8 @@ PolylineTool::PolylineTool( const std::string& toolid ) :
 
   // No constraints are needed for this tool
 
-  LayerManager::Instance()->layers_changed_signal_.connect(
-    boost::bind( &PolylineTool::handle_layers_changed, this ) );
+  this->add_connection ( LayerManager::Instance()->layers_changed_signal_.connect(
+    boost::bind( &PolylineTool::handle_layers_changed, this ) ) );
 
 }
 
