@@ -218,34 +218,20 @@ bool QtEventHandlerContext::process_events()
     SCI_THROW_LOGICERROR( "Cannot process events from outside the Qt thread" );
   }
 
-  bool has_events = false;
-  Utils::EventHandle event;
 
-  {
-    lock_type lock( this->mutex_ );
-    has_events = !this->events_.empty();
-  }
+  lock_type lock( this->mutex_ );
 
-  while ( has_events )
+  while ( !this->events_.empty() )
   {
     try
     {
-      {
-        lock_type lock( this->mutex_ );
-        if ( !this->events_.empty() )
-        {
-          event = this->events_.front();
-          this->events_.pop();
-        }
-        has_events = !this->events_.empty();
-      }
-      // NOTE: It's important to release the lock before handling the event, 
+      Utils::EventHandle event = this->events_.front();
+      this->events_.pop();
+      // NOTE: It's important to unlock before handling the event, 
       // otherwise deadlock might happen.
-      if ( event )
-      {
-        event->handle_event();
-        event.reset();
-      }
+      lock.unlock();
+      event->handle_event();
+      lock.lock();
     }
     catch ( Utils::Exception& except )
     {
