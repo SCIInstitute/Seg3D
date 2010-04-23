@@ -64,7 +64,7 @@ bool QtApplication::setup( int argc, char **argv )
     // Step 3: Insert the event handler into the application layer
     SCI_LOG_DEBUG("Install the QtEventHandlerContext into the Interface layer");
     Interface::Instance()->install_eventhandler_context( qt_eventhandler_context );
-    Interface::Instance()->start_eventhandler();
+    //Interface::Instance()->start_eventhandler();
 
     // Step 4: Create opengl render resources
     SCI_LOG_DEBUG("Creating QtRenderResourcesContext");
@@ -90,6 +90,7 @@ bool QtApplication::exec()
   try
   {
     SCI_LOG_DEBUG("Starting main QT event loop");
+    Interface::Instance()->start_eventhandler();
 
     if ( !( qt_application_->exec() == 0 ) )
     {

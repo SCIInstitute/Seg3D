@@ -33,6 +33,9 @@
 # pragma once
 #endif 
 
+// STL includes
+#include <queue>
+
 // Qt includes
 #include <QtGui>
 
@@ -45,10 +48,14 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
+#include <boost/thread/recursive_mutex.hpp>
 #include <boost/thread/condition_variable.hpp>
 
 namespace Seg3D
 {
+
+class QtEventHandlerContext;
+class QtEventHandlerObject;
 
 // QTEVENTHANDLER:
 
@@ -93,6 +100,27 @@ public:
 
 protected:
   bool eventFilter( QObject* obj, QEvent* event );
+};
+
+class QtEventHandlerObject : public QObject
+{
+Q_OBJECT
+
+public:
+  QtEventHandlerObject( QApplication* parent, QtEventHandlerContext* context );
+  virtual bool eventFilter ( QObject* watched, QEvent* event );
+
+protected:
+  virtual void timerEvent ( QTimerEvent* event );
+
+private Q_SLOTS:
+  void cleanup();
+
+private:
+  QApplication* parent_;
+  QtEventHandlerContext* event_handler_context_;
+  bool event_filter_enabled_;
+  int timer_id_;
 };
 
 // CLASS QtInterfaceContext:
@@ -144,12 +172,22 @@ public:
   // Terminate the eventhandler
   virtual void terminate_eventhandler();
 
+  void empty_event_queue();
+
 private:
   // A pointer to the main Qt application class
   QApplication* qapplication_;
 
-  // Thread id from the thead that is running Qt
+  // Thread id from the thread that is running Qt
   boost::thread::id interface_thread_id_;
+
+  // Event queue
+  std::queue< Utils::EventHandle > events_;
+
+  // Mutex for protecting the event queue
+  typedef boost::recursive_mutex mutex_type;
+  typedef boost::unique_lock< mutex_type > lock_type;
+  mutex_type mutex_;
 };
 
 } // end namespace Seg3D

@@ -88,20 +88,20 @@ AppInterface::AppInterface()
   status_bar_ = new AppStatusBar( this );
 
 
-  InterfaceManager::Instance()->show_window_signal_.connect( boost::bind(
-      &AppInterface::HandleShowWindow, qpointer_type( this ), _1 ) );
+  this->add_connection( InterfaceManager::Instance()->show_window_signal_.connect( 
+    boost::bind( &AppInterface::HandleShowWindow, qpointer_type( this ), _1 ) ) );
 
-  InterfaceManager::Instance()->close_window_signal_.connect( boost::bind(
-      &AppInterface::HandleCloseWindow, qpointer_type( this ), _1 ) );
+  this->add_connection( InterfaceManager::Instance()->close_window_signal_.connect( 
+    boost::bind( &AppInterface::HandleCloseWindow, qpointer_type( this ), _1 ) ) );
 
-  ActionDispatcher::Instance()->begin_progress_signal_.connect( boost::bind(
-    &AppInterface::HandleBeginProgress, qpointer_type( this ), _1 ) );
+  this->add_connection( ActionDispatcher::Instance()->begin_progress_signal_.connect( 
+    boost::bind( &AppInterface::HandleBeginProgress, qpointer_type( this ), _1 ) ) );
 
-  ActionDispatcher::Instance()->end_progress_signal_.connect( boost::bind(
-    &AppInterface::HandleEndProgress, qpointer_type( this ), _1 ) );
+  this->add_connection( ActionDispatcher::Instance()->end_progress_signal_.connect( 
+    boost::bind( &AppInterface::HandleEndProgress, qpointer_type( this ), _1 ) ) );
 
-  ActionDispatcher::Instance()->report_progress_signal_.connect( boost::bind(
-    &AppInterface::HandleReportProgress, qpointer_type( this ), _1 ) );
+  this->add_connection( ActionDispatcher::Instance()->report_progress_signal_.connect( 
+    boost::bind( &AppInterface::HandleReportProgress, qpointer_type( this ), _1 ) ) );
 
   // NOTE: Connect state and reflect the current state (needs to be atomic, hence the lock)
   {
@@ -112,10 +112,72 @@ AppInterface::AppInterface()
     // Connect and update full screen state
     set_full_screen( InterfaceManager::Instance()->full_screen_state_->get() );
     
-    InterfaceManager::Instance()->full_screen_state_-> value_changed_signal_.connect(
-        boost::bind( &AppInterface::SetFullScreen, qpointer_type( this ), _1, _2 ) );
+    this->add_connection( InterfaceManager::Instance()->full_screen_state_->
+      value_changed_signal_.connect( boost::bind( &AppInterface::SetFullScreen, 
+      qpointer_type( this ), _1, _2 ) ) );
   }
+
   this->center_seg3d_gui_on_screen( this );
+}
+
+AppInterface::~AppInterface()
+{
+  //  viewer_interface_->writeSizeSettings();
+}
+
+void AppInterface::closeEvent( QCloseEvent* event )
+{
+  this->disconnect_all();
+
+  if ( this->viewer_interface_ )
+  {
+    this->viewer_interface_->close();
+    this->viewer_interface_->deleteLater();
+  }
+
+  if ( this->controller_interface_ )
+  {
+    this->controller_interface_->close();
+    this->controller_interface_->deleteLater();
+  }
+  
+  if ( this->history_dock_window_ )
+  {
+    this->history_dock_window_->close();
+    this->history_dock_window_->deleteLater();
+  }
+  
+  if ( this->project_dock_window_ )
+  {
+    this->project_dock_window_->close();
+    this->project_dock_window_->deleteLater();
+  }
+  
+  if ( this->tools_dock_window_ )
+  {
+    this->tools_dock_window_->close();
+    this->tools_dock_window_->deleteLater();
+  }
+  
+  if ( this->layer_manager_dock_window_ )
+  {
+    this->layer_manager_dock_window_->close();
+    this->layer_manager_dock_window_->deleteLater();
+  }
+  
+  if ( this->measurement_dock_window_ )
+  {
+    this->measurement_dock_window_->close();
+    this->measurement_dock_window_->deleteLater();
+  }
+  
+  if ( this->progress_ )
+  {
+    this->progress_->close();
+    this->progress_->deleteLater();
+  }
+
+  event->accept();
 }
 
 void AppInterface::center_seg3d_gui_on_screen( QWidget *widget ) 
@@ -131,13 +193,7 @@ void AppInterface::set_full_screen( bool full_screen )
   else showNormal();
 }
 
-AppInterface::~AppInterface()
-{
-  //  viewer_interface_->writeSizeSettings();
-}
-
-ViewerInterface*
-AppInterface::viewer_interface()
+ViewerInterface* AppInterface::viewer_interface()
 {
   return viewer_interface_.data();
 }

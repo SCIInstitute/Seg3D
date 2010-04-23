@@ -133,14 +133,14 @@ AppController::AppController( QWidget* parent ) :
   // Step 5: Link the ActionHistory/StateEngine/EventLog to this widget and have it update 
   // automatically using the signal/slot system
 
-  ActionHistory::Instance()->history_changed_signal_.connect( boost::bind(
-      &AppController::UpdateActionHistory, controller ) );
+  this->add_connection( ActionHistory::Instance()->history_changed_signal_.connect( 
+    boost::bind( &AppController::UpdateActionHistory, controller ) ) );
 
-  StateEngine::Instance()->state_changed_signal_.connect( boost::bind(
-    &AppController::UpdateStateEngine, controller ) );
+  this->add_connection( StateEngine::Instance()->state_changed_signal_.connect( 
+    boost::bind( &AppController::UpdateStateEngine, controller ) ) );
   
-  Utils::Log::Instance()->post_log_signal_.connect( boost::bind(
-      &AppController::UpdateLogHistory, controller, true, _1, _2 ) );
+  this->add_connection( Utils::Log::Instance()->post_log_signal_.connect( 
+    boost::bind( &AppController::UpdateLogHistory, controller, true, _1, _2 ) ) );
 
   // Step 6: Qt connections
   // Connect the edit box to the slot that posts the action
@@ -149,6 +149,15 @@ AppController::AppController( QWidget* parent ) :
 
 AppController::~AppController()
 {
+}
+
+void AppController::closeEvent( QCloseEvent* event )
+{
+  QWidget::closeEvent( event );
+  if ( event->isAccepted() )
+  {
+    this->disconnect_all();
+  }
 }
 
 void AppController::post_action()

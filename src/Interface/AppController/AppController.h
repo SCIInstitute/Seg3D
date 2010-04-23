@@ -40,6 +40,7 @@
 #include <QtGui>
 
 // Utils includes
+#include <Utils/Core/ConnectionHandler.h>
 #include <Utils/Core/Log.h>
 
 // Application includes
@@ -56,7 +57,7 @@ typedef boost::shared_ptr< AppControllerPrivate > AppControllerPrivateHandle;
 class AppController;
 
 // Class definition
-class AppController : public QWidget
+class AppController : public QWidget, private Utils::ConnectionHandler
 {
 Q_OBJECT
 
@@ -72,6 +73,9 @@ public Q_SLOTS:
   void post_action();
   void post_action_message( std::string message );
   void post_action_usage( std::string usage );
+
+protected:
+  virtual void closeEvent ( QCloseEvent* event );
 
 private:
   AppControllerPrivateHandle private_;

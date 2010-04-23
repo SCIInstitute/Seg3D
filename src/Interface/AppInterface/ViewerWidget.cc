@@ -320,6 +320,7 @@ ViewerWidgetPrivate::ViewerWidgetPrivate( QWidget *parent )
   slice_visible_button_->setFixedWidth( 20 );
 
   this->picking_button_ = new SingleShotToolButton( this->buttonbar_ );
+  this->picking_button_->setCheckable( true );
   this->picking_button_->setToolButtonStyle( Qt::ToolButtonIconOnly );
   this->picking_button_->setIcon( picking_icon );
   this->picking_button_->setText( QString( "Picking" ) );
@@ -415,6 +416,7 @@ void ViewerWidget::change_view_type( QAction* viewer_type )
   this->private_->flip_vert_button_->setVisible( !is_volume_view );
   this->private_->grid_button_->setVisible( !is_volume_view );
   this->private_->picking_button_->setVisible( !is_volume_view );
+  this->private_->slice_visible_button_->setVisible( !is_volume_view );
 
   if ( !is_volume_view )
   {

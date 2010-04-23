@@ -60,6 +60,8 @@
 #include <Interface/AppInterface/AppStatusBar.h>
 #include <Interface/AppController/AppController.h>
 
+#include <Utils/Core/ConnectionHandler.h>
+
 namespace Seg3D
 {
 
@@ -72,7 +74,7 @@ namespace Seg3D
 // Although there is only one instance of this class
 // in the program 
 
-class AppInterface : public QMainWindow
+class AppInterface : public QMainWindow, private Utils::ConnectionHandler
 {
 Q_OBJECT
 
@@ -110,6 +112,9 @@ private:
   // Overload the default addDockWidget and upgrade it, so docks are added
   // on top of each other
   void addDockWidget( Qt::DockWidgetArea area, QDockWidget* dock_widget );
+
+protected:
+  virtual void closeEvent ( QCloseEvent* event );
 
 private:
   // Pointer to the main canvas of the main window
