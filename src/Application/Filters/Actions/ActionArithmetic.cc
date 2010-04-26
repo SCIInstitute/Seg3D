@@ -67,7 +67,7 @@ bool ActionArithmetic::run( ActionContextHandle& context, ActionResultHandle& re
   {
     // TODO: run filter
     context->report_message( "The Arithmetic Filter has been triggered "
-      "successfully on: "  + this->layer_a_alias_ + ", " + this->layer_b_alias_
+      "successfully on layers: "  + this->layer_a_alias_ + ", " + this->layer_b_alias_
       + ", and " + this->layer_c_alias_ );
     
     return true;
@@ -78,7 +78,7 @@ bool ActionArithmetic::run( ActionContextHandle& context, ActionResultHandle& re
 
 
 void ActionArithmetic::Dispatch( std::string layer_a_alias, std::string layer_b_alias, 
-                std::string layer_c_alias, std::string expression, bool replace )
+  std::string layer_c_alias, std::string expression, bool replace )
 {
   ActionArithmetic* action = new ActionArithmetic;
   action->layer_a_alias_ = layer_a_alias;

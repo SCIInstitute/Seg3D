@@ -62,7 +62,7 @@ bool ActionDiscreteGaussian::run( ActionContextHandle& context, ActionResultHand
   {
     // TODO: run filter
     context->report_message( "The Discrete Gaussian Filter has been triggered "
-      "successfully on: "  + this->layer_alias_ );
+      "successfully on layer: "  + this->layer_alias_ );
     
     return true;
   }
@@ -71,7 +71,8 @@ bool ActionDiscreteGaussian::run( ActionContextHandle& context, ActionResultHand
 }
 
 
-void ActionDiscreteGaussian::Dispatch( std::string layer_alias, double variance, double kernelwidth, bool replace )
+void ActionDiscreteGaussian::Dispatch( std::string layer_alias, double variance, double kernelwidth, 
+  bool replace )
 {
   ActionDiscreteGaussian* action = new ActionDiscreteGaussian;
   action->layer_alias_ = layer_alias;

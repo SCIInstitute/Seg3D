@@ -67,7 +67,7 @@ bool ActionThresholdSegmentationLS::run( ActionContextHandle& context, ActionRes
   {
     // TODO: run filter
     context->report_message( "The Threshold Segmentation Level Set Filter has been triggered "
-                 "successfully on: "  + this->layer_alias_ );
+      "successfully on layer: "  + this->layer_alias_ + " with mask: " + this->mask_alias_ );
     return true;
   }
     

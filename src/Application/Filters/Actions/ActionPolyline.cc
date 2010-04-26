@@ -55,7 +55,7 @@ bool ActionPolyline::run( ActionContextHandle& context, ActionResultHandle& resu
   {
     // TODO: run filter
     context->report_message( "The Polyline Tool has been triggered "
-      "successfully on: "  + this->layer_alias_ );
+      "successfully on layer: "  + this->layer_alias_ );
     
     return true;
   }

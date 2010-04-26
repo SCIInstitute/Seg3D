@@ -55,7 +55,7 @@ bool ActionBoolean::run( ActionContextHandle& context, ActionResultHandle& resul
   {
     // TODO: run filter
     context->report_message( "The Arithmetic Filter has been triggered "
-      "successfully on: "  + this->mask_a_alias_ + ", " + this->mask_b_alias_
+      "successfully on layers: "  + this->mask_a_alias_ + ", " + this->mask_b_alias_
       + ", " + this->mask_c_alias_ + ", and " + this->mask_d_alias_ );
     
     return true;
@@ -66,14 +66,13 @@ bool ActionBoolean::run( ActionContextHandle& context, ActionResultHandle& resul
 
 
 void ActionBoolean::Dispatch( std::string mask_a_alias, std::string mask_b_alias, 
-                std::string mask_c_alias, std::string mask_d_alias,
-                std::string expression, bool replace )
+  std::string mask_c_alias, std::string mask_d_alias, std::string expression, bool replace )
 {
   ActionBoolean* action = new ActionBoolean;
   action->mask_a_alias_ = mask_a_alias;
   action->mask_b_alias_ = mask_b_alias;
   action->mask_c_alias_ = mask_c_alias;
-  action->mask_c_alias_ = mask_d_alias;
+  action->mask_d_alias_ = mask_d_alias;
   action->expression_ = expression;
   action->replace_ = replace;
   

@@ -55,7 +55,7 @@ bool ActionMaskData::run( ActionContextHandle& context, ActionResultHandle& resu
   {
     // TODO: run filter
     context->report_message( "The Mask Data Filter has been triggered "
-      "successfully on: "  + this->layer_alias_ + ", and " + this->mask_alias_ );
+      "successfully on layer: "  + this->layer_alias_ + " with mask: " + this->mask_alias_ );
     
     return true;
   }
@@ -64,8 +64,8 @@ bool ActionMaskData::run( ActionContextHandle& context, ActionResultHandle& resu
 }
 
 
-  void ActionMaskData::Dispatch( std::string layer_alias, std::string mask_alias, 
-                  std::string replace_with, bool replace )
+void ActionMaskData::Dispatch( std::string layer_alias, std::string mask_alias, 
+  std::string replace_with, bool replace )
 {
   ActionMaskData* action = new ActionMaskData;
   action->layer_alias_ = layer_alias;

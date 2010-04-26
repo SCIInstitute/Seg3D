@@ -55,7 +55,7 @@ bool ActionFillHoles::run( ActionContextHandle& context, ActionResultHandle& res
   {
     // TODO: run filter
     context->report_message( "The Fill Holes Filter has been triggered "
-      "successfully on: "  + this->layer_alias_ );
+      "successfully on layer: "  + this->layer_alias_ );
     
     return true;
   }

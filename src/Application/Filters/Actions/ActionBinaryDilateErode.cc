@@ -62,7 +62,7 @@ bool ActionBinaryDilateErode::run( ActionContextHandle& context, ActionResultHan
   {
     // TODO: run filter
     context->report_message( "The Binary Dilate Erode Filter has been triggered "
-      "successfully on: "  + this->layer_alias_ );
+      "successfully on layer: "  + this->layer_alias_ );
     
     return true;
   }
@@ -71,7 +71,8 @@ bool ActionBinaryDilateErode::run( ActionContextHandle& context, ActionResultHan
 }
 
 
-void ActionBinaryDilateErode::Dispatch( std::string layer_alias, int dialate, int erode, bool replace )
+void ActionBinaryDilateErode::Dispatch( std::string layer_alias, int dialate, int erode, 
+  bool replace )
 {
   ActionBinaryDilateErode* action = new ActionBinaryDilateErode;
   action->layer_alias_ = layer_alias;

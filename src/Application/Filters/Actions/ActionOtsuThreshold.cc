@@ -58,7 +58,7 @@ bool ActionOtsuThreshold::run( ActionContextHandle& context, ActionResultHandle&
   {
     // TODO: run filter
     context->report_message( "The Otsu Threshold Filter has been triggered "
-                 "successfully on: "  + this->layer_alias_ );
+      "successfully on layer: "  + this->layer_alias_ );
     return true;
   }
     
@@ -66,7 +66,7 @@ bool ActionOtsuThreshold::run( ActionContextHandle& context, ActionResultHandle&
 }
 
 
-  void ActionOtsuThreshold::Dispatch( std::string layer_alias, int order )
+void ActionOtsuThreshold::Dispatch( std::string layer_alias, int order )
 {
   ActionOtsuThreshold* action = new ActionOtsuThreshold;
   action->layer_alias_ = layer_alias;

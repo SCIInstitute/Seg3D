@@ -54,8 +54,8 @@ bool ActionNeighborhoodConnected::run( ActionContextHandle& context, ActionResul
   if ( StateEngine::Instance()->is_statealias( this->layer_alias_ ) )
   {
     // TODO: run filter
-    context->report_message( "The Connected Component Filter has been triggered "
-      "successfully on: "  + this->layer_alias_ );
+    context->report_message( "The Neighborhood Connected Filter has been triggered "
+      "successfully on layer "  + this->layer_alias_ );
     
     return true;
   }

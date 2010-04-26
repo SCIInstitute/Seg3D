@@ -66,7 +66,7 @@ bool ActionCannyEdgeDetection::run( ActionContextHandle& context, ActionResultHa
   {
     // TODO: run filter
     context->report_message( "The Canny Edge Detection Filter has been triggered "
-                 "successfully on: "  + this->layer_alias_ );
+      "successfully on layer: "  + this->layer_alias_ );
     return true;
   }
     
@@ -75,7 +75,7 @@ bool ActionCannyEdgeDetection::run( ActionContextHandle& context, ActionResultHa
 
 
 void ActionCannyEdgeDetection::Dispatch( std::string layer_alias, double variance, 
-                double max_error, double threshold, bool replace )
+  double max_error, double threshold, bool replace )
 {
   ActionCannyEdgeDetection* action = new ActionCannyEdgeDetection;
   action->layer_alias_ = layer_alias;

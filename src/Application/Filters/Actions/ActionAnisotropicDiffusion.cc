@@ -66,7 +66,7 @@ bool ActionAnisotropicDiffusion::run( ActionContextHandle& context, ActionResult
   {
     // TODO: run filter
     context->report_message( "The Anisotropic Diffusion Filter has been triggered "
-                 "successfully on: "  + this->layer_alias_ );
+      "successfully on layer: "  + this->layer_alias_ );
     return true;
   }
     
@@ -74,7 +74,8 @@ bool ActionAnisotropicDiffusion::run( ActionContextHandle& context, ActionResult
 }
 
 
-void ActionAnisotropicDiffusion::Dispatch( std::string layer_alias, int iterations, int integration_step, double conductance, bool replace )
+void ActionAnisotropicDiffusion::Dispatch( std::string layer_alias, int iterations, 
+  int integration_step, double conductance, bool replace )
 {
   ActionAnisotropicDiffusion* action = new ActionAnisotropicDiffusion;
   action->layer_alias_ = layer_alias;

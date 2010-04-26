@@ -55,7 +55,7 @@ bool ActionInvert::run( ActionContextHandle& context, ActionResultHandle& result
   {
     // TODO: run filter
     context->report_message( "The Gradient Magnitude Filter has been triggered "
-      "successfully on: "  + this->layer_alias_ );
+      "successfully on layer: "  + this->layer_alias_ );
     
     return true;
   }

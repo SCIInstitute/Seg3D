@@ -66,7 +66,7 @@ bool ActionHistogramEqualization::run( ActionContextHandle& context, ActionResul
   {
     // TODO: run filter
     context->report_message( "The Histogram Equalization Filter has been triggered "
-                 "successfully on: "  + this->layer_alias_ );
+      "successfully on layer: "  + this->layer_alias_ );
     return true;
   }
     
@@ -74,8 +74,8 @@ bool ActionHistogramEqualization::run( ActionContextHandle& context, ActionResul
 }
 
 
-  void ActionHistogramEqualization::Dispatch( std::string layer_alias, double upper_threshold, 
-                         double lower_threshold, int alpha, bool replace )
+void ActionHistogramEqualization::Dispatch( std::string layer_alias, double upper_threshold, 
+  double lower_threshold, int alpha, bool replace )
 {
   ActionHistogramEqualization* action = new ActionHistogramEqualization;
   action->layer_alias_ = layer_alias;

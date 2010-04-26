@@ -62,7 +62,7 @@ bool ActionConfidenceConnected::run( ActionContextHandle& context, ActionResultH
   {
     // TODO: run filter
     context->report_message( "The Confidence Connected Filter has been triggered "
-      "successfully on: "  + this->layer_alias_ );
+      "successfully on layer: "  + this->layer_alias_ );
     
     return true;
   }
