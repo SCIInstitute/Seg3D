@@ -41,12 +41,12 @@ BooleanFilter::BooleanFilter( const std::string& toolid ) :
   Tool( toolid )
 {
   // add default values for the the states
-  add_state( "mask_a", mask_a_state_, "<none>" );
-  add_state( "mask_b", mask_b_state_, "<none>" );
-  add_state( "mask_c", mask_c_state_, "<none>" );
-  add_state( "mask_d", mask_d_state_, "<none>" );
-  add_state( "example_expressions", example_expressions_state_, "<none>", "<none>" );
-  add_state( "replace", replace_state_, false );
+  add_state( "mask_a", this->mask_a_state_, "<none>" );
+  add_state( "mask_b", this->mask_b_state_, "<none>" );
+  add_state( "mask_c", this->mask_c_state_, "<none>" );
+  add_state( "mask_d", this->mask_d_state_, "<none>" );
+  add_state( "example_expressions", this->example_expressions_state_, "<none>", "<none>" );
+  add_state( "replace", this->replace_state_, false );
 
   this->handle_layers_changed();
   
@@ -82,35 +82,52 @@ void BooleanFilter::handle_layers_changed()
   
   for( int i = 0; i < static_cast< int >( target_layers.size() ); ++i )
   {
-    if( mask_a_state_->get() == "<none>" )
+    if( ( this->mask_a_state_->get() == "<none>" ) && ( target_layers[i]->type() == 
+                           Utils::VolumeType::MASK_E ) )
     {
-      mask_a_state_->set( target_layers[i]->get_layer_name(), ActionSource::NONE_E );
+      this->mask_a_state_->set( target_layers[i]->get_layer_name(), ActionSource::NONE_E );
     }
+    if( ( this->mask_b_state_->get() == "<none>" ) && ( target_layers[i]->type() == 
+                           Utils::VolumeType::MASK_E ) )
+    {
+      this->mask_b_state_->set( target_layers[i]->get_layer_name(), ActionSource::NONE_E );
+    }
+    if( ( this->mask_c_state_->get() == "<none>" ) && ( target_layers[i]->type() == 
+                           Utils::VolumeType::MASK_E ) )
+    {
+      this->mask_c_state_->set( target_layers[i]->get_layer_name(), ActionSource::NONE_E );
+    }
+    if( ( this->mask_d_state_->get() == "<none>" ) && ( target_layers[i]->type() == 
+                           Utils::VolumeType::MASK_E ) )
+    {
+      this->mask_d_state_->set( target_layers[i]->get_layer_name(), ActionSource::NONE_E );
+    }
+
   
-    if( target_layers[i]->get_layer_name() == mask_a_state_->get() ) 
+    if( target_layers[i]->get_layer_name() == this->mask_a_state_->get() ) 
       mask_a_found = true;
     
-    if( target_layers[i]->get_layer_name() == mask_b_state_->get() )
+    if( target_layers[i]->get_layer_name() == this->mask_b_state_->get() )
       mask_b_found = true;
     
-    if( target_layers[i]->get_layer_name() == mask_c_state_->get() ) 
+    if( target_layers[i]->get_layer_name() == this->mask_c_state_->get() ) 
       mask_c_found = true;
     
-    if( target_layers[i]->get_layer_name() == mask_d_state_->get() )
+    if( target_layers[i]->get_layer_name() == this->mask_d_state_->get() )
       mask_d_found = true;
   }
   
   if( !mask_a_found )
-    mask_a_state_->set( "", ActionSource::NONE_E );
+    this->mask_a_state_->set( "", ActionSource::NONE_E );
   
   if( !mask_b_found )
-    mask_b_state_->set( "", ActionSource::NONE_E );
+    this->mask_b_state_->set( "", ActionSource::NONE_E );
   
   if( !mask_c_found )
-    mask_c_state_->set( "", ActionSource::NONE_E );
+    this->mask_c_state_->set( "", ActionSource::NONE_E );
   
   if( !mask_d_found )
-    mask_d_state_->set( "", ActionSource::NONE_E );
+    this->mask_d_state_->set( "", ActionSource::NONE_E );
   
 }
 

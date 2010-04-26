@@ -64,12 +64,14 @@ private:
   double conductance_;
   bool replace_;
   
+  
   // -- Dispatch this action from the interface --
 public:
     
   // DISPATCH
   // Create and dispatch action that inserts the new layer 
-  static void Dispatch( std::string layer_alias, int iterations, int integration_step, double conductance, bool replace );
+  static void Dispatch( std::string layer_alias, int iterations, int integration_step, 
+             double conductance, bool replace );
   
 };
   

@@ -41,9 +41,11 @@ ThresholdTool::ThresholdTool( const std::string& toolid ) :
   Tool( toolid )
 {
   // Need to set ranges and default values for all parameters
-  add_state( "target", target_layer_state_, "<none>" );
-  add_state( "upper_threshold", upper_threshold_state_, 1.0, 0.0, 1.0, .01 );
-  add_state( "lower_threshold", lower_threshold_state_, 0.0, 0.0, 1.0, .01 );
+  add_state( "target", this->target_layer_state_, "<none>" );
+  add_state( "upper_threshold", this->upper_threshold_state_, 1.0, 0.0, 1.0, .01 );
+  add_state( "lower_threshold", this->lower_threshold_state_, 0.0, 0.0, 1.0, .01 );
+  
+  this->handle_layers_changed();
 
   // Add constaints, so that when the state changes the right ranges of
   // parameters are selected
@@ -69,6 +71,13 @@ void ThresholdTool::handle_layers_changed()
   
   for( int i = 0; i < static_cast< int >( target_layers.size() ); ++i )
   {
+    if( ( this->target_layer_state_->get() == "<none>" ) && ( target_layers[i]->type() == 
+                                 Utils::VolumeType::DATA_E ) )
+    {
+      this->target_layer_state_->set( target_layers[i]->get_layer_name(), ActionSource::NONE_E );
+      target_found = true;
+      break;
+    }
     if( target_layers[i]->get_layer_name() == target_layer_state_->get() ) {
       target_found = true;
       break;

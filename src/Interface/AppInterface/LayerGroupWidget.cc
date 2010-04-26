@@ -287,7 +287,8 @@ void LayerGroupWidget::insert_layer( LayerHandle layer, int index )
     this->private_->ui_.group_frame_layout_->insertWidget( index, new_layer_handle.data() );
   }
   this->layer_list_.push_back( new_layer_handle );
-  this->update();
+  this->repaint( QRect( 0, 0, this->width(), this->height() ) );
+
   
 }
 
@@ -301,6 +302,7 @@ bool LayerGroupWidget::delete_layer( LayerHandle layer )
     {
       ( *i )->deleteLater();
       layer_list_.erase( i );
+      this->repaint( QRect( 0, 0, this->width(), this->height() ) );
       return true;
     }
   }
@@ -392,7 +394,7 @@ void LayerGroupWidget::uncheck_delete_confirm()
 
 void LayerGroupWidget::show_layers( bool show )
 {
-  if (show) 
+  if(show) 
   {
     this->private_->ui_.group_frame_->show();
     this->private_->ui_.group_tools_->show();
@@ -407,7 +409,7 @@ void LayerGroupWidget::show_layers( bool show )
 
 void LayerGroupWidget::show_resample( bool show )
 {
-  if (show) 
+  if(show) 
   {
     this->private_->ui_.resample_->show();
     
@@ -429,12 +431,12 @@ void LayerGroupWidget::show_resample( bool show )
     this->private_->ui_.resample_->hide();
   }
   show_selection_checkboxes( show );
-  this->repaint();
+  this->repaint( QRect( 0, 0, this->width(), this->height() ) );
 }
 
 void LayerGroupWidget::show_transform( bool show )
 {
-  if (show) 
+  if(show) 
   {
     this->private_->ui_.transform_->show();
     
@@ -455,12 +457,12 @@ void LayerGroupWidget::show_transform( bool show )
     this->private_->ui_.transform_->hide();
   }
   show_selection_checkboxes( show );
-  this->repaint();
+  this->repaint( QRect( 0, 0, this->width(), this->height() ) );
 }
 
 void LayerGroupWidget::show_crop( bool show )
 {
-  if (show) 
+  if(show) 
   {
     this->private_->ui_.roi_->show();
     
@@ -481,12 +483,12 @@ void LayerGroupWidget::show_crop( bool show )
     this->private_->ui_.roi_->hide();
   }
   show_selection_checkboxes( show );
-  this->repaint();
+  this->repaint( QRect( 0, 0, this->width(), this->height() ) );
 }
 
 void LayerGroupWidget::show_flip_rotate( bool show )
 {
-  if (show) 
+  if(show) 
   {
     this->private_->ui_.flip_rotate_->show();
     
@@ -507,12 +509,12 @@ void LayerGroupWidget::show_flip_rotate( bool show )
     this->private_->ui_.flip_rotate_->hide();
   }
   show_selection_checkboxes( show );
-  this->repaint();
+  this->repaint( QRect( 0, 0, this->width(), this->height() ) );
 }
 
 void LayerGroupWidget::show_delete( bool show )
 {
-  if (show) 
+  if(show) 
   {
     this->private_->ui_.delete_->show();
     
@@ -534,7 +536,7 @@ void LayerGroupWidget::show_delete( bool show )
     this->private_->ui_.group_delete_button_->setChecked( false );
   }
   show_selection_checkboxes( show );
-  this->repaint();
+  this->repaint( QRect( 0, 0, this->width(), this->height() ) );
 }
 
   

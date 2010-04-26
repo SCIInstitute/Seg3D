@@ -72,14 +72,14 @@ ProgressWidget::ProgressWidget( ActionProgressHandle action_progress, QWidget *p
   this->private_->ui_.message_->setText( QString::fromStdString( action_progress_->get_message() ) );
 
   // Step (5): Setup cancel button
-  if ( !( this->action_progress_->is_interruptable() ) )
+  if( !( this->action_progress_->is_interruptable() ) )
   {
     this->private_->ui_.cancel_button_->hide();
     this->private_->ui_.running_->setPixmap( this->private_->running_pixmap_[ 0 ] );
   }
 
   // Step (6): Setup progress bar or waiting animation
-  if ( !( this->action_progress_->has_progress_updates() ) )
+  if( !( this->action_progress_->has_progress_updates() ) )
   {
     this->private_->ui_.progress_bar_->hide();
     this->private_->ui_.line_->hide();
@@ -111,7 +111,7 @@ void ProgressWidget::update_running()
 {
   // Loop through the animation
   this->private_->running_count_++;
-  if ( this->private_->running_count_ > 17 ) this->private_->running_count_ = 0;
+  if( this->private_->running_count_ > 17 ) this->private_->running_count_ = 0;
   this->private_->ui_.running_->setPixmap( 
     this->private_->running_pixmap_[ this->private_->running_count_ ] );
 }

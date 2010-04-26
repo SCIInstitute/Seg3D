@@ -41,20 +41,23 @@
 namespace Seg3D
 {
 
-class PolyLineToolInterfacePrivate;
+class PolylineToolInterfacePrivate;
 
-class PolyLineToolInterface : public ToolWidget
+class PolylineToolInterface : public ToolWidget
 {
 Q_OBJECT
 
 // Constructor/destructor
 public:
-  PolyLineToolInterface();
-  virtual ~PolyLineToolInterface();
+  PolylineToolInterface();
+  virtual ~PolylineToolInterface();
   virtual bool build_widget( QFrame* frame );
+  
+private Q_SLOTS:
+  void execute_filter();
 
 private:
-  boost::shared_ptr< PolyLineToolInterfacePrivate > private_;
+  boost::shared_ptr< PolylineToolInterfacePrivate > private_;
 
 };
 

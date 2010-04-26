@@ -55,10 +55,8 @@ private Q_SLOTS:
   
 private:
   QTimer *timer_;
-  //QTimer *shrink_timer_;
   bool changing_size_;
   bool open_;
-  int height_;
   QWidget* parent_;
   
 };

@@ -48,9 +48,9 @@ MeasurementDockWidget::MeasurementDockWidget( QWidget *parent ) :
   QDockWidget( parent ), private_( new MeasurementDockWidgetPrivate )
 {
   // Set up the private internals of the LayerManagerInterface class
-  if ( private_ )
+  if( this->private_ )
   {
-    private_->ui_.setupUi( this );
+    this->private_->ui_.setupUi( this );
 
   }
 }

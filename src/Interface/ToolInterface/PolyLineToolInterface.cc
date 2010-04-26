@@ -32,37 +32,38 @@
 #include <Interface/ToolInterface/CustomWidgets/TargetComboBox.h>
 
 //Qt Gui Includes
-#include <Interface/ToolInterface/PolyLineToolInterface.h>
-#include "ui_PolyLineToolInterface.h"
+#include <Interface/ToolInterface/PolylineToolInterface.h>
+#include "ui_PolylineToolInterface.h"
 
 //Application Includes
 #include <Application/Tools/PolylineTool.h>
+#include <Application/Filters/Actions/ActionPolyline.h>
 
 namespace Seg3D
 {
 
-SCI_REGISTER_TOOLINTERFACE(PolyLineToolInterface)
+SCI_REGISTER_TOOLINTERFACE(PolylineToolInterface)
 
-class PolyLineToolInterfacePrivate
+class PolylineToolInterfacePrivate
 {
 public:
-  Ui::PolyLineToolInterface ui_;
+  Ui::PolylineToolInterface ui_;
   TargetComboBox *target_;
 };
 
 // constructor
-PolyLineToolInterface::PolyLineToolInterface() :
-  private_( new PolyLineToolInterfacePrivate )
+PolylineToolInterface::PolylineToolInterface() :
+  private_( new PolylineToolInterfacePrivate )
 {
 }
 
 // destructor
-PolyLineToolInterface::~PolyLineToolInterface()
+PolylineToolInterface::~PolylineToolInterface()
 {
 }
 
 // build the interface and connect it to the state manager
-bool PolyLineToolInterface::build_widget( QFrame* frame )
+bool PolylineToolInterface::build_widget( QFrame* frame )
 {
   //Step 1 - build the Qt GUI Widget
   this->private_->ui_.setupUi( frame );
@@ -80,12 +81,25 @@ bool PolyLineToolInterface::build_widget( QFrame* frame )
 
   //Step 4 - connect the gui to the tool through the QtBridge
   QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
+  
+  //TODO: need to decide how to pass fill vs delete
+  
+  this->private_->target_->sync_layers();
 
   //Send a message to the log that we have finised with building the Polyline Tool Interface
-  SCI_LOG_MESSAGE("Finished building a PolyLine Tool Interface");
+  SCI_LOG_MESSAGE("Finished building a Polyline Tool Interface");
 
   return ( true );
 } // end build_widget
-
+  
+void PolylineToolInterface::execute_filter()
+{
+  ToolHandle base_tool_ = tool();
+  PolylineTool* tool =
+  dynamic_cast< PolylineTool* > ( base_tool_.get() );
+  
+  ActionPolyline::Dispatch( tool->target_layer_state_->export_to_string() ); 
+}
+  
 } // end namespace Seg3D
 

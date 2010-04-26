@@ -42,11 +42,11 @@ ArithmeticFilter::ArithmeticFilter( const std::string& toolid ) :
   Tool( toolid )
 {
   // add default values for the the states
-  add_state( "volume_a", volume_a_state_, "<none>" );
-  add_state( "volume_b", volume_b_state_, "<none>" );
-  add_state( "volume_c", volume_c_state_, "<none>" );
-  add_state( "example_expressions", example_expressions_state_, "<none>", "<none>" );
-  add_state( "replace", replace_state_, false );
+  add_state( "volume_a", this->volume_a_state_, "<none>" );
+  add_state( "volume_b", this->volume_b_state_, "<none>" );
+  add_state( "volume_c", this->volume_c_state_, "<none>" );
+  add_state( "example_expressions", this->example_expressions_state_, "<none>", "<none>" );
+  add_state( "replace", this->replace_state_, false );
 
   this->handle_layers_changed();
 
@@ -79,29 +79,40 @@ void ArithmeticFilter::handle_layers_changed()
   
   for( int i = 0; i < static_cast< int >( target_layers.size() ); ++i )
   {
-    if( volume_a_state_->get() == "<none>" )
+    if( ( this->volume_a_state_->get() == "<none>" ) && ( target_layers[i]->type() == 
+                                 Utils::VolumeType::DATA_E ) )
     {
-      volume_a_state_->set( target_layers[i]->get_layer_name(), ActionSource::NONE_E );
+      this->volume_a_state_->set( target_layers[i]->get_layer_name(), ActionSource::NONE_E );
+    }
+    if( ( this->volume_b_state_->get() == "<none>" ) && ( target_layers[i]->type() == 
+                               Utils::VolumeType::DATA_E ) )
+    {
+      this->volume_b_state_->set( target_layers[i]->get_layer_name(), ActionSource::NONE_E );
+    }
+    if( ( this->volume_c_state_->get() == "<none>" ) && ( target_layers[i]->type() == 
+                               Utils::VolumeType::DATA_E ) )
+    {
+      this->volume_c_state_->set( target_layers[i]->get_layer_name(), ActionSource::NONE_E );
     }
   
-    if( target_layers[i]->get_layer_name() == volume_a_state_->get() ) 
+    if( target_layers[i]->get_layer_name() == this->volume_a_state_->get() ) 
       volume_a_found = true;
     
-    if( target_layers[i]->get_layer_name() == volume_b_state_->get() )
+    if( target_layers[i]->get_layer_name() == this->volume_b_state_->get() )
       volume_b_found = true;
     
-    if( target_layers[i]->get_layer_name() == volume_c_state_->get() )
+    if( target_layers[i]->get_layer_name() == this->volume_c_state_->get() )
       volume_c_found = true;
   }
   
   if( !volume_a_found )
-    volume_a_state_->set( "", ActionSource::NONE_E );
+    this->volume_a_state_->set( "", ActionSource::NONE_E );
   
   if( !volume_b_found )
-    volume_b_state_->set( "", ActionSource::NONE_E );
+    this->volume_b_state_->set( "", ActionSource::NONE_E );
   
   if( !volume_c_found )
-    volume_c_state_->set( "", ActionSource::NONE_E );
+    this->volume_c_state_->set( "", ActionSource::NONE_E );
   
 }
 

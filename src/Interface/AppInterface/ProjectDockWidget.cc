@@ -47,7 +47,7 @@ public:
 ProjectDockWidget::ProjectDockWidget( QWidget *parent ) :
   QDockWidget( parent ), private_( new ProjectDockWidgetPrivate )
 {
-  if ( private_ )
+  if( private_ )
   {
     private_->ui_.setupUi( this );
   }

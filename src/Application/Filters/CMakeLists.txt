@@ -55,6 +55,28 @@ SET(APPLICATION_FILTERS_ACTIONS_SRCS
   Actions/ActionFillHoles.cc
   Actions/ActionGradientMagnitude.h
   Actions/ActionGradientMagnitude.cc
+  Actions/ActionHistogramEqualization.h
+  Actions/ActionHistogramEqualization.cc
+  Actions/ActionIntensityCorrection.h
+  Actions/ActionIntensityCorrection.cc
+  Actions/ActionInvert.h
+  Actions/ActionInvert.cc
+  Actions/ActionMaskData.h
+  Actions/ActionMaskData.cc
+  Actions/ActionMedian.h
+  Actions/ActionMedian.cc
+  Actions/ActionNeighborhoodConnected.h
+  Actions/ActionNeighborhoodConnected.cc
+  Actions/ActionOtsuThreshold.h
+  Actions/ActionOtsuThreshold.cc
+  Actions/ActionPaint.h
+  Actions/ActionPaint.cc
+  Actions/ActionPolyline.h
+  Actions/ActionPolyline.cc
+  Actions/ActionThresholdSegmentationLS.h
+  Actions/ActionThresholdSegmentationLS.cc
+  Actions/ActionThreshold.h
+  Actions/ActionThreshold.cc
   )
 
 ADD_LIBRARY(Application_Filters STATIC 

@@ -42,7 +42,6 @@ DropSpaceWidget::DropSpaceWidget( QWidget *parent ) :
   
   this->setObjectName( QString::fromUtf8( "insert_space_" ));
   this->setFixedHeight( 0 );  
-  this->height_ = 0;
   this->setStyleSheet( QString::fromUtf8(
     "/*DropSpaceWidget#insert_space_{\n*/"
     " border-radius: 3px;\n"
@@ -74,28 +73,44 @@ DropSpaceWidget::~DropSpaceWidget()
   void DropSpaceWidget::show()
   {
     this->open_ = true;
-    if ( !this->timer_->isActive() ) {
-      this->timer_->start(10);
-    }
+    
+    #if defined( _WIN32 )
+      if( !this->timer_->isActive() ) 
+      {
+        this->timer_->start(10);
+      }
+    #else
+      this->setFixedHeight( 45 );
+      this->updateGeometry();
+      this->setVisible( true );
+    #endif
   }
   
   void DropSpaceWidget::hide()
   {
     this->open_ = false;
-    if ( !this->timer_->isActive() ) {
-      this->timer_->start(10);
-    }
+    
+    #if defined( _WIN32 )
+      if( !this->timer_->isActive() ) 
+      {
+        this->timer_->start(10);
+      }
+    #else
+      this->setFixedHeight( 0 );
+      this->updateGeometry();
+      this->setVisible( false );  
+    #endif
   }
   
   void DropSpaceWidget::change_size()
   {
-    if ( this->open_ ) 
+    if( this->open_ ) 
     {
-      if ( this->isHidden() ) 
+      if( this->isHidden() ) 
       {
         this->setVisible( true );
       }
-      if ( this->height() < 45 ) {
+      if( this->height() < 45 ) {
         this->setFixedHeight( ( this->height() + 5 ) );
         this->updateGeometry();
         this->timer_->start(10);
@@ -103,7 +118,7 @@ DropSpaceWidget::~DropSpaceWidget()
     }
     else 
     {
-      if ( this->height() > 0 ) 
+      if( this->height() > 0 ) 
       {
         this->setFixedHeight( ( this->height() - 15 ) );
         this->updateGeometry();
@@ -116,6 +131,7 @@ DropSpaceWidget::~DropSpaceWidget()
 
   }
 
+  
   
   
 } // end namespace Seg3D

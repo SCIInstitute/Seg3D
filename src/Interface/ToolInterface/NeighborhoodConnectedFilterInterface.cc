@@ -36,6 +36,7 @@
 
 //Application Includes
 #include <Application/Tools/NeighborhoodConnectedFilter.h>
+#include <Application/Filters/Actions/ActionNeighborhoodConnected.h>
 
 namespace Seg3D
 {
@@ -80,11 +81,33 @@ bool NeighborhoodConnectedFilterInterface::build_widget( QFrame* frame )
       
   //Step 4 - connect the gui to the tool through the QtBridge
   QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
+  connect( this->private_->target_, SIGNAL( valid( bool ) ), this, SLOT( enable_run_filter( bool ) ) );
+  
+  connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), this, SLOT( execute_filter() ) );
+  
+  this->private_->target_->sync_layers();
 
   //Send a message to the log that we have finised with building the Neighborhood Connected Filter Interface
   SCI_LOG_DEBUG("Finished building an Neighborhood Connected Filter Interface");
   return ( true );
 
+}
+  
+void NeighborhoodConnectedFilterInterface::enable_run_filter( bool valid )
+{
+  if( valid )
+    this->private_->ui_.runFilterButton->setEnabled( true );
+  else
+    this->private_->ui_.runFilterButton->setEnabled( false );
+}
+
+void NeighborhoodConnectedFilterInterface::execute_filter()
+{
+  ToolHandle base_tool_ = tool();
+  NeighborhoodConnectedFilter* tool =
+  dynamic_cast< NeighborhoodConnectedFilter* > ( base_tool_.get() );
+  
+  ActionNeighborhoodConnected::Dispatch( tool->target_layer_state_->export_to_string() ); 
 }
 
 } // namespace Seg3D

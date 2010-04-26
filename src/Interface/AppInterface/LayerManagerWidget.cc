@@ -89,19 +89,19 @@ void LayerManagerWidget::insert_layer( LayerHandle layer )
   for ( QList< LayerGroupWidgetQHandle >::iterator i = this->group_list_.begin(); 
     i  != this->group_list_.end(); i++ )
   {
-    if ( group_id == ( *i )->get_group_id() ) 
+    if( group_id == ( *i )->get_group_id() ) 
     {
       ( *i )->setUpdatesEnabled( false );
       ( *i )->insert_layer( layer, -1 );
       if( layer->get_active() )
         this->set_active_layer( layer );
       ( *i )->setUpdatesEnabled( true );
-      ( *i )->repaint();
+      ( *i )->repaint( QRect( 0, 0, ( *i )->width(), ( *i )->height() ) );
       inserted = true;
       break;
     } 
   }
-  if ( !inserted )
+  if( !inserted )
   {
     make_new_group( layer );
   }
@@ -114,14 +114,14 @@ void LayerManagerWidget::insert_layer( LayerHandle layer, int index )
   for ( QList< LayerGroupWidgetQHandle >::iterator i = this->group_list_.begin(); 
     i  != this->group_list_.end(); i++ )
   {
-    if ( group_id == ( *i )->get_group_id() ) 
+    if( group_id == ( *i )->get_group_id() ) 
     { 
       ( *i )->setUpdatesEnabled( false );
       ( *i )->insert_layer( layer, index );
       if( layer->get_active() )
         this->set_active_layer( layer );
       ( *i )->setUpdatesEnabled( true );
-      ( *i )->repaint();
+      ( *i )->repaint( QRect( 0, 0, ( *i )->width(), ( *i )->height() ) );
       break;
     } 
   }
@@ -129,8 +129,6 @@ void LayerManagerWidget::insert_layer( LayerHandle layer, int index )
 
 void LayerManagerWidget::delete_layers( std::vector< LayerHandle > layers )
 {
-  this->setUpdatesEnabled( false );
-
   for( int j = 0; j < static_cast< int >(layers.size()); ++j )
   {
     for ( QList< LayerGroupWidgetQHandle >::iterator i = this->group_list_.begin(); 
@@ -141,14 +139,10 @@ void LayerManagerWidget::delete_layers( std::vector< LayerHandle > layers )
         break;
     }   
   }
-  this->setUpdatesEnabled( true );
-  this->repaint();
 }
 
 void LayerManagerWidget::delete_layer( LayerHandle layer )
 {
-  this->setUpdatesEnabled( false );
-
   for ( QList< LayerGroupWidgetQHandle >::iterator i = this->group_list_.begin(); 
     i  != this->group_list_.end(); i++ )
   {
@@ -156,9 +150,6 @@ void LayerManagerWidget::delete_layer( LayerHandle layer )
     if( ( *i )->delete_layer( layer ) )
       break;
   }   
-
-  this->setUpdatesEnabled( true );
-  this->repaint();
 }
 
 
@@ -178,7 +169,7 @@ void LayerManagerWidget::delete_group( LayerGroupHandle group )
   for ( QList< LayerGroupWidgetQHandle >::iterator i = this->group_list_.begin(); 
      i  != this->group_list_.end(); i++ )
   {
-    if ( group->get_group_id() == ( *i )->get_group_id() ) 
+    if( group->get_group_id() == ( *i )->get_group_id() ) 
     {
       ( *i )->deleteLater();
       group_list_.erase( i );
@@ -218,62 +209,62 @@ void  LayerManagerWidget::set_active_layer( LayerHandle layer )
 //  for ( LayerList_type::const_iterator i = this->private_->layer_list_.begin(); i
 //      != this->private_->layer_list_.end(); i++ )
 //  {
-//    if ( ( *i )->color_button_01_ == color_button )
+//    if( ( *i )->color_button_01_ == color_button )
 //    {
 //      ( *i )->typeBackground_->setStyleSheet( QString::fromUtf8(
 //          "QWidget#typeBackground_{background-color: rgb(251,255,74);}" ) );
 //    }
-//    if ( ( *i )->color_button_02_ == color_button )
+//    if( ( *i )->color_button_02_ == color_button )
 //    {
 //      ( *i )->typeBackground_->setStyleSheet( QString::fromUtf8(
 //          "QWidget#typeBackground_{background-color: rgb(248,188,37);}" ) );
 //    }
-//    if ( ( *i )->color_button_03_ == color_button )
+//    if( ( *i )->color_button_03_ == color_button )
 //    {
 //      ( *i )->typeBackground_->setStyleSheet( QString::fromUtf8(
 //          "QWidget#typeBackground_{background-color: rgb(249,152,28);}" ) );
 //    }
-//    if ( ( *i )->color_button_04_ == color_button )
+//    if( ( *i )->color_button_04_ == color_button )
 //    {
 //      ( *i )->typeBackground_->setStyleSheet( QString::fromUtf8(
 //          "QWidget#typeBackground_{background-color: rgb(251,78,15);}" ) );
 //    }
-//    if ( ( *i )->color_button_05_ == color_button )
+//    if( ( *i )->color_button_05_ == color_button )
 //    {
 //      ( *i )->typeBackground_->setStyleSheet( QString::fromUtf8(
 //          "QWidget#typeBackground_{background-color: rgb(252,21,17);}" ) );
 //    }
-//    if ( ( *i )->color_button_06_ == color_button )
+//    if( ( *i )->color_button_06_ == color_button )
 //    {
 //      ( *i )->typeBackground_->setStyleSheet( QString::fromUtf8(
 //          "QWidget#typeBackground_{background-color: rgb(166,12,73);}" ) );
 //    }
-//    if ( ( *i )->color_button_07_ == color_button )
+//    if( ( *i )->color_button_07_ == color_button )
 //    {
 //      ( *i )->typeBackground_->setStyleSheet( QString::fromUtf8(
 //          "QWidget#typeBackground_{background-color: rgb(135,0,172);}" ) );
 //    }
-//    if ( ( *i )->color_button_08_ == color_button )
+//    if( ( *i )->color_button_08_ == color_button )
 //    {
 //      ( *i )->typeBackground_->setStyleSheet( QString::fromUtf8(
 //          "QWidget#typeBackground_{background-color: rgb(66,0,161);}" ) );
 //    }
-//    if ( ( *i )->color_button_09_ == color_button )
+//    if( ( *i )->color_button_09_ == color_button )
 //    {
 //      ( *i )->typeBackground_->setStyleSheet( QString::fromUtf8(
 //          "QWidget#typeBackground_{background-color: rgb(45,66,250);}" ) );
 //    }
-//    if ( ( *i )->color_button_10_ == color_button )
+//    if( ( *i )->color_button_10_ == color_button )
 //    {
 //      ( *i )->typeBackground_->setStyleSheet( QString::fromUtf8(
 //          "QWidget#typeBackground_{background-color: rgb(32,146,204);}" ) );
 //    }
-//    if ( ( *i )->color_button_11_ == color_button )
+//    if( ( *i )->color_button_11_ == color_button )
 //    {
 //      ( *i )->typeBackground_->setStyleSheet( QString::fromUtf8(
 //          "QWidget#typeBackground_{background-color: rgb(100,177,61);}" ) );
 //    }
-//    if ( ( *i )->color_button_12_ == color_button )
+//    if( ( *i )->color_button_12_ == color_button )
 //    {
 //      ( *i )->typeBackground_->setStyleSheet( QString::fromUtf8(
 //          "QWidget#typeBackground_{background-color: rgb(205,235,66);}" ) );

@@ -41,15 +41,17 @@ ThresholdSegmentationLSFilter::ThresholdSegmentationLSFilter( const std::string&
   Tool( toolid )
 {
   // add default values for the the states
-  add_state( "target_layer", target_layer_state_, "<none>" );
-  add_state( "mask_layer", mask_layer_state_, "<none>" );
-  add_state( "iterations", iterations_state_, 1, 100, 1, 2 );
-    add_state( "upper_threshold", upper_threshold_state_, 1.0, 0.0, 1.0, 0.01 );
-  add_state( "lower_threshold", lower_threshold_state_, 0.0, 0.0, 1.0, 0.01 );
-  add_state( "curvature", curvature_state_, 0.0, 0.0, 1.0, 0.01 );
-  add_state( "propagation", propagation_state_, 0.0, 0.0, 1.0, 0.01 );
-  add_state( "edge", edge_state_, 0.0, 0.0, 1.0, 0.01 );
-  add_state( "replace", replace_state_, false );
+  add_state( "target_layer", this->target_layer_state_, "<none>" );
+  add_state( "mask_layer", this->mask_layer_state_, "<none>" );
+  add_state( "iterations", this->iterations_state_, 1, 100, 1, 2 );
+    add_state( "upper_threshold", this->upper_threshold_state_, 1.0, 0.0, 1.0, 0.01 );
+  add_state( "lower_threshold", this->lower_threshold_state_, 0.0, 0.0, 1.0, 0.01 );
+  add_state( "curvature", this->curvature_state_, 0.0, 0.0, 1.0, 0.01 );
+  add_state( "propagation", this->propagation_state_, 0.0, 0.0, 1.0, 0.01 );
+  add_state( "edge", this->edge_state_, 0.0, 0.0, 1.0, 0.01 );
+  add_state( "replace", this->replace_state_, false );
+  
+  this->handle_layers_changed();
 
   // Add constaints, so that when the state changes the right ranges of
   // parameters are selected
@@ -77,18 +79,29 @@ void ThresholdSegmentationLSFilter::handle_layers_changed()
   
   for( int i = 0; i < static_cast< int >( target_layers.size() ); ++i )
   {
-    if( target_layers[i]->get_layer_name() == target_layer_state_->get() ) 
+    if( ( this->target_layer_state_->get() == "<none>" ) && ( target_layers[i]->type() == 
+                                 Utils::VolumeType::DATA_E ) )
+    {
+      this->target_layer_state_->set( target_layers[i]->get_layer_name(), ActionSource::NONE_E );
+    }
+    if( ( this->mask_layer_state_->get() == "<none>" ) && ( target_layers[i]->type() == 
+                                 Utils::VolumeType::MASK_E ) )
+    {
+      this->mask_layer_state_->set( target_layers[i]->get_layer_name(), ActionSource::NONE_E );
+    }
+    
+    if( target_layers[i]->get_layer_name() == this->target_layer_state_->get() ) 
       target_found = true;
     
-    if( target_layers[i]->get_layer_name() == mask_layer_state_->get() )
+    if( target_layers[i]->get_layer_name() == this->mask_layer_state_->get() )
       mask_found = true;
   }
   
   if( !target_found )
-    target_layer_state_->set( "", ActionSource::NONE_E );
+    this->target_layer_state_->set( "", ActionSource::NONE_E );
   
   if( !mask_found )
-    mask_layer_state_->set( "", ActionSource::NONE_E );
+    this->mask_layer_state_->set( "", ActionSource::NONE_E );
   
 } 
 

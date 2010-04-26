@@ -135,7 +135,7 @@ void LayerManagerDockWidget::delete_group_ui( LayerGroupHandle &group )
   
 void LayerManagerDockWidget::HandleInsertLayer( qpointer_type qpointer, LayerHandle layer )
 {
-  if ( !( Interface::IsInterfaceThread() ) )
+  if( !( Interface::IsInterfaceThread() ) )
   {
     Interface::Instance()->post_event( boost::bind( &LayerManagerDockWidget::HandleInsertLayer,
                              qpointer, layer ) );
@@ -143,13 +143,13 @@ void LayerManagerDockWidget::HandleInsertLayer( qpointer_type qpointer, LayerHan
   }
   
   SCI_LOG_DEBUG( "HandleInsertLayer started" );
-  if ( qpointer.data() ) qpointer->insert_layer_ui( layer );
+  if( qpointer.data() ) qpointer->insert_layer_ui( layer );
   SCI_LOG_DEBUG( "HandleInsertLayer done" );
 }
 
 void LayerManagerDockWidget::HandleInsertLayerAt( qpointer_type qpointer, LayerHandle layer, int index )
 {
-  if ( !( Interface::IsInterfaceThread() ) )
+  if( !( Interface::IsInterfaceThread() ) )
   {
     Interface::Instance()->post_event( boost::bind( &LayerManagerDockWidget::HandleInsertLayerAt,
       qpointer, layer, index ) );
@@ -157,13 +157,13 @@ void LayerManagerDockWidget::HandleInsertLayerAt( qpointer_type qpointer, LayerH
   }
 
   SCI_LOG_DEBUG( "HandleInsertLayerAt started" );
-  if ( qpointer.data() ) qpointer->insert_layer_at_ui( layer, index );
+  if( qpointer.data() ) qpointer->insert_layer_at_ui( layer, index );
   SCI_LOG_DEBUG( "HandleInsertLayerAt done" );
 }
 
 void LayerManagerDockWidget::HandleDeleteLayer( qpointer_type qpointer, LayerHandle layer )
 {
-  if ( !( Interface::IsInterfaceThread() ) )
+  if( !( Interface::IsInterfaceThread() ) )
   {
     Interface::Instance()->post_event( boost::bind( &LayerManagerDockWidget::HandleDeleteLayer,
                              qpointer, layer ) );
@@ -171,13 +171,13 @@ void LayerManagerDockWidget::HandleDeleteLayer( qpointer_type qpointer, LayerHan
   }
   
   SCI_LOG_DEBUG( "HandleDeleteLayer started" );
-  if ( qpointer.data() ) qpointer->delete_layer_ui( layer );
+  if( qpointer.data() ) qpointer->delete_layer_ui( layer );
   SCI_LOG_DEBUG( "HandleDeleteLayer done" );
 }
 
 void LayerManagerDockWidget::HandleDeleteLayers( qpointer_type qpointer, std::vector< LayerHandle > layers)
 {
-  if ( !( Interface::IsInterfaceThread() ) )
+  if( !( Interface::IsInterfaceThread() ) )
   {
     Interface::Instance()->post_event( boost::bind( &LayerManagerDockWidget::HandleDeleteLayers,
       qpointer, layers ) );
@@ -185,7 +185,7 @@ void LayerManagerDockWidget::HandleDeleteLayers( qpointer_type qpointer, std::ve
   }
   
   SCI_LOG_DEBUG( "HandleDeleteLayer started" );
-  if ( qpointer.data() ) qpointer->delete_layers_ui( layers );
+  if( qpointer.data() ) qpointer->delete_layers_ui( layers );
   SCI_LOG_DEBUG( "HandleDeleteLayer done" );
 
 }
@@ -194,7 +194,7 @@ void LayerManagerDockWidget::HandleDeleteLayers( qpointer_type qpointer, std::ve
 
 void LayerManagerDockWidget::HandleActivateLayer( qpointer_type qpointer, LayerHandle layer )
 {
-  if ( !( Interface::IsInterfaceThread() ) )
+  if( !( Interface::IsInterfaceThread() ) )
   {
     Interface::Instance()->post_event( boost::bind( &LayerManagerDockWidget::HandleActivateLayer,
         qpointer, layer ) );
@@ -202,13 +202,13 @@ void LayerManagerDockWidget::HandleActivateLayer( qpointer_type qpointer, LayerH
   }
 
   SCI_LOG_DEBUG( "HandleActivateLayer started" );
-  if ( qpointer.data() ) qpointer->activate_layer_ui( layer );
+  if( qpointer.data() ) qpointer->activate_layer_ui( layer );
   SCI_LOG_DEBUG( "HandleActivateLayer done" );
 }
 
 void LayerManagerDockWidget::HandleGroupDeleted( qpointer_type qpointer, LayerGroupHandle group )
 {
-  if ( !( Interface::IsInterfaceThread() ) )
+  if( !( Interface::IsInterfaceThread() ) )
   {
     Interface::Instance()->post_event( boost::bind( &LayerManagerDockWidget::HandleGroupDeleted,
                              qpointer, group ) );
@@ -216,7 +216,7 @@ void LayerManagerDockWidget::HandleGroupDeleted( qpointer_type qpointer, LayerGr
   }
   
   SCI_LOG_DEBUG( "HandleGroupDeleted started" );
-  if ( qpointer.data() ) qpointer->delete_group_ui( group );
+  if( qpointer.data() ) qpointer->delete_group_ui( group );
   SCI_LOG_DEBUG( "HandleGroupDeleted done" );
 }
 

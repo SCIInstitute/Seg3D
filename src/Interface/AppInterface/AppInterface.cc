@@ -68,10 +68,10 @@ AppInterface::AppInterface()
   setCorner( Qt::BottomRightCorner, Qt::RightDockWidgetArea );
 
   // Define the main window viewer canvas
-  viewer_interface_ = new ViewerInterface( this );
+  this->viewer_interface_ = new ViewerInterface( this );
 
-  controller_interface_ = new AppController( this );
-  controller_interface_->hide();
+  this->controller_interface_ = new AppController( this );
+  this->controller_interface_->hide();
 
   // Setup the history dock widget
   add_windowids();
@@ -82,10 +82,10 @@ AppInterface::AppInterface()
 //  show_window( "measurement" );
   show_window( "layermanager" );
 
-  setCentralWidget( viewer_interface_ );
+  setCentralWidget( this->viewer_interface_ );
 
-  application_menu_ = new AppMenu( this );
-  status_bar_ = new AppStatusBar( this );
+  this->application_menu_ = new AppMenu( this );
+  this->status_bar_ = new AppStatusBar( this );
 
 
   this->add_connection( InterfaceManager::Instance()->show_window_signal_.connect( 
@@ -120,6 +120,7 @@ AppInterface::AppInterface()
   this->center_seg3d_gui_on_screen( this );
 }
 
+  
 AppInterface::~AppInterface()
 {
   //  viewer_interface_->writeSizeSettings();
@@ -129,49 +130,49 @@ void AppInterface::closeEvent( QCloseEvent* event )
 {
   this->disconnect_all();
 
-  if ( this->viewer_interface_ )
+  if( this->viewer_interface_ )
   {
     this->viewer_interface_->close();
     this->viewer_interface_->deleteLater();
   }
 
-  if ( this->controller_interface_ )
+  if( this->controller_interface_ )
   {
     this->controller_interface_->close();
     this->controller_interface_->deleteLater();
   }
   
-  if ( this->history_dock_window_ )
+  if( this->history_dock_window_ )
   {
     this->history_dock_window_->close();
     this->history_dock_window_->deleteLater();
   }
   
-  if ( this->project_dock_window_ )
+  if( this->project_dock_window_ )
   {
     this->project_dock_window_->close();
     this->project_dock_window_->deleteLater();
   }
   
-  if ( this->tools_dock_window_ )
+  if( this->tools_dock_window_ )
   {
     this->tools_dock_window_->close();
     this->tools_dock_window_->deleteLater();
   }
   
-  if ( this->layer_manager_dock_window_ )
+  if( this->layer_manager_dock_window_ )
   {
     this->layer_manager_dock_window_->close();
     this->layer_manager_dock_window_->deleteLater();
   }
   
-  if ( this->measurement_dock_window_ )
+  if( this->measurement_dock_window_ )
   {
     this->measurement_dock_window_->close();
     this->measurement_dock_window_->deleteLater();
   }
   
-  if ( this->progress_ )
+  if( this->progress_ )
   {
     this->progress_->close();
     this->progress_->deleteLater();
@@ -189,43 +190,43 @@ void AppInterface::center_seg3d_gui_on_screen( QWidget *widget )
 
 void AppInterface::set_full_screen( bool full_screen )
 {
-  if ( full_screen ) showFullScreen();
+  if( full_screen ) showFullScreen();
   else showNormal();
 }
 
 ViewerInterface* AppInterface::viewer_interface()
 {
-  return viewer_interface_.data();
+  return this->viewer_interface_.data();
 }
 
 HistoryDockWidget*
 AppInterface::history_dock_widget()
 {
-  return history_dock_window_.data();
+  return this->history_dock_window_.data();
 }
 
 ProjectDockWidget*
 AppInterface::project_dock_widget()
 {
-  return project_dock_window_.data();
+  return this->project_dock_window_.data();
 }
 
 ToolsDockWidget*
 AppInterface::tools_dock_widget()
 {
-  return tools_dock_window_.data();
+  return this->tools_dock_window_.data();
 }
 
 LayerManagerDockWidget*
 AppInterface::layer_manager_dock_widget()
 {
-  return layer_manager_dock_window_.data();
+  return this->layer_manager_dock_window_.data();
 }
 
 MeasurementDockWidget*
 AppInterface::measurement_dock_widget()
 {
-  return measurement_dock_window_.data();
+  return this->measurement_dock_window_.data();
 }
 
 void AppInterface::add_windowids()
@@ -241,87 +242,87 @@ void AppInterface::add_windowids()
 void AppInterface::show_window( const std::string& windowid )
 {
   std::string lower_windowid = Utils::StringToLower( windowid );
-  if ( lower_windowid == "controller" )
+  if( lower_windowid == "controller" )
   {
-    if ( controller_interface_.isNull() )
+    if( this->controller_interface_.isNull() )
     {
-      controller_interface_ = new AppController( this );
-      controller_interface_->show();
+      this->controller_interface_ = new AppController( this );
+      this->controller_interface_->show();
     }
     else
     {
-      controller_interface_->show();
-      controller_interface_->raise();
+      this->controller_interface_->show();
+      this->controller_interface_->raise();
     }
   }
-  else if ( lower_windowid == "project" )
+  else if( lower_windowid == "project" )
   {
-    if ( project_dock_window_.isNull() )
+    if( project_dock_window_.isNull() )
     {
-      project_dock_window_ = new ProjectDockWidget( this );
-      addDockWidget( Qt::LeftDockWidgetArea, project_dock_window_ );
-      project_dock_window_->show();
+      this->project_dock_window_ = new ProjectDockWidget( this );
+      addDockWidget( Qt::LeftDockWidgetArea, this->project_dock_window_ );
+      this->project_dock_window_->show();
     }
     else
     {
-      project_dock_window_->show();
-      project_dock_window_->raise();
+      this->project_dock_window_->show();
+      this->project_dock_window_->raise();
     }
   }
-  else if ( lower_windowid == "layermanager" )
+  else if( lower_windowid == "layermanager" )
   {
-    if ( layer_manager_dock_window_.isNull() )
+    if( this->layer_manager_dock_window_.isNull() )
     {
-      layer_manager_dock_window_ = new LayerManagerDockWidget( this );
-      addDockWidget( Qt::RightDockWidgetArea, layer_manager_dock_window_ );
-      layer_manager_dock_window_->show();
+      this->layer_manager_dock_window_ = new LayerManagerDockWidget( this );
+      addDockWidget( Qt::RightDockWidgetArea, this->layer_manager_dock_window_ );
+      this->layer_manager_dock_window_->show();
     }
     else
     {
-      layer_manager_dock_window_->show();
-      layer_manager_dock_window_->raise();
+      this->layer_manager_dock_window_->show();
+      this->layer_manager_dock_window_->raise();
     }
   }
-  else if ( lower_windowid == "history" )
+  else if( lower_windowid == "history" )
   {
-    if ( history_dock_window_.isNull() )
+    if( this->history_dock_window_.isNull() )
     {
-      history_dock_window_ = new HistoryDockWidget( this );
-      addDockWidget( Qt::LeftDockWidgetArea, history_dock_window_ );
-      history_dock_window_->show();
+      this->history_dock_window_ = new HistoryDockWidget( this );
+      addDockWidget( Qt::LeftDockWidgetArea, this->history_dock_window_ );
+      this->history_dock_window_->show();
     }
     else
     {
-      history_dock_window_->show();
-      history_dock_window_->raise();
+      this->history_dock_window_->show();
+      this->history_dock_window_->raise();
     }
   }
-  else if ( lower_windowid == "tools" )
+  else if( lower_windowid == "tools" )
   {
-    if ( tools_dock_window_.isNull() )
+    if( this->tools_dock_window_.isNull() )
     {
-      tools_dock_window_ = new ToolsDockWidget( this );
-      addDockWidget( Qt::LeftDockWidgetArea, tools_dock_window_ );
+      this->tools_dock_window_ = new ToolsDockWidget( this );
+      this->addDockWidget( Qt::LeftDockWidgetArea, this->tools_dock_window_ );
       tools_dock_window_->show();
     }
     else
     {
-      tools_dock_window_->show();
-      tools_dock_window_->raise();
+      this->tools_dock_window_->show();
+      this->tools_dock_window_->raise();
     }
   }
-  else if ( lower_windowid == "measurement" )
+  else if( lower_windowid == "measurement" )
   {
-    if ( measurement_dock_window_.isNull() )
+    if( this->measurement_dock_window_.isNull() )
     {
-      measurement_dock_window_ = new MeasurementDockWidget( this );
-      addDockWidget( Qt::RightDockWidgetArea, measurement_dock_window_ );
-      measurement_dock_window_->show();
+      this->measurement_dock_window_ = new MeasurementDockWidget( this );
+      addDockWidget( Qt::RightDockWidgetArea, this->measurement_dock_window_ );
+      this->measurement_dock_window_->show();
     }
     else
     {
-      measurement_dock_window_->show();
-      measurement_dock_window_->raise();
+      this->measurement_dock_window_->show();
+      this->measurement_dock_window_->raise();
     }
   }
 }
@@ -329,32 +330,32 @@ void AppInterface::show_window( const std::string& windowid )
 void AppInterface::close_window( const std::string& windowid )
 {
   std::string lower_windowid = Utils::StringToLower( windowid );
-  if ( lower_windowid == "controller" )
+  if( lower_windowid == "controller" )
   {
-    if ( !( controller_interface_.isNull() ) )
+    if( !( this->controller_interface_.isNull() ) )
     {
-      controller_interface_->close();
+      this->controller_interface_->close();
     }
   }
-  else if ( lower_windowid == "project" )
+  else if( lower_windowid == "project" )
   {
-    if ( !( project_dock_window_.isNull() ) ) project_dock_window_->close();
+    if( !( this->project_dock_window_.isNull() ) ) this->project_dock_window_->close();
   }
-  else if ( lower_windowid == "layermanager" )
+  else if( lower_windowid == "layermanager" )
   {
-    if ( !( layer_manager_dock_window_.isNull() ) ) layer_manager_dock_window_->close();
+    if( !( this->layer_manager_dock_window_.isNull() ) ) this->layer_manager_dock_window_->close();
   }
-  else if ( lower_windowid == "history" )
+  else if( lower_windowid == "history" )
   {
-    if ( !( history_dock_window_.isNull() ) ) history_dock_window_->close();
+    if( !( this->history_dock_window_.isNull() ) ) this->history_dock_window_->close();
   }
-  else if ( lower_windowid == "tools" )
+  else if( lower_windowid == "tools" )
   {
-    if ( !( tools_dock_window_.isNull() ) ) tools_dock_window_->close();
+    if( !( this->tools_dock_window_.isNull() ) ) this->tools_dock_window_->close();
   }
-  else if ( lower_windowid == "measurement" )
+  else if( lower_windowid == "measurement" )
   {
-    if ( !( measurement_dock_window_.isNull() ) ) measurement_dock_window_->close();
+    if( !( this->measurement_dock_window_.isNull() ) ) this->measurement_dock_window_->close();
   }
 }
 
@@ -362,29 +363,29 @@ void AppInterface::begin_progress( ActionProgressHandle handle )
 {
 
   // Step (1): delete any out standing progress messages
-  if ( progress_.data() )
+  if( this->progress_.data() )
   {
-    progress_->done( 0 );
+    this->progress_->done( 0 );
   }
   
   SCI_LOG_DEBUG( "Start progress widget" );
-  progress_ = new ProgressWidget( handle, this );
-  progress_->exec();
+  this->progress_ = new ProgressWidget( handle, this );
+  this->progress_->exec();
 }
 
 void AppInterface::end_progress( ActionProgressHandle handle )
 {
   SCI_LOG_DEBUG( "Finish progress widget" );
 
-  if (progress_.data() ) 
+  if( this->progress_.data() ) 
   {
-    progress_->done( 0 );
+    this->progress_->done( 0 );
   }
 }
 
 void AppInterface::report_progress( ActionProgressHandle handle )
 {
-  if (progress_.data() ) progress_->update_progress();
+  if( this->progress_.data() ) progress_->update_progress();
 }
 
 void AppInterface::addDockWidget( Qt::DockWidgetArea area, QDockWidget* dock_widget )
@@ -396,7 +397,7 @@ void AppInterface::addDockWidget( Qt::DockWidgetArea area, QDockWidget* dock_wid
   QList< QDockWidget* >::iterator it_end = object_list.end();
   while ( it != it_end )
   {
-    if ( ( dock_widget != *it ) && ( dockWidgetArea( *it ) == area ) )
+    if( ( dock_widget != *it ) && ( dockWidgetArea( *it ) == area ) )
     {
       tabifyDockWidget( *it, dock_widget );
       break;

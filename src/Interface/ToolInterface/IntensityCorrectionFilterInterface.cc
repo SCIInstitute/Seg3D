@@ -36,6 +36,7 @@
 
 //Application Includes
 #include <Application/Tools/IntensityCorrectionFilter.h>
+#include <Application/Filters/Actions/ActionIntensityCorrection.h>
 
 namespace Seg3D
 {
@@ -111,13 +112,38 @@ bool IntensityCorrectionFilterInterface::build_widget( QFrame* frame )
 
   //Step 4 - connect the gui to the tool through the QtBridge
   QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
+  connect( this->private_->target_, SIGNAL( valid( bool ) ), this, SLOT( enable_run_filter( bool ) ) );
   QtBridge::Connect( this->private_->order_, tool->order_state_ );
   QtBridge::Connect( this->private_->edge_, tool->edge_state_ );
   QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
+  
+  connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), this, SLOT( execute_filter() ) );
+  
+  this->private_->target_->sync_layers(); 
 
   //Send a message to the log that we have finised with building the tensity Correction Filter Interface
   SCI_LOG_DEBUG("Finished building an Intensity Correction Filter Interface");
   return ( true );
 
 } // end build_widget
+  
+void IntensityCorrectionFilterInterface::enable_run_filter( bool valid )
+{
+  if( valid )
+    this->private_->ui_.runFilterButton->setEnabled( true );
+  else
+    this->private_->ui_.runFilterButton->setEnabled( false );
+}
+
+void IntensityCorrectionFilterInterface::execute_filter()
+{
+  ToolHandle base_tool_ = tool();
+  IntensityCorrectionFilter* tool =
+  dynamic_cast< IntensityCorrectionFilter* > ( base_tool_.get() );
+  
+  ActionIntensityCorrection::Dispatch( tool->target_layer_state_->export_to_string(), 
+               tool->order_state_->get(), tool->edge_state_->get(),
+               tool->replace_state_->get() ); 
+}
+  
 } // namespace Seg3D

@@ -74,6 +74,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   group_menus_open_( false )
 {
   
+  
   {// Prepare the icons!!
     this->label_layer_icon_.addFile( QString::fromUtf8( ":/Images/LabelMapWhite.png" ),
                     QSize(), QIcon::Normal, QIcon::Off );
@@ -87,6 +88,8 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   this->setObjectName( QString::fromUtf8( "LayerWidget" ) );
   this->setStyleSheet( StyleSheet::LAYERWIDGET_C );
   this->private_->ui_.setupUi( this );
+  
+  this->setUpdatesEnabled( false );
   
   // set some Drag and Drop stuff
   this->setAcceptDrops( true );
@@ -251,9 +254,10 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
         this->private_->ui_.volume_rendered_button_->hide();
         this->private_->ui_.typeBackground_->setStyleSheet( StyleSheet::MASK_VOLUME_COLOR_C );
         this->private_->activate_button_->setIcon(this->mask_layer_icon_);
-        MaskLayer* mask_layer = dynamic_cast< MaskLayer* >( layer.get() );        
+        MaskLayer* mask_layer = dynamic_cast< MaskLayer* >( layer.get() );  
         QtBridge::Connect( this->private_->ui_.iso_surface_button_, mask_layer->show_isosurface_state_ );
         QtBridge::Connect( this->private_->ui_.border_selection_combo_, mask_layer->fill_state_ );
+      
 
           // keep track locally of what type we are
           this->volume_type_ = 2;
@@ -275,11 +279,9 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   }
   
   this->private_->overlay_ = new OverlayWidget( this );
-  this->private_->overlay_->hide();
+  this->private_->overlay_->hide(); 
   
   this->setUpdatesEnabled( true );
-  
-  
 }
   
   
@@ -296,12 +298,12 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
 {
  
   // Exit immediately if they are no longer holding the button the press event isnt valid
-  if ( event->button() != Qt::LeftButton )
+  if( event->button() != Qt::LeftButton )
   { 
     return;
   }
   
-  if ( group_menus_open_ )
+  if( group_menus_open_ )
     return;
 
   QPoint hotSpot = event->pos();
@@ -358,7 +360,7 @@ void LayerWidget::dropEvent( QDropEvent* event )
 {
   std::vector<std::string> mime_data = 
     Utils::SplitString( event->mimeData()->text().toStdString(), "|" );
-  if ( mime_data.size() < 2 ) return;
+  if( mime_data.size() < 2 ) return;
 
   if( this->get_layer_id() == mime_data[ 1 ] )
   {
@@ -366,7 +368,7 @@ void LayerWidget::dropEvent( QDropEvent* event )
     return;
   }
   
-  if ( group_menus_open_ )
+  if( group_menus_open_ )
     return;
   
   bool good_to_go = false;
@@ -407,6 +409,8 @@ void LayerWidget::dropEvent( QDropEvent* event )
   this->set_drop( false );
   this->private_->overlay_->hide();
   this->setUpdatesEnabled( true );
+  this->repaint();
+
 }
 
 void LayerWidget::dragEnterEvent( QDragEnterEvent* event)
@@ -417,9 +421,9 @@ void LayerWidget::dragEnterEvent( QDragEnterEvent* event)
   
   std::vector<std::string> mime_data = 
     Utils::SplitString( event->mimeData()->text().toStdString(), "|" );
-  if ( mime_data.size() < 2 ) return;
+  if( mime_data.size() < 2 ) return;
 
-  if ( ( ( ( this->get_volume_type() == Utils::VolumeType::DATA_E ) &&
+  if( ( ( ( this->get_volume_type() == Utils::VolumeType::DATA_E ) &&
     ( mime_data[ 0 ] == "data" ) ) ||
     ( ( this->get_volume_type() == Utils::VolumeType::MASK_E ) &&
     ( mime_data[ 0 ] =="mask" ) ) ||
@@ -443,7 +447,6 @@ void LayerWidget::dragLeaveEvent( QDragLeaveEvent* event )
 {
   this->set_drop( false );
   this->private_->overlay_->hide();
-  //SCI_LOG_DEBUG( "Leaving from " + this->get_layer_id() + " for reals." );
 }
   
 
@@ -455,22 +458,28 @@ void LayerWidget::seethrough( bool see )
   this->setUpdatesEnabled( false );
   if( see )
   {
-    //this->hide();
+#if defined( _WIN32 )
     this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_PICKED_UP_C );
     this->private_->ui_.header_->hide();
     this->private_->ui_.border_bar_->hide();
     this->private_->ui_.bright_contrast_bar_->hide();
     this->private_->ui_.color_bar_->hide();
-    this->private_->ui_.opacity_bar_->hide();   
+    this->private_->ui_.opacity_bar_->hide();
+#else
+    this->hide();
+#endif
   }
   else
   {
-    //this->show();
+#if defined( _WIN32 )
     this->private_->ui_.header_->show();
     if( this->active_ ) 
       this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_ACTIVE_C );
     else
       this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_INACTIVE_C );
+#else
+    this->show();
+#endif;
   }
   this->setUpdatesEnabled( true );
   this->repaint();
@@ -528,7 +537,7 @@ void LayerWidget::show_selection_checkbox( bool show )
 
 void LayerWidget::show_opacity_bar( bool show )
 {
-  if ( show )
+  if( show )
   {
     this->private_->ui_.opacity_bar_->show();
     this->private_->ui_.bright_contrast_bar_->hide();
@@ -547,7 +556,7 @@ void LayerWidget::show_opacity_bar( bool show )
 
 void LayerWidget::show_brightness_contrast_bar( bool show )
 {
-  if ( show )
+  if( show )
   {
     this->private_->ui_.bright_contrast_bar_->show();
     this->private_->ui_.opacity_bar_->hide();
@@ -561,12 +570,12 @@ void LayerWidget::show_brightness_contrast_bar( bool show )
   {
     this->private_->ui_.bright_contrast_bar_->hide();
   }
-  this->repaint();
+  this->repaint( QRect( 0, 0, this->width(), this->height() ) );
 }
 
 void LayerWidget::show_border_fill_bar( bool show )
 {
-  if ( show )
+  if( show )
   {
     this->private_->ui_.border_bar_->show();
     this->private_->ui_.opacity_bar_->hide();
@@ -585,7 +594,7 @@ void LayerWidget::show_border_fill_bar( bool show )
 
 void LayerWidget::show_color_bar( bool show )
 {
-  if ( show )
+  if( show )
   {
     this->private_->ui_.color_bar_->show();
     this->private_->ui_.opacity_bar_->hide();
@@ -604,7 +613,7 @@ void LayerWidget::show_color_bar( bool show )
 
 void LayerWidget::show_progress_bar( bool show )
 {
-  if ( show )
+  if( show )
   {
     this->private_->ui_.progress_bar_bar_->show();
   }
@@ -617,7 +626,7 @@ void LayerWidget::show_progress_bar( bool show )
 
 void LayerWidget::visual_lock( bool lock )
 {
-  if ( lock )
+  if( lock )
   {
     this->private_->ui_.header_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_LOCKED_C );
     this->private_->ui_.typeBackground_->setStyleSheet( StyleSheet::LAYER_WIDGET_BACKGROUND_LOCKED_C );
@@ -688,11 +697,11 @@ void LayerWidget::visual_lock( bool lock )
   this->repaint();
 }
 
-  void LayerWidget::resizeEvent( QResizeEvent *event )
-  {
-    this->private_->overlay_->resize( event->size() );
-    event->accept();
-  }
+void LayerWidget::resizeEvent( QResizeEvent *event )
+{
+  this->private_->overlay_->resize( event->size() );
+  event->accept();
+}
 
 
 

@@ -103,7 +103,7 @@ ToolsDockWidget::ToolsDockWidget( QWidget *parent ) :
   ToolManager::tool_list_type::iterator active_it = tool_list.find( active_toolid );
 
   // Set the active tool
-  if ( active_it != it_end )
+  if( active_it != it_end )
   {
     activate_tool( ( *active_it ).second );
   }
@@ -124,7 +124,7 @@ void ToolsDockWidget::open_tool( ToolHandle& tool )
   ToolFactory::Instance()->create_toolinterface( tool->type(), tool_interface );
   ToolWidget *widget = dynamic_cast< ToolWidget* > ( tool_interface );
 
-  if ( widget == 0 )
+  if( widget == 0 )
   {
     SCI_THROW_LOGICERROR("A ToolInterface cannot be up casted to a ToolWidget pointer");
   }
@@ -143,7 +143,7 @@ void ToolsDockWidget::open_tool( ToolHandle& tool )
   // Step (4) : If the dock widget was hidden (somebody closed the window),
   // reopen the window
 
-  if ( isHidden() )
+  if( isHidden() )
   {
     show();
   }
@@ -154,7 +154,7 @@ void ToolsDockWidget::close_tool( ToolHandle& tool )
 {
   // Step (1): Find the widget in the list
   tool_widget_list_type::iterator it = tool_widget_list_.find( tool->toolid() );
-  if ( it == tool_widget_list_.end() )
+  if( it == tool_widget_list_.end() )
   {
     SCI_LOG_ERROR(std::string("widget with toolid '")+
       tool->toolid()+"' does not exist");
@@ -176,7 +176,7 @@ void ToolsDockWidget::activate_tool( ToolHandle& tool )
 {
   // Step (1): Find the widget
   tool_widget_list_type::iterator it = tool_widget_list_.find( tool->toolid() );
-  if ( it == tool_widget_list_.end() )
+  if( it == tool_widget_list_.end() )
   {
     SCI_LOG_ERROR(std::string("widget with toolid '")+
       tool->toolid()+"' does not exist");
@@ -185,7 +185,7 @@ void ToolsDockWidget::activate_tool( ToolHandle& tool )
   ToolWidget *widget = ( *it ).second;
 
   // Step (2): Set the active tool if it is not active already
-  if ( widget != toolbox_->get_active_tool() )
+  if( widget != toolbox_->get_active_tool() )
   {
     toolbox_->set_active_tool( widget );
   }
@@ -193,38 +193,38 @@ void ToolsDockWidget::activate_tool( ToolHandle& tool )
 
 void ToolsDockWidget::HandleOpenTool( qpointer_type qpointer, ToolHandle tool )
 {
-  if ( !( Interface::IsInterfaceThread() ) )
+  if( !( Interface::IsInterfaceThread() ) )
   {
     Interface::Instance()->post_event( boost::bind( &ToolsDockWidget::HandleOpenTool, qpointer,
         tool ) );
     return;
   }
 
-  if ( qpointer.data() ) qpointer->open_tool( tool );
+  if( qpointer.data() ) qpointer->open_tool( tool );
 }
 
 void ToolsDockWidget::HandleCloseTool( qpointer_type qpointer, ToolHandle tool )
 {
-  if ( !( Interface::IsInterfaceThread() ) )
+  if( !( Interface::IsInterfaceThread() ) )
   {
     Interface::Instance()->post_event( boost::bind( &ToolsDockWidget::HandleCloseTool,
         qpointer, tool ) );
     return;
   }
 
-  if ( qpointer.data() ) qpointer->close_tool( tool );
+  if( qpointer.data() ) qpointer->close_tool( tool );
 }
 
 void ToolsDockWidget::HandleActivateTool( qpointer_type qpointer, ToolHandle tool )
 {
-  if ( !( Interface::IsInterfaceThread() ) )
+  if( !( Interface::IsInterfaceThread() ) )
   {
     Interface::Instance()->post_event( boost::bind( &ToolsDockWidget::HandleActivateTool,
         qpointer, tool ) );
     return;
   }
 
-  if ( qpointer.data() ) qpointer->activate_tool( tool );
+  if( qpointer.data() ) qpointer->activate_tool( tool );
 }
 
 } // end namespace Seg3D

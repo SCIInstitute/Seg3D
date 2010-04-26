@@ -246,7 +246,7 @@ ViewerWidgetPrivate::ViewerWidgetPrivate( QWidget *parent )
   viewer_ = QtApplication::Instance()->qt_renderresources_context() ->create_qt_render_widget(
       parent );
 
-  if ( viewer_ == 0 )
+  if( viewer_ == 0 )
   {
     SCI_THROW_LOGICERROR("OpenGL was not initialized correctly");
   }
@@ -418,7 +418,7 @@ void ViewerWidget::change_view_type( QAction* viewer_type )
   this->private_->picking_button_->setVisible( !is_volume_view );
   this->private_->slice_visible_button_->setVisible( !is_volume_view );
 
-  if ( !is_volume_view )
+  if( !is_volume_view )
   {
     StateView2DHandle view2d_state = 
       boost::dynamic_pointer_cast<StateView2D>( viewer->get_active_view_state() );
@@ -430,7 +430,7 @@ void ViewerWidget::change_view_type( QAction* viewer_type )
 void ViewerWidget::flip_view_horiz( bool flip )
 {
   ViewerHandle viewer = ViewerManager::Instance()->get_viewer( this->viewer_id_ );
-  if ( !viewer->is_volume_view() )
+  if( !viewer->is_volume_view() )
   {
     StateView2DHandle view2d_state = 
       boost::dynamic_pointer_cast<StateView2D>( viewer->get_active_view_state() );
@@ -441,7 +441,7 @@ void ViewerWidget::flip_view_horiz( bool flip )
 void ViewerWidget::flip_view_vert( bool flip )
 {
   ViewerHandle viewer = ViewerManager::Instance()->get_viewer( this->viewer_id_ );
-  if ( !viewer->is_volume_view() )
+  if( !viewer->is_volume_view() )
   {
     StateView2DHandle view2d_state = 
       boost::dynamic_pointer_cast<StateView2D>( viewer->get_active_view_state() );

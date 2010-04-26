@@ -36,6 +36,7 @@
 
 //Application Includes
 #include <Application/Tools/OtsuThresholdFilter.h>
+#include <Application/Filters/Actions/ActionOtsuThreshold.h>
 
 namespace Seg3D
 {
@@ -96,12 +97,35 @@ bool OtsuThresholdFilterInterface::build_widget( QFrame* frame )
 
   //Step 4 - connect the gui to the tool through the QtBridge
   QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
+  connect( this->private_->target_, SIGNAL( valid( bool ) ), this, SLOT( enable_run_filter( bool ) ) );
   QtBridge::Connect( this->private_->order_, tool->order_state_ );
+  
+  connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), this, SLOT( execute_filter() ) );
+  
+  this->private_->target_->sync_layers(); 
 
   //Send a message to the log that we have finised with building the Otsu Threshold Filter Interface
   SCI_LOG_DEBUG("Finished building an Otsu Threshold Filter Interface");
   return ( true );
 
 } // end build_widget
+  
+void OtsuThresholdFilterInterface::enable_run_filter( bool valid )
+{
+  if( valid )
+    this->private_->ui_.runFilterButton->setEnabled( true );
+  else
+    this->private_->ui_.runFilterButton->setEnabled( false );
+}
+
+void OtsuThresholdFilterInterface::execute_filter()
+{
+  ToolHandle base_tool_ = tool();
+  OtsuThresholdFilter* tool =
+  dynamic_cast< OtsuThresholdFilter* > ( base_tool_.get() );
+  
+  ActionOtsuThreshold::Dispatch( tool->target_layer_state_->export_to_string(), 
+                    tool->order_state_->get() ); 
+}
 
 } // end namespace Seg3D

@@ -41,11 +41,11 @@ CannyEdgeDetectionFilter::CannyEdgeDetectionFilter( const std::string& toolid ) 
   Tool( toolid )
 {
   // Need to set ranges and default values for all parameters
-  add_state( "target", target_layer_state_, "<none>" );
-  add_state( "variance", variance_state_, 0.0, 0.0, 100.0, 1.0 );
-  add_state( "max_error", max_error_state_, 0.0, 0.0, 100.0, 1.0 );
-  add_state( "threshold", threshold_state_, 0.0, 0.0, 100.0, 1.0 );
-  add_state( "replace", replace_state_, false );
+  add_state( "target", this->target_layer_state_, "<none>" );
+  add_state( "variance", this->variance_state_, 0.0, 0.0, 100.0, 1.0 );
+  add_state( "max_error", this->max_error_state_, 0.0, 0.0, 100.0, 1.0 );
+  add_state( "threshold", this->threshold_state_, 0.0, 0.0, 100.0, 1.0 );
+  add_state( "replace", this->replace_state_, false );
   
   this->handle_layers_changed();
 
@@ -72,21 +72,22 @@ void CannyEdgeDetectionFilter::handle_layers_changed()
   
   for( int i = 0; i < static_cast< int >( target_layers.size() ); ++i )
   {
-    if( target_layer_state_->get() == "<none>" )
+    if( ( this->target_layer_state_->get() == "<none>" ) && ( target_layers[i]->type() == 
+                                 Utils::VolumeType::DATA_E ) )
     {
-      target_layer_state_->set( target_layers[i]->get_layer_name(), ActionSource::NONE_E );
+      this->target_layer_state_->set( target_layers[i]->get_layer_name(), ActionSource::NONE_E );
       target_found = true;
       break;
     }
     
-    if( target_layers[i]->get_layer_name() == target_layer_state_->get() ) {
+    if( target_layers[i]->get_layer_name() == this->target_layer_state_->get() ) {
       target_found = true;
       break;
     }
   }
   
   if( !target_found )
-    target_layer_state_->set( "", ActionSource::NONE_E );
+    this->target_layer_state_->set( "", ActionSource::NONE_E );
   
 }
   

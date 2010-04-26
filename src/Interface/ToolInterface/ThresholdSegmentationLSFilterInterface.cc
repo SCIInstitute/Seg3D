@@ -37,6 +37,7 @@
 
 //Application Includes
 #include <Application/Tools/ThresholdSegmentationLSFilter.h>
+#include <Application/Filters/Actions/ActionThresholdSegmentationLS.h>
 
 namespace Seg3D
 {
@@ -175,6 +176,7 @@ bool ThresholdSegmentationLSFilterInterface::build_widget( QFrame* frame )
 
   //Step 4 - connect the gui to the tool through the QtBridge
   QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
+  connect( this->private_->target_, SIGNAL( valid( bool ) ), this, SLOT( enable_run_filter( bool ) ) );
   QtBridge::Connect( this->private_->mask_, tool->mask_layer_state_ );
   QtBridge::Connect( this->private_->iterations_, tool->iterations_state_ );
   QtBridge::Connect( this->private_->upper_threshold_, tool->upper_threshold_state_ );
@@ -183,11 +185,37 @@ bool ThresholdSegmentationLSFilterInterface::build_widget( QFrame* frame )
   QtBridge::Connect( this->private_->edge_, tool->propagation_state_ );
   QtBridge::Connect( this->private_->propagation_, tool->edge_state_ );
   QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
-
+  
+  connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), this, SLOT( execute_filter() ) );
+  
+  this->private_->target_->sync_layers();
+  this->private_->mask_->sync_layers();
+  
   //Send a message to the log that we have finised with building the Segmentation Level Set Filter Interface
   SCI_LOG_DEBUG("Finished building a Segmentation Level Set Filter Interface");
   return ( true );
 
 } // end build_widget
+  
+void ThresholdSegmentationLSFilterInterface::enable_run_filter( bool valid )
+{
+  if( valid )
+    this->private_->ui_.runFilterButton->setEnabled( true );
+  else
+    this->private_->ui_.runFilterButton->setEnabled( false );
+}
+
+void ThresholdSegmentationLSFilterInterface::execute_filter()
+{
+  ToolHandle base_tool_ = tool();
+  ThresholdSegmentationLSFilter* tool =
+  dynamic_cast< ThresholdSegmentationLSFilter* > ( base_tool_.get() );
+  
+  ActionThresholdSegmentationLS::Dispatch( tool->target_layer_state_->export_to_string(), 
+    tool->mask_layer_state_->export_to_string(), tool->iterations_state_->get(),
+    tool->upper_threshold_state_->get(), tool->lower_threshold_state_->get(), 
+    tool->curvature_state_->get(), tool->propagation_state_->get(), tool->edge_state_->get(),
+    tool->replace_state_->get() ); 
+}
 
 } // end namespace Seg3D

@@ -132,10 +132,10 @@ void ViewerInterface::set_active_viewer( int active_viewer )
 {
   for ( size_t j = 0; j < private_->viewer_.size(); j++ )
   {
-    if ( static_cast< int > ( j ) != active_viewer ) private_->viewer_[ j ]->deselect();
+    if( static_cast< int > ( j ) != active_viewer ) private_->viewer_[ j ]->deselect();
   }
 
-  if ( active_viewer >= 0 && active_viewer < static_cast< int > ( private_->viewer_.size() ) )
+  if( active_viewer >= 0 && active_viewer < static_cast< int > ( private_->viewer_.size() ) )
   {
     private_->viewer_[ active_viewer ]->select();
   }
@@ -143,7 +143,7 @@ void ViewerInterface::set_active_viewer( int active_viewer )
 
 void ViewerInterface::set_layout( const std::string& layout )
 {
-  if ( layout == "single" )
+  if( layout == "single" )
   {
     private_->viewer_[ 0 ]->show();
     private_->viewer_[ 1 ]->hide();
@@ -160,7 +160,7 @@ void ViewerInterface::set_layout( const std::string& layout )
     private_->horiz_splitter_->setSizes( sizes );
     private_->horiz_splitter_->repaint();
   }
-  else if ( layout == "1and1" )
+  else if( layout == "1and1" )
   {
     private_->viewer_[ 0 ]->show();
     private_->viewer_[ 1 ]->hide();
@@ -177,7 +177,7 @@ void ViewerInterface::set_layout( const std::string& layout )
     private_->horiz_splitter_->setSizes( sizes );
     private_->horiz_splitter_->repaint();
   }
-  else if ( layout == "1and2" )
+  else if( layout == "1and2" )
   {
     private_->viewer_[ 0 ]->show();
     private_->viewer_[ 1 ]->hide();
@@ -200,7 +200,7 @@ void ViewerInterface::set_layout( const std::string& layout )
     private_->vert_splitter2_->setSizes( vsizes );
     private_->horiz_splitter_->repaint();
   }
-  else if ( layout == "1and3" )
+  else if( layout == "1and3" )
   {
     private_->viewer_[ 0 ]->show();
     private_->viewer_[ 1 ]->hide();
@@ -223,7 +223,7 @@ void ViewerInterface::set_layout( const std::string& layout )
     private_->vert_splitter2_->setSizes( vsizes );
     private_->horiz_splitter_->repaint();
   }
-  else if ( layout == "2and2" )
+  else if( layout == "2and2" )
   {
     private_->viewer_[ 0 ]->show();
     private_->viewer_[ 1 ]->show();
@@ -247,7 +247,7 @@ void ViewerInterface::set_layout( const std::string& layout )
     private_->vert_splitter2_->setSizes( vsizes );
     private_->horiz_splitter_->repaint();
   }
-  else if ( layout == "2and3" )
+  else if( layout == "2and3" )
   {
     private_->viewer_[ 0 ]->show();
     private_->viewer_[ 1 ]->show();
@@ -272,7 +272,7 @@ void ViewerInterface::set_layout( const std::string& layout )
     private_->vert_splitter2_->setSizes( vsizes );
     private_->horiz_splitter_->repaint();
   }
-  else if ( layout == "3and3" )
+  else if( layout == "3and3" )
   {
     private_->viewer_[ 0 ]->show();
     private_->viewer_[ 1 ]->show();
@@ -300,26 +300,26 @@ void ViewerInterface::set_layout( const std::string& layout )
 
 void ViewerInterface::SetViewerLayout( qpointer_type qpointer, std::string layout )
 {
-  if ( !( Interface::IsInterfaceThread() ) )
+  if( !( Interface::IsInterfaceThread() ) )
   {
     Interface::Instance()->post_event( boost::bind( &ViewerInterface::SetViewerLayout,
         qpointer, layout ) );
     return;
   }
 
-  if ( qpointer.data() ) qpointer->set_layout( layout );
+  if( qpointer.data() ) qpointer->set_layout( layout );
 }
 
 void ViewerInterface::SetActiveViewer( qpointer_type qpointer, int active_viewer )
 {
-  if ( !( Interface::IsInterfaceThread() ) )
+  if( !( Interface::IsInterfaceThread() ) )
   {
     Interface::Instance()->post_event( boost::bind( &ViewerInterface::SetActiveViewer,
         qpointer, active_viewer ) );
     return;
   }
 
-  if ( qpointer.data() ) qpointer->set_active_viewer( active_viewer );
+  if( qpointer.data() ) qpointer->set_active_viewer( active_viewer );
 }
 
 } // end namespace Seg3D

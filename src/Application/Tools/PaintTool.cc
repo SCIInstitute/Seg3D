@@ -41,12 +41,14 @@ PaintTool::PaintTool( const std::string& toolid ) :
   Tool( toolid )
 {
   // Need to set ranges and default values for all parameters
-  add_state( "target", target_layer_state_, "<none>" );
-  add_state( "mask", mask_layer_state_, "<none>" );
-  add_state( "brush_radius", brush_radius_state_, 23, 1, 250, 1 );
-  add_state( "upper_threshold", upper_threshold_state_, 1.0, 00.0, 1.0, 0.01 );
-  add_state( "lower_threshold", lower_threshold_state_, 0.0, 00.0, 1.0, 0.01 );
-  add_state( "erase", erase_state_, false );
+  add_state( "target", this->target_layer_state_, "<none>" );
+  add_state( "mask", this->mask_layer_state_, "<none>" );
+  add_state( "brush_radius", this->brush_radius_state_, 23, 1, 250, 1 );
+  add_state( "upper_threshold", this->upper_threshold_state_, 1.0, 00.0, 1.0, 0.01 );
+  add_state( "lower_threshold", this->lower_threshold_state_, 0.0, 00.0, 1.0, 0.01 );
+  add_state( "erase", this->erase_state_, false );
+  
+  this->handle_layers_changed();
 
   // Add constaints, so that when the state changes the right ranges of
   // parameters are selected
@@ -74,18 +76,30 @@ void PaintTool::handle_layers_changed()
   
   for( int i = 0; i < static_cast< int >( target_layers.size() ); ++i )
   {
-    if( target_layers[i]->get_layer_name() == target_layer_state_->get() ) 
+    if( ( this->target_layer_state_->get() == "<none>" ) && ( target_layers[i]->type() == 
+                                 Utils::VolumeType::DATA_E ) )
+    {
+      this->target_layer_state_->set( target_layers[i]->get_layer_name(), ActionSource::NONE_E );
+    }
+    
+    if( ( this->mask_layer_state_->get() == "<none>" ) && ( target_layers[i]->type() == 
+                                 Utils::VolumeType::MASK_E ) )
+    {
+      this->mask_layer_state_->set( target_layers[i]->get_layer_name(), ActionSource::NONE_E );
+    }
+    
+    if( target_layers[i]->get_layer_name() == this->target_layer_state_->get() ) 
       target_found = true;
   
-    if( target_layers[i]->get_layer_name() == mask_layer_state_->get() )
+    if( target_layers[i]->get_layer_name() == this->mask_layer_state_->get() )
       mask_found = true;
   }
     
   if( !target_found )
-    target_layer_state_->set( "", ActionSource::NONE_E );
+    this->target_layer_state_->set( "", ActionSource::NONE_E );
   
   if( !mask_found )
-    mask_layer_state_->set( "", ActionSource::NONE_E );
+    this->mask_layer_state_->set( "", ActionSource::NONE_E );
 
 }
 
@@ -95,17 +109,6 @@ void PaintTool::target_constraint( std::string layerid )
 
 void PaintTool::mask_constraint( std::string layerid )
 {
-  /*
-   if (layerid == "<none>")
-   {
-
-   }
-   else
-   {
-   LayerHandle layer;
-   LayerManager::instance()->get_layer(layerid,layer);
-   }
-   */
 }
 
 void PaintTool::activate()

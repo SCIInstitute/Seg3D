@@ -54,6 +54,9 @@ public:
   virtual ~PaintToolInterface();
   virtual bool build_widget( QFrame* frame );
 
+private Q_SLOTS:
+  void execute_filter();
+  
   // -- private structure with widget classes --
 private:
   boost::shared_ptr< PaintToolInterfacePrivate > private_;

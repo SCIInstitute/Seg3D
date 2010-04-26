@@ -112,7 +112,7 @@ void ToolBoxWidget::add_tool( QWidget * tool, const QString &label,
     boost::function< void() > close_function, boost::function< void() > activate_function,
     const std::string& help_url )
 {
-  if ( !tool ) return;
+  if( !tool ) return;
 
   ToolBoxPageWidget new_page;
 
@@ -154,9 +154,9 @@ void ToolBoxWidget::set_active_tool( QWidget *tool )
   for ( size_t i = 0; i < this->private_->page_list_.size(); i++ )
   {
     // first we deactivate the inactive tools
-//    if ( this->private_->page_list_[ i ].tool_ != tool )
+//    if( this->private_->page_list_[ i ].tool_ != tool )
 //    {
-//      if ( !( this->private_->page_list_[ i ].ui_.tool_frame_->isHidden() ) )
+//      if( !( this->private_->page_list_[ i ].ui_.tool_frame_->isHidden() ) )
 //      {
         this->private_->page_list_[ i ].ui_.page_background_->setStyleSheet( 
           StyleSheet::TOOLBOXPAGEWIDGET_PAGE_BACKGROUND_INACTIVE_C );
@@ -174,12 +174,12 @@ void ToolBoxWidget::set_active_tool( QWidget *tool )
     // then, we activate the active one.
   for ( size_t i = 0; i < this->private_->page_list_.size(); i++ )
   {
-    if ( this->private_->page_list_[ i ].tool_ == tool )
+    if( this->private_->page_list_[ i ].tool_ == tool )
     {
       this->active_index_ = static_cast< int > ( i );
       this->active_tool_ = private_->page_list_[ i ].tool_;
 
-      if ( this->private_->page_list_[ i ].ui_.tool_frame_->isHidden() )
+      if( this->private_->page_list_[ i ].ui_.tool_frame_->isHidden() )
       {
         this->private_->page_list_[ i ].ui_.page_background_->setStyleSheet(
             StyleSheet::TOOLBOXPAGEWIDGET_PAGE_BACKGROUND_ACTIVE_C );
@@ -203,7 +203,7 @@ int ToolBoxWidget::index_of( QWidget *tool )
 {
   for ( size_t i = 0; i < this->private_->page_list_.size(); i++ )
   {
-    if ( this->private_->page_list_[ i ].tool_ == tool )
+    if( this->private_->page_list_[ i ].tool_ == tool )
     {
       return static_cast< int > ( i );
     }
@@ -219,7 +219,7 @@ QWidget* ToolBoxWidget::get_tool_at( int index )
 
 void ToolBoxWidget::set_active_index( int index )
 {
-  if ( ( index < static_cast< int > ( this->private_->page_list_.size() ) ) && ( index >= 0 ) ) set_active_tool(
+  if( ( index < static_cast< int > ( this->private_->page_list_.size() ) ) && ( index >= 0 ) ) set_active_tool(
       this->private_->page_list_[ index ].tool_ );
 
 } // end set_active_index
@@ -228,7 +228,7 @@ void ToolBoxWidget::set_active_index( int index )
 void ToolBoxWidget::remove_tool( int index )
 {
   // Find the index that corresponds to the tool
-  if ( index >=  static_cast< int > (this->private_->page_list_.size()) )
+  if( index >=  static_cast< int > (this->private_->page_list_.size()) )
   {
     return;
   }
@@ -238,9 +238,9 @@ void ToolBoxWidget::remove_tool( int index )
   this->private_->page_list_.erase( private_->page_list_.begin() + index );
 
   // Set the previous tool to active if the one to be deleted is active.
-  if ( this->active_index_ == index )
+  if( this->active_index_ == index )
   {
-    if ( index == 0 )
+    if( index == 0 )
     {
       set_active_index( index );
     }
@@ -258,7 +258,7 @@ void ToolBoxWidget::help_button_clicked()
 
   for ( size_t i = 0; i < this->private_->page_list_.size(); i++ )
   {
-    if ( this->private_->page_list_[ i ].ui_.help_button_ == help_button )
+    if( this->private_->page_list_[ i ].ui_.help_button_ == help_button )
     {
       QDesktopServices::openUrl( QUrl( this->private_->page_list_[ i ].ui_.url_->text() ) );
       break;

@@ -59,7 +59,7 @@ public:
 
 private:
   boost::shared_ptr< MessageHistoryWidgetPrivate > private_;
-  QList<QString> log_;
+  //QList<QString> log_;
   
 public:
   void add_history_item(const QString &message, const QColor &color);

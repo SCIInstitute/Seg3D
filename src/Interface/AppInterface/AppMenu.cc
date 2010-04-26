@@ -101,12 +101,12 @@ void AppMenu::create_layer_menu( QMenu* qmenu )
   qaction = qmenu->addAction( tr( "Import Layer... ") );
   qaction->setShortcut( tr( "Ctrl+Shift+O" ) );
   qaction->setToolTip( tr( "Import a new layer into the layer manager" ) );
-  QtBridge::Connect( qaction, boost::bind( &AppLayerIO::Import,  main_window_ ) );
+  QtBridge::Connect( qaction, boost::bind( &AppLayerIO::Import,  this->main_window_ ) );
 
   qaction = qmenu->addAction( tr( "Export Layer...") );
   qaction->setShortcut( tr( "Ctrl+Shift+S" ) );
   qaction->setToolTip( tr( "Export the active layer" ) );
-  QtBridge::Connect( qaction, boost::bind( &AppLayerIO::Export, main_window_ ) );
+  QtBridge::Connect( qaction, boost::bind( &AppLayerIO::Export, this->main_window_ ) );
 }
 
 

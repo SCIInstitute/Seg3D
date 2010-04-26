@@ -37,6 +37,7 @@
 
 //Application Includes
 #include <Application/Tools/PaintTool.h>
+#include <Application/Filters/Actions/ActionPaint.h>
 
 namespace Seg3D
 {
@@ -137,12 +138,28 @@ bool PaintToolInterface::build_widget( QFrame* frame )
   QtBridge::Connect( this->private_->lower_threshold_, tool->lower_threshold_state_ );
   QtBridge::Connect( this->private_->ui_.eraseCheckBox, tool->erase_state_ );
   
+  this->private_->target_->sync_layers();
+  this->private_->mask_->sync_layers();
+  
+  
   
     //Send a message to the log that we have finised with building the Paint Brush Interface
   SCI_LOG_MESSAGE("Finished building a Paint Brush Interface");
 
   return ( true );
 } // end build_widget
+
+void PaintToolInterface::execute_filter()
+{
+  ToolHandle base_tool_ = tool();
+  PaintTool* tool =
+  dynamic_cast< PaintTool* > ( base_tool_.get() );
+  
+  ActionPaint::Dispatch( tool->target_layer_state_->export_to_string(), 
+    tool->mask_layer_state_->export_to_string(), tool->brush_radius_state_->get(), 
+    tool->upper_threshold_state_->get(), tool->lower_threshold_state_->get(),
+    tool->erase_state_->get() ); 
+}
 
 } // end namespace Seg3D
 

@@ -66,18 +66,18 @@ AppStatusBar::AppStatusBar( QMainWindow* parent ) :
   private_( new AppStatusBarPrivate )
 {
   this->statusbar_ = parent->statusBar();
-  this->statusbar_widget_ = new QWidget( statusbar_ );
+  this->statusbar_widget_ = new QWidget( this->statusbar_ );
   
-  this->private_->ui_.setupUi( statusbar_widget_ );
+  this->private_->ui_.setupUi( this->statusbar_widget_ );
   
   
   this->history_widget_ = new MessageHistoryWidget( parent );
 
-  statusbar_->setContentsMargins( 0, 0, 0, 0 );
+  this->statusbar_->setContentsMargins( 0, 0, 0, 0 );
 
-  statusbar_->addWidget( this->statusbar_widget_, 1 );
+  this->statusbar_->addWidget( this->statusbar_widget_, 1 );
   
-  statusbar_->setStyleSheet( StyleSheet::STATUSBAR_C );
+  this->statusbar_->setStyleSheet( StyleSheet::STATUSBAR_C );
   
   connect(this->private_->ui_.info_button_, 
     SIGNAL(clicked(bool)), this, SLOT(activate_history(bool)));
@@ -107,7 +107,7 @@ AppStatusBar::~AppStatusBar()
 
 void AppStatusBar::set_coordinates_mode( bool is_world )
 {
-  if ( !is_world )
+  if( !is_world )
   {
     this->private_->ui_.world_button_->setToolTip( QString::fromUtf8(
         "Coordinate mode is set to Local, click to toggle to Global" ) );
@@ -131,7 +131,7 @@ void AppStatusBar::set_status_report_label( std::string& status )
 
 void AppStatusBar::activate_history( bool is_active_ )
 {
-  if ( is_active_ )
+  if( is_active_ )
   {
     this->history_widget_->show();
   }
@@ -150,7 +150,7 @@ void AppStatusBar::fix_icon_status()
 
 void AppStatusBar::update_data_point_info( DataPointInfoHandle data_point )
 {
-  if ( !Interface::IsInterfaceThread() )
+  if( !Interface::IsInterfaceThread() )
   {
     Interface::PostEvent( boost::bind( 
       &AppStatusBar::update_data_point_info, this, data_point ) );
@@ -225,7 +225,7 @@ void AppStatusBar::update_data_point_label()
 
 void AppStatusBar::set_message( int msg_type, std::string message )
 {
-  if ( !Interface::IsInterfaceThread() )
+  if( !Interface::IsInterfaceThread() )
   {
     Interface::PostEvent( boost::bind( &AppStatusBar::set_message, this,
         msg_type, message ) );

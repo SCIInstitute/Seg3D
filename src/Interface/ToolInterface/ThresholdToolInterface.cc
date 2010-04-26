@@ -36,6 +36,7 @@
 
 //Application Includes
 #include <Application/Tools/ThresholdTool.h>
+#include <Application/Filters/Actions/ActionThreshold.h>
 
 namespace Seg3D
 {
@@ -109,13 +110,35 @@ bool ThresholdToolInterface::build_widget( QFrame* frame )
 
   //Step 4 - connect the gui to the tool through the QtBridge
   QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
+  connect( this->private_->target_, SIGNAL( valid( bool ) ), this, SLOT( enable_run_filter( bool ) ) );
   QtBridge::Connect( this->private_->upper_threshold_, tool->upper_threshold_state_ );
   QtBridge::Connect( this->private_->lower_threshold_, tool->lower_threshold_state_ );
+  
+  //connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), this, SLOT( execute_filter() ) );
+  this->private_->target_->sync_layers();
 
   //Send a message to the log that we have finised with building the Threshold Tool Interface
   SCI_LOG_DEBUG("Finished building a Threshold Tool Interface");
 
   return ( true );
 } // end build_widget
+  
+void ThresholdToolInterface::enable_run_filter( bool valid )
+{
+  ///if( valid )
+    //this->private_->ui_.runFilterButton->setEnabled( true );
+  //else
+    //this->private_->ui_.runFilterButton->setEnabled( false );
+}
+
+void ThresholdToolInterface::execute_filter()
+{
+  ToolHandle base_tool_ = tool();
+  ThresholdTool* tool =
+  dynamic_cast< ThresholdTool* > ( base_tool_.get() );
+  
+  ActionThreshold::Dispatch( tool->target_layer_state_->export_to_string(), 
+    tool->upper_threshold_state_->get(), tool->lower_threshold_state_->get() ); 
+}
 
 } // end namespace Seg3D

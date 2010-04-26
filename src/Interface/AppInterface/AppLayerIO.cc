@@ -61,13 +61,13 @@ void AppLayerIO::Import( QMainWindow* main_window )
   
   // Step (3): Get the selected filename and name filter
   QStringList file_list = import_dialog.selectedFiles();
-  if ( file_list.size() == 0) return;
+  if( file_list.size() == 0) return;
   std::string filename = file_list[0].toStdString();
   std::string filtername = import_dialog.selectedNameFilter().toStdString();
   
   // Step (4): Get the importer for this specific file type
   LayerImporterHandle importer;
-  if ( ! ( LayerIO::Instance()->create_importer( filename, importer, filtername ) ) )
+  if( ! ( LayerIO::Instance()->create_importer( filename, importer, filtername ) ) )
   {
     std::string error_message = std::string("ERROR: No importer is available for file '") + 
       filename + std::string("'.");
