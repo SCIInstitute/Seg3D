@@ -50,7 +50,6 @@ namespace Seg3D
 LayerManagerWidget::LayerManagerWidget( QWidget* parent ) :
   QScrollArea( parent )
 {
-  
   // set some values for the scrollarea widget
   setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
   setVerticalScrollBarPolicy( Qt::ScrollBarAsNeeded );
@@ -59,23 +58,18 @@ LayerManagerWidget::LayerManagerWidget( QWidget* parent ) :
 
   this->main_ = new QWidget( parent );
   setWidget( this->main_ );
-
-  this->main_layout_ = new QVBoxLayout( this->main_ );
-  this->main_layout_->setContentsMargins( 1, 1, 1, 1 );
-  this->main_layout_->setSpacing( 1 );
-
+  
   this->group_layout_ = new QVBoxLayout;
-  this->group_layout_->setSpacing( 5 );
-  this->main_layout_->addLayout( this->group_layout_ );
-  this->main_layout_->addStretch();
-
-  this->main_->setLayout( this->main_layout_ );
+  this->group_layout_->setSpacing( 2 );
+  this->group_layout_->setContentsMargins( 1, 1, 1, 1 );
+  this->group_layout_->setAlignment( Qt::AlignTop );
+  
+  this->main_->setLayout( this->group_layout_ );
   this->main_->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Preferred );
-
   this->main_->setAcceptDrops( true );
 
 }
-// destructor
+// destructor 
 LayerManagerWidget::~LayerManagerWidget()
 {
 }

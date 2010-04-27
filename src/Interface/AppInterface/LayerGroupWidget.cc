@@ -57,15 +57,15 @@ class LayerGroupWidgetPrivate
 public:
   Ui::LayerGroupWidget ui_;
   
-  SliderDoubleCombo* center_x_adjuster_crop;
-  SliderDoubleCombo* center_y_adjuster_crop;
-  SliderDoubleCombo* center_z_adjuster_crop;
+  SliderDoubleCombo* center_x_adjuster_crop_;
+  SliderDoubleCombo* center_y_adjuster_crop_;
+  SliderDoubleCombo* center_z_adjuster_crop_;
   
-  SliderDoubleCombo* size_width_adjuster_crop;
-  SliderDoubleCombo* size_height_adjuster_crop;
-  SliderDoubleCombo* size_depth_adjuster_crop;
+  SliderDoubleCombo* size_width_adjuster_crop_;
+  SliderDoubleCombo* size_height_adjuster_crop_;
+  SliderDoubleCombo* size_depth_adjuster_crop_;
   
-    SliderDoubleCombo* scale_adjuster;
+    SliderDoubleCombo* scale_adjuster_;
 
   
 };
@@ -99,41 +99,41 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
   this->private_->ui_.delete_button_->setEnabled( false );
   
   // add the slider spinner combo's for the crop
-  this->private_->center_x_adjuster_crop = new SliderDoubleCombo( this->private_->ui_.widget );
-  this->private_->ui_.horizontalLayout_11->addWidget( this->private_->center_x_adjuster_crop );
-  this->private_->center_x_adjuster_crop->setObjectName( QString::fromUtf8( "center_x_adjuster_crop" ) );
+  this->private_->center_x_adjuster_crop_ = new SliderDoubleCombo( this->private_->ui_.widget );
+  this->private_->ui_.horizontalLayout_11->addWidget( this->private_->center_x_adjuster_crop_ );
+  this->private_->center_x_adjuster_crop_->setObjectName( QString::fromUtf8( "center_x_adjuster_crop_" ) );
   
-  this->private_->center_y_adjuster_crop = new SliderDoubleCombo( this->private_->ui_.widget_2 );
-  this->private_->ui_.horizontalLayout_12->addWidget( this->private_->center_y_adjuster_crop );
-  this->private_->center_y_adjuster_crop->setObjectName( QString::fromUtf8( "center_y_adjuster_crop" ) );
+  this->private_->center_y_adjuster_crop_ = new SliderDoubleCombo( this->private_->ui_.widget_2 );
+  this->private_->ui_.horizontalLayout_12->addWidget( this->private_->center_y_adjuster_crop_ );
+  this->private_->center_y_adjuster_crop_->setObjectName( QString::fromUtf8( "center_y_adjuster_crop_" ) );
   
-  this->private_->center_z_adjuster_crop = new SliderDoubleCombo( this->private_->ui_.widget_3 );
-  this->private_->ui_.horizontalLayout_14->addWidget( this->private_->center_z_adjuster_crop );
-  this->private_->center_z_adjuster_crop->setObjectName( QString::fromUtf8( "center_z_adjuster_crop" ) );
+  this->private_->center_z_adjuster_crop_ = new SliderDoubleCombo( this->private_->ui_.widget_3 );
+  this->private_->ui_.horizontalLayout_14->addWidget( this->private_->center_z_adjuster_crop_ );
+  this->private_->center_z_adjuster_crop_->setObjectName( QString::fromUtf8( "center_z_adjuster_crop_" ) );
   
-  this->private_->size_height_adjuster_crop = new SliderDoubleCombo( this->private_->ui_.widget_4 );
-  this->private_->ui_.horizontalLayout_7->addWidget( this->private_->size_height_adjuster_crop );
-  this->private_->size_height_adjuster_crop->setObjectName( QString::fromUtf8( "size_height_adjuster_crop" ) );
+  this->private_->size_height_adjuster_crop_ = new SliderDoubleCombo( this->private_->ui_.widget_4 );
+  this->private_->ui_.horizontalLayout_7->addWidget( this->private_->size_height_adjuster_crop_ );
+  this->private_->size_height_adjuster_crop_->setObjectName( QString::fromUtf8( "size_height_adjuster_crop_" ) );
   
-  this->private_->size_width_adjuster_crop = new SliderDoubleCombo( this->private_->ui_.widget_5 );
-  this->private_->ui_.horizontalLayout_9->addWidget( this->private_->size_width_adjuster_crop );
-  this->private_->size_width_adjuster_crop->setObjectName( QString::fromUtf8( "size_width_adjuster_crop" ) );
+  this->private_->size_width_adjuster_crop_ = new SliderDoubleCombo( this->private_->ui_.widget_5 );
+  this->private_->ui_.horizontalLayout_9->addWidget( this->private_->size_width_adjuster_crop_ );
+  this->private_->size_width_adjuster_crop_->setObjectName( QString::fromUtf8( "size_width_adjuster_crop_" ) );
   
-  this->private_->size_depth_adjuster_crop = new SliderDoubleCombo( this->private_->ui_.widget_6 );
-  this->private_->ui_.horizontalLayout_10->addWidget( this->private_->size_depth_adjuster_crop );
-  this->private_->size_depth_adjuster_crop->setObjectName( QString::fromUtf8( "size_depth_adjuster_crop" ) );
+  this->private_->size_depth_adjuster_crop_ = new SliderDoubleCombo( this->private_->ui_.widget_6 );
+  this->private_->ui_.horizontalLayout_10->addWidget( this->private_->size_depth_adjuster_crop_ );
+  this->private_->size_depth_adjuster_crop_->setObjectName( QString::fromUtf8( "size_depth_adjuster_crop_" ) );
   
-  this->private_->scale_adjuster = new SliderDoubleCombo( this->private_->ui_.widget_7 );
-  this->private_->ui_.horizontalLayout_15->addWidget( this->private_->scale_adjuster );
-  this->private_->scale_adjuster->setObjectName( QString::fromUtf8( "scale_adjuster" ) );
+  this->private_->scale_adjuster_ = new SliderDoubleCombo( this->private_->ui_.widget_7 );
+  this->private_->ui_.horizontalLayout_15->addWidget( this->private_->scale_adjuster_ );
+  this->private_->scale_adjuster_->setObjectName( QString::fromUtf8( "scale_adjuster_" ) );
   
   // set some local values for the current size
-  this->current_width = static_cast<int>( group->get_grid_transform().get_nx() );
-  this->current_height = static_cast<int>( group->get_grid_transform().get_ny() );
-  this->current_depth = static_cast<int>( group->get_grid_transform().get_nz() );
+  this->current_width_ = static_cast<int>( group->get_grid_transform().get_nx() );
+  this->current_height_ = static_cast<int>( group->get_grid_transform().get_ny() );
+  this->current_depth_ = static_cast<int>( group->get_grid_transform().get_nz() );
   
   //  connect the gui signals and slots
-    connect( this->private_->scale_adjuster, SIGNAL( valueAdjusted( double ) ), this, SLOT( adjust_new_size_labels( double )) );
+    connect( this->private_->scale_adjuster_, SIGNAL( valueAdjusted( double ) ), this, SLOT( adjust_new_size_labels( double )) );
   connect( this->private_->ui_.open_button_, SIGNAL( toggled( bool ) ), this, SLOT( show_layers( bool )) );
   connect( this->private_->ui_.group_resample_button_, SIGNAL( clicked( bool ) ), this, SLOT( show_resample( bool )) );
   connect( this->private_->ui_.group_crop_button_, SIGNAL( clicked( bool ) ), this, SLOT( show_crop( bool )) );
@@ -143,14 +143,14 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
   connect( this->private_->ui_.confirm_delete_checkbox_, SIGNAL( clicked ( bool ) ), this, SLOT( enable_delete_button( bool )) );
   connect( this->private_->ui_.delete_button_, SIGNAL( clicked () ), this, SLOT( uncheck_delete_confirm() ) );
   
-  // Add all current layer to the new group
+  // Add the current layer to the new group
   this->insert_layer( layer, -1 );
 
   
   //Set the defaulf values for the Group UI and make the connections to the state engine
       // --- GENERAL ---
       this->private_->ui_.open_button_->setChecked( group->show_layers_state_.get() );
-      this->private_->ui_.group_visibility_button_->setChecked(group->visibility_state_.get() );
+      this->private_->ui_.group_visibility_button_->setChecked( group->visibility_state_.get() );
       
       QtBridge::Connect( this->private_->ui_.open_button_, group->show_layers_state_ );
       QtBridge::Connect( this->private_->ui_.group_visibility_button_, group->visibility_state_ );
@@ -161,29 +161,29 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
       // --- RESAMPLE ---
       // = set the default values
       this->private_->ui_.x_axis_label_current_->setText( QString::fromUtf8("X: ") + 
-      QString::number(group->get_grid_transform().get_nx()) );
+      QString::number( group->get_grid_transform().get_nx()) );
       this->private_->ui_.y_axis_label_current_->setText( QString::fromUtf8("Y: ") + 
-      QString::number(group->get_grid_transform().get_ny()) );
+      QString::number( group->get_grid_transform().get_ny()) );
       this->private_->ui_.z_axis_label_current_->setText( QString::fromUtf8("Z: ") + 
-      QString::number(group->get_grid_transform().get_nz()) );
+      QString::number( group->get_grid_transform().get_nz()) );
       
       this->private_->ui_.x_axis_label_new_->setText( QString::fromUtf8("X: ") + 
-      QString::number(group->get_grid_transform().get_nx()) );
+      QString::number( group->get_grid_transform().get_nx()) );
       this->private_->ui_.y_axis_label_new_->setText( QString::fromUtf8("Y: ") + 
-      QString::number(group->get_grid_transform().get_ny()) );
+      QString::number( group->get_grid_transform().get_ny()) );
       this->private_->ui_.z_axis_label_new_->setText( QString::fromUtf8("Z: ") + 
-      QString::number(group->get_grid_transform().get_nz()) );
+      QString::number( group->get_grid_transform().get_nz()) );
       
       QFont font;
-        font.setPointSize(10);
-        this->private_->ui_.x_axis_label_current_->setFont(font);
-        this->private_->ui_.y_axis_label_current_->setFont(font);
-        this->private_->ui_.z_axis_label_current_->setFont(font);
+        font.setPointSize( 10 );
+        this->private_->ui_.x_axis_label_current_->setFont( font );
+        this->private_->ui_.y_axis_label_current_->setFont( font );
+        this->private_->ui_.z_axis_label_current_->setFont( font );
         
-        font.setBold(true);
-        this->private_->ui_.x_axis_label_new_->setFont(font);
-        this->private_->ui_.y_axis_label_new_->setFont(font);
-        this->private_->ui_.z_axis_label_new_->setFont(font);
+        font.setBold( true );
+        this->private_->ui_.x_axis_label_new_->setFont( font );
+        this->private_->ui_.y_axis_label_new_->setFont( font );
+        this->private_->ui_.z_axis_label_new_->setFont( font );
         
         this->private_->ui_.resample_replace_checkBox_->setChecked( 
       group->resample_replace_state_->get() );
@@ -194,50 +194,50 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
       double resample_step = 0.0;
       group->resample_factor_state_->get_step( resample_step );
       group->resample_factor_state_->get_range( resample_min, resample_max );
-      this->private_->scale_adjuster->setStep( resample_step );
-        this->private_->scale_adjuster->setRange( resample_min, resample_max );
-        this->private_->scale_adjuster->setCurrentValue( group->resample_factor_state_->get() );
+      this->private_->scale_adjuster_->setStep( resample_step );
+        this->private_->scale_adjuster_->setRange( resample_min, resample_max );
+        this->private_->scale_adjuster_->setCurrentValue( group->resample_factor_state_->get() );
         
          // = make the connections
-        QtBridge::Connect( this->private_->scale_adjuster, group->resample_factor_state_ );
+        QtBridge::Connect( this->private_->scale_adjuster_, group->resample_factor_state_ );
       QtBridge::Connect( this->private_->ui_.resample_replace_checkBox_, 
       group->resample_replace_state_ );
         
 
         // --- CROP ---
         // = set the default values
-        this->private_->size_width_adjuster_crop->setRange( 0, 
+        this->private_->size_width_adjuster_crop_->setRange( 0, 
       group->get_grid_transform().get_nx() );
-        this->private_->size_height_adjuster_crop->setRange( 0, 
+        this->private_->size_height_adjuster_crop_->setRange( 0, 
       group->get_grid_transform().get_ny() );
-        this->private_->size_depth_adjuster_crop->setRange( 0, 
+        this->private_->size_depth_adjuster_crop_->setRange( 0, 
       group->get_grid_transform().get_nz() );
         
-        this->private_->size_width_adjuster_crop->setCurrentValue( 
+        this->private_->size_width_adjuster_crop_->setCurrentValue( 
       group->get_grid_transform().get_nx() );
-        this->private_->size_height_adjuster_crop->setCurrentValue( 
+        this->private_->size_height_adjuster_crop_->setCurrentValue( 
       group->get_grid_transform().get_ny() );
-        this->private_->size_depth_adjuster_crop->setCurrentValue( 
+        this->private_->size_depth_adjuster_crop_->setCurrentValue( 
       group->get_grid_transform().get_nz() );
 
-        this->private_->center_x_adjuster_crop->setRange( 0, group->get_grid_transform().get_nx() );
-        this->private_->center_y_adjuster_crop->setRange( 0, group->get_grid_transform().get_ny() );
-        this->private_->center_z_adjuster_crop->setRange( 0, group->get_grid_transform().get_nz() );
+        this->private_->center_x_adjuster_crop_->setRange( 0, group->get_grid_transform().get_nx() );
+        this->private_->center_y_adjuster_crop_->setRange( 0, group->get_grid_transform().get_ny() );
+        this->private_->center_z_adjuster_crop_->setRange( 0, group->get_grid_transform().get_nz() );
         
-        this->private_->center_x_adjuster_crop->setCurrentValue( 0 );
-        this->private_->center_y_adjuster_crop->setCurrentValue( 0 );
-        this->private_->center_z_adjuster_crop->setCurrentValue( 0 );
+        this->private_->center_x_adjuster_crop_->setCurrentValue( 0 );
+        this->private_->center_y_adjuster_crop_->setCurrentValue( 0 );
+        this->private_->center_z_adjuster_crop_->setCurrentValue( 0 );
         
         this->private_->ui_.crop_replace_checkBox_->setChecked( group->crop_replace_state_->get() );
         
         // = make the connections
-        QtBridge::Connect( this->private_->size_width_adjuster_crop, group->crop_size_width_state_ );
-        QtBridge::Connect( this->private_->size_height_adjuster_crop, group->crop_size_height_state_ );
-        QtBridge::Connect( this->private_->size_depth_adjuster_crop, group->crop_size_depth_state_ );
+        QtBridge::Connect( this->private_->size_width_adjuster_crop_, group->crop_size_width_state_ );
+        QtBridge::Connect( this->private_->size_height_adjuster_crop_, group->crop_size_height_state_ );
+        QtBridge::Connect( this->private_->size_depth_adjuster_crop_, group->crop_size_depth_state_ );
         
-        QtBridge::Connect( this->private_->center_x_adjuster_crop, group->crop_center_x_state_ );
-        QtBridge::Connect( this->private_->center_y_adjuster_crop, group->crop_center_y_state_ );
-        QtBridge::Connect( this->private_->center_z_adjuster_crop, group->crop_center_z_state_ );
+        QtBridge::Connect( this->private_->center_x_adjuster_crop_, group->crop_center_x_state_ );
+        QtBridge::Connect( this->private_->center_y_adjuster_crop_, group->crop_center_y_state_ );
+        QtBridge::Connect( this->private_->center_z_adjuster_crop_, group->crop_center_z_state_ );
         
         QtBridge::Connect( this->private_->ui_.crop_replace_checkBox_, group->crop_replace_state_ );
         
@@ -372,11 +372,11 @@ void LayerGroupWidget::show_selection_checkboxes( bool show )
 void LayerGroupWidget::adjust_new_size_labels( double scale_factor )
 {
     this->private_->ui_.x_axis_label_new_->setText( QString::fromUtf8("X: ") + 
-    QString::number(this->current_width * scale_factor ) );
+    QString::number(this->current_width_ * scale_factor ) );
   this->private_->ui_.y_axis_label_new_->setText( QString::fromUtf8("Y: ") + 
-    QString::number(this->current_height * scale_factor ) );
+    QString::number(this->current_height_ * scale_factor ) );
   this->private_->ui_.z_axis_label_new_->setText( QString::fromUtf8("Z: ") + 
-    QString::number(this->current_depth * scale_factor ) );
+    QString::number(this->current_depth_ * scale_factor ) );
 }
   
   

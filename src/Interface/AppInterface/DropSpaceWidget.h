@@ -57,8 +57,6 @@ private:
   QTimer *timer_;
   bool changing_size_;
   bool open_;
-  QWidget* parent_;
-  
 };
   
 } // end namespace Seg3D

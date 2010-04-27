@@ -37,9 +37,6 @@ DropSpaceWidget::DropSpaceWidget( QWidget *parent ) :
   open_( false )
 {
   this->setParent( parent );
-  
-  this->parent_ = parent;
-  
   this->setObjectName( QString::fromUtf8( "insert_space_" ));
   this->setFixedHeight( 0 );  
   this->setStyleSheet( QString::fromUtf8(

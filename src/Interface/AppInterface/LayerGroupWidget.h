@@ -75,9 +75,9 @@ private Q_SLOTS:
     
 private:
   std::string group_id_;
-  int current_height;
-  int current_width;
-  int current_depth;
+  int current_height_;
+  int current_width_;
+  int current_depth_;
   
   // -- widget internals --
 private:

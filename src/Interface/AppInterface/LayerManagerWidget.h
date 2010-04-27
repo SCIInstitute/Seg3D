@@ -45,23 +45,10 @@
 namespace Seg3D
 {
   
-// enum for layer types
-SCI_ENUM_CLASS
-(
-  LayerType,
-  DATA_LAYER_E = 1, 
-  MASK_LAYER_E = 2, 
-  LABEL_LAYER_E = 3
-)
   
-  
-
-//class LayerManagerWidgetPrivate;
-//typedef boost::shared_ptr< LayerManagerWidgetPrivate > LayerManagerWidgetPrivateHandle_type;
-
 class LayerManagerWidget : public QScrollArea
 {
-  // Needed to make it a Qt object
+// Need to make it a Qt object
 Q_OBJECT
 
 //constructor - destructor

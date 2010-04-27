@@ -89,16 +89,13 @@ ToolBoxWidget::ToolBoxWidget( QWidget* parent ) :
 
   this->main_ = new QWidget( this );
   setWidget( this->main_ );
-
-  this->main_layout_ = new QVBoxLayout( this->main_ );
-  this->main_layout_->setContentsMargins( 1, 1, 1, 1 );
-  this->main_layout_->setSpacing( 1 );
-
+  
   this->tool_layout_ = new QVBoxLayout;
-  this->main_layout_->addLayout( this->tool_layout_ );
-  this->main_layout_->addStretch();
-
-  this->main_->setLayout( this->main_layout_ );
+  this->tool_layout_->setSpacing( 2 );
+  this->tool_layout_->setContentsMargins( 1, 1, 1, 1 );
+  this->tool_layout_->setAlignment( Qt::AlignTop );
+  
+  this->main_->setLayout( this->tool_layout_  );
   this->main_->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Preferred );
 
 }

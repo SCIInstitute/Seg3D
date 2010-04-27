@@ -86,23 +86,19 @@ private:
   
   std::string layer_id_;
   Utils::GridTransform grid_transform_;
-  int volume_type_;
   bool active_;
   bool picked_up_;
   bool group_menus_open_;
+  Utils::VolumeType volume_type_;
+  
   LayerWidget* drop_layer_;
 
   
   void set_drop_target( LayerWidget* target_layer );
   void mousePressEvent( QMouseEvent* event );
-//  void dragMoveEvent( QDragMoveEvent* event );
   void dropEvent( QDropEvent* event );
   void dragEnterEvent( QDragEnterEvent* event );
   void dragLeaveEvent( QDragLeaveEvent* event );
-
-//private Q_SLOTS:
-//  void shrink();
-//  void grow();
 
 protected:
   void resizeEvent( QResizeEvent *event );

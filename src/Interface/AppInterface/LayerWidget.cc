@@ -69,9 +69,12 @@ public:
 LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   QWidget( parent ),
   private_( new LayerWidgetPrivate ),
+  layer_id_( layer->get_layer_id() ),
+  grid_transform_( layer->get_grid_transform() ),
   active_( false ),
   picked_up_( false ),
-  group_menus_open_( false )
+  group_menus_open_( false ),
+  volume_type_( layer->type() )
 {
   
   
@@ -98,11 +101,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   // this is a default setting until we can get the name of the layer from the file or by some other means
   this->private_->ui_.label_->setText( QString::fromStdString( layer->name_state_->get() ) );
   this->private_->ui_.label_->setAcceptDrops( false );
-  
-  // here we set the unique layer_id_ of the layer
-  this->layer_id_ = layer->get_layer_id();
-  this->grid_transform_ = layer->get_grid_transform();
-  
+
   // hide the toolbars and the selection check box
   // hide the tool bars and the selection checkbox
   this->private_->ui_.color_bar_->hide();
@@ -207,7 +206,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   QtBridge::Connect( this->private_->opacity_adjuster_, layer->opacity_state_ );
   QtBridge::Connect( this->private_->ui_.label_, layer->name_state_ );
     
-  switch( layer->type() )
+  switch( this->volume_type_ )
   {
     // This if for the Data Layers
     case Utils::VolumeType::DATA_E:
@@ -242,9 +241,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
                 this->private_->contrast_adjuster_->setStep( contrast_step );
                 this->private_->contrast_adjuster_->setRange( contrast_min, contrast_max );
                 this->private_->contrast_adjuster_->setCurrentValue( data_layer->contrast_state_->get() );
-        
-        // keep track locally of what type we are
-        this->volume_type_ = 1;
+
       }
       break;
     // This is for the Mask Layers  
@@ -257,10 +254,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
         MaskLayer* mask_layer = dynamic_cast< MaskLayer* >( layer.get() );  
         QtBridge::Connect( this->private_->ui_.iso_surface_button_, mask_layer->show_isosurface_state_ );
         QtBridge::Connect( this->private_->ui_.border_selection_combo_, mask_layer->fill_state_ );
-      
 
-          // keep track locally of what type we are
-          this->volume_type_ = 2;
       }
       break;
       
@@ -269,8 +263,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
         {
         this->private_->ui_.typeBackground_->setStyleSheet( StyleSheet::LABEL_VOLUME_COLOR_C );
         this->private_->activate_button_->setIcon(this->label_layer_icon_);
-        // keep track locally of what type we are
-            this->volume_type_ = 3;
+
         }
       break;
       
