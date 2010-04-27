@@ -39,6 +39,7 @@
 #include <Interface/AppInterface/PushDragButton.h>
 #include <Interface/AppInterface/DropSpaceWidget.h>
 #include <Interface/AppInterface/OverlayWidget.h>
+#include <Interface/AppInterface/ColorBarWidget.h>
 
 //UI Includes
 #include "ui_LayerWidget.h"
@@ -64,6 +65,7 @@ public:
   PushDragButton* activate_button_;
   DropSpaceWidget* drop_space_;
   OverlayWidget* overlay_;
+  ColorBarWidget* color_widget_;
 };
 
 LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
@@ -74,6 +76,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   active_( false ),
   picked_up_( false ),
   group_menus_open_( false ),
+  layer_menus_open_( false ),
   volume_type_( layer->type() )
 {
   
@@ -146,6 +149,11 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   this->private_->contrast_adjuster_ = new SliderDoubleCombo( this->private_->ui_.bright_contrast_bar_ );
   this->private_->ui_.contrast_h_layout_->addWidget( this->private_->contrast_adjuster_ );
   this->private_->contrast_adjuster_->setObjectName( QString::fromUtf8( "contrast_adjuster_" ) );
+  
+  this->private_->color_widget_ = new ColorBarWidget( this->private_->ui_.color_bar_ );
+  this->private_->ui_.verticalLayout_5->addWidget( this->private_->color_widget_ );
+  this->private_->color_widget_->setObjectName( QString::fromUtf8( "color_widget_" ) );
+  
   
   // --- set the values for the dropdown menu's using values from the state handles
   // -- set the border selection combo box's values 
@@ -250,10 +258,12 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
         this->private_->ui_.brightness_contrast_button_->hide();
         this->private_->ui_.volume_rendered_button_->hide();
         this->private_->ui_.typeBackground_->setStyleSheet( StyleSheet::MASK_VOLUME_COLOR_C );
-        this->private_->activate_button_->setIcon(this->mask_layer_icon_);
+        this->private_->activate_button_->setIcon( this->mask_layer_icon_ );
         MaskLayer* mask_layer = dynamic_cast< MaskLayer* >( layer.get() );  
+        this->private_->color_widget_->set_color_index( mask_layer->color_state_->get() );
         QtBridge::Connect( this->private_->ui_.iso_surface_button_, mask_layer->show_isosurface_state_ );
         QtBridge::Connect( this->private_->ui_.border_selection_combo_, mask_layer->fill_state_ );
+        QtBridge::Connect( this->private_->color_widget_, mask_layer->color_state_ );
 
       }
       break;
@@ -284,7 +294,7 @@ LayerWidget::~LayerWidget()
 
 void LayerWidget::set_group_menu_status( bool status )
 {
-  group_menus_open_ = status;
+  this->group_menus_open_ = status;
 }
   
 void LayerWidget::mousePressEvent( QMouseEvent *event )
@@ -296,7 +306,7 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
     return;
   }
   
-  if( group_menus_open_ )
+  if( this->group_menus_open_ || this->layer_menus_open_ )
     return;
 
   QPoint hotSpot = event->pos();
@@ -322,6 +332,7 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
   // Create a drag object and insert the hotspot
   QDrag *drag = new QDrag( this );
   drag->setMimeData( mimeData );
+  
   // here we add basically a screenshot of the widget
   drag->setPixmap( QPixmap::grabWidget( this ));
   drag->setHotSpot( hotSpot );
@@ -361,7 +372,7 @@ void LayerWidget::dropEvent( QDropEvent* event )
     return;
   }
   
-  if( group_menus_open_ )
+  if( this->group_menus_open_ || this->layer_menus_open_ )
     return;
   
   bool good_to_go = false;
@@ -410,8 +421,6 @@ void LayerWidget::dragEnterEvent( QDragEnterEvent* event)
 {
   this->private_->overlay_->show();
   
-  //SCI_LOG_DEBUG( "A dragenter event was triggered from layer: " + this->get_layer_id() );
-  
   std::vector<std::string> mime_data = 
     Utils::SplitString( event->mimeData()->text().toStdString(), "|" );
   if( mime_data.size() < 2 ) return;
@@ -451,6 +460,7 @@ void LayerWidget::seethrough( bool see )
   this->setUpdatesEnabled( false );
   if( see )
   {
+// We enable some animation if it is a windows system
 #if defined( _WIN32 )
     this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_PICKED_UP_C );
     this->private_->ui_.header_->hide();
@@ -458,6 +468,7 @@ void LayerWidget::seethrough( bool see )
     this->private_->ui_.bright_contrast_bar_->hide();
     this->private_->ui_.color_bar_->hide();
     this->private_->ui_.opacity_bar_->hide();
+// Otherwise we make things simpler
 #else
     this->hide();
 #endif
@@ -494,6 +505,7 @@ void LayerWidget::set_drop( bool drop )
   {
     this->private_->drop_space_->hide();
   }
+  this->repaint();
 } 
 
   
@@ -518,6 +530,7 @@ void LayerWidget::set_active( bool active )
   
 void LayerWidget::show_selection_checkbox( bool show )
 {
+  //this->layer_menus_open_ = show;
   if( show && (!this->private_->ui_.lock_button_->isChecked()) )
   { 
     this->private_->ui_.checkbox_widget_->show();
@@ -526,10 +539,12 @@ void LayerWidget::show_selection_checkbox( bool show )
   {
     this->private_->ui_.checkbox_widget_->hide();
   }
+  this->repaint();
 }
 
 void LayerWidget::show_opacity_bar( bool show )
 {
+  //this->layer_menus_open_ = show;
   if( show )
   {
     this->private_->ui_.opacity_bar_->show();
@@ -549,6 +564,7 @@ void LayerWidget::show_opacity_bar( bool show )
 
 void LayerWidget::show_brightness_contrast_bar( bool show )
 {
+  //this->layer_menus_open_ = show;
   if( show )
   {
     this->private_->ui_.bright_contrast_bar_->show();
@@ -563,11 +579,12 @@ void LayerWidget::show_brightness_contrast_bar( bool show )
   {
     this->private_->ui_.bright_contrast_bar_->hide();
   }
-  this->repaint( QRect( 0, 0, this->width(), this->height() ) );
+  this->repaint();
 }
 
 void LayerWidget::show_border_fill_bar( bool show )
 {
+  //this->layer_menus_open_ = show;
   if( show )
   {
     this->private_->ui_.border_bar_->show();
@@ -587,6 +604,7 @@ void LayerWidget::show_border_fill_bar( bool show )
 
 void LayerWidget::show_color_bar( bool show )
 {
+  //this->layer_menus_open_ = show;
   if( show )
   {
     this->private_->ui_.color_bar_->show();
@@ -606,6 +624,7 @@ void LayerWidget::show_color_bar( bool show )
 
 void LayerWidget::show_progress_bar( bool show )
 {
+  //this->layer_menus_open_ = show;
   if( show )
   {
     this->private_->ui_.progress_bar_bar_->show();
@@ -619,6 +638,7 @@ void LayerWidget::show_progress_bar( bool show )
 
 void LayerWidget::visual_lock( bool lock )
 {
+  //this->layer_menus_open_ = lock;
   if( lock )
   {
     this->private_->ui_.header_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_LOCKED_C );
@@ -685,7 +705,6 @@ void LayerWidget::visual_lock( bool lock )
     this->private_->ui_.volume_rendered_button_->setEnabled( true );
     this->private_->ui_.brightness_contrast_button_->setEnabled( true );
     this->private_->ui_.label_->setEnabled( true );
-    
   }
   this->repaint();
 }
@@ -696,7 +715,6 @@ void LayerWidget::resizeEvent( QResizeEvent *event )
   event->accept();
 }
 
-
-
+  
 } //end namespace Seg3D
 

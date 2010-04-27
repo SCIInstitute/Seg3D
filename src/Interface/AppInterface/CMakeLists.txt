@@ -36,6 +36,7 @@ SET(INTERFACE_APPINTERFACE_SRCS
   AppMenu.cc
   AppLayerIO.cc
   AppStatusBar.cc
+  ColorBarWidget.cc
   HistoryDockWidget.cc
   MessageHistoryWidget.cc
   LayerManagerWidget.cc
@@ -63,6 +64,7 @@ SET(INTERFACE_APPINTERFACE_MOC_SRCS
   AppInterface.h
   AppMenu.h
   AppStatusBar.h
+  ColorBarWidget.h
   HistoryDockWidget.h
   LayerWidget.h
   LayerImporterWidget.h
@@ -93,6 +95,7 @@ SET(INTERFACE_APPINTERFACE_NO_MOC_SRCS
 )
 
 SET(INTERFACE_APPINTERFACE_UI_SRCS
+  ColorBarWidget.ui
   HistoryDockWidget.ui
   LayerGroupWidget.ui
   LayerImporterWidget.ui

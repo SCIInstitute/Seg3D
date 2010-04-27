@@ -296,6 +296,7 @@ namespace Seg3D
     " color: white;"
     "}");
 
+  
 StyleSheet::StyleSheet()
 {
 }    

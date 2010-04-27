@@ -265,6 +265,36 @@ bool QtBridge::Connect( QLineEdit* qlineedit, StateAliasHandle& state_handle )
         }
     // -- END CONNECT FUNCTION -- //
 ///// ====  END SliderIntCombo FUNCTIONS ==== /////
+  
+  
+///// ====  BEGIN ColorBarWidget FUNCTIONS ==== /////
+    // -- BEGIN SIGNAL CONNECTORS FOR THE ColorBarWidget's -- //
+  // signal for when the value of the ColorBarWidget has changed //
+  void QtColorBarWidgetValueChangedSignal( QPointer< ColorBarWidget > qpointer, int state,
+                      ActionSource source )
+  {
+    if ( source != ActionSource::INTERFACE_E )
+    {
+      QtSignal( qpointer, boost::bind( &ColorBarWidget::set_color_index, qpointer.data(), state ) );
+    }
+  }
+    // -- END SIGNAL CONNECTORS FOR THE ColorBarWidget's -- //
+  
+    // -- BEGIN CONNECT FUNCTION FOR CONNECTING ColorBarWidget's TO StateIntHandle's -- //
+  bool QtBridge::Connect( ColorBarWidget* cbwidget, StateIntHandle& state_handle )
+  {
+    new QtColorBarWidgetSlot( cbwidget, state_handle );
+    
+    QPointer< ColorBarWidget > qpointer( cbwidget );
+    
+    // Connect the state signal back to the ColorBarWidget's value variable
+    new QtDeleteSlot( cbwidget, state_handle->value_changed_signal_.connect(
+      boost::bind( &QtColorBarWidgetValueChangedSignal, qpointer, _1, _2 ) ) );
+    
+    return true;
+  }
+    // -- END CONNECT FUNCTION -- //
+///// ====  END ColorBarWidget FUNCTIONS ==== /////
 
 
 ///// ====  BEGIN SliderDoubleCombo FUNCTIONS ==== /////

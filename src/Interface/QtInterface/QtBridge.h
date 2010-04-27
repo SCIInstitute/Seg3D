@@ -34,6 +34,7 @@
 
 #include <Interface/ToolInterface/CustomWidgets/SliderIntCombo.h>
 #include <Interface/ToolInterface/CustomWidgets/SliderDoubleCombo.h>
+#include <Interface/AppInterface/ColorBarWidget.h>
 
 // Application includes
 #include <Application/State/StateValue.h>
@@ -56,7 +57,10 @@ public:
 
   // Connect a QCheckBox to StateValue<bool>
   static bool Connect( QCheckBox* qcheckbox, StateBoolHandle& state_handle );
-
+  
+  // Coonnect a SliderIntCombo to a StateRangedIntValue
+  static bool Connect( ColorBarWidget* cbwidget, StateIntHandle& state_handle );
+  
   // Coonnect a SliderIntCombo to a StateRangedIntValue
   static bool Connect( SliderIntCombo* sscombo, StateRangedIntHandle& state_handle );
   

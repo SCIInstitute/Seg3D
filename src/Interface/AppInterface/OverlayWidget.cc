@@ -37,7 +37,7 @@ namespace Seg3D
 {
 
 OverlayWidget::OverlayWidget( QWidget *parent ) 
-  : QWidget(parent)
+  : QWidget( parent )
 {
   setPalette( Qt::transparent );
   QSizePolicy size_policy( QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding );

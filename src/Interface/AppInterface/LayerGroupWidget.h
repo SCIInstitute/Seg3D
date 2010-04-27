@@ -84,6 +84,7 @@ private:
     boost::shared_ptr< LayerGroupWidgetPrivate > private_;
     QVector< LayerWidgetQHandle > layer_list_;
   
+  
 
       
 };

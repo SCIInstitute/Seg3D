@@ -73,7 +73,7 @@ public:
 public:
 
   // Which color to use for displaying the mask
-  StateStringHandle color_state_;
+  StateIntHandle color_state_;
 
   // State that describes whether to use a fat border for the mask
   StateOptionHandle border_state_;

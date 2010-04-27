@@ -150,25 +150,18 @@ void ToolBoxWidget::set_active_tool( QWidget *tool )
   
   for ( size_t i = 0; i < this->private_->page_list_.size(); i++ )
   {
-    // first we deactivate the inactive tools
-//    if( this->private_->page_list_[ i ].tool_ != tool )
-//    {
-//      if( !( this->private_->page_list_[ i ].ui_.tool_frame_->isHidden() ) )
-//      {
-        this->private_->page_list_[ i ].ui_.page_background_->setStyleSheet( 
-          StyleSheet::TOOLBOXPAGEWIDGET_PAGE_BACKGROUND_INACTIVE_C );
-        this->private_->page_list_[ i ].ui_.activate_button_->setStyleSheet(
-            StyleSheet::TOOLBOXPAGEWIDGET_ACTIVATE_BUTTON_INACTIVE_C );
-        this->private_->page_list_[ i ].ui_.close_button_->setIcon(
-            inactive_close_icon_ );
-        this->private_->page_list_[ i ].ui_.help_button_->setIcon(
-            inactive_help_icon_ );
-        this->private_->page_list_[ i ].ui_.tool_frame_->hide();
-//      }
-//    }
+    this->private_->page_list_[ i ].ui_.page_background_->setStyleSheet( 
+      StyleSheet::TOOLBOXPAGEWIDGET_PAGE_BACKGROUND_INACTIVE_C );
+    this->private_->page_list_[ i ].ui_.activate_button_->setStyleSheet(
+      StyleSheet::TOOLBOXPAGEWIDGET_ACTIVATE_BUTTON_INACTIVE_C );
+    this->private_->page_list_[ i ].ui_.close_button_->setIcon(
+      this->inactive_close_icon_ );
+    this->private_->page_list_[ i ].ui_.help_button_->setIcon(
+      this->inactive_help_icon_ );
+    this->private_->page_list_[ i ].ui_.tool_frame_->hide();
   }
   
-    // then, we activate the active one.
+  // then, we activate the active one.
   for ( size_t i = 0; i < this->private_->page_list_.size(); i++ )
   {
     if( this->private_->page_list_[ i ].tool_ == tool )
@@ -183,9 +176,9 @@ void ToolBoxWidget::set_active_tool( QWidget *tool )
         this->private_->page_list_[ i ].ui_.activate_button_->setStyleSheet(
             StyleSheet::TOOLBOXPAGEWIDGET_ACTIVATE_BUTTON_ACTIVE_C );
         this->private_->page_list_[ i ].ui_.close_button_->setIcon(
-            active_close_icon_ );
+            this->active_close_icon_ );
         this->private_->page_list_[ i ].ui_.help_button_->setIcon(
-            active_help_icon_ );
+            this->active_help_icon_ );
         this->private_->page_list_[ i ].ui_.tool_frame_->show();
       }
       

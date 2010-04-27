@@ -7,14 +7,8 @@
     <x>0</x>
     <y>0</y>
     <width>301</width>
-    <height>242</height>
+    <height>218</height>
    </rect>
-  </property>
-  <property name="minimumSize">
-   <size>
-    <width>0</width>
-    <height>0</height>
-   </size>
   </property>
   <property name="mouseTracking">
    <bool>false</bool>
@@ -252,124 +246,6 @@ QToolButton#progress_cancel_button_:pressed{
   background-color: rgba(0, 0, 0, 0);
 }
 
-QToolButton#color_button_01_{
-  background-color: rgb(251,255,74);
-  border: 1px solid white;
-  border-radius: 4px;
-}
-QToolButton#color_button_01_:pressed{
-  border: 1px solid gray;
-}
-
-
-QToolButton#color_button_02_{
-  background-color: rgb(248,188,37);
-  border: 1px solid white;
-  border-radius: 4px;
-}
-QToolButton#color_button_02_:pressed{
-  border: 1px solid gray;
-}
-
-
-QToolButton#color_button_03_{
-  background-color: rgb(248,152,28);
-  border: 1px solid white;
-  border-radius: 4px;
-}
-QToolButton#color_button_03_:pressed{
-  border: 1px solid gray;
-}
-
-
-QToolButton#color_button_04_{
-  background-color: rgb(251,78,15);
-  border: 1px solid white;
-  border-radius: 4px;
-}
-QToolButton#color_button_04_:pressed{
-  border: 1px solid gray;
-}
-
-
-QToolButton#color_button_05_{
-  background-color: rgb(252,21,17);
-  border: 1px solid white;
-  border-radius: 4px;
-}
-QToolButton#color_button_05_:pressed{
-  border: 1px solid gray;
-}
-
-
-QToolButton#color_button_06_{
-  background-color: rgb(166,12,73);
-  border: 1px solid white;
-  border-radius: 4px;
-}
-QToolButton#color_button_06_:pressed{
-  border: 1px solid gray;
-}
-
-
-QToolButton#color_button_07_{
-  background-color: rgb(135,0,172);
-  border: 1px solid white;
-  border-radius: 4px;
-}
-QToolButton#color_button_07_:pressed{
-  border: 1px solid gray;
-}
-
-
-QToolButton#color_button_08_{
-  background-color: rgb(66,0,161);
-  border: 1px solid white;
-  border-radius: 4px;
-}
-QToolButton#color_button_08_:pressed{
-  border: 1px solid gray;
-}
-
-
-QToolButton#color_button_09_{
-  background-color: rgb(45,66,250);
-  border: 1px solid white;
-  border-radius: 4px;
-}
-QToolButton#color_button_09_:pressed{
-  border: 1px solid gray;
-}
-
-
-QToolButton#color_button_10_{
-  background-color: rgb(32,146,204);
-  border: 1px solid white;
-  border-radius: 4px;
-}
-QToolButton#color_button_10_:pressed{
-  border: 1px solid gray;
-}
-
-
-QToolButton#color_button_11_{
-  background-color: rgb(100,177,61);
-  border: 1px solid white;
-  border-radius: 4px;
-}
-QToolButton#color_button_11_:pressed{
-  border: 1px solid gray;
-}
-
-
-QToolButton#color_button_12_{
-  background-color: rgb(205,235,66);
-  border: 1px solid white;
-  border-radius: 4px;
-}
-QToolButton#color_button_12_:pressed{
-  border: 1px solid gray;
-}
 </string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0">
@@ -972,7 +848,16 @@ QToolButton#color_button_12_:pressed{
          <property name="spacing">
           <number>2</number>
          </property>
-         <property name="margin">
+         <property name="leftMargin">
+          <number>4</number>
+         </property>
+         <property name="topMargin">
+          <number>2</number>
+         </property>
+         <property name="rightMargin">
+          <number>4</number>
+         </property>
+         <property name="bottomMargin">
           <number>4</number>
          </property>
          <item>
@@ -1075,7 +960,16 @@ QToolButton#color_button_12_:pressed{
          <property name="spacing">
           <number>2</number>
          </property>
-         <property name="margin">
+         <property name="leftMargin">
+          <number>4</number>
+         </property>
+         <property name="topMargin">
+          <number>2</number>
+         </property>
+         <property name="rightMargin">
+          <number>4</number>
+         </property>
+         <property name="bottomMargin">
           <number>4</number>
          </property>
          <item>
@@ -1083,375 +977,6 @@ QToolButton#color_button_12_:pressed{
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QWidget" name="widget_6" native="true">
-           <layout class="QHBoxLayout" name="horizontalLayout_5">
-            <property name="spacing">
-             <number>1</number>
-            </property>
-            <property name="leftMargin">
-             <number>0</number>
-            </property>
-            <property name="topMargin">
-             <number>4</number>
-            </property>
-            <property name="rightMargin">
-             <number>0</number>
-            </property>
-            <property name="bottomMargin">
-             <number>0</number>
-            </property>
-            <item>
-             <widget class="QToolButton" name="color_button_01_">
-              <property name="minimumSize">
-               <size>
-                <width>16</width>
-                <height>16</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>16</width>
-                <height>16</height>
-               </size>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>:/new/prefix1/show_info.png</normaloff>:/new/prefix1/show_info.png</iconset>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>25</width>
-                <height>25</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QToolButton" name="color_button_02_">
-              <property name="minimumSize">
-               <size>
-                <width>16</width>
-                <height>16</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>16</width>
-                <height>16</height>
-               </size>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>:/new/prefix1/show_info.png</normaloff>:/new/prefix1/show_info.png</iconset>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>25</width>
-                <height>25</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QToolButton" name="color_button_03_">
-              <property name="minimumSize">
-               <size>
-                <width>16</width>
-                <height>16</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>16</width>
-                <height>16</height>
-               </size>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>:/new/prefix1/show_info.png</normaloff>:/new/prefix1/show_info.png</iconset>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>25</width>
-                <height>25</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QToolButton" name="color_button_04_">
-              <property name="minimumSize">
-               <size>
-                <width>16</width>
-                <height>16</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>16</width>
-                <height>16</height>
-               </size>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>:/new/prefix1/show_info.png</normaloff>:/new/prefix1/show_info.png</iconset>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>25</width>
-                <height>25</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QToolButton" name="color_button_05_">
-              <property name="minimumSize">
-               <size>
-                <width>16</width>
-                <height>16</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>16</width>
-                <height>16</height>
-               </size>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>:/new/prefix1/show_info.png</normaloff>:/new/prefix1/show_info.png</iconset>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>25</width>
-                <height>25</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QToolButton" name="color_button_06_">
-              <property name="minimumSize">
-               <size>
-                <width>16</width>
-                <height>16</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>16</width>
-                <height>16</height>
-               </size>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>:/new/prefix1/show_info.png</normaloff>:/new/prefix1/show_info.png</iconset>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>25</width>
-                <height>25</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QToolButton" name="color_button_07_">
-              <property name="minimumSize">
-               <size>
-                <width>16</width>
-                <height>16</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>16</width>
-                <height>16</height>
-               </size>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>:/new/prefix1/show_info.png</normaloff>:/new/prefix1/show_info.png</iconset>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>25</width>
-                <height>25</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QToolButton" name="color_button_08_">
-              <property name="minimumSize">
-               <size>
-                <width>16</width>
-                <height>16</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>16</width>
-                <height>16</height>
-               </size>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>:/new/prefix1/show_info.png</normaloff>:/new/prefix1/show_info.png</iconset>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>25</width>
-                <height>25</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QToolButton" name="color_button_09_">
-              <property name="minimumSize">
-               <size>
-                <width>16</width>
-                <height>16</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>16</width>
-                <height>16</height>
-               </size>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>:/new/prefix1/show_info.png</normaloff>:/new/prefix1/show_info.png</iconset>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>25</width>
-                <height>25</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QToolButton" name="color_button_10_">
-              <property name="minimumSize">
-               <size>
-                <width>16</width>
-                <height>16</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>16</width>
-                <height>16</height>
-               </size>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>:/new/prefix1/show_info.png</normaloff>:/new/prefix1/show_info.png</iconset>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>25</width>
-                <height>25</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QToolButton" name="color_button_11_">
-              <property name="minimumSize">
-               <size>
-                <width>16</width>
-                <height>16</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>16</width>
-                <height>16</height>
-               </size>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>:/new/prefix1/show_info.png</normaloff>:/new/prefix1/show_info.png</iconset>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>25</width>
-                <height>25</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QToolButton" name="color_button_12_">
-              <property name="minimumSize">
-               <size>
-                <width>16</width>
-                <height>16</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>16</width>
-                <height>16</height>
-               </size>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>:/new/prefix1/show_info.png</normaloff>:/new/prefix1/show_info.png</iconset>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>25</width>
-                <height>25</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-           </layout>
           </widget>
          </item>
         </layout>
@@ -1463,7 +988,16 @@ QToolButton#color_button_12_:pressed{
          <property name="spacing">
           <number>2</number>
          </property>
-         <property name="margin">
+         <property name="leftMargin">
+          <number>4</number>
+         </property>
+         <property name="topMargin">
+          <number>2</number>
+         </property>
+         <property name="rightMargin">
+          <number>4</number>
+         </property>
+         <property name="bottomMargin">
           <number>4</number>
          </property>
          <item>
@@ -1518,7 +1052,16 @@ QToolButton#color_button_12_:pressed{
          <property name="spacing">
           <number>2</number>
          </property>
-         <property name="margin">
+         <property name="leftMargin">
+          <number>4</number>
+         </property>
+         <property name="topMargin">
+          <number>2</number>
+         </property>
+         <property name="rightMargin">
+          <number>4</number>
+         </property>
+         <property name="bottomMargin">
           <number>4</number>
          </property>
          <item>
@@ -1615,7 +1158,16 @@ QToolButton#color_button_12_:pressed{
          <property name="spacing">
           <number>2</number>
          </property>
-         <property name="margin">
+         <property name="leftMargin">
+          <number>4</number>
+         </property>
+         <property name="topMargin">
+          <number>2</number>
+         </property>
+         <property name="rightMargin">
+          <number>4</number>
+         </property>
+         <property name="bottomMargin">
           <number>4</number>
          </property>
          <item>

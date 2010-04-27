@@ -80,7 +80,7 @@ bool ActionSet::run( ActionContextHandle& context, ActionResultHandle& result )
   {
     // Set the value
     state->import_from_variant( state_value_, context->source() );
-    context->report_message( "test message" ); // works!! yeay!!
+    //context->report_message( "test message" ); // works!! yeay!!
     return true;
   }
 

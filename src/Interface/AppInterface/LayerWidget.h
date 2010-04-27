@@ -89,6 +89,8 @@ private:
   bool active_;
   bool picked_up_;
   bool group_menus_open_;
+  bool layer_menus_open_;
+  
   Utils::VolumeType volume_type_;
   
   LayerWidget* drop_layer_;

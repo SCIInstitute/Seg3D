@@ -100,8 +100,6 @@ public:
     
   // === PushDragButton === //
     const static QString PUSHDRAGBUTTON_C;
-    
-  
 
 };    
 

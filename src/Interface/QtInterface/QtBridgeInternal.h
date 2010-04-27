@@ -33,6 +33,7 @@
 #include <QtGui>
 #include <Interface/ToolInterface/CustomWidgets/SliderIntCombo.h>
 #include <Interface/ToolInterface/CustomWidgets/SliderDoubleCombo.h>
+#include <Interface/AppInterface/ColorBarWidget.h>
 
 // boost includes
 #include <boost/signals2/signal.hpp>
@@ -256,6 +257,38 @@ private:
   // Function object
   StateAliasHandle state_handle_;
 };
+  // SLOT FOR CONNECTING THE SliderIntCombo TO THE STATE ENGINE
+  class QtColorBarWidgetSlot : public QtSlot
+  {
+    Q_OBJECT
+  public:
+    
+    // Constructor
+    QtColorBarWidgetSlot( ColorBarWidget* parent, StateIntHandle& state_handle,
+      bool blocking = true ) :
+    QtSlot( parent, blocking ), state_handle_( state_handle )
+    {
+      // Qt's connect function
+      connect( parent, SIGNAL( color_index_changed( int ) ), this, SLOT( slot( int ) ) );
+    }
+    
+    // Virtual destructor: needed by Qt
+    virtual ~QtColorBarWidgetSlot()
+    {
+    }
+    
+    public Q_SLOTS:
+    // Slot that Qt will call
+    void slot(int state)
+    {
+      if (!blocked_) ActionSet::Dispatch( state_handle_, state );
+    }
+    
+  private:
+    // Function object
+    StateIntHandle state_handle_;
+  };
+  
 
 // SLOT FOR CONNECTING THE SliderIntCombo TO THE STATE ENGINE
 class QtSliderIntComboRangedSlot : public QtSlot
