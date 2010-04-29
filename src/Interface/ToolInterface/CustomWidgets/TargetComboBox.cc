@@ -57,11 +57,12 @@ TargetComboBox::~TargetComboBox()
   
 void TargetComboBox::sync_layers()
 {
+  this->value_ = this->currentText().toStdString();
   std::vector< LayerHandle > target_layers;
   LayerManager::Instance()->get_layers( target_layers );
   bool has_layers = false;
   
-  this->value_ = this->currentText().toStdString();
+  //this->value_ = this->currentText().toStdString();
     
   this->clear();
   for( int i = ( static_cast< int >( target_layers.size() ) - 1 ); i > -1; i-- )

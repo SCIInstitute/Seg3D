@@ -55,6 +55,7 @@ public:
 private Q_SLOTS:
   void execute_filter();
   void enable_run_filter( bool valid );
+  void refresh_histogram( QString layer_name );
 
 private:
   boost::shared_ptr< HistogramEqualizationFilterInterfacePrivate > private_;

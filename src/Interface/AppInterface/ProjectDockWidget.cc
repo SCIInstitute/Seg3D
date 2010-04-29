@@ -45,7 +45,8 @@ public:
 };
 
 ProjectDockWidget::ProjectDockWidget( QWidget *parent ) :
-  QDockWidget( parent ), private_( new ProjectDockWidgetPrivate )
+  QDockWidget( parent ), 
+  private_( new ProjectDockWidgetPrivate )
 {
   if( private_ )
   {

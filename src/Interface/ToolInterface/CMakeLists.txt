@@ -60,6 +60,8 @@ SET(INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_SRCS
   CustomWidgets/SliderDoubleCombo.cc
   CustomWidgets/TargetComboBox.cc
   CustomWidgets/MaskComboBox.cc
+  CustomWidgets/HistogramWidget.cc
+  CustomWidgets/Histogram.cc
 )
 
 SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
@@ -92,6 +94,8 @@ SET(INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_MOC_SRCS
   CustomWidgets/SliderDoubleCombo.h
   CustomWidgets/TargetComboBox.h
   CustomWidgets/MaskComboBox.h
+  CustomWidgets/HistogramWidget.h
+  CustomWidgets/Histogram.h
 )
 
 SET(INTERFACE_TOOLINTERFACE_NO_MOC_SRCS
@@ -121,6 +125,7 @@ SET(INTERFACE_TOOLINTERFACE_UI_SRCS
   ThresholdSegmentationLSFilterInterface.ui
   SliderIntCombo.ui
   SliderDoubleCombo.ui
+  CustomWidgets/HistogramWidget.ui
 )
 
 ##################################################

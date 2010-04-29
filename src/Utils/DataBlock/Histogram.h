@@ -67,6 +67,8 @@ public:
   
   double get_min() const;
   double get_max() const;
+  size_t get_min_bin() const;
+  size_t get_max_bin() const;
   
   double get_bin_size() const;
   double get_bin_start( size_t idx = 0) const;
@@ -80,11 +82,16 @@ private:
 
   double min_;
   double max_;
+  
+  size_t max_bin_;
+  size_t min_bin_;
 
   double bin_start_;
   double bin_size_;
   
   std::vector<size_t> histogram_;
+  
+  void compute_min_max();
 
 };
 

@@ -148,27 +148,36 @@ void ToolBoxWidget::set_active_tool( QWidget *tool )
 {
   this->setUpdatesEnabled( false );
   
-  for ( size_t i = 0; i < this->private_->page_list_.size(); i++ )
+  // if we have an active tool then we deactivate it first
+  if ( this->active_tool_ )
   {
-    this->private_->page_list_[ i ].ui_.page_background_->setStyleSheet( 
-      StyleSheet::TOOLBOXPAGEWIDGET_PAGE_BACKGROUND_INACTIVE_C );
-    this->private_->page_list_[ i ].ui_.activate_button_->setStyleSheet(
-      StyleSheet::TOOLBOXPAGEWIDGET_ACTIVATE_BUTTON_INACTIVE_C );
-    this->private_->page_list_[ i ].ui_.close_button_->setIcon(
-      this->inactive_close_icon_ );
-    this->private_->page_list_[ i ].ui_.help_button_->setIcon(
-      this->inactive_help_icon_ );
-    this->private_->page_list_[ i ].ui_.tool_frame_->hide();
+    for ( size_t i = 0; i < this->private_->page_list_.size(); i++ )
+    {
+      if( this->private_->page_list_[ i ].tool_ == this->active_tool_ )
+      {
+        this->private_->page_list_[ i ].ui_.page_background_->setStyleSheet( 
+          StyleSheet::TOOLBOXPAGEWIDGET_PAGE_BACKGROUND_INACTIVE_C );
+        this->private_->page_list_[ i ].ui_.activate_button_->setStyleSheet(
+          StyleSheet::TOOLBOXPAGEWIDGET_ACTIVATE_BUTTON_INACTIVE_C );
+        this->private_->page_list_[ i ].ui_.close_button_->setIcon(
+          this->inactive_close_icon_ );
+        this->private_->page_list_[ i ].ui_.help_button_->setIcon(
+          this->inactive_help_icon_ );
+        this->private_->page_list_[ i ].ui_.tool_frame_->hide();
+        break;
+      }
+    }
   }
-  
+
+  // then we set the new active tool member variabless
+  this->active_tool_ = tool;
+
   // then, we activate the active one.
   for ( size_t i = 0; i < this->private_->page_list_.size(); i++ )
   {
-    if( this->private_->page_list_[ i ].tool_ == tool )
+    if( this->private_->page_list_[ i ].tool_ == active_tool_ )
     {
       this->active_index_ = static_cast< int > ( i );
-      this->active_tool_ = private_->page_list_[ i ].tool_;
-
       if( this->private_->page_list_[ i ].ui_.tool_frame_->isHidden() )
       {
         this->private_->page_list_[ i ].ui_.page_background_->setStyleSheet(
@@ -181,7 +190,7 @@ void ToolBoxWidget::set_active_tool( QWidget *tool )
             this->active_help_icon_ );
         this->private_->page_list_[ i ].ui_.tool_frame_->show();
       }
-      
+      break;
     }
   }
   
@@ -209,8 +218,8 @@ QWidget* ToolBoxWidget::get_tool_at( int index )
 
 void ToolBoxWidget::set_active_index( int index )
 {
-  if( ( index < static_cast< int > ( this->private_->page_list_.size() ) ) && ( index >= 0 ) ) set_active_tool(
-      this->private_->page_list_[ index ].tool_ );
+  if( ( index < static_cast< int > ( this->private_->page_list_.size() ) ) && ( index >= 0 ) ) 
+    set_active_tool( this->private_->page_list_[ index ].tool_ );
 
 } // end set_active_index
 
@@ -239,7 +248,6 @@ void ToolBoxWidget::remove_tool( int index )
       set_active_index( index - 1 );
     }
   }
-
 }
 
 void ToolBoxWidget::help_button_clicked()

@@ -45,6 +45,7 @@ public:
 };
 
 SplashStart::SplashStart( QDialog *parent ) :
+  QDialog( parent ),
   private_( new SplashStartPrivate )
 {
   // Set up the private internals of the SplashStart class

@@ -132,6 +132,8 @@ void Histogram::compute( const signed char* data, size_t size )
   {
     histogram_[ j ] = histogram[ j + hist_begin ];
   }
+
+  this->compute_min_max();
 }
 
 void Histogram::compute( const unsigned char* data, size_t size )
@@ -178,6 +180,8 @@ void Histogram::compute( const unsigned char* data, size_t size )
   {
     histogram_[ j ] = histogram[ j + hist_begin ];
   }
+
+  this->compute_min_max();
 }
 
 void Histogram::compute( const short* data, size_t size )
@@ -243,7 +247,9 @@ void Histogram::compute( const short* data, size_t size )
         histogram_[ j ] += histogram[ idx ];
       }
     }
-  } 
+  }
+
+  this->compute_min_max();  
 }
 
 
@@ -312,6 +318,8 @@ void Histogram::compute( const unsigned short* data, size_t size )
       }
     }
   }
+
+  this->compute_min_max();
 }
 
 
@@ -363,6 +371,8 @@ void Histogram::compute( const int* data, size_t size )
     size_t idx = static_cast<size_t>( ( static_cast<double>( data[j] ) - min_ ) * inv_bin_size );
     histogram_[ idx ]++;
   }
+
+  this->compute_min_max();
 }
 
 
@@ -414,6 +424,8 @@ void Histogram::compute( const unsigned int* data, size_t size )
     size_t idx = static_cast<size_t>( ( static_cast<double>( data[j] ) - min_ ) * inv_bin_size );
     histogram_[ idx ]++;
   }
+
+  this->compute_min_max();
 }
 
 
@@ -458,6 +470,8 @@ void Histogram::compute( const float* data, size_t size )
     size_t idx = static_cast<size_t>( ( static_cast<double>( data[j] ) - min_ ) * inv_bin_size );
     histogram_[ idx ]++;
   }
+
+  this->compute_min_max();
 }
 
 
@@ -499,6 +513,24 @@ void Histogram::compute( const double* data, size_t size )
     size_t idx = static_cast<size_t>( ( static_cast<double>( data[j] ) - min_ ) * inv_bin_size );
     histogram_[ idx ]++;
   }
+  
+  this->compute_min_max();
+}
+
+void Histogram::compute_min_max()
+{
+  size_t min = histogram_[ 0 ];
+  size_t max = histogram_[ 0 ];
+  for( size_t i = 1; i < histogram_.size(); ++i )
+  {
+    if( histogram_[ i ] > max )
+      max = histogram_[ i ];
+    if( histogram_[ i ] < min )
+      min = histogram_[ i ];
+  }
+  
+  max_bin_ = max;
+  min_bin_ = min;
 }
 
 double Histogram::get_min() const
@@ -509,6 +541,16 @@ double Histogram::get_min() const
 double Histogram::get_max() const
 { 
   return this->max_; 
+}
+
+size_t Histogram::get_max_bin() const
+{ 
+  return this->max_bin_;
+}
+
+size_t Histogram::get_min_bin() const
+{ 
+  return this->min_bin_; 
 }
 
 double Histogram::get_bin_size() const

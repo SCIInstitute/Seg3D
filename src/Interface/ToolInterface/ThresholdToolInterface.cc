@@ -29,14 +29,17 @@
 //Interface Includes
 #include <Interface/QtInterface/QtBridge.h>
 #include <Interface/ToolInterface/CustomWidgets/TargetComboBox.h>
+#include <Interface/ToolInterface/CustomWidgets/HistogramWidget.h>
 
 //Qt Gui Includes
 #include <Interface/ToolInterface/ThresholdToolInterface.h>
 #include "ui_ThresholdToolInterface.h"
 
 //Application Includes
+#include <Application/Layer/DataLayer.h>
 #include <Application/Tools/ThresholdTool.h>
 #include <Application/Filters/Actions/ActionThreshold.h>
+#include <Application/LayerManager/LayerManager.h>
 
 namespace Seg3D
 {
@@ -51,6 +54,7 @@ public:
   SliderDoubleCombo *upper_threshold_;
   SliderDoubleCombo *lower_threshold_;
   TargetComboBox *target_;
+  HistogramWidget *histogram_;
 };
 
 // constructor
@@ -80,6 +84,9 @@ bool ThresholdToolInterface::build_widget( QFrame* frame )
     // add the TargetComboBox
     this->private_->target_ = new TargetComboBox( this );
     this->private_->ui_.activeHLayout->addWidget( this->private_->target_ );
+    
+    this->private_->histogram_ = new HistogramWidget( this );
+    this->private_->ui_.histogramHLayout->addWidget( this->private_->histogram_ );
 
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
@@ -111,6 +118,7 @@ bool ThresholdToolInterface::build_widget( QFrame* frame )
   //Step 4 - connect the gui to the tool through the QtBridge
   QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
   connect( this->private_->target_, SIGNAL( valid( bool ) ), this, SLOT( enable_run_filter( bool ) ) );
+  connect( this->private_->target_, SIGNAL( currentIndexChanged( QString ) ), this, SLOT( refresh_histogram( QString ) ) );
   QtBridge::Connect( this->private_->upper_threshold_, tool->upper_threshold_state_ );
   QtBridge::Connect( this->private_->lower_threshold_, tool->lower_threshold_state_ );
   
@@ -129,6 +137,23 @@ void ThresholdToolInterface::enable_run_filter( bool valid )
     //this->private_->ui_.runFilterButton->setEnabled( true );
   //else
     //this->private_->ui_.runFilterButton->setEnabled( false );
+}
+
+void ThresholdToolInterface::refresh_histogram( QString layer_name )
+{
+  if( layer_name == "" )
+  {
+    return;
+  }
+
+  Utils::Histogram temp_histogram = dynamic_cast< DataLayer* >( LayerManager::Instance()->
+    get_layer_by_name( layer_name.toStdString() ).get() )->
+    get_data_volume()->data_block()->get_histogram();
+
+  // Now, display histogram!
+  this->private_->histogram_->set_histogram( temp_histogram.get_bins(), 
+    temp_histogram.get_min(), temp_histogram.get_max(), temp_histogram.get_min_bin(),
+    temp_histogram.get_max_bin() ); 
 }
 
 void ThresholdToolInterface::execute_filter()

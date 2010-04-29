@@ -66,16 +66,15 @@ public:
   SliderDoubleCombo* size_depth_adjuster_crop_;
   
     SliderDoubleCombo* scale_adjuster_;
-
-  
 };
   
 LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
+  QWidget( parent ),
   private_( new LayerGroupWidgetPrivate )
 { 
     LayerGroupHandle group = layer->get_layer_group();
 
-  this->setParent( parent );
+/*  this->setParent( parent );*/
   
   this->private_->ui_.setupUi( this );
   
@@ -131,7 +130,7 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
   this->current_width_ = static_cast<int>( group->get_grid_transform().get_nx() );
   this->current_height_ = static_cast<int>( group->get_grid_transform().get_ny() );
   this->current_depth_ = static_cast<int>( group->get_grid_transform().get_nz() );
-  
+
   //  connect the gui signals and slots
     connect( this->private_->scale_adjuster_, SIGNAL( valueAdjusted( double ) ), this, SLOT( adjust_new_size_labels( double )) );
   connect( this->private_->ui_.open_button_, SIGNAL( toggled( bool ) ), this, SLOT( show_layers( bool )) );
@@ -271,7 +270,6 @@ LayerGroupWidget::~LayerGroupWidget()
   
 void LayerGroupWidget::insert_layer( LayerHandle layer, int index )
 {
-  
   LayerWidgetQHandle new_layer_handle( new LayerWidget(this->private_->ui_.group_frame_, layer ) );
   
   if( index == -1 )
@@ -287,22 +285,20 @@ void LayerGroupWidget::insert_layer( LayerHandle layer, int index )
     this->private_->ui_.group_frame_layout_->insertWidget( index, new_layer_handle.data() );
   }
   this->layer_list_.push_back( new_layer_handle );
-  this->repaint( QRect( 0, 0, this->width(), this->height() ) );
-
-  
+  this->repaint();
 }
 
   
 bool LayerGroupWidget::delete_layer( LayerHandle layer )
 { 
-  for( QVector< LayerWidgetQHandle >::iterator i = layer_list_.begin(); i != 
-    layer_list_.end(); ++i)
+  for( QVector< LayerWidgetQHandle >::iterator i = this->layer_list_.begin(); i != 
+    this->layer_list_.end(); ++i)
   {
     if( ( *i )->get_layer_id() == layer->get_layer_id() )
     {
       ( *i )->deleteLater();
-      layer_list_.erase( i );
-      this->repaint( QRect( 0, 0, this->width(), this->height() ) );
+      this->layer_list_.erase( i );
+      this->repaint();
       return true;
     }
   }
@@ -313,13 +309,13 @@ bool LayerGroupWidget::delete_layer( LayerHandle layer )
 LayerWidgetQWeakHandle LayerGroupWidget::set_active_layer( LayerHandle layer )
 {
   std::string layer_id = layer->get_layer_id();
-    for( int i = 0; i < layer_list_.size(); ++i)
+    for( int i = 0; i < this->layer_list_.size(); ++i)
   {
-      if( layer_id == layer_list_[i]->get_layer_id() )
+      if( layer_id == this->layer_list_[i]->get_layer_id() )
       {
-          layer_list_[i]->set_active( true );
+          this->layer_list_[i]->set_active( true );
           this->set_active( true );
-      return layer_list_[i];
+      return this->layer_list_[i];
       }
   }
   return LayerWidgetQWeakHandle();
@@ -361,22 +357,22 @@ const std::string& LayerGroupWidget::get_group_id()
   
 void LayerGroupWidget::show_selection_checkboxes( bool show )
 {
-  for( int i = 0; i < layer_list_.size(); ++i)
+  for( int i = 0; i < this->layer_list_.size(); ++i)
   {
-    layer_list_[i]->show_selection_checkbox( show );
-    layer_list_[i]->set_group_menu_status( show );
-    layer_list_[i]->setAcceptDrops( !show ); 
+    this->layer_list_[i]->show_selection_checkbox( show );
+    this->layer_list_[i]->set_group_menu_status( show );
+    this->layer_list_[i]->setAcceptDrops( !show ); 
   }
 }
 
 void LayerGroupWidget::adjust_new_size_labels( double scale_factor )
 {
     this->private_->ui_.x_axis_label_new_->setText( QString::fromUtf8("X: ") + 
-    QString::number(this->current_width_ * scale_factor ) );
+    QString::number( this->current_width_ * scale_factor ) );
   this->private_->ui_.y_axis_label_new_->setText( QString::fromUtf8("Y: ") + 
-    QString::number(this->current_height_ * scale_factor ) );
+    QString::number( this->current_height_ * scale_factor ) );
   this->private_->ui_.z_axis_label_new_->setText( QString::fromUtf8("Z: ") + 
-    QString::number(this->current_depth_ * scale_factor ) );
+    QString::number( this->current_depth_ * scale_factor ) );
 }
   
   
@@ -394,7 +390,7 @@ void LayerGroupWidget::uncheck_delete_confirm()
 
 void LayerGroupWidget::show_layers( bool show )
 {
-  if(show) 
+  if( show ) 
   {
     this->private_->ui_.group_frame_->show();
     this->private_->ui_.group_tools_->show();
@@ -406,10 +402,9 @@ void LayerGroupWidget::show_layers( bool show )
   }
 }
 
-
 void LayerGroupWidget::show_resample( bool show )
 {
-  if(show) 
+  if( show ) 
   {
     this->private_->ui_.resample_->show();
     
@@ -429,9 +424,10 @@ void LayerGroupWidget::show_resample( bool show )
   else
   {
     this->private_->ui_.resample_->hide();
+    this->private_->ui_.group_resample_button_->setChecked( false );
   }
   show_selection_checkboxes( show );
-  this->repaint( QRect( 0, 0, this->width(), this->height() ) );
+  this->repaint();
 }
 
 void LayerGroupWidget::show_transform( bool show )
@@ -455,9 +451,10 @@ void LayerGroupWidget::show_transform( bool show )
   else
   {
     this->private_->ui_.transform_->hide();
+    this->private_->ui_.group_transform_button_->setChecked( false );
   }
   show_selection_checkboxes( show );
-  this->repaint( QRect( 0, 0, this->width(), this->height() ) );
+  this->repaint();
 }
 
 void LayerGroupWidget::show_crop( bool show )
@@ -481,9 +478,10 @@ void LayerGroupWidget::show_crop( bool show )
   else
   {
     this->private_->ui_.roi_->hide();
+    this->private_->ui_.group_crop_button_->setChecked( false );
   }
   show_selection_checkboxes( show );
-  this->repaint( QRect( 0, 0, this->width(), this->height() ) );
+  this->repaint();
 }
 
 void LayerGroupWidget::show_flip_rotate( bool show )
@@ -506,10 +504,11 @@ void LayerGroupWidget::show_flip_rotate( bool show )
   }
   else
   {
+    this->private_->ui_.group_flip_rotate_button_->setChecked( false );
     this->private_->ui_.flip_rotate_->hide();
   }
   show_selection_checkboxes( show );
-  this->repaint( QRect( 0, 0, this->width(), this->height() ) );
+  this->repaint();
 }
 
 void LayerGroupWidget::show_delete( bool show )
@@ -536,7 +535,7 @@ void LayerGroupWidget::show_delete( bool show )
     this->private_->ui_.group_delete_button_->setChecked( false );
   }
   show_selection_checkboxes( show );
-  this->repaint( QRect( 0, 0, this->width(), this->height() ) );
+  this->repaint();
 }
 
   

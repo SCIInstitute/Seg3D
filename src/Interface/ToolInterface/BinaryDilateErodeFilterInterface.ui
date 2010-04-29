@@ -194,11 +194,6 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="font">
-         <font>
-          <pointsize>13</pointsize>
-         </font>
-        </property>
         <property name="text">
          <string>Run Erode</string>
         </property>
@@ -235,11 +230,6 @@
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>13</pointsize>
-         </font>
         </property>
         <property name="text">
          <string>Run Dialate</string>

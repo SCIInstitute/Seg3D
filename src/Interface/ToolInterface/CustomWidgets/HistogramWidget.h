@@ -26,28 +26,38 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <Interface/AppInterface/PushDragButton.h>
+#ifndef INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_HISTOGRAMWIDGET_H
+#define INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_HISTOGRAMWIDGET_H
+
+//Boost includes
+#include <boost/shared_ptr.hpp>
+
+//Qt includes
+#include <QtGui>
+
 
 namespace Seg3D
 {
 
+class HistogramWidgetPrivate;
 
-PushDragButton::PushDragButton( QWidget *parent ) :
-  QPushButton( parent )
+class HistogramWidget : public QWidget
 {
-}
+    Q_OBJECT
 
-PushDragButton::~PushDragButton()
-{
-}
+public:
+    HistogramWidget( QWidget *parent = 0 );
+    virtual ~HistogramWidget();
+    
+public Q_SLOTS:
+  void set_histogram( std::vector< size_t > ints_bin, int min, int max, 
+    size_t min_bin, size_t max_bin );
 
-void PushDragButton::mousePressEvent( QMouseEvent *event )
-{
-  if( ( event->modifiers() == Qt::ControlModifier ) || ( event->modifiers() == Qt::ShiftModifier ) )
-    Q_EMIT clicked();
-  else
-    event->ignore();
-}
 
+private:
+  boost::shared_ptr< HistogramWidgetPrivate > private_;
+};
 
 } // end namespace Seg3D
+
+#endif

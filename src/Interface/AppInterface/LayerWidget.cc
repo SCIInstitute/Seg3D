@@ -110,6 +110,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   this->private_->ui_.color_bar_->hide();
   this->private_->ui_.bright_contrast_bar_->hide();
   this->private_->ui_.checkbox_widget_->hide();
+  this->private_->ui_.horizontalLayout_2->setAlignment( Qt::AlignHCenter );
   this->private_->ui_.opacity_bar_->hide();
   this->private_->ui_.progress_bar_bar_->hide();
   this->private_->ui_.border_bar_->hide();

@@ -46,7 +46,7 @@ namespace Seg3D
 {
 
 LayerManagerDockWidget::LayerManagerDockWidget( QWidget *parent ) :
-  QDockWidget( "LayerManagerDockWidget" )
+  QDockWidget( "LayerManagerDockWidget", parent )
 {
   this->setAllowedAreas( Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea );
   this->setWindowTitle( "Layer Manager" );
