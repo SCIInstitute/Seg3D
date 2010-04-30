@@ -129,6 +129,53 @@ bool LayerManager::check_for_same_group( const std::string layer_to_insert_id,
   return ( top_group == bottom_group );
 }
 
+bool LayerManager::move_group_above( std::string group_to_move_id, std::string group_below_id )
+{
+  int index = 0;
+
+  {
+    // Get the Lock
+    lock_type lock( this->get_mutex() );
+
+    LayerGroupHandle group_above = get_LayerGroupHandle_from_group_id( group_to_move_id );
+    LayerGroupHandle group_below = get_LayerGroupHandle_from_group_id( group_below_id );
+
+    if( ( !group_above || !group_below ) || ( group_above == group_below ) )
+      return false;
+
+    this->group_handle_list_.remove( group_above );
+    index = this->insert_group( group_above, group_below );
+
+  }
+
+  group_inserted_at_signal_( group_to_move_id, index );
+  return true;
+}
+
+int LayerManager::insert_group( LayerGroupHandle group_above, LayerGroupHandle group_below )
+{
+  int index = 0;
+
+  for( group_handle_list_type::iterator i = this->group_handle_list_.begin(); 
+    i != this->group_handle_list_.end(); ++i )
+  {
+    if( ( *i ) == group_below )
+    {
+      // First we get the size of the list before the insert
+      int list_size = static_cast< int >( this->group_handle_list_.size() );
+
+      // Second we insert the layer
+      this->group_handle_list_.insert( ++i, group_above );
+      
+      // Finally we return the proper location for the gui to insert the group
+      return abs( index - list_size ) - 1;
+
+    }
+    index++;
+  }
+  return -1;
+}
+
 bool LayerManager::move_layer_above( std::string layer_to_move_id, std::string layer_below_id )
 {
   // we will need to keep track of a few things outside of the locked scope

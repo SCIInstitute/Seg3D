@@ -26,61 +26,49 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_APPINTERFACE_LAYERMANAGERWIDGET_H
-#define INTERFACE_APPINTERFACE_LAYERMANAGERWIDGET_H
+#ifndef APPLICATION_LAYERMANAGER_ACTIONS_ACTIONMOVEGROUPABOVE_H
+#define APPLICATION_LAYERMANAGER_ACTIONS_ACTIONMOVEGROUPABOVE_H
 
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
-# pragma once
-#endif
-
-// Qt includes
-#include <QtGui>
-
-// Application Includes
-#include <Utils/Core/EnumClass.h>
-
-#include <Application/Layer/LayerGroup.h>
-#include <Interface/AppInterface/LayerGroupWidget.h>
+#include <Application/Action/Actions.h>
+#include <Application/Interface/Interface.h>
 
 namespace Seg3D
 {
-  
-  
-class LayerManagerWidget : public QScrollArea
+
+class ActionMoveGroupAbove : public Action
 {
-// Need to make it a Qt object
-Q_OBJECT
-
-//constructor - destructor
-public:
-  LayerManagerWidget( QWidget *parent = 0 );
-  virtual ~LayerManagerWidget();
-
-
-public:
-  void insert_layer( LayerHandle layer );
-  void insert_layer( LayerHandle layer, int index );
-  void delete_layer( LayerHandle layer );
-  void delete_layers( std::vector< LayerHandle > layers );
-  void make_new_group( LayerHandle layer );
-  void move_group( std::string group_id, int new_index );
-  void delete_group( LayerGroupHandle group );
-  void show_group( LayerGroupHandle group );
-  void set_active_layer( LayerHandle layer );
+  CORE_ACTION( "MoveGroupAbove","Move Group Above <name>" );
   
-
+  // -- Constructor/Destructor --
+public:
+  ActionMoveGroupAbove()
+  {
+  }
+  
+  virtual ~ActionMoveGroupAbove()
+  {
+  }
+  
+  // -- Functions that describe action --
+public:
+  virtual bool validate( ActionContextHandle& context );
+  virtual bool run( ActionContextHandle& context, ActionResultHandle& result );
+  
+  // -- Action parameters --
 private:
-  // private Qt GUI Components for the LayerManagerWidget
-  QWidget* main_;
-  QVBoxLayout* main_layout_;
-  QVBoxLayout* group_layout_;
-  LayerWidgetQWeakHandle active_layer_;
-
-
-private:
-  QList< LayerGroupWidgetQHandle > group_list_;
+  // Layer_handle that is requested
+  std::string group_below_id_;
+  std::string group_to_move_id_;
+  
+  // -- Dispatch this action from the interface --
+public:
+  
+  // DISPATCH
+  // Create and dispatch action that moves the layer above 
+  static void Dispatch( std::string group_to_move_id, std::string group_below_id );
+  
 };
-
-} //endnamespace Seg3d
+  
+} // end namespace Seg3D
 
 #endif

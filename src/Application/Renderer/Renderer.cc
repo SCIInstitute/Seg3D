@@ -26,6 +26,10 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// Boost includes
+#include <boost/lexical_cast.hpp>
+
+
 // Utils includes
 #include <Utils/Core/Log.h>
 #include <Utils/RenderResources/RenderResources.h>
@@ -431,7 +435,7 @@ bool Renderer::render_overlay()
     // Render the text
     std::vector< unsigned char > buffer( this->width_ * this->height_, 0 );
     std::vector< std::string > text;
-    text.push_back( std::string( "Hello World" ) );
+    text.push_back( std::string( "Konnichi wa minasan! " ) );
     text.push_back( std::string( "NUMIRA" ) );
     this->text_renderer_->render( text, &buffer[ 0 ], this->width_, this->height_, 5, 20, 10, -1 );
     //this->text_renderer_->render_aligned( text[ 1 ], &buffer[ 0 ], this->width_, this->height_, 48,

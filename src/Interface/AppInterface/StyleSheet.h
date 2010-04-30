@@ -98,8 +98,9 @@ public:
     const static QString GROUP_WIDGET_BACKGROUND_INACTIVE_C;
     const static QString GROUP_WIDGET_ACTIVATE_BUTTON_INACTIVE_C;
     
-  // === PushDragButton === //
-    const static QString PUSHDRAGBUTTON_C;
+  // === PushDragButton's === //
+    const static QString LAYER_PUSHDRAGBUTTON_C;
+    const static QString GROUP_PUSHDRAGBUTTON_C;
 
 };    
 

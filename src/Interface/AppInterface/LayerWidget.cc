@@ -119,7 +119,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   // add the PushDragButton
   this->private_->activate_button_ = new PushDragButton( this->private_->ui_.typeGradient_ );
   this->private_->activate_button_->setObjectName( QString::fromUtf8( "activate_button_" ) );
-  this->private_->activate_button_->setStyleSheet( StyleSheet::PUSHDRAGBUTTON_C );
+  this->private_->activate_button_->setStyleSheet( StyleSheet::LAYER_PUSHDRAGBUTTON_C );
   this->private_->activate_button_->setMinimumHeight( 42 );
   this->private_->activate_button_->setMinimumWidth( 31 );
   this->private_->activate_button_->setIconSize( QSize( 25, 25 ) );

@@ -348,7 +348,8 @@ ViewerWidgetPrivate::ViewerWidgetPrivate( QWidget *parent )
 }
 
 ViewerWidget::ViewerWidget( int viewer_id, QWidget *parent ) :
-  QFrame( parent ), viewer_id_( viewer_id )
+  QFrame( parent ), 
+  viewer_id_( viewer_id )
 {
   private_ = ViewerWidgetPrivateHandle( new ViewerWidgetPrivate( this ) );
   setLayout( private_->layout_ );

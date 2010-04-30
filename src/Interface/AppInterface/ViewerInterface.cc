@@ -63,7 +63,7 @@ public:
   std::vector< ViewerWidget* > viewer_;
 };
 
-ViewerInterfacePrivate::ViewerInterfacePrivate( QWidget* parent )
+ViewerInterfacePrivate::ViewerInterfacePrivate( QWidget* parent ) 
 {
   layout_ = new QVBoxLayout( parent );
   layout_->setContentsMargins( 0, 0, 0, 0 );

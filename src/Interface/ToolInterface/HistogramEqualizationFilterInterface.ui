@@ -248,7 +248,7 @@
      <property name="minimumSize">
       <size>
        <width>205</width>
-       <height>140</height>
+       <height>180</height>
       </size>
      </property>
      <layout class="QHBoxLayout" name="histogramHLayout">

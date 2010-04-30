@@ -36,6 +36,9 @@
 #include <Interface/QtInterface/QtBridge.h>
 #include <Interface/AppInterface/LayerGroupWidget.h>
 #include <Interface/AppInterface/StyleSheet.h>
+#include <Interface/AppInterface/DropSpaceWidget.h>
+#include <Interface/AppInterface/OverlayWidget.h>
+#include <Interface/AppInterface/PushDragButton.h>
 
 //UI Includes
 #include "ui_LayerGroupWidget.h"
@@ -46,6 +49,7 @@
 #include <Application/Layer/LayerGroup.h>
 #include <Application/LayerManager/Actions/ActionDeleteLayers.h>
 #include <Application/LayerManager/Actions/ActionNewMaskLayer.h>
+#include <Application/LayerManager/Actions/ActionMoveGroupAbove.h>
 
 
 
@@ -65,12 +69,17 @@ public:
   SliderDoubleCombo* size_height_adjuster_crop_;
   SliderDoubleCombo* size_depth_adjuster_crop_;
   
+  PushDragButton* activate_button_;
     SliderDoubleCombo* scale_adjuster_;
+  DropSpaceWidget* drop_space_;
+  OverlayWidget* overlay_;
 };
   
 LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
   QWidget( parent ),
-  private_( new LayerGroupWidgetPrivate )
+  private_( new LayerGroupWidgetPrivate ),
+  group_menus_open_( false ),
+  picked_up_( false )
 { 
     LayerGroupHandle group = layer->get_layer_group();
 
@@ -83,12 +92,6 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
   // Set up the Drag and Drop
   this->setAcceptDrops( true );
 
-  // set some values of the GUI
-  std::string group_name = Utils::ToString( group->get_grid_transform().get_nx() ) + " x " +
-    Utils::ToString( group->get_grid_transform().get_ny() ) + " x " +
-    Utils::ToString( group->get_grid_transform().get_nz() );
-  this->private_->ui_.activate_button_->setText( QString::fromStdString( group_name ) );
-
   // hide the tool bars 
   this->private_->ui_.roi_->hide();
   this->private_->ui_.resample_->hide();
@@ -96,7 +99,26 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
   this->private_->ui_.transform_->hide();
   this->private_->ui_.delete_->hide();
   this->private_->ui_.delete_button_->setEnabled( false );
-  
+
+  //add the PushDragButton
+  this->private_->activate_button_ = new PushDragButton( this->private_->ui_.group_header_ );
+  this->private_->activate_button_->setObjectName( QString::fromUtf8( "activate_button_" ) );
+  this->private_->activate_button_->setStyleSheet( StyleSheet::GROUP_PUSHDRAGBUTTON_C );
+  QSizePolicy sizePolicy( QSizePolicy::Preferred, QSizePolicy::Fixed );
+  sizePolicy.setHeightForWidth( this->private_->activate_button_->sizePolicy().hasHeightForWidth() );
+    this->private_->activate_button_->setSizePolicy( sizePolicy );
+    this->private_->activate_button_->setMinimumSize( QSize( 152, 21 ) );
+    this->private_->activate_button_->setCheckable( false );
+    this->private_->activate_button_->setFlat( true );
+  this->private_->ui_.horizontalLayout->insertWidget( 1, this->private_->activate_button_ );
+
+  // set some values of the GUI
+  std::string group_name = Utils::ToString( group->get_grid_transform().get_nx() ) + " x " +
+    Utils::ToString( group->get_grid_transform().get_ny() ) + " x " +
+    Utils::ToString( group->get_grid_transform().get_nz() );
+  this->private_->activate_button_->setText( QString::fromStdString( group_name ) );
+
+
   // add the slider spinner combo's for the crop
   this->private_->center_x_adjuster_crop_ = new SliderDoubleCombo( this->private_->ui_.widget );
   this->private_->ui_.horizontalLayout_11->addWidget( this->private_->center_x_adjuster_crop_ );
@@ -125,6 +147,12 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
   this->private_->scale_adjuster_ = new SliderDoubleCombo( this->private_->ui_.widget_7 );
   this->private_->ui_.horizontalLayout_15->addWidget( this->private_->scale_adjuster_ );
   this->private_->scale_adjuster_->setObjectName( QString::fromUtf8( "scale_adjuster_" ) );
+  
+  this->private_->drop_space_ = new DropSpaceWidget( this );
+  this->private_->ui_.verticalLayout_12->insertWidget( 0, this->private_->drop_space_ );
+  
+  this->private_->drop_space_->hide();
+  
   
   // set some local values for the current size
   this->current_width_ = static_cast<int>( group->get_grid_transform().get_nx() );
@@ -262,11 +290,156 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
 
   this->private_->ui_.group_frame_layout_->setAlignment( Qt::AlignTop );
 
+  this->private_->overlay_ = new OverlayWidget( this );
+  this->private_->overlay_->hide(); 
 }
   
 LayerGroupWidget::~LayerGroupWidget()
 {
 }
+
+void LayerGroupWidget::mousePressEvent( QMouseEvent *event )
+{
+
+  // Exit immediately if they are no longer holding the button the press event isnt valid
+  if( event->button() != Qt::LeftButton )
+  { 
+    return;
+  }
+
+  if( this->group_menus_open_ )
+    return;
+
+  QPoint hotSpot = event->pos();
+
+  // Make up some mimedata containing the layer_id of the layer
+  QMimeData *mimeData = new QMimeData;
+  mimeData->setText(QString::fromStdString( std::string( "group|" ) +  this->get_group_id() ) );
+
+
+  // Create a drag object and insert the hotspot
+  QDrag *drag = new QDrag( this );
+  drag->setMimeData( mimeData );
+
+  // here we add basically a screenshot of the widget
+  drag->setPixmap( QPixmap::grabWidget( this ));
+  drag->setHotSpot( hotSpot );
+
+  // Next we hide the LayerWidget that we are going to be dragging.
+  this->setMinimumHeight( this->height() );
+  this->seethrough( true );
+
+  // Finally if our drag was aborted then we reset the layers styles to be visible
+  if( ( drag->exec(Qt::MoveAction, Qt::MoveAction) ) != Qt::MoveAction )
+  {
+    this->seethrough( false );
+  }
+  // Otherwise we dispatch our move function
+  else 
+  { 
+    ActionMoveGroupAbove::Dispatch( this->get_group_id(), this->drop_group_->get_group_id() );
+  }
+  this->setMinimumHeight( 0 );
+}
+
+void LayerGroupWidget::set_drop_target( LayerGroupWidget* target_group)
+{
+  this->drop_group_ = target_group;
+}
+
+
+void LayerGroupWidget::dropEvent( QDropEvent* event )
+{
+  std::vector<std::string> mime_data = 
+    Utils::SplitString( event->mimeData()->text().toStdString(), "|" );
+  
+  if( mime_data.size() < 2 ) return;
+
+  if( ( this->get_group_id() == mime_data[ 1 ] ) || ( mime_data[ 0 ] != "group" ) )
+  {
+    event->ignore();
+    return;
+  }
+
+  if( this->group_menus_open_ )
+    return;
+
+  dynamic_cast< LayerGroupWidget* >( event->source() )->set_drop_target( this ); 
+  event->setDropAction(Qt::MoveAction);
+  event->accept();
+
+  this->setUpdatesEnabled( false );
+  this->set_drop( false );
+  this->private_->overlay_->hide();
+  this->setUpdatesEnabled( true );
+  this->repaint();
+
+}
+
+void LayerGroupWidget::dragEnterEvent( QDragEnterEvent* event)
+{
+  this->private_->overlay_->show();
+
+  std::vector<std::string> mime_data = 
+    Utils::SplitString( event->mimeData()->text().toStdString(), "|" );
+  
+  if( mime_data.size() < 2 ) return;
+
+  if( ( this->get_group_id() != mime_data[ 0 ] ) && ( mime_data[ 0 ] == "group" ) )
+  {
+    this->set_drop( true );
+    event->setDropAction(Qt::MoveAction);
+    event->accept();
+  }
+  else
+  {
+    this->set_drop( false );
+    this->private_->overlay_->hide();
+    event->ignore();
+  }
+}
+
+void LayerGroupWidget::dragLeaveEvent( QDragLeaveEvent* event )
+{
+  this->set_drop( false );
+  this->private_->overlay_->hide();
+}
+
+void LayerGroupWidget::seethrough( bool see )
+{
+  this->set_picked_up( see );
+
+  this->setUpdatesEnabled( false );
+  if( see )
+  {
+    this->private_->ui_.base_->hide();
+  }
+  else
+  {
+    this->private_->ui_.base_->show();
+  }
+  this->setUpdatesEnabled( true );
+  this->repaint();
+}
+
+void LayerGroupWidget::set_drop( bool drop )
+{
+  // First we check to see if it is picked up if so, we set change the way it looks
+  if( this->picked_up_ )
+  {
+    //this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_PICKED_UP_C );  
+  }
+  // If its not picked up, we set its color to indicate whether or not its a potential drop site
+  else if( drop )
+  {
+    this->private_->drop_space_->show();
+  }
+  else
+  {
+    this->private_->drop_space_->hide();
+  }
+  this->repaint();
+} 
   
 void LayerGroupWidget::insert_layer( LayerHandle layer, int index )
 {
@@ -332,7 +505,7 @@ void  LayerGroupWidget::set_active( bool active )
     this->private_->ui_.group_background_->setStyleSheet( 
       StyleSheet::GROUP_WIDGET_BACKGROUND_ACTIVE_C );
                     
-    this->private_->ui_.activate_button_->setStyleSheet( 
+    this->private_->activate_button_->setStyleSheet( 
       StyleSheet::GROUP_WIDGET_ACTIVATE_BUTTON_ACTIVE_C); 
     }
     else
@@ -343,7 +516,7 @@ void  LayerGroupWidget::set_active( bool active )
         this->private_->ui_.group_background_->setStyleSheet( 
       StyleSheet::GROUP_WIDGET_BACKGROUND_INACTIVE_C );
                   
-      this->private_->ui_.activate_button_->setStyleSheet( 
+      this->private_->activate_button_->setStyleSheet( 
       StyleSheet::GROUP_WIDGET_ACTIVATE_BUTTON_INACTIVE_C );               
     }
 }
@@ -363,6 +536,7 @@ void LayerGroupWidget::show_selection_checkboxes( bool show )
     this->layer_list_[i]->set_group_menu_status( show );
     this->layer_list_[i]->setAcceptDrops( !show ); 
   }
+  this->group_menus_open_ = show;
 }
 
 void LayerGroupWidget::adjust_new_size_labels( double scale_factor )

@@ -81,16 +81,20 @@ public:
   //Delete an empty group
     void delete_group_ui( LayerGroupHandle &group );
 
+  //Move a group
+  void move_group_ui( std::string &group_id, int index );
+
   // -- static functions for callbacks into this widget --
 public:
   typedef QPointer< LayerManagerDockWidget > qpointer_type;
   
-  static void HandleActivateLayer( qpointer_type qpointer, LayerHandle layer );
-  static void HandleInsertLayer( qpointer_type qpointer, LayerHandle layer );
-  static void HandleInsertLayerAt( qpointer_type qpointer, LayerHandle layer, int index );
-  static void HandleDeleteLayer( qpointer_type qpointer, LayerHandle layer );
+  static void HandleActivateLayer( qpointer_type qpointer, LayerHandle &layer );
+  static void HandleInsertLayer( qpointer_type qpointer, LayerHandle &layer );
+  static void HandleInsertLayerAt( qpointer_type qpointer, LayerHandle &layer, int index );
+  static void HandleDeleteLayer( qpointer_type qpointer, LayerHandle &layer );
   static void HandleDeleteLayers( qpointer_type qpointer, std::vector< LayerHandle > layers );
-  static void HandleGroupDeleted( qpointer_type qpointer, LayerGroupHandle group );
+  static void HandleGroupDeleted( qpointer_type qpointer, LayerGroupHandle &group );
+  static void HandleGroupMoved( qpointer_type qpointer, std::string &group_id, int index );
   
   
 private:

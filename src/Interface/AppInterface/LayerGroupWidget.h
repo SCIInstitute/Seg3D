@@ -67,10 +67,19 @@ public:
   const std::string &get_group_id();
   void set_active( bool active );
   LayerWidgetQWeakHandle set_active_layer( LayerHandle layer );
+  void seethrough( bool see );
   
 private Q_SLOTS:
     void adjust_new_size_labels( double scale_factor );
     void uncheck_delete_confirm();
+    void set_picked_up( bool up ){ this->picked_up_ = up; }
+    void set_drop( bool drop );
+   
+  void set_drop_target( LayerGroupWidget* target_layer );
+  void mousePressEvent( QMouseEvent* event );
+  void dropEvent( QDropEvent* event );
+  void dragEnterEvent( QDragEnterEvent* event );
+  void dragLeaveEvent( QDragLeaveEvent* event );
   
     
 private:
@@ -78,6 +87,9 @@ private:
   int current_height_;
   int current_width_;
   int current_depth_;
+  bool group_menus_open_;
+  bool picked_up_;
+  LayerGroupWidget* drop_group_;
   
   // -- widget internals --
 private:

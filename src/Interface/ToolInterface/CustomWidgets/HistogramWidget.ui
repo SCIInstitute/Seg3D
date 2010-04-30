@@ -7,8 +7,14 @@
     <x>0</x>
     <y>0</y>
     <width>223</width>
-    <height>169</height>
+    <height>180</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>180</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Form</string>
@@ -139,7 +145,7 @@ QLabel#label_3{
             <item>
              <widget class="QLabel" name="min">
               <property name="text">
-               <string/>
+               <string>-</string>
               </property>
              </widget>
             </item>
@@ -149,7 +155,7 @@ QLabel#label_3{
                <enum>Qt::RightToLeft</enum>
               </property>
               <property name="text">
-               <string/>
+               <string>-</string>
               </property>
              </widget>
             </item>

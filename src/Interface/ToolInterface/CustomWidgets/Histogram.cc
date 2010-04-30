@@ -57,13 +57,6 @@ void Histogram::set_bins( std::vector< size_t > ints_bin, size_t min_bin, size_t
 void Histogram::paintEvent(QPaintEvent * event )
 {
     QPainter painter( this );
-
-//     QLinearGradient linearGradient( QPointF( 0, 0 ), QPointF( 100, 100 ) );
-//     linearGradient.setColorAt( 0.0, Qt::lightGray );
-//     linearGradient.setColorAt( 0.5, Qt::darkGray );
-//     linearGradient.setColorAt( 1.0, Qt::gray );
-// 
-//     painter.setBrush( linearGradient );
     painter.setRenderHint( QPainter::Antialiasing, true );
 
     double histogram_width = this->width();

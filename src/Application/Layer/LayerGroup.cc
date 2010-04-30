@@ -102,7 +102,7 @@ int LayerGroup::move_layer_above( LayerHandle layer_above, LayerHandle layer_bel
     if( ( *i ) == layer_below )
     { 
       // First we get the size of the list before the insert
-      int list_size = static_cast< int >(this->layer_list_.size());
+      int list_size = static_cast< int >( this->layer_list_.size() );
       
       // Second we insert the layer
       this->layer_list_.insert( ++i, layer_above );

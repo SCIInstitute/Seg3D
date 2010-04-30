@@ -288,7 +288,7 @@ namespace Seg3D
     "}");
     
   // - PushDragButton - //  
-  const QString StyleSheet::PUSHDRAGBUTTON_C = QString::fromUtf8(
+  const QString StyleSheet::LAYER_PUSHDRAGBUTTON_C = QString::fromUtf8(
     "QPushButton#activate_button_{"
     " background-color: rgba(0, 0, 0, 0);"
     " border: 1px solid rgba(0, 0, 0, 0);"
@@ -296,6 +296,26 @@ namespace Seg3D
     " color: white;"
     "}");
 
+  const QString StyleSheet::GROUP_PUSHDRAGBUTTON_C = QString::fromUtf8(
+    "QPushButton#activate_button_{"
+    " background-color:rgba(0, 0, 0, 0);"
+    " border-color: rgba(0, 0, 0, 0);"
+    " border: none;"
+    " height: 24px;"
+    " text-align: left;"
+    " color: white;"
+    " margin: 0 0 0 0;"
+    " padding: 0 0 0 0;"
+    " font: bold;"
+    "}"
+    "QPushButton#activate_button_:pressed{"
+    " background-color:rgba(0, 0, 0, 0);"
+    " border: none;"
+    " border-color: rgba(0, 0, 0, 0);"
+    " color: gray;"
+    " margin: 0 0 0 0;"
+    " padding: 0 0 0 0;"
+    "}");
   
 StyleSheet::StyleSheet()
 {

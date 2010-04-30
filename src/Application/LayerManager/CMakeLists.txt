@@ -46,6 +46,8 @@ SET(APPLICATION_LAYERMANAGER_ACTIONS_SRCS
   Actions/ActionImportLayer.cc
   Actions/ActionInsertLayer.h
   Actions/ActionInsertLayer.cc
+  Actions/ActionMoveGroupAbove.h
+  Actions/ActionMoveGroupAbove.cc
   Actions/ActionMoveLayerAbove.h
   Actions/ActionMoveLayerAbove.cc
   Actions/ActionNewMaskLayer.h

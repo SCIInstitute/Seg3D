@@ -121,6 +121,30 @@ void LayerManagerWidget::insert_layer( LayerHandle layer, int index )
   }
 }
 
+void LayerManagerWidget::move_group( std::string group_id, int new_index )
+{
+  int current_index = 0;
+
+  for ( QList< LayerGroupWidgetQHandle >::iterator i = this->group_list_.begin(); 
+      i  != this->group_list_.end(); i++ )
+  {
+    if( ( *i )->get_group_id() == group_id )
+    {
+      LayerGroupWidgetQHandle group_handle( *i ); 
+      this->group_layout_->removeWidget( group_handle.data() );
+      this->group_layout_->insertWidget( new_index, group_handle.data() );
+      group_handle->seethrough( false );
+      break; 
+    }
+    current_index++;
+  }
+  
+  this->group_list_.move( current_index, new_index );
+
+  
+  
+}
+
 void LayerManagerWidget::delete_layers( std::vector< LayerHandle > layers )
 {
   for( int j = 0; j < static_cast< int >(layers.size()); ++j )

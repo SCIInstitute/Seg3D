@@ -83,7 +83,7 @@ public:
   LayerHandle get_active_layer();
   
   
-  // Action Functions
+  // Layer Action Functions
 public:
   bool insert_layer( LayerHandle layer );
   bool move_layer_above( std::string layer_to_move_id, std::string layer_below_id );
@@ -97,6 +97,13 @@ public:
   // Take an atomic snapshot of visual properties of layers for rendering in the specified viewer
   LayerSceneHandle compose_layer_scene( size_t viewer_id );
   
+  // Group Action Functions
+public:
+  bool move_group_above( std::string group_to_move_id, std::string group_below_id );
+
+private:
+  int insert_group( LayerGroupHandle group_above, LayerGroupHandle group_below );
+
   // Typedef's for the Mutex
 public: 
   typedef boost::recursive_mutex mutex_type;
@@ -112,6 +119,7 @@ public:
   typedef boost::signals2::signal< void( LayerHandle ) > layer_signal_type;
   typedef boost::signals2::signal< void( LayerHandle, int ) > layer_at_signal_type;
   typedef boost::signals2::signal< void( LayerGroupHandle ) > group_signal_type;
+  typedef boost::signals2::signal< void( std::string, int ) > group_at_signal_type;
   typedef boost::signals2::signal< void( std::vector< LayerHandle > ) > layers_signal_type;
   typedef boost::signals2::signal< void() > layers_changed_type;
   // ACTIVE_LAYER_CHANGED_SIGNAL:
@@ -140,7 +148,11 @@ public:
   group_signal_type layers_finished_deleting_signal_;
   
   // GROUP_INSERTED_SIGNAL:
-  // This signal is currently not triggered
+  // This signal is triggered when a group has changed its order int the group list
+  group_at_signal_type group_inserted_at_signal_; 
+
+  // GROUP_INSERTED_AT_SIGNAL:
+  // This signal is triggered when a group has changed its order int the group list
   group_signal_type group_inserted_signal_; 
   
   // GROUP_DELETED_SIGNAL:
