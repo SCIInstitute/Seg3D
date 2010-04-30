@@ -89,6 +89,7 @@ private:
   int current_depth_;
   bool group_menus_open_;
   bool picked_up_;
+  bool drop_group_set_;
   LayerGroupWidget* drop_group_;
   
   // -- widget internals --

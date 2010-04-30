@@ -26,40 +26,32 @@
  DEALINGS IN THE SOFTWARE.
 */
 
+// Interface includes
 #include <Interface/AppInterface/DropSpaceWidget.h>
+#include <Interface/AppInterface/StyleSheet.h>
 
 namespace Seg3D
 {
   
   
-DropSpaceWidget::DropSpaceWidget( QWidget *parent ) :
+DropSpaceWidget::DropSpaceWidget( QWidget *parent, int height, int grow_speed, int shrink_speed ) :
   changing_size_( false ),
-  open_( false )
+  open_( false ),
+  max_height_( height ),
+  grow_speed_( grow_speed ),
+  shrink_speed_( shrink_speed )
 {
   this->setParent( parent );
   this->setObjectName( QString::fromUtf8( "insert_space_" ));
   this->setFixedHeight( 0 );  
-  this->setStyleSheet( QString::fromUtf8(
-    "/*DropSpaceWidget#insert_space_{\n*/"
-    " border-radius: 3px;\n"
-    " margin-top: 0;\n"
-    " margin-bottom: 0;\n"
-    " padding-top: 0;\n"
-    " padding-bottom: 0; \n"
-    " border: 1px solid rgba(50, 50, 50, 40);\n"
-    " background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(0, 0, 0, 50), stop:0.3 rgba(0, 0, 0, 100), stop:0.7 rg"
-    " ba(0, 0, 0, 100), stop:1 rgba(0, 0, 0, 50));\n"
-    "/*}\n*/" ) );
-  
-  
-  
+  this->setStyleSheet( StyleSheet::DROPSPACEWIDGET_C );
+
   this->timer_ = new QTimer( this );
   this->timer_->setSingleShot( true );
   connect( this->timer_, SIGNAL( timeout() ), this, SLOT( change_size() ) );
 
   this->setAcceptDrops( false );
 
-  
 }
 
 DropSpaceWidget::~DropSpaceWidget()
@@ -77,7 +69,7 @@ DropSpaceWidget::~DropSpaceWidget()
         this->timer_->start(10);
       }
     #else
-      this->setFixedHeight( 45 );
+      this->setFixedHeight( this->max_height_ );
       this->updateGeometry();
       this->setVisible( true );
     #endif
@@ -107,8 +99,8 @@ DropSpaceWidget::~DropSpaceWidget()
       {
         this->setVisible( true );
       }
-      if( this->height() < 45 ) {
-        this->setFixedHeight( ( this->height() + 5 ) );
+      if( this->height() < this->max_height_ ) {
+        this->setFixedHeight( ( this->height() + this->grow_speed_ ) );
         this->updateGeometry();
         this->timer_->start(10);
       }
@@ -117,7 +109,7 @@ DropSpaceWidget::~DropSpaceWidget()
     {
       if( this->height() > 0 ) 
       {
-        this->setFixedHeight( ( this->height() - 15 ) );
+        this->setFixedHeight( ( this->height() - this->shrink_speed_ ) );
         this->updateGeometry();
         this->timer_->start(10);
       }

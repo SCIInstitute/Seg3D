@@ -316,7 +316,20 @@ namespace Seg3D
     " margin: 0 0 0 0;"
     " padding: 0 0 0 0;"
     "}");
-  
+
+  const QString StyleSheet::DROPSPACEWIDGET_C = QString::fromUtf8(
+    " border-radius: 3px;"
+    " margin-top: 0;"
+    " margin-bottom: 0;"
+    " padding-top: 0;"
+    " padding-bottom: 0;"
+    " border: 1px solid rgba(50, 50, 50, 40);"
+    " background-color: qlineargradient( spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227,"
+    "   stop:0 rgba(0, 0, 0, 50)," 
+    "   stop:0.3 rgba(0, 0, 0, 100),"
+    "   stop:0.7 rgba(0, 0, 0, 100),"
+    "   stop:1 rgba(0, 0, 0, 50) );");
+
 StyleSheet::StyleSheet()
 {
 }    

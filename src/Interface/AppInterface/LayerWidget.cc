@@ -359,7 +359,6 @@ void LayerWidget::set_drop_target( LayerWidget* target_layer )
 {
   this->drop_layer_ = target_layer;
 }
-  
 
 void LayerWidget::dropEvent( QDropEvent* event )
 {

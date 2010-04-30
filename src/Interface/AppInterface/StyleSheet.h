@@ -102,6 +102,9 @@ public:
     const static QString LAYER_PUSHDRAGBUTTON_C;
     const static QString GROUP_PUSHDRAGBUTTON_C;
 
+  // === DropSpaceWidget === //
+    const static QString DROPSPACEWIDGET_C;
+
 };    
 
 }  // end namespace Seg3D

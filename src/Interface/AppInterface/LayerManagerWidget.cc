@@ -90,7 +90,7 @@ void LayerManagerWidget::insert_layer( LayerHandle layer )
       if( layer->get_active() )
         this->set_active_layer( layer );
       ( *i )->setUpdatesEnabled( true );
-      ( *i )->repaint( QRect( 0, 0, ( *i )->width(), ( *i )->height() ) );
+      ( *i )->repaint();
       inserted = true;
       break;
     } 
@@ -115,7 +115,7 @@ void LayerManagerWidget::insert_layer( LayerHandle layer, int index )
       if( layer->get_active() )
         this->set_active_layer( layer );
       ( *i )->setUpdatesEnabled( true );
-      ( *i )->repaint( QRect( 0, 0, ( *i )->width(), ( *i )->height() ) );
+      ( *i )->repaint();
       break;
     } 
   }
@@ -133,7 +133,6 @@ void LayerManagerWidget::move_group( std::string group_id, int new_index )
       LayerGroupWidgetQHandle group_handle( *i ); 
       this->group_layout_->removeWidget( group_handle.data() );
       this->group_layout_->insertWidget( new_index, group_handle.data() );
-      group_handle->seethrough( false );
       break; 
     }
     current_index++;

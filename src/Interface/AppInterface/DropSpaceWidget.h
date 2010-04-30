@@ -42,7 +42,7 @@ public QWidget
   Q_OBJECT
   
 public:
-  DropSpaceWidget( QWidget *parent );
+  DropSpaceWidget( QWidget *parent, int height = 45, int grow_speed = 5, int shrink_speed = 15 );
   virtual ~DropSpaceWidget();
 
 public:
@@ -57,6 +57,9 @@ private:
   QTimer *timer_;
   bool changing_size_;
   bool open_;
+  int max_height_;
+  int grow_speed_;
+  int shrink_speed_;
 };
   
 } // end namespace Seg3D

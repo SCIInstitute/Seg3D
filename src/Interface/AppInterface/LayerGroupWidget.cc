@@ -79,7 +79,8 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
   QWidget( parent ),
   private_( new LayerGroupWidgetPrivate ),
   group_menus_open_( false ),
-  picked_up_( false )
+  picked_up_( false ),
+  drop_group_set_( false )
 { 
     LayerGroupHandle group = layer->get_layer_group();
 
@@ -148,7 +149,7 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
   this->private_->ui_.horizontalLayout_15->addWidget( this->private_->scale_adjuster_ );
   this->private_->scale_adjuster_->setObjectName( QString::fromUtf8( "scale_adjuster_" ) );
   
-  this->private_->drop_space_ = new DropSpaceWidget( this );
+  this->private_->drop_space_ = new DropSpaceWidget( this, 105 );
   this->private_->ui_.verticalLayout_12->insertWidget( 0, this->private_->drop_space_ );
   
   this->private_->drop_space_->hide();
@@ -330,21 +331,20 @@ void LayerGroupWidget::mousePressEvent( QMouseEvent *event )
   this->seethrough( true );
 
   // Finally if our drag was aborted then we reset the layers styles to be visible
-  if( ( drag->exec(Qt::MoveAction, Qt::MoveAction) ) != Qt::MoveAction )
+  if( ( ( drag->exec(Qt::MoveAction, Qt::MoveAction) ) == Qt::MoveAction ) && this->drop_group_set_ )
   {
-    this->seethrough( false );
-  }
-  // Otherwise we dispatch our move function
-  else 
-  { 
     ActionMoveGroupAbove::Dispatch( this->get_group_id(), this->drop_group_->get_group_id() );
   }
+  
   this->setMinimumHeight( 0 );
+  this->drop_group_set_ = false;
+  this->seethrough( false );
 }
 
 void LayerGroupWidget::set_drop_target( LayerGroupWidget* target_group)
 {
   this->drop_group_ = target_group;
+  this->drop_group_set_ = true;
 }
 
 
@@ -357,6 +357,7 @@ void LayerGroupWidget::dropEvent( QDropEvent* event )
 
   if( ( this->get_group_id() == mime_data[ 1 ] ) || ( mime_data[ 0 ] != "group" ) )
   {
+    event->setDropAction(Qt::CopyAction);
     event->ignore();
     return;
   }

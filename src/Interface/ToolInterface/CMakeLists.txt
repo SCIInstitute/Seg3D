@@ -123,8 +123,11 @@ SET(INTERFACE_TOOLINTERFACE_UI_SRCS
   CannyEdgeDetectionFilterInterface.ui
   OtsuThresholdFilterInterface.ui
   ThresholdSegmentationLSFilterInterface.ui
-  SliderIntCombo.ui
-  SliderDoubleCombo.ui
+)
+
+SET(INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_UI_SRCS
+  CustomWidgets/SliderIntCombo.ui
+  CustomWidgets/SliderDoubleCombo.ui
   CustomWidgets/HistogramWidget.ui
 )
 
@@ -139,6 +142,7 @@ SET(INTERFACE_TOOLINTERFACE_UI_SRCS
 ##################################################
 
 QT4_WRAP_UI(INTERFACE_TOOLINTERFACE_QT_UI_SRCS ${INTERFACE_TOOLINTERFACE_UI_SRCS})
+QT4_WRAP_UI(INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_QT_UI_SRCS ${INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_UI_SRCS})
 
 ##################################################
 # Wrap QT code to expand all the moc code
@@ -165,6 +169,7 @@ ADD_LIBRARY(Interface_ToolInterface STATIC
             ${INTERFACE_TOOLINTERFACE_NO_MOC_SRCS} 
             ${INTERFACE_TOOLINTERFACE_MOC_SRCS}
             ${INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_SRCS}
+            ${INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_QT_UI_SRCS}
             ${INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_QT_MOC_SRCS}
             ${INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_MOC_SRCS})
             
