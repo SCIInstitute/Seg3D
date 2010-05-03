@@ -44,7 +44,8 @@ DropSpaceWidget::DropSpaceWidget( QWidget *parent, int height, int grow_speed, i
   this->setParent( parent );
   this->setObjectName( QString::fromUtf8( "insert_space_" ));
   this->setFixedHeight( 0 );  
-  this->setStyleSheet( StyleSheet::DROPSPACEWIDGET_C );
+  QSizePolicy size_policy( QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding );
+  this->setSizePolicy( size_policy );
 
   this->timer_ = new QTimer( this );
   this->timer_->setSingleShot( true );
@@ -117,10 +118,6 @@ DropSpaceWidget::~DropSpaceWidget()
         this->setVisible( false );
       }
     }
-
   }
-
-  
-  
   
 } // end namespace Seg3D

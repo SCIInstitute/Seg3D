@@ -69,6 +69,9 @@ public:
   LayerWidgetQWeakHandle set_active_layer( LayerHandle layer );
   void seethrough( bool see );
   
+protected:
+  void resizeEvent( QResizeEvent *event );
+  
 private Q_SLOTS:
     void adjust_new_size_labels( double scale_factor );
     void uncheck_delete_confirm();
@@ -80,7 +83,11 @@ private Q_SLOTS:
   void dropEvent( QDropEvent* event );
   void dragEnterEvent( QDragEnterEvent* event );
   void dragLeaveEvent( QDragLeaveEvent* event );
-  
+
+  // -- widget internals --
+private:
+    boost::shared_ptr< LayerGroupWidgetPrivate > private_;
+    QVector< LayerWidgetQHandle > layer_list_;
     
 private:
   std::string group_id_;
@@ -92,10 +99,7 @@ private:
   bool drop_group_set_;
   LayerGroupWidget* drop_group_;
   
-  // -- widget internals --
-private:
-    boost::shared_ptr< LayerGroupWidgetPrivate > private_;
-    QVector< LayerWidgetQHandle > layer_list_;
+
   
   
 

@@ -292,6 +292,7 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
   this->private_->ui_.group_frame_layout_->setAlignment( Qt::AlignTop );
 
   this->private_->overlay_ = new OverlayWidget( this );
+  this->private_->overlay_->setStyleSheet( QString::fromUtf8( "background-color: rgba( 255, 0, 0, 200 )" ) );
   this->private_->overlay_->hide(); 
 }
   
@@ -711,6 +712,12 @@ void LayerGroupWidget::show_delete( bool show )
   }
   show_selection_checkboxes( show );
   this->repaint();
+}
+  
+void LayerGroupWidget::resizeEvent( QResizeEvent *event )
+{
+  this->private_->overlay_->resize( event->size() );
+  event->accept();
 }
 
   

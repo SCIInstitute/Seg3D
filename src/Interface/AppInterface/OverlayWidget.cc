@@ -42,6 +42,7 @@ OverlayWidget::OverlayWidget( QWidget *parent )
   setPalette( Qt::transparent );
   QSizePolicy size_policy( QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding );
   this->setSizePolicy( size_policy );
+  
 }
 
 OverlayWidget::~OverlayWidget()

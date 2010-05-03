@@ -125,16 +125,12 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   this->private_->activate_button_->setIconSize( QSize( 25, 25 ) );
   this->private_->ui_.horizontalLayout_9->addWidget( this->private_->activate_button_ );
   this->private_->activate_button_->setAcceptDrops( false );
-  this->private_->ui_.base_->setAcceptDrops( false );
-  this->private_->ui_.header_->setAcceptDrops( false );
-  this->private_->ui_.widget->setAcceptDrops( false );
-  this->private_->ui_.widget_2->setAcceptDrops( false );
-  this->private_->ui_.typeBackground_->setAcceptDrops( false );
-  this->private_->ui_.typeGradient_->setAcceptDrops( false );
   
   // add the DropSpaceWidget
   this->private_->drop_space_ = new DropSpaceWidget( this );
   this->private_->ui_.verticalLayout_3->insertWidget( 0, this->private_->drop_space_ );
+  
+  this->private_->drop_space_->setStyleSheet( StyleSheet::DROPSPACEWIDGET_C );
   
   this->private_->drop_space_->hide();
   
