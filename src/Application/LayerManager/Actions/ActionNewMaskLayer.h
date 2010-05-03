@@ -39,12 +39,14 @@ namespace Seg3D
 
 class ActionNewMaskLayer : public Action
 {
-  CORE_ACTION( "NewMaskLayer", "NewMaskLayer <name>" );
+  CORE_ACTION( "NewMaskLayer", "<group_name>" );
   
   // -- Constructor/Destructor --
 public:
-  ActionNewMaskLayer()
+  ActionNewMaskLayer() :
+    group_name_("")
   {
+    add_parameter("group", group_name_);
   }
   
   virtual ~ActionNewMaskLayer()
@@ -55,13 +57,27 @@ public:
 public:
   virtual bool validate( ActionContextHandle& context );
   virtual bool run( ActionContextHandle& context, ActionResultHandle& result );
+  
+private:
+  ActionParameter< std::string > group_name_;
 
   // -- Dispatch this action from the interface --
 public:
-
+  // CREATE:
+  // Create action that moves the layer above
+  static ActionHandle Create( LayerGroupHandle group );
+  
+  // CREATE:
+  // Create action that moves the layer above
+  static ActionHandle Create( const std::string& group_name );
+  
   // DISPATCH
-  // Create and dispatch action that activates a layer
+  // Dispatch action that creates a new mask layer 
   static void Dispatch( LayerGroupHandle group );
+  
+  // DISPATCH
+  // Dispatch action that creates a new mask layer 
+  static void Dispatch( const std::string& group_name );
   
 private:
   // Layer_handle that is requested

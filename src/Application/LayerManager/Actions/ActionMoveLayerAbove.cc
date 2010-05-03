@@ -41,15 +41,17 @@ namespace Seg3D
   bool ActionMoveLayerAbove::validate( ActionContextHandle& context )
   {
 
-    if ( !( StateEngine::Instance()->is_stateid( layer_to_move_id_ ) ) )
+    if ( !( StateEngine::Instance()->is_stateid( this->layer_to_move_id_.value() ) ) )
     {
-      context->report_error( std::string( "LayerID '" ) + layer_to_move_id_ + "' is invalid" );
+      context->report_error( std::string( "LayerID '" ) + this->layer_to_move_id_.value()
+        + "' is invalid" );
       return false;
     }
     
-    if ( !( StateEngine::Instance()->is_stateid( layer_below_id_ ) ) )
+    if ( !( StateEngine::Instance()->is_stateid( this->layer_below_id_.value() ) ) )
     {
-      context->report_error( std::string( "LayerID '" ) + layer_below_id_ + "' is invalid" );
+      context->report_error( std::string( "LayerID '" ) + this->layer_below_id_.value()
+        + "' is invalid" );
       return false;
     }
 
@@ -58,24 +60,36 @@ namespace Seg3D
   
   bool ActionMoveLayerAbove::run( ActionContextHandle& context, ActionResultHandle& result )
   {
-    if ( ( StateEngine::Instance()->is_stateid( layer_to_move_id_ ) ) && 
-      ( StateEngine::Instance()->is_stateid( layer_below_id_ ) ) )
+    if ( ( StateEngine::Instance()->is_stateid( this->layer_to_move_id_.value() ) ) && 
+      ( StateEngine::Instance()->is_stateid( this->layer_below_id_.value() ) ) )
     {
-      LayerManager::Instance()->move_layer_above( this->layer_to_move_id_, this->layer_below_id_ );
+      LayerManager::Instance()->move_layer_above( this->layer_to_move_id_.value(), 
+        this->layer_below_id_.value() );
       return true;
     }
 
     return false;
   }
   
-
-  void ActionMoveLayerAbove::Dispatch( std::string layer_to_move_id, std::string layer_below_id )
+  ActionHandle ActionMoveLayerAbove::Create( const std::string& layer_to_move_id, 
+    const std::string& layer_below_id )
   {
+    // Create new action
     ActionMoveLayerAbove* action = new ActionMoveLayerAbove;
-    action->layer_below_id_ = layer_below_id;
-    action->layer_to_move_id_ = layer_to_move_id;
+    
+    // We need to fill in these to ensure the action can be replayed
+    action->layer_below_id_.value() = layer_below_id;
+    action->layer_to_move_id_.value() = layer_to_move_id;
+    
+    // Post the new action
+    return ActionHandle( action );
+  }
   
-    Interface::PostAction( ActionHandle( action ) );
+  
+  void ActionMoveLayerAbove::Dispatch( const std::string& layer_to_move_id, 
+    const std::string& layer_below_id )
+  {
+    Interface::PostAction( Create( layer_to_move_id, layer_below_id ) );
   }
   
 } // end namespace Seg3D

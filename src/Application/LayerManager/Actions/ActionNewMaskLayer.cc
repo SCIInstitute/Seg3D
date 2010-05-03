@@ -40,12 +40,16 @@ CORE_REGISTER_ACTION( NewMaskLayer );
 
 bool ActionNewMaskLayer::validate( ActionContextHandle& context )
 {
-    if ( !this->group_handle_ )
-      return false;
+//    if ( !this->group_handle_ )
+//  {
+//    SCI_LOG_DEBUG( "The group " + this->group_name_.value() + " is invalid" );
+//    return false;
+//  }
+//      
   
-  if ( !( StateEngine::Instance()->is_stateid( group_handle_->get_group_id() ) ) )
+  if ( !( StateEngine::Instance()->is_stateid( this->group_name_.value() ) ) )
   {
-    context->report_error( std::string( "GroupID '" ) + group_handle_->get_group_id() + "' is invalid" );
+    context->report_error( std::string( "GroupID '" ) + this->group_name_.value() + "' is invalid" );
     return false;
   }
 
@@ -54,21 +58,54 @@ bool ActionNewMaskLayer::validate( ActionContextHandle& context )
 
   bool ActionNewMaskLayer::run( ActionContextHandle& context, ActionResultHandle& result )
   {
-    if ( this->group_handle_ )
+    if ( !this->group_handle_ )
     {
-        LayerHandle new_mask_layer = LayerHandle( new MaskLayer( "MaskLayer", group_handle_->get_grid_transform() ));
-      LayerManager::Instance()->insert_layer( new_mask_layer );
-      return true;
+      this->group_handle_ = LayerManager::Instance()->get_LayerGroupHandle_from_group_id( 
+        this->group_name_.value() );
+      
+      if ( !this->group_handle_ )
+      {
+        context->report_error( std::string( "GroupID '" ) + this->group_name_.value() + "' is invalid" );
+        return false;
+      }
     }
     
-    return false;
+    LayerHandle new_mask_layer = LayerHandle( new MaskLayer( "MaskLayer", group_handle_->get_grid_transform() ));
+    LayerManager::Instance()->insert_layer( new_mask_layer );
+    
+    return true;
   }
-  void ActionNewMaskLayer::Dispatch( LayerGroupHandle group )
+  
+  ActionHandle ActionNewMaskLayer::Create( LayerGroupHandle group )
   {
     ActionNewMaskLayer* action = new ActionNewMaskLayer;
     action->group_handle_ = group;
+    action->group_name_.value() = group->get_group_id();
     
-    Interface::PostAction( ActionHandle( action ) );
+    return ActionHandle( action );
+  }
+  
+  ActionHandle ActionNewMaskLayer::Create( const std::string& group_name )
+  {
+    ActionNewMaskLayer* action = new ActionNewMaskLayer;
+    
+    SCI_LOG_DEBUG( "trying to create an action for adding a new mask layer to " + group_name );
+    
+    action->group_handle_ = LayerManager::Instance()->
+      get_LayerGroupHandle_from_group_id( group_name );
+    action->group_name_.value() = group_name;
+    
+    return ActionHandle( action );
+  }
+  
+  void ActionNewMaskLayer::Dispatch( LayerGroupHandle group )
+  {
+    Interface::PostAction( Create( group ) );
+  }
+  
+  void ActionNewMaskLayer::Dispatch( const std::string& group_name )
+  {
+    Interface::PostAction( Create( group_name ) );
   }
 
 } // end namespace Seg3D

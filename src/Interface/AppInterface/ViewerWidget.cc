@@ -118,7 +118,7 @@ public:
 ViewerWidgetPrivate::ViewerWidgetPrivate( QWidget *parent )
 {
   // ensure viewer selection is mutual exclusive
-  viewer_selection_ = new QActionGroup( parent );
+  this->viewer_selection_ = new QActionGroup( parent );
 
   QIcon sagittal_icon;
   sagittal_icon.addPixmap( QPixmap( ":/Images/Xview.png" ), QIcon::Normal, QIcon::Off );
@@ -159,165 +159,165 @@ ViewerWidgetPrivate::ViewerWidgetPrivate( QWidget *parent )
   slice_visible_icon.addPixmap( QPixmap( ":/Images/Visible.png" ), QIcon::Normal, QIcon::On );
   slice_visible_icon.addPixmap( QPixmap( ":/Images/VisibleOff.png" ), QIcon::Normal, QIcon::Off );
 
-  sagittal_viewer_ = new QAction( parent );
-  sagittal_viewer_->setIcon( sagittal_icon );
-  sagittal_viewer_->setText( QString( "Sagittal" ) );
-  sagittal_viewer_->setToolTip( QString( "Sagittal Slice Viewer" ) );
-  sagittal_viewer_->setIconVisibleInMenu( true );
-  sagittal_viewer_->setActionGroup( viewer_selection_ );
-  sagittal_viewer_->setObjectName( QString( Viewer::SAGITTAL_C.c_str() ) );
+  this->sagittal_viewer_ = new QAction( parent );
+  this->sagittal_viewer_->setIcon( sagittal_icon );
+  this->sagittal_viewer_->setText( QString( "Sagittal" ) );
+  this->sagittal_viewer_->setToolTip( QString( "Sagittal Slice Viewer" ) );
+  this->sagittal_viewer_->setIconVisibleInMenu( true );
+  this->sagittal_viewer_->setActionGroup( this->viewer_selection_ );
+  this->sagittal_viewer_->setObjectName( QString( Viewer::SAGITTAL_C.c_str() ) );
 
-  coronal_viewer_ = new QAction( parent );
-  coronal_viewer_->setIcon( coronal_icon );
-  coronal_viewer_->setText( QString( "Coronal" ) );
-  coronal_viewer_->setToolTip( QString( "Coronal Slice Viewer" ) );
-  coronal_viewer_->setIconVisibleInMenu( true );
-  coronal_viewer_->setActionGroup( viewer_selection_ );
-  coronal_viewer_->setObjectName( QString( Viewer::CORONAL_C.c_str() ) );
+  this->coronal_viewer_ = new QAction( parent );
+  this->coronal_viewer_->setIcon( coronal_icon );
+  this->coronal_viewer_->setText( QString( "Coronal" ) );
+  this->coronal_viewer_->setToolTip( QString( "Coronal Slice Viewer" ) );
+  this->coronal_viewer_->setIconVisibleInMenu( true );
+  this->coronal_viewer_->setActionGroup( this->viewer_selection_ );
+  this->coronal_viewer_->setObjectName( QString( Viewer::CORONAL_C.c_str() ) );
 
-  axial_viewer_ = new QAction( parent );
-  axial_viewer_->setIcon( axial_icon );
-  axial_viewer_->setText( QString( "Axial" ) );
-  axial_viewer_->setToolTip( QString( "Axial Slice Viewer" ) );
-  axial_viewer_->setIconVisibleInMenu( true );
-  axial_viewer_->setActionGroup( viewer_selection_ );
-  axial_viewer_->setObjectName( QString( Viewer::AXIAL_C.c_str() ) );
+  this->axial_viewer_ = new QAction( parent );
+  this->axial_viewer_->setIcon( axial_icon );
+  this->axial_viewer_->setText( QString( "Axial" ) );
+  this->axial_viewer_->setToolTip( QString( "Axial Slice Viewer" ) );
+  this->axial_viewer_->setIconVisibleInMenu( true );
+  this->axial_viewer_->setActionGroup( this->viewer_selection_ );
+  this->axial_viewer_->setObjectName( QString( Viewer::AXIAL_C.c_str() ) );
 
-  volume_viewer_ = new QAction( parent );
-  volume_viewer_->setIcon( volume_icon );
-  volume_viewer_->setText( QString( "Volume" ) );
-  volume_viewer_->setToolTip( QString( "3D Volume Viewer" ) );
-  volume_viewer_->setIconVisibleInMenu( true );
-  volume_viewer_->setActionGroup( viewer_selection_ );
-  volume_viewer_->setObjectName( QString( Viewer::VOLUME_C.c_str() ) );
+  this->volume_viewer_ = new QAction( parent );
+  this->volume_viewer_->setIcon( volume_icon );
+  this->volume_viewer_->setText( QString( "Volume" ) );
+  this->volume_viewer_->setToolTip( QString( "3D Volume Viewer" ) );
+  this->volume_viewer_->setIconVisibleInMenu( true );
+  this->volume_viewer_->setActionGroup( this->viewer_selection_ );
+  this->volume_viewer_->setObjectName( QString( Viewer::VOLUME_C.c_str() ) );
 
-  auto_view_ = new QAction( parent );
-  auto_view_->setIcon( auto_view_icon );
-  auto_view_->setText( QString( "AutoView" ) );
-  auto_view_->setToolTip( QString( "Zoom and Translate to see the full dataset" ) );
-  auto_view_->setIconVisibleInMenu( true );
+  this->auto_view_ = new QAction( parent );
+  this->auto_view_->setIcon( auto_view_icon );
+  this->auto_view_->setText( QString( "AutoView" ) );
+  this->auto_view_->setToolTip( QString( "Zoom and Translate to see the full dataset" ) );
+  this->auto_view_->setIconVisibleInMenu( true );
 
-  slice_visible_ = new QAction( parent );
-  slice_visible_->setCheckable( true );
-  slice_visible_->setIcon( slice_visible_icon );
-  slice_visible_->setText( QString( "SliceVisible" ) );
-  slice_visible_->setToolTip( QString( "Show this slice in the volume viewer" ) );
-  slice_visible_->setIconVisibleInMenu( true );
+  this->slice_visible_ = new QAction( parent );
+  this->slice_visible_->setCheckable( true );
+  this->slice_visible_->setIcon( slice_visible_icon );
+  this->slice_visible_->setText( QString( "SliceVisible" ) );
+  this->slice_visible_->setToolTip( QString( "Show this slice in the volume viewer" ) );
+  this->slice_visible_->setIconVisibleInMenu( true );
 
-  grid_ = new QAction( parent );
-  grid_->setCheckable( true );
-  grid_->setIcon( grid_icon );
-  grid_->setText( QString( "Grid" ) );
-  grid_->setToolTip( QString( "Enable measurement grid" ) );
-  grid_->setIconVisibleInMenu( true );
+  this->grid_ = new QAction( parent );
+  this->grid_->setCheckable( true );
+  this->grid_->setIcon( grid_icon );
+  this->grid_->setText( QString( "Grid" ) );
+  this->grid_->setToolTip( QString( "Enable measurement grid" ) );
+  this->grid_->setIconVisibleInMenu( true );
 
-  lock_ = new QAction( parent );
-  lock_->setCheckable( true );
-  lock_->setIcon( lock_icon );
-  lock_->setText( QString( "Lock" ) );
-  lock_->setToolTip( QString( "Lock changes to view to other viewers" ) );
-  lock_->setIconVisibleInMenu( true );
+  this->lock_ = new QAction( parent );
+  this->lock_->setCheckable( true );
+  this->lock_->setIcon( lock_icon );
+  this->lock_->setText( QString( "Lock" ) );
+  this->lock_->setToolTip( QString( "Lock changes to view to other viewers" ) );
+  this->lock_->setIconVisibleInMenu( true );
 
-  flip_horiz_ = new QAction( parent );
-  flip_horiz_->setCheckable( true );
-  flip_horiz_->setIcon( fliphoriz_icon );
-  flip_horiz_->setText( QString( "Flip Horizontal" ) );
-  flip_horiz_->setToolTip( QString( "Flip the slice horizontal" ) );
-  flip_horiz_->setIconVisibleInMenu( true );
+  this->flip_horiz_ = new QAction( parent );
+  this->flip_horiz_->setCheckable( true );
+  this->flip_horiz_->setIcon( fliphoriz_icon );
+  this->flip_horiz_->setText( QString( "Flip Horizontal" ) );
+  this->flip_horiz_->setToolTip( QString( "Flip the slice horizontal" ) );
+  this->flip_horiz_->setIconVisibleInMenu( true );
 
-  flip_vert_ = new QAction( parent );
-  flip_vert_->setCheckable( true );
-  flip_vert_->setIcon( flipvert_icon );
-  flip_vert_->setText( QString( "Flip Vertical" ) );
-  flip_vert_->setToolTip( QString( "Flip the slice vertical" ) );
-  flip_vert_->setIconVisibleInMenu( true );
+  this->flip_vert_ = new QAction( parent );
+  this->flip_vert_->setCheckable( true );
+  this->flip_vert_->setIcon( flipvert_icon );
+  this->flip_vert_->setText( QString( "Flip Vertical" ) );
+  this->flip_vert_->setToolTip( QString( "Flip the slice vertical" ) );
+  this->flip_vert_->setIconVisibleInMenu( true );
 
   // BUILD VIEWER WIDGET  
 
   // --------------------------------------
   // Add frame around widget for selection
-  layout_ = new QVBoxLayout;
-  layout_->setContentsMargins( 0, 0, 0, 0 );
-  layout_->setSpacing( 0 );
+  this->layout_ = new QVBoxLayout;
+  this->layout_->setContentsMargins( 0, 0, 0, 0 );
+  this->layout_->setSpacing( 0 );
 
   // --------------------------------------
   // Generate the OpenGL part of the widget
 
-  viewer_ = QtApplication::Instance()->qt_renderresources_context() ->create_qt_render_widget(
+  this->viewer_ = QtApplication::Instance()->qt_renderresources_context() ->create_qt_render_widget(
       parent );
 
-  if( viewer_ == 0 )
+  if( this->viewer_ == 0 )
   {
     SCI_THROW_LOGICERROR("OpenGL was not initialized correctly");
   }
-  viewer_->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
+  this->viewer_->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
 
   // --------------------------------------
   // Generate button bar at the bottom of
   // the Viewer widget
   SCI_LOG_DEBUG("Create button bar for ViewWidget");
 
-  buttonbar_ = new QFrame( parent );
+  this->buttonbar_ = new QFrame( parent );
   
   // Add the stylesheet to the Buttons
-  buttonbar_->setStyleSheet( StyleSheet::VIEWERWIDGET_TOOLBAR_C );
+  this->buttonbar_->setStyleSheet( StyleSheet::VIEWERWIDGET_TOOLBAR_C );
   
-  buttonbar_layout_ = new QHBoxLayout( buttonbar_ );
-  buttonbar_layout_->setContentsMargins( 0, 0, 0, 0 );
-  buttonbar_layout_->setSpacing( 0 );
+  this->buttonbar_layout_ = new QHBoxLayout( buttonbar_ );
+  this->buttonbar_layout_->setContentsMargins( 0, 0, 0, 0 );
+  this->buttonbar_layout_->setSpacing( 0 );
 
-  buttonbar_->setLayout( buttonbar_layout_ );
+  this->buttonbar_->setLayout( this->buttonbar_layout_ );
 
-  viewer_type_button_ = new QToolButton( buttonbar_ );
-  viewer_menu_ = new QMenu( viewer_type_button_ );
-  viewer_menu_->addAction( sagittal_viewer_ );
-  viewer_menu_->addAction( coronal_viewer_ );
-  viewer_menu_->addAction( axial_viewer_ );
-  viewer_menu_->addAction( volume_viewer_ );
-  viewer_type_button_->setPopupMode( QToolButton::InstantPopup );
-  viewer_type_button_->setToolButtonStyle( Qt::ToolButtonTextBesideIcon );
-  viewer_type_button_->setDefaultAction( axial_viewer_ );
-  viewer_type_button_->setFixedHeight( 20 );
-  viewer_type_button_->setFixedWidth( 80 );
-  viewer_type_button_->setMenu( viewer_menu_ );
-  viewer_type_button_->setArrowType( Qt::NoArrow );
+  this->viewer_type_button_ = new QToolButton( this->buttonbar_ );
+  this->viewer_menu_ = new QMenu( this->viewer_type_button_ );
+  this->viewer_menu_->addAction( this->sagittal_viewer_ );
+  this->viewer_menu_->addAction( this->coronal_viewer_ );
+  this->viewer_menu_->addAction( this->axial_viewer_ );
+  this->viewer_menu_->addAction( this->volume_viewer_ );
+  this->viewer_type_button_->setPopupMode( QToolButton::InstantPopup );
+  this->viewer_type_button_->setToolButtonStyle( Qt::ToolButtonTextBesideIcon );
+  this->viewer_type_button_->setDefaultAction( this->axial_viewer_ );
+  this->viewer_type_button_->setFixedHeight( 20 );
+  this->viewer_type_button_->setFixedWidth( 80 );
+  this->viewer_type_button_->setMenu( this->viewer_menu_ );
+  this->viewer_type_button_->setArrowType( Qt::NoArrow );
 
-  lock_button_ = new QToolButton( buttonbar_ );
-  lock_button_->setToolButtonStyle( Qt::ToolButtonIconOnly );
-  lock_button_->setDefaultAction( lock_ );
-  lock_button_->setFixedHeight( 20 );
-  lock_button_->setFixedWidth( 20 );
+  this->lock_button_ = new QToolButton( this->buttonbar_ );
+  this->lock_button_->setToolButtonStyle( Qt::ToolButtonIconOnly );
+  this->lock_button_->setDefaultAction( this->lock_ );
+  this->lock_button_->setFixedHeight( 20 );
+  this->lock_button_->setFixedWidth( 20 );
 
-  auto_view_button_ = new QToolButton( buttonbar_ );
-  auto_view_button_->setToolButtonStyle( Qt::ToolButtonIconOnly );
-  auto_view_button_->setDefaultAction( auto_view_ );
-  auto_view_button_->setFixedHeight( 20 );
-  auto_view_button_->setFixedWidth( 20 );
+  this->auto_view_button_ = new QToolButton( this->buttonbar_ );
+  this->auto_view_button_->setToolButtonStyle( Qt::ToolButtonIconOnly );
+  this->auto_view_button_->setDefaultAction( this->auto_view_ );
+  this->auto_view_button_->setFixedHeight( 20 );
+  this->auto_view_button_->setFixedWidth( 20 );
 
-  flip_horiz_button_ = new QToolButton( buttonbar_ );
-  flip_horiz_button_->setToolButtonStyle( Qt::ToolButtonIconOnly );
-  flip_horiz_button_->setDefaultAction( flip_horiz_ );
-  flip_horiz_button_->setFixedHeight( 20 );
-  flip_horiz_button_->setFixedWidth( 20 );
+  this->flip_horiz_button_ = new QToolButton( this->buttonbar_ );
+  this->flip_horiz_button_->setToolButtonStyle( Qt::ToolButtonIconOnly );
+  this->flip_horiz_button_->setDefaultAction( flip_horiz_ );
+  this->flip_horiz_button_->setFixedHeight( 20 );
+  this->flip_horiz_button_->setFixedWidth( 20 );
 
-  flip_vert_button_ = new QToolButton( buttonbar_ );
-  flip_vert_button_->setToolButtonStyle( Qt::ToolButtonIconOnly );
-  flip_vert_button_->setDefaultAction( flip_vert_ );
-  flip_vert_button_->setFixedHeight( 20 );
-  flip_vert_button_->setFixedWidth( 20 );
+  this->flip_vert_button_ = new QToolButton( this->buttonbar_ );
+  this->flip_vert_button_->setToolButtonStyle( Qt::ToolButtonIconOnly );
+  this->flip_vert_button_->setDefaultAction( this->flip_vert_ );
+  this->flip_vert_button_->setFixedHeight( 20 );
+  this->flip_vert_button_->setFixedWidth( 20 );
 
-  grid_button_ = new QToolButton( buttonbar_ );
-  grid_button_->setToolButtonStyle( Qt::ToolButtonIconOnly );
-  grid_button_->setDefaultAction( grid_ );
-  grid_button_->setFixedHeight( 20 );
-  grid_button_->setFixedWidth( 20 );
-  grid_button_->setCheckable( true );
+  this->grid_button_ = new QToolButton( this->buttonbar_ );
+  this->grid_button_->setToolButtonStyle( Qt::ToolButtonIconOnly );
+  this->grid_button_->setDefaultAction( this->grid_ );
+  this->grid_button_->setFixedHeight( 20 );
+  this->grid_button_->setFixedWidth( 20 );
+  this->grid_button_->setCheckable( true );
 
-  slice_visible_button_ = new QToolButton( buttonbar_ );
-  slice_visible_button_->setToolButtonStyle( Qt::ToolButtonIconOnly );
-  slice_visible_button_->setDefaultAction( slice_visible_ );
-  slice_visible_button_->setFixedHeight( 20 );
-  slice_visible_button_->setFixedWidth( 20 );
+  this->slice_visible_button_ = new QToolButton( this->buttonbar_ );
+  this->slice_visible_button_->setToolButtonStyle( Qt::ToolButtonIconOnly );
+  this->slice_visible_button_->setDefaultAction( this->slice_visible_ );
+  this->slice_visible_button_->setFixedHeight( 20 );
+  this->slice_visible_button_->setFixedWidth( 20 );
 
   this->picking_button_ = new SingleShotToolButton( this->buttonbar_ );
   this->picking_button_->setCheckable( true );
@@ -328,36 +328,36 @@ ViewerWidgetPrivate::ViewerWidgetPrivate( QWidget *parent )
   this->picking_button_->setFixedHeight( 20 );
   this->picking_button_->setFixedWidth( 20 );
 
-  buttonbar_layout_->addWidget( viewer_type_button_ );
-  buttonbar_layout_->addWidget( auto_view_button_ );
-  buttonbar_layout_->addWidget( lock_button_ );
-  buttonbar_layout_->addWidget( grid_button_ );
-  buttonbar_layout_->addWidget( slice_visible_button_ );
-  buttonbar_layout_->addWidget( flip_horiz_button_ );
-  buttonbar_layout_->addWidget( flip_vert_button_ );
+  this->buttonbar_layout_->addWidget( this->viewer_type_button_ );
+  this->buttonbar_layout_->addWidget( this->auto_view_button_ );
+  this->buttonbar_layout_->addWidget( this->lock_button_ );
+  this->buttonbar_layout_->addWidget( this->grid_button_ );
+  this->buttonbar_layout_->addWidget( this->slice_visible_button_ );
+  this->buttonbar_layout_->addWidget( this->flip_horiz_button_ );
+  this->buttonbar_layout_->addWidget( this->flip_vert_button_ );
   this->buttonbar_layout_->addWidget( this->picking_button_ );
-  buttonbar_layout_->addStretch();
+  this->buttonbar_layout_->addStretch();
 
-  layout_->addWidget( viewer_ );
-  layout_->addWidget( buttonbar_ );
+  this->layout_->addWidget( this->viewer_ );
+  this->layout_->addWidget( this->buttonbar_ );
 
-  deselect_color_ = QColor( 85, 85, 85 );
-  deselect_color_dark_ = QColor( 35, 35, 35 );
-  select_color_ = QColor( 225, 125, 0 );
-  select_color_dark_ = QColor( 180, 90, 0 );
+  this->deselect_color_ = QColor( 85, 85, 85 );
+  this->deselect_color_dark_ = QColor( 35, 35, 35 );
+  this->select_color_ = QColor( 225, 125, 0 );
+  this->select_color_dark_ = QColor( 180, 90, 0 );
 }
 
 ViewerWidget::ViewerWidget( int viewer_id, QWidget *parent ) :
   QFrame( parent ), 
   viewer_id_( viewer_id )
 {
-  private_ = ViewerWidgetPrivateHandle( new ViewerWidgetPrivate( this ) );
+  this->private_ = ViewerWidgetPrivateHandle( new ViewerWidgetPrivate( this ) );
   setLayout( private_->layout_ );
   setLineWidth( 3 );
   setFrameShape( QFrame::Panel );
   setFrameShadow( QFrame::Raised );
 
-  private_->viewer_->set_viewer_id( viewer_id_ );
+  this->private_->viewer_->set_viewer_id( viewer_id_ );
 
   ViewerHandle viewer = ViewerManager::Instance()->get_viewer( this->viewer_id_  );
   this->private_->grid_->setChecked( viewer->slice_grid_state_->get() );

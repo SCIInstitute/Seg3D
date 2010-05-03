@@ -183,7 +183,9 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
       QtBridge::Connect( this->private_->ui_.open_button_, group->show_layers_state_ );
       QtBridge::Connect( this->private_->ui_.group_visibility_button_, group->visibility_state_ );
       QtBridge::Connect( this->private_->ui_.delete_button_, boost::bind( &ActionDeleteLayers::Dispatch, group ) );
-      QtBridge::Connect( this->private_->ui_.group_new_button_, boost::bind( &ActionNewMaskLayer::Dispatch, group ) );
+  
+    void ( *dispatch_fp )( LayerGroupHandle ) = &ActionNewMaskLayer::Dispatch;
+    QtBridge::Connect( this->private_->ui_.group_new_button_, boost::bind( dispatch_fp,  group ) );
   
   
       // --- RESAMPLE ---

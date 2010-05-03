@@ -41,15 +41,17 @@ namespace Seg3D
   bool ActionMoveGroupAbove::validate( ActionContextHandle& context )
   {
 
-    if ( !( StateEngine::Instance()->is_stateid( group_to_move_id_ ) ) )
+    if ( !( StateEngine::Instance()->is_stateid( this->group_to_move_id_.value() ) ) )
     {
-      context->report_error( std::string( "GroupID '" ) + group_to_move_id_ + "' is invalid" );
+      context->report_error( std::string( "GroupID '" ) + this->group_to_move_id_.value() 
+        + "' is invalid" );
       return false;
     }
     
-    if ( !( StateEngine::Instance()->is_stateid( group_below_id_ ) ) )
+    if ( !( StateEngine::Instance()->is_stateid( this->group_below_id_.value() ) ) )
     {
-      context->report_error( std::string( "GroupID '" ) + group_below_id_ + "' is invalid" );
+      context->report_error( std::string( "GroupID '" ) + this->group_below_id_.value()
+        + "' is invalid" );
       return false;
     }
 
@@ -58,23 +60,35 @@ namespace Seg3D
   
   bool ActionMoveGroupAbove::run( ActionContextHandle& context, ActionResultHandle& result )
   {
-    if ( ( StateEngine::Instance()->is_stateid( group_below_id_ ) ) && 
-      ( StateEngine::Instance()->is_stateid( group_to_move_id_ ) ) )
+    if ( ( StateEngine::Instance()->is_stateid( this->group_below_id_.value() ) ) && 
+      ( StateEngine::Instance()->is_stateid( this->group_to_move_id_.value() ) ) )
     {
-      return LayerManager::Instance()->move_group_above( this->group_to_move_id_, this->group_below_id_ );
+      return LayerManager::Instance()->move_group_above( this->group_to_move_id_.value(),
+        this->group_below_id_.value() );
     }
 
     return false;
   }
   
-
-  void ActionMoveGroupAbove::Dispatch( std::string group_to_move_id, std::string group_below_id )
+  ActionHandle ActionMoveGroupAbove::Create( const std::string& group_to_move_id, 
+    const std::string& group_below_id )
   {
+    // Create new action
     ActionMoveGroupAbove* action = new ActionMoveGroupAbove;
-    action->group_below_id_ = group_below_id;
-    action->group_to_move_id_ = group_to_move_id;
+    
+    // We need to fill in these to ensure the action can be replayed
+    action->group_below_id_.value() = group_below_id;
+    action->group_to_move_id_.value() = group_to_move_id;
+    
+    // Post the new action
+    return ActionHandle( action );
+  }
   
-    Interface::PostAction( ActionHandle( action ) );
+
+  void ActionMoveGroupAbove::Dispatch( const std::string& group_to_move_id, 
+    const std::string& group_below_id )
+  {
+    Interface::PostAction( Create( group_to_move_id, group_below_id ) );
   }
   
 } // end namespace Seg3D

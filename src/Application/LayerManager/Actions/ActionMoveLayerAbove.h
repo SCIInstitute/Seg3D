@@ -37,12 +37,17 @@ namespace Seg3D
 
 class ActionMoveLayerAbove : public Action
 {
-  CORE_ACTION( "MoveLayerAbove","Move Layer Above <name>" );
+  CORE_ACTION( "MoveLayerAbove","<name_above> <name_below>" );
   
   // -- Constructor/Destructor --
 public:
-  ActionMoveLayerAbove()
+  ActionMoveLayerAbove() :
+    layer_to_move_id_(""),
+    layer_below_id_("")
+    
   {
+    add_parameter("layertomove", layer_to_move_id_ );
+    add_parameter("layerbelow", layer_below_id_ );
   }
   
   virtual ~ActionMoveLayerAbove()
@@ -57,15 +62,18 @@ public:
   // -- Action parameters --
 private:
   // Layer_handle that is requested
-  std::string layer_below_id_;
-  std::string layer_to_move_id_;
+  ActionParameter< std::string > layer_to_move_id_;
+  ActionParameter< std::string > layer_below_id_;
   
   // -- Dispatch this action from the interface --
 public:
+  // CREATE:
+  // Create action that moves the layer above
+  static ActionHandle Create( const std::string& layer_to_move_id, const std::string& layer_below_id );
   
   // DISPATCH
   // Create and dispatch action that moves the layer above 
-  static void Dispatch( std::string layer_to_move_id, std::string layer_below_id );
+  static void Dispatch( const std::string& layer_to_move_id, const std::string& layer_below_id );
   
 };
   
