@@ -44,6 +44,9 @@ namespace Seg3D
 
 class AppControllerStateEngine : public QAbstractTableModel
 {
+
+Q_OBJECT
+
 public:
   AppControllerStateEngine( QObject* parent = 0 );
 

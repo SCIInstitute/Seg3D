@@ -41,7 +41,6 @@ SET(INTERFACE_APPCONTROLLER_SRCS
 
 SET(INTERFACE_APPCONTROLLER_MOC_SRCS
   AppController.h
-  AppControllerContext.h
   AppControllerActionHistory.h
   AppControllerStateEngine.h
   AppControllerLogHistory.h

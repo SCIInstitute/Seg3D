@@ -33,8 +33,6 @@
 # pragma once
 #endif 
 
-#include <QPointer>
-
 // Include all action related classes
 #include <Core/Action/Actions.h>
 

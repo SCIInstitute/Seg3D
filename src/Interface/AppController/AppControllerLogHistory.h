@@ -48,6 +48,9 @@ namespace Seg3D
 
 class AppControllerLogHistory : public QAbstractTableModel
 {
+
+Q_OBJECT
+
 public:
   AppControllerLogHistory( size_t log_size, QObject* parent = 0 );
 

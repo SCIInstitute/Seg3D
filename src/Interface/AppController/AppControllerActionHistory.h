@@ -46,6 +46,9 @@ namespace Seg3D
 
 class AppControllerActionHistory : public QAbstractTableModel
 {
+
+Q_OBJECT
+
 public:
   AppControllerActionHistory( QObject* parent = 0 );
 
