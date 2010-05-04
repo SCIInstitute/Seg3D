@@ -29,8 +29,8 @@
 #ifndef APPLICATION_LAYERIO_LAYERIO_H
 #define APPLICATION_LAYERIO_LAYERIO_H
 
-// Utils includes
-#include <Utils/Core/Singleton.h>
+// Core includes
+#include <Core/Utils/Singleton.h>
 
 // Application includes
 #include <Application/Layer/Layer.h>

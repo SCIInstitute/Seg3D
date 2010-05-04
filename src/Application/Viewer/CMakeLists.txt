@@ -50,13 +50,13 @@ ADD_LIBRARY(Application_Viewer STATIC
             ${APPLICATION_VIEW_ACTIONS_SRCS} )
             
 TARGET_LINK_LIBRARIES(Application_Viewer
-                      Utils_Core
-            Utils_DataBlock
-            Utils_Volume
-                      Application_Application
-                      Application_Interface
-                      Application_Action
-                      Application_State
+                      Core_Utils
+            Core_DataBlock
+            Core_Volume
+                      Core_Application
+                      Core_Interface
+                      Core_Action
+                      Core_State
                       ${SCI_BOOST_LIBRARY})
 
 # Register actions

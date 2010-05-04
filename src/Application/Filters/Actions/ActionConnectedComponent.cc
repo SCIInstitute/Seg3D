@@ -30,17 +30,17 @@
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/Filters/Actions/ActionConnectedComponent.h>
 
-namespace Seg3D
-{
-  
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
-CORE_REGISTER_ACTION( ConnectedComponent );
+CORE_REGISTER_ACTION( Seg3D, ConnectedComponent )
 
-bool ActionConnectedComponent::validate( ActionContextHandle& context )
+namespace Seg3D
 {
-  if( !( StateEngine::Instance()->is_statealias( this->layer_alias_ ) ) )
+  
+bool ActionConnectedComponent::validate( Core::ActionContextHandle& context )
+{
+  if( !( Core::StateEngine::Instance()->is_statealias( this->layer_alias_ ) ) )
   {
     context->report_error( std::string( "LayerID '" ) + this->layer_alias_ + "' is invalid" );
     return false;
@@ -49,9 +49,9 @@ bool ActionConnectedComponent::validate( ActionContextHandle& context )
   return true;
 }
 
-bool ActionConnectedComponent::run( ActionContextHandle& context, ActionResultHandle& result )
+bool ActionConnectedComponent::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
-  if ( StateEngine::Instance()->is_statealias( this->layer_alias_ ) )
+  if ( Core::StateEngine::Instance()->is_statealias( this->layer_alias_ ) )
   {
     // TODO: run filter
     context->report_message( "The Connected Component Filter has been triggered "
@@ -69,7 +69,7 @@ void ActionConnectedComponent::Dispatch( std::string layer_alias )
   ActionConnectedComponent* action = new ActionConnectedComponent;
   action->layer_alias_ = layer_alias;
   
-  Interface::PostAction( ActionHandle( action ) );
+  Core::Interface::PostAction( Core::ActionHandle( action ) );
 }
   
 } // end namespace Seg3D

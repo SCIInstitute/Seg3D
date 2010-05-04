@@ -30,17 +30,17 @@
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/Filters/Actions/ActionThreshold.h>
 
-namespace Seg3D
-{
-  
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
-CORE_REGISTER_ACTION( Threshold );
+CORE_REGISTER_ACTION( Seg3D, Threshold )
 
-bool ActionThreshold::validate( ActionContextHandle& context )
+namespace Seg3D
 {
-  if( !( StateEngine::Instance()->is_statealias( this->layer_alias_ ) ) )
+  
+bool ActionThreshold::validate( Core::ActionContextHandle& context )
+{
+  if( !( Core::StateEngine::Instance()->is_statealias( this->layer_alias_ ) ) )
   {
     context->report_error( std::string( "LayerID '" ) + this->layer_alias_ + "' is invalid" );
     return false;
@@ -56,9 +56,9 @@ bool ActionThreshold::validate( ActionContextHandle& context )
   return true;
 }
 
-bool ActionThreshold::run( ActionContextHandle& context, ActionResultHandle& result )
+bool ActionThreshold::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
-  if( StateEngine::Instance()->is_statealias( this->layer_alias_ ) )
+  if( Core::StateEngine::Instance()->is_statealias( this->layer_alias_ ) )
   {
     // TODO: run filter
     context->report_message( "The Threshold Filter has been triggered "
@@ -78,7 +78,7 @@ void ActionThreshold::Dispatch( std::string layer_alias, double upper_threshold,
   action->upper_threshold_ = upper_threshold;
   action->lower_threshold_ = lower_threshold;
   
-  Interface::PostAction( ActionHandle( action ) );
+  Core::Interface::PostAction( Core::ActionHandle( action ) );
 }
   
 } // end namespace Seg3D

@@ -29,10 +29,10 @@
 // QT includes
 #include <QtGui>
 
-// Application layer includes
-#include <Application/Action/Actions.h>
-#include <Application/Action/ActionHistory.h>
-#include <Application/Interface/Interface.h>
+// Core includes
+#include <Core/Action/Actions.h>
+#include <Core/Action/ActionHistory.h>
+#include <Core/Interface/Interface.h>
 
 // Interface bridging includes
 #include <Interface/QtInterface/QtBridge.h>
@@ -62,7 +62,7 @@ public:
   AppControllerLogHistory* log_history_model_;
 
   // Action context for running the command line
-  ActionContextHandle context_;
+  Core::ActionContextHandle context_;
 };
 
 AppController::AppController( QWidget* parent ) :
@@ -71,7 +71,7 @@ AppController::AppController( QWidget* parent ) :
 
   // Step 1: Setup the private structure and allocate all the needed structures
   private_->ui_.setupUi( this );
-  private_->context_ = ActionContextHandle( new AppControllerContext( this ) );
+  private_->context_ = Core::ActionContextHandle( new AppControllerContext( this ) );
 
   // These next two are Qt objects and will be deleted when the parent object is
   // deleted
@@ -113,13 +113,13 @@ AppController::AppController( QWidget* parent ) :
   tv_log_history_->resizeRowsToContents();
 
   // Get the list of actions
-  ActionFactory::action_list_type action_list;
-  ActionFactory::Instance()->action_list( action_list );
+  Core::ActionFactory::action_list_type action_list;
+  Core::ActionFactory::Instance()->action_list( action_list );
 
   QMenu* action_menu = new QMenu( tb_action_ );
 
-  ActionFactory::action_list_type::iterator it = action_list.begin();
-  ActionFactory::action_list_type::iterator it_end = action_list.end();
+  Core::ActionFactory::action_list_type::iterator it = action_list.begin();
+  Core::ActionFactory::action_list_type::iterator it_end = action_list.end();
   while ( it != it_end )
   {
     QAction* action_item = action_menu->addAction( QString::fromStdString( *it ) );
@@ -133,13 +133,13 @@ AppController::AppController( QWidget* parent ) :
   // Step 5: Link the ActionHistory/StateEngine/EventLog to this widget and have it update 
   // automatically using the signal/slot system
 
-  this->add_connection( ActionHistory::Instance()->history_changed_signal_.connect( 
+  this->add_connection( Core::ActionHistory::Instance()->history_changed_signal_.connect( 
     boost::bind( &AppController::UpdateActionHistory, controller ) ) );
 
-  this->add_connection( StateEngine::Instance()->state_changed_signal_.connect( 
+  this->add_connection( Core::StateEngine::Instance()->state_changed_signal_.connect( 
     boost::bind( &AppController::UpdateStateEngine, controller ) ) );
   
-  this->add_connection( Utils::Log::Instance()->post_log_signal_.connect( 
+  this->add_connection( Core::Log::Instance()->post_log_signal_.connect( 
     boost::bind( &AppController::UpdateLogHistory, controller, true, _1, _2 ) ) );
 
   // Step 6: Qt connections
@@ -170,8 +170,8 @@ void AppController::post_action()
   std::string action_error;
   std::string action_usage;
 
-  ActionHandle action;
-  if ( !( ActionFactory::CreateAction( action_string, action, action_error, action_usage ) ) )
+  Core::ActionHandle action;
+  if ( !( Core::ActionFactory::CreateAction( action_string, action, action_error, action_usage ) ) )
   {
     qpointer_type controller( this );
     AppController::PostActionMessage( controller, action_error );
@@ -196,9 +196,9 @@ void AppController::post_action_usage( std::string usage )
 void AppController::UpdateActionHistory( qpointer_type controller )
 {
   // Ensure that this call gets relayed to the right thread
-  if ( !( Interface::IsInterfaceThread() ) )
+  if ( !( Core::Interface::IsInterfaceThread() ) )
   {
-    Interface::PostEvent( boost::bind( &AppController::UpdateActionHistory, controller ) );
+    Core::Interface::PostEvent( boost::bind( &AppController::UpdateActionHistory, controller ) );
     return;
   }
 
@@ -216,9 +216,9 @@ void AppController::UpdateActionHistory( qpointer_type controller )
 void AppController::UpdateStateEngine( qpointer_type controller )
 { 
   // Ensure that this call gets relayed to the right thread
-  if ( !( Interface::IsInterfaceThread() ) )
+  if ( !( Core::Interface::IsInterfaceThread() ) )
   {
-    Interface::PostEvent( boost::bind( &AppController::UpdateStateEngine, controller ) );
+    Core::Interface::PostEvent( boost::bind( &AppController::UpdateStateEngine, controller ) );
     return;
   }
 
@@ -237,7 +237,7 @@ void AppController::UpdateLogHistory( qpointer_type controller, bool relay, int 
   // Ensure that this call gets relayed to the right thread
   if ( relay )
   {
-    Interface::PostEvent( boost::bind( &AppController::UpdateLogHistory, controller, false,
+    Core::Interface::PostEvent( boost::bind( &AppController::UpdateLogHistory, controller, false,
         message_type, message ) );
     return;
   }
@@ -257,9 +257,9 @@ void AppController::UpdateLogHistory( qpointer_type controller, bool relay, int 
 void AppController::PostActionMessage( qpointer_type controller, std::string message )
 {
   // Ensure that this call gets relayed to the right thread
-  if ( !( Interface::IsInterfaceThread() ) )
+  if ( !( Core::Interface::IsInterfaceThread() ) )
   {
-    Interface::PostEvent( boost::bind( &AppController::PostActionMessage, controller, message ) );
+    Core::Interface::PostEvent( boost::bind( &AppController::PostActionMessage, controller, message ) );
   }
 
   // Protect controller pointer, so we do not execute if controller does not
@@ -273,9 +273,9 @@ void AppController::PostActionMessage( qpointer_type controller, std::string mes
 void AppController::PostActionUsage( qpointer_type controller, std::string usage )
 {
   // Ensure that this call gets relayed to the right thread
-  if ( !( Interface::IsInterfaceThread() ) )
+  if ( !( Core::Interface::IsInterfaceThread() ) )
   {
-    Interface::PostEvent( boost::bind( &AppController::PostActionUsage, controller, usage ) );
+    Core::Interface::PostEvent( boost::bind( &AppController::PostActionUsage, controller, usage ) );
   }
 
   // Protect controller pointer, so we do not execute if controller does not

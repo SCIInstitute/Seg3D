@@ -30,17 +30,17 @@
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/Filters/Actions/ActionMaskData.h>
 
-namespace Seg3D
-{
-  
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
-CORE_REGISTER_ACTION( MaskData );
+CORE_REGISTER_ACTION( Seg3D, MaskData )
 
-bool ActionMaskData::validate( ActionContextHandle& context )
+namespace Seg3D
 {
-  if( !( StateEngine::Instance()->is_statealias( this->layer_alias_ ) ) )
+  
+bool ActionMaskData::validate( Core::ActionContextHandle& context )
+{
+  if( !( Core::StateEngine::Instance()->is_statealias( this->layer_alias_ ) ) )
   {
     context->report_error( std::string( "LayerID '" ) + this->layer_alias_ + "' is invalid" );
     return false;
@@ -49,9 +49,9 @@ bool ActionMaskData::validate( ActionContextHandle& context )
   return true;
 }
 
-bool ActionMaskData::run( ActionContextHandle& context, ActionResultHandle& result )
+bool ActionMaskData::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
-  if ( StateEngine::Instance()->is_statealias( this->layer_alias_ ) )
+  if ( Core::StateEngine::Instance()->is_statealias( this->layer_alias_ ) )
   {
     // TODO: run filter
     context->report_message( "The Mask Data Filter has been triggered "
@@ -73,7 +73,7 @@ void ActionMaskData::Dispatch( std::string layer_alias, std::string mask_alias,
   action->replace_with_ = replace_with;
   action->replace_ = replace;
   
-  Interface::PostAction( ActionHandle( action ) );
+  Core::Interface::PostAction( Core::ActionHandle( action ) );
 }
   
 } // end namespace Seg3D

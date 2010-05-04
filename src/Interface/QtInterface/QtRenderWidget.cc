@@ -29,13 +29,13 @@
 // Glew includes
 #include <GL/glew.h>
 
-// Utils includes
-#include <Utils/Core/Exception.h>
-#include <Utils/Core/Log.h>
+// Core includes
+#include <Core/Utils/Exception.h>
+#include <Core/Utils/Log.h>
+#include <Core/State/Actions/ActionSet.h>
+#include <Core/Interface/Interface.h>
 
 // Application includes
-#include <Application/State/Actions/ActionSet.h>
-#include <Application/Interface/Interface.h>
 #include <Application/ViewerManager/ViewerManager.h>
 
 // Interface includes
@@ -64,17 +64,17 @@ QtRenderWidget::~QtRenderWidget()
   this->disconnect_all();
 }
 
-void QtRenderWidget::update_texture( Utils::TextureHandle texture, bool delay_update )
+void QtRenderWidget::update_texture( Core::TextureHandle texture, bool delay_update )
 {
   // if not in the interface thread, post an event to the interface thread
-  if ( !Interface::IsInterfaceThread() )
+  if ( !Core::Interface::IsInterfaceThread() )
   {
-    Interface::PostEvent(
+    Core::Interface::PostEvent(
         boost::bind( &QtRenderWidget::update_texture, this, texture, delay_update ) );
     return;
   }
 
-  SCI_LOG_DEBUG(std::string("QtRenderWidget ") + Utils::ToString(this->viewer_id_)
+  SCI_LOG_DEBUG(std::string("QtRenderWidget ") + Core::ToString(this->viewer_id_)
     + ": received new texture");
   renderer_texture_ = texture;
   
@@ -84,17 +84,17 @@ void QtRenderWidget::update_texture( Utils::TextureHandle texture, bool delay_up
   }
 }
 
-void QtRenderWidget::update_overlay_texture( Utils::TextureHandle texture, bool delay_update )
+void QtRenderWidget::update_overlay_texture( Core::TextureHandle texture, bool delay_update )
 {
   // if not in the interface thread, post an event to the interface thread
-  if ( !Interface::IsInterfaceThread() )
+  if ( !Core::Interface::IsInterfaceThread() )
   {
-    Interface::PostEvent(
+    Core::Interface::PostEvent(
         boost::bind( &QtRenderWidget::update_overlay_texture, this, texture, delay_update ) );
     return;
   }
 
-  SCI_LOG_DEBUG(std::string("QtRenderWidget ") + Utils::ToString(this->viewer_id_)
+  SCI_LOG_DEBUG(std::string("QtRenderWidget ") + Core::ToString(this->viewer_id_)
     + ": received new overlay texture");
   this->overlay_texture_ = texture;
   
@@ -106,9 +106,9 @@ void QtRenderWidget::update_overlay_texture( Utils::TextureHandle texture, bool 
 
 void QtRenderWidget::initializeGL()
 {
-  Utils::RenderResources::Instance()->init_gl();
+  Core::RenderResources::Instance()->init_gl();
   glClearColor( 0.5, 0.5, 0.5, 1.0 );
-  Utils::Texture::SetActiveTextureUnit( 0 );
+  Core::Texture::SetActiveTextureUnit( 0 );
   glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
 
   renderer_->initialize();
@@ -138,8 +138,8 @@ void QtRenderWidget::paintGL()
   glMatrixMode( GL_MODELVIEW );
   glLoadIdentity();
 
-  Utils::Texture::lock_type lock( this->renderer_texture_->get_mutex() );
-  Utils::Texture::lock_type overlay_tex_lock( this->overlay_texture_->get_mutex() );
+  Core::Texture::lock_type lock( this->renderer_texture_->get_mutex() );
+  Core::Texture::lock_type overlay_tex_lock( this->overlay_texture_->get_mutex() );
 
   this->renderer_texture_->enable();
   glBegin( GL_QUADS );
@@ -186,7 +186,7 @@ void QtRenderWidget::resizeGL( int width, int height )
   this->viewer_->resize( width, height );
   if ( renderer_.get() )
   {
-    SCI_LOG_DEBUG(std::string("QtRenderWidget ") + Utils::ToString(this->viewer_id_)
+    SCI_LOG_DEBUG(std::string("QtRenderWidget ") + Core::ToString(this->viewer_id_)
       + ": sending resize event to renderer");
     renderer_->resize( width, height );
     // Make sure the GL context of the widget is the current one of this thread,
@@ -242,7 +242,7 @@ void QtRenderWidget::mouseReleaseEvent( QMouseEvent * event )
 
 void QtRenderWidget::wheelEvent( QWheelEvent* event )
 {
-  int delta = Utils::RoundUp( event->delta() / 120.0 );
+  int delta = Core::RoundUp( event->delta() / 120.0 );
   if ( this->viewer_->wheel_event( delta, event->x(), event->y(), 
     event->buttons(), event->modifiers() ) )
   {
@@ -258,7 +258,7 @@ void QtRenderWidget::hideEvent( QHideEvent* event )
 {
   if ( !event->spontaneous() )
   {
-    ActionSet::Dispatch( this->viewer_->viewer_visible_state_, false );
+    Core::ActionSet::Dispatch( this->viewer_->viewer_visible_state_, false );
     this->renderer_->deactivate();
   }
 }
@@ -269,7 +269,7 @@ void QtRenderWidget::showEvent( QShowEvent* event )
   {
     // NOTE: Activate the renderer before setting the viewer to visible.
     this->renderer_->activate();
-    ActionSet::Dispatch( this->viewer_->viewer_visible_state_, true );
+    Core::ActionSet::Dispatch( this->viewer_->viewer_visible_state_, true );
   }
 }
 

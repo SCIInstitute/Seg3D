@@ -29,17 +29,17 @@
 #include <Application/ToolManager/ToolManager.h>
 #include <Application/ToolManager/Actions/ActionCloseTool.h>
 
-namespace Seg3D
-{
-
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
-CORE_REGISTER_ACTION( CloseTool );
+CORE_REGISTER_ACTION( Seg3D, CloseTool )
 
-bool ActionCloseTool::validate( ActionContextHandle& context )
+namespace Seg3D
 {
-  if ( !( StateEngine::Instance()->is_stateid( toolid_.value() ) ) )
+
+bool ActionCloseTool::validate( Core::ActionContextHandle& context )
+{
+  if ( !( Core::StateEngine::Instance()->is_stateid( toolid_.value() ) ) )
   {
     context->report_error( std::string( "ToolID '" ) + toolid_.value() + "' is invalid" );
     return false;
@@ -48,13 +48,13 @@ bool ActionCloseTool::validate( ActionContextHandle& context )
   return true; // validated
 }
 
-bool ActionCloseTool::run( ActionContextHandle& context, ActionResultHandle& result )
+bool ActionCloseTool::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
   ToolManager::Instance()->close_tool( toolid_.value() );
   return true; // success
 }
 
-ActionHandle ActionCloseTool::Create( const std::string& toolid )
+Core::ActionHandle ActionCloseTool::Create( const std::string& toolid )
 {
   // Create new action
   ActionCloseTool* action = new ActionCloseTool;
@@ -63,12 +63,12 @@ ActionHandle ActionCloseTool::Create( const std::string& toolid )
   action->toolid_.value() = toolid;
 
   // Post the new action
-  return ActionHandle( action );
+  return Core::ActionHandle( action );
 }
 
 void ActionCloseTool::Dispatch( const std::string& toolid )
 {
-  Interface::PostAction( Create( toolid ) );
+  Core::Interface::PostAction( Create( toolid ) );
 }
 
 } // end namespace Seg3D

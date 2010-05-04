@@ -28,7 +28,7 @@
 
 
 //Core Includes - for logging
-#include <Utils/Core/Log.h>
+#include <Core/Utils/Log.h>
 
 #include <Interface/ToolInterface/CustomWidgets/SliderIntCombo.h>
 #include "ui_SliderIntCombo.h"

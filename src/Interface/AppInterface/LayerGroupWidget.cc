@@ -30,7 +30,7 @@
 #include <boost/lexical_cast.hpp>
 
 //Core Includes - for logging
-#include <Utils/Core/Log.h>
+#include <Core/Utils/Log.h>
 
 //Interface Includes
 #include <Interface/QtInterface/QtBridge.h>
@@ -114,9 +114,9 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
   this->private_->ui_.horizontalLayout->insertWidget( 1, this->private_->activate_button_ );
 
   // set some values of the GUI
-  std::string group_name = Utils::ToString( group->get_grid_transform().get_nx() ) + " x " +
-    Utils::ToString( group->get_grid_transform().get_ny() ) + " x " +
-    Utils::ToString( group->get_grid_transform().get_nz() );
+  std::string group_name = Core::ToString( group->get_grid_transform().get_nx() ) + " x " +
+    Core::ToString( group->get_grid_transform().get_ny() ) + " x " +
+    Core::ToString( group->get_grid_transform().get_nz() );
   this->private_->activate_button_->setText( QString::fromStdString( group_name ) );
 
 
@@ -354,7 +354,7 @@ void LayerGroupWidget::set_drop_target( LayerGroupWidget* target_group)
 void LayerGroupWidget::dropEvent( QDropEvent* event )
 {
   std::vector<std::string> mime_data = 
-    Utils::SplitString( event->mimeData()->text().toStdString(), "|" );
+    Core::SplitString( event->mimeData()->text().toStdString(), "|" );
   
   if( mime_data.size() < 2 ) return;
 
@@ -385,7 +385,7 @@ void LayerGroupWidget::dragEnterEvent( QDragEnterEvent* event)
   this->private_->overlay_->show();
 
   std::vector<std::string> mime_data = 
-    Utils::SplitString( event->mimeData()->text().toStdString(), "|" );
+    Core::SplitString( event->mimeData()->text().toStdString(), "|" );
   
   if( mime_data.size() < 2 ) return;
 
@@ -452,7 +452,7 @@ void LayerGroupWidget::insert_layer( LayerHandle layer, int index )
   if( index == -1 )
   {
     // If the layer is a data layer, put it on the bottom.
-    if( new_layer_handle->get_volume_type() == Utils::VolumeType::DATA_E )
+    if( new_layer_handle->get_volume_type() == Core::VolumeType::DATA_E )
       this->private_->ui_.group_frame_layout_->insertWidget( -1, new_layer_handle.data() );
     else
       this->private_->ui_.group_frame_layout_->insertWidget( 0, new_layer_handle.data() );

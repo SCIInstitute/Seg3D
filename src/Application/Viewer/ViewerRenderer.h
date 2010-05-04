@@ -39,7 +39,7 @@
 #include <boost/thread.hpp>
 #include <boost/utility.hpp>
 
-#include <Utils/Graphics/Texture.h>
+#include <Core/Graphics/Texture.h>
 
 namespace Seg3D
 {
@@ -93,7 +93,7 @@ public:
 
   // -- signals handling --
 public:
-  typedef boost::signals2::signal< void( Utils::TextureHandle, bool ) > rendering_completed_signal_type;
+  typedef boost::signals2::signal< void( Core::TextureHandle, bool ) > rendering_completed_signal_type;
   rendering_completed_signal_type rendering_completed_signal_;
 
 protected:

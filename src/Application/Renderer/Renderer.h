@@ -34,14 +34,14 @@
 #endif
 
 // Application includes
-#include <Application/Renderer/RendererBase.h>
 #include <Application/Renderer/SliceShader.h>
 #include <Application/Viewer/Viewer.h>
 
-#include <Utils/Core/ConnectionHandler.h>
-#include <Utils/Graphics/Texture.h>
-#include <Utils/Graphics/UnitCube.h>
-#include <Utils/TextRenderer/TextRenderer.h>
+#include <Core/Utils/ConnectionHandler.h>
+#include <Core/Graphics/Texture.h>
+#include <Core/Graphics/UnitCube.h>
+#include <Core/RendererBase/RendererBase.h>
+#include <Core/TextRenderer/TextRenderer.h>
 
 namespace Seg3D
 {
@@ -51,7 +51,7 @@ class Renderer;
 typedef boost::shared_ptr< Renderer > RendererHandle;
 
 // Class definitions
-class Renderer : public RendererBase, private Utils::ConnectionHandler
+class Renderer : public Core::RendererBase, private Core::ConnectionHandler
 {
 
   // -- constructor/destructor --
@@ -77,12 +77,12 @@ private:
   void viewer_mode_changed( size_t viewer_id );
   void picking_target_changed( size_t viewer_id );
 
-  Utils::UnitCubeHandle cube_;
+  Core::UnitCubeHandle cube_;
   SliceShaderHandle slice_shader_;
-  Utils::Texture3DHandle pattern_texture_;
+  Core::Texture3DHandle pattern_texture_;
 
-  Utils::TextRendererHandle text_renderer_;
-  Utils::Texture2DHandle text_texture_;
+  Core::TextRendererHandle text_renderer_;
+  Core::Texture2DHandle text_texture_;
   
   size_t viewer_id_;
 };

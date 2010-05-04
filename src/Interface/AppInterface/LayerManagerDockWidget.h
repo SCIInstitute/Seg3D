@@ -42,7 +42,7 @@
 #include <boost/shared_ptr.hpp>
 
 // Core includes
-#include <Utils/Core/ConnectionHandler.h>
+#include <Core/Utils/ConnectionHandler.h>
 
 // Interface includes
 #include <Interface/AppInterface/LayerWidget.h>
@@ -51,7 +51,7 @@
 namespace Seg3D
 {
 
-class LayerManagerDockWidget : public QDockWidget, public Utils::ConnectionHandler
+class LayerManagerDockWidget : public QDockWidget, public Core::ConnectionHandler
 {
 Q_OBJECT
 

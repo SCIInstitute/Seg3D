@@ -26,10 +26,9 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <Utils/Core/StringUtil.h>
-#include <Utils/Core/Exception.h>
-
-#include <Application/Interface/Interface.h>
+#include <Core/Utils/StringUtil.h>
+#include <Core/Utils/Exception.h>
+#include <Core/Interface/Interface.h>
 
 #include <Interface/QtInterface/QtRenderResources.h>
 
@@ -88,7 +87,7 @@ QtRenderResourcesContext::~QtRenderResourcesContext()
   // Nothing to clean up, everything is handled by smart pointers
 }
 
-bool QtRenderResourcesContext::create_render_context( Utils::RenderContextHandle& context )
+bool QtRenderResourcesContext::create_render_context( Core::RenderContextHandle& context )
 {
   if ( !( shared_widget_.data() ) )
   {
@@ -100,10 +99,10 @@ bool QtRenderResourcesContext::create_render_context( Utils::RenderContextHandle
       shared_widget_->context()->device() ) );
   qt_context->create( shared_widget_->context() );
 
-  SCI_LOG_DEBUG( std::string("qt_context->valid = ") + Utils::ToString( qt_context->isValid() ) );
+  SCI_LOG_DEBUG( std::string("qt_context->valid = ") + Core::ToString( qt_context->isValid() ) );
 
   // Bind the new context in the GUI independent wrapper class
-  context = Utils::RenderContextHandle( new QtRenderContext( qt_context ) );
+  context = Core::RenderContextHandle( new QtRenderContext( qt_context ) );
 
   return ( context->is_valid() );
 }

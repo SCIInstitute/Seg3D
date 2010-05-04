@@ -240,12 +240,12 @@ INCLUDE(CMake/QtResourcesLibrary.cmake)
 
 ###########################################
 # Application layers:
-#  Utils
+#  Core
 #  Application
 #  Interface
 ###########################################
 
-ADD_SUBDIRECTORY(Utils)
+ADD_SUBDIRECTORY(Core)
 ADD_SUBDIRECTORY(Application)
 
 IF(SEG3D_BUILD_INTERFACE)

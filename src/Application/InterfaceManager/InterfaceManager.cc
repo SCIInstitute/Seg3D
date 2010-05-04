@@ -26,9 +26,9 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <Application/Application/Application.h>
+#include <Core/Application/Application.h>
+#include <Core/Interface/Interface.h>
 
-#include <Application/Interface/Interface.h>
 #include <Application/InterfaceManager/InterfaceManager.h>
 
 namespace Seg3D
@@ -50,7 +50,7 @@ InterfaceManager::~InterfaceManager()
 
 void InterfaceManager::add_windowid( const std::string& windowid )
 {
-  std::string lower_windowid = Utils::StringToLower( windowid );
+  std::string lower_windowid = Core::StringToLower( windowid );
   boost::unique_lock< boost::mutex > lock( windowid_list_mutex_ );
   if ( windowid_list_.find( lower_windowid ) == windowid_list_.end() )
   {
@@ -60,7 +60,7 @@ void InterfaceManager::add_windowid( const std::string& windowid )
 
 bool InterfaceManager::is_windowid( const std::string& windowid )
 {
-  std::string lower_windowid = Utils::StringToLower( windowid );
+  std::string lower_windowid = Core::StringToLower( windowid );
   boost::unique_lock< boost::mutex > lock( windowid_list_mutex_ );
   return ( windowid_list_.find( lower_windowid ) != windowid_list_.end() );
 }

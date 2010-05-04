@@ -177,11 +177,11 @@ ADD_LIBRARY_TOOLINTERFACES(Interface_ToolInterface
             ${INTERFACE_TOOLINTERFACE_SRCS})
             
 TARGET_LINK_LIBRARIES(Interface_ToolInterface
-                      Utils_Core
-                      Utils_EventHandler
-                      Application_Application
-                      Application_Interface
-                      Application_Action
+                      Core_Utils
+                      Core_EventHandler
+                      Core_Application
+                      Core_Interface
+                      Core_Action
                       Application_Tool
                       Interface_QtInterface
                       Interface_AppInterface

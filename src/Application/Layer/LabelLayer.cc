@@ -30,13 +30,13 @@
 
 // Boost includes 
 
-#include <Application/Application/Application.h>
+#include <Core/Application/Application.h>
 #include <Application/Layer/LabelLayer.h>
 
 namespace Seg3D
 {
 
-LabelLayer::LabelLayer( const std::string& name, const Utils::VolumeHandle& volume ) :
+LabelLayer::LabelLayer( const std::string& name, const Core::VolumeHandle& volume ) :
   Layer( name )
 {
   // Step (1) : Build the layer specific state variables

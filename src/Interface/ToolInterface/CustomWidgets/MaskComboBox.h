@@ -32,14 +32,14 @@
 // QT includes
 #include <QtGui/QComboBox>
 
-// Utils includes
-#include <Utils/Core/ConnectionHandler.h>
+// Core includes
+#include <Core/Utils/ConnectionHandler.h>
 
 namespace Seg3D
 {
   
 class MaskComboBox :
-public QComboBox, public Utils::ConnectionHandler
+public QComboBox, public Core::ConnectionHandler
 {
   Q_OBJECT
   

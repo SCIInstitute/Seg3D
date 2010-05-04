@@ -30,8 +30,8 @@
 #include <boost/filesystem.hpp>
 #include <boost/thread.hpp>
 
-// Utils includes
-#include <Utils/Core/Log.h>
+// Core includes
+#include <Core/Utils/Log.h>
 
 // Application includes
 #include <Application/LayerManager/Actions/ActionImportLayer.h>
@@ -193,23 +193,23 @@ void LayerImporterWidget::list_import_options()
   boost::filesystem::path full_filename( importer_->get_filename() );
   this->private_->ui_.filename_->setText( QString::fromStdString( full_filename.filename() ) );
   
-  std::string data_type = Utils::ExportToString( importer_->get_data_type() );
+  std::string data_type = Core::ExportToString( importer_->get_data_type() );
   this->private_->ui_.data_type_->setText( QString::fromStdString( data_type ) );
   
-  Utils::GridTransform grid_transform = importer_->get_grid_transform();
+  Core::GridTransform grid_transform = importer_->get_grid_transform();
   this->private_->ui_.x_size_->setText( 
-    QString::fromStdString( Utils::ToString( grid_transform.get_nx() ) ) );
+    QString::fromStdString( Core::ToString( grid_transform.get_nx() ) ) );
   this->private_->ui_.y_size_->setText( 
-    QString::fromStdString( Utils::ToString( grid_transform.get_ny() ) ) );
+    QString::fromStdString( Core::ToString( grid_transform.get_ny() ) ) );
   this->private_->ui_.z_size_->setText( 
-    QString::fromStdString( Utils::ToString( grid_transform.get_nz() ) ) );
+    QString::fromStdString( Core::ToString( grid_transform.get_nz() ) ) );
 
   this->private_->ui_.x_spacing_->setText( 
-    QString::fromStdString( Utils::ToString( grid_transform.spacing_x() ) ) );
+    QString::fromStdString( Core::ToString( grid_transform.spacing_x() ) ) );
   this->private_->ui_.y_spacing_->setText( 
-    QString::fromStdString( Utils::ToString( grid_transform.spacing_y() ) ) );
+    QString::fromStdString( Core::ToString( grid_transform.spacing_y() ) ) );
   this->private_->ui_.z_spacing_->setText( 
-    QString::fromStdString( Utils::ToString( grid_transform.spacing_z() ) ) );
+    QString::fromStdString( Core::ToString( grid_transform.spacing_z() ) ) );
 
   // Step (4): Add connections for selecting and importing the data
   connect( this->private_->ui_.data_, SIGNAL( released() ), 
@@ -361,12 +361,12 @@ void LayerImporterWidget::ScanFile( qpointer_type qpointer, LayerImporterHandle 
   // Step (2) : Update the widget if it still exists
   if( success )
   {
-    Interface::Instance()->post_event( boost::bind( &LayerImporterWidget::ListImportOptions,
+    Core::Interface::Instance()->post_event( boost::bind( &LayerImporterWidget::ListImportOptions,
       qpointer, importer ) ); 
   }
   else
   {
-    Interface::Instance()->post_event( boost::bind( &LayerImporterWidget::ReportImportError,
+    Core::Interface::Instance()->post_event( boost::bind( &LayerImporterWidget::ReportImportError,
       qpointer, importer ) );
   }
 }

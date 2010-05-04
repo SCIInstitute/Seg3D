@@ -30,14 +30,15 @@
 
 // Boost includes 
 
-#include <Application/Application/Application.h>
+#include <Core/Application/Application.h>
 #include <Application/Layer/Layer.h>
+#include <Application/ViewerManager/ViewerManager.h>
 
 namespace Seg3D
 {
 
 Layer::Layer( const std::string& name ) :
-  StateHandler( StateEngine::CreateStateID( "layer" ) ),
+  StateHandler( Core::StateEngine::CreateStateID( "layer" ) ),
   active_( false )
 { 
   // Step (1) : Build the layer specific state variables
@@ -46,12 +47,12 @@ Layer::Layer( const std::string& name ) :
   add_state( "name", name_state_, name );
 
   // == Visibility information for this layer per viewer ==
-  size_t num_viewers = Application::Instance()->number_of_viewers();
+  size_t num_viewers = ViewerManager::Instance()->number_of_viewers();
   visible_state_.resize( num_viewers );
 
   for ( size_t j = 0; j < visible_state_.size(); j++ )
   {
-    std::string key = std::string( "visible" ) + Utils::ToString( j );
+    std::string key = std::string( "visible" ) + Core::ToString( j );
     add_state( key, visible_state_[ j ], true );
   }
 

@@ -44,11 +44,11 @@ ADD_LIBRARY(Application_Tool STATIC
             ${APPLICATION_TOOL_SRCS} )
             
 TARGET_LINK_LIBRARIES(Application_Tool
-                      Utils_Converter
-                      Utils_Core
-                      Application_Application
-                      Application_Interface
-                      Application_Action
-                      Application_State
+                      Core_Converter
+                      Core_Utils
+                      Core_Application
+                      Core_Interface
+                      Core_Action
+                      Core_State
                       ${SCI_BOOST_LIBRARY})
                     

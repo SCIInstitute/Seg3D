@@ -29,15 +29,15 @@
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/LayerManager/Actions/ActionActivateLayer.h>
 
-namespace Seg3D
-{
-
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
-CORE_REGISTER_ACTION( ActivateLayer );
+CORE_REGISTER_ACTION( Seg3D, ActivateLayer )
 
-bool ActionActivateLayer::validate( ActionContextHandle& context )
+namespace Seg3D
+{
+
+bool ActionActivateLayer::validate( Core::ActionContextHandle& context )
 {
   LayerHandle layer( this->layer_weak_handle_.lock() );
     if ( !layer )
@@ -60,7 +60,8 @@ bool ActionActivateLayer::validate( ActionContextHandle& context )
   return true; // validated
 }
 
-bool ActionActivateLayer::run( ActionContextHandle& context, ActionResultHandle& result )
+bool ActionActivateLayer::run( Core::ActionContextHandle& context, 
+  Core::ActionResultHandle& result )
 {
   LayerHandle layer( this->layer_weak_handle_.lock() );
   if( layer )
@@ -72,18 +73,18 @@ bool ActionActivateLayer::run( ActionContextHandle& context, ActionResultHandle&
   return false;
 }
 
-ActionHandle ActionActivateLayer::Create( const LayerHandle layer )
+Core::ActionHandle ActionActivateLayer::Create( const LayerHandle layer )
 {
   ActionActivateLayer* action = new ActionActivateLayer;
   action->layer_weak_handle_ = layer;
   action->layer_name_ = layer->name_state_->get();
   
-  return ActionHandle( action );
+  return Core::ActionHandle( action );
 }
 
 void ActionActivateLayer::Dispatch( const LayerHandle layer )
 {
-  Interface::PostAction( Create( layer ) );
+  Core::Interface::PostAction( Create( layer ) );
 }
 
 } // end namespace Seg3D

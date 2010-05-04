@@ -37,11 +37,11 @@
 #include <Interface/AppInterface/ColorBarWidget.h>
 
 // Application includes
-#include <Application/State/StateValue.h>
-#include <Application/State/StateOption.h>
-#include <Application/State/StateVector.h>
-#include <Application/State/StateRangedValue.h>
-#include <Application/State/StateAlias.h>
+#include <Core/State/StateValue.h>
+#include <Core/State/StateOption.h>
+#include <Core/State/StateVector.h>
+#include <Core/State/StateRangedValue.h>
+#include <Core/State/StateAlias.h>
 
 namespace Seg3D
 {
@@ -56,47 +56,47 @@ class QtBridge : public boost::noncopyable
 public:
 
   // Connect a QCheckBox to StateValue<bool>
-  static bool Connect( QCheckBox* qcheckbox, StateBoolHandle& state_handle );
+  static bool Connect( QCheckBox* qcheckbox, Core::StateBoolHandle& state_handle );
   
   // Coonnect a SliderIntCombo to a StateRangedIntValue
-  static bool Connect( ColorBarWidget* cbwidget, StateIntHandle& state_handle );
+  static bool Connect( ColorBarWidget* cbwidget, Core::StateIntHandle& state_handle );
   
   // Coonnect a SliderIntCombo to a StateRangedIntValue
-  static bool Connect( SliderIntCombo* sscombo, StateRangedIntHandle& state_handle );
+  static bool Connect( SliderIntCombo* sscombo, Core::StateRangedIntHandle& state_handle );
   
   // Coonnect a SliderDoubleCombo to a StateRangedIntValue
-  static bool Connect( SliderDoubleCombo* sscombo, StateRangedDoubleHandle& state_handle );
+  static bool Connect( SliderDoubleCombo* sscombo, Core::StateRangedDoubleHandle& state_handle );
   
   // Connect a QDoubleSpinBox to a StateDoubleValue
-  static bool Connect( QDoubleSpinBox* qdoublespinbox, StateDoubleHandle& state_handle );
+  static bool Connect( QDoubleSpinBox* qdoublespinbox, Core::StateDoubleHandle& state_handle );
   
   // Connect a QComboBox to StateOptionHandle
-  static bool Connect( QComboBox* qcombobox, StateOptionHandle& state_handle );
+  static bool Connect( QComboBox* qcombobox, Core::StateOptionHandle& state_handle );
   
-  static bool Connect( QComboBox* qcombobox, StateStringHandle& state_handle );
+  static bool Connect( QComboBox* qcombobox, Core::StateStringHandle& state_handle );
 
   // Connect QToolButton & QPushButtons
-  static bool Connect( QToolButton* qtoolbutton, StateBoolHandle& state_handle );
+  static bool Connect( QToolButton* qtoolbutton, Core::StateBoolHandle& state_handle );
   
   static bool Connect( QToolButton* qtoolbutton, boost::function< void() > function );
 
   static bool Connect( QPushButton* qpushbutton, boost::function< void() > function );
   
   // Coonect QLineEdits
-  static bool Connect( QLineEdit* qlineedit, StateStringHandle& state_handle );
+  static bool Connect( QLineEdit* qlineedit, Core::StateStringHandle& state_handle );
   
-  static bool Connect( QLineEdit* qlineedit, StateAliasHandle& state_handle );
+  static bool Connect( QLineEdit* qlineedit, Core::StateAliasHandle& state_handle );
 
   // Connect QActionGroup and StateOption
   // NOTE: This requires that each QAction in the QActionGroup has its objectName
   // the same as its corresponding option string
-  static bool Connect( QActionGroup* qactiongroup, StateOptionHandle& state_handle );
+  static bool Connect( QActionGroup* qactiongroup, Core::StateOptionHandle& state_handle );
 
   // Connect menu action to dispatcher
   static bool Connect( QAction* qaction, boost::function< void() > function );
 
   // Connect menu toggle action to dispatcher
-  static bool Connect( QAction* qaction, StateBoolHandle& state_handle );
+  static bool Connect( QAction* qaction, Core::StateBoolHandle& state_handle );
 
 };
 

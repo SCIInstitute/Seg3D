@@ -29,12 +29,12 @@
 // QT includes
 #include <QtGui> 
 
-// Utils includes
-#include <Utils/Core/Log.h>
-#include <Utils/Core/Exception.h>
+// Core includes
+#include <Core/Utils/Log.h>
+#include <Core/Utils/Exception.h>
+#include <Core/Interface/Interface.h>
 
 // Application
-#include <Application/Interface/Interface.h>
 #include <Application/ViewerManager/ViewerManager.h>
 
 // Interface includes
@@ -111,7 +111,7 @@ ViewerInterface::ViewerInterface( QWidget *parent ) :
   // We need a lock here as connecting to the state engine and getting the
   // the current value needs to be atomic
   {
-    StateEngine::lock_type lock( StateEngine::GetMutex() );
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
     // Connect signals
     ViewerManager::Instance()->layout_state_->value_changed_signal_.connect( boost::bind(
         &ViewerInterface::SetViewerLayout, qpointer, _1 ) );
@@ -300,9 +300,9 @@ void ViewerInterface::set_layout( const std::string& layout )
 
 void ViewerInterface::SetViewerLayout( qpointer_type qpointer, std::string layout )
 {
-  if( !( Interface::IsInterfaceThread() ) )
+  if( !( Core::Interface::IsInterfaceThread() ) )
   {
-    Interface::Instance()->post_event( boost::bind( &ViewerInterface::SetViewerLayout,
+    Core::Interface::Instance()->post_event( boost::bind( &ViewerInterface::SetViewerLayout,
         qpointer, layout ) );
     return;
   }
@@ -312,9 +312,9 @@ void ViewerInterface::SetViewerLayout( qpointer_type qpointer, std::string layou
 
 void ViewerInterface::SetActiveViewer( qpointer_type qpointer, int active_viewer )
 {
-  if( !( Interface::IsInterfaceThread() ) )
+  if( !( Core::Interface::IsInterfaceThread() ) )
   {
-    Interface::Instance()->post_event( boost::bind( &ViewerInterface::SetActiveViewer,
+    Core::Interface::Instance()->post_event( boost::bind( &ViewerInterface::SetActiveViewer,
         qpointer, active_viewer ) );
     return;
   }

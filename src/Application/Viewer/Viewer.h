@@ -45,13 +45,13 @@
 // Application includes
 #include <Application/Layer/Layer.h>
 #include <Application/LayerManager/LayerManager.h>
-#include <Application/State/State.h>
 #include <Application/Viewer/ViewerRenderer.h>
 #include <Application/Viewer/ViewManipulator.h>
 
-#include <Utils/Core/EnumClass.h>
-#include <Utils/Volume/DataVolumeSlice.h>
-#include <Utils/Volume/MaskVolumeSlice.h>
+#include <Core/Utils/EnumClass.h>
+#include <Core/State/State.h>
+#include <Core/Volume/DataVolumeSlice.h>
+#include <Core/Volume/MaskVolumeSlice.h>
 
 namespace Seg3D
 {
@@ -108,7 +108,7 @@ typedef boost::shared_ptr< Viewer > ViewerHandle;
 typedef boost::weak_ptr< Viewer > ViewerWeakHandle;
 
 // Class definition
-class Viewer : public StateHandler
+class Viewer : public Core::StateHandler
 {
 
   // -- constructor/destructor --
@@ -149,7 +149,7 @@ private:
 public:
   void resize( int width, int height );
   bool is_volume_view() const;
-  StateViewBaseHandle get_active_view_state();
+  Core::StateViewBaseHandle get_active_view_state();
 
 protected:
   virtual void state_changed();
@@ -168,28 +168,28 @@ public:
   slice_changed_signal_type slice_changed_signal_;
 
 private:
-  void change_view_mode( std::string mode, ActionSource source );
-  void set_slice_number( int num, ActionSource source = ActionSource::NONE_E );
-  void change_visibility( bool visible, ActionSource source );
+  void change_view_mode( std::string mode, Core::ActionSource source );
+  void set_slice_number( int num, Core::ActionSource source = Core::ActionSource::NONE_E );
+  void change_visibility( bool visible, Core::ActionSource source );
   void viewer_lock_state_changed( bool locked );
   void layer_state_changed( bool volume_view );
 
   // -- Data structures for keeping track of slices of layers --
 private:
-  typedef std::map< std::string, Utils::MaskVolumeSliceHandle > mask_slices_map_type;
-  typedef std::map< std::string, Utils::DataVolumeSliceHandle > data_slices_map_type;
+  typedef std::map< std::string, Core::MaskVolumeSliceHandle > mask_slices_map_type;
+  typedef std::map< std::string, Core::DataVolumeSliceHandle > data_slices_map_type;
 
   mask_slices_map_type mask_slices_;
   data_slices_map_type data_slices_;
-  Utils::VolumeSliceHandle active_layer_slice_;
+  Core::VolumeSliceHandle active_layer_slice_;
 
   void insert_layer( LayerHandle layer );
   void delete_layers( std::vector< LayerHandle > layers );
   void set_active_layer( LayerHandle layer );
 
 public:
-  Utils::MaskVolumeSliceHandle get_mask_volume_slice( const std::string& layer_id );
-  Utils::DataVolumeSliceHandle get_data_volume_slice( const std::string& layer_id );
+  Core::MaskVolumeSliceHandle get_mask_volume_slice( const std::string& layer_id );
+  Core::DataVolumeSliceHandle get_data_volume_slice( const std::string& layer_id );
 
   // -- Mutex and lock --
 private:
@@ -217,15 +217,15 @@ public:
 
   // MOVE_SLICE_TO:
   // Move the slice to the given world coordinate. Used for picking.
-  void move_slice_to( const Utils::Point& pt );
+  void move_slice_to( const Core::Point& pt );
 
 private:
   
   // Auto adjust the view states so the slices are fully visible
-  void adjust_view( Utils::VolumeSliceHandle target_slice );
+  void adjust_view( Core::VolumeSliceHandle target_slice );
 
   // Move the active slices to the center of the volume
-  void adjust_depth( Utils::VolumeSliceHandle target_slice );
+  void adjust_depth( Core::VolumeSliceHandle target_slice );
 
   void trigger_redraw( bool delay_update );
   void trigger_redraw_overlay( bool delay_update );
@@ -263,29 +263,29 @@ private:
   // -- State information --
 public:
 
-  StateOptionHandle view_mode_state_;
+  Core::StateOptionHandle view_mode_state_;
 
-  StateView2DHandle axial_view_state_;
-  StateView2DHandle coronal_view_state_;
-  StateView2DHandle sagittal_view_state_;
-  StateView3DHandle volume_view_state_;
+  Core::StateView2DHandle axial_view_state_;
+  Core::StateView2DHandle coronal_view_state_;
+  Core::StateView2DHandle sagittal_view_state_;
+  Core::StateView3DHandle volume_view_state_;
 
-  StateRangedIntHandle slice_number_state_;
+  Core::StateRangedIntHandle slice_number_state_;
 
-  StateBoolHandle slice_grid_state_;
-  StateBoolHandle slice_visible_state_;
+  Core::StateBoolHandle slice_grid_state_;
+  Core::StateBoolHandle slice_visible_state_;
 
-  StateBoolHandle volume_slices_visible_state_;
-  StateBoolHandle volume_isosurfaces_visible_state_;
-  StateBoolHandle volume_volume_rendering_visible_state_;
+  Core::StateBoolHandle volume_slices_visible_state_;
+  Core::StateBoolHandle volume_isosurfaces_visible_state_;
+  Core::StateBoolHandle volume_volume_rendering_visible_state_;
 
-  StateBoolHandle viewer_lock_state_;
-  StateBoolHandle viewer_visible_state_;
-  StateBoolHandle is_picking_target_state_;
+  Core::StateBoolHandle viewer_lock_state_;
+  Core::StateBoolHandle viewer_visible_state_;
+  Core::StateBoolHandle is_picking_target_state_;
 
 private:
   // Indexed view state variables for quick access
-  StateViewBaseHandle view_states_[ 4 ];
+  Core::StateViewBaseHandle view_states_[ 4 ];
 
 public:
   const static std::string AXIAL_C;

@@ -30,14 +30,14 @@
 #define APPLICATION_TOOL_ACTIONS_ACTIONDELETELAYERS_H
 
 
-#include <Application/Action/Actions.h>
-#include <Application/Interface/Interface.h>
+#include <Core/Action/Actions.h>
+#include <Core/Interface/Interface.h>
 #include <Application/Layer/LayerGroup.h>
 
 namespace Seg3D
 {
 
-class ActionDeleteLayers : public Action
+class ActionDeleteLayers : public Core::Action
 {
   CORE_ACTION( "DeleteLayers", "Delete Layers <name>" );
   
@@ -53,8 +53,8 @@ public:
   
 // -- Functions that describe action --
 public:
-  virtual bool validate( ActionContextHandle& context );
-  virtual bool run( ActionContextHandle& context, ActionResultHandle& result );
+  virtual bool validate( Core::ActionContextHandle& context );
+  virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
 
   // -- Dispatch this action from the interface --
 public:

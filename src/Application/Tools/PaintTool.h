@@ -62,22 +62,22 @@ private:
   // -- state --
 public:
   // Layerid of the target layer
-  StateStringHandle target_layer_state_;
+  Core::StateStringHandle target_layer_state_;
   
   // Layerid of the masking layer
-  StateStringHandle mask_layer_state_;
+  Core::StateStringHandle mask_layer_state_;
   
   // Radius of the brush
-  StateRangedIntHandle brush_radius_state_;
+  Core::StateRangedIntHandle brush_radius_state_;
 
   // Upper threshold for painting
-  StateRangedDoubleHandle upper_threshold_state_;
+  Core::StateRangedDoubleHandle upper_threshold_state_;
 
   // Lower threshold for painting
-  StateRangedDoubleHandle lower_threshold_state_;
+  Core::StateRangedDoubleHandle lower_threshold_state_;
 
   // Erase data instead of painting
-  StateBoolHandle erase_state_;
+  Core::StateBoolHandle erase_state_;
 };
 
 } // end namespace

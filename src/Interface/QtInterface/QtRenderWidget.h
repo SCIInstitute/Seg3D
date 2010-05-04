@@ -33,9 +33,9 @@
 # pragma once
 #endif 
 
-// Utils includes
-#include <Utils/Core/ConnectionHandler.h>
-#include <Utils/RenderResources/RenderResources.h> 
+// Core includes
+#include <Core/Utils/ConnectionHandler.h>
+#include <Core/RenderResources/RenderResources.h> 
 
 // Applications includes
 #include <Application/Viewer/ViewerRenderer.h>
@@ -47,7 +47,7 @@
 namespace Seg3D
 {
 
-class QtRenderWidget : public QGLWidget, private Utils::ConnectionHandler
+class QtRenderWidget : public QGLWidget, private Core::ConnectionHandler
 {
 Q_OBJECT
 
@@ -75,12 +75,12 @@ protected:
 
 private:
 
-  void update_texture( Utils::TextureHandle texture, bool delay_update );
-  void update_overlay_texture( Utils::TextureHandle texture, bool delay_update );
+  void update_texture( Core::TextureHandle texture, bool delay_update );
+  void update_overlay_texture( Core::TextureHandle texture, bool delay_update );
 
   RendererHandle renderer_;
-  Utils::TextureHandle renderer_texture_;
-  Utils::TextureHandle overlay_texture_;
+  Core::TextureHandle renderer_texture_;
+  Core::TextureHandle overlay_texture_;
 
   ViewerHandle viewer_;
   size_t viewer_id_;

@@ -27,7 +27,7 @@
  */
 
 #include <Interface/AppInterface/ToolWidget.h>
-#include <Utils/Core/Log.h>
+#include <Core/Utils/Log.h>
 #include <boost/lexical_cast.hpp>
 
 namespace Seg3D

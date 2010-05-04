@@ -34,8 +34,8 @@
 #endif 
 
 // Application includes
-#include <Utils/RenderResources/RenderResourcesContext.h>
-#include <Utils/RenderResources/RenderContext.h>
+#include <Core/RenderResources/RenderResourcesContext.h>
+#include <Core/RenderResources/RenderContext.h>
 
 // Interface includes
 #include <Interface/QtInterface/QtRenderWidget.h>
@@ -59,7 +59,7 @@ typedef boost::shared_ptr< QtRenderResourcesContext > QtRenderResourcesContextHa
 
 typedef boost::shared_ptr< QGLContext > QGLContextHandle;
 
-class QtRenderContext : public Utils::RenderContext
+class QtRenderContext : public Core::RenderContext
 {
   // -- constructor/ destructor --
 public:
@@ -89,7 +89,7 @@ private:
   QGLContextHandle context_;
 };
 
-class QtRenderResourcesContext : public Utils::RenderResourcesContext
+class QtRenderResourcesContext : public Core::RenderResourcesContext
 {
 
 public:
@@ -99,7 +99,7 @@ public:
 public:
   // CREATE_RENDER_CONTEXT:
   // Generate a render context for one of the viewers
-  virtual bool create_render_context( Utils::RenderContextHandle& context );
+  virtual bool create_render_context( Core::RenderContextHandle& context );
 
   // CREATE_QT_RENDER_WIDGET:
   // Get the Qt render context directly

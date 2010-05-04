@@ -60,23 +60,23 @@ private:
   // -- state --
 public:
   // Layerid of the target layer
-  StateStringHandle target_layer_state_;
+  Core::StateStringHandle target_layer_state_;
 
-  StateStringHandle mask_layer_state_;
+  Core::StateStringHandle mask_layer_state_;
 
-  StateRangedIntHandle iterations_state_;
+  Core::StateRangedIntHandle iterations_state_;
 
-  StateRangedDoubleHandle upper_threshold_state_;
+  Core::StateRangedDoubleHandle upper_threshold_state_;
 
-  StateRangedDoubleHandle lower_threshold_state_;
+  Core::StateRangedDoubleHandle lower_threshold_state_;
 
-  StateRangedDoubleHandle curvature_state_;
+  Core::StateRangedDoubleHandle curvature_state_;
 
-  StateRangedDoubleHandle propagation_state_;
+  Core::StateRangedDoubleHandle propagation_state_;
 
-  StateRangedDoubleHandle edge_state_;
+  Core::StateRangedDoubleHandle edge_state_;
 
-  StateBoolHandle replace_state_;
+  Core::StateBoolHandle replace_state_;
 
 };
 

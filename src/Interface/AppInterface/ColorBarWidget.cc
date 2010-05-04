@@ -28,7 +28,7 @@
 
 
 // Util includes
-#include <Utils/Core/Log.h>
+#include <Core/Utils/Log.h>
 
 // Interface includes
 #include <Interface/AppInterface/ColorBarWidget.h>

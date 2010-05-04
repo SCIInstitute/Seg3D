@@ -30,22 +30,22 @@
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/Filters/Actions/ActionThresholdSegmentationLS.h>
 
-namespace Seg3D
-{
-  
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
-CORE_REGISTER_ACTION( ThresholdSegmentationLS );
+CORE_REGISTER_ACTION( Seg3D, ThresholdSegmentationLS )
 
-bool ActionThresholdSegmentationLS::validate( ActionContextHandle& context )
+namespace Seg3D
 {
-  if( !( StateEngine::Instance()->is_statealias( this->layer_alias_ ) ) )
+  
+bool ActionThresholdSegmentationLS::validate( Core::ActionContextHandle& context )
+{
+  if( !( Core::StateEngine::Instance()->is_statealias( this->layer_alias_ ) ) )
   {
     context->report_error( std::string( "LayerID '" ) + this->layer_alias_ + "' is invalid" );
     return false;
   }
-  if( !( StateEngine::Instance()->is_statealias( this->mask_alias_ ) ) )
+  if( !( Core::StateEngine::Instance()->is_statealias( this->mask_alias_ ) ) )
   {
     context->report_error( std::string( "LayerID '" ) + this->mask_alias_ + "' is invalid" );
     return false;
@@ -61,9 +61,9 @@ bool ActionThresholdSegmentationLS::validate( ActionContextHandle& context )
   return true;
 }
 
-bool ActionThresholdSegmentationLS::run( ActionContextHandle& context, ActionResultHandle& result )
+bool ActionThresholdSegmentationLS::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
-  if( StateEngine::Instance()->is_statealias( this->layer_alias_ ) )
+  if( Core::StateEngine::Instance()->is_statealias( this->layer_alias_ ) )
   {
     // TODO: run filter
     context->report_message( "The Threshold Segmentation Level Set Filter has been triggered "
@@ -90,7 +90,7 @@ void ActionThresholdSegmentationLS::Dispatch( std::string layer_alias, std::stri
   action->edge_ = edge;
   action->replace_ = replace;
   
-  Interface::PostAction( ActionHandle( action ) );
+  Core::Interface::PostAction( Core::ActionHandle( action ) );
 }
   
 } // end namespace Seg3D

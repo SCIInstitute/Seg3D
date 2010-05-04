@@ -34,8 +34,9 @@
 #include <Application/ToolManager/Actions/ActionOpenTool.h>
 #include <Application/InterfaceManager/Actions/ActionShowWindow.h>
 
-#include <Application/State/State.h>
-#include <Application/State/Actions/ActionSet.h>
+#include <Core/State/State.h>
+#include <Core/State/Actions/ActionSet.h>
+
 #include <Application/ViewerManager/ViewerManager.h>
 
 // Interface includes
@@ -127,49 +128,49 @@ void AppMenu::create_view_menu( QMenu* qmenu )
   qaction->setShortcut( tr( "ALT+0" ) );
   qaction->setToolTip( tr( "Set the view to one large view" ) );
   QtBridge::Connect( qaction, boost::bind(
-      &ActionSet::Dispatch< StateOptionHandle, std::string >,
+      &Core::ActionSet::Dispatch< Core::StateOptionHandle, std::string >,
       ViewerManager::Instance()->layout_state_, "single" ) );
 
   qaction = qmenu->addAction( tr( "One and One" ) );
   qaction->setShortcut( tr( "ALT+1" ) );
   qaction->setToolTip( tr( "Set the view to two large views" ) );
   QtBridge::Connect( qaction, boost::bind(
-      &ActionSet::Dispatch< StateOptionHandle, std::string >,
+      &Core::ActionSet::Dispatch< Core::StateOptionHandle, std::string >,
       ViewerManager::Instance()->layout_state_, "1and1" ) );
 
   qaction = qmenu->addAction( tr( "One and Two" ) );
   qaction->setShortcut( tr( "ALT+2" ) );
   qaction->setToolTip( tr( "Set the view one large and two smaller views" ) );
   QtBridge::Connect( qaction, boost::bind(
-      &ActionSet::Dispatch< StateOptionHandle, std::string >,
+      &Core::ActionSet::Dispatch< Core::StateOptionHandle, std::string >,
       ViewerManager::Instance()->layout_state_, "1and2" ) );
 
   qaction = qmenu->addAction( tr( "One and Three" ) );
   qaction->setShortcut( tr( "ALT+3" ) );
   qaction->setToolTip( tr( "Set the view one large and three smaller views" ) );
   QtBridge::Connect( qaction, boost::bind(
-      &ActionSet::Dispatch< StateOptionHandle, std::string >,
+      &Core::ActionSet::Dispatch< Core::StateOptionHandle, std::string >,
       ViewerManager::Instance()->layout_state_, "1and3" ) );
 
   qaction = qmenu->addAction( tr( "Two and Two" ) );
   qaction->setShortcut( tr( "ALT+4" ) );
   qaction->setToolTip( tr( "Set the view one large and three smaller views" ) );
   QtBridge::Connect( qaction, boost::bind(
-      &ActionSet::Dispatch< StateOptionHandle, std::string >,
+      &Core::ActionSet::Dispatch< Core::StateOptionHandle, std::string >,
       ViewerManager::Instance()->layout_state_, "2and2" ) );
 
   qaction = qmenu->addAction( tr( "Two and Three" ) );
   qaction->setShortcut( tr( "ALT+5" ) );
   qaction->setToolTip( tr( "Set the view two larger and three smaller views" ) );
   QtBridge::Connect( qaction, boost::bind(
-      &ActionSet::Dispatch< StateOptionHandle, std::string >,
+      &Core::ActionSet::Dispatch< Core::StateOptionHandle, std::string >,
       ViewerManager::Instance()->layout_state_, "2and3" ) );
 
   qaction = qmenu->addAction( tr( "Three and Three" ) );
   qaction->setShortcut( tr( "ALT+6" ) );
   qaction->setToolTip( tr( "Set the view to 6 equally sized views" ) );
   QtBridge::Connect( qaction, boost::bind(
-      &ActionSet::Dispatch< StateOptionHandle, std::string >,
+      &Core::ActionSet::Dispatch< Core::StateOptionHandle, std::string >,
       ViewerManager::Instance()->layout_state_, "3and3" ) );
 }
 

@@ -30,17 +30,17 @@
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/Filters/Actions/ActionBinaryDilateErode.h>
 
-namespace Seg3D
-{
-  
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
-CORE_REGISTER_ACTION( BinaryDilateErode );
+CORE_REGISTER_ACTION( Seg3D, BinaryDilateErode )
 
-bool ActionBinaryDilateErode::validate( ActionContextHandle& context )
+namespace Seg3D
 {
-  if( !( StateEngine::Instance()->is_statealias( this->layer_alias_ ) ) )
+  
+bool ActionBinaryDilateErode::validate( Core::ActionContextHandle& context )
+{
+  if( !( Core::StateEngine::Instance()->is_statealias( this->layer_alias_ ) ) )
   {
     context->report_error( std::string( "LayerID '" ) + this->layer_alias_ + "' is invalid" );
     return false;
@@ -56,9 +56,9 @@ bool ActionBinaryDilateErode::validate( ActionContextHandle& context )
   return true;
 }
 
-bool ActionBinaryDilateErode::run( ActionContextHandle& context, ActionResultHandle& result )
+bool ActionBinaryDilateErode::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
-  if ( StateEngine::Instance()->is_statealias( this->layer_alias_ ) )
+  if ( Core::StateEngine::Instance()->is_statealias( this->layer_alias_ ) )
   {
     // TODO: run filter
     context->report_message( "The Binary Dilate Erode Filter has been triggered "
@@ -80,7 +80,7 @@ void ActionBinaryDilateErode::Dispatch( std::string layer_alias, int dialate, in
   action->erode_ = erode;
   action->replace_ = replace;
   
-  Interface::PostAction( ActionHandle( action ) );
+  Core::Interface::PostAction( Core::ActionHandle( action ) );
 }
   
 } // end namespace Seg3D

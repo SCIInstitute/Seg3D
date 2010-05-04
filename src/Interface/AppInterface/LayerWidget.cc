@@ -30,7 +30,7 @@
 #include <boost/lexical_cast.hpp>
 
 //Core Includes - for logging
-#include <Utils/Core/Log.h>
+#include <Core/Utils/Log.h>
 
 //Interface Includes
 #include <Interface/QtInterface/QtBridge.h>
@@ -214,7 +214,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   switch( this->volume_type_ )
   {
     // This if for the Data Layers
-    case Utils::VolumeType::DATA_E:
+    case Core::VolumeType::DATA_E:
       {
         this->private_->ui_.color_button_->hide();
         this->private_->ui_.compute_iso_surface_button_->hide();
@@ -250,7 +250,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
       }
       break;
     // This is for the Mask Layers  
-    case Utils::VolumeType::MASK_E:
+    case Core::VolumeType::MASK_E:
       {
         this->private_->ui_.brightness_contrast_button_->hide();
         this->private_->ui_.volume_rendered_button_->hide();
@@ -266,7 +266,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
       break;
       
     // This is for the Label Layers
-    case Utils::VolumeType::LABEL_E:
+    case Core::VolumeType::LABEL_E:
         {
         this->private_->ui_.typeBackground_->setStyleSheet( StyleSheet::LABEL_VOLUME_COLOR_C );
         this->private_->activate_button_->setIcon(this->label_layer_icon_);
@@ -313,13 +313,13 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
 
   switch ( this->get_volume_type() ) 
   {
-  case Utils::VolumeType::DATA_E:
+  case Core::VolumeType::DATA_E:
     mimeData->setText( QString::fromStdString( std::string("data|") + this->get_layer_id() ) );
     break;
-  case Utils::VolumeType::MASK_E:
+  case Core::VolumeType::MASK_E:
     mimeData->setText( QString::fromStdString( std::string("mask|") + this->get_layer_id() ) );
     break;
-  case Utils::VolumeType::LABEL_E:
+  case Core::VolumeType::LABEL_E:
     mimeData->setText( QString::fromStdString( std::string("label|") + this->get_layer_id() ) );
     break;
   default:
@@ -359,7 +359,7 @@ void LayerWidget::set_drop_target( LayerWidget* target_layer )
 void LayerWidget::dropEvent( QDropEvent* event )
 {
   std::vector<std::string> mime_data = 
-    Utils::SplitString( event->mimeData()->text().toStdString(), "|" );
+    Core::SplitString( event->mimeData()->text().toStdString(), "|" );
   if( mime_data.size() < 2 ) return;
 
   if( this->get_layer_id() == mime_data[ 1 ] )
@@ -418,14 +418,14 @@ void LayerWidget::dragEnterEvent( QDragEnterEvent* event)
   this->private_->overlay_->show();
   
   std::vector<std::string> mime_data = 
-    Utils::SplitString( event->mimeData()->text().toStdString(), "|" );
+    Core::SplitString( event->mimeData()->text().toStdString(), "|" );
   if( mime_data.size() < 2 ) return;
 
-  if( ( ( ( this->get_volume_type() == Utils::VolumeType::DATA_E ) &&
+  if( ( ( ( this->get_volume_type() == Core::VolumeType::DATA_E ) &&
     ( mime_data[ 0 ] == "data" ) ) ||
-    ( ( this->get_volume_type() == Utils::VolumeType::MASK_E ) &&
+    ( ( this->get_volume_type() == Core::VolumeType::MASK_E ) &&
     ( mime_data[ 0 ] =="mask" ) ) ||
-    ( ( this->get_volume_type() == Utils::VolumeType::LABEL_E ) &&
+    ( ( this->get_volume_type() == Core::VolumeType::LABEL_E ) &&
     ( mime_data[ 0 ] == "label") ) ) && 
     ( this->get_layer_id() != mime_data[ 1 ] ) )
   {
@@ -661,17 +661,17 @@ void LayerWidget::visual_lock( bool lock )
   {
     switch( this->volume_type_ )
       {
-        case Utils::VolumeType::DATA_E:
+        case Core::VolumeType::DATA_E:
         {
               this->private_->ui_.typeBackground_->setStyleSheet( StyleSheet::DATA_VOLUME_COLOR_C );
       }
         break;
-        case Utils::VolumeType::MASK_E:
+        case Core::VolumeType::MASK_E:
       {
         this->private_->ui_.typeBackground_->setStyleSheet( StyleSheet::MASK_VOLUME_COLOR_C );
       }
       break;
-      case Utils::VolumeType::LABEL_E:
+      case Core::VolumeType::LABEL_E:
       {
         this->private_->ui_.typeBackground_->setStyleSheet( StyleSheet::LABEL_VOLUME_COLOR_C );
         }

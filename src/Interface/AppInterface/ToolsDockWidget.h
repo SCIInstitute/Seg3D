@@ -43,7 +43,7 @@
 #include <boost/shared_ptr.hpp>
 
 // Core includes
-#include <Utils/Core/ConnectionHandler.h>
+#include <Core/Utils/ConnectionHandler.h>
 
 // Application includes
 #include <Application/ToolManager/ToolManager.h>
@@ -59,7 +59,7 @@ namespace Seg3D
 class ToolsDockWidget;
 
 // Class definition
-class ToolsDockWidget : public QDockWidget, public Utils::ConnectionHandler
+class ToolsDockWidget : public QDockWidget, public Core::ConnectionHandler
 {
 Q_OBJECT
 

@@ -37,14 +37,12 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
 
-// Utils includes
-#include <Utils/Core/EnumClass.h>
-#include <Utils/Core/Log.h>
-#include <Utils/Core/Exception.h>
-
-// Application includes
-#include <Application/State/State.h>
-#include <Application/State/StateEngine.h>
+// Core includes
+#include <Core/Utils/EnumClass.h>
+#include <Core/Utils/Log.h>
+#include <Core/Utils/Exception.h>
+#include <Core/State/State.h>
+#include <Core/State/StateEngine.h>
 
 namespace Seg3D
 {
@@ -68,7 +66,7 @@ SCI_ENUM_CLASS
 )
 
 // Class definition
-class Tool : public StateHandler
+class Tool : public Core::StateHandler
 {
 
   // -- constructor/destructor --
@@ -129,7 +127,7 @@ public:
 
 #define SCI_TOOL_TYPE(type_string,menu_name_string,shortcut_key_string,properties_mask,help_url) \
   public: \
-    static std::string Type() { return Utils::StringToLower(type_string); } \
+    static std::string Type() { return Core::StringToLower(type_string); } \
     static std::string MenuName() { return menu_name_string; } \
     static std::string ShortcutKey() { return shortcut_key_string; } \
     static int         Properties() { return properties_mask; } \

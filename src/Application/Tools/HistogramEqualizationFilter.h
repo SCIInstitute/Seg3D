@@ -61,15 +61,15 @@ private:
   // -- state --
 public:
   // Layerid of the target layer
-  StateStringHandle target_layer_state_;
+  Core::StateStringHandle target_layer_state_;
 
-  StateRangedDoubleHandle upper_threshold_state_;
+  Core::StateRangedDoubleHandle upper_threshold_state_;
 
-  StateRangedDoubleHandle lower_threshold_state_;
+  Core::StateRangedDoubleHandle lower_threshold_state_;
 
-  StateRangedIntHandle alpha_state_;
+  Core::StateRangedIntHandle alpha_state_;
 
-  StateBoolHandle replace_state_;
+  Core::StateBoolHandle replace_state_;
 
 };
 

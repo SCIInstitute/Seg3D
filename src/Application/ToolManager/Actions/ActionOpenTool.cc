@@ -30,15 +30,15 @@
 #include <Application/Tool/ToolFactory.h>
 #include <Application/ToolManager/Actions/ActionOpenTool.h>
 
-namespace Seg3D
-{
-
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
-CORE_REGISTER_ACTION( OpenTool );
+CORE_REGISTER_ACTION( Seg3D, OpenTool )
 
-bool ActionOpenTool::validate( ActionContextHandle& context )
+namespace Seg3D
+{
+
+bool ActionOpenTool::validate( Core::ActionContextHandle& context )
 {
   // Check whether the tool has a valid type
   if ( !( ToolFactory::Instance()->is_tool_type( toolid_.value() ) ) )
@@ -51,7 +51,7 @@ bool ActionOpenTool::validate( ActionContextHandle& context )
   return true; // validated
 }
 
-bool ActionOpenTool::run( ActionContextHandle& context, ActionResultHandle& result )
+bool ActionOpenTool::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
   std::string new_tool_id;
 
@@ -59,11 +59,11 @@ bool ActionOpenTool::run( ActionContextHandle& context, ActionResultHandle& resu
   ToolManager::Instance()->open_tool( toolid_.value(), new_tool_id );
   ToolManager::Instance()->activate_tool( new_tool_id );
 
-  result = ActionResultHandle( new ActionResult( new_tool_id ) );
+  result = Core::ActionResultHandle( new Core::ActionResult( new_tool_id ) );
   return true; // success
 }
 
-ActionHandle ActionOpenTool::Create( const std::string& toolid )
+Core::ActionHandle ActionOpenTool::Create( const std::string& toolid )
 {
   // Create new action
   ActionOpenTool* action = new ActionOpenTool;
@@ -71,12 +71,12 @@ ActionHandle ActionOpenTool::Create( const std::string& toolid )
   // Set action parameters
   action->toolid_.value() = toolid;
 
-  return ActionHandle( action );
+  return Core::ActionHandle( action );
 }
 
 void ActionOpenTool::Dispatch( const std::string& toolid )
 {
-  Interface::PostAction( Create( toolid ) );
+  Core::Interface::PostAction( Create( toolid ) );
 }
 
 } // end namespace Seg3D

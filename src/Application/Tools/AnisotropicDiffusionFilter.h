@@ -61,15 +61,15 @@ private:
   // -- state --
 public:
   // Layerid of the target layer
-  StateStringHandle target_layer_state_;
+  Core::StateStringHandle target_layer_state_;
 
-  StateRangedIntHandle iterations_state_;
+  Core::StateRangedIntHandle iterations_state_;
 
-  StateRangedIntHandle steps_state_;
+  Core::StateRangedIntHandle steps_state_;
 
-  StateRangedDoubleHandle conductance_state_;
+  Core::StateRangedDoubleHandle conductance_state_;
 
-  StateBoolHandle replace_state_;
+  Core::StateBoolHandle replace_state_;
 
 };
 

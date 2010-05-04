@@ -30,17 +30,17 @@
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/Filters/Actions/ActionBoolean.h>
 
-namespace Seg3D
-{
-  
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
-CORE_REGISTER_ACTION( Boolean );
+CORE_REGISTER_ACTION( Seg3D, Boolean )
 
-bool ActionBoolean::validate( ActionContextHandle& context )
+namespace Seg3D
 {
-  if( !( StateEngine::Instance()->is_statealias( this->mask_a_alias_ ) ) )
+  
+bool ActionBoolean::validate( Core::ActionContextHandle& context )
+{
+  if( !( Core::StateEngine::Instance()->is_statealias( this->mask_a_alias_ ) ) )
   {
     context->report_error( std::string( "LayerID '" ) + this->mask_a_alias_ + "' is invalid" );
     return false;
@@ -49,9 +49,9 @@ bool ActionBoolean::validate( ActionContextHandle& context )
   return true;
 }
 
-bool ActionBoolean::run( ActionContextHandle& context, ActionResultHandle& result )
+bool ActionBoolean::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
-  if ( StateEngine::Instance()->is_statealias( this->mask_a_alias_ ) )
+  if ( Core::StateEngine::Instance()->is_statealias( this->mask_a_alias_ ) )
   {
     // TODO: run filter
     context->report_message( "The Arithmetic Filter has been triggered "
@@ -76,7 +76,7 @@ void ActionBoolean::Dispatch( std::string mask_a_alias, std::string mask_b_alias
   action->expression_ = expression;
   action->replace_ = replace;
   
-  Interface::PostAction( ActionHandle( action ) );
+  Core::Interface::PostAction( Core::ActionHandle( action ) );
 }
   
 } // end namespace Seg3D

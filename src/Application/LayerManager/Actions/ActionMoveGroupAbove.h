@@ -29,13 +29,13 @@
 #ifndef APPLICATION_LAYERMANAGER_ACTIONS_ACTIONMOVEGROUPABOVE_H
 #define APPLICATION_LAYERMANAGER_ACTIONS_ACTIONMOVEGROUPABOVE_H
 
-#include <Application/Action/Actions.h>
-#include <Application/Interface/Interface.h>
+#include <Core/Action/Actions.h>
+#include <Core/Interface/Interface.h>
 
 namespace Seg3D
 {
 
-class ActionMoveGroupAbove : public Action
+class ActionMoveGroupAbove : public Core::Action
 {
   CORE_ACTION( "MoveGroupAbove", "<name_above> <name_below>" );
   
@@ -56,20 +56,20 @@ public:
   
   // -- Functions that describe action --
 public:
-  virtual bool validate( ActionContextHandle& context );
-  virtual bool run( ActionContextHandle& context, ActionResultHandle& result );
+  virtual bool validate( Core::ActionContextHandle& context );
+  virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
   
   // -- Action parameters --
 private:
   // Layer_handle that is requested
-  ActionParameter< std::string >  group_to_move_id_;
-  ActionParameter< std::string >  group_below_id_;
+  Core::ActionParameter< std::string >  group_to_move_id_;
+  Core::ActionParameter< std::string >  group_below_id_;
   
   // -- Dispatch this action from the interface --
 public:
   // CREATE:
   // Create action that moves the layer above
-  static ActionHandle Create( const std::string& group_to_move_id, const std::string& group_below_id );
+  static Core::ActionHandle Create( const std::string& group_to_move_id, const std::string& group_below_id );
   
   // DISPATCH
   // Create and dispatch action that moves the layer above 

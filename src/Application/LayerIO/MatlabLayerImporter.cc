@@ -39,14 +39,14 @@ bool MatlabLayerImporter::import_header()
   return false;
 }
 
-Utils::GridTransform MatlabLayerImporter::get_grid_transform()
+Core::GridTransform MatlabLayerImporter::get_grid_transform()
 {
-  return Utils::GridTransform(1,1,1);
+  return Core::GridTransform(1,1,1);
 }
 
-Utils::DataType MatlabLayerImporter::get_data_type()
+Core::DataType MatlabLayerImporter::get_data_type()
 {
-  return Utils::DataType::UNKNOWN_E;
+  return Core::DataType::UNKNOWN_E;
 }
 
 int MatlabLayerImporter::get_importer_modes()

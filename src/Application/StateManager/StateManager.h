@@ -38,11 +38,11 @@
 #include <boost/utility.hpp>
 
 // Core includes
-#include <Utils/Core/StringUtil.h>
-#include <Utils/Core/Singleton.h>
+#include <Core/Utils/StringUtil.h>
+#include <Core/Utils/Singleton.h>
 
 // Application includes
-#include <Application/State/State.h>
+#include <Core/State/State.h>
 
 namespace Seg3D
 {
@@ -51,13 +51,13 @@ namespace Seg3D
 class StateManager;
 
 // Class definition
-class StateManager : public Utils::Singleton< StateManager >
+class StateManager : public Core::Singleton< StateManager >
 {
 
   // -- Constructor/Destructor --
 
 private:
-  friend class Utils::Singleton< StateManager >;
+  friend class Core::Singleton< StateManager >;
   StateManager();
   virtual ~StateManager();
 

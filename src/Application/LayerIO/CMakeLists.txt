@@ -58,15 +58,15 @@ ADD_LIBRARY(Application_LayerIO STATIC
             ${APPLICATION_LAYERIO_ACTIONS_SRCS} )
             
 TARGET_LINK_LIBRARIES(Application_LayerIO
-                      Utils_Core
-            Utils_Geometry
-            Utils_DataBlock
-            Utils_Volume
-                      Application_Application
-                      Application_Interface
+                      Core_Utils
+            Core_Geometry
+            Core_DataBlock
+            Core_Volume
+                      Core_Application
+                      Core_Interface
                       Application_InterfaceManager
-                      Application_Action
-                      Application_State
+                      Core_Action
+                      Core_State
                       Application_StateManager
                       Application_Layer
                       ${SCI_BOOST_LIBRARY})

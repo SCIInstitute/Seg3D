@@ -30,17 +30,17 @@
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/Filters/Actions/ActionFillHoles.h>
 
-namespace Seg3D
-{
-  
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
-CORE_REGISTER_ACTION( FillHoles );
+CORE_REGISTER_ACTION( Seg3D, FillHoles )
 
-bool ActionFillHoles::validate( ActionContextHandle& context )
+namespace Seg3D
 {
-  if( !( StateEngine::Instance()->is_statealias( this->layer_alias_ ) ) )
+  
+bool ActionFillHoles::validate( Core::ActionContextHandle& context )
+{
+  if( !( Core::StateEngine::Instance()->is_statealias( this->layer_alias_ ) ) )
   {
     context->report_error( std::string( "LayerID '" ) + this->layer_alias_ + "' is invalid" );
     return false;
@@ -49,9 +49,9 @@ bool ActionFillHoles::validate( ActionContextHandle& context )
   return true;
 }
 
-bool ActionFillHoles::run( ActionContextHandle& context, ActionResultHandle& result )
+bool ActionFillHoles::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
-  if ( StateEngine::Instance()->is_statealias( this->layer_alias_ ) )
+  if ( Core::StateEngine::Instance()->is_statealias( this->layer_alias_ ) )
   {
     // TODO: run filter
     context->report_message( "The Fill Holes Filter has been triggered "
@@ -69,7 +69,7 @@ void ActionFillHoles::Dispatch( std::string layer_alias )
   ActionFillHoles* action = new ActionFillHoles;
   action->layer_alias_ = layer_alias;
   
-  Interface::PostAction( ActionHandle( action ) );
+  Core::Interface::PostAction( Core::ActionHandle( action ) );
 }
   
 } // end namespace Seg3D

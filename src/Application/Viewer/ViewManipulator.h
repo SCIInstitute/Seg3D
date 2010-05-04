@@ -31,8 +31,8 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include <Utils/Geometry/Quaternion.h>
-#include <Utils/Geometry/Vector.h>
+#include <Core/Geometry/Quaternion.h>
+#include <Core/Geometry/Vector.h>
 
 namespace Seg3D
 {
@@ -60,12 +60,12 @@ public:
 private:
 
   bool
-      compute_rotation( int x0, int y0, int x1, int y1, Utils::Vector& axis, double& angle ) const;
+      compute_rotation( int x0, int y0, int x1, int y1, Core::Vector& axis, double& angle ) const;
   double compute_scaling( int x0, int y0, int x1, int y1 ) const;
-  Utils::Vector compute_translation( int x0, int y0, int x1, int y1, bool is_view3d ) const;
+  Core::Vector compute_translation( int x0, int y0, int x1, int y1, bool is_view3d ) const;
 
   void compute_3d_viewplane();
-  Utils::Vector project_point_onto_sphere( int x, int y ) const;
+  Core::Vector project_point_onto_sphere( int x, int y ) const;
   inline int remap_y( int y ) const;
 
   int width_;
@@ -82,8 +82,8 @@ private:
 
   Viewer* viewer_;
 
-  Utils::Vector viewplane_u_;
-  Utils::Vector viewplane_v_;
+  Core::Vector viewplane_u_;
+  Core::Vector viewplane_v_;
 };
 
 inline void ViewManipulator::resize( int width, int height )

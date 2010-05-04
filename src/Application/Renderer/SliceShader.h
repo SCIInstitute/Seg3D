@@ -32,7 +32,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
 
-#include <Utils/Graphics/GLSLProgram.h>
+#include <Core/Graphics/GLSLProgram.h>
 
 namespace Seg3D
 {
@@ -61,8 +61,8 @@ private:
 
   bool valid_;
 
-  Utils::GLSLProgramHandle glsl_prog_;
-  Utils::GLSLShaderHandle glsl_frag_shader_;
+  Core::GLSLProgramHandle glsl_prog_;
+  Core::GLSLShaderHandle glsl_frag_shader_;
 
   int slice_tex_loc_;
   int pattern_tex_loc_;

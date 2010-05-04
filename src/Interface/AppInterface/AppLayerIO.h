@@ -33,7 +33,7 @@
 # pragma once
 #endif 
 
-// #include <Interface/AppInterface/AppLayerImporter.h>
+#include <QMainWindow>
 
 namespace Seg3D
 {

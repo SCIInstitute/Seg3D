@@ -26,14 +26,14 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <Application/Interface/Interface.h>
+#include <Core/Interface/Interface.h>
 #include <Application/ViewerManager/Actions/ActionPickPoint.h>
 #include <Application/ViewerManager/ViewerManager.h>
 
+CORE_REGISTER_ACTION( Seg3D, PickPoint )
+
 namespace Seg3D
 {
-
-CORE_REGISTER_ACTION( PickPoint );
 
 ActionPickPoint::ActionPickPoint()
 {
@@ -44,12 +44,13 @@ ActionPickPoint::~ActionPickPoint()
 {
 }
 
-bool ActionPickPoint::validate( ActionContextHandle& context )
+bool ActionPickPoint::validate( Core::ActionContextHandle& context )
 {
   return true;
 }
 
-bool ActionPickPoint::run( ActionContextHandle& context, ActionResultHandle& result )
+bool ActionPickPoint::run( Core::ActionContextHandle& context,
+              Core::ActionResultHandle& result )
 {
   if ( this->source_viewer_ >= 0)
   {
@@ -60,18 +61,18 @@ bool ActionPickPoint::run( ActionContextHandle& context, ActionResultHandle& res
   return false;
 }
 
-ActionHandle ActionPickPoint::Create( size_t src_viewer, const Utils::Point& pt )
+Core::ActionHandle ActionPickPoint::Create( size_t src_viewer, const Core::Point& pt )
 {
   ActionPickPoint* action = new ActionPickPoint;
   action->source_viewer_ = static_cast< int >( src_viewer );
   action->point_.value() = pt;
 
-  return ActionHandle( action );
+  return Core::ActionHandle( action );
 }
 
-void ActionPickPoint::Dispatch( size_t src_viewer, const Utils::Point& pt )
+void ActionPickPoint::Dispatch( size_t src_viewer, const Core::Point& pt )
 {
-  Interface::PostAction( Create( src_viewer, pt ) );
+  Core::Interface::PostAction( Create( src_viewer, pt ) );
 }
 
 } // end namespace Seg3D

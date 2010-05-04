@@ -40,8 +40,8 @@
 // QT includes
 #include <QtGui>
 
-// Utils includes
-#include <Utils/Core/Log.h>
+// Core includes
+#include <Core/Utils/Log.h>
 
 namespace Seg3D
 {

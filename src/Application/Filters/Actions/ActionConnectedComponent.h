@@ -29,14 +29,14 @@
 #ifndef APPLICATION_TOOL_ACTIONS_ACTIONCONNECTEDCOMPONENT_H
 #define APPLICATION_TOOL_ACTIONS_ACTIONCONNECTEDCOMPONENT_H
 
-#include <Application/Action/Actions.h>
-#include <Application/Interface/Interface.h>
+#include <Core/Action/Actions.h>
+#include <Core/Interface/Interface.h>
 #include <Application/Layer/Layer.h>
 
 namespace Seg3D
 {
   
-class ActionConnectedComponent : public Action
+class ActionConnectedComponent : public Core::Action
 {
 CORE_ACTION( "ConnectedComponent", "Run Connected Component Filter on: <name>" );
   
@@ -52,8 +52,8 @@ public:
   
   // -- Functions that describe action --
 public:
-  virtual bool validate( ActionContextHandle& context );
-  virtual bool run( ActionContextHandle& context, ActionResultHandle& result );
+  virtual bool validate( Core::ActionContextHandle& context );
+  virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
   
   // -- Action parameters --
 private:

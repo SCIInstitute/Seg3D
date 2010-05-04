@@ -30,13 +30,13 @@
 
 // Boost includes 
 
-#include <Application/Application/Application.h>
+#include <Core/Application/Application.h>
 #include <Application/Layer/DataLayer.h>
 
 namespace Seg3D
 {
 
-DataLayer::DataLayer( const std::string& name, const Utils::DataVolumeHandle& volume ) :
+DataLayer::DataLayer( const std::string& name, const Core::DataVolumeHandle& volume ) :
   Layer( name ), 
   data_volume_( volume )
 {

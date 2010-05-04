@@ -55,15 +55,15 @@ ENDIF(APPLE)
 TARGET_LINK_LIBRARIES(Seg3D 
   ${QT_LIBRARIES}
   ${SCI_BOOST_LIBRARY}
-  Utils_Core
-  Utils_Converter
-  Utils_DataBlock
-  Utils_EventHandler
-  Utils_Graphics
-  Utils_Volume
-  Application_Application
-  Application_Interface
-  Application_Action
+  Core_Utils
+  Core_Converter
+  Core_DataBlock
+  Core_EventHandler
+  Core_Graphics
+  Core_Volume
+  Core_Application
+  Core_Interface
+  Core_Action
   Interface_AppInterface
   Interface_QtInterface
   Init_Init

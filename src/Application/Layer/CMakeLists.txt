@@ -52,12 +52,12 @@ ADD_LIBRARY(Application_Layer STATIC
             ${APPLICATION_LAYER_ACTIONS_SRCS} )
             
 TARGET_LINK_LIBRARIES(Application_Layer
-                      Utils_Core
-                      Application_Application
-                      Application_Interface
+                      Core_Utils
+                      Core_Application
+                      Core_Interface
                       Application_InterfaceManager
-                      Application_Action
-                      Application_State
+                      Core_Action
+                      Core_State
                       Application_StateManager
             Application_LayerManager
                       ${SCI_BOOST_LIBRARY})

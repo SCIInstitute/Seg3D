@@ -30,65 +30,66 @@
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/LayerManager/Actions/ActionMoveGroupAbove.h>
 
+// REGISTER ACTION:
+// Define a function that registers the action. The action also needs to be
+// registered in the CMake file.
+CORE_REGISTER_ACTION( Seg3D, MoveGroupAbove )
+
 namespace Seg3D
 {
   
-  // REGISTER ACTION:
-  // Define a function that registers the action. The action also needs to be
-  // registered in the CMake file.
-  CORE_REGISTER_ACTION( MoveGroupAbove );
-  
-  bool ActionMoveGroupAbove::validate( ActionContextHandle& context )
+bool ActionMoveGroupAbove::validate( Core::ActionContextHandle& context )
+{
+
+  if ( !( Core::StateEngine::Instance()->is_stateid( this->group_to_move_id_.value() ) ) )
   {
-
-    if ( !( StateEngine::Instance()->is_stateid( this->group_to_move_id_.value() ) ) )
-    {
-      context->report_error( std::string( "GroupID '" ) + this->group_to_move_id_.value() 
-        + "' is invalid" );
-      return false;
-    }
-    
-    if ( !( StateEngine::Instance()->is_stateid( this->group_below_id_.value() ) ) )
-    {
-      context->report_error( std::string( "GroupID '" ) + this->group_below_id_.value()
-        + "' is invalid" );
-      return false;
-    }
-
-    return true;
-  }
-  
-  bool ActionMoveGroupAbove::run( ActionContextHandle& context, ActionResultHandle& result )
-  {
-    if ( ( StateEngine::Instance()->is_stateid( this->group_below_id_.value() ) ) && 
-      ( StateEngine::Instance()->is_stateid( this->group_to_move_id_.value() ) ) )
-    {
-      return LayerManager::Instance()->move_group_above( this->group_to_move_id_.value(),
-        this->group_below_id_.value() );
-    }
-
+    context->report_error( std::string( "GroupID '" ) + this->group_to_move_id_.value() 
+      + "' is invalid" );
     return false;
   }
   
-  ActionHandle ActionMoveGroupAbove::Create( const std::string& group_to_move_id, 
-    const std::string& group_below_id )
+  if ( !( Core::StateEngine::Instance()->is_stateid( this->group_below_id_.value() ) ) )
   {
-    // Create new action
-    ActionMoveGroupAbove* action = new ActionMoveGroupAbove;
-    
-    // We need to fill in these to ensure the action can be replayed
-    action->group_below_id_.value() = group_below_id;
-    action->group_to_move_id_.value() = group_to_move_id;
-    
-    // Post the new action
-    return ActionHandle( action );
+    context->report_error( std::string( "GroupID '" ) + this->group_below_id_.value()
+      + "' is invalid" );
+    return false;
   }
-  
 
-  void ActionMoveGroupAbove::Dispatch( const std::string& group_to_move_id, 
-    const std::string& group_below_id )
+  return true;
+}
+
+bool ActionMoveGroupAbove::run( Core::ActionContextHandle& context, 
+                 Core::ActionResultHandle& result )
+{
+  if ( ( Core::StateEngine::Instance()->is_stateid( this->group_below_id_.value() ) ) && 
+    ( Core::StateEngine::Instance()->is_stateid( this->group_to_move_id_.value() ) ) )
   {
-    Interface::PostAction( Create( group_to_move_id, group_below_id ) );
+    return LayerManager::Instance()->move_group_above( this->group_to_move_id_.value(),
+      this->group_below_id_.value() );
   }
+
+  return false;
+}
+
+Core::ActionHandle ActionMoveGroupAbove::Create( const std::string& group_to_move_id, 
+  const std::string& group_below_id )
+{
+  // Create new action
+  ActionMoveGroupAbove* action = new ActionMoveGroupAbove;
+  
+  // We need to fill in these to ensure the action can be replayed
+  action->group_below_id_.value() = group_below_id;
+  action->group_to_move_id_.value() = group_to_move_id;
+  
+  // Post the new action
+  return Core::ActionHandle( action );
+}
+
+
+void ActionMoveGroupAbove::Dispatch( const std::string& group_to_move_id, 
+  const std::string& group_below_id )
+{
+  Core::Interface::PostAction( Create( group_to_move_id, group_below_id ) );
+}
   
 } // end namespace Seg3D

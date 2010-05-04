@@ -39,7 +39,7 @@ namespace Seg3D
 void InitPlugins()
 {
   // Call the code that registers all the actions in the ActionFactory
-  ActionLibraryInit();
+  Core::ActionLibraryInit();
 
   // Call the code that registers all the tools and tool interfaces
   // in the ToolFactory

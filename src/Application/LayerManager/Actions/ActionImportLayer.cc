@@ -34,15 +34,15 @@
 #include <Application/LayerIO/LayerIO.h>
 #include <Application/LayerManager/LayerManager.h>
 
-namespace Seg3D
-{
-
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
-CORE_REGISTER_ACTION( ImportLayer );
+CORE_REGISTER_ACTION( Seg3D, ImportLayer )
 
-bool ActionImportLayer::validate( ActionContextHandle& context )
+namespace Seg3D
+{
+
+bool ActionImportLayer::validate( Core::ActionContextHandle& context )
 {
   boost::filesystem::path full_filename( filename_.value() );
   if ( !( boost::filesystem::exists ( full_filename ) ) )
@@ -80,11 +80,12 @@ bool ActionImportLayer::validate( ActionContextHandle& context )
   return true; // validated
 }
 
-bool ActionImportLayer::run( ActionContextHandle& context, ActionResultHandle& result )
+bool ActionImportLayer::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
   std::string message = std::string("Importing '") + layer_importer_->get_filename() +
     std::string("'");
-  ActionProgressHandle progress = ActionProgressHandle( new ActionProgress( message ) );
+  Core::ActionProgressHandle progress = 
+    Core::ActionProgressHandle( new Core::ActionProgress( message ) );
 
   progress->begin_progress_reporting();
   
@@ -108,8 +109,8 @@ bool ActionImportLayer::run( ActionContextHandle& context, ActionResultHandle& r
   return true;
 }
 
-ActionHandle ActionImportLayer::Create( const std::string& filename, const std::string& mode,
-  const std::string importer )
+Core::ActionHandle ActionImportLayer::Create( const std::string& filename, 
+  const std::string& mode, const std::string importer )
 {
   // Create new action
   ActionImportLayer* action = new ActionImportLayer;
@@ -120,10 +121,10 @@ ActionHandle ActionImportLayer::Create( const std::string& filename, const std::
   action->importer_.value() = importer;
   
   // Post the new action
-  return ActionHandle( action );
+  return Core::ActionHandle( action );
 }
 
-ActionHandle ActionImportLayer::Create( const LayerImporterHandle& importer, 
+Core::ActionHandle ActionImportLayer::Create( const LayerImporterHandle& importer, 
   LayerImporterMode mode )
 {
   // Create new action
@@ -137,18 +138,18 @@ ActionHandle ActionImportLayer::Create( const LayerImporterHandle& importer,
   action->importer_.value() = importer->name();
   
   // Post the new action
-  return ActionHandle( action );
+  return Core::ActionHandle( action );
 }
 
 void ActionImportLayer::Dispatch( const std::string& filename, const std::string& mode,
   const std::string importer )
 {
-  Interface::PostAction( Create( filename, mode, importer ) );
+  Core::Interface::PostAction( Create( filename, mode, importer ) );
 }
 
 void ActionImportLayer::Dispatch( const LayerImporterHandle& importer, LayerImporterMode mode )
 {
-  Interface::PostAction( Create( importer, mode ) );
+  Core::Interface::PostAction( Create( importer, mode ) );
 }
   
 } // end namespace Seg3D

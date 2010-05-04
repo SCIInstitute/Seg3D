@@ -85,13 +85,13 @@ private:
   QIcon mask_layer_icon_;
   
   std::string layer_id_;
-  Utils::GridTransform grid_transform_;
+  Core::GridTransform grid_transform_;
   bool active_;
   bool picked_up_;
   bool group_menus_open_;
   bool layer_menus_open_;
   
-  Utils::VolumeType volume_type_;
+  Core::VolumeType volume_type_;
   
   LayerWidget* drop_layer_;
 

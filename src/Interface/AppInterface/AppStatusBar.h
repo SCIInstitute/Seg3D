@@ -40,17 +40,19 @@
 // QT includes
 #include <QtGui>
 
-// Application includes
-#include <Application/Interface/StatusBar.h>
+// Interface includes
 #include <Interface/AppInterface/MessageHistoryWidget.h>
-#include <Utils/Core/ConnectionHandler.h>
+
+// Core includes
+#include <Core/Utils/ConnectionHandler.h>
+#include <Core/Interface/StatusBar.h>
 
 namespace Seg3D
 {
 
 class AppStatusBarPrivate;
 
-class AppStatusBar : public QObject, private Utils::ConnectionHandler
+class AppStatusBar : public QObject, private Core::ConnectionHandler
 {
 Q_OBJECT
 
@@ -68,7 +70,7 @@ private Q_SLOTS:
 private:
   MessageHistoryWidget* history_widget_;
   bool show_world_coord_;
-  void update_data_point_info( DataPointInfoHandle data_point );
+  void update_data_point_info( Core::DataPointInfoHandle data_point );
   void update_data_point_label();
   void set_message( int msg_type, std::string message );
 
@@ -76,7 +78,7 @@ private:
   QStatusBar* statusbar_;
   QWidget *statusbar_widget_;
   boost::shared_ptr< AppStatusBarPrivate > private_;
-  DataPointInfo data_point_info_;
+  Core::DataPointInfo data_point_info_;
 
 private Q_SLOTS:
   void fix_icon_status();

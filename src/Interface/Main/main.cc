@@ -34,14 +34,12 @@
 #include <Seg3DConfiguration.h>
 
 // Core includes
-#include <Utils/Core/Log.h>
-#include <Utils/Core/LogHistory.h>
-
-// Application includes
-#include <Application/Application/Application.h>
-#include <Application/Interface/Interface.h>
-#include <Application/Action/ActionHistory.h>
-#include <Application/Action/ActionSocket.h>
+#include <Core/Utils/Log.h>
+#include <Core/Utils/LogHistory.h>
+#include <Core/Application/Application.h>
+#include <Core/Interface/Interface.h>
+#include <Core/Action/ActionHistory.h>
+#include <Core/Action/ActionSocket.h>
 
 // Interface includes
 #include <Interface/QtInterface/QtApplication.h>
@@ -77,7 +75,7 @@ int main( int argc, char **argv )
 
   // -- Setup error logging --
   // stream error to the console window
-  Utils::LogStreamer error_log( Utils::LogMessageType::ALL_E, &( std::cerr ) );
+  Core::LogStreamer error_log( Core::LogMessageType::ALL_E, &( std::cerr ) );
 
   // -- Startup Seg3D --
   SCI_LOG_MESSAGE(std::string("--- Starting Seg3D ")+SEG3D_VERSION+" "+
@@ -85,22 +83,22 @@ int main( int argc, char **argv )
 
   // -- Setup action history --
   SCI_LOG_DEBUG("Setup action history");
-  Seg3D::ActionHistory::Instance()->set_max_history_size( 300 );
+  Core::ActionHistory::Instance()->set_max_history_size( 300 );
 
   // -- Parse the command line parameters and put them in a stl::map --
-  Seg3D::Application::Instance()->parse_command_line_parameters( argc, argv );
+  Core::Application::Instance()->parse_command_line_parameters( argc, argv );
 
   // -- Checking for the socket parameter --
   std::string port_number_string;
-  if ( Application::Instance()->check_command_line_parameter( "socket", port_number_string ) )
+  if ( Core::Application::Instance()->check_command_line_parameter( "socket", port_number_string ) )
   {
     int port_number;
-    if ( Utils::FromString( port_number_string, port_number) )
+    if ( Core::FromString( port_number_string, port_number) )
     {
       // -- Add a socket for receiving actions --
       SCI_LOG_DEBUG( std::string("Starting a socket on port: ") + 
-        Utils::ToString( port_number ) );
-      ActionSocket::Instance()->start( port_number );
+        Core::ToString( port_number ) );
+      Core::ActionSocket::Instance()->start( port_number );
     }
   }
   
@@ -144,7 +142,7 @@ int main( int argc, char **argv )
     }
 
   }
-  catch ( Utils::Exception& except )
+  catch ( Core::Exception& except )
   {
     // Catch any Seg3D generated exceptions and display there message in the log file
     SCI_LOG_ERROR(std::string("Setup of the interface crashed by throwing an exception: ") + except.message());

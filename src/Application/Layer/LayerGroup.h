@@ -42,15 +42,15 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/thread/mutex.hpp>
 
-// Utils includes
-//#include <Utils/Geometry/GridTransform.h>
+// Core includes
+//#include <Core/Geometry/GridTransform.h>
 
 // Application includes
-#include <Application/Application/Application.h>
-#include <Application/Interface/Interface.h>
+#include <Core/Application/Application.h>
+#include <Core/Interface/Interface.h>
 
-#include <Application/Action/Action.h>
-#include <Application/State/State.h>
+#include <Core/Action/Action.h>
+#include <Core/State/State.h>
 
 #include <Application/Layer/Layer.h>
 
@@ -64,13 +64,13 @@ namespace Seg3D
 
 
 // Class definition
-class LayerGroup : public StateHandler
+class LayerGroup : public Core::StateHandler
 {
 
   // -- constructor/destructor --
 public:
 
-  LayerGroup( Utils::GridTransform grid_transform );
+  LayerGroup( Core::GridTransform grid_transform );
   virtual ~LayerGroup();
 
   // -- state variables --
@@ -78,41 +78,41 @@ public:
 
   // This mode records whether the state of the group is being modified
   // and how: NONE, TRANSFORM, CROP, RESAMPLE
-  StateOptionHandle edit_mode_state_;
+  Core::StateOptionHandle edit_mode_state_;
 
   // = Transformation menu state variables =
 
   // Origin where the center of the dataset should
-  StateDoubleHandle transform_origin_x_state_;
-  StateDoubleHandle transform_origin_y_state_;
-  StateDoubleHandle transform_origin_z_state_;
+  Core::StateDoubleHandle transform_origin_x_state_;
+  Core::StateDoubleHandle transform_origin_y_state_;
+  Core::StateDoubleHandle transform_origin_z_state_;
 
   // The new Size information
-  StateDoubleHandle transform_spacing_x_state_;
-  StateDoubleHandle transform_spacing_y_state_;
-  StateDoubleHandle transform_spacing_z_state_;
+  Core::StateDoubleHandle transform_spacing_x_state_;
+  Core::StateDoubleHandle transform_spacing_y_state_;
+  Core::StateDoubleHandle transform_spacing_z_state_;
 
-  StateBoolHandle transform_replace_state_;
+  Core::StateBoolHandle transform_replace_state_;
 
   // = Crop menu state variables =
-  StateRangedDoubleHandle crop_center_x_state_;
-  StateRangedDoubleHandle crop_center_y_state_;
-  StateRangedDoubleHandle crop_center_z_state_;
+  Core::StateRangedDoubleHandle crop_center_x_state_;
+  Core::StateRangedDoubleHandle crop_center_y_state_;
+  Core::StateRangedDoubleHandle crop_center_z_state_;
   
-  StateRangedDoubleHandle crop_size_width_state_;
-  StateRangedDoubleHandle crop_size_height_state_;
-  StateRangedDoubleHandle crop_size_depth_state_;
+  Core::StateRangedDoubleHandle crop_size_width_state_;
+  Core::StateRangedDoubleHandle crop_size_height_state_;
+  Core::StateRangedDoubleHandle crop_size_depth_state_;
 
-  StateBoolHandle crop_replace_state_;
+  Core::StateBoolHandle crop_replace_state_;
 
   // = Resample state variables =
-  StateRangedDoubleHandle resample_factor_state_;
-  StateBoolHandle resample_replace_state_;
+  Core::StateRangedDoubleHandle resample_factor_state_;
+  Core::StateBoolHandle resample_replace_state_;
 
   // = Group visibility =
 
-  StateBoolHandle visibility_state_;
-  StateBoolHandle show_layers_state_;
+  Core::StateBoolHandle visibility_state_;
+  Core::StateBoolHandle show_layers_state_;
 
 
 
@@ -164,7 +164,7 @@ protected:
 public:
   // GRID_TRANSFORM
   // Get the transform of the layer
-  Utils::GridTransform get_grid_transform() 
+  Core::GridTransform get_grid_transform() 
   {
     return grid_transform_;
   }
@@ -192,7 +192,7 @@ public:
 private:
   
   // The transformation that describes the grid dimensions and the spacing
-  Utils::GridTransform grid_transform_;
+  Core::GridTransform grid_transform_;
   
   // The list that contains the layers that are stored in this class
   layer_list_type layer_list_;

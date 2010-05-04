@@ -28,8 +28,8 @@
 
 
 //Core Includes - for logging
-#include <Utils/Core/Log.h>
-#include <Utils/Math/MathFunctions.h>
+#include <Core/Utils/Log.h>
+#include <Core/Math/MathFunctions.h>
 
 #include <Interface/ToolInterface/CustomWidgets/SliderDoubleCombo.h>
 #include "ui_SliderDoubleCombo.h"
@@ -74,7 +74,7 @@ SliderDoubleCombo::~SliderDoubleCombo()
 void SliderDoubleCombo::spinner_signal( double value )
 {   
     this->private_->ui_.horizontalSlider->blockSignals( true );
-    int int_version = Utils::Round( value ) * 100;
+    int int_version = Core::Round( value ) * 100;
     this->private_->ui_.horizontalSlider->setValue( int_version );
     Q_EMIT valueAdjusted( value );
   this->private_->ui_.horizontalSlider->blockSignals( false );

@@ -52,12 +52,12 @@ class LabelLayer : public Layer
   // -- constructor/destructor --
 public:
 
-  LabelLayer( const std::string& name, const Utils::VolumeHandle& volume );
+  LabelLayer( const std::string& name, const Core::VolumeHandle& volume );
   virtual ~LabelLayer();
 
-  virtual Utils::VolumeType type() const { return Utils::VolumeType::LABEL_E; }
+  virtual Core::VolumeType type() const { return Core::VolumeType::LABEL_E; }
   
-  virtual const Utils::GridTransform& get_grid_transform() const = 0;
+  virtual const Core::GridTransform& get_grid_transform() const = 0;
 
 public:
 

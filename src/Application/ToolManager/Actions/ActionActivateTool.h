@@ -29,13 +29,13 @@
 #ifndef APPLICATION_TOOL_ACTIONS_ACTIONACTIVATETOOL_H
 #define APPLICATION_TOOL_ACTIONS_ACTIONACTIVATETOOL_H
 
-#include <Application/Action/Actions.h>
-#include <Application/Interface/Interface.h>
+#include <Core/Action/Actions.h>
+#include <Core/Interface/Interface.h>
 
 namespace Seg3D
 {
 
-class ActionActivateTool : public Action
+class ActionActivateTool : public Core::Action
 {
   CORE_ACTION( "ActivateTool", "ActivateTool <toolid>" );
 
@@ -52,14 +52,14 @@ public:
 
   // -- Functions that describe action --
 public:
-  virtual bool validate( ActionContextHandle& context );
-  virtual bool run( ActionContextHandle& context, ActionResultHandle& result );
+  virtual bool validate( Core::ActionContextHandle& context );
+  virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
 
   // -- Dispatch this action from the interface --
 public:
   // CREATE
   // Create action that activates a tool
-  static ActionHandle Create( const std::string& toolid );
+  static Core::ActionHandle Create( const std::string& toolid );
 
   // DISPATCH
   // Create and dispatch action that activates a tool
@@ -67,7 +67,7 @@ public:
 
   // -- Action parameters --
 private:
-  ActionParameter< std::string > toolid_;
+  Core::ActionParameter< std::string > toolid_;
 };
 
 } // end namespace Seg3D

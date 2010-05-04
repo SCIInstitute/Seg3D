@@ -28,7 +28,7 @@
 #include <sstream>
 #include <iostream>
 
-#include <Utils/Core/Log.h>
+#include <Core/Utils/Log.h>
 
 #include <Interface/AppInterface/HistoryDockWidget.h>
 #include "ui_HistoryDockWidget.h"

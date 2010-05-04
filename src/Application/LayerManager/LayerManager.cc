@@ -33,12 +33,12 @@
 #include <boost/lexical_cast.hpp>
 
 // Volume includes
-#include <Utils/Volume/Volume.h>
+#include <Core/Volume/Volume.h>
 
 // Application includes
 #include <Application/LayerManager/LayerManager.h>
-#include <Application/Application/Application.h>
-#include <Application/Interface/Interface.h>
+#include <Core/Application/Application.h>
+#include <Core/Interface/Interface.h>
 #include <Application/Layer/MaskLayer.h>
 #include <Application/Layer/DataLayer.h>
 
@@ -99,7 +99,7 @@ bool LayerManager::insert_layer( LayerHandle layer )
       active_layer_changed = true;
       
     }
-    if( layer->type() == Utils::VolumeType::DATA_E )
+    if( layer->type() == Core::VolumeType::DATA_E )
       group_handle->insert_layer_front( layer );
     else 
       group_handle->insert_layer_back( layer );
@@ -425,7 +425,7 @@ Seg3D::LayerHandle LayerManager::get_active_layer()
 
 LayerManager::mutex_type& LayerManager::get_mutex()
 {
-  return StateEngine::GetMutex();
+  return Core::StateEngine::GetMutex();
 }
   
 LayerSceneHandle LayerManager::compose_layer_scene( size_t viewer_id )
@@ -458,7 +458,7 @@ LayerSceneHandle LayerManager::compose_layer_scene( size_t viewer_id )
 
       switch( layer->type() )
       {
-      case Utils::VolumeType::DATA_E:
+      case Core::VolumeType::DATA_E:
         {
           DataLayer* data_layer = dynamic_cast< DataLayer* >( layer.get() );
           DataLayerSceneItem* data_layer_scene_item = new DataLayerSceneItem;
@@ -469,7 +469,7 @@ LayerSceneHandle LayerManager::compose_layer_scene( size_t viewer_id )
           data_layer_scene_item->volume_rendered_ = data_layer->volume_rendered_state_->get();
         }
         break;
-      case Utils::VolumeType::MASK_E:
+      case Core::VolumeType::MASK_E:
         {
           MaskLayer* mask_layer = dynamic_cast< MaskLayer* >( layer.get() );
           MaskLayerSceneItem* mask_layer_scene_item = new MaskLayerSceneItem;

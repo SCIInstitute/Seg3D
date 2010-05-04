@@ -42,9 +42,9 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
 
-// Utils includes
-#include <Utils/Core/StringUtil.h>
-#include <Utils/Core/Singleton.h>
+// Core includes
+#include <Core/Utils/StringUtil.h>
+#include <Core/Utils/Singleton.h>
 
 // Application includes
 #include <Application/Tool/Tool.h>
@@ -219,7 +219,7 @@ void register_tool()
   lock_type lock( mutex_ );
 
   // Get the type of the tool
-  std::string tool_type = Utils::StringToLower( TOOL::Type() );
+  std::string tool_type = Core::StringToLower( TOOL::Type() );
 
   // Test is tool was registered before.
   if ( tools_.find( tool_type ) != tools_.end() )

@@ -29,9 +29,9 @@
 // Qt includes
 #include <QMessageBox>
 
-// Utils includes
-#include <Utils/Core/Exception.h>
-#include <Utils/Core/Log.h>
+// Core includes
+#include <Core/Utils/Exception.h>
+#include <Core/Utils/Log.h>
 
 // Interface includes
 #include <Interface/QtInterface/QtEventHandler.h>
@@ -89,7 +89,7 @@ QtEventHandlerContext::~QtEventHandlerContext()
 {
 }
 
-void QtEventHandlerContext::post_event( Utils::EventHandle& event )
+void QtEventHandlerContext::post_event( Core::EventHandle& event )
 {
   if ( !QCoreApplication::closingDown() )
   {
@@ -105,10 +105,10 @@ void QtEventHandlerContext::post_event( Utils::EventHandle& event )
   }
 }
 
-void QtEventHandlerContext::post_and_wait_event( Utils::EventHandle& event )
+void QtEventHandlerContext::post_and_wait_event( Core::EventHandle& event )
 {
   // Need a synchronization class to confirm the event is done
-  Utils::EventSyncHandle sync = Utils::EventSyncHandle( new Utils::EventSync );
+  Core::EventSyncHandle sync = Core::EventSyncHandle( new Core::EventSync );
 
   // Add event to event class so the responder is doing the other part
   // of the synchronization
@@ -143,7 +143,7 @@ bool QtEventHandlerContext::process_events()
   {
     try
     {
-      Utils::EventHandle event = this->events_.front();
+      Core::EventHandle event = this->events_.front();
       this->events_.pop();
       // NOTE: It's important to unlock before handling the event, 
       // otherwise deadlock might happen.
@@ -151,7 +151,7 @@ bool QtEventHandlerContext::process_events()
       event->handle_event();
       lock.lock();
     }
-    catch ( Utils::Exception& except )
+    catch ( Core::Exception& except )
     {
       // Catch any Seg3D generated exceptions and display there message in the log file
       std::string error_message = 
@@ -196,7 +196,7 @@ bool QtEventHandlerContext::wait_and_process_events()
   SCI_THROW_LOGICERROR("Cannot wait on the Qt thread");
 }
 
-bool QtEventHandlerContext::start_eventhandler( Utils::EventHandler* eventhandler )
+bool QtEventHandlerContext::start_eventhandler( Core::EventHandler* eventhandler )
 {
   // Allow Qt to intercept the actions in its main event loop 
   new QtEventHandlerObject( this->qapplication_, this );

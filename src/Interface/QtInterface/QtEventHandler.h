@@ -40,9 +40,9 @@
 #include <QtGui>
 
 // Includes from application layer
-#include <Utils/EventHandler/EventHandlerContext.h>
-#include <Utils/EventHandler/EventHandler.h>
-#include <Utils/EventHandler/Event.h>
+#include <Core/EventHandler/EventHandlerContext.h>
+#include <Core/EventHandler/EventHandler.h>
+#include <Core/EventHandler/Event.h>
 
 // Boost includes
 #include <boost/shared_ptr.hpp>
@@ -93,7 +93,7 @@ private:
 // object, so there is a clean interface between Interface and Application
 // layer.
 
-class QtEventHandlerContext : public Utils::EventHandlerContext
+class QtEventHandlerContext : public Core::EventHandlerContext
 {
 
 public:
@@ -106,14 +106,14 @@ public:
   // Post an event onto the event handler stack. This one
   // returns immediately after posting the event, and does
   // not wait for the process to finish the event.
-  virtual void post_event( Utils::EventHandle& event );
+  virtual void post_event( Core::EventHandle& event );
 
   // POST_AND_WAIT_EVENT:
   // Post an event onto the event handler stack. This one
   // returns after the thread signals that the event has been
   // executed. The function does the full hand shaking for
   // the synchronization.
-  virtual void post_and_wait_event( Utils::EventHandle& event );
+  virtual void post_and_wait_event( Core::EventHandle& event );
 
   // PROCESS_EVENT:
   // process the events that are queued in the event handler stack.
@@ -131,7 +131,7 @@ public:
 
   // START_EVENTHANDLER:
   // Start the eventhandler thread and start processing events
-  virtual bool start_eventhandler( Utils::EventHandler* eventhandler );
+  virtual bool start_eventhandler( Core::EventHandler* eventhandler );
 
   // TERMINATE_EVENTHANDLER:
   // Terminate the eventhandler
@@ -149,7 +149,7 @@ private:
   boost::thread::id interface_thread_id_;
 
   // Event queue
-  std::queue< Utils::EventHandle > events_;
+  std::queue< Core::EventHandle > events_;
 
   // Mutex for protecting the event queue
   typedef boost::recursive_mutex mutex_type;

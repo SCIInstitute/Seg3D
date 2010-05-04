@@ -33,8 +33,8 @@
 #include <boost/lexical_cast.hpp>
 
 // Application includes
-#include <Application/Application/Application.h>
-#include <Application/Interface/Interface.h>
+#include <Core/Application/Application.h>
+#include <Core/Interface/Interface.h>
 
 // Interface includes
 #include <Interface/QtInterface/QtApplication.h>
@@ -94,20 +94,20 @@ AppInterface::AppInterface()
   this->add_connection( InterfaceManager::Instance()->close_window_signal_.connect( 
     boost::bind( &AppInterface::HandleCloseWindow, qpointer_type( this ), _1 ) ) );
 
-  this->add_connection( ActionDispatcher::Instance()->begin_progress_signal_.connect( 
+  this->add_connection( Core::ActionDispatcher::Instance()->begin_progress_signal_.connect( 
     boost::bind( &AppInterface::HandleBeginProgress, qpointer_type( this ), _1 ) ) );
 
-  this->add_connection( ActionDispatcher::Instance()->end_progress_signal_.connect( 
+  this->add_connection( Core::ActionDispatcher::Instance()->end_progress_signal_.connect( 
     boost::bind( &AppInterface::HandleEndProgress, qpointer_type( this ), _1 ) ) );
 
-  this->add_connection( ActionDispatcher::Instance()->report_progress_signal_.connect( 
+  this->add_connection( Core::ActionDispatcher::Instance()->report_progress_signal_.connect( 
     boost::bind( &AppInterface::HandleReportProgress, qpointer_type( this ), _1 ) ) );
 
   // NOTE: Connect state and reflect the current state (needs to be atomic, hence the lock)
   {
     // NOTE: State Engine is locked so the application thread cannot make
     // any changes to it
-    StateEngine::lock_type lock( StateEngine::GetMutex() );
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
 
     // Connect and update full screen state
     set_full_screen( InterfaceManager::Instance()->full_screen_state_->get() );
@@ -241,7 +241,7 @@ void AppInterface::add_windowids()
 
 void AppInterface::show_window( const std::string& windowid )
 {
-  std::string lower_windowid = Utils::StringToLower( windowid );
+  std::string lower_windowid = Core::StringToLower( windowid );
   if( lower_windowid == "controller" )
   {
     if( this->controller_interface_.isNull() )
@@ -329,7 +329,7 @@ void AppInterface::show_window( const std::string& windowid )
 
 void AppInterface::close_window( const std::string& windowid )
 {
-  std::string lower_windowid = Utils::StringToLower( windowid );
+  std::string lower_windowid = Core::StringToLower( windowid );
   if( lower_windowid == "controller" )
   {
     if( !( this->controller_interface_.isNull() ) )
@@ -359,7 +359,7 @@ void AppInterface::close_window( const std::string& windowid )
   }
 }
 
-void AppInterface::begin_progress( ActionProgressHandle handle )
+void AppInterface::begin_progress( Core::ActionProgressHandle handle )
 {
 
   // Step (1): delete any out standing progress messages
@@ -373,7 +373,7 @@ void AppInterface::begin_progress( ActionProgressHandle handle )
   this->progress_->exec();
 }
 
-void AppInterface::end_progress( ActionProgressHandle handle )
+void AppInterface::end_progress( Core::ActionProgressHandle handle )
 {
   SCI_LOG_DEBUG( "Finish progress widget" );
 
@@ -383,7 +383,7 @@ void AppInterface::end_progress( ActionProgressHandle handle )
   }
 }
 
-void AppInterface::report_progress( ActionProgressHandle handle )
+void AppInterface::report_progress( Core::ActionProgressHandle handle )
 {
   if( this->progress_.data() ) progress_->update_progress();
 }
@@ -408,37 +408,37 @@ void AppInterface::addDockWidget( Qt::DockWidgetArea area, QDockWidget* dock_wid
 
 void AppInterface::HandleShowWindow( qpointer_type qpointer, std::string windowid )
 {
-  Interface::PostEvent( CheckQtPointer( qpointer, boost::bind( &AppInterface::show_window,
-      qpointer.data(), windowid ) ) );
+  Core::Interface::PostEvent( CheckQtPointer( qpointer, 
+    boost::bind( &AppInterface::show_window, qpointer.data(), windowid ) ) );
 }
 
 void AppInterface::HandleCloseWindow( qpointer_type qpointer, std::string windowid )
 {
-  Interface::PostEvent( CheckQtPointer( qpointer, boost::bind( &AppInterface::close_window,
-      qpointer.data(), windowid ) ) );
+  Core::Interface::PostEvent( CheckQtPointer( qpointer, 
+    boost::bind( &AppInterface::close_window, qpointer.data(), windowid ) ) );
 }
 
-void AppInterface::HandleBeginProgress( qpointer_type qpointer, ActionProgressHandle handle )
+void AppInterface::HandleBeginProgress( qpointer_type qpointer, Core::ActionProgressHandle handle )
 {
-  Interface::PostEvent( CheckQtPointer( qpointer, boost::bind( &AppInterface::begin_progress,
-      qpointer.data(), handle ) ) );
+  Core::Interface::PostEvent( CheckQtPointer( qpointer, 
+    boost::bind( &AppInterface::begin_progress, qpointer.data(), handle ) ) );
 }
 
-void AppInterface::HandleEndProgress( qpointer_type qpointer, ActionProgressHandle handle )
+void AppInterface::HandleEndProgress( qpointer_type qpointer, Core::ActionProgressHandle handle )
 {
-  Interface::PostEvent( CheckQtPointer( qpointer, boost::bind( &AppInterface::end_progress,
-      qpointer.data(), handle ) ) );
+  Core::Interface::PostEvent( CheckQtPointer( qpointer, 
+    boost::bind( &AppInterface::end_progress, qpointer.data(), handle ) ) );
 }
 
-void AppInterface::HandleReportProgress( qpointer_type qpointer, ActionProgressHandle handle )
+void AppInterface::HandleReportProgress( qpointer_type qpointer, Core::ActionProgressHandle handle )
 {
-  Interface::PostEvent( CheckQtPointer( qpointer, boost::bind( &AppInterface::report_progress,
-      qpointer.data(), handle ) ) );
+  Core::Interface::PostEvent( CheckQtPointer( qpointer, 
+    boost::bind( &AppInterface::report_progress, qpointer.data(), handle ) ) );
 }
 
-void AppInterface::SetFullScreen( qpointer_type qpointer, bool full_screen, ActionSource source )
+void AppInterface::SetFullScreen( qpointer_type qpointer, bool full_screen, Core::ActionSource source )
 {
-  Interface::PostEvent( CheckQtPointer( qpointer, boost::bind(
+  Core::Interface::PostEvent( CheckQtPointer( qpointer, boost::bind(
       &AppInterface::set_full_screen, qpointer.data(), full_screen ) ) );
 }
 

@@ -28,14 +28,14 @@
 
 #include <Application/Renderer/SliceShader.h>
 
-#include <Utils/Core/Log.h>
+#include <Core/Utils/Log.h>
 
 namespace Seg3D
 {
 
 const char* SliceShader::FRAG_SHADER_SOURCE_C[] =
 {
-#include <Application/Renderer/SliceShaderFrag>
+#include "SliceShaderFrag"
 };
 
 SliceShader::SliceShader() :
@@ -49,7 +49,7 @@ SliceShader::~SliceShader()
 
 bool SliceShader::initialize()
 {
-  this->glsl_frag_shader_ = Utils::GLSLShaderHandle( new Utils::GLSLFragmentShader );
+  this->glsl_frag_shader_ = Core::GLSLShaderHandle( new Core::GLSLFragmentShader );
   this->glsl_frag_shader_->set_source( sizeof( FRAG_SHADER_SOURCE_C ) / sizeof( char* ),
     FRAG_SHADER_SOURCE_C );
   if ( !this->glsl_frag_shader_->compile() )
@@ -60,7 +60,7 @@ bool SliceShader::initialize()
     return false;
   }
 
-  this->glsl_prog_ = Utils::GLSLProgramHandle( new Utils::GLSLProgram );
+  this->glsl_prog_ = Core::GLSLProgramHandle( new Core::GLSLProgram );
   this->glsl_prog_->attach_shader( this->glsl_frag_shader_ );
   if ( !this->glsl_prog_->link() )
   {

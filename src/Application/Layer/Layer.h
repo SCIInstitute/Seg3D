@@ -42,13 +42,13 @@
 #include <boost/thread/mutex.hpp>
 
 // Volume includes
-#include <Utils/Volume/Volume.h>
+#include <Core/Action/Action.h>
+#include <Core/Application/Application.h>
+#include <Core/Interface/Interface.h>
+#include <Core/Volume/Volume.h>
 
 // Application includes
-#include <Application/Application/Application.h>
-#include <Application/Interface/Interface.h>
-#include <Application/Action/Action.h>
-#include <Application/State/State.h>
+#include <Core/State/State.h>
 
 
 namespace Seg3D
@@ -71,7 +71,7 @@ typedef std::list< LayerHandle > layer_list_type;
 
 
 // Class definition
-class Layer : public StateHandler
+class Layer : public Core::StateHandler
 {
 
   // -- constructor/destructor --
@@ -85,45 +85,45 @@ public:
 
   // TYPE
   // Get the type of the layer
-  virtual Utils::VolumeType type() const = 0;
+  virtual Core::VolumeType type() const = 0;
 
   // GRID_TRANSFORM
   // Get the transform of the layer
-  virtual const Utils::GridTransform& get_grid_transform() const = 0;
+  virtual const Core::GridTransform& get_grid_transform() const = 0;
   
   // -- State variables --
 public:
   
   // The name of the layer
-  StateAliasHandle name_state_;
+  Core::StateAliasHandle name_state_;
 
   // Per viewer state of whether this layer is visible
-  std::vector< StateBoolHandle > visible_state_;
+  std::vector< Core::StateBoolHandle > visible_state_;
 
   // State indicating whether the layer is locked
-  StateBoolHandle lock_state_;
+  Core::StateBoolHandle lock_state_;
 
   // State that describes the opacity with which the layer is displayed
-  StateRangedDoubleHandle opacity_state_;
+  Core::StateRangedDoubleHandle opacity_state_;
 
   // State of the checkbox that records which layer needs to be processed in
   // the group
-  StateBoolHandle selected_state_;
+  Core::StateBoolHandle selected_state_;
 
   // State that describes which menu is currently shown
-  StateOptionHandle edit_mode_state_;
+  Core::StateOptionHandle edit_mode_state_;
   
   // State that describes which fill mode is active
-  StateOptionHandle fill_mode_state_;
+  Core::StateOptionHandle fill_mode_state_;
   
   // State that describes which border mode is active
-  StateOptionHandle border_mode_state_;
+  Core::StateOptionHandle border_mode_state_;
 
   // -- Locking system --
 public:
   // This code just aligns the layer locking with the StateEngine locking
-  typedef StateEngine::mutex_type mutex_type;
-  typedef StateEngine::lock_type lock_type;
+  typedef Core::StateEngine::mutex_type mutex_type;
+  typedef Core::StateEngine::lock_type lock_type;
 
 
   LayerGroupHandle get_layer_group() 
@@ -167,7 +167,7 @@ public:
   // Get the mutex of the state engine
   static mutex_type& GetMutex()
   {
-    return StateEngine::GetMutex();
+    return Core::StateEngine::GetMutex();
   }
   
 };

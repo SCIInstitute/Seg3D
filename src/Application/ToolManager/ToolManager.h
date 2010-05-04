@@ -43,11 +43,11 @@
 #include <boost/utility.hpp>
 
 // Core includes
-#include <Utils/Core/Log.h>
-#include <Utils/Core/Exception.h>
+#include <Core/Utils/Log.h>
+#include <Core/Utils/Exception.h>
 
 // Application includes
-#include <Application/State/StateHandler.h>
+#include <Core/State/StateHandler.h>
 
 namespace Seg3D
 {
@@ -62,7 +62,7 @@ typedef boost::shared_ptr< Tool > ToolHandle;
 class ToolManager;
 
 // Class definition
-class ToolManager : public StateHandler
+class ToolManager : public Core::StateHandler
 {
   CORE_SINGLETON( ToolManager );
   

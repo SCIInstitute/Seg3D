@@ -64,13 +64,13 @@ private:
   // -- state --
 public:
   // Layerid of the target layer
-  StateStringHandle target_layer_state_;
+  Core::StateStringHandle target_layer_state_;
 
   // Upper threshold for painting
-  StateRangedDoubleHandle upper_threshold_state_;
+  Core::StateRangedDoubleHandle upper_threshold_state_;
 
   // Lower threshold for painting
-  StateRangedDoubleHandle lower_threshold_state_;
+  Core::StateRangedDoubleHandle lower_threshold_state_;
 
   // Seed Points
   // StateVector<Point>            seed_points_state_;

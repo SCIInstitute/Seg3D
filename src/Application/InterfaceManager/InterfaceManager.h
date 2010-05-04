@@ -44,11 +44,11 @@
 #include <boost/utility.hpp>
 
 // Core includes
-#include <Utils/Core/Log.h>
-#include <Utils/Core/Exception.h>
+#include <Core/Utils/Log.h>
+#include <Core/Utils/Exception.h>
 
 // Application includes
-#include <Application/State/StateHandler.h>
+#include <Core/State/StateHandler.h>
 
 namespace Seg3D
 {
@@ -60,7 +60,7 @@ namespace Seg3D
 class InterfaceManager;
 
 // Class Definition
-class InterfaceManager : public StateHandler
+class InterfaceManager : public Core::StateHandler
 {
   CORE_SINGLETON( InterfaceManager );
 
@@ -72,7 +72,7 @@ private:
   // -- state variables of interface --
 public:
   // Whether the view is in full screen mode
-  StateBoolHandle full_screen_state_;
+  Core::StateBoolHandle full_screen_state_;
 
   // -- Signals --
 public:

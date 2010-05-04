@@ -30,17 +30,17 @@
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/Filters/Actions/ActionIntensityCorrection.h>
 
-namespace Seg3D
-{
-  
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
-CORE_REGISTER_ACTION( IntensityCorrection );
+CORE_REGISTER_ACTION( Seg3D, IntensityCorrection )
 
-bool ActionIntensityCorrection::validate( ActionContextHandle& context )
+namespace Seg3D
 {
-  if( !( StateEngine::Instance()->is_statealias( this->layer_alias_ ) ) )
+  
+bool ActionIntensityCorrection::validate( Core::ActionContextHandle& context )
+{
+  if( !( Core::StateEngine::Instance()->is_statealias( this->layer_alias_ ) ) )
   {
     context->report_error( std::string( "LayerID '" ) + this->layer_alias_ + "' is invalid" );
     return false;
@@ -56,9 +56,9 @@ bool ActionIntensityCorrection::validate( ActionContextHandle& context )
   return true;
 }
 
-bool ActionIntensityCorrection::run( ActionContextHandle& context, ActionResultHandle& result )
+bool ActionIntensityCorrection::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
-  if( StateEngine::Instance()->is_statealias( this->layer_alias_ ) )
+  if( Core::StateEngine::Instance()->is_statealias( this->layer_alias_ ) )
   {
     // TODO: run filter
     context->report_message( "The Intensity Correction Filter has been triggered "
@@ -79,7 +79,7 @@ void ActionIntensityCorrection::Dispatch( std::string layer_alias, int order,
   action->edge_ = edge;
   action->replace_ = replace;
   
-  Interface::PostAction( ActionHandle( action ) );
+  Core::Interface::PostAction( Core::ActionHandle( action ) );
 }
   
 } // end namespace Seg3D

@@ -29,8 +29,8 @@
 #ifndef INTERFACE_TOOLINTERFACE_PAINTTOOLINTERFACE_H
 #define INTERFACE_TOOLINTERFACE_PAINTTOOLINTERFACE_H
 
-// Utils includes
-#include <Utils/Core/Log.h>
+// Core includes
+#include <Core/Utils/Log.h>
 
 // Application includes
 #include <Application/Tool/ToolFactory.h>

@@ -98,11 +98,11 @@ ADD_LIBRARY(Interface_AppController STATIC
 
             
 TARGET_LINK_LIBRARIES(Interface_AppController
-                      Utils_Core
-                      Utils_EventHandler
-                      Application_Action
-                      Application_Interface
-                      Application_ActionManager
+                      Core_Utils
+                      Core_EventHandler
+                      Core_Action
+                      Core_Interface
+                      Core_ActionManager
                       Application_Tool
                       Application_Tools
                       Interface_QtInterface

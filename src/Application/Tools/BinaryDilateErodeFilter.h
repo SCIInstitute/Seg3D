@@ -59,13 +59,13 @@ private:
   // -- state --
 public:
   // Layerid of the target layer
-  StateStringHandle target_layer_state_;
+  Core::StateStringHandle target_layer_state_;
 
-  StateRangedIntHandle dilate_state_;
+  Core::StateRangedIntHandle dilate_state_;
 
-  StateRangedIntHandle erode_state_;
+  Core::StateRangedIntHandle erode_state_;
 
-  StateBoolHandle replace_state_;
+  Core::StateBoolHandle replace_state_;
 
 };
 

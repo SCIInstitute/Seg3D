@@ -35,7 +35,7 @@
 
 // Application includes
 #include <Application/Layer/Layer.h>
-#include <Utils/Volume/DataVolume.h>
+#include <Core/Volume/DataVolume.h>
 
 namespace Seg3D
 {
@@ -53,17 +53,17 @@ class DataLayer : public Layer
   // -- constructor/destructor --
 public:
 
-  DataLayer( const std::string& name, const Utils::DataVolumeHandle& volume );
+  DataLayer( const std::string& name, const Core::DataVolumeHandle& volume );
   virtual ~DataLayer();
 
-  virtual Utils::VolumeType type() const { return Utils::VolumeType::DATA_E; }
+  virtual Core::VolumeType type() const { return Core::VolumeType::DATA_E; }
 
-  virtual const Utils::GridTransform& get_grid_transform() const 
+  virtual const Core::GridTransform& get_grid_transform() const 
   { 
     return data_volume_->get_grid_transform(); 
   }
   
-  Utils::DataVolumeHandle get_data_volume()
+  Core::DataVolumeHandle get_data_volume()
   {
     return this->data_volume_;
   }
@@ -72,16 +72,16 @@ public:
 public:
 
   // State describing contrast
-  StateRangedDoubleHandle contrast_state_;
+  Core::StateRangedDoubleHandle contrast_state_;
 
   // State describing brightness
-  StateRangedDoubleHandle brightness_state_;
+  Core::StateRangedDoubleHandle brightness_state_;
 
   // State describing whether volume is volume rendered
-  StateBoolHandle volume_rendered_state_;
+  Core::StateBoolHandle volume_rendered_state_;
 
 private:
-  Utils::DataVolumeHandle data_volume_;
+  Core::DataVolumeHandle data_volume_;
 };
 
 } // end namespace Seg3D

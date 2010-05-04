@@ -61,9 +61,9 @@ private:
   // -- state --
 public:
   // Layerid of the target layer
-  StateStringHandle target_layer_state_;
+  Core::StateStringHandle target_layer_state_;
 
-  StateRangedIntHandle order_state_;
+  Core::StateRangedIntHandle order_state_;
 
 };
 

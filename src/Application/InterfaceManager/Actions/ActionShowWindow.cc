@@ -26,20 +26,19 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <Application/Interface/Interface.h>
+#include <Core/Interface/Interface.h>
 #include <Application/InterfaceManager/InterfaceManager.h>
 #include <Application/InterfaceManager/Actions/ActionShowWindow.h>
-
-namespace Seg3D
-{
 
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
-CORE_REGISTER_ACTION( ShowWindow );
-;
+CORE_REGISTER_ACTION( Seg3D, ShowWindow )
 
-bool ActionShowWindow::validate( ActionContextHandle& context )
+namespace Seg3D
+{
+
+bool ActionShowWindow::validate( Core::ActionContextHandle& context )
 {
   if ( !( InterfaceManager::Instance()->is_windowid( windowid_.value() ) ) )
   {
@@ -50,13 +49,13 @@ bool ActionShowWindow::validate( ActionContextHandle& context )
   return ( true ); // validated
 }
 
-bool ActionShowWindow::run( ActionContextHandle& context, ActionResultHandle& result )
+bool ActionShowWindow::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
   InterfaceManager::Instance()->show_window_signal_( windowid_.value() );
   return ( true ); // success
 }
 
-ActionHandle ActionShowWindow::Create( const std::string& windowid )
+Core::ActionHandle ActionShowWindow::Create( const std::string& windowid )
 {
   // Create new action
   ActionShowWindow* action = new ActionShowWindow;
@@ -65,13 +64,13 @@ ActionHandle ActionShowWindow::Create( const std::string& windowid )
   action->windowid_.value() = windowid;
 
   // Create action handle
-  return ActionHandle( action );
+  return Core::ActionHandle( action );
 }
 
 void ActionShowWindow::Dispatch( const std::string& windowid )
 {
   // Post the new action
-  Interface::PostAction( Create( windowid ) );
+  Core::Interface::PostAction( Create( windowid ) );
 }
 
 } // end namespace Seg3D

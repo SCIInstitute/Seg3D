@@ -60,14 +60,14 @@ private:
   // -- state --
 public:
   // Layerid of the target layer
-  StateStringHandle target_layer_state_;
+  Core::StateStringHandle target_layer_state_;
 
   // Variance
-  StateRangedDoubleHandle variance_state_;
+  Core::StateRangedDoubleHandle variance_state_;
 
-  StateRangedDoubleHandle maximum_kernel_width_state_;
+  Core::StateRangedDoubleHandle maximum_kernel_width_state_;
 
-  StateBoolHandle replace_state_;
+  Core::StateBoolHandle replace_state_;
 
 };
 

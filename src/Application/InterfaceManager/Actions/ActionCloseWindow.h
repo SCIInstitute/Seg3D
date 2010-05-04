@@ -29,12 +29,12 @@
 #ifndef APPLICATION_INTERFACEMANAGER_ACTIONS_ACTIONCLOSEWINDOW_H
 #define APPLICATION_INTERFACEMANAGER_ACTIONS_ACTIONCLOSEWINDOW_H
 
-#include <Application/Action/Actions.h>
+#include <Core/Action/Actions.h>
 
 namespace Seg3D
 {
 
-class ActionCloseWindow : public Action
+class ActionCloseWindow : public Core::Action
 {
   CORE_ACTION( "CloseWindow","CloseWindow <windowid>" );
 
@@ -50,19 +50,19 @@ public:
   }
 
   // -- Functions that describe action --
-  virtual bool validate( ActionContextHandle& context );
-  virtual bool run( ActionContextHandle& context, ActionResultHandle& result );
+  virtual bool validate( Core::ActionContextHandle& context );
+  virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
 
   // -- Action parameters --
 private:
-  ActionParameter< std::string > windowid_;
+  Core::ActionParameter< std::string > windowid_;
 
   // -- Dispatcher for the GUI --
 public:
 
   // CREATE:
   // Create the action
-  static ActionHandle Create( const std::string& windowid );
+  static Core::ActionHandle Create( const std::string& windowid );
 
   // DISPATCH:
   // Create the action and dispatch it

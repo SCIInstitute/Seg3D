@@ -87,10 +87,10 @@ ADD_LIBRARY(Interface_QtInterface STATIC
             
             
 TARGET_LINK_LIBRARIES(Interface_QtInterface 
-                      Utils_Core
-                      Utils_Converter
-                      Utils_EventHandler
-            Utils_Graphics
+                      Core_Utils
+                      Core_Converter
+                      Core_EventHandler
+            Core_Graphics
                       Application_Renderer
                       ${QT_LIBRARIES} 
                       ${SCI_GLEW_LIBRARY}

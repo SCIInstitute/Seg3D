@@ -36,10 +36,10 @@
 // QT includes
 #include <QtGui>
 
-// Application includes
+// Core includes
 // include all the headers associated with the action engine
-#include <Application/Action/Actions.h>
-#include <Application/Action/ActionHistory.h>
+#include <Core/Action/Actions.h>
+#include <Core/Action/ActionHistory.h>
 
 namespace Seg3D
 {
@@ -61,7 +61,7 @@ public:
 
 private:
   // Short cut to where the history is stored
-  ActionHistory* history_;
+  Core::ActionHistory* history_;
 };
 
 } // end namespace Seg3D

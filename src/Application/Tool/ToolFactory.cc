@@ -49,7 +49,7 @@ bool ToolFactory::is_tool_type( const std::string& tool_type )
 {
   lock_type lock( mutex_ );
 
-  tool_map_type::const_iterator it = tools_.find( Utils::StringToLower( tool_type ) );
+  tool_map_type::const_iterator it = tools_.find( Core::StringToLower( tool_type ) );
 
   if ( it == tools_.end() ) return false;
   return true;
@@ -120,7 +120,7 @@ bool ToolFactory::create_tool( const std::string& tool_type, const std::string& 
   lock_type lock( mutex_ );
 
   // Step (1): find the tool
-  tool_map_type::const_iterator it = tools_.find( Utils::StringToLower( tool_type ) );
+  tool_map_type::const_iterator it = tools_.find( Core::StringToLower( tool_type ) );
 
   // Step (2): check its existence
   if ( it == tools_.end() ) return false;

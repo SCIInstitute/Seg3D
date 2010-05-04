@@ -46,11 +46,11 @@ ADD_LIBRARY(Application_ViewerManager STATIC
             ${APPLICATION_VIEWMANAGER_ACTIONS_SRCS} )
             
 TARGET_LINK_LIBRARIES(Application_ViewerManager
-                      Utils_Core
-                      Application_Application
-                      Application_Interface
-                      Application_Action
-                      Application_State
+                      Core_Utils
+                      Core_Application
+                      Core_Interface
+                      Core_Action
+                      Core_State
                       Application_Viewer
                       ${SCI_BOOST_LIBRARY})
 

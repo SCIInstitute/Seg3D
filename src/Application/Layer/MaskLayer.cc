@@ -30,21 +30,21 @@
 
 // Boost includes 
 
-#include <Application/Application/Application.h>
-#include <Utils/Volume/MaskVolume.h>
+#include <Core/Application/Application.h>
+#include <Core/Volume/MaskVolume.h>
 #include <Application/Layer/MaskLayer.h>
 
 namespace Seg3D
 {
 
-MaskLayer::MaskLayer( const std::string& name, const Utils::MaskVolumeHandle& volume ) :
+MaskLayer::MaskLayer( const std::string& name, const Core::MaskVolumeHandle& volume ) :
   Layer( name ), mask_volume_( volume )
 {
   this->initialize_states();  
 }
 
-MaskLayer::MaskLayer( const std::string& name, const Utils::GridTransform& grid_transform ) :
-    Layer( name ), mask_volume_( new Utils::MaskVolume( grid_transform ) )
+MaskLayer::MaskLayer( const std::string& name, const Core::GridTransform& grid_transform ) :
+    Layer( name ), mask_volume_( new Core::MaskVolume( grid_transform ) )
 {
     this->initialize_states();
 }

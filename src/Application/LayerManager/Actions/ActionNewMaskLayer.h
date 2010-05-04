@@ -30,14 +30,14 @@
 #define APPLICATION_TOOL_ACTIONS_ACTIONNEWMASKLAYER_H
 
 
-#include <Application/Action/Actions.h>
-#include <Application/Interface/Interface.h>
+#include <Core/Action/Actions.h>
+#include <Core/Interface/Interface.h>
 #include <Application/Layer/LayerGroup.h>
 
 namespace Seg3D
 {
 
-class ActionNewMaskLayer : public Action
+class ActionNewMaskLayer : public Core::Action
 {
   CORE_ACTION( "NewMaskLayer", "<group_name>" );
   
@@ -55,21 +55,21 @@ public:
   
 // -- Functions that describe action --
 public:
-  virtual bool validate( ActionContextHandle& context );
-  virtual bool run( ActionContextHandle& context, ActionResultHandle& result );
+  virtual bool validate( Core::ActionContextHandle& context );
+  virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
   
 private:
-  ActionParameter< std::string > group_name_;
+  Core::ActionParameter< std::string > group_name_;
 
   // -- Dispatch this action from the interface --
 public:
   // CREATE:
   // Create action that moves the layer above
-  static ActionHandle Create( LayerGroupHandle group );
+  static Core::ActionHandle Create( LayerGroupHandle group );
   
   // CREATE:
   // Create action that moves the layer above
-  static ActionHandle Create( const std::string& group_name );
+  static Core::ActionHandle Create( const std::string& group_name );
   
   // DISPATCH
   // Dispatch action that creates a new mask layer 

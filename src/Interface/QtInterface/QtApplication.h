@@ -39,11 +39,9 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
 
-// Utils includes
-#include <Utils/Core/Singleton.h>
-
-// Application includes
-#include <Application/State/StateHandler.h>
+// Core includes
+#include <Core/Utils/Singleton.h>
+#include <Core/State/StateHandler.h>
 
 // Interface includes
 #include <Interface/QtInterface/QtRenderResources.h>

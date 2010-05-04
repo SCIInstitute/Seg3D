@@ -39,14 +39,14 @@ bool ITKLayerImporter::import_header()
   return false;
 }
 
-Utils::GridTransform ITKLayerImporter::get_grid_transform()
+Core::GridTransform ITKLayerImporter::get_grid_transform()
 {
-  return Utils::GridTransform(1,1,1);
+  return Core::GridTransform(1,1,1);
 }
 
-Utils::DataType ITKLayerImporter::get_data_type()
+Core::DataType ITKLayerImporter::get_data_type()
 {
-  return Utils::DataType::UNKNOWN_E;
+  return Core::DataType::UNKNOWN_E;
 }
 
 int ITKLayerImporter::get_importer_modes()

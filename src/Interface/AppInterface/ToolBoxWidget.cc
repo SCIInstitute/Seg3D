@@ -27,7 +27,7 @@
  */
 
 #include <Interface/AppInterface/ToolBoxWidget.h>
-#include <Utils/Core/Log.h>
+#include <Core/Utils/Log.h>
 
 #include <sstream>
 #include <iostream>

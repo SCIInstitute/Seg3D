@@ -45,9 +45,11 @@
 #include <boost/thread/mutex.hpp>
 
 // Application includes
-#include <Utils/Core/Singleton.h>
 #include <Application/Viewer/Viewer.h>
-#include <Application/State/State.h>
+
+// Core includes
+#include <Core/Utils/Singleton.h>
+#include <Core/State/State.h>
 
 namespace Seg3D
 {
@@ -68,7 +70,7 @@ public:
 };
 
 // typedefs
-class ViewerManager : public StateHandler
+class ViewerManager : public Core::StateHandler
 {
   CORE_SINGLETON( ViewerManager );
 
@@ -80,17 +82,26 @@ private:
   // -- Getting information from manager --
 
 public:
+
+  // NUMBER_OF_VIEWERS
+  // The number of viewers that is available in the application
+  // This is a preset number to simplify the dependency scheme
+  size_t number_of_viewers()
+  {
+    return 6;
+  }
+
   ViewerHandle get_viewer( size_t idx );
   ViewerHandle get_viewer( const std::string viewer_name );
 
   void get_2d_viewers_info( ViewerInfoList viewers[ 3 ] );
-  void pick_point( size_t source_viewer, const Utils::Point& pt );
+  void pick_point( size_t source_viewer, const Core::Point& pt );
   std::vector< size_t > get_locked_viewers( int mode_index );
 
   // -- State information --
 public:
-  StateOptionHandle layout_state_;
-  StateIntHandle active_viewer_state_;
+  Core::StateOptionHandle layout_state_;
+  Core::StateIntHandle active_viewer_state_;
 
   // -- Signals and slots --
 private:

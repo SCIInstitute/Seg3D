@@ -29,17 +29,17 @@
 #include <Application/ToolManager/ToolManager.h>
 #include <Application/ToolManager/Actions/ActionActivateTool.h>
 
-namespace Seg3D
-{
-
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
-CORE_REGISTER_ACTION( ActivateTool );
+CORE_REGISTER_ACTION( Seg3D, ActivateTool )
 
-bool ActionActivateTool::validate( ActionContextHandle& context )
+namespace Seg3D
 {
-  if ( !( StateEngine::Instance()->is_stateid( toolid_.value() ) ) )
+
+bool ActionActivateTool::validate( Core::ActionContextHandle& context )
+{
+  if ( !( Core::StateEngine::Instance()->is_stateid( toolid_.value() ) ) )
   {
     context->report_error( std::string( "ToolID '" ) + toolid_.value() + "' is invalid" );
     return false;
@@ -48,13 +48,13 @@ bool ActionActivateTool::validate( ActionContextHandle& context )
   return true; // validated
 }
 
-bool ActionActivateTool::run( ActionContextHandle& context, ActionResultHandle& result )
+bool ActionActivateTool::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
   ToolManager::Instance()->activate_tool( toolid_.value() );
   return true; // success
 }
 
-ActionHandle ActionActivateTool::Create( const std::string& toolid )
+Core::ActionHandle ActionActivateTool::Create( const std::string& toolid )
 {
   // Create new action
   ActionActivateTool* action = new ActionActivateTool;
@@ -63,13 +63,13 @@ ActionHandle ActionActivateTool::Create( const std::string& toolid )
   action->toolid_.value() = toolid;
 
   // Post the new action
-  return ActionHandle( action );
+  return Core::ActionHandle( action );
 }
 
 void ActionActivateTool::Dispatch( const std::string& toolid )
 {
   // Post the new action
-  Interface::PostAction( Create( toolid ) );
+  Core::Interface::PostAction( Create( toolid ) );
 }
 
 } // end namespace Seg3D

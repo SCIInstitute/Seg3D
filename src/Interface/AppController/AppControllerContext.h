@@ -36,7 +36,7 @@
 #include <QPointer>
 
 // Include all action related classes
-#include <Application/Action/Actions.h>
+#include <Core/Action/Actions.h>
 
 // Include interface code
 #include <Interface/AppController/AppController.h>
@@ -47,7 +47,7 @@ namespace Seg3D
 class AppControllerContext;
 typedef boost::shared_ptr< AppControllerContext > AppControllerContextHandle;
 
-class AppControllerContext : public ActionContext
+class AppControllerContext : public Core::ActionContext
 {
 
   // -- Constructor/destructor --
@@ -60,7 +60,7 @@ public:
   virtual void report_error( const std::string& error );
   virtual void report_warning( const std::string& warning );
   virtual void report_message( const std::string& message );
-  virtual void report_need_resource( const ResourceLockHandle& resource );
+  virtual void report_need_resource( const Core::ResourceLockHandle& resource );
 
   // -- Report that action was done --
 public:
@@ -68,7 +68,7 @@ public:
 
   // -- Source/Status information --
 public:
-  virtual ActionSource source() const;
+  virtual Core::ActionSource source() const;
 
 private:
   // To which controller does the action information need to be relayed

@@ -44,10 +44,10 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
 
-// Utils includes
-#include <Utils/DataBlock/DataType.h>
-#include <Utils/Core/EnumClass.h>
-#include <Utils/Core/Log.h>
+// Core includes
+#include <Core/DataBlock/DataType.h>
+#include <Core/Utils/EnumClass.h>
+#include <Core/Utils/Log.h>
 
 // Application includes
 #include <Application/Layer/Layer.h>
@@ -190,11 +190,11 @@ public:
   
   // GET_GRID_TRANSFORM:
   // Get the grid transform of the grid that we are importing
-  virtual Utils::GridTransform get_grid_transform() = 0;
+  virtual Core::GridTransform get_grid_transform() = 0;
 
   // GET_DATA_TYPE:
   // Get the type of data that is being imported
-  virtual Utils::DataType get_data_type() = 0;
+  virtual Core::DataType get_data_type() = 0;
   
   // GET_IMPORTER_MODES
   // Get then supported importer modes

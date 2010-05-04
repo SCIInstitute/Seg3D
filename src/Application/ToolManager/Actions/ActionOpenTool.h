@@ -29,13 +29,13 @@
 #ifndef APPLICATION_TOOL_ACTIONS_ACTIONOPENTOOL_H
 #define APPLICATION_TOOL_ACTIONS_ACTIONOPENTOOL_H
 
-#include <Application/Action/Actions.h>
-#include <Application/Interface/Interface.h>
+#include <Core/Action/Actions.h>
+#include <Core/Interface/Interface.h>
 
 namespace Seg3D
 {
 
-class ActionOpenTool : public Action
+class ActionOpenTool : public Core::Action
 {
   CORE_ACTION( "OpenTool", "OpenTool <tooltype>" );
 
@@ -52,19 +52,19 @@ public:
 
   // -- Functions that describe action --
 public:
-  virtual bool validate( ActionContextHandle& context );
-  virtual bool run( ActionContextHandle& context, ActionResultHandle& result );
+  virtual bool validate( Core::ActionContextHandle& context );
+  virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
 
   // -- Action parameters --
 private:
   // ToolID that is requested
-  ActionParameter< std::string > toolid_;
+  Core::ActionParameter< std::string > toolid_;
 
   // -- Dispatch this action from the interface --
 public:
   // CREATE
   // Create action that opens a tool
-  static ActionHandle Create( const std::string& tooltype );
+  static Core::ActionHandle Create( const std::string& tooltype );
 
   // DISPATCH
   // Create and dispatch action that closes a tool

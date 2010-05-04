@@ -62,13 +62,13 @@ private:
 public:
 
   // Layerid of the target layer
-  StateStringHandle target_layer_state_;
+  Core::StateStringHandle target_layer_state_;
 
-  StateStringHandle mask_layer_state_;
+  Core::StateStringHandle mask_layer_state_;
 
-  StateOptionHandle replace_with_state_;
+  Core::StateOptionHandle replace_with_state_;
 
-  StateBoolHandle replace_state_;
+  Core::StateBoolHandle replace_state_;
 
 };
 

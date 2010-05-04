@@ -26,7 +26,7 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <Application/Interface/Interface.h>
+#include <Core/Interface/Interface.h>
 
 #include <Interface/AppController/AppControllerContext.h>
 
@@ -57,7 +57,7 @@ void AppControllerContext::report_message( const std::string& message )
   AppController::PostActionMessage( controller_, message );
 }
 
-void AppControllerContext::report_need_resource( const ResourceLockHandle& resource )
+void AppControllerContext::report_need_resource( const Core::ResourceLockHandle& resource )
 {
   std::string message = std::string( "Resource '" ) + resource->name() + std::string(
       "' is currently unavailable" );
@@ -69,9 +69,9 @@ void AppControllerContext::report_done()
   if ( is_success() ) AppController::PostActionMessage( controller_, "" );
 }
 
-ActionSource AppControllerContext::source() const
+Core::ActionSource AppControllerContext::source() const
 {
-  return ActionSource::COMMANDLINE_E;
+  return Core::ActionSource::COMMANDLINE_E;
 }
 
 } //end namespace Seg3D

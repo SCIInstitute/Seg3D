@@ -45,13 +45,13 @@ ADD_LIBRARY(Application_StateManager STATIC
             ${APPLICATION_STATEMANAGER_ACTIONS_SRCS} )
             
 TARGET_LINK_LIBRARIES(Application_StateManager
-                      Utils_Converter
-                      Utils_Core
-                      Utils_EventHandler
-                      Application_Application
-                      Application_Interface
-                      Application_Action
-                      Application_State
+                      Core_Converter
+                      Core_Utils
+                      Core_EventHandler
+                      Core_Application
+                      Core_Interface
+                      Core_Action
+                      Core_State
                       ${SCI_BOOST_LIBRARY})
 
 # Register actions

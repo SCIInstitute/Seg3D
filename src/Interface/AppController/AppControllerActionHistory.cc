@@ -32,7 +32,7 @@ namespace Seg3D
 {
 
 AppControllerActionHistory::AppControllerActionHistory( QObject* parent ) :
-  QAbstractTableModel( parent ), history_( ActionHistory::Instance() )
+  QAbstractTableModel( parent ), history_( Core::ActionHistory::Instance() )
 {
 }
 
@@ -65,13 +65,13 @@ QVariant AppControllerActionHistory::data( const QModelIndex& index, int role ) 
     {
       if ( index.column() == 0 )
       {
-        ActionHandle action = history_->action( sz - index.row() - 1 );
+        Core::ActionHandle action = history_->action( sz - index.row() - 1 );
         if ( action.get() == 0 ) return QString( "" );
         return QString::fromStdString( action->export_to_string() );
       }
       else
       {
-        ActionResultHandle result = history_->result( sz - index.row() - 1 );
+        Core::ActionResultHandle result = history_->result( sz - index.row() - 1 );
         if ( result.get() == 0 ) return QString( "" );
         return QString::fromStdString( result->export_to_string() );
       }

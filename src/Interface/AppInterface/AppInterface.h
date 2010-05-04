@@ -46,7 +46,6 @@
 
 // Application Interface components. 
 #include <Application/InterfaceManager/InterfaceManager.h>
-#include <Application/Action/Actions.h>
 
 #include <Interface/AppInterface/ViewerInterface.h>
 #include <Interface/AppInterface/HistoryDockWidget.h>
@@ -60,7 +59,8 @@
 #include <Interface/AppInterface/AppStatusBar.h>
 #include <Interface/AppController/AppController.h>
 
-#include <Utils/Core/ConnectionHandler.h>
+#include <Core/Action/Actions.h>
+#include <Core/Utils/ConnectionHandler.h>
 
 namespace Seg3D
 {
@@ -74,7 +74,7 @@ namespace Seg3D
 // Although there is only one instance of this class
 // in the program 
 
-class AppInterface : public QMainWindow, private Utils::ConnectionHandler
+class AppInterface : public QMainWindow, private Core::ConnectionHandler
 {
 Q_OBJECT
 
@@ -104,9 +104,9 @@ private:
   void show_window( const std::string& windowid );
   void close_window( const std::string& windowid );
   
-  void begin_progress( ActionProgressHandle handle );
-  void end_progress( ActionProgressHandle handle );
-  void report_progress( ActionProgressHandle handle );
+  void begin_progress( Core::ActionProgressHandle handle );
+  void end_progress( Core::ActionProgressHandle handle );
+  void report_progress( Core::ActionProgressHandle handle );
   void center_seg3d_gui_on_screen( QWidget *widget ); 
 
   // Overload the default addDockWidget and upgrade it, so docks are added
@@ -152,19 +152,20 @@ public:
 
   // HANDLEBEGINPROGRESS:
   // Open a modal window showing progress
-  static void HandleBeginProgress( qpointer_type qpointer, ActionProgressHandle handle);
+  static void HandleBeginProgress( qpointer_type qpointer, Core::ActionProgressHandle handle);
 
   // HANDLEENDPROGRESS:
   // Close the modal window reporting on progress
-  static void HandleEndProgress( qpointer_type qpointer, ActionProgressHandle handle);
+  static void HandleEndProgress( qpointer_type qpointer, Core::ActionProgressHandle handle);
 
   // HANDLEREPORTPROGRESS
   // Report progress to the modal window
-  static void HandleReportProgress( qpointer_type qpointer, ActionProgressHandle handle);
+  static void HandleReportProgress( qpointer_type qpointer, Core::ActionProgressHandle handle);
 
   // SETFULLSCREEN:
   // Set full screen mode of the Main Window
-  static void SetFullScreen( qpointer_type app_interface, bool full_screen, ActionSource source );
+  static void SetFullScreen( qpointer_type app_interface, 
+    bool full_screen, Core::ActionSource source );
   
 };
 

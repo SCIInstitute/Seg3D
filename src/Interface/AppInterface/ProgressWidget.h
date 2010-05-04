@@ -42,7 +42,7 @@
 #include <boost/smart_ptr.hpp>
 
 // Application Includes
-#include <Application/Action/ActionProgress.h>
+#include <Core/Action/ActionProgress.h>
 
 namespace Seg3D
 {
@@ -59,7 +59,7 @@ Q_OBJECT
 public:
   typedef QPointer< ProgressWidget > qpointer_type;
 
-  ProgressWidget( ActionProgressHandle action_progress, QWidget *parent = 0 );
+  ProgressWidget( Core::ActionProgressHandle action_progress, QWidget *parent = 0 );
   virtual ~ProgressWidget();
 
   // -- Update widget --
@@ -82,7 +82,7 @@ public Q_SLOTS:
   
   // -- Internals --
 private:
-  ActionProgressHandle action_progress_;
+  Core::ActionProgressHandle action_progress_;
   
   ProgressWidgetPrivateHandle private_;
 };

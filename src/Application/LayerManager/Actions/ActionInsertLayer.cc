@@ -30,20 +30,20 @@
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/LayerManager/Actions/ActionInsertLayer.h>
 
-namespace Seg3D
-{
-  
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
-CORE_REGISTER_ACTION( InsertLayer );
+CORE_REGISTER_ACTION( Seg3D, InsertLayer )
 
-bool ActionInsertLayer::validate( ActionContextHandle& context )
+namespace Seg3D
+{
+  
+bool ActionInsertLayer::validate( Core::ActionContextHandle& context )
 {
   if ( !this->layer_handle_ )
     return false;
   
-  if ( !( StateEngine::Instance()->is_stateid( layer_handle_->get_layer_id() ) ) )
+  if ( !( Core::StateEngine::Instance()->is_stateid( layer_handle_->get_layer_id() ) ) )
     {
       context->report_error( std::string( "LayerID '" ) + layer_handle_->get_layer_id() + "' is invalid" );
       return false;
@@ -53,7 +53,8 @@ bool ActionInsertLayer::validate( ActionContextHandle& context )
 
 }
 
-bool ActionInsertLayer::run( ActionContextHandle& context, ActionResultHandle& result )
+bool ActionInsertLayer::run( Core::ActionContextHandle& context, 
+              Core::ActionResultHandle& result )
 {
   if ( this->layer_handle_ )
   {
@@ -70,7 +71,7 @@ void ActionInsertLayer::Dispatch( LayerHandle layer )
   ActionInsertLayer* action = new ActionInsertLayer;
   action->layer_handle_ = layer;
   
-  Interface::PostAction( ActionHandle( action ) );
+  Core::Interface::PostAction( Core::ActionHandle( action ) );
 }
   
 } // end namespace Seg3D

@@ -40,15 +40,15 @@
 #include <boost/utility.hpp>
 
 // Core includes
-#include <Utils/Core/StringUtil.h>
-#include <Utils/Core/Singleton.h>
-#include <Utils/Core/Log.h>
-#include <Utils/Core/Exception.h>
+#include <Core/Utils/StringUtil.h>
+#include <Core/Utils/Singleton.h>
+#include <Core/Utils/Log.h>
+#include <Core/Utils/Exception.h>
 
 // Application includes
 #include <Application/Layer/LayerGroup.h>
 #include <Application/LayerManager/LayerScene.h>
-#include <Application/State/StateHandler.h>
+#include <Core/State/StateHandler.h>
 
 namespace Seg3D
 {
@@ -57,7 +57,7 @@ namespace Seg3D
 class LayerManager;
 
 // Class definition
-class LayerManager : public StateHandler
+class LayerManager : public Core::StateHandler
 {
   CORE_SINGLETON( LayerManager );
 

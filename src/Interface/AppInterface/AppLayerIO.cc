@@ -28,6 +28,7 @@
 
 // Qt includes
 #include <QMessageBox>
+#include <QFileDialog>
 
 // Application includes
 #include <Application/LayerIO/LayerIO.h>

@@ -29,13 +29,13 @@
 #ifndef APPLICATION_VIEWER_ACTIONS_ACTIONAUTO_VIEW_H
 #define APPLICATION_VIEWER_ACTIONS_ACTIONAUTO_VIEW_H
 
-#include <Application/Action/Action.h>
+#include <Core/Action/Action.h>
 #include <Application/Viewer/Viewer.h>
 
 namespace Seg3D
 {
 
-class ActionAutoView : public Action
+class ActionAutoView : public Core::Action
 {
   CORE_ACTION( "AutoView", "AutoView <viewer_id>" );
 
@@ -43,11 +43,11 @@ public:
   ActionAutoView();
   virtual ~ActionAutoView() {}
 
-  virtual bool validate( ActionContextHandle& context );
-  virtual bool run( ActionContextHandle& context, ActionResultHandle& result );
+  virtual bool validate( Core::ActionContextHandle& context );
+  virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
 
 private:
-  ActionParameter< std::string > viewer_name_;
+  Core::ActionParameter< std::string > viewer_name_;
 
   ViewerWeakHandle viewer_weak_handle_;
 

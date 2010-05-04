@@ -34,10 +34,10 @@
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/Viewer/Viewer.h> 
 #include <Application/ViewerManager/ViewerManager.h>
-#include <Application/Interface/Interface.h>
 
-// Utils includes
-#include <Utils/Core/ScopedCounter.h>
+// Core includes
+#include <Core/Utils/ScopedCounter.h>
+#include <Core/Interface/Interface.h>
 
 namespace Seg3D
 {
@@ -109,7 +109,7 @@ ViewerHandle ViewerManager::get_viewer( const std::string viewer_name )
 
 void ViewerManager::get_2d_viewers_info( ViewerInfoList viewers[ 3 ] )
 {
-  StateEngine::lock_type lock( StateEngine::GetMutex() );
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
   if ( !LayerManager::Instance()->get_active_layer() )
   {
     return;
@@ -119,7 +119,8 @@ void ViewerManager::get_2d_viewers_info( ViewerInfoList viewers[ 3 ] )
     ViewerHandle viewer = this->viewers_[ i ];
     if ( viewer->viewer_visible_state_->get() && !viewer->is_volume_view() )
     {
-      StateView2D* view2d = static_cast< StateView2D* >( viewer->get_active_view_state().get() );
+      Core::StateView2D* view2d = static_cast< Core::StateView2D* >( 
+        viewer->get_active_view_state().get() );
       ViewerInfoHandle viewer_info( new ViewerInfo );
       viewer_info->viewer_id_ = i;
       viewer_info->view_mode_ = viewer->view_mode_state_->index();
@@ -132,7 +133,7 @@ void ViewerManager::get_2d_viewers_info( ViewerInfoList viewers[ 3 ] )
 
 void ViewerManager::viewer_mode_changed( size_t viewer_id )
 {
-  Utils::ScopedCounter signal_block_counter( this->signal_block_count_ );
+  Core::ScopedCounter signal_block_counter( this->signal_block_count_ );
 
   if ( this->active_axial_viewer_ == static_cast< int >( viewer_id ) )
   {
@@ -153,7 +154,7 @@ void ViewerManager::viewer_mode_changed( size_t viewer_id )
 
 void ViewerManager::viewer_visibility_changed( size_t viewer_id )
 {
-  Utils::ScopedCounter signal_block_counter( this->signal_block_count_ );
+  Core::ScopedCounter signal_block_counter( this->signal_block_count_ );
 
   if ( !this->viewers_[ viewer_id ]->viewer_visible_state_->get() )
   {
@@ -190,7 +191,7 @@ void ViewerManager::viewer_became_picking_target( size_t viewer_id )
   }
 
   {
-    Utils::ScopedCounter signal_block_counter( this->signal_block_count_ );
+    Core::ScopedCounter signal_block_counter( this->signal_block_count_ );
 
     if ( viewer->view_mode_state_->get() == Viewer::AXIAL_C )
     {
@@ -265,7 +266,7 @@ void ViewerManager::update_picking_targets()
   }
 }
 
-void ViewerManager::pick_point( size_t source_viewer, const Utils::Point& pt )
+void ViewerManager::pick_point( size_t source_viewer, const Core::Point& pt )
 {
   ViewerHandle src_viewer = this->viewers_[ source_viewer ];
   if ( this->active_axial_viewer_ >= 0 && 

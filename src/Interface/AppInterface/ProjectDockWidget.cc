@@ -28,7 +28,7 @@
 #include <sstream>
 #include <iostream>
 
-#include <Utils/Core/Log.h>
+#include <Core/Utils/Log.h>
 
 #include <Interface/AppInterface/ProjectDockWidget.h>
 #include "ui_ProjectDockWidget.h"

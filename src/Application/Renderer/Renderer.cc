@@ -30,14 +30,14 @@
 #include <boost/lexical_cast.hpp>
 
 
-// Utils includes
-#include <Utils/Core/Log.h>
-#include <Utils/RenderResources/RenderResources.h>
-#include <Utils/Geometry/View3D.h>
-#include <Utils/Graphics/UnitCube.h>
+// Core includes
+#include <Core/Application/Application.h>
+#include <Core/Utils/Log.h>
+#include <Core/RenderResources/RenderResources.h>
+#include <Core/Geometry/View3D.h>
+#include <Core/Graphics/UnitCube.h>
 
 // Application includes
-#include <Application/Application/Application.h>
 #include <Application/Layer/DataLayer.h>
 #include <Application/Layer/MaskLayer.h>
 #include <Application/LayerManager/LayerManager.h>
@@ -73,7 +73,7 @@ Renderer::Renderer() :
   RendererBase(), 
   ConnectionHandler(), 
   slice_shader_( new SliceShader ),
-  text_renderer_( new Utils::TextRenderer )
+  text_renderer_( new Core::TextRenderer )
 {
 }
 
@@ -89,28 +89,28 @@ void Renderer::post_initialize()
 
   {
     // lock the shared render context
-    Utils::RenderResources::lock_type lock( Utils::RenderResources::GetMutex() );
+    Core::RenderResources::lock_type lock( Core::RenderResources::GetMutex() );
 
-    this->cube_ = Utils::UnitCubeHandle( new Utils::UnitCube() );
+    this->cube_ = Core::UnitCubeHandle( new Core::UnitCube() );
     this->slice_shader_->initialize();
-    this->pattern_texture_ = Utils::Texture3DHandle( new Utils::Texture3D );
+    this->pattern_texture_ = Core::Texture3DHandle( new Core::Texture3D );
     this->pattern_texture_->set_image( PATTERN_SIZE_C, PATTERN_SIZE_C, NUM_OF_PATTERNS_C, 
       GL_ALPHA, MASK_PATTERNS_C, GL_ALPHA, GL_UNSIGNED_BYTE );
-    this->text_texture_ = Utils::Texture2DHandle( new Utils::Texture2D );
+    this->text_texture_ = Core::Texture2DHandle( new Core::Texture2D );
   }
 
   this->slice_shader_->enable();
   this->slice_shader_->set_slice_texture( 0 );
   this->slice_shader_->set_pattern_texture( 1 );
   this->slice_shader_->disable();
-  Utils::Texture::SetActiveTextureUnit( 1 );
+  Core::Texture::SetActiveTextureUnit( 1 );
   this->pattern_texture_->bind();
   this->pattern_texture_->set_mag_filter( GL_LINEAR );
   this->pattern_texture_->set_min_filter( GL_LINEAR );
   this->pattern_texture_->set_wrap_s( GL_REPEAT );
   this->pattern_texture_->set_wrap_t( GL_REPEAT );
   this->pattern_texture_->set_wrap_r( GL_CLAMP );
-  Utils::Texture::SetActiveTextureUnit( 0 );
+  Core::Texture::SetActiveTextureUnit( 0 );
 
   ViewerHandle viewer = ViewerManager::Instance()->get_viewer( this->viewer_id_ );
   this->add_connection( viewer->redraw_signal_.connect( 
@@ -118,7 +118,7 @@ void Renderer::post_initialize()
   this->add_connection( viewer->redraw_overlay_signal_.connect( 
     boost::bind( &Renderer::redraw_overlay, this, _1 ) ) );
 
-  size_t num_of_viewers = Application::Instance()->number_of_viewers();
+  size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
   for ( size_t i = 0; i < num_of_viewers; i++ )
   {
     if ( i != this->viewer_id_ )
@@ -135,7 +135,7 @@ void Renderer::post_initialize()
 
 bool Renderer::render()
 {
-  SCI_LOG_DEBUG( std::string("Renderer ") + Utils::ToString( this->viewer_id_ ) 
+  SCI_LOG_DEBUG( std::string("Renderer ") + Core::ToString( this->viewer_id_ ) 
     + ": starting redraw" );
 
   glClearColor( 0.3f, 0.3f, 0.3f, 1.0f );
@@ -144,7 +144,7 @@ bool Renderer::render()
   glLoadIdentity();
 
   // Lock the state engine
-  StateEngine::lock_type state_lock( StateEngine::Instance()->get_mutex() );
+  Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
   // Get a snapshot of current layers
   LayerSceneHandle layer_scene = LayerManager::Instance()->compose_layer_scene( this->viewer_id_ );
 
@@ -152,7 +152,7 @@ bool Renderer::render()
 
   if ( viewer->is_volume_view() )
   {
-    Utils::View3D view3d( viewer->volume_view_state_->get() );
+    Core::View3D view3d( viewer->volume_view_state_->get() );
 
     // We have got everything we want from the state engine, unlock before we do any rendering
     state_lock.unlock();
@@ -175,12 +175,12 @@ bool Renderer::render()
   {
     // Copy slices from viewer
     {
-      Utils::RenderResources::lock_type lock( Utils::RenderResources::GetMutex() );
+      Core::RenderResources::lock_type lock( Core::RenderResources::GetMutex() );
       this->process_slices( layer_scene, viewer );
     }
 
-    Utils::View2D view2d(
-        dynamic_cast< StateView2D* > ( viewer->get_active_view_state().get() )->get() );
+    Core::View2D view2d(
+        dynamic_cast< Core::StateView2D* > ( viewer->get_active_view_state().get() )->get() );
 
     // We have got everything we want from the state engine, unlock before we do any rendering
     state_lock.unlock();
@@ -194,8 +194,8 @@ bool Renderer::render()
     double left, right, top, bottom;
     view2d.compute_clipping_planes( this->width_ / ( 1.0 * this->height_ ), 
       left, right, bottom, top );
-    Utils::Matrix proj_mat;
-    Utils::Transform::BuildOrtho2DMatrix( proj_mat, left, right, bottom, top );
+    Core::Matrix proj_mat;
+    Core::Transform::BuildOrtho2DMatrix( proj_mat, left, right, bottom, top );
     glMultMatrixd( proj_mat.data() );
     glMatrixMode( GL_MODELVIEW );
     glLoadIdentity();
@@ -203,17 +203,17 @@ bool Renderer::render()
     this->slice_shader_->enable();
     this->slice_shader_->set_border_width( 1 );
 
-    Utils::VolumeSlice* volume_slice = 0;
+    Core::VolumeSlice* volume_slice = 0;
     for ( size_t layer_num = 0; layer_num < layer_scene->size(); layer_num++ )
     {
       LayerSceneItemHandle layer_item = ( *layer_scene )[ layer_num ];
       switch ( layer_item->type() )
       {
-      case Utils::VolumeType::DATA_E:
+      case Core::VolumeType::DATA_E:
         {
           DataLayerSceneItem* data_layer_item = 
             dynamic_cast< DataLayerSceneItem* >( layer_item.get() );
-          Utils::DataVolumeSlice* data_slice = data_layer_item->data_volume_slice_.get();
+          Core::DataVolumeSlice* data_slice = data_layer_item->data_volume_slice_.get();
           volume_slice = data_slice;
           this->slice_shader_->set_mask_mode( false );
 
@@ -233,14 +233,15 @@ bool Renderer::render()
           
           double scale = 1.0 / contrast;
           double bias = 1.0 - ( 1.0 - brightness ) * scale;
-          this->slice_shader_->set_scale_bias( scale, bias );
+          this->slice_shader_->set_scale_bias( static_cast< float >( scale ), 
+            static_cast< float >( bias ) );
         }
         break;
-      case Utils::VolumeType::MASK_E:
+      case Core::VolumeType::MASK_E:
         {
           MaskLayerSceneItem* mask_layer_item = 
             dynamic_cast< MaskLayerSceneItem* >( layer_item.get() );
-          Utils::MaskVolumeSlice* mask_slice = mask_layer_item->mask_volume_slice_.get();
+          Core::MaskVolumeSlice* mask_slice = mask_layer_item->mask_volume_slice_.get();
           volume_slice = mask_slice;
           this->slice_shader_->set_mask_mode( true );
         }
@@ -251,7 +252,7 @@ bool Renderer::render()
       } // end switch
 
       // Compute the size of the slice on screen
-      Utils::Vector slice_x( volume_slice->right() - volume_slice->left(), 0.0, 0.0 );
+      Core::Vector slice_x( volume_slice->right() - volume_slice->left(), 0.0, 0.0 );
       slice_x = proj_mat * slice_x;
       double slice_screen_width = slice_x.x() / 2.0 * this->width_;
       double slice_screen_height = ( volume_slice->top() - volume_slice->bottom() ) / 
@@ -260,9 +261,10 @@ bool Renderer::render()
       float pattern_repeats_y = static_cast< float >( slice_screen_height / PATTERN_SIZE_C );
 
       this->slice_shader_->set_opacity( static_cast< float >( layer_item->opacity_ ) );
-      this->slice_shader_->set_pixel_size( 1.0f / slice_screen_width, 1.0f /slice_screen_height );
-      Utils::TextureHandle slice_tex = volume_slice->get_texture();
-      Utils::Texture::lock_type slice_tex_lock( slice_tex->get_mutex() );
+      this->slice_shader_->set_pixel_size( static_cast< float >( 1.0 / slice_screen_width ), 
+        static_cast< float >( 1.0 /slice_screen_height ) );
+      Core::TextureHandle slice_tex = volume_slice->get_texture();
+      Core::Texture::lock_type slice_tex_lock( slice_tex->get_mutex() );
       slice_tex->bind();
       glBegin( GL_QUADS );
       glMultiTexCoord2f( GL_TEXTURE0, 0.0f, 0.0f );
@@ -290,7 +292,7 @@ bool Renderer::render()
     glDisable( GL_BLEND );
   }
 
-  SCI_LOG_DEBUG( std::string("Renderer ") + Utils::ToString( this->viewer_id_ ) 
+  SCI_LOG_DEBUG( std::string("Renderer ") + Core::ToString( this->viewer_id_ ) 
     + ": done redraw" );
 
   return true;
@@ -298,7 +300,7 @@ bool Renderer::render()
 
 bool Renderer::render_overlay()
 {
-  SCI_LOG_DEBUG( std::string("Renderer ") + Utils::ToString( this->viewer_id_ ) 
+  SCI_LOG_DEBUG( std::string("Renderer ") + Core::ToString( this->viewer_id_ ) 
     + ": starting redraw overlay" );
 
   glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
@@ -307,7 +309,7 @@ bool Renderer::render_overlay()
   glLoadIdentity();
 
   // Lock the state engine
-  StateEngine::lock_type state_lock( StateEngine::GetMutex() );
+  Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
 
   ViewerHandle viewer = ViewerManager::Instance()->get_viewer( this->viewer_id_ );
 
@@ -318,8 +320,8 @@ bool Renderer::render_overlay()
   else
   {
     bool show_grid = viewer->slice_grid_state_->get();
-    Utils::View2D view2d(
-      static_cast< StateView2D* > ( viewer->get_active_view_state().get() )->get() );
+    Core::View2D view2d(
+      static_cast< Core::StateView2D* > ( viewer->get_active_view_state().get() )->get() );
     int view_mode = viewer->view_mode_state_->index();
     ViewerInfoList viewers_info[ 3 ];
     ViewerManager::Instance()->get_2d_viewers_info( viewers_info );
@@ -330,8 +332,8 @@ bool Renderer::render_overlay()
     double left, right, top, bottom;
     view2d.compute_clipping_planes( this->width_ / ( 1.0 * this->height_ ), 
       left, right, bottom, top );
-    Utils::Matrix proj_mat;
-    Utils::Transform::BuildOrtho2DMatrix( proj_mat, left, right, bottom, top );
+    Core::Matrix proj_mat;
+    Core::Transform::BuildOrtho2DMatrix( proj_mat, left, right, bottom, top );
 
     glDisable( GL_DEPTH_TEST );
     glDisable( GL_CULL_FACE );
@@ -386,9 +388,9 @@ bool Renderer::render_overlay()
     size_t num_of_hori_slices = viewers_info[ hori_slice_mode ].size();
     for ( size_t i = 0; i < num_of_vert_slices; i++ )
     {
-      Utils::Point pt( viewers_info[ vert_slice_mode ][ i ]->depth_, 0, 0 );
+      Core::Point pt( viewers_info[ vert_slice_mode ][ i ]->depth_, 0, 0 );
       pt = proj_mat * pt;
-      int slice_pos = Utils::Round( ( pt.x() + 1.0 ) / 2.0 * ( this->width_ - 1 ) ) + 1;
+      int slice_pos = Core::Round( ( pt.x() + 1.0 ) / 2.0 * ( this->width_ - 1 ) ) + 1;
       float color[ 4 ] = { 0.0f, 0.0f, 0.0f, 1.0f };
       color[ vert_slice_mode ] = 1.0f;
       if ( viewers_info[ vert_slice_mode ][ i ]->is_picking_target_ )
@@ -409,9 +411,9 @@ bool Renderer::render_overlay()
     }
     for ( size_t i = 0; i < num_of_hori_slices; i++ )
     {
-      Utils::Point pt( 0, viewers_info[ hori_slice_mode ][ i ]->depth_, 0 );
+      Core::Point pt( 0, viewers_info[ hori_slice_mode ][ i ]->depth_, 0 );
       pt = proj_mat * pt;
-      int slice_pos = Utils::Round( ( pt.y() + 1.0 ) / 2.0 * ( this->height_ - 1 ) ) + 1;
+      int slice_pos = Core::Round( ( pt.y() + 1.0 ) / 2.0 * ( this->height_ - 1 ) ) + 1;
       float color[ 4 ] = { 0.0f, 0.0f, 0.0f, 1.0f };
       color[ hori_slice_mode ] = 1.0f;
       if ( viewers_info[ hori_slice_mode ][ i ]->is_picking_target_ )
@@ -439,7 +441,7 @@ bool Renderer::render_overlay()
     text.push_back( std::string( "NUMIRA" ) );
     this->text_renderer_->render( text, &buffer[ 0 ], this->width_, this->height_, 5, 20, 10, -1 );
     //this->text_renderer_->render_aligned( text[ 1 ], &buffer[ 0 ], this->width_, this->height_, 48,
-    //  50, Utils::TextHAlignmentType::CENTER_E, Utils::TextVAlignmentType::CENTER_E );
+    //  50, Core::TextHAlignmentType::CENTER_E, Core::TextVAlignmentType::CENTER_E );
     this->text_texture_->enable();
     this->text_texture_->set_sub_image( 0, 0, this->width_, this->height_,
         &buffer[ 0 ], GL_ALPHA, GL_UNSIGNED_BYTE );
@@ -449,20 +451,20 @@ bool Renderer::render_overlay()
     glBegin( GL_QUADS );
     glColor4f( 1.0f, 0.1f, 0.1f, 0.4f );
     glTexCoord2f( 0.0f, 0.0f );
-    glVertex2f( 0.0f, 0.0f );
+    glVertex2i( 0, 0 );
     glTexCoord2f( 1.0f, 0.0f );
-    glVertex2f( this->width_, 0.0f );
+    glVertex2i( this->width_, 0 );
     glTexCoord2f( 1.0f, 1.0f );
-    glVertex2f( this->width_, this->height_ );
+    glVertex2i( this->width_, this->height_ );
     glTexCoord2f( 0.0f, 1.0f );
-    glVertex2f( 0.0f, this->height_ );
+    glVertex2i( 0, this->height_ );
     glEnd();
     this->text_texture_->disable();
 
     glDisable( GL_BLEND );
   }
 
-  SCI_LOG_DEBUG( std::string("Renderer ") + Utils::ToString( this->viewer_id_ ) 
+  SCI_LOG_DEBUG( std::string("Renderer ") + Core::ToString( this->viewer_id_ ) 
     + ": done redraw overlay" );
 
   return true;
@@ -471,7 +473,7 @@ bool Renderer::render_overlay()
 void Renderer::post_resize()
 {
   {
-    Utils::RenderResources::lock_type lock( Utils::RenderResources::GetMutex() );
+    Core::RenderResources::lock_type lock( Core::RenderResources::GetMutex() );
     this->text_texture_->set_image( this->width_, this->height_, GL_ALPHA );
   }
 }
@@ -483,18 +485,18 @@ void Renderer::process_slices( LayerSceneHandle& layer_scene, ViewerHandle& view
     LayerSceneItemHandle layer_item = ( *layer_scene )[ layer_num ];
     switch ( layer_item->type() )
     {
-    case Utils::VolumeType::DATA_E:
+    case Core::VolumeType::DATA_E:
       {
         DataLayerSceneItem* data_layer_item = 
           dynamic_cast< DataLayerSceneItem* >( layer_item.get() );
-        Utils::DataVolumeSliceHandle data_volume_slice = 
+        Core::DataVolumeSliceHandle data_volume_slice = 
           viewer->get_data_volume_slice( layer_item->layer_id_ );
         if ( data_volume_slice && !data_volume_slice->out_of_boundary() )
         {
           data_volume_slice->initialize_texture();
           data_volume_slice->upload_texture();
           data_layer_item->data_volume_slice_ = 
-            Utils::DataVolumeSliceHandle( new Utils::DataVolumeSlice( *data_volume_slice ) );
+            Core::DataVolumeSliceHandle( new Core::DataVolumeSlice( *data_volume_slice ) );
         }
         else
         {
@@ -503,18 +505,18 @@ void Renderer::process_slices( LayerSceneHandle& layer_scene, ViewerHandle& view
         }
       }
       break;
-    case Utils::VolumeType::MASK_E:
+    case Core::VolumeType::MASK_E:
       {
         MaskLayerSceneItem* mask_layer_item = 
           dynamic_cast< MaskLayerSceneItem* >( layer_item.get() );
-        Utils::MaskVolumeSliceHandle mask_volume_slice = 
+        Core::MaskVolumeSliceHandle mask_volume_slice = 
           viewer->get_mask_volume_slice( layer_item->layer_id_ );
         if ( mask_volume_slice && !mask_volume_slice->out_of_boundary() )
         {
           mask_volume_slice->initialize_texture();
           mask_volume_slice->upload_texture();
           mask_layer_item->mask_volume_slice_ = 
-            Utils::MaskVolumeSliceHandle( new Utils::MaskVolumeSlice( *mask_volume_slice ) );
+            Core::MaskVolumeSliceHandle( new Core::MaskVolumeSlice( *mask_volume_slice ) );
         }
         else
         {
@@ -535,7 +537,7 @@ void Renderer::process_slices( LayerSceneHandle& layer_scene, ViewerHandle& view
 
 void Renderer::viewer_slice_changed( size_t viewer_id )
 {
-  StateEngine::lock_type lock( StateEngine::GetMutex() );
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
   ViewerHandle self_viewer = ViewerManager::Instance()->get_viewer( this->viewer_id_ );
   ViewerHandle updated_viewer = ViewerManager::Instance()->get_viewer( viewer_id );
   if ( self_viewer->view_mode_state_->index() !=
@@ -547,7 +549,7 @@ void Renderer::viewer_slice_changed( size_t viewer_id )
 
 void Renderer::viewer_mode_changed( size_t viewer_id )
 {
-  StateEngine::lock_type lock( StateEngine::GetMutex() );
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
   if ( ViewerManager::Instance()->get_viewer( viewer_id )->viewer_visible_state_->get() )
   {
     this->redraw_overlay();
@@ -560,7 +562,7 @@ void Renderer::picking_target_changed( size_t viewer_id )
   {
     return;
   }
-  StateEngine::lock_type lock( StateEngine::GetMutex() );
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
   ViewerHandle self_viewer = ViewerManager::Instance()->get_viewer( this->viewer_id_ );
   ViewerHandle updated_viewer = ViewerManager::Instance()->get_viewer( viewer_id );
   if ( self_viewer->view_mode_state_->index() !=

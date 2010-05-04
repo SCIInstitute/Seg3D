@@ -80,19 +80,19 @@ void ArithmeticFilter::handle_layers_changed()
   for( int i = 0; i < static_cast< int >( target_layers.size() ); ++i )
   {
     if( ( this->volume_a_state_->get() == "<none>" ) && ( target_layers[i]->type() == 
-                                 Utils::VolumeType::DATA_E ) )
+                                 Core::VolumeType::DATA_E ) )
     {
-      this->volume_a_state_->set( target_layers[i]->get_layer_name(), ActionSource::NONE_E );
+      this->volume_a_state_->set( target_layers[i]->get_layer_name(), Core::ActionSource::NONE_E );
     }
     if( ( this->volume_b_state_->get() == "<none>" ) && ( target_layers[i]->type() == 
-                               Utils::VolumeType::DATA_E ) )
+                               Core::VolumeType::DATA_E ) )
     {
-      this->volume_b_state_->set( target_layers[i]->get_layer_name(), ActionSource::NONE_E );
+      this->volume_b_state_->set( target_layers[i]->get_layer_name(), Core::ActionSource::NONE_E );
     }
     if( ( this->volume_c_state_->get() == "<none>" ) && ( target_layers[i]->type() == 
-                               Utils::VolumeType::DATA_E ) )
+                               Core::VolumeType::DATA_E ) )
     {
-      this->volume_c_state_->set( target_layers[i]->get_layer_name(), ActionSource::NONE_E );
+      this->volume_c_state_->set( target_layers[i]->get_layer_name(), Core::ActionSource::NONE_E );
     }
   
     if( target_layers[i]->get_layer_name() == this->volume_a_state_->get() ) 
@@ -106,13 +106,13 @@ void ArithmeticFilter::handle_layers_changed()
   }
   
   if( !volume_a_found )
-    this->volume_a_state_->set( "", ActionSource::NONE_E );
+    this->volume_a_state_->set( "", Core::ActionSource::NONE_E );
   
   if( !volume_b_found )
-    this->volume_b_state_->set( "", ActionSource::NONE_E );
+    this->volume_b_state_->set( "", Core::ActionSource::NONE_E );
   
   if( !volume_c_found )
-    this->volume_c_state_->set( "", ActionSource::NONE_E );
+    this->volume_c_state_->set( "", Core::ActionSource::NONE_E );
   
 }
 

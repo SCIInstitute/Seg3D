@@ -32,8 +32,8 @@
 namespace Seg3D
 {
 
-LayerGroup::LayerGroup( Utils::GridTransform grid_transform ) :
-  StateHandler( StateEngine::CreateStateID( "group" ) )
+LayerGroup::LayerGroup( Core::GridTransform grid_transform ) :
+  StateHandler( Core::StateEngine::CreateStateID( "group" ) )
 {
   grid_transform_ = grid_transform;
 

@@ -26,19 +26,19 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <Application/Interface/Interface.h>
+#include <Core/Interface/Interface.h>
 #include <Application/InterfaceManager/InterfaceManager.h>
 #include <Application/InterfaceManager/Actions/ActionCloseWindow.h>
-
-namespace Seg3D
-{
 
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
-CORE_REGISTER_ACTION( CloseWindow );
+CORE_REGISTER_ACTION( Seg3D, CloseWindow )
 
-bool ActionCloseWindow::validate( ActionContextHandle& context )
+namespace Seg3D
+{
+
+bool ActionCloseWindow::validate( Core::ActionContextHandle& context )
 {
   if ( !( InterfaceManager::Instance()->is_windowid( windowid_.value() ) ) )
   {
@@ -49,13 +49,13 @@ bool ActionCloseWindow::validate( ActionContextHandle& context )
   return ( true ); // validated
 }
 
-bool ActionCloseWindow::run( ActionContextHandle& context, ActionResultHandle& result )
+bool ActionCloseWindow::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
   InterfaceManager::Instance()->close_window_signal_( windowid_.value() );
   return ( true ); // success
 }
 
-ActionHandle ActionCloseWindow::Create( const std::string& windowid )
+Core::ActionHandle ActionCloseWindow::Create( const std::string& windowid )
 {
   // Create new action
   ActionCloseWindow* action = new ActionCloseWindow;
@@ -64,13 +64,13 @@ ActionHandle ActionCloseWindow::Create( const std::string& windowid )
   action->windowid_.value() = windowid;
 
   // Create action handle
-  return ( ActionHandle( action ) );
+  return ( Core::ActionHandle( action ) );
 }
 
 void ActionCloseWindow::Dispatch( const std::string& windowid )
 {
   // Post the new action
-  Interface::PostAction( Create( windowid ) );
+  Core::Interface::PostAction( Create( windowid ) );
 }
 
 } // end namespace Seg3D

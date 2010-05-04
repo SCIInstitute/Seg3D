@@ -26,13 +26,13 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-// Utils includes
-#include <Utils/DataBlock/NrrdData.h>
-#include <Utils/DataBlock/MaskDataBlock.h>
-#include <Utils/DataBlock/NrrdDataBlock.h>
-#include <Utils/DataBlock/MaskDataBlockManager.h>
-#include <Utils/Volume/DataVolume.h>
-#include <Utils/Volume/MaskVolume.h>
+// Core includes
+#include <Core/DataBlock/NrrdData.h>
+#include <Core/DataBlock/MaskDataBlock.h>
+#include <Core/DataBlock/NrrdDataBlock.h>
+#include <Core/DataBlock/MaskDataBlockManager.h>
+#include <Core/Volume/DataVolume.h>
+#include <Core/Volume/MaskVolume.h>
 
 // Application includes
 #include <Application/LayerIO/NrrdLayerImporter.h>
@@ -53,7 +53,7 @@ bool NrrdLayerImporter::import_header()
   // NOTE: We load the full data set, as Teem does not support reading headers only :(
   // Hence we need to read the full file
   std::string error;
-  if ( ! ( Utils::NrrdData::LoadNrrd( get_filename() , nrrd_data_, error ) ) )
+  if ( ! ( Core::NrrdData::LoadNrrd( get_filename() , nrrd_data_, error ) ) )
   {
     set_error( error );
     return false;
@@ -62,31 +62,31 @@ bool NrrdLayerImporter::import_header()
 }
 
 
-Utils::GridTransform NrrdLayerImporter::get_grid_transform()
+Core::GridTransform NrrdLayerImporter::get_grid_transform()
 {
   if ( nrrd_data_ )  return nrrd_data_->get_grid_transform();
-  else return Utils::GridTransform(1,1,1);
+  else return Core::GridTransform(1,1,1);
 }
 
 
-Utils::DataType NrrdLayerImporter::get_data_type()
+Core::DataType NrrdLayerImporter::get_data_type()
 {
   if ( nrrd_data_ ) return nrrd_data_->get_data_type();
-  else return Utils::DataType::UNKNOWN_E;
+  else return Core::DataType::UNKNOWN_E;
 }
 
 
 int NrrdLayerImporter::get_importer_modes()
 {
-  Utils::DataType data_type = nrrd_data_->get_data_type();
+  Core::DataType data_type = nrrd_data_->get_data_type();
   
   int importer_modes = 0;
-  if ( Utils::IsReal( data_type ) )
+  if ( Core::IsReal( data_type ) )
   {
     importer_modes |= LayerImporterMode::DATA_E;
   }
   
-  if ( Utils::IsInteger( data_type ) ) 
+  if ( Core::IsInteger( data_type ) ) 
   {
     importer_modes |= LayerImporterMode::SINGLE_MASK_E | LayerImporterMode::BITPLANE_MASK_E |
       LayerImporterMode::LABEL_MASK_E | LayerImporterMode::DATA_E;
@@ -109,10 +109,10 @@ bool NrrdLayerImporter::import_layer( LayerImporterMode mode, std::vector<LayerH
     {
       SCI_LOG_DEBUG( std::string("Importing data layer: ") + get_base_filename() );
           
-      Utils::DataBlockHandle datablock( new Utils::NrrdDataBlock( nrrd_data_ ) );
+      Core::DataBlockHandle datablock( new Core::NrrdDataBlock( nrrd_data_ ) );
       datablock->update_histogram();
       
-      Utils::DataVolumeHandle datavolume( new Utils::DataVolume( 
+      Core::DataVolumeHandle datavolume( new Core::DataVolume( 
         nrrd_data_->get_grid_transform(), datablock ) );
 
       layers.resize( 1 );
@@ -126,16 +126,16 @@ bool NrrdLayerImporter::import_layer( LayerImporterMode mode, std::vector<LayerH
       SCI_LOG_DEBUG( std::string("Importing mask layer: ") + get_base_filename() );
 
 
-      Utils::DataBlockHandle datablock( new Utils::NrrdDataBlock( nrrd_data_ ) );
-      Utils::MaskDataBlockHandle maskdatablock;
+      Core::DataBlockHandle datablock( new Core::NrrdDataBlock( nrrd_data_ ) );
+      Core::MaskDataBlockHandle maskdatablock;
       
-      if ( !( Utils::MaskDataBlockManager::CreateMaskFromNonZeroData( 
+      if ( !( Core::MaskDataBlockManager::CreateMaskFromNonZeroData( 
         datablock, maskdatablock ) ) ) 
       {
         return false;
       }
 
-      Utils::MaskVolumeHandle maskvolume( new Utils::MaskVolume( 
+      Core::MaskVolumeHandle maskvolume( new Core::MaskVolume( 
         nrrd_data_->get_grid_transform(), maskdatablock ) );
       
       layers.resize( 1 );
@@ -150,10 +150,10 @@ bool NrrdLayerImporter::import_layer( LayerImporterMode mode, std::vector<LayerH
       SCI_LOG_DEBUG( std::string("Importing mask layer: ") + get_base_filename() );
 
 
-      Utils::DataBlockHandle datablock( new Utils::NrrdDataBlock( nrrd_data_ ) );
-      std::vector<Utils::MaskDataBlockHandle> maskdatablocks;
+      Core::DataBlockHandle datablock( new Core::NrrdDataBlock( nrrd_data_ ) );
+      std::vector<Core::MaskDataBlockHandle> maskdatablocks;
       
-      if ( !( Utils::MaskDataBlockManager::CreateMaskFromBitPlaneData( 
+      if ( !( Core::MaskDataBlockManager::CreateMaskFromBitPlaneData( 
         datablock, maskdatablocks ) ) ) 
       {
         return false;
@@ -163,7 +163,7 @@ bool NrrdLayerImporter::import_layer( LayerImporterMode mode, std::vector<LayerH
 
       for ( size_t j = 0; j < layers.size(); j++ )
       {
-        Utils::MaskVolumeHandle maskvolume( new Utils::MaskVolume( 
+        Core::MaskVolumeHandle maskvolume( new Core::MaskVolume( 
           nrrd_data_->get_grid_transform(), maskdatablocks[j] ) );
         layers[j] = LayerHandle( new MaskLayer( get_base_filename(), maskvolume ) );
       }
@@ -176,10 +176,10 @@ bool NrrdLayerImporter::import_layer( LayerImporterMode mode, std::vector<LayerH
       SCI_LOG_DEBUG( std::string("Importing mask layer: ") + get_base_filename() );
 
 
-      Utils::DataBlockHandle datablock( new Utils::NrrdDataBlock( nrrd_data_ ) );
-      std::vector<Utils::MaskDataBlockHandle> maskdatablocks;
+      Core::DataBlockHandle datablock( new Core::NrrdDataBlock( nrrd_data_ ) );
+      std::vector<Core::MaskDataBlockHandle> maskdatablocks;
       
-      if ( !( Utils::MaskDataBlockManager::CreateMaskFromLabelData( 
+      if ( !( Core::MaskDataBlockManager::CreateMaskFromLabelData( 
         datablock, maskdatablocks ) ) ) 
       {
         return false;
@@ -189,7 +189,7 @@ bool NrrdLayerImporter::import_layer( LayerImporterMode mode, std::vector<LayerH
 
       for ( size_t j = 0; j < layers.size(); j++ )
       {
-        Utils::MaskVolumeHandle maskvolume( new Utils::MaskVolume( 
+        Core::MaskVolumeHandle maskvolume( new Core::MaskVolume( 
           nrrd_data_->get_grid_transform(), maskdatablocks[j] ) );
         layers[j] = LayerHandle( new MaskLayer( get_base_filename(), maskvolume ) );
       }

@@ -33,9 +33,9 @@
 # pragma once
 #endif 
 
-// Utils includes
-#include <Utils/DataBlock/NrrdData.h>
-#include <Utils/DataBlock/NrrdDataBlock.h>
+// Core includes
+#include <Core/DataBlock/NrrdData.h>
+#include <Core/DataBlock/NrrdDataBlock.h>
 
 // Application includes
 #include <Application/LayerIO/LayerImporter.h>
@@ -72,11 +72,11 @@ public:
 
   // GET_GRID_TRANSFORM:
   // Get the grid transform of the grid that we are importing
-  virtual Utils::GridTransform get_grid_transform();
+  virtual Core::GridTransform get_grid_transform();
 
   // GET_DATA_TYPE:
   // Get the type of data that is being imported
-  virtual Utils::DataType get_data_type();
+  virtual Core::DataType get_data_type();
 
   // GET_IMPORTER_MODES
   // Get then supported importer modes
@@ -90,7 +90,7 @@ public:
   virtual bool import_layer( LayerImporterMode mode, std::vector<LayerHandle>& layers );
 
 private:
-  Utils::NrrdDataHandle nrrd_data_;
+  Core::NrrdDataHandle nrrd_data_;
 
 };
 

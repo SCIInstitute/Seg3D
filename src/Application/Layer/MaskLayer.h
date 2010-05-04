@@ -35,7 +35,7 @@
 
 // Application includes
 #include <Application/Layer/Layer.h>
-#include <Utils/Volume/MaskVolume.h>
+#include <Core/Volume/MaskVolume.h>
 
 namespace Seg3D
 {
@@ -53,18 +53,18 @@ class MaskLayer : public Layer
   // -- constructor/destructor --
 public:
 
-  MaskLayer( const std::string& name, const Utils::MaskVolumeHandle& volume );
-  MaskLayer( const std::string& name, const Utils::GridTransform& grid_transform );
+  MaskLayer( const std::string& name, const Core::MaskVolumeHandle& volume );
+  MaskLayer( const std::string& name, const Core::GridTransform& grid_transform );
   virtual ~MaskLayer();
 
-  virtual Utils::VolumeType type() const { return Utils::VolumeType::MASK_E; }
+  virtual Core::VolumeType type() const { return Core::VolumeType::MASK_E; }
 
-  virtual const Utils::GridTransform& get_grid_transform() const 
+  virtual const Core::GridTransform& get_grid_transform() const 
   { 
     return mask_volume_->get_grid_transform(); 
   }
 
-  Utils::MaskVolumeHandle get_mask_volume()
+  Core::MaskVolumeHandle get_mask_volume()
   {
     return this->mask_volume_;
   }
@@ -73,19 +73,19 @@ public:
 public:
 
   // Which color to use for displaying the mask
-  StateIntHandle color_state_;
+  Core::StateIntHandle color_state_;
 
   // State that describes whether to use a fat border for the mask
-  StateOptionHandle border_state_;
+  Core::StateOptionHandle border_state_;
 
   // State that describes whether to fill the mask solid
-  StateOptionHandle fill_state_;
+  Core::StateOptionHandle fill_state_;
 
   // State that describes whether to show the  isosurface state
-  StateBoolHandle show_isosurface_state_;
+  Core::StateBoolHandle show_isosurface_state_;
 
 private:
-  Utils::MaskVolumeHandle mask_volume_;
+  Core::MaskVolumeHandle mask_volume_;
   void initialize_states();
 };
 

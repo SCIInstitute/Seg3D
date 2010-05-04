@@ -26,7 +26,9 @@
  DEALINGS IN THE SOFTWARE.
  */
 #include <QtGui>
-#include <Application/Interface/Interface.h>
+
+#include <Core/Interface/Interface.h>
+
 #include <Interface/QtInterface/QtBridge.h>
 #include <Interface/QtInterface/QtBridgeInternal.h>
 
@@ -37,9 +39,9 @@ namespace Seg3D
 template<class QTPOINTER>
 void QtSignal( QTPOINTER qpointer, boost::function<void ()> func )
 {
-  if ( !Interface::IsInterfaceThread() )
+  if ( !Core::Interface::IsInterfaceThread() )
   {
-    Interface::PostEvent( boost::bind( &QtSignal<QTPOINTER>, qpointer, func ) );
+    Core::Interface::PostEvent( boost::bind( &QtSignal<QTPOINTER>, qpointer, func ) );
     return;
   }
 
@@ -55,9 +57,9 @@ void QtSignal( QTPOINTER qpointer, boost::function<void ()> func )
 ///// ====  BEGIN QCheckBox FUNCTIONS ==== /////
 // -- BEGIN SIGNAL CONNECTORS FOR THE QCheckBox's -- //
 // signal for when the value of the QCheckBox has changed //
-void QtCheckBoxSignal( QPointer< QCheckBox > qpointer, bool state, ActionSource source )
+void QtCheckBoxSignal( QPointer< QCheckBox > qpointer, bool state, Core::ActionSource source )
 {
-  if ( source != ActionSource::INTERFACE_E )
+  if ( source != Core::ActionSource::INTERFACE_E )
   {
     QtSignal( qpointer, boost::bind( &QCheckBox::setChecked, 
       qpointer.data(), state ) ); 
@@ -67,7 +69,7 @@ void QtCheckBoxSignal( QPointer< QCheckBox > qpointer, bool state, ActionSource 
 
 
 // -- BEGIN CONNECT FUNCTION FOR CONNECTING QCheckBox's TO StateBoolHandle's -- //
-bool QtBridge::Connect( QCheckBox* qcheckbox, StateBoolHandle& state_handle )
+bool QtBridge::Connect( QCheckBox* qcheckbox, Core::StateBoolHandle& state_handle )
 {
   // Connect the dispatch into the StateVariable (with auxiliary object)
   // Link the slot to the parent widget, so Qt's memory manager will
@@ -91,9 +93,9 @@ bool QtBridge::Connect( QCheckBox* qcheckbox, StateBoolHandle& state_handle )
 ///// ====  BEGIN QLineEdit FUNCTIONS ==== /////
 // -- BEGIN SIGNAL CONNECTORS FOR THE QLineEdit's -- //
 // signal for when the QLineEdit has changed //
-void QtLineEditSignal( QPointer< QLineEdit > qpointer, std::string state, ActionSource source )
+void QtLineEditSignal( QPointer< QLineEdit > qpointer, std::string state, Core::ActionSource source )
 {
-  if ( source != ActionSource::INTERFACE_E )
+  if ( source != Core::ActionSource::INTERFACE_E )
   {
     QtSignal( qpointer, boost::bind( &QLineEdit::setText, qpointer.data(), QString::fromStdString( state ) ) ); 
   }
@@ -101,7 +103,7 @@ void QtLineEditSignal( QPointer< QLineEdit > qpointer, std::string state, Action
 // -- END SIGNAL CONNECTORS FOR THE QComboBox's -- //
 
 // -- BEGIN CONNECT FUNCTION FOR CONNECTING QLineEdit's TO StateStringHandle's -- //
-bool QtBridge::Connect( QLineEdit* qlineedit, StateStringHandle& state_handle )
+bool QtBridge::Connect( QLineEdit* qlineedit, Core::StateStringHandle& state_handle )
 {
   // Connect the dispatch into the StateVariable (with auxiliary object)
   // Link the slot to the parent widget, so Qt's memory manager will
@@ -118,7 +120,7 @@ bool QtBridge::Connect( QLineEdit* qlineedit, StateStringHandle& state_handle )
 // -- END CONNECT FUNCTION -- //
 
 // -- BEGIN CONNECT FUNCTION FOR CONNECTING QLineEdit's TO StateAliasHandle's -- //
-bool QtBridge::Connect( QLineEdit* qlineedit, StateAliasHandle& state_handle )
+bool QtBridge::Connect( QLineEdit* qlineedit, Core::StateAliasHandle& state_handle )
 {
   // Connect the dispatch into the StateVariable (with auxiliary object)
   // Link the slot to the parent widget, so Qt's memory manager will
@@ -139,9 +141,9 @@ bool QtBridge::Connect( QLineEdit* qlineedit, StateAliasHandle& state_handle )
 ///// ====  BEGIN QDoubleSpinBox FUNCTIONS ==== /////
     // -- BEGIN SIGNAL CONNECTORS FOR THE QDoubleSpinBox's -- //
         // signal for when the QDoubleSpinBox has changed //
-        void QtDoubleSpinBoxSignal( QPointer< QDoubleSpinBox > qpointer, double state, ActionSource source )
+        void QtDoubleSpinBoxSignal( QPointer< QDoubleSpinBox > qpointer, double state, Core::ActionSource source )
         {
-          if ( source != ActionSource::INTERFACE_E )
+          if ( source != Core::ActionSource::INTERFACE_E )
           {
             QtSignal( qpointer, boost::bind( &QDoubleSpinBox::setValue, qpointer.data(), state ) ); 
           }
@@ -149,7 +151,7 @@ bool QtBridge::Connect( QLineEdit* qlineedit, StateAliasHandle& state_handle )
     // -- END SIGNAL CONNECTORS FOR THE QDoubleSpinBox's -- //
 
     // -- BEGIN CONNECT FUNCTION FOR CONNECTING QDoubleSpinBox's TO StateDoubleHandle's -- //
-        bool QtBridge::Connect( QDoubleSpinBox* qdoublespinbox, StateDoubleHandle& state_handle )
+        bool QtBridge::Connect( QDoubleSpinBox* qdoublespinbox, Core::StateDoubleHandle& state_handle )
         {
             // Connect the dispatch into the StateVariable (with auxiliary object)
           // Link the slot to the parent widget, so Qt's memory manager will
@@ -181,9 +183,9 @@ bool QtBridge::Connect( QLineEdit* qlineedit, StateAliasHandle& state_handle )
           }
         }
     // signal for when the value of the QComboBox has changed //
-        void QtComboBoxSignal( QPointer< QComboBox > qpointer, std::string state, ActionSource source )
+        void QtComboBoxSignal( QPointer< QComboBox > qpointer, std::string state, Core::ActionSource source )
         {
-          if ( source != ActionSource::INTERFACE_E )
+          if ( source != Core::ActionSource::INTERFACE_E )
           {
             QtSignal( qpointer, boost::bind( &QtComboBoxSignal, qpointer.data(), state ) );
           }
@@ -192,7 +194,7 @@ bool QtBridge::Connect( QLineEdit* qlineedit, StateAliasHandle& state_handle )
 
 
     // -- BEGIN CONNECT FUNCTION FOR CONNECTING QComboBox's TO StateOptionHandle's -- //
-        bool QtBridge::Connect( QComboBox* qcombobox, StateOptionHandle& state_handle )
+        bool QtBridge::Connect( QComboBox* qcombobox, Core::StateOptionHandle& state_handle )
         {
           // Connect the dispatch into the StateVariable (with auxiliary object)
           // Link the slot to the parent widget, so Qt's memory manager will
@@ -206,7 +208,7 @@ bool QtBridge::Connect( QLineEdit* qlineedit, StateAliasHandle& state_handle )
 
           return true;
         }
-    bool QtBridge::Connect( QComboBox* qcombobox, StateStringHandle& state_handle )
+    bool QtBridge::Connect( QComboBox* qcombobox, Core::StateStringHandle& state_handle )
     {
       // Connect the dispatch into the StateVariable (with auxiliary object)
       // Link the slot to the parent widget, so Qt's memory manager will
@@ -227,18 +229,18 @@ bool QtBridge::Connect( QLineEdit* qlineedit, StateAliasHandle& state_handle )
     // -- BEGIN SIGNAL CONNECTORS FOR THE SliderIntCombo's -- //
         // signal for when the value of the SliderIntCombo has changed //
         void QtSliderIntComboValueChangedSignal( QPointer< SliderIntCombo > qpointer, int state,
-            ActionSource source )
+            Core::ActionSource source )
         {
-          if ( source != ActionSource::INTERFACE_E )
+          if ( source != Core::ActionSource::INTERFACE_E )
           {
             QtSignal( qpointer, boost::bind( &SliderIntCombo::setCurrentValue, qpointer.data(), state ) );
           }
         }
         // signal for when the range of the SliderIntCombo has changed //
         void QtSliderIntComboRangeChangedSignal( QPointer< SliderIntCombo > qpointer, int min, int max,
-            ActionSource source )
+            Core::ActionSource source )
         {
-          if ( source != ActionSource::INTERFACE_E )
+          if ( source != Core::ActionSource::INTERFACE_E )
           {
             QtSignal( qpointer, boost::bind( &SliderIntCombo::setRange, qpointer.data(), min, max ) );
           }
@@ -247,7 +249,7 @@ bool QtBridge::Connect( QLineEdit* qlineedit, StateAliasHandle& state_handle )
 
 
     // -- BEGIN CONNECT FUNCTION FOR CONNECTING SliderIntCombo's TO StateRangedIntHandle's -- //
-        bool QtBridge::Connect( SliderIntCombo* sscombo, StateRangedIntHandle& state_handle )
+        bool QtBridge::Connect( SliderIntCombo* sscombo, Core::StateRangedIntHandle& state_handle )
         {
           new QtSliderIntComboRangedSlot( sscombo, state_handle );
           
@@ -271,9 +273,9 @@ bool QtBridge::Connect( QLineEdit* qlineedit, StateAliasHandle& state_handle )
     // -- BEGIN SIGNAL CONNECTORS FOR THE ColorBarWidget's -- //
   // signal for when the value of the ColorBarWidget has changed //
   void QtColorBarWidgetValueChangedSignal( QPointer< ColorBarWidget > qpointer, int state,
-                      ActionSource source )
+                      Core::ActionSource source )
   {
-    if ( source != ActionSource::INTERFACE_E )
+    if ( source != Core::ActionSource::INTERFACE_E )
     {
       QtSignal( qpointer, boost::bind( &ColorBarWidget::set_color_index, qpointer.data(), state ) );
     }
@@ -281,7 +283,7 @@ bool QtBridge::Connect( QLineEdit* qlineedit, StateAliasHandle& state_handle )
     // -- END SIGNAL CONNECTORS FOR THE ColorBarWidget's -- //
   
     // -- BEGIN CONNECT FUNCTION FOR CONNECTING ColorBarWidget's TO StateIntHandle's -- //
-  bool QtBridge::Connect( ColorBarWidget* cbwidget, StateIntHandle& state_handle )
+  bool QtBridge::Connect( ColorBarWidget* cbwidget, Core::StateIntHandle& state_handle )
   {
     new QtColorBarWidgetSlot( cbwidget, state_handle );
     
@@ -301,18 +303,18 @@ bool QtBridge::Connect( QLineEdit* qlineedit, StateAliasHandle& state_handle )
     // -- BEGIN SIGNAL CONNECTORS FOR THE SliderDoubleCombo's -- //
         // signal for when the value of the SliderDoubleCombo has changed //
         void QtSliderDoubleComboValueChangedSignal( QPointer< SliderDoubleCombo > qpointer, double state,
-            ActionSource source )
+            Core::ActionSource source )
         {
-          if ( source != ActionSource::INTERFACE_E )
+          if ( source != Core::ActionSource::INTERFACE_E )
           {
             QtSignal( qpointer, boost::bind( &SliderDoubleCombo::setCurrentValue, qpointer.data(), state ) );
           }
         }
         // signal for when the range of the SliderDoubleCombo has changed //
         void QtSliderDoubleComboRangeChangedSignal( QPointer< SliderDoubleCombo > qpointer, double min, double max,
-            ActionSource source )
+            Core::ActionSource source )
         {
-          if ( source != ActionSource::INTERFACE_E )
+          if ( source != Core::ActionSource::INTERFACE_E )
           {
             QtSignal( qpointer, boost::bind( &SliderDoubleCombo::setRange, qpointer.data(), min, max ) );
           }
@@ -322,7 +324,7 @@ bool QtBridge::Connect( QLineEdit* qlineedit, StateAliasHandle& state_handle )
 
 
     // -- BEGIN CONNECT FUNCTION FOR CONNECTING SliderDoubleCombo's TO StateRangedDoubleHandle's -- //
-        bool QtBridge::Connect( SliderDoubleCombo* sscombo, StateRangedDoubleHandle& state_handle )
+        bool QtBridge::Connect( SliderDoubleCombo* sscombo, Core::StateRangedDoubleHandle& state_handle )
         {
           new QtSliderDoubleComboRangedSlot( sscombo, state_handle );
           
@@ -344,9 +346,9 @@ bool QtBridge::Connect( QLineEdit* qlineedit, StateAliasHandle& state_handle )
 ///// ====  BEGIN QToolButton FUNCTIONS ==== /////
     // -- BEGIN SIGNAL CONNECTORS FOR THE QToolButton's -- //
         // signal for when the value of the QToolButton has changed //
-            void QtToolButtonToggleSignal( QPointer< QToolButton > qpointer, bool state, ActionSource source )
+            void QtToolButtonToggleSignal( QPointer< QToolButton > qpointer, bool state, Core::ActionSource source )
             {
-                if ( source != ActionSource::INTERFACE_E )
+                if ( source != Core::ActionSource::INTERFACE_E )
                 {
                    QtSignal( qpointer, boost::bind( &QToolButton::setChecked, 
                   qpointer.data(), state ) ); 
@@ -366,7 +368,7 @@ bool QtBridge::Connect( QLineEdit* qlineedit, StateAliasHandle& state_handle )
     // -- END CONNECT FUNCTION -- //
 
     // -- BEGIN CONNECT FUNCTION FOR CONNECTING QToolButton's TO StateBoolHandle's -- //
-        bool QtBridge::Connect( QToolButton* qtoolbutton, StateBoolHandle& state_handle )
+        bool QtBridge::Connect( QToolButton* qtoolbutton, Core::StateBoolHandle& state_handle )
         {
           // Link the slot to the parent widget, so Qt's memory manager will
           // manage this one.
@@ -407,16 +409,16 @@ bool QtBridge::Connect( QAction* qaction, boost::function< void() > function )
 }
 // -- END CONNECT FUNCTION -- //
 
-void QtActionToggledSignal( QPointer< QAction > qpointer, bool state, ActionSource source )
+void QtActionToggledSignal( QPointer< QAction > qpointer, bool state, Core::ActionSource source )
 {
-  if ( source != ActionSource::INTERFACE_E )
+  if ( source != Core::ActionSource::INTERFACE_E )
   {
     QtSignal( qpointer, boost::bind( &QAction::setChecked, qpointer.data(), state ) );
   }
 }
 
 // -- BEGIN CONNECT FUNCTION FOR CONNECTING QAction's TO StateBoolHandle's -- //
-bool QtBridge::Connect( QAction* qaction, StateBoolHandle& state_handle )
+bool QtBridge::Connect( QAction* qaction, Core::StateBoolHandle& state_handle )
 {
   // Link the slot to the parent widget, so Qt's memory manager will
   // manage this one.
@@ -448,9 +450,9 @@ void QtActionGroupSignal( QActionGroup* qactiongroup, std::string option )
   }
 }
 void QtActionGroupSignal( QPointer< QActionGroup > qpointer, std::string option,
-    ActionSource source )
+    Core::ActionSource source )
 {
-  if ( source != ActionSource::INTERFACE_E )
+  if ( source != Core::ActionSource::INTERFACE_E )
   {
     QtSignal( qpointer, boost::bind( &QtActionGroupSignal, qpointer.data(), option ) );
   }
@@ -459,7 +461,7 @@ void QtActionGroupSignal( QPointer< QActionGroup > qpointer, std::string option,
 
 
 // -- BEGIN CONNECT FUNCTION FOR CONNECTING QActionGroup's TO StateOptionHandle's -- //
-bool QtBridge::Connect( QActionGroup* qactiongroup, StateOptionHandle& state_handle )
+bool QtBridge::Connect( QActionGroup* qactiongroup, Core::StateOptionHandle& state_handle )
 {
   new QtActionGroupSlot( qactiongroup, state_handle );
   QPointer< QActionGroup > qpointer( qactiongroup );

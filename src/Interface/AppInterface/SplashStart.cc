@@ -28,7 +28,7 @@
 #include <sstream>
 #include <iostream>
 
-#include <Utils/Core/Log.h>
+#include <Core/Utils/Log.h>
 
 #include <Interface/AppInterface/SplashStart.h>
 #include "ui_Splash.h"

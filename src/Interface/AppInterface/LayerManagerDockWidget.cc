@@ -28,15 +28,16 @@
 #include <sstream>
 #include <iostream>
 
-#include <Utils/Core/Log.h>
 #include <boost/lexical_cast.hpp>
+
+#include <Core/Utils/Log.h>
+#include <Core/Interface/Interface.h>
 
 // Application Includes
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/Layer/DataLayer.h>
 #include <Application/Layer/MaskLayer.h>
 #include <Application/Layer/LabelLayer.h>
-#include <Application/Interface/Interface.h>
 
 // Interface includes
 #include <Interface/AppInterface/LayerManagerDockWidget.h>
@@ -143,9 +144,9 @@ void LayerManagerDockWidget::move_group_ui( std::string &group_id, int index )
   
 void LayerManagerDockWidget::HandleInsertLayer( qpointer_type qpointer, LayerHandle &layer )
 {
-  if( !( Interface::IsInterfaceThread() ) )
+  if( !( Core::Interface::IsInterfaceThread() ) )
   {
-    Interface::Instance()->post_event( boost::bind( &LayerManagerDockWidget::HandleInsertLayer,
+    Core::Interface::Instance()->post_event( boost::bind( &LayerManagerDockWidget::HandleInsertLayer,
       qpointer, layer ) );
     return;
   }
@@ -157,9 +158,9 @@ void LayerManagerDockWidget::HandleInsertLayer( qpointer_type qpointer, LayerHan
 
 void LayerManagerDockWidget::HandleInsertLayerAt( qpointer_type qpointer, LayerHandle &layer, int index )
 {
-  if( !( Interface::IsInterfaceThread() ) )
+  if( !( Core::Interface::IsInterfaceThread() ) )
   {
-    Interface::Instance()->post_event( boost::bind( &LayerManagerDockWidget::HandleInsertLayerAt,
+    Core::Interface::Instance()->post_event( boost::bind( &LayerManagerDockWidget::HandleInsertLayerAt,
       qpointer, layer, index ) );
     return;
   }
@@ -171,9 +172,9 @@ void LayerManagerDockWidget::HandleInsertLayerAt( qpointer_type qpointer, LayerH
 
 void LayerManagerDockWidget::HandleDeleteLayer( qpointer_type qpointer, LayerHandle &layer )
 {
-  if( !( Interface::IsInterfaceThread() ) )
+  if( !( Core::Interface::IsInterfaceThread() ) )
   {
-    Interface::Instance()->post_event( boost::bind( &LayerManagerDockWidget::HandleDeleteLayer,
+    Core::Interface::Instance()->post_event( boost::bind( &LayerManagerDockWidget::HandleDeleteLayer,
       qpointer, layer ) );
     return;
   }
@@ -185,9 +186,9 @@ void LayerManagerDockWidget::HandleDeleteLayer( qpointer_type qpointer, LayerHan
 
 void LayerManagerDockWidget::HandleDeleteLayers( qpointer_type qpointer, std::vector< LayerHandle > layers)
 {
-  if( !( Interface::IsInterfaceThread() ) )
+  if( !( Core::Interface::IsInterfaceThread() ) )
   {
-    Interface::Instance()->post_event( boost::bind( &LayerManagerDockWidget::HandleDeleteLayers,
+    Core::Interface::Instance()->post_event( boost::bind( &LayerManagerDockWidget::HandleDeleteLayers,
       qpointer, layers ) );
     return;
   }
@@ -202,9 +203,9 @@ void LayerManagerDockWidget::HandleDeleteLayers( qpointer_type qpointer, std::ve
 
 void LayerManagerDockWidget::HandleActivateLayer( qpointer_type qpointer, LayerHandle &layer )
 {
-  if( !( Interface::IsInterfaceThread() ) )
+  if( !( Core::Interface::IsInterfaceThread() ) )
   {
-    Interface::Instance()->post_event( boost::bind( &LayerManagerDockWidget::HandleActivateLayer,
+    Core::Interface::Instance()->post_event( boost::bind( &LayerManagerDockWidget::HandleActivateLayer,
         qpointer, layer ) );
     return;
   }
@@ -216,9 +217,9 @@ void LayerManagerDockWidget::HandleActivateLayer( qpointer_type qpointer, LayerH
 
 void LayerManagerDockWidget::HandleGroupDeleted( qpointer_type qpointer, LayerGroupHandle &group )
 {
-  if( !( Interface::IsInterfaceThread() ) )
+  if( !( Core::Interface::IsInterfaceThread() ) )
   {
-    Interface::Instance()->post_event( boost::bind( &LayerManagerDockWidget::HandleGroupDeleted,
+    Core::Interface::Instance()->post_event( boost::bind( &LayerManagerDockWidget::HandleGroupDeleted,
       qpointer, group ) );
     return;
   }
@@ -230,9 +231,9 @@ void LayerManagerDockWidget::HandleGroupDeleted( qpointer_type qpointer, LayerGr
 
 void LayerManagerDockWidget::HandleGroupMoved( qpointer_type qpointer, std::string &group_id, int index )
 {
-  if( !( Interface::IsInterfaceThread() ) )
+  if( !( Core::Interface::IsInterfaceThread() ) )
   {
-    Interface::Instance()->post_event( boost::bind( &LayerManagerDockWidget::HandleGroupMoved,
+    Core::Interface::Instance()->post_event( boost::bind( &LayerManagerDockWidget::HandleGroupMoved,
       qpointer, group_id, index ) );
     return;
   }

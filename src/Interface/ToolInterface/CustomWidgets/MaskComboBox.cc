@@ -67,7 +67,7 @@ void MaskComboBox::sync_layers()
   for( int i = ( static_cast< int >( target_layers.size() ) - 1 ); i > -1; i-- )
   {   
     has_layers = true;
-    if ( target_layers[i]->type() == Utils::VolumeType::MASK_E ) 
+    if ( target_layers[i]->type() == Core::VolumeType::MASK_E ) 
     {
       this->addItem( QString::fromStdString( target_layers[i]->get_layer_name() ) );
     }

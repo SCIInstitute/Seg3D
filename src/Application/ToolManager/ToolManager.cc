@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <Application/Application/Application.h>
-#include <Application/Interface/Interface.h>
+#include <Core/Application/Application.h>
+#include <Core/Interface/Interface.h>
 
 #include <Application/Tool/ToolFactory.h>
 #include <Application/ToolManager/ToolManager.h>
@@ -64,7 +64,7 @@ bool ToolManager::open_tool( const std::string& tool_type, std::string& new_tool
   SCI_LOG_DEBUG( std::string("Open tool: ") + tool_type );
 
   // STEP (3): Create a new toolid and extract the tool type from the string
-  new_toolid = StateEngine::CreateStateID( tool_type );
+  new_toolid = Core::StateEngine::CreateStateID( tool_type );
 
   // Step (4): Build the tool using the factory. This will generate the default
   // settings.

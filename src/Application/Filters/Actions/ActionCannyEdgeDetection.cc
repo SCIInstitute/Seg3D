@@ -30,17 +30,17 @@
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/Filters/Actions/ActionCannyEdgeDetection.h>
 
-namespace Seg3D
-{
-  
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
-CORE_REGISTER_ACTION( CannyEdgeDetection );
+CORE_REGISTER_ACTION( Seg3D, CannyEdgeDetection )
 
-bool ActionCannyEdgeDetection::validate( ActionContextHandle& context )
+namespace Seg3D
 {
-  if( !( StateEngine::Instance()->is_statealias( this->layer_alias_ ) ) )
+  
+bool ActionCannyEdgeDetection::validate( Core::ActionContextHandle& context )
+{
+  if( !( Core::StateEngine::Instance()->is_statealias( this->layer_alias_ ) ) )
   {
     context->report_error( std::string( "LayerID '" ) + this->layer_alias_ + "' is invalid" );
     return false;
@@ -60,9 +60,9 @@ bool ActionCannyEdgeDetection::validate( ActionContextHandle& context )
   return true;
 }
 
-bool ActionCannyEdgeDetection::run( ActionContextHandle& context, ActionResultHandle& result )
+bool ActionCannyEdgeDetection::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
-  if ( StateEngine::Instance()->is_statealias( this->layer_alias_ ) )
+  if ( Core::StateEngine::Instance()->is_statealias( this->layer_alias_ ) )
   {
     // TODO: run filter
     context->report_message( "The Canny Edge Detection Filter has been triggered "
@@ -84,7 +84,7 @@ void ActionCannyEdgeDetection::Dispatch( std::string layer_alias, double varianc
   action->threshold_ = threshold;
   action->replace_ = replace;
   
-  Interface::PostAction( ActionHandle( action ) );
+  Core::Interface::PostAction( Core::ActionHandle( action ) );
 }
   
 } // end namespace Seg3D

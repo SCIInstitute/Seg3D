@@ -83,24 +83,24 @@ void BooleanFilter::handle_layers_changed()
   for( int i = 0; i < static_cast< int >( target_layers.size() ); ++i )
   {
     if( ( this->mask_a_state_->get() == "<none>" ) && ( target_layers[i]->type() == 
-                           Utils::VolumeType::MASK_E ) )
+                           Core::VolumeType::MASK_E ) )
     {
-      this->mask_a_state_->set( target_layers[i]->get_layer_name(), ActionSource::NONE_E );
+      this->mask_a_state_->set( target_layers[i]->get_layer_name(), Core::ActionSource::NONE_E );
     }
     if( ( this->mask_b_state_->get() == "<none>" ) && ( target_layers[i]->type() == 
-                           Utils::VolumeType::MASK_E ) )
+                           Core::VolumeType::MASK_E ) )
     {
-      this->mask_b_state_->set( target_layers[i]->get_layer_name(), ActionSource::NONE_E );
+      this->mask_b_state_->set( target_layers[i]->get_layer_name(), Core::ActionSource::NONE_E );
     }
     if( ( this->mask_c_state_->get() == "<none>" ) && ( target_layers[i]->type() == 
-                           Utils::VolumeType::MASK_E ) )
+                           Core::VolumeType::MASK_E ) )
     {
-      this->mask_c_state_->set( target_layers[i]->get_layer_name(), ActionSource::NONE_E );
+      this->mask_c_state_->set( target_layers[i]->get_layer_name(), Core::ActionSource::NONE_E );
     }
     if( ( this->mask_d_state_->get() == "<none>" ) && ( target_layers[i]->type() == 
-                           Utils::VolumeType::MASK_E ) )
+                           Core::VolumeType::MASK_E ) )
     {
-      this->mask_d_state_->set( target_layers[i]->get_layer_name(), ActionSource::NONE_E );
+      this->mask_d_state_->set( target_layers[i]->get_layer_name(), Core::ActionSource::NONE_E );
     }
 
   
@@ -118,16 +118,16 @@ void BooleanFilter::handle_layers_changed()
   }
   
   if( !mask_a_found )
-    this->mask_a_state_->set( "", ActionSource::NONE_E );
+    this->mask_a_state_->set( "", Core::ActionSource::NONE_E );
   
   if( !mask_b_found )
-    this->mask_b_state_->set( "", ActionSource::NONE_E );
+    this->mask_b_state_->set( "", Core::ActionSource::NONE_E );
   
   if( !mask_c_found )
-    this->mask_c_state_->set( "", ActionSource::NONE_E );
+    this->mask_c_state_->set( "", Core::ActionSource::NONE_E );
   
   if( !mask_d_found )
-    this->mask_d_state_->set( "", ActionSource::NONE_E );
+    this->mask_d_state_->set( "", Core::ActionSource::NONE_E );
   
 }
 

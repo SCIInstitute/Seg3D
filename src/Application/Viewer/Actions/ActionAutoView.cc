@@ -26,21 +26,21 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <Application/Interface/Interface.h>
+#include <Core/Interface/Interface.h>
 #include <Application/Viewer/Actions/ActionAutoView.h>
 #include <Application/ViewerManager/ViewerManager.h>
 
+CORE_REGISTER_ACTION( Seg3D, AutoView )
+
 namespace Seg3D
 {
-
-CORE_REGISTER_ACTION( AutoView );
 
 ActionAutoView::ActionAutoView()
 {
   add_argument( this->viewer_name_ );
 }
 
-bool ActionAutoView::validate( ActionContextHandle& context )
+bool ActionAutoView::validate( Core::ActionContextHandle& context )
 {
   ViewerHandle viewer = this->viewer_weak_handle_.lock();
   if ( !viewer )
@@ -58,7 +58,7 @@ bool ActionAutoView::validate( ActionContextHandle& context )
   return true;
 }
 
-bool ActionAutoView::run( ActionContextHandle& context, ActionResultHandle& result )
+bool ActionAutoView::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
   ViewerHandle viewer = this->viewer_weak_handle_.lock();
   if ( viewer )
@@ -87,7 +87,7 @@ void ActionAutoView::Dispatch(  ViewerHandle& viewer )
   action->viewer_name_ = viewer->get_stateid();
   action->viewer_weak_handle_ = viewer;
 
-  Interface::PostAction( ActionHandle( action ) );
+  Core::Interface::PostAction( Core::ActionHandle( action ) );
 }
 
 } // end namespace Seg3D

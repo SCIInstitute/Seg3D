@@ -29,14 +29,14 @@
 #ifndef APPLICATION_VIEWERMANAGER_ACTIONS_ACTIONPICKPOINT_H
 #define APPLICATION_VIEWERMANAGER_ACTIONS_ACTIONPICKPOINT_H
 
-#include <Application/Action/Action.h>
+#include <Core/Action/Action.h>
 
-#include <Utils/Geometry/Point.h>
+#include <Core/Geometry/Point.h>
 
 namespace Seg3D
 {
 
-class ActionPickPoint : public Action
+class ActionPickPoint : public Core::Action
 {
 
 CORE_ACTION("Pick", "Pick <x> <y> <z>");
@@ -45,16 +45,16 @@ public:
   ActionPickPoint();
   virtual ~ActionPickPoint();
 
-  virtual bool validate( ActionContextHandle& context );
-  virtual bool run( ActionContextHandle& context, ActionResultHandle& result );
+  virtual bool validate( Core::ActionContextHandle& context );
+  virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
 
 private:
   int source_viewer_;
-  ActionParameter< Utils::Point > point_;
+  Core::ActionParameter< Core::Point > point_;
 
 public:
-  static ActionHandle Create( size_t src_viewer, const Utils::Point& pt );
-  static void Dispatch( size_t src_viewer, const Utils::Point& pt );
+  static Core::ActionHandle Create( size_t src_viewer, const Core::Point& pt );
+  static void Dispatch( size_t src_viewer, const Core::Point& pt );
 };
 
 } // end namespace Seg3D

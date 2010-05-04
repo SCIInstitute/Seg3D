@@ -62,9 +62,9 @@ private:
 public:
 
   // Layerid of the target layer
-  StateStringHandle target_layer_state_;
-  StateRangedIntHandle iterations_state_;
-  StateRangedIntHandle threshold_multiplier_state_;
+  Core::StateStringHandle target_layer_state_;
+  Core::StateRangedIntHandle iterations_state_;
+  Core::StateRangedIntHandle threshold_multiplier_state_;
 
 };
 } // end namespace

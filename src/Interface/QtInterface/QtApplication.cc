@@ -27,12 +27,10 @@
  */
 
 // Core includes
-#include <Utils/Core/Log.h>
-#include <Utils/RenderResources/RenderResources.h>
-
-// Application Layer includes
-#include <Application/Application/Application.h>
-#include <Application/Interface/Interface.h>
+#include <Core/Utils/Log.h>
+#include <Core/RenderResources/RenderResources.h>
+#include <Core/Application/Application.h>
+#include <Core/Interface/Interface.h>
 
 // Interface includes
 #include <Interface/QtInterface/QtApplication.h>
@@ -58,13 +56,13 @@ bool QtApplication::setup( int argc, char **argv )
 
     // Step 2: Create interface class to the main class of the event handler layer
     SCI_LOG_DEBUG("Creating QtEventHandlerContext");
-    Utils::EventHandlerContextHandle qt_eventhandler_context( new QtEventHandlerContext(
+    Core::EventHandlerContextHandle qt_eventhandler_context( new QtEventHandlerContext(
         qt_application_ ) );
 
     // Step 3: Insert the event handler into the application layer
     SCI_LOG_DEBUG("Install the QtEventHandlerContext into the Interface layer");
-    Interface::Instance()->install_eventhandler_context( qt_eventhandler_context );
-    Interface::Instance()->start_eventhandler();
+    Core::Interface::Instance()->install_eventhandler_context( qt_eventhandler_context );
+    Core::Interface::Instance()->start_eventhandler();
 
     // Step 4: Create opengl render resources
     SCI_LOG_DEBUG("Creating QtRenderResourcesContext");
@@ -72,7 +70,7 @@ bool QtApplication::setup( int argc, char **argv )
 
     SCI_LOG_DEBUG("Install the QtRenderResources into the Interface layer");
     // Step 5: Insert the render resources class into the application layer
-    Utils::RenderResources::Instance()->install_resources_context( qt_renderresources_context_ );
+    Core::RenderResources::Instance()->install_resources_context( qt_renderresources_context_ );
 
   }
   catch ( ... )

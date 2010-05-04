@@ -26,12 +26,18 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-// Utils includes
-#include <Utils/Core/Log.h>
 
-#include <Application/State/Actions/ActionFlip.h>
+// Core includes
+#include <Core/Utils/Log.h>
+#include <Core/State/Actions/ActionFlip.h>
+
+// Application includes
 #include <Application/Viewer/Actions/ActionAutoView.h>
 #include <Application/ViewerManager/ViewerManager.h>
+
+// QT includes
+#include <QtGui>
+#include <QtOpenGL>
 
 // Qt Interface support classes
 #include <Interface/QtInterface/QtApplication.h>
@@ -39,9 +45,6 @@
 #include <Interface/QtInterface/QtRenderResources.h>
 #include <Interface/QtInterface/QtRenderWidget.h>
 
-// QT includes
-#include <QtGui>
-#include <QtOpenGL>
 
 // Interface includes
 #include <Interface/AppInterface/SingleShotToolButton.h>
@@ -410,7 +413,7 @@ void ViewerWidget::change_view_type( QAction* viewer_type )
 {
   ViewerHandle viewer = ViewerManager::Instance()->get_viewer( this->viewer_id_ );
 
-  StateEngine::lock_type lock( StateEngine::GetMutex() );
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
 
   bool is_volume_view = viewer->is_volume_view();
   this->private_->flip_horiz_button_->setVisible( !is_volume_view );
@@ -421,8 +424,8 @@ void ViewerWidget::change_view_type( QAction* viewer_type )
 
   if( !is_volume_view )
   {
-    StateView2DHandle view2d_state = 
-      boost::dynamic_pointer_cast<StateView2D>( viewer->get_active_view_state() );
+    Core::StateView2DHandle view2d_state = 
+      boost::dynamic_pointer_cast<Core::StateView2D>( viewer->get_active_view_state() );
     this->private_->flip_horiz_->setChecked( view2d_state->x_flipped() );
     this->private_->flip_vert_->setChecked( view2d_state->y_flipped() );
   }
@@ -433,9 +436,9 @@ void ViewerWidget::flip_view_horiz( bool flip )
   ViewerHandle viewer = ViewerManager::Instance()->get_viewer( this->viewer_id_ );
   if( !viewer->is_volume_view() )
   {
-    StateView2DHandle view2d_state = 
-      boost::dynamic_pointer_cast<StateView2D>( viewer->get_active_view_state() );
-    ActionFlip::Dispatch( view2d_state, Utils::FlipDirectionType::HORIZONTAL_E );
+    Core::StateView2DHandle view2d_state = 
+      boost::dynamic_pointer_cast<Core::StateView2D>( viewer->get_active_view_state() );
+    Core::ActionFlip::Dispatch( view2d_state, Core::FlipDirectionType::HORIZONTAL_E );
   }
 }
 
@@ -444,9 +447,9 @@ void ViewerWidget::flip_view_vert( bool flip )
   ViewerHandle viewer = ViewerManager::Instance()->get_viewer( this->viewer_id_ );
   if( !viewer->is_volume_view() )
   {
-    StateView2DHandle view2d_state = 
-      boost::dynamic_pointer_cast<StateView2D>( viewer->get_active_view_state() );
-    ActionFlip::Dispatch( view2d_state, Utils::FlipDirectionType::VERTICAL_E );
+    Core::StateView2DHandle view2d_state = 
+      boost::dynamic_pointer_cast<Core::StateView2D>( viewer->get_active_view_state() );
+    Core::ActionFlip::Dispatch( view2d_state, Core::FlipDirectionType::VERTICAL_E );
   }
 }
 

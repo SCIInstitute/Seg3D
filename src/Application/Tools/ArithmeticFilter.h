@@ -61,15 +61,15 @@ private:
   // -- state --
 public:
   // Layerid of the target layer
-  StateStringHandle volume_a_state_;
+  Core::StateStringHandle volume_a_state_;
 
-  StateStringHandle volume_b_state_;
+  Core::StateStringHandle volume_b_state_;
 
-  StateStringHandle volume_c_state_;
+  Core::StateStringHandle volume_c_state_;
 
-  StateOptionHandle example_expressions_state_;
+  Core::StateOptionHandle example_expressions_state_;
 
-  StateBoolHandle replace_state_;
+  Core::StateBoolHandle replace_state_;
 
 };
 

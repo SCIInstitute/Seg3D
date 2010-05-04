@@ -77,15 +77,15 @@ void MaskDataFilter::handle_layers_changed()
   for( int i = 0; i < static_cast< int >( target_layers.size() ); ++i )
   {
     if( ( this->target_layer_state_->get() == "<none>" ) && ( target_layers[i]->type() == 
-                           Utils::VolumeType::DATA_E ) )
+                           Core::VolumeType::DATA_E ) )
     {
-      this->target_layer_state_->set( target_layers[i]->get_layer_name(), ActionSource::NONE_E );
+      this->target_layer_state_->set( target_layers[i]->get_layer_name(), Core::ActionSource::NONE_E );
     }
     
     if( ( this->mask_layer_state_->get() == "<none>" ) && ( target_layers[i]->type() == 
-                               Utils::VolumeType::MASK_E ) )
+                               Core::VolumeType::MASK_E ) )
     {
-      this->mask_layer_state_->set( target_layers[i]->get_layer_name(), ActionSource::NONE_E );
+      this->mask_layer_state_->set( target_layers[i]->get_layer_name(), Core::ActionSource::NONE_E );
     }
     
     if( target_layers[i]->get_layer_name() == this->target_layer_state_->get() ) 
@@ -96,10 +96,10 @@ void MaskDataFilter::handle_layers_changed()
   }
   
   if( !target_found )
-    this->target_layer_state_->set( "", ActionSource::NONE_E );
+    this->target_layer_state_->set( "", Core::ActionSource::NONE_E );
   
   if( !mask_found )
-    this->mask_layer_state_->set( "", ActionSource::NONE_E );
+    this->mask_layer_state_->set( "", Core::ActionSource::NONE_E );
   
 }
 

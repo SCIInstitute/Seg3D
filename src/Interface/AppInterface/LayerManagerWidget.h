@@ -37,7 +37,7 @@
 #include <QtGui>
 
 // Application Includes
-#include <Utils/Core/EnumClass.h>
+#include <Core/Utils/EnumClass.h>
 
 #include <Application/Layer/LayerGroup.h>
 #include <Interface/AppInterface/LayerGroupWidget.h>

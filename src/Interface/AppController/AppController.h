@@ -39,13 +39,11 @@
 // QT includes
 #include <QtGui>
 
-// Utils includes
-#include <Utils/Core/ConnectionHandler.h>
-#include <Utils/Core/Log.h>
-
-// Application includes
+// Core includes
+#include <Core/Utils/ConnectionHandler.h>
+#include <Core/Utils/Log.h>
 // include all the headers associated with the action engine
-#include <Application/Action/Actions.h>
+#include <Core/Action/Actions.h>
 
 namespace Seg3D
 {
@@ -57,7 +55,7 @@ typedef boost::shared_ptr< AppControllerPrivate > AppControllerPrivateHandle;
 class AppController;
 
 // Class definition
-class AppController : public QWidget, private Utils::ConnectionHandler
+class AppController : public QWidget, private Core::ConnectionHandler
 {
 Q_OBJECT
 

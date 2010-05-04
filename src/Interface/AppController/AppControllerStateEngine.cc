@@ -27,7 +27,7 @@
  */
 
 // Application includes
-#include <Application/State/StateEngine.h>
+#include <Core/State/StateEngine.h>
 
 // Interface includes
 #include <Interface/AppController/AppControllerStateEngine.h>
@@ -47,7 +47,7 @@ AppControllerStateEngine::~AppControllerStateEngine()
 
 int AppControllerStateEngine::rowCount( const QModelIndex& ) const
 {
-  return ( static_cast< int > ( StateEngine::Instance()->num_states() ) );
+  return ( static_cast< int > ( Core::StateEngine::Instance()->num_states() ) );
 }
 
 int AppControllerStateEngine::columnCount( const QModelIndex& ) const
@@ -65,8 +65,8 @@ QVariant AppControllerStateEngine::data( const QModelIndex& index, int role ) co
   }
   else if ( role == Qt::DisplayRole )
   {
-    StateBaseHandle state;
-    if ( StateEngine::Instance()->get_state( index.row(), state ))
+    Core::StateBaseHandle state;
+    if ( Core::StateEngine::Instance()->get_state( index.row(), state ))
     {
       if ( index.column() == 0 )
       {

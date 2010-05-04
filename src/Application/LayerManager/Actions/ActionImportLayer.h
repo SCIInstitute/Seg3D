@@ -30,14 +30,14 @@
 #define APPLICATION_TOOL_ACTIONS_ACTIONIMPORTLAYER_H
 
 // Application includes
-#include <Application/Action/Actions.h>
-#include <Application/Interface/Interface.h>
+#include <Core/Action/Actions.h>
+#include <Core/Interface/Interface.h>
 #include <Application/LayerIO/LayerImporter.h>
 
 namespace Seg3D
 {
   
-class ActionImportLayer : public Action
+class ActionImportLayer : public Core::Action
 {
   CORE_ACTION( "ImportLayer", "ImportLayer <filename>  [mode=data|single_mask|biplane_mask|label_mask] [importer=name_importer]" );
   
@@ -59,15 +59,15 @@ public:
   
   // -- Functions that describe action --
 public:
-  virtual bool validate( ActionContextHandle& context );
-  virtual bool run( ActionContextHandle& context, ActionResultHandle& result );
+  virtual bool validate( Core::ActionContextHandle& context );
+  virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
   
   // -- Action parameters --
 private:
   // ToolID that is requested
-  ActionParameter< std::string > filename_;
-  ActionParameter< std::string > mode_;
-  ActionParameter< std::string > importer_;
+  Core::ActionParameter< std::string > filename_;
+  Core::ActionParameter< std::string > mode_;
+  Core::ActionParameter< std::string > importer_;
   
   // TODO: possible memory leak here ...
   LayerImporterHandle layer_importer_;
@@ -76,12 +76,12 @@ private:
 public:
   // CREATE:
   // Create action that moves the layer above
-  static ActionHandle Create( const std::string& filename, const std::string& mode = "data",
+  static Core::ActionHandle Create( const std::string& filename, const std::string& mode = "data",
     const std::string importer = "" );
 
   // CREATE:
   // Create action that moves the layer above
-  static ActionHandle Create( const LayerImporterHandle& importer, LayerImporterMode mode );
+  static Core::ActionHandle Create( const LayerImporterHandle& importer, LayerImporterMode mode );
   
   // DISPATCH:
   // Create and dispatch action that moves the layer above 

@@ -39,10 +39,10 @@
 #include <boost/signals2/signal.hpp>
 #include <boost/signals2/connection.hpp>
 
-// Application includes
-#include <Application/State/State.h>
-#include <Application/State/Actions/ActionSet.h>
-#include <Application/State/Actions/ActionSetRange.h>
+// Core includes
+#include <Core/State/State.h>
+#include <Core/State/Actions/ActionSet.h>
+#include <Core/State/Actions/ActionSetRange.h>
 
 
 
@@ -138,7 +138,7 @@ class QtCheckBoxSlot : public QtSlot
 public:
 
   // Constructor
-  QtCheckBoxSlot( QCheckBox* parent, StateBoolHandle& state_handle, bool blocking = true ) :
+  QtCheckBoxSlot( QCheckBox* parent, Core::StateBoolHandle& state_handle, bool blocking = true ) :
   QtSlot( parent, blocking ), state_handle_( state_handle )
   {
     // Qt's connect function
@@ -154,12 +154,12 @@ public Q_SLOTS:
   // Slot that Qt will call
   void slot(int state)
   {
-    if (!blocked_) ActionSet::Dispatch(state_handle_,static_cast<bool>(state));
+    if (!blocked_) Core::ActionSet::Dispatch(state_handle_,static_cast<bool>(state));
   }
 
 private:
   // Function object
-  StateBoolHandle state_handle_;
+  Core::StateBoolHandle state_handle_;
 };
 
 class QtLineEditSlot : public QtSlot
@@ -168,7 +168,7 @@ class QtLineEditSlot : public QtSlot
 public:
 
   // Constructor
-  QtLineEditSlot( QLineEdit* parent, StateStringHandle& state_handle, bool blocking = true ) :
+  QtLineEditSlot( QLineEdit* parent, Core::StateStringHandle& state_handle, bool blocking = true ) :
   QtSlot( parent, blocking ), state_handle_( state_handle )
   {
     // Qt's connect function
@@ -185,12 +185,12 @@ public Q_SLOTS:
   void slot(QString state)
   {
       std::string std_state = state.toStdString();
-    if (!blocked_) ActionSet::Dispatch( state_handle_, std_state );
+    if (!blocked_) Core::ActionSet::Dispatch( state_handle_, std_state );
   }
 
 private:
   // Function object
-  StateStringHandle state_handle_;
+  Core::StateStringHandle state_handle_;
 };
 
 
@@ -200,7 +200,7 @@ class QtDoubleSpinBoxSlot : public QtSlot
 public:
 
   // Constructor
-  QtDoubleSpinBoxSlot( QDoubleSpinBox* parent, StateDoubleHandle& state_handle, bool blocking = true ) :
+  QtDoubleSpinBoxSlot( QDoubleSpinBox* parent, Core::StateDoubleHandle& state_handle, bool blocking = true ) :
   QtSlot( parent, blocking ), state_handle_( state_handle )
   {
     // Qt's connect function
@@ -216,12 +216,12 @@ public Q_SLOTS:
   // Slot that Qt will call
   void slot(double state)
   {
-    if (!blocked_) ActionSet::Dispatch( state_handle_, state );
+    if (!blocked_) Core::ActionSet::Dispatch( state_handle_, state );
   }
 
 private:
   // Function object
-  StateDoubleHandle state_handle_;
+  Core::StateDoubleHandle state_handle_;
 };
 
 
@@ -233,7 +233,7 @@ class QtLineEditAliasSlot : public QtSlot
 public:
 
   // Constructor
-  QtLineEditAliasSlot( QLineEdit* parent, StateAliasHandle& state_handle, bool blocking = true ) :
+  QtLineEditAliasSlot( QLineEdit* parent, Core::StateAliasHandle& state_handle, bool blocking = true ) :
   QtSlot( parent, blocking ), state_handle_( state_handle )
   {
     // Qt's connect function
@@ -250,44 +250,45 @@ public Q_SLOTS:
   void slot(QString state)
   {
       std::string std_state = state.toStdString();
-    if (!blocked_) ActionSet::Dispatch( state_handle_, std_state );
+    if (!blocked_) Core::ActionSet::Dispatch( state_handle_, std_state );
   }
 
 private:
   // Function object
-  StateAliasHandle state_handle_;
+  Core::StateAliasHandle state_handle_;
 };
-  // SLOT FOR CONNECTING THE SliderIntCombo TO THE STATE ENGINE
-  class QtColorBarWidgetSlot : public QtSlot
+
+// SLOT FOR CONNECTING THE SliderIntCombo TO THE STATE ENGINE
+class QtColorBarWidgetSlot : public QtSlot
+{
+  Q_OBJECT
+public:
+  
+  // Constructor
+  QtColorBarWidgetSlot( ColorBarWidget* parent, Core::StateIntHandle& state_handle,
+    bool blocking = true ) :
+  QtSlot( parent, blocking ), state_handle_( state_handle )
   {
-    Q_OBJECT
-  public:
-    
-    // Constructor
-    QtColorBarWidgetSlot( ColorBarWidget* parent, StateIntHandle& state_handle,
-      bool blocking = true ) :
-    QtSlot( parent, blocking ), state_handle_( state_handle )
-    {
-      // Qt's connect function
-      connect( parent, SIGNAL( color_index_changed( int ) ), this, SLOT( slot( int ) ) );
-    }
-    
-    // Virtual destructor: needed by Qt
-    virtual ~QtColorBarWidgetSlot()
-    {
-    }
-    
-    public Q_SLOTS:
-    // Slot that Qt will call
-    void slot(int state)
-    {
-      if (!blocked_) ActionSet::Dispatch( state_handle_, state );
-    }
-    
-  private:
-    // Function object
-    StateIntHandle state_handle_;
-  };
+    // Qt's connect function
+    connect( parent, SIGNAL( color_index_changed( int ) ), this, SLOT( slot( int ) ) );
+  }
+  
+  // Virtual destructor: needed by Qt
+  virtual ~QtColorBarWidgetSlot()
+  {
+  }
+  
+  public Q_SLOTS:
+  // Slot that Qt will call
+  void slot(int state)
+  {
+    if (!blocked_) Core::ActionSet::Dispatch( state_handle_, state );
+  }
+  
+private:
+  // Function object
+  Core::StateIntHandle state_handle_;
+};
   
 
 // SLOT FOR CONNECTING THE SliderIntCombo TO THE STATE ENGINE
@@ -297,7 +298,7 @@ class QtSliderIntComboRangedSlot : public QtSlot
 public:
 
   // Constructor
-  QtSliderIntComboRangedSlot( SliderIntCombo* parent, StateRangedIntHandle& state_handle,
+  QtSliderIntComboRangedSlot( SliderIntCombo* parent, Core::StateRangedIntHandle& state_handle,
     bool blocking = true ) :
   QtSlot( parent, blocking ), state_handle_( state_handle )
   {
@@ -315,17 +316,17 @@ public Q_SLOTS:
   // Slot that Qt will call
   void value_slot(int state)
   {
-    if (!blocked_) ActionSet::Dispatch( state_handle_, state );
+    if (!blocked_) Core::ActionSet::Dispatch( state_handle_, state );
   }
     void range_slot(int min, int max)
   {
       
-    if (!blocked_) ActionSetRange::Dispatch( state_handle_, min, max );
+    if (!blocked_) Core::ActionSetRange::Dispatch( state_handle_, min, max );
   }
 
 private:
   // Function object
-  StateRangedIntHandle state_handle_;
+  Core::StateRangedIntHandle state_handle_;
 };
 
 // SLOT FOR CONNECTING THE SliderDoubleCombo TO THE STATE ENGINE
@@ -335,7 +336,7 @@ class QtSliderDoubleComboRangedSlot : public QtSlot
 public:
 
   // Constructor
-  QtSliderDoubleComboRangedSlot( SliderDoubleCombo* parent, StateRangedDoubleHandle& state_handle,
+  QtSliderDoubleComboRangedSlot( SliderDoubleCombo* parent, Core::StateRangedDoubleHandle& state_handle,
     bool blocking = true ) :
   QtSlot( parent, blocking ), state_handle_( state_handle )
   {
@@ -353,17 +354,17 @@ public Q_SLOTS:
   // Slot that Qt will call
   void value_slot(double state)
   {
-    if (!blocked_) ActionSet::Dispatch( state_handle_, state );
+    if (!blocked_) Core::ActionSet::Dispatch( state_handle_, state );
   }
     void range_slot(double min, double max)
   {
       
-    if (!blocked_) ActionSetRange::Dispatch( state_handle_, min, max );
+    if (!blocked_) Core::ActionSetRange::Dispatch( state_handle_, min, max );
   }
 
 private:
   // Function object
-  StateRangedDoubleHandle state_handle_;
+  Core::StateRangedDoubleHandle state_handle_;
 };
 
 
@@ -374,7 +375,7 @@ class QtComboBoxSlot : public QtSlot
 public:
 
   // Constructor
-  QtComboBoxSlot( QComboBox* parent, StateOptionHandle& state_handle, bool blocking = true) :
+  QtComboBoxSlot( QComboBox* parent, Core::StateOptionHandle& state_handle, bool blocking = true) :
     QtSlot(parent,blocking),
     state_handle_(state_handle)
   {
@@ -383,7 +384,7 @@ public:
     
   }
   
-  QtComboBoxSlot( QComboBox* parent, StateStringHandle& state_handle, bool blocking = true) :
+  QtComboBoxSlot( QComboBox* parent, Core::StateStringHandle& state_handle, bool blocking = true) :
   QtSlot(parent,blocking),
   state_string_handle_(state_handle)
   {
@@ -400,17 +401,17 @@ public Q_SLOTS:
   // Slot that Qt will call
   void option_slot(QString state)
   {
-    if (!blocked_) ActionSet::Dispatch(state_handle_,state.toStdString());
+    if (!blocked_) Core::ActionSet::Dispatch(state_handle_,state.toStdString());
   }
   void string_slot(QString state)
   {
-    if (!blocked_) ActionSet::Dispatch(state_string_handle_,state.toStdString());
+    if (!blocked_) Core::ActionSet::Dispatch(state_string_handle_,state.toStdString());
   }
 
 private:
   // Function object
-  StateOptionHandle state_handle_;
-  StateStringHandle state_string_handle_;
+  Core::StateOptionHandle state_handle_;
+  Core::StateStringHandle state_string_handle_;
 };
 
 class QtActionSlot : public QObject
@@ -452,7 +453,7 @@ class QtActionToggleSlot : public QtSlot
 public:
 
   // Constructor
-  QtActionToggleSlot( QAction* parent, StateBoolHandle& state_handle ) :
+  QtActionToggleSlot( QAction* parent, Core::StateBoolHandle& state_handle ) :
     QtSlot( parent ),
     state_handle_( state_handle )
   {
@@ -470,13 +471,13 @@ public Q_SLOTS:
   {
     if ( !this->blocked_ )
     {
-      ActionSet::Dispatch(state_handle_,state);
+      Core::ActionSet::Dispatch(state_handle_,state);
     }
   }
 
 private:
   // Function object
-  StateBoolHandle state_handle_;
+  Core::StateBoolHandle state_handle_;
 };
   
 class QtToolButtonToggleSlot : public QtSlot
@@ -486,7 +487,7 @@ class QtToolButtonToggleSlot : public QtSlot
 public:
   
   // Constructor
-  QtToolButtonToggleSlot(QToolButton* parent, StateBoolHandle& state_handle, bool blocking = true ) :
+  QtToolButtonToggleSlot(QToolButton* parent, Core::StateBoolHandle& state_handle, bool blocking = true ) :
   QtSlot( parent, blocking ), state_handle_( state_handle )
   {
     // Qt's connect function
@@ -501,12 +502,12 @@ public:
   // Slot that Qt will call
   void slot(bool state)
   {
-    if (!blocked_) ActionSet::Dispatch(state_handle_,state);
+    if (!blocked_) Core::ActionSet::Dispatch(state_handle_,state);
   }
   
 private:
   // Function object
-  StateBoolHandle state_handle_;
+  Core::StateBoolHandle state_handle_;
 };
 
 
@@ -578,7 +579,7 @@ class QtActionGroupSlot : public QtSlot
   Q_OBJECT
 
 public:
-  QtActionGroupSlot(QActionGroup* parent, StateOptionHandle& state_handle) :
+  QtActionGroupSlot(QActionGroup* parent, Core::StateOptionHandle& state_handle) :
     QtSlot(parent), option_state_(state_handle)
   {
     this->connect(parent, SIGNAL(triggered(QAction*)), this, SLOT(slot(QAction*)));
@@ -593,12 +594,12 @@ public Q_SLOTS:
   {
     if (!this->blocked_)
     {
-      ActionSet::Dispatch(this->option_state_, action->objectName().toStdString());
+      Core::ActionSet::Dispatch(this->option_state_, action->objectName().toStdString());
     }
   }
 
 private:
-  StateOptionHandle option_state_;
+  Core::StateOptionHandle option_state_;
 };
 
 } //end namespace Seg3D

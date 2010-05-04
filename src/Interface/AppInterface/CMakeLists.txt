@@ -156,12 +156,12 @@ ADD_LIBRARY(Interface_AppInterface STATIC
                      
             
 TARGET_LINK_LIBRARIES(Interface_AppInterface
-                      Utils_Core
-                      Utils_EventHandler
-                      Application_Action
-                      Application_Interface
-                      Application_ActionManager
-                      Application_State
+                      Core_Utils
+                      Core_EventHandler
+                      Core_Action
+                      Core_Interface
+                      Core_ActionManager
+                      Core_State
                       Application_StateManager
                       Application_Tool
                       Application_ToolManager

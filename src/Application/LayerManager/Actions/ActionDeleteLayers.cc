@@ -29,15 +29,15 @@
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/LayerManager/Actions/ActionDeleteLayers.h>
 
-namespace Seg3D
-{
-
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
-CORE_REGISTER_ACTION( DeleteLayers );
+CORE_REGISTER_ACTION( Seg3D, DeleteLayers )
 
-bool ActionDeleteLayers::validate( ActionContextHandle& context )
+namespace Seg3D
+{
+
+bool ActionDeleteLayers::validate( Core::ActionContextHandle& context )
 {
   LayerGroupHandle layer_group( this->group_weak_handle_.lock() );
   if ( !layer_group )
@@ -55,7 +55,7 @@ bool ActionDeleteLayers::validate( ActionContextHandle& context )
   return true; // validated
 }
 
-bool ActionDeleteLayers::run( ActionContextHandle& context, ActionResultHandle& result )
+bool ActionDeleteLayers::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
   LayerGroupHandle layer_group( this->group_weak_handle_.lock() );
   if ( layer_group )
@@ -72,7 +72,7 @@ void ActionDeleteLayers::Dispatch( LayerGroupHandle group )
   ActionDeleteLayers* action = new ActionDeleteLayers;
   action->group_weak_handle_ = group;
   
-  Interface::PostAction( ActionHandle( action ) );
+  Core::Interface::PostAction( Core::ActionHandle( action ) );
 }
 
 } // end namespace Seg3D

@@ -48,12 +48,12 @@ ADD_LIBRARY(Application_InterfaceManager STATIC
             ${APPLICATION_INTERFACEMANAGER_ACTIONS_SRCS} )
             
 TARGET_LINK_LIBRARIES(Application_InterfaceManager
-                      Utils_Converter
-                      Utils_Core
-                      Application_Application
-                      Application_Interface
-                      Application_Action
-                      Application_State
+                      Core_Converter
+                      Core_Utils
+                      Core_Application
+                      Core_Interface
+                      Core_Action
+                      Core_State
                       ${SCI_BOOST_LIBRARY})
 
 # Register actions

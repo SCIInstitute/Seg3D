@@ -29,14 +29,14 @@
 #ifndef APPLICATION_TOOL_ACTIONS_ACTIONOTSUTHRESHOLD_H
 #define APPLICATION_TOOL_ACTIONS_ACTIONOTSUTHRESHOLD_H
 
-#include <Application/Action/Actions.h>
-#include <Application/Interface/Interface.h>
+#include <Core/Action/Actions.h>
+#include <Core/Interface/Interface.h>
 #include <Application/Layer/Layer.h>
 
 namespace Seg3D
 {
   
-class ActionOtsuThreshold : public Action
+class ActionOtsuThreshold : public Core::Action
 {
 CORE_ACTION( "OtsuThreshold", "Run Otsu Threshold Filter on: <name>" );
   
@@ -52,8 +52,8 @@ public:
   
   // -- Functions that describe action --
 public:
-  virtual bool validate( ActionContextHandle& context );
-  virtual bool run( ActionContextHandle& context, ActionResultHandle& result );
+  virtual bool validate( Core::ActionContextHandle& context );
+  virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
   
   // -- Action parameters --
 private:

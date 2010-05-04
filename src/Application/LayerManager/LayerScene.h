@@ -34,10 +34,10 @@
 
 #include <Application/Layer/Layer.h>
 
-#include <Utils/Volume/DataVolume.h>
-#include <Utils/Volume/DataVolumeSlice.h>
-#include <Utils/Volume/MaskVolume.h>
-#include <Utils/Volume/MaskVolumeSlice.h>
+#include <Core/Volume/DataVolume.h>
+#include <Core/Volume/DataVolumeSlice.h>
+#include <Core/Volume/MaskVolume.h>
+#include <Core/Volume/MaskVolumeSlice.h>
 
 namespace Seg3D
 {
@@ -54,12 +54,12 @@ public:
   LayerSceneItem() {}
   virtual ~LayerSceneItem() {}
 
-  virtual Utils::VolumeType type() = 0;
+  virtual Core::VolumeType type() = 0;
 
 public:
   std::string layer_id_;
   double opacity_;
-  Utils::GridTransform grid_transform_;
+  Core::GridTransform grid_transform_;
 };
 
 class DataLayerSceneItem : public LayerSceneItem
@@ -68,17 +68,17 @@ public:
   DataLayerSceneItem() {}
   virtual ~DataLayerSceneItem() {}
 
-  virtual Utils::VolumeType type()
+  virtual Core::VolumeType type()
   {
-    return Utils::VolumeType::DATA_E;
+    return Core::VolumeType::DATA_E;
   }
 
 public:
-  Utils::DataVolumeHandle data_volume_;
+  Core::DataVolumeHandle data_volume_;
   double contrast_;
   double brightness_;
   bool volume_rendered_;
-  Utils::DataVolumeSliceHandle data_volume_slice_; // This value is set and used by Renderer
+  Core::DataVolumeSliceHandle data_volume_slice_; // This value is set and used by Renderer
 };
 
 class MaskLayerSceneItem : public LayerSceneItem
@@ -87,18 +87,18 @@ public:
   MaskLayerSceneItem() {}
   virtual ~MaskLayerSceneItem() {}
 
-  virtual Utils::VolumeType type()
+  virtual Core::VolumeType type()
   {
-    return Utils::VolumeType::MASK_E;
+    return Core::VolumeType::MASK_E;
   }
 
 public:
-  Utils::MaskVolumeHandle mask_volume_;
+  Core::MaskVolumeHandle mask_volume_;
   int color_;
   std::string border_;
   std::string fill_;
   bool show_isosurface_;
-  Utils::MaskVolumeSliceHandle mask_volume_slice_; // This value is set and used by Renderer
+  Core::MaskVolumeSliceHandle mask_volume_slice_; // This value is set and used by Renderer
 };
 
 } // end namespace Seg3D

@@ -30,13 +30,12 @@
 #include <sstream>
 #include <iostream>
 
-// Utils includes
-#include <Utils/Core/Log.h>
+// Core includes
+#include <Core/Utils/Log.h>
+#include <Core/Interface/Interface.h>
 
 // Application includes
 #include <Application/Tool/ToolFactory.h>
-#include <Application/Interface/Interface.h>
-
 #include <Application/ToolManager/ToolManager.h>
 #include <Application/ToolManager/Actions/ActionCloseTool.h>
 #include <Application/ToolManager/Actions/ActionActivateTool.h>
@@ -193,9 +192,9 @@ void ToolsDockWidget::activate_tool( ToolHandle& tool )
 
 void ToolsDockWidget::HandleOpenTool( qpointer_type qpointer, ToolHandle tool )
 {
-  if( !( Interface::IsInterfaceThread() ) )
+  if( !( Core::Interface::IsInterfaceThread() ) )
   {
-    Interface::Instance()->post_event( boost::bind( &ToolsDockWidget::HandleOpenTool, qpointer,
+    Core::Interface::Instance()->post_event( boost::bind( &ToolsDockWidget::HandleOpenTool, qpointer,
         tool ) );
     return;
   }
@@ -205,9 +204,9 @@ void ToolsDockWidget::HandleOpenTool( qpointer_type qpointer, ToolHandle tool )
 
 void ToolsDockWidget::HandleCloseTool( qpointer_type qpointer, ToolHandle tool )
 {
-  if( !( Interface::IsInterfaceThread() ) )
+  if( !( Core::Interface::IsInterfaceThread() ) )
   {
-    Interface::Instance()->post_event( boost::bind( &ToolsDockWidget::HandleCloseTool,
+    Core::Interface::Instance()->post_event( boost::bind( &ToolsDockWidget::HandleCloseTool,
         qpointer, tool ) );
     return;
   }
@@ -217,9 +216,9 @@ void ToolsDockWidget::HandleCloseTool( qpointer_type qpointer, ToolHandle tool )
 
 void ToolsDockWidget::HandleActivateTool( qpointer_type qpointer, ToolHandle tool )
 {
-  if( !( Interface::IsInterfaceThread() ) )
+  if( !( Core::Interface::IsInterfaceThread() ) )
   {
-    Interface::Instance()->post_event( boost::bind( &ToolsDockWidget::HandleActivateTool,
+    Core::Interface::Instance()->post_event( boost::bind( &ToolsDockWidget::HandleActivateTool,
         qpointer, tool ) );
     return;
   }

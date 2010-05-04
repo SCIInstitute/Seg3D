@@ -30,8 +30,8 @@
 #ifndef INTERFACE_TOOLINTERFACE_FILLHOLESFILTERINTERFACE_H
 #define INTERFACE_TOOLINTERFACE_FILLHOLESFILTERINTERFACE_H
 
-// Utils includes
-#include <Utils/Core/Log.h>
+// Core includes
+#include <Core/Utils/Log.h>
 
 // Application includes
 #include <Application/Tool/ToolFactory.h>

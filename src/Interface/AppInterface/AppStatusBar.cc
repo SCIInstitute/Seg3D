@@ -33,7 +33,8 @@
 #include<boost/tokenizer.hpp>
 
 //Core Includes - for logging
-#include <Utils/Core/Log.h>
+#include <Core/Utils/Log.h>
+#include <Core/Interface/Interface.h>
 
 // Interface includes
 #include <Interface/QtInterface/QtBridge.h>
@@ -43,9 +44,7 @@
 //UI Includes
 #include "ui_StatusBar.h"
 
-
 //  Application includes
-#include <Application/Interface/Interface.h>
 #include <Application/Tool/ToolFactory.h>
 #include <Application/ToolManager/ToolManager.h>
 
@@ -88,9 +87,9 @@ AppStatusBar::AppStatusBar( QMainWindow* parent ) :
 
   //this->update_data_point_label();
 
-  this->add_connection( StatusBar::Instance()->data_point_info_updated_signal_.connect( 
+  this->add_connection( Core::StatusBar::Instance()->data_point_info_updated_signal_.connect( 
     boost::bind( &AppStatusBar::update_data_point_info, this, _1 ) ) );
-  this->add_connection( StatusBar::Instance()->message_updated_signal_.connect( 
+  this->add_connection( Core::StatusBar::Instance()->message_updated_signal_.connect( 
     boost::bind( &AppStatusBar::set_message, this, _1, _2 ) ) );
 
   
@@ -148,11 +147,11 @@ void AppStatusBar::fix_icon_status()
     QString::fromUtf8( "Status = true " ) );
 }
 
-void AppStatusBar::update_data_point_info( DataPointInfoHandle data_point )
+void AppStatusBar::update_data_point_info( Core::DataPointInfoHandle data_point )
 {
-  if( !Interface::IsInterfaceThread() )
+  if( !Core::Interface::IsInterfaceThread() )
   {
-    Interface::PostEvent( boost::bind( 
+    Core::Interface::PostEvent( boost::bind( 
       &AppStatusBar::update_data_point_info, this, data_point ) );
     return;
   }
@@ -225,9 +224,9 @@ void AppStatusBar::update_data_point_label()
 
 void AppStatusBar::set_message( int msg_type, std::string message )
 {
-  if( !Interface::IsInterfaceThread() )
+  if( !Core::Interface::IsInterfaceThread() )
   {
-    Interface::PostEvent( boost::bind( &AppStatusBar::set_message, this,
+    Core::Interface::PostEvent( boost::bind( &AppStatusBar::set_message, this,
         msg_type, message ) );
     return;
   }
@@ -245,19 +244,19 @@ void AppStatusBar::set_message( int msg_type, std::string message )
 
   switch( msg_type )
   {
-  case Utils::LogMessageType::ERROR_E:
+  case Core::LogMessageType::ERROR_E:
     this->private_->ui_.status_report_label_->setStyleSheet( StyleSheet::STATUSBAR_ERROR_C );
     color_ = QColor(121, 0, 0);
     break;
-  case Utils::LogMessageType::WARNING_E:
+  case Core::LogMessageType::WARNING_E:
     this->private_->ui_.status_report_label_->setStyleSheet( StyleSheet::STATUSBAR_WARNING_C );
     color_ = QColor(165, 161, 34);
     break;
-  case Utils::LogMessageType::MESSAGE_E:
+  case Core::LogMessageType::MESSAGE_E:
     this->private_->ui_.status_report_label_->setStyleSheet( StyleSheet::STATUSBAR_MESSAGE_C );
     color_ = QColor(3, 86, 2);
     break;
-  case Utils::LogMessageType::DEBUG_E:
+  case Core::LogMessageType::DEBUG_E:
     this->private_->ui_.status_report_label_->setStyleSheet( StyleSheet::STATUSBAR_DEBUG_C );
     color_ = QColor("purple");
     break;

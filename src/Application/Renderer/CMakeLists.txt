@@ -42,8 +42,6 @@ ADD_CUSTOM_COMMAND(
 ##################################################
 
 SET(APPLICATION_RENDERER_SRCS
-  RendererBase.h
-  RendererBase.cc
   Renderer.h
   Renderer.cc
   SliceShader.h
@@ -58,17 +56,20 @@ SET(APPLICATION_RENDERER_SHADER_SRCS
   SliceShaderFrag
   )
 
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
+  
 ADD_LIBRARY(Application_Renderer STATIC 
             ${APPLICATION_RENDERER_SRCS}
       ${APPLICATION_RENDERER_SHADER_RAW_SRCS}
       ${APPLICATION_RENDERER_SHADER_SRCS})
             
 TARGET_LINK_LIBRARIES(Application_Renderer
-                      Utils_Core
-                      Utils_EventHandler
-            Utils_TextRenderer
-            Utils_Graphics
-            Utils_RenderResources
+                      Core_Utils
+                      Core_EventHandler
+            Core_TextRenderer
+            Core_Graphics
+            Core_RenderResources
+            Core_RendererBase
                       Application_Viewer
                       ${SCI_GLEW_LIBRARY}
                       ${SCI_BOOST_LIBRARY})

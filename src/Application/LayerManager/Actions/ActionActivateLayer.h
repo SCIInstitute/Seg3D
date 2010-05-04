@@ -29,14 +29,14 @@
 #ifndef APPLICATION_TOOL_ACTIONS_ACTIONACTIVATELAYER_H
 #define APPLICATION_TOOL_ACTIONS_ACTIONACTIVATELAYER_H
 
-#include <Application/Action/Actions.h>
-#include <Application/Interface/Interface.h>
+#include <Core/Action/Actions.h>
+#include <Core/Interface/Interface.h>
 #include <Application/Layer/Layer.h>
 
 namespace Seg3D
 {
 
-class ActionActivateLayer : public Action
+class ActionActivateLayer : public Core::Action
 {
   CORE_ACTION( "ActivateLayer", "ActivateLayer <layer_name>" );
 
@@ -53,8 +53,8 @@ public:
 
   // -- Functions that describe action --
 public:
-  virtual bool validate( ActionContextHandle& context );
-  virtual bool run( ActionContextHandle& context, ActionResultHandle& result );
+  virtual bool validate( Core::ActionContextHandle& context );
+  virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
   
   
   // -- Dispatch this action from the interface --
@@ -66,10 +66,10 @@ public:
   
   // CREATE
   // Create an action that activates a layer
-  static ActionHandle Create( const LayerHandle layer );
+  static Core::ActionHandle Create( const LayerHandle layer );
   
 private:
-  ActionParameter< std::string > layer_name_;
+  Core::ActionParameter< std::string > layer_name_;
     LayerWeakHandle layer_weak_handle_;
 
 };
