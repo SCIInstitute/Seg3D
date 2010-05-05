@@ -29,7 +29,6 @@
 #ifndef INTERFACE_APPINTERFACE_VIEWERWIDGET_H
 #define INTERFACE_APPINTERFACE_VIEWERWIDGET_H
 
-#include <Application/Viewer/ViewerRenderer.h>
 #include <Core/Action/ActionContext.h>
 
 // QT includes

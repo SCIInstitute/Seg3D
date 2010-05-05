@@ -38,6 +38,7 @@
 #include <Core/Graphics/Renderbuffer.h>
 #include <Core/Graphics/Texture.h>
 #include <Core/RenderResources/RenderContext.h>
+#include <Core/RendererBase/AbstractRenderer.h>
 
 namespace Core
 {
@@ -46,7 +47,7 @@ namespace Core
 class RendererBase;
 
 // Class definitions
-class RendererBase : private Core::EventHandler
+class RendererBase : public AbstractRenderer, private Core::EventHandler
 {
 
   // -- constructor/destructor --
@@ -58,58 +59,44 @@ public:
   
   // INITIALIZE:
   // Initialize the renderer.
-  void initialize();
+  virtual void initialize();
 
   // RESIZE:
   // resize the renderer.
-  void resize( int width, int height );
+  virtual void resize( int width, int height );
 
   // REDRAW:
   // Calls the "render" function to render onto the FBO.
   // It triggers the "redraw_completed_signal_" at the end.
   // "delay_update" indicates whether the UI should delay the update on receiving
   // the new texture.
-  void redraw( bool delay_update = false );
+  virtual void redraw( bool delay_update = false );
 
   // REDRAW_OVERLAY:
   // Calls the "render_overlay" function to render the overlay onto the FBO.
   // It triggers the "redraw_overlay_completed_signal_" at the end.
-  void redraw_overlay( bool delay_update = false );
+  virtual void redraw_overlay( bool delay_update = false );
 
   // Activate the renderer
-  void activate() 
+  virtual void activate() 
   { 
     lock_type lock( this->get_mutex() );
     this->active_ = true; 
   }
 
   // Deactivate the renderer
-  void deactivate() 
+  virtual void deactivate() 
   {
     lock_type lock( this->get_mutex() );
     this->active_ = false; 
   }
 
   // Return the status of the renderer
-  bool is_active() 
+  virtual bool is_active() 
   { 
     lock_type lock( this->get_mutex() );
     return this->active_; 
   }
-
-  // REDRAW_COMPLETED_SIGNAL_
-  // Triggered when redraw is done. The first parameter is a handle to the texture
-  // containing the redraw result, the second indicates whether the update should be
-  // delayed, such as when there will be a new overlay texture immediately after this
-  // signal.
-  typedef boost::signals2::signal< void( Core::TextureHandle, bool ) > 
-    redraw_completed_signal_type;
-  redraw_completed_signal_type redraw_completed_signal_;
-
-  // REDRAW_OVERLAY_COMPLETED_SIGNAL_
-  // Triggered when redraw_overlay is done.
-  // The parameter is a handle to the texture containing the overlay.
-  redraw_completed_signal_type redraw_overlay_completed_signal_;
 
 protected:
 

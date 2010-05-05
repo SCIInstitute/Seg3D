@@ -1032,5 +1032,51 @@ void Viewer::adjust_contrast_brightness( int dx, int dy )
   }
 }
 
+void Viewer::install_renderer( Core::AbstractRendererHandle renderer )
+{
+  this->add_connection( renderer->redraw_completed_signal_.connect(
+    boost::bind( &Viewer::set_texture, this, _1, _2 ) ) );
+  this->add_connection( renderer->redraw_overlay_completed_signal_.connect(
+    boost::bind( &Viewer::set_overlay_texture, this, _1, _2 ) ) );
+}
+
+Core::Texture2DHandle Viewer::get_texture()
+{
+  lock_type lock( this->get_mutex() );
+  return this->texture_;
+}
+
+Core::Texture2DHandle Viewer::get_overlay_texture()
+{
+  lock_type lock( this->get_mutex() );
+  return this->overlay_texture_;
+}
+
+void Viewer::set_texture( Core::Texture2DHandle texture, bool delay_update )
+{
+  {
+    lock_type lock( this->get_mutex() );
+    this->texture_ = texture;
+  }
+
+  if ( !delay_update )
+  {
+    this->update_display_signal_();
+  }
+}
+
+void Viewer::set_overlay_texture( Core::Texture2DHandle texture, bool delay_update )
+{
+  {
+    lock_type lock( this->get_mutex() );
+    this->overlay_texture_ = texture;
+  }
+
+  if ( !delay_update )
+  {
+    this->update_display_signal_();
+  }
+}
+
 } // end namespace Seg3D
 

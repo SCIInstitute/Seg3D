@@ -32,6 +32,7 @@
 ##################################################
 
 SET(CORE_RENDERERBASE_SRCS
+  AbstractRenderer.h
   RendererBase.h
   RendererBase.cc
   )

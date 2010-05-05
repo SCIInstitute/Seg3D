@@ -48,10 +48,6 @@ QtRenderWidget::QtRenderWidget( const QGLFormat& format, QWidget* parent, QtRend
   QGLWidget( format, parent, share )
 {
   this->renderer_ = RendererHandle( new Renderer() );
-  this->add_connection( renderer_->redraw_completed_signal_.connect(
-      boost::bind( &QtRenderWidget::update_texture, this, _1, _2 ) ) );
-  this->add_connection( renderer_->redraw_overlay_completed_signal_.connect(
-      boost::bind( &QtRenderWidget::update_overlay_texture, this, _1, _2 ) ) );
 
   setAutoFillBackground( false );
   setAttribute( Qt::WA_OpaquePaintEvent );
@@ -64,44 +60,16 @@ QtRenderWidget::~QtRenderWidget()
   this->disconnect_all();
 }
 
-void QtRenderWidget::update_texture( Core::TextureHandle texture, bool delay_update )
+void QtRenderWidget::update_display()
 {
-  // if not in the interface thread, post an event to the interface thread
   if ( !Core::Interface::IsInterfaceThread() )
   {
     Core::Interface::PostEvent(
-        boost::bind( &QtRenderWidget::update_texture, this, texture, delay_update ) );
+        boost::bind( &QtRenderWidget::update_display, this ) );
     return;
   }
 
-  SCI_LOG_DEBUG(std::string("QtRenderWidget ") + Core::ToString(this->viewer_id_)
-    + ": received new texture");
-  renderer_texture_ = texture;
-  
-  if ( !delay_update )
-  {
-    this->updateGL();
-  }
-}
-
-void QtRenderWidget::update_overlay_texture( Core::TextureHandle texture, bool delay_update )
-{
-  // if not in the interface thread, post an event to the interface thread
-  if ( !Core::Interface::IsInterfaceThread() )
-  {
-    Core::Interface::PostEvent(
-        boost::bind( &QtRenderWidget::update_overlay_texture, this, texture, delay_update ) );
-    return;
-  }
-
-  SCI_LOG_DEBUG(std::string("QtRenderWidget ") + Core::ToString(this->viewer_id_)
-    + ": received new overlay texture");
-  this->overlay_texture_ = texture;
-  
-  if ( !delay_update )
-  {
-    this->updateGL();
-  }
+  this->updateGL();
 }
 
 void QtRenderWidget::initializeGL()
@@ -122,7 +90,11 @@ void QtRenderWidget::paintGL()
 {
   SCI_LOG_DEBUG("Start of paintGL");
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-  if ( !this->renderer_texture_ || !this->overlay_texture_ )
+
+  Core::Texture2DHandle texture = this->viewer_->get_texture();
+  Core::Texture2DHandle overlay_texture = this->viewer_->get_overlay_texture();
+
+  if ( !texture || !overlay_texture )
   {
     return;
   }
@@ -138,10 +110,10 @@ void QtRenderWidget::paintGL()
   glMatrixMode( GL_MODELVIEW );
   glLoadIdentity();
 
-  Core::Texture::lock_type lock( this->renderer_texture_->get_mutex() );
-  Core::Texture::lock_type overlay_tex_lock( this->overlay_texture_->get_mutex() );
+  Core::Texture::lock_type lock( texture->get_mutex() );
+  Core::Texture::lock_type overlay_tex_lock( overlay_texture->get_mutex() );
 
-  this->renderer_texture_->enable();
+  texture->enable();
   glBegin( GL_QUADS );
   glTexCoord2f( 0.0f, 0.0f );
   glVertex2f( 0.0f, 0.0f );
@@ -152,7 +124,7 @@ void QtRenderWidget::paintGL()
   glTexCoord2f( 0.0f, 1.0f );
   glVertex2f( 0.0f, height );
   glEnd();
-  this->renderer_texture_->disable();
+  texture->disable();
 
   // Enable blending to render the overlay texture.
   // NOTE: The overlay texture can NOT be simply rendered using multi-texturing because
@@ -160,7 +132,7 @@ void QtRenderWidget::paintGL()
   // actually stores the value of "1-alpha"
   glEnable( GL_BLEND );
   glBlendFunc( GL_ONE, GL_SRC_ALPHA );
-  this->overlay_texture_->enable();
+  overlay_texture->enable();
   glBegin( GL_QUADS );
   glTexCoord2f( 0.0f, 0.0f );
   glVertex2f( 0.0f, 0.0f );
@@ -171,7 +143,7 @@ void QtRenderWidget::paintGL()
   glTexCoord2f( 0.0f, 1.0f );
   glVertex2f( 0.0f, height );
   glEnd();
-  this->overlay_texture_->disable();
+  overlay_texture->disable();
   glDisable( GL_BLEND );
 
 }
@@ -276,8 +248,11 @@ void QtRenderWidget::showEvent( QShowEvent* event )
 void QtRenderWidget::set_viewer_id( size_t viewer_id )
 {
   this->viewer_id_ = viewer_id;
-  viewer_ = ViewerManager::Instance()->get_viewer( viewer_id );
-  renderer_->set_viewer_id( viewer_id );
+  this->viewer_ = ViewerManager::Instance()->get_viewer( viewer_id );
+  this->renderer_->set_viewer_id( viewer_id );
+  this->viewer_->install_renderer( this->renderer_ );
+  this->add_connection( this->viewer_->update_display_signal_.connect(
+    boost::bind( &QtRenderWidget::update_display, this ) ) );
 }
 
 } // end namespace Seg3D

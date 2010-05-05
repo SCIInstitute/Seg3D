@@ -34,8 +34,6 @@
 SET(APPLICATION_VIEW_SRCS
   Viewer.h
   Viewer.cc
-  ViewerRenderer.h
-  ViewerRenderer.cc
   ViewManipulator.h
   ViewManipulator.cc
   )

@@ -38,7 +38,6 @@
 #include <Core/RenderResources/RenderResources.h> 
 
 // Applications includes
-#include <Application/Viewer/ViewerRenderer.h>
 #include <Application/Viewer/Viewer.h>
 #include <Application/Renderer/Renderer.h>
 
@@ -75,12 +74,9 @@ protected:
 
 private:
 
-  void update_texture( Core::TextureHandle texture, bool delay_update );
-  void update_overlay_texture( Core::TextureHandle texture, bool delay_update );
+  void update_display();
 
   RendererHandle renderer_;
-  Core::TextureHandle renderer_texture_;
-  Core::TextureHandle overlay_texture_;
 
   ViewerHandle viewer_;
   size_t viewer_id_;
