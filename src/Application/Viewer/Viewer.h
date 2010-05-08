@@ -245,6 +245,9 @@ private:
   // Move the active slices to the center of the volume
   void adjust_depth( Core::VolumeSliceHandle target_slice );
 
+  // Auto orient the 3D view for the given slice
+  void auto_orient( Core::VolumeSliceHandle target_slice );
+
   void trigger_redraw( bool delay_update );
   void trigger_redraw_overlay( bool delay_update );
   

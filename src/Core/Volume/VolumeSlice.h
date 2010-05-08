@@ -74,7 +74,12 @@ protected:
 
 public:
 
-  VolumeType volume_type()
+  VolumeHandle get_volume() const
+  {
+    return this->volume_;
+  }
+
+  VolumeType volume_type() const
   {
     return this->volume_->type();
   }
@@ -83,7 +88,7 @@ public:
 
   void set_slice_number( size_t slice_num );
 
-  inline size_t get_slice_number() const
+  size_t get_slice_number() const
   {
     return this->slice_number_;
   }
@@ -109,23 +114,23 @@ public:
   // Returns true if the slice is moved successfully, otherwise false.
   void move_slice_to( double depth, bool fail_safe = false );
 
-  inline size_t nx() const { return this->nx_; }
-  inline size_t ny() const { return this->ny_; }
-  inline size_t number_of_slices() const { return this->number_of_slices_; }
-  inline bool out_of_boundary() const { return this->out_of_boundary_; }
+  size_t nx() const { return this->nx_; }
+  size_t ny() const { return this->ny_; }
+  size_t number_of_slices() const { return this->number_of_slices_; }
+  bool out_of_boundary() const { return this->out_of_boundary_; }
 
-  inline double left() const { return this->left_; }
-  inline double right() const { return this->right_; }
-  inline double bottom() const { return this->bottom_; }
-  inline double top() const { return this->top_; }
-  inline double depth() const { return this->depth_; }
+  double left() const { return this->left_; }
+  double right() const { return this->right_; }
+  double bottom() const { return this->bottom_; }
+  double top() const { return this->top_; }
+  double depth() const { return this->depth_; }
 
-  inline const Point& bottom_left() const { return this->bottom_left_; }
-  inline const Point& bottom_right() const { return this->bottom_right_; }
-  inline const Point& top_left() const { return this->top_left_; }
-  inline const Point& top_right() const { return this->top_right_; }
+  const Point& bottom_left() const { return this->bottom_left_; }
+  const Point& bottom_right() const { return this->bottom_right_; }
+  const Point& top_left() const { return this->top_left_; }
+  const Point& top_right() const { return this->top_right_; }
 
-  inline void volume_updated_slot()
+  void volume_updated_slot()
   {
     this->slice_changed_ = true;
   }
@@ -140,7 +145,7 @@ public:
     return this->volume_->apply_inverse_grid_transform( pt );
   }
   
-  inline mutex_type& get_mutex()
+  mutex_type& get_mutex()
   {
     return this->volume_->get_mutex();
   }
@@ -153,7 +158,7 @@ public:
   // acquire a lock on the RenderResources before calling this function.
   virtual void upload_texture() = 0;
 
-  inline TextureHandle get_texture()
+  TextureHandle get_texture()
   {
     return this->texture_;
   }

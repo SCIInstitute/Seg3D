@@ -498,4 +498,27 @@ LayerSceneHandle LayerManager::compose_layer_scene( size_t viewer_id )
   return layer_scene;
 }
 
+Core::BBox LayerManager::get_layers_bbox()
+{
+  // NOTE: This functions is called from the Rendering Thread
+  // Lock the LayerManager
+  lock_type lock( this->get_mutex() );
+
+  Core::BBox bbox;
+  group_handle_list_type::iterator group_iterator = this->group_handle_list_.begin();
+  for ( ; group_iterator != this->group_handle_list_.end(); group_iterator++)
+  {
+    LayerGroupHandle group = *group_iterator;
+    const Core::GridTransform& grid_trans = group->get_grid_transform();
+    Core::Point pt( 0, 0, 0 );
+    bbox.extend( grid_trans * pt );
+    pt = Core::Point( static_cast< double >( grid_trans.get_nx() - 1 ), 
+      static_cast< double >( grid_trans.get_ny() - 1 ), 
+      static_cast< double >( grid_trans.get_nz() - 1 ) );
+    bbox.extend( grid_trans * pt );
+  }
+
+  return bbox;
+}
+
 } // end namespace seg3D

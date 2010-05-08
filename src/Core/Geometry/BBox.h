@@ -279,12 +279,12 @@ public:
     cmax_ += origin;
   }
 
-  inline Point min() const
+  inline const Point& min() const
   {
     return cmin_;
   }
 
-  inline Point max() const
+  inline const Point& max() const
   {
     return cmax_;
   }
@@ -324,17 +324,17 @@ public:
     return IntersectionType::INTERSECT_E;
   }
 
-  inline double x_length()
+  inline double x_length() const
   {
     return ( cmax_.x() - cmin_.x() );
   }
 
-  inline double y_length()
+  inline double y_length() const
   {
     return ( cmax_.y() - cmin_.y() );
   }
 
-  inline double z_length()
+  inline double z_length() const
   {
     return ( cmax_.z() - cmin_.z() );
   }

@@ -111,4 +111,43 @@ void View3D::translate( const Vector& offset )
   this->lookat_ -= offset;
 }
 
+void View3D::compute_clipping_planes( const BBox& bbox, double& znear, double& zfar )
+{
+  Vector eye_vec = this->lookat_ - this->eyep_;
+  eye_vec.normalize();
+  
+  Point cmin = bbox.min();
+  Point cmax = bbox.max();
+
+  Point pt = cmin;
+  znear = zfar = Dot( eye_vec, pt - this->eyep_ );
+  pt = cmax;
+  double dist = Dot( eye_vec, pt - this->eyep_ );
+  znear = Min( znear, dist );
+  zfar = Max( zfar, dist );
+
+  for ( int i = 0; i < 3; i++ )
+  {
+    pt = cmin;
+    pt[ i ] = cmax[ i ];
+    dist = Dot( eye_vec, pt - this->eyep_ );
+    znear = Min( znear, dist );
+    zfar = Max( zfar, dist );
+
+    pt = cmax;
+    pt[ i ] = cmin[ i ];
+    dist = Dot( eye_vec, pt - this->eyep_ );
+    znear = Min( znear, dist );
+    zfar = Max( zfar, dist );
+  }
+
+  // Offset the clipping planes by a small value
+  znear -= 0.001;
+  if ( znear < 0.001 )
+  {
+    znear = 0.001;
+  }
+  zfar += 0.001;
+}
+
 } // End namespace Core

@@ -29,6 +29,7 @@
 #ifndef CORE_GEOMETRY_VIEW3D_H
 #define CORE_GEOMETRY_VIEW3D_H
 
+#include <Core/Geometry/BBox.h>
 #include <Core/Geometry/Point.h>
 #include <Core/Geometry/Vector.h>
 
@@ -92,6 +93,7 @@ public:
   void rotate( const Vector& axis, double angle );
   void scale( double ratio );
   void translate( const Vector& offset );
+  void compute_clipping_planes( const BBox& bbox, double& znear, double& zfar );
 
 private:
 

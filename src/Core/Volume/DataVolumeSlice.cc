@@ -71,8 +71,6 @@ void DataVolumeSlice::initialize_texture()
       this->texture_ = Texture2DHandle( new Texture2D );
       this->texture_->set_mag_filter( GL_NEAREST );
       this->texture_->set_min_filter( GL_NEAREST );
-      //this->texture_->set_wrap_s( GL_CLAMP_TO_EDGE );
-      //this->texture_->set_wrap_t( GL_CLAMP_TO_EDGE );
     }
   }
 }
@@ -194,6 +192,7 @@ void DataVolumeSlice::upload_texture()
   // Step 3. release the pixel unpack buffer
   // NOTE: The texture streaming will still succeed even if the PBO is deleted.
   pixel_buffer->unbind();
+  glFinish();
 
   this->slice_changed_ = false;
 }

@@ -86,6 +86,9 @@ void Renderer::post_initialize()
 {
   glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
   glPixelStorei( GL_PACK_ALIGNMENT, 1 );
+  glDisable( GL_CULL_FACE );
+  glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+  glDepthFunc( GL_LEQUAL );
 
   {
     // lock the shared render context
@@ -145,34 +148,70 @@ bool Renderer::render()
 
   // Lock the state engine
   Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
-  // Get a snapshot of current layers
-  LayerSceneHandle layer_scene = LayerManager::Instance()->compose_layer_scene( this->viewer_id_ );
 
   ViewerHandle viewer = ViewerManager::Instance()->get_viewer( this->viewer_id_ );
 
   if ( viewer->is_volume_view() )
   {
     Core::View3D view3d( viewer->volume_view_state_->get() );
+    std::vector< LayerSceneHandle > layer_scenes;
+    std::vector< double > depths;
+    std::vector< std::string > view_modes;
+    size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
+    for ( size_t i = 0; i < num_of_viewers; i++ )
+    {
+      ViewerHandle other_viewer = ViewerManager::Instance()->get_viewer( i );
+      if ( !other_viewer->viewer_visible_state_->get() || 
+        !other_viewer->slice_visible_state_->get() || 
+        other_viewer->is_volume_view() )
+      {
+        continue;
+      }
+      // Get a snapshot of current layers
+      LayerSceneHandle layer_scene = LayerManager::Instance()->compose_layer_scene( i );
+      
+      // Copy slices from viewer
+      {
+        Core::RenderResources::lock_type lock( Core::RenderResources::GetMutex() );
+        this->process_slices( layer_scene, other_viewer );
+      }
+
+      if ( layer_scene->size() > 0 )
+      {
+        layer_scenes.push_back( layer_scene );
+        Core::StateView2D* view2d_state = static_cast< Core::StateView2D* >(
+          other_viewer->get_active_view_state().get() );
+        depths.push_back( view2d_state->get().center().z() );
+        view_modes.push_back( other_viewer->view_mode_state_->get() );
+      }
+    }
+
+    Core::BBox bbox = LayerManager::Instance()->get_layers_bbox();
 
     // We have got everything we want from the state engine, unlock before we do any rendering
     state_lock.unlock();
 
     glEnable( GL_DEPTH_TEST );
-    glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+    glEnable( GL_BLEND );
+    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
-    gluPerspective( view3d.fov(), this->width_ / ( 1.0 * this->height_ ), 0.1, 5.0 );
+    double znear, zfar;
+    view3d.compute_clipping_planes( bbox, znear, zfar );
+    gluPerspective( view3d.fov(), this->width_ / ( 1.0 * this->height_ ), znear, zfar );
     glMatrixMode( GL_MODELVIEW );
     glLoadIdentity();
     gluLookAt( view3d.eyep().x(), view3d.eyep().y(), view3d.eyep().z(), view3d.lookat().x(),
         view3d.lookat().y(), view3d.lookat().z(), view3d.up().x(), view3d.up().y(), view3d.up().z() );
 
-    glRotatef( 25.0f * ( this->viewer_id_ + 1 ), 1, 0, 1 );
-    glScalef( 0.5f, 0.5f, 0.5f );
-    glTranslatef( -0.5f, -0.5f, -0.5f );
-    this->cube_->draw();
+    this->draw_slices_3d( bbox, layer_scenes, depths, view_modes );
+
+    glDisable( GL_BLEND );
   }
   else
   {
+    // Get a snapshot of current layers
+    LayerSceneHandle layer_scene = LayerManager::Instance()->compose_layer_scene( this->viewer_id_ );
+    
     // Copy slices from viewer
     {
       Core::RenderResources::lock_type lock( Core::RenderResources::GetMutex() );
@@ -180,16 +219,14 @@ bool Renderer::render()
     }
 
     Core::View2D view2d(
-        dynamic_cast< Core::StateView2D* > ( viewer->get_active_view_state().get() )->get() );
+        static_cast< Core::StateView2D* > ( viewer->get_active_view_state().get() )->get() );
 
     // We have got everything we want from the state engine, unlock before we do any rendering
     state_lock.unlock();
 
     glDisable( GL_DEPTH_TEST );
-    glDisable( GL_CULL_FACE );
     glEnable( GL_BLEND );
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-    glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
     double left, right, top, bottom;
     view2d.compute_clipping_planes( this->width_ / ( 1.0 * this->height_ ), 
@@ -207,6 +244,7 @@ bool Renderer::render()
     for ( size_t layer_num = 0; layer_num < layer_scene->size(); layer_num++ )
     {
       LayerSceneItemHandle layer_item = ( *layer_scene )[ layer_num ];
+      this->slice_shader_->set_volume_type( layer_item->type() );
       switch ( layer_item->type() )
       {
       case Core::VolumeType::DATA_E:
@@ -215,7 +253,6 @@ bool Renderer::render()
             dynamic_cast< DataLayerSceneItem* >( layer_item.get() );
           Core::DataVolumeSlice* data_slice = data_layer_item->data_volume_slice_.get();
           volume_slice = data_slice;
-          this->slice_shader_->set_mask_mode( false );
 
           // Convert contrast to range ( 0, 1 ] and brightness to [ -1, 1 ]
           double contrast = ( 1 - data_layer_item->contrast_ / 101 );
@@ -243,7 +280,8 @@ bool Renderer::render()
             dynamic_cast< MaskLayerSceneItem* >( layer_item.get() );
           Core::MaskVolumeSlice* mask_slice = mask_layer_item->mask_volume_slice_.get();
           volume_slice = mask_slice;
-          this->slice_shader_->set_mask_mode( true );
+          this->slice_shader_->set_mask_mode( 0 );
+          this->slice_shader_->set_mask_color( 1.0f, 0.6f, 0.0f );
         }
         break;
       default:
@@ -336,8 +374,6 @@ bool Renderer::render_overlay()
     Core::Transform::BuildOrtho2DMatrix( proj_mat, left, right, bottom, top );
 
     glDisable( GL_DEPTH_TEST );
-    glDisable( GL_CULL_FACE );
-    glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
     // Enable blending
     glEnable( GL_BLEND );
     // NOTE: The result of the following blend function is that, color channels contains
@@ -543,7 +579,14 @@ void Renderer::viewer_slice_changed( size_t viewer_id )
   if ( self_viewer->view_mode_state_->index() !=
     updated_viewer->view_mode_state_->index() )
   {
-    this->redraw_overlay();
+    if ( self_viewer->is_volume_view() )
+    {
+      this->redraw();
+    }
+    else
+    {
+      this->redraw_overlay();
+    }
   }
 }
 
@@ -552,7 +595,14 @@ void Renderer::viewer_mode_changed( size_t viewer_id )
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
   if ( ViewerManager::Instance()->get_viewer( viewer_id )->viewer_visible_state_->get() )
   {
-    this->redraw_overlay();
+    if ( ViewerManager::Instance()->get_viewer( this->viewer_id_ )->is_volume_view() )
+    {
+      this->redraw();
+    }
+    else
+    {
+      this->redraw_overlay();
+    }
   }
 }
 
@@ -570,6 +620,157 @@ void Renderer::picking_target_changed( size_t viewer_id )
   {
     this->redraw_overlay();
   }
+}
+
+void Renderer::draw_slices_3d( const Core::BBox& bbox, 
+                const std::vector< LayerSceneHandle >& layer_scenes, 
+                const std::vector< double >& depths,
+                const std::vector< std::string >& view_modes )
+{
+  this->slice_shader_->enable();
+  size_t num_of_viewers = layer_scenes.size();
+  // for each visible 2D viewer
+  for ( size_t i = 0; i < num_of_viewers; i++ )
+  {
+    std::string view_mode = view_modes[ i ];
+    double depth = depths[ i ];
+    LayerSceneHandle layer_scene = layer_scenes[ i ];
+    Core::Point bottomleft, bottomright, topleft, topright;
+    double left, right, bottom, top;
+    if ( view_mode == Viewer::AXIAL_C )
+    {
+      bottomleft = bbox.min();
+      bottomleft[ 2 ] = depth;
+
+      bottomright[ 0 ] = bbox.max()[ 0 ];
+      bottomright[ 1 ] = bbox.min()[ 1 ];
+      bottomright[ 2 ] = depth;
+      
+      topleft[ 0 ] = bbox.min()[ 0 ];
+      topleft[ 1 ] = bbox.max()[ 1 ];
+      topleft[ 2 ] = depth;
+      
+      topright = bbox.max();
+      topright[ 2 ] = depth;
+
+      left = bottomleft[ 0 ];
+      right = bottomright[ 0 ];
+      bottom = bottomleft[ 1 ];
+      top = topleft[ 1 ];
+    }
+    else if ( view_mode == Viewer::CORONAL_C )
+    {
+      bottomleft = bbox.min();
+      bottomleft[ 1 ] = depth;
+      
+      bottomright[ 0 ] = bbox.min()[ 0 ];
+      bottomright[ 2 ] = bbox.max()[ 2 ];
+      bottomright[ 1 ] = depth;
+
+      topleft[ 0 ] = bbox.max()[ 0 ];
+      topleft[ 2 ] = bbox.min()[ 2 ];
+      topleft[ 1 ] = depth;
+
+      topright = bbox.max();
+      topright[ 1 ] = depth;
+
+      left = bottomleft[ 2 ];
+      right = bottomright[ 2 ];
+      bottom = bottomleft[ 0 ];
+      top = topleft[ 0 ];
+    }
+    else
+    {
+      bottomleft = bbox.min();
+      bottomleft[ 0 ] = depth;
+    
+      bottomright[ 1 ] = bbox.max()[ 1 ];
+      bottomright[ 2 ] = bbox.min()[ 2 ];
+      bottomright[ 0 ] = depth;
+
+      topleft[ 1 ] = bbox.min()[ 1 ];
+      topleft[ 2 ] = bbox.max()[ 2 ];
+      topleft[ 0 ] = depth;
+
+      topright = bbox.max();
+      topright[ 0 ] = depth;
+
+      left = bottomleft[ 1 ];
+      right = bottomright[ 1 ];
+      bottom = bottomleft[ 2 ];
+      top = topleft[ 2 ];
+    }
+
+    Core::VolumeSlice* volume_slice = 0;
+    // for each slice
+    for ( size_t layer_num = 0; layer_num < layer_scene->size(); layer_num++ )
+    {
+      LayerSceneItemHandle layer_item = ( *layer_scene )[ layer_num ];
+      this->slice_shader_->set_volume_type( layer_item->type() );
+      switch ( layer_item->type() )
+      {
+      case Core::VolumeType::DATA_E:
+        {
+          DataLayerSceneItem* data_layer_item = 
+            dynamic_cast< DataLayerSceneItem* >( layer_item.get() );
+          Core::DataVolumeSlice* data_slice = data_layer_item->data_volume_slice_.get();
+          volume_slice = data_slice;
+
+          // Convert contrast to range ( 0, 1 ] and brightness to [ -1, 1 ]
+          double contrast = ( 1 - data_layer_item->contrast_ / 101 );
+          double brightness = data_layer_item->brightness_ / 50 - 1.0;
+          double scale = 1.0 / contrast;
+          double bias = 1.0 - ( 1.0 - brightness ) * scale;
+          this->slice_shader_->set_scale_bias( static_cast< float >( scale ), 
+            static_cast< float >( bias ) );
+        }
+        break;
+      case Core::VolumeType::MASK_E:
+        {
+          MaskLayerSceneItem* mask_layer_item = 
+            dynamic_cast< MaskLayerSceneItem* >( layer_item.get() );
+          Core::MaskVolumeSlice* mask_slice = mask_layer_item->mask_volume_slice_.get();
+          volume_slice = mask_slice;
+          this->slice_shader_->set_mask_mode( 2 );
+          this->slice_shader_->set_mask_color( 1.0f, 0.6f, 0.0f );
+        }
+        break;
+      default:
+        assert( false );
+        continue;
+      } // end switch
+
+
+      this->slice_shader_->set_opacity( static_cast< float >( layer_item->opacity_ ) );
+      double slice_width = volume_slice->right() - volume_slice->left();
+      double slice_height = volume_slice->top() - volume_slice->bottom();
+      double tex_left = ( left - volume_slice->left() ) / slice_width;
+      double tex_right = ( right - volume_slice->right() ) / slice_width + 1.0;
+      double tex_bottom = ( bottom - volume_slice->bottom() ) / slice_height;
+      double tex_top = ( top - volume_slice->top() ) / slice_height + 1.0;
+      Core::TextureHandle slice_tex = volume_slice->get_texture();
+      Core::Texture::lock_type slice_tex_lock( slice_tex->get_mutex() );
+      slice_tex->bind();
+      glBegin( GL_QUADS );
+      glMultiTexCoord2d( GL_TEXTURE0, tex_left, tex_bottom );
+      glVertex3dv( &bottomleft[ 0 ] );
+      glMultiTexCoord2d( GL_TEXTURE0, tex_right, tex_bottom );
+      glVertex3dv( &bottomright[ 0 ] );
+      glMultiTexCoord2d( GL_TEXTURE0, tex_right, tex_top );
+      glVertex3dv( &topright[ 0 ] );
+      glMultiTexCoord2d( GL_TEXTURE0, tex_left, tex_top );
+      glVertex3dv( &topleft[ 0 ] );
+      glEnd();
+      // NOTE: Always unbind, because we are deleting textures in a separate thread/context.
+      // In this case texture binding of the rendering thread won't be reverted to 0, which
+      // will cause problem when a new texture with the same ID is generated and bound to
+      // this context, because the driver would think it's already bound.
+      slice_tex->unbind();
+
+    } // end for
+
+  } // end for each viewer
+  this->slice_shader_->disable();
 }
 
 } // end namespace Seg3D

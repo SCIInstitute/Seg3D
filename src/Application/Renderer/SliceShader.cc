@@ -79,6 +79,8 @@ bool SliceShader::initialize()
   this->scale_bias_loc_ = this->glsl_prog_->get_uniform_location( "scale_bias" );
   this->pixel_size_loc_ = this->glsl_prog_->get_uniform_location( "pixel_size" );
   this->border_width_loc_ = this->glsl_prog_->get_uniform_location( "border_width" );
+  this->volume_type_loc_ = this->glsl_prog_->get_uniform_location( "volume_type" );
+  this->mask_color_loc_ = this->glsl_prog_->get_uniform_location( "mask_color" );
   this->glsl_prog_->disable();
 
   this->valid_ = true;
@@ -112,7 +114,7 @@ void SliceShader::set_opacity( float opacity )
   glUniform1f( this->opacity_loc_, opacity );
 }
 
-void SliceShader::set_mask_mode( bool mask_mode )
+void SliceShader::set_mask_mode( int mask_mode )
 {
   glUniform1i( this->mask_mode_loc_, mask_mode );
 }
@@ -130,6 +132,16 @@ void SliceShader::set_pixel_size( float width, float height )
 void SliceShader::set_border_width( int width )
 {
   glUniform1i( this->border_width_loc_, width );
+}
+
+void SliceShader::set_volume_type( int volume_type )
+{
+  glUniform1i( this->volume_type_loc_, volume_type );
+}
+
+void SliceShader::set_mask_color( float r, float g, float b )
+{
+  glUniform3f( this->mask_color_loc_, r, g, b );
 }
 
 } // end namespace Seg3D

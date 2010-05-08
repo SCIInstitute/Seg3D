@@ -38,6 +38,7 @@
 #include <Application/Viewer/Viewer.h>
 
 #include <Core/Utils/ConnectionHandler.h>
+#include <Core/Geometry/BBox.h>
 #include <Core/Graphics/Texture.h>
 #include <Core/Graphics/UnitCube.h>
 #include <Core/RendererBase/RendererBase.h>
@@ -73,6 +74,10 @@ protected:
 private:
 
   void process_slices( LayerSceneHandle& layer_scene, ViewerHandle& viewer );
+  void draw_slices_3d( const Core::BBox& bbox, 
+    const std::vector< LayerSceneHandle >& layer_scenes, 
+    const std::vector< double >& depths,
+    const std::vector< std::string >& view_modes );
   void viewer_slice_changed( size_t viewer_id );
   void viewer_mode_changed( size_t viewer_id );
   void picking_target_changed( size_t viewer_id );

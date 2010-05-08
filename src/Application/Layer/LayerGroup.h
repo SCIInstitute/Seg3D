@@ -164,27 +164,27 @@ protected:
 public:
   // GRID_TRANSFORM
   // Get the transform of the layer
-  Core::GridTransform get_grid_transform() 
+  const Core::GridTransform& get_grid_transform() const
   {
     return grid_transform_;
   }
   
-  std::string get_group_id()
+  std::string get_group_id() const
   {
     return stateid();
   }
   
-  layer_list_type get_layer_list()
+  layer_list_type get_layer_list() const
   {
     return layer_list_;
   }
   
-  size_t get_list_size()
+  size_t get_list_size() const
   {
     return layer_list_.size();
   }
   
-  bool is_empty()
+  bool is_empty() const
   {
     return layer_list_.empty();
   }

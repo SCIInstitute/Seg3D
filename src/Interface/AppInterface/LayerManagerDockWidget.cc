@@ -104,7 +104,7 @@ LayerManagerDockWidget::LayerManagerDockWidget( QWidget *parent ) :
 
 LayerManagerDockWidget::~LayerManagerDockWidget()
 {
-
+  this->disconnect_all();
 }
 
 void LayerManagerDockWidget::insert_layer_ui( LayerHandle &layer )

@@ -44,6 +44,7 @@
 #include <Core/Utils/Singleton.h>
 #include <Core/Utils/Log.h>
 #include <Core/Utils/Exception.h>
+#include <Core/Geometry/BBox.h>
 
 // Application includes
 #include <Application/Layer/LayerGroup.h>
@@ -96,6 +97,9 @@ private:
 public:
   // Take an atomic snapshot of visual properties of layers for rendering in the specified viewer
   LayerSceneHandle compose_layer_scene( size_t viewer_id );
+
+  // Get the bounding box of all layers
+  Core::BBox get_layers_bbox();
   
   // Group Action Functions
 public:

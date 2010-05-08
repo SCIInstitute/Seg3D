@@ -434,6 +434,7 @@ void Viewer::insert_layer( LayerHandle layer )
   if ( !this->active_layer_slice_ )
   {
     Core::ScopedCounter block_counter( this->signals_block_count_ );
+    this->auto_orient( volume_slice );
     this->adjust_view( volume_slice );
     this->adjust_depth( volume_slice );
     this->set_active_layer( layer );
@@ -443,7 +444,10 @@ void Viewer::insert_layer( LayerHandle layer )
     volume_slice->move_slice_to( this->active_layer_slice_->depth() );
   }
 
-  this->trigger_redraw( false );
+  if ( !this->is_volume_view() )
+  {
+    this->trigger_redraw( false );
+  }
 }
 
 void Viewer::delete_layers( std::vector< LayerHandle > layers )
@@ -531,7 +535,14 @@ void Viewer::set_active_layer( LayerHandle layer )
 
   if ( this->active_layer_slice_ == new_active_slice )
   {
-    this->trigger_redraw_overlay( false );
+    if ( !this->is_volume_view() )
+    {
+      this->trigger_redraw_overlay( false );
+      if ( this->viewer_visible_state_->get() )
+      {
+        this->slice_changed_signal_( this->viewer_id_ );
+      }
+    }
     return;
   }
   this->active_layer_slice_ = new_active_slice;
@@ -786,12 +797,12 @@ void Viewer::adjust_view( Core::VolumeSliceHandle target_slice )
   if ( target_slice->volume_type() == Core::VolumeType::DATA_E )
   {
     volume_slice = Core::VolumeSliceHandle( new Core::DataVolumeSlice( 
-      *dynamic_cast< Core::DataVolumeSlice* >( target_slice.get() ) ) );
+      *static_cast< Core::DataVolumeSlice* >( target_slice.get() ) ) );
   }
   else
   {
     volume_slice = Core::VolumeSliceHandle( new Core::MaskVolumeSlice( 
-      *dynamic_cast< Core::MaskVolumeSlice* >( target_slice.get() ) ) );
+      *static_cast< Core::MaskVolumeSlice* >( target_slice.get() ) ) );
   }
 
   double aspect = 1.0;
@@ -831,6 +842,50 @@ void Viewer::adjust_view( Core::VolumeSliceHandle target_slice )
   scalex = scale * Core::Sign( this->sagittal_view_state_->get().scalex() );
   scaley = scale * Core::Sign( this->sagittal_view_state_->get().scaley() );
   this->sagittal_view_state_->set( Core::View2D( center, scalex, scaley ) );
+
+  Core::VolumeHandle volume = volume_slice->get_volume();
+  Core::Point corner1 = volume->apply_grid_transform( Core::Point( 0, 0, 0 ) );
+  Core::Point corner2 = volume->apply_grid_transform(
+    Core::Point( static_cast< double >( volume->get_nx() - 1 ), 
+    static_cast< double >( volume->get_ny() - 1 ), static_cast< double >( volume->get_nz() - 1 ) ) );
+  Core::View3D view3d( this->volume_view_state_->get() );
+  center = Core::Point( ( corner1 + corner2 ) * 0.5 );
+  view3d.translate( view3d.lookat() - center );
+  Core::Matrix mat;
+  Core::Transform::BuildViewMatrix( mat, view3d.eyep(), view3d.lookat(), view3d.up() );
+  double ctan_hfov = 1.0 / Core::Tan( Core::DegreeToRadian( view3d.fov() * 0.5 ) );
+  // For each vertex of the bounding box, compute its coordinates in eye space
+  Core::Point pt = mat * corner1;
+  double eye_offset = Core::Max( Core::Abs( pt.y() ), Core::Abs( pt.x() ) / aspect ) * 
+    ctan_hfov + pt.z();
+  pt = mat * corner2;
+  eye_offset = Core::Max( eye_offset, Core::Max( Core::Abs( pt.y() ), 
+    Core::Abs( pt.x() ) / aspect ) * ctan_hfov + pt.z() );  
+  for ( int i = 0; i < 3; i++ )
+  {
+    pt = corner1;
+    pt[ i ] = corner2[ i ];
+    pt = mat * pt;
+    eye_offset = Core::Max( eye_offset, Core::Max( Core::Abs( pt.y() ), 
+      Core::Abs( pt.x() ) / aspect ) * ctan_hfov + pt.z() );  
+    
+    pt = corner2;
+    pt[ i ] = corner1[ i ];
+    pt = mat * pt;
+    eye_offset = Core::Max( eye_offset, Core::Max( Core::Abs( pt.y() ), 
+      Core::Abs( pt.x() ) / aspect ) * ctan_hfov + pt.z() );  
+  }
+
+  Core::Vector eye_vec = view3d.eyep() - view3d.lookat();
+  eye_vec.normalize();
+  //double eye_dist = eye_vec.normalize() + depth * 0.99;
+  //height = Core::Max( height, width / aspect ) * 1.01;
+  //eye_dist = Core::Max( height / Core::Tan( 
+  //  Core::DegreeToRadian( view3d.fov() * 0.5 ) ), eye_dist );
+
+  //view3d.eyep( view3d.lookat() + eye_vec * eye_dist );
+  view3d.eyep( view3d.eyep() + eye_vec * eye_offset );
+  this->volume_view_state_->set( view3d );
 }
 
 void Viewer::adjust_depth( Core::VolumeSliceHandle target_slice )
@@ -870,6 +925,22 @@ void Viewer::adjust_depth( Core::VolumeSliceHandle target_slice )
   view2d = this->sagittal_view_state_->get();
   view2d.center().z( volume_slice->depth() );
   this->sagittal_view_state_->set( view2d );
+}
+
+void Viewer::auto_orient( Core::VolumeSliceHandle target_slice )
+{
+  Core::VolumeHandle volume = target_slice->get_volume();
+  Core::Point corner1 = volume->apply_grid_transform( Core::Point( 0, 0, 0 ) );
+  Core::Point corner2 = volume->apply_grid_transform(
+    Core::Point( static_cast< double >( volume->get_nx() - 1 ), 
+    static_cast< double >( volume->get_ny() - 1 ), static_cast< double >( volume->get_nz() - 1 ) ) );
+  Core::View3D view3d;
+  view3d.lookat( Core::Point( ( corner1 + corner2 ) * 0.5 ) );
+  view3d.eyep( view3d.lookat() + Core::Vector( 0, 0, 1 ) );
+  view3d.up( Core::Vector( 0, 1, 0 ) );
+  view3d.rotate( Core::Vector( 1, 0, 0 ), -30 );
+  view3d.rotate( Core::Vector( 0, 1, 0 ), 135 );
+  this->volume_view_state_->set( view3d );
 }
 
 void Viewer::auto_view()
@@ -1014,10 +1085,6 @@ void Viewer::adjust_contrast_brightness( int dx, int dy )
   double contrast = old_contrast + dy * contrast_step;
   contrast = Core::Max( contrast_min, contrast );
   contrast = Core::Min( contrast_max, contrast );
-  if ( contrast != old_contrast )
-  {
-    Core::ActionSet::Dispatch( data_layer->contrast_state_, contrast );
-  }
   
   const double old_brightness = data_layer->brightness_state_->get();
   double brightness_min, brightness_max, brightness_step;
@@ -1026,6 +1093,13 @@ void Viewer::adjust_contrast_brightness( int dx, int dy )
   double brightness = old_brightness + dx * brightness_step;
   brightness = Core::Max( brightness_min, brightness );
   brightness = Core::Min( brightness_max, brightness );
+
+  lock.unlock();
+
+  if ( contrast != old_contrast )
+  {
+    Core::ActionSet::Dispatch( data_layer->contrast_state_, contrast );
+  }
   if ( brightness != old_brightness )
   {
     Core::ActionSet::Dispatch( data_layer->brightness_state_, brightness );
