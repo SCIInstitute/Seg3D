@@ -80,12 +80,12 @@ void ActionFactory::register_action( ActionBuilderBase* builder, std::string nam
     // Hence the program will throw an exception.
     // As registration is done on startup, this will cause a
     // faulty program to fail always on startup.
-    SCI_THROW_LOGICERROR( std::string( "Action '" ) + name + "' was registered twice" );
+    CORE_THROW_LOGICERROR( std::string( "Action '" ) + name + "' was registered twice" );
   }
 
   // Register the action
   private_->action_builders_[ name ] = builder;
-  SCI_LOG_DEBUG( std::string("Registering action : ") +  name );  
+  CORE_LOG_DEBUG( std::string("Registering action : ") +  name ); 
 }
 
 bool ActionFactory::create_action( const std::string& action_string, ActionHandle& action,

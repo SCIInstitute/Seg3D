@@ -46,7 +46,7 @@ StateOption::StateOption( const std::string& stateid, const std::string& default
     std::find( this->option_list_.begin(), this->option_list_.end(), this->value_ );
   if ( it == this->option_list_.end() )
   {
-    SCI_THROW_LOGICERROR( std::string( "Option \"" ) + this->value_ +
+    CORE_THROW_LOGICERROR( std::string( "Option \"" ) + this->value_ +
       "\" not in the option list" );
   }
   this->index_ = static_cast<int>( it - this->option_list_.begin() );
@@ -67,7 +67,7 @@ StateOption::StateOption( const std::string& stateid, const std::string& default
     std::find( this->option_list_.begin(), this->option_list_.end(), this->value_ );
   if ( it == this->option_list_.end() )
   {
-    SCI_THROW_LOGICERROR( std::string( "Option \"" ) + this->value_ +
+    CORE_THROW_LOGICERROR( std::string( "Option \"" ) + this->value_ +
       "\" not in the option list" );
   }
   this->index_ = static_cast<int>( it - this->option_list_.begin() );

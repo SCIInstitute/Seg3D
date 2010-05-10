@@ -138,7 +138,7 @@ void Renderer::post_initialize()
 
 bool Renderer::render()
 {
-  SCI_LOG_DEBUG( std::string("Renderer ") + Core::ToString( this->viewer_id_ ) 
+  CORE_LOG_DEBUG( std::string("Renderer ") + Core::ToString( this->viewer_id_ ) 
     + ": starting redraw" );
 
   glClearColor( 0.3f, 0.3f, 0.3f, 1.0f );
@@ -330,7 +330,7 @@ bool Renderer::render()
     glDisable( GL_BLEND );
   }
 
-  SCI_LOG_DEBUG( std::string("Renderer ") + Core::ToString( this->viewer_id_ ) 
+  CORE_LOG_DEBUG( std::string("Renderer ") + Core::ToString( this->viewer_id_ ) 
     + ": done redraw" );
 
   return true;
@@ -338,7 +338,7 @@ bool Renderer::render()
 
 bool Renderer::render_overlay()
 {
-  SCI_LOG_DEBUG( std::string("Renderer ") + Core::ToString( this->viewer_id_ ) 
+  CORE_LOG_DEBUG( std::string("Renderer ") + Core::ToString( this->viewer_id_ ) 
     + ": starting redraw overlay" );
 
   glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
@@ -500,7 +500,7 @@ bool Renderer::render_overlay()
     glDisable( GL_BLEND );
   }
 
-  SCI_LOG_DEBUG( std::string("Renderer ") + Core::ToString( this->viewer_id_ ) 
+  CORE_LOG_DEBUG( std::string("Renderer ") + Core::ToString( this->viewer_id_ ) 
     + ": done redraw overlay" );
 
   return true;

@@ -158,7 +158,7 @@ public:
   // to enforce a constraint from another action.
   bool set( const T& value, Core::ActionSource source = Core::ActionSource::NONE_E )
   {
-    SCI_LOG_DEBUG(std::string("Set Value ")+ stateid() +
+    CORE_LOG_DEBUG(std::string("Set Value ")+ stateid() +
       std::string(" ") + Core::ExportToString(value));
 
     // Lock the state engine so no other thread will be accessing it

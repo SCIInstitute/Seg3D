@@ -108,7 +108,7 @@ bool MaskDataFilterInterface::build_widget( QFrame* frame )
   this->private_->mask_->sync_layers();
   
   //Send a message to the log that we have finised with building the Mask Data Filter Interface
-  SCI_LOG_DEBUG("Finished building a Mask Data Filter Interface");
+  CORE_LOG_DEBUG("Finished building a Mask Data Filter Interface");
   return ( true );
 } // end build_widget
   

@@ -185,7 +185,7 @@ void StateEngine::add_stateid( const std::string& stateid )
   lock_type lock( get_mutex() );
   if ( stateid_list_.find( stateid ) != stateid_list_.end() )
   {
-    SCI_THROW_LOGICERROR( std::string("Trying to add stateid '") + stateid +
+    CORE_THROW_LOGICERROR( std::string("Trying to add stateid '") + stateid +
       std::string("' that already exists") );
   }
   stateid_list_.insert( stateid );
@@ -243,7 +243,7 @@ void StateEngine::add_statealias( const std::string& statealias, const std::stri
   lock_type lock( get_mutex() );
   if ( statealias_list_.find( statealias ) != statealias_list_.end() )
   {
-    SCI_THROW_LOGICERROR( std::string("Trying to add statealias '") +
+    CORE_THROW_LOGICERROR( std::string("Trying to add statealias '") +
       statealias + std::string("' that already exists") );
   }
   statealias_list_[ statealias ] = stateid;

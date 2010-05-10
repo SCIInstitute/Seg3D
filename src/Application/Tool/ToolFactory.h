@@ -228,14 +228,14 @@ void register_tool()
     // Hence the program will throw an exception.
     // As registration is done on startup, this will cause a
     // faulty program to fail always on startup.
-    SCI_THROW_LOGICERROR( std::string( "Tool '" ) + tool_type + "' is registered twice" );
+    CORE_THROW_LOGICERROR( std::string( "Tool '" ) + tool_type + "' is registered twice" );
   }
 
   // Register the action and set its properties
   tools_[tool_type] = new ToolInfo( TOOL::Type(), new ToolBuilder<TOOL>,
     TOOL::Properties(), TOOL::MenuName(), TOOL::ShortcutKey() );
 
-  SCI_LOG_DEBUG( std::string( "Registering tool : " ) + tool_type );
+  CORE_LOG_DEBUG( std::string( "Registering tool : " ) + tool_type );
 }
 
 private:
@@ -261,7 +261,7 @@ void register_toolinterface( std::string toolinterface_name )
   boost::to_lower( toolinterface_name );
   if ( toolinterface_name.substr( toolinterface_name.size() - 9 ) != std::string( "interface" ) )
   {
-    SCI_THROW_LOGICERROR( std::string( "ToolInterface class name does not end with Interface" ) );
+    CORE_THROW_LOGICERROR( std::string( "ToolInterface class name does not end with Interface" ) );
   }
 
   // Strip out the word interface
@@ -277,13 +277,13 @@ void register_toolinterface( std::string toolinterface_name )
     // Hence the program will throw an exception.
     // As registration is done on startup, this will cause a
     // faulty program to fail always on startup.
-    SCI_THROW_LOGICERROR( std::string( "ToolInterface '" ) +
+    CORE_THROW_LOGICERROR( std::string( "ToolInterface '" ) +
       toolinterface_name + "' is registered twice" );
   }
 
   // Register the action
   toolinterfaces_[ toolinterface_name ] = new ToolInterfaceBuilder<TOOLINTERFACE>;
-  SCI_LOG_DEBUG( std::string( "Registering toolinterface : " ) + toolinterface_name );
+  CORE_LOG_DEBUG( std::string( "Registering toolinterface : " ) + toolinterface_name );
 }
 
 private:

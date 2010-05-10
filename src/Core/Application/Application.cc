@@ -139,7 +139,7 @@ bool Application::get_user_directory( boost::filesystem::path& user_dir )
   }
   else
   {
-    SCI_LOG_ERROR( std::string( "Could not get user directory." ) );
+    CORE_LOG_ERROR( std::string( "Could not get user directory." ) );
     return false;
   }
 #else
@@ -151,7 +151,7 @@ bool Application::get_user_directory( boost::filesystem::path& user_dir )
   }
   else
   {
-    SCI_LOG_ERROR( std::string( "Could not get user directory." ) );
+    CORE_LOG_ERROR( std::string( "Could not get user directory." ) );
     return false;
   }
 #endif
@@ -173,11 +173,11 @@ bool Application::get_config_directory( boost::filesystem::path& config_dir )
   {
     if ( !( boost::filesystem::create_directory( config_dir ) ) )
     {
-      SCI_LOG_ERROR( std::string( "Could not create directory: " ) + config_dir.string() );
+      CORE_LOG_ERROR( std::string( "Could not create directory: " ) + config_dir.string() );
       return ( false );
     }
     
-    SCI_LOG_MESSAGE( std::string( "Created directory: " ) + config_dir.string() );
+    CORE_LOG_MESSAGE( std::string( "Created directory: " ) + config_dir.string() );
   }
   
   return ( true );
@@ -185,14 +185,14 @@ bool Application::get_config_directory( boost::filesystem::path& config_dir )
 
 void Application::log_start()
 {
-  SCI_LOG_MESSAGE( std::string( "Application: " ) + GetApplicationName() );
-  SCI_LOG_MESSAGE( std::string( "Version:" ) + GetVersion() );
-  SCI_LOG_MESSAGE( std::string( "64Bit:" )  + Core::ToString( Is64Bit() ) );
+  CORE_LOG_MESSAGE( std::string( "Application: " ) + GetApplicationName() );
+  CORE_LOG_MESSAGE( std::string( "Version:" ) + GetVersion() );
+  CORE_LOG_MESSAGE( std::string( "64Bit:" )  + Core::ToString( Is64Bit() ) );
 }
 
 void Application::log_finish()
 {
-  SCI_LOG_MESSAGE( std::string( "-- Finished --" ) );
+  CORE_LOG_MESSAGE( std::string( "-- Finished --" ) );
 }
 
 bool Application::IsApplicationThread()

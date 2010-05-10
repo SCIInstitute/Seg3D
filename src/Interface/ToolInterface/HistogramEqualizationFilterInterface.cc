@@ -152,7 +152,7 @@ bool HistogramEqualizationFilterInterface::build_widget( QFrame* frame )
   this->private_->target_->sync_layers();
 
   //Send a message to the log that we have finised with building the Histogram Equalization Filter Interface
-  SCI_LOG_DEBUG("Finished building a Histogram Equalization Filter Interface");
+  CORE_LOG_DEBUG("Finished building a Histogram Equalization Filter Interface");
   return ( true );
 } // end build_widget
   

@@ -80,7 +80,7 @@ bool DefaultEventHandlerContext::process_events()
   // Only run on the application thread
   if ( boost::this_thread::get_id() != eventhandler_thread_.get_id() )
   {
-    SCI_THROW_LOGICERROR("process_events was called from a thread that is not processing the events");
+    CORE_THROW_LOGICERROR("process_events was called from a thread that is not processing the events");
   }
 
   // lock the queue, so it is not changed while we are taking events of the
@@ -111,7 +111,7 @@ bool DefaultEventHandlerContext::wait_and_process_events()
   // Only run on the eventhandler thread
   if ( boost::this_thread::get_id() != eventhandler_thread_.get_id() )
   {
-    SCI_THROW_LOGICERROR("wait_and_process_events was called from a thread that is not processing the events");
+    CORE_THROW_LOGICERROR("wait_and_process_events was called from a thread that is not processing the events");
   }
 
   // lock the queue, so it is not changed while we are taking events of the

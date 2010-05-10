@@ -40,7 +40,7 @@ ConnectionHandler::~ConnectionHandler()
 {
   if ( !connections_.empty() )
   {
-    SCI_LOG_ERROR("disconnect_all() needs to be called in the destructor of the derived class");
+    CORE_LOG_ERROR("disconnect_all() needs to be called in the destructor of the derived class");
     // Correct the problem, although this is not fully thread safe
     disconnect_all();
   }

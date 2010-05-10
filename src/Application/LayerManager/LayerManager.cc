@@ -67,7 +67,7 @@ bool LayerManager::insert_layer( LayerHandle layer )
   {
     lock_type lock( this->get_mutex() );
     
-    SCI_LOG_DEBUG( std::string("Insert New Layer: ") + layer->get_layer_id());
+    CORE_LOG_DEBUG( std::string("Insert New Layer: ") + layer->get_layer_id());
     
     LayerGroupHandle group_handle;
     for ( group_handle_list_type::iterator it = group_handle_list_.begin(); 
@@ -87,7 +87,7 @@ bool LayerManager::insert_layer( LayerHandle layer )
       group_handle = LayerGroupHandle( new LayerGroup(  layer->get_grid_transform() ) );
       group_handle_list_.push_back( group_handle );
       
-      SCI_LOG_DEBUG( std::string("Set Active Layer: ") + layer->get_layer_id());
+      CORE_LOG_DEBUG( std::string("Set Active Layer: ") + layer->get_layer_id());
 
       // deactivate the previous active layer
       if ( active_layer_ )
@@ -268,7 +268,7 @@ void LayerManager::set_active_layer( LayerHandle layer )
     
     active_layer_->set_active( false );
   
-    SCI_LOG_DEBUG( std::string("Set Active Layer: ") + layer->get_layer_id());
+    CORE_LOG_DEBUG( std::string("Set Active Layer: ") + layer->get_layer_id());
     
     active_layer_ = layer;
     active_layer_->set_active( true );
@@ -374,7 +374,7 @@ void LayerManager::delete_layers( LayerGroupHandle group )
     {
       if( ( *it )->selected_state_->get() )
       {   
-        SCI_LOG_DEBUG( std::string("Deleting Layer: ") + ( *it )->get_layer_id() );
+        CORE_LOG_DEBUG( std::string("Deleting Layer: ") + ( *it )->get_layer_id() );
         layer_vector.push_back( *it );
         group->delete_layer( *it );
         if ( *it == this->active_layer_ )
@@ -482,7 +482,7 @@ LayerSceneHandle LayerManager::compose_layer_scene( size_t viewer_id )
         }
         break;
       default:
-        SCI_THROW_LOGICERROR("Unknow layer type");
+        CORE_THROW_LOGICERROR("Unknow layer type");
         break;
       } // end switch
 

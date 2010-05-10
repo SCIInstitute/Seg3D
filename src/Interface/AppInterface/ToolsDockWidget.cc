@@ -125,7 +125,7 @@ void ToolsDockWidget::open_tool( ToolHandle& tool )
 
   if( widget == 0 )
   {
-    SCI_THROW_LOGICERROR("A ToolInterface cannot be up casted to a ToolWidget pointer");
+    CORE_THROW_LOGICERROR("A ToolInterface cannot be up casted to a ToolWidget pointer");
   }
 
   // Step (2) : Instantiate the widget and add the tool to the toolbox
@@ -155,7 +155,7 @@ void ToolsDockWidget::close_tool( ToolHandle& tool )
   tool_widget_list_type::iterator it = tool_widget_list_.find( tool->toolid() );
   if( it == tool_widget_list_.end() )
   {
-    SCI_LOG_ERROR(std::string("widget with toolid '")+
+    CORE_LOG_ERROR(std::string("widget with toolid '")+
       tool->toolid()+"' does not exist");
     return;
   }
@@ -177,7 +177,7 @@ void ToolsDockWidget::activate_tool( ToolHandle& tool )
   tool_widget_list_type::iterator it = tool_widget_list_.find( tool->toolid() );
   if( it == tool_widget_list_.end() )
   {
-    SCI_LOG_ERROR(std::string("widget with toolid '")+
+    CORE_LOG_ERROR(std::string("widget with toolid '")+
       tool->toolid()+"' does not exist");
     return;
   }

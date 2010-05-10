@@ -55,7 +55,7 @@ bool RenderResources::create_render_context( RenderContextHandle& context )
   // is wrong in the program logic, hence warn the user
   if ( !resources_context_.get() )
   {
-    SCI_THROW_LOGICERROR("No render resources were installed to create an opengl context");
+    CORE_THROW_LOGICERROR("No render resources were installed to create an opengl context");
   }
 
   return ( resources_context_->create_render_context( context ) );
@@ -66,7 +66,7 @@ void RenderResources::install_resources_context( RenderResourcesContextHandle re
   // Check whether we got a proper render context
   if ( !resources_context.get() )
   {
-    SCI_THROW_LOGICERROR("Cannot install an empty render resources context");
+    CORE_THROW_LOGICERROR("Cannot install an empty render resources context");
   }
 
   resources_context_ = resources_context;
@@ -158,11 +158,11 @@ void RenderResources::init_gl()
       // Check OpenGL capabilities
       if ( !GLEW_VERSION_2_1 )
       {
-        SCI_THROW_OPENGLEXCEPTION( "Minimum OpenGL version 2.1 required." );
+        CORE_THROW_OPENGLEXCEPTION( "Minimum OpenGL version 2.1 required." );
       }
       if ( !GLEW_EXT_framebuffer_object )
       {
-        SCI_THROW_OPENGLEXCEPTION( "GL_EXT_framebuffer_object not found." );
+        CORE_THROW_OPENGLEXCEPTION( "GL_EXT_framebuffer_object not found." );
       }
     }
   }

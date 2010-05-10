@@ -87,7 +87,7 @@ bool PolylineToolInterface::build_widget( QFrame* frame )
   this->private_->target_->sync_layers();
 
   //Send a message to the log that we have finised with building the Polyline Tool Interface
-  SCI_LOG_MESSAGE("Finished building a Polyline Tool Interface");
+  CORE_LOG_MESSAGE("Finished building a Polyline Tool Interface");
 
   return ( true );
 } // end build_widget

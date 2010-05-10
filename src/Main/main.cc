@@ -71,7 +71,7 @@ int main( int argc, char **argv )
     if ( Core::FromString( port_number_string, port_number) )
     {
       // -- Add a socket for receiving actions --
-      SCI_LOG_DEBUG( std::string("Starting a socket on port: ") + Core::ToString( port_number ) );
+      CORE_LOG_DEBUG( std::string("Starting a socket on port: ") + Core::ToString( port_number ) );
       Core::ActionSocket::Instance()->start( port_number );
     }
   }

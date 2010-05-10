@@ -56,7 +56,7 @@ namespace Core
 template< class T >
 std::string ExportToString( const T& value )
 {
-  SCI_THROW_NOTIMPLEMENTEDERROR(std::string("ExportToString(")+
+  CORE_THROW_NOTIMPLEMENTEDERROR(std::string("ExportToString(")+
     typeid(value).name()+") was not implemented");
 }
 
@@ -121,7 +121,7 @@ std::string ExportToString( const std::vector< Vector >& value );
 template< class T >
 bool ImportFromString( const std::string& str, T& value )
 {
-  SCI_THROW_NOTIMPLEMENTEDERROR(std::string("ImportFromString(")+
+  CORE_THROW_NOTIMPLEMENTEDERROR(std::string("ImportFromString(")+
     typeid(value).name()+") was not implemented");
 }
 

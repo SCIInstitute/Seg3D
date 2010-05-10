@@ -53,7 +53,7 @@ QtApplication::QtApplication() :
 
 bool QtApplication::setup( int argc, char **argv )
 {
-  SCI_LOG_DEBUG( "Setup QT Application" );
+  CORE_LOG_DEBUG( "Setup QT Application" );
 
 #ifdef X11_THREADSAFE
   // Make X11 thread safe if the API is available.
@@ -63,31 +63,31 @@ bool QtApplication::setup( int argc, char **argv )
   try
   {
     // Step 1: Main application class
-    SCI_LOG_DEBUG( "Creating QApplication" );
+    CORE_LOG_DEBUG( "Creating QApplication" );
     qt_application_ = new QApplication( argc, argv );
 
     // Step 2: Create interface class to the main class of the event handler layer
-    SCI_LOG_DEBUG( "Creating QtEventHandlerContext" );
+    CORE_LOG_DEBUG( "Creating QtEventHandlerContext" );
     Core::EventHandlerContextHandle qt_eventhandler_context( new QtEventHandlerContext(
         qt_application_ ) );
 
     // Step 3: Insert the event handler into the application layer
-    SCI_LOG_DEBUG( "Install the QtEventHandlerContext into the Interface layer" );
+    CORE_LOG_DEBUG( "Install the QtEventHandlerContext into the Interface layer" );
     Core::Interface::Instance()->install_eventhandler_context( qt_eventhandler_context );
     Core::Interface::Instance()->start_eventhandler();
 
     // Step 4: Create opengl render resources
-    SCI_LOG_DEBUG( "Creating QtRenderResourcesContext" );
+    CORE_LOG_DEBUG( "Creating QtRenderResourcesContext" );
     qt_renderresources_context_ = QtRenderResourcesContextHandle( new QtRenderResourcesContext );
 
-    SCI_LOG_DEBUG( "Install the QtRenderResources into the Interface layer" );
+    CORE_LOG_DEBUG( "Install the QtRenderResources into the Interface layer" );
     // Step 5: Insert the render resources class into the application layer
     Core::RenderResources::Instance()->install_resources_context( qt_renderresources_context_ );
 
   }
   catch ( ... )
   {
-    SCI_LOG_ERROR( "QtApplication failed to initialize" );
+    CORE_LOG_ERROR( "QtApplication failed to initialize" );
     return ( false );
   }
 
@@ -99,37 +99,37 @@ bool QtApplication::exec()
   bool success = true;
   try
   {
-    SCI_LOG_DEBUG( "Starting main QT event loop" );
+    CORE_LOG_DEBUG( "Starting main QT event loop" );
 
     if ( !( qt_application_->exec() == 0 ) )
     {
-      SCI_LOG_DEBUG( "Qt crashed by dropping out of the event loop" );
+      CORE_LOG_DEBUG( "Qt crashed by dropping out of the event loop" );
       success = false;
     }
 
     delete qt_application_;
     qt_application_ = 0;
 
-    SCI_LOG_DEBUG( "Exiting main QT event loop" );
+    CORE_LOG_DEBUG( "Exiting main QT event loop" );
   }
   catch ( Core::Exception& except )
   {
     // Catch any Seg3D generated exceptions and display there message in the log file
-    SCI_LOG_ERROR( std::string( "Setup of the interface crashed by throwing an exception: " ) +
+    CORE_LOG_ERROR( std::string( "Setup of the interface crashed by throwing an exception: " ) +
       except.message() );
     success = false;
   }
   catch ( std::exception& except )
   {
     // For any other exception
-    SCI_LOG_ERROR( std::string( "Setup of the interface crashed by throwing an exception: " ) +
+    CORE_LOG_ERROR( std::string( "Setup of the interface crashed by throwing an exception: " ) +
       except.what() );
     success = false;
   }
   catch ( ... )
   {
     // For any other exception
-    SCI_LOG_ERROR( std::string( "Setup of the interface crashed by throwing an unknown exception" ) );
+    CORE_LOG_ERROR( std::string( "Setup of the interface crashed by throwing an unknown exception" ) );
     success = false;
   } 
 

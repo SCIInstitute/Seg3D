@@ -105,7 +105,7 @@ bool OtsuThresholdFilterInterface::build_widget( QFrame* frame )
   this->private_->target_->sync_layers(); 
 
   //Send a message to the log that we have finised with building the Otsu Threshold Filter Interface
-  SCI_LOG_DEBUG("Finished building an Otsu Threshold Filter Interface");
+  CORE_LOG_DEBUG("Finished building an Otsu Threshold Filter Interface");
   return ( true );
 
 } // end build_widget

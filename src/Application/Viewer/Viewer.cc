@@ -528,7 +528,7 @@ void Viewer::set_active_layer( LayerHandle layer )
     }
     else
     {
-      SCI_THROW_LOGICERROR( std::string("Active layer '") 
+      CORE_THROW_LOGICERROR( std::string("Active layer '") 
         + layer->get_layer_id() + "' could not be found" );
     }
   }
@@ -789,7 +789,7 @@ void Viewer::adjust_view( Core::VolumeSliceHandle target_slice )
 {
   if ( !target_slice )
   {
-    SCI_LOG_ERROR( "Invalid volume slice handle" );
+    CORE_LOG_ERROR( "Invalid volume slice handle" );
     return;
   }
 
@@ -892,7 +892,7 @@ void Viewer::adjust_depth( Core::VolumeSliceHandle target_slice )
 {
   if ( !target_slice )
   {
-    SCI_LOG_ERROR( "Invalid volume slice handle" );
+    CORE_LOG_ERROR( "Invalid volume slice handle" );
     return;
   }
 

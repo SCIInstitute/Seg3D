@@ -88,7 +88,7 @@ bool NeighborhoodConnectedFilterInterface::build_widget( QFrame* frame )
   this->private_->target_->sync_layers();
 
   //Send a message to the log that we have finised with building the Neighborhood Connected Filter Interface
-  SCI_LOG_DEBUG("Finished building an Neighborhood Connected Filter Interface");
+  CORE_LOG_DEBUG("Finished building an Neighborhood Connected Filter Interface");
   return ( true );
 
 }

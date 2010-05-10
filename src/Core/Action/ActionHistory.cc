@@ -104,7 +104,7 @@ void ActionHistory::record_action( ActionHandle action, ActionResultHandle resul
     action_history_.pop_back();
   }
 
-  //  SCI_LOG_DEBUG(std::string("Record action into history log: ")+action->type());
+  //  CORE_LOG_DEBUG(std::string("Record action into history log: ")+action->type());
   history_changed_signal_();
 }
 

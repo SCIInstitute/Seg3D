@@ -61,7 +61,7 @@ bool ToolManager::open_tool( const std::string& tool_type, std::string& new_tool
   lock_type lock( tool_list_mutex_ );
 
   // Step (2): Add an entry in the debug log
-  SCI_LOG_DEBUG( std::string("Open tool: ") + tool_type );
+  CORE_LOG_DEBUG( std::string("Open tool: ") + tool_type );
 
   // STEP (3): Create a new toolid and extract the tool type from the string
   new_toolid = Core::StateEngine::CreateStateID( tool_type );
@@ -72,7 +72,7 @@ bool ToolManager::open_tool( const std::string& tool_type, std::string& new_tool
 
   if ( !( ToolFactory::Instance()->create_tool( tool_type, new_toolid, tool ) ) )
   {
-    SCI_LOG_ERROR(std::string("Could not create tool of type: '")+tool_type+"'");
+    CORE_LOG_ERROR(std::string("Could not create tool of type: '")+tool_type+"'");
     return false;
   }
 
@@ -96,13 +96,13 @@ void ToolManager::close_tool( const std::string& toolid )
   lock_type lock( tool_list_mutex_ );
 
   // Step (2): Add an entry in the debug log
-  SCI_LOG_DEBUG(std::string("Close tool: ")+toolid);
+  CORE_LOG_DEBUG(std::string("Close tool: ")+toolid);
 
   // Step (3): Find the tool in the list.
   tool_list_type::iterator it = tool_list_.find( toolid );
   if ( it == tool_list_.end() )
   {
-    SCI_LOG_ERROR(std::string("Toolid '"+toolid+"' does not exist"));
+    CORE_LOG_ERROR(std::string("Toolid '"+toolid+"' does not exist"));
     return;
   }
 
@@ -140,7 +140,7 @@ void ToolManager::activate_tool( const std::string& toolid )
   lock_type lock( tool_list_mutex_ );
 
   // Step (2): Add an entry in the debug log
-  SCI_LOG_DEBUG(std::string("Activate tool: ")+toolid);
+  CORE_LOG_DEBUG(std::string("Activate tool: ")+toolid);
 
   // Step (3): Check if anything needs to be done
   if ( toolid == active_toolid_ ) return;

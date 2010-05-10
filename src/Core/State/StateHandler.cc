@@ -72,7 +72,7 @@ bool StateHandler::add_statebase( StateBaseHandle state )
 void StateHandler::handle_state_changed()
 {
   // Trigger the signal in the state engine
-  SCI_LOG_DEBUG("Triggering state changed signal");
+  CORE_LOG_DEBUG("Triggering state changed signal");
   StateEngine::Instance()->state_changed_signal_();
   
   // Call the local function of this state engine that handles the specifics of the derived

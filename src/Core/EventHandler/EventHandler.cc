@@ -63,7 +63,7 @@ void EventHandler::run_eventhandler()
   }
   catch ( Exception& e )
   {
-    SCI_LOG_ERROR(e.message());
+    CORE_LOG_ERROR(e.message());
   }
 }
 

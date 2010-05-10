@@ -138,7 +138,7 @@ bool CannyEdgeDetectionFilterInterface::build_widget( QFrame* frame )
   this->private_->target_->sync_layers();
 
   //Send a message to the log that we have finised with building the Detection Filter Interface
-  SCI_LOG_DEBUG("Finished building a Canny Edge Detection Filter Interface");
+  CORE_LOG_DEBUG("Finished building a Canny Edge Detection Filter Interface");
 
   return ( true );
 }

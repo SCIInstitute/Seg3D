@@ -91,7 +91,7 @@ bool InvertToolInterface::build_widget( QFrame* frame )
 
 
   //Send a message to the log that we have finised with building the Invert Tool Interface
-  SCI_LOG_MESSAGE("Finished building an Invert Tool Interface");
+  CORE_LOG_MESSAGE("Finished building an Invert Tool Interface");
 
   return ( true );
 } // end build_widget

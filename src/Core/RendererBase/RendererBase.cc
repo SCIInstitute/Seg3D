@@ -71,14 +71,14 @@ void RendererBase::initialize()
   {
     if ( !Core::RenderResources::Instance()->create_render_context( this->context_ ) )
     {
-      SCI_THROW_EXCEPTION( "Failed to create a valid rendering context" );
+      CORE_THROW_EXCEPTION( "Failed to create a valid rendering context" );
     }
     this->post_event( boost::bind( &RendererBase::initialize, this ) );
     this->start_eventhandler();
     return;
   }
 
-  SCI_LOG_DEBUG( "Initializing renderer in a separate thread" );
+  CORE_LOG_DEBUG( "Initializing renderer in a separate thread" );
 
 #else
   if ( !Interface::IsInterfaceThread() )
@@ -87,11 +87,11 @@ void RendererBase::initialize()
     return;
   }
 
-  SCI_LOG_DEBUG( "Initializing renderer in the interface thread" );
+  CORE_LOG_DEBUG( "Initializing renderer in the interface thread" );
 
   if ( !Core::RenderResources::Instance()->create_render_context( this->context_ ) )
   {
-    SCI_THROW_EXCEPTION("Failed to create a valid rendering context");
+    CORE_THROW_EXCEPTION("Failed to create a valid rendering context");
   }
 #endif
 
@@ -108,7 +108,7 @@ void RendererBase::initialize()
     this->frame_buffer_->attach_renderbuffer( depth_buffer_, GL_DEPTH_ATTACHMENT_EXT );
   }
 
-  SCI_LOG_DEBUG( std::string( "RendererBase initialized with context " ) 
+  CORE_LOG_DEBUG( std::string( "RendererBase initialized with context " ) 
     + this->context_->to_string() );
 
   this->post_initialize();

@@ -107,7 +107,7 @@ bool NrrdLayerImporter::import_layer( LayerImporterMode mode, std::vector<LayerH
   {
     case LayerImporterMode::DATA_E:
     {
-      SCI_LOG_DEBUG( std::string("Importing data layer: ") + get_base_filename() );
+      CORE_LOG_DEBUG( std::string("Importing data layer: ") + get_base_filename() );
           
       Core::DataBlockHandle datablock( new Core::NrrdDataBlock( nrrd_data_ ) );
       datablock->update_histogram();
@@ -118,12 +118,12 @@ bool NrrdLayerImporter::import_layer( LayerImporterMode mode, std::vector<LayerH
       layers.resize( 1 );
       layers[0] = LayerHandle( new DataLayer( get_base_filename(), datavolume ) );
 
-      SCI_LOG_DEBUG( std::string("Successfully imported: ") + get_base_filename() );
+      CORE_LOG_DEBUG( std::string("Successfully imported: ") + get_base_filename() );
       return true;
     }
     case LayerImporterMode::SINGLE_MASK_E:
     {
-      SCI_LOG_DEBUG( std::string("Importing mask layer: ") + get_base_filename() );
+      CORE_LOG_DEBUG( std::string("Importing mask layer: ") + get_base_filename() );
 
 
       Core::DataBlockHandle datablock( new Core::NrrdDataBlock( nrrd_data_ ) );
@@ -141,13 +141,13 @@ bool NrrdLayerImporter::import_layer( LayerImporterMode mode, std::vector<LayerH
       layers.resize( 1 );
       layers[0] = LayerHandle( new MaskLayer( get_base_filename(), maskvolume ) );
 
-      SCI_LOG_DEBUG( std::string("Successfully imported: ") + get_base_filename() );
+      CORE_LOG_DEBUG( std::string("Successfully imported: ") + get_base_filename() );
       return true;
     }
     
     case LayerImporterMode::BITPLANE_MASK_E:
     {
-      SCI_LOG_DEBUG( std::string("Importing mask layer: ") + get_base_filename() );
+      CORE_LOG_DEBUG( std::string("Importing mask layer: ") + get_base_filename() );
 
 
       Core::DataBlockHandle datablock( new Core::NrrdDataBlock( nrrd_data_ ) );
@@ -168,12 +168,12 @@ bool NrrdLayerImporter::import_layer( LayerImporterMode mode, std::vector<LayerH
         layers[j] = LayerHandle( new MaskLayer( get_base_filename(), maskvolume ) );
       }
       
-      SCI_LOG_DEBUG( std::string("Successfully imported: ") + get_base_filename() );
+      CORE_LOG_DEBUG( std::string("Successfully imported: ") + get_base_filename() );
       return true;
     }
     case LayerImporterMode::LABEL_MASK_E:
     {
-      SCI_LOG_DEBUG( std::string("Importing mask layer: ") + get_base_filename() );
+      CORE_LOG_DEBUG( std::string("Importing mask layer: ") + get_base_filename() );
 
 
       Core::DataBlockHandle datablock( new Core::NrrdDataBlock( nrrd_data_ ) );
@@ -194,7 +194,7 @@ bool NrrdLayerImporter::import_layer( LayerImporterMode mode, std::vector<LayerH
         layers[j] = LayerHandle( new MaskLayer( get_base_filename(), maskvolume ) );
       }
       
-      SCI_LOG_DEBUG( std::string("Successfully imported: ") + get_base_filename() );
+      CORE_LOG_DEBUG( std::string("Successfully imported: ") + get_base_filename() );
       return true;
     }   default:
       return false;

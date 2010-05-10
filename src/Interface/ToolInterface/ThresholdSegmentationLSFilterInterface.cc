@@ -192,7 +192,7 @@ bool ThresholdSegmentationLSFilterInterface::build_widget( QFrame* frame )
   this->private_->mask_->sync_layers();
   
   //Send a message to the log that we have finised with building the Segmentation Level Set Filter Interface
-  SCI_LOG_DEBUG("Finished building a Segmentation Level Set Filter Interface");
+  CORE_LOG_DEBUG("Finished building a Segmentation Level Set Filter Interface");
   return ( true );
 
 } // end build_widget

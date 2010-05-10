@@ -108,7 +108,7 @@ bool FromString( const std::string &str, double &value )
   }
   catch ( std::istringstream::failure e )
   {
-    SCI_LOG_DEBUG(e.what());
+    CORE_LOG_DEBUG(e.what());
     return ( false );
   }
 }

@@ -41,7 +41,7 @@ namespace Core
 
 void InitPlugins()
 {
-  SCI_LOG_DEBUG("Setup and register all the plugins");
+  CORE_LOG_DEBUG("Setup and register all the plugins");
 
   // Call the code that registers all the actions in the ActionFactory
   ActionLibraryInit();

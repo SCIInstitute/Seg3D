@@ -124,7 +124,7 @@ bool BooleanFilterInterface::build_widget( QFrame* frame )
   this->private_->mask_d_->sync_layers();
 
   //Send a message to the log that we have finised with building the Boolean Filter Interface
-  SCI_LOG_DEBUG("Finished building a Boolean Filter Interface");
+  CORE_LOG_DEBUG("Finished building a Boolean Filter Interface");
   return ( true );
 
 }// end build_widget

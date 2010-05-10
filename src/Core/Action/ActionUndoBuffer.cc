@@ -49,7 +49,7 @@ void ActionUndoBuffer::add_undo_action( std::string& tag, ActionHandleList& undo
   // Filter out undo/redo actions that are not valid
   if ( redo_action.get() == 0 )
   {
-    SCI_LOG_ERROR("Registration of a redo action that is empty");
+    CORE_LOG_ERROR("Registration of a redo action that is empty");
     return;
   }
 
@@ -57,7 +57,7 @@ void ActionUndoBuffer::add_undo_action( std::string& tag, ActionHandleList& undo
   {
     if ( undo_actions[ j ].get() == 0 )
     {
-      SCI_LOG_ERROR("Registration of an undo action that is empty");
+      CORE_LOG_ERROR("Registration of an undo action that is empty");
       return;
     }
 
@@ -65,7 +65,7 @@ void ActionUndoBuffer::add_undo_action( std::string& tag, ActionHandleList& undo
 
   if ( tag == "" )
   {
-    SCI_LOG_ERROR("Undo actions need to be tagged with a label");
+    CORE_LOG_ERROR("Undo actions need to be tagged with a label");
     return;
   }
 
@@ -186,13 +186,13 @@ bool ActionUndoBuffer::has_redo_action()
 void ActionUndoBuffer::run_action( ActionHandle action, ActionContextHandle action_context )
 {
 
-  SCI_LOG_DEBUG(std::string("Processing Undo/Redo Action: ")+action->type());
+  CORE_LOG_DEBUG(std::string("Processing Undo/Redo Action: ")+action->type());
 
   // Step (1): An action needs to be validated before it can be executed.
   // The validation is a separate step as invalid actions should nor be
   // posted to the observers recording what the program does
 
-  SCI_LOG_DEBUG("Validating Undo/Redo Action");
+  CORE_LOG_DEBUG("Validating Undo/Redo Action");
   if ( !( action->validate( action_context ) ) )
   {
     // The action  context should return unavailable or invalid
@@ -211,7 +211,7 @@ void ActionUndoBuffer::run_action( ActionHandle action, ActionContextHandle acti
   // Step (2): Run action from the context that was provided. And if the action
   // was synchronous a done signal is triggered in the context, to inform the
   // program whether the action succeeded.
-  SCI_LOG_DEBUG("Running Undo/Redo Action");
+  CORE_LOG_DEBUG("Running Undo/Redo Action");
 
   ActionResultHandle result;
   if ( !( action->run( action_context, result ) ) )

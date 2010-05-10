@@ -109,7 +109,7 @@ void VertexAttribArrayBuffer::set_array( VertexAttribArrayType array_type, GLint
       data_type, stride, reinterpret_cast<void*>( offset ) );
     break;
   default:
-    SCI_LOG_ERROR( "Incompatible array type and parameters" );
+    CORE_LOG_ERROR( "Incompatible array type and parameters" );
     assert( false );
     return;
   }
@@ -138,7 +138,7 @@ void VertexAttribArrayBuffer::set_array( VertexAttribArrayType array_type,
       stride, reinterpret_cast<void*>( offset ) );
     break;
   default:
-    SCI_LOG_ERROR( "Incompatible array type and parameters" );
+    CORE_LOG_ERROR( "Incompatible array type and parameters" );
     assert( false );
     return;
   }
@@ -158,7 +158,7 @@ void VertexAttribArrayBuffer::set_array( VertexAttribArrayType array_type, GLsiz
       reinterpret_cast<void*>( offset ) );
     break;
   default:
-    SCI_LOG_ERROR( "Incompatible array type and parameters" );
+    CORE_LOG_ERROR( "Incompatible array type and parameters" );
     assert( false );
     return;
   }

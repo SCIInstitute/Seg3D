@@ -399,14 +399,14 @@ void AppInterface::begin_progress( Core::ActionProgressHandle handle )
     this->progress_->done( 0 );
   }
   
-  SCI_LOG_DEBUG( "Start progress widget" );
+  CORE_LOG_DEBUG( "Start progress widget" );
   this->progress_ = new ProgressWidget( handle, this );
   this->progress_->exec();
 }
 
 void AppInterface::end_progress( Core::ActionProgressHandle handle )
 {
-  SCI_LOG_DEBUG( "Finish progress widget" );
+  CORE_LOG_DEBUG( "Finish progress widget" );
 
   if( this->progress_.data() ) 
   {

@@ -52,7 +52,7 @@ FreeTypeFaceHandle FreeTypeLibrary::new_face_from_file( const char* file_name, l
     return FreeTypeFaceHandle( new FreeTypeFace( face ) );
   }
 
-  SCI_LOG_ERROR( std::string( "Failed to create a new face from font file " ) + file_name );
+  CORE_LOG_ERROR( std::string( "Failed to create a new face from font file " ) + file_name );
   return FreeTypeFaceHandle();
 }
 
@@ -66,7 +66,7 @@ FreeTypeFaceHandle FreeTypeLibrary::new_face_frome_buffer( const unsigned char* 
     return FreeTypeFaceHandle( new FreeTypeFace( face ) );
   }
 
-  SCI_LOG_ERROR( std::string( "Failed to create a new face from buffer " ) );
+  CORE_LOG_ERROR( std::string( "Failed to create a new face from buffer " ) );
   return FreeTypeFaceHandle();
 }
 
@@ -90,7 +90,7 @@ FreeTypeLibraryHandle FreeTypeLibraryFactory::create_library()
     return FreeTypeLibraryHandle( new FreeTypeLibrary( library ) );
   }
 
-  SCI_LOG_ERROR( "Failed to create a FreeType library" );
+  CORE_LOG_ERROR( "Failed to create a FreeType library" );
   return FreeTypeLibraryHandle();
 }
 

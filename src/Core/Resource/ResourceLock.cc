@@ -85,7 +85,7 @@ void ResourceLock::Lock( ResourceLockHandle& resource_lock )
   // we test here that this is actually true
   if ( !( Application::IsApplicationThread() ) )
   {
-    SCI_THROW_LOGICERROR( "Lock is called from a thread other than the application thread" );
+    CORE_THROW_LOGICERROR( "Lock is called from a thread other than the application thread" );
   }
 
   resource_lock->lock();

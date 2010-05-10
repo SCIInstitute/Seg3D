@@ -39,7 +39,7 @@ BufferObject::BufferObject() :
   copy_constructed_( false )
 {
   glGenBuffers( 1, &( this->id_ ) );
-  SCI_LOG_DEBUG( std::string( "Buffer object generated: " ) + 
+  CORE_LOG_DEBUG( std::string( "Buffer object generated: " ) + 
     Core::ToString( this->id_ ) );
 }
 

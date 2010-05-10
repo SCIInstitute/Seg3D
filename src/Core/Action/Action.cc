@@ -107,7 +107,7 @@ bool Action::import_from_string( const std::string& action, std::string& error )
   std::string command;
   std::string value;
 
-  SCI_LOG_DEBUG(std::string("action = ")+action);
+  CORE_LOG_DEBUG(std::string("action = ")+action);
 
   // First part of the string is the command
   if ( !( Core::ScanCommand( action, pos, command, error ) ) )

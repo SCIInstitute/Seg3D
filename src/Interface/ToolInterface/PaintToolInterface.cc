@@ -144,7 +144,7 @@ bool PaintToolInterface::build_widget( QFrame* frame )
   
   
     //Send a message to the log that we have finised with building the Paint Brush Interface
-  SCI_LOG_MESSAGE("Finished building a Paint Brush Interface");
+  CORE_LOG_MESSAGE("Finished building a Paint Brush Interface");
 
   return ( true );
 } // end build_widget

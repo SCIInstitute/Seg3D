@@ -88,7 +88,7 @@ void QtRenderWidget::initializeGL()
 
 void QtRenderWidget::paintGL()
 {
-  SCI_LOG_DEBUG("Start of paintGL");
+  CORE_LOG_DEBUG("Start of paintGL");
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
   Core::Texture2DHandle texture = this->viewer_->get_texture();
@@ -100,7 +100,7 @@ void QtRenderWidget::paintGL()
   }
 
 
-  SCI_LOG_DEBUG("Painting texture");
+  CORE_LOG_DEBUG("Painting texture");
 
   // draw a window size quad and map the render texture onto it
   QSize view_size = QWidget::size();
@@ -158,7 +158,7 @@ void QtRenderWidget::resizeGL( int width, int height )
   this->viewer_->resize( width, height );
   if ( renderer_.get() )
   {
-    SCI_LOG_DEBUG(std::string("QtRenderWidget ") + Core::ToString(this->viewer_id_)
+    CORE_LOG_DEBUG(std::string("QtRenderWidget ") + Core::ToString(this->viewer_id_)
       + ": sending resize event to renderer");
     renderer_->resize( width, height );
     // Make sure the GL context of the widget is the current one of this thread,

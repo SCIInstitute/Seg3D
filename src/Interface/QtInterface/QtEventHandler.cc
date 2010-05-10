@@ -134,7 +134,7 @@ bool QtEventHandlerContext::process_events()
 {
   if ( !this->is_eventhandler_thread() )
   {
-    SCI_THROW_LOGICERROR( "Cannot process events from outside the Qt thread" );
+    CORE_THROW_LOGICERROR( "Cannot process events from outside the Qt thread" );
   }
 
   lock_type lock( this->mutex_ );
@@ -158,7 +158,7 @@ bool QtEventHandlerContext::process_events()
         std::string( "Interface event loop crashed by throwing an exception: " ) + 
         except.message();
 
-      SCI_LOG_ERROR( error_message );
+      CORE_LOG_ERROR( error_message );
       QMessageBox::critical( 0, QString( "Fatal Error" ), 
         QString::fromStdString( error_message) );
       QCoreApplication::exit( -1 );
@@ -170,7 +170,7 @@ bool QtEventHandlerContext::process_events()
         std::string( "Interface event loop crashed by throwing an exception: " ) + 
         except.what();
 
-      SCI_LOG_ERROR( error_message );
+      CORE_LOG_ERROR( error_message );
       QMessageBox::critical( 0, QString( "Fatal Error" ),  
         QString::fromStdString( error_message) );
       QCoreApplication::exit( -1 );
@@ -181,7 +181,7 @@ bool QtEventHandlerContext::process_events()
       std::string error_message =  
         std::string( "Interface event loop crashed by throwing an unknown exception" );
 
-      SCI_LOG_ERROR( error_message );
+      CORE_LOG_ERROR( error_message );
       QMessageBox::critical( 0, QString( "Fatal Error" ),  
         QString::fromStdString( error_message) );
       QCoreApplication::exit( -1 );
@@ -193,7 +193,7 @@ bool QtEventHandlerContext::process_events()
 
 bool QtEventHandlerContext::wait_and_process_events()
 {
-  SCI_THROW_LOGICERROR("Cannot wait on the Qt thread");
+  CORE_THROW_LOGICERROR("Cannot wait on the Qt thread");
 }
 
 bool QtEventHandlerContext::start_eventhandler( Core::EventHandler* eventhandler )
@@ -206,7 +206,7 @@ bool QtEventHandlerContext::start_eventhandler( Core::EventHandler* eventhandler
 
 void QtEventHandlerContext::terminate_eventhandler()
 {
-  SCI_THROW_LOGICERROR("Cannot terminate the Qt thread");
+  CORE_THROW_LOGICERROR("Cannot terminate the Qt thread");
 }
 
 bool QtEventHandlerContext::is_eventhandler_thread() const

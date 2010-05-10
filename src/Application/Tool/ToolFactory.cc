@@ -142,7 +142,7 @@ bool ToolFactory::create_toolinterface( const std::string& toolinterface_name,
   // Step (2): check its existence
   if ( it == toolinterfaces_.end() )
   {
-    SCI_THROW_LOGICERROR(std::string("Trying to instantiate tool '")
+    CORE_THROW_LOGICERROR(std::string("Trying to instantiate tool '")
       +toolinterface_name +"' that does not exist");
   }
 

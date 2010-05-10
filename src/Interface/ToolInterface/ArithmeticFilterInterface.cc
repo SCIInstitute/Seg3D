@@ -101,7 +101,7 @@ bool ArithmeticFilterInterface::build_widget( QFrame* frame )
   this->private_->volume_c_->sync_layers();
 
   //Send a message to the log that we have finised with building the Arithmetic Filter
-  SCI_LOG_DEBUG("Finished building an Arithmetic Filter Interface");
+  CORE_LOG_DEBUG("Finished building an Arithmetic Filter Interface");
 
   return ( true );
 } // end build_widget

@@ -81,7 +81,7 @@ Core::ActionHandle ActionNewMaskLayer::Create( const std::string& group_name )
 {
   ActionNewMaskLayer* action = new ActionNewMaskLayer;
   
-  SCI_LOG_DEBUG( "trying to create an action for adding a new mask layer to " + group_name );
+  CORE_LOG_DEBUG( "trying to create an action for adding a new mask layer to " + group_name );
   
   action->group_handle_ = LayerManager::Instance()->
     get_LayerGroupHandle_from_group_id( group_name );

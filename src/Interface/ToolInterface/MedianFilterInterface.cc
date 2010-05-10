@@ -107,7 +107,7 @@ bool MedianFilterInterface::build_widget( QFrame* frame )
   
 
   //Send a message to the log that we have finised with building the Median Filter Interface
-  SCI_LOG_DEBUG("Finished building an Median Filter Interface");
+  CORE_LOG_DEBUG("Finished building an Median Filter Interface");
   return ( true );
 
 } // end build_widget

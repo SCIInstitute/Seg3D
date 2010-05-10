@@ -251,14 +251,14 @@ ViewerWidgetPrivate::ViewerWidgetPrivate( QWidget *parent )
 
   if( this->viewer_ == 0 )
   {
-    SCI_THROW_LOGICERROR("OpenGL was not initialized correctly");
+    CORE_THROW_LOGICERROR("OpenGL was not initialized correctly");
   }
   this->viewer_->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
 
   // --------------------------------------
   // Generate button bar at the bottom of
   // the Viewer widget
-  SCI_LOG_DEBUG("Create button bar for ViewWidget");
+  CORE_LOG_DEBUG("Create button bar for ViewWidget");
 
   this->buttonbar_ = new QFrame( parent );
   

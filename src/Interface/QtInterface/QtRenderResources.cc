@@ -91,7 +91,7 @@ bool QtRenderResourcesContext::create_render_context( Core::RenderContextHandle&
 {
   if ( !( shared_widget_.data() ) )
   {
-    SCI_THROW_LOGICERROR("OpenGL render context is not available");
+    CORE_THROW_LOGICERROR("OpenGL render context is not available");
   }
 
   // Generate a new context
@@ -99,7 +99,7 @@ bool QtRenderResourcesContext::create_render_context( Core::RenderContextHandle&
       shared_widget_->context()->device() ) );
   qt_context->create( shared_widget_->context() );
 
-  SCI_LOG_DEBUG( std::string("qt_context->valid = ") + Core::ToString( qt_context->isValid() ) );
+  CORE_LOG_DEBUG( std::string("qt_context->valid = ") + Core::ToString( qt_context->isValid() ) );
 
   // Bind the new context in the GUI independent wrapper class
   context = Core::RenderContextHandle( new QtRenderContext( qt_context ) );
@@ -113,14 +113,14 @@ QtRenderResourcesContext::create_qt_render_widget( QWidget* parent )
   if ( !( shared_widget_.data() ) )
   {
     // Create the first shared widget
-    SCI_LOG_DEBUG( "Create the shared OpenGL widget" );
+    CORE_LOG_DEBUG( "Create the shared OpenGL widget" );
     shared_widget_ = new QtRenderWidget( format_, parent, 0 );
     return ( shared_widget_.data() );
   }
   else
   {
     // Create a sibling widget
-    SCI_LOG_DEBUG( "Create OpenGL widget" );
+    CORE_LOG_DEBUG( "Create OpenGL widget" );
     return ( new QtRenderWidget( format_, parent, shared_widget_.data() ) );
   }
 }

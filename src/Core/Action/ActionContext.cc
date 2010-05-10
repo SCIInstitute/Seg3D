@@ -44,17 +44,17 @@ ActionContext::~ActionContext()
 
 void ActionContext::report_error( const std::string& error )
 {
-  SCI_LOG_ERROR(error);
+  CORE_LOG_ERROR(error);
 }
 
 void ActionContext::report_warning( const std::string& warning )
 {
-  SCI_LOG_WARNING(warning);
+  CORE_LOG_WARNING(warning);
 }
 
 void ActionContext::report_message( const std::string& message )
 {
-  SCI_LOG_MESSAGE(message);
+  CORE_LOG_MESSAGE(message);
 }
 
 void ActionContext::report_result( const ActionResultHandle& result )

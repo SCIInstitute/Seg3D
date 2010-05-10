@@ -115,19 +115,19 @@ public:
 // MACROS FOR AUTOMATICALLY INCLUDING LINE NUMBER AND FILE IN THE
 // LOG FILE 
 
-#define SCI_LOG_ERROR(message)\
+#define CORE_LOG_ERROR(message)\
 Core::Log::Instance()->post_error(message,__LINE__,__FILE__)
 
-#define SCI_LOG_WARNING(message)\
+#define CORE_LOG_WARNING(message)\
 Core::Log::Instance()->post_warning(message,__LINE__,__FILE__)
 
-#define SCI_LOG_MESSAGE(message)\
+#define CORE_LOG_MESSAGE(message)\
 Core::Log::Instance()->post_message(message,__LINE__,__FILE__)
 
 #ifdef NDEBUG
-#define SCI_LOG_DEBUG(message)
+#define CORE_LOG_DEBUG(message)
 #else
-#define SCI_LOG_DEBUG(message)\
+#define CORE_LOG_DEBUG(message)\
 Core::Log::Instance()->post_debug(message,__LINE__,__FILE__)
 #endif
 

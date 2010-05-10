@@ -123,7 +123,7 @@ bool BinaryDilateErodeFilterInterface::build_widget( QFrame* frame )
   this->private_->target_->sync_layers();
 
   //Send a message to the log that we have finised with building the Binary Dialate Erode Filter Interface
-  SCI_LOG_DEBUG("Finished building a Binary Dilate Erode Filter Interface");
+  CORE_LOG_DEBUG("Finished building a Binary Dilate Erode Filter Interface");
   return ( true );
 
 } // end build_widget

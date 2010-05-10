@@ -90,7 +90,7 @@ bool GradientMagnitudeFilterInterface::build_widget( QFrame* frame )
   this->private_->target_->sync_layers();
   
   //Send a message to the log that we have finised with building the Gradient Magnitude Filter Interface
-  SCI_LOG_DEBUG("Finished building a Gradient Magnitude Filter Interface");
+  CORE_LOG_DEBUG("Finished building a Gradient Magnitude Filter Interface");
   return ( true );
 } // end build_widget
   

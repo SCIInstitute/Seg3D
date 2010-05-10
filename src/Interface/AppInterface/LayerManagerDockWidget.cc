@@ -151,9 +151,9 @@ void LayerManagerDockWidget::HandleInsertLayer( qpointer_type qpointer, LayerHan
     return;
   }
   
-  SCI_LOG_DEBUG( "HandleInsertLayer started" );
+  CORE_LOG_DEBUG( "HandleInsertLayer started" );
   if( qpointer.data() ) qpointer->insert_layer_ui( layer );
-  SCI_LOG_DEBUG( "HandleInsertLayer done" );
+  CORE_LOG_DEBUG( "HandleInsertLayer done" );
 }
 
 void LayerManagerDockWidget::HandleInsertLayerAt( qpointer_type qpointer, LayerHandle &layer, int index )
@@ -165,9 +165,9 @@ void LayerManagerDockWidget::HandleInsertLayerAt( qpointer_type qpointer, LayerH
     return;
   }
 
-  SCI_LOG_DEBUG( "HandleInsertLayerAt started" );
+  CORE_LOG_DEBUG( "HandleInsertLayerAt started" );
   if( qpointer.data() ) qpointer->insert_layer_at_ui( layer, index );
-  SCI_LOG_DEBUG( "HandleInsertLayerAt done" );
+  CORE_LOG_DEBUG( "HandleInsertLayerAt done" );
 }
 
 void LayerManagerDockWidget::HandleDeleteLayer( qpointer_type qpointer, LayerHandle &layer )
@@ -179,9 +179,9 @@ void LayerManagerDockWidget::HandleDeleteLayer( qpointer_type qpointer, LayerHan
     return;
   }
   
-  SCI_LOG_DEBUG( "HandleDeleteLayer started" );
+  CORE_LOG_DEBUG( "HandleDeleteLayer started" );
   if( qpointer.data() ) qpointer->delete_layer_ui( layer );
-  SCI_LOG_DEBUG( "HandleDeleteLayer done" );
+  CORE_LOG_DEBUG( "HandleDeleteLayer done" );
 }
 
 void LayerManagerDockWidget::HandleDeleteLayers( qpointer_type qpointer, std::vector< LayerHandle > layers)
@@ -193,9 +193,9 @@ void LayerManagerDockWidget::HandleDeleteLayers( qpointer_type qpointer, std::ve
     return;
   }
   
-  SCI_LOG_DEBUG( "HandleDeleteLayer started" );
+  CORE_LOG_DEBUG( "HandleDeleteLayer started" );
   if( qpointer.data() ) qpointer->delete_layers_ui( layers );
-  SCI_LOG_DEBUG( "HandleDeleteLayer done" );
+  CORE_LOG_DEBUG( "HandleDeleteLayer done" );
 
 }
 
@@ -210,9 +210,9 @@ void LayerManagerDockWidget::HandleActivateLayer( qpointer_type qpointer, LayerH
     return;
   }
 
-  SCI_LOG_DEBUG( "HandleActivateLayer started" );
+  CORE_LOG_DEBUG( "HandleActivateLayer started" );
   if( qpointer.data() ) qpointer->activate_layer_ui( layer );
-  SCI_LOG_DEBUG( "HandleActivateLayer done" );
+  CORE_LOG_DEBUG( "HandleActivateLayer done" );
 }
 
 void LayerManagerDockWidget::HandleGroupDeleted( qpointer_type qpointer, LayerGroupHandle &group )
@@ -224,9 +224,9 @@ void LayerManagerDockWidget::HandleGroupDeleted( qpointer_type qpointer, LayerGr
     return;
   }
   
-  SCI_LOG_DEBUG( "HandleGroupDeleted started" );
+  CORE_LOG_DEBUG( "HandleGroupDeleted started" );
   if( qpointer.data() ) qpointer->delete_group_ui( group );
-  SCI_LOG_DEBUG( "HandleGroupDeleted done" );
+  CORE_LOG_DEBUG( "HandleGroupDeleted done" );
 }
 
 void LayerManagerDockWidget::HandleGroupMoved( qpointer_type qpointer, std::string &group_id, int index )
@@ -238,9 +238,9 @@ void LayerManagerDockWidget::HandleGroupMoved( qpointer_type qpointer, std::stri
     return;
   }
   
-  SCI_LOG_DEBUG( "HandleGroupMoved started" );
+  CORE_LOG_DEBUG( "HandleGroupMoved started" );
   if( qpointer.data() ) qpointer->move_group_ui( group_id, index );
-  SCI_LOG_DEBUG( "HandleGroupMoved done" );
+  CORE_LOG_DEBUG( "HandleGroupMoved done" );
 }
 
 }  // end namespace Seg3D

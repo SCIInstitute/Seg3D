@@ -203,37 +203,37 @@ public:
 // MACROS FOR AUTOMATICALLY INCLUDING LINE NUMBER AND FILE IN THE
 // EXCEPTION THAT WAS THROWN
 
-#define SCI_THROW_EXCEPTION(message)\
+#define CORE_THROW_EXCEPTION(message)\
 throw Core::Exception(message,__LINE__,__FILE__)
 
-#define SCI_THROW_LOGICERROR(message)\
+#define CORE_THROW_LOGICERROR(message)\
 throw Core::LogicError(message,__LINE__,__FILE__)
 
-#define SCI_THROW_RUNTIMEERROR(message)\
+#define CORE_THROW_RUNTIMEERROR(message)\
 throw Core::RunTimeError(message,__LINE__,__FILE__)
 
-#define SCI_THROW_NOTIMPLEMENTEDERROR(message)\
+#define CORE_THROW_NOTIMPLEMENTEDERROR(message)\
 throw Core::NotImplementedError(message,__LINE__,__FILE__)
 
-#define SCI_THROW_INVALIDARGUMENT(message)\
+#define CORE_THROW_INVALIDARGUMENT(message)\
 throw Core::InvalidArgument(message,__LINE__,__FILE__)
 
-#define SCI_THROW_LENGTHERROR(message)\
+#define CORE_THROW_LENGTHERROR(message)\
 throw Core::LengthError(message,__LINE__,__FILE__)
 
-#define SCI_THROW_OUTOFRANGE(message)\
+#define CORE_THROW_OUTOFRANGE(message)\
 throw Core::OutOfRange(message,__LINE__,__FILE__)
 
-#define SCI_THROW_RANGEERROR(message)\
+#define CORE_THROW_RANGEERROR(message)\
 throw Core::RangeError(message,__LINE__,__FILE__)
 
-#define SCI_THROW_OVERFLOWERROR(message)\
+#define CORE_THROW_OVERFLOWERROR(message)\
 throw Core::OverflowError(message,__LINE__,__FILE__)
 
-#define SCI_THROW_UNDERFLOWERROR(message)\
+#define CORE_THROW_UNDERFLOWERROR(message)\
 throw Core::UnderflowError(message,__LINE__,__FILE__)
 
-#define SCI_THROW_OPENGLEXCEPTION(message)\
+#define CORE_THROW_OPENGLEXCEPTION(message)\
 throw OpenGLException(message, __LINE__, __FILE__)
 
 } // end namespace Core
