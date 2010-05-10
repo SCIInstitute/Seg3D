@@ -203,14 +203,14 @@ IF(NOT WIN32 AND NOT APPLE)
 ENDIF(NOT WIN32 AND NOT APPLE)
 
 ###########################################
-# Build Seg3DConfiguration.h
+# Build ApplicationConfiguration.h
 # this file contains information such as
 # version numbers and architecture
 # on which code can depend.
 ###########################################
 
-CONFIGURE_FILE (${CMAKE_CURRENT_SOURCE_DIR}/Configuration/Seg3DConfiguration.h.in 
-                ${CMAKE_CURRENT_BINARY_DIR}/Seg3DConfiguration.h 
+CONFIGURE_FILE (${CMAKE_CURRENT_SOURCE_DIR}/Configuration/ApplicationConfiguration.h.in 
+                ${CMAKE_CURRENT_BINARY_DIR}/ApplicationConfiguration.h 
                 @ONLY )
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
@@ -250,6 +250,7 @@ ADD_SUBDIRECTORY(Application)
 
 IF(SEG3D_BUILD_INTERFACE)
   ADD_SUBDIRECTORY(Interface)
+  ADD_SUBDIRECTORY(Main)
 ENDIF(SEG3D_BUILD_INTERFACE)
 
 ###########################################
@@ -295,7 +296,7 @@ ADD_SUBDIRECTORY(Bootstrap)
 INCLUDE(InstallRequiredSystemLibraries)
 
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Seg3D")
-SET(CPACK_PACKAGE_VENDOR "SCI_and_Numira_BioSciences")
+SET(CPACK_PACKAGE_VENDOR "SCI")
       
 SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/CMake/ReadMe.txt")
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Seg3D ${SEG3D_MAJOR_VERSION}.${SEG3D_MINOR_VERSION} is a segmentation program")

@@ -29,7 +29,7 @@
 #ifndef INIT_INIT_H
 #define INIT_INIT_H
 
-namespace Seg3D
+namespace Core
 {
 
 // INIT PLUGINS:

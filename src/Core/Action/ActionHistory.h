@@ -36,8 +36,10 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/signals2/signal.hpp>
 
+// Core includes
 #include <Core/Action/Action.h>
 #include <Core/Action/ActionDispatcher.h>
+#include <Core/Utils/Lockable.h>
 
 namespace Core
 {
@@ -49,7 +51,7 @@ namespace Core
 class ActionHistory;
 
 // Class defintion
-class ActionHistory : public Core::Singleton< ActionHistory >
+class ActionHistory : public Core::Singleton< ActionHistory >, public Lockable
 {
   CORE_SINGLETON( ActionHistory );
 
@@ -70,6 +72,7 @@ public:
   size_t max_history_size();
 
   // HISTORY_SIZE:
+  // Get the number of entries in the history buffer
   size_t history_size();
 
   // ACTION
@@ -83,12 +86,10 @@ public:
 private:
   typedef std::deque< std::pair< ActionHandle, ActionResultHandle > > action_history_type;
 
-  boost::mutex action_history_mutex_;
   action_history_type action_history_;
-  size_t action_history_max_size_;
+  size_t        action_history_max_size_;
 
-  boost::signals2::connection dispatcher_connection_;
-
+public:
   void record_action( ActionHandle handle, ActionResultHandle result );
 
   // -- History changed signal --

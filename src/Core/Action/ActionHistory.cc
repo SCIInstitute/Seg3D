@@ -34,11 +34,8 @@ namespace Core
 CORE_SINGLETON_IMPLEMENTATION( ActionHistory );
 
 ActionHistory::ActionHistory() :
-  action_history_max_size_( 0 )
+  action_history_max_size_( 300 )
 {
-  // Connect this class to the ActionDispatcher
-  dispatcher_connection_ = ActionDispatcher::Instance()-> post_action_signal_.connect(
-      boost::bind( &ActionHistory::record_action, this, _1, _2 ) );
 }
 
 ActionHistory::~ActionHistory()
@@ -47,7 +44,7 @@ ActionHistory::~ActionHistory()
 
 void ActionHistory::set_max_history_size( size_t size )
 {
-  boost::unique_lock< boost::mutex > lock( action_history_mutex_ );
+  lock_type lock( get_mutex() );
   action_history_max_size_ = size;
   if ( action_history_.size() > action_history_max_size_ )
   {
@@ -60,19 +57,19 @@ void ActionHistory::set_max_history_size( size_t size )
 
 size_t ActionHistory::max_history_size()
 {
-  boost::unique_lock< boost::mutex > lock( action_history_mutex_ );
+  lock_type lock( get_mutex() );
   return ( action_history_max_size_ );
 }
 
 size_t ActionHistory::history_size()
 {
-  boost::unique_lock< boost::mutex > lock( action_history_mutex_ );
+  lock_type lock( get_mutex() );
   return ( action_history_.size() );
 }
 
 ActionHandle ActionHistory::action( size_t index )
 {
-  boost::unique_lock< boost::mutex > lock( action_history_mutex_ );
+  lock_type lock( get_mutex() );
   if ( index < action_history_.size() )
   {
     return action_history_[ index ].first;
@@ -86,7 +83,7 @@ ActionHandle ActionHistory::action( size_t index )
 
 ActionResultHandle ActionHistory::result( size_t index )
 {
-  boost::unique_lock< boost::mutex > lock( action_history_mutex_ );
+  lock_type lock( get_mutex() );
   if ( index < action_history_.size() )
   {
     return action_history_[ index ].second;
@@ -100,7 +97,7 @@ ActionResultHandle ActionHistory::result( size_t index )
 
 void ActionHistory::record_action( ActionHandle action, ActionResultHandle result )
 {
-  boost::unique_lock< boost::mutex > lock( action_history_mutex_ );
+  lock_type lock( get_mutex() );
   action_history_.push_front( std::make_pair( action, result ) );
   if ( action_history_.size() > action_history_max_size_ )
   {

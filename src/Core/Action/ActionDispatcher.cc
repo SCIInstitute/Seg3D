@@ -28,8 +28,12 @@
 
 // Need instance of main application for inserting events into main application
 // thread.
+
+// Core includes
 #include <Core/Application/Application.h>
 #include <Core/Action/ActionDispatcher.h>
+#include <Core/Action/ActionHistory.h>
+
 
 namespace Core
 {
@@ -38,6 +42,9 @@ CORE_SINGLETON_IMPLEMENTATION( ActionDispatcher );
 
 ActionDispatcher::ActionDispatcher()
 {
+  // Connect this class to the ActionHistory
+  post_action_signal_.connect( boost::bind( &ActionHistory::record_action, 
+    ActionHistory::Instance() , _1, _2 ) );
 }
 
 ActionDispatcher::~ActionDispatcher()
@@ -51,7 +58,7 @@ void ActionDispatcher::post_action( ActionHandle action, ActionContextHandle act
   // events are handled in the order that they are posted and one action is fully
   // handled before the next one
 
-  SCI_LOG_DEBUG(std::string("Posting Action: ")+action->export_to_string());
+  SCI_LOG_DEBUG( std::string("Posting Action: ") + action->export_to_string() );
 
   Application::Instance()->post_event( boost::bind( &ActionDispatcher::run_action, this, action,
       action_context ) );
@@ -67,7 +74,7 @@ void ActionDispatcher::post_and_wait_action( ActionHandle action,
 
   if ( Application::IsApplicationThread() )
   {
-    SCI_THROW_LOGICERROR("post_and_wait_action cannot be posted from the thread"
+    SCI_THROW_LOGICERROR( "post_and_wait_action cannot be posted from the thread"
       " that processes the actions. This will lead to a dead lock");
   }
 
@@ -87,8 +94,8 @@ void ActionDispatcher::post_actions( std::vector< ActionHandle > actions,
 
   for ( size_t j = 0; j < actions.size(); j++ )
   {
-    SCI_LOG_DEBUG(std::string("Posting Action sequence: ")+
-      actions[j]->export_to_string());
+    SCI_LOG_DEBUG( std::string("Posting Action sequence: " ) + 
+      actions[ j ]->export_to_string() );
   }
 
   Application::Instance()->post_event( boost::bind( &ActionDispatcher::run_actions, this,
@@ -111,8 +118,8 @@ void ActionDispatcher::post_and_wait_actions( std::vector< ActionHandle > action
 
   for ( size_t j = 0; j < actions.size(); j++ )
   {
-    SCI_LOG_DEBUG(std::string("Posting Action sequence: ")+
-      actions[j]->export_to_string());
+    SCI_LOG_DEBUG( std::string( "Posting Action sequence: ") +
+      actions[ j ]->export_to_string());
   }
 
   Application::Instance()->post_and_wait_event( boost::bind( &ActionDispatcher::run_actions,

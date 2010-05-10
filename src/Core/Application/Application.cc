@@ -27,13 +27,25 @@
  */
 
 // Boost Includes
-#include<boost/tokenizer.hpp>
+#include <boost/tokenizer.hpp>
 #include <boost/lexical_cast.hpp>
 
 // Core includes
 #include <Core/Utils/Log.h>
 #include <Core/Utils/LogHistory.h>
+#include <Core/Utils/StringUtil.h>
 #include <Core/Application/Application.h>
+
+// Includes for platform specific functions to get directory to store temp files and user data
+#ifdef _WIN32
+#include <shlobj.h>    
+#include <tlhelp32.h>
+#else
+#include <stdlib.h>
+#endif
+
+// Include CMake generated files
+#include "ApplicationConfiguration.h"
 
 namespace Core
 {
@@ -108,11 +120,100 @@ void Application::parse_command_line_parameters( int argc, char **argv )
     {
       std::string key = param_vector[ 0 ];
       this->parameters_[ key ] = value;
-      SCI_LOG_MESSAGE( std::string("Set command line parameter key: ") + 
-      key + ", value: " + value);
     }
   }
 }
 
+bool Application::get_user_directory(boost::filesystem::path& user_dir)
+{
+#ifdef _WIN32
+  TCHAR dir[MAX_PATH];
+
+  // Try to create the local application directory
+  // If it already exists return the name of the directory.
+  if ( SUCCEEDED( SHGetFolderPath( 0, CSIDL_LOCAL_APPDATA, 0, 0, dir ) ) )
+  {
+    user_dir = boost::filesystem::path( dir );
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+#else
+  
+  if ( getenv( "HOME" ) )
+  {
+    user_dir = boost::filesystem::path( getenv( "HOME" ) );
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+#endif
+}
+
+void Application::log_start()
+{
+  SCI_LOG_MESSAGE( std::string( "Application: " ) + GetApplicationName() );
+  SCI_LOG_MESSAGE( std::string( "Version:" ) + GetVersion() );
+  SCI_LOG_MESSAGE( std::string( "64Bit:" )  + Core::ToString( Is64Bit() ) );
+}
+
+void Application::log_finish()
+{
+  SCI_LOG_MESSAGE( std::string( "-- Finished --" ) );
+}
+
+bool Application::IsApplicationThread()
+{
+  return ( Instance()->is_eventhandler_thread() );
+}
+
+void Application::PostEvent( boost::function< void() > function )
+{
+  Instance()->post_event( function );
+}
+
+void Application::PostAndWaitEvent( boost::function< void() > function )
+{
+  Instance()->post_and_wait_event( function );
+}
+
+std::string Application::GetVersion()
+{
+  return CORE_APPLICATION_VERSION;
+}
+
+int Application::GetMajorVersion()
+{
+  return CORE_APPLICATION_MAJOR_VERSION;
+}
+
+int Application::GetMinorVersion()
+{
+  return CORE_APPLICATION_MINOR_VERSION;
+}
+
+int Application::GetPatchVersion()
+{
+  return CORE_APPLICATION_PATCH_VERSION;
+}
+
+bool Application::Is64Bit()
+{
+  return ( sizeof(void *) == 8 );
+}
+
+bool Application::Is32Bit()
+{
+  return ( sizeof(void *) == 4 );
+}
+
+std::string Application::GetApplicationName()
+{
+  return CORE_APPLICATION_NAME;
+}
 
 } // end namespace Core

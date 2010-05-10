@@ -33,9 +33,16 @@
 # pragma once
 #endif 
 
+// STL includes
+#include <map>
+
+// Boost includes
+#include <boost/filesystem/path.hpp>
+
 // Core includes
 #include <Core/Utils/Log.h>
 #include <Core/Utils/Singleton.h>
+#include <Core/Utils/Lockable.h>
 #include <Core/EventHandler/EventHandler.h>
 
 namespace Core
@@ -46,7 +53,7 @@ namespace Core
 
 class Application;
 
-class Application : public Core::EventHandler
+class Application : public EventHandler, public Lockable
 {
   CORE_SINGLETON( Application );
 
@@ -57,16 +64,16 @@ private:
 
   // -- Command line parser --
 public:
-  // CHECK_COMMAND_LINE_PARAMETERS
+  // CHECK_COMMAND_LINE_PARAMETERS:
   // check to see if a particular parameter has been placed into the map
   // if so it returns the value as a string
   bool check_command_line_parameter( const std::string& key, std::string& value );
 
-  // SET_PARAMETER
+  // SET_PARAMETER:
   // put parameters from the command line into a map
   void set_command_line_parameter( const std::string& key, const std::string& value );
 
-  // PARSE_COMMAND_LINE_PARAMETERS
+  // PARSE_COMMAND_LINE_PARAMETERS:
   // parse paremeters from the command line
   void parse_command_line_parameters( int argc, char** argv );
 
@@ -74,42 +81,66 @@ private:
   typedef std::map< std::string, std::string > parameters_type;
   parameters_type parameters_;
 
-  // -- Thread safety --
+  // -- Log information on the current executable --
 public:
-  typedef boost::mutex mutex_type;
-  typedef boost::unique_lock<mutex_type> lock_type;
+  // LOG_START:
+  // Log information about the system to the log file
+  void log_start();
 
-  // GET_MUTEX:
-  // Get the mutex that protects this class
-  mutex_type& get_mutex() { return mutex_; }
+  // LOG_FINISH:
+  // Log an end tag mentioning that the program has finished
+  void log_finish();
 
-private:
-  // Lock for this lock
-  mutex_type mutex_;
+  // -- Directory information --
+public:
+  // GET_USER_DIRECTORY:
+  // Get the user directory on the current system 
+  bool get_user_directory(boost::filesystem::path& user_dir);
 
   // -- Application thread --
 public:
   // ISAPPLICATIONTHREAD:
   // Test whether the current thread is the application thread
-  static bool IsApplicationThread()
-  {
-    return ( Instance()->is_eventhandler_thread() );
-  }
+  static bool IsApplicationThread();
 
   // POSTEVENT:
   // Short cut to the event handler
-  static void PostEvent( boost::function< void() > function )
-  {
-    Instance()->post_event( function );
-  }
+  static void PostEvent( boost::function< void() > function );
 
   // POSTANDWAITEVENT:
   // Short cut to the event handler
-  static void PostAndWaitEvent( boost::function< void() > function )
-  {
-    Instance()->post_and_wait_event( function );
-  }
+  static void PostAndWaitEvent( boost::function< void() > function );
 
+  // -- Program information --
+public: 
+  
+  // GETVERSION:
+  // Get the application version
+  static std::string GetVersion();
+  
+  // GETMAJORVERSION:
+  // Major release version
+  static int GetMajorVersion();
+
+  // GETMINORVERSION:
+  // Minor release version
+  static int GetMinorVersion();
+
+  // GETPATCHVERSION:
+  // Patch version
+  static int GetPatchVersion();
+  
+  // IS64BIT:
+  // Is the executable a 64bit version
+  static bool Is64Bit();
+  
+  // IS32BIT:
+  // Is the executable a 64bit version
+  static bool Is32Bit();
+  
+  // GETAPPLICATIONNAME:
+  // Get the name of the application
+  static std::string GetApplicationName();
 };
 
 } // end namespace Core
