@@ -66,8 +66,6 @@ private Q_SLOTS:
 
 private:
   boost::shared_ptr< AppPreferencesPrivate > private_;
-  QVector< ColorButton* > color_buttons_;
-  QVector< ColorPickerWidget* > color_pickers_;
 
 };
 

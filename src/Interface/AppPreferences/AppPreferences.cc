@@ -44,13 +44,16 @@ class AppPreferencesPrivate
 public:
     Ui::AppPreferences ui_;
   SliderDoubleCombo* opacity_adjuster_;
+  
+  QVector< ColorButton* > color_buttons_;
+  QVector< ColorPickerWidget* > color_pickers_;
 };
 
 AppPreferences::AppPreferences( QWidget *parent ) :
     QDialog( parent ),
     private_( new AppPreferencesPrivate )
 {
-    private_->ui_.setupUi( this );
+    this->private_->ui_.setupUi( this );
   
   // Initialize all the tabs
   this->setup_general_prefs();
@@ -58,6 +61,9 @@ AppPreferences::AppPreferences( QWidget *parent ) :
   this->setup_viewer_prefs();
   this->setup_sidebar_prefs();
   this->setup_interface_controls_prefs();
+  
+  // Disable the Apply button since we arent using it yet
+  this->private_->ui_.buttonBox->setEnabled( false );
 
 }
 
@@ -85,43 +91,30 @@ void AppPreferences::setup_layer_prefs()
   
   for( int i = 0; i < 12; ++i )
   {
-    // Step 1: create new ColorButtons, and set some default sizes
-    this->color_buttons_.push_back( new ColorButton( this, i ) );
-    this->color_buttons_[ i ]->setMinimumSize( 25, 25 );
-    this->color_buttons_[ i ]->setMaximumSize( 25, 25 );
+    // Step 1: create new ColorButtons, set some default sizes, and add them to the appropriate layout
+    this->private_->color_buttons_.push_back( new ColorButton( this, i ) );
+    this->private_->color_buttons_[ i ]->setMinimumSize( 25, 25 );
+    this->private_->color_buttons_[ i ]->setMaximumSize( 25, 25 );
+    this->private_->ui_.color_h_layout_->addWidget( this->private_->color_buttons_[ i ] );
     
     // Step 2: set the default colors for the ColorButtons and connect them to the 
     // PreferencesManager's color states
-    this->color_buttons_[ i ]->set_color( PreferencesManager::Instance()->color_states_[ i ]->get() );
-    QtBridge::Connect( this->color_buttons_[ i ], PreferencesManager::Instance()->color_states_[ i ] );
+    this->private_->color_buttons_[ i ]->set_color( PreferencesManager::Instance()->color_states_[ i ]->get() );
+    QtBridge::Connect( this->private_->color_buttons_[ i ], PreferencesManager::Instance()->color_states_[ i ] );
     
     // Step 3: create new ColorPickerWidgets, hide them, and add them to the appropriate layout
-    this->color_pickers_.push_back( new ColorPickerWidget( this ) );
-    this->color_pickers_[ i ]->hide();
-    this->private_->ui_.color_widget_picker_layout_->addWidget( this->color_pickers_[ i ] );
+    this->private_->color_pickers_.push_back( new ColorPickerWidget( this ) );
+    this->private_->color_pickers_[ i ]->hide();
+    this->private_->ui_.color_widget_picker_layout_->addWidget( this->private_->color_pickers_[ i ] );
     
     // Step 4: Connect the ColorPickerWidgets and the ColorButtons
-    connect( this->color_pickers_[ i ], SIGNAL( color_set( Core::Color ) ), 
-        this->color_buttons_[ i ], SLOT( set_color( Core::Color ) ) );
-    connect( this->color_buttons_[ i ], SIGNAL( clicked( Core::Color, bool ) ), 
-        this->color_pickers_[ i ], SLOT( hide_show( Core::Color, bool ) ) );
-    connect( this->color_buttons_[ i ], SIGNAL( clicked( int ) ), 
+    connect( this->private_->color_pickers_[ i ], SIGNAL( color_set( Core::Color ) ), 
+        this->private_->color_buttons_[ i ], SLOT( set_color( Core::Color ) ) );
+    connect( this->private_->color_buttons_[ i ], SIGNAL( clicked( Core::Color, bool ) ), 
+        this->private_->color_pickers_[ i ], SLOT( hide_show( Core::Color, bool ) ) );
+    connect( this->private_->color_buttons_[ i ], SIGNAL( clicked( int ) ), 
         this, SLOT( hide_the_others ( int ) ) );
   }
-  
-  // We need to add the ColorButton's to the appropriate layouts
-  this->private_->ui_.color_1_layout_->addWidget( this->color_buttons_[ 0 ] );
-  this->private_->ui_.color_2_layout_->addWidget( this->color_buttons_[ 1 ] );
-  this->private_->ui_.color_3_layout_->addWidget( this->color_buttons_[ 2 ] );
-  this->private_->ui_.color_4_layout_->addWidget( this->color_buttons_[ 3 ] );
-  this->private_->ui_.color_5_layout_->addWidget( this->color_buttons_[ 4 ] );
-  this->private_->ui_.color_6_layout_->addWidget( this->color_buttons_[ 5 ] );
-  this->private_->ui_.color_7_layout_->addWidget( this->color_buttons_[ 6 ] );
-  this->private_->ui_.color_8_layout_->addWidget( this->color_buttons_[ 7 ] );
-  this->private_->ui_.color_9_layout_->addWidget( this->color_buttons_[ 8 ] );
-  this->private_->ui_.color_10_layout_->addWidget( this->color_buttons_[ 9 ] );
-  this->private_->ui_.color_11_layout_->addWidget( this->color_buttons_[ 10 ] );
-  this->private_->ui_.color_12_layout_->addWidget( this->color_buttons_[ 11 ] );
   
   
 //Set Layers Preferences
@@ -183,20 +176,20 @@ void AppPreferences::setup_layer_prefs()
 void AppPreferences::set_buttons_to_default_colors()
 {
   std::vector< Core::Color > temp_color_list = PreferencesManager::Instance()->get_default_colors();
-  for( int i = 0; i < this->color_buttons_.size(); ++i )
+  for( int i = 0; i < this->private_->color_buttons_.size(); ++i )
   {
-    this->color_buttons_[ i ]->set_color( temp_color_list[ i ] );
+    this->private_->color_buttons_[ i ]->set_color( temp_color_list[ i ] );
   }
 }
 
 void AppPreferences::hide_the_others( int active )
 {
-  for( int i = 0; i < this->color_pickers_.size(); ++i )
+  for( int i = 0; i < this->private_->color_pickers_.size(); ++i )
   {
     if( i != active) 
     {
-      this->color_pickers_[ i ]->hide();
-      this->color_buttons_[ i ]->setChecked( false );
+      this->private_->color_pickers_[ i ]->hide();
+      this->private_->color_buttons_[ i ]->setChecked( false );
     }
   }
 }
