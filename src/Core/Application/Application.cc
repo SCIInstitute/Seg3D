@@ -27,6 +27,7 @@
  */
 
 // Boost Includes
+#include <boost/filesystem.hpp>
 #include <boost/tokenizer.hpp>
 #include <boost/lexical_cast.hpp>
 
@@ -124,7 +125,7 @@ void Application::parse_command_line_parameters( int argc, char **argv )
   }
 }
 
-bool Application::get_user_directory(boost::filesystem::path& user_dir)
+bool Application::get_user_directory( boost::filesystem::path& user_dir )
 {
 #ifdef _WIN32
   TCHAR dir[MAX_PATH];
@@ -138,6 +139,7 @@ bool Application::get_user_directory(boost::filesystem::path& user_dir)
   }
   else
   {
+    SCI_LOG_ERROR( std::string( "Could not get user directory." ) );
     return false;
   }
 #else
@@ -149,9 +151,36 @@ bool Application::get_user_directory(boost::filesystem::path& user_dir)
   }
   else
   {
+    SCI_LOG_ERROR( std::string( "Could not get user directory." ) );
     return false;
   }
 #endif
+}
+
+bool Application::get_config_directory( boost::filesystem::path& config_dir )
+{
+  boost::filesystem::path user_dir;
+  if ( !( get_user_directory( user_dir ) ) ) return false;
+  
+#ifdef _WIN32 
+  config_dir = user_dir / GetApplicationName();
+#else
+  std::string dot_app_name = std::string( "." ) + GetApplicationName();
+  config_dir = user_dir / dot_app_name;
+#endif
+  
+  if ( !( boost::filesystem::exists( config_dir ) ) )
+  {
+    if ( !( boost::filesystem::create_directory( config_dir ) ) )
+    {
+      SCI_LOG_ERROR( std::string( "Could not create directory: " ) + config_dir.string() );
+      return ( false );
+    }
+    
+    SCI_LOG_MESSAGE( std::string( "Created directory: " ) + config_dir.string() );
+  }
+  
+  return ( true );
 }
 
 void Application::log_start()
