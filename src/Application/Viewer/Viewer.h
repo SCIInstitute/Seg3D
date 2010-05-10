@@ -177,7 +177,7 @@ private:
   void set_slice_number( int num, Core::ActionSource source = Core::ActionSource::NONE_E );
   void change_visibility( bool visible, Core::ActionSource source );
   void viewer_lock_state_changed( bool locked );
-  void layer_state_changed( bool volume_view );
+  void layer_state_changed( int affected_view_modes );
 
   // -- Data structures for keeping track of slices of layers --
 private:
@@ -224,6 +224,8 @@ public:
   {
     return this->stateid();
   }
+
+  Core::VolumeSliceHandle get_active_layer_slice() const;
 
   // MOVE_SLICE_TO:
   // Move the slice to the given world coordinate. Used for picking.

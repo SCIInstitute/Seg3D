@@ -88,7 +88,8 @@ public:
   // Render the given text to the target buffer with the specified font size and alignment.
   void render_aligned( const std::string& text, unsigned char* buffer, int width, int height, 
     unsigned int font_size, TextHAlignmentType halign = TextHAlignmentType::LEFT_E,
-    TextVAlignmentType valign = TextVAlignmentType::BOTTOM_E );
+    TextVAlignmentType valign = TextVAlignmentType::BOTTOM_E, int left_margin = 0, 
+    int right_margin = 0, int bottom_margin = 0, int top_margin = 0 );
 
   // RENDER_ALIGNED
   // Render the given text to the target buffer with the specified font size and alignment,
@@ -118,7 +119,8 @@ private:
   void compute_bbox( const std::vector< FreeTypeGlyphHandle >& glyphs, FT_BBox& bbox );
 
   void compute_offset( int width, int height, const FT_BBox& bbox, 
-    TextHAlignmentType halign, TextVAlignmentType valign, int& x_offset, int& y_offset );
+    TextHAlignmentType halign, TextVAlignmentType valign, int& x_offset, int& y_offset,
+    int left_margin = 0, int right_margin = 0, int bottom_margin = 0, int top_margin = 0 );
 
 private:
   FreeTypeLibraryHandle ft_library_;

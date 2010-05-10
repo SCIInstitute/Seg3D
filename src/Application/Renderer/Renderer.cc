@@ -41,12 +41,20 @@
 #include <Application/Layer/DataLayer.h>
 #include <Application/Layer/MaskLayer.h>
 #include <Application/LayerManager/LayerManager.h>
+#include <Application/PreferencesManager/PreferencesManager.h>
 #include <Application/Renderer/Renderer.h>
 #include <Application/ViewerManager/ViewerManager.h>
 
 
 namespace Seg3D
 {
+
+class ProxyRectangle
+{
+public:
+  Core::Point bottomleft, bottomright, topleft, topright;
+  double left, right, bottom, top;
+};
 
 static const unsigned int PATTERN_SIZE_C = 6;
 static const unsigned char MASK_PATTERNS_C[][ PATTERN_SIZE_C ][ PATTERN_SIZE_C ] =
@@ -238,93 +246,11 @@ bool Renderer::render()
     glLoadIdentity();
 
     this->slice_shader_->enable();
-    this->slice_shader_->set_border_width( 1 );
 
-    Core::VolumeSlice* volume_slice = 0;
     for ( size_t layer_num = 0; layer_num < layer_scene->size(); layer_num++ )
     {
-      LayerSceneItemHandle layer_item = ( *layer_scene )[ layer_num ];
-      this->slice_shader_->set_volume_type( layer_item->type() );
-      switch ( layer_item->type() )
-      {
-      case Core::VolumeType::DATA_E:
-        {
-          DataLayerSceneItem* data_layer_item = 
-            dynamic_cast< DataLayerSceneItem* >( layer_item.get() );
-          Core::DataVolumeSlice* data_slice = data_layer_item->data_volume_slice_.get();
-          volume_slice = data_slice;
-
-          // Convert contrast to range ( 0, 1 ] and brightness to [ -1, 1 ]
-          double contrast = ( 1 - data_layer_item->contrast_ / 101 );
-          double brightness = data_layer_item->brightness_ / 50 - 1.0;
-
-          // NOTE: The equations for computing scale and bias are as follows:
-          //
-          // double scale = numeric_range / ( contrast * value_range );
-          // double window_max = -brightness * ( value_max - value_min ) + value_max;
-          // double bias = ( numeric_max - window_max * scale ) / numeric_max;
-          //
-          // However, since we always rescale the data to unsigned short when uploading
-          // textures, numeric_range and value_range are the same, 
-          // and thus the computation can be simplified.
-          
-          double scale = 1.0 / contrast;
-          double bias = 1.0 - ( 1.0 - brightness ) * scale;
-          this->slice_shader_->set_scale_bias( static_cast< float >( scale ), 
-            static_cast< float >( bias ) );
-        }
-        break;
-      case Core::VolumeType::MASK_E:
-        {
-          MaskLayerSceneItem* mask_layer_item = 
-            dynamic_cast< MaskLayerSceneItem* >( layer_item.get() );
-          Core::MaskVolumeSlice* mask_slice = mask_layer_item->mask_volume_slice_.get();
-          volume_slice = mask_slice;
-          this->slice_shader_->set_mask_mode( 0 );
-          this->slice_shader_->set_mask_color( 1.0f, 0.6f, 0.0f );
-        }
-        break;
-      default:
-        assert( false );
-        continue;
-      } // end switch
-
-      // Compute the size of the slice on screen
-      Core::Vector slice_x( volume_slice->right() - volume_slice->left(), 0.0, 0.0 );
-      slice_x = proj_mat * slice_x;
-      double slice_screen_width = slice_x.x() / 2.0 * this->width_;
-      double slice_screen_height = ( volume_slice->top() - volume_slice->bottom() ) / 
-        ( volume_slice->right() - volume_slice->left() ) * slice_screen_width;
-      float pattern_repeats_x = static_cast< float >( slice_screen_width / PATTERN_SIZE_C );
-      float pattern_repeats_y = static_cast< float >( slice_screen_height / PATTERN_SIZE_C );
-
-      this->slice_shader_->set_opacity( static_cast< float >( layer_item->opacity_ ) );
-      this->slice_shader_->set_pixel_size( static_cast< float >( 1.0 / slice_screen_width ), 
-        static_cast< float >( 1.0 /slice_screen_height ) );
-      Core::TextureHandle slice_tex = volume_slice->get_texture();
-      Core::Texture::lock_type slice_tex_lock( slice_tex->get_mutex() );
-      slice_tex->bind();
-      glBegin( GL_QUADS );
-      glMultiTexCoord2f( GL_TEXTURE0, 0.0f, 0.0f );
-      glMultiTexCoord3f( GL_TEXTURE1, 0.0f, 0.0f, 0.0f );
-      glVertex2d( volume_slice->left(), volume_slice->bottom() );
-      glMultiTexCoord2f( GL_TEXTURE0, 1.0f, 0.0f );
-      glMultiTexCoord3f( GL_TEXTURE1, pattern_repeats_x, 0.0f, 0.0f );
-      glVertex2d( volume_slice->right(), volume_slice->bottom() );
-      glMultiTexCoord2f( GL_TEXTURE0, 1.0f, 1.0f );
-      glMultiTexCoord3f( GL_TEXTURE1, pattern_repeats_x, pattern_repeats_y, 0.0f );
-      glVertex2d( volume_slice->right(), volume_slice->top() );
-      glMultiTexCoord2f( GL_TEXTURE0, 0.0f, 1.0f );
-      glMultiTexCoord3f( GL_TEXTURE1, 0.0f, pattern_repeats_y, 0.0f );
-      glVertex2d( volume_slice->left(), volume_slice->top() );
-      glEnd();
-      // NOTE: Always unbind, because we are deleting textures in a separate thread/context.
-      // In this case texture binding of the rendering thread won't be reverted to 0, which
-      // will cause problem when a new texture with the same ID is generated and bound to
-      // this context, because the driver would think it's already bound.
-      slice_tex->unbind();
-
-    } // end for
+      this->draw_slice( ( *layer_scene )[ layer_num ], proj_mat );
+    } 
 
     this->slice_shader_->disable();
     glDisable( GL_BLEND );
@@ -363,6 +289,22 @@ bool Renderer::render_overlay()
     int view_mode = viewer->view_mode_state_->index();
     ViewerInfoList viewers_info[ 3 ];
     ViewerManager::Instance()->get_2d_viewers_info( viewers_info );
+
+    Core::VolumeSliceHandle active_slice = viewer->get_active_layer_slice();
+    std::string slice_str;
+    if ( active_slice )
+    {
+      std::stringstream ss;
+      if ( active_slice->out_of_boundary() )
+      {
+        ss << "- / " << active_slice->number_of_slices();
+      }
+      else
+      {
+        ss << active_slice->get_slice_number() + 1 << " / " << active_slice->number_of_slices();
+      }
+      slice_str = ss.str();
+    }
 
     // We have got everything we want from the state engine, unlock before we do any rendering
     state_lock.unlock();
@@ -475,9 +417,14 @@ bool Renderer::render_overlay()
     std::vector< std::string > text;
     text.push_back( std::string( "Konnichi wa minasan! " ) );
     text.push_back( std::string( "NUMIRA" ) );
-    this->text_renderer_->render( text, &buffer[ 0 ], this->width_, this->height_, 5, 20, 10, -1 );
+    //this->text_renderer_->render( text, &buffer[ 0 ], this->width_, this->height_, 5, 20, 10, -1 );
     //this->text_renderer_->render_aligned( text[ 1 ], &buffer[ 0 ], this->width_, this->height_, 48,
-    //  50, Core::TextHAlignmentType::CENTER_E, Core::TextVAlignmentType::CENTER_E );
+    //  Core::TextHAlignmentType::CENTER_E, Core::TextVAlignmentType::CENTER_E,
+    //  40, 10, 40, 10 );
+    this->text_renderer_->render_aligned( slice_str, &buffer[ 0 ], this->width_, this->height_,
+      14, Core::TextHAlignmentType::RIGHT_E, Core::TextVAlignmentType::TOP_E,
+      5, 5, 5, 5 );
+
     this->text_texture_->enable();
     this->text_texture_->set_sub_image( 0, 0, this->width_, this->height_,
         &buffer[ 0 ], GL_ALPHA, GL_UNSIGNED_BYTE );
@@ -485,7 +432,7 @@ bool Renderer::render_overlay()
     // Blend the text onto the framebuffer
     glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_ADD );
     glBegin( GL_QUADS );
-    glColor4f( 1.0f, 0.1f, 0.1f, 0.4f );
+    glColor4f( 1.0f, 0.6f, 0.1f, 0.75f );
     glTexCoord2f( 0.0f, 0.0f );
     glVertex2i( 0, 0 );
     glTexCoord2f( 1.0f, 0.0f );
@@ -635,142 +582,199 @@ void Renderer::draw_slices_3d( const Core::BBox& bbox,
     std::string view_mode = view_modes[ i ];
     double depth = depths[ i ];
     LayerSceneHandle layer_scene = layer_scenes[ i ];
-    Core::Point bottomleft, bottomright, topleft, topright;
-    double left, right, bottom, top;
+    ProxyRectangleHandle rect( new ProxyRectangle );
+
     if ( view_mode == Viewer::AXIAL_C )
     {
-      bottomleft = bbox.min();
-      bottomleft[ 2 ] = depth;
+      rect->bottomleft = bbox.min();
+      rect->bottomleft[ 2 ] = depth;
 
-      bottomright[ 0 ] = bbox.max()[ 0 ];
-      bottomright[ 1 ] = bbox.min()[ 1 ];
-      bottomright[ 2 ] = depth;
+      rect->bottomright[ 0 ] = bbox.max()[ 0 ];
+      rect->bottomright[ 1 ] = bbox.min()[ 1 ];
+      rect->bottomright[ 2 ] = depth;
       
-      topleft[ 0 ] = bbox.min()[ 0 ];
-      topleft[ 1 ] = bbox.max()[ 1 ];
-      topleft[ 2 ] = depth;
+      rect->topleft[ 0 ] = bbox.min()[ 0 ];
+      rect->topleft[ 1 ] = bbox.max()[ 1 ];
+      rect->topleft[ 2 ] = depth;
       
-      topright = bbox.max();
-      topright[ 2 ] = depth;
+      rect->topright = bbox.max();
+      rect->topright[ 2 ] = depth;
 
-      left = bottomleft[ 0 ];
-      right = bottomright[ 0 ];
-      bottom = bottomleft[ 1 ];
-      top = topleft[ 1 ];
+      rect->left = rect->bottomleft[ 0 ];
+      rect->right = rect->bottomright[ 0 ];
+      rect->bottom = rect->bottomleft[ 1 ];
+      rect->top = rect->topleft[ 1 ];
     }
     else if ( view_mode == Viewer::CORONAL_C )
     {
-      bottomleft = bbox.min();
-      bottomleft[ 1 ] = depth;
+      rect->bottomleft = bbox.min();
+      rect->bottomleft[ 1 ] = depth;
       
-      bottomright[ 0 ] = bbox.min()[ 0 ];
-      bottomright[ 2 ] = bbox.max()[ 2 ];
-      bottomright[ 1 ] = depth;
+      rect->bottomright[ 0 ] = bbox.min()[ 0 ];
+      rect->bottomright[ 2 ] = bbox.max()[ 2 ];
+      rect->bottomright[ 1 ] = depth;
 
-      topleft[ 0 ] = bbox.max()[ 0 ];
-      topleft[ 2 ] = bbox.min()[ 2 ];
-      topleft[ 1 ] = depth;
+      rect->topleft[ 0 ] = bbox.max()[ 0 ];
+      rect->topleft[ 2 ] = bbox.min()[ 2 ];
+      rect->topleft[ 1 ] = depth;
 
-      topright = bbox.max();
-      topright[ 1 ] = depth;
+      rect->topright = bbox.max();
+      rect->topright[ 1 ] = depth;
 
-      left = bottomleft[ 2 ];
-      right = bottomright[ 2 ];
-      bottom = bottomleft[ 0 ];
-      top = topleft[ 0 ];
+      rect->left = rect->bottomleft[ 2 ];
+      rect->right = rect->bottomright[ 2 ];
+      rect->bottom = rect->bottomleft[ 0 ];
+      rect->top = rect->topleft[ 0 ];
     }
     else
     {
-      bottomleft = bbox.min();
-      bottomleft[ 0 ] = depth;
+      rect->bottomleft = bbox.min();
+      rect->bottomleft[ 0 ] = depth;
     
-      bottomright[ 1 ] = bbox.max()[ 1 ];
-      bottomright[ 2 ] = bbox.min()[ 2 ];
-      bottomright[ 0 ] = depth;
+      rect->bottomright[ 1 ] = bbox.max()[ 1 ];
+      rect->bottomright[ 2 ] = bbox.min()[ 2 ];
+      rect->bottomright[ 0 ] = depth;
 
-      topleft[ 1 ] = bbox.min()[ 1 ];
-      topleft[ 2 ] = bbox.max()[ 2 ];
-      topleft[ 0 ] = depth;
+      rect->topleft[ 1 ] = bbox.min()[ 1 ];
+      rect->topleft[ 2 ] = bbox.max()[ 2 ];
+      rect->topleft[ 0 ] = depth;
 
-      topright = bbox.max();
-      topright[ 0 ] = depth;
+      rect->topright = bbox.max();
+      rect->topright[ 0 ] = depth;
 
-      left = bottomleft[ 1 ];
-      right = bottomright[ 1 ];
-      bottom = bottomleft[ 2 ];
-      top = topleft[ 2 ];
+      rect->left = rect->bottomleft[ 1 ];
+      rect->right = rect->bottomright[ 1 ];
+      rect->bottom = rect->bottomleft[ 2 ];
+      rect->top = rect->topleft[ 2 ];
     }
 
-    Core::VolumeSlice* volume_slice = 0;
-    // for each slice
     for ( size_t layer_num = 0; layer_num < layer_scene->size(); layer_num++ )
     {
-      LayerSceneItemHandle layer_item = ( *layer_scene )[ layer_num ];
-      this->slice_shader_->set_volume_type( layer_item->type() );
-      switch ( layer_item->type() )
-      {
-      case Core::VolumeType::DATA_E:
-        {
-          DataLayerSceneItem* data_layer_item = 
-            dynamic_cast< DataLayerSceneItem* >( layer_item.get() );
-          Core::DataVolumeSlice* data_slice = data_layer_item->data_volume_slice_.get();
-          volume_slice = data_slice;
-
-          // Convert contrast to range ( 0, 1 ] and brightness to [ -1, 1 ]
-          double contrast = ( 1 - data_layer_item->contrast_ / 101 );
-          double brightness = data_layer_item->brightness_ / 50 - 1.0;
-          double scale = 1.0 / contrast;
-          double bias = 1.0 - ( 1.0 - brightness ) * scale;
-          this->slice_shader_->set_scale_bias( static_cast< float >( scale ), 
-            static_cast< float >( bias ) );
-        }
-        break;
-      case Core::VolumeType::MASK_E:
-        {
-          MaskLayerSceneItem* mask_layer_item = 
-            dynamic_cast< MaskLayerSceneItem* >( layer_item.get() );
-          Core::MaskVolumeSlice* mask_slice = mask_layer_item->mask_volume_slice_.get();
-          volume_slice = mask_slice;
-          this->slice_shader_->set_mask_mode( 2 );
-          this->slice_shader_->set_mask_color( 1.0f, 0.6f, 0.0f );
-        }
-        break;
-      default:
-        assert( false );
-        continue;
-      } // end switch
-
-
-      this->slice_shader_->set_opacity( static_cast< float >( layer_item->opacity_ ) );
-      double slice_width = volume_slice->right() - volume_slice->left();
-      double slice_height = volume_slice->top() - volume_slice->bottom();
-      double tex_left = ( left - volume_slice->left() ) / slice_width;
-      double tex_right = ( right - volume_slice->right() ) / slice_width + 1.0;
-      double tex_bottom = ( bottom - volume_slice->bottom() ) / slice_height;
-      double tex_top = ( top - volume_slice->top() ) / slice_height + 1.0;
-      Core::TextureHandle slice_tex = volume_slice->get_texture();
-      Core::Texture::lock_type slice_tex_lock( slice_tex->get_mutex() );
-      slice_tex->bind();
-      glBegin( GL_QUADS );
-      glMultiTexCoord2d( GL_TEXTURE0, tex_left, tex_bottom );
-      glVertex3dv( &bottomleft[ 0 ] );
-      glMultiTexCoord2d( GL_TEXTURE0, tex_right, tex_bottom );
-      glVertex3dv( &bottomright[ 0 ] );
-      glMultiTexCoord2d( GL_TEXTURE0, tex_right, tex_top );
-      glVertex3dv( &topright[ 0 ] );
-      glMultiTexCoord2d( GL_TEXTURE0, tex_left, tex_top );
-      glVertex3dv( &topleft[ 0 ] );
-      glEnd();
-      // NOTE: Always unbind, because we are deleting textures in a separate thread/context.
-      // In this case texture binding of the rendering thread won't be reverted to 0, which
-      // will cause problem when a new texture with the same ID is generated and bound to
-      // this context, because the driver would think it's already bound.
-      slice_tex->unbind();
-
+      this->draw_slice( ( *layer_scene )[ layer_num ], Core::Matrix::IDENTITY_C, rect );
     } // end for
 
   } // end for each viewer
   this->slice_shader_->disable();
+}
+
+void Renderer::draw_slice( LayerSceneItemHandle layer_item, 
+              const Core::Matrix& proj_mat, 
+              ProxyRectangleHandle rect )
+{
+  this->slice_shader_->set_volume_type( layer_item->type() );
+  this->slice_shader_->set_opacity( static_cast< float >( layer_item->opacity_ ) );
+  Core::VolumeSlice* volume_slice = 0;
+  switch ( layer_item->type() )
+  {
+  case Core::VolumeType::DATA_E:
+    {
+      DataLayerSceneItem* data_layer_item = 
+        dynamic_cast< DataLayerSceneItem* >( layer_item.get() );
+      Core::DataVolumeSlice* data_slice = data_layer_item->data_volume_slice_.get();
+      volume_slice = data_slice;
+
+      // Convert contrast to range ( 0, 1 ] and brightness to [ -1, 1 ]
+      double contrast = ( 1 - data_layer_item->contrast_ / 101 );
+      double brightness = data_layer_item->brightness_ / 50 - 1.0;
+
+      // NOTE: The equations for computing scale and bias are as follows:
+      //
+      // double scale = numeric_range / ( contrast * value_range );
+      // double window_max = -brightness * ( value_max - value_min ) + value_max;
+      // double bias = ( numeric_max - window_max * scale ) / numeric_max;
+      //
+      // However, since we always rescale the data to unsigned short when uploading
+      // textures, numeric_range and value_range are the same, 
+      // and thus the computation can be simplified.
+
+      double scale = 1.0 / contrast;
+      double bias = 1.0 - ( 1.0 - brightness ) * scale;
+      this->slice_shader_->set_scale_bias( static_cast< float >( scale ), 
+        static_cast< float >( bias ) );
+    }
+    break;
+  case Core::VolumeType::MASK_E:
+    {
+      MaskLayerSceneItem* mask_layer_item = 
+        dynamic_cast< MaskLayerSceneItem* >( layer_item.get() );
+      Core::MaskVolumeSlice* mask_slice = mask_layer_item->mask_volume_slice_.get();
+      volume_slice = mask_slice;
+      if ( rect )
+      {
+        this->slice_shader_->set_mask_mode( 2 );
+      }
+      else
+      {
+        this->slice_shader_->set_mask_mode( 0 );
+        this->slice_shader_->set_border_width( 1 );
+      }
+      Core::Color color = PreferencesManager::Instance()->get_color( mask_layer_item->color_ );
+      this->slice_shader_->set_mask_color( static_cast< float >( color.r() / 255 ), 
+        static_cast< float >( color.g() / 255 ), static_cast< float >( color.b() / 255 ) );
+    }
+    break;
+  default:
+    assert( false );
+    return;
+  } // end switch
+
+
+  double slice_width = volume_slice->right() - volume_slice->left();
+  double slice_height = volume_slice->top() - volume_slice->bottom();
+
+  Core::TextureHandle slice_tex = volume_slice->get_texture();
+  Core::Texture::lock_type slice_tex_lock( slice_tex->get_mutex() );
+  slice_tex->bind();
+
+  if ( rect )
+  {
+    double tex_left = ( rect->left - volume_slice->left() ) / slice_width;
+    double tex_right = ( rect->right - volume_slice->right() ) / slice_width + 1.0;
+    double tex_bottom = ( rect->bottom - volume_slice->bottom() ) / slice_height;
+    double tex_top = ( rect->top - volume_slice->top() ) / slice_height + 1.0;
+    glBegin( GL_QUADS );
+      glMultiTexCoord2d( GL_TEXTURE0, tex_left, tex_bottom );
+      glVertex3dv( &rect->bottomleft[ 0 ] );
+      glMultiTexCoord2d( GL_TEXTURE0, tex_right, tex_bottom );
+      glVertex3dv( &rect->bottomright[ 0 ] );
+      glMultiTexCoord2d( GL_TEXTURE0, tex_right, tex_top );
+      glVertex3dv( &rect->topright[ 0 ] );
+      glMultiTexCoord2d( GL_TEXTURE0, tex_left, tex_top );
+      glVertex3dv( &rect->topleft[ 0 ] );
+    glEnd();
+  }
+  else
+  {
+    // Compute the size of the slice on screen
+    Core::Vector slice_x( slice_width, 0.0, 0.0 );
+    slice_x = proj_mat * slice_x;
+    double slice_screen_width = slice_x.x() / 2.0 * this->width_;
+    double slice_screen_height = slice_height / slice_width * slice_screen_width;
+    float pattern_repeats_x = static_cast< float >( slice_screen_width / PATTERN_SIZE_C );
+    float pattern_repeats_y = static_cast< float >( slice_screen_height / PATTERN_SIZE_C );
+    this->slice_shader_->set_pixel_size( static_cast< float >( 1.0 / slice_screen_width ), 
+      static_cast< float >( 1.0 /slice_screen_height ) );
+    glBegin( GL_QUADS );
+      glMultiTexCoord2f( GL_TEXTURE0, 0.0f, 0.0f );
+      glMultiTexCoord3f( GL_TEXTURE1, 0.0f, 0.0f, 0.0f );
+      glVertex2d( volume_slice->left(), volume_slice->bottom() );
+      glMultiTexCoord2f( GL_TEXTURE0, 1.0f, 0.0f );
+      glMultiTexCoord3f( GL_TEXTURE1, pattern_repeats_x, 0.0f, 0.0f );
+      glVertex2d( volume_slice->right(), volume_slice->bottom() );
+      glMultiTexCoord2f( GL_TEXTURE0, 1.0f, 1.0f );
+      glMultiTexCoord3f( GL_TEXTURE1, pattern_repeats_x, pattern_repeats_y, 0.0f );
+      glVertex2d( volume_slice->right(), volume_slice->top() );
+      glMultiTexCoord2f( GL_TEXTURE0, 0.0f, 1.0f );
+      glMultiTexCoord3f( GL_TEXTURE1, 0.0f, pattern_repeats_y, 0.0f );
+      glVertex2d( volume_slice->left(), volume_slice->top() );
+    glEnd();
+  }
+
+  // NOTE: Always unbind, because we are deleting textures in a separate thread/context.
+  // In this case texture binding of the rendering thread won't be reverted to 0, which
+  // will cause problem when a new texture with the same ID is generated and bound to
+  // this context, because the driver would think it's already bound.
+  slice_tex->unbind();
 }
 
 } // end namespace Seg3D

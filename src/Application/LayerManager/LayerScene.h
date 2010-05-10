@@ -95,7 +95,7 @@ public:
 public:
   Core::MaskVolumeHandle mask_volume_;
   int color_;
-  std::string border_;
+  int border_;
   std::string fill_;
   bool show_isosurface_;
   Core::MaskVolumeSliceHandle mask_volume_slice_; // This value is set and used by Renderer

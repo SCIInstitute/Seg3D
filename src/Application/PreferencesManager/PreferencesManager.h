@@ -105,10 +105,12 @@ public:
   Core::StateBoolHandle show_history_bar_state_;
   
 public:
-  const std::vector< Core::Color >& get_default_colors()
+  const std::vector< Core::Color >& get_default_colors() const
   {
     return default_colors_;
   }
+
+  Core::Color get_color( int index ) const;
   
 private:
   void initialize_states();

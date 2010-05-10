@@ -52,7 +52,13 @@ PreferencesManager::PreferencesManager() :
 PreferencesManager::~PreferencesManager()
 {
 }
-  
+
+Core::Color PreferencesManager::get_color( int index ) const
+{
+  assert( index >= 0 && index < this->color_states_.size() );
+  return this->color_states_[ index ]->get();
+}
+
   
 void PreferencesManager::initialize_states()
 {

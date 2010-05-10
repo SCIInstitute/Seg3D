@@ -475,8 +475,8 @@ LayerSceneHandle LayerManager::compose_layer_scene( size_t viewer_id )
           MaskLayerSceneItem* mask_layer_scene_item = new MaskLayerSceneItem;
           layer_scene_item = LayerSceneItemHandle( mask_layer_scene_item );
           mask_layer_scene_item->mask_volume_ = mask_layer->get_mask_volume();
-          //mask_layer_scene_item->color_ = mask_layer->color_state_->get();
-          mask_layer_scene_item->border_ = mask_layer->border_state_->get();
+          mask_layer_scene_item->color_ = mask_layer->color_state_->get();
+          mask_layer_scene_item->border_ = mask_layer->border_state_->index();
           mask_layer_scene_item->fill_ = mask_layer->fill_state_->get();
           mask_layer_scene_item->show_isosurface_ = mask_layer->show_isosurface_state_->get();
         }

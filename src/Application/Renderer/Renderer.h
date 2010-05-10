@@ -51,6 +51,9 @@ namespace Seg3D
 class Renderer;
 typedef boost::shared_ptr< Renderer > RendererHandle;
 
+class ProxyRectangle;
+typedef boost::shared_ptr< ProxyRectangle > ProxyRectangleHandle;
+
 // Class definitions
 class Renderer : public Core::RendererBase, private Core::ConnectionHandler
 {
@@ -78,6 +81,8 @@ private:
     const std::vector< LayerSceneHandle >& layer_scenes, 
     const std::vector< double >& depths,
     const std::vector< std::string >& view_modes );
+  void draw_slice( LayerSceneItemHandle layer_item, const Core::Matrix& proj_mat,
+    ProxyRectangleHandle rect = ProxyRectangleHandle() );
   void viewer_slice_changed( size_t viewer_id );
   void viewer_mode_changed( size_t viewer_id );
   void picking_target_changed( size_t viewer_id );

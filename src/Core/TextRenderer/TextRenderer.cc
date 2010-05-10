@@ -152,7 +152,8 @@ void TextRenderer::render( const std::vector< std::string >& text, unsigned char
 
 void TextRenderer::render_aligned( const std::string& text, unsigned char* buffer, 
   int width, int height, unsigned int font_size, 
-  TextHAlignmentType halign, TextVAlignmentType valign )
+  TextHAlignmentType halign, TextVAlignmentType valign, 
+  int left_margin, int right_margin, int bottom_margin, int top_margin )
 {
   assert( width > 0 && height > 0 );
 
@@ -178,7 +179,8 @@ void TextRenderer::render_aligned( const std::string& text, unsigned char* buffe
 
   int x_offset = 0;
   int y_offset = 0;
-  this->compute_offset( width, height, bbox, halign, valign, x_offset, y_offset );
+  this->compute_offset( width, height, bbox, halign, valign, x_offset, y_offset,
+    left_margin, right_margin, bottom_margin, top_margin );
   this->render( glyphs, buffer, width, height, x_offset, y_offset );
 }
 
@@ -408,18 +410,19 @@ void TextRenderer::compute_bbox( const std::vector< FreeTypeGlyphHandle >& glyph
 }
 
 void TextRenderer::compute_offset( int width, int height, const FT_BBox& bbox, 
-  TextHAlignmentType halign, TextVAlignmentType valign, int& x_offset, int& y_offset )
+  TextHAlignmentType halign, TextVAlignmentType valign, int& x_offset, int& y_offset,
+  int left_margin, int right_margin, int bottom_margin, int top_margin )
 {
   switch( halign )
   {
   case TextHAlignmentType::LEFT_E:
-    x_offset = -bbox.xMin;
+    x_offset = -bbox.xMin + left_margin;
     break;
   case TextHAlignmentType::RIGHT_E:
-    x_offset = width - bbox.xMax;
+    x_offset = width - bbox.xMax - right_margin;
     break;
   case TextHAlignmentType::CENTER_E:
-    x_offset = ( width - bbox.xMax - bbox.xMin ) / 2;
+    x_offset = ( width - bbox.xMax - bbox.xMin + left_margin - right_margin ) / 2;
     break;
   default:
     assert( false );
@@ -429,13 +432,13 @@ void TextRenderer::compute_offset( int width, int height, const FT_BBox& bbox,
   switch( valign )
   {
   case TextVAlignmentType::BOTTOM_E:
-    y_offset = -bbox.yMin;
+    y_offset = -bbox.yMin + bottom_margin;
     break;
   case TextVAlignmentType::TOP_E:
-    y_offset = height - bbox.yMax;
+    y_offset = height - bbox.yMax - top_margin;
     break;
   case TextVAlignmentType::CENTER_E:
-    y_offset = ( height - bbox.yMax - bbox.yMin ) / 2;
+    y_offset = ( height - bbox.yMax - bbox.yMin + bottom_margin - top_margin ) / 2;
     break;
   default:
     assert( false );

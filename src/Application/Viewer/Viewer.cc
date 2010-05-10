@@ -43,9 +43,20 @@
 namespace Seg3D
 {
 
+SCI_ENUM_CLASS
+(
+  ViewModeType,
+  AXIAL_E = 0x1,
+  CORONAL_E = 0x2,
+  SAGITTAL_E = 0x4,
+  NON_VOLUME_E = AXIAL_E | CORONAL_E | SAGITTAL_E,
+  VOLUME_E = 0x8,
+  ALL_E = NON_VOLUME_E | VOLUME_E
+)
+
 const std::string Viewer::AXIAL_C( "axial" );
-const std::string Viewer::SAGITTAL_C( "sagittal" );
 const std::string Viewer::CORONAL_C( "coronal" );
+const std::string Viewer::SAGITTAL_C( "sagittal" );
 const std::string Viewer::VOLUME_C( "volume" );
 
 Viewer::Viewer( size_t viewer_id ) :
@@ -111,7 +122,7 @@ Viewer::Viewer( size_t viewer_id ) :
   this->add_connection( this->volume_view_state_->state_changed_signal_.connect(
     boost::bind( &Viewer::trigger_redraw, this, false ) ) );
   this->add_connection( this->slice_number_state_->state_changed_signal_.connect(
-    boost::bind( &Viewer::trigger_redraw, this, false ) ) );
+    boost::bind( &Viewer::trigger_redraw, this, true ) ) );
 
   // Connect state variables that should trigger redraw_overlay
   this->add_connection( this->view_mode_state_->state_changed_signal_.connect(
@@ -123,6 +134,8 @@ Viewer::Viewer( size_t viewer_id ) :
   this->add_connection( this->sagittal_view_state_->state_changed_signal_.connect(
     boost::bind( &Viewer::trigger_redraw_overlay, this, false ) ) );
   this->add_connection( this->slice_grid_state_->state_changed_signal_.connect(
+    boost::bind( &Viewer::trigger_redraw_overlay, this, false ) ) );
+  this->add_connection( this->slice_number_state_->state_changed_signal_.connect(
     boost::bind( &Viewer::trigger_redraw_overlay, this, false ) ) );
 }
 
@@ -368,10 +381,10 @@ void Viewer::insert_layer( LayerHandle layer )
 
   this->layer_connection_map_.insert( connection_map_type::value_type( layer->get_layer_id(),
     layer->opacity_state_->state_changed_signal_.connect( 
-    boost::bind( &Viewer::layer_state_changed, this, false ) ) ) );
+    boost::bind( &Viewer::layer_state_changed, this, ViewModeType::ALL_E ) ) ) );
   this->layer_connection_map_.insert( connection_map_type::value_type( layer->get_layer_id(),
     layer->visible_state_[ this->viewer_id_ ]->state_changed_signal_.connect(
-    boost::bind( &Viewer::layer_state_changed, this, false ) ) ) );
+    boost::bind( &Viewer::layer_state_changed, this, ViewModeType::NON_VOLUME_E ) ) ) );
 
   switch( layer->type() )
   {
@@ -386,15 +399,15 @@ void Viewer::insert_layer( LayerHandle layer )
       this->layer_connection_map_.insert( 
         connection_map_type::value_type( layer->get_layer_id(),
         data_layer->contrast_state_->state_changed_signal_.connect(
-        boost::bind( &Viewer::layer_state_changed, this, false ) ) ) );
+        boost::bind( &Viewer::layer_state_changed, this, ViewModeType::ALL_E ) ) ) );
       this->layer_connection_map_.insert( 
         connection_map_type::value_type( layer->get_layer_id(),
         data_layer->brightness_state_->state_changed_signal_.connect(
-        boost::bind( &Viewer::layer_state_changed, this, false ) ) ) );
+        boost::bind( &Viewer::layer_state_changed, this, ViewModeType::ALL_E ) ) ) );
       this->layer_connection_map_.insert( 
         connection_map_type::value_type( layer->get_layer_id(),
         data_layer->volume_rendered_state_->state_changed_signal_.connect(
-        boost::bind( &Viewer::layer_state_changed, this, true ) ) ) );
+        boost::bind( &Viewer::layer_state_changed, this, ViewModeType::VOLUME_E ) ) ) );
     }
     break;
   case Core::VolumeType::MASK_E:
@@ -408,19 +421,19 @@ void Viewer::insert_layer( LayerHandle layer )
       this->layer_connection_map_.insert( 
         connection_map_type::value_type( layer->get_layer_id(),
         mask_layer->color_state_->state_changed_signal_.connect(
-        boost::bind( &Viewer::layer_state_changed, this, false ) ) ) );
+        boost::bind( &Viewer::layer_state_changed, this, ViewModeType::ALL_E ) ) ) );
       this->layer_connection_map_.insert( 
         connection_map_type::value_type( layer->get_layer_id(),
         mask_layer->border_state_->state_changed_signal_.connect(
-        boost::bind( &Viewer::layer_state_changed, this, false ) ) ) );
+        boost::bind( &Viewer::layer_state_changed, this, ViewModeType::NON_VOLUME_E ) ) ) );
       this->layer_connection_map_.insert( 
         connection_map_type::value_type( layer->get_layer_id(),
         mask_layer->fill_state_->state_changed_signal_.connect(
-        boost::bind( &Viewer::layer_state_changed, this, false ) ) ) );
+        boost::bind( &Viewer::layer_state_changed, this, ViewModeType::NON_VOLUME_E ) ) ) );
       this->layer_connection_map_.insert( 
         connection_map_type::value_type( layer->get_layer_id(),
         mask_layer->show_isosurface_state_->state_changed_signal_.connect(
-        boost::bind( &Viewer::layer_state_changed, this, true ) ) ) );
+        boost::bind( &Viewer::layer_state_changed, this, ViewModeType::VOLUME_E ) ) ) );
     }
     break;
   default:
@@ -958,9 +971,10 @@ void Viewer::auto_view()
   this->trigger_redraw_overlay( false );
 }
 
-void Viewer::layer_state_changed( bool volume_view )
+void Viewer::layer_state_changed( int affected_view_modes )
 {
-  if ( volume_view == this->is_volume_view() )
+  if ( ( this->is_volume_view() && ( affected_view_modes & ViewModeType::VOLUME_E ) != 0 ) ||
+    ( !this->is_volume_view() && ( affected_view_modes & ViewModeType::NON_VOLUME_E ) != 0 ) )
   {
     this->trigger_redraw( false );
   }
@@ -1038,7 +1052,8 @@ void Viewer::move_slice_by( double depth_offset )
     }
   }
   
-  this->trigger_redraw( false );
+  this->trigger_redraw( true );
+  this->trigger_redraw_overlay( false );
 
   // NOTE: No need to trigger slice_changed_signal_ here because the viewer that caused
   // the slice change will trigger it.
@@ -1150,6 +1165,11 @@ void Viewer::set_overlay_texture( Core::Texture2DHandle texture, bool delay_upda
   {
     this->update_display_signal_();
   }
+}
+
+Core::VolumeSliceHandle Viewer::get_active_layer_slice() const
+{
+  return this->active_layer_slice_;
 }
 
 } // end namespace Seg3D
