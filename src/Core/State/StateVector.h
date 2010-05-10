@@ -58,12 +58,16 @@ class StateVector;
 
 typedef StateVector< Core::Point > StatePointVector;
 typedef boost::shared_ptr< StatePointVector > StatePointVectorHandle;
+  
+typedef StateVector< Core::Color > StateColorVector;
+typedef boost::shared_ptr< StateColorVector > StateColorVectorHandle;
 
 typedef StateVector< bool > StateBoolVector;
 typedef boost::shared_ptr< StateBoolVector > StateBoolVectorHandle;
 
 typedef StateVector< double > StateDoubleVector;
 typedef boost::shared_ptr< StateDoubleVector > StateDoubleVectorHandle;
+
 
 template< class T >
 class StateVector : public StateBase
@@ -121,7 +125,8 @@ protected:
 
   // IMPORT_FROM_VARIANT:
   // Import the state data from a variant parameter.
-  virtual bool import_from_variant( ActionParameterVariant& variant, bool from_interface = false )
+  virtual bool import_from_variant( ActionParameterVariant& variant, 
+    Core::ActionSource source = Core::ActionSource::NONE_E )
   {
     // Lock the state engine so no other thread will be accessing it
     StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
@@ -131,7 +136,7 @@ protected:
     if ( value != values_vector_ )
     {
       values_vector_ = value;
-      value_changed_signal_( values_vector_, from_interface );
+      value_changed_signal_( values_vector_, ActionSource::NONE_E );
       state_changed_signal_();
     }
     return ( true );
@@ -186,6 +191,9 @@ public:
 
   typedef boost::signals2::signal< void( ActionSource ) > value_changed_signal_type;
   value_changed_signal_type value_changed_signal;
+  
+  typedef boost::signals2::signal< void( std::vector< T >, Core::ActionSource ) > values_changed_signal_type;
+  values_changed_signal_type value_changed_signal_;
 
   // -- internals of StateValue --
 private:

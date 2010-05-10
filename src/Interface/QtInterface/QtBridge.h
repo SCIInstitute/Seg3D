@@ -35,6 +35,7 @@
 #include <Interface/ToolInterface/CustomWidgets/SliderIntCombo.h>
 #include <Interface/ToolInterface/CustomWidgets/SliderDoubleCombo.h>
 #include <Interface/AppInterface/ColorBarWidget.h>
+#include <Interface/AppPreferences/ColorButton.h>
 
 // Application includes
 #include <Core/State/StateValue.h>
@@ -70,6 +71,9 @@ public:
   // Connect a QDoubleSpinBox to a StateDoubleValue
   static bool Connect( QDoubleSpinBox* qdoublespinbox, Core::StateDoubleHandle& state_handle );
   
+  // Connect a QSpinBox to a StateIntValue
+  static bool Connect( QSpinBox* qspinbox, Core::StateIntHandle& state_handle );
+  
   // Connect a QComboBox to StateOptionHandle
   static bool Connect( QComboBox* qcombobox, Core::StateOptionHandle& state_handle );
   
@@ -77,6 +81,8 @@ public:
 
   // Connect QToolButton & QPushButtons
   static bool Connect( QToolButton* qtoolbutton, Core::StateBoolHandle& state_handle );
+  
+  static bool Connect( ColorButton* colorbutton, Core::StateColorHandle& state_handle );
   
   static bool Connect( QToolButton* qtoolbutton, boost::function< void() > function );
 

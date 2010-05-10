@@ -166,8 +166,39 @@ bool QtBridge::Connect( QLineEdit* qlineedit, Core::StateAliasHandle& state_hand
           return true;
         }
     // -- END CONNECT FUNCTION -- //
-///// ====  BEGIN QDoubleSpinBox FUNCTIONS ==== /////
+///// ====  END QDoubleSpinBox FUNCTIONS ==== /////
 
+  ///// ====  BEGIN QSpinBox FUNCTIONS ==== /////
+    // -- BEGIN SIGNAL CONNECTORS FOR THE QSpinBox's -- //
+  // signal for when the QSpinBox has changed //
+  void QtSpinBoxSignal( QPointer< QSpinBox > qpointer, int state, Core::ActionSource source )
+  {
+    if ( source != Core::ActionSource::INTERFACE_E )
+    {
+      QtSignal( qpointer, boost::bind( &QSpinBox::setValue, qpointer.data(), state ) ); 
+    }
+  }
+    // -- END SIGNAL CONNECTORS FOR THE QSpinBox's -- //
+  
+    // -- BEGIN CONNECT FUNCTION FOR CONNECTING QSpinBox's TO StateIntHandle's -- //
+  bool QtBridge::Connect( QSpinBox* qspinbox, Core::StateIntHandle& state_handle )
+  {
+    // Connect the dispatch into the StateVariable (with auxiliary object)
+    // Link the slot to the parent widget, so Qt's memory manager will
+    // manage this one.
+    new QtSpinBoxSlot( qspinbox, state_handle );
+    QPointer< QSpinBox > qpointer( qspinbox );
+    
+    // Connect the state signal back into the Qt Variable
+    new QtDeleteSlot( qspinbox, state_handle->value_changed_signal_.connect( 
+      boost::bind( &QtSpinBoxSignal, qpointer, _1, _2 ) ) );
+    
+    return true;
+  }
+    // -- END CONNECT FUNCTION -- //
+  ///// ====  END QSpinBox FUNCTIONS ==== /////
+  
+  
 
 ///// ====  BEGIN QComboBox FUNCTIONS ==== /////
     // -- BEGIN SIGNAL CONNECTORS FOR THE QComboBox's -- //
@@ -382,6 +413,36 @@ bool QtBridge::Connect( QLineEdit* qlineedit, Core::StateAliasHandle& state_hand
         }
     // -- END CONNECT FUNCTION -- //
 ///// ====  END QToolButton FUNCTIONS ==== /////
+  
+  ///// ====  BEGIN ColorButton FUNCTIONS ==== /////
+    // -- BEGIN SIGNAL CONNECTORS FOR THE ColorButton's -- //
+  // signal for when the value of the ColorButton has changed //
+  void ColorButtonSignal( QPointer< ColorButton > qpointer, Core::Color state, Core::ActionSource source )
+  {
+    if ( source != Core::ActionSource::INTERFACE_E )
+    {
+      QtSignal( qpointer, boost::bind( &ColorButton::set_color, 
+                      qpointer.data(), state ) ); 
+    }
+  }
+  // -- END SIGNAL CONNECTORS FOR THE ColorButton's -- //
+  
+  
+    // -- BEGIN CONNECT FUNCTION FOR CONNECTING QToolButton's TO StateBoolHandle's -- //
+  bool QtBridge::Connect( ColorButton* colorbutton, Core::StateColorHandle& state_handle )
+  {
+    // Link the slot to the parent widget, so Qt's memory manager will
+    // manage this one.
+    new ColorButtonSlot( colorbutton, state_handle );
+    QPointer< ColorButton > qpointer( colorbutton );
+    
+    new QtDeleteSlot( colorbutton, state_handle->value_changed_signal_.connect( 
+        boost::bind( &ColorButtonSignal, qpointer, _1, _2 ) ) );
+    
+    return true;
+  }
+    // -- END CONNECT FUNCTION -- //
+  ///// ====  END ColorButton FUNCTIONS ==== /////
   
 
 // -- BEGIN CONNECT FUNCTION FOR CONNECTING QPushButton's TO void() function's -- //

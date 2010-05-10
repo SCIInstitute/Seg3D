@@ -32,24 +32,24 @@
 ##################################################
 
 SET(CORE_UTILS_SRCS
-  GenerationNumber.h
-  GenerationNumber.cc
   ConnectionHandler.h
   ConnectionHandler.cc
+  EnumClass.h
   Exception.h
   Exception.cc
+  GenerationNumber.h
+  GenerationNumber.cc
   IntrusiveBase.h
   IntrusiveBase.cc
+  Lockable.h
   Log.h
   Log.cc
   LogHistory.h
   LogHistory.cc
+  ScopedCounter.h
+  Singleton.h
   StringUtil.h
   StringUtil.cc
-  EnumClass.h
-  ScopedCounter.h
-  Lockable.h
-  Singleton.h
 )
 
 ##################################################

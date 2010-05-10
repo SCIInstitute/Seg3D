@@ -40,19 +40,11 @@ namespace Seg3D
 
 bool ActionNewMaskLayer::validate( Core::ActionContextHandle& context )
 {
-//    if ( !this->group_handle_ )
-//  {
-//    SCI_LOG_DEBUG( "The group " + this->group_name_.value() + " is invalid" );
-//    return false;
-//  }
-//      
-  
   if ( !( Core::StateEngine::Instance()->is_stateid( this->group_name_.value() ) ) )
   {
     context->report_error( std::string( "GroupID '" ) + this->group_name_.value() + "' is invalid" );
     return false;
   }
-
   return true; // validated
 }
 

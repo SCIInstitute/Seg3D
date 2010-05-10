@@ -26,73 +26,51 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_APPINTERFACE_COLORBARWIDGET_H
-#define INTERFACE_APPINTERFACE_COLORBARWIDGET_H
-
-// QT includes
-#include <QtGui>
-
-// STL includes
-#include <string>
+#ifndef INTERFACE_APPPREFERENCES_APPPREFERENCES_H
+#define INTERFACE_APPPREFERENCES_APPPREFERENCES_H
 
 // Boost includes
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/thread.hpp>
 #include <boost/shared_ptr.hpp>
-
-//Interface includes
 #include <Interface/AppPreferences/ColorButton.h>
+#include <Interface/AppPreferences/ColorPickerWidget.h>
+
+#include <QtGui>
+
+
 
 namespace Seg3D
 {
 
-class ColorBarWidgetPrivate;
+class AppPreferencesPrivate;
 
-class ColorBarWidget : public QWidget
-{
-Q_OBJECT
-
+class AppPreferences : public QDialog {
+    Q_OBJECT
 public:
-  ColorBarWidget( QWidget* parent = 0 );
-  virtual ~ColorBarWidget();
-
-Q_SIGNALS:
-  void color_index_changed( int index );
+    AppPreferences( QWidget *parent = 0 );
+    virtual ~AppPreferences();
   
-public Q_SLOTS:
-  void set_color_index( int index );
-  void set_index_color( int index, QString rgb_color );
-
 private:
-  void make_connections();
-  void initialize_button_list();
-  void mousePressEvent( QMouseEvent* event );
+  void setup_general_prefs();
+  void setup_layer_prefs();
+  void setup_viewer_prefs();
+  void setup_sidebar_prefs();
+  void setup_interface_controls_prefs();
+  
+  void hide_show_color_01( bool );
   
 private Q_SLOTS:
-  void activate_color_01();
-  void activate_color_02();
-  void activate_color_03();
-  void activate_color_04();
-  void activate_color_05();
-  void activate_color_06();
-  void activate_color_07();
-  void activate_color_08();
-  void activate_color_09();
-  void activate_color_10();
-  void activate_color_11();
-  void activate_color_12();
+  void hide_the_others( int index );
+  void set_buttons_to_default_colors();
+  
+  
 
 private:
-  // Internals of the dockwidget
-  boost::shared_ptr< ColorBarWidgetPrivate > private_;
-  
-private:
-  int current_color_index_;
-  //QVector< ColorButton* > button_list_;
-  ColorButton* button_list_[ 13 ];
+  boost::shared_ptr< AppPreferencesPrivate > private_;
+  QVector< ColorButton* > color_buttons_;
+  QVector< ColorPickerWidget* > color_pickers_;
 
 };
 
-} // end namespace
+}
 
-#endif // COLORBARWIDGET_H
+#endif // INTERFACE_APPPREFERENCES_APPPREFERENCES_H

@@ -35,6 +35,7 @@
 
 #include <Core/State/StateBase.h>
 #include <Core/State/StateEngine.h>
+#include <Core/Geometry/Color.h>
 
 namespace Core
 {
@@ -63,7 +64,7 @@ typedef boost::shared_ptr< StateBool > StateBoolHandle;
 
 typedef StateValue< int > StateInt;
 typedef boost::shared_ptr< StateInt > StateIntHandle;
-
+  
 typedef StateValue< std::string > StateString;
 typedef boost::shared_ptr< StateString > StateStringHandle;
 
@@ -158,7 +159,7 @@ public:
   bool set( const T& value, Core::ActionSource source = Core::ActionSource::NONE_E )
   {
     SCI_LOG_DEBUG(std::string("Set Value ")+ stateid() +
-      std::string(" ") + Core::ToString(value));
+      std::string(" ") + Core::ExportToString(value));
 
     // Lock the state engine so no other thread will be accessing it
     StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );

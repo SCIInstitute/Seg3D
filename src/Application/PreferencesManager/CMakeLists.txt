@@ -1,3 +1,4 @@
+
 #
 #  For more information, please see: http://software.sci.utah.edu
 # 
@@ -26,9 +27,34 @@
 #  DEALINGS IN THE SOFTWARE.
 #
 
-ADD_SUBDIRECTORY(AppController)
-ADD_SUBDIRECTORY(AppInterface)
-ADD_SUBDIRECTORY(AppPreferences)
-ADD_SUBDIRECTORY(QtInterface)
-ADD_SUBDIRECTORY(ToolInterface)
-ADD_SUBDIRECTORY(Main)
+##################################################
+# Set sources
+##################################################
+
+SET(APPLICATION_PREFERENCESMANAGER_SRCS
+    PreferencesManager.h
+    PreferencesManager.cc
+  )
+
+SET(APPLICATION_PREFERENCESMANAGER_ACTIONS_SRCS
+  )
+
+
+ADD_LIBRARY(Application_PreferencesManager STATIC 
+            ${APPLICATION_PREFERENCESMANAGER_SRCS}
+            ${APPLICATION_PREFERENCESMANAGER_ACTIONS_SRCS} )
+            
+TARGET_LINK_LIBRARIES(Application_PreferencesManager
+                      Core_Converter
+                      Core_Utils
+                      Core_EventHandler
+                      Core_Application
+                      Core_Interface
+                      Core_Action
+                      Core_State
+                      ${SCI_BOOST_LIBRARY})
+
+# Register actions
+ADD_LIBRARY_ACTIONS(Application_PreferencesManager
+                    ${APPLICATION_PREFERENCESMANAGER_ACTIONS_SRCS})
+

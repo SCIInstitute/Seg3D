@@ -58,6 +58,7 @@
 #include <Interface/AppInterface/AppMenu.h>
 #include <Interface/AppInterface/AppStatusBar.h>
 #include <Interface/AppController/AppController.h>
+#include <Interface/AppPreferences/AppPreferences.h>
 
 #include <Core/Action/Actions.h>
 #include <Core/Utils/ConnectionHandler.h>
@@ -120,6 +121,7 @@ private:
   // Pointer to the main canvas of the main window
   QPointer< ViewerInterface > viewer_interface_;
   QPointer< AppController > controller_interface_;
+  QPointer< AppPreferences > preferences_interface_;
 
   // The dock widgets
   QPointer< HistoryDockWidget > history_dock_window_;

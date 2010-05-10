@@ -108,7 +108,7 @@ bool StateOption::set( const std::string& input_value, ActionSource source )
         this->value_changed_signal_( value_, source );
         this->state_changed_signal_();
       }
-      return ( false );
+      return false;
     }
     this->value_ = value;
     this->index_ = static_cast<int>( it - this->option_list_.begin() );
@@ -117,7 +117,7 @@ bool StateOption::set( const std::string& input_value, ActionSource source )
     this->value_changed_signal_( value_, source );
     this->state_changed_signal_();
   }
-  return ( true );
+  return true;
 }
 
 bool StateOption::import_from_string( const std::string& str, ActionSource source )

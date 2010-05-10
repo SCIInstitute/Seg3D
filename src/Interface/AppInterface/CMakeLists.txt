@@ -168,6 +168,7 @@ TARGET_LINK_LIBRARIES(Interface_AppInterface
                       Application_Tools
                       Interface_QtInterface
                       Interface_AppController
+            Interface_AppPreferences
                       ${QT_LIBRARIES} 
                       ${SCI_BOOST_LIBRARY})
 

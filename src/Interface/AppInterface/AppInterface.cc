@@ -72,6 +72,9 @@ AppInterface::AppInterface()
 
   this->controller_interface_ = new AppController( this );
   this->controller_interface_->hide();
+  
+  this->preferences_interface_ = new AppPreferences( this );
+  this->preferences_interface_->hide();
 
   // Setup the history dock widget
   add_windowids();
@@ -140,6 +143,12 @@ void AppInterface::closeEvent( QCloseEvent* event )
   {
     this->controller_interface_->close();
     this->controller_interface_->deleteLater();
+  }
+  
+  if( this->preferences_interface_ )
+  {
+    this->preferences_interface_->close();
+    this->preferences_interface_->deleteLater();
   }
   
   if( this->history_dock_window_ )
@@ -232,6 +241,7 @@ AppInterface::measurement_dock_widget()
 void AppInterface::add_windowids()
 {
   InterfaceManager::Instance()->add_windowid( "controller" );
+  InterfaceManager::Instance()->add_windowid( "preferences" );
   InterfaceManager::Instance()->add_windowid( "project" );
   InterfaceManager::Instance()->add_windowid( "history" );
   InterfaceManager::Instance()->add_windowid( "layermanager" );
@@ -255,6 +265,20 @@ void AppInterface::show_window( const std::string& windowid )
       this->controller_interface_->raise();
     }
   }
+  else if( lower_windowid == "preferences" )
+  {
+    if( this->preferences_interface_.isNull() )
+    {
+      this->preferences_interface_ = new AppPreferences( this );
+      this->preferences_interface_->show();
+    }
+    else
+    {
+      this->preferences_interface_->show();
+      this->preferences_interface_->raise();
+    }
+  }
+  
   else if( lower_windowid == "project" )
   {
     if( project_dock_window_.isNull() )
@@ -335,6 +359,13 @@ void AppInterface::close_window( const std::string& windowid )
     if( !( this->controller_interface_.isNull() ) )
     {
       this->controller_interface_->close();
+    }
+  }
+  else if( lower_windowid == "preferences" )
+  {
+    if( !( this->preferences_interface_.isNull() ) )
+    {
+      this->preferences_interface_->close();
     }
   }
   else if( lower_windowid == "project" )

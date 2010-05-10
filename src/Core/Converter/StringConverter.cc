@@ -97,6 +97,11 @@ std::string ExportToString( const double& value )
 {
   return ToString( value );
 }
+  
+//std::string ExportToString( const RGBColor& value )
+//{
+//  return ToString( value );
+//}
 
 std::string ExportToString( const View3D& value )
 {
@@ -219,6 +224,16 @@ std::string ExportToString( const std::vector< double >& value )
   result[ result.size() - 1 ] = ']';
   return result;
 }
+  
+//std::string ExportToString( const std::vector< RGBColor >& value )
+//{
+//  std::string result( 1, '[' );
+//  for ( size_t j = 0; j < value.size(); j++ )
+//    result += ExportToString( value[ j ] ) + ' ';
+//  result[ result.size() - 1 ] = ']';
+//  return result;
+//}
+  
 
 std::string ExportToString( const std::vector< Point >& value )
 {
@@ -473,6 +488,11 @@ bool ImportFromString( const std::string& str, std::vector< double >& value )
 {
   return ( MultipleFromString( str, value ) );
 }
+  
+//bool ImportFromString( const std::string& str, std::vector< RGBColor >& value )
+//{
+//  return ( MultipleFromString( str, value ) );
+//}
 
 bool ImportFromString( const std::string& str, std::string& value )
 {

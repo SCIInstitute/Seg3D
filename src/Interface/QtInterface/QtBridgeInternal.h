@@ -34,6 +34,7 @@
 #include <Interface/ToolInterface/CustomWidgets/SliderIntCombo.h>
 #include <Interface/ToolInterface/CustomWidgets/SliderDoubleCombo.h>
 #include <Interface/AppInterface/ColorBarWidget.h>
+#include <Interface/AppPreferences/ColorButton.h>
 
 // boost includes
 #include <boost/signals2/signal.hpp>
@@ -214,9 +215,9 @@ public:
 
 public Q_SLOTS:
   // Slot that Qt will call
-  void slot(double state)
+  void slot( double state )
   {
-    if (!blocked_) Core::ActionSet::Dispatch( state_handle_, state );
+    if ( !blocked_ ) Core::ActionSet::Dispatch( state_handle_, state );
   }
 
 private:
@@ -224,6 +225,35 @@ private:
   Core::StateDoubleHandle state_handle_;
 };
 
+  class QtSpinBoxSlot : public QtSlot
+  {
+    Q_OBJECT
+  public:
+    
+    // Constructor
+    QtSpinBoxSlot( QSpinBox* parent, Core::StateIntHandle& state_handle, bool blocking = true ) :
+    QtSlot( parent, blocking ), state_handle_( state_handle )
+    {
+      // Qt's connect function
+      connect( parent, SIGNAL( valueChanged( int ) ), this, SLOT( slot( int ) ) );
+    }
+    
+    // Virtual destructor: needed by Qt
+    virtual ~QtSpinBoxSlot()
+    {
+    }
+    
+    public Q_SLOTS:
+    // Slot that Qt will call
+    void slot( int state )
+    {
+      if ( !blocked_ ) Core::ActionSet::Dispatch( state_handle_, state );
+    }
+    
+  private:
+    // Function object
+    Core::StateIntHandle state_handle_;
+  };
 
 
 
@@ -509,6 +539,36 @@ private:
   // Function object
   Core::StateBoolHandle state_handle_;
 };
+  
+  class ColorButtonSlot : public QtSlot
+  {
+    Q_OBJECT
+    
+  public:
+    
+    // Constructor
+    ColorButtonSlot(ColorButton* parent, Core::StateColorHandle& state_handle, bool blocking = true ) :
+    QtSlot( parent, blocking ), state_handle_( state_handle )
+    {
+      // Qt's connect function
+      connect( parent,SIGNAL( color_changed( Core::Color ) ), this, SLOT( slot( Core::Color ) ) );
+    }
+    
+    // Virtual destructor: needed by Qt
+    virtual ~ColorButtonSlot()
+    {}
+    
+    public Q_SLOTS:
+    // Slot that Qt will call
+    void slot( Core::Color color )
+    {
+      if ( !blocked_ ) Core::ActionSet::Dispatch( state_handle_, color );
+    }
+    
+  private:
+    // Function object
+    Core::StateColorHandle state_handle_;
+  };
 
 
 

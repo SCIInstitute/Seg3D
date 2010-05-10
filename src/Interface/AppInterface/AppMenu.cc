@@ -292,6 +292,11 @@ void AppMenu::create_window_menu( QMenu* qmenu )
   QtBridge::Connect( qaction, boost::bind( &ActionShowWindow::Dispatch,
       std::string( "controller" ) ) );
 
+  // Preferences Window
+  qaction = qmenu->addAction( "Preferences Window" );
+  qaction->setShortcut( tr( "Ctrl+ALT+P" ) );
+  QtBridge::Connect( qaction, boost::bind( &ActionShowWindow::Dispatch,
+    std::string( "preferences" ) ) );
 }
 
 } // end namespace Seg3D
