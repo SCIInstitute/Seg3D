@@ -26,7 +26,7 @@ QToolButton:pressed {
   border-radius: 3px;
 }
 QToolButton:checked {
-  border: 2px solid rgb(255, 255, 255);
+  border: 2px solid black;
   border-radius: 3px;
 }
 
@@ -509,7 +509,7 @@ QToolButton#color_12_{
                </property>
                <layout class="QHBoxLayout" name="color_h_layout_">
                 <property name="spacing">
-                 <number>-1</number>
+                 <number>6</number>
                 </property>
                 <property name="margin">
                  <number>4</number>

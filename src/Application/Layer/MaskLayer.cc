@@ -60,7 +60,7 @@ void MaskLayer::initialize_states()
     // Step (1) : Build the layer specific state variables
 
     // == Color of the layer ==
-    add_state( "color", color_state_, 1 );
+    add_state( "color", color_state_, 0 );
 
     // == What border is used ==
     add_state( "border", border_state_, "thick", "none|thin|thick" );

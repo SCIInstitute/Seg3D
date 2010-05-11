@@ -45,21 +45,29 @@ class ColorButton :
   
 Q_SIGNALS:
   void color_changed( Core::Color );
-  void clicked( Core::Color, bool );
-  void clicked( int );
-  void clicked();
+  void button_clicked( Core::Color, bool );
+  void index( int );
+  //void clicked( Core::Color, bool );
+  //void clicked( bool );
+  //void toggled( bool );
+  //void clicked( int );
+  //void clicked();
   
 public Q_SLOTS:
   void set_color( Core::Color );
   Core::Color get_color(){ return button_color_; }
   
 public:
-  void mousePressEvent( QMouseEvent *event );
+  //void mousePressEvent( QMouseEvent *event );
   
 public:
-  ColorButton( QWidget *parent = 0, int index = 0, Core::Color button_color = Core::Color() );
+  ColorButton( QWidget *parent = 0, int index = 0, 
+    Core::Color button_color = Core::Color(), int height = 0, int width = 0 );
   virtual ~ColorButton();
   
+private Q_SLOTS:
+  void trigger_signal( bool );
+
 private:
   Core::Color button_color_;
   const int index_;

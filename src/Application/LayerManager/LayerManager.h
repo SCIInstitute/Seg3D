@@ -178,6 +178,8 @@ private:
   // currently active layer
   LayerHandle active_layer_;
 
+  static int color_counter_;
+
     
 };
 

@@ -56,41 +56,22 @@ public:
   ColorBarWidget( QWidget* parent = 0 );
   virtual ~ColorBarWidget();
 
-Q_SIGNALS:
-  void color_index_changed( int index );
-  
 public Q_SLOTS:
   void set_color_index( int index );
-  void set_index_color( int index, QString rgb_color );
+  void signal_activation( int active );
+  void dummy();
+
+Q_SIGNALS:
+  void color_index_changed( int index );
 
 private:
-  void make_connections();
-  void initialize_button_list();
+  void initialize_buttons();
   void mousePressEvent( QMouseEvent* event );
-  
-private Q_SLOTS:
-  void activate_color_01();
-  void activate_color_02();
-  void activate_color_03();
-  void activate_color_04();
-  void activate_color_05();
-  void activate_color_06();
-  void activate_color_07();
-  void activate_color_08();
-  void activate_color_09();
-  void activate_color_10();
-  void activate_color_11();
-  void activate_color_12();
+
 
 private:
   // Internals of the dockwidget
   boost::shared_ptr< ColorBarWidgetPrivate > private_;
-  
-private:
-  int current_color_index_;
-  //QVector< ColorButton* > button_list_;
-  ColorButton* button_list_[ 13 ];
-
 };
 
 } // end namespace

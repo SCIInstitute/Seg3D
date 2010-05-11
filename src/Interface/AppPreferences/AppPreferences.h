@@ -31,7 +31,7 @@
 
 // Boost includes
 #include <boost/shared_ptr.hpp>
-#include <Interface/AppPreferences/ColorButton.h>
+//#include <Interface/AppPreferences/ColorButton.h>
 #include <Interface/AppPreferences/ColorPickerWidget.h>
 
 #include <QtGui>
@@ -56,16 +56,13 @@ private:
   void setup_sidebar_prefs();
   void setup_interface_controls_prefs();
   
-  void hide_show_color_01( bool );
-  
 private Q_SLOTS:
   void hide_the_others( int index );
   void set_buttons_to_default_colors();
   
-  
-
 private:
   boost::shared_ptr< AppPreferencesPrivate > private_;
+  ColorPickerWidget* active_picker_;
 
 };
 

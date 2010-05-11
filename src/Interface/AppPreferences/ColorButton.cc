@@ -32,12 +32,27 @@ namespace Seg3D
 {
   
   
-  ColorButton::ColorButton( QWidget *parent, int index, Core::Color button_color  ) :
+  ColorButton::ColorButton( QWidget *parent, int index, Core::Color button_color,
+    int height, int width ) :
     QToolButton( parent ),
     index_( index )
   {
     this->set_color( button_color );
     this->setCheckable( true );
+    //this->setChecked( true );
+
+    if( height )
+    {
+      this->setMinimumHeight( height );
+      this->setMaximumHeight( height );
+    }
+    if( width )
+    {
+      this->setMinimumWidth( width );
+      this->setMaximumWidth( width );
+    }
+
+    connect( this, SIGNAL( toggled ( bool ) ), this, SLOT( trigger_signal( bool ) ) );
   }
   
   ColorButton::~ColorButton()
@@ -63,13 +78,12 @@ namespace Seg3D
     Q_EMIT color_changed( this->button_color_ );
   }
 
-  void ColorButton::mousePressEvent( QMouseEvent *event )
+  void ColorButton::trigger_signal( bool torf )
   {
-    this->toggle();
-    Q_EMIT this->clicked( this->button_color_, this->isChecked() );
-    Q_EMIT this->clicked( this->index_ );
-    Q_EMIT this->clicked();
+    Q_EMIT this->button_clicked( this->button_color_, this->isChecked() );
+    Q_EMIT this->index( this->index_ );
   }
+
   
 } // end namespace Seg3D
 
