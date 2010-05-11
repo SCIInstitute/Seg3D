@@ -49,46 +49,56 @@
 #include <Core/Geometry/Vector.h>
 
 #include <Core/DataBlock/DataType.h>
+#include <Core/DataBlock/DataBlock.h>
 
 namespace Core
 {
+
+// CLASS NRRDDATA
+// This class is a wrapper for the Teem nrrd structure. It can be generated on the fly from a nrrd
+// object that the Teem library produces or it can be generated based on a DataBlock from this
+// core library.
+
+// The purpose of this class is to do garbage collection and sharing of memory between different
+// pieces of the third party libraries.
 
 // Forward Declaration
 class NrrdData;
 typedef boost::shared_ptr< NrrdData > NrrdDataHandle;
 
+class NrrdDataPrivate;
+typedef boost::shared_ptr< NrrdDataPrivate > NrrdDataPrivateHandle;
+
 // Class definition
 class NrrdData : boost::noncopyable
 {
-
   // -- Constructor/destructor --
 public:
+  // Construct the NrrdData wrapper from a nrrd
+  // own_data tells whether the data should be destroyed when this object is deleted
   NrrdData( Nrrd* nrrd, bool own_data = true );
+  
+  // Construct a NrrdData object from an existing DataBlock of data
+  // The datablock handle will be stored internally until the object is deleted
+  // and the memory with the data is shared between the object and the nrrd object.
+  NrrdData( DataBlockHandle data_block );
+  NrrdData( DataBlockHandle data_block, Transform transform );
+
   virtual ~NrrdData();
 
   // -- Accessors --
 public:
   // NRRD:
   // Return the nrrd structure
-  Nrrd* nrrd() const
-  {
-    return nrrd_;
-  }
+  Nrrd* nrrd() const;
 
   // GET_DATA:
   // Get the pointer to the data block within the nrrd
-  void* get_data() const
-  {
-    if ( nrrd_ ) return nrrd_->data;
-    else return 0;
-  }
+  void* get_data() const;
 
   // OWN_DATA:
   // Return whether the nrrd owns the data
-  bool own_data() const
-  {
-    return own_data_;
-  }
+  bool own_data() const;
 
   // GRID_TRANSFORM
   // Extract the transform from the nrrd
@@ -108,29 +118,26 @@ public:
   size_t ny() const;
   size_t nz() const;
 
-  // IS_<TYPE>
-  // Test whether nrrd is of a certain type
+  // GET_DATA_TYPE:
+  // Get the data type of the nrrd
   DataType get_data_type() const;
 
-  // -- Information for retrieving nrrd --
+  // -- Internals of this class --
 private:
-  // Location where the original nrrd is stored
-  Nrrd* nrrd_;
-
-  // Do we need to clear the nrrd when done
-  bool own_data_;
+  NrrdDataPrivateHandle private_;
 
   // -- Data IO for nrrds --
 public:
 
-  // LOADNRRD
+  // LOADNRRD:
   // Load a nrrd into the nrrd data structure
-  static bool
-      LoadNrrd( const std::string& filename, NrrdDataHandle& nrrddata, std::string& error );
+  static bool LoadNrrd( const std::string& filename, NrrdDataHandle& nrrddata, 
+    std::string& error );
 
-  // SAVENRRD
+  // SAVENRRD:
   // Save a nrrd to file from nrrd data structure
-  static bool SaveNrrd( const std::string& filename, NrrdDataHandle nrrddata, std::string& error );
+  static bool SaveNrrd( const std::string& filename, NrrdDataHandle nrrddata, 
+    std::string& error );
 
   // -- Lock and Unlock Teem (Some parts of Teem are not thread safe) --
 public:
@@ -139,15 +146,7 @@ public:
 
   // GETMUTEX:
   // Get the mutex that protects the Teem library
-  static mutex_type& GetMutex()
-  {
-    return teem_mutex_;
-  }
-
-private:
-  // Mutex protecting Teem calls like nrrdLoad and nrrdSave that are known
-  // to be not thread safe
-  static mutex_type teem_mutex_;
+  static mutex_type& GetMutex();
 };
 
 } // end namespace Core

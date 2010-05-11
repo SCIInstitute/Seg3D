@@ -40,6 +40,8 @@
 #include <boost/thread/recursive_mutex.hpp>
 #include <boost/utility.hpp>
 
+// Core includes
+#include <Core/Utils/Lockable.h>
 #include <Core/DataBlock/DataType.h>
 #include <Core/DataBlock/Histogram.h>
 
@@ -61,15 +63,8 @@ class DataBlock;
 typedef boost::shared_ptr< DataBlock > DataBlockHandle;
 
 // Class definition
-class DataBlock : public boost::noncopyable
+class DataBlock : public RecursiveLockable
 {
-
-  // -- typedefs --
-public:
-  // Lock types
-  typedef boost::recursive_mutex mutex_type;
-  typedef boost::unique_lock< mutex_type > lock_type;
-
   // index/size types
 #ifdef SCI_64BITS
   typedef unsigned long long  size_type;
@@ -153,25 +148,16 @@ public:
   // GET_MAX:
   // Get the maximum value of the data
   // NOTE: update_histogram needs to be called to ensure the data is accurate
-  inline double get_max() const
-  {
-    return this->histogram_.get_max();
-  }
+  double get_max() const;
 
   // GET_MIN:
   // Get the minimum value of the data
   // NOTE: update_histogram needs to be called to ensure the data is accurate
-  inline double get_min() const
-  {
-    return this->histogram_.get_min();
-  }
+  double get_min() const;
 
   // GET_HISTOGRAM:
   // Get the histogram of the underlying data
-  const Histogram& get_histogram() const
-  {
-    return this->histogram_;
-  }
+  const Histogram& get_histogram() const;
 
   // UPDATE_HISTOGRAM:
   // Recompute the histogram. This needs to be triggered each time the data is updated
@@ -181,18 +167,9 @@ protected:
 
   // SET_NX, SET_NY, SET_NZ
   // Set the dimensions of the datablock
-  void set_nx( size_t nx )
-  {
-    nx_ = nx;
-  }
-  void set_ny( size_t ny )
-  {
-    ny_ = ny;
-  }
-  void set_nz( size_t nz )
-  {
-    nz_ = nz;
-  }
+  void set_nx( size_t nx );
+  void set_ny( size_t ny );
+  void set_nz( size_t nz );
 
   // SET_TYPE
   // Set the type of the data
@@ -200,25 +177,11 @@ protected:
 
   // SET_DATA
   // Set the data pointer of the data
-  void set_data( void* data )
-  {
-    this->data_ = data;
-  }
+  void set_data( void* data );
 
-  void set_histogram( const Histogram& histogram )
-  {
-    this->histogram_ = histogram;
-  }
-
-  // -- Locking of the datablock --
-public:
-
-  // GET_MUTEX:
-  // Get the mutex that locks the datablock
-  mutex_type& get_mutex()
-  {
-    return this->mutex_;
-  }
+  // SET_HISTOGRAM:
+  // Set the histogram of the dataset
+  void set_histogram( const Histogram& histogram );
 
   // -- Signals and slots --
 public:
@@ -236,11 +199,6 @@ private:
 
   // The type of the data in this data block
   DataType data_type_;
-
-  // The mutex that protects the data
-  // As data is shared between the renderer and the application threads, we
-  // need locking.
-  mutex_type mutex_;
 
   // Pointer to the data
   void* data_;

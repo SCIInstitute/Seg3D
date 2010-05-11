@@ -26,15 +26,29 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// Teem includes
 #include <teem/nrrd.h>
+
+// Core includes
 #include <Core/DataBlock/NrrdDataBlock.h>
 
 namespace Core
 {
 
-NrrdDataBlock::NrrdDataBlock( NrrdDataHandle nrrd_data ) :
-  nrrd_data_( nrrd_data )
+
+class NrrdDataBlockPrivate : public boost::noncopyable
 {
+public:
+  // Location where the original nrrd is stored
+  NrrdDataHandle nrrd_data_;
+};
+
+
+NrrdDataBlock::NrrdDataBlock( NrrdDataHandle nrrd_data ) :
+  private_( new NrrdDataBlockPrivate)
+{
+  this->private_->nrrd_data_ = nrrd_data;
+
   set_nx( nrrd_data->nx() );
   set_ny( nrrd_data->ny() );
   set_nz( nrrd_data->nz() );

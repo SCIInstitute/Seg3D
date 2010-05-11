@@ -154,6 +154,46 @@ void DataBlock::set_type( DataType type )
   this->data_type_ = type;
 }
 
+void DataBlock::set_nx( size_t nx )
+{
+  this->nx_ = nx;
+}
+
+void DataBlock::set_ny( size_t ny )
+{
+  this->ny_ = ny;
+}
+
+void DataBlock::set_nz( size_t nz )
+{
+  this->nz_ = nz;
+}
+
+void DataBlock::set_data( void* data )
+{
+  this->data_ = data;
+}
+
+void DataBlock::set_histogram( const Histogram& histogram )
+{
+  this->histogram_ = histogram;
+}
+
+inline double DataBlock::get_max() const
+{
+  return this->histogram_.get_max();
+}
+
+inline double DataBlock::get_min() const
+{
+  return this->histogram_.get_min();
+}
+
+const Histogram& DataBlock::get_histogram() const
+{
+  return this->histogram_;
+}
+
 void DataBlock::update_histogram()
 {
   lock_type lock( get_mutex() );

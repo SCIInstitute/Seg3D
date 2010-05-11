@@ -61,22 +61,26 @@ SCI_ENUM_CLASS
   UNKNOWN_E
 )
 
-// IMPORT FROM STRING:
+// IMPORTFROMSTRING:
 // Import a DataType from a string
 // NOTE: If the import fails UNKNOWN_E is returned and the function returns false
 bool ImportFromString( const std::string& data_type_string, DataType& data_type );
 
-// EXPORT TO STRING:
+// EXPORTTOSTRING:
 // Export the data type to a string
 std::string ExportToString( DataType data_type );
 
-// IS INTEGER
+// ISINTEGER:
 // Test whether data type is an integer 
 bool IsInteger( const DataType& data_type );
 
-// IS REAL
+// ISREAL:
 // Test whether data is floating point
 bool IsReal( const DataType& data_type );
+
+// GETNRRDDATATYPE:
+// Get the type of the data
+int GetNrrdDataType( const DataType& data_type);
 
 } // end namespace Core
 

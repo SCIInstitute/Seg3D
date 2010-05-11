@@ -26,6 +26,9 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// Teem includes
+#include <teem/nrrd.h>
+
 // Boost includes
 #include <boost/algorithm/string.hpp>
 
@@ -125,6 +128,35 @@ std::string ExportToString( DataType data_type )
       return "double";
     default:
       return "unknown";
+  }
+}
+
+int GetNrrdDataType( const DataType& data_type)
+{
+  switch ( data_type )
+  {
+    case DataType::CHAR_E:
+      return nrrdTypeChar;
+    case DataType::UCHAR_E:
+      return nrrdTypeUChar;
+    case DataType::SHORT_E:
+      return nrrdTypeShort;
+    case DataType::USHORT_E:
+      return nrrdTypeUShort;
+    case DataType::INT_E:
+      return nrrdTypeInt;
+    case DataType::UINT_E:
+      return nrrdTypeUInt;
+    case DataType::LONGLONG_E:
+      return nrrdTypeLLong;
+    case DataType::ULONGLONG_E:
+      return nrrdTypeULLong;
+    case DataType::FLOAT_E:
+      return nrrdTypeFloat;
+    case DataType::DOUBLE_E:
+      return nrrdTypeDouble;
+    default:
+      return nrrdTypeUnknown;
   }
 }
 

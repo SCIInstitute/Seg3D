@@ -35,6 +35,7 @@
 
 // Util includes
 #include <Core/DataBlock/DataBlock.h>
+#include <Core/DataBlock/NrrdData.h>
 #include <Core/Geometry/Point.h>
 #include <Core/Geometry/Vector.h>
 #include <Core/Geometry/Transform.h>
@@ -77,11 +78,11 @@ public:
 
   // TYPE
   // Get the type of the data layer
-  virtual VolumeType type() const = 0;
+  virtual VolumeType get_type() const = 0;
 
-  // GRIDTRANSFORM
+  // GET_GRID_TRANSFORM
   // Get the grid location
-  const Core::GridTransform& get_grid_transform() const
+  const GridTransform& get_grid_transform() const
   {
     return this->grid_transform_;
   }
@@ -113,7 +114,7 @@ public:
     assert( x < this->nx_ && y < this->ny_ && z < this->nz_ );
     return z * this->nx_ * this->ny_ + y * this->nx_ + x;
   }
-
+  
   Point apply_grid_transform( const Point& pt ) const;
   Point apply_inverse_grid_transform( const Point& pt ) const;
 
@@ -132,9 +133,6 @@ private:
   size_t nx_;
   size_t ny_;
   size_t nz_;
-
-  // Histogram
-//  HistogramHandle histogram_;
 
 };
 

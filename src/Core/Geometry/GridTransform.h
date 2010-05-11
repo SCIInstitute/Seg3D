@@ -92,17 +92,17 @@ public:
   // The spacing in each of directions
   double spacing_x() const
   {
-    return project( Vector(1.0,0.0,0.0) ).length();
+    return project( Vector( 1.0, 0.0, 0.0 ) ).length();
   }
 
   double spacing_y() const
   {
-    return project( Vector(0.0,1.0,0.0) ).length();
+    return project( Vector( 0.0, 1.0, 0.0 ) ).length();
   }
 
   double spacing_z() const
   {
-    return project( Vector(0.0,0.0,1.0) ).length();
+    return project( Vector( 0.0, 0.0, 1.0 ) ).length();
   }
 
   // SET_NX, SET_NY, SET_NY

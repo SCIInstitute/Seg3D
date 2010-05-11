@@ -40,19 +40,21 @@ namespace Core
 class NrrdDataBlock;
 typedef boost::shared_ptr< NrrdDataBlock > NrrdDataBlockHandle;
 
+class NrrdDataBlockPrivate;
+typedef boost::shared_ptr< NrrdDataBlockPrivate > NrrdDataBlockPrivateHandle;
+
 // Class definition
 class NrrdDataBlock : public DataBlock
 {
-
   // -- Constructor/destructor --
 public:
   NrrdDataBlock( NrrdDataHandle nrrd_data );
   virtual ~NrrdDataBlock();
 
-  // -- Information for retrieving nrrd --
+  // -- Internal implementation of this class --
 private:
-  // Location where the original nrrd is stored
-  NrrdDataHandle nrrd_data_;
+  NrrdDataBlockPrivateHandle private_;
+
 };
 
 } // end namespace Core

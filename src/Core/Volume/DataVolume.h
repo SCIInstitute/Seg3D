@@ -47,22 +47,24 @@ public:
   DataVolume( const GridTransform& grid_transform, const DataBlockHandle& data_block );
   virtual ~DataVolume();
 
-  virtual VolumeType type() const
-  {
-    return VolumeType::DATA_E;
-  }
+  // GET_TYPE:
+  // Get the type of the data volume
+  virtual VolumeType get_type() const;
 
   // DATA_BLOCK:
   // Get the data block that contains the volume data
-  DataBlockHandle data_block()
-  {
-    return this->data_block_;
-  }
+  DataBlockHandle data_block() const;
 
+  // GET_MUTEX:
+  // Get access to the mutex protecting this DataVolume
   virtual mutex_type& get_mutex()
   {
     return this->data_block_->get_mutex();
   }
+
+  // CONVERT_TO_NRRD:
+  // Get the volume data as a nrrd wrapped in a NrrdData structure
+  virtual NrrdDataHandle convert_to_nrrd();
 
 private:
   // Handle to where the volume data is really stored

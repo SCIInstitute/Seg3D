@@ -81,7 +81,7 @@ public:
 
   VolumeType volume_type() const
   {
-    return this->volume_->type();
+    return this->volume_->get_type();
   }
 
   void set_slice_type( VolumeSliceType type );

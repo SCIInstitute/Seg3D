@@ -26,35 +26,103 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <Core/Math/MathFunctions.h>
-#include <Core/Geometry/GridTransform.h>
-#include <Core/DataBlock/NrrdData.h>
+// Core includes
 #include <Core/Converter/StringConverter.h>
+#include <Core/DataBlock/NrrdData.h>
+#include <Core/Geometry/GridTransform.h>
+#include <Core/Math/MathFunctions.h>
 #include <Core/Utils/Log.h>
-
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
-# pragma once
-#endif 
 
 namespace Core
 {
 
-NrrdData::NrrdData( Nrrd* nrrd, bool own_data ) :
-  nrrd_( nrrd ), own_data_( own_data )
+class NrrdDataPrivate
 {
+public:
+  // Location where the original nrrd is stored
+  Nrrd* nrrd_;
+
+  // Do we need to clear the nrrd when done
+  bool own_data_; 
+  
+  // Location of the data block from which this nrrd was derived
+  DataBlockHandle data_block_;
+};
+
+
+NrrdData::NrrdData( Nrrd* nrrd, bool own_data ) :
+  private_( new  NrrdDataPrivate )
+{
+  this->private_->nrrd_ = nrrd;
+  this->private_->own_data_ = own_data;
+}
+
+NrrdData::NrrdData( DataBlockHandle data_block ) :
+  private_( new  NrrdDataPrivate )
+{
+  if ( !data_block )
+  {
+    CORE_THROW_LOGICERROR( "Cannot create NrrdData from empty object" );
+  }
+
+  this->private_->own_data_ = false;
+  this->private_->data_block_ = data_block;
+  this->private_->nrrd_ = nrrdNew();
+
+  nrrdWrap_va( this->private_->nrrd_, data_block->get_data(), 
+    GetNrrdDataType( data_block->get_type() ), 3,
+    data_block->get_nx(), data_block->get_ny(),
+    data_block->get_nz() );
+}
+
+
+NrrdData::NrrdData( DataBlockHandle data_block, Transform transform ) :
+  private_( new  NrrdDataPrivate )
+{
+  if ( !data_block )
+  {
+    CORE_THROW_LOGICERROR( "Cannot create NrrdData from empty object" );
+  }
+
+  this->private_->own_data_ = false;
+  this->private_->data_block_ = data_block;
+  this->private_->nrrd_ = nrrdNew();
+
+  nrrdWrap_va( this->private_->nrrd_, data_block->get_data(), 
+    GetNrrdDataType( data_block->get_type() ), 3,
+    data_block->get_nx(), data_block->get_ny(),
+    data_block->get_nz() );
+
+  set_transform( transform );
 }
 
 NrrdData::~NrrdData()
 {
   // If we own the data, clear the nrrd
-  if ( own_data_ )
+  if ( this->private_->own_data_ )
   {
-    nrrdNuke( nrrd_ );
+    nrrdNuke( this->private_->nrrd_ );
   }
   else
   {
-    nrrdNix( nrrd_ );
+    nrrdNix( this->private_->nrrd_ );
   }
+}
+
+Nrrd* NrrdData::nrrd() const
+{
+  return this->private_->nrrd_;
+}
+
+void* NrrdData::get_data() const
+{
+  if ( this->private_->nrrd_ ) return this->private_->nrrd_->data;
+  else return 0;
+}
+
+bool NrrdData::own_data() const
+{
+  return this->private_->own_data_;
 }
 
 Transform NrrdData::get_transform() const
@@ -62,9 +130,9 @@ Transform NrrdData::get_transform() const
   Transform transform;
   transform.load_identity();
 
-  if ( nrrd_ == 0 ) return transform;
+  if ( this->private_->nrrd_ == 0 ) return transform;
 
-  size_t dim = nrrd_->dim;
+  size_t dim = this->private_->nrrd_->dim;
 
   // Ensure min and max are of the proper size and are initialized
   std::vector< double > min( dim, 0.0 ), max( dim, 0.0 );
@@ -73,26 +141,26 @@ Transform NrrdData::get_transform() const
   // Extract info of oldest versions of nrrds
   for ( size_t p = 0; p < dim; p++ )
   {
-    size[ p ] = nrrd_->axis[ p ].size;
+    size[ p ] = this->private_->nrrd_->axis[ p ].size;
 
-    if ( IsFinite( nrrd_->axis[ p ].min ) )
+    if ( IsFinite( this->private_->nrrd_->axis[ p ].min ) )
     {
-      min[ p ] = nrrd_->axis[ p ].min;
+      min[ p ] = this->private_->nrrd_->axis[ p ].min;
     }
     else
     {
       min[ p ] = 0.0;
     }
 
-    if ( IsFinite( nrrd_->axis[ p ].max ) )
+    if ( IsFinite( this->private_->nrrd_->axis[ p ].max ) )
     {
-      max[ p ] = nrrd_->axis[ p ].max;
+      max[ p ] = this->private_->nrrd_->axis[ p ].max;
     }
     else
     {
-      if ( IsFinite( nrrd_->axis[ p ].spacing ) )
+      if ( IsFinite( this->private_->nrrd_->axis[ p ].spacing ) )
       {
-        max[ p ] = nrrd_->axis[ p ].spacing * size[ p ];
+        max[ p ] = this->private_->nrrd_->axis[ p ].spacing * size[ p ];
       }
       else
       {
@@ -156,7 +224,7 @@ Transform NrrdData::get_transform() const
         / static_cast< double > ( rsize[ 1 ] - 1 ), 1.0 / static_cast< double > ( rsize[ 2 ] - 1 ) ) );
   }
 
-  if ( nrrd_->spaceDim > 0 )
+  if ( this->private_->nrrd_->spaceDim > 0 )
   {
     Vector Origin;
     std::vector< Vector > SpaceDir( 3 );
@@ -173,48 +241,48 @@ Transform NrrdData::get_transform() const
 //      }
     }
 
-    if ( nrrd_->spaceDim > 0 )
+    if ( this->private_->nrrd_->spaceDim > 0 )
     {
-      if ( IsFinite( nrrd_->spaceOrigin[ 0 ] ) )
+      if ( IsFinite( this->private_->nrrd_->spaceOrigin[ 0 ] ) )
       {
-        Origin.x( nrrd_->spaceOrigin[ 0 ] );
+        Origin.x( this->private_->nrrd_->spaceOrigin[ 0 ] );
       }
 
       for ( size_t p = 0; p < rdim && p < 3; p++ )
       {
-        if ( IsFinite( nrrd_->axis[ p ].spaceDirection[ 0 ] ) )
+        if ( IsFinite( this->private_->nrrd_->axis[ p ].spaceDirection[ 0 ] ) )
         {
-          SpaceDir[ p ].x( nrrd_->axis[ p ].spaceDirection[ 0 ] );
+          SpaceDir[ p ].x( this->private_->nrrd_->axis[ p ].spaceDirection[ 0 ] );
         }
       }
     }
 
-    if ( nrrd_->spaceDim > 1 )
+    if ( this->private_->nrrd_->spaceDim > 1 )
     {
-      if ( IsFinite( nrrd_->spaceOrigin[ 1 ] ) )
+      if ( IsFinite( this->private_->nrrd_->spaceOrigin[ 1 ] ) )
       {
-        Origin.y( nrrd_->spaceOrigin[ 1 ] );
+        Origin.y( this->private_->nrrd_->spaceOrigin[ 1 ] );
       }
       for ( size_t p = 0; p < rdim && p < 3; p++ )
       {
-        if ( IsFinite( nrrd_->axis[ p ].spaceDirection[ 1 ] ) )
+        if ( IsFinite( this->private_->nrrd_->axis[ p ].spaceDirection[ 1 ] ) )
         {
-          SpaceDir[ p ].y( nrrd_->axis[ p ].spaceDirection[ 1 ] );
+          SpaceDir[ p ].y( this->private_->nrrd_->axis[ p ].spaceDirection[ 1 ] );
         }
       }
     }
 
-    if ( nrrd_->spaceDim > 2 )
+    if ( this->private_->nrrd_->spaceDim > 2 )
     {
-      if ( IsFinite( nrrd_->spaceOrigin[ 2 ] ) )
+      if ( IsFinite( this->private_->nrrd_->spaceOrigin[ 2 ] ) )
       {
-        Origin.z( nrrd_->spaceOrigin[ 2 ] );
+        Origin.z( this->private_->nrrd_->spaceOrigin[ 2 ] );
       }
       for ( size_t p = 0; p < rdim && p < 3; p++ )
       {
-        if ( IsFinite( nrrd_->axis[ p ].spaceDirection[ 2 ] ) )
+        if ( IsFinite( this->private_->nrrd_->axis[ p ].spaceDirection[ 2 ] ) )
         {
-          SpaceDir[ p ].z( nrrd_->axis[ p ].spaceDirection[ 2 ] );
+          SpaceDir[ p ].z( this->private_->nrrd_->axis[ p ].spaceDirection[ 2 ] );
         }
       }
     }
@@ -245,66 +313,77 @@ GridTransform NrrdData::get_grid_transform() const
 
 void NrrdData::set_transform( Transform& transform )
 {
-  if ( !nrrd_ ) return;
+  if ( !this->private_->nrrd_ ) return;
   int centerdata[ NRRD_DIM_MAX ];
   for ( int p = 0; p < NRRD_DIM_MAX; p++ )
   {
     centerdata[ p ] = nrrdCenterCell;
   }
 
-  nrrdAxisInfoSet_nva( nrrd_, nrrdAxisInfoCenter, centerdata );
+  nrrdAxisInfoSet_nva( this->private_->nrrd_, nrrdAxisInfoCenter, centerdata );
   int kind[ NRRD_DIM_MAX ];
   for ( int p = 0; p < NRRD_DIM_MAX; p++ )
   {
     kind[ p ] = nrrdKindSpace;
   }
-  nrrdAxisInfoSet_nva( nrrd_, nrrdAxisInfoKind, kind );
+  nrrdAxisInfoSet_nva( this->private_->nrrd_, nrrdAxisInfoKind, kind );
 
-  nrrd_->spaceDim = 3;
+  this->private_->nrrd_->spaceDim = 3;
 
   double Trans[ 16 ];
 
   transform.get( Trans );
   for ( int p = 0; p < 3; p++ )
   {
-    nrrd_->spaceOrigin[ p ] = Trans[ 3 + 4 * p ];
-    for ( size_t q = 0; q < nrrd_->dim; q++ )
-      nrrd_->axis[ q ].spaceDirection[ p ] = Trans[ q + 4 * p ];
+    this->private_->nrrd_->spaceOrigin[ p ] = Trans[ 3 + 4 * p ];
+    for ( size_t q = 0; q < this->private_->nrrd_->dim; q++ )
+    {
+      this->private_->nrrd_->axis[ q ].spaceDirection[ p ] = Trans[ q + 4 * p ];
+    }
   }
 
   for ( int p = 0; p < 3; p++ )
     for ( int q = 0; q < 3; q++ )
     {
-      if ( p == q ) nrrd_->measurementFrame[ p ][ q ] = 1.0;
-      else nrrd_->measurementFrame[ p ][ q ] = 0.0;
+      if ( p == q ) this->private_->nrrd_->measurementFrame[ p ][ q ] = 1.0;
+      else this->private_->nrrd_->measurementFrame[ p ][ q ] = 0.0;
     }
 
-  nrrd_->space = nrrdSpace3DRightHanded;
+  this->private_->nrrd_->space = nrrdSpace3DRightHanded;
 
 }
 
 size_t NrrdData::nx() const
 {
-  if ( nrrd_ && nrrd_->dim > 0 ) return nrrd_->axis[ 0 ].size;
+  if ( this->private_->nrrd_ && this->private_->nrrd_->dim > 0 ) 
+  {
+    return this->private_->nrrd_->axis[ 0 ].size;
+  }
   return 1;
 }
 
 size_t NrrdData::ny() const
 {
-  if ( nrrd_ && nrrd_->dim > 1 ) return nrrd_->axis[ 1 ].size;
+  if ( this->private_->nrrd_ && this->private_->nrrd_->dim > 1 ) 
+  {
+    return this->private_->nrrd_->axis[ 1 ].size;
+  }
   return 1;
 }
 
 size_t NrrdData::nz() const
 {
-  if ( nrrd_ && nrrd_->dim > 2 ) return nrrd_->axis[ 2 ].size;
+  if ( this->private_->nrrd_ && this->private_->nrrd_->dim > 2 ) 
+  {
+    return this->private_->nrrd_->axis[ 2 ].size;
+  }
   return 1;
 }
 
 DataType NrrdData::get_data_type() const
 {
-  if ( ! (nrrd_) ) return DataType::UNKNOWN_E;
-  switch ( nrrd_->type )
+  if ( ! ( this->private_->nrrd_ ) ) return DataType::UNKNOWN_E;
+  switch ( this->private_->nrrd_->type )
   {
     case nrrdTypeChar: return DataType::CHAR_E;
     case nrrdTypeUChar: return DataType::UCHAR_E;
@@ -369,7 +448,13 @@ bool NrrdData::SaveNrrd( const std::string& filename, NrrdDataHandle nrrddata, s
   return true;
 }
 
-// Need to store the static mutex somewhere
-NrrdData::mutex_type NrrdData::teem_mutex_;
+NrrdData::mutex_type& NrrdData::GetMutex()
+{
+  // Mutex protecting Teem calls like nrrdLoad and nrrdSave that are known
+  // to be not thread safe
+
+  static mutex_type teem_mutex;
+  return teem_mutex;
+}
 
 } // end namespace Core

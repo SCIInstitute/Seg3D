@@ -45,5 +45,14 @@ MaskVolume::MaskVolume( const GridTransform& grid_transform ) :
     MaskDataBlockManager::Instance()->create( get_nx(), get_ny(), get_nz(), mask_data_block_ );
 }
 
+VolumeType MaskVolume::get_type() const
+{
+  return VolumeType::MASK_E;
+}
+
+MaskDataBlockHandle MaskVolume::mask_data_block() const
+{
+  return this->mask_data_block_;
+}
 
 } // end namespace Core

@@ -73,6 +73,7 @@ private:
   mutex_type mutex_;
 };
 
+
 } // end namespace Core
 
 #endif

@@ -47,18 +47,16 @@ public:
   MaskVolume( const GridTransform& grid_transform );
   virtual ~MaskVolume() {}
 
-  virtual VolumeType type() const
-  {
-    return VolumeType::MASK_E;
-  }
-
+  // GET_TYPE:
+  // Get the type of the data volume
+  virtual VolumeType get_type() const;
+  
   // MASK_DATA_BLOCK:
   // Get the datablock that contains the mask
-  MaskDataBlockHandle mask_data_block()
-  {
-    return this->mask_data_block_;
-  }
+  MaskDataBlockHandle mask_data_block() const;
 
+  // GET_MUTEX:
+  // Get access to the mutex protecting this MaskVolume
   virtual mutex_type& get_mutex()
   {
     return this->mask_data_block_->get_mutex();
@@ -67,11 +65,6 @@ public:
 private:
   // Handle to where the mask volume is really stored
   MaskDataBlockHandle mask_data_block_;
-
-public:
-  // CREATEMASKVOLUMEFROMNRRD:
-  // Create a data volume from a nrrd
-  static VolumeHandle CreateMaskVolumeFromNrrd( NrrdDataHandle& nrrddata );
 };
 
 } // end namespace Core

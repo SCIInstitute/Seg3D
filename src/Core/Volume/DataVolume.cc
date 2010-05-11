@@ -42,5 +42,21 @@ DataVolume::~DataVolume()
 {
 }
 
+DataBlockHandle DataVolume::data_block() const
+{
+  return this->data_block_;
+}
+
+VolumeType DataVolume::get_type() const
+{
+  return VolumeType::DATA_E;
+}
+
+NrrdDataHandle DataVolume::convert_to_nrrd()
+{
+  NrrdDataHandle nrrd_data( new NrrdData( data_block_, get_grid_transform().transform() ) );
+  return nrrd_data;
+}
+
 
 } // end namespace Core
