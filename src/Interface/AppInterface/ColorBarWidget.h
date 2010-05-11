@@ -59,7 +59,6 @@ public:
 public Q_SLOTS:
   void set_color_index( int index );
   void signal_activation( int active );
-  void dummy();
 
 Q_SIGNALS:
   void color_index_changed( int index );

@@ -50,6 +50,7 @@
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/LayerManager/Actions/ActionActivateLayer.h>
 #include <Application/LayerManager/Actions/ActionMoveLayerAbove.h>
+#include <Application/PreferencesManager/PreferencesManager.h>
 
 
 namespace Seg3D
@@ -256,12 +257,17 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
         this->private_->ui_.volume_rendered_button_->hide();
         this->private_->ui_.typeBackground_->setStyleSheet( StyleSheet::MASK_VOLUME_COLOR_C );
         this->private_->activate_button_->setIcon( this->mask_layer_icon_ );
+        
+        connect( this->private_->color_widget_, SIGNAL( color_index_changed( int ) ), 
+          this, SLOT( set_mask_background_color( int ) ) );
+
         MaskLayer* mask_layer = dynamic_cast< MaskLayer* >( layer.get() );  
         this->private_->color_widget_->set_color_index( mask_layer->color_state_->get() );
         QtBridge::Connect( this->private_->ui_.iso_surface_button_, mask_layer->show_isosurface_state_ );
         QtBridge::Connect( this->private_->ui_.border_selection_combo_, mask_layer->fill_state_ );
         QtBridge::Connect( this->private_->color_widget_, mask_layer->color_state_ );
-
+        
+        this->set_mask_background_color( mask_layer->color_state_->get() );
       }
       break;
       
@@ -287,6 +293,19 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   
 LayerWidget::~LayerWidget()
 {
+}
+
+void LayerWidget::set_mask_background_color( int color_index )
+{
+  Core::Color background_color = PreferencesManager::Instance()->color_states_[ color_index ]->get();
+  
+  QString style_sheet = QString::fromUtf8( 
+  "background-color: rgb(" ) + QString::number( background_color.r() ) +
+  QString::fromUtf8( ", " ) + QString::number( background_color.g() ) +
+  QString::fromUtf8( ", " ) + QString::number( background_color.b() ) +
+  QString::fromUtf8( "); }" );
+
+  this->private_->ui_.typeBackground_->setStyleSheet( style_sheet );
 }
 
 void LayerWidget::set_group_menu_status( bool status )

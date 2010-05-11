@@ -79,11 +79,6 @@ void ColorBarWidget::initialize_buttons()
     this, SLOT( signal_activation( int ) ) );
 }   
 
-void ColorBarWidget::dummy()
-{
-  int booger = 0;
-}
-
 void ColorBarWidget::signal_activation( int active )
 {
   Q_EMIT color_index_changed( active );

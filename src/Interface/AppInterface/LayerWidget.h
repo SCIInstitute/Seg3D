@@ -102,6 +102,9 @@ private:
   void dragEnterEvent( QDragEnterEvent* event );
   void dragLeaveEvent( QDragLeaveEvent* event );
 
+private Q_SLOTS:
+  void set_mask_background_color( int );
+
 protected:
   void resizeEvent( QResizeEvent *event );
 
