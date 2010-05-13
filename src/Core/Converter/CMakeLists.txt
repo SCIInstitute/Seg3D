@@ -32,8 +32,6 @@
 ##################################################
 
 SET(CORE_CONVERTER_SRCS
-  StringConverter.h
-  StringConverter.cc
   StringParser.h
   StringParser.cc
 )

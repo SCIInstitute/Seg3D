@@ -40,7 +40,7 @@
 #include <boost/smart_ptr.hpp>
 
 // Core includes
-#include <Core/Converter/StringConverter.h>
+#include <Core/Utils/StringUtil.h>
 
 // Application includes
 #include <Core/State/StateBase.h>

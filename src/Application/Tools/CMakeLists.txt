@@ -80,7 +80,6 @@ ADD_LIBRARY(Application_Tools STATIC
             ${APPLICATION_TOOLS_SRCS} )
             
 TARGET_LINK_LIBRARIES(Application_Tools
-                      Core_Converter
                       Core_Utils
                       Core_Application
                       Core_Interface

@@ -60,7 +60,7 @@ const std::string Viewer::SAGITTAL_C( "sagittal" );
 const std::string Viewer::VOLUME_C( "volume" );
 
 Viewer::Viewer( size_t viewer_id ) :
-  StateHandler( std::string( "viewer" ) + Core::ToString( viewer_id ) ),
+  StateHandler( std::string( "viewer" ) + Core::ExportToString( viewer_id ) ),
   adjusting_contrast_brightness_( false ),
   viewer_id_( viewer_id ),
   signals_block_count_( 0 ),

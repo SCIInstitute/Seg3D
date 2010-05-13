@@ -48,7 +48,6 @@ ADD_LIBRARY(Application_InterfaceManager STATIC
             ${APPLICATION_INTERFACEMANAGER_ACTIONS_SRCS} )
             
 TARGET_LINK_LIBRARIES(Application_InterfaceManager
-                      Core_Converter
                       Core_Utils
                       Core_Application
                       Core_Interface

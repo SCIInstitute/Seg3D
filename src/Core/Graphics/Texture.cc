@@ -36,7 +36,7 @@ Texture::Texture()
 {
   glGenTextures( 1, &this->texture_id_ );
   CORE_LOG_DEBUG( std::string( "Texture generated: " ) + 
-    Core::ToString( this->texture_id_ ) + " in context " + 
+    ExportToString( this->texture_id_ ) + " in context " + 
     RenderResources::Instance()->get_current_context_string() );
   if ( this->texture_id_ == 0 )
   {

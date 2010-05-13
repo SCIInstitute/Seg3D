@@ -37,8 +37,8 @@
 #include <boost/smart_ptr.hpp>
 
 // Core includes
-#include <Core/Converter/StringConverter.h>
-#include <Core/Geometry/View2D.h>
+#include <Core/Utils/StringUtil.h>
+#include <Core/Geometry/View3D.h>
 
 // Application includes
 #include <Core/State/StateEngine.h>

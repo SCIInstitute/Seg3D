@@ -114,9 +114,9 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
   this->private_->ui_.horizontalLayout->insertWidget( 1, this->private_->activate_button_ );
 
   // set some values of the GUI
-  std::string group_name = Core::ToString( group->get_grid_transform().get_nx() ) + " x " +
-    Core::ToString( group->get_grid_transform().get_ny() ) + " x " +
-    Core::ToString( group->get_grid_transform().get_nz() );
+  std::string group_name = Core::ExportToString( group->get_grid_transform().get_nx() ) + " x " +
+    Core::ExportToString( group->get_grid_transform().get_ny() ) + " x " +
+    Core::ExportToString( group->get_grid_transform().get_nz() );
   this->private_->activate_button_->setText( QString::fromStdString( group_name ) );
 
 

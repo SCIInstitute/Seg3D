@@ -100,23 +100,27 @@ public:
   // Return whether the nrrd owns the data
   bool own_data() const;
 
-  // GRID_TRANSFORM
+  // GRID_TRANSFORM:
   // Extract the transform from the nrrd
   GridTransform get_grid_transform() const;
 
-  // TRANSFORM
+  // TRANSFORM:
   // Extract the transform from the nrrd
   Transform get_transform() const;
 
-  // SET_TRANSFORM
+  // SET_TRANSFORM:
   // Set the transfrom in the nrrd data
   void set_transform( Transform& transform );
 
-  // NX, NY, NZ
+  // GET_NX, GET_NY, GET_NZ:
   // Get the dimensions of the nrrd
-  size_t nx() const;
-  size_t ny() const;
-  size_t nz() const;
+  size_t get_nx() const;
+  size_t get_ny() const;
+  size_t get_nz() const;
+
+  // GET_SIZE:
+  // Get the total size of the nrrd in pixels
+  size_t get_size() const;
 
   // GET_DATA_TYPE:
   // Get the data type of the nrrd

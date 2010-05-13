@@ -37,6 +37,8 @@
 #include <Core/State/StateBase.h>
 #include <Core/State/StateEngine.h>
 #include <Core/Geometry/Color.h>
+#include <Core/Geometry/Point.h>
+#include <Core/Geometry/Vector.h>
 
 namespace Core
 {
@@ -54,10 +56,10 @@ class StateValue;
 typedef StateValue< double > StateDouble;
 typedef boost::shared_ptr< StateDouble > StateDoubleHandle;
 
-typedef StateValue< Core::Point > StatePoint;
+typedef StateValue< Point > StatePoint;
 typedef boost::shared_ptr< StatePoint > StatePointHandle;
 
-typedef StateValue< Core::Color > StateColor;
+typedef StateValue< Color > StateColor;
 typedef boost::shared_ptr< StateColor > StateColorHandle;
 
 typedef StateValue< bool > StateBool;

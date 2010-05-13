@@ -30,6 +30,7 @@
 // thread.
 
 // Core includes
+#include <Core/Utils/Exception.h>
 #include <Core/Application/Application.h>
 #include <Core/Action/ActionDispatcher.h>
 #include <Core/Action/ActionHistory.h>

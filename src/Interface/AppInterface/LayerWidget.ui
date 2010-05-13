@@ -688,7 +688,7 @@ QToolButton#progress_cancel_button_:pressed{
                   </size>
                  </property>
                  <property name="toolTip">
-                  <string>Turn on or off the ISO surface</string>
+                  <string>Turn on or off the iso-surface</string>
                  </property>
                  <property name="text">
                   <string>I</string>
@@ -718,7 +718,7 @@ QToolButton#progress_cancel_button_:pressed{
                   </size>
                  </property>
                  <property name="toolTip">
-                  <string>Compute the ISO surface</string>
+                  <string>Compute the iso-surface</string>
                  </property>
                  <property name="text">
                   <string>C</string>

@@ -27,11 +27,12 @@
  */
 
 // Core includes
-#include <Core/Converter/StringConverter.h>
-#include <Core/DataBlock/NrrdData.h>
-#include <Core/Geometry/GridTransform.h>
-#include <Core/Math/MathFunctions.h>
 #include <Core/Utils/Log.h>
+#include <Core/Utils/StringUtil.h>
+#include <Core/Utils/Exception.h>
+#include <Core/Math/MathFunctions.h>
+#include <Core/Geometry/GridTransform.h>
+#include <Core/DataBlock/NrrdData.h>
 
 namespace Core
 {
@@ -307,7 +308,7 @@ Transform NrrdData::get_transform() const
 
 GridTransform NrrdData::get_grid_transform() const
 {
-  Core::GridTransform grid_transform( nx(), ny(), nz(), get_transform() );
+  Core::GridTransform grid_transform( get_nx(), get_ny(), get_nz(), get_transform() );
   return grid_transform;
 }
 
@@ -353,7 +354,7 @@ void NrrdData::set_transform( Transform& transform )
 
 }
 
-size_t NrrdData::nx() const
+size_t NrrdData::get_nx() const
 {
   if ( this->private_->nrrd_ && this->private_->nrrd_->dim > 0 ) 
   {
@@ -362,7 +363,7 @@ size_t NrrdData::nx() const
   return 1;
 }
 
-size_t NrrdData::ny() const
+size_t NrrdData::get_ny() const
 {
   if ( this->private_->nrrd_ && this->private_->nrrd_->dim > 1 ) 
   {
@@ -371,13 +372,18 @@ size_t NrrdData::ny() const
   return 1;
 }
 
-size_t NrrdData::nz() const
+size_t NrrdData::get_nz() const
 {
   if ( this->private_->nrrd_ && this->private_->nrrd_->dim > 2 ) 
   {
     return this->private_->nrrd_->axis[ 2 ].size;
   }
   return 1;
+}
+
+size_t NrrdData::get_size() const
+{
+  return get_nx() * get_ny() * get_nz();
 }
 
 DataType NrrdData::get_data_type() const

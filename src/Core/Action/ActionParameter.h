@@ -44,7 +44,6 @@
 // Core
 #include <Core/Utils/Log.h>
 #include <Core/Utils/StringUtil.h>
-#include <Core/Converter/StringConverter.h>
 
 namespace Core
 {
@@ -149,7 +148,7 @@ public:
   // export the contents of the parameter to string
   virtual std::string export_to_string() const
   {
-    return Core::ExportToString( value_ );
+    return ExportToString( value_ );
   }
 
   // IMPORT_FROM_STRING
@@ -157,7 +156,7 @@ public:
   // if the import succeeded
   virtual bool import_from_string( const std::string& str )
   {
-    return Core::ImportFromString( str, value_ );
+    return ImportFromString( str, value_ );
   }
 
 private:
@@ -232,7 +231,7 @@ public:
           dynamic_cast< ActionParameter< T >* > ( typed_value_.get() );
       if ( param_ptr == 0 )
       {
-        if ( !( Core::ImportFromString( typed_value_->export_to_string(), value ) ) )
+        if ( !( ImportFromString( typed_value_->export_to_string(), value ) ) )
         {
           return ( false );
         }
@@ -275,7 +274,7 @@ public:
       if ( param_ptr == 0 )
       {
         T value;
-        if ( !( Core::ImportFromString( typed_value_->export_to_string(), value ) ) )
+        if ( !( ImportFromString( typed_value_->export_to_string(), value ) ) )
         {
           return ( false );
         }

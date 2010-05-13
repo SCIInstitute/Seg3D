@@ -118,6 +118,9 @@ private:
 
 };
 
+std::string ExportToString( const View2D& value );
+bool ImportFromString( const std::string& str, View2D& value );
+
 } // End namespace Core
 
 #endif

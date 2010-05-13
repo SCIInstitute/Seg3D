@@ -38,6 +38,10 @@ SET(CORE_DATABLOCK_SRCS
   DataBlock.cc
   Histogram.h
   Histogram.cc
+  ITKDataBlock.h
+  ITKDataBlock.cc
+  ITKImageData.h
+  ITKImageData.cc
   MaskDataBlock.h
   MaskDataBlock.cc
   MaskDataBlockManager.h
@@ -56,8 +60,8 @@ ADD_LIBRARY(Core_DataBlock STATIC
             
 TARGET_LINK_LIBRARIES(Core_DataBlock
                       Core_Utils
-                      Core_Converter
                       Core_Geometry
+            ${SCI_ITK_LIBRARY}
                       ${SCI_TEEM_LIBRARY}
                       ${SCI_BOOST_LIBRARY})
 

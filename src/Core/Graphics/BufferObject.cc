@@ -40,7 +40,7 @@ BufferObject::BufferObject() :
 {
   glGenBuffers( 1, &( this->id_ ) );
   CORE_LOG_DEBUG( std::string( "Buffer object generated: " ) + 
-    Core::ToString( this->id_ ) );
+    ExportToString( this->id_ ) );
 }
 
 BufferObject::BufferObject( const BufferObjectHandle& bo ) :

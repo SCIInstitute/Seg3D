@@ -114,4 +114,97 @@ bool PointF::InInterval( PointF a, float epsilon )
       && Overlap( data_[ 2 ], a.z(), epsilon ) );
 }
 
+
+std::string ExportToString( const Point& value )
+{
+  return ( std::string( 1, '[' ) + ExportToString( value.x() ) + ' ' 
+    + ExportToString( value.y() ) + ' '
+      + ExportToString( value.z() ) + ']' );
+}
+
+std::string ExportToString( const PointF& value )
+{
+  return ( std::string( 1, '[' ) + ExportToString( value.x() ) + ' ' 
+    + ExportToString( value.y() ) + ' '
+      + ExportToString( value.z() ) + ']' );
+}
+
+std::string ExportToString( const std::vector< Point >& value )
+{
+  std::string result( 1, '[' );
+  for ( size_t j = 0; j < value.size(); j++ )
+    result += ExportToString( value[ j ] ) + ' ';
+  result[ result.size() - 1 ] = ']';
+  return result;
+}
+
+std::string ExportToString( const std::vector< PointF >& value )
+{
+  std::string result( 1, '[' );
+  for ( size_t j = 0; j < value.size(); j++ )
+    result += ExportToString( value[ j ] ) + ' ';
+  result[ result.size() - 1 ] = ']';
+  return result;
+}
+
+bool ImportFromString( const std::string& str, Point& value )
+{
+  std::vector< double > values;
+  ImportFromString( str, values );
+  if ( values.size() == 3 )
+  {
+    value = Point( values[ 0 ], values[ 1 ], values[ 2 ] );
+    return ( true );
+  }
+  return ( false );
+}
+
+bool ImportFromString( const std::string& str, PointF& value )
+{
+  std::vector< float > values;
+  ImportFromString( str, values );
+  if ( values.size() == 3 )
+  {
+    value = PointF( values[ 0 ], values[ 1 ], values[ 2 ] );
+    return ( true );
+  }
+  return ( false );
+}
+
+bool ImportFromString( const std::string& str, std::vector< Point >& value )
+{
+  std::vector< double > values;
+  ImportFromString( str, values );
+
+  size_t num_values = values.size() / 3;
+  if ( values.size() == num_values * 3 )
+  {
+    for ( size_t j = 0; j < num_values; j++ )
+    {
+      size_t offset = j * 3;
+      value[ j ] = Point( values[ offset + 0 ], values[ offset + 1 ], values[ offset + 2 ] );
+    }
+    return ( true );
+  }
+  return ( false );
+}
+
+bool ImportFromString( const std::string& str, std::vector< PointF >& value )
+{
+  std::vector< float > values;
+  ImportFromString( str, values );
+
+  size_t num_values = values.size() / 3;
+  if ( values.size() == num_values * 3 )
+  {
+    for ( size_t j = 0; j < num_values; j++ )
+    {
+      size_t offset = j * 3;
+      value[ j ] = PointF( values[ offset + 0 ], values[ offset + 1 ], values[ offset + 2 ] );
+    }
+    return ( true );
+  }
+  return ( false );
+}
+
 } // End namespace SCIRun

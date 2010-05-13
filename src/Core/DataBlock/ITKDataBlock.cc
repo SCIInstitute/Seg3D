@@ -26,37 +26,33 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-// Teem includes
-#include <teem/nrrd.h>
-
 // Core includes
-#include <Core/DataBlock/NrrdDataBlock.h>
+#include <Core/DataBlock/ITKDataBlock.h>
 
 namespace Core
 {
 
-
-class NrrdDataBlockPrivate : public boost::noncopyable
+class ITKDataBlockPrivate : public boost::noncopyable
 {
 public:
   // Location where the original nrrd is stored
-  NrrdDataHandle nrrd_data_;
+  ITKImageDataHandle itk_image_data_;
 };
 
 
-NrrdDataBlock::NrrdDataBlock( NrrdDataHandle nrrd_data ) :
-  private_( new NrrdDataBlockPrivate)
+ITKDataBlock::ITKDataBlock( ITKImageDataHandle itk_image_data ) :
+  private_( new ITKDataBlockPrivate )
 {
-  this->private_->nrrd_data_ = nrrd_data;
+  this->private_->itk_image_data_ = itk_image_data;
 
-  set_nx( nrrd_data->get_nx() );
-  set_ny( nrrd_data->get_ny() );
-  set_nz( nrrd_data->get_nz() );
-  set_type( nrrd_data->get_data_type() );
-  set_data( nrrd_data->get_data() );
+  set_nx( itk_image_data->get_nx() );
+  set_ny( itk_image_data->get_ny() );
+  set_nz( itk_image_data->get_nz() );
+  set_type( itk_image_data->get_data_type() );
+  set_data( itk_image_data->get_data() );
 }
 
-NrrdDataBlock::~NrrdDataBlock()
+ITKDataBlock::~ITKDataBlock()
 {
 }
 

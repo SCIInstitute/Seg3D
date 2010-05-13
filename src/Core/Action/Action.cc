@@ -34,7 +34,7 @@
 
 // Core includes
 #include <Core/Utils/StringUtil.h>
-#include <Core/Converter/StringParser.h>
+#include <Core/Utils/StringParser.h>
 
 // Application includes
 #include <Core/Action/ActionParameter.h>
@@ -131,8 +131,8 @@ bool Action::import_from_string( const std::string& action, std::string& error )
 
     if ( value.empty() )
     {
-      error = std::string( "ERROR: not enough arguments, argument " ) + Core::ToString( j
-          + 1 ) + " is missing.";
+      error = std::string( "ERROR: not enough arguments, argument " ) + 
+        ExportToString( j + 1 ) + " is missing.";
       return false;
     }
 

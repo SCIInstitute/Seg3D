@@ -26,7 +26,6 @@
 #  DEALINGS IN THE SOFTWARE.
 #
 
-ADD_SUBDIRECTORY(Converter)
 ADD_SUBDIRECTORY(Utils)
 ADD_SUBDIRECTORY(DataBlock)
 ADD_SUBDIRECTORY(EventHandler)
@@ -39,7 +38,6 @@ ADD_SUBDIRECTORY(Application)
 ADD_SUBDIRECTORY(Interface)
 ADD_SUBDIRECTORY(State)
 ADD_SUBDIRECTORY(Resource)
-
 
 # These next three depend on OpenGL and should only be compiled when the renderer is compiled
 ADD_SUBDIRECTORY(Graphics)

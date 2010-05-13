@@ -150,4 +150,26 @@ void View3D::compute_clipping_planes( const BBox& bbox, double& znear, double& z
   zfar += 0.001;
 }
 
+std::string ExportToString( const View3D& value )
+{
+  return ( std::string( 1, '[' ) + ExportToString( value.eyep() ) + ' ' + ExportToString(
+      value.lookat() ) + ' ' + ExportToString( value.up() ) + ' ' + ExportToString(
+      value.fov() ) + ']' );
+}
+
+bool ImportFromString( const std::string& str, View3D& value )
+{
+  std::vector< double > values;
+  ImportFromString( str, values );
+  if ( values.size() == 10 )
+  {
+    value
+        = View3D( Point( values[ 0 ], values[ 1 ], values[ 2 ] ), Point( values[ 3 ],
+            values[ 4 ], values[ 5 ] ), Vector( values[ 6 ], values[ 7 ], values[ 8 ] ),
+            values[ 9 ] );
+    return ( true );
+  }
+  return ( false );
+}
+
 } // End namespace Core

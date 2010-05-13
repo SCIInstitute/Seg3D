@@ -160,7 +160,7 @@ void QtRenderWidget::resizeGL( int width, int height )
   this->viewer_->resize( width, height );
   if ( renderer_.get() )
   {
-    CORE_LOG_DEBUG(std::string("QtRenderWidget ") + Core::ToString(this->viewer_id_)
+    CORE_LOG_DEBUG(std::string("QtRenderWidget ") + Core::ExportToString(this->viewer_id_)
       + ": sending resize event to renderer");
     renderer_->resize( width, height );
     // Make sure the GL context of the widget is the current one of this thread,

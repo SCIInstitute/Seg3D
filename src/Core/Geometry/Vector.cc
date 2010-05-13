@@ -75,4 +75,96 @@ std::ostream& operator<<( std::ostream& os, const VectorF& v )
   return os;
 }
 
+std::string ExportToString( const Vector& value )
+{
+  return ( std::string( 1, '[' ) + ExportToString( value.x() ) + ' ' 
+    + ExportToString( value.y() ) + ' '
+      + ExportToString( value.z() ) + ']' );
+}
+
+std::string ExportToString( const VectorF& value )
+{
+  return ( std::string( 1, '[' ) + ExportToString( value.x() ) + ' ' 
+    + ExportToString( value.y() ) + ' '
+      + ExportToString( value.z() ) + ']' );
+}
+
+std::string ExportToString( const std::vector< Vector >& value )
+{
+  std::string result( 1, '[' );
+  for ( size_t j = 0; j < value.size(); j++ )
+    result += ExportToString( value[ j ] ) + ' ';
+  result[ result.size() - 1 ] = ']';
+  return result;
+}
+
+std::string ExportToString( const std::vector< VectorF >& value )
+{
+  std::string result( 1, '[' );
+  for ( size_t j = 0; j < value.size(); j++ )
+    result += ExportToString( value[ j ] ) + ' ';
+  result[ result.size() - 1 ] = ']';
+  return result;
+}
+
+bool ImportFromString( const std::string& str, Vector& value )
+{
+  std::vector< double > values;
+  ImportFromString( str, values );
+  if ( values.size() == 3 )
+  {
+    value = Vector( values[ 0 ], values[ 1 ], values[ 2 ] );
+    return ( true );
+  }
+  return ( false );
+}
+
+bool ImportFromString( const std::string& str, VectorF& value )
+{
+  std::vector< float > values;
+  ImportFromString( str, values );
+  if ( values.size() == 3 )
+  {
+    value = VectorF( values[ 0 ], values[ 1 ], values[ 2 ] );
+    return ( true );
+  }
+  return ( false );
+}
+
+bool ImportFromString( const std::string& str, std::vector< Vector >& value )
+{
+  std::vector< double > values;
+  ImportFromString( str, values );
+
+  size_t num_values = values.size() / 3;
+  if ( values.size() == num_values * 3 )
+  {
+    for ( size_t j = 0; j < num_values; j++ )
+    {
+      size_t offset = j * 3;
+      value[ j ] = Vector( values[ offset + 0 ], values[ offset + 1 ], values[ offset + 2 ] );
+    }
+    return ( true );
+  }
+  return ( false );
+}
+
+bool ImportFromString( const std::string& str, std::vector< VectorF >& value )
+{
+  std::vector< float > values;
+  ImportFromString( str, values );
+
+  size_t num_values = values.size() / 3;
+  if ( values.size() == num_values * 3 )
+  {
+    for ( size_t j = 0; j < num_values; j++ )
+    {
+      size_t offset = j * 3;
+      value[ j ] = VectorF( values[ offset + 0 ], values[ offset + 1 ], values[ offset + 2 ] );
+    }
+    return ( true );
+  }
+  return ( false );
+}
+
 } // End namespace Core

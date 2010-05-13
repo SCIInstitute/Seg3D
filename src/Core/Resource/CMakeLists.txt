@@ -40,7 +40,6 @@ ADD_LIBRARY(Core_Resource STATIC
             ${CORE_RESOURCE_SRCS})
             
 TARGET_LINK_LIBRARIES(Core_Resource
-                      Core_Converter
                       Core_Utils
                       Core_Application
                       Core_Interface

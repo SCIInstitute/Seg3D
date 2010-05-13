@@ -218,6 +218,9 @@ inline Quaternion& Quaternion::operator=( const Quaternion& rhs )
 Quaternion
     Slerp( const Quaternion& from, const Quaternion& to, double t, bool shortest_path = true );
 
+std::string ExportToString( const Quaternion& value );
+bool ImportFromString( const std::string& str, Quaternion& value );
+
 } // end namespace Core
 
 #endif

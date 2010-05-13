@@ -137,8 +137,8 @@ protected:
     variant.get_value( value );
     if ( value < min_value_ || value > max_value_ )
     {
-      error = "Value " + Core::ToString( value ) + "is out of range [" + Core::ToString(
-          min_value_ ) + "," + Core::ToString( max_value_ ) + "]";
+      error = "Value " + ExportToString( value ) + "is out of range [" + ExportToString(
+          min_value_ ) + "," + ExportToString( max_value_ ) + "]";
       return ( false );
     }
     error = "";

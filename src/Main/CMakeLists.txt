@@ -57,7 +57,6 @@ TARGET_LINK_LIBRARIES(Seg3D
   ${QT_LIBRARIES}
   ${SCI_BOOST_LIBRARY}
   Core_Utils
-  Core_Converter
   Core_DataBlock
   Core_EventHandler
   Core_Graphics

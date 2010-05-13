@@ -29,6 +29,9 @@
 #ifndef CORE_GEOMETRY_COLOR_H
 #define CORE_GEOMETRY_COLOR_H
 
+// STL includes
+#include <string>
+
 namespace Core
 {
 
@@ -117,6 +120,9 @@ private:
 };
 
 Color operator*( double alpha, Color color );
+
+std::string ExportToString( const Color& value );
+bool ImportFromString( const std::string& str, Color& value );
 
 } // End namespace Core
 

@@ -50,7 +50,6 @@ ADD_LIBRARY(Application_ToolManager STATIC
             ${APPLICATION_TOOLMANAGER_ACTIONS_SRCS} )
             
 TARGET_LINK_LIBRARIES(Application_ToolManager
-                      Core_Converter
                       Core_Utils
                       Core_Application
                       Core_Interface

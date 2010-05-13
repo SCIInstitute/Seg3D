@@ -48,6 +48,8 @@ SET(CORE_UTILS_SRCS
   LogHistory.cc
   ScopedCounter.h
   Singleton.h
+  StringParser.h
+  StringParser.cc
   StringUtil.h
   StringUtil.cc
 )

@@ -39,6 +39,7 @@
 #include <iosfwd>
 
 // Core includes
+#include <Core/Utils/StringUtil.h>
 #include <Core/Math/MathFunctions.h>
 
 namespace Core
@@ -262,6 +263,19 @@ inline PointF operator*( float f, const PointF &point )
 
 std::ostream& operator<<( std::ostream& os, const Point& p );
 std::ostream& operator<<( std::ostream& os, const PointF& p );
+
+std::string ExportToString( const Point& value );
+std::string ExportToString( const PointF& value );
+
+std::string ExportToString( const std::vector< Point >& value );
+std::string ExportToString( const std::vector< PointF >& value );
+
+bool ImportFromString( const std::string& str, Point& value );
+bool ImportFromString( const std::string& str, PointF& value );
+
+bool ImportFromString( const std::string& str, std::vector< Point >& value );
+bool ImportFromString( const std::string& str, std::vector< PointF >& value );
+
 
 } // End namespace Core
 

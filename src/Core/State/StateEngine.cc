@@ -229,7 +229,7 @@ std::string StateEngine::create_stateid( std::string baseid )
   
   do
   {
-    new_stateid = baseid + std::string( "_" ) + Core::ToString( number );
+    new_stateid = baseid + std::string( "_" ) + ExportToString( number );
     number++;
   }
   while ( stateid_list_.find( new_stateid ) != stateid_list_.end() );
@@ -293,7 +293,7 @@ std::string StateEngine::create_statealias( std::string basealias )
   
   do
   {
-    new_statealias = basealias + std::string( "_" ) + Core::ToString( number );
+    new_statealias = basealias + std::string( "_" ) + ExportToString( number );
     number++;
   }
   while ( statealias_list_.find( new_statealias ) != statealias_list_.end() );

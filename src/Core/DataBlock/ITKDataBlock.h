@@ -26,38 +26,37 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-// Teem includes
-#include <teem/nrrd.h>
+#ifndef CORE_DATABLOCK_ITKDATABLOCK_H
+#define CORE_DATABLOCK_ITKDATABLOCK_H
 
 // Core includes
-#include <Core/DataBlock/NrrdDataBlock.h>
+#include <Core/DataBlock/DataBlock.h>
+#include <Core/DataBlock/ITKImageData.h>
 
 namespace Core
 {
 
+// Forward Declaration
+class ITKDataBlock;
+typedef boost::shared_ptr< ITKDataBlock > ITKDataBlockHandle;
 
-class NrrdDataBlockPrivate : public boost::noncopyable
+class ITKDataBlockPrivate;
+typedef boost::shared_ptr< ITKDataBlockPrivate > ITKDataBlockPrivateHandle;
+
+// Class definition
+class ITKDataBlock : public DataBlock
 {
+  // -- Constructor/destructor --
 public:
-  // Location where the original nrrd is stored
-  NrrdDataHandle nrrd_data_;
+  ITKDataBlock( ITKImageDataHandle itk_data );
+  virtual ~ITKDataBlock();
+
+  // -- Internal implementation of this class --
+private:
+  ITKDataBlockPrivateHandle private_;
+
 };
 
-
-NrrdDataBlock::NrrdDataBlock( NrrdDataHandle nrrd_data ) :
-  private_( new NrrdDataBlockPrivate)
-{
-  this->private_->nrrd_data_ = nrrd_data;
-
-  set_nx( nrrd_data->get_nx() );
-  set_ny( nrrd_data->get_ny() );
-  set_nz( nrrd_data->get_nz() );
-  set_type( nrrd_data->get_data_type() );
-  set_data( nrrd_data->get_data() );
-}
-
-NrrdDataBlock::~NrrdDataBlock()
-{
-}
-
 } // end namespace Core
+
+#endif

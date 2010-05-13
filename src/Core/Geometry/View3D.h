@@ -108,6 +108,9 @@ private:
 
 };
 
+std::string ExportToString( const View3D& value );
+bool ImportFromString( const std::string& str, View3D& value );
+
 } // End namespace Core
 
 #endif

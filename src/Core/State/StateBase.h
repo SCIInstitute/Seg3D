@@ -41,7 +41,7 @@
 #include <boost/utility.hpp>
 
 // Core includes
-#include <Core/Converter/StringConverter.h>
+#include <Core/Utils/StringUtil.h>
 
 // Action includes
 #include <Core/Action/ActionContext.h>

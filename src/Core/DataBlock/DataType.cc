@@ -172,4 +172,55 @@ bool IsReal( const DataType& data_type )
   return ( data_type == DataType::FLOAT_E || data_type == DataType::DOUBLE_E );
 }
 
+DataType GetDataType( signed char* )
+{
+  return DataType::CHAR_E;
+}
+
+DataType GetDataType( unsigned char* )
+{
+  return DataType::UCHAR_E;
+}
+
+DataType GetDataType( short* )
+{
+  return DataType::SHORT_E;
+}
+
+DataType GetDataType( unsigned short* )
+{
+  return DataType::USHORT_E;
+}
+
+DataType GetDataType( int* )
+{
+  return DataType::INT_E;
+}
+
+DataType GetDataType( unsigned int* )
+{
+  return DataType::UINT_E;
+}
+
+DataType GetDataType( long long* )
+{
+  return DataType::LONGLONG_E;
+}
+
+DataType GetDataType( unsigned long long* )
+{
+  return DataType::ULONGLONG_E;
+}
+
+DataType GetDataType( float* )
+{
+  return DataType::FLOAT_E;
+}
+
+DataType GetDataType( double* )
+{
+  return DataType::DOUBLE_E;
+}
+
+
 } // end namespace Core

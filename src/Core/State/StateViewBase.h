@@ -29,8 +29,13 @@
 #ifndef CORE_STATE_STATEVIEWBASE_H
 #define CORE_STATE_STATEVIEWBASE_H
 
+// Boost includes
 #include <boost/smart_ptr.hpp>
 
+// Core includes
+#include <Core/Utils/StringUtil.h>
+#include <Core/Geometry/Point.h>
+#include <Core/Geometry/Vector.h>
 #include <Core/State/StateBase.h>
 
 namespace Core
@@ -53,7 +58,7 @@ public:
   }
 
   virtual void scale( double ratio ) = 0;
-  virtual void translate( const Core::Vector& offset ) = 0;
+  virtual void translate( const Vector& offset ) = 0;
 };
 
 } // end namespace Core

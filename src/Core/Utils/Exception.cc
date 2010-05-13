@@ -37,7 +37,7 @@ Exception::Exception(std::string message,
   unsigned int line,
   const char* file)
 {
-  message_ = std::string("[") + file + std::string(":") + ToString(line) + 
+  message_ = std::string("[") + file + std::string(":") + ExportToString(line) + 
     std::string("] ERROR: ") + message;
 }
 

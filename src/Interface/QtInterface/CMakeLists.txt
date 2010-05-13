@@ -88,7 +88,6 @@ ADD_LIBRARY(Interface_QtInterface STATIC
             
 TARGET_LINK_LIBRARIES(Interface_QtInterface 
                       Core_Utils
-                      Core_Converter
                       Core_EventHandler
             Core_Graphics
                       Application_Renderer

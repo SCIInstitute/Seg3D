@@ -68,10 +68,10 @@ int main( int argc, char **argv )
   if ( Core::Application::Instance()->check_command_line_parameter( "socket", port_number_string ) )
   {
     int port_number;
-    if ( Core::FromString( port_number_string, port_number) )
+    if ( Core::ImportFromString( port_number_string, port_number) )
     {
       // -- Add a socket for receiving actions --
-      CORE_LOG_DEBUG( std::string("Starting a socket on port: ") + Core::ToString( port_number ) );
+      CORE_LOG_DEBUG( std::string("Starting a socket on port: ") + Core::ExportToString( port_number ) );
       Core::ActionSocket::Instance()->start( port_number );
     }
   }

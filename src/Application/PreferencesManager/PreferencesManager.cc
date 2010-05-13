@@ -28,6 +28,7 @@
 
 // STL includes
 #include <vector>
+#include <fstream>
 
 // Boost Includes
 #include <boost/lexical_cast.hpp>
@@ -70,7 +71,6 @@ Core::Color PreferencesManager::get_color( int index ) const
   return this->color_states_[ index ]->get();
 }
 
-  
 void PreferencesManager::initialize_states()
 {
   //General Preferences
@@ -124,7 +124,6 @@ void PreferencesManager::initialize_states()
   add_state( "show_projectmanager_bar", show_projectmanager_bar_state_, false );
   add_state( "show_measurement_bar", show_measurement_bar_state_, false );
   add_state( "show_history_bar", show_history_bar_state_, false );
-  
   
 }
 

@@ -45,7 +45,6 @@ ADD_LIBRARY(Application_PreferencesManager STATIC
             ${APPLICATION_PREFERENCESMANAGER_ACTIONS_SRCS} )
             
 TARGET_LINK_LIBRARIES(Application_PreferencesManager
-                      Core_Converter
                       Core_Utils
                       Core_EventHandler
                       Core_Application

@@ -64,7 +64,6 @@ ADD_LIBRARY(Core_Action STATIC
             ${CORE_ACTION_SRCS} )
             
 TARGET_LINK_LIBRARIES(Core_Action
-                      Core_Converter
                       Core_Utils
                       Core_EventHandler
                       Core_Application

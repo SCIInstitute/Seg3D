@@ -74,7 +74,6 @@ ADD_LIBRARY(Core_State STATIC
             ${CORE_STATE_ACTIONS_SRCS} )
             
 TARGET_LINK_LIBRARIES(Core_State
-                      Core_Converter
                       Core_Utils
                       Core_Application
                       Core_Interface

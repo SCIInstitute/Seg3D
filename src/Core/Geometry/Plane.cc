@@ -61,5 +61,23 @@ Plane::Plane( const Point &p1, const Point &p2, const Point &p3 ) :
 {
 }
 
+std::string ExportToString( const Plane& value )
+{
+  return ( std::string( 1, '[' ) + ExportToString( value.normal() ) + ' ' + ExportToString(
+      value.distance() ) + ']' );
+}
+
+bool ImportFromString( const std::string& str, Plane& value )
+{
+  std::vector< double > values;
+  ImportFromString( str, values );
+  if ( values.size() == 4 )
+  {
+    value = Plane( Vector( values[ 0 ], values[ 1 ], values[ 2 ] ), values[ 3 ] );
+    return ( true );
+  }
+  return ( false );
+}
+
 }
 

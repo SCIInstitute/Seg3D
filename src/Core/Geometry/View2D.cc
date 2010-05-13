@@ -118,4 +118,22 @@ void View2D::compute_clipping_planes( double aspect, double& left, double& right
   top = this->center_.y() + clipping_height;
 }
 
+std::string ExportToString( const View2D& value )
+{
+  return ( std::string( 1, '[' ) + ExportToString( value.center() ) + ' ' + ExportToString(
+      value.scalex() ) + ' ' + ExportToString( value.scaley() ) + ']' );
+}
+
+bool ImportFromString( const std::string& str, View2D& value )
+{
+  std::vector< double > values;
+  ImportFromString( str, values );
+  if ( values.size() == 16 )
+  {
+    value = View2D( Point( values[ 0 ], values[ 1 ], values[ 2 ] ), values[ 3 ], values[ 4 ] );
+    return ( true );
+  }
+  return ( false );
+}
+
 } // End namespace Core

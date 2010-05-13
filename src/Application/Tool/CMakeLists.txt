@@ -44,7 +44,6 @@ ADD_LIBRARY(Application_Tool STATIC
             ${APPLICATION_TOOL_SRCS} )
             
 TARGET_LINK_LIBRARIES(Application_Tool
-                      Core_Converter
                       Core_Utils
                       Core_Application
                       Core_Interface

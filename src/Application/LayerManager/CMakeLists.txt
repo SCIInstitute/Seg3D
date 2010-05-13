@@ -60,7 +60,6 @@ ADD_LIBRARY(Application_LayerManager STATIC
             ${APPLICATION_LAYERMANAGER_ACTIONS_SRCS} )
             
 TARGET_LINK_LIBRARIES(Application_LayerManager
-                      Core_Converter
                       Core_Utils
                       Core_EventHandler
                       Core_Application

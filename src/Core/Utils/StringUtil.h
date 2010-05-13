@@ -43,105 +43,101 @@
 // STL includes
 #include <string>
 #include <vector>
-#include <sstream>
-#include <fstream>
 
 namespace Core
 {
 
-// Convert multiple values in a string into a vector with numbers
+// Export functions to strings
+std::string ExportToString( const bool& value );
 
-template< class T >
-bool MultipleFromString( const std::string &str, std::vector< T > &values )
-{
-  values.clear();
+std::string ExportToString( const char& value );
+std::string ExportToString( const unsigned char& value);
 
-  // Clear out any markup of the numbers that make it easier to read and
-  // replace it all with spaces.
-  std::string data = str;
-  for ( size_t j = 0; j < data.size(); j++ )
-    if ( ( data[ j ] == '\t' ) || ( data[ j ] == '\r' ) || ( data[ j ] == '\n' ) || ( data[ j ]
-        == '"' ) || ( data[ j ] == ',' ) || ( data[ j ] == '[' ) || ( data[ j ] == ']' )
-        || ( data[ j ] == '(' ) || ( data[ j ] == ')' ) ) data[ j ] = ' ';
+std::string ExportToString( const short& value );
+std::string ExportToString( const unsigned short& value);
 
-  // Loop over the data and extract all numbers from it.
-  for ( size_t p = 0; p < data.size(); )
-  {
-    // find where the number starts
-    while ( ( p < data.size() ) && ( data[ p ] == ' ' ) )
-      p++;
-    // Exit if we are at the end of the series
-    if ( p >= data.size() ) break;
+std::string ExportToString( const int& value );
+std::string ExportToString( const unsigned int& value);
 
-    // strip of the next number
-    std::string::size_type next_space = data.find( ' ', p );
-    if ( next_space == std::string::npos ) next_space = data.size();
+std::string ExportToString( const long& value );
+std::string ExportToString( const unsigned long& value );
 
-    // Extract the number
-    T value;
-    if ( FromString( data.substr( p, next_space - p ), value ) ) values.push_back( value );
-    p = next_space;
+std::string ExportToString( const long long& value );
+std::string ExportToString( const unsigned long long& value );
 
-    if ( p >= data.size() ) break;
-  }
+std::string ExportToString( const float& value );
+std::string ExportToString( const double& value );
 
-  // If no numbers were extracted return false
-  if ( values.size() > 0 ) return ( true );
-  return ( false );
-}
+std::string ExportToString( const float& value, int percision );
+std::string ExportToString( const double& value, int percision );
 
-// Convert a value into a string
+std::string ExportToString( const std::string& value );
 
-template< class T >
-bool FromString( const std::string &str, T &value )
-{
-  std::string data = str + " ";
-  for ( size_t j = 0; j < data.size(); j++ )
-    if ( ( data[ j ] == '\t' ) || ( data[ j ] == '\r' ) || ( data[ j ] == '\n' ) || ( data[ j ]
-        == '"' ) || ( data[ j ] == ',' ) || ( data[ j ] == '[' ) || ( data[ j ] == ']' )
-        || ( data[ j ] == '(' ) || ( data[ j ] == ')' ) ) data[ j ] = ' ';
+std::string ExportToString( const std::vector< char >& value );
+std::string ExportToString( const std::vector< unsigned char>& value);
 
-  std::istringstream iss( data );
-  iss.exceptions( std::ifstream::eofbit | std::ifstream::failbit | std::ifstream::badbit );
-  try
-  {
-    iss >> value;
-    return ( true );
-  }
-  catch ( ... )
-  {
-    return ( false );
-  }
-}
+std::string ExportToString( const std::vector< short >& value );
+std::string ExportToString( const std::vector< unsigned short>& value);
 
+std::string ExportToString( const std::vector< int >& value );
+std::string ExportToString( const std::vector< unsigned int>& value);
 
-// Export a value to a string
-template< class T >
-std::string ToString( T val )
-{
-  std::ostringstream oss;
-  oss << val;
-  return ( oss.str() );
-}
+std::string ExportToString( const std::vector< long long >& value );
+std::string ExportToString( const std::vector< unsigned long long >& value);
 
-// Export a value to a string with percision control
+std::string ExportToString( const std::vector< long >& value );
+std::string ExportToString( const std::vector< unsigned long >& value);
 
-template< class T >
-std::string ToString( T val, int precision )
-{
-  std::ostringstream oss;
-  oss.precision( precision );
-  oss << val;
-  return ( oss.str() );
-}
+std::string ExportToString( const std::vector< float >& value );
+std::string ExportToString( const std::vector< double >& value );
+
+std::string ExportToString( const std::vector< float >& value, int percision );
+std::string ExportToString( const std::vector< double >& value, int percision );
+
+// Import functions from strings
+bool ImportFromString( const std::string& str, bool& value );
+
+bool ImportFromString( const std::string& str, char& value );
+bool ImportFromString(const std::string& str, unsigned char& value);
+
+bool ImportFromString( const std::string& str, short& value );
+bool ImportFromString(const std::string& str, unsigned short& value);
+
+bool ImportFromString( const std::string& str, int& value );
+bool ImportFromString(const std::string& str, unsigned int& value);
+
+bool ImportFromString(const std::string& str, long& value);
+bool ImportFromString(const std::string& str, unsigned long& value);
+
+bool ImportFromString(const std::string& str, long long& value);
+bool ImportFromString(const std::string& str, unsigned long long& value);
+
+bool ImportFromString( const std::string& str, float& value );
+bool ImportFromString( const std::string& str, double& value );
+
+bool ImportFromString( const std::string& str, std::string& value );
+
+bool ImportFromString( const std::string& str, std::vector< char >& value );
+bool ImportFromString( const std::string& str, std::vector< unsigned char>& value);
+
+bool ImportFromString( const std::string& str, std::vector< short >& value );
+bool ImportFromString( const std::string& str, std::vector< unsigned short >& value);
+
+bool ImportFromString( const std::string& str, std::vector< int >& value );
+bool ImportFromString( const std::string& str, std::vector< unsigned int >& value);
+
+bool ImportFromString( const std::string& str, std::vector< long >& value);
+bool ImportFromString( const std::string& str, std::vector< unsigned long >& value);
+
+bool ImportFromString( const std::string& str, std::vector< long long >& value);
+bool ImportFromString( const std::string& str, std::vector< unsigned long long>& value);
+
+bool ImportFromString( const std::string& str, std::vector< float >& value );
+bool ImportFromString( const std::string& str, std::vector< double >& value );
 
 // Convert string to upper or lower case 
 std::string StringToUpper( std::string );
 std::string StringToLower( std::string );
-
-// Special cases that need additional rules to deal with inf and nan
-bool FromString( const std::string &str, double &value );
-bool FromString( const std::string &str, float &value );
 
 // Functions to strip out spaces at the start or at both ends of the string
 void StripSpaces( std::string& str );

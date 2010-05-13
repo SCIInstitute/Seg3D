@@ -95,6 +95,9 @@ private:
 
 };
 
+std::string ExportToString( const Plane& value );
+bool ImportFromString( const std::string& str, Plane& value );
+
 } // End namespace SCIRun
 
 

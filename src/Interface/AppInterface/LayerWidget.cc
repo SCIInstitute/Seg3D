@@ -322,6 +322,13 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
     return;
   }
   
+  if( ( event->modifiers() != Qt::ControlModifier ) && ( event->modifiers() != Qt::ShiftModifier ) )
+  {
+    ActionActivateLayer::Dispatch( 
+      LayerManager::Instance()->get_layer_by_id( this->get_layer_id() ) ); 
+    return;
+  }
+  
   if( this->group_menus_open_ || this->layer_menus_open_ )
     return;
 

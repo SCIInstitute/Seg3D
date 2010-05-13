@@ -27,6 +27,7 @@
  */
 
 #include <Core/Geometry/Color.h>
+#include <Core/Utils/StringUtil.h>
 
 namespace Core
 {
@@ -34,6 +35,25 @@ namespace Core
 Color operator*( double alpha, Color color )
 {
   return ( color * alpha );
+}
+
+std::string ExportToString( const Color& value )
+{
+  return ( std::string( 1, '[' ) + ExportToString( value.r() ) + ' ' 
+    + ExportToString( value.g() ) + ' '
+      + ExportToString( value.b() ) + ']' );
+}
+
+bool ImportFromString( const std::string& str, Color& value )
+{
+  std::vector< double > values;
+  ImportFromString( str, values );
+  if ( values.size() == 3 )
+  {
+    value = Color( values[ 0 ], values[ 1 ], values[ 2 ] );
+    return ( true );
+  }
+  return ( false );
 }
 
 } // End namespace Core

@@ -49,11 +49,23 @@ bool BBox::overlaps_inside( const BBox & bb ) const
   return true;
 }
 
-std::ostream& operator<<( std::ostream& os, const BBox& bbox )
+std::string ExportToString( const BBox& value )
 {
-  os << '[' << bbox.cmin_.x() << ' ' << bbox.cmin_.y() << ' ' << bbox.cmin_.z() << " ; "
-      << bbox.cmax_.x() << ' ' << bbox.cmax_.y() << ' ' << bbox.cmax_.z() << ']';
-  return os;
+  return ( std::string( 1, '[' ) + ExportToString( value.min() ) + ' ' + ExportToString(
+      value.max() ) + ']' );
+}
+
+bool ImportFromString( const std::string& str, BBox& value )
+{
+  std::vector< double > values;
+  ImportFromString( str, values );
+  if ( values.size() == 6 )
+  {
+    value = BBox( Point( values[ 0 ], values[ 1 ], values[ 2 ] ), Point( values[ 3 ],
+        values[ 4 ], values[ 5 ] ) );
+    return ( true );
+  }
+  return ( false );
 }
 
 } // End namespace Core

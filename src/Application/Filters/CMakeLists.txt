@@ -84,7 +84,6 @@ ADD_LIBRARY(Application_Filters STATIC
             ${APPLICATION_FILTERS_ACTIONS_SRCS} )
             
 TARGET_LINK_LIBRARIES(Application_Filters
-                      Core_Converter
                       Core_Utils
                       Core_EventHandler
                       Core_Application

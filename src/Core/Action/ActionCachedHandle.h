@@ -44,7 +44,6 @@
 // Core
 #include <Core/Utils/Log.h>
 #include <Core/Utils/StringUtil.h>
-#include <Core/Converter/StringConverter.h>
 
 namespace Core
 {

@@ -45,7 +45,6 @@ ADD_LIBRARY(Application_StateManager STATIC
             ${APPLICATION_STATEMANAGER_ACTIONS_SRCS} )
             
 TARGET_LINK_LIBRARIES(Application_StateManager
-                      Core_Converter
                       Core_Utils
                       Core_EventHandler
                       Core_Application

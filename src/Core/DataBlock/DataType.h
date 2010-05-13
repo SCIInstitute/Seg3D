@@ -82,6 +82,20 @@ bool IsReal( const DataType& data_type );
 // Get the type of the data
 int GetNrrdDataType( const DataType& data_type);
 
+// GETDATATYPE:
+// Get the data type from a pointer to the type
+DataType GetDataType( signed char* );
+DataType GetDataType( unsigned char* );
+DataType GetDataType( short* );
+DataType GetDataType( unsigned short* );
+DataType GetDataType( int* );
+DataType GetDataType( unsigned int* );
+DataType GetDataType( long long* );
+DataType GetDataType( unsigned long long* );
+DataType GetDataType( float* );
+DataType GetDataType( double* );
+
+
 } // end namespace Core
 
 #endif

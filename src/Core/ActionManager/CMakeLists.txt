@@ -49,7 +49,6 @@ ADD_LIBRARY(Core_ActionManager STATIC
             ${CORE_ACTIONMANAGER_ACTIONS_SRCS} )
             
 TARGET_LINK_LIBRARIES(Core_ActionManager
-                      Core_Converter
                       Core_Utils
                       Core_EventHandler
                       Core_Application

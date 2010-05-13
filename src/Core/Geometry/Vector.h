@@ -39,6 +39,7 @@
 #include <iosfwd>
 
 // Core includes
+#include <Core/Utils/StringUtil.h>
 #include <Core/Math/MathFunctions.h>
 
 namespace Core
@@ -203,6 +204,18 @@ public:
 
 std::ostream& operator<<( std::ostream& os, const Vector& p );
 std::ostream& operator<<( std::ostream& os, const VectorF& p );
+
+std::string ExportToString( const Vector& value );
+std::string ExportToString( const VectorF& value );
+
+std::string ExportToString( const std::vector< Vector >& value );
+std::string ExportToString( const std::vector< VectorF >& value );
+
+bool ImportFromString( const std::string& str, Vector& value );
+bool ImportFromString( const std::string& str, VectorF& value );
+
+bool ImportFromString( const std::string& str, std::vector< Vector >& value );
+bool ImportFromString( const std::string& str, std::vector< VectorF >& value );
 
 } // End namespace Core
 

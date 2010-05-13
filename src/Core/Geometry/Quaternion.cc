@@ -198,4 +198,23 @@ Quaternion Slerp( const Quaternion& from, const Quaternion& to, double t, bool s
   return result;
 }
 
+std::string ExportToString( const Quaternion& value )
+{
+  return ( std::string( 1, '[' ) + ExportToString( value.w() ) + ' ' + ExportToString(
+      value.x() ) + ' ' + ExportToString( value.y() ) + ' ' + ExportToString( value.z() )
+      + " ]" );
+}
+
+bool ImportFromString( const std::string& str, Quaternion& value )
+{
+  std::vector< double > values;
+  ImportFromString( str, values );
+  if ( values.size() == 4 )
+  {
+    value = Quaternion( values[ 0 ], values[ 1 ], values[ 2 ], values[ 3 ] );
+    return ( true );
+  }
+  return ( false );
+}
+
 } // end namespace Core

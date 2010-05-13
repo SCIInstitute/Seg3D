@@ -130,6 +130,9 @@ Vector operator*( const Transform& t, const Vector& d );
 PointF operator*( const Transform& t, const PointF& d );
 VectorF operator*( const Transform& t, const VectorF& d );
 
+std::string ExportToString( const Transform& value );
+bool ImportFromString( const std::string& str, Transform& value );
+
 } // End namespace Core
 
 #endif

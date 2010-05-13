@@ -352,7 +352,9 @@ private:
   bool is_valid_;
 };
 
-std::ostream& operator<<( std::ostream& out, const BBox& bbox );
+std::string ExportToString( const BBox& value );
+bool ImportFromString( const std::string& str, BBox& value );
+
 
 } // End namespace Core
 
