@@ -33,6 +33,7 @@
 # pragma once
 #endif
 
+// Core includes
 #include <Core/State/StateBase.h>
 #include <Core/State/StateEngine.h>
 #include <Core/Geometry/Color.h>
@@ -84,7 +85,7 @@ public:
   {
   }
 
-  // DESTRUCTOR
+  // DESTRUCTRO
   virtual ~StateValue()
   {
   }
@@ -181,6 +182,8 @@ public:
 
   typedef boost::signals2::signal< void( T, Core::ActionSource ) > value_changed_signal_type;
   value_changed_signal_type value_changed_signal_;
+
+
 
   // -- internals of StateValue --
 private:

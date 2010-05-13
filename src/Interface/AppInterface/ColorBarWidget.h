@@ -58,15 +58,18 @@ public:
 
 public Q_SLOTS:
   void set_color_index( int index );
-  void signal_activation( int active );
 
 Q_SIGNALS:
   void color_index_changed( int index );
+  void color_changed( int index );
 
 private:
   void initialize_buttons();
   void mousePressEvent( QMouseEvent* event );
-
+  
+private Q_SLOTS:
+  void signal_activation( int active );
+  void color_only_changed( int button_index );
 
 private:
   // Internals of the dockwidget

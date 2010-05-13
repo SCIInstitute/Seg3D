@@ -95,7 +95,6 @@ private:
   
   LayerWidget* drop_layer_;
 
-  
   void set_drop_target( LayerWidget* target_layer );
   void mousePressEvent( QMouseEvent* event );
   void dropEvent( QDropEvent* event );
@@ -103,7 +102,7 @@ private:
   void dragLeaveEvent( QDragLeaveEvent* event );
 
 private Q_SLOTS:
-  void set_mask_background_color( int );
+  void set_mask_background_color( int color_index );
 
 protected:
   void resizeEvent( QResizeEvent *event );

@@ -145,13 +145,11 @@ namespace Seg3D
   // - Volume Type Colors - //
   const QString StyleSheet::DATA_VOLUME_COLOR_C = QString::fromUtf8(
     "QWidget#typeBackground_{"
-    " background-color: rgb(131, 174, 255);"
-    //" background-color: rgb(166, 12, 73);"
+    " background-color: rgb(90, 90, 90);"
     "}");
   const QString StyleSheet::MASK_VOLUME_COLOR_C = QString::fromUtf8(
     "QWidget#typeBackground_{"
     " background-color: rgb(237, 149, 31);"
-    //" background-color: rgb(255, 128, 0);"
     "}");
   const QString StyleSheet::LABEL_VOLUME_COLOR_C = QString::fromUtf8(
     "QWidget#typeBackground_{ background-color: rgb(90, 90, 90);"

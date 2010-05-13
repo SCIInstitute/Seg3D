@@ -53,6 +53,8 @@ QtRenderWidget::QtRenderWidget( const QGLFormat& format, QWidget* parent, QtRend
   setAttribute( Qt::WA_OpaquePaintEvent );
   setAttribute( Qt::WA_NoSystemBackground );
   setMouseTracking( true );
+
+  this->setCursor( Qt::CrossCursor );
 }
 
 QtRenderWidget::~QtRenderWidget()

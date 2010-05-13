@@ -64,7 +64,7 @@ AppPreferences::AppPreferences( QWidget *parent ) :
   this->setup_interface_controls_prefs();
   
   // Disable the Apply button since we arent using it yet
-  this->private_->ui_.buttonBox->setEnabled( false );
+  this->private_->ui_.apply_button_->setEnabled( false );
 
 }
 

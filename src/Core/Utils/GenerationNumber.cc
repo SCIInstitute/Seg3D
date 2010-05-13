@@ -39,10 +39,11 @@ namespace Core
   {
   }
   
+  boost::detail::atomic_count GenerationNumber::count_( 0 );
   
   void GenerationNumber::next_number()
   {
-    //++GenerationNumber::count_;
+    ++GenerationNumber::count_;
   }
 
 } // end namespace Core

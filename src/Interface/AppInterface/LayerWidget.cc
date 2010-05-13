@@ -258,7 +258,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
         this->private_->ui_.typeBackground_->setStyleSheet( StyleSheet::MASK_VOLUME_COLOR_C );
         this->private_->activate_button_->setIcon( this->mask_layer_icon_ );
         
-        connect( this->private_->color_widget_, SIGNAL( color_index_changed( int ) ), 
+        connect( this->private_->color_widget_, SIGNAL( color_changed( int ) ), 
           this, SLOT( set_mask_background_color( int ) ) );
 
         MaskLayer* mask_layer = dynamic_cast< MaskLayer* >( layer.get() );  
@@ -297,12 +297,12 @@ LayerWidget::~LayerWidget()
 
 void LayerWidget::set_mask_background_color( int color_index )
 {
-  Core::Color background_color = PreferencesManager::Instance()->color_states_[ color_index ]->get();
+  Core::Color color = PreferencesManager::Instance()->color_states_[ color_index ]->get();
   
   QString style_sheet = QString::fromUtf8( 
-  "background-color: rgb(" ) + QString::number( background_color.r() ) +
-  QString::fromUtf8( ", " ) + QString::number( background_color.g() ) +
-  QString::fromUtf8( ", " ) + QString::number( background_color.b() ) +
+  "background-color: rgb(" ) + QString::number( color.r() ) +
+  QString::fromUtf8( ", " ) + QString::number( color.g() ) +
+  QString::fromUtf8( ", " ) + QString::number( color.b() ) +
   QString::fromUtf8( "); }" );
 
   this->private_->ui_.typeBackground_->setStyleSheet( style_sheet );
@@ -545,7 +545,7 @@ void LayerWidget::set_active( bool active )
   
 void LayerWidget::show_selection_checkbox( bool show )
 {
-  //this->layer_menus_open_ = show;
+
   if( show && (!this->private_->ui_.lock_button_->isChecked()) )
   { 
     this->private_->ui_.checkbox_widget_->show();
@@ -559,7 +559,6 @@ void LayerWidget::show_selection_checkbox( bool show )
 
 void LayerWidget::show_opacity_bar( bool show )
 {
-  //this->layer_menus_open_ = show;
   if( show )
   {
     this->private_->ui_.opacity_bar_->show();
@@ -579,7 +578,6 @@ void LayerWidget::show_opacity_bar( bool show )
 
 void LayerWidget::show_brightness_contrast_bar( bool show )
 {
-  //this->layer_menus_open_ = show;
   if( show )
   {
     this->private_->ui_.bright_contrast_bar_->show();
@@ -599,7 +597,6 @@ void LayerWidget::show_brightness_contrast_bar( bool show )
 
 void LayerWidget::show_border_fill_bar( bool show )
 {
-  //this->layer_menus_open_ = show;
   if( show )
   {
     this->private_->ui_.border_bar_->show();
@@ -619,7 +616,6 @@ void LayerWidget::show_border_fill_bar( bool show )
 
 void LayerWidget::show_color_bar( bool show )
 {
-  //this->layer_menus_open_ = show;
   if( show )
   {
     this->private_->ui_.color_bar_->show();
@@ -639,7 +635,6 @@ void LayerWidget::show_color_bar( bool show )
 
 void LayerWidget::show_progress_bar( bool show )
 {
-  //this->layer_menus_open_ = show;
   if( show )
   {
     this->private_->ui_.progress_bar_bar_->show();
@@ -653,7 +648,6 @@ void LayerWidget::show_progress_bar( bool show )
 
 void LayerWidget::visual_lock( bool lock )
 {
-  //this->layer_menus_open_ = lock;
   if( lock )
   {
     this->private_->ui_.header_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_LOCKED_C );
@@ -687,7 +681,10 @@ void LayerWidget::visual_lock( bool lock )
         break;
         case Core::VolumeType::MASK_E:
       {
-        this->private_->ui_.typeBackground_->setStyleSheet( StyleSheet::MASK_VOLUME_COLOR_C );
+        int color_index =  dynamic_cast< MaskLayer* >( ( LayerManager::Instance()->
+          get_layer_by_id( this->get_layer_id() ) ).get() )->color_state_->get();
+        
+        this->set_mask_background_color( color_index );
       }
       break;
       case Core::VolumeType::LABEL_E:

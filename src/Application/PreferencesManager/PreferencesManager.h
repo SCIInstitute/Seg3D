@@ -36,6 +36,7 @@
 
 
 // Boost includes
+#include <boost/filesystem.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
 
@@ -105,20 +106,21 @@ public:
   Core::StateBoolHandle show_history_bar_state_;
   
 public:
-  const std::vector< Core::Color >& get_default_colors() const
-  {
-    return default_colors_;
-  }
-
+  const std::vector< Core::Color >& get_default_colors() const { return default_colors_; }
   Core::Color get_color( int index ) const;
+  bool save_preferences_to_file();
+  bool load_preferences_from_file();
   
 private:
   void initialize_states();
   bool initialize_default_colors();
+
   
 private:
   std::vector< Core::Color > default_colors_;
+  boost::filesystem::path local_config_path_;
   
+
     
 };
 

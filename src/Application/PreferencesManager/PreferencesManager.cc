@@ -29,8 +29,11 @@
 // STL includes
 #include <vector>
 
-// Boost includes 
+// Boost Includes
 #include <boost/lexical_cast.hpp>
+#include <boost/archive/xml_oarchive.hpp>
+#include <boost/archive/xml_iarchive.hpp>
+#include <boost/serialization/nvp.hpp>
 
 // Application includes
 #include <Application/PreferencesManager/PreferencesManager.h>
@@ -45,8 +48,16 @@ CORE_SINGLETON_IMPLEMENTATION( PreferencesManager );
 PreferencesManager::PreferencesManager() :
   StateHandler( "PreferencesManager" )
 { 
+  // Initialize the local config directory path
+  Core::Application::Instance()->get_config_directory( local_config_path_ );
+  local_config_path_ = local_config_path_ / "user_prefs.cfg";
+
   if(  initialize_default_colors() )
     this->initialize_states();
+
+  // this is just for testing
+  this->save_preferences_to_file();
+  
 }
 
 PreferencesManager::~PreferencesManager()
@@ -116,6 +127,27 @@ void PreferencesManager::initialize_states()
   
   
 }
+
+bool PreferencesManager::save_preferences_to_file()
+{
+  std::ofstream user_prefs( local_config_path_.string().c_str() );
+
+  //TODO: add xml encoder
+    // this is temporary test code to write data to the file
+    for( size_t i = 0; i < this->color_states_.size(); ++i )
+    {
+      user_prefs << this->color_states_[ i ]->export_to_string() << std::endl;
+    }
+  user_prefs.close();
+  return true;
+}
+
+bool PreferencesManager::load_preferences_from_file()
+{
+  std::ifstream user_prefs( local_config_path_.string().c_str() );
+  return true;
+}
+
 
 bool PreferencesManager::initialize_default_colors()
 {

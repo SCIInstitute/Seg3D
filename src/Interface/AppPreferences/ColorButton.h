@@ -45,6 +45,7 @@ class ColorButton :
   
 Q_SIGNALS:
   void color_changed( Core::Color );
+  void color_changed( int );
   void button_clicked( Core::Color, bool );
   void index( int );
   //void clicked( Core::Color, bool );

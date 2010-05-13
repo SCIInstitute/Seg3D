@@ -39,7 +39,6 @@ namespace Seg3D
   {
     this->set_color( button_color );
     this->setCheckable( true );
-    //this->setChecked( true );
 
     if( height )
     {
@@ -75,13 +74,15 @@ namespace Seg3D
         
     this->setStyleSheet( style_sheet );
     
-    Q_EMIT color_changed( this->button_color_ );
+    Q_EMIT this->color_changed( this->button_color_ );
+    Q_EMIT this->color_changed( this->index_ );
   }
 
   void ColorButton::trigger_signal( bool torf )
   {
     Q_EMIT this->button_clicked( this->button_color_, this->isChecked() );
     Q_EMIT this->index( this->index_ );
+    Q_EMIT this->color_changed( this->index_ );
   }
 
   

@@ -120,6 +120,8 @@ public:
 
 ViewerWidgetPrivate::ViewerWidgetPrivate( QWidget *parent )
 {
+  
+
   // ensure viewer selection is mutual exclusive
   this->viewer_selection_ = new QActionGroup( parent );
 

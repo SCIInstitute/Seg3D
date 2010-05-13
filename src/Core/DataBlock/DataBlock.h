@@ -65,6 +65,7 @@ typedef boost::shared_ptr< DataBlock > DataBlockHandle;
 // Class definition
 class DataBlock : public RecursiveLockable
 {
+public:
   // index/size types
 #ifdef SCI_64BITS
   typedef unsigned long long  size_type;

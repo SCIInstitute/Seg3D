@@ -979,21 +979,9 @@ QToolButton#color_12_{
        </spacer>
       </item>
       <item>
-       <widget class="QDialogButtonBox" name="buttonBox">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>32</height>
-         </size>
-        </property>
-        <property name="standardButtons">
-         <set>QDialogButtonBox::Apply</set>
+       <widget class="QPushButton" name="apply_button_">
+        <property name="text">
+         <string>Apply</string>
         </property>
        </widget>
       </item>
