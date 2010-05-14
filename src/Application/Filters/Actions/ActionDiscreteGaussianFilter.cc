@@ -28,59 +28,69 @@
 
 
 #include <Application/LayerManager/LayerManager.h>
-#include <Application/Filters/Actions/ActionDiscreteGaussian.h>
+#include <Application/Filters/Actions/ActionDiscreteGaussianFilter.h>
 
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
-CORE_REGISTER_ACTION( Seg3D, DiscreteGaussian )
+CORE_REGISTER_ACTION( Seg3D, DiscreteGaussianFilter )
 
 namespace Seg3D
 {
   
-bool ActionDiscreteGaussian::validate( Core::ActionContextHandle& context )
+bool ActionDiscreteGaussianFilter::validate( Core::ActionContextHandle& context )
 {
-  if( !( Core::StateEngine::Instance()->is_statealias( this->layer_alias_ ) ) )
+  this->layer_.handle() = LayerManager::Instance()->get_layer_by_id( this->layer_id_.value() );
+
+  if ( ! this->layer_.handle() )
   {
-    context->report_error( std::string( "LayerID '" ) + this->layer_alias_ + "' is invalid" );
+    context->report_error( std::string( "LayerID '" ) + this->layer_id_.value() +
+      std::string( "' is not valid." ) );
     return false;
   }
-  if( this->variance_ < 0 )
+
+
+  if( this->variance_.value() < 0.0 )
   {
+    context->report_error( "The filter variance needs to be a positive number" );
     return false;
   }
-  if( this->kernelwidth_ < 0 )
+  
+  if( this->kernelwidth_.value() < 0.0 )
   {
+    context->report_error( "The filter kernel width needs to be a positive number" );
     return false;
   }
+  
   return true;
 }
 
-bool ActionDiscreteGaussian::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
+bool ActionDiscreteGaussianFilter::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
-  if ( Core::StateEngine::Instance()->is_statealias( this->layer_alias_ ) )
-  {
-    // TODO: run filter
-    context->report_message( "The Discrete Gaussian Filter has been triggered "
-      "successfully on layer: "  + this->layer_alias_ );
-    
-    return true;
-  }
-    
-  return false;
+  // TODO: run filter
+  context->report_message( std::string( "The DiscreteGaussianFilter has been triggered "
+    "successfully on layer: " ) + this->layer_.handle()->name_state_->get() );
+  return true;
 }
 
-
-void ActionDiscreteGaussian::Dispatch( std::string layer_alias, double variance, double kernelwidth, 
-  bool replace )
+Core::ActionHandle ActionDiscreteGaussianFilter::Create( std::string layer_id, 
+  double variance, double kernelwidth, bool replace )
 {
-  ActionDiscreteGaussian* action = new ActionDiscreteGaussian;
-  action->layer_alias_ = layer_alias;
-  action->variance_ = variance;
-  action->kernelwidth_ = kernelwidth;
-  action->replace_ = replace;
+  ActionDiscreteGaussianFilter* action = new ActionDiscreteGaussianFilter;
   
-  Core::Interface::PostAction( Core::ActionHandle( action ) );
+  action->layer_id_.value() = layer_id;
+  action->variance_.value() = variance;
+  action->kernelwidth_.value() = kernelwidth;
+  action->replace_.value() = replace;
+
+  return ( Core::ActionHandle( action ) );
+}
+    
+
+void ActionDiscreteGaussianFilter::Dispatch( std::string layer_id, 
+  double variance, double kernelwidth, bool replace )
+{
+  Core::Interface::PostAction( Create( layer_id, variance, kernelwidth, replace ) );
 }
   
 } // end namespace Seg3D

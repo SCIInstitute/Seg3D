@@ -47,7 +47,7 @@ AppControllerStateEngine::~AppControllerStateEngine()
 
 int AppControllerStateEngine::rowCount( const QModelIndex& ) const
 {
-  return ( static_cast< int > ( Core::StateEngine::Instance()->num_states() ) );
+  return ( static_cast< int > ( Core::StateEngine::Instance()->number_of_states() ) );
 }
 
 int AppControllerStateEngine::columnCount( const QModelIndex& ) const

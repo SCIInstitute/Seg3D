@@ -28,49 +28,51 @@
 
 
 #include <Application/LayerManager/LayerManager.h>
-#include <Application/Filters/Actions/ActionGradientMagnitude.h>
+#include <Application/Filters/Actions/ActionGradientMagnitudeFilter.h>
 
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
-CORE_REGISTER_ACTION( Seg3D, GradientMagnitude )
+CORE_REGISTER_ACTION( Seg3D, GradientMagnitudeFilter )
 
 namespace Seg3D
 {
   
-bool ActionGradientMagnitude::validate( Core::ActionContextHandle& context )
+bool ActionGradientMagnitudeFilter::validate( Core::ActionContextHandle& context )
 {
-  if( !( Core::StateEngine::Instance()->is_statealias( this->layer_alias_ ) ) )
+  this->layer_.handle() = LayerManager::Instance()->get_layer_by_id( this->layer_id_.value() );
+
+  if ( ! this->layer_.handle() )
   {
-    context->report_error( std::string( "LayerID '" ) + this->layer_alias_ + "' is invalid" );
+    context->report_error( std::string( "LayerID '" ) + this->layer_id_.value() +
+      std::string( "' is not valid." ) );
     return false;
   }
-
+  
   return true;
 }
 
-bool ActionGradientMagnitude::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
+bool ActionGradientMagnitudeFilter::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
-  if ( Core::StateEngine::Instance()->is_statealias( this->layer_alias_ ) )
-  {
-    // TODO: run filter
-    context->report_message( "The Gradient Magnitude Filter has been triggered "
-      "successfully on layer: "  + this->layer_alias_ );
-    
-    return true;
-  }
-    
-  return false;
+  // TODO: run filter
+  context->report_message( std::string( "The GradientMagnitudeFilter has been triggered "
+    "successfully on layer: " ) + this->layer_.handle()->name_state_->get() );
+  return true;
 }
 
 
-void ActionGradientMagnitude::Dispatch( std::string layer_alias, bool replace )
+Core::ActionHandle  ActionGradientMagnitudeFilter::Create( std::string layer_id, bool replace )
 {
-  ActionGradientMagnitude* action = new ActionGradientMagnitude;
-  action->layer_alias_ = layer_alias;
-  action->replace_ = replace;
+  ActionGradientMagnitudeFilter* action = new ActionGradientMagnitudeFilter;
+  action->layer_id_.value() = layer_id;
+  action->replace_.value() = replace;
   
-  Core::Interface::PostAction( Core::ActionHandle( action ) );
+  return Core::ActionHandle( action );
+}
+
+void ActionGradientMagnitudeFilter::Dispatch( std::string layer_id, bool replace )
+{
+  Core::Interface::PostAction( Create( layer_id, replace ) );
 }
   
 } // end namespace Seg3D

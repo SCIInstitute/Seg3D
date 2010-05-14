@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_TOOL_ACTIONS_ACTIONFILLHOLES_H
-#define APPLICATION_TOOL_ACTIONS_ACTIONFILLHOLES_H
+#ifndef APPLICATION_TOOL_ACTIONS_ACTIONFILLHOLESFILTER_H
+#define APPLICATION_TOOL_ACTIONS_ACTIONFILLHOLESFILTER_H
 
 #include <Core/Action/Actions.h>
 #include <Core/Interface/Interface.h>
@@ -36,17 +36,19 @@
 namespace Seg3D
 {
   
-class ActionFillHoles : public Core::Action
+class ActionFillHolesFilter : public Core::Action
 {
-CORE_ACTION( "FillHoles", "Run Fill Holes Filter on: <name>" );
+CORE_ACTION( "FillHolesFilter", "FillHoleFilter <layerid> <seedpoints>" );
   
   // -- Constructor/Destructor --
 public:
-  ActionFillHoles()
+  ActionFillHolesFilter()
   {
+    add_argument( layer_id_ );
+    add_cachedhandle( layer_ );
   }
   
-  virtual ~ActionFillHoles()
+  virtual ~ActionFillHolesFilter()
   {
   }
   
@@ -57,15 +59,21 @@ public:
   
   // -- Action parameters --
 private:
-  // Layer_handle that is requested
-  std::string layer_alias_;
-  
+
+  Core::ActionParameter< std::string > layer_id_;
+
+  Core::ActionCachedHandle< LayerHandle > layer_; 
+
   // -- Dispatch this action from the interface --
 public:
     
-  // DISPATCH
+  // CREATE:  
+  // Create the action, but do not dispatch it
+  static Core::ActionHandle Create( std::string layer_id );
+  
+  // DISPATCH:
   // Create and dispatch action that inserts the new layer 
-  static void Dispatch( std::string layer_alias );
+  static void Dispatch( std::string layer_id );
   
 };
   

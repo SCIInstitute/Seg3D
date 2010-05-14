@@ -47,7 +47,7 @@ namespace Seg3D
 CORE_SINGLETON_IMPLEMENTATION( PreferencesManager );
 
 PreferencesManager::PreferencesManager() :
-  StateHandler( "PreferencesManager", false )
+  StateHandler( "preferences", false )
 { 
   // Initialize the local config directory path
   Core::Application::Instance()->get_config_directory( local_config_path_ );
@@ -91,30 +91,13 @@ void PreferencesManager::initialize_states()
   add_state( "default_mask_border", default_mask_border_state_, "thick", "none|thin|thick" );
   //add_state( "colors", colors_state_, this->default_colors_ ); 
   
-  add_state( "color_01", color_01_state_, this->default_colors_[0] );
-  this->color_states_.push_back( color_01_state_ );
-  add_state( "color_02", color_02_state_, this->default_colors_[1] );
-  this->color_states_.push_back( color_02_state_ );
-  add_state( "color_03", color_03_state_, this->default_colors_[2] );
-  this->color_states_.push_back( color_03_state_ );
-  add_state( "color_04", color_04_state_, this->default_colors_[3] );
-  this->color_states_.push_back( color_04_state_ );
-  add_state( "color_05", color_05_state_, this->default_colors_[4] );
-  this->color_states_.push_back( color_05_state_ );
-  add_state( "color_06", color_06_state_, this->default_colors_[5] );
-  this->color_states_.push_back( color_06_state_ );
-  add_state( "color_07", color_07_state_, this->default_colors_[6] );
-  this->color_states_.push_back( color_07_state_ );
-  add_state( "color_08", color_08_state_, this->default_colors_[7] );
-  this->color_states_.push_back( color_08_state_ );
-  add_state( "color_09", color_09_state_, this->default_colors_[8] );
-  this->color_states_.push_back( color_09_state_ );
-  add_state( "color_10", color_10_state_, this->default_colors_[9] );
-  this->color_states_.push_back( color_10_state_ );
-  add_state( "color_11", color_11_state_, this->default_colors_[10] );
-  this->color_states_.push_back( color_11_state_ );
-  add_state( "color_12", color_12_state_, this->default_colors_[11] );
-  this->color_states_.push_back( color_12_state_ );
+  color_states_.resize( 12 );
+  
+  for ( size_t j = 0; j < 12; j++ )
+  {
+    std::string stateid = std::string( "color_" ) + Core::ExportToString( j );
+    this->add_state( stateid, color_states_[ j ], this->default_colors_[ j ] );
+  }
   
   //Interface Controls Preferences
   

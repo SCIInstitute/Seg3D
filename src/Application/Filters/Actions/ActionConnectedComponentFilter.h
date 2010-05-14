@@ -45,6 +45,8 @@ CORE_ACTION( "ConnectedComponentFilter",
 public:
   ActionConnectedComponentFilter()
   {
+    add_argument( layer_id_ );
+    add_cachedhandle( layer_ );
   }
   
   virtual ~ActionConnectedComponentFilter()
@@ -58,7 +60,6 @@ public:
   
   // -- Action parameters --
 private:
-  // Layer_handle that is requested
   Core::ActionParameter< std::string > layer_id_;
 
   Core::ActionCachedHandle< LayerHandle > layer_;

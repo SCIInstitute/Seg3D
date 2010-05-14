@@ -86,7 +86,7 @@ public:
 
   inline std::string toolid() const 
   {
-    return stateid();
+    return this->get_statehandler_id();
   }
 
 protected:

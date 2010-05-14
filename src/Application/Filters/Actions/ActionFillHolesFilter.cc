@@ -28,48 +28,50 @@
 
 
 #include <Application/LayerManager/LayerManager.h>
-#include <Application/Filters/Actions/ActionFillHoles.h>
+#include <Application/Filters/Actions/ActionFillHolesFilter.h>
 
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
-CORE_REGISTER_ACTION( Seg3D, FillHoles )
+CORE_REGISTER_ACTION( Seg3D, FillHolesFilter )
 
 namespace Seg3D
 {
   
-bool ActionFillHoles::validate( Core::ActionContextHandle& context )
+bool ActionFillHolesFilter::validate( Core::ActionContextHandle& context )
 {
-  if( !( Core::StateEngine::Instance()->is_statealias( this->layer_alias_ ) ) )
+  this->layer_.handle() = LayerManager::Instance()->get_layer_by_id( this->layer_id_.value() );
+
+  if ( ! this->layer_.handle() )
   {
-    context->report_error( std::string( "LayerID '" ) + this->layer_alias_ + "' is invalid" );
+    context->report_error( std::string( "LayerID '" ) + this->layer_id_.value() +
+      std::string( "' is not valid." ) );
     return false;
   }
 
   return true;
 }
 
-bool ActionFillHoles::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
+bool ActionFillHolesFilter::run( Core::ActionContextHandle& context, 
+  Core::ActionResultHandle& result )
 {
-  if ( Core::StateEngine::Instance()->is_statealias( this->layer_alias_ ) )
-  {
-    // TODO: run filter
-    context->report_message( "The Fill Holes Filter has been triggered "
-      "successfully on layer: "  + this->layer_alias_ );
-    
-    return true;
-  }
-    
-  return false;
+  // TODO: run filter
+  context->report_message( std::string( "The FillHolesFilter has been triggered "
+    "successfully on layer: " ) + this->layer_.handle()->name_state_->get() );
+  return true;
+
 }
 
 
-void ActionFillHoles::Dispatch( std::string layer_alias )
+Core::ActionHandle ActionFillHolesFilter::Create( std::string layer_id )
 {
-  ActionFillHoles* action = new ActionFillHoles;
-  action->layer_alias_ = layer_alias;
-  
-  Core::Interface::PostAction( Core::ActionHandle( action ) );
+  ActionFillHolesFilter* action = new ActionFillHolesFilter;
+  action->layer_id_.value() = layer_id;
+}
+
+void ActionFillHolesFilter::Dispatch( std::string layer_id )
+{ 
+  Core::Interface::PostAction( Create( layer_id) );
 }
   
 } // end namespace Seg3D

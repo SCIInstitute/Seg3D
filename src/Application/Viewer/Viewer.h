@@ -226,7 +226,7 @@ public:
   // Get the stateid prefix of the viewer
   const std::string& get_stateid() const
   {
-    return this->stateid();
+    return this->get_statehandler_id();
   }
 
   Core::VolumeSliceHandle get_active_layer_slice() const;

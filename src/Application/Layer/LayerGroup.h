@@ -171,7 +171,7 @@ public:
   
   std::string get_group_id() const
   {
-    return stateid();
+    return get_statehandler_id();
   }
   
   layer_list_type get_layer_list() const

@@ -45,6 +45,14 @@ CORE_ACTION( "CannyEdgeDetectionFilter", "CannyEdgeDetectionFilter <layerid> [va
 public:
   ActionCannyEdgeDetectionFilter()
   {
+    add_argument( layer_id_ );
+    
+    add_parameter( "variance", variance_, 2.0 );
+    add_parameter( "max_error", max_error_, 1.0 );
+    add_parameter( "threshold", threshold_, 1.0 );
+    add_parameter( "replace", replace_, true );
+  
+    add_cachedhandle( layer_ ); 
   }
   
   virtual ~ActionCannyEdgeDetectionFilter()

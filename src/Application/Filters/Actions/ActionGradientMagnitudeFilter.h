@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_TOOL_ACTIONS_ACTIONGRADIENTMAGNITUDE_H
-#define APPLICATION_TOOL_ACTIONS_ACTIONGRADIENTMAGNITUDE_H
+#ifndef APPLICATION_TOOL_ACTIONS_ACTIONGRADIENTMAGNITUDEFILTER_H
+#define APPLICATION_TOOL_ACTIONS_ACTIONGRADIENTMAGNITUDEFILTER_H
 
 #include <Core/Action/Actions.h>
 #include <Core/Interface/Interface.h>
@@ -36,17 +36,21 @@
 namespace Seg3D
 {
   
-class ActionGradientMagnitude : public Core::Action
+class ActionGradientMagnitudeFilter : public Core::Action
 {
-CORE_ACTION( "GradientMagnitude", "Run Gradient Magnitude Filter on: <name>" );
+CORE_ACTION( "GradientMagnitudeFilter", "GradientMagnitudeFilter <layerid> [replace={true}]" );
   
   // -- Constructor/Destructor --
 public:
-  ActionGradientMagnitude()
+  ActionGradientMagnitudeFilter()
   {
+    add_argument( layer_id_ );
+    add_parameter( "replace", replace_, true );
+
+    add_cachedhandle( layer_ );
   }
   
-  virtual ~ActionGradientMagnitude()
+  virtual ~ActionGradientMagnitudeFilter()
   {
   }
   
@@ -57,16 +61,22 @@ public:
   
   // -- Action parameters --
 private:
-  // Layer_handle that is requested
-  std::string layer_alias_;
-  bool replace_;
+
+  Core::ActionParameter< std::string > layer_id_;
+  Core::ActionParameter< bool > replace_;
+
+  Core::ActionCachedHandle< LayerHandle > layer_; 
   
   // -- Dispatch this action from the interface --
 public:
+
+  // CREATE:  
+  // Create the action, but do not dispatch it
+  static Core::ActionHandle Create( std::string layer_id, bool replace );
     
   // DISPATCH
   // Create and dispatch action that inserts the new layer 
-  static void Dispatch( std::string layer_alias, bool replace );
+  static void Dispatch( std::string layer_id, bool replace );
   
 };
   

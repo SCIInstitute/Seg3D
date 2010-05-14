@@ -65,136 +65,108 @@ public:
 public:
   // ADD_STATE:
   // Add a local state variable with default value
-
   template< class HANDLE, class T >
   bool add_state( const std::string& key, HANDLE& state, const T& default_value )
   {
-    // Step (1): Generate a new unique ID for this state
-    std::string stateid = stateid_prefix_ + std::string( "::" ) + key;
-  
-    // Step (2): Generate the state variable
-    state = HANDLE( new typename HANDLE::element_type( stateid, default_value ) );
-
-    // Step (3): Now handle the common part for each add_state function
-    return ( add_statebase( StateBaseHandle( state ) ) );
+    state = HANDLE( new typename HANDLE::element_type( 
+      this->create_state_id( key ), default_value ) );
+    return this->add_statebase( state );
   }
 
   // ADD_STATE:
   // Add a local state variable with default value and min and max
-
   template< class HANDLE, class T >
   bool add_state( const std::string& key, HANDLE& state, const T& default_value,
       const T& min_value, const T& max_value, const T& step )
   {
-    // Step (1): Generate a new unique ID for this state
-    std::string stateid = stateid_prefix_ + std::string( "::" ) + key;
-    
-    // Step (2): Generate the state variable
-    state = HANDLE( new typename HANDLE::element_type( stateid, default_value, 
+    state = HANDLE( new typename HANDLE::element_type( 
+      this->create_state_id( key ), default_value, 
       min_value, max_value, step ) );
-
-    // Step (3): Now handle the common part for each add_state function
-    return ( add_statebase( StateBaseHandle( state ) ) );
+      
+    return this->add_statebase( state );
   }
 
   // ADD_STATE:
   // Add a local state variable without default value
-
   template< class HANDLE >
   bool add_state( const std::string& key, HANDLE& state )
   {
-    // Step (1): Generate a new unique ID for this state
-    std::string stateid = stateid_prefix_ + std::string( "::" ) + key;
-    
-    // Step (2): Generate the state variable
-    state = HANDLE( new typename HANDLE::element_type( stateid ) );
-
-    // Step (3): Now handle the common part for each add_state function
-    return ( add_statebase( StateBaseHandle( state ) ) );
+    state = HANDLE( new typename HANDLE::element_type(
+      this->create_state_id( key ) ) );
+      
+    return this->add_statebase( state );
   }
 
   // ADD_STATE:
   // Add a local state variable with option list
-
   template< class HANDLE >
   bool add_state( const std::string& key, HANDLE& state, const std::string& default_option,
       const std::string& option_list )
-  {   
-    // Step (1): Generate a new unique ID for this state
-    std::string stateid = stateid_prefix_ + std::string( "::" ) + key;
-  
-    // Step (2): Generate the state variable
-    state = HANDLE( new typename HANDLE::element_type( stateid, default_option, option_list ) );
-
-    // Step (3): Now handle the common part for each add_state function
-    return ( add_statebase( StateBaseHandle( state ) ) );
+  { 
+    state = HANDLE( new typename HANDLE::element_type( 
+      this->create_state_id( key ), default_option, option_list ) );
+    return this->add_statebase( state );
   }
 
   // ADD_STATE:
   // Add a local state variable with option list
-
   template< class HANDLE >
   bool add_state( const std::string& key, HANDLE& state, const std::string& default_option,
       const std::vector< std::string > option_list )
   {
-    // Step (1): Generate a new unique ID for this state
-    std::string stateid = stateid_prefix_ + std::string( "::" ) + key;
-      
-    // Step (2): Generate the state variable
-    state = HANDLE( new typename HANDLE::element_type( stateid, default_option, option_list ) );
-
-    // Step (3): Now handle the common part for each add_state function
-    return ( add_statebase( StateBaseHandle( state ) ) );
+    state = HANDLE( new typename HANDLE::element_type( 
+      this->create_state_id( key ), default_option, option_list ) );
+    return this->add_statebase( state );
   }
 
   // ADD_STATE:
   // Add a local state variable without default value
-  
   template< class HANDLE, class T >
   bool add_state( const std::string& key, HANDLE& state, const std::vector< T >& default_value )
   {
-    // Step (1): Generate a new unique ID for this state
-    std::string stateid = stateid_prefix_ + std::string( "::" ) + key;
-    
-    // Step (2): Generate the state variable
-    state = HANDLE( new typename HANDLE::element_type( stateid, default_value ) );
-
-    // Step (3): Now handle the common part for each add_state function
-    return ( add_statebase( StateBaseHandle( state ) ) );
-
+    state = HANDLE( new typename HANDLE::element_type(
+      this->create_state_id( key ), default_value ) );
+      
+    return this->add_statebase( state );
   }
 
 protected:
   // STATE_CHANGED:
   // This function is called when any of the state variables are changed
-  
-  virtual void state_changed()
-  {
-    // default function is to do nothing
-  }
+  virtual void state_changed();
 
-  const std::string& stateid() const
-  {
-    return ( stateid_prefix_ );
-  }
-  
+public:
+  // GET_STATEHANDLER_ID:
+  // The id of the handler that will be the prefix of the state variables
+  const std::string& get_statehandler_id() const;
 
 private:
   // HANDLE_STATE_CHANGED:
   // This function is called whenever a state registered with this statehandler is changed
   void handle_state_changed();
 
-private:
+  // CREATE_STATE_ID:
+  // Create the full state id
+  std::string create_state_id( const std::string& key ) const;
 
+private:
   friend class StateEngine;
 
+  // ADD_STATEBASE:
   // Function that adds the state variable to the database
   bool add_statebase( StateBaseHandle state );
 
+  // GET_STATE (CALLED BY STATEENGINE):
+  // Get the state variable
   bool get_state( const std::string& state_id, StateBaseHandle& state );
-
-  // Prefix for all state variables of this class
-  std::string stateid_prefix_;
+  
+  // GET_STATE (CALLED BY STATEENGINE):
+  // Get the state variable
+  bool get_state( const size_t idx, StateBaseHandle& state );
+  
+  // NUMBER_OF_STATES:
+  // Get the number of state variables stored in this statehandler
+  size_t number_of_states() const;
 
   StateHandlerPrivate* private_;
 };

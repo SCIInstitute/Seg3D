@@ -106,7 +106,7 @@ void Layer::set_active( bool active )
 
 std::string Layer::get_layer_id() const
 {
-  return stateid();
+  return this->get_statehandler_id();
 }
   
 std::string Layer::get_layer_name() const

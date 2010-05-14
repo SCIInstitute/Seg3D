@@ -37,23 +37,25 @@ typedef std::map< std::string, StateBaseHandle > state_map_type;
 class StateHandlerPrivate
 {
 public:
-  StateHandlerPrivate() {}
-  ~StateHandlerPrivate() {}
+  // The id of this state handler
+  std::string statehandler_id_;
 
+  // The database with the actual states 
   state_map_type state_map_;
 };
+
 
 StateHandler::StateHandler( const std::string& type_str, bool auto_id )
 {
   this->private_ = new StateHandlerPrivate;
-  this->stateid_prefix_ = StateEngine::Instance()->
+  this->private_->statehandler_id_ = StateEngine::Instance()->
     register_state_handler( type_str, this, auto_id );
 }
 
 StateHandler::~StateHandler()
 {
   this->disconnect_all();
-  StateEngine::Instance()->remove_state_handler( this->stateid_prefix_ );
+  StateEngine::Instance()->remove_state_handler( this->private_->statehandler_id_ );
   delete this->private_;
 }
     
@@ -63,24 +65,30 @@ bool StateHandler::add_statebase( StateBaseHandle state )
   // Step (1): Get unique state id
   std::string stateid = state->stateid();
 
-  // Step (2): Import previous setting from the current variable
-  StateBaseHandle old_state;
-  this->get_state( stateid, old_state );
-
-  if ( old_state.get() )
-  {
-    // use the string representation as intermediate
-    state->import_from_string( old_state->export_to_string() );
-  }
-
-  // Step (3): Link with statehandler
+  // Step (2): Link with statehandler
   this->add_connection( state->state_changed_signal_.connect( boost::bind(
       &StateHandler::handle_state_changed, this ) ) );
 
-  // Step (4): Add the state to the map
+  // Step (3): Add the state to the map
   this->private_->state_map_[ stateid ] = state;
 
   return true;
+}
+
+void StateHandler::state_changed()
+{
+  // default function is to do nothing
+}
+
+
+const std::string& StateHandler::get_statehandler_id() const
+{
+  return ( this->private_->statehandler_id_ );
+}
+
+std::string StateHandler::create_state_id( const std::string& key ) const
+{
+  return this->get_statehandler_id() + "::" + key;
 }
 
 bool StateHandler::get_state( const std::string& state_id, StateBaseHandle& state )
@@ -96,6 +104,18 @@ bool StateHandler::get_state( const std::string& state_id, StateBaseHandle& stat
   return false;
 }
 
+bool StateHandler::get_state( const size_t idx, StateBaseHandle& state )
+{
+  state_map_type::iterator it = this->private_->state_map_.begin();
+  
+  if ( idx >= this->private_->state_map_.size() ) return false;
+  
+  std::advance( it, idx );
+  
+  state = ( *it ).second;
+  return true;
+}
+
 void StateHandler::handle_state_changed()
 {
   // Trigger the signal in the state engine
@@ -105,6 +125,11 @@ void StateHandler::handle_state_changed()
   // Call the local function of this state engine that handles the specifics of the derived
   // class when the state engine has changed
   state_changed();
+}
+
+size_t StateHandler::number_of_states() const
+{
+  return this->private_->state_map_.size();
 }
 
 } // end namespace Core

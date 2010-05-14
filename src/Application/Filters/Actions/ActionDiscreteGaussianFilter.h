@@ -36,17 +36,18 @@
 namespace Seg3D
 {
   
-class ActionDiscreteGaussian : public Core::Action
+class ActionDiscreteGaussianFilter : public Core::Action
 {
-CORE_ACTION( "DiscreteGaussian", "Run Discrete Gaussian Filter on: <name>" );
+CORE_ACTION( "DiscreteGaussianFilter", 
+  "DiscreteGaussianFilter <layerid>  [variance={1.0}] [kernelwidth={1.0}] [replace={true}]" );
   
   // -- Constructor/Destructor --
 public:
-  ActionDiscreteGaussian()
+  ActionDiscreteGaussianFilter()
   {
   }
   
-  virtual ~ActionDiscreteGaussian()
+  virtual ~ActionDiscreteGaussianFilter()
   {
   }
   
@@ -57,18 +58,25 @@ public:
   
   // -- Action parameters --
 private:
-  // Layer_handle that is requested
-  std::string layer_alias_;
-  double variance_;
-  double kernelwidth_;
-  bool replace_;
-  
+  Core::ActionParameter< std::string > layer_id_;
+  Core::ActionParameter< double > variance_;
+  Core::ActionParameter< double > kernelwidth_;
+  Core::ActionParameter< bool > replace_;
+
+  Core::ActionCachedHandle< LayerHandle > layer_;
+    
   // -- Dispatch this action from the interface --
 public:
+
+  // CREATE:  
+  // Create the action, but do not dispatch it
+  static Core::ActionHandle Create( std::string layer_id, double variance, 
+    double kernelwidth, bool replace );
     
-  // DISPATCH
+  // DISPATCH:
   // Create and dispatch action that inserts the new layer 
-  static void Dispatch( std::string layer_alias, double variance, double kernelwidth, bool replace );
+  static void Dispatch( std::string layer_id, double variance, 
+    double kernelwidth, bool replace );
   
 };
   

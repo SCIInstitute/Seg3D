@@ -69,7 +69,7 @@ bool ActionCannyEdgeDetectionFilter::run( Core::ActionContextHandle& context,
   Core::ActionResultHandle& result )
 {
   // TODO: run filter
-  context->report_message( std::string( "The ActionCannyEdgeDetectionFilter has been triggered "
+  context->report_message( std::string( "The CannyEdgeDetectionFilter has been triggered "
     "successfully on layer: " ) + this->layer_.handle()->name_state_->get() );
   return true;
 }

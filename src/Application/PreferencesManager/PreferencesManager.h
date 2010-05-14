@@ -83,18 +83,6 @@ public:
   Core::StateOptionHandle default_mask_fill_state_;
   Core::StateOptionHandle default_mask_border_state_;
   std::vector< Core::StateColorHandle > color_states_;
-  Core::StateColorHandle color_01_state_;
-  Core::StateColorHandle color_02_state_;
-  Core::StateColorHandle color_03_state_;
-  Core::StateColorHandle color_04_state_;
-  Core::StateColorHandle color_05_state_;
-  Core::StateColorHandle color_06_state_;
-  Core::StateColorHandle color_07_state_;
-  Core::StateColorHandle color_08_state_;
-  Core::StateColorHandle color_09_state_;
-  Core::StateColorHandle color_10_state_;
-  Core::StateColorHandle color_11_state_;
-  Core::StateColorHandle color_12_state_;
 
   //Interface Controls Preferences
     
