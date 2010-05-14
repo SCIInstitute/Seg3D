@@ -36,7 +36,7 @@
 
 //Application Includes
 #include <Application/Tools/BinaryDilateErodeFilter.h>
-#include <Application/Filters/Actions/ActionBinaryDilateErode.h>
+//#include <Application/Filters/Actions/ActionBinaryDilateErode.h>
 
 namespace Seg3D
 {
@@ -142,8 +142,8 @@ void BinaryDilateErodeFilterInterface::execute_filter()
   BinaryDilateErodeFilter* tool =
     dynamic_cast< BinaryDilateErodeFilter* > ( base_tool_.get() );
 
-  ActionBinaryDilateErode::Dispatch( tool->target_layer_state_->export_to_string(), 
-    tool->dilate_state_->get(), tool->erode_state_->get(), tool->replace_state_->get() ); 
+//  ActionBinaryDilateErode::Dispatch( tool->target_layer_state_->export_to_string(), 
+//    tool->dilate_state_->get(), tool->erode_state_->get(), tool->replace_state_->get() ); 
 }
 
 } // end namespace Seg3D

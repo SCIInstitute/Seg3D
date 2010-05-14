@@ -112,7 +112,7 @@ public:
   {
     return handle_;
   }
-
+  
   // CLEAR_CACHED_HANDLE:
   // Clear the smart pointer to the cached object.
   virtual void clear_cached_handle()

@@ -36,7 +36,7 @@
 
 //Application Includes
 #include <Application/Tools/GradientMagnitudeFilter.h>
-#include <Application/Filters/Actions/ActionGradientMagnitude.h>
+//#include <Application/Filters/Actions/ActionGradientMagnitude.h>
 
 namespace Seg3D
 {
@@ -108,8 +108,8 @@ void GradientMagnitudeFilterInterface::execute_filter()
   GradientMagnitudeFilter* tool =
   dynamic_cast< GradientMagnitudeFilter* > ( base_tool_.get() );
   
-  ActionGradientMagnitude::Dispatch( tool->target_layer_state_->export_to_string(), 
-                     tool->replace_state_->get() ); 
+//  ActionGradientMagnitude::Dispatch( tool->target_layer_state_->export_to_string(), 
+//                     tool->replace_state_->get() ); 
 }
 
 } // end namespace Seg3D

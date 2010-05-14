@@ -225,68 +225,38 @@ private:
   Core::StateDoubleHandle state_handle_;
 };
 
-  class QtSpinBoxSlot : public QtSlot
-  {
-    Q_OBJECT
-  public:
-    
-    // Constructor
-    QtSpinBoxSlot( QSpinBox* parent, Core::StateIntHandle& state_handle, bool blocking = true ) :
-    QtSlot( parent, blocking ), state_handle_( state_handle )
-    {
-      // Qt's connect function
-      connect( parent, SIGNAL( valueChanged( int ) ), this, SLOT( slot( int ) ) );
-    }
-    
-    // Virtual destructor: needed by Qt
-    virtual ~QtSpinBoxSlot()
-    {
-    }
-    
-    public Q_SLOTS:
-    // Slot that Qt will call
-    void slot( int state )
-    {
-      if ( !blocked_ ) Core::ActionSet::Dispatch( state_handle_, state );
-    }
-    
-  private:
-    // Function object
-    Core::StateIntHandle state_handle_;
-  };
-
-
-
-class QtLineEditAliasSlot : public QtSlot
+class QtSpinBoxSlot : public QtSlot
 {
   Q_OBJECT
 public:
-
+  
   // Constructor
-  QtLineEditAliasSlot( QLineEdit* parent, Core::StateAliasHandle& state_handle, bool blocking = true ) :
+  QtSpinBoxSlot( QSpinBox* parent, Core::StateIntHandle& state_handle, bool blocking = true ) :
   QtSlot( parent, blocking ), state_handle_( state_handle )
   {
     // Qt's connect function
-    connect( parent, SIGNAL( textChanged( QString ) ), this, SLOT( slot( QString ) ) );
+    connect( parent, SIGNAL( valueChanged( int ) ), this, SLOT( slot( int ) ) );
   }
-
+  
   // Virtual destructor: needed by Qt
-  virtual ~QtLineEditAliasSlot()
+  virtual ~QtSpinBoxSlot()
   {
   }
-
-public Q_SLOTS:
+  
+  public Q_SLOTS:
   // Slot that Qt will call
-  void slot(QString state)
+  void slot( int state )
   {
-      std::string std_state = state.toStdString();
-    if (!blocked_) Core::ActionSet::Dispatch( state_handle_, std_state );
+    if ( !blocked_ ) Core::ActionSet::Dispatch( state_handle_, state );
   }
-
+  
 private:
   // Function object
-  Core::StateAliasHandle state_handle_;
+  Core::StateIntHandle state_handle_;
 };
+
+
+
 
 // SLOT FOR CONNECTING THE SliderIntCombo TO THE STATE ENGINE
 class QtColorBarWidgetSlot : public QtSlot

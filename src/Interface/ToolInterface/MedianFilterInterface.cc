@@ -36,7 +36,7 @@
 
 //Application Includes
 #include <Application/Tools/MedianFilter.h>
-#include <Application/Filters/Actions/ActionMedian.h>
+//#include <Application/Filters/Actions/ActionMedian.h>
 
 namespace Seg3D
 {
@@ -126,8 +126,8 @@ void MedianFilterInterface::execute_filter()
   MedianFilter* tool =
   dynamic_cast< MedianFilter* > ( base_tool_.get() );
   
-  ActionMedian::Dispatch( tool->target_layer_state_->export_to_string(), 
-     tool->radius_state_->get(), tool->replace_state_->get() ); 
+//  ActionMedian::Dispatch( tool->target_layer_state_->export_to_string(), 
+//     tool->radius_state_->get(), tool->replace_state_->get() ); 
 }
 
 } // end namespace Seg3D

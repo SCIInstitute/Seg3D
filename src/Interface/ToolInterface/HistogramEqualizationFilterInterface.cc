@@ -38,7 +38,7 @@
 //Application Includes
 #include <Application/Layer/DataLayer.h>
 #include <Application/Tools/HistogramEqualizationFilter.h>
-#include <Application/Filters/Actions/ActionHistogramEqualization.h>
+//#include <Application/Filters/Actions/ActionHistogramEqualization.h>
 #include <Application/LayerManager/LayerManager.h>
 
 //Core includes
@@ -184,9 +184,9 @@ void HistogramEqualizationFilterInterface::execute_filter()
   HistogramEqualizationFilter* tool =
   dynamic_cast< HistogramEqualizationFilter* > ( base_tool_.get() );
   
-  ActionHistogramEqualization::Dispatch( tool->target_layer_state_->export_to_string(), 
-           tool->upper_threshold_state_->get(), tool->lower_threshold_state_->get(),
-           tool->alpha_state_->get(), tool->replace_state_->get() ); 
+//  ActionHistogramEqualization::Dispatch( tool->target_layer_state_->export_to_string(), 
+//           tool->upper_threshold_state_->get(), tool->lower_threshold_state_->get(),
+//           tool->alpha_state_->get(), tool->replace_state_->get() ); 
 }
 
 } // end namespace Seg3D

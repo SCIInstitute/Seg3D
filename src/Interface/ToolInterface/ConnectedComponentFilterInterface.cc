@@ -36,7 +36,7 @@
 
 //Application Includes
 #include <Application/Tools/ConnectedComponentFilter.h>
-#include <Application/Filters/Actions/ActionConnectedComponent.h>
+//#include <Application/Filters/Actions/ActionConnectedComponent.h>
 
 namespace Seg3D
 {
@@ -106,7 +106,7 @@ void ConnectedComponentFilterInterface::execute_filter()
   ConnectedComponentFilter* tool =
   dynamic_cast< ConnectedComponentFilter* > ( base_tool_.get() );
   
-  ActionConnectedComponent::Dispatch( tool->target_layer_state_->export_to_string() ); 
+//  ActionConnectedComponent::Dispatch( tool->target_layer_state_->export_to_string() ); 
 }
   
 

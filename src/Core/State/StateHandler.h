@@ -41,7 +41,6 @@
 
 // State includes
 #include <Core/State/StateEngine.h>
-#include <Core/State/StateAlias.h>
 #include <Core/State/StateRangedValue.h>
 #include <Core/State/StateOption.h>
 #include <Core/State/StateValue.h>

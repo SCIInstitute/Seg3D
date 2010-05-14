@@ -71,6 +71,17 @@ void Action::add_cached_handle_ptr( ActionCachedHandleBase* handle )
   cached_handles_.push_back( handle );
 }
 
+void Action::clear_cache()
+{
+  cached_handle_vector_type::iterator it = cached_handles_.begin();
+  cached_handle_vector_type::iterator it_end = cached_handles_.end();
+  
+  while ( it != it_end )
+  {
+    (*it)->clear_cached_handle();
+  }
+}
+
 std::string Action::export_to_string() const
 {
   // Add action name to string

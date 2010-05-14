@@ -26,61 +26,70 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#include <Core/Interface/Interface.h>
 
 #include <Application/LayerManager/LayerManager.h>
-#include <Application/Filters/Actions/ActionBinaryDilateErode.h>
+#include <Application/Filters/Actions/ActionBinaryDilateErodeFilter.h>
 
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
-CORE_REGISTER_ACTION( Seg3D, BinaryDilateErode )
+CORE_REGISTER_ACTION( Seg3D, BinaryDilateErodeFilter )
 
 namespace Seg3D
 {
   
-bool ActionBinaryDilateErode::validate( Core::ActionContextHandle& context )
+bool ActionBinaryDilateErodeFilter::validate( Core::ActionContextHandle& context )
 {
-  if( !( Core::StateEngine::Instance()->is_statealias( this->layer_alias_ ) ) )
+  this->layer_.handle() = LayerManager::Instance()->get_layer_by_id( this->layer_id_.value() );
+  
+  if ( ! this->layer_.handle() )
   {
-    context->report_error( std::string( "LayerID '" ) + this->layer_alias_ + "' is invalid" );
+    context->report_error( std::string( "LayerID '" ) + this->layer_id_.value() + 
+      "' is invalid" );
     return false;
   }
-  if( this->dialate_ < 0 )
+
+  if( this->dilate_.value() < 0 )
   {
+    context->report_error( "Dilate radius cannot be negative. " );
     return false;
   }
-  if( this->erode_ < 0 )
+  if( this->erode_.value() < 0 )
   {
+    context->report_error( "Erode radius cannot be negative. " );
     return false;
   }
+  
   return true;
 }
 
-bool ActionBinaryDilateErode::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
+bool ActionBinaryDilateErodeFilter::run( Core::ActionContextHandle& context, 
+  Core::ActionResultHandle& result )
 {
-  if ( Core::StateEngine::Instance()->is_statealias( this->layer_alias_ ) )
-  {
-    // TODO: run filter
-    context->report_message( "The Binary Dilate Erode Filter has been triggered "
-      "successfully on layer: "  + this->layer_alias_ );
-    
-    return true;
-  }
-    
-  return false;
+  context->report_message( "The BinaryDilateErodeFilter has been triggered "
+    "successfully on layer: "  + this->layer_id_.value() );   
+
+  return true;
 }
 
 
-void ActionBinaryDilateErode::Dispatch( std::string layer_alias, int dialate, int erode, 
-  bool replace )
+Core::ActionHandle ActionBinaryDilateErodeFilter::Create( std::string layer_id, 
+  int dilate, int erode, bool replace )
 {
-  ActionBinaryDilateErode* action = new ActionBinaryDilateErode;
-  action->layer_alias_ = layer_alias;
-  action->dialate_ = dialate;
-  action->erode_ = erode;
-  action->replace_ = replace;
+  ActionBinaryDilateErodeFilter* action = new ActionBinaryDilateErodeFilter;
+  action->layer_id_.value() = layer_id;
+  action->dilate_.value() = dilate;
+  action->erode_.value() = erode;
+  action->replace_.value() = replace;
   
-  Core::Interface::PostAction( Core::ActionHandle( action ) );
+  return Core::ActionHandle( action );
+}
+
+void ActionBinaryDilateErodeFilter::Dispatch( std::string layer_id, int dilate, int erode, 
+  bool replace )
+{ 
+  Core::Interface::PostAction( Create( layer_id, dilate, erode, replace ) );
 }
   
 } // end namespace Seg3D

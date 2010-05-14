@@ -36,7 +36,7 @@
 
 //Application Includes
 #include <Application/Tools/AnisotropicDiffusionFilter.h>
-#include <Application/Filters/Actions/ActionAnisotropicDiffusion.h>
+//#include <Application/Filters/Actions/ActionAnisotropicDiffusion.h>
 
 namespace Seg3D
 {
@@ -153,9 +153,9 @@ void AnisotropicDiffusionFilterInterface::execute_filter()
   AnisotropicDiffusionFilter* tool =
     dynamic_cast< AnisotropicDiffusionFilter* > ( base_tool_.get() );
 
-  ActionAnisotropicDiffusion::Dispatch( tool->target_layer_state_->export_to_string(), 
-    tool->iterations_state_->get(), tool->steps_state_->get(),
-    tool->conductance_state_->get(), tool->replace_state_->get() ); 
+//  ActionAnisotropicDiffusion::Dispatch( tool->target_layer_state_->export_to_string(), 
+//    tool->iterations_state_->get(), tool->steps_state_->get(),
+//    tool->conductance_state_->get(), tool->replace_state_->get() ); 
 }
 
 

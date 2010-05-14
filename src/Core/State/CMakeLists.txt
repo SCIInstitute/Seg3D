@@ -32,8 +32,6 @@
 ##################################################
 
 SET(CORE_STATE_SRCS
-  StateAlias.h
-  StateAlias.cc
   StateBase.h
   StateEngine.h
   StateEngine.cc

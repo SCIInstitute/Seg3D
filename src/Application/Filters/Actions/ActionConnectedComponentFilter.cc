@@ -28,55 +28,49 @@
 
 
 #include <Application/LayerManager/LayerManager.h>
-#include <Application/Filters/Actions/ActionBoolean.h>
+#include <Application/Filters/Actions/ActionConnectedComponentFilter.h>
 
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
-CORE_REGISTER_ACTION( Seg3D, Boolean )
+CORE_REGISTER_ACTION( Seg3D, ConnectedComponentFilter )
 
 namespace Seg3D
 {
   
-bool ActionBoolean::validate( Core::ActionContextHandle& context )
+bool ActionConnectedComponentFilter::validate( Core::ActionContextHandle& context )
 {
-  if( !( Core::StateEngine::Instance()->is_statealias( this->mask_a_alias_ ) ) )
+  this->layer_.handle() = LayerManager::Instance()->get_layer_by_id( this->layer_id_.value() );
+
+  if ( ! this->layer_.handle() )
   {
-    context->report_error( std::string( "LayerID '" ) + this->mask_a_alias_ + "' is invalid" );
+    context->report_error( std::string( "LayerID '" ) + this->layer_id_.value() +
+      std::string( "' is not valid." ) );
     return false;
   }
   
   return true;
 }
 
-bool ActionBoolean::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
+bool ActionConnectedComponentFilter::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
-  if ( Core::StateEngine::Instance()->is_statealias( this->mask_a_alias_ ) )
-  {
-    // TODO: run filter
-    context->report_message( "The Arithmetic Filter has been triggered "
-      "successfully on layers: "  + this->mask_a_alias_ + ", " + this->mask_b_alias_
-      + ", " + this->mask_c_alias_ + ", and " + this->mask_d_alias_ );
-    
-    return true;
-  }
-    
-  return false;
+  // TODO: run filter
+  context->report_message( std::string( "The ActionConnectedComponentFilter has been triggered "
+    "successfully on layer: " ) + this->layer_.handle()->name_state_->get() );
+  return true;
 }
 
-
-void ActionBoolean::Dispatch( std::string mask_a_alias, std::string mask_b_alias, 
-  std::string mask_c_alias, std::string mask_d_alias, std::string expression, bool replace )
+Core::ActionHandle ActionConnectedComponentFilter::Create( std::string layer_id )
 {
-  ActionBoolean* action = new ActionBoolean;
-  action->mask_a_alias_ = mask_a_alias;
-  action->mask_b_alias_ = mask_b_alias;
-  action->mask_c_alias_ = mask_c_alias;
-  action->mask_d_alias_ = mask_d_alias;
-  action->expression_ = expression;
-  action->replace_ = replace;
+  ActionConnectedComponentFilter* action = new ActionConnectedComponentFilter;
+  action->layer_id_.value() = layer_id;
   
-  Core::Interface::PostAction( Core::ActionHandle( action ) );
+  return Core::ActionHandle( action );
+}
+
+void ActionConnectedComponentFilter::Dispatch( std::string layer_id )
+{
+  Core::Interface::PostAction( Create( layer_id ) );
 }
   
 } // end namespace Seg3D

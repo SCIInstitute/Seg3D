@@ -72,25 +72,8 @@ bool StateEngine::get_state( const std::string& state_id, StateBaseHandle& state
 {
   lock_type lock( get_mutex() );
 
-  state_map_type::const_iterator it;
-  if ( state_id.size() > 0 && state_id[ 0 ] == '$' )
-  {
-    // This name is an alias
-    std::string state_alias = state_id.substr( 1 );
-    // Find the name in the alias list
-    if ( statealias_list_.find( state_alias ) == statealias_list_.end() )
-    {
-      state.reset();
-      return ( false );
-    }
-
-    // fill in the proper state id
-    it = state_map_.find( statealias_list_[ state_alias ] );
-  }
-  else
-  {
-    it = state_map_.find( state_id );
-  }
+  state_map_type::const_iterator it = state_map_.find( state_id );
+  
   if ( it == state_map_.end() )
   {
     // make the handle invalid
@@ -108,20 +91,6 @@ void StateEngine::remove_state( const std::string& remove_state_id )
 
   // ensure that we can change it
   std::string state_id = remove_state_id;
-
-  if ( state_id.size() > 0 && state_id[ 0 ] == '$' )
-  {
-    // This name is an alias
-    std::string state_alias = state_id.substr( 1 );
-    // Find the name in the alias list
-    if ( statealias_list_.find( state_alias ) == statealias_list_.end() )
-    {
-      return;
-    }
-
-    // fill in the proper state id
-    state_id = statealias_list_[ state_alias ];
-  }
 
   state_list_type::iterator it = state_list_.begin();
   state_list_type::iterator it_end = state_list_.end();
@@ -235,70 +204,6 @@ std::string StateEngine::create_stateid( std::string baseid )
   while ( stateid_list_.find( new_stateid ) != stateid_list_.end() );
 
   return new_stateid;
-}
-
-
-void StateEngine::add_statealias( const std::string& statealias, const std::string& stateid )
-{
-  lock_type lock( get_mutex() );
-  if ( statealias_list_.find( statealias ) != statealias_list_.end() )
-  {
-    CORE_THROW_LOGICERROR( std::string("Trying to add statealias '") +
-      statealias + std::string("' that already exists") );
-  }
-  statealias_list_[ statealias ] = stateid;
-}
-
-void StateEngine::remove_statealias( const std::string& statealias )
-{
-  lock_type lock( get_mutex() );
-  statealias_list_.erase( statealias );
-}
-
-bool StateEngine::is_statealias( const std::string& statealias )
-{
-  lock_type lock( get_mutex() );
-  return ( statealias_list_.find( statealias ) != statealias_list_.end() );
-}
-
-std::string StateEngine::create_statealias( std::string basealias )
-{
-  // Check
-  std::string::size_type loc = basealias.find_last_of( '_' );
-  if ( loc != std::string::npos )
-  {
-    // there is an under score in the name
-    // check whether the last part is a name
-    bool is_number = true;
-    if ( loc == basealias.size()-1 ) is_number = false;
-  
-    for ( std::string::size_type j = loc + 1; j < basealias.size(); j++ )
-    {
-      if ( basealias[j] < '0' || basealias[j] > '9' ) is_number = false;
-    }
-    
-    if ( is_number ) basealias = basealias.substr( 0, loc );
-  }
-
-  lock_type lock( get_mutex() );
-  
-  int number = 1;
-  std::string new_statealias;
-  
-  new_statealias = basealias;
-  if ( statealias_list_.find( new_statealias ) == statealias_list_.end() )
-  {
-    return new_statealias;
-  }
-  
-  do
-  {
-    new_statealias = basealias + std::string( "_" ) + ExportToString( number );
-    number++;
-  }
-  while ( statealias_list_.find( new_statealias ) != statealias_list_.end() );
-
-  return new_statealias;
 }
 
 } // end namespace Core

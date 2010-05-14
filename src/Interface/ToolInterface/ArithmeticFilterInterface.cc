@@ -36,7 +36,7 @@
 
 //Application Includes
 #include <Application/Tools/ArithmeticFilter.h>
-#include <Application/Filters/Actions/ActionArithmetic.h>
+//#include <Application/Filters/Actions/ActionArithmetic.h>
 
 namespace Seg3D
 {
@@ -69,17 +69,17 @@ bool ArithmeticFilterInterface::build_widget( QFrame* frame )
   //Step 1 - build the Qt GUI Widget
   this->private_->ui_.setupUi( frame );
   
-    this->private_->volume_a_ = new TargetComboBox( this );
-    this->private_->volume_a_->setMinimumHeight( 26 );
-    this->private_->ui_.volumeALayout->addWidget( this->private_->volume_a_ );
-    
-    this->private_->volume_b_ = new TargetComboBox( this );
-    this->private_->volume_b_->setMinimumHeight( 26 );
-    this->private_->ui_.volumeBLayout->addWidget( this->private_->volume_b_ );
+  this->private_->volume_a_ = new TargetComboBox( this );
+  this->private_->volume_a_->setMinimumHeight( 26 );
+  this->private_->ui_.volumeALayout->addWidget( this->private_->volume_a_ );
   
-    this->private_->volume_c_ = new TargetComboBox( this );
-    this->private_->volume_c_->setMinimumHeight( 26 );
-    this->private_->ui_.volumeCLayout->addWidget( this->private_->volume_c_ );
+  this->private_->volume_b_ = new TargetComboBox( this );
+  this->private_->volume_b_->setMinimumHeight( 26 );
+  this->private_->ui_.volumeBLayout->addWidget( this->private_->volume_b_ );
+
+  this->private_->volume_c_ = new TargetComboBox( this );
+  this->private_->volume_c_->setMinimumHeight( 26 );
+  this->private_->ui_.volumeCLayout->addWidget( this->private_->volume_c_ );
 
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
@@ -120,9 +120,9 @@ void ArithmeticFilterInterface::execute_filter()
   ArithmeticFilter* tool =
     dynamic_cast< ArithmeticFilter* > ( base_tool_.get() );
 
-  ActionArithmetic::Dispatch( tool->volume_a_state_->export_to_string(), 
-    tool->volume_b_state_->export_to_string(), tool->volume_c_state_->export_to_string(),
-    tool->example_expressions_state_->get(), tool->replace_state_->get() ); 
+//  ActionArithmetic::Dispatch( tool->volume_a_state_->export_to_string(), 
+//    tool->volume_b_state_->export_to_string(), tool->volume_c_state_->export_to_string(),
+//    tool->example_expressions_state_->get(), tool->replace_state_->get() ); 
 }
 
 } //end seg3d

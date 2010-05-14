@@ -120,6 +120,18 @@ public:
     add_argument_ptr( &argument );
   }
 
+  // ADD_ARGUMENT (WITH DEFAULT VALUE):
+  // A argument to the action needs to be registered with the base
+  // class so we can import and export the arguments to a string.
+  // This function links the arguments of the action to an internal
+  // record of all the arguments
+  template< class ARGUMENT, class T >
+  void add_argument( ARGUMENT& argument, const T& default_value )
+  {
+    argument.value() = default_value;
+    add_argument_ptr( &argument );
+  }
+
   // ADD_PARAMETER:
   // A parameter needs to be registered with the base class
   // so we can import and export the parameters to a string.
@@ -128,6 +140,18 @@ public:
   template< class PARAMETER >
   void add_parameter( const std::string& key, PARAMETER& param )
   {
+    add_parameter_ptr( key, &param );
+  }
+
+  // ADD_PARAMETER (WITH DEFAULT VALUE):
+  // A parameter needs to be registered with the base class
+  // so we can import and export the parameters to a string.
+  // This function links the parameters of the action to an internal
+  // key value pair system to records all the parameters
+  template< class PARAMETER, class T >
+  void add_parameter( const std::string& key, PARAMETER& param, const T& default_value )
+  {
+    param.value() = default_value;
     add_parameter_ptr( key, &param );
   }
 

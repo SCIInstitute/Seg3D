@@ -38,7 +38,7 @@
 //Application Includes
 #include <Application/Layer/DataLayer.h>
 #include <Application/Tools/ThresholdTool.h>
-#include <Application/Filters/Actions/ActionThreshold.h>
+//#include <Application/Filters/Actions/ActionThreshold.h>
 #include <Application/LayerManager/LayerManager.h>
 
 namespace Seg3D
@@ -74,19 +74,19 @@ bool ThresholdToolInterface::build_widget( QFrame* frame )
   //Step 1 - build the Qt GUI Widget
   this->private_->ui_.setupUi( frame );
 
-    // Add the SliderSpinner Combos
-    this->private_->upper_threshold_ = new SliderDoubleCombo();
-    this->private_->ui_.verticalLayout_2->addWidget( this->private_->upper_threshold_ );
+  // Add the SliderSpinner Combos
+  this->private_->upper_threshold_ = new SliderDoubleCombo();
+  this->private_->ui_.verticalLayout_2->addWidget( this->private_->upper_threshold_ );
 
-    this->private_->lower_threshold_ = new SliderDoubleCombo();
-    this->private_->ui_.verticalLayout_3->addWidget( this->private_->lower_threshold_ );
-    
-    // add the TargetComboBox
-    this->private_->target_ = new TargetComboBox( this );
-    this->private_->ui_.activeHLayout->addWidget( this->private_->target_ );
-    
-    this->private_->histogram_ = new HistogramWidget( this );
-    this->private_->ui_.histogramHLayout->addWidget( this->private_->histogram_ );
+  this->private_->lower_threshold_ = new SliderDoubleCombo();
+  this->private_->ui_.verticalLayout_3->addWidget( this->private_->lower_threshold_ );
+  
+  // add the TargetComboBox
+  this->private_->target_ = new TargetComboBox( this );
+  this->private_->ui_.activeHLayout->addWidget( this->private_->target_ );
+  
+  this->private_->histogram_ = new HistogramWidget( this );
+  this->private_->ui_.histogramHLayout->addWidget( this->private_->histogram_ );
 
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
@@ -94,25 +94,25 @@ bool ThresholdToolInterface::build_widget( QFrame* frame )
   
   //Step 3 - set the values for the tool ui from the state engine
       
-     // set the defaults for the upper threshold
-        double upper_threshold_min = 0.0; 
-      double upper_threshold_max = 0.0;
-      double upper_threshold_step = 0.0;
-      tool->upper_threshold_state_->get_step( upper_threshold_step );
-      tool->upper_threshold_state_->get_range( upper_threshold_min, upper_threshold_max );
-      this->private_->upper_threshold_->setStep( upper_threshold_step );
-        this->private_->upper_threshold_->setRange( upper_threshold_min, upper_threshold_max );
-        this->private_->upper_threshold_->setCurrentValue( tool->upper_threshold_state_->get() );
-        
-        // set the defaults for the lower threshold
-        double lower_threshold_min = 0.0; 
-      double lower_threshold_max = 0.0;
-      double lower_threshold_step = 0.0;
-      tool->lower_threshold_state_->get_step( lower_threshold_step );
-      tool->lower_threshold_state_->get_range( lower_threshold_min, lower_threshold_max );
-      this->private_->lower_threshold_->setStep( lower_threshold_step );
-        this->private_->lower_threshold_->setRange( lower_threshold_min, lower_threshold_max );
-        this->private_->lower_threshold_->setCurrentValue( tool->lower_threshold_state_->get() );
+  // set the defaults for the upper threshold
+  double upper_threshold_min = 0.0; 
+  double upper_threshold_max = 0.0;
+  double upper_threshold_step = 0.0;
+  tool->upper_threshold_state_->get_step( upper_threshold_step );
+  tool->upper_threshold_state_->get_range( upper_threshold_min, upper_threshold_max );
+  this->private_->upper_threshold_->setStep( upper_threshold_step );
+  this->private_->upper_threshold_->setRange( upper_threshold_min, upper_threshold_max );
+  this->private_->upper_threshold_->setCurrentValue( tool->upper_threshold_state_->get() );
+  
+  // set the defaults for the lower threshold
+  double lower_threshold_min = 0.0; 
+  double lower_threshold_max = 0.0;
+  double lower_threshold_step = 0.0;
+  tool->lower_threshold_state_->get_step( lower_threshold_step );
+  tool->lower_threshold_state_->get_range( lower_threshold_min, lower_threshold_max );
+  this->private_->lower_threshold_->setStep( lower_threshold_step );
+  this->private_->lower_threshold_->setRange( lower_threshold_min, lower_threshold_max );
+  this->private_->lower_threshold_->setCurrentValue( tool->lower_threshold_state_->get() );
 
 
   //Step 4 - connect the gui to the tool through the QtBridge
@@ -162,8 +162,8 @@ void ThresholdToolInterface::execute_filter()
   ThresholdTool* tool =
   dynamic_cast< ThresholdTool* > ( base_tool_.get() );
   
-  ActionThreshold::Dispatch( tool->target_layer_state_->export_to_string(), 
-    tool->upper_threshold_state_->get(), tool->lower_threshold_state_->get() ); 
+//  ActionThreshold::Dispatch( tool->target_layer_state_->export_to_string(), 
+//    tool->upper_threshold_state_->get(), tool->lower_threshold_state_->get() ); 
 }
 
 } // end namespace Seg3D

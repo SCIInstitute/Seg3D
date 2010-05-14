@@ -95,7 +95,7 @@ public:
 public:
   
   // The name of the layer
-  Core::StateAliasHandle name_state_;
+  Core::StateStringHandle name_state_;
 
   // Per viewer state of whether this layer is visible
   std::vector< Core::StateBoolHandle > visible_state_;
@@ -119,42 +119,31 @@ public:
   // State that describes which border mode is active
   Core::StateOptionHandle border_mode_state_;
 
-  // -- Locking system --
+  // -- Accessors --
 public:
-  // This code just aligns the layer locking with the StateEngine locking
-  typedef Core::StateEngine::mutex_type mutex_type;
-  typedef Core::StateEngine::lock_type lock_type;
 
+  // GET_LAYER_GROUP:
+  // Get a handle to the group this layer belongs to
+  LayerGroupHandle get_layer_group();
+  
+  // SET_LAYER_GROUP:
+  // Set the group this layer is contained within
+  void set_layer_group( LayerGroupWeakHandle layer_group );
+  
+  // TODO: Need to check whether we really need to store whether layer is active here,
+  // as it duplicates state information and allows for synchronization problems
+  // --JS
+  
+  bool get_active();
+  void set_active( bool active );
+  
+  // GET_LAYER_ID:
+  // Get the id of this layer
+  std::string get_layer_id() const;
 
-  LayerGroupHandle get_layer_group() 
-  { 
-    return layer_group_.lock(); 
-  }
-  
-  inline void set_layer_group( LayerGroupWeakHandle layer_group )
-  {
-    layer_group_ = layer_group;
-  }
-  
-  std::string get_layer_id() const
-  {
-    return stateid();
-  }
-  
-  bool get_active()
-  {
-    return active_;
-  }
-  
-  void set_active( bool active )
-  {
-    active_ = active;
-  }
-  
-  std::string get_layer_name()
-  {
-    return this->name_state_->get();
-  }
+  // GET_LAYER_NAME:
+  // Get the name of the layer
+  std::string get_layer_name() const;
   
 private:  
   // The unique ID of the layer
@@ -162,13 +151,15 @@ private:
   LayerGroupWeakHandle layer_group_;
   bool active_;
 
-  // GETMUTEX
+  // -- Locking system --
 public:
+  // This code just aligns the layer locking with the StateEngine locking
+  typedef Core::StateEngine::mutex_type mutex_type;
+  typedef Core::StateEngine::lock_type lock_type;
+  
+  // GETMUTEX:
   // Get the mutex of the state engine
-  static mutex_type& GetMutex()
-  {
-    return Core::StateEngine::GetMutex();
-  }
+  static mutex_type& GetMutex();
   
 };
 

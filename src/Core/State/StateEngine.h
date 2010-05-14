@@ -110,26 +110,6 @@ public:
   // the end
   std::string create_stateid( std::string basename );
 
-  // -- Interface for accounting statealias --
-public:
-
-  // ADD_STATEALIAS:
-  // Add a new alias to the list
-  void add_statealias( const std::string& statealias, const std::string& stateid );
-
-  // REMOVE_STATEALIAS:
-  // Remove an alias from the list
-  void remove_statealias( const std::string& statealias );
-
-  // IS_STATEALIAS:
-  // Check whether an alias exists
-  bool is_statealias( const std::string& statealias );
-
-  // CREATE_STATEALIAS:
-  // Create a new alias based on basename but with an unique extension padded to
-  // the end
-  std::string create_statealias( std::string basename );
-
   // -- Signals --
 public:
   typedef boost::signals2::signal<void ()> state_changed_signal_type;
@@ -153,9 +133,6 @@ private:
   // The list of IDs that are in use
   stateid_list_type stateid_list_;
 
-  // Aliases that are associated with the list
-  statealias_map_type statealias_list_;
-
   // -- Static convenience functions --
 
 public:
@@ -174,12 +151,6 @@ public:
     return Instance()->create_stateid( baseid );
   }
 
-  // CREATESTATEALIAS
-  // Create an unique stateid from a basealias
-  static std::string CreateStateAlias(const std::string& basealias )
-  {
-    return Instance()->create_statealias( basealias );
-  } 
 };
 
 } // end namespace Core

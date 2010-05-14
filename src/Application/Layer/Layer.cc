@@ -82,5 +82,40 @@ Layer::~Layer()
   disconnect_all();
 }
 
+LayerGroupHandle Layer::get_layer_group() 
+{ 
+  return layer_group_.lock(); 
+}
+  
+void Layer::set_layer_group( LayerGroupWeakHandle layer_group )
+{
+  layer_group_ = layer_group;
+}
+    
+bool Layer::get_active()
+{
+  return active_;
+}
+  
+void Layer::set_active( bool active )
+{
+  active_ = active;
+}
+
+std::string Layer::get_layer_id() const
+{
+  return stateid();
+}
+  
+std::string Layer::get_layer_name() const
+{
+  return this->name_state_->get();
+}
+
+Layer::mutex_type& Layer::GetMutex()
+{
+  return Core::StateEngine::GetMutex();
+}
+
 } // end namespace Seg3D
 

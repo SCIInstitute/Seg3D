@@ -36,7 +36,6 @@
 // This include file includes all the State variable combinations
 
 // The various state variables
-#include <Core/State/StateAlias.h>
 #include <Core/State/StateRangedValue.h>
 #include <Core/State/StateOption.h>
 #include <Core/State/StateValue.h>

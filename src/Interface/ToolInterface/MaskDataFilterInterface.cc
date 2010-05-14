@@ -37,7 +37,7 @@
 
 //Application Includes
 #include <Application/Tools/MaskDataFilter.h>
-#include <Application/Filters/Actions/ActionMaskData.h>
+//#include <Application/Filters/Actions/ActionMaskData.h>
 
 namespace Seg3D
 {
@@ -69,12 +69,12 @@ bool MaskDataFilterInterface::build_widget( QFrame* frame )
   //Step 1 - build the Qt GUI Widget
   this->private_->ui_.setupUi( frame );
   
-    // Add the combo boxes
-    this->private_->target_ = new TargetComboBox( this );
-    this->private_->ui_.targetHLayout->addWidget( this->private_->target_ );
-      
-    this->private_->mask_ = new MaskComboBox( this );
-    this->private_->ui_.maskHLayout->addWidget( this->private_->mask_ );
+  // Add the combo boxes
+  this->private_->target_ = new TargetComboBox( this );
+  this->private_->ui_.targetHLayout->addWidget( this->private_->target_ );
+    
+  this->private_->mask_ = new MaskComboBox( this );
+  this->private_->ui_.maskHLayout->addWidget( this->private_->mask_ );
 
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
@@ -82,17 +82,17 @@ bool MaskDataFilterInterface::build_widget( QFrame* frame )
   
   //Step 3 - set the values for the tool ui from the state engine
       
-        //set default falues for the replace with option list
-    
-    std::vector< std::string >temp_option_list = tool->replace_with_state_->option_list();
-      for( size_t i = 0; i < temp_option_list.size(); i++)
-      {   
-          this->private_->ui_.replaceComboBox->addItem( QString::fromStdString( temp_option_list[i] ) );
-      } 
-        this->private_->ui_.replaceComboBox->setCurrentIndex(tool->replace_with_state_->index());
-        
-        // set the default for the replace state
-        this->private_->ui_.replaceCheckBox->setChecked( tool->replace_state_->get() );
+  //set default falues for the replace with option list
+  
+  std::vector< std::string >temp_option_list = tool->replace_with_state_->option_list();
+  for( size_t i = 0; i < temp_option_list.size(); i++)
+  {   
+    this->private_->ui_.replaceComboBox->addItem( QString::fromStdString( temp_option_list[i] ) );
+  } 
+  this->private_->ui_.replaceComboBox->setCurrentIndex(tool->replace_with_state_->index());
+  
+  // set the default for the replace state
+  this->private_->ui_.replaceCheckBox->setChecked( tool->replace_state_->get() );
   
     
   //Step 4 - connect the gui to the tool through the QtBridge
@@ -126,9 +126,9 @@ void MaskDataFilterInterface::execute_filter()
   MaskDataFilter* tool =
   dynamic_cast< MaskDataFilter* > ( base_tool_.get() );
   
-  ActionMaskData::Dispatch( tool->target_layer_state_->export_to_string(), 
-    tool->mask_layer_state_->export_to_string(), tool->replace_with_state_->get(),
-    tool->replace_state_->get() ); 
+//  ActionMaskData::Dispatch( tool->target_layer_state_->export_to_string(), 
+//    tool->mask_layer_state_->export_to_string(), tool->replace_with_state_->get(),
+//    tool->replace_state_->get() ); 
 }
 
 } // end namespace Seg3D

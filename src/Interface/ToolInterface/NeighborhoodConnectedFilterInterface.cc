@@ -36,7 +36,7 @@
 
 //Application Includes
 #include <Application/Tools/NeighborhoodConnectedFilter.h>
-#include <Application/Filters/Actions/ActionNeighborhoodConnected.h>
+//#include <Application/Filters/Actions/ActionNeighborhoodConnected.h>
 
 namespace Seg3D
 {
@@ -107,7 +107,7 @@ void NeighborhoodConnectedFilterInterface::execute_filter()
   NeighborhoodConnectedFilter* tool =
   dynamic_cast< NeighborhoodConnectedFilter* > ( base_tool_.get() );
   
-  ActionNeighborhoodConnected::Dispatch( tool->target_layer_state_->export_to_string() ); 
+//  ActionNeighborhoodConnected::Dispatch( tool->target_layer_state_->export_to_string() ); 
 }
 
 } // namespace Seg3D

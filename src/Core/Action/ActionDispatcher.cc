@@ -141,6 +141,9 @@ void ActionDispatcher::run_action( ActionHandle action, ActionContextHandle acti
       action_context->report_status( ActionStatus::INVALID_E );
     }
     action_context->report_done();
+
+    // Clear any cached handles
+    action->clear_cache();
     return;
   }
 
@@ -160,6 +163,9 @@ void ActionDispatcher::run_action( ActionHandle action, ActionContextHandle acti
     action_context->report_status( ActionStatus::ERROR_E );
     action_context->report_done();
     // actions that fail, are aborted here
+
+    // Clear any cached handles
+    action->clear_cache();
     return;
   }
 
@@ -169,8 +175,12 @@ void ActionDispatcher::run_action( ActionHandle action, ActionContextHandle acti
   {
     action_context->report_result( result );
   }
+  
   action_context->report_status( ActionStatus::SUCCESS_E );
   action_context->report_done();
+
+  // Clear any cached handles
+  action->clear_cache();
 
   // NOTE: Observers that connect to this signal should not change the state of
   // the program as that may invalidate actions that were just run.

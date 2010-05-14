@@ -36,7 +36,7 @@
 
 //Application Includes
 #include <Application/Tools/ConfidenceConnectedFilter.h>
-#include <Application/Filters/Actions/ActionConfidenceConnected.h>
+//#include <Application/Filters/Actions/ActionConfidenceConnected.h>
 
 namespace Seg3D
 {
@@ -138,8 +138,8 @@ void ConfidenceConnectedFilterInterface::execute_filter()
   ConfidenceConnectedFilter* tool =
   dynamic_cast< ConfidenceConnectedFilter* > ( base_tool_.get() );
   
-  ActionConfidenceConnected::Dispatch( tool->target_layer_state_->export_to_string(), 
-            tool->iterations_state_->get(), tool->threshold_multiplier_state_->get() ); 
+//  ActionConfidenceConnected::Dispatch( tool->target_layer_state_->export_to_string(), 
+//            tool->iterations_state_->get(), tool->threshold_multiplier_state_->get() ); 
 }
 
 

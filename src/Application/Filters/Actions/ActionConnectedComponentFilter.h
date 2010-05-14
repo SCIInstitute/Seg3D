@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_TOOL_ACTIONS_ACTIONCONFIDENCECONNECTED_H
-#define APPLICATION_TOOL_ACTIONS_ACTIONCONFIDENCECONNECTED_H
+#ifndef APPLICATION_TOOL_ACTIONS_ACTIONCONNECTEDCOMPONENTFILTER_H
+#define APPLICATION_TOOL_ACTIONS_ACTIONCONNECTEDCOMPONENTFILTER_H
 
 #include <Core/Action/Actions.h>
 #include <Core/Interface/Interface.h>
@@ -36,17 +36,18 @@
 namespace Seg3D
 {
   
-class ActionConfidenceConnected : public Core::Action
+class ActionConnectedComponentFilter : public Core::Action
 {
-CORE_ACTION( "ConfidenceConnected", "Run Confidence Connected Filter on: <name>" );
-  
+CORE_ACTION( "ConnectedComponentFilter", 
+  "ConnectedComponentFilter <layerid> <seedpoints>" );
+    
   // -- Constructor/Destructor --
 public:
-  ActionConfidenceConnected()
+  ActionConnectedComponentFilter()
   {
   }
   
-  virtual ~ActionConfidenceConnected()
+  virtual ~ActionConnectedComponentFilter()
   {
   }
   
@@ -58,16 +59,20 @@ public:
   // -- Action parameters --
 private:
   // Layer_handle that is requested
-  std::string layer_alias_;
-  int iterations_;
-  int multiplier_;
-  
+  Core::ActionParameter< std::string > layer_id_;
+
+  Core::ActionCachedHandle< LayerHandle > layer_;
+    
   // -- Dispatch this action from the interface --
 public:
-    
-  // DISPATCH
+
+  // CREATE:  
+  // Create the action, but do not dispatch it
+  static Core::ActionHandle Create( std::string layer_id );
+      
+  // DISPATCH:
   // Create and dispatch action that inserts the new layer 
-  static void Dispatch( std::string layer_alias, int iterations, int multiplier );
+  static void Dispatch( std::string layer_id );
   
 };
   

@@ -42,7 +42,6 @@
 #include <Core/State/StateOption.h>
 #include <Core/State/StateVector.h>
 #include <Core/State/StateRangedValue.h>
-#include <Core/State/StateAlias.h>
 
 namespace Seg3D
 {
@@ -91,8 +90,6 @@ public:
   // Coonect QLineEdits
   static bool Connect( QLineEdit* qlineedit, Core::StateStringHandle& state_handle );
   
-  static bool Connect( QLineEdit* qlineedit, Core::StateAliasHandle& state_handle );
-
   // Connect QActionGroup and StateOption
   // NOTE: This requires that each QAction in the QActionGroup has its objectName
   // the same as its corresponding option string

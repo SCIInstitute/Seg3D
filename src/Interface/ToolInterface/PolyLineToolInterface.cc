@@ -37,7 +37,7 @@
 
 //Application Includes
 #include <Application/Tools/PolylineTool.h>
-#include <Application/Filters/Actions/ActionPolyline.h>
+//#include <Application/Filters/Actions/ActionPolyline.h>
 
 namespace Seg3D
 {
@@ -98,7 +98,7 @@ void PolylineToolInterface::execute_filter()
   PolylineTool* tool =
   dynamic_cast< PolylineTool* > ( base_tool_.get() );
   
-  ActionPolyline::Dispatch( tool->target_layer_state_->export_to_string() ); 
+//  ActionPolyline::Dispatch( tool->target_layer_state_->export_to_string() ); 
 }
   
 } // end namespace Seg3D

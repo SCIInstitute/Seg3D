@@ -36,7 +36,7 @@
 
 //Application Includes
 #include <Application/Tools/FillHolesFilter.h>
-#include <Application/Filters/Actions/ActionFillHoles.h>
+//#include <Application/Filters/Actions/ActionFillHoles.h>
 
 namespace Seg3D
 {
@@ -107,7 +107,7 @@ void FillHolesFilterInterface::execute_filter()
   FillHolesFilter* tool =
   dynamic_cast< FillHolesFilter* > ( base_tool_.get() );
   
-  ActionFillHoles::Dispatch( tool->target_layer_state_->export_to_string() ); 
+//  ActionFillHoles::Dispatch( tool->target_layer_state_->export_to_string() ); 
 }
 
 } // end namespace Seg3D

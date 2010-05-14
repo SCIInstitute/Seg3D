@@ -36,7 +36,7 @@
 
 //Application Includes
 #include <Application/Tools/InvertTool.h>
-#include <Application/Filters/Actions/ActionInvert.h>
+//#include <Application/Filters/Actions/ActionInvert.h>
 
 namespace Seg3D
 {
@@ -110,8 +110,8 @@ bool InvertToolInterface::build_widget( QFrame* frame )
     InvertTool* tool =
     dynamic_cast< InvertTool* > ( base_tool_.get() );
     
-    ActionInvert::Dispatch( tool->target_layer_state_->export_to_string(), 
-                      tool->replace_state_->get() ); 
+//    ActionInvert::Dispatch( tool->target_layer_state_->export_to_string(), 
+//                      tool->replace_state_->get() ); 
   }
 
 } // end namespace Seg3D

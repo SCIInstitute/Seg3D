@@ -37,7 +37,7 @@
 
 //Application Includes
 #include <Application/Tools/PaintTool.h>
-#include <Application/Filters/Actions/ActionPaint.h>
+//#include <Application/Filters/Actions/ActionPaint.h>
 
 namespace Seg3D
 {
@@ -155,10 +155,10 @@ void PaintToolInterface::execute_filter()
   PaintTool* tool =
   dynamic_cast< PaintTool* > ( base_tool_.get() );
   
-  ActionPaint::Dispatch( tool->target_layer_state_->export_to_string(), 
-    tool->mask_layer_state_->export_to_string(), tool->brush_radius_state_->get(), 
-    tool->upper_threshold_state_->get(), tool->lower_threshold_state_->get(),
-    tool->erase_state_->get() ); 
+//  ActionPaint::Dispatch( tool->target_layer_state_->export_to_string(), 
+//    tool->mask_layer_state_->export_to_string(), tool->brush_radius_state_->get(), 
+//    tool->upper_threshold_state_->get(), tool->lower_threshold_state_->get(),
+//    tool->erase_state_->get() ); 
 }
 
 } // end namespace Seg3D

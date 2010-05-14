@@ -26,27 +26,34 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_TOOL_ACTIONS_ACTIONANISOTROPICDIFFUSION_H
-#define APPLICATION_TOOL_ACTIONS_ACTIONANISOTROPICDIFFUSION_H
+#ifndef APPLICATION_TOOL_ACTIONS_ACTIONBINARYDILATEERODEFILTER_H
+#define APPLICATION_TOOL_ACTIONS_ACTIONBINARYDILATEERODEFILTER_H
 
 #include <Core/Action/Actions.h>
-#include <Core/Interface/Interface.h>
 #include <Application/Layer/Layer.h>
 
 namespace Seg3D
 {
   
-class ActionAnisotropicDiffusion : public Core::Action
+class ActionBinaryDilateErodeFilter : public Core::Action
 {
-CORE_ACTION( "AnisotropicDiffusion", "Run Anisotropic Diffusion Filter on: <name>" );
+CORE_ACTION( "BinaryDialateErodeFilter", 
+  "BinaryDialateErodeFilter <layerid> [dilate={0}] [erode={0}] [replace={true}]" );
   
   // -- Constructor/Destructor --
 public:
-  ActionAnisotropicDiffusion()
+  ActionBinaryDilateErodeFilter()
   {
+    add_argument( layer_id_ );
+    
+    add_parameter( "dilate", dilate_, 0 );
+    add_parameter( "erode", erode_, 0 );
+    add_parameter( "replace", replace_, true );
+    
+    add_cachedhandle( layer_ );
   }
   
-  virtual ~ActionAnisotropicDiffusion()
+  virtual ~ActionBinaryDilateErodeFilter()
   {
   }
   
@@ -57,21 +64,23 @@ public:
   
   // -- Action parameters --
 private:
-  // Layer_handle that is requested
-  std::string layer_alias_;
-  int iterations_;
-  int integration_step_;
-  double conductance_;
-  bool replace_;
+  Core::ActionParameter< std::string > layer_id_;
+  Core::ActionParameter< int > dilate_;
+  Core::ActionParameter< int > erode_;
+  Core::ActionParameter< bool > replace_;
   
-  
+  Core::ActionCachedHandle< LayerHandle > layer_;
+
   // -- Dispatch this action from the interface --
 public:
-    
-  // DISPATCH
-  // Create and dispatch action that inserts the new layer 
-  static void Dispatch( std::string layer_alias, int iterations, int integration_step, 
-             double conductance, bool replace );
+
+  // CREATE:
+  // Create the action, but do not post it.
+  static Core::ActionHandle Create( std::string layer_id, int dilate, int erode, bool replace );
+      
+  // DISPATCH:
+  // Create and dispatch action.
+  static void Dispatch( std::string layer_id, int dilate, int erode, bool replace );
   
 };
   

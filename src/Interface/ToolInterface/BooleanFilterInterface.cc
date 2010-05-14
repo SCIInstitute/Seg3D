@@ -36,7 +36,7 @@
 
 //Application Includes
 #include <Application/Tools/BooleanFilter.h>
-#include <Application/Filters/Actions/ActionBoolean.h>
+//#include <Application/Filters/Actions/ActionBoolean.h>
 
 namespace Seg3D
 {
@@ -143,10 +143,10 @@ void BooleanFilterInterface::execute_filter()
   BooleanFilter* tool =
     dynamic_cast< BooleanFilter* > ( base_tool_.get() );
 
-  ActionBoolean::Dispatch( tool->mask_a_state_->export_to_string(), 
-    tool->mask_b_state_->export_to_string(), tool->mask_c_state_->export_to_string(),
-    tool->mask_d_state_->export_to_string(), tool->example_expressions_state_->get(), 
-    tool->replace_state_->get() ); 
+//  ActionBoolean::Dispatch( tool->mask_a_state_->export_to_string(), 
+//    tool->mask_b_state_->export_to_string(), tool->mask_c_state_->export_to_string(),
+//    tool->mask_d_state_->export_to_string(), tool->example_expressions_state_->get(), 
+//    tool->replace_state_->get() ); 
 }
 
 

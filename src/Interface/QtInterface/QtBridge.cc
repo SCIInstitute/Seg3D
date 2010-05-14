@@ -119,22 +119,6 @@ bool QtBridge::Connect( QLineEdit* qlineedit, Core::StateStringHandle& state_han
 }
 // -- END CONNECT FUNCTION -- //
 
-// -- BEGIN CONNECT FUNCTION FOR CONNECTING QLineEdit's TO StateAliasHandle's -- //
-bool QtBridge::Connect( QLineEdit* qlineedit, Core::StateAliasHandle& state_handle )
-{
-  // Connect the dispatch into the StateVariable (with auxiliary object)
-  // Link the slot to the parent widget, so Qt's memory manager will
-  // manage this one.
-  new QtLineEditAliasSlot( qlineedit, state_handle );
-  QPointer< QLineEdit > qpointer( qlineedit );
-
-  // Connect the state signal back into the Qt Variable
-  new QtDeleteSlot( qlineedit, state_handle->value_changed_signal_.connect( 
-      boost::bind( &QtLineEditSignal, qpointer, _1, _2 ) ) );
-
-  return true;
-}
-// -- END CONNECT FUNCTION -- //
 ///// ====  END QLineEdit FUNCTIONS ==== /////
 
 

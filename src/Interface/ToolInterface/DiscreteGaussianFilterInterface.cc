@@ -36,7 +36,7 @@
 
 //Application Includes
 #include <Application/Tools/DiscreteGaussianFilter.h>
-#include <Application/Filters/Actions/ActionDiscreteGaussian.h>
+//#include <Application/Filters/Actions/ActionDiscreteGaussian.h>
 
 namespace Seg3D
 {
@@ -139,9 +139,9 @@ void DiscreteGaussianFilterInterface::execute_filter()
   DiscreteGaussianFilter* tool =
     dynamic_cast< DiscreteGaussianFilter* > ( base_tool_.get() );
 
-  ActionDiscreteGaussian::Dispatch( tool->target_layer_state_->export_to_string(), 
-    tool->variance_state_->get(), tool->maximum_kernel_width_state_->get(),
-    tool->replace_state_->get() ); 
+//  ActionDiscreteGaussian::Dispatch( tool->target_layer_state_->export_to_string(), 
+//    tool->variance_state_->get(), tool->maximum_kernel_width_state_->get(),
+//    tool->replace_state_->get() ); 
 }
 
 

@@ -36,7 +36,7 @@
 
 //Application Includes
 #include <Application/Tools/OtsuThresholdFilter.h>
-#include <Application/Filters/Actions/ActionOtsuThreshold.h>
+//#include <Application/Filters/Actions/ActionOtsuThreshold.h>
 
 namespace Seg3D
 {
@@ -69,13 +69,13 @@ bool OtsuThresholdFilterInterface::build_widget( QFrame* frame )
   //Step 1 - build the Qt GUI Widget
   this->private_->ui_.setupUi( frame );
 
-    // add sliderspincombos
-    this->private_->order_ = new SliderIntCombo();
-    this->private_->ui_.orderHLayout_bottom->addWidget( this->private_->order_ );
-    
-    // add TargetComboBox
-    this->private_->target_ = new TargetComboBox( this );
-    this->private_->ui_.activeHLayout->addWidget( this->private_->target_ );
+  // add sliderspincombos
+  this->private_->order_ = new SliderIntCombo();
+  this->private_->ui_.orderHLayout_bottom->addWidget( this->private_->order_ );
+  
+  // add TargetComboBox
+  this->private_->target_ = new TargetComboBox( this );
+  this->private_->ui_.activeHLayout->addWidget( this->private_->target_ );
 
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
@@ -83,18 +83,16 @@ bool OtsuThresholdFilterInterface::build_widget( QFrame* frame )
   
   //Step 3 - set the values for the tool ui from the state engine
                 
-        // set the defaults for order
-      int order_min = 0; 
-      int order_max = 0;
-      int order_step = 0;
-      tool->order_state_->get_step( order_step );
-      tool->order_state_->get_range( order_min, order_max );
-      this->private_->order_->setStep( order_step );
-        this->private_->order_->setRange( order_min, order_max );
-        this->private_->order_->setCurrentValue( tool->order_state_->get() );
-        
-        
-
+  // set the defaults for order
+  int order_min = 0; 
+  int order_max = 0;
+  int order_step = 0;
+  tool->order_state_->get_step( order_step );
+  tool->order_state_->get_range( order_min, order_max );
+  this->private_->order_->setStep( order_step );
+  this->private_->order_->setRange( order_min, order_max );
+  this->private_->order_->setCurrentValue( tool->order_state_->get() );
+  
   //Step 4 - connect the gui to the tool through the QtBridge
   QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
   connect( this->private_->target_, SIGNAL( valid( bool ) ), this, SLOT( enable_run_filter( bool ) ) );
@@ -124,8 +122,8 @@ void OtsuThresholdFilterInterface::execute_filter()
   OtsuThresholdFilter* tool =
   dynamic_cast< OtsuThresholdFilter* > ( base_tool_.get() );
   
-  ActionOtsuThreshold::Dispatch( tool->target_layer_state_->export_to_string(), 
-                    tool->order_state_->get() ); 
+//  ActionOtsuThreshold::Dispatch( tool->target_layer_state_->export_to_string(), 
+//                    tool->order_state_->get() ); 
 }
 
 } // end namespace Seg3D

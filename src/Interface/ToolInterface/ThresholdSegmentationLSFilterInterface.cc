@@ -37,7 +37,7 @@
 
 //Application Includes
 #include <Application/Tools/ThresholdSegmentationLSFilter.h>
-#include <Application/Filters/Actions/ActionThresholdSegmentationLS.h>
+//#include <Application/Filters/Actions/ActionThresholdSegmentationLS.h>
 
 namespace Seg3D
 {
@@ -76,30 +76,30 @@ bool ThresholdSegmentationLSFilterInterface::build_widget( QFrame* frame )
   //Step 1 - build the Qt GUI Widget
   this->private_->ui_.setupUi( frame );
 
-    // add sliderspinnercombo's
-    this->private_->iterations_ = new SliderIntCombo();
-    this->private_->ui_.iterationsHLayout_bottom->addWidget( this->private_->iterations_ );
+  // add sliderspinnercombo's
+  this->private_->iterations_ = new SliderIntCombo();
+  this->private_->ui_.iterationsHLayout_bottom->addWidget( this->private_->iterations_ );
 
-    this->private_->upper_threshold_ = new SliderDoubleCombo();
-    this->private_->ui_.upperHLayout_bottom->addWidget( this->private_->upper_threshold_ );
+  this->private_->upper_threshold_ = new SliderDoubleCombo();
+  this->private_->ui_.upperHLayout_bottom->addWidget( this->private_->upper_threshold_ );
 
-    this->private_->lower_threshold_ = new SliderDoubleCombo();
-    this->private_->ui_.lowerHLayout_bottom->addWidget( this->private_->lower_threshold_ );
+  this->private_->lower_threshold_ = new SliderDoubleCombo();
+  this->private_->ui_.lowerHLayout_bottom->addWidget( this->private_->lower_threshold_ );
 
-    this->private_->curvature_ = new SliderDoubleCombo();
-    this->private_->ui_.curvatureHLayout_bottom->addWidget( this->private_->curvature_ );
+  this->private_->curvature_ = new SliderDoubleCombo();
+  this->private_->ui_.curvatureHLayout_bottom->addWidget( this->private_->curvature_ );
 
-    this->private_->edge_ = new SliderDoubleCombo();
-    this->private_->ui_.edgeHLayout_bottom->addWidget( this->private_->edge_ );
+  this->private_->edge_ = new SliderDoubleCombo();
+  this->private_->ui_.edgeHLayout_bottom->addWidget( this->private_->edge_ );
 
-    this->private_->propagation_ = new SliderDoubleCombo();
-    this->private_->ui_.propagationHLayout_bottom->addWidget( this->private_->propagation_ );
-    
-    this->private_->target_ = new TargetComboBox( this );
-    this->private_->ui_.activeHLayout->addWidget( this->private_->target_ );
-    
-    this->private_->mask_ = new MaskComboBox( this );
-    this->private_->ui_.maskHLayout->addWidget( this->private_->mask_ );
+  this->private_->propagation_ = new SliderDoubleCombo();
+  this->private_->ui_.propagationHLayout_bottom->addWidget( this->private_->propagation_ );
+  
+  this->private_->target_ = new TargetComboBox( this );
+  this->private_->ui_.activeHLayout->addWidget( this->private_->target_ );
+  
+  this->private_->mask_ = new MaskComboBox( this );
+  this->private_->ui_.maskHLayout->addWidget( this->private_->mask_ );
 
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
@@ -108,69 +108,69 @@ bool ThresholdSegmentationLSFilterInterface::build_widget( QFrame* frame )
       
   //Step 3 - set the values for the tool ui from the state engine
   
-        // set the defaults for the iterations
-      int iterations_min = 0; 
-      int iterations_max = 0;
-      int iterations_step = 0;
-      tool->iterations_state_->get_step( iterations_step );
-      tool->iterations_state_->get_range( iterations_min, iterations_max );
-      this->private_->iterations_->setStep( iterations_step );
-        this->private_->iterations_->setRange( iterations_min, iterations_max );
-        this->private_->iterations_->setCurrentValue( tool->iterations_state_->get() );
+  // set the defaults for the iterations
+  int iterations_min = 0; 
+  int iterations_max = 0;
+  int iterations_step = 0;
+  tool->iterations_state_->get_step( iterations_step );
+  tool->iterations_state_->get_range( iterations_min, iterations_max );
+  this->private_->iterations_->setStep( iterations_step );
+  this->private_->iterations_->setRange( iterations_min, iterations_max );
+  this->private_->iterations_->setCurrentValue( tool->iterations_state_->get() );
 
-        
-        // set the defaults for the upper threshold
-        double upper_threshold_min = 0.0; 
-      double upper_threshold_max = 0.0;
-      double upper_threshold_step = 0.0;
-      tool->upper_threshold_state_->get_step( upper_threshold_step );
-      tool->upper_threshold_state_->get_range( upper_threshold_min, upper_threshold_max );
-      this->private_->upper_threshold_->setStep( upper_threshold_step );
-        this->private_->upper_threshold_->setRange( upper_threshold_min, upper_threshold_max );
-        this->private_->upper_threshold_->setCurrentValue( tool->upper_threshold_state_->get() );
-        
-        // set the defaults for the lower threshold
-        double lower_threshold_min = 0.0; 
-      double lower_threshold_max = 0.0;
-      double lower_threshold_step = 0.0;
-      tool->lower_threshold_state_->get_step( lower_threshold_step );
-      tool->lower_threshold_state_->get_range( lower_threshold_min, lower_threshold_max );
-      this->private_->lower_threshold_->setStep( lower_threshold_step );
-        this->private_->lower_threshold_->setRange( lower_threshold_min, lower_threshold_max );
-        this->private_->lower_threshold_->setCurrentValue( tool->lower_threshold_state_->get() );
-        
-        // set the defaults for the curvature
-        double curvature_min = 0.0; 
-      double curvature_max = 0.0;
-      double curvature_step = 0.0;
-      tool->curvature_state_->get_step( curvature_step );
-      tool->curvature_state_->get_range( curvature_min, curvature_max );
-      this->private_->curvature_->setStep( curvature_step );
-        this->private_->curvature_->setRange( curvature_min, curvature_max );
-        this->private_->curvature_->setCurrentValue( tool->curvature_state_->get() );
-        
-        // set the defaults for edge
-        double edge_min = 0.0; 
-      double edge_max = 0.0;
-      double edge_step = 0.0;
-      tool->edge_state_->get_step( edge_step );
-      tool->edge_state_->get_range( edge_min, edge_max );
-      this->private_->edge_->setStep( edge_step );
-        this->private_->edge_->setRange( edge_min, edge_max );
-        this->private_->edge_->setCurrentValue( tool->edge_state_->get() ); 
-        
-        // set the defaults for the propagation
-        double propagation_min = 0.0; 
-      double propagation_max = 0.0;
-      double propagation_step = 0.0;
-      tool->propagation_state_->get_step( propagation_step );
-      tool->propagation_state_->get_range( propagation_min, propagation_max );
-      this->private_->propagation_->setStep( propagation_step );
-        this->private_->propagation_->setRange( propagation_min, propagation_max );
-        this->private_->propagation_->setCurrentValue( tool->propagation_state_->get() );
-        
-        // set the default for the replace state
-        this->private_->ui_.replaceCheckBox->setChecked( tool->replace_state_->get() );
+  
+  // set the defaults for the upper threshold
+  double upper_threshold_min = 0.0; 
+  double upper_threshold_max = 0.0;
+  double upper_threshold_step = 0.0;
+  tool->upper_threshold_state_->get_step( upper_threshold_step );
+  tool->upper_threshold_state_->get_range( upper_threshold_min, upper_threshold_max );
+  this->private_->upper_threshold_->setStep( upper_threshold_step );
+  this->private_->upper_threshold_->setRange( upper_threshold_min, upper_threshold_max );
+  this->private_->upper_threshold_->setCurrentValue( tool->upper_threshold_state_->get() );
+  
+  // set the defaults for the lower threshold
+  double lower_threshold_min = 0.0; 
+  double lower_threshold_max = 0.0;
+  double lower_threshold_step = 0.0;
+  tool->lower_threshold_state_->get_step( lower_threshold_step );
+  tool->lower_threshold_state_->get_range( lower_threshold_min, lower_threshold_max );
+  this->private_->lower_threshold_->setStep( lower_threshold_step );
+  this->private_->lower_threshold_->setRange( lower_threshold_min, lower_threshold_max );
+  this->private_->lower_threshold_->setCurrentValue( tool->lower_threshold_state_->get() );
+  
+  // set the defaults for the curvature
+  double curvature_min = 0.0; 
+  double curvature_max = 0.0;
+  double curvature_step = 0.0;
+  tool->curvature_state_->get_step( curvature_step );
+  tool->curvature_state_->get_range( curvature_min, curvature_max );
+  this->private_->curvature_->setStep( curvature_step );
+  this->private_->curvature_->setRange( curvature_min, curvature_max );
+  this->private_->curvature_->setCurrentValue( tool->curvature_state_->get() );
+  
+  // set the defaults for edge
+  double edge_min = 0.0; 
+  double edge_max = 0.0;
+  double edge_step = 0.0;
+  tool->edge_state_->get_step( edge_step );
+  tool->edge_state_->get_range( edge_min, edge_max );
+  this->private_->edge_->setStep( edge_step );
+  this->private_->edge_->setRange( edge_min, edge_max );
+  this->private_->edge_->setCurrentValue( tool->edge_state_->get() ); 
+  
+  // set the defaults for the propagation
+  double propagation_min = 0.0; 
+  double propagation_max = 0.0;
+  double propagation_step = 0.0;
+  tool->propagation_state_->get_step( propagation_step );
+  tool->propagation_state_->get_range( propagation_min, propagation_max );
+  this->private_->propagation_->setStep( propagation_step );
+  this->private_->propagation_->setRange( propagation_min, propagation_max );
+  this->private_->propagation_->setCurrentValue( tool->propagation_state_->get() );
+  
+  // set the default for the replace state
+  this->private_->ui_.replaceCheckBox->setChecked( tool->replace_state_->get() );
 
 
 
@@ -211,11 +211,11 @@ void ThresholdSegmentationLSFilterInterface::execute_filter()
   ThresholdSegmentationLSFilter* tool =
   dynamic_cast< ThresholdSegmentationLSFilter* > ( base_tool_.get() );
   
-  ActionThresholdSegmentationLS::Dispatch( tool->target_layer_state_->export_to_string(), 
-    tool->mask_layer_state_->export_to_string(), tool->iterations_state_->get(),
-    tool->upper_threshold_state_->get(), tool->lower_threshold_state_->get(), 
-    tool->curvature_state_->get(), tool->propagation_state_->get(), tool->edge_state_->get(),
-    tool->replace_state_->get() ); 
+//  ActionThresholdSegmentationLS::Dispatch( tool->target_layer_state_->export_to_string(), 
+//    tool->mask_layer_state_->export_to_string(), tool->iterations_state_->get(),
+//    tool->upper_threshold_state_->get(), tool->lower_threshold_state_->get(), 
+//    tool->curvature_state_->get(), tool->propagation_state_->get(), tool->edge_state_->get(),
+//    tool->replace_state_->get() ); 
 }
 
 } // end namespace Seg3D
