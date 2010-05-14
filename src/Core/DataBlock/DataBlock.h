@@ -63,7 +63,7 @@ class DataBlock;
 typedef boost::shared_ptr< DataBlock > DataBlockHandle;
 
 // Class definition
-class DataBlock : public RecursiveLockable
+class DataBlock : public SharedLockable
 {
 public:
   // index/size types

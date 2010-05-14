@@ -78,7 +78,7 @@ public:
   void get_layers( std::vector< LayerHandle > &vector_of_layers );
   bool check_for_same_group( const std::string layer_to_insert_id, const std::string layer_below_id );
   
-  LayerGroupHandle get_LayerGroupHandle_from_group_id( std::string group_id );
+  LayerGroupHandle get_layer_group( std::string group_id );
   LayerHandle get_layer_by_id( const std::string& layer_id );
   LayerHandle get_layer_by_name( const std::string& layer_name );
   LayerHandle get_active_layer();

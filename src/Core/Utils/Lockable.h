@@ -40,7 +40,6 @@ class Lockable : public boost::noncopyable
 public:
   typedef boost::mutex mutex_type;
   typedef boost::unique_lock< mutex_type > lock_type;
-  typedef boost::shared_lock< mutex_type > shared_lock_type;
 
   Lockable() {}
   ~Lockable() {}
@@ -59,7 +58,6 @@ class RecursiveLockable : public boost::noncopyable
 public:
   typedef boost::recursive_mutex mutex_type;
   typedef boost::unique_lock< mutex_type > lock_type;
-  typedef boost::shared_lock< mutex_type > shared_lock_type;
 
   RecursiveLockable() {}
   ~RecursiveLockable() {}
@@ -73,6 +71,26 @@ private:
   mutex_type mutex_;
 };
 
+class SharedLockable : public boost::noncopyable
+{
+public:
+  typedef boost::shared_mutex mutex_type;
+  typedef boost::unique_lock< mutex_type > lock_type;
+  typedef boost::shared_lock< mutex_type > shared_lock_type;
+  typedef boost::upgrade_lock< mutex_type > upgrade_lock_type;
+  typedef boost::upgrade_to_unique_lock< mutex_type > upgrade_to_unique_lock_type;
+
+  SharedLockable() {}
+  ~SharedLockable() {}
+
+  mutex_type& get_mutex()
+  {
+    return this->mutex_;
+  }
+
+private:
+  mutex_type mutex_;
+};
 
 } // end namespace Core
 

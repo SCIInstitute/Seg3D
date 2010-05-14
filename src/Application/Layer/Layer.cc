@@ -31,6 +31,8 @@
 // Boost includes 
 
 #include <Core/Application/Application.h>
+#include <Core/Utils/AtomicCounter.h>
+#include <Core/Utils/StringUtil.h>
 #include <Application/Layer/Layer.h>
 #include <Application/ViewerManager/ViewerManager.h>
 
@@ -38,7 +40,7 @@ namespace Seg3D
 {
 
 Layer::Layer( const std::string& name ) :
-  StateHandler( Core::StateEngine::CreateStateID( "layer" ) ),
+  StateHandler( "layer", true ),
   active_( false )
 { 
   // Step (1) : Build the layer specific state variables

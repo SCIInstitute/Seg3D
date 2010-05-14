@@ -161,6 +161,8 @@ public:
   // Get the mutex of the state engine
   static mutex_type& GetMutex();
   
+private:
+  static std::string CreateLayerID();
 };
 
 } // end namespace Seg3D

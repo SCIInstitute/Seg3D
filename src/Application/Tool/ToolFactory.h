@@ -297,8 +297,7 @@ public:
   // CREATE_TOOL:
   // Generate an tool from an iostream object that contains the XML
   // specification of the action.
-  bool create_tool( const std::string& tool_type, const std::string& toolid,
-    ToolHandle& tool ); // << THREAD-SAFE
+  bool create_tool( const std::string& tool_type, ToolHandle& tool ); // << THREAD-SAFE
 
   // CREATE_TOOLINTERFACE:
   // Generate an tool from an iostream object that contains the XML

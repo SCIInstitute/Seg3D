@@ -51,12 +51,15 @@
 namespace Core
 {
 
+class StateHandler;
+class StateHandlerPrivate;
+
 class StateHandler : public Core::ConnectionHandler
 {
 
   // -- constructor/destructor --
 public:
-  StateHandler( const std::string& stateid_prefix );
+  StateHandler( const std::string& type_str, bool auto_id );
   virtual ~StateHandler();
 
 public:
@@ -182,11 +185,18 @@ private:
   void handle_state_changed();
 
 private:
+
+  friend class StateEngine;
+
   // Function that adds the state variable to the database
   bool add_statebase( StateBaseHandle state );
 
+  bool get_state( const std::string& state_id, StateBaseHandle& state );
+
   // Prefix for all state variables of this class
   std::string stateid_prefix_;
+
+  StateHandlerPrivate* private_;
 };
 
 } // end namespace Core

@@ -45,7 +45,7 @@ namespace Seg3D
 CORE_SINGLETON_IMPLEMENTATION( ViewerManager );
 
 ViewerManager::ViewerManager() :
-  StateHandler( "view" ),
+  StateHandler( "view", false ),
   active_axial_viewer_( -1 ),
   active_coronal_viewer_( -1 ),
   active_sagittal_viewer_( -1 ),

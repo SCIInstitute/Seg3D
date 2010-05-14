@@ -42,7 +42,7 @@ namespace Seg3D
 CORE_SINGLETON_IMPLEMENTATION( ToolManager );
 
 ToolManager::ToolManager() :
-  StateHandler( "ToolManager" )
+  StateHandler( "ToolManager", false )
 {
 }
 
@@ -61,22 +61,20 @@ bool ToolManager::open_tool( const std::string& tool_type, std::string& new_tool
   lock_type lock( tool_list_mutex_ );
 
   // Step (2): Add an entry in the debug log
-  CORE_LOG_DEBUG( std::string("Open tool: ") + tool_type );
-
-  // STEP (3): Create a new toolid and extract the tool type from the string
-  new_toolid = Core::StateEngine::CreateStateID( tool_type );
+  CORE_LOG_DEBUG( std::string( "Open tool: " ) + tool_type );
 
   // Step (4): Build the tool using the factory. This will generate the default
   // settings.
   ToolHandle tool;
 
-  if ( !( ToolFactory::Instance()->create_tool( tool_type, new_toolid, tool ) ) )
+  if ( !( ToolFactory::Instance()->create_tool( tool_type, tool ) ) )
   {
-    CORE_LOG_ERROR(std::string("Could not create tool of type: '")+tool_type+"'");
+    CORE_LOG_ERROR( std::string( "Could not create tool of type: '" ) + tool_type + "'" );
     return false;
   }
 
   // Step (5): Add the tool id to the tool and add the tool to the list
+  new_toolid = tool->toolid();
   tool_list_[ new_toolid ] = tool;
 
   // Step (6): Signal any observers (UIs) that the tool has been opened

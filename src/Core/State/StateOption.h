@@ -126,7 +126,7 @@ public:
 
   // OPTION_LIST:
   // Get the option list
-  std::vector< std::string > option_list()
+  std::vector< std::string > option_list() const
   {
       return option_list_;
   }

@@ -147,7 +147,7 @@ void DataVolumeSlice::upload_texture()
   //texture_data_type* buffer = &buffer_vector[0];
 
   // Lock the volume
-  lock_type volume_lock( this->get_mutex() );
+  shared_lock_type volume_lock( this->get_mutex() );
   
   switch ( this->data_block_->get_type() )
   {

@@ -59,13 +59,24 @@ private:
   // -- handle updates from layermanager --
   void handle_layers_changed();
 
+  void update_target_options();
+  void update_constraint_options();
+
+private:
+  std::vector< std::string > target_layer_options_;
+  std::vector< std::string > data_constraint_options_;
+  std::vector< std::string > mask_constraint_options_;
+
+  size_t signal_block_count_;
+
   // -- state --
 public:
-  // Layerid of the target layer
   Core::StateStringHandle target_layer_state_;
-  
-  // Layerid of the masking layer
   Core::StateStringHandle mask_layer_state_;
+
+  Core::StateStringHandle target_layer_name_state_;
+  Core::StateStringHandle data_constraint_layer_name_state_;
+  Core::StateStringHandle mask_constraint_layer_name_state_;
   
   // Radius of the brush
   Core::StateRangedIntHandle brush_radius_state_;

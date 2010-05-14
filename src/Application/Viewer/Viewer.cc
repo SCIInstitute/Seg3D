@@ -60,7 +60,7 @@ const std::string Viewer::SAGITTAL_C( "sagittal" );
 const std::string Viewer::VOLUME_C( "volume" );
 
 Viewer::Viewer( size_t viewer_id ) :
-  StateHandler( std::string( "viewer" ) + Core::ExportToString( viewer_id ) ),
+  StateHandler( std::string( "viewer" ) + Core::ExportToString( viewer_id ), false ),
   adjusting_contrast_brightness_( false ),
   viewer_id_( viewer_id ),
   signals_block_count_( 0 ),
@@ -157,7 +157,7 @@ void Viewer::mouse_move_event( const MouseHistory& mouse_history, int button, in
   if ( !mouse_move_handler_.empty() )
   {
     // if the registered handler handled the event, no further process needed
-    if ( mouse_move_handler_( mouse_history, button, buttons, modifiers ) )
+    if ( mouse_move_handler_( this->viewer_id_, mouse_history, button, buttons, modifiers ) )
     {
       return;
     }
@@ -186,7 +186,7 @@ void Viewer::mouse_press_event( const MouseHistory& mouse_history, int button, i
   if ( !mouse_press_handler_.empty() )
   {
     // if the registered handler handled the event, no further process needed
-    if ( mouse_press_handler_( mouse_history, button, buttons, modifiers ) )
+    if ( mouse_press_handler_( this->viewer_id_, mouse_history, button, buttons, modifiers ) )
     {
       return;
     }
@@ -218,7 +218,7 @@ void Viewer::mouse_release_event( const MouseHistory& mouse_history, int button,
   if ( !mouse_release_handler_.empty() )
   {
     // if the registered handler handled the event, no further process needed
-    if ( mouse_release_handler_( mouse_history, button, buttons, modifiers ) )
+    if ( mouse_release_handler_( this->viewer_id_, mouse_history, button, buttons, modifiers ) )
     {
       return;
     }
@@ -235,6 +235,14 @@ void Viewer::mouse_release_event( const MouseHistory& mouse_history, int button,
 
 bool Viewer::wheel_event( int delta, int x, int y, int buttons, int modifiers )
 {
+  if ( !this->wheel_event_handler_.empty() )
+  {
+    if ( this->wheel_event_handler_( this->viewer_id_, delta, x, y, buttons, modifiers ) )
+    {
+      return true;
+    }
+  }
+
   this->offset_slice( -delta );
 
   // Update the status bar display.
@@ -260,11 +268,17 @@ void Viewer::set_mouse_release_handler( mouse_event_handler_type func )
   this->mouse_release_handler_ = func;
 }
 
+void Viewer::set_wheel_event_handler( wheel_event_handler_type func )
+{
+  this->wheel_event_handler_ = func;
+}
+
 void Viewer::reset_mouse_handlers()
 {
   this->mouse_move_handler_ = 0;
   this->mouse_press_handler_ = 0;
   this->mouse_release_handler_ = 0;
+  this->wheel_event_handler_ = 0;
 }
 
 void Viewer::update_status_bar( int x, int y )

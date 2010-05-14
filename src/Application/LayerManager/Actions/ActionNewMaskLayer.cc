@@ -40,11 +40,11 @@ namespace Seg3D
 
 bool ActionNewMaskLayer::validate( Core::ActionContextHandle& context )
 {
-  if ( !( Core::StateEngine::Instance()->is_stateid( this->group_name_.value() ) ) )
-  {
-    context->report_error( std::string( "GroupID '" ) + this->group_name_.value() + "' is invalid" );
-    return false;
-  }
+  //if ( !( Core::StateEngine::Instance()->is_stateid( this->group_name_.value() ) ) )
+  //{
+  //  context->report_error( std::string( "GroupID '" ) + this->group_name_.value() + "' is invalid" );
+  //  return false;
+  //}
   return true; // validated
 }
 
@@ -52,7 +52,7 @@ bool ActionNewMaskLayer::run( Core::ActionContextHandle& context, Core::ActionRe
 {
   if ( !this->group_handle_ )
   {
-    this->group_handle_ = LayerManager::Instance()->get_LayerGroupHandle_from_group_id( 
+    this->group_handle_ = LayerManager::Instance()->get_layer_group( 
       this->group_name_.value() );
     
     if ( !this->group_handle_ )
@@ -84,7 +84,7 @@ Core::ActionHandle ActionNewMaskLayer::Create( const std::string& group_name )
   CORE_LOG_DEBUG( "trying to create an action for adding a new mask layer to " + group_name );
   
   action->group_handle_ = LayerManager::Instance()->
-    get_LayerGroupHandle_from_group_id( group_name );
+    get_layer_group( group_name );
   action->group_name_.value() = group_name;
   
   return Core::ActionHandle( action );

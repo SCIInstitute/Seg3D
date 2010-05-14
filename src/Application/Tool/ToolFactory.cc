@@ -114,8 +114,7 @@ bool ToolFactory::list_tool_types_with_interface( tool_list_type& tool_list, int
   return true;
 }
 
-bool ToolFactory::create_tool( const std::string& tool_type, const std::string& toolid,
-    ToolHandle& tool )
+bool ToolFactory::create_tool( const std::string& tool_type, ToolHandle& tool )
 {
   lock_type lock( mutex_ );
 
@@ -126,7 +125,7 @@ bool ToolFactory::create_tool( const std::string& tool_type, const std::string& 
   if ( it == tools_.end() ) return false;
 
   // Step (3): build the tool
-  tool = (*it).second->builder()->build(toolid);
+  tool = (*it).second->builder()->build(tool_type);
 
   return true;
 }

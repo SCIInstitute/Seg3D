@@ -99,7 +99,7 @@ void MaskVolumeSlice::upload_texture()
     pixel_buffer->map_buffer( GL_WRITE_ONLY ) );
 
   // Lock the volume
-  lock_type volume_lock( this->get_mutex() );
+  shared_lock_type volume_lock( this->get_mutex() );
 
   size_t current_index = this->to_index( 0, 0 );
 
@@ -131,6 +131,7 @@ void MaskVolumeSlice::upload_texture()
   // Step 3. release the pixel unpack buffer
   // NOTE: The texture streaming will still succeed even if the PBO is deleted.
   pixel_buffer->unbind();
+  glFinish();
 
   this->slice_changed_ = false;
 }

@@ -47,7 +47,7 @@ namespace Seg3D
 CORE_SINGLETON_IMPLEMENTATION( PreferencesManager );
 
 PreferencesManager::PreferencesManager() :
-  StateHandler( "PreferencesManager" )
+  StateHandler( "PreferencesManager", false )
 { 
   // Initialize the local config directory path
   Core::Application::Instance()->get_config_directory( local_config_path_ );

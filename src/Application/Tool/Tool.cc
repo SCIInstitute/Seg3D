@@ -26,14 +26,17 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#include <Application/LayerManager/LayerManager.h>
 #include <Application/Tool/Tool.h>
 #include <Application/Tool/ToolFactory.h>
 
 namespace Seg3D
 {
 
-Tool::Tool( const std::string& toolid ) :
-  StateHandler( Core::StateEngine::CreateStateID( toolid ) )
+const std::string Tool::NONE_OPTION_C( "<none>" );
+
+Tool::Tool( const std::string& tool_type ) :
+  StateHandler( tool_type, true )
 {
 }
 
@@ -43,7 +46,7 @@ Tool::~Tool()
 
 void Tool::close()
 {
-  disconnect_all();
+  this->disconnect_all();
 }
 
 void Tool::activate()
@@ -56,4 +59,64 @@ void Tool::deactivate()
   // Defaults to doing nothing
 }
 
+void Tool::CreateLayerNameList( std::vector<std::string> &layer_names, 
+                 Core::VolumeType type )
+{
+  std::vector< LayerHandle > layers;
+  LayerManager::Instance()->get_layers( layers );
+  size_t num_of_layers = layers.size();
+  for ( size_t i = 0; i < num_of_layers; i++ )
+  {
+    if ( layers[ i ]->type() == type )
+    {
+      layer_names.push_back( layers[ i ]->get_layer_name() );
+    }
+  }
 }
+
+void Tool::CreateLayerNameList( std::vector<std::string> &layer_names, 
+                 Core::VolumeType type, LayerGroupHandle layer_group )
+{
+  layer_list_type layer_list;
+  {
+    LayerManager::lock_type lock( LayerManager::Instance()->get_mutex() );
+    layer_list = layer_group->get_layer_list();
+  }
+
+  size_t num_of_layers = layer_list.size();
+  layer_list_type::iterator it = layer_list.begin();
+  for ( ; it != layer_list.end(); it++ )
+  {
+    std::string layer_name = ( *it )->get_layer_name();
+    if ( ( *it )->type() == type )
+    {
+      layer_names.push_back( layer_name );
+    }
+  }
+}
+
+void Tool::CreateLayerNameList( std::vector<std::string> &layer_names, 
+  Core::VolumeType type, LayerGroupHandle layer_group, std::string exclude )
+{
+  layer_list_type layer_list;
+  {
+    LayerManager::lock_type lock( LayerManager::Instance()->get_mutex() );
+    layer_list = layer_group->get_layer_list();
+  }
+
+  size_t num_of_layers = layer_list.size();
+  layer_list_type::iterator it = layer_list.begin();
+  for ( ; it != layer_list.end(); it++ )
+  {
+    std::string layer_name = ( *it )->get_layer_name();
+    if ( ( *it )->type() == type )
+    {
+      if ( layer_name != exclude )
+      {
+        layer_names.push_back( layer_name );
+      }
+    }
+  }
+}
+
+} // end namespace Seg3D

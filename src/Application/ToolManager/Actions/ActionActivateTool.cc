@@ -39,11 +39,11 @@ namespace Seg3D
 
 bool ActionActivateTool::validate( Core::ActionContextHandle& context )
 {
-  if ( !( Core::StateEngine::Instance()->is_stateid( toolid_.value() ) ) )
-  {
-    context->report_error( std::string( "ToolID '" ) + toolid_.value() + "' is invalid" );
-    return false;
-  }
+  //if ( !( Core::StateEngine::Instance()->is_stateid( toolid_.value() ) ) )
+  //{
+  //  context->report_error( std::string( "ToolID '" ) + toolid_.value() + "' is invalid" );
+  //  return false;
+  //}
 
   return true; // validated
 }

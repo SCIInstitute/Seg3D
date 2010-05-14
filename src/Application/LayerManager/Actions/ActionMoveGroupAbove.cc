@@ -41,19 +41,19 @@ namespace Seg3D
 bool ActionMoveGroupAbove::validate( Core::ActionContextHandle& context )
 {
 
-  if ( !( Core::StateEngine::Instance()->is_stateid( this->group_to_move_id_.value() ) ) )
-  {
-    context->report_error( std::string( "GroupID '" ) + this->group_to_move_id_.value() 
-      + "' is invalid" );
-    return false;
-  }
-  
-  if ( !( Core::StateEngine::Instance()->is_stateid( this->group_below_id_.value() ) ) )
-  {
-    context->report_error( std::string( "GroupID '" ) + this->group_below_id_.value()
-      + "' is invalid" );
-    return false;
-  }
+  //if ( !( Core::StateEngine::Instance()->is_stateid( this->group_to_move_id_.value() ) ) )
+  //{
+  //  context->report_error( std::string( "GroupID '" ) + this->group_to_move_id_.value() 
+  //    + "' is invalid" );
+  //  return false;
+  //}
+  //
+  //if ( !( Core::StateEngine::Instance()->is_stateid( this->group_below_id_.value() ) ) )
+  //{
+  //  context->report_error( std::string( "GroupID '" ) + this->group_below_id_.value()
+  //    + "' is invalid" );
+  //  return false;
+  //}
 
   return true;
 }
@@ -61,8 +61,8 @@ bool ActionMoveGroupAbove::validate( Core::ActionContextHandle& context )
 bool ActionMoveGroupAbove::run( Core::ActionContextHandle& context, 
                  Core::ActionResultHandle& result )
 {
-  if ( ( Core::StateEngine::Instance()->is_stateid( this->group_below_id_.value() ) ) && 
-    ( Core::StateEngine::Instance()->is_stateid( this->group_to_move_id_.value() ) ) )
+  //if ( ( Core::StateEngine::Instance()->is_stateid( this->group_below_id_.value() ) ) && 
+  //  ( Core::StateEngine::Instance()->is_stateid( this->group_to_move_id_.value() ) ) )
   {
     return LayerManager::Instance()->move_group_above( this->group_to_move_id_.value(),
       this->group_below_id_.value() );

@@ -52,6 +52,7 @@ SET(CORE_UTILS_SRCS
   StringParser.cc
   StringUtil.h
   StringUtil.cc
+  AtomicCounter.h
 )
 
 ##################################################

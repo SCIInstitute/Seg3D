@@ -26,52 +26,61 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#ifndef CORE_UTILS_ATOMICCOUNTER_H
+#define CORE_UTILS_ATOMICCOUNTER_H
 
-#include <Application/LayerManager/LayerManager.h>
-#include <Application/LayerManager/Actions/ActionInsertLayer.h>
+#include <boost/smart_ptr.hpp>
+#include <boost/smart_ptr/detail/atomic_count.hpp>
+#include <boost/utility.hpp>
 
-// REGISTER ACTION:
-// Define a function that registers the action. The action also needs to be
-// registered in the CMake file.
-CORE_REGISTER_ACTION( Seg3D, InsertLayer )
-
-namespace Seg3D
+namespace Core
 {
-  
-bool ActionInsertLayer::validate( Core::ActionContextHandle& context )
-{
-  if ( !this->layer_handle_ )
-    return false;
-  
-  //if ( !( Core::StateEngine::Instance()->is_stateid( layer_handle_->get_layer_id() ) ) )
- //   {
-  //    context->report_error( std::string( "LayerID '" ) + layer_handle_->get_layer_id() + "' is invalid" );
-  //    return false;
- //   }
-  
-  return true;
 
-}
+class AtomicCounter;
+typedef boost::shared_ptr< AtomicCounter > AtomicCounterHandle;
 
-bool ActionInsertLayer::run( Core::ActionContextHandle& context, 
-              Core::ActionResultHandle& result )
+class AtomicCounter : public boost::noncopyable
 {
-  if ( this->layer_handle_ )
+public:
+  explicit AtomicCounter( long value ) :
+    count_( value )
   {
-    LayerManager::Instance()->insert_layer( layer_handle_ );
-    return true;
   }
-    
-  return false;
-}
 
+  AtomicCounter() :
+    count_( 0 )
+  {
+  }
 
-void ActionInsertLayer::Dispatch( LayerHandle layer )
-{
-  ActionInsertLayer* action = new ActionInsertLayer;
-  action->layer_handle_ = layer;
-  
-  Core::Interface::PostAction( Core::ActionHandle( action ) );
-}
-  
-} // end namespace Seg3D
+  long operator++()
+  {
+    return ++this->count_;
+  }
+
+  long operator++( int )
+  {
+    return ++this->count_ - 1;
+  }
+
+  long operator--()
+  {
+    return --this->count_;
+  }
+
+  long operator--( int )
+  {
+    return --this->count_ + 1;
+  }
+
+  operator long() const
+  {
+    return this->count_;
+  }
+
+private:
+  boost::detail::atomic_count count_;
+};
+
+} // end namespace Core
+
+#endif

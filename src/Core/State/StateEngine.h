@@ -54,6 +54,8 @@ namespace Core
 
 // Forward decclaration
 class StateEngine;
+class StateEnginePrivate;
+class StateHandler;
 
 // Class definition
 class StateEngine : public Core::RecursiveLockable
@@ -68,10 +70,10 @@ private:
   // -- Interface for accessing state variables --
 public:
 
-  // ADD_STATE:
-  // Add the base of a state variable to the central state Engine in
-  // StateEngine.
-  bool add_state( const std::string& stateid, StateBaseHandle& state );
+  //// ADD_STATE:
+  //// Add the base of a state variable to the central state Engine in
+  //// StateEngine.
+  //bool add_state( const std::string& stateid, StateBaseHandle& state );
 
   // GET_STATE:
   // Get pointer to the state variable based on the unique state tag
@@ -81,7 +83,7 @@ public:
   // Remove all the state variables that derive from the tag and the tag
   // itself. So remove ToolManager::PaintTool will remove as well derived
   // values like ToolManager::PaintTool::Brushsize.
-  void remove_state( const std::string& stateid );
+  //void remove_state( const std::string& stateid );
 
   // NUM_STATES:
   // The number of state variables in the system
@@ -95,43 +97,52 @@ public:
 public:
   // ADD_STATEID:
   // Add a new id to the list
-  void add_stateid( const std::string& stateid );
+  //void add_stateid( const std::string& stateid );
 
   // REMOVE_STATEID:
   // Remove an id from the list
-  void remove_stateid( const std::string& stateid );
+  //void remove_stateid( const std::string& stateid );
 
   // IS_STATEID:
   // Check whether an id exists
-  bool is_stateid( const std::string& stateid );
+  //bool is_stateid( const std::string& stateid );
 
   // CREATE_STATEID:
   // Create a new id based on basename but with an unique extension padded to
   // the end
-  std::string create_stateid( std::string basename );
+  //std::string create_stateid( std::string basename );
 
+  std::string register_state_handler( const std::string& type_str, 
+    StateHandler* state_handler, bool auto_id );
+
+  void remove_state_handler( const std::string& handler_id );
   // -- Signals --
 public:
   typedef boost::signals2::signal<void ()> state_changed_signal_type;
   state_changed_signal_type state_changed_signal_;
 
-  // -- state database --
+//  // -- state database --
+//private:
+//  typedef std::set< std::string > stateid_list_type;
+//  typedef boost::unordered_map< std::string, StateBaseHandle > state_map_type;
+//  typedef boost::unordered_map< std::string, std::string > statealias_map_type;
+//  typedef std::vector< StateBaseHandle > state_list_type;
+//
+//  // Map containing pointers to the State variables in the class under control
+//  // by the StateEngine
+//  state_map_type state_map_;
+//
+//  // Maintain an organized vector of states as well, so the order is established for
+//  // writing the states to disk
+//  state_list_type state_list_;
+//
+//  // The list of IDs that are in use
+//  stateid_list_type stateid_list_;
+
+
+  // -- Implementation details --
 private:
-  typedef std::set< std::string > stateid_list_type;
-  typedef boost::unordered_map< std::string, StateBaseHandle > state_map_type;
-  typedef boost::unordered_map< std::string, std::string > statealias_map_type;
-  typedef std::vector< StateBaseHandle > state_list_type;
-
-  // Map containing pointers to the State variables in the class under control
-  // by the StateEngine
-  state_map_type state_map_;
-
-  // Maintain an organized vector of states as well, so the order is established for
-  // writing the states to disk
-  state_list_type state_list_;
-
-  // The list of IDs that are in use
-  stateid_list_type stateid_list_;
+  StateEnginePrivate* private_;
 
   // -- Static convenience functions --
 
@@ -144,13 +155,16 @@ public:
     return Instance()->get_mutex();
   }
   
-  // CREATESTATEID
-  // Create an unique stateid from a baseid
-  static std::string CreateStateID(const std::string& baseid )
-  {
-    return Instance()->create_stateid( baseid );
-  }
+  //// CREATESTATEID
+  //// Create an unique stateid from a baseid
+  //static std::string CreateStateID(const std::string& baseid )
+  //{
+  //  return Instance()->create_stateid( baseid );
+  //}
 
+  //static std::string CreateStateHandlerID( const std::string& baseid )
+  //{
+  //}
 };
 
 } // end namespace Core

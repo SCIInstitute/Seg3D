@@ -37,7 +37,7 @@ namespace Seg3D
 CORE_SINGLETON_IMPLEMENTATION( InterfaceManager );
 
 InterfaceManager::InterfaceManager() :
-  StateHandler( "interface" )
+  StateHandler( "interface", false )
 {
   // set up state variables
   add_state( "fullscreen", full_screen_state_, false );

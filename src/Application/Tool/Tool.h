@@ -44,6 +44,8 @@
 #include <Core/State/State.h>
 #include <Core/State/StateEngine.h>
 
+#include <Application/Layer/Layer.h>
+
 namespace Seg3D
 {
 
@@ -71,7 +73,7 @@ class Tool : public Core::StateHandler
 
   // -- constructor/destructor --
 public:
-  Tool( const std::string& toolid );
+  Tool( const std::string& tool_type );
   virtual ~Tool();
 
   // -- query properties of tool --
@@ -113,6 +115,18 @@ public:
   // Deactivate a tool. A tool is always deactivate before the next one is
   // activated.
   virtual void deactivate();
+
+protected:
+
+  void CreateLayerNameList( std::vector< std::string >& layer_names, Core::VolumeType type );
+  void CreateLayerNameList( std::vector< std::string >& layer_names, 
+    Core::VolumeType type, LayerGroupHandle layer_group );
+  void CreateLayerNameList( std::vector< std::string >& layer_names,
+    Core::VolumeType type, LayerGroupHandle layer_group, std::string exclude );
+
+public:
+
+  const static std::string NONE_OPTION_C;
 
 };
 

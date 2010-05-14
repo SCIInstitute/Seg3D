@@ -36,7 +36,7 @@ namespace Seg3D
 
 // CLASS TOOLINTERFACE:
 // Base class of each tool interface. These are not included inside the tool
-// to ensure that the GUI is propery separated from the application.
+// to ensure that the GUI is properly separated from the application.
 
 class ToolInterface : public boost::noncopyable
 {

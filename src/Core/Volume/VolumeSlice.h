@@ -59,6 +59,7 @@ class VolumeSlice : protected ConnectionHandler
 public:
   typedef Volume::mutex_type mutex_type;
   typedef Volume::lock_type lock_type;
+  typedef Volume::shared_lock_type shared_lock_type;
 
 protected:
   VolumeSlice( const VolumeHandle& volume, VolumeSliceType type, size_t slice_num );

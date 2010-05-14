@@ -120,7 +120,8 @@ public:
   // -- mouse events handling --
 public:
 
-  typedef boost::function< bool( const MouseHistory&, int, int, int ) > mouse_event_handler_type;
+  typedef boost::function< bool( size_t, const MouseHistory&, int, int, int ) > mouse_event_handler_type;
+  typedef boost::function< bool( size_t, int, int, int, int, int ) > wheel_event_handler_type;
 
   void mouse_move_event( const MouseHistory& mouse_history, int button, int buttons,
       int modifiers );
@@ -133,6 +134,7 @@ public:
   void set_mouse_move_handler( mouse_event_handler_type func );
   void set_mouse_press_handler( mouse_event_handler_type func );
   void set_mouse_release_handler( mouse_event_handler_type func );
+  void set_wheel_event_handler( wheel_event_handler_type func );
   void reset_mouse_handlers();
 
 private:
@@ -143,6 +145,8 @@ private:
   mouse_event_handler_type mouse_move_handler_;
   mouse_event_handler_type mouse_press_handler_;
   mouse_event_handler_type mouse_release_handler_;
+  wheel_event_handler_type wheel_event_handler_;
+
   ViewManipulatorHandle view_manipulator_;
   bool adjusting_contrast_brightness_;
 

@@ -52,7 +52,7 @@ namespace Seg3D
 CORE_SINGLETON_IMPLEMENTATION( LayerManager );
 
 LayerManager::LayerManager() :
-  StateHandler( "LayerManager" )
+  StateHandler( "LayerManager", false )
 { 
 }
 
@@ -143,8 +143,8 @@ bool LayerManager::move_group_above( std::string group_to_move_id, std::string g
     // Get the Lock
     lock_type lock( this->get_mutex() );
 
-    LayerGroupHandle group_above = get_LayerGroupHandle_from_group_id( group_to_move_id );
-    LayerGroupHandle group_below = get_LayerGroupHandle_from_group_id( group_below_id );
+    LayerGroupHandle group_above = get_layer_group( group_to_move_id );
+    LayerGroupHandle group_below = get_layer_group( group_below_id );
 
     if( ( !group_above || !group_below ) || ( group_above == group_below ) )
       return false;
@@ -284,7 +284,7 @@ void LayerManager::set_active_layer( LayerHandle layer )
 }
 
 
-LayerGroupHandle LayerManager::get_LayerGroupHandle_from_group_id( std::string group_id )
+LayerGroupHandle LayerManager::get_layer_group( std::string group_id )
 {
     lock_type lock( this->get_mutex() );
     
@@ -299,7 +299,7 @@ LayerGroupHandle LayerManager::get_LayerGroupHandle_from_group_id( std::string g
   return LayerGroupHandle();
 }
 
-Seg3D::LayerHandle LayerManager::get_layer_by_id( const std::string& layer_id )
+LayerHandle LayerManager::get_layer_by_id( const std::string& layer_id )
 {
   lock_type lock( this->get_mutex() );
 
@@ -318,7 +318,7 @@ Seg3D::LayerHandle LayerManager::get_layer_by_id( const std::string& layer_id )
   return LayerHandle();
 }
 
-Seg3D::LayerHandle LayerManager::get_layer_by_name( const std::string& layer_name )
+LayerHandle LayerManager::get_layer_by_name( const std::string& layer_name )
 {
   lock_type lock( this->get_mutex() );
 
@@ -423,7 +423,7 @@ void LayerManager::delete_layers( LayerGroupHandle group )
   
 } // end delete_layer
 
-Seg3D::LayerHandle LayerManager::get_active_layer()
+LayerHandle LayerManager::get_active_layer()
 {
   lock_type lock( this->get_mutex() );  
   return this->active_layer_;

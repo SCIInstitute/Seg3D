@@ -32,15 +32,29 @@
 namespace Core
 {
 
-StateHandler::StateHandler( const std::string& stateid_prefix ) :
-  stateid_prefix_( stateid_prefix )
+typedef std::map< std::string, StateBaseHandle > state_map_type;
+
+class StateHandlerPrivate
 {
-  StateEngine::Instance()->add_stateid( stateid_prefix_ );
+public:
+  StateHandlerPrivate() {}
+  ~StateHandlerPrivate() {}
+
+  state_map_type state_map_;
+};
+
+StateHandler::StateHandler( const std::string& type_str, bool auto_id )
+{
+  this->private_ = new StateHandlerPrivate;
+  this->stateid_prefix_ = StateEngine::Instance()->
+    register_state_handler( type_str, this, auto_id );
 }
 
 StateHandler::~StateHandler()
 {
-  StateEngine::Instance()->remove_state( stateid_prefix_ );
+  this->disconnect_all();
+  StateEngine::Instance()->remove_state_handler( this->stateid_prefix_ );
+  delete this->private_;
 }
     
 
@@ -49,24 +63,37 @@ bool StateHandler::add_statebase( StateBaseHandle state )
   // Step (1): Get unique state id
   std::string stateid = state->stateid();
 
-  // Step (2): Import the previous setting from the current variable
+  // Step (2): Import previous setting from the current variable
   StateBaseHandle old_state;
-  StateEngine::Instance()->get_state( stateid, old_state );
+  this->get_state( stateid, old_state );
 
   if ( old_state.get() )
   {
     // use the string representation as intermediate
     state->import_from_string( old_state->export_to_string() );
-    // delete the old state from the manager
-    StateEngine::Instance()->remove_state( stateid );
   }
 
   // Step (3): Link with statehandler
-  add_connection( state->state_changed_signal_.connect( boost::bind(
+  this->add_connection( state->state_changed_signal_.connect( boost::bind(
       &StateHandler::handle_state_changed, this ) ) );
 
-  // Step (4): Add the state to the StateManager
-  return ( StateEngine::Instance()->add_state( stateid, state ) );
+  // Step (4): Add the state to the map
+  this->private_->state_map_[ stateid ] = state;
+
+  return true;
+}
+
+bool StateHandler::get_state( const std::string& state_id, StateBaseHandle& state )
+{
+  state_map_type::iterator it = this->private_->state_map_.find( state_id );
+  if ( it != this->private_->state_map_.end() )
+  {
+    state = ( *it ).second;
+    return true;
+  }
+
+  state.reset();
+  return false;
 }
 
 void StateHandler::handle_state_changed()

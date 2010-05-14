@@ -41,19 +41,19 @@ namespace Seg3D
 bool ActionMoveLayerAbove::validate( Core::ActionContextHandle& context )
 {
 
-  if ( !( Core::StateEngine::Instance()->is_stateid( this->layer_to_move_id_.value() ) ) )
-  {
-    context->report_error( std::string( "LayerID '" ) + this->layer_to_move_id_.value()
-      + "' is invalid" );
-    return false;
-  }
-  
-  if ( !( Core::StateEngine::Instance()->is_stateid( this->layer_below_id_.value() ) ) )
-  {
-    context->report_error( std::string( "LayerID '" ) + this->layer_below_id_.value()
-      + "' is invalid" );
-    return false;
-  }
+  //if ( !( Core::StateEngine::Instance()->is_stateid( this->layer_to_move_id_.value() ) ) )
+  //{
+  //  context->report_error( std::string( "LayerID '" ) + this->layer_to_move_id_.value()
+  //    + "' is invalid" );
+  //  return false;
+  //}
+  //
+  //if ( !( Core::StateEngine::Instance()->is_stateid( this->layer_below_id_.value() ) ) )
+  //{
+  //  context->report_error( std::string( "LayerID '" ) + this->layer_below_id_.value()
+  //    + "' is invalid" );
+  //  return false;
+  //}
 
   return true;
 }
@@ -61,8 +61,8 @@ bool ActionMoveLayerAbove::validate( Core::ActionContextHandle& context )
 bool ActionMoveLayerAbove::run( Core::ActionContextHandle& context, 
                  Core::ActionResultHandle& result )
 {
-  if ( ( Core::StateEngine::Instance()->is_stateid( this->layer_to_move_id_.value() ) ) && 
-    ( Core::StateEngine::Instance()->is_stateid( this->layer_below_id_.value() ) ) )
+  //if ( ( Core::StateEngine::Instance()->is_stateid( this->layer_to_move_id_.value() ) ) && 
+  //  ( Core::StateEngine::Instance()->is_stateid( this->layer_below_id_.value() ) ) )
   {
     LayerManager::Instance()->move_layer_above( this->layer_to_move_id_.value(), 
       this->layer_below_id_.value() );

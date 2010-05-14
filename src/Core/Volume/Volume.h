@@ -64,6 +64,7 @@ class Volume : public boost::noncopyable
 public:
   typedef DataBlock::mutex_type mutex_type;
   typedef DataBlock::lock_type lock_type;
+  typedef DataBlock::shared_lock_type shared_lock_type;
 
   // -- constructor/destructor --
 public:
