@@ -70,6 +70,8 @@ bool StateEngine::get_state( const std::string& state_id, StateBaseHandle& state
 {
   lock_type lock( get_mutex() );
 
+  state.reset();
+
   std::string state_handler_id;
   size_t loc = state_id.find( "::" );
   if ( loc != std::string::npos )
@@ -78,8 +80,8 @@ bool StateEngine::get_state( const std::string& state_id, StateBaseHandle& state
   }
   else
   {
-    //TODO: Throw a logic error OR return false and log an error
-    state_handler_id = state_id;
+    CORE_LOG_ERROR( std::string( "Invalid state ID " ) + state_id );
+    return false;
   }
 
   state_handler_map_type::iterator it = this->private_->state_handler_map_.
@@ -89,7 +91,6 @@ bool StateEngine::get_state( const std::string& state_id, StateBaseHandle& state
     return ( *it ).second->get_state( state_id, state );
   }
 
-  state.reset();
   return false;
 
 }
@@ -159,7 +160,7 @@ std::string StateEngine::register_state_handler( const std::string &type_str,
       state_handler_counter = ( *it ).second;
     }
 
-    handler_id = type_str + Core::ExportToString( ( *state_handler_counter )++ );
+    handler_id = type_str + "_" + Core::ExportToString( ( *state_handler_counter )++ );
   }
   else
   {

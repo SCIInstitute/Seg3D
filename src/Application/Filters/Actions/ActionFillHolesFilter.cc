@@ -67,6 +67,7 @@ Core::ActionHandle ActionFillHolesFilter::Create( std::string layer_id )
 {
   ActionFillHolesFilter* action = new ActionFillHolesFilter;
   action->layer_id_.value() = layer_id;
+  return Core::ActionHandle( action );
 }
 
 void ActionFillHolesFilter::Dispatch( std::string layer_id )
