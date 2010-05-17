@@ -45,6 +45,7 @@
 #include <Interface/AppPreferences/ColorButton.h>
 
 // Application includes
+#include <Core/State/StateName.h>
 #include <Core/State/StateValue.h>
 #include <Core/State/StateOption.h>
 #include <Core/State/StateVector.h>
@@ -96,6 +97,8 @@ public:
   
   // Coonect QLineEdits
   static bool Connect( QLineEdit* qlineedit, Core::StateStringHandle& state_handle );
+  
+  static bool Connect( QLineEdit* qlineedit, Core::StateNameHandle& state_handle );
   
   // Connect QActionGroup and StateOption
   // NOTE: This requires that each QAction in the QActionGroup has its objectName

@@ -105,6 +105,8 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   // this is a default setting until we can get the name of the layer from the file or by some other means
   this->private_->ui_.label_->setText( QString::fromStdString( layer->name_state_->get() ) );
   this->private_->ui_.label_->setAcceptDrops( false );
+  this->private_->ui_.label_->setValidator( new QRegExpValidator( 
+    QRegExp( QString::fromStdString( Core::StateName::REGEX_VALIDATOR_C ) ), this ) );
 
   // hide the toolbars and the selection check box
   // hide the tool bars and the selection checkbox

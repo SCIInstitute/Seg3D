@@ -45,11 +45,8 @@
 #include <Core/State/Actions/ActionSet.h>
 #include <Core/State/Actions/ActionSetRange.h>
 
-
-
 namespace Seg3D
 {
-
 
 class QtDeleteSlot : public QObject
 {
@@ -192,6 +189,41 @@ public Q_SLOTS:
 private:
   // Function object
   Core::StateStringHandle state_handle_;
+};
+
+class QtNameEditSlot : public QtSlot
+{
+  Q_OBJECT
+
+public:
+  QtNameEditSlot( QLineEdit* parent, Core::StateNameHandle& state_handle, 
+    bool blocking = true ) :
+    QtSlot( parent, blocking ), 
+    parent_( parent ), 
+    state_handle_( state_handle )
+  {
+    this->connect( parent, SIGNAL( editingFinished() ), SLOT( slot() ) );
+  }
+
+  virtual ~QtNameEditSlot()
+  {
+  }
+
+public Q_SLOTS:
+
+  // Slot that Qt will call
+  void slot()
+  {
+    std::string text = this->parent_->text().trimmed().toStdString();
+    if ( !blocked_ )
+    {
+      Core::ActionSet::Dispatch( this->state_handle_, text );
+    }
+  }
+
+private:
+  QLineEdit* parent_;
+  Core::StateNameHandle state_handle_;
 };
 
 

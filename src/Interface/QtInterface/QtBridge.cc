@@ -100,7 +100,16 @@ void QtLineEditSignal( QPointer< QLineEdit > qpointer, std::string state, Core::
     QtSignal( qpointer, boost::bind( &QLineEdit::setText, qpointer.data(), QString::fromStdString( state ) ) ); 
   }
 }
-// -- END SIGNAL CONNECTORS FOR THE QComboBox's -- //
+
+// Signal for connecting to StateName's value_changed_signal_
+// The actual value set in StateName can be different from interface input, so this signal
+// should always be passed to the interface no matter what the source is
+void QtNameEditSignal( QPointer< QLineEdit > qpointer, std::string state )
+{
+  QtSignal( qpointer, boost::bind( &QLineEdit::setText, qpointer.data(), 
+    QString::fromStdString( state ) ) );
+}
+// -- END SIGNAL CONNECTORS FOR THE QLineEdit's -- //
 
 // -- BEGIN CONNECT FUNCTION FOR CONNECTING QLineEdit's TO StateStringHandle's -- //
 bool QtBridge::Connect( QLineEdit* qlineedit, Core::StateStringHandle& state_handle )
@@ -109,11 +118,24 @@ bool QtBridge::Connect( QLineEdit* qlineedit, Core::StateStringHandle& state_han
   // Link the slot to the parent widget, so Qt's memory manager will
   // manage this one.
   new QtLineEditSlot( qlineedit, state_handle );
+
   QPointer< QLineEdit > qpointer( qlineedit );
 
   // Connect the state signal back into the Qt Variable
   new QtDeleteSlot( qlineedit, state_handle->value_changed_signal_.connect( 
       boost::bind( &QtLineEditSignal, qpointer, _1, _2 ) ) );
+
+  return true;
+}
+
+bool QtBridge::Connect( QLineEdit* qlineedit, Core::StateNameHandle& state_handle )
+{
+  new QtNameEditSlot( qlineedit, state_handle );
+
+  QPointer< QLineEdit > qpointer( qlineedit );
+
+  new QtDeleteSlot( qlineedit, state_handle->value_changed_signal_.connect(
+    boost::bind( &QtNameEditSignal, qpointer, _2 ) ) );
 
   return true;
 }

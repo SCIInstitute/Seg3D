@@ -34,7 +34,6 @@
 #endif
 
 #include <Core/State/StateBase.h>
-#include <Core/State/StateEngine.h>
 
 namespace Core
 {

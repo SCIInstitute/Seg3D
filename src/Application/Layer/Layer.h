@@ -88,7 +88,7 @@ public:
 public:
   
   // The name of the layer
-  Core::StateStringHandle name_state_;
+  Core::StateNameHandle name_state_;
 
   // Per viewer state of whether this layer is visible
   std::vector< Core::StateBoolHandle > visible_state_;

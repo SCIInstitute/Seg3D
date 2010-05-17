@@ -70,12 +70,12 @@ void ActionContext::report_need_resource( ResourceLockHandle& resource )
 {
 }
 
-ActionStatus ActionContext::status()
+ActionStatus ActionContext::status() const
 {
   return ( status_ );
 }
 
-ActionSource ActionContext::source()
+ActionSource ActionContext::source() const
 {
   return ( ActionSource::COMMANDLINE_E );
 }

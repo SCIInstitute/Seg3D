@@ -360,8 +360,8 @@ bool Renderer::render_overlay()
     
     // Render the positions of slices in other viewers
     glLineStipple( 1, 0x1C47 );
-    int vert_slice_mode = ( view_mode + 2 ) % 3;
-    int hori_slice_mode = ( view_mode + 1 ) % 3;
+    int vert_slice_mode = ( view_mode + 1 ) % 3;
+    int hori_slice_mode = ( view_mode + 2 ) % 3;
     size_t num_of_vert_slices = viewers_info[ vert_slice_mode ].size();
     size_t num_of_hori_slices = viewers_info[ hori_slice_mode ].size();
     for ( size_t i = 0; i < num_of_vert_slices; i++ )

@@ -74,9 +74,9 @@ Viewer::Viewer( size_t viewer_id ) :
   add_state( "sagittal_view", sagittal_view_state_ );
   add_state( "volume_view", volume_view_state_ );
 
-  this->view_states_[ 0 ] = this->axial_view_state_;
+  this->view_states_[ 0 ] = this->sagittal_view_state_;
   this->view_states_[ 1 ] = this->coronal_view_state_;
-  this->view_states_[ 2 ] = this->sagittal_view_state_;
+  this->view_states_[ 2 ] = this->axial_view_state_;
   this->view_states_[ 3 ] = this->volume_view_state_;
 
   add_state( "slice_number", this->slice_number_state_, 0, 0, 0, 1 );

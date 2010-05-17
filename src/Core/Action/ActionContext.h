@@ -149,8 +149,8 @@ public:
 
   // -- Source/Status information --
 public:
-  virtual ActionStatus status();
-  virtual ActionSource source();
+  virtual ActionStatus status() const;
+  virtual ActionSource source() const;
 
   // -- shortcuts for checking status --
 public:

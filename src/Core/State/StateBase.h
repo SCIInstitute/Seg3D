@@ -40,9 +40,6 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
 
-// Core includes
-#include <Core/Utils/StringUtil.h>
-
 // Action includes
 #include <Core/Action/ActionContext.h>
 #include <Core/Action/ActionParameter.h>

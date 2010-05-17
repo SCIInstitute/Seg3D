@@ -29,7 +29,9 @@
 // STL includes
 #include <algorithm>
 
+#include <Core/State/StateEngine.h>
 #include <Core/State/StateOption.h>
+#include <Core/Utils/Exception.h>
 
 namespace Core
 {
