@@ -56,6 +56,9 @@ public:
   ColorBarWidget( QWidget* parent = 0 );
   virtual ~ColorBarWidget();
 
+public:
+  int get_active_index();
+
 public Q_SLOTS:
   void set_color_index( int index );
 

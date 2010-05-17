@@ -62,11 +62,10 @@ AppPreferences::AppPreferences( QWidget *parent ) :
   this->setup_viewer_prefs();
   this->setup_sidebar_prefs();
   this->setup_interface_controls_prefs();
-  
-  // Disable the Apply button since we arent using it yet
-  connect( this->private_->ui_.apply_button_, SIGNAL( clicked () ), this, SLOT( save_defaults() ) );
-  //this->private_->ui_.apply_button_->setEnabled( false );
 
+  // connect the apply button to the save defaults function
+  connect( this->private_->ui_.apply_button_, SIGNAL( clicked () ), this, SLOT( save_defaults() ) );
+  
 }
 
 AppPreferences::~AppPreferences()

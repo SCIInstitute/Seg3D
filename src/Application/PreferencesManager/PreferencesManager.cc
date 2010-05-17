@@ -84,21 +84,21 @@ void PreferencesManager::initialize_states()
   add_state( "full_screen_on_startup", full_screen_on_startup_state_, false );
   
   //Viewer Preferences
-  add_state( "default_viewer_mode", default_viewer_mode_state_, "one and three", "one|one and one|one and two|one and three|two and two|two and three|three and three" );
+  add_state( "default_viewer_mode", default_viewer_mode_state_, "1and3", 
+    "single|1and1|1and2|1and3|2and2|2and3|3and3" );
   add_state( "grid_size", grid_size_state_, 20 );
-  add_state( "background_color", background_color_state_, "black", "black|lightgray|darkgray|gray|fuchsia" );
+  add_state( "background_color", background_color_state_, "black", 
+    "black|lightgray|darkgray|gray|fuchsia" );
   add_state( "show_slice_number", show_slice_number_state_, true );
-  add_state( "naming_convention", naming_convention_state_, "sagital/axial/coronal", "sagital/axial/coronal|x/y/z" );
+  add_state( "naming_convention", naming_convention_state_, "sagital/axial/coronal", 
+    "sagital/axial/coronal|x/y/z" );
   
   //Layers Preferences
   add_state( "default_layer_opacity", default_layer_opacity_state_, 1.0, 0.0, 1.0, 0.01 );
   add_state( "default_mask_fill", default_mask_fill_state_, "striped", "none|striped|solid" );
   add_state( "default_mask_border", default_mask_border_state_, "thick", "none|thin|thick" );
-  //add_state( "colors", colors_state_, this->default_colors_ ); 
-  
-  
+    
   color_states_.resize( 12 );
-  
   for ( size_t j = 0; j < 12; j++ )
   {
     std::string stateid = std::string( "color_" ) + Core::ExportToString( j );

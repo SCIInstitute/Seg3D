@@ -60,10 +60,6 @@ namespace Seg3D
   
   void ColorButton::set_color( Core::Color button_color )
   {
-    //if ( this->button_color_ == button_color ) {
-    //  return;
-    //}
-    
     this->button_color_ = button_color;
     
     QString style_sheet = QString::fromUtf8( 

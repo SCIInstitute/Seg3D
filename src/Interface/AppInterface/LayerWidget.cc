@@ -297,6 +297,10 @@ LayerWidget::~LayerWidget()
 
 void LayerWidget::set_mask_background_color( int color_index )
 {
+  if( dynamic_cast< MaskLayer* >( LayerManager::Instance()->get_layer_by_id( 
+    this->get_layer_id()).get()  )->color_state_->get() != color_index )
+    return;
+
   Core::Color color = PreferencesManager::Instance()->color_states_[ color_index ]->get();
   
   QString style_sheet = QString::fromUtf8( 

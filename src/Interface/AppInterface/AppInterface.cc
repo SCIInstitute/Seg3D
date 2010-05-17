@@ -69,13 +69,15 @@ AppInterface::AppInterface()
   setCorner( Qt::BottomRightCorner, Qt::RightDockWidgetArea );
 
   // Define the main window viewer canvas
+  this->preferences_interface_ = new AppPreferences( this );
+  this->preferences_interface_->hide();
+
   this->viewer_interface_ = new ViewerInterface( this );
 
   this->controller_interface_ = new AppController( this );
   this->controller_interface_->hide();
   
-  this->preferences_interface_ = new AppPreferences( this );
-  this->preferences_interface_->hide();
+  
 
   // Setup the dock widgets
   add_windowids();
@@ -83,6 +85,7 @@ AppInterface::AppInterface()
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
 
+    // Show the Windows that are specified in the PreferencesManager
     if( PreferencesManager::Instance()->show_history_bar_state_->get() )
       show_window( "history" );
 
@@ -127,8 +130,6 @@ AppInterface::AppInterface()
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
 
     // Connect and update full screen state
-    //set_full_screen( InterfaceManager::Instance()->full_screen_state_->get() );
-    
     this->add_connection( InterfaceManager::Instance()->full_screen_state_->
       value_changed_signal_.connect( boost::bind( &AppInterface::SetFullScreen, 
       qpointer_type( this ), _1, _2 ) ) );

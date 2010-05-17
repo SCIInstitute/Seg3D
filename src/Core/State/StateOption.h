@@ -70,6 +70,10 @@ public:
   // Convert the contents of the State into a string
   virtual std::string export_to_string() const;
 
+  // EXPORT_LIST_TO_STRING:
+  // Convert the contents of the State into a string
+  virtual std::string export_list_to_string() const;
+
   // IMPORT_FROM_STRING:
   // Set the State from a string
   virtual bool import_from_string( const std::string& str, Core::ActionSource source =

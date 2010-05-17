@@ -63,6 +63,11 @@ ColorBarWidget::ColorBarWidget( QWidget *parent ) :
 ColorBarWidget::~ColorBarWidget()
 {
 } 
+
+int ColorBarWidget::get_active_index()
+{
+  return this->private_->color_button_group_->checkedId();
+}
   
 void ColorBarWidget::initialize_buttons()
 { 

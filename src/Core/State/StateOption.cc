@@ -82,6 +82,15 @@ std::string StateOption::export_to_string() const
   return ( value_ );
 }
 
+std::string StateOption::export_list_to_string() const
+{
+  std::string list_as_string = "";
+  for( size_t i = 0; i < ( option_list_.size() - 1 ); ++i )
+    list_as_string = list_as_string + option_list_[ i ] + "|";
+
+  return list_as_string + option_list_[ ( option_list_.size() - 1 ) ];
+}
+
 bool StateOption::set( const std::string& input_value, ActionSource source )
 {
   // Lock the state engine so no other thread will be accessing it

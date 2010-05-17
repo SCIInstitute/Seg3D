@@ -34,6 +34,7 @@
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/Viewer/Viewer.h> 
 #include <Application/ViewerManager/ViewerManager.h>
+#include <Application/PreferencesManager/PreferencesManager.h>
 
 // Core includes
 #include <Core/Utils/ScopedCounter.h>
@@ -53,8 +54,9 @@ ViewerManager::ViewerManager() :
 {
   // Step (1)
   // Set the default state of this element
-  this->add_state( "layout", this->layout_state_, "1and3", 
-    "single|1and1|1and2|1and3|2and2|2and3|3and3" );
+  this->add_state( "layout", this->layout_state_, PreferencesManager::Instance()->
+    default_viewer_mode_state_->export_to_string(), PreferencesManager::Instance()->
+    default_viewer_mode_state_->export_list_to_string() );
   this->add_state( "active_viewer", this->active_viewer_state_, 0 );
 
   // Step (2)
