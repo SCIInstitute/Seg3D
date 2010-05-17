@@ -32,9 +32,9 @@
 
 // Boost Includes
 #include <boost/lexical_cast.hpp>
-#include <boost/archive/xml_oarchive.hpp>
-#include <boost/archive/xml_iarchive.hpp>
-#include <boost/serialization/nvp.hpp>
+
+// TinyXML includes
+#include <Externals/tinyxml/tinyxml.h>
 
 // Application includes
 #include <Application/PreferencesManager/PreferencesManager.h>
@@ -56,13 +56,18 @@ PreferencesManager::PreferencesManager() :
   if(  initialize_default_colors() )
     this->initialize_states();
 
-  // this is just for testing
-  this->save_preferences_to_file();
+  // After we initialize the states, we then load the saved preferences from file.
+  load_states( local_config_path_ );
   
 }
 
 PreferencesManager::~PreferencesManager()
 {
+}
+
+void PreferencesManager::save_state()
+{
+  save_states( local_config_path_ );
 }
 
 Core::Color PreferencesManager::get_color( int index ) const
@@ -74,7 +79,7 @@ Core::Color PreferencesManager::get_color( int index ) const
 void PreferencesManager::initialize_states()
 {
   //General Preferences
-  add_state( "project_path", project_path_state_, "" );
+  add_state( "project_path", project_path_state_, local_config_path_.string() );
   add_state( "considate_project", considate_project_state_, false );
   add_state( "full_screen_on_startup", full_screen_on_startup_state_, false );
   
@@ -90,6 +95,7 @@ void PreferencesManager::initialize_states()
   add_state( "default_mask_fill", default_mask_fill_state_, "striped", "none|striped|solid" );
   add_state( "default_mask_border", default_mask_border_state_, "thick", "none|thin|thick" );
   //add_state( "colors", colors_state_, this->default_colors_ ); 
+  
   
   color_states_.resize( 12 );
   
@@ -108,26 +114,6 @@ void PreferencesManager::initialize_states()
   add_state( "show_measurement_bar", show_measurement_bar_state_, false );
   add_state( "show_history_bar", show_history_bar_state_, false );
   
-}
-
-bool PreferencesManager::save_preferences_to_file()
-{
-  std::ofstream user_prefs( local_config_path_.string().c_str() );
-
-  //TODO: add xml encoder
-    // this is temporary test code to write data to the file
-    for( size_t i = 0; i < this->color_states_.size(); ++i )
-    {
-      user_prefs << this->color_states_[ i ]->export_to_string() << std::endl;
-    }
-  user_prefs.close();
-  return true;
-}
-
-bool PreferencesManager::load_preferences_from_file()
-{
-  std::ifstream user_prefs( local_config_path_.string().c_str() );
-  return true;
 }
 
 

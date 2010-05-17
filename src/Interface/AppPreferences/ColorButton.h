@@ -48,25 +48,25 @@ Q_SIGNALS:
   void color_changed( int );
   void button_clicked( Core::Color, bool );
   void index( int );
-  //void clicked( Core::Color, bool );
-  //void clicked( bool );
-  //void toggled( bool );
-  //void clicked( int );
-  //void clicked();
-  
-public Q_SLOTS:
-  void set_color( Core::Color );
-  Core::Color get_color(){ return button_color_; }
-  
+
 public:
-  //void mousePressEvent( QMouseEvent *event );
-  
-public:
+  // - Constructor / Destructor
   ColorButton( QWidget *parent = 0, int index = 0, 
     Core::Color button_color = Core::Color(), int height = 0, int width = 0 );
   virtual ~ColorButton();
   
+public Q_SLOTS:
+  // SET_COLOR:
+  // This function sets the color and the stylesheet of the button to reflect the desired color
+  void set_color( Core::Color );
+
+  // GET_COLOR:
+  // This function returns the current color of the button
+  Core::Color get_color(){ return button_color_; }
+  
 private Q_SLOTS:
+  // TRIGGER_SIGNAL:
+  // This function is called when the button needs to signal that it has been toggled.
   void trigger_signal( bool );
 
 private:

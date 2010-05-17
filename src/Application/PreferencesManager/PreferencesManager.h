@@ -94,13 +94,19 @@ public:
   Core::StateBoolHandle show_history_bar_state_;
   
 public:
+  // GET_DEFAULT_COLORS:
+  // this function returns a vector of the default colors
   const std::vector< Core::Color >& get_default_colors() const { return default_colors_; }
   Core::Color get_color( int index ) const;
-  bool save_preferences_to_file();
-  bool load_preferences_from_file();
+  void save_state();
   
 private:
+  // INITIALIZE_STATES:
+  // This function is called by the constructor to initialize the state variables
   void initialize_states();
+  
+  // INITIALIZE_DEFAULT_COLORS:
+  // This function is called by the constructor to initialize a vector of default color values
   bool initialize_default_colors();
 
   

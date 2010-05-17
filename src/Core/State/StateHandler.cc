@@ -26,8 +26,12 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// TinyXML includes
+#include <Externals/tinyxml/tinyxml.h>
+
 #include <Core/State/StateHandler.h>
 #include <Core/State/StateEngine.h>
+#include <Core/Application/Application.h>
 
 namespace Core
 {
@@ -50,6 +54,7 @@ StateHandler::StateHandler( const std::string& type_str, bool auto_id )
   this->private_ = new StateHandlerPrivate;
   this->private_->statehandler_id_ = StateEngine::Instance()->
     register_state_handler( type_str, this, auto_id );
+
 }
 
 StateHandler::~StateHandler()
@@ -113,6 +118,76 @@ bool StateHandler::get_state( const size_t idx, StateBaseHandle& state )
   std::advance( it, idx );
   
   state = ( *it ).second;
+  return true;
+}
+
+bool StateHandler::save_states( boost::filesystem::path path )
+{
+  state_map_type::iterator it = this->private_->state_map_.begin();
+  state_map_type::iterator it_end = this->private_->state_map_.end();
+
+  // XML declaration and version number
+  TiXmlDocument doc;  
+  TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "", "" );  
+  doc.LinkEndChild( decl );  
+
+  // Set Seg3D2 as our root
+  TiXmlElement * root = new TiXmlElement( "Seg3D2" );  
+  doc.LinkEndChild( root );  
+ 
+  // We will use our statehandler_id as the parent for its state values
+  TiXmlElement* preferences = new TiXmlElement( this->private_->statehandler_id_.c_str() );  
+  root->LinkEndChild( preferences );  
+
+  TiXmlElement* state_value;
+
+  while ( it != it_end )
+  {
+    // Here we will add all the state values 
+    state_value = new TiXmlElement( ( *it ).second->stateid().c_str() );
+    state_value->LinkEndChild( new TiXmlText( ( *it ).second->export_to_string().c_str() ));  
+    preferences->LinkEndChild( state_value );
+    ++it;
+  }
+
+  // Finally we will save our XML to the specified file
+  doc.SaveFile( path.string().c_str() );
+  
+  return true;
+}
+
+
+bool StateHandler::load_states( boost::filesystem::path path )
+{
+  // We will load in the file from the specified path and exit if the path is invalid
+  TiXmlDocument doc( path.string().c_str() );
+  if ( !doc.LoadFile() ) return false;
+
+  TiXmlHandle hDoc( &doc );
+  TiXmlElement* state_values;
+  TiXmlHandle hRoot(0);
+
+  // We should have a valid root if not we will exit
+  {
+    state_values = hDoc.FirstChildElement().Element();
+    if ( !state_values ) return false;
+    hRoot = TiXmlHandle( state_values );
+  }
+
+  // Now we are expecting to get the proper statehandler_id_
+  {
+    state_values = hRoot.FirstChild( this->private_->
+      statehandler_id_.c_str() ).FirstChild().Element();
+
+    for( state_values; state_values; state_values = state_values->NextSiblingElement() )
+    {
+      // Finally we import the actual state values from the XML and import them
+      std::string state_value_name = std::string( state_values->Value() );
+      std::string state_value_value = std::string( state_values->GetText() );
+      if( ( state_value_name != "" ) && ( state_value_value != "" ) )
+        private_->state_map_[ state_value_name ]->import_from_string( state_value_value );
+    }
+  }
   return true;
 }
 

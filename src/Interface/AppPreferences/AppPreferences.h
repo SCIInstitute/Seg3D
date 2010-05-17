@@ -50,15 +50,39 @@ public:
     virtual ~AppPreferences();
   
 private:
+  // SETUP_GENERAL_PREFS:
+  // This function will initialize all the preferences contained within the general tab
   void setup_general_prefs();
+
+  // SETUP_LAYER_PREFS:
+  // This function will initialize all the preferences contained within the layer tab
   void setup_layer_prefs();
+
+  // SETUP_VIEWER_PREFS:
+  // This function will initialize all the preferences contained within the viewer tab
   void setup_viewer_prefs();
+
+  // SETUP_SIDEBAR_PREFS:
+  // This function will initialize all the preferences contained within the sidebar tab
   void setup_sidebar_prefs();
+
+  // SETUP_INTERFACE_CONTROLS_PREFS:
+  // This function will initialize all the preferences contained within the interface control tab
   void setup_interface_controls_prefs();
   
 private Q_SLOTS:
+  // HIDE_THE_OTHERS
+  // This function will hide the inactive colorpickers
   void hide_the_others( int index );
+
+  // SET_BUTTONS_TO_DEFAULT_COLORS:
+  // this function will set all the buttons colors back to default
   void set_buttons_to_default_colors();
+
+  // SAVE_DEFAULTS:
+  // this function will cause Seg3D2 to save all the user preferences to a file which will be 
+  // loaded next time the program starts
+  void save_defaults();
   
 private:
   boost::shared_ptr< AppPreferencesPrivate > private_;

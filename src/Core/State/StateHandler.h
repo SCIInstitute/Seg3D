@@ -35,6 +35,7 @@
 
 // Boost includes
 #include <boost/utility.hpp>
+#include <boost/filesystem.hpp>
 
 // Core includes
 #include <Core/Utils/ConnectionHandler.h>
@@ -129,6 +130,17 @@ public:
       
     return this->add_statebase( state );
   }
+
+public:
+  // SAVE_STATES:
+  // This function will save all the state values of the particular statehandler to XML at the
+  // location that is specified by path
+  bool save_states( boost::filesystem::path path );
+
+  // LOAD_STATES:
+  // This function will load all the state values of the particular statehandler from XML at the
+  // location that is specified by path
+  bool load_states( boost::filesystem::path path );
 
 protected:
   // STATE_CHANGED:

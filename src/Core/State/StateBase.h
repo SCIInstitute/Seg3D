@@ -116,6 +116,14 @@ public:
     return ( stateid_.substr( 0, stateid_.find( ':' ) ) );
   }
 
+  // GET_ID:
+  // Get the base id of this state variable
+  std::string id() const
+  {
+    //return ( stateid_.substr( 2, stateid_.find( ":" ) ) );
+    return Core::SplitString(  stateid_, "::" )[ 1 ];
+  }
+
 private:
   std::string stateid_;
 

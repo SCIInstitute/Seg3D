@@ -51,7 +51,8 @@ TARGET_LINK_LIBRARIES(Application_PreferencesManager
                       Core_Interface
                       Core_Action
                       Core_State
-                      ${SCI_BOOST_LIBRARY})
+                      ${SCI_BOOST_LIBRARY}
+                      ${SCI_TINYXML_LIBRARY})
 
 # Register actions
 ADD_LIBRARY_ACTIONS(Application_PreferencesManager

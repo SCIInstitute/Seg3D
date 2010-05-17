@@ -64,7 +64,8 @@ AppPreferences::AppPreferences( QWidget *parent ) :
   this->setup_interface_controls_prefs();
   
   // Disable the Apply button since we arent using it yet
-  this->private_->ui_.apply_button_->setEnabled( false );
+  connect( this->private_->ui_.apply_button_, SIGNAL( clicked () ), this, SLOT( save_defaults() ) );
+  //this->private_->ui_.apply_button_->setEnabled( false );
 
 }
 
@@ -279,6 +280,11 @@ void AppPreferences::setup_sidebar_prefs()
   QtBridge::Connect( this->private_->ui_.history_checkbox_, 
     PreferencesManager::Instance()->show_history_bar_state_ );
   
+}
+
+void AppPreferences::save_defaults()
+{
+  PreferencesManager::Instance()->save_state();
 }
 
 void AppPreferences::setup_interface_controls_prefs()

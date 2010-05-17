@@ -35,6 +35,7 @@
 // Application includes
 #include <Core/Application/Application.h>
 #include <Core/Interface/Interface.h>
+#include <Application/PreferencesManager/PreferencesManager.h>
 
 // Interface includes
 #include <Interface/QtInterface/QtApplication.h>
@@ -76,14 +77,27 @@ AppInterface::AppInterface()
   this->preferences_interface_ = new AppPreferences( this );
   this->preferences_interface_->hide();
 
-  // Setup the history dock widget
+  // Setup the dock widgets
   add_windowids();
 
-//  show_window( "history" );
-//  show_window( "project" );
-  show_window( "tools" );
-//  show_window( "measurement" );
-  show_window( "layermanager" );
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
+    if( PreferencesManager::Instance()->show_history_bar_state_->get() )
+      show_window( "history" );
+
+    if( PreferencesManager::Instance()->show_projectmanager_bar_state_->get() )
+      show_window( "project" );
+
+    if( PreferencesManager::Instance()->show_tools_bar_state_->get() )
+      show_window( "tools" );
+
+    if( PreferencesManager::Instance()->show_measurement_bar_state_->get() )
+      show_window( "measurement" );
+
+    if( PreferencesManager::Instance()->show_layermanager_bar_state_->get() )
+      show_window( "layermanager" );
+  }
 
   setCentralWidget( this->viewer_interface_ );
 
@@ -113,11 +127,14 @@ AppInterface::AppInterface()
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
 
     // Connect and update full screen state
-    set_full_screen( InterfaceManager::Instance()->full_screen_state_->get() );
+    //set_full_screen( InterfaceManager::Instance()->full_screen_state_->get() );
     
     this->add_connection( InterfaceManager::Instance()->full_screen_state_->
       value_changed_signal_.connect( boost::bind( &AppInterface::SetFullScreen, 
       qpointer_type( this ), _1, _2 ) ) );
+
+    InterfaceManager::Instance()->full_screen_state_->set( 
+      PreferencesManager::Instance()->full_screen_on_startup_state_->get() );
   }
 
   this->center_seg3d_gui_on_screen( this );
