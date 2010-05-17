@@ -41,9 +41,7 @@ SET(CORE_EVENTHANDLER_SRCS
   EventHandlerContext.h
   )
 
-
-ADD_LIBRARY(Core_EventHandler STATIC 
-            ${CORE_EVENTHANDLER_SRCS} )
+CORE_ADD_LIBRARY(Core_EventHandler ${CORE_EVENTHANDLER_SRCS} )
             
 TARGET_LINK_LIBRARIES(Core_EventHandler
                       Core_Utils

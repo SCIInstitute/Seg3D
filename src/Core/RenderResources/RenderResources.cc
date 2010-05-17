@@ -34,8 +34,7 @@ namespace Core
 
 CORE_SINGLETON_IMPLEMENTATION( RenderResources );
 
-RenderResources::RenderResources() :
-  gl_initialized_( false )
+RenderResources::RenderResources()
 {
 }
 
@@ -45,21 +44,48 @@ RenderResources::~RenderResources()
 
 void RenderResources::initialize_eventhandler()
 {
-  this->render_context_->make_current();
+  this->delete_context_->make_current();
 }
 
 bool RenderResources::create_render_context( RenderContextHandle& context )
 {
+  lock_type lock( this->get_mutex() );
+
   // The context gets setup through the GUI system and is GUI dependent
   // if this function is accessed before the GUI system is setup, something
   // is wrong in the program logic, hence warn the user
-  if ( !resources_context_.get() )
+  if ( ! this->resources_context_.get() )
   {
-    CORE_THROW_LOGICERROR("No render resources were installed to create an opengl context");
+    CORE_THROW_LOGICERROR(
+      "No render resources were installed to create an opengl context" );
   }
 
-  return ( resources_context_->create_render_context( context ) );
+  return ( this->resources_context_->create_render_context( context ) );
 }
+
+
+void RenderResources::init_render_resources()
+{
+  if ( ! ( this->delete_context_ ) )
+  {
+    glewInit();
+
+    // Check OpenGL capabilities
+    if ( !GLEW_VERSION_2_1 )
+    {
+      CORE_THROW_OPENGLEXCEPTION( "Minimum OpenGL version 2.1 required." );
+    }
+    if ( !GLEW_EXT_framebuffer_object )
+    {
+      CORE_THROW_OPENGLEXCEPTION( "GL_EXT_framebuffer_object not found." );
+    }
+
+    // Create GL context for the event handler thread and start it
+    this->resources_context_->create_render_context( this->delete_context_ );
+    this->start_eventhandler();
+  }
+}
+
 
 void RenderResources::install_resources_context( RenderResourcesContextHandle resources_context )
 {
@@ -69,12 +95,13 @@ void RenderResources::install_resources_context( RenderResourcesContextHandle re
     CORE_THROW_LOGICERROR("Cannot install an empty render resources context");
   }
 
-  resources_context_ = resources_context;
+  resources_context_ = resources_context; 
 }
 
 bool RenderResources::valid_render_resources()
 {
-  return ( resources_context_.get() && resources_context_->valid_render_resources() );
+  return ( resources_context_ && resources_context_->valid_render_resources() 
+    && delete_context_ );
 }
 
 void RenderResources::delete_texture( unsigned int texture_id )
@@ -132,41 +159,12 @@ void RenderResources::delete_framebuffer_object( unsigned int framebuffer_object
   SCI_CHECK_OPENGL_ERROR();
 }
 
-std::string RenderResources::get_current_context_string()
-{
-  if ( this->resources_context_ )
-  {
-    return this->resources_context_->get_current_context_string();
-  }
-  return std::string("");
+RenderResources::mutex_type& RenderResources::GetMutex() 
+{ 
+  return Instance()->get_mutex(); 
 }
 
-void RenderResources::init_gl()
-{
-  if ( !this->gl_initialized_ )
-  {
-    lock_type lock( this->get_mutex() );
-    if ( !this->gl_initialized_ )
-    {
-      glewInit();
-      this->gl_initialized_ = true;
 
-      // Create GL context for the event handler thread and start it
-      this->create_render_context( this->render_context_ );
-      this->start_eventhandler();
-
-      // Check OpenGL capabilities
-      if ( !GLEW_VERSION_2_1 )
-      {
-        CORE_THROW_OPENGLEXCEPTION( "Minimum OpenGL version 2.1 required." );
-      }
-      if ( !GLEW_EXT_framebuffer_object )
-      {
-        CORE_THROW_OPENGLEXCEPTION( "GL_EXT_framebuffer_object not found." );
-      }
-    }
-  }
-}
 
 } // end namespace Core
 

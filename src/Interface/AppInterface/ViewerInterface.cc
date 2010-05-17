@@ -46,75 +46,100 @@ namespace Seg3D
 
 class ViewerInterfacePrivate
 {
+  // -- constructor/destructor --
 public:
+  ViewerInterfacePrivate();
 
-  ViewerInterfacePrivate( QWidget* parent );
-
+  // -- Setup the UI --
 public:
-  // Layout elements
+  void setup_ui( QWidget* parent ); 
+
+  // -- The UI pieces of the interface --
+public:
+  // Add a layout that allows a small widget to be entered beneath the
+  // the viewers
   QVBoxLayout* layout_;
 
   // Splitters
+  // Horizontal splitter separates the left and right set of viewers
   QSplitter* horiz_splitter_;
+  // The first vertical splitter is for the viewers on the left and
+  // the second one is for the viewers on the right
   QSplitter* vert_splitter1_;
   QSplitter* vert_splitter2_;
 
-  // All six viewers
+  // List of all the viewers
   std::vector< ViewerWidget* > viewer_;
 };
 
-ViewerInterfacePrivate::ViewerInterfacePrivate( QWidget* parent ) 
+ViewerInterfacePrivate::ViewerInterfacePrivate() :
+  layout_( 0 ),
+  horiz_splitter_( 0 ),
+  vert_splitter1_( 0 ),
+  vert_splitter2_( 0 )
 {
-  layout_ = new QVBoxLayout( parent );
-  layout_->setContentsMargins( 0, 0, 0, 0 );
-  layout_->setSpacing( 0 );
+}
 
-  vert_splitter1_ = new QSplitter( Qt::Vertical, parent );
-  vert_splitter2_ = new QSplitter( Qt::Vertical, parent );
-  horiz_splitter_ = new QSplitter( Qt::Horizontal, parent );
 
-  horiz_splitter_->addWidget( vert_splitter1_ );
-  horiz_splitter_->addWidget( vert_splitter2_ );
-  horiz_splitter_->setOpaqueResize( false );
+void ViewerInterfacePrivate::setup_ui( QWidget* parent ) 
+{
+  this->layout_ = new QVBoxLayout( parent );
+  this->layout_->setContentsMargins( 0, 0, 0, 0 );
+  this->layout_->setSpacing( 0 );
 
-  viewer_.resize( 6 );
+  this->vert_splitter1_ = new QSplitter( Qt::Vertical, parent );
+  this->vert_splitter2_ = new QSplitter( Qt::Vertical, parent );
+  this->horiz_splitter_ = new QSplitter( Qt::Horizontal, parent );
+
+  this->horiz_splitter_->addWidget( this->vert_splitter1_ );
+  this->horiz_splitter_->addWidget( this->vert_splitter2_ );
+  this->horiz_splitter_->setOpaqueResize( false );
+
+  this->viewer_.resize( 6 );
   for ( size_t j = 0; j < 6; j++ )
-    viewer_[ j ] = new ViewerWidget( static_cast< int > ( j ), parent );
-
-  vert_splitter1_->addWidget( viewer_[ 0 ] );
-  vert_splitter1_->addWidget( viewer_[ 1 ] );
-  vert_splitter1_->addWidget( viewer_[ 2 ] );
+  {
+    ViewerHandle viewer = ViewerManager::Instance()->get_viewer( j );
+    this->viewer_[ j ] = new ViewerWidget( viewer, parent );
+  }
+  
+  this->vert_splitter1_->addWidget( this->viewer_[ 0 ] );
+  this->vert_splitter1_->addWidget( this->viewer_[ 1 ] );
+  this->vert_splitter1_->addWidget( this->viewer_[ 2 ] );
   vert_splitter1_->setOpaqueResize( false );
 
-  vert_splitter2_->addWidget( viewer_[ 3 ] );
-  vert_splitter2_->addWidget( viewer_[ 4 ] );
-  vert_splitter2_->addWidget( viewer_[ 5 ] );
+  this->vert_splitter2_->addWidget( this->viewer_[ 3 ] );
+  this->vert_splitter2_->addWidget( this->viewer_[ 4 ] );
+  this->vert_splitter2_->addWidget( this->viewer_[ 5 ] );
   vert_splitter2_->setOpaqueResize( false );
 
-  layout_->addWidget( horiz_splitter_ );
+  this->layout_->addWidget( this->horiz_splitter_ );
   parent->setLayout( layout_ );
 
   for ( size_t j = 0; j < 6; j++ )
-    parent->connect( viewer_[ j ], SIGNAL( selected( int ) ), SLOT( set_active_viewer( int ) ) );
+  {
+    parent->connect( this->viewer_[ j ], SIGNAL( selected( int ) ), 
+      SLOT( set_active_viewer( int ) ) );
+  }
 }
 
 ViewerInterface::ViewerInterface( QWidget *parent ) :
-  QWidget( parent )
+  QWidget( parent ),
+  private_( new ViewerInterfacePrivate )
 {
   // Create the internals of the interface
-  private_ = ViewerInterfacePrivateHandle( new ViewerInterfacePrivate( this ) );
-
-  // Get a qpointer to this object, so all the application signal callbacks
-  // can use this to ensure that the pointer to this object is still valid.
-  qpointer_type qpointer( this );
+  this->private_->setup_ui( this );
 
   // We need a lock here as connecting to the state engine and getting the
   // the current value needs to be atomic
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
+    qpointer_type qpointer( this );
+    
     // Connect signals
-    ViewerManager::Instance()->layout_state_->value_changed_signal_.connect( boost::bind(
-        &ViewerInterface::SetViewerLayout, qpointer, _1 ) );
+    ViewerManager::Instance()->layout_state_->value_changed_signal_.connect( 
+      boost::bind( &ViewerInterface::SetViewerLayout, qpointer, _1 ) );
+      
     ViewerManager::Instance()->active_viewer_state_->value_changed_signal_.connect(
         boost::bind( &ViewerInterface::SetActiveViewer, qpointer, _1 ) );
 

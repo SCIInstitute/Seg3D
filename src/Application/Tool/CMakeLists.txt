@@ -40,8 +40,7 @@ SET(APPLICATION_TOOL_SRCS
   ToolFactory.cc
   )
 
-ADD_LIBRARY(Application_Tool STATIC 
-            ${APPLICATION_TOOL_SRCS} )
+CORE_ADD_LIBRARY(Application_Tool ${APPLICATION_TOOL_SRCS} )
             
 TARGET_LINK_LIBRARIES(Application_Tool
                       Core_Utils

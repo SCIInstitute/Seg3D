@@ -51,7 +51,6 @@ class QtRenderWidget : public QGLWidget, private Core::ConnectionHandler
 Q_OBJECT
 
 public:
-
   QtRenderWidget( const QGLFormat& format, QWidget* parent, QtRenderWidget* share );
   virtual ~QtRenderWidget();
 

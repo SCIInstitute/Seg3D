@@ -26,6 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// Application includes
+#include <Application/Tool/Tool.h>
 #include <Application/Tool/ToolInterface.h>
 
 namespace Seg3D
@@ -37,6 +39,21 @@ ToolInterface::ToolInterface()
 
 ToolInterface::~ToolInterface()
 {
+}
+
+void ToolInterface::set_tool( ToolHandle tool )
+{
+  tool_ = tool;
+}
+
+ToolHandle ToolInterface::tool() const
+{
+  return tool_;
+}
+
+std::string ToolInterface::toolid() const
+{
+  return tool_->toolid();
 }
 
 } // end namespace Seg3D

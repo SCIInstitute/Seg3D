@@ -43,6 +43,7 @@
 #include <boost/utility.hpp>
 
 // Core includes
+#include <Core/Utils/Lockable.h>
 #include <Core/Utils/StringUtil.h>
 #include <Core/Utils/Singleton.h>
 
@@ -128,6 +129,9 @@ virtual ToolInterface* build()
 }
 };
 
+
+// TODO: Need to move this class into a private class
+
 class ToolInfo
 {
 public:
@@ -197,7 +201,7 @@ private:
 class ToolFactory;
 
 // Class definition
-class ToolFactory : public boost::noncopyable
+class ToolFactory : public Core::Lockable
 {
   CORE_SINGLETON( ToolFactory );
 
@@ -206,85 +210,80 @@ private:
   ToolFactory();
   virtual ~ToolFactory();
 
-// -- Tool registration --
+  // -- Tool registration --
 public:
-// REGISTER_TOOL:
-// Register a tool so that it can be automatically built in the tool
-// factory.
+  // REGISTER_TOOL:
+  // Register a tool so that it can be automatically built in the tool
+  // factory.
 
-template <class TOOL>
-void register_tool()
-{
-  // Lock the factory
-  lock_type lock( mutex_ );
-
-  // Get the type of the tool
-  std::string tool_type = Core::StringToLower( TOOL::Type() );
-
-  // Test is tool was registered before.
-  if ( tools_.find( tool_type ) != tools_.end() )
+  template <class TOOL>
+  void register_tool()
   {
-    // Actions that are registered twice, will cause problems
-    // Hence the program will throw an exception.
-    // As registration is done on startup, this will cause a
-    // faulty program to fail always on startup.
-    CORE_THROW_LOGICERROR( std::string( "Tool '" ) + tool_type + "' is registered twice" );
+    // Lock the factory
+    lock_type lock( get_mutex() );
+
+    // Get the type of the tool
+    std::string tool_type = Core::StringToLower( TOOL::Type() );
+
+    // Test is tool was registered before.
+    if ( tools_.find( tool_type ) != tools_.end() )
+    {
+      // Actions that are registered twice, will cause problems
+      // Hence the program will throw an exception.
+      // As registration is done on startup, this will cause a
+      // faulty program to fail always on startup.
+      CORE_THROW_LOGICERROR( std::string( "Tool '" ) + tool_type + "' is registered twice" );
+    }
+
+    // Register the action and set its properties
+    tools_[tool_type] = new ToolInfo( TOOL::Type(), new ToolBuilder<TOOL>,
+      TOOL::Properties(), TOOL::MenuName(), TOOL::ShortcutKey() );
+
+    CORE_LOG_DEBUG( std::string( "Registering tool : " ) + tool_type );
   }
-
-  // Register the action and set its properties
-  tools_[tool_type] = new ToolInfo( TOOL::Type(), new ToolBuilder<TOOL>,
-    TOOL::Properties(), TOOL::MenuName(), TOOL::ShortcutKey() );
-
-  CORE_LOG_DEBUG( std::string( "Registering tool : " ) + tool_type );
-}
 
 private:
   typedef boost::unordered_map<std::string,ToolInfo*> tool_map_type;
-  typedef boost::mutex mutex_type;
-  typedef boost::unique_lock<mutex_type> lock_type;
 
   // List with builders that can be called to generate a new object
   tool_map_type tools_;
 
-  // Mutex for protecting registration
-  mutex_type mutex_;
-
-// -- ToolInterface registration --
+  // -- ToolInterface registration --
 public:
-// REGISTER_TOOLINTERFACE:
-// Register a tool so that it can be automatically build in the tool
-// factory.
+  // REGISTER_TOOLINTERFACE:
+  // Register a tool so that it can be automatically build in the tool
+  // factory.
 
-template <class TOOLINTERFACE>
-void register_toolinterface( std::string toolinterface_name )
-{
-  boost::to_lower( toolinterface_name );
-  if ( toolinterface_name.substr( toolinterface_name.size() - 9 ) != std::string( "interface" ) )
+  template <class TOOLINTERFACE>
+  void register_toolinterface( std::string toolinterface_name )
   {
-    CORE_THROW_LOGICERROR( std::string( "ToolInterface class name does not end with Interface" ) );
+    toolinterface_name = Core::StringToLower( toolinterface_name );
+    if ( toolinterface_name.substr( toolinterface_name.size() - 9 ) != std::string( "interface" ) )
+    {
+      CORE_THROW_LOGICERROR( std::string( "ToolInterface class name does not end with Interface" ) );
+    }
+
+    // Strip out the word interface
+    toolinterface_name = toolinterface_name.substr( 0, toolinterface_name.size() - 9 );
+
+    // Lock the factory
+    lock_type lock( get_mutex() );
+
+    // Test is tool was registered before.
+    if ( toolinterfaces_.find( toolinterface_name ) != toolinterfaces_.end() )
+    {
+      // Actions that are registered twice, will cause problems
+      // Hence the program will throw an exception.
+      // As registration is done on startup, this will cause a
+      // faulty program to fail always on startup.
+      CORE_THROW_LOGICERROR( std::string( "ToolInterface '" ) +
+        toolinterface_name + "' is registered twice" );
+    }
+
+    // Register the action
+    toolinterfaces_[ toolinterface_name ] = new ToolInterfaceBuilder<TOOLINTERFACE>;
+    CORE_LOG_DEBUG( std::string( "Registering toolinterface : " ) + toolinterface_name );
   }
-
-  // Strip out the word interface
-  toolinterface_name = toolinterface_name.substr( 0, toolinterface_name.size() - 9 );
-
-  // Lock the factory
-  lock_type lock( mutex_ );
-
-  // Test is tool was registered before.
-  if ( toolinterfaces_.find( toolinterface_name ) != toolinterfaces_.end() )
-  {
-    // Actions that are registered twice, will cause problems
-    // Hence the program will throw an exception.
-    // As registration is done on startup, this will cause a
-    // faulty program to fail always on startup.
-    CORE_THROW_LOGICERROR( std::string( "ToolInterface '" ) +
-      toolinterface_name + "' is registered twice" );
-  }
-
-  // Register the action
-  toolinterfaces_[ toolinterface_name ] = new ToolInterfaceBuilder<TOOLINTERFACE>;
-  CORE_LOG_DEBUG( std::string( "Registering toolinterface : " ) + toolinterface_name );
-}
 
 private:
   typedef boost::unordered_map<std::string,ToolInterfaceBuilderBase*> toolinterface_map_type;
@@ -316,6 +315,7 @@ public:
 
   // LIST_TOOL_TYPES:
   // List the tools of a certain group
+  // TODO: Need to simplify this the tool_list_type
   bool list_tool_types( tool_list_type& tool_list, int tool_property ); // << THREAD-SAFE
 
   // LIST_TOOL_TYPES_WITH_INTERFACE:

@@ -99,6 +99,10 @@ public:
   // thread and runs the run_eventhandler() function.
   bool start_eventhandler();
 
+  // EVENTHANDLER_STARTED:
+  // Check whether the eventhandler is running
+  bool eventhandler_started();  
+
   // RUN_EVENTHANDLER:
   // The main functions that processes all the incoming events.
   virtual void run_eventhandler();

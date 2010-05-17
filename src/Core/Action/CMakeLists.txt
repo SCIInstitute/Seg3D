@@ -59,9 +59,7 @@ SET(CORE_ACTION_SRCS
   ActionUndoBuffer.cc
   )
 
-
-ADD_LIBRARY(Core_Action STATIC 
-            ${CORE_ACTION_SRCS} )
+CORE_ADD_LIBRARY(Core_Action ${CORE_ACTION_SRCS} )
             
 TARGET_LINK_LIBRARIES(Core_Action
                       Core_Utils

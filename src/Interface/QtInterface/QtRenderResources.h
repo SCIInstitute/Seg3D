@@ -83,8 +83,6 @@ public:
   // Swap the front and back buffers
   virtual void swap_buffers() const;
 
-  virtual std::string to_string() const;
-
 private:
   QGLContextHandle context_;
 };
@@ -109,8 +107,6 @@ public:
   // VALID_RENDER_RESOURCES:
   // Check whether valid render resources were installed
   virtual bool valid_render_resources();
-
-  virtual std::string get_current_context_string();
 
 private:
   // The Qt render context format options

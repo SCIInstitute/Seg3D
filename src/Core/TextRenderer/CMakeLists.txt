@@ -43,8 +43,7 @@ SET(CORE_TEXTRENDERER_SRCS
   )
 
   
-ADD_LIBRARY(Core_TextRenderer STATIC
-      ${CORE_TEXTRENDERER_SRCS})
+CORE_ADD_LIBRARY(Core_TextRenderer ${CORE_TEXTRENDERER_SRCS})
       
 TARGET_LINK_LIBRARIES(Core_TextRenderer
             Core_Utils

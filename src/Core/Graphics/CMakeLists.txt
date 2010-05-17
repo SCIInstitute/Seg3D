@@ -53,8 +53,7 @@ SET(CORE_GRAPHICS_SRCS
   )
 
 
-ADD_LIBRARY(Core_Graphics STATIC 
-            ${CORE_GRAPHICS_SRCS} )
+CORE_ADD_LIBRARY(Core_Graphics ${CORE_GRAPHICS_SRCS} )
             
 TARGET_LINK_LIBRARIES(Core_Graphics
             Core_RenderResources

@@ -46,10 +46,10 @@
 #include <Core/Application/Application.h>
 #include <Core/Interface/Interface.h>
 #include <Core/Volume/Volume.h>
-
-// Application includes
 #include <Core/State/State.h>
 
+// Application includes
+#include <Application/Layer/LayerFWD.h>
 
 namespace Seg3D
 {
@@ -59,14 +59,7 @@ namespace Seg3D
 
 // Forward declarations
   
-class LayerGroup;
-typedef boost::shared_ptr< LayerGroup > LayerGroupHandle;
-typedef boost::weak_ptr< LayerGroup > LayerGroupWeakHandle;
 typedef std::list < LayerGroupHandle > group_handle_list_type;
-  
-class Layer;
-typedef boost::shared_ptr< Layer > LayerHandle;
-typedef boost::weak_ptr< Layer > LayerWeakHandle;
 typedef std::list< LayerHandle > layer_list_type;
 
 

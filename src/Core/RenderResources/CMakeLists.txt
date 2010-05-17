@@ -40,8 +40,7 @@ SET(CORE_RENDERRESOURCES_SRCS
   RenderContext.cc
   )
 
-ADD_LIBRARY(Core_RenderResources STATIC 
-            ${CORE_RENDERRESOURCES_SRCS})
+CORE_ADD_LIBRARY(Core_RenderResources ${CORE_RENDERRESOURCES_SRCS})
             
 TARGET_LINK_LIBRARIES(Core_RenderResources
                       ${SCI_GLEW_LIBRARY}

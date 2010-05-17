@@ -236,6 +236,7 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 ###########################################
 
 INCLUDE(CMake/ActionLibrary.cmake)
+INCLUDE(CMake/Core.cmake)
 INCLUDE(CMake/ToolLibrary.cmake)
 INCLUDE(CMake/ImporterExporterLibrary.cmake)
 INCLUDE(CMake/QtResourcesLibrary.cmake)
@@ -246,6 +247,7 @@ INCLUDE(CMake/QtResourcesLibrary.cmake)
 #  Core
 #  Application
 #  Interface
+#  Main
 ###########################################
 
 ADD_SUBDIRECTORY(Core)

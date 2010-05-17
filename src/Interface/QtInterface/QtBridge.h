@@ -30,7 +30,14 @@
 #define INTERFACE_QTINTERFACE_QTBRIDGE_H
 
 // QT includes/custom widget
-#include <QtGui>
+#include <QtGui/QCheckBox>
+#include <QtGui/QDoubleSpinBox>
+#include <QtGui/QSpinBox>
+#include <QtGui/QComboBox>
+#include <QtGui/QToolButton>
+#include <QtGui/QPushButton>
+#include <QtGui/QLineEdit>
+#include <QtGui/QActionGroup>
 
 #include <Interface/ToolInterface/CustomWidgets/SliderIntCombo.h>
 #include <Interface/ToolInterface/CustomWidgets/SliderDoubleCombo.h>

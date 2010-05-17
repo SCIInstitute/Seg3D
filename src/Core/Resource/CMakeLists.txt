@@ -36,8 +36,7 @@ SET(CORE_RESOURCE_SRCS
     ResourceLock.cc
   )
 
-ADD_LIBRARY(Core_Resource STATIC 
-            ${CORE_RESOURCE_SRCS})
+CORE_ADD_LIBRARY(Core_Resource ${CORE_RESOURCE_SRCS})
             
 TARGET_LINK_LIBRARIES(Core_Resource
                       Core_Utils

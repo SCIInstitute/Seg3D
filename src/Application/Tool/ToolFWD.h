@@ -26,50 +26,19 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef CORE_RENDERRESOURCES_RENDERRESOURCESCONTEXT_H
-#define CORE_RENDERRESOURCES_RENDERRESOURCESCONTEXT_H
+#ifndef APPLICATION_TOOL_TOOLFWD_H
+#define APPLICATION_TOOL_TOOLFWD_H
 
 // Boost includes
-#include <boost/thread/mutex.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/utility.hpp>
 
-// Core includes
-#include <Core/Utils/Log.h>
-#include <Core/RenderResources/RenderContext.h>
-
-namespace Core
+namespace Seg3D
 {
 
-// Forward declarations
-class RenderResourcesContext;
-typedef boost::shared_ptr< RenderResourcesContext > RenderResourcesContextHandle;
+// Forward declaration
+class Tool;
+typedef boost::shared_ptr< Tool > ToolHandle;
 
-// Class definitions
-
-class RenderResourcesContext : public boost::noncopyable
-{
-
-  // -- constructor/ destructor --
-public:
-  RenderResourcesContext();
-  virtual ~RenderResourcesContext();
-
-  // -- functions implemented by GUI system --
-
-protected:
-
-  friend class RenderResources;
-
-  // CREATE_RENDER_CONTEXT:
-  // Generate a render context for one of the viewers
-  virtual bool create_render_context( RenderContextHandle& context ) = 0;
-
-  // VALID_RENDER_RESOURCES:
-  // Check whether valid render resources were installed
-  virtual bool valid_render_resources() = 0;
-};
-
-} // end namespace Core
+} // end namespace Seg3D
 
 #endif

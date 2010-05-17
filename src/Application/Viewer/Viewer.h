@@ -114,8 +114,13 @@ class Viewer : public Core::StateHandler
   // -- constructor/destructor --
 public:
   friend class ViewManipulator;
+
   Viewer( size_t viewer_id );
   virtual ~Viewer();
+
+  // -- viewer id --
+public:
+  size_t get_viewer_id() const;
 
   // -- mouse events handling --
 public:

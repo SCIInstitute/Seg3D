@@ -29,7 +29,6 @@
 #ifndef INTERFACE_APPINTERFACE_VIEWERWIDGET_H
 #define INTERFACE_APPINTERFACE_VIEWERWIDGET_H
 
-#include <Core/Action/ActionContext.h>
 
 // QT includes
 #include <QAction>
@@ -43,6 +42,13 @@
 #include <boost/thread/thread.hpp>
 #include <boost/shared_ptr.hpp>
 
+// Core includes
+#include <Core/Action/ActionContext.h>
+
+// Application includes
+#include <Application/Viewer/Viewer.h>
+
+
 namespace Seg3D
 {
 
@@ -53,30 +59,54 @@ typedef boost::shared_ptr< ViewerWidgetPrivate > ViewerWidgetPrivateHandle;
 // Class definitions
 class ViewerWidget : public QFrame
 {
+  Q_OBJECT
 
-Q_OBJECT
+  // -- constructor/destructor --
 public:
-  ViewerWidget( int viewer_id, QWidget *parent = 0 );
+  ViewerWidget( ViewerHandle viewer, QWidget *parent = 0 );
   virtual ~ViewerWidget();
 
-  Q_SIGNALS:
-  void selected(int);
+Q_SIGNALS:
+  // SELECTED:
+  // This signal is triggered when the widget is selected
+  void selected( int );
+  
+  // CHANGED_VIEWER_TYPE:
+  // This signal is triggered when the viewer type ( axial, sagittal, coronal, or volume)
+  // is changed
   void changed_viewer_type( int );
 
 public Q_SLOTS:
+
+  // SELECT:
+  // This slot is triggered when the widget is selected.
   void select();
+  
+  // DESELECT:
+  // This slot is triggered if another viewer is activated and this one needs to be deselected.
   void deselect();
+  
+  // CHANGE_VIEW_TYPE:
+  // This slot is triggered when the viewer type is changed.
   void change_view_type( QAction* );
+  
+  // FLIP_VIEW_HORIZ:
+  // Flip the view horizontally.
   void flip_view_horiz( bool );
+
+  // FLIP_VIEW_VERT:
+  // Flip the view vertically.
   void flip_view_vert( bool );
+  
+  // AUTO_VIEW:
+  // Resize the viewer such that the scene is centered and scaled so most of the scene can be
+  // viewed.
   void auto_view( bool );
 
 private:
   // Internals of the viewer widget, so most dependencies do not need to
-  // be included here
+  // be included here.
   ViewerWidgetPrivateHandle private_;
-
-  int viewer_id_;
 };
 
 } // end namespace Seg3D

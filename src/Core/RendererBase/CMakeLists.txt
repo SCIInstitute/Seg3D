@@ -37,8 +37,7 @@ SET(CORE_RENDERERBASE_SRCS
   RendererBase.cc
   )
   
-ADD_LIBRARY(Core_RendererBase STATIC 
-            ${CORE_RENDERERBASE_SRCS})
+CORE_ADD_LIBRARY(Core_RendererBase ${CORE_RENDERERBASE_SRCS})
             
 TARGET_LINK_LIBRARIES(Core_RendererBase
                       Core_Utils

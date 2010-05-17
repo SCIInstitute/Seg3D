@@ -40,9 +40,7 @@ SET(CORE_INTERFACE_SRCS
   StatusBar.cc
   )
 
-
-ADD_LIBRARY(Core_Interface STATIC 
-            ${CORE_INTERFACE_SRCS} )
+CORE_ADD_LIBRARY(Core_Interface ${CORE_INTERFACE_SRCS} )
             
 TARGET_LINK_LIBRARIES(Core_Interface
                       Core_Application

@@ -47,6 +47,14 @@
 namespace Core
 {
 
+// Forward Declaration
+class DefaultEventHandlerContext;
+
+// Internals of the default event handler
+class DefaultEventHandlerContextPrivate;
+typedef boost::shared_ptr<DefaultEventHandlerContextPrivate> 
+  DefaultEventHandlerContextPrivateHandle;
+
 class DefaultEventHandlerContext : public EventHandlerContext
 {
 
@@ -92,37 +100,19 @@ public:
   // Start the eventhandler thread and start processing events
   virtual bool start_eventhandler( EventHandler* eventhandler );
 
+  // EVENTHANDLER_STARTED:
+  // Check whether the eventhandler is running
+  virtual bool eventhandler_started();
+
   // TERMINATE_EVENTHANDLER:
   // Terminate the eventhandler
   virtual void terminate_eventhandler();
 
-protected:
+  // -- internals of this class --
+private:
 
-  // Queue type that is used to store the events
-  typedef std::queue< EventHandle > event_queue_type;
-
-  // EventHandler thread id
-  boost::thread eventhandler_thread_;
-
-  // Mutex protecting the event queue
-  boost::mutex event_queue_mutex_;
-
-  // Condition variable signalling that a new event was posted
-  boost::condition_variable event_queue_new_event_;
-
-  // The event queue
-  event_queue_type event_queue_;
-
-  // Indicating that event handling is done
-  bool done_;
-
-  // Signal handling to ensure thread is running before returning from
-  // start_eventhandler
-  boost::mutex thread_mutex_;
-  boost::condition_variable thread_condition_variable_;
-
-  // Function for safely starting thread
-  void start_thread( EventHandler* eventhandler );
+  // Handle to the internals of this class
+  DefaultEventHandlerContextPrivateHandle private_;
 };
 
 } // end namespace Core

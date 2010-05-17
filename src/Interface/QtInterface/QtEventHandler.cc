@@ -80,6 +80,7 @@ void QtEventHandlerObject::cleanup()
 
 QtEventHandlerContext::QtEventHandlerContext( QApplication* qapplication ) :
   EventHandlerContext(),
+  eventhandler_started_( false ),
   qapplication_( qapplication ), 
   interface_thread_id_( boost::this_thread::get_id() )
 {
@@ -201,8 +202,15 @@ bool QtEventHandlerContext::start_eventhandler( Core::EventHandler* eventhandler
   // Allow Qt to intercept the actions in its main event loop 
   new QtEventHandlerObject( this->qapplication_, this );
 
+  eventhandler_started_ = true;
   return ( true );
 }
+
+bool QtEventHandlerContext::eventhandler_started()
+{
+  return  eventhandler_started_;
+}
+
 
 void QtEventHandlerContext::terminate_eventhandler()
 {

@@ -79,8 +79,7 @@ SET(APPLICATION_FILTERS_ACTIONS_SRCS
 #  Actions/ActionThresholdTool.cc
   )
 
-ADD_LIBRARY(Application_Filters STATIC 
-            ${APPLICATION_FILTERS_SRCS}
+CORE_ADD_LIBRARY(Application_Filters ${APPLICATION_FILTERS_SRCS}
             ${APPLICATION_FILTERS_ACTIONS_SRCS} )
             
 TARGET_LINK_LIBRARIES(Application_Filters

@@ -146,7 +146,7 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 # Build the Components library
 ##################################################
 
-ADD_LIBRARY(Interface_AppInterface STATIC 
+CORE_ADD_LIBRARY(Interface_AppInterface 
             ${INTERFACE_APPINTERFACE_SRCS} 
             ${INTERFACE_APPINTERFACE_QT_UI_SRCS}
             ${INTERFACE_APPINTERFACE_QT_MOC_SRCS}
@@ -182,3 +182,4 @@ IF(NOT WIN32)
     DEPENDS ${RESOURCE_IMAGE_FILES}
   )
 ENDIF(NOT WIN32)
+

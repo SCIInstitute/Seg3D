@@ -101,6 +101,10 @@ public:
   // TERMINATE_EVENTHANDLER:
   // Terminate the eventhandler
   virtual void terminate_eventhandler() = 0;
+  
+  // EVENTHANDLER_STARTED:
+  // Check whether the eventhandler is running
+  virtual bool eventhandler_started() = 0;  
 };
 
 typedef boost::shared_ptr< EventHandlerContext > EventHandlerContextHandle;

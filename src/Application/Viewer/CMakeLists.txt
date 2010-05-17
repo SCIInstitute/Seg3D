@@ -43,8 +43,7 @@ SET(APPLICATION_VIEW_ACTIONS_SRCS
   Actions/ActionAutoView.cc
   )
 
-ADD_LIBRARY(Application_Viewer STATIC 
-            ${APPLICATION_VIEW_SRCS}
+CORE_ADD_LIBRARY(Application_Viewer ${APPLICATION_VIEW_SRCS}
             ${APPLICATION_VIEW_ACTIONS_SRCS} )
             
 TARGET_LINK_LIBRARIES(Application_Viewer

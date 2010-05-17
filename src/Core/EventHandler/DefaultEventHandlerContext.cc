@@ -35,9 +35,53 @@
 namespace Core
 {
 
-DefaultEventHandlerContext::DefaultEventHandlerContext() :
-  done_( false )
+class DefaultEventHandlerContextPrivate
 {
+public:
+  // Queue type that is used to store the events
+  typedef std::queue< EventHandle > event_queue_type;
+
+  // Whether the eventhandler started
+  bool eventhandler_started_;
+
+  // EventHandler thread id
+  boost::thread eventhandler_thread_;
+
+  // Mutex protecting the event queue
+  boost::mutex event_queue_mutex_;
+
+  // Condition variable signalling that a new event was posted
+  boost::condition_variable event_queue_new_event_;
+
+  // The event queue
+  event_queue_type event_queue_;
+
+  // Indicating that event handling is done
+  bool done_;
+
+  // Signal handling to ensure thread is running before returning from
+  // start_eventhandler
+  boost::mutex thread_mutex_;
+  boost::condition_variable thread_condition_variable_; 
+  
+  // Function for safely starting thread
+  void start_thread( EventHandler* eventhandler );  
+};
+
+void DefaultEventHandlerContextPrivate::start_thread( EventHandler* eventhandler )
+{
+  {
+    boost::unique_lock< boost::mutex > lock( thread_mutex_ );
+    thread_condition_variable_.notify_all();
+  }
+  eventhandler->run_eventhandler();
+}
+
+DefaultEventHandlerContext::DefaultEventHandlerContext() :
+  private_( new DefaultEventHandlerContextPrivate )
+{
+  this->private_->eventhandler_started_ = false;
+  this->private_->done_ = false;
 }
 
 DefaultEventHandlerContext::~DefaultEventHandlerContext()
@@ -46,9 +90,9 @@ DefaultEventHandlerContext::~DefaultEventHandlerContext()
 
 void DefaultEventHandlerContext::post_event( EventHandle& event )
 {
-  boost::unique_lock< boost::mutex > lock( event_queue_mutex_ );
-  event_queue_.push( event );
-  event_queue_new_event_.notify_all();
+  boost::unique_lock< boost::mutex > lock( this->private_->event_queue_mutex_ );
+  this->private_->event_queue_.push( event );
+  this->private_->event_queue_new_event_.notify_all();
 }
 
 void DefaultEventHandlerContext::post_and_wait_event( EventHandle& event )
@@ -65,10 +109,10 @@ void DefaultEventHandlerContext::post_and_wait_event( EventHandle& event )
 
   {
     // Need to lock queue before inserting message
-    boost::unique_lock< boost::mutex > lock( event_queue_mutex_ );
+    boost::unique_lock< boost::mutex > lock( this->private_->event_queue_mutex_ );
     // Adding event to queue
-    event_queue_.push( event );
-    event_queue_new_event_.notify_all();
+    this->private_->event_queue_.push( event );
+    this->private_->event_queue_new_event_.notify_all();
   }
 
   // wait for application to handle the event
@@ -78,22 +122,22 @@ void DefaultEventHandlerContext::post_and_wait_event( EventHandle& event )
 bool DefaultEventHandlerContext::process_events()
 {
   // Only run on the application thread
-  if ( boost::this_thread::get_id() != eventhandler_thread_.get_id() )
+  if ( boost::this_thread::get_id() != this->private_->eventhandler_thread_.get_id() )
   {
     CORE_THROW_LOGICERROR("process_events was called from a thread that is not processing the events");
   }
 
   // lock the queue, so it is not changed while we are taking events of the
   // the list.
-  boost::unique_lock< boost::mutex > lock( event_queue_mutex_ );
+  boost::unique_lock< boost::mutex > lock( this->private_->event_queue_mutex_ );
 
-  while ( !event_queue_.empty() )
+  while ( ! ( this->private_->event_queue_.empty() ) )
   {
     // get the next event
     EventHandle event_handle;
-    event_handle.swap( event_queue_.front() );
+    event_handle.swap( this->private_->event_queue_.front() );
     // pop the handled event from the list
-    event_queue_.pop();
+    this->private_->event_queue_.pop();
 
     // unlock so the call back can add another event on the list
     lock.unlock();
@@ -103,32 +147,37 @@ bool DefaultEventHandlerContext::process_events()
     lock.lock();
   }
 
-  return ( done_ );
+  return ( this->private_->done_ );
 }
 
 bool DefaultEventHandlerContext::wait_and_process_events()
 {
   // Only run on the eventhandler thread
-  if ( boost::this_thread::get_id() != eventhandler_thread_.get_id() )
+  if ( boost::this_thread::get_id() != this->private_->eventhandler_thread_.get_id() )
   {
-    CORE_THROW_LOGICERROR("wait_and_process_events was called from a thread that is not processing the events");
+    CORE_THROW_LOGICERROR(
+      "wait_and_process_events was called from a thread"
+      " that is not processing the events" );
   }
 
   // lock the queue, so it is not changed while we are taking events of the
   // the list.
-  boost::unique_lock< boost::mutex > lock( event_queue_mutex_ );
+  boost::unique_lock< boost::mutex > lock( this->private_->event_queue_mutex_ );
 
   // wait for an event to come if the event queue is empty
-  if ( event_queue_.empty() ) event_queue_new_event_.wait( lock );
-
-  while ( !event_queue_.empty() )
+  if ( this->private_->event_queue_.empty() ) 
+  {
+    this->private_->event_queue_new_event_.wait( lock );
+  }
+  
+  while ( ! ( this->private_->event_queue_.empty() ) )
   {
 
     // get the next event
     EventHandle event_handle;
-    event_handle.swap( event_queue_.front() );
+    event_handle.swap( this->private_->event_queue_.front() );
     // pop the handled event from the list
-    event_queue_.pop();
+    this->private_->event_queue_.pop();
 
     // unlock so the call back can add another event on the list
     lock.unlock();
@@ -140,12 +189,13 @@ bool DefaultEventHandlerContext::wait_and_process_events()
     lock.lock();
   }
 
-  return ( done_ );
+  return ( this->private_->done_ );
 }
 
 bool DefaultEventHandlerContext::is_eventhandler_thread() const
 {
-  return ( boost::this_thread::get_id() == eventhandler_thread_.get_id() );
+  return ( boost::this_thread::get_id() == 
+    this->private_->eventhandler_thread_.get_id() );
 }
 
 bool DefaultEventHandlerContext::start_eventhandler( EventHandler* eventhandler )
@@ -154,21 +204,21 @@ bool DefaultEventHandlerContext::start_eventhandler( EventHandler* eventhandler 
   // It needs a pointer to the run_eventhandler() and will
   // use that as callable
 
-  boost::unique_lock< boost::mutex > lock( thread_mutex_ );
-  eventhandler_thread_ = boost::thread( boost::bind( &DefaultEventHandlerContext::start_thread,
-      this, eventhandler ) );
+  boost::unique_lock< boost::mutex > lock( this->private_->thread_mutex_ );
+  this->private_->eventhandler_thread_ = 
+    boost::thread( boost::bind( &DefaultEventHandlerContextPrivate::start_thread,
+      this->private_.get(), eventhandler ) );
+    
   // wait for thread to be initialized
-  thread_condition_variable_.wait( lock );
+  this->private_->thread_condition_variable_.wait( lock );
+  
+  this->private_->eventhandler_started_ = true;
   return ( true );
 }
 
-void DefaultEventHandlerContext::start_thread( EventHandler* eventhandler )
+bool DefaultEventHandlerContext::eventhandler_started()
 {
-  {
-    boost::unique_lock< boost::mutex > lock( thread_mutex_ );
-    thread_condition_variable_.notify_all();
-  }
-  eventhandler->run_eventhandler();
+  return this->private_->eventhandler_started_;
 }
 
 void DefaultEventHandlerContext::terminate_eventhandler()
@@ -176,21 +226,21 @@ void DefaultEventHandlerContext::terminate_eventhandler()
   // Signal that we are done handling events
   {
     // Lock the state of the eventhandler
-    boost::unique_lock< boost::mutex > lock( event_queue_mutex_ );
+    boost::unique_lock< boost::mutex > lock( this->private_->event_queue_mutex_ );
 
     // If it is already done, exit the function as this
     // function has already been exeecuted
-    if ( done_ == true ) return;
+    if ( this->private_->done_ == true ) return;
 
     // Mark the eventhandler as done
-    done_ = true;
+    this->private_->done_ = true;
 
     // Notify the thread waiting for input that it can stop waiting
-    event_queue_new_event_.notify_one();
+    this->private_->event_queue_new_event_.notify_one();
   }
 
   // Join the thread back into the main application thread
-  eventhandler_thread_.join();
+  this->private_->eventhandler_thread_.join();
 }
 
 } // end namespace Core

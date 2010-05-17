@@ -113,6 +113,11 @@ bool EventHandler::start_eventhandler()
   return ( eventhandler_context_->start_eventhandler( this ) );
 }
 
+bool EventHandler::eventhandler_started()
+{
+  return ( eventhandler_context_->eventhandler_started() );
+}
+
 void EventHandler::terminate_eventhandler()
 {
   eventhandler_context_->terminate_eventhandler();

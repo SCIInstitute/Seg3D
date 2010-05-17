@@ -1,4 +1,3 @@
-
 #
 #  For more information, please see: http://software.sci.utah.edu
 # 
@@ -27,37 +26,24 @@
 #  DEALINGS IN THE SOFTWARE.
 #
 
-##################################################
-# Set sources
-##################################################
+OPTION(USE_PRECOMPILED_HEADERS "Use precompiled headers to speed up compilation" OFF)
 
-SET(APPLICATION_TOOLMANAGER_SRCS
-  ToolManager.h
-  ToolManager.cc
-  )
+MACRO(CORE_ADD_LIBRARY name)
 
-SET(APPLICATION_TOOLMANAGER_ACTIONS_SRCS
-  Actions/ActionOpenTool.h
-  Actions/ActionOpenTool.cc
-  Actions/ActionCloseTool.h
-  Actions/ActionCloseTool.cc
-  Actions/ActionActivateTool.h
-  Actions/ActionActivateTool.cc
-  )
+  ADD_LIBRARY( ${name} STATIC ${ARGN})
 
-CORE_ADD_LIBRARY(Application_ToolManager ${APPLICATION_TOOLMANAGER_SRCS}
-            ${APPLICATION_TOOLMANAGER_ACTIONS_SRCS} )
-            
-TARGET_LINK_LIBRARIES(Application_ToolManager
-                      Core_Utils
-                      Core_Application
-                      Core_Interface
-                      Core_Action
-                      Core_State
-                      Application_Tool
-                      ${SCI_BOOST_LIBRARY})
+  IF(USE_PRECOMPILED_HEADERS)
+    IF(${CMAKE_GENERATOR} MATCHES "Xcode")
+    FILE( MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/Precompiled )
+  
+      SET_TARGET_PROPERTIES( ${name} PROPERTIES 
+      XCODE_ATTRIBUTE_SHARED_PRECOMPS_DIR ${CMAKE_BINARY_DIR}/Precompiled
+      XCODE_ATTRIBUTE_GCC_PREFIX_HEADER ${CMAKE_SOURCE_DIR}/Configuration/PrefixHeader.h
+      XCODE_ATTRIBUTE_GCC_PRECOMPILE_PREFIX_HEADER YES
+      XCODE_ATTRIBUTE_PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR NO)
+    ENDIF(${CMAKE_GENERATOR} MATCHES "Xcode")
+  ENDIF(USE_PRECOMPILED_HEADERS)
 
-# Register actions
-ADD_LIBRARY_ACTIONS(Application_ToolManager
-                    ${APPLICATION_TOOLMANAGER_ACTIONS_SRCS})
-                    
+
+ENDMACRO(CORE_ADD_LIBRARY)
+

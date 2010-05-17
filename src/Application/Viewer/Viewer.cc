@@ -66,8 +66,8 @@ Viewer::Viewer( size_t viewer_id ) :
   signals_block_count_( 0 ),
   slice_lock_count_( 0 )
 {
-  add_state( "view_mode", view_mode_state_, AXIAL_C, AXIAL_C + Core::StateOption::SPLITTER_C
-      + CORONAL_C + Core::StateOption::SPLITTER_C + SAGITTAL_C + Core::StateOption::SPLITTER_C + VOLUME_C );
+  add_state( "view_mode", view_mode_state_, AXIAL_C, SAGITTAL_C + Core::StateOption::SPLITTER_C
+      + CORONAL_C + Core::StateOption::SPLITTER_C + AXIAL_C + Core::StateOption::SPLITTER_C + VOLUME_C );
 
   add_state( "axial_view", axial_view_state_ );
   add_state( "coronal_view", coronal_view_state_ );
@@ -82,7 +82,7 @@ Viewer::Viewer( size_t viewer_id ) :
   add_state( "slice_number", this->slice_number_state_, 0, 0, 0, 1 );
 
   add_state( "slice_lock", viewer_lock_state_, false );
-  add_state( "slice_grid", slice_grid_state_, true );
+  add_state( "slice_grid", slice_grid_state_, false );
   add_state( "slice_visible", slice_visible_state_, true );
 
   add_state( "volume_slices_visible", volume_slices_visible_state_, true );
@@ -142,6 +142,11 @@ Viewer::Viewer( size_t viewer_id ) :
 Viewer::~Viewer()
 {
   this->disconnect_all();
+}
+
+size_t Viewer::get_viewer_id() const
+{
+  return viewer_id_;
 }
 
 void Viewer::resize( int width, int height )
@@ -1125,6 +1130,7 @@ void Viewer::adjust_contrast_brightness( int dx, int dy )
 
   lock.unlock();
 
+  // TODO: Check whether we need the if statement here
   if ( contrast != old_contrast )
   {
     Core::ActionSet::Dispatch( data_layer->contrast_state_, contrast );

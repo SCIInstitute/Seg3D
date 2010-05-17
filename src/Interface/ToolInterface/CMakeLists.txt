@@ -162,7 +162,7 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 # Build the Components library
 ##################################################
 
-ADD_LIBRARY(Interface_ToolInterface STATIC 
+CORE_ADD_LIBRARY(Interface_ToolInterface 
             ${INTERFACE_TOOLINTERFACE_SRCS} 
             ${INTERFACE_TOOLINTERFACE_QT_UI_SRCS}
             ${INTERFACE_TOOLINTERFACE_QT_MOC_SRCS}

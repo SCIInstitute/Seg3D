@@ -78,7 +78,7 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 # Build the Components library
 ##################################################
 
-ADD_LIBRARY(Interface_QtInterface STATIC 
+CORE_ADD_LIBRARY(Interface_QtInterface
             ${INTERFACE_QTINTERFACE_SRCS} 
             ${INTERFACE_QTINTERFACE_QT_UI_SRCS}
             ${INTERFACE_QTINTERFACE_QT_MOC_SRCS}
@@ -94,4 +94,5 @@ TARGET_LINK_LIBRARIES(Interface_QtInterface
                       ${QT_LIBRARIES} 
                       ${SCI_GLEW_LIBRARY}
                       ${SCI_BOOST_LIBRARY})
+
 

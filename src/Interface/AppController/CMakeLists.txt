@@ -87,8 +87,8 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 # Build the Components library
 ##################################################
 
-ADD_LIBRARY(Interface_AppController STATIC 
-            ${INTERFACE_APPCONTROLLER_SRCS} 
+CORE_ADD_LIBRARY(Interface_AppController 
+      ${INTERFACE_APPCONTROLLER_SRCS} 
             ${INTERFACE_APPCONTROLLER_QT_UI_SRCS}
             ${INTERFACE_APPCONTROLLER_QT_RCC_SRCS}
             ${INTERFACE_APPCONTROLLER_QT_MOC_SRCS}

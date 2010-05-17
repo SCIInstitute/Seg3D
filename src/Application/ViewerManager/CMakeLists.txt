@@ -41,8 +41,7 @@ SET(APPLICATION_VIEWMANAGER_ACTIONS_SRCS
   Actions/ActionPickPoint.cc  
   )
 
-ADD_LIBRARY(Application_ViewerManager STATIC 
-            ${APPLICATION_VIEWMANAGER_SRCS}
+CORE_ADD_LIBRARY(Application_ViewerManager ${APPLICATION_VIEWMANAGER_SRCS}
             ${APPLICATION_VIEWMANAGER_ACTIONS_SRCS} )
             
 TARGET_LINK_LIBRARIES(Application_ViewerManager

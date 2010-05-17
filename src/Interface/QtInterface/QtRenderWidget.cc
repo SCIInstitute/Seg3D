@@ -30,10 +30,11 @@
 #include <GL/glew.h>
 
 // Core includes
+#include <Core/Interface/Interface.h>
+#include <Core/State/Actions/ActionSet.h>
+
 #include <Core/Utils/Exception.h>
 #include <Core/Utils/Log.h>
-#include <Core/State/Actions/ActionSet.h>
-#include <Core/Interface/Interface.h>
 
 // Application includes
 #include <Application/ViewerManager/ViewerManager.h>
@@ -76,16 +77,21 @@ void QtRenderWidget::update_display()
 
 void QtRenderWidget::initializeGL()
 {
-  Core::RenderResources::Instance()->init_gl();
-  glClearColor( 0.5, 0.5, 0.5, 1.0 );
-  Core::Texture::SetActiveTextureUnit( 0 );
-  glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+  // This function calls all the pieces that need initialization using an OpenGL context
+  Core::RenderResources::Instance()->init_render_resources();
 
-  renderer_->initialize();
-  // Make sure the GL context of the widget is the current one of this thread,
-  // because in the single threaded rendering mode, the renderer will make its own context
-  // the current one of the Qt thread.
-  this->makeCurrent();
+  if ( Core::RenderResources::Instance()->valid_render_resources() )
+  {
+    glClearColor( 0.5, 0.5, 0.5, 1.0 );
+    Core::Texture::SetActiveTextureUnit( 0 );
+    glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+
+    if ( this->renderer_ ) this->renderer_->initialize();
+    // Make sure the GL context of the widget is the current one of this thread,
+    // because in the single threaded rendering mode, the renderer will make its own context
+    // the current one of the Qt thread.
+    this->makeCurrent();
+  }
 }
 
 void QtRenderWidget::paintGL()
@@ -100,7 +106,6 @@ void QtRenderWidget::paintGL()
   {
     return;
   }
-
 
   CORE_LOG_DEBUG("Painting texture");
 
@@ -158,11 +163,11 @@ void QtRenderWidget::resizeGL( int width, int height )
   gluOrtho2D( 0, width, 0, height );
 
   this->viewer_->resize( width, height );
-  if ( renderer_.get() )
+  if ( this->renderer_ )
   {
-    CORE_LOG_DEBUG(std::string("QtRenderWidget ") + Core::ExportToString(this->viewer_id_)
+    CORE_LOG_DEBUG(std::string("QtRenderWidget ") + Core::ExportToString( this->viewer_id_ )
       + ": sending resize event to renderer");
-    renderer_->resize( width, height );
+    this->renderer_->resize( width, height );
     // Make sure the GL context of the widget is the current one of this thread,
     // because in the single threaded rendering mode, the renderer will make its own context
     // the current one of the Qt thread.
@@ -230,21 +235,21 @@ void QtRenderWidget::wheelEvent( QWheelEvent* event )
 
 void QtRenderWidget::hideEvent( QHideEvent* event )
 {
-  if ( !event->spontaneous() )
-  {
+//  if ( !event->spontaneous() )
+//  {
+    if ( this->renderer_ ) this->renderer_->deactivate();
     Core::ActionSet::Dispatch( this->viewer_->viewer_visible_state_, false );
-    this->renderer_->deactivate();
-  }
+//  }
 }
 
 void QtRenderWidget::showEvent( QShowEvent* event )
 {
-  if ( !event->spontaneous() )
-  {
+//  if ( !event->spontaneous() )
+//  {
     // NOTE: Activate the renderer before setting the viewer to visible.
-    this->renderer_->activate();
+    if ( this->renderer_ ) this->renderer_->activate();
     Core::ActionSet::Dispatch( this->viewer_->viewer_visible_state_, true );
-  }
+//  }
 }
 
 void QtRenderWidget::set_viewer_id( size_t viewer_id )
@@ -253,6 +258,7 @@ void QtRenderWidget::set_viewer_id( size_t viewer_id )
   this->viewer_ = ViewerManager::Instance()->get_viewer( viewer_id );
   this->renderer_->set_viewer_id( viewer_id );
   this->viewer_->install_renderer( this->renderer_ );
+  
   this->add_connection( this->viewer_->update_display_signal_.connect(
     boost::bind( &QtRenderWidget::update_display, this ) ) );
 }

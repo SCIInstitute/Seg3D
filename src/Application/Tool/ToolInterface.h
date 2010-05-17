@@ -29,7 +29,15 @@
 #ifndef APPLICATION_TOOL_TOOLINTERFACE_H
 #define APPLICATION_TOOL_TOOLINTERFACE_H
 
-#include <Application/Tool/Tool.h>
+// STL includes
+#include <string>
+
+// Boost includes
+#include <boost/utility.hpp>
+
+// Application includes
+// NOTE: Only need the forward declaration of Tool for defining this class
+#include <Application/Tool/ToolFWD.h> 
 
 namespace Seg3D
 {
@@ -49,27 +57,18 @@ public:
   // Store the parent tool this interface is intended for.
 public:
 
-  // SET_TOOL
+  // SET_TOOL:
   // Insert the tool into the interface
-  void set_tool( ToolHandle tool )
-  {
-    tool_ = tool;
-  }
+  void set_tool( ToolHandle tool );
 
-  // TOOL
+  // TOOL:
   // Get the current tool handle stored in this interface class
-  ToolHandle tool() const
-  {
-    return tool_;
-  }
-
-  // TOOLID
+  ToolHandle tool() const;
+  
+  // TOOLID:
   // This is a shortcut function to the toolid this interface is associated
   // with
-  std::string toolid() const
-  {
-    return tool_->toolid();
-  }
+  std::string toolid() const;
 
   // -- internals of this class --
 protected:

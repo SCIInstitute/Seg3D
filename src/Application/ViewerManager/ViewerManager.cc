@@ -61,6 +61,7 @@ ViewerManager::ViewerManager() :
   // Create the viewers that are part of the application
   // Currently a maximum of 6 viewers can be created
   this->viewers_.resize( 6 );
+  
   for ( size_t j = 0; j < viewers_.size(); j++ )
   {
     this->viewers_[ j ] = ViewerHandle( new Viewer( j ) );
@@ -79,6 +80,14 @@ ViewerManager::ViewerManager() :
       connect( boost::bind( &ViewerManager::viewer_lock_state_changed, this, j ), 
       boost::signals2::at_front ) );
   }
+
+  // Step set defaults for viewers
+  this->viewers_[ 0 ]->view_mode_state_->set( Viewer::VOLUME_C );
+  this->viewers_[ 1 ]->view_mode_state_->set( Viewer::AXIAL_C );
+  this->viewers_[ 2 ]->view_mode_state_->set( Viewer::AXIAL_C );
+  this->viewers_[ 3 ]->view_mode_state_->set( Viewer::AXIAL_C );
+  this->viewers_[ 4 ]->view_mode_state_->set( Viewer::SAGITTAL_C );
+  this->viewers_[ 5 ]->view_mode_state_->set( Viewer::CORONAL_C );
 }
 
 ViewerManager::~ViewerManager()

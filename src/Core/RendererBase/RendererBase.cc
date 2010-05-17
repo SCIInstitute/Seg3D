@@ -108,9 +108,6 @@ void RendererBase::initialize()
     this->frame_buffer_->attach_renderbuffer( depth_buffer_, GL_DEPTH_ATTACHMENT_EXT );
   }
 
-  CORE_LOG_DEBUG( std::string( "RendererBase initialized with context " ) 
-    + this->context_->to_string() );
-
   this->post_initialize();
 
   SCI_CHECK_OPENGL_ERROR();

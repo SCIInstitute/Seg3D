@@ -60,5 +60,6 @@ SET(CORE_GEOMETRY_SRCS
 # Build static library
 ##################################################
 
-ADD_LIBRARY(Core_Geometry STATIC ${CORE_GEOMETRY_SRCS})
+CORE_ADD_LIBRARY(Core_Geometry ${CORE_GEOMETRY_SRCS})
+
 TARGET_LINK_LIBRARIES(Core_Geometry ${SCI_BOOST_LIBRARY})

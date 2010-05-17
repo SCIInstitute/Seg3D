@@ -132,6 +132,10 @@ public:
   // START_EVENTHANDLER:
   // Start the eventhandler thread and start processing events
   virtual bool start_eventhandler( Core::EventHandler* eventhandler );
+  
+  // EVENTHANDLER_STARTED:
+  // Check whether the eventhandler is running
+  virtual bool eventhandler_started();
 
   // TERMINATE_EVENTHANDLER:
   // Terminate the eventhandler
@@ -142,6 +146,9 @@ public:
   void empty_event_queue();
 
 private:
+  // Keep track of when the event filter is installed
+  bool eventhandler_started_;
+
   // A pointer to the main Qt application class
   QApplication* qapplication_;
 

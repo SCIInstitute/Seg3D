@@ -26,9 +26,17 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <Interface/AppInterface/ToolWidget.h>
-#include <Core/Utils/Log.h>
+// Qt includes
+#include <QtGui/QHBoxLayout>
+
+// Boost includes
 #include <boost/lexical_cast.hpp>
+
+// Core includes
+#include <Core/Utils/Log.h>
+
+// Interface includes
+#include <Interface/AppInterface/ToolWidget.h>
 
 namespace Seg3D
 {

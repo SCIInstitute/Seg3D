@@ -35,9 +35,6 @@ namespace Core
 Texture::Texture()
 {
   glGenTextures( 1, &this->texture_id_ );
-  CORE_LOG_DEBUG( std::string( "Texture generated: " ) + 
-    ExportToString( this->texture_id_ ) + " in context " + 
-    RenderResources::Instance()->get_current_context_string() );
   if ( this->texture_id_ == 0 )
   {
     CORE_LOG_ERROR( "Failed to create a new texture object." );

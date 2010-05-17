@@ -33,28 +33,24 @@
 #include <string>
 
 // Boost includes
-#include <boost/signals2/signal.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
 
 // Core includes
 #include <Core/Utils/EnumClass.h>
-#include <Core/Utils/Log.h>
-#include <Core/Utils/Exception.h>
-#include <Core/State/State.h>
-#include <Core/State/StateEngine.h>
+#include <Core/State/StateHandler.h>
+#include <Core/Volume/Volume.h>
 
-#include <Application/Layer/Layer.h>
+// Application includes
+#include <Application/Layer/LayerFWD.h>
+#include <Application/Tool/ToolFWD.h>
 
 namespace Seg3D
 {
 
 // CLASS TOOL:
-// Base class of a tool
+// The Tool class forms the basis of the tool classes
 
-// Forward declaration
-class Tool;
-typedef boost::shared_ptr< Tool > ToolHandle;
 
 // Tool groups help organize the tools in different categories
 SCI_ENUM_CLASS

@@ -67,9 +67,7 @@ SET(CORE_STATE_ACTIONS_SRCS
   Actions/ActionSetRange.cc
   )
 
-ADD_LIBRARY(Core_State STATIC 
-            ${CORE_STATE_SRCS}
-            ${CORE_STATE_ACTIONS_SRCS} )
+CORE_ADD_LIBRARY(Core_State ${CORE_STATE_SRCS} ${CORE_STATE_ACTIONS_SRCS} )
             
 TARGET_LINK_LIBRARIES(Core_State
                       Core_Utils

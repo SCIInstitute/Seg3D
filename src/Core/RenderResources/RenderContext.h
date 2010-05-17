@@ -68,8 +68,6 @@ public:
   // SWAP_BUFFERS:
   // Swap the front and back buffers
   virtual void swap_buffers() const = 0;
-
-  virtual std::string to_string() const = 0;
 };
 
 } // end namespace Seg3D

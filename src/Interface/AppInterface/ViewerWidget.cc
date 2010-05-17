@@ -57,27 +57,22 @@ namespace Seg3D
 class ViewerWidgetPrivate
 {
 public:
-  ViewerWidgetPrivate( QWidget *parent );
+  ViewerWidgetPrivate( QWidget *parent, ViewerHandle viewer );
 
-public:
   QVBoxLayout* layout_;
-  QtRenderWidget* viewer_;
+  QtRenderWidget* render_widget_;
+  
   QFrame* buttonbar_;
-
   QHBoxLayout* buttonbar_layout_;
 
   QToolButton* viewer_type_button_;
   QToolButton* auto_view_button_;
   QToolButton* grid_button_;
   QToolButton* lock_button_;
+  QToolButton* picking_button_;
 
   QToolButton* flip_horiz_button_;
   QToolButton* flip_vert_button_;
-
-  //QToolButton* next_slice_button_;
-  //QToolButton* previous_slice_button_;
-
-  QToolButton* picking_button_;
 
   QToolButton* slice_visible_button_;
 
@@ -111,17 +106,21 @@ public:
   QAction* isosurfaces_visible_;
   QAction* volume_visible_;
 
+  // Colors for the viewer widgets
   QColor select_color_;
   QColor select_color_dark_;
   QColor deselect_color_;
   QColor deselect_color_dark_;
-
+  
+  // Handle to the underlying Viewer structure
+  ViewerHandle viewer_;
+  
 };
 
-ViewerWidgetPrivate::ViewerWidgetPrivate( QWidget *parent )
+ViewerWidgetPrivate::ViewerWidgetPrivate( QWidget *parent, ViewerHandle viewer )
 {
+  this->viewer_ = viewer;
   
-
   // ensure viewer selection is mutual exclusive
   this->viewer_selection_ = new QActionGroup( parent );
 
@@ -248,14 +247,15 @@ ViewerWidgetPrivate::ViewerWidgetPrivate( QWidget *parent )
   // --------------------------------------
   // Generate the OpenGL part of the widget
 
-  this->viewer_ = QtApplication::Instance()->qt_renderresources_context() ->create_qt_render_widget(
-      parent );
+  this->render_widget_ = QtApplication::Instance()->qt_renderresources_context()->
+    create_qt_render_widget( parent );
 
-  if( this->viewer_ == 0 )
+  if( this->render_widget_ == 0 )
   {
     CORE_THROW_LOGICERROR("OpenGL was not initialized correctly");
   }
-  this->viewer_->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
+  
+  this->render_widget_->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
 
   // --------------------------------------
   // Generate button bar at the bottom of
@@ -343,7 +343,7 @@ ViewerWidgetPrivate::ViewerWidgetPrivate( QWidget *parent )
   this->buttonbar_layout_->addWidget( this->picking_button_ );
   this->buttonbar_layout_->addStretch();
 
-  this->layout_->addWidget( this->viewer_ );
+  this->layout_->addWidget( this->render_widget_ );
   this->layout_->addWidget( this->buttonbar_ );
 
   this->deselect_color_ = QColor( 85, 85, 85 );
@@ -352,43 +352,55 @@ ViewerWidgetPrivate::ViewerWidgetPrivate( QWidget *parent )
   this->select_color_dark_ = QColor( 180, 90, 0 );
 }
 
-ViewerWidget::ViewerWidget( int viewer_id, QWidget *parent ) :
-  QFrame( parent ), 
-  viewer_id_( viewer_id )
+ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
+  QFrame( parent )
 {
-  this->private_ = ViewerWidgetPrivateHandle( new ViewerWidgetPrivate( this ) );
+  this->private_ = ViewerWidgetPrivateHandle( new ViewerWidgetPrivate( this, viewer ) );
+
   setLayout( private_->layout_ );
   setLineWidth( 3 );
   setFrameShape( QFrame::Panel );
   setFrameShadow( QFrame::Raised );
 
-  this->private_->viewer_->set_viewer_id( viewer_id_ );
+  this->private_->render_widget_->set_viewer_id( this->private_->viewer_->get_viewer_id() );
 
-  ViewerHandle viewer = ViewerManager::Instance()->get_viewer( this->viewer_id_  );
-  this->private_->grid_->setChecked( viewer->slice_grid_state_->get() );
+  // Update state of the widget to reflect current state
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    this->private_->grid_->setChecked( this->private_->viewer_->slice_grid_state_->get() );
 
-  QtBridge::Connect( this->private_->viewer_selection_, viewer->view_mode_state_ );
+    QAction* qaction = this->private_->viewer_selection_->actions()
+      [ this->private_->viewer_->view_mode_state_->index() ];
+    this->change_view_type( qaction );
+    this->private_->viewer_type_button_->setDefaultAction( qaction );
+    
+    QtBridge::Connect( this->private_->viewer_selection_, this->private_->viewer_->view_mode_state_ );
 
-  // NOTE: Connect StateBool to QAction instead of QToolButton, because calling 
-  // setChecked on QToolButton won't change the underlying QAction.
-  
-  QtBridge::Connect( this->private_->picking_button_, viewer->is_picking_target_state_ );
-  QtBridge::Connect( this->private_->grid_, viewer->slice_grid_state_ );
-  QtBridge::Connect( this->private_->lock_, viewer->viewer_lock_state_ );
+    // NOTE: Connect StateBool to QAction instead of QToolButton, because calling 
+    // setChecked on QToolButton won't change the underlying QAction.
+    
+    QtBridge::Connect( this->private_->picking_button_, 
+      this->private_->viewer_->is_picking_target_state_ );
+    QtBridge::Connect( this->private_->grid_, 
+      this->private_->viewer_->slice_grid_state_ );
+    QtBridge::Connect( this->private_->lock_, 
+      this->private_->viewer_->viewer_lock_state_ );
 
-  this->connect( this->private_->viewer_selection_, SIGNAL( triggered( QAction* ) ),
-    this->private_->viewer_type_button_, SLOT( setDefaultAction( QAction* ) ) );
+    this->connect( this->private_->viewer_selection_, SIGNAL( triggered( QAction* ) ),
+      this->private_->viewer_type_button_, SLOT( setDefaultAction( QAction* ) ) );
 
-  this->connect( this->private_->viewer_selection_,
-    SIGNAL( triggered( QAction* ) ), SLOT( change_view_type( QAction* ) ) );
+    this->connect( this->private_->viewer_selection_,
+      SIGNAL( triggered( QAction* ) ), SLOT( change_view_type( QAction* ) ) );
 
-  this->connect( this->private_->flip_horiz_, SIGNAL( triggered( bool ) ),
-    SLOT( flip_view_horiz( bool ) ) );
-  this->connect( this->private_->flip_vert_, SIGNAL( triggered( bool ) ),
-    SLOT( flip_view_vert( bool ) ) );
-  this->connect( this->private_->auto_view_, SIGNAL( triggered( bool ) ),
-    SLOT( auto_view( bool ) ) );
+    this->connect( this->private_->flip_horiz_, SIGNAL( triggered( bool ) ),
+      SLOT( flip_view_horiz( bool ) ) );
 
+    this->connect( this->private_->flip_vert_, SIGNAL( triggered( bool ) ),
+      SLOT( flip_view_vert( bool ) ) );
+
+    this->connect( this->private_->auto_view_, SIGNAL( triggered( bool ) ),
+      SLOT( auto_view( bool ) ) );
+  }
 }
 
 ViewerWidget::~ViewerWidget()
@@ -413,11 +425,10 @@ void ViewerWidget::deselect()
 
 void ViewerWidget::change_view_type( QAction* viewer_type )
 {
-  ViewerHandle viewer = ViewerManager::Instance()->get_viewer( this->viewer_id_ );
-
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
 
-  bool is_volume_view = viewer->is_volume_view();
+  bool is_volume_view = this->private_->viewer_->is_volume_view();
+  
   this->private_->flip_horiz_button_->setVisible( !is_volume_view );
   this->private_->flip_vert_button_->setVisible( !is_volume_view );
   this->private_->grid_button_->setVisible( !is_volume_view );
@@ -426,8 +437,8 @@ void ViewerWidget::change_view_type( QAction* viewer_type )
 
   if( !is_volume_view )
   {
-    Core::StateView2DHandle view2d_state = 
-      boost::dynamic_pointer_cast<Core::StateView2D>( viewer->get_active_view_state() );
+    Core::StateView2DHandle view2d_state = boost::dynamic_pointer_cast<Core::StateView2D>( 
+      this->private_->viewer_->get_active_view_state() );
     this->private_->flip_horiz_->setChecked( view2d_state->x_flipped() );
     this->private_->flip_vert_->setChecked( view2d_state->y_flipped() );
   }
@@ -435,30 +446,27 @@ void ViewerWidget::change_view_type( QAction* viewer_type )
 
 void ViewerWidget::flip_view_horiz( bool flip )
 {
-  ViewerHandle viewer = ViewerManager::Instance()->get_viewer( this->viewer_id_ );
-  if( !viewer->is_volume_view() )
+  if( ! this->private_->viewer_->is_volume_view() )
   {
-    Core::StateView2DHandle view2d_state = 
-      boost::dynamic_pointer_cast<Core::StateView2D>( viewer->get_active_view_state() );
+    Core::StateView2DHandle view2d_state = boost::dynamic_pointer_cast<Core::StateView2D>( 
+      this->private_->viewer_->get_active_view_state() );
     Core::ActionFlip::Dispatch( view2d_state, Core::FlipDirectionType::HORIZONTAL_E );
   }
 }
 
 void ViewerWidget::flip_view_vert( bool flip )
 {
-  ViewerHandle viewer = ViewerManager::Instance()->get_viewer( this->viewer_id_ );
-  if( !viewer->is_volume_view() )
+  if( ! this->private_->viewer_->is_volume_view() )
   {
-    Core::StateView2DHandle view2d_state = 
-      boost::dynamic_pointer_cast<Core::StateView2D>( viewer->get_active_view_state() );
+    Core::StateView2DHandle view2d_state = boost::dynamic_pointer_cast<Core::StateView2D>( 
+      this->private_->viewer_->get_active_view_state() );
     Core::ActionFlip::Dispatch( view2d_state, Core::FlipDirectionType::VERTICAL_E );
   }
 }
 
 void ViewerWidget::auto_view( bool /* checked*/)
 {
-  ViewerHandle viewer = ViewerManager::Instance()->get_viewer( this->viewer_id_ );
-  ActionAutoView::Dispatch( viewer );
+  ActionAutoView::Dispatch( this->private_->viewer_ );
 }
 
 } // end namespace Seg3D

@@ -30,12 +30,11 @@
 #define INTERFACE_APPINTERFACE_TOOLWIDGET_H
 
 // QT Includes
-#include <QtGui>
+#include <QtGui/QWidget>
+#include <QtGui/QFrame>
 
 // Application includes
 #include <Application/Tool/ToolInterface.h>
-#include <Application/Tool/Tool.h>
-#include <Application/ToolManager/ToolManager.h>
 
 namespace Seg3D
 {

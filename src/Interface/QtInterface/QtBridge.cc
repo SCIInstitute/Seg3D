@@ -152,7 +152,7 @@ bool QtBridge::Connect( QLineEdit* qlineedit, Core::StateStringHandle& state_han
     // -- END CONNECT FUNCTION -- //
 ///// ====  END QDoubleSpinBox FUNCTIONS ==== /////
 
-  ///// ====  BEGIN QSpinBox FUNCTIONS ==== /////
+///// ====  BEGIN QSpinBox FUNCTIONS ==== /////
     // -- BEGIN SIGNAL CONNECTORS FOR THE QSpinBox's -- //
   // signal for when the QSpinBox has changed //
   void QtSpinBoxSignal( QPointer< QSpinBox > qpointer, int state, Core::ActionSource source )
@@ -494,6 +494,7 @@ void QtActionGroupSignal( QActionGroup* qactiongroup, std::string option )
     }
   }
 }
+
 void QtActionGroupSignal( QPointer< QActionGroup > qpointer, std::string option,
     Core::ActionSource source )
 {

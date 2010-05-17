@@ -59,6 +59,5 @@ SET(CORE_UTILS_SRCS
 # Build static library
 ##################################################
 
-ADD_LIBRARY(Core_Utils STATIC ${CORE_UTILS_SRCS})
+CORE_ADD_LIBRARY(Core_Utils ${CORE_UTILS_SRCS})
 TARGET_LINK_LIBRARIES(Core_Utils ${SCI_BOOST_LIBRARY})
-

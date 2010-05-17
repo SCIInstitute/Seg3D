@@ -40,6 +40,7 @@
 #include <Core/Utils/Log.h>
 #include <Core/Utils/Singleton.h>
 #include <Core/Utils/StringUtil.h>
+#include <Core/Utils/Lockable.h>
 #include <Core/EventHandler/EventHandler.h>
 #include <Core/RenderResources/RenderContext.h>
 #include <Core/RenderResources/RenderResourcesContext.h>
@@ -55,14 +56,21 @@ namespace Core
 class RenderResources;
 
 // Class definition
-class RenderResources : private EventHandler
+class RenderResources : private EventHandler, public RecursiveLockable
 {
   CORE_SINGLETON( RenderResources );
-  // -- constructor --
+  
+  // -- constructor/destructor --
 private:
   RenderResources();
   virtual ~RenderResources();
 
+  // -- overloaded event handler --
+private:
+  // INITIALIZE_EVENTHANDLER:
+  // This function initializes the event handler associated with the singleton
+  // class. It is used to ensure that the OpenGL context for deleting objects has
+  // been initialized.
   virtual void initialize_eventhandler();
 
   // -- context handling --
@@ -79,7 +87,19 @@ public:
   // VALID_RENDER_RESOURCES:
   // Check whether valid render resources have been installed
   bool valid_render_resources();
+  
+  // INIT_RENDER_RESOURCES:
+  // Initialize the render resources
+  // NOTE: This function needs to be called with a valid OpenGL context.
+  void init_render_resources();
 
+  // -- thread safe deletion of GL objects --
+private:
+  friend class Texture;
+  friend class BufferObject;
+  friend class FramebufferObject;
+  friend class Renderbuffer;
+  
   // DELETE_TEXTURE:
   // Delete a texture within the right context
   void delete_texture( unsigned int texture_id );
@@ -96,53 +116,24 @@ public:
   // Delete a renderbuffer within the right context
   void delete_renderbuffer( unsigned int renderbuffer_id );
 
-  std::string get_current_context_string();
-
 private:
 
   // A Handle to resource that generated the contexts
   RenderResourcesContextHandle resources_context_;
 
-  // An GL context for deleting objects
-  RenderContextHandle render_context_;
-
-  // -- render locks --
-public:
-
-  typedef boost::recursive_mutex mutex_type;
-  typedef boost::unique_lock< mutex_type > lock_type;
-
-  // GET_MUTEX:
-  // reference to the mutex that protects the common pool of textures
-  mutex_type& get_mutex()
-  {
-    return mutex_;
-  }
-
-private:
-  // We need a lock that protects against multiple threads reserving
-  // OpenGL resources at the same time
-  mutex_type mutex_;
-
-  // -- OpenGL initialization --
-public:
-
-  // Initialize the OpenGL environment
-  void init_gl();
-
-private:
-
-  // State variable indicating whether the OpenGL environment has been initialized
-  bool gl_initialized_;
+  // An GL context for deleting shared objects
+  // NOTE: Since objects need to be deleted inside an OpenGL context
+  // this contxt has been specially constructed for deleting objects
+  // when their handles go out of scope. As these objects are maintained
+  // through the program using handles, the OpenGL context in which they
+  // were created may be deleted already. Hence we delete them all in
+  // a separate thread using a separate OpenGL context.
+  RenderContextHandle delete_context_;
   
 public:
   // GETMUTEX:
   // Get the shared mutex for the opengl resources
-  static mutex_type& GetMutex() 
-  { 
-    return Instance()->get_mutex(); 
-  }
-
+  static mutex_type& GetMutex();
 };
 
 #define SCI_CHECK_OPENGL_ERROR()\

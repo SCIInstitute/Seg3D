@@ -46,9 +46,7 @@ SET(CORE_VOLUME_SRCS
   DataVolumeSlice.cc
   )
 
-
-ADD_LIBRARY(Core_Volume STATIC 
-            ${CORE_VOLUME_SRCS} )
+CORE_ADD_LIBRARY(Core_Volume ${CORE_VOLUME_SRCS} )
             
 TARGET_LINK_LIBRARIES(Core_Volume
                       Core_Utils

@@ -44,7 +44,7 @@ SET(CORE_ACTIONMANAGER_ACTIONS_SRCS
   )
 
 
-ADD_LIBRARY(Core_ActionManager STATIC 
+CORE_ADD_LIBRARY(Core_ActionManager 
             ${CORE_ACTIONMANAGER_SRCS}
             ${CORE_ACTIONMANAGER_ACTIONS_SRCS} )
             

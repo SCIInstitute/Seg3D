@@ -36,9 +36,7 @@ SET(CORE_APPLICATION_SRCS
   Application.cc
   )
 
-
-ADD_LIBRARY(Core_Application STATIC 
-            ${CORE_APPLICATION_SRCS} )
+CORE_ADD_LIBRARY(Core_Application ${CORE_APPLICATION_SRCS} )
             
 TARGET_LINK_LIBRARIES(Core_Application
                       Core_Utils

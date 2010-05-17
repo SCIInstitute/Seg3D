@@ -54,9 +54,7 @@ SET(CORE_DATABLOCK_SRCS
   StdDataBlock.cc
   )
 
-
-ADD_LIBRARY(Core_DataBlock STATIC 
-            ${CORE_DATABLOCK_SRCS} )
+CORE_ADD_LIBRARY(Core_DataBlock ${CORE_DATABLOCK_SRCS} )
             
 TARGET_LINK_LIBRARIES(Core_DataBlock
                       Core_Utils

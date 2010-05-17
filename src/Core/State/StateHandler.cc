@@ -179,7 +179,7 @@ bool StateHandler::load_states( boost::filesystem::path path )
     state_values = hRoot.FirstChild( this->private_->
       statehandler_id_.c_str() ).FirstChild().Element();
 
-    for( state_values; state_values; state_values = state_values->NextSiblingElement() )
+    for( ; state_values; state_values = state_values->NextSiblingElement() )
     {
       // Finally we import the actual state values from the XML and import them
       std::string state_value_name = std::string( state_values->Value() );

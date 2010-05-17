@@ -64,27 +64,13 @@ void QtRenderContext::swap_buffers() const
   context_->swapBuffers();
 }
 
-std::string QtRenderContext::to_string() const
-{
-  std::ostringstream oss;
-  oss << this->context_.get();
-  return oss.str();
-}
-
 QtRenderResourcesContext::QtRenderResourcesContext() :
   format_( QGLFormat::defaultFormat() )
 {
-  // Step 1: set up the render format properties of all the OpenGL contexts that
-  // are used. These need to be the same for all the contexts as they need to
-  // shared textures and objects.
-
-  // For now do not double buffer
-  //format_.setDoubleBuffer(false);
 }
 
 QtRenderResourcesContext::~QtRenderResourcesContext()
 {
-  // Nothing to clean up, everything is handled by smart pointers
 }
 
 bool QtRenderResourcesContext::create_render_context( Core::RenderContextHandle& context )
@@ -113,14 +99,16 @@ QtRenderResourcesContext::create_qt_render_widget( QWidget* parent )
   if ( !( shared_widget_.data() ) )
   {
     // Create the first shared widget
-    CORE_LOG_DEBUG( "Create the shared OpenGL widget" );
+    CORE_LOG_DEBUG( "Create a shared OpenGL widget" );
+    
     shared_widget_ = new QtRenderWidget( format_, parent, 0 );
     return ( shared_widget_.data() );
   }
   else
   {
     // Create a sibling widget
-    CORE_LOG_DEBUG( "Create OpenGL widget" );
+    CORE_LOG_DEBUG( "Create an OpenGL widget" );
+    
     return ( new QtRenderWidget( format_, parent, shared_widget_.data() ) );
   }
 }
@@ -128,13 +116,6 @@ QtRenderResourcesContext::create_qt_render_widget( QWidget* parent )
 bool QtRenderResourcesContext::valid_render_resources()
 {
   return ( shared_widget_.data() && shared_widget_->isValid() );
-}
-
-std::string QtRenderResourcesContext::get_current_context_string()
-{
-  std::ostringstream oss;
-  oss << QGLContext::currentContext();
-  return oss.str();
 }
 
 } // end namespace Seg3D

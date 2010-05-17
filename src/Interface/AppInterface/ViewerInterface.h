@@ -30,7 +30,8 @@
 #define INTERFACE_APPINTERFACE_VIEWERINTERFACE_H
 
 // QT includes
-#include <QtGui>
+#include <QtGui/QWidget>
+#include <QtCore/QPointer>
 
 // STL includes
 #include <string>
@@ -48,12 +49,16 @@ typedef boost::shared_ptr< ViewerInterfacePrivate > ViewerInterfacePrivateHandle
 
 class ViewerInterface : public QWidget
 {
+  Q_OBJECT
 
-Q_OBJECT
-// -- Private class containing all the widgets --
+  // -- Private class containing all the widgets --
 private:
   ViewerInterfacePrivateHandle private_;
 
+  // -- typedefs --
+public:
+  typedef QPointer< ViewerInterface > qpointer_type;
+  
   // -- Constructor/Destructor --
 public:
   ViewerInterface( QWidget *parent = 0 );
@@ -63,12 +68,11 @@ public:
   void set_layout( const std::string& layout );
 
 public Q_SLOTS:
-void set_active_viewer(int);
+  void set_active_viewer(int);
 
-// -- Slots --    
+  // -- Slots --    
 public:
-  typedef QPointer< ViewerInterface > qpointer_type;
-
+  
   // SetViewerLayout: (Thread safe slot)
   static void SetViewerLayout( qpointer_type qpointer, std::string layout );
 

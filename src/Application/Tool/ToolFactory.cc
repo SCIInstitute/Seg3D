@@ -47,7 +47,7 @@ ToolFactory::~ToolFactory()
 
 bool ToolFactory::is_tool_type( const std::string& tool_type )
 {
-  lock_type lock( mutex_ );
+  lock_type lock( get_mutex() );
 
   tool_map_type::const_iterator it = tools_.find( Core::StringToLower( tool_type ) );
 
@@ -63,7 +63,7 @@ bool LessToolList( ToolFactory::tool_list_type::value_type val1,
 
 bool ToolFactory::list_tool_types( tool_list_type& tool_list, int properties )
 {
-  lock_type lock( mutex_ );
+  lock_type lock( get_mutex() );
 
   // clear the list
   tool_list.clear();
@@ -88,7 +88,7 @@ bool ToolFactory::list_tool_types( tool_list_type& tool_list, int properties )
 
 bool ToolFactory::list_tool_types_with_interface( tool_list_type& tool_list, int properties )
 {
-  lock_type lock( mutex_ );
+  lock_type lock( get_mutex() );
 
   // clear the list
   tool_list.clear();
@@ -116,7 +116,7 @@ bool ToolFactory::list_tool_types_with_interface( tool_list_type& tool_list, int
 
 bool ToolFactory::create_tool( const std::string& tool_type, ToolHandle& tool )
 {
-  lock_type lock( mutex_ );
+  lock_type lock( get_mutex() );
 
   // Step (1): find the tool
   tool_map_type::const_iterator it = tools_.find( Core::StringToLower( tool_type ) );
@@ -133,7 +133,7 @@ bool ToolFactory::create_tool( const std::string& tool_type, ToolHandle& tool )
 bool ToolFactory::create_toolinterface( const std::string& toolinterface_name,
     ToolInterface*& toolinterface )
 {
-  lock_type lock( mutex_ );
+  lock_type lock( get_mutex() );
 
   // Step (1): find the tool
   toolinterface_map_type::const_iterator it = toolinterfaces_.find( toolinterface_name );

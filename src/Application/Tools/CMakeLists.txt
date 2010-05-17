@@ -76,8 +76,7 @@ SET(APPLICATION_TOOLS_SRCS
   ThresholdSegmentationLSFilter.cc
   )
 
-ADD_LIBRARY(Application_Tools STATIC 
-            ${APPLICATION_TOOLS_SRCS} )
+CORE_ADD_LIBRARY(Application_Tools ${APPLICATION_TOOLS_SRCS} )
             
 TARGET_LINK_LIBRARIES(Application_Tools
                       Core_Utils

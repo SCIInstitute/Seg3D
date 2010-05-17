@@ -26,6 +26,14 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// Core includes
+#include <Core/Utils/Log.h>
+#include <Core/Utils/Exception.h>
+#include <Core/State/State.h>
+#include <Core/State/StateEngine.h>
+
+// Application includes
+#include <Application/Layer/Layer.h>
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/Tool/Tool.h>
 #include <Application/Tool/ToolFactory.h>
