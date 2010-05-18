@@ -70,15 +70,16 @@ namespace Seg3D
         
     this->setStyleSheet( style_sheet );
     
+    // some signals we emit when the color of the button has been changed
     Q_EMIT this->color_changed( this->button_color_ );
     Q_EMIT this->color_changed( this->index_ );
   }
 
   void ColorButton::trigger_signal( bool torf )
   {
+    // other signals we want to emit when the button has been clicked.
     Q_EMIT this->button_clicked( this->button_color_, this->isChecked() );
     Q_EMIT this->index( this->index_ );
-    Q_EMIT this->color_changed( this->index_ );
   }
 
   

@@ -30,9 +30,13 @@
 
 // Boost includes 
 
+// Core includes
 #include <Core/Application/Application.h>
 #include <Core/Volume/MaskVolume.h>
+
+// Application includes
 #include <Application/Layer/MaskLayer.h>
+#include <Application/PreferencesManager/PreferencesManager.h>
 
 namespace Seg3D
 {
@@ -63,16 +67,19 @@ void MaskLayer::initialize_states()
     add_state( "color", color_state_, 0 );
 
     // == What border is used ==
-    add_state( "border", border_state_, "thick", "none|thin|thick" );
+    add_state( "border", border_state_, PreferencesManager::Instance()->
+    default_mask_border_state_->export_to_string(), PreferencesManager::Instance()->
+    default_mask_border_state_->export_list_to_string() );
 
     // == How is the segmentation filled in ==
-    add_state( "fill", fill_state_, "striped", "none|striped|solid" );
+    add_state( "fill", fill_state_, PreferencesManager::Instance()->
+    default_mask_fill_state_->export_to_string(), PreferencesManager::Instance()->
+    default_mask_fill_state_->export_list_to_string() );
 
     // == Whether the isosurface is shown in the volume display ==
     add_state( "isosurface", show_isosurface_state_, false );
     
 }
-
 
 } // end namespace Seg3D
 

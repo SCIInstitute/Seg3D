@@ -425,11 +425,10 @@ bool QtBridge::Connect( QLineEdit* qlineedit, Core::StateNameHandle& state_handl
   // signal for when the value of the ColorButton has changed //
   void ColorButtonSignal( QPointer< ColorButton > qpointer, Core::Color state, Core::ActionSource source )
   {
-    if ( source != Core::ActionSource::INTERFACE_E )
-    {
-      QtSignal( qpointer, boost::bind( &ColorButton::set_color, 
+    // this needs to go back to the interface so that we can update the 
+    // layerwidget's colorbar from the preferences manager
+    QtSignal( qpointer, boost::bind( &ColorButton::set_color, 
                       qpointer.data(), state ) ); 
-    }
   }
   // -- END SIGNAL CONNECTORS FOR THE ColorButton's -- //
   

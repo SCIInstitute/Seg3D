@@ -63,8 +63,11 @@ AppPreferences::AppPreferences( QWidget *parent ) :
   this->setup_sidebar_prefs();
   this->setup_interface_controls_prefs();
 
+  //Hide the interface controls since they arent connected yet
+  this->private_->ui_.tab_interface_controls_->hide();
+
   // connect the apply button to the save defaults function
-  connect( this->private_->ui_.apply_button_, SIGNAL( clicked () ), this, SLOT( save_defaults() ) );
+  connect( this->private_->ui_.apply_button_, SIGNAL( clicked() ), this, SLOT( save_defaults() ) );
   
 }
 
@@ -72,9 +75,33 @@ AppPreferences::~AppPreferences()
 {
 }
 
+void AppPreferences::change_project_directory()
+{
+  QString path = QFileDialog::getExistingDirectory ( this, tr( "Directory" ), 
+    project_directory_.path() );
+    if ( path.isNull() == false )
+    {
+        project_directory_.setPath( path );
+    this->private_->ui_.path_->setText( project_directory_.absolutePath() );
+
+  }
+}
+
+
 void AppPreferences::setup_general_prefs()
 {
 //Set Layers Preferences
+  this->project_directory_.setPath( QString::fromStdString( PreferencesManager::Instance()->
+    project_path_state_->export_to_string() ) );
+
+  this->private_->ui_.path_->setText( QString::fromStdString( PreferencesManager::Instance()->
+    project_path_state_->export_to_string() ) );
+
+  QtBridge::Connect( this->private_->ui_.path_, PreferencesManager::Instance()->project_path_state_ );
+
+  connect( this->private_->ui_.change_directory_button_, SIGNAL( clicked() ), 
+    this, SLOT( change_project_directory() ) );
+
   this->private_->ui_.consolidate_project_checkbox_->setChecked( 
     PreferencesManager::Instance()->considate_project_state_->get() );
   this->private_->ui_.full_screen_on_startup_checkbox_->setChecked(  

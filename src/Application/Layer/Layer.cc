@@ -30,11 +30,15 @@
 
 // Boost includes 
 
+// Core includes
 #include <Core/Application/Application.h>
 #include <Core/Utils/AtomicCounter.h>
 #include <Core/Utils/StringUtil.h>
+
+// Application includes
 #include <Application/Layer/Layer.h>
 #include <Application/ViewerManager/ViewerManager.h>
+#include <Application/PreferencesManager/PreferencesManager.h>
 
 namespace Seg3D
 {
@@ -71,10 +75,14 @@ Layer::Layer( const std::string& name ) :
   add_state( "edit_mode", edit_mode_state_, "none", "none|opacity|color|contrast|appearance" );
   
   // == Which fill mode is active ==
-  add_state( "fill_mode", fill_mode_state_, "none", "none|crosshatch|stipple|solid" );
-  
+  add_state( "fill_mode", fill_mode_state_, PreferencesManager::Instance()->
+    default_mask_fill_state_->export_to_string(), PreferencesManager::Instance()->
+    default_mask_fill_state_->export_list_to_string() );
+
   // == Which border mode is active ==
-  add_state( "border_mode", border_mode_state_, "none", "none|solid|dashed|dotted" );
+  add_state( "border_mode", border_mode_state_, PreferencesManager::Instance()->
+    default_mask_border_state_->export_to_string(), PreferencesManager::Instance()->
+    default_mask_border_state_->export_list_to_string() );
 
 }
   

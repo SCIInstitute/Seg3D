@@ -98,7 +98,7 @@ QToolButton#color_12_{
          </property>
          <layout class="QGridLayout" name="gridLayout_4">
           <item row="0" column="2">
-           <widget class="QPushButton" name="pushButton">
+           <widget class="QPushButton" name="change_directory_button_">
             <property name="text">
              <string>Change</string>
             </property>
@@ -119,9 +119,12 @@ QToolButton#color_12_{
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QLineEdit" name="path_edit_">
+           <widget class="QLineEdit" name="path_">
             <property name="text">
              <string>/users/wchristiansen/Seg3d2-Projects</string>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
             </property>
            </widget>
           </item>

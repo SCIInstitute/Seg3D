@@ -79,6 +79,11 @@ private Q_SLOTS:
   // this function will set all the buttons colors back to default
   void set_buttons_to_default_colors();
 
+  // CHANGE_PROJECT_DIRECTORY:
+  // this function will be called when the user clicks the button to change the default location
+  // of the project
+  void change_project_directory();
+
   // SAVE_DEFAULTS:
   // this function will cause Seg3D2 to save all the user preferences to a file which will be 
   // loaded next time the program starts
@@ -87,6 +92,7 @@ private Q_SLOTS:
 private:
   boost::shared_ptr< AppPreferencesPrivate > private_;
   ColorPickerWidget* active_picker_;
+  QDir project_directory_;
 
 };
 

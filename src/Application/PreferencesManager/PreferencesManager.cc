@@ -78,8 +78,12 @@ Core::Color PreferencesManager::get_color( int index ) const
 
 void PreferencesManager::initialize_states()
 {
+  boost::filesystem::path user_path;
+  Core::Application::Instance()->get_user_directory( user_path );
+  user_path = user_path / "Seg3D-Projects";
+
   //General Preferences
-  add_state( "project_path", project_path_state_, local_config_path_.string() );
+  add_state( "project_path", project_path_state_, user_path.string() );
   add_state( "considate_project", considate_project_state_, false );
   add_state( "full_screen_on_startup", full_screen_on_startup_state_, false );
   
@@ -119,6 +123,7 @@ void PreferencesManager::initialize_states()
 
 bool PreferencesManager::initialize_default_colors()
 {
+  // perhaps a better color wheel http://www.thisoldhouse.com/toh/photos/0,,20161202,00.html
   this->default_colors_.push_back( Core::Color( 251, 255, 74 ) );
   this->default_colors_.push_back( Core::Color( 248, 188, 37 ) );
   this->default_colors_.push_back( Core::Color( 248, 152, 28 ) );

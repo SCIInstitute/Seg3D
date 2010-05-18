@@ -77,9 +77,12 @@ void ColorBarWidget::initialize_buttons()
       this, i, PreferencesManager::Instance()->color_states_[ i ]->get(), 16, 16 ), i );
     QtBridge::Connect( dynamic_cast< ColorButton* >( this->private_->color_button_group_->button( i ) ), 
       PreferencesManager::Instance()->color_states_[ i ] );
+
     connect(  dynamic_cast< ColorButton* >( this->private_->color_button_group_->button( i ) ), 
       SIGNAL( color_changed( int ) ), this, SLOT( color_only_changed( int ) ) );
+
     this->private_->ui_.button_layout_->addWidget( this->private_->color_button_group_->button( i ) );
+  
   }
 
   connect( this->private_->color_button_group_, SIGNAL( buttonClicked( int ) ),

@@ -260,8 +260,11 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
         this->private_->ui_.typeBackground_->setStyleSheet( StyleSheet::MASK_VOLUME_COLOR_C );
         this->private_->activate_button_->setIcon( this->mask_layer_icon_ );
         
-        connect( this->private_->color_widget_, SIGNAL( color_changed( int ) ), 
+        connect( this->private_->color_widget_, SIGNAL( color_index_changed( int ) ), 
           this, SLOT( set_mask_background_color( int ) ) );
+
+        connect( this->private_->color_widget_, SIGNAL( color_changed( int ) ),
+          this, SLOT( set_mask_background_color_from_preference_change( int ) ) );
 
         MaskLayer* mask_layer = dynamic_cast< MaskLayer* >( layer.get() );  
         this->private_->color_widget_->set_color_index( mask_layer->color_state_->get() );
@@ -299,6 +302,19 @@ LayerWidget::~LayerWidget()
 
 void LayerWidget::set_mask_background_color( int color_index )
 {
+  Core::Color color = PreferencesManager::Instance()->color_states_[ color_index ]->get();
+  
+  QString style_sheet = QString::fromUtf8( 
+  "background-color: rgb(" ) + QString::number( color.r() ) +
+  QString::fromUtf8( ", " ) + QString::number( color.g() ) +
+  QString::fromUtf8( ", " ) + QString::number( color.b() ) +
+  QString::fromUtf8( "); }" );
+
+  this->private_->ui_.typeBackground_->setStyleSheet( style_sheet );
+}
+
+void LayerWidget::set_mask_background_color_from_preference_change( int color_index )
+{
   if( dynamic_cast< MaskLayer* >( LayerManager::Instance()->get_layer_by_id( 
     this->get_layer_id()).get()  )->color_state_->get() != color_index )
     return;
@@ -313,6 +329,7 @@ void LayerWidget::set_mask_background_color( int color_index )
 
   this->private_->ui_.typeBackground_->setStyleSheet( style_sheet );
 }
+
 
 void LayerWidget::set_group_menu_status( bool status )
 {
