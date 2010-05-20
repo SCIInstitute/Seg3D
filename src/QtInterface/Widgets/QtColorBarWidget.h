@@ -26,38 +26,60 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_HISTOGRAMWIDGET_H
-#define INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_HISTOGRAMWIDGET_H
+#ifndef QTINTERFACE_WIDGETS_QTCOLORBARWIDGET_H
+#define QTINTERFACE_WIDGETS_QTCOLORBARWIDGET_H
 
-//Boost includes
+// QT includes
+#include <QWidget>
+
+// STL includes
+#include <string>
+
+// Boost includes
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/thread.hpp>
 #include <boost/shared_ptr.hpp>
 
-//Qt includes
-#include <QtGui>
+// QtInterface includes
+#include <QtInterface/Widgets/QtColorButton.h>
 
-
-namespace Seg3D
+namespace Core
 {
 
-class HistogramWidgetPrivate;
+class QtColorBarWidgetPrivate;
+typedef boost::shared_ptr< QtColorBarWidgetPrivate > QtColorBarWidgetPrivateHandle;
 
-class HistogramWidget : public QWidget
+class QtColorBarWidget : public QWidget
 {
-    Q_OBJECT
+Q_OBJECT
 
 public:
-    HistogramWidget( QWidget *parent = 0 );
-    virtual ~HistogramWidget();
-    
-public Q_SLOTS:
-  void set_histogram( std::vector< size_t > ints_bin, int min, int max, 
-    size_t min_bin, size_t max_bin );
+  QtColorBarWidget( QWidget* parent = 0 );
+  virtual ~QtColorBarWidget();
 
+public:
+  void add_color_button( QtColorButton* color_button, int index );
+
+  int get_active_index();
+
+public Q_SLOTS:
+  void set_color_index( int index );
+
+Q_SIGNALS:
+  void color_index_changed( int index );
+  void color_changed( int index );
 
 private:
-  boost::shared_ptr< HistogramWidgetPrivate > private_;
+  void mousePressEvent( QMouseEvent* event );
+  
+private Q_SLOTS:
+  void signal_activation( int active );
+  void color_only_changed( int button_index );
+
+private:
+  QtColorBarWidgetPrivateHandle private_;
 };
 
-} // end namespace Seg3D
+} // end namespace Core
 
 #endif

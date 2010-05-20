@@ -26,68 +26,40 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_QTINTERFACE_QTRENDERRESOURCES_H
-#define INTERFACE_QTINTERFACE_QTRENDERRESOURCES_H
+#ifndef QTINTERFACE_UTILS_QTRENDERRESOURCES_H
+#define QTINTERFACE_UTILS_QTRENDERRESOURCES_H
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
 #endif 
 
+// Glew include
+#include <GL/glew.h>
+
+// Qt includes
+#include <QtOpenGL>
+#include <QPointer>
+
+// QtInterface includes
+#include <QtInterface/Utils/QtRenderWidget.h>
+
 // Application includes
 #include <Core/RenderResources/RenderResourcesContext.h>
 #include <Core/RenderResources/RenderContext.h>
 
-// Interface includes
-#include <Interface/QtInterface/QtRenderWidget.h>
-
-// Qt includes
-#include <QtOpenGL>
-#include <QtGui>
-
-namespace Seg3D
+namespace Core
 {
+
+// CLASS: QtRenderResourcesContext
+// Qt specific implementation of the render resources class
 
 // Forward declarations
-class QtRenderContext;
 class QtRenderResourcesContext;
-typedef boost::shared_ptr< QtRenderContext > QtRenderContextHandle;
 typedef boost::shared_ptr< QtRenderResourcesContext > QtRenderResourcesContextHandle;
 
-// Shared pointer to one of Qt's internal resources
-// NOTE: As GLContext objects are not managed by Qt we
-// need to do this ourselves using a smart pointer
 
-typedef boost::shared_ptr< QGLContext > QGLContextHandle;
-
-class QtRenderContext : public Core::RenderContext
-{
-  // -- constructor/ destructor --
-public:
-  QtRenderContext( QGLContextHandle& context );
-  virtual ~QtRenderContext();
-
-  // -- context functions --
-  // IS_VALID:
-  // Test whether the context is valid
-  virtual bool is_valid() const;
-
-  // MAKE_CURRENT:
-  // Set the rendering context current to this thread
-  virtual void make_current();
-
-  // DONE_CURRENT:
-  // Indicate that rendering using this context is done for now
-  virtual void done_current();
-
-  // SWAP_BUFFERS:
-  // Swap the front and back buffers
-  virtual void swap_buffers() const;
-
-private:
-  QGLContextHandle context_;
-};
-
-class QtRenderResourcesContext : public Core::RenderResourcesContext
+// Class definition
+class QtRenderResourcesContext : public RenderResourcesContext
 {
 
 public:
@@ -97,12 +69,12 @@ public:
 public:
   // CREATE_RENDER_CONTEXT:
   // Generate a render context for one of the viewers
-  virtual bool create_render_context( Core::RenderContextHandle& context );
+  virtual bool create_render_context( RenderContextHandle& context );
 
   // CREATE_QT_RENDER_WIDGET:
   // Get the Qt render context directly
   // NOTE: The viewers access this directly
-  QtRenderWidget* create_qt_render_widget( QWidget* parent );
+  QtRenderWidget* create_qt_render_widget( QWidget* parent, AbstractViewerHandle viewer );
 
   // VALID_RENDER_RESOURCES:
   // Check whether valid render resources were installed
@@ -118,6 +90,6 @@ private:
 
 };
 
-} // end namespace Seg3D
+} // end namespace Core
 
 #endif

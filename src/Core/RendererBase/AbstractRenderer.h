@@ -35,6 +35,7 @@
 
 // boost includes
 #include <boost/shared_ptr.hpp>
+#include <boost/signals2.hpp>
 
 // Core includes
 #include <Core/Graphics/Texture.h>

@@ -75,7 +75,6 @@ protected:
   virtual bool render_overlay();
 
 private:
-
   void process_slices( LayerSceneHandle& layer_scene, ViewerHandle& viewer );
   void draw_slices_3d( const Core::BBox& bbox, 
     const std::vector< LayerSceneHandle >& layer_scenes, 

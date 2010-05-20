@@ -26,63 +26,102 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_QTINTERFACE_QTRENDERWIDGET_H
-#define INTERFACE_QTINTERFACE_QTRENDERWIDGET_H
+#ifndef QTINTERFACE_UTILS_QTRENDERWIDGET_H
+#define QTINTERFACE_UTILS_QTRENDERWIDGET_H
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
 #endif 
 
+// Glew includes
+// NOTE: Glew needs to be included before any openGL headers
+#include <GL/glew.h>
+
+// Qt includes
+#include <QtOpenGL>
+
 // Core includes
 #include <Core/Utils/ConnectionHandler.h>
 #include <Core/RenderResources/RenderResources.h> 
+#include <Core/Viewer/AbstractViewer.h>
 
-// Applications includes
-#include <Application/Viewer/Viewer.h>
-#include <Application/Renderer/Renderer.h>
-
-#include <QtOpenGL>
-
-namespace Seg3D
+namespace Core
 {
+
+class QtRenderWidget;
+class QtRenderWidgetPrivate;
+typedef boost::shared_ptr<QtRenderWidgetPrivate> QtRenderWidgetPrivateHandle;
 
 class QtRenderWidget : public QGLWidget, private Core::ConnectionHandler
 {
 Q_OBJECT
 
+  // -- constructor/ destructor --
 public:
-  QtRenderWidget( const QGLFormat& format, QWidget* parent, QtRenderWidget* share );
+  QtRenderWidget( const QGLFormat& format, QWidget* parent, QtRenderWidget* share, 
+    Core::AbstractViewerHandle viewer );
+    
   virtual ~QtRenderWidget();
-
-  void set_viewer_id( size_t viewer_id );
 
 protected:
 
+  // INITIALIZEGL:
+  // This function is called by Qt when the widget is initialized
   virtual void initializeGL();
+  
+  // PAINTGL:
+  // This function is called whenever Qt has to repaint the contents of 
+  // the widget displaying the Qt scene
   virtual void paintGL();
+  
+  // RESIZEGL:
+  // This function gets called whenever the Qt widget is resized
   virtual void resizeGL( int width, int height );
 
+  // MOUSEDOUBLECLICKEVENT:
+  // This function is called by Qt to deliver a double mouse click event
+  // to the GUI.
   virtual void mouseDoubleClickEvent( QMouseEvent * event ) {}
+
+  // MOUSEMOVEEVENT:
+  // This function is called by Qt to deliver mouse movement event
+  // to the GUI.  
   virtual void mouseMoveEvent( QMouseEvent * event );
+  
+  // MOUSEDOUBLECLICKEVENT:
+  // This function is called by Qt to deliver a single mouse click event
+  // to the GUI.
   virtual void mousePressEvent( QMouseEvent * event );
+  
+  // MOUSERELEASEEVENT:
+  // This function is called by Qt to deliver a mouse button release event
+  // to the GUI.  
   virtual void mouseReleaseEvent( QMouseEvent * event );
+  
+  // WHEELEVENT:
+  // This function is called by Qt to deliver mouse wheel event
+  // to the GUI.  
   virtual void wheelEvent( QWheelEvent* event );
 
+  // HIDEEVENT:
+  // This function is called by Qt to deliver an event that tells that the
+  // widget is being hidden. 
+  // NOTE: This is called when the user changes the number of viewers in the
+  // main display
   virtual void hideEvent( QHideEvent* event );
+
+  // SHOWEVENT:
+  // This function is called by Qt to deliver an event that tells that the
+  // widget is being shown
+  // NOTE: This is called when the user changes the number of viewers in the
+  // main display
   virtual void showEvent( QShowEvent* event );
 
+  // -- internals of the QtRenderWidget --
 private:
-
-  void update_display();
-
-  RendererHandle renderer_;
-
-  ViewerHandle viewer_;
-  size_t viewer_id_;
-
-  MouseHistory mouse_history_;
+  QtRenderWidgetPrivateHandle private_;
 };
 
-} // end namespace Seg3D
+} // end namespace Core
 
 #endif

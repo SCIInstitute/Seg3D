@@ -30,19 +30,16 @@
 // Util includes
 #include <Core/Utils/Log.h>
 
-// Application includes
-#include <Application/PreferencesManager/PreferencesManager.h>
+// UI includes
+#include "ui_QtColorBarWidget.h"
 
-// Interface includes
-#include <Interface/AppInterface/ColorBarWidget.h>
-#include <Interface/AppInterface/StyleSheet.h>
-#include <Interface/QtInterface/QtBridge.h>
-#include "ui_ColorBarWidget.h"
+// QtInterface includes
+#include <QtInterface/Widgets/QtColorBarWidget.h>
 
-namespace Seg3D
+namespace Core
 {
 
-class ColorBarWidgetPrivate
+class QtColorBarWidgetPrivate
 {
 public:
   Ui::ColorBarWidget ui_;
@@ -50,64 +47,54 @@ public:
 
 };
 
-ColorBarWidget::ColorBarWidget( QWidget *parent ) :
+QtColorBarWidget::QtColorBarWidget( QWidget *parent ) :
   QWidget( parent ),
-  private_( new ColorBarWidgetPrivate )
+  private_( new QtColorBarWidgetPrivate )
 {
   // Set up the private internals of the ColorBarWidget class
   this->private_->ui_.setupUi( this );
   this->private_->color_button_group_ = new QButtonGroup( this );
-  this->initialize_buttons();
+  
+  this->connect( this->private_->color_button_group_, SIGNAL( buttonClicked( int ) ),
+    this, SLOT( signal_activation( int ) ) ); 
 }
 
-ColorBarWidget::~ColorBarWidget()
+QtColorBarWidget::~QtColorBarWidget()
 {
 } 
 
-int ColorBarWidget::get_active_index()
+int QtColorBarWidget::get_active_index()
 {
   return this->private_->color_button_group_->checkedId();
 }
   
-void ColorBarWidget::initialize_buttons()
-{ 
-  for( int i = 0; i < 12; ++i )
-  {
-    this->private_->color_button_group_->addButton( new ColorButton( 
-      this, i, PreferencesManager::Instance()->color_states_[ i ]->get(), 16, 16 ), i );
-    QtBridge::Connect( dynamic_cast< ColorButton* >( this->private_->color_button_group_->button( i ) ), 
-      PreferencesManager::Instance()->color_states_[ i ] );
+void QtColorBarWidget::add_color_button( QtColorButton* color_button, int index )
+{
+  this->private_->color_button_group_->addButton( color_button, index );
+  this->connect( color_button, SIGNAL( color_changed( int ) ), 
+    this, SLOT( color_only_changed( int ) ) );
+  this->private_->ui_.button_layout_->addWidget( color_button );  
+}
 
-    connect(  dynamic_cast< ColorButton* >( this->private_->color_button_group_->button( i ) ), 
-      SIGNAL( color_changed( int ) ), this, SLOT( color_only_changed( int ) ) );
-
-    this->private_->ui_.button_layout_->addWidget( this->private_->color_button_group_->button( i ) );
-  
-  }
-
-  connect( this->private_->color_button_group_, SIGNAL( buttonClicked( int ) ),
-    this, SLOT( signal_activation( int ) ) );
-}   
-
-void ColorBarWidget::signal_activation( int active )
+void QtColorBarWidget::signal_activation( int active )
 {
   Q_EMIT this->color_index_changed( active );
 }
 
-void ColorBarWidget::set_color_index( int index )
+void QtColorBarWidget::set_color_index( int index )
 {
-  dynamic_cast< ColorButton* >( this->private_->color_button_group_->button( index ) )->
+  dynamic_cast< QtColorButton* >( this->private_->color_button_group_->button( index ) )->
     setChecked( true );
   this->signal_activation( index );
   
 }
 
-void ColorBarWidget::color_only_changed( int button_index )
+void QtColorBarWidget::color_only_changed( int button_index )
 {
   Q_EMIT this->color_changed( button_index );
 }
 
-void ColorBarWidget::mousePressEvent( QMouseEvent* event )
+void QtColorBarWidget::mousePressEvent( QMouseEvent* event )
 {
   // do nothing.
 }

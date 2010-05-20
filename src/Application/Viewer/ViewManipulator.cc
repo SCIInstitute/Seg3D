@@ -52,7 +52,7 @@ ViewManipulator::~ViewManipulator()
 {
 }
 
-void ViewManipulator::mouse_press( const MouseHistory& mouse_history, int button, int buttons,
+void ViewManipulator::mouse_press( const Core::MouseHistory& mouse_history, int button, int buttons,
     int modifiers )
 {
   // if there is already an active mouse action, return directly
@@ -63,42 +63,42 @@ void ViewManipulator::mouse_press( const MouseHistory& mouse_history, int button
 
   if ( this->viewer_->is_volume_view() )
   {
-    if ( button == MouseButton::LEFT_BUTTON_E )
+    if ( button == Core::MouseButton::LEFT_BUTTON_E )
     {
       this->translate_active_ = true;
       this->compute_3d_viewplane();
     }
-    else if ( button == MouseButton::RIGHT_BUTTON_E )
+    else if ( button == Core::MouseButton::RIGHT_BUTTON_E )
     {
       this->scale_active_ = true;
     }
-    else if ( button == MouseButton::MID_BUTTON_E )
+    else if ( button == Core::MouseButton::MID_BUTTON_E )
     {
       this->rotate_active_ = true;
     }
   }
   else
   {
-    if ( ( button == MouseButton::LEFT_BUTTON_E ) && ( modifiers
-        == KeyModifier::SHIFT_MODIFIER_E ) )
+    if ( ( button == Core::MouseButton::LEFT_BUTTON_E ) && ( modifiers
+        == Core::KeyModifier::SHIFT_MODIFIER_E ) )
     {
       this->translate_active_ = true;
     }
-    else if ( ( button == MouseButton::RIGHT_BUTTON_E ) && ( modifiers
-        == KeyModifier::SHIFT_MODIFIER_E ) )
+    else if ( ( button == Core::MouseButton::RIGHT_BUTTON_E ) && ( modifiers
+        == Core::KeyModifier::SHIFT_MODIFIER_E ) )
     {
       this->scale_active_ = true;
     }
   }
 }
 
-void ViewManipulator::mouse_move( const MouseHistory& mouse_history, int button, int buttons,
+void ViewManipulator::mouse_move( const Core::MouseHistory& mouse_history, int button, int buttons,
     int modifiers )
 {
   if ( this->translate_active_ )
   {
-    Core::Vector offset = this->compute_translation( mouse_history.previous.x,
-        mouse_history.previous.y, mouse_history.current.x, mouse_history.current.y,
+    Core::Vector offset = this->compute_translation( mouse_history.previous_.x_,
+        mouse_history.previous_.y_, mouse_history.current_.x_, mouse_history.current_.y_,
         this->viewer_->is_volume_view() );
     Core::StateViewBaseHandle view_state = this->viewer_->get_active_view_state();
     Core::ActionTranslateView::Dispatch( view_state, offset );
@@ -109,7 +109,7 @@ void ViewManipulator::mouse_move( const MouseHistory& mouse_history, int button,
       for ( size_t i = 0; i < locked_viewers.size(); i++ )
       {
         size_t viewer_id = locked_viewers[ i ];
-        if ( this->viewer_->viewer_id_ != viewer_id )
+        if ( this->viewer_->get_viewer_id() != viewer_id )
         {
           ViewerHandle viewer = ViewerManager::Instance()->get_viewer( viewer_id );
           Core::StateViewBaseHandle view_state = viewer->get_active_view_state();       
@@ -120,8 +120,8 @@ void ViewManipulator::mouse_move( const MouseHistory& mouse_history, int button,
   }
   else if ( this->scale_active_ )
   {
-    double scale_ratio = this->compute_scaling( mouse_history.previous.x,
-        mouse_history.previous.y, mouse_history.current.x, mouse_history.current.y );
+    double scale_ratio = this->compute_scaling( mouse_history.previous_.x_,
+        mouse_history.previous_.y_, mouse_history.current_.x_, mouse_history.current_.y_ );
     Core::StateViewBaseHandle view_state = this->viewer_->get_active_view_state();
     Core::ActionScaleView::Dispatch( view_state, scale_ratio );
     if ( this->viewer_->viewer_lock_state_->get() )
@@ -131,7 +131,7 @@ void ViewManipulator::mouse_move( const MouseHistory& mouse_history, int button,
       for ( size_t i = 0; i < locked_viewers.size(); i++ )
       {
         size_t viewer_id = locked_viewers[ i ];
-        if ( this->viewer_->viewer_id_ != viewer_id )
+        if ( this->viewer_->get_viewer_id() != viewer_id )
         {
           ViewerHandle viewer = ViewerManager::Instance()->get_viewer( viewer_id );
           Core::StateViewBaseHandle view_state = viewer->get_active_view_state();       
@@ -144,8 +144,8 @@ void ViewManipulator::mouse_move( const MouseHistory& mouse_history, int button,
   {
     Core::Vector axis;
     double angle;
-    if ( this->compute_rotation( mouse_history.previous.x, mouse_history.previous.y,
-        mouse_history.current.x, mouse_history.current.y, axis, angle ) )
+    if ( this->compute_rotation( mouse_history.previous_.x_, mouse_history.previous_.y_,
+        mouse_history.current_.x_, mouse_history.current_.y_, axis, angle ) )
     {
       // dispatch an ActionRotateView3D
       Core::ActionRotateView3D::Dispatch( this->viewer_->volume_view_state_, axis, angle );
@@ -156,7 +156,7 @@ void ViewManipulator::mouse_move( const MouseHistory& mouse_history, int button,
         for ( size_t i = 0; i < locked_viewers.size(); i++ )
         {
           size_t viewer_id = locked_viewers[ i ];
-          if ( this->viewer_->viewer_id_ != viewer_id )
+          if ( this->viewer_->get_viewer_id() != viewer_id )
           {
             ViewerHandle viewer = ViewerManager::Instance()->get_viewer( viewer_id );
             Core::ActionRotateView3D::Dispatch( viewer->volume_view_state_, axis, angle );
@@ -167,18 +167,18 @@ void ViewManipulator::mouse_move( const MouseHistory& mouse_history, int button,
   }
 }
 
-void ViewManipulator::mouse_release( const MouseHistory& mouse_history, int button, int buttons,
+void ViewManipulator::mouse_release( const Core::MouseHistory& mouse_history, int button, int buttons,
     int modifiers )
 {
   switch( button )
   {
-  case MouseButton::LEFT_BUTTON_E:
+  case Core::MouseButton::LEFT_BUTTON_E:
     this->translate_active_ = false;
     break;
-  case MouseButton::RIGHT_BUTTON_E:
+  case Core::MouseButton::RIGHT_BUTTON_E:
     this->scale_active_ = false;
     break;
-  case MouseButton::MID_BUTTON_E:
+  case Core::MouseButton::MID_BUTTON_E:
     this->rotate_active_ = false;
     break;
   }

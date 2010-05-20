@@ -109,7 +109,7 @@ ViewerHandle ViewerManager::get_viewer( const std::string viewer_name )
   ViewerHandle handle;
   for ( size_t i = 0; i < this->viewers_.size(); i++ )
   {
-    if ( this->viewers_[ i ]->get_stateid() == viewer_name )
+    if ( this->viewers_[ i ]->get_statehandler_id() == viewer_name )
     {
       handle = this->viewers_[ i ];
       break;

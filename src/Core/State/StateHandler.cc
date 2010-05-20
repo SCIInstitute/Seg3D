@@ -44,6 +44,9 @@ public:
   // The id of this state handler
   std::string statehandler_id_;
 
+  // The number at the end of the state handler id
+  size_t statehandler_id_number_;
+
   // The database with the actual states 
   state_map_type state_map_;
 };
@@ -54,7 +57,14 @@ StateHandler::StateHandler( const std::string& type_str, bool auto_id )
   this->private_ = new StateHandlerPrivate;
   this->private_->statehandler_id_ = StateEngine::Instance()->
     register_state_handler( type_str, this, auto_id );
-
+    
+  this->private_->statehandler_id_number_ = 0;
+  std::string::size_type loc = this->private_->statehandler_id_.size();
+  while (  loc > 0 && this->private_->statehandler_id_[ loc - 1 ] >= '0' && 
+      this->private_->statehandler_id_[ loc - 1 ] <= '9' ) loc--;
+  
+  ImportFromString( this->private_->statehandler_id_.substr( loc ), 
+    this->private_->statehandler_id_number_ );
 }
 
 StateHandler::~StateHandler()
@@ -85,11 +95,16 @@ void StateHandler::state_changed()
   // default function is to do nothing
 }
 
-
 const std::string& StateHandler::get_statehandler_id() const
 {
   return ( this->private_->statehandler_id_ );
 }
+
+size_t StateHandler::get_statehandler_id_number() const
+{
+  return ( this->private_->statehandler_id_number_ );
+}
+
 
 std::string StateHandler::create_state_id( const std::string& key ) const
 {

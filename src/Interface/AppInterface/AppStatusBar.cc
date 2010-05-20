@@ -26,8 +26,9 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <QStatusBar>
 
+// Qt includes
+#include <QStatusBar>
 
 // boost includes
 #include<boost/tokenizer.hpp>
@@ -36,8 +37,10 @@
 #include <Core/Utils/Log.h>
 #include <Core/Interface/Interface.h>
 
+// QtInterface includes
+#include <QtInterface/Utils/QtBridge.h>
+
 // Interface includes
-#include <Interface/QtInterface/QtBridge.h>
 #include <Interface/AppInterface/AppStatusBar.h>
 #include <Interface/AppInterface/StyleSheet.h>
 

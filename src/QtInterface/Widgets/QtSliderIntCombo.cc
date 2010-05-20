@@ -27,24 +27,27 @@
 */
 
 
-//Core Includes - for logging
+//Core includes
 #include <Core/Utils/Log.h>
 
-#include <Interface/ToolInterface/CustomWidgets/SliderIntCombo.h>
-#include "ui_SliderIntCombo.h"
+// UI includes
+#include "ui_QtSliderIntCombo.h"
 
-namespace Seg3D
+// QtInterface includes
+#include <QtInterface/Widgets/QtSliderIntCombo.h>
+
+namespace Core
 {
 
-class SliderIntComboPrivate
+class QtSliderIntComboPrivate
 {
 public:
     Ui::SliderIntCombo ui_;
 };
 
-SliderIntCombo::SliderIntCombo( QWidget* parent, bool edit_range ) :
+QtSliderIntCombo::QtSliderIntCombo( QWidget* parent, bool edit_range ) :
      QWidget( parent ),
-  private_( new SliderIntComboPrivate )
+  private_( new QtSliderIntComboPrivate )
 {
     this->private_->ui_.setupUi( this );
     
@@ -65,37 +68,40 @@ SliderIntCombo::SliderIntCombo( QWidget* parent, bool edit_range ) :
     connect( this->private_->ui_.spinBox, SIGNAL( valueChanged( int ) ), this, SLOT( spinner_signal( int ) ) );
 }
 
-SliderIntCombo::~SliderIntCombo()
+QtSliderIntCombo::~QtSliderIntCombo()
 {
 }
 
-void SliderIntCombo::spinner_signal( int value )
+void QtSliderIntCombo::spinner_signal( int value )
 {
     this->private_->ui_.horizontalSlider->blockSignals( true );
     this->private_->ui_.horizontalSlider->setValue( value );
     Q_EMIT valueAdjusted( value );
   this->private_->ui_.horizontalSlider->blockSignals( false );
+  
   this->value_ = value;
 }
 
-void SliderIntCombo::slider_signal( int value )
+void QtSliderIntCombo::slider_signal( int value )
 {
     this->private_->ui_.spinBox->blockSignals( true );
     this->private_->ui_.spinBox->setValue( value );
     Q_EMIT valueAdjusted( value );
   this->private_->ui_.spinBox->blockSignals( false );
+  
   this->value_ = value;
 }
 
 
-void SliderIntCombo::setStep(int step)
+void QtSliderIntCombo::setStep(int step)
 {
   block_signals( true );
     this->private_->ui_.horizontalSlider->setSingleStep( step );
     this->private_->ui_.spinBox->setSingleStep( step );
     block_signals( false );
 }
-void SliderIntCombo::setRange( int min, int max)
+
+void QtSliderIntCombo::setRange( int min, int max)
 {
   block_signals( true );
     this->private_->ui_.horizontalSlider->setRange( min, max );
@@ -107,7 +113,8 @@ void SliderIntCombo::setRange( int min, int max)
     this->private_->ui_.horizontalSlider->setTickInterval( tick );
     block_signals( false );
 }
-void SliderIntCombo::setCurrentValue( int value )
+
+void QtSliderIntCombo::setCurrentValue( int value )
 {
   block_signals( true );
     this->private_->ui_.horizontalSlider->setValue( value );
@@ -116,7 +123,7 @@ void SliderIntCombo::setCurrentValue( int value )
 }
 
 
-void SliderIntCombo::change_min( int new_min )
+void QtSliderIntCombo::change_min( int new_min )
 {
   block_signals( true );
     this->private_->ui_.horizontalSlider->setMinimum( new_min );
@@ -127,7 +134,7 @@ void SliderIntCombo::change_min( int new_min )
     block_signals( false );
 }
 
-void SliderIntCombo::change_max( int new_max )
+void QtSliderIntCombo::change_max( int new_max )
 {
   block_signals( true );
     this->private_->ui_.horizontalSlider->setMaximum( new_max );
@@ -138,20 +145,20 @@ void SliderIntCombo::change_max( int new_max )
     block_signals( false );
 }
 
-void SliderIntCombo::double_range()
+void QtSliderIntCombo::double_range()
 {
     int new_max = this->private_->ui_.max_->text().toInt() * 2;
     change_max( new_max );
     rangeChanged( this->private_->ui_.min_->text().toInt(), new_max );
 }
-void SliderIntCombo::half_range()
+void QtSliderIntCombo::half_range()
 {
     int new_max = this->private_->ui_.max_->text().toInt() / 2;
     change_max( new_max );
     rangeChanged( this->private_->ui_.min_->text().toInt(), new_max );
 }
 
-void SliderIntCombo::edit_ranges( bool edit )
+void QtSliderIntCombo::edit_ranges( bool edit )
 {
   if( edit )
   {
@@ -165,12 +172,10 @@ void SliderIntCombo::edit_ranges( bool edit )
   }
 }
 
-void SliderIntCombo::block_signals( bool block )
+void QtSliderIntCombo::block_signals( bool block )
 {
   this->private_->ui_.horizontalSlider->blockSignals( block );
   this->private_->ui_.spinBox->blockSignals( block ); 
 }
 
-
-
-}  // end namespace Seg3D
+}  // end namespace Core

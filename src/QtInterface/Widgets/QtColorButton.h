@@ -26,48 +26,55 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <QtGui>
-#include <time.h>
-#include "ui_HistogramWidget.h"
+#ifndef QTINTERFACE_WIDGETS_QTCOLORBUTTON_H
+#define QTINTERFACE_WIDGETS_QTCOLORBUTTON_H
 
-// Interface includes
-#include <Interface/ToolInterface/CustomWidgets/HistogramWidget.h>
-#include <Interface/ToolInterface/CustomWidgets/Histogram.h>
+// QT includes
+#include <QtGui/QToolButton>
 
-namespace Seg3D
+// Core includes
+#include <Core/Geometry/Color.h>
+
+namespace Core
 {
-
-class HistogramWidgetPrivate 
-{
-public:
-  Ui::HistogramWidget ui_;
-  Histogram* histogram_;
-};
-
-
-HistogramWidget::HistogramWidget( QWidget *parent ) :
-  QWidget( parent ),
-    private_( new HistogramWidgetPrivate )
-{
-  this->private_->ui_.setupUi( this );
   
-  this->private_->histogram_ = new Histogram( this );
-  this->private_->ui_.histogramLayout->addWidget( this->private_->histogram_ );
-  this->setMinimumHeight( 170 );
-  this->private_->ui_.label_3->setAlignment( Qt::AlignHCenter | Qt::AlignVCenter );
-}
-
-HistogramWidget::~HistogramWidget()
+class QtColorButton :
+  public QToolButton
 {
-}
+  Q_OBJECT
+  
+Q_SIGNALS:
+  void color_changed( Core::Color );
+  void color_changed( int );
+  void button_clicked( Core::Color, bool );
+  void index( int );
 
-void HistogramWidget::set_histogram( std::vector< size_t > ints_bin, int min, int max,
-  size_t min_bin, size_t max_bin )
-{
-  this->private_->histogram_->set_bins( ints_bin, min_bin, max_bin );
-  this->private_->ui_.min->setText( QString::number( min ) );
-  this->private_->ui_.max->setText( QString::number( max ) );
-  this->private_->histogram_->repaint();
-}
+public:
+  // - Constructor / Destructor
+  QtColorButton( QWidget *parent = 0, int index = 0, 
+    Core::Color button_color = Core::Color(), int height = 0, int width = 0 );
+  virtual ~QtColorButton();
+  
+public Q_SLOTS:
+  // SET_COLOR:
+  // This function sets the color and the stylesheet of the button to reflect the desired color
+  void set_color( Core::Color );
 
-} // end namespace Seg3D
+  // GET_COLOR:
+  // This function returns the current color of the button
+  Core::Color get_color(){ return button_color_; }
+  
+private Q_SLOTS:
+  // TRIGGER_SIGNAL:
+  // This function is called when the button needs to signal that it has been toggled.
+  void trigger_signal( bool );
+
+private:
+  Core::Color button_color_;
+  const int index_;
+  
+};
+  
+} // end namespace Core
+
+#endif

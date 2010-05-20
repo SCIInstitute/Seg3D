@@ -35,12 +35,10 @@
 
 // STL includes
 #include <vector>
+#include <string>
 
 // Boost includes
-#include <boost/unordered_map.hpp>
-#include <boost/thread/mutex.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/utility.hpp>
 
 // Core includes
 #include <Core/Utils/Lockable.h>
@@ -62,14 +60,13 @@ namespace Seg3D
 
 class ToolBuilderBase
 {
+
 public:
-  // ensure we can delete the builder correctly
-  virtual ~ToolBuilderBase()
-  {
-  }
+  // virtual destructor to ensure class can be deleted properly
+  virtual ~ToolBuilderBase();
 
   // the functor call to build the object
-virtual ToolHandle build(const std::string& toolid) = 0;
+  virtual ToolHandle build( const std::string& toolid ) = 0;
 };
 
 // TOOLBUILDER:
@@ -81,15 +78,16 @@ class ToolBuilder: public ToolBuilderBase
 {
 
 public:
-// ensure we can delete the builder correctly
-virtual ~ToolBuilder()
-{}
+  // ensure we can delete the builder correctly
+  virtual ~ToolBuilder()
+  {
+  }
 
-// The actual builder call
-virtual ToolHandle build(const std::string& toolid)
-{
-  return ToolHandle(new TOOL(toolid));
-}
+  // The actual builder call
+  virtual ToolHandle build( const std::string& toolid )
+  {
+    return ToolHandle( new TOOL( toolid ) );
+  }
 };
 
 // TOOLINTERFACEBUILDERBASE:
@@ -101,12 +99,11 @@ virtual ToolHandle build(const std::string& toolid)
 class ToolInterfaceBuilderBase
 {
 public:
-// ensure we can delete the builder correctly
-virtual ~ToolInterfaceBuilderBase()
-{}
+  // ensure we can delete the builder correctly
+  virtual ~ToolInterfaceBuilderBase();
 
-// the functor call to build the object
-virtual ToolInterface* build() = 0;
+  // the functor call to build the object
+  virtual ToolInterface* build() = 0;
 };
 
 // TOOLINTERFACEBUILDER:
@@ -118,79 +115,38 @@ class ToolInterfaceBuilder: public ToolInterfaceBuilderBase
 {
 
 public:
-// ensure we can delete the builder correctly
-virtual ~ToolInterfaceBuilder()
-{}
+  virtual ~ToolInterfaceBuilder()
+  {
+  }
 
-// The actual builder call
-virtual ToolInterface* build()
-{
-  return new TOOLINTERFACE;
-}
+  // The actual builder call
+  virtual ToolInterface* build()
+  {
+    return new TOOLINTERFACE;
+  }
 };
 
-
-// TODO: Need to move this class into a private class
 
 class ToolInfo
 {
 public:
-  ToolInfo(std::string type,
-    ToolBuilderBase* builder,
-    int properties,
-    std::string menu_name,
-    std::string shortcut_key) :
-    type_(type),
-    builder_(builder),
-    properties_(properties),
-    menu_name_(menu_name),
-    shortcut_key_(shortcut_key)
-  {
-  }
-
-  // Copy constructor and default constructor are needed by the unordered_map
-  // class
-  ToolInfo(const ToolInfo& toolinfo) : 
-    type_(toolinfo.type_), builder_(toolinfo.builder_), properties_(toolinfo.properties_),
-    menu_name_(toolinfo.menu_name_), shortcut_key_(toolinfo.shortcut_key_)
-  {
-  }
-
-  ToolInfo() :
-    type_(""), builder_(0), properties_(0), menu_name_(""), shortcut_key_("")
-  {
-  }
-
-  std::string type() const
-  { 
-    return type_;
-  }
-    
-  ToolBuilderBase* builder() const
-  { 
-    return builder_;
-  }
-    
-  int properties() const
-  { return properties_;}
-    
-  std::string menu_name() const
-  { 
-    return menu_name_;
-  }
-    
-  std::string shortcut_key() const
-  { 
-    return shortcut_key_;
-  }
-
-private:
-  std::string type_;
+  // Pointer to the factory builder, that creates the objects
   ToolBuilderBase* builder_;
+
+  // The type of the tool
+  std::string type_;
+  
+  // The properties associated with the tool
   int properties_;
+  
+  // The name the tool should have in the menu
   std::string menu_name_;
+  
+  // The default short cut key used to open this tool
   std::string shortcut_key_;
 };
+
+typedef std::vector<ToolInfo> ToolInfoList;
 
 // ------------------------------
 
@@ -199,6 +155,9 @@ private:
 
 // Forward declaration
 class ToolFactory;
+class ToolFactoryPrivate;
+typedef boost::shared_ptr<ToolFactoryPrivate> ToolFactoryPrivateHandle;
+
 
 // Class definition
 class ToolFactory : public Core::Lockable
@@ -215,113 +174,43 @@ public:
   // REGISTER_TOOL:
   // Register a tool so that it can be automatically built in the tool
   // factory.
+  void register_tool( ToolBuilderBase* builder, std::string type,
+    int properties, std::string menu_name, std::string shortcut_key );
 
-  template <class TOOL>
-  void register_tool()
-  {
-    // Lock the factory
-    lock_type lock( get_mutex() );
-
-    // Get the type of the tool
-    std::string tool_type = Core::StringToLower( TOOL::Type() );
-
-    // Test is tool was registered before.
-    if ( tools_.find( tool_type ) != tools_.end() )
-    {
-      // Actions that are registered twice, will cause problems
-      // Hence the program will throw an exception.
-      // As registration is done on startup, this will cause a
-      // faulty program to fail always on startup.
-      CORE_THROW_LOGICERROR( std::string( "Tool '" ) + tool_type + "' is registered twice" );
-    }
-
-    // Register the action and set its properties
-    tools_[tool_type] = new ToolInfo( TOOL::Type(), new ToolBuilder<TOOL>,
-      TOOL::Properties(), TOOL::MenuName(), TOOL::ShortcutKey() );
-
-    CORE_LOG_DEBUG( std::string( "Registering tool : " ) + tool_type );
-  }
-
-private:
-  typedef boost::unordered_map<std::string,ToolInfo*> tool_map_type;
-
-  // List with builders that can be called to generate a new object
-  tool_map_type tools_;
-
-  // -- ToolInterface registration --
-public:
   // REGISTER_TOOLINTERFACE:
   // Register a tool so that it can be automatically build in the tool
   // factory.
+  void register_toolinterface( ToolInterfaceBuilderBase* builder, 
+    std::string toolinterface_name );
 
-  template <class TOOLINTERFACE>
-  void register_toolinterface( std::string toolinterface_name )
-  {
-    toolinterface_name = Core::StringToLower( toolinterface_name );
-    if ( toolinterface_name.substr( toolinterface_name.size() - 9 ) != std::string( "interface" ) )
-    {
-      CORE_THROW_LOGICERROR( std::string( "ToolInterface class name does not end with Interface" ) );
-    }
-
-    // Strip out the word interface
-    toolinterface_name = toolinterface_name.substr( 0, toolinterface_name.size() - 9 );
-
-    // Lock the factory
-    lock_type lock( get_mutex() );
-
-    // Test is tool was registered before.
-    if ( toolinterfaces_.find( toolinterface_name ) != toolinterfaces_.end() )
-    {
-      // Actions that are registered twice, will cause problems
-      // Hence the program will throw an exception.
-      // As registration is done on startup, this will cause a
-      // faulty program to fail always on startup.
-      CORE_THROW_LOGICERROR( std::string( "ToolInterface '" ) +
-        toolinterface_name + "' is registered twice" );
-    }
-
-    // Register the action
-    toolinterfaces_[ toolinterface_name ] = new ToolInterfaceBuilder<TOOLINTERFACE>;
-    CORE_LOG_DEBUG( std::string( "Registering toolinterface : " ) + toolinterface_name );
-  }
-
-private:
-  typedef boost::unordered_map<std::string,ToolInterfaceBuilderBase*> toolinterface_map_type;
-  // List with builders that can be called to generate a new object
-  toolinterface_map_type toolinterfaces_;
 
   // -- Instantiate tools and toolinterfaces --
 public:
 
   // CREATE_TOOL:
-  // Generate an tool from an iostream object that contains the XML
-  // specification of the action.
-  bool create_tool( const std::string& tool_type, ToolHandle& tool ); // << THREAD-SAFE
+  // Generate an tool from a type
+  bool create_tool( const std::string& tool_type, ToolHandle& tool );
 
   // CREATE_TOOLINTERFACE:
-  // Generate an tool from an iostream object that contains the XML
-  // specification of the action.
+  // Generate an tool interface from a type
   bool create_toolinterface( const std::string& toolinterface_name,
-    ToolInterface*& toolinterface ); // << THREAD-SAFE
+    ToolInterface*& toolinterface );
 
   // -- List of tools and interfaces --
 public:
-  // pairs of tool name and the name the tool should have in the menu
-  typedef std::vector<ToolInfo*> tool_list_type;
 
   // IS_TOOL_TYPE:
   // Check whether a tool with a specified name is available
-  bool is_tool_type( const std::string& tool_type ); // << THREAD-SAFE
+  bool is_tool_type( const std::string& tool_type );
 
   // LIST_TOOL_TYPES:
   // List the tools of a certain group
   // TODO: Need to simplify this the tool_list_type
-  bool list_tool_types( tool_list_type& tool_list, int tool_property ); // << THREAD-SAFE
+  bool list_tool_types( ToolInfoList& tool_list, int tool_property );
 
-  // LIST_TOOL_TYPES_WITH_INTERFACE:
-  // List the tools of a certain group
-  bool list_tool_types_with_interface( tool_list_type& tool_list, 
-    int tool_property ); // << THREAD-SAFE
+  // -- internals of ToolFactory --
+private:
+  ToolFactoryPrivateHandle private_;
 
 };
 
@@ -330,13 +219,14 @@ public:
 #define SCI_REGISTER_TOOL(name)\
 void register_tool_##name()\
 {\
-  ToolFactory::Instance()->register_tool<name>();\
+  ToolFactory::Instance()->register_tool( new ToolBuilder<name>, name::Type(), \
+      name::Properties(), name::MenuName(), name::ShortcutKey() );\
 } 
 
 #define SCI_REGISTER_TOOLINTERFACE(name)\
 void register_toolinterface_##name()\
 {\
-  ToolFactory::Instance()->register_toolinterface<name>(#name);\
+  ToolFactory::Instance()->register_toolinterface( new ToolInterfaceBuilder<name>, #name);\
 } 
 
 #endif

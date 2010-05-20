@@ -27,7 +27,9 @@
  */
 
 //Interface Includes
-#include <Interface/QtInterface/QtBridge.h>
+#include <QtInterface/Utils/QtBridge.h>
+
+//QtInterface Includes
 #include <Interface/ToolInterface/CustomWidgets/TargetComboBox.h>
 
 //Qt Gui Includes
@@ -80,8 +82,8 @@ bool InvertToolInterface::build_widget( QFrame* frame )
         this->private_->ui_.replaceCheckBox->setChecked(tool->replace_state_);
   
   //Step 4 - connect the gui to the tool through the QtBridge
-  QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
-  QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
+  Core::QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
+  Core::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
   connect( this->private_->target_, SIGNAL( valid( bool ) ), this, SLOT( enable_run_filter( bool ) ) );
   
   connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), this, SLOT( execute_filter() ) );

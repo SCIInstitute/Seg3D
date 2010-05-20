@@ -64,8 +64,12 @@ TARGET_LINK_LIBRARIES(Seg3D
   Core_Application
   Core_Interface
   Core_Action
+  QtInterface_Utils
+  QtInterface_Widgets
   Interface_AppInterface
-  Interface_QtInterface
+  Interface_AppController
+  Interface_AppPreferences
+  Interface_ToolInterface
   Init_Init
 )
 

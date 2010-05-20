@@ -28,7 +28,7 @@
 
 
 //Interface Includes
-#include <Interface/QtInterface/QtBridge.h>
+#include <QtInterface/Utils/QtBridge.h>
 #include <Interface/ToolInterface/CustomWidgets/TargetComboBox.h>
 
 //Qt Gui Includes
@@ -80,7 +80,7 @@ bool PolylineToolInterface::build_widget( QFrame* frame )
     // N/A
 
   //Step 4 - connect the gui to the tool through the QtBridge
-  QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
+  Core::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
   
   //TODO: need to decide how to pass fill vs delete
   

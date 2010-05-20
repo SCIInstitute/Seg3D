@@ -1,3 +1,4 @@
+
 #
 #  For more information, please see: http://software.sci.utah.edu
 # 
@@ -26,21 +27,24 @@
 #  DEALINGS IN THE SOFTWARE.
 #
 
-ADD_SUBDIRECTORY(Utils)
-ADD_SUBDIRECTORY(DataBlock)
-ADD_SUBDIRECTORY(EventHandler)
-ADD_SUBDIRECTORY(Geometry)
-ADD_SUBDIRECTORY(Volume)
-ADD_SUBDIRECTORY(TextRenderer)
-ADD_SUBDIRECTORY(Action)
-ADD_SUBDIRECTORY(ActionManager)
-ADD_SUBDIRECTORY(Application)
-ADD_SUBDIRECTORY(Interface)
-ADD_SUBDIRECTORY(State)
-ADD_SUBDIRECTORY(Resource)
-ADD_SUBDIRECTORY(Viewer)
+##################################################
+# Set sources
+##################################################
 
-# These next three depend on OpenGL and should only be compiled when the renderer is compiled
-ADD_SUBDIRECTORY(Graphics)
-ADD_SUBDIRECTORY(RenderResources)
-ADD_SUBDIRECTORY(RendererBase)
+SET(CORE_VIEWER_SRCS
+  AbstractViewer.h
+  AbstractViewer.cc
+  Mouse.h
+)
+
+##################################################
+# Build static library
+##################################################
+
+CORE_ADD_LIBRARY(Core_Viewer ${CORE_VIEWER_SRCS})
+
+TARGET_LINK_LIBRARIES(Core_Viewer 
+  Core_State
+  Core_Utils
+  Core_RendererBase 
+  ${SCI_BOOST_LIBRARY})

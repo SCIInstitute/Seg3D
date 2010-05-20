@@ -26,8 +26,10 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+//QtInterface Includes
+#include <QtInterface/Utils/QtBridge.h>
+
 //Interface Includes
-#include <Interface/QtInterface/QtBridge.h>
 #include <Interface/ToolInterface/CustomWidgets/TargetComboBox.h>
 
 //Qt Gui Includes
@@ -47,8 +49,8 @@ class ConfidenceConnectedFilterInterfacePrivate
 {
 public:
   Ui::ConfidenceConnectedFilterInterface ui_;
-    SliderIntCombo *iterations_;
-  SliderIntCombo *multiplier_;
+    Core::QtSliderIntCombo *iterations_;
+  Core::QtSliderIntCombo *multiplier_;
   TargetComboBox *target_;
 };
 
@@ -70,10 +72,10 @@ bool ConfidenceConnectedFilterInterface::build_widget( QFrame* frame )
   this->private_->ui_.setupUi( frame );
 
     //Add the SliderSpinCombos
-    this->private_->iterations_ = new SliderIntCombo();
+    this->private_->iterations_ = new Core::QtSliderIntCombo();
     this->private_->ui_.iterationsHLayout_bottom->addWidget( this->private_->iterations_ );
 
-    this->private_->multiplier_ = new SliderIntCombo();
+    this->private_->multiplier_ = new Core::QtSliderIntCombo();
     this->private_->ui_.multiplierHLayout_bottom->addWidget( this->private_->multiplier_ );
     
     this->private_->target_ = new TargetComboBox( this );
@@ -109,12 +111,12 @@ bool ConfidenceConnectedFilterInterface::build_widget( QFrame* frame )
    
 
   //Step 4 - connect the gui to the tool through the QtBridge
-  QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
-  connect( this->private_->target_, SIGNAL( valid( bool ) ), this, SLOT( enable_run_filter( bool ) ) );
-  QtBridge::Connect( this->private_->iterations_, tool->iterations_state_ );
-  QtBridge::Connect( this->private_->multiplier_, tool->threshold_multiplier_state_ );
+  Core::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
+  this->connect( this->private_->target_, SIGNAL( valid( bool ) ), this, SLOT( enable_run_filter( bool ) ) );
+  Core::QtBridge::Connect( this->private_->iterations_, tool->iterations_state_ );
+  Core::QtBridge::Connect( this->private_->multiplier_, tool->threshold_multiplier_state_ );
 
-  connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), this, SLOT( execute_filter() ) );
+  this->connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), this, SLOT( execute_filter() ) );
   
   this->private_->target_->sync_layers();
   

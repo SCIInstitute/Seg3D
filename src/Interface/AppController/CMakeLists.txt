@@ -104,7 +104,8 @@ TARGET_LINK_LIBRARIES(Interface_AppController
                       Core_ActionManager
                       Application_Tool
                       Application_Tools
-                      Interface_QtInterface
-                      ${QT_LIBRARIES} 
+                      QtInterface_Utils
+                      QtInterface_Widgets
+            ${QT_LIBRARIES} 
                       ${SCI_BOOST_LIBRARY})
 

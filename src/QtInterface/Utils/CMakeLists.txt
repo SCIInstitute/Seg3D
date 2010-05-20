@@ -31,7 +31,7 @@
 # Set sources
 ##################################################
 
-SET(INTERFACE_QTINTERFACE_SRCS
+SET(QTINTERFACE_UTILS_SRCS
   QtApplication.cc
   QtEventHandler.cc
   QtRenderResources.cc
@@ -39,33 +39,33 @@ SET(INTERFACE_QTINTERFACE_SRCS
   QtRenderWidget.cc
 )
 
-SET(INTERFACE_QTINTERFACE_MOC_SRCS
+SET(QTINTERFACE_UTILS_MOC_SRCS
   QtEventHandler.h
   QtBridgeInternal.h
   QtRenderWidget.h
 )
 
-SET(INTERFACE_QTINTERFACE_NO_MOC_SRCS
+SET(QTINTERFACE_UTILS_NO_MOC_SRCS
   QtApplication.h
   QtRenderResources.h
   QtBridge.h
 )
 
-SET(INTERFACE_QTINTERFACE_UI_SRCS
+SET(QTINTERFACE_UTILS_UI_SRCS
 )
 
 ##################################################
 # Generate header out of UI code
 ##################################################
 
-QT4_WRAP_UI(INTERFACE_QTINTERFACE_QT_UI_SRCS ${INTERFACE_QTINTERFACE_UI_SRCS})
+QT4_WRAP_UI(QTINTERFACE_UTILS_QT_UI_SRCS ${QTINTERFACE_UTILS_UI_SRCS})
 
 
 ##################################################
 # Wrap QT code to expand all the moc code
 ##################################################
 
-QT4_WRAP_CPP(INTERFACE_QTINTERFACE_QT_MOC_SRCS ${INTERFACE_QTINTERFACE_MOC_SRCS})
+QT4_WRAP_CPP(QTINTERFACE_UTILS_QT_MOC_SRCS ${QTINTERFACE_UTILS_MOC_SRCS})
 
 ##################################################
 # Ensure that we can find the files generated
@@ -78,21 +78,20 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 # Build the Components library
 ##################################################
 
-CORE_ADD_LIBRARY(Interface_QtInterface
-            ${INTERFACE_QTINTERFACE_SRCS} 
-            ${INTERFACE_QTINTERFACE_QT_UI_SRCS}
-            ${INTERFACE_QTINTERFACE_QT_MOC_SRCS}
-            ${INTERFACE_QTINTERFACE_MOC_SRCS}
-            ${INTERFACE_QTINTERFACE_NO_MOC_SRCS} )
+CORE_ADD_LIBRARY( QtInterface_Utils
+            ${QTINTERFACE_UTILS_SRCS} 
+            ${QTINTERFACE_UTILS_QT_UI_SRCS}
+            ${QTINTERFACE_UTILS_QT_MOC_SRCS}
+            ${QTINTERFACE_UTILS_MOC_SRCS}
+            ${QTINTERFACE_UTILS_NO_MOC_SRCS} )
             
-            
-TARGET_LINK_LIBRARIES(Interface_QtInterface 
+TARGET_LINK_LIBRARIES(QtInterface_Utils 
                       Core_Utils
                       Core_EventHandler
             Core_Graphics
-                      Application_Renderer
+            Core_RendererBase
+            Core_Viewer
+            QtInterface_Widgets
                       ${QT_LIBRARIES} 
                       ${SCI_GLEW_LIBRARY}
                       ${SCI_BOOST_LIBRARY})
-
-

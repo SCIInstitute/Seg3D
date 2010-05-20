@@ -152,6 +152,10 @@ public:
   // The id of the handler that will be the prefix of the state variables
   const std::string& get_statehandler_id() const;
 
+  // GET_STATEHANDLER_ID_NUMBER:
+  // The id number of the handler that will be at the end of the prefix
+  size_t get_statehandler_id_number() const;
+
 private:
   // HANDLE_STATE_CHANGED:
   // This function is called whenever a state registered with this statehandler is changed

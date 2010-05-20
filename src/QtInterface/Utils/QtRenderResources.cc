@@ -30,10 +30,51 @@
 #include <Core/Utils/Exception.h>
 #include <Core/Interface/Interface.h>
 
-#include <Interface/QtInterface/QtRenderResources.h>
+#include <QtInterface/Utils/QtRenderResources.h>
 
-namespace Seg3D
+namespace Core
 {
+
+// CLASS: QtRenderContext
+
+// Forward declarations
+// The QtRenderContext class is an implementation of the openGL context
+// on top of the abstract interface that is used for managing OpenGL contexts
+class QtRenderContext;
+typedef boost::shared_ptr< QtRenderContext > QtRenderContextHandle;
+
+// Shared pointer to one of Qt's internal resources
+// NOTE: As GLContext objects are not managed by Qt we
+// need to do this ourselves using a smart pointer
+typedef boost::shared_ptr< QGLContext > QGLContextHandle;
+
+class QtRenderContext : public RenderContext
+{
+  // -- constructor/ destructor --
+public:
+  QtRenderContext( QGLContextHandle& context );
+  virtual ~QtRenderContext();
+
+  // -- context functions --
+  // IS_VALID:
+  // Test whether the context is valid
+  virtual bool is_valid() const;
+
+  // MAKE_CURRENT:
+  // Set the rendering context current to this thread
+  virtual void make_current();
+
+  // DONE_CURRENT:
+  // Indicate that rendering using this context is done for now
+  virtual void done_current();
+
+  // SWAP_BUFFERS:
+  // Swap the front and back buffers
+  virtual void swap_buffers() const;
+
+private:
+  QGLContextHandle context_;
+};
 
 QtRenderContext::QtRenderContext( QGLContextHandle& context ) :
   context_( context )
@@ -64,6 +105,10 @@ void QtRenderContext::swap_buffers() const
   context_->swapBuffers();
 }
 
+
+// CLASS: QtRenderResourcesContext
+// Implementation details of this class
+
 QtRenderResourcesContext::QtRenderResourcesContext() :
   format_( QGLFormat::defaultFormat() )
 {
@@ -88,20 +133,20 @@ bool QtRenderResourcesContext::create_render_context( Core::RenderContextHandle&
   CORE_LOG_DEBUG( std::string("qt_context->valid = ") + Core::ExportToString( qt_context->isValid() ) );
 
   // Bind the new context in the GUI independent wrapper class
-  context = Core::RenderContextHandle( new QtRenderContext( qt_context ) );
+  context = RenderContextHandle( new QtRenderContext( qt_context ) );
 
   return ( context->is_valid() );
 }
 
 QtRenderWidget*
-QtRenderResourcesContext::create_qt_render_widget( QWidget* parent )
+QtRenderResourcesContext::create_qt_render_widget( QWidget* parent, AbstractViewerHandle viewer )
 {
   if ( !( shared_widget_.data() ) )
   {
     // Create the first shared widget
     CORE_LOG_DEBUG( "Create a shared OpenGL widget" );
     
-    shared_widget_ = new QtRenderWidget( format_, parent, 0 );
+    shared_widget_ = new QtRenderWidget( format_, parent, 0, viewer );
     return ( shared_widget_.data() );
   }
   else
@@ -109,7 +154,7 @@ QtRenderResourcesContext::create_qt_render_widget( QWidget* parent )
     // Create a sibling widget
     CORE_LOG_DEBUG( "Create an OpenGL widget" );
     
-    return ( new QtRenderWidget( format_, parent, shared_widget_.data() ) );
+    return ( new QtRenderWidget( format_, parent, shared_widget_.data(), viewer ) );
   }
 }
 

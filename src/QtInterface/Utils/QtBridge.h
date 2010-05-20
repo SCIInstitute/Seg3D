@@ -26,10 +26,10 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_QTINTERFACE_QTBRIDGE_H
-#define INTERFACE_QTINTERFACE_QTBRIDGE_H
+#ifndef QTINTERFACE_UTILS_QTBRIDGE_H
+#define QTINTERFACE_UTILS_QTBRIDGE_H
 
-// QT includes/custom widget
+// QT includes
 #include <QtGui/QCheckBox>
 #include <QtGui/QDoubleSpinBox>
 #include <QtGui/QSpinBox>
@@ -39,19 +39,20 @@
 #include <QtGui/QLineEdit>
 #include <QtGui/QActionGroup>
 
-#include <Interface/ToolInterface/CustomWidgets/SliderIntCombo.h>
-#include <Interface/ToolInterface/CustomWidgets/SliderDoubleCombo.h>
-#include <Interface/AppInterface/ColorBarWidget.h>
-#include <Interface/AppPreferences/ColorButton.h>
+// QtInterface includes
+#include <QtInterface/Widgets/QtSliderIntCombo.h>
+#include <QtInterface/Widgets/QtSliderDoubleCombo.h>
+#include <QtInterface/Widgets/QtColorButton.h>
+#include <QtInterface/Widgets/QtColorBarWidget.h>
 
-// Application includes
+// Core includes
 #include <Core/State/StateName.h>
 #include <Core/State/StateValue.h>
 #include <Core/State/StateOption.h>
 #include <Core/State/StateVector.h>
 #include <Core/State/StateRangedValue.h>
 
-namespace Seg3D
+namespace Core
 {
 
 // CLASS QTBRIDGE:
@@ -67,13 +68,14 @@ public:
   static bool Connect( QCheckBox* qcheckbox, Core::StateBoolHandle& state_handle );
   
   // Coonnect a SliderIntCombo to a StateRangedIntValue
-  static bool Connect( ColorBarWidget* cbwidget, Core::StateIntHandle& state_handle );
+  static bool Connect( QtColorBarWidget* cbwidget, Core::StateIntHandle& state_handle,
+    std::vector<StateColorHandle>& colors );
   
   // Coonnect a SliderIntCombo to a StateRangedIntValue
-  static bool Connect( SliderIntCombo* sscombo, Core::StateRangedIntHandle& state_handle );
+  static bool Connect( QtSliderIntCombo* sscombo, Core::StateRangedIntHandle& state_handle );
   
   // Coonnect a SliderDoubleCombo to a StateRangedIntValue
-  static bool Connect( SliderDoubleCombo* sscombo, Core::StateRangedDoubleHandle& state_handle );
+  static bool Connect( QtSliderDoubleCombo* sscombo, Core::StateRangedDoubleHandle& state_handle );
   
   // Connect a QDoubleSpinBox to a StateDoubleValue
   static bool Connect( QDoubleSpinBox* qdoublespinbox, Core::StateDoubleHandle& state_handle );
@@ -89,7 +91,7 @@ public:
   // Connect QToolButton & QPushButtons
   static bool Connect( QToolButton* qtoolbutton, Core::StateBoolHandle& state_handle );
   
-  static bool Connect( ColorButton* colorbutton, Core::StateColorHandle& state_handle );
+  static bool Connect( QtColorButton* colorbutton, Core::StateColorHandle& state_handle );
   
   static bool Connect( QToolButton* qtoolbutton, boost::function< void() > function );
 
@@ -113,6 +115,6 @@ public:
 
 };
 
-} // end namespace Seg3D
+} // end namespace Core
 
 #endif

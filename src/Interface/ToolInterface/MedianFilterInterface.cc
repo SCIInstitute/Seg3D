@@ -26,8 +26,10 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-//Interface Includes
-#include <Interface/QtInterface/QtBridge.h>
+// QtInterface Includes
+#include <QtInterface/Utils/QtBridge.h>
+
+// Interface Includes
 #include <Interface/ToolInterface/CustomWidgets/TargetComboBox.h>
 
 //Qt Gui Includes
@@ -48,7 +50,7 @@ class MedianFilterInterfacePrivate
 public:
   Ui::MedianFilterInterface ui_;
   
-  SliderIntCombo *radius_;
+  Core::QtSliderIntCombo *radius_;
   TargetComboBox *target_;
 };
 
@@ -70,7 +72,7 @@ bool MedianFilterInterface::build_widget( QFrame* frame )
   this->private_->ui_.setupUi( frame );
 
   //add sliderspincombo
-  this->private_->radius_ = new SliderIntCombo();
+  this->private_->radius_ = new Core::QtSliderIntCombo();
   this->private_->ui_.radiusHLayout_bottom->addWidget( this->private_->radius_ );
   
   this->private_->target_ = new TargetComboBox( this );
@@ -96,10 +98,10 @@ bool MedianFilterInterface::build_widget( QFrame* frame )
         this->private_->ui_.replaceCheckBox->setChecked( tool->replace_state_->get() );
 
   //Step 4 - connect the gui to the tool through the QtBridge
-  QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
+  Core::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
   connect( this->private_->target_, SIGNAL( valid( bool ) ), this, SLOT( enable_run_filter( bool ) ) );
-  QtBridge::Connect( this->private_->radius_, tool->radius_state_ );
-  QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
+  Core::QtBridge::Connect( this->private_->radius_, tool->radius_state_ );
+  Core::QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
   
   connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), this, SLOT( execute_filter() ) );
   

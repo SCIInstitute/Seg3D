@@ -35,7 +35,7 @@
 #include <Core/Interface/Interface.h>
 
 // Interface bridging includes
-#include <Interface/QtInterface/QtBridge.h>
+#include <QtInterface/Utils/QtBridge.h>
 
 // Interface includes
 #include <Interface/AppController/AppController.h>
@@ -123,7 +123,7 @@ AppController::AppController( QWidget* parent ) :
   while ( it != it_end )
   {
     QAction* action_item = action_menu->addAction( QString::fromStdString( *it ) );
-    QtBridge::Connect( action_item, boost::bind( &AppController::SetActionType, controller,
+    Core::QtBridge::Connect( action_item, boost::bind( &AppController::SetActionType, controller,
         ( *it ) ) );
     ++it;
   }
@@ -144,7 +144,7 @@ AppController::AppController( QWidget* parent ) :
 
   // Step 6: Qt connections
   // Connect the edit box to the slot that posts the action
-  connect( le_edit_action_, SIGNAL( returnPressed() ), this, SLOT( post_action() ) );
+  this->connect( le_edit_action_, SIGNAL( returnPressed() ), this, SLOT( post_action() ) );
 }
 
 AppController::~AppController()

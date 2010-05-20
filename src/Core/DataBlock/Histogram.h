@@ -74,7 +74,8 @@ public:
   double get_bin_start( size_t idx = 0) const;
   double get_bin_end( size_t idx = 0) const;
   
-  std::vector<size_t> get_bins() const;
+  size_t get_size() const;
+  const std::vector<size_t>& get_bins() const;
   
   bool is_valid() const;
         
@@ -83,8 +84,8 @@ private:
   double min_;
   double max_;
   
-  size_t max_bin_;
   size_t min_bin_;
+  size_t max_bin_;
 
   double bin_start_;
   double bin_size_;

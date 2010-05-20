@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_QTINTERFACE_QTAPPLICATION_H
-#define INTERFACE_QTINTERFACE_QTAPPLICATION_H
+#ifndef QTINTERFACE_UTILS_QTAPPLICATION_H
+#define QTINTERFACE_UTILS_QTAPPLICATION_H
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
@@ -43,14 +43,13 @@
 #include <Core/Utils/Singleton.h>
 #include <Core/State/StateHandler.h>
 
-// Interface includes
-#include <Interface/QtInterface/QtRenderResources.h>
+// QtInterface includes
+#include <QtInterface/Utils/QtRenderResources.h>
 
 // Qt includes
 #include <QApplication>
-#include <QtGui>
 
-namespace Seg3D
+namespace Core
 {
 
 // -- QtInterface class (singleton) --
@@ -99,6 +98,6 @@ private:
 
 };
 
-} // end namespace Seg3D
+} // end namespace Core
 
 #endif

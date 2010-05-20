@@ -40,10 +40,10 @@
 #include <QtOpenGL>
 
 // Qt Interface support classes
-#include <Interface/QtInterface/QtApplication.h>
-#include <Interface/QtInterface/QtBridge.h>
-#include <Interface/QtInterface/QtRenderResources.h>
-#include <Interface/QtInterface/QtRenderWidget.h>
+#include <QtInterface/Utils/QtApplication.h>
+#include <QtInterface/Utils/QtBridge.h>
+#include <QtInterface/Utils/QtRenderResources.h>
+#include <QtInterface/Utils/QtRenderWidget.h>
 
 
 // Interface includes
@@ -60,7 +60,7 @@ public:
   ViewerWidgetPrivate( QWidget *parent, ViewerHandle viewer );
 
   QVBoxLayout* layout_;
-  QtRenderWidget* render_widget_;
+  Core::QtRenderWidget* render_widget_;
   
   QFrame* buttonbar_;
   QHBoxLayout* buttonbar_layout_;
@@ -247,8 +247,8 @@ ViewerWidgetPrivate::ViewerWidgetPrivate( QWidget *parent, ViewerHandle viewer )
   // --------------------------------------
   // Generate the OpenGL part of the widget
 
-  this->render_widget_ = QtApplication::Instance()->qt_renderresources_context()->
-    create_qt_render_widget( parent );
+  this->render_widget_ = Core::QtApplication::Instance()->qt_renderresources_context()->
+    create_qt_render_widget( parent, viewer );
 
   if( this->render_widget_ == 0 )
   {
@@ -362,8 +362,6 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
   setFrameShape( QFrame::Panel );
   setFrameShadow( QFrame::Raised );
 
-  this->private_->render_widget_->set_viewer_id( this->private_->viewer_->get_viewer_id() );
-
   // Update state of the widget to reflect current state
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
@@ -374,16 +372,16 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
     this->change_view_type( qaction );
     this->private_->viewer_type_button_->setDefaultAction( qaction );
     
-    QtBridge::Connect( this->private_->viewer_selection_, this->private_->viewer_->view_mode_state_ );
+    Core::QtBridge::Connect( this->private_->viewer_selection_, this->private_->viewer_->view_mode_state_ );
 
     // NOTE: Connect StateBool to QAction instead of QToolButton, because calling 
     // setChecked on QToolButton won't change the underlying QAction.
     
-    QtBridge::Connect( this->private_->picking_button_, 
+    Core::QtBridge::Connect( this->private_->picking_button_, 
       this->private_->viewer_->is_picking_target_state_ );
-    QtBridge::Connect( this->private_->grid_, 
+    Core::QtBridge::Connect( this->private_->grid_, 
       this->private_->viewer_->slice_grid_state_ );
-    QtBridge::Connect( this->private_->lock_, 
+    Core::QtBridge::Connect( this->private_->lock_, 
       this->private_->viewer_->viewer_lock_state_ );
 
     this->connect( this->private_->viewer_selection_, SIGNAL( triggered( QAction* ) ),

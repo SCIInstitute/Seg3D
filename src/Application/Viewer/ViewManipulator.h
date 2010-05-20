@@ -53,14 +53,14 @@ public:
   inline void set_flip_y( bool flip_y );
   inline void set_camera_mode( bool camera_mode );
 
-  void mouse_move( const MouseHistory& mouse_history, int button, int buttons, int modifiers );
-  void mouse_press( const MouseHistory& mouse_history, int button, int buttons, int modifiers );
-  void mouse_release( const MouseHistory& mouse_history, int button, int buttons, int modifiers );
+  void mouse_move( const Core::MouseHistory& mouse_history, int button, int buttons, int modifiers );
+  void mouse_press( const Core::MouseHistory& mouse_history, int button, int buttons, int modifiers );
+  void mouse_release( const Core::MouseHistory& mouse_history, int button, int buttons, int modifiers );
 
 private:
 
-  bool
-      compute_rotation( int x0, int y0, int x1, int y1, Core::Vector& axis, double& angle ) const;
+  bool compute_rotation( int x0, int y0, int x1, int y1, 
+    Core::Vector& axis, double& angle ) const;
   double compute_scaling( int x0, int y0, int x1, int y1 ) const;
   Core::Vector compute_translation( int x0, int y0, int x1, int y1, bool is_view3d ) const;
 

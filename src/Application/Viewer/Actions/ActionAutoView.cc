@@ -84,7 +84,7 @@ bool ActionAutoView::run( Core::ActionContextHandle& context, Core::ActionResult
 void ActionAutoView::Dispatch(  ViewerHandle& viewer )
 {
   ActionAutoView* action = new ActionAutoView;
-  action->viewer_name_ = viewer->get_stateid();
+  action->viewer_name_ = viewer->get_statehandler_id();
   action->viewer_weak_handle_ = viewer;
 
   Core::Interface::PostAction( Core::ActionHandle( action ) );

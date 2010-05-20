@@ -27,7 +27,9 @@
  */
 
 //Interface Includes
-#include <Interface/QtInterface/QtBridge.h>
+#include <QtInterface/Utils/QtBridge.h>
+
+//Interface Includes
 #include <Interface/ToolInterface/CustomWidgets/TargetComboBox.h>
 
 //Qt Gui Includes
@@ -47,8 +49,8 @@ class DiscreteGaussianFilterInterfacePrivate
 {
 public:
   Ui::DiscreteGaussianFilterInterface ui_;
-    SliderDoubleCombo *variance_;
-  SliderDoubleCombo *kernel_width_;
+    Core::QtSliderDoubleCombo *variance_;
+  Core::QtSliderDoubleCombo *kernel_width_;
   TargetComboBox *target_;
 };
 
@@ -69,15 +71,15 @@ bool DiscreteGaussianFilterInterface::build_widget( QFrame* frame )
   //Step 1 - build the Qt GUI Widget
   this->private_->ui_.setupUi( frame );
 
-    //Add the SliderSpinCombos
-    this->private_->variance_ = new SliderDoubleCombo();
-    this->private_->ui_.varianceHLayout_bottom->addWidget( this->private_->variance_ );
+  //Add the SliderSpinCombos
+  this->private_->variance_ = new Core::QtSliderDoubleCombo();
+  this->private_->ui_.varianceHLayout_bottom->addWidget( this->private_->variance_ );
 
-    this->private_->kernel_width_ = new SliderDoubleCombo();
-    this->private_->ui_.kernelHLayout_bottom->addWidget( this->private_->kernel_width_ );
-    
-    this->private_->target_ = new TargetComboBox( this );
-    this->private_->ui_.activeHLayout->addWidget( this->private_->target_ );
+  this->private_->kernel_width_ = new Core::QtSliderDoubleCombo();
+  this->private_->ui_.kernelHLayout_bottom->addWidget( this->private_->kernel_width_ );
+  
+  this->private_->target_ = new TargetComboBox( this );
+  this->private_->ui_.activeHLayout->addWidget( this->private_->target_ );
 
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
@@ -85,38 +87,37 @@ bool DiscreteGaussianFilterInterface::build_widget( QFrame* frame )
 
     //Step 3 - set the values for the tool ui from the state engine
         
-        // set the defaults for the variance
-      double variance_min = 0.0; 
-      double variance_max = 0.0;
-      double variance_step = 0.0;
-      tool->variance_state_->get_step( variance_step );
-      tool->variance_state_->get_range( variance_min, variance_max );
-      this->private_->variance_->setStep( variance_step );
-        this->private_->variance_->setRange( variance_min, variance_max );
-        this->private_->variance_->setCurrentValue( tool->variance_state_->get() );
-        
-        // set the defaults for the kernel width
-        double kernel_width_min = 0.0; 
-      double kernel_width_max = 0.0;
-      double kernel_width_step = 0.0;
-      tool->maximum_kernel_width_state_->get_step( kernel_width_step );
-      tool->maximum_kernel_width_state_->get_range( kernel_width_min, kernel_width_max );
-      this->private_->kernel_width_->setStep( kernel_width_step );
-        this->private_->kernel_width_->setRange( kernel_width_min, kernel_width_max );
-        this->private_->kernel_width_->setCurrentValue( tool->maximum_kernel_width_state_->get() );
-        
-        //set the default replace checkbox value
-        this->private_->ui_.replaceCheckBox->setChecked( tool->replace_state_->get() );
-        
-    
-  //Step 4 - connect the gui to the tool through the QtBridge
-  QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
-  connect( this->private_->target_, SIGNAL( valid( bool ) ), this, SLOT( enable_run_filter( bool ) ) );
-  QtBridge::Connect( this->private_->variance_, tool->variance_state_ );
-  QtBridge::Connect( this->private_->kernel_width_, tool->maximum_kernel_width_state_ );
-  QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
+  // set the defaults for the variance
+  double variance_min = 0.0; 
+  double variance_max = 0.0;
+  double variance_step = 0.0;
+  tool->variance_state_->get_step( variance_step );
+  tool->variance_state_->get_range( variance_min, variance_max );
+  this->private_->variance_->setStep( variance_step );
+  this->private_->variance_->setRange( variance_min, variance_max );
+  this->private_->variance_->setCurrentValue( tool->variance_state_->get() );
   
-  connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), this, SLOT( execute_filter() ) );
+  // set the defaults for the kernel width
+  double kernel_width_min = 0.0; 
+  double kernel_width_max = 0.0;
+  double kernel_width_step = 0.0;
+  tool->maximum_kernel_width_state_->get_step( kernel_width_step );
+  tool->maximum_kernel_width_state_->get_range( kernel_width_min, kernel_width_max );
+  this->private_->kernel_width_->setStep( kernel_width_step );
+  this->private_->kernel_width_->setRange( kernel_width_min, kernel_width_max );
+  this->private_->kernel_width_->setCurrentValue( tool->maximum_kernel_width_state_->get() );
+  
+  //set the default replace checkbox value
+  this->private_->ui_.replaceCheckBox->setChecked( tool->replace_state_->get() );
+        
+  //Step 4 - connect the gui to the tool through the QtBridge
+  Core::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
+  connect( this->private_->target_, SIGNAL( valid( bool ) ), this, SLOT( enable_run_filter( bool ) ) );
+  Core::QtBridge::Connect( this->private_->variance_, tool->variance_state_ );
+  Core::QtBridge::Connect( this->private_->kernel_width_, tool->maximum_kernel_width_state_ );
+  Core::QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
+  
+  this->connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), this, SLOT( execute_filter() ) );
 
   this->private_->target_->sync_layers();
 

@@ -26,8 +26,10 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+//QtInterface Includes
+#include <QtInterface/Utils/QtBridge.h>
+
 //Interface Includes
-#include <Interface/QtInterface/QtBridge.h>
 #include <Interface/ToolInterface/CustomWidgets/MaskComboBox.h>
 
 //Qt Gui Includes
@@ -70,51 +72,52 @@ bool BooleanFilterInterface::build_widget( QFrame* frame )
   //Step 1 - build the Qt GUI Widget
   this->private_->ui_.setupUi( frame );
   
-    // Add the MaskComboBoxes
-    this->private_->mask_a_ = new MaskComboBox( this );
-    this->private_->mask_a_->setMinimumHeight( 26 );
-    this->private_->ui_.maskAHLayout->addWidget( this->private_->mask_a_ );
-    this->private_->ui_.maskAHLayout->setStretch(1, 3);
-    
-    this->private_->mask_b_ = new MaskComboBox( this );
-    this->private_->mask_b_->setMinimumHeight( 26 );
-    this->private_->ui_.maskBHLayout->addWidget( this->private_->mask_b_ );
-    
-    this->private_->mask_c_ = new MaskComboBox( this );
-    this->private_->mask_c_->setMinimumHeight( 26 );
-    this->private_->ui_.maskCHLayout->addWidget( this->private_->mask_c_ );
-    
-    this->private_->mask_d_ = new MaskComboBox( this );
-    this->private_->mask_d_->setMinimumHeight( 26 );
-    this->private_->ui_.maskDHLayout->addWidget( this->private_->mask_d_ );
+  // Add the MaskComboBoxes
+  this->private_->mask_a_ = new MaskComboBox( this );
+  this->private_->mask_a_->setMinimumHeight( 26 );
+  this->private_->ui_.maskAHLayout->addWidget( this->private_->mask_a_ );
+  this->private_->ui_.maskAHLayout->setStretch(1, 3);
+  
+  this->private_->mask_b_ = new MaskComboBox( this );
+  this->private_->mask_b_->setMinimumHeight( 26 );
+  this->private_->ui_.maskBHLayout->addWidget( this->private_->mask_b_ );
+  
+  this->private_->mask_c_ = new MaskComboBox( this );
+  this->private_->mask_c_->setMinimumHeight( 26 );
+  this->private_->ui_.maskCHLayout->addWidget( this->private_->mask_c_ );
+  
+  this->private_->mask_d_ = new MaskComboBox( this );
+  this->private_->mask_d_->setMinimumHeight( 26 );
+  this->private_->ui_.maskDHLayout->addWidget( this->private_->mask_d_ );
 
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
   BooleanFilter* tool = dynamic_cast< BooleanFilter* > ( base_tool_.get() );
   
   //Step 3 - set the values for the tool ui from the state engine
-  
-      //set default falues for the example list
-    std::vector< std::string > temp_option_list = tool->example_expressions_state_->option_list();
-      for( size_t i = 0; i < temp_option_list.size(); i++)
-      {   
-          this->private_->ui_.exampleExpComboBox->addItem( QString::fromStdString( temp_option_list[i] ) );
-      } 
-        this->private_->ui_.exampleExpComboBox->setCurrentIndex(tool->example_expressions_state_->index());
-        
-        // set the default for the replace state
-        this->private_->ui_.replaceCheckBox->setChecked( tool->replace_state_->get() );
 
+  //set default falues for the example list
+  std::vector< std::string > temp_option_list = tool->example_expressions_state_->option_list();
+  for( size_t i = 0; i < temp_option_list.size(); i++)
+  {   
+    this->private_->ui_.exampleExpComboBox->addItem( QString::fromStdString( temp_option_list[i] ) );
+  } 
+  this->private_->ui_.exampleExpComboBox->setCurrentIndex(tool->example_expressions_state_->index());
+  
+  // set the default for the replace state
+  this->private_->ui_.replaceCheckBox->setChecked( tool->replace_state_->get() );
 
   //Step 4 - connect the gui to the tool through the QtBridge
-  QtBridge::Connect( this->private_->mask_a_, tool->mask_a_state_ );
-  QtBridge::Connect( this->private_->mask_b_, tool->mask_b_state_ );
-  QtBridge::Connect( this->private_->mask_c_, tool->mask_c_state_ );
-  QtBridge::Connect( this->private_->mask_d_, tool->mask_d_state_ );
-  connect( this->private_->mask_a_, SIGNAL( valid( bool ) ), this, SLOT( enable_run_filter( bool ) ) );
+  Core::QtBridge::Connect( this->private_->mask_a_, tool->mask_a_state_ );
+  Core::QtBridge::Connect( this->private_->mask_b_, tool->mask_b_state_ );
+  Core::QtBridge::Connect( this->private_->mask_c_, tool->mask_c_state_ );
+  Core::QtBridge::Connect( this->private_->mask_d_, tool->mask_d_state_ );
+  this->connect( this->private_->mask_a_, SIGNAL( valid( bool ) ), 
+    this, SLOT( enable_run_filter( bool ) ) );
   
-  QtBridge::Connect( this->private_->ui_.exampleExpComboBox, tool->example_expressions_state_ );
-  QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
+  Core::QtBridge::Connect( this->private_->ui_.exampleExpComboBox, 
+    tool->example_expressions_state_ );
+  Core::QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
   
   connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), this, SLOT( execute_filter() ) );
   

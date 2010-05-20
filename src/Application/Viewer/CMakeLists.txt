@@ -54,6 +54,7 @@ TARGET_LINK_LIBRARIES(Application_Viewer
                       Core_Interface
                       Core_Action
                       Core_State
+            Core_Viewer
                       ${SCI_BOOST_LIBRARY})
 
 # Register actions

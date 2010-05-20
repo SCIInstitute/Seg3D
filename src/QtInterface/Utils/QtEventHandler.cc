@@ -34,9 +34,9 @@
 #include <Core/Utils/Log.h>
 
 // Interface includes
-#include <Interface/QtInterface/QtEventHandler.h>
+#include <QtInterface/Utils/QtEventHandler.h>
 
-namespace Seg3D
+namespace Core
 {
 
 // CLASS QtEventHandlerObject
@@ -90,7 +90,7 @@ QtEventHandlerContext::~QtEventHandlerContext()
 {
 }
 
-void QtEventHandlerContext::post_event( Core::EventHandle& event )
+void QtEventHandlerContext::post_event( EventHandle& event )
 {
   if ( !QCoreApplication::closingDown() )
   {
@@ -106,10 +106,10 @@ void QtEventHandlerContext::post_event( Core::EventHandle& event )
   }
 }
 
-void QtEventHandlerContext::post_and_wait_event( Core::EventHandle& event )
+void QtEventHandlerContext::post_and_wait_event( EventHandle& event )
 {
   // Need a synchronization class to confirm the event is done
-  Core::EventSyncHandle sync = Core::EventSyncHandle( new Core::EventSync );
+  EventSyncHandle sync = EventSyncHandle( new EventSync );
 
   // Add event to event class so the responder is doing the other part
   // of the synchronization
@@ -197,7 +197,7 @@ bool QtEventHandlerContext::wait_and_process_events()
   CORE_THROW_LOGICERROR("Cannot wait on the Qt thread");
 }
 
-bool QtEventHandlerContext::start_eventhandler( Core::EventHandler* eventhandler )
+bool QtEventHandlerContext::start_eventhandler( EventHandler* eventhandler )
 {
   // Allow Qt to intercept the actions in its main event loop 
   new QtEventHandlerObject( this->qapplication_, this );
@@ -231,4 +231,4 @@ void QtEventHandlerContext::empty_event_queue()
   }
 }
 
-} // end namespace Seg3D
+} // end namespace Core

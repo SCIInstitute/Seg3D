@@ -26,31 +26,36 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_SLIDERINTCOMBO_H
-#define INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_SLIDERINTCOMBO_H
+#ifndef QTINTERFACE_WIDGETS_QTSLIDERINTCOMBO_H
+#define QTINTERFACE_WIDGETS_QTSLIDERINTCOMBO_H
 
 // QT Includes
-#include <QtGui>
+#include <QWidget>
 
+// Boost includes
 #include <boost/shared_ptr.hpp>
 
-namespace Seg3D 
+namespace Core 
 {
 
-class SliderIntComboPrivate;
+// Forward declaration
+class QtSliderIntCombo;
+class QtSliderIntComboPrivate;
+typedef boost::shared_ptr< QtSliderIntComboPrivate > QtSliderIntComboPrivateHandle;
 
-class SliderIntCombo : public QWidget
+// Class definition
+class QtSliderIntCombo : public QWidget
 {
 Q_OBJECT
+
+// -- constructor/destructor --
+public:
+    QtSliderIntCombo( QWidget* parent = 0, bool edit_range = false );
+    virtual ~QtSliderIntCombo();
 
 Q_SIGNALS:
   void valueAdjusted( int );
   void rangeChanged( int, int );
-
-// -- constructor/destructor --
-public:
-    SliderIntCombo( QWidget* parent = 0, bool edit_range = false );
-    virtual ~SliderIntCombo();
     
 public Q_SLOTS:
     void setStep(int);
@@ -58,11 +63,14 @@ public Q_SLOTS:
   void setCurrentValue( int );
   
 public:
-  int get_value(){ return value_; }
+  int get_value() 
+  { 
+    return value_;
+  }
 
 // -- widget internals -- 
 private:
-    boost::shared_ptr< SliderIntComboPrivate > private_;
+    QtSliderIntComboPrivateHandle private_;
     
 private Q_SLOTS:
     void edit_ranges( bool edit );
@@ -79,6 +87,6 @@ private:
   
 };
 
-}  // end namespace Seg3D
+}  // end namespace Core
 
 #endif

@@ -32,16 +32,16 @@
 #include <Core/Application/Application.h>
 #include <Core/Interface/Interface.h>
 
-// Interface includes
-#include <Interface/QtInterface/QtApplication.h>
-#include <Interface/QtInterface/QtEventHandler.h>
+// QtInterface includes
+#include <QtInterface/Utils/QtApplication.h>
+#include <QtInterface/Utils/QtEventHandler.h>
 
 // X11 includes
 #ifdef X11_THREADSAFE
 #include <X11/Xlib.h>
 #endif
 
-namespace Seg3D
+namespace Core
 {
 
 CORE_SINGLETON_IMPLEMENTATION( QtApplication );

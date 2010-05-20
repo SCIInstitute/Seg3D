@@ -27,7 +27,7 @@
  */
 
 // For the version numbers
-#include "Seg3DConfiguration.h"
+#include "ApplicationConfiguration.h"
 
 // Boost include
 #include <boost/lexical_cast.hpp>
@@ -37,9 +37,10 @@
 #include <Core/Interface/Interface.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
 
+// QtInterface includes
+#include <QtInterface/Utils/QtPointer.h>
+
 // Interface includes
-#include <Interface/QtInterface/QtApplication.h>
-#include <Interface/QtInterface/QtPointer.h>
 #include <Interface/AppInterface/AppInterface.h>
 #include <Interface/AppInterface/SplashStart.h>
 
@@ -49,9 +50,8 @@ namespace Seg3D
 AppInterface::AppInterface()
 {
   // Set the window information and set the version numbers
-  setWindowTitle( QString( "Seg3D Version " ) + SEG3D_VERSION + QString( " " ) + SEG3D_BITS
-      + QString( " " ) + SEG3D_DEBUG_VERSION );
-  setWindowIconText( QString( "Seg3D" ) );
+  setWindowTitle( QString( CORE_APPLICATION_NAME ) + " Version " + CORE_APPLICATION_VERSION );
+  setWindowIconText( QString( CORE_APPLICATION_NAME ) );
 
   // TODO: Do we need this one?
   setDocumentMode( true );

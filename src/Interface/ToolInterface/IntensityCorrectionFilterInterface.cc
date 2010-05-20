@@ -26,8 +26,10 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+//QtInterface Includes
+#include <QtInterface/Utils/QtBridge.h>
+
 //Interface Includes
-#include <Interface/QtInterface/QtBridge.h>
 #include <Interface/ToolInterface/CustomWidgets/TargetComboBox.h>
 
 //Qt Gui Includes
@@ -48,8 +50,8 @@ class IntensityCorrectionFilterInterfacePrivate
 public:
   Ui::IntensityCorrectionFilterInterface ui_;
   
-    SliderIntCombo *order_;
-  SliderDoubleCombo *edge_;
+    Core::QtSliderIntCombo *order_;
+  Core::QtSliderDoubleCombo *edge_;
   TargetComboBox *target_;
 };
 
@@ -71,10 +73,10 @@ bool IntensityCorrectionFilterInterface::build_widget( QFrame* frame )
   this->private_->ui_.setupUi( frame );
 
   //Add the SliderSpinCombos
-  this->private_->order_ = new SliderIntCombo();
+  this->private_->order_ = new Core::QtSliderIntCombo();
   this->private_->ui_.orderHLayout_bottom->addWidget( this->private_->order_ );
 
-  this->private_->edge_ = new SliderDoubleCombo();
+  this->private_->edge_ = new Core::QtSliderDoubleCombo();
   this->private_->ui_.edgeHLayout_bottom->addWidget( this->private_->edge_ );
   
   this->private_->target_ = new TargetComboBox( this );
@@ -111,13 +113,15 @@ bool IntensityCorrectionFilterInterface::build_widget( QFrame* frame )
 
 
   //Step 4 - connect the gui to the tool through the QtBridge
-  QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
-  connect( this->private_->target_, SIGNAL( valid( bool ) ), this, SLOT( enable_run_filter( bool ) ) );
-  QtBridge::Connect( this->private_->order_, tool->order_state_ );
-  QtBridge::Connect( this->private_->edge_, tool->edge_state_ );
-  QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
+  Core::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
+  this->connect( this->private_->target_, SIGNAL( valid( bool ) ), 
+    this, SLOT( enable_run_filter( bool ) ) );
+  Core::QtBridge::Connect( this->private_->order_, tool->order_state_ );
+  Core::QtBridge::Connect( this->private_->edge_, tool->edge_state_ );
+  Core::QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
   
-  connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), this, SLOT( execute_filter() ) );
+  this->connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), 
+    this, SLOT( execute_filter() ) );
   
   this->private_->target_->sync_layers(); 
 

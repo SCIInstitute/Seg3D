@@ -26,6 +26,13 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// STL includes
+#include <vector>
+
+// Boost includes
+#include <boost/algorithm/minmax_element.hpp>
+
+// Core includes
 #include <Core/Math/MathFunctions.h>
 #include <Core/DataBlock/Histogram.h>
 
@@ -34,51 +41,51 @@ namespace Core
 
 Histogram::Histogram() 
 {
-  min_ = Core::Nan();
-  max_ = Core::Nan();
-  bin_start_ = Core::Nan();
-  bin_size_ = Core::Nan();
-  histogram_.resize( 0 );
+  this->min_ = Core::Nan();
+  this->max_ = Core::Nan();
+  this->bin_start_ = Core::Nan();
+  this->bin_size_ = Core::Nan();
+  this->histogram_.resize( 0 );
 }
 
 Histogram::Histogram( const signed char* data, size_t size )
 {
-  compute( data, size );
+  this->compute( data, size );
 }
   
 Histogram::Histogram( const unsigned char* data, size_t size )
 {
-  compute( data, size );
+  this->compute( data, size );
 }
 
 Histogram::Histogram( const short* data, size_t size )
 {
-  compute( data, size );
+  this->compute( data, size );
 }
 
 Histogram::Histogram( const unsigned short* data, size_t size )
 {
-  compute( data, size );
+  this->compute( data, size );
 }
 
 Histogram::Histogram( const int* data, size_t size )
 {
-  compute( data, size );
+  this->compute( data, size );
 }
 
 Histogram::Histogram( const unsigned int* data, size_t size )
 {
-  compute( data, size );
+  this->compute( data, size );
 }
 
 Histogram::Histogram( const float* data, size_t size )
 {
-  compute( data, size );
+  this->compute( data, size );
 }
 
 Histogram::Histogram( const double* data, size_t size )
 {
-  compute( data, size );
+  this->compute( data, size );
 }
 
 Histogram::~Histogram()
@@ -91,11 +98,11 @@ Histogram::~Histogram()
 
 void Histogram::compute( const signed char* data, size_t size )
 {
-  min_ = Core::Nan();
-  max_ = Core::Nan();
-  bin_start_ = Core::Nan();
-  bin_size_ = Core::Nan();
-  histogram_.resize( 0 );
+  this->min_ = Core::Nan();
+  this->max_ = Core::Nan();
+  this->bin_start_ = Core::Nan();
+  this->bin_size_ = Core::Nan();
+  this->histogram_.resize( 0 );
   if ( size == 0 ) return;
   
   std::vector<size_t> histogram;
@@ -120,29 +127,32 @@ void Histogram::compute( const signed char* data, size_t size )
     if ( histogram[ hsize - 1 - j ] > 0 ) hist_begin = hsize - 1 - j;
   }
 
-  min_ = static_cast<double>( hist_begin ) - static_cast<double>( 0x80 );
-  max_ = static_cast<double>( hist_end ) - static_cast<double>( 0x80 );
+  this->min_ = static_cast<double>( hist_begin ) - static_cast<double>( 0x80 );
+  this->max_ = static_cast<double>( hist_end ) - static_cast<double>( 0x80 );
 
-  bin_size_  = 1.0;
-  bin_start_ = min_ - 0.5;
+  this->bin_size_  = 1.0;
+  this->bin_start_ = this->min_ - 0.5;
 
-  histogram_.resize( hist_end + 1 - hist_begin );
+  this->histogram_.resize( hist_end + 1 - hist_begin );
 
   for ( size_t j = 0 ; j < histogram_.size() ; j++ )
   {
-    histogram_[ j ] = histogram[ j + hist_begin ];
+    this->histogram_[ j ] = histogram[ j + hist_begin ];
   }
 
-  this->compute_min_max();
+  std::pair< std::vector<size_t>::iterator, std::vector<size_t>::iterator > min_max = 
+    boost::minmax_element( this->histogram_.begin(), this->histogram_.end() );
+  this->min_bin_ = (*min_max.first);
+  this->max_bin_ = (*min_max.second);
 }
 
 void Histogram::compute( const unsigned char* data, size_t size )
 {
-  min_ = Core::Nan();
-  max_ = Core::Nan();
-  bin_start_ = Core::Nan();
-  bin_size_ = Core::Nan();
-  histogram_.resize( 0 );
+  this->min_ = Core::Nan();
+  this->max_ = Core::Nan();
+  this->bin_start_ = Core::Nan();
+  this->bin_size_ = Core::Nan();
+  this->histogram_.resize( 0 );
   if ( size == 0 ) return;
 
   std::vector<size_t> histogram;
@@ -168,29 +178,33 @@ void Histogram::compute( const unsigned char* data, size_t size )
   }
 
 
-  min_ = static_cast<double>( hist_begin );
-  max_ = static_cast<double>( hist_end );
+  this->min_ = static_cast<double>( hist_begin );
+  this->max_ = static_cast<double>( hist_end );
 
-  bin_size_  = 1.0;
-  bin_start_ = min_ - 0.5;
+  this->bin_size_  = 1.0;
+  this->bin_start_ = this->min_ - 0.5;
 
-  histogram_.resize( hist_end + 1 - hist_begin );
+  this->histogram_.resize( hist_end + 1 - hist_begin );
 
   for ( size_t j = 0 ; j < histogram_.size() ; j++ )
   {
-    histogram_[ j ] = histogram[ j + hist_begin ];
+    this->histogram_[ j ] = histogram[ j + hist_begin ];
   }
 
-  this->compute_min_max();
+  std::pair< std::vector<size_t>::iterator, std::vector<size_t>::iterator > min_max = 
+    boost::minmax_element( this->histogram_.begin(), this->histogram_.end() );
+  this->min_bin_ = (*min_max.first);
+  this->max_bin_ = (*min_max.second);
+
 }
 
 void Histogram::compute( const short* data, size_t size )
 {
-  min_ = Core::Nan();
-  max_ = Core::Nan();
-  bin_start_ = Core::Nan();
-  bin_size_ = Core::Nan();
-  histogram_.resize( 0 );
+  this->min_ = Core::Nan();
+  this->max_ = Core::Nan();
+  this->bin_start_ = Core::Nan();
+  this->bin_size_ = Core::Nan();
+  this->histogram_.resize( 0 );
   if ( size == 0 ) return;
 
   std::vector<size_t> histogram;
@@ -215,51 +229,55 @@ void Histogram::compute( const short* data, size_t size )
     if ( histogram[ hsize - 1 - j ] > 0 ) hist_begin = hsize - 1 - j;
   }
 
-  min_ = static_cast<double>( hist_begin ) - static_cast<double>( 0x8000 );
-  max_ = static_cast<double>( hist_end ) - static_cast<double>( 0x8000 );
+  this->min_ = static_cast<double>( hist_begin ) - static_cast<double>( 0x8000 );
+  this->max_ = static_cast<double>( hist_end ) - static_cast<double>( 0x8000 );
 
   size_t hist_length = hist_end + 1 - hist_begin;
   if ( hist_length > 0x100 ) hist_length = 0x100;
   
-  histogram_.resize( hist_length, 0 );
+  this->histogram_.resize( hist_length, 0 );
 
     if ( hist_length == 1 )
   {
-    bin_size_  = 1.0;
-    bin_start_ = min_ - ( bin_size_ * 0.5 );
+    this->bin_size_  = 1.0;
+    this->bin_start_ = this->min_ - ( this->bin_size_ * 0.5 );
   }
   else
   {
-    bin_size_ = ( max_ - min_ ) / static_cast<double>( hist_length - 1 );
-    bin_start_ = min_ - ( bin_size_ * 0.5 );
+    this->bin_size_ = ( this->max_ - this->min_ ) / static_cast<double>( hist_length - 1 );
+    this->bin_start_ = this->min_ - ( this->bin_size_ * 0.5 );
   }
   
   for ( size_t j = 0 ; j < histogram_.size() ; j++ )
   {
-    double min_value = bin_start_ + j * bin_size_;
-    double max_value = bin_start_ + ( j + 1 ) * bin_size_;
+    double min_value = this->bin_start_ + j * this->bin_size_;
+    double max_value = this->bin_start_ + ( j + 1 ) * this->bin_size_;
 
     for ( int k = Ceil( min_value ) ; k < Ceil( max_value ); k++ )
     {
       int idx = static_cast<int>( k ) + 0x8000;
       if ( idx >= 0 && idx < static_cast<int>( histogram.size() ) ) 
       {
-        histogram_[ j ] += histogram[ idx ];
+        this->histogram_[ j ] += histogram[ idx ];
       }
     }
   }
 
-  this->compute_min_max();  
+  std::pair< std::vector<size_t>::iterator, std::vector<size_t>::iterator > min_max = 
+    boost::minmax_element( this->histogram_.begin(), this->histogram_.end() );
+  this->min_bin_ = (*min_max.first);
+  this->max_bin_ = (*min_max.second);
+
 }
 
 
 void Histogram::compute( const unsigned short* data, size_t size )
 {
-  min_ = Core::Nan();
-  max_ = Core::Nan();
-  bin_start_ = Core::Nan();
-  bin_size_ = Core::Nan();
-  histogram_.resize( 0 );
+  this->min_ = Core::Nan();
+  this->max_ = Core::Nan();
+  this->bin_start_ = Core::Nan();
+  this->bin_size_ = Core::Nan();
+  this->histogram_.resize( 0 );
   if ( size == 0 ) return;
 
   std::vector<size_t> histogram;
@@ -284,52 +302,54 @@ void Histogram::compute( const unsigned short* data, size_t size )
     if ( histogram[ hsize - 1 - j ] > 0 ) hist_begin = hsize - 1 - j;
   }
 
-
-  min_ = static_cast<double>( hist_begin );
-  max_ = static_cast<double>( hist_end );
+  this->min_ = static_cast<double>( hist_begin );
+  this->max_ = static_cast<double>( hist_end );
 
   size_t hist_length = hist_end + 1 - hist_begin;
   if ( hist_length > 0x100 ) hist_length = 0x100;
   
-  histogram_.resize( hist_length, 0 );
+  this->histogram_.resize( hist_length, 0 );
 
     if ( hist_length == 1 )
   {
-    bin_size_  = 1.0;
-    bin_start_ = min_ - ( bin_size_ * 0.5 );
+    this->bin_size_  = 1.0;
+    this->bin_start_ = min_ - ( this->bin_size_ * 0.5 );
   }
   else
   {
-    bin_size_ = ( max_ - min_ ) / static_cast<double>( hist_length - 1 );
-    bin_start_ = min_ - ( bin_size_ * 0.5 );
+    this->bin_size_ = ( this->max_ - this->min_ ) / static_cast<double>( hist_length - 1 );
+    this->bin_start_ = this->min_ - ( this->bin_size_ * 0.5 );
   }
   
   for ( size_t j = 0 ; j < histogram_.size() ; j++ )
   {
-    double min_value = bin_start_ + j * bin_size_;
-    double max_value = bin_start_ + ( j + 1 ) * bin_size_;
+    double min_value = this->bin_start_ + j * this->bin_size_;
+    double max_value = this->bin_start_ + ( j + 1 ) * this->bin_size_;
 
     for ( int k = Ceil( min_value ) ; k < Ceil( max_value ); k ++ )
     {
       int idx = static_cast<int>( k );
       if ( idx >= 0 && idx < static_cast<int>( histogram.size() ) ) 
       {
-        histogram_[ j ] += histogram[ idx ];
+        this->histogram_[ j ] += histogram[ idx ];
       }
     }
   }
 
-  this->compute_min_max();
+  std::pair< std::vector<size_t>::iterator, std::vector<size_t>::iterator > min_max = 
+    boost::minmax_element( this->histogram_.begin(), this->histogram_.end() );
+  this->min_bin_ = (*min_max.first);
+  this->max_bin_ = (*min_max.second);
 }
 
 
 void Histogram::compute( const int* data, size_t size )
 {
-  min_ = Core::Nan();
-  max_ = Core::Nan();
-  bin_start_ = Core::Nan();
-  bin_size_ = Core::Nan();
-  histogram_.resize( 0 );
+  this->min_ = Core::Nan();
+  this->max_ = Core::Nan();
+  this->bin_start_ = Core::Nan();
+  this->bin_size_ = Core::Nan();
+  this->histogram_.resize( 0 );
   if ( size == 0 ) return;
 
   int int_min = data[ 0 ];
@@ -341,48 +361,52 @@ void Histogram::compute( const int* data, size_t size )
     if ( data[ j ] > int_max ) int_max = data[ j ];
   }
   
-  min_ = static_cast<double>( int_min );
-  max_ = static_cast<double>( int_max );
+  this->min_ = static_cast<double>( int_min );
+  this->max_ = static_cast<double>( int_max );
 
-    if ( min_ == max_ )
+    if ( this->min_ == this->max_ )
   {
-    bin_size_  = 1.0;
-    bin_start_ = min_ - ( bin_size_ * 0.5 );
-    histogram_.resize( 1, 0 );
+    this->bin_size_  = 1.0;
+    this->bin_start_ = this->min_ - ( this->bin_size_ * 0.5 );
+    this->histogram_.resize( 1, 0 );
   }
-  else if ( ( max_ - min_ ) < 256.0 )
+  else if ( ( this->max_ - this->min_ ) < 256.0 )
   {
-    size_t hist_size = static_cast<size_t>( max_ - min_ ) + 1;
-    histogram_.resize( hist_size, 0 );
-    bin_size_ = ( max_ - min_ ) / static_cast<double>( hist_size - 1 );
-    bin_start_ = min_ - ( bin_size_ * 0.5 );
+    size_t hist_size = static_cast<size_t>( this->max_ - this->min_ ) + 1;
+    this->histogram_.resize( hist_size, 0 );
+    this->bin_size_ = ( this->max_ - this->min_ ) / static_cast<double>( hist_size - 1 );
+    this->bin_start_ = this->min_ - ( this->bin_size_ * 0.5 );
   }
   else
   {
     size_t hist_size = 0x100;
-    histogram_.resize( hist_size, 0 );
-    bin_size_ = ( max_ - min_ ) / static_cast<double>( hist_size - 1 );
-    bin_start_ = min_ - ( bin_size_ * 0.5 );  
+    this->histogram_.resize( hist_size, 0 );
+    this->bin_size_ = ( this->max_ - this->min_ ) / static_cast<double>( hist_size - 1 );
+    this->bin_start_ = this->min_ - ( this->bin_size_ * 0.5 );  
   }
 
-  double inv_bin_size = 1.0 / bin_size_;
+  double inv_bin_size = 1.0 / this->bin_size_;
   for ( size_t j = 1 ; j < size ; j++ )
   {
-    size_t idx = static_cast<size_t>( ( static_cast<double>( data[j] ) - min_ ) * inv_bin_size );
-    histogram_[ idx ]++;
+    size_t idx = static_cast<size_t>( ( static_cast<double>( data[j] ) - 
+      this->min_ ) * inv_bin_size );
+    this->histogram_[ idx ]++;
   }
 
-  this->compute_min_max();
+  std::pair< std::vector<size_t>::iterator, std::vector<size_t>::iterator > min_max = 
+    boost::minmax_element( this->histogram_.begin(), this->histogram_.end() );
+  this->min_bin_ = (*min_max.first);
+  this->max_bin_ = (*min_max.second);
 }
 
 
 void Histogram::compute( const unsigned int* data, size_t size )
 {
-  min_ = Core::Nan();
-  max_ = Core::Nan();
-  bin_start_ = Core::Nan();
-  bin_size_ = Core::Nan();
-  histogram_.resize( 0 );
+  this->min_ = Core::Nan();
+  this->max_ = Core::Nan();
+  this->bin_start_ = Core::Nan();
+  this->bin_size_ = Core::Nan();
+  this->histogram_.resize( 0 );
   if ( size == 0 ) return;
 
   unsigned int int_min = data[ 0 ];
@@ -394,48 +418,51 @@ void Histogram::compute( const unsigned int* data, size_t size )
     if ( data[ j ] > int_max ) int_max = data[ j ];
   }
   
-  min_ = static_cast<double>( int_min );
-  max_ = static_cast<double>( int_max );
+  this->min_ = static_cast<double>( int_min );
+  this->max_ = static_cast<double>( int_max );
 
-    if ( min_ == max_ )
+    if ( this->min_ == this->max_ )
   {
-    bin_size_  = 1.0;
-    bin_start_ = min_ - ( bin_size_ * 0.5 );
-    histogram_.resize( 1, 0 );
+    this->bin_size_  = 1.0;
+    this->bin_start_ = this->min_ - ( this->bin_size_ * 0.5 );
+    this->histogram_.resize( 1, 0 );
   }
-  else if ( ( max_ - min_ ) < 256.0 )
+  else if ( ( this->max_ - this->min_ ) < 256.0 )
   {
-    size_t hist_size = static_cast<size_t>( max_ - min_ ) + 1;
-    histogram_.resize( hist_size, 0 );
-    bin_size_ = ( max_ - min_ ) / static_cast<double>( hist_size - 1 );
-    bin_start_ = min_ - ( bin_size_ * 0.5 );
+    size_t hist_size = static_cast<size_t>( this->max_ - this->min_ ) + 1;
+    this->histogram_.resize( hist_size, 0 );
+    this->bin_size_ = ( this->max_ - this->min_ ) / static_cast<double>( hist_size - 1 );
+    this->bin_start_ = this->min_ - ( this->bin_size_ * 0.5 );
   }
   else
   {
     size_t hist_size = 0x100;
-    histogram_.resize( hist_size, 0 );
-    bin_size_ = ( max_ - min_ ) / static_cast<double>( hist_size - 1 );
-    bin_start_ = min_ - ( bin_size_ * 0.5 );  
+    this->histogram_.resize( hist_size, 0 );
+    this->bin_size_ = ( this->max_ - this->min_ ) / static_cast<double>( hist_size - 1 );
+    this->bin_start_ = this->min_ - ( this->bin_size_ * 0.5 );  
   }
 
-  double inv_bin_size = 1.0 / bin_size_;
+  double inv_bin_size = 1.0 / this->bin_size_;
   for ( size_t j = 1 ; j < size ; j++ )
   {
-    size_t idx = static_cast<size_t>( ( static_cast<double>( data[j] ) - min_ ) * inv_bin_size );
-    histogram_[ idx ]++;
+    size_t idx = static_cast<size_t>( ( static_cast<double>( data[j] ) - this->min_ ) * inv_bin_size );
+    this->histogram_[ idx ]++;
   }
 
-  this->compute_min_max();
+  std::pair< std::vector<size_t>::iterator, std::vector<size_t>::iterator > min_max = 
+    boost::minmax_element( this->histogram_.begin(), this->histogram_.end() );
+  this->min_bin_ = (*min_max.first);
+  this->max_bin_ = (*min_max.second);
 }
 
 
 void Histogram::compute( const float* data, size_t size )
 {
-  min_ = Core::Nan();
-  max_ = Core::Nan();
-  bin_start_ = Core::Nan();
-  bin_size_ = Core::Nan();
-  histogram_.resize( 0 );
+  this->min_ = Core::Nan();
+  this->max_ = Core::Nan();
+  this->bin_start_ = Core::Nan();
+  this->bin_size_ = Core::Nan();
+  this->histogram_.resize( 0 );
   if ( size == 0 ) return;
 
   float float_min = data[ 0 ];
@@ -447,90 +474,83 @@ void Histogram::compute( const float* data, size_t size )
     if ( data[ j ] > float_max ) float_max = data[ j ];
   }
   
-  min_ = static_cast<double>( float_min );
-  max_ = static_cast<double>( float_max );
+  this->min_ = static_cast<double>( float_min );
+  this->max_ = static_cast<double>( float_max );
 
-    if ( min_ == max_ )
+    if ( this->min_ == this->max_ )
   {
-    bin_size_  = 1.0;
-    bin_start_ = min_ - ( bin_size_ * 0.5 );
-    histogram_.resize( 1, 0 );
+    this->bin_size_  = 1.0;
+    this->bin_start_ = this->min_ - ( this->bin_size_ * 0.5 );
+    this->histogram_.resize( 1, 0 );
   }
   else
   {
     size_t hist_size = 0x100;
-    histogram_.resize( hist_size, 0 );
-    bin_size_ = ( max_ - min_ ) / static_cast<double>( hist_size - 1 );
-    bin_start_ = min_ - ( bin_size_ * 0.5 );  
+    this->histogram_.resize( hist_size, 0 );
+    this->bin_size_ = ( this->max_ - this->min_ ) / static_cast<double>( hist_size - 1 );
+    this->bin_start_ = this->min_ - ( this->bin_size_ * 0.5 );  
   }
 
-  double inv_bin_size = 1.0 / bin_size_;
+  double inv_bin_size = 1.0 / this->bin_size_;
   for ( size_t j = 1 ; j < size ; j++ )
   {
-    size_t idx = static_cast<size_t>( ( static_cast<double>( data[j] ) - min_ ) * inv_bin_size );
-    histogram_[ idx ]++;
+    size_t idx = static_cast<size_t>( ( static_cast<double>( data[j] ) - 
+      this->min_ ) * inv_bin_size );
+    this->histogram_[ idx ]++;
   }
 
-  this->compute_min_max();
+  std::pair< std::vector<size_t>::iterator, std::vector<size_t>::iterator > min_max = 
+    boost::minmax_element( this->histogram_.begin(), this->histogram_.end() );
+  this->min_bin_ = (*min_max.first);
+  this->max_bin_ = (*min_max.second);
 }
 
 
 void Histogram::compute( const double* data, size_t size )
 {
-  min_ = Core::Nan();
-  max_ = Core::Nan();
-  bin_start_ = Core::Nan();
-  bin_size_ = Core::Nan();
-  histogram_.resize( 0 );
+  this->min_ = Core::Nan();
+  this->max_ = Core::Nan();
+  this->bin_start_ = Core::Nan();
+  this->bin_size_ = Core::Nan();
+  this->histogram_.resize( 0 );
   if ( size == 0 ) return;
 
-  min_ = data[ 0 ];
-  max_ = data[ 0 ];
+  this->min_ = data[ 0 ];
+  this->max_ = data[ 0 ];
 
   for ( size_t j = 1 ; j < size ; j++ )
   {
-    if ( data[ j ] < min_ ) min_ = data[ j ];
-    if ( data[ j ] > max_ ) max_ = data[ j ];
+    if ( data[ j ] < this->min_ ) this->min_ = data[ j ];
+    if ( data[ j ] > this->max_ ) this->max_ = data[ j ];
   }
   
-    if ( min_ == max_ )
+    if ( this->min_ == this->max_ )
   {
-    bin_size_  = 1.0;
-    bin_start_ = min_ - ( bin_size_ * 0.5 );
-    histogram_.resize( 1, 0 );
+    this->bin_size_  = 1.0;
+    this->bin_start_ = this->min_ - ( this->bin_size_ * 0.5 );
+    this->histogram_.resize( 1, 0 );
   }
   else
   {
     size_t hist_size = 0x100;
-    histogram_.resize( hist_size, 0 );
-    bin_size_ = ( max_ - min_ ) / static_cast<double>( hist_size - 1 );
-    bin_start_ = min_ - ( bin_size_ * 0.5 );  
+    this->histogram_.resize( hist_size, 0 );
+    this->bin_size_ = ( this->max_ - this->min_ ) / static_cast<double>( hist_size - 1 );
+    this->bin_start_ = this->min_ - ( this->bin_size_ * 0.5 );  
   }
 
   double inv_bin_size = 1.0 / bin_size_;
   for ( size_t j = 1 ; j < size ; j++ )
   {
-    size_t idx = static_cast<size_t>( ( static_cast<double>( data[j] ) - min_ ) * inv_bin_size );
-    histogram_[ idx ]++;
+    size_t idx = static_cast<size_t>( ( static_cast<double>( data[j] ) - this->min_ ) *
+      inv_bin_size );
+    this->histogram_[ idx ]++;
   }
   
-  this->compute_min_max();
-}
+  std::pair< std::vector<size_t>::iterator, std::vector<size_t>::iterator > min_max = 
+    boost::minmax_element( this->histogram_.begin(), this->histogram_.end() );
+  this->min_bin_ = (*min_max.first);
+  this->max_bin_ = (*min_max.second);
 
-void Histogram::compute_min_max()
-{
-  size_t min = histogram_[ 0 ];
-  size_t max = histogram_[ 0 ];
-  for( size_t i = 1; i < histogram_.size(); ++i )
-  {
-    if( histogram_[ i ] > max )
-      max = histogram_[ i ];
-    if( histogram_[ i ] < min )
-      min = histogram_[ i ];
-  }
-  
-  max_bin_ = max;
-  min_bin_ = min;
 }
 
 double Histogram::get_min() const
@@ -568,16 +588,19 @@ double Histogram::get_bin_end( size_t idx ) const
   return this->bin_start_ + ( idx + 1 ) * this->bin_size_;
 }
 
-std::vector<size_t> Histogram::get_bins() const
+const std::vector<size_t>& Histogram::get_bins() const
 {
   return this->histogram_;
 }
 
-bool Histogram::is_valid() const
+size_t Histogram::get_size() const
 {
-  return !( IsNan( min_ ) || IsNan( max_ ) );
+  return this->histogram_.size();
 }
 
-
+bool Histogram::is_valid() const
+{
+  return !( IsNan( this->min_ ) || IsNan( this->max_ ) );
+}
 
 } // end namespace Core

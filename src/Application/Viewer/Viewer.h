@@ -42,64 +42,21 @@
 #include <boost/function.hpp>
 #include <boost/thread.hpp>
 
+// Core includes
+#include <Core/Utils/EnumClass.h>
+#include <Core/RendererBase/AbstractRenderer.h>
+#include <Core/Viewer/AbstractViewer.h>
+#include <Core/State/State.h>
+#include <Core/Volume/DataVolumeSlice.h>
+#include <Core/Volume/MaskVolumeSlice.h>
+
 // Application includes
 #include <Application/Layer/Layer.h>
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/Viewer/ViewManipulator.h>
 
-#include <Core/Utils/EnumClass.h>
-#include <Core/RendererBase/AbstractRenderer.h>
-#include <Core/State/State.h>
-#include <Core/Volume/DataVolumeSlice.h>
-#include <Core/Volume/MaskVolumeSlice.h>
-
 namespace Seg3D
 {
-
-// Enums for mouse buttons 
-// they have the same values as corresponding Qt ones
-SCI_ENUM_CLASS
-(
-  MouseButton,
-  NO_BUTTON_E = 0x00000000,
-  LEFT_BUTTON_E = 0x00000001,
-  RIGHT_BUTTON_E = 0x00000002,
-  MID_BUTTON_E = 0x00000004
-)
-
-// Enums for key modifiers
-// they have the same values as corresponding Qt ones
-SCI_ENUM_CLASS
-(
-  KeyModifier,
-  NO_MODIFIER_E = 0x00000000,
-  SHIFT_MODIFIER_E = 0x02000000,
-  CONTROL_MODIFIER_E = 0x04000000,
-  ALT_MODIFIER_E = 0x08000000
-)
-
-class MousePosition
-{
-public:
-  MousePosition( int x_in = 0, int y_in = 0 ) :
-    x( x_in ), y( y_in )
-  {
-  }
-
-  int x;
-  int y;
-};
-typedef boost::shared_ptr< MousePosition > MousePositionHandle;
-
-class MouseHistory
-{
-public:
-  MousePosition left_start;
-  MousePosition right_start;
-  MousePosition mid_start;
-  MousePosition previous;
-  MousePosition current;
-};
 
 // Forward declarations
 class ViewManipulator;
@@ -108,7 +65,7 @@ typedef boost::shared_ptr< Viewer > ViewerHandle;
 typedef boost::weak_ptr< Viewer > ViewerWeakHandle;
 
 // Class definition
-class Viewer : public Core::StateHandler
+class Viewer : public Core::AbstractViewer
 {
 
   // -- constructor/destructor --
@@ -118,23 +75,21 @@ public:
   Viewer( size_t viewer_id );
   virtual ~Viewer();
 
-  // -- viewer id --
-public:
-  size_t get_viewer_id() const;
-
   // -- mouse events handling --
 public:
 
-  typedef boost::function< bool( size_t, const MouseHistory&, int, int, int ) > mouse_event_handler_type;
-  typedef boost::function< bool( size_t, int, int, int, int, int ) > wheel_event_handler_type;
+  typedef boost::function< bool( size_t, const Core::MouseHistory&, int, int, int ) > 
+    mouse_event_handler_type;
+  typedef boost::function< bool( size_t, int, int, int, int, int ) > 
+    wheel_event_handler_type;
 
-  void mouse_move_event( const MouseHistory& mouse_history, int button, int buttons,
-      int modifiers );
-  void mouse_press_event( const MouseHistory& mouse_history, int button, int buttons,
-      int modifiers );
-  void mouse_release_event( const MouseHistory& mouse_history, int button, int buttons,
-      int modifiers );
-  bool wheel_event( int delta, int x, int y, int buttons, int modifiers );
+  virtual void mouse_move_event( const Core::MouseHistory& mouse_history, int button, 
+    int buttons, int modifiers );
+  virtual void mouse_press_event( const Core::MouseHistory& mouse_history, int button, 
+    int buttons, int modifiers );
+  virtual void mouse_release_event( const Core::MouseHistory& mouse_history, int button, 
+    int buttons, int modifiers );
+  virtual bool wheel_event( int delta, int x, int y, int buttons, int modifiers );
 
   void set_mouse_move_handler( mouse_event_handler_type func );
   void set_mouse_press_handler( mouse_event_handler_type func );
@@ -156,7 +111,8 @@ private:
   bool adjusting_contrast_brightness_;
 
 public:
-  void resize( int width, int height );
+  virtual void resize( int width, int height );
+  
   bool is_volume_view() const;
   Core::StateViewBaseHandle get_active_view_state();
 
@@ -175,11 +131,6 @@ public:
   // Renderers of other viewers connect to this signal to update the overlay.
   typedef boost::signals2::signal< void ( size_t ) > slice_changed_signal_type;
   slice_changed_signal_type slice_changed_signal_;
-
-  // UPDATE_DISPLAY_SIGNAL_:
-  // Triggered when new texture is received.
-  typedef boost::signals2::signal< void () > update_display_signal_type;
-  update_display_signal_type update_display_signal_;
 
 private:
   void change_view_mode( std::string mode, Core::ActionSource source );
@@ -205,48 +156,17 @@ public:
   Core::MaskVolumeSliceHandle get_mask_volume_slice( const std::string& layer_id );
   Core::DataVolumeSliceHandle get_data_volume_slice( const std::string& layer_id );
 
-  // -- Mutex and lock --
-private:
-
-  typedef boost::recursive_mutex mutex_type;
-  typedef boost::unique_lock< mutex_type > lock_type;
-
-  inline mutex_type& get_mutex()
-  {
-    return this->internal_mutex_;
-  }
-
-  mutex_type internal_mutex_;
-
   // -- Other functions and variables --
 public:
 
-  // INSTALL_RENDERER:
-  // Install a renderer to the viewer.
-  void install_renderer( Core::AbstractRendererHandle renderer );
-
   // Auto adjust the view for the active layer
   void auto_view();
-
-  // Get the stateid prefix of the viewer
-  const std::string& get_stateid() const
-  {
-    return this->get_statehandler_id();
-  }
 
   Core::VolumeSliceHandle get_active_layer_slice() const;
 
   // MOVE_SLICE_TO:
   // Move the slice to the given world coordinate. Used for picking.
   void move_slice_to( const Core::Point& pt );
-
-  // GET_TEXTURE:
-  // Returns the texture generated by the renderer
-  Core::Texture2DHandle get_texture();
-
-  // GET_OVERLAY_TEXTURE:
-  // Returns the overlay texture generated by the renderer
-  Core::Texture2DHandle get_overlay_texture();
 
 private:
   
@@ -276,18 +196,7 @@ private:
   // The active slice can only go out of boundary when the viewer is locked to other viewers.
   void reset_active_slice();
 
-  // SET_TEXTURE:
-  // Connected to the redraw_completed_signal_ of the renderer.
-  void set_texture( Core::Texture2DHandle texture, bool delay_update );
-
-  // SET_OVERLAY_TEXTURE:
-  // Connected to the redraw_overlay_completed_signal_ of the renderer.
-  void set_overlay_texture( Core::Texture2DHandle texture, bool delay_update );
-
 private:
-  const size_t viewer_id_;
-  int width_;
-  int height_;
 
   // SIGNALS_BLOCK_COUNT_:
   // Counts the number of times state change signals are blocked
@@ -299,9 +208,6 @@ private:
 
   typedef std::multimap< std::string, boost::signals2::connection > connection_map_type;
   connection_map_type layer_connection_map_;
-
-  Core::Texture2DHandle texture_;
-  Core::Texture2DHandle overlay_texture_;
 
   // -- State information --
 public:
@@ -323,7 +229,6 @@ public:
   Core::StateBoolHandle volume_volume_rendering_visible_state_;
 
   Core::StateBoolHandle viewer_lock_state_;
-  Core::StateBoolHandle viewer_visible_state_;
   Core::StateBoolHandle is_picking_target_state_;
 
 private:

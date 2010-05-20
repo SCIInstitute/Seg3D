@@ -26,35 +26,42 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_HISTOGRAM_H
-#define INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_HISTOGRAM_H
+#ifndef QTINTERFACE_WIDGETS_QTHISTOGRAMWIDGET_H
+#define QTINTERFACE_WIDGETS_QTHISTOGRAMWIDGET_H
 
-#include <QtGui>
+// STL includes
+#include <vector>
 
-namespace Seg3D
+//Boost includes
+#include <boost/shared_ptr.hpp>
+
+//Qt includes
+#include <QWidget>
+
+// Core includes
+#include <Core/DataBlock/Histogram.h>
+
+namespace Core
 {
 
-class Histogram : public QWidget
+// Forward declaration
+class QtHistogramWidgetPrivate;
+typedef boost::shared_ptr< QtHistogramWidgetPrivate > QtHistogramWidgetPrivateHandle;
+
+// Class definition
+class QtHistogramWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    Histogram( QWidget *parent = 0 );
-    virtual ~Histogram();
+    QtHistogramWidget( QWidget *parent = 0 );
+    virtual ~QtHistogramWidget();
     
-public:
-  void set_bins( std::vector< size_t > ints_bin, size_t min_bin, size_t max_bin );
-// public Q_SLOTS:
-//  void setHistogram();
-
-protected:
-    void paintEvent( QPaintEvent *event );
+public Q_SLOTS:
+  void set_histogram( const Histogram& histogram );
 
 private:
-    std::vector< size_t > bins_;
-    size_t min_bin_;
-    size_t max_bin_;
-
+  QtHistogramWidgetPrivateHandle private_;
 };
 
 } // end namespace Seg3D

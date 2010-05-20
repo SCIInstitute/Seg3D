@@ -35,6 +35,7 @@
 #include <Core/Interface/Interface.h>
 
 // Application
+#include <Application/Renderer/Renderer.h>
 #include <Application/ViewerManager/ViewerManager.h>
 
 // Interface includes
@@ -98,7 +99,13 @@ void ViewerInterfacePrivate::setup_ui( QWidget* parent )
   this->viewer_.resize( 6 );
   for ( size_t j = 0; j < 6; j++ )
   {
+    // Step 1: Get the viewer class that maintains the state of the viewer
     ViewerHandle viewer = ViewerManager::Instance()->get_viewer( j );
+    // Step 2: Generate a renderer for the viewer
+    RendererHandle renderer = RendererHandle( new Renderer() );
+    renderer->set_viewer_id( j );
+    viewer->install_renderer( Core::AbstractRendererHandle( renderer ) );
+    // Step 3: Generate the widget
     this->viewer_[ j ] = new ViewerWidget( viewer, parent );
   }
   

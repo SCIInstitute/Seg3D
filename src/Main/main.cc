@@ -38,8 +38,10 @@
 #include <Core/Action/ActionHistory.h>
 #include <Core/Action/ActionSocket.h>
 
+// QtInterface includes
+#include <QtInterface/Utils/QtApplication.h>
+
 // Interface includes
-#include <Interface/QtInterface/QtApplication.h>
 #include <Interface/AppInterface/AppInterface.h>
 
 // Plugin functionality
@@ -84,7 +86,7 @@ int main( int argc, char **argv )
   Core::Application::Instance()->start_eventhandler();
 
   // -- Setup the QT Interface Layer --
-  if ( !( QtApplication::Instance()->setup( argc, argv ) ) ) return ( -1 );
+  if ( !( Core::QtApplication::Instance()->setup( argc, argv ) ) ) return ( -1 );
 
   // -- Setup Application Interface Window --
   AppInterface* app_interface = new AppInterface;
@@ -100,7 +102,7 @@ int main( int argc, char **argv )
   // the interface eventloop of the Application layer.
 
   // -- Run QT event loop --
-  if ( !( QtApplication::Instance()->exec() ) ) return ( -1 );
+  if ( !( Core::QtApplication::Instance()->exec() ) ) return ( -1 );
 
   // Indicate a successful finish of the program
   Core::Application::Instance()->log_finish();

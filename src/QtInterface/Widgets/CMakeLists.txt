@@ -31,46 +31,45 @@
 # Set sources
 ##################################################
 
-SET(INTERFACE_APPPREFERENCES_SRCS
-  AppPreferences.cc
-  ColorPickerWidget.cc
+SET(QTINTERFACE_WIDGETS_SRCS
+  QtColorBarWidget.cc
+  QtColorButton.cc
+  QtHistogramGraph.cc
+  QtHistogramWidget.cc
+  QtSliderDoubleCombo.cc
+  QtSliderIntCombo.cc
 )
 
-SET(INTERFACE_APPPREFERENCES_MOC_SRCS
-  AppPreferences.h
-  ColorPickerWidget.h
+SET(QTINTERFACE_WIDGETS_MOC_SRCS
+  QtColorBarWidget.h
+  QtColorButton.h
+  QtHistogramGraph.h
+  QtHistogramWidget.h
+  QtSliderDoubleCombo.h
+  QtSliderIntCombo.h
 )
 
-SET(INTERFACE_APPPREFERENCES_NO_MOC_SRCS
+SET(QTINTERFACE_WIDGETS_NO_MOC_SRCS
 )
 
-SET(INTERFACE_APPPREFERENCES_UI_SRCS
-  AppPreferences.ui
-  ColorPickerWidget.ui
+SET(QTINTERFACE_WIDGETS_UI_SRCS
+  QtColorBarWidget.ui
+  QtHistogramWidget.ui
+  QtSliderDoubleCombo.ui
+  QtSliderIntCombo.ui 
 )
-
-SET(INTERFACE_APPPREFERENCES_RCC_SRCS
-#  AppPreferences.qrc
-)
-
-
-##################################################
-# Get Icon files
-##################################################
-
-QT4_ADD_RESOURCES(INTERFACE_APPPREFERENCES_QT_RCC_SRCS ${INTERFACE_APPPREFERENCES_RCC_SRCS})
 
 ##################################################
 # Generate header out of UI code
 ##################################################
 
-QT4_WRAP_UI(INTERFACE_APPPREFERENCES_QT_UI_SRCS ${INTERFACE_APPPREFERENCES_UI_SRCS})
+QT4_WRAP_UI(QTINTERFACE_WIDGETS_QT_UI_SRCS ${QTINTERFACE_WIDGETS_UI_SRCS})
 
 ##################################################
 # Wrap QT code to expand all the moc code
 ##################################################
 
-QT4_WRAP_CPP(INTERFACE_APPPREFERENCES_QT_MOC_SRCS ${INTERFACE_APPPREFERENCES_MOC_SRCS})
+QT4_WRAP_CPP(QTINTERFACE_WIDGETS_QT_MOC_SRCS ${QTINTERFACE_WIDGETS_MOC_SRCS})
 
 ##################################################
 # Ensure that we can find the files generated
@@ -83,23 +82,16 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 # Build the Components library
 ##################################################
 
-CORE_ADD_LIBRARY(Interface_AppPreferences 
-            ${INTERFACE_APPPREFERENCES_SRCS} 
-            ${INTERFACE_APPPREFERENCES_QT_UI_SRCS}
-            ${INTERFACE_APPPREFERENCES_QT_RCC_SRCS}
-            ${INTERFACE_APPPREFERENCES_QT_MOC_SRCS}
-            ${INTERFACE_APPPREFERENCES_NO_MOC_SRCS} 
-            ${INTERFACE_APPPREFERENCES_MOC_SRCS})
-
+CORE_ADD_LIBRARY( QtInterface_Widgets
+            ${QTINTERFACE_WIDGETS_SRCS} 
+            ${QTINTERFACE_WIDGETS_QT_UI_SRCS}
+            ${QTINTERFACE_WIDGETS_QT_MOC_SRCS}
+            ${QTINTERFACE_WIDGETS_MOC_SRCS}
+            ${QTINTERFACE_WIDGETS_NO_MOC_SRCS} )
             
-TARGET_LINK_LIBRARIES(Interface_AppPreferences
-                      Core_Utils
-                      Core_EventHandler
-                      Core_Action
-                      Core_Interface
-                      Core_ActionManager
-                      QtInterface_Utils
-                      QtInterface_Widgets
-            ${QT_LIBRARIES} 
-                      ${SCI_BOOST_LIBRARY})
-
+TARGET_LINK_LIBRARIES( QtInterface_Widgets
+                       Core_Utils
+                       Core_Geometry
+                       ${QT_LIBRARIES} 
+                       ${SCI_GLEW_LIBRARY}
+                       ${SCI_BOOST_LIBRARY} )

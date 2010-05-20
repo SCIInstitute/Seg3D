@@ -56,12 +56,8 @@ SET(INTERFACE_TOOLINTERFACE_SRCS
 )
 
 SET(INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_SRCS
-  CustomWidgets/SliderIntCombo.cc
-  CustomWidgets/SliderDoubleCombo.cc
   CustomWidgets/TargetComboBox.cc
   CustomWidgets/MaskComboBox.cc
-  CustomWidgets/HistogramWidget.cc
-  CustomWidgets/Histogram.cc
 )
 
 SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
@@ -90,12 +86,8 @@ SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
 )
 
 SET(INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_MOC_SRCS
-  CustomWidgets/SliderIntCombo.h
-  CustomWidgets/SliderDoubleCombo.h
   CustomWidgets/TargetComboBox.h
   CustomWidgets/MaskComboBox.h
-  CustomWidgets/HistogramWidget.h
-  CustomWidgets/Histogram.h
 )
 
 SET(INTERFACE_TOOLINTERFACE_NO_MOC_SRCS
@@ -126,9 +118,6 @@ SET(INTERFACE_TOOLINTERFACE_UI_SRCS
 )
 
 SET(INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_UI_SRCS
-  CustomWidgets/SliderIntCombo.ui
-  CustomWidgets/SliderDoubleCombo.ui
-  CustomWidgets/HistogramWidget.ui
 )
 
 ##################################################
@@ -183,7 +172,8 @@ TARGET_LINK_LIBRARIES(Interface_ToolInterface
                       Core_Interface
                       Core_Action
                       Application_Tool
-                      Interface_QtInterface
-                      Interface_AppInterface
+            QtInterface_Utils
+                      QtInterface_Widgets                      
+            Interface_AppInterface
                       ${QT_LIBRARIES} 
                       ${SCI_BOOST_LIBRARY})

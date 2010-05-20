@@ -32,8 +32,10 @@
 //Core Includes - for logging
 #include <Core/Utils/Log.h>
 
+//QtInterface Includes
+#include <QtInterface/Utils/QtBridge.h>
+
 //Interface Includes
-#include <Interface/QtInterface/QtBridge.h>
 #include <Interface/AppInterface/LayerGroupWidget.h>
 #include <Interface/AppInterface/StyleSheet.h>
 #include <Interface/AppInterface/DropSpaceWidget.h>
@@ -52,7 +54,6 @@
 #include <Application/LayerManager/Actions/ActionMoveGroupAbove.h>
 
 
-
 namespace Seg3D
 {
   
@@ -61,16 +62,16 @@ class LayerGroupWidgetPrivate
 public:
   Ui::LayerGroupWidget ui_;
   
-  SliderDoubleCombo* center_x_adjuster_crop_;
-  SliderDoubleCombo* center_y_adjuster_crop_;
-  SliderDoubleCombo* center_z_adjuster_crop_;
+  Core::QtSliderDoubleCombo* center_x_adjuster_crop_;
+  Core::QtSliderDoubleCombo* center_y_adjuster_crop_;
+  Core::QtSliderDoubleCombo* center_z_adjuster_crop_;
   
-  SliderDoubleCombo* size_width_adjuster_crop_;
-  SliderDoubleCombo* size_height_adjuster_crop_;
-  SliderDoubleCombo* size_depth_adjuster_crop_;
+  Core::QtSliderDoubleCombo* size_width_adjuster_crop_;
+  Core::QtSliderDoubleCombo* size_height_adjuster_crop_;
+  Core::QtSliderDoubleCombo* size_depth_adjuster_crop_;
   
   PushDragButton* activate_button_;
-    SliderDoubleCombo* scale_adjuster_;
+    Core::QtSliderDoubleCombo* scale_adjuster_;
   DropSpaceWidget* drop_space_;
   OverlayWidget* overlay_;
 };
@@ -121,31 +122,31 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
 
 
   // add the slider spinner combo's for the crop
-  this->private_->center_x_adjuster_crop_ = new SliderDoubleCombo( this->private_->ui_.widget );
+  this->private_->center_x_adjuster_crop_ = new Core::QtSliderDoubleCombo( this->private_->ui_.widget );
   this->private_->ui_.horizontalLayout_11->addWidget( this->private_->center_x_adjuster_crop_ );
   this->private_->center_x_adjuster_crop_->setObjectName( QString::fromUtf8( "center_x_adjuster_crop_" ) );
   
-  this->private_->center_y_adjuster_crop_ = new SliderDoubleCombo( this->private_->ui_.widget_2 );
+  this->private_->center_y_adjuster_crop_ = new Core::QtSliderDoubleCombo( this->private_->ui_.widget_2 );
   this->private_->ui_.horizontalLayout_12->addWidget( this->private_->center_y_adjuster_crop_ );
   this->private_->center_y_adjuster_crop_->setObjectName( QString::fromUtf8( "center_y_adjuster_crop_" ) );
   
-  this->private_->center_z_adjuster_crop_ = new SliderDoubleCombo( this->private_->ui_.widget_3 );
+  this->private_->center_z_adjuster_crop_ = new Core::QtSliderDoubleCombo( this->private_->ui_.widget_3 );
   this->private_->ui_.horizontalLayout_14->addWidget( this->private_->center_z_adjuster_crop_ );
   this->private_->center_z_adjuster_crop_->setObjectName( QString::fromUtf8( "center_z_adjuster_crop_" ) );
   
-  this->private_->size_height_adjuster_crop_ = new SliderDoubleCombo( this->private_->ui_.widget_4 );
+  this->private_->size_height_adjuster_crop_ = new Core::QtSliderDoubleCombo( this->private_->ui_.widget_4 );
   this->private_->ui_.horizontalLayout_7->addWidget( this->private_->size_height_adjuster_crop_ );
   this->private_->size_height_adjuster_crop_->setObjectName( QString::fromUtf8( "size_height_adjuster_crop_" ) );
   
-  this->private_->size_width_adjuster_crop_ = new SliderDoubleCombo( this->private_->ui_.widget_5 );
+  this->private_->size_width_adjuster_crop_ = new Core::QtSliderDoubleCombo( this->private_->ui_.widget_5 );
   this->private_->ui_.horizontalLayout_9->addWidget( this->private_->size_width_adjuster_crop_ );
   this->private_->size_width_adjuster_crop_->setObjectName( QString::fromUtf8( "size_width_adjuster_crop_" ) );
   
-  this->private_->size_depth_adjuster_crop_ = new SliderDoubleCombo( this->private_->ui_.widget_6 );
+  this->private_->size_depth_adjuster_crop_ = new Core::QtSliderDoubleCombo( this->private_->ui_.widget_6 );
   this->private_->ui_.horizontalLayout_10->addWidget( this->private_->size_depth_adjuster_crop_ );
   this->private_->size_depth_adjuster_crop_->setObjectName( QString::fromUtf8( "size_depth_adjuster_crop_" ) );
   
-  this->private_->scale_adjuster_ = new SliderDoubleCombo( this->private_->ui_.widget_7 );
+  this->private_->scale_adjuster_ = new Core::QtSliderDoubleCombo( this->private_->ui_.widget_7 );
   this->private_->ui_.horizontalLayout_15->addWidget( this->private_->scale_adjuster_ );
   this->private_->scale_adjuster_->setObjectName( QString::fromUtf8( "scale_adjuster_" ) );
   
@@ -180,12 +181,12 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
       this->private_->ui_.open_button_->setChecked( group->show_layers_state_.get() );
       this->private_->ui_.group_visibility_button_->setChecked( group->visibility_state_.get() );
       
-      QtBridge::Connect( this->private_->ui_.open_button_, group->show_layers_state_ );
-      QtBridge::Connect( this->private_->ui_.group_visibility_button_, group->visibility_state_ );
-      QtBridge::Connect( this->private_->ui_.delete_button_, boost::bind( &ActionDeleteLayers::Dispatch, group ) );
+      Core::QtBridge::Connect( this->private_->ui_.open_button_, group->show_layers_state_ );
+      Core::QtBridge::Connect( this->private_->ui_.group_visibility_button_, group->visibility_state_ );
+      Core::QtBridge::Connect( this->private_->ui_.delete_button_, boost::bind( &ActionDeleteLayers::Dispatch, group ) );
   
     void ( *dispatch_fp )( LayerGroupHandle ) = &ActionNewMaskLayer::Dispatch;
-    QtBridge::Connect( this->private_->ui_.group_new_button_, boost::bind( dispatch_fp,  group ) );
+    Core::QtBridge::Connect( this->private_->ui_.group_new_button_, boost::bind( dispatch_fp,  group ) );
   
   
       // --- RESAMPLE ---
@@ -229,8 +230,8 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
         this->private_->scale_adjuster_->setCurrentValue( group->resample_factor_state_->get() );
         
          // = make the connections
-        QtBridge::Connect( this->private_->scale_adjuster_, group->resample_factor_state_ );
-      QtBridge::Connect( this->private_->ui_.resample_replace_checkBox_, 
+        Core::QtBridge::Connect( this->private_->scale_adjuster_, group->resample_factor_state_ );
+      Core::QtBridge::Connect( this->private_->ui_.resample_replace_checkBox_, 
       group->resample_replace_state_ );
         
 
@@ -261,15 +262,15 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
         this->private_->ui_.crop_replace_checkBox_->setChecked( group->crop_replace_state_->get() );
         
         // = make the connections
-        QtBridge::Connect( this->private_->size_width_adjuster_crop_, group->crop_size_width_state_ );
-        QtBridge::Connect( this->private_->size_height_adjuster_crop_, group->crop_size_height_state_ );
-        QtBridge::Connect( this->private_->size_depth_adjuster_crop_, group->crop_size_depth_state_ );
+        Core::QtBridge::Connect( this->private_->size_width_adjuster_crop_, group->crop_size_width_state_ );
+        Core::QtBridge::Connect( this->private_->size_height_adjuster_crop_, group->crop_size_height_state_ );
+        Core::QtBridge::Connect( this->private_->size_depth_adjuster_crop_, group->crop_size_depth_state_ );
         
-        QtBridge::Connect( this->private_->center_x_adjuster_crop_, group->crop_center_x_state_ );
-        QtBridge::Connect( this->private_->center_y_adjuster_crop_, group->crop_center_y_state_ );
-        QtBridge::Connect( this->private_->center_z_adjuster_crop_, group->crop_center_z_state_ );
+        Core::QtBridge::Connect( this->private_->center_x_adjuster_crop_, group->crop_center_x_state_ );
+        Core::QtBridge::Connect( this->private_->center_y_adjuster_crop_, group->crop_center_y_state_ );
+        Core::QtBridge::Connect( this->private_->center_z_adjuster_crop_, group->crop_center_z_state_ );
         
-        QtBridge::Connect( this->private_->ui_.crop_replace_checkBox_, group->crop_replace_state_ );
+        Core::QtBridge::Connect( this->private_->ui_.crop_replace_checkBox_, group->crop_replace_state_ );
         
         
         // --- TRANSFORM ---
@@ -281,15 +282,15 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
         this->private_->ui_.transform_replace_checkBox_->setChecked( group->resample_replace_state_->get() );
         
         // = make the connections
-      QtBridge::Connect( this->private_->ui_.origin_x_spinbox_, group->transform_origin_x_state_ );
-      QtBridge::Connect( this->private_->ui_.origin_y_spinbox_, group->transform_origin_y_state_ );
-      QtBridge::Connect( this->private_->ui_.origin_z_spinbox_, group->transform_origin_z_state_ );
+      Core::QtBridge::Connect( this->private_->ui_.origin_x_spinbox_, group->transform_origin_x_state_ );
+      Core::QtBridge::Connect( this->private_->ui_.origin_y_spinbox_, group->transform_origin_y_state_ );
+      Core::QtBridge::Connect( this->private_->ui_.origin_z_spinbox_, group->transform_origin_z_state_ );
       
-      QtBridge::Connect( this->private_->ui_.spacing_x_spinbox_, group->transform_spacing_x_state_ );
-      QtBridge::Connect( this->private_->ui_.spacing_y_spinbox_, group->transform_spacing_y_state_ );
-      QtBridge::Connect( this->private_->ui_.spacing_z_spinbox_, group->transform_spacing_z_state_ );
+      Core::QtBridge::Connect( this->private_->ui_.spacing_x_spinbox_, group->transform_spacing_x_state_ );
+      Core::QtBridge::Connect( this->private_->ui_.spacing_y_spinbox_, group->transform_spacing_y_state_ );
+      Core::QtBridge::Connect( this->private_->ui_.spacing_z_spinbox_, group->transform_spacing_z_state_ );
         
-        QtBridge::Connect( this->private_->ui_.transform_replace_checkBox_, group->transform_replace_state_ );
+        Core::QtBridge::Connect( this->private_->ui_.transform_replace_checkBox_, group->transform_replace_state_ );
 
   this->private_->ui_.group_frame_layout_->setAlignment( Qt::AlignTop );
 

@@ -36,7 +36,6 @@ SET(INTERFACE_APPINTERFACE_SRCS
   AppMenu.cc
   AppLayerIO.cc
   AppStatusBar.cc
-  ColorBarWidget.cc
   HistoryDockWidget.cc
   MessageHistoryWidget.cc
   LayerManagerWidget.cc
@@ -64,7 +63,6 @@ SET(INTERFACE_APPINTERFACE_MOC_SRCS
   AppInterface.h
   AppMenu.h
   AppStatusBar.h
-  ColorBarWidget.h
   HistoryDockWidget.h
   LayerWidget.h
   LayerImporterWidget.h
@@ -95,7 +93,6 @@ SET(INTERFACE_APPINTERFACE_NO_MOC_SRCS
 )
 
 SET(INTERFACE_APPINTERFACE_UI_SRCS
-  ColorBarWidget.ui
   HistoryDockWidget.ui
   LayerGroupWidget.ui
   LayerImporterWidget.ui
@@ -162,11 +159,13 @@ TARGET_LINK_LIBRARIES(Interface_AppInterface
                       Core_Interface
                       Core_ActionManager
                       Core_State
+            Application_Renderer
                       Application_StateManager
                       Application_Tool
                       Application_ToolManager
                       Application_Tools
-                      Interface_QtInterface
+                      QtInterface_Utils
+                      QtInterface_Widgets
                       Interface_AppController
             Interface_AppPreferences
                       ${QT_LIBRARIES} 

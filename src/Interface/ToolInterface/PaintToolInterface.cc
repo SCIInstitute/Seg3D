@@ -26,11 +26,6 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-//Interface Includes
-#include <Interface/QtInterface/QtBridge.h>
-#include <Interface/ToolInterface/CustomWidgets/TargetComboBox.h>
-#include <Interface/ToolInterface/CustomWidgets/MaskComboBox.h>
-
 //Qt Gui Includes
 #include <Interface/ToolInterface/PaintToolInterface.h>
 #include "ui_PaintToolInterface.h"
@@ -38,6 +33,14 @@
 //Application Includes
 #include <Application/Tools/PaintTool.h>
 //#include <Application/Filters/Actions/ActionPaint.h>
+
+//QtInterface Includes
+#include <QtInterface/Utils/QtBridge.h>
+
+//Interface Includes
+#include <Interface/ToolInterface/CustomWidgets/TargetComboBox.h>
+#include <Interface/ToolInterface/CustomWidgets/MaskComboBox.h>
+
 
 namespace Seg3D
 {
@@ -49,9 +52,9 @@ class PaintToolInterfacePrivate
 public:
   Ui::PaintToolInterface ui_;
 
-    SliderIntCombo *brush_radius_;
-  SliderDoubleCombo *upper_threshold_;
-  SliderDoubleCombo *lower_threshold_;
+    Core::QtSliderIntCombo *brush_radius_;
+  Core::QtSliderDoubleCombo *upper_threshold_;
+  Core::QtSliderDoubleCombo *lower_threshold_;
   TargetComboBox *target_;
   MaskComboBox *mask_;
   
@@ -75,21 +78,21 @@ bool PaintToolInterface::build_widget( QFrame* frame )
   //Step 1 - build the Qt GUI Widget
   this->private_->ui_.setupUi( frame );
 
-      //Add the SliderSpinCombos
-      this->private_->brush_radius_ = new SliderIntCombo( this, true );
-      this->private_->ui_.verticalLayout->addWidget( this->private_->brush_radius_ );
+  //Add the SliderSpinCombos
+  this->private_->brush_radius_ = new Core::QtSliderIntCombo( this, true );
+  this->private_->ui_.verticalLayout->addWidget( this->private_->brush_radius_ );
 
-        this->private_->upper_threshold_ = new SliderDoubleCombo( this, true );
-      this->private_->ui_.upperHLayout_bottom->addWidget( this->private_->upper_threshold_ );
-      
-      this->private_->lower_threshold_ = new SliderDoubleCombo( this, false );
-      this->private_->ui_.lowerHLayout_bottom->addWidget( this->private_->lower_threshold_ );
+  this->private_->upper_threshold_ = new Core::QtSliderDoubleCombo( this, true );
+  this->private_->ui_.upperHLayout_bottom->addWidget( this->private_->upper_threshold_ );
   
-    this->private_->target_ = new TargetComboBox( this );
-    this->private_->ui_.activeHLayout->addWidget( this->private_->target_ );
+  this->private_->lower_threshold_ = new Core::QtSliderDoubleCombo( this, false );
+  this->private_->ui_.lowerHLayout_bottom->addWidget( this->private_->lower_threshold_ );
 
-    this->private_->mask_ = new MaskComboBox( this );
-    this->private_->ui_.maskHLayout->addWidget( this->private_->mask_ );
+  this->private_->target_ = new TargetComboBox( this );
+  this->private_->ui_.activeHLayout->addWidget( this->private_->target_ );
+
+  this->private_->mask_ = new MaskComboBox( this );
+  this->private_->ui_.maskHLayout->addWidget( this->private_->mask_ );
   
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
@@ -97,46 +100,46 @@ bool PaintToolInterface::build_widget( QFrame* frame )
   
   //Step 3 - set the values for the tool ui from the state engine
   
-      // set the defaults for the paint brush size
-      int brush_min = 0; 
-      int brush_max = 0;
-      int brush_radius_step = 0;
-      tool->brush_radius_state_->get_step( brush_radius_step );
-      tool->brush_radius_state_->get_range( brush_min, brush_max );
-      this->private_->brush_radius_->setStep( brush_radius_step );
-        this->private_->brush_radius_->setRange( brush_min, brush_max );
-        this->private_->brush_radius_->setCurrentValue( tool->brush_radius_state_->get() );
-        
-        // set the defaults for the upper threshold
-        double upper_threshold_min = 0.0; 
-      double upper_threshold_max = 0.0;
-      double upper_threshold_step = 0.0;
-      tool->upper_threshold_state_->get_step( upper_threshold_step );
-      tool->upper_threshold_state_->get_range( upper_threshold_min, upper_threshold_max );
-      this->private_->upper_threshold_->setStep( upper_threshold_step );
-        this->private_->upper_threshold_->setRange( upper_threshold_min, upper_threshold_max );
-        this->private_->upper_threshold_->setCurrentValue( tool->upper_threshold_state_->get() );
-        
-        // set the defaults for the lower threshold
-        double lower_threshold_min = 0.0; 
-      double lower_threshold_max = 0.0;
-      double lower_threshold_step = 0.0;
-      tool->lower_threshold_state_->get_step( lower_threshold_step );
-      tool->lower_threshold_state_->get_range( lower_threshold_min, lower_threshold_max );
-      this->private_->lower_threshold_->setStep( lower_threshold_step );
-        this->private_->lower_threshold_->setRange( lower_threshold_min, lower_threshold_max );
-        this->private_->lower_threshold_->setCurrentValue( tool->lower_threshold_state_->get() );
-        
-        // set the default setchecked state
-        this->private_->ui_.eraseCheckBox->setChecked( tool->erase_state_->get() );
+  // set the defaults for the paint brush size
+  int brush_min = 0; 
+  int brush_max = 0;
+  int brush_radius_step = 0;
+  tool->brush_radius_state_->get_step( brush_radius_step );
+  tool->brush_radius_state_->get_range( brush_min, brush_max );
+  this->private_->brush_radius_->setStep( brush_radius_step );
+  this->private_->brush_radius_->setRange( brush_min, brush_max );
+  this->private_->brush_radius_->setCurrentValue( tool->brush_radius_state_->get() );
+  
+  // set the defaults for the upper threshold
+  double upper_threshold_min = 0.0; 
+  double upper_threshold_max = 0.0;
+  double upper_threshold_step = 0.0;
+  tool->upper_threshold_state_->get_step( upper_threshold_step );
+  tool->upper_threshold_state_->get_range( upper_threshold_min, upper_threshold_max );
+  this->private_->upper_threshold_->setStep( upper_threshold_step );
+  this->private_->upper_threshold_->setRange( upper_threshold_min, upper_threshold_max );
+  this->private_->upper_threshold_->setCurrentValue( tool->upper_threshold_state_->get() );
+  
+  // set the defaults for the lower threshold
+  double lower_threshold_min = 0.0; 
+  double lower_threshold_max = 0.0;
+  double lower_threshold_step = 0.0;
+  tool->lower_threshold_state_->get_step( lower_threshold_step );
+  tool->lower_threshold_state_->get_range( lower_threshold_min, lower_threshold_max );
+  this->private_->lower_threshold_->setStep( lower_threshold_step );
+  this->private_->lower_threshold_->setRange( lower_threshold_min, lower_threshold_max );
+  this->private_->lower_threshold_->setCurrentValue( tool->lower_threshold_state_->get() );
+  
+  // set the default setchecked state
+  this->private_->ui_.eraseCheckBox->setChecked( tool->erase_state_->get() );
   
   //Step 4 - connect the gui to the tool through the QtBridge
-  QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
-  QtBridge::Connect( this->private_->mask_, tool->mask_layer_state_ );
-  QtBridge::Connect( this->private_->brush_radius_, tool->brush_radius_state_ );
-  QtBridge::Connect( this->private_->upper_threshold_, tool->upper_threshold_state_ );
-  QtBridge::Connect( this->private_->lower_threshold_, tool->lower_threshold_state_ );
-  QtBridge::Connect( this->private_->ui_.eraseCheckBox, tool->erase_state_ );
+  Core::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
+  Core::QtBridge::Connect( this->private_->mask_, tool->mask_layer_state_ );
+  Core::QtBridge::Connect( this->private_->brush_radius_, tool->brush_radius_state_ );
+  Core::QtBridge::Connect( this->private_->upper_threshold_, tool->upper_threshold_state_ );
+  Core::QtBridge::Connect( this->private_->lower_threshold_, tool->lower_threshold_state_ );
+  Core::QtBridge::Connect( this->private_->ui_.eraseCheckBox, tool->erase_state_ );
   
   this->private_->target_->sync_layers();
   this->private_->mask_->sync_layers();

@@ -26,8 +26,10 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+//QtInterface Includes
+#include <QtInterface/Utils/QtBridge.h>
+
 //Interface Includes
-#include <Interface/QtInterface/QtBridge.h>
 #include <Interface/ToolInterface/CustomWidgets/TargetComboBox.h>
 #include <Interface/ToolInterface/CustomWidgets/MaskComboBox.h>
 
@@ -49,12 +51,12 @@ class ThresholdSegmentationLSFilterInterfacePrivate
 public:
   Ui::ThresholdSegmentationLSFilterInterface ui_;
   
-  SliderIntCombo *iterations_;
-  SliderDoubleCombo *upper_threshold_;
-  SliderDoubleCombo *lower_threshold_;
-  SliderDoubleCombo *curvature_;
-  SliderDoubleCombo *edge_;
-  SliderDoubleCombo *propagation_;
+  Core::QtSliderIntCombo *iterations_;
+  Core::QtSliderDoubleCombo *upper_threshold_;
+  Core::QtSliderDoubleCombo *lower_threshold_;
+  Core::QtSliderDoubleCombo *curvature_;
+  Core::QtSliderDoubleCombo *edge_;
+  Core::QtSliderDoubleCombo *propagation_;
   TargetComboBox *target_;
   MaskComboBox *mask_;
 };
@@ -77,22 +79,22 @@ bool ThresholdSegmentationLSFilterInterface::build_widget( QFrame* frame )
   this->private_->ui_.setupUi( frame );
 
   // add sliderspinnercombo's
-  this->private_->iterations_ = new SliderIntCombo();
+  this->private_->iterations_ = new Core::QtSliderIntCombo();
   this->private_->ui_.iterationsHLayout_bottom->addWidget( this->private_->iterations_ );
 
-  this->private_->upper_threshold_ = new SliderDoubleCombo();
+  this->private_->upper_threshold_ = new Core::QtSliderDoubleCombo();
   this->private_->ui_.upperHLayout_bottom->addWidget( this->private_->upper_threshold_ );
 
-  this->private_->lower_threshold_ = new SliderDoubleCombo();
+  this->private_->lower_threshold_ = new Core::QtSliderDoubleCombo();
   this->private_->ui_.lowerHLayout_bottom->addWidget( this->private_->lower_threshold_ );
 
-  this->private_->curvature_ = new SliderDoubleCombo();
+  this->private_->curvature_ = new Core::QtSliderDoubleCombo();
   this->private_->ui_.curvatureHLayout_bottom->addWidget( this->private_->curvature_ );
 
-  this->private_->edge_ = new SliderDoubleCombo();
+  this->private_->edge_ = new Core::QtSliderDoubleCombo();
   this->private_->ui_.edgeHLayout_bottom->addWidget( this->private_->edge_ );
 
-  this->private_->propagation_ = new SliderDoubleCombo();
+  this->private_->propagation_ = new Core::QtSliderDoubleCombo();
   this->private_->ui_.propagationHLayout_bottom->addWidget( this->private_->propagation_ );
   
   this->private_->target_ = new TargetComboBox( this );
@@ -175,18 +177,18 @@ bool ThresholdSegmentationLSFilterInterface::build_widget( QFrame* frame )
 
 
   //Step 4 - connect the gui to the tool through the QtBridge
-  QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
-  connect( this->private_->target_, SIGNAL( valid( bool ) ), this, SLOT( enable_run_filter( bool ) ) );
-  QtBridge::Connect( this->private_->mask_, tool->mask_layer_state_ );
-  QtBridge::Connect( this->private_->iterations_, tool->iterations_state_ );
-  QtBridge::Connect( this->private_->upper_threshold_, tool->upper_threshold_state_ );
-  QtBridge::Connect( this->private_->lower_threshold_, tool->lower_threshold_state_ );
-  QtBridge::Connect( this->private_->curvature_, tool->curvature_state_ );
-  QtBridge::Connect( this->private_->edge_, tool->propagation_state_ );
-  QtBridge::Connect( this->private_->propagation_, tool->edge_state_ );
-  QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
+  Core::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
+  this->connect( this->private_->target_, SIGNAL( valid( bool ) ), this, SLOT( enable_run_filter( bool ) ) );
+  Core::QtBridge::Connect( this->private_->mask_, tool->mask_layer_state_ );
+  Core::QtBridge::Connect( this->private_->iterations_, tool->iterations_state_ );
+  Core::QtBridge::Connect( this->private_->upper_threshold_, tool->upper_threshold_state_ );
+  Core::QtBridge::Connect( this->private_->lower_threshold_, tool->lower_threshold_state_ );
+  Core::QtBridge::Connect( this->private_->curvature_, tool->curvature_state_ );
+  Core::QtBridge::Connect( this->private_->edge_, tool->propagation_state_ );
+  Core::QtBridge::Connect( this->private_->propagation_, tool->edge_state_ );
+  Core::QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
   
-  connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), this, SLOT( execute_filter() ) );
+  this->connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), this, SLOT( execute_filter() ) );
   
   this->private_->target_->sync_layers();
   this->private_->mask_->sync_layers();

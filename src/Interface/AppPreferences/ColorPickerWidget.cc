@@ -29,10 +29,11 @@
 // Application includes
 #include <Application/PreferencesManager/PreferencesManager.h>
 
+// QtInterface includes
+#include <QtInterface/Utils/QtBridge.h>
 
 // Interface includes
 #include <Interface/AppPreferences/ColorPickerWidget.h>
-#include <Interface/QtInterface/QtBridge.h>
 
 // The interface from the designer
 #include "ui_ColorPickerWidget.h"
@@ -44,9 +45,9 @@ class ColorPickerWidgetPrivate
 {
 public:
     Ui::ColorPickerWidget ui_;
-  SliderIntCombo* r_adjuster_;
-  SliderIntCombo* g_adjuster_;
-  SliderIntCombo* b_adjuster_;
+  Core::QtSliderIntCombo* r_adjuster_;
+  Core::QtSliderIntCombo* g_adjuster_;
+  Core::QtSliderIntCombo* b_adjuster_;
 
 };
 
@@ -57,31 +58,31 @@ ColorPickerWidget::ColorPickerWidget( QWidget *parent ) :
     private_->ui_.setupUi( this );
   
   // add the SliderCombo Widgets
-  this->private_->r_adjuster_ = new SliderIntCombo( this );
+  this->private_->r_adjuster_ = new Core::QtSliderIntCombo( this );
   this->private_->ui_.r_h_layout_->addWidget( this->private_->r_adjuster_ );
   this->private_->r_adjuster_->setObjectName( QString::fromUtf8( "r_adjuster_" ) );
   this->private_->r_adjuster_->setRange( 0, 255 );
   this->private_->r_adjuster_->setCurrentValue( 0 );
   
-  this->private_->g_adjuster_ = new SliderIntCombo( this );
+  this->private_->g_adjuster_ = new Core::QtSliderIntCombo( this );
   this->private_->ui_.g_h_layout_->addWidget( this->private_->g_adjuster_ );
   this->private_->g_adjuster_->setObjectName( QString::fromUtf8( "g_adjuster_" ) );
   this->private_->g_adjuster_->setRange( 0, 255 );
   this->private_->g_adjuster_->setCurrentValue( 0 );
   
-  this->private_->b_adjuster_ = new SliderIntCombo( this );
+  this->private_->b_adjuster_ = new Core::QtSliderIntCombo( this );
   this->private_->ui_.b_h_layout_->addWidget( this->private_->b_adjuster_ );
   this->private_->b_adjuster_->setObjectName( QString::fromUtf8( "b_adjuster_" ) );
   this->private_->b_adjuster_->setRange( 0, 255 );
   this->private_->b_adjuster_->setCurrentValue( 0 );
   
-  connect( this, SIGNAL( color_changed()), this, SLOT( set_color() ) );
+  this->connect( this, SIGNAL( color_changed()), this, SLOT( set_color() ) );
       
-  connect( this->private_->r_adjuster_, SIGNAL( valueAdjusted( int ) ), this, SLOT( set_r( int ) ) );
-  connect( this->private_->g_adjuster_, SIGNAL( valueAdjusted( int ) ), this, SLOT( set_g( int ) ) );
-  connect( this->private_->b_adjuster_, SIGNAL( valueAdjusted( int ) ), this, SLOT( set_b( int ) ) );
+  this->connect( this->private_->r_adjuster_, SIGNAL( valueAdjusted( int ) ), this, SLOT( set_r( int ) ) );
+  this->connect( this->private_->g_adjuster_, SIGNAL( valueAdjusted( int ) ), this, SLOT( set_g( int ) ) );
+  this->connect( this->private_->b_adjuster_, SIGNAL( valueAdjusted( int ) ), this, SLOT( set_b( int ) ) );
   
-  connect( this->private_->ui_.set_color_button_, SIGNAL( clicked() ), this, SLOT( signal_color_set() ) );
+  this->connect( this->private_->ui_.set_color_button_, SIGNAL( clicked() ), this, SLOT( signal_color_set() ) );
 
 }
 

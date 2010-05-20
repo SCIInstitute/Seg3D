@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_QTINTERFACE_QTEVENTHANDLER_H
-#define INTERFACE_QTINTERFACE_QTEVENTHANDLER_H
+#ifndef QTINTERFACE_UTILS_QTEVENTHANDLER_H
+#define QTINTERFACE_UTILS_QTEVENTHANDLER_H
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
@@ -37,7 +37,9 @@
 #include <queue>
 
 // Qt includes
-#include <QtGui>
+#include <QApplication>
+#include <QEvent>
+#include <QObject>
 
 // Includes from application layer
 #include <Core/EventHandler/EventHandlerContext.h>
@@ -51,7 +53,7 @@
 #include <boost/thread/recursive_mutex.hpp>
 #include <boost/thread/condition_variable.hpp>
 
-namespace Seg3D
+namespace Core
 {
 
 class QtEventHandlerContext;
@@ -93,7 +95,7 @@ private:
 // object, so there is a clean interface between Interface and Application
 // layer.
 
-class QtEventHandlerContext : public Core::EventHandlerContext
+class QtEventHandlerContext : public EventHandlerContext
 {
 
 public:
@@ -106,14 +108,14 @@ public:
   // Post an event onto the event handler stack. This one
   // returns immediately after posting the event, and does
   // not wait for the process to finish the event.
-  virtual void post_event( Core::EventHandle& event );
+  virtual void post_event( EventHandle& event );
 
   // POST_AND_WAIT_EVENT:
   // Post an event onto the event handler stack. This one
   // returns after the thread signals that the event has been
   // executed. The function does the full hand shaking for
   // the synchronization.
-  virtual void post_and_wait_event( Core::EventHandle& event );
+  virtual void post_and_wait_event( EventHandle& event );
 
   // PROCESS_EVENT:
   // process the events that are queued in the event handler stack.
@@ -131,7 +133,7 @@ public:
 
   // START_EVENTHANDLER:
   // Start the eventhandler thread and start processing events
-  virtual bool start_eventhandler( Core::EventHandler* eventhandler );
+  virtual bool start_eventhandler( EventHandler* eventhandler );
   
   // EVENTHANDLER_STARTED:
   // Check whether the eventhandler is running
@@ -156,7 +158,7 @@ private:
   boost::thread::id interface_thread_id_;
 
   // Event queue
-  std::queue< Core::EventHandle > events_;
+  std::queue< EventHandle > events_;
 
   // Mutex for protecting the event queue
   typedef boost::recursive_mutex mutex_type;
@@ -164,6 +166,6 @@ private:
   mutex_type mutex_;
 };
 
-} // end namespace Seg3D
+} // end namespace Core
 
 #endif
