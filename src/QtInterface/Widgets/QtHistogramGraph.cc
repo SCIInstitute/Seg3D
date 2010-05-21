@@ -33,7 +33,7 @@
 // Interface includes
 #include <QtInterface/Widgets/QtHistogramGraph.h>
 
-namespace Core
+namespace QtUtils
 {
 
 QtHistogramGraph::QtHistogramGraph( QWidget *parent )
@@ -47,7 +47,7 @@ QtHistogramGraph::~QtHistogramGraph()
 {
 }
 
-void QtHistogramGraph::set_histogram( const Histogram& histogram )
+void QtHistogramGraph::set_histogram( const Core::Histogram& histogram )
 {
   this->histogram_ = histogram;
 }
@@ -82,4 +82,4 @@ void QtHistogramGraph::paintEvent(QPaintEvent * event )
     }
 }
 
-} // end namespace Core
+} // end namespace QtUtils

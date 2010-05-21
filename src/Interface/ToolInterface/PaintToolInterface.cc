@@ -26,20 +26,17 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#include <QComboBox>
+
 //Qt Gui Includes
 #include <Interface/ToolInterface/PaintToolInterface.h>
 #include "ui_PaintToolInterface.h"
 
 //Application Includes
 #include <Application/Tools/PaintTool.h>
-//#include <Application/Filters/Actions/ActionPaint.h>
 
 //QtInterface Includes
-#include <QtInterface/Utils/QtBridge.h>
-
-//Interface Includes
-#include <Interface/ToolInterface/CustomWidgets/TargetComboBox.h>
-#include <Interface/ToolInterface/CustomWidgets/MaskComboBox.h>
+#include <QtInterface/Bridge/QtBridge.h>
 
 
 namespace Seg3D
@@ -52,11 +49,11 @@ class PaintToolInterfacePrivate
 public:
   Ui::PaintToolInterface ui_;
 
-    Core::QtSliderIntCombo *brush_radius_;
-  Core::QtSliderDoubleCombo *upper_threshold_;
-  Core::QtSliderDoubleCombo *lower_threshold_;
-  TargetComboBox *target_;
-  MaskComboBox *mask_;
+    QtUtils::QtSliderIntCombo *brush_radius_;
+  QtUtils::QtSliderDoubleCombo *upper_threshold_;
+  QtUtils::QtSliderDoubleCombo *lower_threshold_;
+  QComboBox *target_;
+  QComboBox *mask_constraint_;
   
 };
 
@@ -79,20 +76,20 @@ bool PaintToolInterface::build_widget( QFrame* frame )
   this->private_->ui_.setupUi( frame );
 
   //Add the SliderSpinCombos
-  this->private_->brush_radius_ = new Core::QtSliderIntCombo( this, true );
+  this->private_->brush_radius_ = new QtUtils::QtSliderIntCombo( this, true );
   this->private_->ui_.verticalLayout->addWidget( this->private_->brush_radius_ );
 
-  this->private_->upper_threshold_ = new Core::QtSliderDoubleCombo( this, true );
+  this->private_->upper_threshold_ = new QtUtils::QtSliderDoubleCombo( this, true );
   this->private_->ui_.upperHLayout_bottom->addWidget( this->private_->upper_threshold_ );
   
-  this->private_->lower_threshold_ = new Core::QtSliderDoubleCombo( this, false );
+  this->private_->lower_threshold_ = new QtUtils::QtSliderDoubleCombo( this, false );
   this->private_->ui_.lowerHLayout_bottom->addWidget( this->private_->lower_threshold_ );
 
-  this->private_->target_ = new TargetComboBox( this );
+  this->private_->target_ = new QComboBox( this );
   this->private_->ui_.activeHLayout->addWidget( this->private_->target_ );
 
-  this->private_->mask_ = new MaskComboBox( this );
-  this->private_->ui_.maskHLayout->addWidget( this->private_->mask_ );
+  this->private_->mask_constraint_ = new QComboBox( this );
+  this->private_->ui_.maskHLayout->addWidget( this->private_->mask_constraint_ );
   
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
@@ -134,18 +131,13 @@ bool PaintToolInterface::build_widget( QFrame* frame )
   this->private_->ui_.eraseCheckBox->setChecked( tool->erase_state_->get() );
   
   //Step 4 - connect the gui to the tool through the QtBridge
-  Core::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
-  Core::QtBridge::Connect( this->private_->mask_, tool->mask_layer_state_ );
-  Core::QtBridge::Connect( this->private_->brush_radius_, tool->brush_radius_state_ );
-  Core::QtBridge::Connect( this->private_->upper_threshold_, tool->upper_threshold_state_ );
-  Core::QtBridge::Connect( this->private_->lower_threshold_, tool->lower_threshold_state_ );
-  Core::QtBridge::Connect( this->private_->ui_.eraseCheckBox, tool->erase_state_ );
-  
-  this->private_->target_->sync_layers();
-  this->private_->mask_->sync_layers();
-  
-  
-  
+  QtUtils::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
+  QtUtils::QtBridge::Connect( this->private_->mask_constraint_, tool->mask_constraint_layer_state_ );
+  QtUtils::QtBridge::Connect( this->private_->brush_radius_, tool->brush_radius_state_ );
+  QtUtils::QtBridge::Connect( this->private_->upper_threshold_, tool->upper_threshold_state_ );
+  QtUtils::QtBridge::Connect( this->private_->lower_threshold_, tool->lower_threshold_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.eraseCheckBox, tool->erase_state_ );
+    
     //Send a message to the log that we have finised with building the Paint Brush Interface
   CORE_LOG_MESSAGE("Finished building a Paint Brush Interface");
 
@@ -158,10 +150,6 @@ void PaintToolInterface::execute_filter()
   PaintTool* tool =
   dynamic_cast< PaintTool* > ( base_tool_.get() );
   
-//  ActionPaint::Dispatch( tool->target_layer_state_->export_to_string(), 
-//    tool->mask_layer_state_->export_to_string(), tool->brush_radius_state_->get(), 
-//    tool->upper_threshold_state_->get(), tool->lower_threshold_state_->get(),
-//    tool->erase_state_->get() ); 
 }
 
 } // end namespace Seg3D

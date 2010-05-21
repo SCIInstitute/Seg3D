@@ -27,7 +27,7 @@
  */
 
 //Interface Includes
-#include <QtInterface/Utils/QtBridge.h>
+#include <QtInterface/Bridge/QtBridge.h>
 
 //Interface Includes
 #include <Interface/ToolInterface/CustomWidgets/TargetComboBox.h>
@@ -49,8 +49,8 @@ class DiscreteGaussianFilterInterfacePrivate
 {
 public:
   Ui::DiscreteGaussianFilterInterface ui_;
-    Core::QtSliderDoubleCombo *variance_;
-  Core::QtSliderDoubleCombo *kernel_width_;
+    QtUtils::QtSliderDoubleCombo *variance_;
+  QtUtils::QtSliderDoubleCombo *kernel_width_;
   TargetComboBox *target_;
 };
 
@@ -72,10 +72,10 @@ bool DiscreteGaussianFilterInterface::build_widget( QFrame* frame )
   this->private_->ui_.setupUi( frame );
 
   //Add the SliderSpinCombos
-  this->private_->variance_ = new Core::QtSliderDoubleCombo();
+  this->private_->variance_ = new QtUtils::QtSliderDoubleCombo();
   this->private_->ui_.varianceHLayout_bottom->addWidget( this->private_->variance_ );
 
-  this->private_->kernel_width_ = new Core::QtSliderDoubleCombo();
+  this->private_->kernel_width_ = new QtUtils::QtSliderDoubleCombo();
   this->private_->ui_.kernelHLayout_bottom->addWidget( this->private_->kernel_width_ );
   
   this->private_->target_ = new TargetComboBox( this );
@@ -111,11 +111,11 @@ bool DiscreteGaussianFilterInterface::build_widget( QFrame* frame )
   this->private_->ui_.replaceCheckBox->setChecked( tool->replace_state_->get() );
         
   //Step 4 - connect the gui to the tool through the QtBridge
-  Core::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
+  QtUtils::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
   connect( this->private_->target_, SIGNAL( valid( bool ) ), this, SLOT( enable_run_filter( bool ) ) );
-  Core::QtBridge::Connect( this->private_->variance_, tool->variance_state_ );
-  Core::QtBridge::Connect( this->private_->kernel_width_, tool->maximum_kernel_width_state_ );
-  Core::QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
+  QtUtils::QtBridge::Connect( this->private_->variance_, tool->variance_state_ );
+  QtUtils::QtBridge::Connect( this->private_->kernel_width_, tool->maximum_kernel_width_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
   
   this->connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), this, SLOT( execute_filter() ) );
 

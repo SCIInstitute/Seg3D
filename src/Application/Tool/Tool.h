@@ -112,14 +112,6 @@ public:
   // activated.
   virtual void deactivate();
 
-protected:
-
-  void CreateLayerNameList( std::vector< std::string >& layer_names, Core::VolumeType type );
-  void CreateLayerNameList( std::vector< std::string >& layer_names, 
-    Core::VolumeType type, LayerGroupHandle layer_group );
-  void CreateLayerNameList( std::vector< std::string >& layer_names,
-    Core::VolumeType type, LayerGroupHandle layer_group, std::string exclude );
-
 public:
 
   const static std::string NONE_OPTION_C;

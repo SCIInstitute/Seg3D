@@ -63,20 +63,15 @@ private:
   void update_constraint_options();
 
 private:
-  std::vector< std::string > target_layer_options_;
-  std::vector< std::string > data_constraint_options_;
-  std::vector< std::string > mask_constraint_options_;
 
   size_t signal_block_count_;
 
   // -- state --
 public:
-  Core::StateStringHandle target_layer_state_;
-  Core::StateStringHandle mask_layer_state_;
 
-  Core::StateStringHandle target_layer_name_state_;
-  Core::StateStringHandle data_constraint_layer_name_state_;
-  Core::StateStringHandle mask_constraint_layer_name_state_;
+  Core::StateLabeledOptionHandle target_layer_state_;
+  Core::StateLabeledOptionHandle data_constraint_layer_state_;
+  Core::StateLabeledOptionHandle mask_constraint_layer_state_;
   
   // Radius of the brush
   Core::StateRangedIntHandle brush_radius_state_;

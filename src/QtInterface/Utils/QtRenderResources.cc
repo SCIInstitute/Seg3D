@@ -32,7 +32,7 @@
 
 #include <QtInterface/Utils/QtRenderResources.h>
 
-namespace Core
+namespace QtUtils
 {
 
 // CLASS: QtRenderContext
@@ -48,7 +48,7 @@ typedef boost::shared_ptr< QtRenderContext > QtRenderContextHandle;
 // need to do this ourselves using a smart pointer
 typedef boost::shared_ptr< QGLContext > QGLContextHandle;
 
-class QtRenderContext : public RenderContext
+class QtRenderContext : public Core::RenderContext
 {
   // -- constructor/ destructor --
 public:
@@ -133,13 +133,13 @@ bool QtRenderResourcesContext::create_render_context( Core::RenderContextHandle&
   CORE_LOG_DEBUG( std::string("qt_context->valid = ") + Core::ExportToString( qt_context->isValid() ) );
 
   // Bind the new context in the GUI independent wrapper class
-  context = RenderContextHandle( new QtRenderContext( qt_context ) );
+  context = Core::RenderContextHandle( new QtRenderContext( qt_context ) );
 
   return ( context->is_valid() );
 }
 
-QtRenderWidget*
-QtRenderResourcesContext::create_qt_render_widget( QWidget* parent, AbstractViewerHandle viewer )
+QtRenderWidget* QtRenderResourcesContext::create_qt_render_widget( QWidget* parent, 
+                          Core::AbstractViewerHandle viewer )
 {
   if ( !( shared_widget_.data() ) )
   {

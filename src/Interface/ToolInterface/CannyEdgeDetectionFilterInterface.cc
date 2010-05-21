@@ -27,7 +27,7 @@
  */
 
 //QtInterface Includes
-#include <QtInterface/Utils/QtBridge.h>
+#include <QtInterface/Bridge/QtBridge.h>
 
 //Interface Includes
 #include <Interface/ToolInterface/CustomWidgets/TargetComboBox.h>
@@ -50,9 +50,9 @@ class CannyEdgeDetectionFilterInterfacePrivate
 public:
   Ui::CannyEdgeDetectionFilterInterface ui_;
   
-  Core::QtSliderDoubleCombo *variance_;
-  Core::QtSliderDoubleCombo *max_error_;
-  Core::QtSliderDoubleCombo *threshold_;
+  QtUtils::QtSliderDoubleCombo *variance_;
+  QtUtils::QtSliderDoubleCombo *max_error_;
+  QtUtils::QtSliderDoubleCombo *threshold_;
   TargetComboBox *target_;
 };
 
@@ -74,13 +74,13 @@ bool CannyEdgeDetectionFilterInterface::build_widget( QFrame* frame )
   this->private_->ui_.setupUi( frame );
 
   //Add the SliderSpinCombos
-  this->private_->variance_ = new Core::QtSliderDoubleCombo();
+  this->private_->variance_ = new QtUtils::QtSliderDoubleCombo();
   this->private_->ui_.varianceHLayout_bottom->addWidget( this->private_->variance_ );
 
-  this->private_->max_error_ = new Core::QtSliderDoubleCombo();
+  this->private_->max_error_ = new QtUtils::QtSliderDoubleCombo();
   this->private_->ui_.errorHLayout_bottom->addWidget( this->private_->max_error_ );
 
-  this->private_->threshold_ = new Core::QtSliderDoubleCombo();
+  this->private_->threshold_ = new QtUtils::QtSliderDoubleCombo();
   this->private_->ui_.thresholdHLayout_bottom->addWidget( this->private_->threshold_ );
   
   this->private_->target_ = new TargetComboBox( this );
@@ -127,12 +127,12 @@ bool CannyEdgeDetectionFilterInterface::build_widget( QFrame* frame )
   this->private_->ui_.replaceCheckBox->setChecked(tool->replace_state_);
 
   //Step 4 - connect the gui to the tool through the QtBridge
-  Core::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
+  QtUtils::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
   this->connect( this->private_->target_, SIGNAL( valid( bool ) ), this, SLOT( enable_run_filter( bool ) ) );
-  Core::QtBridge::Connect( this->private_->variance_, tool->variance_state_ );
-  Core::QtBridge::Connect( this->private_->max_error_, tool->max_error_state_ );
-  Core::QtBridge::Connect( this->private_->threshold_, tool->threshold_state_ );
-  Core::QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
+  QtUtils::QtBridge::Connect( this->private_->variance_, tool->variance_state_ );
+  QtUtils::QtBridge::Connect( this->private_->max_error_, tool->max_error_state_ );
+  QtUtils::QtBridge::Connect( this->private_->threshold_, tool->threshold_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
   
   this->connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), this, SLOT( execute_filter() ) );
 

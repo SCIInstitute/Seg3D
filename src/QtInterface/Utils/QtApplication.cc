@@ -41,7 +41,7 @@
 #include <X11/Xlib.h>
 #endif
 
-namespace Core
+namespace QtUtils
 {
 
 CORE_SINGLETON_IMPLEMENTATION( QtApplication );

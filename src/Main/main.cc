@@ -86,7 +86,7 @@ int main( int argc, char **argv )
   Core::Application::Instance()->start_eventhandler();
 
   // -- Setup the QT Interface Layer --
-  if ( !( Core::QtApplication::Instance()->setup( argc, argv ) ) ) return ( -1 );
+  if ( !( QtUtils::QtApplication::Instance()->setup( argc, argv ) ) ) return ( -1 );
 
   // -- Setup Application Interface Window --
   AppInterface* app_interface = new AppInterface;
@@ -102,7 +102,7 @@ int main( int argc, char **argv )
   // the interface eventloop of the Application layer.
 
   // -- Run QT event loop --
-  if ( !( Core::QtApplication::Instance()->exec() ) ) return ( -1 );
+  if ( !( QtUtils::QtApplication::Instance()->exec() ) ) return ( -1 );
 
   // Indicate a successful finish of the program
   Core::Application::Instance()->log_finish();

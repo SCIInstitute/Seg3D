@@ -35,7 +35,7 @@
 // Boost includes
 #include <boost/shared_ptr.hpp>
 
-namespace Core
+namespace QtUtils
 {
 
 // Forward declarations
@@ -82,6 +82,6 @@ private:
   
 };
 
-}  // end namespace Core
+}  // end namespace QtUtils
 
 #endif

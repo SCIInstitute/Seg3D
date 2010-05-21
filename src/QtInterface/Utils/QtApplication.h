@@ -49,7 +49,7 @@
 // Qt includes
 #include <QApplication>
 
-namespace Core
+namespace QtUtils
 {
 
 // -- QtInterface class (singleton) --
@@ -98,6 +98,6 @@ private:
 
 };
 
-} // end namespace Core
+} // end namespace QtUtils
 
 #endif

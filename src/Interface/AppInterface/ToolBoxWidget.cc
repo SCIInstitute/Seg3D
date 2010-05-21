@@ -34,7 +34,7 @@
 #include <boost/lexical_cast.hpp>
 
 // Interface includes
-#include <QtInterface/Utils/QtBridge.h>
+#include <QtInterface/Bridge/QtBridge.h>
 
 // Application includes
 #include <Interface/AppInterface/StyleSheet.h>
@@ -136,8 +136,8 @@ void ToolBoxWidget::add_tool( QWidget * tool, const QString &label,
   //make all the proper connections
   connect( new_page.ui_.help_button_, SIGNAL( clicked() ), this, 
     SLOT( help_button_clicked() ) );
-  Core::QtBridge::Connect( new_page.ui_.activate_button_, activate_function );
-  Core::QtBridge::Connect( new_page.ui_.close_button_, close_function );
+  QtUtils::QtBridge::Connect( new_page.ui_.activate_button_, activate_function );
+  QtUtils::QtBridge::Connect( new_page.ui_.close_button_, close_function );
 
   set_active_tool( tool );
 

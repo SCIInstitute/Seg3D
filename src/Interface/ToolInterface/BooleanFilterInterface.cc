@@ -27,7 +27,7 @@
  */
 
 //QtInterface Includes
-#include <QtInterface/Utils/QtBridge.h>
+#include <QtInterface/Bridge/QtBridge.h>
 
 //Interface Includes
 #include <Interface/ToolInterface/CustomWidgets/MaskComboBox.h>
@@ -108,16 +108,16 @@ bool BooleanFilterInterface::build_widget( QFrame* frame )
   this->private_->ui_.replaceCheckBox->setChecked( tool->replace_state_->get() );
 
   //Step 4 - connect the gui to the tool through the QtBridge
-  Core::QtBridge::Connect( this->private_->mask_a_, tool->mask_a_state_ );
-  Core::QtBridge::Connect( this->private_->mask_b_, tool->mask_b_state_ );
-  Core::QtBridge::Connect( this->private_->mask_c_, tool->mask_c_state_ );
-  Core::QtBridge::Connect( this->private_->mask_d_, tool->mask_d_state_ );
+  QtUtils::QtBridge::Connect( this->private_->mask_a_, tool->mask_a_state_ );
+  QtUtils::QtBridge::Connect( this->private_->mask_b_, tool->mask_b_state_ );
+  QtUtils::QtBridge::Connect( this->private_->mask_c_, tool->mask_c_state_ );
+  QtUtils::QtBridge::Connect( this->private_->mask_d_, tool->mask_d_state_ );
   this->connect( this->private_->mask_a_, SIGNAL( valid( bool ) ), 
     this, SLOT( enable_run_filter( bool ) ) );
   
-  Core::QtBridge::Connect( this->private_->ui_.exampleExpComboBox, 
+  QtUtils::QtBridge::Connect( this->private_->ui_.exampleExpComboBox, 
     tool->example_expressions_state_ );
-  Core::QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
   
   connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), this, SLOT( execute_filter() ) );
   

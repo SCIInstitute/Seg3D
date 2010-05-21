@@ -35,7 +35,7 @@
 // Core includes
 #include <Core/Geometry/Color.h>
 
-namespace Core
+namespace QtUtils
 {
   
 class QtColorButton :
@@ -75,6 +75,6 @@ private:
   
 };
   
-} // end namespace Core
+} // end namespace QtUtils
 
 #endif

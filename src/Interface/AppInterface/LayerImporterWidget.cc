@@ -37,7 +37,7 @@
 #include <Application/LayerManager/Actions/ActionImportLayer.h>
 
 // QtInterface Includes
-#include <QtInterface/Utils/QtBridge.h>
+#include <QtInterface/Bridge/QtBridge.h>
 
 // Interface Includes
 #include <Interface/AppInterface/StyleSheet.h>

@@ -27,7 +27,7 @@
  */
 
 //QtInterface Includes
-#include <QtInterface/Utils/QtBridge.h>
+#include <QtInterface/Bridge/QtBridge.h>
 
 //Interface Includes
 #include <Interface/ToolInterface/CustomWidgets/TargetComboBox.h>
@@ -88,14 +88,14 @@ bool ArithmeticFilterInterface::build_widget( QFrame* frame )
   ArithmeticFilter* tool = dynamic_cast< ArithmeticFilter* > ( base_tool_.get() );
 
   //Step 3 - connect the gui to the tool through the QtBridge
-  Core::QtBridge::Connect( this->private_->volume_a_, tool->volume_a_state_ );
-  Core::QtBridge::Connect( this->private_->volume_b_, tool->volume_b_state_ );
-  Core::QtBridge::Connect( this->private_->volume_c_, tool->volume_c_state_ );
+  QtUtils::QtBridge::Connect( this->private_->volume_a_, tool->volume_a_state_ );
+  QtUtils::QtBridge::Connect( this->private_->volume_b_, tool->volume_b_state_ );
+  QtUtils::QtBridge::Connect( this->private_->volume_c_, tool->volume_c_state_ );
   this->connect( this->private_->volume_a_, SIGNAL( valid( bool ) ), 
     this, SLOT( enable_run_filter( bool ) ) );
   
-  Core::QtBridge::Connect( this->private_->ui_.exampleExpComboBox, tool->example_expressions_state_ );
-  Core::QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.exampleExpComboBox, tool->example_expressions_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
   
   this->connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), 
     this, SLOT( execute_filter() ) );

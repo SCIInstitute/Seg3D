@@ -75,24 +75,24 @@ public:
 
   // IMPORT_FROM_STRING:
   // Set the State from a string
-  virtual bool import_from_string( const std::string& str, Core::ActionSource source =
-      Core::ActionSource::NONE_E );
+  virtual bool import_from_string( const std::string& str, ActionSource source =
+      ActionSource::NONE_E );
 
 protected:
   // EXPORT_TO_VARIANT
   // Export the state data to a variant parameter
-  virtual void export_to_variant( Core::ActionParameterVariant& variant ) const;
+  virtual void export_to_variant( ActionParameterVariant& variant ) const;
 
   // IMPORT_FROM_VARIANT:
   // Import the state data from a variant parameter.
-  virtual bool import_from_variant( Core::ActionParameterVariant& variant, 
-    Core::ActionSource source = Core::ActionSource::NONE_E );
+  virtual bool import_from_variant( ActionParameterVariant& variant, 
+    ActionSource source = ActionSource::NONE_E );
 
   // VALIDATE_VARIANT:
   // Validate a variant parameter
   // This function returns false if the parameter is invalid or cannot be
   // converted and in that case error will describe the error.
-  virtual bool validate_variant( Core::ActionParameterVariant& variant, std::string& error );
+  virtual bool validate_variant( ActionParameterVariant& variant, std::string& error );
 
   // -- signals describing the state --
 public:
@@ -158,7 +158,7 @@ public:
   // NOTE: this function by passes the action mechanism and should only be used
   // to enforce a constraint from another action.
   bool set( const std::string& value, 
-    Core::ActionSource source = Core::ActionSource::NONE_E );
+    ActionSource source = ActionSource::NONE_E );
 
   // -- option list --
 protected:

@@ -37,7 +37,7 @@
 // QtInterface includes
 #include <QtInterface/Widgets/QtSliderDoubleCombo.h>
 
-namespace Core
+namespace QtUtils
 {
 
 class QtSliderDoubleComboPrivate
@@ -81,7 +81,7 @@ QtSliderDoubleCombo::~QtSliderDoubleCombo()
 void QtSliderDoubleCombo::spinner_signal( double value )
 {   
     this->private_->ui_.horizontalSlider->blockSignals( true );
-    int int_version = Round( value ) * 100;
+    int int_version = Core::Round( value ) * 100;
     this->private_->ui_.horizontalSlider->setValue( int_version );
     Q_EMIT valueAdjusted( value );
   this->private_->ui_.horizontalSlider->blockSignals( false );
@@ -188,4 +188,4 @@ void QtSliderDoubleCombo::block_signals( bool block )
     this->private_->ui_.spinBox->blockSignals( block ); 
 }
 
-}  // end namespace Core
+}  // end namespace QtUtils

@@ -36,7 +36,7 @@
 // QtInterface includes
 #include <QtInterface/Widgets/QtSliderIntCombo.h>
 
-namespace Core
+namespace QtUtils
 {
 
 class QtSliderIntComboPrivate
@@ -178,4 +178,4 @@ void QtSliderIntCombo::block_signals( bool block )
   this->private_->ui_.spinBox->blockSignals( block ); 
 }
 
-}  // end namespace Core
+}  // end namespace QtUtils

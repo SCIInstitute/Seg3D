@@ -41,7 +41,7 @@
 // Core includes
 #include <Core/DataBlock/Histogram.h>
 
-namespace Core
+namespace QtUtils
 {
 
 // Forward declaration
@@ -58,7 +58,7 @@ public:
     virtual ~QtHistogramWidget();
     
 public Q_SLOTS:
-  void set_histogram( const Histogram& histogram );
+  void set_histogram( const Core::Histogram& histogram );
 
 private:
   QtHistogramWidgetPrivateHandle private_;

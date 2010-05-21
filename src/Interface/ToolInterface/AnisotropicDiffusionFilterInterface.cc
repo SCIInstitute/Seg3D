@@ -39,7 +39,7 @@
 //#include <Application/Filters/Actions/ActionAnisotropicDiffusion.h>
 
 //QtInterface Includes
-#include <QtInterface/Utils/QtBridge.h>
+#include <QtInterface/Bridge/QtBridge.h>
 
 //Interface Includes
 #include <Interface/ToolInterface/CustomWidgets/TargetComboBox.h>
@@ -53,9 +53,9 @@ class AnisotropicDiffusionFilterInterfacePrivate
 {
 public:
   Ui::AnisotropicDiffusionFilterInterface ui_;
-  Core::QtSliderIntCombo *iterations_;
-  Core::QtSliderIntCombo *step_;
-  Core::QtSliderDoubleCombo *conductance_;
+  QtUtils::QtSliderIntCombo *iterations_;
+  QtUtils::QtSliderIntCombo *step_;
+  QtUtils::QtSliderDoubleCombo *conductance_;
   TargetComboBox *target_;
 };
 
@@ -76,13 +76,13 @@ bool AnisotropicDiffusionFilterInterface::build_widget( QFrame* frame )
   //Step 1 - build the Qt GUI Widget
   this->private_->ui_.setupUi( frame );
     
-  this->private_->iterations_ = new Core::QtSliderIntCombo();
+  this->private_->iterations_ = new QtUtils::QtSliderIntCombo();
   this->private_->ui_.iterationsHLayout_bottom->addWidget( this->private_->iterations_ );
 
-  this->private_->step_ = new Core::QtSliderIntCombo();
+  this->private_->step_ = new QtUtils::QtSliderIntCombo();
   this->private_->ui_.integrationHLayout_bottom->addWidget( this->private_->step_ );
 
-  this->private_->conductance_ = new Core::QtSliderDoubleCombo();
+  this->private_->conductance_ = new QtUtils::QtSliderDoubleCombo();
   this->private_->ui_.conductanceHLayout_bottom->addWidget( this->private_->conductance_ );
 
   this->private_->target_ = new TargetComboBox( this );
@@ -129,12 +129,12 @@ bool AnisotropicDiffusionFilterInterface::build_widget( QFrame* frame )
   this->private_->ui_.replaceCheckBox->setChecked(tool->replace_state_->get());
   
     //Step 4 - connect the gui to the tool through the QtBridge
-  Core::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
+  QtUtils::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
   connect( this->private_->target_, SIGNAL( valid( bool ) ), this, SLOT( enable_run_filter( bool ) ) );
-  Core::QtBridge::Connect( this->private_->iterations_, tool->iterations_state_ );
-  Core::QtBridge::Connect( this->private_->step_, tool->steps_state_ );
-  Core::QtBridge::Connect( this->private_->conductance_, tool->conductance_state_ );
-  Core::QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
+  QtUtils::QtBridge::Connect( this->private_->iterations_, tool->iterations_state_ );
+  QtUtils::QtBridge::Connect( this->private_->step_, tool->steps_state_ );
+  QtUtils::QtBridge::Connect( this->private_->conductance_, tool->conductance_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
   
   connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), this, SLOT( execute_filter() ) );
   

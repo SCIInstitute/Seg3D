@@ -33,7 +33,7 @@
 #include <QtInterface/Widgets/QtHistogramWidget.h>
 #include <QtInterface/Widgets/QtHistogramGraph.h>
 
-namespace Core
+namespace QtUtils
 {
 
 class QtHistogramWidgetPrivate 
@@ -61,7 +61,7 @@ QtHistogramWidget::~QtHistogramWidget()
 {
 }
 
-void QtHistogramWidget::set_histogram( const Histogram& histogram )
+void QtHistogramWidget::set_histogram( const Core::Histogram& histogram )
 {
   this->private_->histogram_graph_->set_histogram( histogram );
   this->private_->ui_.min->setText( QString::number( histogram.get_min() ) );
@@ -69,4 +69,4 @@ void QtHistogramWidget::set_histogram( const Histogram& histogram )
   this->private_->histogram_graph_->repaint();
 }
 
-} // end namespace Core
+} // end namespace QtUtils

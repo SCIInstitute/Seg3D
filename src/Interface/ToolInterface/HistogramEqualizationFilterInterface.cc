@@ -27,7 +27,7 @@
  */
 
 //QtInterface Includes
-#include <QtInterface/Utils/QtBridge.h>
+#include <QtInterface/Bridge/QtBridge.h>
 #include <QtInterface/Widgets/QtHistogramWidget.h>
 
 //Interface Includes
@@ -57,11 +57,11 @@ class HistogramEqualizationFilterInterfacePrivate
 public:
   Ui::HistogramEqualizationFilterInterface ui_;
     
-    Core::QtSliderDoubleCombo *upper_threshold_;
-  Core::QtSliderDoubleCombo *lower_threshold_;
-  Core::QtSliderIntCombo *alpha_;
+    QtUtils::QtSliderDoubleCombo *upper_threshold_;
+  QtUtils::QtSliderDoubleCombo *lower_threshold_;
+  QtUtils::QtSliderIntCombo *alpha_;
   TargetComboBox *target_;
-  Core::QtHistogramWidget *histogram_;
+  QtUtils::QtHistogramWidget *histogram_;
 };
 
 // constructor
@@ -82,19 +82,19 @@ bool HistogramEqualizationFilterInterface::build_widget( QFrame* frame )
   this->private_->ui_.setupUi( frame );
 
     //Add the SliderSpinCombos
-    this->private_->upper_threshold_ = new Core::QtSliderDoubleCombo();
+    this->private_->upper_threshold_ = new QtUtils::QtSliderDoubleCombo();
     this->private_->ui_.upperHLayout_bottom->addWidget( this->private_->upper_threshold_ );
 
-    this->private_->lower_threshold_ = new Core::QtSliderDoubleCombo();
+    this->private_->lower_threshold_ = new QtUtils::QtSliderDoubleCombo();
     this->private_->ui_.lowerHLayout_bottom->addWidget( this->private_->lower_threshold_ );
 
-    this->private_->alpha_ = new Core::QtSliderIntCombo();
+    this->private_->alpha_ = new QtUtils::QtSliderIntCombo();
     this->private_->ui_.alphaHLayout_bottom->addWidget( this->private_->alpha_ );
     
     this->private_->target_ = new TargetComboBox( this );
     this->private_->ui_.activeHLayout->addWidget( this->private_->target_ );
     
-    this->private_->histogram_ = new Core::QtHistogramWidget( this );
+    this->private_->histogram_ = new QtUtils::QtHistogramWidget( this );
     this->private_->ui_.histogramHLayout->addWidget( this->private_->histogram_ );
 
   //Step 2 - get a pointer to the tool
@@ -140,13 +140,13 @@ bool HistogramEqualizationFilterInterface::build_widget( QFrame* frame )
   this->private_->ui_.replaceCheckBox->setChecked( tool->replace_state_->get() );
 
   //Step 4 - connect the gui to the tool through the QtBridge
-  Core::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
+  QtUtils::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
   this->connect( this->private_->target_, SIGNAL( valid( bool ) ), this, SLOT( enable_run_filter( bool ) ) );
   this->connect( this->private_->target_, SIGNAL( currentIndexChanged( QString ) ), this, SLOT( refresh_histogram( QString ) ) );
-  Core::QtBridge::Connect( this->private_->upper_threshold_, tool->upper_threshold_state_ );
-  Core::QtBridge::Connect( this->private_->lower_threshold_, tool->lower_threshold_state_ );
-  Core::QtBridge::Connect( this->private_->alpha_, tool->alpha_state_ );
-  Core::QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
+  QtUtils::QtBridge::Connect( this->private_->upper_threshold_, tool->upper_threshold_state_ );
+  QtUtils::QtBridge::Connect( this->private_->lower_threshold_, tool->lower_threshold_state_ );
+  QtUtils::QtBridge::Connect( this->private_->alpha_, tool->alpha_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
   
   this->connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), this, SLOT( execute_filter() ) );
   this->private_->target_->sync_layers();

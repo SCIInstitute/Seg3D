@@ -43,15 +43,13 @@
 #include <boost/thread/mutex.hpp>
 
 // Core includes
-//#include <Core/Geometry/GridTransform.h>
-
-// Application includes
+#include <Core/Geometry/GridTransform.h>
 #include <Core/Application/Application.h>
 #include <Core/Interface/Interface.h>
-
 #include <Core/Action/Action.h>
 #include <Core/State/State.h>
 
+// Application includes
 #include <Application/Layer/Layer.h>
 
 namespace Seg3D
@@ -61,7 +59,7 @@ namespace Seg3D
 // This is the class that records the layers that are grouped together
 
 // Forward declarations
-
+typedef std::list< LayerHandle > layer_list_type;
 
 // Class definition
 class LayerGroup : public Core::StateHandler
@@ -188,6 +186,11 @@ public:
   {
     return layer_list_.empty();
   }
+
+  void get_layer_names( std::vector< LayerIDNamePair >& layer_names, 
+    Core::VolumeType type ) const;
+  void get_layer_names( std::vector< LayerIDNamePair >& layer_names, 
+    Core::VolumeType type, LayerHandle excluded_layer ) const;
   
 private:
   

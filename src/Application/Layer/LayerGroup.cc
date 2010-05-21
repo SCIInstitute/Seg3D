@@ -26,7 +26,9 @@
  DEALINGS IN THE SOFTWARE.
 */
 
+#include <Core/State/StateEngine.h>
 
+#include <Application/Layer/Layer.h>
 #include <Application/Layer/LayerGroup.h>
 
 namespace Seg3D
@@ -140,5 +142,39 @@ void LayerGroup::flip_layer()
 {
   
 }
-  
+
+void LayerGroup::get_layer_names( std::vector< LayerIDNamePair >& layer_names, 
+  Core::VolumeType type ) const
+{
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
+  size_t num_of_layers = this->layer_list_.size();
+  layer_list_type::const_iterator it = this->layer_list_.begin();
+  for ( ; it != this->layer_list_.end(); it++ )
+  {
+    if ( ( *it )->type() == type )
+    {
+      layer_names.push_back( std::make_pair( ( *it )->get_layer_id(),
+        ( *it )->get_layer_name() ) );
+    }
+  }
+}
+
+void LayerGroup::get_layer_names( std::vector< LayerIDNamePair >& layer_names, 
+  Core::VolumeType type, LayerHandle excluded_layer ) const
+{
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
+  size_t num_of_layers = this->layer_list_.size();
+  layer_list_type::const_iterator it = this->layer_list_.begin();
+  for ( ; it != this->layer_list_.end(); it++ )
+  {
+    if ( *it != excluded_layer && ( *it )->type() == type )
+    {
+      layer_names.push_back( std::make_pair( ( *it )->get_layer_id(),
+        ( *it )->get_layer_name() ) );
+    }
+  }
+}
+
 } // end namespace Seg3D

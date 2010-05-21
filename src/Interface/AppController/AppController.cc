@@ -35,7 +35,7 @@
 #include <Core/Interface/Interface.h>
 
 // Interface bridging includes
-#include <QtInterface/Utils/QtBridge.h>
+#include <QtInterface/Bridge/QtBridge.h>
 
 // Interface includes
 #include <Interface/AppController/AppController.h>
@@ -123,7 +123,7 @@ AppController::AppController( QWidget* parent ) :
   while ( it != it_end )
   {
     QAction* action_item = action_menu->addAction( QString::fromStdString( *it ) );
-    Core::QtBridge::Connect( action_item, boost::bind( &AppController::SetActionType, controller,
+    QtUtils::QtBridge::Connect( action_item, boost::bind( &AppController::SetActionType, controller,
         ( *it ) ) );
     ++it;
   }

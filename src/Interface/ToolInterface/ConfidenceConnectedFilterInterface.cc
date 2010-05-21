@@ -27,7 +27,7 @@
  */
 
 //QtInterface Includes
-#include <QtInterface/Utils/QtBridge.h>
+#include <QtInterface/Bridge/QtBridge.h>
 
 //Interface Includes
 #include <Interface/ToolInterface/CustomWidgets/TargetComboBox.h>
@@ -49,8 +49,8 @@ class ConfidenceConnectedFilterInterfacePrivate
 {
 public:
   Ui::ConfidenceConnectedFilterInterface ui_;
-    Core::QtSliderIntCombo *iterations_;
-  Core::QtSliderIntCombo *multiplier_;
+    QtUtils::QtSliderIntCombo *iterations_;
+  QtUtils::QtSliderIntCombo *multiplier_;
   TargetComboBox *target_;
 };
 
@@ -72,10 +72,10 @@ bool ConfidenceConnectedFilterInterface::build_widget( QFrame* frame )
   this->private_->ui_.setupUi( frame );
 
     //Add the SliderSpinCombos
-    this->private_->iterations_ = new Core::QtSliderIntCombo();
+    this->private_->iterations_ = new QtUtils::QtSliderIntCombo();
     this->private_->ui_.iterationsHLayout_bottom->addWidget( this->private_->iterations_ );
 
-    this->private_->multiplier_ = new Core::QtSliderIntCombo();
+    this->private_->multiplier_ = new QtUtils::QtSliderIntCombo();
     this->private_->ui_.multiplierHLayout_bottom->addWidget( this->private_->multiplier_ );
     
     this->private_->target_ = new TargetComboBox( this );
@@ -111,10 +111,10 @@ bool ConfidenceConnectedFilterInterface::build_widget( QFrame* frame )
    
 
   //Step 4 - connect the gui to the tool through the QtBridge
-  Core::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
+  QtUtils::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
   this->connect( this->private_->target_, SIGNAL( valid( bool ) ), this, SLOT( enable_run_filter( bool ) ) );
-  Core::QtBridge::Connect( this->private_->iterations_, tool->iterations_state_ );
-  Core::QtBridge::Connect( this->private_->multiplier_, tool->threshold_multiplier_state_ );
+  QtUtils::QtBridge::Connect( this->private_->iterations_, tool->iterations_state_ );
+  QtUtils::QtBridge::Connect( this->private_->multiplier_, tool->threshold_multiplier_state_ );
 
   this->connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), this, SLOT( execute_filter() ) );
   

@@ -36,7 +36,7 @@
 // QtInterface includes
 #include <QtInterface/Widgets/QtColorBarWidget.h>
 
-namespace Core
+namespace QtUtils
 {
 
 class QtColorBarWidgetPrivate

@@ -27,7 +27,7 @@
  */
 
 //QtInterface Includes
-#include <QtInterface/Utils/QtBridge.h>
+#include <QtInterface/Bridge/QtBridge.h>
 
 //Interface Includes
 #include <Interface/ToolInterface/CustomWidgets/TargetComboBox.h>
@@ -50,7 +50,7 @@ class OtsuThresholdFilterInterfacePrivate
 public:
   Ui::OtsuThresholdFilterInterface ui_;
   
-  Core::QtSliderIntCombo *order_;
+  QtUtils::QtSliderIntCombo *order_;
   TargetComboBox *target_;
 };
 
@@ -72,7 +72,7 @@ bool OtsuThresholdFilterInterface::build_widget( QFrame* frame )
   this->private_->ui_.setupUi( frame );
 
   // add sliderspincombos
-  this->private_->order_ = new Core::QtSliderIntCombo();
+  this->private_->order_ = new QtUtils::QtSliderIntCombo();
   this->private_->ui_.orderHLayout_bottom->addWidget( this->private_->order_ );
   
   // add TargetComboBox
@@ -96,10 +96,10 @@ bool OtsuThresholdFilterInterface::build_widget( QFrame* frame )
   this->private_->order_->setCurrentValue( tool->order_state_->get() );
   
   //Step 4 - connect the gui to the tool through the QtBridge
-  Core::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
+  QtUtils::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
   connect( this->private_->target_, SIGNAL( valid( bool ) ), 
     this, SLOT( enable_run_filter( bool ) ) );
-  Core::QtBridge::Connect( this->private_->order_, tool->order_state_ );
+  QtUtils::QtBridge::Connect( this->private_->order_, tool->order_state_ );
   
   connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), 
     this, SLOT( execute_filter() ) );

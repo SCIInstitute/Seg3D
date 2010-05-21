@@ -30,7 +30,7 @@
 #include <Application/PreferencesManager/PreferencesManager.h>
 
 // QtInterface includes
-#include <QtInterface/Utils/QtBridge.h>
+#include <QtInterface/Bridge/QtBridge.h>
 
 // Interface includes
 #include <Interface/AppPreferences/AppPreferences.h>
@@ -45,7 +45,7 @@ class AppPreferencesPrivate
 {
 public:
     Ui::AppPreferences ui_;
-  Core::QtSliderDoubleCombo* opacity_adjuster_;
+  QtUtils::QtSliderDoubleCombo* opacity_adjuster_;
   
   //QVector< ColorButton* > color_buttons_;
   QButtonGroup* color_button_group_;
@@ -99,7 +99,7 @@ void AppPreferences::setup_general_prefs()
   this->private_->ui_.path_->setText( QString::fromStdString( PreferencesManager::Instance()->
     project_path_state_->export_to_string() ) );
 
-  Core::QtBridge::Connect( this->private_->ui_.path_, PreferencesManager::Instance()->project_path_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.path_, PreferencesManager::Instance()->project_path_state_ );
 
   connect( this->private_->ui_.change_directory_button_, SIGNAL( clicked() ), 
     this, SLOT( change_project_directory() ) );
@@ -110,9 +110,9 @@ void AppPreferences::setup_general_prefs()
     PreferencesManager::Instance()->full_screen_on_startup_state_->get() );
   
   //Connect General Preferences 
-  Core::QtBridge::Connect( this->private_->ui_.consolidate_project_checkbox_, 
+  QtUtils::QtBridge::Connect( this->private_->ui_.consolidate_project_checkbox_, 
     PreferencesManager::Instance()->considate_project_state_ );
-  Core::QtBridge::Connect( this->private_->ui_.full_screen_on_startup_checkbox_, 
+  QtUtils::QtBridge::Connect( this->private_->ui_.full_screen_on_startup_checkbox_, 
     PreferencesManager::Instance()->full_screen_on_startup_state_ );
 }
 
@@ -124,7 +124,7 @@ void AppPreferences::setup_layer_prefs()
   for( int i = 0; i < 12; ++i )
   {
     // Step 1: create new buttons and add them to the button group
-    this->private_->color_button_group_->addButton( new Core::QtColorButton( 
+    this->private_->color_button_group_->addButton( new QtUtils::QtColorButton( 
       this, i, PreferencesManager::Instance()->color_states_[ i ]->get(), 25, 25 ), i );
     this->private_->ui_.color_h_layout_->addWidget( this->private_->color_button_group_->button( i ) );
     
@@ -134,7 +134,7 @@ void AppPreferences::setup_layer_prefs()
     this->private_->ui_.color_widget_picker_layout_->addWidget( this->private_->color_pickers_[ i ] );
     
     // Step 3: Connect the ColorPickerWidgets and the ColorButtons to each other and the state engine
-    Core::QtBridge::Connect( dynamic_cast< Core::QtColorButton* >( this->private_->color_button_group_->button( i ) ), 
+    QtUtils::QtBridge::Connect( dynamic_cast< QtUtils::QtColorButton* >( this->private_->color_button_group_->button( i ) ), 
       PreferencesManager::Instance()->color_states_[ i ] );
     connect( this->private_->color_pickers_[ i ], SIGNAL( color_set( Core::Color ) ), 
       this->private_->color_button_group_->button( i ), SLOT( set_color( Core::Color ) ) );
@@ -151,7 +151,7 @@ void AppPreferences::setup_layer_prefs()
   
 //Set Layers Preferences
   // Add SliderSpin Combo for adjusting the default opacity of the layers
-  this->private_->opacity_adjuster_ = new Core::QtSliderDoubleCombo( this );
+  this->private_->opacity_adjuster_ = new QtUtils::QtSliderDoubleCombo( this );
   this->private_->ui_.verticalLayout_2->addWidget( this->private_->opacity_adjuster_ );
   this->private_->opacity_adjuster_->setObjectName( QString::fromUtf8( "opacity_adjuster_" ) );
   
@@ -194,11 +194,11 @@ void AppPreferences::setup_layer_prefs()
     PreferencesManager::Instance()->default_mask_fill_state_->index() );
   
   //Connect Layers Preferences
-  Core::QtBridge::Connect( this->private_->opacity_adjuster_, 
+  QtUtils::QtBridge::Connect( this->private_->opacity_adjuster_, 
     PreferencesManager::Instance()->default_layer_opacity_state_ );
-  Core::QtBridge::Connect( this->private_->ui_.mask_fill_combobox_, 
+  QtUtils::QtBridge::Connect( this->private_->ui_.mask_fill_combobox_, 
     PreferencesManager::Instance()->default_mask_fill_state_ );
-  Core::QtBridge::Connect( this->private_->ui_.mask_border_combobox_, 
+  QtUtils::QtBridge::Connect( this->private_->ui_.mask_border_combobox_, 
     PreferencesManager::Instance()->default_mask_border_state_ );
   
   this->connect( this->private_->ui_.revert_to_defaults_button_, SIGNAL( clicked() ), 
@@ -210,7 +210,7 @@ void AppPreferences::set_buttons_to_default_colors()
   std::vector< Core::Color > temp_color_list = PreferencesManager::Instance()->get_default_colors();
   for( int i = 0; i < 12; ++i )
   {
-    dynamic_cast< Core::QtColorButton* >( this->private_->color_button_group_->button( i ) )->
+    dynamic_cast< QtUtils::QtColorButton* >( this->private_->color_button_group_->button( i ) )->
       set_color( temp_color_list[ i ] );
   }
 }
@@ -269,15 +269,15 @@ void AppPreferences::setup_viewer_prefs()
   
   
 //Connect Viewer Preferences
-  Core::QtBridge::Connect( this->private_->ui_.viewer_mode_combobox_, 
+  QtUtils::QtBridge::Connect( this->private_->ui_.viewer_mode_combobox_, 
     PreferencesManager::Instance()->default_viewer_mode_state_ );
-  Core::QtBridge::Connect( this->private_->ui_.background_color_combobox_, 
+  QtUtils::QtBridge::Connect( this->private_->ui_.background_color_combobox_, 
     PreferencesManager::Instance()->background_color_state_ );
-  Core::QtBridge::Connect( this->private_->ui_.grid_size_spinbox_, 
+  QtUtils::QtBridge::Connect( this->private_->ui_.grid_size_spinbox_, 
     PreferencesManager::Instance()->grid_size_state_ );
-  Core::QtBridge::Connect( this->private_->ui_.naming_convention_combobox_, 
+  QtUtils::QtBridge::Connect( this->private_->ui_.naming_convention_combobox_, 
     PreferencesManager::Instance()->naming_convention_state_ );
-  Core::QtBridge::Connect( this->private_->ui_.show_slice_numbers_checkbox_, 
+  QtUtils::QtBridge::Connect( this->private_->ui_.show_slice_numbers_checkbox_, 
     PreferencesManager::Instance()->show_slice_number_state_ );
 
 }
@@ -297,15 +297,15 @@ void AppPreferences::setup_sidebar_prefs()
     PreferencesManager::Instance()->show_history_bar_state_->get() );
   
 //Connect Sidebars Preferences
-  Core::QtBridge::Connect( this->private_->ui_.tools_filters_checkbox_, 
+  QtUtils::QtBridge::Connect( this->private_->ui_.tools_filters_checkbox_, 
     PreferencesManager::Instance()->show_tools_bar_state_ );
-  Core::QtBridge::Connect( this->private_->ui_.layer_manager_checkbox_, 
+  QtUtils::QtBridge::Connect( this->private_->ui_.layer_manager_checkbox_, 
     PreferencesManager::Instance()->show_layermanager_bar_state_ );
-  Core::QtBridge::Connect( this->private_->ui_.project_manager_checkbox_, 
+  QtUtils::QtBridge::Connect( this->private_->ui_.project_manager_checkbox_, 
     PreferencesManager::Instance()->show_projectmanager_bar_state_ );
-  Core::QtBridge::Connect( this->private_->ui_.measurement_checkbox_, 
+  QtUtils::QtBridge::Connect( this->private_->ui_.measurement_checkbox_, 
     PreferencesManager::Instance()->show_measurement_bar_state_ );
-  Core::QtBridge::Connect( this->private_->ui_.history_checkbox_, 
+  QtUtils::QtBridge::Connect( this->private_->ui_.history_checkbox_, 
     PreferencesManager::Instance()->show_history_bar_state_ );
   
 }

@@ -30,7 +30,7 @@
 #include <Application/PreferencesManager/PreferencesManager.h>
 
 // QtInterface includes
-#include <QtInterface/Utils/QtBridge.h>
+#include <QtInterface/Bridge/QtBridge.h>
 
 // Interface includes
 #include <Interface/AppPreferences/ColorPickerWidget.h>
@@ -45,9 +45,9 @@ class ColorPickerWidgetPrivate
 {
 public:
     Ui::ColorPickerWidget ui_;
-  Core::QtSliderIntCombo* r_adjuster_;
-  Core::QtSliderIntCombo* g_adjuster_;
-  Core::QtSliderIntCombo* b_adjuster_;
+  QtUtils::QtSliderIntCombo* r_adjuster_;
+  QtUtils::QtSliderIntCombo* g_adjuster_;
+  QtUtils::QtSliderIntCombo* b_adjuster_;
 
 };
 
@@ -58,19 +58,19 @@ ColorPickerWidget::ColorPickerWidget( QWidget *parent ) :
     private_->ui_.setupUi( this );
   
   // add the SliderCombo Widgets
-  this->private_->r_adjuster_ = new Core::QtSliderIntCombo( this );
+  this->private_->r_adjuster_ = new QtUtils::QtSliderIntCombo( this );
   this->private_->ui_.r_h_layout_->addWidget( this->private_->r_adjuster_ );
   this->private_->r_adjuster_->setObjectName( QString::fromUtf8( "r_adjuster_" ) );
   this->private_->r_adjuster_->setRange( 0, 255 );
   this->private_->r_adjuster_->setCurrentValue( 0 );
   
-  this->private_->g_adjuster_ = new Core::QtSliderIntCombo( this );
+  this->private_->g_adjuster_ = new QtUtils::QtSliderIntCombo( this );
   this->private_->ui_.g_h_layout_->addWidget( this->private_->g_adjuster_ );
   this->private_->g_adjuster_->setObjectName( QString::fromUtf8( "g_adjuster_" ) );
   this->private_->g_adjuster_->setRange( 0, 255 );
   this->private_->g_adjuster_->setCurrentValue( 0 );
   
-  this->private_->b_adjuster_ = new Core::QtSliderIntCombo( this );
+  this->private_->b_adjuster_ = new QtUtils::QtSliderIntCombo( this );
   this->private_->ui_.b_h_layout_->addWidget( this->private_->b_adjuster_ );
   this->private_->b_adjuster_->setObjectName( QString::fromUtf8( "b_adjuster_" ) );
   this->private_->b_adjuster_->setRange( 0, 255 );

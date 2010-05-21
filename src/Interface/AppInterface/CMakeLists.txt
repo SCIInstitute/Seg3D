@@ -166,6 +166,7 @@ TARGET_LINK_LIBRARIES(Interface_AppInterface
                       Application_Tools
                       QtInterface_Utils
                       QtInterface_Widgets
+            QtInterface_Bridge
                       Interface_AppController
             Interface_AppPreferences
                       ${QT_LIBRARIES} 

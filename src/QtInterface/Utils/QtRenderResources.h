@@ -47,7 +47,7 @@
 #include <Core/RenderResources/RenderResourcesContext.h>
 #include <Core/RenderResources/RenderContext.h>
 
-namespace Core
+namespace QtUtils
 {
 
 // CLASS: QtRenderResourcesContext
@@ -59,7 +59,7 @@ typedef boost::shared_ptr< QtRenderResourcesContext > QtRenderResourcesContextHa
 
 
 // Class definition
-class QtRenderResourcesContext : public RenderResourcesContext
+class QtRenderResourcesContext : public Core::RenderResourcesContext
 {
 
 public:
@@ -69,12 +69,12 @@ public:
 public:
   // CREATE_RENDER_CONTEXT:
   // Generate a render context for one of the viewers
-  virtual bool create_render_context( RenderContextHandle& context );
+  virtual bool create_render_context( Core::RenderContextHandle& context );
 
   // CREATE_QT_RENDER_WIDGET:
   // Get the Qt render context directly
   // NOTE: The viewers access this directly
-  QtRenderWidget* create_qt_render_widget( QWidget* parent, AbstractViewerHandle viewer );
+  QtRenderWidget* create_qt_render_widget( QWidget* parent, Core::AbstractViewerHandle viewer );
 
   // VALID_RENDER_RESOURCES:
   // Check whether valid render resources were installed
@@ -90,6 +90,6 @@ private:
 
 };
 
-} // end namespace Core
+} // end namespace QtUtils
 
 #endif

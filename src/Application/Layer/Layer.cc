@@ -44,7 +44,7 @@ namespace Seg3D
 {
 
 Layer::Layer( const std::string& name ) :
-  StateHandler( "layer", true ),
+  StateHandler( "$layer", true ),
   active_( false )
 { 
   // Step (1) : Build the layer specific state variables

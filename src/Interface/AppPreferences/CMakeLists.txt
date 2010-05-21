@@ -100,6 +100,7 @@ TARGET_LINK_LIBRARIES(Interface_AppPreferences
                       Core_ActionManager
                       QtInterface_Utils
                       QtInterface_Widgets
+            QtInterface_Bridge
             ${QT_LIBRARIES} 
                       ${SCI_BOOST_LIBRARY})
 

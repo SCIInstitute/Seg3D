@@ -38,7 +38,7 @@
 // Core includes
 #include <Core/DataBlock/Histogram.h>
 
-namespace Core
+namespace QtUtils
 {
 
 class QtHistogramGraph : public QWidget
@@ -50,15 +50,15 @@ public:
     virtual ~QtHistogramGraph();
     
 public:
-  void set_histogram( const Histogram& histogram );
+  void set_histogram( const Core::Histogram& histogram );
 
 protected:
     void paintEvent( QPaintEvent *event );
 
 private:
-  Histogram histogram_;
+  Core::Histogram histogram_;
 };
 
-} // end namespace Core
+} // end namespace QtUtils
 
 #endif

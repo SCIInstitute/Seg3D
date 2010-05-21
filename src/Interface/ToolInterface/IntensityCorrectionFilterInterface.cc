@@ -27,7 +27,7 @@
  */
 
 //QtInterface Includes
-#include <QtInterface/Utils/QtBridge.h>
+#include <QtInterface/Bridge/QtBridge.h>
 
 //Interface Includes
 #include <Interface/ToolInterface/CustomWidgets/TargetComboBox.h>
@@ -50,8 +50,8 @@ class IntensityCorrectionFilterInterfacePrivate
 public:
   Ui::IntensityCorrectionFilterInterface ui_;
   
-    Core::QtSliderIntCombo *order_;
-  Core::QtSliderDoubleCombo *edge_;
+    QtUtils::QtSliderIntCombo *order_;
+  QtUtils::QtSliderDoubleCombo *edge_;
   TargetComboBox *target_;
 };
 
@@ -73,10 +73,10 @@ bool IntensityCorrectionFilterInterface::build_widget( QFrame* frame )
   this->private_->ui_.setupUi( frame );
 
   //Add the SliderSpinCombos
-  this->private_->order_ = new Core::QtSliderIntCombo();
+  this->private_->order_ = new QtUtils::QtSliderIntCombo();
   this->private_->ui_.orderHLayout_bottom->addWidget( this->private_->order_ );
 
-  this->private_->edge_ = new Core::QtSliderDoubleCombo();
+  this->private_->edge_ = new QtUtils::QtSliderDoubleCombo();
   this->private_->ui_.edgeHLayout_bottom->addWidget( this->private_->edge_ );
   
   this->private_->target_ = new TargetComboBox( this );
@@ -113,12 +113,12 @@ bool IntensityCorrectionFilterInterface::build_widget( QFrame* frame )
 
 
   //Step 4 - connect the gui to the tool through the QtBridge
-  Core::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
+  QtUtils::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
   this->connect( this->private_->target_, SIGNAL( valid( bool ) ), 
     this, SLOT( enable_run_filter( bool ) ) );
-  Core::QtBridge::Connect( this->private_->order_, tool->order_state_ );
-  Core::QtBridge::Connect( this->private_->edge_, tool->edge_state_ );
-  Core::QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
+  QtUtils::QtBridge::Connect( this->private_->order_, tool->order_state_ );
+  QtUtils::QtBridge::Connect( this->private_->edge_, tool->edge_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
   
   this->connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), 
     this, SLOT( execute_filter() ) );

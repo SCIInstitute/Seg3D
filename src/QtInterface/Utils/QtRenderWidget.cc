@@ -38,22 +38,22 @@
 // Interface includes
 #include <QtInterface/Utils/QtRenderWidget.h>
 
-namespace Core
+namespace QtUtils
 {
 
 class QtRenderWidgetPrivate
 {
 
 public:
-  AbstractViewerHandle viewer_;
-  MouseHistory mouse_history_;
+  Core::AbstractViewerHandle viewer_;
+  Core::MouseHistory mouse_history_;
   QtRenderWidget* render_widget_;
 
   void update_display();
 };
 
 QtRenderWidget::QtRenderWidget( const QGLFormat& format, QWidget* parent, QtRenderWidget* share, 
-    AbstractViewerHandle viewer ) :
+    Core::AbstractViewerHandle viewer ) :
   QGLWidget( format, parent, share ),
   private_( new QtRenderWidgetPrivate )
 {
@@ -74,9 +74,9 @@ QtRenderWidget::~QtRenderWidget()
 
 void QtRenderWidgetPrivate::update_display()
 {
-  if ( !Interface::IsInterfaceThread() )
+  if ( !Core::Interface::IsInterfaceThread() )
   {
-    Interface::PostEvent( boost::bind( &QtRenderWidgetPrivate::update_display, this ) );
+    Core::Interface::PostEvent( boost::bind( &QtRenderWidgetPrivate::update_display, this ) );
     return;
   }
 
@@ -86,12 +86,12 @@ void QtRenderWidgetPrivate::update_display()
 void QtRenderWidget::initializeGL()
 {
   // This function calls all the pieces that need initialization using an OpenGL context
-  RenderResources::Instance()->init_render_resources();
+  Core::RenderResources::Instance()->init_render_resources();
 
-  if ( RenderResources::Instance()->valid_render_resources() )
+  if ( Core::RenderResources::Instance()->valid_render_resources() )
   {
     glClearColor( 0.5, 0.5, 0.5, 1.0 );
-    Texture::SetActiveTextureUnit( 0 );
+    Core::Texture::SetActiveTextureUnit( 0 );
     glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
 
     if ( this->private_->viewer_->get_renderer() ) 
@@ -114,8 +114,8 @@ void QtRenderWidget::paintGL()
   CORE_LOG_DEBUG("Start of paintGL");
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-  Texture2DHandle texture = this->private_->viewer_->get_texture();
-  Texture2DHandle overlay_texture = this->private_->viewer_->get_overlay_texture();
+  Core::Texture2DHandle texture = this->private_->viewer_->get_texture();
+  Core::Texture2DHandle overlay_texture = this->private_->viewer_->get_overlay_texture();
 
   if ( !texture || !overlay_texture )
   {
@@ -132,8 +132,8 @@ void QtRenderWidget::paintGL()
   glMatrixMode( GL_MODELVIEW );
   glLoadIdentity();
 
-  Texture::lock_type texture_lock( texture->get_mutex() );
-  Texture::lock_type overlay_texture_lock( overlay_texture->get_mutex() );
+  Core::Texture::lock_type texture_lock( texture->get_mutex() );
+  Core::Texture::lock_type overlay_texture_lock( overlay_texture->get_mutex() );
 
   texture->enable();
   glBegin( GL_QUADS );
@@ -260,7 +260,7 @@ void QtRenderWidget::hideEvent( QHideEvent* event )
   {
     this->private_->viewer_->get_renderer()->deactivate();
   }
-  ActionSet::Dispatch( this->private_->viewer_->viewer_visible_state_, false );
+  Core::ActionSet::Dispatch( this->private_->viewer_->viewer_visible_state_, false );
 }
 
 void QtRenderWidget::showEvent( QShowEvent* event )
@@ -270,7 +270,7 @@ void QtRenderWidget::showEvent( QShowEvent* event )
   {
     this->private_->viewer_->get_renderer()->activate();
   }
-  ActionSet::Dispatch( this->private_->viewer_->viewer_visible_state_, true );
+  Core::ActionSet::Dispatch( this->private_->viewer_->viewer_visible_state_, true );
 }
 
-} // end namespace Core
+} // end namespace QtUtils

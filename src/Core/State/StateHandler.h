@@ -44,6 +44,7 @@
 #include <Core/State/StateEngine.h>
 #include <Core/State/StateRangedValue.h>
 #include <Core/State/StateOption.h>
+#include <Core/State/StateLabeledOption.h>
 #include <Core/State/StateValue.h>
 #include <Core/State/StateVector.h>
 #include <Core/State/StateView2D.h>
@@ -119,6 +120,18 @@ public:
       this->create_state_id( key ), default_option, option_list ) );
     return this->add_statebase( state );
   }
+
+    // ADD_STATE:
+  // Add a local state variable with option list
+  template< class HANDLE >
+  bool add_state( const std::string& key, HANDLE& state, const std::string& default_option,
+      const std::vector< OptionLabelPair > option_list )
+  {
+    state = HANDLE( new typename HANDLE::element_type( 
+      this->create_state_id( key ), default_option, option_list ) );
+    return this->add_statebase( state );
+  }
+
 
   // ADD_STATE:
   // Add a local state variable without default value

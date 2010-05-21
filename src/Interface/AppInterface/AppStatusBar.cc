@@ -38,7 +38,7 @@
 #include <Core/Interface/Interface.h>
 
 // QtInterface includes
-#include <QtInterface/Utils/QtBridge.h>
+#include <QtInterface/Bridge/QtBridge.h>
 
 // Interface includes
 #include <Interface/AppInterface/AppStatusBar.h>

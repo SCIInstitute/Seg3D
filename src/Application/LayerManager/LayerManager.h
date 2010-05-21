@@ -47,7 +47,7 @@
 #include <Core/Geometry/BBox.h>
 
 // Application includes
-#include <Application/Layer/LayerGroup.h>
+#include <Application/Layer/LayerFWD.h>
 #include <Application/LayerManager/LayerScene.h>
 #include <Core/State/StateHandler.h>
 
@@ -69,7 +69,7 @@ private:
 
   
 public:
-  typedef std::list < LayerGroupHandle > group_handle_list_type;
+  typedef std::list < LayerGroupHandle > group_list_type;
   
   // Accessor Functions
 public:
@@ -83,7 +83,9 @@ public:
   LayerHandle get_layer_by_name( const std::string& layer_name );
   LayerHandle get_active_layer();
   
-  
+  void get_layer_names( std::vector< LayerIDNamePair >& layer_names, 
+    Core::VolumeType type );
+
   // Layer Action Functions
 public:
   bool insert_layer( LayerHandle layer );
@@ -110,8 +112,8 @@ private:
 
   // Typedef's for the Mutex
 public: 
-  typedef boost::recursive_mutex mutex_type;
-  typedef boost::unique_lock< mutex_type > lock_type;
+  typedef Core::StateEngine::mutex_type mutex_type;
+  typedef Core::StateEngine::lock_type lock_type;
   
   // GET_MUTEX:
   // Get the mutex, so it can be locked by the interface that is built
@@ -173,7 +175,7 @@ public:
   
 private:
     // list of the current groups 
-  group_handle_list_type group_handle_list_;
+  group_list_type group_list_;
   
   // currently active layer
   LayerHandle active_layer_;

@@ -35,20 +35,17 @@ SET(QTINTERFACE_UTILS_SRCS
   QtApplication.cc
   QtEventHandler.cc
   QtRenderResources.cc
-  QtBridge.cc
   QtRenderWidget.cc
 )
 
 SET(QTINTERFACE_UTILS_MOC_SRCS
   QtEventHandler.h
-  QtBridgeInternal.h
   QtRenderWidget.h
 )
 
 SET(QTINTERFACE_UTILS_NO_MOC_SRCS
   QtApplication.h
   QtRenderResources.h
-  QtBridge.h
 )
 
 SET(QTINTERFACE_UTILS_UI_SRCS
@@ -78,12 +75,12 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 # Build the Components library
 ##################################################
 
-CORE_ADD_LIBRARY( QtInterface_Utils
-            ${QTINTERFACE_UTILS_SRCS} 
-            ${QTINTERFACE_UTILS_QT_UI_SRCS}
-            ${QTINTERFACE_UTILS_QT_MOC_SRCS}
-            ${QTINTERFACE_UTILS_MOC_SRCS}
-            ${QTINTERFACE_UTILS_NO_MOC_SRCS} )
+CORE_ADD_LIBRARY(QtInterface_Utils
+         ${QTINTERFACE_UTILS_SRCS} 
+         ${QTINTERFACE_UTILS_QT_UI_SRCS}
+         ${QTINTERFACE_UTILS_QT_MOC_SRCS}
+         ${QTINTERFACE_UTILS_MOC_SRCS}
+         ${QTINTERFACE_UTILS_NO_MOC_SRCS})
             
 TARGET_LINK_LIBRARIES(QtInterface_Utils 
                       Core_Utils

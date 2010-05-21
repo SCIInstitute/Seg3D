@@ -57,11 +57,6 @@ namespace Seg3D
 // CLASS Layer
 // This is the main class for collecting state information on a layer
 
-// Forward declarations
-  
-typedef std::list < LayerGroupHandle > group_handle_list_type;
-typedef std::list< LayerHandle > layer_list_type;
-
 
 // Class definition
 class Layer : public Core::StateHandler

@@ -41,7 +41,7 @@
 #include <Application/ViewerManager/ViewerManager.h>
 
 // QtInterface includes
-#include <QtInterface/Utils/QtBridge.h>
+#include <QtInterface/Bridge/QtBridge.h>
 
 // Interface includes
 #include <Interface/AppInterface/AppMenu.h>
@@ -105,13 +105,13 @@ void AppMenu::create_layer_menu( QMenu* qmenu )
   qaction = qmenu->addAction( tr( "Import Layer... ") );
   qaction->setShortcut( tr( "Ctrl+Shift+O" ) );
   qaction->setToolTip( tr( "Import a new layer into the layer manager" ) );
-  Core::QtBridge::Connect( qaction, 
+  QtUtils::QtBridge::Connect( qaction, 
     boost::bind( &AppLayerIO::Import,  this->main_window_ ) );
 
   qaction = qmenu->addAction( tr( "Export Layer...") );
   qaction->setShortcut( tr( "Ctrl+Shift+S" ) );
   qaction->setToolTip( tr( "Export the active layer" ) );
-  Core::QtBridge::Connect( qaction, 
+  QtUtils::QtBridge::Connect( qaction, 
     boost::bind( &AppLayerIO::Export, this->main_window_ ) );
 }
 
@@ -125,56 +125,56 @@ void AppMenu::create_view_menu( QMenu* qmenu )
   qaction->setShortcut( tr( "Ctrl+F" ) );
   qaction->setToolTip( tr( "Toggle the view between full screen and normal" ) );
   qaction->setCheckable( true );
-  Core::QtBridge::Connect( qaction, InterfaceManager::Instance()->full_screen_state_ );
+  QtUtils::QtBridge::Connect( qaction, InterfaceManager::Instance()->full_screen_state_ );
 
   qmenu->addSeparator();
 
   qaction = qmenu->addAction( tr( "Only One Viewer" ) );
   qaction->setShortcut( tr( "ALT+0" ) );
   qaction->setToolTip( tr( "Set the view to one large view" ) );
-  Core::QtBridge::Connect( qaction, boost::bind(
+  QtUtils::QtBridge::Connect( qaction, boost::bind(
       &Core::ActionSet::Dispatch< Core::StateOptionHandle, std::string >,
       ViewerManager::Instance()->layout_state_, "single" ) );
 
   qaction = qmenu->addAction( tr( "One and One" ) );
   qaction->setShortcut( tr( "ALT+1" ) );
   qaction->setToolTip( tr( "Set the view to two large views" ) );
-  Core::QtBridge::Connect( qaction, boost::bind(
+  QtUtils::QtBridge::Connect( qaction, boost::bind(
       &Core::ActionSet::Dispatch< Core::StateOptionHandle, std::string >,
       ViewerManager::Instance()->layout_state_, "1and1" ) );
 
   qaction = qmenu->addAction( tr( "One and Two" ) );
   qaction->setShortcut( tr( "ALT+2" ) );
   qaction->setToolTip( tr( "Set the view one large and two smaller views" ) );
-  Core::QtBridge::Connect( qaction, boost::bind(
+  QtUtils::QtBridge::Connect( qaction, boost::bind(
       &Core::ActionSet::Dispatch< Core::StateOptionHandle, std::string >,
       ViewerManager::Instance()->layout_state_, "1and2" ) );
 
   qaction = qmenu->addAction( tr( "One and Three" ) );
   qaction->setShortcut( tr( "ALT+3" ) );
   qaction->setToolTip( tr( "Set the view one large and three smaller views" ) );
-  Core::QtBridge::Connect( qaction, boost::bind(
+  QtUtils::QtBridge::Connect( qaction, boost::bind(
       &Core::ActionSet::Dispatch< Core::StateOptionHandle, std::string >,
       ViewerManager::Instance()->layout_state_, "1and3" ) );
 
   qaction = qmenu->addAction( tr( "Two and Two" ) );
   qaction->setShortcut( tr( "ALT+4" ) );
   qaction->setToolTip( tr( "Set the view one large and three smaller views" ) );
-  Core::QtBridge::Connect( qaction, boost::bind(
+  QtUtils::QtBridge::Connect( qaction, boost::bind(
       &Core::ActionSet::Dispatch< Core::StateOptionHandle, std::string >,
       ViewerManager::Instance()->layout_state_, "2and2" ) );
 
   qaction = qmenu->addAction( tr( "Two and Three" ) );
   qaction->setShortcut( tr( "ALT+5" ) );
   qaction->setToolTip( tr( "Set the view two larger and three smaller views" ) );
-  Core::QtBridge::Connect( qaction, boost::bind(
+  QtUtils::QtBridge::Connect( qaction, boost::bind(
       &Core::ActionSet::Dispatch< Core::StateOptionHandle, std::string >,
       ViewerManager::Instance()->layout_state_, "2and3" ) );
 
   qaction = qmenu->addAction( tr( "Three and Three" ) );
   qaction->setShortcut( tr( "ALT+6" ) );
   qaction->setToolTip( tr( "Set the view to 6 equally sized views" ) );
-  Core::QtBridge::Connect( qaction, boost::bind(
+  QtUtils::QtBridge::Connect( qaction, boost::bind(
       &Core::ActionSet::Dispatch< Core::StateOptionHandle, std::string >,
       ViewerManager::Instance()->layout_state_, "3and3" ) );
 }
@@ -195,7 +195,7 @@ void AppMenu::create_tool_menu( QMenu* qmenu )
     qaction->setShortcut( QString::fromStdString( ( *it ).shortcut_key_ ) );
 
     // Connect the action with dispatching a command in the ToolManager
-    Core::QtBridge::Connect( qaction, 
+    QtUtils::QtBridge::Connect( qaction, 
       boost::bind( &ActionOpenTool::Dispatch, ( *it ).type_ ) );
     ++it;
   }
@@ -221,7 +221,7 @@ void AppMenu::create_filter_menu( QMenu* qmenu )
     qaction->setShortcut( QString::fromStdString( ( *it ).shortcut_key_ ) );
 
     // Connect the action with dispatching a command in the ToolManager
-    Core::QtBridge::Connect( qaction, 
+    QtUtils::QtBridge::Connect( qaction, 
       boost::bind( &ActionOpenTool::Dispatch, ( *it ).type_ ) );
     ++it;
   }
@@ -240,7 +240,7 @@ void AppMenu::create_filter_menu( QMenu* qmenu )
     qaction->setShortcut( QString::fromStdString( ( *it ).shortcut_key_ ) );
 
     // Connect the action with dispatching a command in the ToolManager
-    Core::QtBridge::Connect( qaction, 
+    QtUtils::QtBridge::Connect( qaction, 
       boost::bind( &ActionOpenTool::Dispatch, ( *it ).type_ ) );
     ++it;
   }
@@ -258,7 +258,7 @@ void AppMenu::create_filter_menu( QMenu* qmenu )
     qaction->setShortcut( QString::fromStdString( ( *it ).shortcut_key_ ) );
 
     // Connect the action with dispatching a command in the ToolManager
-    Core::QtBridge::Connect( qaction, 
+    QtUtils::QtBridge::Connect( qaction, 
       boost::bind( &ActionOpenTool::Dispatch, ( *it ).type_ ) );
     ++it;
   }
@@ -271,31 +271,31 @@ void AppMenu::create_window_menu( QMenu* qmenu )
   // Project Window
   qaction = qmenu->addAction( "Project Window" );
   qaction->setShortcut( tr( "Ctrl+Shift+P" ) );
-  Core::QtBridge::Connect( qaction, boost::bind( &ActionShowWindow::Dispatch, 
+  QtUtils::QtBridge::Connect( qaction, boost::bind( &ActionShowWindow::Dispatch, 
     std::string( "project" ) ) );
 
   // History Window
   qaction = qmenu->addAction( "History Window" );
   qaction->setShortcut( tr( "Ctrl+Shift+H" ) );
-  Core::QtBridge::Connect( qaction, boost::bind( &ActionShowWindow::Dispatch, 
+  QtUtils::QtBridge::Connect( qaction, boost::bind( &ActionShowWindow::Dispatch, 
     std::string( "history" ) ) );
 
   //Tools Window
   qaction = qmenu->addAction( "Tools Window" );
   qaction->setShortcut( tr( "Ctrl+Shift+T" ) );
-  Core::QtBridge::Connect( qaction, boost::bind( &ActionShowWindow::Dispatch, 
+  QtUtils::QtBridge::Connect( qaction, boost::bind( &ActionShowWindow::Dispatch, 
     std::string( "tools" ) ) );
 
   // Layer Manager Window
   qaction = qmenu->addAction( "Layer Manager Window" );
   qaction->setShortcut( tr( "Ctrl+Shift+L" ) );
-  Core::QtBridge::Connect( qaction, boost::bind( &ActionShowWindow::Dispatch, 
+  QtUtils::QtBridge::Connect( qaction, boost::bind( &ActionShowWindow::Dispatch, 
     std::string( "layermanager" ) ) );
 
   // Measurement Window
   qaction = qmenu->addAction( "Measurement Window" );
   qaction->setShortcut( tr( "Ctrl+Shift+M" ) );
-  Core::QtBridge::Connect( qaction, boost::bind( &ActionShowWindow::Dispatch, 
+  QtUtils::QtBridge::Connect( qaction, boost::bind( &ActionShowWindow::Dispatch, 
     std::string( "measurement" ) ) );
 
   qmenu->addSeparator();
@@ -303,13 +303,13 @@ void AppMenu::create_window_menu( QMenu* qmenu )
   // Controller Window
   qaction = qmenu->addAction( "Controller Window" );
   qaction->setShortcut( tr( "Ctrl+Shift+C" ) );
-  Core::QtBridge::Connect( qaction, boost::bind( &ActionShowWindow::Dispatch,
+  QtUtils::QtBridge::Connect( qaction, boost::bind( &ActionShowWindow::Dispatch,
       std::string( "controller" ) ) );
 
   // Preferences Window
   qaction = qmenu->addAction( "Preferences Window" );
   qaction->setShortcut( tr( "Ctrl+ALT+P" ) );
-  Core::QtBridge::Connect( qaction, boost::bind( &ActionShowWindow::Dispatch,
+  QtUtils::QtBridge::Connect( qaction, boost::bind( &ActionShowWindow::Dispatch,
     std::string( "preferences" ) ) );
 }
 

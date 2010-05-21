@@ -28,7 +28,7 @@
 
 #include <QtInterface/Widgets/QtColorButton.h>
 
-namespace Core
+namespace QtUtils
 {
   
 QtColorButton::QtColorButton( QWidget *parent, int index, Core::Color button_color,
@@ -80,4 +80,4 @@ void QtColorButton::trigger_signal( bool torf )
   Q_EMIT this->color_changed( this->index_ );
 }
   
-} // end namespace Core
+} // end namespace QtUtils

@@ -29,6 +29,9 @@
 #ifndef APPLICATION_LAYER_LAYERFWD_H
 #define APPLICATION_LAYER_LAYERFWD_H
 
+#include <utility>
+#include <string>
+
 // Boost includes 
 #include <boost/shared_ptr.hpp>
 
@@ -43,6 +46,8 @@ typedef boost::weak_ptr< LayerGroup > LayerGroupWeakHandle;
 class Layer;
 typedef boost::shared_ptr< Layer > LayerHandle;
 typedef boost::weak_ptr< Layer > LayerWeakHandle;
+
+typedef std::pair< std::string, std::string > LayerIDNamePair;
 
 } // end namespace Seg3D
 

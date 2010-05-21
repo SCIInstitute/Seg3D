@@ -43,7 +43,7 @@
 // QtInterface includes
 #include <QtInterface/Widgets/QtColorButton.h>
 
-namespace Core
+namespace QtUtils
 {
 
 class QtColorBarWidgetPrivate;
@@ -80,6 +80,6 @@ private:
   QtColorBarWidgetPrivateHandle private_;
 };
 
-} // end namespace Core
+} // end namespace QtUtils
 
 #endif

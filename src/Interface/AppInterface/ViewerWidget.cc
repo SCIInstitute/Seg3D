@@ -41,7 +41,7 @@
 
 // Qt Interface support classes
 #include <QtInterface/Utils/QtApplication.h>
-#include <QtInterface/Utils/QtBridge.h>
+#include <QtInterface/Bridge/QtBridge.h>
 #include <QtInterface/Utils/QtRenderResources.h>
 #include <QtInterface/Utils/QtRenderWidget.h>
 
@@ -60,7 +60,7 @@ public:
   ViewerWidgetPrivate( QWidget *parent, ViewerHandle viewer );
 
   QVBoxLayout* layout_;
-  Core::QtRenderWidget* render_widget_;
+  QtUtils::QtRenderWidget* render_widget_;
   
   QFrame* buttonbar_;
   QHBoxLayout* buttonbar_layout_;
@@ -247,7 +247,7 @@ ViewerWidgetPrivate::ViewerWidgetPrivate( QWidget *parent, ViewerHandle viewer )
   // --------------------------------------
   // Generate the OpenGL part of the widget
 
-  this->render_widget_ = Core::QtApplication::Instance()->qt_renderresources_context()->
+  this->render_widget_ = QtUtils::QtApplication::Instance()->qt_renderresources_context()->
     create_qt_render_widget( parent, viewer );
 
   if( this->render_widget_ == 0 )
@@ -372,16 +372,16 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
     this->change_view_type( qaction );
     this->private_->viewer_type_button_->setDefaultAction( qaction );
     
-    Core::QtBridge::Connect( this->private_->viewer_selection_, this->private_->viewer_->view_mode_state_ );
+    QtUtils::QtBridge::Connect( this->private_->viewer_selection_, this->private_->viewer_->view_mode_state_ );
 
     // NOTE: Connect StateBool to QAction instead of QToolButton, because calling 
     // setChecked on QToolButton won't change the underlying QAction.
     
-    Core::QtBridge::Connect( this->private_->picking_button_, 
+    QtUtils::QtBridge::Connect( this->private_->picking_button_, 
       this->private_->viewer_->is_picking_target_state_ );
-    Core::QtBridge::Connect( this->private_->grid_, 
+    QtUtils::QtBridge::Connect( this->private_->grid_, 
       this->private_->viewer_->slice_grid_state_ );
-    Core::QtBridge::Connect( this->private_->lock_, 
+    QtUtils::QtBridge::Connect( this->private_->lock_, 
       this->private_->viewer_->viewer_lock_state_ );
 
     this->connect( this->private_->viewer_selection_, SIGNAL( triggered( QAction* ) ),

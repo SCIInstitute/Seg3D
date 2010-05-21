@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef QTINTERFACE_UTILS_QTBRIDGE_H
-#define QTINTERFACE_UTILS_QTBRIDGE_H
+#ifndef QTINTERFACE_BRIDGE_QTBRIDGE_H
+#define QTINTERFACE_BRIDGE_QTBRIDGE_H
 
 // QT includes
 #include <QtGui/QCheckBox>
@@ -46,13 +46,14 @@
 #include <QtInterface/Widgets/QtColorBarWidget.h>
 
 // Core includes
+#include <Core/State/StateLabeledOption.h>
 #include <Core/State/StateName.h>
 #include <Core/State/StateValue.h>
 #include <Core/State/StateOption.h>
 #include <Core/State/StateVector.h>
 #include <Core/State/StateRangedValue.h>
 
-namespace Core
+namespace QtUtils
 {
 
 // CLASS QTBRIDGE:
@@ -69,7 +70,7 @@ public:
   
   // Coonnect a SliderIntCombo to a StateRangedIntValue
   static bool Connect( QtColorBarWidget* cbwidget, Core::StateIntHandle& state_handle,
-    std::vector<StateColorHandle>& colors );
+    std::vector< Core::StateColorHandle >& colors );
   
   // Coonnect a SliderIntCombo to a StateRangedIntValue
   static bool Connect( QtSliderIntCombo* sscombo, Core::StateRangedIntHandle& state_handle );
@@ -85,17 +86,19 @@ public:
   
   // Connect a QComboBox to StateOptionHandle
   static bool Connect( QComboBox* qcombobox, Core::StateOptionHandle& state_handle );
+
+  static bool Connect( QComboBox* qcombobox, Core::StateLabeledOptionHandle& state );
   
   static bool Connect( QComboBox* qcombobox, Core::StateStringHandle& state_handle );
 
   // Connect QToolButton & QPushButtons
   static bool Connect( QToolButton* qtoolbutton, Core::StateBoolHandle& state_handle );
   
-  static bool Connect( QtColorButton* colorbutton, Core::StateColorHandle& state_handle );
-  
   static bool Connect( QToolButton* qtoolbutton, boost::function< void() > function );
-
+  
   static bool Connect( QPushButton* qpushbutton, boost::function< void() > function );
+
+  static bool Connect( QtColorButton* colorbutton, Core::StateColorHandle& state_handle );
   
   // Coonect QLineEdits
   static bool Connect( QLineEdit* qlineedit, Core::StateStringHandle& state_handle );
@@ -115,6 +118,6 @@ public:
 
 };
 
-} // end namespace Core
+} // end namespace QtUtils
 
 #endif

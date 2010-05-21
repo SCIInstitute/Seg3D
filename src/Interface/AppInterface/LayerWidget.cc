@@ -33,7 +33,7 @@
 #include <Core/Utils/Log.h>
 
 //QtInterface Includes
-#include <QtInterface/Utils/QtBridge.h>
+#include <QtInterface/Bridge/QtBridge.h>
 #include <QtInterface/Widgets/QtColorBarWidget.h>
 
 //Interface Includes
@@ -62,13 +62,13 @@ class LayerWidgetPrivate
 {
 public:
   Ui::LayerWidget ui_;
-  Core::QtSliderDoubleCombo* opacity_adjuster_;
-  Core::QtSliderDoubleCombo* brightness_adjuster_;
-  Core::QtSliderDoubleCombo* contrast_adjuster_;
+  QtUtils::QtSliderDoubleCombo* opacity_adjuster_;
+  QtUtils::QtSliderDoubleCombo* brightness_adjuster_;
+  QtUtils::QtSliderDoubleCombo* contrast_adjuster_;
   PushDragButton* activate_button_;
   DropSpaceWidget* drop_space_;
   OverlayWidget* overlay_;
-  Core::QtColorBarWidget* color_widget_;
+  QtUtils::QtColorBarWidget* color_widget_;
 };
 
 LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
@@ -140,19 +140,19 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   this->private_->drop_space_->hide();
   
   // add the SliderCombo Widgets
-  this->private_->opacity_adjuster_ = new Core::QtSliderDoubleCombo( this->private_->ui_.opacity_bar_ );
+  this->private_->opacity_adjuster_ = new QtUtils::QtSliderDoubleCombo( this->private_->ui_.opacity_bar_ );
   this->private_->ui_.verticalLayout_2->addWidget( this->private_->opacity_adjuster_ );
   this->private_->opacity_adjuster_->setObjectName( QString::fromUtf8( "opacity_adjuster_" ) );
   
-  this->private_->brightness_adjuster_ = new Core::QtSliderDoubleCombo( this->private_->ui_.bright_contrast_bar_ );
+  this->private_->brightness_adjuster_ = new QtUtils::QtSliderDoubleCombo( this->private_->ui_.bright_contrast_bar_ );
   this->private_->ui_.brightness_h_layout_->addWidget( this->private_->brightness_adjuster_ );
   this->private_->brightness_adjuster_->setObjectName( QString::fromUtf8( "brightness_adjuster_" ) );
   
-  this->private_->contrast_adjuster_ = new Core::QtSliderDoubleCombo( this->private_->ui_.bright_contrast_bar_ );
+  this->private_->contrast_adjuster_ = new QtUtils::QtSliderDoubleCombo( this->private_->ui_.bright_contrast_bar_ );
   this->private_->ui_.contrast_h_layout_->addWidget( this->private_->contrast_adjuster_ );
   this->private_->contrast_adjuster_->setObjectName( QString::fromUtf8( "contrast_adjuster_" ) );
   
-  this->private_->color_widget_ = new Core::QtColorBarWidget( this->private_->ui_.color_bar_ );
+  this->private_->color_widget_ = new QtUtils::QtColorBarWidget( this->private_->ui_.color_bar_ );
   this->private_->ui_.verticalLayout_5->addWidget( this->private_->color_widget_ );
   this->private_->color_widget_->setObjectName( QString::fromUtf8( "color_widget_" ) );
   
@@ -207,14 +207,14 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
       SIGNAL( toggled( bool )), this, 
       SLOT( visual_lock( bool )));
       
-    Core::QtBridge::Connect( this->private_->activate_button_, 
+    QtUtils::QtBridge::Connect( this->private_->activate_button_, 
     boost::bind( &ActionActivateLayer::Dispatch, layer ) );
   
   // make the default connections, for any layer type, to the state engine
-  Core::QtBridge::Connect( this->private_->ui_.selection_checkbox_, layer->selected_state_ );
-  Core::QtBridge::Connect( this->private_->ui_.lock_button_, layer->lock_state_ );
-  Core::QtBridge::Connect( this->private_->opacity_adjuster_, layer->opacity_state_ );
-  Core::QtBridge::Connect( this->private_->ui_.label_, layer->name_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.selection_checkbox_, layer->selected_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.lock_button_, layer->lock_state_ );
+  QtUtils::QtBridge::Connect( this->private_->opacity_adjuster_, layer->opacity_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.label_, layer->name_state_ );
     
   switch( this->volume_type_ )
   {
@@ -229,8 +229,8 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
         this->private_->activate_button_->setIcon(this->data_layer_icon_);
         
         DataLayer* data_layer = dynamic_cast< DataLayer* >( layer.get() );
-        Core::QtBridge::Connect( this->private_->brightness_adjuster_, data_layer->brightness_state_ );
-        Core::QtBridge::Connect( this->private_->contrast_adjuster_, data_layer->contrast_state_ );
+        QtUtils::QtBridge::Connect( this->private_->brightness_adjuster_, data_layer->brightness_state_ );
+        QtUtils::QtBridge::Connect( this->private_->contrast_adjuster_, data_layer->contrast_state_ );
         
         // set the defaults for the brightness
                 double brightness_min = 0.0; 
@@ -269,9 +269,9 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
           this, SLOT( set_mask_background_color_from_preference_change( int ) ) );
 
         MaskLayer* mask_layer = dynamic_cast< MaskLayer* >( layer.get() );  
-        Core::QtBridge::Connect( this->private_->ui_.iso_surface_button_, mask_layer->show_isosurface_state_ );
-        Core::QtBridge::Connect( this->private_->ui_.border_selection_combo_, mask_layer->fill_state_ );
-        Core::QtBridge::Connect( this->private_->color_widget_, mask_layer->color_state_,
+        QtUtils::QtBridge::Connect( this->private_->ui_.iso_surface_button_, mask_layer->show_isosurface_state_ );
+        QtUtils::QtBridge::Connect( this->private_->ui_.border_selection_combo_, mask_layer->fill_state_ );
+        QtUtils::QtBridge::Connect( this->private_->color_widget_, mask_layer->color_state_,
           PreferencesManager::Instance()->color_states_ );
 
         this->private_->color_widget_->set_color_index( mask_layer->color_state_->get() );

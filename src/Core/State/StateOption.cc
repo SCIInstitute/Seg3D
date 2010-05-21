@@ -39,10 +39,10 @@ namespace Core
 StateOption::StateOption( const std::string& stateid, const std::string& default_value, 
   const std::string& option_list ) :
   StateBase( stateid ),
-  value_( default_value )
+  value_( Core::StringToLower( default_value ) )
 {
   // Unwrap the option lists
-  this->option_list_ = Core::SplitString( Core::StringToLower( option_list), "|" );
+  this->option_list_ = Core::SplitString( Core::StringToLower( option_list ), "|" );
 
   option_list_iterator_type it = 
     std::find( this->option_list_.begin(), this->option_list_.end(), this->value_ );
@@ -57,7 +57,7 @@ StateOption::StateOption( const std::string& stateid, const std::string& default
 StateOption::StateOption( const std::string& stateid, const std::string& default_value,
     const std::vector< std::string >& option_list ) :
   StateBase( stateid ),
-  value_( default_value )
+  value_( Core::StringToLower( default_value ) )
 {
   option_list_.resize( option_list.size() );
   for ( size_t j = 0; j < option_list.size(); j++ )
@@ -181,6 +181,9 @@ bool StateOption::is_option( const std::string& option )
 
 void StateOption::set_option_list( const std::vector< std::string >& option_list )
 {
+  // Lock the state engine so no other thread will be accessing it
+  StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
+
   option_list_ = option_list;
   option_list_iterator_type it = 
     std::find( this->option_list_.begin(), this->option_list_.end(), this->value_ );
@@ -196,12 +199,15 @@ void StateOption::set_option_list( const std::vector< std::string >& option_list
       value_ = "";
       this->index_ = -1;
     }
-    value_changed_signal_( value_, ActionSource::NONE_E );
-    state_changed_signal_();
+
+    lock.unlock();
+    this->value_changed_signal_( value_, ActionSource::NONE_E );
+    this->state_changed_signal_();
   }
   else
   {
     this->index_ = static_cast<int>( it - this->option_list_.begin() );
+    lock.unlock();
   }
 
   optionlist_changed_signal_();
@@ -209,6 +215,9 @@ void StateOption::set_option_list( const std::vector< std::string >& option_list
 
 void StateOption::set_option_list( const std::string& option_list )
 {
+  // Lock the state engine so no other thread will be accessing it
+  StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
+
   // Unwrap the option lists
   std::string option_list_string = Core::StringToLower( option_list );
 
@@ -239,12 +248,15 @@ void StateOption::set_option_list( const std::string& option_list )
       value_ = "";
       this->index_ = -1;
     }
+
+    lock.unlock();
     value_changed_signal_( value_, ActionSource::NONE_E );
     state_changed_signal_();
   }
   else
   {
     this->index_ = static_cast<int>( it - this->option_list_.begin() );
+    lock.unlock();
   }
 
   optionlist_changed_signal_();
@@ -252,6 +264,9 @@ void StateOption::set_option_list( const std::string& option_list )
 
 void StateOption::set_option_list( const std::string& option_list, const std::string& option )
 {
+  // Lock the state engine so no other thread will be accessing it
+  StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
+
   // Unwrap the option lists
   std::string option_list_string = Core::StringToLower( option_list );
 
@@ -269,6 +284,7 @@ void StateOption::set_option_list( const std::string& option_list, const std::st
   }
 
   std::string lower_option = Core::StringToLower( option );
+  bool value_changed = false;
 
   option_list_iterator_type it = 
     std::find( this->option_list_.begin(), this->option_list_.end(), lower_option );
@@ -284,8 +300,8 @@ void StateOption::set_option_list( const std::string& option_list, const std::st
       value_ = "";
       this->index_ = -1;
     }
-    value_changed_signal_( value_, ActionSource::NONE_E );
-    state_changed_signal_();
+
+    value_changed = true;
   }
   else
   {
@@ -293,11 +309,16 @@ void StateOption::set_option_list( const std::string& option_list, const std::st
     if ( value_ != lower_option )
     {
       value_ = lower_option;
-      value_changed_signal_( value_, ActionSource::NONE_E );
-      state_changed_signal_();
+      value_changed = true;
     }
   }
 
+  lock.unlock();
+  if ( value_changed )
+  {
+    value_changed_signal_( value_, ActionSource::NONE_E );
+    state_changed_signal_();
+  }
   optionlist_changed_signal_();
 }
 

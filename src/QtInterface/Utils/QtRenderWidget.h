@@ -45,7 +45,7 @@
 #include <Core/RenderResources/RenderResources.h> 
 #include <Core/Viewer/AbstractViewer.h>
 
-namespace Core
+namespace QtUtils
 {
 
 class QtRenderWidget;
@@ -122,6 +122,6 @@ private:
   QtRenderWidgetPrivateHandle private_;
 };
 
-} // end namespace Core
+} // end namespace QtUtils
 
 #endif

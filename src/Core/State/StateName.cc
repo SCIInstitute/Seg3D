@@ -219,10 +219,10 @@ bool StateName::set( const std::string& value, ActionSource source )
       return true;
     }
 
-    if ( source == ActionSource::INTERFACE_E &&
-      value.size() == 0 )
+    if ( value.size() == 0 )
     {
       this->value_changed_signal_( this->private_->value_, this->private_->value_, source );
+      this->state_changed_signal_();
       return false;
     }
 

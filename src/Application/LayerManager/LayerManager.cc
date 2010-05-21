@@ -32,17 +32,18 @@
 // Boost includes 
 #include <boost/lexical_cast.hpp>
 
-// Volume includes
+// Core includes
+#include <Core/Application/Application.h>
+#include <Core/Interface/Interface.h>
 #include <Core/Volume/Volume.h>
 
 // Application includes
-#include <Application/LayerManager/LayerManager.h>
-#include <Core/Application/Application.h>
-#include <Core/Interface/Interface.h>
+#include <Application/Layer/LayerGroup.h>
 #include <Application/Layer/MaskLayer.h>
 #include <Application/Layer/DataLayer.h>
 
 // Application action includes
+#include <Application/LayerManager/LayerManager.h>
 #include <Application/LayerManager/Actions/ActionInsertLayer.h>
 
 
@@ -76,8 +77,8 @@ bool LayerManager::insert_layer( LayerHandle layer )
       dynamic_cast< MaskLayer* >( layer.get() )->color_state_->set( this->color_counter_++ % 11 );
     
     LayerGroupHandle group_handle;
-    for ( group_handle_list_type::iterator it = group_handle_list_.begin(); 
-       it != group_handle_list_.end(); ++it )
+    for ( group_list_type::iterator it = group_list_.begin(); 
+       it != group_list_.end(); ++it )
     {
             
       if (layer->get_grid_transform() == ( *it )->get_grid_transform()) 
@@ -91,7 +92,7 @@ bool LayerManager::insert_layer( LayerHandle layer )
     {
       //TODO add logic for handling where the layer should go
       group_handle = LayerGroupHandle( new LayerGroup(  layer->get_grid_transform() ) );
-      group_handle_list_.push_back( group_handle );
+      group_list_.push_back( group_handle );
       
       CORE_LOG_DEBUG( std::string("Set Active Layer: ") + layer->get_layer_id());
 
@@ -149,7 +150,7 @@ bool LayerManager::move_group_above( std::string group_to_move_id, std::string g
     if( ( !group_above || !group_below ) || ( group_above == group_below ) )
       return false;
 
-    this->group_handle_list_.remove( group_above );
+    this->group_list_.remove( group_above );
     index = this->insert_group( group_above, group_below );
 
   }
@@ -162,16 +163,16 @@ int LayerManager::insert_group( LayerGroupHandle group_above, LayerGroupHandle g
 {
   int index = 0;
 
-  for( group_handle_list_type::iterator i = this->group_handle_list_.begin(); 
-    i != this->group_handle_list_.end(); ++i )
+  for( group_list_type::iterator i = this->group_list_.begin(); 
+    i != this->group_list_.end(); ++i )
   {
     if( ( *i ) == group_below )
     {
       // First we get the size of the list before the insert
-      int list_size = static_cast< int >( this->group_handle_list_.size() );
+      int list_size = static_cast< int >( this->group_list_.size() );
 
       // Second we insert the layer
-      this->group_handle_list_.insert( ++i, group_above );
+      this->group_list_.insert( ++i, group_above );
       
       // Finally we return the proper location for the gui to insert the group
       return abs( index - list_size ) - 1;
@@ -225,7 +226,7 @@ bool LayerManager::move_layer_above( std::string layer_to_move_id, std::string l
       //  from the list of groups and signal the GUI
       if( group_above->get_layer_list().empty() )
       {   
-        group_handle_list_.remove( group_above );
+        group_list_.remove( group_above );
         group_above_has_been_deleted = true;
         
       }
@@ -288,8 +289,8 @@ LayerGroupHandle LayerManager::get_layer_group( std::string group_id )
 {
     lock_type lock( this->get_mutex() );
     
-  for( group_handle_list_type::iterator i = group_handle_list_.begin(); 
-    i != group_handle_list_.end(); ++i )
+  for( group_list_type::iterator i = group_list_.begin(); 
+    i != group_list_.end(); ++i )
   {
     if (( *i )->get_group_id() == group_id ) 
     {
@@ -303,8 +304,8 @@ LayerHandle LayerManager::get_layer_by_id( const std::string& layer_id )
 {
   lock_type lock( this->get_mutex() );
 
-  for( group_handle_list_type::iterator i = group_handle_list_.begin(); 
-    i != group_handle_list_.end(); ++i )
+  for( group_list_type::iterator i = group_list_.begin(); 
+    i != group_list_.end(); ++i )
   {
     for( layer_list_type::iterator j = ( *i )->layer_list_.begin(); 
       j != ( *i )->layer_list_.end(); ++j )
@@ -322,8 +323,8 @@ LayerHandle LayerManager::get_layer_by_name( const std::string& layer_name )
 {
   lock_type lock( this->get_mutex() );
 
-  for( group_handle_list_type::iterator i = group_handle_list_.begin(); 
-    i != group_handle_list_.end(); ++i )
+  for( group_list_type::iterator i = group_list_.begin(); 
+    i != group_list_.end(); ++i )
   {
     for( layer_list_type::iterator j = ( *i )->layer_list_.begin(); 
       j != ( *i )->layer_list_.end(); ++j )
@@ -341,8 +342,8 @@ void LayerManager::get_groups( std::vector< LayerGroupHandle > &vector_of_groups
 {
     lock_type lock( this->get_mutex() );
     
-  for( group_handle_list_type::iterator i = group_handle_list_.begin(); 
-    i != group_handle_list_.end(); ++i )
+  for( group_list_type::iterator i = group_list_.begin(); 
+    i != group_list_.end(); ++i )
   {
     vector_of_groups.push_back( *i );
   } 
@@ -353,8 +354,8 @@ void LayerManager::get_layers( std::vector< LayerHandle > &vector_of_layers )
 {
     lock_type lock( this->get_mutex() );
     
-  for( group_handle_list_type::iterator i = group_handle_list_.begin(); 
-    i != group_handle_list_.end(); ++i )
+  for( group_list_type::iterator i = group_list_.begin(); 
+    i != group_list_.end(); ++i )
   {
       for( layer_list_type::iterator j = ( *i )->layer_list_.begin(); 
     j != ( *i )->layer_list_.end(); ++j )
@@ -392,15 +393,15 @@ void LayerManager::delete_layers( LayerGroupHandle group )
     
     if( group->is_empty() )
     {   
-      group_handle_list_.remove( group );
+      group_list_.remove( group );
     }
 
     if ( active_layer_deleted )
     {
       this->active_layer_.reset();
-      if ( this->group_handle_list_.size() > 0 )
+      if ( this->group_list_.size() > 0 )
       {
-        this->active_layer_ = this->group_handle_list_.front()->layer_list_.back();
+        this->active_layer_ = this->group_list_.front()->layer_list_.back();
         this->active_layer_->set_active( true );
         active_layer_changed = true;
       }
@@ -443,8 +444,8 @@ LayerSceneHandle LayerManager::compose_layer_scene( size_t viewer_id )
   LayerSceneHandle layer_scene( new LayerScene );
 
   // For each layer group
-  group_handle_list_type::iterator group_iterator = this->group_handle_list_.begin();
-  for ( ; group_iterator != this->group_handle_list_.end(); group_iterator++)
+  group_list_type::iterator group_iterator = this->group_list_.begin();
+  for ( ; group_iterator != this->group_list_.end(); group_iterator++)
   {
     layer_list_type layer_list = ( *group_iterator )->get_layer_list();
 
@@ -511,8 +512,8 @@ Core::BBox LayerManager::get_layers_bbox()
   lock_type lock( this->get_mutex() );
 
   Core::BBox bbox;
-  group_handle_list_type::iterator group_iterator = this->group_handle_list_.begin();
-  for ( ; group_iterator != this->group_handle_list_.end(); group_iterator++)
+  group_list_type::iterator group_iterator = this->group_list_.begin();
+  for ( ; group_iterator != this->group_list_.end(); group_iterator++)
   {
     LayerGroupHandle group = *group_iterator;
     const Core::GridTransform& grid_trans = group->get_grid_transform();
@@ -525,6 +526,24 @@ Core::BBox LayerManager::get_layers_bbox()
   }
 
   return bbox;
+}
+
+void LayerManager::get_layer_names( std::vector< LayerIDNamePair >& layer_names, 
+    Core::VolumeType type )
+{
+  lock_type lock( this->get_mutex() );
+
+  std::vector< LayerHandle > layers;
+  LayerManager::Instance()->get_layers( layers );
+  size_t num_of_layers = layers.size();
+  for ( size_t i = 0; i < num_of_layers; i++ )
+  {
+    if ( layers[ i ]->type() == type )
+    {
+      layer_names.push_back( std::make_pair( layers[ i ]->get_layer_id(), 
+        layers[ i ]->get_layer_name() ) );
+    }
+  }
 }
 
 } // end namespace seg3D
