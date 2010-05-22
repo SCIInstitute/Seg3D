@@ -146,7 +146,7 @@ int AbstractViewer::get_width()
 int AbstractViewer::get_height()
 {
   lock_type lock( this->get_mutex() );
-  return this->private_->width_;
+  return this->private_->height_;
 }
 
 void AbstractViewer::set_texture( Core::Texture2DHandle texture, bool delay_update )
