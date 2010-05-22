@@ -45,7 +45,6 @@
 #include <QtInterface/Bridge/detail/QtAbstractButtonConnector.h>
 #include <QtInterface/Bridge/detail/QtActionConnector.h>
 #include <QtInterface/Bridge/detail/QtActionGroupConnector.h>
-#include <QtInterface/Bridge/detail/QtCheckBoxConnector.h>
 #include <QtInterface/Bridge/detail/QtColorButtonConnector.h>
 #include <QtInterface/Bridge/detail/QtColorBarWidgetConnector.h>
 #include <QtInterface/Bridge/detail/QtComboBoxConnector.h>
@@ -57,9 +56,15 @@
 namespace QtUtils
 {
 
-bool QtBridge::Connect( QCheckBox* qcheckbox, Core::StateBoolHandle& state )
+bool QtBridge::Connect( QAbstractButton* qbutton, Core::StateBoolHandle& state )
 {
-  new QtCheckBoxConnector( qcheckbox, state );
+  new QtAbstractButtonConnector( qbutton, state );
+  return true;
+}
+
+bool QtBridge::Connect( QAbstractButton* qbutton, boost::function< void() > function )
+{
+  new QtAbstractButtonConnector( qbutton, function );
   return true;
 }
 
@@ -121,24 +126,6 @@ bool QtBridge::Connect( QtColorBarWidget* colorbar_widget,
 bool QtBridge::Connect( QtSliderDoubleCombo* sscombo, Core::StateRangedDoubleHandle& state )
 {
   new QtSliderDoubleComboConnector( sscombo, state );
-  return true;
-}
-
-bool QtBridge::Connect( QToolButton* qtoolbutton, boost::function< void() > function )
-{
-  new QtAbstractButtonConnector( qtoolbutton, function );
-  return true;
-}
-
-bool QtBridge::Connect( QToolButton* qtoolbutton, Core::StateBoolHandle& state )
-{
-  new QtAbstractButtonConnector( qtoolbutton, state );
-  return true;
-}
-
-bool QtBridge::Connect( QPushButton* qpushbutton, boost::function< void() > function )
-{
-  new QtAbstractButtonConnector( qpushbutton, function );
   return true;
 }
 

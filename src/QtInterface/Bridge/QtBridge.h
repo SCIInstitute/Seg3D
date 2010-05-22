@@ -30,12 +30,10 @@
 #define QTINTERFACE_BRIDGE_QTBRIDGE_H
 
 // QT includes
-#include <QtGui/QCheckBox>
+#include <QtGui/QAbstractButton>
 #include <QtGui/QDoubleSpinBox>
 #include <QtGui/QSpinBox>
 #include <QtGui/QComboBox>
-#include <QtGui/QToolButton>
-#include <QtGui/QPushButton>
 #include <QtGui/QLineEdit>
 #include <QtGui/QActionGroup>
 
@@ -65,8 +63,10 @@ class QtBridge : public boost::noncopyable
   // -- widget/menu connectors --
 public:
 
-  // Connect a QCheckBox to StateValue<bool>
-  static bool Connect( QCheckBox* qcheckbox, Core::StateBoolHandle& state_handle );
+  // Connect a QAbstractButton or its subclasses to StateValue<bool>
+  static bool Connect( QAbstractButton* qbutton, Core::StateBoolHandle& state );
+  
+  static bool Connect( QAbstractButton* qbutton, boost::function< void() > function );
   
   // Coonnect a SliderIntCombo to a StateRangedIntValue
   static bool Connect( QtColorBarWidget* cbwidget, Core::StateIntHandle& state_handle,
@@ -90,13 +90,6 @@ public:
   static bool Connect( QComboBox* qcombobox, Core::StateLabeledOptionHandle& state );
   
   static bool Connect( QComboBox* qcombobox, Core::StateStringHandle& state_handle );
-
-  // Connect QToolButton & QPushButtons
-  static bool Connect( QToolButton* qtoolbutton, Core::StateBoolHandle& state_handle );
-  
-  static bool Connect( QToolButton* qtoolbutton, boost::function< void() > function );
-  
-  static bool Connect( QPushButton* qpushbutton, boost::function< void() > function );
 
   static bool Connect( QtColorButton* colorbutton, Core::StateColorHandle& state_handle );
   

@@ -34,7 +34,6 @@
 SET(QTINTERFACE_BRIDGE_SRCS
   QtBridge.cc
   detail/QtComboBoxConnector.cc
-  detail/QtCheckBoxConnector.cc
   detail/QtSpinBoxConnector.cc
   detail/QtLineEditConnector.cc
   detail/QtSliderIntComboConnector.cc
@@ -49,7 +48,6 @@ SET(QTINTERFACE_BRIDGE_SRCS
 SET(QTINTERFACE_BRIDGE_MOC_SRCS
   detail/QtConnectorBase.h
   detail/QtComboBoxConnector.h
-  detail/QtCheckBoxConnector.h
   detail/QtSpinBoxConnector.h
   detail/QtLineEditConnector.h
   detail/QtSliderIntComboConnector.h
