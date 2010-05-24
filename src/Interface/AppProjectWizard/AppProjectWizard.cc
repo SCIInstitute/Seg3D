@@ -37,7 +37,7 @@ namespace Seg3D
 AppProjectWizard::AppProjectWizard( QWidget *parent ) :
     QWizard( parent )
 {
-    this->addPage( new IntroPage );
+    //this->addPage( new IntroPage );
     this->addPage( new ProjectInfoPage );
     this->addPage( new SummaryPage );
   

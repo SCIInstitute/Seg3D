@@ -59,7 +59,7 @@ AppSplash::AppSplash( QWidget *parent ) :
   
   // Disable these since they arent being used yet.
   this->private_->ui_.load_recent_button_->setEnabled( false );
-  this->private_->ui_.existing_project_button_->setEnabled( false );
+  //this->private_->ui_.existing_project_button_->setEnabled( false );
   
   this->populate_recent_projects();
     
@@ -86,8 +86,8 @@ void AppSplash::new_project()
 void AppSplash::open_existing()
 {
   //QDir project_directory_;
-  QString path = QFileDialog::getOpenFileName( this, "Open Seg3D2 Project",
-    QString::fromStdString( ProjectManager::Instance()->current_project_path_state_->get() ) ); 
+//  QString path = QFileDialog::getOpenFileName( this, "Open Seg3D2 Project",
+//    QString::fromStdString( ProjectManager::Instance()->current_project_path_state_->get() ) ); 
   this->close();
 }
   
