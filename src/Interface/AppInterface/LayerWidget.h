@@ -149,8 +149,9 @@ private:
   // be represented properly in the gui
   bool active_;
   bool picked_up_;
-  bool group_menus_open_;
   bool layer_menus_open_;
+  bool group_menus_open_;
+  
   
   LayerWidget* drop_layer_;
 

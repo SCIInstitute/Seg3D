@@ -74,7 +74,8 @@ bool LayerManager::insert_layer( LayerHandle layer )
     CORE_LOG_DEBUG( std::string("Insert New Layer: ") + layer->get_layer_id());
     
     if( layer->type() == Core::VolumeType::MASK_E )
-      dynamic_cast< MaskLayer* >( layer.get() )->color_state_->set( this->color_counter_++ % 11 );
+      dynamic_cast< MaskLayer* >( layer.get() )->color_state_->
+      set( this->color_counter_++ % 11 );
     
     LayerGroupHandle group_handle;
     for ( group_list_type::iterator it = group_list_.begin(); 
@@ -473,7 +474,8 @@ LayerSceneHandle LayerManager::compose_layer_scene( size_t viewer_id )
           data_layer_scene_item->data_volume_ = data_layer->get_data_volume();
           data_layer_scene_item->contrast_ = data_layer->contrast_state_->get();
           data_layer_scene_item->brightness_ = data_layer->brightness_state_->get();
-          data_layer_scene_item->volume_rendered_ = data_layer->volume_rendered_state_->get();
+          data_layer_scene_item->volume_rendered_ = data_layer->
+            volume_rendered_state_->get();
         }
         break;
       case Core::VolumeType::MASK_E:
@@ -485,7 +487,8 @@ LayerSceneHandle LayerManager::compose_layer_scene( size_t viewer_id )
           mask_layer_scene_item->color_ = mask_layer->color_state_->get();
           mask_layer_scene_item->border_ = mask_layer->border_state_->index();
           mask_layer_scene_item->fill_ = mask_layer->fill_state_->get();
-          mask_layer_scene_item->show_isosurface_ = mask_layer->show_isosurface_state_->get();
+          mask_layer_scene_item->show_isosurface_ = mask_layer->
+            show_isosurface_state_->get();
         }
         break;
       default:

@@ -76,13 +76,18 @@ ColorPickerWidget::ColorPickerWidget( QWidget *parent ) :
   this->private_->b_adjuster_->setRange( 0, 255 );
   this->private_->b_adjuster_->setCurrentValue( 0 );
   
-  this->connect( this, SIGNAL( color_changed()), this, SLOT( set_color() ) );
-      
-  this->connect( this->private_->r_adjuster_, SIGNAL( valueAdjusted( int ) ), this, SLOT( set_r( int ) ) );
-  this->connect( this->private_->g_adjuster_, SIGNAL( valueAdjusted( int ) ), this, SLOT( set_g( int ) ) );
-  this->connect( this->private_->b_adjuster_, SIGNAL( valueAdjusted( int ) ), this, SLOT( set_b( int ) ) );
-  
-  this->connect( this->private_->ui_.set_color_button_, SIGNAL( clicked() ), this, SLOT( signal_color_set() ) );
+
+  connect( this, SIGNAL( color_changed() ), this, SLOT( set_color() ) );
+
+  connect( this->private_->r_adjuster_, SIGNAL( valueAdjusted( int ) ), 
+    this, SLOT( set_r( int ) ) );
+  connect( this->private_->g_adjuster_, SIGNAL( valueAdjusted( int ) ), 
+    this, SLOT( set_g( int ) ) );
+  connect( this->private_->b_adjuster_, SIGNAL( valueAdjusted( int ) ),
+    this, SLOT( set_b( int ) ) );
+  connect( this->private_->ui_.set_color_button_, SIGNAL( clicked() ), 
+    this, SLOT( signal_color_set() ) );
+
 
 }
 
@@ -92,8 +97,6 @@ ColorPickerWidget::~ColorPickerWidget()
   
 void ColorPickerWidget::set_color()
 {
-  
-  
   QString style_sheet = QString::fromUtf8( "QWidget#color_sample_{"
     "background-color: rgb(" ) + QString::number( this->r_ ) +
     QString::fromUtf8( ", " ) + QString::number( this->g_ ) +
@@ -104,28 +107,27 @@ void ColorPickerWidget::set_color()
   this->private_->ui_.color_sample_->repaint();
 }
   
-  void ColorPickerWidget::hide_show( Core::Color color, bool show )
+void ColorPickerWidget::hide_show( Core::Color color, bool show )
+{
+  if ( !show )
   {
-    if ( !show )
-    {
-      this->setVisible( false );
-      return;
-    }
-
-    this->set_r( color.r() );
-    this->set_g( color.g() );
-    this->set_b( color.b() );
-    
-    this->private_->r_adjuster_->setCurrentValue( this->r_ );
-    this->private_->g_adjuster_->setCurrentValue( this->g_ );
-    this->private_->b_adjuster_->setCurrentValue( this->b_ );
-    
-    this->set_color();
-    
-    this->setVisible( true );
-    
+    this->setVisible( false );
+    return;
   }
+
+  this->set_r( color.r() );
+  this->set_g( color.g() );
+  this->set_b( color.b() );
   
+  this->private_->r_adjuster_->setCurrentValue( this->r_ );
+  this->private_->g_adjuster_->setCurrentValue( this->g_ );
+  this->private_->b_adjuster_->setCurrentValue( this->b_ );
+  
+  this->set_color();
+  
+  this->setVisible( true );
+  
+}
   
 void ColorPickerWidget::set_r( int r )
 {

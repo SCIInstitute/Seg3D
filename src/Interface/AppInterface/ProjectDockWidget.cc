@@ -25,11 +25,17 @@
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
  */
-#include <sstream>
-#include <iostream>
 
+// Core includes
 #include <Core/Utils/Log.h>
 
+//QtInterface Includes
+#include <QtInterface/Bridge/QtBridge.h>
+
+//Application includes
+#include <Application/ProjectManager/ProjectManager.h>
+
+// Interface includes
 #include <Interface/AppInterface/ProjectDockWidget.h>
 #include "ui_ProjectDockWidget.h"
 
@@ -48,9 +54,13 @@ ProjectDockWidget::ProjectDockWidget( QWidget *parent ) :
   QDockWidget( parent ), 
   private_( new ProjectDockWidgetPrivate )
 {
-  if( private_ )
+  if( this->private_ )
   {
-    private_->ui_.setupUi( this );
+    this->private_->ui_.setupUi( this );
+    QtUtils::QtBridge::Connect( this->private_->ui_.project_name_edit_, 
+      ProjectManager::Instance()->current_project_->project_name_state_ );
+    //this->private_->ui_.project_name_edit_->setText( QString::fromStdString( 
+//      ProjectManager::Instance()->current_project_name() ) );
   }
 }
 
@@ -58,5 +68,7 @@ ProjectDockWidget::~ProjectDockWidget()
 {
 
 }
+  
+
 
 } // end namespace Seg3D

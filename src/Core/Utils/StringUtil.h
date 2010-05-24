@@ -75,6 +75,8 @@ std::string ExportToString( const std::string& value );
 
 std::string ExportToString( const std::vector< char >& value );
 std::string ExportToString( const std::vector< unsigned char>& value);
+  
+std::string ExportToString( const std::vector< std::string >& value);
 
 std::string ExportToString( const std::vector< short >& value );
 std::string ExportToString( const std::vector< unsigned short>& value);
@@ -93,6 +95,8 @@ std::string ExportToString( const std::vector< double >& value );
 
 std::string ExportToString( const std::vector< float >& value, int percision );
 std::string ExportToString( const std::vector< double >& value, int percision );
+  
+  
 
 // Import functions from strings
 bool ImportFromString( const std::string& str, bool& value );
@@ -119,6 +123,8 @@ bool ImportFromString( const std::string& str, std::string& value );
 
 bool ImportFromString( const std::string& str, std::vector< char >& value );
 bool ImportFromString( const std::string& str, std::vector< unsigned char>& value);
+  
+bool ImportFromString( const std::string& str, std::vector< std::string >& value);
 
 bool ImportFromString( const std::string& str, std::vector< short >& value );
 bool ImportFromString( const std::string& str, std::vector< unsigned short >& value);

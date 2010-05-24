@@ -69,6 +69,8 @@ TARGET_LINK_LIBRARIES(Seg3D
   Interface_AppInterface
   Interface_AppController
   Interface_AppPreferences
+  Interface_AppProjectWizard
+  Interface_AppSplash
   Interface_ToolInterface
   Init_Init
 )

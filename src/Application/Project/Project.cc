@@ -1,22 +1,22 @@
 /*
  For more information, please see: http://software.sci.utah.edu
- 
+
  The MIT License
- 
+
  Copyright (c) 2009 Scientific Computing and Imaging Institute,
  University of Utah.
- 
- 
+
+
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
  the rights to use, copy, modify, merge, publish, distribute, sublicense,
  and/or sell copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included
  in all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -26,39 +26,42 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_APPINTERFACE_SPLASHSTART_H
-#define INTERFACE_APPINTERFACE_SPLASHSTART_H
-
-// QT includes
-#include <QtGui>
-
 // STL includes
-#include <string>
 
 // Boost includes
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/thread.hpp>
-#include <boost/shared_ptr.hpp>
+#include <boost/filesystem.hpp>
+
+// Core includes
+#include <Core/Application/Application.h>
+#include <Core/Utils/StringUtil.h>
+
+// Application includes
+#include <Application/Project/Project.h>
+#include <Application/PreferencesManager/PreferencesManager.h>
 
 namespace Seg3D
 {
 
-class SplashStartPrivate;
-
-class SplashStart : public QDialog
+Project::Project( const std::string& project_name ) :
+  StateHandler( "project", false )
+{ 
+  add_state( "project_name", project_name_state_, project_name );
+  add_state( "auto_consolidate_files", auto_consolidate_files_state_, true );
+  add_state( "save_custom_colors", save_custom_colors_state_, false );
+  
+}
+  
+Project::~Project()
 {
-Q_OBJECT
 
-public:
-  SplashStart( QDialog* parent = 0 );
-  virtual ~SplashStart();
+}
 
-private:
-  // Internals of the dockwidget
-  boost::shared_ptr< SplashStartPrivate > private_;
+  void Project::initialize_from_file( const std::string& project_path )
+{
+  boost::filesystem::path temp_path = project_path;
+  load_states( temp_path );
+  
+}
 
-};
+} // end namespace Seg3D
 
-} // end namespace
-
-#endif // SPLASHSTART_H

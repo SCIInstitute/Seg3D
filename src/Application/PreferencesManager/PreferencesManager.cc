@@ -50,14 +50,14 @@ PreferencesManager::PreferencesManager() :
   StateHandler( "preferences", false )
 { 
   // Initialize the local config directory path
-  Core::Application::Instance()->get_config_directory( local_config_path_ );
-  local_config_path_ = local_config_path_ / "user_prefs.cfg";
+  Core::Application::Instance()->get_config_directory( this->local_config_path_ );
+  this->local_config_path_ = this->local_config_path_ / "user_prefs.cfg";
 
   if(  initialize_default_colors() )
     this->initialize_states();
 
   // After we initialize the states, we then load the saved preferences from file.
-  load_states( local_config_path_ );
+  load_states( this->local_config_path_ );
   
 }
 
@@ -67,12 +67,12 @@ PreferencesManager::~PreferencesManager()
 
 void PreferencesManager::save_state()
 {
-  save_states( local_config_path_ );
+  save_states( this->local_config_path_ );
 }
 
 Core::Color PreferencesManager::get_color( int index ) const
 {
-  assert( index >= 0 && index < this->color_states_.size() );
+  assert( index >= 0 && index < static_cast< int >( this->color_states_.size() ) );
   return this->color_states_[ index ]->get();
 }
 
@@ -94,8 +94,6 @@ void PreferencesManager::initialize_states()
   add_state( "background_color", background_color_state_, "black", 
     "black|lightgray|darkgray|gray|fuchsia" );
   add_state( "show_slice_number", show_slice_number_state_, true );
-  add_state( "naming_convention", naming_convention_state_, "sagital/axial/coronal", 
-    "sagital/axial/coronal|x/y/z" );
   
   //Layers Preferences
   add_state( "default_layer_opacity", default_layer_opacity_state_, 1.0, 0.0, 1.0, 0.01 );
@@ -123,21 +121,20 @@ void PreferencesManager::initialize_states()
 
 bool PreferencesManager::initialize_default_colors()
 {
-  // perhaps a better color wheel http://www.thisoldhouse.com/toh/photos/0,,20161202,00.html
-  this->default_colors_.push_back( Core::Color( 251, 255, 74 ) );
-  this->default_colors_.push_back( Core::Color( 248, 188, 37 ) );
-  this->default_colors_.push_back( Core::Color( 248, 152, 28 ) );
-  this->default_colors_.push_back( Core::Color( 251, 78, 15 ) );
+  this->default_colors_.push_back( Core::Color( 106, 22, 102 ) );
+  this->default_colors_.push_back( Core::Color( 198, 0, 34 ) );
+  this->default_colors_.push_back( Core::Color( 210, 70, 38 ) );
+  this->default_colors_.push_back( Core::Color( 221, 120, 47 ) );
   
-  this->default_colors_.push_back( Core::Color( 252, 21, 17 ) );
-  this->default_colors_.push_back( Core::Color( 166, 12, 73 ) );
-  this->default_colors_.push_back( Core::Color( 135, 0, 172 ) );
-  this->default_colors_.push_back( Core::Color( 66, 0, 161 ) );
+  this->default_colors_.push_back( Core::Color( 237, 177, 53 ) );
+  this->default_colors_.push_back( Core::Color( 241, 235, 69 ) );
+  this->default_colors_.push_back( Core::Color( 112, 181, 66 ) );
+  this->default_colors_.push_back( Core::Color( 21, 143, 67 ) );
   
-  this->default_colors_.push_back( Core::Color( 45, 66, 250 ) );
-  this->default_colors_.push_back( Core::Color( 32, 146, 204 ) );
-  this->default_colors_.push_back( Core::Color( 100, 177, 61 ) );
-  this->default_colors_.push_back( Core::Color( 205, 235, 66 ) );
+  this->default_colors_.push_back( Core::Color( 33, 131, 130 ) );
+  this->default_colors_.push_back( Core::Color( 41, 93, 153 ) );
+  this->default_colors_.push_back( Core::Color( 28, 60, 116 ) );
+  this->default_colors_.push_back( Core::Color( 35, 31, 98 ) );
   
   return true;
 }

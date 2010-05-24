@@ -76,11 +76,11 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   private_( new LayerWidgetPrivate ),
   layer_id_( layer->get_layer_id() ),
   grid_transform_( layer->get_grid_transform() ),
+  volume_type_( layer->type() ),
   active_( false ),
   picked_up_( false ),
-  group_menus_open_( false ),
   layer_menus_open_( false ),
-  volume_type_( layer->type() )
+  group_menus_open_( false ) 
 {
   
   

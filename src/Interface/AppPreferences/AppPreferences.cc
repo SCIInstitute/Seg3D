@@ -69,7 +69,8 @@ AppPreferences::AppPreferences( QWidget *parent ) :
   this->private_->ui_.tab_interface_controls_->hide();
 
   // connect the apply button to the save defaults function
-  connect( this->private_->ui_.apply_button_, SIGNAL( clicked() ), this, SLOT( save_defaults() ) );
+  connect( this->private_->ui_.apply_button_, SIGNAL( clicked() ), 
+    this, SLOT( save_defaults() ) );
   
 }
 
@@ -85,7 +86,6 @@ void AppPreferences::change_project_directory()
     {
         project_directory_.setPath( path );
     this->private_->ui_.path_->setText( project_directory_.absolutePath() );
-
   }
 }
 
@@ -98,6 +98,7 @@ void AppPreferences::setup_general_prefs()
 
   this->private_->ui_.path_->setText( QString::fromStdString( PreferencesManager::Instance()->
     project_path_state_->export_to_string() ) );
+
 
   QtUtils::QtBridge::Connect( this->private_->ui_.path_, PreferencesManager::Instance()->project_path_state_ );
 
@@ -126,16 +127,20 @@ void AppPreferences::setup_layer_prefs()
     // Step 1: create new buttons and add them to the button group
     this->private_->color_button_group_->addButton( new QtUtils::QtColorButton( 
       this, i, PreferencesManager::Instance()->color_states_[ i ]->get(), 25, 25 ), i );
-    this->private_->ui_.color_h_layout_->addWidget( this->private_->color_button_group_->button( i ) );
+    this->private_->ui_.color_h_layout_->addWidget( this->private_->
+      color_button_group_->button( i ) );
     
     // Step 2: create new ColorPickerWidgets, hide them, and add them to the appropriate layout
     this->private_->color_pickers_.push_back( new ColorPickerWidget( this ) );
     this->private_->color_pickers_[ i ]->hide();
-    this->private_->ui_.color_widget_picker_layout_->addWidget( this->private_->color_pickers_[ i ] );
+    this->private_->ui_.color_widget_picker_layout_->addWidget( this->private_->
+      color_pickers_[ i ] );
     
+
     // Step 3: Connect the ColorPickerWidgets and the ColorButtons to each other and the state engine
     QtUtils::QtBridge::Connect( dynamic_cast< QtUtils::QtColorButton* >( this->private_->color_button_group_->button( i ) ), 
       PreferencesManager::Instance()->color_states_[ i ] );
+
     connect( this->private_->color_pickers_[ i ], SIGNAL( color_set( Core::Color ) ), 
       this->private_->color_button_group_->button( i ), SLOT( set_color( Core::Color ) ) );
     connect( this->private_->color_button_group_->button( i ), 
@@ -161,7 +166,8 @@ void AppPreferences::setup_layer_prefs()
   double opacity_max = 0.0;
   double opacity_step = 0.0;
   PreferencesManager::Instance()->default_layer_opacity_state_->get_step( opacity_step );
-  PreferencesManager::Instance()->default_layer_opacity_state_->get_range( opacity_min, opacity_max );
+  PreferencesManager::Instance()->default_layer_opacity_state_->get_range( 
+    opacity_min, opacity_max );
   this->private_->opacity_adjuster_->setStep( opacity_step );
   this->private_->opacity_adjuster_->setRange( opacity_min, opacity_max );
   this->private_->opacity_adjuster_->setCurrentValue( 
@@ -207,7 +213,8 @@ void AppPreferences::setup_layer_prefs()
   
 void AppPreferences::set_buttons_to_default_colors()
 {
-  std::vector< Core::Color > temp_color_list = PreferencesManager::Instance()->get_default_colors();
+  std::vector< Core::Color > temp_color_list = PreferencesManager::Instance()->
+    get_default_colors();
   for( int i = 0; i < 12; ++i )
   {
     dynamic_cast< QtUtils::QtColorButton* >( this->private_->color_button_group_->button( i ) )->
@@ -250,17 +257,7 @@ void AppPreferences::setup_viewer_prefs()
   this->private_->ui_.background_color_combobox_->setCurrentIndex( 
     PreferencesManager::Instance()->background_color_state_->index() );
   
-  // -- set the fill selection combo box's values 
-  temp_option_list = PreferencesManager::Instance()->naming_convention_state_->option_list();
-  for( size_t i = 0; i < temp_option_list.size(); i++)
-  {   
-    this->private_->ui_.naming_convention_combobox_->addItem( 
-      QString::fromStdString( temp_option_list[i] ) );
-  }
-  // Set it's default value
-  this->private_->ui_.naming_convention_combobox_->setCurrentIndex( 
-    PreferencesManager::Instance()->naming_convention_state_->index() );
-  
+    
   this->private_->ui_.grid_size_spinbox_->setValue(
     PreferencesManager::Instance()->grid_size_state_->get() );
   
@@ -275,8 +272,6 @@ void AppPreferences::setup_viewer_prefs()
     PreferencesManager::Instance()->background_color_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.grid_size_spinbox_, 
     PreferencesManager::Instance()->grid_size_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ui_.naming_convention_combobox_, 
-    PreferencesManager::Instance()->naming_convention_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.show_slice_numbers_checkbox_, 
     PreferencesManager::Instance()->show_slice_number_state_ );
 

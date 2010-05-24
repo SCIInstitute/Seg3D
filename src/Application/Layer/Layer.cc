@@ -28,7 +28,8 @@
 
 // STL includes
 
-// Boost includes 
+// Boost includes
+#include <boost/filesystem.hpp>
 
 // Core includes
 #include <Core/Application/Application.h>
@@ -66,7 +67,7 @@ Layer::Layer( const std::string& name ) :
   add_state( "lock", lock_state_, false );
 
   // == The opacity of the layer ==
-  add_state( "opacity", opacity_state_, 1.0, 0.0, 1.0, 0.01 );
+  add_state( "opacity", opacity_state_, PreferencesManager::Instance()->default_layer_opacity_state_->get(), 0.0, 1.0, 0.01 );
 
   // == Selected by the LayerGroup ==
   add_state( "selected", selected_state_, false );
@@ -83,6 +84,14 @@ Layer::Layer( const std::string& name ) :
   add_state( "border_mode", border_mode_state_, PreferencesManager::Instance()->
     default_mask_border_state_->export_to_string(), PreferencesManager::Instance()->
     default_mask_border_state_->export_list_to_string() );
+  
+  
+  // test code
+  boost::filesystem::path local_config_path_;
+  Core::Application::Instance()->get_config_directory( local_config_path_ );
+  local_config_path_ = local_config_path_ / "layer.cfg";
+  //save_states( local_config_path_ );
+
 
 }
   

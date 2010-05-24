@@ -42,7 +42,7 @@
 
 // Interface includes
 #include <Interface/AppInterface/AppInterface.h>
-#include <Interface/AppInterface/SplashStart.h>
+
 
 namespace Seg3D
 {
@@ -58,9 +58,6 @@ AppInterface::AppInterface()
 
   // Tell Qt what size to start up in
   resize( 1280, 720 );
-
-  SplashStart* splash_screen_ = new SplashStart();
-  splash_screen_->exec();
   
   // Tell Qt where to doc the toolbars
   setCorner( Qt::TopLeftCorner, Qt::LeftDockWidgetArea );
@@ -68,14 +65,20 @@ AppInterface::AppInterface()
   setCorner( Qt::BottomLeftCorner, Qt::LeftDockWidgetArea );
   setCorner( Qt::BottomRightCorner, Qt::RightDockWidgetArea );
 
-  // Define the main window viewer canvas
+  
   this->preferences_interface_ = new AppPreferences( this );
   this->preferences_interface_->hide();
-
-  this->viewer_interface_ = new ViewerInterface( this );
-
+  
   this->controller_interface_ = new AppController( this );
   this->controller_interface_->hide();
+  
+  this->splash_interface_ = new AppSplash( this );
+  this->show_window( "splash" );
+
+  // Define the main window viewer canvas
+  this->viewer_interface_ = new ViewerInterface( this );
+
+
   
   
 
@@ -169,6 +172,12 @@ void AppInterface::closeEvent( QCloseEvent* event )
     this->preferences_interface_->deleteLater();
   }
   
+  if( this->splash_interface_ )
+  {
+    this->splash_interface_->close();
+    this->splash_interface_->deleteLater();
+  }
+  
   if( this->history_dock_window_ )
   {
     this->history_dock_window_->close();
@@ -260,6 +269,7 @@ void AppInterface::add_windowids()
 {
   InterfaceManager::Instance()->add_windowid( "controller" );
   InterfaceManager::Instance()->add_windowid( "preferences" );
+  InterfaceManager::Instance()->add_windowid( "splash" );
   InterfaceManager::Instance()->add_windowid( "project" );
   InterfaceManager::Instance()->add_windowid( "history" );
   InterfaceManager::Instance()->add_windowid( "layermanager" );
@@ -295,6 +305,23 @@ void AppInterface::show_window( const std::string& windowid )
       this->preferences_interface_->show();
       this->preferences_interface_->raise();
     }
+  }
+  
+  else if( lower_windowid == "splash" )
+  {
+    if( this->splash_interface_.isNull() )
+    {
+      this->splash_interface_ = new AppSplash( this );
+      this->splash_interface_->show();
+    }
+    else
+    {
+      this->splash_interface_->show();
+      this->splash_interface_->raise();
+    }
+    
+    QRect rect = QApplication::desktop()->availableGeometry( this->splash_interface_ );
+    this->splash_interface_->move(rect.center() - this->splash_interface_->rect().center());
   }
   
   else if( lower_windowid == "project" )
@@ -384,6 +411,13 @@ void AppInterface::close_window( const std::string& windowid )
     if( !( this->preferences_interface_.isNull() ) )
     {
       this->preferences_interface_->close();
+    }
+  }
+  else if( lower_windowid == "splash" )
+  {
+    if( !( this->splash_interface_.isNull() ) )
+    {
+      this->splash_interface_->close();
     }
   }
   else if( lower_windowid == "project" )

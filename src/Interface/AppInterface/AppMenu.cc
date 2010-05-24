@@ -83,11 +83,28 @@ AppMenu::~AppMenu()
 void AppMenu::create_file_menu( QMenu* qmenu )
 {
   QAction* qaction;
+  qaction = qmenu->addAction( tr( "&New Project" ) );
+  qaction->setShortcut( tr( "Ctrl+P" ) );
+  qaction->setToolTip( tr( "Start a new project." ) );
+  // TODO: connect this action to the Project Manager
+
   qaction = qmenu->addAction( tr( "&Open Project" ) );
   qaction->setShortcut( QKeySequence::Open );
-  qaction->setToolTip( tr( "Open a new project" ) );
-  // Need to setup signal/slot part here
-
+  qaction->setToolTip( tr( "Open an existing project" ) );
+  // TODO: connect this action to the Project Manager
+  
+  qaction = qmenu->addAction( tr( "&Close Project" ) );
+  qaction->setShortcut( tr( "Ctrl+C" ) );
+  qaction->setToolTip( tr( "Close the current project." ) );
+  // TODO: connect this action to the Project Manager
+  
+  qaction = qmenu->addAction( tr( "&Save Project" ) );
+  qaction->setShortcut( tr( "Ctrl+S" ) );
+  qaction->setToolTip( tr( "Save the current project." ) );
+  // TODO: connect this action to the Project Manager
+  
+  qmenu->addSeparator();
+  
   qaction = qmenu->addAction( tr( "&Quit" ) );
   qaction->setShortcut( tr( "Ctrl+Q" ) );
   qaction->setToolTip( tr( "Open a file." ) );

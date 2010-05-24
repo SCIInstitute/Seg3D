@@ -29,19 +29,19 @@
         <file>Images/Circle320.png</file>
         <file>Images/Circle340.png</file>
         <file>Images/Close.png</file>
-		<file>Images/CloseWhite.png</file>
+        <file>Images/CloseWhite.png</file>
         <file>Images/Crop.png</file>
         <file>Images/CropOff.png</file>
-		<file>Images/Color.png</file>
-		<file>Images/ColorOff.png</file>
-		<file>Images/DownArrow.png</file>
+        <file>Images/Color.png</file>
+        <file>Images/ColorOff.png</file>
+        <file>Images/DownArrow.png</file>
         <file>Images/DownArrowWhite.png</file>
         <file>Images/Data.png</file>
         <file>Images/DataVolume.png</file>
         <file>Images/DataVolumeOff.png</file>
         <file>Images/DataWhite.png</file>
-		<file>Images/Delete.png</file>
-		<file>Images/DeleteWhite.png</file>
+        <file>Images/Delete.png</file>
+        <file>Images/DeleteWhite.png</file>
         <file>Images/Flip.png</file>
         <file>Images/FlipOff.png</file>
         <file>Images/FlipVert.png</file>
@@ -60,7 +60,7 @@
         <file>Images/LabelMap.png</file>
         <file>Images/LabelMask.png</file>
         <file>Images/LabelMaskOff.png</file>
-		<file>Images/LabelMapVolume.png</file>
+        <file>Images/LabelMapVolume.png</file>
         <file>Images/LabelMapWhite.png</file>
         <file>Images/LabelMapWhite.png</file>
         <file>Images/Light.png</file>
@@ -74,8 +74,8 @@
         <file>Images/MaskWhite_shadow.png</file>
         <file>Images/NextSlice.png</file>
         <file>Images/NextSliceOff.png</file>
-		<file>Images/Opacity.png</file>
-		<file>Images/OpacityOff.png</file>
+        <file>Images/Opacity.png</file>
+        <file>Images/OpacityOff.png</file>
         <file>Images/Picking.png</file>
         <file>Images/PickingOff.png</file>
         <file>Images/PreviousSlice.png</file>
@@ -88,7 +88,7 @@
         <file>Images/SingleMaskOff.png</file>
         <file>Images/SlicesVisible.png</file>
         <file>Images/SlicesVisibleOff.png</file>
-		<file>Images/Seg3DSplash.png</file>
+        <file>Images/Seg3DSplash.png</file>
         <file>Images/Transform.png</file>
         <file>Images/TransformOff.png</file>
         <file>Images/Text.png</file>
@@ -106,5 +106,6 @@
         <file>Images/Yview.png</file>
         <file>Images/Zview.png</file>
         <file>Images/NewWhite.png</file>
+        <file>Images/Symbol.png</file>
     </qresource>
 </RCC>

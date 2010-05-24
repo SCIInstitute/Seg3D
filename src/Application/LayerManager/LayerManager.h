@@ -76,7 +76,8 @@ public:
     // Functions for getting a copy of the Layers and Groups with the proper locking
   void get_groups( std::vector< LayerGroupHandle > &vector_of_groups );
   void get_layers( std::vector< LayerHandle > &vector_of_layers );
-  bool check_for_same_group( const std::string layer_to_insert_id, const std::string layer_below_id );
+  bool check_for_same_group( const std::string layer_to_insert_id, 
+    const std::string layer_below_id );
   
   LayerGroupHandle get_layer_group( std::string group_id );
   LayerHandle get_layer_by_id( const std::string& layer_id );

@@ -76,7 +76,7 @@ public:
   Core::StateIntHandle grid_size_state_;
   Core::StateOptionHandle background_color_state_;
   Core::StateBoolHandle show_slice_number_state_;
-  Core::StateOptionHandle naming_convention_state_;
+
   
   //Layers Preferences
   Core::StateRangedDoubleHandle default_layer_opacity_state_;

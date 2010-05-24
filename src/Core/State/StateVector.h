@@ -67,6 +67,9 @@ typedef boost::shared_ptr< StateBoolVector > StateBoolVectorHandle;
 
 typedef StateVector< double > StateDoubleVector;
 typedef boost::shared_ptr< StateDoubleVector > StateDoubleVectorHandle;
+  
+typedef StateVector< std::string > StateStringVector;
+typedef boost::shared_ptr< StateStringVector > StateStringVectorHandle;
 
 
 template< class T >

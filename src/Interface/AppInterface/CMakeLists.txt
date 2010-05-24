@@ -47,7 +47,6 @@ SET(INTERFACE_APPINTERFACE_SRCS
   ProgressWidget.cc
   ProjectDockWidget.cc
   PushDragButton.cc
-  SplashStart.cc
   ToolBoxWidget.cc
   ToolsDockWidget.cc
   ToolWidget.cc
@@ -77,7 +76,6 @@ SET(INTERFACE_APPINTERFACE_MOC_SRCS
   ToolBoxWidget.h
   ToolsDockWidget.h
   ToolWidget.h
-  SplashStart.h
   ViewAction.h
   ViewerInterface.h
   ViewerWidget.h
@@ -102,7 +100,6 @@ SET(INTERFACE_APPINTERFACE_UI_SRCS
   MessageHistoryWidget.ui
   ProjectDockWidget.ui
   ProgressWidget.ui
-  Splash.ui
   ToolBoxPageWidget.ui
   ViewerInterface.ui
   StatusBar.ui
@@ -159,6 +156,8 @@ TARGET_LINK_LIBRARIES(Interface_AppInterface
                       Core_Interface
                       Core_ActionManager
                       Core_State
+            Application_Project
+            Application_ProjectManager
             Application_Renderer
                       Application_StateManager
                       Application_Tool
@@ -169,6 +168,7 @@ TARGET_LINK_LIBRARIES(Interface_AppInterface
             QtInterface_Bridge
                       Interface_AppController
             Interface_AppPreferences
+            Interface_AppSplash
                       ${QT_LIBRARIES} 
                       ${SCI_BOOST_LIBRARY})
 

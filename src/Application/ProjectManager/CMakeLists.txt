@@ -1,3 +1,4 @@
+
 #
 #  For more information, please see: http://software.sci.utah.edu
 # 
@@ -26,9 +27,35 @@
 #  DEALINGS IN THE SOFTWARE.
 #
 
-ADD_SUBDIRECTORY(AppController)
-ADD_SUBDIRECTORY(AppInterface)
-ADD_SUBDIRECTORY(AppPreferences)
-ADD_SUBDIRECTORY(AppProjectWizard)
-ADD_SUBDIRECTORY(AppSplash)
-ADD_SUBDIRECTORY(ToolInterface)
+##################################################
+# Set sources
+##################################################
+
+SET(APPLICATION_PROJECTMANAGER_SRCS
+    ProjectManager.h
+    ProjectManager.cc
+)
+
+SET(APPLICATION_PROJECTMANAGER_ACTIONS_SRCS
+
+)
+
+
+CORE_ADD_LIBRARY(Application_ProjectManager ${APPLICATION_PROJECTMANAGER_SRCS}
+            ${APPLICATION_PROJECTMANAGER_ACTIONS_SRCS} )
+            
+TARGET_LINK_LIBRARIES(Application_ProjectManager
+                      Core_Utils
+                      Core_EventHandler
+                      Core_Application
+                      Core_Interface
+                      Core_Action
+                      Core_State
+                      Application_StateManager
+                      Application_Project
+                      ${SCI_BOOST_LIBRARY})
+
+# Register actions
+ADD_LIBRARY_ACTIONS(Application_ProjectManager
+                    ${APPLICATION_PROJECTMANAGER_ACTIONS_SRCS})
+

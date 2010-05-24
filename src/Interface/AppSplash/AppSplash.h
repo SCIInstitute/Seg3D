@@ -25,37 +25,47 @@
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
  */
-#include <sstream>
-#include <iostream>
 
-#include <Core/Utils/Log.h>
+#ifndef INTERFACE_APPSPLASH_APPSPLASH_H
+#define INTERFACE_APPSPLASH_APPSPLASH_H
 
-#include <Interface/AppInterface/SplashStart.h>
-#include "ui_Splash.h"
+// QT includes
+#include <QtGui>
+
+// Boost includes
+#include <boost/shared_ptr.hpp>
+
+// Interface includes
+#include <Interface/AppProjectWizard/AppProjectWizard.h>
 
 namespace Seg3D
 {
 
-class SplashStartPrivate
-{
-public:
+class AppSplashPrivate;
 
-  Ui::Splash ui_;
+class AppSplash : public QDialog
+{
+Q_OBJECT
+
+public:
+  AppSplash( QWidget* parent = 0 );
+  virtual ~AppSplash();
+  
+private:
+  void populate_recent_projects();
+
+private Q_SLOTS:
+  void new_project();
+  void open_existing();
+  void open_recent();
+  
+private:
+  // Internals of the splash screen
+  boost::shared_ptr< AppSplashPrivate > private_;
+  QPointer< AppProjectWizard > new_project_wizard_;
 
 };
 
-SplashStart::SplashStart( QDialog *parent ) :
-  QDialog( parent ),
-  private_( new SplashStartPrivate )
-{
-  // Set up the private internals of the SplashStart class
-  this->private_->ui_.setupUi( this );
-  this->private_->ui_.existing_project_button_->setEnabled( false );
+} // end namespace
 
-}
-
-SplashStart::~SplashStart()
-{
-}
-
-} // end namespace Seg3D
+#endif // APPSPLASH_H

@@ -418,6 +418,15 @@ std::string ExportToString( const std::vector< char >& value )
   result[ result.size() - 1 ] = ']';
   return result;
 }
+  
+  std::string ExportToString( const std::vector< std::string >& value )
+  {
+    std::string result( 1, '[' );
+    for ( size_t j = 0; j < value.size(); j++ )
+      result += value[ j ] + ' ';
+    result[ result.size() - 1 ] = ']';
+    return result;
+  } 
 
 std::string ExportToString(const std::vector< unsigned char >& value)
 {
@@ -664,6 +673,11 @@ bool ImportFromString( const std::string& str, std::vector< float >& value )
 }
 
 bool ImportFromString( const std::string& str, std::vector< double >& value )
+{
+  return ( MultipleFromString( str, value ) );
+}
+  
+bool ImportFromString( const std::string& str, std::vector< std::string >& value )
 {
   return ( MultipleFromString( str, value ) );
 }

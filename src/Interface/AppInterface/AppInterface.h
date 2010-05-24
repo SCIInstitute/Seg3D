@@ -59,6 +59,7 @@
 #include <Interface/AppInterface/AppStatusBar.h>
 #include <Interface/AppController/AppController.h>
 #include <Interface/AppPreferences/AppPreferences.h>
+#include <Interface/AppSplash/AppSplash.h>
 
 #include <Core/Action/Actions.h>
 #include <Core/Utils/ConnectionHandler.h>
@@ -120,8 +121,11 @@ protected:
 private:
   // Pointer to the main canvas of the main window
   QPointer< ViewerInterface > viewer_interface_;
+  
+  // Pointers to dialog widgets
   QPointer< AppController > controller_interface_;
   QPointer< AppPreferences > preferences_interface_;
+  QPointer< AppSplash > splash_interface_;
 
   // The dock widgets
   QPointer< HistoryDockWidget > history_dock_window_;
@@ -130,6 +134,9 @@ private:
   QPointer< LayerManagerDockWidget > layer_manager_dock_window_;
   QPointer< MeasurementDockWidget > measurement_dock_window_;
   QPointer< ProgressWidget > progress_;
+  
+  // Pointer to the new project wizard
+  QPointer< AppProjectWizard > new_project_wizard_;
 
   // Application menu, statusbar
   QPointer< AppMenu > application_menu_;
