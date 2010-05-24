@@ -90,7 +90,7 @@ ProjectInfoPage::ProjectInfoPage( QWidget *parent )
     
     this->project_path_change_button_ = new QPushButton( "Choose Alternative Location" );
     connect( this->project_path_change_button_, SIGNAL( clicked() ), this, SLOT( set_path() ) );
-  this->project_path_change_button_->setFocusPolicy( Qt::ClickFocus );
+  this->project_path_change_button_->setFocusPolicy( Qt::NoFocus );
 
     this->automatically_consolidate_checkbox_ = new QCheckBox(
             "Consolidate the project files into the project folder." );

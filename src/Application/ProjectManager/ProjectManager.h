@@ -67,13 +67,27 @@ private:
   ProjectManager();
   virtual ~ProjectManager();
   
-
-  
 public:
+  
+  // NEW_PROJECT:
+  // this function sets the state values of the current project to reflect the desired values
   void new_project( const std::string& project_name, bool consolidate );
+  
+  // OPEN_PROJECT:
+  // this function takes the path to the desired project and loads the values from the file 
+  // located at that location
   void open_project( const std::string& project_path, const std::string& project_name );
+  
+  // SAVE_PROJECT:
+  // this function saves the values in current_project_ to the current save location
   void save_project();
+  
+  // SAVE_PROJECT_AS:
+  // this function saves the valuse in current_project_ to the desired save location
   void save_project_as();
+  
+  // SAVE_PROJECT_MANAGER_STATE:
+  // this function calls save_states that writes the state values of ProjectManager to file
   void save_projectmanager_state();
   
 public:
@@ -82,7 +96,12 @@ public:
   ProjectHandle current_project_;
   
 private:
+  // INITIALIZE:
+  // this function loads the values for ProjectManager from file
   void initialize();
+  
+  // ADD_TO_RECENT_PROJECTS:
+  // this function adds the latest project to the list of recent projects
   void add_to_recent_projects( const std::string& project_path, const std::string& project_name );
   
 private:

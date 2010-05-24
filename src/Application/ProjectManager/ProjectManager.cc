@@ -47,7 +47,7 @@ ProjectManager::ProjectManager() :
   this->local_projectmanager_path_ = this->local_projectmanager_path_ / "seg3d2_project_settings.cfg";
   
   std::vector< std::string> projects;
-  projects.resize( 10, "" );
+  projects.resize( 20, "" );
 
   add_state( "recent_projects", this->recent_projects_state_, projects );
   add_state( "current_project_path", this->current_project_path_state_, PreferencesManager::Instance()->project_path_state_->get() );
@@ -90,21 +90,22 @@ void ProjectManager::new_project( const std::string& project_name, bool consolid
 {
   this->current_project_->project_name_state_->set( project_name );
   this->current_project_->auto_consolidate_files_state_->set( consolidate );
-  
-  //boost::filesystem::path temp_path = project_path / project_name;
+
   this->add_to_recent_projects( this->current_project_path_state_->export_to_string(),
     project_name );
 }
   
 void ProjectManager::open_project( const std::string& project_path, const std::string& project_name )
 {
-  this->current_project_->initialize_from_file( project_path );
+  this->current_project_->initialize_from_file( project_path + "/" + project_name );
   this->add_to_recent_projects( project_path, project_name );
 }
   
 void ProjectManager::save_project()
 {
-    
+  boost::filesystem::path project_path = boost::filesystem::path( current_project_path_state_->get().c_str() );
+  project_path = project_path / current_project_->project_name_state_->get().c_str();
+  this->current_project_->save_states( project_path );
 }
   
 void ProjectManager::save_project_as()
@@ -117,7 +118,7 @@ void ProjectManager::add_to_recent_projects( const std::string& project_path, co
   std::vector< std::string > temp_projects_vector = this->recent_projects_state_->get();
   
   temp_projects_vector.insert( temp_projects_vector.begin(), ( project_path + "|" + project_name ) );
-  temp_projects_vector.resize(10);
+  temp_projects_vector.resize(20);
   
   this->recent_projects_state_->set( temp_projects_vector );
   this->save_projectmanager_state();

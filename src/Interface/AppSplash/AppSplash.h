@@ -52,11 +52,26 @@ public:
   virtual ~AppSplash();
   
 private:
+  
+  // POPULATE_RECENT_PROJECTS:
+  // this function is called in the constructor to populate the list of recent projects from the
+  // project manager
   void populate_recent_projects();
 
 private Q_SLOTS:
+  
+  // NEW_PROJECT:
+  // this function is called when a user clicks the button to create a new project.  It starts the
+  // new project wizard and closes the splash screen
   void new_project();
+  
+  // OPEN_EXISTING:
+  // this function is called when a user clicks the button to open an existing project.  It starts
+  // a file browse dialog.
   void open_existing();
+  
+  // OPEN_RECENT:
+  // this function is called when a user double-clicks on an item in the list. 
   void open_recent();
   
 private:

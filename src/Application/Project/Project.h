@@ -73,6 +73,8 @@ public:
   Core::StateBoolHandle auto_consolidate_files_state_;
   
 public:
+  // INITIALIZE_FROM_FILE:
+  // this file initializes the state values for project from the file at the path specified
   void initialize_from_file( const std::string& project_path );
   
 
