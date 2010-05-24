@@ -75,24 +75,6 @@ Layer::Layer( const std::string& name ) :
   // == Which of the submenus is being editted ==
   add_state( "edit_mode", edit_mode_state_, "none", "none|opacity|color|contrast|appearance" );
   
-  // == Which fill mode is active ==
-  add_state( "fill_mode", fill_mode_state_, PreferencesManager::Instance()->
-    default_mask_fill_state_->export_to_string(), PreferencesManager::Instance()->
-    default_mask_fill_state_->export_list_to_string() );
-
-  // == Which border mode is active ==
-  add_state( "border_mode", border_mode_state_, PreferencesManager::Instance()->
-    default_mask_border_state_->export_to_string(), PreferencesManager::Instance()->
-    default_mask_border_state_->export_list_to_string() );
-  
-  
-  // test code
-  boost::filesystem::path local_config_path_;
-  Core::Application::Instance()->get_config_directory( local_config_path_ );
-  local_config_path_ = local_config_path_ / "layer.cfg";
-  //save_states( local_config_path_ );
-
-
 }
   
 Layer::~Layer()

@@ -178,16 +178,13 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
   
   //Set the defaulf values for the Group UI and make the connections to the state engine
       // --- GENERAL ---
-      this->private_->ui_.open_button_->setChecked( group->show_layers_state_.get() );
-      this->private_->ui_.group_visibility_button_->setChecked( group->visibility_state_.get() );
-      
+    
       QtUtils::QtBridge::Connect( this->private_->ui_.open_button_, group->show_layers_state_ );
       QtUtils::QtBridge::Connect( this->private_->ui_.group_visibility_button_, group->visibility_state_ );
       QtUtils::QtBridge::Connect( this->private_->ui_.delete_button_, boost::bind( &ActionDeleteLayers::Dispatch, group ) );
   
     void ( *dispatch_fp )( LayerGroupHandle ) = &ActionNewMaskLayer::Dispatch;
     QtUtils::QtBridge::Connect( this->private_->ui_.group_new_button_, boost::bind( dispatch_fp,  group ) );
-  
   
       // --- RESAMPLE ---
       // = set the default values
@@ -216,20 +213,8 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
         this->private_->ui_.y_axis_label_new_->setFont( font );
         this->private_->ui_.z_axis_label_new_->setFont( font );
         
-        this->private_->ui_.resample_replace_checkBox_->setChecked( 
-      group->resample_replace_state_->get() );
         
-        // set the defaults for the upper threshold
-        double resample_min = 0.0; 
-      double resample_max = 0.0;
-      double resample_step = 0.0;
-      group->resample_factor_state_->get_step( resample_step );
-      group->resample_factor_state_->get_range( resample_min, resample_max );
-      this->private_->scale_adjuster_->setStep( resample_step );
-        this->private_->scale_adjuster_->setRange( resample_min, resample_max );
-        this->private_->scale_adjuster_->setCurrentValue( group->resample_factor_state_->get() );
-        
-         // = make the connections
+        // = make the connections
         QtUtils::QtBridge::Connect( this->private_->scale_adjuster_, group->resample_factor_state_ );
       QtUtils::QtBridge::Connect( this->private_->ui_.resample_replace_checkBox_, 
       group->resample_replace_state_ );
@@ -244,22 +229,13 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
         this->private_->size_depth_adjuster_crop_->setRange( 0, 
       group->get_grid_transform().get_nz() );
         
-        this->private_->size_width_adjuster_crop_->setCurrentValue( 
-      group->get_grid_transform().get_nx() );
-        this->private_->size_height_adjuster_crop_->setCurrentValue( 
-      group->get_grid_transform().get_ny() );
-        this->private_->size_depth_adjuster_crop_->setCurrentValue( 
-      group->get_grid_transform().get_nz() );
-
+    group->crop_size_width_state_->set( group->get_grid_transform().get_nx() );
+    group->crop_size_height_state_->set( group->get_grid_transform().get_ny() );
+    group->crop_size_depth_state_->set( group->get_grid_transform().get_nz() );
+  
         this->private_->center_x_adjuster_crop_->setRange( 0, group->get_grid_transform().get_nx() );
         this->private_->center_y_adjuster_crop_->setRange( 0, group->get_grid_transform().get_ny() );
         this->private_->center_z_adjuster_crop_->setRange( 0, group->get_grid_transform().get_nz() );
-        
-        this->private_->center_x_adjuster_crop_->setCurrentValue( 0 );
-        this->private_->center_y_adjuster_crop_->setCurrentValue( 0 );
-        this->private_->center_z_adjuster_crop_->setCurrentValue( 0 );
-        
-        this->private_->ui_.crop_replace_checkBox_->setChecked( group->crop_replace_state_->get() );
         
         // = make the connections
         QtUtils::QtBridge::Connect( this->private_->size_width_adjuster_crop_, group->crop_size_width_state_ );
@@ -275,11 +251,10 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
         
         // --- TRANSFORM ---
         // = set the default values
-        this->private_->ui_.spacing_x_spinbox_->setValue( group->get_grid_transform().get_nx() );
-        this->private_->ui_.spacing_y_spinbox_->setValue( group->get_grid_transform().get_ny() );
-        this->private_->ui_.spacing_z_spinbox_->setValue( group->get_grid_transform().get_nz() );
-        
-        this->private_->ui_.transform_replace_checkBox_->setChecked( group->resample_replace_state_->get() );
+  
+        group->transform_spacing_x_state_->set( group->get_grid_transform().spacing_x() );
+        group->transform_spacing_y_state_->set( group->get_grid_transform().spacing_y() );
+        group->transform_spacing_z_state_->set( group->get_grid_transform().spacing_z() );
         
         // = make the connections
       QtUtils::QtBridge::Connect( this->private_->ui_.origin_x_spinbox_, group->transform_origin_x_state_ );

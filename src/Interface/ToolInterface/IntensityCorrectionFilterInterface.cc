@@ -86,33 +86,8 @@ bool IntensityCorrectionFilterInterface::build_widget( QFrame* frame )
   ToolHandle base_tool_ = tool();
   IntensityCorrectionFilter* tool =
       dynamic_cast< IntensityCorrectionFilter* > ( base_tool_.get() );
-    
-    //Step 3 - set the values for the tool ui from the state engine
-        
-  // set the defaults for order
-  int order_min = 0; 
-  int order_max = 0;
-  int order_step = 0;
-  tool->order_state_->get_step( order_step );
-  tool->order_state_->get_range( order_min, order_max );
-  this->private_->order_->setStep( order_step );
-  this->private_->order_->setRange( order_min, order_max );
-  this->private_->order_->setCurrentValue( tool->order_state_->get() );
-  
-  // set the defaults for edge
-  double edge_min = 0.0; 
-  double edge_max = 0.0;
-  double edge_step = 0.0;
-  tool->edge_state_->get_step( edge_step );
-  tool->edge_state_->get_range( edge_min, edge_max );
-  this->private_->edge_->setStep( edge_step );
-  this->private_->edge_->setRange( edge_min, edge_max );
-  this->private_->edge_->setCurrentValue( tool->edge_state_->get() ); 
-  
-  this->private_->ui_.replaceCheckBox->setChecked( tool->replace_state_->get() );
 
-
-  //Step 4 - connect the gui to the tool through the QtBridge
+  //Step 3 - connect the gui to the tool through the QtBridge
   QtUtils::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
   this->connect( this->private_->target_, SIGNAL( valid( bool ) ), 
     this, SLOT( enable_run_filter( bool ) ) );

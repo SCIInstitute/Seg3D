@@ -81,28 +81,12 @@ bool MedianFilterInterface::build_widget( QFrame* frame )
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
   MedianFilter* tool = dynamic_cast< MedianFilter* > ( base_tool_.get() );
-  
-  //Step 3 - set the values for the tool ui from the state engine
-  
-        // set the defaults for the radius
-      int radius_min = 0; 
-      int radius_max = 0;
-      int radius_step = 0;
-      tool->radius_state_->get_step( radius_step );
-      tool->radius_state_->get_range( radius_min, radius_max );
-      this->private_->radius_->setStep( radius_step );
-        this->private_->radius_->setRange( radius_min, radius_max );
-        this->private_->radius_->setCurrentValue( tool->radius_state_->get() );
-        
-        // set the default for the replace state
-        this->private_->ui_.replaceCheckBox->setChecked( tool->replace_state_->get() );
 
-  //Step 4 - connect the gui to the tool through the QtBridge
+  //Step 3 - connect the gui to the tool through the QtBridge
   QtUtils::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
   connect( this->private_->target_, SIGNAL( valid( bool ) ), this, SLOT( enable_run_filter( bool ) ) );
   QtUtils::QtBridge::Connect( this->private_->radius_, tool->radius_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
-  
   connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), this, SLOT( execute_filter() ) );
   
   this->private_->target_->sync_layers();

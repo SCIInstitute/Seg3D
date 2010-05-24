@@ -85,32 +85,7 @@ bool DiscreteGaussianFilterInterface::build_widget( QFrame* frame )
   ToolHandle base_tool_ = tool();
   DiscreteGaussianFilter* tool = dynamic_cast< DiscreteGaussianFilter* > ( base_tool_.get() );
 
-    //Step 3 - set the values for the tool ui from the state engine
-        
-  // set the defaults for the variance
-  double variance_min = 0.0; 
-  double variance_max = 0.0;
-  double variance_step = 0.0;
-  tool->variance_state_->get_step( variance_step );
-  tool->variance_state_->get_range( variance_min, variance_max );
-  this->private_->variance_->setStep( variance_step );
-  this->private_->variance_->setRange( variance_min, variance_max );
-  this->private_->variance_->setCurrentValue( tool->variance_state_->get() );
-  
-  // set the defaults for the kernel width
-  double kernel_width_min = 0.0; 
-  double kernel_width_max = 0.0;
-  double kernel_width_step = 0.0;
-  tool->maximum_kernel_width_state_->get_step( kernel_width_step );
-  tool->maximum_kernel_width_state_->get_range( kernel_width_min, kernel_width_max );
-  this->private_->kernel_width_->setStep( kernel_width_step );
-  this->private_->kernel_width_->setRange( kernel_width_min, kernel_width_max );
-  this->private_->kernel_width_->setCurrentValue( tool->maximum_kernel_width_state_->get() );
-  
-  //set the default replace checkbox value
-  this->private_->ui_.replaceCheckBox->setChecked( tool->replace_state_->get() );
-        
-  //Step 4 - connect the gui to the tool through the QtBridge
+    //Step 3 - connect the gui to the tool through the QtBridge
   QtUtils::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
   connect( this->private_->target_, SIGNAL( valid( bool ) ), this, SLOT( enable_run_filter( bool ) ) );
   QtUtils::QtBridge::Connect( this->private_->variance_, tool->variance_state_ );

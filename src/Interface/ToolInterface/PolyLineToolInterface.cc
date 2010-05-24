@@ -75,11 +75,7 @@ bool PolylineToolInterface::build_widget( QFrame* frame )
   ToolHandle base_tool_ = tool();
   PolylineTool* tool = dynamic_cast< PolylineTool* > ( base_tool_.get() );
 
-    //Step 3 - set the values for the tool ui from the state engine
-        
-    // N/A
-
-  //Step 4 - connect the gui to the tool through the QtBridge
+  //Step 3 - connect the gui to the tool through the QtBridge
   QtUtils::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
   
   //TODO: need to decide how to pass fill vs delete

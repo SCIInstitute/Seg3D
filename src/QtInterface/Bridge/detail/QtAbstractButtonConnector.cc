@@ -41,6 +41,8 @@ QtAbstractButtonConnector::QtAbstractButtonConnector( QAbstractButton* parent,
   state_( state )
 {
   QPointer< QtAbstractButtonConnector > qpointer( this );
+  
+  this->UpdateChecked( qpointer );
 
   parent->setCheckable( true );
   this->connect( parent, SIGNAL( toggled( bool ) ), SLOT( set_state( bool ) ) );
@@ -101,4 +103,41 @@ void QtAbstractButtonConnector::call_func()
   this->func_();
 }
 
+void QtAbstractButtonConnector::UpdateChecked( QPointer< QtAbstractButtonConnector > qpointer )
+{
+  if ( !Core::Interface::IsInterfaceThread() )
+  {
+    Core::Interface::PostEvent( boost::bind( &QtAbstractButtonConnector::UpdateChecked, qpointer ) );
+    return;
+  }
+  
+  if ( qpointer.isNull() )
+  {
+    return;
+  }
+  
+  // block signals back to the application thread
+  qpointer->block();
+  
+  QAbstractButton* button_or_checkbox = qpointer->parent_;
+  
+  // lock the state engine
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+  
+  Core::StateBase* state_base = qpointer->state_.get();
+  
+  if ( typeid( *state_base ) == typeid( Core::StateBool ) )
+  {
+    Core::StateBool* state_bool = static_cast< Core::StateBool* > ( state_base );
+    
+    button_or_checkbox->setChecked( state_bool->get() );
+    
+  }
+  
+  // unblock signals
+  qpointer->unblock();    
+}
+  
+  
+  
 } // end namespace QtUtils

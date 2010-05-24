@@ -83,19 +83,7 @@ bool OtsuThresholdFilterInterface::build_widget( QFrame* frame )
   ToolHandle base_tool_ = tool();
   OtsuThresholdFilter* tool = dynamic_cast< OtsuThresholdFilter* > ( base_tool_.get() );
   
-  //Step 3 - set the values for the tool ui from the state engine
-                
-  // set the defaults for order
-  int order_min = 0; 
-  int order_max = 0;
-  int order_step = 0;
-  tool->order_state_->get_step( order_step );
-  tool->order_state_->get_range( order_min, order_max );
-  this->private_->order_->setStep( order_step );
-  this->private_->order_->setRange( order_min, order_max );
-  this->private_->order_->setCurrentValue( tool->order_state_->get() );
-  
-  //Step 4 - connect the gui to the tool through the QtBridge
+  //Step 3 - connect the gui to the tool through the QtBridge
   QtUtils::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
   connect( this->private_->target_, SIGNAL( valid( bool ) ), 
     this, SLOT( enable_run_filter( bool ) ) );

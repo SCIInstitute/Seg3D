@@ -61,7 +61,7 @@ PaintTool::PaintTool( const std::string& toolid ) :
   this->add_state( "brush_radius", this->brush_radius_state_, 23, 1, 250, 1 );
   this->add_state( "upper_threshold", this->upper_threshold_state_, 1.0, 00.0, 1.0, 0.01 );
   this->add_state( "lower_threshold", this->lower_threshold_state_, 0.0, 00.0, 1.0, 0.01 );
-  this->add_state( "erase", this->erase_state_, false );
+  this->add_state( "erase", this->erase_state_, true );
   
   this->handle_layers_changed();
 

@@ -108,75 +108,7 @@ bool ThresholdSegmentationLSFilterInterface::build_widget( QFrame* frame )
   ThresholdSegmentationLSFilter* tool =
       dynamic_cast< ThresholdSegmentationLSFilter* > ( base_tool_.get() );
       
-  //Step 3 - set the values for the tool ui from the state engine
-  
-  // set the defaults for the iterations
-  int iterations_min = 0; 
-  int iterations_max = 0;
-  int iterations_step = 0;
-  tool->iterations_state_->get_step( iterations_step );
-  tool->iterations_state_->get_range( iterations_min, iterations_max );
-  this->private_->iterations_->setStep( iterations_step );
-  this->private_->iterations_->setRange( iterations_min, iterations_max );
-  this->private_->iterations_->setCurrentValue( tool->iterations_state_->get() );
-
-  
-  // set the defaults for the upper threshold
-  double upper_threshold_min = 0.0; 
-  double upper_threshold_max = 0.0;
-  double upper_threshold_step = 0.0;
-  tool->upper_threshold_state_->get_step( upper_threshold_step );
-  tool->upper_threshold_state_->get_range( upper_threshold_min, upper_threshold_max );
-  this->private_->upper_threshold_->setStep( upper_threshold_step );
-  this->private_->upper_threshold_->setRange( upper_threshold_min, upper_threshold_max );
-  this->private_->upper_threshold_->setCurrentValue( tool->upper_threshold_state_->get() );
-  
-  // set the defaults for the lower threshold
-  double lower_threshold_min = 0.0; 
-  double lower_threshold_max = 0.0;
-  double lower_threshold_step = 0.0;
-  tool->lower_threshold_state_->get_step( lower_threshold_step );
-  tool->lower_threshold_state_->get_range( lower_threshold_min, lower_threshold_max );
-  this->private_->lower_threshold_->setStep( lower_threshold_step );
-  this->private_->lower_threshold_->setRange( lower_threshold_min, lower_threshold_max );
-  this->private_->lower_threshold_->setCurrentValue( tool->lower_threshold_state_->get() );
-  
-  // set the defaults for the curvature
-  double curvature_min = 0.0; 
-  double curvature_max = 0.0;
-  double curvature_step = 0.0;
-  tool->curvature_state_->get_step( curvature_step );
-  tool->curvature_state_->get_range( curvature_min, curvature_max );
-  this->private_->curvature_->setStep( curvature_step );
-  this->private_->curvature_->setRange( curvature_min, curvature_max );
-  this->private_->curvature_->setCurrentValue( tool->curvature_state_->get() );
-  
-  // set the defaults for edge
-  double edge_min = 0.0; 
-  double edge_max = 0.0;
-  double edge_step = 0.0;
-  tool->edge_state_->get_step( edge_step );
-  tool->edge_state_->get_range( edge_min, edge_max );
-  this->private_->edge_->setStep( edge_step );
-  this->private_->edge_->setRange( edge_min, edge_max );
-  this->private_->edge_->setCurrentValue( tool->edge_state_->get() ); 
-  
-  // set the defaults for the propagation
-  double propagation_min = 0.0; 
-  double propagation_max = 0.0;
-  double propagation_step = 0.0;
-  tool->propagation_state_->get_step( propagation_step );
-  tool->propagation_state_->get_range( propagation_min, propagation_max );
-  this->private_->propagation_->setStep( propagation_step );
-  this->private_->propagation_->setRange( propagation_min, propagation_max );
-  this->private_->propagation_->setCurrentValue( tool->propagation_state_->get() );
-  
-  // set the default for the replace state
-  this->private_->ui_.replaceCheckBox->setChecked( tool->replace_state_->get() );
-
-
-
-  //Step 4 - connect the gui to the tool through the QtBridge
+  //Step 3 - connect the gui to the tool through the QtBridge
   QtUtils::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
   this->connect( this->private_->target_, SIGNAL( valid( bool ) ), this, SLOT( enable_run_filter( bool ) ) );
   QtUtils::QtBridge::Connect( this->private_->mask_, tool->mask_layer_state_ );

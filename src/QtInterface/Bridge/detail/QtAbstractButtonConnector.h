@@ -55,6 +55,8 @@ public:
 private:
   static void SetButtonChecked( QPointer< QtAbstractButtonConnector > qpointer,
     bool checked, Core::ActionSource source );
+  
+  static void UpdateChecked( QPointer< QtAbstractButtonConnector > qpointer );
 
   // -- slot functions for Qt signals --
 private Q_SLOTS:

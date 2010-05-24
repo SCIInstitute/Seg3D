@@ -156,38 +156,6 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   this->private_->ui_.verticalLayout_5->addWidget( this->private_->color_widget_ );
   this->private_->color_widget_->setObjectName( QString::fromUtf8( "color_widget_" ) );
   
-  
-  // --- set the values for the dropdown menu's using values from the state handles
-  // -- set the border selection combo box's values 
-  std::vector< std::string > temp_option_list = layer->border_mode_state_->option_list();
-  for( size_t i = 0; i < temp_option_list.size(); i++)
-  {   
-      this->private_->ui_.border_selection_combo_->addItem( QString::fromStdString( temp_option_list[i] ) );
-  }
-  // Set it's default value
-  this->private_->ui_.border_selection_combo_->setCurrentIndex( layer->border_mode_state_->index() );
-  
-  // -- set the fill selection combo box's values 
-  temp_option_list = layer->fill_mode_state_->option_list();
-  for( size_t i = 0; i < temp_option_list.size(); i++)
-  {   
-      this->private_->ui_.fill_selection_combo_->addItem( QString::fromStdString( temp_option_list[i] ) );
-  }
-  
-  // Set it's default value
-  this->private_->ui_.fill_selection_combo_->setCurrentIndex(layer->fill_mode_state_->index());
-  
-  // set the default values for the slidercombo's
-  // set the defaults for the opacity
-        double opacity_min = 0.0; 
-      double opacity_max = 0.0;
-      double opacity_step = 0.0;
-      layer->opacity_state_->get_step( opacity_step );
-      layer->opacity_state_->get_range( opacity_min, opacity_max );
-      this->private_->opacity_adjuster_->setStep( opacity_step );
-        this->private_->opacity_adjuster_->setRange( opacity_min, opacity_max );
-        this->private_->opacity_adjuster_->setCurrentValue( layer->opacity_state_->get() );
-
   // connect the GUI signals and slots
   connect( this->private_->ui_.opacity_button_, 
       SIGNAL( clicked( bool ) ), this, 
@@ -231,27 +199,6 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
         DataLayer* data_layer = dynamic_cast< DataLayer* >( layer.get() );
         QtUtils::QtBridge::Connect( this->private_->brightness_adjuster_, data_layer->brightness_state_ );
         QtUtils::QtBridge::Connect( this->private_->contrast_adjuster_, data_layer->contrast_state_ );
-        
-        // set the defaults for the brightness
-                double brightness_min = 0.0; 
-                double brightness_max = 0.0;
-                double brightness_step = 0.0;
-                data_layer->brightness_state_->get_step( brightness_step );
-                data_layer->brightness_state_->get_range( brightness_min, brightness_max );
-                this->private_->brightness_adjuster_->setStep( brightness_step );
-                this->private_->brightness_adjuster_->setRange( brightness_min, brightness_max );
-                this->private_->brightness_adjuster_->setCurrentValue( data_layer->brightness_state_->get() );
-                
-                // set the defaults for the contrast
-                double contrast_min = 0.0; 
-                double contrast_max = 0.0;
-                double contrast_step = 0.0;
-                data_layer->contrast_state_->get_step( contrast_step );
-                data_layer->contrast_state_->get_range( contrast_min, contrast_max );
-                this->private_->contrast_adjuster_->setStep( contrast_step );
-                this->private_->contrast_adjuster_->setRange( contrast_min, contrast_max );
-                this->private_->contrast_adjuster_->setCurrentValue( data_layer->contrast_state_->get() );
-
       }
       break;
     // This is for the Mask Layers  
@@ -270,7 +217,8 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
 
         MaskLayer* mask_layer = dynamic_cast< MaskLayer* >( layer.get() );  
         QtUtils::QtBridge::Connect( this->private_->ui_.iso_surface_button_, mask_layer->show_isosurface_state_ );
-        QtUtils::QtBridge::Connect( this->private_->ui_.border_selection_combo_, mask_layer->fill_state_ );
+        QtUtils::QtBridge::Connect( this->private_->ui_.border_selection_combo_, mask_layer->border_state_ );
+        QtUtils::QtBridge::Connect( this->private_->ui_.fill_selection_combo_, mask_layer->fill_state_ );
         QtUtils::QtBridge::Connect( this->private_->color_widget_, mask_layer->color_state_,
           PreferencesManager::Instance()->color_states_ );
 

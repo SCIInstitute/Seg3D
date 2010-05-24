@@ -76,13 +76,7 @@ bool GradientMagnitudeFilterInterface::build_widget( QFrame* frame )
   ToolHandle base_tool_ = tool();
   GradientMagnitudeFilter* tool = dynamic_cast< GradientMagnitudeFilter* > ( base_tool_.get() );
 
-    //Step 3 - set the values for the tool ui from the state engine
-        
-        //set the default replace checkbox value
-        this->private_->ui_.replaceCheckBox->setChecked(tool->replace_state_);
-  
-
-  //Step 4 - connect the gui to the tool through the QtBridge
+    //Step 3 - connect the gui to the tool through the QtBridge
   QtUtils::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
   this->connect( this->private_->target_, SIGNAL( valid( bool ) ), this, SLOT( enable_run_filter( bool ) ) );
   QtUtils::QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );

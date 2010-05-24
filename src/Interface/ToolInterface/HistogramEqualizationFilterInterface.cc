@@ -101,45 +101,8 @@ bool HistogramEqualizationFilterInterface::build_widget( QFrame* frame )
   ToolHandle base_tool_ = tool();
   HistogramEqualizationFilter* tool =
       dynamic_cast< HistogramEqualizationFilter* > ( base_tool_.get() );
-      
-      
-  //Step 3 - set the values for the tool ui from the state engine
 
-      
-   // set the defaults for the upper threshold
-  double upper_threshold_min = 0.0; 
-  double upper_threshold_max = 0.0;
-  double upper_threshold_step = 0.0;
-  tool->upper_threshold_state_->get_step( upper_threshold_step );
-  tool->upper_threshold_state_->get_range( upper_threshold_min, upper_threshold_max );
-  this->private_->upper_threshold_->setStep( upper_threshold_step );
-  this->private_->upper_threshold_->setRange( upper_threshold_min, upper_threshold_max );
-  this->private_->upper_threshold_->setCurrentValue( tool->upper_threshold_state_->get() );
-  
-  // set the defaults for the lower threshold
-  double lower_threshold_min = 0.0; 
-  double lower_threshold_max = 0.0;
-  double lower_threshold_step = 0.0;
-  tool->lower_threshold_state_->get_step( lower_threshold_step );
-  tool->lower_threshold_state_->get_range( lower_threshold_min, lower_threshold_max );
-  this->private_->lower_threshold_->setStep( lower_threshold_step );
-  this->private_->lower_threshold_->setRange( lower_threshold_min, lower_threshold_max );
-  this->private_->lower_threshold_->setCurrentValue( tool->lower_threshold_state_->get() );
-  
-   // set the defaults for the alpha
-  int alpha_min = 0; 
-  int alpha_max = 0;
-  int alpha_step = 0;
-  tool->alpha_state_->get_step( alpha_step );
-  tool->alpha_state_->get_range( alpha_min, alpha_max );
-  this->private_->alpha_->setStep( alpha_step );
-  this->private_->alpha_->setRange( alpha_min, alpha_max );
-  this->private_->alpha_->setCurrentValue( tool->alpha_state_->get() );
-  
-  // set the default for the replace state
-  this->private_->ui_.replaceCheckBox->setChecked( tool->replace_state_->get() );
-
-  //Step 4 - connect the gui to the tool through the QtBridge
+  //Step 3 - connect the gui to the tool through the QtBridge
   QtUtils::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
   this->connect( this->private_->target_, SIGNAL( valid( bool ) ), this, SLOT( enable_run_filter( bool ) ) );
   this->connect( this->private_->target_, SIGNAL( currentIndexChanged( QString ) ), this, SLOT( refresh_histogram( QString ) ) );

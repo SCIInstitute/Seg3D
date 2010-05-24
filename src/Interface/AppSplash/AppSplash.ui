@@ -116,7 +116,7 @@ QPushButton#new_project_button_:pressed{
       <string/>
      </property>
      <property name="pixmap">
-      <pixmap resource="../AppInterface/Resources/AppInterface.qrc">:/Images/Seg3DSplash.png</pixmap>
+      <pixmap>:/Images/Seg3DSplash.png</pixmap>
      </property>
     </widget>
    </item>

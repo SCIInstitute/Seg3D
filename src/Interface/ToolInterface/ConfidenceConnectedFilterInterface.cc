@@ -87,30 +87,7 @@ bool ConfidenceConnectedFilterInterface::build_widget( QFrame* frame )
   ConfidenceConnectedFilter* tool =
       dynamic_cast< ConfidenceConnectedFilter* > ( base_tool_.get() );
       
-  //Step 3 - set the values for the tool ui from the state engine
-  
-      // set the defaults for the iterations
-      int iterations_min = 0; 
-      int iterations_max = 0;
-      int iterations_step = 0;
-      tool->iterations_state_->get_step( iterations_step );
-      tool->iterations_state_->get_range( iterations_min, iterations_max );
-      this->private_->iterations_->setStep( iterations_step );
-        this->private_->iterations_->setRange( iterations_min, iterations_max );
-        this->private_->iterations_->setCurrentValue( tool->iterations_state_->get() );
-        
-        // set the defaults for the multiplier
-      int multiplier_min = 0; 
-      int multiplier_max = 0;
-      int multiplier_step = 0;
-      tool->threshold_multiplier_state_->get_step( multiplier_step );
-      tool->threshold_multiplier_state_->get_range( multiplier_min, multiplier_max );
-      this->private_->multiplier_->setStep( multiplier_step );
-        this->private_->multiplier_->setRange( multiplier_min, multiplier_max );
-        this->private_->multiplier_->setCurrentValue( tool->threshold_multiplier_state_->get() );
-   
-
-  //Step 4 - connect the gui to the tool through the QtBridge
+  //Step 3 - connect the gui to the tool through the QtBridge
   QtUtils::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
   this->connect( this->private_->target_, SIGNAL( valid( bool ) ), this, SLOT( enable_run_filter( bool ) ) );
   QtUtils::QtBridge::Connect( this->private_->iterations_, tool->iterations_state_ );

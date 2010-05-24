@@ -42,6 +42,8 @@ QtSliderDoubleComboConnector::QtSliderDoubleComboConnector( QtSliderDoubleCombo*
   state_( state )
 {
   QPointer< QtSliderDoubleComboConnector > qpointer( this );
+  
+  UpdateSliderCombo( qpointer );
 
   this->connect( parent, SIGNAL( valueAdjusted( double ) ), SLOT( set_state_value( double ) ) );
   this->connect( parent, SIGNAL( rangeChanged( double, double ) ), SLOT( set_state_range( double, double ) ) );
@@ -121,5 +123,50 @@ void QtSliderDoubleComboConnector::set_state_range( double min_val, double max_v
     Core::ActionSetRange::Dispatch( this->state_, min_val, max_val );
   }
 }
+  
+void QtSliderDoubleComboConnector::UpdateSliderCombo( QPointer< QtSliderDoubleComboConnector > qpointer )
+{
+  if ( !Core::Interface::IsInterfaceThread() )
+  {
+    Core::Interface::PostEvent( boost::bind( &QtSliderDoubleComboConnector::UpdateSliderCombo, qpointer ) );
+    return;
+  }
+  
+  if ( qpointer.isNull() )
+  {
+    return;
+  }
+  
+  // block signals back to the application thread
+  qpointer->block();
+  
+  QtSliderDoubleCombo* slider_combo = qpointer->parent_;
+  
+  // lock the state engine
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+  
+  Core::StateBase* state_base = qpointer->state_.get();
+  
+  if ( typeid( *state_base ) == typeid( Core::StateRangedDouble ) )
+  {
+    Core::StateRangedDouble* state_ranged_double = static_cast< Core::StateRangedDouble* > ( state_base );
+    
+    double min; 
+    double max;
+    state_ranged_double->get_range( min, max );
+    slider_combo->setRange( min, max );
+    
+    double step;
+    state_ranged_double->get_step( step );
+    slider_combo->setStep( step );
+    
+    slider_combo->setCurrentValue( state_ranged_double->get() );
+    
+  }
+  
+  // unblock signals
+  qpointer->unblock();    
+}
+  
 
 } // end namespace QtUtils

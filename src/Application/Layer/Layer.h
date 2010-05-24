@@ -101,12 +101,6 @@ public:
   // State that describes which menu is currently shown
   Core::StateOptionHandle edit_mode_state_;
   
-  // State that describes which fill mode is active
-  Core::StateOptionHandle fill_mode_state_;
-  
-  // State that describes which border mode is active
-  Core::StateOptionHandle border_mode_state_;
-
   // -- Accessors --
 public:
 

@@ -94,20 +94,7 @@ bool BooleanFilterInterface::build_widget( QFrame* frame )
   ToolHandle base_tool_ = tool();
   BooleanFilter* tool = dynamic_cast< BooleanFilter* > ( base_tool_.get() );
   
-  //Step 3 - set the values for the tool ui from the state engine
-
-  //set default falues for the example list
-  std::vector< std::string > temp_option_list = tool->example_expressions_state_->option_list();
-  for( size_t i = 0; i < temp_option_list.size(); i++)
-  {   
-    this->private_->ui_.exampleExpComboBox->addItem( QString::fromStdString( temp_option_list[i] ) );
-  } 
-  this->private_->ui_.exampleExpComboBox->setCurrentIndex(tool->example_expressions_state_->index());
-  
-  // set the default for the replace state
-  this->private_->ui_.replaceCheckBox->setChecked( tool->replace_state_->get() );
-
-  //Step 4 - connect the gui to the tool through the QtBridge
+  //Step 3 - connect the gui to the tool through the QtBridge
   QtUtils::QtBridge::Connect( this->private_->mask_a_, tool->mask_a_state_ );
   QtUtils::QtBridge::Connect( this->private_->mask_b_, tool->mask_b_state_ );
   QtUtils::QtBridge::Connect( this->private_->mask_c_, tool->mask_c_state_ );

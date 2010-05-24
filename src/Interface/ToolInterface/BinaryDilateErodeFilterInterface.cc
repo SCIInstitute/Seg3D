@@ -86,33 +86,7 @@ bool BinaryDilateErodeFilterInterface::build_widget( QFrame* frame )
   ToolHandle base_tool_ = tool();
   BinaryDilateErodeFilter* tool = dynamic_cast< BinaryDilateErodeFilter* > ( base_tool_.get() );
   
-  //Step 3 - set the values for the tool ui from the state engine
-  
-  // set the defaults for erode
-  int erode_min = 0; 
-  int erode_max = 0;
-  int erode_step = 0;
-  tool->erode_state_->get_step( erode_step );
-  tool->erode_state_->get_range( erode_min, erode_max );
-  this->private_->erode_->setStep( erode_step );
-  this->private_->erode_->setRange( erode_min, erode_max );
-  this->private_->erode_->setCurrentValue( tool->erode_state_->get() );
-  
-  // set the defaults for dialate
-  int dilate_min = 0; 
-  int dilate_max = 0;
-  int dilate_step = 0;
-  tool->dilate_state_->get_step( dilate_step );
-  tool->dilate_state_->get_range( dilate_min, dilate_max );
-  this->private_->dilate_->setStep( dilate_step );
-  this->private_->dilate_->setRange( dilate_min, dilate_max );
-  this->private_->dilate_->setCurrentValue( tool->dilate_state_->get() );
-
-  // set the default for the replace state
-  this->private_->ui_.replaceCheckBox->setChecked( tool->replace_state_->get() );
-
-
-  //Step 4 - connect the gui to the tool through the QtBridge
+  //Step 3 - connect the gui to the tool through the QtBridge
   QtUtils::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
   this->connect( this->private_->target_, SIGNAL( valid( bool ) ), 
     this, SLOT( enable_run_filter( bool ) ) );

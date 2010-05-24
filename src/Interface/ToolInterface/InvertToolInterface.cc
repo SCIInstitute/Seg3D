@@ -77,15 +77,10 @@ bool InvertToolInterface::build_widget( QFrame* frame )
   ToolHandle base_tool_ = tool();
   InvertTool* tool = dynamic_cast< InvertTool* > ( base_tool_.get() );
   
-  //Step 3 - set the default values from the state variables
-        //set the default replace checkbox value
-        this->private_->ui_.replaceCheckBox->setChecked(tool->replace_state_);
-  
-  //Step 4 - connect the gui to the tool through the QtBridge
+  //Step 3 - connect the gui to the tool through the QtBridge
   QtUtils::QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
   QtUtils::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
   connect( this->private_->target_, SIGNAL( valid( bool ) ), this, SLOT( enable_run_filter( bool ) ) );
-  
   connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), this, SLOT( execute_filter() ) );
   
   this->private_->target_->sync_layers();

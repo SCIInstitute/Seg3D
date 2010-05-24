@@ -82,22 +82,7 @@ bool MaskDataFilterInterface::build_widget( QFrame* frame )
   ToolHandle base_tool_ = tool();
   MaskDataFilter* tool = dynamic_cast< MaskDataFilter* > ( base_tool_.get() );
   
-  //Step 3 - set the values for the tool ui from the state engine
-      
-  //set default falues for the replace with option list
-  
-  std::vector< std::string >temp_option_list = tool->replace_with_state_->option_list();
-  for( size_t i = 0; i < temp_option_list.size(); i++)
-  {   
-    this->private_->ui_.replaceComboBox->addItem( QString::fromStdString( temp_option_list[i] ) );
-  } 
-  this->private_->ui_.replaceComboBox->setCurrentIndex(tool->replace_with_state_->index());
-  
-  // set the default for the replace state
-  this->private_->ui_.replaceCheckBox->setChecked( tool->replace_state_->get() );
-  
-    
-  //Step 4 - connect the gui to the tool through the QtBridge
+  //Step 3 - connect the gui to the tool through the QtBridge
   QtUtils::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
   this->connect( this->private_->target_, SIGNAL( valid( bool ) ), this, SLOT( enable_run_filter( bool ) ) );
   QtUtils::QtBridge::Connect( this->private_->mask_, tool->mask_layer_state_ );

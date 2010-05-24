@@ -93,42 +93,7 @@ bool AnisotropicDiffusionFilterInterface::build_widget( QFrame* frame )
   AnisotropicDiffusionFilter* tool =
       dynamic_cast< AnisotropicDiffusionFilter* > ( base_tool_.get() );
   
-    //Step 3 - set the values for the tool ui from the state engine
-      
-  // set the defaults for the iterations from the state variables
-  int iterations_min = 0; 
-  int iterations_max = 0;
-  int iterations_step = 0;
-  tool->iterations_state_->get_step( iterations_step );
-  tool->iterations_state_->get_range( iterations_min, iterations_max );
-  this->private_->iterations_->setStep( iterations_step );
-  this->private_->iterations_->setRange( iterations_min, iterations_max );
-  this->private_->iterations_->setCurrentValue( tool->iterations_state_->get() );
-  
-  // set the defaults for the step from the state variables
-  int step_min = 0; 
-  int step_max = 0;
-  int step_step = 0;
-  tool->steps_state_->get_step( step_step );
-  tool->steps_state_->get_range( step_min, step_max );
-  this->private_->step_->setStep( step_step );
-  this->private_->step_->setRange( step_min, step_max );
-  this->private_->step_->setCurrentValue( tool->steps_state_->get() );
-  
-  // set the defaults for the conductance from the state variables
-  double conductance_min = 0.0; 
-  double conductance_max = 0.0;
-  double conductance_step = 0.0;
-  tool->conductance_state_->get_step( conductance_step );
-  tool->conductance_state_->get_range( conductance_min, conductance_max );
-  this->private_->conductance_->setStep( conductance_step );
-  this->private_->conductance_->setRange( conductance_min, conductance_max );
-  this->private_->conductance_->setCurrentValue( tool->conductance_state_->get() );
-  
-  //set the default replace checkbox value
-  this->private_->ui_.replaceCheckBox->setChecked(tool->replace_state_->get());
-  
-    //Step 4 - connect the gui to the tool through the QtBridge
+    //Step 3 - connect the gui to the tool through the QtBridge
   QtUtils::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
   connect( this->private_->target_, SIGNAL( valid( bool ) ), this, SLOT( enable_run_filter( bool ) ) );
   QtUtils::QtBridge::Connect( this->private_->iterations_, tool->iterations_state_ );

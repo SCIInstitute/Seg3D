@@ -63,10 +63,11 @@ public Q_SLOTS:
   void setCurrentValue( int );
   
 public:
-  int get_value() 
-  { 
-    return value_;
-  }
+  int get_value() { return value_; }
+//  void block() { blockSignals( true ); }
+//  void unblock() { blockSignals( false ); }
+//  void parent(){ return parentWidget(); }
+  
 
 // -- widget internals -- 
 private:
