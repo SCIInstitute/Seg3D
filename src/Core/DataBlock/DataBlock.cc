@@ -179,12 +179,12 @@ void DataBlock::set_histogram( const Histogram& histogram )
   this->histogram_ = histogram;
 }
 
-inline double DataBlock::get_max() const
+double DataBlock::get_max() const
 {
   return this->histogram_.get_max();
 }
 
-inline double DataBlock::get_min() const
+double DataBlock::get_min() const
 {
   return this->histogram_.get_min();
 }

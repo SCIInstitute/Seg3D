@@ -29,7 +29,6 @@
 #ifndef APPLICATION_TOOL_ACTIONS_ACTIONNEWMASKLAYER_H
 #define APPLICATION_TOOL_ACTIONS_ACTIONNEWMASKLAYER_H
 
-
 #include <Core/Action/Actions.h>
 #include <Core/Interface/Interface.h>
 #include <Application/Layer/LayerGroup.h>
@@ -39,7 +38,7 @@ namespace Seg3D
 
 class ActionNewMaskLayer : public Core::Action
 {
-  CORE_ACTION( "NewMaskLayer", "<group_name>" );
+  CORE_ACTION( "NewMaskLayer", "NewMaskLayer <group_name>" );
   
   // -- Constructor/Destructor --
 public:
@@ -47,6 +46,7 @@ public:
     group_name_("")
   {
     add_parameter("group", group_name_);
+    add_cachedhandle( group_handle_ );
   }
   
   virtual ~ActionNewMaskLayer()
@@ -56,10 +56,15 @@ public:
 // -- Functions that describe action --
 public:
   virtual bool validate( Core::ActionContextHandle& context );
-  virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
+  virtual bool run( Core::ActionContextHandle& context, 
+    Core::ActionResultHandle& result );
   
 private:
+  // The name of the group where the mask needs to be added
   Core::ActionParameter< std::string > group_name_;
+  
+  //  A short cut to where the layer group
+  Core::ActionCachedHandle<LayerGroupHandle> group_handle_;
 
   // -- Dispatch this action from the interface --
 public:
@@ -67,21 +72,9 @@ public:
   // Create action that moves the layer above
   static Core::ActionHandle Create( LayerGroupHandle group );
   
-  // CREATE:
-  // Create action that moves the layer above
-  static Core::ActionHandle Create( const std::string& group_name );
-  
   // DISPATCH
   // Dispatch action that creates a new mask layer 
   static void Dispatch( LayerGroupHandle group );
-  
-  // DISPATCH
-  // Dispatch action that creates a new mask layer 
-  static void Dispatch( const std::string& group_name );
-  
-private:
-  // Layer_handle that is requested
-  LayerGroupHandle group_handle_;
   
 };
   

@@ -133,10 +133,27 @@ bool MaskDataBlockManager::create( size_t nx, size_t ny, size_t nz, MaskDataBloc
   mask = MaskDataBlockHandle( new MaskDataBlock( data_block, mask_bit ) );
   // Clear the mask before using it
   // TODO: we might want to put this logic in the constructor of MaskVolume
+  
   size_t data_size = nx * ny * nz;
-  for ( size_t i = 0; i< data_size; i++ )
+  unsigned char* data = mask->get_mask_data();
+  unsigned char not_mask_value = ~( mask->get_mask_value() );
+  
+  size_t data_size8 = data_size/8;
+  size_t i = 0;
+  for ( ; i< data_size8; i+=8 )
   {
-    mask->clear_mask_at( i );
+    data[ i ] &= not_mask_value;
+    data[ i+1 ] &= not_mask_value;
+    data[ i+2 ] &= not_mask_value;
+    data[ i+3 ] &= not_mask_value;
+    data[ i+4 ] &= not_mask_value;
+    data[ i+5 ] &= not_mask_value;
+    data[ i+6 ] &= not_mask_value;
+    data[ i+7 ] &= not_mask_value;
+  }
+  for ( ; i< data_size; i++ )
+  {
+    data[ i ] &= not_mask_value;
   }
 
   // Mark the bitplane as being used before returning the mask

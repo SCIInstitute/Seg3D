@@ -38,7 +38,8 @@ MaskDataBlock::MaskDataBlock( DataBlockHandle& data_block, unsigned int mask_bit
   nz_( data_block->get_nz() ),
   data_block_( data_block ),
   mask_bit_( mask_bit ),
-  mask_value_( 1 << mask_bit )
+  mask_value_( 1 << mask_bit ),
+  not_mask_value_( ~( 1 << mask_bit ) ) 
 {
   this->data_ = reinterpret_cast<unsigned char*>( this->data_block_->get_data() );
 }

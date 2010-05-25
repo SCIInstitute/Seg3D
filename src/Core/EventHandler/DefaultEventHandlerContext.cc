@@ -152,14 +152,6 @@ bool DefaultEventHandlerContext::process_events()
 
 bool DefaultEventHandlerContext::wait_and_process_events()
 {
-  // Only run on the eventhandler thread
-  if ( boost::this_thread::get_id() != this->private_->eventhandler_thread_.get_id() )
-  {
-    CORE_THROW_LOGICERROR(
-      "wait_and_process_events was called from a thread"
-      " that is not processing the events" );
-  }
-
   // lock the queue, so it is not changed while we are taking events of the
   // the list.
   boost::unique_lock< boost::mutex > lock( this->private_->event_queue_mutex_ );

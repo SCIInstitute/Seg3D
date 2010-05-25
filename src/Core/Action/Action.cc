@@ -79,6 +79,7 @@ void Action::clear_cache()
   while ( it != it_end )
   {
     (*it)->clear_cached_handle();
+    ++it;
   }
 }
 

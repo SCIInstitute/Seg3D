@@ -112,7 +112,7 @@ public:
     return this->mask_bit_;
   }
 
-  // MASK_VALUE
+  // GET_MASK_VALUE
   // Get the value at which the mask is stored
   unsigned char get_mask_value()
   {
@@ -157,7 +157,7 @@ public:
 
   inline void clear_mask_at( size_t index )
   {
-    this->data_[ index ] &= ~( this->mask_value_ );
+    this->data_[ index ] &= this->not_mask_value_;
   }
 
 // -- Locking of the datablock --
@@ -195,6 +195,7 @@ private:
   const unsigned int mask_bit_;
 
   const unsigned char mask_value_;
+  const unsigned char not_mask_value_;
 
   // Cached data pointer of the underlying DataBlock
   unsigned char* data_;
