@@ -31,8 +31,8 @@
 
 
 // QT includes
-#include <QAction>
-#include <QFrame>
+#include <QWidget>
+#include <QPointer>
 
 // STL includes
 #include <string>
@@ -43,6 +43,7 @@
 #include <boost/shared_ptr.hpp>
 
 // Core includes
+#include <Core/Utils/ConnectionHandler.h>
 #include <Core/Action/ActionContext.h>
 
 // Application includes
@@ -57,7 +58,7 @@ class ViewerWidgetPrivate;
 typedef boost::shared_ptr< ViewerWidgetPrivate > ViewerWidgetPrivateHandle;
 
 // Class definitions
-class ViewerWidget : public QWidget
+class ViewerWidget : public QWidget, public Core::ConnectionHandler
 {
   Q_OBJECT
 
@@ -75,6 +76,9 @@ Q_SIGNALS:
   // This signal is triggered when the viewer type ( axial, sagittal, coronal, or volume)
   // is changed
   void changed_viewer_type( int );
+  
+public:
+  typedef QPointer< ViewerWidget > qpointer_type_;
 
 public Q_SLOTS:
 
@@ -103,15 +107,21 @@ public Q_SLOTS:
   // viewed.
   void auto_view();
   
+  // HANDLE_VIEW_MODE_CHANGED:
+  // 
+  static void handle_view_mode_changed( qpointer_type_ qpointer );
+  
 private:
   // ADD_ICONS_TO_COMBOBOX:
   // This function adds the proper Icons to the viewer states combobox
   void add_icons_to_combobox();
-
+  
 private:
   // Internals of the viewer widget, so most dependencies do not need to
   // be included here.
   ViewerWidgetPrivateHandle private_;
+  
+  
 };
 
 } // end namespace Seg3D

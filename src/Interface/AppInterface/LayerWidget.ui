@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>273</width>
-    <height>231</height>
+    <width>301</width>
+    <height>207</height>
    </rect>
   </property>
   <property name="mouseTracking">
@@ -35,28 +35,20 @@ QLineEdit#label_{
   text-align: left;
   color: black;
   margin-right: 3px;
-  background-color: rgba(255, 255, 255, 1);
+  background-color: rgba(255, 255, 255, 0);
 }
 QLineEdit#label_:focus{
-  background-color: rgba(255, 255, 255, 1);
+  background-color: rgb(255, 255, 255);
 }
 
-QWidget#insert_space_{
+/*QWidget#insert_space_{
   margin-top: 0;
   margin-bottom: 0;
   padding-top: 0;
   padding-bottom: 0; 
   border: 1px solid rgba(50, 50, 50, 40);
   background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(0, 0, 0, 50), stop:0.3 rgba(0, 0, 0, 100), stop:0.7 rgba(0, 0, 0, 100), stop:1 rgba(0, 0, 0, 50));
-}
-
-QPushButton#activate_button_{
-  background-color: rgba(0, 0, 0, 0);
-  border: 1px solid rgba(0, 0, 0, 0);
-  border-radius: 3px;
-  margin-left:1px;
-  color: white;
-}
+}*/
 
 QWidget#typeBackground_{
   background-color: rgb(255, 128, 0);
@@ -72,178 +64,22 @@ QWidget#typeGradient_{
 
 /* Buttons */
 
-QToolButton#lock_button_{
+QToolButton{
   background-color: rgba(0, 0, 0, 0);
   border: 1px solid rgba(0, 0, 0, 0);
 }
-QToolButton#lock_button_:hover{
+QToolButton:hover{
   background-color: rgba( 0, 0, 0, 30 );
 }
-QToolButton#lock_button_:pressed{
+QToolButton:pressed{
   background-color: rgba(0, 0, 0, 0);
   border: 1px solid rgb(139, 139, 139);
   margin:0;
 }
-QToolButton#lock_button_:checked{
+QToolButton:checked{
   background-color: rgba(0, 0, 0, 0);
   border: 1px solid rgb(139, 139, 139);
   margin:0;
-}
-
-QToolButton#opacity_button_{
-  background-color: rgba(0, 0, 0, 0);
-  border: 1px solid rgba(0, 0, 0, 0);
-}
-QToolButton#opacity_button_:hover{
-  background-color: rgba( 0, 0, 0, 30 );
-}
-QToolButton#opacity_button_:pressed{
-  background-color: rgba(0, 0, 0, 0);
-  border: 1px solid rgb(139, 139, 139);
-  margin:0;
-}
-QToolButton#opacity_button_:checked{
-  background-color: rgba(0, 0, 0, 0);
-  border: 1px solid rgb(139, 139, 139);
-  margin:0;
-}
-
-QToolButton#brightness_contrast_button_{
-  background-color: rgba(0, 0, 0, 0);
-  border: 1px solid rgba(0, 0, 0, 0);
-}
-QToolButton#brightness_contrast_button_:hover{
-  background-color: rgba( 0, 0, 0, 30 );
-}
-QToolButton#brightness_contrast_button_:pressed{
-  background-color: rgba(0, 0, 0, 0);
-  border: 1px solid rgb(139, 139, 139);
-  margin:0;
-}
-QToolButton#brightness_contrast_button_:checked{
-  background-color: rgba(0, 0, 0, 0);
-  border: 1px solid rgb(139, 139, 139);
-  margin:0;
-}
-
-QToolButton#visibility_button_{
-  background-color: rgba(0, 0, 0, 0);
-  border: 1px solid rgba(0, 0, 0, 0);
-}
-QToolButton#visibility_button_:hover{
-    background-color: rgba( 0, 0, 0, 30 );
-}
-QToolButton#visibility_button_:pressed{
-  background-color: rgba(0, 0, 0, 0);
-  border: 1px solid rgb(139, 139, 139);
-  margin:0;
-}
-QToolButton#visibility_button_:checked{
-  background-color: rgba(0, 0, 0, 0);
-  border: 1px solid rgb(139, 139, 139);
-  margin:0;
-}
-
-QToolButton#iso_surface_button_{
-  background-color: rgba(0, 0, 0, 0);
-  border: 1px solid rgba(0, 0, 0, 0);
-}
-QToolButton#iso_surface_button_:hover{
-    background-color: rgba( 0, 0, 0, 30 );
-}
-QToolButton#iso_surface_button_:pressed{
-  background-color: rgba(0, 0, 0, 0);
-  border: 1px solid rgb(139, 139, 139);
-  margin:0;
-}
-QToolButton#iso_surface_button_:checked{
-  background-color: rgba(0, 0, 0, 0);
-  border: 1px solid rgb(139, 139, 139);
-  margin:0;
-}
-
-QToolButton#compute_iso_surface_button_{
-  background-color: rgba(0, 0, 0, 0);
-  border: 1px solid rgba(0, 0, 0, 0);
-}
-QToolButton#compute_iso_surface_button_:hover{
-    background-color: rgba( 0, 0, 0, 30 );
-}
-QToolButton#compute_iso_surface_button_:pressed{
-  background-color: rgba(0, 0, 0, 0);
-  border: 1px solid rgb(139, 139, 139);
-  margin:0;
-}
-QToolButton#compute_iso_surface_button_:checked{
-  background-color: rgba(0, 0, 0, 0);
-  border: 1px solid rgb(139, 139, 139);
-  margin:0;
-}
-
-QToolButton#fill_border_button_{
-  background-color: rgba(0, 0, 0, 0);
-  border: 1px solid rgba(0, 0, 0, 0);
-}
-QToolButton#fill_border_button_:hover{
-    background-color: rgba( 0, 0, 0, 30 );
-}
-QToolButton#fill_border_button_:pressed{
-  background-color: rgba(0, 0, 0, 0);
-  border: 1px solid rgb(139, 139, 139);
-  margin:0;
-}
-QToolButton#fill_border_button_:checked{
-  background-color: rgba(0, 0, 0, 0);
-  border: 1px solid rgb(139, 139, 139);
-  margin:0;
-}
-
-QToolButton#volume_rendered_button_{
-  background-color: rgba(0, 0, 0, 0);
-  border: 1px solid rgba(0, 0, 0, 0);
-}
-QToolButton#volume_rendered_button_:hover{
-    background-color: rgba( 0, 0, 0, 30 );
-}
-QToolButton#volume_rendered_button_:pressed{
-  background-color: rgba(0, 0, 0, 0);
-  border: 1px solid rgb(139, 139, 139);
-  margin:0;
-}
-QToolButton#volume_rendered_button_:checked{
-  background-color: rgba(0, 0, 0, 0);
-  border: 1px solid rgb(139, 139, 139);
-  margin:0;
-}
-
-QToolButton#color_button_{
-  background-color: rgba(0, 0, 0, 0);
-  border: 1px solid rgba(0, 0, 0, 0);
-}
-QToolButton#color_button_:hover{
-    background-color: rgba( 0, 0, 0, 30 );
-}
-QToolButton#color_button_:pressed{
-  background-color: rgba(0, 0, 0, 0);
-  border: 1px solid rgb(139, 139, 139);
-  margin:0;
-}
-QToolButton#color_button_:checked{
-  background-color: rgba(0, 0, 0, 0);
-  border: 1px solid rgb(139, 139, 139);
-  margin:0;
-}
-
-
-QToolButton#progress_cancel_button_{
-  background-color: rgba(0, 0, 0, 0);
-  border: 1px solid rgba(0, 0, 0, 0);
-}
-QToolButton#progress_cancel_button_:hover{
-    background-color: rgba( 0, 0, 0, 30 );
-}
-QToolButton#progress_cancel_button_:pressed{
-  background-color: rgba(0, 0, 0, 0);
 }
 
 </string>

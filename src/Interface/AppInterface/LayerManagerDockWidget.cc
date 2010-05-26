@@ -70,25 +70,25 @@ LayerManagerDockWidget::LayerManagerDockWidget( QWidget *parent ) :
   
   // Connect the signals from the LayerManager to the GUI
   add_connection( LayerManager::Instance()->layer_inserted_signal_.connect( boost::bind(
-          &LayerManagerDockWidget::HandleInsertLayer, layer_dock_widget, _1 ) ) );
+    &LayerManagerDockWidget::HandleInsertLayer, layer_dock_widget, _1 ) ) );
           
   add_connection( LayerManager::Instance()->layer_inserted_at_signal_.connect( boost::bind(
-          LayerManagerDockWidget::HandleInsertLayerAt, layer_dock_widget, _1, _2 ) ) );
+    LayerManagerDockWidget::HandleInsertLayerAt, layer_dock_widget, _1, _2 ) ) );
           
   add_connection( LayerManager::Instance()->layer_deleted_signal_.connect( boost::bind(
-          &LayerManagerDockWidget::HandleDeleteLayer, layer_dock_widget, _1 ) ) );
+    &LayerManagerDockWidget::HandleDeleteLayer, layer_dock_widget, _1 ) ) );
           
   add_connection( LayerManager::Instance()->layers_deleted_signal_.connect( boost::bind(
-          &LayerManagerDockWidget::HandleDeleteLayers, layer_dock_widget, _1 ) ) );
+    &LayerManagerDockWidget::HandleDeleteLayers, layer_dock_widget, _1 ) ) );
           
   add_connection( LayerManager::Instance()->active_layer_changed_signal_.connect( boost::bind(
-          &LayerManagerDockWidget::HandleActivateLayer, layer_dock_widget, _1 ) ) );
+    &LayerManagerDockWidget::HandleActivateLayer, layer_dock_widget, _1 ) ) );
   
   add_connection( LayerManager::Instance()->group_deleted_signal_.connect( boost::bind(
-                  &LayerManagerDockWidget::HandleGroupDeleted, layer_dock_widget, _1 ) ) );
+    &LayerManagerDockWidget::HandleGroupDeleted, layer_dock_widget, _1 ) ) );
   
   add_connection( LayerManager::Instance()->group_inserted_at_signal_.connect( boost::bind(
-          LayerManagerDockWidget::HandleGroupMoved, layer_dock_widget, _1, _2 ) ) );
+    LayerManagerDockWidget::HandleGroupMoved, layer_dock_widget, _1, _2 ) ) );
   
   
   // Add any layers that may have been added before the GUI was initialized

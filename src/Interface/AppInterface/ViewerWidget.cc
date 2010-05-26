@@ -29,6 +29,7 @@
 
 // Core includes
 #include <Core/Utils/Log.h>
+#include <Core/Interface/Interface.h>
 #include <Core/State/Actions/ActionFlip.h>
 
 // Application includes
@@ -82,6 +83,8 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
   
   this->private_->viewer_ = viewer;
   
+  
+  
   this->private_->ui_.setupUi( this );
   
   // Setup the Custom Picking Button
@@ -99,7 +102,7 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
   // --------------------------------------
   // Generate the OpenGL part of the widget
   this->private_->render_widget_ = QtUtils::QtApplication::Instance()->
-    qt_renderresources_context()->create_qt_render_widget( this, viewer );
+    qt_renderresources_context()->create_qt_render_widget( this, this->private_->viewer_ );
   
   if( this->private_->render_widget_ == 0 )
   {
@@ -113,8 +116,10 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
     
-    //this->change_view_type( 0 );
-
+    qpointer_type_ viewer_widget( this );
+    
+    this->add_connection( this->private_->viewer_->view_mode_state_->value_changed_signal_.connect( 
+      boost::bind( &ViewerWidget::handle_view_mode_changed, viewer_widget ) ) );
 
     this->connect( this->private_->ui_.viewer_states_,
       SIGNAL( currentIndexChanged( int ) ), SLOT( change_view_type( int ) ) );
@@ -130,13 +135,13 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
 
   
     QtUtils::QtBridge::Connect( this->private_->ui_.viewer_states_, 
-                   this->private_->viewer_->view_mode_state_ );
+      this->private_->viewer_->view_mode_state_ );
     QtUtils::QtBridge::Connect( this->private_->picking_button_ , 
-                   this->private_->viewer_->is_picking_target_state_ );
+      this->private_->viewer_->is_picking_target_state_ );
     QtUtils::QtBridge::Connect( this->private_->ui_.grid_button_, 
-                   this->private_->viewer_->slice_grid_state_ );
+      this->private_->viewer_->slice_grid_state_ );
     QtUtils::QtBridge::Connect( this->private_->ui_.lock_button_, 
-                   this->private_->viewer_->viewer_lock_state_ );
+      this->private_->viewer_->viewer_lock_state_ );
 
     this->add_icons_to_combobox();
   }
@@ -186,15 +191,32 @@ void ViewerWidget::change_view_type( int index )
   this->private_->picking_button_->setVisible( !is_volume_view );
   this->private_->ui_.slice_visible_button_->setVisible( !is_volume_view );
 
-//  if( !is_volume_view )
-//  {
-//    Core::StateView2DHandle view2d_state = boost::dynamic_pointer_cast<Core::StateView2D>( 
-//      this->private_->viewer_->get_active_view_state() );
-//    this->private_->ui_.flip_horizontal_button_->setChecked( view2d_state->x_flipped() );
-//    this->private_->ui_.flip_vertical_button_->setChecked( view2d_state->y_flipped() );
-//  }
 }
+  
+void ViewerWidget::handle_view_mode_changed( qpointer_type_ qpointer )
+{
+  if( !( Core::Interface::IsInterfaceThread() ) )
+  {
+    Core::Interface::Instance()->post_event( boost::bind( &ViewerWidget::handle_view_mode_changed,
+      qpointer ) );
+    return;
+  }
+  
+  if( qpointer.data() )
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    bool is_volume_view = qpointer->private_->viewer_->is_volume_view();
 
+    if( !is_volume_view )
+    {
+      Core::StateView2DHandle view2d_state = boost::dynamic_pointer_cast<Core::StateView2D>( 
+        qpointer->private_->viewer_->get_active_view_state() );
+      qpointer->private_->ui_.flip_horizontal_button_->setChecked( view2d_state->x_flipped() );
+      qpointer->private_->ui_.flip_vertical_button_->setChecked( view2d_state->y_flipped() );
+    }
+  }
+}
+  
 void ViewerWidget::flip_view_horiz()
 {
   if( ! this->private_->viewer_->is_volume_view() )
