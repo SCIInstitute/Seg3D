@@ -104,6 +104,10 @@ public:
 
   // === DropSpaceWidget === //
     const static QString DROPSPACEWIDGET_C;
+  
+  // === ViewerWidget === //
+    const static QString VIEWERSELECTED_C;
+    const static QString VIEWERNOTSELECTED_C;
 
 };    
 

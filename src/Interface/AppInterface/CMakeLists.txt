@@ -102,6 +102,7 @@ SET(INTERFACE_APPINTERFACE_UI_SRCS
   ProgressWidget.ui
   ToolBoxPageWidget.ui
   ViewerInterface.ui
+  ViewerWidget.ui
   StatusBar.ui
 )
 

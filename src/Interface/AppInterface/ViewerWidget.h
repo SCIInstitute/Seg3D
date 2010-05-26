@@ -57,7 +57,7 @@ class ViewerWidgetPrivate;
 typedef boost::shared_ptr< ViewerWidgetPrivate > ViewerWidgetPrivateHandle;
 
 // Class definitions
-class ViewerWidget : public QFrame
+class ViewerWidget : public QWidget
 {
   Q_OBJECT
 
@@ -88,20 +88,25 @@ public Q_SLOTS:
   
   // CHANGE_VIEW_TYPE:
   // This slot is triggered when the viewer type is changed.
-  void change_view_type( QAction* );
+  void change_view_type( int );
   
   // FLIP_VIEW_HORIZ:
   // Flip the view horizontally.
-  void flip_view_horiz( bool );
+  void flip_view_horiz();
 
   // FLIP_VIEW_VERT:
   // Flip the view vertically.
-  void flip_view_vert( bool );
+  void flip_view_vert();
   
   // AUTO_VIEW:
   // Resize the viewer such that the scene is centered and scaled so most of the scene can be
   // viewed.
-  void auto_view( bool );
+  void auto_view();
+  
+private:
+  // ADD_ICONS_TO_COMBOBOX:
+  // This function adds the proper Icons to the viewer states combobox
+  void add_icons_to_combobox();
 
 private:
   // Internals of the viewer widget, so most dependencies do not need to

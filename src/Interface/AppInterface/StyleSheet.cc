@@ -271,7 +271,7 @@ namespace Seg3D
     " background-color: rgb( 200, 200, 200 );"
     " border: 1px solid rgb( 60, 60, 60 );"
     " border-radius: 3px;"
-    "}\n");
+    "}");
   const QString StyleSheet::GROUP_WIDGET_ACTIVATE_BUTTON_INACTIVE_C = QString::fromUtf8(
     "QPushButton#activate_button_{"
     " background-color:rgba(0, 0, 0, 0);"
@@ -327,6 +327,23 @@ namespace Seg3D
     "   stop:0.3 rgba(0, 0, 0, 100),"
     "   stop:0.7 rgba(0, 0, 0, 100),"
     "   stop:1 rgba(0, 0, 0, 50) );");
+  
+  // - ViewerWidget - //
+  const QString StyleSheet::VIEWERSELECTED_C = QString::fromUtf8(
+    "QWidget#border_{"
+    " border-top: 3px solid rgb( 225, 125, 0 );"
+    " border-bottom: 3px solid rgb( 180, 90, 0 );"
+    " border-left: 3px solid rgb( 225, 125, 0 );"
+    " border-right: 3px solid rgb( 180, 90, 0 );"
+    "}");
+  
+  const QString StyleSheet::VIEWERNOTSELECTED_C = QString::fromUtf8(
+     "QWidget#border_{"
+     "  border-top: 3px solid rgb( 55, 55, 55 );"
+     "  border-bottom: 3px solid rgb( 35, 35, 35 );"
+     "  border-left: 3px solid rgb( 55, 55, 55 );"
+     "  border-right: 3px solid rgb( 35, 35, 35 );"
+     "}");
 
 StyleSheet::StyleSheet()
 {
