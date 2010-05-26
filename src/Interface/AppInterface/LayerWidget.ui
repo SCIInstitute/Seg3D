@@ -82,6 +82,12 @@ QToolButton:checked{
   margin:0;
 }
 
+QPushButton#activate_button_{
+  border-radius: 3px;
+  margin-left:1px;
+  color: white;
+}
+
 </string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0">

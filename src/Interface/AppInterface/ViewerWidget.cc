@@ -119,7 +119,7 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
     qpointer_type_ viewer_widget( this );
     
     this->add_connection( this->private_->viewer_->view_mode_state_->value_changed_signal_.connect( 
-      boost::bind( &ViewerWidget::handle_view_mode_changed, viewer_widget ) ) );
+      boost::bind( &ViewerWidget::HandleViewModeChanged, viewer_widget ) ) );
 
     this->connect( this->private_->ui_.viewer_states_,
       SIGNAL( currentIndexChanged( int ) ), SLOT( change_view_type( int ) ) );
@@ -193,11 +193,11 @@ void ViewerWidget::change_view_type( int index )
 
 }
   
-void ViewerWidget::handle_view_mode_changed( qpointer_type_ qpointer )
+void ViewerWidget::HandleViewModeChanged( qpointer_type_ qpointer )
 {
   if( !( Core::Interface::IsInterfaceThread() ) )
   {
-    Core::Interface::Instance()->post_event( boost::bind( &ViewerWidget::handle_view_mode_changed,
+    Core::Interface::Instance()->post_event( boost::bind( &ViewerWidget::HandleViewModeChanged,
       qpointer ) );
     return;
   }

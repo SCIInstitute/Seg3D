@@ -109,7 +109,7 @@ public Q_SLOTS:
   
   // HANDLE_VIEW_MODE_CHANGED:
   // 
-  static void handle_view_mode_changed( qpointer_type_ qpointer );
+  static void HandleViewModeChanged( qpointer_type_ qpointer );
   
 private:
   // ADD_ICONS_TO_COMBOBOX:
