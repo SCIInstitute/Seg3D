@@ -83,7 +83,7 @@ QtLineEditConnector::~QtLineEditConnector()
 void QtLineEditConnector::SetLineEditText( QPointer< QtLineEditConnector > qpointer, 
     std::string text, Core::ActionSource source )
 {
-  if ( source == Core::ActionSource::INTERFACE_E )
+  if ( source == Core::ActionSource::INTERFACE_WIDGET_E )
   {
     return;
   }

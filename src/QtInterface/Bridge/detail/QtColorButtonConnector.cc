@@ -60,7 +60,7 @@ QtColorButtonConnector::~QtColorButtonConnector()
 void QtColorButtonConnector::SetButtonColor( QPointer< QtColorButtonConnector > qpointer, 
     Core::Color val, Core::ActionSource source )
 {
-  if ( source == Core::ActionSource::INTERFACE_E )
+  if ( source == Core::ActionSource::INTERFACE_WIDGET_E )
   {
     return;
   }

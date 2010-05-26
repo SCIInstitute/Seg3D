@@ -106,7 +106,7 @@ bool StateOption::set( const std::string& input_value, ActionSource source )
 
     if ( this->option_list_.end() == it )
     {
-      if ( source == ActionSource::INTERFACE_E )
+      if ( source == ActionSource::INTERFACE_WIDGET_E )
       {
         lock.unlock();
         // NOTE: This is a special case in which the option requested by the

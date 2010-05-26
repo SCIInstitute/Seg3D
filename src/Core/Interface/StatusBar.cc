@@ -67,8 +67,12 @@ CORE_SINGLETON_IMPLEMENTATION( StatusBar );
 
 StatusBar::StatusBar()
 {
-  this->add_connection( Interface::Instance()->interface_action_context()->
+  this->add_connection( Interface::Instance()->widget_interface_action_context()->
     action_message_signal_.connect( boost::bind( &StatusBar::set_message, this, _1, _2 ) ) );
+
+  this->add_connection( Interface::Instance()->mouse_interface_action_context()->
+    action_message_signal_.connect( boost::bind( &StatusBar::set_message, this, _1, _2 ) ) );
+
 }
 
 StatusBar::~StatusBar()

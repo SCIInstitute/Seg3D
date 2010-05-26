@@ -66,7 +66,7 @@ void QtColorBarWidgetConnector::SetColorIndex(
     QPointer< QtColorBarWidgetConnector > qpointer, 
     int index, Core::ActionSource source )
 {
-  if ( source == Core::ActionSource::INTERFACE_E )
+  if ( source == Core::ActionSource::INTERFACE_WIDGET_E )
   {
     return;
   }

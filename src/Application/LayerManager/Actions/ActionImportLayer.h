@@ -26,12 +26,14 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_TOOL_ACTIONS_ACTIONIMPORTLAYER_H
-#define APPLICATION_TOOL_ACTIONS_ACTIONIMPORTLAYER_H
+#ifndef APPLICATION_LAYERMANAGER_ACTIONS_ACTIONIMPORTLAYER_H
+#define APPLICATION_LAYERMANAGER_ACTIONS_ACTIONIMPORTLAYER_H
 
-// Application includes
+// Core includes
 #include <Core/Action/Actions.h>
 #include <Core/Interface/Interface.h>
+
+// Application includes
 #include <Application/LayerIO/LayerImporter.h>
 
 namespace Seg3D
@@ -64,13 +66,19 @@ public:
   
   // -- Action parameters --
 private:
-  // ToolID that is requested
+
+  // The filename of the file to load
   Core::ActionParameter< std::string > filename_;
+
+  // How should the file be loaded
   Core::ActionParameter< std::string > mode_;
+
+  // Which type of importer should we use
   Core::ActionParameter< std::string > importer_;
   
-  // TODO: possible memory leak here ...
-  LayerImporterHandle layer_importer_;
+  // Short cut to the layer importer that has already loaded the data if the file
+  // was read through the GUI
+  Core::ActionCachedHandle<LayerImporterHandle> layer_importer_;
   
   // -- Dispatch this action from the interface --
 public:

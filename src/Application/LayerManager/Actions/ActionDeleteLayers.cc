@@ -26,6 +26,9 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// Application includes
+#include <Application/Layer/Layer.h>
+#include <Application/Layer/LayerGroup.h>
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/LayerManager/Actions/ActionDeleteLayers.h>
 
@@ -39,40 +42,43 @@ namespace Seg3D
 
 bool ActionDeleteLayers::validate( Core::ActionContextHandle& context )
 {
-  LayerGroupHandle layer_group( this->group_weak_handle_.lock() );
-  if ( !layer_group )
+  if ( ! this->group_.handle() )
   {
-    return false;
+    this->group_.handle() = LayerManager::Instance()->get_layer_group( 
+      this->group_id_.value() );
+    
+    if ( ! this->group_.handle() )
+    {
+      context->report_error( std::string( "LayerGroupID: '" ) + 
+        this->group_id_.value() + "' is invalid" );
+      return false;
+    }
   }
-  
-  // TODO: fix it
-  //if ( !( StateEngine::Instance()->is_stateid( group_weak_handle_->get_group_id() ) ) )
-  //{
-  //  context->report_error( std::string( "GroupID '" ) + group_weak_handle_->get_group_id() + "' is invalid" );
-  //  return false;
-  //}
 
   return true; // validated
 }
 
-bool ActionDeleteLayers::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
+bool ActionDeleteLayers::run( Core::ActionContextHandle& context, 
+  Core::ActionResultHandle& result )
 {
-  LayerGroupHandle layer_group( this->group_weak_handle_.lock() );
-  if ( layer_group )
-  {
-    LayerManager::Instance()->delete_layers( layer_group );
-    return true;
-  }
-  
-  return false;
+  LayerManager::Instance()->delete_layers( this->group_.handle() );
+  return true;
 }
+
+Core::ActionHandle ActionDeleteLayers::Create( LayerGroupHandle group )
+{
+  ActionDeleteLayers* action = new ActionDeleteLayers;
+
+  action->group_.handle() = group;
+  action->group_id_.value() = group->get_group_id();
+
+  return Core::ActionHandle( action );
+}
+
 
 void ActionDeleteLayers::Dispatch( LayerGroupHandle group )
 {
-  ActionDeleteLayers* action = new ActionDeleteLayers;
-  action->group_weak_handle_ = group;
-  
-  Core::Interface::PostAction( Core::ActionHandle( action ) );
+  Core::Interface::PostAction( Create( group ) );
 }
 
 } // end namespace Seg3D

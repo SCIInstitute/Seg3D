@@ -104,6 +104,16 @@ public:
     Interface::PostAction( Create( state, statevalue ) );
   }
 
+  // DISPATCHMOUSE:
+  // Dispatch the action from the interface tagged as a mouse command
+  // so that widgets are updated
+  template< class HANDLE, class T >
+  static void DispatchMouse( HANDLE& state, const T& statevalue )
+  {
+    // Post the new action
+    Interface::PostMouseAction( Create( state, statevalue ) );
+  }
+
 };
 
 } // end namespace Core

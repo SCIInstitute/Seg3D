@@ -1157,11 +1157,11 @@ void Viewer::adjust_contrast_brightness( int dx, int dy )
   // TODO: Check whether we need the if statement here
   if ( contrast != old_contrast )
   {
-    Core::ActionSet::Dispatch( data_layer->contrast_state_, contrast );
+    Core::ActionSet::DispatchMouse( data_layer->contrast_state_, contrast );
   }
   if ( brightness != old_brightness )
   {
-    Core::ActionSet::Dispatch( data_layer->brightness_state_, brightness );
+    Core::ActionSet::DispatchMouse( data_layer->brightness_state_, brightness );
   }
 }
 

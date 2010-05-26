@@ -31,7 +31,8 @@
 namespace Core
 {
 
-InterfaceActionContext::InterfaceActionContext()
+InterfaceActionContext::InterfaceActionContext( ActionSource source ) :
+  source_( source )
 {
 }
 

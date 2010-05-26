@@ -57,7 +57,7 @@ class InterfaceActionContext : public ActionContext
   // -- Constructor/destructor --
 public:
   // Wrap a context around an action
-  InterfaceActionContext();
+  InterfaceActionContext( ActionSource source = ActionSource::INTERFACE_WIDGET_E );
 
   // Virtual destructor for memory management
   virtual ~InterfaceActionContext();
@@ -80,8 +80,11 @@ public:
 public:
   virtual ActionSource source() const
   {
-    return ActionSource::INTERFACE_E;
+    return source_;
   }
+
+private:
+  ActionSource source_;
 
   // -- Signals --
 public:

@@ -276,7 +276,7 @@ bool StateLabeledOption::set( const std::string& input_value, Core::ActionSource
 
   if ( index < 0 )
   {
-    if ( source == ActionSource::INTERFACE_E )
+    if ( source == ActionSource::INTERFACE_WIDGET_E )
     {
       lock.unlock();
       // NOTE: This is a special case in which the option requested by the

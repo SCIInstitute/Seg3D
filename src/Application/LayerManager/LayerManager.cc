@@ -44,7 +44,6 @@
 
 // Application action includes
 #include <Application/LayerManager/LayerManager.h>
-#include <Application/LayerManager/Actions/ActionInsertLayer.h>
 
 
 namespace Seg3D

@@ -34,7 +34,8 @@ namespace Core
 CORE_SINGLETON_IMPLEMENTATION( Interface );
 
 Interface::Interface() :
-  context_( new InterfaceActionContext )
+  widget_context_( new InterfaceActionContext( ActionSource::INTERFACE_WIDGET_E ) ),
+  mouse_context_( new InterfaceActionContext( ActionSource::INTERFACE_MOUSE_E ) )
 {
 }
 
@@ -42,9 +43,14 @@ Interface::~Interface()
 {
 }
 
-InterfaceActionContextHandle Interface::interface_action_context()
+InterfaceActionContextHandle Interface::widget_interface_action_context()
 {
-  return context_;
+  return widget_context_;
+}
+
+InterfaceActionContextHandle Interface::mouse_interface_action_context()
+{
+  return mouse_context_;
 }
 
 void Interface::PostEvent( boost::function< void() > function )
@@ -60,7 +66,13 @@ void Interface::PostAndWaitEvent( boost::function< void() > function )
 void Interface::PostAction( ActionHandle action )
 {
   ActionDispatcher::Instance()->post_action( action, ActionContextHandle(
-      Interface::Instance()->interface_action_context() ) );
+      Interface::Instance()->widget_interface_action_context() ) );
+}
+
+void Interface::PostMouseAction( ActionHandle action )
+{
+  ActionDispatcher::Instance()->post_action( action, ActionContextHandle(
+      Interface::Instance()->mouse_interface_action_context() ) );
 }
 
 } // end namespace Core

@@ -67,7 +67,7 @@ QtSliderIntComboConnector::~QtSliderIntComboConnector()
 void QtSliderIntComboConnector::SetValue( QPointer< QtSliderIntComboConnector > qpointer, 
     int val, Core::ActionSource source )
 {
-  if ( source == Core::ActionSource::INTERFACE_E )
+  if ( source == Core::ActionSource::INTERFACE_WIDGET_E )
   {
     return;
   }
@@ -92,7 +92,7 @@ void QtSliderIntComboConnector::SetValue( QPointer< QtSliderIntComboConnector > 
 void QtSliderIntComboConnector::SetRange( QPointer< QtSliderIntComboConnector > qpointer, 
     int min_val, int max_val, Core::ActionSource source )
 {
-  if ( source == Core::ActionSource::INTERFACE_E )
+  if ( source == Core::ActionSource::INTERFACE_WIDGET_E )
   {
     return;
   }

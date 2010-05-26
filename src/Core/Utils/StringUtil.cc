@@ -423,7 +423,7 @@ std::string ExportToString( const std::vector< char >& value )
   {
     std::string result( 1, '[' );
     for ( size_t j = 0; j < value.size(); j++ )
-      result += value[ j ] + ' ';
+      result += ExportToString(value[ j ]) + ' ';
     result[ result.size() - 1 ] = ']';
     return result;
   } 
@@ -544,12 +544,12 @@ bool ImportFromString( const std::string& str, bool& value )
   StripSurroundingSpaces( tmpstr );
   tmpstr = StringToLower( tmpstr );
   
-  if ( ( tmpstr == "0" ) || ( tmpstr == "false" ) || ( tmpstr == "off" ) )
+  if ( ( tmpstr == "0" ) || ( tmpstr == "false" ) || ( tmpstr == "off" ) || ( tmpstr == "no" ) )
   {
     value = false;
     return ( true );
   }
-  else if ( ( tmpstr == "1" ) || ( tmpstr == "true" ) || ( tmpstr == "on" ) )
+  else if ( ( tmpstr == "1" ) || ( tmpstr == "true" ) || ( tmpstr == "on" ) || ( tmpstr == "yes" ) )
   {
     value = true;
     return ( true );
@@ -679,7 +679,36 @@ bool ImportFromString( const std::string& str, std::vector< double >& value )
   
 bool ImportFromString( const std::string& str, std::vector< std::string >& value )
 {
-  return ( MultipleFromString( str, value ) );
+  value.clear();
+  
+  size_t j = 0;
+  while ( j < str.size() )
+  {
+    while ( j < str.size() && ( ( str[ j ] == ' ') || ( str[ j ] == '\t' ) || 
+      ( str[ j ] == '\r' ) || ( str[ j ] == '\n' ) ) ) j++;
+
+    if ( j == str.size() ) return true;
+    if ( str[ j ] == '"' )
+    {
+      j++;
+      size_t start = j;
+      while ( j < str.size() && str[ j ] != '"' ) j++;
+      // if there is no end quotation mark
+      if ( j == str.size() ) return false;
+      value.push_back( str.substr( start, j-start ) );
+      j++;
+    }
+    else
+    {
+      size_t start = j;
+      while ( j < str.size() && ( ( str[ j ] != ' ' )  || ( str[ j ] != '\t' ) ||
+        ( str[ j ] != '\r' ) || ( str[ j ] != '\n' ) ) ) j++;
+    
+      value.push_back( str.substr( start, j-start ) );
+    }
+  }
+
+  return true;
 }
   
 bool ImportFromString( const std::string& str, std::string& value )

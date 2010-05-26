@@ -92,7 +92,7 @@ void QtComboBoxConnector::SetComboBoxIndexByText(
   QPointer< QtComboBoxConnector > qpointer,
   std::string text, Core::ActionSource source )
 {
-  if ( source == Core::ActionSource::INTERFACE_E )
+  if ( source == Core::ActionSource::INTERFACE_WIDGET_E )
   {
     return;
   }
@@ -128,7 +128,7 @@ void QtComboBoxConnector::SetComboBoxIndexByData(
   QPointer< QtComboBoxConnector > qpointer,
   std::string data, Core::ActionSource source )
 {
-  if ( source == Core::ActionSource::INTERFACE_E )
+  if ( source == Core::ActionSource::INTERFACE_WIDGET_E )
   {
     return;
   }

@@ -78,7 +78,7 @@ QtSpinBoxConnector::~QtSpinBoxConnector()
 void QtSpinBoxConnector::SetSpinBoxValue( QPointer< QtSpinBoxConnector > qpointer,
     int val, Core::ActionSource source )
 {
-  if ( source == Core::ActionSource::INTERFACE_E )
+  if ( source == Core::ActionSource::INTERFACE_WIDGET_E )
   {
     return;
   }
@@ -103,7 +103,7 @@ void QtSpinBoxConnector::SetSpinBoxValue( QPointer< QtSpinBoxConnector > qpointe
 void QtSpinBoxConnector::SetDoubleSpinBoxValue( QPointer< QtSpinBoxConnector > qpointer,
     double val, Core::ActionSource source )
 {
-  if ( source == Core::ActionSource::INTERFACE_E )
+  if ( source == Core::ActionSource::INTERFACE_WIDGET_E )
   {
     return;
   }

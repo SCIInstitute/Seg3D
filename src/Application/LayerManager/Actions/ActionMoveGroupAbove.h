@@ -29,6 +29,7 @@
 #ifndef APPLICATION_LAYERMANAGER_ACTIONS_ACTIONMOVEGROUPABOVE_H
 #define APPLICATION_LAYERMANAGER_ACTIONS_ACTIONMOVEGROUPABOVE_H
 
+// Core includes
 #include <Core/Action/Actions.h>
 #include <Core/Interface/Interface.h>
 
@@ -37,7 +38,7 @@ namespace Seg3D
 
 class ActionMoveGroupAbove : public Core::Action
 {
-  CORE_ACTION( "MoveGroupAbove", "<name_above> <name_below>" );
+  CORE_ACTION( "MoveGroupAbove", "MoveGroupAbove <group_to_move_id> <groupid_below>" );
   
   // -- Constructor/Destructor --
 public:
@@ -46,8 +47,8 @@ public:
     group_below_id_("")
   
   {
-    add_parameter("GroupToMove", group_to_move_id_ );
-    add_parameter("GroupBelow", group_below_id_ );
+    this->add_argument( group_to_move_id_ );
+    this->add_argument( group_below_id_ );
   }
   
   virtual ~ActionMoveGroupAbove()

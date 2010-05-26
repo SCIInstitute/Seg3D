@@ -26,6 +26,7 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#include <Application/Layer/Layer.h>
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/LayerManager/Actions/ActionActivateLayer.h>
 
@@ -39,50 +40,40 @@ namespace Seg3D
 
 bool ActionActivateLayer::validate( Core::ActionContextHandle& context )
 {
-  LayerHandle layer( this->layer_weak_handle_.lock() );
-    if ( !layer )
+  if ( ! this->layer_.handle() )
   {
-    layer = LayerManager::Instance()->get_layer_by_name( this->layer_name_.value() );
-    if ( !layer )
+    this->layer_.handle() = LayerManager::Instance()->get_layer_by_id( 
+      this->layer_id_.value() );
+    
+    if ( ! this->layer_.handle() )
     {
-      layer = LayerManager::Instance()->get_layer_by_id( this->layer_name_.value() );
-      if ( !layer )
-      {
-        context->report_error( std::string( "LayerName: '" ) + 
-          this->layer_name_.value() + "' is invalid" );
-        return false;
-      }
+      context->report_error( std::string( "LayerID: '" ) + 
+        this->layer_id_.value() + "' is invalid" );
+      return false;
     }
+  }
 
-    this->layer_weak_handle_ = layer;
-  }   
-  
   return true; // validated
 }
 
 bool ActionActivateLayer::run( Core::ActionContextHandle& context, 
   Core::ActionResultHandle& result )
 {
-  LayerHandle layer( this->layer_weak_handle_.lock() );
-  if( layer )
-  {
-    LayerManager::Instance()->set_active_layer( layer );
-    return true;
-  }
-
-  return false;
+  LayerManager::Instance()->set_active_layer( layer_.handle() );
+  return true;
 }
 
-Core::ActionHandle ActionActivateLayer::Create( const LayerHandle layer )
+Core::ActionHandle ActionActivateLayer::Create( LayerHandle layer )
 {
   ActionActivateLayer* action = new ActionActivateLayer;
-  action->layer_weak_handle_ = layer;
-  action->layer_name_ = layer->name_state_->get();
+  
+  action->layer_.handle() = layer;
+  action->layer_id_.value() = layer->get_layer_id();
   
   return Core::ActionHandle( action );
 }
 
-void ActionActivateLayer::Dispatch( const LayerHandle layer )
+void ActionActivateLayer::Dispatch( LayerHandle layer )
 {
   Core::Interface::PostAction( Create( layer ) );
 }

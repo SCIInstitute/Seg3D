@@ -26,13 +26,12 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-// boost includes
-#include <boost/timer.hpp>
-
 // Application includes
+#include <Application/Layer/MaskLayer.h>
+#include <Application/Layer/LayerGroup.h>
+
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/LayerManager/Actions/ActionNewMaskLayer.h>
-#include <Application/Layer/MaskLayer.h>
 
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
@@ -44,15 +43,15 @@ namespace Seg3D
 
 bool ActionNewMaskLayer::validate( Core::ActionContextHandle& context )
 {
-  if ( !this->group_handle_.handle() )
+  if ( !this->group_.handle() )
   {
-    this->group_handle_.handle() = LayerManager::Instance()->get_layer_group( 
-      this->group_name_.value() );    
+    this->group_.handle() = LayerManager::Instance()->get_layer_group( 
+      this->group_id_.value() );    
   }
 
-  if ( !this->group_handle_.handle() )
+  if ( !this->group_.handle() )
   {
-    context->report_error( std::string( "GroupID '" ) + this->group_name_.value() + 
+    context->report_error( std::string( "GroupID '" ) + this->group_id_.value() + 
       "' is invalid" );
     return false;
   }
@@ -62,13 +61,10 @@ bool ActionNewMaskLayer::validate( Core::ActionContextHandle& context )
 
 bool ActionNewMaskLayer::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 { 
-boost::timer timer;
   LayerHandle new_mask_layer = LayerHandle( new MaskLayer( 
-    "MaskLayer", group_handle_.handle()->get_grid_transform() ) );
+    "MaskLayer", group_.handle()->get_grid_transform() ) );
 
-CORE_LOG_DEBUG( std::string("time: ") + Core::ExportToString( timer.elapsed() ) );
   LayerManager::Instance()->insert_layer( new_mask_layer );
-CORE_LOG_DEBUG( std::string("time: ") + Core::ExportToString( timer.elapsed() ) );
   
   return true;
 }
@@ -76,8 +72,9 @@ CORE_LOG_DEBUG( std::string("time: ") + Core::ExportToString( timer.elapsed() ) 
 Core::ActionHandle ActionNewMaskLayer::Create( LayerGroupHandle group )
 {
   ActionNewMaskLayer* action = new ActionNewMaskLayer;
-  action->group_handle_.handle() = group;
-  action->group_name_.value() = group->get_group_id();
+  
+  action->group_.handle() = group;
+  action->group_id_.value() = group->get_group_id();
   
   return Core::ActionHandle( action );
 }

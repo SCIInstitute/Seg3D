@@ -71,7 +71,7 @@ void QtActionConnector::SetActionChecked(
     QPointer< QtActionConnector > qpointer, 
     bool checked, Core::ActionSource source )
 {
-  if ( source == Core::ActionSource::INTERFACE_E )
+  if ( source == Core::ActionSource::INTERFACE_WIDGET_E )
   {
     return;
   }

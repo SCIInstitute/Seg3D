@@ -59,7 +59,7 @@ void QtActionGroupConnector::TriggerAction(
     QPointer< QtActionGroupConnector > qpointer, 
     std::string option, Core::ActionSource source )
 {
-  if ( source == Core::ActionSource::INTERFACE_E )
+  if ( source == Core::ActionSource::INTERFACE_WIDGET_E )
   {
     return;
   }

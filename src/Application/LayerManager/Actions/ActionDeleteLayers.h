@@ -26,25 +26,29 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_TOOL_ACTIONS_ACTIONDELETELAYERS_H
-#define APPLICATION_TOOL_ACTIONS_ACTIONDELETELAYERS_H
+#ifndef APPLICATION_LAYERMANAGER_ACTIONS_ACTIONDELETELAYERS_H
+#define APPLICATION_LAYERMANAGER_ACTIONS_ACTIONDELETELAYERS_H
 
-
+// Core includes
 #include <Core/Action/Actions.h>
 #include <Core/Interface/Interface.h>
-#include <Application/Layer/LayerGroup.h>
+
+// Application includes
+#include <Application/Layer/LayerFWD.h>
 
 namespace Seg3D
 {
 
 class ActionDeleteLayers : public Core::Action
 {
-  CORE_ACTION( "DeleteLayers", "Delete Layers <name>" );
+  CORE_ACTION( "DeleteLayers", "DeleteLayers <groupid>" );
   
   // -- Constructor/Destructor --
 public:
   ActionDeleteLayers()
   {
+    this->add_argument( this->group_id_ );
+    this->add_cachedhandle( this->group_ );
   }
   
   virtual ~ActionDeleteLayers()
@@ -56,17 +60,24 @@ public:
   virtual bool validate( Core::ActionContextHandle& context );
   virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
 
+private:
+  // This parameter contains the id of the layer group
+  Core::ActionParameter< std::string > group_id_;
+  
+  // This cached handle contains a short cut to the layer group 
+  // from which layers need to be deleted
+  Core::ActionCachedHandle< LayerGroupHandle > group_;
+
   // -- Dispatch this action from the interface --
 public:
 
+  // CREATE:
+  // Create an action that deletes the selected layers
+  static Core::ActionHandle Create( LayerGroupHandle layer );
+
   // DISPATCH
-  // Create and dispatch action that activates a layer
-  static void Dispatch( LayerGroupHandle group );
-  
-private:
-  // Layer_handle that is requested
-  LayerGroupWeakHandle group_weak_handle_;
-  
+  // Create and dispatch action that deletes the selected layers
+  static void Dispatch( LayerGroupHandle group ); 
 };
   
 } // end namespace Seg3D

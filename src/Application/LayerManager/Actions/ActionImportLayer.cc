@@ -47,32 +47,33 @@ bool ActionImportLayer::validate( Core::ActionContextHandle& context )
   boost::filesystem::path full_filename( filename_.value() );
   if ( !( boost::filesystem::exists ( full_filename ) ) )
   {
-    context->report_error( std::string( "File '" ) + filename_.value() + "' does not exist." );
+    context->report_error( std::string( "File '" ) + this->filename_.value() +
+      "' does not exist." );
     return false;
   }
 
-  if ( !( layer_importer_ ) )
+  if ( !( this->layer_importer_.handle() ) )
   {
-    if ( !( LayerIO::Instance()->create_importer( filename_.value(),  layer_importer_, 
-      importer_.value() ) ) )
+    if ( !( LayerIO::Instance()->create_importer( this->filename_.value(),  
+      this->layer_importer_.handle(), this->importer_.value() ) ) )
     {
       context->report_error( std::string( "Could not create importer with name '" ) +
-        importer_.value() + "' for file '" + filename_.value() + "'." );
+        this->importer_.value() + "' for file '" + this->filename_.value() + "'." );
       return false;
     } 
   }
 
   LayerImporterMode mode = LayerImporterMode::INVALID_E;
-  if ( !( ImportFromString( mode_.value(), mode ) ) )
+  if ( !( ImportFromString( this->mode_.value(), mode ) ) )
   {
-    context->report_error( std::string( "Import mode '") +  mode_.value() + 
+    context->report_error( std::string( "Import mode '") +  this->mode_.value() + 
       "' is not a valid layer importer mode." );
     return false;
   }
 
-  if ( !( layer_importer_->get_importer_modes() & mode ) )
+  if ( !( this->layer_importer_.handle()->get_importer_modes() & mode ) )
   {
-    context->report_error( std::string( "Import mode '") +  mode_.value() + 
+    context->report_error( std::string( "Import mode '") +  this->mode_.value() + 
       "' is not available for this importer." );
     return false; 
   }
@@ -82,27 +83,24 @@ bool ActionImportLayer::validate( Core::ActionContextHandle& context )
 
 bool ActionImportLayer::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
-  std::string message = std::string("Importing '") + layer_importer_->get_filename() +
-    std::string("'");
+  std::string message = std::string("Importing '") + 
+    this->layer_importer_.handle()->get_filename() + std::string("'");
+    
   Core::ActionProgressHandle progress = 
     Core::ActionProgressHandle( new Core::ActionProgress( message ) );
 
   progress->begin_progress_reporting();
   
   LayerImporterMode mode = LayerImporterMode::INVALID_E;
-  ImportFromString( mode_.value(), mode );
+  ImportFromString( this->mode_.value(), mode );
 
   std::vector<LayerHandle> layers;
-  layer_importer_->import_layer( mode, layers );
+  this->layer_importer_.handle()->import_layer( mode, layers );
     
   for (size_t j = 0; j < layers.size(); j++)
   {
     if ( layers[ j ] ) LayerManager::Instance()->insert_layer( layers[ j ] );
   }
-
-  // As actions are only executed by one thread, modifications can be made. However this needs
-  // to be in the part that only involves the execution and not the parameters of the action.
-  layer_importer_.reset();
 
   progress->end_progress_reporting();
 
@@ -130,7 +128,8 @@ Core::ActionHandle ActionImportLayer::Create( const LayerImporterHandle& importe
   // Create new action
   ActionImportLayer* action = new ActionImportLayer;
   
-  action->layer_importer_ = importer;
+  // Fill in the short cut so the data that was already read is not lost
+  action->layer_importer_.handle() = importer;
 
   // We need to fill in these to ensure the action can be replayed without the importer present
   action->filename_.value() = importer->get_filename();

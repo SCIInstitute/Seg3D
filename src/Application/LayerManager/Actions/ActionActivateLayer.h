@@ -26,25 +26,26 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_TOOL_ACTIONS_ACTIONACTIVATELAYER_H
-#define APPLICATION_TOOL_ACTIONS_ACTIONACTIVATELAYER_H
+#ifndef APPLICATION_LAYERMANAGER_ACTIONS_ACTIONACTIVATELAYER_H
+#define APPLICATION_LAYERMANAGER_ACTIONS_ACTIONACTIVATELAYER_H
 
 #include <Core/Action/Actions.h>
 #include <Core/Interface/Interface.h>
-#include <Application/Layer/Layer.h>
+#include <Application/Layer/LayerFWD.h>
 
 namespace Seg3D
 {
 
 class ActionActivateLayer : public Core::Action
 {
-  CORE_ACTION( "ActivateLayer", "ActivateLayer <layer_name>" );
+  CORE_ACTION( "ActivateLayer", "ActivateLayer <layerid>" );
 
   // -- Constructor/Destructor --
 public:
   ActionActivateLayer()
   {
-    add_argument( this->layer_name_ );
+    this->add_argument( this->layer_id_ );
+    this->add_cachedhandle( this->layer_ );
   }
 
   virtual ~ActionActivateLayer()
@@ -56,22 +57,23 @@ public:
   virtual bool validate( Core::ActionContextHandle& context );
   virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
   
+private:
+  // This parameter contains the id of the layer
+  Core::ActionParameter< std::string > layer_id_;
   
+  // This cached handle contains a short cut to the layer that needs activating
+  Core::ActionCachedHandle< LayerHandle > layer_;
+
   // -- Dispatch this action from the interface --
 public:
-
-  // DISPATCH
-  // Dispatch an action that activates a layer
-  static void Dispatch( const LayerHandle layer );
   
-  // CREATE
+  // CREATE:
   // Create an action that activates a layer
-  static Core::ActionHandle Create( const LayerHandle layer );
+  static Core::ActionHandle Create( LayerHandle layer );
   
-private:
-  Core::ActionParameter< std::string > layer_name_;
-    LayerWeakHandle layer_weak_handle_;
-
+  // DISPATCH:
+  // Dispatch an action that activates a layer
+  static void Dispatch( LayerHandle layer );
 };
 
 } // end namespace Seg3D
