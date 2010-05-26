@@ -43,6 +43,11 @@ QtActionConnector::QtActionConnector( QAction* parent,
   QPointer< QtActionConnector > qpointer( this );
 
   parent->setCheckable( true );
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    parent->setChecked( state->get() );
+  }
+
   this->connect( parent, SIGNAL( toggled( bool ) ), SLOT( set_state( bool ) ) );
   this->add_connection( state->value_changed_signal_.connect(
     boost::bind( &QtActionConnector::SetActionChecked, qpointer, _1, _2 ) ) );

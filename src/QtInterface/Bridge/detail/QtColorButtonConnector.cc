@@ -42,6 +42,11 @@ QtColorButtonConnector::QtColorButtonConnector( QtColorButton* parent,
 {
   QPointer< QtColorButtonConnector > qpointer( this );
 
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    parent->set_color( state->get() );
+  }
+
   this->connect( parent, SIGNAL( color_changed( Core::Color ) ), SLOT( set_state( Core::Color ) ) );
   this->add_connection( state->value_changed_signal_.connect(
     boost::bind( &QtColorButtonConnector::SetButtonColor, qpointer, _1, _2 ) ) );

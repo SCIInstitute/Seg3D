@@ -59,10 +59,6 @@ private:
     int val, Core::ActionSource source );
   static void SetDoubleSpinBoxValue( QPointer< QtSpinBoxConnector > qpointer,
     double val, Core::ActionSource source );
-
-  static void UpdateIntDefaults( QPointer< QtSpinBoxConnector > qpointer );
-  static void UpdateDoubleDefaults( QPointer< QtSpinBoxConnector > qpointer );
-
   
   // -- slot functions for Qt signals --
 private Q_SLOTS:

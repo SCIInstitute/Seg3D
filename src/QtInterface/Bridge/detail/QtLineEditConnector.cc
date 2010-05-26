@@ -42,6 +42,11 @@ QtLineEditConnector::QtLineEditConnector( QLineEdit* parent,
 {
   QPointer< QtLineEditConnector > qpointer( this );
 
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    parent->setText( QString( state->get().c_str() ) );
+  }
+
   this->connect( parent, SIGNAL( editingFinished() ), SLOT( set_state() ) );
   this->add_connection( state->value_changed_signal_.connect(
     boost::bind( &QtLineEditConnector::SetLineEditText, qpointer, _1, _2 ) ) );
@@ -54,6 +59,11 @@ QtLineEditConnector::QtLineEditConnector( QLineEdit* parent,
   state_( state )
 {
   QPointer< QtLineEditConnector > qpointer( this );
+
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    parent->setText( QString( state->get().c_str() ) );
+  }
 
   this->connect( parent, SIGNAL( editingFinished() ), SLOT( set_state() ) );
 

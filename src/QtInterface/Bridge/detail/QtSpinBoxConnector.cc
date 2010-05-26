@@ -42,7 +42,10 @@ QtSpinBoxConnector::QtSpinBoxConnector( QSpinBox* parent,
 {
   QPointer< QtSpinBoxConnector > qpointer( this );
   
-  UpdateIntDefaults( qpointer );
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    parent->setValue( state->get() );
+  }
 
   this->connect( parent, SIGNAL( valueChanged( int ) ), SLOT( set_state( int ) ) );
   this->add_connection( state->value_changed_signal_.connect(
@@ -57,7 +60,10 @@ QtSpinBoxConnector::QtSpinBoxConnector( QDoubleSpinBox* parent,
 {
   QPointer< QtSpinBoxConnector > qpointer( this );
   
-  UpdateDoubleDefaults( qpointer );
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    parent->setValue( state->get() );
+  }
 
   this->connect( parent, SIGNAL( valueChanged( double ) ), SLOT( set_state( double ) ) );
   this->add_connection( state->value_changed_signal_.connect(
@@ -135,71 +141,4 @@ void QtSpinBoxConnector::set_state( double val )
   }
 }
   
-void QtSpinBoxConnector::UpdateIntDefaults( QPointer< QtSpinBoxConnector > qpointer )
-{
-  if ( !Core::Interface::IsInterfaceThread() )
-  {
-    Core::Interface::PostEvent( boost::bind( &QtSpinBoxConnector::UpdateIntDefaults, qpointer ) );
-    return;
-  }
-  
-  if ( qpointer.isNull() )
-  {
-    return;
-  }
-  
-  // block signals back to the application thread
-  qpointer->block();
-  
-  QSpinBox* spinbox = qpointer->spinbox_;
-  
-  // lock the state engine
-  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-  
-  Core::StateBase* state_base = qpointer->state_.get();
-  
-  if ( typeid( *state_base ) == typeid( Core::StateInt ) )
-  {
-    Core::StateInt* state_int = static_cast< Core::StateInt* > ( state_base );
-    spinbox->setValue( state_int->get() );
-  }
-  
-  // unblock signals
-  qpointer->unblock();  
-}
-void QtSpinBoxConnector::UpdateDoubleDefaults( QPointer< QtSpinBoxConnector > qpointer )  
-{ 
-  if ( !Core::Interface::IsInterfaceThread() )
-  {
-    Core::Interface::PostEvent( boost::bind( &QtSpinBoxConnector::UpdateDoubleDefaults, qpointer ) );
-    return;
-  }
-  
-  if ( qpointer.isNull() )
-  {
-    return;
-  }
-  
-  // block signals back to the application thread
-  qpointer->block();
-  
-  QDoubleSpinBox* spinbox = qpointer->double_spinbox_;
-  
-  // lock the state engine
-  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-  
-  Core::StateBase* state_base = qpointer->state_.get();
-  
-  if ( typeid( *state_base ) == typeid( Core::StateDouble ) )
-  {
-    Core::StateDouble* state_double = static_cast< Core::StateDouble* > ( state_base );
-    spinbox->setValue( state_double->get() );
-  }
-  
-  // unblock signals
-  qpointer->unblock();  
-  
-    
-}
-
 } // end namespace QtUtils

@@ -42,6 +42,9 @@ QtActionGroupConnector::QtActionGroupConnector( QActionGroup* parent,
 {
   QPointer< QtActionGroupConnector > qpointer( this );
 
+  // TODO: Create QAction's for each option in the state variable and add them to 
+  // the QActionGroup. Should not add anything to the QActionGroup outside.
+
   this->connect( parent, SIGNAL( triggered( QAction* ) ), SLOT( set_state( QAction* ) ) );
   this->add_connection( state->value_changed_signal_.connect(
     boost::bind( &QtActionGroupConnector::TriggerAction, qpointer, _1, _2 ) ) );

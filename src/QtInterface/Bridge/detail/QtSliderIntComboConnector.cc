@@ -43,7 +43,13 @@ QtSliderIntComboConnector::QtSliderIntComboConnector( QtSliderIntCombo* parent,
 {
   QPointer< QtSliderIntComboConnector > qpointer( this );
   
-  this->UpdateSliderCombo( qpointer );
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    int min_val, max_val;
+    state->get_range( min_val, max_val );
+    parent->setRange( min_val, max_val );
+    parent->setCurrentValue( state->get() );
+  }
 
   this->connect( parent, SIGNAL( valueAdjusted( int ) ), SLOT( set_state_value( int ) ) );
   this->connect( parent, SIGNAL( rangeChanged( int, int ) ), SLOT( set_state_range( int, int ) ) );
@@ -124,49 +130,4 @@ void QtSliderIntComboConnector::set_state_range( int min_val, int max_val )
   }
 }
   
-void QtSliderIntComboConnector::UpdateSliderCombo( QPointer< QtSliderIntComboConnector > qpointer )
-{
-  if ( !Core::Interface::IsInterfaceThread() )
-  {
-    Core::Interface::PostEvent( boost::bind( &QtSliderIntComboConnector::UpdateSliderCombo, qpointer ) );
-    return;
-  }
-  
-  if ( qpointer.isNull() )
-  {
-    return;
-  }
-  
-  // block signals back to the application thread
-  qpointer->block();
-  
-  QtSliderIntCombo* slider_combo = qpointer->parent_;
-  
-  // lock the state engine
-  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-  
-  Core::StateBase* state_base = qpointer->state_.get();
-  
-  if ( typeid( *state_base ) == typeid( Core::StateRangedInt ) )
-  {
-    Core::StateRangedInt* state_ranged_int = static_cast< Core::StateRangedInt* > ( state_base );
-    
-    int min; 
-      int max;
-    state_ranged_int->get_range( min, max );
-    slider_combo->setRange( min, max );
-    
-    int step;
-    state_ranged_int->get_step( step );
-    slider_combo->setStep( step );
-    
-    slider_combo->setCurrentValue( state_ranged_int->get() );
-    
-  }
-  
-  // unblock signals
-  qpointer->unblock();    
-}
-  
-
 } // end namespace QtUtils
