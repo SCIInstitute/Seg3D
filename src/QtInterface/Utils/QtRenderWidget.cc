@@ -52,7 +52,7 @@ public:
   void update_display();
 };
 
-QtRenderWidget::QtRenderWidget( const QGLFormat& format, QWidget* parent, QtRenderWidget* share, 
+QtRenderWidget::QtRenderWidget( const QGLFormat& format, QWidget* parent, QGLWidget* share, 
     Core::AbstractViewerHandle viewer ) :
   QGLWidget( format, parent, share ),
   private_( new QtRenderWidgetPrivate )
@@ -85,9 +85,6 @@ void QtRenderWidgetPrivate::update_display()
 
 void QtRenderWidget::initializeGL()
 {
-  // This function calls all the pieces that need initialization using an OpenGL context
-  Core::RenderResources::Instance()->init_render_resources();
-
   if ( Core::RenderResources::Instance()->valid_render_resources() )
   {
     glClearColor( 0.5, 0.5, 0.5, 1.0 );
@@ -98,11 +95,6 @@ void QtRenderWidget::initializeGL()
     {
       this->private_->viewer_->get_renderer()->initialize();
     }
-    // Make sure the GL context of the widget is the current one of this thread,
-    // because in the single threaded rendering mode, the renderer will make its own context
-    // the current one of the Qt thread.
-
-    this->makeCurrent();
 
     this->add_connection( this->private_->viewer_->update_display_signal_.connect(
       boost::bind( &QtRenderWidgetPrivate::update_display, this->private_.get() ) ) );
@@ -185,10 +177,6 @@ void QtRenderWidget::resizeGL( int width, int height )
       ": sending resize event to renderer" );
       
     this->private_->viewer_->get_renderer()->resize( width, height );
-    // Make sure the GL context of the widget is the current one of this thread,
-    // because in the single threaded rendering mode, the renderer will make its own context
-    // the current one of the Qt thread.
-    this->makeCurrent();
   }
 }
 

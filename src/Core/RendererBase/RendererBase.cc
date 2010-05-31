@@ -93,6 +93,8 @@ void RendererBase::initialize()
   {
     CORE_THROW_EXCEPTION("Failed to create a valid rendering context");
   }
+
+  RenderContextHandle old_context = RenderResources::Instance()->get_current_context();
 #endif
 
   // Make the GL context current. In multi-threaded rendering mode,
@@ -111,6 +113,13 @@ void RendererBase::initialize()
   this->post_initialize();
 
   SCI_CHECK_OPENGL_ERROR();
+
+#if !MULTITHREADED_RENDERING
+  if ( old_context )
+  {
+    old_context->make_current();
+  }
+#endif
 }
 
 void RendererBase::redraw( bool delay_update )
@@ -131,6 +140,7 @@ void RendererBase::redraw( bool delay_update )
     Interface::PostEvent( boost::bind( &RendererBase::redraw, this, delay_update ) );
     return;
   }
+  RenderContextHandle old_context = RenderResources::Instance()->get_current_context();
   // Make the GL context current in the interface thread
   this->context_->make_current();
 #endif
@@ -183,6 +193,13 @@ void RendererBase::redraw( bool delay_update )
 
   // swap render textures 
   this->active_render_texture_ = ( ~this->active_render_texture_ ) & 1;
+
+#if !MULTITHREADED_RENDERING
+  if ( old_context )
+  {
+    old_context->make_current();
+  }
+#endif
 }
 
 void RendererBase::redraw_overlay( bool delay_update )
@@ -203,6 +220,7 @@ void RendererBase::redraw_overlay( bool delay_update )
     Interface::PostEvent( boost::bind( &RendererBase::redraw_overlay, this, delay_update ) );
     return;
   }
+  RenderContextHandle old_context = RenderResources::Instance()->get_current_context();
   // Make the GL context current in the interface thread
   this->context_->make_current();
 #endif
@@ -255,6 +273,13 @@ void RendererBase::redraw_overlay( bool delay_update )
 
   // swap render textures 
   this->active_overlay_texture_ = ( ~( this->active_overlay_texture_ - 2 ) ) & 1 + 2;
+
+#if !MULTITHREADED_RENDERING
+  if ( old_context )
+  {
+    old_context->make_current();
+  }
+#endif
 }
 
 void RendererBase::resize( int width, int height )
@@ -271,6 +296,7 @@ void RendererBase::resize( int width, int height )
     Interface::PostEvent( boost::bind( &RendererBase::resize, this, width, height ) );
     return;
   }
+  RenderContextHandle old_context = RenderResources::Instance()->get_current_context();
   // Make the GL context current in the interface thread
   this->context_->make_current();
 #endif
@@ -310,6 +336,13 @@ void RendererBase::resize( int width, int height )
   this->activate();
   this->redraw( true );
   this->redraw_overlay();
+
+#if !MULTITHREADED_RENDERING
+  if ( old_context )
+  {
+    old_context->make_current();
+  }
+#endif
 }
 
 void RendererBase::post_initialize()

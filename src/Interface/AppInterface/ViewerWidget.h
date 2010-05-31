@@ -54,6 +54,9 @@ namespace Seg3D
 {
 
 // Forward declaration
+class ViewerWidget;
+typedef QPointer< ViewerWidget > ViewerWidgetHandle;
+
 class ViewerWidgetPrivate;
 typedef boost::shared_ptr< ViewerWidgetPrivate > ViewerWidgetPrivateHandle;
 
@@ -77,9 +80,6 @@ Q_SIGNALS:
   // is changed
   void changed_viewer_type( int );
   
-public:
-  typedef QPointer< ViewerWidget > qpointer_type_;
-
 public Q_SLOTS:
 
   // SELECT:
@@ -109,7 +109,7 @@ public Q_SLOTS:
   
   // HANDLE_VIEW_MODE_CHANGED:
   // 
-  static void HandleViewModeChanged( qpointer_type_ qpointer );
+  static void HandleViewModeChanged( ViewerWidgetHandle viewer_widget );
   
 private:
   // ADD_ICONS_TO_COMBOBOX:

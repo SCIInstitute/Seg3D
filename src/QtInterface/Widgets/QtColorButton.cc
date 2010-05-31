@@ -62,7 +62,7 @@ void QtColorButton::set_color( Core::Color button_color )
   this->button_color_ = button_color;
   
   QString style_sheet = QString::fromUtf8( 
-    "background-color: rgb(" ) + QString::number( this->button_color_.r() ) +
+    "{ background-color: rgb(" ) + QString::number( this->button_color_.r() ) +
     QString::fromUtf8( ", " ) + QString::number( this->button_color_.g() ) +
     QString::fromUtf8( ", " ) + QString::number( this->button_color_.b() ) +
     QString::fromUtf8( "); }" );

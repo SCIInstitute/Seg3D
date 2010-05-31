@@ -34,8 +34,33 @@ namespace Core
 
 CORE_SINGLETON_IMPLEMENTATION( RenderResources );
 
-RenderResources::RenderResources()
+class RenderResourcesPrivate
 {
+public:
+  // A Handle to resource that generated the contexts
+  RenderResourcesContextHandle resources_context_;
+
+  // An GL context for deleting shared objects
+  // NOTE: Since objects need to be deleted inside an OpenGL context
+  // this context has been specially constructed for deleting objects
+  // when their handles go out of scope. As these objects are maintained
+  // through the program using handles, the OpenGL context in which they
+  // were created may be deleted already. Hence we delete them all in
+  // a separate thread using a separate OpenGL context.
+  RenderContextHandle delete_context_;
+
+  // Mutex and condition variable to make sure the RenderResources thread has 
+  // completed initialization before continuing the main thread.
+  boost::mutex thread_mutex_;
+  boost::condition_variable thread_condition_variable_;
+
+  bool gl_capable_;
+};
+
+RenderResources::RenderResources() :
+  private_( new RenderResourcesPrivate )
+{
+  this->private_->gl_capable_ = false;
 }
 
 RenderResources::~RenderResources()
@@ -44,7 +69,30 @@ RenderResources::~RenderResources()
 
 void RenderResources::initialize_eventhandler()
 {
-  this->delete_context_->make_current();
+  boost::unique_lock< boost::mutex > lock( this->private_->thread_mutex_ );
+  this->private_->delete_context_->make_current();
+  this->private_->gl_capable_ = true;
+
+  int err = glewInit();
+  if ( err != GLEW_OK )
+  {
+    this->private_->gl_capable_ = false;
+    CORE_LOG_ERROR( "glewInit failed with error code " + Core::ExportToString( err ) );
+  }
+
+  // Check OpenGL capabilities
+  if ( !GLEW_VERSION_2_1 )
+  {
+    this->private_->gl_capable_ = false;
+    CORE_LOG_ERROR( "OpenGL 2.1 required but not found." );
+  }
+  if ( !GLEW_EXT_framebuffer_object )
+  {
+    this->private_->gl_capable_ = false;
+    CORE_LOG_ERROR( "GL_EXT_framebuffer_object required but not found." );
+  }
+
+  this->private_->thread_condition_variable_.notify_one();
 }
 
 bool RenderResources::create_render_context( RenderContextHandle& context )
@@ -54,38 +102,19 @@ bool RenderResources::create_render_context( RenderContextHandle& context )
   // The context gets setup through the GUI system and is GUI dependent
   // if this function is accessed before the GUI system is setup, something
   // is wrong in the program logic, hence warn the user
-  if ( ! this->resources_context_.get() )
+  if ( ! this->private_->resources_context_.get() )
   {
     CORE_THROW_LOGICERROR(
       "No render resources were installed to create an opengl context" );
   }
 
-  return ( this->resources_context_->create_render_context( context ) );
+  return this->private_->resources_context_->create_render_context( context );
 }
 
-
-void RenderResources::init_render_resources()
+RenderContextHandle RenderResources::get_current_context()
 {
-  if ( ! ( this->delete_context_ ) )
-  {
-    glewInit();
-
-    // Check OpenGL capabilities
-    if ( !GLEW_VERSION_2_1 )
-    {
-      CORE_THROW_OPENGLEXCEPTION( "Minimum OpenGL version 2.1 required." );
-    }
-    if ( !GLEW_EXT_framebuffer_object )
-    {
-      CORE_THROW_OPENGLEXCEPTION( "GL_EXT_framebuffer_object not found." );
-    }
-
-    // Create GL context for the event handler thread and start it
-    this->resources_context_->create_render_context( this->delete_context_ );
-    this->start_eventhandler();
-  }
+  return this->private_->resources_context_->get_current_context();
 }
-
 
 void RenderResources::install_resources_context( RenderResourcesContextHandle resources_context )
 {
@@ -95,13 +124,26 @@ void RenderResources::install_resources_context( RenderResourcesContextHandle re
     CORE_THROW_LOGICERROR("Cannot install an empty render resources context");
   }
 
-  resources_context_ = resources_context; 
+  if ( this->private_->resources_context_ )
+  {
+    CORE_THROW_LOGICERROR( "A RenderResourcesContext has already been installed" );
+  }
+  
+  this->private_->resources_context_ = resources_context;
+
+  // Create GL context for the event handler thread and start it
+  this->private_->resources_context_->create_render_context( this->private_->delete_context_ );
+  boost::unique_lock< boost::mutex > lock( this->private_->thread_mutex_ );
+  this->start_eventhandler();
+  this->private_->thread_condition_variable_.wait( lock );
 }
 
 bool RenderResources::valid_render_resources()
 {
-  return ( resources_context_ && resources_context_->valid_render_resources() 
-    && delete_context_ );
+  return ( this->private_->resources_context_ && 
+         this->private_->resources_context_->valid_render_resources() && 
+         this->private_->delete_context_ &&
+         this->private_->gl_capable_ );
 }
 
 void RenderResources::delete_texture( unsigned int texture_id )

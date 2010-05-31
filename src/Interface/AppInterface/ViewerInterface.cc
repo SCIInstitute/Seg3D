@@ -33,6 +33,7 @@
 #include <Core/Utils/Log.h>
 #include <Core/Utils/Exception.h>
 #include <Core/Interface/Interface.h>
+#include <Core/RenderResources/RenderResources.h>
 
 // Application
 #include <Application/Renderer/Renderer.h>
@@ -102,9 +103,13 @@ void ViewerInterfacePrivate::setup_ui( QWidget* parent )
     // Step 1: Get the viewer class that maintains the state of the viewer
     ViewerHandle viewer = ViewerManager::Instance()->get_viewer( j );
     // Step 2: Generate a renderer for the viewer
-    RendererHandle renderer = RendererHandle( new Renderer() );
-    renderer->set_viewer_id( j );
-    viewer->install_renderer( Core::AbstractRendererHandle( renderer ) );
+    // Only create renderer if the render resources are valid.
+    if ( Core::RenderResources::Instance()->valid_render_resources() )
+    {
+      RendererHandle renderer = RendererHandle( new Renderer() );
+      renderer->set_viewer_id( j );
+      viewer->install_renderer( Core::AbstractRendererHandle( renderer ) );
+    }
     // Step 3: Generate the widget
     this->viewer_[ j ] = new ViewerWidget( viewer, parent );
   }

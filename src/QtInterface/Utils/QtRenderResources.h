@@ -40,12 +40,12 @@
 #include <QtOpenGL>
 #include <QPointer>
 
-// QtInterface includes
-#include <QtInterface/Utils/QtRenderWidget.h>
-
 // Application includes
 #include <Core/RenderResources/RenderResourcesContext.h>
 #include <Core/RenderResources/RenderContext.h>
+#include <Core/Viewer/AbstractViewer.h>
+
+#include <QtInterface/Utils/QtRenderWidget.h>
 
 namespace QtUtils
 {
@@ -55,8 +55,11 @@ namespace QtUtils
 
 // Forward declarations
 class QtRenderResourcesContext;
-typedef boost::shared_ptr< QtRenderResourcesContext > QtRenderResourcesContextHandle;
-
+class QtRenderResourcesContextPrivate;
+typedef boost::shared_ptr< QtRenderResourcesContext > 
+  QtRenderResourcesContextHandle;
+typedef boost::shared_ptr< QtRenderResourcesContextPrivate > 
+  QtRenderResourcesContextPrivateHandle;
 
 // Class definition
 class QtRenderResourcesContext : public Core::RenderResourcesContext
@@ -80,13 +83,14 @@ public:
   // Check whether valid render resources were installed
   virtual bool valid_render_resources();
 
-private:
-  // The Qt render context format options
-  QGLFormat format_;
+  // GET_CURRENT_CONTEXT:
+  // Get the current render context of the calling thread
+  // NOTE: The returned handle should only be used in the scope where this function is
+  // being called, because it may become invalid later.
+  virtual Core::RenderContextHandle get_current_context();
 
-  // The handle to the first qt widget that defines all the sharing
-  // between contexts
-  QPointer< QtRenderWidget > shared_widget_;
+private:
+  QtRenderResourcesContextPrivateHandle private_;
 
 };
 

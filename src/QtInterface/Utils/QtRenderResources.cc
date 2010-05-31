@@ -30,6 +30,7 @@
 #include <Core/Utils/Exception.h>
 #include <Core/Interface/Interface.h>
 
+// QtInterface includes
 #include <QtInterface/Utils/QtRenderResources.h>
 
 namespace QtUtils
@@ -52,7 +53,7 @@ class QtRenderContext : public Core::RenderContext
 {
   // -- constructor/ destructor --
 public:
-  QtRenderContext( QGLContextHandle& context );
+  QtRenderContext( QGLContextHandle context );
   virtual ~QtRenderContext();
 
   // -- context functions --
@@ -76,7 +77,18 @@ private:
   QGLContextHandle context_;
 };
 
-QtRenderContext::QtRenderContext( QGLContextHandle& context ) :
+class QtRenderResourcesContextPrivate
+{
+public:
+  // The Qt render context format options
+  QGLFormat format_;
+
+  // The handle to the first qt widget that defines all the sharing
+  // between contexts
+  QGLWidget* shared_widget_;
+};
+
+QtRenderContext::QtRenderContext( QGLContextHandle context ) :
   context_( context )
 {
 }
@@ -110,57 +122,68 @@ void QtRenderContext::swap_buffers() const
 // Implementation details of this class
 
 QtRenderResourcesContext::QtRenderResourcesContext() :
-  format_( QGLFormat::defaultFormat() )
+  private_( new QtRenderResourcesContextPrivate )
 {
+  this->private_->format_ = QGLFormat::defaultFormat();
+  this->private_->shared_widget_ = new QGLWidget( this->private_->format_ );
 }
 
 QtRenderResourcesContext::~QtRenderResourcesContext()
 {
+  delete this->private_->shared_widget_;
 }
 
 bool QtRenderResourcesContext::create_render_context( Core::RenderContextHandle& context )
 {
-  if ( !( shared_widget_.data() ) )
-  {
-    CORE_THROW_LOGICERROR("OpenGL render context is not available");
-  }
-
   // Generate a new context
-  QGLContextHandle qt_context = QGLContextHandle( new QGLContext( format_,
-      shared_widget_->context()->device() ) );
-  qt_context->create( shared_widget_->context() );
+  QGLContextHandle qt_context = QGLContextHandle( new QGLContext( this->private_->format_,
+    this->private_->shared_widget_->context()->device() ) );
+  qt_context->create( this->private_->shared_widget_->context() );
 
-  CORE_LOG_DEBUG( std::string("qt_context->valid = ") + Core::ExportToString( qt_context->isValid() ) );
+  CORE_LOG_DEBUG( std::string( "qt_context->valid = " ) + 
+    Core::ExportToString( qt_context->isValid() ) );
 
   // Bind the new context in the GUI independent wrapper class
   context = Core::RenderContextHandle( new QtRenderContext( qt_context ) );
 
-  return ( context->is_valid() );
+  return context->is_valid();
 }
 
 QtRenderWidget* QtRenderResourcesContext::create_qt_render_widget( QWidget* parent, 
                           Core::AbstractViewerHandle viewer )
 {
-  if ( !( shared_widget_.data() ) )
-  {
-    // Create the first shared widget
-    CORE_LOG_DEBUG( "Create a shared OpenGL widget" );
-    
-    shared_widget_ = new QtRenderWidget( format_, parent, 0, viewer );
-    return ( shared_widget_.data() );
-  }
-  else
-  {
-    // Create a sibling widget
-    CORE_LOG_DEBUG( "Create an OpenGL widget" );
-    
-    return ( new QtRenderWidget( format_, parent, shared_widget_.data(), viewer ) );
-  }
+  CORE_LOG_DEBUG( "Create an OpenGL widget" );
+
+  return new QtRenderWidget( this->private_->format_, parent, 
+    this->private_->shared_widget_, viewer );
 }
 
 bool QtRenderResourcesContext::valid_render_resources()
 {
-  return ( shared_widget_.data() && shared_widget_->isValid() );
+  return this->private_->shared_widget_->isValid();
+}
+
+class SharedPtrNopDeleter
+{
+public:
+  template< class T >
+  void operator()( T* p )
+  {
+  }
+};
+
+Core::RenderContextHandle QtRenderResourcesContext::get_current_context()
+{
+  const QGLContext* current_context = QGLContext::currentContext();
+  if ( current_context != 0 )
+  {
+    // NOTE: We don't want to delete the context after the handle goes out of scope,
+    // so we pass a NOP deleter to shared_ptr
+    return Core::RenderContextHandle( new QtRenderContext( QGLContextHandle( 
+      const_cast< QGLContext* >( current_context ), SharedPtrNopDeleter() ) ) );
+  }
+  
+  return Core::RenderContextHandle();
 }
 
 } // end namespace Seg3D

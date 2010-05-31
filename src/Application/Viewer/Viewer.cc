@@ -489,10 +489,7 @@ void Viewer::insert_layer( LayerHandle layer )
     volume_slice->move_slice_to( this->active_layer_slice_->depth() );
   }
 
-  if ( !this->is_volume_view() )
-  {
-    this->trigger_redraw( false );
-  }
+  this->trigger_redraw( false );
 }
 
 void Viewer::delete_layers( std::vector< LayerHandle > layers )

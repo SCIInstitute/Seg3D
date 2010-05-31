@@ -58,7 +58,7 @@ Q_OBJECT
 
   // -- constructor/ destructor --
 public:
-  QtRenderWidget( const QGLFormat& format, QWidget* parent, QtRenderWidget* share, 
+  QtRenderWidget( const QGLFormat& format, QWidget* parent, QGLWidget* share, 
     Core::AbstractViewerHandle viewer );
     
   virtual ~QtRenderWidget();

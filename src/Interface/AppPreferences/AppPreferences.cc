@@ -105,10 +105,10 @@ void AppPreferences::setup_general_prefs()
   connect( this->private_->ui_.change_directory_button_, SIGNAL( clicked() ), 
     this, SLOT( change_project_directory() ) );
 
-  this->private_->ui_.consolidate_project_checkbox_->setChecked( 
-    PreferencesManager::Instance()->considate_project_state_->get() );
-  this->private_->ui_.full_screen_on_startup_checkbox_->setChecked(  
-    PreferencesManager::Instance()->full_screen_on_startup_state_->get() );
+  //this->private_->ui_.consolidate_project_checkbox_->setChecked( 
+  //  PreferencesManager::Instance()->considate_project_state_->get() );
+  //this->private_->ui_.full_screen_on_startup_checkbox_->setChecked(  
+  //  PreferencesManager::Instance()->full_screen_on_startup_state_->get() );
   
   //Connect General Preferences 
   QtUtils::QtBridge::Connect( this->private_->ui_.consolidate_project_checkbox_, 

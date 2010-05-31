@@ -116,7 +116,7 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
     
-    qpointer_type_ viewer_widget( this );
+    ViewerWidgetHandle viewer_widget( this );
     
     this->add_connection( this->private_->viewer_->view_mode_state_->value_changed_signal_.connect( 
       boost::bind( &ViewerWidget::HandleViewModeChanged, viewer_widget ) ) );
@@ -168,6 +168,7 @@ void ViewerWidget::add_icons_to_combobox()
 
 ViewerWidget::~ViewerWidget()
 {
+  this->disconnect_all();
 }
 
 void ViewerWidget::select()
@@ -182,7 +183,6 @@ void ViewerWidget::deselect()
 
 void ViewerWidget::change_view_type( int index )
 {
-  
   bool is_volume_view = ( index == 3 );
   
   this->private_->ui_.flip_horizontal_button_->setVisible( !is_volume_view );
@@ -190,29 +190,28 @@ void ViewerWidget::change_view_type( int index )
   this->private_->ui_.grid_button_->setVisible( !is_volume_view );
   this->private_->picking_button_->setVisible( !is_volume_view );
   this->private_->ui_.slice_visible_button_->setVisible( !is_volume_view );
-
 }
   
-void ViewerWidget::HandleViewModeChanged( qpointer_type_ qpointer )
+void ViewerWidget::HandleViewModeChanged( ViewerWidgetHandle viewer_widget )
 {
   if( !( Core::Interface::IsInterfaceThread() ) )
   {
     Core::Interface::Instance()->post_event( boost::bind( &ViewerWidget::HandleViewModeChanged,
-      qpointer ) );
+      viewer_widget ) );
     return;
   }
   
-  if( qpointer.data() )
+  if( viewer_widget.data() )
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-    bool is_volume_view = qpointer->private_->viewer_->is_volume_view();
+    bool is_volume_view = viewer_widget->private_->viewer_->is_volume_view();
 
     if( !is_volume_view )
     {
-      Core::StateView2DHandle view2d_state = boost::dynamic_pointer_cast<Core::StateView2D>( 
-        qpointer->private_->viewer_->get_active_view_state() );
-      qpointer->private_->ui_.flip_horizontal_button_->setChecked( view2d_state->x_flipped() );
-      qpointer->private_->ui_.flip_vertical_button_->setChecked( view2d_state->y_flipped() );
+      Core::StateView2D* view2d_state = static_cast< Core::StateView2D* >( 
+        viewer_widget->private_->viewer_->get_active_view_state().get() );
+      viewer_widget->private_->ui_.flip_horizontal_button_->setChecked( view2d_state->x_flipped() );
+      viewer_widget->private_->ui_.flip_vertical_button_->setChecked( view2d_state->y_flipped() );
     }
   }
 }

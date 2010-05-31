@@ -54,6 +54,8 @@ namespace Core
 
 // Forward declaration
 class RenderResources;
+class RenderResourcesPrivate;
+typedef boost::shared_ptr< RenderResourcesPrivate > RenderResourcesPrivateHandle;
 
 // Class definition
 class RenderResources : private EventHandler, public RecursiveLockable
@@ -88,10 +90,11 @@ public:
   // Check whether valid render resources have been installed
   bool valid_render_resources();
   
-  // INIT_RENDER_RESOURCES:
-  // Initialize the render resources
-  // NOTE: This function needs to be called with a valid OpenGL context.
-  void init_render_resources();
+  // GET_CURRENT_CONTEXT:
+  // Get the current render context of the calling thread
+  // NOTE: The returned handle should only be used in the scope where this function is
+  // being called, because it may become invalid later.
+  RenderContextHandle get_current_context();
 
   // -- thread safe deletion of GL objects --
 private:
@@ -117,18 +120,7 @@ private:
   void delete_renderbuffer( unsigned int renderbuffer_id );
 
 private:
-
-  // A Handle to resource that generated the contexts
-  RenderResourcesContextHandle resources_context_;
-
-  // An GL context for deleting shared objects
-  // NOTE: Since objects need to be deleted inside an OpenGL context
-  // this contxt has been specially constructed for deleting objects
-  // when their handles go out of scope. As these objects are maintained
-  // through the program using handles, the OpenGL context in which they
-  // were created may be deleted already. Hence we delete them all in
-  // a separate thread using a separate OpenGL context.
-  RenderContextHandle delete_context_;
+  RenderResourcesPrivateHandle private_;
   
 public:
   // GETMUTEX:

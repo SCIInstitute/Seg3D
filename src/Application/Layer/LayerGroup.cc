@@ -148,7 +148,6 @@ void LayerGroup::get_layer_names( std::vector< LayerIDNamePair >& layer_names,
 {
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
 
-  size_t num_of_layers = this->layer_list_.size();
   layer_list_type::const_iterator it = this->layer_list_.begin();
   for ( ; it != this->layer_list_.end(); it++ )
   {
@@ -165,7 +164,6 @@ void LayerGroup::get_layer_names( std::vector< LayerIDNamePair >& layer_names,
 {
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
 
-  size_t num_of_layers = this->layer_list_.size();
   layer_list_type::const_iterator it = this->layer_list_.begin();
   for ( ; it != this->layer_list_.end(); it++ )
   {
