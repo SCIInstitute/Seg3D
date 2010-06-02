@@ -83,10 +83,10 @@ ProjectInfoPage::ProjectInfoPage( QWidget *parent )
                    "want to create." );
 
     this->project_name_label_ = new QLabel( "Project name:" );
-    this->project_name_lineedit_ = new QLineEdit;
+    this->project_name_lineedit_ = new QLineEdit( "New project" );
 
     this->project_path_label_ = new QLabel( "Project Path:" );
-    this->project_path_lineedit_ = new QLineEdit(  );
+    this->project_path_lineedit_ = new QLineEdit;
     
     this->project_path_change_button_ = new QPushButton( "Choose Alternative Location" );
     connect( this->project_path_change_button_, SIGNAL( clicked() ), this, SLOT( set_path() ) );
@@ -96,9 +96,7 @@ ProjectInfoPage::ProjectInfoPage( QWidget *parent )
             "Consolidate the project files into the project folder." );
     this->automatically_consolidate_checkbox_->setChecked( true );
 
-
-
-    registerField( "projectName*", this->project_name_lineedit_ );
+    registerField( "projectName", this->project_name_lineedit_ );
     registerField( "autoConsolidate", this->automatically_consolidate_checkbox_ );
 
 
