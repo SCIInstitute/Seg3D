@@ -53,7 +53,7 @@ namespace Core
 
 // NOTE: This class is *not* like a mutex, it is intended to be used in a 
 // synchronous context, which means one should first check whether a resource
-// is available by is_lockde() and then lock it if needed. Both the is_locked 
+// is available by is_locked() and then lock it if needed. Both the is_locked 
 // and Lock function *should* be called only from the application thread.
 // Only Unlock can be called from anywhere.
 
@@ -64,28 +64,24 @@ namespace Core
 class ResourceLock;
 typedef boost::shared_ptr< ResourceLock > ResourceLockHandle;
 
+class ResourceLockPrivate;
+typedef boost::shared_ptr< ResourceLockPrivate > ResourceLockPrivateHandle;
+
 // Class definition
 class ResourceLock : public boost::noncopyable
 {
 
   // -- constructor/destructor --
 public:
-  friend class ResourceGuard;
-  ResourceLock( std::string name );
+  ResourceLock( const std::string& name );
   virtual ~ResourceLock();
 
   // -- name of the resource for error reporting --
 public:
   // NAME:
   // Return the name of the resource
-  std::string name() const
-  {
-    return name_;
-  }
-
-private:
-  std::string name_;
-
+  std::string name() const;
+  
   // -- lock /unlock --
 private:
   // NOTE: lock and unlock are *private* and the static functions Lock and
@@ -93,9 +89,9 @@ private:
   // functions take the handle to the resource, which they need in case the
   // unlock needs to forwarded to a different thread.
 
-  // LOCK:
+  // TRY_LOCK:
   // Lock the resource that this lock is protecting
-  void lock();
+  bool try_lock();
 
   // UNLOCK:
   // Unlock the resource and wake up any threads that are waiting
@@ -125,48 +121,17 @@ public:
 
   // -- internals --
 private:
-  // Infrastructure to ensure other threads can wait until a resource is
-  // unlocked.
-  typedef boost::mutex mutex_type;
-  typedef boost::unique_lock< mutex_type > guard_type;
-
-  mutex_type resource_lock_;
-  boost::condition_variable resource_available_;
-
-  int resource_lock_count_;
-
+  ResourceLockPrivateHandle private_;
+  
   // -- public lock and unlock functions --
 public:
-  // LOCK:
+  // TRYLOCK:
   // Lock the resource that this lock is protecting
-  static void Lock( ResourceLockHandle& resource_lock );
+  static bool TryLock( ResourceLockHandle& resource_lock );
 
   // UNLOCK:
   // Unlock the resource and wake up any threads that are waiting
   static void Unlock( ResourceLockHandle& resource_lock );
-};
-
-// CLASS ResourceGuard
-// This class will automatically lock the ResourceLock and unlock it when the
-// class gets deleted. A handle is also provided to allow the guard to be passed
-// on to another class while keeping the lock closed
-
-// Forward declaration
-class ResourceGuard;
-typedef boost::shared_ptr< ResourceGuard > ResourceGuardHandle;
-
-// Class definition
-class ResourceGuard : public boost::noncopyable
-{
-
-  // -- constructor/destructor --
-public:
-  ResourceGuard( ResourceLockHandle& resource_lock );
-  virtual ~ResourceGuard();
-
-  // -- handle to resource lock --
-private:
-  ResourceLockHandle resource_lock_;
 };
 
 } // end namespace Seg3D

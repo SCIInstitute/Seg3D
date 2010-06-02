@@ -404,9 +404,13 @@ std::string ExportToString( const std::string& value )
   for ( size_t j = 0; j < value.size(); j++)
   {
     if ( value[j] == ' ' || value[j] == '\t' || value[j] == '[' || value[j] == ']' ||
-      value[j] == '(' || value[j] == ')' || value[j] == ',' ) need_quotes = true;
+      value[j] == '(' || value[j] == ')' || value[j] == ',' || value[j] == '"' ) 
+    {
+      need_quotes = true;
+    }
   }
-  if ( need_quotes ) return std::string("\"") + value + std::string("\"");
+  
+  if ( need_quotes ) return std::string(1,'[') + value + std::string(1,']');
   else return value;
 }
 
@@ -679,32 +683,49 @@ bool ImportFromString( const std::string& str, std::vector< double >& value )
   
 bool ImportFromString( const std::string& str, std::vector< std::string >& value )
 {
+  std::string data = str;
+  if ( data.size() > 1 )
+  {
+    if ( ( data[ 0 ] == '[' ) && ( data[ data.size() - 1 ] == ']' ) )
+    {
+      data = data.substr( 1, data.size() - 2 );
+    }
+  }
+  
   value.clear();
   
   size_t j = 0;
-  while ( j < str.size() )
+  while ( j < data.size() )
   {
-    while ( j < str.size() && ( ( str[ j ] == ' ') || ( str[ j ] == '\t' ) || 
-      ( str[ j ] == '\r' ) || ( str[ j ] == '\n' ) ) ) j++;
+    while ( j < data.size() && ( ( data[ j ] == ' ') || ( data[ j ] == '\t' ) || 
+      ( data[ j ] == '\r' ) || ( data[ j ] == '\n' ) ) ) j++;
 
-    if ( j == str.size() ) return true;
-    if ( str[ j ] == '"' )
+    if ( j == data.size() ) return true;
+    if ( data[ j ] == '[' )
     {
       j++;
       size_t start = j;
-      while ( j < str.size() && str[ j ] != '"' ) j++;
+      size_t paren_count = 0;
+
+      while ( j < data.size() && ( data[ j ] != ']' || paren_count > 0 ) )
+      {
+        if ( data[ j ] == '[' ) paren_count++;
+        if ( data[ j ] == ']' ) paren_count--;
+        j++;
+      }
+
       // if there is no end quotation mark
-      if ( j == str.size() ) return false;
-      value.push_back( str.substr( start, j-start ) );
+      if ( j == data.size() ) return false;
+      value.push_back( data.substr( start, j-start ) );
       j++;
     }
     else
     {
       size_t start = j;
-      while ( j < str.size() && ( ( str[ j ] != ' ' )  || ( str[ j ] != '\t' ) ||
-        ( str[ j ] != '\r' ) || ( str[ j ] != '\n' ) ) ) j++;
+      while ( j < data.size() && ( ( data[ j ] != ' ' )  && ( data[ j ] != '\t' ) &&
+        ( data[ j ] != '\r' ) && ( data[ j ] != '\n' ) ) ) j++;
     
-      value.push_back( str.substr( start, j-start ) );
+      value.push_back( data.substr( start, j-start ) );
     }
   }
 
@@ -721,7 +742,12 @@ bool ImportFromString( const std::string& str, std::string& value )
     {
       value = str.substr( 1, str.size() - 2 );
     }
+    else if ( ( str[0] == '[' ) && ( str[ str.size() - 1 ] == ']' ) )
+    {
+      value = str.substr( 1, str.size() - 2 );
+    }
   }
+  
   return ( true );
 }
 

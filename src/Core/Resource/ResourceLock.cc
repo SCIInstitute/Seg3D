@@ -33,32 +33,60 @@
 namespace Core
 {
 
-ResourceLock::ResourceLock( std::string name ) :
-  name_( name ), resource_lock_count_( 0 )
+class ResourceLockPrivate
 {
+public:
+  
+  std::string name_;
+  
+  typedef boost::mutex mutex_type;
+  typedef boost::unique_lock< mutex_type > lock_type;
+
+  mutex_type mutex_;
+  boost::condition_variable resource_available_;
+
+  int resource_lock_count_;
+};
+
+ResourceLock::ResourceLock( const std::string& name ) :
+  private_( new ResourceLockPrivate)
+{
+  this->private_->name_ = name; 
+  this->private_->resource_lock_count_ = 0;
 }
 
 ResourceLock::~ResourceLock()
 {
 }
 
-//bool ResourceLock::lock()
-//{
-//  guard_type guard( resource_lock_ );
-//  if ( resource_lock_count_ > 0 )
-//  {
-//    return ( false );
-//  }
-//  resource_lock_count_++;
-//  resource_locked_signal();
-//}
+std::string ResourceLock::name() const
+{
+  return this->private_->name_;
+}
+
+bool ResourceLock::try_lock()
+{
+  ResourceLockPrivate::lock_type guard( this->private_->mutex_ );
+  
+  if ( this->private_->resource_lock_count_ > 0 )
+  {
+    return false;
+  }
+  
+  this->private_->resource_lock_count_++;
+  
+  resource_locked_signal_();
+
+  return true;
+}
 
 void ResourceLock::unlock()
 {
-  guard_type guard( resource_lock_ );
-  if ( resource_lock_count_ > 0 )
+  ResourceLockPrivate::lock_type guard( this->private_->mutex_ );
+
+  if ( this->private_->resource_lock_count_ > 0 )
   {
-    resource_lock_count_--;
+    this->private_->resource_lock_count_--;
   }
   else
   {
@@ -67,14 +95,35 @@ void ResourceLock::unlock()
   }
 
   // Check whether it was finally unlocked.
-  if ( resource_lock_count_ == 0 )
+  if ( this->private_->resource_lock_count_ == 0 )
   {
-    resource_available_.notify_all();
+    this->private_->resource_available_.notify_all();
     resource_unlocked_signal_();
   }
 }
 
-void ResourceLock::Lock( ResourceLockHandle& resource_lock )
+void ResourceLock::wait()
+{
+  ResourceLockPrivate::lock_type guard( this->private_->mutex_ );
+
+  // wait until the resource has been unlocked
+  while ( this->private_->resource_lock_count_ != 0 )
+  {
+    // sleep until a resource availability signal is triggered
+    this->private_->resource_available_.wait( guard );
+  }
+
+  // resource count so one can try again to lock the resource
+  return;
+}
+
+bool ResourceLock::is_locked()
+{
+  ResourceLockPrivate::lock_type guard( this->private_->mutex_ );
+  return ( this->private_->resource_lock_count_ != 0 );
+}
+
+bool ResourceLock::TryLock( ResourceLockHandle& resource_lock )
 {
   // NOTE:
   // Lock *needs* to be called from the application thread to ensure that
@@ -88,7 +137,7 @@ void ResourceLock::Lock( ResourceLockHandle& resource_lock )
     CORE_THROW_LOGICERROR( "Lock is called from a thread other than the application thread" );
   }
 
-  resource_lock->lock();
+  return resource_lock->try_lock();
 }
 
 void ResourceLock::Unlock( ResourceLockHandle& resource_lock )
@@ -105,38 +154,7 @@ void ResourceLock::Unlock( ResourceLockHandle& resource_lock )
     return;
   }
 
-  resource_lock->lock();
-}
-
-void ResourceLock::wait()
-{
-  guard_type guard( resource_lock_ );
-
-  // wait until the resource has been unlocked
-  while ( resource_lock_count_ != 0 )
-  {
-    // sleep until a resource availability signal is triggered
-    resource_available_.wait( guard );
-  }
-  // resource count so one can try again to lock the resource
-  return;
-}
-
-bool ResourceLock::is_locked()
-{
-  guard_type guard( resource_lock_ );
-  return ( resource_lock_count_ != 0 );
-}
-
-ResourceGuard::ResourceGuard( ResourceLockHandle& resource_lock ) :
-  resource_lock_( resource_lock )
-{
-  resource_lock_->lock();
-}
-
-ResourceGuard::~ResourceGuard()
-{
-  resource_lock_->unlock();
+  resource_lock->unlock();
 }
 
 } // end namespace Core
