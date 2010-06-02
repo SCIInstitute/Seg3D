@@ -52,8 +52,10 @@ namespace Seg3D
 CORE_SINGLETON_IMPLEMENTATION( LayerManager );
 
 LayerManager::LayerManager() :
-  StateHandler( "LayerManager", false )
+  StateHandler( "layermanager", false )
 { 
+  std::vector< std::string> groups;
+  add_state( "groups", this->groups_state_, groups );
 }
 
 LayerManager::~LayerManager()
@@ -123,6 +125,9 @@ bool LayerManager::insert_layer( LayerHandle layer )
     active_layer_changed_signal_( layer );
   }
   
+  // keep the state variables in sync
+  this->sync_group_lists();
+  
   return true;
 }
 
@@ -152,10 +157,13 @@ bool LayerManager::move_group_above( std::string group_to_move_id, std::string g
 
     this->group_list_.remove( group_above );
     index = this->insert_group( group_above, group_below );
-
   }
 
   group_inserted_at_signal_( group_to_move_id, index );
+  
+  // keep the state variables in sync
+  this->sync_group_lists();
+  
   return true;
 }
 
@@ -247,6 +255,9 @@ bool LayerManager::move_layer_above( std::string layer_to_move_id, std::string l
   
   layer_inserted_at_signal_( layer_above, index );
   layers_changed_signal_();
+  
+  // keep the state variables in sync
+  this->sync_group_lists();
   
   return true;  
 }
@@ -422,6 +433,9 @@ void LayerManager::delete_layers( LayerGroupHandle group )
     this->active_layer_changed_signal_( this->active_layer_ );
   }
   
+  // keep the state variables in sync
+  this->sync_group_lists();
+  
 } // end delete_layer
 
 LayerHandle LayerManager::get_active_layer()
@@ -546,6 +560,21 @@ void LayerManager::get_layer_names( std::vector< LayerIDNamePair >& layer_names,
         layers[ i ]->get_layer_name() ) );
     }
   }
+}
+  
+void LayerManager::sync_group_lists()
+{
+  lock_type lock( this->get_mutex() );
+  
+  std::vector< std::string > group_vector;
+  this->groups_state_->set( group_vector );
+  
+  group_list_type::iterator group_iterator = this->group_list_.begin();
+  for ( ; group_iterator != this->group_list_.end(); group_iterator++)
+  {
+    group_vector.push_back( ( *group_iterator )->get_statehandler_id() );
+  }
+  this->groups_state_->set( group_vector );
 }
 
 } // end namespace seg3D

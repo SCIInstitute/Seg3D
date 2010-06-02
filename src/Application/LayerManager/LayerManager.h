@@ -120,6 +120,10 @@ public:
   // Get the mutex, so it can be locked by the interface that is built
   // on top of this
   mutex_type& get_mutex();
+  
+  // state variables
+public:
+  Core::StateStringVectorHandle groups_state_;
 
 public:
   // -- Signal/Slots --
@@ -173,6 +177,9 @@ public:
   // SOMETHING_CHANGED_SIGNAL:
   // This gets signaled when we 
   layers_changed_type layers_changed_signal_;
+  
+private:
+  void sync_group_lists();
   
 private:
     // list of the current groups 

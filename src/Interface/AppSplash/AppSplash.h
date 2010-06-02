@@ -74,10 +74,17 @@ private Q_SLOTS:
   // this function is called when a user double-clicks on an item in the list. 
   void open_recent();
   
+  // ENABLE_LOAD_RECENT_BUTTON:
+  // this function enables the load recent button if you select a recent project from the list
+  void enable_load_recent_button( QListWidgetItem* item );
+  
 private:
   // Internals of the splash screen
   boost::shared_ptr< AppSplashPrivate > private_;
+  
+  std::vector< std::string > recent_project_list_;
   QPointer< AppProjectWizard > new_project_wizard_;
+  
 
 };
 

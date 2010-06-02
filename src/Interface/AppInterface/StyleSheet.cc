@@ -290,6 +290,7 @@ namespace Seg3D
     "QPushButton#activate_button_{"
     " background-color: rgba(0, 0, 0, 0);"
     " border: 1px solid rgba(0, 0, 0, 0);"
+    " margin-left:1px;"
     " border-radius: 3px;"
     " color: white;"
     "}");

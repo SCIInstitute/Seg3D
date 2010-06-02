@@ -37,37 +37,41 @@ namespace Seg3D
 LayerGroup::LayerGroup( Core::GridTransform grid_transform ) :
   StateHandler( "group", true )
 {
-  grid_transform_ = grid_transform;
+  this->grid_transform_ = grid_transform;
 
   // Need to set ranges and default values for all parameters
-  add_state( "mode", edit_mode_state_, "none", "none|TRANSFORM|COPY|RESAMPLE" );
+  add_state( "mode", this->edit_mode_state_, "none", "none|TRANSFORM|COPY|RESAMPLE" );
 
     // = Transformation menu state variables =
-  add_state( "transform_origin_x", transform_origin_x_state_, 0.0 );
-  add_state( "transform_origin_y", transform_origin_y_state_ , 0.0 );
-  add_state( "transform_origin_z", transform_origin_z_state_ , 0.0 );
-  add_state( "transform_spacing_x", transform_spacing_x_state_, 1.0 );
-  add_state( "transform_spacing_y", transform_spacing_y_state_, 1.0 );
-  add_state( "transform_spacing_z", transform_spacing_z_state_, 1.0 );
-  add_state( "transform_replace", transform_replace_state_, false );
+  add_state( "transform_origin_x", this->transform_origin_x_state_, 0.0 );
+  add_state( "transform_origin_y", this->transform_origin_y_state_ , 0.0 );
+  add_state( "transform_origin_z", this->transform_origin_z_state_ , 0.0 );
+  add_state( "transform_spacing_x", this->transform_spacing_x_state_, 1.0 );
+  add_state( "transform_spacing_y", this->transform_spacing_y_state_, 1.0 );
+  add_state( "transform_spacing_z", this->transform_spacing_z_state_, 1.0 );
+  add_state( "transform_replace", this->transform_replace_state_, false );
   
       // = Set Crop menu state variables =
-  add_state( "crop_center_x", crop_center_x_state_, 0.0, 00.0, 1000.0, 1.0 );
-  add_state( "crop_center_y", crop_center_y_state_, 0.0, 00.0, 1000.0, 1.0 );
-  add_state( "crop_center_z", crop_center_z_state_, 0.0, 00.0, 1000.0, 1.0 );
-  add_state( "crop_size_x", crop_size_width_state_, 0.0, 00.0, 1000.0, 1.0 );
-  add_state( "crop_size_y", crop_size_height_state_, 0.0, 00.0, 1000.0, 1.0 );
-  add_state( "crop_size_z", crop_size_depth_state_, 0.0, 00.0, 1000.0, 1.0 );
-  add_state( "crop_replace", crop_replace_state_, false );
+  add_state( "crop_center_x", this->crop_center_x_state_, 0.0, 00.0, 1000.0, 1.0 );
+  add_state( "crop_center_y", this->crop_center_y_state_, 0.0, 00.0, 1000.0, 1.0 );
+  add_state( "crop_center_z", this->crop_center_z_state_, 0.0, 00.0, 1000.0, 1.0 );
+  add_state( "crop_size_x", this->crop_size_width_state_, 0.0, 00.0, 1000.0, 1.0 );
+  add_state( "crop_size_y", this->crop_size_height_state_, 0.0, 00.0, 1000.0, 1.0 );
+  add_state( "crop_size_z", this->crop_size_depth_state_, 0.0, 00.0, 1000.0, 1.0 );
+  add_state( "crop_replace", this->crop_replace_state_, false );
   
   
   // = Set Resample state variables =
-  add_state( "resample_factor", resample_factor_state_, 1.0, 0.10, 5.0, .10 );
-  add_state( "resample_replace", resample_replace_state_, false );
+  add_state( "resample_factor", this->resample_factor_state_, 1.0, 0.10, 5.0, .10 );
+  add_state( "resample_replace", this->resample_replace_state_, false );
   
   // = General state settings
-  add_state( "show_layers", show_layers_state_, true );
-  add_state( "visibility", visibility_state_, true );
+  add_state( "show_layers", this->show_layers_state_, true );
+  add_state( "visibility", this->visibility_state_, true );
+  
+  // = Layer list
+  std::vector< std::string> layers;
+  add_state( "groups", this->layers_state_, layers );
   
 }
 
@@ -86,11 +90,16 @@ void LayerGroup::create_mask_layer()
 void LayerGroup::insert_layer_back( LayerHandle new_layer )
 {
   layer_list_.push_back( new_layer );
+  // keep layer lists in sync
+  this->sync_layer_lists();
 }
 
 void LayerGroup::insert_layer_front( LayerHandle new_layer )
 {
   layer_list_.push_front( new_layer );
+  
+  // keep layer lists in sync
+  this->sync_layer_lists();
 }
 
 
@@ -109,6 +118,9 @@ int LayerGroup::move_layer_above( LayerHandle layer_above, LayerHandle layer_bel
       // Second we insert the layer
       this->layer_list_.insert( ++i, layer_above );
       
+      // keep layer lists in sync
+      this->sync_layer_lists();
+      
       // Finally we return the proper location for the gui to insert the layer
       return abs( index - list_size ) - 1;
     }
@@ -121,6 +133,9 @@ int LayerGroup::move_layer_above( LayerHandle layer_above, LayerHandle layer_bel
 void LayerGroup::delete_layer( LayerHandle layer )
 {
   layer_list_.remove( layer );
+  
+  // keep layer lists in sync
+  this->sync_layer_lists();
 }
 
 void LayerGroup::crop_layer()
@@ -173,6 +188,22 @@ void LayerGroup::get_layer_names( std::vector< LayerIDNamePair >& layer_names,
         ( *it )->get_layer_name() ) );
     }
   }
+}
+  
+
+void LayerGroup::sync_layer_lists()
+{
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+  
+  std::vector< std::string > layer_vector;
+  this->layers_state_->set( layer_vector );
+  
+  layer_list_type::const_iterator layer_iterator = this->layer_list_.begin();
+  for ( ; layer_iterator != this->layer_list_.end(); ++layer_iterator )
+  {
+    layer_vector.push_back( ( *layer_iterator )->get_statehandler_id() );
+  }
+  this->layers_state_->set( layer_vector );
 }
 
 } // end namespace Seg3D

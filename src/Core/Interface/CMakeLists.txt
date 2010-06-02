@@ -45,6 +45,7 @@ CORE_ADD_LIBRARY(Core_Interface ${CORE_INTERFACE_SRCS} )
 TARGET_LINK_LIBRARIES(Core_Interface
                       Core_Application
                       Core_Action
+            Core_Resource
                       Core_Utils
                       Core_EventHandler
                       ${SCI_BOOST_LIBRARY})

@@ -28,45 +28,7 @@ QToolButton:pressed {
 QToolButton:checked {
   border: 2px solid black;
   border-radius: 3px;
-}
-
-QToolButton#color_01_ {
-  background-color: rgb(251,255,74);
-}
-QToolButton#color_02_{
-  background-color: rgb(248,188,37);
-}
-QToolButton#color_03_{
-  background-color: rgb(248,152,28);
-}
-QToolButton#color_04_{
-  background-color: rgb(251,78,15);
-}
-QToolButton#color_05_{
-  background-color: rgb(252,21,17);
-}
-QToolButton#color_06_{
-  background-color: rgb(166,12,73);
-}
-QToolButton#color_07_{
-  background-color: rgb(135,0,172);
-}
-QToolButton#color_08_{
-  background-color: rgb(66,0,161);
-}
-QToolButton#color_09_{
-  background-color: rgb(45,66,250);
-}
-QToolButton#color_10_{
-  background-color: rgb(32,146,204);
-}
-QToolButton#color_11_{
-  background-color: rgb(100,177,61);
-}
-QToolButton#color_12_{
-  background-color: rgb(205,235,66);
-}
-</string>
+}</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
@@ -78,7 +40,7 @@ QToolButton#color_12_{
    <item>
     <widget class="QTabWidget" name="prefs_tabs_">
      <property name="currentIndex">
-      <number>0</number>
+      <number>4</number>
      </property>
      <widget class="QWidget" name="tab_general_">
       <attribute name="title">

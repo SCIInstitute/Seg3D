@@ -84,7 +84,7 @@ ProjectInfoPage::ProjectInfoPage( QWidget *parent )
 
     this->project_name_label_ = new QLabel( "Project name:" );
     this->project_name_lineedit_ = new QLineEdit( "New project" );
-
+  
     this->project_path_label_ = new QLabel( "Project Path:" );
     this->project_path_lineedit_ = new QLineEdit;
     

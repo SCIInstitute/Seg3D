@@ -107,8 +107,8 @@ public Q_SLOTS:
   // viewed.
   void auto_view();
   
-  // HANDLE_VIEW_MODE_CHANGED:
-  // 
+  // HANDLEVIEWMODECHANGED:
+  // this handles signals from the viewer to keep the flip buttons in sync
   static void HandleViewModeChanged( ViewerWidgetHandle viewer_widget );
   
 private:

@@ -10,6 +10,14 @@
     <height>644</height>
    </rect>
   </property>
+  <property name="styleSheet">
+   <string notr="true">QCheckBox#consolidate_files_checkbox_{
+  margin-left: -2px;
+}
+QLabel#label{
+
+}</string>
+  </property>
   <property name="allowedAreas">
    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
   </property>
@@ -118,7 +126,7 @@
               <widget class="QCheckBox" name="consolidate_files_checkbox_">
                <property name="maximumSize">
                 <size>
-                 <width>18</width>
+                 <width>16</width>
                  <height>16777215</height>
                 </size>
                </property>
@@ -138,13 +146,6 @@
               </widget>
              </item>
             </layout>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="checkBox_3">
-            <property name="text">
-             <string>Option 3</string>
-            </property>
            </widget>
           </item>
           <item>
@@ -193,15 +194,12 @@
         <number>2</number>
        </property>
        <property name="margin">
-        <number>2</number>
+        <number>0</number>
        </property>
        <item>
-        <widget class="QListView" name="listView">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
+        <widget class="QListWidget" name="sessions_list_">
+         <property name="editTriggers">
+          <set>QAbstractItemView::NoEditTriggers</set>
          </property>
          <property name="alternatingRowColors">
           <bool>true</bool>

@@ -111,7 +111,9 @@ public:
 
   Core::StateBoolHandle visibility_state_;
   Core::StateBoolHandle show_layers_state_;
-
+  
+  // = Layers
+  Core::StateStringVectorHandle layers_state_;
 
 
   // -- Layers contained within group --
@@ -191,6 +193,9 @@ public:
     Core::VolumeType type ) const;
   void get_layer_names( std::vector< LayerIDNamePair >& layer_names, 
     Core::VolumeType type, LayerHandle excluded_layer ) const;
+  
+private:
+  void sync_layer_lists();
   
 private:
   

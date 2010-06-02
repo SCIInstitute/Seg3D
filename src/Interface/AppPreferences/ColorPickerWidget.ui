@@ -21,7 +21,6 @@
   </property>
   <property name="styleSheet">
    <string notr="true">QWidget#color_sample_{
-  background-color: rgb(64, 128, 0);
   border: 2px solid white;
   border-radius: 4px;
 }

@@ -42,6 +42,10 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/thread/mutex.hpp>
 
+// Application indludes
+#include <Application/Project/Session.h>
+
+
 // Volume includes
 #include <Core/Action/Action.h>
 #include <Core/Application/Application.h>
@@ -71,11 +75,27 @@ public:
   Core::StateStringHandle project_name_state_;
   Core::StateBoolHandle save_custom_colors_state_;
   Core::StateBoolHandle auto_consolidate_files_state_;
+  Core::StateStringVectorHandle sessions_state_;
   
 public:
   // INITIALIZE_FROM_FILE:
   // this file initializes the state values for project from the file at the path specified
-  void initialize_from_file( const std::string& project_path );
+  bool initialize_from_file( boost::filesystem::path project_path, const std::string& project_name );
+  
+  // LOAD_SESSION:
+  // this function will be called to load a specific session
+  bool load_session( boost::filesystem::path project_path, int state_index );
+  
+  // SAVE_SESSION:
+  // this function will be called from the project manager
+  bool save_session( boost::filesystem::path project_path, const std::string& session_name );
+  
+private:
+  
+  void add_session_to_list( const std::string& session_path_and_name );
+  
+private:
+  SessionHandle current_session_;
   
 
 };

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>209</width>
+    <width>242</width>
     <height>142</height>
    </rect>
   </property>
@@ -34,24 +34,6 @@ QWidget#border_{
   border-left: 3px solid rgb( 85, 85, 85 );
   border-right: 3px solid rgb( 35, 35, 35 );
 }
-/*
-QComboBox {
-  margin: 0, 0, 0, 0;
-  padding: 0, 0, 0, 0;
-  min-width: 6em;
-  background-color: rgba( 0, 0, 0, 0 );
-}
-QComboBox::down-arrow:on {
-  top: 1px;
-  left: 1px;
-}
-QComboBox::down-arrow
-{
-  margin: 0, 0, 0, 0;
-  padding: 0, 0, 0, 0;
-  
-}
-*/
 
 QToolButton{
   border: 1px solid rgba( 0, 0, 0, 0 );
@@ -71,8 +53,6 @@ QToolButton:pressed{
 
 
  QComboBox {
-     /*border: 1px solid gray;
-     border-radius: 3px;*/
      padding: 1px 1px 1px 1px;
      min-width: 6em;
   background-color: rgba( 0,0,0,0 );
@@ -80,13 +60,10 @@ QToolButton:pressed{
  }
 
  QComboBox:editable {
-     /*background: white;*/
  }
 
  QComboBox:!editable, QComboBox::drop-down:editable {
-      /*background-color: rgba( 0,0,0,0 );*/
-  background-color:
-  qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+  background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                                   stop: 0 #E1E1E1, stop: 0.4 #DDDDDD,
                                   stop: 0.5 #D8D8D8, stop: 1.0 #D3D3D3);
  }
@@ -99,23 +76,18 @@ QToolButton:pressed{
  }
 
  QComboBox:on { /* shift the text when the popup opens */
-     /*padding-top: 3px;
-     padding-left: 4px;*/
  }
 
  QComboBox::drop-down {
      subcontrol-origin: padding;
      subcontrol-position: top right;
-     width: 0px;
-  /*border-left-width: 1px;
-     border-left-color: gray;
-     border-left-style: solid; /* just a single line */
-     border-top-right-radius: 3px; /* same radius as the QComboBox */
+     width: 16px;
+     border-top-right-radius: 3px;
      border-bottom-right-radius: 3px;
  }
 
  QComboBox::down-arrow {
-     image: url(/usr/share/icons/crystalsvg/16x16/actions/1downarrow.png);
+     image: url(&quot;:/Images/Arrow.png&quot;);
  }
 
  QComboBox::down-arrow:on { /* shift the arrow when popup is open */
@@ -200,13 +172,13 @@ QComboBox::icon{
            </property>
            <property name="minimumSize">
             <size>
-             <width>82</width>
+             <width>0</width>
              <height>20</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>82</width>
+             <width>92</width>
              <height>20</height>
             </size>
            </property>
@@ -229,12 +201,6 @@ QComboBox::icon{
                <size>
                 <width>98</width>
                 <height>20</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>82</width>
-                <height>16777215</height>
                </size>
               </property>
               <property name="palette">
@@ -607,7 +573,11 @@ QComboBox::icon{
                </property>
                <property name="icon">
                 <iconset resource="Resources/AppInterface.qrc">
-                 <normaloff>:/Images/Xview.png</normaloff>:/Images/Xview.png</iconset>
+                 <normaloff>:/Images/XviewOff.png</normaloff>
+                 <normalon>:/Images/Xview.png</normalon>
+                 <disabledoff>:/Images/Xview.png</disabledoff>
+                 <activeoff>:/Images/Xview.png</activeoff>
+                 <selectedoff>:/Images/Xview.png</selectedoff>:/Images/XviewOff.png</iconset>
                </property>
               </item>
               <item>
@@ -616,7 +586,8 @@ QComboBox::icon{
                </property>
                <property name="icon">
                 <iconset resource="Resources/AppInterface.qrc">
-                 <normaloff>:/Images/Zview.png</normaloff>:/Images/Zview.png</iconset>
+                 <normaloff>:/Images/ZviewOff.png</normaloff>
+                 <normalon>:/Images/Zview.png</normalon>:/Images/ZviewOff.png</iconset>
                </property>
               </item>
               <item>
@@ -625,7 +596,8 @@ QComboBox::icon{
                </property>
                <property name="icon">
                 <iconset resource="Resources/AppInterface.qrc">
-                 <normaloff>:/Images/Yview.png</normaloff>:/Images/Yview.png</iconset>
+                 <normaloff>:/Images/YviewOff.png</normaloff>
+                 <normalon>:/Images/Yview.png</normalon>:/Images/YviewOff.png</iconset>
                </property>
               </item>
               <item>
@@ -634,12 +606,20 @@ QComboBox::icon{
                </property>
                <property name="icon">
                 <iconset resource="Resources/AppInterface.qrc">
-                 <normaloff>:/Images/Vview.png</normaloff>:/Images/Vview.png</iconset>
+                 <normaloff>:/Images/VviewOff.png</normaloff>
+                 <normalon>:/Images/Vview.png</normalon>:/Images/VviewOff.png</iconset>
                </property>
               </item>
              </widget>
             </item>
            </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="Line" name="line">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
           </widget>
          </item>
          <item>

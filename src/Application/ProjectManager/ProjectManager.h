@@ -90,6 +90,14 @@ public:
   // this function calls save_states that writes the state values of ProjectManager to file
   void save_projectmanager_state();
   
+  // SAVE_PROJECT_SESSION:
+  // this function saves the current session to disk
+  bool save_project_session(); 
+  
+  // LOAD_PROJECT_SESSION:
+  // this function saves the current session to disk
+  bool load_project_session( int session_index ); 
+  
 public:
   Core::StateStringVectorHandle recent_projects_state_;
   Core::StateStringHandle current_project_path_state_;
@@ -103,6 +111,14 @@ private:
   // ADD_TO_RECENT_PROJECTS:
   // this function adds the latest project to the list of recent projects
   void add_to_recent_projects( const std::string& project_path, const std::string& project_name );
+  
+  // CREATE_PROJECT_FOLDERS:
+  // this will try and create the project folders and if is successfull return true 
+  bool create_project_folders( const std::string& project_name );
+  
+  // RENAME_PROJECT_FOLDER
+  // this function is triggered when a user changes the folder name
+  void rename_project_folder( const std::string& new_name, Core::ActionSource source );
   
 private:
   

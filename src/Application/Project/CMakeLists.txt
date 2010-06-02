@@ -34,6 +34,8 @@
 SET(APPLICATION_PROJECT_SRCS
   Project.h
   Project.cc
+  Session.h
+  Session.cc
 )
 
 SET(APPLICATION_PROJECT_ACTIONS_SRCS

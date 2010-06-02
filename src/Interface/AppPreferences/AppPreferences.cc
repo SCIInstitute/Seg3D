@@ -66,7 +66,7 @@ AppPreferences::AppPreferences( QWidget *parent ) :
   this->setup_interface_controls_prefs();
 
   //Hide the interface controls since they arent connected yet
-  this->private_->ui_.tab_interface_controls_->hide();
+  this->private_->ui_.prefs_tabs_->removeTab( 3 );
 
   // connect the apply button to the save defaults function
   connect( this->private_->ui_.apply_button_, SIGNAL( clicked() ), 
@@ -105,10 +105,6 @@ void AppPreferences::setup_general_prefs()
   connect( this->private_->ui_.change_directory_button_, SIGNAL( clicked() ), 
     this, SLOT( change_project_directory() ) );
 
-  //this->private_->ui_.consolidate_project_checkbox_->setChecked( 
-  //  PreferencesManager::Instance()->considate_project_state_->get() );
-  //this->private_->ui_.full_screen_on_startup_checkbox_->setChecked(  
-  //  PreferencesManager::Instance()->full_screen_on_startup_state_->get() );
   
   //Connect General Preferences 
   QtUtils::QtBridge::Connect( this->private_->ui_.consolidate_project_checkbox_, 
@@ -152,52 +148,13 @@ void AppPreferences::setup_layer_prefs()
   
   // setting an arbitrary picker as the default active picker to deal with the first case
   this->active_picker_ = this->private_->color_pickers_[ 0 ];
-
+  this->private_->color_button_group_->button( 0 )->click();
   
 //Set Layers Preferences
   // Add SliderSpin Combo for adjusting the default opacity of the layers
   this->private_->opacity_adjuster_ = new QtUtils::QtSliderDoubleCombo( this );
   this->private_->ui_.verticalLayout_2->addWidget( this->private_->opacity_adjuster_ );
   this->private_->opacity_adjuster_->setObjectName( QString::fromUtf8( "opacity_adjuster_" ) );
-  
-  // set the default values for the slidercombo's
-  // set the defaults for the opacity
-  double opacity_min = 0.0; 
-  double opacity_max = 0.0;
-  double opacity_step = 0.0;
-  PreferencesManager::Instance()->default_layer_opacity_state_->get_step( opacity_step );
-  PreferencesManager::Instance()->default_layer_opacity_state_->get_range( 
-    opacity_min, opacity_max );
-  this->private_->opacity_adjuster_->setStep( opacity_step );
-  this->private_->opacity_adjuster_->setRange( opacity_min, opacity_max );
-  this->private_->opacity_adjuster_->setCurrentValue( 
-    PreferencesManager::Instance()->default_layer_opacity_state_->get() );
-  
-  
-  // --- set the values for the dropdown menu's using values from the state handles
-  // -- set the border selection combo box's values 
-  std::vector< std::string > temp_option_list = 
-    PreferencesManager::Instance()->default_mask_border_state_->option_list();
-  
-  for( size_t i = 0; i < temp_option_list.size(); i++)
-  {   
-    this->private_->ui_.mask_border_combobox_->addItem( 
-      QString::fromStdString( temp_option_list[i] ) );
-  }
-  // Set it's default value
-  this->private_->ui_.mask_border_combobox_->setCurrentIndex( 
-    PreferencesManager::Instance()->default_mask_border_state_->index() );
-  
-  // -- set the fill selection combo box's values 
-  temp_option_list = PreferencesManager::Instance()->default_mask_fill_state_->option_list();
-  for( size_t i = 0; i < temp_option_list.size(); i++)
-  {   
-    this->private_->ui_.mask_fill_combobox_->addItem( 
-      QString::fromStdString( temp_option_list[i] ) );
-  }
-  // Set it's default value
-  this->private_->ui_.mask_fill_combobox_->setCurrentIndex( 
-    PreferencesManager::Instance()->default_mask_fill_state_->index() );
   
   //Connect Layers Preferences
   QtUtils::QtBridge::Connect( this->private_->opacity_adjuster_, 
@@ -211,59 +168,10 @@ void AppPreferences::setup_layer_prefs()
     this, SLOT( set_buttons_to_default_colors () ) );
 }
   
-void AppPreferences::set_buttons_to_default_colors()
-{
-  std::vector< Core::Color > temp_color_list = PreferencesManager::Instance()->
-    get_default_colors();
-  for( int i = 0; i < 12; ++i )
-  {
-    dynamic_cast< QtUtils::QtColorButton* >( this->private_->color_button_group_->button( i ) )->
-      set_color( temp_color_list[ i ] );
-  }
-}
 
-void AppPreferences::hide_the_others( int active )
-{
-  this->active_picker_->hide();
-  this->active_picker_ = this->private_->color_pickers_[ active ];
-  this->active_picker_->show();
-}
 
 void AppPreferences::setup_viewer_prefs()
 {
-//Set Viewer Preferences
-  // --- set the values for the dropdown menu's using values from the state handles
-  // -- set the border selection combo box's values 
-  std::vector< std::string > temp_option_list = 
-  PreferencesManager::Instance()->default_viewer_mode_state_->option_list();
-  
-  for( size_t i = 0; i < temp_option_list.size(); i++)
-  {   
-    this->private_->ui_.viewer_mode_combobox_->addItem( 
-      QString::fromStdString( temp_option_list[i] ) );
-  }
-  // Set it's default value
-  this->private_->ui_.viewer_mode_combobox_->setCurrentIndex( 
-    PreferencesManager::Instance()->default_viewer_mode_state_->index() );
-  
-  // -- set the fill selection combo box's values 
-  temp_option_list = PreferencesManager::Instance()->background_color_state_->option_list();
-  for( size_t i = 0; i < temp_option_list.size(); i++)
-  {   
-    this->private_->ui_.background_color_combobox_->addItem( 
-      QString::fromStdString( temp_option_list[i] ) );
-  }
-  // Set it's default value
-  this->private_->ui_.background_color_combobox_->setCurrentIndex( 
-    PreferencesManager::Instance()->background_color_state_->index() );
-  
-    
-  this->private_->ui_.grid_size_spinbox_->setValue(
-    PreferencesManager::Instance()->grid_size_state_->get() );
-  
-  this->private_->ui_.show_slice_numbers_checkbox_->setChecked( 
-    PreferencesManager::Instance()->show_slice_number_state_->get() );
-  
   
 //Connect Viewer Preferences
   QtUtils::QtBridge::Connect( this->private_->ui_.viewer_mode_combobox_, 
@@ -304,15 +212,35 @@ void AppPreferences::setup_sidebar_prefs()
     PreferencesManager::Instance()->show_history_bar_state_ );
   
 }
+  
+void AppPreferences::setup_interface_controls_prefs()
+{
+  //Interface Controls Preferences  
+}
+
+void AppPreferences::set_buttons_to_default_colors()
+{
+  std::vector< Core::Color > temp_color_list = PreferencesManager::Instance()->
+  get_default_colors();
+  for( int i = 0; i < 12; ++i )
+  {
+    dynamic_cast< QtUtils::QtColorButton* >( this->private_->color_button_group_->button( i ) )->
+    set_color( temp_color_list[ i ] );
+  }
+}
+
+void AppPreferences::hide_the_others( int active )
+{
+  this->active_picker_->hide();
+  this->active_picker_ = this->private_->color_pickers_[ active ];
+  this->active_picker_->show();
+}
 
 void AppPreferences::save_defaults()
 {
   PreferencesManager::Instance()->save_state();
 }
 
-void AppPreferences::setup_interface_controls_prefs()
-{
-  //Interface Controls Preferences  
-}
+
 
 } // end namespace Seg3D

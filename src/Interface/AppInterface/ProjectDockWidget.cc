@@ -28,6 +28,7 @@
 
 // Core includes
 #include <Core/Utils/Log.h>
+#include <Core/Interface/Interface.h>
 
 //QtInterface Includes
 #include <QtInterface/Bridge/QtBridge.h>
@@ -56,11 +57,31 @@ ProjectDockWidget::ProjectDockWidget( QWidget *parent ) :
 {
   if( this->private_ )
   {
+    qpointer_type project_dock_widget( this );
+    
     this->private_->ui_.setupUi( this );
     QtUtils::QtBridge::Connect( this->private_->ui_.project_name_edit_, 
       ProjectManager::Instance()->current_project_->project_name_state_ );
-    //this->private_->ui_.project_name_edit_->setText( QString::fromStdString( 
-//      ProjectManager::Instance()->current_project_name() ) );
+    
+    QtUtils::QtBridge::Connect( this->private_->ui_.custom_colors_checkbox_, 
+      ProjectManager::Instance()->current_project_->save_custom_colors_state_ );
+    
+    QtUtils::QtBridge::Connect( this->private_->ui_.consolidate_files_checkbox_, 
+      ProjectManager::Instance()->current_project_->auto_consolidate_files_state_ );
+    
+    add_connection( ProjectManager::Instance()->current_project_->sessions_state_->
+      state_changed_signal_.connect( boost::bind( &ProjectDockWidget::HandleSessionSaved, 
+      project_dock_widget ) ) );
+    
+    
+    connect( this->private_->ui_.save_session_button_, SIGNAL( clicked() ), 
+      this, SLOT( save_project() ) );
+    
+    connect( this->private_->ui_.load_session_button_, SIGNAL( clicked() ), 
+        this, SLOT( load_session() ) );
+    
+    
+  
   }
 }
 
@@ -69,6 +90,64 @@ ProjectDockWidget::~ProjectDockWidget()
 
 }
   
-
+  
+void ProjectDockWidget::save_project()
+{
+  ProjectManager::Instance()->save_project();
+}
+  
+void ProjectDockWidget::load_session()
+{
+  if( this->private_->ui_.sessions_list_->currentItem()->text() != "" )
+  {
+    std::vector< std::string > sessions = ProjectManager::Instance()->current_project_->
+    sessions_state_->get();
+    
+    
+    for( size_t i = 0; i < sessions.size(); ++i )
+    {
+      if( QString::fromStdString( ( Core::SplitString( sessions[ i ], "|" ) )[ 1 ] ) == 
+         this->private_->ui_.sessions_list_->currentItem()->text() )
+      {
+        ProjectManager::Instance()->load_project_session( i );  
+        break;
+      }
+    }
+  }
+    
+}
+  
+  
+void ProjectDockWidget::populate_session_list()
+{
+  std::vector< std::string > sessions = ProjectManager::Instance()->current_project_->
+    sessions_state_->get();
+  
+  this->private_->ui_.sessions_list_->clear();
+  
+  for( size_t i = 0; i < sessions.size(); ++i )
+  {
+    if( sessions[ i ] != "" )
+    {
+      this->private_->ui_.sessions_list_->addItem( QString::fromStdString( 
+        ( Core::SplitString( sessions[ i ], "|" ) )[ 1 ] ) );
+    }
+  }
+}
+    
+  
+void ProjectDockWidget::HandleSessionSaved( qpointer_type qpointer )
+{
+  if( !( Core::Interface::IsInterfaceThread() ) )
+  {
+    Core::Interface::Instance()->post_event( boost::bind( 
+      &ProjectDockWidget::HandleSessionSaved, qpointer ) );
+    return;
+  }
+  
+  CORE_LOG_DEBUG( "HandleSessionSaved started" );
+  if( qpointer.data() ) qpointer->populate_session_list();
+  CORE_LOG_DEBUG( "HandleSessionSaved done" );
+}
 
 } // end namespace Seg3D

@@ -1,22 +1,22 @@
 /*
  For more information, please see: http://software.sci.utah.edu
- 
+
  The MIT License
- 
+
  Copyright (c) 2009 Scientific Computing and Imaging Institute,
  University of Utah.
- 
- 
+
+
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
  the rights to use, copy, modify, merge, publish, distribute, sublicense,
  and/or sell copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included
  in all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -26,51 +26,56 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_APPINTERFACE_PROJECTDOCKWIDGET_H
-#define INTERFACE_APPINTERFACE_PROJECTDOCKWIDGET_H
+#ifndef APPLICATION_PROJECT_SESSION_H
+#define APPLICATION_PROJECT_SESSION_H
 
-// QT includes
-#include <QtGui>
-#include <QDockWidget>
-
-// STL includes
-#include <string>
-
-// Core includes
-#include <Core/Utils/ConnectionHandler.h>
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+#pragma once
+#endif
 
 // Boost includes
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/thread.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/thread/mutex.hpp>
+
+// Volume includes
+#include <Core/State/State.h>
 
 namespace Seg3D
 {
-  
-class ProjectDockWidgetPrivate;
 
-class ProjectDockWidget : public QDockWidget, public Core::ConnectionHandler
+// CLASS Session
+// This is the main class for collecting state information on a Session
+class Session;
+  
+typedef boost::shared_ptr< Session > SessionHandle;
+
+// Class definition
+class Session : public Core::StateHandler
 {
-  
-  Q_OBJECT
-  
-public:
-  ProjectDockWidget( QWidget *parent = 0 );
-  virtual ~ProjectDockWidget();
-  
-public:
-  typedef QPointer< ProjectDockWidget > qpointer_type;
-  static void HandleSessionSaved( qpointer_type qpointer );
-  
-private Q_SLOTS:
-  void save_project();
-  void populate_session_list();
-  void load_session();
-  
-private:
-  boost::shared_ptr< ProjectDockWidgetPrivate > private_;
-};
-  
-} // end namespace
 
-#endif // PROJECTDOCKWIDGET_H
+  // -- constructor/destructor --
+public:
+  Session( const std::string& session_name );
+  virtual ~Session();
+  
+public:
+  // general session data
+  Core::StateStringHandle session_name_state_;
+
+
+public:
+  // INITIALIZE_FROM_FILE:
+  // this file initializes the state values for Session from the file at the path specified
+  bool initialize_from_file( boost::filesystem::path path, const std::string& session_name );
+  
+  // SAVE_CURRENT_STATE:
+  // this function will take a snapshot of the current state of the project and save it
+  bool save_session_settings( boost::filesystem::path path, const std::string& session_name );
+  
+
+};
+
+} // end namespace Seg3D
+
+#endif // SESSION_H

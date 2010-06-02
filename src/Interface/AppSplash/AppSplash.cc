@@ -68,6 +68,12 @@ AppSplash::AppSplash( QWidget *parent ) :
   
   connect( this->private_->ui_.existing_project_button_, SIGNAL( clicked() ), 
     this, SLOT( open_existing() ) );
+  
+  connect( this->private_->ui_.load_recent_button_, SIGNAL( clicked() ), 
+    this, SLOT( open_recent() ) );
+  
+  connect( this->private_->ui_.recent_project_listwidget_, SIGNAL( itemPressed( QListWidgetItem* ) ),
+    this, SLOT( enable_load_recent_button( QListWidgetItem* ) ) );  
 
 }
 
@@ -85,29 +91,53 @@ void AppSplash::new_project()
   
 void AppSplash::open_existing()
 {
-  //QDir project_directory_;
+//  QDir project_directory_;
 //  QString path = QFileDialog::getOpenFileName( this, "Open Seg3D2 Project",
 //    QString::fromStdString( ProjectManager::Instance()->current_project_path_state_->get() ) ); 
+//  
+//  std::string booger = path.toStdString();
+  
   this->close();
 }
   
 void AppSplash::open_recent()
 {
+  if( this->private_->ui_.recent_project_listwidget_->currentItem()->text() != "" )
+  {
+    for( size_t i = 0; i < this->recent_project_list_.size(); ++i )
+    {
+      if( QString::fromStdString( ( Core::SplitString( this->recent_project_list_[ i ], "|" ) )[ 1 ] ) == 
+        this->private_->ui_.recent_project_listwidget_->currentItem()->text() )
+      {
+        ProjectManager::Instance()->open_project( ( Core::SplitString( 
+        this->recent_project_list_[ i ], "|" ) )[ 0 ], 
+        ( Core::SplitString( this->recent_project_list_[ i ], "|" ) )[ 1 ] ); 
+        break;
+      }
+    }
+  }
   
+  this->close();
 }
   
 void AppSplash::populate_recent_projects()
 {
-  std::vector< std::string > temp_projects_vector = ProjectManager::Instance()->
+  this->recent_project_list_ = ProjectManager::Instance()->
     recent_projects_state_->get();
-  for( size_t i = 0; i < temp_projects_vector.size(); ++i )
+  for( size_t i = 0; i < this->recent_project_list_.size(); ++i )
   {
-    if (temp_projects_vector[ i ] != "")
+    if( this->recent_project_list_[ i ] != "" )
     {
-      this->private_->ui_.recent_project_list_->addItem( QString::fromStdString( 
-        ( Core::SplitString( temp_projects_vector[ i ], "|" ) )[ 1 ] ) );
+      this->private_->ui_.recent_project_listwidget_->addItem( QString::fromStdString( 
+        ( Core::SplitString( this->recent_project_list_[ i ], "|" ) )[ 1 ] ) );
+      
     }
   }
+}
+  
+void AppSplash::enable_load_recent_button( QListWidgetItem* not_used )
+{
+  this->private_->ui_.load_recent_button_->setEnabled( true );
 }
 
   
