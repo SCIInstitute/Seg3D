@@ -95,8 +95,9 @@ bool Session::save_session_settings( boost::filesystem::path path, const std::st
         get_layer_group( group_vector[ i ] )->layers_state_->get();
       for( size_t j = 0; j < layer_vector.size(); ++j )
       {
-        LayerManager::Instance()->get_layer_by_id( layer_vector[ j ] )->
-          save_states( path / layer_vector[ j ] );
+        std::string layer_name = ( Core::SplitString( layer_vector[ i ], "|" ) )[ 0 ];
+        LayerManager::Instance()->get_layer_by_id( layer_name )->
+          save_states( path / layer_name );
       }
     }
   }

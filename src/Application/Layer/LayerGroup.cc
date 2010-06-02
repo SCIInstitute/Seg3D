@@ -197,11 +197,26 @@ void LayerGroup::sync_layer_lists()
   
   std::vector< std::string > layer_vector;
   this->layers_state_->set( layer_vector );
+  std::string volume_type;
   
   layer_list_type::const_iterator layer_iterator = this->layer_list_.begin();
   for ( ; layer_iterator != this->layer_list_.end(); ++layer_iterator )
   {
-    layer_vector.push_back( ( *layer_iterator )->get_statehandler_id() );
+    switch ( ( *layer_iterator )->type() ) {
+      case Core::VolumeType::DATA_E:
+        volume_type = "DATA_E";
+        break;
+      case Core::VolumeType::MASK_E:
+        volume_type = "MASK_E";
+        break;
+      case Core::VolumeType::LABEL_E:
+        volume_type = "LABEL_E";
+        break;
+      default:
+        break;
+    }
+      
+    layer_vector.push_back( ( *layer_iterator )->get_statehandler_id() + "|" + volume_type );
   }
   this->layers_state_->set( layer_vector );
 }
