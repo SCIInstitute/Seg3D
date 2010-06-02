@@ -197,12 +197,6 @@ QComboBox::icon{
                 <verstretch>0</verstretch>
                </sizepolicy>
               </property>
-              <property name="minimumSize">
-               <size>
-                <width>98</width>
-                <height>20</height>
-               </size>
-              </property>
               <property name="palette">
                <palette>
                 <active>
