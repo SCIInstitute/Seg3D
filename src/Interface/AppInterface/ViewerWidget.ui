@@ -549,9 +549,6 @@ QComboBox::icon{
               <property name="currentIndex">
                <number>0</number>
               </property>
-              <property name="sizeAdjustPolicy">
-               <enum>QComboBox::AdjustToContents</enum>
-              </property>
               <property name="iconSize">
                <size>
                 <width>16</width>
