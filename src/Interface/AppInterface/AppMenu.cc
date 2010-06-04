@@ -93,11 +93,6 @@ void AppMenu::create_file_menu( QMenu* qmenu )
   qaction->setToolTip( tr( "Open an existing project" ) );
   // TODO: connect this action to the Project Manager
   
-  qaction = qmenu->addAction( tr( "&Close Project" ) );
-  qaction->setShortcut( tr( "Ctrl+C" ) );
-  qaction->setToolTip( tr( "Close the current project." ) );
-  // TODO: connect this action to the Project Manager
-  
   qaction = qmenu->addAction( tr( "&Save Project" ) );
   qaction->setShortcut( tr( "Ctrl+S" ) );
   qaction->setToolTip( tr( "Save the current project." ) );

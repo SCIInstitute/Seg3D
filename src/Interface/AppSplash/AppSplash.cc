@@ -75,6 +75,9 @@ AppSplash::AppSplash( QWidget *parent ) :
   connect( this->private_->ui_.recent_project_listwidget_, SIGNAL( itemPressed( QListWidgetItem* ) ),
     this, SLOT( enable_load_recent_button( QListWidgetItem* ) ) );  
 
+  connect( this->private_->ui_.recent_project_listwidget_, SIGNAL( itemDoubleClicked ( QListWidgetItem* ) ),
+    this, SLOT( call_open_recent( QListWidgetItem* ) ) ); 
+
 }
 
 AppSplash::~AppSplash()
@@ -116,8 +119,12 @@ void AppSplash::open_recent()
       }
     }
   }
-  
   this->close();
+}
+
+void AppSplash::call_open_recent( QListWidgetItem* item )
+{
+  this->open_recent();
 }
   
 void AppSplash::populate_recent_projects()

@@ -73,6 +73,8 @@ private Q_SLOTS:
   // OPEN_RECENT:
   // this function is called when a user double-clicks on an item in the list. 
   void open_recent();
+
+  void call_open_recent( QListWidgetItem* item );
   
   // ENABLE_LOAD_RECENT_BUTTON:
   // this function enables the load recent button if you select a recent project from the list
