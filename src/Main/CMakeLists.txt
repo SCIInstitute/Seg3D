@@ -27,6 +27,13 @@
 #
 
 ###########################################
+# Set Revision information for GLP
+###########################################
+
+INCLUDE(${CMAKE_SOURCE_DIR}/CMake/RevisionInfo.cmake)
+GENERATE_REVISION_INFO()
+
+###########################################
 # Set Seg3D main sources
 ###########################################
 

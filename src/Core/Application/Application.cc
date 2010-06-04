@@ -65,6 +65,16 @@ Application::~Application()
 {
 }
 
+
+bool Application::is_command_line_parameter( const std::string &key )
+{
+  lock_type lock( get_mutex() );
+
+  if ( this->parameters_.find( key ) == this->parameters_.end() ) return false;
+  return true;
+}
+
+
 //This is a function to check parameters.
 //This avoids accidentally putting data into the map that we dont want
 bool Application::check_command_line_parameter( const std::string &key, std::string& value )

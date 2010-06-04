@@ -26,48 +26,61 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-// Application includes
 #include <Application/Layer/Layer.h>
-#include <Application/Layer/LayerGroup.h>
 #include <Application/LayerManager/LayerManager.h>
-#include <Application/LayerManager/Actions/ActionDeleteLayers.h>
-
-// REGISTER ACTION:
-// Define a function that registers the action. The action also needs to be
-// registered in the CMake file.
-CORE_REGISTER_ACTION( Seg3D, DeleteLayers )
+#include <Application/LayerManager/Actions/ActionLayer.h>
 
 namespace Seg3D
 {
 
-bool ActionDeleteLayers::validate( Core::ActionContextHandle& context )
+bool ActionLayer::cache_layer_handle( Core::ActionContextHandle& context,
+  Core::ActionParameter< std::string >& layer_id, 
+  Core::ActionCachedHandle< LayerHandle >& layer )
 {
-  if ( ! this->cache_group_handle( context, this->group_id_, this->group_ ) ) return false;
-
-  return true; // validated
-}
-
-bool ActionDeleteLayers::run( Core::ActionContextHandle& context, 
-  Core::ActionResultHandle& result )
-{
-  LayerManager::Instance()->delete_layers( this->group_.handle() );
+  if ( ! layer.handle() )
+  {
+    layer.handle() = LayerManager::Instance()->get_layer_by_id( layer_id.value() );
+    
+    if ( ! layer.handle() )
+    {
+      context->report_error( std::string( "LayerID: '" ) + layer_id.value() + "' is invalid" );
+      return false;
+    }
+  }
+  
   return true;
 }
 
-Core::ActionHandle ActionDeleteLayers::Create( LayerGroupHandle group )
+bool ActionLayer::cache_group_handle( Core::ActionContextHandle& context,
+  Core::ActionParameter< std::string >& group_id, 
+  Core::ActionCachedHandle< LayerGroupHandle >& group )
 {
-  ActionDeleteLayers* action = new ActionDeleteLayers;
-
-  action->group_.handle() = group;
-  action->group_id_.value() = group->get_group_id();
-
-  return Core::ActionHandle( action );
+  if ( ! group.handle() )
+  {
+    group.handle() = LayerManager::Instance()->get_layer_group( group_id.value() );
+    
+    if ( ! group.handle() )
+    {
+      context->report_error( std::string( "LayerGroupID: '" ) + 
+        group_id.value() + "' is invalid" );
+      return false;
+    }
+  }
+  
+  return true;
 }
 
-
-void ActionDeleteLayers::Dispatch( LayerGroupHandle group )
+bool ActionLayer::check_availability( Core::ActionContextHandle& context,
+  Core::ActionCachedHandle< LayerHandle >& layer )
 {
-  Core::Interface::PostAction( Create( group ) );
+  Core::ResourceLockHandle resource_lock = layer.handle()->get_resource_lock();
+  if ( resource_lock->is_locked() )
+  {
+    context->report_need_resource( resource_lock );
+    return false;
+  }
+  
+  return true;
 }
 
 } // end namespace Seg3D

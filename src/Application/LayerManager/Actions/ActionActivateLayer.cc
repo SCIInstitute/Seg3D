@@ -40,26 +40,8 @@ namespace Seg3D
 
 bool ActionActivateLayer::validate( Core::ActionContextHandle& context )
 {
-  // Check whether layer exists
-  if ( ! this->layer_.handle() )
-  {
-    this->layer_.handle() = LayerManager::Instance()->get_layer_by_id( 
-      this->layer_id_.value() );
-    
-    if ( ! this->layer_.handle() )
-    {
-      context->report_error( std::string( "LayerID: '" ) + 
-        this->layer_id_.value() + "' is invalid" );
-      return false;
-    }
-  }
-  
-  Core::ResourceLockHandle resource = this->layer_.handle()->get_resource_lock();
-  if ( resource->is_locked() )
-  {
-    context->report_need_resource( resource );
-    return false;
-  }
+  if ( ! this->cache_layer_handle( context, this->layer_id_, this->layer_ ) 
+    || !this->check_availability( context, this->layer_ ) ) return false;
 
   return true; // validated
 }

@@ -35,11 +35,12 @@
 
 // Application includes
 #include <Application/Layer/LayerFWD.h>
+#include <APplication/LayerManager/Actions/ActionLayer.h>
 
 namespace Seg3D
 {
 
-class ActionDeleteLayers : public Core::Action
+class ActionDeleteLayers : public ActionLayer
 {
   CORE_ACTION( "DeleteLayers", "DeleteLayers <groupid>" );
   

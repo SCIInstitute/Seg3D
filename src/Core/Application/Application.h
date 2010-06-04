@@ -64,6 +64,9 @@ private:
 
   // -- Command line parser --
 public:
+  // IS_COMMAND_LINE_PARAMETERS:
+  bool is_command_line_parameter( const std::string& key );
+
   // CHECK_COMMAND_LINE_PARAMETERS:
   // check to see if a particular parameter has been placed into the map
   // if so it returns the value as a string

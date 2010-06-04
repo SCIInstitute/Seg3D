@@ -31,12 +31,14 @@
 
 #include <Core/Action/Actions.h>
 #include <Core/Interface/Interface.h>
+
 #include <Application/Layer/LayerFWD.h>
+#include <Application/LayerManager/Actions/ActionLayer.h>
 
 namespace Seg3D
 {
 
-class ActionActivateLayer : public Core::Action
+class ActionActivateLayer : public ActionLayer
 {
   CORE_ACTION( "ActivateLayer", "ActivateLayer <layerid>" );
 

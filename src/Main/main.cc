@@ -48,6 +48,9 @@
 #include <Init/Init.h>
 #include <Init/QtInit.h>
 
+// Revision information
+#include "Seg3D_RevisionInfo.h"
+
 ///////////////////////////////////////////////////////////
 // Main Seg3D entry point
 ///////////////////////////////////////////////////////////
@@ -61,6 +64,20 @@ int main( int argc, char **argv )
 
   // -- Parse the command line parameters --
   Core::Application::Instance()->parse_command_line_parameters( argc, argv );
+  
+  // -- Check whether the user requested a version / revision number
+  if ( Core::Application::Instance()->is_command_line_parameter( "revision") )
+  {
+    std::cout << Seg3D_REVISIONINFO << std::endl;
+    return 0;
+  }
+
+  if ( Core::Application::Instance()->is_command_line_parameter( "version") )
+  {
+    std::cout << Core::Application::Instance()->GetApplicationName() << " version: " <<  
+      Core::Application::Instance()->GetVersion() << std::endl;
+    return 0;
+  }
 
   // -- Log application information --
   Core::Application::Instance()->log_start();
