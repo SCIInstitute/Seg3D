@@ -98,6 +98,9 @@ void ProjectDockWidget::save_project()
   
 void ProjectDockWidget::load_session()
 {
+  if( !this->private_->ui_.sessions_list_->currentItem() )
+    return;
+
   if( this->private_->ui_.sessions_list_->currentItem()->text() != "" )
   {
     std::vector< std::string > sessions = ProjectManager::Instance()->current_project_->
