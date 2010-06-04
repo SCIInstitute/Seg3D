@@ -221,4 +221,9 @@ void LayerGroup::sync_layer_lists()
   this->layers_state_->set( layer_vector );
 }
 
+bool LayerGroup::post_load_states()
+{
+  return true;
+}
+
 } // end namespace Seg3D

@@ -38,6 +38,7 @@
 // Boost includes
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
+#include <boost/filesystem.hpp>
 
 // Core includes
 #include <Core/Utils/StringUtil.h>
@@ -177,6 +178,9 @@ public:
   // SOMETHING_CHANGED_SIGNAL:
   // This gets signaled when we 
   layers_changed_type layers_changed_signal_;
+
+public:
+  bool post_save_states( boost::filesystem::path path );
   
 private:
   void sync_group_lists();

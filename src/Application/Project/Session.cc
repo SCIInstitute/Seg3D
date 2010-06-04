@@ -64,6 +64,13 @@ bool Session::initialize_from_file( boost::filesystem::path path, const std::str
     ViewerManager::Instance()->get_viewer( "viewer5" )->load_states( path / "viewer5" );
     
     LayerManager::Instance()->load_states( path / "layermanager" );
+    //std::vector< std::string > group_vector = LayerManager::Instance()->groups_state_->get();
+    //if( ( group_vector[ 0 ] != "]" ) && ( group_vector[ 0 ] != "\0" ) )
+    //{
+    //  LayerManager::Instance()->get_layer_group( group_vector[ 0 ] )->load_states( 
+    //    path / group_vector[ 0 ] );
+    //}
+
 
     return true;
   }
@@ -73,18 +80,18 @@ bool Session::initialize_from_file( boost::filesystem::path path, const std::str
   
 bool Session::save_session_settings( boost::filesystem::path path, const std::string& session_name )
 {
-  InterfaceManager::Instance()->save_states( path / "interfacemanager" );
+  InterfaceManager::Instance()->save_states( path, "interfacemanager" );
   
-  ViewerManager::Instance()->save_states( path / "viewermanager" );
-  ViewerManager::Instance()->get_viewer( "viewer0" )->save_states( path / "viewer0" );
-  ViewerManager::Instance()->get_viewer( "viewer1" )->save_states( path / "viewer1" );
-  ViewerManager::Instance()->get_viewer( "viewer2" )->save_states( path / "viewer2" );
-  ViewerManager::Instance()->get_viewer( "viewer3" )->save_states( path / "viewer3" );
-  ViewerManager::Instance()->get_viewer( "viewer4" )->save_states( path / "viewer4" );
-  ViewerManager::Instance()->get_viewer( "viewer5" )->save_states( path / "viewer5" );
+  ViewerManager::Instance()->save_states( path, "viewermanager" );
+  ViewerManager::Instance()->get_viewer( "viewer0" )->save_states( path, "viewer0" );
+  ViewerManager::Instance()->get_viewer( "viewer1" )->save_states( path, "viewer1" );
+  ViewerManager::Instance()->get_viewer( "viewer2" )->save_states( path, "viewer2" );
+  ViewerManager::Instance()->get_viewer( "viewer3" )->save_states( path, "viewer3" );
+  ViewerManager::Instance()->get_viewer( "viewer4" )->save_states( path, "viewer4" );
+  ViewerManager::Instance()->get_viewer( "viewer5" )->save_states( path, "viewer5" );
   
-  LayerManager::Instance()->save_states( path / "layermanager" );
-  std::vector< std::string > group_vector = LayerManager::Instance()->groups_state_->get();
+  LayerManager::Instance()->save_states( path, "layermanager" );
+  /*std::vector< std::string > group_vector = LayerManager::Instance()->groups_state_->get();
   for( size_t i = 0; i < group_vector.size(); ++i )
   {
     if( ( group_vector[ i ] != "]" ) && ( group_vector[ i ] != "\0" ) )
@@ -95,15 +102,15 @@ bool Session::save_session_settings( boost::filesystem::path path, const std::st
         get_layer_group( group_vector[ i ] )->layers_state_->get();
       for( size_t j = 0; j < layer_vector.size(); ++j )
       {
-        std::string layer_name = ( Core::SplitString( layer_vector[ i ], "|" ) )[ 0 ];
+        std::string layer_name = ( Core::SplitString( layer_vector[ j ], "|" ) )[ 0 ];
         LayerManager::Instance()->get_layer_by_id( layer_name )->
           save_states( path / layer_name );
       }
     }
-  }
+  }*/
   
   
-  return this->save_states( path / session_name );
+  return this->save_states( path, session_name );
 }
     
 } // end namespace Seg3d

@@ -193,6 +193,8 @@ public:
     Core::VolumeType type ) const;
   void get_layer_names( std::vector< LayerIDNamePair >& layer_names, 
     Core::VolumeType type, LayerHandle excluded_layer ) const;
+
+  bool post_load_states();
   
 private:
   void sync_layer_lists();

@@ -51,13 +51,13 @@ PreferencesManager::PreferencesManager() :
 { 
   // Initialize the local config directory path
   Core::Application::Instance()->get_config_directory( this->local_config_path_ );
-  this->local_config_path_ = this->local_config_path_ / "user_prefs.cfg";
+  //this->local_config_path_ = this->local_config_path_ / "user_prefs.cfg";
 
   if(  initialize_default_colors() )
     this->initialize_states();
 
   // After we initialize the states, we then load the saved preferences from file.
-  load_states( this->local_config_path_ );
+  load_states( this->local_config_path_ / "user_prefs.cfg" );
   
 }
 
@@ -67,7 +67,7 @@ PreferencesManager::~PreferencesManager()
 
 void PreferencesManager::save_state()
 {
-  save_states( this->local_config_path_ );
+  save_states( this->local_config_path_, "user_prefs.cfg" );
 }
 
 Core::Color PreferencesManager::get_color( int index ) const

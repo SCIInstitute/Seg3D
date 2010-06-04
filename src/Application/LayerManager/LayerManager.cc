@@ -561,6 +561,25 @@ void LayerManager::get_layer_names( std::vector< LayerIDNamePair >& layer_names,
     }
   }
 }
+
+bool LayerManager::post_save_states( boost::filesystem::path path )
+{
+  std::vector< std::string > group_vector = this->groups_state_->get();
+  for( size_t i = 0; i < group_vector.size(); ++i )
+  {
+    if( ( group_vector[ i ] != "]" ) && ( group_vector[ i ] != "\0" ) )
+    {
+      LayerGroupHandle temp_group = this->get_layer_group( group_vector[ i ] );
+      if( this->get_layer_group( group_vector[ i ] ) )
+      {
+        ( this->get_layer_group( group_vector[ i ] ) )->save_states( 
+        path, group_vector[ i ] );
+      }
+    }
+  }
+
+  return true;
+}
   
 void LayerManager::sync_group_lists()
 {

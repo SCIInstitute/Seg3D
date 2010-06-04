@@ -47,8 +47,8 @@ ProjectManager::ProjectManager() :
   StateHandler( "projectmanager", false )
 { 
   Core::Application::Instance()->get_config_directory( this->local_projectmanager_path_ );
-  this->local_projectmanager_path_ = this->local_projectmanager_path_ / 
-    "seg3d2_project_settings.cfg";
+  //this->local_projectmanager_path_ = this->local_projectmanager_path_ / 
+  //  "seg3d2_project_settings.cfg";
   
   std::vector< std::string> projects;
   projects.resize( 20, "" );
@@ -87,9 +87,17 @@ ProjectManager::~ProjectManager()
   
 void ProjectManager::rename_project_folder( const std::string& new_name, Core::ActionSource source )
 {
-  std::string old_name = ( Core::SplitString( this->recent_projects_state_->get()[ 0 ], "|" ) )[ 1 ];
+  std::vector< std::string > old_name_vector = Core::SplitString( this->recent_projects_state_->get()[ 0 ], "|" );
+
+  if( old_name_vector.size() < 2 )
+    return;
+
+  std::string old_name = old_name_vector[ 1 ];
+
+  if( old_name == new_name )
+    return;
   
-  if ( old_name == "" )
+  if( old_name == "" )
   {
     return;
   }
@@ -123,7 +131,7 @@ void ProjectManager::rename_project_folder( const std::string& new_name, Core::A
   boost::filesystem::path project_path = boost::filesystem::path( 
     current_project_path_state_->get().c_str() );
   project_path = project_path / this->current_project_->project_name_state_->get().c_str();
-  this->current_project_->save_states( project_path / 
+  this->current_project_->save_states( project_path, 
     this->current_project_->project_name_state_->get() );
   
   this->add_to_recent_projects( path.string(), new_name );
@@ -133,12 +141,12 @@ void ProjectManager::rename_project_folder( const std::string& new_name, Core::A
 
 void ProjectManager::initialize()
 {
-  load_states( this->local_projectmanager_path_ );
+  load_states( this->local_projectmanager_path_ / "seg3d2_project_settings.cfg" );
 }
   
 void ProjectManager::save_projectmanager_state()
 {
-  save_states( this->local_projectmanager_path_ );
+  save_states( this->local_projectmanager_path_, "seg3d2_project_settings.cfg" );
 }
 
 
@@ -175,7 +183,7 @@ void ProjectManager::save_project()
     boost::filesystem::path project_path = boost::filesystem::path( 
       current_project_path_state_->get().c_str() );
     project_path = project_path / this->current_project_->project_name_state_->get().c_str();
-    this->current_project_->save_states( project_path / 
+    this->current_project_->save_states( project_path, 
       this->current_project_->project_name_state_->get() );
   }
 }
