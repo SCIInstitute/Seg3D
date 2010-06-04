@@ -123,7 +123,7 @@ bool MaskDataBlockManager::create( size_t nx, size_t ny, size_t nz, MaskDataBloc
   if ( !( data_block.get() ) )
   {
     // Could not find empty position, so create a new data block
-    data_block = DataBlockHandle( new StdDataBlock( nx, ny, nz, DataType::UCHAR_E ) );
+    data_block = StdDataBlock::New( nx, ny, nz, DataType::UCHAR_E );
     mask_bit = 0;
     mask_entry_index = mask_list.size();
     mask_list.push_back( MaskDataBlockEntry( data_block ) );

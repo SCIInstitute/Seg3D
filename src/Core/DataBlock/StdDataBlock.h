@@ -47,9 +47,16 @@ typedef boost::shared_ptr< StdDataBlock > StdDataBlockHandle;
 class StdDataBlock : public DataBlock
 {
   // -- Constructor/destructor --
-public:
+private:
   StdDataBlock( size_t nx, size_t ny, size_t nz, DataType type );
+
+public: 
   virtual ~StdDataBlock();
+
+public:
+  static DataBlockHandle New( size_t nx, size_t ny, size_t nz, DataType type, 
+    generation_type generation = -1 );
+
 };
 
 } // end namespace Core

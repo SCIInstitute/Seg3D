@@ -70,6 +70,14 @@ private:
   // Handle to where the volume data is really stored
   DataBlockHandle data_block_;
 
+
+public:
+  static bool LoadDataVolume( const std::string& filename, DataVolumeHandle& volume,
+    std::string& error );
+
+  static bool SaveDataVolume( const std::string& filename, DataVolumeHandle& volume,
+    std::string& error );
+  
 };
 
 } // end namespace Core

@@ -45,62 +45,71 @@ namespace Seg3D
 {
 
 Layer::Layer( const std::string& name ) :
-  StateHandler( "$layer", true ),
+  StateHandler( "layer", true ),
   active_( false )
 { 
   // Step (1) : Build the layer specific state variables
 
   // == The name of the layer ==
-  add_state( "name", name_state_, name );
+  this->add_state( "name", name_state_, name );
 
   // == Visibility information for this layer per viewer ==
   size_t num_viewers = ViewerManager::Instance()->number_of_viewers();
-  visible_state_.resize( num_viewers );
+  this->visible_state_.resize( num_viewers );
 
   for ( size_t j = 0; j < visible_state_.size(); j++ )
   {
     std::string key = std::string( "visible" ) + Core::ExportToString( j );
-    add_state( key, visible_state_[ j ], true );
+    this->add_state( key, visible_state_[ j ], true );
   }
 
   // == The state of the lock ==
-  add_state( "lock", lock_state_, false );
+  this->add_state( "lock", lock_state_, false );
 
   // == The opacity of the layer ==
-  add_state( "opacity", opacity_state_, PreferencesManager::Instance()->default_layer_opacity_state_->get(), 0.0, 1.0, 0.01 );
+  this->add_state( "opacity", opacity_state_, PreferencesManager::Instance()->default_layer_opacity_state_->get(), 0.0, 1.0, 0.01 );
 
   // == Selected by the LayerGroup ==
-  add_state( "selected", selected_state_, false );
+  this->add_state( "selected", selected_state_, false );
 
   // == Which of the submenus is being editted ==
-  add_state( "edit_mode", edit_mode_state_, "none", "none|opacity|color|contrast|appearance" );
+  this->add_state( "edit_mode", edit_mode_state_, "none", "none|opacity|color|contrast|appearance" );
   
+  // == Resource locking ==
+  resource_lock_ = Core::ResourceLockHandle( new Core::ResourceLock( get_statehandler_id() ) );
+
 }
   
 Layer::~Layer()
 {
   // Disconnect all current connections
-  disconnect_all();
+  this->disconnect_all();
 }
 
 LayerGroupHandle Layer::get_layer_group() 
 { 
-  return layer_group_.lock(); 
+  return this->layer_group_.lock(); 
 }
+
+Core::ResourceLockHandle Layer::get_resource_lock()
+{
+  return this->resource_lock_;
+}
+
   
 void Layer::set_layer_group( LayerGroupWeakHandle layer_group )
 {
-  layer_group_ = layer_group;
+  this->layer_group_ = layer_group;
 }
     
 bool Layer::get_active()
 {
-  return active_;
+  return this->active_;
 }
   
 void Layer::set_active( bool active )
 {
-  active_ = active;
+  this->active_ = active;
 }
 
 std::string Layer::get_layer_id() const

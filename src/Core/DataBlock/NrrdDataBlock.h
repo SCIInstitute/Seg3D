@@ -47,14 +47,20 @@ typedef boost::shared_ptr< NrrdDataBlockPrivate > NrrdDataBlockPrivateHandle;
 class NrrdDataBlock : public DataBlock
 {
   // -- Constructor/destructor --
-public:
+private:
   NrrdDataBlock( NrrdDataHandle nrrd_data );
+
+public:
   virtual ~NrrdDataBlock();
 
   // -- Internal implementation of this class --
 private:
   NrrdDataBlockPrivateHandle private_;
 
+public:
+  // NEW: ( Factory constructor )
+  // Constructs object and registers object with manager
+  static DataBlockHandle New( NrrdDataHandle nrrd_data, generation_type generation = -1 );
 };
 
 } // end namespace Core

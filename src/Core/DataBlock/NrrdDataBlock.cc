@@ -31,6 +31,7 @@
 
 // Core includes
 #include <Core/DataBlock/NrrdDataBlock.h>
+#include <Core/DataBlock/DataBlockManager.h>
 
 namespace Core
 {
@@ -59,5 +60,14 @@ NrrdDataBlock::NrrdDataBlock( NrrdDataHandle nrrd_data ) :
 NrrdDataBlock::~NrrdDataBlock()
 {
 }
+
+DataBlockHandle NrrdDataBlock::New( NrrdDataHandle nrrd_data, generation_type generation )
+{
+  DataBlockHandle data_block( new NrrdDataBlock( nrrd_data ) );
+  DataBlockManager::Instance()->register_datablock( data_block, generation );
+  return data_block;
+}
+
+
 
 } // end namespace Core

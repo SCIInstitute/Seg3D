@@ -51,14 +51,15 @@ CORE_ADD_LIBRARY(Application_Layer ${APPLICATION_LAYER_SRCS}
             ${APPLICATION_LAYER_ACTIONS_SRCS} )
             
 TARGET_LINK_LIBRARIES(Application_Layer
-                      Core_Utils
+                      Core_Action
                       Core_Application
                       Core_Interface
+            Core_Resource
+            Core_State
+                      Core_Utils
                       Application_InterfaceManager
-                      Core_Action
-                      Core_State
+            Application_LayerManager
                       Application_StateManager
-          Application_LayerManager
                       ${SCI_BOOST_LIBRARY})
 
 # Register actions

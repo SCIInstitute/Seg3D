@@ -65,6 +65,7 @@ public:
 private:
   // Handle to where the mask volume is really stored
   MaskDataBlockHandle mask_data_block_;
+  
 };
 
 } // end namespace Core

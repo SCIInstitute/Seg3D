@@ -41,12 +41,13 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/thread/mutex.hpp>
 
-// Volume includes
+// Core includes
 #include <Core/Action/Action.h>
 #include <Core/Application/Application.h>
 #include <Core/Interface/Interface.h>
-#include <Core/Volume/Volume.h>
+#include <Core/Resource/ResourceLock.h>
 #include <Core/State/State.h>
+#include <Core/Volume/Volume.h>
 
 // Application includes
 #include <Application/Layer/LayerFWD.h>
@@ -62,7 +63,7 @@ namespace Seg3D
 class Layer : public Core::StateHandler
 {
 
-  // -- constructor/destructor --
+  // -- Constructor/destructor --
 protected:
   // NOTE: Use the specific class to build the layer
   Layer( const std::string& name);
@@ -78,6 +79,17 @@ public:
   // GRID_TRANSFORM
   // Get the transform of the layer
   virtual const Core::GridTransform& get_grid_transform() const = 0;
+  
+  // -- Layer Locking system --
+public:
+  
+  // GET_RESOURCE_LOCK:
+  // This function returns the resource lock that ensures that an action
+  // cannot be executed on a resource that is being computed.
+  Core::ResourceLockHandle get_resource_lock();
+    
+private:
+  Core::ResourceLockHandle resource_lock_;
   
   // -- State variables --
 public:
@@ -131,6 +143,8 @@ private:
   // The unique ID of the layer
 
   LayerGroupWeakHandle layer_group_;
+
+  // TODO: At some point we should move this one
   bool active_;
 
   // -- Locking system --
@@ -143,8 +157,6 @@ public:
   // Get the mutex of the state engine
   static mutex_type& GetMutex();
   
-private:
-  static std::string CreateLayerID();
 };
 
 } // end namespace Seg3D

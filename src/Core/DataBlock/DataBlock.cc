@@ -27,6 +27,7 @@
  */
 
 #include <Core/DataBlock/DataBlock.h>
+#include <Core/DataBlock/DataBlockManager.h>
 #include <Core/DataBlock/StdDataBlock.h>
 
 namespace Core
@@ -43,6 +44,7 @@ DataBlock::DataBlock() :
 
 DataBlock::~DataBlock()
 {
+  DataBlockManager::Instance()->unregister_datablock( this->generation_ );
 }
 
 double DataBlock::get_data_at( size_t index ) const
@@ -194,6 +196,21 @@ const Histogram& DataBlock::get_histogram() const
   return this->histogram_;
 }
 
+DataBlock::generation_type DataBlock::get_generation() const
+{
+  return this->generation_;
+}
+
+void DataBlock::set_generation( generation_type generation )
+{
+  this->generation_ = generation;
+}
+
+void DataBlock::increment_generation()
+{
+  this->generation_ = DataBlockManager::Instance()->increment_generation( this->generation_ );
+}
+
 void DataBlock::update_histogram()
 {
   lock_type lock( get_mutex() );
@@ -299,8 +316,8 @@ bool DataBlock::ConvertDataType( const DataBlockHandle& src_data_block,
 
   lock_type lock( src_data_block->get_mutex( ) );
 
-  dst_data_block = DataBlockHandle( new StdDataBlock( src_data_block->get_nx(),
-    src_data_block->get_ny(), src_data_block->get_nz(), new_data_type ) );
+  dst_data_block = StdDataBlock::New( src_data_block->get_nx(),
+    src_data_block->get_ny(), src_data_block->get_nz(), new_data_type );
     
   if ( !dst_data_block )
   {
@@ -444,8 +461,8 @@ bool DataBlock::PermuteData( const DataBlockHandle& src_data_block,
   
   if ( dn[ 0 ] * dn[ 1 ] * dn[ 2 ] == 0 ) return false;
   
-  dst_data_block = DataBlockHandle( new StdDataBlock( dn[ 0 ], dn[ 1 ], dn[ 2 ], 
-    src_data_block->get_type() ) ); 
+  dst_data_block = StdDataBlock::New( dn[ 0 ], dn[ 1 ], dn[ 2 ], 
+    src_data_block->get_type() ); 
 
   switch( src_data_block->get_type() )
   {
@@ -606,8 +623,8 @@ bool DataBlock::QuantizeData( const DataBlockHandle& src_data_block,
     return false;
   } 
 
-  dst_data_block = DataBlockHandle( new StdDataBlock( src_data_block->get_nx(),
-    src_data_block->get_ny(), src_data_block->get_nz(), new_data_type ) );
+  dst_data_block = StdDataBlock::New( src_data_block->get_nx(),
+    src_data_block->get_ny(), src_data_block->get_nz(), new_data_type );
     
   if ( !dst_data_block )
   {
@@ -659,8 +676,8 @@ bool DataBlock::Clone( const DataBlockHandle& src_data_block,
   lock_type lock( src_data_block->get_mutex( ) );
 
   // Step (3): Generate a new data block with the right type
-  dst_data_block = DataBlockHandle( new StdDataBlock( src_data_block->get_nx(),
-    src_data_block->get_ny(), src_data_block->get_nz(), src_data_block->get_type() ) );
+  dst_data_block = StdDataBlock::New( src_data_block->get_nx(),
+    src_data_block->get_ny(), src_data_block->get_nz(), src_data_block->get_type() );
     
   // Step (4): Copy the data  
   size_t mem_size = src_data_block->get_size(); 

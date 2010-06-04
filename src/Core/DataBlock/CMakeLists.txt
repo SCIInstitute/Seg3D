@@ -36,6 +36,8 @@ SET(CORE_DATABLOCK_SRCS
   DataType.cc
   DataBlock.h
   DataBlock.cc
+  DataBlockManager.h
+  DataBlockManager.cc
   Histogram.h
   Histogram.cc
   ITKDataBlock.h

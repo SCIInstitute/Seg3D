@@ -44,6 +44,7 @@
 #include <Core/Utils/Lockable.h>
 #include <Core/DataBlock/DataType.h>
 #include <Core/DataBlock/Histogram.h>
+#include <Core/DataBlock/DataBlockGeneration.h>
 
 
 namespace Core
@@ -61,6 +62,7 @@ namespace Core
 // Forward Declaration
 class DataBlock;
 typedef boost::shared_ptr< DataBlock > DataBlockHandle;
+typedef boost::weak_ptr< DataBlock > DataBlockWeakHandle;
 
 // Class definition
 class DataBlock : public SharedLockable
@@ -75,9 +77,11 @@ public:
   typedef int         index_type;
 #endif  
 
+  typedef unsigned long long  generation_type;
+
   // -- Constructor/destructor --
 public:
-  DataBlock();
+  DataBlock();  
   virtual ~DataBlock();
 
   // -- Access properties of data block --
@@ -163,7 +167,19 @@ public:
   // UPDATE_HISTOGRAM:
   // Recompute the histogram. This needs to be triggered each time the data is updated
   void update_histogram();
+  
+  // GET_GENERATION:
+  // Get the current generation number of the data volume.
+  generation_type get_generation() const;
+  
+  // INCREMENT_GENERATION:
+  // Increment the generation number to a new unique number.
+  void increment_generation();
 
+private:
+  friend class DataBlockManager;
+  void set_generation( generation_type generation );
+  
 protected:
 
   // SET_NX, SET_NY, SET_NZ
@@ -206,6 +222,9 @@ private:
 
   // Histogram information for this data block
   Histogram histogram_;
+  
+  // Generation number
+  generation_type generation_;
 
 public:
 
@@ -230,6 +249,15 @@ public:
   // CLONE:
   static bool Clone( const DataBlockHandle& src_data_block, 
     DataBlockHandle& dst_data_block ); 
+  
+  // SETGENERATIONCOUNT:
+  // Set the counter for the generation number of datablocks to a new value.
+  // NOTE: This function should only be called by the project loader
+  static void SetGenerationCount( generation_type generation_count );
+  
+  // GETGENERATIONCOUNT:
+  // Get the latest generation count
+  static generation_type GetGenerationCount();
   
 };
 

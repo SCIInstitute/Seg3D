@@ -109,7 +109,7 @@ bool NrrdLayerImporter::import_layer( LayerImporterMode mode, std::vector<LayerH
     {
       CORE_LOG_DEBUG( std::string("Importing data layer: ") + get_base_filename() );
           
-      Core::DataBlockHandle datablock( new Core::NrrdDataBlock( nrrd_data_ ) );
+      Core::DataBlockHandle datablock( Core::NrrdDataBlock::New( nrrd_data_ ) );
       datablock->update_histogram();
       
       Core::DataVolumeHandle datavolume( new Core::DataVolume( 
@@ -126,7 +126,7 @@ bool NrrdLayerImporter::import_layer( LayerImporterMode mode, std::vector<LayerH
       CORE_LOG_DEBUG( std::string("Importing mask layer: ") + get_base_filename() );
 
 
-      Core::DataBlockHandle datablock( new Core::NrrdDataBlock( nrrd_data_ ) );
+      Core::DataBlockHandle datablock( Core::NrrdDataBlock::New( nrrd_data_ ) );
       Core::MaskDataBlockHandle maskdatablock;
       
       if ( !( Core::MaskDataBlockManager::CreateMaskFromNonZeroData( 
@@ -150,7 +150,7 @@ bool NrrdLayerImporter::import_layer( LayerImporterMode mode, std::vector<LayerH
       CORE_LOG_DEBUG( std::string("Importing mask layer: ") + get_base_filename() );
 
 
-      Core::DataBlockHandle datablock( new Core::NrrdDataBlock( nrrd_data_ ) );
+      Core::DataBlockHandle datablock( Core::NrrdDataBlock::New( nrrd_data_ ) );
       std::vector<Core::MaskDataBlockHandle> maskdatablocks;
       
       if ( !( Core::MaskDataBlockManager::CreateMaskFromBitPlaneData( 
@@ -176,7 +176,7 @@ bool NrrdLayerImporter::import_layer( LayerImporterMode mode, std::vector<LayerH
       CORE_LOG_DEBUG( std::string("Importing mask layer: ") + get_base_filename() );
 
 
-      Core::DataBlockHandle datablock( new Core::NrrdDataBlock( nrrd_data_ ) );
+      Core::DataBlockHandle datablock( Core::NrrdDataBlock::New( nrrd_data_ ) );
       std::vector<Core::MaskDataBlockHandle> maskdatablocks;
       
       if ( !( Core::MaskDataBlockManager::CreateMaskFromLabelData( 

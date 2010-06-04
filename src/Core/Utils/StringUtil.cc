@@ -748,7 +748,7 @@ bool ImportFromString( const std::string& str, std::string& value )
     }
   }
   
-  return ( true );
+  return true;
 }
 
 } // End namespace Core

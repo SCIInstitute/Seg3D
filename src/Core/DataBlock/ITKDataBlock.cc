@@ -28,6 +28,7 @@
 
 // Core includes
 #include <Core/DataBlock/ITKDataBlock.h>
+#include <Core/DataBlock/DataBlockManager.h>
 
 namespace Core
 {
@@ -54,6 +55,13 @@ ITKDataBlock::ITKDataBlock( ITKImageDataHandle itk_image_data ) :
 
 ITKDataBlock::~ITKDataBlock()
 {
+}
+
+DataBlockHandle ITKDataBlock::New( ITKImageDataHandle itk_data, generation_type generation )
+{
+  DataBlockHandle data_block( new ITKDataBlock( itk_data ) );
+  DataBlockManager::Instance()->register_datablock( data_block, generation );
+  return data_block;
 }
 
 } // end namespace Core

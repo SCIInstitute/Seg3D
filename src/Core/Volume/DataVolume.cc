@@ -26,6 +26,7 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#include <Core/DataBlock/NrrdDataBlock.h>
 #include <Core/Volume/DataVolume.h>
 
 namespace Core
@@ -58,5 +59,31 @@ NrrdDataHandle DataVolume::convert_to_nrrd()
   return nrrd_data;
 }
 
+bool DataVolume::LoadDataVolume( const std::string& filename, DataVolumeHandle& volume, 
+  std::string& error )
+{
+  volume.reset();
+  
+  NrrdDataHandle nrrd;
+  if ( ! ( NrrdData::LoadNrrd( filename, nrrd, error ) ) ) return false;
+  
+  volume = DataVolumeHandle( new DataVolume( nrrd->get_grid_transform(),
+    NrrdDataBlock::New( nrrd ) ) );
+  
+  return true;
+}
+
+bool DataVolume::SaveDataVolume( const std::string& filename, DataVolumeHandle& volume,
+  std::string& error )
+{
+  volume.reset();
+  
+  NrrdDataHandle nrrd = NrrdDataHandle( new NrrdData( 
+    volume->data_block_, volume->get_grid_transform() ) );
+
+  if ( ! ( NrrdData::SaveNrrd( filename, nrrd, error ) ) ) return false;
+  
+  return true;
+}
 
 } // end namespace Core

@@ -86,6 +86,7 @@ public:
 
 private:
   Core::MaskVolumeHandle mask_volume_;
+
   void initialize_states();
 };
 

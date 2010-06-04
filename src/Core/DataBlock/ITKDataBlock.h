@@ -47,13 +47,17 @@ typedef boost::shared_ptr< ITKDataBlockPrivate > ITKDataBlockPrivateHandle;
 class ITKDataBlock : public DataBlock
 {
   // -- Constructor/destructor --
-public:
+private:
   ITKDataBlock( ITKImageDataHandle itk_data );
+public: 
   virtual ~ITKDataBlock();
 
   // -- Internal implementation of this class --
 private:
   ITKDataBlockPrivateHandle private_;
+  
+public: 
+  static DataBlockHandle New( ITKImageDataHandle itk_data, generation_type generation = -1 );
 
 };
 

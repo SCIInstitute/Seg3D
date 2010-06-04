@@ -177,9 +177,7 @@ bool StateHandler::save_states( boost::filesystem::path path, const std::string&
 
 bool StateHandler::load_states( boost::filesystem::path path )
 {
-
-  if( !pre_load_states() )
-    return false;
+  if( !pre_load_states() ) return false;
 
   // We will load in the file from the specified path and exit if the path is invalid
   TiXmlDocument doc( path.string().c_str() );
@@ -210,6 +208,7 @@ bool StateHandler::load_states( boost::filesystem::path path )
         private_->state_map_[ state_value_name ]->import_from_string( state_value_value );
     }
   }
+
   return post_load_states();
 }
 
