@@ -148,12 +148,19 @@ public:
   // SAVE_STATES:
   // This function will save all the state values of the particular statehandler to XML at the
   // location that is specified by path
-  bool save_states( boost::filesystem::path path );
+  bool save_states( boost::filesystem::path path, const std::string& name );
 
   // LOAD_STATES:
   // This function will load all the state values of the particular statehandler from XML at the
   // location that is specified by path
   bool load_states( boost::filesystem::path path );
+
+  virtual bool pre_load_states();
+  virtual bool post_load_states();
+
+  virtual bool pre_save_states();
+  virtual bool post_save_states( boost::filesystem::path path );
+  
 
 protected:
   // STATE_CHANGED:

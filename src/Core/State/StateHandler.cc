@@ -136,8 +136,11 @@ bool StateHandler::get_state( const size_t idx, StateBaseHandle& state )
   return true;
 }
 
-bool StateHandler::save_states( boost::filesystem::path path )
+bool StateHandler::save_states( boost::filesystem::path path, const std::string& name )
 {
+  if( !pre_save_states() )
+    return false;
+
   state_map_type::iterator it = this->private_->state_map_.begin();
   state_map_type::iterator it_end = this->private_->state_map_.end();
 
@@ -166,14 +169,18 @@ bool StateHandler::save_states( boost::filesystem::path path )
   }
 
   // Finally we will save our XML to the specified file
-  doc.SaveFile( path.string().c_str() );
+  doc.SaveFile( ( path / name ).string().c_str() );
   
-  return true;
+  return post_save_states( path );
 }
 
 
 bool StateHandler::load_states( boost::filesystem::path path )
 {
+
+  if( !pre_load_states() )
+    return false;
+
   // We will load in the file from the specified path and exit if the path is invalid
   TiXmlDocument doc( path.string().c_str() );
   if ( !doc.LoadFile() ) return false;
@@ -203,6 +210,30 @@ bool StateHandler::load_states( boost::filesystem::path path )
         private_->state_map_[ state_value_name ]->import_from_string( state_value_value );
     }
   }
+  return post_load_states();
+}
+
+bool StateHandler::pre_load_states()
+{
+  // Do nothing.
+  return true;
+}
+
+bool StateHandler::post_load_states()
+{
+  // Do nothing.
+  return true;
+}
+
+bool StateHandler::pre_save_states()
+{
+  // Do nothing.
+  return true;
+}
+
+bool StateHandler::post_save_states( boost::filesystem::path path )
+{
+  // Do nothing.
   return true;
 }
 
