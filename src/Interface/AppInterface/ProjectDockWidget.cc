@@ -79,6 +79,10 @@ ProjectDockWidget::ProjectDockWidget( QWidget *parent ) :
     
     connect( this->private_->ui_.load_session_button_, SIGNAL( clicked() ), 
         this, SLOT( load_session() ) );
+
+    connect( this->private_->ui_.sessions_list_, SIGNAL( itemDoubleClicked ( QListWidgetItem* ) ),
+      this, SLOT( call_load_session( QListWidgetItem* ) ) );
+    
     
     
   
@@ -107,7 +111,7 @@ void ProjectDockWidget::load_session()
     sessions_state_->get();
     
     
-    for( size_t i = 0; i < sessions.size(); ++i )
+    for( int i = 0; i < static_cast< int >( sessions.size() ); ++i )
     {
       if( QString::fromStdString( ( Core::SplitString( sessions[ i ], "|" ) )[ 1 ] ) == 
          this->private_->ui_.sessions_list_->currentItem()->text() )
@@ -117,7 +121,11 @@ void ProjectDockWidget::load_session()
       }
     }
   }
-    
+}
+
+void ProjectDockWidget::call_load_session( QListWidgetItem* item )
+{
+  this->load_session();
 }
   
   

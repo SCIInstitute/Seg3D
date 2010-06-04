@@ -66,6 +66,7 @@ private Q_SLOTS:
   void save_project();
   void populate_session_list();
   void load_session();
+  void call_load_session( QListWidgetItem* item );
   
 private:
   boost::shared_ptr< ProjectDockWidgetPrivate > private_;
