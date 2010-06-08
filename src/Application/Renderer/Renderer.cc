@@ -159,7 +159,7 @@ bool Renderer::render()
     for ( size_t i = 0; i < num_of_viewers; i++ )
     {
       ViewerHandle other_viewer = ViewerManager::Instance()->get_viewer( i );
-      if ( !other_viewer->viewer_visible_state_->get() || 
+      if ( // !other_viewer->viewer_visible_state_->get() || 
         !other_viewer->slice_visible_state_->get() || 
         other_viewer->is_volume_view() )
       {

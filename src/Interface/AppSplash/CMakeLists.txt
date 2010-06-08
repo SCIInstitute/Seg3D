@@ -87,6 +87,9 @@ CORE_ADD_LIBRARY(Interface_AppSplash
             ${INTERFACE_APPSPLASH_NO_MOC_SRCS} 
             ${INTERFACE_APPSPLASH_MOC_SRCS})
 
+ADD_DEPENDENCIES(Interface_AppSplash 
+      ${INTERFACE_APPSPLASH_UI_SRCS}
+      ${INTERFACE_APPSPLASH_RCC_SRCS} ) 
             
 TARGET_LINK_LIBRARIES(Interface_AppSplash
                       Core_Utils

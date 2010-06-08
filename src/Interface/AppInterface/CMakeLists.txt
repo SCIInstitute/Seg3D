@@ -149,7 +149,10 @@ CORE_ADD_LIBRARY(Interface_AppInterface
             ${INTERFACE_APPINTERFACE_MOC_SRCS}
             ${INTERFACE_APPINTERFACE_QT_RCC_SRCS})
                      
-            
+ADD_DEPENDENCIES(Interface_AppInterface 
+      ${INTERFACE_APPINTERFACE_UI_SRCS}
+      ${INTERFACE_APPINTERFACE_RCC_SRCS} )
+
 TARGET_LINK_LIBRARIES(Interface_AppInterface
                       Core_Utils
                       Core_EventHandler

@@ -64,10 +64,29 @@ ViewerManager::ViewerManager() :
   // Currently a maximum of 6 viewers can be created
   this->viewers_.resize( 6 );
   
+
+  
   for ( size_t j = 0; j < viewers_.size(); j++ )
   {
     this->viewers_[ j ] = ViewerHandle( new Viewer( j ) );
+  }
 
+  // Step set defaults for viewers
+  this->viewers_[ 0 ]->view_mode_state_->set( Viewer::VOLUME_C );
+  this->viewers_[ 0 ]->slice_visible_state_->set( false );
+  this->viewers_[ 1 ]->view_mode_state_->set( Viewer::AXIAL_C );
+  this->viewers_[ 1 ]->slice_visible_state_->set( false );
+  this->viewers_[ 2 ]->view_mode_state_->set( Viewer::AXIAL_C );
+  this->viewers_[ 2 ]->slice_visible_state_->set( false );
+  this->viewers_[ 3 ]->view_mode_state_->set( Viewer::AXIAL_C );
+  this->viewers_[ 3 ]->slice_visible_state_->set( true );
+  this->viewers_[ 4 ]->view_mode_state_->set( Viewer::SAGITTAL_C );
+  this->viewers_[ 4 ]->slice_visible_state_->set( true );
+  this->viewers_[ 5 ]->view_mode_state_->set( Viewer::CORONAL_C );
+  this->viewers_[ 5 ]->slice_visible_state_->set( true );
+
+  for ( size_t j = 0; j < viewers_.size(); j++ )
+  {
     // NOTE: ViewerManager needs to process these signals first
     this->add_connection( this->viewers_[ j ]->view_mode_state_->value_changed_signal_.
       connect( boost::bind( &ViewerManager::viewer_mode_changed, this, j ), 
@@ -81,15 +100,11 @@ ViewerManager::ViewerManager() :
     this->add_connection( this->viewers_[ j ]->viewer_lock_state_->value_changed_signal_.
       connect( boost::bind( &ViewerManager::viewer_lock_state_changed, this, j ), 
       boost::signals2::at_front ) );
+      
+    // NOTE: For these signals order does not matter  
+    this->add_connection( this->viewers_[ j ]->slice_visible_state_->state_changed_signal_.
+      connect( boost::bind( &ViewerManager::update_volume_viewers, this ) ) );
   }
-
-  // Step set defaults for viewers
-  this->viewers_[ 0 ]->view_mode_state_->set( Viewer::VOLUME_C );
-  this->viewers_[ 1 ]->view_mode_state_->set( Viewer::AXIAL_C );
-  this->viewers_[ 2 ]->view_mode_state_->set( Viewer::AXIAL_C );
-  this->viewers_[ 3 ]->view_mode_state_->set( Viewer::AXIAL_C );
-  this->viewers_[ 4 ]->view_mode_state_->set( Viewer::SAGITTAL_C );
-  this->viewers_[ 5 ]->view_mode_state_->set( Viewer::CORONAL_C );
 }
 
 ViewerManager::~ViewerManager()
@@ -238,6 +253,24 @@ void ViewerManager::viewer_became_picking_target( size_t viewer_id )
   }
 
   this->picking_target_changed_signal_( viewer_id );
+}
+
+void ViewerManager::update_volume_viewers()
+{
+
+  for ( size_t i = 0; i < 6; i++ )
+  {
+    ViewerHandle viewer = this->viewers_[ i ];
+    if ( !viewer->viewer_visible_state_->get() )
+    {
+      continue;
+    }
+
+    if ( viewer->view_mode_state_->get() == Viewer::VOLUME_C )
+    {
+      viewer->trigger_redraw();
+    }
+  }
 }
 
 void ViewerManager::update_picking_targets()

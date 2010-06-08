@@ -177,6 +177,8 @@ void RendererBase::redraw( bool delay_update )
   {
     return;
   }
+  
+  // Synchronization calln for multi threaded rendering
   glFinish();
 
   SCI_CHECK_OPENGL_ERROR();

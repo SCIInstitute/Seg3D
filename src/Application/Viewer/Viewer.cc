@@ -81,16 +81,19 @@ Viewer::Viewer( size_t viewer_id ) :
 
   this->add_state( "slice_number", this->slice_number_state_, 0, 0, 0, 1 );
 
-  this->add_state( "slice_lock", viewer_lock_state_, false );
-  this->add_state( "slice_grid", slice_grid_state_, false );
-  this->add_state( "slice_visible", slice_visible_state_, true );
+  this->add_state( "slice_lock", this->viewer_lock_state_, false );
+  this->add_state( "slice_grid", this->slice_grid_state_, false );
+  this->add_state( "slice_visible", this->slice_visible_state_, true );
 
-  this->add_state( "volume_slices_visible", volume_slices_visible_state_, true );
-  this->add_state( "volume_isosurfaces_visible", volume_isosurfaces_visible_state_, true );
-  this->add_state( "volume_volume_rendering_visible", volume_volume_rendering_visible_state_, 
-    false );
-
+  this->add_state( "volume_slices_visible", this->volume_slices_visible_state_, true );
+  this->add_state( "volume_isosurfaces_visible", this->volume_isosurfaces_visible_state_, true );
+  this->add_state( "volume_volume_rendering_visible", 
+    this->volume_volume_rendering_visible_state_, false );
+  this->add_state( "volume_light_visible", this->volume_light_visible_state_, true ); 
+    
   this->add_state( "is_picking_target", this->is_picking_target_state_, false );
+
+
 
   this->view_manipulator_ = ViewManipulatorHandle( new ViewManipulator( this ) );
   this->add_connection( LayerManager::Instance()->layer_inserted_signal_.connect( 

@@ -114,6 +114,7 @@ private:
   void viewer_became_picking_target( size_t viewer_id );
   void viewer_lock_state_changed( size_t viewer_id );
   void update_picking_targets();
+  void update_volume_viewers();
 
 public:
   typedef boost::signals2::signal< void ( size_t ) > picking_target_changed_signal_type;

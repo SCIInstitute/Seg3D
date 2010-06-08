@@ -91,6 +91,9 @@ CORE_ADD_LIBRARY(Interface_AppPreferences
             ${INTERFACE_APPPREFERENCES_NO_MOC_SRCS} 
             ${INTERFACE_APPPREFERENCES_MOC_SRCS})
 
+ADD_DEPENDENCIES(Interface_AppPreferences 
+      ${INTERFACE_APPPREFERENCES_UI_SRCS}
+      ${INTERFACE_APPPREFERENCES_RCC_SRCS} )  
             
 TARGET_LINK_LIBRARIES(Interface_AppPreferences
                       Core_Utils

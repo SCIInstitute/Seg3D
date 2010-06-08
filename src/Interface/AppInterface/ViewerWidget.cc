@@ -82,9 +82,6 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
   this->private_->picking_icon_.addPixmap( QPixmap( ":/Images/PickingOff.png" ), QIcon::Normal, QIcon::Off );
   
   this->private_->viewer_ = viewer;
-  
-  
-  
   this->private_->ui_.setupUi( this );
   
   // Setup the Custom Picking Button
@@ -142,6 +139,16 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
       this->private_->viewer_->slice_grid_state_ );
     QtUtils::QtBridge::Connect( this->private_->ui_.lock_button_, 
       this->private_->viewer_->viewer_lock_state_ );
+    QtUtils::QtBridge::Connect( this->private_->ui_.slice_visible_button_,
+      this->private_->viewer_->slice_visible_state_ );
+    QtUtils::QtBridge::Connect( this->private_->ui_.slices_visible_button_,
+      this->private_->viewer_->volume_slices_visible_state_ );
+    QtUtils::QtBridge::Connect( this->private_->ui_.light_visible_button_,
+      this->private_->viewer_->volume_light_visible_state_ );
+    QtUtils::QtBridge::Connect( this->private_->ui_.isosurfaces_visible_button_,
+      this->private_->viewer_->volume_isosurfaces_visible_state_ );
+    QtUtils::QtBridge::Connect( this->private_->ui_.volume_rendering_visible_button_,
+      this->private_->viewer_->volume_volume_rendering_visible_state_ );
 
     this->add_icons_to_combobox();
   }
@@ -188,12 +195,19 @@ void ViewerWidget::deselect()
 void ViewerWidget::change_view_type( int index )
 {
   bool is_volume_view = ( index == 3 );
-  
+
+  // 2D viewer specific buttons
   this->private_->ui_.flip_horizontal_button_->setVisible( !is_volume_view );
   this->private_->ui_.flip_vertical_button_->setVisible( !is_volume_view );
   this->private_->ui_.grid_button_->setVisible( !is_volume_view );
   this->private_->picking_button_->setVisible( !is_volume_view );
   this->private_->ui_.slice_visible_button_->setVisible( !is_volume_view );
+
+  // 3D viewer specific buttons
+  this->private_->ui_.slices_visible_button_->setVisible( is_volume_view );
+  this->private_->ui_.light_visible_button_->setVisible( is_volume_view );
+  this->private_->ui_.isosurfaces_visible_button_->setVisible( is_volume_view );
+  this->private_->ui_.volume_rendering_visible_button_->setVisible( is_volume_view); 
 }
   
 void ViewerWidget::HandleViewModeChanged( ViewerWidgetHandle viewer_widget )

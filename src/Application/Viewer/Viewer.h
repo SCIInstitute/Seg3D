@@ -169,6 +169,7 @@ public:
   void move_slice_to( const Core::Point& pt );
 
 private:
+  friend class ViewerManager;
   
   // Auto adjust the view states so the slices are fully visible
   void adjust_view( Core::VolumeSliceHandle target_slice );
@@ -179,9 +180,11 @@ private:
   // Auto orient the 3D view for the given slice
   void auto_orient( Core::VolumeSliceHandle target_slice );
 
-  void trigger_redraw( bool delay_update );
-  void trigger_redraw_overlay( bool delay_update );
-  
+  void trigger_redraw( bool delay_update = false );
+  void trigger_redraw_overlay( bool delay_update = false );
+    
+
+private:
   // OFFSET_SLICE:
   // Offset the slice number by the given value.
   void offset_slice( int delta );
@@ -221,12 +224,15 @@ public:
 
   Core::StateRangedIntHandle slice_number_state_;
 
+  // 2D viewer state
   Core::StateBoolHandle slice_grid_state_;
   Core::StateBoolHandle slice_visible_state_;
 
+  // 3D viewer state
   Core::StateBoolHandle volume_slices_visible_state_;
   Core::StateBoolHandle volume_isosurfaces_visible_state_;
   Core::StateBoolHandle volume_volume_rendering_visible_state_;
+  Core::StateBoolHandle volume_light_visible_state_;
 
   Core::StateBoolHandle viewer_lock_state_;
   Core::StateBoolHandle is_picking_target_state_;
