@@ -32,6 +32,7 @@
 #include <boost/bind.hpp>
 #include <boost/thread.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/timer.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 #include <Core/Utils/Log.h>
@@ -41,6 +42,8 @@ namespace Core
 {
 
 CORE_SINGLETON_IMPLEMENTATION( Log );
+
+boost::timer log_timer;
 
 Log::Log()
 {
@@ -56,7 +59,8 @@ std::string Log::header( const int line, const char* file ) const
 
   std::string header_string = std::string( "[" ) + 
     boost::posix_time::to_simple_string( timestamp ) + 
-    std::string("|") + filename.filename() +  
+    std::string( "|" ) + ExportToString( log_timer.elapsed() ) +
+    std::string( "|" ) + filename.filename() +  
     std::string( "|" ) + ExportToString( line ) + std::string( "]" );
   return header_string;
 }
@@ -125,9 +129,6 @@ LogStreamer::LogStreamer(unsigned int log_flags, std::ostream* stream)
   Log::Instance()->post_log_signal_.connect(
     Log::post_log_signal_type::slot_type(&LogStreamerInternal::stream_message,
       internal_.get(),_1,_2).track(internal_));
-
-  //   Log::Instance()->post_log_signal.connect(boost::bind(&LogStreamerInternal::stream_message,
-  //      internal_.get(),_1,_2));
 }
 
 } // end namespace

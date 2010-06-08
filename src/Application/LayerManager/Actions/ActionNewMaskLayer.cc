@@ -43,18 +43,7 @@ namespace Seg3D
 
 bool ActionNewMaskLayer::validate( Core::ActionContextHandle& context )
 {
-  if ( !this->group_.handle() )
-  {
-    this->group_.handle() = LayerManager::Instance()->get_layer_group( 
-      this->group_id_.value() );    
-  }
-
-  if ( !this->group_.handle() )
-  {
-    context->report_error( std::string( "GroupID '" ) + this->group_id_.value() + 
-      "' is invalid" );
-    return false;
-  }
+  if ( !this->cache_group_handle( context, this->group_id_, this->group_ ) ) return false;
   
   return true; // validated
 }

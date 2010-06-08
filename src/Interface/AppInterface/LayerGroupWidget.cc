@@ -180,11 +180,12 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
       // --- GENERAL ---
     
       QtUtils::QtBridge::Connect( this->private_->ui_.open_button_, group->show_layers_state_ );
-      QtUtils::QtBridge::Connect( this->private_->ui_.group_visibility_button_, group->visibility_state_ );
-      QtUtils::QtBridge::Connect( this->private_->ui_.delete_button_, boost::bind( &ActionDeleteLayers::Dispatch, group ) );
-  
-    void ( *dispatch_fp )( LayerGroupHandle ) = &ActionNewMaskLayer::Dispatch;
-    QtUtils::QtBridge::Connect( this->private_->ui_.group_new_button_, boost::bind( dispatch_fp,  group ) );
+      QtUtils::QtBridge::Connect( this->private_->ui_.group_visibility_button_, 
+      group->visibility_state_ );
+      QtUtils::QtBridge::Connect( this->private_->ui_.delete_button_, 
+      boost::bind( &ActionDeleteLayers::Dispatch, group ) );
+    QtUtils::QtBridge::Connect( this->private_->ui_.group_new_button_, 
+      boost::bind( &ActionNewMaskLayer::Dispatch,  group ) );
   
       // --- RESAMPLE ---
       // = set the default values

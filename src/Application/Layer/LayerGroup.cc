@@ -196,13 +196,14 @@ void LayerGroup::sync_layer_lists()
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
   
   std::vector< std::string > layer_vector;
-  this->layers_state_->set( layer_vector );
-  std::string volume_type;
   
   layer_list_type::const_iterator layer_iterator = this->layer_list_.begin();
   for ( ; layer_iterator != this->layer_list_.end(); ++layer_iterator )
   {
-    switch ( ( *layer_iterator )->type() ) {
+    std::string volume_type;
+
+    switch ( ( *layer_iterator )->type() ) 
+    {
       case Core::VolumeType::DATA_E:
         volume_type = "DATA_E";
         break;

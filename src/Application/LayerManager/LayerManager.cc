@@ -66,7 +66,6 @@ int LayerManager::color_counter_ = 0;
   
 bool LayerManager::insert_layer( LayerHandle layer )
 {
-  //this->color_counter_ = 0;
   bool active_layer_changed = false;
   
   {
@@ -75,8 +74,10 @@ bool LayerManager::insert_layer( LayerHandle layer )
     CORE_LOG_DEBUG( std::string("Insert New Layer: ") + layer->get_layer_id());
     
     if( layer->type() == Core::VolumeType::MASK_E )
-      dynamic_cast< MaskLayer* >( layer.get() )->color_state_->
-      set( this->color_counter_++ % 11 );
+    {
+      static_cast< MaskLayer* >( layer.get() )->color_state_->
+        set( this->color_counter_++ % 11 );
+    }
     
     LayerGroupHandle group_handle;
     for ( group_list_type::iterator it = group_list_.begin(); 
@@ -96,12 +97,10 @@ bool LayerManager::insert_layer( LayerHandle layer )
       group_handle = LayerGroupHandle( new LayerGroup(  layer->get_grid_transform() ) );
       group_list_.push_back( group_handle );
       
-      CORE_LOG_DEBUG( std::string("Set Active Layer: ") + layer->get_layer_id());
+      CORE_LOG_DEBUG( std::string( "Set Active Layer: " ) + layer->get_layer_id());
 
       // deactivate the previous active layer
-      if ( active_layer_ )
-        active_layer_->set_active( false ); 
-
+      if ( active_layer_ ) active_layer_->set_active( false ); 
       active_layer_ = layer;
       active_layer_->set_active( true );
       
@@ -117,6 +116,14 @@ bool LayerManager::insert_layer( LayerHandle layer )
       
   } // unlocked from here
 
+  CORE_LOG_DEBUG( std::string( "Signalling that new layer was inserted" ) );
+
+  // keep the state variables in sync
+  this->sync_group_lists();
+
+  CORE_LOG_DEBUG( std::string( "--- triggering signals ---" ) );
+
+  
   layer_inserted_signal_( layer );
   layers_changed_signal_();
 
@@ -124,9 +131,6 @@ bool LayerManager::insert_layer( LayerHandle layer )
   {
     active_layer_changed_signal_( layer );
   }
-  
-  // keep the state variables in sync
-  this->sync_group_lists();
   
   return true;
 }
