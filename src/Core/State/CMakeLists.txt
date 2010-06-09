@@ -37,6 +37,8 @@ SET(CORE_STATE_SRCS
   StateEngine.cc
   StateHandler.h
   StateHandler.cc
+  StateIO.h
+  StateIO.cc
   StateLabeledOption.h
   StateLabeledOption.cc
   StateName.h

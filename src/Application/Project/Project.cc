@@ -64,10 +64,10 @@ Project::~Project()
 
 }
 
-bool Project::initialize_from_file( boost::filesystem::path project_path, 
+bool Project::initialize_from_file( boost::filesystem::path& project_path, 
   const std::string& project_name )
 {
-  if( load_states( project_path / project_name ) )  
+  if( import_states( project_path, project_name ) ) 
   {
     project_path = project_path / 
       ( Core::SplitString( ( this->sessions_state_->get() )[0], "|" ) )[ 0 ];
@@ -78,7 +78,7 @@ bool Project::initialize_from_file( boost::filesystem::path project_path,
   return false;
 }
   
-bool Project::load_session( boost::filesystem::path project_path, int state_index )
+bool Project::load_session( boost::filesystem::path& project_path, int state_index )
 {
   project_path = project_path / 
   ( Core::SplitString( ( this->sessions_state_->get() )[ state_index ], "|" ) )[ 0 ];
@@ -88,7 +88,7 @@ bool Project::load_session( boost::filesystem::path project_path, int state_inde
   
 }
   
-bool Project::save_session( boost::filesystem::path project_path, const std::string& session_name )
+bool Project::save_session( boost::filesystem::path& project_path, const std::string& session_name )
 {
   this->current_session_->session_name_state_->set( session_name );
   

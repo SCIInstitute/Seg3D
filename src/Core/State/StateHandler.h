@@ -61,7 +61,7 @@ class StateHandler : public Core::ConnectionHandler
 
   // -- constructor/destructor --
 public:
-  StateHandler( const std::string& type_str, bool auto_id );
+  StateHandler( const std::string& type_str, bool auto_id, int save_priority = -1 );
   virtual ~StateHandler();
 
 public:
@@ -145,21 +145,45 @@ public:
   }
 
 public:
-  // SAVE_STATES:
-  // This function will save all the state values of the particular statehandler to XML at the
-  // location that is specified by path
-  bool save_states( boost::filesystem::path path, const std::string& name );
+  // POPULATE_SESSION_STATES:
+  // This function will save all the state values of this StateHandler to the list of states
+  // that is stored in the StateEngine
+  bool populate_session_states();
 
   // LOAD_STATES:
-  // This function will load all the state values of the particular statehandler from XML at the
-  // location that is specified by path
-  bool load_states( boost::filesystem::path path );
+  // This function will load all the state values of this StateHandler from the list of states
+  // that it is passed
+  bool load_states( std::vector< std::string >& states_vector );
 
+  // IMPORT_STATES:
+  // This function is called on StateHandlers that need to have its states loaded from a particular
+  // location that is seperate from the session states
+  bool import_states( boost::filesystem::path path, const std::string& name );
+
+  // EXPORT_STATES:
+  // This function is called on StateHandlers that need to have its states saved to a particular
+  // location that is seperate from the session states
+  bool export_states( boost::filesystem::path path, const std::string& name );
+
+  // PRE_LOAD_STATES:
+  // This virtual function can be implemented in the StateHandlers and will be called before its
+  // states are loaded
   virtual bool pre_load_states();
+
+  // POST_LOAD_STATES:
+  // This virtual function can be implemented in the StateHandlers and will be called after its
+  // states are loaded
   virtual bool post_load_states();
 
+  // PRE_SAVE_STATES:
+  // This virtual function can be implemented in the StateHandlers and will be called before its
+  // states are saved
   virtual bool pre_save_states();
-  virtual bool post_save_states( boost::filesystem::path path );
+
+  // POST_SAVE_STATES:
+  // This virtual function can be implemented in the StateHandlers and will be called after its
+  // states are saved
+  virtual bool post_save_states();
   
 
 protected:
@@ -175,6 +199,11 @@ public:
   // GET_STATEHANDLER_ID_NUMBER:
   // The id number of the handler that will be at the end of the prefix
   size_t get_statehandler_id_number() const;
+
+  // GET_SAVE_TO_DISK:
+  // This function returns a bool indicating whether this statehandler should be save to disk
+  int get_save_priority();
+
 
 private:
   // HANDLE_STATE_CHANGED:
@@ -205,6 +234,7 @@ private:
   size_t number_of_states() const;
 
   StateHandlerPrivate* private_;
+
 };
 
 } // end namespace Core

@@ -51,13 +51,12 @@ PreferencesManager::PreferencesManager() :
 { 
   // Initialize the local config directory path
   Core::Application::Instance()->get_config_directory( this->local_config_path_ );
-  //this->local_config_path_ = this->local_config_path_ / "user_prefs.cfg";
 
   if(  initialize_default_colors() )
     this->initialize_states();
 
   // After we initialize the states, we then load the saved preferences from file.
-  load_states( this->local_config_path_ / "user_prefs.cfg" );
+  this->initialize();
   
 }
 
@@ -65,9 +64,14 @@ PreferencesManager::~PreferencesManager()
 {
 }
 
+void PreferencesManager::initialize()
+{
+  import_states( this->local_config_path_, "preferences" );
+}
+
 void PreferencesManager::save_state()
 {
-  save_states( this->local_config_path_, "user_prefs.cfg" );
+  export_states( this->local_config_path_, "preferences" );
 }
 
 Core::Color PreferencesManager::get_color( int index ) const
@@ -86,6 +90,8 @@ void PreferencesManager::initialize_states()
   add_state( "project_path", project_path_state_, user_path.string() );
   add_state( "considate_project", considate_project_state_, false );
   add_state( "full_screen_on_startup", full_screen_on_startup_state_, false );
+  add_state( "auto_save", auto_save_state_, true );
+  add_state( "smart_save", smart_save_state_, true );
   
   //Viewer Preferences
   add_state( "default_viewer_mode", default_viewer_mode_state_, "1and3", 
@@ -112,7 +118,7 @@ void PreferencesManager::initialize_states()
   //Sidebars Preferences
   add_state( "show_tools_bar", show_tools_bar_state_, true );
   add_state( "show_layermanager_bar", show_layermanager_bar_state_, true );
-  add_state( "show_projectmanager_bar", show_projectmanager_bar_state_, false );
+  add_state( "show_projectmanager_bar", show_projectmanager_bar_state_, true );
   add_state( "show_measurement_bar", show_measurement_bar_state_, false );
   add_state( "show_history_bar", show_history_bar_state_, false );
   

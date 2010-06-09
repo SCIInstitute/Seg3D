@@ -101,6 +101,8 @@ public:
 public:
   Core::StateStringVectorHandle recent_projects_state_;
   Core::StateStringHandle current_project_path_state_;
+  Core::StateIntHandle default_project_name_counter_state_;
+  Core::StateBoolHandle auto_save_state_;
   ProjectHandle current_project_;
   
 private:
@@ -119,7 +121,11 @@ private:
   // RENAME_PROJECT_FOLDER
   // this function is triggered when a user changes the folder name
   void rename_project_folder( const std::string& new_name, Core::ActionSource source );
-  
+
+  // GET_TIMESTAMP:
+  // this function is called when you need a timestamp as a string
+  std::string get_timestamp();
+
 private:
   
   std::vector< Core::Color > project_colors_;

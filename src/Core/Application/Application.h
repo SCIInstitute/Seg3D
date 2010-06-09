@@ -98,11 +98,11 @@ public:
 public:
   // GET_USER_DIRECTORY:
   // Get the user directory on the current system 
-  bool get_user_directory(boost::filesystem::path& user_dir);
+  bool get_user_directory( boost::filesystem::path& user_dir, bool config_path = false );
 
   // GET_CONFIG_DIRECTORY:
   // Get the configuration directory on the current system  
-  bool get_config_directory(boost::filesystem::path& config_dir);
+  bool get_config_directory( boost::filesystem::path& config_dir );
 
   // -- Application thread --
 public:

@@ -33,7 +33,8 @@
 #include <map>
 #include <set>
 
-// boost includes
+// Boost includes
+#include <boost/filesystem.hpp>
 #include <boost/unordered_map.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/recursive_mutex.hpp>
@@ -80,6 +81,21 @@ public:
   // NUMBER_OF_STATES:
   // The number of state variables in the system
   size_t number_of_states();
+
+public:
+  // LOAD_SESSION_STATES:
+  // This function finds the StateHandlers that are saved to file by default and then
+  // sets their state variables from the values that have been loaded into session_states_
+  bool load_session_states();
+
+  // POPULATE_SESSION_VECTOR:
+  // This function finds the StateHandlers that are set to save to file by default and 
+  // calls tells them to populate session_states_ with their state values.
+  bool populate_session_vector();
+
+  // This is the vector that holds string representations of the state variables that we
+  // will be saving to XML
+  std::vector< std::string > session_states_;
   
   // -- Interface for accounting stateids --
 private:

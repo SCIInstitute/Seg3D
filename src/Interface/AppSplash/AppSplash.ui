@@ -141,7 +141,7 @@ QPushButton:pressed{
           <number>2</number>
          </property>
          <property name="margin">
-          <number>0</number>
+          <number>4</number>
          </property>
          <item>
           <widget class="QListWidget" name="recent_project_listwidget_">
@@ -309,6 +309,7 @@ QPushButton:pressed{
   </layout>
  </widget>
  <resources>
+  <include location="../AppInterface/Resources/AppInterface.qrc"/>
   <include location="../AppInterface/Resources/AppInterface.qrc"/>
  </resources>
  <connections/>

@@ -38,7 +38,6 @@
 // Boost includes
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
-#include <boost/filesystem.hpp>
 
 // Core includes
 #include <Core/Utils/StringUtil.h>
@@ -180,9 +179,14 @@ public:
   layers_changed_type layers_changed_signal_;
 
 public:
-  bool post_save_states( boost::filesystem::path path );
+  // POST_SAVE_STATES:
+  // This function is called after the LayerManagers states have been saved and then
+  // tells the groups to save their states as well.
+  bool post_save_states();
   
 private:
+  // SYNC_GROUP_LISTS:
+  // This function keeps the groups_state_ in sync with group_list_ 
   void sync_group_lists();
   
 private:

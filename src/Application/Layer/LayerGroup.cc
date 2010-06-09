@@ -222,8 +222,16 @@ void LayerGroup::sync_layer_lists()
   this->layers_state_->set( layer_vector );
 }
 
-bool LayerGroup::post_load_states()
+bool LayerGroup::post_save_states()
 {
+  std::vector< std::string > layer_vector = this->layers_state_->get();
+  layer_list_type::iterator layer_iterator = this->layer_list_.begin();
+  for( int j = 0; j < static_cast< int >( layer_vector.size() ); ++j )
+  {
+    std::string layer_name = ( Core::SplitString( layer_vector[ j ], "|" ) )[ 0 ];
+    ( *layer_iterator )->populate_session_states();
+    ++layer_iterator;
+  }
   return true;
 }
 

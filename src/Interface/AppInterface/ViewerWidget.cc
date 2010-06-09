@@ -158,22 +158,18 @@ void ViewerWidget::add_icons_to_combobox()
 { 
   QIcon icon;
   icon.addFile(QString::fromUtf8(":/Images/Xview.png"), QSize(), QIcon::Normal, QIcon::On);
-  //icon.addFile(QString::fromUtf8(":/Images/XviewOff.png"), QSize(), QIcon::Normal, QIcon::Off);
   this->private_->ui_.viewer_states_->setItemIcon( 0, icon );
   
   QIcon icon1;
   icon1.addFile(QString::fromUtf8(":/Images/Yview.png"), QSize(), QIcon::Normal, QIcon::On);
-  //icon1.addFile(QString::fromUtf8(":/Images/YviewOff.png"), QSize(), QIcon::Normal, QIcon::Off);
   this->private_->ui_.viewer_states_->setItemIcon( 1, icon1 );
   
   QIcon icon2;
   icon2.addFile(QString::fromUtf8(":/Images/Zview.png"), QSize(), QIcon::Normal, QIcon::On);
-  //icon2.addFile(QString::fromUtf8(":/Images/ZviewOff.png"), QSize(), QIcon::Normal, QIcon::Off);
   this->private_->ui_.viewer_states_->setItemIcon( 2, icon2 );
   
   QIcon icon3;
   icon3.addFile(QString::fromUtf8(":/Images/Vview.png"), QSize(), QIcon::Normal, QIcon::On);
-  //icon3.addFile(QString::fromUtf8(":/Images/VviewOff.png"), QSize(), QIcon::Normal, QIcon::Off);
   this->private_->ui_.viewer_states_->setItemIcon( 3, icon3 );  
 }
 

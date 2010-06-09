@@ -83,7 +83,17 @@ ProjectInfoPage::ProjectInfoPage( QWidget *parent )
                    "want to create." );
 
     this->project_name_label_ = new QLabel( "Project name:" );
-    this->project_name_lineedit_ = new QLineEdit( "New project" );
+
+  QString default_name_count = QString::number( ProjectManager::Instance()->
+    default_project_name_counter_state_->get() );
+
+  if( default_name_count == "0" )
+    this->project_name_lineedit_ = new QLineEdit( "New Project" );
+  else
+  {
+    this->project_name_lineedit_ = new QLineEdit();
+    this->project_name_lineedit_->setText(  "New Project " + default_name_count );
+  }
   
     this->project_path_label_ = new QLabel( "Project Path:" );
     this->project_path_lineedit_ = new QLineEdit;

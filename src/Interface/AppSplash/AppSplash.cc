@@ -135,8 +135,11 @@ void AppSplash::populate_recent_projects()
   {
     if( this->recent_project_list_[ i ] != "" )
     {
-      this->private_->ui_.recent_project_listwidget_->addItem( QString::fromStdString( 
-        ( Core::SplitString( this->recent_project_list_[ i ], "|" ) )[ 1 ] ) );
+      this->private_->ui_.recent_project_listwidget_->addItem( 
+        QString::fromStdString( ( Core::SplitString( 
+        this->recent_project_list_[ i ], "|" ) )[ 1 ] ) + "  -  " +
+        QString::fromStdString( ( Core::SplitString( 
+        this->recent_project_list_[ i ], "|" ) )[ 2 ] ) );
       
     }
   }

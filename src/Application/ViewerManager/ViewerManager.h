@@ -120,6 +120,21 @@ public:
   typedef boost::signals2::signal< void ( size_t ) > picking_target_changed_signal_type;
   picking_target_changed_signal_type picking_target_changed_signal_;
 
+public:
+  // POST_SAVE_STATES:
+  // This function is called by the statehandler once the initial state saving has finished and
+  // will then save the states of each of the viewers.
+  bool post_save_states();
+
+  // POST_LOAD_STATES:
+  // This function is called by the statehandler once the initial state loading has finished and
+  // will then load the states of each of the viewers.
+  bool post_load_states();
+
+  // state variables
+public:
+  Core::StateStringVectorHandle viewers_state_;
+
   // -- Viewer information --
 private:
 

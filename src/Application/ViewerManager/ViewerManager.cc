@@ -46,7 +46,7 @@ namespace Seg3D
 CORE_SINGLETON_IMPLEMENTATION( ViewerManager );
 
 ViewerManager::ViewerManager() :
-  StateHandler( "view", false ),
+  StateHandler( "view", false, 1 ),
   active_axial_viewer_( -1 ),
   active_coronal_viewer_( -1 ),
   active_sagittal_viewer_( -1 ),
@@ -58,6 +58,9 @@ ViewerManager::ViewerManager() :
     default_viewer_mode_state_->export_to_string(), PreferencesManager::Instance()->
     default_viewer_mode_state_->export_list_to_string() );
   this->add_state( "active_viewer", this->active_viewer_state_, 0 );
+
+  std::vector< std::string> viewers;
+  this->add_state( "viewers", this->viewers_state_, viewers );
 
   // Step (2)
   // Create the viewers that are part of the application
@@ -105,6 +108,15 @@ ViewerManager::ViewerManager() :
     this->add_connection( this->viewers_[ j ]->slice_visible_state_->state_changed_signal_.
       connect( boost::bind( &ViewerManager::update_volume_viewers, this ) ) );
   }
+
+
+  // Finally we will put the viewers into state variables for loading to/from file
+  std::vector< std::string > viewers_vector;
+  for( size_t i = 0; i < this->viewers_.size(); ++i )
+  {
+    viewers_vector.push_back( this->viewers_[ i ]->get_statehandler_id() );
+  }
+  this->viewers_state_->set( viewers_vector );
 }
 
 ViewerManager::~ViewerManager()
@@ -378,6 +390,43 @@ void ViewerManager::viewer_lock_state_changed( size_t viewer_id )
     }
     assert( found );
   }
+}
+
+bool ViewerManager::post_save_states()
+{
+  std::vector< std::string > viewers_vector = this->viewers_state_->get();
+
+  if( viewers_vector.size() != viewers_.size() )
+    return false;
+
+  for( size_t i = 0; i < viewers_vector.size(); ++i )
+  {
+    if( ( viewers_vector[ i ] != "]" ) && ( viewers_vector[ i ] != "\0" ) )
+    {
+      if( !( viewers_[ i ] )->populate_session_states() )
+      {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+bool ViewerManager::post_load_states()
+{
+  std::vector< std::string > viewers_vector = this->viewers_state_->get();
+  for( size_t i = 0; i < viewers_vector.size(); ++i )
+  {
+    if( ( viewers_vector[ i ] != "]" ) && ( viewers_vector[ i ] != "\0" ) )
+    {
+      // TODO: Need to implement signal blocking before we can load the viewers
+      //if( !( viewers_[ i ] )->load_states( Core::StateEngine::Instance()->session_states_ ) )
+      //{
+      //  return false;
+      //}
+    }
+  }
+  return true;
 }
 
 } // end namespace Seg3D

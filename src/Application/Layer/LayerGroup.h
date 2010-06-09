@@ -194,9 +194,14 @@ public:
   void get_layer_names( std::vector< LayerIDNamePair >& layer_names, 
     Core::VolumeType type, LayerHandle excluded_layer ) const;
 
-  bool post_load_states();
+  // POST_SAVE_STATES:
+  // This function is called after the LayerGroup's states have been saved and then
+  // tells the layers to save their states as well.
+  bool post_save_states();
   
 private:
+  // SYNC_LAYER_LISTS:
+  // This function keeps the layers_state_ in sync with layer_list_ 
   void sync_layer_lists();
   
 private:

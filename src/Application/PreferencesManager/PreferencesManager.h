@@ -70,6 +70,8 @@ public:
   Core::StateStringHandle project_path_state_;
   Core::StateBoolHandle considate_project_state_;
   Core::StateBoolHandle full_screen_on_startup_state_;
+  Core::StateBoolHandle auto_save_state_;
+  Core::StateBoolHandle smart_save_state_;
   
   //Viewers Preferences
   Core::StateOptionHandle default_viewer_mode_state_;
@@ -101,6 +103,10 @@ public:
   void save_state();
   
 private:
+  // INITIALIZE:
+  // this function loads the values for PreferencesManager from file
+  void initialize();
+
   // INITIALIZE_STATES:
   // This function is called by the constructor to initialize the state variables
   void initialize_states();

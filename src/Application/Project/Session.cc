@@ -34,6 +34,11 @@
 #include <Application/Layer/LayerGroup.h>
 
 
+// Core includes
+#include <Core/State/StateEngine.h>
+#include <Core/State/StateIO.h>
+
+
 namespace Seg3D
 {
 
@@ -48,69 +53,32 @@ Session::~Session()
 
 }
 
-bool Session::initialize_from_file( boost::filesystem::path path, const std::string& session_name )
+bool Session::initialize_from_file( boost::filesystem::path& path, const std::string& session_name )
 {
-//  boost::filesystem::path path = session_path;
-  if( this->load_states( path / session_name ) )
+  // First we make sure the session_states_ vector is empty.
+  Core::StateEngine::Instance()->session_states_.clear();
+
+  // Next we import the session information from file
+  if( Core::StateIO::import_from_file( ( path / session_name ), 
+    Core::StateEngine::Instance()->session_states_ ) )
   {
-    InterfaceManager::Instance()->load_states( path / "interfacemanager" );
-    
-    ViewerManager::Instance()->load_states( path / "viewermanager" );
-    ViewerManager::Instance()->get_viewer( "viewer0" )->load_states( path / "viewer0" );
-    ViewerManager::Instance()->get_viewer( "viewer1" )->load_states( path / "viewer1" );
-    ViewerManager::Instance()->get_viewer( "viewer2" )->load_states( path / "viewer2" );
-    ViewerManager::Instance()->get_viewer( "viewer3" )->load_states( path / "viewer3" );
-    ViewerManager::Instance()->get_viewer( "viewer4" )->load_states( path / "viewer4" );
-    ViewerManager::Instance()->get_viewer( "viewer5" )->load_states( path / "viewer5" );
-    
-    LayerManager::Instance()->load_states( path / "layermanager" );
-    //std::vector< std::string > group_vector = LayerManager::Instance()->groups_state_->get();
-    //if( ( group_vector[ 0 ] != "]" ) && ( group_vector[ 0 ] != "\0" ) )
-    //{
-    //  LayerManager::Instance()->get_layer_group( group_vector[ 0 ] )->load_states( 
-    //    path / group_vector[ 0 ] );
-    //}
-
-
-    return true;
+    //InterfaceManager::Instance()->load_states( Core::StateEngine::Instance()->session_states_ );
+    //ViewerManager::Instance()->load_states( Core::StateEngine::Instance()->session_states_ );
+    return Core::StateEngine::Instance()->load_session_states();
   }
-  
+
   return false;
 }
   
-bool Session::save_session_settings( boost::filesystem::path path, const std::string& session_name )
+bool Session::save_session_settings( boost::filesystem::path& path, const std::string& session_name )
 {
-  InterfaceManager::Instance()->save_states( path, "interfacemanager" );
-  
-  ViewerManager::Instance()->save_states( path, "viewermanager" );
-  ViewerManager::Instance()->get_viewer( "viewer0" )->save_states( path, "viewer0" );
-  ViewerManager::Instance()->get_viewer( "viewer1" )->save_states( path, "viewer1" );
-  ViewerManager::Instance()->get_viewer( "viewer2" )->save_states( path, "viewer2" );
-  ViewerManager::Instance()->get_viewer( "viewer3" )->save_states( path, "viewer3" );
-  ViewerManager::Instance()->get_viewer( "viewer4" )->save_states( path, "viewer4" );
-  ViewerManager::Instance()->get_viewer( "viewer5" )->save_states( path, "viewer5" );
-  
-  LayerManager::Instance()->save_states( path, "layermanager" );
-  /*std::vector< std::string > group_vector = LayerManager::Instance()->groups_state_->get();
-  for( size_t i = 0; i < group_vector.size(); ++i )
+  if( Core::StateEngine::Instance()->populate_session_vector() )
   {
-    if( ( group_vector[ i ] != "]" ) && ( group_vector[ i ] != "\0" ) )
-    {
-      LayerManager::Instance()->get_layer_group( group_vector[ i ] )->save_states( 
-        path / group_vector[ i ] );
-      std::vector< std::string > layer_vector = LayerManager::Instance()->
-        get_layer_group( group_vector[ i ] )->layers_state_->get();
-      for( size_t j = 0; j < layer_vector.size(); ++j )
-      {
-        std::string layer_name = ( Core::SplitString( layer_vector[ j ], "|" ) )[ 0 ];
-        LayerManager::Instance()->get_layer_by_id( layer_name )->
-          save_states( path / layer_name );
-      }
-    }
-  }*/
-  
-  
-  return this->save_states( path, session_name );
+    return Core::StateIO::export_to_file( ( path / session_name ), 
+      Core::StateEngine::Instance()->session_states_ );
+  }
+
+  return false;
 }
     
 } // end namespace Seg3d

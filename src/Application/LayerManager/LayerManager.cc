@@ -52,10 +52,10 @@ namespace Seg3D
 CORE_SINGLETON_IMPLEMENTATION( LayerManager );
 
 LayerManager::LayerManager() :
-  StateHandler( "layermanager", false )
+  StateHandler( "layermanager", false, 0 )
 { 
   std::vector< std::string> groups;
-  add_state( "groups", this->groups_state_, groups );
+  this->add_state( "groups", this->groups_state_, groups );
 }
 
 LayerManager::~LayerManager()
@@ -566,22 +566,22 @@ void LayerManager::get_layer_names( std::vector< LayerIDNamePair >& layer_names,
   }
 }
 
-bool LayerManager::post_save_states( boost::filesystem::path path )
+bool LayerManager::post_save_states()
 {
   std::vector< std::string > group_vector = this->groups_state_->get();
   for( size_t i = 0; i < group_vector.size(); ++i )
   {
     if( ( group_vector[ i ] != "]" ) && ( group_vector[ i ] != "\0" ) )
     {
-      LayerGroupHandle temp_group = this->get_layer_group( group_vector[ i ] );
       if( this->get_layer_group( group_vector[ i ] ) )
       {
-        ( this->get_layer_group( group_vector[ i ] ) )->save_states( 
-        path, group_vector[ i ] );
+        if( !( this->get_layer_group( group_vector[ i ] ) )->populate_session_states() )
+        {
+          return false;
+        }
       }
     }
   }
-
   return true;
 }
   

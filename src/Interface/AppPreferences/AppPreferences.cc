@@ -71,7 +71,7 @@ AppPreferences::AppPreferences( QWidget *parent ) :
   // connect the apply button to the save defaults function
   connect( this->private_->ui_.apply_button_, SIGNAL( clicked() ), 
     this, SLOT( save_defaults() ) );
-  
+
 }
 
 AppPreferences::~AppPreferences()
@@ -99,18 +99,23 @@ void AppPreferences::setup_general_prefs()
   this->private_->ui_.path_->setText( QString::fromStdString( PreferencesManager::Instance()->
     project_path_state_->export_to_string() ) );
 
-
-  QtUtils::QtBridge::Connect( this->private_->ui_.path_, PreferencesManager::Instance()->project_path_state_ );
+  //Connect General Preferences
+  QtUtils::QtBridge::Connect( this->private_->ui_.path_, 
+    PreferencesManager::Instance()->project_path_state_ );
 
   connect( this->private_->ui_.change_directory_button_, SIGNAL( clicked() ), 
     this, SLOT( change_project_directory() ) );
 
   
-  //Connect General Preferences 
+    
   QtUtils::QtBridge::Connect( this->private_->ui_.consolidate_project_checkbox_, 
     PreferencesManager::Instance()->considate_project_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.full_screen_on_startup_checkbox_, 
     PreferencesManager::Instance()->full_screen_on_startup_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.auto_save_checkbox_,
+    PreferencesManager::Instance()->auto_save_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.smart_save_checkbox_,
+    PreferencesManager::Instance()->smart_save_state_ );
 }
 
 void AppPreferences::setup_layer_prefs()

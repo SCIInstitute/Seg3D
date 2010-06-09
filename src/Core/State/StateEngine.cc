@@ -66,6 +66,54 @@ StateEngine::~StateEngine()
   delete this->private_;
 }
 
+bool  StateEngine::load_session_states()
+{
+  state_handler_map_type::iterator it = this->private_->state_handler_map_.begin();
+  state_handler_map_type::iterator it_end = this->private_->state_handler_map_.end();
+
+  std::vector< std::string > handler_order;
+  handler_order.resize( 3 );
+  while( it != it_end )
+  {
+    if( ( ( *it ).second->get_save_priority() ) != -1 )
+    {
+      handler_order[ ( *it ).second->get_save_priority() ] = ( *it ).first;
+    }
+    ++it;
+  }
+  for( int i = 0; i < 3; ++i )
+  {
+    if( !( * ( this->private_->state_handler_map_.find( handler_order[ i ] ) ) ).second->
+        load_states( this->session_states_ ) )
+    {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+
+bool StateEngine::populate_session_vector()
+{
+  this->session_states_.clear();
+
+  state_handler_map_type::iterator it = this->private_->state_handler_map_.begin();
+  state_handler_map_type::iterator it_end = this->private_->state_handler_map_.end();
+
+  while( it != it_end )
+  {
+    if( ( ( *it ).second->get_save_priority() ) != -1 )
+    {
+      if( !( *it ).second->populate_session_states() )
+        return false;
+    }
+    ++it;
+  }
+  return true;
+}
+
+
 bool StateEngine::get_state( const std::string& state_id, StateBaseHandle& state )
 {
   lock_type lock( get_mutex() );

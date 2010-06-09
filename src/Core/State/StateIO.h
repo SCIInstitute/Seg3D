@@ -26,43 +26,37 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <Core/Application/Application.h>
-#include <Core/Interface/Interface.h>
+#ifndef CORE_STATE_STATEIO_H
+#define CORE_STATE_STATEIO_H
 
-#include <Application/InterfaceManager/InterfaceManager.h>
+// Boost includes
+#include <boost/filesystem.hpp>
 
-namespace Seg3D
+namespace Core
 {
 
-CORE_SINGLETON_IMPLEMENTATION( InterfaceManager );
-
-InterfaceManager::InterfaceManager() :
-  StateHandler( "interface", false, 2 )
+class StateIO
 {
-  // set up state variables
-  add_state( "fullscreen", full_screen_state_, false );
-}
 
-InterfaceManager::~InterfaceManager()
-{
-  disconnect_all();
-}
+private:
+  StateIO();
 
-void InterfaceManager::add_windowid( const std::string& windowid )
-{
-  std::string lower_windowid = Core::StringToLower( windowid );
-  boost::unique_lock< boost::mutex > lock( windowid_list_mutex_ );
-  if ( windowid_list_.find( lower_windowid ) == windowid_list_.end() )
-  {
-    windowid_list_.insert( lower_windowid );
-  }
-}
+public:
+  virtual ~StateIO();
 
-bool InterfaceManager::is_windowid( const std::string& windowid )
-{
-  std::string lower_windowid = Core::StringToLower( windowid );
-  boost::unique_lock< boost::mutex > lock( windowid_list_mutex_ );
-  return ( windowid_list_.find( lower_windowid ) != windowid_list_.end() );
-}
+public:
 
-} // end namespace Seg3D
+  // EXPORT_TO_FILE:
+  // This function when called will export the contents of the vector of strings to an xml file
+  static bool export_to_file( boost::filesystem::path path, std::vector< std::string >& state_list );
+
+  // IMPORT_FROM_FILE:
+  // This function when called, imports the contents of the xml file at the path specified
+  static bool import_from_file( boost::filesystem::path path, std::vector< std::string >& state_list );
+
+};
+
+
+} // end namespace Core
+
+#endif //CORE_STATE_STATEIO_H

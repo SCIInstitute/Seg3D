@@ -47,8 +47,6 @@ ProjectManager::ProjectManager() :
   StateHandler( "projectmanager", false )
 { 
   Core::Application::Instance()->get_config_directory( this->local_projectmanager_path_ );
-  //this->local_projectmanager_path_ = this->local_projectmanager_path_ / 
-  //  "seg3d2_project_settings.cfg";
   
   std::vector< std::string> projects;
   projects.resize( 20, "" );
@@ -56,7 +54,11 @@ ProjectManager::ProjectManager() :
   add_state( "recent_projects", this->recent_projects_state_, projects );
   add_state( "current_project_path", this->current_project_path_state_, 
     PreferencesManager::Instance()->project_path_state_->get() );
-  
+  add_state( "default_project_name_counter", this->default_project_name_counter_state_, 0 );
+  add_state( "auto_save", auto_save_state_,
+    PreferencesManager::Instance()->auto_save_state_->get() );
+
+
   try
   {
     boost::filesystem::path path = complete( boost::filesystem::path( this->
@@ -76,13 +78,20 @@ ProjectManager::ProjectManager() :
   // Connect the signals from the LayerManager to the GUI
   this->add_connection( this->current_project_->project_name_state_->value_changed_signal_.connect( 
     boost::bind( &ProjectManager::rename_project_folder, this, _1, _2 ) ) );
-  
-  
-
 }
 
 ProjectManager::~ProjectManager()
 {
+}
+
+void ProjectManager::initialize()
+{
+  import_states( this->local_projectmanager_path_, "projectmanager" );
+}
+  
+void ProjectManager::save_projectmanager_state()
+{
+  export_states( this->local_projectmanager_path_, "projectmanager" );
 }
   
 void ProjectManager::rename_project_folder( const std::string& new_name, Core::ActionSource source )
@@ -107,7 +116,8 @@ void ProjectManager::rename_project_folder( const std::string& new_name, Core::A
   try
   {
     boost::filesystem::rename( ( path / old_name ), ( path / new_name ) );
-    boost::filesystem::rename( ( path / new_name / old_name ), ( path / new_name / new_name ) );
+    boost::filesystem::rename( ( path / new_name / ( old_name + ".xml" ) ), 
+      ( path / new_name / ( new_name + ".xml" ) ) );
   }
   catch ( std::exception& e ) 
   {
@@ -131,29 +141,22 @@ void ProjectManager::rename_project_folder( const std::string& new_name, Core::A
   boost::filesystem::path project_path = boost::filesystem::path( 
     current_project_path_state_->get().c_str() );
   project_path = project_path / this->current_project_->project_name_state_->get().c_str();
-  this->current_project_->save_states( project_path, 
-    this->current_project_->project_name_state_->get() );
   
+  this->current_project_->populate_session_states();
   this->add_to_recent_projects( path.string(), new_name );
 
 }
-  
-
-void ProjectManager::initialize()
-{
-  load_states( this->local_projectmanager_path_ / "seg3d2_project_settings.cfg" );
-}
-  
-void ProjectManager::save_projectmanager_state()
-{
-  save_states( this->local_projectmanager_path_, "seg3d2_project_settings.cfg" );
-}
-
 
 void ProjectManager::new_project( const std::string& project_name, bool consolidate )
 {
   if( create_project_folders( project_name ) )
   {
+    if( project_name.compare( 0, 11, "New Project" ) == 0 )
+    {
+      this->default_project_name_counter_state_->set( 
+        this->default_project_name_counter_state_->get() + 1 ); 
+    }
+
     this->current_project_->project_name_state_->set( project_name );
     this->current_project_->auto_consolidate_files_state_->set( consolidate );
     this->add_to_recent_projects( this->current_project_path_state_->export_to_string(),
@@ -162,9 +165,6 @@ void ProjectManager::new_project( const std::string& project_name, bool consolid
     this->save_project_session();
   }
 }
-  
-
-  
   
 void ProjectManager::open_project( const std::string& project_path, const std::string& project_name )
 {
@@ -183,7 +183,7 @@ void ProjectManager::save_project()
     boost::filesystem::path project_path = boost::filesystem::path( 
       current_project_path_state_->get().c_str() );
     project_path = project_path / this->current_project_->project_name_state_->get().c_str();
-    this->current_project_->save_states( project_path, 
+    this->current_project_->export_states( project_path, 
       this->current_project_->project_name_state_->get() );
   }
 }
@@ -196,15 +196,7 @@ void ProjectManager::save_project_as()
   
 bool ProjectManager::save_project_session()
 {
-  time_t rawtime;
-  struct tm * timeinfo;
-  char time_buffer [80];
-  
-  time ( &rawtime );
-  timeinfo = localtime ( &rawtime );
-  
-  strftime ( time_buffer, 80, "%Y-%b%d-%H-%M-%S", timeinfo );
-  std::string current_time_stamp = time_buffer;
+  std::string current_time_stamp = this->get_timestamp();
   
   boost::filesystem::path path = complete( boost::filesystem::path( this->
     current_project_path_state_->get().c_str(), boost::filesystem::native ) );
@@ -218,6 +210,8 @@ bool ProjectManager::save_project_session()
   {
     return false;
   }
+  this->add_to_recent_projects( this->current_project_path_state_->export_to_string(),
+    this->current_project_->project_name_state_->get() );
   
   return this->current_project_->save_session( ( path /
     this->current_project_->project_name_state_->get() ), current_time_stamp );
@@ -237,22 +231,31 @@ bool ProjectManager::load_project_session( int session_index )
 void ProjectManager::add_to_recent_projects( const std::string& project_path, 
   const std::string& project_name )
 {
+
+
   std::vector< std::string > temp_projects_vector = this->recent_projects_state_->get();
   
   // first we are going to remove this project from the list if its in there.
   size_t projects_vector_size = temp_projects_vector.size();
   for( size_t i = 0; i < projects_vector_size; ++i )
   {
-    if( temp_projects_vector[ i ] == ( project_path + "|" + project_name ) )
+    if( temp_projects_vector[ i ] != "" )
     {
-      temp_projects_vector.erase( temp_projects_vector.begin() + i );
-      projects_vector_size--;
+      //if( temp_projects_vector[ i ] == ( project_path + "|" + project_name ) )
+      if( ( ( Core::SplitString( temp_projects_vector[ i ], "|" ) )[ 0 ] + "|" +
+        ( Core::SplitString( temp_projects_vector[ i ], "|" ) )[ 1 ] )
+        == ( project_path + "|" + project_name ) )
+      {
+        temp_projects_vector.erase( temp_projects_vector.begin() + i );
+        projects_vector_size--;
+        i--;
+      }
     }
   }
   
   // now we add id to the beginning of the list
   temp_projects_vector.insert( temp_projects_vector.begin(), 
-    ( project_path + "|" + project_name ) );
+    ( project_path + "|" + project_name + "|" + this->get_timestamp() ) );
   temp_projects_vector.resize(20);
   
   this->recent_projects_state_->set( temp_projects_vector );
@@ -296,5 +299,19 @@ bool ProjectManager::create_project_folders( const std::string& project_name )
   
   return true;
 }
+
+std::string ProjectManager::get_timestamp()
+{
+  time_t rawtime;
+  struct tm * timeinfo;
+  char time_buffer [80];
+  
+  time ( &rawtime );
+  timeinfo = localtime ( &rawtime );
+  
+  strftime ( time_buffer, 80, "%Y-%b%d-%H-%M-%S", timeinfo );
+  std::string current_time_stamp = time_buffer;
+  return current_time_stamp;
+ }
 
 } // end namespace seg3D

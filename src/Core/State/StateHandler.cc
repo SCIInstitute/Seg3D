@@ -31,6 +31,7 @@
 
 #include <Core/State/StateHandler.h>
 #include <Core/State/StateEngine.h>
+#include <Core/State/StateIO.h>
 #include <Core/Application/Application.h>
 
 namespace Core
@@ -47,12 +48,14 @@ public:
   // The number at the end of the state handler id
   size_t statehandler_id_number_;
 
+  int save_priority_;
+
   // The database with the actual states 
   state_map_type state_map_;
 };
 
 
-StateHandler::StateHandler( const std::string& type_str, bool auto_id )
+StateHandler::StateHandler( const std::string& type_str, bool auto_id,  int save_priority )
 {
   this->private_ = new StateHandlerPrivate;
   this->private_->statehandler_id_ = StateEngine::Instance()->
@@ -65,6 +68,8 @@ StateHandler::StateHandler( const std::string& type_str, bool auto_id )
   
   ImportFromString( this->private_->statehandler_id_.substr( loc ), 
     this->private_->statehandler_id_number_ );
+
+  this->private_->save_priority_ = save_priority;
 }
 
 StateHandler::~StateHandler()
@@ -105,6 +110,11 @@ size_t StateHandler::get_statehandler_id_number() const
   return ( this->private_->statehandler_id_number_ );
 }
 
+int StateHandler::get_save_priority()
+{
+  return this->private_->save_priority_;
+}
+
 
 std::string StateHandler::create_state_id( const std::string& key ) const
 {
@@ -136,7 +146,7 @@ bool StateHandler::get_state( const size_t idx, StateBaseHandle& state )
   return true;
 }
 
-bool StateHandler::save_states( boost::filesystem::path path, const std::string& name )
+bool StateHandler::populate_session_states()
 {
   if( !pre_save_states() )
     return false;
@@ -144,72 +154,84 @@ bool StateHandler::save_states( boost::filesystem::path path, const std::string&
   state_map_type::iterator it = this->private_->state_map_.begin();
   state_map_type::iterator it_end = this->private_->state_map_.end();
 
-  // XML declaration and version number
-  TiXmlDocument doc;  
-  TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "", "" );  
-  doc.LinkEndChild( decl );  
-
-  // Set Seg3D2 as our root
-  TiXmlElement * root = new TiXmlElement( "Seg3D2" );  
-  doc.LinkEndChild( root );  
- 
-  // We will use our statehandler_id as the parent for its state values
-  TiXmlElement* preferences = new TiXmlElement( this->private_->statehandler_id_.c_str() );  
-  root->LinkEndChild( preferences );  
-
-  TiXmlElement* state_value;
+  // Like in XML which we are mimicking we surround the StateHandler's state variables
+  // with its statehandler_id
+  StateEngine::Instance()->session_states_.push_back( this->private_->statehandler_id_ );
 
   while ( it != it_end )
   {
-    // Here we will add all the state values 
-    state_value = new TiXmlElement( ( *it ).second->stateid().c_str() );
-    state_value->LinkEndChild( new TiXmlText( ( *it ).second->export_to_string().c_str() ));  
-    preferences->LinkEndChild( state_value );
+
+    StateEngine::Instance()->session_states_.push_back( ( *it ).second->stateid() + "*"
+      + ( *it ).second->export_to_string() );
     ++it;
   }
-
-  // Finally we will save our XML to the specified file
-  doc.SaveFile( ( path / name ).string().c_str() );
   
-  return post_save_states( path );
+  // Like in XML which we are mimicking we surround the StateHandler's state variables
+  // with its statehandler_id
+  StateEngine::Instance()->session_states_.push_back( this->private_->statehandler_id_ );
+  
+  return post_save_states();
 }
 
 
-bool StateHandler::load_states( boost::filesystem::path path )
+bool StateHandler::load_states( std::vector< std::string >& states_vector )
 {
   if( !pre_load_states() ) return false;
 
-  // We will load in the file from the specified path and exit if the path is invalid
-  TiXmlDocument doc( path.string().c_str() );
-  if ( !doc.LoadFile() ) return false;
-
-  TiXmlHandle hDoc( &doc );
-  TiXmlElement* state_values;
-  TiXmlHandle hRoot(0);
-
-  // We should have a valid root if not we will exit
+  for( int i = 0; i < static_cast< int >( states_vector.size() ); ++i )
   {
-    state_values = hDoc.FirstChildElement().Element();
-    if ( !state_values ) return false;
-    hRoot = TiXmlHandle( state_values );
-  }
-
-  // Now we are expecting to get the proper statehandler_id_
-  {
-    state_values = hRoot.FirstChild( this->private_->
-      statehandler_id_.c_str() ).FirstChild().Element();
-
-    for( ; state_values; state_values = state_values->NextSiblingElement() )
-    {
-      // Finally we import the actual state values from the XML and import them
-      std::string state_value_name = std::string( state_values->Value() );
-      std::string state_value_value = std::string( state_values->GetText() );
-      if( ( state_value_name != "" ) && ( state_value_value != "" ) )
-        private_->state_map_[ state_value_name ]->import_from_string( state_value_value );
+    if( states_vector[ i ] == this->private_->statehandler_id_ )
+    { 
+      i++;
+      std::vector< std::string > state_value_as_string_vector; 
+      while( states_vector[ i ] != this->private_->statehandler_id_ )
+      {
+        state_value_as_string_vector = 
+          SplitString( states_vector[ i ], "*" );
+        if( ( state_value_as_string_vector[ 0 ] != "" ) && 
+          ( state_value_as_string_vector[ 1 ] != "" ) )
+        {
+          private_->state_map_[ state_value_as_string_vector[ 0 ] ]->
+            import_from_string( state_value_as_string_vector[ 1 ] );
+        }
+        else
+        {
+          return false;
+        }
+        i++;
+      }
     }
   }
 
   return post_load_states();
+}
+
+bool StateHandler::import_states( boost::filesystem::path path, const std::string& name )
+{
+  std::vector< std::string > state_values;
+  if( Core::StateIO::import_from_file( ( path / ( name ) ), state_values ) )
+    return this->load_states( state_values );
+  else
+    return false;
+}
+
+bool StateHandler::export_states( boost::filesystem::path path, const std::string& name )
+{
+
+  state_map_type::iterator it = this->private_->state_map_.begin();
+  state_map_type::iterator it_end = this->private_->state_map_.end();
+  std::vector< std::string > state_values;
+  
+  state_values.push_back( this->private_->statehandler_id_ );
+  while ( it != it_end )
+  {
+    state_values.push_back( ( *it ).second->stateid() + "*"
+      + ( *it ).second->export_to_string() );
+    ++it;
+  }
+  state_values.push_back( this->private_->statehandler_id_ );
+
+  return Core::StateIO::export_to_file( ( path / ( name ) ), state_values );
 }
 
 bool StateHandler::pre_load_states()
@@ -230,7 +252,7 @@ bool StateHandler::pre_save_states()
   return true;
 }
 
-bool StateHandler::post_save_states( boost::filesystem::path path )
+bool StateHandler::post_save_states()
 {
   // Do nothing.
   return true;
