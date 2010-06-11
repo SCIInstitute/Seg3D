@@ -43,6 +43,14 @@
 #include <Core/Geometry/Vector.h>
 #include <Core/Math/MathFunctions.h>
 
+#ifdef max
+#undef max
+#endif
+
+#ifdef min
+#undef min
+#endif
+
 namespace Core
 {
 

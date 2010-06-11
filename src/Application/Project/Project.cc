@@ -103,6 +103,17 @@ bool Project::save_session( boost::filesystem::path& project_path, const std::st
 void Project::add_session_to_list( const std::string& session_path_and_name )
 {
   std::vector< std::string > temp_sessions_vector = this->sessions_state_->get();
+  int temp_sessions_size = static_cast< int >( temp_sessions_vector.size() );
+  
+  for( int i = 0; i < temp_sessions_size; ++i )
+  {
+    if( temp_sessions_vector[ i ] == session_path_and_name )
+    {
+      temp_sessions_vector.erase( temp_sessions_vector.begin() + i );
+      temp_sessions_size--;
+      i--;
+    }
+  }
   temp_sessions_vector.insert( temp_sessions_vector.begin(), session_path_and_name );
   this->sessions_state_->set( temp_sessions_vector );
 }

@@ -91,6 +91,7 @@ void PreferencesManager::initialize_states()
   add_state( "considate_project", considate_project_state_, false );
   add_state( "full_screen_on_startup", full_screen_on_startup_state_, false );
   add_state( "auto_save", auto_save_state_, true );
+  add_state( "auto_save_timer", auto_save_timer_state_, 5 , 5, 60, 1 );
   add_state( "smart_save", smart_save_state_, true );
   
   //Viewer Preferences

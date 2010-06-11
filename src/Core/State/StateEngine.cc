@@ -57,6 +57,7 @@ public:
 CORE_SINGLETON_IMPLEMENTATION( StateEngine );
 
 StateEngine::StateEngine()
+   : block_signals_( false )
 {
   this->private_ = new StateEnginePrivate;
 }

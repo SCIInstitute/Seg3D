@@ -115,7 +115,7 @@ Core::ActionHandle ActionImportLayer::Create( const std::string& filename,
   
   // Set action parameters
   action->filename_.value() = filename;
-  action->mode_.value() = mode;
+  action->mode_.value()   = mode;
   action->importer_.value() = importer;
   
   // Post the new action

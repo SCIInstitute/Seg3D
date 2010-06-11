@@ -176,7 +176,10 @@ bool StateHandler::populate_session_states()
 
 bool StateHandler::load_states( std::vector< std::string >& states_vector )
 {
+  
   if( !pre_load_states() ) return false;
+  
+  StateEngine::Instance()->block_signals( true );
 
   for( int i = 0; i < static_cast< int >( states_vector.size() ); ++i )
   {
@@ -202,8 +205,10 @@ bool StateHandler::load_states( std::vector< std::string >& states_vector )
       }
     }
   }
+  StateEngine::Instance()->block_signals( false );
 
   return post_load_states();
+
 }
 
 bool StateHandler::import_states( boost::filesystem::path path, const std::string& name )
@@ -262,6 +267,7 @@ void StateHandler::handle_state_changed()
 {
   // Trigger the signal in the state engine
   CORE_LOG_DEBUG("Triggering state changed signal");
+
   StateEngine::Instance()->state_changed_signal_();
   
   // Call the local function of this state engine that handles the specifics of the derived

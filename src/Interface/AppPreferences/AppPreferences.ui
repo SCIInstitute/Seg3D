@@ -372,22 +372,6 @@ border: 1px solid gray;
                    <property name="margin">
                     <number>2</number>
                    </property>
-                   <item>
-                    <widget class="QSlider" name="horizontalSlider">
-                     <property name="minimum">
-                      <number>5</number>
-                     </property>
-                     <property name="maximum">
-                      <number>60</number>
-                     </property>
-                     <property name="orientation">
-                      <enum>Qt::Horizontal</enum>
-                     </property>
-                     <property name="tickPosition">
-                      <enum>QSlider::TicksBelow</enum>
-                     </property>
-                    </widget>
-                   </item>
                   </layout>
                  </widget>
                 </item>

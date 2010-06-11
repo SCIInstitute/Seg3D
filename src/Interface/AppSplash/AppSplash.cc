@@ -75,7 +75,8 @@ AppSplash::AppSplash( QWidget *parent ) :
   connect( this->private_->ui_.recent_project_listwidget_, SIGNAL( itemPressed( QListWidgetItem* ) ),
     this, SLOT( enable_load_recent_button( QListWidgetItem* ) ) );  
 
-  connect( this->private_->ui_.recent_project_listwidget_, SIGNAL( itemDoubleClicked ( QListWidgetItem* ) ),
+  connect( this->private_->ui_.recent_project_listwidget_, 
+    SIGNAL( itemDoubleClicked ( QListWidgetItem* ) ),
     this, SLOT( call_open_recent( QListWidgetItem* ) ) ); 
 
 }
@@ -109,8 +110,14 @@ void AppSplash::open_recent()
   {
     for( size_t i = 0; i < this->recent_project_list_.size(); ++i )
     {
-      if( QString::fromStdString( ( Core::SplitString( this->recent_project_list_[ i ], "|" ) )[ 1 ] ) == 
-        this->private_->ui_.recent_project_listwidget_->currentItem()->text() )
+      std::string recent_project = ( Core::SplitString( 
+        this->recent_project_list_[ i ], "|" ) )[ 1 ];
+      std::string list_item = ( this->private_->ui_.recent_project_listwidget_->
+        currentItem()->text() ).toStdString();
+
+      list_item = Core::SplitString( list_item, "  -  " )[ 0 ];
+      
+      if( recent_project == list_item )
       {
         ProjectManager::Instance()->open_project( ( Core::SplitString( 
         this->recent_project_list_[ i ], "|" ) )[ 0 ], 

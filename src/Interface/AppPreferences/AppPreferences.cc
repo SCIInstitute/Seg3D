@@ -46,6 +46,7 @@ class AppPreferencesPrivate
 public:
     Ui::AppPreferences ui_;
   QtUtils::QtSliderDoubleCombo* opacity_adjuster_;
+  QtUtils::QtSliderIntCombo* auto_save_timer_adjuster_;
   
   //QVector< ColorButton* > color_buttons_;
   QButtonGroup* color_button_group_;
@@ -89,9 +90,13 @@ void AppPreferences::change_project_directory()
   }
 }
 
-
 void AppPreferences::setup_general_prefs()
 {
+
+  this->private_->auto_save_timer_adjuster_ = new QtUtils::QtSliderIntCombo( this );
+  this->private_->ui_.horizontalLayout_13->addWidget( this->private_->auto_save_timer_adjuster_ );
+  this->private_->auto_save_timer_adjuster_->setObjectName( QString::fromUtf8( "auto_save_timer_adjuster_" ) );
+
   //Set Layers Preferences
   this->project_directory_.setPath( QString::fromStdString( PreferencesManager::Instance()->
     project_path_state_->export_to_string() ) );
@@ -106,8 +111,6 @@ void AppPreferences::setup_general_prefs()
   connect( this->private_->ui_.change_directory_button_, SIGNAL( clicked() ), 
     this, SLOT( change_project_directory() ) );
 
-  
-    
   QtUtils::QtBridge::Connect( this->private_->ui_.consolidate_project_checkbox_, 
     PreferencesManager::Instance()->considate_project_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.full_screen_on_startup_checkbox_, 
@@ -116,6 +119,8 @@ void AppPreferences::setup_general_prefs()
     PreferencesManager::Instance()->auto_save_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.smart_save_checkbox_,
     PreferencesManager::Instance()->smart_save_state_ );
+  QtUtils::QtBridge::Connect( this->private_->auto_save_timer_adjuster_,
+    PreferencesManager::Instance()->auto_save_timer_state_ );
 }
 
 void AppPreferences::setup_layer_prefs()

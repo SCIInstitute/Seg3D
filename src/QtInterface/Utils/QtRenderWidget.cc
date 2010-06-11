@@ -41,7 +41,7 @@
 namespace QtUtils
 {
 
-class QtRenderWidgetPrivate
+class QtRenderWidgetPrivate : public QObject
 {
 
 public:
@@ -49,7 +49,9 @@ public:
   Core::MouseHistory mouse_history_;
   QtRenderWidget* render_widget_;
 
-  void update_display();
+  typedef QPointer< QtRenderWidgetPrivate > qpointer_type;
+  
+  static void update_display( qpointer_type qpointer );
 };
 
 QtRenderWidget::QtRenderWidget( const QGLFormat& format, QWidget* parent, QGLWidget* share, 
@@ -72,15 +74,15 @@ QtRenderWidget::~QtRenderWidget()
   this->disconnect_all();
 }
 
-void QtRenderWidgetPrivate::update_display()
+void QtRenderWidgetPrivate::update_display( qpointer_type qpointer )
 {
   if ( !Core::Interface::IsInterfaceThread() )
   {
-    Core::Interface::PostEvent( boost::bind( &QtRenderWidgetPrivate::update_display, this ) );
+    Core::Interface::PostEvent( boost::bind( &QtRenderWidgetPrivate::update_display, qpointer ) );
     return;
   }
 
-  this->render_widget_->updateGL();
+  qpointer->render_widget_->updateGL();
 }
 
 void QtRenderWidget::initializeGL()
@@ -96,8 +98,10 @@ void QtRenderWidget::initializeGL()
       this->private_->viewer_->get_renderer()->initialize();
     }
 
+    QtRenderWidgetPrivate::qpointer_type render_widget( this->private_.get() );
+
     this->add_connection( this->private_->viewer_->update_display_signal_.connect(
-      boost::bind( &QtRenderWidgetPrivate::update_display, this->private_.get() ) ) );
+      boost::bind( &QtRenderWidgetPrivate::update_display, render_widget ) ) );
   }
 }
 

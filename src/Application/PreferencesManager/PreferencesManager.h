@@ -71,6 +71,7 @@ public:
   Core::StateBoolHandle considate_project_state_;
   Core::StateBoolHandle full_screen_on_startup_state_;
   Core::StateBoolHandle auto_save_state_;
+  Core::StateRangedIntHandle auto_save_timer_state_;
   Core::StateBoolHandle smart_save_state_;
   
   //Viewers Preferences

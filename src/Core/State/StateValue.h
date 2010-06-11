@@ -161,6 +161,9 @@ public:
   // to enforce a constraint from another action.
   bool set( const T& value, Core::ActionSource source = Core::ActionSource::NONE_E )
   {
+    if( StateEngine::Instance()->is_blocked() )
+      return false;
+
     CORE_LOG_DEBUG(std::string("Set Value ")+ stateid() +
       std::string(" ") + Core::ExportToString(value));
 

@@ -420,10 +420,10 @@ bool ViewerManager::post_load_states()
     if( ( viewers_vector[ i ] != "]" ) && ( viewers_vector[ i ] != "\0" ) )
     {
       // TODO: Need to implement signal blocking before we can load the viewers
-      //if( !( viewers_[ i ] )->load_states( Core::StateEngine::Instance()->session_states_ ) )
-      //{
-      //  return false;
-      //}
+      if( !( viewers_[ i ] )->load_states( Core::StateEngine::Instance()->session_states_ ) )
+      {
+        return false;
+      }
     }
   }
   return true;

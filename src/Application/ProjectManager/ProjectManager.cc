@@ -32,6 +32,8 @@
 // Boost includes
 #include <boost/lexical_cast.hpp>
 
+
+
 // Application includes
 #include <Application/ProjectManager/ProjectManager.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
@@ -44,7 +46,8 @@ namespace Seg3D
 CORE_SINGLETON_IMPLEMENTATION( ProjectManager );
 
 ProjectManager::ProjectManager() :
-  StateHandler( "projectmanager", false )
+  StateHandler( "projectmanager", false ),
+  auto_save_timer_( 10 )
 { 
   Core::Application::Instance()->get_config_directory( this->local_projectmanager_path_ );
   
@@ -57,7 +60,6 @@ ProjectManager::ProjectManager() :
   add_state( "default_project_name_counter", this->default_project_name_counter_state_, 0 );
   add_state( "auto_save", auto_save_state_,
     PreferencesManager::Instance()->auto_save_state_->get() );
-
 
   try
   {
@@ -78,6 +80,12 @@ ProjectManager::ProjectManager() :
   // Connect the signals from the LayerManager to the GUI
   this->add_connection( this->current_project_->project_name_state_->value_changed_signal_.connect( 
     boost::bind( &ProjectManager::rename_project_folder, this, _1, _2 ) ) );
+
+  this->add_connection( PreferencesManager::Instance()->auto_save_timer_state_->
+    value_changed_signal_.connect( boost::bind( 
+    &ProjectManager::set_auto_save_timer, this, _1, _2 ) ) );
+
+/*  this->timer_ = new boost::asio::deadline_timer( this->io_ );*/
 }
 
 ProjectManager::~ProjectManager()
@@ -96,7 +104,8 @@ void ProjectManager::save_projectmanager_state()
   
 void ProjectManager::rename_project_folder( const std::string& new_name, Core::ActionSource source )
 {
-  std::vector< std::string > old_name_vector = Core::SplitString( this->recent_projects_state_->get()[ 0 ], "|" );
+  std::vector< std::string > old_name_vector = 
+    Core::SplitString( this->recent_projects_state_->get()[ 0 ], "|" );
 
   if( old_name_vector.size() < 2 )
     return;
@@ -176,9 +185,9 @@ void ProjectManager::open_project( const std::string& project_path, const std::s
   this->add_to_recent_projects( project_path, project_name );
 }
   
-void ProjectManager::save_project()
+void ProjectManager::save_project(  bool autosave  )
 {
-  if( this->save_project_session() )
+  if( this->save_project_session( autosave ) )
   {
     boost::filesystem::path project_path = boost::filesystem::path( 
       current_project_path_state_->get().c_str() );
@@ -186,6 +195,8 @@ void ProjectManager::save_project()
     this->current_project_->export_states( project_path, 
       this->current_project_->project_name_state_->get() );
   }
+
+  this->start_auto_save_timer();
 }
   
   
@@ -194,9 +205,13 @@ void ProjectManager::save_project_as()
     
 }
   
-bool ProjectManager::save_project_session()
+bool ProjectManager::save_project_session( bool autosave )
 {
-  std::string current_time_stamp = this->get_timestamp();
+  std::string session_name;
+  if( autosave )
+    session_name = "autosave";
+  else
+    session_name = this->get_timestamp();
   
   boost::filesystem::path path = complete( boost::filesystem::path( this->
     current_project_path_state_->get().c_str(), boost::filesystem::native ) );
@@ -204,7 +219,7 @@ bool ProjectManager::save_project_session()
   try // to create a project session folder
   {
     boost::filesystem::create_directory( path / this->current_project_->project_name_state_->
-      get() / "sessions" / current_time_stamp );
+      get() / "sessions" / session_name );
   }
   catch ( std::exception& e ) // any errors that we might get thrown
   {
@@ -214,7 +229,7 @@ bool ProjectManager::save_project_session()
     this->current_project_->project_name_state_->get() );
   
   return this->current_project_->save_session( ( path /
-    this->current_project_->project_name_state_->get() ), current_time_stamp );
+    this->current_project_->project_name_state_->get() ), session_name );
 }
   
 
@@ -231,7 +246,6 @@ bool ProjectManager::load_project_session( int session_index )
 void ProjectManager::add_to_recent_projects( const std::string& project_path, 
   const std::string& project_name )
 {
-
 
   std::vector< std::string > temp_projects_vector = this->recent_projects_state_->get();
   
@@ -313,5 +327,22 @@ std::string ProjectManager::get_timestamp()
   std::string current_time_stamp = time_buffer;
   return current_time_stamp;
  }
+
+void ProjectManager::set_auto_save_timer( int timeout, Core::ActionSource source )
+{
+  this->auto_save_timer_ = timeout * 60;
+}
+
+
+void ProjectManager::start_auto_save_timer()
+{
+  //boost::asio::io_service io_;
+//  this->timer_->cancel();
+//  this->timer_->expires_from_now(boost::posix_time::seconds( 10 ));
+//  timer_->async_wait( boost::bind( &ProjectManager::save_project, this, true ) );
+//  this->io_.run();
+}
+
+
 
 } // end namespace seg3D

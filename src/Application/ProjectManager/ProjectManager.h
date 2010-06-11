@@ -39,6 +39,8 @@
 #include <boost/filesystem.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
+#include <boost/asio.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 // Core includes
 #include <Core/Utils/StringUtil.h>
@@ -80,7 +82,7 @@ public:
   
   // SAVE_PROJECT:
   // this function saves the values in current_project_ to the current save location
-  void save_project();
+  void save_project( bool autosave = false );
   
   // SAVE_PROJECT_AS:
   // this function saves the valuse in current_project_ to the desired save location
@@ -92,7 +94,7 @@ public:
   
   // SAVE_PROJECT_SESSION:
   // this function saves the current session to disk
-  bool save_project_session(); 
+  bool save_project_session( bool autosave = false ); 
   
   // LOAD_PROJECT_SESSION:
   // this function saves the current session to disk
@@ -104,6 +106,7 @@ public:
   Core::StateIntHandle default_project_name_counter_state_;
   Core::StateBoolHandle auto_save_state_;
   ProjectHandle current_project_;
+  int autosave_countdown_;
   
 private:
   // INITIALIZE:
@@ -122,14 +125,24 @@ private:
   // this function is triggered when a user changes the folder name
   void rename_project_folder( const std::string& new_name, Core::ActionSource source );
 
+  // SET_AUTO_SAVE_TIMER
+  // this function is called whenever the value of the autosave time is changed in the Preferences
+  // manager.
+  void set_auto_save_timer( int timeout, Core::ActionSource source );
+
+  void start_auto_save_timer();
+
   // GET_TIMESTAMP:
   // this function is called when you need a timestamp as a string
   std::string get_timestamp();
 
 private:
-  
+  int auto_save_timer_;
   std::vector< Core::Color > project_colors_;
   boost::filesystem::path local_projectmanager_path_;
+  boost::asio::io_service io_;
+  boost::asio::deadline_timer* timer_;
+
 
 };
 
