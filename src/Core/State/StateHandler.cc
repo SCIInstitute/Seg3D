@@ -179,7 +179,7 @@ bool StateHandler::load_states( std::vector< std::string >& states_vector )
   
   if( !pre_load_states() ) return false;
   
-  StateEngine::Instance()->block_signals( true );
+  //StateEngine::Instance()->block_signals( true );
 
   for( int i = 0; i < static_cast< int >( states_vector.size() ); ++i )
   {
@@ -205,7 +205,7 @@ bool StateHandler::load_states( std::vector< std::string >& states_vector )
       }
     }
   }
-  StateEngine::Instance()->block_signals( false );
+  //StateEngine::Instance()->block_signals( false );
 
   return post_load_states();
 

@@ -53,7 +53,7 @@ Session::~Session()
 
 }
 
-bool Session::initialize_from_file( boost::filesystem::path& path, const std::string& session_name )
+bool Session::initialize_from_file( boost::filesystem::path path, const std::string& session_name )
 {
   // First we make sure the session_states_ vector is empty.
   Core::StateEngine::Instance()->session_states_.clear();
@@ -62,15 +62,13 @@ bool Session::initialize_from_file( boost::filesystem::path& path, const std::st
   if( Core::StateIO::import_from_file( ( path / session_name ), 
     Core::StateEngine::Instance()->session_states_ ) )
   {
-    //InterfaceManager::Instance()->load_states( Core::StateEngine::Instance()->session_states_ );
-    //ViewerManager::Instance()->load_states( Core::StateEngine::Instance()->session_states_ );
     return Core::StateEngine::Instance()->load_session_states();
   }
 
   return false;
 }
   
-bool Session::save_session_settings( boost::filesystem::path& path, const std::string& session_name )
+bool Session::save_session_settings( boost::filesystem::path path, const std::string& session_name )
 {
   if( Core::StateEngine::Instance()->populate_session_vector() )
   {

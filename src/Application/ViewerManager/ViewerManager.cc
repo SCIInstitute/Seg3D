@@ -260,7 +260,7 @@ void ViewerManager::viewer_became_picking_target( size_t viewer_id )
     }
     else
     {
-      assert( false );
+      //assert( false );
     }
   }
 

@@ -80,15 +80,15 @@ public:
 public:
   // INITIALIZE_FROM_FILE:
   // this file initializes the state values for project from the file at the path specified
-  bool initialize_from_file( boost::filesystem::path& project_path, const std::string& project_name );
+  bool initialize_from_file( boost::filesystem::path project_path, const std::string& project_name );
   
   // LOAD_SESSION:
   // this function will be called to load a specific session
-  bool load_session( boost::filesystem::path& project_path, int state_index );
+  bool load_session( boost::filesystem::path project_path, int state_index );
   
   // SAVE_SESSION:
   // this function will be called from the project manager
-  bool save_session( boost::filesystem::path& project_path, const std::string& session_name );
+  bool save_session( boost::filesystem::path project_path, const std::string& session_name );
   
 private:
   // ADD_SESSION_TO_LIST

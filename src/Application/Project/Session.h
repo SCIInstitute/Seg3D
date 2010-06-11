@@ -67,11 +67,11 @@ public:
 public:
   // INITIALIZE_FROM_FILE:
   // this file initializes the state values for Session from the file at the path specified
-  bool initialize_from_file( boost::filesystem::path& path, const std::string& session_name );
+  bool initialize_from_file( boost::filesystem::path path, const std::string& session_name );
   
   // SAVE_CURRENT_STATE:
   // this function will take a snapshot of the current state of the project and save it
-  bool save_session_settings( boost::filesystem::path& path, const std::string& session_name );
+  bool save_session_settings( boost::filesystem::path path, const std::string& session_name );
   
 
 };
