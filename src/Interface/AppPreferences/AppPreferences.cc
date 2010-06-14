@@ -72,12 +72,17 @@ AppPreferences::AppPreferences( QWidget *parent ) :
   // connect the apply button to the save defaults function
   connect( this->private_->ui_.apply_button_, SIGNAL( clicked() ), 
     this, SLOT( save_defaults() ) );
+  
+  connect( this->private_->auto_save_timer_adjuster_, SIGNAL( valueAdjusted( int ) ),
+    this, SLOT( set_timer_label( int ) ) );
 
 }
 
 AppPreferences::~AppPreferences()
 {
 }
+      
+      
 
 void AppPreferences::change_project_directory()
 {
@@ -121,6 +126,8 @@ void AppPreferences::setup_general_prefs()
     PreferencesManager::Instance()->smart_save_state_ );
   QtUtils::QtBridge::Connect( this->private_->auto_save_timer_adjuster_,
     PreferencesManager::Instance()->auto_save_timer_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.compression_combobox_,
+    PreferencesManager::Instance()->compression_state_ );
 }
 
 void AppPreferences::setup_layer_prefs()
@@ -251,6 +258,12 @@ void AppPreferences::save_defaults()
   PreferencesManager::Instance()->save_state();
 }
 
+      
+void AppPreferences::set_timer_label( int time_set )
+{
+  QString time_label = QString::number( time_set ) + QString::fromUtf8(" minutes");
+  this->private_->ui_.frequency_label_->setText( time_label );
+}
 
 
 } // end namespace Seg3D

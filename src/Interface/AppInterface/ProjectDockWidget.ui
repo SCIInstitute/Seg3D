@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>354</width>
-    <height>644</height>
+    <width>258</width>
+    <height>632</height>
    </rect>
   </property>
   <property name="styleSheet">
@@ -215,6 +215,9 @@ QLabel#label{
           </size>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout">
+          <property name="spacing">
+           <number>-1</number>
+          </property>
           <property name="margin">
            <number>0</number>
           </property>
@@ -222,6 +225,13 @@ QLabel#label{
            <widget class="QPushButton" name="load_session_button_">
             <property name="text">
              <string>Load</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="delete_session_button_">
+            <property name="text">
+             <string>Delete</string>
             </property>
            </widget>
           </item>

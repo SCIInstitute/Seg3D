@@ -47,9 +47,6 @@ CORE_SINGLETON_IMPLEMENTATION( ViewerManager );
 
 ViewerManager::ViewerManager() :
   StateHandler( "view", false, 1 ),
-  active_axial_viewer_( -1 ),
-  active_coronal_viewer_( -1 ),
-  active_sagittal_viewer_( -1 ),
   signal_block_count_( 0 )
 {
   // Step (1)
@@ -61,6 +58,10 @@ ViewerManager::ViewerManager() :
 
   std::vector< std::string> viewers;
   this->add_state( "viewers", this->viewers_state_, viewers );
+  
+  this->add_state( "active_axial_viewer", active_axial_viewer_, -1 );
+  this->add_state( "active_coronal_viewer", active_coronal_viewer_, -1 );
+  this->add_state( "active_sagittal_viewer", active_sagittal_viewer_, -1 );
 
   // Step (2)
   // Create the viewers that are part of the application
@@ -173,17 +174,17 @@ void ViewerManager::viewer_mode_changed( size_t viewer_id )
 {
   Core::ScopedCounter signal_block_counter( this->signal_block_count_ );
 
-  if ( this->active_axial_viewer_ == static_cast< int >( viewer_id ) )
+  if ( this->active_axial_viewer_->get() == static_cast< int >( viewer_id ) )
   {
-    this->active_axial_viewer_ = -1;
+    this->active_axial_viewer_->set( -1 );
   }
-  else if ( this->active_coronal_viewer_ == static_cast< int >( viewer_id ) )
+  else if ( this->active_coronal_viewer_->get() == static_cast< int >( viewer_id ) )
   {
-    this->active_coronal_viewer_ = -1;
+    this->active_coronal_viewer_->set( -1 );
   }
-  else if ( this->active_sagittal_viewer_ == static_cast< int >( viewer_id ) )
+  else if ( this->active_sagittal_viewer_->get() == static_cast< int >( viewer_id ) )
   {
-    this->active_sagittal_viewer_ = -1;
+    this->active_sagittal_viewer_->set( -1 );
   }
   
   this->viewers_[ viewer_id ]->is_picking_target_state_->set( false );
@@ -196,17 +197,17 @@ void ViewerManager::viewer_visibility_changed( size_t viewer_id )
 
   if ( !this->viewers_[ viewer_id ]->viewer_visible_state_->get() )
   {
-    if ( this->active_axial_viewer_ == static_cast< int >( viewer_id ) )
+    if ( this->active_axial_viewer_->get() == static_cast< int >( viewer_id ) )
     {
-      this->active_axial_viewer_ = -1;
+      this->active_axial_viewer_->set( -1 );
     }
-    else if ( this->active_coronal_viewer_ == static_cast< int >( viewer_id ) )
+    else if ( this->active_coronal_viewer_->get() == static_cast< int >( viewer_id ) )
     {
-      this->active_coronal_viewer_ = -1;
+      this->active_coronal_viewer_->set( -1 );
     }
-    else if ( this->active_sagittal_viewer_ == static_cast< int >( viewer_id ) )
+    else if ( this->active_sagittal_viewer_->get() == static_cast< int >( viewer_id ) )
     {
-      this->active_sagittal_viewer_ = -1;
+      this->active_sagittal_viewer_->set( -1 );
     }
 
     this->viewers_[ viewer_id ]->is_picking_target_state_->set( false );
@@ -233,30 +234,30 @@ void ViewerManager::viewer_became_picking_target( size_t viewer_id )
 
     if ( viewer->view_mode_state_->get() == Viewer::AXIAL_C )
     {
-      if ( this->active_axial_viewer_ >= 0 )
+      if ( this->active_axial_viewer_->get() >= 0 )
       {
-        assert( this->active_axial_viewer_ != static_cast< int >( viewer_id ) );
-        this->viewers_[ this->active_axial_viewer_ ]->is_picking_target_state_->set( false );
+        assert( this->active_axial_viewer_->get() != static_cast< int >( viewer_id ) );
+        this->viewers_[ this->active_axial_viewer_->get() ]->is_picking_target_state_->set( false );
       }
-      this->active_axial_viewer_ = static_cast< int >( viewer_id );
+      this->active_axial_viewer_->set( static_cast< int >( viewer_id ) );
     }
     else if ( viewer->view_mode_state_->get() == Viewer::CORONAL_C )
     {
-      if ( this->active_coronal_viewer_ >= 0 )
+      if ( this->active_coronal_viewer_->get() >= 0 )
       {
-        assert( this->active_coronal_viewer_ != static_cast< int >( viewer_id ) );
-        this->viewers_[ this->active_coronal_viewer_ ]->is_picking_target_state_->set( false );
+        assert( this->active_coronal_viewer_->get() != static_cast< int >( viewer_id ) );
+        this->viewers_[ this->active_coronal_viewer_->get() ]->is_picking_target_state_->set( false );
       }
-      this->active_coronal_viewer_ = static_cast< int >( viewer_id );
+      this->active_coronal_viewer_->set( static_cast< int >( viewer_id ) );
     }
     else if ( viewer->view_mode_state_->get() == Viewer::SAGITTAL_C )
     {
-      if ( this->active_sagittal_viewer_ >= 0 )
+      if ( this->active_sagittal_viewer_->get() >= 0 )
       {
-        assert( this->active_sagittal_viewer_ != static_cast< int >( viewer_id ) );
-        this->viewers_[ this->active_sagittal_viewer_ ]->is_picking_target_state_->set( false );
+        assert( this->active_sagittal_viewer_->get() != static_cast< int >( viewer_id ) );
+        this->viewers_[ this->active_sagittal_viewer_->get() ]->is_picking_target_state_->set( false );
       }
-      this->active_sagittal_viewer_ = static_cast< int >( viewer_id );
+      this->active_sagittal_viewer_->set( static_cast< int >( viewer_id ) );
     }
     else
     {
@@ -297,25 +298,25 @@ void ViewerManager::update_picking_targets()
     
     if ( viewer->view_mode_state_->get() == Viewer::AXIAL_C )
     {
-      if ( this->active_axial_viewer_ < 0 )
+      if ( this->active_axial_viewer_->get() < 0 )
       {
-        this->active_axial_viewer_ = static_cast< int >( i );
+        this->active_axial_viewer_->set( static_cast< int >( i ) );
         viewer->is_picking_target_state_->set( true );
       }
     }
     else if ( viewer->view_mode_state_->get() == Viewer::CORONAL_C )
     {
-      if ( this->active_coronal_viewer_ < 0 )
+      if ( this->active_coronal_viewer_->get() < 0 )
       {
-        this->active_coronal_viewer_ = static_cast< int >( i );
+        this->active_coronal_viewer_->set( static_cast< int >( i ) );
         viewer->is_picking_target_state_->set( true );
       }
     }
     else if ( viewer->view_mode_state_->get() == Viewer::SAGITTAL_C )
     {
-      if ( this->active_sagittal_viewer_ < 0 )
+      if ( this->active_sagittal_viewer_->get() < 0 )
       {
-        this->active_sagittal_viewer_ = static_cast< int >( i );
+        this->active_sagittal_viewer_->set( static_cast< int >( i ) );
         viewer->is_picking_target_state_->set( true );
       }
     }
@@ -325,28 +326,28 @@ void ViewerManager::update_picking_targets()
 void ViewerManager::pick_point( size_t source_viewer, const Core::Point& pt )
 {
   ViewerHandle src_viewer = this->viewers_[ source_viewer ];
-  if ( this->active_axial_viewer_ >= 0 && 
-    this->active_axial_viewer_ != static_cast< int >( source_viewer ) )
+  if ( this->active_axial_viewer_->get() >= 0 && 
+    this->active_axial_viewer_->get() != static_cast< int >( source_viewer ) )
   {
-    ViewerHandle viewer = this->viewers_[ this->active_axial_viewer_ ];
+    ViewerHandle viewer = this->viewers_[ this->active_axial_viewer_->get() ];
     if ( viewer->view_mode_state_->get() != src_viewer->view_mode_state_->get() )
     {
       viewer->move_slice_to( pt );
     }
   }
-  if ( this->active_coronal_viewer_ >= 0 && 
-    this->active_coronal_viewer_ != static_cast< int >( source_viewer ) )
+  if ( this->active_coronal_viewer_->get() >= 0 && 
+    this->active_coronal_viewer_->get() != static_cast< int >( source_viewer ) )
   {
-    ViewerHandle viewer = this->viewers_[ this->active_coronal_viewer_ ];
+    ViewerHandle viewer = this->viewers_[ this->active_coronal_viewer_->get() ];
     if ( viewer->view_mode_state_->get() != src_viewer->view_mode_state_->get() )
     {
       viewer->move_slice_to( pt );
     }
   }
-  if ( this->active_sagittal_viewer_ >= 0 && 
-    this->active_sagittal_viewer_ != static_cast< int >( source_viewer ) )
+  if ( this->active_sagittal_viewer_->get() >= 0 && 
+    this->active_sagittal_viewer_->get() != static_cast< int >( source_viewer ) )
   {
-    ViewerHandle viewer = this->viewers_[ this->active_sagittal_viewer_ ];
+    ViewerHandle viewer = this->viewers_[ this->active_sagittal_viewer_->get() ];
     if ( viewer->view_mode_state_->get() != src_viewer->view_mode_state_->get() )
     {
       viewer->move_slice_to( pt );

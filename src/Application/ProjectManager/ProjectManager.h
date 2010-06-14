@@ -100,6 +100,10 @@ public:
   // this function saves the current session to disk
   bool load_project_session( int session_index ); 
   
+  // DELETE_PROJECT_SESSION:
+  // this function deletes the current session from disk
+  bool delete_project_session( int session_index ); 
+  
 public:
   Core::StateStringVectorHandle recent_projects_state_;
   Core::StateStringHandle current_project_path_state_;

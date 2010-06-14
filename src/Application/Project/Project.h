@@ -77,6 +77,8 @@ public:
   Core::StateBoolHandle auto_consolidate_files_state_;
   Core::StateStringVectorHandle sessions_state_;
   
+  
+  
 public:
   // INITIALIZE_FROM_FILE:
   // this file initializes the state values for project from the file at the path specified
@@ -87,8 +89,25 @@ public:
   bool load_session( boost::filesystem::path project_path, int state_index );
   
   // SAVE_SESSION:
-  // this function will be called from the project manager
+  // this function will be called from the project manager to save a session
   bool save_session( boost::filesystem::path project_path, const std::string& session_name );
+  
+  // DELETE_SESSION:
+  // this function will be called by the project manager to delete a session
+  bool delete_session( boost::filesystem::path project_path, int state_index );
+  
+  // NAME_IS_SET:
+  // this function is set called to set the name_set_ toggle in the project so it knows if the name
+  // has actually been set.
+  void name_is_set( bool set ){ this->name_set_ = set; }
+  
+  // NAME_STATUS:
+  // this function is called to check the status of the project name.  This is because we get a 
+  // signal that the project name has changed the first time it gets set.  This is a temporary 
+  // stopgap until we can implement signal blocking
+  bool name_status(){ return this->name_set_; }
+
+  
   
 private:
   // ADD_SESSION_TO_LIST
@@ -97,6 +116,7 @@ private:
   
 private:
   SessionHandle current_session_;
+  bool name_set_;
   
 
 };

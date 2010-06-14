@@ -78,13 +78,13 @@ ProjectDockWidget::ProjectDockWidget( QWidget *parent ) :
       this, SLOT( save_project() ) );
     
     connect( this->private_->ui_.load_session_button_, SIGNAL( clicked() ), 
-        this, SLOT( load_session() ) );
+      this, SLOT( load_session() ) );
+    
+    connect( this->private_->ui_.delete_session_button_, SIGNAL( clicked() ),
+      this, SLOT( delete_session() ) );
 
     connect( this->private_->ui_.sessions_list_, SIGNAL( itemDoubleClicked ( QListWidgetItem* ) ),
       this, SLOT( call_load_session( QListWidgetItem* ) ) );
-    
-    
-    
   
   }
 }
@@ -100,6 +100,38 @@ void ProjectDockWidget::save_project()
   ProjectManager::Instance()->save_project();
 }
   
+void ProjectDockWidget::delete_session()
+{ 
+  if( !this->private_->ui_.sessions_list_->currentItem() )
+    return;
+  
+  if( this->private_->ui_.sessions_list_->currentItem()->text() != "" )
+  {
+    QMessageBox message_box;
+    message_box.setText( QString::fromUtf8( "WARNING: You are going to regret this.") );
+    message_box.setInformativeText( QString::fromUtf8( "Are you sure you want to do this?" ) );
+    message_box.setStandardButtons( QMessageBox::Yes | QMessageBox::No );
+    message_box.setDefaultButton( QMessageBox::No );
+    if( message_box.exec() )
+    {
+      std::vector< std::string > sessions = ProjectManager::Instance()->current_project_->
+        sessions_state_->get();
+      
+      for( int i = 0; i < static_cast< int >( sessions.size() ); ++i )
+      {
+        if( QString::fromStdString( ( Core::SplitString( sessions[ i ], "|" ) )[ 1 ] ) == 
+           this->private_->ui_.sessions_list_->currentItem()->text() )
+        {
+          ProjectManager::Instance()->delete_project_session( i );  
+          break;
+        }
+      }
+    }
+  }
+  
+  this->populate_session_list();
+}
+  
 void ProjectDockWidget::load_session()
 {
   if( !this->private_->ui_.sessions_list_->currentItem() )
@@ -107,18 +139,26 @@ void ProjectDockWidget::load_session()
 
   if( this->private_->ui_.sessions_list_->currentItem()->text() != "" )
   {
-    std::vector< std::string > sessions = ProjectManager::Instance()->current_project_->
-    sessions_state_->get();
-    
-    
-    for( int i = 0; i < static_cast< int >( sessions.size() ); ++i )
+    QMessageBox message_box;
+    message_box.setText( QString::fromUtf8( "WARNING: By loading a saved session you will loose"
+      " any unsaved changes.") );
+    message_box.setInformativeText( QString::fromUtf8( "Are you sure you want to do this?" ) );
+    message_box.setStandardButtons( QMessageBox::Yes | QMessageBox::No );
+    message_box.setDefaultButton( QMessageBox::No );
+    if( message_box.exec() )
     {
-      if( QString::fromStdString( ( Core::SplitString( sessions[ i ], "|" ) )[ 1 ] ) == 
-         this->private_->ui_.sessions_list_->currentItem()->text() )
+      std::vector< std::string > sessions = ProjectManager::Instance()->current_project_->
+        sessions_state_->get();
+      
+      for( int i = 0; i < static_cast< int >( sessions.size() ); ++i )
       {
-        ProjectManager::Instance()->load_project_session( i );  
-        break;
-      }
+        if( QString::fromStdString( ( Core::SplitString( sessions[ i ], "|" ) )[ 1 ] ) == 
+           this->private_->ui_.sessions_list_->currentItem()->text() )
+        {
+          ProjectManager::Instance()->load_project_session( i );  
+          break;
+        }
+      }     
     }
   }
 }

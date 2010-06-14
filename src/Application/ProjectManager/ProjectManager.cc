@@ -104,9 +104,15 @@ void ProjectManager::save_projectmanager_state()
   
 void ProjectManager::rename_project_folder( const std::string& new_name, Core::ActionSource source )
 {
+  if( !this->current_project_->name_status() )
+  {
+    this->current_project_->name_is_set( true );
+    return;
+  }
+    
   std::vector< std::string > old_name_vector = 
     Core::SplitString( this->recent_projects_state_->get()[ 0 ], "|" );
-
+  
   if( old_name_vector.size() < 2 )
     return;
 
@@ -130,19 +136,25 @@ void ProjectManager::rename_project_folder( const std::string& new_name, Core::A
   }
   catch ( std::exception& e ) 
   {
-    return;
+    //return;
   }
   
   std::vector< std::string > temp_projects_vector = this->recent_projects_state_->get();
-  
+
   // first we are going to remove this project from the list if its in there.
-  size_t projects_vector_size = temp_projects_vector.size();
-  for( size_t i = 0; i < projects_vector_size; ++i )
+  for( size_t i = 0; i < temp_projects_vector.size(); ++i )
   {
-    if( temp_projects_vector[ i ] == ( path.string() + "|" + old_name ) )
+    
+    if( temp_projects_vector[ i ] != "" )
     {
-      temp_projects_vector.erase( temp_projects_vector.begin() + i );
-      projects_vector_size--;
+      std::string from_project_list = ( ( Core::SplitString( temp_projects_vector[ i ], "|" ) )[ 0 ] 
+        + "|" + ( Core::SplitString( temp_projects_vector[ i ], "|" ) )[ 1 ] );
+      std::string from_path_and_name = ( path.string() + "|" + old_name );
+      
+      if( from_project_list == from_path_and_name )
+      {
+        temp_projects_vector[ i ] = "";
+      }
     }
   }
   this->recent_projects_state_->set( temp_projects_vector );
@@ -168,8 +180,8 @@ void ProjectManager::new_project( const std::string& project_name, bool consolid
 
     this->current_project_->project_name_state_->set( project_name );
     this->current_project_->auto_consolidate_files_state_->set( consolidate );
-    this->add_to_recent_projects( this->current_project_path_state_->export_to_string(),
-      project_name );
+    //this->add_to_recent_projects( this->current_project_path_state_->export_to_string(),
+//      project_name );
     
     this->save_project_session();
   }
@@ -243,6 +255,15 @@ bool ProjectManager::load_project_session( int session_index )
     
 }
   
+bool ProjectManager::delete_project_session( int session_index )
+{
+  boost::filesystem::path path = complete( boost::filesystem::path( this->
+    current_project_path_state_->get().c_str(), boost::filesystem::native ) );
+  
+  return this->current_project_->delete_session( ( path /
+    this->current_project_->project_name_state_->get() ), session_index );
+}
+  
 void ProjectManager::add_to_recent_projects( const std::string& project_path, 
   const std::string& project_name )
 {
@@ -250,8 +271,7 @@ void ProjectManager::add_to_recent_projects( const std::string& project_path,
   std::vector< std::string > temp_projects_vector = this->recent_projects_state_->get();
   
   // first we are going to remove this project from the list if its in there.
-  size_t projects_vector_size = temp_projects_vector.size();
-  for( size_t i = 0; i < projects_vector_size; ++i )
+  for( size_t i = 0; i < temp_projects_vector.size(); ++i )
   {
     if( temp_projects_vector[ i ] != "" )
     {
@@ -260,9 +280,7 @@ void ProjectManager::add_to_recent_projects( const std::string& project_path,
         ( Core::SplitString( temp_projects_vector[ i ], "|" ) )[ 1 ] )
         == ( project_path + "|" + project_name ) )
       {
-        temp_projects_vector.erase( temp_projects_vector.begin() + i );
-        projects_vector_size--;
-        i--;
+        temp_projects_vector[ i ] = "";
       }
     }
   }

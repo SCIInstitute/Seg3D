@@ -106,6 +106,10 @@ public:
   Core::StateOptionHandle background_color_state_;
   Core::StateBoolHandle show_slice_number_state_;
   Core::StateOptionHandle naming_convention_state_;
+  
+  Core::StateIntHandle active_axial_viewer_;
+  Core::StateIntHandle active_coronal_viewer_;
+  Core::StateIntHandle active_sagittal_viewer_;
 
   // -- Signals and slots --
 private:
@@ -140,10 +144,6 @@ private:
 
   std::vector< ViewerHandle > viewers_;
   std::vector< size_t > locked_viewers_[ 4 ];
-
-  int active_axial_viewer_;
-  int active_coronal_viewer_;
-  int active_sagittal_viewer_;
 
   size_t signal_block_count_;
 

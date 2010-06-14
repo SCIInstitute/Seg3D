@@ -44,7 +44,8 @@ namespace Seg3D
 {
 
 Project::Project( const std::string& project_name ) :
-  StateHandler( "project", false )
+  StateHandler( "project", false ),
+  name_set_( false )
 { 
   add_state( "project_name", this->project_name_state_, project_name );
   add_state( "auto_consolidate_files", this->auto_consolidate_files_state_, true );
@@ -81,7 +82,7 @@ bool Project::initialize_from_file( boost::filesystem::path project_path,
 bool Project::load_session( boost::filesystem::path project_path, int state_index )
 {
   project_path = project_path / 
-  ( Core::SplitString( ( this->sessions_state_->get() )[ state_index ], "|" ) )[ 0 ];
+    ( Core::SplitString( ( this->sessions_state_->get() )[ state_index ], "|" ) )[ 0 ];
   
   return this->current_session_->initialize_from_file( project_path,
     ( Core::SplitString( ( this->sessions_state_->get() )[ state_index ], "|" ) )[ 1 ] );
@@ -100,18 +101,36 @@ bool Project::save_session( boost::filesystem::path project_path, const std::str
     ( project_path / "sessions" / session_name ), session_name );
 }
   
+bool Project::delete_session( boost::filesystem::path project_path, int state_index )
+{
+  project_path = project_path / 
+    ( Core::SplitString( ( this->sessions_state_->get() )[ state_index ], "|" ) )[ 0 ];
+  
+  std::vector< std::string > temp_sessions_vector = this->sessions_state_->get();
+  temp_sessions_vector.erase( temp_sessions_vector.begin() + state_index );
+  this->sessions_state_->set( temp_sessions_vector );
+  
+  try 
+  {
+    boost::filesystem::remove_all( project_path );
+  }
+  catch(  std::exception& e ) 
+  {
+    return false;
+  }
+  
+  return true;
+}
+  
 void Project::add_session_to_list( const std::string& session_path_and_name )
 {
   std::vector< std::string > temp_sessions_vector = this->sessions_state_->get();
-  int temp_sessions_size = static_cast< int >( temp_sessions_vector.size() );
   
-  for( int i = 0; i < temp_sessions_size; ++i )
+  for( int i = 0; i < static_cast< int >( temp_sessions_vector.size() ); ++i )
   {
     if( temp_sessions_vector[ i ] == session_path_and_name )
     {
-      temp_sessions_vector.erase( temp_sessions_vector.begin() + i );
-      temp_sessions_size--;
-      i--;
+      temp_sessions_vector[ i ] = "";
     }
   }
   temp_sessions_vector.insert( temp_sessions_vector.begin(), session_path_and_name );

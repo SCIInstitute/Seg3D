@@ -278,7 +278,7 @@ border: 1px solid gray;
                        <number>0</number>
                       </property>
                       <item>
-                       <widget class="QComboBox" name="comboBox"/>
+                       <widget class="QComboBox" name="compression_combobox_"/>
                       </item>
                      </layout>
                     </widget>
