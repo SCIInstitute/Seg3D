@@ -43,7 +43,9 @@
 // QtInterface includes
 #include <QtInterface/Bridge/QtBridge.h>
 #include <QtInterface/Bridge/detail/QtAbstractButtonConnector.h>
+#include <QtInterface/Bridge/detail/QtAbstractButtonVectorConnector.h>
 #include <QtInterface/Bridge/detail/QtActionConnector.h>
+#include <QtInterface/Bridge/detail/QtActionVectorConnector.h>
 #include <QtInterface/Bridge/detail/QtActionGroupConnector.h>
 #include <QtInterface/Bridge/detail/QtColorButtonConnector.h>
 #include <QtInterface/Bridge/detail/QtColorBarWidgetConnector.h>
@@ -65,6 +67,13 @@ bool QtBridge::Connect( QAbstractButton* qbutton, Core::StateBoolHandle& state )
 bool QtBridge::Connect( QAbstractButton* qbutton, boost::function< void() > function )
 {
   new QtAbstractButtonConnector( qbutton, function );
+  return true;
+}
+
+bool QtBridge::Connect( QAbstractButton* qbutton, std::vector<Core::StateBoolHandle>& state,
+  Core::StateIntHandle& index)
+{
+  new QtAbstractButtonVectorConnector( qbutton, state, index );
   return true;
 }
 
@@ -144,6 +153,13 @@ bool QtBridge::Connect( QAction* qaction, boost::function< void() > function )
 bool QtBridge::Connect( QAction* qaction, Core::StateBoolHandle& state )
 {
   new QtActionConnector( qaction, state );
+  return true;
+}
+
+bool QtBridge::Connect( QAction* qaction, std::vector<Core::StateBoolHandle>& state,
+  Core::StateIntHandle& index)
+{
+  new QtActionVectorConnector( qaction, state, index );
   return true;
 }
 

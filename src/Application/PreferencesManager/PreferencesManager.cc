@@ -104,7 +104,7 @@ void PreferencesManager::initialize_states()
   add_state( "show_slice_number", show_slice_number_state_, true );
   
   //Layers Preferences
-  add_state( "default_layer_opacity", default_layer_opacity_state_, 0.5, 0.0, 1.0, 0.01 );
+  add_state( "default_layer_opacity", default_layer_opacity_state_, 1.0, 0.0, 1.0, 0.01 );
   add_state( "default_mask_fill", default_mask_fill_state_, "striped", "none|striped|solid" );
   add_state( "default_mask_border", default_mask_border_state_, "thick", "none|thin|thick" );
     

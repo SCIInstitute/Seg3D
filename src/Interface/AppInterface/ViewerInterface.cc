@@ -167,14 +167,26 @@ ViewerInterface::~ViewerInterface()
 
 void ViewerInterface::set_active_viewer( int active_viewer )
 {
-  for ( size_t j = 0; j < private_->viewer_.size(); j++ )
+  // -1 means select all
+  if ( active_viewer == -1 )
   {
-    if( static_cast< int > ( j ) != active_viewer ) private_->viewer_[ j ]->deselect();
+    for ( size_t j = 0; j < private_->viewer_.size(); j++ )
+    {
+      private_->viewer_[ j ]->select();
+    } 
   }
-
-  if( active_viewer >= 0 && active_viewer < static_cast< int > ( private_->viewer_.size() ) )
+  else
+  // select individual viewer
   {
-    private_->viewer_[ active_viewer ]->select();
+    for ( size_t j = 0; j < private_->viewer_.size(); j++ )
+    {
+      if( static_cast< int > ( j ) != active_viewer ) private_->viewer_[ j ]->deselect();
+    }
+
+    if( active_viewer >= 0 && active_viewer < static_cast< int > ( private_->viewer_.size() ) )
+    {
+      private_->viewer_[ active_viewer ]->select();
+    }
   }
 }
 

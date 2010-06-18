@@ -67,15 +67,19 @@ public:
   static bool Connect( QAbstractButton* qbutton, Core::StateBoolHandle& state );
   
   static bool Connect( QAbstractButton* qbutton, boost::function< void() > function );
-  
-  // Coonnect a SliderIntCombo to a StateRangedIntValue
+    
+  // Connect vector of bools to one button controlled by an index
+  static bool Connect(  QAbstractButton* qbutton, 
+    std::vector<Core::StateBoolHandle>& state_handles, Core::StateIntHandle& index_handle );    
+    
+  // Connect a SliderIntCombo to a StateRangedIntValue
   static bool Connect( QtColorBarWidget* cbwidget, Core::StateIntHandle& state_handle,
     std::vector< Core::StateColorHandle >& colors );
   
-  // Coonnect a SliderIntCombo to a StateRangedIntValue
+  // Connect a SliderIntCombo to a StateRangedIntValue
   static bool Connect( QtSliderIntCombo* sscombo, Core::StateRangedIntHandle& state_handle );
   
-  // Coonnect a SliderDoubleCombo to a StateRangedIntValue
+  // Connect a SliderDoubleCombo to a StateRangedIntValue
   static bool Connect( QtSliderDoubleCombo* sscombo, Core::StateRangedDoubleHandle& state_handle );
   
   // Connect a QDoubleSpinBox to a StateDoubleValue
@@ -106,8 +110,13 @@ public:
   // Connect menu action to dispatcher
   static bool Connect( QAction* qaction, boost::function< void() > function );
 
-  // Connect menu toggle action to dispatcher
+  // Connect menu toggle action to state variable
   static bool Connect( QAction* qaction, Core::StateBoolHandle& state_handle );
+  
+  // Connect vector of bools to one button controlled by an index
+  static bool Connect( QAction* qaction, std::vector<Core::StateBoolHandle>& state_handles,
+    Core::StateIntHandle& index_handle );
+
 
 };
 

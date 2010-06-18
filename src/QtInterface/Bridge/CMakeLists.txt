@@ -39,7 +39,9 @@ SET(QTINTERFACE_BRIDGE_SRCS
   detail/QtSliderIntComboConnector.cc
   detail/QtSliderDoubleComboConnector.cc
   detail/QtAbstractButtonConnector.cc
+  detail/QtAbstractButtonVectorConnector.cc
   detail/QtActionConnector.cc
+  detail/QtActionVectorConnector.cc
   detail/QtActionGroupConnector.cc
   detail/QtColorButtonConnector.cc
   detail/QtColorBarWidgetConnector.cc
@@ -53,7 +55,9 @@ SET(QTINTERFACE_BRIDGE_MOC_SRCS
   detail/QtSliderIntComboConnector.h
   detail/QtSliderDoubleComboConnector.h
   detail/QtAbstractButtonConnector.h
+  detail/QtAbstractButtonVectorConnector.h
   detail/QtActionConnector.h
+  detail/QtActionVectorConnector.h
   detail/QtActionGroupConnector.h
   detail/QtColorButtonConnector.h
   detail/QtColorBarWidgetConnector.h

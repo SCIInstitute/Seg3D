@@ -47,6 +47,7 @@
 #include "ui_LayerWidget.h"
 
 //Application Includes
+#include <Application/ViewerManager/ViewerManager.h>
 #include <Application/Layer/DataLayer.h>
 #include <Application/Layer/MaskLayer.h>
 #include <Application/LayerManager/LayerManager.h>
@@ -174,71 +175,76 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   connect( this->private_->ui_.lock_button_, 
       SIGNAL( toggled( bool )), this, 
       SLOT( visual_lock( bool )));
-      
-    QtUtils::QtBridge::Connect( this->private_->activate_button_, 
-    boost::bind( &ActionActivateLayer::Dispatch, layer ) );
-  
-  // make the default connections, for any layer type, to the state engine
-  QtUtils::QtBridge::Connect( this->private_->ui_.selection_checkbox_, layer->selected_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ui_.lock_button_, layer->lock_state_ );
-  QtUtils::QtBridge::Connect( this->private_->opacity_adjuster_, layer->opacity_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ui_.label_, layer->name_state_ );
-    
-  switch( this->volume_type_ )
   {
-    // This if for the Data Layers
-    case Core::VolumeType::DATA_E:
-      {
-        this->private_->ui_.color_button_->hide();
-        this->private_->ui_.compute_iso_surface_button_->hide();
-        this->private_->ui_.fill_border_button_->hide();
-        this->private_->ui_.iso_surface_button_->hide();
-        this->private_->ui_.typeBackground_->setStyleSheet( StyleSheet::DATA_VOLUME_COLOR_C );
-        this->private_->activate_button_->setIcon(this->data_layer_icon_);
-        
-        DataLayer* data_layer = dynamic_cast< DataLayer* >( layer.get() );
-        QtUtils::QtBridge::Connect( this->private_->brightness_adjuster_, data_layer->brightness_state_ );
-        QtUtils::QtBridge::Connect( this->private_->contrast_adjuster_, data_layer->contrast_state_ );
-      }
-      break;
-    // This is for the Mask Layers  
-    case Core::VolumeType::MASK_E:
-      {
-        this->private_->ui_.brightness_contrast_button_->hide();
-        this->private_->ui_.volume_rendered_button_->hide();
-        this->private_->ui_.typeBackground_->setStyleSheet( StyleSheet::MASK_VOLUME_COLOR_C );
-        this->private_->activate_button_->setIcon( this->mask_layer_icon_ );
-        
-        this->connect( this->private_->color_widget_, SIGNAL( color_changed( int ) ), 
-          this, SLOT( set_mask_background_color( int ) ) );
-
-        this->connect( this->private_->color_widget_, SIGNAL( color_changed( int ) ),
-          this, SLOT( set_mask_background_color_from_preference_change( int ) ) );
-
-        MaskLayer* mask_layer = dynamic_cast< MaskLayer* >( layer.get() );  
-        QtUtils::QtBridge::Connect( this->private_->ui_.iso_surface_button_, mask_layer->show_isosurface_state_ );
-        QtUtils::QtBridge::Connect( this->private_->ui_.border_selection_combo_, mask_layer->border_state_ );
-        QtUtils::QtBridge::Connect( this->private_->ui_.fill_selection_combo_, mask_layer->fill_state_ );
-
-        QtUtils::QtBridge::Connect( this->private_->color_widget_, mask_layer->color_state_,
-          PreferencesManager::Instance()->color_states_ );
-        // this->private_->color_widget_->set_color_index( mask_layer->color_state_->get() );
-        
-        this->set_mask_background_color( mask_layer->color_state_->get() );
-      }
-      break;
-      
-    // This is for the Label Layers
-    case Core::VolumeType::LABEL_E:
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+  
+    QtUtils::QtBridge::Connect( this->private_->activate_button_, 
+      boost::bind( &ActionActivateLayer::Dispatch, layer ) );
+    
+    // make the default connections, for any layer type, to the state engine
+    QtUtils::QtBridge::Connect( this->private_->ui_.selection_checkbox_, layer->selected_state_ );
+    QtUtils::QtBridge::Connect( this->private_->ui_.lock_button_, layer->lock_state_ );
+    QtUtils::QtBridge::Connect( this->private_->opacity_adjuster_, layer->opacity_state_ );
+    QtUtils::QtBridge::Connect( this->private_->ui_.label_, layer->name_state_ );
+    QtUtils::QtBridge::Connect( this->private_->ui_.visibility_button_, layer->visible_state_,
+      ViewerManager::Instance()->active_viewer_state_ );
+  
+    switch( this->volume_type_ )
+    {
+      // This if for the Data Layers
+      case Core::VolumeType::DATA_E:
         {
-        this->private_->ui_.typeBackground_->setStyleSheet( StyleSheet::LABEL_VOLUME_COLOR_C );
-        this->private_->activate_button_->setIcon(this->label_layer_icon_);
+          this->private_->ui_.color_button_->hide();
+          this->private_->ui_.compute_iso_surface_button_->hide();
+          this->private_->ui_.fill_border_button_->hide();
+          this->private_->ui_.iso_surface_button_->hide();
+          this->private_->ui_.typeBackground_->setStyleSheet( StyleSheet::DATA_VOLUME_COLOR_C );
+          this->private_->activate_button_->setIcon(this->data_layer_icon_);
+          
+          DataLayer* data_layer = dynamic_cast< DataLayer* >( layer.get() );
+          QtUtils::QtBridge::Connect( this->private_->brightness_adjuster_, data_layer->brightness_state_ );
+          QtUtils::QtBridge::Connect( this->private_->contrast_adjuster_, data_layer->contrast_state_ );
+        }
+        break;
+      // This is for the Mask Layers  
+      case Core::VolumeType::MASK_E:
+        {
+          this->private_->ui_.brightness_contrast_button_->hide();
+          this->private_->ui_.volume_rendered_button_->hide();
+          this->private_->ui_.typeBackground_->setStyleSheet( StyleSheet::MASK_VOLUME_COLOR_C );
+          this->private_->activate_button_->setIcon( this->mask_layer_icon_ );
+          
+          this->connect( this->private_->color_widget_, SIGNAL( color_changed( int ) ), 
+            this, SLOT( set_mask_background_color( int ) ) );
+
+          this->connect( this->private_->color_widget_, SIGNAL( color_changed( int ) ),
+            this, SLOT( set_mask_background_color_from_preference_change( int ) ) );
+
+          MaskLayer* mask_layer = dynamic_cast< MaskLayer* >( layer.get() );  
+          QtUtils::QtBridge::Connect( this->private_->ui_.iso_surface_button_, mask_layer->show_isosurface_state_ );
+          QtUtils::QtBridge::Connect( this->private_->ui_.border_selection_combo_, mask_layer->border_state_ );
+          QtUtils::QtBridge::Connect( this->private_->ui_.fill_selection_combo_, mask_layer->fill_state_ );
+
+          QtUtils::QtBridge::Connect( this->private_->color_widget_, mask_layer->color_state_,
+            PreferencesManager::Instance()->color_states_ );
+          // this->private_->color_widget_->set_color_index( mask_layer->color_state_->get() );
+          
+          this->set_mask_background_color( mask_layer->color_state_->get() );
+        }
+        break;
+        
+      // This is for the Label Layers
+      case Core::VolumeType::LABEL_E:
+        {
+          this->private_->ui_.typeBackground_->setStyleSheet( StyleSheet::LABEL_VOLUME_COLOR_C );
+          this->private_->activate_button_->setIcon(this->label_layer_icon_);
 
         }
-      break;
-      
-    default:
-      break;
+        break;
+        
+      default:
+        break;
+    }
   }
   
   this->private_->overlay_ = new OverlayWidget( this );

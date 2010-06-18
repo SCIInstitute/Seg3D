@@ -109,6 +109,13 @@ void AppMenu::create_file_menu( QMenu* qmenu )
 
 void AppMenu::create_edit_menu( QMenu* qmenu )
 {
+  QAction* qaction;
+  qaction = qmenu->addAction( tr( "Select All") );
+  qaction->setShortcut( tr( "Ctrl+A" ) );
+  qaction->setToolTip( tr( "Select all viewers" ) );
+  QtUtils::QtBridge::Connect( qaction, 
+    boost::bind( &Core::ActionSet::DispatchState< Core::StateValue<int> >,  
+      ViewerManager::Instance()->active_viewer_state_, -1 ) );
 }
 
 void AppMenu::create_layer_menu( QMenu* qmenu )
@@ -145,7 +152,7 @@ void AppMenu::create_view_menu( QMenu* qmenu )
   qaction->setShortcut( tr( "ALT+0" ) );
   qaction->setToolTip( tr( "Set the view to one large view" ) );
   QtUtils::QtBridge::Connect( qaction, boost::bind(
-      &Core::ActionSet::Dispatch< Core::StateOptionHandle, std::string >,
+      &Core::ActionSet::DispatchState< Core::StateOption >,
       ViewerManager::Instance()->layout_state_, "single" ) );
 
   qaction = qmenu->addAction( tr( "One and One" ) );

@@ -150,7 +150,6 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
       this->private_->viewer_->volume_isosurfaces_visible_state_ );
     QtUtils::QtBridge::Connect( this->private_->ui_.volume_rendering_visible_button_,
       this->private_->viewer_->volume_volume_rendering_visible_state_ );
-
     this->add_icons_to_combobox();
     
     this->private_->render_widget_->activate_signal_.connect(
