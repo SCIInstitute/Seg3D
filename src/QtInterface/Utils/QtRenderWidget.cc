@@ -269,21 +269,27 @@ void QtRenderWidget::keyPressEvent( QKeyEvent* event )
 
 void QtRenderWidget::hideEvent( QHideEvent* event )
 {
-  if ( this->private_->viewer_->get_renderer() ) 
+  if ( !event->spontaneous() )
   {
-    this->private_->viewer_->get_renderer()->deactivate();
+    if ( this->private_->viewer_->get_renderer() ) 
+    {
+      this->private_->viewer_->get_renderer()->deactivate();
+    }
+    Core::ActionSet::Dispatch( this->private_->viewer_->viewer_visible_state_, false );
   }
-  Core::ActionSet::Dispatch( this->private_->viewer_->viewer_visible_state_, false );
 }
 
 void QtRenderWidget::showEvent( QShowEvent* event )
 {
-  // NOTE: Activate the renderer before setting the viewer to visible.
-  if ( this->private_->viewer_->get_renderer() ) 
+  if ( !event->spontaneous() )
   {
-    this->private_->viewer_->get_renderer()->activate();
+    // NOTE: Activate the renderer before setting the viewer to visible.
+    if ( this->private_->viewer_->get_renderer() ) 
+    {
+      this->private_->viewer_->get_renderer()->activate();
+    }
+    Core::ActionSet::Dispatch( this->private_->viewer_->viewer_visible_state_, true );
   }
-  Core::ActionSet::Dispatch( this->private_->viewer_->viewer_visible_state_, true );
 }
 
 void QtRenderWidget::enterEvent( QEvent* event )
