@@ -95,11 +95,9 @@ void AppSplash::new_project()
   
 void AppSplash::open_existing()
 {
-//  QDir project_directory_;
-//  QString path = QFileDialog::getOpenFileName( this, "Open Seg3D2 Project",
-//    QString::fromStdString( ProjectManager::Instance()->current_project_path_state_->get() ) ); 
-//  
-//  std::string booger = path.toStdString();
+  QDir project_directory_;
+  QString path = QFileDialog::getExistingDirectory ( this, "Directory" ); 
+
   
   this->close();
 }

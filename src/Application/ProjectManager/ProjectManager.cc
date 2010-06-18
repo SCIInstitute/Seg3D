@@ -32,8 +32,6 @@
 // Boost includes
 #include <boost/lexical_cast.hpp>
 
-
-
 // Application includes
 #include <Application/ProjectManager/ProjectManager.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
@@ -180,10 +178,9 @@ void ProjectManager::new_project( const std::string& project_name, bool consolid
 
     this->current_project_->project_name_state_->set( project_name );
     this->current_project_->auto_consolidate_files_state_->set( consolidate );
-    //this->add_to_recent_projects( this->current_project_path_state_->export_to_string(),
-//      project_name );
-    
-    this->save_project_session();
+
+
+    this->save_project_session( std::string( "initial save" ) );
   }
 }
   
@@ -197,9 +194,9 @@ void ProjectManager::open_project( const std::string& project_path, const std::s
   this->add_to_recent_projects( project_path, project_name );
 }
   
-void ProjectManager::save_project(  bool autosave  )
+void ProjectManager::save_project( std::string& notes, bool autosave  )
 {
-  if( this->save_project_session( autosave ) )
+  if( this->save_project_session( notes, autosave ) )
   {
     boost::filesystem::path project_path = boost::filesystem::path( 
       current_project_path_state_->get().c_str() );
@@ -217,8 +214,9 @@ void ProjectManager::save_project_as()
     
 }
   
-bool ProjectManager::save_project_session( bool autosave )
+bool ProjectManager::save_project_session( std::string& notes, bool autosave )
 {
+  // Here we check to see if its an autosave and if it is, just save over the previous autosave
   std::string session_name;
   if( autosave )
     session_name = "autosave";
@@ -241,7 +239,7 @@ bool ProjectManager::save_project_session( bool autosave )
     this->current_project_->project_name_state_->get() );
   
   return this->current_project_->save_session( ( path /
-    this->current_project_->project_name_state_->get() ), session_name );
+    this->current_project_->project_name_state_->get() ), session_name, notes );
 }
   
 
@@ -360,6 +358,17 @@ void ProjectManager::start_auto_save_timer()
 //  timer_->async_wait( boost::bind( &ProjectManager::save_project, this, true ) );
 //  this->io_.run();
 }
+
+boost::filesystem::path ProjectManager::get_project_data_path() const
+{
+  boost::filesystem::path path = complete( boost::filesystem::path( this->
+    current_project_path_state_->get().c_str(), boost::filesystem::native ) );
+  
+  return path / this->current_project_->project_name_state_->get() / "data";
+
+  
+}
+
 
 
 

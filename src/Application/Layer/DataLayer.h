@@ -54,6 +54,7 @@ class DataLayer : public Layer
 public:
 
   DataLayer( const std::string& name, const Core::DataVolumeHandle& volume );
+  DataLayer( const std::string& state_id );
   virtual ~DataLayer();
 
   virtual Core::VolumeType type() const { return Core::VolumeType::DATA_E; }
@@ -68,6 +69,11 @@ public:
     return this->data_volume_;
   }
 
+  void set_data_volume( Core::DataVolumeHandle data_volume )
+  { 
+    this->data_volume_ = data_volume; 
+  } 
+  
   // -- state variables --
 public:
 
@@ -79,6 +85,16 @@ public:
 
   // State describing whether volume is volume rendered
   Core::StateBoolHandle volume_rendered_state_;
+
+protected:
+  // PRE_SAVE_STATES:
+  // this function synchronize the generation number for the session saving
+  virtual bool pre_save_states();
+
+  virtual bool post_load_states();
+
+private:
+  void initialize_states();
 
 private:
   Core::DataVolumeHandle data_volume_;

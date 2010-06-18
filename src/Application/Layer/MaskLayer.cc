@@ -32,26 +32,43 @@
 
 // Core includes
 #include <Core/Application/Application.h>
+#include <Core/DataBlock/MaskDataBlockManager.h>
 #include <Core/Volume/MaskVolume.h>
 
 // Application includes
 #include <Application/Layer/MaskLayer.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
+#include <Application/ProjectManager/ProjectManager.h>
 
 namespace Seg3D
 {
 
 MaskLayer::MaskLayer( const std::string& name, const Core::MaskVolumeHandle& volume ) :
-  Layer( name ), mask_volume_( volume )
+  Layer( name ), 
+  mask_volume_( volume )
 {
-  this->initialize_states();  
+  this->initialize_states();
+  this->bit_state_->set( static_cast< int >( volume->mask_data_block()->get_mask_bit() ) );
 }
 
 MaskLayer::MaskLayer( const std::string& name, const Core::GridTransform& grid_transform ) :
-    Layer( name ), mask_volume_( new Core::MaskVolume( grid_transform ) )
+    Layer( name ), 
+  mask_volume_( new Core::MaskVolume( grid_transform ) )
 {
     this->initialize_states();
+  this->bit_state_->set( static_cast< int >( this->mask_volume_->
+    mask_data_block()->get_mask_bit() ) );
 }
+
+MaskLayer::MaskLayer( const std::string& state_id ) :
+  Layer( "not_initialized", state_id )
+{
+  this->initialize_states();
+}
+
+
+
+
 
 MaskLayer::~MaskLayer()
 {
@@ -83,10 +100,53 @@ void MaskLayer::initialize_states()
 
     // == Whether the isosurface is shown in the volume display ==
     add_state( "isosurface", show_isosurface_state_, false );
+
+  add_state( "bit", this->bit_state_, 0 );
     
 }
 
 Core::AtomicCounter MaskLayer::color_count_;
+bool MaskLayer::pre_save_states()
+{
+  this->generation_state_->set( static_cast< int >( this->get_mask_volume()->
+    mask_data_block()->get_data_block()->get_generation() ) );
+  return true;
+}
+
+bool MaskLayer::post_load_states()
+{
+  Core::DataBlock::generation_type generation = this->generation_state_->get();
+  unsigned int bit = static_cast< unsigned int >( this->bit_state_->get() );
+  Core::MaskDataBlockHandle mask_data_block;
+  Core::GridTransform grid_transform;
+  bool success = Core::MaskDataBlockManager::Instance()->
+    create( generation, bit, grid_transform, mask_data_block );
+  if ( !success )
+  {
+    Core::DataVolumeHandle data_volume;
+    boost::filesystem::path volume_path = ProjectManager::Instance()->get_project_data_path() /
+      ( this->generation_state_->export_to_string() + ".nrrd" );
+    std::string error;
+
+    if( Core::DataVolume::LoadDataVolume( volume_path, data_volume, error ) )
+    {
+      Core::MaskDataBlockManager::Instance()->register_data_block( data_volume->data_block(),
+        data_volume->get_grid_transform() );
+      success = Core::MaskDataBlockManager::Instance()->
+        create( generation, bit, grid_transform, mask_data_block );
+    }
+  }
+
+  if ( success )
+  {
+    this->mask_volume_ = Core::MaskVolumeHandle( new Core::MaskVolume( 
+      grid_transform, mask_data_block ) );
+  }
+  
+  return success;
+}
+
+
 
 } // end namespace Seg3D
 

@@ -43,7 +43,7 @@
 // Core includes
 #include <Core/Utils/Singleton.h>
 #include <Core/Utils/Lockable.h>
-
+#include <Core/Geometry/GridTransform.h>
 #include <Core/DataBlock/DataBlock.h>
 #include <Core/DataBlock/MaskDataBlock.h>
 
@@ -72,7 +72,14 @@ public:
 
   // CREATE:
   // Create a new mask layer
-  bool create( size_t nx, size_t ny, size_t nz, MaskDataBlockHandle& mask );
+  bool create( const GridTransform& grid_transform, MaskDataBlockHandle& mask );
+
+  bool create( DataBlock::generation_type generation, unsigned int bit, 
+    GridTransform& grid_transform, MaskDataBlockHandle& mask );
+
+  void register_data_block( DataBlockHandle data_block, const GridTransform& grid_transform );
+
+  bool save_data_blocks();
 
   // COMPACT:
   // Compact the masks into less memory if possible by moving them around
@@ -92,27 +99,6 @@ protected:
 private:
    MaskDataBlockManagerInternalHandle private_;
 
-  // -- functions for creating MaskDataBlocks --
-public: 
-  
-  // CREATEMASKFROMNONZERODATA:
-  // Create a mask from the non zero data contained in a datablock
-  static bool CreateMaskFromNonZeroData( const DataBlockHandle data, 
-    MaskDataBlockHandle& mask );
-
-  // CREATEMASKFROMBITPLANEDATA:
-  // Create a mask from each bitplane in integer data
-  static bool CreateMaskFromBitPlaneData( const DataBlockHandle data, 
-    std::vector<MaskDataBlockHandle>& mask );
-
-  // CREATEMASKFROMLABELDATA:
-  // Create a mask from each label in integer data
-  static bool CreateMaskFromLabelData( const DataBlockHandle data, 
-    std::vector<MaskDataBlockHandle>& mask, bool reuse_data = false );
-
-  // CREATEEMPTYMASK:
-  // Create an empty mask with given dimensions.
-  static bool CreateEmptyMask( size_t nx, size_t ny, size_t nz, MaskDataBlockHandle& mask );
 };
 
 } // end namespace Core

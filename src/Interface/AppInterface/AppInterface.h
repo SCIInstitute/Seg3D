@@ -136,11 +136,16 @@ private:
   QPointer< ProgressWidget > progress_;
   
   // Pointer to the new project wizard
-  QPointer< AppProjectWizard > new_project_wizard_;
+  static QPointer< AppProjectWizard > new_project_wizard_;
 
   // Application menu, statusbar
   QPointer< AppMenu > application_menu_;
   QPointer< AppStatusBar > status_bar_;
+
+public:
+  // OPEN_PROJECT_WIZARD:
+  // This function opens up the new project wizard
+  static void open_project_wizard();
 
   // -- Main Window management functions --
 public:

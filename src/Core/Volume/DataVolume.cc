@@ -59,25 +59,34 @@ NrrdDataHandle DataVolume::convert_to_nrrd()
   return nrrd_data;
 }
 
-bool DataVolume::LoadDataVolume( const std::string& filename, DataVolumeHandle& volume, 
+DataBlock::generation_type DataVolume::get_generation() const
+{
+  return this->data_block_->get_generation();
+}
+
+
+bool DataVolume::LoadDataVolume( const boost::filesystem::path& filename, DataVolumeHandle& volume, 
   std::string& error )
 {
   volume.reset();
   
   NrrdDataHandle nrrd;
-  if ( ! ( NrrdData::LoadNrrd( filename, nrrd, error ) ) ) return false;
+  if ( ! ( NrrdData::LoadNrrd( filename.string(), nrrd, error ) ) ) return false;
   
+  DataBlock::generation_type generation;
+  Core::ImportFromString( filename.stem(), generation );
+  Core::DataBlockHandle datablock( Core::NrrdDataBlock::New( nrrd, generation ) );
+  datablock->update_histogram();
+
   volume = DataVolumeHandle( new DataVolume( nrrd->get_grid_transform(),
-    NrrdDataBlock::New( nrrd ) ) );
-  
+    datablock ) );
   return true;
 }
 
 bool DataVolume::SaveDataVolume( const std::string& filename, DataVolumeHandle& volume,
   std::string& error )
 {
-  volume.reset();
-  
+
   NrrdDataHandle nrrd = NrrdDataHandle( new NrrdData( 
     volume->data_block_, volume->get_grid_transform() ) );
 

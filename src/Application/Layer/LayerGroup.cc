@@ -26,10 +26,15 @@
  DEALINGS IN THE SOFTWARE.
 */
 
+// Core includes
 #include <Core/State/StateEngine.h>
 
-#include <Application/Layer/Layer.h>
+// Application includes
+#include <Application/Layer/DataLayer.h>
+#include <Application/Layer/MaskLayer.h>
+//#include <Application/Layer/Layer.h>
 #include <Application/Layer/LayerGroup.h>
+
 
 namespace Seg3D
 {
@@ -70,8 +75,8 @@ LayerGroup::LayerGroup( Core::GridTransform grid_transform ) :
   add_state( "visibility", this->visibility_state_, true );
   
   // = Layer list
-  std::vector< std::string> layers;
-  add_state( "groups", this->layers_state_, layers );
+  //std::vector< std::string> layers;
+  //add_state( "groups", this->layers_state_, layers );
   
 }
 
@@ -91,7 +96,7 @@ void LayerGroup::insert_layer_back( LayerHandle new_layer )
 {
   layer_list_.push_back( new_layer );
   // keep layer lists in sync
-  this->sync_layer_lists();
+  //this->sync_layer_lists();
 }
 
 void LayerGroup::insert_layer_front( LayerHandle new_layer )
@@ -99,7 +104,7 @@ void LayerGroup::insert_layer_front( LayerHandle new_layer )
   layer_list_.push_front( new_layer );
   
   // keep layer lists in sync
-  this->sync_layer_lists();
+  //this->sync_layer_lists();
 }
 
 
@@ -119,7 +124,7 @@ int LayerGroup::move_layer_above( LayerHandle layer_above, LayerHandle layer_bel
       this->layer_list_.insert( ++i, layer_above );
       
       // keep layer lists in sync
-      this->sync_layer_lists();
+      //this->sync_layer_lists();
       
       // Finally we return the proper location for the gui to insert the layer
       return abs( index - list_size ) - 1;
@@ -135,7 +140,7 @@ void LayerGroup::delete_layer( LayerHandle layer )
   layer_list_.remove( layer );
   
   // keep layer lists in sync
-  this->sync_layer_lists();
+  //this->sync_layer_lists();
 }
 
 void LayerGroup::crop_layer()
@@ -189,20 +194,15 @@ void LayerGroup::get_layer_names( std::vector< LayerIDNamePair >& layer_names,
     }
   }
 }
-  
 
-void LayerGroup::sync_layer_lists()
+void LayerGroup::get_layer_names( std::vector< std::string >& layer_ids )
 {
-  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-  
-  std::vector< std::string > layer_vector;
-  
-  layer_list_type::const_iterator layer_iterator = this->layer_list_.begin();
-  for ( ; layer_iterator != this->layer_list_.end(); ++layer_iterator )
+  layer_list_type::const_iterator it = this->layer_list_.begin();
+  for ( ; it != this->layer_list_.end(); it++ )
   {
     std::string volume_type;
-
-    switch ( ( *layer_iterator )->type() ) 
+ 
+    switch ( ( *it )->type() ) 
     {
       case Core::VolumeType::DATA_E:
         volume_type = "DATA_E";
@@ -216,23 +216,21 @@ void LayerGroup::sync_layer_lists()
       default:
         break;
     }
-      
-    layer_vector.push_back( ( *layer_iterator )->get_statehandler_id() + "|" + volume_type );
+
+    layer_ids.push_back( ( *it )->get_layer_id() + "|" + volume_type );
   }
-  this->layers_state_->set( layer_vector );
 }
 
-bool LayerGroup::post_save_states()
-{
-  std::vector< std::string > layer_vector = this->layers_state_->get();
-  layer_list_type::iterator layer_iterator = this->layer_list_.begin();
-  for( int j = 0; j < static_cast< int >( layer_vector.size() ); ++j )
-  {
-    std::string layer_name = ( Core::SplitString( layer_vector[ j ], "|" ) )[ 0 ];
-    ( *layer_iterator )->populate_session_states();
-    ++layer_iterator;
-  }
-  return true;
-}
+// void LayerGroup::destroy_layers()
+// {
+//  for( layer_list_type::iterator it = this->layer_list_.begin(); 
+//  it != this->layer_list_.end(); ++it
+//  {
+//    this->delete_layer( *it );
+//  }
+// }
+
+
+
 
 } // end namespace Seg3D

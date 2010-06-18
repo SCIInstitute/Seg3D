@@ -113,7 +113,7 @@ public:
   Core::StateBoolHandle show_layers_state_;
   
   // = Layers
-  Core::StateStringVectorHandle layers_state_;
+  //Core::StateStringVectorHandle layers_state_;
 
 
   // -- Layers contained within group --
@@ -178,6 +178,8 @@ public:
   {
     return layer_list_;
   }
+
+  void get_layer_names( std::vector< std::string >& layer_ids );
   
   size_t get_list_size() const
   {
@@ -193,17 +195,11 @@ public:
     Core::VolumeType type ) const;
   void get_layer_names( std::vector< LayerIDNamePair >& layer_names, 
     Core::VolumeType type, LayerHandle excluded_layer ) const;
-
-  // POST_SAVE_STATES:
-  // This function is called after the LayerGroup's states have been saved and then
-  // tells the layers to save their states as well.
-  bool post_save_states();
   
 private:
-  // SYNC_LAYER_LISTS:
-  // This function keeps the layers_state_ in sync with layer_list_ 
-  void sync_layer_lists();
-  
+
+/*  void destroy_layers();*/
+
 private:
   
   // The transformation that describes the grid dimensions and the spacing
@@ -211,6 +207,8 @@ private:
   
   // The list that contains the layers that are stored in this class
   layer_list_type layer_list_;
+
+  //std::vector< std::string > layer_names_list_
   
 
 

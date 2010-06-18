@@ -90,7 +90,7 @@ public:
   
   // SAVE_SESSION:
   // this function will be called from the project manager to save a session
-  bool save_session( boost::filesystem::path project_path, const std::string& session_name );
+  bool save_session( boost::filesystem::path project_path, const std::string& session_name, const std::string& notes );
   
   // DELETE_SESSION:
   // this function will be called by the project manager to delete a session
@@ -106,7 +106,6 @@ public:
   // signal that the project name has changed the first time it gets set.  This is a temporary 
   // stopgap until we can implement signal blocking
   bool name_status(){ return this->name_set_; }
-
   
   
 private:

@@ -96,6 +96,7 @@ public:
   
 private:
   bool validate_layer_move( LayerHandle layer_above, LayerHandle layer_below );
+  bool delete_all();
 
 public:
   // Take an atomic snapshot of visual properties of layers for rendering in the specified viewer
@@ -123,7 +124,7 @@ public:
   
   // state variables
 public:
-  Core::StateStringVectorHandle groups_state_;
+  Core::StateStringVectorHandle layers_state_;
 
 public:
   // -- Signal/Slots --
@@ -179,15 +180,19 @@ public:
   layers_changed_type layers_changed_signal_;
 
 public:
+  virtual bool pre_save_states();
+
   // POST_SAVE_STATES:
   // This function is called after the LayerManagers states have been saved and then
   // tells the groups to save their states as well.
   bool post_save_states();
+
+  bool post_load_states();
   
 private:
   // SYNC_GROUP_LISTS:
   // This function keeps the groups_state_ in sync with group_list_ 
-  void sync_group_lists();
+  //void sync_group_lists();
   
 private:
     // list of the current groups 

@@ -165,24 +165,26 @@ public:
   // location that is seperate from the session states
   bool export_states( boost::filesystem::path path, const std::string& name );
 
+
+protected:
   // PRE_LOAD_STATES:
   // This virtual function can be implemented in the StateHandlers and will be called before its
-  // states are loaded
+  // states are loaded.  If it doesn't succeed it needs to return false.
   virtual bool pre_load_states();
 
   // POST_LOAD_STATES:
   // This virtual function can be implemented in the StateHandlers and will be called after its
-  // states are loaded
+  // states are loaded.  If it doesn't succeed it needs to return false.
   virtual bool post_load_states();
 
   // PRE_SAVE_STATES:
   // This virtual function can be implemented in the StateHandlers and will be called before its
-  // states are saved
+  // states are saved.  If it doesn't succeed it needs to return false.
   virtual bool pre_save_states();
 
   // POST_SAVE_STATES:
   // This virtual function can be implemented in the StateHandlers and will be called after its
-  // states are saved
+  // states are saved.  If it doesn't succeed it needs to return false.
   virtual bool post_save_states();
   
 

@@ -89,13 +89,14 @@ bool Project::load_session( boost::filesystem::path project_path, int state_inde
   
 }
   
-bool Project::save_session( boost::filesystem::path project_path, const std::string& session_name )
+bool Project::save_session( boost::filesystem::path project_path, const std::string& session_name, 
+  const std::string& notes )
 {
   this->current_session_->session_name_state_->set( session_name );
   
   boost::filesystem::path temp_path = "sessions";
   temp_path = temp_path / session_name;
-  this->add_session_to_list( temp_path.string() + "|" + session_name );
+  this->add_session_to_list( temp_path.string() + "|" + session_name + "|" + notes );
 
   return this->current_session_->save_session_settings( 
     ( project_path / "sessions" / session_name ), session_name );

@@ -28,10 +28,10 @@
 
 // Application includes
 #include <Application/Project/Session.h>
-#include <Application/InterfaceManager/InterfaceManager.h>
-#include <Application/ViewerManager/ViewerManager.h>
-#include <Application/LayerManager/LayerManager.h>
-#include <Application/Layer/LayerGroup.h>
+// #include <Application/InterfaceManager/InterfaceManager.h>
+// #include <Application/ViewerManager/ViewerManager.h>
+// #include <Application/LayerManager/LayerManager.h>
+// #include <Application/Layer/LayerGroup.h>
 
 
 // Core includes

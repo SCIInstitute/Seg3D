@@ -66,8 +66,14 @@ class Layer : public Core::StateHandler
   // -- Constructor/destructor --
 protected:
   // NOTE: Use the specific class to build the layer
-  Layer( const std::string& name);
+  Layer( const std::string& name );
+  Layer( const std::string& name, const std::string& state_id );
   virtual ~Layer();
+
+private:
+  // INITIALIZE_STATES:
+  // This function sets the initial states of the layer, and returns true if successful
+  void initialize_states( const std::string& name );
 
   // -- Layer properties --
 public:
@@ -159,7 +165,12 @@ public:
 
   // State that describes which menu is currently shown
   Core::StateOptionHandle edit_mode_state_;
-  
+
+protected:
+  // State that stores the generation of its datablock
+  Core::StateIntHandle generation_state_;
+
+
   // -- Accessors --
 public:
 

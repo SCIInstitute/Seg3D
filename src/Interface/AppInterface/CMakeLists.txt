@@ -173,6 +173,7 @@ TARGET_LINK_LIBRARIES(Interface_AppInterface
                       Interface_AppController
             Interface_AppPreferences
             Interface_AppSplash
+            Interface_AppProjectWizard
                       ${QT_LIBRARIES} 
                       ${SCI_BOOST_LIBRARY})
 

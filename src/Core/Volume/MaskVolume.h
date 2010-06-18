@@ -31,7 +31,7 @@
 
 #include <Core/DataBlock/MaskDataBlock.h>
 #include <Core/DataBlock/NrrdData.h>
-#include <Core/Volume/Volume.h>
+#include <Core/Volume/DataVolume.h>
 
 namespace Core
 {
@@ -61,6 +61,28 @@ public:
   {
     return this->mask_data_block_->get_mutex();
   }
+
+  // -- functions for creating MaskVolumeHandle's --
+public: 
+
+  // CREATEMASKFROMNONZERODATA:
+  // Create a mask from the non zero data contained in a datablock
+  static bool CreateMaskFromNonZeroData( const DataVolumeHandle data, 
+    MaskDataBlockHandle& mask );
+
+  // CREATEMASKFROMBITPLANEDATA:
+  // Create a mask from each bitplane in integer data
+  static bool CreateMaskFromBitPlaneData( const DataVolumeHandle data, 
+    std::vector<MaskDataBlockHandle>& masks );
+
+  // CREATEMASKFROMLABELDATA:
+  // Create a mask from each label in integer data
+  static bool CreateMaskFromLabelData( const DataVolumeHandle data, 
+    std::vector<MaskDataBlockHandle>& masks, bool reuse_data = false );
+
+  // CREATEEMPTYMASK:
+  // Create an empty mask with given dimensions.
+  static bool CreateEmptyMask( GridTransform grid_transform, MaskVolumeHandle& mask );
 
 private:
   // Handle to where the mask volume is really stored

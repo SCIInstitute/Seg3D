@@ -29,6 +29,8 @@
 #ifndef CORE_VOLUME_DATAVOLUME_H
 #define CORE_VOLUME_DATAVOLUME_H
 
+#include <boost/filesystem.hpp>
+
 #include <Core/DataBlock/DataBlock.h>
 #include <Core/DataBlock/NrrdData.h>
 #include <Core/Geometry/GridTransform.h>
@@ -66,13 +68,15 @@ public:
   // Get the volume data as a nrrd wrapped in a NrrdData structure
   virtual NrrdDataHandle convert_to_nrrd();
 
+  DataBlock::generation_type get_generation() const;
+
 private:
   // Handle to where the volume data is really stored
   DataBlockHandle data_block_;
 
 
 public:
-  static bool LoadDataVolume( const std::string& filename, DataVolumeHandle& volume,
+  static bool LoadDataVolume( const boost::filesystem::path& filename, DataVolumeHandle& volume,
     std::string& error );
 
   static bool SaveDataVolume( const std::string& filename, DataVolumeHandle& volume,

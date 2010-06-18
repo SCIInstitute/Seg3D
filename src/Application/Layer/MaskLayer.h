@@ -58,6 +58,7 @@ public:
 
   MaskLayer( const std::string& name, const Core::MaskVolumeHandle& volume );
   MaskLayer( const std::string& name, const Core::GridTransform& grid_transform );
+  MaskLayer( const std::string& state_id );
   virtual ~MaskLayer();
 
   virtual Core::VolumeType type() const { return Core::VolumeType::MASK_E; }
@@ -86,6 +87,16 @@ public:
 
   // State that describes whether to show the  isosurface state
   Core::StateBoolHandle show_isosurface_state_;
+
+private:
+  Core::StateIntHandle bit_state_;
+
+protected:
+  // PRE_SAVE_STATES:
+  // this function synchronize the generation number for the session saving
+  virtual bool pre_save_states();
+
+  virtual bool post_load_states();
 
 private:
   Core::MaskVolumeHandle mask_volume_;

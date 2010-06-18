@@ -33,9 +33,11 @@
 #include <boost/lexical_cast.hpp>
 
 // Core includes
+
 #include <Core/Application/Application.h>
 #include <Core/Interface/Interface.h>
 #include <Core/Volume/Volume.h>
+#include <Core/DataBlock/MaskDataBlockManager.h>
 
 // Application includes
 #include <Application/Layer/LayerGroup.h>
@@ -54,8 +56,8 @@ CORE_SINGLETON_IMPLEMENTATION( LayerManager );
 LayerManager::LayerManager() :
   StateHandler( "layermanager", false, 0 )
 { 
-  std::vector< std::string> groups;
-  this->add_state( "groups", this->groups_state_, groups );
+  std::vector< std::string> layers;
+  this->add_state( "layers", this->layers_state_, layers );
 }
 
 LayerManager::~LayerManager()
@@ -111,7 +113,7 @@ bool LayerManager::insert_layer( LayerHandle layer )
   CORE_LOG_DEBUG( std::string( "Signalling that new layer was inserted" ) );
 
   // keep the state variables in sync
-  this->sync_group_lists();
+  //this->sync_group_lists();
 
   CORE_LOG_DEBUG( std::string( "--- triggering signals ---" ) );
 
@@ -158,7 +160,7 @@ bool LayerManager::move_group_above( std::string group_to_move_id, std::string g
   group_inserted_at_signal_( group_to_move_id, index );
   
   // keep the state variables in sync
-  this->sync_group_lists();
+  //this->sync_group_lists();
   
   return true;
 }
@@ -253,7 +255,7 @@ bool LayerManager::move_layer_above( std::string layer_to_move_id, std::string l
   layers_changed_signal_();
   
   // keep the state variables in sync
-  this->sync_group_lists();
+  //this->sync_group_lists();
   
   return true;  
 }
@@ -430,9 +432,38 @@ void LayerManager::delete_layers( LayerGroupHandle group )
   }
   
   // keep the state variables in sync
-  this->sync_group_lists();
+  //this->sync_group_lists();
   
 } // end delete_layer
+
+bool LayerManager::delete_all()
+{
+  lock_type lock( get_mutex() );
+
+  // Cycle through all the groups and delete all the layers
+  group_list_type::iterator group_iterator = this->group_list_.begin();
+  for ( ; group_iterator != this->group_list_.end(); ++group_iterator )
+  {
+    // set all of the layers to selected so they are deleted.
+    layer_list_type layer_list = ( *group_iterator )->get_layer_list();
+    for( layer_list_type::iterator it = layer_list.begin(); it != layer_list.end(); ++it )
+    {
+      //layer_list_type::iterator temp_it = it;
+      //it++;
+      ( *it )->selected_state_->set( true );
+    }
+
+    LayerGroupHandle temp_group = ( *group_iterator );
+    //++group_iterator;
+    this->delete_layers( temp_group );
+    if( group_list_.empty() )
+    {
+      break;
+    }
+  }
+  return true;
+}
+
 
 LayerHandle LayerManager::get_active_layer()
 {
@@ -560,36 +591,88 @@ void LayerManager::get_layer_names( std::vector< LayerIDNamePair >& layer_names,
 
 bool LayerManager::post_save_states()
 {
-  std::vector< std::string > group_vector = this->groups_state_->get();
-  for( size_t i = 0; i < group_vector.size(); ++i )
+  lock_type lock( this->get_mutex() );
+  std::vector< LayerHandle > layers;
+  this->get_layers( layers );
+
+  for( int i = 0; i < static_cast< int >( layers.size() ); ++i )
   {
-    if( ( group_vector[ i ] != "]" ) && ( group_vector[ i ] != "\0" ) )
+    if( !layers[ i ]->populate_session_states() )
     {
-      if( this->get_layer_group( group_vector[ i ] ) )
-      {
-        if( !( this->get_layer_group( group_vector[ i ] ) )->populate_session_states() )
-        {
-          return false;
-        }
-      }
+      return false;
     }
   }
+  return Core::MaskDataBlockManager::Instance()->save_data_blocks();
+}
+
+bool LayerManager::post_load_states()
+{
+
+  lock_type lock( this->get_mutex() );
+  if( !this->delete_all() )
+  {
+    return false;
+  }
+
+  std::vector< std::string > layer_vector = this->layers_state_->get();
+  for( int j = 0; j < static_cast< int >( layer_vector.size() ); ++j )
+  {
+    if( layer_vector[ j ] == "]" )
+    {
+      return true;
+    }
+
+    LayerHandle restored_layer;
+    std::vector< std::string > layer = Core::SplitString( layer_vector[ j ], "|" );
+  
+    if( layer[ 1 ] == "DATA_E" )
+    {
+      restored_layer = LayerHandle( new DataLayer( layer[ 0 ] ) );
+    }
+    else if( layer[ 1 ] == "MASK_E" )
+    {
+      restored_layer = LayerHandle( new MaskLayer(  layer[ 0 ] ) );
+    }
+    else
+    {
+      return false;
+    }
+ 
+    if( !restored_layer->load_states( Core::StateEngine::Instance()->session_states_ ) )
+    {
+      return false;
+    }
+    
+    this->insert_layer( restored_layer );
+  }
+
   return true;
 }
-  
-void LayerManager::sync_group_lists()
+
+bool LayerManager::pre_save_states()
 {
   lock_type lock( this->get_mutex() );
-  
-  std::vector< std::string > group_vector;
-  this->groups_state_->set( group_vector );
-  
+
+  std::vector< std::string > layers_vector;
+  this->layers_state_->set( layers_vector );
+
   group_list_type::iterator group_iterator = this->group_list_.begin();
   for ( ; group_iterator != this->group_list_.end(); group_iterator++)
   {
-    group_vector.push_back( ( *group_iterator )->get_statehandler_id() );
+    std::vector< std::string > group_layers_vector; 
+    ( *group_iterator )->get_layer_names( group_layers_vector );
+    for( int i = 0; i < static_cast< int >( group_layers_vector.size() ); ++i  )
+    {
+      layers_vector.push_back( group_layers_vector[ i ] );
+    }
   }
-  this->groups_state_->set( group_vector );
+
+  this->layers_state_->set( layers_vector );
+  return true;
 }
+
+
+
+
 
 } // end namespace seg3D

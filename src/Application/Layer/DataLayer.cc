@@ -29,35 +29,94 @@
 // STL includes
 
 // Boost includes 
+#include <boost/filesystem.hpp>
 
+// Core includes
 #include <Core/Application/Application.h>
+
+// Application includes
+#include <Application/ProjectManager/ProjectManager.h>
 #include <Application/Layer/DataLayer.h>
 
 namespace Seg3D
 {
 
 DataLayer::DataLayer( const std::string& name, const Core::DataVolumeHandle& volume ) :
-  Layer( name ), 
+  Layer( name ),
   data_volume_( volume )
 {
-  // Step (1) : Build the layer specific state variables
-
-  // == The brightness of the layer ==
-  add_state( "brightness", brightness_state_, 50.0, 0.0, 100.0, 0.1 );
-  
-  // == The contrast of the layer ==
-  add_state( "contrast", contrast_state_, 0.0, 0.0, 100.0, 0.1 );
-
-  // == Is this volume rendered through the volume renderer ==
-  add_state( "volume_rendered", volume_rendered_state_, false );
+  this->initialize_states();
   
 }
+  
+DataLayer::DataLayer( const std::string& state_id ) :
+  Layer( "not_initialized", state_id )
+{
+  this->initialize_states();
+}
+
 
 DataLayer::~DataLayer()
 {
   // Disconnect all current connections
   disconnect_all();
 }
+
+bool DataLayer::pre_save_states()
+{
+  this->generation_state_->set( static_cast< int >( this->data_volume_->get_generation() ) );
+
+  std::string generation = this->generation_state_->export_to_string() + ".nrrd";
+  boost::filesystem::path volume_path = ProjectManager::Instance()->get_project_data_path() /
+    generation;
+  std::string error;
+
+  if ( Core::DataVolume::SaveDataVolume( volume_path.string(), this->data_volume_ , error ) )
+  {
+    return true;
+  }
+
+  CORE_LOG_ERROR( error );
+  return false;
+
+}
+
+bool DataLayer::post_load_states()
+{
+  std::string generation = this->generation_state_->export_to_string() + ".nrrd";
+  boost::filesystem::path volume_path = ProjectManager::Instance()->get_project_data_path() /
+    generation;
+  std::string error;
+
+  if( Core::DataVolume::LoadDataVolume( volume_path, this->data_volume_, error ) )
+  {
+    return true;
+  }
+
+  CORE_LOG_ERROR( error );
+  return false;
+}
+
+void DataLayer::initialize_states()
+{
+
+  // Step (1) : Build the layer specific state variables
+
+  // == The brightness of the layer ==
+  add_state( "brightness", brightness_state_, 50.0, 0.0, 100.0, 0.1 );
+
+  // == The contrast of the layer ==
+  add_state( "contrast", contrast_state_, 0.0, 0.0, 100.0, 0.1 );
+
+  // == Is this volume rendered through the volume renderer ==
+  add_state( "volume_rendered", volume_rendered_state_, false );
+
+  
+
+}
+
+
+
 
 } // end namespace Seg3D
 

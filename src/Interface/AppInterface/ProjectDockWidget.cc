@@ -48,6 +48,7 @@ class ProjectDockWidgetPrivate
 public:
 
   Ui::ProjectDockWidget ui_;
+  std::vector< std::string > notes;
 
 };
 
@@ -97,7 +98,8 @@ ProjectDockWidget::~ProjectDockWidget()
   
 void ProjectDockWidget::save_project()
 {
-  ProjectManager::Instance()->save_project();
+  
+  ProjectManager::Instance()->save_project( std::string( "this is a note" ) );
 }
   
 void ProjectDockWidget::delete_session()
@@ -176,12 +178,29 @@ void ProjectDockWidget::populate_session_list()
   
   this->private_->ui_.sessions_list_->clear();
   
-  for( size_t i = 0; i < sessions.size(); ++i )
+  for( int i = 0; i < static_cast< int >( sessions.size() ); ++i )
   {
     if( sessions[ i ] != "" )
     {
+//      this->private_->ui_.sessions_list_->setCellWidget( i, 0, new QLabel( QString::fromStdString( 
+//        ( Core::SplitString( sessions[ i ], "|" ) )[ 1 ] ) ));
+// 
+//      this->private_->ui_.sessions_list_->setCellWidget( i, 1, new QTextEdit( QString::fromStdString( 
+//        ( Core::SplitString( sessions[ i ], "|" ) )[ 2 ] ) ));
+
+//      QTableWidgetItem *new_session_name = new QTableWidgetItem( QString::fromStdString( 
+//        ( Core::SplitString( sessions[ i ], "|" ) )[ 1 ] ), 0 );
+//      this->private_->ui_.sessions_list_->setItem( i, 0, new_session_name );
+// 
+//      QTableWidgetItem *new_session_note= new QTableWidgetItem( QString::fromStdString( 
+//        ( Core::SplitString( sessions[ i ], "|" ) )[ 2] ), 0 );
+//      this->private_->ui_.sessions_list_->setItem( i, 1, new_session_note );
+
+
+
       this->private_->ui_.sessions_list_->addItem( QString::fromStdString( 
         ( Core::SplitString( sessions[ i ], "|" ) )[ 1 ] ) );
+      //this->private_->notes.push_back(  )
     }
   }
 }

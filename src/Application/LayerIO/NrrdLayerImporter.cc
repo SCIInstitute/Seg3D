@@ -125,19 +125,21 @@ bool NrrdLayerImporter::import_layer( LayerImporterMode mode, std::vector<LayerH
     {
       CORE_LOG_DEBUG( std::string("Importing mask layer: ") + get_base_filename() );
 
-
       Core::DataBlockHandle datablock( Core::NrrdDataBlock::New( nrrd_data_ ) );
+      Core::DataVolumeHandle datavolume( new Core::DataVolume( 
+        nrrd_data_->get_grid_transform(), datablock ) );
+    
       Core::MaskDataBlockHandle maskdatablock;
       
-      if ( !( Core::MaskDataBlockManager::CreateMaskFromNonZeroData( 
-        datablock, maskdatablock ) ) ) 
+      if ( !( Core::MaskVolume::CreateMaskFromNonZeroData( 
+        datavolume, maskdatablock ) ) ) 
       {
         return false;
       }
-
+      
       Core::MaskVolumeHandle maskvolume( new Core::MaskVolume( 
         nrrd_data_->get_grid_transform(), maskdatablock ) );
-      
+
       layers.resize( 1 );
       layers[0] = LayerHandle( new MaskLayer( get_base_filename(), maskvolume ) );
 
@@ -151,10 +153,12 @@ bool NrrdLayerImporter::import_layer( LayerImporterMode mode, std::vector<LayerH
 
 
       Core::DataBlockHandle datablock( Core::NrrdDataBlock::New( nrrd_data_ ) );
+      Core::DataVolumeHandle datavolume( new Core::DataVolume( 
+        nrrd_data_->get_grid_transform(), datablock ) );
       std::vector<Core::MaskDataBlockHandle> maskdatablocks;
       
-      if ( !( Core::MaskDataBlockManager::CreateMaskFromBitPlaneData( 
-        datablock, maskdatablocks ) ) ) 
+      if ( !( Core::MaskVolume::CreateMaskFromBitPlaneData( 
+        datavolume, maskdatablocks ) ) ) 
       {
         return false;
       }
@@ -177,10 +181,12 @@ bool NrrdLayerImporter::import_layer( LayerImporterMode mode, std::vector<LayerH
 
 
       Core::DataBlockHandle datablock( Core::NrrdDataBlock::New( nrrd_data_ ) );
+      Core::DataVolumeHandle datavolume( new Core::DataVolume( 
+        nrrd_data_->get_grid_transform(), datablock ) );
       std::vector<Core::MaskDataBlockHandle> maskdatablocks;
-      
-      if ( !( Core::MaskDataBlockManager::CreateMaskFromLabelData( 
-        datablock, maskdatablocks ) ) ) 
+            
+      if ( !( Core::MaskVolume::CreateMaskFromLabelData( 
+        datavolume, maskdatablocks ) ) ) 
       {
         return false;
       }

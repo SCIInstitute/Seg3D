@@ -86,7 +86,7 @@ void AppMenu::create_file_menu( QMenu* qmenu )
   qaction = qmenu->addAction( tr( "&New Project" ) );
   qaction->setShortcut( tr( "Ctrl+P" ) );
   qaction->setToolTip( tr( "Start a new project." ) );
-  // TODO: connect this action to the Project Manager
+  AppInterface::open_project_wizard();
 
   qaction = qmenu->addAction( tr( "&Open Project" ) );
   qaction->setShortcut( QKeySequence::Open );

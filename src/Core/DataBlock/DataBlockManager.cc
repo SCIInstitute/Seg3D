@@ -43,10 +43,19 @@ void DataBlockManager::register_datablock( DataBlockHandle data_block,
 {
   lock_type lock( get_mutex() );
 
-  if ( generation == -1 ) generation = this->generation_; 
+  if ( generation == -1 )
+  {
+    generation = this->generation_; 
+  }
+  else if ( this->generation_ < generation )
+  {
+    this->generation_ = generation;
+  }
+
   data_block->set_generation( generation );
   this->generation_++;
   
+  assert( this->generation_map_.count( data_block->get_generation() ) == 0 );
   this->generation_map_[ data_block->get_generation() ] = DataBlockWeakHandle( data_block );
 }
 
