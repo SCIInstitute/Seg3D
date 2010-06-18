@@ -41,6 +41,8 @@
 #ifdef _WIN32
 #include <shlobj.h>    
 #include <tlhelp32.h>
+#include <windows.h>
+#include <LMCons.h>
 #else
 #include <stdlib.h>
 #endif
@@ -219,6 +221,7 @@ bool Application::get_user_name( std::string& user_name )
   if ( GetUserName( name, &length ) )
   {
     user_name = std::string( name );
+    return true;
   }
   else
   {

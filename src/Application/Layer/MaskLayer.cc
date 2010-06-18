@@ -83,8 +83,8 @@ void MaskLayer::initialize_states()
     // == Color of the layer ==
   
 
-    add_state( "color", color_state_, color_count_ %  PreferencesManager::Instance()->
-    color_states_.size() );
+    add_state( "color", color_state_, static_cast< int >( color_count_ %  PreferencesManager::Instance()->
+    color_states_.size() ) );
 
   color_count_++;
 

@@ -66,7 +66,8 @@ QtAbstractButtonVectorConnector::QtAbstractButtonVectorConnector( QAbstractButto
     for ( size_t j = 0; j < this->state_.size(); j++)
     {
       this->add_connection( this->state_[ j ]->value_changed_signal_.connect(
-        boost::bind( &QtAbstractButtonVectorConnector::SetActionChecked, qpointer, j, _1, _2 ) ) );
+        boost::bind( &QtAbstractButtonVectorConnector::SetActionChecked, qpointer, 
+        static_cast< int >( j ), _1, _2 ) ) );
     }
     
     this->add_connection( this->index_->value_changed_signal_.connect(

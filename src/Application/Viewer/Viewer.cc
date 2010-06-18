@@ -510,7 +510,10 @@ void Viewer::insert_layer( LayerHandle layer )
     volume_slice->move_slice_to( this->active_layer_slice_->depth() );
   }
 
-  this->trigger_redraw( false );
+  if ( !this->is_volume_view() )
+  {
+    this->trigger_redraw( false );
+  }
 }
 
 void Viewer::delete_layers( std::vector< LayerHandle > layers )
@@ -1189,4 +1192,3 @@ Core::VolumeSliceHandle Viewer::get_active_layer_slice() const
 }
 
 } // end namespace Seg3D
-
