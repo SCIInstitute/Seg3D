@@ -82,7 +82,7 @@ public:
   
   // SAVE_PROJECT:
   // this function saves the values in current_project_ to the current save location
-  void save_project( std::string& notes, bool autosave = false );
+  void save_project( const std::string& notes, bool autosave = false );
   
   // SAVE_PROJECT_AS:
   // this function saves the valuse in current_project_ to the desired save location
@@ -94,7 +94,7 @@ public:
   
   // SAVE_PROJECT_SESSION:
   // this function saves the current session to disk
-  bool save_project_session( std::string& notes, bool autosave = false ); 
+  bool save_project_session( const std::string& notes, bool autosave = false ); 
   
   // LOAD_PROJECT_SESSION:
   // this function saves the current session to disk

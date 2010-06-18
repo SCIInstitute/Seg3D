@@ -194,7 +194,7 @@ void ProjectManager::open_project( const std::string& project_path, const std::s
   this->add_to_recent_projects( project_path, project_name );
 }
   
-void ProjectManager::save_project( std::string& notes, bool autosave  )
+void ProjectManager::save_project( const std::string& notes, bool autosave  )
 {
   if( this->save_project_session( notes, autosave ) )
   {
@@ -214,7 +214,7 @@ void ProjectManager::save_project_as()
     
 }
   
-bool ProjectManager::save_project_session( std::string& notes, bool autosave )
+bool ProjectManager::save_project_session( const std::string& notes, bool autosave )
 {
   // Here we check to see if its an autosave and if it is, just save over the previous autosave
   std::string session_name;
