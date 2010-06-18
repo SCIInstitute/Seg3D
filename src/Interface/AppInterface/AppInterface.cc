@@ -449,20 +449,22 @@ void AppInterface::begin_progress( Core::ActionProgressHandle handle )
   if( this->progress_.data() )
   {
     this->progress_->done( 0 );
+    this->progress_->deleteLater(); 
   }
   
-  CORE_LOG_DEBUG( "Start progress widget" );
+  CORE_LOG_DEBUG( "-- Start progress widget --" );
   this->progress_ = new ProgressWidget( handle, this );
   this->progress_->exec();
 }
 
-void AppInterface::end_progress( Core::ActionProgressHandle handle )
+void AppInterface::end_progress( Core::ActionProgressHandle /*handle*/ )
 {
-  CORE_LOG_DEBUG( "Finish progress widget" );
+  CORE_LOG_DEBUG( "-- Finish progress widget --" );
 
   if( this->progress_.data() ) 
   {
     this->progress_->done( 0 );
+    this->progress_->deleteLater(); 
   }
 }
 

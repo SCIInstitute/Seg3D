@@ -212,17 +212,17 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
         this->connect( this->private_->color_widget_, SIGNAL( color_changed( int ) ), 
           this, SLOT( set_mask_background_color( int ) ) );
 
-        connect( this->private_->color_widget_, SIGNAL( color_changed( int ) ),
+        this->connect( this->private_->color_widget_, SIGNAL( color_changed( int ) ),
           this, SLOT( set_mask_background_color_from_preference_change( int ) ) );
 
         MaskLayer* mask_layer = dynamic_cast< MaskLayer* >( layer.get() );  
         QtUtils::QtBridge::Connect( this->private_->ui_.iso_surface_button_, mask_layer->show_isosurface_state_ );
         QtUtils::QtBridge::Connect( this->private_->ui_.border_selection_combo_, mask_layer->border_state_ );
         QtUtils::QtBridge::Connect( this->private_->ui_.fill_selection_combo_, mask_layer->fill_state_ );
+
         QtUtils::QtBridge::Connect( this->private_->color_widget_, mask_layer->color_state_,
           PreferencesManager::Instance()->color_states_ );
-
-        this->private_->color_widget_->set_color_index( mask_layer->color_state_->get() );
+        // this->private_->color_widget_->set_color_index( mask_layer->color_state_->get() );
         
         this->set_mask_background_color( mask_layer->color_state_->get() );
       }

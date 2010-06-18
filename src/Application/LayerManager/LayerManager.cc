@@ -61,8 +61,6 @@ LayerManager::LayerManager() :
 LayerManager::~LayerManager()
 {
 }
-
-int LayerManager::color_counter_ = 0;
   
 bool LayerManager::insert_layer( LayerHandle layer )
 {
@@ -72,13 +70,7 @@ bool LayerManager::insert_layer( LayerHandle layer )
     lock_type lock( this->get_mutex() );
     
     CORE_LOG_DEBUG( std::string("Insert New Layer: ") + layer->get_layer_id());
-    
-    if( layer->type() == Core::VolumeType::MASK_E )
-    {
-      static_cast< MaskLayer* >( layer.get() )->color_state_->
-        set( this->color_counter_++ % 11 );
-    }
-    
+        
     LayerGroupHandle group_handle;
     for ( group_list_type::iterator it = group_list_.begin(); 
        it != group_list_.end(); ++it )

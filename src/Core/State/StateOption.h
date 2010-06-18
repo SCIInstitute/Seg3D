@@ -48,6 +48,10 @@ typedef boost::shared_ptr< StateOption > StateOptionHandle;
 
 class StateOption : public StateBase
 {
+  // -- type definitions --
+public:
+  typedef std::string value_type;
+  typedef StateOptionHandle handle_type;
 
   // -- constructor/destructor --
 public:

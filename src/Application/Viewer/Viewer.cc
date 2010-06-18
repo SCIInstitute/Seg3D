@@ -93,8 +93,6 @@ Viewer::Viewer( size_t viewer_id ) :
     
   this->add_state( "is_picking_target", this->is_picking_target_state_, false );
 
-
-
   this->view_manipulator_ = ViewManipulatorHandle( new ViewManipulator( this ) );
   this->add_connection( LayerManager::Instance()->layer_inserted_signal_.connect( 
     boost::bind( &Viewer::insert_layer, this, _1 ) ) );
@@ -255,6 +253,26 @@ bool Viewer::wheel_event( int delta, int x, int y, int buttons, int modifiers )
   this->update_status_bar( x, y );
   
   return true;
+}
+
+
+bool Viewer::key_event( int key, int modifier )
+{
+  if ( key == Core::Key::KEY_LESS_E || key == Core::Key::KEY_COMMA_E || 
+    key == Core::Key::KEY_LEFT_E || key == Core::Key::KEY_DOWN_E )
+  {
+    this->offset_slice( -1 );
+    return true;
+  }
+
+  if ( key == Core::Key::KEY_GREATER_E || key == Core::Key::KEY_PERIOD_E || 
+    key == Core::Key::KEY_RIGHT_E || key == Core::Key::KEY_UP_E)
+  {
+    this->offset_slice( 1 );
+    return true;
+  }
+  
+  return false;
 }
 
 void Viewer::set_mouse_move_handler( mouse_event_handler_type func )

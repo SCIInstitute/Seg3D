@@ -60,6 +60,10 @@ typedef boost::shared_ptr< StateRangedInt > StateRangedIntHandle;
 template< class T >
 class StateRangedValue : public StateBase
 {
+  // -- type definitions --
+public:
+  typedef T value_type;
+  typedef boost::shared_ptr< StateRangedValue< T > > handle_type;
 
   // -- constructor/destructor --
 public:

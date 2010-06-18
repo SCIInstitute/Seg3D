@@ -31,6 +31,7 @@
 #include <Core/Utils/Log.h>
 #include <Core/Interface/Interface.h>
 #include <Core/State/Actions/ActionFlip.h>
+#include <Core/State/Actions/ActionSet.h>
 
 // Application includes
 #include <Application/Viewer/Actions/ActionAutoView.h>
@@ -151,25 +152,30 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
       this->private_->viewer_->volume_volume_rendering_visible_state_ );
 
     this->add_icons_to_combobox();
+    
+    this->private_->render_widget_->activate_signal_.connect(
+      boost::bind( &Core::ActionSet::Dispatch<Core::StateIntHandle,int>, 
+        ViewerManager::Instance()->active_viewer_state_, 
+        this->private_->viewer_->get_viewer_id() ) );
   }
 }
   
 void ViewerWidget::add_icons_to_combobox()
 { 
   QIcon icon;
-  icon.addFile(QString::fromUtf8(":/Images/Xview.png"), QSize(), QIcon::Normal, QIcon::On);
+  icon.addFile( QString::fromUtf8(":/Images/Xview.png"), QSize(), QIcon::Normal, QIcon::On );
   this->private_->ui_.viewer_states_->setItemIcon( 0, icon );
   
   QIcon icon1;
-  icon1.addFile(QString::fromUtf8(":/Images/Yview.png"), QSize(), QIcon::Normal, QIcon::On);
+  icon1.addFile( QString::fromUtf8(":/Images/Yview.png"), QSize(), QIcon::Normal, QIcon::On );
   this->private_->ui_.viewer_states_->setItemIcon( 1, icon1 );
   
   QIcon icon2;
-  icon2.addFile(QString::fromUtf8(":/Images/Zview.png"), QSize(), QIcon::Normal, QIcon::On);
+  icon2.addFile( QString::fromUtf8(":/Images/Zview.png"), QSize(), QIcon::Normal, QIcon::On );
   this->private_->ui_.viewer_states_->setItemIcon( 2, icon2 );
   
   QIcon icon3;
-  icon3.addFile(QString::fromUtf8(":/Images/Vview.png"), QSize(), QIcon::Normal, QIcon::On);
+  icon3.addFile( QString::fromUtf8(":/Images/Vview.png"), QSize(), QIcon::Normal, QIcon::On );
   this->private_->ui_.viewer_states_->setItemIcon( 3, icon3 );  
 }
 

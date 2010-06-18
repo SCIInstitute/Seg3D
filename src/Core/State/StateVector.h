@@ -75,7 +75,11 @@ typedef boost::shared_ptr< StateStringVector > StateStringVectorHandle;
 template< class T >
 class StateVector : public StateBase
 {
-
+  // -- type definitions --
+public:
+  typedef std::vector<T> value_type;
+  typedef boost::shared_ptr< StateVector< T > > handle_type;
+  
   // -- constructor/destructor --
 public:
   // CONSTRUCTOR

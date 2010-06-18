@@ -90,6 +90,10 @@ public:
   // This function needs to be overloaded to track mouse wheel events. 
   virtual bool wheel_event( int delta, int x, int y, int buttons, int modifiers );
 
+  // KEY_EVENT:
+  // This function is called when a key is pressed while hovering over the render widget
+  virtual bool key_event( int key, int modifiers );
+
   // RESIZE:
   // This function is called when the viewer is resized by the render widget.
   virtual void resize( int width, int height );

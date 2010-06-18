@@ -49,6 +49,12 @@ typedef std::pair< std::string, std::string > OptionLabelPair;
 
 class StateLabeledOption : public StateBase
 {
+
+  // -- type definitions --
+public:
+  typedef std::string value_type;
+  typedef StateLabeledOptionHandle handle_type;
+
 public:
 
   // Constructor

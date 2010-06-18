@@ -56,19 +56,21 @@ ViewerManager::ViewerManager() :
     default_viewer_mode_state_->export_list_to_string() );
   this->add_state( "active_viewer", this->active_viewer_state_, 0 );
 
-  std::vector< std::string> viewers;
-  this->add_state( "viewers", this->viewers_state_, viewers );
-  
+  // No viewer will be the active viewer for picking
+  // NOTE: The interface will set this up
   this->add_state( "active_axial_viewer", active_axial_viewer_, -1 );
   this->add_state( "active_coronal_viewer", active_coronal_viewer_, -1 );
   this->add_state( "active_sagittal_viewer", active_sagittal_viewer_, -1 );
+
+  // NOTE: Privately held state variable for  recording which viewers are used in the program
+  // Currently there are six default viewers
+  std::vector< std::string> viewers;
+  this->add_state( "viewers", this->viewers_state_, viewers );
 
   // Step (2)
   // Create the viewers that are part of the application
   // Currently a maximum of 6 viewers can be created
   this->viewers_.resize( 6 );
-  
-
   
   for ( size_t j = 0; j < viewers_.size(); j++ )
   {
@@ -110,8 +112,8 @@ ViewerManager::ViewerManager() :
       connect( boost::bind( &ViewerManager::update_volume_viewers, this ) ) );
   }
 
-
   // Finally we will put the viewers into state variables for loading to/from file
+  // NOTE: This state variable is for internal use only
   std::vector< std::string > viewers_vector;
   for( size_t i = 0; i < this->viewers_.size(); ++i )
   {

@@ -49,7 +49,6 @@
 // Application includes
 #include <Application/Viewer/Viewer.h>
 
-
 namespace Seg3D
 {
 

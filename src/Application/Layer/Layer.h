@@ -79,7 +79,54 @@ public:
   // GRID_TRANSFORM
   // Get the transform of the layer
   virtual const Core::GridTransform& get_grid_transform() const = 0;
+
+  // -- layer progress signals --
+public:
+  // NOTE: Layers can be locked and unlock to use as a source 
+  // (No alterations are made) or layers can be locked for filtering
+  // in which case progress on the new layer is reported as well
   
+  typedef boost::signals2::signal< void () > lock_signal_type;
+  typedef boost::signals2::signal< void () > unlock_signal_type;
+  
+  typedef boost::signals2::signal< void () > start_progress_signal_type;
+  typedef boost::signals2::signal< void () > finish_progress_signal_type;
+  typedef boost::signals2::signal< void (double) > update_progress_signal_type;
+
+  // LOCK_SIGNAL:
+  // The layer is being locked
+  lock_signal_type lock_signal_;
+  
+  // UNLOCK_SIGNAL:
+  // The layer is being unlocked
+  unlock_signal_type unlock_signal_;
+  
+
+  // START_PROGRESS_SIGNAL:
+  // This signal is raised when a filter starts updating the layer
+  start_progress_signal_type start_progress_signal_;
+  
+  // FINISH_PROGRESS_SIGNAL:
+  // This signal is raised when a filter finishes updating a layer
+  finish_progress_signal_type finish_progress_signal_;
+  
+  // UPDATE_PROGRESS:
+  // When new information on progress is available this signal is triggered.
+  update_progress_signal_type update_progress_signal_;
+  
+  // -- layer filter abort support --
+public:
+  // RAISE_ABORT:
+  // Abort the filter that is working on this layer
+  void raise_abort();
+  
+  // CHECK_ABORT:
+  // Check whether the abort flag was raised, it was reset by start_progress
+  bool check_abort();
+  
+private:
+  bool abort_;
+
   // -- Layer Locking system --
 public:
   

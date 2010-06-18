@@ -77,7 +77,7 @@ public:
   typedef int         index_type;
 #endif  
 
-  typedef unsigned long long  generation_type;
+  typedef long long  generation_type;
 
   // -- Constructor/destructor --
 public:

@@ -64,7 +64,12 @@ void MaskLayer::initialize_states()
     // Step (1) : Build the layer specific state variables
 
     // == Color of the layer ==
-    add_state( "color", color_state_, 0 );
+  
+
+    add_state( "color", color_state_, color_count_ %  PreferencesManager::Instance()->
+    color_states_.size() );
+
+  color_count_++;
 
     // == What border is used ==
     add_state( "border", border_state_, PreferencesManager::Instance()->
@@ -80,6 +85,8 @@ void MaskLayer::initialize_states()
     add_state( "isosurface", show_isosurface_state_, false );
     
 }
+
+Core::AtomicCounter MaskLayer::color_count_;
 
 } // end namespace Seg3D
 

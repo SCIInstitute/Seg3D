@@ -117,9 +117,28 @@ protected:
   // main display
   virtual void showEvent( QShowEvent* event );
 
+  // ENTEREVENT:
+  // This function is called by Qt when the mouse starts to hover over the widget
+  virtual void enterEvent( QEvent* event );
+
+  // LEAVEEVENT:
+  // This function is called by Qt when the mouse finishes to hover over the widget
+  virtual void leaveEvent( QEvent* event );
+  
+  // KEYPRESSEVENT:
+  // This function is called by Qt when a key is pressed
+  virtual void keyPressEvent( QKeyEvent* event );
+
   // -- internals of the QtRenderWidget --
 private:
   QtRenderWidgetPrivateHandle private_;
+  
+  // -- signals / slots --
+public:
+  // ACTIVATE_SIGNAL:
+  // This signal is triggered when the mouse is clicked in the widget
+  typedef boost::signals2::signal< void () > activate_signal_type;
+  activate_signal_type activate_signal_;
 };
 
 } // end namespace QtUtils

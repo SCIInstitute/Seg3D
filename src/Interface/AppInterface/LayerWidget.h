@@ -188,10 +188,6 @@ private Q_SLOTS:
 protected:
   void resizeEvent( QResizeEvent *event );
 
-
-  
-
-
 };
 
 } //end namespace Seg3D

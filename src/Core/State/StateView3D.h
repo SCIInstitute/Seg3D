@@ -57,6 +57,10 @@ typedef boost::weak_ptr< StateView3D > StateView3DWeakHandle;
 
 class StateView3D : public StateViewBase
 {
+  // -- type definitions --
+public:
+  typedef View3D value_type;
+  typedef StateView3DHandle handle_type;
 
   // -- constructor/destructor --
 public:

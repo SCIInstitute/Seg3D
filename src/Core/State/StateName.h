@@ -46,6 +46,11 @@ typedef boost::shared_ptr< StateNamePrivate > StateNamePrivateHandle;
 
 class StateName : public StateBase
 {
+  // -- type definitions --
+public:
+  typedef std::string value_type;
+  typedef StateNameHandle handle_type;
+  
   // -- Constructor/Destructor --
 public:
   StateName( const std::string& stateid, const std::string& value );

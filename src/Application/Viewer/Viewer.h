@@ -91,6 +91,8 @@ public:
     int buttons, int modifiers );
   virtual bool wheel_event( int delta, int x, int y, int buttons, int modifiers );
 
+  virtual bool key_event( int key, int modifier );
+
   void set_mouse_move_handler( mouse_event_handler_type func );
   void set_mouse_press_handler( mouse_event_handler_type func );
   void set_mouse_release_handler( mouse_event_handler_type func );

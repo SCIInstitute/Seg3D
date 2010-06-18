@@ -57,7 +57,11 @@ typedef boost::weak_ptr< StateView2D > StateView2DWeakHandle;
 
 class StateView2D : public StateViewBase
 {
-
+  // -- type definitions --
+public:
+  typedef View2D value_type;
+  typedef StateView2DHandle handle_type;
+  
   // -- constructor/destructor --
 public:
 

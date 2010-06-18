@@ -96,7 +96,13 @@ void AbstractViewer::mouse_release_event( const MouseHistory& mouse_history, int
 bool AbstractViewer::wheel_event( int delta, int x, int y, int buttons, int modifiers )
 {
   // Do nothing
-  return true;
+  return false;
+}
+
+bool AbstractViewer::key_event( int key, int modifiers )
+{
+  // do nothing
+  return false;
 }
 
 void AbstractViewer::install_renderer( Core::AbstractRendererHandle renderer )

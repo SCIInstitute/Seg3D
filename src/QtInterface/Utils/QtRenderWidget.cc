@@ -26,6 +26,9 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// STL includes
+#include <iostream>
+
 // Glew includes
 #include <GL/glew.h>
 
@@ -67,6 +70,7 @@ QtRenderWidget::QtRenderWidget( const QGLFormat& format, QWidget* parent, QGLWid
   this->setAttribute( Qt::WA_NoSystemBackground );
   this->setMouseTracking( true );
   this->setCursor( Qt::CrossCursor );
+  this->setFocusPolicy( Qt::StrongFocus );
 }
 
 QtRenderWidget::~QtRenderWidget()
@@ -196,6 +200,8 @@ void QtRenderWidget::mouseMoveEvent( QMouseEvent * event )
 
 void QtRenderWidget::mousePressEvent( QMouseEvent * event )
 {
+  this->activate_signal_();
+
   this->private_->mouse_history_.current_.x_ = 
     this->private_->mouse_history_.previous_.x_ = event->x();
   this->private_->mouse_history_.current_.y_ = 
@@ -234,6 +240,8 @@ void QtRenderWidget::mouseReleaseEvent( QMouseEvent * event )
 
 void QtRenderWidget::wheelEvent( QWheelEvent* event )
 {
+  this->activate_signal_();
+
   int delta = Core::RoundUp( event->delta() / 120.0 );
   if ( this->private_->viewer_->wheel_event( delta, event->x(), event->y(), 
     event->buttons(), event->modifiers() ) )
@@ -245,6 +253,19 @@ void QtRenderWidget::wheelEvent( QWheelEvent* event )
     event->ignore();
   }
 }
+
+void QtRenderWidget::keyPressEvent( QKeyEvent* event )
+{
+  std::cerr << "key pressed "<< std::endl;
+
+  this->activate_signal_();
+
+  if ( ! ( this->private_->viewer_->key_event( event->key(), event->modifiers() ) ) )
+  {
+    QWidget::keyPressEvent( event );
+  }
+}
+
 
 void QtRenderWidget::hideEvent( QHideEvent* event )
 {
@@ -263,6 +284,18 @@ void QtRenderWidget::showEvent( QShowEvent* event )
     this->private_->viewer_->get_renderer()->activate();
   }
   Core::ActionSet::Dispatch( this->private_->viewer_->viewer_visible_state_, true );
+}
+
+void QtRenderWidget::enterEvent( QEvent* event )
+{
+  event->accept();
+  setFocus();
+}
+
+void QtRenderWidget::leaveEvent( QEvent* event )
+{
+  event->accept();
+  clearFocus();
 }
 
 } // end namespace QtUtils

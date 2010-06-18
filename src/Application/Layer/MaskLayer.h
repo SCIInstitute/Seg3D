@@ -33,9 +33,12 @@
 #pragma once
 #endif
 
+// Core includes
+#include <Core/Volume/MaskVolume.h>
+#include <Core/Utils/AtomicCounter.h>
+
 // Application includes
 #include <Application/Layer/Layer.h>
-#include <Core/Volume/MaskVolume.h>
 
 namespace Seg3D
 {
@@ -88,6 +91,9 @@ private:
   Core::MaskVolumeHandle mask_volume_;
 
   void initialize_states();
+  
+  // counter for generating new colors for each new mask
+  static Core::AtomicCounter color_count_;
 };
 
 } // end namespace Seg3D

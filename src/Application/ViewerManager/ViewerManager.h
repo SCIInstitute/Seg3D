@@ -100,15 +100,31 @@ public:
 
   // -- State information --
 public:
+
+  // Which layout is used to display the data
   Core::StateOptionHandle layout_state_;
-  Core::StateIntHandle active_viewer_state_;
-  Core::StateIntHandle grid_size_state_;
-  Core::StateOptionHandle background_color_state_;
-  Core::StateBoolHandle show_slice_number_state_;
-  Core::StateOptionHandle naming_convention_state_;
   
+  // Number of the viewer that is the active viewer
+  Core::StateIntHandle active_viewer_state_;
+  
+  // Size of the grid
+  Core::StateIntHandle grid_size_state_;
+
+  // Background color in the viewer windows
+  Core::StateOptionHandle background_color_state_;
+
+  // Whether slice number is shown
+  Core::StateBoolHandle show_slice_number_state_;
+
+  Core::StateOptionHandle naming_convention_state_;
+
+  // Number of the viewer that is the active axial viewer ( for picking )
   Core::StateIntHandle active_axial_viewer_;
+  
+  // Number of the viewer that is the active coronal viewer ( for picking )
   Core::StateIntHandle active_coronal_viewer_;
+  
+  // Number of the viewer that is the active  sagittal viewer ( for picking )
   Core::StateIntHandle active_sagittal_viewer_;
 
   // -- Signals and slots --

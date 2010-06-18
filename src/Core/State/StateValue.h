@@ -76,6 +76,10 @@ typedef boost::shared_ptr< StateString > StateStringHandle;
 template< class T >
 class StateValue : public StateBase
 {
+  // -- type definitions --
+public:
+  typedef T value_type;
+  typedef boost::shared_ptr< StateValue< T > > handle_type;
 
   // -- constructor/destructor --
 public:
