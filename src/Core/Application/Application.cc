@@ -210,6 +210,36 @@ bool Application::get_config_directory( boost::filesystem::path& config_dir )
   return ( true );
 }
 
+bool Application::get_user_name( std::string& user_name )
+{
+#ifdef _WIN32
+  TCHAR name[UNLEN+1];
+  DWORD length = UNLEN;
+
+  if ( GetUserName( name, &length ) )
+  {
+    user_name = std::string( name );
+  }
+  else
+  {
+    CORE_LOG_ERROR( std::string( "Could not resolve user name." ) );
+    return false; 
+  }
+#else
+  if ( getenv( "USER" ) )
+  {
+    user_name = std::string( getenv( "USER" ) );
+    return true;
+  }
+  else
+  {
+    CORE_LOG_ERROR( std::string( "Could not resolve user name." ) );
+    return false;
+  }
+#endif
+
+}
+
 void Application::log_start()
 {
   CORE_LOG_MESSAGE( std::string( "Application: " ) + GetApplicationName() );

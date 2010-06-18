@@ -95,9 +95,9 @@ CORE_ADD_LIBRARY(Interface_AppController
             ${INTERFACE_APPCONTROLLER_NO_MOC_SRCS} 
             ${INTERFACE_APPCONTROLLER_MOC_SRCS})
 
-ADD_DEPENDENCIES(Interface_AppController 
-      ${INTERFACE_APPCONTROLLER_UI_SRCS}
-      ${INTERFACE_APPCONTROLLER_RCC_SRCS} )     
+#ADD_DEPENDENCIES(Interface_AppController 
+#     ${INTERFACE_APPCONTROLLER_UI_SRCS}
+#     ${INTERFACE_APPCONTROLLER_RCC_SRCS} )     
       
 TARGET_LINK_LIBRARIES(Interface_AppController
                       Core_Utils
