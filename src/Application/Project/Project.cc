@@ -104,7 +104,7 @@ bool Project::save_session( boost::filesystem::path project_path, const std::str
   
 bool Project::delete_session( boost::filesystem::path project_path, int state_index )
 {
-  project_path = project_path / 
+  boost::filesystem::path session_path = project_path / 
     ( Core::SplitString( ( this->sessions_state_->get() )[ state_index ], "|" ) )[ 0 ];
   
   std::vector< std::string > temp_sessions_vector = this->sessions_state_->get();
@@ -113,13 +113,14 @@ bool Project::delete_session( boost::filesystem::path project_path, int state_in
   
   try 
   {
-    boost::filesystem::remove_all( project_path );
+    boost::filesystem::remove_all( session_path );
   }
   catch(  std::exception& e ) 
   {
     return false;
   }
   
+  this->export_states( project_path, this->project_name_state_->get() );
   return true;
 }
   
