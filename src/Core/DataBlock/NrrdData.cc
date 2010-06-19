@@ -440,7 +440,10 @@ bool NrrdData::SaveNrrd( const std::string& filename, NrrdDataHandle nrrddata, s
     return false;
   }
 
-  if ( nrrdSave( filename.c_str(), nrrddata->nrrd(), 0 ) )
+  NrrdIoState* nio = nrrdIoStateNew();
+  nrrdIoStateSet( nio,  nrrdIoStateZlibLevel, 6 );
+  
+  if ( nrrdSave( filename.c_str(), nrrddata->nrrd(), nio ) )
   {
     char *err = biffGet( NRRD );
     error = "Error writing file: " + filename + " : " + std::string( err );
@@ -449,6 +452,8 @@ bool NrrdData::SaveNrrd( const std::string& filename, NrrdDataHandle nrrddata, s
 
     return false;
   }
+
+    nio = nrrdIoStateNix( nio );
 
   error = "";
   return true;
