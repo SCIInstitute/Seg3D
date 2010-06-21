@@ -27,7 +27,7 @@
  */
 
 //Interface Includes
-#include <QtInterface/Bridge/QtBridge.h>
+#include <QtUtils/Bridge/QtBridge.h>
 
 //Interface Includes
 #include <Interface/ToolInterface/CustomWidgets/TargetComboBox.h>

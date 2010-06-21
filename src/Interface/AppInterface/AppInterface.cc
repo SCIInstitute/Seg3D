@@ -37,8 +37,8 @@
 #include <Core/Interface/Interface.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
 
-// QtInterface includes
-#include <QtInterface/Utils/QtPointer.h>
+// QtUtils includes
+#include <QtUtils/Utils/QtPointer.h>
 
 // Interface includes
 #include <Interface/AppInterface/AppInterface.h>

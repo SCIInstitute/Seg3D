@@ -42,7 +42,6 @@
 // Core includes
 #include <Core/Utils/ConnectionHandler.h>
 #include <Core/Utils/Log.h>
-// include all the headers associated with the action engine
 #include <Core/Action/Actions.h>
 
 namespace Seg3D

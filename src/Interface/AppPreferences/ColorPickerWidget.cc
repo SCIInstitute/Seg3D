@@ -29,8 +29,8 @@
 // Application includes
 #include <Application/PreferencesManager/PreferencesManager.h>
 
-// QtInterface includes
-#include <QtInterface/Bridge/QtBridge.h>
+// QtUtils includes
+#include <QtUtils/Bridge/QtBridge.h>
 
 // Interface includes
 #include <Interface/AppPreferences/ColorPickerWidget.h>

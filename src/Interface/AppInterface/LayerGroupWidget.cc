@@ -32,8 +32,8 @@
 //Core Includes - for logging
 #include <Core/Utils/Log.h>
 
-//QtInterface Includes
-#include <QtInterface/Bridge/QtBridge.h>
+//QtUtils Includes
+#include <QtUtils/Bridge/QtBridge.h>
 
 //Interface Includes
 #include <Interface/AppInterface/LayerGroupWidget.h>

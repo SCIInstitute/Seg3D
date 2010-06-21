@@ -32,9 +32,9 @@
 //Core Includes - for logging
 #include <Core/Utils/Log.h>
 
-//QtInterface Includes
-#include <QtInterface/Bridge/QtBridge.h>
-#include <QtInterface/Widgets/QtColorBarWidget.h>
+//QtUtils Includes
+#include <QtUtils/Bridge/QtBridge.h>
+#include <QtUtils/Widgets/QtColorBarWidget.h>
 
 //Interface Includes
 #include <Interface/AppInterface/LayerWidget.h>

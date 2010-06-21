@@ -27,7 +27,7 @@
  */
 
 //Interface Includes
-#include <Interface/QtInterface/QtBridge.h>
+#include <Interface/QtUtils/QtBridge.h>
 
 //Qt Gui Includes
 #include <Interface/ToolInterface/FlipToolInterface.h>

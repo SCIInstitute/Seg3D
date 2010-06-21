@@ -34,7 +34,7 @@
 #include <boost/lexical_cast.hpp>
 
 // Interface includes
-#include <QtInterface/Bridge/QtBridge.h>
+#include <QtUtils/Bridge/QtBridge.h>
 
 // Application includes
 #include <Interface/AppInterface/StyleSheet.h>

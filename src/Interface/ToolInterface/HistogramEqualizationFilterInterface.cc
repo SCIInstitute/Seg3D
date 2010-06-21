@@ -26,9 +26,9 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-//QtInterface Includes
-#include <QtInterface/Bridge/QtBridge.h>
-#include <QtInterface/Widgets/QtHistogramWidget.h>
+//QtUtils Includes
+#include <QtUtils/Bridge/QtBridge.h>
+#include <QtUtils/Widgets/QtHistogramWidget.h>
 
 //Interface Includes
 #include <Interface/ToolInterface/CustomWidgets/TargetComboBox.h>

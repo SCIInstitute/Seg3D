@@ -30,8 +30,8 @@
 #include <Core/Utils/Log.h>
 #include <Core/Interface/Interface.h>
 
-//QtInterface Includes
-#include <QtInterface/Bridge/QtBridge.h>
+//QtUtils Includes
+#include <QtUtils/Bridge/QtBridge.h>
 
 //Application includes
 #include <Application/ProjectManager/ProjectManager.h>

@@ -38,8 +38,8 @@
 #include <Core/Action/ActionHistory.h>
 #include <Core/Action/ActionSocket.h>
 
-// QtInterface includes
-#include <QtInterface/Utils/QtApplication.h>
+// QtUtils includes
+#include <QtUtils/Utils/QtApplication.h>
 
 // Interface includes
 #include <Interface/AppInterface/AppInterface.h>

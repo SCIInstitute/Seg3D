@@ -36,8 +36,8 @@
 // Application includes
 #include <Application/LayerManager/Actions/ActionImportLayer.h>
 
-// QtInterface Includes
-#include <QtInterface/Bridge/QtBridge.h>
+// QtUtils Includes
+#include <QtUtils/Bridge/QtBridge.h>
 
 // Interface Includes
 #include <Interface/AppInterface/StyleSheet.h>

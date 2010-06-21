@@ -35,8 +35,8 @@
 //Application Includes
 #include <Application/Tools/PaintTool.h>
 
-//QtInterface Includes
-#include <QtInterface/Bridge/QtBridge.h>
+//QtUtils Includes
+#include <QtUtils/Bridge/QtBridge.h>
 
 
 namespace Seg3D

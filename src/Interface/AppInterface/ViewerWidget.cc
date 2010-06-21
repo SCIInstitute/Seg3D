@@ -42,10 +42,10 @@
 #include <QtOpenGL>
 
 // Qt Interface support classes
-#include <QtInterface/Utils/QtApplication.h>
-#include <QtInterface/Bridge/QtBridge.h>
-#include <QtInterface/Utils/QtRenderResources.h>
-#include <QtInterface/Utils/QtRenderWidget.h>
+#include <QtUtils/Utils/QtApplication.h>
+#include <QtUtils/Bridge/QtBridge.h>
+#include <QtUtils/Utils/QtRenderResources.h>
+#include <QtUtils/Utils/QtRenderWidget.h>
 
 // Ui includes
 #include "ui_ViewerWidget.h"

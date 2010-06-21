@@ -35,7 +35,7 @@
 #include <Core/Interface/Interface.h>
 
 // Interface bridging includes
-#include <QtInterface/Bridge/QtBridge.h>
+#include <QtUtils/Bridge/QtBridge.h>
 
 // Interface includes
 #include <Interface/AppController/AppController.h>
