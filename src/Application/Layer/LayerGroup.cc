@@ -221,16 +221,4 @@ void LayerGroup::get_layer_names( std::vector< std::string >& layer_ids )
   }
 }
 
-// void LayerGroup::destroy_layers()
-// {
-//  for( layer_list_type::iterator it = this->layer_list_.begin(); 
-//  it != this->layer_list_.end(); ++it
-//  {
-//    this->delete_layer( *it );
-//  }
-// }
-
-
-
-
 } // end namespace Seg3D

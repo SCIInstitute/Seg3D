@@ -50,6 +50,8 @@ public:
   Ui::ProjectDockWidget ui_;
   std::vector< std::string > notes;
 
+  QStandardItemModel* note_model_;
+
 };
 
 ProjectDockWidget::ProjectDockWidget( QWidget *parent ) :
@@ -61,17 +63,19 @@ ProjectDockWidget::ProjectDockWidget( QWidget *parent ) :
     qpointer_type project_dock_widget( this );
     
     this->private_->ui_.setupUi( this );
+
     QtUtils::QtBridge::Connect( this->private_->ui_.project_name_edit_, 
       ProjectManager::Instance()->current_project_->project_name_state_ );
     
     QtUtils::QtBridge::Connect( this->private_->ui_.custom_colors_checkbox_, 
       ProjectManager::Instance()->current_project_->save_custom_colors_state_ );
     
-    QtUtils::QtBridge::Connect( this->private_->ui_.consolidate_files_checkbox_, 
-      ProjectManager::Instance()->current_project_->auto_consolidate_files_state_ );
-    
     add_connection( ProjectManager::Instance()->current_project_->sessions_state_->
       state_changed_signal_.connect( boost::bind( &ProjectDockWidget::HandleSessionSaved, 
+      project_dock_widget ) ) );
+
+    add_connection( ProjectManager::Instance()->current_project_->project_notes_state_->
+      state_changed_signal_.connect( boost::bind( &ProjectDockWidget::HandleNoteSaved, 
       project_dock_widget ) ) );
     
     
@@ -86,7 +90,9 @@ ProjectDockWidget::ProjectDockWidget( QWidget *parent ) :
 
     connect( this->private_->ui_.sessions_list_, SIGNAL( itemDoubleClicked ( QListWidgetItem* ) ),
       this, SLOT( call_load_session( QListWidgetItem* ) ) );
-  
+
+    connect( this->private_->ui_.save_note_button_, SIGNAL( clicked() ), 
+      this, SLOT( save_note() ) );
   }
 }
 
@@ -98,8 +104,14 @@ ProjectDockWidget::~ProjectDockWidget()
   
 void ProjectDockWidget::save_project()
 {
-  
-  ProjectManager::Instance()->save_project( std::string( "this is a note" ) );
+  ProjectManager::Instance()->save_project();
+}
+
+void ProjectDockWidget::save_note()
+{
+  ProjectManager::Instance()->save_note( this->private_->ui_.note_edit_->toPlainText().toStdString() );
+  this->private_->ui_.note_edit_->setPlainText( QString::fromUtf8( "" ) );
+
 }
   
 void ProjectDockWidget::delete_session()
@@ -169,6 +181,8 @@ void ProjectDockWidget::call_load_session( QListWidgetItem* item )
 {
   this->load_session();
 }
+
+
   
   
 void ProjectDockWidget::populate_session_list()
@@ -182,29 +196,50 @@ void ProjectDockWidget::populate_session_list()
   {
     if( sessions[ i ] != "" )
     {
-//      this->private_->ui_.sessions_list_->setCellWidget( i, 0, new QLabel( QString::fromStdString( 
-//        ( Core::SplitString( sessions[ i ], "|" ) )[ 1 ] ) ));
-// 
-//      this->private_->ui_.sessions_list_->setCellWidget( i, 1, new QTextEdit( QString::fromStdString( 
-//        ( Core::SplitString( sessions[ i ], "|" ) )[ 2 ] ) ));
-
-//      QTableWidgetItem *new_session_name = new QTableWidgetItem( QString::fromStdString( 
-//        ( Core::SplitString( sessions[ i ], "|" ) )[ 1 ] ), 0 );
-//      this->private_->ui_.sessions_list_->setItem( i, 0, new_session_name );
-// 
-//      QTableWidgetItem *new_session_note= new QTableWidgetItem( QString::fromStdString( 
-//        ( Core::SplitString( sessions[ i ], "|" ) )[ 2] ), 0 );
-//      this->private_->ui_.sessions_list_->setItem( i, 1, new_session_note );
-
-
-
       this->private_->ui_.sessions_list_->addItem( QString::fromStdString( 
         ( Core::SplitString( sessions[ i ], "|" ) )[ 1 ] ) );
-      //this->private_->notes.push_back(  )
     }
   }
 }
     
+
+void ProjectDockWidget::populate_notes_list()
+{
+  std::vector< std::string > notes = ProjectManager::Instance()->current_project_->
+    project_notes_state_->get();
+  
+  // Clear out the treewidget
+  this->private_->ui_.notes_tree_->clear();
+
+  int num_of_notes = static_cast< int >( notes.size() );
+
+  if( num_of_notes < 1 )
+  {
+    return;
+  }
+  else if ( notes[ 0 ] == "[" )
+  {
+    return;
+  }
+
+  for( int i = 0; i < num_of_notes; i++ )
+  {
+    QTreeWidgetItem* item = new QTreeWidgetItem( this->private_->ui_.notes_tree_ );
+    item->setText( 0, QString::fromStdString( ( Core::SplitString( notes[ i ], "|" ) )[ 0 ] ) );
+    QTreeWidgetItem* note = new QTreeWidgetItem();
+
+    std::string test = ( Core::SplitString( notes[ i ], "|" ) )[ 1 ];
+    QString note_body = QString::fromStdString( test );
+    QLabel* note_text = new QLabel( note_body );
+
+    note_text->setWordWrap( true );
+    item->addChild( note );
+
+    this->private_->ui_.notes_tree_->addTopLevelItem( item );
+    this->private_->ui_.notes_tree_->setItemWidget( note, 0, note_text );
+    
+  }
+}
   
 void ProjectDockWidget::HandleSessionSaved( qpointer_type qpointer )
 {
@@ -219,5 +254,25 @@ void ProjectDockWidget::HandleSessionSaved( qpointer_type qpointer )
   if( qpointer.data() ) qpointer->populate_session_list();
   CORE_LOG_DEBUG( "HandleSessionSaved done" );
 }
+
+void ProjectDockWidget::HandleNoteSaved( qpointer_type qpointer )
+{
+  if( !( Core::Interface::IsInterfaceThread() ) )
+  {
+    Core::Interface::Instance()->post_event( boost::bind( 
+      &ProjectDockWidget::HandleNoteSaved, qpointer ) );
+    return;
+  }
+
+  CORE_LOG_DEBUG( "HandleNoteSaved started" );
+  if( qpointer.data() ) qpointer->populate_notes_list();
+  CORE_LOG_DEBUG( "HandleNoteSaved done" );
+}
+
+
+
+
+
+
 
 } // end namespace Seg3D

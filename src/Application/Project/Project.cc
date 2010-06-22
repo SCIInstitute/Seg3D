@@ -51,8 +51,9 @@ Project::Project( const std::string& project_name ) :
   add_state( "auto_consolidate_files", this->auto_consolidate_files_state_, true );
   add_state( "save_custom_colors", this->save_custom_colors_state_, false );
   
-  std::vector< std::string> sessions;
-  add_state( "sessions", this->sessions_state_, sessions );
+  std::vector< std::string> empty_vector;
+  add_state( "sessions", this->sessions_state_, empty_vector );
+  add_state( "project_notes", this->project_notes_state_, empty_vector );
 
   SessionHandle new_session( new Session( "default_session" ) );
   this->current_session_ = new_session;
@@ -89,14 +90,13 @@ bool Project::load_session( boost::filesystem::path project_path, int state_inde
   
 }
   
-bool Project::save_session( boost::filesystem::path project_path, const std::string& session_name, 
-  const std::string& notes )
+bool Project::save_session( boost::filesystem::path project_path, const std::string& session_name )
 {
   this->current_session_->session_name_state_->set( session_name );
   
   boost::filesystem::path temp_path = "sessions";
   temp_path = temp_path / session_name;
-  this->add_session_to_list( temp_path.string() + "|" + session_name + "|" + notes );
+  this->add_session_to_list( temp_path.string() + "|" + session_name );
 
   return this->current_session_->save_session_settings( 
     ( project_path / "sessions" / session_name ), session_name );

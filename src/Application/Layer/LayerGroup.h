@@ -208,10 +208,6 @@ private:
   // The list that contains the layers that are stored in this class
   layer_list_type layer_list_;
 
-  //std::vector< std::string > layer_names_list_
-  
-
-
 };
 
 } // end namespace Seg3D

@@ -116,8 +116,7 @@ void AppPreferences::setup_general_prefs()
   connect( this->private_->ui_.change_directory_button_, SIGNAL( clicked() ), 
     this, SLOT( change_project_directory() ) );
 
-  QtUtils::QtBridge::Connect( this->private_->ui_.consolidate_project_checkbox_, 
-    PreferencesManager::Instance()->considate_project_state_ );
+
   QtUtils::QtBridge::Connect( this->private_->ui_.full_screen_on_startup_checkbox_, 
     PreferencesManager::Instance()->full_screen_on_startup_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.auto_save_checkbox_,

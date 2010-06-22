@@ -76,6 +76,7 @@ public:
   Core::StateBoolHandle save_custom_colors_state_;
   Core::StateBoolHandle auto_consolidate_files_state_;
   Core::StateStringVectorHandle sessions_state_;
+  Core::StateStringVectorHandle project_notes_state_;
   
   
   
@@ -90,7 +91,7 @@ public:
   
   // SAVE_SESSION:
   // this function will be called from the project manager to save a session
-  bool save_session( boost::filesystem::path project_path, const std::string& session_name, const std::string& notes );
+  bool save_session( boost::filesystem::path project_path, const std::string& session_name );
   
   // DELETE_SESSION:
   // this function will be called by the project manager to delete a session

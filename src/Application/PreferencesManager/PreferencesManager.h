@@ -68,7 +68,6 @@ private:
 public:
   //General Preferences
   Core::StateStringHandle project_path_state_;
-  Core::StateBoolHandle considate_project_state_;
   Core::StateBoolHandle full_screen_on_startup_state_;
   Core::StateBoolHandle auto_save_state_;
   Core::StateRangedIntHandle auto_save_timer_state_;

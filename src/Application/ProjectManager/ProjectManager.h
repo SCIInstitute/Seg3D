@@ -82,7 +82,7 @@ public:
   
   // SAVE_PROJECT:
   // this function saves the values in current_project_ to the current save location
-  void save_project( const std::string& notes, bool autosave = false );
+  void save_project( bool autosave = false );
   
   // SAVE_PROJECT_AS:
   // this function saves the valuse in current_project_ to the desired save location
@@ -94,7 +94,7 @@ public:
   
   // SAVE_PROJECT_SESSION:
   // this function saves the current session to disk
-  bool save_project_session( const std::string& notes, bool autosave = false ); 
+  bool save_project_session( bool autosave = false ); 
   
   // LOAD_PROJECT_SESSION:
   // this function saves the current session to disk
@@ -103,6 +103,10 @@ public:
   // DELETE_PROJECT_SESSION:
   // this function deletes the current session from disk
   bool delete_project_session( int session_index ); 
+
+  // SAVE_NOTE:
+  // this function saves a note
+  void save_note( const std::string& note );
 
   // GET_PROJECT_DATA_PATH:
   boost::filesystem::path get_project_data_path() const;
@@ -132,6 +136,11 @@ private:
   // RENAME_PROJECT_FOLDER
   // this function is triggered when a user changes the folder name
   void rename_project_folder( const std::string& new_name, Core::ActionSource source );
+
+  // SAVE_PROJECT_ONLY:
+  // this function saves only the project and is used internally only. It returns if it was 
+  // successful.
+  bool save_project_only();
 
   // SET_AUTO_SAVE_TIMER
   // this function is called whenever the value of the autosave time is changed in the Preferences

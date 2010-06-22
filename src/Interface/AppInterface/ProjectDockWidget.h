@@ -61,10 +61,13 @@ public:
 public:
   typedef QPointer< ProjectDockWidget > qpointer_type;
   static void HandleSessionSaved( qpointer_type qpointer );
+  static void HandleNoteSaved( qpointer_type qpointer );
   
 private Q_SLOTS:
   void save_project();
+  void save_note();
   void populate_session_list();
+  void populate_notes_list();
   void load_session();
   void delete_session();
   void call_load_session( QListWidgetItem* item );

@@ -180,7 +180,7 @@ void ProjectManager::new_project( const std::string& project_name, bool consolid
     this->current_project_->auto_consolidate_files_state_->set( consolidate );
 
 
-    this->save_project_session( std::string( "initial save" ) );
+    this->save_project_session();
   }
 }
   
@@ -194,15 +194,17 @@ void ProjectManager::open_project( const std::string& project_path, const std::s
   this->add_to_recent_projects( project_path, project_name );
 }
   
-void ProjectManager::save_project( const std::string& notes, bool autosave  )
+void ProjectManager::save_project( bool autosave /*= false*/ )
 {
-  if( this->save_project_session( notes, autosave ) )
+  if( this->save_project_session( autosave ) )
   {
-    boost::filesystem::path project_path = boost::filesystem::path( 
-      current_project_path_state_->get().c_str() );
-    project_path = project_path / this->current_project_->project_name_state_->get().c_str();
-    this->current_project_->export_states( project_path, 
-      this->current_project_->project_name_state_->get() );
+//    boost::filesystem::path project_path = boost::filesystem::path( 
+//      current_project_path_state_->get().c_str() );
+//    project_path = project_path / this->current_project_->project_name_state_->get().c_str();
+//    this->current_project_->export_states( project_path, 
+//      this->current_project_->project_name_state_->get() );
+    this->save_project_only();
+
   }
 
   this->start_auto_save_timer();
@@ -214,7 +216,7 @@ void ProjectManager::save_project_as()
     
 }
   
-bool ProjectManager::save_project_session( const std::string& notes, bool autosave )
+bool ProjectManager::save_project_session( bool autosave /*= false */ )
 {
   // Here we check to see if its an autosave and if it is, just save over the previous autosave
   std::string session_name;
@@ -222,6 +224,11 @@ bool ProjectManager::save_project_session( const std::string& notes, bool autosa
     session_name = "autosave";
   else
     session_name = this->get_timestamp();
+
+  std::string user_name;
+  Core::Application::Instance()->get_user_name( user_name );
+
+  session_name = session_name + " - " + user_name;
   
   boost::filesystem::path path = complete( boost::filesystem::path( this->
     current_project_path_state_->get().c_str(), boost::filesystem::native ) );
@@ -239,7 +246,7 @@ bool ProjectManager::save_project_session( const std::string& notes, bool autosa
     this->current_project_->project_name_state_->get() );
   
   return this->current_project_->save_session( ( path /
-    this->current_project_->project_name_state_->get() ), session_name, notes );
+    this->current_project_->project_name_state_->get() ), session_name );
 }
   
 
@@ -283,6 +290,8 @@ void ProjectManager::add_to_recent_projects( const std::string& project_path,
     }
   }
   
+  
+
   // now we add id to the beginning of the list
   temp_projects_vector.insert( temp_projects_vector.begin(), 
     ( project_path + "|" + project_name + "|" + this->get_timestamp() ) );
@@ -368,6 +377,47 @@ boost::filesystem::path ProjectManager::get_project_data_path() const
 
   
 }
+
+void ProjectManager::save_note( const std::string& note )
+{
+//  std::string new_note = note;
+//  int note_length = static_cast< int >( new_note.length() );
+//  int splits = note_length / 32;
+// 
+//  // now for some fancy word wrapping.
+//  for( int i = 1; i <= splits; i++ )
+//  {
+//    size_t last_location = new_note.find_last_of( " ", ( ( 30 * i ) + ( i ) ) );
+//    new_note.replace( last_location, 1, "\n" );
+//  }
+
+  std::string user_name;
+  Core::Application::Instance()->get_user_name( user_name );
+
+
+
+  std::vector< std::string > notes = this->current_project_->project_notes_state_->get();
+
+  notes.push_back( get_timestamp() + " - " + user_name + "|" + note );
+
+  this->current_project_->project_notes_state_->set( notes );
+
+  this->save_project_only();
+}
+
+bool ProjectManager::save_project_only()
+{
+  boost::filesystem::path project_path = boost::filesystem::path( 
+    current_project_path_state_->get().c_str() );
+
+  project_path = project_path / this->current_project_->project_name_state_->get().c_str();
+
+  return this->current_project_->export_states( project_path, 
+    this->current_project_->project_name_state_->get() );
+
+}
+
+
 
 
 
