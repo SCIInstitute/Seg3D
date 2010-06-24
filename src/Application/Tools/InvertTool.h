@@ -63,6 +63,9 @@ public:
   // Replace data
   Core::StateBoolHandle replace_state_;
 
+private:
+  const static size_t version_number_;
+
 };
 
 } // end namespace

@@ -43,8 +43,8 @@ namespace Seg3D
 
 const std::string Tool::NONE_OPTION_C( "<none>" );
 
-Tool::Tool( const std::string& tool_type ) :
-  StateHandler( tool_type, true )
+Tool::Tool( const std::string& tool_type, size_t version_number ) :
+  StateHandler( tool_type, version_number, true )
 {
 }
 

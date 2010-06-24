@@ -63,6 +63,9 @@ public:
   // Layerid of the target layer
   Core::StateStringHandle target_layer_state_;
 
+private:
+  const static size_t version_number_;
+
 };
 
 } // end namespace

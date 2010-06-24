@@ -41,10 +41,12 @@
 namespace Seg3D
 {
 
+const size_t ProjectManager::version_number_ = 1;
+
 CORE_SINGLETON_IMPLEMENTATION( ProjectManager );
 
 ProjectManager::ProjectManager() :
-  StateHandler( "projectmanager", false ),
+  StateHandler( "projectmanager", version_number_, false ),
   auto_save_timer_( 10 )
 { 
   Core::Application::Instance()->get_config_directory( this->local_projectmanager_path_ );
@@ -67,7 +69,7 @@ ProjectManager::ProjectManager() :
   }
   catch ( std::exception& e ) 
   {
-    
+    CORE_LOG_ERROR( e.what() );
   }
   
   this->initialize();
@@ -134,7 +136,7 @@ void ProjectManager::rename_project_folder( const std::string& new_name, Core::A
   }
   catch ( std::exception& e ) 
   {
-    //return;
+    CORE_LOG_ERROR( e.what() );
   }
   
   std::vector< std::string > temp_projects_vector = this->recent_projects_state_->get();
@@ -198,13 +200,7 @@ void ProjectManager::save_project( bool autosave /*= false*/ )
 {
   if( this->save_project_session( autosave ) )
   {
-//    boost::filesystem::path project_path = boost::filesystem::path( 
-//      current_project_path_state_->get().c_str() );
-//    project_path = project_path / this->current_project_->project_name_state_->get().c_str();
-//    this->current_project_->export_states( project_path, 
-//      this->current_project_->project_name_state_->get() );
     this->save_project_only();
-
   }
 
   this->start_auto_save_timer();
@@ -233,15 +229,6 @@ bool ProjectManager::save_project_session( bool autosave /*= false */ )
   boost::filesystem::path path = complete( boost::filesystem::path( this->
     current_project_path_state_->get().c_str(), boost::filesystem::native ) );
   
-  try // to create a project session folder
-  {
-    boost::filesystem::create_directory( path / this->current_project_->project_name_state_->
-      get() / "sessions" / session_name );
-  }
-  catch ( std::exception& e ) // any errors that we might get thrown
-  {
-    return false;
-  }
   this->add_to_recent_projects( this->current_project_path_state_->export_to_string(),
     this->current_project_->project_name_state_->get() );
   
@@ -280,7 +267,6 @@ void ProjectManager::add_to_recent_projects( const std::string& project_path,
   {
     if( temp_projects_vector[ i ] != "" )
     {
-      //if( temp_projects_vector[ i ] == ( project_path + "|" + project_name ) )
       if( ( ( Core::SplitString( temp_projects_vector[ i ], "|" ) )[ 0 ] + "|" +
         ( Core::SplitString( temp_projects_vector[ i ], "|" ) )[ 1 ] )
         == ( project_path + "|" + project_name ) )
@@ -290,8 +276,6 @@ void ProjectManager::add_to_recent_projects( const std::string& project_path,
     }
   }
   
-  
-
   // now we add id to the beginning of the list
   temp_projects_vector.insert( temp_projects_vector.begin(), 
     ( project_path + "|" + project_name + "|" + this->get_timestamp() ) );
@@ -311,6 +295,7 @@ bool ProjectManager::create_project_folders( const std::string& project_name )
   }
   catch ( std::exception& e ) // any errors that we might get thrown
   {
+    CORE_LOG_ERROR( e.what() );
     return false;
   }
   
@@ -322,6 +307,7 @@ bool ProjectManager::create_project_folders( const std::string& project_name )
   }
   catch ( std::exception& e ) // any errors that we might get thrown
   {
+    CORE_LOG_ERROR( e.what() );
     return false;
   }
   
@@ -333,6 +319,7 @@ bool ProjectManager::create_project_folders( const std::string& project_name )
   }
   catch ( std::exception& e ) // any errors that we might get thrown
   {
+    CORE_LOG_ERROR( e.what() );
     return false;
   }
   
@@ -380,22 +367,8 @@ boost::filesystem::path ProjectManager::get_project_data_path() const
 
 void ProjectManager::save_note( const std::string& note )
 {
-//  std::string new_note = note;
-//  int note_length = static_cast< int >( new_note.length() );
-//  int splits = note_length / 32;
-// 
-//  // now for some fancy word wrapping.
-//  for( int i = 1; i <= splits; i++ )
-//  {
-//    size_t last_location = new_note.find_last_of( " ", ( ( 30 * i ) + ( i ) ) );
-//    new_note.replace( last_location, 1, "\n" );
-//  }
-
   std::string user_name;
   Core::Application::Instance()->get_user_name( user_name );
-
-
-
   std::vector< std::string > notes = this->current_project_->project_notes_state_->get();
 
   notes.push_back( get_timestamp() + " - " + user_name + "|" + note );
@@ -416,6 +389,9 @@ bool ProjectManager::save_project_only()
     this->current_project_->project_name_state_->get() );
 
 }
+
+
+
 
 
 

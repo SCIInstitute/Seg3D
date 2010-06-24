@@ -51,10 +51,12 @@
 namespace Seg3D
 {
 
+const size_t LayerManager::version_number_ = 1;
+
 CORE_SINGLETON_IMPLEMENTATION( LayerManager );
 
 LayerManager::LayerManager() :
-  StateHandler( "layermanager", false, 0 )
+  StateHandler( "layermanager", version_number_, false, 0 )
 { 
   std::vector< std::string> layers;
   this->add_state( "layers", this->layers_state_, layers );
@@ -442,24 +444,24 @@ bool LayerManager::delete_all()
 
   // Cycle through all the groups and delete all the layers
   group_list_type::iterator group_iterator = this->group_list_.begin();
-  for ( ; group_iterator != this->group_list_.end(); ++group_iterator )
+  for ( ; group_iterator != this->group_list_.end(); )
   {
     // set all of the layers to selected so they are deleted.
     layer_list_type layer_list = ( *group_iterator )->get_layer_list();
-    for( layer_list_type::iterator it = layer_list.begin(); it != layer_list.end(); ++it )
+    for( layer_list_type::iterator it = layer_list.begin(); it != layer_list.end(); ++it)
     {
-      //layer_list_type::iterator temp_it = it;
-      //it++;
       ( *it )->selected_state_->set( true );
     }
 
-    LayerGroupHandle temp_group = ( *group_iterator );
-    //++group_iterator;
-    this->delete_layers( temp_group );
+    group_list_type::iterator it_temp = group_iterator;
+    ++it_temp;
+
+    this->delete_layers( *group_iterator );
     if( group_list_.empty() )
     {
       break;
     }
+    group_iterator = it_temp;
   }
   return true;
 }
@@ -637,8 +639,10 @@ bool LayerManager::post_load_states()
     {
       return false;
     }
- 
-    if( !restored_layer->load_states( Core::StateEngine::Instance()->session_states_ ) )
+    std::vector< std::string > state_values;
+    Core::StateEngine::Instance()->get_session_states( state_values );
+
+    if( !restored_layer->load_states( state_values ) )
     {
       return false;
     }
@@ -657,7 +661,7 @@ bool LayerManager::pre_save_states()
   this->layers_state_->set( layers_vector );
 
   group_list_type::iterator group_iterator = this->group_list_.begin();
-  for ( ; group_iterator != this->group_list_.end(); group_iterator++)
+  for ( ; group_iterator != this->group_list_.end(); ++group_iterator )
   {
     std::vector< std::string > group_layers_vector; 
     ( *group_iterator )->get_layer_names( group_layers_vector );

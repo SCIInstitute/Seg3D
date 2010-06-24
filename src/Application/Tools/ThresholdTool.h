@@ -74,6 +74,9 @@ public:
 
   // Seed Points
   // StateVector<Point>            seed_points_state_;
+
+private:
+  const static size_t version_number_;
 };
 
 } // end namespace

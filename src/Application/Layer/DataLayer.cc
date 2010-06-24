@@ -41,8 +41,10 @@
 namespace Seg3D
 {
 
+const size_t DataLayer::version_number_ = 1;
+
 DataLayer::DataLayer( const std::string& name, const Core::DataVolumeHandle& volume ) :
-  Layer( name ),
+  Layer( name, version_number_ ),
   data_volume_( volume )
 {
   this->initialize_states();
@@ -50,7 +52,7 @@ DataLayer::DataLayer( const std::string& name, const Core::DataVolumeHandle& vol
 }
   
 DataLayer::DataLayer( const std::string& state_id ) :
-  Layer( "not_initialized", state_id )
+  Layer( "not_initialized", version_number_, state_id )
 {
   this->initialize_states();
 }

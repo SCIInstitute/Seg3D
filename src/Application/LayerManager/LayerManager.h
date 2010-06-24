@@ -201,6 +201,9 @@ private:
   // currently active layer
   LayerHandle active_layer_;
 
+  // current version number of the LayerManager
+  const static size_t version_number_;
+
 };
 
 } // end namespace seg3D

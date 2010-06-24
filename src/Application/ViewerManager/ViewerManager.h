@@ -160,7 +160,7 @@ private:
 
   std::vector< ViewerHandle > viewers_;
   std::vector< size_t > locked_viewers_[ 4 ];
-
+  const static size_t version_number_;
   size_t signal_block_count_;
 
 }; // class ViewerManager

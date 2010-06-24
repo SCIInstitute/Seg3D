@@ -63,6 +63,9 @@ public:
 
   // TODO: Need to generate this class
 
+private:
+  const static size_t version_number_;
+
 };
 
 } // end namespace Seg3D

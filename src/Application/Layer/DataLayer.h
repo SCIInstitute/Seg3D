@@ -98,6 +98,7 @@ private:
 
 private:
   Core::DataVolumeHandle data_volume_;
+  const static size_t version_number_;
 };
 
 } // end namespace Seg3D

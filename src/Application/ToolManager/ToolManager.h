@@ -80,7 +80,7 @@ protected:
 
   // OPEN_TOOL (accessed through Action):
   // Open a new tool into the current collection of active tools
-  bool open_tool( const std::string& toolid, std::string& new_toolid );
+  bool open_tool( const std::string& toolid, std::string& new_toolid, bool create_tool_id = true );
 
   // CLOSE_TOOL (accessed through Action):
   // Close tool in current collection of active tools
@@ -127,6 +127,14 @@ public:
   // on top of this
   mutex_type& get_mutex();
 
+public:
+  virtual bool pre_save_states();
+
+  virtual bool post_save_states();
+
+protected:
+  Core::StateStringVectorHandle tools_state_;
+
 private:
 
   // All the open tools are stored in this hash map
@@ -137,6 +145,8 @@ private:
 
   // The tool that is currently active is stored here
   std::string active_toolid_;
+
+  const static size_t version_number_;
 
 };
 

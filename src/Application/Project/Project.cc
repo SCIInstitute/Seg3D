@@ -43,8 +43,10 @@
 namespace Seg3D
 {
 
+const size_t Project::version_number_ = 1;
+
 Project::Project( const std::string& project_name ) :
-  StateHandler( "project", false ),
+  StateHandler( "project", version_number_, false ),
   name_set_( false )
 { 
   add_state( "project_name", this->project_name_state_, project_name );
@@ -57,7 +59,6 @@ Project::Project( const std::string& project_name ) :
 
   SessionHandle new_session( new Session( "default_session" ) );
   this->current_session_ = new_session;
-  
   
 }
   
@@ -93,19 +94,17 @@ bool Project::load_session( boost::filesystem::path project_path, int state_inde
 bool Project::save_session( boost::filesystem::path project_path, const std::string& session_name )
 {
   this->current_session_->session_name_state_->set( session_name );
-  
-  boost::filesystem::path temp_path = "sessions";
-  temp_path = temp_path / session_name;
-  this->add_session_to_list( temp_path.string() + "|" + session_name );
+  this->add_session_to_list( "sessions|" + session_name );
 
   return this->current_session_->save_session_settings( 
-    ( project_path / "sessions" / session_name ), session_name );
+    ( project_path / "sessions" ), session_name );
 }
   
 bool Project::delete_session( boost::filesystem::path project_path, int state_index )
 {
-  boost::filesystem::path session_path = project_path / 
-    ( Core::SplitString( ( this->sessions_state_->get() )[ state_index ], "|" ) )[ 0 ];
+  boost::filesystem::path session_path = project_path / "sessions";
+  session_path = session_path / (
+    ( Core::SplitString( ( this->sessions_state_->get() )[ state_index ], "|" ) )[ 1 ] + ".xml");
   
   std::vector< std::string > temp_sessions_vector = this->sessions_state_->get();
   temp_sessions_vector.erase( temp_sessions_vector.begin() + state_index );
@@ -117,6 +116,7 @@ bool Project::delete_session( boost::filesystem::path project_path, int state_in
   }
   catch(  std::exception& e ) 
   {
+    CORE_LOG_ERROR( e.what() );
     return false;
   }
   
@@ -138,6 +138,21 @@ void Project::add_session_to_list( const std::string& session_path_and_name )
   temp_sessions_vector.insert( temp_sessions_vector.begin(), session_path_and_name );
   this->sessions_state_->set( temp_sessions_vector );
 }
+
+bool Project::get_session_name( int index, std::string& session_name )
+{
+  std::vector< std::string > temp_sessions_vector = this->sessions_state_->get();
+  for( int i = 0; i < static_cast< int >( temp_sessions_vector.size() ); ++i )
+  {
+    if( i == index )
+    {
+      session_name = ( Core::SplitString( temp_sessions_vector[ i ], "|" ) )[ 1 ];
+      return true;
+    }
+  }
+  return false;
+}
+
 
 } // end namespace Seg3D
 

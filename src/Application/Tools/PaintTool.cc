@@ -39,11 +39,13 @@
 namespace Seg3D
 {
 
+const size_t PaintTool::version_number_ = 1;
+
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL(PaintTool)
 
 PaintTool::PaintTool( const std::string& toolid ) :
-  Tool( toolid ),
+  Tool( toolid, version_number_ ),
   signal_block_count_( 0 )
 {
   // Need to set ranges and default values for all parameters

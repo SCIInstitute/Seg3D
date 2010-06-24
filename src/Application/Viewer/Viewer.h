@@ -249,6 +249,9 @@ public:
   const static std::string CORONAL_C;
   const static std::string VOLUME_C;
 
+private:
+  const static size_t version_number_;
+
 };
 
 } // end namespace Seg3D

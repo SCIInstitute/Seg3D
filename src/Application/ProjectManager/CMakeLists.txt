@@ -37,7 +37,14 @@ SET(APPLICATION_PROJECTMANAGER_SRCS
 )
 
 SET(APPLICATION_PROJECTMANAGER_ACTIONS_SRCS
-
+    Actions/ActionSaveSession.h
+    Actions/ActionSaveSession.cc
+    Actions/ActionLoadSession.h
+    Actions/ActionLoadSession.cc
+    Actions/ActionDeleteSession.h
+    Actions/ActionDeleteSession.cc
+    Actions/ActionLoadProject.h
+    Actions/ActionLoadProject.cc
 )
 
 

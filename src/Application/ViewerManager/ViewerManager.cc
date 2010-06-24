@@ -43,10 +43,12 @@
 namespace Seg3D
 {
 
+const size_t ViewerManager::version_number_ = 1;
+
 CORE_SINGLETON_IMPLEMENTATION( ViewerManager );
 
 ViewerManager::ViewerManager() :
-  StateHandler( "view", false, 1 ),
+  StateHandler( "view", version_number_, false, 1 ),
   signal_block_count_( 0 )
 {
   // Step (1)
@@ -422,8 +424,10 @@ bool ViewerManager::post_load_states()
   {
     if( ( viewers_vector[ i ] != "]" ) && ( viewers_vector[ i ] != "\0" ) )
     {
+      std::vector< std::string > state_values;
+      Core::StateEngine::Instance()->get_session_states( state_values );
       // TODO: Need to implement signal blocking before we can load the viewers
-      if( !( viewers_[ i ] )->load_states( Core::StateEngine::Instance()->session_states_ ) )
+      if( !( viewers_[ i ] )->load_states( state_values ) )
       {
         return false;
       }

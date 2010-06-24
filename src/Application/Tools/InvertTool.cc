@@ -35,11 +35,13 @@
 namespace Seg3D
 {
 
+const size_t InvertTool::version_number_ = 1;
+
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL(InvertTool)
 
 InvertTool::InvertTool( const std::string& toolid ) :
-  Tool( toolid )
+  Tool( toolid, version_number_ )
 {
   // Need to set ranges and default values for all parameters
   add_state( "target", this->target_layer_state_, "<none>" );

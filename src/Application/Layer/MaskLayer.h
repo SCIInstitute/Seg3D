@@ -91,6 +91,8 @@ public:
 private:
   Core::StateIntHandle bit_state_;
 
+  const static size_t version_number_;
+
 protected:
   // PRE_SAVE_STATES:
   // this function synchronize the generation number for the session saving

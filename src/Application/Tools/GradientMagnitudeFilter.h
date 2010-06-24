@@ -64,6 +64,9 @@ public:
   Core::StateStringHandle target_layer_state_;
   Core::StateBoolHandle replace_state_;
 
+private:
+  const static size_t version_number_;
+
 };
 
 } // end namespace

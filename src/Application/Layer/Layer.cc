@@ -44,8 +44,8 @@
 namespace Seg3D
 {
 
-Layer::Layer( const std::string& name ) :
-  StateHandler( "layer", true ),
+Layer::Layer( const std::string& name, size_t version_number ) :
+  StateHandler( "layer", version_number, true ),
   active_( false )
 { 
   this->initialize_states( name );
@@ -54,8 +54,8 @@ Layer::Layer( const std::string& name ) :
   resource_lock_ = Core::ResourceLockHandle( new Core::ResourceLock( get_statehandler_id() ) );
 }
 
-Layer::Layer( const std::string& name, const std::string& state_id ) :
-  StateHandler( state_id, false ),
+Layer::Layer( const std::string& name, size_t version_number, const std::string& state_id ) :
+  StateHandler( state_id, version_number, false ),
   active_( false )
 {
   this->initialize_states( name );

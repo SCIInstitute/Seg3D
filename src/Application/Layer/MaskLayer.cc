@@ -43,8 +43,10 @@
 namespace Seg3D
 {
 
+const size_t MaskLayer::version_number_ = 1;
+
 MaskLayer::MaskLayer( const std::string& name, const Core::MaskVolumeHandle& volume ) :
-  Layer( name ), 
+  Layer( name, version_number_ ), 
   mask_volume_( volume )
 {
   this->initialize_states();
@@ -52,7 +54,7 @@ MaskLayer::MaskLayer( const std::string& name, const Core::MaskVolumeHandle& vol
 }
 
 MaskLayer::MaskLayer( const std::string& name, const Core::GridTransform& grid_transform ) :
-    Layer( name ), 
+    Layer( name, version_number_ ), 
   mask_volume_( new Core::MaskVolume( grid_transform ) )
 {
     this->initialize_states();
@@ -61,7 +63,7 @@ MaskLayer::MaskLayer( const std::string& name, const Core::GridTransform& grid_t
 }
 
 MaskLayer::MaskLayer( const std::string& state_id ) :
-  Layer( "not_initialized", state_id )
+  Layer( "not_initialized", version_number_, state_id )
 {
   this->initialize_states();
 }

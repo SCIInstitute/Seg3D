@@ -107,6 +107,8 @@ public:
   // signal that the project name has changed the first time it gets set.  This is a temporary 
   // stopgap until we can implement signal blocking
   bool name_status(){ return this->name_set_; }
+
+  bool get_session_name( int index, std::string& session_name );
   
   
 private:
@@ -117,6 +119,7 @@ private:
 private:
   SessionHandle current_session_;
   bool name_set_;
+  const static size_t version_number_;
   
 
 };

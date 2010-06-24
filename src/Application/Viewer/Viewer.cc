@@ -43,6 +43,9 @@
 namespace Seg3D
 {
 
+const size_t Viewer::version_number_ = 1;
+
+
 SCI_ENUM_CLASS
 (
   ViewModeType,
@@ -60,7 +63,7 @@ const std::string Viewer::SAGITTAL_C( "sagittal" );
 const std::string Viewer::VOLUME_C( "volume" );
 
 Viewer::Viewer( size_t viewer_id ) :
-  Core::AbstractViewer(  viewer_id ),
+  Core::AbstractViewer(  viewer_id, version_number_ ),
   adjusting_contrast_brightness_( false ),
   signals_block_count_( 0 ),
   slice_lock_count_( 0 )

@@ -26,58 +26,58 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_PROJECT_SESSION_H
-#define APPLICATION_PROJECT_SESSION_H
+#ifndef APPLICATION_PROJECTMANAGER_ACTIONS_ACTIONDELETESESSION_H
+#define APPLICATION_PROJECTMANAGER_ACTIONS_ACTIONDELETESESSION_H
 
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
-#pragma once
-#endif
+#include <Core/Action/Action.h> 
+#include <Core/Interface/Interface.h>
 
-// Boost includes
-#include <boost/filesystem.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/thread/mutex.hpp>
-
-// Volume includes
-#include <Core/State/State.h>
 
 namespace Seg3D
 {
 
-// CLASS Session
-// This is the main class for collecting state information on a Session
-class Session;
-  
-typedef boost::shared_ptr< Session > SessionHandle;
-
-// Class definition
-class Session : public Core::StateHandler
+class ActionDeleteSession : public Core::Action
 {
+  CORE_ACTION( "DeleteSession", "DeleteSession <sessionname>" );
 
-  // -- constructor/destructor --
+  // -- Constructor/Destructor --
 public:
-  Session( const std::string& session_name );
-  virtual ~Session();
-  
-public:
-  // general session data
-  Core::StateStringHandle session_name_state_;
+  ActionDeleteSession()
+  {
+    this->add_argument( this->session_name_ );
+    this->add_argument( this->session_index_ );
+  }
 
+  virtual ~ActionDeleteSession()
+  {
+  }
 
+  // -- Functions that describe action --
 public:
-  // INITIALIZE_FROM_FILE:
-  // this file initializes the state values for Session from the file at the path specified
-  bool initialize_from_file( boost::filesystem::path path, const std::string& session_name );
-  
-  // SAVE_CURRENT_STATE:
-  // this function will take a snapshot of the current state of the project and save it
-  bool save_session_settings( boost::filesystem::path path, const std::string& session_name );
+  virtual bool validate( Core::ActionContextHandle& context );
+  virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
   
 private:
-  const static size_t version_number_;
 
+
+  // This parameter contains the name of the session to be loaded
+  Core::ActionParameter< std::string > session_name_;
+
+  // This parameter contains the index of the session to be loaded
+  Core::ActionParameter< int > session_index_;
+  
+  // -- Dispatch this action from the interface --
+public:
+  
+  // CREATE:
+  // Create an action that loads a session
+  static Core::ActionHandle Create( int session_index );
+  
+  // DISPATCH:
+  // Dispatch an action loads a session
+  static void Dispatch( int session_index );
 };
 
 } // end namespace Seg3D
 
-#endif // SESSION_H
+#endif  //ACTIONDELETESESSION_H

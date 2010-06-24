@@ -42,8 +42,10 @@
 namespace Seg3D
 {
 
+const size_t Session::version_number_ = 1;
+
 Session::Session( const std::string& session_name ) :
-  StateHandler( "session", false )
+  StateHandler( "session", version_number_, false )
 { 
   this->add_state( "session_name", this->session_name_state_, session_name );
 }
@@ -56,12 +58,14 @@ Session::~Session()
 bool Session::initialize_from_file( boost::filesystem::path path, const std::string& session_name )
 {
   // First we make sure the session_states_ vector is empty.
-  Core::StateEngine::Instance()->session_states_.clear();
+  //Core::StateEngine::Instance()->session_states_.clear();
+  std::vector< std::string > state_values;
 
   // Next we import the session information from file
-  if( Core::StateIO::import_from_file( ( path / session_name ), 
-    Core::StateEngine::Instance()->session_states_ ) )
+  if( Core::StateIO::import_from_file( ( path / session_name ), state_values ) )
   {
+    Core::StateEngine::Instance()->GetMutex();
+    Core::StateEngine::Instance()->set_session_states( state_values );
     return Core::StateEngine::Instance()->load_session_states();
   }
 
@@ -72,8 +76,10 @@ bool Session::save_session_settings( boost::filesystem::path path, const std::st
 {
   if( Core::StateEngine::Instance()->populate_session_vector() )
   {
-    return Core::StateIO::export_to_file( ( path / session_name ), 
-      Core::StateEngine::Instance()->session_states_ );
+    std::vector< std::string > state_values;
+    Core::StateEngine::Instance()->GetMutex();
+    Core::StateEngine::Instance()->get_session_states( state_values );
+    return Core::StateIO::export_to_file( ( path / session_name ), state_values );
   }
 
   return false;

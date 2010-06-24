@@ -84,6 +84,9 @@ public:
 
   // Erase data instead of painting
   Core::StateBoolHandle erase_state_;
+
+private:
+  const static size_t version_number_;
 };
 
 } // end namespace

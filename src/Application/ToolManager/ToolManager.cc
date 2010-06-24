@@ -39,11 +39,15 @@
 namespace Seg3D
 {
 
+const size_t ToolManager::version_number_ = 1;
+
 CORE_SINGLETON_IMPLEMENTATION( ToolManager );
 
 ToolManager::ToolManager() :
-  StateHandler( "ToolManager", false )
+  StateHandler( "ToolManager", version_number_, false, 2 )
 {
+  std::vector< std::string> tools;
+  this->add_state( "tools", this->tools_state_, tools );
 }
 
 ToolManager::~ToolManager()
@@ -55,7 +59,8 @@ ToolManager::~ToolManager()
 // Only ActionOpenTool calls this function and this action is only run on the
 // application thread. Hence the function is always executed by the same thread.
 
-bool ToolManager::open_tool( const std::string& tool_type, std::string& new_toolid )
+bool ToolManager::open_tool( const std::string& tool_type, std::string& new_toolid, 
+  bool create_tool_id /*= true */ )
 {
   // Step (1): Make the function thread safe
   lock_type lock( tool_list_mutex_ );
@@ -184,5 +189,39 @@ ToolManager::get_mutex()
 {
   return tool_list_mutex_;
 }
+
+bool ToolManager::pre_save_states()
+{
+  lock_type lock( this->get_mutex() );
+
+  std::vector< std::string > tools_vector;
+  this->tools_state_->set( tools_vector );
+
+  for( tool_list_type::iterator it = tool_list_.begin(); it != tool_list_.end(); ++it )
+  {
+    tools_vector.push_back( ( *it ).first );
+  }
+
+  this->tools_state_->set( tools_vector );
+
+  return true;
+
+}
+
+bool ToolManager::post_save_states()
+{
+  lock_type lock( this->get_mutex() );
+
+  for( tool_list_type::iterator it = tool_list_.begin(); it != tool_list_.end(); ++it )
+  {
+    if( !( ( *it ).second )->populate_session_states() )
+    {
+      return false;
+    }
+  }
+  return true;
+}
+
+
 
 } // end namespace Seg3D

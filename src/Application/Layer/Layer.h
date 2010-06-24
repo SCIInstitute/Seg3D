@@ -66,8 +66,8 @@ class Layer : public Core::StateHandler
   // -- Constructor/destructor --
 protected:
   // NOTE: Use the specific class to build the layer
-  Layer( const std::string& name );
-  Layer( const std::string& name, const std::string& state_id );
+  Layer( const std::string& name, size_t version_number );
+  Layer( const std::string& name, size_t version_number, const std::string& state_id );
   virtual ~Layer();
 
 private:
