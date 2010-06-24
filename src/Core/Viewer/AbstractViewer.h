@@ -61,7 +61,7 @@ class AbstractViewer : public StateHandler, public RecursiveLockable
 
   // -- constructor/destructor --
 public:
-  AbstractViewer( size_t viewer_id );
+  AbstractViewer( size_t viewer_id, size_t version_number );
   virtual ~AbstractViewer();
 
   // -- mouse events handling --

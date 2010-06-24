@@ -61,7 +61,7 @@ class StateHandler : public Core::ConnectionHandler
 
   // -- constructor/destructor --
 public:
-  StateHandler( const std::string& type_str, bool auto_id, int save_priority = -1 );
+  StateHandler( const std::string& type_str, size_t version_number, bool auto_id, int save_priority = -1 );
   virtual ~StateHandler();
 
 public:
@@ -236,6 +236,8 @@ private:
   size_t number_of_states() const;
 
   StateHandlerPrivate* private_;
+
+  
 
 };
 

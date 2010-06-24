@@ -76,12 +76,20 @@ bool StateIO::export_to_file( boost::filesystem::path path, std::vector< std::st
       i++;
       continue;
     }
-    
     std::vector< std::string > state_value_as_string_vector = 
       SplitString( state_list[ i ], "*" );
 
-    state_value = new TiXmlElement( state_value_as_string_vector[ 0 ].c_str() );
-    state_value->LinkEndChild( new TiXmlText( state_value_as_string_vector[ 1 ].c_str() ) );
+    if( state_value_as_string_vector.size() == 3 )
+    {
+      state_value = new TiXmlElement( ( state_value_as_string_vector[ 0 ] + ":" +
+        state_value_as_string_vector[ 1 ] ).c_str() );
+      state_value->LinkEndChild( new TiXmlText( state_value_as_string_vector[ 2 ].c_str() ) );
+    }
+    else
+    {
+      state_value = new TiXmlElement( state_value_as_string_vector[ 0 ].c_str() );
+      state_value->LinkEndChild( new TiXmlText( state_value_as_string_vector[ 1 ].c_str() ) );
+    }
     branch->LinkEndChild( state_value );
     
   } // end state_list for loop
@@ -96,7 +104,8 @@ bool StateIO::import_from_file( boost::filesystem::path path, std::vector< std::
 
   // We will load in the file from the specified path and exit if the path is invalid
   TiXmlDocument doc( ( path.string() + ".xml" ).c_str() );
-  if ( !doc.LoadFile() ) return false;
+  if ( !doc.LoadFile() ) 
+    return false;
 
   TiXmlHandle hDoc( &doc );
   TiXmlElement* state_handler;
@@ -126,7 +135,13 @@ bool StateIO::import_from_file( boost::filesystem::path path, std::vector< std::
       for (  ; state_value; state_value = state_value->NextSiblingElement() )
       {
         std::string state_handler_name = std::string( state_value->Value() );
-        std::string state_value_value = std::string( state_value->GetText() );
+        std::string state_value_value = "";
+        if( SplitString( state_handler_name, ":" ).size() == 2 )
+          state_handler_name.replace( state_handler_name.find( ":" ), 1, "*" );
+        if( state_value->GetText() != NULL )
+        {
+          state_value_value = std::string( state_value->GetText() );
+        }
         state_list.push_back( state_handler_name + "*" + state_value_value );
       
       }

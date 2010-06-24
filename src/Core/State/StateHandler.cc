@@ -25,6 +25,8 @@
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
  */
+// Boost includes
+#include <boost/lexical_cast.hpp>
 
 // TinyXML includes
 #include <Externals/tinyxml/tinyxml.h>
@@ -52,12 +54,15 @@ public:
 
   // The database with the actual states 
   state_map_type state_map_;
+
+  size_t version_number_;
 };
 
 
-StateHandler::StateHandler( const std::string& type_str, bool auto_id,  int save_priority )
+StateHandler::StateHandler( const std::string& type_str, size_t version_number, bool auto_id,  int save_priority )
 {
   this->private_ = new StateHandlerPrivate;
+  this->private_->version_number_ = version_number;
   this->private_->statehandler_id_ = StateEngine::Instance()->
     register_state_handler( type_str, this, auto_id );
     
@@ -154,22 +159,32 @@ bool StateHandler::populate_session_states()
   state_map_type::iterator it = this->private_->state_map_.begin();
   state_map_type::iterator it_end = this->private_->state_map_.end();
 
+  std::vector< std::string > states;
+  StateEngine::Instance()->get_session_states( states );
+
   // Like in XML which we are mimicking we surround the StateHandler's state variables
   // with its statehandler_id
-  StateEngine::Instance()->session_states_.push_back( this->private_->statehandler_id_ );
+
+
+  states.push_back( this->private_->statehandler_id_ );
+
+  states.push_back( this->private_->statehandler_id_ +
+    "*version*" + boost::lexical_cast< std::string >( this->private_->version_number_) );
 
   while ( it != it_end )
   {
 
-    StateEngine::Instance()->session_states_.push_back( ( *it ).second->stateid() + "*"
+    states.push_back( ( *it ).second->stateid() + "*"
       + ( *it ).second->export_to_string() );
     ++it;
   }
   
   // Like in XML which we are mimicking we surround the StateHandler's state variables
   // with its statehandler_id
-  StateEngine::Instance()->session_states_.push_back( this->private_->statehandler_id_ );
+  states.push_back( this->private_->statehandler_id_ );
   
+  StateEngine::Instance()->set_session_states( states );
+
   return post_save_states();
 }
 
@@ -178,37 +193,48 @@ bool StateHandler::load_states( std::vector< std::string >& states_vector )
 {
   
   if( !pre_load_states() ) return false;
-  
-  //StateEngine::Instance()->block_signals( true );
+
+  size_t loaded_version = 0;
 
   for( int i = 0; i < static_cast< int >( states_vector.size() ); ++i )
   {
     if( states_vector[ i ] == this->private_->statehandler_id_ )
     { 
       i++;
+      if( ( SplitString( states_vector[ i ], "*" ) )[ 1 ] == "version" )
+      {
+        loaded_version = boost::lexical_cast< size_t > 
+          ( ( SplitString( states_vector[ i ], "*" ) )[ 2 ] );
+        i++;
+      }
+      
       std::vector< std::string > state_value_as_string_vector; 
       while( states_vector[ i ] != this->private_->statehandler_id_ )
       {
-        state_value_as_string_vector = 
-          SplitString( states_vector[ i ], "*" );
-        if( ( state_value_as_string_vector[ 0 ] != "" ) && 
-          ( state_value_as_string_vector[ 1 ] != "" ) )
+        if( ( loaded_version == 0 ) || ( loaded_version == this->private_->version_number_ ) )
         {
-          private_->state_map_[ state_value_as_string_vector[ 0 ] ]->
-            import_from_string( state_value_as_string_vector[ 1 ] );
+          state_value_as_string_vector = 
+            SplitString( states_vector[ i ], "*" );
+          if( ( state_value_as_string_vector[ 0 ] != "" ) && 
+            ( state_value_as_string_vector[ 1 ] != "" ) )
+          {
+            private_->state_map_[ state_value_as_string_vector[ 0 ] ]->
+              import_from_string( state_value_as_string_vector[ 1 ] );
+          }
+          else
+          {
+            return false;
+          }
         }
         else
         {
-          return false;
+          // TODO: version translation is called here.
         }
         i++;
       }
     }
   }
-  //StateEngine::Instance()->block_signals( false );
-
   return post_load_states();
-
 }
 
 bool StateHandler::import_states( boost::filesystem::path path, const std::string& name )
@@ -228,6 +254,8 @@ bool StateHandler::export_states( boost::filesystem::path path, const std::strin
   std::vector< std::string > state_values;
   
   state_values.push_back( this->private_->statehandler_id_ );
+  state_values.push_back( this->private_->statehandler_id_ +
+    "*version*" + boost::lexical_cast< std::string >( this->private_->version_number_) );
   while ( it != it_end )
   {
     state_values.push_back( ( *it ).second->stateid() + "*"

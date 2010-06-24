@@ -95,7 +95,10 @@ public:
 
   // This is the vector that holds string representations of the state variables that we
   // will be saving to XML
-  std::vector< std::string > session_states_;
+  
+  void get_session_states( std::vector< std::string >& states );
+  
+  void set_session_states( std::vector< std::string >& states );
   
   // -- Interface for accounting stateids --
 private:
@@ -118,7 +121,7 @@ public:
   // -- Implementation details --
 private:
   StateEnginePrivate* private_;
-
+  std::vector< std::string > session_states_;
   bool block_signals_;
 
   // -- Static convenience functions --

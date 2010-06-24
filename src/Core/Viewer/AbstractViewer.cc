@@ -48,8 +48,8 @@ public:
   Core::Texture2DHandle overlay_texture_;
 };
 
-AbstractViewer::AbstractViewer( size_t viewer_id ) :
-  StateHandler( std::string( "viewer" ) + Core::ExportToString( viewer_id ), false ),
+AbstractViewer::AbstractViewer( size_t viewer_id, size_t version_number ) :
+  StateHandler( std::string( "viewer" ) + Core::ExportToString( viewer_id ), version_number, false ),
   private_( new AbstractViewerPrivate )
 {
   // ensure these are initialized

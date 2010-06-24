@@ -240,4 +240,18 @@ void StateEngine::remove_state_handler( const std::string& handler_id )
   }
 }
 
+void StateEngine::get_session_states( std::vector< std::string >& states )
+{
+  lock_type lock( this->get_mutex() );
+  states = this->session_states_;
+}
+
+void StateEngine::set_session_states( std::vector< std::string >& states )
+{
+  lock_type lock( this->get_mutex() );
+  this->session_states_ = states;
+}
+
+
+
 } // end namespace Core
