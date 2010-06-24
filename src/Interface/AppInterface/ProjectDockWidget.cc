@@ -35,6 +35,9 @@
 
 //Application includes
 #include <Application/ProjectManager/ProjectManager.h>
+#include <Application/ProjectManager/Actions/ActionSaveSession.h>
+#include <Application/ProjectManager/Actions/ActionLoadSession.h>
+#include <Application/ProjectManager/Actions/ActionDeleteSession.h>
 
 // Interface includes
 #include <Interface/AppInterface/ProjectDockWidget.h>
@@ -71,7 +74,7 @@ ProjectDockWidget::ProjectDockWidget( QWidget *parent ) :
       ProjectManager::Instance()->current_project_->save_custom_colors_state_ );
     
     add_connection( ProjectManager::Instance()->current_project_->sessions_state_->
-      state_changed_signal_.connect( boost::bind( &ProjectDockWidget::HandleSessionSaved, 
+      state_changed_signal_.connect( boost::bind( &ProjectDockWidget::HandleSessionsChanged, 
       project_dock_widget ) ) );
 
     add_connection( ProjectManager::Instance()->current_project_->project_notes_state_->
@@ -104,7 +107,8 @@ ProjectDockWidget::~ProjectDockWidget()
   
 void ProjectDockWidget::save_project()
 {
-  ProjectManager::Instance()->save_project();
+  ActionSaveSession::Dispatch( false );
+  //ProjectManager::Instance()->save_project();
 }
 
 void ProjectDockWidget::save_note()
@@ -136,7 +140,8 @@ void ProjectDockWidget::delete_session()
         if( QString::fromStdString( ( Core::SplitString( sessions[ i ], "|" ) )[ 1 ] ) == 
            this->private_->ui_.sessions_list_->currentItem()->text() )
         {
-          ProjectManager::Instance()->delete_project_session( i );  
+          ActionDeleteSession::Dispatch( i );
+          //ProjectManager::Instance()->delete_project_session( i );  
           break;
         }
       }
@@ -169,7 +174,8 @@ void ProjectDockWidget::load_session()
         if( QString::fromStdString( ( Core::SplitString( sessions[ i ], "|" ) )[ 1 ] ) == 
            this->private_->ui_.sessions_list_->currentItem()->text() )
         {
-          ProjectManager::Instance()->load_project_session( i );  
+          ActionLoadSession::Dispatch( i );
+          //ProjectManager::Instance()->load_project_session( i );  
           break;
         }
       }     
@@ -194,7 +200,7 @@ void ProjectDockWidget::populate_session_list()
   
   for( int i = 0; i < static_cast< int >( sessions.size() ); ++i )
   {
-    if( sessions[ i ] != "" )
+    if( ( sessions[ i ] != "" ) )// && ( sessions[ i ] != "]" ) )
     {
       this->private_->ui_.sessions_list_->addItem( QString::fromStdString( 
         ( Core::SplitString( sessions[ i ], "|" ) )[ 1 ] ) );
@@ -217,7 +223,7 @@ void ProjectDockWidget::populate_notes_list()
   {
     return;
   }
-  else if ( notes[ 0 ] == "[" )
+  else if( ( notes[ 0 ] == "]" ) || ( notes[ 0 ] == "[" ) || ( notes[ 0 ] == "" ) )
   {
     return;
   }
@@ -241,18 +247,18 @@ void ProjectDockWidget::populate_notes_list()
   }
 }
   
-void ProjectDockWidget::HandleSessionSaved( qpointer_type qpointer )
+void ProjectDockWidget::HandleSessionsChanged( qpointer_type qpointer )
 {
   if( !( Core::Interface::IsInterfaceThread() ) )
   {
     Core::Interface::Instance()->post_event( boost::bind( 
-      &ProjectDockWidget::HandleSessionSaved, qpointer ) );
+      &ProjectDockWidget::HandleSessionsChanged,  qpointer ) );
     return;
   }
   
-  CORE_LOG_DEBUG( "HandleSessionSaved started" );
+  CORE_LOG_DEBUG( "HandleSessionsChanged started" );
   if( qpointer.data() ) qpointer->populate_session_list();
-  CORE_LOG_DEBUG( "HandleSessionSaved done" );
+  CORE_LOG_DEBUG( "HandleSessionsChanged done" );
 }
 
 void ProjectDockWidget::HandleNoteSaved( qpointer_type qpointer )

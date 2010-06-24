@@ -26,15 +26,19 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// Boost includes
+#include <boost/filesystem.hpp>
+
 // Core indcludes
 #include <Core/Utils/Log.h>
 
 // Interface includes
 #include <Interface/AppSplash/AppSplash.h>
 
-
 // Application includes
 #include <Application/ProjectManager/ProjectManager.h>
+#include <Application/ProjectManager/Actions/ActionLoadProject.h>
+
 #include "ui_AppSplash.h"
 
 namespace Seg3D
@@ -96,8 +100,18 @@ void AppSplash::new_project()
 void AppSplash::open_existing()
 {
   QDir project_directory_;
-  QString path = QFileDialog::getExistingDirectory ( this, "Directory" ); 
 
+  boost::filesystem::path current_projects_path = complete( 
+    boost::filesystem::path( ProjectManager::Instance()->
+    current_project_path_state_->get().c_str(), boost::filesystem::native ) );
+
+  boost::filesystem::path full_path = ( QFileDialog::getExistingDirectory ( this, "Directory", 
+    QString::fromStdString( current_projects_path.string() ) ) ).toStdString(); 
+  
+  std::string path = full_path.parent_path().string();
+  std::string file_name = full_path.filename();
+
+  ActionLoadProject::Dispatch( path, file_name );
   
   this->close();
 }

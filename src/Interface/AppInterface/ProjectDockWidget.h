@@ -60,7 +60,7 @@ public:
   
 public:
   typedef QPointer< ProjectDockWidget > qpointer_type;
-  static void HandleSessionSaved( qpointer_type qpointer );
+  static void HandleSessionsChanged( qpointer_type qpointer );
   static void HandleNoteSaved( qpointer_type qpointer );
   
 private Q_SLOTS:
