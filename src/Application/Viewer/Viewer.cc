@@ -108,7 +108,7 @@ Viewer::Viewer( size_t viewer_id ) :
   this->add_connection( this->slice_number_state_->value_changed_signal_.connect(
     boost::bind( &Viewer::set_slice_number, this, _1, _2 ) ) );
   this->add_connection( this->viewer_visible_state_->value_changed_signal_.connect(
-    boost::bind( &Viewer::change_visibility, this, _1, _2 ) ) );
+    boost::bind( &Viewer::change_visibility, this, _1 ) ) );
   this->add_connection( this->viewer_lock_state_->value_changed_signal_.connect(
     boost::bind( &Viewer::viewer_lock_state_changed, this, _1 ) ) );
 
@@ -819,17 +819,28 @@ void Viewer::set_slice_number( int num, Core::ActionSource source )
   }
 }
 
-void Viewer::change_visibility( bool visible, Core::ActionSource /*source*/ )
+void Viewer::change_visibility( bool visible )
 {
   if ( !visible && this->viewer_lock_state_->get() )
   {
     Core::ScopedCounter block_counter( this->signals_block_count_ );
+    // Unlock the viewer when it becomes invisible
     this->viewer_lock_state_->set( false );
   }
 
   if ( visible)
   {
-    this->reset_active_slice();
+    {
+      Core::ScopedCounter block_counter( this->signals_block_count_ );
+      this->reset_active_slice();
+    }
+    this->get_renderer()->activate();
+    this->trigger_redraw( true );
+    this->trigger_redraw_overlay( false );
+  }
+  else
+  {
+    this->get_renderer()->deactivate();
   }
   
   this->slice_changed_signal_( this->get_viewer_id() );

@@ -54,6 +54,13 @@ RendererBase::RendererBase() :
   redraw_overlay_needed_( false ),
   active_( false )
 {
+  if ( !Core::RenderResources::Instance()->create_render_context( this->context_ ) )
+  {
+    CORE_THROW_EXCEPTION( "Failed to create a valid rendering context" );
+  }
+#if MULTITHREADED_RENDERING
+  this->start_eventhandler();
+#endif
 }
 
 RendererBase::~RendererBase()
@@ -69,17 +76,11 @@ void RendererBase::initialize()
   // the scene to be blank sometimes.
   if ( !is_eventhandler_thread() )
   {
-    if ( !Core::RenderResources::Instance()->create_render_context( this->context_ ) )
-    {
-      CORE_THROW_EXCEPTION( "Failed to create a valid rendering context" );
-    }
     this->post_event( boost::bind( &RendererBase::initialize, this ) );
-    this->start_eventhandler();
     return;
   }
 
   CORE_LOG_DEBUG( "Initializing renderer in a separate thread" );
-
 #else
   if ( !Interface::IsInterfaceThread() )
   {
@@ -88,12 +89,8 @@ void RendererBase::initialize()
   }
 
   CORE_LOG_DEBUG( "Initializing renderer in the interface thread" );
-
-  if ( !Core::RenderResources::Instance()->create_render_context( this->context_ ) )
-  {
-    CORE_THROW_EXCEPTION("Failed to create a valid rendering context");
-  }
-
+  
+  // Save old GL context so it can be restored at the end
   RenderContextHandle old_context = RenderResources::Instance()->get_current_context();
 #endif
 
@@ -107,7 +104,7 @@ void RendererBase::initialize()
 
     this->depth_buffer_ = Core::RenderbufferHandle( new Core::Renderbuffer );
     this->frame_buffer_ = Core::FramebufferObjectHandle( new Core::FramebufferObject );
-    this->frame_buffer_->attach_renderbuffer( depth_buffer_, GL_DEPTH_ATTACHMENT_EXT );
+    this->frame_buffer_->attach_renderbuffer( this->depth_buffer_, GL_DEPTH_ATTACHMENT_EXT );
   }
 
   this->post_initialize();
@@ -334,8 +331,6 @@ void RendererBase::resize( int width, int height )
 
   this->post_resize();
 
-  // Getting here means the size is valid, make sure that the renderer is active
-  this->activate();
   this->redraw( true );
   this->redraw_overlay();
 

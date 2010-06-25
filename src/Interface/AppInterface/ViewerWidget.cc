@@ -155,7 +155,7 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
     this->private_->render_widget_->activate_signal_.connect(
       boost::bind( &Core::ActionSet::Dispatch<Core::StateIntHandle,int>, 
         ViewerManager::Instance()->active_viewer_state_, 
-        this->private_->viewer_->get_viewer_id() ) );
+        static_cast< int >( this->private_->viewer_->get_viewer_id() ) ) );
   }
 }
   

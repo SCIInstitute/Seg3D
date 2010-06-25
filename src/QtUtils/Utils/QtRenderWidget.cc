@@ -44,18 +44,16 @@
 namespace QtUtils
 {
 
+typedef QPointer< QtRenderWidget > QtRenderWidgetWeakHandle;
+
 class QtRenderWidgetPrivate : public QObject
 {
-
 public:
   Core::AbstractViewerHandle viewer_;
   Core::MouseHistory mouse_history_;
   QtRenderWidget* render_widget_;
-
-  typedef QPointer< QtRenderWidgetPrivate > qpointer_type;
-  
-  static void update_display( qpointer_type qpointer );
 };
+
 
 QtRenderWidget::QtRenderWidget( const QGLFormat& format, QWidget* parent, QGLWidget* share, 
     Core::AbstractViewerHandle viewer ) :
@@ -78,15 +76,18 @@ QtRenderWidget::~QtRenderWidget()
   this->disconnect_all();
 }
 
-void QtRenderWidgetPrivate::update_display( qpointer_type qpointer )
+static void UpdateDisplay( QtRenderWidgetWeakHandle qpointer )
 {
   if ( !Core::Interface::IsInterfaceThread() )
   {
-    Core::Interface::PostEvent( boost::bind( &QtRenderWidgetPrivate::update_display, qpointer ) );
+    Core::Interface::PostEvent( boost::bind( &UpdateDisplay, qpointer ) );
     return;
   }
 
-  qpointer->render_widget_->updateGL();
+  if ( !qpointer.isNull() )
+  {
+    qpointer->updateGL();
+  }
 }
 
 void QtRenderWidget::initializeGL()
@@ -97,15 +98,10 @@ void QtRenderWidget::initializeGL()
     Core::Texture::SetActiveTextureUnit( 0 );
     glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
 
-    if ( this->private_->viewer_->get_renderer() ) 
-    {
-      this->private_->viewer_->get_renderer()->initialize();
-    }
-
-    QtRenderWidgetPrivate::qpointer_type render_widget( this->private_.get() );
+    QtRenderWidgetWeakHandle qpointer( this );
 
     this->add_connection( this->private_->viewer_->update_display_signal_.connect(
-      boost::bind( &QtRenderWidgetPrivate::update_display, render_widget ) ) );
+      boost::bind( &UpdateDisplay, qpointer ) ) );
   }
 }
 
@@ -177,15 +173,6 @@ void QtRenderWidget::resizeGL( int width, int height )
   gluOrtho2D( 0, width, 0, height );
 
   this->private_->viewer_->resize( width, height );
-  
-  if ( this->private_->viewer_->get_renderer() )
-  {
-    CORE_LOG_DEBUG( std::string( "QtRenderWidget " ) + 
-      Core::ExportToString( this->private_->viewer_->get_viewer_id() ) + 
-      ": sending resize event to renderer" );
-      
-    this->private_->viewer_->get_renderer()->resize( width, height );
-  }
 }
 
 void QtRenderWidget::mouseMoveEvent( QMouseEvent * event )
@@ -266,15 +253,10 @@ void QtRenderWidget::keyPressEvent( QKeyEvent* event )
   }
 }
 
-
 void QtRenderWidget::hideEvent( QHideEvent* event )
 {
   if ( !event->spontaneous() )
   {
-    if ( this->private_->viewer_->get_renderer() ) 
-    {
-      this->private_->viewer_->get_renderer()->deactivate();
-    }
     Core::ActionSet::Dispatch( this->private_->viewer_->viewer_visible_state_, false );
   }
 }
@@ -283,11 +265,6 @@ void QtRenderWidget::showEvent( QShowEvent* event )
 {
   if ( !event->spontaneous() )
   {
-    // NOTE: Activate the renderer before setting the viewer to visible.
-    if ( this->private_->viewer_->get_renderer() ) 
-    {
-      this->private_->viewer_->get_renderer()->activate();
-    }
     Core::ActionSet::Dispatch( this->private_->viewer_->viewer_visible_state_, true );
   }
 }

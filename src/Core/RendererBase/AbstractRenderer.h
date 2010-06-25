@@ -87,8 +87,7 @@ public:
   // REDRAW_COMPLETED_SIGNAL_
   // Triggered when redraw is done. The first parameter is a handle to the texture
   // containing the redraw result, the second indicates whether the update should be
-  // delayed, such as when there will be a new overlay texture immediately after this
-  // signal.
+  // delayed, such as when there will be another texture coming after this signal.
   typedef boost::signals2::signal< void( Core::Texture2DHandle, bool ) > 
     redraw_completed_signal_type;
   redraw_completed_signal_type redraw_completed_signal_;

@@ -165,7 +165,12 @@ public:
   }
 
 private:
+  // UPDATE_DIMENSION:
+  // Update the dimension of the slice.
+  void update_dimension();
 
+  // UPDATE_POSITION:
+  // Update the position of the slice.
   void update_position();
 
 protected:

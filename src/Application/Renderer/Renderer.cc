@@ -67,11 +67,12 @@ static const unsigned char MASK_PATTERNS_C[][ PATTERN_SIZE_C ][ PATTERN_SIZE_C ]
 static const int NUM_OF_PATTERNS_C = 
   sizeof( MASK_PATTERNS_C ) / ( PATTERN_SIZE_C * PATTERN_SIZE_C );
 
-Renderer::Renderer() :
+Renderer::Renderer( size_t viewer_id ) :
   RendererBase(), 
   ConnectionHandler(), 
   slice_shader_( new SliceShader ),
-  text_renderer_( new Core::TextRenderer )
+  text_renderer_( new Core::TextRenderer ),
+  viewer_id_( viewer_id )
 {
 }
 
@@ -276,7 +277,8 @@ bool Renderer::render_overlay()
     bool show_grid = viewer->slice_grid_state_->get();
     Core::View2D view2d(
       static_cast< Core::StateView2D* > ( viewer->get_active_view_state().get() )->get() );
-    int view_mode = viewer->view_mode_state_->index();
+    //int view_mode = viewer->view_mode_state_->index();
+    std::string view_mode = viewer->view_mode_state_->get();
     ViewerInfoList viewers_info[ 3 ];
     ViewerManager::Instance()->get_2d_viewers_info( viewers_info );
 
@@ -350,8 +352,24 @@ bool Renderer::render_overlay()
     
     // Render the positions of slices in other viewers
     glLineStipple( 1, 0x1C47 );
-    int vert_slice_mode = ( view_mode + 1 ) % 3;
-    int hori_slice_mode = ( view_mode + 2 ) % 3;
+    int vert_slice_mode;
+    int hori_slice_mode;
+    if ( view_mode == Viewer::SAGITTAL_C )
+    {
+      vert_slice_mode = 1;
+      hori_slice_mode = 2;
+    }
+    else if ( view_mode == Viewer::CORONAL_C )
+    {
+      vert_slice_mode = 0;
+      hori_slice_mode = 2;
+    }
+    else
+    {
+      vert_slice_mode = 0;
+      hori_slice_mode = 1;
+    }
+    
     size_t num_of_vert_slices = viewers_info[ vert_slice_mode ].size();
     size_t num_of_hori_slices = viewers_info[ hori_slice_mode ].size();
     for ( size_t i = 0; i < num_of_vert_slices; i++ )
@@ -600,21 +618,21 @@ void Renderer::draw_slices_3d( const Core::BBox& bbox,
       rect->bottomleft = bbox.min();
       rect->bottomleft[ 1 ] = depth;
       
-      rect->bottomright[ 0 ] = bbox.min()[ 0 ];
-      rect->bottomright[ 2 ] = bbox.max()[ 2 ];
+      rect->bottomright[ 0 ] = bbox.max()[ 0 ];
+      rect->bottomright[ 2 ] = bbox.min()[ 2 ];
       rect->bottomright[ 1 ] = depth;
 
-      rect->topleft[ 0 ] = bbox.max()[ 0 ];
-      rect->topleft[ 2 ] = bbox.min()[ 2 ];
+      rect->topleft[ 0 ] = bbox.min()[ 0 ];
+      rect->topleft[ 2 ] = bbox.max()[ 2 ];
       rect->topleft[ 1 ] = depth;
 
       rect->topright = bbox.max();
       rect->topright[ 1 ] = depth;
 
-      rect->left = rect->bottomleft[ 2 ];
-      rect->right = rect->bottomright[ 2 ];
-      rect->bottom = rect->bottomleft[ 0 ];
-      rect->top = rect->topleft[ 0 ];
+      rect->left = rect->bottomleft[ 0 ];
+      rect->right = rect->bottomright[ 0 ];
+      rect->bottom = rect->bottomleft[ 2 ];
+      rect->top = rect->topleft[ 2 ];
     }
     else
     {

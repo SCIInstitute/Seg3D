@@ -137,7 +137,7 @@ public:
 private:
   void change_view_mode( std::string mode, Core::ActionSource source );
   void set_slice_number( int num, Core::ActionSource source = Core::ActionSource::NONE_E );
-  void change_visibility( bool visible, Core::ActionSource source );
+  void change_visibility( bool visible );
   void viewer_lock_state_changed( bool locked );
   void layer_state_changed( int affected_view_modes );
 

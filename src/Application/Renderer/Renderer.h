@@ -60,13 +60,8 @@ class Renderer : public Core::RendererBase, private Core::ConnectionHandler
 
   // -- constructor/destructor --
 public:
-  Renderer();
+  Renderer( size_t viewer_id );
   virtual ~Renderer();
-
-  void set_viewer_id( size_t viewer_id )
-  {
-    this->viewer_id_ = viewer_id;
-  }
 
 protected:
   virtual void post_initialize();
