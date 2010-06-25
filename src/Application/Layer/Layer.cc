@@ -45,8 +45,7 @@ namespace Seg3D
 {
 
 Layer::Layer( const std::string& name, size_t version_number ) :
-  StateHandler( "layer", version_number, true ),
-  active_( false )
+  StateHandler( "layer", version_number, true )
 { 
   this->initialize_states( name );
     
@@ -55,8 +54,7 @@ Layer::Layer( const std::string& name, size_t version_number ) :
 }
 
 Layer::Layer( const std::string& name, size_t version_number, const std::string& state_id ) :
-  StateHandler( state_id, version_number, false ),
-  active_( false )
+  StateHandler( state_id, version_number, false )
 {
   this->initialize_states( name );
 
@@ -88,12 +86,12 @@ void Layer::set_layer_group( LayerGroupWeakHandle layer_group )
     
 bool Layer::get_active()
 {
-  return this->active_;
+  return this->active_state_->get();
 }
   
 void Layer::set_active( bool active )
 {
-  this->active_ = active;
+  this->active_state_->set( active );
 }
 
 std::string Layer::get_layer_id() const
@@ -136,6 +134,9 @@ void Layer::initialize_states( const std::string& name )
 
   // == Selected by the LayerGroup ==
   this->add_state( "selected", selected_state_, false );
+
+  // == Selected by the LayerGroup ==
+  this->add_state( "active", active_state_, false );
 
   // == Which of the submenus is being editted ==
   this->add_state( "edit_mode", edit_mode_state_, "none", "none|opacity|color|contrast|appearance" );

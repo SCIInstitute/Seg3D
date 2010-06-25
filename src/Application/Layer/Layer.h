@@ -166,6 +166,8 @@ public:
   // State that describes which menu is currently shown
   Core::StateOptionHandle edit_mode_state_;
 
+  Core::StateBoolHandle active_state_;
+
 protected:
   // State that stores the generation of its datablock
   Core::StateIntHandle generation_state_;
@@ -203,7 +205,7 @@ private:
   LayerGroupWeakHandle layer_group_;
 
   // TODO: At some point we should move this one
-  bool active_;
+  //bool active_;
 
   // -- Locking system --
 public:

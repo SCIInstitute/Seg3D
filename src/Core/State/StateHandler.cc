@@ -56,6 +56,10 @@ public:
   state_map_type state_map_;
 
   size_t version_number_;
+
+  bool valid_;
+
+  boost::mutex mutex_;
 };
 
 
@@ -75,12 +79,17 @@ StateHandler::StateHandler( const std::string& type_str, size_t version_number, 
     this->private_->statehandler_id_number_ );
 
   this->private_->save_priority_ = save_priority;
+
+  this->private_->valid_ = true;
 }
 
 StateHandler::~StateHandler()
 {
   this->disconnect_all();
-  StateEngine::Instance()->remove_state_handler( this->private_->statehandler_id_ );
+  if( this->is_valid() )
+  {
+    StateEngine::Instance()->remove_state_handler( this->private_->statehandler_id_ );
+  }
   delete this->private_;
 }
     
@@ -307,5 +316,33 @@ size_t StateHandler::number_of_states() const
 {
   return this->private_->state_map_.size();
 }
+
+void StateHandler::invalidate()
+{
+  {
+    boost::mutex::scoped_lock lock( this->private_->mutex_ );
+    if( !this->private_->valid_ )
+    {
+      return;
+    }
+    this->private_->valid_ = false;
+  }
+  StateEngine::Instance()->remove_state_handler( this->private_->statehandler_id_ );
+  clean_up();
+}
+
+bool StateHandler::is_valid()
+{
+  boost::mutex::scoped_lock lock( this->private_->mutex_ );
+  return this->private_->valid_;
+}
+
+void StateHandler::clean_up()
+{
+  // does nothing by default.
+}
+
+
+
 
 } // end namespace Core

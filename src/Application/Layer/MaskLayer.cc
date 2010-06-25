@@ -148,6 +148,12 @@ bool MaskLayer::post_load_states()
   return success;
 }
 
+void MaskLayer::clean_up()
+{
+  this->mask_volume_.reset();
+}
+
+
 
 
 } // end namespace Seg3D

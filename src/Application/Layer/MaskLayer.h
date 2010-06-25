@@ -100,6 +100,8 @@ protected:
 
   virtual bool post_load_states();
 
+  virtual void clean_up();
+
 private:
   Core::MaskVolumeHandle mask_volume_;
 

@@ -39,6 +39,7 @@
 
 // Core includes
 #include <Core/Utils/ConnectionHandler.h>
+#include <Core/Utils/Lockable.h>
 
 // State includes
 #include <Core/State/StateEngine.h>
@@ -56,7 +57,7 @@ namespace Core
 class StateHandler;
 class StateHandlerPrivate;
 
-class StateHandler : public Core::ConnectionHandler
+class StateHandler : public ConnectionHandler
 {
 
   // -- constructor/destructor --
@@ -143,6 +144,21 @@ public:
       
     return this->add_statebase( state );
   }
+
+public:
+  // INVALIDATE:
+  // this function is called when you need to delete something from the state engine but may have 
+  // lingering handles that need to be cleaned up
+  void invalidate();
+
+  // IS_VALID:
+  // returns true if the function hasn't been invalidated
+  bool is_valid();
+
+protected:
+  // CLEAN_UP:
+  // This function is called by invalidate to clean up stuff in the statehandler subclasses
+  virtual void clean_up();
 
 public:
   // POPULATE_SESSION_STATES:

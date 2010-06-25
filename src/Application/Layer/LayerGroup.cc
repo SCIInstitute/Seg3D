@@ -137,6 +137,7 @@ int LayerGroup::move_layer_above( LayerHandle layer_above, LayerHandle layer_bel
 
 void LayerGroup::delete_layer( LayerHandle layer )
 {
+  layer->invalidate();
   layer_list_.remove( layer );
   
   // keep layer lists in sync
