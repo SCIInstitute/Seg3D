@@ -57,14 +57,11 @@ Session::~Session()
 
 bool Session::initialize_from_file( boost::filesystem::path path, const std::string& session_name )
 {
-  // First we make sure the session_states_ vector is empty.
-  //Core::StateEngine::Instance()->session_states_.clear();
   std::vector< std::string > state_values;
 
   // Next we import the session information from file
   if( Core::StateIO::import_from_file( ( path / session_name ), state_values ) )
   {
-    Core::StateEngine::Instance()->GetMutex();
     Core::StateEngine::Instance()->set_session_states( state_values );
     return Core::StateEngine::Instance()->load_session_states();
   }
@@ -77,7 +74,6 @@ bool Session::save_session_settings( boost::filesystem::path path, const std::st
   if( Core::StateEngine::Instance()->populate_session_vector() )
   {
     std::vector< std::string > state_values;
-    Core::StateEngine::Instance()->GetMutex();
     Core::StateEngine::Instance()->get_session_states( state_values );
     return Core::StateIO::export_to_file( ( path / session_name ), state_values );
   }

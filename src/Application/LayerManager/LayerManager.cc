@@ -591,9 +591,34 @@ void LayerManager::get_layer_names( std::vector< LayerIDNamePair >& layer_names,
   }
 }
 
+  
+bool LayerManager::pre_save_states()
+{
+  lock_type lock( this->get_mutex() );
+  
+  std::vector< std::string > layers_vector;
+  this->layers_state_->set( layers_vector );
+  
+  group_list_type::iterator group_iterator = this->group_list_.begin();
+  for ( ; group_iterator != this->group_list_.end(); ++group_iterator )
+  {
+    std::vector< std::string > group_layers_vector; 
+    ( *group_iterator )->get_layer_names( group_layers_vector );
+    for( int i = 0; i < static_cast< int >( group_layers_vector.size() ); ++i  )
+    {
+      layers_vector.push_back( group_layers_vector[ i ] );
+    }
+  }
+  
+  this->layers_state_->set( layers_vector );
+  return true;
+}
+  
+
 bool LayerManager::post_save_states()
 {
   lock_type lock( this->get_mutex() );
+  
   std::vector< LayerHandle > layers;
   this->get_layers( layers );
 
@@ -606,15 +631,18 @@ bool LayerManager::post_save_states()
   }
   return Core::MaskDataBlockManager::Instance()->save_data_blocks();
 }
+  
+  
+bool LayerManager::pre_load_states()
+{
+  return this->delete_all();
+}
 
+  
 bool LayerManager::post_load_states()
 {
-
-  lock_type lock( this->get_mutex() );
-  if( !this->delete_all() )
-  {
-    return false;
-  }
+  std::vector< std::string > state_values;
+  Core::StateEngine::Instance()->get_session_states( state_values );
 
   std::vector< std::string > layer_vector = this->layers_state_->get();
   for( int j = 0; j < static_cast< int >( layer_vector.size() ); ++j )
@@ -639,9 +667,7 @@ bool LayerManager::post_load_states()
     {
       return false;
     }
-    std::vector< std::string > state_values;
-    Core::StateEngine::Instance()->get_session_states( state_values );
-
+    
     if( !restored_layer->load_states( state_values ) )
     {
       return false;
@@ -653,27 +679,7 @@ bool LayerManager::post_load_states()
   return true;
 }
 
-bool LayerManager::pre_save_states()
-{
-  lock_type lock( this->get_mutex() );
 
-  std::vector< std::string > layers_vector;
-  this->layers_state_->set( layers_vector );
-
-  group_list_type::iterator group_iterator = this->group_list_.begin();
-  for ( ; group_iterator != this->group_list_.end(); ++group_iterator )
-  {
-    std::vector< std::string > group_layers_vector; 
-    ( *group_iterator )->get_layer_names( group_layers_vector );
-    for( int i = 0; i < static_cast< int >( group_layers_vector.size() ); ++i  )
-    {
-      layers_vector.push_back( group_layers_vector[ i ] );
-    }
-  }
-
-  this->layers_state_->set( layers_vector );
-  return true;
-}
 
 
 

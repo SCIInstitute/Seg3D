@@ -185,9 +185,11 @@ public:
   // POST_SAVE_STATES:
   // This function is called after the LayerManagers states have been saved and then
   // tells the groups to save their states as well.
-  bool post_save_states();
+  virtual bool post_save_states();
 
-  bool post_load_states();
+  virtual bool post_load_states();
+  
+  virtual bool pre_load_states();
   
 private:
   // SYNC_GROUP_LISTS:

@@ -58,8 +58,6 @@ bool ActionLoadProject::validate( Core::ActionContextHandle& context )
 bool ActionLoadProject::run( Core::ActionContextHandle& context, 
   Core::ActionResultHandle& result )
 {
-  bool success = false;
-
   std::string message = std::string("Loading project: '") + 
     this->project_name_.value() + std::string("'");
 
