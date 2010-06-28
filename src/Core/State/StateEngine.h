@@ -93,11 +93,12 @@ public:
   // calls tells them to populate session_states_ with their state values.
   bool populate_session_vector();
 
-  // This is the vector that holds string representations of the state variables that we
-  // will be saving to XML
-  
+  // GET_SESSION_STATES:
+  // a locked getter function for getting the vector that contains the data loaded from file  
   void get_session_states( std::vector< std::string >& states );
   
+  // SET_SESSION_STATES:
+  // a locked setter function for setting the vector that contains data to be saved to file
   void set_session_states( std::vector< std::string >& states );
   
   // -- Interface for accounting stateids --

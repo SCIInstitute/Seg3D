@@ -174,7 +174,7 @@ bool MaskDataBlockManager::create( DataBlock::generation_type generation, unsign
   lock_type lock( this->get_mutex() );
 
   DataBlockHandle data_block;
-  size_t mask_entry_index = 0;
+  //size_t mask_entry_index = 0;
 
   MaskDataBlockManagerInternal::mask_list_type& mask_list = private_->mask_list_;
 

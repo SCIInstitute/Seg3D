@@ -98,8 +98,13 @@ protected:
   // this function synchronize the generation number for the session saving
   virtual bool pre_save_states();
 
+  // POST_LOAD_STATES:
+  // this function takes care of connecting the MaskVolume to the mask layer after it's settings
+  // have been loaded
   virtual bool post_load_states();
 
+  // CLEAN_UP:
+  // this function cleans up the mask volume for when you are deleting the mask and reloading 
   virtual void clean_up();
 
 private:

@@ -64,41 +64,6 @@ DataLayer::~DataLayer()
   disconnect_all();
 }
 
-bool DataLayer::pre_save_states()
-{
-  this->generation_state_->set( static_cast< int >( this->data_volume_->get_generation() ) );
-
-  std::string generation = this->generation_state_->export_to_string() + ".nrrd";
-  boost::filesystem::path volume_path = ProjectManager::Instance()->get_project_data_path() /
-    generation;
-  std::string error;
-
-  if ( Core::DataVolume::SaveDataVolume( volume_path.string(), this->data_volume_ , error ) )
-  {
-    return true;
-  }
-
-  CORE_LOG_ERROR( error );
-  return false;
-
-}
-
-bool DataLayer::post_load_states()
-{
-  std::string generation = this->generation_state_->export_to_string() + ".nrrd";
-  boost::filesystem::path volume_path = ProjectManager::Instance()->get_project_data_path() /
-    generation;
-  std::string error;
-
-  if( Core::DataVolume::LoadDataVolume( volume_path, this->data_volume_, error ) )
-  {
-    return true;
-  }
-
-  CORE_LOG_ERROR( error );
-  return false;
-}
-
 void DataLayer::initialize_states()
 {
 
@@ -113,11 +78,48 @@ void DataLayer::initialize_states()
   // == Is this volume rendered through the volume renderer ==
   add_state( "volume_rendered", volume_rendered_state_, false );
 
-  
-
 }
 
+  
+bool DataLayer::pre_save_states()
+{
+  this->generation_state_->set( static_cast< int >( this->data_volume_->get_generation() ) );
+  
+  std::string generation = this->generation_state_->export_to_string() + ".nrrd";
+  boost::filesystem::path volume_path = ProjectManager::Instance()->get_project_data_path() /
+  generation;
+  std::string error;
+  
+  if ( Core::DataVolume::SaveDataVolume( volume_path.string(), this->data_volume_ , error ) )
+  {
+    return true;
+  }
+  
+  CORE_LOG_ERROR( error );
+  return false;
+  
+}
 
+bool DataLayer::post_load_states()
+{
+  std::string generation = this->generation_state_->export_to_string() + ".nrrd";
+  boost::filesystem::path volume_path = ProjectManager::Instance()->get_project_data_path() /
+  generation;
+  std::string error;
+  
+  if( Core::DataVolume::LoadDataVolume( volume_path, this->data_volume_, error ) )
+  {
+    return true;
+  }
+  
+  CORE_LOG_ERROR( error );
+  return false;
+}
+  
+void DataLayer::clean_up()
+{
+  this->data_volume_.reset();
+}
 
 
 } // end namespace Seg3D
