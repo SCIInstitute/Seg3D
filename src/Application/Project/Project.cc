@@ -93,8 +93,8 @@ bool Project::load_session( boost::filesystem::path project_path, int state_inde
   boost::filesystem::path session_path = project_path / 
     ( Core::SplitString( ( this->sessions_state_->get() )[ state_index ], "|" ) )[ 0 ];
   
-  return  this->current_session_->initialize_from_file( session_path,
-    ( Core::SplitString( ( this->sessions_state_->get() )[ state_index ], "|" ) )[ 1 ] ) );
+  return  this->current_session_->initialize_from_file( session_path, 
+    ( Core::SplitString( ( this->sessions_state_->get() )[ state_index ], "|" ) )[ 1 ] );
 
 }
   
