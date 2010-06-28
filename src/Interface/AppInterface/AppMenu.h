@@ -62,8 +62,14 @@ private:
   void create_filter_menu( QMenu* menu );
   void create_window_menu( QMenu* menu );
   
+  
   // Keep a pointer to the main window
   QMainWindow*  main_window_;
+  
+private Q_SLOTS:
+  void open_project_wizard();
+  
+  //QPointer< AppProjectWizard > new_project_wizard_;
 };
 
 } // end namespace Seg3D

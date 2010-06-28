@@ -61,13 +61,19 @@ public:
   MaskLayer( const std::string& state_id );
   virtual ~MaskLayer();
 
+  // TYPE:
+  // this function returns the a Core::VolumeType indicating that this is a MaskLayer
   virtual Core::VolumeType type() const { return Core::VolumeType::MASK_E; }
 
+  // GET_GRID_TRANSFORM:
+  // this function returns the grid transform of the mask volume
   virtual const Core::GridTransform& get_grid_transform() const 
   { 
     return mask_volume_->get_grid_transform(); 
   }
 
+  // GET_MASK_VOLUME:
+  // this function returns the mask volume
   Core::MaskVolumeHandle get_mask_volume()
   {
     return this->mask_volume_;
@@ -88,11 +94,6 @@ public:
   // State that describes whether to show the  isosurface state
   Core::StateBoolHandle show_isosurface_state_;
 
-private:
-  Core::StateIntHandle bit_state_;
-
-  const static size_t version_number_;
-
 protected:
   // PRE_SAVE_STATES:
   // this function synchronize the generation number for the session saving
@@ -108,9 +109,13 @@ protected:
   virtual void clean_up();
 
 private:
-  Core::MaskVolumeHandle mask_volume_;
-
   void initialize_states();
+  
+private:
+  
+  Core::StateIntHandle bit_state_;
+  const static size_t version_number_;
+  Core::MaskVolumeHandle mask_volume_;
   
   // counter for generating new colors for each new mask
   static Core::AtomicCounter color_count_;

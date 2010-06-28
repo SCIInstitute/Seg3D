@@ -168,8 +168,9 @@ void ProjectManager::rename_project_folder( const std::string& new_name, Core::A
 
 }
 
-void ProjectManager::new_project( const std::string& project_name, bool consolidate )
+void ProjectManager::new_project( const std::string& project_name, const std::string& project_path )
 {
+
   if( create_project_folders( project_name ) )
   {
     if( project_name.compare( 0, 11, "New Project" ) == 0 )
@@ -178,11 +179,13 @@ void ProjectManager::new_project( const std::string& project_name, bool consolid
         this->default_project_name_counter_state_->get() + 1 ); 
     }
 
+    std::vector< std::string > empty_vector;
     this->current_project_->project_name_state_->set( project_name );
-    this->current_project_->auto_consolidate_files_state_->set( consolidate );
-
-
-    this->save_project_session();
+    this->current_project_path_state_->set( project_path );
+    this->current_project_->sessions_state_->set( empty_vector );
+    this->current_project_->project_notes_state_->set( empty_vector );
+    this->current_project_->save_custom_colors_state_->set( false );
+    this->save_project( false );
   }
 }
   
@@ -202,7 +205,6 @@ void ProjectManager::save_project( bool autosave /*= false*/ )
   {
     this->save_project_only();
   }
-
   this->start_auto_save_timer();
 }
   

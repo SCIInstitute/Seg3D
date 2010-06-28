@@ -187,8 +187,13 @@ public:
   // tells the groups to save their states as well.
   virtual bool post_save_states();
 
+  // POST_LOAD_STATES:
+  // this function creates the layers who's information was saved to file, and then tells them
+  // to populate their state variables from file
   virtual bool post_load_states();
   
+  // PRE_LOAD_STATES:
+  // this function clears out all existing layers before we load a project from file
   virtual bool pre_load_states();
   
 private:

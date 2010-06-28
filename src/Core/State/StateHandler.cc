@@ -258,6 +258,9 @@ bool StateHandler::import_states( boost::filesystem::path path, const std::strin
 bool StateHandler::export_states( boost::filesystem::path path, const std::string& name )
 {
 
+  if( !pre_save_states() )
+    return false;
+
   state_map_type::iterator it = this->private_->state_map_.begin();
   state_map_type::iterator it_end = this->private_->state_map_.end();
   std::vector< std::string > state_values;

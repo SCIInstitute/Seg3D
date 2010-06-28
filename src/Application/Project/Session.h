@@ -73,6 +73,7 @@ public:
   // this function will take a snapshot of the current state of the project and save it
   bool save_session_settings( boost::filesystem::path path, const std::string& session_name );
   
+  
 private:
   const static size_t version_number_;
 

@@ -54,10 +54,10 @@ AppProjectWizard::~AppProjectWizard()
 void AppProjectWizard::accept()
 {
   // TODO: call the create new project action dispatcher with the settings
-  ProjectManager::Instance()->current_project_path_state_->set( 
+//  ProjectManager::Instance()->current_project_path_state_->set( 
+//    field("projectPath").toString().toStdString() );
+  ProjectManager::Instance()->new_project( field("projectName").toString().toStdString(),
     field("projectPath").toString().toStdString() );
-  ProjectManager::Instance()->new_project( field("projectName").toString().toStdString(), 
-    field("autoConsolidate").toBool() );
     QDialog::accept();
 }
 
@@ -102,13 +102,7 @@ ProjectInfoPage::ProjectInfoPage( QWidget *parent )
     connect( this->project_path_change_button_, SIGNAL( clicked() ), this, SLOT( set_path() ) );
   this->project_path_change_button_->setFocusPolicy( Qt::NoFocus );
 
-    this->automatically_consolidate_checkbox_ = new QCheckBox(
-            "Consolidate the project files into the project folder." );
-    this->automatically_consolidate_checkbox_->setChecked( true );
-
     registerField( "projectName", this->project_name_lineedit_ );
-    registerField( "autoConsolidate", this->automatically_consolidate_checkbox_ );
-
 
     QGridLayout *layout = new QGridLayout;
     layout->addWidget( this->project_name_label_, 0, 0 );
@@ -116,7 +110,6 @@ ProjectInfoPage::ProjectInfoPage( QWidget *parent )
     layout->addWidget( this->project_path_label_, 1, 0 );
     layout->addWidget( this->project_path_lineedit_, 1, 1 );
     layout->addWidget( this->project_path_change_button_, 2, 1, 1, 2 );
-    layout->addWidget( this->automatically_consolidate_checkbox_, 3, 0, 1, 2 );
     setLayout( layout );
 
 }

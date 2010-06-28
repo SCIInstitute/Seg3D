@@ -404,6 +404,7 @@ void LayerManager::delete_layers( LayerGroupHandle group )
     
     if( group->is_empty() )
     {   
+      group->invalidate();
       group_list_.remove( group );
     }
 

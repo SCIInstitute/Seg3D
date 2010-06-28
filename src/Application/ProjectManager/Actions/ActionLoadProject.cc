@@ -58,8 +58,8 @@ bool ActionLoadProject::validate( Core::ActionContextHandle& context )
 bool ActionLoadProject::run( Core::ActionContextHandle& context, 
   Core::ActionResultHandle& result )
 {
-  std::string message = std::string("Loading project: '") + 
-    this->project_name_.value() + std::string("'");
+  std::string message = std::string("Please wait while project: '") + 
+    this->project_name_.value() + std::string("' is loaded...");
 
   Core::ActionProgressHandle progress = 
     Core::ActionProgressHandle( new Core::ActionProgress( message ) );

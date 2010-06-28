@@ -52,8 +52,8 @@ bool ActionLoadSession::run( Core::ActionContextHandle& context,
 {
   bool success = false;
 
-  std::string message = std::string("Loading session: '") + 
-    this->session_name_.value() + std::string("'");
+  std::string message = std::string("Please wait while session: '") + 
+    this->session_name_.value() + std::string("' is loaded...");
 
   Core::ActionProgressHandle progress = 
     Core::ActionProgressHandle( new Core::ActionProgress( message ) );

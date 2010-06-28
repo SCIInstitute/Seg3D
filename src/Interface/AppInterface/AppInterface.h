@@ -114,6 +114,8 @@ private:
   // Overload the default addDockWidget and upgrade it, so docks are added
   // on top of each other
   void addDockWidget( Qt::DockWidgetArea area, QDockWidget* dock_widget );
+  
+  
 
 protected:
   virtual void closeEvent ( QCloseEvent* event );

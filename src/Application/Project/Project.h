@@ -74,9 +74,9 @@ public:
 public:
   Core::StateStringHandle project_name_state_;
   Core::StateBoolHandle save_custom_colors_state_;
-  Core::StateBoolHandle auto_consolidate_files_state_;
   Core::StateStringVectorHandle sessions_state_;
   Core::StateStringVectorHandle project_notes_state_;
+  std::vector< Core::StateColorHandle > color_states_;
   
   
   
@@ -108,8 +108,24 @@ public:
   // stopgap until we can implement signal blocking
   bool name_status(){ return this->name_set_; }
 
+  // GET_SESSION_NAME:
+  // this function gets the name of a session at an index of the projects session list, this is 
+  // used for display what session you are loading when you load a session.
   bool get_session_name( int index, std::string& session_name );
+
+  // INVALIDATE_CURRENT_SESSION: // NOT CURRENTLY USED //
+  // this is a public function that enables the ProjectManager to call invalidate on the current
+  // session
+  void invalidate_current_session(){ this->current_session_->invalidate(); }
   
+protected:
+  // PRE_SAVE_STATES:
+  // this function synchronizes the colors if they are set to be saved with the project
+  virtual bool pre_save_states();
+  
+  // POST_LOAD_STATES:
+  // this function sets Seg3d's mask colors if they are set to be saved with the project
+  virtual bool post_load_states();
   
 private:
   // ADD_SESSION_TO_LIST

@@ -73,7 +73,7 @@ public:
   
   // NEW_PROJECT:
   // this function sets the state values of the current project to reflect the desired values
-  void new_project( const std::string& project_name, bool consolidate );
+  void new_project( const std::string& project_name, const std::string& project_path );
   
   // OPEN_PROJECT:
   // this function takes the path to the desired project and loads the values from the file 
@@ -127,7 +127,7 @@ private:
   
   // ADD_TO_RECENT_PROJECTS:
   // this function adds the latest project to the list of recent projects
-  void add_to_recent_projects( const std::string& project_path, const std::string& project_name );
+  void add_to_recent_projects( const std::string& project_path, const std::string& project_name = "" );
   
   // CREATE_PROJECT_FOLDERS:
   // this will try and create the project folders and if is successfull return true 

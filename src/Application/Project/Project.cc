@@ -50,12 +50,18 @@ Project::Project( const std::string& project_name ) :
   name_set_( false )
 { 
   add_state( "project_name", this->project_name_state_, project_name );
-  add_state( "auto_consolidate_files", this->auto_consolidate_files_state_, true );
   add_state( "save_custom_colors", this->save_custom_colors_state_, false );
   
   std::vector< std::string> empty_vector;
   add_state( "sessions", this->sessions_state_, empty_vector );
   add_state( "project_notes", this->project_notes_state_, empty_vector );
+  
+  this->color_states_.resize( 12 );
+  for ( size_t j = 0; j < 12; j++ )
+  {
+    std::string stateid = std::string( "color_" ) + Core::ExportToString( j );
+    this->add_state( stateid, this->color_states_[ j ], PreferencesManager::Instance()->get_default_colors()[ j ] );
+  }
 
   SessionHandle new_session( new Session( "default_session" ) );
   this->current_session_ = new_session;
@@ -83,19 +89,20 @@ bool Project::initialize_from_file( boost::filesystem::path project_path,
   
 bool Project::load_session( boost::filesystem::path project_path, int state_index )
 {
-  project_path = project_path / 
+  
+  boost::filesystem::path session_path = project_path / 
     ( Core::SplitString( ( this->sessions_state_->get() )[ state_index ], "|" ) )[ 0 ];
   
-  return this->current_session_->initialize_from_file( project_path,
-    ( Core::SplitString( ( this->sessions_state_->get() )[ state_index ], "|" ) )[ 1 ] );
-  
+  return  this->current_session_->initialize_from_file( session_path,
+    ( Core::SplitString( ( this->sessions_state_->get() )[ state_index ], "|" ) )[ 1 ] ) );
+
 }
   
 bool Project::save_session( boost::filesystem::path project_path, const std::string& session_name )
 {
   this->current_session_->session_name_state_->set( session_name );
   this->add_session_to_list( "sessions|" + session_name );
-
+  
   return this->current_session_->save_session_settings( 
     ( project_path / "sessions" ), session_name );
 }
@@ -153,6 +160,29 @@ bool Project::get_session_name( int index, std::string& session_name )
   return false;
 }
 
+  bool Project::pre_save_states()
+  {
+    if( this->save_custom_colors_state_->get() )
+    {
+      for ( size_t j = 0; j < 12; j++ )
+      {
+        this->color_states_[ j ]->set( PreferencesManager::Instance()->color_states_[ j ]->get() );
+      }
+    }
+    return true;
+  }
+  
+  bool Project::post_load_states()
+  {
+    if( this->save_custom_colors_state_->get() )
+    {
+      for ( size_t j = 0; j < 12; j++ )
+      {
+        PreferencesManager::Instance()->color_states_[ j ]->set( this->color_states_[ j ]->get() );
+      }
+    }
+    return true;
+  }
 
 } // end namespace Seg3D
 

@@ -109,7 +109,7 @@ void PreferencesManager::initialize_states()
   add_state( "default_mask_fill", default_mask_fill_state_, "striped", "none|striped|solid" );
   add_state( "default_mask_border", default_mask_border_state_, "thick", "none|thin|thick" );
     
-  color_states_.resize( 12 );
+  this->color_states_.resize( 12 );
   for ( size_t j = 0; j < 12; j++ )
   {
     std::string stateid = std::string( "color_" ) + Core::ExportToString( j );

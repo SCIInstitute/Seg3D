@@ -99,7 +99,7 @@ void AppSplash::new_project()
   
 void AppSplash::open_existing()
 {
-  QDir project_directory_;
+  //QDir project_directory_;
 
   boost::filesystem::path current_projects_path = complete( 
     boost::filesystem::path( ProjectManager::Instance()->
@@ -131,7 +131,8 @@ void AppSplash::open_recent()
       
       if( recent_project == list_item )
       {
-        ProjectManager::Instance()->open_project( ( Core::SplitString( 
+        ActionLoadProject::Dispatch(
+        /*ProjectManager::Instance()->open_project(*/ ( Core::SplitString( 
         this->recent_project_list_[ i ], "|" ) )[ 0 ], 
         ( Core::SplitString( this->recent_project_list_[ i ], "|" ) )[ 1 ] ); 
         break;

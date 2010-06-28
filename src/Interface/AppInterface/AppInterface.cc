@@ -32,10 +32,14 @@
 // Boost include
 #include <boost/lexical_cast.hpp>
 
-// Application includes
+
+// Core includes
 #include <Core/Application/Application.h>
 #include <Core/Interface/Interface.h>
+
+// Application includes
 #include <Application/PreferencesManager/PreferencesManager.h>
+
 
 // QtUtils includes
 #include <QtUtils/Utils/QtPointer.h>
@@ -533,6 +537,8 @@ void AppInterface::open_project_wizard()
 //  new_project_wizard_ = new AppProjectWizard();
 //  new_project_wizard_->show();
 }
+  
+
 
 
 } // end namespace Seg3D

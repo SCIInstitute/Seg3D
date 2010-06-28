@@ -28,6 +28,7 @@
 
 // Qt includes
 #include <QMenuBar>
+#include <QFileDialog>
 
 // Core includes
 #include <Core/State/State.h>
@@ -39,6 +40,7 @@
 #include <Application/ToolManager/Actions/ActionOpenTool.h>
 #include <Application/InterfaceManager/Actions/ActionShowWindow.h>
 #include <Application/ViewerManager/ViewerManager.h>
+#include <Application/ProjectManager/Actions/ActionSaveSession.h>
 
 // QtUtils includes
 #include <QtUtils/Bridge/QtBridge.h>
@@ -47,6 +49,7 @@
 #include <Interface/AppInterface/AppMenu.h>
 #include <Interface/AppInterface/AppInterface.h>
 #include <Interface/AppInterface/ViewerInterface.h>
+#include <Interface/AppProjectWizard/AppProjectWizard.h>
 
 namespace Seg3D
 {
@@ -86,16 +89,24 @@ void AppMenu::create_file_menu( QMenu* qmenu )
   qaction = qmenu->addAction( tr( "&New Project" ) );
   qaction->setShortcut( tr( "Ctrl+P" ) );
   qaction->setToolTip( tr( "Start a new project." ) );
-  AppInterface::open_project_wizard();
+  connect( qaction, SIGNAL( triggered() ), this, SLOT( open_project_wizard() ) );
 
   qaction = qmenu->addAction( tr( "&Open Project" ) );
   qaction->setShortcut( QKeySequence::Open );
   qaction->setToolTip( tr( "Open an existing project" ) );
+  
+  // TODO: connect this action to the Project Manager
+  
+  qaction = qmenu->addAction( tr( "&Show Project Folder" ) );
+  qaction->setShortcut( tr( "Ctrl+ALT+F" ) );
+  qaction->setToolTip( tr( "The current project folder" ) );
   // TODO: connect this action to the Project Manager
   
   qaction = qmenu->addAction( tr( "&Save Project" ) );
   qaction->setShortcut( tr( "Ctrl+S" ) );
   qaction->setToolTip( tr( "Save the current project." ) );
+  QtUtils::QtBridge::Connect( qaction, 
+    boost::bind( &ActionSaveSession::Dispatch, false ) );
   // TODO: connect this action to the Project Manager
   
   qmenu->addSeparator();
@@ -331,5 +342,21 @@ void AppMenu::create_window_menu( QMenu* qmenu )
   QtUtils::QtBridge::Connect( qaction, boost::bind( &ActionShowWindow::Dispatch,
     std::string( "preferences" ) ) );
 }
+  
+void AppMenu::open_project_wizard()
+{
+  QMessageBox message_box;
+  message_box.setText( QString::fromUtf8( "WARNING: You will lose changes to your current project that haven't been saved.") );
+  message_box.setInformativeText( QString::fromUtf8( "Are you sure you want to do this?" ) );
+  message_box.setStandardButtons( QMessageBox::Yes | QMessageBox::No );
+  message_box.setDefaultButton( QMessageBox::No );
+  if( message_box.exec() )
+  {
+    QPointer< AppProjectWizard > new_project_wizard_ = new AppProjectWizard( this->main_window_);
+    new_project_wizard_->show();
+  }
+}
+  
+
 
 } // end namespace Seg3D

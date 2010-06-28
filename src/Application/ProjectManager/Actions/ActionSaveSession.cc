@@ -45,7 +45,7 @@ bool ActionSaveSession::validate( Core::ActionContextHandle& context )
 bool ActionSaveSession::run( Core::ActionContextHandle& context, 
   Core::ActionResultHandle& result )
 {
-  std::string message = std::string("Saving your session...");
+  std::string message = std::string("Please wait while your session is saved...");
 
   Core::ActionProgressHandle progress = 
     Core::ActionProgressHandle( new Core::ActionProgress( message ) );
