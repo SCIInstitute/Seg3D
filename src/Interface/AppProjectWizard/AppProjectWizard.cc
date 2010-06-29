@@ -30,6 +30,7 @@
 // Interface includes
 #include <Interface/AppProjectWizard/AppProjectWizard.h>
 #include <Application/ProjectManager/ProjectManager.h>
+#include <Application/ProjectManager/Actions/ActionNewProject.h>
 
 namespace Seg3D
 {
@@ -54,10 +55,11 @@ AppProjectWizard::~AppProjectWizard()
 void AppProjectWizard::accept()
 {
   // TODO: call the create new project action dispatcher with the settings
-//  ProjectManager::Instance()->current_project_path_state_->set( 
+  
+  ActionNewProject::Dispatch( field("projectPath").toString().toStdString(),
+    field("projectName").toString().toStdString() );
+//  ProjectManager::Instance()->new_project( field("projectName").toString().toStdString(),
 //    field("projectPath").toString().toStdString() );
-  ProjectManager::Instance()->new_project( field("projectName").toString().toStdString(),
-    field("projectPath").toString().toStdString() );
     QDialog::accept();
 }
 
