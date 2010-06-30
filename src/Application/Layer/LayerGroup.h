@@ -179,7 +179,7 @@ public:
     return layer_list_;
   }
 
-  void get_layer_names( std::vector< std::string >& layer_ids );
+  
   
   size_t get_list_size() const
   {
@@ -195,6 +195,7 @@ public:
     Core::VolumeType type ) const;
   void get_layer_names( std::vector< LayerIDNamePair >& layer_names, 
     Core::VolumeType type, LayerHandle excluded_layer ) const;
+  void get_layer_names( std::vector< std::string >& layer_ids );
   
 private:
 

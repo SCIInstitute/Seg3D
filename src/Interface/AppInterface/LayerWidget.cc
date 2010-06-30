@@ -402,6 +402,10 @@ void LayerWidget::dropEvent( QDropEvent* event )
     good_to_go = true;
   }
   
+  this->set_drop( false );
+  this->private_->overlay_->hide();
+  
+  
   if( good_to_go )
   {
     dynamic_cast< LayerWidget* >( event->source() )->set_drop_target( this ); 
@@ -412,11 +416,11 @@ void LayerWidget::dropEvent( QDropEvent* event )
   {
     event->ignore();
   }
-  this->setUpdatesEnabled( false );
-  this->set_drop( false );
-  this->private_->overlay_->hide();
-  this->setUpdatesEnabled( true );
-  this->repaint();
+//  this->setUpdatesEnabled( false );
+//  this->set_drop( false );
+//  this->private_->overlay_->hide();
+//  this->setUpdatesEnabled( true );
+//  this->repaint();
 
 }
 

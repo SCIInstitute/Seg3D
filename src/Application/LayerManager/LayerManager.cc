@@ -79,8 +79,15 @@ bool LayerManager::insert_layer( LayerHandle layer )
     for ( group_list_type::iterator it = group_list_.begin(); 
        it != group_list_.end(); ++it )
     {
+      // for testing 
+      Core::GridTransform layer_grid_transform = layer->get_grid_transform();
+      Core::GridTransform group_grid_transform = ( *it )->get_grid_transform();
+      
+      // for testing
+      std::string layer_string = Core::ExportToString( layer_grid_transform );
+      std::string group_string = Core::ExportToString( group_grid_transform );
             
-      if (layer->get_grid_transform() == ( *it )->get_grid_transform()) 
+      if ( layer_grid_transform == group_grid_transform ) 
       {
         group_handle = *it;
         break;
@@ -89,7 +96,6 @@ bool LayerManager::insert_layer( LayerHandle layer )
 
     if ( !group_handle )  
     {
-      //TODO add logic for handling where the layer should go
       group_handle = LayerGroupHandle( new LayerGroup(  layer->get_grid_transform() ) );
       group_list_.push_back( group_handle );
       
@@ -113,12 +119,7 @@ bool LayerManager::insert_layer( LayerHandle layer )
   } // unlocked from here
 
   CORE_LOG_DEBUG( std::string( "Signalling that new layer was inserted" ) );
-
-  // keep the state variables in sync
-  //this->sync_group_lists();
-
   CORE_LOG_DEBUG( std::string( "--- triggering signals ---" ) );
-
   
   layer_inserted_signal_( layer );
   layers_changed_signal_();
@@ -160,10 +161,7 @@ bool LayerManager::move_group_above( std::string group_to_move_id, std::string g
   }
 
   group_inserted_at_signal_( group_to_move_id, index );
-  
-  // keep the state variables in sync
-  //this->sync_group_lists();
-  
+    
   return true;
 }
 
@@ -257,9 +255,6 @@ bool LayerManager::move_layer_above( std::string layer_to_move_id, std::string l
   layer_inserted_at_signal_( layer_above, index );
   layers_changed_signal_();
   
-  // keep the state variables in sync
-  //this->sync_group_lists();
-  
   return true;  
 }
 
@@ -286,12 +281,12 @@ void LayerManager::set_active_layer( LayerHandle layer )
     }
     
     active_layer_->set_active( false );
-  
     CORE_LOG_DEBUG( std::string("Set Active Layer: ") + layer->get_layer_id());
     
     active_layer_ = layer;
     active_layer_->set_active( true );
-  }
+    
+  } // We release the lock  here.
 
   active_layer_changed_signal_( layer );  
 }
@@ -604,9 +599,11 @@ bool LayerManager::pre_save_states()
   group_list_type::iterator group_iterator = this->group_list_.begin();
   for ( ; group_iterator != this->group_list_.end(); ++group_iterator )
   {
+    std::string group = ( *group_iterator )->get_group_id();
     std::vector< std::string > group_layers_vector; 
     ( *group_iterator )->get_layer_names( group_layers_vector );
     for( int i = 0; i < static_cast< int >( group_layers_vector.size() ); ++i  )
+    //for( int i = static_cast< int >( group_layers_vector.size() ) - 1; i >= 0; --i  )
     {
       layers_vector.push_back( group_layers_vector[ i ] );
     }

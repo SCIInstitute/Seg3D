@@ -74,28 +74,66 @@ public:
   // Accessor Functions
 public:
     // Functions for getting a copy of the Layers and Groups with the proper locking
-  void get_groups( std::vector< LayerGroupHandle > &vector_of_groups );
-  void get_layers( std::vector< LayerHandle > &vector_of_layers );
+  // GET_GROUPS:
+  // this function copies the groups into the vector that is passed
+  void get_groups( std::vector< LayerGroupHandle >& vector_of_groups );
+  
+  // GET_LAYERS:
+  // this function copies the layers into the vector that is passed
+  void get_layers( std::vector< LayerHandle >& vector_of_layers );
+  
+  // CHECK_FOR_SAME_GROUP:
+  // this function returns true if the layer id's that are passed are from layer's in the same
+  // group
   bool check_for_same_group( const std::string layer_to_insert_id, 
     const std::string layer_below_id );
   
+  // GET_LAYER_GROUP:
+  // this function returns the group with the id that is passed
   LayerGroupHandle get_layer_group( std::string group_id );
+  
+  // GET_LAYER_BY_ID:
+  // this function returns a handle to the layer with the id that is passed
   LayerHandle get_layer_by_id( const std::string& layer_id );
+  
+  // GET_LAYER_BY_NAME:
+  // this function returns a handle to a layer with the name that is passed
   LayerHandle get_layer_by_name( const std::string& layer_name );
+  
+  // GET_ACTIVE_LAYER:
+  // This function returns a handle to the active layer
   LayerHandle get_active_layer();
   
+  // GET_LAYER_NAMES:
+  // this function gets the layer names
   void get_layer_names( std::vector< LayerIDNamePair >& layer_names, 
     Core::VolumeType type );
 
   // Layer Action Functions
 public:
+  // INSERT_LAYER:
+  // This function returns true when it successfully inserts a layer
   bool insert_layer( LayerHandle layer );
+  
+  // MOVE_LAYER_ABOVE:
+  // this function returns true when it has successfully inserted a layer above another layer
   bool move_layer_above( std::string layer_to_move_id, std::string layer_below_id );
+  
+  // DELETE_LAYERS:
+  // this function deletes the selected layers in the group that is passed
   void delete_layers( LayerGroupHandle group );
+  
+  // SET_ACTIVE_LAYER:
+  // this function sets the active layer
   void set_active_layer( LayerHandle layer );
   
 private:
+  // VALIDATE_LAYER_MOVE:
+  // this function is used to validate that a layer move is the kind we want to allow. 
+  // Currently the layers have to be the same type to successfully move.
   bool validate_layer_move( LayerHandle layer_above, LayerHandle layer_below );
+  
+  // DELETE_ALL:
   bool delete_all();
 
 public:

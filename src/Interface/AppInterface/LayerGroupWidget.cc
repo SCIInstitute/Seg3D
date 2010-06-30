@@ -337,23 +337,27 @@ void LayerGroupWidget::dropEvent( QDropEvent* event )
 
   if( ( this->get_group_id() == mime_data[ 1 ] ) || ( mime_data[ 0 ] != "group" ) )
   {
-    event->setDropAction(Qt::CopyAction);
+    //event->setDropAction(Qt::CopyAction);
     event->ignore();
     return;
   }
 
   if( this->group_menus_open_ )
     return;
+  
+  
+  this->set_drop( false );
+  this->private_->overlay_->hide();
 
   dynamic_cast< LayerGroupWidget* >( event->source() )->set_drop_target( this ); 
   event->setDropAction(Qt::MoveAction);
   event->accept();
 
-  this->setUpdatesEnabled( false );
-  this->set_drop( false );
-  this->private_->overlay_->hide();
-  this->setUpdatesEnabled( true );
-  this->repaint();
+  //this->setUpdatesEnabled( false );
+//  this->set_drop( false );
+//  this->private_->overlay_->hide();
+//  this->setUpdatesEnabled( true );
+//  this->repaint();
 
 }
 
