@@ -137,11 +137,12 @@ int LayerGroup::move_layer_above( LayerHandle layer_above, LayerHandle layer_bel
 
 void LayerGroup::delete_layer( LayerHandle layer )
 {
-  layer->invalidate();
+  if( !layer->check_moving() )
+  {
+    layer->invalidate();
+  }
+  layer->set_moving( false );
   layer_list_.remove( layer );
-  
-  // keep layer lists in sync
-  //this->sync_layer_lists();
 }
 
 void LayerGroup::crop_layer()

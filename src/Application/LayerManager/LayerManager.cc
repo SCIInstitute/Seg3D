@@ -224,6 +224,7 @@ bool LayerManager::move_layer_above( std::string layer_to_move_id, std::string l
     group_below = layer_below->get_layer_group();
     
     // First we Delete the Layer from its list of layers
+    layer_above->set_moving( true );
     group_above->delete_layer( layer_above );
     index = group_below->move_layer_above( layer_above, layer_below );
     
@@ -266,7 +267,7 @@ bool LayerManager::move_layer_above( std::string layer_to_move_id, std::string l
 bool LayerManager::validate_layer_move( LayerHandle layer_above, LayerHandle layer_below )
 {
   // Validate the most common move
-  if ( layer_above->type() == layer_below->type() )
+  if( layer_above->type() == layer_below->type() )
     return true;
   
   return false;

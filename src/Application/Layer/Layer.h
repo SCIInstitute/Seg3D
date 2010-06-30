@@ -191,6 +191,9 @@ public:
   bool get_active();
   void set_active( bool active );
   
+  void set_moving( bool moving ){ this->is_moving_ = moving; }
+  bool check_moving(){ return this->is_moving_; }
+  
   // GET_LAYER_ID:
   // Get the id of this layer
   std::string get_layer_id() const;
@@ -203,6 +206,8 @@ private:
   // The unique ID of the layer
 
   LayerGroupWeakHandle layer_group_;
+  
+  bool is_moving_;
 
   // TODO: At some point we should move this one
   //bool active_;

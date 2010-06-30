@@ -48,6 +48,7 @@ Layer::Layer( const std::string& name, size_t version_number ) :
   StateHandler( "layer", version_number, true )
 { 
   this->initialize_states( name );
+  this->is_moving_ = false;
     
   // == Resource locking ==
   resource_lock_ = Core::ResourceLockHandle( new Core::ResourceLock( get_statehandler_id() ) );
@@ -57,6 +58,7 @@ Layer::Layer( const std::string& name, size_t version_number, const std::string&
   StateHandler( state_id, version_number, false )
 {
   this->initialize_states( name );
+  this->is_moving_ = false;
 
   // == Resource locking ==
   resource_lock_ = Core::ResourceLockHandle( new Core::ResourceLock( get_statehandler_id() ) );
