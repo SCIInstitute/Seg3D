@@ -163,6 +163,7 @@ public:
   // state variables
 public:
   Core::StateStringVectorHandle layers_state_;
+  Core::StateStringHandle active_layer_state_;
 
 public:
   // -- Signal/Slots --

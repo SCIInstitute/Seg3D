@@ -60,6 +60,7 @@ LayerManager::LayerManager() :
 { 
   std::vector< std::string> layers;
   this->add_state( "layers", this->layers_state_, layers );
+  this->add_state( "active_layer", this->active_layer_state_, "" );
 }
 
 LayerManager::~LayerManager()
@@ -102,9 +103,9 @@ bool LayerManager::insert_layer( LayerHandle layer )
       CORE_LOG_DEBUG( std::string( "Set Active Layer: " ) + layer->get_layer_id());
 
       // deactivate the previous active layer
-      if ( active_layer_ ) active_layer_->set_active( false ); 
+      //if ( active_layer_ ) active_layer_->set_active( false ); 
       active_layer_ = layer;
-      active_layer_->set_active( true );
+      //active_layer_->set_active( true );
       
       active_layer_changed = true;
       
@@ -280,11 +281,11 @@ void LayerManager::set_active_layer( LayerHandle layer )
       return;
     }
     
-    active_layer_->set_active( false );
+    //active_layer_->set_active( false );
     CORE_LOG_DEBUG( std::string("Set Active Layer: ") + layer->get_layer_id());
     
     active_layer_ = layer;
-    active_layer_->set_active( true );
+    //active_layer_->set_active( true );
     
   } // We release the lock  here.
 
@@ -410,7 +411,7 @@ void LayerManager::delete_layers( LayerGroupHandle group )
       if ( this->group_list_.size() > 0 )
       {
         this->active_layer_ = this->group_list_.front()->layer_list_.back();
-        this->active_layer_->set_active( true );
+        //this->active_layer_->set_active( true );
         active_layer_changed = true;
       }
     }
@@ -592,7 +593,16 @@ void LayerManager::get_layer_names( std::vector< LayerIDNamePair >& layer_names,
 bool LayerManager::pre_save_states()
 {
   lock_type lock( this->get_mutex() );
-  
+
+  if( this->active_layer_ )
+  {
+    this->active_layer_state_->set( this->active_layer_->get_layer_id() );
+  }
+  else
+  {
+    this->active_layer_state_->set( "none" );
+  }
+
   std::vector< std::string > layers_vector;
   this->layers_state_->set( layers_vector );
   
@@ -673,6 +683,11 @@ bool LayerManager::post_load_states()
     }
     
     this->insert_layer( restored_layer );
+  }
+
+  if ( this->active_layer_state_->get() !=  "none" )
+  {
+    this->set_active_layer( this->get_layer_by_id( this->active_layer_state_->get() ) );
   }
 
   return true;

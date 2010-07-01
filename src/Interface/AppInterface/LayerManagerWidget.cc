@@ -87,7 +87,8 @@ void LayerManagerWidget::insert_layer( LayerHandle layer )
     {
       ( *i )->setUpdatesEnabled( false );
       ( *i )->insert_layer( layer, -1 );
-      if( layer->get_active() )
+      //if( layer->get_active() )
+      if( LayerManager::Instance()->get_active_layer() == layer )
         this->set_active_layer( layer );
       ( *i )->setUpdatesEnabled( true );
       ( *i )->repaint();
@@ -112,7 +113,8 @@ void LayerManagerWidget::insert_layer( LayerHandle layer, int index )
     { 
       ( *i )->setUpdatesEnabled( false );
       ( *i )->insert_layer( layer, index );
-      if( layer->get_active() )
+      //if( layer->get_active() )
+      if( LayerManager::Instance()->get_active_layer() == layer )     
         this->set_active_layer( layer );
       ( *i )->setUpdatesEnabled( true );
       ( *i )->repaint();

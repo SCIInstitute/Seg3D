@@ -86,15 +86,15 @@ void Layer::set_layer_group( LayerGroupWeakHandle layer_group )
   this->layer_group_ = layer_group;
 }
     
-bool Layer::get_active()
-{
-  return this->active_state_->get();
-}
-  
-void Layer::set_active( bool active )
-{
-  this->active_state_->set( active );
-}
+// bool Layer::get_active()
+// {
+//  return this->active_state_->get();
+// }
+//  
+// void Layer::set_active( bool active )
+// {
+//  this->active_state_->set( active );
+// }
 
 std::string Layer::get_layer_id() const
 {
@@ -137,8 +137,8 @@ void Layer::initialize_states( const std::string& name )
   // == Selected by the LayerGroup ==
   this->add_state( "selected", selected_state_, false );
 
-  // == Selected by the LayerGroup ==
-  this->add_state( "active", active_state_, false );
+//  // == Selected by the LayerGroup ==
+//  this->add_state( "active", active_state_, false );
 
   // == Which of the submenus is being editted ==
   this->add_state( "edit_mode", edit_mode_state_, "none", "none|opacity|color|contrast|appearance" );

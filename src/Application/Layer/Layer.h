@@ -173,7 +173,7 @@ public:
   // State that describes which menu is currently shown
   Core::StateOptionHandle edit_mode_state_;
 
-  Core::StateBoolHandle active_state_;
+/*  Core::StateBoolHandle active_state_;*/
 
 protected:
   // State that stores the generation of its datablock
@@ -195,8 +195,8 @@ public:
   // as it duplicates state information and allows for synchronization problems
   // --JS
   
-  bool get_active();
-  void set_active( bool active );
+//  bool get_active();
+//  void set_active( bool active );
   
   void set_moving( bool moving ){ this->is_moving_ = moving; }
   bool check_moving(){ return this->is_moving_; }
