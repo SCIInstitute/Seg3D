@@ -41,7 +41,7 @@ SCI_TOOL_TYPE( "OtsuThresholdFilter", "Otsu Threshold", "Alt+O",
   "http://seg3d.org/")
 
 public:
-  OtsuThresholdFilter( const std::string& toolid );
+  OtsuThresholdFilter( const std::string& toolid, bool auto_number = true );
   virtual ~OtsuThresholdFilter();
 
   // -- constraint parameters --

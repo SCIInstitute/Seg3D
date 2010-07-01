@@ -324,8 +324,8 @@ const size_t PaintTool::VERSION_NUMBER_C = 1;
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL(PaintTool)
 
-PaintTool::PaintTool( const std::string& toolid ) :
-  Tool( toolid, VERSION_NUMBER_C ),
+PaintTool::PaintTool( const std::string& toolid, bool auto_number ) :
+  Tool( toolid, VERSION_NUMBER_C, auto_number ),
   signal_block_count_( 0 ),
   private_( new PaintToolPrivate )
 {

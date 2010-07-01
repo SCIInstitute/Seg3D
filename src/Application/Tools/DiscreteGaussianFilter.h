@@ -40,7 +40,7 @@ SCI_TOOL_TYPE( "DiscreteGaussianFilter", "Discrete Gaussian", "Alt+D",
   ToolGroupType::DATATODATA_E|ToolGroupType::FILTER_E,
   "http://seg3d.org/")
 public:
-  DiscreteGaussianFilter( const std::string& toolid );
+  DiscreteGaussianFilter( const std::string& toolid, bool auto_number = true );
   virtual ~DiscreteGaussianFilter();
 
   // -- constraint parameters --

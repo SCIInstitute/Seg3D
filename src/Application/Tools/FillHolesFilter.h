@@ -41,7 +41,7 @@ SCI_TOOL_TYPE( "FillHolesFilter", "Fill Holes", "Alt+Shift+F",
   "http://seg3d.org/")
 
 public:
-  FillHolesFilter( const std::string& toolid );
+  FillHolesFilter( const std::string& toolid, bool auto_number = true );
   virtual ~FillHolesFilter();
 
   // -- constraint parameters --

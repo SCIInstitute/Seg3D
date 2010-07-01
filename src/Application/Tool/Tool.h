@@ -71,7 +71,7 @@ class Tool : public Core::StateHandler
 
   // -- constructor/destructor --
 public:
-  Tool( const std::string& tool_type, size_t version_number );
+  Tool( const std::string& tool_type, size_t version_number, bool auto_number = true );
   virtual ~Tool();
 
   // -- query properties of tool --

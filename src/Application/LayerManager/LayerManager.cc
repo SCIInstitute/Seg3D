@@ -51,12 +51,12 @@
 namespace Seg3D
 {
 
-const size_t LayerManager::version_number_ = 1;
+const size_t LayerManager::VERSION_NUMBER_C = 1;
 
 CORE_SINGLETON_IMPLEMENTATION( LayerManager );
 
 LayerManager::LayerManager() :
-  StateHandler( "layermanager", version_number_, false, 0 )
+  StateHandler( "layermanager", VERSION_NUMBER_C, false, 0 )
 { 
   std::vector< std::string> layers;
   this->add_state( "layers", this->layers_state_, layers );

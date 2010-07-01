@@ -40,7 +40,7 @@ SCI_TOOL_TYPE( "CannyEdgeDetectionFilter", "Canny Edge Detection", "Alt+E",
   ToolGroupType::DATATODATA_E|ToolGroupType::FILTER_E,
   "http://seg3d.org/")
 public:
-  CannyEdgeDetectionFilter( const std::string& toolid );
+  CannyEdgeDetectionFilter( const std::string& toolid, bool auto_number = true );
   virtual ~CannyEdgeDetectionFilter();
 
   // -- constraint parameters --

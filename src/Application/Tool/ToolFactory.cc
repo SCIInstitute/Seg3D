@@ -180,19 +180,21 @@ bool ToolFactory::list_tool_types( ToolInfoList& tool_list, int properties )
   return true;
 }
 
-bool ToolFactory::create_tool( const std::string& tool_type, ToolHandle& tool )
+bool ToolFactory::create_tool( const std::string& tool_type, ToolHandle& tool, bool auto_number )
 {
   lock_type lock( get_mutex() );
 
   // Step (1): find the tool
+  std::string tool_name = Core::SplitString( tool_type, "_" )[ 0 ];
+
   ToolFactoryPrivate::tool_map_type::const_iterator it = 
-    this->private_->tools_.find( Core::StringToLower( tool_type ) );
+    this->private_->tools_.find( Core::StringToLower( tool_name ) );
 
   // Step (2): check its existence
   if ( it == this->private_->tools_.end() ) return false;
 
   // Step (3): build the tool
-  tool = (*it).second.builder_->build(tool_type);
+  tool = ( *it ).second.builder_->build( tool_type, auto_number );
 
   return true;
 }

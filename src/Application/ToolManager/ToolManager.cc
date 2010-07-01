@@ -63,6 +63,7 @@ public:
   ToolHandle active_tool_;
 
   Core::StateStringVectorHandle tools_state_;
+  Core::StateStringHandle active_tool_state_;
 };
 
 bool ToolManagerPrivate::handle_mouse_enter( size_t viewer_id )
@@ -128,6 +129,7 @@ ToolManager::ToolManager() :
 {
   std::vector< std::string> tools;
   this->add_state( "tools", this->private_->tools_state_, tools );
+  this->add_state( "active_tool", this->private_->active_tool_state_, "none" );
 
   // Register mouse event handlers for all the viewers
   size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
@@ -171,7 +173,7 @@ bool ToolManager::open_tool( const std::string& tool_type, std::string& new_tool
   // settings.
   ToolHandle tool;
 
-  if ( !( ToolFactory::Instance()->create_tool( tool_type, tool ) ) )
+  if ( !( ToolFactory::Instance()->create_tool( tool_type, tool, create_tool_id ) ) )
   {
     CORE_LOG_ERROR( std::string( "Could not create tool of type: '" ) + tool_type + "'" );
     return false;
@@ -300,6 +302,8 @@ bool ToolManager::pre_save_states()
 {
   lock_type lock( this->get_mutex() );
 
+  this->private_->active_tool_state_->set( this->active_toolid() );
+
   std::vector< std::string > tools_vector;
   this->private_->tools_state_->set( tools_vector );
 
@@ -328,5 +332,67 @@ bool ToolManager::post_save_states()
   }
   return true;
 }
+
+bool ToolManager::post_load_states()
+{
+  std::vector< std::string > state_values;
+  Core::StateEngine::Instance()->get_session_states( state_values );
+
+  std::vector< std::string > tools_vector = this->private_->tools_state_->get();
+  for( int j = 0; j < static_cast< int >( tools_vector.size() ); ++j )
+  {
+    if( tools_vector[ j ] == "]" )
+    {
+      return true;
+    }
+    
+    std::string new_tool_id;
+    this->open_tool( tools_vector[ j ], new_tool_id, false );
+    //this->activate_tool( tools_vector[ j ] );
+
+    if( this->get_tool( tools_vector[ j ] ) )
+    {
+      if( !( this->get_tool( tools_vector[ j ] )->load_states( state_values ) ) )
+      {
+        return false;
+      }
+    }
+    else
+    {
+      return false;
+    }
+  }
+
+  if( this->private_->active_tool_state_->get() != "none" )
+  {
+    this->activate_tool( this->private_->active_tool_state_->get() );
+  }
+
+  return true;
+}
+
+bool ToolManager::pre_load_states()
+{
+  tool_list_type::iterator it = this->private_->tool_list_.begin();
+  while( it != this->private_->tool_list_.end() )
+  {
+    ( *it ).second->invalidate();
+    tool_list_type::iterator temp_it = it;
+    it++;
+    this->close_tool( ( *temp_it ).first );
+  }
+
+  return true;
+}
+
+Seg3D::ToolHandle ToolManager::get_tool( const std::string toolid )
+{
+  return ( *( this->private_->tool_list_.find( toolid ) ) ).second;
+}
+
+
+
+
+
 
 } // end namespace Seg3D

@@ -41,7 +41,7 @@ SCI_TOOL_TYPE( "BooleanFilter", "Boolean", "Alt+B",
   "http://seg3d.org/")
 
 public:
-  BooleanFilter( const std::string& toolid );
+  BooleanFilter( const std::string& toolid, bool auto_number = true );
   virtual ~BooleanFilter();
 
   // -- constraint parameters --

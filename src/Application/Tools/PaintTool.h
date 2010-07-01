@@ -43,7 +43,8 @@ class PaintTool : public Tool
 SCI_TOOL_TYPE("PaintTool", "Paint Brush", "Alt+P", ToolGroupType::TOOL_E, "http://seg3d.org/")
   // -- constructor/destructor --
 public:
-  PaintTool( const std::string& toolid );
+  PaintTool( const std::string& toolid, bool auto_number = true );
+
   virtual ~PaintTool();
 
   virtual void activate();

@@ -39,8 +39,8 @@ const size_t ConfidenceConnectedFilter::version_number_ = 1;
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL( ConfidenceConnectedFilter )
 
-ConfidenceConnectedFilter::ConfidenceConnectedFilter( const std::string& toolid ) :
-  Tool( toolid, version_number_ )
+ConfidenceConnectedFilter::ConfidenceConnectedFilter( const std::string& toolid, bool auto_number ) :
+  Tool( toolid, version_number_, auto_number )
 {
   add_state( "target", this->target_layer_state_, "<none>" );
   add_state( "iterations", this->iterations_state_, 1, 1, 100, 1 );

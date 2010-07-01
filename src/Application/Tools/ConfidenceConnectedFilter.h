@@ -41,7 +41,7 @@ SCI_TOOL_TYPE( "ConfidenceConnectedFilter", "Confidence Connected", "Alt+Shift+C
   "http://seg3d.org/")
 
 public:
-  ConfidenceConnectedFilter( const std::string& toolid );
+  ConfidenceConnectedFilter( const std::string& toolid, bool auto_number = true );
   virtual ~ConfidenceConnectedFilter();
 
   // -- constraint parameters --

@@ -41,7 +41,7 @@ SCI_TOOL_TYPE( "BinaryDilateErodeFilter", "Binary Dialate -> Erode", "Alt+Shift+
   "http://seg3d.org/")
 
 public:
-  BinaryDilateErodeFilter( const std::string& toolid );
+  BinaryDilateErodeFilter( const std::string& toolid, bool auto_number = true );
   virtual ~BinaryDilateErodeFilter();
   // -- constraint parameters --
 

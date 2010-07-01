@@ -248,7 +248,7 @@ private:
   LayerHandle active_layer_;
 
   // current version number of the LayerManager
-  const static size_t version_number_;
+  const static size_t VERSION_NUMBER_C;
 
 };
 

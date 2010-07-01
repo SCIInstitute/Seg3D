@@ -39,7 +39,7 @@ class InvertTool : public Tool
 SCI_TOOL_TYPE("InvertTool", "Invert", "Alt+I", ToolGroupType::TOOL_E, "http://seg3d.org/")
   // -- constructor/destructor --
 public:
-  InvertTool( const std::string& toolid );
+  InvertTool( const std::string& toolid, bool auto_number = true );
   virtual ~InvertTool();
 
 

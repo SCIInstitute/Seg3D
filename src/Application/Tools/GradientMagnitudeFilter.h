@@ -41,7 +41,7 @@ SCI_TOOL_TYPE( "GradientMagnitudeFilter", "Gradient Magnitude", "ALT+G",
   "http://seg3d.org/")
 
 public:
-  GradientMagnitudeFilter( const std::string& toolid );
+  GradientMagnitudeFilter( const std::string& toolid, bool auto_number = true );
   virtual ~GradientMagnitudeFilter();
 
   // -- constraint parameters --

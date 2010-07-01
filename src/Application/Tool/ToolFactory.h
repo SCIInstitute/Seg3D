@@ -66,7 +66,7 @@ public:
   virtual ~ToolBuilderBase();
 
   // the functor call to build the object
-  virtual ToolHandle build( const std::string& toolid ) = 0;
+  virtual ToolHandle build( const std::string& toolid, bool auto_number = true ) = 0;
 };
 
 // TOOLBUILDER:
@@ -84,10 +84,11 @@ public:
   }
 
   // The actual builder call
-  virtual ToolHandle build( const std::string& toolid )
+  virtual ToolHandle build( const std::string& toolid, bool auto_number = true )
   {
-    return ToolHandle( new TOOL( toolid ) );
+    return ToolHandle( new TOOL( toolid, auto_number ) );
   }
+
 };
 
 // TOOLINTERFACEBUILDERBASE:
@@ -189,7 +190,7 @@ public:
 
   // CREATE_TOOL:
   // Generate an tool from a type
-  bool create_tool( const std::string& tool_type, ToolHandle& tool );
+  bool create_tool( const std::string& tool_type, ToolHandle& tool, bool auto_number );
 
   // CREATE_TOOLINTERFACE:
   // Generate an tool interface from a type

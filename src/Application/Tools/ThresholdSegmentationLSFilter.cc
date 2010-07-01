@@ -39,8 +39,8 @@ const size_t ThresholdSegmentationLSFilter::version_number_ = 1;
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL(ThresholdSegmentationLSFilter)
 
-ThresholdSegmentationLSFilter::ThresholdSegmentationLSFilter( const std::string& toolid ) :
-  Tool( toolid, version_number_ )
+ThresholdSegmentationLSFilter::ThresholdSegmentationLSFilter( const std::string& toolid, bool auto_number ) :
+  Tool( toolid, version_number_, auto_number )
 {
   // add default values for the the states
   add_state( "target_layer", this->target_layer_state_, "<none>" );

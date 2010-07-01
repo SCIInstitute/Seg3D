@@ -41,7 +41,7 @@ SCI_TOOL_TYPE( "ConnectedComponentFilter", "Connected Component", "Alt+C",
   "http://seg3d.org/")
 
 public:
-  ConnectedComponentFilter( const std::string& toolid );
+  ConnectedComponentFilter( const std::string& toolid, bool auto_number = true );
   virtual ~ConnectedComponentFilter();
 
   // -- constraint parameters --

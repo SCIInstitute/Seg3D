@@ -41,7 +41,7 @@ SCI_TOOL_TYPE( "AnisotropicDiffusionFilter", "Anisotropic Diffusion", "Alt+A",
   "http://seg3d.org/")
 
 public:
-  AnisotropicDiffusionFilter( const std::string& toolid );
+  AnisotropicDiffusionFilter( const std::string& toolid, bool auto_number = true );
   virtual ~AnisotropicDiffusionFilter();
 
   // -- constraint parameters --

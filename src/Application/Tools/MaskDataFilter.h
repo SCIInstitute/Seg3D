@@ -41,7 +41,7 @@ SCI_TOOL_TYPE( "MaskDataFilter", "Mask Data", "Alt+Shift+M",
   "http://seg3d.org/")
 
 public:
-  MaskDataFilter( const std::string& toolid );
+  MaskDataFilter( const std::string& toolid, bool auto_number = true );
   virtual ~MaskDataFilter();
 
   // -- constraint parameters --

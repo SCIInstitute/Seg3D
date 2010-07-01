@@ -122,10 +122,16 @@ public:
 
   ToolHandle get_active_tool();
 
+  ToolHandle get_tool( const std::string toolid );
+
 public:
   virtual bool pre_save_states();
 
   virtual bool post_save_states();
+
+  virtual bool pre_load_states();
+
+  virtual bool post_load_states();
 
 private:
   ToolManagerPrivateHandle private_;

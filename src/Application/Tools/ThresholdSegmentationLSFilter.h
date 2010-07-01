@@ -40,7 +40,7 @@ SCI_TOOL_TYPE( "ThresholdSegmentationLSFilter", "Segmentation Level Set", "Alt+L
   ToolGroupType::DATATOMASK_E|ToolGroupType::FILTER_E, "http://seg3d.org/")
 
 public:
-  ThresholdSegmentationLSFilter( const std::string& toolid );
+  ThresholdSegmentationLSFilter( const std::string& toolid, bool auto_number = true );
   virtual ~ThresholdSegmentationLSFilter();
 
   // -- constraint parameters --

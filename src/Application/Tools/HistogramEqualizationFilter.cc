@@ -39,8 +39,8 @@ const size_t HistogramEqualizationFilter::version_number_ = 1;
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL(HistogramEqualizationFilter)
 
-HistogramEqualizationFilter::HistogramEqualizationFilter( const std::string& toolid ) :
-  Tool( toolid, version_number_ )
+HistogramEqualizationFilter::HistogramEqualizationFilter( const std::string& toolid, bool auto_number ) :
+  Tool( toolid, version_number_, auto_number )
 {
   // Need to set ranges and default values for all parameters
   add_state( "target", this->target_layer_state_, "<none>" );

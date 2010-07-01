@@ -41,7 +41,7 @@ SCI_TOOL_TYPE( "PolylineTool", "Polyline", "Alt+Y",
   "http://seg3d.org/" )
   // -- constructor/destructor --
 public:
-  PolylineTool( const std::string& toolid );
+  PolylineTool( const std::string& toolid, bool auto_number = true );
   virtual ~PolylineTool();
 
   // -- activate/deactivate tool --

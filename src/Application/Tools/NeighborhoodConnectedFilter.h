@@ -41,7 +41,7 @@ SCI_TOOL_TYPE( "NeighborhoodConnectedFilter", "Neighborhood Connected", "Alt+N",
   "http://seg3d.org/")
 
 public:
-  NeighborhoodConnectedFilter( const std::string& toolid );
+  NeighborhoodConnectedFilter( const std::string& toolid, bool auto_number = true );
   virtual ~NeighborhoodConnectedFilter();
 
   // -- constraint parameters --

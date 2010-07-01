@@ -41,7 +41,7 @@ SCI_TOOL_TYPE( "IntensityCorrectionFilter", "Intensity Correction", "Alt+Shift+I
   "http://seg3d.org/")
 
 public:
-  IntensityCorrectionFilter( const std::string& toolid );
+  IntensityCorrectionFilter( const std::string& toolid, bool auto_number = true );
   virtual ~IntensityCorrectionFilter();
 
   // -- constraint parameters --

@@ -42,7 +42,7 @@ SCI_TOOL_TYPE( "MedianFilter", "Median", "Alt+M",
 
   // -- constructor/destructor --
 public:
-  MedianFilter( const std::string& toolid );
+  MedianFilter( const std::string& toolid, bool auto_number = true );
   virtual ~MedianFilter();
 
   // -- constraint parameters --

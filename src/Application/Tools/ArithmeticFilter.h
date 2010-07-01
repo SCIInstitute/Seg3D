@@ -41,7 +41,7 @@ SCI_TOOL_TYPE( "ArithmeticFilter", "Arithmetic", "Alt+Shift+A",
   "http://seg3d.org/")
 
 public:
-  ArithmeticFilter( const std::string& toolid );
+  ArithmeticFilter( const std::string& toolid, bool auto_number = true );
   virtual ~ArithmeticFilter();
 
   // -- constraint parameters --

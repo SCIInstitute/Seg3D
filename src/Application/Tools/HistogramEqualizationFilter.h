@@ -41,7 +41,7 @@ SCI_TOOL_TYPE( "HistogramEqualizationFilter", "Histogram Equalization", "Alt+H",
   "http://seg3d.org/")
 
 public:
-  HistogramEqualizationFilter( const std::string& toolid );
+  HistogramEqualizationFilter( const std::string& toolid, bool auto_number = true );
   virtual ~HistogramEqualizationFilter();
 
   // -- constraint parameters --
