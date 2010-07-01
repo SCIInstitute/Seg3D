@@ -70,8 +70,12 @@ public:
   // acquire a lock on the RenderResources before calling this function. 
   virtual void upload_texture();
 
+  // GET_MASK_DATA_BLOCK:
+  // Return a handle to the underlying mask data block.
+  MaskDataBlockHandle get_mask_data_block() const;
+
 private:
-  // Pointer to the mask data block. The base class keeps a handle of the volume,
+  //  Pointer to the mask data block. The base class keeps a handle of the volume,
   // so it's safe to use a pointer here.
   MaskDataBlock* mask_data_block_;
 

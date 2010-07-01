@@ -84,6 +84,14 @@ public:
   // This function needs to be overloaded to record mouse buttons being released.
   virtual void mouse_release_event( const MouseHistory& mouse_history, 
     int button, int buttons, int modifiers );
+
+  // MOUSE_ENTER_EVENT:
+  // This function is called by the render widget when a mouse enter event has occurred.
+  virtual void mouse_enter_event();
+
+  // MOUSE_LEAVE_EVENT:
+  // This function is called by the render widget when a mouse leave event has occurred.
+  virtual void mouse_leave_event();
   
   // WHEEL_EVENT:
   // This function is called by the render widget when a mouse wheel event has occurred.
@@ -92,7 +100,7 @@ public:
 
   // KEY_EVENT:
   // This function is called when a key is pressed while hovering over the render widget
-  virtual bool key_event( int key, int modifiers );
+  virtual bool key_press_event( int key, int modifiers );
 
   // RESIZE:
   // This function is called when the viewer is resized by the render widget.

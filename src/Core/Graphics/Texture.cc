@@ -128,6 +128,13 @@ void Texture::safe_unbind()
   }
 }
 
+unsigned int Texture::GetActiveTextureUnit()
+{
+  int tex_unit;
+  glGetIntegerv( GL_ACTIVE_TEXTURE, &tex_unit );
+  return static_cast< unsigned int >( tex_unit - GL_TEXTURE0 );
+}
+
 void Texture::SetActiveTextureUnit( unsigned int unit )
 {
   glActiveTexture( GL_TEXTURE0 + unit );

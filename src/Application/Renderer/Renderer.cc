@@ -43,6 +43,8 @@
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
 #include <Application/Renderer/Renderer.h>
+#include <Application/Tool/Tool.h>
+#include <Application/ToolManager/ToolManager.h>
 #include <Application/ViewerManager/ViewerManager.h>
 
 
@@ -318,6 +320,13 @@ bool Renderer::render_overlay()
     gluOrtho2D( 0, this->width_, 0, this->height_ );
     glMatrixMode( GL_MODELVIEW );
     glLoadIdentity();
+
+    // Render the active tool
+    ToolHandle tool = ToolManager::Instance()->get_active_tool();
+    if ( tool )
+    {
+      tool->repaint( this->viewer_id_, proj_mat );
+    }
 
     // Render the grid
     if ( show_grid )
@@ -753,6 +762,20 @@ void Renderer::draw_slice( LayerSceneItemHandle layer_item,
   }
   else
   {
+    // NOTE: Extend the size of the slice by half voxel size in each direction. 
+    // This is to compensate the difference between node centering and cell centering.
+    // The volume data uses node centering, but OpenGL texture uses cell centering.
+    double voxel_width = ( volume_slice->right() - volume_slice->left() ) 
+      / ( volume_slice->nx() - 1 );
+    double voxel_height = ( volume_slice->top() - volume_slice->bottom() )
+      / ( volume_slice->ny() - 1 );
+    double left = volume_slice->left() - 0.5 * voxel_width;
+    double right = volume_slice->right() + 0.5 * voxel_width;
+    double bottom = volume_slice->bottom() - 0.5 * voxel_height;
+    double top = volume_slice->top() + 0.5 * voxel_height;
+    slice_width = right - left;
+    slice_height = top - bottom;
+
     // Compute the size of the slice on screen
     Core::Vector slice_x( slice_width, 0.0, 0.0 );
     slice_x = proj_mat * slice_x;
@@ -765,16 +788,16 @@ void Renderer::draw_slice( LayerSceneItemHandle layer_item,
     glBegin( GL_QUADS );
       glMultiTexCoord2f( GL_TEXTURE0, 0.0f, 0.0f );
       glMultiTexCoord3f( GL_TEXTURE1, 0.0f, 0.0f, 0.0f );
-      glVertex2d( volume_slice->left(), volume_slice->bottom() );
+      glVertex2d( left, bottom );
       glMultiTexCoord2f( GL_TEXTURE0, 1.0f, 0.0f );
       glMultiTexCoord3f( GL_TEXTURE1, pattern_repeats_x, 0.0f, 0.0f );
-      glVertex2d( volume_slice->right(), volume_slice->bottom() );
+      glVertex2d( right, bottom );
       glMultiTexCoord2f( GL_TEXTURE0, 1.0f, 1.0f );
       glMultiTexCoord3f( GL_TEXTURE1, pattern_repeats_x, pattern_repeats_y, 0.0f );
-      glVertex2d( volume_slice->right(), volume_slice->top() );
+      glVertex2d( right, top );
       glMultiTexCoord2f( GL_TEXTURE0, 0.0f, 1.0f );
       glMultiTexCoord3f( GL_TEXTURE1, 0.0f, pattern_repeats_y, 0.0f );
-      glVertex2d( volume_slice->left(), volume_slice->top() );
+      glVertex2d( left, top );
     glEnd();
   }
 

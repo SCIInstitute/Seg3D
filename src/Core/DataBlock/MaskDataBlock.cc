@@ -49,4 +49,14 @@ MaskDataBlock::~MaskDataBlock()
   MaskDataBlockManager::Instance()->release( data_block_, mask_bit_ );
 }
 
+DataBlock::generation_type MaskDataBlock::get_generation() const
+{
+  return  this->data_block_->get_generation();
+}
+
+void MaskDataBlock::increase_generation()
+{
+  this->data_block_->increase_generation();
+}
+
 } // end namespace Core

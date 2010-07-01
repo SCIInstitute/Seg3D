@@ -119,6 +119,13 @@ public:
   // UPDATE_PROGRESS:
   // When new information on progress is available this signal is triggered.
   update_progress_signal_type update_progress_signal_;
+
+  // -- layer updated signal --
+public:
+  typedef boost::signals2::signal< void () > layer_updated_signal_type;
+  // LAYER_UPDATED_SIGNAL:
+  // Triggered when the layer data has been modified.
+  layer_updated_signal_type layer_updated_signal_;
   
   // -- layer filter abort support --
 public:

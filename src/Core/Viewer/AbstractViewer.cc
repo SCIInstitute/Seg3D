@@ -132,13 +132,23 @@ void AbstractViewer::mouse_release_event( const MouseHistory& mouse_history,
   // Do nothing
 }
 
+void AbstractViewer::mouse_enter_event()
+{
+  // Do nothing
+}
+
+void AbstractViewer::mouse_leave_event()
+{
+  // Do nothing
+}
+
 bool AbstractViewer::wheel_event( int delta, int x, int y, int buttons, int modifiers )
 {
   // Do nothing
   return false;
 }
 
-bool AbstractViewer::key_event( int key, int modifiers )
+bool AbstractViewer::key_press_event( int key, int modifiers )
 {
   // do nothing
   return false;

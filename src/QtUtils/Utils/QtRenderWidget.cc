@@ -177,6 +177,7 @@ void QtRenderWidget::resizeGL( int width, int height )
 
 void QtRenderWidget::mouseMoveEvent( QMouseEvent * event )
 {
+  event->accept();
   this->private_->mouse_history_.previous_ = this->private_->mouse_history_.current_;
   this->private_->mouse_history_.current_.x_ = event->x();
   this->private_->mouse_history_.current_.y_ = event->y();
@@ -247,7 +248,7 @@ void QtRenderWidget::keyPressEvent( QKeyEvent* event )
 
   this->activate_signal_();
 
-  if ( ! ( this->private_->viewer_->key_event( event->key(), event->modifiers() ) ) )
+  if ( ! ( this->private_->viewer_->key_press_event( event->key(), event->modifiers() ) ) )
   {
     QWidget::keyPressEvent( event );
   }
@@ -273,12 +274,14 @@ void QtRenderWidget::enterEvent( QEvent* event )
 {
   event->accept();
   setFocus();
+  this->private_->viewer_->mouse_enter_event();
 }
 
 void QtRenderWidget::leaveEvent( QEvent* event )
 {
   event->accept();
   clearFocus();
+  this->private_->viewer_->mouse_leave_event();
 }
 
 } // end namespace QtUtils

@@ -102,6 +102,8 @@ private:
   friend class BufferObject;
   friend class FramebufferObject;
   friend class Renderbuffer;
+  friend class GLSLShader;
+  friend class GLSLProgram;
   
   // DELETE_TEXTURE:
   // Delete a texture within the right context
@@ -119,6 +121,14 @@ private:
   // Delete a renderbuffer within the right context
   void delete_renderbuffer( unsigned int renderbuffer_id );
 
+  // DELETE_PROGRAM:
+  // Delete the given GLSL program.
+  void delete_program( unsigned int program_id );
+
+  // DELETE_SHADER:
+  // Delete the given GLSL shader.
+  void delete_shader( unsigned int shader_id );
+
 private:
   RenderResourcesPrivateHandle private_;
   
@@ -128,7 +138,7 @@ public:
   static mutex_type& GetMutex();
 };
 
-#define SCI_CHECK_OPENGL_ERROR()\
+#define CORE_CHECK_OPENGL_ERROR()\
 {\
   GLenum err = glGetError();\
   if (err != GL_NO_ERROR)\

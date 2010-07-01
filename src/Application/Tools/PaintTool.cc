@@ -27,26 +27,307 @@
  */
 
 #include <algorithm>
+#include <cstdlib>
 
+#include <Core/Viewer/Mouse.h>
+#include <Core/Graphics/Texture.h>
+#include <Core/RenderResources/RenderResources.h>
 #include <Core/Utils/ScopedCounter.h>
 
 // Application includes
 #include <Application/Layer/LayerGroup.h>
+#include <Application/Layer/MaskLayer.h>
 #include <Application/LayerManager/LayerManager.h>
+#include <Application/PreferencesManager/PreferencesManager.h>
+#include <Application/Renderer/SliceShader.h>
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/PaintTool.h>
+#include <Application/Viewer/Viewer.h>
+#include <Application/ViewerManager/ViewerManager.h>
 
 namespace Seg3D
 {
 
-const size_t PaintTool::version_number_ = 1;
+//////////////////////////////////////////////////////////////////////////
+// Declaration and implementation of class PaintToolPrivate
+//////////////////////////////////////////////////////////////////////////
+
+class PaintToolPrivate : public Core::RecursiveLockable
+{
+public:
+  // BUILD_BRUSH_MASK:
+  // Build mask for the brush which can later be used for painting.
+  void build_brush_mask();
+
+  void initialize();
+  void upload_mask_texture();
+  void handle_brush_radius_changed();
+
+  //PAINT:
+  // Paint on the target layer with the brush centered at (x0, y0).
+  void paint( int xc, int yc );
+
+  void paint_range( int x0, int y0, int x1, int y1 );
+
+  bool initialized_;
+  bool brush_mask_changed_;
+
+  PaintTool* paint_tool_;
+  int current_viewer_;
+  int center_x_;
+  int center_y_;
+  std::vector< unsigned char > brush_mask_;
+  Core::Texture2DHandle brush_tex_;
+  SliceShaderHandle shader_;
+
+  const static int INVALID_VIEWER_C;
+};
+
+const int PaintToolPrivate::INVALID_VIEWER_C = -1;
+
+// Set the pixel at (x, y) of the buffer to the given value. 
+// The size of the buffer must be dimension * dimension
+inline void SetPixel( std::vector< unsigned char >& buffer, int x, int y, 
+           int dimension, unsigned char value = 1 )
+{
+  buffer[ y * dimension + x ] = value;
+}
+
+// Bresenham algorithm for drawing a circle.
+static void BresenhamCircle( std::vector< unsigned char >& buffer, int radius )
+{
+  const int x0 = radius;
+  const int y0 = radius;
+  const int dimension = radius * 2 + 1;
+
+  int f = 1 - radius;
+  int ddF_x = 1;
+  int ddF_y = -2 * radius;
+  int x = 0;
+  int y = radius;
+
+  SetPixel( buffer, x0, y0 + radius, dimension );
+  SetPixel( buffer, x0, y0 - radius, dimension );
+  SetPixel( buffer, x0 + radius, y0, dimension );
+  SetPixel( buffer, x0 - radius, y0, dimension );
+
+  while( x < y )
+  {
+    if( f >= 0 ) 
+    {
+      y--;
+      ddF_y += 2;
+      f += ddF_y;
+    }
+    x++;
+    ddF_x += 2;
+    f += ddF_x;    
+    SetPixel( buffer, x0 + x, y0 + y, dimension );
+    SetPixel( buffer, x0 - x, y0 + y, dimension );
+    SetPixel( buffer, x0 + x, y0 - y, dimension );
+    SetPixel( buffer, x0 - x, y0 - y, dimension );
+    SetPixel( buffer, x0 + y, y0 + x, dimension );
+    SetPixel( buffer, x0 - y, y0 + x, dimension );
+    SetPixel( buffer, x0 + y, y0 - x, dimension );
+    SetPixel( buffer, x0 - y, y0 - x, dimension );
+  }
+}
+
+// Flood fill the buffer with the given value, starting from (x, y). The algorithm stops
+// when it gets to the boundary of the buffer, or when it arrives at a point where the
+// value equals to the given value.
+static void FloodFill( std::vector< unsigned char >& buffer, int x, int y, 
+            int dimension, unsigned char value )
+{
+  if ( x >= dimension || y >= dimension ||
+    buffer[ y * dimension + x ] == value )
+  {
+    return;
+  }
+  
+  buffer[ y * dimension + x ] = value;
+  FloodFill( buffer, x + 1, y, dimension, value );
+  FloodFill( buffer, x - 1, y, dimension, value );
+  FloodFill( buffer, x, y + 1, dimension, value );
+  FloodFill( buffer, x, y - 1, dimension, value );
+}
+
+void PaintToolPrivate::build_brush_mask()
+{
+  int radius = this->paint_tool_->brush_radius_state_->get();
+  int brush_size = radius * 2 + 1;
+  this->brush_mask_.resize( brush_size * brush_size );
+  if ( brush_size == 1 )
+  {
+    this->brush_mask_[ 0 ] = 1;
+    return;
+  }
+  memset( &this->brush_mask_[ 0 ], 0, sizeof( unsigned char ) * this->brush_mask_.size() );
+  BresenhamCircle( this->brush_mask_, radius );
+  FloodFill( this->brush_mask_, radius, radius, brush_size, 1 );
+}
+
+void PaintToolPrivate::initialize()
+{
+  if ( !this->initialized_ )
+  {
+    Core::RenderResources::lock_type lock( Core::RenderResources::GetMutex() );
+    this->brush_tex_ = Core::Texture2DHandle( new Core::Texture2D );
+    this->brush_tex_->set_mag_filter( GL_NEAREST );
+    this->brush_tex_->set_min_filter( GL_NEAREST );
+
+    this->shader_ = SliceShaderHandle( new SliceShader );
+    this->shader_->initialize();
+    this->shader_->enable();
+    this->shader_->set_border_width( 1 );
+    this->shader_->set_mask_mode( 1 );
+    this->shader_->set_opacity( 1.0f );
+    this->shader_->set_slice_texture( 0 );
+    this->shader_->set_volume_type( Core::VolumeType::MASK_E );
+    this->shader_->disable();
+
+    this->initialized_ = true;
+  }
+}
+
+void PaintToolPrivate::upload_mask_texture()
+{
+  if ( !this->brush_mask_changed_ )
+  {
+    return;
+  }
+  
+  Core::RenderResources::lock_type lock( Core::RenderResources::GetMutex() );
+  int radius = this->paint_tool_->brush_radius_state_->get();
+  int brush_size = radius * 2 + 1;
+  this->brush_tex_->set_image( brush_size, brush_size, GL_ALPHA, &this->brush_mask_[ 0 ],
+    GL_ALPHA, GL_UNSIGNED_BYTE );
+
+  this->brush_mask_changed_ = false;
+}
+
+void PaintToolPrivate::handle_brush_radius_changed()
+{
+  lock_type lock( this->get_mutex() );
+  this->build_brush_mask();
+  this->brush_mask_changed_ = true;
+}
+
+void PaintToolPrivate::paint( int xc, int yc )
+{
+  PaintToolPrivate::lock_type lock( this->get_mutex() );
+
+  // If no target layer is selected, or if the tool is not in any viewer, return
+  if ( this->paint_tool_->target_layer_state_->get() == Tool::NONE_OPTION_C ||
+    this->current_viewer_ == INVALID_VIEWER_C )
+  {
+    return;
+  }
+
+  ViewerHandle viewer = ViewerManager::Instance()->get_viewer( 
+    static_cast< size_t >( this->current_viewer_ ) );
+  Core::MaskVolumeSliceHandle target_slice = viewer->get_mask_volume_slice( 
+    this->paint_tool_->target_layer_state_->get() );
+  if ( !target_slice )
+  {
+    CORE_THROW_LOGICERROR( "Layer with ID '" + this->paint_tool_->target_layer_state_->get() +
+      "' does not exist" );
+  }
+  
+  if ( target_slice->out_of_boundary() )
+  {
+    return;
+  }
+  
+  int radius = this->paint_tool_->brush_radius_state_->get();
+  int brush_size = radius * 2 + 1;
+  double xpos, ypos;
+  viewer->window_to_world( xc, yc, xpos, ypos );
+  int x0, y0;
+  target_slice->world_to_index( xpos, ypos, x0, y0 );
+  int x_min = x0 - radius;
+  int x_max = x0 + radius;
+  int y_min = y0 - radius;
+  int y_max = y0 + radius;
+  if ( x_min >= static_cast< int >( target_slice->nx() ) ||
+    x_max < 0 || y_max < 0 ||
+    y_min >= static_cast< int >( target_slice->ny() ) )
+  {
+    return;
+  }
+  
+  size_t x_start = static_cast< size_t >( Core::Max( x_min, 0 ) - x_min );
+  size_t x_end = static_cast< size_t >( Core::Min( x_max, static_cast< int >( 
+    target_slice->nx() - 1 ) ) - x_min );
+  size_t y_start = static_cast< size_t >( Core::Max( y_min, 0 ) - y_min );
+  size_t y_end = static_cast< size_t >( Core::Min( y_max, static_cast< int >( 
+    target_slice->ny() - 1 ) ) - y_min );
+
+  // Lock the volume
+  Core::VolumeSlice::lock_type volume_lock( target_slice->get_mutex() ); 
+
+  for ( size_t y = y_start; y <= y_end; y++ )
+  {
+    for ( size_t x = x_start; x <= x_end; x++ )
+    {
+      if ( this->brush_mask_[ y * brush_size + x ] != 0 )
+      {
+        if ( this->paint_tool_->erase_state_->get() )
+        {
+          target_slice->clear_mask_at( x_min + x, y_min + y );
+        }
+        else
+        {
+          target_slice->set_mask_at( x_min + x, y_min + y );
+        }
+      }
+    }
+  }
+  Core::MaskDataBlockHandle mask_data_block = target_slice->get_mask_data_block();
+  // Increase the generation number of the mask
+  mask_data_block->increase_generation();
+  // Unlock before triggering the signal.
+  // NOTE: The mutex used by DataBlock and hence MaskDataBlock is non-recursive,
+  // and thus triggering the signal before releasing the lock might result in deadlock.
+  volume_lock.unlock();
+  // Trigger mask_updated_signal_
+  mask_data_block->mask_updated_signal_();
+}
+
+void PaintToolPrivate::paint_range( int x0, int y0, int x1, int y1 )
+{
+  int delta_x = Core::Abs( x1 - x0 );
+  int delta_y = Core::Abs( y1 - y0 );
+  int radius = this->paint_tool_->brush_radius_state_->get();
+  // If the distance between the two points are greater than radius, 
+  // we need to interpolate between them
+  if ( ( radius == 0 && ( delta_x > 1 || delta_y > 1 ) ) ||
+    ( radius > 0 && (delta_x > radius || delta_y > radius ) ) )
+  {
+    int mid_x = Core::Round( ( x0 + x1 ) * 0.5 );
+    int mid_y = Core::Round( ( y0 + y1 ) * 0.5 );
+    this->paint_range( x0, y0, mid_x, mid_y );
+    this->paint_range( mid_x, mid_y, x1, y1 );
+  }
+  else
+  {
+    this->paint( x1, y1 );
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////
+// Implementation of class PaintTool
+//////////////////////////////////////////////////////////////////////////
+
+const size_t PaintTool::VERSION_NUMBER_C = 1;
 
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL(PaintTool)
 
 PaintTool::PaintTool( const std::string& toolid ) :
-  Tool( toolid, version_number_ ),
-  signal_block_count_( 0 )
+  Tool( toolid, VERSION_NUMBER_C ),
+  signal_block_count_( 0 ),
+  private_( new PaintToolPrivate )
 {
   // Need to set ranges and default values for all parameters
 
@@ -60,10 +341,10 @@ PaintTool::PaintTool( const std::string& toolid ) :
   this->add_state( "mask_constraint", this->mask_constraint_layer_state_,
     Tool::NONE_OPTION_C, empty_names );
 
-  this->add_state( "brush_radius", this->brush_radius_state_, 23, 1, 250, 1 );
+  this->add_state( "brush_radius", this->brush_radius_state_, 3, 0, 250, 1 );
   this->add_state( "upper_threshold", this->upper_threshold_state_, 1.0, 00.0, 1.0, 0.01 );
   this->add_state( "lower_threshold", this->lower_threshold_state_, 0.0, 00.0, 1.0, 0.01 );
-  this->add_state( "erase", this->erase_state_, true );
+  this->add_state( "erase", this->erase_state_, false );
   
   this->handle_layers_changed();
 
@@ -73,6 +354,20 @@ PaintTool::PaintTool( const std::string& toolid ) :
   this->add_connection ( LayerManager::Instance()->layers_changed_signal_.connect(
     boost::bind( &PaintTool::handle_layers_changed, this ) ) );
 
+  LayerHandle active_layer = LayerManager::Instance()->get_active_layer();
+  if ( active_layer && active_layer->type() == Core::VolumeType::MASK_E )
+  {
+    this->target_layer_state_->set( active_layer->get_layer_id() );
+  }
+
+  this->private_->paint_tool_ = this;
+  this->private_->current_viewer_ = PaintToolPrivate::INVALID_VIEWER_C;
+  this->private_->build_brush_mask();
+  this->private_->initialized_ = false;
+  this->private_->brush_mask_changed_ = true;
+
+  this->add_connection( this->brush_radius_state_->state_changed_signal_.connect(
+    boost::bind( &PaintToolPrivate::handle_brush_radius_changed, this->private_ ) ) );
 }
 
 PaintTool::~PaintTool()
@@ -95,11 +390,6 @@ void PaintTool::update_target_options()
   {
     Core::ScopedCounter counter( this->signal_block_count_ );
     this->target_layer_state_->set_option_list( mask_layer_names );
-    LayerHandle active_layer = LayerManager::Instance()->get_active_layer();
-    if ( active_layer && active_layer->type() == Core::VolumeType::MASK_E )
-    {
-      this->target_layer_state_->set( active_layer->get_layer_id() );
-    }
   }
 }
 
@@ -136,20 +426,175 @@ void PaintTool::update_constraint_options()
   this->mask_constraint_layer_state_->set_option_list( mask_layer_names );
 }
 
-void PaintTool::target_constraint( std::string layerid )
-{
-}
-
-void PaintTool::mask_constraint( std::string layerid )
-{
-}
-
 void PaintTool::activate()
 {
 }
 
 void PaintTool::deactivate()
 {
+}
+
+void PaintTool::repaint( size_t viewer_id, const Core::Matrix& proj_mat )
+{
+  PaintToolPrivate::lock_type lock( this->private_->get_mutex() );
+
+  // Don't draw the tool if the viewer is not the one that the tool is currently in.
+  if ( this->private_->current_viewer_ != static_cast< int >( viewer_id ) )
+  {
+    return;
+  }
+  
+  // If no target layer is selected, return
+  if ( this->target_layer_state_->get() == Tool::NONE_OPTION_C )
+  {
+    return;
+  }
+
+  LayerHandle target_layer = LayerManager::Instance()->get_layer_by_id( 
+    this->target_layer_state_->get() );
+  if ( !target_layer )
+  {
+    CORE_THROW_LOGICERROR( "Layer with ID '" + this->target_layer_state_->get() +
+      "' does not exist" );
+  }
+
+  ViewerHandle viewer = ViewerManager::Instance()->get_viewer( viewer_id );
+  Core::MaskVolumeSliceHandle target_slice = viewer->get_mask_volume_slice( 
+    this->target_layer_state_->get() );
+  if ( target_slice->out_of_boundary() )
+  {
+    return;
+  }
+  
+  // Compute the position of the brush in world space
+  // NOTE: The size of the brush needs to be extended by half of the voxel size in each
+  // direction in order to visually align with the target mask layer.
+  int radius = this->brush_radius_state_->get();
+  double xpos, ypos;
+  viewer->window_to_world( this->private_->center_x_, this->private_->center_y_,
+    xpos, ypos );
+  int i, j;
+  target_slice->world_to_index( xpos, ypos, i, j );
+  double voxel_width = ( target_slice->right() - target_slice->left() ) / 
+    ( target_slice->nx() - 1 );
+  double voxel_height = ( target_slice->top() - target_slice->bottom() ) /
+    ( target_slice->ny() - 1 );
+  double left = target_slice->left() + ( i - radius - 0.5 ) * voxel_width;
+  double right = target_slice->left() + ( i + radius + 0.5 ) * voxel_width;
+  double bottom = target_slice->bottom() + ( j - radius - 0.5 ) * voxel_height;
+  double top = target_slice->bottom() + ( j + radius + 0.5 ) * voxel_height;
+
+  // Compute the size of the brush in window space
+  Core::Vector brush_x( right - left, 0.0, 0.0 );
+  brush_x = proj_mat * brush_x;
+  double brush_screen_width = brush_x.x() / 2.0 * viewer->get_width();
+  double brush_screen_height = ( top - bottom ) / ( right - left ) * brush_screen_width;
+
+  this->private_->initialize();
+  this->private_->upload_mask_texture();
+
+  this->private_->shader_->enable();
+  this->private_->shader_->set_pixel_size( static_cast< float >( 1.0 / brush_screen_width ), 
+    static_cast< float >( 1.0 /brush_screen_height ) );
+
+  unsigned int old_tex_unit = Core::Texture::GetActiveTextureUnit();
+  Core::Texture::SetActiveTextureUnit( 0 );
+  this->private_->brush_tex_->bind();
+  
+  MaskLayer* target_mask_layer = static_cast< MaskLayer* >( target_layer.get() );
+  Core::Color color = PreferencesManager::Instance()->get_color( 
+    target_mask_layer->color_state_->get() );
+  this->private_->shader_->set_mask_color( static_cast< float >( color.r() / 255 ), 
+    static_cast< float >( color.g() / 255 ), static_cast< float >( color.b() / 255 ) );
+
+  glPushAttrib( GL_TRANSFORM_BIT );
+  glMatrixMode( GL_PROJECTION );
+  glPushMatrix();
+  glLoadIdentity();
+  glMultMatrixd( proj_mat.data() );
+
+  glBegin( GL_QUADS );
+    glTexCoord2f( 0.0f, 0.0f );
+    glVertex2d( left, bottom );
+    glTexCoord2f( 1.0f, 0.0f );
+    glVertex2d( right, bottom );
+    glTexCoord2f( 1.0f, 1.0f );
+    glVertex2d( right, top );
+    glTexCoord2f( 0.0f, 1.0f );
+    glVertex2d( left, top );
+  glEnd();
+
+  this->private_->brush_tex_->unbind();
+  Core::Texture::SetActiveTextureUnit( old_tex_unit );
+  this->private_->shader_->disable();
+
+  glPopMatrix();
+  glPopAttrib();
+}
+
+bool PaintTool::handle_mouse_enter( size_t viewer_id )
+{
+  this->private_->current_viewer_ = static_cast< int >( viewer_id );
+  return true;
+}
+
+bool PaintTool::handle_mouse_leave( size_t viewer_id )
+{
+  this->private_->current_viewer_ = PaintToolPrivate::INVALID_VIEWER_C;
+  return true;
+}
+
+bool PaintTool::handle_mouse_move( const Core::MouseHistory& mouse_history, 
+                  int button, int buttons, int modifiers )
+{
+  this->private_->center_x_ = mouse_history.current_.x_;
+  this->private_->center_y_ = mouse_history.current_.y_;
+
+  if ( modifiers == Core::KeyModifier::NO_MODIFIER_E )
+  {
+    if ( buttons == Core::MouseButton::LEFT_BUTTON_E )
+    {
+      this->private_->paint_range( mouse_history.previous_.x_, mouse_history.previous_.y_,
+        mouse_history.current_.x_, mouse_history.current_.y_ );
+    }
+    return true;
+  }
+  
+  return false;
+}
+
+bool PaintTool::handle_mouse_press( const Core::MouseHistory& mouse_history, 
+                   int button, int buttons, int modifiers )
+{
+  if ( modifiers == Core::KeyModifier::NO_MODIFIER_E &&
+    buttons == Core::MouseButton::LEFT_BUTTON_E )
+  {
+    this->private_->center_x_ = mouse_history.current_.x_;
+    this->private_->center_y_ = mouse_history.current_.y_;
+
+    this->private_->paint( this->private_->center_x_, this->private_->center_y_ );
+    return true;
+  }
+
+  return false;
+}
+
+bool PaintTool::handle_mouse_release( const Core::MouseHistory& mouse_history, 
+                   int button, int buttons, int modifiers )
+{
+  return false;
+}
+
+bool PaintTool::handle_wheel( int delta, int x, int y, int buttons, int modifiers )
+{
+  if ( modifiers == Core::KeyModifier::CONTROL_MODIFIER_E )
+  {
+    PaintToolPrivate::lock_type lock( this->private_->get_mutex() );
+    this->brush_radius_state_->set( this->brush_radius_state_->get() + delta );
+    return true;
+  }
+  
+  return false;
 }
 
 } // end namespace Seg3D

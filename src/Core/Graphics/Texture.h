@@ -112,6 +112,7 @@ protected:
   mutex_type mutex_;
 
 public:
+  static unsigned int GetActiveTextureUnit();
   static void SetActiveTextureUnit( unsigned int unit );
   static void SetClientActiveTextureUnit( unsigned int unit );
 };

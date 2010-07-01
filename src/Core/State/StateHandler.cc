@@ -227,8 +227,11 @@ bool StateHandler::load_states( std::vector< std::string >& states_vector )
           if( ( state_value_as_string_vector[ 0 ] != "" ) && 
             ( state_value_as_string_vector[ 1 ] != "" ) )
           {
-            private_->state_map_[ state_value_as_string_vector[ 0 ] ]->
-              import_from_string( state_value_as_string_vector[ 1 ] );
+            state_map_type::iterator it = this->private_->state_map_.find( state_value_as_string_vector[ 0 ] );
+            if ( it != this->private_->state_map_.end() )
+            {
+              ( *it ).second->import_from_string( state_value_as_string_vector[ 1 ] );
+            }           
           }
           else
           {

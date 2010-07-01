@@ -119,7 +119,7 @@ protected:
 
   // ENTEREVENT:
   // This function is called by Qt when the mouse starts to hover over the widget
-  virtual void enterEvent( QEvent* event );
+  virtual void enterEvent ( QEvent* event );
 
   // LEAVEEVENT:
   // This function is called by Qt when the mouse finishes to hover over the widget

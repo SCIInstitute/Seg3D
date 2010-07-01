@@ -33,9 +33,9 @@ namespace Core
 
 MaskVolumeSlice::MaskVolumeSlice( const MaskVolumeHandle& mask_volume, 
                  VolumeSliceType type, size_t slice_num ) :
-  VolumeSlice( mask_volume, type, slice_num )
+  VolumeSlice( mask_volume, type, slice_num ),
+  mask_data_block_( mask_volume->mask_data_block().get() )
 {
-  this->mask_data_block_ = mask_volume->mask_data_block().get();
   this->add_connection( this->mask_data_block_->mask_updated_signal_.connect( 
     boost::bind( &VolumeSlice::volume_updated_slot, this ) ) );
 }
@@ -135,5 +135,11 @@ void MaskVolumeSlice::upload_texture()
 
   this->slice_changed_ = false;
 }
+
+MaskDataBlockHandle MaskVolumeSlice::get_mask_data_block() const
+{
+  return this->mask_data_block_->shared_from_this();
+}
+
 
 } // end namespace Core

@@ -32,6 +32,7 @@
 #include <boost/shared_array.hpp>
 
 #include <Core/Graphics/GLSLShader.h>
+#include <Core/RenderResources/RenderResources.h>
 
 namespace Core
 {
@@ -43,7 +44,7 @@ GLSLShader::GLSLShader( GLenum shader_type )
 
 GLSLShader::~GLSLShader()
 {
-  glDeleteShader( this->shader_id_ );
+  RenderResources::Instance()->delete_shader( this->shader_id_ );
 }
 
 bool GLSLShader::set_source( const std::string& file_name )

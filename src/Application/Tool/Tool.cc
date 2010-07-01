@@ -67,4 +67,50 @@ void Tool::deactivate()
   // Defaults to doing nothing
 }
 
+const std::string& Tool::toolid() const
+{
+  return this->get_statehandler_id();
+}
+
+bool Tool::handle_mouse_enter( size_t viewer_id )
+{
+  // Default implementation doesn't handle this event
+  return false;
+}
+
+bool Tool::handle_mouse_leave( size_t viewer_id )
+{
+  // Default implementation doesn't handle this event
+  return false;
+}
+
+bool Tool::handle_mouse_move( const Core::MouseHistory& mouse_history, int button, int buttons, int modifiers )
+{
+  // Default implementation doesn't handle this event
+  return false;
+}
+
+bool Tool::handle_mouse_press( const Core::MouseHistory& mouse_history, int button, int buttons, int modifiers )
+{
+  // Default implementation doesn't handle this event
+  return false;
+}
+
+bool Tool::handle_mouse_release( const Core::MouseHistory& mouse_history, int button, int buttons, int modifiers )
+{
+  // Default implementation doesn't handle this event
+  return false;
+}
+
+bool Tool::handle_wheel( int delta, int x, int y, int buttons, int modifiers )
+{
+  // Default implementation doesn't handle this event
+  return false;
+}
+
+void Tool::repaint( size_t viewer_id, const Core::Matrix& proj_mat )
+{
+}
+
+
 } // end namespace Seg3D

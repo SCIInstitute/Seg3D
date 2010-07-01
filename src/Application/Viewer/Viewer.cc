@@ -146,6 +146,7 @@ Viewer::Viewer( size_t viewer_id ) :
 Viewer::~Viewer()
 {
   this->disconnect_all();
+  this->reset_mouse_handlers();
 }
 
 void Viewer::resize( int width, int height )
@@ -160,9 +161,9 @@ void Viewer::mouse_move_event( const Core::MouseHistory& mouse_history, int butt
   if ( !mouse_move_handler_.empty() )
   {
     // if the registered handler handled the event, no further process needed
-    if ( mouse_move_handler_( this->get_viewer_id(), mouse_history, 
-      button, buttons, modifiers ) )
+    if ( mouse_move_handler_( mouse_history, button, buttons, modifiers ) )
     {
+      this->trigger_redraw_overlay();
       return;
     }
   }
@@ -190,8 +191,7 @@ void Viewer::mouse_press_event( const Core::MouseHistory& mouse_history, int but
   if ( !mouse_press_handler_.empty() )
   {
     // if the registered handler handled the event, no further process needed
-    if ( mouse_press_handler_( this->get_viewer_id(), mouse_history, 
-      button, buttons, modifiers ) )
+    if ( mouse_press_handler_( mouse_history, button, buttons, modifiers ) )
     {
       return;
     }
@@ -223,7 +223,7 @@ void Viewer::mouse_release_event( const Core::MouseHistory& mouse_history, int b
   if ( !mouse_release_handler_.empty() )
   {
     // if the registered handler handled the event, no further process needed
-    if ( mouse_release_handler_( this->get_viewer_id(), mouse_history, button, buttons, modifiers ) )
+    if ( mouse_release_handler_( mouse_history, button, buttons, modifiers ) )
     {
       return;
     }
@@ -238,12 +238,32 @@ void Viewer::mouse_release_event( const Core::MouseHistory& mouse_history, int b
   this->view_manipulator_->mouse_release( mouse_history, button, buttons, modifiers );
 }
 
+void Viewer::mouse_enter_event()
+{
+  if ( this->mouse_enter_handler_ )
+  {
+    this->mouse_enter_handler_( this->get_viewer_id() );
+  }
+}
+
+void Viewer::mouse_leave_event()
+{
+  if ( this->mouse_leave_handler_ )
+  {
+    if ( this->mouse_leave_handler_( this->get_viewer_id() ) )
+    {
+      this->trigger_redraw_overlay();
+    }
+  }
+}
+
 bool Viewer::wheel_event( int delta, int x, int y, int buttons, int modifiers )
 {
   if ( !this->wheel_event_handler_.empty() )
   {
-    if ( this->wheel_event_handler_( this->get_viewer_id(), delta, x, y, buttons, modifiers ) )
+    if ( this->wheel_event_handler_( delta, x, y, buttons, modifiers ) )
     {
+      this->trigger_redraw_overlay();
       return true;
     }
   }
@@ -259,7 +279,7 @@ bool Viewer::wheel_event( int delta, int x, int y, int buttons, int modifiers )
 }
 
 
-bool Viewer::key_event( int key, int modifier )
+bool Viewer::key_press_event( int key, int modifiers )
 {
   if ( key == Core::Key::KEY_LESS_E || key == Core::Key::KEY_COMMA_E || 
     key == Core::Key::KEY_LEFT_E || key == Core::Key::KEY_DOWN_E )
@@ -293,6 +313,16 @@ void Viewer::set_mouse_release_handler( mouse_event_handler_type func )
   this->mouse_release_handler_ = func;
 }
 
+void Viewer::set_mouse_enter_handler( enter_event_handler_type func )
+{
+  this->mouse_enter_handler_ = func;
+}
+
+void Viewer::set_mouse_leave_handler( leave_event_handler_type func )
+{
+  this->mouse_leave_handler_ = func;
+}
+
 void Viewer::set_wheel_event_handler( wheel_event_handler_type func )
 {
   this->wheel_event_handler_ = func;
@@ -303,6 +333,8 @@ void Viewer::reset_mouse_handlers()
   this->mouse_move_handler_ = 0;
   this->mouse_press_handler_ = 0;
   this->mouse_release_handler_ = 0;
+  this->mouse_enter_handler_ = 0;
+  this->mouse_leave_handler_ = 0;
   this->wheel_event_handler_ = 0;
 }
 
@@ -318,27 +350,12 @@ void Viewer::update_status_bar( int x, int y )
     this->active_layer_slice_ &&
     !this->active_layer_slice_->out_of_boundary() )
   {
-    Core::VolumeSlice* volume_slice = this->active_layer_slice_.get();
-    // Scale the mouse position to [-1, 1]
-    double width =  static_cast<double>( this->get_width() );
-    double height = static_cast<double>( this->get_height() );
-    
-    double xpos = x * 2.0 / ( width - 1 ) - 1.0;
-    double ypos = ( height - 1 - y ) * 2.0 / ( height - 1.0 ) - 1.0;
+    double xpos, ypos;
+    this->window_to_world( x, y, xpos, ypos );
 
-    double left, right, bottom, top;
-    Core::StateView2D* view_2d = dynamic_cast<Core::StateView2D*>( 
-      this->get_active_view_state().get() );
-    view_2d->get().compute_clipping_planes( width / height, left, right, bottom, top );
-
-    Core::Matrix proj, inv_proj;
-    Core::Transform::BuildOrtho2DMatrix( proj, left, right, bottom, top );
-    Core::Invert( proj, inv_proj );
-    Core::Point pos( xpos, ypos, 0 );
-    pos = inv_proj * pos;
-    
+    Core::VolumeSlice* volume_slice = this->active_layer_slice_.get();    
     int i, j;
-    volume_slice->world_to_index( pos.x(), pos.y(), i, j );
+    volume_slice->world_to_index( xpos, ypos, i, j );
     Core::Point index;
     if ( i >= 0 && static_cast<size_t>( i ) < volume_slice->nx() && 
        j >= 0 && static_cast<size_t>( j ) < volume_slice->ny() )
@@ -434,6 +451,9 @@ void Viewer::insert_layer( LayerHandle layer )
   this->layer_connection_map_.insert( connection_map_type::value_type( layer->get_layer_id(),
     layer->visible_state_[ this->get_viewer_id() ]->state_changed_signal_.connect(
     boost::bind( &Viewer::layer_state_changed, this, ViewModeType::NON_VOLUME_E ) ) ) );
+  this->layer_connection_map_.insert( connection_map_type::value_type( layer->get_layer_id(),
+    layer->layer_updated_signal_.connect( boost::bind(
+    &Viewer::layer_state_changed, this, ViewModeType::ALL_E ) ) ) );
 
   switch( layer->type() )
   {
@@ -1203,6 +1223,35 @@ void Viewer::adjust_contrast_brightness( int dx, int dy )
 Core::VolumeSliceHandle Viewer::get_active_layer_slice() const
 {
   return this->active_layer_slice_;
+}
+
+void Viewer::window_to_world( int x, int y, double& world_x, double& world_y )
+{
+  if ( this->is_volume_view() )
+  {
+    CORE_THROW_LOGICERROR( "Viewer is in volume mode");
+  }
+
+  // Scale the mouse position to [-1, 1]
+  double width =  static_cast<double>( this->get_width() );
+  double height = static_cast<double>( this->get_height() );
+
+  double xpos = x * 2.0 / ( width - 1 ) - 1.0;
+  double ypos = ( height - 1 - y ) * 2.0 / ( height - 1.0 ) - 1.0;
+
+  double left, right, bottom, top;
+  Core::StateView2D* view_2d = dynamic_cast<Core::StateView2D*>( 
+    this->get_active_view_state().get() );
+  view_2d->get().compute_clipping_planes( width / height, left, right, bottom, top );
+
+  Core::Matrix proj, inv_proj;
+  Core::Transform::BuildOrtho2DMatrix( proj, left, right, bottom, top );
+  Core::Invert( proj, inv_proj );
+  Core::Point pos( xpos, ypos, 0 );
+  pos = inv_proj * pos;
+
+  world_x = pos.x();
+  world_y = pos.y();
 }
 
 } // end namespace Seg3D

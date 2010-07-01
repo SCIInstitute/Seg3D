@@ -109,7 +109,7 @@ void RendererBase::initialize()
 
   this->post_initialize();
 
-  SCI_CHECK_OPENGL_ERROR();
+  CORE_CHECK_OPENGL_ERROR();
 
 #if !MULTITHREADED_RENDERING
   if ( old_context )
@@ -178,7 +178,7 @@ void RendererBase::redraw( bool delay_update )
   // Synchronization calln for multi threaded rendering
   glFinish();
 
-  SCI_CHECK_OPENGL_ERROR();
+  CORE_CHECK_OPENGL_ERROR();
 
   this->frame_buffer_->detach_texture( this->textures_[ this->active_render_texture_ ] );
   this->frame_buffer_->disable();
@@ -258,7 +258,7 @@ void RendererBase::redraw_overlay( bool delay_update )
   }
   glFinish();
 
-  SCI_CHECK_OPENGL_ERROR();
+  CORE_CHECK_OPENGL_ERROR();
 
   this->frame_buffer_->detach_texture( this->textures_[ this->active_overlay_texture_ ] );
   this->frame_buffer_->disable();

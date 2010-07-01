@@ -37,8 +37,9 @@
 #include <boost/utility.hpp>
 
 // Core includes
-#include <Core/Utils/EnumClass.h>
 #include <Core/State/StateHandler.h>
+#include <Core/Utils/EnumClass.h>
+#include <Core/Viewer/Mouse.h>
 #include <Core/Volume/Volume.h>
 
 // Application includes
@@ -66,6 +67,7 @@ SCI_ENUM_CLASS
 // Class definition
 class Tool : public Core::StateHandler
 {
+  friend class ToolFactory;
 
   // -- constructor/destructor --
 public:
@@ -80,13 +82,25 @@ public:
   virtual int properties() const = 0;
   virtual std::string url() const = 0;
 
-  inline std::string toolid() const 
-  {
-    return this->get_statehandler_id();
-  }
+  const std::string& toolid() const;
 
-protected:
-  friend class ToolFactory;
+  // -- mouse and keyboard event handlers --
+public:
+  virtual bool handle_mouse_enter( size_t viewer_id );
+  virtual bool handle_mouse_leave( size_t viewer_id );
+  virtual bool handle_mouse_move( const Core::MouseHistory& mouse_history, 
+    int button, int buttons, int modifiers );
+  virtual bool handle_mouse_press( const Core::MouseHistory& mouse_history, 
+    int button, int buttons, int modifiers );
+  virtual bool handle_mouse_release( const Core::MouseHistory& mouse_history, 
+    int button, int buttons, int modifiers );
+  virtual bool handle_wheel( int delta, int x, int y, int buttons, int modifiers );
+
+public:
+  // REPAINT:
+  // Draw the tool in the specified viewer. Default implementation does nothing.
+  // The function should only be called by the renderer, which has a valid GL context.
+  virtual void repaint( size_t viewer_id, const Core::Matrix& proj_mat );
 
   // -- close tool --
 public:

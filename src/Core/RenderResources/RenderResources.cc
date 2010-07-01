@@ -156,7 +156,7 @@ void RenderResources::delete_texture( unsigned int texture_id )
   
   lock_type lock( RenderResources::GetMutex() );
   glDeleteTextures( 1, &texture_id );
-  SCI_CHECK_OPENGL_ERROR();
+  CORE_CHECK_OPENGL_ERROR();
 }
 
 void RenderResources::delete_renderbuffer( unsigned int renderbuffer_id )
@@ -170,7 +170,7 @@ void RenderResources::delete_renderbuffer( unsigned int renderbuffer_id )
   
   lock_type lock( RenderResources::GetMutex() );
   glDeleteRenderbuffersEXT( 1, &renderbuffer_id );
-  SCI_CHECK_OPENGL_ERROR();
+  CORE_CHECK_OPENGL_ERROR();
 }
 
 void RenderResources::delete_buffer_object( unsigned int buffer_object_id )
@@ -184,7 +184,7 @@ void RenderResources::delete_buffer_object( unsigned int buffer_object_id )
   
   lock_type lock( RenderResources::GetMutex() );
   glDeleteBuffers( 1, &buffer_object_id );
-  SCI_CHECK_OPENGL_ERROR();
+  CORE_CHECK_OPENGL_ERROR();
 }
 
 void RenderResources::delete_framebuffer_object( unsigned int framebuffer_object_id )
@@ -198,15 +198,41 @@ void RenderResources::delete_framebuffer_object( unsigned int framebuffer_object
   
   lock_type lock( RenderResources::GetMutex() );
   glDeleteFramebuffersEXT( 1, &framebuffer_object_id );
-  SCI_CHECK_OPENGL_ERROR();
+  CORE_CHECK_OPENGL_ERROR();
+}
+
+void RenderResources::delete_program( unsigned int program_id )
+{
+  if ( ! (is_eventhandler_thread() ) )
+  {
+    post_event( boost::bind( &RenderResources::delete_program, this, 
+      program_id ) );
+    return;
+  }
+
+  lock_type lock( RenderResources::GetMutex() );
+  glDeleteProgram( program_id );
+  CORE_CHECK_OPENGL_ERROR();
+}
+
+void RenderResources::delete_shader( unsigned int shader_id )
+{
+  if ( ! (is_eventhandler_thread() ) )
+  {
+    post_event( boost::bind( &RenderResources::delete_shader, this, 
+      shader_id ) );
+    return;
+  }
+
+  lock_type lock( RenderResources::GetMutex() );
+  glDeleteShader( shader_id );
+  CORE_CHECK_OPENGL_ERROR();
 }
 
 RenderResources::mutex_type& RenderResources::GetMutex() 
 { 
   return Instance()->get_mutex(); 
 }
-
-
 
 } // end namespace Core
 

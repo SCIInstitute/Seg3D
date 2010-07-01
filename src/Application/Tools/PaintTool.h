@@ -34,6 +34,10 @@
 namespace Seg3D
 {
 
+
+class PaintToolPrivate;
+typedef boost::shared_ptr< PaintToolPrivate > PaintToolPrivateHandle;
+
 class PaintTool : public Tool
 {
 SCI_TOOL_TYPE("PaintTool", "Paint Brush", "Alt+P", ToolGroupType::TOOL_E, "http://seg3d.org/")
@@ -42,21 +46,27 @@ public:
   PaintTool( const std::string& toolid );
   virtual ~PaintTool();
 
-  // -- state constraints --
-
-  // Constrain viewer to right painting tool when layer is selected
-  void target_constraint( std::string layerid );
-
-  // Constrain state to right options when mask layer is selected
-  void mask_constraint( std::string layerid );
-
-  // -- activate/deactivate tool --
-
   virtual void activate();
   virtual void deactivate();
+
+public:
+  virtual bool handle_mouse_enter( size_t viewer_id );
+  virtual bool handle_mouse_leave( size_t viewer_id );
+  virtual bool handle_mouse_move( const Core::MouseHistory& mouse_history, 
+    int button, int buttons, int modifiers );
+  virtual bool handle_mouse_press( const Core::MouseHistory& mouse_history, 
+    int button, int buttons, int modifiers );
+  virtual bool handle_mouse_release( const Core::MouseHistory& mouse_history, 
+    int button, int buttons, int modifiers );
+  virtual bool handle_wheel( int delta, int x, int y, int buttons, int modifiers );
   
+  // REPAINT:
+  // Draw the paint tool in the specified viewer.
+  // The function should only be called by the renderer, which has a valid GL context.
+  virtual void repaint( size_t viewer_id, const Core::Matrix& proj_mat );
+
 private:
-  // -- handle updates from layermanager --
+  // -- handle updates from layer manager --
   void handle_layers_changed();
 
   void update_target_options();
@@ -86,7 +96,10 @@ public:
   Core::StateBoolHandle erase_state_;
 
 private:
-  const static size_t version_number_;
+  PaintToolPrivateHandle private_;
+
+private:
+  const static size_t VERSION_NUMBER_C;
 };
 
 } // end namespace

@@ -51,6 +51,8 @@ MaskLayer::MaskLayer( const std::string& name, const Core::MaskVolumeHandle& vol
 {
   this->initialize_states();
   this->bit_state_->set( static_cast< int >( volume->mask_data_block()->get_mask_bit() ) );
+  this->add_connection( this->mask_volume_->mask_data_block()->mask_updated_signal_.
+    connect( boost::bind( &MaskLayer::handle_mask_data_changed, this ) ) );
 }
 
 MaskLayer::MaskLayer( const std::string& name, const Core::GridTransform& grid_transform ) :
@@ -60,6 +62,8 @@ MaskLayer::MaskLayer( const std::string& name, const Core::GridTransform& grid_t
     this->initialize_states();
   this->bit_state_->set( static_cast< int >( this->mask_volume_->
     mask_data_block()->get_mask_bit() ) );
+  this->add_connection( this->mask_volume_->mask_data_block()->mask_updated_signal_.
+    connect( boost::bind( &MaskLayer::handle_mask_data_changed, this ) ) );
 }
 
 MaskLayer::MaskLayer( const std::string& state_id ) :
@@ -68,14 +72,10 @@ MaskLayer::MaskLayer( const std::string& state_id ) :
   this->initialize_states();
 }
 
-
-
-
-
 MaskLayer::~MaskLayer()
 {
   // Disconnect all current connections
-  disconnect_all();
+  this->disconnect_all();
 }
 
 void MaskLayer::initialize_states()
@@ -104,7 +104,7 @@ void MaskLayer::initialize_states()
     add_state( "isosurface", show_isosurface_state_, false );
 
   add_state( "bit", this->bit_state_, 0 );
-    
+
 }
 
 Core::AtomicCounter MaskLayer::color_count_;
@@ -143,6 +143,8 @@ bool MaskLayer::post_load_states()
   {
     this->mask_volume_ = Core::MaskVolumeHandle( new Core::MaskVolume( 
       grid_transform, mask_data_block ) );
+    this->add_connection( this->mask_volume_->mask_data_block()->mask_updated_signal_.
+      connect( boost::bind( &MaskLayer::handle_mask_data_changed, this ) ) );
   }
   
   return success;
@@ -151,9 +153,13 @@ bool MaskLayer::post_load_states()
 void MaskLayer::clean_up()
 {
   this->mask_volume_.reset();
+  this->disconnect_all();
 }
 
-
+void MaskLayer::handle_mask_data_changed()
+{
+  this->layer_updated_signal_();
+}
 
 
 } // end namespace Seg3D

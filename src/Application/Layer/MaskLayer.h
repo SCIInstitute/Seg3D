@@ -110,6 +110,7 @@ protected:
 
 private:
   void initialize_states();
+  void handle_mask_data_changed();
   
 private:
   

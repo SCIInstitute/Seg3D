@@ -57,7 +57,8 @@ typedef boost::shared_ptr< MaskDataBlock > MaskDataBlockHandle;
 typedef boost::weak_ptr< MaskDataBlock > MaskDataBlockWeakHandle;
 
 // Class definition
-class MaskDataBlock : public boost::noncopyable
+class MaskDataBlock : public boost::noncopyable, 
+  public boost::enable_shared_from_this< MaskDataBlock >
 {
 
   // -- typedefs --
@@ -65,6 +66,7 @@ public:
   // Lock types
   typedef DataBlock::mutex_type mutex_type;
   typedef DataBlock::lock_type lock_type;
+  typedef DataBlock::shared_lock_type shared_lock_type;
 
   // -- Constructor/destructor --
 public:
@@ -129,6 +131,14 @@ public:
   {
     return data_block_;
   }
+
+  // GET_GENERATION:
+  // Get the current generation number of the data volume.
+  DataBlock::generation_type get_generation() const;
+
+  // INCREASE_GENERATION:
+  // Increase the generation number to a new unique number.
+  void increase_generation();
 
   inline bool get_mask_at( size_t x, size_t y, size_t z ) const
   {

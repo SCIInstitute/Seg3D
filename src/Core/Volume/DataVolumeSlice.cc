@@ -192,6 +192,8 @@ void DataVolumeSlice::upload_texture()
   // Step 3. release the pixel unpack buffer
   // NOTE: The texture streaming will still succeed even if the PBO is deleted.
   pixel_buffer->unbind();
+
+  // Use glFinish here to solve synchronization issue when the slice is used in multiple views
   glFinish();
 
   this->slice_changed_ = false;

@@ -78,9 +78,11 @@ public:
   // -- mouse events handling --
 public:
 
-  typedef boost::function< bool( size_t, const Core::MouseHistory&, int, int, int ) > 
+  typedef boost::function< bool( const Core::MouseHistory&, int, int, int ) > 
     mouse_event_handler_type;
-  typedef boost::function< bool( size_t, int, int, int, int, int ) > 
+  typedef boost::function< bool( size_t ) > enter_event_handler_type;
+  typedef enter_event_handler_type leave_event_handler_type;
+  typedef boost::function< bool( int, int, int, int, int ) > 
     wheel_event_handler_type;
 
   virtual void mouse_move_event( const Core::MouseHistory& mouse_history, int button, 
@@ -89,13 +91,17 @@ public:
     int buttons, int modifiers );
   virtual void mouse_release_event( const Core::MouseHistory& mouse_history, int button, 
     int buttons, int modifiers );
+  virtual void mouse_enter_event();
+  virtual void mouse_leave_event();
   virtual bool wheel_event( int delta, int x, int y, int buttons, int modifiers );
 
-  virtual bool key_event( int key, int modifier );
+  virtual bool key_press_event( int key, int modifiers );
 
   void set_mouse_move_handler( mouse_event_handler_type func );
   void set_mouse_press_handler( mouse_event_handler_type func );
   void set_mouse_release_handler( mouse_event_handler_type func );
+  void set_mouse_enter_handler( enter_event_handler_type func );
+  void set_mouse_leave_handler( leave_event_handler_type func );
   void set_wheel_event_handler( wheel_event_handler_type func );
   void reset_mouse_handlers();
 
@@ -107,6 +113,8 @@ private:
   mouse_event_handler_type mouse_move_handler_;
   mouse_event_handler_type mouse_press_handler_;
   mouse_event_handler_type mouse_release_handler_;
+  enter_event_handler_type mouse_enter_handler_;
+  leave_event_handler_type mouse_leave_handler_;
   wheel_event_handler_type wheel_event_handler_;
 
   ViewManipulatorHandle view_manipulator_;
@@ -164,11 +172,18 @@ public:
   // Auto adjust the view for the active layer
   void auto_view();
 
+  // GET_ACTIVE_LAYER_SLICE:
+  // Returns the volume slice that corresponds to the active layer.
   Core::VolumeSliceHandle get_active_layer_slice() const;
 
   // MOVE_SLICE_TO:
   // Move the slice to the given world coordinate. Used for picking.
   void move_slice_to( const Core::Point& pt );
+
+  // WINDOW_TO_WORLD:
+  // Maps from window coordinates to world coordinates.
+  // NOTE: Only call this function when the viewer is in one of the 2D modes.
+  void window_to_world( int x, int y, double& world_x, double& world_y );
 
 private:
   friend class ViewerManager;

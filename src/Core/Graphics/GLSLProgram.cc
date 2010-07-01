@@ -28,6 +28,7 @@
 
 #include <boost/shared_array.hpp>
 #include <Core/Graphics/GLSLProgram.h>
+#include <Core/RenderResources/RenderResources.h>
 
 namespace Core
 {
@@ -39,7 +40,7 @@ GLSLProgram::GLSLProgram()
 
 GLSLProgram::~GLSLProgram()
 {
-  glDeleteProgram( this->program_id_ );
+  RenderResources::Instance()->delete_program( this->program_id_ );
 }
 
 void GLSLProgram::attach_shader( GLSLShaderHandle shader )

@@ -172,9 +172,9 @@ public:
   // Get the current generation number of the data volume.
   generation_type get_generation() const;
   
-  // INCREMENT_GENERATION:
-  // Increment the generation number to a new unique number.
-  void increment_generation();
+  // INCREASE_GENERATION:
+  // Increase the generation number to a new unique number.
+  void increase_generation();
 
 private:
   friend class DataBlockManager;

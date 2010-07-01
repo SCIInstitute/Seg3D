@@ -43,26 +43,26 @@
 #include <boost/utility.hpp>
 
 // Core includes
+#include <Core/State/StateHandler.h>
 #include <Core/Utils/Log.h>
 #include <Core/Utils/Exception.h>
 
 // Application includes
-#include <Core/State/StateHandler.h>
+#include <Application/Tool/ToolFWD.h>
 
 namespace Seg3D
 {
-
-class Tool;
-typedef boost::shared_ptr< Tool > ToolHandle;
 
 // CLASS TOOLMANAGER:
 // This class manages the tools in the toolbox of the application
 
 // Forward declaration
 class ToolManager;
+class ToolManagerPrivate;
+typedef boost::shared_ptr< ToolManagerPrivate > ToolManagerPrivateHandle;
 
 // Class definition
-class ToolManager : public Core::StateHandler
+class ToolManager : public Core::StateHandler, public Core::RecursiveLockable
 {
   CORE_SINGLETON( ToolManager );
   
@@ -100,19 +100,17 @@ public:
   tool_signal_type open_tool_signal_;
 
   // CLOSE_TOOL_SIGNAL:
-  // This signal is triggered when before a tool is closed
+  // This signal is triggered after a tool is closed
   tool_signal_type close_tool_signal_;
 
   // ACTIVATE_TOOL_SIGNAL:
-  // This signal is triggered when before a tool is closed
+  // This signal is triggered after a tool is activated
   tool_signal_type activate_tool_signal_;
 
   // -- Access to toollist --
 public:
   typedef std::map< std::string, ToolHandle > tool_list_type;
   typedef std::set< std::string > toolid_list_type;
-  typedef boost::recursive_mutex mutex_type;
-  typedef boost::unique_lock< mutex_type > lock_type;
 
   // TOOL_LIST:
   // Get the current open tool list
@@ -122,31 +120,17 @@ public:
   // Get the active toolid
   std::string active_toolid();
 
-  // GET_MUTEX:
-  // Get the mutex, so it can be locked by the interface that is built
-  // on top of this
-  mutex_type& get_mutex();
+  ToolHandle get_active_tool();
 
 public:
   virtual bool pre_save_states();
 
   virtual bool post_save_states();
 
-protected:
-  Core::StateStringVectorHandle tools_state_;
-
 private:
+  ToolManagerPrivateHandle private_;
 
-  // All the open tools are stored in this hash map
-  tool_list_type tool_list_;
-
-  // Lock for the tool_list
-  mutex_type tool_list_mutex_;
-
-  // The tool that is currently active is stored here
-  std::string active_toolid_;
-
-  const static size_t version_number_;
+  const static size_t VERSION_NUMBER_C;
 
 };
 

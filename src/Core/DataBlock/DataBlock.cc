@@ -206,7 +206,7 @@ void DataBlock::set_generation( generation_type generation )
   this->generation_ = generation;
 }
 
-void DataBlock::increment_generation()
+void DataBlock::increase_generation()
 {
   this->generation_ = DataBlockManager::Instance()->increment_generation( this->generation_ );
 }
