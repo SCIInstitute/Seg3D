@@ -60,6 +60,7 @@ SET(SEG3D_PATCH_VERSION 0)
 
 INCLUDE(CMakeBackwardCompatibilityC)
 INCLUDE(CMakeBackwardCompatibilityCXX)
+INCLUDE(CheckCSourceCompiles)
 
 ###########################################
 # DETERMINE ARCHITECTURE
