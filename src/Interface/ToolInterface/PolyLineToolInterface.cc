@@ -57,7 +57,7 @@ PolylineToolInterface::PolylineToolInterface() :
 {
 }
 
-// destructor
+// destructor 
 PolylineToolInterface::~PolylineToolInterface()
 {
 }
