@@ -510,6 +510,11 @@ void Viewer::insert_layer( LayerHandle layer )
         connection_map_type::value_type( layer->get_layer_id(),
         mask_layer->show_isosurface_state_->state_changed_signal_.connect(
         boost::bind( &Viewer::layer_state_changed, this, ViewModeType::VOLUME_E ) ) ) );
+
+      this->layer_connection_map_.insert( 
+        connection_map_type::value_type( layer->get_layer_id(),
+        mask_volume_slice->cache_updated_signal_.connect( boost::bind(
+        &Viewer::layer_state_changed, this, ViewModeType::NON_VOLUME_E ) ) ) );
     }
     break;
   default:

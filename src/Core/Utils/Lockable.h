@@ -44,13 +44,13 @@ public:
   Lockable() {}
   ~Lockable() {}
 
-  mutex_type& get_mutex()
+  mutex_type& get_mutex() const
   {
     return this->mutex_;
   }
 
 private:
-  mutex_type mutex_;
+  mutable mutex_type mutex_;
 };
 
 class RecursiveLockable : public boost::noncopyable
@@ -62,13 +62,13 @@ public:
   RecursiveLockable() {}
   ~RecursiveLockable() {}
 
-  mutex_type& get_mutex()
+  mutex_type& get_mutex() const
   {
     return this->mutex_;
   }
 
 private:
-  mutex_type mutex_;
+  mutable mutex_type mutex_;
 };
 
 class SharedLockable : public boost::noncopyable
@@ -83,13 +83,13 @@ public:
   SharedLockable() {}
   ~SharedLockable() {}
 
-  mutex_type& get_mutex()
+  mutex_type& get_mutex() const
   {
     return this->mutex_;
   }
 
 private:
-  mutex_type mutex_;
+  mutable mutex_type mutex_;
 };
 
 } // end namespace Core

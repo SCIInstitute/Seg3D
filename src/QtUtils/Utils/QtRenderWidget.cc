@@ -86,7 +86,7 @@ static void UpdateDisplay( QtRenderWidgetWeakHandle qpointer )
 
   if ( !qpointer.isNull() )
   {
-    qpointer->updateGL();
+    qpointer->repaint();
   }
 }
 
@@ -119,6 +119,15 @@ void QtRenderWidget::paintGL()
   }
 
   CORE_LOG_DEBUG("Painting texture");
+
+  if ( this->private_->viewer_->get_cursor_visible() )
+  {
+    this->setCursor( Qt::CrossCursor );
+  }
+  else
+  {
+    this->setCursor( Qt::BlankCursor );
+  }
 
   // draw a window size quad and map the render texture onto it
   QSize view_size = QWidget::size();

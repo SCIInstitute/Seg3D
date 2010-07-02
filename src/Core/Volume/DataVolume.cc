@@ -65,8 +65,8 @@ DataBlock::generation_type DataVolume::get_generation() const
 }
 
 
-bool DataVolume::LoadDataVolume( const boost::filesystem::path& filename, DataVolumeHandle& volume, 
-  std::string& error )
+bool DataVolume::LoadDataVolume( const boost::filesystem::path& filename, 
+                DataVolumeHandle& volume, std::string& error )
 {
   volume.reset();
   

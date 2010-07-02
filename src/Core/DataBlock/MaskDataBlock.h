@@ -175,7 +175,7 @@ public:
 
   // GET_MUTEX:
   // Get the mutex that locks the datablock
-  mutex_type& get_mutex()
+  mutex_type& get_mutex() const
   { 
     return data_block_->get_mutex();
   }

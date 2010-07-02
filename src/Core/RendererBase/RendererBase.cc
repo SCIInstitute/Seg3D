@@ -132,8 +132,6 @@ void RendererBase::redraw( bool delay_update )
 #else
   if ( !Interface::IsInterfaceThread() )
   {
-    lock_type lock( this->get_mutex() );
-    this->redraw_needed_ = true;
     Interface::PostEvent( boost::bind( &RendererBase::redraw, this, delay_update ) );
     return;
   }
@@ -147,6 +145,7 @@ void RendererBase::redraw( bool delay_update )
     return;
   }
 
+#if MULTITHREADED_RENDERING
   {
     lock_type lock( this->get_mutex() );
     if ( !this->redraw_needed_ )
@@ -155,6 +154,7 @@ void RendererBase::redraw( bool delay_update )
     }
     this->redraw_needed_ = false;
   }
+#endif
 
   // lock the active render texture
   Core::Texture::lock_type texture_lock( this->textures_[ this->active_render_texture_ ]->get_mutex() );
@@ -186,19 +186,19 @@ void RendererBase::redraw( bool delay_update )
   // release the lock on the active render texture
   texture_lock.unlock();
 
-  // signal rendering completed
-  this->redraw_completed_signal_( 
-    this->textures_[ this->active_render_texture_ ], delay_update );
-
-  // swap render textures 
-  this->active_render_texture_ = ( ~this->active_render_texture_ ) & 1;
-
 #if !MULTITHREADED_RENDERING
   if ( old_context )
   {
     old_context->make_current();
   }
 #endif
+
+  // signal rendering completed
+  this->redraw_completed_signal_( 
+    this->textures_[ this->active_render_texture_ ], delay_update );
+
+  // swap render textures 
+  this->active_render_texture_ = ( ~this->active_render_texture_ ) & 1;
 }
 
 void RendererBase::redraw_overlay( bool delay_update )
@@ -214,8 +214,6 @@ void RendererBase::redraw_overlay( bool delay_update )
 #else
   if ( !Interface::IsInterfaceThread() )
   {
-    lock_type lock( this->get_mutex() );
-    this->redraw_overlay_needed_ = true;
     Interface::PostEvent( boost::bind( &RendererBase::redraw_overlay, this, delay_update ) );
     return;
   }
@@ -229,6 +227,7 @@ void RendererBase::redraw_overlay( bool delay_update )
     return;
   }
 
+#if MULTITHREADED_RENDERING
   {
     lock_type lock( this->get_mutex() );
     if ( !this->redraw_overlay_needed_ )
@@ -237,6 +236,7 @@ void RendererBase::redraw_overlay( bool delay_update )
     }
     this->redraw_overlay_needed_ = false;
   }
+#endif
 
   // lock the active render texture
   Core::Texture::lock_type texture_lock( this->textures_[ this->active_overlay_texture_ ]->get_mutex() );
@@ -266,6 +266,13 @@ void RendererBase::redraw_overlay( bool delay_update )
   // release the lock on the active render texture
   texture_lock.unlock();
 
+#if !MULTITHREADED_RENDERING
+  if ( old_context )
+  {
+    old_context->make_current();
+  }
+#endif
+
   // signal rendering completed
   this->redraw_overlay_completed_signal_( 
     this->textures_[ this->active_overlay_texture_ ], delay_update );
@@ -273,12 +280,6 @@ void RendererBase::redraw_overlay( bool delay_update )
   // swap render textures 
   this->active_overlay_texture_ = ( ~( this->active_overlay_texture_ - 2 ) ) & 1 + 2;
 
-#if !MULTITHREADED_RENDERING
-  if ( old_context )
-  {
-    old_context->make_current();
-  }
-#endif
 }
 
 void RendererBase::resize( int width, int height )

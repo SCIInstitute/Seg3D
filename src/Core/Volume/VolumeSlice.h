@@ -131,7 +131,7 @@ public:
   const Point& top_left() const { return this->top_left_; }
   const Point& top_right() const { return this->top_right_; }
 
-  void volume_updated_slot()
+  void handle_volume_updated()
   {
     this->slice_changed_ = true;
   }
@@ -146,7 +146,7 @@ public:
     return this->volume_->apply_inverse_grid_transform( pt );
   }
   
-  mutex_type& get_mutex()
+  mutex_type& get_mutex() const
   {
     return this->volume_->get_mutex();
   }
@@ -199,7 +199,7 @@ protected:
   // better to have a separate mutex.
   typedef boost::recursive_mutex internal_mutex_type;
   typedef boost::unique_lock< internal_mutex_type > internal_lock_type;
-  boost::recursive_mutex internal_mutex_;
+  mutable internal_mutex_type internal_mutex_;
 
 private:
   VolumeHandle volume_;

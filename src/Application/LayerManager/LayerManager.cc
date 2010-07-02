@@ -683,7 +683,8 @@ bool LayerManager::post_load_states()
     this->insert_layer( restored_layer );
   }
 
-  if ( this->active_layer_state_->get() !=  "none" )
+  if ( this->active_layer_state_->get().size() > 0 &&
+    this->active_layer_state_->get() !=  "none" )
   {
     this->set_active_layer( this->get_layer_by_id( this->active_layer_state_->get() ) );
   }

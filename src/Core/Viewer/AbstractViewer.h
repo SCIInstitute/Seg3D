@@ -134,11 +134,19 @@ public:
 
   // GET_WIDTH:
   // Get the width of the viewer
-  int get_width();
+  int get_width() const;
 
   // GET_HEIGHT:
   // Get the height of the viewer
-  int get_height();
+  int get_height() const;
+
+  // SET_CURSOR_VISIBLE:
+  // Set the visibility of cursor in the viewer.
+  void set_cursor_visible( bool visible = true );
+
+  // GET_CURSOR_VISIBLE:
+  // Get the visibility of cursor in the viewer.
+  bool get_cursor_visible() const;
 
 protected:
   // GET_RENDERER:

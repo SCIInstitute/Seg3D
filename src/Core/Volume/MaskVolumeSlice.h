@@ -37,14 +37,21 @@ namespace Core
 {
 
 class MaskVolumeSlice;
+class MaskVolumeSlicePrivate;
 typedef boost::shared_ptr< MaskVolumeSlice > MaskVolumeSliceHandle;
+typedef boost::shared_ptr< MaskVolumeSlicePrivate > MaskVolumeSlicePrivateHandle;
 
 class MaskVolumeSlice : public VolumeSlice
 {
 public:
   MaskVolumeSlice( const MaskVolumeHandle& mask_volume, 
     VolumeSliceType type = VolumeSliceType::AXIAL_E, size_t slice_num = 0 );
+
+  // COPY CONSTRUCTOR:
+  // NOTE: This is only used by the renderer to take a snapshot of the original slice.
+  // The copy constructed object shares the same texture object and cache with the original one.
   MaskVolumeSlice( const MaskVolumeSlice& copy );
+
   virtual ~MaskVolumeSlice();
 
   inline bool get_mask_at( size_t i, size_t j ) const
@@ -74,11 +81,33 @@ public:
   // Return a handle to the underlying mask data block.
   MaskDataBlockHandle get_mask_data_block() const;
 
+  // GET_CACHED_DATA:
+  // Return a pointer to the cached data of the current slice.
+  unsigned char* get_cached_data();
+
+  // RELEASE_CACHED_DATA:
+  // Sync the cached data back to the mask volume and then release the memory.
+  void release_cached_data();
+
+  // -- Mutex and lock for protected access to cached data
+public:
+  typedef boost::recursive_mutex cache_mutex_type;
+  typedef boost::unique_lock< cache_mutex_type > cache_lock_type;
+  
+  cache_mutex_type& get_cache_mutex() const;
+
+public:
+  // CACHE_UPDATED_SIGNAL:
+  // Triggered when the cache has been updated.
+  typedef boost::signals2::signal< void () > cache_updated_signal_type;
+  cache_updated_signal_type cache_updated_signal_;
+
 private:
   //  Pointer to the mask data block. The base class keeps a handle of the volume,
   // so it's safe to use a pointer here.
   MaskDataBlock* mask_data_block_;
 
+  MaskVolumeSlicePrivateHandle private_;
 };
 
 } // end namespace Core

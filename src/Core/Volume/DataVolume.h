@@ -59,7 +59,7 @@ public:
 
   // GET_MUTEX:
   // Get access to the mutex protecting this DataVolume
-  virtual mutex_type& get_mutex()
+  virtual mutex_type& get_mutex() const
   {
     return this->data_block_->get_mutex();
   }

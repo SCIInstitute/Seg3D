@@ -29,6 +29,7 @@
 #include <algorithm>
 #include <cstdlib>
 
+#include <Core/Application/Application.h>
 #include <Core/Viewer/Mouse.h>
 #include <Core/Graphics/Texture.h>
 #include <Core/RenderResources/RenderResources.h>
@@ -65,15 +66,19 @@ public:
 
   //PAINT:
   // Paint on the target layer with the brush centered at (x0, y0).
-  void paint( int xc, int yc );
+  void paint( int xc, int yc, int& paint_count );
 
+  void interpolated_paint( int x0, int y0, int x1, int y1, int& paint_count );
   void paint_range( int x0, int y0, int x1, int y1 );
 
   bool initialized_;
   bool brush_mask_changed_;
+  bool painting_;
+  bool erase_;
+  Core::MaskVolumeSliceHandle target_slice_;
+  ViewerHandle viewer_;
 
   PaintTool* paint_tool_;
-  int current_viewer_;
   int center_x_;
   int center_y_;
   std::vector< unsigned char > brush_mask_;
@@ -179,7 +184,7 @@ void PaintToolPrivate::initialize()
     this->shader_ = SliceShaderHandle( new SliceShader );
     this->shader_->initialize();
     this->shader_->enable();
-    this->shader_->set_border_width( 1 );
+    this->shader_->set_border_width( 2 );
     this->shader_->set_mask_mode( 1 );
     this->shader_->set_opacity( 1.0f );
     this->shader_->set_slice_texture( 0 );
@@ -213,88 +218,59 @@ void PaintToolPrivate::handle_brush_radius_changed()
   this->brush_mask_changed_ = true;
 }
 
-void PaintToolPrivate::paint( int xc, int yc )
-{
-  PaintToolPrivate::lock_type lock( this->get_mutex() );
-
-  // If no target layer is selected, or if the tool is not in any viewer, return
-  if ( this->paint_tool_->target_layer_state_->get() == Tool::NONE_OPTION_C ||
-    this->current_viewer_ == INVALID_VIEWER_C )
-  {
-    return;
-  }
-
-  ViewerHandle viewer = ViewerManager::Instance()->get_viewer( 
-    static_cast< size_t >( this->current_viewer_ ) );
-  Core::MaskVolumeSliceHandle target_slice = viewer->get_mask_volume_slice( 
-    this->paint_tool_->target_layer_state_->get() );
-  if ( !target_slice )
-  {
-    CORE_THROW_LOGICERROR( "Layer with ID '" + this->paint_tool_->target_layer_state_->get() +
-      "' does not exist" );
-  }
-  
-  if ( target_slice->out_of_boundary() )
-  {
-    return;
-  }
-  
+void PaintToolPrivate::paint( int xc, int yc, int& paint_count )
+{ 
   int radius = this->paint_tool_->brush_radius_state_->get();
   int brush_size = radius * 2 + 1;
   double xpos, ypos;
-  viewer->window_to_world( xc, yc, xpos, ypos );
+  this->viewer_->window_to_world( xc, yc, xpos, ypos );
   int x0, y0;
-  target_slice->world_to_index( xpos, ypos, x0, y0 );
+  this->target_slice_->world_to_index( xpos, ypos, x0, y0 );
   int x_min = x0 - radius;
   int x_max = x0 + radius;
   int y_min = y0 - radius;
   int y_max = y0 + radius;
-  if ( x_min >= static_cast< int >( target_slice->nx() ) ||
+  if ( x_min >= static_cast< int >( this->target_slice_->nx() ) ||
     x_max < 0 || y_max < 0 ||
-    y_min >= static_cast< int >( target_slice->ny() ) )
+    y_min >= static_cast< int >( this->target_slice_->ny() ) )
   {
     return;
   }
   
+  // Compute the start and end indices of the region of the brush that 
+  // intersects with the mask volume slice.
   size_t x_start = static_cast< size_t >( Core::Max( x_min, 0 ) - x_min );
   size_t x_end = static_cast< size_t >( Core::Min( x_max, static_cast< int >( 
-    target_slice->nx() - 1 ) ) - x_min );
+    this->target_slice_->nx() - 1 ) ) - x_min );
   size_t y_start = static_cast< size_t >( Core::Max( y_min, 0 ) - y_min );
   size_t y_end = static_cast< size_t >( Core::Min( y_max, static_cast< int >( 
-    target_slice->ny() - 1 ) ) - y_min );
+    this->target_slice_->ny() - 1 ) ) - y_min );
 
-  // Lock the volume
-  Core::VolumeSlice::lock_type volume_lock( target_slice->get_mutex() ); 
-
+  unsigned char* buffer = this->target_slice_->get_cached_data();
+  size_t nx = this->target_slice_->nx();
+  size_t ny = this->target_slice_->ny();
   for ( size_t y = y_start; y <= y_end; y++ )
   {
     for ( size_t x = x_start; x <= x_end; x++ )
     {
       if ( this->brush_mask_[ y * brush_size + x ] != 0 )
       {
-        if ( this->paint_tool_->erase_state_->get() )
+        if ( this->erase_ )
         {
-          target_slice->clear_mask_at( x_min + x, y_min + y );
+          buffer[ ( y_min + y ) * nx + x_min + x ] = 0;
         }
         else
         {
-          target_slice->set_mask_at( x_min + x, y_min + y );
+          buffer[ ( y_min + y ) * nx + x_min + x ] = 1;
         }
       }
     }
   }
-  Core::MaskDataBlockHandle mask_data_block = target_slice->get_mask_data_block();
-  // Increase the generation number of the mask
-  mask_data_block->increase_generation();
-  // Unlock before triggering the signal.
-  // NOTE: The mutex used by DataBlock and hence MaskDataBlock is non-recursive,
-  // and thus triggering the signal before releasing the lock might result in deadlock.
-  volume_lock.unlock();
-  // Trigger mask_updated_signal_
-  mask_data_block->mask_updated_signal_();
+
+  paint_count++;
 }
 
-void PaintToolPrivate::paint_range( int x0, int y0, int x1, int y1 )
+void PaintToolPrivate::interpolated_paint( int x0, int y0, int x1, int y1, int& paint_count )
 {
   int delta_x = Core::Abs( x1 - x0 );
   int delta_y = Core::Abs( y1 - y0 );
@@ -306,12 +282,43 @@ void PaintToolPrivate::paint_range( int x0, int y0, int x1, int y1 )
   {
     int mid_x = Core::Round( ( x0 + x1 ) * 0.5 );
     int mid_y = Core::Round( ( y0 + y1 ) * 0.5 );
-    this->paint_range( x0, y0, mid_x, mid_y );
-    this->paint_range( mid_x, mid_y, x1, y1 );
+    this->interpolated_paint( x0, y0, mid_x, mid_y, paint_count );
+    this->interpolated_paint( mid_x, mid_y, x1, y1, paint_count );
   }
   else
   {
-    this->paint( x1, y1 );
+    this->paint( x1, y1, paint_count );
+  }
+}
+
+void PaintToolPrivate::paint_range( int x0, int y0, int x1, int y1 )
+{
+  //if ( !Core::Application::IsApplicationThread() )
+  //{
+  //  Core::Application::PostEvent( boost::bind( &PaintToolPrivate::paint_range,
+  //    this, x0, y0, x1, y1 ) );
+  //  return;
+  //}
+
+  PaintToolPrivate::lock_type lock( this->get_mutex() );
+
+  if ( !this->painting_ || !this->viewer_ || !this->target_slice_ )
+  {
+    // Shouldn't be here
+    assert( false );
+    return;
+  }
+
+  int paint_count = 0;
+
+  {
+    Core::MaskVolumeSlice::cache_lock_type cache_lock( this->target_slice_->get_cache_mutex() );
+    this->interpolated_paint( x0, y0, x1, y1, paint_count );
+  }
+
+  if ( paint_count > 0)
+  {
+    this->target_slice_->cache_updated_signal_();
   }
 }
 
@@ -361,10 +368,10 @@ PaintTool::PaintTool( const std::string& toolid, bool auto_number ) :
   }
 
   this->private_->paint_tool_ = this;
-  this->private_->current_viewer_ = PaintToolPrivate::INVALID_VIEWER_C;
   this->private_->build_brush_mask();
   this->private_->initialized_ = false;
   this->private_->brush_mask_changed_ = true;
+  this->private_->painting_ = false;
 
   this->add_connection( this->brush_radius_state_->state_changed_signal_.connect(
     boost::bind( &PaintToolPrivate::handle_brush_radius_changed, this->private_ ) ) );
@@ -439,7 +446,7 @@ void PaintTool::repaint( size_t viewer_id, const Core::Matrix& proj_mat )
   PaintToolPrivate::lock_type lock( this->private_->get_mutex() );
 
   // Don't draw the tool if the viewer is not the one that the tool is currently in.
-  if ( this->private_->current_viewer_ != static_cast< int >( viewer_id ) )
+  if ( !this->private_->viewer_ || this->private_->viewer_->get_viewer_id() != viewer_id )
   {
     return;
   }
@@ -534,13 +541,15 @@ void PaintTool::repaint( size_t viewer_id, const Core::Matrix& proj_mat )
 
 bool PaintTool::handle_mouse_enter( size_t viewer_id )
 {
-  this->private_->current_viewer_ = static_cast< int >( viewer_id );
+  this->private_->viewer_ = ViewerManager::Instance()->get_viewer( viewer_id );
+  this->private_->viewer_->set_cursor_visible( false );
   return true;
 }
 
 bool PaintTool::handle_mouse_leave( size_t viewer_id )
 {
-  this->private_->current_viewer_ = PaintToolPrivate::INVALID_VIEWER_C;
+  this->private_->viewer_->set_cursor_visible( true );
+  this->private_->viewer_.reset();
   return true;
 }
 
@@ -550,13 +559,14 @@ bool PaintTool::handle_mouse_move( const Core::MouseHistory& mouse_history,
   this->private_->center_x_ = mouse_history.current_.x_;
   this->private_->center_y_ = mouse_history.current_.y_;
 
-  if ( modifiers == Core::KeyModifier::NO_MODIFIER_E )
+  if ( this->private_->painting_ )
   {
-    if ( buttons == Core::MouseButton::LEFT_BUTTON_E )
-    {
-      this->private_->paint_range( mouse_history.previous_.x_, mouse_history.previous_.y_,
-        mouse_history.current_.x_, mouse_history.current_.y_ );
-    }
+    this->private_->paint_range( mouse_history.previous_.x_, mouse_history.previous_.y_,
+      mouse_history.current_.x_, mouse_history.current_.y_ );
+    return true;
+  }
+  else if ( modifiers == Core::KeyModifier::NO_MODIFIER_E )
+  {
     return true;
   }
   
@@ -566,31 +576,79 @@ bool PaintTool::handle_mouse_move( const Core::MouseHistory& mouse_history,
 bool PaintTool::handle_mouse_press( const Core::MouseHistory& mouse_history, 
                    int button, int buttons, int modifiers )
 {
-  if ( modifiers == Core::KeyModifier::NO_MODIFIER_E &&
-    buttons == Core::MouseButton::LEFT_BUTTON_E )
-  {
-    this->private_->center_x_ = mouse_history.current_.x_;
-    this->private_->center_y_ = mouse_history.current_.y_;
+  this->private_->center_x_ = mouse_history.current_.x_;
+  this->private_->center_y_ = mouse_history.current_.y_;
 
-    this->private_->paint( this->private_->center_x_, this->private_->center_y_ );
-    return true;
+  if ( modifiers == Core::KeyModifier::NO_MODIFIER_E &&
+    this->target_layer_state_->get() != Tool::NONE_OPTION_C &&
+    !this->private_->painting_ )
+  {
+    if ( button == Core::MouseButton::LEFT_BUTTON_E )
+    {
+      this->private_->painting_ = true;
+      this->private_->erase_ = false;
+    }
+    else if ( button == Core::MouseButton::RIGHT_BUTTON_E )
+    {
+      this->private_->painting_ = true;
+      this->private_->erase_ = true;
+    }
+
+    if ( this->private_->painting_ )
+    {
+      this->private_->target_slice_ = this->private_->viewer_->get_mask_volume_slice(
+        this->target_layer_state_->get() );
+      if ( !this->private_->target_slice_ )
+      {
+        CORE_THROW_LOGICERROR( "Mask layer with ID '" + 
+          this->target_layer_state_->get() + "' does not exist" );
+      }
+      if ( this->private_->target_slice_->out_of_boundary() )
+      {
+        this->private_->painting_ = false;
+        this->private_->target_slice_.reset();
+      }
+      else
+      {
+        this->private_->paint_range( this->private_->center_x_, this->private_->center_y_,
+          this->private_->center_x_, this->private_->center_y_ );
+        return true;
+      }
+    }
   }
 
-  return false;
+  return this->private_->painting_;
 }
 
 bool PaintTool::handle_mouse_release( const Core::MouseHistory& mouse_history, 
                    int button, int buttons, int modifiers )
 {
+  if ( this->private_->painting_ )
+  {
+    if ( ( this->private_->erase_ && button == Core::MouseButton::RIGHT_BUTTON_E ) ||
+      ( !this->private_->erase_ && button == Core::MouseButton::LEFT_BUTTON_E ) )
+    {
+      this->private_->painting_ = false;
+      this->private_->target_slice_->release_cached_data();
+      this->private_->target_slice_.reset();
+      return true;
+    }
+  }
   return false;
 }
 
 bool PaintTool::handle_wheel( int delta, int x, int y, int buttons, int modifiers )
 {
-  if ( modifiers == Core::KeyModifier::CONTROL_MODIFIER_E )
+  if ( modifiers == Core::KeyModifier::CONTROL_MODIFIER_E &&
+    !this->private_->painting_ )
   {
     PaintToolPrivate::lock_type lock( this->private_->get_mutex() );
     this->brush_radius_state_->set( this->brush_radius_state_->get() + delta );
+    return true;
+  }
+
+  if ( this->private_->painting_)
+  {
     return true;
   }
   
