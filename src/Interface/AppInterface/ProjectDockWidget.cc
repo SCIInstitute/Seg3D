@@ -67,6 +67,9 @@ ProjectDockWidget::ProjectDockWidget( QWidget *parent ) :
     
     this->private_->ui_.setupUi( this );
 
+    // We dont want them to be able to save blank notes.
+    this->private_->ui_.save_note_button_->setEnabled( false );
+
     QtUtils::QtBridge::Connect( this->private_->ui_.project_name_edit_, 
       ProjectManager::Instance()->current_project_->project_name_state_ );
     
@@ -96,6 +99,11 @@ ProjectDockWidget::ProjectDockWidget( QWidget *parent ) :
 
     connect( this->private_->ui_.save_note_button_, SIGNAL( clicked() ), 
       this, SLOT( save_note() ) );
+
+    connect( this->private_->ui_.note_edit_, SIGNAL( cursorPositionChanged() ),
+      this, SLOT( enable_save_notes_button() ) );
+
+
   }
 }
 
@@ -223,13 +231,15 @@ void ProjectDockWidget::populate_notes_list()
   {
     return;
   }
-  else if( ( notes[ 0 ] == "]" ) || ( notes[ 0 ] == "[" ) || ( notes[ 0 ] == "" ) )
-  {
-    return;
-  }
 
-  for( int i = 0; i < num_of_notes; i++ )
+
+  for( int i = num_of_notes - 1; i >= 0; i-- )
   {
+    if( ( notes[ i ] == "]" ) || ( notes[ i ] == "[" ) || ( notes[ i ] == "" ) )
+    {
+      continue;
+    }
+
     QTreeWidgetItem* item = new QTreeWidgetItem( this->private_->ui_.notes_tree_ );
     item->setText( 0, QString::fromStdString( ( Core::SplitString( notes[ i ], "|" ) )[ 0 ] ) );
     QTreeWidgetItem* note = new QTreeWidgetItem();
@@ -245,6 +255,8 @@ void ProjectDockWidget::populate_notes_list()
     this->private_->ui_.notes_tree_->setItemWidget( note, 0, note_text );
     
   }
+
+  this->private_->ui_.notes_tree_->expandItem( this->private_->ui_.notes_tree_->topLevelItem( 0 ) );
 }
   
 void ProjectDockWidget::HandleSessionsChanged( qpointer_type qpointer )
@@ -274,6 +286,21 @@ void ProjectDockWidget::HandleNoteSaved( qpointer_type qpointer )
   if( qpointer.data() ) qpointer->populate_notes_list();
   CORE_LOG_DEBUG( "HandleNoteSaved done" );
 }
+
+void ProjectDockWidget::enable_save_notes_button()
+{
+  std::string current_text = this->private_->ui_.note_edit_->toPlainText().toStdString();
+
+  if( current_text.size() > 3 )
+  {
+    this->private_->ui_.save_note_button_->setEnabled( true );
+  }
+  else
+  {
+    this->private_->ui_.save_note_button_->setEnabled( false );
+  }
+}
+
 
 
 

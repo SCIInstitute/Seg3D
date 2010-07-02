@@ -115,7 +115,7 @@ private:
 private:
   
   Core::StateIntHandle bit_state_;
-  const static size_t version_number_;
+  const static size_t VERSION_NUMBER_C;
   Core::MaskVolumeHandle mask_volume_;
   
   // counter for generating new colors for each new mask

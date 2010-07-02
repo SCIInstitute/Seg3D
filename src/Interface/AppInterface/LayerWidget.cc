@@ -87,11 +87,11 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   
   {// Prepare the icons!!
     this->label_layer_icon_.addFile( QString::fromUtf8( ":/Images/LabelMapWhite.png" ),
-                    QSize(), QIcon::Normal, QIcon::Off );
-    this->data_layer_icon_.addFile( QString::fromUtf8( ":/Images/DataWhite.png" ), QSize(),
-                     QIcon::Normal, QIcon::Off );
-    this->mask_layer_icon_.addFile( QString::fromUtf8( ":/Images/MaskWhite_shadow.png" ), QSize(),
-      QIcon::Normal, QIcon::Off );
+      QSize(), QIcon::Normal, QIcon::Off );
+    this->data_layer_icon_.addFile( QString::fromUtf8( ":/Images/DataWhite.png" ), 
+      QSize(), QIcon::Normal, QIcon::Off );
+    this->mask_layer_icon_.addFile( QString::fromUtf8( ":/Images/MaskWhite_shadow.png" ), 
+      QSize(), QIcon::Normal, QIcon::Off );
   }
 
   // Add the Ui children onto the QWidget

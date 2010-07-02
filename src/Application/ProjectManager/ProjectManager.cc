@@ -41,12 +41,12 @@
 namespace Seg3D
 {
 
-const size_t ProjectManager::version_number_ = 1;
+const size_t ProjectManager::VERSION_NUMBER_C = 1;
 
 CORE_SINGLETON_IMPLEMENTATION( ProjectManager );
 
 ProjectManager::ProjectManager() :
-  StateHandler( "projectmanager", version_number_, false ),
+  StateHandler( "projectmanager", VERSION_NUMBER_C, false ),
   auto_save_timer_( 10 )
 { 
   Core::Application::Instance()->get_config_directory( this->local_projectmanager_path_ );

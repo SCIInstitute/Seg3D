@@ -159,7 +159,7 @@ private:
   boost::filesystem::path local_projectmanager_path_;
   boost::asio::io_service io_;
   boost::asio::deadline_timer* timer_;
-  const static size_t version_number_;
+  const static size_t VERSION_NUMBER_C;
 
 
 };

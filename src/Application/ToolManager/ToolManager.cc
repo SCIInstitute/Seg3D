@@ -348,7 +348,6 @@ bool ToolManager::post_load_states()
     
     std::string new_tool_id;
     this->open_tool( tools_vector[ j ], new_tool_id, false );
-    //this->activate_tool( tools_vector[ j ] );
 
     if( this->get_tool( tools_vector[ j ] ) )
     {

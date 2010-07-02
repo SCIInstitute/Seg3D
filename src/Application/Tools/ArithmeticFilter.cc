@@ -34,14 +34,14 @@
 namespace Seg3D
 {
 
-const size_t ArithmeticFilter::version_number_ = 1;
+const size_t ArithmeticFilter::VERSION_NUMBER_C = 1;
 
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL( ArithmeticFilter )
 
 // Constructor, set default values
 ArithmeticFilter::ArithmeticFilter( const std::string& toolid, bool auto_number ) :
-  Tool( toolid, version_number_, auto_number )
+  Tool( toolid, VERSION_NUMBER_C, auto_number )
 {
   // add default values for the the states
   add_state( "volume_a", this->volume_a_state_, "<none>" );

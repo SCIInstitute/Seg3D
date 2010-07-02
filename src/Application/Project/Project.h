@@ -135,7 +135,7 @@ private:
 private:
   SessionHandle current_session_;
   bool name_set_;
-  const static size_t version_number_;
+  const static size_t VERSION_NUMBER_C;
   
 
 };

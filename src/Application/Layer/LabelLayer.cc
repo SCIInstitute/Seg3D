@@ -36,10 +36,10 @@
 namespace Seg3D
 {
 
-const size_t LabelLayer::version_number_ = 1;
+const size_t LabelLayer::VERSION_NUMBER_C = 1;
 
 LabelLayer::LabelLayer( const std::string& name, const Core::VolumeHandle& volume ) :
-  Layer( name, version_number_ )
+  Layer( name, VERSION_NUMBER_C )
 {
   // Step (1) : Build the layer specific state variables
 

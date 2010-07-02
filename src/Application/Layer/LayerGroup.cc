@@ -74,9 +74,6 @@ LayerGroup::LayerGroup( Core::GridTransform grid_transform ) :
   add_state( "show_layers", this->show_layers_state_, true );
   add_state( "visibility", this->visibility_state_, true );
   
-  // = Layer list
-  //std::vector< std::string> layers;
-  //add_state( "groups", this->layers_state_, layers );
   
 }
 
@@ -95,16 +92,11 @@ void LayerGroup::create_mask_layer()
 void LayerGroup::insert_layer_back( LayerHandle new_layer )
 {
   layer_list_.push_back( new_layer );
-  // keep layer lists in sync
-  //this->sync_layer_lists();
 }
 
 void LayerGroup::insert_layer_front( LayerHandle new_layer )
 {
   layer_list_.push_front( new_layer );
-  
-  // keep layer lists in sync
-  //this->sync_layer_lists();
 }
 
 
@@ -122,9 +114,6 @@ int LayerGroup::move_layer_above( LayerHandle layer_above, LayerHandle layer_bel
       
       // Second we insert the layer
       this->layer_list_.insert( ++i, layer_above );
-      
-      // keep layer lists in sync
-      //this->sync_layer_lists();
       
       // Finally we return the proper location for the gui to insert the layer
       return abs( index - list_size ) - 1;

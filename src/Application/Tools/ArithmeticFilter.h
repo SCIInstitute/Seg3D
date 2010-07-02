@@ -72,7 +72,7 @@ public:
   Core::StateBoolHandle replace_state_;
 
 private:
-  const static size_t version_number_;
+  const static size_t VERSION_NUMBER_C;
 
 };
 

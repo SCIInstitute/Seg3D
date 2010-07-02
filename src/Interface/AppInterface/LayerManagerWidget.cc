@@ -87,7 +87,7 @@ void LayerManagerWidget::insert_layer( LayerHandle layer )
     {
       ( *i )->setUpdatesEnabled( false );
       ( *i )->insert_layer( layer, -1 );
-      //if( layer->get_active() )
+
       if( LayerManager::Instance()->get_active_layer() == layer )
         this->set_active_layer( layer );
       ( *i )->setUpdatesEnabled( true );
@@ -113,7 +113,7 @@ void LayerManagerWidget::insert_layer( LayerHandle layer, int index )
     { 
       ( *i )->setUpdatesEnabled( false );
       ( *i )->insert_layer( layer, index );
-      //if( layer->get_active() )
+
       if( LayerManager::Instance()->get_active_layer() == layer )     
         this->set_active_layer( layer );
       ( *i )->setUpdatesEnabled( true );
@@ -202,8 +202,6 @@ void  LayerManagerWidget::set_active_layer( LayerHandle layer )
 {
   if( active_layer_ )
     this->active_layer_.toStrongRef()->set_active( false );
-  
-    //this->set_active_group( layer->get_layer_group() );   
     
     for ( QList< LayerGroupWidgetQHandle >::iterator i = this->group_list_.begin(); 
      i  != this->group_list_.end(); i++ )

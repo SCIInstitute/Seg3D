@@ -107,12 +107,17 @@ public:
   // to enforce a constraint from another action.
   bool set( const std::string& value, ActionSource source = ActionSource::NONE_E );
 
+  virtual void invalidate( const std::string& name );
+
+  bool is_valid(){ return valid_; }
+
 public:
   // The regular expression for validating a name string
   const static std::string REGEX_VALIDATOR_C;
 
 private:
   StateNamePrivateHandle private_;
+  bool valid_;
 
 };
 

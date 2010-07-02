@@ -85,16 +85,6 @@ void Layer::set_layer_group( LayerGroupWeakHandle layer_group )
 {
   this->layer_group_ = layer_group;
 }
-    
-// bool Layer::get_active()
-// {
-//  return this->active_state_->get();
-// }
-//  
-// void Layer::set_active( bool active )
-// {
-//  this->active_state_->set( active );
-// }
 
 std::string Layer::get_layer_id() const
 {

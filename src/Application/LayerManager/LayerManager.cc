@@ -431,9 +431,6 @@ void LayerManager::delete_layers( LayerGroupHandle group )
     this->active_layer_changed_signal_( this->active_layer_ );
   }
   
-  // keep the state variables in sync
-  //this->sync_group_lists();
-  
 } // end delete_layer
 
 bool LayerManager::delete_all()
@@ -606,8 +603,8 @@ bool LayerManager::pre_save_states()
   std::vector< std::string > layers_vector;
   this->layers_state_->set( layers_vector );
   
-  group_list_type::iterator group_iterator = this->group_list_.begin();
-  for ( ; group_iterator != this->group_list_.end(); ++group_iterator )
+  group_list_type::reverse_iterator group_iterator = this->group_list_.rbegin();
+  for ( ; group_iterator != this->group_list_.rend(); ++group_iterator )
   {
     std::string group = ( *group_iterator )->get_group_id();
     std::vector< std::string > group_layers_vector; 
@@ -631,7 +628,7 @@ bool LayerManager::post_save_states()
   std::vector< LayerHandle > layers;
   this->get_layers( layers );
 
-  for( int i = 0; i < static_cast< int >( layers.size() ); ++i )
+  for( int i = static_cast< int >( layers.size() ) -1 ; i >= 0; --i )
   {
     if( !layers[ i ]->populate_session_states() )
     {
@@ -655,6 +652,7 @@ bool LayerManager::post_load_states()
 
   std::vector< std::string > layer_vector = this->layers_state_->get();
   for( int j = 0; j < static_cast< int >( layer_vector.size() ); ++j )
+  //for( int j = static_cast< int >( layer_vector.size() ) - 1; j >= 0; --j )
   {
     if( layer_vector[ j ] == "]" )
     {
@@ -692,11 +690,5 @@ bool LayerManager::post_load_states()
 
   return true;
 }
-
-
-
-
-
-
 
 } // end namespace seg3D

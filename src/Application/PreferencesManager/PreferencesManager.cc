@@ -44,12 +44,12 @@
 namespace Seg3D
 {
 
-const size_t PreferencesManager::version_number_ = 1;
+const size_t PreferencesManager::VERSION_NUMBER_C = 1;
 
 CORE_SINGLETON_IMPLEMENTATION( PreferencesManager );
 
 PreferencesManager::PreferencesManager() :
-  StateHandler( "preferences", version_number_, false )
+  StateHandler( "preferences", VERSION_NUMBER_C, false )
 { 
   // Initialize the local config directory path
   Core::Application::Instance()->get_config_directory( this->local_config_path_ );

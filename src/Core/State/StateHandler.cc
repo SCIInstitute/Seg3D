@@ -332,6 +332,17 @@ void StateHandler::invalidate()
     }
     this->private_->valid_ = false;
   }
+
+  // Just in case we have to deal with state handlers with names, such as layers, we invalidate
+  // the layer's name as well.
+  std::string whole_name = this->private_->statehandler_id_ + "::name";
+  state_map_type::iterator it = this->private_->state_map_.find( whole_name );
+
+  if( it != this->private_->state_map_.end() )
+  {
+    ( *it ).second->invalidate( ( *it ).second->export_to_string() );
+  }
+  
   StateEngine::Instance()->remove_state_handler( this->private_->statehandler_id_ );
   clean_up();
 }

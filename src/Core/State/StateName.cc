@@ -147,7 +147,8 @@ StateNamePrivate::mutex_type StateNamePrivate::NAME_SET_MUTEX_S;
 const boost::regex StateNamePrivate::REGEX_C( "[^\\w\\s]" );
 
 StateName::StateName( const std::string& stateid, const std::string& value ) :
-  StateBase( stateid )
+  StateBase( stateid ),
+  valid_( true )
 {
   this->private_ = StateNamePrivateHandle( new StateNamePrivate( value ) );
 }
@@ -235,5 +236,18 @@ bool StateName::set( const std::string& value, ActionSource source )
   this->state_changed_signal_();
   return true;
 }
+
+void StateName::invalidate( const std::string& name )
+{
+  if( !this->valid_ )
+  {
+    return;
+  }
+  this->valid_ = false;
+  
+  this->private_->RemoveName( name );
+  
+}
+
 
 } // end namespace Core

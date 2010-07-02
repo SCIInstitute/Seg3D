@@ -121,6 +121,11 @@ public:
     return Core::SplitString(  stateid_, "::" )[ 1 ];
   }
 
+  virtual void invalidate( const std::string& name ) 
+  {
+    // default we do nothing
+  }
+
 private:
   std::string stateid_;
 
@@ -132,6 +137,9 @@ public:
   state_changed_signal_type state_changed_signal_;
 
 };
+
+
+
 
 } // end namespace Core
 

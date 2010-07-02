@@ -72,6 +72,11 @@ private:
   ToolManager();
   virtual ~ToolManager();
 
+private:
+  // GET_TOOL:
+  // This is an internal private function for retrieving the handle to a tool by passing its id
+  ToolHandle get_tool( const std::string toolid );
+
   // -- Handler functions --
 protected:
   friend class ActionOpenTool;
@@ -121,8 +126,6 @@ public:
   std::string active_toolid();
 
   ToolHandle get_active_tool();
-
-  ToolHandle get_tool( const std::string toolid );
 
 public:
   virtual bool pre_save_states();

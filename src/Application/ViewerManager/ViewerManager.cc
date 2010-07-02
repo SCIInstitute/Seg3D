@@ -43,12 +43,12 @@
 namespace Seg3D
 {
 
-const size_t ViewerManager::version_number_ = 1;
+const size_t ViewerManager::VERSION_NUMBER_C = 1;
 
 CORE_SINGLETON_IMPLEMENTATION( ViewerManager );
 
 ViewerManager::ViewerManager() :
-  StateHandler( "view", version_number_, false, 1 ),
+  StateHandler( "view", VERSION_NUMBER_C, false, 1 ),
   signal_block_count_( 0 )
 {
   // Step (1)

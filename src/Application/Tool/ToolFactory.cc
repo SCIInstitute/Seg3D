@@ -184,16 +184,17 @@ bool ToolFactory::create_tool( const std::string& tool_type, ToolHandle& tool, b
 {
   lock_type lock( get_mutex() );
 
-  // Step (1): find the tool
+  // Step (1): split the tool type in case it has a number affixed
   std::string tool_name = Core::SplitString( tool_type, "_" )[ 0 ];
 
+  // Step (2): find the tool
   ToolFactoryPrivate::tool_map_type::const_iterator it = 
     this->private_->tools_.find( Core::StringToLower( tool_name ) );
 
-  // Step (2): check its existence
+  // Step (3): check its existence
   if ( it == this->private_->tools_.end() ) return false;
 
-  // Step (3): build the tool
+  // Step (4): build the tool
   tool = ( *it ).second.builder_->build( tool_type, auto_number );
 
   return true;

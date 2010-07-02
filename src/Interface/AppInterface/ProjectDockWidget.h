@@ -71,6 +71,7 @@ private Q_SLOTS:
   void load_session();
   void delete_session();
   void call_load_session( QListWidgetItem* item );
+  void enable_save_notes_button();
   
 private:
   boost::shared_ptr< ProjectDockWidgetPrivate > private_;

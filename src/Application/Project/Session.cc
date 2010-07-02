@@ -42,10 +42,10 @@
 namespace Seg3D
 {
 
-const size_t Session::version_number_ = 1;
+const size_t Session::VERSION_NUMBER_C = 1;
 
 Session::Session( const std::string& session_name ) :
-  StateHandler( "session", version_number_, false )
+  StateHandler( "session", VERSION_NUMBER_C, false )
 { 
   this->add_state( "session_name", this->session_name_state_, session_name );
 }
