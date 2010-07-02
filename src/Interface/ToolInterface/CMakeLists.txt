@@ -33,7 +33,7 @@
 
 SET(INTERFACE_TOOLINTERFACE_SRCS
   PaintToolInterface.cc
-  PolyLineToolInterface.cc
+  PolylineToolInterface.cc
   ThresholdToolInterface.cc
   InvertToolInterface.cc
   MedianFilterInterface.cc
@@ -62,7 +62,7 @@ SET(INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_SRCS
 
 SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
   PaintToolInterface.h
-  PolyLineToolInterface.h
+  PolylineToolInterface.h
   ThresholdToolInterface.h
   InvertToolInterface.h
   MedianFilterInterface.h
