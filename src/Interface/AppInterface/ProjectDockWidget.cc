@@ -116,7 +116,6 @@ ProjectDockWidget::~ProjectDockWidget()
 void ProjectDockWidget::save_project()
 {
   ActionSaveSession::Dispatch( false );
-  //ProjectManager::Instance()->save_project();
 }
 
 void ProjectDockWidget::save_note()
@@ -124,39 +123,6 @@ void ProjectDockWidget::save_note()
   ProjectManager::Instance()->save_note( this->private_->ui_.note_edit_->toPlainText().toStdString() );
   this->private_->ui_.note_edit_->setPlainText( QString::fromUtf8( "" ) );
 
-}
-  
-void ProjectDockWidget::delete_session()
-{ 
-  if( !this->private_->ui_.sessions_list_->currentItem() )
-    return;
-  
-  if( this->private_->ui_.sessions_list_->currentItem()->text() != "" )
-  {
-    QMessageBox message_box;
-    message_box.setText( QString::fromUtf8( "WARNING: You are going to regret this.") );
-    message_box.setInformativeText( QString::fromUtf8( "Are you sure you want to do this?" ) );
-    message_box.setStandardButtons( QMessageBox::Yes | QMessageBox::No );
-    message_box.setDefaultButton( QMessageBox::No );
-    if( message_box.exec() )
-    {
-      std::vector< std::string > sessions = ProjectManager::Instance()->current_project_->
-        sessions_state_->get();
-      
-      for( int i = 0; i < static_cast< int >( sessions.size() ); ++i )
-      {
-        if( QString::fromStdString( ( Core::SplitString( sessions[ i ], "|" ) )[ 1 ] ) == 
-           this->private_->ui_.sessions_list_->currentItem()->text() )
-        {
-          ActionDeleteSession::Dispatch( i );
-          //ProjectManager::Instance()->delete_project_session( i );  
-          break;
-        }
-      }
-    }
-  }
-  
-  this->populate_session_list();
 }
   
 void ProjectDockWidget::load_session()
@@ -183,7 +149,6 @@ void ProjectDockWidget::load_session()
            this->private_->ui_.sessions_list_->currentItem()->text() )
         {
           ActionLoadSession::Dispatch( i );
-          //ProjectManager::Instance()->load_project_session( i );  
           break;
         }
       }     
@@ -191,14 +156,38 @@ void ProjectDockWidget::load_session()
   }
 }
 
-void ProjectDockWidget::call_load_session( QListWidgetItem* item )
-{
-  this->load_session();
+void ProjectDockWidget::delete_session()
+{ 
+  if( !this->private_->ui_.sessions_list_->currentItem() )
+    return;
+
+  if( this->private_->ui_.sessions_list_->currentItem()->text() != "" )
+  {
+    QMessageBox message_box;
+    message_box.setText( QString::fromUtf8( "WARNING: You are going to regret this.") );
+    message_box.setInformativeText( QString::fromUtf8( "Are you sure you want to do this?" ) );
+    message_box.setStandardButtons( QMessageBox::Yes | QMessageBox::No );
+    message_box.setDefaultButton( QMessageBox::No );
+    if( message_box.exec() )
+    {
+      std::vector< std::string > sessions = ProjectManager::Instance()->current_project_->
+        sessions_state_->get();
+
+      for( int i = 0; i < static_cast< int >( sessions.size() ); ++i )
+      {
+        if( QString::fromStdString( ( Core::SplitString( sessions[ i ], "|" ) )[ 1 ] ) == 
+          this->private_->ui_.sessions_list_->currentItem()->text() )
+        {
+          ActionDeleteSession::Dispatch( i ); 
+          break;
+        }
+      }
+    }
+  }
+
+  this->populate_session_list();
 }
 
-
-  
-  
 void ProjectDockWidget::populate_session_list()
 {
   std::vector< std::string > sessions = ProjectManager::Instance()->current_project_->
@@ -289,7 +278,7 @@ void ProjectDockWidget::HandleNoteSaved( qpointer_type qpointer )
 
 void ProjectDockWidget::enable_save_notes_button()
 {
-  std::string current_text = this->private_->ui_.note_edit_->toPlainText().toStdString();
+std::string current_text = this->private_->ui_.note_edit_->toPlainText().toStdString();
 
   if( current_text.size() > 3 )
   {
@@ -301,9 +290,10 @@ void ProjectDockWidget::enable_save_notes_button()
   }
 }
 
-
-
-
+void ProjectDockWidget::call_load_session( QListWidgetItem* item )
+{
+  this->load_session();
+}
 
 
 

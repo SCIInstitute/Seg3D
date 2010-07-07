@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>301</width>
-    <height>207</height>
+    <height>265</height>
    </rect>
   </property>
   <property name="mouseTracking">
@@ -90,7 +90,7 @@ QPushButton#activate_button_{
 
 </string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0">
+  <layout class="QVBoxLayout" name="verticalLayout_3">
    <property name="spacing">
     <number>0</number>
    </property>
@@ -1145,6 +1145,13 @@ QPushButton#activate_button_{
        </widget>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="dummy_widget_">
+     <property name="text">
+      <string/>
+     </property>
     </widget>
    </item>
   </layout>

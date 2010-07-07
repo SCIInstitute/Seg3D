@@ -97,6 +97,7 @@ public:
   static void HandleGroupMoved( qpointer_type qpointer, std::string &group_id, int index );
   
   
+  
 private:
   QSharedPointer< LayerManagerWidget > layer_manager_widget_;
   

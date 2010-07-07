@@ -84,7 +84,6 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   group_menus_open_( false ) 
 {
   
-  
   {// Prepare the icons!!
     this->label_layer_icon_.addFile( QString::fromUtf8( ":/Images/LabelMapWhite.png" ),
       QSize(), QIcon::Normal, QIcon::Off );
@@ -137,7 +136,6 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   this->private_->ui_.verticalLayout_3->insertWidget( 0, this->private_->drop_space_ );
   
   this->private_->drop_space_->setStyleSheet( StyleSheet::DROPSPACEWIDGET_C );
-  
   this->private_->drop_space_->hide();
   
   // add the SliderCombo Widgets
@@ -249,6 +247,8 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   
   this->private_->overlay_ = new OverlayWidget( this );
   this->private_->overlay_->hide(); 
+
+  this->private_->ui_.dummy_widget_->hide();
   
   this->setUpdatesEnabled( true );
 }
@@ -344,6 +344,8 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
   // Next we hide the LayerWidget that we are going to be dragging.
   this->parentWidget()->setMinimumHeight( this->parentWidget()->height() );
   this->seethrough( true );
+
+  Q_EMIT prep_for_drag_and_drop( true );
   
   // Finally if our drag was aborted then we reset the layers styles to be visible
   if( ( drag->exec(Qt::MoveAction, Qt::MoveAction) ) != Qt::MoveAction )
@@ -355,6 +357,7 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
   { 
     ActionMoveLayerAbove::Dispatch( this->get_layer_id(), this->drop_layer_->get_layer_id() );
   }
+  Q_EMIT prep_for_drag_and_drop( false );
   this->parentWidget()->setMinimumHeight( 0 );
 }
 
@@ -416,11 +419,6 @@ void LayerWidget::dropEvent( QDropEvent* event )
   {
     event->ignore();
   }
-//  this->setUpdatesEnabled( false );
-//  this->set_drop( false );
-//  this->private_->overlay_->hide();
-//  this->setUpdatesEnabled( true );
-//  this->repaint();
 
 }
 
@@ -467,30 +465,20 @@ void LayerWidget::seethrough( bool see )
   this->setUpdatesEnabled( false );
   if( see )
   {
-// We enable some animation if it is a windows system
-#if defined( _WIN32 )
-    this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_PICKED_UP_C );
-    this->private_->ui_.header_->hide();
-    this->private_->ui_.border_bar_->hide();
-    this->private_->ui_.bright_contrast_bar_->hide();
-    this->private_->ui_.color_bar_->hide();
-    this->private_->ui_.opacity_bar_->hide();
-// Otherwise we make things simpler
-#else
+
     this->hide();
-#endif
   }
   else
   {
-#if defined( _WIN32 )
-    this->private_->ui_.header_->show();
-    if( this->active_ ) 
-      this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_ACTIVE_C );
-    else
-      this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_INACTIVE_C );
-#else
+/*#if defined( _WIN32 )*/
+    //this->private_->ui_.header_->show();
+    //if( this->active_ ) 
+    //  this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_ACTIVE_C );
+    //else
+    //  this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_INACTIVE_C );
+// #else
     this->show();
-#endif;
+// #endif;
   }
   this->setUpdatesEnabled( true );
   this->repaint();
@@ -512,7 +500,7 @@ void LayerWidget::set_drop( bool drop )
   {
     this->private_->drop_space_->hide();
   }
-  this->repaint();
+  //this->repaint();
 } 
 
   
@@ -718,6 +706,25 @@ void LayerWidget::resizeEvent( QResizeEvent *event )
   this->private_->overlay_->resize( event->size() );
   event->accept();
 }
+
+void LayerWidget::prep_for_animation( bool move_time )
+{
+  if( move_time )
+  {
+    this->private_->ui_.dummy_widget_->setMinimumHeight( this->private_->ui_.base_->height() );
+    this->private_->ui_.dummy_widget_->setMinimumWidth( this->private_->ui_.base_->width() );
+    this->private_->ui_.dummy_widget_->setPixmap( QPixmap::grabWidget( this->private_->ui_.base_ ) );
+    this->private_->ui_.base_->hide();
+    this->private_->ui_.dummy_widget_->show();
+  }
+  else
+  {
+    this->private_->ui_.dummy_widget_->hide();
+    this->private_->ui_.base_->show();
+  }
+  
+}
+
 
   
 } //end namespace Seg3D

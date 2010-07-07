@@ -59,6 +59,7 @@ public Q_SLOTS:
   void show_delete( bool show );
   void show_selection_checkboxes( bool show );
   void enable_delete_button( bool enable );
+  void prep_for_layer_drag_and_drop( bool move_time );
   
 public:
   //void add_layer( LayerHandle layer );
@@ -68,6 +69,9 @@ public:
   void set_active( bool active );
   LayerWidgetQWeakHandle set_active_layer( LayerHandle layer );
   void seethrough( bool see );
+
+
+  
   
 protected:
   void resizeEvent( QResizeEvent *event );

@@ -89,7 +89,7 @@ LayerManagerDockWidget::LayerManagerDockWidget( QWidget *parent ) :
   
   add_connection( LayerManager::Instance()->group_inserted_at_signal_.connect( boost::bind(
     LayerManagerDockWidget::HandleGroupMoved, layer_dock_widget, _1, _2 ) ) );
-  
+
   
   // Add any layers that may have been added before the GUI was initialized
   std::vector< LayerHandle > temporary_layerhandle_vector;
@@ -242,5 +242,8 @@ void LayerManagerDockWidget::HandleGroupMoved( qpointer_type qpointer, std::stri
   if( qpointer.data() ) qpointer->move_group_ui( group_id, index );
   CORE_LOG_DEBUG( "HandleGroupMoved done" );
 }
+
+
+
 
 }  // end namespace Seg3D

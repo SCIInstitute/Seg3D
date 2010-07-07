@@ -68,7 +68,6 @@ public:
   void show_group( LayerGroupHandle group );
   void set_active_layer( LayerHandle layer );
   
-
 private:
   // private Qt GUI Components for the LayerManagerWidget
   QWidget* main_;

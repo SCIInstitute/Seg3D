@@ -109,6 +109,7 @@ public:
   void get_layer_names( std::vector< LayerIDNamePair >& layer_names, 
     Core::VolumeType type );
 
+
   // Layer Action Functions
 public:
   // INSERT_LAYER:
@@ -126,7 +127,7 @@ public:
   // SET_ACTIVE_LAYER:
   // this function sets the active layer
   void set_active_layer( LayerHandle layer );
-  
+
 private:
   // VALIDATE_LAYER_MOVE:
   // this function is used to validate that a layer move is the kind we want to allow. 

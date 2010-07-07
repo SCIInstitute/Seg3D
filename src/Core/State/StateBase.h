@@ -121,6 +121,10 @@ public:
     return Core::SplitString(  stateid_, "::" )[ 1 ];
   }
 
+  // INVALIDATE:
+  // This function is used to invalidate the name of the layer to prevent conflicts when a layer
+  // is being deleted shortly before being created again when loading a session with the same name
+  // as the previous session.
   virtual void invalidate( const std::string& name ) 
   {
     // default we do nothing

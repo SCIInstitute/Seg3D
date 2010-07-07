@@ -46,15 +46,22 @@ public:
   virtual ~DropSpaceWidget();
 
 public:
+  // HIDE:
+  // This overloaded function adds some animation to the hide function for this widget
   void hide();
+
+  // SHOW:
+  // This overloaded function adds some animation to the show function for this widget
   void show();
 
   
 private Q_SLOTS:
+  // CHANGE_SIZE:
+  // This is the function that does the actual size changing for the animation
   void change_size();
   
 private:
-  QTimer *timer_;
+  //QTimer *timer_;
   bool changing_size_;
   bool open_;
   int max_height_;

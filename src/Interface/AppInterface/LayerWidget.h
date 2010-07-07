@@ -53,6 +53,10 @@ class LayerWidget : public QWidget
 {
 Q_OBJECT
 
+
+Q_SIGNALS:
+  void prep_for_drag_and_drop( bool );
+
 // -- constructor/destructor --
 public:
   LayerWidget( QFrame* parent, LayerHandle layer );
@@ -119,6 +123,11 @@ public:
   // SET_PICKED_UP:
   // this function is called to set or unset the state of picked_up_
   void set_picked_up( bool up ){ this->picked_up_ = up; }
+
+  // PREP_FOR_ANIMATION:
+  // this function hides the actual widgets and substitutes them for images to make drag and drop
+  // faster
+  void prep_for_animation( bool move_time );
 
 public:
   // GET_VOLUME_TYPE:

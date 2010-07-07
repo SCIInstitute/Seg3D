@@ -215,4 +215,6 @@ void  LayerManagerWidget::set_active_layer( LayerHandle layer )
   }
 }
 
+
+
 }  // end namespace Seg3D
