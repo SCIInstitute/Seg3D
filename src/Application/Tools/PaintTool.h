@@ -66,16 +66,15 @@ public:
   // The function should only be called by the renderer, which has a valid GL context.
   virtual void repaint( size_t viewer_id, const Core::Matrix& proj_mat );
 
+protected:
+  virtual bool post_load_states();
+
 private:
-  // -- handle updates from layer manager --
   void handle_layers_changed();
+  void handle_data_constraint_changed();
 
   void update_target_options();
   void update_constraint_options();
-
-private:
-
-  size_t signal_block_count_;
 
   // -- state --
 public:

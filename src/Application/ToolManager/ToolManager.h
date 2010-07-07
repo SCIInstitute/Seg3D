@@ -75,7 +75,7 @@ private:
 private:
   // GET_TOOL:
   // This is an internal private function for retrieving the handle to a tool by passing its id
-  ToolHandle get_tool( const std::string toolid );
+  ToolHandle get_tool( const std::string& toolid );
 
   // -- Handler functions --
 protected:

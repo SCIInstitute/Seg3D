@@ -67,7 +67,7 @@ QtRenderWidget::QtRenderWidget( const QGLFormat& format, QWidget* parent, QGLWid
   this->setAttribute( Qt::WA_OpaquePaintEvent );
   this->setAttribute( Qt::WA_NoSystemBackground );
   this->setMouseTracking( true );
-  this->setCursor( Qt::CrossCursor );
+  //this->setCursor( Qt::CrossCursor );
   this->setFocusPolicy( Qt::StrongFocus );
 }
 
@@ -119,15 +119,6 @@ void QtRenderWidget::paintGL()
   }
 
   CORE_LOG_DEBUG("Painting texture");
-
-  if ( this->private_->viewer_->get_cursor_visible() )
-  {
-    this->setCursor( Qt::CrossCursor );
-  }
-  else
-  {
-    this->setCursor( Qt::BlankCursor );
-  }
 
   // draw a window size quad and map the render texture onto it
   QSize view_size = QWidget::size();

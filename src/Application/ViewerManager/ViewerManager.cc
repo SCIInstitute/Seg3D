@@ -285,7 +285,7 @@ void ViewerManager::update_volume_viewers()
 
     if ( viewer->view_mode_state_->get() == Viewer::VOLUME_C )
     {
-      viewer->trigger_redraw();
+      viewer->redraw();
     }
   }
 }

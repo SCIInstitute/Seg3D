@@ -45,6 +45,7 @@
 #include <Application/Tools/PaintTool.h>
 #include <Application/Viewer/Viewer.h>
 #include <Application/ViewerManager/ViewerManager.h>
+#include <Application/Layer/DataLayer.h>
 
 namespace Seg3D
 {
@@ -75,6 +76,9 @@ public:
   bool brush_mask_changed_;
   bool painting_;
   bool erase_;
+  bool brush_visible_;
+  size_t signal_block_count_;
+
   Core::MaskVolumeSliceHandle target_slice_;
   ViewerHandle viewer_;
 
@@ -216,6 +220,10 @@ void PaintToolPrivate::handle_brush_radius_changed()
   lock_type lock( this->get_mutex() );
   this->build_brush_mask();
   this->brush_mask_changed_ = true;
+  if ( this->viewer_ )
+  {
+    this->viewer_->redraw_overlay();
+  }
 }
 
 void PaintToolPrivate::paint( int xc, int yc, int& paint_count )
@@ -333,7 +341,6 @@ SCI_REGISTER_TOOL(PaintTool)
 
 PaintTool::PaintTool( const std::string& toolid, bool auto_number ) :
   Tool( toolid, VERSION_NUMBER_C, auto_number ),
-  signal_block_count_( 0 ),
   private_( new PaintToolPrivate )
 {
   // Need to set ranges and default values for all parameters
@@ -353,6 +360,9 @@ PaintTool::PaintTool( const std::string& toolid, bool auto_number ) :
   this->add_state( "lower_threshold", this->lower_threshold_state_, 0.0, 00.0, 1.0, 0.01 );
   this->add_state( "erase", this->erase_state_, false );
   
+  this->add_connection( this->data_constraint_layer_state_->state_changed_signal_.connect(
+    boost::bind( &PaintTool::handle_data_constraint_changed, this ) ) );
+
   this->handle_layers_changed();
 
   this->add_connection( this->target_layer_state_->value_changed_signal_.connect(
@@ -372,6 +382,8 @@ PaintTool::PaintTool( const std::string& toolid, bool auto_number ) :
   this->private_->initialized_ = false;
   this->private_->brush_mask_changed_ = true;
   this->private_->painting_ = false;
+  this->private_->brush_visible_ = true;
+  this->private_->signal_block_count_ = 0;
 
   this->add_connection( this->brush_radius_state_->state_changed_signal_.connect(
     boost::bind( &PaintToolPrivate::handle_brush_radius_changed, this->private_ ) ) );
@@ -395,14 +407,14 @@ void PaintTool::update_target_options()
   LayerManager::Instance()->get_layer_names( mask_layer_names, Core::VolumeType::MASK_E );
 
   {
-    Core::ScopedCounter counter( this->signal_block_count_ );
+    Core::ScopedCounter counter( this->private_->signal_block_count_ );
     this->target_layer_state_->set_option_list( mask_layer_names );
   }
 }
 
 void PaintTool::update_constraint_options()
 {
-  if ( this->signal_block_count_ > 0 )
+  if ( this->private_->signal_block_count_ > 0 )
   {
     return;
   }
@@ -433,6 +445,27 @@ void PaintTool::update_constraint_options()
   this->mask_constraint_layer_state_->set_option_list( mask_layer_names );
 }
 
+void PaintTool::handle_data_constraint_changed()
+{
+  if ( this->data_constraint_layer_state_->get() == Tool::NONE_OPTION_C )
+  {
+    return;
+  }
+
+  LayerHandle layer = LayerManager::Instance()->get_layer_by_id(
+    this->data_constraint_layer_state_->get() );
+  if ( !layer )
+  {
+    CORE_THROW_LOGICERROR( "Data layer '" + this->data_constraint_layer_state_->get() +
+      "' does not exist" );
+  }
+  DataLayer* data_layer = static_cast< DataLayer* >( layer.get() );
+  double min_val = data_layer->get_data_volume()->data_block()->get_min();
+  double max_val = data_layer->get_data_volume()->data_block()->get_max();
+  this->lower_threshold_state_->set_range( min_val, max_val );
+  this->upper_threshold_state_->set_range( min_val, max_val );
+}
+
 void PaintTool::activate()
 {
 }
@@ -446,7 +479,8 @@ void PaintTool::repaint( size_t viewer_id, const Core::Matrix& proj_mat )
   PaintToolPrivate::lock_type lock( this->private_->get_mutex() );
 
   // Don't draw the tool if the viewer is not the one that the tool is currently in.
-  if ( !this->private_->viewer_ || this->private_->viewer_->get_viewer_id() != viewer_id )
+  if ( !this->private_->brush_visible_ || !this->private_->viewer_ || 
+    this->private_->viewer_->get_viewer_id() != viewer_id )
   {
     return;
   }
@@ -542,13 +576,12 @@ void PaintTool::repaint( size_t viewer_id, const Core::Matrix& proj_mat )
 bool PaintTool::handle_mouse_enter( size_t viewer_id )
 {
   this->private_->viewer_ = ViewerManager::Instance()->get_viewer( viewer_id );
-  this->private_->viewer_->set_cursor_visible( false );
   return true;
 }
 
-bool PaintTool::handle_mouse_leave( size_t viewer_id )
+bool PaintTool::handle_mouse_leave( size_t /*viewer_id*/ )
 {
-  this->private_->viewer_->set_cursor_visible( true );
+  this->private_->viewer_->redraw_overlay();
   this->private_->viewer_.reset();
   return true;
 }
@@ -558,6 +591,10 @@ bool PaintTool::handle_mouse_move( const Core::MouseHistory& mouse_history,
 {
   this->private_->center_x_ = mouse_history.current_.x_;
   this->private_->center_y_ = mouse_history.current_.y_;
+  if ( this->private_->brush_visible_ )
+  {
+    this->private_->viewer_->redraw_overlay();
+  }
 
   if ( this->private_->painting_ )
   {
@@ -617,6 +654,8 @@ bool PaintTool::handle_mouse_press( const Core::MouseHistory& mouse_history,
     }
   }
 
+  this->private_->brush_visible_ = this->private_->painting_;
+  this->private_->viewer_->redraw_overlay();
   return this->private_->painting_;
 }
 
@@ -634,6 +673,9 @@ bool PaintTool::handle_mouse_release( const Core::MouseHistory& mouse_history,
       return true;
     }
   }
+  
+  this->private_->brush_visible_ = true;
+  this->private_->viewer_->redraw_overlay();
   return false;
 }
 
@@ -642,17 +684,23 @@ bool PaintTool::handle_wheel( int delta, int x, int y, int buttons, int modifier
   if ( modifiers == Core::KeyModifier::CONTROL_MODIFIER_E &&
     !this->private_->painting_ )
   {
-    PaintToolPrivate::lock_type lock( this->private_->get_mutex() );
-    this->brush_radius_state_->set( this->brush_radius_state_->get() + delta );
+    int brush_radius = this->brush_radius_state_->get() + delta;
+    Core::ActionSet::Dispatch( this->brush_radius_state_, brush_radius );
     return true;
   }
 
-  if ( this->private_->painting_)
+  if ( this->private_->painting_ )
   {
     return true;
   }
   
   return false;
+}
+
+bool PaintTool::post_load_states()
+{
+  this->handle_layers_changed();
+  return true;
 }
 
 } // end namespace Seg3D

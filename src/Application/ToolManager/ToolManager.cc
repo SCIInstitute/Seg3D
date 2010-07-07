@@ -305,7 +305,6 @@ bool ToolManager::pre_save_states()
   this->private_->active_tool_state_->set( this->active_toolid() );
 
   std::vector< std::string > tools_vector;
-  this->private_->tools_state_->set( tools_vector );
 
   for( tool_list_type::iterator it = this->private_->tool_list_.begin(); 
     it != this->private_->tool_list_.end(); ++it )
@@ -349,17 +348,11 @@ bool ToolManager::post_load_states()
     std::string new_tool_id;
     this->open_tool( tools_vector[ j ], new_tool_id, false );
 
-    if( this->get_tool( tools_vector[ j ] ) )
-    {
-      if( !( this->get_tool( tools_vector[ j ] )->load_states( state_values ) ) )
-      {
-        return false;
-      }
-    }
-    else
+    ToolHandle tool = this->get_tool( tools_vector[ j ] );
+    if ( !tool || !( tool->load_states( state_values ) ) )
     {
       return false;
-    }
+    }   
   }
 
   if( this->private_->active_tool_state_->get() != "none" )
@@ -384,14 +377,16 @@ bool ToolManager::pre_load_states()
   return true;
 }
 
-Seg3D::ToolHandle ToolManager::get_tool( const std::string toolid )
+ToolHandle ToolManager::get_tool( const std::string& toolid )
 {
-  return ( *( this->private_->tool_list_.find( toolid ) ) ).second;
+  tool_list_type::iterator it = this->private_->tool_list_.find( toolid );
+  if ( it != this->private_->tool_list_.end() )
+  {
+    return ( *it ).second;
+  }
+  
+  return ToolHandle();
 }
-
-
-
-
 
 
 } // end namespace Seg3D

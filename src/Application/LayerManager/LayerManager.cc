@@ -683,10 +683,16 @@ bool LayerManager::post_load_states()
     this->insert_layer( restored_layer );
   }
 
-  if ( this->active_layer_state_->get().size() > 0 &&
-    this->active_layer_state_->get() !=  "none" )
+  // If there are layers loaded, restore the active layer state
+  if ( this->group_list_.size() > 0 )
   {
-    this->set_active_layer( this->get_layer_by_id( this->active_layer_state_->get() ) );
+    LayerHandle active_layer = this->get_layer_by_id( this->active_layer_state_->get() );
+    if ( !active_layer )
+    {
+      CORE_LOG_ERROR( "Incorrect active layer state loaded from session" );
+      active_layer = this->group_list_.front()->layer_list_.back(); 
+    }
+    this->set_active_layer( active_layer );
   }
 
   return true;

@@ -197,8 +197,10 @@ private:
   // Auto orient the 3D view for the given slice
   void auto_orient( Core::VolumeSliceHandle target_slice );
 
-  void trigger_redraw( bool delay_update = false );
-  void trigger_redraw_overlay( bool delay_update = false );
+  void redraw( bool delay_update = false );
+
+public:
+  void redraw_overlay( bool delay_update = false );
     
 
 private:
