@@ -72,6 +72,11 @@ public:
   void interpolated_paint( int x0, int y0, int x1, int y1, int& paint_count );
   void paint_range( int x0, int y0, int x1, int y1 );
 
+  // UPDATE_VIEWERS:
+  // Cause viewers with the same view mode as the one that contains the paint brush
+  // to redraw overlay to display the current position of the brush.
+  void update_viewers();
+
   bool initialized_;
   bool brush_mask_changed_;
   bool painting_;
@@ -85,6 +90,8 @@ public:
   PaintTool* paint_tool_;
   int center_x_;
   int center_y_;
+  double world_x_;
+  double world_y_;
   std::vector< unsigned char > brush_mask_;
   Core::Texture2DHandle brush_tex_;
   SliceShaderHandle shader_;
@@ -190,7 +197,6 @@ void PaintToolPrivate::initialize()
     this->shader_->enable();
     this->shader_->set_border_width( 2 );
     this->shader_->set_mask_mode( 1 );
-    this->shader_->set_opacity( 1.0f );
     this->shader_->set_slice_texture( 0 );
     this->shader_->set_pattern_texture( 1 );
     this->shader_->set_volume_type( Core::VolumeType::MASK_E );
@@ -222,10 +228,7 @@ void PaintToolPrivate::handle_brush_radius_changed()
   lock_type lock( this->get_mutex() );
   this->build_brush_mask();
   this->brush_mask_changed_ = true;
-  if ( this->viewer_ )
-  {
-    this->viewer_->redraw_overlay();
-  }
+  this->update_viewers();
 }
 
 void PaintToolPrivate::paint( int xc, int yc, int& paint_count )
@@ -329,6 +332,31 @@ void PaintToolPrivate::paint_range( int x0, int y0, int x1, int y1 )
   if ( paint_count > 0)
   {
     this->target_slice_->cache_updated_signal_();
+  }
+}
+
+void PaintToolPrivate::update_viewers()
+{
+  if ( !this->viewer_ || this->viewer_->is_volume_view() )
+  {
+    return;
+  }
+
+  this->viewer_->redraw_overlay();
+  const std::string& view_mode = this->viewer_->view_mode_state_->get();
+  size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
+  for ( size_t i = 0; i < num_of_viewers; i++ )
+  {
+    if ( i == this->viewer_->get_viewer_id() )
+    {
+      continue;
+    }
+
+    ViewerHandle viewer = ViewerManager::Instance()->get_viewer( i );
+    if ( viewer->view_mode_state_->get() == view_mode )
+    {
+      viewer->redraw_overlay();
+    }
   }
 }
 
@@ -481,8 +509,7 @@ void PaintTool::repaint( size_t viewer_id, const Core::Matrix& proj_mat )
   PaintToolPrivate::lock_type lock( this->private_->get_mutex() );
 
   // Don't draw the tool if the viewer is not the one that the tool is currently in.
-  if ( !this->private_->brush_visible_ || !this->private_->viewer_ || 
-    this->private_->viewer_->get_viewer_id() != viewer_id )
+  if ( !this->private_->brush_visible_ || !this->private_->viewer_ )
   {
     return;
   }
@@ -509,15 +536,18 @@ void PaintTool::repaint( size_t viewer_id, const Core::Matrix& proj_mat )
     return;
   }
   
+  float opacity = 1.0f;
+  if ( this->private_->viewer_->get_viewer_id() != viewer_id )
+  {
+    opacity = 0.5f;
+  }
+
   // Compute the position of the brush in world space
   // NOTE: The size of the brush needs to be extended by half of the voxel size in each
   // direction in order to visually align with the target mask layer.
   int radius = this->brush_radius_state_->get();
-  double xpos, ypos;
-  viewer->window_to_world( this->private_->center_x_, this->private_->center_y_,
-    xpos, ypos );
   int i, j;
-  target_slice->world_to_index( xpos, ypos, i, j );
+  target_slice->world_to_index( this->private_->world_x_, this->private_->world_y_, i, j );
   double voxel_width = ( target_slice->right() - target_slice->left() ) / 
     ( target_slice->nx() - 1 );
   double voxel_height = ( target_slice->top() - target_slice->bottom() ) /
@@ -537,6 +567,7 @@ void PaintTool::repaint( size_t viewer_id, const Core::Matrix& proj_mat )
   this->private_->upload_mask_texture();
   
   this->private_->shader_->enable();
+  this->private_->shader_->set_opacity( opacity );
   this->private_->shader_->set_pixel_size( static_cast< float >( 1.0 / brush_screen_width ), 
     static_cast< float >( 1.0 /brush_screen_height ) );
 
@@ -578,12 +609,14 @@ void PaintTool::repaint( size_t viewer_id, const Core::Matrix& proj_mat )
 bool PaintTool::handle_mouse_enter( size_t viewer_id )
 {
   this->private_->viewer_ = ViewerManager::Instance()->get_viewer( viewer_id );
+  this->private_->brush_visible_ = true;
   return true;
 }
 
 bool PaintTool::handle_mouse_leave( size_t /*viewer_id*/ )
 {
-  this->private_->viewer_->redraw_overlay();
+  this->private_->brush_visible_ = false;
+  this->private_->update_viewers();
   this->private_->viewer_.reset();
   return true;
 }
@@ -591,11 +624,19 @@ bool PaintTool::handle_mouse_leave( size_t /*viewer_id*/ )
 bool PaintTool::handle_mouse_move( const Core::MouseHistory& mouse_history, 
                   int button, int buttons, int modifiers )
 {
+  if ( !this->private_->viewer_ || this->private_->viewer_->is_volume_view() )
+  {
+    return false;
+  }
+
   this->private_->center_x_ = mouse_history.current_.x_;
   this->private_->center_y_ = mouse_history.current_.y_;
+  this->private_->viewer_->window_to_world( this->private_->center_x_, 
+    this->private_->center_y_, this->private_->world_x_, this->private_->world_y_ );
+
   if ( this->private_->brush_visible_ )
   {
-    this->private_->viewer_->redraw_overlay();
+    this->private_->update_viewers();
   }
 
   if ( this->private_->painting_ )
@@ -615,8 +656,15 @@ bool PaintTool::handle_mouse_move( const Core::MouseHistory& mouse_history,
 bool PaintTool::handle_mouse_press( const Core::MouseHistory& mouse_history, 
                    int button, int buttons, int modifiers )
 {
+  if ( !this->private_->viewer_ || this->private_->viewer_->is_volume_view() )
+  {
+    return false;
+  }
+
   this->private_->center_x_ = mouse_history.current_.x_;
   this->private_->center_y_ = mouse_history.current_.y_;
+  this->private_->viewer_->window_to_world( this->private_->center_x_, 
+    this->private_->center_y_, this->private_->world_x_, this->private_->world_y_ );
 
   if ( modifiers == Core::KeyModifier::NO_MODIFIER_E &&
     this->target_layer_state_->get() != Tool::NONE_OPTION_C &&
@@ -657,13 +705,18 @@ bool PaintTool::handle_mouse_press( const Core::MouseHistory& mouse_history,
   }
 
   this->private_->brush_visible_ = this->private_->painting_;
-  this->private_->viewer_->redraw_overlay();
+  this->private_->update_viewers();
   return this->private_->painting_;
 }
 
 bool PaintTool::handle_mouse_release( const Core::MouseHistory& mouse_history, 
                    int button, int buttons, int modifiers )
 {
+  if ( !this->private_->viewer_ || this->private_->viewer_->is_volume_view() )
+  {
+    return false;
+  }
+
   if ( this->private_->painting_ )
   {
     if ( ( this->private_->erase_ && button == Core::MouseButton::RIGHT_BUTTON_E ) ||
@@ -677,12 +730,17 @@ bool PaintTool::handle_mouse_release( const Core::MouseHistory& mouse_history,
   }
   
   this->private_->brush_visible_ = true;
-  this->private_->viewer_->redraw_overlay();
+  this->private_->update_viewers();
   return false;
 }
 
 bool PaintTool::handle_wheel( int delta, int x, int y, int buttons, int modifiers )
 {
+  if ( !this->private_->viewer_ || this->private_->viewer_->is_volume_view() )
+  {
+    return false;
+  }
+
   if ( modifiers == Core::KeyModifier::CONTROL_MODIFIER_E &&
     !this->private_->painting_ )
   {
