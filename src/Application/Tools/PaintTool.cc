@@ -192,6 +192,7 @@ void PaintToolPrivate::initialize()
     this->shader_->set_mask_mode( 1 );
     this->shader_->set_opacity( 1.0f );
     this->shader_->set_slice_texture( 0 );
+    this->shader_->set_pattern_texture( 1 );
     this->shader_->set_volume_type( Core::VolumeType::MASK_E );
     this->shader_->disable();
 
@@ -209,6 +210,7 @@ void PaintToolPrivate::upload_mask_texture()
   Core::RenderResources::lock_type lock( Core::RenderResources::GetMutex() );
   int radius = this->paint_tool_->brush_radius_state_->get();
   int brush_size = radius * 2 + 1;
+  glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
   this->brush_tex_->set_image( brush_size, brush_size, GL_ALPHA, &this->brush_mask_[ 0 ],
     GL_ALPHA, GL_UNSIGNED_BYTE );
 
@@ -533,7 +535,7 @@ void PaintTool::repaint( size_t viewer_id, const Core::Matrix& proj_mat )
 
   this->private_->initialize();
   this->private_->upload_mask_texture();
-
+  
   this->private_->shader_->enable();
   this->private_->shader_->set_pixel_size( static_cast< float >( 1.0 / brush_screen_width ), 
     static_cast< float >( 1.0 /brush_screen_height ) );
@@ -547,13 +549,13 @@ void PaintTool::repaint( size_t viewer_id, const Core::Matrix& proj_mat )
     target_mask_layer->color_state_->get() );
   this->private_->shader_->set_mask_color( static_cast< float >( color.r() / 255 ), 
     static_cast< float >( color.g() / 255 ), static_cast< float >( color.b() / 255 ) );
-
+  
   glPushAttrib( GL_TRANSFORM_BIT );
   glMatrixMode( GL_PROJECTION );
   glPushMatrix();
   glLoadIdentity();
   glMultMatrixd( proj_mat.data() );
-
+  
   glBegin( GL_QUADS );
     glTexCoord2f( 0.0f, 0.0f );
     glVertex2d( left, bottom );
@@ -568,9 +570,9 @@ void PaintTool::repaint( size_t viewer_id, const Core::Matrix& proj_mat )
   this->private_->brush_tex_->unbind();
   Core::Texture::SetActiveTextureUnit( old_tex_unit );
   this->private_->shader_->disable();
-
   glPopMatrix();
   glPopAttrib();
+  glFinish();
 }
 
 bool PaintTool::handle_mouse_enter( size_t viewer_id )
