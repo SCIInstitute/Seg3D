@@ -219,7 +219,9 @@ public:
         source = ActionSource::NONE_E;
       }
       value_ = value;
-      value_changed_signal_( value_, source );
+      // NOTE: Unlock before triggering signals
+      lock.unlock();
+      value_changed_signal_( value, source );
       state_changed_signal_();
     }
     return ( true );

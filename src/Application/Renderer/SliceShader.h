@@ -33,6 +33,7 @@
 #include <boost/utility.hpp>
 
 #include <Core/Graphics/GLSLProgram.h>
+#include <Core/Utils/Lockable.h>
 
 namespace Seg3D
 {
@@ -40,7 +41,7 @@ namespace Seg3D
 class SliceShader;
 typedef boost::shared_ptr< SliceShader > SliceShaderHandle;
 
-class SliceShader : public boost::noncopyable
+class SliceShader : public Core::Lockable
 {
 public:
   SliceShader();

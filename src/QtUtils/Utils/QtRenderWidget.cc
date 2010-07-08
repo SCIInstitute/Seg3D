@@ -86,7 +86,8 @@ static void UpdateDisplay( QtRenderWidgetWeakHandle qpointer )
 
   if ( !qpointer.isNull() )
   {
-    qpointer->repaint();
+//    qpointer->repaint();
+    qpointer->updateGL();
   }
 }
 
