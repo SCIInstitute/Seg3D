@@ -61,40 +61,48 @@ Q_SIGNALS:
 public:
   LayerWidget( QFrame* parent, LayerHandle layer );
   virtual ~LayerWidget();
+
+// -- update functions --
+public:
+  // ENABLE_BUTTONS:
+  // Specify which buttons need to be enabled for the user
+  void enable_buttons( bool lock_button, bool other_buttons, bool initialize = false);
+
+  // SET_ACTIVE_MENU:
+  // Setup which menu is currently shown
+  void set_active_menu( std::string& menu_state, bool override, bool initialize = false );
+
+  // UPDATE_APPEARANCE:
+  // Update the appearance of the widget to reflect its state
+  void update_appearance( bool locked, bool active, bool initialize = false);
+
+  // UPDATE_WIDGET_STATE:
+  // Update the button state, the open menus and color of the widget
+  void update_widget_state( bool initialize = false );
     
 // -- widget internals --
 public Q_SLOTS:
-  // SHOW_OPACITY_BAR:
-  // this function is called when the opacity button is clicked, it hides any bars that might be
-  // open and hides or shows the opacity bar
-  void show_opacity_bar( bool show );
+  // SELECT_OPACITY_BAR:
+  void select_opacity_bar( bool show );
 
-  // SHOW_BRIGHTNESS_CONTRAST_BAR:
-  // this function is called when the brightness contrast button is clicked, it hides any bars that might be
-  // open and hides or shows the brightness contrast bar
-  void show_brightness_contrast_bar( bool show );
+  // SELECT_BRIGHTNESS_CONTRAST_BAR:
+  void select_brightness_contrast_bar( bool show );
 
-  // SHOW_BORDER_FILL_BAR:
-  // this function is called when the border fill button is clicked, it hides any bars that might be
-  // open and hides or shows the border fill bar
-  void show_border_fill_bar( bool show );
+  // SELECT_BORDER_FILL_BAR:
+  void select_border_fill_bar( bool show );
 
-  // SHOW_COLOR_BAR:
-  // this function is called when the color button is clicked, it hides any bars that might be
-  // open and hides or shows the color bar
-  void show_color_bar( bool show );
+  // SELECT_COLOR_BAR:
+  void select_color_bar( bool show );
 
+  // SELECT_VISUAL_LOCK:
+  void select_visual_lock( bool lock );
+
+public:
   // SHOW_PROGRESS_BAR:
   // this function is called when work is being done on the layer, it hides any bars that might be
   // open and hides or shows the progress bar
   void show_progress_bar( bool show );
-
-  // VISUAL_LOCK:
-  // this function is called when the layer is locked, it locks the gui representation of the layer
-  // and also makes it so that you cannot access it for making changes
-  void visual_lock( bool lock );
   
-public:
   // SHOW_SELECTION_CHECKBOX:
   // this function is called when the user opens a group menu so that the layer's selection
   // checkbox can be accessed
@@ -105,11 +113,11 @@ public:
   // stylesheet of the layer appropriately
   void set_active( bool active );
 
-  // SET_DROP:
+  // ENABLE_DROP_SPACE:
   // this function is called when a drag enter or leave event is triggered and it calls hide
   // or show on the dropspace to make it look like there is a space for the user to drop the
   // dragged layer
-  void set_drop( bool drop );
+  void enable_drop_space( bool drop );
 
   // SEETHROUGH:
   // this function is called when the user clicks on a layer to drag it.  It sets the stylesheet
@@ -122,7 +130,7 @@ public:
 
   // SET_PICKED_UP:
   // this function is called to set or unset the state of picked_up_
-  void set_picked_up( bool up ){ this->picked_up_ = up; }
+  void set_picked_up( bool up );
 
   // PREP_FOR_ANIMATION:
   // this function hides the actual widgets and substitutes them for images to make drag and drop
@@ -132,37 +140,23 @@ public:
 public:
   // GET_VOLUME_TYPE:
   // this function returns the type volume that the layerwidget represents
-  int get_volume_type(){ return this->volume_type_; }
+  int get_volume_type() const;
 
   // GET_LAYER_ID:
   // this function returns the id of the layer that the layerwidget represents
-  std::string& get_layer_id(){ return this->layer_id_; }
+  std::string get_layer_id() const;
 
-
-  
 private:
     boost::shared_ptr< LayerWidgetPrivate > private_;
 
 private:
   // icons to represent the layer types
-  QIcon data_layer_icon_;
-  QIcon label_layer_icon_;
-  QIcon mask_layer_icon_;
-  
-  // these member variables are for keeping track locally of the layer settings
-  std::string layer_id_;
-  Core::GridTransform grid_transform_;
-  Core::VolumeType volume_type_;
 
+  
   // these member variables are for keeping track of the states of the layers so that they can
   // be represented properly in the gui
-  bool active_;
-  bool picked_up_;
   bool layer_menus_open_;
   bool group_menus_open_;
-  
-  
-  LayerWidget* drop_layer_;
 
   // SET_DROP_TARGET:
   // this function is for keeping track of which layer the drop is going to happen on
@@ -196,6 +190,13 @@ private Q_SLOTS:
 
 protected:
   void resizeEvent( QResizeEvent *event );
+  
+public:
+  typedef QPointer< LayerWidget > qpointer_type;
+
+  // UPDATESTATE:
+  // Entry point for the state engine to notify state has changed
+  static void UpdateState( qpointer_type qpointer );
 
 };
 

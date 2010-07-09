@@ -57,10 +57,11 @@ public:
 
   // GET_MUTEX:
   // Get access to the mutex protecting this MaskVolume
-  virtual mutex_type& get_mutex() const
-  {
-    return this->mask_data_block_->get_mutex();
-  }
+  virtual mutex_type& get_mutex();
+  
+  // GET_GENERATION:
+  // Get the  generation number of the data volume
+  virtual DataBlock::generation_type get_generation() const;
 
   // -- functions for creating MaskVolumeHandle's --
 public: 
@@ -87,6 +88,10 @@ public:
 private:
   // Handle to where the mask volume is really stored
   MaskDataBlockHandle mask_data_block_;
+  
+  // Mutex for a volume without a data block associated with it
+  // NOTE: This is use to set up a new layer that is still contructing its data
+  mutex_type invalid_mutex_;
   
 };
 

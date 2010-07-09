@@ -108,6 +108,8 @@ NrrdData::~NrrdData()
   {
     nrrdNix( this->private_->nrrd_ );
   }
+  
+  this->private_->data_block_.reset();
 }
 
 Nrrd* NrrdData::nrrd() const
@@ -336,7 +338,7 @@ void NrrdData::set_transform( Transform& transform )
   transform.get( Trans );
   for ( int p = 0; p < 3; p++ )
   {
-    this->private_->nrrd_->spaceOrigin[ p ] = Trans[ 3 + 4 * p ];
+    this->private_->nrrd_->spaceOrigin[ p ] = Trans[ 12 + p ];
     for ( size_t q = 0; q < this->private_->nrrd_->dim; q++ )
     {
       this->private_->nrrd_->axis[ q ].spaceDirection[ p ] = Trans[ q + 4 * p ];

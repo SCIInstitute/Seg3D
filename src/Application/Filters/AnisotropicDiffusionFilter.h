@@ -1,22 +1,22 @@
 /*
  For more information, please see: http://software.sci.utah.edu
- 
+
  The MIT License
- 
+
  Copyright (c) 2009 Scientific Computing and Imaging Institute,
  University of Utah.
- 
- 
+
+
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
  the rights to use, copy, modify, merge, publish, distribute, sublicense,
  and/or sell copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included
  in all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -26,39 +26,49 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_APPINTERFACE_PUSHDRAGBUTTON_H
-#define INTERFACE_APPINTERFACE_PUSHDRAGBUTTON_H
+#ifndef APPLICATION_FILTER_ANISOTROPICDIFFUSIONFILTER_H
+#define APPLICATION_FILTER_ANISOTROPICDIFFUSIONFILTER_H
 
-// QT includes
-#include <QtGui/QPushButton>
-#include <QtGui/QMouseEvent>
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+#pragma once
+#endif
 
-
-
+// Application includes
+#include <Application/Filters/Filter.h>
 
 namespace Seg3D
 {
 
-class PushDragButton :
-  public QPushButton
-{
-Q_OBJECT
-  
-public:
-  PushDragButton( QWidget *parent );
-  virtual ~PushDragButton();
+// Forward Declaration
+class AnisotropicDiffusionFilter;
 
-  // SET_ENABLED:
-  // Set whether the button detect clicks or is only draggable
-  void set_enabled( bool enabled );
+// Class definition
+class AnisotropicDiffusionFilter : public Filter
+{
+
+  // -- Constructor/destructor --
+public:
+
+  Filter();
+  virtual ~Filter();
+
+public:
+  // START:
+  // Start the filter on a separate thread
+  bool start( LayerHandle layer );
+      
+protected:
+
+  // RUN_FILTER:
+  // The actual implementation of the filter
+  virtual bool run_filter( LayerHandle layer ) = 0;
 
 private:
-  virtual void mousePressEvent( QMouseEvent *event );
+  // Function for running the separate thread
+  static void RunFilter( FilterHandle filter, LayerHandle layer );
 
-  // Record whether the button is active
-  bool enabled_;
 };
 
 } // end namespace Seg3D
 
-#endif //INTERFACE_APPINTERFACE_PUSHDRAGBUTTON_H
+#endif

@@ -58,7 +58,6 @@ namespace Seg3D
 // CLASS Layer
 // This is the main class for collecting state information on a layer
 
-
 // Class definition
 class Layer : public Core::StateHandler
 {
@@ -88,36 +87,20 @@ public:
 
   // -- layer progress signals --
 public:
-  // NOTE: Layers can be locked and unlock to use as a source 
-  // (No alterations are made) or layers can be locked for filtering
-  // in which case progress on the new layer is reported as well
+  typedef boost::signals2::signal< void ( bool ) > lock_signal_type;
   
-  typedef boost::signals2::signal< void () > lock_signal_type;
-  typedef boost::signals2::signal< void () > unlock_signal_type;
-  
-  typedef boost::signals2::signal< void () > start_progress_signal_type;
-  typedef boost::signals2::signal< void () > finish_progress_signal_type;
   typedef boost::signals2::signal< void (double) > update_progress_signal_type;
 
-  // LOCK_SIGNAL:
-  // The layer is being locked
-  lock_signal_type lock_signal_;
-  
-  // UNLOCK_SIGNAL:
-  // The layer is being unlocked
-  unlock_signal_type unlock_signal_;
-  
+  // DATA_LOCK_SIGNAL:
+  // This signal is triggered when the data contained in the layer is locked from being
+  // modified (bool = true), or when the data is unlocked (bool = false). This also means 
+  // that the layer cannot be used in any filter.
+  lock_signal_type data_lock_signal_;
 
-  // START_PROGRESS_SIGNAL:
-  // This signal is raised when a filter starts updating the layer
-  start_progress_signal_type start_progress_signal_;
-  
-  // FINISH_PROGRESS_SIGNAL:
-  // This signal is raised when a filter finishes updating a layer
-  finish_progress_signal_type finish_progress_signal_;
-  
   // UPDATE_PROGRESS:
-  // When new information on progress is available this signal is triggered.
+  // When new information on progress is available this signal is triggered. If this signal is 
+  // triggered it should end with a value 1.0 indicating that progress reporting has finised.
+  // Progress is measured between 0.0 and 1.0.
   update_progress_signal_type update_progress_signal_;
 
   // -- layer updated signal --
@@ -161,7 +144,7 @@ public:
   std::vector< Core::StateBoolHandle > visible_state_;
 
   // State indicating whether the layer is locked
-  Core::StateBoolHandle lock_state_;
+  Core::StateBoolHandle visual_lock_state_;
 
   // State that describes the opacity with which the layer is displayed
   Core::StateRangedDoubleHandle opacity_state_;
@@ -171,14 +154,19 @@ public:
   Core::StateBoolHandle selected_state_;
 
   // State that describes which menu is currently shown
-  Core::StateOptionHandle edit_mode_state_;
+  Core::StateOptionHandle menu_state_;
+
+  // State that stores the current layer state
+  Core::StateOptionHandle data_state_;
 
 /*  Core::StateBoolHandle active_state_;*/
 
 protected:
   // State that stores the generation of its datablock
   Core::StateIntHandle generation_state_;
-
+  
+  // State that stores the last action that was played
+  Core::StateStringHandle last_action_state_;
 
   // -- Accessors --
 public:
@@ -191,16 +179,6 @@ public:
   // Set the group this layer is contained within
   void set_layer_group( LayerGroupWeakHandle layer_group );
   
-  // TODO: Need to check whether we really need to store whether layer is active here,
-  // as it duplicates state information and allows for synchronization problems
-  // --JS
-  
-//  bool get_active();
-//  void set_active( bool active );
-  
-  void set_moving( bool moving ){ this->is_moving_ = moving; }
-  bool check_moving(){ return this->is_moving_; }
-  
   // GET_LAYER_ID:
   // Get the id of this layer
   std::string get_layer_id() const;
@@ -210,14 +188,9 @@ public:
   std::string get_layer_name() const;
   
 private:  
-  // The unique ID of the layer
-
+  // Handle to the layer group (this one needs to be weak to ensure objects are not persistent
+  // due to a circular dependency)
   LayerGroupWeakHandle layer_group_;
-  
-  bool is_moving_;
-
-  // TODO: At some point we should move this one
-  //bool active_;
 
   // -- Locking system --
 public:
@@ -228,7 +201,21 @@ public:
   // GETMUTEX:
   // Get the mutex of the state engine
   static mutex_type& GetMutex();
+
+public:
+
+  // Options for the state of the data inside of the layer
+  const static std::string CREATING_C;
+  const static std::string PROCESSING_C;
+  const static std::string AVAILABLE_C;
+  const static std::string IN_USE_C;
   
+  // Options for the state of the menus that are open in the layer manager
+  const static std::string NO_MENU_C;
+  const static std::string OPACITY_MENU_C;
+  const static std::string COLOR_MENU_C;
+  const static std::string CONTRAST_MENU_C;
+  const static std::string APPEARANCE_MENU_C;
 };
 
 } // end namespace Seg3D

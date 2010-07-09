@@ -44,12 +44,36 @@ MaskVolume::MaskVolume( const GridTransform& grid_transform,
 MaskVolume::MaskVolume( const GridTransform& grid_transform ) :
   Volume( grid_transform )
 {
-    MaskDataBlockManager::Instance()->create( grid_transform, mask_data_block_ );
+    MaskDataBlockManager::Instance()->create( grid_transform, this->mask_data_block_ );
 }
 
 VolumeType MaskVolume::get_type() const
 {
   return VolumeType::MASK_E;
+}
+
+DataBlock::generation_type MaskVolume::get_generation() const
+{
+  if ( this->mask_data_block_ )
+  {
+    return this->mask_data_block_->get_data_block()->get_generation();
+  }
+  else
+  {
+    return -1;
+  }
+}
+
+MaskVolume::mutex_type& MaskVolume::get_mutex()
+{
+  if ( this->mask_data_block_ )
+  {
+    return this->mask_data_block_->get_mutex();
+  }
+  else
+  {
+    return this->invalid_mutex_;
+  }
 }
 
 MaskDataBlockHandle MaskVolume::mask_data_block() const

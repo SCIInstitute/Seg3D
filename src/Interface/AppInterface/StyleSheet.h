@@ -78,7 +78,7 @@ public:
     const static QString LAYER_WIDGET_BASE_ACTIVE_C;
     // - INACTIVE - //
     const static QString LAYER_WIDGET_BASE_INACTIVE_C;
-    const static QString LAYER_WIDGET_LABEL_C;
+    const static QString LAYER_WIDGET_LABEL_INACTIVE_C;
     // - DROP - //
     const static QString LAYER_WIDGET_BASE_DROP_C;
     // - PICKED-UP - //
@@ -91,6 +91,7 @@ public:
   // === LayerGroupWidget Styles === //
     // - ACTIVE - //
     const static QString GROUP_WIDGET_BASE_ACTIVE_C;
+    const static QString LAYER_WIDGET_LABEL_ACTIVE_C;   
     const static QString GROUP_WIDGET_BACKGROUND_ACTIVE_C;
     const static QString GROUP_WIDGET_ACTIVATE_BUTTON_ACTIVE_C;
     // - INACTIVE - //

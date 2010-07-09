@@ -41,19 +41,19 @@ namespace Seg3D
 bool ActionMoveLayerAbove::validate( Core::ActionContextHandle& context )
 {
 
-  //if ( !( Core::StateEngine::Instance()->is_stateid( this->layer_to_move_id_.value() ) ) )
-  //{
-  //  context->report_error( std::string( "LayerID '" ) + this->layer_to_move_id_.value()
-  //    + "' is invalid" );
-  //  return false;
-  //}
-  //
-  //if ( !( Core::StateEngine::Instance()->is_stateid( this->layer_below_id_.value() ) ) )
-  //{
-  //  context->report_error( std::string( "LayerID '" ) + this->layer_below_id_.value()
-  //    + "' is invalid" );
-  //  return false;
-  //}
+  if ( ! LayerManager::Instance()->get_layer_by_id( this->layer_to_move_id_.value() ) )
+  {
+    context->report_error( std::string( "LayerID '" ) + this->layer_to_move_id_.value()
+      + "' is invalid" );
+    return false;
+  }
+  
+  if ( ! LayerManager::Instance()->get_layer_by_id( this->target_layer_id_.value() ) )
+  {
+    context->report_error( std::string( "LayerID '" ) + this->target_layer_id_.value()
+      + "' is invalid" );
+    return false;
+  }
 
   return true;
 }
@@ -61,26 +61,31 @@ bool ActionMoveLayerAbove::validate( Core::ActionContextHandle& context )
 bool ActionMoveLayerAbove::run( Core::ActionContextHandle& context, 
                  Core::ActionResultHandle& result )
 {
-  //if ( ( Core::StateEngine::Instance()->is_stateid( this->layer_to_move_id_.value() ) ) && 
-  //  ( Core::StateEngine::Instance()->is_stateid( this->layer_below_id_.value() ) ) )
-  {
-    LayerManager::Instance()->move_layer_above( this->layer_to_move_id_.value(), 
-      this->layer_below_id_.value() );
-    return true;
+  if ( this->move_above_.value() )
+  { 
+    LayerManager::Instance()->move_layer_above( 
+      LayerManager::Instance()->get_layer_by_id( this->layer_to_move_id_.value() ),
+      LayerManager::Instance()->get_layer_by_id( this->target_layer_id_.value() ) );
   }
-
-  return false;
+  else
+  {
+    LayerManager::Instance()->move_layer_below( 
+      LayerManager::Instance()->get_layer_by_id( this->layer_to_move_id_.value() ),
+      LayerManager::Instance()->get_layer_by_id( this->target_layer_id_.value() ) );  
+  }
+  return true;
 }
 
 Core::ActionHandle ActionMoveLayerAbove::Create( const std::string& layer_to_move_id, 
-  const std::string& layer_below_id )
+  const std::string& target_layer_id, bool move_above )
 {
   // Create new action
   ActionMoveLayerAbove* action = new ActionMoveLayerAbove;
   
   // We need to fill in these to ensure the action can be replayed
-  action->layer_below_id_.value() = layer_below_id;
   action->layer_to_move_id_.value() = layer_to_move_id;
+  action->target_layer_id_.value() = target_layer_id;
+  action->move_above_.value() = move_above;
   
   // Post the new action
   return Core::ActionHandle( action );
@@ -88,9 +93,9 @@ Core::ActionHandle ActionMoveLayerAbove::Create( const std::string& layer_to_mov
 
 
 void ActionMoveLayerAbove::Dispatch( const std::string& layer_to_move_id, 
-  const std::string& layer_below_id )
+  const std::string& layer_below_id, bool move_above )
 {
-  Core::Interface::PostAction( Create( layer_to_move_id, layer_below_id ) );
+  Core::Interface::PostAction( Create( layer_to_move_id, layer_below_id, move_above ) );
 }
   
 } // end namespace Seg3D

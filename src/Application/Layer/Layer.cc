@@ -44,11 +44,21 @@
 namespace Seg3D
 {
 
+const std::string Layer::CREATING_C( "creating" );
+const std::string Layer::PROCESSING_C( "processing" );
+const std::string Layer::AVAILABLE_C( "available" );
+const std::string Layer::IN_USE_C( "inuse" );
+
+const std::string Layer::NO_MENU_C( "none" );
+const std::string Layer::OPACITY_MENU_C( "opacity" );
+const std::string Layer::COLOR_MENU_C( "color" );
+const std::string Layer::CONTRAST_MENU_C( "contrast" );
+const std::string Layer::APPEARANCE_MENU_C( "appearance" );
+
 Layer::Layer( const std::string& name, size_t version_number ) :
   StateHandler( "layer", version_number, true )
 { 
   this->initialize_states( name );
-  this->is_moving_ = false;
     
   // == Resource locking ==
   resource_lock_ = Core::ResourceLockHandle( new Core::ResourceLock( get_statehandler_id() ) );
@@ -58,7 +68,6 @@ Layer::Layer( const std::string& name, size_t version_number, const std::string&
   StateHandler( state_id, version_number, false )
 {
   this->initialize_states( name );
-  this->is_moving_ = false;
 
   // == Resource locking ==
   resource_lock_ = Core::ResourceLockHandle( new Core::ResourceLock( get_statehandler_id() ) );
@@ -109,35 +118,37 @@ void Layer::initialize_states( const std::string& name )
   this->add_state( "name", name_state_, name );
 
   // == Visibility information for this layer per viewer ==
-  size_t num_viewers = ViewerManager::Instance()->number_of_viewers();
-  this->visible_state_.resize( num_viewers );
-
-  for ( size_t j = 0; j < visible_state_.size(); j++ )
+  this->visible_state_.resize( ViewerManager::Instance()->number_of_viewers() );
+  for ( size_t j = 0; j < this->visible_state_.size(); j++ )
   {
-    std::string key = std::string( "visible" ) + Core::ExportToString( j );
-    this->add_state( key, visible_state_[ j ], true );
+    this->add_state( std::string( "visible" ) + Core::ExportToString( j ), 
+      this->visible_state_[ j ], true );
   }
 
   // == The state of the lock ==
-  this->add_state( "lock", lock_state_, false );
+  this->add_state( "visual_lock", visual_lock_state_, false );
 
   // == The opacity of the layer ==
-  this->add_state( "opacity", opacity_state_, PreferencesManager::Instance()->default_layer_opacity_state_->get(), 0.0, 1.0, 0.01 );
+  this->add_state( "opacity", opacity_state_, 
+    PreferencesManager::Instance()->default_layer_opacity_state_->get(), 0.0, 1.0, 0.01 );
 
   // == Selected by the LayerGroup ==
   this->add_state( "selected", selected_state_, false );
 
-//  // == Selected by the LayerGroup ==
-//  this->add_state( "active", active_state_, false );
-
   // == Which of the submenus is being editted ==
-  this->add_state( "edit_mode", edit_mode_state_, "none", "none|opacity|color|contrast|appearance" );
+  this->add_state( "menu", menu_state_, NO_MENU_C, NO_MENU_C + "|" + OPACITY_MENU_C + 
+    "|" + COLOR_MENU_C + "|" + CONTRAST_MENU_C + "|" + APPEARANCE_MENU_C );
 
+  // == The generation number of the data, or -1 if there is no data =
   this->add_state( "generation", this->generation_state_, -1 );
+
+  // == The last action that was run on this layer ==
+  this->add_state( "last_action", this->last_action_state_, "" );
+  
+  // == The layer state indicating whether data is bein processed ==
+  this->add_state( "data", this->data_state_,  AVAILABLE_C , 
+    AVAILABLE_C + "|" + CREATING_C + "|" + PROCESSING_C + "|" + IN_USE_C );
 }
-
-
-
 
 } // end namespace Seg3D
 

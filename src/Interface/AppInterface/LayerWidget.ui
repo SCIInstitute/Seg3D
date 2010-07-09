@@ -50,7 +50,7 @@ QLineEdit#label_:focus{
   background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(0, 0, 0, 50), stop:0.3 rgba(0, 0, 0, 100), stop:0.7 rgba(0, 0, 0, 100), stop:1 rgba(0, 0, 0, 50));
 }*/
 
-QWidget#typeBackground_{
+QWidget#type_{
   background-color: rgb(255, 128, 0);
   border-radius: 3px;
   border: 1px solid rgba(165, 165, 165, 200);
@@ -197,7 +197,7 @@ QPushButton#activate_button_{
           </widget>
          </item>
          <item>
-          <widget class="QWidget" name="typeBackground_" native="true">
+          <widget class="QWidget" name="type_" native="true">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
              <horstretch>0</horstretch>

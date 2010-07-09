@@ -34,10 +34,13 @@ namespace Core
 Volume::Volume( const GridTransform& grid_transform ) :
   grid_transform_( grid_transform )
 {
+  // Cache size for faster indexing into the volume
   this->nx_ = this->grid_transform_.get_nx();
   this->ny_ = this->grid_transform_.get_ny();
   this->nz_ = this->grid_transform_.get_nz();
+  this->nxy_ = this->nx_ * this->ny_;
 
+  // Compute the inverse transform asw well.
   this->inverse_grid_transform_ = this->grid_transform_.transform().get_inverse();
 }
 

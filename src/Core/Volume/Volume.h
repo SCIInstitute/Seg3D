@@ -81,13 +81,20 @@ public:
   // Get the type of the data layer
   virtual VolumeType get_type() const = 0;
 
+  virtual DataBlock::generation_type get_generation() const = 0;
+
+  bool is_valid() const
+  {
+    return this->get_generation() != -1;
+  }
+
   // GET_GRID_TRANSFORM
   // Get the grid location
   const GridTransform& get_grid_transform() const
   {
     return this->grid_transform_;
   }
-
+  
   // GET_NX, GET_NY, GET_NZ, GET_SIZE
   // The volume dimensions
   inline size_t get_nx() const
@@ -110,16 +117,26 @@ public:
     return this->nx_ * this->ny_ * this->nz_;
   }
 
+
+  // TO_INDEX:
+  // Compute the index into the data blcok based on a coordinate in index space
   inline size_t to_index( size_t x, size_t y, size_t z ) const
   {
     assert( x < this->nx_ && y < this->ny_ && z < this->nz_ );
-    return z * this->nx_ * this->ny_ + y * this->nx_ + x;
+    return z * this->nxy_ + y * this->nx_ + x;
   }
   
+  // APPLY_GRID_TRANSFORM:
+  // Compute corresponding point in world coordinates
   Point apply_grid_transform( const Point& pt ) const;
+
+  // APPLY_INVERSE_GRID_TRANSFORM:
+  // Compute corresponding point in index coordinates
   Point apply_inverse_grid_transform( const Point& pt ) const;
 
-  virtual mutex_type& get_mutex() const = 0;
+  // GET_MUTEX:
+  // Get the mutex that protects this resource
+  virtual mutex_type& get_mutex() = 0;
 
   // -- internals of volume --
 private:
@@ -128,13 +145,15 @@ private:
   // NOTE: Currently only axis aligned transforms are allowed
   GridTransform grid_transform_;
 
+  // A precomputed transform in
   Transform inverse_grid_transform_;
 
-  // Cached size information of the GridTransform
+  // Cached size information of the GridTransform for fast indexing into the volume
   size_t nx_;
   size_t ny_;
   size_t nz_;
-
+  size_t nxy_;
+  
 };
 
 } // end namespace Core

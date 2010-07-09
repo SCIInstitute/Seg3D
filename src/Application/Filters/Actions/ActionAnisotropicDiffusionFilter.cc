@@ -37,11 +37,36 @@ CORE_REGISTER_ACTION( Seg3D, AnisotropicDiffusionFilter )
 
 namespace Seg3D
 {
+
+// --------------------------------------------------------------
+
+/*
+class AnisotropicDiffusionFilterImplementation : public FilterImplementation {
+
+  // -- Constructor/destructor --
+public:
+
+  AnisotropicDiffusionFilterImplementation();
+  virtual ~AnisotropicDiffusionFilterImplementation();
+
+public:
+  // RUN_FILTER:
+  // The actual implementation of the filter
+  virtual bool run_filter( LayerHandle layer ) = 0;
+
+};
+*/
+
+// --------------------------------------------------------------
+
   
 bool ActionAnisotropicDiffusionFilter::validate( Core::ActionContextHandle& context )
 {
+/*
+  // Find the layer in the LayerManager
   this->layer_.handle() = LayerManager::Instance()->get_layer_by_id( this->layer_id_.value() );
 
+  // If the layer cannot be found the handle will be empty
   if ( ! this->layer_.handle() )
   {
     context->report_error( std::string( "LayerID '" ) + this->layer_id_.value() +
@@ -49,33 +74,47 @@ bool ActionAnisotropicDiffusionFilter::validate( Core::ActionContextHandle& cont
     return false;
   }
   
+  // If the number of iterations is lower than one, we cannot run the filter
   if( this->iterations_.value() < 1 )
   {
     context->report_error( "The number of iterations needs to be larger than zero." );
     return false;
   }
   
+  // If the number of integration steps is smaller than one we cannot run the filter
   if( this->integration_step_.value() < 1 )
   {
     context->report_error( "The integration step needs to be larger than zero." );
     return false;
   }
   
+  // Conductance needs to be a positive number
   if( this->conductance_.value() < 0.0 )
   {
     context->report_error( "The conductance needs to be larger than zero." );
     return false;
   }
-  
+*/  
   return true;
 }
 
 bool ActionAnisotropicDiffusionFilter::run( Core::ActionContextHandle& context, 
   Core::ActionResultHandle& result )
 {
-  // TODO: run filter
-  context->report_message( std::string( "The AnisotropicDiffusionFilter has been triggered "
-    "successfully on layer: " ) + this->layer_.handle()->name_state_->get() );
+/*
+  FilterImplementationHandle filter( new AnisotropicDiffusionFilterImplementation );
+  
+  LayerHandle src_layer = this->layer_.handle();
+  LayerHandle dst_layer = src_layer;
+  
+  if ( !( action->replace_.value() ) )
+  {
+    dst_layer = LayerManager::( src_layer );
+  }
+    
+  filter->add_src_layer( src_layer );
+  filter->set_dst_layer( dst_layer );
+*/
   return true;
 }
 
@@ -83,6 +122,7 @@ bool ActionAnisotropicDiffusionFilter::run( Core::ActionContextHandle& context,
 Core::ActionHandle ActionAnisotropicDiffusionFilter::Create( std::string layer_id, int iterations, 
   int integration_step, double conductance, bool replace )
 {
+
   // Create a new action
   ActionAnisotropicDiffusionFilter* action = new ActionAnisotropicDiffusionFilter;
 

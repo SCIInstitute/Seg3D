@@ -55,15 +55,41 @@ VolumeType DataVolume::get_type() const
 
 NrrdDataHandle DataVolume::convert_to_nrrd()
 {
-  NrrdDataHandle nrrd_data( new NrrdData( data_block_, get_grid_transform().transform() ) );
-  return nrrd_data;
+  if ( this->data_block_ )
+  {
+    NrrdDataHandle nrrd_data( new NrrdData( this->data_block_, get_grid_transform().transform() ) );
+    return nrrd_data;
+  }
+  else
+  {
+       NrrdDataHandle handle;
+    return handle;
+  }
 }
 
 DataBlock::generation_type DataVolume::get_generation() const
-{
-  return this->data_block_->get_generation();
+{ 
+  if ( this->data_block_ )
+  {
+    return this->data_block_->get_generation();
+  }
+  else
+  {
+    return -1;
+  }
 }
 
+DataVolume::mutex_type& DataVolume::get_mutex()
+{
+  if ( this->data_block_ )
+  {
+    return this->data_block_->get_mutex();
+  }
+  else
+  {
+    return this->invalid_mutex_;
+  }
+}
 
 bool DataVolume::LoadDataVolume( const boost::filesystem::path& filename, 
                 DataVolumeHandle& volume, std::string& error )

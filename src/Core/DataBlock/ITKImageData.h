@@ -99,6 +99,7 @@ public:
   // GET_DATA_TYPE:
   // Get the data type of the nrrd
   virtual DataType get_data_type() const = 0;
+  
 };
 
 // Forward declaration
@@ -237,7 +238,8 @@ ITKImageDataT<T>::ITKImageDataT( DataBlockHandle data_block, Transform transform
 template<class T>
 ITKImageDataT<T>::~ITKImageDataT()
 {
-  // Do nothing: everything is handle by smart pointers
+  itk_image_ = 0;
+  this->data_block_.reset();
 }
 
 template<class T>
@@ -267,21 +269,20 @@ bool ITKImageDataT<T>::initialize( DataBlockHandle data_block, Transform transfo
   
   // Step (3) : copy the dimensions of the data block
   typename image_type::RegionType region;
-  region[0] = data_block->get_nx();
-  region[1] = data_block->get_ny();
-  region[2] = data_block->get_nz();
-  
+  region.setSize( 0, data_block->get_nx() );
+  region.setSize( 1, data_block->get_ny() );
+  region.setSize( 2, data_block->get_nz() );
   itk_image_->setRegions( region );
 
   // Step (4) : Wrap our data into an ITK pixel container
   typename image_type::PixelContainerPointer pixel_container = 
-    typename image_type::PixelContainerPointer::New();
+    image_type::PixelContainerPointer::New();
   
-  pixel_container->SetImporterPointer( reinterpret_cast<T*>( data_block->get_data() ),
-    static_cast<typename image_type::PixelContainerPointer::TElementIdentifier >
+  pixel_container->SetImportPointer( reinterpret_cast<T*>( data_block->get_data() ),
+    static_cast<typename image_type::PixelContainer::ElementIdentifier >
     ( data_block->get_size() ), false );
 
-  itk_image_->setPixelContainer( pixel_container );
+  itk_image_->SetPixelContainer( pixel_container );
 
   // Step (5) : Add the transformation to the itk data
   set_transform( transform );

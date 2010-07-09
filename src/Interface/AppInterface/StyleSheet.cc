@@ -144,21 +144,21 @@ namespace Seg3D
   
   // - Volume Type Colors - //
   const QString StyleSheet::DATA_VOLUME_COLOR_C = QString::fromUtf8(
-    "QWidget#typeBackground_{"
+    "QWidget#type_{"
     " background-color: rgb(90, 90, 90);"
     "}");
   const QString StyleSheet::MASK_VOLUME_COLOR_C = QString::fromUtf8(
-    "QWidget#typeBackground_{"
+    "QWidget#type_{"
     " background-color: rgb(237, 149, 31);"
     "}");
   const QString StyleSheet::LABEL_VOLUME_COLOR_C = QString::fromUtf8(
-    "QWidget#typeBackground_{ background-color: rgb(90, 90, 90);"
+    "QWidget#type_{ background-color: rgb(90, 90, 90);"
     "}");
 
   // - ACTIVE - //
   const QString StyleSheet::LAYER_WIDGET_BASE_ACTIVE_C = QString::fromUtf8(
     "QWidget#base_{"
-    " border-radius: 7px;"
+    " border-radius: 3px;"
     " border:1px solid rgb(83, 111, 165);"
     " background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1,"
     "   stop:0 rgba(193, 215, 255, 255),"
@@ -176,14 +176,22 @@ namespace Seg3D
     " border-radius: 3px;"
     " border: 1px solid rgb(80, 80, 80);"
     "}");
-  const QString StyleSheet::LAYER_WIDGET_LABEL_C = QString::fromUtf8(
+  const QString StyleSheet::LAYER_WIDGET_LABEL_INACTIVE_C = QString::fromUtf8(
     "QLineEdit#label_{"
     " text-align: left;"
     " color: black;"
     " margin-right: 3px;"
-    " background-color: rgba( 255, 255, 255, 1 );"
+    " background-color: rgba( 211, 211, 211, 255);"
     "}");
-    
+
+  const QString StyleSheet::LAYER_WIDGET_LABEL_ACTIVE_C = QString::fromUtf8(
+    "QLineEdit#label_{"
+    " text-align: left;"
+    " color: black;"
+    " margin-right: 3px;"
+    " background-color: rgba( 193, 215, 255, 255 );"
+    "}");
+        
   // - DROP - //
   const QString StyleSheet::LAYER_WIDGET_BASE_DROP_C = QString::fromUtf8(
     "QWidget#base_{"
@@ -195,7 +203,6 @@ namespace Seg3D
     " border: 1px solid rgb(90, 90, 90);"
     "}");
     
-  // - LOCKED - //
   const QString StyleSheet::LAYER_WIDGET_BASE_PICKED_UP_C = QString::fromUtf8(
     "QWidget#base_{"
     " background-color: rgba( 0, 0, 0, 0 );"
@@ -203,7 +210,7 @@ namespace Seg3D
     " border: 1px solid rgba( 0, 0, 0, 0 );"
     "}");
     
-  // - LOCKED - //
+  // - VISUAL_LOCKED - //
   const QString StyleSheet::LAYER_WIDGET_BASE_LOCKED_C = QString::fromUtf8(
     "QWidget#base_{"
     " background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227," 
@@ -212,19 +219,19 @@ namespace Seg3D
     "   stop:1 rgba(184, 184, 184, 255));"
     " border-radius: 3px;"
     " border: 1px solid rgb(120, 120, 120);"
-    "}");
+    "}");   
   const QString StyleSheet::LAYER_WIDGET_BACKGROUND_LOCKED_C = QString::fromUtf8(
-    "QWidget#typeBackground_{"
+    "QWidget#type_{"
     " background-color: gray;"
     " border: 1px solid rgb(141, 141, 141);"
-    " border-radius: 4px;"
+    " border-radius: 3px;"
     "}");
   const QString StyleSheet::LAYER_WIDGET_LABEL_LOCKED_C = QString::fromUtf8(
     "QLineEdit#label_{"
     " background-color:rgba(255, 255, 255, 1);"
     " color: gray;"
     "}");
-    
+
 
 // === LayerGroupWidget Styles === //
   // - ACTIVE - //

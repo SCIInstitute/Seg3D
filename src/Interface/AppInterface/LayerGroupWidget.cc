@@ -160,7 +160,6 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
   
   this->private_->drop_space_->hide();
   
-  
   // set some local values for the current size
   this->current_width_ = static_cast<int>( group->get_grid_transform().get_nx() );
   this->current_height_ = static_cast<int>( group->get_grid_transform().get_ny() );

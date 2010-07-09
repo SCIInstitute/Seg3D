@@ -59,21 +59,23 @@ public:
 
   // GET_MUTEX:
   // Get access to the mutex protecting this DataVolume
-  virtual mutex_type& get_mutex() const
-  {
-    return this->data_block_->get_mutex();
-  }
+  virtual mutex_type& get_mutex();
 
   // CONVERT_TO_NRRD:
   // Get the volume data as a nrrd wrapped in a NrrdData structure
   virtual NrrdDataHandle convert_to_nrrd();
 
-  DataBlock::generation_type get_generation() const;
+  // GET_GENERATION:
+  // Get the  generation number of the data volume
+  virtual DataBlock::generation_type get_generation() const;
 
 private:
   // Handle to where the volume data is really stored
   DataBlockHandle data_block_;
 
+  // Mutex for a volume without a data block associated with it
+  // NOTE: This is use to set up a new layer that is still contructing its data
+  mutex_type invalid_mutex_;
 
 public:
   static bool LoadDataVolume( const boost::filesystem::path& filename, DataVolumeHandle& volume,

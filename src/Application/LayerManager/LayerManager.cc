@@ -83,11 +83,7 @@ bool LayerManager::insert_layer( LayerHandle layer )
       // for testing 
       Core::GridTransform layer_grid_transform = layer->get_grid_transform();
       Core::GridTransform group_grid_transform = ( *it )->get_grid_transform();
-      
-      // for testing
-      std::string layer_string = Core::ExportToString( layer_grid_transform );
-      std::string group_string = Core::ExportToString( group_grid_transform );
-            
+                  
       if ( layer_grid_transform == group_grid_transform ) 
       {
         group_handle = *it;
@@ -190,7 +186,7 @@ int LayerManager::insert_group( LayerGroupHandle group_above, LayerGroupHandle g
   return -1;
 }
 
-bool LayerManager::move_layer_above( std::string layer_to_move_id, std::string layer_below_id )
+bool LayerManager::move_layer_above( LayerHandle layer_to_move, LayerHandle target_layer )
 {
   // we will need to keep track of a few things outside of the locked scope
   // This keeps track of whether or not we delete the group we are moving from
@@ -202,30 +198,22 @@ bool LayerManager::move_layer_above( std::string layer_to_move_id, std::string l
   // These handles will let us send signals after we make the moves
   LayerGroupHandle group_above;
   LayerGroupHandle group_below;
-  LayerHandle layer_above;
-  LayerHandle layer_below;
-
+  
   {
     // Get the Lock
     lock_type lock( this->get_mutex() );
-  
-    // First we get LayerHandles for the Layers
-    layer_above = this->get_layer_by_id( layer_to_move_id );
-    layer_below = this->get_layer_by_id( layer_below_id );
+      
+    if( !layer_to_move || !target_layer ) return false;
     
-    if( !layer_above || !layer_below )
+    if ( !validate_layer_move( layer_to_move, target_layer ) )
       return false;
     
-    if ( !validate_layer_move( layer_above, layer_below ) )
-      return false;
-    
-    group_above = layer_above->get_layer_group();
-    group_below = layer_below->get_layer_group();
+    group_above = layer_to_move->get_layer_group();
+    group_below = target_layer->get_layer_group();
     
     // First we Delete the Layer from its list of layers
-    layer_above->set_moving( true );
-    group_above->delete_layer( layer_above );
-    index = group_below->move_layer_above( layer_above, layer_below );
+    group_above->delete_layer( layer_to_move, false );
+    index = group_below->move_layer_above( layer_to_move, target_layer );
     
     // If they are in the same group ---
     if( group_above != group_below )
@@ -239,25 +227,33 @@ bool LayerManager::move_layer_above( std::string layer_to_move_id, std::string l
         
       }
       // Set the weak handle in the layer we've inserted to the proper group
-      layer_above->set_layer_group( group_below );
+      layer_to_move->set_layer_group( group_below );
     }
   
+  
+    if( group_above_has_been_deleted )
+    {
+      group_deleted_signal_( group_above );
+    } 
+    else
+    {
+      layer_deleted_signal_( layer_to_move );
+    }
+    
+    layer_inserted_at_signal_( layer_to_move, index );
+    layers_changed_signal_();
+
   } // We release the lock  here.
-  
-  if( group_above_has_been_deleted )
-  {
-    group_deleted_signal_( group_above );
-  } 
-  else
-  {
-    layer_deleted_signal_( layer_above );
-  }
-  
-  layer_inserted_at_signal_( layer_above, index );
-  layers_changed_signal_();
   
   return true;  
 }
+
+bool LayerManager::move_layer_below( LayerHandle layer_to_move, LayerHandle target_layer )
+{
+
+  return true;  
+}
+
 
 // Here is the logic for inserting a layer
 bool LayerManager::validate_layer_move( LayerHandle layer_above, LayerHandle layer_below )

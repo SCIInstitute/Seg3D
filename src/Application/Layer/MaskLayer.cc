@@ -108,10 +108,10 @@ void MaskLayer::initialize_states()
 }
 
 Core::AtomicCounter MaskLayer::color_count_;
+
 bool MaskLayer::pre_save_states()
 {
-  this->generation_state_->set( static_cast< int >( this->get_mask_volume()->
-    mask_data_block()->get_data_block()->get_generation() ) );
+  this->generation_state_->set( static_cast< int >( this->get_mask_volume()->get_generation() ) );
   return true;
 }
 

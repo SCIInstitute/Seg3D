@@ -124,13 +124,9 @@ int LayerGroup::move_layer_above( LayerHandle layer_above, LayerHandle layer_bel
   return -1 ;
 }
 
-void LayerGroup::delete_layer( LayerHandle layer )
+void LayerGroup::delete_layer( LayerHandle layer, bool invalidate_layerid )
 {
-  if( !layer->check_moving() )
-  {
-    layer->invalidate();
-  }
-  layer->set_moving( false );
+  if ( invalidate_layerid ) layer->invalidate();
   layer_list_.remove( layer );
 }
 
