@@ -46,11 +46,6 @@ DropSpaceWidget::DropSpaceWidget( QWidget *parent, int height, int grow_speed, i
   this->setFixedHeight( 0 );  
   QSizePolicy size_policy( QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding );
   this->setSizePolicy( size_policy );
-
-//  this->timer_ = new QTimer( this );
-//  this->timer_->setSingleShot( true );
-//  connect( this->timer_, SIGNAL( timeout() ), this, SLOT( change_size() ) );
-
   this->setAcceptDrops( false );
 
 }
@@ -60,69 +55,17 @@ DropSpaceWidget::~DropSpaceWidget()
   this->disconnect();
 }
 
-  void DropSpaceWidget::show()
-  {
-    this->open_ = true;
+void DropSpaceWidget::show()
+{
+  this->open_ = true;
+  this->change_size();
+}
 
-    this->change_size();
-    
-    //#if defined( _WIN32 )
-    //  if( !this->timer_->isActive() ) 
-    //  {
-    //    this->timer_->start(10);
-    //  }
-    //#else
-    //  this->setFixedHeight( this->max_height_ );
-    //  this->updateGeometry();
-    //  this->setVisible( true );
-    //#endif
-  }
-  
-  void DropSpaceWidget::hide()
-  {
-    this->open_ = false;
-
-    this->change_size();
-    
-    //#if defined( _WIN32 )
-    //  if( !this->timer_->isActive() ) 
-    //  {
-    //    this->timer_->start(10);
-    //  }
-    //#else
-    //  this->setFixedHeight( 0 );
-    //  this->updateGeometry();
-    //  this->setVisible( false );  
-    //#endif
-  }
-  
-//  void DropSpaceWidget::change_size()
-//  {
-//    if( this->open_ ) 
-//    {
-//      if( this->isHidden() ) 
-//      {
-//        this->setVisible( true );
-//      }
-//      if( this->height() < this->max_height_ ) {
-//        this->setFixedHeight( ( this->height() + this->grow_speed_ ) );
-//        this->updateGeometry();
-//        this->timer_->start(10);
-//      }
-//    }
-//    else 
-//    {
-//      if( this->height() > 0 ) 
-//      {
-//        this->setFixedHeight( ( this->height() - this->shrink_speed_ ) );
-//        this->updateGeometry();
-//        this->timer_->start(10);
-//      }
-//      else {
-//        this->setVisible( false );
-//      }
-//    }
-//  }
+void DropSpaceWidget::hide()
+{
+  this->open_ = false;
+  this->change_size();
+}
 
 
 void DropSpaceWidget::change_size()
@@ -136,8 +79,8 @@ void DropSpaceWidget::change_size()
     
     QPropertyAnimation *animation = new QPropertyAnimation( this, "minimumHeight" );
     animation->setDuration( 200 );
-    animation->setStartValue( this->height() );
     animation->setEndValue( this->max_height_ );
+    animation->setEasingCurve( QEasingCurve::OutQuad );
     animation->start();
 
   }
@@ -147,8 +90,8 @@ void DropSpaceWidget::change_size()
     {
       QPropertyAnimation *animation = new QPropertyAnimation( this, "minimumHeight" );
       animation->setDuration( 200 );
-      animation->setStartValue( this->height() );
       animation->setEndValue( 0 );
+      animation->setEasingCurve( QEasingCurve::InQuad );
       animation->start();
     }
     else {

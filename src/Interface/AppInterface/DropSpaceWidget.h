@@ -53,6 +53,8 @@ public:
   // SHOW:
   // This overloaded function adds some animation to the show function for this widget
   void show();
+  
+  void set_height( int height ){ this->max_height_ = height; }
 
   
 private Q_SLOTS:

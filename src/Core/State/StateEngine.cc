@@ -201,6 +201,7 @@ std::string StateEngine::register_state_handler( const std::string &type_str,
   if ( auto_id )
   {
     Core::AtomicCounterHandle state_handler_counter;
+    std::string id_number = "_0";
     state_handler_counter_map_type::iterator it = 
       this->private_->state_handler_counter_map_.find( type_str );
     
@@ -213,9 +214,11 @@ std::string StateEngine::register_state_handler( const std::string &type_str,
     else
     {
       state_handler_counter = ( *it ).second;
+      id_number = "_" + Core::ExportToString( ++( *state_handler_counter ) );
     }
-
-    handler_id = type_str + "_" + Core::ExportToString( ( *state_handler_counter )++ );
+    
+    
+    handler_id = type_str + id_number;
   }
   // Here we handle the case where we have previously loaded layers from file and the layer
   // counting has already begun.

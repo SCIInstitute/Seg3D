@@ -45,6 +45,16 @@ class LayerGroupWidget : public QWidget
 {
   Q_OBJECT
   
+Q_SIGNALS:
+  // PREP_GROUPS_FOR_DRAG_AND_DROP:
+  // this signal tells the LayerManagerWidget that it needs to prep all the groups for drag and 
+  // drop.
+  void prep_layers_for_drag_and_drop_signal_( bool );
+  
+  void prep_groups_for_drag_and_drop_signal_( bool );
+  
+  void picked_up_group_size_signal_( int );
+  
   // -- constructor/destructor --
 public:
   LayerGroupWidget( QWidget* parent, LayerHandle layer );
@@ -59,7 +69,15 @@ public Q_SLOTS:
   void show_delete( bool show );
   void show_selection_checkboxes( bool show );
   void enable_delete_button( bool enable );
-  void prep_for_layer_drag_and_drop( bool move_time );
+  
+  // NOTIFY_LAYER_MANAGER_WIDGET:
+  // this function triggers the prep_groups_for_drag_and_drop signal.
+  void notify_layer_manager_widget( bool move_time );
+  
+  // PREP_FOR_ANIMATION:
+  // this function replaces the widget with a screenshot of the widget for speed
+  void prep_for_animation( bool move_time );
+  
   
 public:
   //void add_layer( LayerHandle layer );
@@ -69,6 +87,13 @@ public:
   void set_active( bool active );
   LayerWidgetQWeakHandle set_active_layer( LayerHandle layer );
   void seethrough( bool see );
+  
+  // PREP_LAYERS_FOR_DRAG_AND_DROP:
+  // this function tells each layer to pepare for drag and drop by replacing the actual widgets
+  // with images of themselves.
+  void prep_layers_for_drag_and_drop( bool move_time );
+  
+  void set_picked_up_group_size( int group_height );
 
 
   
@@ -87,6 +112,8 @@ private Q_SLOTS:
   void dropEvent( QDropEvent* event );
   void dragEnterEvent( QDragEnterEvent* event );
   void dragLeaveEvent( QDragLeaveEvent* event );
+  void show_group();
+  void hide_group();
 
   // -- widget internals --
 private:
@@ -95,6 +122,7 @@ private:
     
 private:
   std::string group_id_;
+  int picked_up_group_height_;
   int current_height_;
   int current_width_;
   int current_depth_;
@@ -102,12 +130,7 @@ private:
   bool picked_up_;
   bool drop_group_set_;
   LayerGroupWidget* drop_group_;
-  
-
-  
-  
-
-      
+    
 };
     
 

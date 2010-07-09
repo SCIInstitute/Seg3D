@@ -71,6 +71,8 @@ private:
   MessageHistoryWidget* history_widget_;
   bool show_world_coord_;
   void update_data_point_info( Core::DataPointInfoHandle data_point );
+  void update_active_layer_label( std::string& active_layer_name );
+  void update_active_tool_label( std::string& active_tool_name );
   void update_data_point_label();
   void set_message( int msg_type, std::string message );
 

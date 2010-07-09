@@ -98,11 +98,7 @@ bool LayerManager::insert_layer( LayerHandle layer )
       
       CORE_LOG_DEBUG( std::string( "Set Active Layer: " ) + layer->get_layer_id());
 
-      // deactivate the previous active layer
-      //if ( active_layer_ ) active_layer_->set_active( false ); 
       active_layer_ = layer;
-      //active_layer_->set_active( true );
-      
       active_layer_changed = true;
       
     }
@@ -277,15 +273,15 @@ void LayerManager::set_active_layer( LayerHandle layer )
       return;
     }
     
-    //active_layer_->set_active( false );
     CORE_LOG_DEBUG( std::string("Set Active Layer: ") + layer->get_layer_id());
     
     active_layer_ = layer;
-    //active_layer_->set_active( true );
-    
+        
   } // We release the lock  here.
 
-  active_layer_changed_signal_( layer );  
+  active_layer_changed_signal_( layer );
+  
+  active_layer_name_changed_signal_( layer->get_layer_name() + " " );
 }
 
 
@@ -689,8 +685,9 @@ bool LayerManager::post_load_states()
       active_layer = this->group_list_.front()->layer_list_.back(); 
     }
     this->set_active_layer( active_layer );
+    active_layer_name_changed_signal_( active_layer->get_layer_name() + " " );
   }
-
+  
   return true;
 }
 

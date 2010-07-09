@@ -55,6 +55,8 @@ Q_OBJECT
 
 
 Q_SIGNALS:
+  // PREP_FOR_DRAG_AND_DROP:
+  // this signal tells the group that it is time to prep the layers for drag and drop
   void prep_for_drag_and_drop( bool );
 
 // -- constructor/destructor --

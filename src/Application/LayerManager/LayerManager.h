@@ -150,9 +150,13 @@ public:
   
   // Group Action Functions
 public:
+  // MOVE_GROUP_ABOVE:
+  // this function handle changing the order of a group in the list
   bool move_group_above( std::string group_to_move_id, std::string group_below_id );
 
 private:
+  // INSERT_GROUP:
+  // this function handle inserting a group into the list
   int insert_group( LayerGroupHandle group_above, LayerGroupHandle group_below );
 
   // Typedef's for the Mutex
@@ -173,6 +177,7 @@ public:
 public:
   // -- Signal/Slots --
   typedef boost::signals2::signal< void( LayerHandle ) > layer_signal_type;
+  typedef boost::signals2::signal< void( std::string ) > layer_name_signal_type;
   typedef boost::signals2::signal< void( LayerHandle, int ) > layer_at_signal_type;
   typedef boost::signals2::signal< void( LayerGroupHandle ) > group_signal_type;
   typedef boost::signals2::signal< void( std::string, int ) > group_at_signal_type;
@@ -181,6 +186,8 @@ public:
   // ACTIVE_LAYER_CHANGED_SIGNAL:
   // This signal is triggered after the active layer is changed
   layer_signal_type active_layer_changed_signal_; 
+  
+  layer_name_signal_type active_layer_name_changed_signal_;
   
   // LAYER_INSERTED_SIGNAL:
   // This signal is triggered after a layer has been inserted
@@ -240,10 +247,6 @@ public:
   // this function clears out all existing layers before we load a project from file
   virtual bool pre_load_states();
   
-private:
-  // SYNC_GROUP_LISTS:
-  // This function keeps the groups_state_ in sync with group_list_ 
-  //void sync_group_lists();
   
 private:
     // list of the current groups 

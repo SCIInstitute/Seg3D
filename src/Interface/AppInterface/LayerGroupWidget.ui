@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>270</width>
-    <height>731</height>
+    <width>260</width>
+    <height>752</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -981,7 +981,7 @@ QWidget#group_tools_{
                   <number>0</number>
                  </property>
                  <property name="elideMode">
-                  <enum>Qt::ElideNone</enum>
+                  <enum>Qt::ElideRight</enum>
                  </property>
                  <widget class="QWidget" name="tab">
                   <property name="minimumSize">
@@ -1943,7 +1943,21 @@ QWidget#group_tools_{
         </layout>
        </widget>
       </item>
+      <item>
+       <widget class="QLabel" name="fake_widget_">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
      </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="group_dummy_">
+     <property name="text">
+      <string/>
+     </property>
     </widget>
    </item>
   </layout>

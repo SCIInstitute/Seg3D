@@ -75,11 +75,7 @@ public:
   DropSpaceWidget* drop_space_;
   OverlayWidget* overlay_;
 
-  QPixmap widget_image_;
-  QLabel* dummy_widget_;
   int group_height;
-
-  QPropertyAnimation *animation;
 
 };
   
@@ -273,16 +269,16 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
         QtUtils::QtBridge::Connect( this->private_->ui_.transform_replace_checkBox_, group->transform_replace_state_ );
 
   this->private_->ui_.group_frame_layout_->setAlignment( Qt::AlignTop );
+  this->private_->ui_.verticalLayout_13->setAlignment( Qt::AlignTop );
 
   this->private_->overlay_ = new OverlayWidget( this );
   this->private_->overlay_->setStyleSheet( QString::fromUtf8( "background-color: rgba( 255, 0, 0, 200 )" ) );
   this->private_->overlay_->hide(); 
 
-  this->private_->widget_image_ = QPixmap::grabWidget( this->private_->ui_.tools_and_layers_widget_ );
-  this->private_->dummy_widget_ = new QLabel( this->private_->ui_.tools_and_layers_widget_ );
-  this->private_->ui_.verticalLayout_11->addWidget( this->private_->dummy_widget_ );
-  this->private_->dummy_widget_->setMinimumHeight( 0 );
-  this->private_->dummy_widget_->hide();
+  this->private_->ui_.fake_widget_->setMinimumHeight( 0 );
+  this->private_->ui_.fake_widget_->hide();
+  
+  this->private_->ui_.group_dummy_->hide();
 
   this->private_->group_height = this->private_->ui_.tools_and_layers_widget_->height();
   
@@ -322,7 +318,11 @@ void LayerGroupWidget::mousePressEvent( QMouseEvent *event )
   // Next we hide the LayerWidget that we are going to be dragging.
   this->setMinimumHeight( this->height() );
   this->seethrough( true );
+  this->picked_up_ = true;
 
+  Q_EMIT prep_groups_for_drag_and_drop_signal_( true );
+  Q_EMIT picked_up_group_size_signal_( this->height() );
+  
   // Finally if our drag was aborted then we reset the layers styles to be visible
   if( ( ( drag->exec(Qt::MoveAction, Qt::MoveAction) ) == Qt::MoveAction ) && this->drop_group_set_ )
   {
@@ -333,6 +333,9 @@ void LayerGroupWidget::mousePressEvent( QMouseEvent *event )
   this->drop_group_set_ = false;
   this->seethrough( false );
   this->private_->overlay_->hide();
+  
+  Q_EMIT prep_groups_for_drag_and_drop_signal_( false );
+  this->picked_up_ = false;
 }
 
 void LayerGroupWidget::set_drop_target( LayerGroupWidget* target_group)
@@ -401,7 +404,7 @@ void LayerGroupWidget::seethrough( bool see )
 {
   this->set_picked_up( see );
 
-  this->setUpdatesEnabled( false );
+  //this->setUpdatesEnabled( false );
   if( see )
   {
     this->private_->ui_.base_->hide();
@@ -410,12 +413,13 @@ void LayerGroupWidget::seethrough( bool see )
   {
     this->private_->ui_.base_->show();
   }
-  this->setUpdatesEnabled( true );
+  //this->setUpdatesEnabled( true );
   this->repaint();
 }
 
 void LayerGroupWidget::set_drop( bool drop )
 {
+  this->private_->drop_space_->set_height( this->picked_up_group_height_ + 4 );
   // First we check to see if it is picked up if so, we set change the way it looks
   if( this->picked_up_ )
   {
@@ -451,9 +455,10 @@ void LayerGroupWidget::insert_layer( LayerHandle layer, int index )
   }
   this->layer_list_.push_back( new_layer_handle );
   this->repaint();
+  
+  connect( new_layer_handle.data(), SIGNAL( prep_for_drag_and_drop( bool ) ), 
+    this, SLOT( notify_layer_manager_widget( bool ) ) );
 
-  connect( new_layer_handle.data(), SIGNAL( prep_for_drag_and_drop( bool )), this, 
-    SLOT( prep_for_layer_drag_and_drop( bool ) ) );
 }
 
   
@@ -563,42 +568,54 @@ void LayerGroupWidget::show_layers( bool show )
   {
     if( this->private_->ui_.tools_and_layers_widget_->isHidden() )
     {
-      this->private_->dummy_widget_->show();
-      this->private_->animation = new QPropertyAnimation( this->private_->dummy_widget_, "minimumHeight" );
-      this->private_->animation->setDuration( 1000 );
-      this->private_->animation->setStartValue( 0 );
-      this->private_->animation->setEndValue( this->private_->group_height );
-      this->private_->animation->start();
-      //this->private_->ui_.tools_and_layers_widget_->show();
-      this->private_->dummy_widget_->hide();
+      if( this->private_->ui_.fake_widget_->isHidden() )
+      {
+        this->private_->ui_.fake_widget_->setMinimumHeight( 0 );
+        this->private_->ui_.fake_widget_->setFixedHeight( 0 );
+        this->private_->ui_.fake_widget_->show();
+      }
+      
+      QPropertyAnimation *animation = new QPropertyAnimation( 
+        this->private_->ui_.fake_widget_, "minimumHeight" );
+      animation->setDuration( 500 );
+      animation->setEndValue( this->private_->group_height );
+      animation->setEasingCurve(QEasingCurve::OutQuad);
+      connect( animation, SIGNAL( finished() ), this, SLOT( show_group() ) );
+      animation->start();
     }
-    
-
-    
   }
   else
   {
-    this->private_->widget_image_ = QPixmap::grabWidget( this->private_->ui_.tools_and_layers_widget_ );
     this->private_->group_height = this->private_->ui_.tools_and_layers_widget_->height();
-    this->private_->dummy_widget_->setPixmap( this->private_->widget_image_ );
-
-    this->private_->dummy_widget_->setMinimumHeight( this->private_->ui_.tools_and_layers_widget_->height() );
-    this->private_->dummy_widget_->setMinimumWidth( this->private_->ui_.tools_and_layers_widget_->width() );
+    this->private_->ui_.fake_widget_->setMinimumWidth( 
+      this->private_->ui_.tools_and_layers_widget_->width() );
+    this->private_->ui_.fake_widget_->setMinimumHeight( this->private_->group_height );
+    this->private_->ui_.fake_widget_->setFixedHeight( this->private_->group_height );
     
     this->private_->ui_.tools_and_layers_widget_->hide();
-    this->private_->dummy_widget_->show();
+    this->private_->ui_.fake_widget_->show();
     
-    this->private_->animation = new QPropertyAnimation( this->private_->dummy_widget_, "minimumHeight" );
-    this->private_->animation->setDuration( 1000 );
-    this->private_->animation->setStartValue( this->private_->dummy_widget_->height() );
-    this->private_->animation->setEndValue( 0 );
-    this->private_->animation->start();
-
-
-
-
+    QPropertyAnimation *animation = new QPropertyAnimation( 
+      this->private_->ui_.fake_widget_, "minimumHeight" );
+    animation->setDuration( 400 );
+    animation->setEndValue( 0 );
+    animation->setEasingCurve(QEasingCurve::InQuad);
+    connect( animation, SIGNAL( finished() ), this, SLOT( hide_group() ) );
+    animation->start();
   }
 }
+  
+void LayerGroupWidget::show_group()
+{
+  this->private_->ui_.fake_widget_->hide();
+  this->private_->ui_.tools_and_layers_widget_->show();
+}
+
+void LayerGroupWidget::hide_group()
+{
+  this->private_->ui_.fake_widget_->hide();
+}
+  
 
 void LayerGroupWidget::show_resample( bool show )
 {
@@ -741,13 +758,43 @@ void LayerGroupWidget::resizeEvent( QResizeEvent *event )
   this->private_->overlay_->resize( event->size() );
   event->accept();
 }
+  
+void LayerGroupWidget::notify_layer_manager_widget( bool move_time )
+{
+  Q_EMIT prep_layers_for_drag_and_drop_signal_( move_time );
+}
 
-void LayerGroupWidget::prep_for_layer_drag_and_drop( bool move_time )
+void LayerGroupWidget::prep_layers_for_drag_and_drop( bool move_time )
 {
   for( int i = 0; i < this->layer_list_.size(); ++i)
   {
     this->layer_list_[i]->prep_for_animation( move_time );
   }
+}
+
+void LayerGroupWidget::prep_for_animation( bool move_time )
+{
+  if( this->picked_up_ )
+    return;
+  
+  if( move_time )
+  {
+    this->private_->ui_.group_dummy_->setMinimumHeight( this->private_->ui_.base_->height() );
+    this->private_->ui_.group_dummy_->setMinimumWidth( this->private_->ui_.base_->width() );
+    this->private_->ui_.group_dummy_->setPixmap( QPixmap::grabWidget( this->private_->ui_.base_ ) );
+    this->private_->ui_.base_->hide();
+    this->private_->ui_.group_dummy_->show();
+  }
+  else
+  {
+    this->private_->ui_.group_dummy_->hide();
+    this->private_->ui_.base_->show();
+  }
+}
+  
+void LayerGroupWidget::set_picked_up_group_size( int group_height )
+{
+  this->picked_up_group_height_ = group_height;
 }
 
 

@@ -151,7 +151,7 @@ AppInterface::AppInterface()
   
 AppInterface::~AppInterface()
 {
-  //  viewer_interface_->writeSizeSettings();
+  this->disconnect_all();
 }
 
 void AppInterface::closeEvent( QCloseEvent* event )

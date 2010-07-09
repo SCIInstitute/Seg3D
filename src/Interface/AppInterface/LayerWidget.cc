@@ -685,7 +685,9 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
       this->private_->drop_layer_->get_layer_id() );
   }
   Q_EMIT prep_for_drag_and_drop( false );
-  this->parentWidget()->setMinimumHeight( 0 );
+  
+  this->repaint();
+  //this->parentWidget()->setMinimumHeight( 0 );
 }
 
 void LayerWidget::set_drop_target( LayerWidget* target_layer )

@@ -50,6 +50,7 @@ class LayerManagerWidget : public QScrollArea
 {
 // Need to make it a Qt object
 Q_OBJECT
+  
 
 //constructor - destructor
 public:
@@ -67,6 +68,19 @@ public:
   void delete_group( LayerGroupHandle group );
   void show_group( LayerGroupHandle group );
   void set_active_layer( LayerHandle layer );
+  
+private Q_SLOTS:
+  // PREP_LAYERS_FOR_DRAG_AND_DROP:
+  // this function tells the groups to prepare their layers for drag and drop
+  void prep_layers_for_drag_and_drop( bool move_time );
+  
+  // PREP_GROUPS_FOR_DRAG_AND_DROP:
+  // this function tells the groups to prepare for drag and drop
+  void prep_groups_for_drag_and_drop( bool move_time );
+  
+  // NOTIFY_PICKED_UP_GROUP_SIZE:
+  // this function will notify all the groups of what size the currently picked up group is
+  void notify_picked_up_group_size( int group_size );
   
 private:
   // private Qt GUI Components for the LayerManagerWidget

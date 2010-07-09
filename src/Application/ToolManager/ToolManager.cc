@@ -274,6 +274,7 @@ void ToolManager::activate_tool( const std::string& toolid )
 
   // Step (4): signal for interface
   activate_tool_signal_( ( *it ).second );
+  active_tool_name_signal_( ( ( *it ).second )->menu_name() + " " + Core::SplitString( toolid, "_" )[ 1 ] + " " );
 }
 
 ToolManager::tool_list_type ToolManager::tool_list()

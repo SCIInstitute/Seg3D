@@ -175,10 +175,20 @@ void LayerManagerWidget::delete_layer( LayerHandle layer )
 
 void LayerManagerWidget::make_new_group( LayerHandle layer )
 {
-    LayerGroupWidgetQHandle new_group_handle( new LayerGroupWidget( this->main_, layer ) );
+    LayerGroupWidgetQHandle new_group_handle( new LayerGroupWidget( this, layer ) );
   this->group_layout_->addWidget( new_group_handle.data() );
   new_group_handle->show();
   this->group_list_.push_back( new_group_handle );
+  
+  connect( new_group_handle.data(), SIGNAL( prep_layers_for_drag_and_drop_signal_( bool ) ), 
+    this, SLOT( prep_layers_for_drag_and_drop( bool ) ) );
+  
+  connect( new_group_handle.data(), SIGNAL( prep_groups_for_drag_and_drop_signal_( bool ) ), 
+    this, SLOT( prep_groups_for_drag_and_drop( bool ) ) );
+  
+  connect( new_group_handle.data(), SIGNAL( picked_up_group_size_signal_( int ) ), 
+    this, SLOT( notify_picked_up_group_size( int ) ) );
+  
 }
 
 
@@ -213,6 +223,34 @@ void  LayerManagerWidget::set_active_layer( LayerHandle layer )
       break;
     }
   }
+}
+
+  
+void LayerManagerWidget::prep_layers_for_drag_and_drop( bool move_time )
+{
+  for ( QList< LayerGroupWidgetQHandle >::iterator i = this->group_list_.begin(); 
+     i  != this->group_list_.end(); i++ )
+  {
+    ( *i )->prep_layers_for_drag_and_drop( move_time );
+  }
+}
+
+void LayerManagerWidget::prep_groups_for_drag_and_drop( bool move_time )
+{
+  for ( QList< LayerGroupWidgetQHandle >::iterator i = this->group_list_.begin(); 
+     i  != this->group_list_.end(); i++ )
+  {
+    ( *i )->prep_for_animation( move_time );
+  }
+}
+  
+void LayerManagerWidget::notify_picked_up_group_size( int group_size )
+{
+  for ( QList< LayerGroupWidgetQHandle >::iterator i = this->group_list_.begin(); 
+     i  != this->group_list_.end(); i++ )
+  {
+    ( *i )->set_picked_up_group_size( group_size );
+  } 
 }
 
 

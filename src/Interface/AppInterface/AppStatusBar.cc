@@ -50,6 +50,7 @@
 //  Application includes
 #include <Application/Tool/ToolFactory.h>
 #include <Application/ToolManager/ToolManager.h>
+#include <Application/LayerManager/LayerManager.h>
 
 
 namespace Seg3D
@@ -81,6 +82,9 @@ AppStatusBar::AppStatusBar( QMainWindow* parent ) :
   
   this->statusbar_->setStyleSheet( StyleSheet::STATUSBAR_C );
   
+  //this->private_->ui_.active_tool_label_->setText( QString::fromUtf8( "none " ) );
+  //this->private_->ui_.active_layer_label_->setText( QString::fromUtf8( "none " ) );
+  
   connect(this->private_->ui_.info_button_, 
     SIGNAL(clicked(bool)), this, SLOT(activate_history(bool)));
   connect(this->history_widget_, 
@@ -94,6 +98,10 @@ AppStatusBar::AppStatusBar( QMainWindow* parent ) :
     boost::bind( &AppStatusBar::update_data_point_info, this, _1 ) ) );
   this->add_connection( Core::StatusBar::Instance()->message_updated_signal_.connect( 
     boost::bind( &AppStatusBar::set_message, this, _1, _2 ) ) );
+  this->add_connection( LayerManager::Instance()->active_layer_name_changed_signal_.connect(
+    boost::bind( &AppStatusBar::update_active_layer_label, this, _1 ) ) );
+  this->add_connection( ToolManager::Instance()->active_tool_name_signal_.connect(
+    boost::bind( &AppStatusBar::update_active_tool_label, this, _1 ) ) );
 
   
 
@@ -161,6 +169,32 @@ void AppStatusBar::update_data_point_info( Core::DataPointInfoHandle data_point 
 
   this->data_point_info_ = *data_point;
   this->update_data_point_label();
+}
+  
+void AppStatusBar::update_active_layer_label( std::string& active_layer_name )
+{
+  if( !Core::Interface::IsInterfaceThread() )
+  {
+    Core::Interface::PostEvent( boost::bind( 
+      &AppStatusBar::update_active_layer_label, this, active_layer_name ) );
+    return;
+  }
+  
+  this->private_->ui_.layer_combobox_->insertItem( 0, QString::fromStdString( active_layer_name ) );
+  //this->private_->ui_.active_layer_label_->setText( QString::fromStdString( active_layer_name ) );
+}
+  
+void AppStatusBar::update_active_tool_label( std::string& active_tool_name )
+{
+  if( !Core::Interface::IsInterfaceThread() )
+  {
+    Core::Interface::PostEvent( boost::bind( 
+      &AppStatusBar::update_active_tool_label, this, active_tool_name ) );
+    return;
+  }
+  
+  this->private_->ui_.tool_combobox_->insertItem( 0, QString::fromStdString( active_tool_name ) );
+  //this->private_->ui_.active_tool_label_->setText( QString::fromStdString( active_tool_name ) );
 }
 
 void AppStatusBar::update_data_point_label()

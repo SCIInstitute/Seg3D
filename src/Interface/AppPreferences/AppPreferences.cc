@@ -28,6 +28,7 @@
 
 // Application includes
 #include <Application/PreferencesManager/PreferencesManager.h>
+#include <Application/Tool/ToolFactory.h>
 
 // QtUtils includes
 #include <QtUtils/Bridge/QtBridge.h>
@@ -226,6 +227,34 @@ void AppPreferences::setup_sidebar_prefs()
     PreferencesManager::Instance()->show_measurement_bar_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.history_checkbox_, 
     PreferencesManager::Instance()->show_history_bar_state_ );
+  
+  
+  ToolInfoList tool_types_list;
+  ToolInfoList::const_iterator it;
+  ToolInfoList::const_iterator it_end;
+  
+  ToolFactory::Instance()->list_tool_types( tool_types_list, ToolGroupType::FILTER_E );
+  
+  it = tool_types_list.begin();
+  it_end = tool_types_list.end();
+  
+  while ( it != it_end )
+  {
+    this->private_->ui_.filter_list_->addItem( QString::fromStdString( ( *it ).menu_name_ ) );
+    ++it;
+  }
+
+  ToolFactory::Instance()->list_tool_types( tool_types_list, ToolGroupType::TOOL_E );
+  
+  it = tool_types_list.begin();
+  it_end = tool_types_list.end();
+  
+  while ( it != it_end )
+  {
+    this->private_->ui_.tool_list_->addItem( QString::fromStdString( ( *it ).menu_name_ ) );
+    ++it;
+  }
+  
   
 }
   
