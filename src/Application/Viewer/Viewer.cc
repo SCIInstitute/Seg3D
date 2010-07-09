@@ -237,16 +237,18 @@ void Viewer::mouse_release_event( const Core::MouseHistory& mouse_history, int b
   this->view_manipulator_->mouse_release( mouse_history, button, buttons, modifiers );
 }
 
-void Viewer::mouse_enter_event()
+void Viewer::mouse_enter_event( int x, int y )
 {
+  CORE_LOG_DEBUG( "Mouse entering viewer " + Core::ExportToString( this->get_viewer_id() ) );
   if ( this->mouse_enter_handler_ )
   {
-    this->mouse_enter_handler_( this->get_viewer_id() );
+    this->mouse_enter_handler_( this->get_viewer_id(), x, y );
   }
 }
 
 void Viewer::mouse_leave_event()
 {
+  CORE_LOG_DEBUG( "Mouse leaving viewer " + Core::ExportToString( this->get_viewer_id() ) );
   if ( this->mouse_leave_handler_ )
   {
     this->mouse_leave_handler_( this->get_viewer_id() );

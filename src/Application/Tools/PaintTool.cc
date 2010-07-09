@@ -645,11 +645,15 @@ void PaintTool::repaint( size_t viewer_id, const Core::Matrix& proj_mat )
   glFinish();
 }
 
-bool PaintTool::handle_mouse_enter( size_t viewer_id )
+bool PaintTool::handle_mouse_enter( size_t viewer_id, int x, int y )
 {
   PaintToolPrivate::lock_type lock( this->private_->get_mutex() );
   this->private_->viewer_ = ViewerManager::Instance()->get_viewer( viewer_id );
   this->private_->brush_visible_ = true;
+  this->private_->center_x_ = x;
+  this->private_->center_y_ = y;
+  this->private_->viewer_->window_to_world( x, y, this->private_->world_x_, this->private_->world_y_ );
+
   return true;
 }
 
@@ -659,6 +663,12 @@ bool PaintTool::handle_mouse_leave( size_t /*viewer_id*/ )
   this->private_->brush_visible_ = false;
   this->private_->update_viewers();
   this->private_->viewer_.reset();
+  if ( this->private_->painting_ )
+  {
+    this->private_->target_slice_->release_cached_data();
+    this->private_->target_slice_.reset();
+    this->private_->painting_ = false;
+  }
   return true;
 }
 
@@ -780,7 +790,7 @@ bool PaintTool::handle_mouse_release( const Core::MouseHistory& mouse_history,
   {
     return false;
   }
-
+  
   if ( this->private_->painting_ )
   {
     if ( ( this->private_->erase_ && button == Core::MouseButton::RIGHT_BUTTON_E ) ||

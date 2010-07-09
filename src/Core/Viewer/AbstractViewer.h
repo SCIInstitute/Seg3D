@@ -87,7 +87,7 @@ public:
 
   // MOUSE_ENTER_EVENT:
   // This function is called by the render widget when a mouse enter event has occurred.
-  virtual void mouse_enter_event();
+  virtual void mouse_enter_event( int x, int y );
 
   // MOUSE_LEAVE_EVENT:
   // This function is called by the render widget when a mouse leave event has occurred.

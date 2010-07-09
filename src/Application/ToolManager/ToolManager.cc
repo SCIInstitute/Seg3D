@@ -48,7 +48,7 @@ CORE_SINGLETON_IMPLEMENTATION( ToolManager );
 class ToolManagerPrivate
 {
 public:
-  bool handle_mouse_enter( size_t viewer_id );
+  bool handle_mouse_enter( size_t viewer_id, int x, int y );
   bool handle_mouse_leave( size_t viewer_id );
   bool handle_mouse_move( const Core::MouseHistory& mouse_history, 
     int button, int buttons, int modifiers );
@@ -66,11 +66,11 @@ public:
   Core::StateStringHandle active_tool_state_;
 };
 
-bool ToolManagerPrivate::handle_mouse_enter( size_t viewer_id )
+bool ToolManagerPrivate::handle_mouse_enter( size_t viewer_id, int x, int y )
 {
   if ( this->active_tool_ )
   {
-    return this->active_tool_->handle_mouse_enter( viewer_id );
+    return this->active_tool_->handle_mouse_enter( viewer_id, x, y );
   }
   return false;
 }
@@ -137,7 +137,7 @@ ToolManager::ToolManager() :
   {
     ViewerHandle viewer = ViewerManager::Instance()->get_viewer( i );
     viewer->set_mouse_enter_handler( boost::bind( &ToolManagerPrivate::handle_mouse_enter,
-      this->private_, _1 ) );
+      this->private_, _1, _2, _3 ) );
     viewer->set_mouse_leave_handler( boost::bind( &ToolManagerPrivate::handle_mouse_leave,
       this->private_, _1 ) );
     viewer->set_mouse_move_handler( boost::bind( &ToolManagerPrivate::handle_mouse_move,

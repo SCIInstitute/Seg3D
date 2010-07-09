@@ -80,8 +80,8 @@ public:
 
   typedef boost::function< bool( const Core::MouseHistory&, int, int, int ) > 
     mouse_event_handler_type;
-  typedef boost::function< bool( size_t ) > enter_event_handler_type;
-  typedef enter_event_handler_type leave_event_handler_type;
+  typedef boost::function< bool( size_t, int, int ) > enter_event_handler_type;
+  typedef boost::function< bool( size_t ) > leave_event_handler_type;
   typedef boost::function< bool( int, int, int, int, int ) > 
     wheel_event_handler_type;
 
@@ -91,7 +91,7 @@ public:
     int buttons, int modifiers );
   virtual void mouse_release_event( const Core::MouseHistory& mouse_history, int button, 
     int buttons, int modifiers );
-  virtual void mouse_enter_event();
+  virtual void mouse_enter_event( int x, int y );
   virtual void mouse_leave_event();
   virtual bool wheel_event( int delta, int x, int y, int buttons, int modifiers );
 

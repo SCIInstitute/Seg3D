@@ -275,7 +275,8 @@ void QtRenderWidget::enterEvent( QEvent* event )
 {
   event->accept();
   setFocus();
-  this->private_->viewer_->mouse_enter_event();
+  QPoint cursor_pos = this->mapFromGlobal( QCursor::pos() );
+  this->private_->viewer_->mouse_enter_event( cursor_pos.x(), cursor_pos.y() );
 }
 
 void QtRenderWidget::leaveEvent( QEvent* event )

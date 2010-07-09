@@ -136,7 +136,7 @@ void AbstractViewer::mouse_release_event( const MouseHistory& mouse_history,
   // Do nothing
 }
 
-void AbstractViewer::mouse_enter_event()
+void AbstractViewer::mouse_enter_event( int x, int y )
 {
   // Do nothing
 }

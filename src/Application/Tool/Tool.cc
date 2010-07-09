@@ -72,7 +72,7 @@ const std::string& Tool::toolid() const
   return this->get_statehandler_id();
 }
 
-bool Tool::handle_mouse_enter( size_t viewer_id )
+bool Tool::handle_mouse_enter( size_t viewer_id, int x, int y )
 {
   // Default implementation doesn't handle this event
   return false;
