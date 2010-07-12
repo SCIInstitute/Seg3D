@@ -649,10 +649,14 @@ bool PaintTool::handle_mouse_enter( size_t viewer_id, int x, int y )
 {
   PaintToolPrivate::lock_type lock( this->private_->get_mutex() );
   this->private_->viewer_ = ViewerManager::Instance()->get_viewer( viewer_id );
-  this->private_->brush_visible_ = true;
-  this->private_->center_x_ = x;
-  this->private_->center_y_ = y;
-  this->private_->viewer_->window_to_world( x, y, this->private_->world_x_, this->private_->world_y_ );
+  if ( !this->private_->viewer_->is_volume_view() )
+  {
+    this->private_->brush_visible_ = true;
+    this->private_->center_x_ = x;
+    this->private_->center_y_ = y;
+    this->private_->viewer_->window_to_world( x, y, 
+      this->private_->world_x_, this->private_->world_y_ );
+  }
 
   return true;
 }
