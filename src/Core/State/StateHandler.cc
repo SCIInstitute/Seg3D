@@ -75,9 +75,16 @@ StateHandler::StateHandler( const std::string& type_str, size_t version_number, 
   while (  loc > 0 && this->private_->statehandler_id_[ loc - 1 ] >= '0' && 
       this->private_->statehandler_id_[ loc - 1 ] <= '9' ) loc--;
   
-  ImportFromString( this->private_->statehandler_id_.substr( loc ), 
-    this->private_->statehandler_id_number_ );
-
+  if ( loc >= this->private_->statehandler_id_.size() )
+  {
+    this->private_->statehandler_id_number_ = 0;
+  }
+  else
+  {
+    ImportFromString( this->private_->statehandler_id_.substr( loc ), 
+      this->private_->statehandler_id_number_ );
+  }
+  
   this->private_->save_priority_ = save_priority;
 
   this->private_->valid_ = true;
