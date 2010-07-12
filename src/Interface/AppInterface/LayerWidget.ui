@@ -41,15 +41,6 @@ QLineEdit#label_:focus{
   background-color: rgb(255, 255, 255);
 }
 
-/*QWidget#insert_space_{
-  margin-top: 0;
-  margin-bottom: 0;
-  padding-top: 0;
-  padding-bottom: 0; 
-  border: 1px solid rgba(50, 50, 50, 40);
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(0, 0, 0, 50), stop:0.3 rgba(0, 0, 0, 100), stop:0.7 rgba(0, 0, 0, 100), stop:1 rgba(0, 0, 0, 50));
-}*/
-
 QWidget#type_{
   background-color: rgb(255, 128, 0);
   border-radius: 3px;

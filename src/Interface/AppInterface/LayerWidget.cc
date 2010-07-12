@@ -159,7 +159,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   this->private_->drop_space_ = new DropSpaceWidget( this );
   this->private_->ui_.verticalLayout_3->insertWidget( 0, this->private_->drop_space_ );
   
-  this->private_->drop_space_->setStyleSheet( StyleSheet::DROPSPACEWIDGET_C );
+  //this->private_->drop_space_->setStyleSheet( StyleSheet::DROPSPACEWIDGET_C );
   this->private_->drop_space_->hide();
   
   // add the SliderCombo Widgets
@@ -587,12 +587,16 @@ int LayerWidget::get_volume_type() const
 void LayerWidget::set_mask_background_color( int color_index )
 {
   Core::Color color = PreferencesManager::Instance()->color_states_[ color_index ]->get();
-  
+    
+  int r = static_cast< int >( color.r() );
+  int g = static_cast< int >( color.g() );
+  int b = static_cast< int >( color.b() );
+
   QString style_sheet = QString::fromUtf8( 
-  "background-color: rgb(" ) + QString::number( color.r() ) +
-  QString::fromUtf8( ", " ) + QString::number( color.g() ) +
-  QString::fromUtf8( ", " ) + QString::number( color.b() ) +
-  QString::fromUtf8( "); }" );
+  "background-color: rgb(" ) + QString::number( r ) +
+  QString::fromUtf8( ", " ) + QString::number( g ) +
+  QString::fromUtf8( ", " ) + QString::number( b ) +
+  QString::fromUtf8( ");" );
 
   this->private_->ui_.type_->setStyleSheet( style_sheet );
 }
@@ -603,12 +607,16 @@ void LayerWidget::set_mask_background_color_from_preference_change( int color_in
     return;
 
   Core::Color color = PreferencesManager::Instance()->color_states_[ color_index ]->get();
+
+  int r = static_cast< int >( color.r() );
+  int g = static_cast< int >( color.g() );
+  int b = static_cast< int >( color.b() );
   
   QString style_sheet = QString::fromUtf8( 
-  "background-color: rgb(" ) + QString::number( color.r() ) +
-  QString::fromUtf8( ", " ) + QString::number( color.g() ) +
-  QString::fromUtf8( ", " ) + QString::number( color.b() ) +
-  QString::fromUtf8( "); }" );
+  "background-color: rgb(" ) + QString::number( r ) +
+  QString::fromUtf8( ", " ) + QString::number( g ) +
+  QString::fromUtf8( ", " ) + QString::number( b ) +
+  QString::fromUtf8( ");" );
 
   this->private_->ui_.type_->setStyleSheet( style_sheet );
 }

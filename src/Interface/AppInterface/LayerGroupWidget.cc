@@ -579,7 +579,7 @@ void LayerGroupWidget::show_layers( bool show )
         this->private_->ui_.fake_widget_, "minimumHeight" );
       animation->setDuration( 500 );
       animation->setEndValue( this->private_->group_height );
-      animation->setEasingCurve(QEasingCurve::OutQuad);
+      animation->setEasingCurve( QEasingCurve::OutQuad );
       connect( animation, SIGNAL( finished() ), this, SLOT( show_group() ) );
       animation->start();
     }
@@ -587,21 +587,22 @@ void LayerGroupWidget::show_layers( bool show )
   else
   {
     this->private_->group_height = this->private_->ui_.tools_and_layers_widget_->height();
-    this->private_->ui_.fake_widget_->setMinimumWidth( 
-      this->private_->ui_.tools_and_layers_widget_->width() );
-    this->private_->ui_.fake_widget_->setMinimumHeight( this->private_->group_height );
-    this->private_->ui_.fake_widget_->setFixedHeight( this->private_->group_height );
+    //this->private_->ui_.fake_widget_->setMinimumWidth( 
+    //  this->private_->ui_.tools_and_layers_widget_->width() );
+    //this->private_->ui_.fake_widget_->setMinimumHeight( this->private_->group_height );
+    //this->private_->ui_.fake_widget_->setFixedHeight( this->private_->group_height );
     
     this->private_->ui_.tools_and_layers_widget_->hide();
-    this->private_->ui_.fake_widget_->show();
-    
-    QPropertyAnimation *animation = new QPropertyAnimation( 
-      this->private_->ui_.fake_widget_, "minimumHeight" );
-    animation->setDuration( 400 );
-    animation->setEndValue( 0 );
-    animation->setEasingCurve(QEasingCurve::InQuad);
-    connect( animation, SIGNAL( finished() ), this, SLOT( hide_group() ) );
-    animation->start();
+    this->private_->ui_.fake_widget_->setMinimumHeight( 0 );
+    //
+    //
+    //QPropertyAnimation *animation = new QPropertyAnimation( 
+    //  this->private_->ui_.fake_widget_, "fixedHeight" );
+    //animation->setDuration( 1000 );
+    //animation->setEndValue( 25 );
+    //animation->setEasingCurve(QEasingCurve::InQuad);
+    //connect( animation, SIGNAL( finished() ), this, SLOT( hide_group() ) );
+    //animation->start();
   }
 }
   
