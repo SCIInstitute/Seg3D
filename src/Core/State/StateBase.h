@@ -81,6 +81,7 @@ public:
 protected:
   friend class ActionSet;
   friend class ActionGet;
+  friend class StateHandler;
 
   // EXPORT_TO_VARIANT
   // Export the state data to a variant parameter
@@ -121,14 +122,12 @@ public:
     return Core::SplitString(  stateid_, "::" )[ 1 ];
   }
 
+protected:
   // INVALIDATE:
-  // This function is used to invalidate the name of the layer to prevent conflicts when a layer
-  // is being deleted shortly before being created again when loading a session with the same name
-  // as the previous session.
-  virtual void invalidate( const std::string& name ) 
-  {
-    // default we do nothing
-  }
+  // Invalidate the state variable. This function is called by the "invalidate" function of 
+  // StateHandler to release any resource occupied by the state.
+  // Default implementation does nothing.
+  virtual void invalidate() {}
 
 private:
   std::string stateid_;

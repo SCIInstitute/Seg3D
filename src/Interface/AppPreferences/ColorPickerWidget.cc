@@ -115,9 +115,9 @@ void ColorPickerWidget::hide_show( Core::Color color, bool show )
     return;
   }
 
-  this->set_r( color.r() );
-  this->set_g( color.g() );
-  this->set_b( color.b() );
+  this->r_ = static_cast< int >( color.r() );
+  this->g_ = static_cast< int >( color.g() );
+  this->b_ = static_cast< int >( color.b() );
   
   this->private_->r_adjuster_->setCurrentValue( this->r_ );
   this->private_->g_adjuster_->setCurrentValue( this->g_ );

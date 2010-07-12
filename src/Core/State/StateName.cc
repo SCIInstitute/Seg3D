@@ -55,6 +55,11 @@ public:
 
   ~StateNamePrivate()
   {
+    if ( !this->valid_ )
+    {
+      return;
+    }
+    
     lock_type lock( GetMutex() );
     if ( NAME_SET_S.erase( this->value_ ) == 0 )
     {
@@ -66,6 +71,7 @@ public:
 public:
   // Actual storage for the state
   std::string value_;
+  bool valid_;
 
   // -- Static members --
 public:
@@ -147,10 +153,10 @@ StateNamePrivate::mutex_type StateNamePrivate::NAME_SET_MUTEX_S;
 const boost::regex StateNamePrivate::REGEX_C( "[^\\w\\s]" );
 
 StateName::StateName( const std::string& stateid, const std::string& value ) :
-  StateBase( stateid ),
-  valid_( true )
+  StateBase( stateid )
 {
   this->private_ = StateNamePrivateHandle( new StateNamePrivate( value ) );
+  this->private_->valid_ = true;
 }
 
 StateName::~StateName()
@@ -237,17 +243,17 @@ bool StateName::set( const std::string& value, ActionSource source )
   return true;
 }
 
-void StateName::invalidate( const std::string& name )
+void StateName::invalidate()
 {
-  if( !this->valid_ )
+  if( !this->private_->valid_ )
   {
     return;
   }
-  this->valid_ = false;
-  
-  this->private_->RemoveName( name );
-  
-}
 
+  this->private_->valid_ = false;
+  
+  StateNamePrivate::RemoveName( this->private_->value_ );
+  this->private_->value_ = "";
+}
 
 } // end namespace Core

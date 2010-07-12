@@ -107,9 +107,12 @@ public:
   // to enforce a constraint from another action.
   bool set( const std::string& value, ActionSource source = ActionSource::NONE_E );
 
-  virtual void invalidate( const std::string& name );
-
-  bool is_valid(){ return valid_; }
+protected:
+  // INVALIDATE:
+  // Invalidate the state variable. This function is called by the "invalidate" function of 
+  // StateHandler to release any resource occupied by the state.
+  // It will put the name string back to the pool.
+  virtual void invalidate();
 
 public:
   // The regular expression for validating a name string
@@ -117,7 +120,6 @@ public:
 
 private:
   StateNamePrivateHandle private_;
-  bool valid_;
 
 };
 
