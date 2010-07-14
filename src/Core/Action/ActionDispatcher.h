@@ -54,6 +54,8 @@ namespace Core
 
 // Forward declaration
 class ActionDispatcher;
+class ActionDispatcherPrivate;
+typedef boost::shared_ptr< ActionDispatcherPrivate > ActionDispatcherPrivateHandle;
 
 // Class defintion
 class ActionDispatcher : public boost::noncopyable
@@ -67,13 +69,13 @@ private:
 
   // -- Action handling --
 public:
+
   // POST_ACTION:
   // Post an action onto the application thread, the action is posted on the
   // stack of actions that need to be processed. Each action needs to be
   // posted with an ActionContextHandle which describes where feedback from
   // the action needs to posted.
   // The action context needs to be created before posting the action.
-
   void post_action( ActionHandle action, ActionContextHandle action_context ); // << THREAD-SAFE SLOT
 
   // POST_AND_WAIT_ACTION:
@@ -84,30 +86,30 @@ public:
   // The action context needs to be created before posting the action.
   // This function also waits on the action to be fully completed and hence
   // needs to be called from a thread that is not needed for action processing
-
   void post_and_wait_action( ActionHandle action, ActionContextHandle action_context ); // << THREAD-SAFE SLOT
 
   // POST_ACTIONS:
   // Post multiple actions in specified order
-
   void post_actions( std::vector< ActionHandle > actions, ActionContextHandle action_context ); // << THREAD-SAFE SLOT
 
   // POST_AND_WAIT_ACTIONS:
   // Post multiple actions in specified order and wait for them to finish
-
   void post_and_wait_actions( std::vector< ActionHandle > actions,
       ActionContextHandle action_context ); // << THREAD-SAFE SLOT
 
+  // IS_BUSY:
+  // Returns true if there are actions being processed, otherwise false.
+  bool is_busy();
+
 private:
+  friend class ActionDispatcherPrivate;
 
   // RUN_ACTION:
   // Run the action
-
   void run_action( ActionHandle action, ActionContextHandle action_context );
 
   // RUN_ACTIONS:
   // Run multiple actions in specified order
-
   void run_actions( std::vector< ActionHandle > actions, ActionContextHandle action_context );
 
   // -- Action monitoring --
@@ -122,8 +124,7 @@ public:
 
   // PRE_ACTION_SIGNAL:
   // Connect an observer that records all the actions in the program before
-  // they are exectuted
-
+  // they are executed
   pre_action_signal_type pre_action_signal_;
 
   // NOTE: One can observe action before or after they have been issued:
@@ -135,8 +136,7 @@ public:
 
   // POST_ACTION_SIGNAL:
   // Connect an observer that records all the actions in the program after
-  // they are exectuted.
-
+  // they are executed.
   post_action_signal_type post_action_signal_;
 
   // BEGIN_PROGRESS_SIGNAL:
@@ -154,18 +154,27 @@ public:
   // Issued every time when progress can be reported
   action_progress_signal_type report_progress_signal_;
 
+private:
+  ActionDispatcherPrivateHandle private_;
+
+public:
+  // FUNCTION PostAction:
+  // This function is a short cut to posting an action using the dispatcher
+  static void PostAction( const ActionHandle& action, 
+    const ActionContextHandle& action_context );
+
+  // FUNCTION PostAndWaitAction:
+  // This function is a short cut to posting an action using the dispatcher and
+  // waiting until the action has been completed
+  static void PostAndWaitAction( const ActionHandle& action, 
+    const ActionContextHandle& action_context );
+
+  // Function IsBusy:
+  // This is a short cut function to the "is_busy" function of the singleton.
+  static bool IsBusy();
+
 };
 
-// FUNCTION PostAction:
-// This function is a short cut to posting an action using the dispatcher
-
-void PostAction( const ActionHandle& action, const ActionContextHandle& action_context );
-
-// FUNCTION PostAndWaitAction:
-// This function is a short cut to posting an action using the dispatcher and
-// waiting until the action has been completed
-
-void PostAndWaitAction( const ActionHandle& action, const ActionContextHandle& action_context );
 
 } // namespace Core
 

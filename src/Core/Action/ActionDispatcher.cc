@@ -30,6 +30,7 @@
 // thread.
 
 // Core includes
+#include <Core/Utils/AtomicCounter.h>
 #include <Core/Utils/Exception.h>
 #include <Core/Application/Application.h>
 #include <Core/Action/ActionDispatcher.h>
@@ -39,10 +40,38 @@
 namespace Core
 {
 
+//////////////////////////////////////////////////////////////////////////
+// Implementation of class  ActionDispatcherPrivate
+//////////////////////////////////////////////////////////////////////////
+
+class ActionDispatcherPrivate
+{
+public:
+  // RUN_ACTION:
+  // Convenience function for keeping track of actions being executed.
+  void run_action(  ActionHandle action, ActionContextHandle action_context );
+
+  ActionDispatcher* dispatcher_;
+  AtomicCounter action_count_;
+};
+
+void ActionDispatcherPrivate::run_action( ActionHandle action, 
+                     ActionContextHandle action_context )
+{
+  this->dispatcher_->run_action( action, action_context );
+  --this->action_count_;
+}
+
+//////////////////////////////////////////////////////////////////////////
+// Implementation of class ActionDispatcher
+//////////////////////////////////////////////////////////////////////////
+
 CORE_SINGLETON_IMPLEMENTATION( ActionDispatcher );
 
-ActionDispatcher::ActionDispatcher()
+ActionDispatcher::ActionDispatcher() :
+  private_( new ActionDispatcherPrivate )
 {
+  this->private_->dispatcher_ = this;
   // Connect this class to the ActionHistory
   post_action_signal_.connect( boost::bind( &ActionHistory::record_action, 
     ActionHistory::Instance() , _1, _2 ) );
@@ -60,9 +89,9 @@ void ActionDispatcher::post_action( ActionHandle action, ActionContextHandle act
   // handled before the next one
 
   CORE_LOG_DEBUG( std::string("Posting Action: ") + action->export_to_string() );
-
-  Application::Instance()->post_event( boost::bind( &ActionDispatcher::run_action, this, action,
-      action_context ) );
+  ++this->private_->action_count_;
+  Application::Instance()->post_event( boost::bind( &ActionDispatcherPrivate::run_action, 
+    this->private_.get(), action, action_context ) );
 }
 
 void ActionDispatcher::post_and_wait_action( ActionHandle action,
@@ -80,9 +109,9 @@ void ActionDispatcher::post_and_wait_action( ActionHandle action,
   }
 
   CORE_LOG_DEBUG(std::string("Posting Action: ")+action->export_to_string());
-
-  Application::Instance()->post_and_wait_event( boost::bind( &ActionDispatcher::run_action, this,
-      action, action_context ) );
+  ++this->private_->action_count_;
+  Application::Instance()->post_and_wait_event( boost::bind( &ActionDispatcherPrivate::run_action, 
+    this->private_.get(), action, action_context ) );
 }
 
 void ActionDispatcher::post_actions( std::vector< ActionHandle > actions,
@@ -95,6 +124,7 @@ void ActionDispatcher::post_actions( std::vector< ActionHandle > actions,
 
   for ( size_t j = 0; j < actions.size(); j++ )
   {
+    ++this->private_->action_count_;
     CORE_LOG_DEBUG( std::string("Posting Action sequence: " ) + 
       actions[ j ]->export_to_string() );
   }
@@ -119,12 +149,18 @@ void ActionDispatcher::post_and_wait_actions( std::vector< ActionHandle > action
 
   for ( size_t j = 0; j < actions.size(); j++ )
   {
+    ++this->private_->action_count_;
     CORE_LOG_DEBUG( std::string( "Posting Action sequence: ") +
       actions[ j ]->export_to_string());
   }
 
   Application::Instance()->post_and_wait_event( boost::bind( &ActionDispatcher::run_actions,
       this, actions, action_context ) );
+}
+
+bool ActionDispatcher::is_busy()
+{
+  return this->private_->action_count_ > 0;
 }
 
 void ActionDispatcher::run_action( ActionHandle action, ActionContextHandle action_context )
@@ -198,18 +234,26 @@ void ActionDispatcher::run_actions( std::vector< ActionHandle > actions,
   // Run the actions one by one.
   for ( size_t j = 0; j < actions.size(); j++ )
   {
-    run_action( actions[ j ], action_context );
+    this->private_->run_action( actions[ j ], action_context );
   }
 }
 
-void PostAction( const ActionHandle& action, const ActionContextHandle& action_context )
+void ActionDispatcher::PostAction( const ActionHandle& action, 
+                  const ActionContextHandle& action_context )
 {
-  ActionDispatcher::Instance()->post_action( action, action_context );
+  Instance()->post_action( action, action_context );
 }
 
-void PostAndWaitAction( const ActionHandle& action, const ActionContextHandle& action_context )
+void ActionDispatcher::PostAndWaitAction( const ActionHandle& action, 
+                     const ActionContextHandle& action_context )
 {
-  ActionDispatcher::Instance()->post_and_wait_action( action, action_context );
+  Instance()->post_and_wait_action( action, action_context );
 }
+
+bool ActionDispatcher::IsBusy()
+{
+  return Instance()->is_busy();
+}
+
 
 } // end namespace Core
