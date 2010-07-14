@@ -179,7 +179,7 @@ void AppController::post_action()
   }
   else
   {
-    PostAction( action, private_->context_ );
+    Core::ActionDispatcher::PostAction( action, private_->context_ );
   }
 }
 

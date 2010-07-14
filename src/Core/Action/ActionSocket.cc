@@ -162,7 +162,7 @@ void ActionSocket::run_action_socket( int portnum )
         else
         {
           context->reset();
-          PostAndWaitAction( action, context );
+          ActionDispatcher::PostAndWaitAction( action, context );
           std::string message = context->message();
           boost::asio::write( socket, boost::asio::buffer( message ) );
         }
