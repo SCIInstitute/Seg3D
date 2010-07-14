@@ -116,14 +116,9 @@ public:
   typedef boost::signals2::signal<void ()> state_changed_signal_type;
   state_changed_signal_type state_changed_signal_;
 
-  void block_signals( bool block ){ block_signals_ = block; }
-  bool is_blocked(){ return block_signals_; }
-
   // -- Implementation details --
 private:
   StateEnginePrivate* private_;
-  std::vector< std::string > session_states_;
-  bool block_signals_;
 
   // -- Static convenience functions --
 public:

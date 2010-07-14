@@ -103,7 +103,7 @@ public:
   // Convert the contents of the State into a string
   virtual std::string export_to_string() const
   {
-    return ( Core::ExportToString( value_ ) );
+    return Core::ExportToString( value_ );
   }
 
   // IMPORT_FROM_STRING:
@@ -112,9 +112,9 @@ public:
     Core::ActionSource::NONE_E )
   {
     T value;
-    if ( !( Core::ImportFromString( str, value ) ) ) return ( false );
+    if ( !( Core::ImportFromString( str, value ) ) ) return false;
 
-    return ( set( value, source ) );
+    return set( value, source );
   }
 
 protected:
@@ -122,7 +122,7 @@ protected:
   // Export the state data to a variant parameter
   virtual void export_to_variant( Core::ActionParameterVariant& variant ) const
   {
-    variant.set_value( value_ );
+    variant.set_value( this->value_ );
   }
 
   // IMPORT_FROM_VARIANT:
@@ -131,8 +131,8 @@ protected:
     Core::ActionSource source = Core::ActionSource::NONE_E )
   {
     T value;
-    if ( !( variant.get_value( value ) ) ) return ( false );
-    return ( set( value, source ) );
+    if ( !( variant.get_value( value ) ) ) return false;
+    return set( value, source );
   }
 
   // VALIDATE_VARIANT:
@@ -144,10 +144,10 @@ protected:
     if ( !( variant.validate_type< T > () ) )
     {
       error = "Cannot convert the value '" + variant.export_to_string() + "'";
-      return ( false );
+      return false;
     }
     error = "";
-    return ( true );
+    return true;
   }
 
   // -- access value --
@@ -156,31 +156,31 @@ public:
   // Get the value of the state variable
   const T& get() const
   {
-    return value_;
+    return this->value_;
   }
 
   // SET:
   // Set the value of the state variable
-  // NOTE: this function by passes the action mechanism and should only be used
-  // to enforce a constraint from another action.
+  // NOTE: Please use action to set the state of a variable
   bool set( const T& value, Core::ActionSource source = Core::ActionSource::NONE_E )
   {
-    if( StateEngine::Instance()->is_blocked() )
-      return false;
-
-    CORE_LOG_DEBUG(std::string("Set Value ")+ stateid() +
-      std::string(" ") + Core::ExportToString(value));
-
     // Lock the state engine so no other thread will be accessing it
     StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
 
-    if ( value != value_ )
+    if ( value != this->value_ )
     {
-      value_ = value;
-      value_changed_signal_( value_, source );
-      state_changed_signal_();
+      this->value_ = value;
+      
+      // NOTE: We need to unlock the state engine before triggering the signals
+      lock.unlock();
+      
+      if ( this->signals_enabled() )
+      {
+        this->value_changed_signal_( value, source );
+        this->state_changed_signal_();
+      }
     }
-    return ( true );
+    return true;
   }
 
   // -- signals describing the state --
@@ -191,8 +191,6 @@ public:
 
   typedef boost::signals2::signal< void( T, Core::ActionSource ) > value_changed_signal_type;
   value_changed_signal_type value_changed_signal_;
-
-
 
   // -- internals of StateValue --
 private:

@@ -48,14 +48,8 @@ typedef boost::weak_ptr< StateViewBase > StateViewBaseWeakHandle;
 class StateViewBase : public StateBase
 {
 public:
-  StateViewBase( const std::string& stateid ) :
-    StateBase( stateid )
-  {
-  }
-  
-  virtual ~StateViewBase()
-  {
-  }
+  StateViewBase( const std::string& stateid );
+  virtual ~StateViewBase();
 
   virtual void scale( double ratio ) = 0;
   virtual void translate( const Vector& offset ) = 0;

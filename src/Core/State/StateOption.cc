@@ -59,10 +59,10 @@ StateOption::StateOption( const std::string& stateid, const std::string& default
   StateBase( stateid ),
   value_( Core::StringToLower( default_value ) )
 {
-  option_list_.resize( option_list.size() );
+  this->option_list_.resize( option_list.size() );
   for ( size_t j = 0; j < option_list.size(); j++ )
   {
-    option_list_[ j ] = Core::StringToLower( option_list[ j ] );
+    this->option_list_[ j ] = Core::StringToLower( option_list[ j ] );
   }
 
   option_list_iterator_type it = 
@@ -81,16 +81,16 @@ StateOption::~StateOption()
 
 std::string StateOption::export_to_string() const
 {
-  return ( value_ );
+  return this->value_;
 }
 
 std::string StateOption::export_list_to_string() const
 {
   std::string list_as_string = "";
-  for( size_t i = 0; i < ( option_list_.size() - 1 ); ++i )
+  for( size_t i = 0; i < ( this->option_list_.size() - 1 ); ++i )
     list_as_string = list_as_string + option_list_[ i ] + "|";
 
-  return list_as_string + option_list_[ ( option_list_.size() - 1 ) ];
+  return list_as_string + this->option_list_[ ( this->option_list_.size() - 1 ) ];
 }
 
 bool StateOption::set( const std::string& input_value, ActionSource source )
@@ -116,8 +116,11 @@ bool StateOption::set( const std::string& input_value, ActionSource source )
 
         // Any other sources are fine as they do not reflect a different value
         // and are validated before the code can reach this point.
-        this->value_changed_signal_( value_, source );
-        this->state_changed_signal_();
+        if ( this->signals_enabled() )
+        {       
+          this->value_changed_signal_( value_, source );
+          this->state_changed_signal_();
+        }
       }
       return false;
     }
@@ -125,8 +128,12 @@ bool StateOption::set( const std::string& input_value, ActionSource source )
     this->index_ = static_cast<int>( it - this->option_list_.begin() );
 
     lock.unlock();
-    this->value_changed_signal_( value_, source );
-    this->state_changed_signal_();
+    
+    if ( this->signals_enabled() )
+    {
+      this->value_changed_signal_( value_, source );
+      this->state_changed_signal_();
+    }
   }
   return true;
 }
@@ -134,22 +141,22 @@ bool StateOption::set( const std::string& input_value, ActionSource source )
 bool StateOption::import_from_string( const std::string& str, ActionSource source )
 {
   std::string value;
-  if ( !( Core::ImportFromString( str, value ) ) ) return ( false );
+  if ( !( Core::ImportFromString( str, value ) ) ) return false;
 
-  return ( set( value, source ) );
+  return this->set( value, source );
 }
 
 void StateOption::export_to_variant( ActionParameterVariant& variant ) const
 {
-  variant.set_value( value_ );
+  variant.set_value( this->value_ );
 }
 
 bool StateOption::import_from_variant( ActionParameterVariant& variant, ActionSource source )
 {
   std::string value;
-  if ( !( variant.get_value( value ) ) ) return ( false );
+  if ( !( variant.get_value( value ) ) ) return false;
 
-  return ( set( value, source ) );
+  return this->set( value, source );
 }
 
 bool StateOption::validate_variant( ActionParameterVariant& variant, std::string& error )
@@ -158,25 +165,26 @@ bool StateOption::validate_variant( ActionParameterVariant& variant, std::string
   if ( !( variant.get_value( value ) ) )
   {
     error = "Cannot convert the value '" + variant.export_to_string() + "'";
-    return ( false );
+    return false;
   }
 
   value = Core::StringToLower( value );
-  if ( option_list_.end() == std::find( option_list_.begin(), option_list_.end(), value ) )
+  if ( this->option_list_.end() == std::find( this->option_list_.begin(),
+    this->option_list_.end(), value ) )
   {
     error = "Option '" + value + "' is not a valid option";
-    return ( false );
+    return false;
   }
 
   error = "";
-  return ( true );
+  return true;
 }
 
 bool StateOption::is_option( const std::string& option )
 {
-  if ( option_list_.end() == std::find( option_list_.begin(), option_list_.end(),
-      Core::StringToLower( option ) ) ) return ( false );
-  return ( true );
+  if ( this->option_list_.end() == std::find( this->option_list_.begin(), 
+    this->option_list_.end(), Core::StringToLower( option ) ) ) return false;
+  return true;
 }
 
 void StateOption::set_option_list( const std::vector< std::string >& option_list )
@@ -184,25 +192,35 @@ void StateOption::set_option_list( const std::vector< std::string >& option_list
   // Lock the state engine so no other thread will be accessing it
   StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
 
-  option_list_ = option_list;
+  this->option_list_ = option_list;
+  for ( size_t j = 0; j < this->option_list_.size(); j++ )
+  {
+    this->option_list_[ j ] = Core::StringToLower( this->option_list_[ j ] );
+  }
+  
   option_list_iterator_type it = 
     std::find( this->option_list_.begin(), this->option_list_.end(), this->value_ );
-  if ( option_list_.end() == it )
+
+  if ( this->option_list_.end() == it )
   {
     if ( option_list.size() )
     {
       this->index_ = 0;
-      value_ = option_list[ 0 ];
+      this->value_ = option_list[ 0 ];
     }
     else
     {
-      value_ = "";
+      this->value_ = "";
       this->index_ = -1;
     }
 
     lock.unlock();
-    this->value_changed_signal_( value_, ActionSource::NONE_E );
-    this->state_changed_signal_();
+    
+    if ( this->signals_enabled() )
+    {
+      this->value_changed_signal_( this->value_, ActionSource::NONE_E );
+      this->state_changed_signal_();
+    }
   }
   else
   {
@@ -210,56 +228,15 @@ void StateOption::set_option_list( const std::vector< std::string >& option_list
     lock.unlock();
   }
 
-  optionlist_changed_signal_();
+  if ( this->signals_enabled() )
+  {
+    this->optionlist_changed_signal_();
+  }
 }
 
 void StateOption::set_option_list( const std::string& option_list )
 {
-  // Lock the state engine so no other thread will be accessing it
-  StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
-
-  // Unwrap the option lists
-  std::string option_list_string = Core::StringToLower( option_list );
-
-  option_list_.clear();
-  while ( 1 )
-  {
-    size_t loc = option_list_string.find( SPLITTER_C );
-    if ( loc >= option_list_string.size() )
-    {
-      option_list_.push_back( option_list_string );
-      break;
-    }
-    option_list_.push_back( option_list_string.substr( 0, loc ) );
-    option_list_string = option_list_string.substr( loc + 1 );
-  }
-
-  option_list_iterator_type it = 
-    std::find( this->option_list_.begin(), this->option_list_.end(), this->value_ );
-  if ( option_list_.end() == it )
-  {
-    if ( option_list.size() ) 
-    {
-      this->index_ = 0;
-      value_ = option_list[ 0 ];
-    }
-    else 
-    {
-      value_ = "";
-      this->index_ = -1;
-    }
-
-    lock.unlock();
-    value_changed_signal_( value_, ActionSource::NONE_E );
-    state_changed_signal_();
-  }
-  else
-  {
-    this->index_ = static_cast<int>( it - this->option_list_.begin() );
-    lock.unlock();
-  }
-
-  optionlist_changed_signal_();
+  this->set_option_list( Core::SplitString( option_list, "|" ) );
 }
 
 void StateOption::set_option_list( const std::string& option_list, const std::string& option )
@@ -268,36 +245,23 @@ void StateOption::set_option_list( const std::string& option_list, const std::st
   StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
 
   // Unwrap the option lists
-  std::string option_list_string = Core::StringToLower( option_list );
-
-  option_list_.clear();
-  while ( 1 )
-  {
-    size_t loc = option_list_string.find( SPLITTER_C );
-    if ( loc >= option_list_string.size() )
-    {
-      option_list_.push_back( option_list_string );
-      break;
-    }
-    option_list_.push_back( option_list_string.substr( 0, loc ) );
-    option_list_string = option_list_string.substr( loc + 1 );
-  }
+  this->option_list_ = Core::SplitString( Core::StringToLower( option_list ), "|" );
 
   std::string lower_option = Core::StringToLower( option );
   bool value_changed = false;
 
   option_list_iterator_type it = 
     std::find( this->option_list_.begin(), this->option_list_.end(), lower_option );
-  if ( option_list_.end() == it )
+  if ( this->option_list_.end() == it )
   {
-    if ( option_list.size() ) 
+    if ( this->option_list_.size() ) 
     {
       this->index_ = 0;
-      value_ = option_list[ 0 ];
+      this->value_ = this->option_list_[ 0 ];
     }
     else 
     {
-      value_ = "";
+      this->value_ = "";
       this->index_ = -1;
     }
 
@@ -306,22 +270,28 @@ void StateOption::set_option_list( const std::string& option_list, const std::st
   else
   {
     this->index_ = static_cast<int>( it - this->option_list_.begin() );
-    if ( value_ != lower_option )
+    if ( this->value_ != lower_option )
     {
-      value_ = lower_option;
+      this->value_ = lower_option;
       value_changed = true;
     }
   }
 
   lock.unlock();
+  
   if ( value_changed )
   {
-    value_changed_signal_( value_, ActionSource::NONE_E );
-    state_changed_signal_();
+    if ( this->signals_enabled() )
+    {
+      this->value_changed_signal_( value_, ActionSource::NONE_E );
+      this->state_changed_signal_();
+    }
   }
-  optionlist_changed_signal_();
+  
+  if ( this->signals_enabled() )
+  { 
+    this->optionlist_changed_signal_();
+  }
 }
-
-const char StateOption::SPLITTER_C = '|';
 
 } // end namespace Core

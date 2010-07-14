@@ -46,15 +46,15 @@ StateView3D::~StateView3D()
 
 std::string StateView3D::export_to_string() const
 {
-  return ( Core::ExportToString( value_ ) );
+  return ( Core::ExportToString( this->value_ ) );
 }
 
 bool StateView3D::import_from_string( const std::string& str, ActionSource source )
 {
   Core::View3D value;
-  if ( !( Core::ImportFromString( str, value ) ) ) return ( false );
+  if ( !( Core::ImportFromString( str, value ) ) ) return false;
 
-  return ( set( value, source ) );
+  return this->set( value, source );
 }
 
 bool StateView3D::set( const Core::View3D& value, ActionSource source )
@@ -62,13 +62,18 @@ bool StateView3D::set( const Core::View3D& value, ActionSource source )
   // Lock the state engine so no other thread will be accessing it
   StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
 
-  if ( value != value_ )
+  if ( value != this->value_ )
   {
-    value_ = value;
-    value_changed_signal_( value_, source );
-    state_changed_signal_();
+    this->value_ = value;
+    lock.unlock();
+    
+    if ( this->signals_enabled() )
+    {
+      this->value_changed_signal_( value, source );
+      this->state_changed_signal_();
+    }
   }
-  return ( true );
+  return true;
 }
 
 void StateView3D::rotate( const Core::Vector& axis, double angle )
@@ -78,7 +83,11 @@ void StateView3D::rotate( const Core::Vector& axis, double angle )
     StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
     this->value_.rotate( axis, angle );
   }
-  this->state_changed_signal_();
+  
+  if ( this->signals_enabled() )
+  {
+    this->state_changed_signal_();
+  }
 }
 
 void StateView3D::scale( double ratio )
@@ -88,7 +97,11 @@ void StateView3D::scale( double ratio )
     StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
     this->value_.scale( ratio );
   }
-  this->state_changed_signal_();
+  
+  if ( this->signals_enabled() )
+  {
+    this->state_changed_signal_();
+  }
 }
 
 void StateView3D::translate( const Core::Vector& offset )
@@ -98,20 +111,24 @@ void StateView3D::translate( const Core::Vector& offset )
     StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
     this->value_.translate( offset );
   }
-  this->state_changed_signal_();
+  
+  if ( this->signals_enabled() )
+  {
+    this->state_changed_signal_();
+  }
 }
 
 void StateView3D::export_to_variant( ActionParameterVariant& variant ) const
 {
-  variant.set_value( value_ );
+  variant.set_value( this->value_ );
 }
 
 bool StateView3D::import_from_variant( ActionParameterVariant& variant, ActionSource source )
 {
   Core::View3D value;
-  if ( !( variant.get_value( value ) ) ) return ( false );
+  if ( !( variant.get_value( value ) ) ) return false;
 
-  return ( set( value, source ) );
+  return this->set( value, source );
 }
 
 bool StateView3D::validate_variant( ActionParameterVariant& variant, std::string& error )
@@ -121,11 +138,11 @@ bool StateView3D::validate_variant( ActionParameterVariant& variant, std::string
   {
     error = "Cannot convert the value '" + variant.export_to_string()
         + "' to a 3D Camera position";
-    return ( false );
+    return false;
   }
 
   error = "";
-  return ( true );
+  return true;
 }
 
 } // end namespace Core

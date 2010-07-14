@@ -48,6 +48,7 @@ SET(CORE_STATE_SRCS
   StateRangedValue.h
   StateValue.h
   StateViewBase.h
+  StateViewBase.cc
   StateView2D.cc
   StateView2D.h
   StateView3D.cc

@@ -69,8 +69,7 @@ Viewer::Viewer( size_t viewer_id ) :
   slice_lock_count_( 0 )
 {
   this->add_state( "view_mode", view_mode_state_, AXIAL_C, SAGITTAL_C + 
-    Core::StateOption::SPLITTER_C + CORONAL_C + Core::StateOption::SPLITTER_C + 
-    AXIAL_C + Core::StateOption::SPLITTER_C + VOLUME_C );
+    "|" + CORONAL_C + "|" + AXIAL_C + "|" + VOLUME_C );
 
   this->add_state( "axial_view", axial_view_state_ );
   this->add_state( "coronal_view", coronal_view_state_ );

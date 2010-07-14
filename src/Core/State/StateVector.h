@@ -100,7 +100,7 @@ public:
   // Convert the contents of the State into a string
   virtual std::string export_to_string() const
   {
-    return ( Core::ExportToString( values_vector_ ) );
+    return Core::ExportToString( values_vector_ );
   }
 
   // IMPORT_FROM_STRING:
@@ -108,18 +108,10 @@ public:
   virtual bool import_from_string( const std::string& str, ActionSource source =
     ActionSource::NONE_E )
   {
-    // Lock the state engine so no other thread will be accessing it
-    StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
+    std::vector<T> value;
+    if ( !( Core::ImportFromString( str, value ) ) ) return false;
 
-    std::vector< T > value;
-    if ( !( Core::ImportFromString( str, value ) ) ) return ( false );
-    if ( value != values_vector_ )
-    {
-      values_vector_ = value;
-      value_changed_signal_( values_vector_, source );
-      state_changed_signal_();
-    }
-    return ( true );
+    return this->set( value, source );
   }
 
 protected:
@@ -127,7 +119,7 @@ protected:
   // Export the state data to a variant parameter
   virtual void export_to_variant( ActionParameterVariant& variant ) const
   {
-    variant.set_value( values_vector_ );
+    variant.set_value( this->values_vector_ );
   }
 
   // IMPORT_FROM_VARIANT:
@@ -135,18 +127,9 @@ protected:
   virtual bool import_from_variant( ActionParameterVariant& variant, 
     Core::ActionSource source = Core::ActionSource::NONE_E )
   {
-    // Lock the state engine so no other thread will be accessing it
-    StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
-
-    std::vector< T > value;
-    if ( !( variant.get_value( value ) ) ) return ( false );
-    if ( value != values_vector_ )
-    {
-      values_vector_ = value;
-      value_changed_signal_( values_vector_, ActionSource::NONE_E );
-      state_changed_signal_();
-    }
-    return ( true );
+    std::vector<T> value;
+    if ( !( variant.get_value( value ) ) ) return false;
+    return this->set( value, source );  
   }
 
   // VALIDATE_VARIANT:
@@ -155,13 +138,13 @@ protected:
   // converted and in that case error will describe the error.
   virtual bool validate_variant( ActionParameterVariant& variant, std::string& error )
   {
-    if ( !( variant.validate_type< T > () ) )
+    if ( !( variant.validate_type< std::vector< T > > () ) )
     {
       error = "Cannot convert the value '" + variant.export_to_string() + "'";
-      return ( false );
+      return false;
     }
     error = "";
-    return ( true );
+    return true;
   }
 
   // -- access value --
@@ -170,7 +153,7 @@ public:
   // Get the value of the state variable
   const std::vector< T >& get() const
   {
-    return values_vector_;
+    return this->values_vector_;
   }
 
   // SET:
@@ -182,24 +165,26 @@ public:
     // Lock the state engine so no other thread will be accessing it
     StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
 
-    if ( value != values_vector_ )
+    if ( value != this->values_vector_ )
     {
-      values_vector_ = value;
-      value_changed_signal_( values_vector_, source );
-      state_changed_signal_();
+      this->values_vector_ = value;
+      lock.unlock();
+      
+      if ( this->signals_enabled() )
+      {
+        this->value_changed_signal_( value, source );
+        this->state_changed_signal_();
+      }
     }
-    return ( true );
+    return true;
   }
 
   // -- signals describing the state --
 public:
   // VALUE_CHANGED_SIGNAL:
   // Signal when the data in the state is changed.
-
-  typedef boost::signals2::signal< void( ActionSource ) > value_changed_signal_type;
-  value_changed_signal_type value_changed_signal;
-  
-  typedef boost::signals2::signal< void( std::vector< T >, Core::ActionSource ) > values_changed_signal_type;
+  typedef boost::signals2::signal< void( std::vector< T >, 
+    Core::ActionSource ) > values_changed_signal_type;
   values_changed_signal_type value_changed_signal_;
 
   // -- internals of StateValue --

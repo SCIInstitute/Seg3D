@@ -239,11 +239,16 @@ void StateLabeledOption::set_option_list(  const std::vector< OptionLabelPair >&
   }
 
   lock.unlock();
-  this->optionlist_changed_signal_();
-  if ( !found )
+  
+  
+  if ( this->signals_enabled() )
   {
-    this->value_changed_signal_( old_value, this->private_->value_, ActionSource::NONE_E );
-    this->state_changed_signal_();
+    this->optionlist_changed_signal_();
+    if ( !found )
+    {
+      this->value_changed_signal_( old_value, this->private_->value_, ActionSource::NONE_E );
+      this->state_changed_signal_();
+    }
   }
 }
 
@@ -276,6 +281,7 @@ bool StateLabeledOption::set( const std::string& input_value, Core::ActionSource
 
   if ( index < 0 )
   {
+    std::string old_value = this->private_->value_;
     if ( source == ActionSource::INTERFACE_WIDGET_E )
     {
       lock.unlock();
@@ -286,9 +292,11 @@ bool StateLabeledOption::set( const std::string& input_value, Core::ActionSource
 
       // Any other sources are fine as they do not reflect a different value
       // and are validated before the code can reach this point.
-      this->value_changed_signal_( this->private_->value_, 
-        this->private_->value_, source );
-      this->state_changed_signal_();
+      if ( this->signals_enabled() )
+      {     
+        this->value_changed_signal_( old_value, old_value, source );
+        this->state_changed_signal_();
+      }
     }
 
     return false;
@@ -300,11 +308,15 @@ bool StateLabeledOption::set( const std::string& input_value, Core::ActionSource
   this->private_->value_ = this->private_->option_list_[ index ].first;
   this->private_->index_ = index;
 
+  std::string new_value = this->private_->value_;
   lock.unlock();
-  
-  this->value_changed_signal_( old_value, this->private_->value_, source );
-  this->state_changed_signal_();
 
+  if ( this->signals_enabled() )
+  { 
+    this->value_changed_signal_( old_value, new_value, source );
+    this->state_changed_signal_();
+  }
+  
   return true;
 }
 

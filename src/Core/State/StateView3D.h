@@ -112,8 +112,7 @@ public:
   // Signal when the data in the state is changed, the second parameter
   // indicates the source of the change
 
-  typedef boost::signals2::signal< void( Core::View3D, ActionSource ) >
-      value_changed_signal_type;
+  typedef boost::signals2::signal< void( Core::View3D, ActionSource ) > value_changed_signal_type;
   value_changed_signal_type value_changed_signal_;
 
   // -- Functions specific to this type of state --
@@ -125,15 +124,14 @@ public:
   // Get the value of the state variable
   const Core::View3D& get() const
   {
-    return value_;
+    return this->value_;
   }
 
   // SET:
   // Set the value of the state variable
   // NOTE: this function by passes the action mechanism and should only be used
   // to enforce a constraint from another action.
-  bool set( const Core::View3D& value, 
-    ActionSource source = ActionSource::NONE_E );
+  bool set( const Core::View3D& value, ActionSource source = ActionSource::NONE_E );
 
   // -- storage of the view --
 protected:

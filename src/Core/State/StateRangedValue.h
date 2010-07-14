@@ -77,7 +77,7 @@ public:
     max_value_( max_value ), 
     step_value_( step_value )
   {
-    if ( min_value_ > max_value_ ) std::swap( min_value_, max_value_ );
+    if ( this->min_value_ > this->max_value_ ) std::swap( this->min_value_, this->max_value_ );
   }
 
   // DESTRUCTOR
@@ -91,7 +91,7 @@ public:
   // Convert the contents of the State into a string
   virtual std::string export_to_string() const
   {
-    return ( Core::ExportToString( value_ ) );
+    return Core::ExportToString( this->value_ );
   }
 
   // IMPORT_FROM_STRING:
@@ -100,8 +100,8 @@ public:
     Core::ActionSource::NONE_E )
   {
     T value;
-    if ( !( Core::ImportFromString( str, value ) ) ) return ( false );
-    return ( set( value, source ) );
+    if ( !( Core::ImportFromString( str, value ) ) ) return false;
+    return this->set( value, source );
   }
 
 protected:
@@ -109,7 +109,7 @@ protected:
   // Export the state data to a variant parameter
   virtual void export_to_variant( Core::ActionParameterVariant& variant ) const
   {
-    variant.set_value( value_ );
+    variant.set_value( this->value_ );
   }
 
   // IMPORT_FROM_VARIANT:
@@ -119,10 +119,10 @@ protected:
   {
     // Get the value from the action parameter
     T value;
-    if ( !( variant.get_value( value ) ) ) return ( false );
+    if ( !( variant.get_value( value ) ) ) return false;
 
     // Set the parameter in this state variable
-    return ( set( value, source ) );
+    return this->set( value, source );
   }
 
   // VALIDATE_VARIANT:
@@ -134,19 +134,19 @@ protected:
     if ( !( variant.validate_type< T > () ) )
     {
       error = "Cannot convert the value '" + variant.export_to_string() + "'";
-      return ( false );
+      return false;
     }
 
     T value;
     variant.get_value( value );
-    if ( value < min_value_ || value > max_value_ )
+    if ( value < this->min_value_ || value > this->max_value_ )
     {
       error = "Value " + ExportToString( value ) + "is out of range [" + ExportToString(
-          min_value_ ) + "," + ExportToString( max_value_ ) + "]";
-      return ( false );
+          this->min_value_ ) + "," + ExportToString( this->max_value_ ) + "]";
+      return false;
     }
     error = "";
-    return ( true );
+    return true;
   }
 
   // -- Functions specific to this type of state --
@@ -157,28 +157,50 @@ public:
   // variable normally is represented by a slider and this one records the
   // min and max values so values can be validated correctly
 
-  void set_range( const T& min_value, const T& max_value,
+  void set_range( T min_value, T max_value,
     Core::ActionSource source = Core::ActionSource::NONE_E )
   {
-    min_value_ = min_value;
-    max_value_ = max_value;
+    StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );  
 
-    if ( min_value_ > max_value_ ) std::swap( min_value_, max_value_ );
+    if ( min_value > max_value ) std::swap( min_value, max_value );
+  
+    this->min_value_ = min_value;
+    this->max_value_ = max_value;
 
-    if ( value_ < min_value_ )
+    if ( this->value_ < this->min_value_ )
     {
-      value_ = min_value_;
-      value_changed_signal_( value_, ActionSource::NONE_E );
-      state_changed_signal_();
+      this->value_ = this->min_value_;
+      T value = this->value_;
+      lock.unlock();
+      
+      if ( this->signals_enabled() )
+      {
+        this->value_changed_signal_( value, ActionSource::NONE_E );
+        this->state_changed_signal_();
+        this->range_changed_signal_( min_value, max_value, source );
+      }
     }
-    else if ( value_ > max_value_ )
+    else if ( this->value_ > this->max_value_ )
     {
-      value_ = max_value_;
-      value_changed_signal_( value_, ActionSource::NONE_E );
-      state_changed_signal_();
+      this->value_ = this->max_value_;
+      T value = this->value_;
+      lock.unlock();
+    
+      if ( this->signals_enabled() )
+      {
+        this->value_changed_signal_( value, ActionSource::NONE_E );
+        this->state_changed_signal_();
+      }
     }
+    else
+    {
+      lock.unlock();
 
-    range_changed_signal_( min_value_, max_value_, source );
+      if ( this->signals_enabled() )
+      {
+        this->range_changed_signal_( min_value, max_value, source );
+      }
+    }
   }
 
   // -- access value --
@@ -187,7 +209,7 @@ public:
   // Get the value of the state variable
   T get() const
   {
-    return value_;
+    return this->value_;
   }
 
   // SET:
@@ -200,7 +222,7 @@ public:
     // Lock the state engine so no other thread will be accessing it
     StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
 
-    if ( value != value_ )
+    if ( value != this->value_ )
     {
       // NOTE: If the value is out of bound the variable from_interface is
       // rewmoved to ensure that any updates make it to the widget as well
@@ -208,36 +230,41 @@ public:
       // by the user and the application at the same time. This prevents
       // loop backs of signals between the application layer and the
       // interface layer.
-      if ( value < min_value_ )
+      if ( value < this->min_value_ )
       {
-        value = min_value_;
+        value = this->min_value_;
         source = ActionSource::NONE_E;
       }
-      if ( value > max_value_ )
+      if ( value > this->max_value_ )
       {
-        value = max_value_;
+        value = this->max_value_;
         source = ActionSource::NONE_E;
       }
-      value_ = value;
+      this->value_ = value;
+      
       // NOTE: Unlock before triggering signals
       lock.unlock();
-      value_changed_signal_( value, source );
-      state_changed_signal_();
+      
+      if ( this->signals_enabled() )
+      {     
+        this->value_changed_signal_( value, source );
+        this->state_changed_signal_();
+      }
     }
-    return ( true );
+    return true;
   }
 
   // GET_RANGE:
   // Get the range of the variable
   void get_range( T& min_value, T& max_value )
   {
-    min_value = min_value_;
-    max_value = max_value_;
+    min_value = this->min_value_;
+    max_value = this->max_value_;
   }
     
     void get_step( T& step )
     {
-        step = step_value_;
+        step = this->step_value_;
     }
 
   // -- signals describing the state --

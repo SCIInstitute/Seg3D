@@ -53,12 +53,13 @@ public:
 
   state_handler_counter_map_type state_handler_counter_map_;
   state_handler_map_type state_handler_map_;
+  
+  std::vector< std::string > session_states_; 
 };
 
 CORE_SINGLETON_IMPLEMENTATION( StateEngine );
 
 StateEngine::StateEngine()
-   : block_signals_( false )
 {
   this->private_ = new StateEnginePrivate;
 }
@@ -88,7 +89,7 @@ bool  StateEngine::load_session_states()
   for( int i = 0; i < 3; ++i )
   {
     if( !( * ( this->private_->state_handler_map_.find( handler_order[ i ] ) ) ).second->
-        load_states( this->session_states_ ) )
+        load_states( this->private_->session_states_ ) )
     {
       return false;
     }
@@ -102,7 +103,7 @@ bool StateEngine::populate_session_vector()
 {
   lock_type lock( get_mutex() );
   
-  this->session_states_.clear();
+  this->private_->session_states_.clear();
 
   state_handler_map_type::iterator it = this->private_->state_handler_map_.begin();
   state_handler_map_type::iterator it_end = this->private_->state_handler_map_.end();
@@ -280,15 +281,13 @@ void StateEngine::remove_state_handler( const std::string& handler_id )
 void StateEngine::get_session_states( std::vector< std::string >& states )
 {
   lock_type lock( this->get_mutex() );
-  states = this->session_states_;
+  states = this->private_->session_states_;
 }
 
 void StateEngine::set_session_states( std::vector< std::string >& states )
 {
   lock_type lock( this->get_mutex() );
-  this->session_states_ = states;
+  this->private_->session_states_ = states;
 }
-
-
 
 } // end namespace Core

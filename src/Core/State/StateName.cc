@@ -61,7 +61,7 @@ public:
     }
     
     lock_type lock( GetMutex() );
-    if ( NAME_SET_S.erase( this->value_ ) == 0 )
+    if ( NameSet.erase( this->value_ ) == 0 )
     {
       CORE_LOG_ERROR( std::string( "Trying to delete name \"" ) + this->value_ +
         "\" that does not exist" );
@@ -86,9 +86,9 @@ public:
 
     std::string input_str = boost::regex_replace( str, REGEX_C, "_" );
 
-    if ( NAME_SET_S.count( input_str ) == 0 )
+    if ( NameSet.count( input_str ) == 0 )
     {
-      NAME_SET_S.insert( input_str );
+      NameSet.insert( input_str );
       return input_str;
     }
 
@@ -117,39 +117,39 @@ public:
     do 
     {
       result = str_prefix + ExportToString( i++ );
-    } while ( NAME_SET_S.count( result ) != 0 );
+    } while ( NameSet.count( result ) != 0 );
 
-    NAME_SET_S.insert( result );
+    NameSet.insert( result );
     return result;
   }
 
   static void RemoveName( const std::string& value )
   {
     lock_type lock( GetMutex() );
-    NAME_SET_S.erase( value );
+    NameSet.erase( value );
   }
 
   static bool NameExists( const std::string& value )
   {
     lock_type lock( GetMutex() );
-    return NAME_SET_S.count( value ) != 0;
+    return NameSet.count( value ) != 0;
   }
 
   static mutex_type& GetMutex()
   {
-    return NAME_SET_MUTEX_S;
+    return NameSetMutex;
   }
 
 public:
   // Static data structure for keeping track of names in use
-  static name_set_type NAME_SET_S;
-  static mutex_type NAME_SET_MUTEX_S;
+  static name_set_type NameSet;
+  static mutex_type NameSetMutex;
   static const boost::regex REGEX_C;
 };
 
 const std::string StateName::REGEX_VALIDATOR_C( "[\\w\\s]*" );
-StateNamePrivate::name_set_type StateNamePrivate::NAME_SET_S;
-StateNamePrivate::mutex_type StateNamePrivate::NAME_SET_MUTEX_S;
+StateNamePrivate::name_set_type StateNamePrivate::NameSet;
+StateNamePrivate::mutex_type StateNamePrivate::NameSetMutex;
 const boost::regex StateNamePrivate::REGEX_C( "[^\\w\\s]" );
 
 StateName::StateName( const std::string& stateid, const std::string& value ) :
@@ -216,6 +216,7 @@ const std::string& StateName::get() const
 bool StateName::set( const std::string& value, ActionSource source )
 {
   std::string old_value;
+  std::string new_value;
 
   {
     // Lock the state engine so no other thread will be accessing it
@@ -226,20 +227,31 @@ bool StateName::set( const std::string& value, ActionSource source )
       return true;
     }
 
+    old_value = this->private_->value_;
+
     if ( value.size() == 0 )
     {
-      this->value_changed_signal_( this->private_->value_, this->private_->value_, source );
-      this->state_changed_signal_();
+      lock.unlock();
+      
+      if ( this->signals_enabled() )
+      {   
+        this->value_changed_signal_( old_value, old_value, source );
+        this->state_changed_signal_();
+      }
       return false;
     }
 
-    old_value = this->private_->value_;
     StateNamePrivate::RemoveName( old_value );
     this->private_->value_ = StateNamePrivate::GenerateName( value );
+    new_value = this->private_->value_;
   }
 
-  this->value_changed_signal_( old_value, this->private_->value_, source );
-  this->state_changed_signal_();
+  if ( this->signals_enabled() )
+  {
+    this->value_changed_signal_( old_value, new_value, source );
+    this->state_changed_signal_();
+  }
+  
   return true;
 }
 

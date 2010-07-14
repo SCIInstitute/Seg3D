@@ -98,20 +98,31 @@ protected:
   // converted and in that case error will describe the error.
   virtual bool validate_variant( Core::ActionParameterVariant& variant, std::string& error ) = 0;
 
+  // ENABLE_SIGNALS
+  void enable_signals( bool signals_enabled )
+  {
+    this->signals_enabled_ = signals_enabled;
+  }
+  
+  bool signals_enabled()
+  {
+    return this->signals_enabled_;
+  }
+  
   // -- stateid handling --
 public:
   // GET_STATEID:
   // Get the unique id assigned to the state variable
   std::string stateid() const
   {
-    return ( stateid_ );
+    return this->stateid_;
   }
 
   // GET_BASEID:
   // Get the base id of this state variable
   std::string baseid() const
   {
-    return ( stateid_.substr( 0, stateid_.find( ':' ) ) );
+    return ( this->stateid_.substr( 0, this->stateid_.find( ':' ) ) );
   }
 
   // GET_ID:
@@ -119,8 +130,15 @@ public:
   std::string id() const
   {
     //return ( stateid_.substr( 2, stateid_.find( ":" ) ) );
-    return Core::SplitString(  stateid_, "::" )[ 1 ];
+    return Core::SplitString(  this->stateid_, "::" )[ 1 ];
   }
+
+  // -- signal handling --
+public:
+  // STATE_CHANGED_SIGNAL:
+  // This signal is triggered when the state is changed
+  typedef boost::signals2::signal< void() > state_changed_signal_type;
+  state_changed_signal_type state_changed_signal_;
 
 protected:
   // INVALIDATE:
@@ -130,19 +148,13 @@ protected:
   virtual void invalidate() {}
 
 private:
+  // The name of this state, so it can be saved in human readable form
   std::string stateid_;
 
-  // -- signal handling --
-public:
-  // STATE_CHANGED_SIGNAL:
-  // This signal is triggered when the state is changed
-  typedef boost::signals2::signal< void() > state_changed_signal_type;
-  state_changed_signal_type state_changed_signal_;
+  // Whether the signals are blocked
+  bool signals_enabled_;
 
 };
-
-
-
 
 } // end namespace Core
 

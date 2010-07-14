@@ -135,7 +135,7 @@ public:
   // Get the option list
   std::vector< std::string > option_list() const
   {
-      return option_list_;
+      return this->option_list_;
   }
 
   // IS_OPTION:
@@ -148,9 +148,10 @@ public:
   // Get the value of the state variable
   const std::string& get() const
   {
-    return value_;
+    return this->value_;
   }
 
+  // INDEX:
   // Get the index of the value
   inline int index() const
   {
@@ -159,6 +160,7 @@ public:
 
   // SET:
   // Set the value of the state variable
+  
   // NOTE: this function by passes the action mechanism and should only be used
   // to enforce a constraint from another action.
   bool set( const std::string& value, 
@@ -177,9 +179,6 @@ protected:
   std::vector< std::string > option_list_;
 
   typedef std::vector< std::string >::iterator option_list_iterator_type;
-
-public:
-  const static char SPLITTER_C;
 
 };
 

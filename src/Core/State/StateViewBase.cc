@@ -26,4 +26,19 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <Application/State/StateViewBase.h>
+#include <Core/State/StateViewBase.h>
+
+namespace Core
+{
+
+StateViewBase::StateViewBase( const std::string& stateid ) :
+  StateBase( stateid )
+{
+}
+
+StateViewBase::~StateViewBase()
+{
+}
+
+} // end namespace Core
+

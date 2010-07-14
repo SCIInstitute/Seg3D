@@ -46,15 +46,15 @@ StateView2D::~StateView2D()
 
 std::string StateView2D::export_to_string() const
 {
-  return ( Core::ExportToString( value_ ) );
+  return Core::ExportToString( value_ );
 }
 
 bool StateView2D::import_from_string( const std::string& str, ActionSource source )
 {
   Core::View2D value;
-  if ( !( Core::ImportFromString( str, value ) ) ) return ( false );
+  if ( !( Core::ImportFromString( str, value ) ) ) return false;
 
-  return ( set( value, source ) );
+  return this->set( value, source );
 }
 
 void StateView2D::scale( double ratio )
@@ -64,7 +64,11 @@ void StateView2D::scale( double ratio )
     StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
     this->value_.scale( ratio );
   }
-  this->state_changed_signal_();
+  
+  if ( this->signals_enabled() )
+  {
+    this->state_changed_signal_();
+  }
 }
 
 void StateView2D::translate( const Core::Vector& offset )
@@ -74,7 +78,11 @@ void StateView2D::translate( const Core::Vector& offset )
     StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
     this->value_.translate( offset );
   }
-  this->state_changed_signal_();
+  
+  if ( this->signals_enabled() )
+  {
+    this->state_changed_signal_();
+  }
 }
 
 void StateView2D::flip( Core::FlipDirectionType direction )
@@ -83,7 +91,11 @@ void StateView2D::flip( Core::FlipDirectionType direction )
     StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
     this->value_.flip( direction );
   }
-  this->state_changed_signal_();
+  
+  if ( this->signals_enabled() )
+  {
+    this->state_changed_signal_();
+  }
 }
 
 bool StateView2D::x_flipped() const
@@ -101,27 +113,32 @@ bool StateView2D::set( const Core::View2D& value, ActionSource source )
   // Lock the state engine so no other thread will be accessing it
   StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
 
-  if ( value_ != value )
+  if ( this->value_ != value )
   {
-    value_ = value;
-    value_changed_signal_( value_, source );
-    state_changed_signal_();
+    this->value_ = value;
+    lock.unlock();
+    
+    if ( this->signals_enabled() )
+    {
+      this->value_changed_signal_( value, source );
+      this->state_changed_signal_();
+    }
   }
 
-  return ( true );
+  return true;
 }
 
 void StateView2D::export_to_variant( ActionParameterVariant& variant ) const
 {
-  variant.set_value( value_ );
+  variant.set_value( this->value_ );
 }
 
 bool StateView2D::import_from_variant( ActionParameterVariant& variant, ActionSource source )
 {
   Core::View2D value;
-  if ( !( variant.get_value( value ) ) ) return ( false );
+  if ( !( variant.get_value( value ) ) ) return false;
 
-  return ( set( value, source ) );
+  return this->set( value, source );
 }
 
 bool StateView2D::validate_variant( ActionParameterVariant& variant, std::string& error )
@@ -131,11 +148,11 @@ bool StateView2D::validate_variant( ActionParameterVariant& variant, std::string
   {
     error = "Cannot convert the value '" + variant.export_to_string()
         + "' to a 2D Camera position";
-    return ( false );
+    return false;
   }
 
   error = "";
-  return ( true );
+  return true;
 }
 
 } // end namespace Core
