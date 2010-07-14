@@ -131,7 +131,7 @@ void ToolsDockWidget::open_tool( ToolHandle& tool )
   // Step (2) : Instantiate the widget and add the tool to the toolbox
   widget->create_widget( this, tool );
 
-  std::string label = tool->menu_name() + " " + tool->toolid().substr(tool->toolid().find('_')+1);
+  std::string label = tool->tool_name();
   toolbox_->add_tool( widget, QString::fromStdString( label ), 
     boost::bind( &ActionCloseTool::Dispatch, tool->toolid() ),
       boost::bind( &ActionActivateTool::Dispatch, tool->toolid() ), tool->url() );
@@ -142,11 +142,11 @@ void ToolsDockWidget::open_tool( ToolHandle& tool )
   // Step (4) : If the dock widget was hidden (somebody closed the window),
   // reopen the window
 
-  if( isHidden() )
+  if( this->isHidden() )
   {
-    show();
+    this->show();
   }
-  raise();
+  this->raise();
 }
 
 void ToolsDockWidget::close_tool( ToolHandle& tool )

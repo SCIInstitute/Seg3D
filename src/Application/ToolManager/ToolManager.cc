@@ -274,7 +274,6 @@ void ToolManager::activate_tool( const std::string& toolid )
 
   // Step (4): signal for interface
   activate_tool_signal_( ( *it ).second );
-  active_tool_name_signal_( ( ( *it ).second )->menu_name() + " " + Core::SplitString( toolid, "_" )[ 1 ] + " " );
 }
 
 ToolManager::tool_list_type ToolManager::tool_list()
@@ -388,6 +387,20 @@ ToolHandle ToolManager::get_tool( const std::string& toolid )
   
   return ToolHandle();
 }
+
+void ToolManager::get_tool_names( std::vector< ToolIDNamePair >& tool_names )
+{
+  lock_type lock( this->get_mutex() );
+  tool_list_type::iterator it = this->private_->tool_list_.begin();
+  tool_list_type::iterator it_end = this->private_->tool_list_.end();
+  while ( it != it_end )
+  {
+    ToolHandle tool = ( *it ).second;
+    tool_names.push_back( std::make_pair( tool->toolid(), tool->tool_name() ) );
+    it++;
+  }
+}
+
 
 
 } // end namespace Seg3D

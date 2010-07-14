@@ -63,9 +63,24 @@ Core::ActionHandle ActionActivateLayer::Create( LayerHandle layer )
   return Core::ActionHandle( action );
 }
 
+Core::ActionHandle ActionActivateLayer::Create( const std::string& layer_id )
+{
+  ActionActivateLayer* action = new ActionActivateLayer;
+
+  action->layer_id_.value() = layer_id;
+
+  return Core::ActionHandle( action );
+}
+
+
 void ActionActivateLayer::Dispatch( LayerHandle layer )
 {
   Core::Interface::PostAction( Create( layer ) );
+}
+
+void ActionActivateLayer::Dispatch( const std::string& layer_id )
+{
+  Core::Interface::PostAction( Create( layer_id ) );
 }
 
 } // end namespace Seg3D

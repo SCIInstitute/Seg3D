@@ -31,34 +31,17 @@
 # Set sources
 ##################################################
 
-SET(APPLICATION_VIEW_SRCS
-  Viewer.h
-  Viewer.cc
-  ViewManipulator.h
-  ViewManipulator.cc
+SET(APPLICATION_STATUSBAR_SRCS
+  StatusBar.h
+  StatusBar.cc
   )
 
-SET(APPLICATION_VIEW_ACTIONS_SRCS
-  Actions/ActionAutoView.h
-  Actions/ActionAutoView.cc
-  )
-
-CORE_ADD_LIBRARY(Application_Viewer ${APPLICATION_VIEW_SRCS}
-            ${APPLICATION_VIEW_ACTIONS_SRCS} )
+CORE_ADD_LIBRARY(Application_StatusBar ${APPLICATION_STATUSBAR_SRCS} )
             
-TARGET_LINK_LIBRARIES(Application_Viewer
-                      Core_Utils
-            Core_DataBlock
-            Core_Volume
-                      Core_Application
+TARGET_LINK_LIBRARIES(Application_StatusBar
                       Core_Interface
-                      Core_Action
-                      Core_State
-            Core_Viewer
-            Application_StatusBar
+                      Core_Utils
+            Application_LayerManager
+            Application_ToolManager
                       ${SCI_BOOST_LIBRARY})
 
-# Register actions
-ADD_LIBRARY_ACTIONS(Application_Viewer
-                    ${APPLICATION_VIEW_ACTIONS_SRCS})
-                    

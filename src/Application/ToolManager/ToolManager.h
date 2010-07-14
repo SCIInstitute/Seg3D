@@ -99,7 +99,6 @@ protected:
   // -- Signals for the User Interface --
 public:
   typedef boost::signals2::signal< void( ToolHandle ) > tool_signal_type;
-  typedef boost::signals2::signal< void( std::string ) > tool_name_signal_type;
 
   // OPEN_TOOL_SIGNAL:
   // This signal is triggered after a tool has been opened
@@ -113,13 +112,9 @@ public:
   // This signal is triggered after a tool is activated
   tool_signal_type activate_tool_signal_;
   
-  // ACTIVE_TOOL_NAME_SIGNAL:
-  tool_name_signal_type active_tool_name_signal_;
-
   // -- Access to toollist --
 public:
   typedef std::map< std::string, ToolHandle > tool_list_type;
-  typedef std::set< std::string > toolid_list_type;
 
   // TOOL_LIST:
   // Get the current open tool list
@@ -130,6 +125,8 @@ public:
   std::string active_toolid();
 
   ToolHandle get_active_tool();
+
+  void get_tool_names( std::vector< ToolIDNamePair >& tool_names );
 
 public:
   virtual bool pre_save_states();

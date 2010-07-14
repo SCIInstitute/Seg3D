@@ -72,10 +72,18 @@ public:
   // CREATE:
   // Create an action that activates a layer
   static Core::ActionHandle Create( LayerHandle layer );
+
+  // CREATE:
+  // Create an action that activates a layer
+  static Core::ActionHandle Create( const std::string& layer_id );
   
   // DISPATCH:
   // Dispatch an action that activates a layer
   static void Dispatch( LayerHandle layer );
+
+  // DISPATCH:
+  // Dispatch an action that activates a layer
+  static void Dispatch( const std::string& layer_id );
 };
 
 } // end namespace Seg3D

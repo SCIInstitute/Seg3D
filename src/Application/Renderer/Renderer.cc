@@ -325,7 +325,7 @@ bool Renderer::render_overlay()
     ToolHandle tool = ToolManager::Instance()->get_active_tool();
     if ( tool )
     {
-      tool->repaint( this->viewer_id_, proj_mat );
+      tool->redraw( this->viewer_id_, proj_mat );
     }
 
     // Render the grid

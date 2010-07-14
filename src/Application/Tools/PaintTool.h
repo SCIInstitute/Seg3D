@@ -61,10 +61,10 @@ public:
     int button, int buttons, int modifiers );
   virtual bool handle_wheel( int delta, int x, int y, int buttons, int modifiers );
   
-  // REPAINT:
+  // REDRAW:
   // Draw the paint tool in the specified viewer.
   // The function should only be called by the renderer, which has a valid GL context.
-  virtual void repaint( size_t viewer_id, const Core::Matrix& proj_mat );
+  virtual void redraw( size_t viewer_id, const Core::Matrix& proj_mat );
 
 protected:
   virtual bool post_load_states();

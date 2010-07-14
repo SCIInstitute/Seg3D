@@ -32,16 +32,19 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/signals2.hpp>
 
-#include <Core/Utils/ConnectionHandler.h>
-#include <Core/Utils/Singleton.h>
 #include <Core/Geometry/Point.h>
+#include <Core/State/StateHandler.h>
+#include <Core/State/StateLabeledOption.h>
+#include <Core/Utils/Singleton.h>
 
-namespace Core
+namespace Seg3D
 {
 
 class StatusBar;
+class StatusBarPrivate;
 class DataPointInfo;
 typedef boost::shared_ptr< DataPointInfo > DataPointInfoHandle;
+typedef boost::shared_ptr< StatusBarPrivate > StatusBarPrivateHandle;
 
 class DataPointInfo
 {
@@ -63,7 +66,7 @@ private:
   double value_;
 };
 
-class StatusBar : private Core::ConnectionHandler
+class StatusBar : private Core::StateHandler
 {
   CORE_SINGLETON( StatusBar );
   
@@ -78,8 +81,18 @@ public:
 public:
   boost::signals2::signal< void ( DataPointInfoHandle ) > data_point_info_updated_signal_;
   boost::signals2::signal< void ( int, std::string ) > message_updated_signal_;
+
+public:
+  Core::StateLabeledOptionHandle active_layer_state_;
+  Core::StateLabeledOptionHandle active_tool_state_;
+
+private:
+  StatusBarPrivateHandle private_;
+
+private:
+  const static size_t VERSION_NUMBER_C;
 };
 
-} // end namespace Core
+} // end namespace Seg3D
 
 #endif

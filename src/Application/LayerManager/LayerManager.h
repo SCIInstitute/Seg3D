@@ -105,10 +105,13 @@ public:
   LayerHandle get_active_layer();
   
   // GET_LAYER_NAMES:
-  // this function gets the layer names
+  // This function returns a vector of layer ID and name pairs of the specified layer type.
   void get_layer_names( std::vector< LayerIDNamePair >& layer_names, 
     Core::VolumeType type );
 
+  // GET_LAYER_NAMES:
+  // This function returns a vector of layer ID and name pairs of all layers.
+  void get_layer_names( std::vector< LayerIDNamePair >& layer_names );
 
   // Layer Action Functions
 public:
@@ -186,9 +189,7 @@ public:
   // ACTIVE_LAYER_CHANGED_SIGNAL:
   // This signal is triggered after the active layer is changed
   layer_signal_type active_layer_changed_signal_; 
-  
-  layer_name_signal_type active_layer_name_changed_signal_;
-  
+    
   // LAYER_INSERTED_SIGNAL:
   // This signal is triggered after a layer has been inserted
   layer_signal_type layer_inserted_signal_;

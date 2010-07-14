@@ -523,7 +523,7 @@ void PaintTool::deactivate()
 {
 }
 
-void PaintTool::repaint( size_t viewer_id, const Core::Matrix& proj_mat )
+void PaintTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 {
   ViewerHandle viewer = ViewerManager::Instance()->get_viewer( viewer_id );
   ViewerHandle current_viewer;

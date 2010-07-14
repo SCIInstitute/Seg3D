@@ -29,6 +29,8 @@
 #ifndef APPLICATION_TOOL_TOOLFWD_H
 #define APPLICATION_TOOL_TOOLFWD_H
 
+#include <utility>
+
 // Boost includes
 #include <boost/shared_ptr.hpp>
 
@@ -38,6 +40,8 @@ namespace Seg3D
 // Forward declaration
 class Tool;
 typedef boost::shared_ptr< Tool > ToolHandle;
+
+typedef std::pair< std::string, std::string > ToolIDNamePair;
 
 } // end namespace Seg3D
 

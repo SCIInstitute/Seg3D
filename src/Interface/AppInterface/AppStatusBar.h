@@ -45,7 +45,7 @@
 
 // Core includes
 #include <Core/Utils/ConnectionHandler.h>
-#include <Core/Interface/StatusBar.h>
+#include <Application/StatusBar/StatusBar.h>
 
 namespace Seg3D
 {
@@ -70,9 +70,7 @@ private Q_SLOTS:
 private:
   MessageHistoryWidget* history_widget_;
   bool show_world_coord_;
-  void update_data_point_info( Core::DataPointInfoHandle data_point );
-  void update_active_layer_label( std::string& active_layer_name );
-  void update_active_tool_label( std::string& active_tool_name );
+  void update_data_point_info( DataPointInfoHandle data_point );
   void update_data_point_label();
   void set_message( int msg_type, std::string message );
 
@@ -80,7 +78,7 @@ private:
   QStatusBar* statusbar_;
   QWidget *statusbar_widget_;
   boost::shared_ptr< AppStatusBarPrivate > private_;
-  Core::DataPointInfo data_point_info_;
+  DataPointInfo data_point_info_;
 
 private Q_SLOTS:
   void fix_icon_status();

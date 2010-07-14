@@ -211,7 +211,8 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
       boost::bind( &LayerWidget::UpdateState, qpointer ) ); 
   
     QtUtils::QtBridge::Connect( this->private_->activate_button_, 
-      boost::bind( &ActionActivateLayer::Dispatch, layer ) );
+      boost::bind( static_cast< void ( * ) ( LayerHandle ) >( 
+      &ActionActivateLayer::Dispatch ), layer ) );
     
     // make the default connections, for any layer type, to the state engine
     QtUtils::QtBridge::Connect( this->private_->ui_.selection_checkbox_, layer->selected_state_ );

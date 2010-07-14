@@ -41,10 +41,18 @@
 namespace Seg3D
 {
 
+class ToolPrivate
+{
+public:
+  std::string name_;
+};
+
+
 const std::string Tool::NONE_OPTION_C( "<none>" );
 
 Tool::Tool( const std::string& tool_type, size_t version_number, bool auto_number ) :
-  StateHandler( tool_type, version_number, auto_number )
+  StateHandler( tool_type, version_number, auto_number ),
+  private_( new ToolPrivate )
 {
 }
 
@@ -70,6 +78,12 @@ void Tool::deactivate()
 const std::string& Tool::toolid() const
 {
   return this->get_statehandler_id();
+}
+
+std::string Tool::tool_name() const
+{
+  std::string tool_id = this->toolid();
+  return this->menu_name() + " " + tool_id.substr( tool_id.find( '_' ) + 1 );
 }
 
 bool Tool::handle_mouse_enter( size_t viewer_id, int x, int y )
@@ -108,9 +122,8 @@ bool Tool::handle_wheel( int delta, int x, int y, int buttons, int modifiers )
   return false;
 }
 
-void Tool::repaint( size_t viewer_id, const Core::Matrix& proj_mat )
+void Tool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 {
 }
-
 
 } // end namespace Seg3D

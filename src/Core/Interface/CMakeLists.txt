@@ -36,8 +36,6 @@ SET(CORE_INTERFACE_SRCS
   InterfaceActionContext.cc
   Interface.h
   Interface.cc
-  StatusBar.h
-  StatusBar.cc
   )
 
 CORE_ADD_LIBRARY(Core_Interface ${CORE_INTERFACE_SRCS} )

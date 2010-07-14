@@ -279,9 +279,7 @@ void LayerManager::set_active_layer( LayerHandle layer )
         
   } // We release the lock  here.
 
-  active_layer_changed_signal_( layer );
-  
-  active_layer_name_changed_signal_( layer->get_layer_name() + " " );
+  active_layer_changed_signal_( layer );  
 }
 
 
@@ -578,6 +576,21 @@ void LayerManager::get_layer_names( std::vector< LayerIDNamePair >& layer_names,
   }
 }
 
+void LayerManager::get_layer_names( std::vector< LayerIDNamePair >& layer_names )
+{
+  lock_type lock( this->get_mutex() );
+
+  std::vector< LayerHandle > layers;
+  LayerManager::Instance()->get_layers( layers );
+  size_t num_of_layers = layers.size();
+  for ( size_t i = 0; i < num_of_layers; i++ )
+  {
+    layer_names.push_back( std::make_pair( layers[ i ]->get_layer_id(), 
+      layers[ i ]->get_layer_name() ) );
+  }
+}
+
+
   
 bool LayerManager::pre_save_states()
 {
@@ -685,7 +698,6 @@ bool LayerManager::post_load_states()
       active_layer = this->group_list_.front()->layer_list_.back(); 
     }
     this->set_active_layer( active_layer );
-    active_layer_name_changed_signal_( active_layer->get_layer_name() + " " );
   }
   
   return true;

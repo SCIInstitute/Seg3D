@@ -49,6 +49,10 @@
 namespace Seg3D
 {
 
+// Forward declaration
+class ToolPrivate;
+typedef boost::shared_ptr< ToolPrivate > ToolPrivateHandle;
+
 // CLASS TOOL:
 // The Tool class forms the basis of the tool classes
 
@@ -83,6 +87,7 @@ public:
   virtual std::string url() const = 0;
 
   const std::string& toolid() const;
+  std::string tool_name() const;
 
   // -- mouse and keyboard event handlers --
 public:
@@ -97,10 +102,10 @@ public:
   virtual bool handle_wheel( int delta, int x, int y, int buttons, int modifiers );
 
 public:
-  // REPAINT:
+  // REDRAW:
   // Draw the tool in the specified viewer. Default implementation does nothing.
   // The function should only be called by the renderer, which has a valid GL context.
-  virtual void repaint( size_t viewer_id, const Core::Matrix& proj_mat );
+  virtual void redraw( size_t viewer_id, const Core::Matrix& proj_mat );
 
   // -- close tool --
 public:
@@ -125,6 +130,9 @@ public:
   // Deactivate a tool. A tool is always deactivate before the next one is
   // activated.
   virtual void deactivate();
+
+private:
+  ToolPrivateHandle private_;
 
 public:
 

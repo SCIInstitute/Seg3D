@@ -28,7 +28,7 @@
 
 // Core includes
 #include <Core/Utils/ScopedCounter.h>
-#include <Core/Interface/StatusBar.h>
+#include <Application/StatusBar/StatusBar.h>
 #include <Core/State/Actions/ActionSet.h>
 
 // Application includes
@@ -370,13 +370,13 @@ void Viewer::update_status_bar( int x, int y )
         Core::MaskVolumeSlice* mask_slice = dynamic_cast< Core::MaskVolumeSlice* >( volume_slice );
         value = mask_slice->get_mask_at( static_cast<size_t>( i ), static_cast<size_t>( j ) );
       }
-      Core::DataPointInfoHandle data_point( new Core::DataPointInfo( index, world_pos, value ) );
-      Core::StatusBar::Instance()->set_data_point_info( data_point );
+      DataPointInfoHandle data_point( new DataPointInfo( index, world_pos, value ) );
+      StatusBar::Instance()->set_data_point_info( data_point );
     }
     else
     {
-      Core::DataPointInfoHandle data_point( new Core::DataPointInfo );
-      Core::StatusBar::Instance()->set_data_point_info( data_point );
+      DataPointInfoHandle data_point( new DataPointInfo );
+      StatusBar::Instance()->set_data_point_info( data_point );
     }
   }
 }
