@@ -69,19 +69,16 @@ public:
 protected:
   virtual bool post_load_states();
 
-private:
-  void handle_layers_changed();
-  void handle_data_constraint_changed();
-
-  void update_target_options();
-  void update_constraint_options();
-
   // -- state --
 public:
 
   Core::StateLabeledOptionHandle target_layer_state_;
   Core::StateLabeledOptionHandle data_constraint_layer_state_;
   Core::StateLabeledOptionHandle mask_constraint_layer_state_;
+
+  Core::StateBoolHandle use_active_layer_state_;
+  Core::StateBoolHandle negative_data_constraint_state_;
+  Core::StateBoolHandle negative_mask_constraint_state_;
   
   // Radius of the brush
   Core::StateRangedIntHandle brush_radius_state_;

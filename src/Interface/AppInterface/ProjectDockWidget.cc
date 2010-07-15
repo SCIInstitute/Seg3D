@@ -109,7 +109,7 @@ ProjectDockWidget::ProjectDockWidget( QWidget *parent ) :
 
 ProjectDockWidget::~ProjectDockWidget()
 {
-
+  this->disconnect_all();
 }
   
   

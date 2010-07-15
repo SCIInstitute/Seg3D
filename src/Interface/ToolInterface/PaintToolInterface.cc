@@ -96,13 +96,30 @@ bool PaintToolInterface::build_widget( QFrame* frame )
   PaintTool* tool = dynamic_cast< PaintTool* > ( base_tool_.get() );
   
   //Step 3 - connect the gui to the tool through the QtBridge
-  QtUtils::QtBridge::Connect( this->private_->ui_.target_mask_, tool->target_layer_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ui_.mask_constraint_, tool->mask_constraint_layer_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ui_.data_constraint_, tool->data_constraint_layer_state_ );
-  QtUtils::QtBridge::Connect( this->private_->brush_radius_, tool->brush_radius_state_ );
-  QtUtils::QtBridge::Connect( this->private_->upper_threshold_, tool->upper_threshold_state_ );
-  QtUtils::QtBridge::Connect( this->private_->lower_threshold_, tool->lower_threshold_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ui_.eraseCheckBox, tool->erase_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.target_mask_, 
+    tool->target_layer_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.use_active_layer_, 
+    tool->use_active_layer_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.mask_constraint_, 
+    tool->mask_constraint_layer_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.negative_mask_constraint_,
+    tool->negative_mask_constraint_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.data_constraint_, 
+    tool->data_constraint_layer_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.negative_data_constraint_,
+    tool->negative_data_constraint_state_ );
+  QtUtils::QtBridge::Connect( this->private_->brush_radius_, 
+    tool->brush_radius_state_ );
+  QtUtils::QtBridge::Connect( this->private_->upper_threshold_, 
+    tool->upper_threshold_state_ );
+  QtUtils::QtBridge::Connect( this->private_->lower_threshold_, 
+    tool->lower_threshold_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.eraseCheckBox, 
+    tool->erase_state_ );
+
+  this->private_->ui_.target_mask_->setDisabled( tool->use_active_layer_state_->get() );
+  connect( this->private_->ui_.use_active_layer_, SIGNAL( toggled( bool ) ),
+    this->private_->ui_.target_mask_, SLOT( setDisabled( bool ) ) );
     
     //Send a message to the log that we have finised with building the Paint Brush Interface
   CORE_LOG_MESSAGE("Finished building a Paint Brush Interface");
