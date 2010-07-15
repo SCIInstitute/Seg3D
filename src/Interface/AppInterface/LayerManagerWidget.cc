@@ -74,7 +74,6 @@ LayerManagerWidget::~LayerManagerWidget()
 {
 }
 
-
 void LayerManagerWidget::insert_layer( LayerHandle layer )
 {
   std::string group_id = layer->get_layer_group()->get_group_id();
@@ -171,8 +170,6 @@ void LayerManagerWidget::delete_layer( LayerHandle layer )
   }   
 }
 
-
-
 void LayerManagerWidget::make_new_group( LayerHandle layer )
 {
     LayerGroupWidgetQHandle new_group_handle( new LayerGroupWidget( this, layer ) );
@@ -191,8 +188,6 @@ void LayerManagerWidget::make_new_group( LayerHandle layer )
   
 }
 
-
-  
 void LayerManagerWidget::delete_group( LayerGroupHandle group )
 {
   for ( QList< LayerGroupWidgetQHandle >::iterator i = this->group_list_.begin(); 
@@ -206,7 +201,6 @@ void LayerManagerWidget::delete_group( LayerGroupHandle group )
     }
   }
 }
-
 
 void  LayerManagerWidget::set_active_layer( LayerHandle layer )
 {
@@ -225,7 +219,6 @@ void  LayerManagerWidget::set_active_layer( LayerHandle layer )
   }
 }
 
-  
 void LayerManagerWidget::prep_layers_for_drag_and_drop( bool move_time )
 {
   for ( QList< LayerGroupWidgetQHandle >::iterator i = this->group_list_.begin(); 
@@ -252,7 +245,5 @@ void LayerManagerWidget::notify_picked_up_group_size( int group_size )
     ( *i )->set_picked_up_group_size( group_size );
   } 
 }
-
-
 
 }  // end namespace Seg3D

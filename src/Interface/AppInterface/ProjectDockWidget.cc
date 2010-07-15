@@ -35,6 +35,7 @@
 
 //Application includes
 #include <Application/ProjectManager/ProjectManager.h>
+#include <Application/PreferencesManager/PreferencesManager.h>
 #include <Application/ProjectManager/Actions/ActionSaveSession.h>
 #include <Application/ProjectManager/Actions/ActionLoadSession.h>
 #include <Application/ProjectManager/Actions/ActionDeleteSession.h>
@@ -70,6 +71,13 @@ ProjectDockWidget::ProjectDockWidget( QWidget *parent ) :
     // We dont want them to be able to save blank notes.
     this->private_->ui_.save_note_button_->setEnabled( false );
 
+    double minutes = PreferencesManager::Instance()->auto_save_time_state_->get();
+
+    this->private_->ui_.minutes_label_->setText( QString::number( minutes, 'f', 2 ) );
+
+    QtUtils::QtBridge::Connect( this->private_->ui_.autosave_checkbox_,
+      PreferencesManager::Instance()->auto_save_state_ );
+
     QtUtils::QtBridge::Connect( this->private_->ui_.project_name_edit_, 
       ProjectManager::Instance()->current_project_->project_name_state_ );
     
@@ -83,6 +91,14 @@ ProjectDockWidget::ProjectDockWidget( QWidget *parent ) :
     add_connection( ProjectManager::Instance()->current_project_->project_notes_state_->
       state_changed_signal_.connect( boost::bind( &ProjectDockWidget::HandleNoteSaved, 
       project_dock_widget ) ) );
+
+    add_connection( PreferencesManager::Instance()->auto_save_time_state_->
+      value_changed_signal_.connect( boost::bind( 
+      &ProjectDockWidget::HandleAutoSaveTimeChanged, project_dock_widget, _1 ) ) );
+
+    add_connection( PreferencesManager::Instance()->smart_save_state_->
+      state_changed_signal_.connect( boost::bind( 
+      &ProjectDockWidget::HandleSmartAutoSaveToggled, project_dock_widget ) ) );
     
     
     connect( this->private_->ui_.save_session_button_, SIGNAL( clicked() ), 
@@ -197,10 +213,19 @@ void ProjectDockWidget::populate_session_list()
   
   for( int i = 0; i < static_cast< int >( sessions.size() ); ++i )
   {
-    if( ( sessions[ i ] != "" ) )// && ( sessions[ i ] != "]" ) )
+    if( ( sessions[ i ] != "" ) )
     {
-      this->private_->ui_.sessions_list_->addItem( QString::fromStdString( 
-        ( Core::SplitString( sessions[ i ], "|" ) )[ 1 ] ) );
+      std::string session_name = ( Core::SplitString( sessions[ i ], "|" ) )[ 1 ];
+      QListWidgetItem *new_item = new QListWidgetItem( QString::fromStdString( session_name ) );
+
+      if( session_name.substr( 0, 7 ) == "(AS) - " )
+      {
+        QFont font;
+        font.setBold( true );
+        new_item->setFont( font );
+      }
+      
+      this->private_->ui_.sessions_list_->addItem( new_item );
     }
   }
 }
@@ -294,6 +319,55 @@ void ProjectDockWidget::call_load_session( QListWidgetItem* item )
 {
   this->load_session();
 }
+
+void ProjectDockWidget::HandleAutoSaveTimeChanged( qpointer_type qpointer, double duration )
+{
+  if( !( Core::Interface::IsInterfaceThread() ) )
+  {
+    Core::Interface::Instance()->post_event( boost::bind( 
+      &ProjectDockWidget::HandleAutoSaveTimeChanged, qpointer, duration ) );
+    return;
+  }
+
+  if( qpointer.data() ) qpointer->set_auto_save_label( duration );
+
+}
+
+void ProjectDockWidget::HandleSmartAutoSaveToggled( qpointer_type qpointer )
+{
+  if( !( Core::Interface::IsInterfaceThread() ) )
+  {
+    Core::Interface::Instance()->post_event( boost::bind( 
+      &ProjectDockWidget::HandleSmartAutoSaveToggled, qpointer ) );
+    return;
+  }
+  if( qpointer.data() ) qpointer->set_smart_save_label();
+}
+
+void ProjectDockWidget::set_auto_save_label( double duration )
+{
+  double time_duration = PreferencesManager::Instance()->auto_save_time_state_->get();
+  this->private_->ui_.minutes_label_->setText( QString::number( time_duration, 'f', 2 ) );
+}
+
+void ProjectDockWidget::set_smart_save_label()
+{
+  if( PreferencesManager::Instance()->smart_save_state_->get() == true )
+  {
+    this->private_->ui_.smart_autosave_status_label_->setText( 
+      QString::fromUtf8( "ACTIVE" ) );
+  }
+  else
+  {
+    this->private_->ui_.smart_autosave_status_label_->setText( 
+      QString::fromUtf8( "INACTIVE" ) );
+  }
+
+}
+
+
+
+
 
 
 

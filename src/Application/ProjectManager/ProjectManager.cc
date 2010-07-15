@@ -26,14 +26,12 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-// STL includes
-#include <time.h>
-
 // Boost includes
 #include <boost/lexical_cast.hpp>
 
 // Application includes
 #include <Application/ProjectManager/ProjectManager.h>
+#include <Application/ProjectManager/AutoSave.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
 
 
@@ -47,7 +45,7 @@ CORE_SINGLETON_IMPLEMENTATION( ProjectManager );
 
 ProjectManager::ProjectManager() :
   StateHandler( "projectmanager", VERSION_NUMBER_C, false ),
-  auto_save_timer_( 10 )
+  session_saving_( false )
 { 
   Core::Application::Instance()->get_config_directory( this->local_projectmanager_path_ );
   
@@ -58,8 +56,6 @@ ProjectManager::ProjectManager() :
   add_state( "current_project_path", this->current_project_path_state_, 
     PreferencesManager::Instance()->project_path_state_->get() );
   add_state( "default_project_name_counter", this->default_project_name_counter_state_, 0 );
-  add_state( "auto_save", auto_save_state_,
-    PreferencesManager::Instance()->auto_save_state_->get() );
 
   try
   {
@@ -81,11 +77,7 @@ ProjectManager::ProjectManager() :
   this->add_connection( this->current_project_->project_name_state_->value_changed_signal_.connect( 
     boost::bind( &ProjectManager::rename_project_folder, this, _1, _2 ) ) );
 
-  this->add_connection( PreferencesManager::Instance()->auto_save_timer_state_->
-    value_changed_signal_.connect( boost::bind( 
-    &ProjectManager::set_auto_save_timer, this, _1, _2 ) ) );
-
-/*  this->timer_ = new boost::asio::deadline_timer( this->io_ );*/
+  AutoSave::Instance()->start();
 }
 
 ProjectManager::~ProjectManager()
@@ -185,7 +177,7 @@ void ProjectManager::new_project( const std::string& project_name, const std::st
     this->current_project_->sessions_state_->set( empty_vector );
     this->current_project_->project_notes_state_->set( empty_vector );
     this->current_project_->save_custom_colors_state_->set( false );
-    this->save_project( false );
+    this->save_project( true );
   }
 }
   
@@ -197,17 +189,19 @@ void ProjectManager::open_project( const std::string& project_path, const std::s
   this->current_project_->initialize_from_file( path / project_name, project_name );
   this->current_project_path_state_->set( project_path );
   this->add_to_recent_projects( project_path, project_name );
+
+  this->set_last_saved_session_time_stamp();
 }
   
 void ProjectManager::save_project( bool autosave /*= false*/ )
 {
+  this->session_saving_ = true;
   if( this->save_project_session( autosave ) )
   {
     this->save_project_only();
   }
-  this->start_auto_save_timer();
+  this->session_saving_ = false;
 }
-  
   
 void ProjectManager::save_project_as()
 {
@@ -217,11 +211,12 @@ void ProjectManager::save_project_as()
 bool ProjectManager::save_project_session( bool autosave /*= false */ )
 {
   // Here we check to see if its an autosave and if it is, just save over the previous autosave
-  std::string session_name;
+  std::string session_name = "";
   if( autosave )
-    session_name = "autosave";
-  else
-    session_name = this->get_timestamp();
+  {
+    session_name = "(AS) - ";
+  } 
+  session_name = session_name + this->get_timestamp();
 
   std::string user_name;
   Core::Application::Instance()->get_user_name( user_name );
@@ -234,8 +229,18 @@ bool ProjectManager::save_project_session( bool autosave /*= false */ )
   this->add_to_recent_projects( this->current_project_path_state_->export_to_string(),
     this->current_project_->project_name_state_->get() );
   
-  return this->current_project_->save_session( ( path /
+  bool result = this->current_project_->save_session( ( path /
     this->current_project_->project_name_state_->get() ), session_name );
+
+  if( result )
+  {
+    this->set_last_saved_session_time_stamp();
+  }
+
+  AutoSave::Instance()->recompute_auto_save();
+
+  return result;
+
 }
   
 
@@ -244,9 +249,15 @@ bool ProjectManager::load_project_session( int session_index )
   boost::filesystem::path path = complete( boost::filesystem::path( this->
     current_project_path_state_->get().c_str(), boost::filesystem::native ) );
   
-  return this->current_project_->load_session( ( path /
+  bool result =  this->current_project_->load_session( ( path /
     this->current_project_->project_name_state_->get() ), session_index );
-    
+
+  if( result )
+  {
+    this->set_last_saved_session_time_stamp();
+  }
+
+  return result;
 }
   
 bool ProjectManager::delete_project_session( int session_index )
@@ -261,7 +272,6 @@ bool ProjectManager::delete_project_session( int session_index )
 void ProjectManager::add_to_recent_projects( const std::string& project_path, 
   const std::string& project_name )
 {
-
   std::vector< std::string > temp_projects_vector = this->recent_projects_state_->get();
   
   // first we are going to remove this project from the list if its in there.
@@ -274,6 +284,7 @@ void ProjectManager::add_to_recent_projects( const std::string& project_path,
         == ( project_path + "|" + project_name ) )
       {
         temp_projects_vector[ i ] = "";
+        break;
       }
     }
   }
@@ -281,7 +292,7 @@ void ProjectManager::add_to_recent_projects( const std::string& project_path,
   // now we add id to the beginning of the list
   temp_projects_vector.insert( temp_projects_vector.begin(), 
     ( project_path + "|" + project_name + "|" + this->get_timestamp() ) );
-  temp_projects_vector.resize(20);
+  temp_projects_vector.resize( 20 );
   
   this->recent_projects_state_->set( temp_projects_vector );
   this->save_projectmanager_state();
@@ -340,22 +351,21 @@ std::string ProjectManager::get_timestamp()
   strftime ( time_buffer, 80, "%Y-%b%d-%H-%M-%S", timeinfo );
   std::string current_time_stamp = time_buffer;
   return current_time_stamp;
- }
+}
 
-void ProjectManager::set_auto_save_timer( int timeout, Core::ActionSource source )
+void ProjectManager::set_last_saved_session_time_stamp()
 {
-  this->auto_save_timer_ = timeout * 60;
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+  last_saved_session_time_stamp_ = boost::posix_time::second_clock::local_time();
+}
+
+boost::posix_time::ptime ProjectManager::get_last_saved_session_time_stamp() const
+{
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+  return this->last_saved_session_time_stamp_;
 }
 
 
-void ProjectManager::start_auto_save_timer()
-{
-  //boost::asio::io_service io_;
-//  this->timer_->cancel();
-//  this->timer_->expires_from_now(boost::posix_time::seconds( 10 ));
-//  timer_->async_wait( boost::bind( &ProjectManager::save_project, this, true ) );
-//  this->io_.run();
-}
 
 boost::filesystem::path ProjectManager::get_project_data_path() const
 {
@@ -363,8 +373,6 @@ boost::filesystem::path ProjectManager::get_project_data_path() const
     current_project_path_state_->get().c_str(), boost::filesystem::native ) );
   
   return path / this->current_project_->project_name_state_->get() / "data";
-
-  
 }
 
 void ProjectManager::save_note( const std::string& note )
@@ -391,6 +399,21 @@ bool ProjectManager::save_project_only()
     this->current_project_->project_name_state_->get() );
 
 }
+
+double ProjectManager::get_time_since_last_saved_session() const
+{
+  boost::posix_time::ptime last_save = this->get_last_saved_session_time_stamp();
+  boost::posix_time::ptime current_time = boost::posix_time::second_clock::local_time();
+  boost::posix_time::time_duration duration = current_time - last_save;
+  return static_cast< double >( duration.total_milliseconds() ) * 0.001;
+}
+
+bool ProjectManager::is_saving()
+{
+  return this->session_saving_;
+}
+
+
 
 
 

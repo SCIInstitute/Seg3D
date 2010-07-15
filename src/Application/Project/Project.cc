@@ -101,7 +101,7 @@ bool Project::load_session( boost::filesystem::path project_path, int state_inde
 bool Project::save_session( boost::filesystem::path project_path, const std::string& session_name )
 {
   this->current_session_->session_name_state_->set( session_name );
-  this->add_session_to_list( "sessions|" + session_name );
+  this->add_session_to_list( project_path, "sessions|" + session_name );
   
   return this->current_session_->save_session_settings( 
     ( project_path / "sessions" ), session_name );
@@ -131,15 +131,23 @@ bool Project::delete_session( boost::filesystem::path project_path, int state_in
   return true;
 }
   
-void Project::add_session_to_list( const std::string& session_path_and_name )
+void Project::add_session_to_list( boost::filesystem::path project_path, const std::string& session_path_and_name )
 {
   std::vector< std::string > temp_sessions_vector = this->sessions_state_->get();
   
   for( int i = 0; i < static_cast< int >( temp_sessions_vector.size() ); ++i )
   {
-    if( temp_sessions_vector[ i ] == session_path_and_name )
+    if( temp_sessions_vector[ i ] == "" )
+    {
+      continue;
+    }
+    std::string stored_session_name = ( Core::SplitString( temp_sessions_vector[ i ], "|" ) )[ 1 ];
+    std::string new_session_name = ( Core::SplitString( session_path_and_name, "|" ) )[ 1 ];
+    if( ( stored_session_name.substr( 0, 7 ) == "(AS) - " ) && 
+      ( new_session_name.substr( 0, 7 ) == "(AS) - " ) )
     {
       temp_sessions_vector[ i ] = "";
+      this->delete_session( project_path, i );
     }
   }
   temp_sessions_vector.insert( temp_sessions_vector.begin(), session_path_and_name );

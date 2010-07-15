@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1112</width>
-    <height>20</height>
+    <height>22</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -62,9 +62,9 @@
  QComboBox::drop-down {
      subcontrol-origin: padding;
      subcontrol-position: top right;
-     width: 16px;
-     border-top-right-radius: 3px;
-     border-bottom-right-radius: 3px;
+    /* width: 16px;*/
+     border-top-right-radius: 2px;
+     border-bottom-right-radius: 2px;
  }
 
  QComboBox::down-arrow {
@@ -267,7 +267,7 @@ QComboBox::icon{
         </property>
         <property name="minimumSize">
          <size>
-          <width>98</width>
+          <width>80</width>
           <height>0</height>
          </size>
         </property>
@@ -279,6 +279,11 @@ QComboBox::icon{
         <property name="frame">
          <bool>false</bool>
         </property>
+        <item>
+         <property name="text">
+          <string>the_really_really_long_item_that_will_barely_fit</string>
+         </property>
+        </item>
        </widget>
       </item>
       <item>
@@ -310,7 +315,7 @@ QComboBox::icon{
         </property>
         <property name="minimumSize">
          <size>
-          <width>98</width>
+          <width>80</width>
           <height>0</height>
          </size>
         </property>

@@ -38,7 +38,6 @@ namespace Seg3D
 AppProjectWizard::AppProjectWizard( QWidget *parent ) :
     QWizard( parent )
 {
-    //this->addPage( new IntroPage );
     this->addPage( new ProjectInfoPage );
     this->addPage( new SummaryPage );
   
@@ -54,28 +53,10 @@ AppProjectWizard::~AppProjectWizard()
 
 void AppProjectWizard::accept()
 {
-  // TODO: call the create new project action dispatcher with the settings
-  
   ActionNewProject::Dispatch( Core::Interface::GetWidgetActionContext(),
     field("projectPath").toString().toStdString(),
     field("projectName").toString().toStdString() );
-//  ProjectManager::Instance()->new_project( field("projectName").toString().toStdString(),
-//    field("projectPath").toString().toStdString() );
     QDialog::accept();
-}
-
-IntroPage::IntroPage( QWidget *parent )
-    : QWizardPage( parent )
-{
-    setTitle( "Introduction" );
-    this->description_ = new QLabel( "This wizard will help you create a new Seg3D2 project. "
-                          "You simply need to specify the project name and set a few "
-                          "options to get going." );
-    this->description_->setWordWrap( true );
-
-    QVBoxLayout *layout = new QVBoxLayout;
-    layout->addWidget( this->description_ );
-    setLayout( layout );
 }
 
 ProjectInfoPage::ProjectInfoPage( QWidget *parent )
@@ -154,14 +135,10 @@ SummaryPage::SummaryPage( QWidget *parent )
     this->project_path_ = new QLabel;
     this->project_path_->setWordWrap( true );
   
-  this->consolidate_ = new QLabel;
-  this->consolidate_->setWordWrap( true );
-
     QVBoxLayout *layout = new QVBoxLayout;
   layout->addWidget( this->description_ );
     layout->addWidget( this->project_name_ );
     layout->addWidget( this->project_path_ );
-  layout->addWidget( this->consolidate_ );
     this->setLayout( layout );
 
 }
@@ -173,11 +150,6 @@ void SummaryPage::initializePage()
 
     this->project_name_->setText( QString::fromUtf8( "Project Name: " ) + field("projectName").toString() );
     this->project_path_->setText( QString::fromUtf8( "Project Path: " ) + field("projectPath").toString() );
-  if( field( "autoConsolidate" ).toBool() )
-    this->consolidate_->setText( QString::fromUtf8( "Project Files Setting: Consolidate files into project directory" ) );
-  else
-    this->consolidate_->setText( QString::fromUtf8( "Project Files Setting: Leave files in place." ) );
-
   
 }
 

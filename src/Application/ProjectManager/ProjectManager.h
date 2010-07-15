@@ -33,13 +33,13 @@
 # pragma once
 #endif 
 
-
+// STL includes
+#include <time.h>
 
 // Boost includes
 #include <boost/filesystem.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
-#include <boost/asio.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 // Core includes
@@ -70,7 +70,6 @@ private:
   virtual ~ProjectManager();
   
 public:
-  
   // NEW_PROJECT:
   // this function sets the state values of the current project to reflect the desired values
   void new_project( const std::string& project_name, const std::string& project_path );
@@ -111,15 +110,29 @@ public:
   // GET_PROJECT_DATA_PATH:
   boost::filesystem::path get_project_data_path() const;
 
+  // GET_TIME_SINCE:
+  // function that returns a double containing the time difference since the last
+  // autosave
+  boost::posix_time::ptime get_last_saved_session_time_stamp() const;
+
+  double get_time_since_last_saved_session() const;
+
+  bool is_saving();
+
+
   
 public:
   Core::StateStringVectorHandle recent_projects_state_;
   Core::StateStringHandle current_project_path_state_;
   Core::StateIntHandle default_project_name_counter_state_;
-  Core::StateBoolHandle auto_save_state_;
-  ProjectHandle current_project_;
-  int autosave_countdown_;
   
+  ProjectHandle current_project_;
+
+//  Core::StateBoolHandle smart_auto_save_state_;
+//  Core::StateRangedDoubleHandle auto_save_time_state_;
+//  Core::StateBoolHandle auto_save_state_;
+  
+
 private:
   // INITIALIZE:
   // this function loads the values for ProjectManager from file
@@ -142,29 +155,30 @@ private:
   // successful.
   bool save_project_only();
 
-  // SET_AUTO_SAVE_TIMER
-  // this function is called whenever the value of the autosave time is changed in the Preferences
-  // manager.
-  void set_auto_save_timer( int timeout, Core::ActionSource source );
+  //// SET_AUTO_SAVE_TIMER
+  //// this function is called whenever the value of the autosave time is changed in the Preferences
+  //// manager.
+  //void set_auto_save_timer( int timeout, Core::ActionSource source );
 
-  void start_auto_save_timer();
+  void set_last_saved_session_time_stamp();
+
+  
 
   // GET_TIMESTAMP:
   // this function is called when you need a timestamp as a string
   std::string get_timestamp();
 
 private:
-  int auto_save_timer_;
+  boost::posix_time::ptime last_saved_session_time_stamp_;
   std::vector< Core::Color > project_colors_;
   boost::filesystem::path local_projectmanager_path_;
-  boost::asio::io_service io_;
-  boost::asio::deadline_timer* timer_;
   const static size_t VERSION_NUMBER_C;
+  bool session_saving_;
 
 
 };
 
-} // end namespace seg3D
+} // end namespace seg3d
 
 #endif
 

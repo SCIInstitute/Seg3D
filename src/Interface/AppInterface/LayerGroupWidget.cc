@@ -76,7 +76,6 @@ public:
   OverlayWidget* overlay_;
 
   int group_height;
-
 };
   
 LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
@@ -254,7 +253,6 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
         
         // --- TRANSFORM ---
         // = set the default values
-  
         group->transform_spacing_x_state_->set( group->get_grid_transform().spacing_x() );
         group->transform_spacing_y_state_->set( group->get_grid_transform().spacing_y() );
         group->transform_spacing_z_state_->set( group->get_grid_transform().spacing_z() );
@@ -292,7 +290,6 @@ LayerGroupWidget::~LayerGroupWidget()
 
 void LayerGroupWidget::mousePressEvent( QMouseEvent *event )
 {
-
   // Exit immediately if they are no longer holding the button the press event isnt valid
   if( event->button() != Qt::LeftButton )
   { 
@@ -307,7 +304,6 @@ void LayerGroupWidget::mousePressEvent( QMouseEvent *event )
   // Make up some mimedata containing the layer_id of the layer
   QMimeData *mimeData = new QMimeData;
   mimeData->setText(QString::fromStdString( std::string( "group|" ) +  this->get_group_id() ) );
-
 
   // Create a drag object and insert the hotspot
   QDrag *drag = new QDrag( this );
@@ -364,14 +360,12 @@ void LayerGroupWidget::dropEvent( QDropEvent* event )
   if( this->group_menus_open_ )
     return;
   
-  
   this->set_drop( false );
   this->private_->overlay_->hide();
 
   dynamic_cast< LayerGroupWidget* >( event->source() )->set_drop_target( this ); 
   event->setDropAction(Qt::MoveAction);
   event->accept();
-
 }
 
 void LayerGroupWidget::dragEnterEvent( QDragEnterEvent* event)
@@ -407,7 +401,6 @@ void LayerGroupWidget::seethrough( bool see )
 {
   this->set_picked_up( see );
 
-  //this->setUpdatesEnabled( false );
   if( see )
   {
     this->private_->ui_.base_->hide();
@@ -416,20 +409,20 @@ void LayerGroupWidget::seethrough( bool see )
   {
     this->private_->ui_.base_->show();
   }
-  //this->setUpdatesEnabled( true );
+  
   this->repaint();
 }
 
 void LayerGroupWidget::set_drop( bool drop )
 {
   this->private_->drop_space_->set_height( this->picked_up_group_height_ + 4 );
-  // First we check to see if it is picked up if so, we set change the way it looks
+  
   if( this->picked_up_ )
   {
-    //this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_PICKED_UP_C );  
+    return;
   }
-  // If its not picked up, we set its color to indicate whether or not its a potential drop site
-  else if( drop )
+  
+  if( drop )
   {
     this->private_->drop_space_->show();
   }
@@ -481,7 +474,6 @@ bool LayerGroupWidget::delete_layer( LayerHandle layer )
   return false;  
 }
   
-
 LayerWidgetQWeakHandle LayerGroupWidget::set_active_layer( LayerHandle layer )
 {
   std::string layer_id = layer->get_layer_id();
@@ -490,40 +482,11 @@ LayerWidgetQWeakHandle LayerGroupWidget::set_active_layer( LayerHandle layer )
       if( layer_id == this->layer_list_[i]->get_layer_id() )
       {
           this->layer_list_[i]->set_active( true );
-          this->set_active( true );
       return this->layer_list_[i];
       }
   }
   return LayerWidgetQWeakHandle();
-  
 }
-
-void  LayerGroupWidget::set_active( bool active )
-{
-  if( active )
-    {
-        this->private_->ui_.base_->setStyleSheet( 
-      StyleSheet::GROUP_WIDGET_BASE_ACTIVE_C );
-                  
-    this->private_->ui_.group_background_->setStyleSheet( 
-      StyleSheet::GROUP_WIDGET_BACKGROUND_ACTIVE_C );
-                    
-    this->private_->activate_button_->setStyleSheet( 
-      StyleSheet::GROUP_WIDGET_ACTIVATE_BUTTON_ACTIVE_C); 
-    }
-    else
-    {
-        this->private_->ui_.base_->setStyleSheet( 
-      StyleSheet::GROUP_WIDGET_BASE_INACTIVE_C );
-        
-        this->private_->ui_.group_background_->setStyleSheet( 
-      StyleSheet::GROUP_WIDGET_BACKGROUND_INACTIVE_C );
-                  
-      this->private_->activate_button_->setStyleSheet( 
-      StyleSheet::GROUP_WIDGET_ACTIVATE_BUTTON_INACTIVE_C );               
-    }
-}
-
 
 const std::string& LayerGroupWidget::get_group_id()
 {
@@ -638,7 +601,6 @@ void LayerGroupWidget::show_resample( bool show )
     
     this->private_->ui_.transform_->hide();
     this->private_->ui_.group_transform_button_->setChecked( false );
-    
   }
   else
   {
@@ -800,13 +762,5 @@ void LayerGroupWidget::set_picked_up_group_size( int group_height )
 {
   this->picked_up_group_height_ = group_height;
 }
-
-
   
 }  //end namespace Seg3D
-
-
-
-
-
-

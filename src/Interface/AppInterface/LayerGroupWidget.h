@@ -46,13 +46,19 @@ class LayerGroupWidget : public QWidget
   Q_OBJECT
   
 Q_SIGNALS:
-  // PREP_GROUPS_FOR_DRAG_AND_DROP:
+  // PREP_GROUPS_FOR_DRAG_AND_DROP_SIGNAL_:
   // this signal tells the LayerManagerWidget that it needs to prep all the groups for drag and 
   // drop.
   void prep_layers_for_drag_and_drop_signal_( bool );
   
+  // PREP_LAYERS_FOR_DRAG_AND_DROP_SIGNAL_:
+  // this signal tells the LayerManagerWidget that it needs to tell all the groups to prepare their
+  // layers for for drag and drop.
   void prep_groups_for_drag_and_drop_signal_( bool );
   
+  // PICKED_UP_GROUP_SIZE_SIGNAL_:
+  // this signal is sent to the LayerManagerWidget to notify the other groups what size this
+  // group is so that the proper size slot is opened up
   void picked_up_group_size_signal_( int );
   
   // -- constructor/destructor --
@@ -61,13 +67,36 @@ public:
   virtual ~LayerGroupWidget();
   
 public Q_SLOTS:
+  // SHOW_LAYERS:
+  // function that shows or hides the layers
   void show_layers( bool show );
+
+  // SHOW_RESAMPLE:
+  // function that hides or shows the resample menu
   void show_resample( bool show );
+  
+  // SHOW_TRANSFORM:
+  // function that hides or shows the transform menu
   void show_transform( bool show );
+
+  // SHOW_CROP:
+  // function that hides or shows the crop menu
   void show_crop( bool show );
+
+  // SHOW_FLIP_ROTATE:
+  // function that hides or shows the flip rotate menu
   void show_flip_rotate( bool show );
+
+  // SHOW_DELETE:
+  // function that hides or shows the delete menu
   void show_delete( bool show );
+
+  // SHOW_SELECTION_CHECKBOXES:
+  // function that hides or shows selection checkboxes
   void show_selection_checkboxes( bool show );
+
+  // ENABLE_DELETE_BUTTON:
+  // function that enables the delete button
   void enable_delete_button( bool enable );
   
   // NOTIFY_LAYER_MANAGER_WIDGET:
@@ -80,12 +109,25 @@ public Q_SLOTS:
   
   
 public:
-  //void add_layer( LayerHandle layer );
+  // INSERT_LAYER:
+  // function that creates a new LayerWidget associated with the passed layer
+  // and inserts it at the passed index location
   void insert_layer( LayerHandle layer, int index );
+
+  // DELETE_LAYER:
+  // function that deletes a LayerWidget that is associated with a specific layer
   bool delete_layer( LayerHandle layer );
+
+  // GET_GROUP_ID:
+  // function that returns a string containing the groups id
   const std::string &get_group_id();
-  void set_active( bool active );
+
+  // SET_ACTIVE_LAYER:
+  // function that sets the active layer
   LayerWidgetQWeakHandle set_active_layer( LayerHandle layer );
+
+  // SEETHROUGH:
+  // function that puts the group widget into a state that makes it look "picked up"
   void seethrough( bool see );
   
   // PREP_LAYERS_FOR_DRAG_AND_DROP:
@@ -93,26 +135,62 @@ public:
   // with images of themselves.
   void prep_layers_for_drag_and_drop( bool move_time );
   
+  // SET_PICKED_UP_GROUP_SIZE:
+  // function that sets the size of the currently picked up group
   void set_picked_up_group_size( int group_height );
 
-
-  
-  
 protected:
+  // RESIZEEVENT:
+  // this is an overloaded function to keep the size of the overlay widget in sync with the 
+  // size of the LayerGroupWidget
   void resizeEvent( QResizeEvent *event );
   
 private Q_SLOTS:
+  // ADJUST_NEW_SIZE_LABELS:
+  // this function adjusts the size of the labels based on the scale
     void adjust_new_size_labels( double scale_factor );
+
+  // UNCHECK_DELETE_CONFIRM:
+  // this is a simple helper function that unchecks the delete confirmation checkbox
     void uncheck_delete_confirm();
+
+  // SET_PICKED_UP:
+  // this sets the local member variable picked_up_ to indicate whether the current LayerWidget 
+  // has been picked up.  This is useful when we are representing drag and drop visually
     void set_picked_up( bool up ){ this->picked_up_ = up; }
+
+  // SET_DROP:
+  // this function give the user the impression that a group is available for dropping onto by
+  // opening up a space for dropping
     void set_drop( bool drop );
-   
-  void set_drop_target( LayerGroupWidget* target_layer );
+
+  // SET_DROP_TARGET:
+  // this function stores a local copy of the widget that is going to be dropped onto
+  // in the LayerGroupWidget that is being dropped
+  void set_drop_target( LayerGroupWidget* target_group );
+
+  // MOUSEPRESSEVENT:
+  // Overloaded function that is triggered when a user clicks on the group
   void mousePressEvent( QMouseEvent* event );
+
+  // DROPEVENT:
+  // Overloaded function that is triggered when a drop occurs on the group
   void dropEvent( QDropEvent* event );
+
+  // DRAGENTEREVENT:
+  // Overloaded function that is triggered when a drag even enters the group
   void dragEnterEvent( QDragEnterEvent* event );
+  
+  // DRAGLEAVEEVENT:
+  // Overloaded function that is triggered when a drag even leaves the group
   void dragLeaveEvent( QDragLeaveEvent* event );
+
+  // SHOW_GROUP:
+  // helper function for the show_layers function that shows the group
   void show_group();
+
+  // HIDE_GROUP:
+  // helper function for the show_layers function
   void hide_group();
 
   // -- widget internals --

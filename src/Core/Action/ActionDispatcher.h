@@ -37,6 +37,8 @@
 #include <boost/utility.hpp>
 #include <boost/signals2/signal.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+
 
 #include <Core/Utils/Log.h>
 #include <Core/Utils/Singleton.h>
@@ -100,6 +102,11 @@ public:
   // IS_BUSY:
   // Returns true if there are actions being processed, otherwise false.
   bool is_busy();
+
+  // LAST_ACTION_COMPLETED:
+  // Returns the timestamp of the last action that was completed
+  boost::posix_time::ptime last_action_completed() const;
+
 
 private:
   friend class ActionDispatcherPrivate;

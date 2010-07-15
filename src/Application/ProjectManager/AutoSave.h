@@ -26,70 +26,73 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_APPPROJECTWIZARD_APPPROJECTWIZARD_H
-#define INTERFACE_APPPROJECTWIZARD_APPPROJECTWIZARD_H
+#ifndef APPLICATION_PROJECTMANAGER_AUTOSAVE_H
+#define APPLICATION_PROJECTMANAGER_AUTOSAVE_H
 
-//Qt includes
-#include <QtGui>
+#include <boost/thread.hpp>
+
+
+// Core includes
+#include <Core/Utils/ConnectionHandler.h>
+#include <Core/Utils/Singleton.h>
+#include <Core/Utils/Lockable.h>
+
 
 namespace Seg3D
 {
 
-class AppProjectWizard : public QWizard
+class AutoSave : public Core::Lockable, Core::ConnectionHandler
 {
-Q_OBJECT
+
+CORE_SINGLETON( AutoSave );
 
 public:
-    AppProjectWizard( QWidget *parent = 0 );
-    virtual ~AppProjectWizard();
+  AutoSave();
+  virtual ~AutoSave();
+
+public:
+  // START:
+  // function that makes the connections to the ProjectManager and then starts the thread
+  void start();
+
+  // RECOMPUTE_AUTO_SAVE:
+  // function that 
+  void recompute_auto_save();
+
+  // AUTO_SAVE_DONE:
+  // function that notifies us that the autosave is done
+  void auto_save_is_done();
 
 private:
-    void accept();
+  // RUN:
+  // function that actually runs the timer
+  void run();
 
+  // NEEDS_AUTO_SAVE:
+  // checks to see if autosave is needed
+  bool needs_auto_save();
+
+  // DO_AUTO_SAVE:
+  // function that actually dispatches the session save action
+  void do_auto_save();
+
+  // COMPUTE_TIMEOUT:
+  // function that computes the timeout
+  double compute_timeout();
+
+
+private:
+  boost::thread auto_save_thread_;
+  boost::condition_variable recompute_auto_save_;
+  boost::condition_variable auto_save_done_;
 
 };
 
-class ProjectInfoPage : public QWizardPage
-{
-Q_OBJECT
 
-public:
-    ProjectInfoPage( QWidget *parent = 0 );
-  
-protected:
-    void initializePage();
 
-private:
-    QLabel *project_name_label_;
-    QLabel *project_path_label_;
-    QLineEdit *project_name_lineedit_;
-    QLineEdit *project_path_lineedit_;
-    QPushButton *project_path_change_button_;
-    QCheckBox *automatically_consolidate_checkbox_;
 
-private Q_SLOTS:
-    void set_path();
-};
 
-class SummaryPage : public QWizardPage
-{
-    Q_OBJECT
-
-public:
-    SummaryPage(QWidget *parent = 0);
-
-protected:
-    void initializePage();
-
-private:
-  QLabel *description_;
-    QLabel *project_name_;
-    QLabel *project_path_;
-  QLabel *consolidate_;
-
-};
 
 
 } // end namespace Seg3D
-#endif // APPPROJECTWIZARD_H
-
+#endif

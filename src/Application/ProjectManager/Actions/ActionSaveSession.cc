@@ -39,6 +39,21 @@ namespace Seg3D
 
 bool ActionSaveSession::validate( Core::ActionContextHandle& context )
 {
+  if( this->is_autosave_.value() )
+  {
+    boost::posix_time::ptime time_stamp = ProjectManager::Instance()->get_last_saved_session_time_stamp();
+    if( ProjectManager::Instance()->get_last_saved_session_time_stamp() > this->time_stamp_ )
+    {
+      return false;
+    }
+    
+    if( ProjectManager::Instance()->is_saving() )
+    {
+      return false;
+    }
+  }
+
+  
   return true; // validated
 }
 
@@ -65,6 +80,7 @@ Core::ActionHandle ActionSaveSession::Create( bool is_autosave )
   
   action->is_autosave_.value() = is_autosave;
   
+  action->time_stamp_ = boost::posix_time::second_clock::local_time();
   return Core::ActionHandle( action );
 }
 

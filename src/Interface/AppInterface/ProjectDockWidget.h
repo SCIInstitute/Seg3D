@@ -72,6 +72,14 @@ private:
   // process to the correct one in order to save reload the notes displayed after they have been
   // updated elsewhere.
   static void HandleNoteSaved( qpointer_type qpointer );
+
+  static void HandleAutoSaveTimeChanged( qpointer_type qpointer, double duration );
+  static void HandleSmartAutoSaveToggled( qpointer_type qpointer );
+
+private:
+  void set_auto_save_label( double duration );
+
+  void set_smart_save_label();
   
 private Q_SLOTS:
   // SAVE_PROJECT:

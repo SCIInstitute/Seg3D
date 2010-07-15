@@ -51,22 +51,42 @@ class LayerManagerWidget : public QScrollArea
 // Need to make it a Qt object
 Q_OBJECT
   
-
 //constructor - destructor
 public:
   LayerManagerWidget( QWidget *parent = 0 );
   virtual ~LayerManagerWidget();
 
-
 public:
+  // INSERT_LAYER:
+  // generic function for inserting a layer into a group
   void insert_layer( LayerHandle layer );
+  
+  // INSERT_LAYER:
+  // function for inserting a layer into a group at a specific index
   void insert_layer( LayerHandle layer, int index );
+  
+  // DELETE_LAYER:
+  // function for deleting a specific LayerWidget that is associated with the passed LayerHandle
   void delete_layer( LayerHandle layer );
+  
+  // DELETE_LAYERS:
+  // function for deleting multiple layers
   void delete_layers( std::vector< LayerHandle > layers );
+
+  // MAKE_NEW_GROUP:
+  // 
   void make_new_group( LayerHandle layer );
+
+  // MOVE_GROUP:
+  // 
   void move_group( std::string group_id, int new_index );
+  
+  // DELETE_GROUP:
+  // this function deletes the LayerGroupWidget associated with the LayerGroupHandle
   void delete_group( LayerGroupHandle group );
-  void show_group( LayerGroupHandle group );
+  
+  // SET_ACTIVE_LAYER:
+  // function for setting the local copy of the active layer
   void set_active_layer( LayerHandle layer );
   
 private Q_SLOTS:
@@ -88,7 +108,6 @@ private:
   QVBoxLayout* main_layout_;
   QVBoxLayout* group_layout_;
   LayerWidgetQWeakHandle active_layer_;
-
 
 private:
   QList< LayerGroupWidgetQHandle > group_list_;

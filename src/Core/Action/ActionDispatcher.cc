@@ -28,6 +28,8 @@
 
 // Need instance of main application for inserting events into main application
 // thread.
+// Boost includes
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 // Core includes
 #include <Core/Utils/AtomicCounter.h>
@@ -50,9 +52,12 @@ public:
   // RUN_ACTION:
   // Convenience function for keeping track of actions being executed.
   void run_action(  ActionHandle action, ActionContextHandle action_context );
+  void make_timestamp();
+  boost::posix_time::ptime get_last_action_completed_timestamp();
 
   ActionDispatcher* dispatcher_;
   AtomicCounter action_count_;
+  boost::posix_time::ptime last_action_completed_;
 };
 
 void ActionDispatcherPrivate::run_action( ActionHandle action, 
@@ -60,6 +65,17 @@ void ActionDispatcherPrivate::run_action( ActionHandle action,
 {
   this->dispatcher_->run_action( action, action_context );
   --this->action_count_;
+  this->make_timestamp();
+}
+
+void ActionDispatcherPrivate::make_timestamp() 
+{
+  this->last_action_completed_ = boost::posix_time::second_clock::local_time();
+}
+
+boost::posix_time::ptime ActionDispatcherPrivate::get_last_action_completed_timestamp()
+{
+  return this->last_action_completed_;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -254,6 +270,12 @@ bool ActionDispatcher::IsBusy()
 {
   return Instance()->is_busy();
 }
+
+boost::posix_time::ptime ActionDispatcher::last_action_completed() const
+{
+  return this->private_->get_last_action_completed_timestamp();
+}
+
 
 
 } // end namespace Core

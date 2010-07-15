@@ -29,8 +29,14 @@
 #ifndef APPLICATION_PROJECTMANAGER_ACTIONS_ACTIONSAVESESSION_H
 #define APPLICATION_PROJECTMANAGER_ACTIONS_ACTIONSAVESESSION_H
 
+
+// Boost includes
+#include <boost/date_time.hpp>
+
+// Core includes
 #include <Core/Action/Action.h> 
 #include <Core/Interface/Interface.h>
+
 
 
 namespace Seg3D
@@ -38,13 +44,13 @@ namespace Seg3D
 
 class ActionSaveSession : public Core::Action
 {
-  CORE_ACTION( "SaveSession", "SaveSession <autosave>" );
+  CORE_ACTION( "SaveSession", "SaveSession [ autosave = false ]" );
 
   // -- Constructor/Destructor --
 public:
   ActionSaveSession()
   {
-    this->add_argument( this->is_autosave_ );
+    this->add_parameter( "autosave", this->is_autosave_, false );
   }
 
   virtual ~ActionSaveSession()
@@ -70,6 +76,9 @@ public:
   // DISPATCH:
   // Dispatch an action that activates a layer
   static void Dispatch( Core::ActionContextHandle context, bool is_autosave );
+
+private:
+  boost::posix_time::ptime time_stamp_;
 };
 
 } // end namespace Seg3D

@@ -130,7 +130,7 @@ protected:
 private:
   // ADD_SESSION_TO_LIST
   // this function adds sessions to the list of sessions that is stored in the projects state
-  void add_session_to_list( const std::string& session_path_and_name );
+  void add_session_to_list( boost::filesystem::path project_path, const std::string& session_path_and_name );
   
 private:
   SessionHandle current_session_;

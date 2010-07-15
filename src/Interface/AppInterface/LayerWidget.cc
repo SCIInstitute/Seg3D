@@ -85,11 +85,10 @@ public:
   OverlayWidget* overlay_;
   LayerWidget* drop_layer_;
 
-  // local copy of state information 
+  // Local copy of state information 
   bool active_;
   bool locked_;
   bool picked_up_;
-
 };
 
 LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
@@ -104,7 +103,6 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   this->private_->active_ = false;
   this->private_->locked_ = false;
   this->private_->picked_up_ = false;
-  
   
   // Store the icons in the private class, so they only need to be generated once
   this->private_->label_layer_icon_.addFile( QString::fromUtf8( ":/Images/LabelMapWhite.png" ),
@@ -158,8 +156,6 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   // add the DropSpaceWidget
   this->private_->drop_space_ = new DropSpaceWidget( this );
   this->private_->ui_.verticalLayout_3->insertWidget( 0, this->private_->drop_space_ );
-  
-  //this->private_->drop_space_->setStyleSheet( StyleSheet::DROPSPACEWIDGET_C );
   this->private_->drop_space_->hide();
   
   // add the SliderCombo Widgets
@@ -302,7 +298,6 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   this->private_->ui_.dummy_widget_->hide();
   
   this->update_widget_state( true );
-
   this->setUpdatesEnabled( true );
 }
   
@@ -489,7 +484,6 @@ void LayerWidget::update_appearance( bool locked, bool active, bool initialize )
     break;
   }
 
-  
   if ( locked )
   {
     this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_LOCKED_C );
@@ -570,7 +564,6 @@ void LayerWidget::update_widget_state( bool initialize )
     
     // Show the progress bar, since we are computing a new layer
     this->show_progress_bar( true );
-    
   }
 }
 
@@ -630,7 +623,6 @@ void LayerWidget::set_group_menu_status( bool status )
   
 void LayerWidget::mousePressEvent( QMouseEvent *event )
 {
- 
   // Exit immediately if they are no longer holding the button the press event isnt valid
   if( event->button() != Qt::LeftButton )
   { 
@@ -716,11 +708,6 @@ void LayerWidget::dropEvent( QDropEvent* event )
     return;
   }
   
-  // TODO: We should allow this
-//  if( this->group_menus_open_ || this->layer_menus_open_ )
-//    return;
-  
-
   bool good_to_go = false;
   
   if( !LayerManager::Instance()->check_for_same_group(
@@ -747,7 +734,6 @@ void LayerWidget::dropEvent( QDropEvent* event )
     good_to_go = true;
   }
   
-  
   this->enable_drop_space( false );
   
   if( good_to_go )
@@ -760,7 +746,6 @@ void LayerWidget::dropEvent( QDropEvent* event )
   {
     event->ignore();
   }
-
 }
 
 void LayerWidget::dragEnterEvent( QDragEnterEvent* event)
@@ -797,7 +782,6 @@ void LayerWidget::seethrough( bool see )
 {
   this->set_picked_up( see );
   
-  this->setUpdatesEnabled( false );
   if( see )
   {
 
@@ -807,7 +791,6 @@ void LayerWidget::seethrough( bool see )
   {
     this->show();
   }
-  this->setUpdatesEnabled( true );
   this->repaint();
 }
 
@@ -846,7 +829,6 @@ void LayerWidget::set_active( bool active )
 
 void LayerWidget::show_selection_checkbox( bool show )
 {
-
   if( show && (!this->private_->ui_.lock_button_->isChecked()) )
   { 
     this->private_->ui_.checkbox_widget_->show();
@@ -914,7 +896,6 @@ void LayerWidget::select_color_bar( bool show )
   }
 }
 
-
 void LayerWidget::show_progress_bar( bool show )
 {
   if( show )
@@ -953,8 +934,7 @@ void LayerWidget::prep_for_animation( bool move_time )
   {
     this->private_->ui_.dummy_widget_->hide();
     this->private_->ui_.base_->show();
-  }
-  
+  } 
 }
 
 void LayerWidget::UpdateState( qpointer_type qpointer )
@@ -975,4 +955,3 @@ void LayerWidget::UpdateState( qpointer_type qpointer )
 }
   
 } //end namespace Seg3D
-
