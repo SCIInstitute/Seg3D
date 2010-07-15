@@ -59,7 +59,8 @@ class StateBase : public boost::noncopyable
   // -- constructor / destructor --
 public:
   StateBase(const std::string& stateid) :
-    stateid_( stateid )
+    stateid_( stateid ),
+    signals_enabled_( true )
   {
   }
   
