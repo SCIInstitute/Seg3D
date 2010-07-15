@@ -61,7 +61,7 @@ bool ActionGradientMagnitudeFilter::run( Core::ActionContextHandle& context, Cor
 }
 
 
-Core::ActionHandle  ActionGradientMagnitudeFilter::Create( std::string layer_id, bool replace )
+Core::ActionHandle ActionGradientMagnitudeFilter::Create( std::string layer_id, bool replace )
 {
   ActionGradientMagnitudeFilter* action = new ActionGradientMagnitudeFilter;
   action->layer_id_.value() = layer_id;
@@ -70,9 +70,10 @@ Core::ActionHandle  ActionGradientMagnitudeFilter::Create( std::string layer_id,
   return Core::ActionHandle( action );
 }
 
-void ActionGradientMagnitudeFilter::Dispatch( std::string layer_id, bool replace )
+void ActionGradientMagnitudeFilter::Dispatch( Core::ActionContextHandle context, 
+  std::string layer_id, bool replace )
 {
-  Core::Interface::PostAction( Create( layer_id, replace ) );
+  Core::ActionDispatcher::PostAction( Create( layer_id, replace ), context );
 }
   
 } // end namespace Seg3D

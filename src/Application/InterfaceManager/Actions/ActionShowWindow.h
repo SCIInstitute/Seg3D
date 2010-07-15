@@ -66,7 +66,7 @@ public:
 
   // DISPATCH:
   // Create the action and dispatch it
-  static void Dispatch( const std::string& windowid );
+  static void Dispatch( Core::ActionContextHandle context, const std::string& windowid );
 
 };
 

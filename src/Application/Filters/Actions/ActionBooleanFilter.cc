@@ -118,11 +118,12 @@ Core::ActionHandle ActionBooleanFilter::Create( std::string layer_a_id, std::str
   return Core::ActionHandle( action );
 }
 
-void ActionBooleanFilter::Dispatch( std::string layer_a_id, std::string layer_b_id, 
+void ActionBooleanFilter::Dispatch( Core::ActionContextHandle context, 
+  std::string layer_a_id, std::string layer_b_id, 
   std::string layer_c_id, std::string layer_d_id, std::string expression, bool replace )
 {
-  Core::Interface::PostAction( Create( layer_a_id, layer_b_id, layer_c_id, layer_d_id, 
-    expression, replace ) );
+  Core::ActionDispatcher::PostAction( Create( layer_a_id, layer_b_id, layer_c_id, layer_d_id, 
+    expression, replace ), context );
 }
 
   

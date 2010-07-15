@@ -88,10 +88,12 @@ Core::ActionHandle ActionCannyEdgeDetectionFilter::Create( std::string layer_id,
   return ( Core::ActionHandle( action ) );
 }
 
-void ActionCannyEdgeDetectionFilter::Dispatch( std::string layer_id, double variance, 
+void ActionCannyEdgeDetectionFilter::Dispatch( Core::ActionContextHandle context,
+  std::string layer_id, double variance, 
   double max_error, double threshold, bool replace )
 {
-  Core::Interface::PostAction(  Create( layer_id, variance, max_error, threshold, replace ) );
+  Core::ActionDispatcher::PostAction( Create( layer_id, variance, max_error, threshold, replace ),
+    context );
 }
   
 } // end namespace Seg3D

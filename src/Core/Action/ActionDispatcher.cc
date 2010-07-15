@@ -239,13 +239,13 @@ void ActionDispatcher::run_actions( std::vector< ActionHandle > actions,
 }
 
 void ActionDispatcher::PostAction( const ActionHandle& action, 
-                  const ActionContextHandle& action_context )
+  const ActionContextHandle& action_context )
 {
   Instance()->post_action( action, action_context );
 }
 
 void ActionDispatcher::PostAndWaitAction( const ActionHandle& action, 
-                     const ActionContextHandle& action_context )
+  const ActionContextHandle& action_context )
 {
   Instance()->post_and_wait_action( action, action_context );
 }

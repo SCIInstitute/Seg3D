@@ -70,11 +70,13 @@ private:
 public:
   // CREATE:
   // Create action that moves the layer above
-  static Core::ActionHandle Create( const std::string& group_to_move_id, const std::string& group_below_id );
+  static Core::ActionHandle Create( const std::string& group_to_move_id, 
+    const std::string& group_below_id );
   
   // DISPATCH
   // Create and dispatch action that moves the layer above 
-  static void Dispatch( const std::string& group_to_move_id, const std::string& group_below_id );
+  static void Dispatch( Core::ActionContextHandle context, const std::string& group_to_move_id, 
+    const std::string& group_below_id );
   
 };
   

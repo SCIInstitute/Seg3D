@@ -76,7 +76,7 @@ public:
     
   // DISPATCH
   // Create and dispatch action that inserts the new layer 
-  static void Dispatch( std::string layer_id, bool replace );
+  static void Dispatch( Core::ActionContextHandle context, std::string layer_id, bool replace );
   
 };
   

@@ -86,10 +86,10 @@ Core::ActionHandle ActionBinaryDilateErodeFilter::Create( std::string layer_id,
   return Core::ActionHandle( action );
 }
 
-void ActionBinaryDilateErodeFilter::Dispatch( std::string layer_id, int dilate, int erode, 
-  bool replace )
+void ActionBinaryDilateErodeFilter::Dispatch( Core::ActionContextHandle context, 
+  std::string layer_id, int dilate, int erode, bool replace )
 { 
-  Core::Interface::PostAction( Create( layer_id, dilate, erode, replace ) );
+  Core::ActionDispatcher::PostAction( Create( layer_id, dilate, erode, replace ), context );
 }
   
 } // end namespace Seg3D

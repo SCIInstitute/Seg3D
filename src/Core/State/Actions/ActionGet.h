@@ -65,7 +65,7 @@ private:
   // database
   StateBaseWeakHandle state_weak_handle_;
 
-  // -- Dispatch this action from the interface --
+  // -- Create and dispatch this action --
 public:
 
   // CREATE:
@@ -73,8 +73,8 @@ public:
   static ActionHandle Create( StateBaseHandle& state );
 
   // DISPATCH:
-  // Dispatch the action from the interface
-  static void Dispatch( StateBaseHandle& state );
+  // Dispatch the action from the specified context
+  static void Dispatch( ActionContextHandle context, StateBaseHandle& state );
 };
 
 } // end namespace Core

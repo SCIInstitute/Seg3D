@@ -136,7 +136,7 @@ void StatusBarPrivate::set_active_layer_by_status_bar( std::string layer_id )
   
   if ( layer_id != EMPTY_OPTION_C )
   {
-    ActionActivateLayer::Dispatch( layer_id );
+    ActionActivateLayer::Dispatch( Core::Interface::GetWidgetActionContext(), layer_id );
   }
 }
 
@@ -178,7 +178,7 @@ void StatusBarPrivate::set_active_tool_by_status_bar( std::string tool_id )
 
   if ( tool_id != EMPTY_OPTION_C )
   {
-    ActionActivateTool::Dispatch( tool_id );
+    ActionActivateTool::Dispatch( Core::Interface::GetWidgetActionContext(), tool_id );
   }
 }
 
@@ -220,10 +220,10 @@ StatusBar::StatusBar() :
   this->add_connection( this->active_tool_state_->value_changed_signal_.connect(
     boost::bind( &StatusBarPrivate::set_active_tool_by_status_bar, this->private_, _2 ) ) );
 
-  this->add_connection( Core::Interface::Instance()->widget_interface_action_context()->
+  this->add_connection( Core::Interface::Instance()->get_widget_action_context()->
     action_message_signal_.connect( boost::bind( &StatusBar::set_message, this, _1, _2 ) ) );
 
-  this->add_connection( Core::Interface::Instance()->mouse_interface_action_context()->
+  this->add_connection( Core::Interface::Instance()->get_mouse_action_context()->
     action_message_signal_.connect( boost::bind( &StatusBar::set_message, this, _1, _2 ) ) );
 
 }

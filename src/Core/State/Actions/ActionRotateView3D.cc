@@ -83,7 +83,7 @@ bool ActionRotateView3D::run( ActionContextHandle& context, ActionResultHandle& 
   return false;
 }
 
-void ActionRotateView3D::Dispatch( StateView3DHandle& view3d_state, const Core::Vector& axis,
+ActionHandle ActionRotateView3D::Create( StateView3DHandle& view3d_state, const Core::Vector& axis,
     double angle )
 {
   ActionRotateView3D* action = new ActionRotateView3D;
@@ -91,8 +91,13 @@ void ActionRotateView3D::Dispatch( StateView3DHandle& view3d_state, const Core::
   action->axis_.value() = axis;
   action->angle_.value() = angle;
   action->view3d_state_ = StateView3DWeakHandle( view3d_state );
+  return ActionHandle( action );
+}
 
-  Interface::PostAction( ActionHandle( action ) );
+void ActionRotateView3D::Dispatch( ActionContextHandle context, StateView3DHandle& view3d_state, 
+  const Core::Vector& axis, double angle )
+{
+  ActionDispatcher::PostAction( Create( view3d_state, axis, angle), context );
 }
 
 } // end namespace Core

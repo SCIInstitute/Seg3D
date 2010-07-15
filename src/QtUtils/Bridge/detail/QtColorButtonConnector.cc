@@ -86,7 +86,7 @@ void QtColorButtonConnector::set_state( Core::Color val )
 {
   if ( !this->is_blocked() )
   {
-    Core::ActionSet::Dispatch( this->state_, val );
+    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), this->state_, val );
   }
 }
 

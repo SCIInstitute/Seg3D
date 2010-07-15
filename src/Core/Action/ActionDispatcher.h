@@ -175,7 +175,6 @@ public:
 
 };
 
-
 } // namespace Core
 
 #endif

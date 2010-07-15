@@ -68,9 +68,9 @@ Core::ActionHandle ActionNewMaskLayer::Create( LayerGroupHandle group )
   return Core::ActionHandle( action );
 }
 
-void ActionNewMaskLayer::Dispatch( LayerGroupHandle group )
+void ActionNewMaskLayer::Dispatch( Core::ActionContextHandle context, LayerGroupHandle group )
 {
-  Core::Interface::PostAction( Create( group ) );
+  Core::ActionDispatcher::PostAction( Create( group ), context );
 }
 
 } // end namespace Seg3D

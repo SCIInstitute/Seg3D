@@ -55,17 +55,17 @@ bool ActionUndo::run( Core::ActionContextHandle& context, Core::ActionResultHand
   return true; // success
 }
 
-void ActionUndo::Dispatch()
+void ActionUndo::Dispatch( ActionContextHandle context )
 {
   // Post the new action
-  Core::Interface::PostAction( Create() );
+  ActionDispatcher::PostAction( Create(), context );
 }
 
-Core::ActionHandle ActionUndo::Create()
+ActionHandle ActionUndo::Create()
 {
   // Create new action
   ActionUndo* action = new ActionUndo;
-  return Core::ActionHandle( action );
+  return ActionHandle( action );
 }
 
 } // end namespace Core

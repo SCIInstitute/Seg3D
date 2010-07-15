@@ -118,7 +118,7 @@ void QtSliderDoubleComboConnector::set_state_value( double val )
 {
   if ( !this->is_blocked() )
   {
-    Core::ActionSet::Dispatch( this->state_, val );
+    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), this->state_, val );
   }
 }
 
@@ -126,7 +126,8 @@ void QtSliderDoubleComboConnector::set_state_range( double min_val, double max_v
 {
   if ( !this->is_blocked() )
   {
-    Core::ActionSetRange::Dispatch( this->state_, min_val, max_val );
+    Core::ActionSetRange::Dispatch( Core::Interface::GetWidgetActionContext(), this->state_,
+      min_val, max_val );
   }
 }
   

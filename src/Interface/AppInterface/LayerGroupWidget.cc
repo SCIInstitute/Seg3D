@@ -183,9 +183,11 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
       QtUtils::QtBridge::Connect( this->private_->ui_.group_visibility_button_, 
       group->visibility_state_ );
       QtUtils::QtBridge::Connect( this->private_->ui_.delete_button_, 
-      boost::bind( &ActionDeleteLayers::Dispatch, group ) );
+      boost::bind( &ActionDeleteLayers::Dispatch, 
+        Core::Interface::GetWidgetActionContext(), group ) );
     QtUtils::QtBridge::Connect( this->private_->ui_.group_new_button_, 
-      boost::bind( &ActionNewMaskLayer::Dispatch,  group ) );
+      boost::bind( &ActionNewMaskLayer::Dispatch, 
+        Core::Interface::GetWidgetActionContext(), group ) );
   
       // --- RESAMPLE ---
       // = set the default values
@@ -326,7 +328,8 @@ void LayerGroupWidget::mousePressEvent( QMouseEvent *event )
   // Finally if our drag was aborted then we reset the layers styles to be visible
   if( ( ( drag->exec(Qt::MoveAction, Qt::MoveAction) ) == Qt::MoveAction ) && this->drop_group_set_ )
   {
-    ActionMoveGroupAbove::Dispatch( this->get_group_id(), this->drop_group_->get_group_id() );
+    ActionMoveGroupAbove::Dispatch( Core::Interface::GetWidgetActionContext(), 
+      this->get_group_id(), this->drop_group_->get_group_id() );
   }
   
   this->setMinimumHeight( 0 );

@@ -98,41 +98,20 @@ public:
   // DISPATCH:
   // Dispatch the action from the interface
   template< class STATE >
-  static void DispatchState( typename STATE::handle_type& state, 
+  static void DispatchState( ActionContextHandle context, typename STATE::handle_type& state, 
     const typename STATE::value_type& statevalue )
   {
     // Post the new action
-    Interface::PostAction( Create( state, statevalue ) );
+    ActionDispatcher::PostAction( Create( state, statevalue ), context );
   }
   
   // DISPATCH:
   // Dispatch the action from the interface
   template< class HANDLE, class T >
-  static void Dispatch( HANDLE& state, const T& statevalue )
+  static void Dispatch( ActionContextHandle context, HANDLE& state, const T& statevalue )
   {
     // Post the new action
-    Interface::PostAction( Create( state, statevalue ) );
-  }
-
-  // DISPATCHMOUSE:
-  // Dispatch the action from the interface tagged as a mouse command
-  // so that widgets are updated
-  template< class STATE >
-  static void DispatchMouse( typename STATE::handle_type& state, 
-    const typename STATE::value_type& statevalue )
-  {
-    // Post the new action
-    Interface::PostMouseAction( Create( state, statevalue ) );
-  }
-
-  // DISPATCHMOUSE:
-  // Dispatch the action from the interface tagged as a mouse command
-  // so that widgets are updated
-  template< class HANDLE, class T >
-  static void DispatchMouse( HANDLE& state, const T& statevalue )
-  {
-    // Post the new action
-    Interface::PostMouseAction( Create( state, statevalue ) );
+    ActionDispatcher::PostAction( Create( state, statevalue ), context );
   }
 
 };

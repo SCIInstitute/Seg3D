@@ -67,10 +67,10 @@ Core::ActionHandle ActionCloseWindow::Create( const std::string& windowid )
   return ( Core::ActionHandle( action ) );
 }
 
-void ActionCloseWindow::Dispatch( const std::string& windowid )
+void ActionCloseWindow::Dispatch( Core::ActionContextHandle context, const std::string& windowid )
 {
   // Post the new action
-  Core::Interface::PostAction( Create( windowid ) );
+  Core::ActionDispatcher::PostAction( Create( windowid ), context );
 }
 
 } // end namespace Seg3D

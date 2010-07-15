@@ -80,9 +80,9 @@ Core::ActionHandle ActionLoadSession::Create( int session_index )
   return Core::ActionHandle( action );
 }
 
-void ActionLoadSession::Dispatch( int session_index )
+void ActionLoadSession::Dispatch( Core::ActionContextHandle context, int session_index )
 {
-  Core::Interface::PostAction( Create( session_index ) );
+  Core::ActionDispatcher::PostAction( Create( session_index ), context );
 }
 
 } // end namespace Seg3D

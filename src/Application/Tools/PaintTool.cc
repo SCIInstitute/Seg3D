@@ -833,7 +833,8 @@ bool PaintTool::handle_wheel( int delta, int x, int y, int buttons, int modifier
     int brush_radius = this->brush_radius_state_->get() + delta;
     if ( brush_radius >= min_radius && brush_radius <= max_radius )
     {
-      Core::ActionSet::DispatchMouse( this->brush_radius_state_, brush_radius );
+      Core::ActionSet::Dispatch( Core::Interface::GetMouseActionContext(), 
+        this->brush_radius_state_, brush_radius );
     }
     return true;
   }

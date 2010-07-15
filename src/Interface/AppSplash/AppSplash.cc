@@ -111,7 +111,7 @@ void AppSplash::open_existing()
   std::string path = full_path.parent_path().string();
   std::string file_name = full_path.filename();
 
-  ActionLoadProject::Dispatch( path, file_name );
+  ActionLoadProject::Dispatch( Core::Interface::GetWidgetActionContext(), path, file_name );
   
   this->close();
 }
@@ -131,10 +131,10 @@ void AppSplash::open_recent()
       
       if( recent_project == list_item )
       {
-        ActionLoadProject::Dispatch(
-        /*ProjectManager::Instance()->open_project(*/ ( Core::SplitString( 
-        this->recent_project_list_[ i ], "|" ) )[ 0 ], 
-        ( Core::SplitString( this->recent_project_list_[ i ], "|" ) )[ 1 ] ); 
+        std::vector<std::string> project_entry = 
+          Core::SplitString( this->recent_project_list_[ i ], "|" );
+        ActionLoadProject::Dispatch( Core::Interface::GetWidgetActionContext(),
+          project_entry[ 0 ], project_entry[ 1 ] ); 
         break;
       }
     }

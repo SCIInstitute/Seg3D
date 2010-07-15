@@ -68,9 +68,9 @@ Core::ActionHandle ActionSaveSession::Create( bool is_autosave )
   return Core::ActionHandle( action );
 }
 
-void ActionSaveSession::Dispatch( bool is_autosave )
+void ActionSaveSession::Dispatch( Core::ActionContextHandle context, bool is_autosave )
 {
-  Core::Interface::PostAction( Create( is_autosave ) );
+  Core::ActionDispatcher::PostAction( Create( is_autosave ), context );
 }
 
 } // end namespace Seg3D

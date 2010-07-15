@@ -75,7 +75,7 @@ public:
   
   // DISPATCH:
   // Dispatch an action loads a session
-  static void Dispatch( int session_index );
+  static void Dispatch( Core::ActionContextHandle context, int session_index );
 };
 
 } // end namespace Seg3D

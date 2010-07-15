@@ -56,40 +56,45 @@ bool ActionFlip::validate( ActionContextHandle &context )
     }
 
     if ( typeid(*state) != typeid(StateView2D) )
-      {
-        context->report_error( std::string( "State variable '" ) + stateid_.value()
-            + "' doesn't support ActionFlip" );
-        return false;
-      }
-
-      this->view2d_state_ = StateView2DWeakHandle(
-          boost::dynamic_pointer_cast< StateView2D >( state ) );
+    {
+      context->report_error( std::string( "State variable '" ) + stateid_.value()
+        + "' doesn't support ActionFlip" );
+      return false;
     }
 
+    this->view2d_state_ = StateView2DWeakHandle(
+      boost::dynamic_pointer_cast< StateView2D >( state ) );
+  }
+
+  return true;
+}
+
+bool ActionFlip::run( ActionContextHandle& context, ActionResultHandle& result )
+{
+  StateView2DHandle state = this->view2d_state_.lock();
+
+  if ( state )
+  {
+    state->flip( static_cast< Core::FlipDirectionType::enum_type > ( this->direction_.value() ) );
     return true;
   }
 
-  bool ActionFlip::run( ActionContextHandle& context, ActionResultHandle& result )
-  {
-    StateView2DHandle state = this->view2d_state_.lock();
+  return false;
+}
 
-    if ( state )
-    {
-      state->flip( static_cast< Core::FlipDirectionType::enum_type > ( this->direction_.value() ) );
-      return true;
-    }
+ActionHandle ActionFlip::Create( StateView2DHandle& state, Core::FlipDirectionType direction )
+{
+  ActionFlip* action = new ActionFlip;
+  action->stateid_.value() = state->stateid();
+  action->direction_.value() = direction;
+  action->view2d_state_ = state;
+  return ActionHandle( action );  
+}
 
-    return false;
-  }
+void ActionFlip::Dispatch( ActionContextHandle context, StateView2DHandle& state, 
+  Core::FlipDirectionType direction )
+{
+  ActionDispatcher::PostAction( Create( state, direction ), context );
+}
 
-  void ActionFlip::Dispatch( StateView2DHandle& state, Core::FlipDirectionType direction )
-  {
-    ActionFlip* action = new ActionFlip;
-    action->stateid_.value() = state->stateid();
-    action->direction_.value() = direction;
-    action->view2d_state_ = state;
-    Interface::PostAction( ActionHandle( action ) );
-  }
-
-  } // end namespace Core
-
+} // end namespace Core

@@ -101,7 +101,8 @@ void ViewManipulator::mouse_move( const Core::MouseHistory& mouse_history, int b
         mouse_history.previous_.y_, mouse_history.current_.x_, mouse_history.current_.y_,
         this->viewer_->is_volume_view() );
     Core::StateViewBaseHandle view_state = this->viewer_->get_active_view_state();
-    Core::ActionTranslateView::Dispatch( view_state, offset );
+    Core::ActionTranslateView::Dispatch( Core::Interface::GetWidgetActionContext(), 
+      view_state, offset );
     if ( this->viewer_->viewer_lock_state_->get() )
     {
       std::vector< size_t > locked_viewers = ViewerManager::Instance()->
@@ -113,7 +114,8 @@ void ViewManipulator::mouse_move( const Core::MouseHistory& mouse_history, int b
         {
           ViewerHandle viewer = ViewerManager::Instance()->get_viewer( viewer_id );
           Core::StateViewBaseHandle view_state = viewer->get_active_view_state();       
-          Core::ActionTranslateView::Dispatch( view_state, offset );
+          Core::ActionTranslateView::Dispatch( Core::Interface::GetWidgetActionContext(),
+            view_state, offset );
         }
       }
     }
@@ -123,7 +125,8 @@ void ViewManipulator::mouse_move( const Core::MouseHistory& mouse_history, int b
     double scale_ratio = this->compute_scaling( mouse_history.previous_.x_,
         mouse_history.previous_.y_, mouse_history.current_.x_, mouse_history.current_.y_ );
     Core::StateViewBaseHandle view_state = this->viewer_->get_active_view_state();
-    Core::ActionScaleView::Dispatch( view_state, scale_ratio );
+    Core::ActionScaleView::Dispatch( Core::Interface::GetWidgetActionContext(), 
+      view_state, scale_ratio );
     if ( this->viewer_->viewer_lock_state_->get() )
     {
       std::vector< size_t > locked_viewers = ViewerManager::Instance()->
@@ -135,7 +138,8 @@ void ViewManipulator::mouse_move( const Core::MouseHistory& mouse_history, int b
         {
           ViewerHandle viewer = ViewerManager::Instance()->get_viewer( viewer_id );
           Core::StateViewBaseHandle view_state = viewer->get_active_view_state();       
-          Core::ActionScaleView::Dispatch( view_state, scale_ratio );
+          Core::ActionScaleView::Dispatch( Core::Interface::GetWidgetActionContext(),
+            view_state, scale_ratio );
         }
       }
     }
@@ -148,7 +152,8 @@ void ViewManipulator::mouse_move( const Core::MouseHistory& mouse_history, int b
         mouse_history.current_.x_, mouse_history.current_.y_, axis, angle ) )
     {
       // dispatch an ActionRotateView3D
-      Core::ActionRotateView3D::Dispatch( this->viewer_->volume_view_state_, axis, angle );
+      Core::ActionRotateView3D::Dispatch( Core::Interface::GetWidgetActionContext(),
+        this->viewer_->volume_view_state_, axis, angle );
       if ( this->viewer_->viewer_lock_state_->get() )
       {
         std::vector< size_t > locked_viewers = ViewerManager::Instance()->
@@ -159,7 +164,8 @@ void ViewManipulator::mouse_move( const Core::MouseHistory& mouse_history, int b
           if ( this->viewer_->get_viewer_id() != viewer_id )
           {
             ViewerHandle viewer = ViewerManager::Instance()->get_viewer( viewer_id );
-            Core::ActionRotateView3D::Dispatch( viewer->volume_view_state_, axis, angle );
+            Core::ActionRotateView3D::Dispatch( Core::Interface::GetWidgetActionContext(),
+              viewer->volume_view_state_, axis, angle );
           }
         }
       }

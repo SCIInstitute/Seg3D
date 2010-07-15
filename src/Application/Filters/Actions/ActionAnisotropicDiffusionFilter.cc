@@ -136,11 +136,12 @@ Core::ActionHandle ActionAnisotropicDiffusionFilter::Create( std::string layer_i
   return ( Core::ActionHandle( action ) );
 }
 
-void ActionAnisotropicDiffusionFilter::Dispatch( std::string layer_id, int iterations, 
+void ActionAnisotropicDiffusionFilter::Dispatch( Core::ActionContextHandle context, 
+  std::string layer_id, int iterations, 
   int integration_step, double conductance, bool replace )
 { 
-  Core::Interface::PostAction( Create( layer_id, iterations, integration_step, 
-    conductance, replace ) );
+  Core::ActionDispatcher::PostAction( Create( layer_id, iterations, integration_step, 
+    conductance, replace ), context );
 }
   
 } // end namespace Seg3D

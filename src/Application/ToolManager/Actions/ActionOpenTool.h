@@ -68,7 +68,7 @@ public:
 
   // DISPATCH
   // Create and dispatch action that closes a tool
-  static void Dispatch( const std::string& tooltype );
+  static void Dispatch( Core::ActionContextHandle context, const std::string& tooltype );
 
 };
 

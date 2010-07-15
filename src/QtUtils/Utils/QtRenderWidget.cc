@@ -259,7 +259,8 @@ void QtRenderWidget::hideEvent( QHideEvent* event )
 {
   if ( !event->spontaneous() )
   {
-    Core::ActionSet::Dispatch( this->private_->viewer_->viewer_visible_state_, false );
+    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
+      this->private_->viewer_->viewer_visible_state_, false );
   }
 }
 
@@ -267,7 +268,8 @@ void QtRenderWidget::showEvent( QShowEvent* event )
 {
   if ( !event->spontaneous() )
   {
-    Core::ActionSet::Dispatch( this->private_->viewer_->viewer_visible_state_, true );
+    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
+      this->private_->viewer_->viewer_visible_state_, true );
   }
 }
 

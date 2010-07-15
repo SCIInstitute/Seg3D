@@ -58,7 +58,7 @@ public:
 
   // DISPATCH:
   // Dispatch the action from the interface
-  static void Dispatch();
+  static void Dispatch( ActionContextHandle context );
 
   // CREATE:
   // Create the action but do not dispatch it yet

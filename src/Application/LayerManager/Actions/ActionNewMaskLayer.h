@@ -77,7 +77,7 @@ public:
   
   // DISPATCH:
   // Dispatch action that creates a new mask layer 
-  static void Dispatch( LayerGroupHandle group );
+  static void Dispatch( Core::ActionContextHandle context, LayerGroupHandle group );
 };
   
 } // end namespace Seg3D

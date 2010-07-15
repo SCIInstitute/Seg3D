@@ -66,10 +66,10 @@ Core::ActionHandle ActionActivateTool::Create( const std::string& toolid )
   return Core::ActionHandle( action );
 }
 
-void ActionActivateTool::Dispatch( const std::string& toolid )
+void ActionActivateTool::Dispatch( Core::ActionContextHandle context, const std::string& toolid )
 {
   // Post the new action
-  Core::Interface::PostAction( Create( toolid ) );
+  Core::ActionDispatcher::PostAction( Create( toolid ), context );
 }
 
 } // end namespace Seg3D

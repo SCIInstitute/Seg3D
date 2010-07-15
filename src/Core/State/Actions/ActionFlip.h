@@ -39,10 +39,12 @@ class ActionFlip : public Action
 {
   CORE_ACTION( "Flip", "Flip <key> <direction>" );
 
+  // -- Constructor/Destructor --
 public:
   ActionFlip();
   virtual ~ActionFlip();
 
+  // -- Functions that describe action --
   virtual bool validate( ActionContextHandle& context );
   virtual bool run( ActionContextHandle& context, ActionResultHandle& result );
 
@@ -52,8 +54,17 @@ private:
 
   StateView2DWeakHandle view2d_state_;
 
+  // -- Create and dispatch this action --
 public:
-  static void Dispatch( StateView2DHandle& state, Core::FlipDirectionType direction );
+
+  // CREATE:
+  // Create the action but do not dispatch it yet
+  static ActionHandle Create( StateView2DHandle& state, Core::FlipDirectionType direction  );
+
+  // DISPATCH:
+  // Dispatch the action from the specified context
+  static void Dispatch( ActionContextHandle context, StateView2DHandle& state, 
+    Core::FlipDirectionType direction );
 };
 } // end namespace Core
 

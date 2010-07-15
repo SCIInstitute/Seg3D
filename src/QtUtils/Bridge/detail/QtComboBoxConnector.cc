@@ -84,7 +84,8 @@ void QtComboBoxConnector::set_state( const QString& value )
 {
   if ( !this->is_blocked() )
   {
-    Core::ActionSet::Dispatch( this->state_, value.toStdString() );
+    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), this->state_, 
+      value.toStdString() );
   }
 }
 

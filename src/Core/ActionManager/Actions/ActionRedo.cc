@@ -53,10 +53,10 @@ bool ActionRedo::run( ActionContextHandle& context, ActionResultHandle& result )
   return true; // success
 }
 
-void ActionRedo::Dispatch()
+void ActionRedo::Dispatch( ActionContextHandle context )
 {
   // Post the new action
-  Interface::PostAction( Create() );
+  ActionDispatcher::PostAction( Create(), context );
 }
 
 ActionHandle ActionRedo::Create()

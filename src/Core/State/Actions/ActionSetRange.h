@@ -56,17 +56,25 @@ private:
 
   StateBaseWeakHandle state_weak_handle_;
 
+  // -- Dispatch this action from the interface --
 public:
+
   template< class STATE_HANDLE >
-  static void Dispatch( STATE_HANDLE& state_handle, double min_value, double max_value )
+  static ActionHandle Create( STATE_HANDLE& state_handle, double min_value, double max_value )
   {
     ActionSetRange* action = new ActionSetRange;
     action->stateid_.value() = state_handle->stateid();
     action->min_value_.value() = min_value;
     action->max_value_.value() = max_value;
     action->state_weak_handle_ = state_handle;
+    return ActionHandle( action );
+  }
 
-    Interface::PostAction( ActionHandle( action ) );
+  template< class STATE_HANDLE >
+  static void Dispatch( ActionContextHandle context, STATE_HANDLE& state_handle, 
+    double min_value, double max_value )
+  {
+    ActionDispatcher::PostAction( Create( state_handle, min_value, max_value ), context );
   }
 };
 

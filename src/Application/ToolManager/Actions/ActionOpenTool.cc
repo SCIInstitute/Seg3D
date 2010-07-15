@@ -74,9 +74,9 @@ Core::ActionHandle ActionOpenTool::Create( const std::string& toolid )
   return Core::ActionHandle( action );
 }
 
-void ActionOpenTool::Dispatch( const std::string& toolid )
+void ActionOpenTool::Dispatch( Core::ActionContextHandle context, const std::string& toolid )
 {
-  Core::Interface::PostAction( Create( toolid ) );
+  Core::ActionDispatcher::PostAction( Create( toolid ), context );
 }
 
 } // end namespace Seg3D

@@ -98,7 +98,8 @@ public:
   
   // DISPATCH:
   // Create and dispatch action.
-  static void Dispatch( std::string layer_a_id, std::string layer_b_id, 
+  static void Dispatch( Core::ActionContextHandle context, 
+    std::string layer_a_id, std::string layer_b_id, 
     std::string layer_c_id, std::string layer_d_id, std::string expression, bool replace );
   
 };

@@ -110,7 +110,7 @@ void QtLineEditConnector::set_state()
   if ( !this->is_blocked() )
   {
     std::string text = this->parent_->text().trimmed().toStdString();
-    Core::ActionSet::Dispatch( this->state_, text );
+    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), this->state_, text );
   }
 }
 

@@ -140,15 +140,16 @@ Core::ActionHandle ActionImportLayer::Create( const LayerImporterHandle& importe
   return Core::ActionHandle( action );
 }
 
-void ActionImportLayer::Dispatch( const std::string& filename, const std::string& mode,
-  const std::string importer )
+void ActionImportLayer::Dispatch( Core::ActionContextHandle context, const std::string& filename, 
+  const std::string& mode, const std::string importer )
 {
-  Core::Interface::PostAction( Create( filename, mode, importer ) );
+  Core::ActionDispatcher::PostAction( Create( filename, mode, importer ), context );
 }
 
-void ActionImportLayer::Dispatch( const LayerImporterHandle& importer, LayerImporterMode mode )
+void ActionImportLayer::Dispatch( Core::ActionContextHandle context, 
+  const LayerImporterHandle& importer, LayerImporterMode mode )
 {
-  Core::Interface::PostAction( Create( importer, mode ) );
+  Core::ActionDispatcher::PostAction( Create( importer, mode ), context );
 }
   
 } // end namespace Seg3D

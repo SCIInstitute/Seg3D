@@ -133,8 +133,10 @@ void ToolsDockWidget::open_tool( ToolHandle& tool )
 
   std::string label = tool->tool_name();
   toolbox_->add_tool( widget, QString::fromStdString( label ), 
-    boost::bind( &ActionCloseTool::Dispatch, tool->toolid() ),
-      boost::bind( &ActionActivateTool::Dispatch, tool->toolid() ), tool->url() );
+    boost::bind( &ActionCloseTool::Dispatch, Core::Interface::GetWidgetActionContext(), 
+      tool->toolid() ),
+      boost::bind( &ActionActivateTool::Dispatch, Core::Interface::GetWidgetActionContext(),
+      tool->toolid() ), tool->url() );
 
   // Step (3) : Add the tool to the list
   tool_widget_list_[ tool->toolid() ] = widget;

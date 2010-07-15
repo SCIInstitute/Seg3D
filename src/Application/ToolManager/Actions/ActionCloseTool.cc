@@ -66,9 +66,9 @@ Core::ActionHandle ActionCloseTool::Create( const std::string& toolid )
   return Core::ActionHandle( action );
 }
 
-void ActionCloseTool::Dispatch( const std::string& toolid )
+void ActionCloseTool::Dispatch( Core::ActionContextHandle context, const std::string& toolid )
 {
-  Core::Interface::PostAction( Create( toolid ) );
+  Core::ActionDispatcher::PostAction( Create( toolid ), context );
 }
 
 } // end namespace Seg3D

@@ -347,7 +347,7 @@ void LayerImporterWidget::set_mode( LayerImporterMode mode )
 
 void LayerImporterWidget::import()
 {
-  ActionImportLayer::Dispatch( importer_, mode_ );
+  ActionImportLayer::Dispatch( Core::Interface::GetWidgetActionContext(), importer_, mode_ );
   accept();
 }
 

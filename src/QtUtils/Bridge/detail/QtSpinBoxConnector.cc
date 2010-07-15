@@ -129,7 +129,7 @@ void QtSpinBoxConnector::set_state( int val )
 {
   if( !this->is_blocked() )
   {
-    Core::ActionSet::Dispatch( this->state_, val );
+    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), this->state_, val );
   }
 }
 
@@ -137,7 +137,7 @@ void QtSpinBoxConnector::set_state( double val )
 {
   if( !this->is_blocked() )
   {
-    Core::ActionSet::Dispatch( this->state_, val );
+    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), this->state_, val );
   }
 }
   

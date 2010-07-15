@@ -80,7 +80,8 @@ public:
       
   // DISPATCH:
   // Create and dispatch action.
-  static void Dispatch( std::string layer_id, int dilate, int erode, bool replace );
+  static void Dispatch( Core::ActionContextHandle context, std::string layer_id, 
+    int dilate, int erode, bool replace );
   
 };
   

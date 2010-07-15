@@ -97,7 +97,8 @@ void QtActionConnector::set_state( bool value )
 {
   if ( !this->is_blocked() )
   {
-    Core::ActionSet::Dispatch( this->state_, value );
+    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
+      this->state_, value );
   }
 }
 

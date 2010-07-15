@@ -162,12 +162,14 @@ void QtActionVectorConnector::set_state( bool value )
     {
       for ( size_t j = 0; j< state_.size(); j++ )
       {
-        Core::ActionSet::Dispatch( this->state_[ j ], value );
+        Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
+          this->state_[ j ], value );
       }
     }
     else if ( index >= 0 && index < static_cast<int>( this->state_.size() ) )
     {
-      Core::ActionSet::Dispatch( this->state_[ index ], value );
+      Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
+        this->state_[ index ], value );
     }
   }
 }

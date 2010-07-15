@@ -83,23 +83,24 @@ private:
   // -- Dispatch this action from the interface --
 public:
   // CREATE:
-  // Create action that moves the layer above
+  // Create action that imports a layer
   static Core::ActionHandle Create( const std::string& filename, const std::string& mode = "data",
     const std::string importer = "" );
 
   // CREATE:
-  // Create action that moves the layer above
+  // Create action that imports a layer
   static Core::ActionHandle Create( const LayerImporterHandle& importer, LayerImporterMode mode );
   
   // DISPATCH:
   // Create and dispatch action that moves the layer above 
-  static void Dispatch( const std::string& filename, const std::string& mode = "data",
-    const std::string importer = "" );
+  static void Dispatch( Core::ActionContextHandle context, const std::string& filename, 
+    const std::string& mode = "data", const std::string importer = "" );
 
   // DISPATCH:
   // To avoid reading a file twice, this action has a special option, so it can take an
   // importer that has already loaded the file. This prevents it from being read twice
-  static void Dispatch( const LayerImporterHandle& importer, LayerImporterMode mode );
+  static void Dispatch( Core::ActionContextHandle context, const LayerImporterHandle& importer, 
+    LayerImporterMode mode );
   
 };
   

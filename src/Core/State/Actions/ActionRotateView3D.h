@@ -56,8 +56,18 @@ private:
 
   StateView3DWeakHandle view3d_state_;
 
+  // -- Create and dispatch this action --
 public:
-  static void Dispatch( StateView3DHandle& view3d_state, const Core::Vector& axis, double angle );
+
+  // CREATE:
+  // Create the action but do not dispatch it yet
+  static ActionHandle Create( StateView3DHandle& view3d_state, 
+    const Core::Vector& axis, double angle );
+    
+  // DISPATCH:
+  // Dispatch the action from the specified context
+  static void Dispatch( ActionContextHandle context, StateView3DHandle& view3d_state, 
+    const Core::Vector& axis, double angle );
 };
 
 } // end namespace Core

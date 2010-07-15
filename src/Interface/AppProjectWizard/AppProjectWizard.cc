@@ -56,7 +56,8 @@ void AppProjectWizard::accept()
 {
   // TODO: call the create new project action dispatcher with the settings
   
-  ActionNewProject::Dispatch( field("projectPath").toString().toStdString(),
+  ActionNewProject::Dispatch( Core::Interface::GetWidgetActionContext(),
+    field("projectPath").toString().toStdString(),
     field("projectName").toString().toStdString() );
 //  ProjectManager::Instance()->new_project( field("projectName").toString().toStdString(),
 //    field("projectPath").toString().toStdString() );

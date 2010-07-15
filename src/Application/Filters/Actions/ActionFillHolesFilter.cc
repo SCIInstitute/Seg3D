@@ -59,7 +59,6 @@ bool ActionFillHolesFilter::run( Core::ActionContextHandle& context,
   context->report_message( std::string( "The FillHolesFilter has been triggered "
     "successfully on layer: " ) + this->layer_.handle()->name_state_->get() );
   return true;
-
 }
 
 
@@ -70,9 +69,9 @@ Core::ActionHandle ActionFillHolesFilter::Create( std::string layer_id )
   return Core::ActionHandle( action );
 }
 
-void ActionFillHolesFilter::Dispatch( std::string layer_id )
+void ActionFillHolesFilter::Dispatch( Core::ActionContextHandle context, std::string layer_id )
 { 
-  Core::Interface::PostAction( Create( layer_id) );
+  Core::ActionDispatcher::PostAction( Create( layer_id), context );
 }
   
 } // end namespace Seg3D

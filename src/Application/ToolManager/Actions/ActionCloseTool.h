@@ -67,7 +67,7 @@ public:
 
   // DISPATCH
   // Create and dispatch action that closes a tool
-  static void Dispatch( const std::string& toolid );
+  static void Dispatch( Core::ActionContextHandle context, const std::string& toolid );
 };
 
 } // end namespace Seg3D

@@ -70,9 +70,10 @@ Core::ActionHandle ActionPickPoint::Create( size_t src_viewer, const Core::Point
   return Core::ActionHandle( action );
 }
 
-void ActionPickPoint::Dispatch( size_t src_viewer, const Core::Point& pt )
+void ActionPickPoint::Dispatch( Core::ActionContextHandle context, size_t src_viewer, 
+  const Core::Point& pt )
 {
-  Core::Interface::PostAction( Create( src_viewer, pt ) );
+  Core::ActionDispatcher::PostAction( Create( src_viewer, pt ), context );
 }
 
 } // end namespace Seg3D

@@ -79,9 +79,9 @@ Core::ActionHandle ActionDeleteSession::Create( int session_index )
   return Core::ActionHandle( action );
 }
 
-void ActionDeleteSession::Dispatch( int session_index )
+void ActionDeleteSession::Dispatch( Core::ActionContextHandle context, int session_index )
 {
-  Core::Interface::PostAction( Create( session_index ) );
+  Core::ActionDispatcher::PostAction( Create( session_index ), context );
 }
 
 } // end namespace Seg3D

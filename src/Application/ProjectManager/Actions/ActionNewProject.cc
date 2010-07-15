@@ -79,10 +79,10 @@ Core::ActionHandle ActionNewProject::Create( const std::string& project_path,
   return Core::ActionHandle( action );
 }
 
-void ActionNewProject::Dispatch( const std::string& project_path, 
-  const std::string& project_name )
+void ActionNewProject::Dispatch( Core::ActionContextHandle context,
+  const std::string& project_path, const std::string& project_name )
 {
-  Core::Interface::PostAction( Create( project_path, project_name ) );
+  Core::ActionDispatcher::PostAction( Create( project_path, project_name ), context );
 }
 
 } // end namespace Seg3D

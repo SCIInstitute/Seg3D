@@ -95,7 +95,8 @@ void QtActionGroupConnector::set_state( QAction* action )
 {
   if ( !this->is_blocked() )
   {
-    Core::ActionSet::Dispatch( this->state_, action->objectName().toStdString() );
+    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
+      this->state_, action->objectName().toStdString() );
   }
 }
 

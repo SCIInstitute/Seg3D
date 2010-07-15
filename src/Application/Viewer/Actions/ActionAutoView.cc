@@ -81,13 +81,18 @@ bool ActionAutoView::run( Core::ActionContextHandle& context, Core::ActionResult
   return false;
 }
 
-void ActionAutoView::Dispatch(  ViewerHandle& viewer )
+Core::ActionHandle ActionAutoView::Create( ViewerHandle& viewer )
 {
   ActionAutoView* action = new ActionAutoView;
   action->viewer_name_ = viewer->get_statehandler_id();
   action->viewer_weak_handle_ = viewer;
+  
+  return Core::ActionHandle( action );
+}
 
-  Core::Interface::PostAction( Core::ActionHandle( action ) );
+void ActionAutoView::Dispatch( Core::ActionContextHandle context, ViewerHandle& viewer )
+{
+  Core::ActionDispatcher::PostAction( Create( viewer ), context );
 }
 
 } // end namespace Seg3D

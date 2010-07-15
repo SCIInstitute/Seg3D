@@ -154,6 +154,7 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
     
     this->private_->render_widget_->activate_signal_.connect(
       boost::bind( &Core::ActionSet::Dispatch<Core::StateIntHandle,int>, 
+        Core::Interface::GetWidgetActionContext(),
         ViewerManager::Instance()->active_viewer_state_, 
         static_cast< int >( this->private_->viewer_->get_viewer_id() ) ) );
   }
@@ -241,7 +242,8 @@ void ViewerWidget::flip_view_horiz()
   {
     Core::StateView2DHandle view2d_state = boost::dynamic_pointer_cast<Core::StateView2D>( 
       this->private_->viewer_->get_active_view_state() );
-    Core::ActionFlip::Dispatch( view2d_state, Core::FlipDirectionType::HORIZONTAL_E );
+    Core::ActionFlip::Dispatch( Core::Interface::GetWidgetActionContext(),
+      view2d_state, Core::FlipDirectionType::HORIZONTAL_E );
   }
 }
 
@@ -251,13 +253,14 @@ void ViewerWidget::flip_view_vert()
   {
     Core::StateView2DHandle view2d_state = boost::dynamic_pointer_cast<Core::StateView2D>( 
       this->private_->viewer_->get_active_view_state() );
-    Core::ActionFlip::Dispatch( view2d_state, Core::FlipDirectionType::VERTICAL_E );
+    Core::ActionFlip::Dispatch( Core::Interface::GetWidgetActionContext(),
+    view2d_state, Core::FlipDirectionType::VERTICAL_E );
   }
 }
 
 void ViewerWidget::auto_view()
 {
-  ActionAutoView::Dispatch( this->private_->viewer_ );
+  ActionAutoView::Dispatch( Core::Interface::GetWidgetActionContext(), this->private_->viewer_ );
 }
 
 } // end namespace Seg3D

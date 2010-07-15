@@ -51,16 +51,16 @@ public:
   virtual bool validate( Core::ActionContextHandle& context );
   virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
 
-  // -- Dispatch/Create this action from the interface --
+  // -- Dispatch/Create this action --
 public:
-
-  // DISPATCH:
-  // Dispatch the action from the interface
-  static void Dispatch();
 
   // CREATE:
   // Create the action but do not dispatch it yet
-  static Core::ActionHandle Create();
+  static ActionHandle Create();
+  
+  // DISPATCH:
+  // Dispatch the action from a specified context
+  static void Dispatch( ActionContextHandle context );
 };
 
 } // end namespace Core

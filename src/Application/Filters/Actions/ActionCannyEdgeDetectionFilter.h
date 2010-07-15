@@ -85,7 +85,8 @@ public:
     
   // DISPATCH:
   // Create and dispatch action that inserts the new layer 
-  static void Dispatch( std::string layer_id, double variance, double max_error, 
+  static void Dispatch( Core::ActionContextHandle context, 
+    std::string layer_id, double variance, double max_error, 
     double threshold, bool replace );
   
 };

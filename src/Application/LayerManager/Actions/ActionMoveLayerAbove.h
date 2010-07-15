@@ -73,7 +73,8 @@ public:
   
   // DISPATCH
   // Create and dispatch action that moves the layer above 
-  static void Dispatch( const std::string& layer_to_move_id, 
+  static void Dispatch( Core::ActionContextHandle context,
+    const std::string& layer_to_move_id, 
     const std::string& target_layer_id, bool move_above = true );
   
 };

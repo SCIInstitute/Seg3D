@@ -93,10 +93,10 @@ ActionHandle ActionGet::Create( StateBaseHandle& state )
   return ActionHandle( action );
 }
 
-void ActionGet::Dispatch( StateBaseHandle& state )
+void ActionGet::Dispatch( ActionContextHandle context, StateBaseHandle& state )
 {
   // Post the a action
-  Interface::PostAction( Create( state ) );
+  ActionDispatcher::PostAction( Create( state ), context );
 }
 
 } // end namespace Core

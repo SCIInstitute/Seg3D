@@ -115,7 +115,7 @@ ProjectDockWidget::~ProjectDockWidget()
   
 void ProjectDockWidget::save_project()
 {
-  ActionSaveSession::Dispatch( false );
+  ActionSaveSession::Dispatch( Core::Interface::GetWidgetActionContext(), false );
 }
 
 void ProjectDockWidget::save_note()
@@ -148,7 +148,7 @@ void ProjectDockWidget::load_session()
         if( QString::fromStdString( ( Core::SplitString( sessions[ i ], "|" ) )[ 1 ] ) == 
            this->private_->ui_.sessions_list_->currentItem()->text() )
         {
-          ActionLoadSession::Dispatch( i );
+          ActionLoadSession::Dispatch( Core::Interface::GetWidgetActionContext(), i );
           break;
         }
       }     
@@ -178,7 +178,7 @@ void ProjectDockWidget::delete_session()
         if( QString::fromStdString( ( Core::SplitString( sessions[ i ], "|" ) )[ 1 ] ) == 
           this->private_->ui_.sessions_list_->currentItem()->text() )
         {
-          ActionDeleteSession::Dispatch( i ); 
+          ActionDeleteSession::Dispatch( Core::Interface::GetWidgetActionContext(), i );  
           break;
         }
       }

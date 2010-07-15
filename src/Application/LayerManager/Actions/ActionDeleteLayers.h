@@ -78,7 +78,7 @@ public:
 
   // DISPATCH
   // Create and dispatch action that deletes the selected layers
-  static void Dispatch( LayerGroupHandle group ); 
+  static void Dispatch( Core::ActionContextHandle context, LayerGroupHandle group );  
 };
   
 } // end namespace Seg3D

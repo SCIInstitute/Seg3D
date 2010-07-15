@@ -93,7 +93,8 @@ public:
     
   // DISPATCH:
   // Create and dispatch action.
-  static void Dispatch( std::string mask_a_id, std::string mask_b_id, 
+  static void Dispatch( Core::ActionContextHandle context,
+    std::string mask_a_id, std::string mask_b_id, 
     std::string mask_c_id, std::string mask_d_id,
     std::string expression, bool replace );
   

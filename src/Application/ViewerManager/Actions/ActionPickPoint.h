@@ -54,7 +54,8 @@ private:
 
 public:
   static Core::ActionHandle Create( size_t src_viewer, const Core::Point& pt );
-  static void Dispatch( size_t src_viewer, const Core::Point& pt );
+  static void Dispatch( Core::ActionContextHandle context, 
+    size_t src_viewer, const Core::Point& pt );
 };
 
 } // end namespace Seg3D

@@ -76,7 +76,8 @@ public:
   
   // DISPATCH:
   // Dispatch an action loads a session
-  static void Dispatch( const std::string& project_path, const std::string& project_name );
+  static void Dispatch( Core::ActionContextHandle context, const std::string& project_path, 
+    const std::string& project_name );
 };
 
 } // end namespace Seg3D

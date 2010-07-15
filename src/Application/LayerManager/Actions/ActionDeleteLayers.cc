@@ -65,9 +65,9 @@ Core::ActionHandle ActionDeleteLayers::Create( LayerGroupHandle group )
 }
 
 
-void ActionDeleteLayers::Dispatch( LayerGroupHandle group )
+void ActionDeleteLayers::Dispatch( Core::ActionContextHandle context, LayerGroupHandle group )
 {
-  Core::Interface::PostAction( Create( group ) );
+  Core::ActionDispatcher::PostAction( Create( group ), context );
 }
 
 } // end namespace Seg3D

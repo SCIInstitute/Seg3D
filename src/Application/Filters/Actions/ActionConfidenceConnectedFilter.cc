@@ -83,10 +83,11 @@ Core::ActionHandle ActionConfidenceConnectedFilter::Create( std::string layer_id
   return Core::ActionHandle( action );
 }
 
-void ActionConfidenceConnectedFilter::Dispatch( std::string layer_id, 
+void ActionConfidenceConnectedFilter::Dispatch( Core::ActionContextHandle context, 
+  std::string layer_id, 
   int iterations, int multiplier )
 { 
-  Core::Interface::PostAction( Create( layer_id, iterations, multiplier ) );
+  Core::ActionDispatcher::PostAction( Create( layer_id, iterations, multiplier ), context );
 }
   
 } // end namespace Seg3D

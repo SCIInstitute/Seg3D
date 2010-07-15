@@ -86,10 +86,10 @@ Core::ActionHandle ActionMoveGroupAbove::Create( const std::string& group_to_mov
 }
 
 
-void ActionMoveGroupAbove::Dispatch( const std::string& group_to_move_id, 
-  const std::string& group_below_id )
+void ActionMoveGroupAbove::Dispatch( Core::ActionContextHandle context, 
+  const std::string& group_to_move_id, const std::string& group_below_id )
 {
-  Core::Interface::PostAction( Create( group_to_move_id, group_below_id ) );
+  Core::ActionDispatcher::PostAction( Create( group_to_move_id, group_below_id ), context );
 }
   
 } // end namespace Seg3D

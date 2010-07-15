@@ -407,7 +407,7 @@ void Viewer::pick_point( int x, int y )
     pos = inv_proj * pos;
     volume_slice->get_world_coord( pos.x(), pos.y(), pos );
 
-    ActionPickPoint::Dispatch( this->get_viewer_id(), pos );
+    ActionPickPoint::Dispatch( Core::Interface::GetWidgetActionContext(), this->get_viewer_id(), pos );
   }
 }
 
@@ -1106,7 +1106,7 @@ void Viewer::offset_slice( int delta )
     if ( new_slice >= 0 && 
       static_cast< size_t >( new_slice ) < this->active_layer_slice_->number_of_slices() )
     {
-      Core::ActionSet::Dispatch( this->slice_number_state_, new_slice );
+      Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), this->slice_number_state_, new_slice );
     }
   }
 }
@@ -1213,11 +1213,11 @@ void Viewer::adjust_contrast_brightness( int dx, int dy )
   // TODO: Check whether we need the if statement here
   if ( contrast != old_contrast )
   {
-    Core::ActionSet::DispatchMouse( data_layer->contrast_state_, contrast );
+    Core::ActionSet::Dispatch( Core::Interface::GetMouseActionContext(), data_layer->contrast_state_, contrast );
   }
   if ( brightness != old_brightness )
   {
-    Core::ActionSet::DispatchMouse( data_layer->brightness_state_, brightness );
+    Core::ActionSet::Dispatch(Core::Interface::GetMouseActionContext(), data_layer->brightness_state_, brightness );
   }
 }
 

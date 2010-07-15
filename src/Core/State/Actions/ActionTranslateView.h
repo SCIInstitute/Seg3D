@@ -59,20 +59,23 @@ private:
 
 public:
   template< class VIEWSTATEHANDLE >
-  static void Dispatch( VIEWSTATEHANDLE& view_state, const Core::Vector& offset );
+  static ActionHandle Create( VIEWSTATEHANDLE& view_state, const Core::Vector& offset )
+  {
+    ActionTranslateView* action = new ActionTranslateView;
+    action->stateid_ = view_state->stateid();
+    action->offset_ = offset;
+    action->state_weak_handle_ = view_state;
 
+    return ActionHandle( action );
+  }
+
+  template< class VIEWSTATEHANDLE >
+  static void Dispatch( ActionContextHandle context, VIEWSTATEHANDLE& view_state, 
+    const Core::Vector& offset )
+  {
+    ActionDispatcher::PostAction( Create( view_state, offset ), context );
+  }
 };
-
-template< class VIEWSTATEHANDLE >
-void ActionTranslateView::Dispatch( VIEWSTATEHANDLE& view_state, const Core::Vector& offset )
-{
-  ActionTranslateView* action = new ActionTranslateView;
-  action->stateid_ = view_state->stateid();
-  action->offset_ = offset;
-  action->state_weak_handle_ = view_state;
-
-  Interface::PostAction( ActionHandle( action ) );
-}
 
 } // end namespace Core
 

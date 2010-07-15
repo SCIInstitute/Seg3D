@@ -54,29 +54,29 @@ bool ActionTranslateView::validate( ActionContextHandle &context )
     }
 
     if ( typeid(*state) != typeid(StateView2D) && typeid(*state) != typeid(StateView3D) )
-      {
-        context->report_error( std::string( "State variable '" ) + stateid_.value()
-            + "' doesn't support ActionScaleView3D" );
-        return false;
-      }
-
-      this->state_weak_handle_ = boost::dynamic_pointer_cast< StateViewBase >( state );
+    {
+      context->report_error( std::string( "State variable '" ) + stateid_.value()
+        + "' doesn't support ActionScaleView3D" );
+      return false;
     }
 
+    this->state_weak_handle_ = boost::dynamic_pointer_cast< StateViewBase >( state );
+  }
+
+  return true;
+}
+
+bool ActionTranslateView::run( ActionContextHandle& context, ActionResultHandle& result )
+{
+  StateViewBaseHandle state = this->state_weak_handle_.lock();
+
+  if ( state )
+  {
+    state->translate( this->offset_.value() );
     return true;
   }
 
-  bool ActionTranslateView::run( ActionContextHandle& context, ActionResultHandle& result )
-  {
-    StateViewBaseHandle state = this->state_weak_handle_.lock();
+  return false;
+}
 
-    if ( state )
-    {
-      state->translate( this->offset_.value() );
-      return true;
-    }
-
-    return false;
-  }
-
-  } // end namespace Core
+} // end namespace Core

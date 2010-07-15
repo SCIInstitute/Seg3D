@@ -52,7 +52,9 @@ private:
   ViewerWeakHandle viewer_weak_handle_;
 
 public:
-  static void Dispatch( ViewerHandle& viewer );
+  static Core::ActionHandle Create( ViewerHandle& viewer );
+
+  static void Dispatch( Core::ActionContextHandle context, ViewerHandle& viewer );
 };
 
 } // end namespace Seg3D

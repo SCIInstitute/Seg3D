@@ -92,10 +92,12 @@ Core::ActionHandle ActionMoveLayerAbove::Create( const std::string& layer_to_mov
 }
 
 
-void ActionMoveLayerAbove::Dispatch( const std::string& layer_to_move_id, 
+void ActionMoveLayerAbove::Dispatch( Core::ActionContextHandle context, 
+  const std::string& layer_to_move_id, 
   const std::string& layer_below_id, bool move_above )
 {
-  Core::Interface::PostAction( Create( layer_to_move_id, layer_below_id, move_above ) );
+  Core::ActionDispatcher::PostAction( Create( layer_to_move_id, layer_below_id, 
+    move_above ), context );
 }
   
 } // end namespace Seg3D

@@ -87,10 +87,11 @@ Core::ActionHandle ActionDiscreteGaussianFilter::Create( std::string layer_id,
 }
     
 
-void ActionDiscreteGaussianFilter::Dispatch( std::string layer_id, 
-  double variance, double kernelwidth, bool replace )
+void ActionDiscreteGaussianFilter::Dispatch( Core::ActionContextHandle context, 
+  std::string layer_id, double variance, double kernelwidth, bool replace )
 {
-  Core::Interface::PostAction( Create( layer_id, variance, kernelwidth, replace ) );
+  Core::ActionDispatcher::PostAction( Create( layer_id, variance, kernelwidth, replace ), 
+    context );
 }
   
 } // end namespace Seg3D

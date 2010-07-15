@@ -68,9 +68,10 @@ Core::ActionHandle ActionConnectedComponentFilter::Create( std::string layer_id 
   return Core::ActionHandle( action );
 }
 
-void ActionConnectedComponentFilter::Dispatch( std::string layer_id )
+void ActionConnectedComponentFilter::Dispatch( Core::ActionContextHandle context, 
+  std::string layer_id )
 {
-  Core::Interface::PostAction( Create( layer_id ) );
+  Core::ActionDispatcher::PostAction( Create( layer_id ), context );
 }
   
 } // end namespace Seg3D

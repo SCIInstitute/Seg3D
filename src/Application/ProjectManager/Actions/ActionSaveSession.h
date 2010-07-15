@@ -69,7 +69,7 @@ public:
   
   // DISPATCH:
   // Dispatch an action that activates a layer
-  static void Dispatch( bool is_autosave );
+  static void Dispatch( Core::ActionContextHandle context, bool is_autosave );
 };
 
 } // end namespace Seg3D

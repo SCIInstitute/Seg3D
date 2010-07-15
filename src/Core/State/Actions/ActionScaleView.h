@@ -55,8 +55,17 @@ private:
 
   StateViewBaseWeakHandle state_weak_handle_;
 
+  // -- Create and dispatch this action --
 public:
-  static void Dispatch( StateViewBaseHandle& view_state, double ratio );
+
+  // CREATE:
+  // Create the action but do not dispatch it yet
+  static ActionHandle Create( StateViewBaseHandle& view_state, double ratio );
+
+  // DISPATCH:
+  // Dispatch the action from the specified context
+  static void Dispatch( ActionContextHandle context, StateViewBaseHandle& view_state, 
+    double ratio );
 };
 
 } // end namespace Core

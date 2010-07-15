@@ -80,14 +80,19 @@ bool ActionScaleView::run( ActionContextHandle& context, ActionResultHandle& res
   return false;
 }
 
-void ActionScaleView::Dispatch( StateViewBaseHandle& view_state, double ratio )
+ActionHandle ActionScaleView::Create( StateViewBaseHandle& view_state, double ratio )
 {
   ActionScaleView* action = new ActionScaleView;
   action->stateid_ = view_state->stateid();
   action->scale_ratio_ = ratio;
   action->state_weak_handle_ = view_state;
+  return ActionHandle( action );
+}
 
-  Interface::PostAction( ActionHandle( action ) );
+void ActionScaleView::Dispatch( ActionContextHandle context, StateViewBaseHandle& view_state, 
+  double ratio )
+{
+  ActionDispatcher::PostAction( Create( view_state, ratio ), context );
 }
 
 } // end namespace Core

@@ -211,8 +211,8 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
       boost::bind( &LayerWidget::UpdateState, qpointer ) ); 
   
     QtUtils::QtBridge::Connect( this->private_->activate_button_, 
-      boost::bind( static_cast< void ( * ) ( LayerHandle ) >( 
-      &ActionActivateLayer::Dispatch ), layer ) );
+      boost::bind( static_cast<void (*) ( Core::ActionContextHandle, LayerHandle )>( 
+      &ActionActivateLayer::Dispatch ), Core::Interface::GetWidgetActionContext(), layer ) );
     
     // make the default connections, for any layer type, to the state engine
     QtUtils::QtBridge::Connect( this->private_->ui_.selection_checkbox_, layer->selected_state_ );
@@ -639,7 +639,7 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
   
   if( ( event->modifiers() != Qt::ControlModifier ) && ( event->modifiers() != Qt::ShiftModifier ) )
   {
-    ActionActivateLayer::Dispatch( 
+    ActionActivateLayer::Dispatch( Core::Interface::GetWidgetActionContext(),
       LayerManager::Instance()->get_layer_by_id( this->get_layer_id() ) ); 
     return;
   }
@@ -690,8 +690,8 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
   // Otherwise we dispatch our move function
   else 
   { 
-    ActionMoveLayerAbove::Dispatch( this->get_layer_id(), 
-      this->private_->drop_layer_->get_layer_id() );
+    ActionMoveLayerAbove::Dispatch( Core::Interface::GetWidgetActionContext(),
+      this->get_layer_id(), this->private_->drop_layer_->get_layer_id() );
   }
   Q_EMIT prep_for_drag_and_drop( false );
   
@@ -862,11 +862,13 @@ void LayerWidget::select_opacity_bar( bool show )
 {
   if ( show )
   {
-    Core::ActionSet::Dispatch( this->private_->layer_->menu_state_, Layer::OPACITY_MENU_C );
+    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
+      this->private_->layer_->menu_state_, Layer::OPACITY_MENU_C );
   }
   else
   {
-    Core::ActionSet::Dispatch( this->private_->layer_->menu_state_, Layer::NO_MENU_C );
+    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
+      this->private_->layer_->menu_state_, Layer::NO_MENU_C );
   }
 }
 
@@ -874,11 +876,13 @@ void LayerWidget::select_brightness_contrast_bar( bool show )
 {
   if ( show )
   {
-    Core::ActionSet::Dispatch( this->private_->layer_->menu_state_, Layer::CONTRAST_MENU_C );
+    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
+      this->private_->layer_->menu_state_, Layer::CONTRAST_MENU_C );
   }
   else
   {
-    Core::ActionSet::Dispatch( this->private_->layer_->menu_state_, Layer::NO_MENU_C );
+    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
+      this->private_->layer_->menu_state_, Layer::NO_MENU_C );
   }
 }
 
@@ -886,11 +890,13 @@ void LayerWidget::select_border_fill_bar( bool show )
 {
   if ( show )
   {
-    Core::ActionSet::Dispatch( this->private_->layer_->menu_state_, Layer::APPEARANCE_MENU_C );
+    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
+      this->private_->layer_->menu_state_, Layer::APPEARANCE_MENU_C );
   }
   else
   {
-    Core::ActionSet::Dispatch( this->private_->layer_->menu_state_, Layer::NO_MENU_C );
+    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
+      this->private_->layer_->menu_state_, Layer::NO_MENU_C );
   }
 }
 
@@ -898,11 +904,13 @@ void LayerWidget::select_color_bar( bool show )
 {
   if ( show )
   {
-    Core::ActionSet::Dispatch( this->private_->layer_->menu_state_, Layer::COLOR_MENU_C );
+    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
+      this->private_->layer_->menu_state_, Layer::COLOR_MENU_C );
   }
   else
   {
-    Core::ActionSet::Dispatch( this->private_->layer_->menu_state_, Layer::NO_MENU_C );
+    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
+      this->private_->layer_->menu_state_, Layer::NO_MENU_C );
   }
 }
 
@@ -921,7 +929,8 @@ void LayerWidget::show_progress_bar( bool show )
 
 void LayerWidget::select_visual_lock( bool lock )
 {
-  Core::ActionSet::Dispatch( this->private_->layer_->visual_lock_state_, lock );
+  Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
+    this->private_->layer_->visual_lock_state_, lock );
 }
 
 void LayerWidget::resizeEvent( QResizeEvent *event )
