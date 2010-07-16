@@ -50,12 +50,12 @@ AutoSave::~AutoSave()
 
 void AutoSave::start()
 {
-  add_connection( PreferencesManager::Instance()->auto_save_time_state_->state_changed_signal_.connect(
-    boost::bind( &AutoSave::recompute_auto_save, this ) ) );
-  add_connection( PreferencesManager::Instance()->auto_save_state_->state_changed_signal_.connect(
-    boost::bind( &AutoSave::recompute_auto_save, this ) ) );
-  add_connection( PreferencesManager::Instance()->smart_save_state_->state_changed_signal_.connect(
-    boost::bind( &AutoSave::recompute_auto_save, this ) ) );
+  add_connection( PreferencesManager::Instance()->auto_save_time_state_->state_changed_signal_.
+    connect( boost::bind( &AutoSave::recompute_auto_save, this ) ) );
+  add_connection( PreferencesManager::Instance()->auto_save_state_->state_changed_signal_.
+    connect( boost::bind( &AutoSave::recompute_auto_save, this ) ) );
+  add_connection( PreferencesManager::Instance()->smart_save_state_->state_changed_signal_.
+    connect( boost::bind( &AutoSave::recompute_auto_save, this ) ) );
 
   this->auto_save_thread_ = boost::thread( boost::bind( &AutoSave::run, this ) );
 }
@@ -79,8 +79,10 @@ void AutoSave::run()
             boost::posix_time::ptime current_time = 
               boost::posix_time::second_clock::local_time();
 
-            boost::posix_time::time_duration duration = current_time - last_action_completed;
-            double time_since_last_action = static_cast< double >( duration.total_milliseconds() ) * 0.001;
+            boost::posix_time::time_duration duration = 
+              current_time - last_action_completed;
+            double time_since_last_action = static_cast< double >
+              ( duration.total_milliseconds() ) * 0.001;
 
             if( time_since_last_action > 5  )
             {
@@ -116,7 +118,8 @@ double AutoSave::compute_timeout()
   Core::StateEngine::lock_type state_engine_lock( Core::StateEngine::GetMutex() );
   double time_remaining = PreferencesManager::Instance()->auto_save_time_state_->get() * 60;
 
-  time_remaining = time_remaining - ProjectManager::Instance()->get_time_since_last_saved_session();
+  time_remaining = time_remaining - ProjectManager::Instance()->
+    get_time_since_last_saved_session();
 
   return time_remaining;
 }
@@ -136,42 +139,6 @@ bool AutoSave::needs_auto_save()
   {
     return false;
   }
-  
-//  if( PreferencesManager::Instance()->smart_save_state_->get() == true )
-//  {
-//    lock_type lock( this->get_mutex() );
-//    while( true )
-//    {
-//      if( !Core::ActionDispatcher::Instance()->is_busy() )
-//      {
-//        boost::posix_time::ptime last_action_completed = 
-//          Core::ActionDispatcher::Instance()->last_action_completed();
-//        boost::posix_time::ptime current_time = 
-//          boost::posix_time::second_clock::local_time();
-//        
-//        boost::posix_time::time_duration duration = current_time - last_action_completed;
-//        double time_since_last_action = static_cast< double >( duration.total_milliseconds() ) * 0.001;
-// 
-//        if( time_since_last_action > 5  )
-//        {
-//          return true;
-//        }
-//      }
-// 
-//      boost::posix_time::milliseconds wait_time( static_cast< int >( 5000.0 ) );
-//      recompute_auto_save_.timed_wait( lock, wait_time );
-//    }
-
-
-
-
-/*  }*/
-
-    //if( Core::ActionDispatcher::Instance()->get_time_since_last_action() < 5.0 )
-    //{
-    //  return false;
-    //}
-  
 
   return true;
 }

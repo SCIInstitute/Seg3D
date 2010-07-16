@@ -283,7 +283,7 @@ void ProjectManager::add_to_recent_projects( const std::string& project_path,
         ( Core::SplitString( temp_projects_vector[ i ], "|" ) )[ 1 ] )
         == ( project_path + "|" + project_name ) )
       {
-        temp_projects_vector[ i ] = "";
+        temp_projects_vector.erase( temp_projects_vector.begin() + i );
         break;
       }
     }
@@ -356,7 +356,7 @@ std::string ProjectManager::get_timestamp()
 void ProjectManager::set_last_saved_session_time_stamp()
 {
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-  last_saved_session_time_stamp_ = boost::posix_time::second_clock::local_time();
+  this->last_saved_session_time_stamp_ = boost::posix_time::second_clock::local_time();
 }
 
 boost::posix_time::ptime ProjectManager::get_last_saved_session_time_stamp() const
