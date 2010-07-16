@@ -63,39 +63,47 @@ class ViewerWidgetPrivate
 public:
   Ui::ViewerWidget ui_;
   QtUtils::QtRenderWidget* render_widget_;
-  
+
+  int minimum_toolbar_width_; 
+  bool initialized_size_;
+
   // We need a special single shot button for the picking button
   QToolButton* picking_button_;
-  
+  QIcon picking_icon_;
+
   // Handle to the underlying Viewer structure
   ViewerHandle viewer_;
-  
-  QIcon picking_icon_;
 };
 
 ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
   QWidget( parent ),
   private_( new ViewerWidgetPrivate )
 {
-  
+  this->private_->viewer_ = viewer;
+  this->private_->ui_.setupUi( this );
+
   // Setup the Icon
   this->private_->picking_icon_.addPixmap( QPixmap( ":/Images/Picking.png" ), QIcon::Normal, QIcon::On );
   this->private_->picking_icon_.addPixmap( QPixmap( ":/Images/PickingOff.png" ), QIcon::Normal, QIcon::Off );
   
-  this->private_->viewer_ = viewer;
-  this->private_->ui_.setupUi( this );
-  
   // Setup the Custom Picking Button
-  this->private_->picking_button_ =  new SingleShotToolButton( this->private_->ui_.buttonbar_ );
+  this->private_->picking_button_ =  new SingleShotToolButton( this->private_->ui_.less_common_tools_ );
   this->private_->picking_button_->setCheckable( true );
   this->private_->picking_button_->setToolButtonStyle( Qt::ToolButtonIconOnly );
   this->private_->picking_button_->setIcon( this->private_->picking_icon_ );
   this->private_->picking_button_->setText( QString( "Picking" ) );
-  this->private_->picking_button_->setToolTip( QString( "Make the viewer a target for picking" ) );
+  this->private_->picking_button_->setToolTip( QString( "Make this viewer a target for picking" ) );
   this->private_->picking_button_->setFixedHeight( 20 );
   this->private_->picking_button_->setFixedWidth( 20 );
   
-  this->private_->ui_.button_layout_->insertWidget( 8, this->private_->picking_button_ );
+  this->private_->ui_.less_common_tools_layout_->insertWidget( 0, this->private_->picking_button_ );
+  
+  // Setup the widget so for a small size it can be broken into two
+  this->private_->minimum_toolbar_width_ = 300;
+  this->private_->initialized_size_ = false;
+  this->private_->ui_.buttonbar_->setMinimumSize( QSize( 170, 0 ) );
+  this->private_->ui_.button_layout_->setStretchFactor( this->private_->ui_.common_tools_, 0 );
+  this->private_->ui_.button_layout_->setStretchFactor( this->private_->ui_.less_common_tools_, 1 );
   
   // --------------------------------------
   // Generate the OpenGL part of the widget
@@ -106,6 +114,7 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
   {
     CORE_THROW_LOGICERROR("OpenGL was not initialized correctly");
   }
+  
   this->private_->render_widget_->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
   this->private_->ui_.viewer_layout_->addWidget( this->private_->render_widget_ );
   
@@ -119,7 +128,7 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
     this->add_connection( this->private_->viewer_->view_mode_state_->value_changed_signal_.connect( 
       boost::bind( &ViewerWidget::HandleViewModeChanged, viewer_widget ) ) );
 
-    this->connect( this->private_->ui_.viewer_states_,
+    this->connect( this->private_->ui_.viewer_mode_,
       SIGNAL( currentIndexChanged( int ) ), SLOT( change_view_type( int ) ) );
 
     this->connect( this->private_->ui_.flip_horizontal_button_, SIGNAL( clicked() ),
@@ -132,7 +141,7 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
       SLOT( auto_view() ) );
 
   
-    QtUtils::QtBridge::Connect( this->private_->ui_.viewer_states_, 
+    QtUtils::QtBridge::Connect( this->private_->ui_.viewer_mode_, 
       this->private_->viewer_->view_mode_state_ );
     QtUtils::QtBridge::Connect( this->private_->picking_button_ , 
       this->private_->viewer_->is_picking_target_state_ );
@@ -164,24 +173,55 @@ void ViewerWidget::add_icons_to_combobox()
 { 
   QIcon icon;
   icon.addFile( QString::fromUtf8(":/Images/Xview.png"), QSize(), QIcon::Normal, QIcon::On );
-  this->private_->ui_.viewer_states_->setItemIcon( 0, icon );
+  this->private_->ui_.viewer_mode_->setItemIcon( 0, icon );
   
   QIcon icon1;
   icon1.addFile( QString::fromUtf8(":/Images/Yview.png"), QSize(), QIcon::Normal, QIcon::On );
-  this->private_->ui_.viewer_states_->setItemIcon( 1, icon1 );
+  this->private_->ui_.viewer_mode_->setItemIcon( 1, icon1 );
   
   QIcon icon2;
   icon2.addFile( QString::fromUtf8(":/Images/Zview.png"), QSize(), QIcon::Normal, QIcon::On );
-  this->private_->ui_.viewer_states_->setItemIcon( 2, icon2 );
+  this->private_->ui_.viewer_mode_->setItemIcon( 2, icon2 );
   
   QIcon icon3;
   icon3.addFile( QString::fromUtf8(":/Images/Vview.png"), QSize(), QIcon::Normal, QIcon::On );
-  this->private_->ui_.viewer_states_->setItemIcon( 3, icon3 );  
+  this->private_->ui_.viewer_mode_->setItemIcon( 3, icon3 );  
 }
 
 ViewerWidget::~ViewerWidget()
 {
   this->disconnect_all();
+}
+
+void ViewerWidget::resizeEvent( QResizeEvent * event )
+{
+  int old_width = event->oldSize().width();
+  int new_width = event->size().width();
+  
+  if ( new_width <= this->private_->minimum_toolbar_width_ &&
+    ( old_width > this->private_->minimum_toolbar_width_ || 
+    ! this->private_->initialized_size_ ) )
+  {
+    this->private_->ui_.sep_line_->hide();    
+    this->private_->ui_.button_layout_->removeWidget( this->private_->ui_.less_common_tools_ );
+    this->private_->ui_.toolbar_layout_->addWidget( this->private_->ui_.less_common_tools_, 0 );
+
+    this->update();
+  }
+  else if ( new_width > this->private_->minimum_toolbar_width_ &&
+    ( old_width <= this->private_->minimum_toolbar_width_ || 
+    ! this->private_->initialized_size_ ) )
+  {
+    this->private_->ui_.sep_line_->show();  
+    this->private_->ui_.toolbar_layout_->removeWidget( this->private_->ui_.less_common_tools_ );
+    this->private_->ui_.button_layout_->addWidget( this->private_->ui_.less_common_tools_, 1 );
+
+    this->update();
+  }
+  
+  this->private_->initialized_size_ = true;
+  
+  QWidget::resizeEvent( event );
 }
 
 void ViewerWidget::select()
@@ -202,8 +242,8 @@ void ViewerWidget::change_view_type( int index )
   this->private_->ui_.flip_horizontal_button_->setVisible( !is_volume_view );
   this->private_->ui_.flip_vertical_button_->setVisible( !is_volume_view );
   this->private_->ui_.grid_button_->setVisible( !is_volume_view );
-  this->private_->picking_button_->setVisible( !is_volume_view );
   this->private_->ui_.slice_visible_button_->setVisible( !is_volume_view );
+  this->private_->picking_button_->setVisible( !is_volume_view );
 
   // 3D viewer specific buttons
   this->private_->ui_.slices_visible_button_->setVisible( is_volume_view );

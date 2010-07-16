@@ -109,6 +109,12 @@ public Q_SLOTS:
   // HANDLEVIEWMODECHANGED:
   // this handles signals from the viewer to keep the flip buttons in sync
   static void HandleViewModeChanged( ViewerWidgetHandle viewer_widget );
+
+protected:
+
+  // RESIZEEVENT:
+  // Overloaded Qt function
+  virtual void resizeEvent( QResizeEvent * event );
   
 private:
   // ADD_ICONS_TO_COMBOBOX:
@@ -119,8 +125,6 @@ private:
   // Internals of the viewer widget, so most dependencies do not need to
   // be included here.
   ViewerWidgetPrivateHandle private_;
-  
-  
 };
 
 } // end namespace Seg3D
