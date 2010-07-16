@@ -778,6 +778,8 @@ void Viewer::change_view_mode( std::string mode, Core::ActionSource source )
 
 void Viewer::set_slice_number( int num, Core::ActionSource source )
 {
+  Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
+
   const std::string& view_mode = this->view_mode_state_->get();
   
   if ( this->slice_lock_count_ > 0 || 

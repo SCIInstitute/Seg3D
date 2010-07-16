@@ -39,6 +39,10 @@
 namespace Core
 {
 
+class StateRangedValueBase;
+typedef boost::shared_ptr< StateRangedValueBase > StateRangedValueBaseHandle;
+typedef boost::weak_ptr< StateRangedValueBase > StateRangedValueBaseWeakHandle;
+
 // STATEVALUE:
 // This class is a specification of State that is used to hold a single bound
 // instance of a value.
@@ -55,10 +59,28 @@ typedef boost::shared_ptr< StateRangedDouble > StateRangedDoubleHandle;
 typedef StateRangedValue< int > StateRangedInt;
 typedef boost::shared_ptr< StateRangedInt > StateRangedIntHandle;
 
+// Class StateValueBase:
+// This pure virtual class defines an extra interface that StateValue provides.
+class StateRangedValueBase : public StateBase
+{
+public:
+  StateRangedValueBase( const std::string& stateid ) :
+    StateBase( stateid )
+  {
+  }
+
+protected:
+  friend class ActionOffset;
+  // IMPORT_OFFSET_FROM_VARIANT:
+  // Import the offset value from the variant and apply it to the current value.
+  virtual bool import_offset_from_variant( ActionParameterVariant& variant, 
+    ActionSource source = ActionSource::NONE_E ) = 0;
+};
+
 // Definition of the templated StateValue class
 
 template< class T >
-class StateRangedValue : public StateBase
+class StateRangedValue : public StateRangedValueBase
 {
   // -- type definitions --
 public:
@@ -71,7 +93,7 @@ public:
   // CONSTRUCTOR
   StateRangedValue( const std::string& stateid, const T& default_value, const T& min_value, 
     const T& max_value, const T& step_value ) :
-    StateBase( stateid ),
+    StateRangedValueBase( stateid ),
     value_( default_value ), 
     min_value_( min_value ), 
     max_value_( max_value ), 
@@ -123,6 +145,19 @@ protected:
 
     // Set the parameter in this state variable
     return this->set( value, source );
+  }
+
+  // IMPORT_OFFSET_FROM_VARIANT:
+  // Import the offset value from the variant and apply it to the current value.
+  virtual bool import_offset_from_variant( ActionParameterVariant& variant, 
+    ActionSource source = ActionSource::NONE_E )
+  {
+    T offset_value;
+    if ( !variant.get_value( offset_value ) )
+    {
+      return false;
+    }
+    return this->offset( offset_value, source );
   }
 
   // VALIDATE_VARIANT:
@@ -225,7 +260,7 @@ public:
     if ( value != this->value_ )
     {
       // NOTE: If the value is out of bound the variable from_interface is
-      // rewmoved to ensure that any updates make it to the widget as well
+      // removed to ensure that any updates make it to the widget as well
       // Normally from_interface will ensure that the widget is not updated
       // by the user and the application at the same time. This prevents
       // loop backs of signals between the application layer and the
@@ -251,6 +286,44 @@ public:
         this->state_changed_signal_();
       }
     }
+    return true;
+  }
+
+  // OFFSET:
+  // Offset the value of the state variable by the specified amount.
+  bool offset( const T& offset_value, ActionSource source = ActionSource::NONE_E )
+  {
+    T new_value;
+    bool value_changed = false;
+    {
+      // Lock the state engine so no other thread will be accessing it
+      StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
+      new_value = this->value_ + offset_value;
+
+      if ( new_value < this->min_value_ )
+      {
+        new_value = this->min_value_;
+        source = ActionSource::NONE_E;
+      }
+      if ( new_value > this->max_value_ )
+      {
+        new_value = this->max_value_;
+        source = ActionSource::NONE_E;
+      }
+
+      if ( this->value_ != new_value )
+      {
+        this->value_ = new_value;
+        value_changed = true;
+      }
+    }
+
+    if ( value_changed && this->signals_enabled() )
+    {
+      this->value_changed_signal_( new_value, source );
+      this->state_changed_signal_();
+    }
+
     return true;
   }
 

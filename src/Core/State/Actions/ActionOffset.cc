@@ -26,63 +26,69 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#include <Core/State/Actions/ActionOffset.h>
 #include <Core/State/StateEngine.h>
-#include <Core/State/Actions/ActionSet.h>
+#include <Core/Action/ActionFactory.h>
 
-// REGISTER ACTION:
-// Define a function that registers the action. The action also needs to be
-// registered in the CMake file.
-CORE_REGISTER_ACTION( Core, Set )
+CORE_REGISTER_ACTION( Core, Offset )
 
 namespace Core
 {
 
-bool ActionSet::validate( ActionContextHandle& context )
+ActionOffset::ActionOffset()
 {
-  // Check whether the state exists
+  this->add_argument( this->stateid_ );
+  this->add_argument( this->offset_value_ );
+}
 
-  // NOTE: We use lock() to avoid constructor from throwing an exception
-  StateBaseHandle state( state_weak_handle_.lock() );
+ActionOffset::~ActionOffset()
+{
+}
 
-  // If not the state cannot be retrieved report an error
-  if ( !state.get() )
+bool ActionOffset::validate( ActionContextHandle& context )
+{
+  StateBaseHandle state( this->state_weak_handle_.lock() );
+
+  if ( !state )
   {
-    if ( !( StateEngine::Instance()->get_state( stateid_.value(), state ) ) )
+    if ( !StateEngine::Instance()->get_state( this->stateid_.value(), state ) )
     {
-      context->report_error( std::string( "Unknown state variable '" ) + stateid_.value()
-          + "'" );
+      context->report_error( std::string( "Unknown state variable '" ) + stateid_.value() + "'" );
       return false;
     }
-    state_weak_handle_ = state;
+    StateRangedValueBaseHandle value_state = 
+      boost::dynamic_pointer_cast< StateRangedValueBase >( state );
+    if ( !value_state )
+    {
+      context->report_error( std::string( "State variable '") + this->stateid_.value() +
+        "' doesn't support ActionOffset" );
+      return false;
+    }
+    this->state_weak_handle_ = value_state; 
   }
 
-  // The Variant parameter can contain both the value send from the State in
-  // its right format or a string in case it is send from a script.
-  // In any case we need to validate whether the value can be transcribed into
-  // the type we want.
-
   std::string error;
-  if ( !( state->validate_variant( state_value_, error ) ) )
+  if ( !state->validate_variant( this->offset_value_, error ) )
   {
     context->report_error( error );
     return false;
   }
-
+  
   return true;
 }
 
-bool ActionSet::run( ActionContextHandle& context, ActionResultHandle& result )
+bool ActionOffset::run( ActionContextHandle& context, ActionResultHandle& result )
 {
-  // Get the state
-  StateBaseHandle state( state_weak_handle_.lock() );
-
-  if ( state.get() )
+  StateRangedValueBaseHandle value_state( this->state_weak_handle_.lock() );
+  if ( value_state )
   {
-    // Set the value
-    return state->import_from_variant( state_value_, context->source() );
+    return value_state->import_offset_from_variant( this->offset_value_, context->source() );
   }
-
+  
   return false;
 }
+
+
+
 
 } // end namespace Core

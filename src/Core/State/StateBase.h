@@ -82,6 +82,7 @@ public:
 protected:
   friend class ActionSet;
   friend class ActionGet;
+  friend class ActionOffset;
   friend class StateHandler;
 
   // EXPORT_TO_VARIANT

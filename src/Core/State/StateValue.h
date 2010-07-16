@@ -108,8 +108,8 @@ public:
 
   // IMPORT_FROM_STRING:
   // Set the State from a string
-  virtual bool import_from_string( const std::string& str, Core::ActionSource source =
-    Core::ActionSource::NONE_E )
+  virtual bool import_from_string( const std::string& str, ActionSource source =
+    ActionSource::NONE_E )
   {
     T value;
     if ( !( Core::ImportFromString( str, value ) ) ) return false;
@@ -120,15 +120,15 @@ public:
 protected:
   // EXPORT_TO_VARIANT
   // Export the state data to a variant parameter
-  virtual void export_to_variant( Core::ActionParameterVariant& variant ) const
+  virtual void export_to_variant( ActionParameterVariant& variant ) const
   {
     variant.set_value( this->value_ );
   }
 
   // IMPORT_FROM_VARIANT:
   // Import the state data from a variant parameter.
-  virtual bool import_from_variant( Core::ActionParameterVariant& variant, 
-    Core::ActionSource source = Core::ActionSource::NONE_E )
+  virtual bool import_from_variant( ActionParameterVariant& variant, 
+    ActionSource source = ActionSource::NONE_E )
   {
     T value;
     if ( !( variant.get_value( value ) ) ) return false;
@@ -162,7 +162,7 @@ public:
   // SET:
   // Set the value of the state variable
   // NOTE: Please use action to set the state of a variable
-  bool set( const T& value, Core::ActionSource source = Core::ActionSource::NONE_E )
+  bool set( const T& value, ActionSource source = ActionSource::NONE_E )
   {
     // Lock the state engine so no other thread will be accessing it
     StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
