@@ -49,6 +49,7 @@ class AppSplashPrivate
 public:
 
   Ui::AppSplash ui_;
+  bool ready_to_quit_;
 
 };
 
@@ -82,6 +83,10 @@ AppSplash::AppSplash( QWidget *parent ) :
   connect( this->private_->ui_.recent_project_listwidget_, 
     SIGNAL( itemDoubleClicked ( QListWidgetItem* ) ),
     this, SLOT( call_open_recent( QListWidgetItem* ) ) ); 
+  
+  connect( this, SIGNAL( dialog_closed() ), this->parentWidget(), SLOT( close() ) );
+  
+  this->private_->ready_to_quit_ = true;
 
 }
 
@@ -94,6 +99,7 @@ void AppSplash::new_project()
   this->new_project_wizard_ = new AppProjectWizard( this->parentWidget() );
   this->new_project_wizard_->show();
   // now we just close the splash window
+  this->private_->ready_to_quit_ = false;
   this->close();
 }
   
@@ -105,14 +111,16 @@ void AppSplash::open_existing()
     boost::filesystem::path( ProjectManager::Instance()->
     current_project_path_state_->get().c_str(), boost::filesystem::native ) );
 
-  boost::filesystem::path full_path = ( QFileDialog::getExistingDirectory ( this, "Directory", 
-    QString::fromStdString( current_projects_path.string() ) ) ).toStdString(); 
+  boost::filesystem::path full_path = ( QFileDialog::getOpenFileName ( this, 
+    tr( "Open Seg3D Project" ), QString::fromStdString( current_projects_path.string() ), 
+    tr( "Text files( *.s3d )" ) ) ).toStdString(); 
   
   std::string path = full_path.parent_path().string();
   std::string file_name = full_path.filename();
 
-  ActionLoadProject::Dispatch( Core::Interface::GetWidgetActionContext(), path, file_name );
+  ActionLoadProject::Dispatch( Core::Interface::GetWidgetActionContext(), path );//, file_name );
   
+  this->private_->ready_to_quit_ = false;
   this->close();
 }
   
@@ -133,12 +141,16 @@ void AppSplash::open_recent()
       {
         std::vector<std::string> project_entry = 
           Core::SplitString( this->recent_project_list_[ i ], "|" );
+        boost::filesystem::path path = project_entry[ 0 ];
+        path = path / project_entry[ 1 ];
+        
         ActionLoadProject::Dispatch( Core::Interface::GetWidgetActionContext(),
-          project_entry[ 0 ], project_entry[ 1 ] ); 
+          path.string() );//, project_entry[ 1 ] ); 
         break;
       }
     }
   }
+  this->private_->ready_to_quit_ = false;
   this->close();
 }
 
@@ -168,6 +180,15 @@ void AppSplash::populate_recent_projects()
 void AppSplash::enable_load_recent_button( QListWidgetItem* not_used )
 {
   this->private_->ui_.load_recent_button_->setEnabled( true );
+}
+  
+void AppSplash::closeEvent( QCloseEvent *event )
+{
+  if( this->private_->ready_to_quit_ )
+  {
+    Q_EMIT dialog_closed();
+  }
+  event->accept();
 }
 
   

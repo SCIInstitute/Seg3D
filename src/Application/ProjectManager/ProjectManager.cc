@@ -123,13 +123,15 @@ void ProjectManager::rename_project_folder( const std::string& new_name, Core::A
   try
   {
     boost::filesystem::rename( ( path / old_name ), ( path / new_name ) );
-    boost::filesystem::rename( ( path / new_name / ( old_name + ".xml" ) ), 
-      ( path / new_name / ( new_name + ".xml" ) ) );
+    boost::filesystem::rename( ( path / new_name / ( old_name + ".s3d" ) ), 
+      ( path / new_name / ( new_name + ".s3d" ) ) );
   }
   catch ( std::exception& e ) 
   {
     CORE_LOG_ERROR( e.what() );
   }
+  
+  this->current_project_->project_name_state_->set( new_name );
   
   std::vector< std::string > temp_projects_vector = this->recent_projects_state_->get();
 
@@ -145,19 +147,17 @@ void ProjectManager::rename_project_folder( const std::string& new_name, Core::A
       
       if( from_project_list == from_path_and_name )
       {
-        temp_projects_vector[ i ] = "";
+        temp_projects_vector.erase( temp_projects_vector.begin() + i );
       }
     }
   }
   this->recent_projects_state_->set( temp_projects_vector );
   
-  boost::filesystem::path project_path = boost::filesystem::path( 
-    current_project_path_state_->get().c_str() );
-  project_path = project_path / this->current_project_->project_name_state_->get().c_str();
-  
-  this->current_project_->populate_session_states();
-  this->add_to_recent_projects( path.string(), new_name );
-
+  if( this->save_project_only() )
+  {
+    this->current_project_->populate_session_states();
+    this->add_to_recent_projects( this->current_project_path_state_->get(), new_name );
+  }
 }
 
 void ProjectManager::new_project( const std::string& project_name, const std::string& project_path )
@@ -170,6 +170,9 @@ void ProjectManager::new_project( const std::string& project_name, const std::st
       this->default_project_name_counter_state_->set( 
         this->default_project_name_counter_state_->get() + 1 ); 
     }
+    
+    boost::filesystem::path path = project_path;
+    path = path / project_name;
 
     std::vector< std::string > empty_vector;
     this->current_project_->project_name_state_->set( project_name );
@@ -181,14 +184,14 @@ void ProjectManager::new_project( const std::string& project_name, const std::st
   }
 }
   
-void ProjectManager::open_project( const std::string& project_path, const std::string& project_name )
-{
-  this->current_project_->project_name_state_->set( project_name );
+void ProjectManager::open_project( const std::string& project_path )
+{ 
   boost::filesystem::path path = project_path;
+  this->current_project_->project_name_state_->set( path.leaf() );
   
-  this->current_project_->initialize_from_file( path / project_name, project_name );
-  this->current_project_path_state_->set( project_path );
-  this->add_to_recent_projects( project_path, project_name );
+  this->current_project_->initialize_from_file( path, path.leaf() );
+  this->current_project_path_state_->set( path.parent_path().string() );
+  this->add_to_recent_projects( path.parent_path().string(), path.leaf() );
 
   this->set_last_saved_session_time_stamp();
 }
@@ -396,7 +399,7 @@ bool ProjectManager::save_project_only()
   project_path = project_path / this->current_project_->project_name_state_->get().c_str();
 
   return this->current_project_->export_states( project_path, 
-    this->current_project_->project_name_state_->get() );
+    this->current_project_->project_name_state_->get(), true );
 
 }
 
@@ -412,15 +415,5 @@ bool ProjectManager::is_saving()
 {
   return this->session_saving_;
 }
-
-
-
-
-
-
-
-
-
-
 
 } // end namespace seg3D

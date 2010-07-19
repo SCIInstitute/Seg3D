@@ -48,7 +48,8 @@ StateIO::~StateIO()
 {
 }
 
-bool StateIO::export_to_file( boost::filesystem::path path, std::vector< std::string >& state_list )
+bool StateIO::export_to_file( boost::filesystem::path path, std::vector< std::string >& state_list,
+  bool project_file)
 {
   // XML declaration and version number
   TiXmlDocument doc;  
@@ -94,16 +95,29 @@ bool StateIO::export_to_file( boost::filesystem::path path, std::vector< std::st
     
   } // end state_list for loop
 
-  doc.SaveFile( ( ( path ).string() + ".xml" ).c_str() );
+  std::string extension = ".xml";
+  if( project_file ) 
+  {
+    extension = ".s3d";
+  }
+  
+  doc.SaveFile( ( ( path ).string() + extension ).c_str() );
 
   return true;
 }
 
-bool StateIO::import_from_file( boost::filesystem::path path, std::vector< std::string >& state_list )
+bool StateIO::import_from_file( boost::filesystem::path path, std::vector< std::string >& state_list,
+  bool project_file )
 {
 
+  std::string extension = ".xml";
+  if( project_file ) 
+  {
+    extension = ".s3d";
+  }
+  
   // We will load in the file from the specified path and exit if the path is invalid
-  TiXmlDocument doc( ( path.string() + ".xml" ).c_str() );
+  TiXmlDocument doc( ( path.string() + extension ).c_str() );
   if ( !doc.LoadFile() ) 
     return false;
 

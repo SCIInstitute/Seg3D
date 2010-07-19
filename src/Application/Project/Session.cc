@@ -28,6 +28,8 @@
 
 // Application includes
 #include <Application/Project/Session.h>
+
+#include <Application/DataManager/DataManager.h>
 // #include <Application/InterfaceManager/InterfaceManager.h>
 // #include <Application/ViewerManager/ViewerManager.h>
 // #include <Application/LayerManager/LayerManager.h>
@@ -60,10 +62,14 @@ bool Session::initialize_from_file( boost::filesystem::path path, const std::str
   std::vector< std::string > state_values;
 
   // Next we import the session information from file
-  if( Core::StateIO::import_from_file( ( path / session_name ), state_values ) )
+  if( Core::StateIO::import_from_file( ( path / session_name ), state_values, false ) )
   {
     Core::StateEngine::Instance()->set_session_states( state_values );
-    return Core::StateEngine::Instance()->load_session_states();
+    if( Core::StateEngine::Instance()->load_session_states() )
+    {
+      DataManager::Instance()->initialize();
+      return true;
+    }
   }
 
   return false;
@@ -75,7 +81,11 @@ bool Session::save_session_settings( boost::filesystem::path path, const std::st
   {
     std::vector< std::string > state_values;
     Core::StateEngine::Instance()->get_session_states( state_values );
-    return Core::StateIO::export_to_file( ( path / session_name ), state_values );
+    if( Core::StateIO::export_to_file( ( path / session_name ), state_values, false ) )
+    {
+      DataManager::Instance()->save_datamanager_state( session_name );
+      return true;
+    }
   }
 
   return false;

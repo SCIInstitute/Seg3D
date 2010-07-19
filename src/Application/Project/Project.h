@@ -78,6 +78,9 @@ public:
   Core::StateStringVectorHandle project_notes_state_;
   std::vector< Core::StateColorHandle > color_states_;
   
+public:
+  typedef boost::signals2::signal< void( std::string ) > session_deleted_signal_type;
+  session_deleted_signal_type session_deleted_signal_;
   
   
 public:

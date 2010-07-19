@@ -48,11 +48,13 @@ public:
 
   // EXPORT_TO_FILE:
   // This function when called will export the contents of the vector of strings to an xml file
-  static bool export_to_file( boost::filesystem::path path, std::vector< std::string >& state_list );
+  static bool export_to_file( boost::filesystem::path path, 
+    std::vector< std::string >& state_list, bool project_file );
 
   // IMPORT_FROM_FILE:
   // This function when called, imports the contents of the xml file at the path specified
-  static bool import_from_file( boost::filesystem::path path, std::vector< std::string >& state_list );
+  static bool import_from_file( boost::filesystem::path path, 
+    std::vector< std::string >& state_list, bool project_file );
 
 };
 

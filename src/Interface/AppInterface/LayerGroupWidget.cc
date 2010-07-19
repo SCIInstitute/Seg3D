@@ -608,6 +608,7 @@ void LayerGroupWidget::show_resample( bool show )
     this->private_->ui_.group_resample_button_->setChecked( false );
   }
   show_selection_checkboxes( show );
+  this->parentWidget()->resize( this->parentWidget()->width(), this->parentWidget()->height() );
   this->repaint();
 }
 

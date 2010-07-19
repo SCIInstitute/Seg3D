@@ -187,6 +187,8 @@ public:
   // Get the name of the layer
   std::string get_layer_name() const;
   
+  int get_generation() const;
+  
 private:  
   // Handle to the layer group (this one needs to be weak to ensure objects are not persistent
   // due to a circular dependency)

@@ -46,6 +46,9 @@ class AppSplashPrivate;
 class AppSplash : public QDialog
 {
 Q_OBJECT
+  
+Q_SIGNALS:
+  void dialog_closed();
 
 public:
   AppSplash( QWidget* parent = 0 );
@@ -79,6 +82,9 @@ private Q_SLOTS:
   // ENABLE_LOAD_RECENT_BUTTON:
   // this function enables the load recent button if you select a recent project from the list
   void enable_load_recent_button( QListWidgetItem* item );
+  
+public:
+  void closeEvent( QCloseEvent *event );
   
 private:
   // Internals of the splash screen

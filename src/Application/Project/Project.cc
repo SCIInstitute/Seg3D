@@ -76,7 +76,7 @@ Project::~Project()
 bool Project::initialize_from_file( boost::filesystem::path project_path, 
   const std::string& project_name )
 {
-  if( import_states( project_path, project_name ) ) 
+  if( import_states( project_path, project_name, true ) ) 
   {
     project_path = project_path / 
       ( Core::SplitString( ( this->sessions_state_->get() )[0], "|" ) )[ 0 ];
@@ -127,7 +127,9 @@ bool Project::delete_session( boost::filesystem::path project_path, int state_in
     return false;
   }
   
-  this->export_states( project_path, this->project_name_state_->get() );
+  session_deleted_signal_( Core::SplitString( session_path.leaf(), "." )[ 0 ] );
+  
+  this->export_states( project_path, this->project_name_state_->get(), true );
   return true;
 }
   
@@ -146,7 +148,7 @@ void Project::add_session_to_list( boost::filesystem::path project_path, const s
     if( ( stored_session_name.substr( 0, 7 ) == "(AS) - " ) && 
       ( new_session_name.substr( 0, 7 ) == "(AS) - " ) )
     {
-      temp_sessions_vector[ i ] = "";
+      temp_sessions_vector.erase( temp_sessions_vector.begin() + i );
       this->delete_session( project_path, i );
     }
   }

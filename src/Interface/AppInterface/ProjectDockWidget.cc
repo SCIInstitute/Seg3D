@@ -71,9 +71,8 @@ ProjectDockWidget::ProjectDockWidget( QWidget *parent ) :
     // We dont want them to be able to save blank notes.
     this->private_->ui_.save_note_button_->setEnabled( false );
 
-    double minutes = PreferencesManager::Instance()->auto_save_time_state_->get();
-
-    this->private_->ui_.minutes_label_->setText( QString::number( minutes, 'f', 2 ) );
+    int minutes = PreferencesManager::Instance()->auto_save_time_state_->get();
+    this->private_->ui_.minutes_label_->setText( QString::number( minutes ) );
 
     QtUtils::QtBridge::Connect( this->private_->ui_.autosave_checkbox_,
       PreferencesManager::Instance()->auto_save_state_ );
@@ -320,7 +319,7 @@ void ProjectDockWidget::call_load_session( QListWidgetItem* item )
   this->load_session();
 }
 
-void ProjectDockWidget::HandleAutoSaveTimeChanged( qpointer_type qpointer, double duration )
+void ProjectDockWidget::HandleAutoSaveTimeChanged( qpointer_type qpointer, int duration )
 {
   if( !( Core::Interface::IsInterfaceThread() ) )
   {
@@ -344,10 +343,10 @@ void ProjectDockWidget::HandleSmartAutoSaveToggled( qpointer_type qpointer )
   if( qpointer.data() ) qpointer->set_smart_save_label();
 }
 
-void ProjectDockWidget::set_auto_save_label( double duration )
+void ProjectDockWidget::set_auto_save_label( int duration )
 {
-  double time_duration = PreferencesManager::Instance()->auto_save_time_state_->get();
-  this->private_->ui_.minutes_label_->setText( QString::number( time_duration, 'f', 2 ) );
+  //int time_duration = PreferencesManager::Instance()->auto_save_time_state_->get();
+  this->private_->ui_.minutes_label_->setText( QString::number( duration ) );
 }
 
 void ProjectDockWidget::set_smart_save_label()

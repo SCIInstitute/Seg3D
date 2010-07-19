@@ -52,8 +52,6 @@ public:
     QtUtils::QtSliderIntCombo *brush_radius_;
   QtUtils::QtSliderDoubleCombo *upper_threshold_;
   QtUtils::QtSliderDoubleCombo *lower_threshold_;
-//  QComboBox *target_;
-//  QComboBox *mask_constraint_;
   
 };
 
@@ -84,12 +82,6 @@ bool PaintToolInterface::build_widget( QFrame* frame )
   
   this->private_->lower_threshold_ = new QtUtils::QtSliderDoubleCombo( this, false );
   this->private_->ui_.lowerHLayout_bottom->addWidget( this->private_->lower_threshold_ );
-
-//  this->private_->target_ = new QComboBox( this );
-//  this->private_->ui_.activeHLayout->addWidget( this->private_->target_ );
-//
-//  this->private_->mask_constraint_ = new QComboBox( this );
-//  this->private_->ui_.maskHLayout->addWidget( this->private_->mask_constraint_ );
   
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
@@ -120,6 +112,10 @@ bool PaintToolInterface::build_widget( QFrame* frame )
   this->private_->ui_.target_mask_->setDisabled( tool->use_active_layer_state_->get() );
   connect( this->private_->ui_.use_active_layer_, SIGNAL( toggled( bool ) ),
     this->private_->ui_.target_mask_, SLOT( setDisabled( bool ) ) );
+  
+//  this->private_->ui_.target_mask_->setMaximumContentsLength() 
+//  this->private_->ui_.mask_constraint_
+//  this->private_->ui_.data_constraint_
     
     //Send a message to the log that we have finised with building the Paint Brush Interface
   CORE_LOG_MESSAGE("Finished building a Paint Brush Interface");

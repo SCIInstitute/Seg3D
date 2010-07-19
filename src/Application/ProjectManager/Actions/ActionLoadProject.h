@@ -38,14 +38,13 @@ namespace Seg3D
 
 class ActionLoadProject : public Core::Action
 {
-  CORE_ACTION( "LoadProject", "LoadProject <projectname>" );
+  CORE_ACTION( "LoadProject", "LoadProject <projectpath>" );
 
   // -- Constructor/Destructor --
 public:
   ActionLoadProject()
   {
-    this->add_argument( this->project_name_ );
-    this->add_argument( this->project_path_ );
+    this->add_parameter("projectpath", this->project_path_ );
   }
 
   virtual ~ActionLoadProject()
@@ -59,10 +58,6 @@ public:
   
 private:
 
-
-  // This parameter contains the name of the session to be loaded
-  Core::ActionParameter< std::string > project_name_;
-
   // This parameter contains the index of the session to be loaded
   Core::ActionParameter< std::string > project_path_;
   
@@ -71,13 +66,12 @@ public:
   
   // CREATE:
   // Create an action that loads a session
-  static Core::ActionHandle Create( const std::string& project_path, 
-    const std::string& project_name );
+  static Core::ActionHandle Create( const std::string& project_path );
   
   // DISPATCH:
   // Dispatch an action loads a session
-  static void Dispatch( Core::ActionContextHandle context, const std::string& project_path, 
-    const std::string& project_name );
+  static void Dispatch( Core::ActionContextHandle context, const std::string& project_path );
+
 };
 
 } // end namespace Seg3D

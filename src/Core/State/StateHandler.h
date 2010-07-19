@@ -174,12 +174,12 @@ public:
   // IMPORT_STATES:
   // This function is called on StateHandlers that need to have its states loaded from a particular
   // location that is seperate from the session states
-  bool import_states( boost::filesystem::path path, const std::string& name );
+  bool import_states( boost::filesystem::path path, const std::string& name, bool project_file = false );
 
   // EXPORT_STATES:
   // This function is called on StateHandlers that need to have its states saved to a particular
   // location that is seperate from the session states
-  bool export_states( boost::filesystem::path path, const std::string& name );
+  bool export_states( boost::filesystem::path path, const std::string& name, bool project_file = false );
 
 
 protected:

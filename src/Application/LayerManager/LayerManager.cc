@@ -250,7 +250,6 @@ bool LayerManager::move_layer_below( LayerHandle layer_to_move, LayerHandle targ
   return true;  
 }
 
-
 // Here is the logic for inserting a layer
 bool LayerManager::validate_layer_move( LayerHandle layer_above, LayerHandle layer_below )
 {
@@ -260,7 +259,6 @@ bool LayerManager::validate_layer_move( LayerHandle layer_above, LayerHandle lay
   
   return false;
 }
-
 
 void LayerManager::set_active_layer( LayerHandle layer )
 {
@@ -281,7 +279,6 @@ void LayerManager::set_active_layer( LayerHandle layer )
 
   active_layer_changed_signal_( layer );  
 }
-
 
 LayerGroupHandle LayerManager::get_layer_group( std::string group_id )
 {
@@ -401,7 +398,6 @@ void LayerManager::delete_layers( LayerGroupHandle group )
       if ( this->group_list_.size() > 0 )
       {
         this->active_layer_ = this->group_list_.front()->layer_list_.back();
-        //this->active_layer_->set_active( true );
         active_layer_changed = true;
       }
     }
@@ -450,7 +446,6 @@ bool LayerManager::delete_all()
   }
   return true;
 }
-
 
 LayerHandle LayerManager::get_active_layer()
 {
@@ -590,8 +585,6 @@ void LayerManager::get_layer_names( std::vector< LayerIDNamePair >& layer_names 
   }
 }
 
-
-  
 bool LayerManager::pre_save_states()
 {
   lock_type lock( this->get_mutex() );
@@ -641,15 +634,13 @@ bool LayerManager::post_save_states()
     }
   }
   return Core::MaskDataBlockManager::Instance()->save_data_blocks();
-}
-  
+} 
   
 bool LayerManager::pre_load_states()
 {
   return this->delete_all();
 }
 
-  
 bool LayerManager::post_load_states()
 {
   std::vector< std::string > state_values;
@@ -657,7 +648,6 @@ bool LayerManager::post_load_states()
 
   std::vector< std::string > layer_vector = this->layers_state_->get();
   for( int j = 0; j < static_cast< int >( layer_vector.size() ); ++j )
-  //for( int j = static_cast< int >( layer_vector.size() ) - 1; j >= 0; --j )
   {
     if( layer_vector[ j ] == "]" )
     {
@@ -702,7 +692,5 @@ bool LayerManager::post_load_states()
   
   return true;
 }
-
-
 
 } // end namespace seg3D

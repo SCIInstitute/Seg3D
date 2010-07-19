@@ -44,7 +44,7 @@ namespace Seg3D
 bool ActionLoadProject::validate( Core::ActionContextHandle& context )
 {
   boost::filesystem::path full_filename( project_path_.value() );
-  full_filename = full_filename / project_name_.value();
+  full_filename = full_filename / ( full_filename.leaf() + ".s3d" );
   if ( !( boost::filesystem::exists ( full_filename ) ) )
   {
     context->report_error( std::string( "File '" ) + this->project_path_.value() +
@@ -58,38 +58,34 @@ bool ActionLoadProject::validate( Core::ActionContextHandle& context )
 bool ActionLoadProject::run( Core::ActionContextHandle& context, 
   Core::ActionResultHandle& result )
 {
+  boost::filesystem::path full_filename( project_path_.value() );
   std::string message = std::string("Please wait while project: '") + 
-    this->project_name_.value() + std::string("' is loaded...");
+    full_filename.leaf() + std::string("' is loaded...");
 
   Core::ActionProgressHandle progress = 
     Core::ActionProgressHandle( new Core::ActionProgress( message ) );
 
   progress->begin_progress_reporting();
 
-  ProjectManager::Instance()->open_project( this->project_path_.value(), 
-    this->project_name_.value() );
-
+  ProjectManager::Instance()->open_project( this->project_path_.value() );
   progress->end_progress_reporting();
-
 
   return true;
 }
 
-Core::ActionHandle ActionLoadProject::Create( const std::string& project_path, 
-  const std::string& project_name )
+Core::ActionHandle ActionLoadProject::Create( const std::string& project_path )
 {
   ActionLoadProject* action = new ActionLoadProject;
   
   action->project_path_.value() = project_path;
-  action->project_name_.value() = project_name;
   
   return Core::ActionHandle( action );
 }
 
 void ActionLoadProject::Dispatch( Core::ActionContextHandle context, 
-  const std::string& project_path, const std::string& project_name )
+  const std::string& project_path )
 {
-  Core::ActionDispatcher::PostAction( Create( project_path, project_name ), context );
+  Core::ActionDispatcher::PostAction( Create( project_path ), context );
 }
 
 } // end namespace Seg3D

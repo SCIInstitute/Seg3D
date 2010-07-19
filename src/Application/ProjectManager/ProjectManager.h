@@ -77,7 +77,7 @@ public:
   // OPEN_PROJECT:
   // this function takes the path to the desired project and loads the values from the file 
   // located at that location
-  void open_project( const std::string& project_path, const std::string& project_name );
+  void open_project( const std::string& project_path );//, const std::string& project_name );
   
   // SAVE_PROJECT:
   // this function saves the values in current_project_ to the current save location
@@ -127,11 +127,6 @@ public:
   Core::StateIntHandle default_project_name_counter_state_;
   
   ProjectHandle current_project_;
-
-//  Core::StateBoolHandle smart_auto_save_state_;
-//  Core::StateRangedDoubleHandle auto_save_time_state_;
-//  Core::StateBoolHandle auto_save_state_;
-  
 
 private:
   // INITIALIZE:

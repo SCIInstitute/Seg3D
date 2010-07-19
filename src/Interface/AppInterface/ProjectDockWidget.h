@@ -73,11 +73,11 @@ private:
   // updated elsewhere.
   static void HandleNoteSaved( qpointer_type qpointer );
 
-  static void HandleAutoSaveTimeChanged( qpointer_type qpointer, double duration );
+  static void HandleAutoSaveTimeChanged( qpointer_type qpointer, int duration );
   static void HandleSmartAutoSaveToggled( qpointer_type qpointer );
 
 private:
-  void set_auto_save_label( double duration );
+  void set_auto_save_label( int duration );
 
   void set_smart_save_label();
   

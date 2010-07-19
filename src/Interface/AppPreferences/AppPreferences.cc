@@ -47,7 +47,7 @@ class AppPreferencesPrivate
 public:
     Ui::AppPreferences ui_;
   QtUtils::QtSliderDoubleCombo* opacity_adjuster_;
-  QtUtils::QtSliderDoubleCombo* auto_save_timer_adjuster_;
+  QtUtils::QtSliderIntCombo* auto_save_timer_adjuster_;
   
   //QVector< ColorButton* > color_buttons_;
   QButtonGroup* color_button_group_;
@@ -74,8 +74,8 @@ AppPreferences::AppPreferences( QWidget *parent ) :
   connect( this->private_->ui_.apply_button_, SIGNAL( clicked() ), 
     this, SLOT( save_defaults() ) );
   
-  connect( this->private_->auto_save_timer_adjuster_, SIGNAL( valueAdjusted( double ) ),
-    this, SLOT( set_timer_label( double ) ) );
+  connect( this->private_->auto_save_timer_adjuster_, SIGNAL( valueAdjusted( int ) ),
+    this, SLOT( set_timer_label( int ) ) );
 
 }
 
@@ -99,7 +99,7 @@ void AppPreferences::change_project_directory()
 void AppPreferences::setup_general_prefs()
 {
 
-  this->private_->auto_save_timer_adjuster_ = new QtUtils::QtSliderDoubleCombo( this );
+  this->private_->auto_save_timer_adjuster_ = new QtUtils::QtSliderIntCombo( this );
   this->private_->ui_.horizontalLayout_13->addWidget( this->private_->auto_save_timer_adjuster_ );
   this->private_->auto_save_timer_adjuster_->setObjectName( QString::fromUtf8( "auto_save_timer_adjuster_" ) );
 
@@ -126,8 +126,8 @@ void AppPreferences::setup_general_prefs()
     PreferencesManager::Instance()->smart_save_state_ );
   QtUtils::QtBridge::Connect( this->private_->auto_save_timer_adjuster_,
     PreferencesManager::Instance()->auto_save_time_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ui_.compression_combobox_,
-    PreferencesManager::Instance()->compression_state_ );
+//  QtUtils::QtBridge::Connect( this->private_->ui_.compression_combobox_,
+//    PreferencesManager::Instance()->compression_state_ );
 }
 
 void AppPreferences::setup_layer_prefs()
@@ -287,9 +287,9 @@ void AppPreferences::save_defaults()
 }
 
       
-void AppPreferences::set_timer_label( double time_set )
+void AppPreferences::set_timer_label( int time_set )
 {
-  QString time_label = QString::number( time_set, 'f', 2 ) + QString::fromUtf8(" minutes");
+  QString time_label = QString::number( time_set ) + QString::fromUtf8(" minutes");
   this->private_->ui_.frequency_label_->setText( time_label );
 }
 

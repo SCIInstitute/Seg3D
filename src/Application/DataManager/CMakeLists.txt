@@ -1,3 +1,4 @@
+
 #
 #  For more information, please see: http://software.sci.utah.edu
 # 
@@ -26,21 +27,30 @@
 #  DEALINGS IN THE SOFTWARE.
 #
 
+##################################################
+# Set sources
+##################################################
 
-ADD_SUBDIRECTORY(DataManager)
-ADD_SUBDIRECTORY(Filters)
-ADD_SUBDIRECTORY(InterfaceManager)
-ADD_SUBDIRECTORY(Layer)
-ADD_SUBDIRECTORY(LayerIO)
-ADD_SUBDIRECTORY(LayerManager)
-ADD_SUBDIRECTORY(PreferencesManager)
-ADD_SUBDIRECTORY(Project)
-ADD_SUBDIRECTORY(ProjectManager)
-ADD_SUBDIRECTORY(Renderer)
-ADD_SUBDIRECTORY(StateManager)
-ADD_SUBDIRECTORY(StatusBar)
-ADD_SUBDIRECTORY(Tool)
-ADD_SUBDIRECTORY(ToolManager)
-ADD_SUBDIRECTORY(Tools)
-ADD_SUBDIRECTORY(Viewer)
-ADD_SUBDIRECTORY(ViewerManager)
+SET(APPLICATION_DATAMANAGER_SRCS
+    DataManager.h
+    DataManager.cc
+)
+
+
+CORE_ADD_LIBRARY(Application_DataManager ${APPLICATION_DATAMANAGER_SRCS})
+            
+TARGET_LINK_LIBRARIES(Application_DataManager
+                      Core_Utils
+                      Core_EventHandler
+                      Core_Application
+                      Core_Interface
+                      Core_Action
+                      Core_State
+          Application_LayerManager
+                      Application_StateManager
+                      Application_Project
+                      ${SCI_BOOST_LIBRARY})
+
+# Register actions
+ADD_LIBRARY_ACTIONS(Application_DataManager)
+

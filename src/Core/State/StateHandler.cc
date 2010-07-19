@@ -231,7 +231,7 @@ bool StateHandler::load_states( std::vector< std::string >& states_vector )
         {
           state_value_as_string_vector = 
             SplitString( states_vector[ i ], "*" );
-          if( ( state_value_as_string_vector[ 0 ] != "" ) )//&& ( state_value_as_string_vector[ 1 ] != "" ) )
+          if( ( state_value_as_string_vector[ 0 ] != "" ) )
           {
             state_map_type::iterator it = this->private_->state_map_.find( state_value_as_string_vector[ 0 ] );
             if ( it != this->private_->state_map_.end() )
@@ -255,16 +255,16 @@ bool StateHandler::load_states( std::vector< std::string >& states_vector )
   return post_load_states();
 }
 
-bool StateHandler::import_states( boost::filesystem::path path, const std::string& name )
+bool StateHandler::import_states( boost::filesystem::path path, const std::string& name, bool project_file )
 {
   std::vector< std::string > state_values;
-  if( Core::StateIO::import_from_file( ( path / ( name ) ), state_values ) )
+  if( Core::StateIO::import_from_file( ( path / ( name ) ), state_values, project_file ) )
     return this->load_states( state_values );
   else
     return false;
 }
 
-bool StateHandler::export_states( boost::filesystem::path path, const std::string& name )
+bool StateHandler::export_states( boost::filesystem::path path, const std::string& name, bool project_file )
 {
 
   if( !pre_save_states() )
@@ -285,7 +285,7 @@ bool StateHandler::export_states( boost::filesystem::path path, const std::strin
   }
   state_values.push_back( this->private_->statehandler_id_ );
 
-  return Core::StateIO::export_to_file( ( path / ( name ) ), state_values );
+  return Core::StateIO::export_to_file( ( path / ( name ) ), state_values, project_file );
 }
 
 bool StateHandler::pre_load_states()
