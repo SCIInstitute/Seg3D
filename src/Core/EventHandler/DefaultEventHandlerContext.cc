@@ -45,12 +45,12 @@ public:
   bool eventhandler_started_;
 
   // EventHandler thread id
-  boost::thread eventhandler_thread_;
+  boost::thread* eventhandler_thread_;
 
   // Mutex protecting the event queue
   boost::mutex event_queue_mutex_;
 
-  // Condition variable signalling that a new event was posted
+  // Condition variable signaling that a new event was posted
   boost::condition_variable event_queue_new_event_;
 
   // The event queue
@@ -80,12 +80,14 @@ void DefaultEventHandlerContextPrivate::start_thread( EventHandler* eventhandler
 DefaultEventHandlerContext::DefaultEventHandlerContext() :
   private_( new DefaultEventHandlerContextPrivate )
 {
+  this->private_->eventhandler_thread_ = 0;
   this->private_->eventhandler_started_ = false;
   this->private_->done_ = false;
 }
 
 DefaultEventHandlerContext::~DefaultEventHandlerContext()
 {
+  delete this->private_->eventhandler_thread_;
 }
 
 void DefaultEventHandlerContext::post_event( EventHandle& event )
@@ -122,7 +124,7 @@ void DefaultEventHandlerContext::post_and_wait_event( EventHandle& event )
 bool DefaultEventHandlerContext::process_events()
 {
   // Only run on the application thread
-  if ( boost::this_thread::get_id() != this->private_->eventhandler_thread_.get_id() )
+  if ( boost::this_thread::get_id() != this->private_->eventhandler_thread_->get_id() )
   {
     CORE_THROW_LOGICERROR("process_events was called from a thread that is not processing the events");
   }
@@ -187,7 +189,7 @@ bool DefaultEventHandlerContext::wait_and_process_events()
 bool DefaultEventHandlerContext::is_eventhandler_thread() const
 {
   return ( boost::this_thread::get_id() == 
-    this->private_->eventhandler_thread_.get_id() );
+    this->private_->eventhandler_thread_->get_id() );
 }
 
 bool DefaultEventHandlerContext::start_eventhandler( EventHandler* eventhandler )
@@ -197,7 +199,7 @@ bool DefaultEventHandlerContext::start_eventhandler( EventHandler* eventhandler 
   // use that as callable
 
   boost::unique_lock< boost::mutex > lock( this->private_->thread_mutex_ );
-  this->private_->eventhandler_thread_ = 
+  this->private_->eventhandler_thread_ = new
     boost::thread( boost::bind( &DefaultEventHandlerContextPrivate::start_thread,
       this->private_.get(), eventhandler ) );
     
@@ -221,7 +223,7 @@ void DefaultEventHandlerContext::terminate_eventhandler()
     boost::unique_lock< boost::mutex > lock( this->private_->event_queue_mutex_ );
 
     // If it is already done, exit the function as this
-    // function has already been exeecuted
+    // function has already been executed
     if ( this->private_->done_ == true ) return;
 
     // Mark the eventhandler as done
@@ -232,7 +234,7 @@ void DefaultEventHandlerContext::terminate_eventhandler()
   }
 
   // Join the thread back into the main application thread
-  this->private_->eventhandler_thread_.join();
+  this->private_->eventhandler_thread_->join();
 }
 
 } // end namespace Core
