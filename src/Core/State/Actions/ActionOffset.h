@@ -30,6 +30,7 @@
 #define CORE_STATE_ACTIONS_ACTIONOFFSET_H
 
 #include <Core/Action/Action.h>
+#include <Core/Action/ActionDispatcher.h>
 #include <Core/State/StateRangedValue.h>
 
 namespace Core

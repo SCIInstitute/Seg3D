@@ -86,6 +86,8 @@ public:
   virtual void scale( double ratio );
 
   virtual void translate( const Core::Vector& offset );
+  
+  void dolly( double dz );
 
   void flip( Core::FlipDirectionType direction );
 

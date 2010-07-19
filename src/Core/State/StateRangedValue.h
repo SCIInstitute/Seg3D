@@ -75,6 +75,10 @@ protected:
   // Import the offset value from the variant and apply it to the current value.
   virtual bool import_offset_from_variant( ActionParameterVariant& variant, 
     ActionSource source = ActionSource::NONE_E ) = 0;
+
+  // VALIDATE_OFFSET_VARIANT:
+  // Returns true if the value stored in the variant is a valid offset value, otherwise false.
+  virtual bool validate_offset_variant( ActionParameterVariant& variant, std::string& error ) = 0;
 };
 
 // Definition of the templated StateValue class
@@ -164,7 +168,7 @@ protected:
   // Validate a variant parameter
   // This function returns false if the parameter is invalid or cannot be
   // converted and in that case error will describe the error.
-  virtual bool validate_variant( Core::ActionParameterVariant& variant, std::string& error )
+  virtual bool validate_variant( ActionParameterVariant& variant, std::string& error )
   {
     if ( !( variant.validate_type< T > () ) )
     {
@@ -180,6 +184,20 @@ protected:
           this->min_value_ ) + "," + ExportToString( this->max_value_ ) + "]";
       return false;
     }
+    error = "";
+    return true;
+  }
+
+  // VALIDATE_OFFSET_VARIANT:
+  // Returns true if the value stored in the variant is a valid offset value, otherwise false.
+  virtual bool validate_offset_variant( ActionParameterVariant& variant, std::string& error )
+  {
+    if ( !( variant.validate_type< T > () ) )
+    {
+      error = "Cannot convert the value '" + variant.export_to_string() + "'";
+      return false;
+    }
+
     error = "";
     return true;
   }

@@ -94,6 +94,11 @@ void View2D::translate( const Vector& offset )
   this->center_[0] -= delta_x;
   this->center_[1] -= delta_y;
 }
+  
+void View2D::dolly( double dz )
+{
+  this->center_[ 2 ] += dz;
+}
 
 void View2D::flip(FlipDirectionType direction)
 {

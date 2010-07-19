@@ -65,7 +65,7 @@ typedef boost::shared_ptr< Viewer > ViewerHandle;
 typedef boost::weak_ptr< Viewer > ViewerWeakHandle;
 
 // Class definition
-class Viewer : public Core::AbstractViewer
+class Viewer : public Core::AbstractViewer, public boost::enable_shared_from_this< Viewer >
 {
 
   // -- constructor/destructor --
@@ -204,9 +204,11 @@ public:
     
 
 private:
+  friend class ActionOffsetSlice;
+
   // OFFSET_SLICE:
   // Offset the slice number by the given value.
-  void offset_slice( int delta );
+  int offset_slice( int delta );
 
   // MOVE_SLICE_BY:
   // Move the active slice by the given offset in world coordinates.

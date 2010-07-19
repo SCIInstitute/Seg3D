@@ -84,6 +84,23 @@ void StateView2D::translate( const Core::Vector& offset )
     this->state_changed_signal_();
   }
 }
+  
+void StateView2D::dolly( double dz )
+{
+  View2D val;
+  {
+    // Lock the state engine so no other thread will be accessing it
+    StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
+    this->value_.dolly( dz );
+    val = this->value_;
+  }
+  
+  if ( this->signals_enabled() ) 
+  {
+    this->value_changed_signal_( val, ActionSource::NONE_E );
+    this->state_changed_signal_();
+  }
+}
 
 void StateView2D::flip( Core::FlipDirectionType direction )
 {

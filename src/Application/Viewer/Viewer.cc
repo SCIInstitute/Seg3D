@@ -27,16 +27,20 @@
  */
 
 // Core includes
+#include <Core/Application/Application.h>
+#include <Core/Interface/Interface.h>
 #include <Core/Utils/ScopedCounter.h>
-#include <Application/StatusBar/StatusBar.h>
+#include <Core/State/Actions/ActionOffset.h>
 #include <Core/State/Actions/ActionSet.h>
 
 // Application includes
 #include <Application/Layer/DataLayer.h>
 #include <Application/Layer/MaskLayer.h>
 #include <Application/LayerManager/LayerManager.h>
+#include <Application/StatusBar/StatusBar.h>
 #include <Application/Viewer/Viewer.h>
 #include <Application/Viewer/ViewManipulator.h>
+#include <Application/Viewer/Actions/ActionOffsetSlice.h>
 #include <Application/ViewerManager/Actions/ActionPickPoint.h>
 #include <Application/ViewerManager/ViewerManager.h>
 
@@ -264,7 +268,8 @@ bool Viewer::wheel_event( int delta, int x, int y, int buttons, int modifiers )
     }
   }
 
-  this->offset_slice( -delta );
+  ActionOffsetSlice::Dispatch( Core::Interface::GetMouseActionContext(),
+    this->shared_from_this(), -delta );
 
   // Update the status bar display.
   // 'update_status_bar' reposts itself to the application thread, so it's guaranteed that 
@@ -280,14 +285,16 @@ bool Viewer::key_press_event( int key, int modifiers )
   if ( key == Core::Key::KEY_LESS_E || key == Core::Key::KEY_COMMA_E || 
     key == Core::Key::KEY_LEFT_E || key == Core::Key::KEY_DOWN_E )
   {
-    this->offset_slice( -1 );
+    ActionOffsetSlice::Dispatch( Core::Interface::GetWidgetActionContext(),
+      this->shared_from_this(), -1 );
     return true;
   }
 
   if ( key == Core::Key::KEY_GREATER_E || key == Core::Key::KEY_PERIOD_E || 
     key == Core::Key::KEY_RIGHT_E || key == Core::Key::KEY_UP_E)
   {
-    this->offset_slice( 1 );
+    ActionOffsetSlice::Dispatch( Core::Interface::GetWidgetActionContext(),
+      this->shared_from_this(), 1 );
     return true;
   }
   
@@ -778,8 +785,6 @@ void Viewer::change_view_mode( std::string mode, Core::ActionSource source )
 
 void Viewer::set_slice_number( int num, Core::ActionSource source )
 {
-  Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
-
   const std::string& view_mode = this->view_mode_state_->get();
   
   if ( this->slice_lock_count_ > 0 || 
@@ -1091,26 +1096,26 @@ void Viewer::move_slice_to( const Core::Point& pt )
   }
 }
 
-void Viewer::offset_slice( int delta )
+int Viewer::offset_slice( int delta )
 {
-  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-  
+  // This function should only be called by ActionOffsetSlice. 
+  // The following assertion is to ensure that.
+  assert ( Core::Application::IsApplicationThread() );
+
   if ( !this->is_volume_view() && delta != 0 && this->active_layer_slice_ )
   {
     if ( this->active_layer_slice_->out_of_boundary() )
     {
       this->reset_active_slice();
-      return;
+      return 0;
     }
 
-    int slice_num = static_cast<int>( this->active_layer_slice_->get_slice_number() );
-    int new_slice = static_cast<int>( slice_num + delta );
-    if ( new_slice >= 0 && 
-      static_cast< size_t >( new_slice ) < this->active_layer_slice_->number_of_slices() )
-    {
-      Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), this->slice_number_state_, new_slice );
-    }
+    int old_slice = this->slice_number_state_->get();
+    this->slice_number_state_->offset( delta );
+    return this->slice_number_state_->get() - old_slice;
   }
+
+  return 0;
 }
 
 void Viewer::move_slice_by( double depth_offset )
@@ -1127,11 +1132,8 @@ void Viewer::move_slice_by( double depth_offset )
 
     Core::StateView2D* view2d_state = dynamic_cast< Core::StateView2D* >( 
       this->get_active_view_state().get() );
-    Core::View2D view2d( view2d_state->get() );
-    double depth = view2d.center().z();
-    depth += depth_offset;
-    view2d.center().z( depth );
-    view2d_state->set( view2d ) ;
+    view2d_state->dolly( depth_offset );
+    double depth = view2d_state->get().center().z();
 
     // Move all the slices to the new position
     mask_slices_map_type::iterator mask_slice_it = this->mask_slices_.begin();
@@ -1186,7 +1188,6 @@ void Viewer::reset_active_slice()
 
 void Viewer::adjust_contrast_brightness( int dx, int dy )
 {
-  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
   LayerHandle active_layer = LayerManager::Instance()->get_active_layer();
   if ( !active_layer || active_layer->type() != Core::VolumeType::DATA_E )
   {
@@ -1194,33 +1195,17 @@ void Viewer::adjust_contrast_brightness( int dx, int dy )
   }
   
   DataLayer* data_layer = static_cast< DataLayer* >( active_layer.get() );
-  const double old_contrast = data_layer->contrast_state_->get();
-  double contrast_min, contrast_max, contrast_step;
-  data_layer->contrast_state_->get_range( contrast_min, contrast_max );
-  data_layer->contrast_state_->get_step( contrast_step );
-  double contrast = old_contrast + dy * contrast_step;
-  contrast = Core::Max( contrast_min, contrast );
-  contrast = Core::Min( contrast_max, contrast );
-  
-  const double old_brightness = data_layer->brightness_state_->get();
-  double brightness_min, brightness_max, brightness_step;
-  data_layer->brightness_state_->get_range( brightness_min, brightness_max );
-  data_layer->brightness_state_->get_step( brightness_step );
-  double brightness = old_brightness + dx * brightness_step;
-  brightness = Core::Max( brightness_min, brightness );
-  brightness = Core::Min( brightness_max, brightness );
-
-  lock.unlock();
-
-  // TODO: Check whether we need the if statement here
-  if ( contrast != old_contrast )
+  double contrast_step, brightness_step;
   {
-    Core::ActionSet::Dispatch( Core::Interface::GetMouseActionContext(), data_layer->contrast_state_, contrast );
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    data_layer->contrast_state_->get_step( contrast_step ); 
+    data_layer->brightness_state_->get_step( brightness_step );
   }
-  if ( brightness != old_brightness )
-  {
-    Core::ActionSet::Dispatch(Core::Interface::GetMouseActionContext(), data_layer->brightness_state_, brightness );
-  }
+
+  Core::ActionOffset::Dispatch( Core::Interface::GetMouseActionContext(), 
+    data_layer->contrast_state_, dy * contrast_step );
+  Core::ActionOffset::Dispatch( Core::Interface::GetMouseActionContext(),
+    data_layer->brightness_state_, dx * brightness_step );
 }
 
 Core::VolumeSliceHandle Viewer::get_active_layer_slice() const
