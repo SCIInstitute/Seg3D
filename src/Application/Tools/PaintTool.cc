@@ -28,6 +28,7 @@
 
 #include <algorithm>
 #include <cstdlib>
+#include <stack>
 
 #include <Core/Application/Application.h>
 #include <Core/Viewer/Mouse.h>
@@ -181,17 +182,52 @@ static void BresenhamCircle( std::vector< unsigned char >& buffer, int radius )
 static void FloodFill( std::vector< unsigned char >& buffer, int x, int y, 
             int dimension, unsigned char value )
 {
-  if ( x >= dimension || y >= dimension ||
-    buffer[ y * dimension + x ] == value )
+  std::stack< std::pair< int, int > > seed_points;
+  seed_points.push( std::make_pair( x, y ) );
+
+  while ( !seed_points.empty() )
   {
-    return;
+    std::pair< int, int > seed = seed_points.top();
+    seed_points.pop();
+
+    bool span_up = false;
+    bool span_down = false;
+    int x0 = seed.first;
+    int y0 = seed.second;
+    while ( x0 >= 0 && buffer[ y0 * dimension + x0 ] != value ) x0--;
+    x0++;
+
+    while ( x0 < dimension && buffer[ y0 * dimension + x0 ] != value )
+    {
+      SetPixel( buffer, x0, y0, dimension, value );
+
+      if ( !span_down && y0 > 0 && 
+        buffer[ ( y0 - 1 ) * dimension + x0 ] != value )
+      {
+        seed_points.push( std::make_pair( x0, y0 - 1 ) );
+        span_down = true;
+      }
+      else if ( span_down && y0 > 0 &&
+        buffer[ ( y0 - 1 ) * dimension + x0 ] == value )
+      {
+        span_down = false;
+      }
+
+      if ( !span_up && y0 < dimension - 1 &&
+        buffer[ ( y0 + 1 ) * dimension + x0 ] != value )
+      {
+        seed_points.push( std::make_pair( x0, y0 + 1 ) );
+        span_up = true;
+      }
+      else if ( span_up && y0 < dimension - 1 &&
+        buffer[ ( y0 + 1 ) * dimension + x0 ] == value )
+      {
+        span_up = false;
+      }
+
+      x0++;
+    }
   }
-  
-  buffer[ y * dimension + x ] = value;
-  FloodFill( buffer, x + 1, y, dimension, value );
-  FloodFill( buffer, x - 1, y, dimension, value );
-  FloodFill( buffer, x, y + 1, dimension, value );
-  FloodFill( buffer, x, y - 1, dimension, value );
 }
 
 void PaintToolPrivate::build_brush_mask()
