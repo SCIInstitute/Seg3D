@@ -553,22 +553,8 @@ void LayerGroupWidget::show_layers( bool show )
   else
   {
     this->private_->group_height = this->private_->ui_.tools_and_layers_widget_->height();
-    //this->private_->ui_.fake_widget_->setMinimumWidth( 
-    //  this->private_->ui_.tools_and_layers_widget_->width() );
-    //this->private_->ui_.fake_widget_->setMinimumHeight( this->private_->group_height );
-    //this->private_->ui_.fake_widget_->setFixedHeight( this->private_->group_height );
-    
     this->private_->ui_.tools_and_layers_widget_->hide();
     this->private_->ui_.fake_widget_->setMinimumHeight( 0 );
-    //
-    //
-    //QPropertyAnimation *animation = new QPropertyAnimation( 
-    //  this->private_->ui_.fake_widget_, "fixedHeight" );
-    //animation->setDuration( 1000 );
-    //animation->setEndValue( 25 );
-    //animation->setEasingCurve(QEasingCurve::InQuad);
-    //connect( animation, SIGNAL( finished() ), this, SLOT( hide_group() ) );
-    //animation->start();
   }
 }
   

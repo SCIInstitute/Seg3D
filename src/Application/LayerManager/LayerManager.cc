@@ -608,7 +608,6 @@ bool LayerManager::pre_save_states()
     std::vector< std::string > group_layers_vector; 
     ( *group_iterator )->get_layer_names( group_layers_vector );
     for( int i = 0; i < static_cast< int >( group_layers_vector.size() ); ++i  )
-    //for( int i = static_cast< int >( group_layers_vector.size() ) - 1; i >= 0; --i  )
     {
       layers_vector.push_back( group_layers_vector[ i ] );
     }

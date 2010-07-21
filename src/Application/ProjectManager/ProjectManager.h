@@ -115,12 +115,14 @@ public:
   // autosave
   boost::posix_time::ptime get_last_saved_session_time_stamp() const;
 
+  // GET_TIME_SINCE_LAST_SAVED_SESSION:
+  // function that returns the difference between the current time and the last saved session
   double get_time_since_last_saved_session() const;
 
-  bool is_saving();
+  // IS_SAVING:
+  // function that returns whether or not the program  is currently in the process of saving
+  bool is_saving() const;
 
-
-  
 public:
   Core::StateStringVectorHandle recent_projects_state_;
   Core::StateStringHandle current_project_path_state_;
@@ -150,14 +152,10 @@ private:
   // successful.
   bool save_project_only();
 
-  //// SET_AUTO_SAVE_TIMER
-  //// this function is called whenever the value of the autosave time is changed in the Preferences
-  //// manager.
-  //void set_auto_save_timer( int timeout, Core::ActionSource source );
-
+  // SET_LAST_SAVED_SESSION_TIME_STAMP:
+  // this function updates last_saved_session_time_stamp_ to reflect the new last saved session
+  // time
   void set_last_saved_session_time_stamp();
-
-  
 
   // GET_TIMESTAMP:
   // this function is called when you need a timestamp as a string
@@ -169,6 +167,7 @@ private:
   boost::filesystem::path local_projectmanager_path_;
   const static size_t VERSION_NUMBER_C;
   bool session_saving_;
+  bool changing_projects_;
 
 
 };

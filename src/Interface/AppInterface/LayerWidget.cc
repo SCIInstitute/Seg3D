@@ -724,7 +724,7 @@ void LayerWidget::dropEvent( QDropEvent* event )
     message_box.setInformativeText( QString::fromUtf8( "Are you sure you want to do this?" ) );
     message_box.setStandardButtons( QMessageBox::Yes | QMessageBox::No );
     message_box.setDefaultButton( QMessageBox::No );
-    if( message_box.exec() )
+    if( QMessageBox::Yes == message_box.exec() )
     {
       good_to_go = true;
     }

@@ -30,8 +30,7 @@
 #include <boost/lexical_cast.hpp>
 
 // Application includes
-#include <Application/DataManager/DataManager.h>
-#include <Application/ProjectManager/ProjectManager.h>
+#include <Application/Project/DataManager.h>
 #include <Application/LayerManager/LayerManager.h>
 
 
@@ -41,37 +40,31 @@ namespace Seg3D
 
 const size_t DataManager::VERSION_NUMBER_C = 1;
 
-CORE_SINGLETON_IMPLEMENTATION( DataManager );
-
 DataManager::DataManager() :
   StateHandler( "datamanager", VERSION_NUMBER_C, false )
 { 
-  this->project_datafile_path_ = ProjectManager::Instance()->get_project_data_path();
-
   std::vector< std::string> sessions_and_datafiles;
   add_state( "sessions_and_datafiles", sessions_and_datafiles_state_, sessions_and_datafiles );
-  
 }
 
 DataManager::~DataManager()
 {
 }
   
-void DataManager::initialize()
+void DataManager::initialize( boost::filesystem::path project_path )
 {
-  import_states( this->project_datafile_path_, "datamanager" );
-  
-  this->add_connection( ProjectManager::Instance()->current_project_->session_deleted_signal_.
-    connect( boost::bind( &DataManager::remove_session, this, _1 ) ) );
+  project_path = project_path / "data";
+  import_states( project_path, "datamanager" );
 }
 
-void DataManager::save_datamanager_state( const std::string& session_name )
+void DataManager::save_datamanager_state( boost::filesystem::path project_path, const std::string& session_name )
 {
-  this->prep_for_save( session_name );
-  export_states( this->project_datafile_path_, "datamanager" );
+  project_path = project_path / "data";
+  this->prep_for_save( project_path, session_name );
+  export_states( project_path, "datamanager" );
 }
   
-void DataManager::prep_for_save( const std::string& session_name )
+void DataManager::prep_for_save( boost::filesystem::path project_path, const std::string& session_name )
 {
   lock_type lock( this->get_mutex() );
   
@@ -102,10 +95,10 @@ void DataManager::prep_for_save( const std::string& session_name )
     }
   }
   
-  if ( boost::filesystem::exists( this->project_datafile_path_ ) )
+  if ( boost::filesystem::exists( project_path ) )
   {
     boost::filesystem::directory_iterator dir_end;
-    for( boost::filesystem::directory_iterator dir_itr( this->project_datafile_path_ ); 
+    for( boost::filesystem::directory_iterator dir_itr( project_path ); 
       dir_itr != dir_end; ++dir_itr )
     {
       // in the case that we find the datamanager.xml file, we skip it.
@@ -140,6 +133,7 @@ void DataManager::prep_for_save( const std::string& session_name )
   
 void DataManager::remove_session( const std::string& session_name )
 {
+  int x = 0;
   lock_type lock( this->get_mutex() );
   std::vector< std::string > sessions_and_data = this->sessions_and_datafiles_state_->get();
   

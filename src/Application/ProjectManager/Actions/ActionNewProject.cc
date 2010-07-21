@@ -31,6 +31,8 @@
 
 // Application includes
 #include <Application/ProjectManager/ProjectManager.h>
+#include <Application/LayerManager/LayerManager.h>
+#include <Application/ToolManager/ToolManager.h>
 #include <Application/ProjectManager/Actions/ActionNewProject.h>
 
 // REGISTER ACTION:
@@ -58,6 +60,9 @@ bool ActionNewProject::run( Core::ActionContextHandle& context,
     Core::ActionProgressHandle( new Core::ActionProgress( message ) );
 
   progress->begin_progress_reporting();
+
+  LayerManager::Instance()->delete_all();
+  ToolManager::Instance()->delete_all();
 
   ProjectManager::Instance()->new_project( this->project_name_.value(), 
     this->project_path_.value() );

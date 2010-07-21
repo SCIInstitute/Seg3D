@@ -183,7 +183,7 @@ void ProjectDockWidget::delete_session()
     message_box.setInformativeText( QString::fromUtf8( "Are you sure you want to do this?" ) );
     message_box.setStandardButtons( QMessageBox::Yes | QMessageBox::No );
     message_box.setDefaultButton( QMessageBox::No );
-    if( message_box.exec() )
+    if( QMessageBox::Yes == message_box.exec() )
     {
       std::vector< std::string > sessions = ProjectManager::Instance()->current_project_->
         sessions_state_->get();
@@ -212,12 +212,12 @@ void ProjectDockWidget::populate_session_list()
   
   for( int i = 0; i < static_cast< int >( sessions.size() ); ++i )
   {
-    if( ( sessions[ i ] != "" ) )
+    if( ( sessions[ i ] != "" ) && ( sessions[ i ] != "]" ) )
     {
       std::string session_name = ( Core::SplitString( sessions[ i ], "|" ) )[ 1 ];
       QListWidgetItem *new_item = new QListWidgetItem( QString::fromStdString( session_name ) );
 
-      if( session_name.substr( 0, 7 ) == "(AS) - " )
+      if( session_name.substr( 0, 5 ) == "AS - " )
       {
         QFont font;
         font.setBold( true );
@@ -345,7 +345,6 @@ void ProjectDockWidget::HandleSmartAutoSaveToggled( qpointer_type qpointer )
 
 void ProjectDockWidget::set_auto_save_label( int duration )
 {
-  //int time_duration = PreferencesManager::Instance()->auto_save_time_state_->get();
   this->private_->ui_.minutes_label_->setText( QString::number( duration ) );
 }
 

@@ -26,6 +26,9 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// Boost includes
+#include <boost/filesystem.hpp>
+
 // Qt includes
 #include <QMenuBar>
 #include <QFileDialog>
@@ -37,10 +40,12 @@
 //  Application includes
 #include <Application/Tool/ToolFactory.h>
 #include <Application/ToolManager/ToolManager.h>
+#include <Application/ProjectManager/ProjectManager.h>
 #include <Application/ToolManager/Actions/ActionOpenTool.h>
 #include <Application/InterfaceManager/Actions/ActionShowWindow.h>
 #include <Application/ViewerManager/ViewerManager.h>
 #include <Application/ProjectManager/Actions/ActionSaveSession.h>
+#include <Application/ProjectManager/Actions/ActionLoadProject.h>
 
 // QtUtils includes
 #include <QtUtils/Bridge/QtBridge.h>
@@ -94,6 +99,7 @@ void AppMenu::create_file_menu( QMenu* qmenu )
   qaction = qmenu->addAction( tr( "&Open Project" ) );
   qaction->setShortcut( QKeySequence::Open );
   qaction->setToolTip( tr( "Open an existing project" ) );
+  connect( qaction, SIGNAL( triggered() ), this, SLOT( open_project_from_file() ) );
   
   // TODO: connect this action to the Project Manager
   
@@ -360,17 +366,47 @@ void AppMenu::create_window_menu( QMenu* qmenu )
 void AppMenu::open_project_wizard()
 {
   QMessageBox message_box;
-  message_box.setText( QString::fromUtf8( "WARNING: You will lose changes to your current project that haven't been saved.") );
+  message_box.setText( QString::fromUtf8( "WARNING: You will lose changes to your current" 
+    "project that haven't been saved.") );
   message_box.setInformativeText( QString::fromUtf8( "Are you sure you want to do this?" ) );
   message_box.setStandardButtons( QMessageBox::Yes | QMessageBox::No );
   message_box.setDefaultButton( QMessageBox::No );
-  if( message_box.exec() )
+  if( QMessageBox::Yes == message_box.exec() )
   {
     QPointer< AppProjectWizard > new_project_wizard_ = new AppProjectWizard( this->main_window_);
     new_project_wizard_->show();
   }
 }
+
+void AppMenu::open_project_from_file()
+{
+  QMessageBox message_box;
+  message_box.setText( QString::fromUtf8( "WARNING: You will lose changes to your current project that haven't been saved.") );
+  message_box.setInformativeText( QString::fromUtf8( "Are you sure you want to do this?" ) );
+  message_box.setStandardButtons( QMessageBox::Yes | QMessageBox::No );
+  message_box.setDefaultButton( QMessageBox::No );
+  if( QMessageBox::Yes == message_box.exec() )
+  {
+    boost::filesystem::path current_projects_path = complete( 
+      boost::filesystem::path( ProjectManager::Instance()->
+      current_project_path_state_->get().c_str(), boost::filesystem::native ) );
+
+    boost::filesystem::path full_path = ( QFileDialog::getOpenFileName ( this->main_window_,
+      tr( "Open Seg3D Project" ), QString::fromStdString( current_projects_path.string() ), 
+      tr( "Seg3D Project File ( *.s3d )" ) ) ).toStdString(); 
+
+    std::string path = full_path.parent_path().string();
+    
+    if( boost::filesystem::exists( full_path ) )
+    { 
+      ActionLoadProject::Dispatch( Core::Interface::GetWidgetActionContext(), path );
+    }
+  }
+
   
+}
+
+
 
 
 } // end namespace Seg3D

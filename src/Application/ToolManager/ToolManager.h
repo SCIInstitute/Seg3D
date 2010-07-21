@@ -124,9 +124,18 @@ public:
   // Get the active toolid
   std::string active_toolid();
 
+  // GET_ACTIVE_TOOL:
+  // function that returns a handle to the active tool
   ToolHandle get_active_tool();
 
+  // GET_TOOL_NAMES:
+  // function that populates a passed vector of pairs with the tool names
   void get_tool_names( std::vector< ToolIDNamePair >& tool_names );
+
+  // DELETE_ALL:
+  // this function closes and deletes all the current tools.  It is used when preparing to open or
+  // create a new project
+  bool delete_all();
 
 public:
   virtual bool pre_save_states();

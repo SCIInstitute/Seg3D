@@ -68,8 +68,7 @@ private:
   
 private Q_SLOTS:
   void open_project_wizard();
-  
-  //QPointer< AppProjectWizard > new_project_wizard_;
+  void open_project_from_file();
 };
 
 } // end namespace Seg3D

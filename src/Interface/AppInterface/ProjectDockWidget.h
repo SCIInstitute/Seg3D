@@ -73,12 +73,24 @@ private:
   // updated elsewhere.
   static void HandleNoteSaved( qpointer_type qpointer );
 
+  // HANDLEAUTOSAVETIMECHANGED:
+  // this function handles signals that the autosave time has changed and routes them, on the 
+  // correct thread to the set_auto_save_label function so that it can update the label's text
   static void HandleAutoSaveTimeChanged( qpointer_type qpointer, int duration );
+
+  // HANDLESMARTAUTOSAVETOGGLED:
+  // this function handles signals that smart autosave has been toggled off or on and routes them,
+  // on the correct thread to the set_smart_save_label function to update the gui to refect the 
+  // change
   static void HandleSmartAutoSaveToggled( qpointer_type qpointer );
 
 private:
+  // SET_AUTO_SAVE_LABEL:
+  // function that sets the autosave label's text
   void set_auto_save_label( int duration );
 
+  // SET_SMART_SAVE_LABEL:
+  // function that updates the gui to reflect the status of the smart autosave state variable
   void set_smart_save_label();
   
 private Q_SLOTS:

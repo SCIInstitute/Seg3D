@@ -101,28 +101,28 @@ void AppSplash::new_project()
 {
   this->new_project_wizard_ = new AppProjectWizard( this->parentWidget() );
   this->new_project_wizard_->show();
-  // now we just close the splash window
   this->private_->ready_to_quit_ = false;
   this->close();
 }
   
 void AppSplash::open_existing()
 {
-  //QDir project_directory_;
-
   boost::filesystem::path current_projects_path = complete( 
     boost::filesystem::path( ProjectManager::Instance()->
     current_project_path_state_->get().c_str(), boost::filesystem::native ) );
 
   boost::filesystem::path full_path = ( QFileDialog::getOpenFileName ( this, 
     tr( "Open Seg3D Project" ), QString::fromStdString( current_projects_path.string() ), 
-    tr( "Text files( *.s3d )" ) ) ).toStdString(); 
+    tr( "Seg3D Project File ( *.s3d )" ) ) ).toStdString(); 
   
   std::string path = full_path.parent_path().string();
   std::string file_name = full_path.filename();
 
-  ActionLoadProject::Dispatch( Core::Interface::GetWidgetActionContext(), path );//, file_name );
-  
+  if( boost::filesystem::exists( full_path ) )
+  {
+    ActionLoadProject::Dispatch( Core::Interface::GetWidgetActionContext(), path );
+  }
+
   this->private_->ready_to_quit_ = false;
   this->close();
 }
@@ -147,9 +147,12 @@ void AppSplash::open_recent()
         boost::filesystem::path path = project_entry[ 0 ];
         path = path / project_entry[ 1 ];
         
-        ActionLoadProject::Dispatch( Core::Interface::GetWidgetActionContext(),
-          path.string() );//, project_entry[ 1 ] ); 
-        break;
+        if( boost::filesystem::exists( path ) )
+        { 
+          ActionLoadProject::Dispatch( Core::Interface::GetWidgetActionContext(),
+            path.string() );
+          break;
+        }
       }
     }
   }

@@ -36,6 +36,8 @@ SET(APPLICATION_PROJECT_SRCS
   Project.cc
   Session.h
   Session.cc
+  DataManager.h
+  DataManager.cc
 )
 
 SET(APPLICATION_PROJECT_ACTIONS_SRCS

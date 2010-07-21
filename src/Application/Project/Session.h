@@ -36,7 +36,6 @@
 // Boost includes
 #include <boost/filesystem.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/thread/mutex.hpp>
 
 // Volume includes
 #include <Core/State/State.h>
@@ -53,7 +52,6 @@ typedef boost::shared_ptr< Session > SessionHandle;
 // Class definition
 class Session : public Core::StateHandler
 {
-
   // -- constructor/destructor --
 public:
   Session( const std::string& session_name );
@@ -63,7 +61,6 @@ public:
   // general session data
   Core::StateStringHandle session_name_state_;
 
-
 public:
   // INITIALIZE_FROM_FILE:
   // this file initializes the state values for Session from the file at the path specified
@@ -72,7 +69,6 @@ public:
   // SAVE_CURRENT_STATE:
   // this function will take a snapshot of the current state of the project and save it
   bool save_session_settings( boost::filesystem::path path, const std::string& session_name );
-  
   
 private:
   const static size_t VERSION_NUMBER_C;

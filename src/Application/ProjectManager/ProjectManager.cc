@@ -45,7 +45,8 @@ CORE_SINGLETON_IMPLEMENTATION( ProjectManager );
 
 ProjectManager::ProjectManager() :
   StateHandler( "projectmanager", VERSION_NUMBER_C, false ),
-  session_saving_( false )
+  session_saving_( false ),
+  changing_projects_( false )
 { 
   Core::Application::Instance()->get_config_directory( this->local_projectmanager_path_ );
   
@@ -70,9 +71,8 @@ ProjectManager::ProjectManager() :
   
   this->initialize();
   
-  ProjectHandle new_project( new Project( "default_project" ) );
-  this->current_project_ = new_project;
-  
+  this->current_project_ = ProjectHandle( new Project( "default_project" ) );
+
   // Connect the signals from the LayerManager to the GUI
   this->add_connection( this->current_project_->project_name_state_->value_changed_signal_.connect( 
     boost::bind( &ProjectManager::rename_project_folder, this, _1, _2 ) ) );
@@ -96,6 +96,11 @@ void ProjectManager::save_projectmanager_state()
   
 void ProjectManager::rename_project_folder( const std::string& new_name, Core::ActionSource source )
 {
+  if( changing_projects_ )
+  {
+    return;
+  }
+
   if( !this->current_project_->name_status() )
   {
     this->current_project_->name_is_set( true );
@@ -138,7 +143,6 @@ void ProjectManager::rename_project_folder( const std::string& new_name, Core::A
   // first we are going to remove this project from the list if its in there.
   for( size_t i = 0; i < temp_projects_vector.size(); ++i )
   {
-    
     if( temp_projects_vector[ i ] != "" )
     {
       std::string from_project_list = ( ( Core::SplitString( temp_projects_vector[ i ], "|" ) )[ 0 ] 
@@ -162,6 +166,7 @@ void ProjectManager::rename_project_folder( const std::string& new_name, Core::A
 
 void ProjectManager::new_project( const std::string& project_name, const std::string& project_path )
 {
+  this->changing_projects_ = true;
 
   if( create_project_folders( project_name ) )
   {
@@ -182,18 +187,21 @@ void ProjectManager::new_project( const std::string& project_name, const std::st
     this->current_project_->save_custom_colors_state_->set( false );
     this->save_project( true );
   }
+
+  this->changing_projects_ = false;
 }
   
 void ProjectManager::open_project( const std::string& project_path )
 { 
+  this->changing_projects_ = true;
   boost::filesystem::path path = project_path;
-  this->current_project_->project_name_state_->set( path.leaf() );
   
   this->current_project_->initialize_from_file( path, path.leaf() );
   this->current_project_path_state_->set( path.parent_path().string() );
   this->add_to_recent_projects( path.parent_path().string(), path.leaf() );
 
   this->set_last_saved_session_time_stamp();
+  this->changing_projects_ = false;
 }
   
 void ProjectManager::save_project( bool autosave /*= false*/ )
@@ -217,7 +225,7 @@ bool ProjectManager::save_project_session( bool autosave /*= false */ )
   std::string session_name = "";
   if( autosave )
   {
-    session_name = "(AS) - ";
+    session_name = "AS - ";
   } 
   session_name = session_name + this->get_timestamp();
 
@@ -411,7 +419,7 @@ double ProjectManager::get_time_since_last_saved_session() const
   return static_cast< double >( duration.total_milliseconds() ) * 0.001;
 }
 
-bool ProjectManager::is_saving()
+bool ProjectManager::is_saving() const
 {
   return this->session_saving_;
 }

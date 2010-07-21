@@ -85,7 +85,7 @@ bool ToolManagerPrivate::handle_mouse_leave( size_t viewer_id )
 }
 
 bool ToolManagerPrivate::handle_mouse_move( const Core::MouseHistory& mouse_history, 
-                       int button, int buttons, int modifiers )
+  int button, int buttons, int modifiers )
 {
   if ( this->active_tool_ )
   {
@@ -95,7 +95,7 @@ bool ToolManagerPrivate::handle_mouse_move( const Core::MouseHistory& mouse_hist
 }
 
 bool ToolManagerPrivate::handle_mouse_press( const Core::MouseHistory& mouse_history, 
-                      int button, int buttons, int modifiers )
+  int button, int buttons, int modifiers )
 {
   if ( this->active_tool_ )
   {
@@ -105,7 +105,7 @@ bool ToolManagerPrivate::handle_mouse_press( const Core::MouseHistory& mouse_his
 }
 
 bool ToolManagerPrivate::handle_mouse_release( const Core::MouseHistory& mouse_history, 
-                        int button, int buttons, int modifiers )
+  int button, int buttons, int modifiers )
 {
   if ( this->active_tool_ )
   {
@@ -365,16 +365,7 @@ bool ToolManager::post_load_states()
 
 bool ToolManager::pre_load_states()
 {
-  tool_list_type::iterator it = this->private_->tool_list_.begin();
-  while( it != this->private_->tool_list_.end() )
-  {
-    ( *it ).second->invalidate();
-    tool_list_type::iterator temp_it = it;
-    it++;
-    this->close_tool( ( *temp_it ).first );
-  }
-
-  return true;
+  return this->delete_all();
 }
 
 ToolHandle ToolManager::get_tool( const std::string& toolid )
@@ -400,6 +391,20 @@ void ToolManager::get_tool_names( std::vector< ToolIDNamePair >& tool_names )
     it++;
   }
 }
+
+bool ToolManager::delete_all()
+{
+  tool_list_type::iterator it = this->private_->tool_list_.begin();
+  while( it != this->private_->tool_list_.end() )
+  {
+    ( *it ).second->invalidate();
+    tool_list_type::iterator temp_it = it;
+    it++;
+    this->close_tool( ( *temp_it ).first );
+  }
+  return true;
+}
+
 
 
 

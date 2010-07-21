@@ -57,14 +57,13 @@ namespace Seg3D
 // Forward declaration
 class DataManager;
   
+typedef boost::shared_ptr< DataManager > DataManagerHandle;
 
 // Class definition
 class DataManager : public Core::StateHandler
 {
-  CORE_SINGLETON( DataManager );
-
   // -- Constructor/Destructor --
-private:
+public:
   DataManager();
   virtual ~DataManager();
   
@@ -74,33 +73,30 @@ protected:
 public:
   // INITIALIZE:
   // this function loads the values for DataManager from file
-  void initialize();
+  void initialize( boost::filesystem::path project_path );
   
-  // SAVE_DATAMANAGER_STATE()
+  // SAVE_DATAMANAGER_STATE:
   // this function saves the DataManager's state to file
-  void save_datamanager_state( const std::string& session_name );
-  
-  
-  typedef Core::StateEngine::mutex_type mutex_type;
-  typedef Core::StateEngine::lock_type lock_type;
-  mutex_type& get_mutex();
-  
-private:
-  // DELETE_UNUSED_DATAFILES:
-  // this function deletes unused datafiles
-  void delete_unused_datafiles();
-  
-  // PREP_FOR_SAVE:
-  // this function prepares the state variable "essions_and_datafiles_state_" for saving to file
-  void prep_for_save( const std::string& session_name );
-  
+  void save_datamanager_state( boost::filesystem::path project_path, const std::string& session_name );
+
   // REMOVE_SESSION:
   // this function runs when the project emits a signal saying that a session has been deleted,
   // and removes it from the session datafile list
   void remove_session( const std::string& session_name );
   
 private:
-  boost::filesystem::path project_datafile_path_;
+  // PREP_FOR_SAVE:
+  // this function prepares the state variable "essions_and_datafiles_state_" for saving to file
+  void prep_for_save( boost::filesystem::path project_path, const std::string& session_name );
+
+  // GET_MUTEX:
+  // we need a state engine mutex for when we retrieve the list of layers and list of currently
+  // used datafiles.
+  typedef Core::StateEngine::mutex_type mutex_type;
+  typedef Core::StateEngine::lock_type lock_type;
+  mutex_type& get_mutex();
+  
+private:
   const static size_t VERSION_NUMBER_C;
 
 };
