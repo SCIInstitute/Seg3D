@@ -31,14 +31,13 @@
 #include <Application/Tools/IntensityCorrectionFilter.h>
 #include <Application/LayerManager/LayerManager.h>
 
+// Register the tool into the tool factory
+SCI_REGISTER_TOOL( Seg3D, IntensityCorrectionFilter )
+
 namespace Seg3D
 {
 
 const size_t IntensityCorrectionFilter::VERSION_NUMBER_C = 1;
-
-
-// Register the tool into the tool factory
-SCI_REGISTER_TOOL(IntensityCorrectionFilter)
 
 IntensityCorrectionFilter::IntensityCorrectionFilter( const std::string& toolid, bool auto_number ) :
   Tool( toolid, VERSION_NUMBER_C, auto_number )

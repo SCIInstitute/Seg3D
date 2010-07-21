@@ -40,10 +40,10 @@
 #include <Application/Tools/GradientMagnitudeFilter.h>
 //#include <Application/Filters/Actions/ActionGradientMagnitude.h>
 
+SCI_REGISTER_TOOLINTERFACE( Seg3D, GradientMagnitudeFilterInterface )
+
 namespace Seg3D
 {
-
-SCI_REGISTER_TOOLINTERFACE(GradientMagnitudeFilterInterface)
 
 class GradientMagnitudeFilterInterfacePrivate
 {

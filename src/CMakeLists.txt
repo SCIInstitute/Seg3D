@@ -84,7 +84,6 @@ ENDIF (CMAKE_SIZEOF_VOID_P MATCHES 8)
 # need to be set project wide.
 ###########################################
 
-
 ADD_DEFINITIONS(-DITKSTATIC)
 ADD_DEFINITIONS(-DITK_BUILD_SHARED_LIBS_DEF)
 ADD_DEFINITIONS(-DGLEW_STATIC)
@@ -93,9 +92,6 @@ ADD_DEFINITIONS(-DLIBXML_STATIC)
 ADD_DEFINITIONS(-DTINYXML_STATIC)
 ADD_DEFINITIONS(-DBOOST_ALL_NO_LIB)
 ADD_DEFINITIONS(-DQT_NO_KEYWORDS)
-
-# defines Windows 2000 features like mouse leaving window
-ADD_DEFINITIONS(-D_WIN32_WINNT=0x0500)
   
 SET(ITK_BUILD_SHARED_LIBS "STATIC")
 
@@ -106,6 +102,7 @@ SET(ITK_BUILD_SHARED_LIBS "STATIC")
 ###########################################
 
 IF (WIN32 AND MSVC)
+  ADD_DEFINITIONS(-D_WIN32_WINNT=0x0500)
   ADD_DEFINITIONS(-D_SCL_SECURE_NO_WARNINGS)
   ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
   SET(CMAKE_CXX_FLAGS "/Oi ${CMAKE_CXX_FLAGS}")
@@ -243,28 +240,30 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 # the plugins
 ###########################################
 
-INCLUDE(CMake/ActionLibrary.cmake)
 INCLUDE(CMake/Core.cmake)
-INCLUDE(CMake/ToolLibrary.cmake)
-INCLUDE(CMake/ImporterExporterLibrary.cmake)
-INCLUDE(CMake/QtResourcesLibrary.cmake)
-
+INCLUDE(CMake/RegisterClass.cmake)
 
 ###########################################
 # Application layers:
-#  Core
-#  Application
-#  Interface
-#  Main
+#  Core - Core functionality
+#  Application - All pieces need for the
+#          application specific to Seg3D
+#  Interface - Seg3D interface
+#  Main - Main function of the application
+#
+# Auxillart layers:
+#  QtUtils - binding QtWidgets and abstract
+#            class around Qt implementations
+#  Resources - Icons, images, etc.
 ###########################################
 
 ADD_SUBDIRECTORY(Core)
 ADD_SUBDIRECTORY(Application)
 
 IF(SEG3D_BUILD_INTERFACE)
+  ADD_SUBDIRECTORY(Resources)
   ADD_SUBDIRECTORY(QtUtils)
   ADD_SUBDIRECTORY(Interface)
-  ADD_SUBDIRECTORY(Main)
 ENDIF(SEG3D_BUILD_INTERFACE)
 
 ###########################################
@@ -276,6 +275,17 @@ ENDIF(SEG3D_BUILD_INTERFACE)
 # factories.
 ###########################################
 
+###########################################
+# Main:
+# Main needs to be included after custom 
+# plugins
+###########################################
+
+
+IF(SEG3D_BUILD_INTERFACE)
+  ADD_SUBDIRECTORY(Main)
+ENDIF(SEG3D_BUILD_INTERFACE)
+
 
 ###########################################
 # Build the plugin generator files
@@ -284,21 +294,14 @@ ENDIF(SEG3D_BUILD_INTERFACE)
 # factories
 ###########################################
 
-BUILD_REGISTER_ACTIONS_LIBRARY()
-BUILD_REGISTER_TOOLS_LIBRARY()
-BUILD_REGISTER_IMPORTEREXPORTER_LIBRARY()
-BUILD_REGISTER_QTRESOURCES_LIBRARY()
+GENERATE_REGISTRATION_FILES()
 
 ###########################################
-# Init:
-# This builds the function that glues all
-# the plugins together for use in a static
-# application. This mechanism ensures every
-# action and tool is registered and 
-# mentioned 
+# Bootstrap
+# Add code for packaging shaders and other
+# objects into the executable
 ###########################################
 
-ADD_SUBDIRECTORY(Init)
 ADD_SUBDIRECTORY(Bootstrap)
 
 ###########################################

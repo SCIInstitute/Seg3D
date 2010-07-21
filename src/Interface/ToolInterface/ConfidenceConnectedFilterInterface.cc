@@ -40,10 +40,10 @@
 #include <Application/Tools/ConfidenceConnectedFilter.h>
 //#include <Application/Filters/Actions/ActionConfidenceConnected.h>
 
+SCI_REGISTER_TOOLINTERFACE( Seg3D, ConfidenceConnectedFilterInterface )
+
 namespace Seg3D
 {
-
-SCI_REGISTER_TOOLINTERFACE(ConfidenceConnectedFilterInterface)
 
 class ConfidenceConnectedFilterInterfacePrivate
 {

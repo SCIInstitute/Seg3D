@@ -56,31 +56,38 @@ namespace Core
 // This class is the base functor for the class that builds the classes in
 // the factory
 
-class ActionBuilderBase
+class ActionBuilder;
+typedef boost::shared_ptr<ActionBuilder> ActionBuilderHandle;
+template <class ACTION> class ActionBuilderT;
+
+class ActionBuilder
 {
 public:
   // ensure we can delete the builder correctly
-  virtual ~ActionBuilderBase()
+  virtual ~ActionBuilder()
   {
   }
   
+  // BUILD:
   // the function call to build the object
   virtual ActionHandle build() = 0;
 };
 
-// ACTIONBUILDER:
+// ACTIONBUILDERT:
 // The actual instantiation that builds the action of type ACTION. This class
 // is loaded on top of the base functor and creates the action
 
 template <class ACTION>
-class ActionBuilder: public ActionBuilderBase
+class ActionBuilderT: public ActionBuilder
 {
 public:
   // ensure we can delete the builder correctly
-  virtual ~ActionBuilder<ACTION>()
-  {}
+  virtual ~ActionBuilderT<ACTION>()
+  {
+  }
   
-  // The actual builder call
+  // BUILD:
+  // the function call to build the object
   virtual ActionHandle build()
   { 
     return ActionHandle( new ACTION );
@@ -106,51 +113,43 @@ private:
   ActionFactory();
   virtual ~ActionFactory();
   
-public:
-  // ACTION_LIST:
-  // Retrieve the full list of registered actions
-  typedef std::vector<std::string> action_list_type;
-  bool action_list(action_list_type& action_list);
-
-  // -- implementation details --
-private:
-  ActionFactoryPrivateHandle private_;
 
   // -- Instantiate actions --
 public:
+  // ACTION_LIST:
+  // Retrieve the full list of registered actions
+  bool action_list( std::vector<std::string>& action_list );
 
   // CREATE_ACTION:
   // Generate an action from an iostream object that contains the XML
   // specification of the action.
-  bool create_action(const std::string& actionstring,
-    ActionHandle& action,
-    std::string& error,
-    std::string& usage);
+  bool create_action(const std::string& actionstring, ActionHandle& action,
+    std::string& error, std::string& usage );
 
   // -- Action registration --
 public:
   // REGISTER_ACTION:
   // Register an action so that it can be automatically build in the action
   // factory.
-  void register_action( ActionBuilderBase* builder, std::string type );
+  void register_action( ActionBuilderHandle builder, ActionInfoHandle info );
+
+  // -- implementation details --
+private:
+  ActionFactoryPrivateHandle private_;
 
   // -- Shortcuts for creating actions --
 public:
   // CREATEACTION:
   // Create an action from a string using the ActionFactory object
-  static bool CreateAction(const std::string& actionstring,
-  ActionHandle& action,
-  std::string& error);
+  static bool CreateAction( const std::string& actionstring,  ActionHandle& action,
+    std::string& error);
 
   // CREATEACTION:
   // Create an action from a string using the ActionFactory object
   // This version also returns the usage of the action if the action could
   // not be created
-  static bool CreateAction(const std::string& actionstring,
-  ActionHandle& action,
-  std::string& error,
-  std::string& usage);
-
+  static bool CreateAction( const std::string& actionstring, ActionHandle& action,
+    std::string& error, std::string& usage );
 };
 
 // Macro for adding function for registering action
@@ -163,7 +162,9 @@ namespace Core\
   using namespace namesp;\
   void register_Action##name()\
   {\
-    ActionFactory::Instance()->register_action( new ActionBuilder<Action##name>, Action##name::Type() );\
+    ActionFactory::Instance()->register_action(\
+      ActionBuilderHandle( new ActionBuilderT<Action##name> ),\
+      Action##name::GetActionInfo() );\
   }\
 }
 

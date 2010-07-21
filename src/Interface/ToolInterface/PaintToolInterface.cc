@@ -38,11 +38,10 @@
 //QtUtils Includes
 #include <QtUtils/Bridge/QtBridge.h>
 
+SCI_REGISTER_TOOLINTERFACE( Seg3D, PaintToolInterface )
 
 namespace Seg3D
 {
-
-SCI_REGISTER_TOOLINTERFACE(PaintToolInterface)
 
 class PaintToolInterfacePrivate
 {

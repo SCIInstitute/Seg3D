@@ -38,8 +38,7 @@ namespace Seg3D
   
 class ActionCannyEdgeDetectionFilter : public Core::Action
 {
-CORE_ACTION( "CannyEdgeDetectionFilter", "CannyEdgeDetectionFilter <layerid> [variance={2.0}] "
-  "[max_error={1.0}] [threshold={1.0}] [replace={true}]"  );
+CORE_ACTION( "CannyEdgeDetectionFilter|layerid|variance=2.0|max_error=1.0|threshold=1.0|replace=true" );
   
   // -- Constructor/Destructor --
 public:

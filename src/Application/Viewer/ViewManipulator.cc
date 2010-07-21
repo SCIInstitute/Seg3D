@@ -103,7 +103,7 @@ void ViewManipulator::mouse_move( const Core::MouseHistory& mouse_history, int b
     Core::StateViewBaseHandle view_state = this->viewer_->get_active_view_state();
     Core::ActionTranslateView::Dispatch( Core::Interface::GetWidgetActionContext(), 
       view_state, offset );
-    if ( this->viewer_->viewer_lock_state_->get() )
+    if ( this->viewer_->lock_state_->get() )
     {
       std::vector< size_t > locked_viewers = ViewerManager::Instance()->
         get_locked_viewers( this->viewer_->view_mode_state_->index() );
@@ -127,7 +127,7 @@ void ViewManipulator::mouse_move( const Core::MouseHistory& mouse_history, int b
     Core::StateViewBaseHandle view_state = this->viewer_->get_active_view_state();
     Core::ActionScaleView::Dispatch( Core::Interface::GetWidgetActionContext(), 
       view_state, scale_ratio );
-    if ( this->viewer_->viewer_lock_state_->get() )
+    if ( this->viewer_->lock_state_->get() )
     {
       std::vector< size_t > locked_viewers = ViewerManager::Instance()->
         get_locked_viewers( this->viewer_->view_mode_state_->index() );
@@ -154,7 +154,7 @@ void ViewManipulator::mouse_move( const Core::MouseHistory& mouse_history, int b
       // dispatch an ActionRotateView3D
       Core::ActionRotateView3D::Dispatch( Core::Interface::GetWidgetActionContext(),
         this->viewer_->volume_view_state_, axis, angle );
-      if ( this->viewer_->viewer_lock_state_->get() )
+      if ( this->viewer_->lock_state_->get() )
       {
         std::vector< size_t > locked_viewers = ViewerManager::Instance()->
           get_locked_viewers( this->viewer_->view_mode_state_->index() );

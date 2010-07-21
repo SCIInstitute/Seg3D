@@ -31,13 +31,13 @@
 #include <Application/Tools/ThresholdSegmentationLSFilter.h>
 #include <Application/LayerManager/LayerManager.h>
 
+// Register the tool into the tool factory
+SCI_REGISTER_TOOL( Seg3D, ThresholdSegmentationLSFilter )
+
 namespace Seg3D
 {
 
 const size_t ThresholdSegmentationLSFilter::VERSION_NUMBER_C = 1;
-
-// Register the tool into the tool factory
-SCI_REGISTER_TOOL(ThresholdSegmentationLSFilter)
 
 ThresholdSegmentationLSFilter::ThresholdSegmentationLSFilter( const std::string& toolid, bool auto_number ) :
   Tool( toolid, VERSION_NUMBER_C, auto_number )

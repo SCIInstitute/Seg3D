@@ -39,7 +39,7 @@ namespace Seg3D
 class ActionPickPoint : public Core::Action
 {
 
-CORE_ACTION("Pick", "Pick <x> <y> <z>");
+CORE_ACTION("Pick|point");
 
 public:
   ActionPickPoint();

@@ -46,11 +46,10 @@
 //Core includes
 #include <Core/DataBlock/Histogram.h>
 
+SCI_REGISTER_TOOLINTERFACE( Seg3D, HistogramEqualizationFilterInterface )
 
 namespace Seg3D
 {
-
-SCI_REGISTER_TOOLINTERFACE(HistogramEqualizationFilterInterface)
 
 class HistogramEqualizationFilterInterfacePrivate
 {

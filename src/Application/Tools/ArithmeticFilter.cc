@@ -31,13 +31,13 @@
 #include <Application/Tools/ArithmeticFilter.h>
 #include <Application/LayerManager/LayerManager.h>
 
+// Register the tool into the tool factory
+SCI_REGISTER_TOOL( Seg3D, ArithmeticFilter )
+
 namespace Seg3D
 {
 
 const size_t ArithmeticFilter::VERSION_NUMBER_C = 1;
-
-// Register the tool into the tool factory
-SCI_REGISTER_TOOL( ArithmeticFilter )
 
 // Constructor, set default values
 ArithmeticFilter::ArithmeticFilter( const std::string& toolid, bool auto_number ) :

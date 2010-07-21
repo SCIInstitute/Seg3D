@@ -59,10 +59,5 @@ TARGET_LINK_LIBRARIES(Application_Layer
                       Core_Utils
                       Application_InterfaceManager
             Application_LayerManager
-                      Application_StateManager
                       ${SCI_BOOST_LIBRARY})
-
-# Register actions
-#ADD_LIBRARY_ACTIONS(Application_Layer
-#                    ${APPLICATION_LAYER_ACTIONS_SRCS})
-                    
+            

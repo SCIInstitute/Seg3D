@@ -44,7 +44,7 @@ namespace Seg3D
 
 class ActionSaveSession : public Core::Action
 {
-  CORE_ACTION( "SaveSession", "SaveSession [ autosave = false ]" );
+  CORE_ACTION( "SaveSession|autosave=false" );
 
   // -- Constructor/Destructor --
 public:

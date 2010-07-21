@@ -37,7 +37,7 @@ namespace Core
 {
 class ActionFlip : public Action
 {
-  CORE_ACTION( "Flip", "Flip <key> <direction>" );
+  CORE_ACTION( "Flip|stateid|direction" );
 
   // -- Constructor/Destructor --
 public:

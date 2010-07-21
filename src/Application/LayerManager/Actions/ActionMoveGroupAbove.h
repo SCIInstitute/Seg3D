@@ -38,7 +38,7 @@ namespace Seg3D
 
 class ActionMoveGroupAbove : public Core::Action
 {
-  CORE_ACTION( "MoveGroupAbove", "MoveGroupAbove <group_to_move_id> <groupid_below>" );
+  CORE_ACTION( "MoveGroupAbove|group_to_move_id|groupid_below" );
   
   // -- Constructor/Destructor --
 public:

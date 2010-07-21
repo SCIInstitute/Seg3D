@@ -40,10 +40,10 @@
 #include <Application/Tools/NeighborhoodConnectedFilter.h>
 //#include <Application/Filters/Actions/ActionNeighborhoodConnected.h>
 
+SCI_REGISTER_TOOLINTERFACE( Seg3D, NeighborhoodConnectedFilterInterface )
+
 namespace Seg3D
 {
-
-SCI_REGISTER_TOOLINTERFACE(NeighborhoodConnectedFilterInterface)
 
 class NeighborhoodConnectedFilterInterfacePrivate
 {

@@ -86,16 +86,19 @@ Viewer::Viewer( size_t viewer_id ) :
   this->view_states_[ 3 ] = this->volume_view_state_;
 
   this->add_state( "slice_number", this->slice_number_state_, 0, 0, 0, 1 );
-
-  this->add_state( "slice_lock", this->viewer_lock_state_, false );
   this->add_state( "slice_grid", this->slice_grid_state_, false );
   this->add_state( "slice_visible", this->slice_visible_state_, true );
+  this->add_state( "slice_mirror_cursor", this->slice_mirror_cursor_state_, true );
+  this->add_state( "slice_picking_visible", this->slice_picking_visible_state_, true );
 
   this->add_state( "volume_slices_visible", this->volume_slices_visible_state_, true );
   this->add_state( "volume_isosurfaces_visible", this->volume_isosurfaces_visible_state_, true );
   this->add_state( "volume_volume_rendering_visible", 
     this->volume_volume_rendering_visible_state_, false );
   this->add_state( "volume_light_visible", this->volume_light_visible_state_, true ); 
+
+  this->add_state( "lock", this->lock_state_, false );
+  this->add_state( "overlay_visible", this->overlay_visible_state_, true );
     
   this->add_state( "is_picking_target", this->is_picking_target_state_, false );
 
@@ -112,7 +115,7 @@ Viewer::Viewer( size_t viewer_id ) :
     boost::bind( &Viewer::set_slice_number, this, _1, _2 ) ) );
   this->add_connection( this->viewer_visible_state_->value_changed_signal_.connect(
     boost::bind( &Viewer::change_visibility, this, _1 ) ) );
-  this->add_connection( this->viewer_lock_state_->value_changed_signal_.connect(
+  this->add_connection( this->lock_state_->value_changed_signal_.connect(
     boost::bind( &Viewer::viewer_lock_state_changed, this, _1 ) ) );
 
   // Connect state variables that should trigger redraw.
@@ -721,7 +724,7 @@ void Viewer::change_view_mode( std::string mode, Core::ActionSource source )
 {
   {
     Core::ScopedCounter block_counter( this->signals_block_count_ );
-    this->viewer_lock_state_->set( false );
+    this->lock_state_->set( false );
   }
 
   if ( mode == VOLUME_C )
@@ -826,7 +829,7 @@ void Viewer::set_slice_number( int num, Core::ActionSource source )
     }
   }
 
-  if ( this->viewer_lock_state_->get() )
+  if ( this->lock_state_->get() )
   {
     std::vector< size_t > locked_viewers = ViewerManager::Instance()->
       get_locked_viewers( this->view_mode_state_->index() );
@@ -849,11 +852,11 @@ void Viewer::set_slice_number( int num, Core::ActionSource source )
 
 void Viewer::change_visibility( bool visible )
 {
-  if ( !visible && this->viewer_lock_state_->get() )
+  if ( !visible && this->lock_state_->get() )
   {
     Core::ScopedCounter block_counter( this->signals_block_count_ );
     // Unlock the viewer when it becomes invisible
-    this->viewer_lock_state_->set( false );
+    this->lock_state_->set( false );
   }
 
   if ( visible)

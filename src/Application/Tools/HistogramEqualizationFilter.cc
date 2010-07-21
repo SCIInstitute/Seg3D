@@ -31,13 +31,13 @@
 #include <Application/Tools/HistogramEqualizationFilter.h>
 #include <Application/LayerManager/LayerManager.h>
 
+// Register the tool into the tool factory
+SCI_REGISTER_TOOL( Seg3D, HistogramEqualizationFilter )
+
 namespace Seg3D
 {
 
 const size_t HistogramEqualizationFilter::VERSION_NUMBER_C = 1;
-
-// Register the tool into the tool factory
-SCI_REGISTER_TOOL(HistogramEqualizationFilter)
 
 HistogramEqualizationFilter::HistogramEqualizationFilter( const std::string& toolid, bool auto_number ) :
   Tool( toolid, VERSION_NUMBER_C, auto_number )

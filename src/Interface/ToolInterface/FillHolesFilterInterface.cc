@@ -40,10 +40,10 @@
 #include <Application/Tools/FillHolesFilter.h>
 //#include <Application/Filters/Actions/ActionFillHoles.h>
 
+SCI_REGISTER_TOOLINTERFACE( Seg3D, FillHolesFilterInterface )
+
 namespace Seg3D
 {
-
-SCI_REGISTER_TOOLINTERFACE(FillHolesFilterInterface)
 
 class FillHolesFilterInterfacePrivate
 {

@@ -38,8 +38,7 @@ namespace Seg3D
   
 class ActionDiscreteGaussianFilter : public Core::Action
 {
-CORE_ACTION( "DiscreteGaussianFilter", 
-  "DiscreteGaussianFilter <layerid>  [variance={1.0}] [kernelwidth={1.0}] [replace={true}]" );
+CORE_ACTION( "DiscreteGaussianFilter|layerid|variance=1.0|kernelwidth=1.0|replace=true" );
   
   // -- Constructor/Destructor --
 public:

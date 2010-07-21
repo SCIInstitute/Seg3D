@@ -38,8 +38,7 @@ namespace Seg3D
   
 class ActionBooleanFilter : public Core::Action
 {
-CORE_ACTION( "BooleanFilter",
-  "BooleanFilter <layerid> <expression> [b=layerid] [c=layerid] [d=layerid] [replace={true}]" );
+CORE_ACTION( "BooleanFilter|layerid|expression|b=layerid|c=layerid|d=layerid|replace=true" );
   
   // -- Constructor/Destructor --
 public:

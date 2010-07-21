@@ -56,7 +56,7 @@ TARGET_LINK_LIBRARIES(Core_ActionManager
                       Core_Action
                       ${SCI_BOOST_LIBRARY})
 
-# Register actions
-ADD_LIBRARY_ACTIONS(Core_ActionManager
-                    ${CORE_ACTIONMANAGER_ACTIONS_SRCS})
+# Register action classes
+REGISTER_LIBRARY_AND_CLASSES(Core_ActionManager 
+               ${CORE_ACTIONMANAGER_ACTIONS_SRCS})
 

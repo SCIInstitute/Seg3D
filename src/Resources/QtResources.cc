@@ -26,17 +26,18 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <Application/StateManager/StateManager.h>
+// Qt specific includes
+#include <QDir>
 
-namespace Seg3D
-{
+// Resource specific includes
+#include <Resources/QtResources.h>
 
-StateManager::StateManager()
+void InitQtResources()
 {
+  static bool initialized = false;
+  if ( !initialized )
+  {
+    Q_INIT_RESOURCE(QtResources);
+    initialized = true;
+  }
 }
-
-StateManager::~StateManager()
-{
-}
-
-} // end namespace seg3D

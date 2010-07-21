@@ -29,10 +29,10 @@
 // Application includes
 #include <Application/LayerIO/MatlabLayerImporter.h>
 
+SCI_REGISTER_IMPORTER( Seg3D, MatlabLayerImporter );
+
 namespace Seg3D
 {
-
-SCI_REGISTER_IMPORTER(MatlabLayerImporter);
 
 bool MatlabLayerImporter::import_header()
 {

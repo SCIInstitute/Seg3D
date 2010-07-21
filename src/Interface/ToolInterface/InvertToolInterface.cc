@@ -40,10 +40,10 @@
 #include <Application/Tools/InvertTool.h>
 //#include <Application/Filters/Actions/ActionInvert.h>
 
+SCI_REGISTER_TOOLINTERFACE( Seg3D, InvertToolInterface )
+
 namespace Seg3D
 {
-
-SCI_REGISTER_TOOLINTERFACE(InvertToolInterface)
 
 class InvertToolInterfacePrivate
 {

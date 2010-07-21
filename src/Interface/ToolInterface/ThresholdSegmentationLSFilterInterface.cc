@@ -41,10 +41,10 @@
 #include <Application/Tools/ThresholdSegmentationLSFilter.h>
 //#include <Application/Filters/Actions/ActionThresholdSegmentationLS.h>
 
+SCI_REGISTER_TOOLINTERFACE( Seg3D, ThresholdSegmentationLSFilterInterface )
+
 namespace Seg3D
 {
-
-SCI_REGISTER_TOOLINTERFACE(ThresholdSegmentationLSFilterInterface)
 
 class ThresholdSegmentationLSFilterInterfacePrivate
 {

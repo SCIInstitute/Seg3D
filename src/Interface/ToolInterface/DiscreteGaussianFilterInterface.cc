@@ -40,10 +40,10 @@
 #include <Application/Tools/DiscreteGaussianFilter.h>
 //#include <Application/Filters/Actions/ActionDiscreteGaussian.h>
 
+SCI_REGISTER_TOOLINTERFACE( Seg3D, DiscreteGaussianFilterInterface )
+
 namespace Seg3D
 {
-
-SCI_REGISTER_TOOLINTERFACE(DiscreteGaussianFilterInterface)
 
 class DiscreteGaussianFilterInterfacePrivate
 {

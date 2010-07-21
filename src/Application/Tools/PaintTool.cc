@@ -48,6 +48,9 @@
 #include <Application/ViewerManager/ViewerManager.h>
 #include <Application/Layer/DataLayer.h>
 
+// Register the tool into the tool factory
+SCI_REGISTER_TOOL( Seg3D, PaintTool )
+
 namespace Seg3D
 {
 
@@ -630,9 +633,6 @@ void PaintToolPrivate::stop_painting()
 //////////////////////////////////////////////////////////////////////////
 
 const size_t PaintTool::VERSION_NUMBER_C = 1;
-
-// Register the tool into the tool factory
-SCI_REGISTER_TOOL(PaintTool)
 
 PaintTool::PaintTool( const std::string& toolid, bool auto_number ) :
   Tool( toolid, VERSION_NUMBER_C, auto_number ),

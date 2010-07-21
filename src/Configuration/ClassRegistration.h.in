@@ -34,8 +34,10 @@
 namespace Core 
 {
 
+// Functions that need to be included from else where
 @DECLARATIONS@
 
+// Function that calls the registration functions one by one.
 void RegisterClasses()
 {
 @IMPLEMENTATIONS@

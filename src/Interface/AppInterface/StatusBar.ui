@@ -141,7 +141,7 @@ QComboBox::icon{
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="Resources/AppInterface.qrc">
+         <iconset resource="../../Resources/QtResources.qrc">
           <normaloff>:/Images/TextOff.png</normaloff>
           <normalon>:/Images/Text.png</normalon>:/Images/TextOff.png</iconset>
         </property>
@@ -407,7 +407,7 @@ QComboBox::icon{
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="Resources/AppInterface.qrc">
+         <iconset resource="../../Resources/QtResources.qrc">
           <normaloff>:/Images/WorldOff.png</normaloff>
           <normalon>:/Images/World.png</normalon>:/Images/WorldOff.png</iconset>
         </property>
@@ -815,7 +815,7 @@ QComboBox::icon{
   </layout>
  </widget>
  <resources>
-  <include location="Resources/AppInterface.qrc"/>
+  <include location="../../Resources/QtResources.qrc"/>
  </resources>
  <connections/>
 </ui>

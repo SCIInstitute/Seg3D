@@ -333,7 +333,7 @@ QWidget#group_tools_{
                <string/>
               </property>
               <property name="icon">
-               <iconset resource="Resources/AppInterface.qrc">
+               <iconset resource="../../Resources/QtResources.qrc">
                 <normaloff>:/Images/RightArrowWhite.png</normaloff>
                 <normalon>:/Images/DownArrowWhite.png</normalon>:/Images/RightArrowWhite.png</iconset>
               </property>
@@ -372,7 +372,7 @@ QWidget#group_tools_{
                <string/>
               </property>
               <property name="icon">
-               <iconset resource="Resources/AppInterface.qrc">
+               <iconset resource="../../Resources/QtResources.qrc">
                 <normaloff>:/Images/VisibleOff.png</normaloff>
                 <normalon>:/Images/VisibleWhite.png</normalon>:/Images/VisibleOff.png</iconset>
               </property>
@@ -498,7 +498,7 @@ QWidget#group_tools_{
                   <string/>
                  </property>
                  <property name="icon">
-                  <iconset resource="Resources/AppInterface.qrc">
+                  <iconset resource="../../Resources/QtResources.qrc">
                    <normaloff>:/Images/CropOff.png</normaloff>
                    <normalon>:/Images/Crop.png</normalon>:/Images/CropOff.png</iconset>
                  </property>
@@ -534,7 +534,7 @@ QWidget#group_tools_{
                   <string/>
                  </property>
                  <property name="icon">
-                  <iconset resource="Resources/AppInterface.qrc">
+                  <iconset resource="../../Resources/QtResources.qrc">
                    <normaloff>:/Images/FlipOff.png</normaloff>
                    <normalon>:/Images/Flip.png</normalon>:/Images/FlipOff.png</iconset>
                  </property>
@@ -570,7 +570,7 @@ QWidget#group_tools_{
                   <string/>
                  </property>
                  <property name="icon">
-                  <iconset resource="Resources/AppInterface.qrc">
+                  <iconset resource="../../Resources/QtResources.qrc">
                    <normaloff>:/Images/ResampleOff.png</normaloff>
                    <normalon>:/Images/Resample.png</normalon>:/Images/ResampleOff.png</iconset>
                  </property>
@@ -606,7 +606,7 @@ QWidget#group_tools_{
                   <string/>
                  </property>
                  <property name="icon">
-                  <iconset resource="Resources/AppInterface.qrc">
+                  <iconset resource="../../Resources/QtResources.qrc">
                    <normaloff>:/Images/TransformOff.png</normaloff>
                    <normalon>:/Images/Transform.png</normalon>:/Images/TransformOff.png</iconset>
                  </property>
@@ -642,7 +642,7 @@ QWidget#group_tools_{
                   <string/>
                  </property>
                  <property name="icon">
-                  <iconset resource="Resources/AppInterface.qrc">
+                  <iconset resource="../../Resources/QtResources.qrc">
                    <normaloff>:/Images/Delete.png</normaloff>
                    <normalon>:/Images/DeleteWhite.png</normalon>:/Images/Delete.png</iconset>
                  </property>
@@ -672,7 +672,7 @@ QWidget#group_tools_{
                   <string/>
                  </property>
                  <property name="icon">
-                  <iconset resource="Resources/AppInterface.qrc">
+                  <iconset resource="../../Resources/QtResources.qrc">
                    <normaloff>:/Images/Add.png</normaloff>
                    <normalon>:/Images/AddWhite.png</normalon>:/Images/Add.png</iconset>
                  </property>
@@ -1952,7 +1952,7 @@ QWidget#group_tools_{
  </widget>
  <layoutdefault spacing="2" margin="0"/>
  <resources>
-  <include location="Resources/AppInterface.qrc"/>
+  <include location="../../Resources/QtResources.qrc"/>
  </resources>
  <connections/>
 </ui>

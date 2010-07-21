@@ -49,10 +49,6 @@ SET(INTERFACE_APPPREFERENCES_UI_SRCS
   ColorPickerWidget.ui
 )
 
-SET(INTERFACE_APPPREFERENCES_RCC_SRCS
-#  AppPreferences.qrc
-)
-
 
 ##################################################
 # Get Icon files
@@ -90,10 +86,6 @@ CORE_ADD_LIBRARY(Interface_AppPreferences
             ${INTERFACE_APPPREFERENCES_QT_MOC_SRCS}
             ${INTERFACE_APPPREFERENCES_NO_MOC_SRCS} 
             ${INTERFACE_APPPREFERENCES_MOC_SRCS})
-
-#ADD_DEPENDENCIES(Interface_AppPreferences 
-#     ${INTERFACE_APPPREFERENCES_UI_SRCS}
-#     ${INTERFACE_APPPREFERENCES_RCC_SRCS} )  
             
 TARGET_LINK_LIBRARIES(Interface_AppPreferences
                       Core_Utils
@@ -104,6 +96,7 @@ TARGET_LINK_LIBRARIES(Interface_AppPreferences
                       QtUtils_Utils
                       QtUtils_Widgets
             QtUtils_Bridge
+            Resources_QtResources
             ${QT_LIBRARIES} 
                       ${SCI_BOOST_LIBRARY})
 

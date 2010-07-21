@@ -105,7 +105,7 @@ ViewerManager::ViewerManager() :
     this->add_connection( this->viewers_[ j ]->is_picking_target_state_->value_changed_signal_.
       connect( boost::bind( &ViewerManager::viewer_became_picking_target, this, j ), 
       boost::signals2::at_front ) );
-    this->add_connection( this->viewers_[ j ]->viewer_lock_state_->value_changed_signal_.
+    this->add_connection( this->viewers_[ j ]->lock_state_->value_changed_signal_.
       connect( boost::bind( &ViewerManager::viewer_lock_state_changed, this, j ), 
       boost::signals2::at_front ) );
       
@@ -373,7 +373,7 @@ std::vector< size_t > ViewerManager::get_locked_viewers( int mode_index )
 void ViewerManager::viewer_lock_state_changed( size_t viewer_id )
 {
   ViewerHandle viewer = this->viewers_[ viewer_id ];
-  bool locked = viewer->viewer_lock_state_->get();
+  bool locked = viewer->lock_state_->get();
   if ( locked )
   {
     this->locked_viewers_[ viewer->view_mode_state_->index() ].push_back( viewer_id );

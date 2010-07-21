@@ -160,15 +160,8 @@ CORE_ADD_LIBRARY(Interface_ToolInterface
             ${INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_SRCS}
             ${INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_QT_UI_SRCS}
             ${INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_QT_MOC_SRCS}
-            ${INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_MOC_SRCS})
-          
-#ADD_DEPENDENCIES(Interface_ToolInterface 
-#            ${INTERFACE_TOOLINTERFACE_UI_SRCS}
-#            ${INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_UI_SRCS} )       
-          
-ADD_LIBRARY_TOOLINTERFACES(Interface_ToolInterface
-            ${INTERFACE_TOOLINTERFACE_SRCS})
-            
+            ${INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_MOC_SRCS})      
+                      
 TARGET_LINK_LIBRARIES(Interface_ToolInterface
                       Core_Utils
                       Core_EventHandler
@@ -179,6 +172,13 @@ TARGET_LINK_LIBRARIES(Interface_ToolInterface
             QtUtils_Utils
                       QtUtils_Widgets
             QtUtils_Bridge
+            Resources_QtResources
             Interface_AppInterface
                       ${QT_LIBRARIES} 
                       ${SCI_BOOST_LIBRARY})
+
+# Register action classes
+REGISTER_LIBRARY_AND_CLASSES(Interface_ToolInterface
+            ${INTERFACE_TOOLINTERFACE_SRCS})
+
+

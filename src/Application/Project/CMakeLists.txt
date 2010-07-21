@@ -45,17 +45,12 @@ CORE_ADD_LIBRARY(Application_Project ${APPLICATION_PROJECT_SRCS}
             ${APPLICATION_PROJECT_ACTIONS_SRCS} )
             
 TARGET_LINK_LIBRARIES(Application_Project
+                      Core_Action
+                      Core_State
                       Core_Utils
                       Core_Application
                       Core_Interface
                       Application_InterfaceManager
-                      Core_Action
-                      Core_State
-                      Application_StateManager
                   Application_LayerManager
                       ${SCI_BOOST_LIBRARY})
-
-# Register actions
-#ADD_LIBRARY_ACTIONS(Application_Project
-#                    ${APPLICATION_PROJECT_ACTIONS_SRCS})
                     

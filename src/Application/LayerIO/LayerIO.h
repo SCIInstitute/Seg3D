@@ -137,11 +137,15 @@ public:
 // Macro for adding function that registers a new importer
 // Note these functions will be called in the init call of the program.
 
-#define SCI_REGISTER_IMPORTER(name)\
-void register_importer_##name()\
+#define SCI_REGISTER_IMPORTER(namesp, name)\
+namespace Core\
 {\
-  LayerIO::Instance()->register_importer<name>();\
-} 
+  using namespace namesp;\
+  void register_##name()\
+  {\
+    LayerIO::Instance()->register_importer<name>();\
+  }\
+}
 
 } // end namespace seg3D
 

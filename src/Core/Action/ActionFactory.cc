@@ -38,21 +38,21 @@ namespace Core
 
 CORE_SINGLETON_IMPLEMENTATION( ActionFactory );
 
+class ActionFactoryEntry
+{
+public:
+  ActionBuilderHandle  builder_;
+  ActionInfoHandle  info_;
+};
+
+
 // Definition of the internals of the class
 class ActionFactoryPrivate
 {
 public:
-  // Types used internally
-  typedef boost::mutex mutex_type;
-  typedef boost::unique_lock<mutex_type> lock_type;
-
-  // Mutex protecting the singleton interface
-  typedef boost::unordered_map<std::string,ActionBuilderBase*> action_map_type;
   // List with builders that can be called to generate a new object
-  action_map_type action_builders_;
-  
-  // Mutex for protecting registration
-  mutex_type mutex_;
+  typedef boost::unordered_map<std::string,ActionFactoryEntry> action_map_type;
+  action_map_type actions_;
 };
   
 
@@ -65,16 +65,21 @@ ActionFactory::~ActionFactory()
 {
 }
 
-void ActionFactory::register_action( ActionBuilderBase* builder, std::string name )
+void ActionFactory::register_action( ActionBuilderHandle builder, ActionInfoHandle info )
 {
-  // Lock the factory
+  // Make a new entry for this action
+  ActionFactoryEntry entry;
+  entry.builder_ = builder;
+  entry.info_ = info;
+
+  // Lock the factory, so the internal list can be modified
   lock_type lock( get_mutex() );
 
-  // Ensure the name will be treaded case insensitive
-  boost::to_lower( name );
+  // Ensure the name will be treated case insensitive
+  std::string name = StringToLower( info->get_type() );
 
   // Test is action was registered before.
-  if ( private_->action_builders_.find( name ) != private_->action_builders_.end() )
+  if ( private_->actions_.find( name ) != private_->actions_.end() )
   {
     // Actions that are registered twice, will cause problems
     // Hence the program will throw an exception.
@@ -84,61 +89,59 @@ void ActionFactory::register_action( ActionBuilderBase* builder, std::string nam
   }
 
   // Register the action
-  private_->action_builders_[ name ] = builder;
+  private_->actions_[ name ] = entry;
+  
+  // Add debug information for the registration process
   CORE_LOG_DEBUG( std::string("Registering action : ") +  name ); 
 }
 
 bool ActionFactory::create_action( const std::string& action_string, ActionHandle& action,
     std::string& error, std::string& usage )
 {
-  ActionFactoryPrivate::lock_type lock( private_->mutex_ );
+  // Ensure that the default output has been cleared
+  action.reset();
+  error = "";
+  usage = "";
+
+  // Lock the factory
+  lock_type lock( get_mutex() );
+  
   std::string command;
   std::string::size_type pos = 0;
-
-  usage = "";
 
   // Scan for the command that needs to be instanted.
   if ( !( Core::ScanCommand( action_string, pos, command, error ) ) )
   {
     error = std::string( "SYNTAX ERROR: " ) + error;
-    return ( false );
+    return false;
   }
 
-  boost::to_lower( command );
-  // NOTE: Factory is not locked as we assume that all actions are already
-  // inserted.
-  ActionFactoryPrivate::action_map_type::const_iterator it = private_->action_builders_.find( command );
+  command = StringToLower( command );
+  
+  ActionFactoryPrivate::action_map_type::const_iterator it = 
+    this->private_->actions_.find( command );
 
   // If we cannot find the maker report error.
-  if ( it == private_->action_builders_.end() )
+  if ( it == private_->actions_.end() )
   {
     error = std::string( "SYNTAX ERROR: Unknown command '" + command + "'" );
-    return ( false );
+    return false;
   }
 
   // Build the action of the right type
-  action = (*it).second->build();
+  action = (*it).second.builder_->build();
+  usage = (*it).second.info_->get_usage();
 
-  if ( !( action->import_from_string( action_string, error ) ) )
-  {
-    // the import_from_string function reports the error and hence
-    // we do not need to set it here.
-
-    // The action did build but the argument list is incorrect
-    // Post the usage of the action for the user to help troubleshooting.
-    usage = action->usage();
-    return ( false );
-  }
-
-  return ( true );
+  return action->import_from_string( action_string, error );
 }
 
-bool ActionFactory::action_list( action_list_type& action_list )
+bool ActionFactory::action_list( std::vector<std::string>& action_list )
 {
-  ActionFactoryPrivate::lock_type lock( private_->mutex_ );
+  // Lock the factory
+  lock_type lock( get_mutex() );
 
-  ActionFactoryPrivate::action_map_type::iterator it = private_->action_builders_.begin();
-  ActionFactoryPrivate::action_map_type::iterator it_end = private_->action_builders_.end();
+  ActionFactoryPrivate::action_map_type::iterator it = private_->actions_.begin();
+  ActionFactoryPrivate::action_map_type::iterator it_end = private_->actions_.end();
 
   while ( it != it_end )
   {
@@ -149,7 +152,7 @@ bool ActionFactory::action_list( action_list_type& action_list )
   std::sort( action_list.begin(), action_list.end() );
 
   // indicate success
-  return ( true );
+  return true;
 }
 
 bool ActionFactory::CreateAction( const std::string& actionstring, ActionHandle& action,

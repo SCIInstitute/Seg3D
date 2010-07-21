@@ -29,10 +29,11 @@
 // Application includes
 #include <Application/LayerIO/ITKLayerImporter.h>
 
+SCI_REGISTER_IMPORTER( Seg3D, ITKLayerImporter );
+
+
 namespace Seg3D
 {
-
-SCI_REGISTER_IMPORTER(ITKLayerImporter);
 
 bool ITKLayerImporter::import_header()
 {

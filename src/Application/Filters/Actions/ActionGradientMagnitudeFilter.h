@@ -38,7 +38,7 @@ namespace Seg3D
   
 class ActionGradientMagnitudeFilter : public Core::Action
 {
-CORE_ACTION( "GradientMagnitudeFilter", "GradientMagnitudeFilter <layerid> [replace={true}]" );
+CORE_ACTION( "GradientMagnitudeFilter|layerid|replace=true" );
   
   // -- Constructor/Destructor --
 public:

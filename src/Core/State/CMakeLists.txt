@@ -83,9 +83,10 @@ TARGET_LINK_LIBRARIES(Core_State
                       Core_Application
                       Core_Interface
                       Core_Action
-                      ${SCI_BOOST_LIBRARY})
+                      ${SCI_BOOST_LIBRARY}
+            ${SCI_TINYXML_LIBRARY})
 
-# Register actions
-ADD_LIBRARY_ACTIONS(Core_State
+# Register action classes
+REGISTER_LIBRARY_AND_CLASSES(Core_State
                     ${CORE_STATE_ACTIONS_SRCS})
                     

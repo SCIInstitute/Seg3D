@@ -31,13 +31,13 @@
 #include <Application/Tools/FillHolesFilter.h>
 #include <Application/LayerManager/LayerManager.h>
 
+// Register the tool into the tool factory
+SCI_REGISTER_TOOL( Seg3D, FillHolesFilter )
+
 namespace Seg3D
 {
 
 const size_t FillHolesFilter::VERSION_NUMBER_C = 1;
-
-// Register the tool into the tool factory
-SCI_REGISTER_TOOL(FillHolesFilter)
 
 FillHolesFilter::FillHolesFilter( const std::string& toolid, bool auto_number ) :
   Tool( toolid, VERSION_NUMBER_C, auto_number )

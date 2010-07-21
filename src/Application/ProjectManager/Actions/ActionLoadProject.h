@@ -38,7 +38,7 @@ namespace Seg3D
 
 class ActionLoadProject : public Core::Action
 {
-  CORE_ACTION( "LoadProject", "LoadProject <projectpath>" );
+  CORE_ACTION( "LoadProject|projectpath" );
 
   // -- Constructor/Destructor --
 public:

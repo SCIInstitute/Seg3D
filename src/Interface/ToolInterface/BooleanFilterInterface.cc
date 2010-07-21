@@ -40,10 +40,10 @@
 #include <Application/Tools/BooleanFilter.h>
 //#include <Application/Filters/Actions/ActionBoolean.h>
 
+SCI_REGISTER_TOOLINTERFACE( Seg3D, BooleanFilterInterface )
+
 namespace Seg3D
 {
-
-SCI_REGISTER_TOOLINTERFACE(BooleanFilterInterface)
 
 class BooleanFilterInterfacePrivate
 {

@@ -62,11 +62,10 @@ TARGET_LINK_LIBRARIES(Application_ProjectManager
                       Core_Interface
                       Core_Action
                       Core_State
-                      Application_StateManager
                       Application_Project
                       ${SCI_BOOST_LIBRARY})
 
-# Register actions
-ADD_LIBRARY_ACTIONS(Application_ProjectManager
+# Register action classes
+REGISTER_LIBRARY_AND_CLASSES(Application_ProjectManager
                     ${APPLICATION_PROJECTMANAGER_ACTIONS_SRCS})
 

@@ -31,14 +31,13 @@
 #include <Application/Tools/InvertTool.h>
 #include <Application/LayerManager/LayerManager.h>
 
+// Register the tool into the tool factory
+SCI_REGISTER_TOOL( Seg3D, InvertTool )
 
 namespace Seg3D
 {
 
 const size_t InvertTool::VERSION_NUMBER_C = 1;
-
-// Register the tool into the tool factory
-SCI_REGISTER_TOOL(InvertTool)
 
 InvertTool::InvertTool( const std::string& toolid, bool auto_number ) :
   Tool( toolid, VERSION_NUMBER_C, auto_number )

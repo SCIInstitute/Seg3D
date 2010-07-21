@@ -30,11 +30,11 @@
 #include <Application/Tools/FlipTool.h>
 // #include <Application/LayerManager/LayerManager.h>
 
+// Register the tool into the tool factory
+SCI_REGISTER_TOOL( Seg3D, FlipTool)
+
 namespace Seg3D
 {
-
-// Register the tool into the tool factory
-SCI_REGISTER_TOOL(FlipTool)
 
 FlipTool::FlipTool( const std::string& toolid ) :
   Tool( toolid )

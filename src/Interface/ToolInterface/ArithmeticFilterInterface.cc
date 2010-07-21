@@ -40,10 +40,10 @@
 #include <Application/Tools/ArithmeticFilter.h>
 //#include <Application/Filters/Actions/ActionArithmetic.h>
 
+SCI_REGISTER_TOOLINTERFACE( Seg3D, ArithmeticFilterInterface )
+
 namespace Seg3D
 {
-
-SCI_REGISTER_TOOLINTERFACE(ArithmeticFilterInterface)
 
 class ArithmeticFilterInterfacePrivate
 {

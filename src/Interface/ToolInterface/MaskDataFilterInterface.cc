@@ -41,10 +41,10 @@
 #include <Application/Tools/MaskDataFilter.h>
 //#include <Application/Filters/Actions/ActionMaskData.h>
 
+SCI_REGISTER_TOOLINTERFACE( Seg3D, MaskDataFilterInterface )
+
 namespace Seg3D
 {
-
-SCI_REGISTER_TOOLINTERFACE(MaskDataFilterInterface)
 
 class MaskDataFilterInterfacePrivate
 {

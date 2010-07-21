@@ -89,12 +89,11 @@ TARGET_LINK_LIBRARIES(Application_Filters
                       Core_Interface
                       Core_Action
                       Core_State
-                      Application_StateManager
                       Application_Layer
                       Application_LayerManager
                       ${SCI_BOOST_LIBRARY})
 
-# Register actions
-ADD_LIBRARY_ACTIONS(Application_Filters
-                    ${APPLICATION_FILTERS_ACTIONS_SRCS})
+# Register action classes
+REGISTER_LIBRARY_AND_CLASSES(Application_Filters
+               ${APPLICATION_FILTERS_ACTIONS_SRCS})
                     

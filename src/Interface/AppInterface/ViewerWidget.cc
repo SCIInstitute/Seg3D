@@ -148,7 +148,7 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
     QtUtils::QtBridge::Connect( this->private_->ui_.grid_button_, 
       this->private_->viewer_->slice_grid_state_ );
     QtUtils::QtBridge::Connect( this->private_->ui_.lock_button_, 
-      this->private_->viewer_->viewer_lock_state_ );
+      this->private_->viewer_->lock_state_ );
     QtUtils::QtBridge::Connect( this->private_->ui_.slice_visible_button_,
       this->private_->viewer_->slice_visible_state_ );
     QtUtils::QtBridge::Connect( this->private_->ui_.slices_visible_button_,

@@ -38,9 +38,8 @@ namespace Seg3D
   
 class ActionArithmeticFilter : public Core::Action
 {
-CORE_ACTION( "ArithmeticFilter", 
-  "ArithmeticFilter <layerid> <expression> [b=layerid] [c=layerid] [d=layerid] [replace={true}]" );
-  
+CORE_ACTION( "ArithmeticFilter|layerid|expression|b=layerid|c=layerid|d=layerid|replace=true" ); 
+
   // -- Constructor/Destructor --
 public:
   ActionArithmeticFilter()

@@ -39,6 +39,9 @@
 #include <Application/ProjectManager/ProjectManager.h>
 #include <Application/ProjectManager/Actions/ActionLoadProject.h>
 
+// Resources includes
+#include <Resources/QtResources.h>
+
 #include "ui_AppSplash.h"
 
 namespace Seg3D
@@ -57,7 +60,7 @@ AppSplash::AppSplash( QWidget *parent ) :
   QDialog( parent ),
   private_( new AppSplashPrivate )
 {
-  
+  InitQtResources();
   setAttribute( Qt::WA_DeleteOnClose );
   // Set up the private internals of the AppSplash class
   this->private_->ui_.setupUi( this );

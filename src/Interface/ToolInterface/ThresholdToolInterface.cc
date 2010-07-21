@@ -43,10 +43,10 @@
 //#include <Application/Filters/Actions/ActionThreshold.h>
 #include <Application/LayerManager/LayerManager.h>
 
+SCI_REGISTER_TOOLINTERFACE( Seg3D, ThresholdToolInterface )
+
 namespace Seg3D
 {
-
-SCI_REGISTER_TOOLINTERFACE(ThresholdToolInterface)
 
 class ThresholdToolInterfacePrivate
 {

@@ -40,10 +40,10 @@
 #include <Application/Tools/BinaryDilateErodeFilter.h>
 //#include <Application/Filters/Actions/ActionBinaryDilateErode.h>
 
+SCI_REGISTER_TOOLINTERFACE( Seg3D, BinaryDilateErodeFilterInterface )
+
 namespace Seg3D
 {
-
-SCI_REGISTER_TOOLINTERFACE(BinaryDilateErodeFilterInterface)
 
 class BinaryDilateErodeFilterInterfacePrivate
 {

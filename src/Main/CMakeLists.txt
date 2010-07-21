@@ -81,12 +81,14 @@ TARGET_LINK_LIBRARIES(Seg3D
   Interface_AppProjectWizard
   Interface_AppSplash
   Interface_ToolInterface
-  Init_Init
 )
 
 IF(WIN32)
   TARGET_LINK_LIBRARIES(Seg3D ${QT_QTMAIN_LIBRARY} )
 ENDIF(WIN32)
+
+# add libraries with plug-ins and extensions
+REGISTERED_TARGET_LINK_LIBRARIES(Seg3D)
 
 ###########################################
 # SETUP MACOSX APPLICATION BUNDLE

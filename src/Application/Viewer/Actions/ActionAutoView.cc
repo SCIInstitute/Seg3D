@@ -63,7 +63,7 @@ bool ActionAutoView::run( Core::ActionContextHandle& context, Core::ActionResult
   ViewerHandle viewer = this->viewer_weak_handle_.lock();
   if ( viewer )
   {
-    if ( viewer->viewer_lock_state_->get() )
+    if ( viewer->lock_state_->get() )
     {
       std::vector< size_t > locked_viewers = ViewerManager::Instance()->
         get_locked_viewers( viewer->view_mode_state_->index() );

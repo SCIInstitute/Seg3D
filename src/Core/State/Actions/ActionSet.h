@@ -41,7 +41,7 @@ namespace Core
 
 class ActionSet : public Action
 {
-  CORE_ACTION( "Set", "Set <state> <value>" );
+  CORE_ACTION( "Set|stateid|value" );
 
   // -- Constructor/Destructor --
 public:

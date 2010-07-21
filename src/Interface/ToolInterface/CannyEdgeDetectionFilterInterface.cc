@@ -40,10 +40,10 @@
 #include <Application/Tools/CannyEdgeDetectionFilter.h>
 //#include <Application/Filters/Actions/ActionCannyEdgeDetection.h>
 
+SCI_REGISTER_TOOLINTERFACE( Seg3D, CannyEdgeDetectionFilterInterface )
+
 namespace Seg3D
 {
-
-SCI_REGISTER_TOOLINTERFACE(CannyEdgeDetectionFilterInterface)
 
 class CannyEdgeDetectionFilterInterfacePrivate
 {

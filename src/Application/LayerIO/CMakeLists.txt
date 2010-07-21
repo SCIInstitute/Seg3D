@@ -57,20 +57,20 @@ CORE_ADD_LIBRARY(Application_LayerIO ${APPLICATION_LAYERIO_SRCS}
             ${APPLICATION_LAYERIO_ACTIONS_SRCS} )
             
 TARGET_LINK_LIBRARIES(Application_LayerIO
-                      Core_Utils
+          Core_Utils
           Core_Geometry
           Core_DataBlock
           Core_Volume
-                      Core_Application
-                      Core_Interface
-                      Application_InterfaceManager
-                      Core_Action
-                      Core_State
-                      Application_StateManager
-                      Application_Layer
-                      ${SCI_BOOST_LIBRARY})
+          Core_Application
+          Core_Interface
+          Core_Action
+          Core_State
+          Application_InterfaceManager
+          Application_Layer
+          ${SCI_BOOST_LIBRARY})
 
-# Register actions
-ADD_LIBRARY_ACTIONS(Application_LayerIO ${APPLICATION_LAYERIO_ACTIONS_SRCS})
+# Register actions and importers
+REGISTER_LIBRARY_AND_CLASSES(Application_LayerIO 
+  ${APPLICATION_LAYERIO_ACTIONS_SRCS}
+  ${APPLICATION_LAYERIO_IMPORTERS_SRCS})
 
-ADD_LIBRARY_IMPORTERS(Application_LayerIO ${APPLICATION_LAYERIO_IMPORTERS_SRCS})

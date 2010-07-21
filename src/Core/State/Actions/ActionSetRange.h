@@ -40,7 +40,7 @@ namespace Core
 
 class ActionSetRange : public Action
 {
-  CORE_ACTION( "SetRange", "SetRange <state> <min> <max>" );
+  CORE_ACTION( "SetRange|stateid|min|max" );
 
 public:
   ActionSetRange();

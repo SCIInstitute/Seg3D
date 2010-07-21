@@ -53,7 +53,7 @@ TARGET_LINK_LIBRARIES(Application_PreferencesManager
                       ${SCI_BOOST_LIBRARY}
                       ${SCI_TINYXML_LIBRARY})
 
-# Register actions
-ADD_LIBRARY_ACTIONS(Application_PreferencesManager
+# Register action classes
+REGISTER_LIBRARY_AND_CLASSES(Application_PreferencesManager
                     ${APPLICATION_PREFERENCESMANAGER_ACTIONS_SRCS})
 

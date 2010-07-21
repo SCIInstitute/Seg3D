@@ -37,7 +37,7 @@ namespace Core
 
 class ActionScaleView : public Action
 {
-  CORE_ACTION( "Scale", "Scale <key> <ratio>" );
+  CORE_ACTION( "Scale|stateid|ratio" );
 
 public:
   ActionScaleView();

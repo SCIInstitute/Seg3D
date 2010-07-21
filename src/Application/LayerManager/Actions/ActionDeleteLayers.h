@@ -42,7 +42,7 @@ namespace Seg3D
 
 class ActionDeleteLayers : public ActionLayer
 {
-  CORE_ACTION( "DeleteLayers", "DeleteLayers <groupid>" );
+  CORE_ACTION( "DeleteLayers|groupid" );
   
   // -- Constructor/Destructor --
 public:

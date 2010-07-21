@@ -113,18 +113,19 @@ AppController::AppController( QWidget* parent ) :
   tv_log_history_->resizeRowsToContents();
 
   // Get the list of actions
-  Core::ActionFactory::action_list_type action_list;
+  std::vector<std::string> action_list;
   Core::ActionFactory::Instance()->action_list( action_list );
 
   QMenu* action_menu = new QMenu( tb_action_ );
 
-  Core::ActionFactory::action_list_type::iterator it = action_list.begin();
-  Core::ActionFactory::action_list_type::iterator it_end = action_list.end();
+  std::vector<std::string>::iterator it = action_list.begin();
+  std::vector<std::string>::iterator it_end = action_list.end();
+  
   while ( it != it_end )
   {
     QAction* action_item = action_menu->addAction( QString::fromStdString( *it ) );
-    QtUtils::QtBridge::Connect( action_item, boost::bind( &AppController::SetActionType, controller,
-        ( *it ) ) );
+    QtUtils::QtBridge::Connect( action_item, boost::bind( &AppController::SetActionType, 
+      controller, ( *it ) ) );
     ++it;
   }
 

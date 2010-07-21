@@ -57,7 +57,7 @@ TARGET_LINK_LIBRARIES(Application_ToolManager
                       Application_Tool
                       ${SCI_BOOST_LIBRARY})
 
-# Register actions
-ADD_LIBRARY_ACTIONS(Application_ToolManager
+# Register action classes
+REGISTER_LIBRARY_AND_CLASSES(Application_ToolManager
                     ${APPLICATION_TOOLMANAGER_ACTIONS_SRCS})
                     

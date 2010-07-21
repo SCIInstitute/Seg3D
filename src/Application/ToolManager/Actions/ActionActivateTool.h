@@ -37,7 +37,7 @@ namespace Seg3D
 
 class ActionActivateTool : public Core::Action
 {
-  CORE_ACTION( "ActivateTool", "ActivateTool <toolid>" );
+  CORE_ACTION( "ActivateTool|toolid" );
 
   // -- Constructor/Destructor --
 public:

@@ -42,7 +42,7 @@ namespace Seg3D
 
 class ActionNewMaskLayer : public ActionLayer
 {
-  CORE_ACTION( "NewMaskLayer", "NewMaskLayer <groupid>" );
+  CORE_ACTION( "NewMaskLayer|groupid" );
   
   // -- Constructor/Destructor --
 public:

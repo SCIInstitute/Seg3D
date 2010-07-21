@@ -44,9 +44,12 @@
 // Interface includes
 #include <Interface/AppInterface/AppInterface.h>
 
-// Plugin functionality
-#include <Init/Init.h>
-#include <Init/QtInit.h>
+// Resource includes
+#include <Resources/QtResources.h>
+
+// File that contains a function that registers all the class that need registration,
+// such as Actions and Tools
+#include "ClassRegistration.h"
 
 // Revision information
 #include "Seg3D_RevisionInfo.h"
@@ -96,9 +99,8 @@ int main( int argc, char **argv )
   }
   
   // -- Add plugins into the architecture  
-  Core::InitPlugins();
-  Seg3D::QtInitResources();
-
+  Core::RegisterClasses();
+  
   // -- Start the application event handler --
   Core::Application::Instance()->start_eventhandler();
 

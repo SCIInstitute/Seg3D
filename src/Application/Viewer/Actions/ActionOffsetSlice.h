@@ -41,7 +41,7 @@ typedef boost::shared_ptr< ActionOffsetSlicePrivate > ActionOffsetSlicePrivateHa
 
 class ActionOffsetSlice : public Core::Action
 {
-  CORE_ACTION( "OffsetSlice", "OffsetSlice <viewerid> <offset_value>" );
+  CORE_ACTION( "OffsetSlice viewerid offset_value" );
 
 public:
   ActionOffsetSlice();

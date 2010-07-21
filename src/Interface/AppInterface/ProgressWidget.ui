@@ -116,7 +116,7 @@ QToolButton#cancel_button_:pressed{
            <string/>
           </property>
           <property name="pixmap">
-           <pixmap resource="Resources/AppInterface.qrc">:/Images/Circle.png</pixmap>
+           <pixmap resource="../../Resources/QtResources.qrc">:/Images/Circle.png</pixmap>
           </property>
           <property name="scaledContents">
            <bool>true</bool>
@@ -172,7 +172,7 @@ QToolButton#cancel_button_:pressed{
            <string/>
           </property>
           <property name="icon">
-           <iconset resource="Resources/AppInterface.qrc">
+           <iconset resource="../../Resources/QtResources.qrc">
             <normaloff>:/Images/Close.png</normaloff>:/Images/Close.png</iconset>
           </property>
           <property name="iconSize">
@@ -236,7 +236,7 @@ QToolButton#cancel_button_:pressed{
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
-  <include location="Resources/AppInterface.qrc"/>
+  <include location="../../Resources/QtResources.qrc"/>
  </resources>
  <connections/>
 </ui>

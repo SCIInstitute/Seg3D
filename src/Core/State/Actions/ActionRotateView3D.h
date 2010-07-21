@@ -40,7 +40,7 @@ namespace Core
 
 class ActionRotateView3D : public Action
 {
-  CORE_ACTION("Rotate", "Rotate <key> <axis> <angle>");
+  CORE_ACTION( "Rotate|stateid|axis|angle" );
 
 public:
   ActionRotateView3D();

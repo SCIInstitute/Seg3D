@@ -40,10 +40,10 @@
 #include <Application/Tools/MedianFilter.h>
 //#include <Application/Filters/Actions/ActionMedian.h>
 
+SCI_REGISTER_TOOLINTERFACE( Seg3D, MedianFilterInterface )
+
 namespace Seg3D
 {
-
-SCI_REGISTER_TOOLINTERFACE(MedianFilterInterface)
 
 class MedianFilterInterfacePrivate
 {

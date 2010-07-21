@@ -36,7 +36,7 @@ namespace Core
 
 class ActionRedo : public Action
 {
-  CORE_ACTION("Redo","Redo");
+  CORE_ACTION( "Redo" );
 
   // -- Constructor/Destructor --
 public:

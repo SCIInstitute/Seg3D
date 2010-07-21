@@ -40,10 +40,10 @@
 #include <Application/Tools/IntensityCorrectionFilter.h>
 //#include <Application/Filters/Actions/ActionIntensityCorrection.h>
 
+SCI_REGISTER_TOOLINTERFACE( Seg3D, IntensityCorrectionFilterInterface )
+
 namespace Seg3D
 {
-
-SCI_REGISTER_TOOLINTERFACE(IntensityCorrectionFilterInterface)
 
 class IntensityCorrectionFilterInterfacePrivate
 {

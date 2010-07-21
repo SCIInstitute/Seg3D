@@ -40,10 +40,10 @@
 #include <Application/Tools/ConnectedComponentFilter.h>
 //#include <Application/Filters/Actions/ActionConnectedComponent.h>
 
+SCI_REGISTER_TOOLINTERFACE( Seg3D, ConnectedComponentFilterInterface )
+
 namespace Seg3D
 {
-
-SCI_REGISTER_TOOLINTERFACE(ConnectedComponentFilterInterface)
 
 class ConnectedComponentFilterInterfacePrivate
 {

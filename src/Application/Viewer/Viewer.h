@@ -242,12 +242,13 @@ public:
   Core::StateView2DHandle coronal_view_state_;
   Core::StateView2DHandle sagittal_view_state_;
   Core::StateView3DHandle volume_view_state_;
-
   Core::StateRangedIntHandle slice_number_state_;
 
   // 2D viewer state
   Core::StateBoolHandle slice_grid_state_;
   Core::StateBoolHandle slice_visible_state_;
+  Core::StateBoolHandle slice_mirror_cursor_state_;
+  Core::StateBoolHandle slice_picking_visible_state_;
 
   // 3D viewer state
   Core::StateBoolHandle volume_slices_visible_state_;
@@ -255,7 +256,8 @@ public:
   Core::StateBoolHandle volume_volume_rendering_visible_state_;
   Core::StateBoolHandle volume_light_visible_state_;
 
-  Core::StateBoolHandle viewer_lock_state_;
+  Core::StateBoolHandle lock_state_;
+  Core::StateBoolHandle overlay_visible_state_;
   Core::StateBoolHandle is_picking_target_state_;
 
 private:

@@ -46,11 +46,10 @@ TARGET_LINK_LIBRARIES(Application_DataManager
                       Core_Interface
                       Core_Action
                       Core_State
-          Application_LayerManager
-                      Application_StateManager
+            Application_LayerManager
                       Application_Project
                       ${SCI_BOOST_LIBRARY})
 
-# Register actions
-ADD_LIBRARY_ACTIONS(Application_DataManager)
+# Register action classes
+REGISTER_LIBRARY_AND_CLASSES(Application_DataManager)
 

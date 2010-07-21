@@ -37,9 +37,8 @@ namespace Seg3D
   
 class ActionBinaryDilateErodeFilter : public Core::Action
 {
-CORE_ACTION( "BinaryDialateErodeFilter", 
-  "BinaryDialateErodeFilter <layerid> [dilate={0}] [erode={0}] [replace={true}]" );
-  
+CORE_ACTION( "BinaryDialateErodeFilter|layerid|dilate=0|erode=0|replace=true" ); 
+
   // -- Constructor/Destructor --
 public:
   ActionBinaryDilateErodeFilter()

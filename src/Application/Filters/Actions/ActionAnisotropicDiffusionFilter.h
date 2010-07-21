@@ -38,9 +38,8 @@ namespace Seg3D
   
 class ActionAnisotropicDiffusionFilter : public Core::Action
 {
-CORE_ACTION( "AnisotropicDiffusionFilter", 
-  "AnisotropicDiffusionFilter <layerid> [iterations={10}] [step={2}]"
-  " [conductance={1.0}] [replace={true}]" );
+CORE_ACTION( "AnisotropicDiffusionFilter|layerid|interations=10|step=2|"
+  "conductance=1.0|replace=true" );
   
   // -- Constructor/Destructor --
 public:

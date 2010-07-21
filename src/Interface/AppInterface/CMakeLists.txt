@@ -107,12 +107,11 @@ SET(INTERFACE_APPINTERFACE_UI_SRCS
 )
 
 SET(INTERFACE_APPINTERFACE_RCC_SRCS
-  Resources/AppInterface.qrc
 )
 
 
 ##################################################
-# Get Icon files
+# Resource files
 ##################################################
 
 QT4_ADD_RESOURCES(INTERFACE_APPINTERFACE_QT_RCC_SRCS ${INTERFACE_APPINTERFACE_RCC_SRCS})
@@ -148,10 +147,6 @@ CORE_ADD_LIBRARY(Interface_AppInterface
             ${INTERFACE_APPINTERFACE_NO_MOC_SRCS} 
             ${INTERFACE_APPINTERFACE_MOC_SRCS}
             ${INTERFACE_APPINTERFACE_QT_RCC_SRCS})
-                     
-#ADD_DEPENDENCIES(Interface_AppInterface 
-#     ${INTERFACE_APPINTERFACE_UI_SRCS}
-#     ${INTERFACE_APPINTERFACE_RCC_SRCS} )
 
 TARGET_LINK_LIBRARIES(Interface_AppInterface
                       Core_Utils
@@ -163,22 +158,19 @@ TARGET_LINK_LIBRARIES(Interface_AppInterface
             Application_Project
             Application_ProjectManager
             Application_Renderer
-                      Application_StateManager
                       Application_Tool
                       Application_ToolManager
                       Application_Tools
                       QtUtils_Utils
                       QtUtils_Widgets
             QtUtils_Bridge
+            Resources_QtResources
                       Interface_AppController
             Interface_AppPreferences
             Interface_AppSplash
             Interface_AppProjectWizard
                       ${QT_LIBRARIES} 
                       ${SCI_BOOST_LIBRARY})
-
-ADD_LIBRARY_QTRESOURCES(AppInterface)
-
 
 FILE(GLOB RESOURCE_IMAGE_FILES "${CMAKE_CURRENT_SOURCE_DIR}Resources/Images/*.png")
 

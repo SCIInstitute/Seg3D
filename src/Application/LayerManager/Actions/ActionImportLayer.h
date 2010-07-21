@@ -41,7 +41,7 @@ namespace Seg3D
   
 class ActionImportLayer : public Core::Action
 {
-  CORE_ACTION( "ImportLayer", "ImportLayer <filename>  [mode=data|single_mask|biplane_mask|label_mask] [importer=name_importer]" );
+  CORE_ACTION( "ImportLayer|filename|mode=data#data,single_mask,biplane_mask,label_mask|importer=name" );
   
   // -- Constructor/Destructor --
 public:

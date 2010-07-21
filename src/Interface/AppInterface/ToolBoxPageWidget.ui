@@ -197,7 +197,7 @@ QWidget#tool_frame_{
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="Resources/AppInterface.qrc">
+            <iconset resource="../../Resources/QtResources.qrc">
              <normaloff>:/Images/HelpWhite.png</normaloff>:/Images/HelpWhite.png</iconset>
            </property>
           </widget>
@@ -220,7 +220,7 @@ QWidget#tool_frame_{
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="Resources/AppInterface.qrc">
+            <iconset resource="../../Resources/QtResources.qrc">
              <normaloff>:/Images/CloseWhite.png</normaloff>:/Images/CloseWhite.png</iconset>
            </property>
           </widget>
@@ -287,7 +287,7 @@ QWidget#tool_frame_{
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
-  <include location="Resources/AppInterface.qrc"/>
+  <include location="../../Resources/QtResources.qrc"/>
  </resources>
  <connections/>
 </ui>

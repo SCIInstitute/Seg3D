@@ -381,7 +381,7 @@ QPushButton#activate_button_{
                   <string/>
                  </property>
                  <property name="icon">
-                  <iconset resource="Resources/AppInterface.qrc">
+                  <iconset resource="../../Resources/QtResources.qrc">
                    <normaloff>:/Images/VisibleOff.png</normaloff>
                    <normalon>:/Images/Visible.png</normalon>:/Images/VisibleOff.png</iconset>
                  </property>
@@ -414,7 +414,7 @@ QPushButton#activate_button_{
                   <string/>
                  </property>
                  <property name="icon">
-                  <iconset resource="Resources/AppInterface.qrc">
+                  <iconset resource="../../Resources/QtResources.qrc">
                    <normaloff>:/Images/OpacityOff.png</normaloff>
                    <normalon>:/Images/Opacity.png</normalon>:/Images/OpacityOff.png</iconset>
                  </property>
@@ -451,7 +451,7 @@ QPushButton#activate_button_{
                   <string/>
                  </property>
                  <property name="icon">
-                  <iconset resource="Resources/AppInterface.qrc">
+                  <iconset resource="../../Resources/QtResources.qrc">
                    <normaloff>:/Images/LockOff.png</normaloff>
                    <normalon>:/Images/Lock.png</normalon>:/Images/LockOff.png</iconset>
                  </property>
@@ -497,7 +497,7 @@ QPushButton#activate_button_{
                   <string/>
                  </property>
                  <property name="icon">
-                  <iconset resource="Resources/AppInterface.qrc">
+                  <iconset resource="../../Resources/QtResources.qrc">
                    <normaloff>:/Images/ColorOff.png</normaloff>
                    <normalon>:/Images/Color.png</normalon>:/Images/ColorOff.png</iconset>
                  </property>
@@ -527,7 +527,7 @@ QPushButton#activate_button_{
                   <string>I</string>
                  </property>
                  <property name="icon">
-                  <iconset resource="Resources/AppInterface.qrc">
+                  <iconset resource="../../Resources/QtResources.qrc">
                    <normaloff>:/Images/IsosurfaceVisibleOff.png</normaloff>
                    <normalon>:/Images/IsosurfaceVisible.png</normalon>:/Images/IsosurfaceVisibleOff.png</iconset>
                  </property>
@@ -557,7 +557,7 @@ QPushButton#activate_button_{
                   <string>C</string>
                  </property>
                  <property name="icon">
-                  <iconset resource="Resources/AppInterface.qrc">
+                  <iconset resource="../../Resources/QtResources.qrc">
                    <normaloff>:/Images/IsosurfaceComputeOff.png</normaloff>
                    <normalon>:/Images/IsosurfaceCompute.png</normalon>:/Images/IsosurfaceComputeOff.png</iconset>
                  </property>
@@ -587,7 +587,7 @@ QPushButton#activate_button_{
                   <string/>
                  </property>
                  <property name="icon">
-                  <iconset resource="Resources/AppInterface.qrc">
+                  <iconset resource="../../Resources/QtResources.qrc">
                    <normaloff>:/Images/BorderOff.png</normaloff>
                    <normalon>:/Images/Border.png</normalon>:/Images/BorderOff.png</iconset>
                  </property>
@@ -617,7 +617,7 @@ QPushButton#activate_button_{
                   <string/>
                  </property>
                  <property name="icon">
-                  <iconset resource="Resources/AppInterface.qrc">
+                  <iconset resource="../../Resources/QtResources.qrc">
                    <normaloff>:/Images/VolumeVisibleOff.png</normaloff>
                    <normalon>:/Images/VolumeVisible.png</normalon>:/Images/VolumeVisibleOff.png</iconset>
                  </property>
@@ -644,7 +644,7 @@ QPushButton#activate_button_{
                   <string/>
                  </property>
                  <property name="icon">
-                  <iconset resource="Resources/AppInterface.qrc">
+                  <iconset resource="../../Resources/QtResources.qrc">
                    <normaloff>:/Images/BrightnessOff.png</normaloff>
                    <normalon>:/Images/Brightness.png</normalon>:/Images/BrightnessOff.png</iconset>
                  </property>
@@ -937,7 +937,7 @@ QPushButton#activate_button_{
                <string/>
               </property>
               <property name="icon">
-               <iconset resource="Resources/AppInterface.qrc">
+               <iconset resource="../../Resources/QtResources.qrc">
                 <normaloff>:/Images/Close.png</normaloff>:/Images/Close.png</iconset>
               </property>
               <property name="iconSize">
@@ -1148,7 +1148,7 @@ QPushButton#activate_button_{
   </layout>
  </widget>
  <resources>
-  <include location="Resources/AppInterface.qrc"/>
+  <include location="../../Resources/QtResources.qrc"/>
  </resources>
  <connections/>
 </ui>

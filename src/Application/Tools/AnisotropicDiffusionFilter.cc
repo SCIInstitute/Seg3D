@@ -31,13 +31,14 @@
 #include <Application/Tools/AnisotropicDiffusionFilter.h>
 #include <Application/LayerManager/LayerManager.h>
 
+SCI_REGISTER_TOOL( Seg3D, AnisotropicDiffusionFilter )
+
 namespace Seg3D
 {
 
 const size_t AnisotropicDiffusionFilter::VERSION_NUMBER_C = 1;
 
 // Register the tool into the tool factory
-SCI_REGISTER_TOOL( AnisotropicDiffusionFilter )
 
 AnisotropicDiffusionFilter::AnisotropicDiffusionFilter( const std::string& toolid, bool auto_number ) :
   Tool( toolid, VERSION_NUMBER_C, auto_number )

@@ -36,6 +36,9 @@
 // Interface includes
 #include <Interface/AppPreferences/AppPreferences.h>
 
+// Resource includes
+#include <Resources/QtResources.h>
+
 // The interface from the designer
 #include "ui_AppPreferences.h"
 
@@ -58,6 +61,8 @@ AppPreferences::AppPreferences( QWidget *parent ) :
     QDialog( parent ),
     private_( new AppPreferencesPrivate )
 {
+  InitQtResources();
+
     this->private_->ui_.setupUi( this );
   
   // Initialize all the tabs

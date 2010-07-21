@@ -572,7 +572,7 @@ QComboBox::icon{
                    <string notr="true">Sagittal</string>
                   </property>
                   <property name="icon">
-                   <iconset resource="Resources/AppInterface.qrc">
+                   <iconset resource="../../Resources/QtResources.qrc">
                     <normaloff>:/Images/XviewOff.png</normaloff>
                     <normalon>:/Images/Xview.png</normalon>
                     <disabledoff>:/Images/Xview.png</disabledoff>
@@ -585,7 +585,7 @@ QComboBox::icon{
                    <string notr="true">Axial</string>
                   </property>
                   <property name="icon">
-                   <iconset resource="Resources/AppInterface.qrc">
+                   <iconset resource="../../Resources/QtResources.qrc">
                     <normaloff>:/Images/ZviewOff.png</normaloff>
                     <normalon>:/Images/Zview.png</normalon>:/Images/ZviewOff.png</iconset>
                   </property>
@@ -595,7 +595,7 @@ QComboBox::icon{
                    <string notr="true">Coronal</string>
                   </property>
                   <property name="icon">
-                   <iconset resource="Resources/AppInterface.qrc">
+                   <iconset resource="../../Resources/QtResources.qrc">
                     <normaloff>:/Images/YviewOff.png</normaloff>
                     <normalon>:/Images/Yview.png</normalon>:/Images/YviewOff.png</iconset>
                   </property>
@@ -605,7 +605,7 @@ QComboBox::icon{
                    <string notr="true">Volume</string>
                   </property>
                   <property name="icon">
-                   <iconset resource="Resources/AppInterface.qrc">
+                   <iconset resource="../../Resources/QtResources.qrc">
                     <normaloff>:/Images/VviewOff.png</normaloff>
                     <normalon>:/Images/Vview.png</normalon>:/Images/VviewOff.png</iconset>
                   </property>
@@ -658,7 +658,7 @@ QComboBox::icon{
                   <string/>
                  </property>
                  <property name="icon">
-                  <iconset resource="Resources/AppInterface.qrc">
+                  <iconset resource="../../Resources/QtResources.qrc">
                    <normaloff>:/Images/AutoViewOff.png</normaloff>
                    <normalon>:/Images/AutoView.png</normalon>:/Images/AutoViewOff.png</iconset>
                  </property>
@@ -688,7 +688,7 @@ QComboBox::icon{
                   </size>
                  </property>
                  <property name="icon">
-                  <iconset resource="Resources/AppInterface.qrc">
+                  <iconset resource="../../Resources/QtResources.qrc">
                    <normaloff>:/Images/LockOff.png</normaloff>
                    <normalon>:/Images/Lock.png</normalon>:/Images/LockOff.png</iconset>
                  </property>
@@ -712,7 +712,7 @@ QComboBox::icon{
                   </size>
                  </property>
                  <property name="icon">
-                  <iconset resource="Resources/AppInterface.qrc">
+                  <iconset resource="../../Resources/QtResources.qrc">
                    <normaloff>:/Images/VisibleOff.png</normaloff>
                    <normalon>:/Images/Visible.png</normalon>:/Images/VisibleOff.png</iconset>
                  </property>
@@ -739,7 +739,7 @@ QComboBox::icon{
                   <string/>
                  </property>
                  <property name="icon">
-                  <iconset resource="Resources/AppInterface.qrc">
+                  <iconset resource="../../Resources/QtResources.qrc">
                    <normaloff>:/Images/LightOff.png</normaloff>
                    <normalon>:/Images/Light.png</normalon>:/Images/LightOff.png</iconset>
                  </property>
@@ -792,7 +792,7 @@ QComboBox::icon{
                   </size>
                  </property>
                  <property name="icon">
-                  <iconset resource="Resources/AppInterface.qrc">
+                  <iconset resource="../../Resources/QtResources.qrc">
                    <normaloff>:/Images/GridOff.png</normaloff>
                    <normalon>:/Images/Grid.png</normalon>:/Images/GridOff.png</iconset>
                  </property>
@@ -816,7 +816,7 @@ QComboBox::icon{
                   </size>
                  </property>
                  <property name="icon">
-                  <iconset resource="Resources/AppInterface.qrc">
+                  <iconset resource="../../Resources/QtResources.qrc">
                    <normaloff>:/Images/FlipHorizOff.png</normaloff>
                    <normalon>:/Images/FlipHoriz.png</normalon>:/Images/FlipHorizOff.png</iconset>
                  </property>
@@ -840,7 +840,7 @@ QComboBox::icon{
                   </size>
                  </property>
                  <property name="icon">
-                  <iconset resource="Resources/AppInterface.qrc">
+                  <iconset resource="../../Resources/QtResources.qrc">
                    <normaloff>:/Images/FlipVertOff.png</normaloff>
                    <normalon>:/Images/FlipVert.png</normalon>:/Images/FlipVertOff.png</iconset>
                  </property>
@@ -867,7 +867,7 @@ QComboBox::icon{
                   <string/>
                  </property>
                  <property name="icon">
-                  <iconset resource="Resources/AppInterface.qrc">
+                  <iconset resource="../../Resources/QtResources.qrc">
                    <normaloff>:/Images/IsosurfaceVisibleOff.png</normaloff>
                    <normalon>:/Images/IsosurfaceVisible.png</normalon>:/Images/IsosurfaceVisibleOff.png</iconset>
                  </property>
@@ -891,7 +891,7 @@ QComboBox::icon{
                   <string/>
                  </property>
                  <property name="icon">
-                  <iconset resource="Resources/AppInterface.qrc">
+                  <iconset resource="../../Resources/QtResources.qrc">
                    <normaloff>:/Images/SlicesVisibleOff.png</normaloff>
                    <normalon>:/Images/SlicesVisible.png</normalon>:/Images/SlicesVisibleOff.png</iconset>
                  </property>
@@ -915,7 +915,7 @@ QComboBox::icon{
                   <string/>
                  </property>
                  <property name="icon">
-                  <iconset resource="Resources/AppInterface.qrc">
+                  <iconset resource="../../Resources/QtResources.qrc">
                    <normaloff>:/Images/VolumeVisibleOff.png</normaloff>
                    <normalon>:/Images/VolumeVisible.png</normalon>:/Images/VolumeVisibleOff.png</iconset>
                  </property>
@@ -949,7 +949,7 @@ QComboBox::icon{
   </layout>
  </widget>
  <resources>
-  <include location="Resources/AppInterface.qrc"/>
+  <include location="../../Resources/QtResources.qrc"/>
  </resources>
  <connections/>
 </ui>

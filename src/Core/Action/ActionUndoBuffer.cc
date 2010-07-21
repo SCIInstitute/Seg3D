@@ -186,7 +186,7 @@ bool ActionUndoBuffer::has_redo_action()
 void ActionUndoBuffer::run_action( ActionHandle action, ActionContextHandle action_context )
 {
 
-  CORE_LOG_DEBUG(std::string("Processing Undo/Redo Action: ")+action->type());
+  CORE_LOG_DEBUG( std::string("Processing Undo/Redo Action: ") + action->get_type() );
 
   // Step (1): An action needs to be validated before it can be executed.
   // The validation is a separate step as invalid actions should nor be

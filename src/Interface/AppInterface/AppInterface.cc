@@ -32,7 +32,6 @@
 // Boost include
 #include <boost/lexical_cast.hpp>
 
-
 // Core includes
 #include <Core/Application/Application.h>
 #include <Core/Interface/Interface.h>
@@ -40,19 +39,23 @@
 // Application includes
 #include <Application/PreferencesManager/PreferencesManager.h>
 
-
 // QtUtils includes
 #include <QtUtils/Utils/QtPointer.h>
 
+// Resource includes
+#include <Resources/QtResources.h>
+
 // Interface includes
 #include <Interface/AppInterface/AppInterface.h>
-
 
 namespace Seg3D
 {
 
 AppInterface::AppInterface()
 {
+  // Ensure that resources are available
+  InitQtResources();
+
   // Set the window information and set the version numbers
   setWindowTitle( QString( CORE_APPLICATION_NAME ) + " Version " + CORE_APPLICATION_VERSION );
   setWindowIconText( QString( CORE_APPLICATION_NAME ) );

@@ -38,8 +38,7 @@ namespace Seg3D
   
 class ActionConfidenceConnectedFilter : public Core::Action
 {
-CORE_ACTION( "ConfidenceConnectedFilter",
-  "ConfidenceConnectedFilter <layerid> [iterations={10}] [multiplier={1}]" );
+CORE_ACTION( "ConfidenceConnectedFilter|layerid|iterations=10|multiplier=1" );
   
   // -- Constructor/Destructor --
 public:

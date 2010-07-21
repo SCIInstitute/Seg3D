@@ -39,10 +39,10 @@
 #include <Application/Tools/PolylineTool.h>
 //#include <Application/Filters/Actions/ActionPolyline.h>
 
+SCI_REGISTER_TOOLINTERFACE( Seg3D, PolylineToolInterface )
+
 namespace Seg3D
 {
-
-SCI_REGISTER_TOOLINTERFACE(PolylineToolInterface)
 
 class PolylineToolInterfacePrivate
 {

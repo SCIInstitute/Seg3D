@@ -37,7 +37,7 @@ namespace Seg3D
 
 class ActionAutoView : public Core::Action
 {
-  CORE_ACTION( "AutoView", "AutoView <viewer_id>" );
+  CORE_ACTION( "AutoView|viewerid" );
 
 public:
   ActionAutoView();

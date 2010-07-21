@@ -86,7 +86,7 @@ void Action::clear_cache()
 std::string Action::export_to_string() const
 {
   // Add action name to string
-  std::string command = std::string( type() ) + " ";
+  std::string command = std::string( get_type() ) + " ";
 
   // Loop through all the arguments and add them
   for ( size_t j = 0; j < arguments_.size(); j++ )

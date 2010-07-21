@@ -44,10 +44,11 @@
 //Interface Includes
 #include <Interface/ToolInterface/CustomWidgets/TargetComboBox.h>
 
+
+SCI_REGISTER_TOOLINTERFACE( Seg3D, AnisotropicDiffusionFilterInterface )
+
 namespace Seg3D
 {
-
-SCI_REGISTER_TOOLINTERFACE(AnisotropicDiffusionFilterInterface)
 
 class AnisotropicDiffusionFilterInterfacePrivate
 {

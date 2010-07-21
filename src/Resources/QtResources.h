@@ -25,47 +25,19 @@
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
  */
-
-#ifndef APPLICATION_STATEMANAGER_STATEMANAGER_H
-#define APPLICATION_STATEMANAGER_STATEMANAGER_H
+ 
+#ifndef RESOURCES_QTRESOURCES_H
+#define RESOURCES_QTRESOURCES_H
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
 #endif 
 
-// Boost includes
-#include <boost/shared_ptr.hpp>
-#include <boost/utility.hpp>
+// NOTE: Needs to be in global namespace in order for Qt macro to work properly
 
-// Core includes
-#include <Core/Utils/StringUtil.h>
-#include <Core/Utils/Singleton.h>
-
-// Application includes
-#include <Core/State/State.h>
-
-namespace Seg3D
-{
-
-// Forward declaration
-class StateManager;
-
-// Class definition
-class StateManager : public Core::Singleton< StateManager >
-{
-
-  // -- Constructor/Destructor --
-
-private:
-  friend class Core::Singleton< StateManager >;
-  StateManager();
-  virtual ~StateManager();
-
-  // -- Signal/Slots --
-public:
-
-};
-
-} // end namespace seg3D
+// INITQTRESOURCES:
+// Init the resource files that Qt generated from the icons and the images
+// NOTE: This function should only be called from the Qt Interface thread
+void InitQtResources();
 
 #endif

@@ -38,14 +38,14 @@ namespace Seg3D
 
 class ActionNewProject : public Core::Action
 {
-  CORE_ACTION( "NewProject", "NewProject <projectname>" );
+  CORE_ACTION( "NewProject|projectpoth|projectname" );
 
   // -- Constructor/Destructor --
 public:
   ActionNewProject()
   {
-    this->add_argument( this->project_name_ );
     this->add_argument( this->project_path_ );
+    this->add_argument( this->project_name_ );
   }
 
   virtual ~ActionNewProject()
@@ -58,7 +58,6 @@ public:
   virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
   
 private:
-
 
   // This parameter contains the name of the session to be loaded
   Core::ActionParameter< std::string > project_name_;

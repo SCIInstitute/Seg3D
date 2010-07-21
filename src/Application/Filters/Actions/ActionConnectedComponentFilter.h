@@ -38,8 +38,7 @@ namespace Seg3D
   
 class ActionConnectedComponentFilter : public Core::Action
 {
-CORE_ACTION( "ConnectedComponentFilter", 
-  "ConnectedComponentFilter <layerid> <seedpoints>" );
+CORE_ACTION( "ConnectedComponentFilter|layerid|seedpoints" );
     
   // -- Constructor/Destructor --
 public:

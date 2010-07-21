@@ -29,7 +29,7 @@
 #ifndef CORE_STATE_ACTIONS_ACTIONOFFSET_H
 #define CORE_STATE_ACTIONS_ACTIONOFFSET_H
 
-#include <Core/Action/Action.h>
+#include <Core/Action/Actions.h>
 #include <Core/Action/ActionDispatcher.h>
 #include <Core/State/StateRangedValue.h>
 
@@ -38,7 +38,7 @@ namespace Core
 
 class ActionOffset : public Action
 {
-  CORE_ACTION( "Offset", "Offset <state> <value>" );
+  CORE_ACTION( "Offset|stateid|value" );
 
 public:
   ActionOffset();

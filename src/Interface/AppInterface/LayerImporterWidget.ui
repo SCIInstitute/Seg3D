@@ -718,7 +718,7 @@ p, li { white-space: pre-wrap; }
  </widget>
  <layoutdefault spacing="2" margin="0"/>
  <resources>
-  <include location="Resources/AppInterface.qrc"/>
+  <include location="../../Resources/QtResources.qrc"/>
  </resources>
  <connections/>
 </ui>

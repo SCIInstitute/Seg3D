@@ -40,10 +40,10 @@
 #include <Application/Tools/OtsuThresholdFilter.h>
 //#include <Application/Filters/Actions/ActionOtsuThreshold.h>
 
+SCI_REGISTER_TOOLINTERFACE( Seg3D, OtsuThresholdFilterInterface )
+
 namespace Seg3D
 {
-
-SCI_REGISTER_TOOLINTERFACE(OtsuThresholdFilterInterface)
 
 class OtsuThresholdFilterInterfacePrivate
 {

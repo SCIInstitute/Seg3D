@@ -31,13 +31,13 @@
 #include <Application/Tools/MedianFilter.h>
 #include <Application/LayerManager/LayerManager.h>
 
+// Register the tool into the tool factory
+SCI_REGISTER_TOOL( Seg3D, MedianFilter )
+
 namespace Seg3D
 {
 
 const size_t MedianFilter::VERSION_NUMBER_C = 1;
-
-// Register the tool into the tool factory
-SCI_REGISTER_TOOL(MedianFilter)
 
 MedianFilter::MedianFilter( const std::string& toolid, bool auto_number ) :
   Tool( toolid, VERSION_NUMBER_C, auto_number )

@@ -36,13 +36,14 @@ namespace Core
 
 class ActionUndo : public Core::Action
 {
-  CORE_ACTION("Undo","Undo");
+  CORE_ACTION( "Undo" );
 
   // -- Constructor/Destructor --
 public:
   ActionUndo()
   {
   }
+  
   virtual ~ActionUndo()
   {
   }

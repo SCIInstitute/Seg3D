@@ -54,7 +54,7 @@ TARGET_LINK_LIBRARIES(Application_InterfaceManager
                       Core_State
                       ${SCI_BOOST_LIBRARY})
 
-# Register actions
-ADD_LIBRARY_ACTIONS(Application_InterfaceManager
+# Register action classes
+REGISTER_LIBRARY_AND_CLASSES(Application_InterfaceManager
                     ${APPLICATION_INTERFACEMANAGER_ACTIONS_SRCS})
                     

@@ -37,7 +37,7 @@ namespace Core
 
 class ActionGet : public Action
 {
-  CORE_ACTION("Get","Get <state>");
+  CORE_ACTION( "Get|stateid" );
 
   // -- Constructor/Destructor --
 public:

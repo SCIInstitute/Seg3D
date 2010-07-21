@@ -36,9 +36,11 @@
 namespace Seg3D
 {
 
+// TODO: Need fix the session name <> index duality here
+
 class ActionDeleteSession : public Core::Action
 {
-  CORE_ACTION( "DeleteSession", "DeleteSession <sessionname>" );
+  CORE_ACTION( "DeleteSession|sessionname" );
 
   // -- Constructor/Destructor --
 public:

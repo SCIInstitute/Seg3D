@@ -31,13 +31,13 @@
 #include <Application/Tools/OtsuThresholdFilter.h>
 #include <Application/LayerManager/LayerManager.h>
 
+// Register the tool into the tool factory
+SCI_REGISTER_TOOL( Seg3D, OtsuThresholdFilter )
+
 namespace Seg3D
 {
 
 const size_t OtsuThresholdFilter::VERSION_NUMBER_C = 1;
-
-// Register the tool into the tool factory
-SCI_REGISTER_TOOL(OtsuThresholdFilter)
 
 OtsuThresholdFilter::OtsuThresholdFilter( const std::string& toolid, bool auto_number ) :
   Tool( toolid, VERSION_NUMBER_C, auto_number )

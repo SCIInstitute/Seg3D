@@ -38,7 +38,7 @@ namespace Seg3D
 
 class ActionLoadSession : public Core::Action
 {
-  CORE_ACTION( "LoadSession", "LoadSession <sessionname>" );
+  CORE_ACTION( "LoadSession|sessionname" );
 
   // -- Constructor/Destructor --
 public:

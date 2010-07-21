@@ -40,7 +40,7 @@ namespace Core
 
 class ActionTranslateView : public Action
 {
-  CORE_ACTION( "Translate", "Translate <key> <offset>" );
+  CORE_ACTION( "Translate|stateid|offset" );
 
 public:
   ActionTranslateView();

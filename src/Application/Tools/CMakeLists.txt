@@ -84,12 +84,11 @@ TARGET_LINK_LIBRARIES(Application_Tools
                       Core_Interface
                       Core_Action
                       Core_State
-                      Application_StateManager                      
                       Application_Tool
                       Application_ToolManager
                       ${SCI_BOOST_LIBRARY})
 
-# Register actions
-ADD_LIBRARY_TOOLS(Application_Tools
-                  ${APPLICATION_TOOLS_SRCS})
+# Register tool classes
+REGISTER_LIBRARY_AND_CLASSES(Application_Tools
+               ${APPLICATION_TOOLS_SRCS})
                     

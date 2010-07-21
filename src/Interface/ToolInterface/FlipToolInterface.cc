@@ -36,10 +36,10 @@
 //Application Includes
 #include <Application/Tools/FlipTool.h>
 
+SCI_REGISTER_TOOLINTERFACE( Seg3D, FlipToolInterface )
+
 namespace Seg3D
 {
-
-SCI_REGISTER_TOOLINTERFACE(FlipToolInterface)
 
 class FlipToolInterfacePrivate
 {

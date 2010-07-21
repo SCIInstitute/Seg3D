@@ -36,7 +36,7 @@ namespace Seg3D
 
 class ActionCloseWindow : public Core::Action
 {
-  CORE_ACTION( "CloseWindow","CloseWindow <windowid>" );
+  CORE_ACTION( "CloseWindow|windowid" );
 
   // -- Constructor/Destructor --
 public:

@@ -48,7 +48,8 @@
 #include <Core/Utils/Log.h>
 #include <Core/Utils/IntrusiveBase.h>
 
-// Application includes
+// Action includes
+#include <Core/Action/ActionInfo.h>
 #include <Core/Action/ActionContext.h>
 #include <Core/Action/ActionParameter.h>
 #include <Core/Action/ActionCachedHandle.h>
@@ -77,9 +78,15 @@ public:
   virtual ~Action(); // << NEEDS TO BE REIMPLEMENTED
 
   // These functions define the properties of the action and are implemented
-  // by the SCI_ACTION_TYPE macro
-  virtual std::string type() const = 0;
-  virtual std::string usage() const = 0;
+  // by the CORE_ACTION_TYPE macro
+  
+  virtual std::string get_definition() const = 0;
+  
+  virtual std::string get_type() const = 0;
+  
+  virtual std::string get_usage() const = 0;
+  
+  virtual ActionInfoHandle get_action_info() const = 0;
 
   // -- Run/Validate interface --
 public:
@@ -216,16 +223,49 @@ private:
 // we only have a pointer to the base object. Hence we need virtual functions
 // as well. 
 
-// Note: one would expect to use virtual static functions, but those are not
-// allowed in C++
 
-#define CORE_ACTION(type_string,usage_string) \
-  public: \
-    static std::string Type()  { return type_string; }\
-    static std::string Usage() { return usage_string; }\
-    \
-    virtual std::string type() const  { return Type(); } \
-    virtual std::string usage() const { return Usage(); }
+// DEFINITION STRING MARKUP:
+// The definition string is a short description of the action listing all the names of all
+// the arguments and the action it self. The definition string is parsed and is used everywhere
+// where the program needs to interpret user defined actions, that are parsed in as text
+// The format is:
+//   fields are separated by the character '\'
+//   descriptions are entered after the character '#'
+//   key value pair need to have an '=' in the field
+// The first field is the name of the action, followed by the definition of the required arguments
+// and finally the key value pairs are added at the end
+// For example 'MyAction#this action does nothing|argument1#the name of the argument|argument2|
+//  key1=default_value#my key/value pair'
+  
+  
+#define CORE_ACTION(definition_string) \
+public: \
+  static std::string Definition() { return definition_string; } \
+  static std::string Type() { return GetActionInfo()->get_type(); } \
+  static std::string Usage() { return GetActionInfo()->get_usage(); } \
+  static Core::ActionInfoHandle GetActionInfo() \
+  {\
+    static bool initialized; \
+    static Core::ActionInfoHandle info; \
+    if ( !initialized ) \
+    {\
+      {\
+        Core::ActionInfo::lock_type lock( Core::ActionInfo::GetMutex() );\
+        if ( !info ) info = Core::ActionInfoHandle( new Core::ActionInfo( Definition() ) ); \
+      }\
+      {\
+        Core::ActionInfo::lock_type lock( Core::ActionInfo::GetMutex() );\
+        initialized = true;\
+      }\
+    }\
+    return info;\
+  } \
+  \
+  virtual std::string get_definition() const { return Definition(); } \
+    virtual std::string get_type() const  { return GetActionInfo()->get_type(); } \
+    virtual std::string get_usage() const { return GetActionInfo()->get_usage(); } \
+  virtual Core::ActionInfoHandle get_action_info() const { return GetActionInfo(); }
+  
 } // end namespace Core
 
 #endif

@@ -31,13 +31,13 @@
 #include <Application/Tools/ThresholdTool.h>
 #include <Application/LayerManager/LayerManager.h>
 
+// Register the tool into the tool factory
+SCI_REGISTER_TOOL( Seg3D, ThresholdTool )
+
 namespace Seg3D
 {
 
 const size_t ThresholdTool::VERSION_NUMBER_C = 1;
-
-// Register the tool into the tool factory
-SCI_REGISTER_TOOL(ThresholdTool)
 
 ThresholdTool::ThresholdTool( const std::string& toolid, bool auto_number ) :
   Tool( toolid, VERSION_NUMBER_C, auto_number )

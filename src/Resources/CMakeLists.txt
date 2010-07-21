@@ -31,50 +31,41 @@
 # Set sources
 ##################################################
 
-SET(INTERFACE_APPCONTROLLER_SRCS
-  AppController.cc
-  AppControllerContext.cc
-  AppControllerActionHistory.cc
-  AppControllerStateEngine.cc
-  AppControllerLogHistory.cc
+SET(RESOURCES_QTRESOURCES_SRCS
+  QtResources.cc
 )
 
-SET(INTERFACE_APPCONTROLLER_MOC_SRCS
-  AppController.h
-  AppControllerActionHistory.h
-  AppControllerStateEngine.h
-  AppControllerLogHistory.h
+SET(RESOURCES_QTRESOURCES_MOC_SRCS
 )
 
-SET(INTERFACE_APPCONTROLLER_NO_MOC_SRCS
+SET(RESOURCES_QTRESOURCES_NO_MOC_SRCS
+  QtResources.h
 )
 
-SET(INTERFACE_APPCONTROLLER_UI_SRCS
-  AppController.ui
+SET(RESOURCES_QTRESOURCES_UI_SRCS
 )
 
-SET(INTERFACE_APPCONTROLLER_RCC_SRCS
-#  AppController.qrc
+SET(RESOURCES_QTRESOURCES_RCC_SRCS
+  QtResources.qrc
 )
-
 
 ##################################################
-# Get Icon files
+# Resource files
 ##################################################
 
-QT4_ADD_RESOURCES(INTERFACE_APPCONTROLLER_QT_RCC_SRCS ${INTERFACE_APPCONTROLLER_RCC_SRCS})
+QT4_ADD_RESOURCES(RESOURCES_QTRESOURCES_QT_RCC_SRCS ${RESOURCES_QTRESOURCES_RCC_SRCS})
 
 ##################################################
 # Generate header out of UI code
 ##################################################
 
-QT4_WRAP_UI(INTERFACE_APPCONTROLLER_QT_UI_SRCS ${INTERFACE_APPCONTROLLER_UI_SRCS})
+QT4_WRAP_UI(RESOURCES_QTRESOURCES_QT_UI_SRCS ${RESOURCES_QTRESOURCES_UI_SRCS})
 
 ##################################################
 # Wrap QT code to expand all the moc code
 ##################################################
 
-QT4_WRAP_CPP(INTERFACE_APPCONTROLLER_QT_MOC_SRCS ${INTERFACE_APPCONTROLLER_MOC_SRCS})
+QT4_WRAP_CPP(RESOURCES_QTRESOURCES_QT_MOC_SRCS ${RESOURCES_QTRESOURCES_MOC_SRCS})
 
 ##################################################
 # Ensure that we can find the files generated
@@ -87,26 +78,13 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 # Build the Components library
 ##################################################
 
-CORE_ADD_LIBRARY(Interface_AppController 
-      ${INTERFACE_APPCONTROLLER_SRCS} 
-            ${INTERFACE_APPCONTROLLER_QT_UI_SRCS}
-            ${INTERFACE_APPCONTROLLER_QT_RCC_SRCS}
-            ${INTERFACE_APPCONTROLLER_QT_MOC_SRCS}
-            ${INTERFACE_APPCONTROLLER_NO_MOC_SRCS} 
-            ${INTERFACE_APPCONTROLLER_MOC_SRCS})    
-      
-TARGET_LINK_LIBRARIES(Interface_AppController
-                      Core_Utils
-                      Core_EventHandler
-                      Core_Action
-                      Core_Interface
-                      Core_ActionManager
-            Core_Resource
-                      Application_Tool
-                      Application_Tools
-                      QtUtils_Utils
-                      QtUtils_Widgets
-            QtUtils_Bridge
-            ${QT_LIBRARIES} 
-                      ${SCI_BOOST_LIBRARY})
-
+CORE_ADD_LIBRARY(Resources_QtResources
+         ${RESOURCES_QTRESOURCES_SRCS} 
+         ${RESOURCES_QTRESOURCES_QT_UI_SRCS}
+         ${RESOURCES_QTRESOURCES_QT_MOC_SRCS}
+         ${RESOURCES_QTRESOURCES_MOC_SRCS}
+         ${RESOURCES_QTRESOURCES_NO_MOC_SRCS}
+         ${RESOURCES_QTRESOURCES_QT_RCC_SRCS})
+            
+TARGET_LINK_LIBRARIES(Resources_QtResources 
+                      ${QT_LIBRARIES})

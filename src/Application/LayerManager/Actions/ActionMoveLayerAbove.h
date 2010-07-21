@@ -37,7 +37,7 @@ namespace Seg3D
 
 class ActionMoveLayerAbove : public Core::Action
 {
-  CORE_ACTION( "MoveLayerAbove","MoveLayer <name_above> <name_below> above=[true]" );
+  CORE_ACTION( "MoveLayerAbove|layerid_above|layerid_below|above=true" );
   
   // -- Constructor/Destructor --
 public:

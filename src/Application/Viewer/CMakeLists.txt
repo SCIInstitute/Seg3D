@@ -60,7 +60,7 @@ TARGET_LINK_LIBRARIES(Application_Viewer
             Application_StatusBar
                       ${SCI_BOOST_LIBRARY})
 
-# Register actions
-ADD_LIBRARY_ACTIONS(Application_Viewer
+# Register action classes
+REGISTER_LIBRARY_AND_CLASSES(Application_Viewer
                     ${APPLICATION_VIEW_ACTIONS_SRCS})
                     

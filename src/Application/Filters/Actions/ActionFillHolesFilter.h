@@ -38,7 +38,7 @@ namespace Seg3D
   
 class ActionFillHolesFilter : public Core::Action
 {
-CORE_ACTION( "FillHolesFilter", "FillHoleFilter <layerid> <seedpoints>" );
+CORE_ACTION( "FillHolesFilter|layerid|seedpoints" );
   
   // -- Constructor/Destructor --
 public:

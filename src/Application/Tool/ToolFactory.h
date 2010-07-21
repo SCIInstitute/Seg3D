@@ -217,17 +217,25 @@ private:
 
 } // end namespace seg3D
 
-#define SCI_REGISTER_TOOL(name)\
-void register_tool_##name()\
+#define SCI_REGISTER_TOOL(namesp, name)\
+namespace Core\
 {\
-  ToolFactory::Instance()->register_tool( new ToolBuilder<name>, name::Type(), \
-      name::Properties(), name::MenuName(), name::ShortcutKey() );\
-} 
+  using namespace namesp;\
+  void register_##name()\
+  {\
+    ToolFactory::Instance()->register_tool( new ToolBuilder<name>, name::Type(), \
+        name::Properties(), name::MenuName(), name::ShortcutKey() );\
+  } \
+}
 
-#define SCI_REGISTER_TOOLINTERFACE(name)\
-void register_toolinterface_##name()\
+#define SCI_REGISTER_TOOLINTERFACE(namesp, name)\
+namespace Core\
 {\
-  ToolFactory::Instance()->register_toolinterface( new ToolInterfaceBuilder<name>, #name);\
-} 
+  using namespace namesp;\
+  void register_##name()\
+  {\
+    ToolFactory::Instance()->register_toolinterface( new ToolInterfaceBuilder<name>, #name);\
+  }\
+}
 
 #endif

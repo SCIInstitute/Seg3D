@@ -39,11 +39,10 @@
 #include <Application/Layer/DataLayer.h>
 #include <Application/Layer/MaskLayer.h>
 
+SCI_REGISTER_IMPORTER( Seg3D, NrrdLayerImporter );
+
 namespace Seg3D
 {
-
-SCI_REGISTER_IMPORTER(NrrdLayerImporter);
-
 
 bool NrrdLayerImporter::import_header()
 {
