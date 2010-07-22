@@ -73,14 +73,12 @@ AppPreferences::AppPreferences( QWidget *parent ) :
   this->setup_interface_controls_prefs();
 
   //Hide the interface controls since they arent connected yet
-  this->private_->ui_.prefs_tabs_->removeTab( 3 );
+  this->private_->ui_.prefs_tabs_->removeTab( 2 );
 
   // connect the apply button to the save defaults function
   connect( this->private_->ui_.apply_button_, SIGNAL( clicked() ), 
     this, SLOT( save_defaults() ) );
-  
-  connect( this->private_->auto_save_timer_adjuster_, SIGNAL( valueAdjusted( int ) ),
-    this, SLOT( set_timer_label( int ) ) );
+
 
 }
 
@@ -131,8 +129,7 @@ void AppPreferences::setup_general_prefs()
     PreferencesManager::Instance()->smart_save_state_ );
   QtUtils::QtBridge::Connect( this->private_->auto_save_timer_adjuster_,
     PreferencesManager::Instance()->auto_save_time_state_ );
-//  QtUtils::QtBridge::Connect( this->private_->ui_.compression_combobox_,
-//    PreferencesManager::Instance()->compression_state_ );
+
 }
 
 void AppPreferences::setup_layer_prefs()
@@ -289,13 +286,7 @@ void AppPreferences::hide_the_others( int active )
 void AppPreferences::save_defaults()
 {
   PreferencesManager::Instance()->save_state();
-}
-
-      
-void AppPreferences::set_timer_label( int time_set )
-{
-  QString time_label = QString::number( time_set ) + QString::fromUtf8(" minutes");
-  this->private_->ui_.frequency_label_->setText( time_label );
+  this->close();
 }
 
 

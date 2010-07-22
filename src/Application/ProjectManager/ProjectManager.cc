@@ -29,6 +29,9 @@
 // Boost includes
 #include <boost/lexical_cast.hpp>
 
+// Interface includes
+#include <Application/StatusBar/StatusBar.h>
+
 // Application includes
 #include <Application/ProjectManager/ProjectManager.h>
 #include <Application/ProjectManager/AutoSave.h>
@@ -96,11 +99,13 @@ void ProjectManager::save_projectmanager_state()
   
 void ProjectManager::rename_project_folder( const std::string& new_name, Core::ActionSource source )
 {
+  // return if rename gets called while we are in the middle of changing a project
   if( changing_projects_ )
   {
     return;
   }
 
+  // If this is the first time the name has been set, then we set it, and return
   if( !this->current_project_->name_status() )
   {
     this->current_project_->name_is_set( true );
@@ -110,14 +115,17 @@ void ProjectManager::rename_project_folder( const std::string& new_name, Core::A
   std::vector< std::string > old_name_vector = 
     Core::SplitString( this->recent_projects_state_->get()[ 0 ], "|" );
   
+  // If the vector made from the old name, is less than 2, then we return
   if( old_name_vector.size() < 2 )
     return;
 
   std::string old_name = old_name_vector[ 1 ];
 
+  // If the new name is the same as the old name we return
   if( old_name == new_name )
     return;
   
+  // If the old name is empty then something is wrong and we return
   if( old_name == "" )
   {
     return;
@@ -162,6 +170,10 @@ void ProjectManager::rename_project_folder( const std::string& new_name, Core::A
     this->current_project_->populate_session_states();
     this->add_to_recent_projects( this->current_project_path_state_->get(), new_name );
   }
+  
+  StatusBar::Instance()->set_message( Core::LogMessageType::MESSAGE_E, 
+    "The project name has been successfully changed to: '" + new_name  + "'" );
+  
 }
 
 void ProjectManager::new_project( const std::string& project_name, const std::string& project_path )
@@ -189,6 +201,9 @@ void ProjectManager::new_project( const std::string& project_name, const std::st
   }
 
   this->changing_projects_ = false;
+  
+  this->set_last_saved_session_time_stamp();
+  AutoSave::Instance()->recompute_auto_save();
 }
   
 void ProjectManager::open_project( const std::string& project_path )
@@ -202,6 +217,14 @@ void ProjectManager::open_project( const std::string& project_path )
 
   this->set_last_saved_session_time_stamp();
   this->changing_projects_ = false;
+
+  StatusBar::Instance()->set_message( Core::LogMessageType::MESSAGE_E, 
+     "Project: '" + this->current_project_->project_name_state_->get()
+     + "' has been successfully opened." );
+  
+  this->set_last_saved_session_time_stamp();
+  AutoSave::Instance()->recompute_auto_save();
+  
 }
   
 void ProjectManager::save_project( bool autosave /*= false*/ )
@@ -212,6 +235,20 @@ void ProjectManager::save_project( bool autosave /*= false*/ )
     this->save_project_only();
   }
   this->session_saving_ = false;
+  
+  if( autosave )
+  {
+    StatusBar::Instance()->set_message( Core::LogMessageType::MESSAGE_E, 
+      "Autosave completed successfully for project: '" 
+      +  this->current_project_->project_name_state_->get() + "'" );
+  }
+  else
+  {
+    StatusBar::Instance()->set_message( Core::LogMessageType::MESSAGE_E, 
+      "Project: '" + this->current_project_->project_name_state_->get() 
+      + "' has been successfully saved" );
+  }
+
 }
   
 void ProjectManager::save_project_as()

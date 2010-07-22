@@ -88,10 +88,6 @@ private Q_SLOTS:
   // loaded next time the program starts
   void save_defaults();
   
-  // SET_TIMER_LABEL:
-  // This function is called when the slider is updated and it shows the actual value of the slider
-  void set_timer_label( int );
-  
 private:
   boost::shared_ptr< AppPreferencesPrivate > private_;
   ColorPickerWidget* active_picker_;

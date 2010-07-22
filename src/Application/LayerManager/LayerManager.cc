@@ -46,6 +46,7 @@
 
 // Application action includes
 #include <Application/LayerManager/LayerManager.h>
+#include <Application/ProjectManager/ProjectManager.h>
 
 
 namespace Seg3D
@@ -632,7 +633,8 @@ bool LayerManager::post_save_states()
       return false;
     }
   }
-  return Core::MaskDataBlockManager::Instance()->save_data_blocks();
+  return Core::MaskDataBlockManager::Instance()->save_data_blocks( 
+    Seg3D::ProjectManager::Instance()->get_project_data_path() );
 } 
   
 bool LayerManager::pre_load_states()

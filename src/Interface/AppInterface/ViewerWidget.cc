@@ -96,10 +96,16 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
   this->private_->picking_button_->setFixedHeight( 20 );
   this->private_->picking_button_->setFixedWidth( 20 );
   
+  this->private_->picking_button_->setMinimumHeight( 20 );
+  this->private_->picking_button_->setMinimumWidth( 20 );
+  this->private_->picking_button_->setMaximumHeight( 20 );
+  this->private_->picking_button_->setMaximumWidth( 20 );
+  
+  
   this->private_->ui_.less_common_tools_layout_->insertWidget( 0, this->private_->picking_button_ );
   
   // Setup the widget so for a small size it can be broken into two
-  this->private_->minimum_toolbar_width_ = 300;
+  this->private_->minimum_toolbar_width_ = 245;
   this->private_->initialized_size_ = false;
   this->private_->ui_.buttonbar_->setMinimumSize( QSize( 170, 0 ) );
   this->private_->ui_.button_layout_->setStretchFactor( this->private_->ui_.common_tools_, 0 );

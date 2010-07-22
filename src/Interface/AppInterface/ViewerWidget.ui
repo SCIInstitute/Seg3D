@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>427</width>
+    <width>316</width>
     <height>279</height>
    </rect>
   </property>
@@ -166,7 +166,7 @@ QComboBox::icon{
            </property>
            <layout class="QHBoxLayout" name="button_layout_">
             <property name="spacing">
-             <number>10</number>
+             <number>0</number>
             </property>
             <property name="margin">
              <number>0</number>
@@ -195,7 +195,16 @@ QComboBox::icon{
                <property name="spacing">
                 <number>0</number>
                </property>
-               <property name="margin">
+               <property name="leftMargin">
+                <number>1</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>1</number>
+               </property>
+               <property name="bottomMargin">
                 <number>0</number>
                </property>
                <item>
@@ -625,12 +634,21 @@ QComboBox::icon{
               </property>
               <layout class="QHBoxLayout" name="common_tools_layout_">
                <property name="spacing">
-                <number>0</number>
+                <number>1</number>
                </property>
                <property name="sizeConstraint">
                 <enum>QLayout::SetMinimumSize</enum>
                </property>
-               <property name="margin">
+               <property name="leftMargin">
+                <number>1</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>1</number>
+               </property>
+               <property name="bottomMargin">
                 <number>0</number>
                </property>
                <item>
@@ -765,9 +783,18 @@ QComboBox::icon{
              <widget class="QWidget" name="less_common_tools_" native="true">
               <layout class="QHBoxLayout" name="less_common_tools_layout_">
                <property name="spacing">
+                <number>1</number>
+               </property>
+               <property name="leftMargin">
+                <number>1</number>
+               </property>
+               <property name="topMargin">
                 <number>0</number>
                </property>
-               <property name="margin">
+               <property name="rightMargin">
+                <number>1</number>
+               </property>
+               <property name="bottomMargin">
                 <number>0</number>
                </property>
                <item>

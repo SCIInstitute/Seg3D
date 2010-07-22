@@ -72,7 +72,7 @@ public:
   Core::StateBoolHandle auto_save_state_;
   Core::StateRangedIntHandle auto_save_time_state_;
   Core::StateBoolHandle smart_save_state_;
-  Core::StateOptionHandle compression_state_;
+  //Core::StateOptionHandle compression_state_;
   
   //Viewers Preferences
   Core::StateOptionHandle default_viewer_mode_state_;

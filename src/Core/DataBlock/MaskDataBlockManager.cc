@@ -32,11 +32,11 @@
 
 #include <bitset>
 
+// Core includes
 #include <Core/DataBlock/MaskDataBlockManager.h>
 #include <Core/DataBlock/StdDataBlock.h>
 #include <Core/DataBlock/NrrdData.h>
-
-#include <Application/ProjectManager/ProjectManager.h>
+#include <Core/Utils/Log.h>
 
 
 namespace Core
@@ -233,7 +233,7 @@ void MaskDataBlockManager::register_data_block( DataBlockHandle data_block,
   this->private_->mask_list_.push_back( MaskDataBlockEntry( data_block, grid_transform ) );
 }
 
-bool MaskDataBlockManager::save_data_blocks()
+bool MaskDataBlockManager::save_data_blocks( boost::filesystem::path data_save_path )
 {
   lock_type lock( get_mutex() );
 
@@ -241,8 +241,8 @@ bool MaskDataBlockManager::save_data_blocks()
 
   for ( size_t j = 0 ; j < mask_list.size() ; j++ )
   {
-    boost::filesystem::path volume_path = Seg3D::ProjectManager::Instance()->
-      get_project_data_path() / ( Core::ExportToString( mask_list[ j ].data_block_->
+    boost::filesystem::path volume_path = data_save_path / 
+      ( Core::ExportToString( mask_list[ j ].data_block_->
       get_generation() ) + ".nrrd" );
 
     NrrdDataHandle nrrd = NrrdDataHandle( new NrrdData( 

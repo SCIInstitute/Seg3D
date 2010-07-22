@@ -116,6 +116,7 @@ void DataManager::prep_for_save( boost::filesystem::path project_path, const std
           break;
         }
       }
+      // now we delete the .nrrd files that aren't in use in any of the sessions
       if ( !found )
       {
         try 
@@ -133,7 +134,6 @@ void DataManager::prep_for_save( boost::filesystem::path project_path, const std
   
 void DataManager::remove_session( const std::string& session_name )
 {
-  int x = 0;
   lock_type lock( this->get_mutex() );
   std::vector< std::string > sessions_and_data = this->sessions_and_datafiles_state_->get();
   

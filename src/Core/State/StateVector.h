@@ -34,6 +34,7 @@
 #endif
 
 #include <algorithm>
+#include <vector>
 
 // boost includes
 #include <boost/smart_ptr.hpp>
@@ -42,6 +43,8 @@
 #include <Core/Utils/StringUtil.h>
 #include <Core/State/StateBase.h>
 #include <Core/State/StateEngine.h>
+#include <Core/Geometry/Color.h>
+#include <Core/Geometry/Point.h>
 
 namespace Core
 {
@@ -60,11 +63,11 @@ class StateVector;
 
 // Predefine the StateVector instantiation that are used in Seg3D 
 
-class Point;
+//class Point;
 typedef StateVector< Point > StatePointVector;
 typedef boost::shared_ptr< StatePointVector > StatePointVectorHandle;
   
-class Color;
+//class Color;
 typedef StateVector< Color > StateColorVector;
 typedef boost::shared_ptr< StateColorVector > StateColorVectorHandle;
 
