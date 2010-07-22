@@ -86,6 +86,12 @@ bool Project::initialize_from_file( boost::filesystem::path project_path,
   return false;
 }
   
+//  bool Project::load_session( boost::filesystem::path project_path, const std::string& session_name )
+//  {
+//    boost::filesystem::path session_path = project_path / "sessions";
+//    return  this->current_session_->initialize_from_file( session_path, session_name );
+//  }
+  
 bool Project::load_session( boost::filesystem::path project_path, int state_index )
 {
   std::vector< std::string > session = 
@@ -114,7 +120,40 @@ bool Project::save_session( boost::filesystem::path project_path, const std::str
   return false;
 
 }
-  
+
+//bool Project::delete_session( boost::filesystem::path project_path, const std::string& session_name )
+//{
+//  boost::filesystem::path session_path = project_path / "sessions";
+//  session_path = session_path / ( session_name + ".xml" );
+//  
+//  std::vector< std::string > temp_sessions_vector = this->sessions_state_->get();
+//  
+//  for( int i = 0; i < static_cast< int >( temp_sessions_vector.size() ); ++i )
+//  {
+//    if( Core::SplitString( temp_sessions_vector, "|" )[ 1 ] == session_name )
+//    {
+//      temp_sessions_vector.erase( temp_sessions_vector.begin() + i );
+//    }
+//  }
+//  
+//  this->sessions_state_->set( temp_sessions_vector );
+//  
+//  try 
+//  {
+//    boost::filesystem::remove_all( session_path );
+//  }
+//  catch(  std::exception& e ) 
+//  {
+//    CORE_LOG_ERROR( e.what() );
+//    return false;
+//  }
+//  
+//  this->data_manager_->remove_session( session_name );
+//  
+//  this->export_states( project_path, this->project_name_state_->get(), true );
+//  return true;
+//} 
+
 bool Project::delete_session( boost::filesystem::path project_path, int state_index )
 {
   boost::filesystem::path session_path = project_path / "sessions";

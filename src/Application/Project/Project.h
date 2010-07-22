@@ -92,6 +92,7 @@ public:
   // LOAD_SESSION:
   // this function will be called to load a specific session
   bool load_session( boost::filesystem::path project_path, int state_index );
+//  bool load_session( boost::filesystem::path project_path, const std::string& session_name );
   
   // SAVE_SESSION:
   // this function will be called from the project manager to save a session
@@ -100,6 +101,7 @@ public:
   // DELETE_SESSION:
   // this function will be called by the project manager to delete a session
   bool delete_session( boost::filesystem::path project_path, int state_index );
+//  bool delete_session( boost::filesystem::path project_path, const std::string& session_name );
   
   // NAME_IS_SET:
   // this function is set called to set the name_set_ toggle in the project so it knows if the name

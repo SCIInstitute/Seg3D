@@ -163,6 +163,9 @@ void ProjectDockWidget::load_session()
         if( QString::fromStdString( ( Core::SplitString( sessions[ i ], "|" ) )[ 1 ] ) == 
            this->private_->ui_.sessions_list_->currentItem()->text() )
         {
+          // Code for sending session name to action instead of index
+//          ActionLoadSession::Dispatch( Core::Interface::GetWidgetActionContext(), 
+//            this->private_->ui_.sessions_list_->currentItem()->text() );
           ActionLoadSession::Dispatch( Core::Interface::GetWidgetActionContext(), i );
           break;
         }
@@ -193,6 +196,9 @@ void ProjectDockWidget::delete_session()
         if( QString::fromStdString( ( Core::SplitString( sessions[ i ], "|" ) )[ 1 ] ) == 
           this->private_->ui_.sessions_list_->currentItem()->text() )
         {
+          // Code for sending session name to action instead of index
+//          ActionDeleteSession::Dispatch( Core::Interface::GetWidgetActionContext(), 
+//            this->private_->ui_.sessions_list_->currentItem()->text() );
           ActionDeleteSession::Dispatch( Core::Interface::GetWidgetActionContext(), i );  
           break;
         }

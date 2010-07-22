@@ -291,6 +291,22 @@ bool ProjectManager::save_project_session( bool autosave /*= false */ )
 
 }
   
+//bool ProjectManager::load_project_session( const std::string& session_name )
+//{
+//  boost::filesystem::path path = complete( boost::filesystem::path( this->
+//    current_project_path_state_->get().c_str(), boost::filesystem::native ) );
+//  
+//  bool result =  this->current_project_->load_session( ( path /
+//    this->current_project_->project_name_state_->get() ), session_name );
+//  
+//  if( result )
+//  {
+//    this->set_last_saved_session_time_stamp();
+//  }
+//  
+//  return result;
+//}
+  
 
 bool ProjectManager::load_project_session( int session_index )
 {
@@ -307,6 +323,15 @@ bool ProjectManager::load_project_session( int session_index )
 
   return result;
 }
+  
+//bool ProjectManager::delete_project_session( const std::string& session_name )
+//{
+//  boost::filesystem::path path = complete( boost::filesystem::path( this->
+//    current_project_path_state_->get().c_str(), boost::filesystem::native ) );
+//  
+//  return this->current_project_->delete_session( ( path /
+//    this->current_project_->project_name_state_->get() ), session_name );
+//}
   
 bool ProjectManager::delete_project_session( int session_index )
 {

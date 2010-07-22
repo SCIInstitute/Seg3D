@@ -98,10 +98,12 @@ public:
   // LOAD_PROJECT_SESSION:
   // this function saves the current session to disk
   bool load_project_session( int session_index ); 
+//  bool load_project_session( const std::string& session_name );
   
   // DELETE_PROJECT_SESSION:
   // this function deletes the current session from disk
-  bool delete_project_session( int session_index ); 
+  bool delete_project_session( int session_index );
+//  bool delete_project_session( const std::string& session_name );
 
   // SAVE_NOTE:
   // this function saves a note
