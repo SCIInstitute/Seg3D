@@ -197,12 +197,10 @@ private:
   // Auto orient the 3D view for the given slice
   void auto_orient( Core::VolumeSliceHandle target_slice );
 
-  void redraw( bool delay_update = false );
-
 public:
+  void redraw( bool delay_update = false );
   void redraw_overlay( bool delay_update = false );
     
-
 private:
   friend class ActionOffsetSlice;
 

@@ -46,7 +46,7 @@
     <number>4</number>
    </property>
    <item>
-    <layout class="QHBoxLayout" name="activeHLayout" stretch="1">
+    <layout class="QHBoxLayout" name="activeHLayout" stretch="0,0">
      <property name="spacing">
       <number>4</number>
      </property>
@@ -68,6 +68,9 @@
         <string>Target:</string>
        </property>
       </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="target_"/>
      </item>
     </layout>
    </item>

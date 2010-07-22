@@ -76,7 +76,14 @@ SET(APPLICATION_TOOLS_SRCS
   ThresholdSegmentationLSFilter.cc
   )
 
-CORE_ADD_LIBRARY(Application_Tools ${APPLICATION_TOOLS_SRCS} )
+SET(APPLICATION_TOOLS_NOREGISTER_SRCS
+  SeedPointsTool.h
+  SeedPointsTool.cc
+  )
+  
+CORE_ADD_LIBRARY(Application_Tools 
+                 ${APPLICATION_TOOLS_SRCS}
+                 ${APPLICATION_TOOLS_NOREGISTER_SRCS})
             
 TARGET_LINK_LIBRARIES(Application_Tools
                       Core_Utils

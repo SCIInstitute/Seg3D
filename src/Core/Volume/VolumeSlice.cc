@@ -265,22 +265,31 @@ void VolumeSlice::get_world_coord( double i_pos, double j_pos, Point& world_coor
   }
 }
 
-void VolumeSlice::move_slice_to( const Point& pos, bool fail_safe )
+void VolumeSlice::project_onto_slice( const Point& pt, double& i_pos, double& j_pos ) const
 {
-  Point index = this->volume_->apply_inverse_grid_transform( pos );
-  int slice_num = -1;
   switch ( this->slice_type_ )
   {
   case VolumeSliceType::AXIAL_E:
-    slice_num = Round( index.z() );
+    i_pos = pt[ 0 ];
+    j_pos = pt[ 1 ];
     break;
   case VolumeSliceType::CORONAL_E:
-    slice_num = Round( index.y() );
+    i_pos = pt[ 0 ];
+    j_pos = pt[ 2 ];
     break;
   case VolumeSliceType::SAGITTAL_E:
-    slice_num = Round( index.x() );
+    i_pos = pt[ 1 ];
+    j_pos = pt[ 2 ];
     break;
-  }
+  default:
+    assert( false );
+    break;
+  } 
+}
+
+void VolumeSlice::move_slice_to( const Point& pos, bool fail_safe )
+{
+  int slice_num = this->get_closest_slice( pos );
 
   if ( ( slice_num < 0 || slice_num >= static_cast< int >( this->number_of_slices_ ) ) && 
      !fail_safe )
@@ -297,21 +306,41 @@ void VolumeSlice::move_slice_to( const Point& pos, bool fail_safe )
 
 void VolumeSlice::move_slice_to( double depth, bool fail_safe )
 {
-  Point index;
+  Point pos;
   switch ( this->slice_type_ )
   {
   case VolumeSliceType::AXIAL_E:
-    index = Point( 0, 0, depth );
+    pos = Point( 0, 0, depth );
     break;
   case VolumeSliceType::CORONAL_E:
-    index = Point( 0, depth, 0 );
+    pos = Point( 0, depth, 0 );
     break;
   case VolumeSliceType::SAGITTAL_E:
-    index = Point( depth, 0, 0 );
+    pos = Point( depth, 0, 0 );
     break;
   }
 
-  this->move_slice_to( index, fail_safe );
+  this->move_slice_to( pos, fail_safe );
+}
+
+int VolumeSlice::get_closest_slice( const Point& pt ) const
+{
+  Point index = this->volume_->apply_inverse_grid_transform( pt );
+  int slice_num = -1;
+  switch ( this->slice_type_ )
+  {
+  case VolumeSliceType::AXIAL_E:
+    slice_num = Round( index.z() );
+    break;
+  case VolumeSliceType::CORONAL_E:
+    slice_num = Round( index.y() );
+    break;
+  case VolumeSliceType::SAGITTAL_E:
+    slice_num = Round( index.x() );
+    break;
+  }
+
+  return slice_num;
 }
 
 } // end namespace Core

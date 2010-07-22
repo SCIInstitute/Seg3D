@@ -49,7 +49,6 @@ class ConnectedComponentFilterInterfacePrivate
 {
 public:
   Ui::ConnectedComponentFilterInterface ui_;
-  TargetComboBox *target_;
 };
 
 // constructor
@@ -69,20 +68,15 @@ bool ConnectedComponentFilterInterface::build_widget( QFrame* frame )
   //Step 1 - build the Qt GUI Widget
   this->private_->ui_.setupUi( frame );
   
-    this->private_->target_ = new TargetComboBox( this );
-    this->private_->ui_.activeHLayout->addWidget( this->private_->target_ );
-
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
   ConnectedComponentFilter* tool = dynamic_cast< ConnectedComponentFilter* > ( base_tool_.get() );
 
     //Step 3 - connect the gui to the tool through the QtBridge
-  QtUtils::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
-  connect( this->private_->target_, SIGNAL( valid( bool ) ), this, SLOT( enable_run_filter( bool ) ) );
+  QtUtils::QtBridge::Connect( this->private_->ui_.target_, tool->target_layer_state_ );
   
   connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), this, SLOT( execute_filter() ) );
   
-  this->private_->target_->sync_layers();
 
   //Send a message to the log that we have finised with building the Connected Component Filter Interface
   CORE_LOG_DEBUG("Finished building a Connected Component Filter Interface");

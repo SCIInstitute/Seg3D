@@ -26,40 +26,44 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_TOOLS_CONNECTEDCOMPONENTFILTER_H
-#define APPLICATION_TOOLS_CONNECTEDCOMPONENTFILTER_H
+#ifndef APPLICATION_TOOLS_SEEDPOINTSTOOL_H
+#define APPLICATION_TOOLS_SEEDPOINTSTOOL_H
 
-#include <Core/State/StateLabeledOption.h>
+#include <Core/Geometry/Point.h>
+#include <Core/State/StateVector.h>
 
-#include <Application/Tools/SeedPointsTool.h>
+#include <Application/Tool/Tool.h>
 
 namespace Seg3D
 {
 
-class ConnectedComponentFilter : public SeedPointsTool
+class SeedPointsToolPrivate;
+typedef boost::shared_ptr< SeedPointsToolPrivate > SeedPointsToolPrivateHandle;
+
+class SeedPointsTool : public Tool
 {
-SCI_TOOL_TYPE( "ConnectedComponentFilter", "Connected Component", "Alt+C",
-  ToolGroupType::MASKTOMASK_E|ToolGroupType::FILTER_E,
-  "http://seg3d.org/")
+public:
+   SeedPointsTool( const std::string& toolid, size_t version_number, bool auto_number = true );
+   virtual ~SeedPointsTool() = 0;
 
 public:
-  ConnectedComponentFilter( const std::string& toolid, bool auto_number = true );
-  virtual ~ConnectedComponentFilter();
+  virtual bool handle_mouse_enter( size_t viewer_id, int x, int y );
+  virtual bool handle_mouse_leave( size_t viewer_id );
+  virtual bool handle_mouse_press( const Core::MouseHistory& mouse_history, 
+    int button, int buttons, int modifiers );
 
+  // REDRAW:
+  // Draw seed points in the specified viewer.
+  // The function should only be called by the renderer, which has a valid GL context.
+  virtual void redraw( size_t viewer_id, const Core::Matrix& proj_mat );
 
-  // -- activate/deactivate tool --
-  virtual void activate();
-  virtual void deactivate();
-  
+public:
+  Core::StatePointVectorHandle seed_points_state_;
+  Core::StateLabeledOptionHandle target_layer_state_;
+
 private:
-  // -- handle updates from layermanager --
-  void handle_layers_changed();
-
-private:
-  const static size_t VERSION_NUMBER_C;
-
+  SeedPointsToolPrivateHandle private_;
 };
 
-} // end namespace
-
+} // end namespace Seg3D
 #endif

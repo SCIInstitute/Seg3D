@@ -33,18 +33,22 @@
 # pragma once
 #endif
 
+#include <algorithm>
+
 // boost includes
 #include <boost/smart_ptr.hpp>
 
 // Core includes
 #include <Core/Utils/StringUtil.h>
-
-// Application includes
 #include <Core/State/StateBase.h>
 #include <Core/State/StateEngine.h>
 
 namespace Core
 {
+
+class StateVectorBase;
+typedef boost::shared_ptr< StateVectorBase > StateVectorBaseHandle;
+typedef boost::weak_ptr< StateVectorBase > StateVectorBaseWeakHandle;
 
 // STATEVECTOR:
 // This class is a specification of State that is used to hold a single unbound
@@ -56,10 +60,12 @@ class StateVector;
 
 // Predefine the StateVector instantiation that are used in Seg3D 
 
-typedef StateVector< Core::Point > StatePointVector;
+class Point;
+typedef StateVector< Point > StatePointVector;
 typedef boost::shared_ptr< StatePointVector > StatePointVectorHandle;
   
-typedef StateVector< Core::Color > StateColorVector;
+class Color;
+typedef StateVector< Color > StateColorVector;
 typedef boost::shared_ptr< StateColorVector > StateColorVectorHandle;
 
 typedef StateVector< bool > StateBoolVector;
@@ -71,9 +77,33 @@ typedef boost::shared_ptr< StateDoubleVector > StateDoubleVectorHandle;
 typedef StateVector< std::string > StateStringVector;
 typedef boost::shared_ptr< StateStringVector > StateStringVectorHandle;
 
+class StateVectorBase : public StateBase
+{
+public:
+  StateVectorBase( const std::string& stateid ) :
+    StateBase( stateid )
+  {
+  }
+
+  virtual ~StateVectorBase() {}
+
+protected:
+  friend class ActionAdd;
+  friend class ActionRemove;
+
+  virtual bool add( ActionParameterVariant& variant, 
+    Core::ActionSource source = Core::ActionSource::NONE_E ) = 0;
+
+  virtual bool remove( ActionParameterVariant& variant, 
+    Core::ActionSource source = Core::ActionSource::NONE_E ) = 0;
+
+  virtual bool validate_element_variant( ActionParameterVariant& variant, 
+    std::string& error ) = 0;
+};
+
 
 template< class T >
-class StateVector : public StateBase
+class StateVector : public StateVectorBase
 {
   // -- type definitions --
 public:
@@ -84,8 +114,13 @@ public:
 public:
   // CONSTRUCTOR
   StateVector( const std::string& stateid, const std::vector< T >& default_value ) :
-    StateBase( stateid ),
+    StateVectorBase( stateid ),
     values_vector_( default_value )
+  {
+  }
+
+  StateVector( const std::string& stateid ) :
+    StateVectorBase( stateid )
   {
   }
 
@@ -130,6 +165,40 @@ protected:
     std::vector<T> value;
     if ( !( variant.get_value( value ) ) ) return false;
     return this->set( value, source );  
+  }
+
+  virtual bool add( ActionParameterVariant& variant, 
+    Core::ActionSource source = Core::ActionSource::NONE_E )
+  {
+    T element_value;
+    if ( !variant.get_value( element_value ) )
+    {
+      return false;
+    }
+    return this->add( element_value, source );
+  }
+
+  virtual bool remove( ActionParameterVariant& variant, 
+    Core::ActionSource source = Core::ActionSource::NONE_E )
+  {
+    T element_value;
+    if ( !variant.get_value( element_value ) )
+    {
+      return false;
+    }
+    return this->remove( element_value, source );
+  }
+
+  virtual bool validate_element_variant( ActionParameterVariant& variant, 
+    std::string& error )
+  {
+    if ( !variant.validate_type< T >() )
+    {
+      error = "Cannot convert the value '" + variant.export_to_string() + "'";
+      return false;
+    }
+    error = "";
+    return true;
   }
 
   // VALIDATE_VARIANT:
@@ -177,6 +246,44 @@ public:
       }
     }
     return true;
+  }
+
+  bool add( const T& value, ActionSource source = ActionSource::NONE_E )
+  {
+    {
+      StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
+      this->values_vector_.push_back( value );
+    }
+
+    if ( this->signals_enabled() )
+    {
+      this->value_changed_signal_( this->values_vector_, source );
+      this->state_changed_signal_();
+    }
+
+    return true;
+  }
+
+  bool remove( const T& value, ActionSource source = ActionSource::NONE_E )
+  {
+    bool removed = false;
+    {
+      StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
+      value_type::iterator it = std::find( this->values_vector_.begin(), 
+        this->values_vector_.end(), value );
+      if ( it != this->values_vector_.end() )
+      {
+        this->values_vector_.erase( it );
+        removed = true;
+      } 
+    }
+
+    if ( removed && this->signals_enabled() )
+    {
+      this->value_changed_signal_( this->values_vector_, source );
+      this->state_changed_signal_();
+    }
+    return removed;
   }
 
   // -- signals describing the state --

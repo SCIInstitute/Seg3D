@@ -179,6 +179,7 @@ bool ImportFromString( const std::string& str, std::vector< Point >& value )
   size_t num_values = values.size() / 3;
   if ( values.size() == num_values * 3 )
   {
+    value.resize( num_values );
     for ( size_t j = 0; j < num_values; j++ )
     {
       size_t offset = j * 3;
@@ -197,6 +198,7 @@ bool ImportFromString( const std::string& str, std::vector< PointF >& value )
   size_t num_values = values.size() / 3;
   if ( values.size() == num_values * 3 )
   {
+    value.resize( num_values );
     for ( size_t j = 0; j < num_values; j++ )
     {
       size_t offset = j * 3;

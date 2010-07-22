@@ -74,6 +74,10 @@ SET(CORE_STATE_ACTIONS_SRCS
   Actions/ActionFlip.cc
   Actions/ActionSetRange.h
   Actions/ActionSetRange.cc
+  Actions/ActionAdd.h
+  Actions/ActionAdd.cc
+  Actions/ActionRemove.h
+  Actions/ActionRemove.cc
   )
 
 CORE_ADD_LIBRARY(Core_State ${CORE_STATE_SRCS} ${CORE_STATE_ACTIONS_SRCS} )

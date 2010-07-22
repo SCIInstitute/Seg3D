@@ -107,6 +107,12 @@ public:
   // Get the 3D world coordinate of the point
   void get_world_coord( double i_pos, double j_pos, Point& world_coord ) const;
 
+  // Project a point in 3D space onto the plane of the slice.
+  void project_onto_slice( const Point& pt, double& i_pos, double& j_pos ) const;
+
+  // Return the slice number that's closest to the point in 3D space.
+  int get_closest_slice( const Point& pt ) const;
+
   // Move the slice to closely match the given point in world space.
   // Returns true if slice is moved, otherwise false.
   void move_slice_to( const Point& pos, bool fail_safe = false );

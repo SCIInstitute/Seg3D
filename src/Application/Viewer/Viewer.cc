@@ -271,14 +271,17 @@ bool Viewer::wheel_event( int delta, int x, int y, int buttons, int modifiers )
     }
   }
 
-  ActionOffsetSlice::Dispatch( Core::Interface::GetMouseActionContext(),
-    this->shared_from_this(), -delta );
+  if ( delta != 0 )
+  {
+    ActionOffsetSlice::Dispatch( Core::Interface::GetMouseActionContext(),
+      this->shared_from_this(), -delta );
 
-  // Update the status bar display.
-  // 'update_status_bar' reposts itself to the application thread, so it's guaranteed that 
-  // by the time it actually runs, the slice number has been updated.
-  this->update_status_bar( x, y );
-  
+    // Update the status bar display.
+    // 'update_status_bar' reposts itself to the application thread, so it's guaranteed that 
+    // by the time it actually runs, the slice number has been updated.
+    this->update_status_bar( x, y );
+  }
+    
   return true;
 }
 
@@ -1218,6 +1221,8 @@ Core::VolumeSliceHandle Viewer::get_active_layer_slice() const
 
 void Viewer::window_to_world( int x, int y, double& world_x, double& world_y )
 {
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
   if ( this->is_volume_view() )
   {
     CORE_THROW_LOGICERROR( "Viewer is in volume mode");

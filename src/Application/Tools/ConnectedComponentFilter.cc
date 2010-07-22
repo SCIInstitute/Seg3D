@@ -27,6 +27,7 @@
  */
 
 // Application includes
+#include <Application/Layer/LayerFWD.h>
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/ConnectedComponentFilter.h>
 #include <Application/LayerManager/LayerManager.h>
@@ -40,57 +41,28 @@ namespace Seg3D
 const size_t ConnectedComponentFilter::VERSION_NUMBER_C = 1;
   
 ConnectedComponentFilter::ConnectedComponentFilter( const std::string& toolid, bool auto_number ) :
-  Tool( toolid, VERSION_NUMBER_C, auto_number )
+  SeedPointsTool( toolid, VERSION_NUMBER_C, auto_number )
 {
-  // Need to set ranges and default values for all parameters
-  add_state("target", this->target_layer_state_,"<none>" );
+  std::vector< LayerIDNamePair > empty_names( 1, 
+    std::make_pair( Tool::NONE_OPTION_C, Tool::NONE_OPTION_C ) );
   
   this->handle_layers_changed();
-
-  // Add constaints, so that when the state changes the right ranges of 
-  // parameters are selected
-  this->add_connection ( this->target_layer_state_->value_changed_signal_.connect(
-    boost::bind( &ConnectedComponentFilter::target_constraint,this,_1 ) ) );
-    
-    
+      
   this->add_connection ( LayerManager::Instance()->layers_changed_signal_.connect(
     boost::bind( &ConnectedComponentFilter::handle_layers_changed, this ) ) );
 }
 
 ConnectedComponentFilter::~ConnectedComponentFilter()
 { 
-  disconnect_all();
+  this->disconnect_all();
 }
 
 void ConnectedComponentFilter::handle_layers_changed()
 {
-  std::vector< LayerHandle > target_layers;
-  LayerManager::Instance()->get_layers( target_layers );
-  bool target_found = false;
-  
-  for( int i = 0; i < static_cast< int >( target_layers.size() ); ++i )
-  {
-    if( ( this->target_layer_state_->get() == "<none>" ) && ( target_layers[i]->type() == 
-                                 Core::VolumeType::DATA_E ) )
-    {
-      this->target_layer_state_->set( target_layers[i]->get_layer_name(), Core::ActionSource::NONE_E );
-      target_found = true;
-      break;
-    }
-    if( target_layers[i]->get_layer_name() == this->target_layer_state_->get() ) {
-      target_found = true;
-      break;
-    }
-  }
-  
-  if( !target_found )
-    this->target_layer_state_->set( "", Core::ActionSource::NONE_E );
-  
-}
-  
-  
-void ConnectedComponentFilter::target_constraint( std::string layerid )
-{
+  std::vector< LayerIDNamePair > layer_names( 1, 
+    std::make_pair( Tool::NONE_OPTION_C, Tool::NONE_OPTION_C ) );
+  LayerManager::Instance()->get_layer_names( layer_names, Core::VolumeType::DATA_E );
+  this->target_layer_state_->set_option_list( layer_names );
 }
 
 void ConnectedComponentFilter::activate()
