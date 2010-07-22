@@ -61,20 +61,6 @@ DataVolumeSlice::~DataVolumeSlice()
   this->disconnect_all();
 }
 
-void DataVolumeSlice::initialize_texture()
-{
-  if ( !this->texture_ )
-  {
-    internal_lock_type lock( this->internal_mutex_ );
-    if ( !this->texture_ )
-    {
-      this->texture_ = Texture2DHandle( new Texture2D );
-      this->texture_->set_mag_filter( GL_NEAREST );
-      this->texture_->set_min_filter( GL_NEAREST );
-    }
-  }
-}
-
 template<class DATA1, class DATA2>
 void CopyTypedData( DataVolumeSlice* slice, DATA1* buffer )
 {
@@ -109,7 +95,6 @@ void CopyTypedData( DataVolumeSlice* slice, DATA1* buffer )
     row_start += y_stride;
   }
 }
-
 
 void DataVolumeSlice::upload_texture()
 {
@@ -197,6 +182,11 @@ void DataVolumeSlice::upload_texture()
   glFinish();
 
   this->slice_changed_ = false;
+}
+
+VolumeSliceHandle DataVolumeSlice::clone()
+{
+  return VolumeSliceHandle( new DataVolumeSlice( *this ) );
 }
 
 } // end namespace Core

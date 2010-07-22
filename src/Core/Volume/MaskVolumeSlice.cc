@@ -64,21 +64,6 @@ MaskVolumeSlice::~MaskVolumeSlice()
   this->disconnect_all();
 }
 
-void MaskVolumeSlice::initialize_texture()
-{
-  if ( !this->texture_ )
-  {
-    internal_lock_type lock( this->internal_mutex_ );
-    if ( !this->texture_ )
-    {
-      this->texture_ = Texture2DHandle( new Texture2D );
-      // It doesn't make sense to use linear interpolation for mask texture
-      this->texture_->set_mag_filter( GL_NEAREST );
-      this->texture_->set_min_filter( GL_NEAREST );
-    }
-  }
-}
-
 static void CopyMaskData( const MaskVolumeSlice* slice, unsigned char* buffer )
 {
   size_t current_index = slice->to_index( 0, 0 );
@@ -167,6 +152,11 @@ void MaskVolumeSlice::upload_texture()
   }
 
   this->slice_changed_ = false;
+}
+
+VolumeSliceHandle MaskVolumeSlice::clone()
+{
+  return VolumeSliceHandle( new MaskVolumeSlice( *this ) );
 }
 
 MaskDataBlockHandle MaskVolumeSlice::get_mask_data_block() const

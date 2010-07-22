@@ -173,11 +173,7 @@ void Viewer::mouse_move_event( const Core::MouseHistory& mouse_history, int butt
     }
   }
 
-  if ( buttons == Core::MouseButton::NO_BUTTON_E )
-  {
-    this->update_status_bar( mouse_history.current_.x_, mouse_history.current_.y_ );
-    return;
-  }
+  this->update_status_bar( mouse_history.current_.x_, mouse_history.current_.y_ );
 
   if ( this->adjusting_contrast_brightness_ )
   {

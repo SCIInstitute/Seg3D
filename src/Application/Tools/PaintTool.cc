@@ -425,6 +425,7 @@ void PaintToolPrivate::paint_range( int x0, int y0, int x1, int y1 )
   int paint_count = 0;
 
   {
+    Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
     Core::MaskVolumeSlice::cache_lock_type cache_lock( this->target_slice_->get_cache_mutex() );
     this->interpolated_paint( x0, y0, x1, y1, paint_count );
   }

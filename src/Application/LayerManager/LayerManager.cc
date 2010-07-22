@@ -494,7 +494,6 @@ LayerSceneHandle LayerManager::compose_layer_scene( size_t viewer_id )
           DataLayer* data_layer = dynamic_cast< DataLayer* >( layer.get() );
           DataLayerSceneItem* data_layer_scene_item = new DataLayerSceneItem;
           layer_scene_item = LayerSceneItemHandle( data_layer_scene_item );
-          data_layer_scene_item->data_volume_ = data_layer->get_data_volume();
           data_layer_scene_item->contrast_ = data_layer->contrast_state_->get();
           data_layer_scene_item->brightness_ = data_layer->brightness_state_->get();
           data_layer_scene_item->volume_rendered_ = data_layer->
@@ -506,7 +505,6 @@ LayerSceneHandle LayerManager::compose_layer_scene( size_t viewer_id )
           MaskLayer* mask_layer = dynamic_cast< MaskLayer* >( layer.get() );
           MaskLayerSceneItem* mask_layer_scene_item = new MaskLayerSceneItem;
           layer_scene_item = LayerSceneItemHandle( mask_layer_scene_item );
-          mask_layer_scene_item->mask_volume_ = mask_layer->get_mask_volume();
           mask_layer_scene_item->color_ = mask_layer->color_state_->get();
           mask_layer_scene_item->border_ = mask_layer->border_state_->index();
           mask_layer_scene_item->fill_ = mask_layer->fill_state_->get();

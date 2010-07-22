@@ -60,6 +60,7 @@ public:
   std::string layer_id_;
   double opacity_;
   Core::GridTransform grid_transform_;
+  Core::VolumeSliceHandle volume_slice_; // This value is set and used by Renderer
 };
 
 class DataLayerSceneItem : public LayerSceneItem
@@ -74,11 +75,9 @@ public:
   }
 
 public:
-  Core::DataVolumeHandle data_volume_;
   double contrast_;
   double brightness_;
   bool volume_rendered_;
-  Core::DataVolumeSliceHandle data_volume_slice_; // This value is set and used by Renderer
 };
 
 class MaskLayerSceneItem : public LayerSceneItem
@@ -93,12 +92,10 @@ public:
   }
 
 public:
-  Core::MaskVolumeHandle mask_volume_;
   int color_;
   int border_;
   std::string fill_;
   bool show_isosurface_;
-  Core::MaskVolumeSliceHandle mask_volume_slice_; // This value is set and used by Renderer
 };
 
 } // end namespace Seg3D

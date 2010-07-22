@@ -483,49 +483,29 @@ void Renderer::process_slices( LayerSceneHandle& layer_scene, ViewerHandle& view
   for ( size_t layer_num = 0; layer_num < layer_scene->size(); layer_num++ )
   {
     LayerSceneItemHandle layer_item = ( *layer_scene )[ layer_num ];
+    Core::VolumeSliceHandle volume_slice;
     switch ( layer_item->type() )
     {
     case Core::VolumeType::DATA_E:
-      {
-        DataLayerSceneItem* data_layer_item = 
-          dynamic_cast< DataLayerSceneItem* >( layer_item.get() );
-        Core::DataVolumeSliceHandle data_volume_slice = 
-          viewer->get_data_volume_slice( layer_item->layer_id_ );
-        if ( data_volume_slice && !data_volume_slice->out_of_boundary() )
-        {
-          data_volume_slice->initialize_texture();
-          data_volume_slice->upload_texture();
-          data_layer_item->data_volume_slice_ = 
-            Core::DataVolumeSliceHandle( new Core::DataVolumeSlice( *data_volume_slice ) );
-        }
-        else
-        {
-          layer_scene->erase( layer_scene->begin() + layer_num );
-          layer_num--;
-        }
-      }
+      volume_slice =  viewer->get_data_volume_slice( layer_item->layer_id_ );
       break;
     case Core::VolumeType::MASK_E:
-      {
-        MaskLayerSceneItem* mask_layer_item = 
-          dynamic_cast< MaskLayerSceneItem* >( layer_item.get() );
-        Core::MaskVolumeSliceHandle mask_volume_slice = 
-          viewer->get_mask_volume_slice( layer_item->layer_id_ );
-        if ( mask_volume_slice && !mask_volume_slice->out_of_boundary() )
-        {
-          mask_volume_slice->initialize_texture();
-          mask_volume_slice->upload_texture();
-          mask_layer_item->mask_volume_slice_ = 
-            Core::MaskVolumeSliceHandle( new Core::MaskVolumeSlice( *mask_volume_slice ) );
-        }
-        else
-        {
-          layer_scene->erase( layer_scene->begin() + layer_num );
-          layer_num--;
-        }
-      }
+      volume_slice =  viewer->get_mask_volume_slice( layer_item->layer_id_ );
       break;
-    } // end switch
+    } 
+
+    if ( volume_slice && !volume_slice->out_of_boundary() )
+    {
+      volume_slice->initialize_texture();
+      volume_slice->upload_texture();
+      layer_item->volume_slice_ = volume_slice->clone();
+    }
+    else
+    {
+      layer_scene->erase( layer_scene->begin() + layer_num );
+      layer_num--;
+    }
+
   } // end for
 
   // Make the bottom layer fully opaque
@@ -680,15 +660,13 @@ void Renderer::draw_slice( LayerSceneItemHandle layer_item,
 {
   this->slice_shader_->set_volume_type( layer_item->type() );
   this->slice_shader_->set_opacity( static_cast< float >( layer_item->opacity_ ) );
-  Core::VolumeSlice* volume_slice = 0;
+  Core::VolumeSlice* volume_slice = layer_item->volume_slice_.get();
   switch ( layer_item->type() )
   {
   case Core::VolumeType::DATA_E:
     {
       DataLayerSceneItem* data_layer_item = 
         dynamic_cast< DataLayerSceneItem* >( layer_item.get() );
-      Core::DataVolumeSlice* data_slice = data_layer_item->data_volume_slice_.get();
-      volume_slice = data_slice;
 
       // Convert contrast to range ( 0, 1 ] and brightness to [ -1, 1 ]
       double contrast = ( 1 - data_layer_item->contrast_ / 101 );
@@ -714,8 +692,6 @@ void Renderer::draw_slice( LayerSceneItemHandle layer_item,
     {
       MaskLayerSceneItem* mask_layer_item = 
         dynamic_cast< MaskLayerSceneItem* >( layer_item.get() );
-      Core::MaskVolumeSlice* mask_slice = mask_layer_item->mask_volume_slice_.get();
-      volume_slice = mask_slice;
       if ( rect )
       {
         this->slice_shader_->set_mask_mode( 2 );

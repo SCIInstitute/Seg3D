@@ -343,4 +343,16 @@ int VolumeSlice::get_closest_slice( const Point& pt ) const
   return slice_num;
 }
 
+void VolumeSlice::initialize_texture()
+{
+  internal_lock_type lock( this->internal_mutex_ );
+  if ( !this->texture_ )
+  {
+    this->texture_ = Texture2DHandle( new Texture2D );
+    this->texture_->set_mag_filter( GL_NEAREST );
+    this->texture_->set_min_filter( GL_NEAREST );
+  }
+}
+
+
 } // end namespace Core

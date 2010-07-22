@@ -64,13 +64,14 @@ public:
     this->data_block_->set_data_at( this->to_index( i, j ), value );
   }
 
-  // Create the texture object
-  virtual void initialize_texture();
-
   // Upload the data slice to graphics texture.
   // NOTE: This function allocates resources on the GPU, so the caller should
   // acquire a lock on the RenderResources before calling this function.
   virtual void upload_texture();
+
+  // CLONE:
+  // Make a copy of the slice, which will share texture object with the original one.
+  virtual VolumeSliceHandle clone();
 
 private:
   // Pointer to the data block. The base class keeps a handle of the volume,

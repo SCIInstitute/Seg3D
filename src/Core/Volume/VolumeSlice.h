@@ -158,12 +158,16 @@ public:
   }
 
   // Create the texture object
-  virtual void initialize_texture() = 0;
+  virtual void initialize_texture();
 
   // Upload the volume slice to texture.
   // NOTE: This function allocates resources on the GPU, so the caller should
   // acquire a lock on the RenderResources before calling this function.
   virtual void upload_texture() = 0;
+
+  // CLONE:
+  // Make a copy of the slice, which will share texture object with the original one.
+  virtual VolumeSliceHandle clone() = 0;
 
   TextureHandle get_texture()
   {
