@@ -26,19 +26,17 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#include <Core/Interface/Interface.h>
+
+//Application Includes
+#include <Application/Tools/ConnectedComponentFilter.h>
+
 //QtUtils Includes
 #include <QtUtils/Bridge/QtBridge.h>
-
-//Interface Includes
-#include <Interface/ToolInterface/CustomWidgets/TargetComboBox.h>
 
 //Qt Gui Includes
 #include <Interface/ToolInterface/ConnectedComponentFilterInterface.h>
 #include "ui_ConnectedComponentFilterInterface.h"
-
-//Application Includes
-#include <Application/Tools/ConnectedComponentFilter.h>
-//#include <Application/Filters/Actions/ActionConnectedComponent.h>
 
 SCI_REGISTER_TOOLINTERFACE( Seg3D, ConnectedComponentFilterInterface )
 
@@ -69,16 +67,18 @@ bool ConnectedComponentFilterInterface::build_widget( QFrame* frame )
   this->private_->ui_.setupUi( frame );
   
   //Step 2 - get a pointer to the tool
-  ToolHandle base_tool_ = tool();
-  ConnectedComponentFilter* tool = dynamic_cast< ConnectedComponentFilter* > ( base_tool_.get() );
+  ToolHandle base_tool = tool();
+  ConnectedComponentFilter* tool = dynamic_cast< ConnectedComponentFilter* > ( base_tool.get() );
 
     //Step 3 - connect the gui to the tool through the QtBridge
   QtUtils::QtBridge::Connect( this->private_->ui_.target_, tool->target_layer_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.clearSeedsButton, boost::bind( 
+    &ConnectedComponentFilter::clear, tool, Core::Interface::GetWidgetActionContext() ) );
   
   connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), this, SLOT( execute_filter() ) );
   
 
-  //Send a message to the log that we have finised with building the Connected Component Filter Interface
+  //Send a message to the log that we have finished with building the Connected Component Filter Interface
   CORE_LOG_DEBUG("Finished building a Connected Component Filter Interface");
   return ( true );
 

@@ -78,6 +78,8 @@ SET(CORE_STATE_ACTIONS_SRCS
   Actions/ActionAdd.cc
   Actions/ActionRemove.h
   Actions/ActionRemove.cc
+  Actions/ActionClear.h
+  Actions/ActionClear.cc
   )
 
 CORE_ADD_LIBRARY(Core_State ${CORE_STATE_SRCS} ${CORE_STATE_ACTIONS_SRCS} )

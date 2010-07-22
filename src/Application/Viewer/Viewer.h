@@ -124,7 +124,7 @@ public:
   virtual void resize( int width, int height );
   
   bool is_volume_view() const;
-  Core::StateViewBaseHandle get_active_view_state();
+  Core::StateViewBaseHandle get_active_view_state() const;
 
 protected:
   virtual void state_changed();
@@ -183,7 +183,9 @@ public:
   // WINDOW_TO_WORLD:
   // Maps from window coordinates to world coordinates.
   // NOTE: Only call this function when the viewer is in one of the 2D modes.
-  void window_to_world( int x, int y, double& world_x, double& world_y );
+  void window_to_world( int x, int y, double& world_x, double& world_y ) const;
+
+  void get_projection_matrix( Core::Matrix& proj_mat ) const;
 
 private:
   friend class ViewerManager;

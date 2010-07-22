@@ -433,7 +433,7 @@ bool Viewer::is_volume_view() const
   return this->view_mode_state_->get() == VOLUME_C;
 }
 
-Core::StateViewBaseHandle Viewer::get_active_view_state()
+Core::StateViewBaseHandle Viewer::get_active_view_state() const
 {
   return this->view_states_[ this->view_mode_state_->index() ];
 }
@@ -1219,7 +1219,7 @@ Core::VolumeSliceHandle Viewer::get_active_layer_slice() const
   return this->active_layer_slice_;
 }
 
-void Viewer::window_to_world( int x, int y, double& world_x, double& world_y )
+void Viewer::window_to_world( int x, int y, double& world_x, double& world_y ) const
 {
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
 
@@ -1235,19 +1235,32 @@ void Viewer::window_to_world( int x, int y, double& world_x, double& world_y )
   double xpos = x * 2.0 / ( width - 1 ) - 1.0;
   double ypos = ( height - 1 - y ) * 2.0 / ( height - 1.0 ) - 1.0;
 
-  double left, right, bottom, top;
-  Core::StateView2D* view_2d = dynamic_cast<Core::StateView2D*>( 
-    this->get_active_view_state().get() );
-  view_2d->get().compute_clipping_planes( width / height, left, right, bottom, top );
-
   Core::Matrix proj, inv_proj;
-  Core::Transform::BuildOrtho2DMatrix( proj, left, right, bottom, top );
+  this->get_projection_matrix( proj );
   Core::Invert( proj, inv_proj );
   Core::Point pos( xpos, ypos, 0 );
   pos = inv_proj * pos;
 
   world_x = pos.x();
   world_y = pos.y();
+}
+
+void Viewer::get_projection_matrix( Core::Matrix& proj_mat ) const
+{
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
+  if ( this->is_volume_view() )
+  {
+    CORE_THROW_LOGICERROR( "Viewer is in volume mode");
+  }
+
+  double left, right, bottom, top;
+  Core::StateView2D* view_2d = dynamic_cast<Core::StateView2D*>( 
+    this->get_active_view_state().get() );
+  view_2d->get().compute_clipping_planes( this->get_width() / 
+    ( this->get_height() * 1.0 ), left, right, bottom, top );
+
+  Core::Transform::BuildOrtho2DMatrix( proj_mat, left, right, bottom, top );
 }
 
 } // end namespace Seg3D

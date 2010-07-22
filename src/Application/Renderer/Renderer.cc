@@ -317,7 +317,7 @@ bool Renderer::render_overlay()
     glBlendFuncSeparate( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA , 
       GL_ZERO, GL_ONE_MINUS_SRC_ALPHA  );
 
-    gluOrtho2D( 0, this->width_, 0, this->height_ );
+    gluOrtho2D( 0, this->width_ - 1, 0, this->height_ - 1 );
     glMatrixMode( GL_MODELVIEW );
     glLoadIdentity();
 
@@ -385,7 +385,7 @@ bool Renderer::render_overlay()
     {
       Core::Point pt( viewers_info[ vert_slice_mode ][ i ]->depth_, 0, 0 );
       pt = proj_mat * pt;
-      int slice_pos = Core::Round( ( pt.x() + 1.0 ) / 2.0 * ( this->width_ - 1 ) ) + 1;
+      int slice_pos = Core::Round( ( pt.x() + 1.0 ) / 2.0 * ( this->width_ - 1 ) );
       float color[ 4 ] = { 0.0f, 0.0f, 0.0f, 1.0f };
       color[ vert_slice_mode ] = 1.0f;
       if ( viewers_info[ vert_slice_mode ][ i ]->is_picking_target_ )
@@ -408,7 +408,7 @@ bool Renderer::render_overlay()
     {
       Core::Point pt( 0, viewers_info[ hori_slice_mode ][ i ]->depth_, 0 );
       pt = proj_mat * pt;
-      int slice_pos = Core::Round( ( pt.y() + 1.0 ) / 2.0 * ( this->height_ - 1 ) ) + 1;
+      int slice_pos = Core::Round( ( pt.y() + 1.0 ) / 2.0 * ( this->height_ - 1 ) );
       float color[ 4 ] = { 0.0f, 0.0f, 0.0f, 1.0f };
       color[ hori_slice_mode ] = 1.0f;
       if ( viewers_info[ hori_slice_mode ][ i ]->is_picking_target_ )
@@ -453,11 +453,11 @@ bool Renderer::render_overlay()
     glTexCoord2f( 0.0f, 0.0f );
     glVertex2i( 0, 0 );
     glTexCoord2f( 1.0f, 0.0f );
-    glVertex2i( this->width_, 0 );
+    glVertex2i( this->width_ - 1, 0 );
     glTexCoord2f( 1.0f, 1.0f );
-    glVertex2i( this->width_, this->height_ );
+    glVertex2i( this->width_ - 1, this->height_ - 1 );
     glTexCoord2f( 0.0f, 1.0f );
-    glVertex2i( 0, this->height_ );
+    glVertex2i( 0, this->height_ - 1 );
     glEnd();
     this->text_texture_->disable();
 

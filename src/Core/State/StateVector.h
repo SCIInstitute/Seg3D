@@ -90,12 +90,15 @@ public:
 protected:
   friend class ActionAdd;
   friend class ActionRemove;
+  friend class ActionClear;
 
   virtual bool add( ActionParameterVariant& variant, 
-    Core::ActionSource source = Core::ActionSource::NONE_E ) = 0;
+    ActionSource source = ActionSource::NONE_E ) = 0;
 
   virtual bool remove( ActionParameterVariant& variant, 
-    Core::ActionSource source = Core::ActionSource::NONE_E ) = 0;
+    ActionSource source = ActionSource::NONE_E ) = 0;
+
+  virtual void clear( ActionSource source = ActionSource::NONE_E ) = 0;
 
   virtual bool validate_element_variant( ActionParameterVariant& variant, 
     std::string& error ) = 0;
@@ -251,7 +254,7 @@ public:
   bool add( const T& value, ActionSource source = ActionSource::NONE_E )
   {
     {
-      StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
+      StateEngine::lock_type lock( StateEngine::GetMutex() );
       this->values_vector_.push_back( value );
     }
 
@@ -268,8 +271,8 @@ public:
   {
     bool removed = false;
     {
-      StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
-      value_type::iterator it = std::find( this->values_vector_.begin(), 
+      StateEngine::lock_type lock( StateEngine::GetMutex() );
+      typename value_type::iterator it = std::find( this->values_vector_.begin(), 
         this->values_vector_.end(), value );
       if ( it != this->values_vector_.end() )
       {
@@ -284,6 +287,20 @@ public:
       this->state_changed_signal_();
     }
     return removed;
+  }
+
+  virtual void clear( ActionSource source = ActionSource::NONE_E )
+  {
+    {
+      StateEngine::lock_type lock( StateEngine::GetMutex() );
+      this->values_vector_.clear();
+    }
+
+    if ( this->signals_enabled() )
+    {
+      this->value_changed_signal_( this->values_vector_, source );
+      this->state_changed_signal_();
+    }
   }
 
   // -- signals describing the state --
