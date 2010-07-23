@@ -35,15 +35,6 @@ CORE_REGISTER_ACTION( Core, Clear )
 namespace Core
 {
 
-ActionClear::ActionClear()
-{
-  this->add_argument( this->stateid_ );
-}
-
-ActionClear::~ActionClear()
-{
-}
-
 bool ActionClear::validate( ActionContextHandle& context )
 {
   StateBaseHandle state( this->state_weak_handle_.lock() );

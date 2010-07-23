@@ -38,10 +38,20 @@ namespace Core
 
 class ActionAdd : public Action
 {
-  CORE_ACTION( "Add|stateid|value" );
+
+CORE_ACTION( 
+  CORE_ACTION_TYPE( "Add", "Add an item to a vector state.")
+  CORE_ACTION_ARGUMENT( "stateid", "The stateid of the vector state")
+  CORE_ACTION_ARGUMENT( "value", "The value that needs to be added to the vector." )
+)
+
 public:
-  ActionAdd();
-  virtual ~ActionAdd();
+  ActionAdd()
+  {
+    this->add_argument( this->stateid_ );
+    this->add_argument( this->value_ );
+  } 
+  virtual ~ActionAdd() {}
 
   virtual bool validate( ActionContextHandle& context );
   virtual bool run( ActionContextHandle& context, ActionResultHandle& result );

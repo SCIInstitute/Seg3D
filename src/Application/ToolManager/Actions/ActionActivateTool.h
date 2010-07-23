@@ -37,13 +37,16 @@ namespace Seg3D
 
 class ActionActivateTool : public Core::Action
 {
-  CORE_ACTION( "ActivateTool|toolid" );
 
+CORE_ACTION( 
+  CORE_ACTION_TYPE( "ActivateTool", "Activate a tool so it becomes the active tool." )
+  CORE_ACTION_ARGUMENT( "toolid", "Toolid of the tool that needs to be activated." )
+)
   // -- Constructor/Destructor --
 public:
   ActionActivateTool()
   {
-    add_argument( toolid_ );
+    this->add_argument( this->toolid_ );
   }
 
   virtual ~ActionActivateTool()

@@ -30,14 +30,17 @@
 #define _HAS_CPP0X 0
 #endif
 
+// STL includes
 #include <bitset>
 
+// Boost includes
+#include <boost/filesystem.hpp>
+
 // Core includes
+#include <Core/Utils/Log.h>
 #include <Core/DataBlock/MaskDataBlockManager.h>
 #include <Core/DataBlock/StdDataBlock.h>
 #include <Core/DataBlock/NrrdData.h>
-#include <Core/Utils/Log.h>
-
 
 namespace Core
 {
@@ -241,6 +244,7 @@ bool MaskDataBlockManager::save_data_blocks( boost::filesystem::path data_save_p
 
   for ( size_t j = 0 ; j < mask_list.size() ; j++ )
   {
+
     boost::filesystem::path volume_path = data_save_path / 
       ( Core::ExportToString( mask_list[ j ].data_block_->
       get_generation() ) + ".nrrd" );

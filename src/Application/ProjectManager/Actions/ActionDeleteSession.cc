@@ -39,8 +39,9 @@ namespace Seg3D
 
 bool ActionDeleteSession::validate( Core::ActionContextHandle& context )
 {
-  if( ProjectManager::Instance()->current_project_->
-    get_session_name( this->session_index_.value(), this->session_name_.value() ) )
+  std::string session_name;
+  if( ProjectManager::Instance()->current_project_->get_session_name( 
+    this->session_index_.value(), session_name ) )
   {
     return true;
   }
@@ -52,8 +53,11 @@ bool ActionDeleteSession::run( Core::ActionContextHandle& context,
 {
   bool success = false;
 
-  std::string message = std::string("Deleting session: '") + 
-    this->session_name_.value() + std::string("'");
+  std::string session_name;
+  ProjectManager::Instance()->current_project_->get_session_name( this->session_index_.value(), 
+    session_name );
+
+  std::string message = std::string( "Deleting session: '" ) + session_name + std::string( "'" );
 
   Core::ActionProgressHandle progress = 
     Core::ActionProgressHandle( new Core::ActionProgress( message ) );
@@ -64,8 +68,8 @@ bool ActionDeleteSession::run( Core::ActionContextHandle& context,
   {
     success = true;
   }
-  progress->end_progress_reporting();
 
+  progress->end_progress_reporting();
 
   return success;
 }

@@ -40,13 +40,16 @@ namespace Seg3D
 
 class ActionDeleteSession : public Core::Action
 {
-  CORE_ACTION( "DeleteSession|sessionname" );
+
+CORE_ACTION( 
+  CORE_ACTION_TYPE( "DeleteSession", "Delete a session." )
+  CORE_ACTION_ARGUMENT( "index", "Index of the session to delete." )
+)
 
   // -- Constructor/Destructor --
 public:
   ActionDeleteSession()
   {
-    this->add_argument( this->session_name_ );
     this->add_argument( this->session_index_ );
   }
 
@@ -60,10 +63,6 @@ public:
   virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
   
 private:
-
-
-  // This parameter contains the name of the session to be loaded
-  Core::ActionParameter< std::string > session_name_;
 
   // This parameter contains the index of the session to be loaded
   Core::ActionParameter< int > session_index_;

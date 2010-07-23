@@ -35,11 +35,6 @@ CORE_REGISTER_ACTION( Seg3D, AutoView )
 namespace Seg3D
 {
 
-ActionAutoView::ActionAutoView()
-{
-  add_argument( this->viewer_name_ );
-}
-
 bool ActionAutoView::validate( Core::ActionContextHandle& context )
 {
   ViewerHandle viewer = this->viewer_weak_handle_.lock();

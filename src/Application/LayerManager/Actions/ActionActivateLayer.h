@@ -40,7 +40,11 @@ namespace Seg3D
 
 class ActionActivateLayer : public ActionLayer
 {
-  CORE_ACTION( "ActivateLayer|layerid" );
+  
+CORE_ACTION(
+  CORE_ACTION_TYPE( "ActivateLayer", "Activate a layer so it becomes the active target.")
+  CORE_ACTION_ARGUMENT( "layerid", "The layerid of the layer that needs to be activated." )
+)
 
   // -- Constructor/Destructor --
 public:

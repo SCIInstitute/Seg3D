@@ -38,10 +38,17 @@ namespace Core
 
 class ActionClear : public Action
 {
-  CORE_ACTION( "Clear|stateid" );
+CORE_ACTION( 
+  CORE_ACTION_TYPE( "Clear", "Clear the contents of a state vector variable.")
+  CORE_ACTION_ARGUMENT( "stateid", "The stateid of the state vector variable." )
+)
+
 public:
-  ActionClear();
-  virtual ~ActionClear();
+  ActionClear()
+  {
+    this->add_argument( this->stateid_ );
+  } 
+  virtual ~ActionClear() {}
 
   virtual bool validate( ActionContextHandle& context );
   virtual bool run( ActionContextHandle& context, ActionResultHandle& result );

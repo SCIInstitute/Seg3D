@@ -26,16 +26,12 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-// Application includes
-#include <Core/State/StateIO.h>
-
 // TinyXML includes
 #include <Externals/tinyxml/tinyxml.h>
 
 // Core includes
+#include <Core/State/StateIO.h>
 #include <Core/Utils/StringUtil.h>
-
-
 
 namespace Core
 {

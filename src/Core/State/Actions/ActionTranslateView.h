@@ -40,7 +40,12 @@ namespace Core
 
 class ActionTranslateView : public Action
 {
-  CORE_ACTION( "Translate|stateid|offset" );
+
+CORE_ACTION(
+CORE_ACTION_TYPE( "TranslateView", "This action translates the state in a view state variable." )
+CORE_ACTION_ARGUMENT( "stateid", "The name of the state variable." )
+CORE_ACTION_ARGUMENT( "offset", "The offset that needs to be added." )
+)
 
 public:
   ActionTranslateView();

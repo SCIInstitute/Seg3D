@@ -38,7 +38,13 @@ namespace Seg3D
   
 class ActionDiscreteGaussianFilter : public Core::Action
 {
-CORE_ACTION( "DiscreteGaussianFilter|layerid|variance=1.0|kernelwidth=1.0|replace=true" );
+CORE_ACTION_XML( 
+  CORE_ACTION_TYPE( "DiscreteGaussianFilter", "ITK filter that blurs the data." )
+  CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
+  CORE_ACTION_KEY( "variance", "1.0", "The amount of blurring." )
+  CORE_ACTION_KEY( "kernelwidth", "1.0", "Size of the volume that will be used for the blurring." )
+  CORE_ACTION_KEY( "replace", "true", "Replace the old layer (true), or add an new layer (false)" )
+)
   
   // -- Constructor/Destructor --
 public:

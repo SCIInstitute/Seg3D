@@ -37,13 +37,17 @@ namespace Seg3D
 
 class ActionOpenTool : public Core::Action
 {
-  CORE_ACTION( "OpenTool|tooltype" );
+
+CORE_ACTION( 
+  CORE_ACTION_TYPE( "OpenTool", "Open a new tool of a certain type." )
+  CORE_ACTION_ARGUMENT( "tooltype", "Type of the tool that needs to be opened.")
+)
 
   // -- Constructor/Destructor --
 public:
   ActionOpenTool()
   {
-    add_argument( toolid_ );
+    this->add_argument( this->toolid_ );
   }
 
   virtual ~ActionOpenTool()

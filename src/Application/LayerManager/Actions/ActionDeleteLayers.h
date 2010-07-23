@@ -42,7 +42,11 @@ namespace Seg3D
 
 class ActionDeleteLayers : public ActionLayer
 {
-  CORE_ACTION( "DeleteLayers|groupid" );
+
+CORE_ACTION( 
+  CORE_ACTION_TYPE( "DeleteLayers", "Delete selected layers from a group and the group if it will become empty.")
+  CORE_ACTION_ARGUMENT( "groupid", "The groupid of the selected layers that needs to be deleted." )
+)
   
   // -- Constructor/Destructor --
 public:

@@ -38,10 +38,20 @@ namespace Core
 
 class ActionRemove : public Action
 {
-  CORE_ACTION( "Remove|stateid|value" );
+CORE_ACTION( 
+  CORE_ACTION_TYPE( "Remove", "Remove an item from a vector state." )
+  CORE_ACTION_ARGUMENT( "stateid", "The stateid of the state variable from which the item needs to be removed" )
+  CORE_ACTION_ARGUMENT( "value", "The value that needs to be removed" ) 
+)
+
 public:
-  ActionRemove();
-  virtual ~ActionRemove();
+  ActionRemove()
+  {
+    this->add_argument( this->stateid_ );
+    this->add_argument( this->value_ );
+  }
+  
+  virtual ~ActionRemove() {}
 
   virtual bool validate( ActionContextHandle& context );
   virtual bool run( ActionContextHandle& context, ActionResultHandle& result );

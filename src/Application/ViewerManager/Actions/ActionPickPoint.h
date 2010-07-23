@@ -36,10 +36,15 @@
 namespace Seg3D
 {
 
+// TODO: Source viewer needs to be dealt with properly
+
 class ActionPickPoint : public Core::Action
 {
 
-CORE_ACTION("Pick|point");
+CORE_ACTION(
+  CORE_ACTION_TYPE( "Pick", "Pick a new point to align slices with." )
+  CORE_ACTION_ARGUMENT( "point", "The new pick point." )
+)
 
 public:
   ActionPickPoint();
@@ -49,7 +54,8 @@ public:
   virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
 
 private:
-  int source_viewer_;
+  // TODO: Need to replace this with viewerid instead of number
+  Core::ActionParameter< int > viewer_;
   Core::ActionParameter< Core::Point > point_;
 
 public:

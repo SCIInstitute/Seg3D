@@ -38,14 +38,19 @@ namespace Seg3D
   
 class ActionFillHolesFilter : public Core::Action
 {
-CORE_ACTION( "FillHolesFilter|layerid|seedpoints" );
+
+CORE_ACTION_XML( 
+  CORE_ACTION_TYPE( "FillHolesFilter", " Filter that fills in the holes within a mask, all the holes marked by a seed point are excluded." )
+  CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
+  CORE_ACTION_ARGUMENT( "seedpoints", "The seed point locations that need to be excluded." )
+)
   
   // -- Constructor/Destructor --
 public:
   ActionFillHolesFilter()
   {
-    add_argument( layer_id_ );
-    add_cachedhandle( layer_ );
+    this->add_argument( this->layer_id_ );
+    this->add_cachedhandle( layer_ );
   }
   
   virtual ~ActionFillHolesFilter()

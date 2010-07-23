@@ -34,15 +34,21 @@
 namespace Seg3D
 {
 
+// TODO:
+// Need to replace this with a state variable
+
 class ActionCloseWindow : public Core::Action
 {
-  CORE_ACTION( "CloseWindow|windowid" );
 
+CORE_ACTION(
+  CORE_ACTION_TYPE( "CloseWindow", "Close a window on the interface." )
+  CORE_ACTION_ARGUMENT( "windowid", "The name of the window that needs to be closed." )
+)
   // -- Constructor/Destructor --
 public:
   ActionCloseWindow()
   {
-    add_argument( windowid_ );
+    add_argument( this->windowid_ );
   }
 
   virtual ~ActionCloseWindow()

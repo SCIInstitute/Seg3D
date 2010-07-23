@@ -37,7 +37,13 @@ namespace Seg3D
 
 class ActionMoveLayerAbove : public Core::Action
 {
-  CORE_ACTION( "MoveLayerAbove|layerid_above|layerid_below|above=true" );
+
+CORE_ACTION( 
+  CORE_ACTION_TYPE( "MoveLayerAbove", "Move a layer to the slot above another layer." )
+  CORE_ACTION_ARGUMENT( "layerid", "Layerid of the layer that needs to be moved." )
+  CORE_ACTION_ARGUMENT( "slot_layerid", "Layerid of the layer above the layer needs to be inserted." )
+  CORE_ACTION_KEY( "above", "true", "Whether the layer needs to inserted above or below the target layer.")
+)
   
   // -- Constructor/Destructor --
 public:
@@ -45,7 +51,7 @@ public:
   {
     add_argument( layer_to_move_id_ );
     add_argument( target_layer_id_ );
-    add_parameter( "above", move_above_, true );
+    add_key( move_above_ );
   }
   
   virtual ~ActionMoveLayerAbove()

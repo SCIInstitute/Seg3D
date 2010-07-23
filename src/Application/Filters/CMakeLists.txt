@@ -43,18 +43,18 @@ SET(APPLICATION_FILTERS_ACTIONS_SRCS
   Actions/ActionBinaryDilateErodeFilter.cc
   Actions/ActionBooleanFilter.h
   Actions/ActionBooleanFilter.cc
-  Actions/ActionCannyEdgeDetectionFilter.h
-  Actions/ActionCannyEdgeDetectionFilter.cc
-  Actions/ActionConfidenceConnectedFilter.h
-  Actions/ActionConfidenceConnectedFilter.cc
-  Actions/ActionConnectedComponentFilter.h
-  Actions/ActionConnectedComponentFilter.cc
-  Actions/ActionDiscreteGaussianFilter.h
-  Actions/ActionDiscreteGaussianFilter.cc
-  Actions/ActionFillHolesFilter.h
-  Actions/ActionFillHolesFilter.cc
-  Actions/ActionGradientMagnitudeFilter.h
-  Actions/ActionGradientMagnitudeFilter.cc
+#  Actions/ActionCannyEdgeDetectionFilter.h
+#  Actions/ActionCannyEdgeDetectionFilter.cc
+#  Actions/ActionConfidenceConnectedFilter.h
+#  Actions/ActionConfidenceConnectedFilter.cc
+#  Actions/ActionConnectedComponentFilter.h
+#  Actions/ActionConnectedComponentFilter.cc
+#  Actions/ActionDiscreteGaussianFilter.h
+#  Actions/ActionDiscreteGaussianFilter.cc
+#  Actions/ActionFillHolesFilter.h
+#  Actions/ActionFillHolesFilter.cc
+#  Actions/ActionGradientMagnitudeFilter.h
+#  Actions/ActionGradientMagnitudeFilter.cc
 #  Actions/ActionHistogramEqualizationFilter.h
 #  Actions/ActionHistogramEqualizationFilter.cc
 #  Actions/ActionIntensityCorrectionFilter.h

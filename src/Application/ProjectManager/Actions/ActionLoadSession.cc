@@ -39,8 +39,9 @@ namespace Seg3D
 
 bool ActionLoadSession::validate( Core::ActionContextHandle& context )
 {
+  std::string session_name;
   if( ProjectManager::Instance()->current_project_->
-    get_session_name( this->session_index_.value(), this->session_name_.value() ) )
+    get_session_name( this->session_index_.value(), session_name ) )
   {
     return true;
   }
@@ -52,8 +53,12 @@ bool ActionLoadSession::run( Core::ActionContextHandle& context,
 {
   bool success = false;
 
+  std::string session_name;
+  ProjectManager::Instance()->current_project_->
+    get_session_name( this->session_index_.value(), session_name );
+
   std::string message = std::string("Please wait while session: '") + 
-    this->session_name_.value() + std::string("' is loaded...");
+    session_name + std::string("' is loaded...");
 
   Core::ActionProgressHandle progress = 
     Core::ActionProgressHandle( new Core::ActionProgress( message ) );
@@ -66,7 +71,6 @@ bool ActionLoadSession::run( Core::ActionContextHandle& context,
   }
 
   progress->end_progress_reporting();
-
 
   return success;
 }

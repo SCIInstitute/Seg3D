@@ -37,7 +37,12 @@ namespace Core
 
 class ActionScaleView : public Action
 {
-  CORE_ACTION( "Scale|stateid|ratio" );
+
+CORE_ACTION( 
+CORE_ACTION_TYPE( "ScaleView", "This action scales the state in a view state variable." )
+CORE_ACTION_ARGUMENT( "stateid", "The name of the state variable." )
+CORE_ACTION_ARGUMENT( "scale", "The scale to multiply the view by." )
+)
 
 public:
   ActionScaleView();

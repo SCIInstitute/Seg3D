@@ -40,7 +40,13 @@ namespace Core
 
 class ActionRotateView3D : public Action
 {
-  CORE_ACTION( "Rotate|stateid|axis|angle" );
+
+CORE_ACTION(
+CORE_ACTION_TYPE( "RotateView", "This action rotates the camera in a view state variable." )
+CORE_ACTION_ARGUMENT( "stateid", "The name of the state variable." )
+CORE_ACTION_ARGUMENT( "axis", "The axis around which to rotate." )
+CORE_ACTION_ARGUMENT( "angle", "The angle to rotate the view about." )
+);
 
 public:
   ActionRotateView3D();

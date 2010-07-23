@@ -34,10 +34,16 @@
 namespace Seg3D
 {
 
+// TODO:
+// This action should be merged into a state variable
+
 class ActionShowWindow : public Core::Action
 {
-  CORE_ACTION( "ShowWindow|windowid" );
 
+CORE_ACTION( 
+  CORE_ACTION_TYPE( "ShowWindow", "Show a window in the interface." )
+  CORE_ACTION_ARGUMENT( "windowid", "Name of the window to show." )
+)
   // -- Constructor/Destructor --
 public:
   ActionShowWindow()

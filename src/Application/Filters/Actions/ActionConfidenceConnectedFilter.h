@@ -38,7 +38,13 @@ namespace Seg3D
   
 class ActionConfidenceConnectedFilter : public Core::Action
 {
-CORE_ACTION( "ConfidenceConnectedFilter|layerid|iterations=10|multiplier=1" );
+
+CORE_ACTION_XML(
+  CORE_ACTION_TYPE( "ConfidenceConnectedFilter", "Find regions that are connected within a value range." )
+  CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
+  CORE_ACTION_KEY( "iterations", "10", "Number of iterations to recomputed the range based on the last selected region." )
+  CORE_ACTION_KEY( "multiplier", "1", "Multiplier" )
+)
   
   // -- Constructor/Destructor --
 public:
@@ -46,8 +52,8 @@ public:
   {
     add_argument( this->layer_id_ );
     
-    add_parameter( "iterations", this->iterations_, 10 );
-    add_parameter( "multiplier", this->multiplier_, 1 );
+    add_key( this->iterations_ );
+    add_key( this->multiplier_ );
     
     add_cachedhandle( this->layer_ );
   }

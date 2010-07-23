@@ -38,20 +38,27 @@ namespace Seg3D
   
 class ActionCannyEdgeDetectionFilter : public Core::Action
 {
-CORE_ACTION( "CannyEdgeDetectionFilter|layerid|variance=2.0|max_error=1.0|threshold=1.0|replace=true" );
+CORE_ACTION_XML( 
+  CORE_ACTION_TYPE( "CannyEdgeDetectionFilter", "ITK filter that detects where edges are in a data layer." )
+  CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
+  CORE_ACTION_KEY( "variance", "2.0", "The spatial variance." )
+  CORE_ACTION_KEY( "max_error", "1.0", "The maximum error." )
+  CORE_ACTION_KEY( "threshold", "1.0", "The threshold." )
+  CORE_ACTION_KEY( "replace", "true", "Replace the old layer (true), or add an new layer (false)" )
+)  
   
   // -- Constructor/Destructor --
 public:
   ActionCannyEdgeDetectionFilter()
   {
-    add_argument( layer_id_ );
+    add_argument( this->layer_id_ );
     
-    add_parameter( "variance", variance_, 2.0 );
-    add_parameter( "max_error", max_error_, 1.0 );
-    add_parameter( "threshold", threshold_, 1.0 );
-    add_parameter( "replace", replace_, true );
+    add_key( this->variance_ );
+    add_key( this->max_error_ );
+    add_key( this->threshold_ );
+    add_key( this->replace_ );
   
-    add_cachedhandle( layer_ ); 
+    add_cachedhandle( this->layer_ ); 
   }
   
   virtual ~ActionCannyEdgeDetectionFilter()

@@ -37,19 +37,25 @@ namespace Seg3D
   
 class ActionBinaryDilateErodeFilter : public Core::Action
 {
-CORE_ACTION( "BinaryDialateErodeFilter|layerid|dilate=0|erode=0|replace=true" ); 
 
+CORE_ACTION( 
+  CORE_ACTION_TYPE( "BinaryDialateErodeFilter", "Binary dilation or erosion, or a combination of both." )
+  CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
+  CORE_ACTION_KEY( "dilate", "0", "The number of dilation steps to perform." )
+  CORE_ACTION_KEY( "erode", "0", "The number of erosion steps to perform." )
+  CORE_ACTION_KEY( "replace", "true", "Replace the old layer (true), or add an new layer (false)" )
+)
   // -- Constructor/Destructor --
 public:
   ActionBinaryDilateErodeFilter()
   {
-    add_argument( layer_id_ );
+    add_argument( this->layer_id_ );
     
-    add_parameter( "dilate", dilate_, 0 );
-    add_parameter( "erode", erode_, 0 );
-    add_parameter( "replace", replace_, true );
+    add_key( this->dilate_ );
+    add_key( this->erode_ );
+    add_key( this->replace_ );
     
-    add_cachedhandle( layer_ );
+    add_cachedhandle( this->layer_ );
   }
   
   virtual ~ActionBinaryDilateErodeFilter()

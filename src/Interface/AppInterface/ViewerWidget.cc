@@ -105,7 +105,7 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
   this->private_->ui_.less_common_tools_layout_->insertWidget( 0, this->private_->picking_button_ );
   
   // Setup the widget so for a small size it can be broken into two
-  this->private_->minimum_toolbar_width_ = 245;
+  this->private_->minimum_toolbar_width_ = 300;
   this->private_->initialized_size_ = false;
   this->private_->ui_.buttonbar_->setMinimumSize( QSize( 170, 0 ) );
   this->private_->ui_.button_layout_->setStretchFactor( this->private_->ui_.common_tools_, 0 );
@@ -249,6 +249,8 @@ void ViewerWidget::change_view_type( int index )
   this->private_->ui_.flip_vertical_button_->setVisible( !is_volume_view );
   this->private_->ui_.grid_button_->setVisible( !is_volume_view );
   this->private_->ui_.slice_visible_button_->setVisible( !is_volume_view );
+  this->private_->ui_.picking_lines_visible_button_->setVisible( !is_volume_view );
+  this->private_->ui_.cursor_mirrored_button_->setVisible( !is_volume_view );
   this->private_->picking_button_->setVisible( !is_volume_view );
 
   // 3D viewer specific buttons

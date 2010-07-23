@@ -31,7 +31,7 @@
 
 #include <boost/smart_ptr.hpp>
 
-#include <Core/Action/Action.h>
+#include <Core/Action/Actions.h>
 #include <Core/State/StateRangedValue.h>
 
 namespace Core
@@ -39,10 +39,20 @@ namespace Core
 
 class ActionSetRange : public Action
 {
-  CORE_ACTION( "SetRange|stateid|min|max" );
+CORE_ACTION(
+  CORE_ACTION_TYPE( "SetRange", "This action sets the range of a state variable." )
+  CORE_ACTION_ARGUMENT( "stateid", "The name of the state variable." )
+  CORE_ACTION_ARGUMENT( "min", "The new minimum value of the state variable." )
+  CORE_ACTION_ARGUMENT( "max", "The new maximum value of the state variable." )
+)
 
 public:
-  ActionSetRange();
+  ActionSetRange()
+  {
+    this->add_argument( this->stateid_ );
+    this->add_argument( this->min_value_ );
+    this->add_argument( this->max_value_ );
+  }
   virtual ~ActionSetRange() {}
 
   virtual bool validate( ActionContextHandle& context );

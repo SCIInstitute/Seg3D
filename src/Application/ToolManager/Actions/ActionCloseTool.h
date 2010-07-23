@@ -37,13 +37,16 @@ namespace Seg3D
 
 class ActionCloseTool : public Core::Action
 {
-  CORE_ACTION( "CloseTool|toolid" );
+CORE_ACTION( 
+  CORE_ACTION_TYPE( "CloseTool", "Close a tool that was opened previously." )
+  CORE_ACTION_ARGUMENT( "toolid", "Toolid of the tool." )
+)
 
   // -- Constructor/Destructor --
 public:
   ActionCloseTool()
   {
-    add_argument( toolid_ );
+    this->add_argument( this->toolid_ );
   }
 
   virtual ~ActionCloseTool()

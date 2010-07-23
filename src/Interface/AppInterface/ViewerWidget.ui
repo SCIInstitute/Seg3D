@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>316</width>
+    <width>385</width>
     <height>279</height>
    </rect>
   </property>
@@ -945,6 +945,51 @@ QComboBox::icon{
                   <iconset resource="../../Resources/QtResources.qrc">
                    <normaloff>:/Images/VolumeVisibleOff.png</normaloff>
                    <normalon>:/Images/VolumeVisible.png</normalon>:/Images/VolumeVisibleOff.png</iconset>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QToolButton" name="cursor_mirrored_button_">
+                 <property name="text">
+                  <string>...</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="../../Resources/QtResources.qrc">
+                   <normaloff>:/Images/CursorMirrorOff.png</normaloff>
+                   <normalon>:/Images/CursorMirror.png</normalon>:/Images/CursorMirrorOff.png</iconset>
+                 </property>
+                 <property name="checkable">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QToolButton" name="picking_lines_visible_button_">
+                 <property name="text">
+                  <string>...</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="../../Resources/QtResources.qrc">
+                   <normaloff>:/Images/PickingLinesOff.png</normaloff>
+                   <normalon>:/Images/PickingLines.png</normalon>:/Images/PickingLinesOff.png</iconset>
+                 </property>
+                 <property name="checkable">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QToolButton" name="overlay_visible_button_">
+                 <property name="text">
+                  <string>...</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="../../Resources/QtResources.qrc">
+                   <normaloff>:/Images/TextOff.png</normaloff>
+                   <normalon>:/Images/Text.png</normalon>:/Images/TextOff.png</iconset>
+                 </property>
+                 <property name="checkable">
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>

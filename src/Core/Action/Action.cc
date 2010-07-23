@@ -51,24 +51,51 @@ Action::~Action()
 {
 }
 
-bool Action::validate( ActionContextHandle& context )
+std::string Action::get_definition() const
 {
-  return ( true );
+  return this->get_action_info()->get_definition();
+}
+
+std::string Action::get_type() const
+{
+  return this->get_action_info()->get_type();
+}
+
+std::string Action::get_usage() const
+{
+  return this->get_action_info()->get_usage();
+}
+
+std::string Action::get_key( size_t index ) const
+{
+  return this->get_action_info()->get_key( index );
+}
+
+int Action::get_key_index( const std::string& key ) const
+{
+  return this->get_action_info()->get_key_index( key );
+}
+
+
+std::string Action::get_default_key_value( size_t index ) const
+{
+  return this->get_action_info()->get_default_key_value( index );
 }
 
 void Action::add_argument_ptr( ActionParameterBase* param )
 {
-  arguments_.push_back( param );
+  this->arguments_.push_back( param );
 }
 
-void Action::add_parameter_ptr( const std::string& key, ActionParameterBase* param )
+void Action::add_key_ptr( ActionParameterBase* param )
 {
-  parameters_[ boost::to_lower_copy( key ) ] = param;
+  param->import_from_string( this->get_default_key_value( this->keys_.size() ) );
+  this->keys_.push_back( param );
 }
 
 void Action::add_cached_handle_ptr( ActionCachedHandleBase* handle )
 {
-  cached_handles_.push_back( handle );
+  this->cached_handles_.push_back( handle );
 }
 
 void Action::clear_cache()
@@ -86,21 +113,21 @@ void Action::clear_cache()
 std::string Action::export_to_string() const
 {
   // Add action name to string
-  std::string command = std::string( get_type() ) + " ";
+  std::string command = std::string( this->get_type() ) + " ";
 
   // Loop through all the arguments and add them
-  for ( size_t j = 0; j < arguments_.size(); j++ )
+  for ( size_t j = 0; j < this->arguments_.size(); j++ )
   {
-    command += arguments_[ j ]->export_to_string() + " ";
+    command += this->arguments_[ j ]->export_to_string() + " ";
   }
-
-  // Loop through all the parameters and add them
-  parameter_map_type::const_iterator it = parameters_.begin();
-  parameter_map_type::const_iterator it_end = parameters_.end();
-  while ( it != it_end )
+  
+  for ( size_t j = 0; j < keys_.size(); j++ )
   {
-    command += ( *it ).first + "=" + ( *it ).second->export_to_string() + " ";
-    ++it;
+    if ( keys_[ j ] == 0 )
+    {
+      CORE_THROW_LOGICERROR( "Encountered incorrectly constructed action" );
+    }
+    command += this->get_key( j ) + "=" + this->keys_[ j ]->export_to_string() + " ";
   }
 
   // Return the command
@@ -110,7 +137,7 @@ std::string Action::export_to_string() const
 bool Action::import_from_string( const std::string& action )
 {
   std::string error;
-  return ( import_from_string( action, error ) );
+  return this->import_from_string( action, error );
 }
 
 bool Action::import_from_string( const std::string& action, std::string& error )
@@ -119,19 +146,17 @@ bool Action::import_from_string( const std::string& action, std::string& error )
   std::string command;
   std::string value;
 
-  CORE_LOG_DEBUG(std::string("action = ")+action);
-
   // First part of the string is the command
   if ( !( Core::ScanCommand( action, pos, command, error ) ) )
   {
     error = std::string( "SYNTAX ERROR: " ) + error;
-    return ( false );
+    return false;
   }
 
   if ( command.empty() )
   {
     error = std::string( "ERROR: missing command." );
-    return ( false );
+    return false;
   }
 
   for ( size_t j = 0; j < arguments_.size(); j++ )
@@ -148,40 +173,42 @@ bool Action::import_from_string( const std::string& action, std::string& error )
       return false;
     }
 
-    if ( !( arguments_[ j ]->import_from_string( value ) ) )
+    if ( !( this->arguments_[ j ]->import_from_string( value ) ) )
     {
       error = std::string( "SYNTAX ERROR: Could not interpret '" + value + "'" );
-      return ( false );
+      return false;
     }
   }
 
   // Get all the key value pairs and stream them into the action
   std::string key;
 
-  while ( 1 )
+  while ( true )
   {
     if ( !( Core::ScanKeyValuePair( action, pos, key, value, error ) ) )
     {
       error = std::string( "SYNTAX ERROR: " ) + error;
-      return ( false );
+      return false;
     }
 
     if ( key.empty() ) break;
 
-    boost::to_lower( key );
-
-    parameter_map_type::iterator it = parameters_.find( key );
-    if ( it != parameters_.end() )
+    int index = this->get_key_index( Core::StringToLower( key ) );
+    if ( index == -1 )
     {
-      if ( !( ( *it ).second->import_from_string( value ) ) )
-      {
-        error = std::string( "SYNTAX ERROR: Could not interpret '" + value + "'" );
-        return ( false );
-      }
+      error = std::string( "SYNTAX ERROR: Could not interpret '" + value + "'" );
+      return false;   
     }
+
+    if ( this->keys_[ index ] == 0 )
+    {
+      CORE_THROW_LOGICERROR( "Encountered incorrectly constructed action" );
+    }
+    
+    this->keys_[ index ]->import_from_string( value );
   }
 
-  return ( true );
+  return true;
 }
 
 } // end namespace Core

@@ -37,7 +37,11 @@ namespace Core
 
 class ActionGet : public Action
 {
-  CORE_ACTION( "Get|stateid" );
+
+CORE_ACTION( 
+CORE_ACTION_TYPE( "Get", "Get the value of a state variable." )
+CORE_ACTION_ARGUMENT( "stateid", "The name of the state variable." )
+);
 
   // -- Constructor/Destructor --
 public:

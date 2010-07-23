@@ -38,7 +38,12 @@ namespace Core
 
 class ActionOffset : public Action
 {
-  CORE_ACTION( "Offset|stateid|value" );
+
+CORE_ACTION( 
+CORE_ACTION_TYPE("Offset","Add an offset to a state variable.")
+CORE_ACTION_ARGUMENT("stateid","The name of the state variable.")
+CORE_ACTION_ARGUMENT("value","The offset that needs to be added.")
+)
 
 public:
   ActionOffset();

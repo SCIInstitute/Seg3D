@@ -36,7 +36,10 @@ namespace Core
 
 class ActionUndo : public Core::Action
 {
-  CORE_ACTION( "Undo" );
+
+CORE_ACTION( 
+CORE_ACTION_TYPE( "Undo", "Undo the last action")
+)
 
   // -- Constructor/Destructor --
 public:

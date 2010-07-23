@@ -38,24 +38,32 @@ namespace Seg3D
   
 class ActionBooleanFilter : public Core::Action
 {
-CORE_ACTION( "BooleanFilter|layerid|expression|b=layerid|c=layerid|d=layerid|replace=true" );
+CORE_ACTION(
+  CORE_ACTION_TYPE( "BooleanFilter", "Boolean expression for mask layers" ) 
+  CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
+  CORE_ACTION_ARGUMENT( "expression", "The expression to evaluate, note the layers are denote as A, B, C, or D" )
+  CORE_ACTION_KEY( "b", "", "Layerid that is loaded into variable B." )
+  CORE_ACTION_KEY( "c", "", "Layerid that is loaded into variable C." )
+  CORE_ACTION_KEY( "d", "", "Layerid that is loaded into variable D." )
+  CORE_ACTION_KEY( "replace", "true", "Replace the old layer (true), or add an new layer (false)" )
+)  
   
   // -- Constructor/Destructor --
 public:
   ActionBooleanFilter()
   {
-    add_argument( layer_a_id_ );
-    add_argument( expression_ );
+    add_argument( this->layer_a_id_ );
+    add_argument( this->expression_ );
     
-    add_parameter( "b", layer_b_id_ );
-    add_parameter( "c", layer_c_id_ );
-    add_parameter( "d", layer_d_id_ );
-    add_parameter( "replace", replace_, true );
+    add_key( this->layer_b_id_ );
+    add_key( this->layer_c_id_ );
+    add_key( this->layer_d_id_ );
+    add_key( this->replace_ );
     
-    add_cachedhandle( layer_a_ );
-    add_cachedhandle( layer_b_ );
-    add_cachedhandle( layer_c_ );
-    add_cachedhandle( layer_d_ ); 
+    add_cachedhandle( this->layer_a_ );
+    add_cachedhandle( this->layer_b_ );
+    add_cachedhandle( this->layer_c_ );
+    add_cachedhandle( this->layer_d_ ); 
   }
   
   virtual ~ActionBooleanFilter()

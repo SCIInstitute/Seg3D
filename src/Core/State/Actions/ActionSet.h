@@ -41,7 +41,12 @@ namespace Core
 
 class ActionSet : public Action
 {
-  CORE_ACTION( "Set|stateid|value" );
+
+CORE_ACTION( 
+CORE_ACTION_TYPE( "Set", "This action sets the value of a state variable." )
+CORE_ACTION_ARGUMENT( "stateid", "The name of the state variable." )
+CORE_ACTION_ARGUMENT( "value", "The new value of the state variable." )
+)
 
   // -- Constructor/Destructor --
 public:

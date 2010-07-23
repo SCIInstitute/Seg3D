@@ -37,7 +37,12 @@ namespace Core
 {
 class ActionFlip : public Action
 {
-  CORE_ACTION( "Flip|stateid|direction" );
+
+CORE_ACTION( 
+CORE_ACTION_TYPE("FlipView","This action flip the state in a view state variable.")
+CORE_ACTION_ARGUMENT("stateid","The name of the state variable.")
+CORE_ACTION_ARGUMENT("direction","Whether to flip in x or y.")
+)
 
   // -- Constructor/Destructor --
 public:

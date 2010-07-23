@@ -58,8 +58,8 @@ SET(CORE_STATE_SRCS
   )
 
 SET(CORE_STATE_ACTIONS_SRCS
-  Actions/ActionSet.h
-  Actions/ActionSet.cc
+  Actions/ActionFlip.h
+  Actions/ActionFlip.cc
   Actions/ActionGet.h
   Actions/ActionGet.cc
   Actions/ActionOffset.h
@@ -68,12 +68,12 @@ SET(CORE_STATE_ACTIONS_SRCS
   Actions/ActionRotateView3D.cc
   Actions/ActionScaleView.h
   Actions/ActionScaleView.cc
-  Actions/ActionTranslateView.h
-  Actions/ActionTranslateView.cc
-  Actions/ActionFlip.h
-  Actions/ActionFlip.cc
+  Actions/ActionSet.h
+  Actions/ActionSet.cc
   Actions/ActionSetRange.h
   Actions/ActionSetRange.cc
+  Actions/ActionTranslateView.h
+  Actions/ActionTranslateView.cc
   Actions/ActionAdd.h
   Actions/ActionAdd.cc
   Actions/ActionRemove.h
@@ -82,7 +82,10 @@ SET(CORE_STATE_ACTIONS_SRCS
   Actions/ActionClear.cc
   )
 
-CORE_ADD_LIBRARY(Core_State ${CORE_STATE_SRCS} ${CORE_STATE_ACTIONS_SRCS} )
+CORE_ADD_LIBRARY(Core_State 
+  ${CORE_STATE_SRCS} 
+  ${CORE_STATE_ACTIONS_SRCS} 
+  ${CORE_STATE_ACTIONS_XML_H_SRCS})
             
 TARGET_LINK_LIBRARIES(Core_State
                       Core_Utils

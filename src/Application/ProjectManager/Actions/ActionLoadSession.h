@@ -38,13 +38,14 @@ namespace Seg3D
 
 class ActionLoadSession : public Core::Action
 {
-  CORE_ACTION( "LoadSession|sessionname" );
-
+CORE_ACTION( 
+  CORE_ACTION_TYPE( "LoadSession", "Load a saved session.")
+  CORE_ACTION_ARGUMENT( "index", "Index of the session that needs to be loaded." )
+)
   // -- Constructor/Destructor --
 public:
   ActionLoadSession()
   {
-    this->add_argument( this->session_name_ );
     this->add_argument( this->session_index_ );
   }
 
@@ -58,10 +59,6 @@ public:
   virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
   
 private:
-
-
-  // This parameter contains the name of the session to be loaded
-  Core::ActionParameter< std::string > session_name_;
 
   // This parameter contains the index of the session to be loaded
   Core::ActionParameter< int > session_index_;

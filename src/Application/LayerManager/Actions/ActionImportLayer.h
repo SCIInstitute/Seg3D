@@ -41,18 +41,21 @@ namespace Seg3D
   
 class ActionImportLayer : public Core::Action
 {
-  CORE_ACTION( "ImportLayer|filename|mode=data#data,single_mask,biplane_mask,label_mask|importer=name" );
-  
+
+CORE_ACTION( 
+  CORE_ACTION_TYPE( "ImportLayer", "This action imports a layer into the layer manager.")
+  CORE_ACTION_ARGUMENT( "filename", "The name of the file to load." )
+  CORE_ACTION_KEY( "mode", "data", "The mode to use: data, single_mask, bitplane_mask, or label_mask.")
+  CORE_ACTION_KEY( "importer", "", "Optional name for a specific importer." )
+)
+
   // -- Constructor/Destructor --
 public:
-  ActionImportLayer() :
-    filename_(""),
-    mode_("data"),
-    importer_("")
+  ActionImportLayer()
   {
-    add_argument( filename_ );
-    add_parameter( "mode", mode_ );
-    add_parameter( "importer", importer_ );
+    add_argument( this->filename_ );
+    add_key( this->mode_ );
+    add_key( this->importer_ );
   }
   
   virtual ~ActionImportLayer()

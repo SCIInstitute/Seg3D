@@ -35,13 +35,6 @@ CORE_REGISTER_ACTION( Core, SetRange )
 namespace Core
 {
 
-ActionSetRange::ActionSetRange()
-{
-  this->add_argument( this->stateid_ );
-  this->add_argument( this->min_value_ );
-  this->add_argument( this->max_value_ );
-}
-
 bool ActionSetRange::validate(  ActionContextHandle& context )
 {
   StateBaseHandle state = this->state_weak_handle_.lock();

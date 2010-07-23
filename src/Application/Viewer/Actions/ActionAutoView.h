@@ -37,10 +37,17 @@ namespace Seg3D
 
 class ActionAutoView : public Core::Action
 {
-  CORE_ACTION( "AutoView|viewerid" );
+  
+CORE_ACTION( 
+  CORE_ACTION_TYPE( "AutoView", "Set camera of viewer to a reasonable default." )
+  CORE_ACTION_ARGUMENT( "viewerid", "The viewerid of the viewer that needs auto view." )
+)
 
 public:
-  ActionAutoView();
+  ActionAutoView()
+  {
+    add_argument( this->viewer_name_ );
+  } 
   virtual ~ActionAutoView() {}
 
   virtual bool validate( Core::ActionContextHandle& context );

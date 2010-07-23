@@ -38,13 +38,18 @@ namespace Seg3D
   
 class ActionConnectedComponentFilter : public Core::Action
 {
-CORE_ACTION( "ConnectedComponentFilter|layerid|seedpoints" );
+
+CORE_ACTION_XML( 
+  CORE_ACTION_TYPE( "ConnectedComponentFilter", " ITK filter that finds regions that are connected and share seed points." )
+  CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
+  CORE_ACTION_ARGUMENT( "seedpoints", "The seed point locations that need to be connected." )
+)
     
   // -- Constructor/Destructor --
 public:
   ActionConnectedComponentFilter()
   {
-    add_argument( layer_id_ );
+    this->add_argument( this->layer_id_ );
     add_cachedhandle( layer_ );
   }
   

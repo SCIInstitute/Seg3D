@@ -44,13 +44,17 @@ namespace Seg3D
 
 class ActionSaveSession : public Core::Action
 {
-  CORE_ACTION( "SaveSession|autosave=false" );
+  
+CORE_ACTION(
+  CORE_ACTION_TYPE( "SaveSession", "Save a new session." )
+  CORE_ACTION_KEY( "autosave", "false", "Whether this action was triggered by the autosave feature." )
+)
 
   // -- Constructor/Destructor --
 public:
   ActionSaveSession()
   {
-    this->add_parameter( "autosave", this->is_autosave_, false );
+    this->add_key( this->is_autosave_ );
   }
 
   virtual ~ActionSaveSession()

@@ -35,16 +35,6 @@ CORE_REGISTER_ACTION( Core, Remove )
 namespace Core
 {
 
-ActionRemove::ActionRemove()
-{
-  this->add_argument( this->stateid_ );
-  this->add_argument( this->value_ );
-}
-
-ActionRemove::~ActionRemove()
-{
-}
-
 bool ActionRemove::validate( ActionContextHandle& context )
 {
   StateBaseHandle state( this->state_weak_handle_.lock() );

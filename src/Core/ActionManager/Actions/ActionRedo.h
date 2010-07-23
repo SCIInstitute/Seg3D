@@ -36,7 +36,10 @@ namespace Core
 
 class ActionRedo : public Action
 {
-  CORE_ACTION( "Redo" );
+
+CORE_ACTION( 
+CORE_ACTION_TYPE( "Redo", "Redo the last action" )
+)
 
   // -- Constructor/Destructor --
 public:

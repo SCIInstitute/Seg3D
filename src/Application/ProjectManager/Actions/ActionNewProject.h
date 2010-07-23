@@ -38,7 +38,12 @@ namespace Seg3D
 
 class ActionNewProject : public Core::Action
 {
-  CORE_ACTION( "NewProject|projectpoth|projectname" );
+  
+CORE_ACTION( 
+  CORE_ACTION_TYPE( "NewProject", "Create a new project and close the current one." )
+  CORE_ACTION_ARGUMENT( "path", "Where to create the new project." )
+  CORE_ACTION_ARGUMENT( "name", "The name of the new project." )
+)
 
   // -- Constructor/Destructor --
 public:

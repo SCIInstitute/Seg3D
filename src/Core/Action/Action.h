@@ -77,17 +77,40 @@ public:
   // Virtual destructor for memory management of derived classes
   virtual ~Action(); // << NEEDS TO BE REIMPLEMENTED
 
-  // These functions define the properties of the action and are implemented
-  // by the CORE_ACTION_TYPE macro
-  
-  virtual std::string get_definition() const = 0;
-  
-  virtual std::string get_type() const = 0;
-  
-  virtual std::string get_usage() const = 0;
-  
+  // -- action definition --
+public:
+  // GET_ACTION_INFO:
+  // Get the action information class that contains all the information about the
+  // action.
+  // NOTE: this function is generated using the macro for each function
   virtual ActionInfoHandle get_action_info() const = 0;
 
+  // -- query information (from the action info) --
+public: 
+  // GET_DEFINTION:
+  // Get the definition of the action (in XML format)
+  std::string get_definition() const;
+  
+  // GET_TYPE:
+  // Get the type of the action
+  std::string get_type() const;
+  
+  // GET_USAGE:
+  // Get a usage description
+  std::string get_usage() const;
+  
+  // GET_KEY:
+  // Get the name of the key with a certain index
+  std::string get_key( size_t index ) const;
+
+  // GET_KEY_DEFAULT_VALUE:
+  // Get the name of the key with a certain index
+  std::string get_default_key_value( size_t index ) const;
+  
+  // GET_KEY_INDEX:
+  // Get the index of a certain key
+  int get_key_index( const std::string& name ) const;
+  
   // -- Run/Validate interface --
 public:
 
@@ -95,13 +118,12 @@ public:
   // Each action needs to be validated just before it is posted. This way we
   // enforce that every action that hits the main post_action signal will be
   // a valid action to execute.
-  // NOTE: If this function is *not* overloaded the function will return true.
   // NOTE: This function is *not* const and may alter the values of the parameters
   //       and correct faulty input. Run on the other hand is not allowed to
   //       change anything in the action, as it is posted to any observers
   //       after the action is validated.
 
-  virtual bool validate( ActionContextHandle& context );
+  virtual bool validate( ActionContextHandle& context ) = 0;
 
   // RUN:
   // Each action needs to have this piece implemented. It spells out how the
@@ -124,42 +146,18 @@ public:
   template< class ARGUMENT >
   void add_argument( ARGUMENT& argument )
   {
-    add_argument_ptr( &argument );
+    this->add_argument_ptr( &argument );
   }
 
-  // ADD_ARGUMENT (WITH DEFAULT VALUE):
-  // A argument to the action needs to be registered with the base
-  // class so we can import and export the arguments to a string.
-  // This function links the arguments of the action to an internal
-  // record of all the arguments
-  template< class ARGUMENT, class T >
-  void add_argument( ARGUMENT& argument, const T& default_value )
+  // ADD_KEY:
+  // A key needs to be registered with the base class
+  // so we can import and export the keys to a string.
+  // This function links the keys of the action to an internal
+  // key value pair system to records all the keys
+  template< class KEY >
+  void add_key( KEY& param )
   {
-    argument.value() = default_value;
-    add_argument_ptr( &argument );
-  }
-
-  // ADD_PARAMETER:
-  // A parameter needs to be registered with the base class
-  // so we can import and export the parameters to a string.
-  // This function links the parameters of the action to an internal
-  // key value pair system to records all the parameters
-  template< class PARAMETER >
-  void add_parameter( const std::string& key, PARAMETER& param )
-  {
-    add_parameter_ptr( key, &param );
-  }
-
-  // ADD_PARAMETER (WITH DEFAULT VALUE):
-  // A parameter needs to be registered with the base class
-  // so we can import and export the parameters to a string.
-  // This function links the parameters of the action to an internal
-  // key value pair system to records all the parameters
-  template< class PARAMETER, class T >
-  void add_parameter( const std::string& key, PARAMETER& param, const T& default_value )
-  {
-    param.value() = default_value;
-    add_parameter_ptr( key, &param );
+    this->add_key_ptr( &param );
   }
 
   // ADD_CACHEDHANDLE:
@@ -168,7 +166,7 @@ public:
   template< class CACHEDHANDLE >
   void add_cachedhandle( CACHEDHANDLE& handle )
   {
-    add_cached_handle_ptr( &handle );
+    this->add_cached_handle_ptr( &handle );
   }
 
   // EXPORT_TO_STRING:
@@ -195,19 +193,18 @@ private:
   // These take pointers to the base class, the ones defined above work
   // with references of the parameters for more convenience.
   void add_argument_ptr( ActionParameterBase* param );
-  void add_parameter_ptr( const std::string& key, ActionParameterBase* param );
+  void add_key_ptr( ActionParameterBase* param );
   void add_cached_handle_ptr( ActionCachedHandleBase* handle );
 
   // Typedefs
-  typedef std::vector< ActionParameterBase* > argument_vector_type;
-  typedef std::map< std::string, ActionParameterBase* > parameter_map_type;
+  typedef std::vector< ActionParameterBase* > parameter_list_type;
   typedef std::vector< ActionCachedHandleBase* > cached_handle_vector_type;
 
   // Vector that stores the required arguments of the action.
-  argument_vector_type arguments_;
+  parameter_list_type arguments_;
 
-  // Map that stores the location of the parameters in the action.
-  parameter_map_type parameters_;
+  // Vector that stores the option key value pairs of the action.
+  parameter_list_type keys_;
   
   // Vector that stores shared pointers to temporary objects
   cached_handle_vector_type cached_handles_;
@@ -223,24 +220,20 @@ private:
 // we only have a pointer to the base object. Hence we need virtual functions
 // as well. 
 
+} // end namespace Core
 
-// DEFINITION STRING MARKUP:
-// The definition string is a short description of the action listing all the names of all
-// the arguments and the action it self. The definition string is parsed and is used everywhere
-// where the program needs to interpret user defined actions, that are parsed in as text
-// The format is:
-//   fields are separated by the character '\'
-//   descriptions are entered after the character '#'
-//   key value pair need to have an '=' in the field
-// The first field is the name of the action, followed by the definition of the required arguments
-// and finally the key value pairs are added at the end
-// For example 'MyAction#this action does nothing|argument1#the name of the argument|argument2|
-//  key1=default_value#my key/value pair'
-  
-  
+#define CORE_ACTION_TYPE( name, description ) \
+"<action name=\"" name "\">" description "</action>"
+
+#define CORE_ACTION_ARGUMENT( name, description ) \
+"<argument name=\"" name "\">" description "</argument>"
+
+#define CORE_ACTION_KEY( name, default_value, description ) \
+"<key name=\"" name "\" default=\"" default_value "\"> " description "</key>"
+
 #define CORE_ACTION(definition_string) \
 public: \
-  static std::string Definition() { return definition_string; } \
+  static std::string Definition() { return GetActionInfo()->get_definition(); }\
   static std::string Type() { return GetActionInfo()->get_type(); } \
   static std::string Usage() { return GetActionInfo()->get_usage(); } \
   static Core::ActionInfoHandle GetActionInfo() \
@@ -251,7 +244,8 @@ public: \
     {\
       {\
         Core::ActionInfo::lock_type lock( Core::ActionInfo::GetMutex() );\
-        if ( !info ) info = Core::ActionInfoHandle( new Core::ActionInfo( Definition() ) ); \
+        std::string definition = std::string( "<?xml version=\"1.0\"?>\n" definition_string "\n" ); \
+        if ( !info ) info = Core::ActionInfoHandle( new Core::ActionInfo( definition ) ); \
       }\
       {\
         Core::ActionInfo::lock_type lock( Core::ActionInfo::GetMutex() );\
@@ -261,11 +255,7 @@ public: \
     return info;\
   } \
   \
-  virtual std::string get_definition() const { return Definition(); } \
-    virtual std::string get_type() const  { return GetActionInfo()->get_type(); } \
-    virtual std::string get_usage() const { return GetActionInfo()->get_usage(); } \
   virtual Core::ActionInfoHandle get_action_info() const { return GetActionInfo(); }
-  
-} // end namespace Core
 
 #endif
+

@@ -41,7 +41,12 @@ typedef boost::shared_ptr< ActionOffsetSlicePrivate > ActionOffsetSlicePrivateHa
 
 class ActionOffsetSlice : public Core::Action
 {
-  CORE_ACTION( "OffsetSlice viewerid offset_value" );
+
+CORE_ACTION( 
+  CORE_ACTION_TYPE( "OffsetSlice", "Move the current slice to new location." )
+  CORE_ACTION_ARGUMENT( "viewerid", "The viewerid of the viewer that needs a new location." )
+  CORE_ACTION_ARGUMENT( "offset", "The offset by which to move the current slice." )
+)
 
 public:
   ActionOffsetSlice();

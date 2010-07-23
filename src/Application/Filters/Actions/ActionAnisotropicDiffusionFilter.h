@@ -38,21 +38,27 @@ namespace Seg3D
   
 class ActionAnisotropicDiffusionFilter : public Core::Action
 {
-CORE_ACTION( "AnisotropicDiffusionFilter|layerid|interations=10|step=2|"
-  "conductance=1.0|replace=true" );
+CORE_ACTION( 
+  CORE_ACTION_TYPE( "AnisotropicDiffusionFilter", "Run the ITK Anisotropic Diffusion Filter." )
+  CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
+  CORE_ACTION_KEY( "interations", "10", "Number of iterations to perform." )
+  CORE_ACTION_KEY( "integration_step", "2", "Number of divisions for each integration." )
+  CORE_ACTION_KEY( "conductance", "1.0", "Weight for specifying how closely connected values are." )
+  CORE_ACTION_KEY( "replace", "true", "Replace the old layer (true), or add an new layer (false)" )
+)
   
   // -- Constructor/Destructor --
 public:
   ActionAnisotropicDiffusionFilter()
   {
-    add_argument( this->layer_id_ );
+    this->add_argument( this->layer_id_ );
     
-    add_parameter( "iterations", this->iterations_, 10 );
-    add_parameter( "step", this->integration_step_, 2 );
-    add_parameter( "conductance", this->conductance_, 1.0 );
-    add_parameter( "replace", this->replace_, true );
+    this->add_key( this->iterations_ );
+    this->add_key( this->integration_step_ );
+    this->add_key( this->conductance_ );
+    this->add_key( this->replace_ );
     
-    add_cachedhandle( this->layer_ );
+    this->add_cachedhandle( this->layer_ );
   }
   
   virtual ~ActionAnisotropicDiffusionFilter()

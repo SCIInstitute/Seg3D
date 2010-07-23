@@ -38,16 +38,22 @@ namespace Seg3D
   
 class ActionGradientMagnitudeFilter : public Core::Action
 {
-CORE_ACTION( "GradientMagnitudeFilter|layerid|replace=true" );
+
+CORE_ACTION_XML( 
+  CORE_ACTION_TYPE( "GradientMagnitudeFilter", "Extract the magnitude of the local gradient from a data layer." )
+  CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
+  CORE_ACTION_KEY( "replace", "true", "Replace the old layer (true), or add an new layer (false)" )
+)
   
   // -- Constructor/Destructor --
 public:
   ActionGradientMagnitudeFilter()
   {
-    add_argument( layer_id_ );
-    add_parameter( "replace", replace_, true );
+    this->add_argument( this->layer_id_ );
 
-    add_cachedhandle( layer_ );
+    this->add_key( this->replace_ );
+
+    this->add_cachedhandle( this->layer_ );
   }
   
   virtual ~ActionGradientMagnitudeFilter()

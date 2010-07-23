@@ -60,45 +60,53 @@ public:
   ActionInfo( const std::string& definition );
   
 public:
+  // GET_DEFINITION:
+  // Get the definition of the action (in xml format)
+  std::string get_definition() const;
+
   // GET_TYPE:
   // The type/name of the action
-  std::string get_type();
+  std::string get_type() const;
 
   // GET_USAGE:
   // The usage string of the action
-  std::string get_usage();
+  std::string get_usage() const;
   
   // GET_DESCRIPTION:
   // Get the description of the action
-  std::string get_description();
+  std::string get_description() const;
   
   // GET_NUM_ARGUMENTS:
   // The number of arguments for this action
-  size_t get_num_arguments();
+  size_t get_num_arguments() const;
   
   // GET_NUM_KEY_VALUE_PAIRS:
   // THe number of key value pairs associated with this action
-  size_t get_num_key_value_pairs();
+  size_t get_num_key_value_pairs() const;
   
   // GET_ARGUMENT:
   // The name of argument <index>
-  std::string get_argument( size_t index );
+  std::string get_argument( size_t index ) const;
 
   // GET_ARGUMENT_DESCRIPTION:
   // The description of argument <index>
-  std::string get_argument_description( size_t index );
+  std::string get_argument_description( size_t index ) const;
   
   // GET_KEY:
   // The name of key <index>
-  std::string get_key( size_t index );
+  std::string get_key( size_t index ) const;
+  
+  // GET_INDEX:
+  // The index of a key
+  int get_key_index( const std::string& key ) const;
   
   // GET_DEFAULT_KEY_VALUE:
   // The default value of the key <index>
-  std::string get_default_key_value( size_t index );
+  std::string get_default_key_value( size_t index ) const;
   
   // GET_KEY_DESCRIPTION:
   // The description of key <index>
-  std::string get_key_description( size_t index );
+  std::string get_key_description( size_t index ) const;
   
 private:
   // Private implementation of this class

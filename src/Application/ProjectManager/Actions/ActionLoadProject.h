@@ -38,13 +38,17 @@ namespace Seg3D
 
 class ActionLoadProject : public Core::Action
 {
-  CORE_ACTION( "LoadProject|projectpath" );
+  
+CORE_ACTION( 
+  CORE_ACTION_TYPE( "LoadProject", "Load a new project and discard the current one." )
+  CORE_ACTION_ARGUMENT( "projectfolder", "Folder name that contains the project." )
+)
 
   // -- Constructor/Destructor --
 public:
   ActionLoadProject()
   {
-    this->add_parameter("projectpath", this->project_path_ );
+    this->add_argument( this->project_path_ );
   }
 
   virtual ~ActionLoadProject()
@@ -76,4 +80,4 @@ public:
 
 } // end namespace Seg3D
 
-#endif  //ACTIONDELETESESSION_H
+#endif

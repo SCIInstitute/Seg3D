@@ -35,16 +35,6 @@ CORE_REGISTER_ACTION( Core, Add )
 namespace Core
 {
 
-ActionAdd::ActionAdd()
-{
-  this->add_argument( this->stateid_ );
-  this->add_argument( this->value_ );
-}
-
-ActionAdd::~ActionAdd()
-{
-}
-
 bool ActionAdd::validate( ActionContextHandle& context )
 {
   StateBaseHandle state( this->state_weak_handle_.lock() );
