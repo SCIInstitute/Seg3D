@@ -37,9 +37,9 @@ namespace Core
 
 ActionSetRange::ActionSetRange()
 {
-  add_argument( this->stateid_ );
-  add_argument( this->min_value_ );
-  add_argument( this->max_value_ );
+  this->add_argument( this->stateid_ );
+  this->add_argument( this->min_value_ );
+  this->add_argument( this->max_value_ );
 }
 
 bool ActionSetRange::validate(  ActionContextHandle& context )
@@ -53,42 +53,37 @@ bool ActionSetRange::validate(  ActionContextHandle& context )
           + "'" );
       return false;
     }
-  }
 
-  if ( typeid( *state ) != typeid( StateRangedInt ) &&
-     typeid( *state ) != typeid( StateRangedDouble ) )
-  {
-    context->report_error( std::string( "State variable '" ) + stateid_.value()
+    StateRangedValueBaseHandle ranged_value =
+      boost::dynamic_pointer_cast< StateRangedValueBase >( state );
+    if ( !ranged_value )
+    {
+      context->report_error( std::string( "State variable '" ) + stateid_.value()
         + "' doesn't support ActionSetRange" );
-    return false;
+      return false;
+    }
+
+    std::string error;
+    if ( !ranged_value->validate_value_type_variant( this->min_value_, error ) ||
+      !ranged_value->validate_value_type_variant( this->max_value_, error ) )
+    {
+      context->report_error( error );
+      return false;
+    }
+
+    this->state_weak_handle_ = ranged_value;
   }
 
-  this->state_weak_handle_ = state;
   return true;
 }
 
 bool ActionSetRange::run( ActionContextHandle& context, ActionResultHandle& result )
 {
-  StateBaseHandle state = this->state_weak_handle_.lock();
+  StateRangedValueBaseHandle state = this->state_weak_handle_.lock();
   if ( state )
   {
-    if ( typeid( *state ) == typeid( StateRangedInt ) )
-    {
-      StateRangedInt* ranged_int_state = 
-        dynamic_cast< StateRangedInt* >( state.get() );
-      ranged_int_state->set_range( static_cast<int>( this->min_value_.value() ),
-        static_cast<int>( this->max_value_.value() ), context->source() );
-      return true;
-    }
-
-    if ( typeid( *state ) == typeid( StateRangedDouble ) )
-    {
-      StateRangedDouble* ranged_double_state = 
-        dynamic_cast< StateRangedDouble* >( state.get() );
-      ranged_double_state->set_range( this->min_value_.value(), this->max_value_.value(),
-        context->source() );
-      return true;
-    }
+     return state->import_range_from_variant( this->min_value_, this->max_value_, 
+       context->source() );
   }
 
   return false;

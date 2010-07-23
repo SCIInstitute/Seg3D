@@ -76,7 +76,7 @@ bool PaintToolInterface::build_widget( QFrame* frame )
   this->private_->brush_radius_ = new QtUtils::QtSliderIntCombo( this, true );
   this->private_->ui_.verticalLayout->addWidget( this->private_->brush_radius_ );
 
-  this->private_->upper_threshold_ = new QtUtils::QtSliderDoubleCombo( this, true );
+  this->private_->upper_threshold_ = new QtUtils::QtSliderDoubleCombo( this, false );
   this->private_->ui_.upperHLayout_bottom->addWidget( this->private_->upper_threshold_ );
   
   this->private_->lower_threshold_ = new QtUtils::QtSliderDoubleCombo( this, false );

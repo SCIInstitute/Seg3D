@@ -68,7 +68,7 @@ bool ActionOffset::validate( ActionContextHandle& context )
   }
 
   std::string error;
-  if ( !this->state_weak_handle_.lock()->validate_offset_variant( this->offset_value_, error ) )
+  if ( !this->state_weak_handle_.lock()->validate_value_type_variant( this->offset_value_, error ) )
   {
     context->report_error( error );
     return false;

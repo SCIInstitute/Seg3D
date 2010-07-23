@@ -33,7 +33,6 @@
 
 #include <Core/Action/Action.h>
 #include <Core/State/StateRangedValue.h>
-#include <Core/Interface/Interface.h>
 
 namespace Core
 {
@@ -51,28 +50,29 @@ public:
 
 private:
   ActionParameter< std::string > stateid_;
-  ActionParameter< double > min_value_;
-  ActionParameter< double > max_value_;
+  ActionParameterVariant min_value_;
+  ActionParameterVariant max_value_;
 
-  StateBaseWeakHandle state_weak_handle_;
+  StateRangedValueBaseWeakHandle state_weak_handle_;
 
-  // -- Dispatch this action from the interface --
 public:
 
-  template< class STATE_HANDLE >
-  static ActionHandle Create( STATE_HANDLE& state_handle, double min_value, double max_value )
+  template< class T >
+  static ActionHandle Create( typename StateRangedValue< T >::handle_type& state_handle,
+    T min_value, T max_value )
   {
     ActionSetRange* action = new ActionSetRange;
     action->stateid_.value() = state_handle->stateid();
-    action->min_value_.value() = min_value;
-    action->max_value_.value() = max_value;
+    action->min_value_.set_value( min_value );
+    action->max_value_.set_value( max_value );
     action->state_weak_handle_ = state_handle;
     return ActionHandle( action );
   }
 
-  template< class STATE_HANDLE >
-  static void Dispatch( ActionContextHandle context, STATE_HANDLE& state_handle, 
-    double min_value, double max_value )
+  template< class T >
+  static void Dispatch( ActionContextHandle context, 
+    typename StateRangedValue< T >::handle_type& state_handle, 
+    T min_value, T max_value )
   {
     ActionDispatcher::PostAction( Create( state_handle, min_value, max_value ), context );
   }

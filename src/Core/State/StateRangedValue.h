@@ -71,14 +71,23 @@ public:
 
 protected:
   friend class ActionOffset;
+  friend class ActionSetRange;
+
   // IMPORT_OFFSET_FROM_VARIANT:
   // Import the offset value from the variant and apply it to the current value.
   virtual bool import_offset_from_variant( ActionParameterVariant& variant, 
     ActionSource source = ActionSource::NONE_E ) = 0;
 
+  // IMPORT_RANGE_FROM_VARIANT:
+  // Import range values from variants.
+  virtual bool import_range_from_variant( ActionParameterVariant& variant_min,
+    ActionParameterVariant& variant_max, 
+    ActionSource source = ActionSource::NONE_E ) = 0;
+
   // VALIDATE_OFFSET_VARIANT:
   // Returns true if the value stored in the variant is a valid offset value, otherwise false.
-  virtual bool validate_offset_variant( ActionParameterVariant& variant, std::string& error ) = 0;
+  virtual bool validate_value_type_variant( ActionParameterVariant& variant, 
+    std::string& error ) = 0;
 };
 
 // Definition of the templated StateValue class
@@ -164,6 +173,22 @@ protected:
     return this->offset( offset_value, source );
   }
 
+  // IMPORT_RANGE_FROM_VARIANT:
+  // Import range values from variants.
+  virtual bool import_range_from_variant( ActionParameterVariant& variant_min,
+    ActionParameterVariant& variant_max, 
+    ActionSource source = ActionSource::NONE_E )
+  {
+    T min_val, max_val;
+    if ( !variant_min.get_value( min_val ) ||
+      !variant_max.get_value( max_val ) )
+    {
+      return false;
+    }
+    this->set_range( min_val, max_val, source );
+    return true;
+  }
+
   // VALIDATE_VARIANT:
   // Validate a variant parameter
   // This function returns false if the parameter is invalid or cannot be
@@ -190,7 +215,8 @@ protected:
 
   // VALIDATE_OFFSET_VARIANT:
   // Returns true if the value stored in the variant is a valid offset value, otherwise false.
-  virtual bool validate_offset_variant( ActionParameterVariant& variant, std::string& error )
+  virtual bool validate_value_type_variant( ActionParameterVariant& variant, 
+    std::string& error )
   {
     if ( !( variant.validate_type< T > () ) )
     {
@@ -219,39 +245,30 @@ public:
   
     this->min_value_ = min_value;
     this->max_value_ = max_value;
+    bool value_changed = false;
+    T new_value = this->value_;
 
     if ( this->value_ < this->min_value_ )
     {
       this->value_ = this->min_value_;
-      T value = this->value_;
-      lock.unlock();
-      
-      if ( this->signals_enabled() )
-      {
-        this->value_changed_signal_( value, ActionSource::NONE_E );
-        this->state_changed_signal_();
-        this->range_changed_signal_( min_value, max_value, source );
-      }
+      new_value = this->value_;
+      value_changed = true;     
     }
     else if ( this->value_ > this->max_value_ )
     {
       this->value_ = this->max_value_;
-      T value = this->value_;
-      lock.unlock();
-    
-      if ( this->signals_enabled() )
-      {
-        this->value_changed_signal_( value, ActionSource::NONE_E );
-        this->state_changed_signal_();
-      }
+      new_value = this->value_;
+      value_changed = true;
     }
-    else
-    {
-      lock.unlock();
 
-      if ( this->signals_enabled() )
+    lock.unlock();
+    if ( this->signals_enabled() )
+    {
+      this->range_changed_signal_( min_value, max_value, source );
+      if ( value_changed )
       {
-        this->range_changed_signal_( min_value, max_value, source );
+        this->value_changed_signal_( new_value, ActionSource::NONE_E );
+        this->state_changed_signal_();
       }
     }
   }
