@@ -126,4 +126,14 @@ void Tool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 {
 }
 
+bool Tool::has_2d_visual()
+{
+  return false;
+}
+
+bool Tool::has_3d_visual()
+{
+  return false;
+}
+
 } // end namespace Seg3D

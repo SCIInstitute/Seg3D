@@ -139,8 +139,6 @@ void ToolBoxWidget::add_tool( QWidget * tool, const QString &label,
   QtUtils::QtBridge::Connect( new_page.ui_.activate_button_, activate_function );
   QtUtils::QtBridge::Connect( new_page.ui_.close_button_, close_function );
 
-  set_active_tool( tool );
-
   this->private_->page_list_.push_back( new_page );
 }
 
@@ -169,7 +167,7 @@ void ToolBoxWidget::set_active_tool( QWidget *tool )
     }
   }
 
-  // then we set the new active tool member variabless
+  // then we set the new active tool member variables
   this->active_tool_ = tool;
 
   // then, we activate the active one.

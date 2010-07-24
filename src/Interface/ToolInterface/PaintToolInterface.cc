@@ -64,7 +64,6 @@ PaintToolInterface::PaintToolInterface() :
 PaintToolInterface::~PaintToolInterface()
 {
 }
-  
 
 // build the interface and connect it to the state manager
 bool PaintToolInterface::build_widget( QFrame* frame )
@@ -111,24 +110,12 @@ bool PaintToolInterface::build_widget( QFrame* frame )
   this->private_->ui_.target_mask_->setDisabled( tool->use_active_layer_state_->get() );
   connect( this->private_->ui_.use_active_layer_, SIGNAL( toggled( bool ) ),
     this->private_->ui_.target_mask_, SLOT( setDisabled( bool ) ) );
-  
-//  this->private_->ui_.target_mask_->setMaximumContentsLength() 
-//  this->private_->ui_.mask_constraint_
-//  this->private_->ui_.data_constraint_
     
-    //Send a message to the log that we have finised with building the Paint Brush Interface
-  CORE_LOG_MESSAGE("Finished building a Paint Brush Interface");
+    //Send a message to the log that we have finished with building the Paint Brush Interface
+  CORE_LOG_DEBUG( "Finished building a Paint Brush Interface" );
 
   return ( true );
-} // end build_widget
-
-void PaintToolInterface::execute_filter()
-{
-  ToolHandle base_tool_ = tool();
-  PaintTool* tool =
-  dynamic_cast< PaintTool* > ( base_tool_.get() );
-  
-}
+} 
 
 } // end namespace Seg3D
 

@@ -53,9 +53,6 @@ public:
   PaintToolInterface();
   virtual ~PaintToolInterface();
   virtual bool build_widget( QFrame* frame );
-
-private Q_SLOTS:
-  void execute_filter();
   
   // -- private structure with widget classes --
 private:

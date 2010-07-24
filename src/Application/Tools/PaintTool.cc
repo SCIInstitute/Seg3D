@@ -1023,4 +1023,10 @@ bool PaintTool::post_load_states()
   return true;
 }
 
+bool PaintTool::has_2d_visual()
+{
+  return true;
+}
+
+
 } // end namespace Seg3D

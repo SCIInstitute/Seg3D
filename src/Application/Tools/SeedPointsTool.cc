@@ -270,7 +270,7 @@ void SeedPointsTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
     int y = static_cast< int >( ( pt[ 1 ] + 1.0 ) * 0.5 * ( viewer->get_height() - 1 ) );
     int slice_num = vol_slice->get_closest_slice( seed_points[ i ] );
     bool in_slice = ( !vol_slice->out_of_boundary() && 
-      slice_num == vol_slice->get_slice_number() );
+      slice_num == static_cast< int >( vol_slice->get_slice_number() ) );
     Core::Color color = in_slice ? Core::Color( 1.0, 1.0, 0.0 ) : Core::Color( 0.6, 0.6, 0.0 );
     glColor3d( color.r(), color.g(), color.b() );
     glBegin( GL_LINES );
@@ -289,5 +289,14 @@ void SeedPointsTool::clear( Core::ActionContextHandle context )
   Core::ActionClear::Dispatch( context, this->seed_points_state_ );
 }
 
+bool SeedPointsTool::has_2d_visual()
+{
+  return true;
+}
+
+bool SeedPointsTool::has_3d_visual()
+{
+  return true;
+}
 
 } // end namespace Seg3D

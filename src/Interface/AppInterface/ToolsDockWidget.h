@@ -59,7 +59,7 @@ namespace Seg3D
 class ToolsDockWidget;
 
 // Class definition
-class ToolsDockWidget : public QDockWidget, public Core::ConnectionHandler
+class ToolsDockWidget : public QDockWidget, private Core::ConnectionHandler
 {
 Q_OBJECT
 

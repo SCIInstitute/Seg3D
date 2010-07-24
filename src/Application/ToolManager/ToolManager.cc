@@ -129,7 +129,7 @@ ToolManager::ToolManager() :
 {
   std::vector< std::string> tools;
   this->add_state( "tools", this->private_->tools_state_, tools );
-  this->add_state( "active_tool", this->private_->active_tool_state_, "none" );
+  this->add_state( "active_tool", this->private_->active_tool_state_, Tool::NONE_OPTION_C );
 
   // Register mouse event handlers for all the viewers
   size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
@@ -182,9 +182,12 @@ bool ToolManager::open_tool( const std::string& tool_type, std::string& new_tool
   // Step (5): Add the tool id to the tool and add the tool to the list
   new_toolid = tool->toolid();
   this->private_->tool_list_[ new_toolid ] = tool;
-
+  
   // Step (6): Signal any observers (UIs) that the tool has been opened
   open_tool_signal_( tool );
+
+  // Set the tool to be active
+  this->activate_tool( new_toolid );
 
   // All done
   return true;
@@ -232,6 +235,14 @@ void ToolManager::close_tool( const std::string& toolid )
 
   // Step (7): Signal that the tool will be closed.
   close_tool_signal_( tool );
+
+  if ( !this->private_->active_tool_ && !this->private_->tool_list_.empty() )
+  {
+    this->private_->active_tool_ = ( *this->private_->tool_list_.begin() ).second;
+    this->private_->active_tool_->activate();
+    this->activate_tool_signal_( this->private_->active_tool_ );
+  }
+  
 }
 
 // THREAD-SAFETY:
@@ -252,27 +263,50 @@ void ToolManager::activate_tool( const std::string& toolid )
   {
     return;
   }
-  
-  // Step (4): Deactivate the current active tool if it exists
-  if ( this->private_->active_tool_ )
-  {
-    this->private_->active_tool_->deactivate();
-  }
-  
-  // Step (5): Find new active tool and activate it
+
+  // Step (4): Find new active tool
   tool_list_type::iterator it = this->private_->tool_list_.find( toolid );
-  if ( it != this->private_->tool_list_.end() )
+  if ( it == this->private_->tool_list_.end() )
   {
-    ( *it ).second->activate();
-    this->private_->active_tool_ = ( *it ).second;
-  }
-  else
-  {
-    this->private_->active_tool_.reset();
     return;
   }
 
-  // Step (4): signal for interface
+  // Step (4): Deactivate the current active tool if it exists, and activate the new one
+  ToolHandle old_tool = this->private_->active_tool_;
+  this->private_->active_tool_ = ( *it ).second;
+  if ( old_tool )
+  {
+    old_tool->deactivate();
+  } 
+  this->private_->active_tool_->activate();
+
+  // Step (5): Update viewers if necessary.
+  bool redraw_2d = this->private_->active_tool_->has_2d_visual() ||
+    ( old_tool && old_tool->has_2d_visual() );
+  bool redraw_3d = this->private_->active_tool_->has_3d_visual() ||
+    ( old_tool && old_tool->has_3d_visual() );
+
+  if ( redraw_2d || redraw_3d )
+  {
+    size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
+    for ( size_t i = 0; i < num_of_viewers; i++ )
+    {
+      ViewerHandle viewer = ViewerManager::Instance()->get_viewer( i );
+      if ( viewer->is_volume_view() )
+      {
+        if ( redraw_3d )
+        {
+          viewer->redraw();
+        }
+      }
+      else if ( redraw_2d )
+      {
+        viewer->redraw_overlay();
+      }
+    }
+  }
+  
+  // Step (6): signal for interface
   activate_tool_signal_( ( *it ).second );
 }
 
@@ -289,7 +323,7 @@ std::string ToolManager::active_toolid()
   {
     return this->private_->active_tool_->toolid();
   }
-  return "";
+  return Tool::NONE_OPTION_C;
 }
 
 ToolHandle ToolManager::get_active_tool()
@@ -355,9 +389,13 @@ bool ToolManager::post_load_states()
     }   
   }
 
-  if( this->private_->active_tool_state_->get() != "none" )
+  if( this->private_->active_tool_state_->get() != Tool::NONE_OPTION_C )
   {
     this->activate_tool( this->private_->active_tool_state_->get() );
+  }
+  else if ( !this->private_->tool_list_.empty() )
+  {
+    this->activate_tool( ( *this->private_->tool_list_.begin() ).first );
   }
 
   return true;
