@@ -50,16 +50,21 @@ public:
   // The number at the end of the state handler id
   size_t statehandler_id_number_;
 
+  // The priority number used for saving the contents of this state handler
   int save_priority_;
 
   // The database with the actual states 
   state_map_type state_map_;
 
+  // Version number of this state handler
   size_t version_number_;
 
+  // Check whether this state handler is still valid ( invalidate will unset this )
   bool valid_;
-
-  boost::mutex mutex_;
+  
+  // Keep track of which state was switched on
+  bool signals_enabled_;
+  bool initializing_;
 };
 
 
@@ -88,6 +93,8 @@ StateHandler::StateHandler( const std::string& type_str, size_t version_number, 
   this->private_->save_priority_ = save_priority;
 
   this->private_->valid_ = true;
+  this->private_->signals_enabled_ = true;
+  this->private_->initializing_ = false;
 }
 
 StateHandler::~StateHandler()
@@ -104,7 +111,7 @@ StateHandler::~StateHandler()
 bool StateHandler::add_statebase( StateBaseHandle state )
 {
   // Step (1): Get unique state id
-  std::string stateid = state->stateid();
+  std::string stateid = state->get_stateid();
 
   // Step (2): Link with statehandler
   this->add_connection( state->state_changed_signal_.connect( boost::bind(
@@ -112,6 +119,10 @@ bool StateHandler::add_statebase( StateBaseHandle state )
 
   // Step (3): Add the state to the map
   this->private_->state_map_[ stateid ] = state;
+
+  // Step (4): copy current state to state variable
+  state->enable_signals( this->private_->signals_enabled_ );
+  state->set_initializing( this->private_->initializing_ );
 
   return true;
 }
@@ -190,7 +201,7 @@ bool StateHandler::populate_session_states()
   while ( it != it_end )
   {
 
-    states.push_back( ( *it ).second->stateid() + "*"
+    states.push_back( ( *it ).second->get_stateid() + "*"
       + ( *it ).second->export_to_string() );
     ++it;
   }
@@ -279,7 +290,7 @@ bool StateHandler::export_states( boost::filesystem::path path, const std::strin
     "*version*" + boost::lexical_cast< std::string >( this->private_->version_number_) );
   while ( it != it_end )
   {
-    state_values.push_back( ( *it ).second->stateid() + "*"
+    state_values.push_back( ( *it ).second->get_stateid() + "*"
       + ( *it ).second->export_to_string() );
     ++it;
   }
@@ -332,7 +343,7 @@ size_t StateHandler::number_of_states() const
 void StateHandler::invalidate()
 {
   {
-    boost::mutex::scoped_lock lock( this->private_->mutex_ );
+    StateEngine::lock_type lock( StateEngine::GetMutex() );
     if( !this->private_->valid_ )
     {
       return;
@@ -353,9 +364,36 @@ void StateHandler::invalidate()
   StateEngine::Instance()->remove_state_handler( this->private_->statehandler_id_ );
 }
 
+void StateHandler::enable_signals( bool enabled )
+{
+  state_map_type::iterator it_end = this->private_->state_map_.end();
+  state_map_type::iterator it = this->private_->state_map_.begin();
+  while ( it != it_end )
+  {
+    ( *it ).second->enable_signals( enabled );
+    it++;
+  }
+
+  this->private_->signals_enabled_ = enabled;
+}
+
+
+void StateHandler::set_initializing( bool initializing )
+{
+  state_map_type::iterator it_end = this->private_->state_map_.end();
+  state_map_type::iterator it = this->private_->state_map_.begin();
+  while ( it != it_end )
+  {
+    ( *it ).second->set_initializing( initializing );
+    it++;
+  }
+  
+  this->private_->initializing_ = initializing;
+}
+
 bool StateHandler::is_valid()
 {
-  boost::mutex::scoped_lock lock( this->private_->mutex_ );
+  StateEngine::lock_type lock( StateEngine::GetMutex() );
   return this->private_->valid_;
 }
 
@@ -363,8 +401,5 @@ void StateHandler::clean_up()
 {
   // does nothing by default.
 }
-
-
-
 
 } // end namespace Core

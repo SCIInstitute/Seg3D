@@ -66,13 +66,13 @@ const std::string Viewer::CORONAL_C( "coronal" );
 const std::string Viewer::SAGITTAL_C( "sagittal" );
 const std::string Viewer::VOLUME_C( "volume" );
 
-Viewer::Viewer( size_t viewer_id ) :
+Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
   Core::AbstractViewer(  viewer_id, VERSION_NUMBER_C ),
   adjusting_contrast_brightness_( false ),
   signals_block_count_( 0 ),
   slice_lock_count_( 0 )
 {
-  this->add_state( "view_mode", view_mode_state_, AXIAL_C, SAGITTAL_C + 
+  this->add_state( "view_mode", view_mode_state_, mode , SAGITTAL_C + 
     "|" + CORONAL_C + "|" + AXIAL_C + "|" + VOLUME_C );
 
   this->add_state( "axial_view", axial_view_state_ );
@@ -87,8 +87,7 @@ Viewer::Viewer( size_t viewer_id ) :
 
   this->add_state( "slice_number", this->slice_number_state_, 0, 0, 0, 1 );
   this->add_state( "slice_grid", this->slice_grid_state_, false );
-  this->add_state( "slice_visible", this->slice_visible_state_, true );
-  this->add_state( "slice_mirror_cursor", this->slice_mirror_cursor_state_, true );
+  this->add_state( "slice_visible", this->slice_visible_state_, visible);
   this->add_state( "slice_picking_visible", this->slice_picking_visible_state_, true );
 
   this->add_state( "volume_slices_visible", this->volume_slices_visible_state_, true );

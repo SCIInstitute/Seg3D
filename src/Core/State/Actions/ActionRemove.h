@@ -77,7 +77,7 @@ ActionHandle ActionRemove::Create( const typename
                  StateVector< T >::handle_type& state, const T& value )
 {
   ActionRemove* action = new ActionRemove;
-  action->stateid_.set_value( state->stateid() );
+  action->stateid_.set_value( state->get_stateid() );
   action->value_.set_value( value );
   action->state_weak_handle_ = state;
 

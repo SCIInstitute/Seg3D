@@ -59,6 +59,9 @@ bool StateView2D::import_from_string( const std::string& str, ActionSource sourc
 
 void StateView2D::scale( double ratio )
 {
+  // NOTE: State variables can only be set from the application thread
+  ASSERT_IS_APPLICATION_THREAD_OR_INITIALIZING();
+
   {
     // Lock the state engine so no other thread will be accessing it
     StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
@@ -73,6 +76,9 @@ void StateView2D::scale( double ratio )
 
 void StateView2D::translate( const Core::Vector& offset )
 {
+  // NOTE: State variables can only be set from the application thread
+  ASSERT_IS_APPLICATION_THREAD_OR_INITIALIZING();
+
   {
     // Lock the state engine so no other thread will be accessing it
     StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
@@ -87,6 +93,9 @@ void StateView2D::translate( const Core::Vector& offset )
   
 void StateView2D::dolly( double dz )
 {
+  // NOTE: State variables can only be set from the application thread
+  ASSERT_IS_APPLICATION_THREAD_OR_INITIALIZING();
+
   View2D val;
   {
     // Lock the state engine so no other thread will be accessing it
@@ -104,6 +113,9 @@ void StateView2D::dolly( double dz )
 
 void StateView2D::flip( Core::FlipDirectionType direction )
 {
+  // NOTE: State variables can only be set from the application thread
+  ASSERT_IS_APPLICATION_THREAD_OR_INITIALIZING();
+
   {
     StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
     this->value_.flip( direction );
@@ -127,6 +139,9 @@ bool StateView2D::y_flipped() const
 
 bool StateView2D::set( const Core::View2D& value, ActionSource source )
 {
+  // NOTE: State variables can only be set from the application thread
+  ASSERT_IS_APPLICATION_THREAD_OR_INITIALIZING();
+
   // Lock the state engine so no other thread will be accessing it
   StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
 

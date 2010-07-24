@@ -239,6 +239,9 @@ public:
   void set_range( T min_value, T max_value,
     Core::ActionSource source = Core::ActionSource::NONE_E )
   {
+    // NOTE: State variables can only be set from the application thread
+    ASSERT_IS_APPLICATION_THREAD_OR_INITIALIZING();
+    
     StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );  
 
     if ( min_value > max_value ) std::swap( min_value, max_value );
@@ -289,6 +292,9 @@ public:
   // mechanism to ensure that the action is recorded correctly.
   bool set( T value, Core::ActionSource source = Core::ActionSource::NONE_E )
   {
+    // NOTE: State variables can only be set from the application thread
+    ASSERT_IS_APPLICATION_THREAD_OR_INITIALIZING();
+    
     // Lock the state engine so no other thread will be accessing it
     StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
 
@@ -328,6 +334,9 @@ public:
   // Offset the value of the state variable by the specified amount.
   bool offset( const T& offset_value, ActionSource source = ActionSource::NONE_E )
   {
+    // NOTE: State variables can only be set from the application thread
+    ASSERT_IS_APPLICATION_THREAD_OR_INITIALIZING();
+    
     T new_value;
     bool value_changed = false;
     {

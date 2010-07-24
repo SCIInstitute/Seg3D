@@ -206,6 +206,9 @@ bool StateLabeledOption::validate_variant( ActionParameterVariant& variant, std:
 
 void StateLabeledOption::set_option_list(  const std::vector< OptionLabelPair >& option_list )
 {
+  // NOTE: State variables can only be set from the application thread
+  ASSERT_IS_APPLICATION_THREAD_OR_INITIALIZING();
+  
   // Lock the state engine so no other thread will be accessing it
   StateEngine::lock_type lock( StateEngine::GetMutex() );
 
@@ -269,6 +272,9 @@ int StateLabeledOption::index() const
 
 bool StateLabeledOption::set( const std::string& input_value, Core::ActionSource source )
 {
+  // NOTE: State variables can only be set from the application thread
+  ASSERT_IS_APPLICATION_THREAD_OR_INITIALIZING();
+  
   // Lock the state engine so no other thread will be accessing it
   StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
 

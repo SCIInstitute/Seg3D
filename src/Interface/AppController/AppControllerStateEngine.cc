@@ -70,7 +70,7 @@ QVariant AppControllerStateEngine::data( const QModelIndex& index, int role ) co
     {
       if ( index.column() == 0 )
       {
-        return ( QString::fromStdString( state->stateid() ) );
+        return ( QString::fromStdString( state->get_stateid() ) );
       }
       else
       {

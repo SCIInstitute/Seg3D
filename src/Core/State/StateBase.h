@@ -40,7 +40,8 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
 
-// Action includes
+// Core includes
+#include <Core/Application/Application.h>
 #include <Core/Action/ActionContext.h>
 #include <Core/Action/ActionParameter.h>
 
@@ -58,18 +59,12 @@ class StateBase : public boost::noncopyable
 
   // -- constructor / destructor --
 public:
-  StateBase(const std::string& stateid) :
-    stateid_( stateid ),
-    signals_enabled_( true )
-  {
-  }
-  
-  virtual ~StateBase()
-  {
-  }
+  StateBase(const std::string& stateid);
+
+  virtual ~StateBase();
 
   // -- functions for accessing data --
-
+public:
   // EXPORT_TO_STRING:
   // Convert the contents of the State into a string
   virtual std::string export_to_string() const = 0;
@@ -100,40 +95,50 @@ protected:
   // converted and in that case error will describe the error.
   virtual bool validate_variant( Core::ActionParameterVariant& variant, std::string& error ) = 0;
 
-  // ENABLE_SIGNALS
-  void enable_signals( bool signals_enabled )
-  {
-    this->signals_enabled_ = signals_enabled;
-  }
+  // ENABLE_SIGNALS:
+  // Allow signals to be triggered from this state variable
+  // NOTE: Signal enabling is used for loading sessions, switching off signalling can prevent
+  // a lot of signals being triggered when every state variable is reinitialized.
+  void enable_signals( bool signals_enabled );
   
+  // SIGNALS_ENABLED:
+  // Check whether signals are enabled
   bool signals_enabled()
   {
     return this->signals_enabled_;
   }
   
+  // SET_INITIALIZING:
+  // Indicate that the statehandler is still being created. Hence only one thread will have
+  // access to the state variable, and thread safety checking is not needed. 
+  // NOTE: This is mainly intended to be set in the constructor of the state handler of this
+  // variable, which may need to initialize the state variables to certain values. As that handlers
+  // are can be singletons they can be created from any thread. Hence strict thread checking
+  // maybe an issue, however the creation of an instance normally is thread safe as no other
+  // thread has access to the state parameters and signals are still being blocked.
+  void set_initializing( bool initializing );
+  
+  // GET_INITIALIZING:
+  // Query whether the state variable and its parent are still being initialized.
+  bool get_initializing()
+  {
+    return this->initializing_;
+  }
+  
+  
   // -- stateid handling --
 public:
   // GET_STATEID:
   // Get the unique id assigned to the state variable
-  std::string stateid() const
-  {
-    return this->stateid_;
-  }
+  std::string get_stateid() const;
 
   // GET_BASEID:
   // Get the base id of this state variable
-  std::string baseid() const
-  {
-    return ( this->stateid_.substr( 0, this->stateid_.find( ':' ) ) );
-  }
+  std::string get_baseid() const;
 
   // GET_ID:
   // Get the base id of this state variable
-  std::string id() const
-  {
-    //return ( stateid_.substr( 2, stateid_.find( ":" ) ) );
-    return Core::SplitString(  this->stateid_, "::" )[ 1 ];
-  }
+  std::string get_id() const;
 
   // -- signal handling --
 public:
@@ -147,18 +152,25 @@ protected:
   // Invalidate the state variable. This function is called by the "invalidate" function of 
   // StateHandler to release any resource occupied by the state.
   // Default implementation does nothing.
-  virtual void invalidate() {}
+  virtual void invalidate();
 
 private:
   // The name of this state, so it can be saved in human readable form
   std::string stateid_;
 
-  // Whether the signals are blocked
+  // Whether the signals are enabled
   bool signals_enabled_;
+
+  // Whether the state variable is still being initialized
+  bool initializing_;
 
 };
 
 } // end namespace Core
+
+// Ensure that any set outside the initialization phase is done on the application thread
+#define ASSERT_IS_APPLICATION_THREAD_OR_INITIALIZING() \
+assert( Core::Application::IsApplicationThread() || get_initializing() )
 
 #endif
 

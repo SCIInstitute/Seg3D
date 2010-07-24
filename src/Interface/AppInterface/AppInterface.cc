@@ -66,7 +66,7 @@ AppInterface::AppInterface()
   // Tell Qt what size to start up in
   resize( 1280, 720 );
   
-  // Tell Qt where to doc the toolbars
+  // Tell Qt where to dock the toolbars
   setCorner( Qt::TopLeftCorner, Qt::LeftDockWidgetArea );
   setCorner( Qt::TopRightCorner, Qt::RightDockWidgetArea );
   setCorner( Qt::BottomLeftCorner, Qt::LeftDockWidgetArea );
@@ -84,10 +84,6 @@ AppInterface::AppInterface()
 
   // Define the main window viewer canvas
   this->viewer_interface_ = new ViewerInterface( this );
-
-
-  
-  
 
   // Setup the dock widgets
   add_windowids();
@@ -143,9 +139,6 @@ AppInterface::AppInterface()
     this->add_connection( InterfaceManager::Instance()->full_screen_state_->
       value_changed_signal_.connect( boost::bind( &AppInterface::SetFullScreen, 
       qpointer_type( this ), _1, _2 ) ) );
-
-    InterfaceManager::Instance()->full_screen_state_->set( 
-      PreferencesManager::Instance()->full_screen_on_startup_state_->get() );
   }
 
   this->center_seg3d_gui_on_screen( this );
@@ -461,7 +454,7 @@ void AppInterface::begin_progress( Core::ActionProgressHandle handle )
   
   CORE_LOG_DEBUG( "-- Start progress widget --" );
   this->progress_ = new ProgressWidget( handle, this );
-  this->progress_->exec();
+  this->progress_->show();
 }
 
 void AppInterface::end_progress( Core::ActionProgressHandle /*handle*/ )

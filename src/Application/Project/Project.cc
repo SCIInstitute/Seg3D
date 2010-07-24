@@ -110,7 +110,6 @@ bool Project::save_session( boost::filesystem::path project_path, const std::str
 {
   this->current_session_->session_name_state_->set( session_name );
   
-  
   if( this->current_session_->save_session_settings( 
     ( project_path / "sessions" ), session_name ) )
   {

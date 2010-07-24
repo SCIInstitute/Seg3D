@@ -237,6 +237,9 @@ public:
   // to enforce a constraint from another action.
   bool set( const std::vector< T >& value, ActionSource source = ActionSource::NONE_E )
   {
+    // NOTE: State variables can only be set from the application thread
+    ASSERT_IS_APPLICATION_THREAD_OR_INITIALIZING();
+
     // Lock the state engine so no other thread will be accessing it
     StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
 
@@ -256,6 +259,9 @@ public:
 
   bool add( const T& value, ActionSource source = ActionSource::NONE_E )
   {
+    // NOTE: State variables can only be set from the application thread
+    ASSERT_IS_APPLICATION_THREAD_OR_INITIALIZING();
+  
     {
       StateEngine::lock_type lock( StateEngine::GetMutex() );
       this->values_vector_.push_back( value );
@@ -272,6 +278,9 @@ public:
 
   bool remove( const T& value, ActionSource source = ActionSource::NONE_E )
   {
+    // NOTE: State variables can only be set from the application thread
+    ASSERT_IS_APPLICATION_THREAD_OR_INITIALIZING();
+
     bool removed = false;
     {
       StateEngine::lock_type lock( StateEngine::GetMutex() );
@@ -294,6 +303,9 @@ public:
 
   virtual void clear( ActionSource source = ActionSource::NONE_E )
   {
+    // NOTE: State variables can only be set from the application thread
+    ASSERT_IS_APPLICATION_THREAD_OR_INITIALIZING();
+
     {
       StateEngine::lock_type lock( StateEngine::GetMutex() );
       this->values_vector_.clear();

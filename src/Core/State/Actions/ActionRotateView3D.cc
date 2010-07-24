@@ -87,7 +87,7 @@ ActionHandle ActionRotateView3D::Create( StateView3DHandle& view3d_state, const 
     double angle )
 {
   ActionRotateView3D* action = new ActionRotateView3D;
-  action->stateid_.value() = view3d_state->stateid();
+  action->stateid_.value() = view3d_state->get_stateid();
   action->axis_.value() = axis;
   action->angle_.value() = angle;
   action->view3d_state_ = StateView3DWeakHandle( view3d_state );

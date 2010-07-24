@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>385</width>
+    <width>360</width>
     <height>279</height>
    </rect>
   </property>
@@ -564,6 +564,9 @@ QComboBox::icon{
                    </disabled>
                   </palette>
                  </property>
+                 <property name="toolTip">
+                  <string>Select viewer mode.</string>
+                 </property>
                  <property name="currentIndex">
                   <number>0</number>
                  </property>
@@ -672,6 +675,9 @@ QComboBox::icon{
                    <height>20</height>
                   </size>
                  </property>
+                 <property name="toolTip">
+                  <string>Autoview</string>
+                 </property>
                  <property name="text">
                   <string/>
                  </property>
@@ -705,6 +711,9 @@ QComboBox::icon{
                    <height>20</height>
                   </size>
                  </property>
+                 <property name="toolTip">
+                  <string>Lock navigation with the other locked viewers.</string>
+                 </property>
                  <property name="icon">
                   <iconset resource="../../Resources/QtResources.qrc">
                    <normaloff>:/Images/LockOff.png</normaloff>
@@ -729,6 +738,9 @@ QComboBox::icon{
                    <height>20</height>
                   </size>
                  </property>
+                 <property name="toolTip">
+                  <string>Show this slice in volume viewer.</string>
+                 </property>
                  <property name="icon">
                   <iconset resource="../../Resources/QtResources.qrc">
                    <normaloff>:/Images/VisibleOff.png</normaloff>
@@ -752,6 +764,9 @@ QComboBox::icon{
                    <width>20</width>
                    <height>20</height>
                   </size>
+                 </property>
+                 <property name="toolTip">
+                  <string>Scene lighting on/off</string>
                  </property>
                  <property name="text">
                   <string/>
@@ -818,6 +833,9 @@ QComboBox::icon{
                    <height>20</height>
                   </size>
                  </property>
+                 <property name="toolTip">
+                  <string>Switch on/off grid</string>
+                 </property>
                  <property name="icon">
                   <iconset resource="../../Resources/QtResources.qrc">
                    <normaloff>:/Images/GridOff.png</normaloff>
@@ -841,6 +859,9 @@ QComboBox::icon{
                    <width>20</width>
                    <height>20</height>
                   </size>
+                 </property>
+                 <property name="toolTip">
+                  <string>Flip the data visually horizontal.</string>
                  </property>
                  <property name="icon">
                   <iconset resource="../../Resources/QtResources.qrc">
@@ -866,6 +887,9 @@ QComboBox::icon{
                    <height>20</height>
                   </size>
                  </property>
+                 <property name="toolTip">
+                  <string>Flip the data visually vertical.</string>
+                 </property>
                  <property name="icon">
                   <iconset resource="../../Resources/QtResources.qrc">
                    <normaloff>:/Images/FlipVertOff.png</normaloff>
@@ -889,6 +913,9 @@ QComboBox::icon{
                    <width>20</width>
                    <height>20</height>
                   </size>
+                 </property>
+                 <property name="toolTip">
+                  <string>Show isosurface</string>
                  </property>
                  <property name="text">
                   <string/>
@@ -914,6 +941,9 @@ QComboBox::icon{
                    <height>20</height>
                   </size>
                  </property>
+                 <property name="toolTip">
+                  <string>Show slice plains</string>
+                 </property>
                  <property name="text">
                   <string/>
                  </property>
@@ -938,6 +968,9 @@ QComboBox::icon{
                    <height>20</height>
                   </size>
                  </property>
+                 <property name="toolTip">
+                  <string>Show volume rendering</string>
+                 </property>
                  <property name="text">
                   <string/>
                  </property>
@@ -949,22 +982,10 @@ QComboBox::icon{
                 </widget>
                </item>
                <item>
-                <widget class="QToolButton" name="cursor_mirrored_button_">
-                 <property name="text">
-                  <string>...</string>
-                 </property>
-                 <property name="icon">
-                  <iconset resource="../../Resources/QtResources.qrc">
-                   <normaloff>:/Images/CursorMirrorOff.png</normaloff>
-                   <normalon>:/Images/CursorMirror.png</normalon>:/Images/CursorMirrorOff.png</iconset>
-                 </property>
-                 <property name="checkable">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
                 <widget class="QToolButton" name="picking_lines_visible_button_">
+                 <property name="toolTip">
+                  <string>Show picking lines.</string>
+                 </property>
                  <property name="text">
                   <string>...</string>
                  </property>
@@ -980,6 +1001,9 @@ QComboBox::icon{
                </item>
                <item>
                 <widget class="QToolButton" name="overlay_visible_button_">
+                 <property name="toolTip">
+                  <string>Show overlay.</string>
+                 </property>
                  <property name="text">
                   <string>...</string>
                  </property>

@@ -140,9 +140,6 @@ bool QtRenderResourcesContext::create_render_context( Core::RenderContextHandle&
     this->private_->shared_widget_->context()->device() ) );
   qt_context->create( this->private_->shared_widget_->context() );
 
-  CORE_LOG_DEBUG( std::string( "qt_context->valid = " ) + 
-    Core::ExportToString( qt_context->isValid() ) );
-
   // Bind the new context in the GUI independent wrapper class
   context = Core::RenderContextHandle( new QtRenderContext( qt_context ) );
 

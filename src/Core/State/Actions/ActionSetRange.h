@@ -72,7 +72,7 @@ public:
     T min_value, T max_value )
   {
     ActionSetRange* action = new ActionSetRange;
-    action->stateid_.value() = state_handle->stateid();
+    action->stateid_.value() = state_handle->get_stateid();
     action->min_value_.set_value( min_value );
     action->max_value_.set_value( max_value );
     action->state_weak_handle_ = state_handle;

@@ -26,6 +26,9 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// STL
+#include <iostream>
+
 // Qt includes
 #include <QTimer>
 
@@ -91,7 +94,7 @@ ProgressWidget::ProgressWidget( Core::ActionProgressHandle action_progress, QWid
     connect( this->private_->running_timer_, SIGNAL( timeout() ), 
       this, SLOT( update_running() ) );
   
-    this->private_->running_timer_->start();
+    this->private_->running_timer_->start( );
   }
   else
   {

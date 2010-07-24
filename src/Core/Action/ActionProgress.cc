@@ -55,12 +55,12 @@ ActionProgress::~ActionProgress()
 
 void ActionProgress::begin_progress_reporting()
 {
-  ActionDispatcher::Instance()->begin_progress_signal_( ActionProgressHandle( this ) );
+  ActionDispatcher::Instance()->begin_progress_signal_( this->shared_from_this() );
 }
 
 void ActionProgress::end_progress_reporting()
 {
-  ActionDispatcher::Instance()->end_progress_signal_( ActionProgressHandle( this ) );
+  ActionDispatcher::Instance()->end_progress_signal_(  this->shared_from_this() );
 }
 
 void ActionProgress::set_interrupt( bool interrupt )
@@ -79,7 +79,7 @@ void ActionProgress::set_progress( double progress )
 {
   lock_type lock( get_mutex() );
   progress_ = progress;
-  ActionDispatcher::Instance()->report_progress_signal_( ActionProgressHandle( this ) ); 
+  ActionDispatcher::Instance()->report_progress_signal_( this->shared_from_this() ); 
 }
 
 double ActionProgress::get_progress()

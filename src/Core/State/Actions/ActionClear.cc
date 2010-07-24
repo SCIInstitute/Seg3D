@@ -74,7 +74,7 @@ bool ActionClear::run( ActionContextHandle& context, ActionResultHandle& result 
 ActionHandle ActionClear::Create( const StateVectorBaseHandle& state )
 {
   ActionClear* action = new ActionClear;
-  action->stateid_.set_value( state->stateid() );
+  action->stateid_.set_value( state->get_stateid() );
   action->state_weak_handle_ = state;
 
   return ActionHandle( action );

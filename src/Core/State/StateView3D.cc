@@ -59,6 +59,9 @@ bool StateView3D::import_from_string( const std::string& str, ActionSource sourc
 
 bool StateView3D::set( const Core::View3D& value, ActionSource source )
 {
+  // NOTE: State variables can only be set from the application thread
+  ASSERT_IS_APPLICATION_THREAD_OR_INITIALIZING();
+
   // Lock the state engine so no other thread will be accessing it
   StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
 
@@ -78,6 +81,9 @@ bool StateView3D::set( const Core::View3D& value, ActionSource source )
 
 void StateView3D::rotate( const Core::Vector& axis, double angle )
 {
+  // NOTE: State variables can only be set from the application thread
+  ASSERT_IS_APPLICATION_THREAD_OR_INITIALIZING();
+
   {
     // Lock the state engine so no other thread will be accessing it
     StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
@@ -92,6 +98,9 @@ void StateView3D::rotate( const Core::Vector& axis, double angle )
 
 void StateView3D::scale( double ratio )
 {
+  // NOTE: State variables can only be set from the application thread
+  ASSERT_IS_APPLICATION_THREAD_OR_INITIALIZING();
+
   {
     // Lock the state engine so no other thread will be accessing it
     StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
@@ -106,6 +115,9 @@ void StateView3D::scale( double ratio )
 
 void StateView3D::translate( const Core::Vector& offset )
 {
+  // NOTE: State variables can only be set from the application thread
+  ASSERT_IS_APPLICATION_THREAD_OR_INITIALIZING();
+
   {
     // Lock the state engine so no other thread will be accessing it
     StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );

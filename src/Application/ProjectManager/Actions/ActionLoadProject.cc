@@ -68,6 +68,7 @@ bool ActionLoadProject::run( Core::ActionContextHandle& context,
   progress->begin_progress_reporting();
 
   ProjectManager::Instance()->open_project( this->project_path_.value() );
+  
   progress->end_progress_reporting();
 
   return true;

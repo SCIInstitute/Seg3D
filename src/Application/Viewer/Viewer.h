@@ -72,7 +72,7 @@ class Viewer : public Core::AbstractViewer, public boost::enable_shared_from_thi
 public:
   friend class ViewManipulator;
 
-  Viewer( size_t viewer_id );
+  Viewer( size_t viewer_id, bool visible = true, const std::string& mode = Viewer::AXIAL_C );
   virtual ~Viewer();
 
   // -- mouse events handling --
@@ -247,7 +247,6 @@ public:
   // 2D viewer state
   Core::StateBoolHandle slice_grid_state_;
   Core::StateBoolHandle slice_visible_state_;
-  Core::StateBoolHandle slice_mirror_cursor_state_;
   Core::StateBoolHandle slice_picking_visible_state_;
 
   // 3D viewer state

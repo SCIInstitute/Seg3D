@@ -215,6 +215,9 @@ const std::string& StateName::get() const
 
 bool StateName::set( const std::string& value, ActionSource source )
 {
+  // NOTE: State variables can only be set from the application thread
+  ASSERT_IS_APPLICATION_THREAD_OR_INITIALIZING();
+
   std::string old_value;
   std::string new_value;
 

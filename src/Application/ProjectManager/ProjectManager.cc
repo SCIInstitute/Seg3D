@@ -63,8 +63,9 @@ ProjectManager::ProjectManager() :
 
   try
   {
-    boost::filesystem::path path = complete( boost::filesystem::path( this->
-      current_project_path_state_->get().c_str(), boost::filesystem::native ) );
+    boost::filesystem::path path = complete( boost::filesystem::path(
+      PreferencesManager::Instance()->project_path_state_->get().c_str(), 
+      boost::filesystem::native ) );
     boost::filesystem::create_directory( path );
   }
   catch ( std::exception& e ) 
@@ -72,8 +73,12 @@ ProjectManager::ProjectManager() :
     CORE_LOG_ERROR( e.what() );
   }
   
-  this->initialize();
-  
+  // This constructor is called from the Qt thread, hence state variables can only be set
+  // in initializing mode.
+  this->set_initializing( true );
+  import_states( this->local_projectmanager_path_, "projectmanager" );
+  this->set_initializing( false );
+    
   this->current_project_ = ProjectHandle( new Project( "default_project" ) );
 
   // Connect the signals from the LayerManager to the GUI
@@ -85,11 +90,6 @@ ProjectManager::ProjectManager() :
 
 ProjectManager::~ProjectManager()
 {
-}
-
-void ProjectManager::initialize()
-{
-  import_states( this->local_projectmanager_path_, "projectmanager" );
 }
   
 void ProjectManager::save_projectmanager_state()

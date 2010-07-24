@@ -156,4 +156,6 @@ public:
 
 } // end namespace Core
 
+#define ASSERT_IS_APPLICATION_THREAD() assert( Core::Application::IsApplicationThread() )
+
 #endif

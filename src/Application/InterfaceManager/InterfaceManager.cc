@@ -30,6 +30,7 @@
 #include <Core/Interface/Interface.h>
 
 #include <Application/InterfaceManager/InterfaceManager.h>
+#include <Application/PreferencesManager/PreferencesManager.h>
 
 namespace Seg3D
 {
@@ -42,7 +43,9 @@ InterfaceManager::InterfaceManager() :
   StateHandler( "interface", VERSION_NUMBER_C, false )
 {
   // set up state variables
-  add_state( "fullscreen", full_screen_state_, false );
+  this->add_state( "fullscreen", full_screen_state_, 
+    PreferencesManager::Instance()->full_screen_on_startup_state_->get() );
+
 }
 
 InterfaceManager::~InterfaceManager()

@@ -82,6 +82,8 @@
     <file>Images/NextSliceOff.png</file>
     <file>Images/Opacity.png</file>
     <file>Images/OpacityOff.png</file>
+    <file>Images/Overlay.png</file>
+    <file>Images/OverlayOff.png</file>
     <file>Images/Picking.png</file>
     <file>Images/PickingOff.png</file>
     <file>Images/PickingLines.png</file>

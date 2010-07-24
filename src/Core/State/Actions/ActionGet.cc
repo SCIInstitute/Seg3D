@@ -84,7 +84,7 @@ ActionHandle ActionGet::Create( StateBaseHandle& state )
   ActionGet* action = new ActionGet;
 
   // Set action parameters
-  action->stateid_.value() = state->stateid();
+  action->stateid_.value() = state->get_stateid();
 
   // Add optimization
   action->state_weak_handle_ = state;

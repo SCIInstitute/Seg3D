@@ -230,10 +230,11 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
       group->get_grid_transform().get_ny() );
         this->private_->size_depth_adjuster_crop_->setRange( 0, 
       group->get_grid_transform().get_nz() );
-        
-    group->crop_size_width_state_->set( group->get_grid_transform().get_nx() );
-    group->crop_size_height_state_->set( group->get_grid_transform().get_ny() );
-    group->crop_size_depth_state_->set( group->get_grid_transform().get_nz() );
+  
+// TODO: Need to migrate this to the application thread         
+//    group->crop_size_width_state_->set( group->get_grid_transform().get_nx() );
+//    group->crop_size_height_state_->set( group->get_grid_transform().get_ny() );
+//    group->crop_size_depth_state_->set( group->get_grid_transform().get_nz() );
   
         this->private_->center_x_adjuster_crop_->setRange( 0, group->get_grid_transform().get_nx() );
         this->private_->center_y_adjuster_crop_->setRange( 0, group->get_grid_transform().get_ny() );
@@ -253,9 +254,11 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
         
         // --- TRANSFORM ---
         // = set the default values
-        group->transform_spacing_x_state_->set( group->get_grid_transform().spacing_x() );
-        group->transform_spacing_y_state_->set( group->get_grid_transform().spacing_y() );
-        group->transform_spacing_z_state_->set( group->get_grid_transform().spacing_z() );
+        
+    // TODO: Being called from the wrong thread needs to be migrated to application thread
+    //group->transform_spacing_x_state_->set( group->get_grid_transform().spacing_x() );
+        //group->transform_spacing_y_state_->set( group->get_grid_transform().spacing_y() );
+        //group->transform_spacing_z_state_->set( group->get_grid_transform().spacing_z() );
         
         // = make the connections
       QtUtils::QtBridge::Connect( this->private_->ui_.origin_x_spinbox_, group->transform_origin_x_state_ );

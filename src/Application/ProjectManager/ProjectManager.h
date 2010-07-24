@@ -127,15 +127,12 @@ public:
 
 public:
   Core::StateStringVectorHandle recent_projects_state_;
-  Core::StateStringHandle current_project_path_state_;
-  Core::StateIntHandle default_project_name_counter_state_;
+  Core::StateStringHandle       current_project_path_state_;
+  Core::StateIntHandle          default_project_name_counter_state_;
   
   ProjectHandle current_project_;
 
 private:
-  // INITIALIZE:
-  // this function loads the values for ProjectManager from file
-  void initialize();
   
   // ADD_TO_RECENT_PROJECTS:
   // this function adds the latest project to the list of recent projects

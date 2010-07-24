@@ -67,7 +67,7 @@ public:
   static ActionHandle Create( VIEWSTATEHANDLE& view_state, const Core::Vector& offset )
   {
     ActionTranslateView* action = new ActionTranslateView;
-    action->stateid_ = view_state->stateid();
+    action->stateid_ = view_state->get_stateid();
     action->offset_ = offset;
     action->state_weak_handle_ = view_state;
 

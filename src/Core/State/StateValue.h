@@ -164,6 +164,9 @@ public:
   // NOTE: Please use action to set the state of a variable
   bool set( const T& value, ActionSource source = ActionSource::NONE_E )
   {
+    // NOTE: State variables can only be set from the application thread
+    ASSERT_IS_APPLICATION_THREAD_OR_INITIALIZING();
+    
     // Lock the state engine so no other thread will be accessing it
     StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
 

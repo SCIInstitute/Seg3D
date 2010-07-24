@@ -159,6 +159,10 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
       this->private_->viewer_->slice_visible_state_ );
     QtUtils::QtBridge::Connect( this->private_->ui_.slices_visible_button_,
       this->private_->viewer_->volume_slices_visible_state_ );
+    QtUtils::QtBridge::Connect( this->private_->ui_.picking_lines_visible_button_,
+      this->private_->viewer_->slice_picking_visible_state_ );
+    QtUtils::QtBridge::Connect( this->private_->ui_.overlay_visible_button_,
+      this->private_->viewer_->overlay_visible_state_ );
     QtUtils::QtBridge::Connect( this->private_->ui_.light_visible_button_,
       this->private_->viewer_->volume_light_visible_state_ );
     QtUtils::QtBridge::Connect( this->private_->ui_.isosurfaces_visible_button_,
@@ -250,7 +254,6 @@ void ViewerWidget::change_view_type( int index )
   this->private_->ui_.grid_button_->setVisible( !is_volume_view );
   this->private_->ui_.slice_visible_button_->setVisible( !is_volume_view );
   this->private_->ui_.picking_lines_visible_button_->setVisible( !is_volume_view );
-  this->private_->ui_.cursor_mirrored_button_->setVisible( !is_volume_view );
   this->private_->picking_button_->setVisible( !is_volume_view );
 
   // 3D viewer specific buttons

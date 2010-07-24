@@ -95,6 +95,9 @@ std::string StateOption::export_list_to_string() const
 
 bool StateOption::set( const std::string& input_value, ActionSource source )
 {
+  // NOTE: State variables can only be set from the application thread
+  ASSERT_IS_APPLICATION_THREAD_OR_INITIALIZING();
+  
   // Lock the state engine so no other thread will be accessing it
   StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
 
@@ -189,6 +192,9 @@ bool StateOption::is_option( const std::string& option )
 
 void StateOption::set_option_list( const std::vector< std::string >& option_list )
 {
+  // NOTE: State variables can only be set from the application thread
+  ASSERT_IS_APPLICATION_THREAD_OR_INITIALIZING();
+
   // Lock the state engine so no other thread will be accessing it
   StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
 
@@ -241,6 +247,9 @@ void StateOption::set_option_list( const std::string& option_list )
 
 void StateOption::set_option_list( const std::string& option_list, const std::string& option )
 {
+  // NOTE: State variables can only be set from the application thread
+  ASSERT_IS_APPLICATION_THREAD_OR_INITIALIZING();
+  
   // Lock the state engine so no other thread will be accessing it
   StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
 

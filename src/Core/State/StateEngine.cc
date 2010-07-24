@@ -71,7 +71,7 @@ StateEngine::~StateEngine()
 
 bool  StateEngine::load_session_states()
 {
-  lock_type lock( get_mutex() );
+//  lock_type lock( get_mutex() );
   
   state_handler_map_type::iterator it = this->private_->state_handler_map_.begin();
   state_handler_map_type::iterator it_end = this->private_->state_handler_map_.end();

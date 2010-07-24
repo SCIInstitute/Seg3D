@@ -54,10 +54,10 @@ namespace Core
 // Forward declaration
 class ActionProgress;
 // NOTE: The intrusive pointer will allow a handle to be generate inside the class
-typedef boost::intrusive_ptr< ActionProgress > ActionProgressHandle;
+typedef boost::shared_ptr< ActionProgress > ActionProgressHandle;
 
 // Class defintion
-class ActionProgress : public Core::IntrusiveBase, public Core::Lockable
+class ActionProgress :  public Core::Lockable, public boost::enable_shared_from_this<ActionProgress>
 {
   // -- Constructor / Destructor --
 public:

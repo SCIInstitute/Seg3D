@@ -83,7 +83,7 @@ bool ActionScaleView::run( ActionContextHandle& context, ActionResultHandle& res
 ActionHandle ActionScaleView::Create( StateViewBaseHandle& view_state, double ratio )
 {
   ActionScaleView* action = new ActionScaleView;
-  action->stateid_ = view_state->stateid();
+  action->stateid_ = view_state->get_stateid();
   action->scale_ratio_ = ratio;
   action->state_weak_handle_ = view_state;
   return ActionHandle( action );

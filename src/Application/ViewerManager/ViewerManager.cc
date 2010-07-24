@@ -51,6 +51,9 @@ ViewerManager::ViewerManager() :
   StateHandler( "view", VERSION_NUMBER_C, false, 1 ),
   signal_block_count_( 0 )
 {
+  // Allow states to be set from outside of the application thread
+  this->set_initializing( true );
+
   // Step (1)
   // Set the default state of this element
   this->add_state( "layout", this->layout_state_, PreferencesManager::Instance()->
@@ -74,24 +77,12 @@ ViewerManager::ViewerManager() :
   // Currently a maximum of 6 viewers can be created
   this->viewers_.resize( 6 );
   
-  for ( size_t j = 0; j < viewers_.size(); j++ )
-  {
-    this->viewers_[ j ] = ViewerHandle( new Viewer( j ) );
-  }
-
-  // Step set defaults for viewers
-  this->viewers_[ 0 ]->view_mode_state_->set( Viewer::VOLUME_C );
-  this->viewers_[ 0 ]->slice_visible_state_->set( false );
-  this->viewers_[ 1 ]->view_mode_state_->set( Viewer::AXIAL_C );
-  this->viewers_[ 1 ]->slice_visible_state_->set( false );
-  this->viewers_[ 2 ]->view_mode_state_->set( Viewer::AXIAL_C );
-  this->viewers_[ 2 ]->slice_visible_state_->set( false );
-  this->viewers_[ 3 ]->view_mode_state_->set( Viewer::AXIAL_C );
-  this->viewers_[ 3 ]->slice_visible_state_->set( true );
-  this->viewers_[ 4 ]->view_mode_state_->set( Viewer::SAGITTAL_C );
-  this->viewers_[ 4 ]->slice_visible_state_->set( true );
-  this->viewers_[ 5 ]->view_mode_state_->set( Viewer::CORONAL_C );
-  this->viewers_[ 5 ]->slice_visible_state_->set( true );
+  this->viewers_[ 0 ] = ViewerHandle( new Viewer( 0, true,  Viewer::VOLUME_C ) );
+  this->viewers_[ 1 ] = ViewerHandle( new Viewer( 1, false, Viewer::AXIAL_C ) );
+  this->viewers_[ 2 ] = ViewerHandle( new Viewer( 2, false, Viewer::AXIAL_C ) );
+  this->viewers_[ 3 ] = ViewerHandle( new Viewer( 3, true, Viewer::AXIAL_C ) );
+  this->viewers_[ 4 ] = ViewerHandle( new Viewer( 4, true, Viewer::SAGITTAL_C ) );
+  this->viewers_[ 5 ] = ViewerHandle( new Viewer( 5, true, Viewer::CORONAL_C ) );
 
   for ( size_t j = 0; j < viewers_.size(); j++ )
   {
@@ -122,6 +113,8 @@ ViewerManager::ViewerManager() :
     viewers_vector.push_back( this->viewers_[ i ]->get_statehandler_id() );
   }
   this->viewers_state_->set( viewers_vector );
+  
+  this->set_initializing( false );
 }
 
 ViewerManager::~ViewerManager()

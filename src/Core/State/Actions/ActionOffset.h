@@ -73,7 +73,7 @@ ActionHandle ActionOffset::Create( const typename StateRangedValue< T >::handle_
                   const T& offset )
 {
   ActionOffset* action = new ActionOffset;
-  action->stateid_.value() = state->stateid();
+  action->stateid_.value() = state->get_stateid();
   action->offset_value_.set_value( offset );
   action->state_weak_handle_ = state;
 

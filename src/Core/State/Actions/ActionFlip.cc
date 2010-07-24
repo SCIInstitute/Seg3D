@@ -85,7 +85,7 @@ bool ActionFlip::run( ActionContextHandle& context, ActionResultHandle& result )
 ActionHandle ActionFlip::Create( StateView2DHandle& state, Core::FlipDirectionType direction )
 {
   ActionFlip* action = new ActionFlip;
-  action->stateid_.value() = state->stateid();
+  action->stateid_.value() = state->get_stateid();
   action->direction_.value() = direction;
   action->view2d_state_ = state;
   return ActionHandle( action );  

@@ -32,6 +32,7 @@
 ##################################################
 
 SET(CORE_STATE_SRCS
+  StateBase.cc
   StateBase.h
   StateEngine.h
   StateEngine.cc

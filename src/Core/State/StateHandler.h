@@ -62,7 +62,8 @@ class StateHandler : public ConnectionHandler
 
   // -- constructor/destructor --
 public:
-  StateHandler( const std::string& type_str, size_t version_number, bool auto_id, int save_priority = -1 );
+  StateHandler( const std::string& type_str, size_t version_number, 
+    bool auto_id, int save_priority = -1 );
   virtual ~StateHandler();
 
 public:
@@ -147,8 +148,13 @@ public:
 
 public:
   // INVALIDATE:
-  // this function is called when you need to delete something from the state engine but may have 
+  // this function is called when you need to delete something from the state engine, but may have 
   // lingering handles that need to be cleaned up
+  
+  // NOTE: This is needed to ensure that all states are removed from the state engine while the
+  // UI can still have lingering handles to the object. This situation occurs because of the
+  // Qt and Application thread to be separate and the messaging is synchronous without any
+  // confirmation when things have been updated.
   void invalidate();
 
   // IS_VALID:
@@ -156,9 +162,19 @@ public:
   bool is_valid();
 
 protected:
+
   // CLEAN_UP:
   // This function is called by invalidate to clean up stuff in the statehandler subclasses
   virtual void clean_up();
+
+  // ENABLE_SIGNALS:
+  // This function enables/disables signals in the state variables
+  void enable_signals( bool enabled );
+  
+  // SET_INITIALIZING:
+  // This function denotes whether a state handler is initializing or not. During the initializing
+  // phase signals and thread checking are turned off
+  void set_initializing( bool initializing );
 
 public:
   // POPULATE_SESSION_STATES:
@@ -206,7 +222,8 @@ protected:
 
 protected:
   // STATE_CHANGED:
-  // This function is called when any of the state variables are changed
+  // This function is called when any of the state variables are changed and can be overloaded
+  // to implement a general function that needs to be called each time the state is updated.
   virtual void state_changed();
 
 public:
@@ -219,11 +236,14 @@ public:
   size_t get_statehandler_id_number() const;
 
   // GET_SAVE_TO_DISK:
-  // This function returns a bool indicating whether this statehandler should be save to disk
+  // This function returns a priority indicating whether this statehandler should be save to disk
+  // a priority below 0 is not saved to disk automatically
   int get_save_priority();
 
 
 private:
+  friend class StateEngine;
+
   // HANDLE_STATE_CHANGED:
   // This function is called whenever a state registered with this statehandler is changed
   void handle_state_changed();
@@ -232,11 +252,9 @@ private:
   // Create the full state id
   std::string create_state_id( const std::string& key ) const;
 
-private:
-  friend class StateEngine;
-
   // ADD_STATEBASE:
-  // Function that adds the state variable to the database
+  // Function that adds the state variable to the database, the functions add_state call
+  // this function to finalize the process of adding the state to the state engine
   bool add_statebase( StateBaseHandle state );
 
   // GET_STATE (CALLED BY STATEENGINE):
@@ -247,14 +265,12 @@ private:
   // Get the state variable
   bool get_state( const size_t idx, StateBaseHandle& state );
   
-  // NUMBER_OF_STATES:
+  // NUMBER_OF_STATES (CALLED BY STATEENGINE):
   // Get the number of state variables stored in this statehandler
   size_t number_of_states() const;
 
+  // Internal implementation
   StateHandlerPrivate* private_;
-
-  
-
 };
 
 } // end namespace Core

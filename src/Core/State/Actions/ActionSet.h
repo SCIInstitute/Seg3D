@@ -90,7 +90,7 @@ public:
     ActionSet* action = new ActionSet;
 
     // Set action parameters
-    action->stateid_.value() = state->stateid();
+    action->stateid_.value() = state->get_stateid();
     action->state_value_.set_value( statevalue );
 
     // Add optimization
