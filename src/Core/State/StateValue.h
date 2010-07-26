@@ -55,21 +55,27 @@ class StateValue;
 
 typedef StateValue< double > StateDouble;
 typedef boost::shared_ptr< StateDouble > StateDoubleHandle;
+typedef boost::weak_ptr< StateDouble > StateDoubleWeakHandle;
 
 typedef StateValue< Point > StatePoint;
 typedef boost::shared_ptr< StatePoint > StatePointHandle;
+typedef boost::weak_ptr< StatePoint > StatePointWeakHandle;
 
 typedef StateValue< Color > StateColor;
 typedef boost::shared_ptr< StateColor > StateColorHandle;
+typedef boost::weak_ptr< StateColor > StateColorWeakHandle;
 
 typedef StateValue< bool > StateBool;
 typedef boost::shared_ptr< StateBool > StateBoolHandle;
+typedef boost::weak_ptr< StateBool > StateBoolWeakHandle;
 
 typedef StateValue< int > StateInt;
 typedef boost::shared_ptr< StateInt > StateIntHandle;
+typedef boost::weak_ptr< StateInt > StateIntWeakHandle;
   
 typedef StateValue< std::string > StateString;
 typedef boost::shared_ptr< StateString > StateStringHandle;
+typedef boost::weak_ptr< StateString > StateStringWeakHandle;
 
 // Definition of the templated StateValue class
 

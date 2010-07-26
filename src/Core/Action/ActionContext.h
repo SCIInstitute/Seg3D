@@ -91,22 +91,26 @@ SCI_ENUM_CLASS
   // interaction
   INTERFACE_MOUSE_E = 2,
 
+  // INTERFACE_KEYBOARD_E - The action is run from the interface, but through a keyboard
+  // interaction
+  INTERFACE_KEYBOARD_E = 3,
+
   // SCRIPT_E -The action is run from a script, which means that
   // the interface needs to be updated and as well that actions need to be
   // queued. Hence for this source the required resource lock needs to be
   // returned, so the script can wait for the action to be completed.
-  SCRIPT_E = 3,
+  SCRIPT_E = 4,
 
   // COMMANDLINE_E - This action is run from the command line, it
   // needs to update the interface, but does not allow queuing
-  COMMANDLINE_E = 4,
+  COMMANDLINE_E = 5,
 
   // PROVENANCE_E - The action is run from the provenance buffer
   // Hence it should not be recorded again into the provenance buffer
-  PROVENANCE_E = 5,
+  PROVENANCE_E = 6,
 
   // UNDOBUFFER_E - The action is run from the undobuffer
-  UNDOBUFFER_E = 6
+  UNDOBUFFER_E = 7
 )
 
 class ActionContext;

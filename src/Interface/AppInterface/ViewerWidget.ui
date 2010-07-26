@@ -982,6 +982,24 @@ QComboBox::icon{
                 </widget>
                </item>
                <item>
+                <widget class="QToolButton" name="overlay_visible_button_">
+                 <property name="toolTip">
+                  <string>Show overlay.</string>
+                 </property>
+                 <property name="text">
+                  <string>...</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="../../Resources/QtResources.qrc">
+                   <normaloff>:/Images/OverlayOff.png</normaloff>
+                   <normalon>:/Images/Overlay.png</normalon>:/Images/OverlayOff.png</iconset>
+                 </property>
+                 <property name="checkable">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
                 <widget class="QToolButton" name="picking_lines_visible_button_">
                  <property name="toolTip">
                   <string>Show picking lines.</string>
@@ -993,24 +1011,6 @@ QComboBox::icon{
                   <iconset resource="../../Resources/QtResources.qrc">
                    <normaloff>:/Images/PickingLinesOff.png</normaloff>
                    <normalon>:/Images/PickingLines.png</normalon>:/Images/PickingLinesOff.png</iconset>
-                 </property>
-                 <property name="checkable">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QToolButton" name="overlay_visible_button_">
-                 <property name="toolTip">
-                  <string>Show overlay.</string>
-                 </property>
-                 <property name="text">
-                  <string>...</string>
-                 </property>
-                 <property name="icon">
-                  <iconset resource="../../Resources/QtResources.qrc">
-                   <normaloff>:/Images/TextOff.png</normaloff>
-                   <normalon>:/Images/Text.png</normalon>:/Images/TextOff.png</iconset>
                  </property>
                  <property name="checkable">
                   <bool>true</bool>

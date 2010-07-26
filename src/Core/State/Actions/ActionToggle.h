@@ -26,56 +26,84 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef CORE_STATE_ACTIONS_ACTIONROTATEVIEW3D_H
-#define CORE_STATE_ACTIONS_ACTIONROTATEVIEW3D_H
+#ifndef CORE_STATE_ACTIONS_ACTIONSET_H
+#define CORE_STATE_ACTIONS_ACTIONSET_H
 
 #include <Core/Action/Action.h>
 #include <Core/Interface/Interface.h>
-#include <Core/State/StateView3D.h>
-
-#include <Core/Geometry/Vector.h>
+#include <Core/State/StateValue.h>
 
 namespace Core
 {
 
-class ActionRotateView3D : public Action
+// CLASS ActionSet
+// Set the value of a state variable
+
+class ActionToggle : public Action
 {
 
-CORE_ACTION(
-CORE_ACTION_TYPE( "RotateView", "This action rotates the camera in a view state variable." )
+CORE_ACTION( 
+CORE_ACTION_TYPE( "Toggle", "This action toggles the value of a boolean state variable." )
 CORE_ACTION_ARGUMENT( "stateid", "The name of the state variable." )
-CORE_ACTION_ARGUMENT( "axis", "The axis around which to rotate." )
-CORE_ACTION_ARGUMENT( "angle", "The angle to rotate the view about." )
-);
+)
 
+  // -- Constructor/Destructor --
 public:
-  ActionRotateView3D();
-  virtual ~ActionRotateView3D();
+  ActionToggle()
+  {
+    this->add_argument( this->stateid_ );
+  }
 
+  virtual ~ActionToggle()
+  {
+  }
+
+  // -- Functions that describe action --
   virtual bool validate( ActionContextHandle& context );
   virtual bool run( ActionContextHandle& context, ActionResultHandle& result );
 
+  // -- Action parameters --
 private:
+  // This one describes where the state is located
   ActionParameter< std::string > stateid_;
-  ActionParameter< Core::Vector > axis_;
-  ActionParameter< double > angle_;
 
-  StateView3DWeakHandle view3d_state_;
+  // -- Action optimization --
+private:
+  // This is an internal optimization to avoid the lookup in the state
+  // database
+  StateBoolWeakHandle state_weak_handle_;
 
-  // -- Create and dispatch this action --
+  // -- Dispatch this action from the interface --
 public:
 
   // CREATE:
   // Create the action but do not dispatch it yet
-  static ActionHandle Create( StateView3DHandle& view3d_state, 
-    const Core::Vector& axis, double angle );
-    
+  static ActionHandle Create( StateBoolHandle& state )
+  {
+    // Create new action
+    ActionToggle* action = new ActionToggle;
+
+    // Set action parameters
+    action->stateid_.value() = state->get_stateid();
+
+    // Add optimization
+    action->state_weak_handle_ = state;
+
+    // return the new action
+    return ActionHandle( action );
+  }
+
   // DISPATCH:
-  // Dispatch the action from the specified context
-  static void Dispatch( ActionContextHandle context, StateView3DHandle& view3d_state, 
-    const Core::Vector& axis, double angle );
+  // Dispatch the action from the interface
+  static void Dispatch( ActionContextHandle context, StateBoolHandle& state )
+  {
+    // Post the new action
+    ActionDispatcher::PostAction( Create( state ), context );
+  }
+  
 };
 
 } // end namespace Core
 
 #endif
+

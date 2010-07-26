@@ -29,7 +29,7 @@
 // Core includes
 #include <Core/Math/MathFunctions.h>
 
-#include <Core/State/Actions/ActionRotateView3D.h>
+#include <Core/State/Actions/ActionRotateView.h>
 #include <Core/State/Actions/ActionScaleView.h>
 #include <Core/State/Actions/ActionTranslateView.h>
 #include <Application/Viewer/Viewer.h>
@@ -151,8 +151,8 @@ void ViewManipulator::mouse_move( const Core::MouseHistory& mouse_history, int b
     if ( this->compute_rotation( mouse_history.previous_.x_, mouse_history.previous_.y_,
         mouse_history.current_.x_, mouse_history.current_.y_, axis, angle ) )
     {
-      // dispatch an ActionRotateView3D
-      Core::ActionRotateView3D::Dispatch( Core::Interface::GetWidgetActionContext(),
+      // dispatch an ActionRotateView
+      Core::ActionRotateView::Dispatch( Core::Interface::GetWidgetActionContext(),
         this->viewer_->volume_view_state_, axis, angle );
       if ( this->viewer_->lock_state_->get() )
       {
@@ -164,7 +164,7 @@ void ViewManipulator::mouse_move( const Core::MouseHistory& mouse_history, int b
           if ( this->viewer_->get_viewer_id() != viewer_id )
           {
             ViewerHandle viewer = ViewerManager::Instance()->get_viewer( viewer_id );
-            Core::ActionRotateView3D::Dispatch( Core::Interface::GetWidgetActionContext(),
+            Core::ActionRotateView::Dispatch( Core::Interface::GetWidgetActionContext(),
               viewer->volume_view_state_, axis, angle );
           }
         }

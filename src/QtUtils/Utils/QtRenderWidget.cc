@@ -245,8 +245,6 @@ void QtRenderWidget::wheelEvent( QWheelEvent* event )
 
 void QtRenderWidget::keyPressEvent( QKeyEvent* event )
 {
-  std::cerr << "key pressed "<< std::endl;
-
   this->activate_signal_();
 
   if ( ! ( this->private_->viewer_->key_press_event( event->key(), event->modifiers() ) ) )

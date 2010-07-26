@@ -31,6 +31,7 @@
 #include <Core/Interface/Interface.h>
 #include <Core/Utils/ScopedCounter.h>
 #include <Core/State/Actions/ActionOffset.h>
+#include <Core/State/Actions/ActionToggle.h>
 #include <Core/State/Actions/ActionSet.h>
 
 // Application includes
@@ -129,7 +130,7 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
   this->add_connection( this->sagittal_view_state_->state_changed_signal_.connect(
     boost::bind( &Viewer::redraw, this, true ) ) );
   this->add_connection( this->volume_view_state_->state_changed_signal_.connect(
-    boost::bind( &Viewer::redraw, this, false ) ) );
+    boost::bind( &Viewer::redraw, this, true ) ) );
   this->add_connection( this->slice_number_state_->state_changed_signal_.connect(
     boost::bind( &Viewer::redraw, this, true ) ) );
 
@@ -283,22 +284,71 @@ bool Viewer::wheel_event( int delta, int x, int y, int buttons, int modifiers )
 
 bool Viewer::key_press_event( int key, int modifiers )
 {
-  if ( key == Core::Key::KEY_LESS_E || key == Core::Key::KEY_COMMA_E || 
-    key == Core::Key::KEY_LEFT_E || key == Core::Key::KEY_DOWN_E )
-  {
-    ActionOffsetSlice::Dispatch( Core::Interface::GetWidgetActionContext(),
-      this->shared_from_this(), -1 );
-    return true;
-  }
 
-  if ( key == Core::Key::KEY_GREATER_E || key == Core::Key::KEY_PERIOD_E || 
-    key == Core::Key::KEY_RIGHT_E || key == Core::Key::KEY_UP_E)
+  switch ( key )
   {
-    ActionOffsetSlice::Dispatch( Core::Interface::GetWidgetActionContext(),
-      this->shared_from_this(), 1 );
-    return true;
-  }
+    case Core::Key::KEY_LESS_E:
+    case Core::Key::KEY_COMMA_E:
+    case Core::Key::KEY_LEFT_E:
+    case Core::Key::KEY_DOWN_E:
+    {
+      ActionOffsetSlice::Dispatch( Core::Interface::GetKeyboardActionContext(),
+        this->shared_from_this(), -1 );
+      return true;    
+    }
+    
+    case Core::Key::KEY_GREATER_E:
+    case Core::Key::KEY_PERIOD_E:
+    case Core::Key::KEY_RIGHT_E:
+    case Core::Key::KEY_UP_E:
+    {
+      ActionOffsetSlice::Dispatch( Core::Interface::GetKeyboardActionContext(),
+        this->shared_from_this(), 1 );
+      return true;
+    }
   
+    case Core::Key::KEY_G_E:
+    {
+      Core::ActionToggle::Dispatch( Core::Interface::GetKeyboardActionContext(),
+        this->slice_grid_state_ );
+      return true;
+    }
+  
+    case Core::Key::KEY_L_E:
+    {
+      Core::ActionToggle::Dispatch( Core::Interface::GetKeyboardActionContext(),
+        this->lock_state_ );
+      return true;
+    }
+  
+    case Core::Key::KEY_S_E:
+    {
+      Core::ActionToggle::Dispatch( Core::Interface::GetKeyboardActionContext(),
+        this->slice_visible_state_ );   
+      return true;
+    }
+  
+    case Core::Key::KEY_T_E:
+    {
+      Core::ActionToggle::Dispatch( Core::Interface::GetKeyboardActionContext(),
+        this->overlay_visible_state_ );   
+      return true;
+    }
+  
+    case Core::Key::KEY_SPACE_E:
+    {
+      LayerHandle layer = LayerManager::Instance()->get_active_layer();
+      if ( layer )
+      {
+        if ( this->get_viewer_id() < layer->visible_state_.size() )
+        {
+          Core::ActionToggle::Dispatch( Core::Interface::GetKeyboardActionContext(),
+            layer->visible_state_[ this->get_viewer_id() ] );
+        }
+      }
+      return true;
+    }
+  }
   return false;
 }
 

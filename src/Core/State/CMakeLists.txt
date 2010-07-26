@@ -59,28 +59,30 @@ SET(CORE_STATE_SRCS
   )
 
 SET(CORE_STATE_ACTIONS_SRCS
+  Actions/ActionAdd.h
+  Actions/ActionAdd.cc
+  Actions/ActionClear.h
+  Actions/ActionClear.cc
   Actions/ActionFlip.h
   Actions/ActionFlip.cc
   Actions/ActionGet.h
   Actions/ActionGet.cc
   Actions/ActionOffset.h
   Actions/ActionOffset.cc
-  Actions/ActionRotateView3D.h
-  Actions/ActionRotateView3D.cc
+  Actions/ActionRemove.h
+  Actions/ActionRemove.cc
+  Actions/ActionRotateView.h
+  Actions/ActionRotateView.cc
   Actions/ActionScaleView.h
   Actions/ActionScaleView.cc
   Actions/ActionSet.h
   Actions/ActionSet.cc
   Actions/ActionSetRange.h
   Actions/ActionSetRange.cc
+  Actions/ActionToggle.h
+  Actions/ActionToggle.cc
   Actions/ActionTranslateView.h
   Actions/ActionTranslateView.cc
-  Actions/ActionAdd.h
-  Actions/ActionAdd.cc
-  Actions/ActionRemove.h
-  Actions/ActionRemove.cc
-  Actions/ActionClear.h
-  Actions/ActionClear.cc
   )
 
 CORE_ADD_LIBRARY(Core_State 

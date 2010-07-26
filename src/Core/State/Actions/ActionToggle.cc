@@ -26,27 +26,18 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <Core/State/Actions/ActionRotateView3D.h>
+#include <Core/Action/ActionFactory.h>
+#include <Core/State/StateEngine.h>
+#include <Core/State/Actions/ActionToggle.h>
 
-CORE_REGISTER_ACTION( Core, RotateView3D )
+CORE_REGISTER_ACTION( Core, Toggle )
 
 namespace Core
 {
 
-ActionRotateView3D::ActionRotateView3D()
+bool ActionToggle::validate(  ActionContextHandle& context )
 {
-  add_argument( this->stateid_ );
-  add_argument( this->axis_ );
-  add_argument( this->angle_ );
-}
-
-ActionRotateView3D::~ActionRotateView3D()
-{
-}
-
-bool ActionRotateView3D::validate( ActionContextHandle& context )
-{
-  StateBaseHandle state = this->view3d_state_.lock();
+  StateBaseHandle state = this->state_weak_handle_.lock();
   if ( !state )
   {
     if ( !( StateEngine::Instance()->get_state( stateid_.value(), state ) ) )
@@ -56,48 +47,31 @@ bool ActionRotateView3D::validate( ActionContextHandle& context )
       return false;
     }
 
-    if ( typeid(*state) != typeid(StateView3D) )
+    StateBoolHandle typed_state =
+      boost::dynamic_pointer_cast< StateBool >( state );
+    if ( !typed_state )
     {
       context->report_error( std::string( "State variable '" ) + stateid_.value()
-          + "' doesn't support ActionRotateView3D" );
+        + "' doesn't support ActionToggle" );
       return false;
     }
-
-    this->view3d_state_ = StateView3DWeakHandle(
-        boost::dynamic_pointer_cast< StateView3D >( state ) );
+    
+    this->state_weak_handle_ = typed_state;
   }
 
   return true;
 }
 
-bool ActionRotateView3D::run( ActionContextHandle& context, ActionResultHandle& result )
+bool ActionToggle::run( ActionContextHandle& context, ActionResultHandle& result )
 {
-  StateView3DHandle state = this->view3d_state_.lock();
-
+  StateBoolHandle state = this->state_weak_handle_.lock();
   if ( state )
   {
-    state->rotate( this->axis_.value(), this->angle_.value() );
+    state->set( !state->get() );
     return true;
   }
 
   return false;
-}
-
-ActionHandle ActionRotateView3D::Create( StateView3DHandle& view3d_state, const Core::Vector& axis,
-    double angle )
-{
-  ActionRotateView3D* action = new ActionRotateView3D;
-  action->stateid_.value() = view3d_state->get_stateid();
-  action->axis_.value() = axis;
-  action->angle_.value() = angle;
-  action->view3d_state_ = StateView3DWeakHandle( view3d_state );
-  return ActionHandle( action );
-}
-
-void ActionRotateView3D::Dispatch( ActionContextHandle context, StateView3DHandle& view3d_state, 
-  const Core::Vector& axis, double angle )
-{
-  ActionDispatcher::PostAction( Create( view3d_state, axis, angle), context );
 }
 
 } // end namespace Core

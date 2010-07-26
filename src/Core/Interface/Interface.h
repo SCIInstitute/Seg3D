@@ -82,6 +82,10 @@ public:
   // Get the current interface action context for mouse commands
   InterfaceActionContextHandle get_mouse_action_context();
 
+  // GET_KEYBOARD_ACTION_CONTEXT:
+  // Get the current interface action context for keyboard commands
+  InterfaceActionContextHandle get_keyboard_action_context();
+
 private:
   InterfacePrivateHandle private_;
 
@@ -110,6 +114,10 @@ public:
   // GETMOUSEACTIONCONTEXT:
   // Get the action context that mouse actions use to post their actions
   static ActionContextHandle GetMouseActionContext();
+
+  // GETKEYBOARDACTIONCONTEXT:
+  // Get the action context that keyboard actions use to post their actions
+  static ActionContextHandle GetKeyboardActionContext();
 
 };
 
