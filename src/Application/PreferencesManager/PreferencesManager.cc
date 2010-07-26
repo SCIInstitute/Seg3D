@@ -51,6 +51,8 @@ CORE_SINGLETON_IMPLEMENTATION( PreferencesManager );
 PreferencesManager::PreferencesManager() :
   StateHandler( "preferences", VERSION_NUMBER_C, false )
 { 
+  this->set_initializing( true );
+
   // Initialize the local config directory path
   Core::Application::Instance()->get_config_directory( this->local_config_path_ );
 
@@ -59,7 +61,7 @@ PreferencesManager::PreferencesManager() :
 
   // After we initialize the states, we then load the saved preferences from file.
   this->initialize();
-  
+  this->set_initializing( false );
 }
 
 PreferencesManager::~PreferencesManager()
