@@ -42,6 +42,7 @@
 #include <Application/Viewer/Viewer.h>
 #include <Application/Viewer/ViewManipulator.h>
 #include <Application/Viewer/Actions/ActionOffsetSlice.h>
+#include <Application/Viewer/Actions/ActionAutoView.h>
 #include <Application/ViewerManager/Actions/ActionPickPoint.h>
 #include <Application/ViewerManager/ViewerManager.h>
 
@@ -119,7 +120,7 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
     boost::bind( &Viewer::viewer_lock_state_changed, this, _1 ) ) );
 
   // Connect state variables that should trigger redraw.
-  // For those state variables that will trigger both redraw and redraw_overlay, 
+  // NOTE: For those state variables that will trigger both redraw and redraw_overlay, 
   // "delay_update" is set to true for redraw.
   this->add_connection( this->view_mode_state_->state_changed_signal_.connect(
     boost::bind( &Viewer::redraw, this, true ) ) );
@@ -129,8 +130,9 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
     boost::bind( &Viewer::redraw, this, true ) ) );
   this->add_connection( this->sagittal_view_state_->state_changed_signal_.connect(
     boost::bind( &Viewer::redraw, this, true ) ) );
+  // NOTE: This one is false as it is not updated by the next list
   this->add_connection( this->volume_view_state_->state_changed_signal_.connect(
-    boost::bind( &Viewer::redraw, this, true ) ) );
+    boost::bind( &Viewer::redraw, this, false ) ) );
   this->add_connection( this->slice_number_state_->state_changed_signal_.connect(
     boost::bind( &Viewer::redraw, this, true ) ) );
 
@@ -323,8 +325,19 @@ bool Viewer::key_press_event( int key, int modifiers )
   
     case Core::Key::KEY_S_E:
     {
-      Core::ActionToggle::Dispatch( Core::Interface::GetKeyboardActionContext(),
-        this->slice_visible_state_ );   
+      // Need to lock the query into the state engine, as this function is called
+      // from a variety of threads
+      Core::StateEngine::lock_type( Core::StateEngine::Instance()->GetMutex() );
+      if ( this->view_mode_state_->get() == Viewer::VOLUME_C )
+      {
+        Core::ActionToggle::Dispatch( Core::Interface::GetKeyboardActionContext(),
+          this->volume_slices_visible_state_ ); 
+      }
+      else
+      {
+        Core::ActionToggle::Dispatch( Core::Interface::GetKeyboardActionContext(),
+          this->slice_visible_state_ );   
+      }
       return true;
     }
   
@@ -334,7 +347,35 @@ bool Viewer::key_press_event( int key, int modifiers )
         this->overlay_visible_state_ );   
       return true;
     }
-  
+
+    case Core::Key::KEY_I_E:
+    {
+      Core::ActionToggle::Dispatch( Core::Interface::GetKeyboardActionContext(),
+        this->volume_isosurfaces_visible_state_ );    
+      return true;
+    }
+
+    case Core::Key::KEY_H_E:
+    {
+      Core::ActionToggle::Dispatch( Core::Interface::GetKeyboardActionContext(),
+        this->volume_light_visible_state_ );    
+      return true;
+    }
+
+    case Core::Key::KEY_P_E:
+    {
+      Core::ActionToggle::Dispatch( Core::Interface::GetKeyboardActionContext(),
+        this->slice_picking_visible_state_ );   
+      return true;
+    }
+
+    case Core::Key::KEY_A_E:
+    {
+      ActionAutoView::Dispatch( Core::Interface::GetKeyboardActionContext(), 
+        this->get_viewer_id() );  
+      return true;
+    }
+      
     case Core::Key::KEY_SPACE_E:
     {
       LayerHandle layer = LayerManager::Instance()->get_active_layer();
@@ -349,6 +390,7 @@ bool Viewer::key_press_event( int key, int modifiers )
       return true;
     }
   }
+  // function wasn't handled, hence return false.
   return false;
 }
 

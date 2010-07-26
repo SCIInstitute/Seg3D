@@ -46,7 +46,7 @@ CORE_ACTION(
 public:
   ActionAutoView()
   {
-    add_argument( this->viewer_name_ );
+    add_argument( this->viewer_id_ );
   } 
   virtual ~ActionAutoView() {}
 
@@ -54,14 +54,13 @@ public:
   virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
 
 private:
-  Core::ActionParameter< std::string > viewer_name_;
+  Core::ActionParameter< size_t > viewer_id_;
 
   ViewerWeakHandle viewer_weak_handle_;
 
 public:
-  static Core::ActionHandle Create( ViewerHandle& viewer );
-
-  static void Dispatch( Core::ActionContextHandle context, ViewerHandle& viewer );
+  static Core::ActionHandle Create( size_t viewer_id );
+  static void Dispatch( Core::ActionContextHandle context, size_t viewer_id );
 };
 
 } // end namespace Seg3D

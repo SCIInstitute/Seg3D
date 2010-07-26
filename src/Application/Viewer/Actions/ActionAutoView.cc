@@ -40,10 +40,11 @@ bool ActionAutoView::validate( Core::ActionContextHandle& context )
   ViewerHandle viewer = this->viewer_weak_handle_.lock();
   if ( !viewer )
   {
-    viewer = ViewerManager::Instance()->get_viewer( this->viewer_name_.value() );
+    viewer = ViewerManager::Instance()->get_viewer( this->viewer_id_.value() );
     if ( !viewer )
     {
-      context->report_error( std::string( "Viewer '" ) + this->viewer_name_.value()
+      context->report_error( std::string( "Viewer '" ) 
+        + Core::ExportToString( this->viewer_id_.value() )
         + "' does not exist" );
       return false;
     }
@@ -76,18 +77,17 @@ bool ActionAutoView::run( Core::ActionContextHandle& context, Core::ActionResult
   return false;
 }
 
-Core::ActionHandle ActionAutoView::Create( ViewerHandle& viewer )
+Core::ActionHandle ActionAutoView::Create( size_t viewer_id )
 {
   ActionAutoView* action = new ActionAutoView;
-  action->viewer_name_ = viewer->get_statehandler_id();
-  action->viewer_weak_handle_ = viewer;
+  action->viewer_id_ = viewer_id;
   
   return Core::ActionHandle( action );
 }
 
-void ActionAutoView::Dispatch( Core::ActionContextHandle context, ViewerHandle& viewer )
+void ActionAutoView::Dispatch( Core::ActionContextHandle context, size_t viewer_id )
 {
-  Core::ActionDispatcher::PostAction( Create( viewer ), context );
+  Core::ActionDispatcher::PostAction( Create( viewer_id ), context );
 }
 
 } // end namespace Seg3D

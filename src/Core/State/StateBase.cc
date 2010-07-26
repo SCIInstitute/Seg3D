@@ -34,7 +34,8 @@ namespace Core {
 StateBase::StateBase(const std::string& stateid) :
   stateid_( stateid ),
   signals_enabled_( true ),
-  initializing_( false )
+  initializing_( false ),
+  session_priority_( DEFAULT_LOAD_E )
 {
 }
 
@@ -53,7 +54,19 @@ void StateBase::set_initializing( bool initializing )
   StateEngine::lock_type lock( StateEngine::Instance()->GetMutex() );
   this->initializing_ = initializing;
 }
+
+int StateBase::get_session_priority() const
+{
+  return  this->session_priority_;
+}
   
+void StateBase::set_session_priority( int priority )
+{
+  this->session_priority_ = priority;
+}
+
+
+
 std::string StateBase::get_stateid() const
 {
   return this->stateid_;

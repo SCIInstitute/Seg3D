@@ -59,8 +59,8 @@ bool ActionLoadProject::run( Core::ActionContextHandle& context,
   Core::ActionResultHandle& result )
 {
   boost::filesystem::path full_filename( project_path_.value() );
-  std::string message = std::string("Please wait while project: '") + 
-    full_filename.leaf() + std::string("' is loaded...");
+  std::string message = std::string("Please wait, while loading project '") + 
+    full_filename.leaf() + std::string("' ...");
 
   Core::ActionProgressHandle progress = 
     Core::ActionProgressHandle( new Core::ActionProgress( message ) );

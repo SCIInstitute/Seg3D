@@ -107,7 +107,7 @@ protected:
   {
     return this->signals_enabled_;
   }
-  
+    
   // SET_INITIALIZING:
   // Indicate that the statehandler is still being created. Hence only one thread will have
   // access to the state variable, and thread safety checking is not needed. 
@@ -125,6 +125,21 @@ protected:
     return this->initializing_;
   }
   
+  // -- session handling -- 
+public:
+  enum {
+    DO_NOT_LOAD_E = -1,
+    LOAD_LAST_E = 0,
+    DEFAULT_LOAD_E = 100
+  };
+  
+  // GET_SESSION_PRIORITY:
+  // Get the priority in which loading sets the states
+  int get_session_priority() const;
+  
+  // SET_SESSION_PRIORITY:
+  // By default the priority is set to DEAFULT_LOAD_E.
+  void set_session_priority( int priority );
   
   // -- stateid handling --
 public:
@@ -164,6 +179,8 @@ private:
   // Whether the state variable is still being initialized
   bool initializing_;
 
+  // The session saving/loading priority
+  int session_priority_;
 };
 
 } // end namespace Core

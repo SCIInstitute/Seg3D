@@ -57,8 +57,8 @@ bool ActionLoadSession::run( Core::ActionContextHandle& context,
   ProjectManager::Instance()->current_project_->
     get_session_name( this->session_index_.value(), session_name );
 
-  std::string message = std::string("Please wait while session: '") + 
-    session_name + std::string("' is loaded...");
+  std::string message = std::string("Please wait, while loading '") + 
+    session_name + std::string("' ...");
 
   Core::ActionProgressHandle progress = 
     Core::ActionProgressHandle( new Core::ActionProgress( message ) );

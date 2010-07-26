@@ -57,7 +57,7 @@ namespace Core
 class StateHandler;
 class StateHandlerPrivate;
 
-class StateHandler : public ConnectionHandler
+class StateHandler : protected ConnectionHandler
 {
 
   // -- constructor/destructor --
@@ -123,7 +123,7 @@ public:
     return this->add_statebase( state );
   }
 
-    // ADD_STATE:
+  // ADD_STATE:
   // Add a local state variable with option list
   template< class HANDLE >
   bool add_state( const std::string& key, HANDLE& state, const std::string& default_option,
@@ -133,7 +133,6 @@ public:
       this->create_state_id( key ), default_option, option_list ) );
     return this->add_statebase( state );
   }
-
 
   // ADD_STATE:
   // Add a local state variable without default value
@@ -191,7 +190,7 @@ public:
   // This function is called on StateHandlers that need to have its states loaded from a particular
   // location that is seperate from the session states
   bool import_states( boost::filesystem::path path, const std::string& name, bool project_file = false );
-
+ 
   // EXPORT_STATES:
   // This function is called on StateHandlers that need to have its states saved to a particular
   // location that is seperate from the session states

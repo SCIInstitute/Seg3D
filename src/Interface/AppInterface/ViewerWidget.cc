@@ -311,7 +311,7 @@ void ViewerWidget::flip_view_vert()
 
 void ViewerWidget::auto_view()
 {
-  ActionAutoView::Dispatch( Core::Interface::GetWidgetActionContext(), this->private_->viewer_ );
+  ActionAutoView::Dispatch( Core::Interface::GetWidgetActionContext(), this->private_->viewer_->get_viewer_id() );
 }
 
 } // end namespace Seg3D
