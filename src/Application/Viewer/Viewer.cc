@@ -52,7 +52,7 @@ namespace Seg3D
 const size_t Viewer::VERSION_NUMBER_C = 1;
 
 
-SCI_ENUM_CLASS
+CORE_ENUM_CLASS
 (
   ViewModeType,
   AXIAL_E = 0x1,
@@ -76,6 +76,7 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
 {
   this->add_state( "view_mode", view_mode_state_, mode , SAGITTAL_C + 
     "|" + CORONAL_C + "|" + AXIAL_C + "|" + VOLUME_C );
+  this->view_mode_state_->set_session_priority( Core::StateBase::DEFAULT_LOAD_E + 1 );
 
   this->add_state( "axial_view", axial_view_state_ );
   this->add_state( "coronal_view", coronal_view_state_ );
@@ -88,6 +89,7 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
   this->view_states_[ 3 ] = this->volume_view_state_;
 
   this->add_state( "slice_number", this->slice_number_state_, 0, 0, 0, 1 );
+  this->slice_number_state_->set_session_priority( Core::StateBase::DEFAULT_LOAD_E - 1 );
   this->add_state( "slice_grid", this->slice_grid_state_, false );
   this->add_state( "slice_visible", this->slice_visible_state_, visible);
   this->add_state( "slice_picking_visible", this->slice_picking_visible_state_, true );
@@ -102,6 +104,7 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
   this->add_state( "overlay_visible", this->overlay_visible_state_, true );
     
   this->add_state( "is_picking_target", this->is_picking_target_state_, false );
+  this->is_picking_target_state_->set_session_priority( Core::StateBase::DO_NOT_LOAD_E );
 
   this->view_manipulator_ = ViewManipulatorHandle( new ViewManipulator( this ) );
   this->add_connection( LayerManager::Instance()->layer_inserted_signal_.connect( 

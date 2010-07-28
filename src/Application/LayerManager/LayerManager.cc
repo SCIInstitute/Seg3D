@@ -43,10 +43,12 @@
 #include <Application/Layer/LayerGroup.h>
 #include <Application/Layer/MaskLayer.h>
 #include <Application/Layer/DataLayer.h>
+#include <Application/Session/Session.h>
 
 // Application action includes
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/ProjectManager/ProjectManager.h>
+#include "Core/State/StateIO.h"
 
 
 namespace Seg3D
@@ -57,10 +59,8 @@ const size_t LayerManager::VERSION_NUMBER_C = 1;
 CORE_SINGLETON_IMPLEMENTATION( LayerManager );
 
 LayerManager::LayerManager() :
-  StateHandler( "layermanager", VERSION_NUMBER_C, false, 0 )
+  StateHandler( "layermanager", VERSION_NUMBER_C, false )
 { 
-  std::vector< std::string> layers;
-  this->add_state( "layers", this->layers_state_, layers );
   this->add_state( "active_layer", this->active_layer_state_, "" );
 }
 
@@ -584,7 +584,7 @@ void LayerManager::get_layer_names( std::vector< LayerIDNamePair >& layer_names 
   }
 }
 
-bool LayerManager::pre_save_states()
+bool LayerManager::pre_save_states( Core::StateIO& state_io )
 {
   lock_type lock( this->get_mutex() );
 
@@ -597,85 +597,84 @@ bool LayerManager::pre_save_states()
     this->active_layer_state_->set( "none" );
   }
 
-  std::vector< std::string > layers_vector;
-  this->layers_state_->set( layers_vector );
-  
-  group_list_type::reverse_iterator group_iterator = this->group_list_.rbegin();
-  for ( ; group_iterator != this->group_list_.rend(); ++group_iterator )
-  {
-    std::string group = ( *group_iterator )->get_group_id();
-    std::vector< std::string > group_layers_vector; 
-    ( *group_iterator )->get_layer_names( group_layers_vector );
-    for( int i = 0; i < static_cast< int >( group_layers_vector.size() ); ++i  )
-    {
-      layers_vector.push_back( group_layers_vector[ i ] );
-    }
-  }
-  
-  this->layers_state_->set( layers_vector );
   return true;
 }
   
 
-bool LayerManager::post_save_states()
+bool LayerManager::post_save_states( Core::StateIO& state_io )
 {
-  lock_type lock( this->get_mutex() );
-  
+  TiXmlElement* lm_element = state_io.get_current_element();
+  assert( this->get_statehandler_id() == lm_element->Value() );
+  TiXmlElement* layers_element = new TiXmlElement( "layers" );
+  lm_element->LinkEndChild( layers_element );
+
+  state_io.push_current_element();
+  state_io.set_current_element( layers_element );
+
   std::vector< LayerHandle > layers;
   this->get_layers( layers );
 
-  for( int i = static_cast< int >( layers.size() ) -1 ; i >= 0; --i )
+  for( size_t i = 0; i < layers.size(); ++i )
   {
-    if( !layers[ i ]->populate_session_states() )
-    {
-      return false;
-    }
+    layers[ i ]->save_states( state_io );
   }
+
+  state_io.pop_current_element();
+
   return Core::MaskDataBlockManager::Instance()->save_data_blocks( 
     Seg3D::ProjectManager::Instance()->get_project_data_path() );
 } 
   
-bool LayerManager::pre_load_states()
+bool LayerManager::pre_load_states( const Core::StateIO& state_io )
 {
   return this->delete_all();
 }
 
-bool LayerManager::post_load_states()
+bool LayerManager::post_load_states( const Core::StateIO& state_io )
 {
-  std::vector< std::string > state_values;
-  Core::StateEngine::Instance()->get_session_states( state_values );
-
-  std::vector< std::string > layer_vector = this->layers_state_->get();
-  for( int j = 0; j < static_cast< int >( layer_vector.size() ); ++j )
+  const TiXmlElement* layers_element = state_io.get_current_element()->
+    FirstChildElement( "layers" );
+  if ( layers_element == 0 )
   {
-    if( layer_vector[ j ] == "]" )
-    {
-      return true;
-    }
+    return false;
+  }
 
-    LayerHandle restored_layer;
-    std::vector< std::string > layer = Core::SplitString( layer_vector[ j ], "|" );
-  
-    if( layer[ 1 ] == "DATA_E" )
+  state_io.push_current_element();
+  state_io.set_current_element( layers_element );
+
+  bool success = true;
+  const TiXmlElement* layer_element = layers_element->FirstChildElement();
+  while ( layer_element != 0 )
+  {
+    std::string layer_id( layer_element->Value() );
+    std::string layer_type( layer_element->Attribute( "type" ) );
+    LayerHandle layer;
+    if ( layer_type == "data" )
     {
-      restored_layer = LayerHandle( new DataLayer( layer[ 0 ] ) );
+      layer.reset( new DataLayer( layer_id ) );
     }
-    else if( layer[ 1 ] == "MASK_E" )
+    else if ( layer_type == "mask" )
     {
-      restored_layer = LayerHandle( new MaskLayer(  layer[ 0 ] ) );
+      layer.reset( new MaskLayer( layer_id ) );
     }
     else
     {
-      return false;
+      CORE_LOG_ERROR( "Unsupported layer type" );
     }
-    
-    if( !restored_layer->load_states( state_values ) )
+
+    if ( layer && layer->load_states( state_io ) )
     {
-      return false;
+      this->insert_layer( layer );
     }
-    
-    this->insert_layer( restored_layer );
+    else
+    {
+      success = false;
+    }
+
+    layer_element = layer_element->NextSiblingElement();
   }
+
+  state_io.pop_current_element();
 
   // If there are layers loaded, restore the active layer state
   if ( this->group_list_.size() > 0 )
@@ -689,7 +688,13 @@ bool LayerManager::post_load_states()
     this->set_active_layer( active_layer );
   }
   
-  return true;
+  return success;
 }
+
+int LayerManager::get_session_priority()
+{
+  return SessionPriority::LAYER_MANAGER_PRIORITY_E;
+}
+
 
 } // end namespace seg3D

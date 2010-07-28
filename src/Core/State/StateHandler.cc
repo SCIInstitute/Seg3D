@@ -25,6 +25,9 @@
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
  */
+
+#include <queue>
+
 // Boost includes
 #include <boost/lexical_cast.hpp>
 
@@ -40,6 +43,7 @@ namespace Core
 {
 
 typedef std::map< std::string, StateBaseHandle > state_map_type;
+const std::string STATE_ELEMENT_NAME( "State" );
 
 class StateHandlerPrivate
 {
@@ -49,9 +53,6 @@ public:
 
   // The number at the end of the state handler id
   size_t statehandler_id_number_;
-
-  // The priority number used for saving the contents of this state handler
-  int save_priority_;
 
   // The database with the actual states 
   state_map_type state_map_;
@@ -68,7 +69,7 @@ public:
 };
 
 
-StateHandler::StateHandler( const std::string& type_str, size_t version_number, bool auto_id,  int save_priority )
+StateHandler::StateHandler( const std::string& type_str, size_t version_number, bool auto_id )
 {
   this->private_ = new StateHandlerPrivate;
   this->private_->version_number_ = version_number;
@@ -90,8 +91,6 @@ StateHandler::StateHandler( const std::string& type_str, size_t version_number, 
       this->private_->statehandler_id_number_ );
   }
   
-  this->private_->save_priority_ = save_priority;
-
   this->private_->valid_ = true;
   this->private_->signals_enabled_ = true;
   this->private_->initializing_ = false;
@@ -100,13 +99,12 @@ StateHandler::StateHandler( const std::string& type_str, size_t version_number, 
 StateHandler::~StateHandler()
 {
   this->disconnect_all();
-  if( this->is_valid() )
+  if( this->private_->valid_ )
   {
     StateEngine::Instance()->remove_state_handler( this->private_->statehandler_id_ );
   }
   delete this->private_;
 }
-    
 
 bool StateHandler::add_statebase( StateBaseHandle state )
 {
@@ -142,11 +140,10 @@ size_t StateHandler::get_statehandler_id_number() const
   return ( this->private_->statehandler_id_number_ );
 }
 
-int StateHandler::get_save_priority()
+int StateHandler::get_session_priority()
 {
-  return this->private_->save_priority_;
+  return -1;
 }
-
 
 std::string StateHandler::create_state_id( const std::string& key ) const
 {
@@ -178,147 +175,125 @@ bool StateHandler::get_state( const size_t idx, StateBaseHandle& state )
   return true;
 }
 
-bool StateHandler::populate_session_states()
+typedef std::pair< std::string, StateBaseHandle > StateEntry;
+
+bool operator<( const StateEntry& left, const StateEntry& right )
 {
-  if( !pre_save_states() )
-    return false;
-
-  state_map_type::iterator it = this->private_->state_map_.begin();
-  state_map_type::iterator it_end = this->private_->state_map_.end();
-
-  std::vector< std::string > states;
-  StateEngine::Instance()->get_session_states( states );
-
-  // Like in XML which we are mimicking we surround the StateHandler's state variables
-  // with its statehandler_id
-
-
-  states.push_back( this->private_->statehandler_id_ );
-
-  states.push_back( this->private_->statehandler_id_ +
-    "*version*" + boost::lexical_cast< std::string >( this->private_->version_number_) );
-
-  while ( it != it_end )
-  {
-
-    states.push_back( ( *it ).second->get_stateid() + "*"
-      + ( *it ).second->export_to_string() );
-    ++it;
-  }
-  
-  // Like in XML which we are mimicking we surround the StateHandler's state variables
-  // with its statehandler_id
-  states.push_back( this->private_->statehandler_id_ );
-  
-  StateEngine::Instance()->set_session_states( states );
-
-  return post_save_states();
+  return left.second->get_session_priority() < right.second->get_session_priority();
 }
 
-
-bool StateHandler::load_states( std::vector< std::string >& states_vector )
+bool StateHandler::load_states( const StateIO& state_io )
 {
-  
-  if( !pre_load_states() ) return false;
-
-  size_t loaded_version = 0;
-
-  for( int i = 0; i < static_cast< int >( states_vector.size() ); ++i )
+  // Get the XML element corresponding to this state handler
+  const TiXmlElement* sh_element = state_io.get_current_element()->
+    FirstChildElement( this->get_statehandler_id().c_str() );
+  if ( sh_element == 0 )
   {
-    if( states_vector[ i ] == this->private_->statehandler_id_ )
-    { 
-      i++;
-      if( ( SplitString( states_vector[ i ], "*" ) )[ 1 ] == "version" )
+    return false;
+  }
+
+  state_io.push_current_element();
+  state_io.set_current_element( sh_element );
+  this->pre_load_states( state_io );
+  state_io.pop_current_element();
+
+  // Query the version number in the loaded XML file.
+  // NOTE: If the call fails, loaded_verison will not be changed, and thus is the same
+  // as the current version number.
+  int loaded_version = static_cast< int >( this->private_->version_number_ );
+  sh_element->QueryIntAttribute( "version", &loaded_version );
+
+  // Build a priority queue of all the states sorted in the descending order of
+  // their session priority. Only  state variables with priority other than 
+  // StateBase::DO_NOT_LOAD_E will be loaded.
+  std::priority_queue< StateEntry > state_queue;
+  state_map_type::iterator it = this->private_->state_map_.begin();
+  state_map_type::iterator it_end = this->private_->state_map_.end();
+  while ( it != it_end )
+  {
+    if ( ( *it ).second->get_session_priority() != StateBase::DO_NOT_LOAD_E )
+    {
+      state_queue.push( *it );
+    }
+    ++it;
+  }
+
+  // Build a map of state IDs and value strings by reading all the state elements.
+  std::map< std::string, std::string > state_value_str_map;
+  const TiXmlElement* state_element = 
+    sh_element->FirstChildElement( STATE_ELEMENT_NAME.c_str() );
+  bool success = true;
+  while ( success && state_element != 0 )
+  {
+    const char* stateid = state_element->Attribute( "id" );
+    if ( stateid == 0 )
+    {
+      CORE_LOG_ERROR( "Invalid state record" );
+      success = false;
+    }
+    else
+    {
+      const char* state_value_str = state_element->GetText();
+      if ( state_value_str == 0 )
       {
-        loaded_version = boost::lexical_cast< size_t > 
-          ( ( SplitString( states_vector[ i ], "*" ) )[ 2 ] );
-        i++;
+        state_value_str = "";
       }
       
-      std::vector< std::string > state_value_as_string_vector; 
-      while( states_vector[ i ] != this->private_->statehandler_id_ )
-      {
-        if( ( loaded_version == 0 ) || ( loaded_version == this->private_->version_number_ ) )
-        {
-          state_value_as_string_vector = 
-            SplitString( states_vector[ i ], "*" );
-          if( ( state_value_as_string_vector[ 0 ] != "" ) )
-          {
-            state_map_type::iterator it = this->private_->state_map_.find( state_value_as_string_vector[ 0 ] );
-            if ( it != this->private_->state_map_.end() )
-            {
-              ( *it ).second->import_from_string( state_value_as_string_vector[ 1 ] );
-            }           
-          }
-          else
-          {
-            return false;
-          }
-        }
-        else
-        {
-          // TODO: version translation is called here.
-        }
-        i++;
-      }
+      state_value_str_map[ this->get_statehandler_id() + "::" + stateid ] = state_value_str;
+    }
+
+    state_element = state_element->NextSiblingElement( STATE_ELEMENT_NAME );
+  }
+  
+  if ( !success )
+  {
+    return false;
+  }
+
+  // Import the state values in the correct order.
+  while ( !state_queue.empty() )
+  {
+    StateEntry state_entry = state_queue.top();
+    state_queue.pop();
+    std::map< std::string, std::string >::iterator state_it =
+      state_value_str_map.find( state_entry.first );
+    if ( state_it != state_value_str_map.end() )
+    {
+      success &= state_entry.second->import_from_string( ( *state_it ).second );
     }
   }
-  return post_load_states();
-}
-
-bool StateHandler::import_states( boost::filesystem::path path, const std::string& name, bool project_file )
-{
-  std::vector< std::string > state_values;
-  if( Core::StateIO::import_from_file( ( path / ( name ) ), state_values, project_file ) )
-    return this->load_states( state_values );
-  else
-    return false;
-}
-
-bool StateHandler::export_states( boost::filesystem::path path, const std::string& name, bool project_file )
-{
-  if( !pre_save_states() )
+  
+  // If the loading was successful, run post loading process.
+  if ( success )
   {
-    return false;
+    state_io.push_current_element();
+    state_io.set_current_element( sh_element );
+    success &= this->post_load_states( state_io );
+    state_io.pop_current_element();
   }
   
-  state_map_type::iterator it = this->private_->state_map_.begin();
-  state_map_type::iterator it_end = this->private_->state_map_.end();
-  std::vector< std::string > state_values;
-  
-  state_values.push_back( this->private_->statehandler_id_ );
-  state_values.push_back( this->private_->statehandler_id_ +
-    "*version*" + boost::lexical_cast< std::string >( this->private_->version_number_) );
-  while ( it != it_end )
-  {
-    state_values.push_back( ( *it ).second->get_stateid() + "*"
-      + ( *it ).second->export_to_string() );
-    ++it;
-  }
-  state_values.push_back( this->private_->statehandler_id_ );
-
-  return Core::StateIO::export_to_file( ( path / ( name ) ), state_values, project_file );
+  return success;
 }
 
-bool StateHandler::pre_load_states()
+bool StateHandler::pre_load_states( const StateIO& state_io )
 {
   // Do nothing.
   return true;
 }
 
-bool StateHandler::post_load_states()
+bool StateHandler::post_load_states( const StateIO& state_io )
 {
   // Do nothing.
   return true;
 }
 
-bool StateHandler::pre_save_states()
+bool StateHandler::pre_save_states( StateIO& state_io )
 {
   // Do nothing.
   return true;
 }
 
-bool StateHandler::post_save_states()
+bool StateHandler::post_save_states( StateIO& state_io )
 {
   // Do nothing.
   return true;
@@ -350,6 +325,7 @@ void StateHandler::invalidate()
       return;
     }
     this->private_->valid_ = false;
+    StateEngine::Instance()->remove_state_handler( this->private_->statehandler_id_ );
   }
 
   state_map_type::iterator it_end = this->private_->state_map_.end();
@@ -357,12 +333,11 @@ void StateHandler::invalidate()
   while ( it != it_end )
   {
     ( *it ).second->invalidate();
-    it++;
+    ++it;
   }
     
   this->clean_up();
 
-  StateEngine::Instance()->remove_state_handler( this->private_->statehandler_id_ );
 }
 
 void StateHandler::enable_signals( bool enabled )
@@ -401,6 +376,34 @@ bool StateHandler::is_valid()
 void StateHandler::clean_up()
 {
   // does nothing by default.
+}
+
+void StateHandler::save_states( StateIO& state_io )
+{
+  TiXmlElement* sh_element = new TiXmlElement( this->get_statehandler_id() );
+  state_io.get_current_element()->LinkEndChild( sh_element );
+  sh_element->SetAttribute( "version", static_cast< int >( this->private_->version_number_ ) );
+  
+  state_io.push_current_element();
+  state_io.set_current_element( sh_element );
+  this->pre_save_states( state_io );
+
+  state_map_type::iterator it = this->private_->state_map_.begin();
+  state_map_type::iterator it_end = this->private_->state_map_.end();
+  while ( it != it_end )
+  {
+    if ( ( *it ).second->get_session_priority() != StateBase::DO_NOT_LOAD_E )
+    {
+      TiXmlElement* state_element = new TiXmlElement( STATE_ELEMENT_NAME.c_str() );
+      state_element->SetAttribute( "id", SplitString( ( *it ).first, "::" )[ 1 ].c_str() );
+      state_element->LinkEndChild( new TiXmlText( ( *it ).second->export_to_string().c_str() ) );
+      sh_element->LinkEndChild( state_element );
+    }
+    ++it;
+  }
+
+  this->post_save_states( state_io );
+  state_io.pop_current_element();
 }
 
 } // end namespace Core

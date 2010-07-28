@@ -57,6 +57,7 @@ namespace Core
 class StateEngine;
 class StateEnginePrivate;
 class StateHandler;
+class StateIO;
 
 // Class definition
 class StateEngine : public Core::RecursiveLockable
@@ -86,20 +87,9 @@ public:
   // LOAD_SESSION_STATES:
   // This function finds the StateHandlers that are saved to file by default and then
   // sets their state variables from the values that have been loaded into session_states_
-  bool load_session_states();
+  bool load_states( const StateIO& state_io );
 
-  // POPULATE_SESSION_VECTOR:
-  // This function finds the StateHandlers that are set to save to file by default and 
-  // calls tells them to populate session_states_ with their state values.
-  bool populate_session_vector();
-
-  // GET_SESSION_STATES:
-  // a locked getter function for getting the vector that contains the data loaded from file  
-  void get_session_states( std::vector< std::string >& states );
-  
-  // SET_SESSION_STATES:
-  // a locked setter function for setting the vector that contains data to be saved to file
-  void set_session_states( std::vector< std::string >& states );
+  bool save_states( StateIO& state_io );
   
   // -- Interface for accounting stateids --
 private:

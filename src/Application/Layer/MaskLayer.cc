@@ -109,13 +109,13 @@ void MaskLayer::initialize_states()
 
 Core::AtomicCounter MaskLayer::color_count_;
 
-bool MaskLayer::pre_save_states()
+bool MaskLayer::pre_save_states( Core::StateIO& state_io )
 {
   this->generation_state_->set( static_cast< int >( this->get_mask_volume()->get_generation() ) );
   return true;
 }
 
-bool MaskLayer::post_load_states()
+bool MaskLayer::post_load_states( const Core::StateIO& state_io )
 {
   Core::DataBlock::generation_type generation = this->generation_state_->get();
   unsigned int bit = static_cast< unsigned int >( this->bit_state_->get() );

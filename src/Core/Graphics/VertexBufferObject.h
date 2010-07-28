@@ -42,7 +42,7 @@
 namespace Core
 {
 
-SCI_ENUM_CLASS
+CORE_ENUM_CLASS
 (
   VertexAttribArrayType,
   VERTEX_E = 0,

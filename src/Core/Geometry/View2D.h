@@ -39,7 +39,7 @@ namespace Core
 // Forward declaration
 class View2D;
 
-SCI_ENUM_CLASS
+CORE_ENUM_CLASS
 (
   FlipDirectionType,
   HORIZONTAL_E = 0, 

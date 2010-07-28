@@ -52,7 +52,7 @@ namespace Core
 // ENUM ActionStatus
 // This enum lists the possible outcomes of preforming an action
 
-SCI_ENUM_CLASS
+CORE_ENUM_CLASS
 (
   ActionStatus,
 
@@ -76,7 +76,7 @@ SCI_ENUM_CLASS
 // action run from the provenance buffer requires a different path for recording
 // provenance.
 
-SCI_ENUM_CLASS
+CORE_ENUM_CLASS
 (
   ActionSource,
 

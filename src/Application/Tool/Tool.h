@@ -58,7 +58,7 @@ typedef boost::shared_ptr< ToolPrivate > ToolPrivateHandle;
 
 
 // Tool groups help organize the tools in different categories
-SCI_ENUM_CLASS
+CORE_ENUM_CLASS
 (
   ToolGroupType,
   TOOL_E = 0x0001,

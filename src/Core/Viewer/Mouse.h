@@ -45,7 +45,7 @@ namespace Core
 // CLASS MouseButton:
 // Enums for mouse buttons 
 // they have the same values as corresponding Qt ones
-SCI_ENUM_CLASS
+CORE_ENUM_CLASS
 (
   MouseButton,
   NO_BUTTON_E = 0x00000000,
@@ -57,7 +57,7 @@ SCI_ENUM_CLASS
 // CLASS KeyModifier:
 // Enums for key modifiers
 // they have the same values as corresponding Qt ones
-SCI_ENUM_CLASS
+CORE_ENUM_CLASS
 (
   KeyModifier,
   NO_MODIFIER_E = 0x00000000,
@@ -66,7 +66,7 @@ SCI_ENUM_CLASS
   ALT_MODIFIER_E = 0x08000000
 )
 
-SCI_ENUM_CLASS
+CORE_ENUM_CLASS
 (
   Key,
   KEY_LEFT_E = 0x01000012,   

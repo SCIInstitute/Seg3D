@@ -33,6 +33,7 @@
 
 // Core includes
 #include <Core/Application/Application.h>
+#include <Core/State/StateIO.h>
 #include <Core/Utils/AtomicCounter.h>
 #include <Core/Utils/StringUtil.h>
 
@@ -140,7 +141,7 @@ void Layer::initialize_states( const std::string& name )
   // == Selected by the LayerGroup ==
   this->add_state( "selected", selected_state_, false );
 
-  // == Which of the submenus is being editted ==
+  // == Which of the sub-menus is being edited ==
   this->add_state( "menu", menu_state_, NO_MENU_C, NO_MENU_C + "|" + OPACITY_MENU_C + 
     "|" + COLOR_MENU_C + "|" + CONTRAST_MENU_C + "|" + APPEARANCE_MENU_C );
 
@@ -154,6 +155,32 @@ void Layer::initialize_states( const std::string& name )
   this->add_state( "data", this->data_state_,  AVAILABLE_C , 
     AVAILABLE_C + "|" + CREATING_C + "|" + PROCESSING_C + "|" + IN_USE_C );
 }
+
+bool Layer::post_save_states( Core::StateIO& state_io )
+{
+  TiXmlElement* layer_element = state_io.get_current_element();
+  assert( this->get_statehandler_id() == layer_element->Value() );
+  std::string layer_type;
+  switch ( this->type() )
+  {
+  case Core::VolumeType::DATA_E:
+    layer_type = "data";
+    break;
+  case Core::VolumeType::MASK_E:
+    layer_type = "mask";
+    break;
+  case Core::VolumeType::LABEL_E:
+    layer_type = "label";
+    break;
+  default:
+    CORE_LOG_ERROR( "Unknow layer type" );
+    assert( false );
+  }
+  
+  layer_element->SetAttribute( "type", layer_type );
+  return true;
+}
+
 
 } // end namespace Seg3D
 

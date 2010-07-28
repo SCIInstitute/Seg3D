@@ -33,6 +33,7 @@
 
 // Core includes
 #include <Core/Application/Application.h>
+#include <Core/State/StateIO.h>
 
 // Application includes
 #include <Application/ProjectManager/ProjectManager.h>
@@ -81,7 +82,7 @@ void DataLayer::initialize_states()
 }
 
   
-bool DataLayer::pre_save_states()
+bool DataLayer::pre_save_states( Core::StateIO& state_io )
 {
   this->generation_state_->set( static_cast< int >( this->data_volume_->get_generation() ) );
   
@@ -100,7 +101,7 @@ bool DataLayer::pre_save_states()
   
 }
 
-bool DataLayer::post_load_states()
+bool DataLayer::post_load_states( const Core::StateIO& state_io )
 {
   std::string generation = this->generation_state_->export_to_string() + ".nrrd";
   boost::filesystem::path volume_path = ProjectManager::Instance()->get_project_data_path() /

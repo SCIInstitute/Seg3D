@@ -1,3 +1,4 @@
+
 #
 #  For more information, please see: http://software.sci.utah.edu
 # 
@@ -26,20 +27,18 @@
 #  DEALINGS IN THE SOFTWARE.
 #
 
+##################################################
+# Set sources
+##################################################
 
-ADD_SUBDIRECTORY(Filters)
-ADD_SUBDIRECTORY(InterfaceManager)
-ADD_SUBDIRECTORY(Layer)
-ADD_SUBDIRECTORY(LayerIO)
-ADD_SUBDIRECTORY(LayerManager)
-ADD_SUBDIRECTORY(PreferencesManager)
-ADD_SUBDIRECTORY(Project)
-ADD_SUBDIRECTORY(ProjectManager)
-ADD_SUBDIRECTORY(Renderer)
-ADD_SUBDIRECTORY(StatusBar)
-ADD_SUBDIRECTORY(Session)
-ADD_SUBDIRECTORY(Tool)
-ADD_SUBDIRECTORY(ToolManager)
-ADD_SUBDIRECTORY(Tools)
-ADD_SUBDIRECTORY(Viewer)
-ADD_SUBDIRECTORY(ViewerManager)
+SET(APPLICATION_SESSION_SRCS
+  Session.h
+  Session.cc
+)
+
+CORE_ADD_LIBRARY(Application_Session
+         ${APPLICATION_SESSION_SRCS} )
+            
+TARGET_LINK_LIBRARIES(Application_Session
+                      ${SCI_BOOST_LIBRARY})
+                    

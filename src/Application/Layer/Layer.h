@@ -189,6 +189,9 @@ public:
   
   int get_generation() const;
   
+protected:
+  virtual bool post_save_states( Core::StateIO& state_io );
+
 private:  
   // Handle to the layer group (this one needs to be weak to ensure objects are not persistent
   // due to a circular dependency)

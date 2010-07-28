@@ -26,9 +26,13 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#include <tinyxml.h>
+
 #include <Core/Application/Application.h>
 #include <Core/Interface/Interface.h>
+#include <Core/State/StateIO.h>
 
+#include <Application/Session/Session.h>
 #include <Application/Tool/ToolFactory.h>
 #include <Application/ToolManager/ToolManager.h>
 
@@ -62,7 +66,6 @@ public:
   ToolManager::tool_list_type tool_list_;
   ToolHandle active_tool_;
 
-  Core::StateStringVectorHandle tools_state_;
   Core::StateStringHandle active_tool_state_;
 };
 
@@ -124,11 +127,9 @@ bool ToolManagerPrivate::handle_wheel( int delta, int x, int y, int buttons, int
 }
 
 ToolManager::ToolManager() :
-  StateHandler( "ToolManager", VERSION_NUMBER_C, false, 2 ),
+  StateHandler( "ToolManager", VERSION_NUMBER_C, false ),
   private_( new ToolManagerPrivate )
 {
-  std::vector< std::string> tools;
-  this->add_state( "tools", this->private_->tools_state_, tools );
   this->add_state( "active_tool", this->private_->active_tool_state_, Tool::NONE_OPTION_C );
 
   // Register mouse event handlers for all the viewers
@@ -332,62 +333,61 @@ ToolHandle ToolManager::get_active_tool()
   return this->private_->active_tool_;
 }
 
-bool ToolManager::pre_save_states()
+bool ToolManager::pre_save_states( Core::StateIO& state_io )
 {
-  lock_type lock( this->get_mutex() );
-
   this->private_->active_tool_state_->set( this->active_toolid() );
+  return true;
+}
 
-  std::vector< std::string > tools_vector;
+bool ToolManager::post_save_states( Core::StateIO& state_io )
+{
+  TiXmlElement* tm_element = state_io.get_current_element();
+  assert( this->get_statehandler_id() == tm_element->Value() );
+  TiXmlElement* tools_element = new TiXmlElement( "tools" );
+  tm_element->LinkEndChild( tools_element );
 
-  for( tool_list_type::iterator it = this->private_->tool_list_.begin(); 
-    it != this->private_->tool_list_.end(); ++it )
+  state_io.push_current_element();
+  state_io.set_current_element( tools_element );
+
+  tool_list_type::iterator it = this->private_->tool_list_.begin();
+  tool_list_type::iterator it_end = this->private_->tool_list_.end();
+  while ( it != it_end )
   {
-    tools_vector.push_back( ( *it ).first );
+    ( *it ).second->save_states( state_io );
+    ++it;
   }
 
-  this->private_->tools_state_->set( tools_vector );
+  state_io.pop_current_element();
 
   return true;
 }
 
-bool ToolManager::post_save_states()
+bool ToolManager::post_load_states( const Core::StateIO& state_io )
 {
-  lock_type lock( this->get_mutex() );
-
-  for( tool_list_type::iterator it = this->private_->tool_list_.begin(); 
-    it != this->private_->tool_list_.end(); ++it )
+  const TiXmlElement* tools_element = state_io.get_current_element()->
+    FirstChildElement( "tools" );
+  if ( tools_element == 0 )
   {
-    if( !( ( *it ).second )->populate_session_states() )
-    {
-      return false;
-    }
+    return false;
   }
-  return true;
-}
+  
+  state_io.push_current_element();
+  state_io.set_current_element( tools_element );
 
-bool ToolManager::post_load_states()
-{
-  std::vector< std::string > state_values;
-  Core::StateEngine::Instance()->get_session_states( state_values );
-
-  std::vector< std::string > tools_vector = this->private_->tools_state_->get();
-  for( int j = 0; j < static_cast< int >( tools_vector.size() ); ++j )
+  bool success = true;
+  const TiXmlElement* tool_element = tools_element->FirstChildElement();
+  while ( tool_element != 0 )
   {
-    if( tools_vector[ j ] == "]" )
+    std::string toolid( tool_element->Value() );
+    if ( this->open_tool( toolid, toolid, false ) )
     {
-      return true;
+      ToolHandle tool = this->get_tool( toolid );
+      success &= tool->load_states( state_io );
     }
-    
-    std::string new_tool_id;
-    this->open_tool( tools_vector[ j ], new_tool_id, false );
-
-    ToolHandle tool = this->get_tool( tools_vector[ j ] );
-    if ( !tool || !( tool->load_states( state_values ) ) )
-    {
-      return false;
-    }   
+    tool_element = tool_element->NextSiblingElement();
   }
+
+  state_io.pop_current_element();
 
   if( this->private_->active_tool_state_->get() != Tool::NONE_OPTION_C )
   {
@@ -401,7 +401,7 @@ bool ToolManager::post_load_states()
   return true;
 }
 
-bool ToolManager::pre_load_states()
+bool ToolManager::pre_load_states( const Core::StateIO& state_io )
 {
   return this->delete_all();
 }
@@ -443,7 +443,9 @@ bool ToolManager::delete_all()
   return true;
 }
 
-
-
+int ToolManager::get_session_priority()
+{
+  return SessionPriority::TOOL_MANAGER_PRIORITY_E;
+}
 
 } // end namespace Seg3D

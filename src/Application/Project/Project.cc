@@ -34,6 +34,7 @@
 
 // Core includes
 #include <Core/Application/Application.h>
+#include <Core/State/StateIO.h>
 #include <Core/Utils/StringUtil.h>
 
 // Application includes
@@ -75,7 +76,9 @@ Project::~Project()
 bool Project::initialize_from_file( boost::filesystem::path project_path, 
   const std::string& project_name )
 {
-  if( this->import_states( project_path, project_name, true ) ) 
+  Core::StateIO stateio;
+  if( stateio.import_from_file( project_path / ( project_name + ".s3d" ) ) &&
+    this->load_states( stateio ) )  
   {
     if( this->load_session( project_path, 0 ) )
     {
@@ -103,14 +106,14 @@ bool Project::load_session( boost::filesystem::path project_path, int state_inde
   }
 
   boost::filesystem::path session_path = project_path / session[ 0 ];
-  return  this->current_session_->initialize_from_file( session_path, session[ 1 ] );
+  return  this->current_session_->load( session_path, session[ 1 ] );
 }
   
 bool Project::save_session( boost::filesystem::path project_path, const std::string& session_name )
 {
   this->current_session_->session_name_state_->set( session_name );
   
-  if( this->current_session_->save_session_settings( 
+  if( this->current_session_->save( 
     ( project_path / "sessions" ), session_name ) )
   {
     this->add_session_to_list( project_path, session_name );
@@ -177,7 +180,11 @@ bool Project::delete_session( boost::filesystem::path project_path, int state_in
 
   this->data_manager_->remove_session( session_deleted_name );
 
-  this->export_states( project_path, this->project_name_state_->get(), true );
+  Core::StateIO stateio;
+  stateio.initialize( "Seg3D" );
+  this->save_states( stateio );
+  stateio.export_to_file( project_path / ( this->project_name_state_->get() + ".s3d" ) );
+  
   return true;
 }
   
@@ -220,7 +227,7 @@ bool Project::get_session_name( int index, std::string& session_name )
   return false;
 }
 
-bool Project::pre_save_states()
+bool Project::pre_save_states( Core::StateIO& state_io )
 {
   if( this->save_custom_colors_state_->get() )
   {
@@ -232,7 +239,7 @@ bool Project::pre_save_states()
   return true;
 }
 
-bool Project::post_load_states()
+bool Project::post_load_states( const Core::StateIO& state_io )
 {
   if( this->save_custom_colors_state_->get() )
   {

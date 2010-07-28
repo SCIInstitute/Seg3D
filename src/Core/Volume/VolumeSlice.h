@@ -40,7 +40,7 @@
 namespace Core
 {
 
-SCI_ENUM_CLASS
+CORE_ENUM_CLASS
 (
   VolumeSliceType,
   AXIAL_E = 0,

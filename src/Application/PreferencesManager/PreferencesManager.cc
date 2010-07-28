@@ -33,12 +33,12 @@
 // Boost Includes
 #include <boost/lexical_cast.hpp>
 
-// TinyXML includes
-#include <Externals/tinyxml/tinyxml.h>
+// Core includes
+#include <Core/Application/Application.h>
+#include <Core/State/StateIO.h>
 
 // Application includes
 #include <Application/PreferencesManager/PreferencesManager.h>
-#include <Core/Application/Application.h>
 
 
 namespace Seg3D
@@ -56,7 +56,7 @@ PreferencesManager::PreferencesManager() :
   // Initialize the local config directory path
   Core::Application::Instance()->get_config_directory( this->local_config_path_ );
 
-  if(  initialize_default_colors() )
+  if( initialize_default_colors() )
     this->initialize_states();
 
   // After we initialize the states, we then load the saved preferences from file.
@@ -70,12 +70,17 @@ PreferencesManager::~PreferencesManager()
 
 void PreferencesManager::initialize()
 {
-  import_states( this->local_config_path_, "preferences" );
+  Core::StateIO state_io;
+  state_io.import_from_file( this->local_config_path_ / "preferences.xml" );
+  this->load_states( state_io );
 }
 
 void PreferencesManager::save_state()
 {
-  export_states( this->local_config_path_, "preferences" );
+  Core::StateIO state_io;
+  state_io.initialize( "Seg3D2" );
+  this->save_states( state_io );
+  state_io.export_to_file( this->local_config_path_ / "preferences.xml" );
 }
 
 Core::Color PreferencesManager::get_color( int index ) const

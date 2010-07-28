@@ -31,55 +31,70 @@
 
 namespace Core {
 
-StateBase::StateBase(const std::string& stateid) :
-  stateid_( stateid ),
-  signals_enabled_( true ),
-  initializing_( false ),
-  session_priority_( DEFAULT_LOAD_E )
+class StateBasePrivate
 {
+public:
+  // The name of this state, so it can be saved in human readable form
+  std::string stateid_;
+
+  // Whether the signals are enabled
+  bool signals_enabled_;
+
+  // Whether the state variable is still being initialized
+  bool initializing_;
+
+  // The session saving/loading priority
+  int session_priority_;
+};
+
+StateBase::StateBase(const std::string& stateid) :
+  private_( new StateBasePrivate )
+{
+  this->private_->stateid_ = stateid;
+  this->private_->signals_enabled_ = true;
+  this->private_->initializing_ = false;
+  this->private_->session_priority_ = DEFAULT_LOAD_E;
 }
 
 StateBase::~StateBase()
 {
 }
 
+std::string StateBase::get_stateid() const
+{
+  return this->private_->stateid_;
+}
+
 void StateBase::enable_signals( bool signals_enabled )
 {
   StateEngine::lock_type lock( StateEngine::Instance()->GetMutex() );
-  this->signals_enabled_ = signals_enabled;
+  this->private_->signals_enabled_ = signals_enabled;
+}
+
+bool StateBase::signals_enabled()
+{
+  return this->private_->signals_enabled_;
 }
 
 void StateBase::set_initializing( bool initializing )
 {
   StateEngine::lock_type lock( StateEngine::Instance()->GetMutex() );
-  this->initializing_ = initializing;
+  this->private_->initializing_ = initializing;
+}
+
+bool StateBase::get_initializing()
+{
+  return this->private_->initializing_;
 }
 
 int StateBase::get_session_priority() const
 {
-  return  this->session_priority_;
+  return  this->private_->session_priority_;
 }
   
 void StateBase::set_session_priority( int priority )
 {
-  this->session_priority_ = priority;
-}
-
-
-
-std::string StateBase::get_stateid() const
-{
-  return this->stateid_;
-}
-
-std::string StateBase::get_baseid() const
-{
-  return ( this->stateid_.substr( 0, this->stateid_.find( ':' ) ) );
-}
-
-std::string StateBase::get_id() const
-{
-  return Core::SplitString(  this->stateid_, "::" )[ 1 ];
+  this->private_->session_priority_ = priority;
 }
 
 void StateBase::invalidate()

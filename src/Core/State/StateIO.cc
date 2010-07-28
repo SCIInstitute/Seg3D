@@ -26,8 +26,6 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-// TinyXML includes
-#include <Externals/tinyxml/tinyxml.h>
 
 // Core includes
 #include <Core/State/StateIO.h>
@@ -36,132 +34,82 @@
 namespace Core
 {
 
-StateIO::StateIO()
+class StateIOPrivate
 {
+public:
+  TiXmlDocument xml_doc_;
+
+  mutable TiXmlElement* current_element_;
+  mutable std::stack< TiXmlElement* > current_element_stack_;
+};
+
+StateIO::StateIO() :
+  private_( new StateIOPrivate )
+{
+  this->private_->current_element_ = 0;
 }
 
 StateIO::~StateIO()
 {
 }
 
-bool StateIO::export_to_file( boost::filesystem::path path, std::vector< std::string >& state_list,
-  bool project_file)
+bool StateIO::export_to_file( const boost::filesystem::path& path )
 {
-  // XML declaration and version number
-  TiXmlDocument doc;  
-  TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "", "" );  
-  doc.LinkEndChild( decl );  
-
-  // Set Seg3D2 as our root
-  TiXmlElement * root = new TiXmlElement( "Seg3D2" );  
-  doc.LinkEndChild( root );  
- 
-  // We will use our statehandler_id as the parent for its state values
-  TiXmlElement* branch = new TiXmlElement( state_list[ 0 ].c_str() );
-  std::string node = state_list[ 0 ];
-  root->LinkEndChild( branch ); 
-
-  TiXmlElement* state_value;
-
-  for( int i = 1; i < ( static_cast< int >( state_list.size() ) - 1 ); ++i )
-  {
-    if( node == state_list[ i ] )
-    {
-      branch = new TiXmlElement( state_list[ i + 1 ].c_str() );
-      root->LinkEndChild( branch );
-      node = state_list[ i + 1 ];
-      i++;
-      continue;
-    }
-    std::vector< std::string > state_value_as_string_vector = 
-      SplitString( state_list[ i ], "*" );
-
-    if( state_value_as_string_vector.size() == 3 )
-    {
-      state_value = new TiXmlElement( ( state_value_as_string_vector[ 0 ] + ":" +
-        state_value_as_string_vector[ 1 ] ).c_str() );
-      state_value->LinkEndChild( new TiXmlText( state_value_as_string_vector[ 2 ].c_str() ) );
-    }
-    else
-    {
-      state_value = new TiXmlElement( state_value_as_string_vector[ 0 ].c_str() );
-      state_value->LinkEndChild( new TiXmlText( state_value_as_string_vector[ 1 ].c_str() ) );
-    }
-    branch->LinkEndChild( state_value );
-    
-  } // end state_list for loop
-
-  std::string extension = ".xml";
-  if( project_file ) 
-  {
-    extension = ".s3d";
-  }
-  
-  doc.SaveFile( ( ( path ).string() + extension ).c_str() );
-
-  return true;
+  return this->private_->xml_doc_.SaveFile( path.string() );
 }
 
-bool StateIO::import_from_file( boost::filesystem::path path, std::vector< std::string >& state_list,
-  bool project_file )
+bool StateIO::import_from_file( const boost::filesystem::path& path )
 {
-
-  std::string extension = ".xml";
-  if( project_file ) 
+  if ( !this->private_->xml_doc_.LoadFile( path.string() ) )
   {
-    extension = ".s3d";
-  }
-  
-  // We will load in the file from the specified path and exit if the path is invalid
-  TiXmlDocument doc( ( path.string() + extension ).c_str() );
-  if ( !doc.LoadFile() ) 
     return false;
-
-  TiXmlHandle hDoc( &doc );
-  TiXmlElement* state_handler;
-  TiXmlElement* state_value;
-  TiXmlHandle hRoot(0);
-
-  // We should have a valid root if not we will exit
-  {
-    state_handler = hDoc.FirstChildElement().Element();
-    if ( !state_handler ) return false;
-    hRoot = TiXmlHandle( state_handler );
   }
-
-  // Now we are expecting to get the proper statehandler_id_
+  
+  this->private_->current_element_ = this->private_->xml_doc_.FirstChildElement();
+  if ( this->private_->current_element_ == 0 )
   {
-    state_handler = hRoot.FirstChildElement().Element();
-    if ( !state_handler ) return false;
-
-    for( ; state_handler; state_handler = state_handler->NextSiblingElement() )
-    {
-      // Finally we import the actual state values from the XML and import them
-      std::string state_handler_name = std::string( state_handler->Value() );
-      state_list.push_back( state_handler_name );
-
-      state_value = state_handler->FirstChildElement();
-      if ( !state_value ) return false;
-      for (  ; state_value; state_value = state_value->NextSiblingElement() )
-      {
-        std::string state_handler_name = std::string( state_value->Value() );
-        std::string state_value_value = "";
-        if( SplitString( state_handler_name, ":" ).size() == 2 )
-          state_handler_name.replace( state_handler_name.find( ":" ), 1, "*" );
-        if( state_value->GetText() != NULL )
-        {
-          state_value_value = std::string( state_value->GetText() );
-        }
-        state_list.push_back( state_handler_name + "*" + state_value_value );
-      
-      }
-      state_list.push_back( state_handler_name );
-    }
+    return false;
   }
-
-
+  
   return true;
 }
 
+void StateIO::initialize( const std::string& root_name )
+{
+  this->private_->xml_doc_.LinkEndChild( new TiXmlDeclaration( "1.0", "", "" ) );  
+
+  this->private_->current_element_ = new TiXmlElement( root_name );  
+  this->private_->xml_doc_.LinkEndChild( this->private_->current_element_ );  
+}
+
+const TiXmlElement* StateIO::get_current_element() const
+{
+  return this->private_->current_element_;
+}
+
+TiXmlElement* StateIO::get_current_element()
+{
+  return this->private_->current_element_;
+}
+
+void StateIO::set_current_element( const TiXmlElement* element ) const
+{
+  this->private_->current_element_ = const_cast< TiXmlElement* >( element );
+}
+
+void StateIO::push_current_element() const
+{
+  this->private_->current_element_stack_.push( this->private_->current_element_ );
+}
+
+void StateIO::pop_current_element() const
+{
+  assert( !this->private_->current_element_stack_.empty() );
+  if ( !this->private_->current_element_stack_.empty() )
+  {
+    this->private_->current_element_ = this->private_->current_element_stack_.top();
+    this->private_->current_element_stack_.pop();
+  }
+}
 
 } // end namespace Core

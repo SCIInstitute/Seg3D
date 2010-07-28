@@ -43,7 +43,7 @@
 #include <boost/thread/mutex.hpp>
 
 // Application indludes
-#include <Application/Project/Session.h>
+#include <Application/Session/Session.h>
 #include <Application/Project/DataManager.h>
 
 
@@ -127,11 +127,11 @@ public:
 protected:
   // PRE_SAVE_STATES:
   // this function synchronizes the colors if they are set to be saved with the project
-  virtual bool pre_save_states();
+  virtual bool pre_save_states( Core::StateIO& state_io );
   
   // POST_LOAD_STATES:
   // this function sets Seg3d's mask colors if they are set to be saved with the project
-  virtual bool post_load_states();
+  virtual bool post_load_states( const Core::StateIO& state_io );
   
 private:
   // ADD_SESSION_TO_LIST
@@ -144,7 +144,6 @@ private:
   const static size_t VERSION_NUMBER_C;
   DataManagerHandle data_manager_;
   
-
 };
 
 } // end namespace Seg3D

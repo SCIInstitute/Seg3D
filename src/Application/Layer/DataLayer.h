@@ -97,11 +97,11 @@ public:
 protected:
   // PRE_SAVE_STATES:
   // this function synchronize the generation number for the session saving
-  virtual bool pre_save_states();
+  virtual bool pre_save_states( Core::StateIO& state_io );
 
   // POST_LOAD_STATES:
   // this function takes care of connecting the DataVolume to the data layer after it's settings
-  virtual bool post_load_states();
+  virtual bool post_load_states( const Core::StateIO& state_io );
   
   // CLEAN_UP:
   // this function cleans up the data volume for when you are deleting the data layer and reloading

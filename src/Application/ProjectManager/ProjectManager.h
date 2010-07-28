@@ -144,7 +144,7 @@ private:
   
   // RENAME_PROJECT_FOLDER
   // this function is triggered when a user changes the folder name
-  void rename_project_folder( const std::string& new_name, Core::ActionSource source );
+  void rename_project( const std::string& new_name, Core::ActionSource source );
 
   // SAVE_PROJECT_ONLY:
   // this function saves only the project and is used internally only. It returns if it was 

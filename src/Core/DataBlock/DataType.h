@@ -45,7 +45,7 @@ namespace Core
 // CLASS DataType:
 // This class describes the data types that the program uses
 
-SCI_ENUM_CLASS
+CORE_ENUM_CLASS
 (
   DataType,
   CHAR_E = 0, 

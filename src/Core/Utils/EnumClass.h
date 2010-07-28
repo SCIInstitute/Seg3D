@@ -32,7 +32,7 @@
 namespace Core
 {
 
-#define SCI_ENUM_CLASS(CLASS_NAME, ...)\
+#define CORE_ENUM_CLASS(CLASS_NAME, ...)\
 class CLASS_NAME \
 {\
 public:\

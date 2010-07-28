@@ -32,6 +32,7 @@
 // Application includes
 #include <Application/Project/DataManager.h>
 #include <Application/LayerManager/LayerManager.h>
+#include <Core/State/StateIO.h>
 
 
 
@@ -53,15 +54,19 @@ DataManager::~DataManager()
   
 void DataManager::initialize( boost::filesystem::path project_path )
 {
-  project_path = project_path / "data";
-  import_states( project_path, "datamanager" );
+  Core::StateIO stateio;
+  stateio.import_from_file( project_path / "data" / "datamanager.xml" );
+  this->load_states( stateio );
 }
 
 void DataManager::save_datamanager_state( boost::filesystem::path project_path, const std::string& session_name )
 {
-  project_path = project_path / "data";
-  this->prep_for_save( project_path, session_name );
-  export_states( project_path, "datamanager" );
+  // TODO: Fix prep_for_save, as it mistakenly deletes all the session files.
+  //this->prep_for_save( project_path, session_name );
+  Core::StateIO stateio;
+  stateio.initialize( "Seg3D2" );
+  this->save_states( stateio );
+  stateio.export_to_file( project_path / "data" / "datamanager.xml" );
 }
   
 void DataManager::prep_for_save( boost::filesystem::path project_path, const std::string& session_name )

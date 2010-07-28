@@ -98,6 +98,14 @@ public:
   void pick_point( size_t source_viewer, const Core::Point& pt );
   std::vector< size_t > get_locked_viewers( int mode_index );
 
+  // DISABLE_RENDERING:
+  // Triggers enable_rendering_signal_( false ).
+  void disable_rendering();
+
+  // ENABLE_RENDERING:
+  // Triggers enable_rendering_signal_( true ).
+  void enable_rendering();
+
   // -- State information --
 public:
 
@@ -140,20 +148,25 @@ public:
   typedef boost::signals2::signal< void ( size_t ) > picking_target_changed_signal_type;
   picking_target_changed_signal_type picking_target_changed_signal_;
 
-public:
+  boost::signals2::signal< void ( bool ) > enable_rendering_signal_;
+
+protected:
   // POST_SAVE_STATES:
   // This function is called by the statehandler once the initial state saving has finished and
   // will then save the states of each of the viewers.
-  bool post_save_states();
+  virtual bool post_save_states( Core::StateIO& state_io );
+
+  // PRE_LOAD_STATES:
+  // This virtual function is called by StateHandler::load_states before loading any states.
+  virtual bool pre_load_states( const Core::StateIO& state_io );
 
   // POST_LOAD_STATES:
   // This function is called by the statehandler once the initial state loading has finished and
   // will then load the states of each of the viewers.
-  bool post_load_states();
+  virtual bool post_load_states( const Core::StateIO& state_io );
 
-  // state variables
 public:
-  Core::StateStringVectorHandle viewers_state_;
+  virtual int get_session_priority();
 
   // -- Viewer information --
 private:

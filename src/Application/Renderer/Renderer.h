@@ -49,7 +49,9 @@ namespace Seg3D
 
 // Forward declarations
 class Renderer;
+class RendererPrivate;
 typedef boost::shared_ptr< Renderer > RendererHandle;
+typedef boost::shared_ptr< RendererPrivate > RendererPrivateHandle;
 
 class ProxyRectangle;
 typedef boost::shared_ptr< ProxyRectangle > ProxyRectangleHandle;
@@ -80,8 +82,8 @@ private:
   void viewer_slice_changed( size_t viewer_id );
   void viewer_mode_changed( size_t viewer_id );
   void picking_target_changed( size_t viewer_id );
+  void enable_rendering( bool enable );
 
-  Core::UnitCubeHandle cube_;
   SliceShaderHandle slice_shader_;
   Core::Texture3DHandle pattern_texture_;
 
@@ -89,6 +91,8 @@ private:
   Core::Texture2DHandle text_texture_;
   
   size_t viewer_id_;
+
+  RendererPrivateHandle private_;
 };
 
 } // end namespace Seg3D

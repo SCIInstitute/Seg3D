@@ -26,12 +26,13 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// STL includes
+#include <string>
+#include <queue>
+
 // Boost includes
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
-
-// STL includes
-#include <string>
 
 // Application includes
 #include <Core/State/StateEngine.h>
@@ -45,7 +46,7 @@ typedef std::map< std::string, Core::AtomicCounterHandle >
   state_handler_counter_map_type;
 typedef std::map< std::string, StateHandler* > state_handler_map_type;
 
-class StateEnginePrivate
+class StateEnginePrivate : public RecursiveLockable
 {
 public:
   StateEnginePrivate() {}
@@ -69,62 +70,97 @@ StateEngine::~StateEngine()
   delete this->private_;
 }
 
-bool  StateEngine::load_session_states()
-{
-//  lock_type lock( get_mutex() );
-  
-  state_handler_map_type::iterator it = this->private_->state_handler_map_.begin();
-  state_handler_map_type::iterator it_end = this->private_->state_handler_map_.end();
+typedef std::pair< int, std::string > HandlerEntry;
 
-  std::vector< std::string > handler_order;
-  handler_order.resize( 3 );
-  while( it != it_end )
+bool operator<( const HandlerEntry& left, const HandlerEntry& right )
+{
+  return left.first < right.first;
+}
+
+bool operator>( const HandlerEntry& left, const HandlerEntry& right )
+{
+  return left.first > right.first;
+}
+
+bool  StateEngine::load_states( const StateIO& state_io )
+{
+  // Put all the current state handlers in a priority queue in the descending order of priorities
+  std::priority_queue< HandlerEntry > state_handlers;
   {
-    if( ( ( *it ).second->get_save_priority() ) != -1 )
+    StateEnginePrivate::lock_type lock( this->private_->get_mutex() );
+    state_handler_map_type::iterator it = this->private_->state_handler_map_.begin();
+    state_handler_map_type::iterator it_end = this->private_->state_handler_map_.end();
+    while ( it != it_end )
     {
-      handler_order[ ( *it ).second->get_save_priority() ] = ( *it ).first;
+      if ( ( *it ).second->get_session_priority() != -1 )
+      {
+        state_handlers.push( std::make_pair( ( *it ).second->get_session_priority(),
+          ( *it ).second->get_statehandler_id() ) );
+      }
+      ++it;
     }
-    ++it;
   }
-  for( int i = 0; i < 3; ++i )
+
+  bool success = true;
+  // Call load_states on each state handler if it still exists.
+  while ( !state_handlers.empty() )
   {
-    if( !( * ( this->private_->state_handler_map_.find( handler_order[ i ] ) ) ).second->
-        load_states( this->private_->session_states_ ) )
+    std::string statehandler_id = state_handlers.top().second;
+    state_handlers.pop();
+
+    StateEnginePrivate::lock_type lock( this->private_->get_mutex() );
+    state_handler_map_type::iterator it = this->private_->
+      state_handler_map_.find( statehandler_id );
+    if ( it != this->private_->state_handler_map_.end() )
     {
-      return false;
+      lock.unlock();
+      success &= ( *it ).second->load_states( state_io );
+    }
+  }
+
+  return success;
+}
+
+bool StateEngine::save_states( StateIO& state_io )
+{
+  // Put all the current state handlers in a priority queue in the ascending order of priorities
+  std::priority_queue< HandlerEntry, std::vector< HandlerEntry>, 
+    std::greater< HandlerEntry > > state_handlers;
+  {
+    StateEnginePrivate::lock_type lock( this->private_->get_mutex() );
+    state_handler_map_type::iterator it = this->private_->state_handler_map_.begin();
+    state_handler_map_type::iterator it_end = this->private_->state_handler_map_.end();
+    while ( it != it_end )
+    {
+      if ( ( *it ).second->get_session_priority() != -1 )
+      {
+        state_handlers.push( std::make_pair( ( *it ).second->get_session_priority(),
+          ( *it ).second->get_statehandler_id() ) );
+      }
+      ++it;
+    }
+  }
+
+  while ( !state_handlers.empty() )
+  {
+    std::string statehandler_id = state_handlers.top().second;
+    state_handlers.pop();
+
+    StateEnginePrivate::lock_type lock( this->private_->get_mutex() );
+    state_handler_map_type::iterator it = this->private_->
+      state_handler_map_.find( statehandler_id );
+    if ( it != this->private_->state_handler_map_.end() )
+    {
+      lock.unlock();
+      ( *it ).second->save_states( state_io );
     }
   }
 
   return true;
 }
-
-
-bool StateEngine::populate_session_vector()
-{
-  lock_type lock( get_mutex() );
-  
-  this->private_->session_states_.clear();
-
-  state_handler_map_type::iterator it = this->private_->state_handler_map_.begin();
-  state_handler_map_type::iterator it_end = this->private_->state_handler_map_.end();
-
-  while( it != it_end )
-  {
-    if( ( ( *it ).second->get_save_priority() ) != -1 )
-    {
-      if( !( *it ).second->populate_session_states() )
-        return false;
-    }
-    ++it;
-  }
-  return true;
-}
-
 
 bool StateEngine::get_state( const std::string& state_id, StateBaseHandle& state )
 {
-  lock_type lock( get_mutex() );
-
   state.reset();
 
   std::string state_handler_id;
@@ -139,6 +175,8 @@ bool StateEngine::get_state( const std::string& state_id, StateBaseHandle& state
     return false;
   }
 
+  StateEnginePrivate::lock_type lock( this->private_->get_mutex() );
+
   state_handler_map_type::iterator it = this->private_->state_handler_map_.
     find( state_handler_id );
   if ( it != this->private_->state_handler_map_.end() )
@@ -147,12 +185,11 @@ bool StateEngine::get_state( const std::string& state_id, StateBaseHandle& state
   }
 
   return false;
-
 }
 
 size_t StateEngine::number_of_states()
 {
-  lock_type lock( get_mutex() );
+  StateEnginePrivate::lock_type lock( this->private_->get_mutex() );
 
   state_handler_map_type::iterator it = this->private_->state_handler_map_.begin();
   state_handler_map_type::iterator it_end = this->private_->state_handler_map_.end();
@@ -169,7 +206,7 @@ size_t StateEngine::number_of_states()
 
 bool StateEngine::get_state( const size_t idx, StateBaseHandle& state)
 {
-  lock_type lock( get_mutex() );
+  StateEnginePrivate::lock_type lock( this->private_->get_mutex() );
 
   state_handler_map_type::iterator it = this->private_->state_handler_map_.begin();
   state_handler_map_type::iterator it_end = this->private_->state_handler_map_.end();
@@ -196,7 +233,7 @@ bool StateEngine::get_state( const size_t idx, StateBaseHandle& state)
 std::string StateEngine::register_state_handler( const std::string &type_str, 
   Core::StateHandler* state_handler, bool auto_id )
 {
-  lock_type lock( this->get_mutex() );
+  StateEnginePrivate::lock_type lock( this->private_->get_mutex() );
 
   std::string handler_id;
   if ( auto_id )
@@ -270,24 +307,13 @@ std::string StateEngine::register_state_handler( const std::string &type_str,
 
 void StateEngine::remove_state_handler( const std::string& handler_id )
 {
-  lock_type lock( this->get_mutex() );
+  StateEnginePrivate::lock_type lock( this->private_->get_mutex() );
+
   if ( this->private_->state_handler_map_.erase( handler_id ) == 0 )
   {
     CORE_LOG_ERROR( std::string( "Trying to remove a state handler that does not exist: " ) +
       handler_id );
   }
-}
-
-void StateEngine::get_session_states( std::vector< std::string >& states )
-{
-  lock_type lock( this->get_mutex() );
-  states = this->private_->session_states_;
-}
-
-void StateEngine::set_session_states( std::vector< std::string >& states )
-{
-  lock_type lock( this->get_mutex() );
-  this->private_->session_states_ = states;
 }
 
 } // end namespace Core

@@ -54,7 +54,7 @@
 namespace Core
 {
 
-SCI_ENUM_CLASS
+CORE_ENUM_CLASS
 (
   IntersectionType,
   INSIDE_E = 1, 

@@ -89,7 +89,7 @@ ProgressWidget::ProgressWidget( Core::ActionProgressHandle action_progress, QWid
     this->private_->ui_.line_->hide();
 
     this->private_->running_timer_ = new QTimer( this );
-    this->private_->running_timer_->setInterval( 40 );
+    this->private_->running_timer_->setInterval( 100 );
     
     connect( this->private_->running_timer_, SIGNAL( timeout() ), 
       this, SLOT( update_running() ) );

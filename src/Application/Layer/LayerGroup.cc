@@ -182,30 +182,4 @@ void LayerGroup::get_layer_names( std::vector< LayerIDNamePair >& layer_names,
   }
 }
 
-void LayerGroup::get_layer_names( std::vector< std::string >& layer_ids )
-{
-  layer_list_type::const_iterator it = this->layer_list_.begin();
-  for ( ; it != this->layer_list_.end(); it++ )
-  {
-    std::string volume_type;
- 
-    switch ( ( *it )->type() ) 
-    {
-      case Core::VolumeType::DATA_E:
-        volume_type = "DATA_E";
-        break;
-      case Core::VolumeType::MASK_E:
-        volume_type = "MASK_E";
-        break;
-      case Core::VolumeType::LABEL_E:
-        volume_type = "LABEL_E";
-        break;
-      default:
-        break;
-    }
-
-    layer_ids.push_back( ( *it )->get_layer_id() + "|" + volume_type );
-  }
-}
-
 } // end namespace Seg3D

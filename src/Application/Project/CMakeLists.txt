@@ -34,8 +34,6 @@
 SET(APPLICATION_PROJECT_SRCS
   Project.h
   Project.cc
-  Session.h
-  Session.cc
   DataManager.h
   DataManager.cc
 )
@@ -52,6 +50,7 @@ TARGET_LINK_LIBRARIES(Application_Project
                       Core_Utils
                       Core_Application
                       Core_Interface
+            Application_Session
                       Application_InterfaceManager
                   Application_LayerManager
                       ${SCI_BOOST_LIBRARY})

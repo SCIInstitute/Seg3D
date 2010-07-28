@@ -54,6 +54,9 @@ class StateBase;
 typedef boost::shared_ptr< StateBase > StateBaseHandle;
 typedef boost::weak_ptr< StateBase > StateBaseWeakHandle;
 
+class StateBasePrivate;
+typedef boost::shared_ptr< StateBasePrivate > StateBasePrivateHandle;
+
 class StateBase : public boost::noncopyable
 {
 
@@ -103,10 +106,7 @@ protected:
   
   // SIGNALS_ENABLED:
   // Check whether signals are enabled
-  bool signals_enabled()
-  {
-    return this->signals_enabled_;
-  }
+  bool signals_enabled();
     
   // SET_INITIALIZING:
   // Indicate that the statehandler is still being created. Hence only one thread will have
@@ -120,14 +120,12 @@ protected:
   
   // GET_INITIALIZING:
   // Query whether the state variable and its parent are still being initialized.
-  bool get_initializing()
-  {
-    return this->initializing_;
-  }
+  bool get_initializing();
   
   // -- session handling -- 
 public:
-  enum {
+  enum 
+  {
     DO_NOT_LOAD_E = -1,
     LOAD_LAST_E = 0,
     DEFAULT_LOAD_E = 100
@@ -147,14 +145,6 @@ public:
   // Get the unique id assigned to the state variable
   std::string get_stateid() const;
 
-  // GET_BASEID:
-  // Get the base id of this state variable
-  std::string get_baseid() const;
-
-  // GET_ID:
-  // Get the base id of this state variable
-  std::string get_id() const;
-
   // -- signal handling --
 public:
   // STATE_CHANGED_SIGNAL:
@@ -170,17 +160,7 @@ protected:
   virtual void invalidate();
 
 private:
-  // The name of this state, so it can be saved in human readable form
-  std::string stateid_;
-
-  // Whether the signals are enabled
-  bool signals_enabled_;
-
-  // Whether the state variable is still being initialized
-  bool initializing_;
-
-  // The session saving/loading priority
-  int session_priority_;
+  StateBasePrivateHandle private_;
 };
 
 } // end namespace Core

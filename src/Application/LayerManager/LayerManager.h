@@ -113,6 +113,8 @@ public:
   // This function returns a vector of layer ID and name pairs of all layers.
   void get_layer_names( std::vector< LayerIDNamePair >& layer_names );
 
+  virtual int get_session_priority();
+
   // Layer Action Functions
 public:
   // INSERT_LAYER:
@@ -174,7 +176,6 @@ public:
   
   // state variables
 public:
-  Core::StateStringVectorHandle layers_state_;
   Core::StateStringHandle active_layer_state_;
 
 public:
@@ -231,22 +232,22 @@ public:
   // This gets signaled when we 
   layers_changed_type layers_changed_signal_;
 
-public:
-  virtual bool pre_save_states();
+protected:
+  virtual bool pre_save_states( Core::StateIO& state_io );
 
   // POST_SAVE_STATES:
   // This function is called after the LayerManagers states have been saved and then
   // tells the groups to save their states as well.
-  virtual bool post_save_states();
+  virtual bool post_save_states( Core::StateIO& state_io );
 
   // POST_LOAD_STATES:
   // this function creates the layers who's information was saved to file, and then tells them
   // to populate their state variables from file
-  virtual bool post_load_states();
+  virtual bool post_load_states( const Core::StateIO& state_io );
   
   // PRE_LOAD_STATES:
   // this function clears out all existing layers before we load a project from file
-  virtual bool pre_load_states();
+  virtual bool pre_load_states( const Core::StateIO& state_io );
   
   
 private:

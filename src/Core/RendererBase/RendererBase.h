@@ -47,7 +47,7 @@ namespace Core
 class RendererBase;
 
 // Class definitions
-class RendererBase : public AbstractRenderer, private Core::EventHandler
+class RendererBase : public AbstractRenderer, protected Core::EventHandler
 {
 
   // -- constructor/destructor --

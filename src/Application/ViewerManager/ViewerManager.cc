@@ -35,10 +35,12 @@
 #include <Application/Viewer/Viewer.h> 
 #include <Application/ViewerManager/ViewerManager.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
+#include <Application/Session/Session.h>
 
 // Core includes
 #include <Core/Utils/ScopedCounter.h>
 #include <Core/Interface/Interface.h>
+#include <Core/State/StateIO.h>
 
 namespace Seg3D
 {
@@ -48,7 +50,7 @@ const size_t ViewerManager::VERSION_NUMBER_C = 1;
 CORE_SINGLETON_IMPLEMENTATION( ViewerManager );
 
 ViewerManager::ViewerManager() :
-  StateHandler( "view", VERSION_NUMBER_C, false, 1 ),
+  StateHandler( "view", VERSION_NUMBER_C, false ),
   signal_block_count_( 0 )
 {
   // Allow states to be set from outside of the application thread
@@ -59,6 +61,7 @@ ViewerManager::ViewerManager() :
   this->add_state( "layout", this->layout_state_, PreferencesManager::Instance()->
     default_viewer_mode_state_->export_to_string(), PreferencesManager::Instance()->
     default_viewer_mode_state_->export_list_to_string() );
+  this->layout_state_->set_session_priority( Core::StateBase::DEFAULT_LOAD_E + 1 );
   this->add_state( "active_viewer", this->active_viewer_state_, 0 );
 
   // No viewer will be the active viewer for picking
@@ -66,11 +69,6 @@ ViewerManager::ViewerManager() :
   this->add_state( "active_axial_viewer", active_axial_viewer_, -1 );
   this->add_state( "active_coronal_viewer", active_coronal_viewer_, -1 );
   this->add_state( "active_sagittal_viewer", active_sagittal_viewer_, -1 );
-
-  // NOTE: Privately held state variable for  recording which viewers are used in the program
-  // Currently there are six default viewers
-  std::vector< std::string> viewers;
-  this->add_state( "viewers", this->viewers_state_, viewers );
 
   // Step (2)
   // Create the viewers that are part of the application
@@ -104,15 +102,6 @@ ViewerManager::ViewerManager() :
     this->add_connection( this->viewers_[ j ]->slice_visible_state_->state_changed_signal_.
       connect( boost::bind( &ViewerManager::update_volume_viewers, this ) ) );
   }
-
-  // Finally we will put the viewers into state variables for loading to/from file
-  // NOTE: This state variable is for internal use only
-  std::vector< std::string > viewers_vector;
-  for( size_t i = 0; i < this->viewers_.size(); ++i )
-  {
-    viewers_vector.push_back( this->viewers_[ i ]->get_statehandler_id() );
-  }
-  this->viewers_state_->set( viewers_vector );
   
   this->set_initializing( false );
 }
@@ -396,43 +385,76 @@ void ViewerManager::viewer_lock_state_changed( size_t viewer_id )
   }
 }
 
-bool ViewerManager::post_save_states()
+bool ViewerManager::post_save_states( Core::StateIO& state_io )
 {
-  std::vector< std::string > viewers_vector = this->viewers_state_->get();
-
-  if( viewers_vector.size() != viewers_.size() )
-    return false;
-
-  for( size_t i = 0; i < viewers_vector.size(); ++i )
+  for ( size_t i = 0; i < this->number_of_viewers(); i++ )
   {
-    if( ( viewers_vector[ i ] != "]" ) && ( viewers_vector[ i ] != "\0" ) )
-    {
-      if( !( viewers_[ i ] )->populate_session_states() )
-      {
-        return false;
-      }
-    }
+    this->viewers_[ i ]->save_states( state_io );
   }
+  
   return true;
 }
 
-bool ViewerManager::post_load_states()
+bool ViewerManager::post_load_states( const Core::StateIO& state_io )
 {
-  std::vector< std::string > viewers_vector = this->viewers_state_->get();
-  for( size_t i = 0; i < viewers_vector.size(); ++i )
+  // Block signals
+  Core::ScopedCounter signal_block_counter( this->signal_block_count_ );
+  // Clear all picking targets
+  for ( size_t i = 0; i < this->number_of_viewers(); i++ )
   {
-    if( ( viewers_vector[ i ] != "]" ) && ( viewers_vector[ i ] != "\0" ) )
-    {
-      std::vector< std::string > state_values;
-      Core::StateEngine::Instance()->get_session_states( state_values );
-      // TODO: Need to implement signal blocking before we can load the viewers
-      if( !( viewers_[ i ] )->load_states( state_values ) )
-      {
-        return false;
-      }
-    }
+    this->viewers_[ i ]->is_picking_target_state_->set( false );
   }
+  
+  // Restore picking targets for each view mode.
+  if ( this->active_axial_viewer_->get() >= 0 )
+  {
+    assert ( this->viewers_[ this->active_axial_viewer_->get() ]->
+      view_mode_state_->get() == Viewer::AXIAL_C );
+    this->viewers_[ this->active_axial_viewer_->get() ]->is_picking_target_state_->set( true ); 
+  }
+  if ( this->active_coronal_viewer_->get() >= 0 )
+  {
+    assert ( this->viewers_[ this->active_coronal_viewer_->get() ]->
+      view_mode_state_->get() == Viewer::CORONAL_C );
+    this->viewers_[ this->active_coronal_viewer_->get() ]->is_picking_target_state_->set( true ); 
+  }
+  if ( this->active_sagittal_viewer_->get() >= 0 )
+  {
+    assert ( this->viewers_[ this->active_sagittal_viewer_->get() ]->
+      view_mode_state_->get() == Viewer::SAGITTAL_C );
+    this->viewers_[ this->active_sagittal_viewer_->get() ]->is_picking_target_state_->set( true ); 
+  }
+  
   return true;
+}
+
+int ViewerManager::get_session_priority()
+{
+  return SessionPriority::VIEWER_MANAGER_PRIORITY_E;
+}
+
+bool ViewerManager::pre_load_states( const Core::StateIO& state_io )
+{
+  // Load states of all the viewers before loading ViewerManager states.
+  // NOTE: The reason for doing this is that some of the ViewerManager states are affected
+  // by certain states of viewers, and we don't want the loaded states to be overwritten.
+
+  for ( size_t i = 0; i < this->number_of_viewers(); i++ )
+  {
+    this->viewers_[ i ]->load_states( state_io );
+  }
+
+  return true;
+}
+
+void ViewerManager::disable_rendering()
+{
+  this->enable_rendering_signal_( false );
+}
+
+void ViewerManager::enable_rendering()
+{
+  this->enable_rendering_signal_( true );
 }
 
 } // end namespace Seg3D

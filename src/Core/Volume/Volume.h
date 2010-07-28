@@ -50,7 +50,7 @@ class Volume;
 typedef boost::shared_ptr< Volume > VolumeHandle;
 typedef boost::weak_ptr< Volume > VolumeWeakHandle;
 
-SCI_ENUM_CLASS
+CORE_ENUM_CLASS
 (
   VolumeType,
   DATA_E = 1, 

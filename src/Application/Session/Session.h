@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_PROJECT_SESSION_H
-#define APPLICATION_PROJECT_SESSION_H
+#ifndef APPLICATION_SESSION_SESSION_H
+#define APPLICATION_SESSION_SESSION_H
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 #pragma once
@@ -37,11 +37,21 @@
 #include <boost/filesystem.hpp>
 #include <boost/shared_ptr.hpp>
 
-// Volume includes
+// Core includes
 #include <Core/State/State.h>
+#include <Core/Utils/EnumClass.h>
 
 namespace Seg3D
 {
+
+CORE_ENUM_CLASS
+(
+  SessionPriority,
+  DEFAULT_PRIORITY_E = -1,
+  LAYER_MANAGER_PRIORITY_E = 300,
+  VIEWER_MANAGER_PRIORITY_E = 200,
+  TOOL_MANAGER_PRIORITY_E = 100
+)
 
 // CLASS Session
 // This is the main class for collecting state information on a Session
@@ -64,11 +74,11 @@ public:
 public:
   // INITIALIZE_FROM_FILE:
   // this file initializes the state values for Session from the file at the path specified
-  bool initialize_from_file( boost::filesystem::path path, const std::string& session_name );
+  bool load( boost::filesystem::path path, const std::string& session_name );
   
   // SAVE_CURRENT_STATE:
   // this function will take a snapshot of the current state of the project and save it
-  bool save_session_settings( boost::filesystem::path path, const std::string& session_name );
+  bool save( boost::filesystem::path path, const std::string& session_name );
   
 private:
   const static size_t VERSION_NUMBER_C;

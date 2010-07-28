@@ -26,13 +26,13 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-// Application includes
-#include <Application/Project/Session.h>
-
 // Core includes
 #include <Core/State/StateEngine.h>
 #include <Core/State/StateIO.h>
 
+// Application includes
+#include <Application/Session/Session.h>
+#include <Application/ViewerManager/ViewerManager.h>
 
 namespace Seg3D
 {
@@ -50,28 +50,31 @@ Session::~Session()
 
 }
 
-bool Session::initialize_from_file( boost::filesystem::path path, const std::string& session_name )
+bool Session::load( boost::filesystem::path path, const std::string& session_name )
 {
-  std::vector< std::string > state_values;
-
-  // Next we import the session information from file
-  if( Core::StateIO::import_from_file( ( path / session_name ), state_values, false ) )
+  Core::StateIO state_io;
+  if ( !state_io.import_from_file( path / ( session_name + ".xml" ) ) )
   {
-    Core::StateEngine::Instance()->set_session_states( state_values );
-    return Core::StateEngine::Instance()->load_session_states();
-    
+    return false;
   }
 
-  return false;
+  ViewerManager::Instance()->disable_rendering();
+  bool result = Core::StateEngine::Instance()->load_states( state_io );
+  ViewerManager::Instance()->enable_rendering();
+  return result;
 }
   
-bool Session::save_session_settings( boost::filesystem::path path, const std::string& session_name )
+bool Session::save( boost::filesystem::path path, const std::string& session_name )
 {
-  if( Core::StateEngine::Instance()->populate_session_vector() )
+  Core::StateIO state_io;
+  state_io.initialize( "Seg3D2" );
+  if ( Core::StateEngine::Instance()->save_states( state_io ) )
   {
-    std::vector< std::string > state_values;
-    Core::StateEngine::Instance()->get_session_states( state_values );
-    return Core::StateIO::export_to_file( ( path / session_name ), state_values, false );
+    if ( !boost::filesystem::exists( path ) )
+    {
+      boost::filesystem::create_directory( path );
+    }
+    return state_io.export_to_file( path / ( session_name + ".xml" ) );
   }
 
   return false;

@@ -137,14 +137,17 @@ public:
   // create a new project
   bool delete_all();
 
+protected:
+  virtual bool pre_save_states( Core::StateIO& state_io );
+
+  virtual bool post_save_states( Core::StateIO& state_io );
+
+  virtual bool pre_load_states( const Core::StateIO& state_io );
+
+  virtual bool post_load_states( const Core::StateIO& state_io );
+
 public:
-  virtual bool pre_save_states();
-
-  virtual bool post_save_states();
-
-  virtual bool pre_load_states();
-
-  virtual bool post_load_states();
+  virtual int get_session_priority();
 
 private:
   ToolManagerPrivateHandle private_;

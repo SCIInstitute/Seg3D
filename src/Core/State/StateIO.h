@@ -30,32 +30,43 @@
 #define CORE_STATE_STATEIO_H
 
 // Boost includes
+#include <boost/smart_ptr/shared_ptr.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/utility.hpp>
+
+// TinyXML includes
+#include <tinyxml.h>
 
 namespace Core
 {
 
-class StateIO
+class StateIO;
+class StateIOPrivate;
+typedef boost::shared_ptr< StateIOPrivate > StateIOPrivateHandle;
+
+class StateIO : public boost::noncopyable
 {
 
-private:
+public:
   StateIO();
+  ~StateIO();
 
 public:
-  virtual ~StateIO();
 
-public:
+  void initialize( const std::string& root_name );
 
-  // EXPORT_TO_FILE:
-  // This function when called will export the contents of the vector of strings to an xml file
-  static bool export_to_file( boost::filesystem::path path, 
-    std::vector< std::string >& state_list, bool project_file );
+  const TiXmlElement* get_current_element() const;
+  TiXmlElement* get_current_element();
 
-  // IMPORT_FROM_FILE:
-  // This function when called, imports the contents of the xml file at the path specified
-  static bool import_from_file( boost::filesystem::path path, 
-    std::vector< std::string >& state_list, bool project_file );
+  bool import_from_file( const boost::filesystem::path& path );
+  bool export_to_file( const boost::filesystem::path& path );
 
+  void push_current_element() const;
+  void pop_current_element() const;
+  void set_current_element( const TiXmlElement* element ) const;
+
+private:
+  StateIOPrivateHandle private_;
 };
 
 

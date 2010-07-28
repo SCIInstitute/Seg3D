@@ -51,6 +51,14 @@
 namespace Seg3D
 {
 
+class RendererPrivate
+{
+public:
+
+  bool rendering_enabled_;
+};
+
+
 class ProxyRectangle
 {
 public:
@@ -74,8 +82,10 @@ Renderer::Renderer( size_t viewer_id ) :
   ConnectionHandler(), 
   slice_shader_( new SliceShader ),
   text_renderer_( new Core::TextRenderer ),
-  viewer_id_( viewer_id )
+  viewer_id_( viewer_id ),
+  private_( new RendererPrivate )
 {
+  this->private_->rendering_enabled_ = true;
 }
 
 Renderer::~Renderer()
@@ -95,7 +105,6 @@ void Renderer::post_initialize()
     // lock the shared render context
     Core::RenderResources::lock_type lock( Core::RenderResources::GetMutex() );
 
-    this->cube_ = Core::UnitCubeHandle( new Core::UnitCube() );
     this->slice_shader_->initialize();
     this->pattern_texture_ = Core::Texture3DHandle( new Core::Texture3D );
     this->pattern_texture_->set_image( PATTERN_SIZE_C, PATTERN_SIZE_C, NUM_OF_PATTERNS_C, 
@@ -135,15 +144,23 @@ void Renderer::post_initialize()
   }
   this->add_connection( ViewerManager::Instance()->picking_target_changed_signal_.connect(
     boost::bind( &Renderer::picking_target_changed, this, _1 ) ) );
+  this->add_connection( ViewerManager::Instance()->enable_rendering_signal_.connect(
+    boost::bind( &Renderer::enable_rendering, this, _1 ) ) );
 }
 
 bool Renderer::render()
 {
+  if ( !this->private_->rendering_enabled_ )
+  {
+    return false;
+  }
+
   CORE_LOG_DEBUG( std::string("Renderer ") + Core::ExportToString( this->viewer_id_ ) 
     + ": starting redraw" );
 
   glClearColor( 0.3f, 0.3f, 0.3f, 1.0f );
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
   glMatrixMode( GL_PROJECTION );
   glLoadIdentity();
 
@@ -257,6 +274,11 @@ bool Renderer::render()
 
 bool Renderer::render_overlay()
 {
+  if ( !this->private_->rendering_enabled_ )
+  {
+    return false;
+  }
+
   CORE_LOG_DEBUG( std::string("Renderer ") + Core::ExportToString( this->viewer_id_ ) 
     + ": starting redraw overlay" );
 
@@ -782,6 +804,25 @@ void Renderer::draw_slice( LayerSceneItemHandle layer_item,
   // will cause problem when a new texture with the same ID is generated and bound to
   // this context, because the driver would think it's already bound.
   slice_tex->unbind();
+}
+
+void Renderer::enable_rendering( bool enable )
+{
+  // TODO: This is some updating issues when rendering is re-enabled.
+
+  //if ( !this->is_eventhandler_thread() )
+  //{
+  //  this->post_event( boost::bind( &Renderer::enable_rendering, this, enable ) );
+  //  return;
+  //}
+  
+  //this->private_->rendering_enabled_ = enable;
+
+  //if ( enable )
+  //{
+  //  this->redraw( true );
+  //  this->redraw_overlay( false );
+  //}
 }
 
 } // end namespace Seg3D

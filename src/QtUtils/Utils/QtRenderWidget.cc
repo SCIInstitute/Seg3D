@@ -86,7 +86,6 @@ static void UpdateDisplay( QtRenderWidgetWeakHandle qpointer )
 
   if ( !qpointer.isNull() )
   {
-//    qpointer->repaint();
     qpointer->updateGL();
   }
 }
@@ -108,7 +107,6 @@ void QtRenderWidget::initializeGL()
 
 void QtRenderWidget::paintGL()
 {
-  CORE_LOG_DEBUG("Start of paintGL");
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
   Core::Texture2DHandle texture = this->private_->viewer_->get_texture();
@@ -118,8 +116,6 @@ void QtRenderWidget::paintGL()
   {
     return;
   }
-
-  CORE_LOG_DEBUG("Painting texture");
 
   // draw a window size quad and map the render texture onto it
   QSize view_size = QWidget::size();

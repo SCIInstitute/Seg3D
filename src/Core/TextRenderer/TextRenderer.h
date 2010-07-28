@@ -46,7 +46,7 @@ namespace Core
 class TextRenderer;
 typedef boost::shared_ptr< TextRenderer > TextRendererHandle;
 
-SCI_ENUM_CLASS
+CORE_ENUM_CLASS
 (
   TextHAlignmentType,
   LEFT_E,
@@ -54,7 +54,7 @@ SCI_ENUM_CLASS
   CENTER_E
 )
 
-SCI_ENUM_CLASS
+CORE_ENUM_CLASS
 (
   TextVAlignmentType,
   BOTTOM_E,

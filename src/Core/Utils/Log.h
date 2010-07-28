@@ -55,7 +55,7 @@ namespace Core
 // Forward declaration
 class Log;
 
-SCI_ENUM_CLASS
+CORE_ENUM_CLASS
 (
   LogMessageType,
   ERROR_E = 0x01, 

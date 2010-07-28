@@ -300,7 +300,7 @@ void StripSurroundingSpaces( std::string& str )
   str = str.substr( idx, ( ridx - idx + 1 ) );
 }
 
-// Function to split a list of options delimited by a characher into a vector of
+// Function to split a list of options delimited by a character into a vector of
 // strings
 std::vector<std::string> SplitString( const std::string& str, const std::string& delimiter )
 {
@@ -315,7 +315,7 @@ std::vector<std::string> SplitString( const std::string& str, const std::string&
       break;
     }
     option_list.push_back( option_list_string.substr( 0, loc ) );
-    option_list_string = option_list_string.substr( loc + 1 );
+    option_list_string = option_list_string.substr( loc + delimiter.size() );
   }
 
   return option_list;

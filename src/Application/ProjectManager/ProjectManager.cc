@@ -29,15 +29,14 @@
 // Boost includes
 #include <boost/lexical_cast.hpp>
 
-// Interface includes
-#include <Application/StatusBar/StatusBar.h>
+// Core includes
+#include <Core/State/StateIO.h>
 
 // Application includes
 #include <Application/ProjectManager/ProjectManager.h>
 #include <Application/ProjectManager/AutoSave.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
-
-
+#include <Application/StatusBar/StatusBar.h>
 
 namespace Seg3D
 {
@@ -76,14 +75,16 @@ ProjectManager::ProjectManager() :
   // This constructor is called from the Qt thread, hence state variables can only be set
   // in initializing mode.
   this->set_initializing( true );
-  import_states( this->local_projectmanager_path_, "projectmanager" );
+  Core::StateIO stateio;
+  stateio.import_from_file( this->local_projectmanager_path_ / "projectmanager.xml" );
+  this->load_states( stateio );
   this->set_initializing( false );
     
   this->current_project_ = ProjectHandle( new Project( "default_project" ) );
 
   // Connect the signals from the LayerManager to the GUI
   this->add_connection( this->current_project_->project_name_state_->value_changed_signal_.connect( 
-    boost::bind( &ProjectManager::rename_project_folder, this, _1, _2 ) ) );
+    boost::bind( &ProjectManager::rename_project, this, _1, _2 ) ) );
 
   AutoSave::Instance()->start();
 }
@@ -94,10 +95,13 @@ ProjectManager::~ProjectManager()
   
 void ProjectManager::save_projectmanager_state()
 {
-  export_states( this->local_projectmanager_path_, "projectmanager" );
+  Core::StateIO stateio;
+  stateio.initialize( "Seg3D2" );
+  this->save_states( stateio );
+  stateio.export_to_file( this->local_projectmanager_path_ / "projectmanager.xml" );
 }
   
-void ProjectManager::rename_project_folder( const std::string& new_name, Core::ActionSource source )
+void ProjectManager::rename_project( const std::string& new_name, Core::ActionSource source )
 {
   // return if rename gets called while we are in the middle of changing a project
   if( changing_projects_ )
@@ -167,7 +171,6 @@ void ProjectManager::rename_project_folder( const std::string& new_name, Core::A
   
   if( this->save_project_only() )
   {
-    this->current_project_->populate_session_states();
     this->add_to_recent_projects( this->current_project_path_state_->get(), new_name );
   }
   
@@ -463,14 +466,17 @@ void ProjectManager::save_note( const std::string& note )
 
 bool ProjectManager::save_project_only()
 {
-  boost::filesystem::path project_path = boost::filesystem::path( 
-    current_project_path_state_->get().c_str() );
+  boost::filesystem::path project_path( this->current_project_path_state_->get() );
 
-  project_path = project_path / this->current_project_->project_name_state_->get().c_str();
+  std::string project_name = this->current_project_->project_name_state_->get();
+  project_path = project_path / project_name / ( project_name + ".s3d" );
 
-  return this->current_project_->export_states( project_path, 
-    this->current_project_->project_name_state_->get(), true );
-
+  Core::StateIO stateio;
+  stateio.initialize( "Seg3D2" );
+  this->current_project_->save_states( stateio );
+  stateio.export_to_file( project_path );
+  
+  return true;
 }
 
 double ProjectManager::get_time_since_last_saved_session() const

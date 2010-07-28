@@ -39,10 +39,8 @@
 
 // Core includes
 #include <Core/Utils/ConnectionHandler.h>
-#include <Core/Utils/Lockable.h>
 
 // State includes
-#include <Core/State/StateEngine.h>
 #include <Core/State/StateRangedValue.h>
 #include <Core/State/StateOption.h>
 #include <Core/State/StateLabeledOption.h>
@@ -56,6 +54,7 @@ namespace Core
 
 class StateHandler;
 class StateHandlerPrivate;
+class StateIO;
 
 class StateHandler : protected ConnectionHandler
 {
@@ -63,7 +62,7 @@ class StateHandler : protected ConnectionHandler
   // -- constructor/destructor --
 public:
   StateHandler( const std::string& type_str, size_t version_number, 
-    bool auto_id, int save_priority = -1 );
+    bool auto_id );
   virtual ~StateHandler();
 
 public:
@@ -176,47 +175,31 @@ protected:
   void set_initializing( bool initializing );
 
 public:
-  // POPULATE_SESSION_STATES:
-  // This function will save all the state values of this StateHandler to the list of states
-  // that is stored in the StateEngine
-  bool populate_session_states();
 
-  // LOAD_STATES:
-  // This function will load all the state values of this StateHandler from the list of states
-  // that it is passed
-  bool load_states( std::vector< std::string >& states_vector );
+  bool load_states( const StateIO& state_io );
 
-  // IMPORT_STATES:
-  // This function is called on StateHandlers that need to have its states loaded from a particular
-  // location that is seperate from the session states
-  bool import_states( boost::filesystem::path path, const std::string& name, bool project_file = false );
- 
-  // EXPORT_STATES:
-  // This function is called on StateHandlers that need to have its states saved to a particular
-  // location that is seperate from the session states
-  bool export_states( boost::filesystem::path path, const std::string& name, bool project_file = false );
-
+  void save_states( StateIO& state_io );
 
 protected:
   // PRE_LOAD_STATES:
   // This virtual function can be implemented in the StateHandlers and will be called before its
   // states are loaded.  If it doesn't succeed it needs to return false.
-  virtual bool pre_load_states();
+  virtual bool pre_load_states( const StateIO& state_io );
 
   // POST_LOAD_STATES:
   // This virtual function can be implemented in the StateHandlers and will be called after its
   // states are loaded.  If it doesn't succeed it needs to return false.
-  virtual bool post_load_states();
+  virtual bool post_load_states( const StateIO& state_io );
 
   // PRE_SAVE_STATES:
   // This virtual function can be implemented in the StateHandlers and will be called before its
   // states are saved.  If it doesn't succeed it needs to return false.
-  virtual bool pre_save_states();
+  virtual bool pre_save_states( StateIO& state_io );
 
   // POST_SAVE_STATES:
   // This virtual function can be implemented in the StateHandlers and will be called after its
   // states are saved.  If it doesn't succeed it needs to return false.
-  virtual bool post_save_states();
+  virtual bool post_save_states( StateIO& state_io );
   
 
 protected:
@@ -234,11 +217,12 @@ public:
   // The id number of the handler that will be at the end of the prefix
   size_t get_statehandler_id_number() const;
 
-  // GET_SAVE_TO_DISK:
-  // This function returns a priority indicating whether this statehandler should be save to disk
-  // a priority below 0 is not saved to disk automatically
-  int get_save_priority();
-
+  // GET_SESSION_PRIORITY:
+  // Returns the session priority of the state handler. State handlers with higher priorities
+  // gets loaded earlier than those with lower priorities.
+  // By default this functions returns -1, which means that the state handler won't be
+  // saved/loaded by the state engine.
+  virtual int get_session_priority();
 
 private:
   friend class StateEngine;

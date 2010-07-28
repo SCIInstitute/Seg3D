@@ -60,7 +60,7 @@ namespace Seg3D
 // The modes that define how data can be imported
 
 // LayerImporterMode class definition
-SCI_ENUM_CLASS
+CORE_ENUM_CLASS
 (
   LayerImporterMode,
   // -- UNKNOWN --
