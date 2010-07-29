@@ -808,21 +808,21 @@ void Renderer::draw_slice( LayerSceneItemHandle layer_item,
 
 void Renderer::enable_rendering( bool enable )
 {
-  // TODO: This is some updating issues when rendering is re-enabled.
-
-  //if ( !this->is_eventhandler_thread() )
-  //{
-  //  this->post_event( boost::bind( &Renderer::enable_rendering, this, enable ) );
-  //  return;
-  //}
+  if ( !this->is_eventhandler_thread() )
+  {
+    this->post_event( boost::bind( &Renderer::enable_rendering, this, enable ) );
+    return;
+  }
   
-  //this->private_->rendering_enabled_ = enable;
+  this->private_->rendering_enabled_ = enable;
 
-  //if ( enable )
-  //{
-  //  this->redraw( true );
-  //  this->redraw_overlay( false );
-  //}
+  if ( enable )
+  {
+    this->set_redraw_needed();
+    this->set_redraw_overlay_needed();
+    this->redraw( true );
+    this->redraw_overlay( false );
+  }
 }
 
 } // end namespace Seg3D

@@ -98,7 +98,8 @@ AbstractViewer::AbstractViewer( size_t viewer_id, size_t version_number ) :
   this->private_->viewer_ = this;
   this->private_->cursor_visible_ = true;
   
-  add_state( "viewer_visible", this->viewer_visible_state_, false );
+  this->add_state( "viewer_visible", this->viewer_visible_state_, false );
+  this->viewer_visible_state_->set_session_priority( StateBase::DO_NOT_LOAD_E );
 }
 
 AbstractViewer::~AbstractViewer()

@@ -128,10 +128,22 @@ protected:
     return this->redraw_needed_;
   }
 
+  void set_redraw_needed()
+  {
+    lock_type lock( this->get_mutex() );
+    this->redraw_needed_ = true;
+  }
+
   bool redraw_overlay_needed()
   {
     lock_type lock( this->get_mutex() );
     return this->redraw_overlay_needed_;
+  }
+
+  void set_redraw_overlay_needed()
+  {
+    lock_type lock( this->get_mutex() );
+    this->redraw_overlay_needed_ = true;
   }
 
   typedef boost::mutex mutex_type;
