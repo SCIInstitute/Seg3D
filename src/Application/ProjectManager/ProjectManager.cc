@@ -75,9 +75,13 @@ ProjectManager::ProjectManager() :
   // This constructor is called from the Qt thread, hence state variables can only be set
   // in initializing mode.
   this->set_initializing( true );
+
   Core::StateIO stateio;
-  stateio.import_from_file( this->local_projectmanager_path_ / "projectmanager.xml" );
-  this->load_states( stateio );
+  if ( stateio.import_from_file( this->local_projectmanager_path_ / "projectmanager.xml" ) )
+  {
+    this->load_states( stateio );
+  }
+  
   this->set_initializing( false );
     
   this->current_project_ = ProjectHandle( new Project( "default_project" ) );

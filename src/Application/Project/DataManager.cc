@@ -55,8 +55,10 @@ DataManager::~DataManager()
 void DataManager::initialize( boost::filesystem::path project_path )
 {
   Core::StateIO stateio;
-  stateio.import_from_file( project_path / "data" / "datamanager.xml" );
-  this->load_states( stateio );
+  if ( stateio.import_from_file( project_path / "data" / "datamanager.xml" ) )
+  {
+    this->load_states( stateio );
+  }
 }
 
 void DataManager::save_datamanager_state( boost::filesystem::path project_path, const std::string& session_name )

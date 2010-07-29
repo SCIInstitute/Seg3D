@@ -71,8 +71,10 @@ PreferencesManager::~PreferencesManager()
 void PreferencesManager::initialize()
 {
   Core::StateIO state_io;
-  state_io.import_from_file( this->local_config_path_ / "preferences.xml" );
-  this->load_states( state_io );
+  if ( state_io.import_from_file( this->local_config_path_ / "preferences.xml" ) )
+  {
+    this->load_states( state_io );
+  }
 }
 
 void PreferencesManager::save_state()
