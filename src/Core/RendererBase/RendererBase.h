@@ -34,10 +34,6 @@
 #endif
 
 #include <Core/EventHandler/EventHandler.h>
-#include <Core/Graphics/FramebufferObject.h>
-#include <Core/Graphics/Renderbuffer.h>
-#include <Core/Graphics/Texture.h>
-#include <Core/RenderResources/RenderContext.h>
 #include <Core/RendererBase/AbstractRenderer.h>
 
 namespace Core
@@ -45,11 +41,12 @@ namespace Core
 
 // Forward declarations
 class RendererBase;
+class RendererBasePrivate;
+typedef boost::shared_ptr< RendererBasePrivate > RendererBasePrivateHandle;
 
 // Class definitions
-class RendererBase : public AbstractRenderer, protected Core::EventHandler
+class RendererBase : public AbstractRenderer, private EventHandler
 {
-
   // -- constructor/destructor --
 public:
   RendererBase();
@@ -78,27 +75,16 @@ public:
   virtual void redraw_overlay( bool delay_update = false );
 
   // Activate the renderer
-  virtual void activate() 
-  { 
-    lock_type lock( this->get_mutex() );
-    this->active_ = true; 
-  }
+  virtual void activate();
 
   // Deactivate the renderer
-  virtual void deactivate() 
-  {
-    lock_type lock( this->get_mutex() );
-    this->active_ = false; 
-  }
+  virtual void deactivate();
 
   // Return the status of the renderer
-  virtual bool is_active() 
-  { 
-    lock_type lock( this->get_mutex() );
-    return this->active_; 
-  }
+  virtual bool is_active();
 
 protected:
+  friend class RendererBasePrivate;
 
   // POST_INITIALIZE:
   // Called at the end of "initialize". The default implementation does not do anything.
@@ -122,37 +108,29 @@ protected:
   // were errors or the rendering was interrupted.
   virtual bool render_overlay();
 
-  bool redraw_needed()
-  {
-    lock_type lock( this->get_mutex() );
-    return this->redraw_needed_;
-  }
+  // REDRAW_NEEDED:
+  // Returns true if there is redraw pending, otherwise false.
+  bool redraw_needed();
 
-  void set_redraw_needed()
-  {
-    lock_type lock( this->get_mutex() );
-    this->redraw_needed_ = true;
-  }
+  // SET_REDRAW_NEEDED:
+  // Set the redraw flag to the given value.
+  void set_redraw_needed( bool needed = true );
 
-  bool redraw_overlay_needed()
-  {
-    lock_type lock( this->get_mutex() );
-    return this->redraw_overlay_needed_;
-  }
+  // REDRAW_OVERLAY_NEEDED:
+  // Returns true if there is redraw_overlay pending, otherwise false.
+  bool redraw_overlay_needed();
 
-  void set_redraw_overlay_needed()
-  {
-    lock_type lock( this->get_mutex() );
-    this->redraw_overlay_needed_ = true;
-  }
+  // SET_REDRAW_OVERLAY_NEEDED:
+  // Set the redraw_overlay flag to the given value.
+  void set_redraw_overlay_needed( bool needed = true );
 
-  typedef boost::mutex mutex_type;
-  typedef boost::unique_lock< mutex_type > lock_type;
+  // IS_RENDERER_THREAD:
+  // Returns true if the calling thread is the renderer thread, otherwise false.
+  bool is_renderer_thread();
 
-  mutex_type& get_mutex()
-  {
-    return this->mutex_;
-  }
+  // POST_RENDERER_EVENT:
+  // Post an event to the renderer thread.
+  void post_renderer_event( boost::function< void () > event );
 
 protected:
 
@@ -160,23 +138,7 @@ protected:
   int height_;
 
 private:
-
-  // GL context for rendering
-  Core::RenderContextHandle context_;
-
-  Core::Texture2DHandle textures_[ 4 ];
-  Core::RenderbufferHandle depth_buffer_;
-  Core::FramebufferObjectHandle frame_buffer_;
-
-  int active_render_texture_;
-  int active_overlay_texture_;
-
-  bool redraw_needed_;
-  bool redraw_overlay_needed_;
-
-  bool active_;
-
-  mutex_type mutex_;
+  RendererBasePrivateHandle private_;
 };
 
 } // end namespace Core

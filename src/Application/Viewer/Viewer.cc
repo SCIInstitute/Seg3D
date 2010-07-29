@@ -982,6 +982,12 @@ void Viewer::viewer_lock_state_changed( bool locked )
 
 void Viewer::redraw( bool delay_update )
 {
+  if ( !Core::Application::IsApplicationThread() )
+  {
+    Core::Application::PostEvent( boost::bind( &Viewer::redraw, this, delay_update ) );
+    return;
+  }
+  
   if ( this->signals_block_count_ == 0 )
   {
     this->redraw_signal_( delay_update );
@@ -990,6 +996,12 @@ void Viewer::redraw( bool delay_update )
 
 void Viewer::redraw_overlay( bool delay_update )
 {
+  if ( !Core::Application::IsApplicationThread() )
+  {
+    Core::Application::PostEvent( boost::bind( &Viewer::redraw_overlay, this, delay_update ) );
+    return;
+  }
+
   if ( this->signals_block_count_ == 0 )
   {
     this->redraw_overlay_signal_( delay_update );

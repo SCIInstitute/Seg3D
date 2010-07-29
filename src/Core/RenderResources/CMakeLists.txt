@@ -38,6 +38,8 @@ SET(CORE_RENDERRESOURCES_SRCS
   RenderResourcesContext.cc
   RenderContext.h
   RenderContext.cc
+  RenderContextBinding.h
+  RenderContextBinding.cc
   )
 
 CORE_ADD_LIBRARY(Core_RenderResources ${CORE_RENDERRESOURCES_SRCS})

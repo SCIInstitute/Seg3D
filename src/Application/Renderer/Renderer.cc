@@ -54,8 +54,9 @@ namespace Seg3D
 class RendererPrivate
 {
 public:
-
   bool rendering_enabled_;
+  bool blank_scene_rendered_;
+  bool blank_overlay_rendered_;
 };
 
 
@@ -150,16 +151,22 @@ void Renderer::post_initialize()
 
 bool Renderer::render()
 {
+  glClearColor( 0.3f, 0.3f, 0.3f, 1.0f );
+  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
   if ( !this->private_->rendering_enabled_ )
   {
+    if ( !this->private_->blank_scene_rendered_ )
+    {
+      this->private_->blank_scene_rendered_ = true;
+      return true;
+    }
     return false;
   }
 
   CORE_LOG_DEBUG( std::string("Renderer ") + Core::ExportToString( this->viewer_id_ ) 
     + ": starting redraw" );
 
-  glClearColor( 0.3f, 0.3f, 0.3f, 1.0f );
-  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
   glMatrixMode( GL_PROJECTION );
   glLoadIdentity();
@@ -274,16 +281,22 @@ bool Renderer::render()
 
 bool Renderer::render_overlay()
 {
+  glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
+  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
   if ( !this->private_->rendering_enabled_ )
   {
+    if ( !this->private_->blank_overlay_rendered_ )
+    {
+      this->private_->blank_overlay_rendered_ = true;
+      return true;
+    }
     return false;
   }
 
   CORE_LOG_DEBUG( std::string("Renderer ") + Core::ExportToString( this->viewer_id_ ) 
     + ": starting redraw overlay" );
 
-  glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
-  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
   glMatrixMode( GL_PROJECTION );
   glLoadIdentity();
 
@@ -808,9 +821,9 @@ void Renderer::draw_slice( LayerSceneItemHandle layer_item,
 
 void Renderer::enable_rendering( bool enable )
 {
-  if ( !this->is_eventhandler_thread() )
+  if ( !this->is_renderer_thread() )
   {
-    this->post_event( boost::bind( &Renderer::enable_rendering, this, enable ) );
+    this->post_renderer_event( boost::bind( &Renderer::enable_rendering, this, enable ) );
     return;
   }
   
@@ -823,8 +836,11 @@ void Renderer::enable_rendering( bool enable )
     this->redraw( true );
     this->redraw_overlay( false );
   }
+  else
+  {
+    this->private_->blank_scene_rendered_ = false;
+    this->private_->blank_overlay_rendered_ = false;
+  }
 }
 
 } // end namespace Seg3D
-
-
