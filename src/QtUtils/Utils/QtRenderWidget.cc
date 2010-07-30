@@ -93,14 +93,14 @@ static void UpdateDisplay( QtRenderWidgetWeakHandle qpointer )
 
 void QtRenderWidget::initializeGL()
 {
+  glClearColor( 0.3f, 0.3f, 0.3f, 1.0f );
+
   if ( Core::RenderResources::Instance()->valid_render_resources() )
   {
-    glClearColor( 0.5, 0.5, 0.5, 1.0 );
     Core::Texture::SetActiveTextureUnit( 0 );
     glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
 
     QtRenderWidgetWeakHandle qpointer( this );
-
     this->add_connection( this->private_->viewer_->update_display_signal_.connect(
       boost::bind( &UpdateDisplay, qpointer ) ) );
   }
@@ -110,6 +110,14 @@ void QtRenderWidget::paintGL()
 {
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
+  if ( !Core::RenderResources::Instance()->valid_render_resources() )
+  {
+    glColor3f( 1.0f, 0.5f, 0.0f );
+    QString error_str( "Rendering disabled because the system doesn't have required OpenGL support." );
+    this->renderText( 5, 20, error_str );
+    return;
+  }
+  
   Core::Texture2DHandle texture = this->private_->viewer_->get_texture();
   Core::Texture2DHandle overlay_texture = this->private_->viewer_->get_overlay_texture();
 
