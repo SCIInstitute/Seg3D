@@ -122,9 +122,12 @@ void MaskVolumeSlice::upload_texture()
     this->texture_->set_sub_image( 0, 0, static_cast<int>( this->nx_ ), 
       static_cast<int>( this->ny_ ), &this->private_->cache_[ 0 ], GL_ALPHA, GL_UNSIGNED_BYTE );
     this->texture_->unbind();
+    cache_lock.unlock();
   }
   else
   {
+    cache_lock.unlock();
+
     // Step 1. copy the data in the slice to a pixel unpack buffer
     PixelBufferObjectHandle pixel_buffer( new PixelUnpackBuffer );
     pixel_buffer->bind();
@@ -234,13 +237,13 @@ void MaskVolumeSlice::release_cached_data()
   {
     lock_type volume_lock( this->get_mutex() );
     CopyCachedDataBack( this, &this->private_->cache_[ 0 ] );
+    this->mask_data_block_->increase_generation();
   }
   
   this->private_->cache_.resize( 0 );
   this->private_->using_cache_ = false;
   cache_lock.unlock();
   
-  this->mask_data_block_->increase_generation();
   this->mask_data_block_->mask_updated_signal_();
 }
 
