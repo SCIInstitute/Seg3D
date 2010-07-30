@@ -235,10 +235,13 @@ void MaskVolumeSlice::release_cached_data()
     lock_type volume_lock( this->get_mutex() );
     CopyCachedDataBack( this, &this->private_->cache_[ 0 ] );
   }
-  this->mask_data_block_->increase_generation();
-  this->mask_data_block_->mask_updated_signal_();
+  
   this->private_->cache_.resize( 0 );
   this->private_->using_cache_ = false;
+  cache_lock.unlock();
+  
+  this->mask_data_block_->increase_generation();
+  this->mask_data_block_->mask_updated_signal_();
 }
 
 } // end namespace Core
