@@ -2,11 +2,11 @@
 #version 120
 
 uniform sampler2D slice_tex;
-uniform sampler3D pattern_tex;
+uniform sampler2D pattern_tex;
 
 // Mask drawing mode
-// 0: border + pattern
-// 1: border only
+// 0: border only
+// 1: border + pattern
 // 2: fill
 uniform int mask_mode;
 
@@ -81,7 +81,7 @@ vec4 shade_mask_slice()
   float mask = texture2D( slice_tex, gl_TexCoord[0].st ).a;
   if ( mask == 0.0 ) discard;
 
-  if ( mask_mode == 0 ) // border + pattern
+  if ( mask_mode == 1 ) // border + pattern
   {
     if ( border_width > 0 )
     {
@@ -89,10 +89,10 @@ vec4 shade_mask_slice()
         return vec4( mask_color, opacity );
     }
     
-    float pattern = texture3D( pattern_tex, gl_TexCoord[1].stp ).a;
+    float pattern = texture2D( pattern_tex, gl_TexCoord[1].st ).a;
     return vec4( mask_color, pattern * opacity );
   }
-  else if ( mask_mode == 1 ) // border only
+  else if ( mask_mode == 0 ) // border only
   {
     if ( border_width > 0 )
     {

@@ -85,7 +85,7 @@ private:
   void enable_rendering( bool enable );
 
   SliceShaderHandle slice_shader_;
-  Core::Texture3DHandle pattern_texture_;
+  Core::Texture2DHandle pattern_texture_;
 
   Core::TextRendererHandle text_renderer_;
   Core::Texture2DHandle text_texture_;

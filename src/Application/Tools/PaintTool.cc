@@ -270,7 +270,7 @@ void PaintToolPrivate::initialize()
 
     this->shader_->enable();
     this->shader_->set_border_width( 2 );
-    this->shader_->set_mask_mode( 1 );
+    this->shader_->set_mask_mode( 0 );
     this->shader_->set_slice_texture( 0 );
     this->shader_->set_pattern_texture( 1 );
     this->shader_->set_volume_type( Core::VolumeType::MASK_E );
@@ -584,7 +584,8 @@ bool PaintToolPrivate::start_painting()
 
   this->painting_ = true;
   const std::string& target_layer_id = this->paint_tool_->target_layer_state_->get();
-  this->target_slice_ = this->viewer_->get_mask_volume_slice( target_layer_id );
+  this->target_slice_ = boost::dynamic_pointer_cast< Core::MaskVolumeSlice >( 
+    this->viewer_->get_volume_slice( target_layer_id ) );;
   if ( !this->target_slice_ )
   {
     CORE_THROW_LOGICERROR( "Mask layer with ID '" + 
@@ -603,11 +604,13 @@ bool PaintToolPrivate::start_painting()
     data_constraint_layer_state_->get();
   if ( mask_constraint_id != Tool::NONE_OPTION_C )
   {
-    this->mask_constraint_slice_ = this->viewer_->get_mask_volume_slice( mask_constraint_id );
+    this->mask_constraint_slice_ = boost::dynamic_pointer_cast< Core::MaskVolumeSlice >(
+      this->viewer_->get_volume_slice( mask_constraint_id ) );
   }
   if ( data_constraint_id != Tool::NONE_OPTION_C )
   {
-    this->data_constraint_slice_ = this->viewer_->get_data_volume_slice( data_constraint_id );
+    this->data_constraint_slice_ = boost::dynamic_pointer_cast< Core::DataVolumeSlice >(
+      this->viewer_->get_volume_slice( data_constraint_id ) );
   }
 
   this->has_mask_constraint_ = this->mask_constraint_slice_.get() != 0;
@@ -752,8 +755,8 @@ void PaintTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
       "' does not exist" );
   }
 
-  Core::MaskVolumeSliceHandle target_slice = viewer->
-    get_mask_volume_slice( target_layer_id );
+  Core::MaskVolumeSliceHandle target_slice = boost::dynamic_pointer_cast
+    < Core::MaskVolumeSlice >( viewer->get_volume_slice( target_layer_id ) );
   if ( target_slice->out_of_boundary() )
   {
     return;
@@ -868,6 +871,17 @@ bool PaintTool::handle_mouse_move( const Core::MouseHistory& mouse_history,
     return false;
   }
 
+  std::string data_constraint_layer;
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    data_constraint_layer = this->data_constraint_layer_state_->get();
+  }
+  if ( data_constraint_layer != Tool::NONE_OPTION_C )
+  {
+    this->private_->viewer_->update_status_bar( mouse_history.current_.x_,
+      mouse_history.current_.y_, data_constraint_layer );
+  }
+  
   double world_x, world_y;
   this->private_->viewer_->window_to_world( mouse_history.current_.x_, 
     mouse_history.current_.y_, world_x, world_y );
@@ -918,11 +932,20 @@ bool PaintTool::handle_mouse_press( const Core::MouseHistory& mouse_history,
     this->private_->world_y_ = world_y;
   }
 
-  std::string target_layer_id = this->target_layer_state_->get();
+  bool paintable = false;
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    if ( modifiers == Core::KeyModifier::NO_MODIFIER_E &&
+      this->target_layer_state_->get() != Tool::NONE_OPTION_C &&
+      !this->private_->painting_ )
+    {
+      MaskLayerHandle layer = boost::dynamic_pointer_cast< Core::MaskLayer >(
+        LayerManager::Instance()->get_layer_by_id( this->target_layer_state_->get() ) );
+      paintable = layer->visible_state_[ this->private_->viewer_->get_viewer_id() ]->get();
+    }
+  }
 
-  if ( modifiers == Core::KeyModifier::NO_MODIFIER_E &&
-    target_layer_id != Tool::NONE_OPTION_C &&
-    !this->private_->painting_ )
+  if ( paintable )
   {
     if ( button == Core::MouseButton::LEFT_BUTTON_E )
     {
@@ -995,7 +1018,7 @@ bool PaintTool::handle_wheel( int delta, int x, int y, int buttons, int modifier
     return false;
   }
 
-  if ( modifiers == Core::KeyModifier::CONTROL_MODIFIER_E &&
+  if ( modifiers == Core::KeyModifier::NO_MODIFIER_E &&
     !this->private_->painting_ )
   {
     int min_radius, max_radius;

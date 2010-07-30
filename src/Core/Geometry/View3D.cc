@@ -142,12 +142,12 @@ void View3D::compute_clipping_planes( const BBox& bbox, double& znear, double& z
   }
 
   // Offset the clipping planes by a small value
-  znear -= 0.001;
-  if ( znear < 0.001 )
+  znear /= 1.0001;
+  zfar *= 1.0001;
+  if ( znear < 0 )
   {
-    znear = 0.001;
+    znear = 1e-4;
   }
-  zfar += 0.001;
 }
 
 std::string ExportToString( const View3D& value )

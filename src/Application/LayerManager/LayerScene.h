@@ -94,7 +94,7 @@ public:
 public:
   int color_;
   int border_;
-  std::string fill_;
+  int fill_;
   bool show_isosurface_;
 };
 

@@ -106,7 +106,6 @@ public:
   void reset_mouse_handlers();
 
 private:
-  void update_status_bar( int x, int y );
   void pick_point( int x, int y );
   void adjust_contrast_brightness( int dx, int dy );
 
@@ -122,6 +121,11 @@ private:
 
 public:
   virtual void resize( int width, int height );
+
+  // UPDATE_STATUS_BAR:
+  // Update the status bar to show the data information of the specified layer under
+  // the mouse cursor. If no layer is specified, the active layer will be used.
+  void update_status_bar( int x, int y, const std::string& layer_id = "" );
   
   bool is_volume_view() const;
   Core::StateViewBaseHandle get_active_view_state() const;
@@ -151,11 +155,9 @@ private:
 
   // -- Data structures for keeping track of slices of layers --
 private:
-  typedef std::map< std::string, Core::MaskVolumeSliceHandle > mask_slices_map_type;
-  typedef std::map< std::string, Core::DataVolumeSliceHandle > data_slices_map_type;
+  typedef std::map< std::string, Core::VolumeSliceHandle > volume_slice_map_type;
 
-  mask_slices_map_type mask_slices_;
-  data_slices_map_type data_slices_;
+  volume_slice_map_type volume_slices_;
   Core::VolumeSliceHandle active_layer_slice_;
 
   void insert_layer( LayerHandle layer );
@@ -163,8 +165,7 @@ private:
   void set_active_layer( LayerHandle layer );
 
 public:
-  Core::MaskVolumeSliceHandle get_mask_volume_slice( const std::string& layer_id );
-  Core::DataVolumeSliceHandle get_data_volume_slice( const std::string& layer_id );
+  Core::VolumeSliceHandle get_volume_slice( const std::string& layer_id );
 
   // -- Other functions and variables --
 public:

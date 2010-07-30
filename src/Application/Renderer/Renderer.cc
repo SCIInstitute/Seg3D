@@ -51,6 +51,10 @@
 namespace Seg3D
 {
 
+//////////////////////////////////////////////////////////////////////////
+// Implementation of class RendererPrivate
+//////////////////////////////////////////////////////////////////////////
+
 class RendererPrivate
 {
 public:
@@ -59,6 +63,9 @@ public:
   bool blank_overlay_rendered_;
 };
 
+//////////////////////////////////////////////////////////////////////////
+// Implementation of class ProxyRectangle
+//////////////////////////////////////////////////////////////////////////
 
 class ProxyRectangle
 {
@@ -67,16 +74,21 @@ public:
   double left, right, bottom, top;
 };
 
-static const unsigned int PATTERN_SIZE_C = 6;
-static const unsigned char MASK_PATTERNS_C[][ PATTERN_SIZE_C ][ PATTERN_SIZE_C ] =
-{
-  { { 255, 0, 0, 255, 0, 0 }, { 0, 255, 0, 0, 255, 0 }, 
-    { 0, 0, 255, 0, 0, 255 }, { 255, 0, 0, 255, 0, 0 },
-    { 0, 255, 0, 0, 255, 0 }, { 0, 0, 255, 0, 0, 255 } }
-};
+//////////////////////////////////////////////////////////////////////////
+// Implementation of class Renderer
+//////////////////////////////////////////////////////////////////////////
 
-static const int NUM_OF_PATTERNS_C = 
-  sizeof( MASK_PATTERNS_C ) / ( PATTERN_SIZE_C * PATTERN_SIZE_C );
+static const unsigned int PATTERN_SIZE_C = 6;
+static const unsigned char MAX_PATTERN_VAL_C = 150;
+static const unsigned char MASK_PATTERNS_C[ PATTERN_SIZE_C ][ PATTERN_SIZE_C ] =
+{
+  { MAX_PATTERN_VAL_C, 0, 0, MAX_PATTERN_VAL_C, 0, 0 }, 
+  { 0, MAX_PATTERN_VAL_C, 0, 0, MAX_PATTERN_VAL_C, 0 }, 
+  { 0, 0, MAX_PATTERN_VAL_C, 0, 0, MAX_PATTERN_VAL_C }, 
+  { MAX_PATTERN_VAL_C, 0, 0, MAX_PATTERN_VAL_C, 0, 0 },
+  { 0, MAX_PATTERN_VAL_C, 0, 0, MAX_PATTERN_VAL_C, 0 }, 
+  { 0, 0, MAX_PATTERN_VAL_C, 0, 0, MAX_PATTERN_VAL_C }
+};
 
 Renderer::Renderer( size_t viewer_id ) :
   RendererBase(), 
@@ -107,8 +119,8 @@ void Renderer::post_initialize()
     Core::RenderResources::lock_type lock( Core::RenderResources::GetMutex() );
 
     this->slice_shader_->initialize();
-    this->pattern_texture_ = Core::Texture3DHandle( new Core::Texture3D );
-    this->pattern_texture_->set_image( PATTERN_SIZE_C, PATTERN_SIZE_C, NUM_OF_PATTERNS_C, 
+    this->pattern_texture_.reset( new Core::Texture2D );
+    this->pattern_texture_->set_image( PATTERN_SIZE_C, PATTERN_SIZE_C, 
       GL_ALPHA, MASK_PATTERNS_C, GL_ALPHA, GL_UNSIGNED_BYTE );
     this->text_texture_ = Core::Texture2DHandle( new Core::Texture2D );
   }
@@ -123,7 +135,6 @@ void Renderer::post_initialize()
   this->pattern_texture_->set_min_filter( GL_LINEAR );
   this->pattern_texture_->set_wrap_s( GL_REPEAT );
   this->pattern_texture_->set_wrap_t( GL_REPEAT );
-  this->pattern_texture_->set_wrap_r( GL_CLAMP );
   Core::Texture::SetActiveTextureUnit( 0 );
 
   ViewerHandle viewer = ViewerManager::Instance()->get_viewer( this->viewer_id_ );
@@ -312,6 +323,8 @@ bool Renderer::render_overlay()
   else
   {
     bool show_grid = viewer->slice_grid_state_->get();
+    bool show_picking_lines = viewer->slice_picking_visible_state_->get();
+    bool show_overlay = viewer->overlay_visible_state_->get();
     Core::View2D view2d(
       static_cast< Core::StateView2D* > ( viewer->get_active_view_state().get() )->get() );
     //int view_mode = viewer->view_mode_state_->index();
@@ -364,7 +377,7 @@ bool Renderer::render_overlay()
     }
 
     // Render the grid
-    if ( show_grid )
+    if ( show_overlay && show_grid )
     {
       glColor4f( 0.1f, 0.1f, 0.1f, 0.75f );
       int grid_spacing = 50;
@@ -392,109 +405,108 @@ bool Renderer::render_overlay()
         glVertex2i( this->width_, center_y + grid_spacing * i );
       }
       glEnd();
-    }
+    } // end if ( show_grid )
     
     // Render the positions of slices in other viewers
-    glLineStipple( 1, 0x1C47 );
-    int vert_slice_mode;
-    int hori_slice_mode;
-    if ( view_mode == Viewer::SAGITTAL_C )
+    if ( show_overlay && show_picking_lines )
     {
-      vert_slice_mode = 1;
-      hori_slice_mode = 2;
-    }
-    else if ( view_mode == Viewer::CORONAL_C )
-    {
-      vert_slice_mode = 0;
-      hori_slice_mode = 2;
-    }
-    else
-    {
-      vert_slice_mode = 0;
-      hori_slice_mode = 1;
-    }
-    
-    size_t num_of_vert_slices = viewers_info[ vert_slice_mode ].size();
-    size_t num_of_hori_slices = viewers_info[ hori_slice_mode ].size();
-    for ( size_t i = 0; i < num_of_vert_slices; i++ )
-    {
-      Core::Point pt( viewers_info[ vert_slice_mode ][ i ]->depth_, 0, 0 );
-      pt = proj_mat * pt;
-      int slice_pos = Core::Round( ( pt.x() + 1.0 ) / 2.0 * ( this->width_ - 1 ) );
-      float color[ 4 ] = { 0.0f, 0.0f, 0.0f, 1.0f };
-      color[ vert_slice_mode ] = 1.0f;
-      if ( viewers_info[ vert_slice_mode ][ i ]->is_picking_target_ )
+      glLineStipple( 1, 0x1C47 );
+      int vert_slice_mode;
+      int hori_slice_mode;
+      if ( view_mode == Viewer::SAGITTAL_C )
       {
-        glDisable( GL_LINE_STIPPLE );
+        vert_slice_mode = 1;
+        hori_slice_mode = 2;
+      }
+      else if ( view_mode == Viewer::CORONAL_C )
+      {
+        vert_slice_mode = 0;
+        hori_slice_mode = 2;
       }
       else
       {
-        glEnable( GL_LINE_STIPPLE );
-        color[ 3 ] = 0.5f;
+        vert_slice_mode = 0;
+        hori_slice_mode = 1;
       }
-      //color[ 3 ] = viewers_info[ vert_slice_mode ][ i ]->is_picking_target_ ? 0.75f : 0.3f;
-      glColor4fv( color );
-      glBegin( GL_LINES );
-      glVertex2i( slice_pos, 0 );
-      glVertex2i( slice_pos, this->height_ );
-      glEnd();
-    }
-    for ( size_t i = 0; i < num_of_hori_slices; i++ )
-    {
-      Core::Point pt( 0, viewers_info[ hori_slice_mode ][ i ]->depth_, 0 );
-      pt = proj_mat * pt;
-      int slice_pos = Core::Round( ( pt.y() + 1.0 ) / 2.0 * ( this->height_ - 1 ) );
-      float color[ 4 ] = { 0.0f, 0.0f, 0.0f, 1.0f };
-      color[ hori_slice_mode ] = 1.0f;
-      if ( viewers_info[ hori_slice_mode ][ i ]->is_picking_target_ )
+
+      size_t num_of_vert_slices = viewers_info[ vert_slice_mode ].size();
+      size_t num_of_hori_slices = viewers_info[ hori_slice_mode ].size();
+      for ( size_t i = 0; i < num_of_vert_slices; i++ )
       {
-        glDisable( GL_LINE_STIPPLE );
+        Core::Point pt( viewers_info[ vert_slice_mode ][ i ]->depth_, 0, 0 );
+        pt = proj_mat * pt;
+        int slice_pos = Core::Round( ( pt.x() + 1.0 ) / 2.0 * ( this->width_ - 1 ) );
+        float color[ 4 ] = { 0.0f, 0.0f, 0.0f, 1.0f };
+        color[ vert_slice_mode ] = 1.0f;
+        if ( viewers_info[ vert_slice_mode ][ i ]->is_picking_target_ )
+        {
+          glDisable( GL_LINE_STIPPLE );
+        }
+        else
+        {
+          glEnable( GL_LINE_STIPPLE );
+          color[ 3 ] = 0.5f;
+        }
+        //color[ 3 ] = viewers_info[ vert_slice_mode ][ i ]->is_picking_target_ ? 0.75f : 0.3f;
+        glColor4fv( color );
+        glBegin( GL_LINES );
+        glVertex2i( slice_pos, 0 );
+        glVertex2i( slice_pos, this->height_ );
+        glEnd();
       }
-      else
+      for ( size_t i = 0; i < num_of_hori_slices; i++ )
       {
-        glEnable( GL_LINE_STIPPLE );
-        color[ 3 ] = 0.5f;
+        Core::Point pt( 0, viewers_info[ hori_slice_mode ][ i ]->depth_, 0 );
+        pt = proj_mat * pt;
+        int slice_pos = Core::Round( ( pt.y() + 1.0 ) / 2.0 * ( this->height_ - 1 ) );
+        float color[ 4 ] = { 0.0f, 0.0f, 0.0f, 1.0f };
+        color[ hori_slice_mode ] = 1.0f;
+        if ( viewers_info[ hori_slice_mode ][ i ]->is_picking_target_ )
+        {
+          glDisable( GL_LINE_STIPPLE );
+        }
+        else
+        {
+          glEnable( GL_LINE_STIPPLE );
+          color[ 3 ] = 0.5f;
+        }
+        //color[ 3 ] = viewers_info[ hori_slice_mode ][ i ]->is_picking_target_ ? 0.75f : 0.3f;
+        glColor4fv( color );    
+        glBegin( GL_LINES );
+        glVertex2i( 0, slice_pos);
+        glVertex2i( this->width_, slice_pos );
+        glEnd();
       }
-      //color[ 3 ] = viewers_info[ hori_slice_mode ][ i ]->is_picking_target_ ? 0.75f : 0.3f;
-      glColor4fv( color );    
-      glBegin( GL_LINES );
-      glVertex2i( 0, slice_pos);
-      glVertex2i( this->width_, slice_pos );
-      glEnd();
-    }
-    glDisable( GL_LINE_STIPPLE );
+      glDisable( GL_LINE_STIPPLE );
+    } // end if ( show_picking_lines )
 
     // Render the text
-    std::vector< unsigned char > buffer( this->width_ * this->height_, 0 );
-    std::vector< std::string > text;
-    text.push_back( std::string( "Konnichi wa minasan! " ) );
-    text.push_back( std::string( "NUMIRA" ) );
-    //this->text_renderer_->render( text, &buffer[ 0 ], this->width_, this->height_, 5, 20, 10, -1 );
-    //this->text_renderer_->render_aligned( text[ 1 ], &buffer[ 0 ], this->width_, this->height_, 48,
-    //  Core::TextHAlignmentType::CENTER_E, Core::TextVAlignmentType::CENTER_E,
-    //  40, 10, 40, 10 );
-    this->text_renderer_->render_aligned( slice_str, &buffer[ 0 ], this->width_, this->height_,
-      14, Core::TextHAlignmentType::RIGHT_E, Core::TextVAlignmentType::TOP_E,
-      5, 5, 5, 5 );
+    if ( show_overlay )
+    {
+      std::vector< unsigned char > buffer( this->width_ * this->height_, 0 );
+      this->text_renderer_->render_aligned( slice_str, &buffer[ 0 ], this->width_, this->height_,
+        14, Core::TextHAlignmentType::RIGHT_E, Core::TextVAlignmentType::TOP_E,
+        5, 5, 5, 5 );
 
-    this->text_texture_->enable();
-    this->text_texture_->set_sub_image( 0, 0, this->width_, this->height_,
+      this->text_texture_->enable();
+      this->text_texture_->set_sub_image( 0, 0, this->width_, this->height_,
         &buffer[ 0 ], GL_ALPHA, GL_UNSIGNED_BYTE );
 
-    // Blend the text onto the framebuffer
-    glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_ADD );
-    glBegin( GL_QUADS );
-    glColor4f( 1.0f, 0.6f, 0.1f, 0.75f );
-    glTexCoord2f( 0.0f, 0.0f );
-    glVertex2i( 0, 0 );
-    glTexCoord2f( 1.0f, 0.0f );
-    glVertex2i( this->width_ - 1, 0 );
-    glTexCoord2f( 1.0f, 1.0f );
-    glVertex2i( this->width_ - 1, this->height_ - 1 );
-    glTexCoord2f( 0.0f, 1.0f );
-    glVertex2i( 0, this->height_ - 1 );
-    glEnd();
-    this->text_texture_->disable();
+      // Blend the text onto the framebuffer
+      glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_ADD );
+      glBegin( GL_QUADS );
+      glColor4f( 1.0f, 0.6f, 0.1f, 0.75f );
+      glTexCoord2f( 0.0f, 0.0f );
+      glVertex2i( 0, 0 );
+      glTexCoord2f( 1.0f, 0.0f );
+      glVertex2i( this->width_ - 1, 0 );
+      glTexCoord2f( 1.0f, 1.0f );
+      glVertex2i( this->width_ - 1, this->height_ - 1 );
+      glTexCoord2f( 0.0f, 1.0f );
+      glVertex2i( 0, this->height_ - 1 );
+      glEnd();
+      this->text_texture_->disable();
+    } // end rendering text
 
     glDisable( GL_BLEND );
   }
@@ -518,16 +530,8 @@ void Renderer::process_slices( LayerSceneHandle& layer_scene, ViewerHandle& view
   for ( size_t layer_num = 0; layer_num < layer_scene->size(); layer_num++ )
   {
     LayerSceneItemHandle layer_item = ( *layer_scene )[ layer_num ];
-    Core::VolumeSliceHandle volume_slice;
-    switch ( layer_item->type() )
-    {
-    case Core::VolumeType::DATA_E:
-      volume_slice =  viewer->get_data_volume_slice( layer_item->layer_id_ );
-      break;
-    case Core::VolumeType::MASK_E:
-      volume_slice =  viewer->get_mask_volume_slice( layer_item->layer_id_ );
-      break;
-    } 
+    Core::VolumeSliceHandle volume_slice = 
+      viewer->get_volume_slice( layer_item->layer_id_ );
 
     if ( volume_slice && !volume_slice->out_of_boundary() )
     {
@@ -733,8 +737,14 @@ void Renderer::draw_slice( LayerSceneItemHandle layer_item,
       }
       else
       {
-        this->slice_shader_->set_mask_mode( 0 );
-        this->slice_shader_->set_border_width( 1 );
+        // If mask fill mode is none, force the border width to be at least 1
+        if ( mask_layer_item->fill_ == 0 && mask_layer_item->border_ == 0 )
+        {
+          mask_layer_item->border_ = 1;
+        }
+        
+        this->slice_shader_->set_mask_mode( mask_layer_item->fill_ );
+        this->slice_shader_->set_border_width( mask_layer_item->border_ );
       }
       Core::Color color = PreferencesManager::Instance()->get_color( mask_layer_item->color_ );
       this->slice_shader_->set_mask_color( static_cast< float >( color.r() / 255 ), 
@@ -798,16 +808,16 @@ void Renderer::draw_slice( LayerSceneItemHandle layer_item,
       static_cast< float >( 1.0 /slice_screen_height ) );
     glBegin( GL_QUADS );
       glMultiTexCoord2f( GL_TEXTURE0, 0.0f, 0.0f );
-      glMultiTexCoord3f( GL_TEXTURE1, 0.0f, 0.0f, 0.0f );
+      glMultiTexCoord2f( GL_TEXTURE1, 0.0f, 0.0f );
       glVertex2d( left, bottom );
       glMultiTexCoord2f( GL_TEXTURE0, 1.0f, 0.0f );
-      glMultiTexCoord3f( GL_TEXTURE1, pattern_repeats_x, 0.0f, 0.0f );
+      glMultiTexCoord2f( GL_TEXTURE1, pattern_repeats_x, 0.0f );
       glVertex2d( right, bottom );
       glMultiTexCoord2f( GL_TEXTURE0, 1.0f, 1.0f );
-      glMultiTexCoord3f( GL_TEXTURE1, pattern_repeats_x, pattern_repeats_y, 0.0f );
+      glMultiTexCoord2f( GL_TEXTURE1, pattern_repeats_x, pattern_repeats_y );
       glVertex2d( right, top );
       glMultiTexCoord2f( GL_TEXTURE0, 0.0f, 1.0f );
-      glMultiTexCoord3f( GL_TEXTURE1, 0.0f, pattern_repeats_y, 0.0f );
+      glMultiTexCoord2f( GL_TEXTURE1, 0.0f, pattern_repeats_y );
       glVertex2d( left, top );
     glEnd();
   }

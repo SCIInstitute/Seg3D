@@ -69,21 +69,7 @@ Core::VolumeSliceHandle SeedPointsToolPrivate::get_target_slice( ViewerHandle vi
   {
     return vol_slice;
   }
-  LayerHandle layer = LayerManager::Instance()->get_layer_by_id( target_layer_id );
-  if ( !layer )
-  {
-    return vol_slice;
-  }
-  
-  switch ( layer->type() )
-  {
-  case Core::VolumeType::DATA_E:
-    vol_slice = viewer->get_data_volume_slice( target_layer_id );
-    break;
-  case Core::VolumeType::MASK_E:
-    vol_slice = viewer_->get_mask_volume_slice( target_layer_id );
-    break;
-  }
+  vol_slice = viewer->get_volume_slice( target_layer_id );
   
   return vol_slice;
 }
@@ -228,6 +214,28 @@ bool SeedPointsTool::handle_mouse_press( const Core::MouseHistory& mouse_history
         this->seed_points_state_, pt );
     }
     return true;
+  }
+  
+  return false;
+}
+
+bool SeedPointsTool::handle_mouse_move( const Core::MouseHistory& mouse_history, 
+                     int button, int buttons, int modifiers )
+{
+  if ( modifiers == Core::KeyModifier::NO_MODIFIER_E &&
+    buttons == Core::MouseButton::NO_BUTTON_E )
+  {
+    std::string target_id;
+    {
+      Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+      target_id = this->target_layer_state_->get();
+    }
+    if ( target_id != Tool::NONE_OPTION_C )
+    {
+      this->private_->viewer_->update_status_bar( mouse_history.current_.x_,
+        mouse_history.current_.y_, target_id );
+      return true;
+    }
   }
   
   return false;

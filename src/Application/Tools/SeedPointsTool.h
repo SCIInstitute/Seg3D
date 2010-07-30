@@ -51,6 +51,8 @@ public:
   virtual bool handle_mouse_leave( size_t viewer_id );
   virtual bool handle_mouse_press( const Core::MouseHistory& mouse_history, 
     int button, int buttons, int modifiers );
+  virtual bool handle_mouse_move( const Core::MouseHistory& mouse_history, 
+    int button, int buttons, int modifiers );
 
   // REDRAW:
   // Draw seed points in the specified viewer.

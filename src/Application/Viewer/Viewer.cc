@@ -152,6 +152,10 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
     boost::bind( &Viewer::redraw_overlay, this, false ) ) );
   this->add_connection( this->slice_number_state_->state_changed_signal_.connect(
     boost::bind( &Viewer::redraw_overlay, this, false ) ) );
+  this->add_connection( this->slice_picking_visible_state_->state_changed_signal_.connect(
+    boost::bind( &Viewer::redraw_overlay, this, false ) ) );
+  this->add_connection( this->overlay_visible_state_->state_changed_signal_.connect(
+    boost::bind( &Viewer::redraw_overlay, this, false ) ) );
 }
 
 Viewer::~Viewer()
@@ -205,7 +209,9 @@ void Viewer::mouse_press_event( const Core::MouseHistory& mouse_history, int but
 
   if ( button == Core::MouseButton::RIGHT_BUTTON_E &&
     modifiers == Core::KeyModifier::NO_MODIFIER_E &&
-    !( this->is_volume_view() ) )
+    !( this->is_volume_view() ) && 
+    this->slice_picking_visible_state_->get() &&
+    this->overlay_visible_state_->get() )
   {
     this->pick_point( mouse_history.current_.x_, mouse_history.current_.y_ );
     return;
@@ -282,10 +288,9 @@ bool Viewer::wheel_event( int delta, int x, int y, int buttons, int modifiers )
     // by the time it actually runs, the slice number has been updated.
     this->update_status_bar( x, y );
   }
-    
+
   return true;
 }
-
 
 bool Viewer::key_press_event( int key, int modifiers )
 {
@@ -437,22 +442,31 @@ void Viewer::reset_mouse_handlers()
   this->wheel_event_handler_ = 0;
 }
 
-void Viewer::update_status_bar( int x, int y )
+void Viewer::update_status_bar( int x, int y, const std::string& layer_id )
 {
   if ( !Core::Application::IsApplicationThread() )
   {
-    Core::Application::PostEvent( boost::bind( &Viewer::update_status_bar, this, x, y ) );
+    Core::Application::PostEvent( boost::bind( 
+      &Viewer::update_status_bar, this, x, y, layer_id ) );
     return;
   }
 
-  if ( !this->is_volume_view() && 
-    this->active_layer_slice_ &&
-    !this->active_layer_slice_->out_of_boundary() )
+  Core::VolumeSliceHandle volume_slice;
+  if ( layer_id == "" )
+  {
+    volume_slice = this->active_layer_slice_;
+  }
+  else
+  {
+    volume_slice = this->get_volume_slice( layer_id );
+  }
+
+  if ( !this->is_volume_view() && volume_slice &&
+    !volume_slice->out_of_boundary() )
   {
     double xpos, ypos;
     this->window_to_world( x, y, xpos, ypos );
 
-    Core::VolumeSlice* volume_slice = this->active_layer_slice_.get();    
     int i, j;
     volume_slice->world_to_index( xpos, ypos, i, j );
     Core::Point index;
@@ -464,12 +478,14 @@ void Viewer::update_status_bar( int x, int y )
       double value = 0.0;
       if ( volume_slice->volume_type() == Core::VolumeType::DATA_E )
       {
-        Core::DataVolumeSlice* data_slice = dynamic_cast< Core::DataVolumeSlice* >( volume_slice );
+        Core::DataVolumeSlice* data_slice = dynamic_cast< 
+          Core::DataVolumeSlice* >( volume_slice.get() );
         value = data_slice->get_data_at( static_cast<size_t>( i ), static_cast<size_t>( j ) );
       }
       else
       {
-        Core::MaskVolumeSlice* mask_slice = dynamic_cast< Core::MaskVolumeSlice* >( volume_slice );
+        Core::MaskVolumeSlice* mask_slice = dynamic_cast< 
+          Core::MaskVolumeSlice* >( volume_slice.get() );
         value = mask_slice->get_mask_at( static_cast<size_t>( i ), static_cast<size_t>( j ) );
       }
       DataPointInfoHandle data_point( new DataPointInfo( index, world_pos, value ) );
@@ -520,6 +536,7 @@ void Viewer::state_changed()
 
 bool Viewer::is_volume_view() const
 {
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
   return this->view_mode_state_->get() == VOLUME_C;
 }
 
@@ -560,10 +577,7 @@ void Viewer::insert_layer( LayerHandle layer )
     {
       DataLayer* data_layer = dynamic_cast< DataLayer* >( layer.get() );
       Core::DataVolumeHandle data_volume = data_layer->get_data_volume();
-      Core::DataVolumeSliceHandle data_volume_slice( 
-        new Core::DataVolumeSlice( data_volume, slice_type ) );
-      this->data_slices_[ layer->get_layer_id() ] = data_volume_slice;
-      volume_slice = data_volume_slice;
+      volume_slice.reset( new Core::DataVolumeSlice( data_volume, slice_type ) );
       
       this->layer_connection_map_.insert( 
         connection_map_type::value_type( layer->get_layer_id(),
@@ -585,9 +599,8 @@ void Viewer::insert_layer( LayerHandle layer )
     {
       MaskLayer* mask_layer = dynamic_cast< MaskLayer* >( layer.get() );
       Core::MaskVolumeHandle mask_volume = mask_layer->get_mask_volume();
-      Core::MaskVolumeSliceHandle mask_volume_slice(
+      Core::MaskVolumeSliceHandle mask_volume_slice( 
         new Core::MaskVolumeSlice( mask_volume, slice_type ) );
-      this->mask_slices_[ layer->get_layer_id() ] = mask_volume_slice;
       volume_slice = mask_volume_slice;
       
       this->layer_connection_map_.insert( 
@@ -621,6 +634,7 @@ void Viewer::insert_layer( LayerHandle layer )
     assert( false );
   }
 
+  this->volume_slices_[ layer->get_layer_id() ] = volume_slice;
   lock.unlock();
 
   // Auto adjust the view and depth if it is the first layer inserted
@@ -647,7 +661,7 @@ void Viewer::delete_layers( std::vector< LayerHandle > layers )
 {
   lock_type lock( this->get_mutex() );
 
-  for ( size_t i = 0; i < layers.size(); i++ )
+  for ( size_t i = 0; i < layers.size(); ++i )
   {
     LayerHandle layer = layers[ i ];
     
@@ -655,40 +669,19 @@ void Viewer::delete_layers( std::vector< LayerHandle > layers )
     std::pair< connection_map_type::iterator, connection_map_type::iterator > range = 
       this->layer_connection_map_.equal_range( layer->get_layer_id() );
       
-    for ( connection_map_type::iterator it = range.first; it != range.second; it++ )
+    for ( connection_map_type::iterator it = range.first; it != range.second; ++it )
     {
       ( *it ).second.disconnect();
     }
     this->layer_connection_map_.erase( layer->get_layer_id() );
 
-    switch( layer->type() )
+    volume_slice_map_type::iterator it = this->volume_slices_.find( layer->get_layer_id() );
+    assert( it != this->volume_slices_.end() );
+    if ( this->active_layer_slice_ == ( *it ).second )
     {
-    case Core::VolumeType::DATA_E:
-      {
-        data_slices_map_type::iterator it = this->data_slices_.find( layer->get_layer_id() );
-        assert( it != this->data_slices_.end() );
-        if ( this->active_layer_slice_ == ( *it ).second )
-        {
-          this->active_layer_slice_.reset();
-        }
-        this->data_slices_.erase( it );
-      }
-      break;
-    case Core::VolumeType::MASK_E:
-      {
-        mask_slices_map_type::iterator it = this->mask_slices_.find( layer->get_layer_id() );
-        assert( it != this->mask_slices_.end() );
-        if ( this->active_layer_slice_ == ( *it ).second )
-        {
-          this->active_layer_slice_.reset();
-        }
-        this->mask_slices_.erase( it );
-      }
-      break;
-    default:
-      // Should never reach here.
-      assert( false );
+      this->active_layer_slice_.reset();
     }
+    this->volume_slices_.erase( it );   
   }
 
   lock.unlock();
@@ -706,26 +699,9 @@ void Viewer::delete_layers( std::vector< LayerHandle > layers )
 
 void Viewer::set_active_layer( LayerHandle layer )
 {
-  Core::VolumeSliceHandle new_active_slice;
-
-  data_slices_map_type::iterator data_slice_it = this->data_slices_.find( layer->get_layer_id() );
-  if ( data_slice_it != this->data_slices_.end() )
-  {
-    new_active_slice = ( *data_slice_it ).second;
-  }
-  else
-  {
-    mask_slices_map_type::iterator mask_slice_it = this->mask_slices_.find( layer->get_layer_id() );
-    if ( mask_slice_it != this->mask_slices_.end() )
-    {
-      new_active_slice = ( *mask_slice_it ).second;
-    }
-    else
-    {
-      CORE_THROW_LOGICERROR( std::string( "Active layer '" ) 
-        + layer->get_layer_id() + "' could not be found" );
-    }
-  }
+  volume_slice_map_type::iterator it = this->volume_slices_.find( layer->get_layer_id() );
+  assert( it != this->volume_slices_.end() );
+  Core::VolumeSliceHandle new_active_slice = ( *it ).second;
 
   if ( this->active_layer_slice_ == new_active_slice )
   {
@@ -787,30 +763,15 @@ void Viewer::set_active_layer( LayerHandle layer )
   }
 }
 
-Core::MaskVolumeSliceHandle Viewer::get_mask_volume_slice( const std::string& layer_id )
+Core::VolumeSliceHandle Viewer::get_volume_slice( const std::string& layer_id )
 {
   lock_type lock( this->get_mutex() );
-
-  mask_slices_map_type::iterator it = this->mask_slices_.find( layer_id );
-  if ( it != this->mask_slices_.end() )
+  volume_slice_map_type::iterator it = this->volume_slices_.find( layer_id );
+  if ( it != this->volume_slices_.end() )
   {
     return ( *it ).second;
   }
-
-  return Core::MaskVolumeSliceHandle();
-}
-
-Core::DataVolumeSliceHandle Viewer::get_data_volume_slice( const std::string& layer_id )
-{
-  lock_type lock( this->get_mutex() );
-
-  data_slices_map_type::iterator it = this->data_slices_.find( layer_id );
-  if ( it != this->data_slices_.end() )
-  {
-    return ( *it ).second;
-  }
-
-  return Core::DataVolumeSliceHandle();
+  return Core::VolumeSliceHandle();
 }
 
 void Viewer::change_view_mode( std::string mode, Core::ActionSource source )
@@ -835,16 +796,12 @@ void Viewer::change_view_mode( std::string mode, Core::ActionSource source )
     slice_type =  Core::VolumeSliceType::SAGITTAL_E;
   }
 
-  mask_slices_map_type::iterator mask_slices_it = this->mask_slices_.begin();
-  for ( ; mask_slices_it != this->mask_slices_.end(); mask_slices_it++ )
+  volume_slice_map_type::iterator it = this->volume_slices_.begin();
+  volume_slice_map_type::iterator it_end = this->volume_slices_.end();
+  while ( it != it_end )
   {
-    ( *mask_slices_it ).second->set_slice_type( slice_type );
-  }
-
-  data_slices_map_type::iterator data_slices_it = this->data_slices_.begin();
-  for ( ; data_slices_it != this->data_slices_.end(); data_slices_it++ )
-  {
-    ( *data_slices_it ).second->set_slice_type( slice_type );
+    ( *it ).second->set_slice_type( slice_type );
+    ++it;
   }
 
   if ( this->active_layer_slice_ )
@@ -906,19 +863,12 @@ void Viewer::set_slice_number( int num, Core::ActionSource source )
     view2d_state->set( view2d ) ;
 
     // Move other layer slices to the new position
-    mask_slices_map_type::iterator mask_slice_it = this->mask_slices_.begin();
-    for ( ; mask_slice_it != this->mask_slices_.end(); mask_slice_it++ )
+    for ( volume_slice_map_type::iterator it = this->volume_slices_.begin();
+      it != this->volume_slices_.end(); ++it )
     {
-      if ( ( *mask_slice_it ).second == this->active_layer_slice_ )
+      if ( ( *it ).second == this->active_layer_slice_ )
         continue;
-      ( *mask_slice_it ).second->move_slice_to( this->active_layer_slice_->depth() );
-    }
-    data_slices_map_type::iterator data_slice_it = this->data_slices_.begin();
-    for ( ; data_slice_it != this->data_slices_.end(); data_slice_it++ )
-    {
-      if ( ( *data_slice_it ).second == this->active_layer_slice_ )
-        continue;
-      ( *data_slice_it ).second->move_slice_to( this->active_layer_slice_->depth() );
+      ( *it ).second->move_slice_to( this->active_layer_slice_->depth() );
     }
   }
 
@@ -1016,17 +966,7 @@ void Viewer::adjust_view( Core::VolumeSliceHandle target_slice )
     return;
   }
 
-  Core::VolumeSliceHandle volume_slice;
-  if ( target_slice->volume_type() == Core::VolumeType::DATA_E )
-  {
-    volume_slice = Core::VolumeSliceHandle( new Core::DataVolumeSlice( 
-      *static_cast< Core::DataVolumeSlice* >( target_slice.get() ) ) );
-  }
-  else
-  {
-    volume_slice = Core::VolumeSliceHandle( new Core::MaskVolumeSlice( 
-      *static_cast< Core::MaskVolumeSlice* >( target_slice.get() ) ) );
-  }
+  Core::VolumeSliceHandle volume_slice = target_slice->clone();
 
   double aspect = 1.0;
   double width =  static_cast<double>( this->get_width() );
@@ -1105,12 +1045,6 @@ void Viewer::adjust_view( Core::VolumeSliceHandle target_slice )
 
   Core::Vector eye_vec = view3d.eyep() - view3d.lookat();
   eye_vec.normalize();
-  //double eye_dist = eye_vec.normalize() + depth * 0.99;
-  //height = Core::Max( height, width / aspect ) * 1.01;
-  //eye_dist = Core::Max( height / Core::Tan( 
-  //  Core::DegreeToRadian( view3d.fov() * 0.5 ) ), eye_dist );
-
-  //view3d.eyep( view3d.lookat() + eye_vec * eye_dist );
   view3d.eyep( view3d.eyep() + eye_vec * eye_offset );
   this->volume_view_state_->set( view3d );
 }
@@ -1123,17 +1057,7 @@ void Viewer::adjust_depth( Core::VolumeSliceHandle target_slice )
     return;
   }
 
-  Core::VolumeSliceHandle volume_slice;
-  if ( target_slice->volume_type() == Core::VolumeType::DATA_E )
-  {
-    volume_slice = Core::VolumeSliceHandle( new Core::DataVolumeSlice( 
-      *dynamic_cast< Core::DataVolumeSlice* >( target_slice.get() ) ) );
-  }
-  else
-  {
-    volume_slice = Core::VolumeSliceHandle( new Core::MaskVolumeSlice( 
-      *dynamic_cast< Core::MaskVolumeSlice* >( target_slice.get() ) ) );
-  }
+  Core::VolumeSliceHandle volume_slice = target_slice->clone();
 
   volume_slice->set_slice_type( Core::VolumeSliceType::AXIAL_E );
   volume_slice->set_slice_number( volume_slice->number_of_slices() / 2 );
@@ -1244,15 +1168,10 @@ void Viewer::move_slice_by( double depth_offset )
     double depth = view2d_state->get().center().z();
 
     // Move all the slices to the new position
-    mask_slices_map_type::iterator mask_slice_it = this->mask_slices_.begin();
-    for ( ; mask_slice_it != this->mask_slices_.end(); mask_slice_it++ )
+    for ( volume_slice_map_type::iterator it = this->volume_slices_.begin();
+      it != this->volume_slices_.end(); ++it )
     {
-      ( *mask_slice_it ).second->move_slice_to( depth );
-    }
-    data_slices_map_type::iterator data_slice_it = this->data_slices_.begin();
-    for ( ; data_slice_it != this->data_slices_.end(); data_slice_it++ )
-    {
-      ( *data_slice_it ).second->move_slice_to( depth );
+      ( *it ).second->move_slice_to( depth );
     }
 
     if ( !this->active_layer_slice_->out_of_boundary() )
