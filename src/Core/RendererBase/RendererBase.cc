@@ -107,6 +107,7 @@ void RendererBasePrivate::redraw( bool delay_update )
   this->frame_buffer_->enable();
   // attach texture
   this->frame_buffer_->attach_texture( this->textures_[ this->active_render_texture_ ] );
+  this->frame_buffer_->attach_renderbuffer( this->depth_buffer_, GL_DEPTH_ATTACHMENT_EXT );
 
   if ( !this->frame_buffer_->check_status() )
   {
@@ -179,6 +180,7 @@ void RendererBasePrivate::redraw_overlay( bool delay_update )
   this->frame_buffer_->enable();
   // attach texture
   this->frame_buffer_->attach_texture( this->textures_[ this->active_overlay_texture_ ] );
+  this->frame_buffer_->attach_renderbuffer( this->depth_buffer_, GL_DEPTH_ATTACHMENT_EXT );
 
   if ( !this->frame_buffer_->check_status() )
   {

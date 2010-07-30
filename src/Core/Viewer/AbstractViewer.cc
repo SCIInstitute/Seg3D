@@ -116,7 +116,10 @@ void AbstractViewer::resize( int width, int height )
 {
   this->private_->width_ = width;
   this->private_->height_ = height;
-  this->private_->renderer_->resize( width, height );
+  if ( this->private_->renderer_ )
+  {
+    this->private_->renderer_->resize( width, height );
+  }
 }
 
 void AbstractViewer::mouse_move_event( const MouseHistory& mouse_history, 
