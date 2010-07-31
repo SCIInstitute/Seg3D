@@ -83,6 +83,9 @@ private:
 private Q_SLOTS:
   void fix_icon_status();
 
+private:
+  static void SetMessage( QPointer< AppStatusBar > qpointer, 
+    int msg_type, std::string message );
 };
 
 } // end namespace Seg3D

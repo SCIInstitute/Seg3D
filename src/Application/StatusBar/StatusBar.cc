@@ -220,12 +220,15 @@ StatusBar::StatusBar() :
   this->add_connection( this->active_tool_state_->value_changed_signal_.connect(
     boost::bind( &StatusBarPrivate::set_active_tool_by_status_bar, this->private_, _2 ) ) );
 
-  this->add_connection( Core::Interface::Instance()->get_widget_action_context()->
+  this->add_connection( Core::Interface::GetWidgetActionContext()->
+    action_message_signal_.connect( boost::bind( &StatusBar::set_message, this, _1, _2 ) ) );
+  this->add_connection( Core::Interface::GetMouseActionContext()->
+    action_message_signal_.connect( boost::bind( &StatusBar::set_message, this, _1, _2 ) ) );
+  this->add_connection( Core::Interface::GetKeyboardActionContext()->
     action_message_signal_.connect( boost::bind( &StatusBar::set_message, this, _1, _2 ) ) );
 
-  this->add_connection( Core::Interface::Instance()->get_mouse_action_context()->
-    action_message_signal_.connect( boost::bind( &StatusBar::set_message, this, _1, _2 ) ) );
-
+  this->add_connection( Core::Log::Instance()->post_log_signal_.connect( 
+    boost::bind( &StatusBar::set_message, this, _1, _2 ) ) );
 }
 
 StatusBar::~StatusBar()
@@ -240,7 +243,10 @@ void StatusBar::set_data_point_info( DataPointInfoHandle data_point )
 
 void StatusBar::set_message( int msg_type, std::string message )
 {
-  this->message_updated_signal_( msg_type, message );
+  if ( msg_type != Core::LogMessageType::DEBUG_E )
+  {
+    this->message_updated_signal_( msg_type, message );
+  }
 }
 
 } // end namespace Seg3D

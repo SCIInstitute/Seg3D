@@ -97,8 +97,7 @@ AppStatusBar::AppStatusBar( QMainWindow* parent ) :
   this->add_connection( StatusBar::Instance()->data_point_info_updated_signal_.connect( 
     boost::bind( &AppStatusBar::update_data_point_info, this, _1 ) ) );
   this->add_connection( StatusBar::Instance()->message_updated_signal_.connect( 
-    boost::bind( &AppStatusBar::set_message, this, _1, _2 ) ) );
-
+    boost::bind( &AppStatusBar::SetMessage, QPointer< AppStatusBar >( this ), _1, _2 ) ) );
 }
 
 AppStatusBar::~AppStatusBar()
@@ -229,13 +228,6 @@ void AppStatusBar::update_data_point_label()
 
 void AppStatusBar::set_message( int msg_type, std::string message )
 {
-  if( !Core::Interface::IsInterfaceThread() )
-  {
-    Core::Interface::PostEvent( boost::bind( &AppStatusBar::set_message, this,
-        msg_type, message ) );
-    return;
-  }
-
   QColor color_ = QColor(255, 255, 255);
   std::string status_message = message;
   boost::char_separator< char > separater( " " );
@@ -271,6 +263,22 @@ void AppStatusBar::set_message( int msg_type, std::string message )
 
   this->private_->ui_.status_report_label_->setText( QString::fromStdString( message ) );
   this->history_widget_->add_history_item( QString::fromStdString( message ), color_ );
+}
+
+void AppStatusBar::SetMessage( QPointer< AppStatusBar > qpointer, 
+                int msg_type, std::string message )
+{
+  if ( !Core::Interface::IsInterfaceThread() )
+  {
+    Core::Interface::PostEvent( boost::bind( &AppStatusBar::SetMessage, qpointer,
+      msg_type, message ) );
+    return;
+  }
+
+  if ( !qpointer.isNull() && !QCoreApplication::closingDown() )
+  {
+    qpointer->set_message( msg_type, message );
+  }
 }
 
 } // end namespace Seg3D

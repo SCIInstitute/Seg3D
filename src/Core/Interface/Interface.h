@@ -109,15 +109,15 @@ public:
 
   // GETWIDGETACTIONCONTEXT:
   // Get the action context that widgets use to post their actions
-  static ActionContextHandle GetWidgetActionContext();
+  static InterfaceActionContextHandle GetWidgetActionContext();
 
   // GETMOUSEACTIONCONTEXT:
   // Get the action context that mouse actions use to post their actions
-  static ActionContextHandle GetMouseActionContext();
+  static InterfaceActionContextHandle GetMouseActionContext();
 
   // GETKEYBOARDACTIONCONTEXT:
   // Get the action context that keyboard actions use to post their actions
-  static ActionContextHandle GetKeyboardActionContext();
+  static InterfaceActionContextHandle GetKeyboardActionContext();
 
 };
 

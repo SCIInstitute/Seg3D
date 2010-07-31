@@ -1,3 +1,4 @@
+#include "boost\noncopyable.hpp"
 /*
  For more information, please see: http://software.sci.utah.edu
 
@@ -26,27 +27,38 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef QTUTILS_UTILS_QTPOINTER_H
-#define QTUTILS_UTILS_QTPOINTER_H
+#ifndef CORE_UTILS_TIMER_H
+#define CORE_UTILS_TIMER_H
 
-// QT includes/custom widget
-#include <QPointer>
+#include <boost/utility.hpp>
+#include <boost/cstdint.hpp>
+#include <boost/signals2.hpp>
 
-namespace QtUtils
+namespace Core
 {
 
-template< class QPOINTER >
-void CheckQtPointerImpl( QPOINTER qpointer, boost::function< void() > function )
-{
-  if ( !( qpointer.isNull() ) ) function();
-}
+class TimerPrivate;
+typedef boost::shared_ptr< TimerPrivate > TimerPrivateHandle;
 
-template< class QPOINTER >
-boost::function< void() > CheckQtPointer( QPOINTER qpointer, boost::function< void() > function )
+class Timer : public boost::noncopyable
 {
-  return boost::bind( &CheckQtPointerImpl< QPOINTER > , qpointer, function );
-}
+public:
+  Timer( boost::int64_t interval );
+  ~Timer();
 
-} // end namespace QtUtils
+  void start();
+  void stop();
+
+  void set_interval( boost::int64_t interval ); 
+  void set_single_shot( bool single_shot );
+  
+public:
+  boost::signals2::signal< void () > timeout_signal_;
+
+private:
+  TimerPrivateHandle private_;
+};
+
+} // end namespace Core
 
 #endif

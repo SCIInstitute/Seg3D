@@ -88,19 +88,19 @@ void Interface::PostAndWaitEvent( boost::function< void() > function )
   Instance()->post_and_wait_event( function );
 }
 
-ActionContextHandle Interface::GetWidgetActionContext()
+InterfaceActionContextHandle Interface::GetWidgetActionContext()
 {
-  return ActionContextHandle( Interface::Instance()->get_widget_action_context() );
+  return Interface::Instance()->get_widget_action_context();
 }
 
-ActionContextHandle Interface::GetMouseActionContext()
+InterfaceActionContextHandle Interface::GetMouseActionContext()
 {
-  return ActionContextHandle( Interface::Instance()->get_mouse_action_context() );
+  return Interface::Instance()->get_mouse_action_context();
 }
 
-ActionContextHandle Interface::GetKeyboardActionContext()
+InterfaceActionContextHandle Interface::GetKeyboardActionContext()
 {
-  return ActionContextHandle( Interface::Instance()->get_keyboard_action_context() );
+  return Interface::Instance()->get_keyboard_action_context();
 }
 
 } // end namespace Core

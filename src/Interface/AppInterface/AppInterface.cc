@@ -493,37 +493,37 @@ void AppInterface::addDockWidget( Qt::DockWidgetArea area, QDockWidget* dock_wid
 
 void AppInterface::HandleShowWindow( qpointer_type qpointer, std::string windowid )
 {
-  Core::Interface::PostEvent( CheckQtPointer( qpointer, 
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, 
     boost::bind( &AppInterface::show_window, qpointer.data(), windowid ) ) );
 }
 
 void AppInterface::HandleCloseWindow( qpointer_type qpointer, std::string windowid )
 {
-  Core::Interface::PostEvent( CheckQtPointer( qpointer, 
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, 
     boost::bind( &AppInterface::close_window, qpointer.data(), windowid ) ) );
 }
 
 void AppInterface::HandleBeginProgress( qpointer_type qpointer, Core::ActionProgressHandle handle )
 {
-  Core::Interface::PostEvent( CheckQtPointer( qpointer, 
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, 
     boost::bind( &AppInterface::begin_progress, qpointer.data(), handle ) ) );
 }
 
 void AppInterface::HandleEndProgress( qpointer_type qpointer, Core::ActionProgressHandle handle )
 {
-  Core::Interface::PostEvent( CheckQtPointer( qpointer, 
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, 
     boost::bind( &AppInterface::end_progress, qpointer.data(), handle ) ) );
 }
 
 void AppInterface::HandleReportProgress( qpointer_type qpointer, Core::ActionProgressHandle handle )
 {
-  Core::Interface::PostEvent( CheckQtPointer( qpointer, 
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, 
     boost::bind( &AppInterface::report_progress, qpointer.data(), handle ) ) );
 }
 
 void AppInterface::SetFullScreen( qpointer_type qpointer, bool full_screen, Core::ActionSource source )
 {
-  Core::Interface::PostEvent( CheckQtPointer( qpointer, boost::bind(
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
       &AppInterface::set_full_screen, qpointer.data(), full_screen ) ) );
 }
 

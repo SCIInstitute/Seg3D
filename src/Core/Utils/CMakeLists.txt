@@ -53,6 +53,8 @@ SET(CORE_UTILS_SRCS
   StringUtil.h
   StringUtil.cc
   AtomicCounter.h
+  Timer.h
+  Timer.cc
 )
 
 ##################################################

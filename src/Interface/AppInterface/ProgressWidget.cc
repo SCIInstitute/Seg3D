@@ -32,6 +32,9 @@
 // Qt includes
 #include <QTimer>
 
+#include <Core/Interface/Interface.h>
+#include <Core/Utils/Timer.h>
+
 // Interface includes
 #include <Interface/AppInterface/ProgressWidget.h>
 
@@ -47,7 +50,7 @@ public:
   
   QPixmap running_pixmap_[18];
   int running_count_;
-  QTimer* running_timer_;
+  Core::Timer* timer_;
 };
 
 ProgressWidget::ProgressWidget( Core::ActionProgressHandle action_progress, QWidget *parent ) :
@@ -55,6 +58,8 @@ ProgressWidget::ProgressWidget( Core::ActionProgressHandle action_progress, QWid
   action_progress_( action_progress ),
   private_( new ProgressWidgetPrivate )
 {
+  this->private_->timer_ = 0;
+
   // Step (1): Prevent any import from other widgets while progress bar is shown
   setModal( true );
   setAttribute( Qt::WA_DeleteOnClose );
@@ -88,13 +93,10 @@ ProgressWidget::ProgressWidget( Core::ActionProgressHandle action_progress, QWid
     this->private_->ui_.progress_bar_->hide();
     this->private_->ui_.line_->hide();
 
-    this->private_->running_timer_ = new QTimer( this );
-    this->private_->running_timer_->setInterval( 100 );
-    
-    connect( this->private_->running_timer_, SIGNAL( timeout() ), 
-      this, SLOT( update_running() ) );
-  
-    this->private_->running_timer_->start( );
+    this->private_->timer_ = new Core::Timer( 100 );
+    this->private_->timer_->timeout_signal_.connect( 
+      boost::bind( &ProgressWidget::update_running, this ) );
+    this->private_->timer_->start();
   }
   else
   {
@@ -109,15 +111,26 @@ ProgressWidget::ProgressWidget( Core::ActionProgressHandle action_progress, QWid
 
 ProgressWidget::~ProgressWidget()
 {
+  if ( this->private_->timer_ != 0 )
+  {
+    delete this->private_->timer_;
+  }
 }
 
 void ProgressWidget::update_running()
 {
+  if ( !Core::Interface::IsInterfaceThread() )
+  {
+    Core::Interface::PostEvent( boost::bind( &ProgressWidget::update_running, this ) );
+    return;
+  }
+  
   // Loop through the animation
   this->private_->running_count_++;
   if( this->private_->running_count_ > 17 ) this->private_->running_count_ = 0;
   this->private_->ui_.running_->setPixmap( 
     this->private_->running_pixmap_[ this->private_->running_count_ ] );
+  this->repaint();
 }
 
 void ProgressWidget::update_progress( )
