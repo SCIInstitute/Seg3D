@@ -29,16 +29,21 @@
 #ifndef APPLICATION_TOOLS_PAINTTOOL_H
 #define APPLICATION_TOOLS_PAINTTOOL_H
 
+#include <boost/smart_ptr.hpp>
+
 #include <Application/Tool/Tool.h>
 
 namespace Seg3D
 {
 
+class PaintTool;
+typedef boost::shared_ptr< PaintTool > PaintToolHandle;
+typedef boost::weak_ptr< PaintTool > PaintToolWeakHandle;
 
 class PaintToolPrivate;
 typedef boost::shared_ptr< PaintToolPrivate > PaintToolPrivateHandle;
 
-class PaintTool : public Tool
+class PaintTool : public Tool, public boost::enable_shared_from_this< PaintTool >
 {
 SCI_TOOL_TYPE("PaintTool", "Paint Brush", "Alt+P", ToolGroupType::TOOL_E, "http://seg3d.org/")
   // -- constructor/destructor --
@@ -73,6 +78,11 @@ public:
 
 protected:
   virtual bool post_load_states();
+
+private:
+  friend class ActionPaint;
+
+  bool paint( int x0, int y0, int x1, int y1 );
 
   // -- state --
 public:

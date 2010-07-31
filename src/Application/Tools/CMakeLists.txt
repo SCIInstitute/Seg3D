@@ -81,9 +81,15 @@ SET(APPLICATION_TOOLS_NOREGISTER_SRCS
   SeedPointsTool.cc
   )
   
+SET(APPLICATION_TOOLS_ACTIONS_SRCS
+  Actions/ActionPaint.h
+  Actions/ActionPaint.cc
+  )
+  
 CORE_ADD_LIBRARY(Application_Tools 
                  ${APPLICATION_TOOLS_SRCS}
-                 ${APPLICATION_TOOLS_NOREGISTER_SRCS})
+                 ${APPLICATION_TOOLS_NOREGISTER_SRCS}
+         ${APPLICATION_TOOLS_ACTIONS_SRCS})
             
 TARGET_LINK_LIBRARIES(Application_Tools
                       Core_Utils
@@ -97,5 +103,6 @@ TARGET_LINK_LIBRARIES(Application_Tools
 
 # Register tool classes
 REGISTER_LIBRARY_AND_CLASSES(Application_Tools
-               ${APPLICATION_TOOLS_SRCS})
+               ${APPLICATION_TOOLS_SRCS}
+               ${APPLICATION_TOOLS_ACTIONS_SRCS})
                     

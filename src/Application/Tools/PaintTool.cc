@@ -47,6 +47,7 @@
 #include <Application/Viewer/Viewer.h>
 #include <Application/ViewerManager/ViewerManager.h>
 #include <Application/Layer/DataLayer.h>
+#include <Application/Tools/Actions/ActionPaint.h>
 
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL( Seg3D, PaintTool )
@@ -86,7 +87,7 @@ public:
   void paint( int xc, int yc, int& paint_count );
 
   void interpolated_paint( int x0, int y0, int x1, int y1, int& paint_count );
-  void paint_range( int x0, int y0, int x1, int y1 );
+  bool paint_range( int x0, int y0, int x1, int y1 );
 
   // UPDATE_VIEWERS:
   // Cause viewers with the same view mode as the one that contains the paint brush
@@ -406,20 +407,15 @@ void PaintToolPrivate::interpolated_paint( int x0, int y0, int x1, int y1, int& 
   }
 }
 
-void PaintToolPrivate::paint_range( int x0, int y0, int x1, int y1 )
+bool PaintToolPrivate::paint_range( int x0, int y0, int x1, int y1 )
 {
-  if ( !Core::Application::IsApplicationThread() )
-  {
-    Core::Application::PostEvent( boost::bind( &PaintToolPrivate::paint_range,
-      this, x0, y0, x1, y1 ) );
-    return;
-  }
+  ASSERT_IS_APPLICATION_THREAD();
 
   PaintToolPrivate::lock_type lock( this->get_mutex() );
 
   if ( !this->painting_ || !this->viewer_ || !this->target_slice_ )
   {
-    return;
+    return false;
   }
 
   int paint_count = 0;
@@ -433,7 +429,10 @@ void PaintToolPrivate::paint_range( int x0, int y0, int x1, int y1 )
   if ( paint_count > 0)
   {
     this->target_slice_->cache_updated_signal_();
+    return true;
   }
+
+  return false;
 }
 
 void PaintToolPrivate::update_viewers()
@@ -900,7 +899,8 @@ bool PaintTool::handle_mouse_move( const Core::MouseHistory& mouse_history,
 
   if ( this->private_->painting_ )
   {
-    this->private_->paint_range( mouse_history.previous_.x_, mouse_history.previous_.y_,
+    ActionPaint::Dispatch( Core::Interface::GetMouseActionContext(), 
+      this->shared_from_this(), mouse_history.previous_.x_, mouse_history.previous_.y_,
       mouse_history.current_.x_, mouse_history.current_.y_ );
     return true;
   }
@@ -964,7 +964,8 @@ bool PaintTool::handle_mouse_press( const Core::MouseHistory& mouse_history,
 
       if ( this->private_->start_painting() )
       {
-        this->private_->paint_range( this->private_->center_x_, this->private_->center_y_,
+        ActionPaint::Dispatch( Core::Interface::GetMouseActionContext(), 
+          this->shared_from_this(), this->private_->center_x_, this->private_->center_y_,
           this->private_->center_x_, this->private_->center_y_ );
         return true;
       }
@@ -1051,5 +1052,9 @@ bool PaintTool::has_2d_visual()
   return true;
 }
 
+bool PaintTool::paint( int x0, int y0, int x1, int y1 )
+{
+  return this->private_->paint_range( x0, y0, x1, y1 );
+}
 
 } // end namespace Seg3D
