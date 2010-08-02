@@ -26,45 +26,51 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_RENDERER_RENDERER_H
-#define APPLICATION_RENDERER_RENDERER_H
+#ifndef APPLICATION_TOOLS_DETAIL_PAINTBRUSHSHADER_H
+#define APPLICATION_TOOLS_DETAIL_PAINTBRUSHSHADER_H
 
-#if defined (_MSC_VER) && (_MSC_VER >= 1020)
-# pragma once
-#endif
+#include <boost/shared_ptr.hpp>
+#include <boost/utility.hpp>
 
-#include <Core/Utils/ConnectionHandler.h>
-#include <Core/RendererBase/RendererBase.h>
+#include <Core/Graphics/GLSLProgram.h>
+#include <Core/Utils/Lockable.h>
 
 namespace Seg3D
 {
 
-// Forward declarations
-class Renderer;
-class RendererPrivate;
-typedef boost::shared_ptr< Renderer > RendererHandle;
-typedef boost::shared_ptr< RendererPrivate > RendererPrivateHandle;
+class PaintBrushShader;
+typedef boost::shared_ptr< PaintBrushShader > PaintBrushShaderHandle;
 
-// Class definitions
-class Renderer : public Core::RendererBase, private Core::ConnectionHandler
+class PaintBrushShader : public Core::Lockable
 {
-  friend class RendererPrivate;
-
-  // -- constructor/destructor --
 public:
-  Renderer( size_t viewer_id );
-  virtual ~Renderer();
+  PaintBrushShader();
+  ~PaintBrushShader();
 
-protected:
-  virtual void post_initialize();
-  virtual void post_resize();
-  virtual bool render();
-  virtual bool render_overlay();
+  bool initialize();
+  void enable();
+  void disable();
+  void set_brush_texture( int tex_unit );
+  void set_brush_color( float r, float g, float b );
+  void set_opacity( float opacity );
+  void set_pixel_size( float width, float height );
+  void set_border_width( int width );
 
 private:
-  RendererPrivateHandle private_;
+
+  bool valid_;
+
+  Core::GLSLProgramHandle glsl_prog_;
+  Core::GLSLShaderHandle glsl_frag_shader_;
+
+  int brush_tex_loc_;
+  int brush_color_loc_;
+  int opacity_loc_;
+  int border_width_loc_;
+  int pixel_size_loc_;
+
+  const static char* FRAG_SHADER_SOURCE_C[];
 };
 
 } // end namespace Seg3D
-
 #endif

@@ -46,7 +46,7 @@ namespace QtUtils
 
 typedef QPointer< QtRenderWidget > QtRenderWidgetWeakHandle;
 
-class QtRenderWidgetPrivate : public QObject
+class QtRenderWidgetPrivate
 {
 public:
   Core::AbstractViewerHandle viewer_;
@@ -65,9 +65,7 @@ QtRenderWidget::QtRenderWidget( const QGLFormat& format, QWidget* parent, QGLWid
 
   this->setAutoFillBackground( false );
   this->setAttribute( Qt::WA_OpaquePaintEvent );
-  this->setAttribute( Qt::WA_NoSystemBackground );
   this->setMouseTracking( true );
-  //this->setCursor( Qt::CrossCursor );
   this->setFocusPolicy( Qt::StrongFocus );
 }
 
@@ -86,8 +84,8 @@ static void UpdateDisplay( QtRenderWidgetWeakHandle qpointer )
 
   if ( !qpointer.isNull() )
   {
-    //qpointer->updateGL();
-    qpointer->repaint();
+    qpointer->updateGL();
+    //qpointer->repaint();
   }
 }
 

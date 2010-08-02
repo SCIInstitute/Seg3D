@@ -41,7 +41,7 @@ namespace Seg3D
 class SliceShader;
 typedef boost::shared_ptr< SliceShader > SliceShaderHandle;
 
-class SliceShader : public Core::Lockable
+class SliceShader : public boost::noncopyable
 {
 public:
   SliceShader();

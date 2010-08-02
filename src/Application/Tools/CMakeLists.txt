@@ -28,6 +28,16 @@
 #
 
 ##################################################
+# Import shaders into source files
+##################################################
+
+ADD_CUSTOM_COMMAND(
+  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/PaintBrushShaderFrag
+  COMMAND ShaderImporter ${CMAKE_CURRENT_SOURCE_DIR}/detail/PaintBrushShader.frag ${CMAKE_CURRENT_BINARY_DIR}/PaintBrushShaderFrag
+  DEPENDS ShaderImporter ${CMAKE_CURRENT_SOURCE_DIR}/detail/PaintBrushShader.frag
+  )
+
+##################################################
 # Set sources
 ##################################################
 
@@ -79,6 +89,10 @@ SET(APPLICATION_TOOLS_SRCS
 SET(APPLICATION_TOOLS_NOREGISTER_SRCS
   SeedPointsTool.h
   SeedPointsTool.cc
+  detail/PaintBrushShader.h
+  detail/PaintBrushShader.cc
+  detail/PaintBrushShader.frag
+  PaintBrushShaderFrag
   )
   
 SET(APPLICATION_TOOLS_ACTIONS_SRCS
@@ -86,6 +100,8 @@ SET(APPLICATION_TOOLS_ACTIONS_SRCS
   Actions/ActionPaint.cc
   )
   
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
+
 CORE_ADD_LIBRARY(Application_Tools 
                  ${APPLICATION_TOOLS_SRCS}
                  ${APPLICATION_TOOLS_NOREGISTER_SRCS}

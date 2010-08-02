@@ -41,7 +41,7 @@
 #include <Application/Layer/MaskLayer.h>
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
-#include <Application/Renderer/SliceShader.h>
+#include <Application/Tools/detail/PaintBrushShader.h>
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/PaintTool.h>
 #include <Application/Viewer/Viewer.h>
@@ -125,7 +125,7 @@ public:
 
   std::vector< unsigned char > brush_mask_;
   Core::Texture2DHandle brush_tex_;
-  SliceShaderHandle shader_;
+  PaintBrushShaderHandle shader_;
 
   const static int INVALID_VIEWER_C;
 };
@@ -262,7 +262,7 @@ void PaintToolPrivate::initialize()
     {
       Core::RenderResources::lock_type rr_lock( Core::RenderResources::GetMutex() );
       this->brush_tex_ = Core::Texture2DHandle( new Core::Texture2D );
-      this->shader_ = SliceShaderHandle( new SliceShader );
+      this->shader_.reset( new PaintBrushShader );
       this->shader_->initialize();
     }
 
@@ -271,10 +271,7 @@ void PaintToolPrivate::initialize()
 
     this->shader_->enable();
     this->shader_->set_border_width( 2 );
-    this->shader_->set_mask_mode( 0 );
-    this->shader_->set_slice_texture( 0 );
-    this->shader_->set_pattern_texture( 1 );
-    this->shader_->set_volume_type( Core::VolumeType::MASK_E );
+    this->shader_->set_brush_texture( 0 );
     this->shader_->disable();
 
     this->initialized_ = true;
@@ -789,7 +786,7 @@ void PaintTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 
   
   // Lock the shader, because this function can be called from multiple rendering threads
-  SliceShader::lock_type shader_lock( this->private_->shader_->get_mutex() );
+  PaintBrushShader::lock_type shader_lock( this->private_->shader_->get_mutex() );
   // Lock the brush texture
   Core::Texture::lock_type tex_lock( this->private_->brush_tex_->get_mutex() );
 
@@ -805,7 +802,7 @@ void PaintTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
   MaskLayer* target_mask_layer = static_cast< MaskLayer* >( target_layer.get() );
   Core::Color color = PreferencesManager::Instance()->get_color( 
     target_mask_layer->color_state_->get() );
-  this->private_->shader_->set_mask_color( static_cast< float >( color.r() / 255 ), 
+  this->private_->shader_->set_brush_color( static_cast< float >( color.r() / 255 ), 
     static_cast< float >( color.g() / 255 ), static_cast< float >( color.b() / 255 ) );
   
   glPushAttrib( GL_TRANSFORM_BIT );
