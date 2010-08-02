@@ -39,9 +39,8 @@ namespace Seg3D
 
 bool ActionDeleteSession::validate( Core::ActionContextHandle& context )
 {
-  std::string session_name;
-  if( ProjectManager::Instance()->current_project_->get_session_name( 
-    this->session_index_.value(), session_name ) )
+  if( ProjectManager::Instance()->current_project_->
+    validate_session_name( this->session_name_.value() ) )
   {
     return true;
   }
@@ -53,18 +52,15 @@ bool ActionDeleteSession::run( Core::ActionContextHandle& context,
 {
   bool success = false;
 
-  std::string session_name;
-  ProjectManager::Instance()->current_project_->get_session_name( this->session_index_.value(), 
-    session_name );
-
-  std::string message = std::string( "Deleting session: '" ) + session_name + std::string( "'" );
+  std::string message = std::string( "Deleting session: '" ) + this->session_name_.value()
+    + std::string( "'" );
 
   Core::ActionProgressHandle progress = 
     Core::ActionProgressHandle( new Core::ActionProgress( message ) );
 
   progress->begin_progress_reporting();
 
-  if( ProjectManager::Instance()->delete_project_session( this->session_index_.value() ) )
+  if( ProjectManager::Instance()->delete_project_session( this->session_name_.value() ) )
   {
     success = true;
   }
@@ -74,18 +70,19 @@ bool ActionDeleteSession::run( Core::ActionContextHandle& context,
   return success;
 }
 
-Core::ActionHandle ActionDeleteSession::Create( int session_index )
+Core::ActionHandle ActionDeleteSession::Create( const std::string& session_name )
 {
   ActionDeleteSession* action = new ActionDeleteSession;
   
-  action->session_index_.value() = session_index;
+  action->session_name_.value() = session_name;
   
   return Core::ActionHandle( action );
 }
 
-void ActionDeleteSession::Dispatch( Core::ActionContextHandle context, int session_index )
+void ActionDeleteSession::Dispatch( Core::ActionContextHandle context, 
+  const std::string& session_name )
 {
-  Core::ActionDispatcher::PostAction( Create( session_index ), context );
+  Core::ActionDispatcher::PostAction( Create( session_name ), context );
 }
 
 } // end namespace Seg3D

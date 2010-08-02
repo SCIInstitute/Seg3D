@@ -81,7 +81,7 @@ public:
   static bool LoadDataVolume( const boost::filesystem::path& filename, DataVolumeHandle& volume,
     std::string& error );
 
-  static bool SaveDataVolume( const std::string& filename, DataVolumeHandle& volume,
+  static bool SaveDataVolume( const boost::filesystem::path& filepath, DataVolumeHandle& volume, 
     std::string& error );
   
 };

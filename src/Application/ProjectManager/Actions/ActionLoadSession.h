@@ -46,7 +46,7 @@ CORE_ACTION(
 public:
   ActionLoadSession()
   {
-    this->add_argument( this->session_index_ );
+    this->add_argument( this->session_name_ );
   }
 
   virtual ~ActionLoadSession()
@@ -60,19 +60,19 @@ public:
   
 private:
 
-  // This parameter contains the index of the session to be loaded
-  Core::ActionParameter< int > session_index_;
+  // This parameter contains the name of the session to be loaded
+  Core::ActionParameter< std::string > session_name_;
   
   // -- Dispatch this action from the interface --
 public:
   
   // CREATE:
   // Create an action that loads a session
-  static Core::ActionHandle Create( int session_index );
+  static Core::ActionHandle Create( const std::string& session_name );
   
   // DISPATCH:
   // Dispatch an action loads a session
-  static void Dispatch( Core::ActionContextHandle context, int session_index );
+  static void Dispatch( Core::ActionContextHandle context, const std::string& session_name );
 };
 
 } // end namespace Seg3D

@@ -53,7 +53,7 @@ Session::~Session()
 bool Session::load( boost::filesystem::path path, const std::string& session_name )
 {
   Core::StateIO state_io;
-  if ( !state_io.import_from_file( path / ( session_name + ".xml" ) ) )
+  if ( !state_io.import_from_file( path / "sessions" / ( session_name + ".xml" ) ) )
   {
     return false;
   }
@@ -68,6 +68,7 @@ bool Session::save( boost::filesystem::path path, const std::string& session_nam
 {
   Core::StateIO state_io;
   state_io.initialize( "Seg3D2" );
+  path = path / "sessions";
   if ( Core::StateEngine::Instance()->save_states( state_io ) )
   {
     if ( !boost::filesystem::exists( path ) )

@@ -145,7 +145,7 @@ bool AutoSave::needs_auto_save()
 
 void AutoSave::do_auto_save()
 {
-  ActionSaveSession::Dispatch( Core::Interface::GetWidgetActionContext(), true );
+  ActionSaveSession::Dispatch( Core::Interface::GetWidgetActionContext(), true, "" );
 }
 
 

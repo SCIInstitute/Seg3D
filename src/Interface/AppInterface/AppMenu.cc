@@ -101,20 +101,19 @@ void AppMenu::create_file_menu( QMenu* qmenu )
   qaction->setToolTip( tr( "Open an existing project" ) );
   connect( qaction, SIGNAL( triggered() ), this, SLOT( open_project_from_file() ) );
   
-  // TODO: connect this action to the Project Manager
-  
+#if defined( _WIN32 ) || defined ( __APPLE__ )  
   qaction = qmenu->addAction( tr( "&Show Project Folder" ) );
   qaction->setShortcut( tr( "Ctrl+ALT+F" ) );
-  qaction->setToolTip( tr( "The current project folder" ) );
-  // TODO: connect this action to the Project Manager
+  qaction->setToolTip( tr( "Open the current project folder" ) );
+  connect( qaction, SIGNAL( triggered() ), this, SLOT( open_project_folder() ) );
+#endif
   
   qaction = qmenu->addAction( tr( "&Save Project" ) );
   qaction->setShortcut( tr( "Ctrl+S" ) );
   qaction->setToolTip( tr( "Save the current project." ) );
   QtUtils::QtBridge::Connect( qaction, 
     boost::bind( &ActionSaveSession::Dispatch, 
-    Core::Interface::GetWidgetActionContext(), false ) );
-  // TODO: connect this action to the Project Manager
+    Core::Interface::GetWidgetActionContext(), false, "" ) );
   
   qmenu->addSeparator();
   
@@ -402,8 +401,39 @@ void AppMenu::open_project_from_file()
       ActionLoadProject::Dispatch( Core::Interface::GetWidgetActionContext(), path );
     }
   }
+}
 
-  
+void AppMenu::open_project_folder()
+{
+  boost::filesystem::path project_path = ProjectManager::Instance()->
+    current_project_path_state_->get();
+
+  boost::filesystem::path current_projects_path = complete( 
+    boost::filesystem::path( ProjectManager::Instance()->
+    current_project_path_state_->get().c_str(), boost::filesystem::native ) );
+
+  project_path = project_path / ProjectManager::Instance()->current_project_->project_name_state_->get();
+  QString qstring_path = QString::fromStdString( project_path.string() );
+
+  if( boost::filesystem::exists( project_path ) )
+  {
+    QProcess process;
+    process.setReadChannelMode( QProcess::MergedChannels );
+#ifdef _WIN32
+    qstring_path = qstring_path.replace( QString( "/" ), QString( "\\" ) );
+    process.start( "explorer.exe", QStringList() << qstring_path );
+#else
+    process.start( "open", QStringList() << QString::fromStdString( qstring_path ) );
+#endif
+
+    if( !process.waitForFinished() )
+    {
+      CORE_LOG_ERROR( "There was an issue when Seg3d2 tried to open the path: " 
+        + process.errorString().toStdString() );
+    } 
+    return;
+  }
+  CORE_LOG_ERROR( "There current project path seems to be invalid." );
 }
 
 

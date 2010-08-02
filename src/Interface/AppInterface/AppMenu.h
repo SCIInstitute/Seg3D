@@ -62,13 +62,13 @@ private:
   void create_filter_menu( QMenu* menu );
   void create_window_menu( QMenu* menu );
   
-  
   // Keep a pointer to the main window
   QMainWindow*  main_window_;
   
 private Q_SLOTS:
   void open_project_wizard();
   void open_project_from_file();
+  void open_project_folder();
 };
 
 } // end namespace Seg3D

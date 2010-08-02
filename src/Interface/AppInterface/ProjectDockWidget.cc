@@ -26,6 +26,9 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// STL includes
+#include <time.h>
+
 // Core includes
 #include <Core/Utils/Log.h>
 #include <Core/Interface/Interface.h>
@@ -99,9 +102,8 @@ ProjectDockWidget::ProjectDockWidget( QWidget *parent ) :
       state_changed_signal_.connect( boost::bind( 
       &ProjectDockWidget::HandleSmartAutoSaveToggled, project_dock_widget ) ) );
     
-    
     connect( this->private_->ui_.save_session_button_, SIGNAL( clicked() ), 
-      this, SLOT( save_project() ) );
+      this, SLOT( save_session() ) );
     
     connect( this->private_->ui_.load_session_button_, SIGNAL( clicked() ), 
       this, SLOT( load_session() ) );
@@ -109,8 +111,8 @@ ProjectDockWidget::ProjectDockWidget( QWidget *parent ) :
     connect( this->private_->ui_.delete_session_button_, SIGNAL( clicked() ),
       this, SLOT( delete_session() ) );
 
-    connect( this->private_->ui_.sessions_list_, SIGNAL( itemDoubleClicked ( QListWidgetItem* ) ),
-      this, SLOT( call_load_session( QListWidgetItem* ) ) );
+    connect( this->private_->ui_.sessions_list_, SIGNAL( cellDoubleClicked ( int, int ) ),
+      this, SLOT( call_load_session( int, int ) ) );
 
     connect( this->private_->ui_.save_note_button_, SIGNAL( clicked() ), 
       this, SLOT( save_note() ) );
@@ -118,7 +120,9 @@ ProjectDockWidget::ProjectDockWidget( QWidget *parent ) :
     connect( this->private_->ui_.note_edit_, SIGNAL( cursorPositionChanged() ),
       this, SLOT( enable_save_notes_button() ) );
 
-
+    QStringList headers;
+    headers << "Time:" << "Session Name:";
+    this->private_->ui_.sessions_list_->setHorizontalHeaderLabels( headers );
   }
 }
 
@@ -128,9 +132,11 @@ ProjectDockWidget::~ProjectDockWidget()
 }
   
   
-void ProjectDockWidget::save_project()
+void ProjectDockWidget::save_session()
 {
-  ActionSaveSession::Dispatch( Core::Interface::GetWidgetActionContext(), false );
+  std::string session_name = this->private_->ui_.session_name_linedit_->text().toStdString();
+  ActionSaveSession::Dispatch( Core::Interface::GetWidgetActionContext(), false, session_name );
+  this->private_->ui_.session_name_linedit_->setText( "" );
 }
 
 void ProjectDockWidget::save_note()
@@ -142,10 +148,21 @@ void ProjectDockWidget::save_note()
   
 void ProjectDockWidget::load_session()
 {
-  if( !this->private_->ui_.sessions_list_->currentItem() )
-    return;
+  int row = this->private_->ui_.sessions_list_->currentRow();
 
-  if( this->private_->ui_.sessions_list_->currentItem()->text() != "" )
+  if( ( row < 0 ) || ( row > this->private_->ui_.sessions_list_->rowCount() ) )
+  {
+    return;
+  }
+
+  if( !this->private_->ui_.sessions_list_->item( row, 1 ) )
+  {
+    return;
+  }
+
+  std::string row_time = this->private_->ui_.sessions_list_->item( row, 0 )->text().toStdString();
+
+  if( row_time != "" )
   {
     QMessageBox message_box;
     message_box.setText( QString::fromUtf8( "WARNING: By loading a saved session you will loose"
@@ -153,33 +170,34 @@ void ProjectDockWidget::load_session()
     message_box.setInformativeText( QString::fromUtf8( "Are you sure you want to do this?" ) );
     message_box.setStandardButtons( QMessageBox::Yes | QMessageBox::No );
     message_box.setDefaultButton( QMessageBox::No );
-    if( message_box.exec() )
+    if( QMessageBox::Yes == message_box.exec() )
     {
       std::vector< std::string > sessions = ProjectManager::Instance()->current_project_->
         sessions_state_->get();
-      
-      for( int i = 0; i < static_cast< int >( sessions.size() ); ++i )
-      {
-        if( QString::fromStdString( ( Core::SplitString( sessions[ i ], "|" ) )[ 1 ] ) == 
-           this->private_->ui_.sessions_list_->currentItem()->text() )
-        {
-          // Code for sending session name to action instead of index
-//          ActionLoadSession::Dispatch( Core::Interface::GetWidgetActionContext(), 
-//            this->private_->ui_.sessions_list_->currentItem()->text() );
-          ActionLoadSession::Dispatch( Core::Interface::GetWidgetActionContext(), i );
-          break;
-        }
-      }     
+
+      std::string session_name = sessions[ row ];
+      ActionLoadSession::Dispatch( Core::Interface::GetWidgetActionContext(), session_name );
     }
   }
 }
 
 void ProjectDockWidget::delete_session()
 { 
-  if( !this->private_->ui_.sessions_list_->currentItem() )
-    return;
+  int row = this->private_->ui_.sessions_list_->currentRow();
 
-  if( this->private_->ui_.sessions_list_->currentItem()->text() != "" )
+  if( ( row < 0 ) || ( row > this->private_->ui_.sessions_list_->rowCount() ) )
+  {
+    return;
+  }
+
+  if( !this->private_->ui_.sessions_list_->item( row , 1 ) )
+  {
+    return;
+  }
+
+  std::string row_time= this->private_->ui_.sessions_list_->item( row, 0 )->text().toStdString();
+
+  if( row_time != "" )
   {
     QMessageBox message_box;
     message_box.setText( QString::fromUtf8( "WARNING: You are going to regret this.") );
@@ -191,18 +209,8 @@ void ProjectDockWidget::delete_session()
       std::vector< std::string > sessions = ProjectManager::Instance()->current_project_->
         sessions_state_->get();
 
-      for( int i = 0; i < static_cast< int >( sessions.size() ); ++i )
-      {
-        if( QString::fromStdString( ( Core::SplitString( sessions[ i ], "|" ) )[ 1 ] ) == 
-          this->private_->ui_.sessions_list_->currentItem()->text() )
-        {
-          // Code for sending session name to action instead of index
-//          ActionDeleteSession::Dispatch( Core::Interface::GetWidgetActionContext(), 
-//            this->private_->ui_.sessions_list_->currentItem()->text() );
-          ActionDeleteSession::Dispatch( Core::Interface::GetWidgetActionContext(), i );  
-          break;
-        }
-      }
+      std::string session_name = sessions[ row ];
+      ActionDeleteSession::Dispatch( Core::Interface::GetWidgetActionContext(), session_name );
     }
   }
 
@@ -213,26 +221,68 @@ void ProjectDockWidget::populate_session_list()
 {
   std::vector< std::string > sessions = ProjectManager::Instance()->current_project_->
     sessions_state_->get();
-  
-  this->private_->ui_.sessions_list_->clear();
-  
+
+  this->private_->ui_.sessions_list_->verticalHeader()->setUpdatesEnabled( false );
+
+  // Clean out the old table
+  for( int j = this->private_->ui_.sessions_list_->rowCount() -1; j >= 0; j-- )
+  {
+    this->private_->ui_.sessions_list_->removeRow( j );
+  }
+
   for( int i = 0; i < static_cast< int >( sessions.size() ); ++i )
   {
     if( ( sessions[ i ] != "" ) && ( sessions[ i ] != "]" ) )
     {
-      std::string session_name = ( Core::SplitString( sessions[ i ], "|" ) )[ 1 ];
-      QListWidgetItem *new_item = new QListWidgetItem( QString::fromStdString( session_name ) );
+      std::string session_name = sessions[ i ];
+      QTableWidgetItem *new_item_name;
+      QTableWidgetItem *new_item_time;
 
-      if( session_name.substr( 0, 5 ) == "AS - " )
+      new_item_time = new QTableWidgetItem( QString::fromStdString( 
+        ( Core::SplitString( session_name, " - " ) )[ 0 ] ) );
+      new_item_name = new QTableWidgetItem( QString::fromStdString( 
+        ( Core::SplitString( session_name, " - " ) )[ 1 ] ) );
+
+      if( ( Core::SplitString( session_name, " - " ) )[ 1 ]== "AutoSave" )
       {
         QFont font;
         font.setBold( true );
-        new_item->setFont( font );
+        new_item_name->setFont( font );
+        new_item_time->setFont( font );
       }
-      
-      this->private_->ui_.sessions_list_->addItem( new_item );
+
+      this->private_->ui_.sessions_list_->insertRow( i );
+
+      std::vector< std::string > time_vector = Core::SplitString( 
+        new_item_time->text().toStdString(), "-" );
+      if( time_vector.size() == 6 )
+      {
+        std::string date = time_vector[ 0 ] + "-" + time_vector[ 1 ] + "-" + time_vector[ 2 ];
+        if( date == this->get_date() )
+        {
+          new_item_time->setText( QString::fromStdString( time_vector[ 3 ] + ":" + 
+            time_vector[ 4 ] + ":" + time_vector[ 5 ] ) );
+        }
+        else
+        {
+          new_item_time->setText( QString::fromStdString( date ) );
+        }
+      }
+
+      // Add a tooltip to display the user who saved the session 
+      new_item_time->setToolTip( QString::fromUtf8( "This session was saved by: " )
+        + QString::fromStdString( ( Core::SplitString( session_name, " - " ) )[ 2 ] ) );
+      new_item_name->setToolTip( QString::fromUtf8( "This session was saved by: " )
+        + QString::fromStdString( ( Core::SplitString( session_name, " - " ) )[ 2 ] ) );
+    
+      std::string test = new_item_time->text().toStdString();
+      this->private_->ui_.sessions_list_->setItem( i, 0, new_item_time );
+      this->private_->ui_.sessions_list_->setItem( i, 1, new_item_name );
+      this->private_->ui_.sessions_list_->verticalHeader()->resizeSection( i, 24 );
     }
   }
+
+  this->private_->ui_.sessions_list_->verticalHeader()->setUpdatesEnabled( true );
 }
     
 
@@ -320,7 +370,7 @@ std::string current_text = this->private_->ui_.note_edit_->toPlainText().toStdSt
   }
 }
 
-void ProjectDockWidget::call_load_session( QListWidgetItem* item )
+void ProjectDockWidget::call_load_session( int row, int column )
 {
   this->load_session();
 }
@@ -369,11 +419,18 @@ void ProjectDockWidget::set_smart_save_label()
 
 }
 
+std::string ProjectDockWidget::get_date()
+{
+  time_t rawtime;
+  struct tm * timeinfo;
+  char time_buffer [80];
 
+  time ( &rawtime );
+  timeinfo = localtime ( &rawtime );
 
-
-
-
-
+  strftime ( time_buffer, 80, "%d-%b-%Y", timeinfo );
+  std::string date = time_buffer;
+  return date;
+}
 
 } // end namespace Seg3D

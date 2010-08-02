@@ -91,8 +91,8 @@ public:
   
   // LOAD_SESSION:
   // this function will be called to load a specific session
-  bool load_session( boost::filesystem::path project_path, int state_index );
-//  bool load_session( boost::filesystem::path project_path, const std::string& session_name );
+  //bool load_session( boost::filesystem::path project_path, int state_index );
+  bool load_session( boost::filesystem::path project_path, const std::string& session_name );
   
   // SAVE_SESSION:
   // this function will be called from the project manager to save a session
@@ -100,8 +100,8 @@ public:
   
   // DELETE_SESSION:
   // this function will be called by the project manager to delete a session
-  bool delete_session( boost::filesystem::path project_path, int state_index );
-//  bool delete_session( boost::filesystem::path project_path, const std::string& session_name );
+//  bool delete_session( boost::filesystem::path project_path, int state_index );
+  bool delete_session( boost::filesystem::path project_path, const std::string& session_name );
   
   // NAME_IS_SET:
   // this function is set called to set the name_set_ toggle in the project so it knows if the name
@@ -117,12 +117,20 @@ public:
   // GET_SESSION_NAME:
   // this function gets the name of a session at an index of the projects session list, this is 
   // used for display what session you are loading when you load a session.
-  bool get_session_name( int index, std::string& session_name );
+  std::string get_session_name( int index );
+
+  // VALIDATE_SESSION_NAME:
+  // function for validating that a session name exists
+  bool validate_session_name( std::string& session_name );
 
   // INVALIDATE_CURRENT_SESSION: // NOT CURRENTLY USED //
   // this is a public function that enables the ProjectManager to call invalidate on the current
   // session
   void invalidate_current_session(){ this->current_session_->invalidate(); }
+
+  // CLEAR_DATAMANAGER_LIST:
+  // function for clearing out the datamanager list
+  void clear_datamanager_list(){ this->data_manager_->clear_data_file_list(); }
   
 protected:
   // PRE_SAVE_STATES:

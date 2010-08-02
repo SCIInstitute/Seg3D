@@ -55,6 +55,7 @@ public:
   ActionSaveSession()
   {
     this->add_key( this->is_autosave_ );
+    this->add_argument( this->session_name_ );
   }
 
   virtual ~ActionSaveSession()
@@ -69,17 +70,19 @@ public:
 private:
   // This parameter contains the id of the layer
   Core::ActionParameter< bool > is_autosave_;
+  Core::ActionParameter< std::string > session_name_;
   
   // -- Dispatch this action from the interface --
 public:
   
   // CREATE:
   // Create an action that activates a layer
-  static Core::ActionHandle Create( bool is_autosave );
+  static Core::ActionHandle Create( bool is_autosave, const std::string& session_name );
   
   // DISPATCH:
   // Dispatch an action that activates a layer
-  static void Dispatch( Core::ActionContextHandle context, bool is_autosave );
+  static void Dispatch( Core::ActionContextHandle context, bool is_autosave, 
+    std::string session_name );
 
 private:
   boost::posix_time::ptime time_stamp_;

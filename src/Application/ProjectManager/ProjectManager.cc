@@ -26,11 +26,15 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// STL includes
+#include <time.h>
+
 // Boost includes
 #include <boost/lexical_cast.hpp>
 
 // Core includes
 #include <Core/State/StateIO.h>
+#include <Core/State/Actions/ActionAdd.h>
 
 // Application includes
 #include <Application/ProjectManager/ProjectManager.h>
@@ -107,11 +111,6 @@ void ProjectManager::save_projectmanager_state()
   
 void ProjectManager::rename_project( const std::string& new_name, Core::ActionSource source )
 {
-  // return if rename gets called while we are in the middle of changing a project
-  if( changing_projects_ )
-  {
-    return;
-  }
 
   // If this is the first time the name has been set, then we set it, and return
   if( !this->current_project_->name_status() )
@@ -119,7 +118,13 @@ void ProjectManager::rename_project( const std::string& new_name, Core::ActionSo
     this->current_project_->name_is_set( true );
     return;
   }
-    
+
+  // return if rename gets called while we are in the middle of changing a project
+  if( changing_projects_ )
+  {
+    return;
+  }
+  
   std::vector< std::string > old_name_vector = 
     Core::SplitString( this->recent_projects_state_->get()[ 0 ], "|" );
   
@@ -204,6 +209,7 @@ void ProjectManager::new_project( const std::string& project_name, const std::st
     this->current_project_->sessions_state_->set( empty_vector );
     this->current_project_->project_notes_state_->set( empty_vector );
     this->current_project_->save_custom_colors_state_->set( false );
+    this->current_project_->clear_datamanager_list();
     this->save_project( true );
   }
 
@@ -234,10 +240,11 @@ void ProjectManager::open_project( const std::string& project_path )
   
 }
   
-void ProjectManager::save_project( bool autosave /*= false*/ )
+void ProjectManager::save_project( bool autosave /*= false*/, std::string session_name )
 {
+  ASSERT_ON_APPLICATION_THREAD();
   this->session_saving_ = true;
-  if( this->save_project_session( autosave ) )
+  if( this->save_project_session( autosave, session_name ) )
   {
     this->save_project_only();
   }
@@ -263,15 +270,19 @@ void ProjectManager::save_project_as()
     
 }
   
-bool ProjectManager::save_project_session( bool autosave /*= false */ )
+bool ProjectManager::save_project_session( bool autosave /*= false */, std::string session_name  )
 {
   // Here we check to see if its an autosave and if it is, just save over the previous autosave
-  std::string session_name = "";
+  
+  if( session_name == "" )
+  {
+    session_name = "UnnamedSession";
+  }
   if( autosave )
   {
-    session_name = "AS - ";
+    session_name = "AutoSave";
   } 
-  session_name = session_name + this->get_timestamp();
+  session_name = this->get_timestamp() + " - " + session_name;
 
   std::string user_name;
   Core::Application::Instance()->get_user_name( user_name );
@@ -281,6 +292,7 @@ bool ProjectManager::save_project_session( bool autosave /*= false */ )
   boost::filesystem::path path = complete( boost::filesystem::path( this->
     current_project_path_state_->get().c_str(), boost::filesystem::native ) );
   
+  // This saves the project to the list that appears on the splash screen.
   this->add_to_recent_projects( this->current_project_path_state_->export_to_string(),
     this->current_project_->project_name_state_->get() );
   
@@ -298,55 +310,29 @@ bool ProjectManager::save_project_session( bool autosave /*= false */ )
 
 }
   
-//bool ProjectManager::load_project_session( const std::string& session_name )
-//{
-//  boost::filesystem::path path = complete( boost::filesystem::path( this->
-//    current_project_path_state_->get().c_str(), boost::filesystem::native ) );
-//  
-//  bool result =  this->current_project_->load_session( ( path /
-//    this->current_project_->project_name_state_->get() ), session_name );
-//  
-//  if( result )
-//  {
-//    this->set_last_saved_session_time_stamp();
-//  }
-//  
-//  return result;
-//}
-  
-
-bool ProjectManager::load_project_session( int session_index )
+bool ProjectManager::load_project_session( const std::string& session_name )
 {
   boost::filesystem::path path = complete( boost::filesystem::path( this->
     current_project_path_state_->get().c_str(), boost::filesystem::native ) );
   
   bool result =  this->current_project_->load_session( ( path /
-    this->current_project_->project_name_state_->get() ), session_index );
-
+    this->current_project_->project_name_state_->get() ), session_name );
+  
   if( result )
   {
     this->set_last_saved_session_time_stamp();
   }
-
+  
   return result;
 }
   
-//bool ProjectManager::delete_project_session( const std::string& session_name )
-//{
-//  boost::filesystem::path path = complete( boost::filesystem::path( this->
-//    current_project_path_state_->get().c_str(), boost::filesystem::native ) );
-//  
-//  return this->current_project_->delete_session( ( path /
-//    this->current_project_->project_name_state_->get() ), session_name );
-//}
-  
-bool ProjectManager::delete_project_session( int session_index )
+bool ProjectManager::delete_project_session( const std::string& session_name )
 {
   boost::filesystem::path path = complete( boost::filesystem::path( this->
     current_project_path_state_->get().c_str(), boost::filesystem::native ) );
   
   return this->current_project_->delete_session( ( path /
-    this->current_project_->project_name_state_->get() ), session_index );
+    this->current_project_->project_name_state_->get() ), session_name );
 }
   
 void ProjectManager::add_to_recent_projects( const std::string& project_path, 
@@ -404,7 +390,7 @@ bool ProjectManager::create_project_folders( const std::string& project_name )
     return false;
   }
   
-  try // to create a project sessions folder
+  try // to create a project data folder
   {
     boost::filesystem::path path = complete( boost::filesystem::path( this->
       current_project_path_state_->get().c_str(), boost::filesystem::native ) );
@@ -428,7 +414,7 @@ std::string ProjectManager::get_timestamp()
   time ( &rawtime );
   timeinfo = localtime ( &rawtime );
   
-  strftime ( time_buffer, 80, "%Y-%b%d-%H-%M-%S", timeinfo );
+  strftime ( time_buffer, 80, "%d-%b-%Y-%H-%M-%S", timeinfo );
   std::string current_time_stamp = time_buffer;
   return current_time_stamp;
 }
@@ -459,11 +445,10 @@ void ProjectManager::save_note( const std::string& note )
 {
   std::string user_name;
   Core::Application::Instance()->get_user_name( user_name );
-  std::vector< std::string > notes = this->current_project_->project_notes_state_->get();
 
-  notes.push_back( get_timestamp() + " - " + user_name + "|" + note );
-
-  this->current_project_->project_notes_state_->set( notes );
+  Core::ActionAdd::Dispatch( Core::Interface::GetWidgetActionContext(),
+    this->current_project_->project_notes_state_, 
+    get_timestamp() + " - " + user_name + "|" + note );
 
   this->save_project_only();
 }
@@ -493,6 +478,7 @@ double ProjectManager::get_time_since_last_saved_session() const
 
 bool ProjectManager::is_saving() const
 {
+  ASSERT_ON_APPLICATION_THREAD();
   return this->session_saving_;
 }
 

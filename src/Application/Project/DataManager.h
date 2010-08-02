@@ -83,6 +83,10 @@ public:
   // this function runs when the project emits a signal saying that a session has been deleted,
   // and removes it from the session datafile list
   void remove_session( const std::string& session_name );
+
+  // CLEAR_DATA_FILE_LIST:
+  // funtion clear out the data file list in preperation for starting a new project
+  void clear_data_file_list();
   
 private:
   // PREP_FOR_SAVE:

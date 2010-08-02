@@ -67,26 +67,28 @@ bool ActionSaveSession::run( Core::ActionContextHandle& context,
 
   progress->begin_progress_reporting();
 
-  ProjectManager::Instance()->save_project( this->is_autosave_.value() );
+  ProjectManager::Instance()->save_project( this->is_autosave_.value(), this->session_name_.value() );
 
   progress->end_progress_reporting();
 
   return true;
 }
 
-Core::ActionHandle ActionSaveSession::Create( bool is_autosave )
+Core::ActionHandle ActionSaveSession::Create( bool is_autosave, const std::string& session_name )
 {
   ActionSaveSession* action = new ActionSaveSession;
   
   action->is_autosave_.value() = is_autosave;
+  action->session_name_.value() = session_name;
   
   action->time_stamp_ = boost::posix_time::second_clock::local_time();
   return Core::ActionHandle( action );
 }
 
-void ActionSaveSession::Dispatch( Core::ActionContextHandle context, bool is_autosave )
+void ActionSaveSession::Dispatch( Core::ActionContextHandle context, bool is_autosave, 
+  std::string session_name )
 {
-  Core::ActionDispatcher::PostAction( Create( is_autosave ), context );
+  Core::ActionDispatcher::PostAction( Create( is_autosave, session_name ), context );
 }
 
 } // end namespace Seg3D

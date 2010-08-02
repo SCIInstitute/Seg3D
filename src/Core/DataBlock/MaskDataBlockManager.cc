@@ -244,22 +244,23 @@ bool MaskDataBlockManager::save_data_blocks( boost::filesystem::path data_save_p
 
   for ( size_t j = 0 ; j < mask_list.size() ; j++ )
   {
-
     boost::filesystem::path volume_path = data_save_path / 
       ( Core::ExportToString( mask_list[ j ].data_block_->
       get_generation() ) + ".nrrd" );
 
-    NrrdDataHandle nrrd = NrrdDataHandle( new NrrdData( 
-      mask_list[ j ].data_block_, mask_list[ j ].grid_transform_ ) );
-
-    std::string error;
-
-    if ( ! ( NrrdData::SaveNrrd( volume_path.string(), nrrd, error ) ) ) 
+    if( !boost::filesystem::exists( volume_path ) )
     {
-      CORE_LOG_ERROR( error );
-      return false;
+      NrrdDataHandle nrrd = NrrdDataHandle( new NrrdData( 
+        mask_list[ j ].data_block_, mask_list[ j ].grid_transform_ ) );
+
+      std::string error;
+
+      if ( ! ( NrrdData::SaveNrrd( volume_path.string(), nrrd, error ) ) ) 
+      {
+        CORE_LOG_ERROR( error );
+        return false;
+      }
     }
-  
   }
 
   return true;

@@ -33,9 +33,6 @@
 # pragma once
 #endif 
 
-// STL includes
-#include <time.h>
-
 // Boost includes
 #include <boost/filesystem.hpp>
 #include <boost/shared_ptr.hpp>
@@ -77,11 +74,11 @@ public:
   // OPEN_PROJECT:
   // this function takes the path to the desired project and loads the values from the file 
   // located at that location
-  void open_project( const std::string& project_path );//, const std::string& project_name );
+  void open_project( const std::string& project_path );
   
   // SAVE_PROJECT:
   // this function saves the values in current_project_ to the current save location
-  void save_project( bool autosave = false );
+  void save_project( bool autosave = false, std::string session_name = "" );
   
   // SAVE_PROJECT_AS:
   // this function saves the valuse in current_project_ to the desired save location
@@ -93,17 +90,15 @@ public:
   
   // SAVE_PROJECT_SESSION:
   // this function saves the current session to disk
-  bool save_project_session( bool autosave = false ); 
+  bool save_project_session( bool autosave = false, std::string session_name = "" ); 
   
   // LOAD_PROJECT_SESSION:
   // this function saves the current session to disk
-  bool load_project_session( int session_index ); 
-//  bool load_project_session( const std::string& session_name );
+  bool load_project_session( const std::string& session_name );
   
   // DELETE_PROJECT_SESSION:
   // this function deletes the current session from disk
-  bool delete_project_session( int session_index );
-//  bool delete_project_session( const std::string& session_name );
+  bool delete_project_session( const std::string& session_name );
 
   // SAVE_NOTE:
   // this function saves a note

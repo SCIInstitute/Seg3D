@@ -166,7 +166,6 @@ bool DefaultEventHandlerContext::wait_and_process_events()
   
   while ( ! ( this->private_->event_queue_.empty() ) )
   {
-
     // get the next event
     EventHandle event_handle;
     event_handle.swap( this->private_->event_queue_.front() );

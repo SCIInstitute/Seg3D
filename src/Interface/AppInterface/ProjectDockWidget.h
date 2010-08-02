@@ -92,11 +92,15 @@ private:
   // SET_SMART_SAVE_LABEL:
   // function that updates the gui to reflect the status of the smart autosave state variable
   void set_smart_save_label();
+
+  // GET_DATE:
+  // function for getting the current date to check the session names against
+  std::string get_date();
   
 private Q_SLOTS:
   // SAVE_PROJECT:
   // this function calls the Save Project Session action
-  void save_project();
+  void save_session();
   
   // SAVE_NOTE:
   // this function calls ProjectManagers save note function and then clears the editor window
@@ -121,13 +125,13 @@ private Q_SLOTS:
   // CALL_LOAD_SESSION:
   // This is an internal function that allows loading session by double clicking on the session
   // name.
-  void call_load_session( QListWidgetItem* item );
+  void call_load_session( int row, int column );
   
   // ENABLE_SAVE_NOTES_BUTTON:
   // This is an internal function that enables the button for saving notes when at least 3
   // characters have been entered.
   void enable_save_notes_button();
-  
+
 private:
   boost::shared_ptr< ProjectDockWidgetPrivate > private_;
 };

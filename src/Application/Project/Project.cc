@@ -80,7 +80,7 @@ bool Project::initialize_from_file( boost::filesystem::path project_path,
   if( stateio.import_from_file( project_path / ( project_name + ".s3d" ) ) &&
     this->load_states( stateio ) )  
   {
-    if( this->load_session( project_path, 0 ) )
+    if( this->load_session( project_path, this->get_session_name( 0 ) ) )
     {
       this->data_manager_->initialize( project_path );
       return true;
@@ -89,32 +89,18 @@ bool Project::initialize_from_file( boost::filesystem::path project_path,
   return false;
 }
   
-//  bool Project::load_session( boost::filesystem::path project_path, const std::string& session_name )
-//  {
-//    boost::filesystem::path session_path = project_path / "sessions";
-//    return  this->current_session_->initialize_from_file( session_path, session_name );
-//  }
-  
-bool Project::load_session( boost::filesystem::path project_path, int state_index )
+bool Project::load_session( boost::filesystem::path project_path, const std::string& session_name )
 {
-  std::vector< std::string > session = 
-    Core::SplitString( ( this->sessions_state_->get() )[ state_index ], "|" );
-  
-  if( session[ 0 ] == "]" )
-  {
-    return false;
-  }
-
-  boost::filesystem::path session_path = project_path / session[ 0 ];
-  return  this->current_session_->load( session_path, session[ 1 ] );
+  boost::filesystem::path session_path = project_path;
+  return  this->current_session_->load( session_path, session_name );
 }
-  
+
+//TODO: add project path as a member variable
 bool Project::save_session( boost::filesystem::path project_path, const std::string& session_name )
 {
   this->current_session_->session_name_state_->set( session_name );
   
-  if( this->current_session_->save( 
-    ( project_path / "sessions" ), session_name ) )
+  if( this->current_session_->save( project_path, session_name ) )
   {
     this->add_session_to_list( project_path, session_name );
     return true;
@@ -123,47 +109,21 @@ bool Project::save_session( boost::filesystem::path project_path, const std::str
 
 }
 
-//bool Project::delete_session( boost::filesystem::path project_path, const std::string& session_name )
-//{
-//  boost::filesystem::path session_path = project_path / "sessions";
-//  session_path = session_path / ( session_name + ".xml" );
-//  
-//  std::vector< std::string > temp_sessions_vector = this->sessions_state_->get();
-//  
-//  for( int i = 0; i < static_cast< int >( temp_sessions_vector.size() ); ++i )
-//  {
-//    if( Core::SplitString( temp_sessions_vector, "|" )[ 1 ] == session_name )
-//    {
-//      temp_sessions_vector.erase( temp_sessions_vector.begin() + i );
-//    }
-//  }
-//  
-//  this->sessions_state_->set( temp_sessions_vector );
-//  
-//  try 
-//  {
-//    boost::filesystem::remove_all( session_path );
-//  }
-//  catch(  std::exception& e ) 
-//  {
-//    CORE_LOG_ERROR( e.what() );
-//    return false;
-//  }
-//  
-//  this->data_manager_->remove_session( session_name );
-//  
-//  this->export_states( project_path, this->project_name_state_->get(), true );
-//  return true;
-//} 
-
-bool Project::delete_session( boost::filesystem::path project_path, int state_index )
+bool Project::delete_session( boost::filesystem::path project_path, const std::string& session_name )
 {
-  boost::filesystem::path session_path = project_path / "sessions";
-  session_path = session_path / (
-    ( Core::SplitString( ( this->sessions_state_->get() )[ state_index ], "|" ) )[ 1 ] + ".xml");
+  boost::filesystem::path session_path = project_path / "sessions" / ( session_name + ".xml" );
   
   std::vector< std::string > temp_sessions_vector = this->sessions_state_->get();
-  temp_sessions_vector.erase( temp_sessions_vector.begin() + state_index );
+  
+  for( int i = 0; i < static_cast< int >( temp_sessions_vector.size() ); ++i )
+  {
+    if( temp_sessions_vector[ i ] == session_name )
+    {
+      temp_sessions_vector.erase( temp_sessions_vector.begin() + i );
+      break;
+    }
+  }
+  
   this->sessions_state_->set( temp_sessions_vector );
   
   try 
@@ -176,17 +136,16 @@ bool Project::delete_session( boost::filesystem::path project_path, int state_in
     return false;
   }
   
-  std::string session_deleted_name = Core::SplitString( session_path.leaf(), "." )[ 0 ];
-
-  this->data_manager_->remove_session( session_deleted_name );
-
+  this->data_manager_->remove_session( session_name );
+  
   Core::StateIO stateio;
   stateio.initialize( "Seg3D" );
   this->save_states( stateio );
   stateio.export_to_file( project_path / ( this->project_name_state_->get() + ".s3d" ) );
   
   return true;
-}
+} 
+
   
 void Project::add_session_to_list( boost::filesystem::path project_path, const std::string& session_name )
 {
@@ -198,33 +157,35 @@ void Project::add_session_to_list( boost::filesystem::path project_path, const s
     {
       continue;
     }
-    std::string stored_session_name = ( Core::SplitString( temp_sessions_vector[ i ], "|" ) )[ 1 ];
-    if( ( stored_session_name.substr( 0, 5 ) == "AS - " ) && 
-      ( session_name.substr( 0, 5 ) == "AS - " ) )
+    
+    if( ( ( Core::SplitString( temp_sessions_vector[ i ], " - " ) )[ 1 ]== "AutoSave" ) && 
+      ( ( Core::SplitString( session_name, " - " ) )[ 1 ]== "AutoSave" ) )
     {
+      this->delete_session( project_path, temp_sessions_vector[ i ] );
       temp_sessions_vector.erase( temp_sessions_vector.begin() + i );
-      this->delete_session( project_path, i );
+      break;
     }
   }
-  temp_sessions_vector.insert( temp_sessions_vector.begin(), ( "sessions|" + session_name ) );
+  temp_sessions_vector.insert( temp_sessions_vector.begin(), ( session_name ) );
   this->sessions_state_->set( temp_sessions_vector );
 
   this->data_manager_->save_datamanager_state( project_path, session_name );
   
 }
 
-bool Project::get_session_name( int index, std::string& session_name )
+std::string Project::get_session_name( int index )
 {
   std::vector< std::string > temp_sessions_vector = this->sessions_state_->get();
+  std::string session_name = "";
   for( int i = 0; i < static_cast< int >( temp_sessions_vector.size() ); ++i )
   {
     if( i == index )
     {
-      session_name = ( Core::SplitString( temp_sessions_vector[ i ], "|" ) )[ 1 ];
-      return true;
+      session_name = temp_sessions_vector[ i ];
+      break;
     }
   }
-  return false;
+  return session_name;
 }
 
 bool Project::pre_save_states( Core::StateIO& state_io )
@@ -250,6 +211,20 @@ bool Project::post_load_states( const Core::StateIO& state_io )
   }
   return true;
 }
+
+bool Project::validate_session_name( std::string& session_name )
+{
+  std::vector< std::string > temp_sessions_vector = this->sessions_state_->get();
+  for( int i = 0; i < static_cast< int >( temp_sessions_vector.size() ); ++i )
+  {
+    if( temp_sessions_vector[ i ] == ( session_name ) )
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
 
 } // end namespace Seg3D
 

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>360</width>
+    <width>364</width>
     <height>279</height>
    </rect>
   </property>
@@ -137,6 +137,12 @@ QComboBox::icon{
       </item>
       <item>
        <widget class="QWidget" name="toolbar_" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>20</height>
+         </size>
+        </property>
         <layout class="QVBoxLayout" name="toolbar_layout_">
          <property name="spacing">
           <number>0</number>
@@ -635,6 +641,18 @@ QComboBox::icon{
                 <verstretch>0</verstretch>
                </sizepolicy>
               </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>20</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>20</height>
+               </size>
+              </property>
               <layout class="QHBoxLayout" name="common_tools_layout_">
                <property name="spacing">
                 <number>1</number>
@@ -796,6 +814,18 @@ QComboBox::icon{
             </item>
             <item>
              <widget class="QWidget" name="less_common_tools_" native="true">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>20</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>20</height>
+               </size>
+              </property>
               <layout class="QHBoxLayout" name="less_common_tools_layout_">
                <property name="spacing">
                 <number>1</number>
@@ -983,6 +1013,18 @@ QComboBox::icon{
                </item>
                <item>
                 <widget class="QToolButton" name="overlay_visible_button_">
+                 <property name="minimumSize">
+                  <size>
+                   <width>20</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>20</width>
+                   <height>20</height>
+                  </size>
+                 </property>
                  <property name="toolTip">
                   <string>Show overlay.</string>
                  </property>
@@ -1001,6 +1043,18 @@ QComboBox::icon{
                </item>
                <item>
                 <widget class="QToolButton" name="picking_lines_visible_button_">
+                 <property name="minimumSize">
+                  <size>
+                   <width>20</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>20</width>
+                   <height>20</height>
+                  </size>
+                 </property>
                  <property name="toolTip">
                   <string>Show picking lines.</string>
                  </property>

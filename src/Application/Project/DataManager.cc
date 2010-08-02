@@ -63,8 +63,7 @@ void DataManager::initialize( boost::filesystem::path project_path )
 
 void DataManager::save_datamanager_state( boost::filesystem::path project_path, const std::string& session_name )
 {
-  // TODO: Fix prep_for_save, as it mistakenly deletes all the session files.
-  //this->prep_for_save( project_path, session_name );
+  this->prep_for_save( project_path, session_name );
   Core::StateIO stateio;
   stateio.initialize( "Seg3D2" );
   this->save_states( stateio );
@@ -101,7 +100,8 @@ void DataManager::prep_for_save( boost::filesystem::path project_path, const std
       used_datafiles.push_back( session_datafiles[ j ] );
     }
   }
-  
+  project_path = project_path / "data";
+
   if ( boost::filesystem::exists( project_path ) )
   {
     boost::filesystem::directory_iterator dir_end;
@@ -159,6 +159,12 @@ void DataManager::remove_session( const std::string& session_name )
 DataManager::mutex_type& DataManager::get_mutex()
 {
   return Core::StateEngine::GetMutex();
+}
+
+void DataManager::clear_data_file_list()
+{
+  std::vector< std::string > empty_vector;
+  this->sessions_and_datafiles_state_->set( empty_vector );
 }
 
 } // end namespace seg3D

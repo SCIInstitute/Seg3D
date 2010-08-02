@@ -26,6 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+//Core Includes
+#include <Core/Utils/Log.h>
 #include <Core/DataBlock/NrrdDataBlock.h>
 #include <Core/Volume/DataVolume.h>
 
@@ -109,14 +111,19 @@ bool DataVolume::LoadDataVolume( const boost::filesystem::path& filename,
   return true;
 }
 
-bool DataVolume::SaveDataVolume( const std::string& filename, DataVolumeHandle& volume,
-  std::string& error )
+bool DataVolume::SaveDataVolume( const boost::filesystem::path& filepath, DataVolumeHandle& volume, std::string& error )
 {
+  if( !boost::filesystem::exists( filepath ) )
+  {
+    NrrdDataHandle nrrd = NrrdDataHandle( new NrrdData( 
+      volume->data_block_, volume->get_grid_transform() ) );
 
-  NrrdDataHandle nrrd = NrrdDataHandle( new NrrdData( 
-    volume->data_block_, volume->get_grid_transform() ) );
-
-  if ( ! ( NrrdData::SaveNrrd( filename, nrrd, error ) ) ) return false;
+    if ( ! ( NrrdData::SaveNrrd( filepath.string(), nrrd, error ) ) ) 
+    {
+      CORE_LOG_ERROR( error );
+      return false;
+    }
+  }
   
   return true;
 }
