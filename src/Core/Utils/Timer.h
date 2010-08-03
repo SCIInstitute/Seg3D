@@ -1,4 +1,3 @@
-#include "boost\noncopyable.hpp"
 /*
  For more information, please see: http://software.sci.utah.edu
 

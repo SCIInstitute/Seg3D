@@ -423,7 +423,7 @@ void AppMenu::open_project_folder()
     qstring_path = qstring_path.replace( QString( "/" ), QString( "\\" ) );
     process.start( "explorer.exe", QStringList() << qstring_path );
 #else
-    process.start( "open", QStringList() << QString::fromStdString( qstring_path ) );
+    process.start( "open", QStringList() << qstring_path );
 #endif
 
     if( !process.waitForFinished() )
