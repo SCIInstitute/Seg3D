@@ -32,6 +32,7 @@
 ##################################################
 
 SET(CORE_UTILS_SRCS
+  AtomicCounter.h
   ConnectionHandler.h
   ConnectionHandler.cc
   EnumClass.h
@@ -46,13 +47,14 @@ SET(CORE_UTILS_SRCS
   Log.cc
   LogHistory.h
   LogHistory.cc
+  Parallel.h
+  Parallel.cc
   ScopedCounter.h
   Singleton.h
   StringParser.h
   StringParser.cc
   StringUtil.h
   StringUtil.cc
-  AtomicCounter.h
   Timer.h
   Timer.cc
 )
