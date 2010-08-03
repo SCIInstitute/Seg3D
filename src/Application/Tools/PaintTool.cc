@@ -938,7 +938,8 @@ bool PaintTool::handle_mouse_press( const Core::MouseHistory& mouse_history,
     {
       MaskLayerHandle layer = boost::dynamic_pointer_cast< Core::MaskLayer >(
         LayerManager::Instance()->get_layer_by_id( this->target_layer_state_->get() ) );
-      paintable = layer->visible_state_[ this->private_->viewer_->get_viewer_id() ]->get();
+      paintable = layer->get_layer_group()->visibility_state_->get() && 
+        layer->visible_state_[ this->private_->viewer_->get_viewer_id() ]->get();
     }
   }
 

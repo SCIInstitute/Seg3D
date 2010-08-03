@@ -42,12 +42,6 @@
 namespace Seg3D
 {
 
-class LayerSceneItem;
-typedef boost::shared_ptr< LayerSceneItem > LayerSceneItemHandle;
-
-typedef std::vector< LayerSceneItemHandle > LayerScene;
-typedef boost::shared_ptr< LayerScene > LayerSceneHandle;
-
 class LayerSceneItem
 {
 public:
@@ -59,6 +53,7 @@ public:
 public:
   std::string layer_id_;
   double opacity_;
+  LayerHandle layer_;
   Core::GridTransform grid_transform_;
   Core::VolumeSliceHandle volume_slice_; // This value is set and used by Renderer
 };

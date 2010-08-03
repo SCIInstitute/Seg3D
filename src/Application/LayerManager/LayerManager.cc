@@ -43,6 +43,7 @@
 #include <Application/Layer/LayerGroup.h>
 #include <Application/Layer/MaskLayer.h>
 #include <Application/Layer/DataLayer.h>
+#include <Application/LayerManager/LayerScene.h>
 #include <Application/Session/Session.h>
 
 // Application action includes
@@ -71,13 +72,14 @@ LayerManager::~LayerManager()
 bool LayerManager::insert_layer( LayerHandle layer )
 {
   bool active_layer_changed = false;
+  bool new_group = false;
+  LayerGroupHandle group_handle;
   
   {
     lock_type lock( this->get_mutex() );
     
     CORE_LOG_DEBUG( std::string("Insert New Layer: ") + layer->get_layer_id());
         
-    LayerGroupHandle group_handle;
     for ( group_list_type::iterator it = group_list_.begin(); 
        it != group_list_.end(); ++it )
     {
@@ -94,6 +96,7 @@ bool LayerManager::insert_layer( LayerHandle layer )
 
     if ( !group_handle )  
     {
+      new_group = true;
       group_handle = LayerGroupHandle( new LayerGroup(  layer->get_grid_transform() ) );
       group_list_.push_back( group_handle );
       
@@ -115,9 +118,14 @@ bool LayerManager::insert_layer( LayerHandle layer )
   CORE_LOG_DEBUG( std::string( "Signalling that new layer was inserted" ) );
   CORE_LOG_DEBUG( std::string( "--- triggering signals ---" ) );
   
-  layer_inserted_signal_( layer );
-  layers_changed_signal_();
+  if ( new_group )
+  {
+    this->group_inserted_signal_( group_handle );
+  }
 
+  this->layer_inserted_signal_( layer );
+  this->layers_changed_signal_();
+  
   if( active_layer_changed )
   {
     active_layer_changed_signal_( layer );
@@ -407,7 +415,7 @@ void LayerManager::delete_layers( LayerGroupHandle group )
 // signal the listeners
   if( group->is_empty() )
   {   
-      group_deleted_signal_( group );
+      this->group_deleted_signal_( group );
   }
   
   layers_deleted_signal_( layer_vector );
@@ -471,6 +479,11 @@ LayerSceneHandle LayerManager::compose_layer_scene( size_t viewer_id )
   group_list_type::iterator group_iterator = this->group_list_.begin();
   for ( ; group_iterator != this->group_list_.end(); group_iterator++)
   {
+    if ( !( *group_iterator )->visibility_state_->get() )
+    {
+      continue;
+    }
+    
     layer_list_type layer_list = ( *group_iterator )->get_layer_list();
 
     layer_list_type::iterator layer_iterator = layer_list.begin();
@@ -518,6 +531,7 @@ LayerSceneHandle LayerManager::compose_layer_scene( size_t viewer_id )
       } // end switch
 
       layer_scene_item->layer_id_ = layer->get_layer_id();
+      layer_scene_item->layer_ = layer;
       layer_scene_item->opacity_ = layer->opacity_state_->get();
       layer_scene_item->grid_transform_ = layer->get_grid_transform();
 

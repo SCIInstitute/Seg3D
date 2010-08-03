@@ -64,11 +64,11 @@ void TimerPrivate::run()
     this->timer_condition_.timed_wait( lock, boost::posix_time::millisec( this->interval_ ) );
     if ( this->running_ )
     {
-      this->timer_->timeout_signal_();
       if ( this->single_shot_ )
       {
         this->running_ = false;
       }
+      this->timer_->timeout_signal_();
     }
   }
 
@@ -84,6 +84,7 @@ Timer::Timer( boost::int64_t interval ) :
   this->private_->running_ = false;
   this->private_->timer_ = this;
   this->private_->single_shot_ = false;
+  this->private_->timer_thread_ = 0;
 }
 
 Timer::~Timer()
@@ -96,6 +97,12 @@ void Timer::start()
   boost::mutex::scoped_lock lock( this->private_->mutex_ );
   if ( !this->private_->running_ )
   {
+    // Clean up previous timer thread
+    if ( this->private_->timer_thread_ != 0 )
+    {
+      delete this->private_->timer_thread_;
+    }
+    
     this->private_->running_ = true;
     this->private_->timer_thread_ = new boost::thread( boost::bind( 
       &TimerPrivate::run, this->private_ ) );
@@ -121,7 +128,6 @@ void Timer::stop()
 
   if ( this->private_->timer_thread_ != 0 )
   {
-    this->private_->timer_thread_->join();
     delete this->private_->timer_thread_;
     this->private_->timer_thread_ = 0;
   }

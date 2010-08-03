@@ -31,6 +31,7 @@
 
 #include <utility>
 #include <string>
+#include <vector>
 
 // Boost includes 
 #include <boost/shared_ptr.hpp>
@@ -48,6 +49,11 @@ typedef boost::shared_ptr< Layer > LayerHandle;
 typedef boost::weak_ptr< Layer > LayerWeakHandle;
 
 typedef std::pair< std::string, std::string > LayerIDNamePair;
+
+class LayerSceneItem;
+typedef boost::shared_ptr< LayerSceneItem > LayerSceneItemHandle;
+typedef std::vector< LayerSceneItemHandle > LayerScene;
+typedef boost::shared_ptr< LayerScene > LayerSceneHandle;
 
 } // end namespace Seg3D
 

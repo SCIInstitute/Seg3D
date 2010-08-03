@@ -29,6 +29,7 @@
 // Application includes
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/GradientMagnitudeFilter.h>
+#include <Application/Layer/Layer.h>
 #include <Application/LayerManager/LayerManager.h>
 
 // Register the tool into the tool factory

@@ -38,6 +38,11 @@ const char* SliceShader::FRAG_SHADER_SOURCE_C[] =
 #include "SliceShaderFrag"
 };
 
+const char* SliceShader::VERT_SHADER_SOURCE_C[] =
+{
+#include "SliceShaderVert"
+};
+
 SliceShader::SliceShader() :
   valid_( false )
 {
@@ -60,12 +65,26 @@ bool SliceShader::initialize()
     return false;
   }
 
+  this->glsl_vert_shader_.reset( new Core::GLSLVertexShader );
+  this->glsl_vert_shader_->set_source( sizeof( VERT_SHADER_SOURCE_C ) / sizeof( char* ),
+    VERT_SHADER_SOURCE_C );
+  if ( !this->glsl_vert_shader_->compile() )
+  {
+    std::string error_info = this->glsl_vert_shader_->get_info_log();
+    CORE_LOG_ERROR( std::string( "Failed compling SliceShader source: \n" ) + error_info );
+    this->glsl_frag_shader_.reset();
+    this->glsl_vert_shader_.reset();
+    return false;
+  }
+  
   this->glsl_prog_ = Core::GLSLProgramHandle( new Core::GLSLProgram );
+  this->glsl_prog_->attach_shader( this->glsl_vert_shader_ );
   this->glsl_prog_->attach_shader( this->glsl_frag_shader_ );
   if ( !this->glsl_prog_->link() )
   {
     std::string error_info = this->glsl_prog_->get_info_log();
     CORE_LOG_ERROR( std::string( "Failed linking SliceShader program: \n" ) + error_info );
+    this->glsl_vert_shader_.reset();
     this->glsl_frag_shader_.reset();
     this->glsl_prog_.reset();
     return false;
@@ -81,6 +100,7 @@ bool SliceShader::initialize()
   this->border_width_loc_ = this->glsl_prog_->get_uniform_location( "border_width" );
   this->volume_type_loc_ = this->glsl_prog_->get_uniform_location( "volume_type" );
   this->mask_color_loc_ = this->glsl_prog_->get_uniform_location( "mask_color" );
+  this->enable_lighting_loc_ = this->glsl_prog_->get_uniform_location( "enable_lighting" );
   this->glsl_prog_->disable();
 
   this->valid_ = true;
@@ -143,5 +163,11 @@ void SliceShader::set_mask_color( float r, float g, float b )
 {
   glUniform3f( this->mask_color_loc_, r, g, b );
 }
+
+void SliceShader::set_lighting( bool enabled )
+{
+  glUniform1i( this->enable_lighting_loc_, enabled );
+}
+
 
 } // end namespace Seg3D

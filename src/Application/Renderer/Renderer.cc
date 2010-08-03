@@ -43,7 +43,9 @@
 // Application includes
 #include <Application/Layer/DataLayer.h>
 #include <Application/Layer/MaskLayer.h>
+#include <Application/Layer/LayerGroup.h>
 #include <Application/LayerManager/LayerManager.h>
+#include <Application/LayerManager/LayerScene.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
 #include <Application/Renderer/Renderer.h>
 #include <Application/Tool/Tool.h>
@@ -68,6 +70,7 @@ class ProxyRectangle
 public:
   Core::Point bottomleft, bottomright, topleft, topright;
   double left, right, bottom, top;
+  Core::Vector normal;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -93,7 +96,8 @@ public:
   void draw_slices_3d( const Core::BBox& bbox, 
     const std::vector< LayerSceneHandle >& layer_scenes, 
     const std::vector< double >& depths,
-    const std::vector< std::string >& view_modes );
+    const std::vector< std::string >& view_modes,
+    bool with_lighting );
   void draw_slice( LayerSceneItemHandle layer_item, const Core::Matrix& proj_mat,
     ProxyRectangleHandle rect = ProxyRectangleHandle() );
   void viewer_slice_changed( size_t viewer_id );
@@ -119,16 +123,26 @@ void RendererPrivate::process_slices( LayerSceneHandle& layer_scene, ViewerHandl
   for ( size_t layer_num = 0; layer_num < layer_scene->size(); layer_num++ )
   {
     LayerSceneItemHandle layer_item = ( *layer_scene )[ layer_num ];
-    Core::VolumeSliceHandle volume_slice = 
-      viewer->get_volume_slice( layer_item->layer_id_ );
-
-    if ( volume_slice && !volume_slice->out_of_boundary() )
+    bool layer_visible = false;
+    if ( layer_item->layer_->visible_state_[ this->viewer_id_ ]->get() )
     {
-      volume_slice->initialize_texture();
-      volume_slice->upload_texture();
-      layer_item->volume_slice_ = volume_slice->clone();
+      Core::VolumeSliceHandle volume_slice = 
+        viewer->get_volume_slice( layer_item->layer_id_ );
+
+      if ( volume_slice && !volume_slice->out_of_boundary() )
+      {
+        volume_slice->initialize_texture();
+        volume_slice->upload_texture();
+        layer_item->volume_slice_ = volume_slice->clone();
+        layer_visible = true;
+      }
     }
-    else
+    
+    // Release the handle to the layer
+    layer_item->layer_.reset();
+
+    // Remove the LayerSceneItem if it's not visible in the current viewer
+    if ( !layer_visible )
     {
       layer_scene->erase( layer_scene->begin() + layer_num );
       layer_num--;
@@ -197,9 +211,11 @@ void RendererPrivate::picking_target_changed( size_t viewer_id )
 void RendererPrivate::draw_slices_3d( const Core::BBox& bbox, 
                 const std::vector< LayerSceneHandle >& layer_scenes, 
                 const std::vector< double >& depths,
-                const std::vector< std::string >& view_modes )
+                const std::vector< std::string >& view_modes,
+                bool with_lighting )
 {
   this->slice_shader_->enable();
+  this->slice_shader_->set_lighting( with_lighting );
   size_t num_of_viewers = layer_scenes.size();
   // for each visible 2D viewer
   for ( size_t i = 0; i < num_of_viewers; i++ )
@@ -229,6 +245,7 @@ void RendererPrivate::draw_slices_3d( const Core::BBox& bbox,
       rect->right = rect->bottomright[ 0 ];
       rect->bottom = rect->bottomleft[ 1 ];
       rect->top = rect->topleft[ 1 ];
+      rect->normal = Core::Vector( 0.0, 0.0, 1.0 );
     }
     else if ( view_mode == Viewer::CORONAL_C )
     {
@@ -250,6 +267,7 @@ void RendererPrivate::draw_slices_3d( const Core::BBox& bbox,
       rect->right = rect->bottomright[ 0 ];
       rect->bottom = rect->bottomleft[ 2 ];
       rect->top = rect->topleft[ 2 ];
+      rect->normal = Core::Vector( 0.0, 1.0, 0.0 );
     }
     else
     {
@@ -271,6 +289,7 @@ void RendererPrivate::draw_slices_3d( const Core::BBox& bbox,
       rect->right = rect->bottomright[ 1 ];
       rect->bottom = rect->bottomleft[ 2 ];
       rect->top = rect->topleft[ 2 ];
+      rect->normal = Core::Vector( 1.0, 0.0, 0.0 );
     }
 
     for ( size_t layer_num = 0; layer_num < layer_scene->size(); layer_num++ )
@@ -360,6 +379,7 @@ void RendererPrivate::draw_slice( LayerSceneItemHandle layer_item,
     double tex_bottom = ( rect->bottom - volume_slice->bottom() ) / slice_height;
     double tex_top = ( rect->top - volume_slice->top() ) / slice_height + 1.0;
     glBegin( GL_QUADS );
+    glNormal3dv( &rect->normal[ 0 ] );
     glMultiTexCoord2d( GL_TEXTURE0, tex_left, tex_bottom );
     glVertex3dv( &rect->bottomleft[ 0 ] );
     glMultiTexCoord2d( GL_TEXTURE0, tex_right, tex_bottom );
@@ -472,6 +492,16 @@ void Renderer::post_initialize()
   glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
   glDepthFunc( GL_LEQUAL );
 
+  // Set up the lighting parameters
+  float white_color[ 4 ] = { 1.0f, 1.0f, 1.0f, 1.0f };
+  float gray_color[ 4 ] = { 0.2f, 0.2f, 0.2f, 1.0f };
+  glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, white_color );
+  glMaterialfv( GL_FRONT_AND_BACK, GL_SPECULAR, gray_color );
+  glMaterialf( GL_FRONT_AND_BACK, GL_SHININESS, 128 );
+  glLightfv( GL_LIGHT0, GL_DIFFUSE, white_color );
+  glLightfv( GL_LIGHT0, GL_SPECULAR, white_color );
+  glLightModelfv( GL_LIGHT_MODEL_AMBIENT, gray_color );
+
   {
     // lock the shared render context
     Core::RenderResources::lock_type lock( Core::RenderResources::GetMutex() );
@@ -486,6 +516,7 @@ void Renderer::post_initialize()
   this->private_->slice_shader_->enable();
   this->private_->slice_shader_->set_slice_texture( 0 );
   this->private_->slice_shader_->set_pattern_texture( 1 );
+  this->private_->slice_shader_->set_lighting( false );
   this->private_->slice_shader_->disable();
   Core::Texture::SetActiveTextureUnit( 1 );
   this->private_->pattern_texture_->bind();
@@ -581,6 +612,7 @@ bool Renderer::render()
     }
 
     Core::BBox bbox = LayerManager::Instance()->get_layers_bbox();
+    bool with_lighting = viewer->volume_light_visible_state_->get();
 
     // We have got everything we want from the state engine, unlock before we do any rendering
     state_lock.unlock();
@@ -597,7 +629,7 @@ bool Renderer::render()
     gluLookAt( view3d.eyep().x(), view3d.eyep().y(), view3d.eyep().z(), view3d.lookat().x(),
         view3d.lookat().y(), view3d.lookat().z(), view3d.up().x(), view3d.up().y(), view3d.up().z() );
 
-    this->private_->draw_slices_3d( bbox, layer_scenes, depths, view_modes );
+    this->private_->draw_slices_3d( bbox, layer_scenes, depths, view_modes, with_lighting );
 
     glDisable( GL_BLEND );
   }
@@ -633,6 +665,7 @@ bool Renderer::render()
     glLoadIdentity();
 
     this->private_->slice_shader_->enable();
+    this->private_->slice_shader_->set_lighting( false );
 
     for ( size_t layer_num = 0; layer_num < layer_scene->size(); layer_num++ )
     {

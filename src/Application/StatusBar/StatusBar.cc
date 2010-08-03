@@ -29,7 +29,7 @@
 #include <Core/Interface/Interface.h>
 #include <Core/Utils/ScopedCounter.h>
 
-#include <Application/Layer/LayerFWD.h>
+#include <Application/Layer/Layer.h>
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/LayerManager/Actions/ActionActivateLayer.h>
 #include <Application/StatusBar/StatusBar.h>

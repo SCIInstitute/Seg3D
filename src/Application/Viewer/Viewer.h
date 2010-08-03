@@ -64,6 +64,9 @@ class Viewer;
 typedef boost::shared_ptr< Viewer > ViewerHandle;
 typedef boost::weak_ptr< Viewer > ViewerWeakHandle;
 
+class ViewerPrivate;
+typedef boost::shared_ptr< ViewerPrivate > ViewerPrivateHandle;
+
 // Class definition
 class Viewer : public Core::AbstractViewer, public boost::enable_shared_from_this< Viewer >
 {
@@ -71,6 +74,7 @@ class Viewer : public Core::AbstractViewer, public boost::enable_shared_from_thi
   // -- constructor/destructor --
 public:
   friend class ViewManipulator;
+  friend class ViewerPrivate;
 
   Viewer( size_t viewer_id, bool visible = true, const std::string& mode = Viewer::AXIAL_C );
   virtual ~Viewer();
@@ -271,6 +275,8 @@ public:
   const static std::string VOLUME_C;
 
 private:
+  ViewerPrivateHandle private_;
+
   const static size_t VERSION_NUMBER_C;
 
 };

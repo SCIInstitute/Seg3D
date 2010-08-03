@@ -44,11 +44,11 @@
 #include <Core/Utils/Singleton.h>
 #include <Core/Utils/Log.h>
 #include <Core/Utils/Exception.h>
+#include <Core/Volume/Volume.h>
 #include <Core/Geometry/BBox.h>
 
 // Application includes
 #include <Application/Layer/LayerFWD.h>
-#include <Application/LayerManager/LayerScene.h>
 #include <Core/State/StateHandler.h>
 
 namespace Seg3D

@@ -37,6 +37,7 @@
 // Application includes
 #include <Application/Layer/DataLayer.h>
 #include <Application/Layer/MaskLayer.h>
+#include <Application/Layer/LayerGroup.h>
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/StatusBar/StatusBar.h>
 #include <Application/Viewer/Viewer.h>
@@ -49,9 +50,6 @@
 namespace Seg3D
 {
 
-const size_t Viewer::VERSION_NUMBER_C = 1;
-
-
 CORE_ENUM_CLASS
 (
   ViewModeType,
@@ -63,6 +61,44 @@ CORE_ENUM_CLASS
   ALL_E = NON_VOLUME_E | VOLUME_E
 )
 
+//////////////////////////////////////////////////////////////////////////
+// Implementation of class ViewerPrivate
+//////////////////////////////////////////////////////////////////////////
+
+class ViewerPrivate
+{
+public:
+  void handle_layer_group_inserted( LayerGroupHandle layer_group );
+  void handle_layer_group_deleted( LayerGroupHandle layer_group );
+
+  Viewer* viewer_;
+
+};
+
+void ViewerPrivate::handle_layer_group_inserted( LayerGroupHandle layer_group )
+{
+  this->viewer_->layer_connection_map_.insert( std::make_pair( layer_group->get_group_id(),
+    layer_group->visibility_state_->state_changed_signal_.connect(
+    boost::bind( &Viewer::layer_state_changed, this->viewer_, ViewModeType::ALL_E ) ) ) );
+}
+
+void ViewerPrivate::handle_layer_group_deleted( LayerGroupHandle layer_group )
+{
+  std::pair< Viewer::connection_map_type::iterator, Viewer::connection_map_type::iterator > 
+    range = this->viewer_->layer_connection_map_.equal_range( layer_group->get_group_id() );
+
+  for ( Viewer::connection_map_type::iterator it = range.first; it != range.second; ++it )
+  {
+    ( *it ).second.disconnect();
+  }
+  this->viewer_->layer_connection_map_.erase( layer_group->get_group_id() );  
+}
+
+//////////////////////////////////////////////////////////////////////////
+// Implementation of class Viewer
+//////////////////////////////////////////////////////////////////////////
+
+const size_t Viewer::VERSION_NUMBER_C = 1;
 const std::string Viewer::AXIAL_C( "axial" );
 const std::string Viewer::CORONAL_C( "coronal" );
 const std::string Viewer::SAGITTAL_C( "sagittal" );
@@ -72,8 +108,11 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
   Core::AbstractViewer(  viewer_id, VERSION_NUMBER_C ),
   adjusting_contrast_brightness_( false ),
   signals_block_count_( 0 ),
-  slice_lock_count_( 0 )
+  slice_lock_count_( 0 ),
+  private_( new ViewerPrivate )
 {
+  this->private_->viewer_ = this;
+
   this->add_state( "view_mode", view_mode_state_, mode , SAGITTAL_C + 
     "|" + CORONAL_C + "|" + AXIAL_C + "|" + VOLUME_C );
   this->view_mode_state_->set_session_priority( Core::StateBase::DEFAULT_LOAD_E + 1 );
@@ -113,6 +152,11 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
     boost::bind( &Viewer::delete_layers, this, _1 ) ) );
   this->add_connection( LayerManager::Instance()->active_layer_changed_signal_.connect(
     boost::bind( &Viewer::set_active_layer, this, _1 ) ) );
+  this->add_connection( LayerManager::Instance()->group_inserted_signal_.connect(
+    boost::bind( &ViewerPrivate::handle_layer_group_inserted, this->private_, _1 ) ) );
+  this->add_connection( LayerManager::Instance()->group_deleted_signal_.connect(
+    boost::bind( &ViewerPrivate::handle_layer_group_deleted, this->private_, _1 ) ) );
+
   this->add_connection( this->view_mode_state_->value_changed_signal_.connect(
     boost::bind( &Viewer::change_view_mode, this, _1, _2 ) ) );
   this->add_connection( this->slice_number_state_->value_changed_signal_.connect(
@@ -133,11 +177,13 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
     boost::bind( &Viewer::redraw, this, true ) ) );
   this->add_connection( this->sagittal_view_state_->state_changed_signal_.connect(
     boost::bind( &Viewer::redraw, this, true ) ) );
+  this->add_connection( this->slice_number_state_->state_changed_signal_.connect(
+    boost::bind( &Viewer::redraw, this, true ) ) );
   // NOTE: This one is false as it is not updated by the next list
   this->add_connection( this->volume_view_state_->state_changed_signal_.connect(
     boost::bind( &Viewer::redraw, this, false ) ) );
-  this->add_connection( this->slice_number_state_->state_changed_signal_.connect(
-    boost::bind( &Viewer::redraw, this, true ) ) );
+  this->add_connection( this->volume_light_visible_state_->state_changed_signal_.connect(
+    boost::bind( &Viewer::redraw, this, false ) ) );
 
   // Connect state variables that should trigger redraw_overlay
   this->add_connection( this->view_mode_state_->state_changed_signal_.connect(
@@ -566,7 +612,7 @@ void Viewer::insert_layer( LayerHandle layer )
     boost::bind( &Viewer::layer_state_changed, this, ViewModeType::ALL_E ) ) ) );
   this->layer_connection_map_.insert( connection_map_type::value_type( layer->get_layer_id(),
     layer->visible_state_[ this->get_viewer_id() ]->state_changed_signal_.connect(
-    boost::bind( &Viewer::layer_state_changed, this, ViewModeType::NON_VOLUME_E ) ) ) );
+    boost::bind( &Viewer::layer_state_changed, this, ViewModeType::ALL_E ) ) ) );
   this->layer_connection_map_.insert( connection_map_type::value_type( layer->get_layer_id(),
     layer->layer_updated_signal_.connect( boost::bind(
     &Viewer::layer_state_changed, this, ViewModeType::ALL_E ) ) ) );

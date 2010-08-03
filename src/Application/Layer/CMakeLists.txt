@@ -32,6 +32,7 @@
 ##################################################
 
 SET(APPLICATION_LAYER_SRCS
+  LayerFWD.h
   LayerGroup.h
   LayerGroup.cc
   Layer.h

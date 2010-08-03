@@ -21,6 +21,14 @@ uniform vec2 scale_bias;
 uniform int border_width; // width of the mask border
 uniform vec2 pixel_size; // pixel size in texture space
 
+varying vec4 diffuse, ambient_global, ambient; // Light components.
+varying vec3 light_dir; // Light direction
+varying vec3 half_vector; // Half vector between eye and light source. 
+                                       // In the case of head light, it's the same as eye vector.
+varying float dist; // Distance to light source.
+varying vec3 normal; // The normal vector. It's the same all over the slice.
+uniform bool enable_lighting;
+
 vec4 shade_data_slice()
 {
   float value = texture2D( slice_tex, gl_TexCoord[0].st ).r;
@@ -107,6 +115,29 @@ vec4 shade_mask_slice()
   }
 }
 
+vec4 compute_lighting()
+{
+  vec3 n, half_v;
+  float n_dot_l, n_dot_hv;
+  vec4 color = ambient_global;
+  
+  n = normalize(normal);
+  
+  n_dot_l = abs( dot ( n, normalize( light_dir ) ) );
+
+  if ( n_dot_l > 0.0 ) 
+  {
+    color += ( diffuse * n_dot_l + ambient );
+    
+    half_v = normalize(half_vector);
+    n_dot_hv = abs( dot ( n, half_v ) );
+    color += gl_FrontMaterial.specular * gl_LightSource[0].specular * 
+            pow( n_dot_hv, gl_FrontMaterial.shininess );
+  }
+
+  return color;
+}
+
 void main()
 {
   // Discard the fragment if it's completely transparent
@@ -119,12 +150,20 @@ void main()
     gl_TexCoord[0].t > 1.0 )
     discard;
 
+  vec4 slice_color;
   if ( volume_type == 2 )
   {
-    gl_FragColor = shade_mask_slice();
+    slice_color = shade_mask_slice();
   }
   else
   {
-    gl_FragColor = shade_data_slice();
+    slice_color = shade_data_slice();
   }
+
+  if ( enable_lighting )
+  {
+    slice_color.rgb = ( slice_color * compute_lighting() ).rgb;
+  }
+
+  gl_FragColor = slice_color;
 }

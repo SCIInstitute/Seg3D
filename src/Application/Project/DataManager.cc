@@ -31,6 +31,7 @@
 
 // Application includes
 #include <Application/Project/DataManager.h>
+#include <Application/Layer/Layer.h>
 #include <Application/LayerManager/LayerManager.h>
 #include <Core/State/StateIO.h>
 

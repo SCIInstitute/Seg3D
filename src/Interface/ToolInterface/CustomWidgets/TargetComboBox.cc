@@ -30,6 +30,7 @@
 #include <Interface/ToolInterface/CustomWidgets/TargetComboBox.h>
 
 // Application Includes
+#include <Application/Layer/Layer.h>
 #include <Application/LayerManager/LayerManager.h>
 
 namespace Seg3D

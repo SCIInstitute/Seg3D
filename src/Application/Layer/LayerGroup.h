@@ -112,10 +112,6 @@ public:
   Core::StateBoolHandle visibility_state_;
   Core::StateBoolHandle show_layers_state_;
   
-  // = Layers
-  //Core::StateStringVectorHandle layers_state_;
-
-
   // -- Layers contained within group --
 protected:
   // NOTE: Only the layer manager groups the layers, this is all done

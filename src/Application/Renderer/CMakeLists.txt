@@ -36,6 +36,12 @@ ADD_CUSTOM_COMMAND(
   COMMAND ShaderImporter ${CMAKE_CURRENT_SOURCE_DIR}/SliceShader.frag ${CMAKE_CURRENT_BINARY_DIR}/SliceShaderFrag
   DEPENDS ShaderImporter ${CMAKE_CURRENT_SOURCE_DIR}/SliceShader.frag
   )
+
+ADD_CUSTOM_COMMAND(
+  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/SliceShaderVert
+  COMMAND ShaderImporter ${CMAKE_CURRENT_SOURCE_DIR}/SliceShader.vert ${CMAKE_CURRENT_BINARY_DIR}/SliceShaderVert
+  DEPENDS ShaderImporter ${CMAKE_CURRENT_SOURCE_DIR}/SliceShader.vert
+  )
    
 ##################################################
 # Set sources
@@ -49,10 +55,12 @@ SET(APPLICATION_RENDERER_SRCS
   )
   
 SET(APPLICATION_RENDERER_SHADER_RAW_SRCS
+  SliceShader.vert
   SliceShader.frag
   )
 
 SET(APPLICATION_RENDERER_SHADER_SRCS
+  SliceShaderVert
   SliceShaderFrag
   )
 

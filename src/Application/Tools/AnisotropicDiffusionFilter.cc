@@ -29,6 +29,7 @@
 // Application includes
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/AnisotropicDiffusionFilter.h>
+#include <Application/Layer/Layer.h>
 #include <Application/LayerManager/LayerManager.h>
 
 SCI_REGISTER_TOOL( Seg3D, AnisotropicDiffusionFilter )

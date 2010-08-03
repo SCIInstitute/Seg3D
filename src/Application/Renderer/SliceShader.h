@@ -59,6 +59,7 @@ public:
   void set_scale_bias( float scale, float bias );
   void set_pixel_size( float width, float height );
   void set_border_width( int width );
+  void set_lighting( bool enabled );
 
 private:
 
@@ -66,6 +67,7 @@ private:
 
   Core::GLSLProgramHandle glsl_prog_;
   Core::GLSLShaderHandle glsl_frag_shader_;
+  Core::GLSLShaderHandle glsl_vert_shader_;
 
   int slice_tex_loc_;
   int pattern_tex_loc_;
@@ -76,7 +78,9 @@ private:
   int scale_bias_loc_;
   int border_width_loc_;
   int pixel_size_loc_;
+  int enable_lighting_loc_;
 
+  const static char* VERT_SHADER_SOURCE_C[];
   const static char* FRAG_SHADER_SOURCE_C[];
 };
 
