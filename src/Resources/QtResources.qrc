@@ -61,6 +61,8 @@
     <file>Images/HelpWhite.png</file>
     <file>Images/IsosurfaceCompute.png</file>
     <file>Images/IsosurfaceComputeOff.png</file>
+    <file>Images/IsosurfaceDelete.png</file>
+    <file>Images/IsosurfaceDeleteOff.png</file>
     <file>Images/IsosurfaceVisible.png</file>
     <file>Images/IsosurfaceVisibleOff.png</file>
     <file>Images/LabelMap.png</file>
