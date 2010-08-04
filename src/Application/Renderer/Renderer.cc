@@ -723,7 +723,7 @@ bool Renderer::render_overlay()
     ViewerInfoList viewers_info[ 3 ];
     ViewerManager::Instance()->get_2d_viewers_info( viewers_info );
 
-    Core::VolumeSliceHandle active_slice = viewer->get_active_layer_slice();
+    Core::VolumeSliceHandle active_slice = viewer->get_active_volume_slice();
     std::string slice_str;
     if ( active_slice )
     {

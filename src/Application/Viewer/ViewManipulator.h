@@ -33,12 +33,12 @@
 
 #include <Core/Geometry/Quaternion.h>
 #include <Core/Geometry/Vector.h>
+#include <Core/Viewer/Mouse.h>
 
 namespace Seg3D
 {
 
 class Viewer;
-class MouseHistory;
 class ViewManipulator;
 typedef boost::shared_ptr< ViewManipulator > ViewManipulatorHandle;
 
@@ -48,10 +48,10 @@ public:
   ViewManipulator( Viewer* viewer );
   ~ViewManipulator();
 
-  inline void resize( int width, int height );
-  inline void set_scale_factor( double scale_factor );
-  inline void set_flip_y( bool flip_y );
-  inline void set_camera_mode( bool camera_mode );
+  void resize( int width, int height );
+  void set_scale_factor( double scale_factor );
+  void set_flip_y( bool flip_y );
+  void set_camera_mode( bool camera_mode );
 
   void mouse_move( const Core::MouseHistory& mouse_history, int button, int buttons, int modifiers );
   void mouse_press( const Core::MouseHistory& mouse_history, int button, int buttons, int modifiers );

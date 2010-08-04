@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>294</width>
+    <width>298</width>
     <height>770</height>
    </rect>
   </property>
@@ -226,49 +226,6 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="eraseHLayout">
-     <item>
-      <spacer name="eraseHSpacer_left">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeType">
-        <enum>QSizePolicy::MinimumExpanding</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="eraseCheckBox">
-       <property name="text">
-        <string>Erase Mode</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="eraseHSpacer_right">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeType">
-        <enum>QSizePolicy::MinimumExpanding</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
-   </item>
-   <item>
     <layout class="QHBoxLayout" name="brushHLayout">
      <property name="spacing">
       <number>0</number>
@@ -307,6 +264,20 @@
      <property name="rightMargin">
       <number>0</number>
      </property>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="eraseHLayout">
+     <property name="leftMargin">
+      <number>2</number>
+     </property>
+     <item>
+      <widget class="QCheckBox" name="eraseCheckBox">
+       <property name="text">
+        <string>Erase Mode</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
   </layout>

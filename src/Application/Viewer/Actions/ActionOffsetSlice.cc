@@ -91,7 +91,7 @@ bool ActionOffsetSlice::validate( Core::ActionContextHandle& context )
       return false;
     }
     
-    if ( !this->private_->viewer_->active_layer_slice_ )
+    if ( !this->private_->viewer_->get_active_volume_slice() )
     {
       context->report_error( "No layer loaded" );
       this->private_->viewer_.reset();

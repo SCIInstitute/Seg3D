@@ -35,6 +35,8 @@
 #include <Core/Graphics/Texture.h>
 #include <Core/RenderResources/RenderResources.h>
 #include <Core/Utils/ScopedCounter.h>
+#include <Core/Volume/DataVolumeSlice.h>
+#include <Core/Volume/MaskVolumeSlice.h>
 
 // Application includes
 #include <Application/Layer/LayerGroup.h>
@@ -930,8 +932,10 @@ bool PaintTool::handle_mouse_press( const Core::MouseHistory& mouse_history,
   }
 
   bool paintable = false;
+  bool erase = false;
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    erase = this->erase_state_->get();
     if ( modifiers == Core::KeyModifier::NO_MODIFIER_E &&
       this->target_layer_state_->get() != Tool::NONE_OPTION_C &&
       !this->private_->painting_ )
@@ -948,7 +952,7 @@ bool PaintTool::handle_mouse_press( const Core::MouseHistory& mouse_history,
     if ( button == Core::MouseButton::LEFT_BUTTON_E )
     {
       this->private_->painting_ = true;
-      this->private_->erase_ = false;
+      this->private_->erase_ = erase;
     }
     else if ( button == Core::MouseButton::RIGHT_BUTTON_E )
     {
