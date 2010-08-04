@@ -36,9 +36,14 @@ namespace Seg3D
 
 class MaskDataFilter : public Tool
 {
-SCI_TOOL_TYPE( "MaskDataFilter", "Mask Data", "Alt+Shift+M",
-  ToolGroupType::DATATODATA_E|ToolGroupType::FILTER_E,
-  "http://seg3d.org/")
+
+SEG3D_TOOL(
+SEG3D_TOOL_NAME( "MaskDataFilter", "Cut a masked region out of a data layer" )
+SEG3D_TOOL_MENULABEL( "Mask Data" )
+SEG3D_TOOL_MENU( "filter_data_to_data" )
+SEG3D_TOOL_SHORTCUT_KEY( "Alt+Shift+M" )
+SEG3D_TOOL_URL( "http://seg3d.org/" )
+)
 
 public:
   MaskDataFilter( const std::string& toolid, bool auto_number = true );

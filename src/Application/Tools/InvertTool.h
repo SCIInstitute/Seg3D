@@ -36,7 +36,15 @@ namespace Seg3D
 
 class InvertTool : public Tool
 {
-SCI_TOOL_TYPE("InvertTool", "Invert", "Alt+I", ToolGroupType::TOOL_E, "http://seg3d.org/")
+
+SEG3D_TOOL(
+SEG3D_TOOL_NAME( "InvertTool", "Tool for inverting masks" )
+SEG3D_TOOL_MENULABEL( "Invert" )
+SEG3D_TOOL_MENU( "tools" )
+SEG3D_TOOL_SHORTCUT_KEY( "Alt+I" )
+SEG3D_TOOL_URL( "http://seg3d.org/" )
+)
+
   // -- constructor/destructor --
 public:
   InvertTool( const std::string& toolid, bool auto_number = true );

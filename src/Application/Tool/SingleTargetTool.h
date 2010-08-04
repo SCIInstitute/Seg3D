@@ -1,22 +1,22 @@
 /*
  For more information, please see: http://software.sci.utah.edu
- 
+
  The MIT License
- 
+
  Copyright (c) 2009 Scientific Computing and Imaging Institute,
  University of Utah.
- 
- 
+
+
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
  the rights to use, copy, modify, merge, publish, distribute, sublicense,
  and/or sell copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included
  in all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -26,59 +26,49 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_TOOLS_INTENSITYCORRECTIONFILTER_H
-#define APPLICATION_TOOLS_INTENSITYCORRECTIONFILTER_H
+#ifndef APPLICATION_TOOL_SINGLETARGETTOOL_H
+#define APPLICATION_TOOL_SINGLETARGETTOOL_H
 
+// Application includes
 #include <Application/Tool/Tool.h>
 
 namespace Seg3D
 {
 
-class IntensityCorrectionFilter : public Tool
+// Forward declaration
+class SingleTargetToolPrivate;
+typedef boost::shared_ptr< SingleTargetToolPrivate > SingleTargetToolPrivateHandle;
+
+// CLASS TOOL:
+// The Tool class forms the basis of the tool classes
+
+// Class definition
+class SingleTargetTool : public Tool
 {
 
-SEG3D_TOOL(
-SEG3D_TOOL_NAME( "IntensityCorrectionFilter", "Correct for gradual intensity changes" )
-SEG3D_TOOL_MENULABEL( "Intensity Correction" )
-SEG3D_TOOL_MENU( "filter_data_to_data" )
-SEG3D_TOOL_SHORTCUT_KEY( "Alt+Shift+I" )
-SEG3D_TOOL_URL( "http://seg3d.org/" )
-)
-
+  // -- constructor/destructor --
 public:
-  IntensityCorrectionFilter( const std::string& toolid, bool auto_number = true );
-  virtual ~IntensityCorrectionFilter();
-
-  // -- constraint parameters --
-
-  // Constrain viewer to right painting tool when layer is selected
-  void target_constraint( std::string layerid );
-
-  // -- activate/deactivate tool --
-
-  virtual void activate();
-  virtual void deactivate();
+  SingleTargetTool( Core::VolumeType target_volume_type, const std::string& tool_type, 
+    size_t version_number, bool auto_number );
   
-private:
-  // -- handle updates from layermanager --
-  void handle_layers_changed();
+  virtual ~SingleTargetTool();
 
   // -- state --
 public:
   // Layerid of the target layer
-  Core::StateStringHandle target_layer_state_;
+  Core::StateLabeledOptionHandle target_layer_state_;
 
-  Core::StateRangedIntHandle order_state_;
+  // Whether to use the active of one from the list
+  Core::StateBoolHandle use_active_layer_state_;
 
-  Core::StateRangedDoubleHandle edge_state_;
-
-  Core::StateBoolHandle replace_state_;
+  // Whether a valid layer has been selected
+  Core::StateBoolHandle valid_target_state_;
 
 private:
-  const static size_t VERSION_NUMBER_C;
+  SingleTargetToolPrivateHandle private_;
 
 };
 
-} // end namespace
+} // end namespace Seg3D
 
 #endif

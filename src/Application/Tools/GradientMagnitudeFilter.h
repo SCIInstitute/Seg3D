@@ -36,9 +36,14 @@ namespace Seg3D
 
 class GradientMagnitudeFilter : public Tool
 {
-SCI_TOOL_TYPE( "GradientMagnitudeFilter", "Gradient Magnitude", "ALT+G",
-  ToolGroupType::DATATODATA_E|ToolGroupType::FILTER_E,
-  "http://seg3d.org/")
+
+SEG3D_TOOL(
+SEG3D_TOOL_NAME( "GradientMagnitudeFilter", "Compute the norm of the gradient" )
+SEG3D_TOOL_MENULABEL( "Gradient Magnitude" )
+SEG3D_TOOL_MENU( "filter_data_to_data" )
+SEG3D_TOOL_SHORTCUT_KEY( "Alt+G" )
+SEG3D_TOOL_URL( "http://seg3d.org/" )
+)
 
 public:
   GradientMagnitudeFilter( const std::string& toolid, bool auto_number = true );

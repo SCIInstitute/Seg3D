@@ -227,22 +227,25 @@ void AppMenu::create_tool_menu( QMenu* qmenu )
 {
   ToolInfoList tool_types_list;
 
-  ToolFactory::Instance()->list_tool_types( tool_types_list, ToolGroupType::TOOL_E );
+  ToolFactory::Instance()->list_tools( tool_types_list );
   ToolInfoList::const_iterator it = tool_types_list.begin();
   ToolInfoList::const_iterator it_end = tool_types_list.end();
 
   QAction* qaction;
   while ( it != it_end )
   {
-    // Add menu option to open tool
-    qaction = qmenu->addAction( QString::fromStdString( ( *it ).menu_name_ ) );
-    qaction->setShortcut( QString::fromStdString( ( *it ).shortcut_key_ ) );
+    if ( (*it)->get_menu() == "tools" )
+    {
+      // Add menu option to open tool
+      qaction = qmenu->addAction( QString::fromStdString( ( *it )->get_menu_label() ) );
+      qaction->setShortcut( QString::fromStdString( ( *it )->get_shortcut_key() ) );
 
-    // Connect the action with dispatching a command in the ToolManager
-    QtUtils::QtBridge::Connect( qaction, 
-      boost::bind( &ActionOpenTool::Dispatch, 
-        Core::Interface::GetWidgetActionContext(),
-        ( *it ).type_ ) );
+      // Connect the action with dispatching a command in the ToolManager
+      QtUtils::QtBridge::Connect( qaction, 
+        boost::bind( &ActionOpenTool::Dispatch, 
+          Core::Interface::GetWidgetActionContext(),
+          ( *it )->get_name() ) );
+    }
     ++it;
   }
 }
@@ -253,62 +256,66 @@ void AppMenu::create_filter_menu( QMenu* qmenu )
   ToolInfoList::const_iterator it;
   ToolInfoList::const_iterator it_end;
 
-  ToolFactory::Instance()->list_tool_types( tool_types_list, ToolGroupType::DATATODATA_E
-      | ToolGroupType::FILTER_E );
-    
+  ToolFactory::Instance()->list_tools( tool_types_list );
   it = tool_types_list.begin();
   it_end = tool_types_list.end();
   QAction* qaction;
 
   while ( it != it_end )
   {
-    // Add menu option to open tool
-    qaction = qmenu->addAction( QString::fromStdString( ( *it ).menu_name_ ) );
-    qaction->setShortcut( QString::fromStdString( ( *it ).shortcut_key_ ) );
+    if ( (*it)->get_menu() == "filter_data_to_data" )
+    {
+      // Add menu option to open tool
+      qaction = qmenu->addAction( QString::fromStdString( ( *it )->get_menu_label() ) );
+      qaction->setShortcut( QString::fromStdString( ( *it )->get_shortcut_key() ) );
 
-    // Connect the action with dispatching a command in the ToolManager
-    QtUtils::QtBridge::Connect( qaction, 
-      boost::bind( &ActionOpenTool::Dispatch, 
-        Core::Interface::GetWidgetActionContext(), ( *it ).type_ ) );
+      // Connect the action with dispatching a command in the ToolManager
+      QtUtils::QtBridge::Connect( qaction, 
+        boost::bind( &ActionOpenTool::Dispatch, 
+          Core::Interface::GetWidgetActionContext(), ( *it )->get_name() ) );
+    }
     ++it;
   }
 
   qmenu->addSeparator();
 
-  ToolFactory::Instance()->list_tool_types( tool_types_list, ToolGroupType::DATATOMASK_E
-      | ToolGroupType::FILTER_E );
-    
   it = tool_types_list.begin();
   it_end = tool_types_list.end();
+
   while ( it != it_end )
   {
-    // Add menu option to open tool
-    qaction = qmenu->addAction( QString::fromStdString( ( *it ).menu_name_ ) );
-    qaction->setShortcut( QString::fromStdString( ( *it ).shortcut_key_ ) );
+    if ( (*it)->get_menu() == "filter_data_to_mask" )
+    {
+      // Add menu option to open tool
+      qaction = qmenu->addAction( QString::fromStdString( ( *it )->get_menu_label() ) );
+      qaction->setShortcut( QString::fromStdString( ( *it )->get_shortcut_key() ) );
 
-    // Connect the action with dispatching a command in the ToolManager
-    QtUtils::QtBridge::Connect( qaction, 
-      boost::bind( &ActionOpenTool::Dispatch, 
-        Core::Interface::GetWidgetActionContext(), ( *it ).type_ ) );
+      // Connect the action with dispatching a command in the ToolManager
+      QtUtils::QtBridge::Connect( qaction, 
+        boost::bind( &ActionOpenTool::Dispatch, 
+          Core::Interface::GetWidgetActionContext(), ( *it )->get_name() ) );
+    }
     ++it;
   }
 
   qmenu->addSeparator();
 
-  ToolFactory::Instance()->list_tool_types( tool_types_list, ToolGroupType::MASKTOMASK_E
-      | ToolGroupType::FILTER_E );
   it = tool_types_list.begin();
   it_end = tool_types_list.end();
+  
   while ( it != it_end )
   {
-    // Add menu option to open tool
-    qaction = qmenu->addAction( QString::fromStdString( ( *it ).menu_name_ ) );
-    qaction->setShortcut( QString::fromStdString( ( *it ).shortcut_key_ ) );
+    if ( (*it)->get_menu() == "filter_mask_to_mask" )
+    {
+      // Add menu option to open tool
+      qaction = qmenu->addAction( QString::fromStdString( ( *it )->get_menu_label() ) );
+      qaction->setShortcut( QString::fromStdString( ( *it )->get_shortcut_key() ) );
 
-    // Connect the action with dispatching a command in the ToolManager
-    QtUtils::QtBridge::Connect( qaction, 
-      boost::bind( &ActionOpenTool::Dispatch, 
-        Core::Interface::GetWidgetActionContext(), ( *it ).type_ ) );
+      // Connect the action with dispatching a command in the ToolManager
+      QtUtils::QtBridge::Connect( qaction, 
+        boost::bind( &ActionOpenTool::Dispatch, 
+          Core::Interface::GetWidgetActionContext(), ( *it )->get_name() ) );
+    }
     ++it;
   }
 }

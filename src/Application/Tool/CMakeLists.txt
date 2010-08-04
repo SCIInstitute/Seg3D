@@ -32,8 +32,12 @@
 ##################################################
 
 SET(APPLICATION_TOOL_SRCS
+  SingleTargetTool.h
+  SingleTargetTool.cc
   Tool.h
   Tool.cc
+  ToolInfo.h
+  ToolInfo.cc
   ToolInterface.h
   ToolInterface.cc
   ToolFactory.h
@@ -48,5 +52,6 @@ TARGET_LINK_LIBRARIES(Application_Tool
                       Core_Interface
                       Core_Action
                       Core_State
-                      ${SCI_BOOST_LIBRARY})
+                      ${SCI_BOOST_LIBRARY}
+            ${SCI_TINYXML_LIBRARY})
                     

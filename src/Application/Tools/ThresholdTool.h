@@ -36,7 +36,15 @@ namespace Seg3D
 
 class ThresholdTool : public Tool
 {
-SCI_TOOL_TYPE("ThresholdTool", "Threshold", "Alt+T", ToolGroupType::TOOL_E, "http://seg3d.org/")
+
+SEG3D_TOOL(
+SEG3D_TOOL_NAME( "ThresholdTool", "Tool for thresholding data" )
+SEG3D_TOOL_MENULABEL( "Threshold" )
+SEG3D_TOOL_MENU( "tools" )
+SEG3D_TOOL_SHORTCUT_KEY( "Alt+T" )
+SEG3D_TOOL_URL( "http://seg3d.org/" )
+)
+
   // -- constructor/destructor --
 public:
   ThresholdTool( const std::string& toolid, bool auto_number = true );

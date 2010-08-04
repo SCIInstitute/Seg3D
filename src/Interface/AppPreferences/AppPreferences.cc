@@ -235,29 +235,16 @@ void AppPreferences::setup_sidebar_prefs()
   ToolInfoList::const_iterator it;
   ToolInfoList::const_iterator it_end;
   
-  ToolFactory::Instance()->list_tool_types( tool_types_list, ToolGroupType::FILTER_E );
+  ToolFactory::Instance()->list_tools( tool_types_list );
   
   it = tool_types_list.begin();
   it_end = tool_types_list.end();
   
   while ( it != it_end )
   {
-    this->private_->ui_.filter_list_->addItem( QString::fromStdString( ( *it ).menu_name_ ) );
+    this->private_->ui_.filter_list_->addItem( QString::fromStdString( ( *it )->get_menu_label() ) );
     ++it;
-  }
-
-  ToolFactory::Instance()->list_tool_types( tool_types_list, ToolGroupType::TOOL_E );
-  
-  it = tool_types_list.begin();
-  it_end = tool_types_list.end();
-  
-  while ( it != it_end )
-  {
-    this->private_->ui_.tool_list_->addItem( QString::fromStdString( ( *it ).menu_name_ ) );
-    ++it;
-  }
-  
-  
+  } 
 }
   
 void AppPreferences::setup_interface_controls_prefs()

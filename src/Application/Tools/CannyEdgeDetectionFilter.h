@@ -36,9 +36,15 @@ namespace Seg3D
 
 class CannyEdgeDetectionFilter : public Tool
 {
-SCI_TOOL_TYPE( "CannyEdgeDetectionFilter", "Canny Edge Detection", "Alt+E",
-  ToolGroupType::DATATODATA_E|ToolGroupType::FILTER_E,
-  "http://seg3d.org/")
+
+SEG3D_TOOL(
+SEG3D_TOOL_NAME( "CannyEdgeDetectionFilter", "Compute the locations of edges inside the data" )
+SEG3D_TOOL_MENULABEL( "Canny Edge Detection" )
+SEG3D_TOOL_MENU( "filter_data_to_data" )
+SEG3D_TOOL_SHORTCUT_KEY( "Alt+E" )
+SEG3D_TOOL_URL( "http://seg3d.org/" )
+)
+
 public:
   CannyEdgeDetectionFilter( const std::string& toolid, bool auto_number = true );
   virtual ~CannyEdgeDetectionFilter();

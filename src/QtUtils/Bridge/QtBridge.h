@@ -117,7 +117,8 @@ public:
   static bool Connect( QAction* qaction, std::vector<Core::StateBoolHandle>& state_handles,
     Core::StateIntHandle& index_handle );
 
-
+  // Enable / Disable a button from state engine
+  static bool Enable( QWidget* qwidget, Core::StateBoolHandle& state );
 };
 
 } // end namespace QtUtils

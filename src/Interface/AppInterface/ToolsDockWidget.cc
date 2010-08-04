@@ -120,7 +120,7 @@ void ToolsDockWidget::open_tool( ToolHandle& tool )
 
   // NOTE: The reason that the tool interface is upcasted to the real type, is
   // because the ToolFactory only stores pointers to the base classes
-  ToolFactory::Instance()->create_toolinterface( tool->type(), tool_interface );
+  ToolFactory::Instance()->create_toolinterface( tool->get_name(), tool_interface );
   ToolWidget *widget = dynamic_cast< ToolWidget* > ( tool_interface );
 
   if( widget == 0 )
@@ -136,7 +136,7 @@ void ToolsDockWidget::open_tool( ToolHandle& tool )
     boost::bind( &ActionCloseTool::Dispatch, Core::Interface::GetWidgetActionContext(), 
       tool->toolid() ),
       boost::bind( &ActionActivateTool::Dispatch, Core::Interface::GetWidgetActionContext(),
-      tool->toolid() ), tool->url() );
+      tool->toolid() ), tool->get_url() );
 
   // Step (3) : Add the tool to the list
   tool_widget_list_[ tool->toolid() ] = widget;

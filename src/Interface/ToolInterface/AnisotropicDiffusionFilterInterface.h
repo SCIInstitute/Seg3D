@@ -41,16 +41,20 @@ class AnisotropicDiffusionFilterInterface : public ToolWidget
 {
 Q_OBJECT
 
-// Constructor/destructor
+// -- Constructor/destructor --
 public:
   AnisotropicDiffusionFilterInterface();
   virtual ~AnisotropicDiffusionFilterInterface();
+
+// -- create interface --
+public:
   virtual bool build_widget( QFrame* frame );
 
+// -- run filter --
 private Q_SLOTS:
   void execute_filter();
-  void enable_run_filter( bool valid );
 
+// -- filter internals --
 private:
   boost::shared_ptr< AnisotropicDiffusionFilterInterfacePrivate > private_;
 };

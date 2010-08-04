@@ -36,9 +36,13 @@ namespace Seg3D
 
 class FillHolesFilter : public Tool
 {
-SCI_TOOL_TYPE( "FillHolesFilter", "Fill Holes", "Alt+Shift+F",
-  ToolGroupType::MASKTOMASK_E|ToolGroupType::FILTER_E,
-  "http://seg3d.org/")
+SEG3D_TOOL(
+SEG3D_TOOL_NAME( "FillHolesFilter", "Fill all the holes not marked with a seed point" )
+SEG3D_TOOL_MENULABEL( "Fill Holes" )
+SEG3D_TOOL_MENU( "filter_mask_to_mask" )
+SEG3D_TOOL_SHORTCUT_KEY( "Alt+Shift+F" )
+SEG3D_TOOL_URL( "http://seg3d.org/" )
+)
 
 public:
   FillHolesFilter( const std::string& toolid, bool auto_number = true );

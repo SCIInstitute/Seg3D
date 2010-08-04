@@ -29,47 +29,39 @@
 #ifndef APPLICATION_TOOLS_ANISOTROPICDIFFUSIONFILTER_H
 #define APPLICATION_TOOLS_ANISOTROPICDIFFUSIONFILTER_H
 
-#include <Application/Tool/Tool.h>
+#include <Application/Tool/SingleTargetTool.h>
 
 namespace Seg3D
 {
 
-class AnisotropicDiffusionFilter : public Tool
+class AnisotropicDiffusionFilter : public SingleTargetTool
 {
-SCI_TOOL_TYPE( "AnisotropicDiffusionFilter", "Anisotropic Diffusion", "Alt+A",
-  ToolGroupType::DATATODATA_E|ToolGroupType::FILTER_E,
-  "http://seg3d.org/")
+SEG3D_TOOL(
+SEG3D_TOOL_NAME( "AnisotropicDiffusionFilter", "Filter for smoothing data" )
+SEG3D_TOOL_MENULABEL( "Anisotropic Diffusion" )
+SEG3D_TOOL_MENU( "filter_data_to_data" )
+SEG3D_TOOL_SHORTCUT_KEY( "Alt+A" )
+SEG3D_TOOL_URL( "http://seg3d.org/" )
+)
 
 public:
   AnisotropicDiffusionFilter( const std::string& toolid, bool auto_number = true );
   virtual ~AnisotropicDiffusionFilter();
-
-  // -- constraint parameters --
-
-  // Constrain viewer to right painting tool when layer is selected
-  void target_constraint( std::string layerid );
-
-  // -- activate/deactivate tool --
-
-  virtual void activate();
-  virtual void deactivate();
-
-private:
-  // -- handle updates from layermanager --
-  void handle_layers_changed();
   
   // -- state --
 public:
-  // Layerid of the target layer
-  Core::StateStringHandle target_layer_state_;
+  // Whether the layer needs to be replaced
+  Core::StateBoolHandle replace_state_;
 
+  // Number of iterations the filter needs to run
   Core::StateRangedIntHandle iterations_state_;
 
+  // Number of steps needed
   Core::StateRangedIntHandle steps_state_;
 
+  // The conductance for deciding what is a similar value
   Core::StateRangedDoubleHandle conductance_state_;
 
-  Core::StateBoolHandle replace_state_;
 
 private:
   const static size_t VERSION_NUMBER_C;

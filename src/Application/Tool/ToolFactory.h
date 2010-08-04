@@ -127,27 +127,7 @@ public:
   }
 };
 
-
-class ToolInfo
-{
-public:
-  // Pointer to the factory builder, that creates the objects
-  ToolBuilderBase* builder_;
-
-  // The type of the tool
-  std::string type_;
-  
-  // The properties associated with the tool
-  int properties_;
-  
-  // The name the tool should have in the menu
-  std::string menu_name_;
-  
-  // The default short cut key used to open this tool
-  std::string shortcut_key_;
-};
-
-typedef std::vector<ToolInfo> ToolInfoList;
+typedef std::vector<ToolInfoHandle> ToolInfoList;
 
 // ------------------------------
 
@@ -175,8 +155,7 @@ public:
   // REGISTER_TOOL:
   // Register a tool so that it can be automatically built in the tool
   // factory.
-  void register_tool( ToolBuilderBase* builder, std::string type,
-    int properties, std::string menu_name, std::string shortcut_key );
+  void register_tool( ToolBuilderBase* builder, ToolInfoHandle tool_info );
 
   // REGISTER_TOOLINTERFACE:
   // Register a tool so that it can be automatically build in the tool
@@ -206,8 +185,7 @@ public:
 
   // LIST_TOOL_TYPES:
   // List the tools of a certain group
-  // TODO: Need to simplify this the tool_list_type
-  bool list_tool_types( ToolInfoList& tool_list, int tool_property );
+  bool list_tools( ToolInfoList& tool_list );
 
   // -- internals of ToolFactory --
 private:
@@ -223,8 +201,7 @@ namespace Core\
   using namespace namesp;\
   void register_##name()\
   {\
-    ToolFactory::Instance()->register_tool( new ToolBuilder<name>, name::Type(), \
-        name::Properties(), name::MenuName(), name::ShortcutKey() );\
+    ToolFactory::Instance()->register_tool( new ToolBuilder<name>, name::GetToolInfo() );\
   } \
 }
 

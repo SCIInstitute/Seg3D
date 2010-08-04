@@ -36,9 +36,14 @@ namespace Seg3D
 
 class BinaryDilateErodeFilter : public Tool
 {
-SCI_TOOL_TYPE( "BinaryDilateErodeFilter", "Binary Dialate -> Erode", "Alt+Shift+E",
-  ToolGroupType::MASKTOMASK_E|ToolGroupType::FILTER_E,
-  "http://seg3d.org/")
+
+SEG3D_TOOL(
+SEG3D_TOOL_NAME( "BinaryDilateErodeFilter", "Grow and Shrink segmentations" )
+SEG3D_TOOL_MENULABEL( "Binary Dialate -> Erode" )
+SEG3D_TOOL_MENU( "filter_mask_to_mask" )
+SEG3D_TOOL_SHORTCUT_KEY( "Alt+Shift+E" )
+SEG3D_TOOL_URL( "http://seg3d.org/" )
+)
 
 public:
   BinaryDilateErodeFilter( const std::string& toolid, bool auto_number = true );

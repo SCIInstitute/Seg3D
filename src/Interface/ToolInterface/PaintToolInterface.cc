@@ -108,13 +108,10 @@ bool PaintToolInterface::build_widget( QFrame* frame )
     tool->erase_state_ );
 
   this->private_->ui_.target_mask_->setDisabled( tool->use_active_layer_state_->get() );
-  connect( this->private_->ui_.use_active_layer_, SIGNAL( toggled( bool ) ),
+  this->connect( this->private_->ui_.use_active_layer_, SIGNAL( toggled( bool ) ),
     this->private_->ui_.target_mask_, SLOT( setDisabled( bool ) ) );
-    
-    //Send a message to the log that we have finished with building the Paint Brush Interface
-  CORE_LOG_DEBUG( "Finished building a Paint Brush Interface" );
 
-  return ( true );
+  return true;
 } 
 
 } // end namespace Seg3D

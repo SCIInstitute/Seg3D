@@ -36,9 +36,14 @@ namespace Seg3D
 
 class OtsuThresholdFilter : public Tool
 {
-SCI_TOOL_TYPE( "OtsuThresholdFilter", "Otsu Threshold", "Alt+O",
-  ToolGroupType::DATATOMASK_E|ToolGroupType::FILTER_E,
-  "http://seg3d.org/")
+
+SEG3D_TOOL(
+SEG3D_TOOL_NAME( "OtsuThresholdFilter", "Separate the data in different regions based on the histogram" )
+SEG3D_TOOL_MENULABEL( "Otsu Threshold" )
+SEG3D_TOOL_MENU( "filter_data_to_mask" )
+SEG3D_TOOL_SHORTCUT_KEY( "Alt+O" )
+SEG3D_TOOL_URL( "http://seg3d.org/" )
+)
 
 public:
   OtsuThresholdFilter( const std::string& toolid, bool auto_number = true );

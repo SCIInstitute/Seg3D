@@ -75,6 +75,36 @@ void Tool::deactivate()
   // Defaults to doing nothing
 }
 
+std::string Tool::get_name() const
+{
+  return get_tool_info()->get_name();
+}
+
+std::string Tool::get_menu() const
+{
+  return get_tool_info()->get_menu();
+}
+
+std::string Tool::get_menu_label() const
+{
+  return get_tool_info()->get_menu_label();
+}
+
+std::string Tool::get_shortcut_key() const
+{
+  return get_tool_info()->get_shortcut_key();
+}
+
+std::string Tool::get_url() const
+{
+  return get_tool_info()->get_url();
+}
+
+std::string Tool::get_definition() const
+{
+  return get_tool_info()->get_definition();
+}
+
 const std::string& Tool::toolid() const
 {
   return this->get_statehandler_id();
@@ -83,7 +113,7 @@ const std::string& Tool::toolid() const
 std::string Tool::tool_name() const
 {
   std::string tool_id = this->toolid();
-  return this->menu_name() + " " + tool_id.substr( tool_id.find( '_' ) + 1 );
+  return this->get_menu_label() + " " + tool_id.substr( tool_id.find( '_' ) + 1 );
 }
 
 bool Tool::handle_mouse_enter( size_t viewer_id, int x, int y )

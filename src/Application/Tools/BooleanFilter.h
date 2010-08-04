@@ -36,9 +36,14 @@ namespace Seg3D
 
 class BooleanFilter : public Tool
 {
-SCI_TOOL_TYPE( "BooleanFilter", "Boolean", "Alt+B",
-  ToolGroupType::MASKTOMASK_E|ToolGroupType::FILTER_E,
-  "http://seg3d.org/")
+
+SEG3D_TOOL(
+SEG3D_TOOL_NAME( "BooleanFilter", "Boolean Algebra with masks" )
+SEG3D_TOOL_MENULABEL( "Boolean" )
+SEG3D_TOOL_MENU( "filter_mask_to_mask" )
+SEG3D_TOOL_SHORTCUT_KEY( "Alt+B" )
+SEG3D_TOOL_URL( "http://seg3d.org/" )
+)
 
 public:
   BooleanFilter( const std::string& toolid, bool auto_number = true );

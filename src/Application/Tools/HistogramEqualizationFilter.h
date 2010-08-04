@@ -36,9 +36,13 @@ namespace Seg3D
 
 class HistogramEqualizationFilter : public Tool
 {
-SCI_TOOL_TYPE( "HistogramEqualizationFilter", "Histogram Equalization", "Alt+H",
-  ToolGroupType::DATATODATA_E|ToolGroupType::FILTER_E,
-  "http://seg3d.org/")
+SEG3D_TOOL(
+SEG3D_TOOL_NAME( "HistogramEqualizationFilter", "Equalize the histgram" )
+SEG3D_TOOL_MENULABEL( "Histogram Equalization" )
+SEG3D_TOOL_MENU( "filter_data_to_data" )
+SEG3D_TOOL_SHORTCUT_KEY( "Alt+H" )
+SEG3D_TOOL_URL( "http://seg3d.org/" )
+)
 
 public:
   HistogramEqualizationFilter( const std::string& toolid, bool auto_number = true );

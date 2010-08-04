@@ -36,9 +36,15 @@ namespace Seg3D
 
 class PolylineTool : public Tool
 {
-SCI_TOOL_TYPE( "PolylineTool", "Polyline", "Alt+Y",
-  ToolGroupType::TOOL_E,
-  "http://seg3d.org/" )
+
+SEG3D_TOOL(
+SEG3D_TOOL_NAME( "PolylineTool", "Tool for drawing with polylines" )
+SEG3D_TOOL_MENULABEL( "Polyline" )
+SEG3D_TOOL_MENU( "tools" )
+SEG3D_TOOL_SHORTCUT_KEY( "Alt+Y" )
+SEG3D_TOOL_URL( "http://seg3d.org/" )
+)
+
   // -- constructor/destructor --
 public:
   PolylineTool( const std::string& toolid, bool auto_number = true );

@@ -1,22 +1,22 @@
 /*
  For more information, please see: http://software.sci.utah.edu
- 
+
  The MIT License
- 
+
  Copyright (c) 2009 Scientific Computing and Imaging Institute,
  University of Utah.
- 
- 
+
+
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
  the rights to use, copy, modify, merge, publish, distribute, sublicense,
  and/or sell copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included
  in all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -26,59 +26,35 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_TOOLS_INTENSITYCORRECTIONFILTER_H
-#define APPLICATION_TOOLS_INTENSITYCORRECTIONFILTER_H
+#ifndef QTUTILS_BRIDGE_DETAIL_QTENABLECONNECTOR_H
+#define QTUTILS_BRIDGE_DETAIL_QTENABLECONNECTOR_H
 
-#include <Application/Tool/Tool.h>
+#include <QObject>
+#include <QPointer>
 
-namespace Seg3D
+#include <Core/Utils/ConnectionHandler.h>
+#include <Core/State/StateValue.h>
+
+namespace QtUtils
 {
 
-class IntensityCorrectionFilter : public Tool
+class QtEnableConnector : public QObject, protected Core::ConnectionHandler
 {
-
-SEG3D_TOOL(
-SEG3D_TOOL_NAME( "IntensityCorrectionFilter", "Correct for gradual intensity changes" )
-SEG3D_TOOL_MENULABEL( "Intensity Correction" )
-SEG3D_TOOL_MENU( "filter_data_to_data" )
-SEG3D_TOOL_SHORTCUT_KEY( "Alt+Shift+I" )
-SEG3D_TOOL_URL( "http://seg3d.org/" )
-)
-
+  Q_OBJECT
 public:
-  IntensityCorrectionFilter( const std::string& toolid, bool auto_number = true );
-  virtual ~IntensityCorrectionFilter();
+  QtEnableConnector( QWidget* parent, Core::StateBoolHandle& state );
+  virtual ~QtEnableConnector();
 
-  // -- constraint parameters --
-
-  // Constrain viewer to right painting tool when layer is selected
-  void target_constraint( std::string layerid );
-
-  // -- activate/deactivate tool --
-
-  virtual void activate();
-  virtual void deactivate();
-  
+  // -- slot functions for boost signals --
 private:
-  // -- handle updates from layermanager --
-  void handle_layers_changed();
+  static void EnableWidget( QPointer< QtEnableConnector > qpointer,
+    bool enabled, Core::ActionSource source );
 
-  // -- state --
-public:
-  // Layerid of the target layer
-  Core::StateStringHandle target_layer_state_;
-
-  Core::StateRangedIntHandle order_state_;
-
-  Core::StateRangedDoubleHandle edge_state_;
-
-  Core::StateBoolHandle replace_state_;
-
+  // -- internal variables --
 private:
-  const static size_t VERSION_NUMBER_C;
-
+  QWidget* parent_;
 };
 
-} // end namespace
+} // end namespace QtUtils
 
 #endif

@@ -53,9 +53,9 @@ typedef boost::weak_ptr< Volume > VolumeWeakHandle;
 CORE_ENUM_CLASS
 (
   VolumeType,
-  DATA_E = 1, 
-  MASK_E = 2, 
-  LABEL_E = 3
+  DATA_E = 0x1, 
+  MASK_E = 0x2, 
+  LABEL_E = 0x4
 )
 
 // Class definition

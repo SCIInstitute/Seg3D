@@ -45,6 +45,7 @@
 // Application includes
 #include <Application/Layer/LayerFWD.h>
 #include <Application/Tool/ToolFWD.h>
+#include <Application/Tool/ToolInfo.h>
 
 namespace Seg3D
 {
@@ -55,18 +56,6 @@ typedef boost::shared_ptr< ToolPrivate > ToolPrivateHandle;
 
 // CLASS TOOL:
 // The Tool class forms the basis of the tool classes
-
-
-// Tool groups help organize the tools in different categories
-CORE_ENUM_CLASS
-(
-  ToolGroupType,
-  TOOL_E = 0x0001,
-  FILTER_E = 0x0002,
-  DATATODATA_E = 0x0010,
-  DATATOMASK_E = 0x0020,
-  MASKTOMASK_E = 0x0040
-)
 
 // Class definition
 class Tool : public Core::StateHandler
@@ -80,14 +69,43 @@ public:
 
   // -- query properties of tool --
 public:
-  virtual std::string type() const = 0;
-  virtual std::string menu_name() const = 0;
-  virtual std::string shortcut_key() const = 0;
-  virtual int properties() const = 0;
-  virtual std::string url() const = 0;
+  // GET_TOOL_INFO:
+  // Get the tool information class that contains all the information about the
+  // tool.
+  // NOTE: this function is generated using the macro for each function
+  virtual ToolInfoHandle get_tool_info() const = 0;
 
+  // GET_NAME:
+  // Name of the tool
+  std::string get_name() const;
+  
+  // GET_MENU:
+  // Get the menu in which the tool is located
+  std::string get_menu() const;
+  
+  // GET_MENU_LABEL:
+  // Get the label with which the tool is displayed in the menu
+  std::string get_menu_label() const;
+  
+  // GET_SHORTCUT_KEY:
+  // Get the short cut key for this tool
+  std::string get_shortcut_key() const;
+  
+  // GET_URL:
+  // Get the URL where more information on the tool can be found
+  std::string get_url() const;
+  
+  // GET_DEFINITION:
+  // Get the definition of the tool in XML format
+  std::string get_definition() const;
+
+  // TOOLID:
+  // Get the statehandler id of this tool
   const std::string& toolid() const;
-  std::string tool_name() const;
+  
+  // TOOL_NAME:
+  // THe name that appears in the tool header
+  virtual std::string tool_name() const;
 
   // -- mouse and keyboard event handlers --
 public:
@@ -150,28 +168,50 @@ public:
 
 };
 
-// SCI_TOOL_TYPE:
-// Tool type should be defined at the top of each action. It renders code that
-// allows both the class as well as the Tool object to determine what its
-// properties are. By defining class specific static functions the class 
-// properties can be queried without instantiating the action. On the other
-// hand you want to query these properties from the object as well, even when
-// we only have a pointer to the base object. Hence we need virtual functions
-// as well. 
 
-#define SCI_TOOL_TYPE(type_string,menu_name_string,shortcut_key_string,properties_mask,help_url) \
-  public: \
-    static std::string Type() { return Core::StringToLower(type_string); } \
-    static std::string MenuName() { return menu_name_string; } \
-    static std::string ShortcutKey() { return shortcut_key_string; } \
-    static int         Properties() { return properties_mask; } \
-    static std::string Url() { return help_url; } \
-    \
-    virtual std::string type() const { return Type(); } \
-    virtual std::string menu_name() const { return MenuName(); } \
-    virtual std::string shortcut_key() const { return ShortcutKey(); } \
-    virtual int         properties() const { return Properties(); } \
-    virtual std::string url() const { return Url(); }
+#define SEG3D_TOOL_NAME( name, description ) \
+"<tool name=\"" name "\">" description "</tool>"
+
+#define SEG3D_TOOL_MENULABEL( name ) \
+"<menulabel>" name "</menulabel>"
+
+#define SEG3D_TOOL_MENU( name ) \
+"<menu>" name "</menu>"
+
+#define SEG3D_TOOL_URL( urlname ) \
+"<url>" urlname "</url>"
+
+#define SEG3D_TOOL_SHORTCUT_KEY( key ) \
+"<shortcutkey>" key "</shortcutkey>"
+
+#define SEG3D_TOOL( definition_string ) \
+public: \
+    static std::string Name() { return GetToolInfo()->get_name(); } \
+    static std::string MenuLabel() { return GetToolInfo()->get_menu_label(); } \
+    static std::string Menu() { return GetToolInfo()->get_menu(); } \
+    static std::string ShortcutKey() { return GetToolInfo()->get_shortcut_key(); } \
+    static std::string Url() { return GetToolInfo()->get_url(); } \
+  static std::string Definition() { return GetToolInfo()->get_definition(); }\
+  static Seg3D::ToolInfoHandle GetToolInfo() \
+  {\
+    static bool initialized; \
+    static Seg3D::ToolInfoHandle info; \
+    if ( !initialized ) \
+    {\
+      {\
+        Seg3D::ToolInfo::lock_type lock( Seg3D::ToolInfo::GetMutex() );\
+        std::string definition = std::string( "<?xml version=\"1.0\"?>\n" definition_string "\n" ); \
+        if ( !info ) info = Seg3D::ToolInfoHandle( new Seg3D::ToolInfo( definition ) ); \
+      }\
+      {\
+        Seg3D::ToolInfo::lock_type lock( Seg3D::ToolInfo::GetMutex() );\
+        initialized = true;\
+      }\
+    }\
+    return info;\
+  } \
+  \
+  virtual Seg3D::ToolInfoHandle get_tool_info() const { return GetToolInfo(); }
 
 } // end namespace Seg3D
 

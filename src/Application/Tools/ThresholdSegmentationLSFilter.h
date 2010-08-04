@@ -36,8 +36,15 @@ namespace Seg3D
 
 class ThresholdSegmentationLSFilter : public Tool
 {
-SCI_TOOL_TYPE( "ThresholdSegmentationLSFilter", "Segmentation Level Set", "Alt+L",
-  ToolGroupType::DATATOMASK_E|ToolGroupType::FILTER_E, "http://seg3d.org/")
+
+SEG3D_TOOL(
+SEG3D_TOOL_NAME( "ThresholdSegmentationLSFilter", "Grow a mask region outwards based on the data, geometry and local edges" )
+SEG3D_TOOL_MENULABEL( "Segmentation Level Set" )
+SEG3D_TOOL_MENU( "filter_data_to_mask" )
+SEG3D_TOOL_SHORTCUT_KEY( "Alt+L" )
+SEG3D_TOOL_URL( "http://seg3d.org/" )
+)
+
 
 public:
   ThresholdSegmentationLSFilter( const std::string& toolid, bool auto_number = true );

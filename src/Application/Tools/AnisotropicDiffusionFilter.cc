@@ -42,71 +42,20 @@ const size_t AnisotropicDiffusionFilter::VERSION_NUMBER_C = 1;
 // Register the tool into the tool factory
 
 AnisotropicDiffusionFilter::AnisotropicDiffusionFilter( const std::string& toolid, bool auto_number ) :
-  Tool( toolid, VERSION_NUMBER_C, auto_number )
+  SingleTargetTool( Core::VolumeType::DATA_E, toolid, VERSION_NUMBER_C, auto_number )
 {
-  // Need to set ranges and default values for all parameters
-  add_state( "target", this->target_layer_state_, "<none>" );
-  add_state( "iterations", this->iterations_state_, 1, 1, 100, 1 );
-  add_state( "steps", this->steps_state_, 1, 1, 100, 1 );
-  add_state( "conductance", this->conductance_state_, .10, .10, 10.0, .10 );
-  add_state( "replace", this->replace_state_, false );
-    
-  this->handle_layers_changed();
+  // Need to set ranges and default values for all parameters 
+  this->add_state( "iterations", this->iterations_state_, 1, 1, 100, 1 );
+  this->add_state( "steps", this->steps_state_, 1, 1, 100, 1 );
+  this->add_state( "conductance", this->conductance_state_, .10, .10, 10.0, .10 );
+  this->add_state( "replace", this->replace_state_, false );
 
-  // Add constaints, so that when the state changes the right ranges of
-  // parameters are selected
-  this->add_connection ( this->target_layer_state_->value_changed_signal_.connect( boost::bind(
-      &AnisotropicDiffusionFilter::target_constraint, this, _1 ) ) );
-  
-  this->add_connection ( LayerManager::Instance()->layers_changed_signal_.connect(
-    boost::bind( &AnisotropicDiffusionFilter::handle_layers_changed, this ) ) );
-    
 }
 
 AnisotropicDiffusionFilter::~AnisotropicDiffusionFilter()
 {
   disconnect_all();
 } 
-
-void AnisotropicDiffusionFilter::handle_layers_changed()
-{
-  std::vector< LayerHandle > target_layers;
-  LayerManager::Instance()->get_layers( target_layers );
-  bool target_found = false;
-  
-  for( int i = 0; i < static_cast< int >( target_layers.size() ); ++i )
-  {
-    if( ( this->target_layer_state_->get() == "<none>" ) && ( target_layers[i]->type() == 
-                                 Core::VolumeType::DATA_E ) )
-    {
-      this->target_layer_state_->set( target_layers[i]->get_layer_name(), Core::ActionSource::NONE_E );
-      target_found = true;
-      break;
-    }
-    if( target_layers[i]->get_layer_name() == this->target_layer_state_->get() ) 
-    { 
-      target_found = true;
-      break;
-    }
-  }
-  
-  if( !target_found )
-    this->target_layer_state_->set( "", Core::ActionSource::NONE_E );
-
-}
-
-void AnisotropicDiffusionFilter::target_constraint( std::string layerid )
-{
-
-}
-
-void AnisotropicDiffusionFilter::activate()
-{
-}
-
-void AnisotropicDiffusionFilter::deactivate()
-{
-}
 
 } // end namespace Seg3D
 

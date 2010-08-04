@@ -54,6 +54,7 @@
 #include <QtUtils/Bridge/detail/QtSpinBoxConnector.h>
 #include <QtUtils/Bridge/detail/QtSliderIntComboConnector.h>
 #include <QtUtils/Bridge/detail/QtSliderDoubleComboConnector.h>
+#include <QtUtils/Bridge/detail/QtEnableConnector.h>
 
 namespace QtUtils
 {
@@ -168,5 +169,12 @@ bool QtBridge::Connect( QActionGroup* qactiongroup, Core::StateOptionHandle& sta
   new QtActionGroupConnector( qactiongroup, state );
   return true;
 }
+
+bool QtBridge::Enable( QWidget* qwidget, Core::StateBoolHandle& state )
+{
+  new QtEnableConnector( qwidget, state );
+  return true;
+}
+
 
 } // end namespace QtUtils

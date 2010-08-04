@@ -44,11 +44,21 @@ ToolInterfaceBuilderBase::~ToolInterfaceBuilderBase()
 {
 }
 
+class ToolEntry
+{
+public:
+  // Pointer to the factory builder, that creates the objects
+  ToolBuilderBase* builder_;
+
+  // The tool information
+  ToolInfoHandle info_;
+};
+
 class ToolFactoryPrivate
 {
 public:
   // List with builders that can be called to generate a new object
-  typedef std::map< std::string, ToolInfo > tool_map_type;
+  typedef std::map< std::string, ToolEntry > tool_map_type;
   tool_map_type tools_;
 
   typedef std::map< std::string, ToolInterfaceBuilderBase* > toolinterface_map_type;
@@ -56,7 +66,6 @@ public:
   toolinterface_map_type toolinterfaces_;
 
 };
-
 
 CORE_SINGLETON_IMPLEMENTATION( ToolFactory );
 
@@ -69,34 +78,26 @@ ToolFactory::~ToolFactory()
 {
 }
 
-void ToolFactory::register_tool( ToolBuilderBase* builder, std::string tool_type,
-  int properties, std::string menu_name, std::string shortcut_key )
+void ToolFactory::register_tool( ToolBuilderBase* builder, ToolInfoHandle info )
 {
   lock_type lock( this->get_mutex() );
 
-  // Get the type of the tool
-  tool_type = Core::StringToLower( tool_type );
-
   // Test is tool was registered before.
-  if ( this->private_->tools_.find( tool_type ) != this->private_->tools_.end() )
+  if ( this->private_->tools_.find( info->get_name() ) != this->private_->tools_.end() )
   {
     // Actions that are registered twice, will cause problems
     // Hence the program will throw an exception.
     // As registration is done on startup, this will cause a
     // faulty program to fail always on startup.
-    CORE_THROW_LOGICERROR( std::string( "Tool '" ) + tool_type + "' is registered twice" );
+    CORE_THROW_LOGICERROR( std::string( "Tool '" ) + info->get_name() + "' is registered twice" );
   }
 
-  // Register the action and set its properties
-  ToolInfo info;
-  info.builder_ = builder;
-  info.type_ = tool_type;
-  info.properties_ = properties;
-  info.menu_name_ = menu_name;
-  info.shortcut_key_ = shortcut_key;
-  
-  this->private_->tools_[ tool_type ] = info;
-  CORE_LOG_DEBUG( std::string( "Registering tool : " ) + tool_type );
+  // Register the action and set its properties 
+  ToolEntry entry;
+  entry.builder_ = builder;
+  entry.info_ = info;
+  this->private_->tools_[ info->get_name() ] = entry;
+  CORE_LOG_DEBUG( std::string( "Registering tool : " ) + info->get_name() );
 }
 
 void ToolFactory::register_toolinterface( ToolInterfaceBuilderBase* builder,
@@ -135,11 +136,11 @@ void ToolFactory::register_toolinterface( ToolInterfaceBuilderBase* builder,
 }
 
 
-bool ToolFactory::is_tool_type( const std::string& tool_type )
+bool ToolFactory::is_tool_type( const std::string& tool_name )
 {
   lock_type lock( this->get_mutex() );
 
-  if ( this->private_->tools_.find( Core::StringToLower( tool_type ) )
+  if ( this->private_->tools_.find( Core::StringToLower( tool_name ) )
     == this->private_->tools_.end() ) return false;
 
   return true;
@@ -147,11 +148,11 @@ bool ToolFactory::is_tool_type( const std::string& tool_type )
 
 bool LessToolList( ToolInfoList::value_type val1, ToolInfoList::value_type val2 )
 {
-  return ( val1.menu_name_ < val2.menu_name_ );
+  return ( val1->get_menu_label() < val2->get_menu_label() );
 }
 
 
-bool ToolFactory::list_tool_types( ToolInfoList& tool_list, int properties )
+bool ToolFactory::list_tools( ToolInfoList& tool_list )
 {
   lock_type lock( this->get_mutex() );
 
@@ -163,13 +164,10 @@ bool ToolFactory::list_tool_types( ToolInfoList& tool_list, int properties )
   // loop through all the tools
   while ( it != this->private_->tools_.end() )
   {
-    if ( ( ( *it ).second.properties_ & properties ) == properties )
+    if ( this->private_->toolinterfaces_.find( ( *it ).first ) != 
+      this->private_->toolinterfaces_.end() )
     {
-      if ( this->private_->toolinterfaces_.find( ( *it ).first ) != 
-        this->private_->toolinterfaces_.end() )
-      {
-        tool_list.push_back( ( *it ).second );
-      }
+      tool_list.push_back( ( *it ).second.info_ );
     }
     ++it;
   }

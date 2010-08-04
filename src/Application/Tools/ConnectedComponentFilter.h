@@ -38,9 +38,14 @@ namespace Seg3D
 
 class ConnectedComponentFilter : public SeedPointsTool
 {
-SCI_TOOL_TYPE( "ConnectedComponentFilter", "Connected Component", "Alt+C",
-  ToolGroupType::MASKTOMASK_E|ToolGroupType::FILTER_E,
-  "http://seg3d.org/")
+
+SEG3D_TOOL(
+SEG3D_TOOL_NAME( "ConnectedComponentFilter", "Find everything conndected to the seed points" )
+SEG3D_TOOL_MENULABEL( "Connected Component" )
+SEG3D_TOOL_MENU( "filter_mask_to_mask" )
+SEG3D_TOOL_SHORTCUT_KEY( "Alt+C" )
+SEG3D_TOOL_URL( "http://seg3d.org/" )
+)
 
 public:
   ConnectedComponentFilter( const std::string& toolid, bool auto_number = true );
