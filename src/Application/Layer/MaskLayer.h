@@ -34,6 +34,7 @@
 #endif
 
 // Core includes
+#include <Core/Isosurface/Isosurface.h>
 #include <Core/Volume/MaskVolume.h>
 #include <Core/Utils/AtomicCounter.h>
 
@@ -117,6 +118,7 @@ private:
   Core::StateIntHandle bit_state_;
   const static size_t VERSION_NUMBER_C;
   Core::MaskVolumeHandle mask_volume_;
+  Core::IsosurfaceHandle isosurface_;
   
   // counter for generating new colors for each new mask
   static Core::AtomicCounter color_count_;

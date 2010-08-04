@@ -81,7 +81,7 @@ void RenderResources::initialize_eventhandler()
   }
 
   // Check OpenGL capabilities
-  if ( !GLEW_VERSION_2_1 )
+  if ( !GLEW_VERSION_2_0 )
   {
     this->private_->gl_capable_ = false;
     CORE_LOG_ERROR( "OpenGL 2.1 required but not found." );
@@ -90,6 +90,11 @@ void RenderResources::initialize_eventhandler()
   {
     this->private_->gl_capable_ = false;
     CORE_LOG_ERROR( "GL_EXT_framebuffer_object required but not found." );
+  }
+  if ( !GLEW_EXT_pixel_buffer_object )
+  {
+    this->private_->gl_capable_ = false;
+    CORE_LOG_ERROR( "GLEW_EXT_pixel_buffer_object required but not found." );
   }
 
   this->private_->thread_condition_variable_.notify_one();

@@ -55,6 +55,7 @@ TARGET_LINK_LIBRARIES(Application_Layer
                       Core_Action
                       Core_Application
                       Core_Interface
+                      Core_Isosurface
             Core_Resource
             Core_State
                       Core_Utils
