@@ -103,6 +103,10 @@ ViewerManager::ViewerManager() :
       connect( boost::bind( &ViewerManager::update_volume_viewers, this ) ) );
   }
   
+    // NOTE: ViewerManager needs to process these signals last
+  this->add_connection( LayerManager::Instance()->layer_inserted_signal_.connect(
+    boost::bind( &ViewerManager::update_volume_viewers, this ) ) );
+
   this->set_initializing( false );
 }
 
@@ -262,7 +266,6 @@ void ViewerManager::viewer_became_picking_target( size_t viewer_id )
 
 void ViewerManager::update_volume_viewers()
 {
-
   for ( size_t i = 0; i < 6; i++ )
   {
     ViewerHandle viewer = this->viewers_[ i ];

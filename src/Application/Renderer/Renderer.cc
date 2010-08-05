@@ -586,8 +586,7 @@ bool Renderer::render()
     for ( size_t i = 0; i < num_of_viewers; i++ )
     {
       ViewerHandle other_viewer = ViewerManager::Instance()->get_viewer( i );
-      if ( // !other_viewer->viewer_visible_state_->get() || 
-        !other_viewer->slice_visible_state_->get() || 
+      if ( !other_viewer->slice_visible_state_->get() || 
         other_viewer->is_volume_view() )
       {
         continue;
@@ -613,6 +612,7 @@ bool Renderer::render()
 
     Core::BBox bbox = LayerManager::Instance()->get_layers_bbox();
     bool with_lighting = viewer->volume_light_visible_state_->get();
+    bool draw_slices = viewer->volume_slices_visible_state_->get();
 
     // We have got everything we want from the state engine, unlock before we do any rendering
     state_lock.unlock();
@@ -629,7 +629,10 @@ bool Renderer::render()
     gluLookAt( view3d.eyep().x(), view3d.eyep().y(), view3d.eyep().z(), view3d.lookat().x(),
         view3d.lookat().y(), view3d.lookat().z(), view3d.up().x(), view3d.up().y(), view3d.up().z() );
 
-    this->private_->draw_slices_3d( bbox, layer_scenes, depths, view_modes, with_lighting );
+    if ( draw_slices )
+    {
+      this->private_->draw_slices_3d( bbox, layer_scenes, depths, view_modes, with_lighting );
+    }
 
     glDisable( GL_BLEND );
   }

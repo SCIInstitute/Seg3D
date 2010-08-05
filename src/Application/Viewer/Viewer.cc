@@ -368,9 +368,9 @@ void ViewerPrivate::delete_layers( std::vector< LayerHandle > layers )
 
 void ViewerPrivate::set_active_layer( LayerHandle layer )
 {
-  volume_slice_map_type::iterator it = this->volume_slices_.find( layer->get_layer_id() );
-  assert( it != this->volume_slices_.end() );
-  Core::VolumeSliceHandle new_active_slice = ( *it ).second;
+  Core::VolumeSliceHandle new_active_slice = this->viewer_->
+    get_volume_slice( layer->get_layer_id() );
+  assert( new_active_slice );
 
   if ( this->active_layer_slice_ == new_active_slice )
   {
@@ -860,6 +860,10 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
     boost::bind( &ViewerPrivate::handle_layer_group_inserted, this->private_, _1 ) ) );
   this->add_connection( LayerManager::Instance()->group_deleted_signal_.connect(
     boost::bind( &ViewerPrivate::handle_layer_group_deleted, this->private_, _1 ) ) );
+  this->add_connection( LayerManager::Instance()->layer_inserted_at_signal_.connect(
+    boost::bind( &Viewer::redraw, this, false ) ) );
+  this->add_connection( LayerManager::Instance()->group_inserted_at_signal_.connect(
+    boost::bind( &Viewer::redraw, this, false ) ) );
 
   this->add_connection( this->view_mode_state_->value_changed_signal_.connect(
     boost::bind( &ViewerPrivate::change_view_mode, this->private_, _1, _2 ) ) );
@@ -887,6 +891,8 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
   this->add_connection( this->volume_view_state_->state_changed_signal_.connect(
     boost::bind( &Viewer::redraw, this, false ) ) );
   this->add_connection( this->volume_light_visible_state_->state_changed_signal_.connect(
+    boost::bind( &Viewer::redraw, this, false ) ) );
+  this->add_connection( this->volume_slices_visible_state_->state_changed_signal_.connect(
     boost::bind( &Viewer::redraw, this, false ) ) );
 
   // Connect state variables that should trigger redraw_overlay
@@ -1002,7 +1008,6 @@ void Viewer::mouse_release_event( const Core::MouseHistory& mouse_history, int b
 
 void Viewer::mouse_enter_event( int x, int y )
 {
-  CORE_LOG_DEBUG( "Mouse entering viewer " + Core::ExportToString( this->get_viewer_id() ) );
   if ( this->private_->mouse_enter_handler_ )
   {
     this->private_->mouse_enter_handler_( this->get_viewer_id(), x, y );
@@ -1011,7 +1016,6 @@ void Viewer::mouse_enter_event( int x, int y )
 
 void Viewer::mouse_leave_event()
 {
-  CORE_LOG_DEBUG( "Mouse leaving viewer " + Core::ExportToString( this->get_viewer_id() ) );
   if ( this->private_->mouse_leave_handler_ )
   {
     this->private_->mouse_leave_handler_( this->get_viewer_id() );
