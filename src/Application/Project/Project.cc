@@ -73,45 +73,41 @@ Project::~Project()
 
 }
 
-bool Project::initialize_from_file( boost::filesystem::path project_path, 
-  const std::string& project_name )
+bool Project::initialize_from_file( const std::string& project_name )
 {
   Core::StateIO stateio;
-  if( stateio.import_from_file( project_path / ( project_name + ".s3d" ) ) &&
+  if( stateio.import_from_file( this->project_path_ / ( project_name + ".s3d" ) ) &&
     this->load_states( stateio ) )  
   {
-    if( this->load_session( project_path, this->get_session_name( 0 ) ) )
+    if( this->load_session( this->get_session_name( 0 ) ) )
     {
-      this->data_manager_->initialize( project_path );
+      this->data_manager_->initialize( this->project_path_ );
       return true;
     }
   }
   return false;
 }
   
-bool Project::load_session( boost::filesystem::path project_path, const std::string& session_name )
+bool Project::load_session( const std::string& session_name )
 {
-  boost::filesystem::path session_path = project_path;
-  return  this->current_session_->load( session_path, session_name );
+  return  this->current_session_->load( this->project_path_,  session_name );
 }
 
-//TODO: add project path as a member variable
-bool Project::save_session( boost::filesystem::path project_path, const std::string& session_name )
+bool Project::save_session( const std::string& session_name )
 {
   this->current_session_->session_name_state_->set( session_name );
-  
-  if( this->current_session_->save( project_path, session_name ) )
+
+  if( this->current_session_->save( this->project_path_, session_name ) )
   {
-    this->add_session_to_list( project_path, session_name );
+    this->add_session_to_list( session_name );
     return true;
   }
   return false;
-
 }
 
-bool Project::delete_session( boost::filesystem::path project_path, const std::string& session_name )
+bool Project::delete_session( const std::string& session_name )
 {
-  boost::filesystem::path session_path = project_path / "sessions" / ( session_name + ".xml" );
+  boost::filesystem::path session_path = this->project_path_ / "sessions" / ( session_name + ".xml" );
   
   std::vector< std::string > temp_sessions_vector = this->sessions_state_->get();
   
@@ -141,13 +137,13 @@ bool Project::delete_session( boost::filesystem::path project_path, const std::s
   Core::StateIO stateio;
   stateio.initialize( "Seg3D" );
   this->save_states( stateio );
-  stateio.export_to_file( project_path / ( this->project_name_state_->get() + ".s3d" ) );
+  stateio.export_to_file( this->project_path_ / ( this->project_name_state_->get() + ".s3d" ) );
   
   return true;
 } 
 
   
-void Project::add_session_to_list( boost::filesystem::path project_path, const std::string& session_name )
+void Project::add_session_to_list( const std::string& session_name )
 {
   std::vector< std::string > temp_sessions_vector = this->sessions_state_->get();
   
@@ -161,7 +157,7 @@ void Project::add_session_to_list( boost::filesystem::path project_path, const s
     if( ( ( Core::SplitString( temp_sessions_vector[ i ], " - " ) )[ 1 ]== "AutoSave" ) && 
       ( ( Core::SplitString( session_name, " - " ) )[ 1 ]== "AutoSave" ) )
     {
-      this->delete_session( project_path, temp_sessions_vector[ i ] );
+      this->delete_session( temp_sessions_vector[ i ] );
       temp_sessions_vector.erase( temp_sessions_vector.begin() + i );
       break;
     }
@@ -169,7 +165,7 @@ void Project::add_session_to_list( boost::filesystem::path project_path, const s
   temp_sessions_vector.insert( temp_sessions_vector.begin(), ( session_name ) );
   this->sessions_state_->set( temp_sessions_vector );
 
-  this->data_manager_->save_datamanager_state( project_path, session_name );
+  this->data_manager_->save_datamanager_state( this->project_path_, session_name );
   
 }
 
@@ -202,6 +198,8 @@ bool Project::pre_save_states( Core::StateIO& state_io )
 
 bool Project::post_load_states( const Core::StateIO& state_io )
 {
+  // If the user has chosen to save their custom colors as part of the project, we load them into
+  // the preferences manager from the project's state variables
   if( this->save_custom_colors_state_->get() )
   {
     for ( size_t j = 0; j < 12; j++ )
@@ -209,6 +207,10 @@ bool Project::post_load_states( const Core::StateIO& state_io )
       PreferencesManager::Instance()->color_states_[ j ]->set( this->color_states_[ j ]->get() );
     }
   }
+
+  // Once we have loaded the state of the sessions_list, we need to validate that the files exist
+  this->cleanup_session_list();
+
   return true;
 }
 
@@ -223,6 +225,31 @@ bool Project::validate_session_name( std::string& session_name )
     }
   }
   return false;
+}
+
+void Project::set_project_path( const boost::filesystem::path& project_path )
+{
+  this->project_path_ = project_path;
+}
+
+void Project::cleanup_session_list()
+{
+  std::vector< std::string > sessions_vector = this->sessions_state_->get();
+  std::vector< std::string > new_session_vector;
+
+  for( int i = 0; i < static_cast< int >( sessions_vector.size() ); ++i )
+  {
+    if( ( sessions_vector[ i ] != "" ) && ( sessions_vector[ i ] != "]" ) )
+    {
+      boost::filesystem::path session_path = this->project_path_ / "sessions" 
+        / ( sessions_vector[ i ] + ".xml" );
+      if( boost::filesystem::exists( session_path ) )
+      {
+        new_session_vector.push_back( sessions_vector[ i ] );
+      }
+    }
+  }
+  this->sessions_state_->set( new_session_vector );
 }
 
 

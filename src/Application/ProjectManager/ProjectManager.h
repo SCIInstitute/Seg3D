@@ -155,6 +155,10 @@ private:
   // this function is called when you need a timestamp as a string
   std::string get_timestamp();
 
+  // CLEANUP_PROJECTS_LIST:
+  // this function cleans up projects from the recent projects list that don't exist.
+  void cleanup_projects_list();
+
 private:
   boost::posix_time::ptime last_saved_session_time_stamp_;
   std::vector< Core::Color > project_colors_;

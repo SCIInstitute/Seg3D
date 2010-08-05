@@ -230,15 +230,6 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
       group->get_grid_transform().get_ny() );
         this->private_->size_depth_adjuster_crop_->setRange( 0, 
       group->get_grid_transform().get_nz() );
-  
-// TODO: Need to migrate this to the application thread         
-//    group->crop_size_width_state_->set( group->get_grid_transform().get_nx() );
-//    group->crop_size_height_state_->set( group->get_grid_transform().get_ny() );
-//    group->crop_size_depth_state_->set( group->get_grid_transform().get_nz() );
-  
-        this->private_->center_x_adjuster_crop_->setRange( 0, group->get_grid_transform().get_nx() );
-        this->private_->center_y_adjuster_crop_->setRange( 0, group->get_grid_transform().get_ny() );
-        this->private_->center_z_adjuster_crop_->setRange( 0, group->get_grid_transform().get_nz() );
         
         // = make the connections
         QtUtils::QtBridge::Connect( this->private_->size_width_adjuster_crop_, group->crop_size_width_state_ );
@@ -253,13 +244,6 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
         
         
         // --- TRANSFORM ---
-        // = set the default values
-        
-    // TODO: Being called from the wrong thread needs to be migrated to application thread
-    //group->transform_spacing_x_state_->set( group->get_grid_transform().spacing_x() );
-        //group->transform_spacing_y_state_->set( group->get_grid_transform().spacing_y() );
-        //group->transform_spacing_z_state_->set( group->get_grid_transform().spacing_z() );
-        
         // = make the connections
       QtUtils::QtBridge::Connect( this->private_->ui_.origin_x_spinbox_, group->transform_origin_x_state_ );
       QtUtils::QtBridge::Connect( this->private_->ui_.origin_y_spinbox_, group->transform_origin_y_state_ );
@@ -271,8 +255,10 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
         
         QtUtils::QtBridge::Connect( this->private_->ui_.transform_replace_checkBox_, group->transform_replace_state_ );
 
+  this->setMinimumHeight( 0 );
   this->private_->ui_.group_frame_layout_->setAlignment( Qt::AlignTop );
   this->private_->ui_.verticalLayout_13->setAlignment( Qt::AlignTop );
+  
 
   this->private_->overlay_ = new OverlayWidget( this );
   this->private_->overlay_->setStyleSheet( QString::fromUtf8( "background-color: rgba( 255, 0, 0, 200 )" ) );
@@ -317,7 +303,6 @@ void LayerGroupWidget::mousePressEvent( QMouseEvent *event )
   drag->setHotSpot( hotSpot );
 
   // Next we hide the LayerWidget that we are going to be dragging.
-  this->setMinimumHeight( this->height() );
   this->seethrough( true );
   this->picked_up_ = true;
 
@@ -325,13 +310,13 @@ void LayerGroupWidget::mousePressEvent( QMouseEvent *event )
   Q_EMIT picked_up_group_size_signal_( this->height() );
   
   // Finally if our drag was aborted then we reset the layers styles to be visible
-  if( ( ( drag->exec(Qt::MoveAction, Qt::MoveAction) ) == Qt::MoveAction ) && this->drop_group_set_ )
+  if( ( ( drag->exec( Qt::MoveAction, Qt::MoveAction ) ) == Qt::MoveAction ) && this->drop_group_set_ )
   {
     ActionMoveGroupAbove::Dispatch( Core::Interface::GetWidgetActionContext(), 
       this->get_group_id(), this->drop_group_->get_group_id() );
   }
   
-  this->setMinimumHeight( 0 );
+  //this->setMinimumHeight( 0 );
   this->drop_group_set_ = false;
   this->seethrough( false );
   this->private_->overlay_->hide();

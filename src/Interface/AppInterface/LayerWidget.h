@@ -152,8 +152,6 @@ private:
     boost::shared_ptr< LayerWidgetPrivate > private_;
 
 private:
-  // icons to represent the layer types
-
   
   // these member variables are for keeping track of the states of the layers so that they can
   // be represented properly in the gui

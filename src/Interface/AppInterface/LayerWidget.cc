@@ -567,7 +567,6 @@ void LayerWidget::update_widget_state( bool initialize )
   }
 }
 
-
 std::string LayerWidget::get_layer_id() const
 { 
   return this->private_->layer_->get_layer_id(); 
@@ -614,7 +613,6 @@ void LayerWidget::set_mask_background_color_from_preference_change( int color_in
 
   this->private_->ui_.type_->setStyleSheet( style_sheet );
 }
-
 
 void LayerWidget::set_group_menu_status( bool status )
 {

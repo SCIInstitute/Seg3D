@@ -104,7 +104,10 @@ ProjectDockWidget::ProjectDockWidget( QWidget *parent ) :
     
     connect( this->private_->ui_.save_session_button_, SIGNAL( clicked() ), 
       this, SLOT( save_session() ) );
-    
+
+    connect( this->private_->ui_.session_name_linedit_, SIGNAL( returnPressed() ),
+      this, SLOT( save_session() ) );
+
     connect( this->private_->ui_.load_session_button_, SIGNAL( clicked() ), 
       this, SLOT( load_session() ) );
     
@@ -120,9 +123,13 @@ ProjectDockWidget::ProjectDockWidget( QWidget *parent ) :
     connect( this->private_->ui_.note_edit_, SIGNAL( cursorPositionChanged() ),
       this, SLOT( enable_save_notes_button() ) );
 
+    
     QStringList headers;
     headers << "Time:" << "Session Name:";
     this->private_->ui_.sessions_list_->setHorizontalHeaderLabels( headers );
+    
+    this->private_->ui_.session_name_linedit_->setText( QString::fromUtf8( "UnnamedSession" ) );
+
   }
 }
 
@@ -131,19 +138,17 @@ ProjectDockWidget::~ProjectDockWidget()
   this->disconnect_all();
 }
   
-  
 void ProjectDockWidget::save_session()
 {
   std::string session_name = this->private_->ui_.session_name_linedit_->text().toStdString();
   ActionSaveSession::Dispatch( Core::Interface::GetWidgetActionContext(), false, session_name );
-  this->private_->ui_.session_name_linedit_->setText( "" );
+  this->private_->ui_.session_name_linedit_->setText( QString::fromUtf8( "UnnamedSession" ) );
 }
 
 void ProjectDockWidget::save_note()
 {
   ProjectManager::Instance()->save_note( this->private_->ui_.note_edit_->toPlainText().toStdString() );
   this->private_->ui_.note_edit_->setPlainText( QString::fromUtf8( "" ) );
-
 }
   
 void ProjectDockWidget::load_session()
@@ -230,56 +235,76 @@ void ProjectDockWidget::populate_session_list()
     this->private_->ui_.sessions_list_->removeRow( j );
   }
 
+  // The session list has a list of session files that we need to list.  The session files are 
+  // saved in the format timestamp - sessionname - username.xml
   for( int i = 0; i < static_cast< int >( sessions.size() ); ++i )
   {
-    if( ( sessions[ i ] != "" ) && ( sessions[ i ] != "]" ) )
+    // in the saving and reloading using Splitstring we occasionally get empty spaces in our
+    // vectors as well as extra ] characters, so we need to filter them out
+    if( ( sessions[ i ] == "" ) || ( sessions[ i ] == "]" ) )
     {
-      std::string session_name = sessions[ i ];
-      QTableWidgetItem *new_item_name;
-      QTableWidgetItem *new_item_time;
+      continue;
+    }
 
-      new_item_time = new QTableWidgetItem( QString::fromStdString( 
-        ( Core::SplitString( session_name, " - " ) )[ 0 ] ) );
-      new_item_name = new QTableWidgetItem( QString::fromStdString( 
-        ( Core::SplitString( session_name, " - " ) )[ 1 ] ) );
+    if( static_cast< int >( Core::SplitString( sessions[ i ], " - " ).size() ) < 3 )
+    {
+      continue;
+    }
 
-      if( ( Core::SplitString( session_name, " - " ) )[ 1 ]== "AutoSave" )
+    std::string session_name = sessions[ i ];
+    QTableWidgetItem *new_item_name;
+    QTableWidgetItem *new_item_time;
+
+    new_item_time = new QTableWidgetItem( QString::fromStdString( 
+      ( Core::SplitString( session_name, " - " ) )[ 0 ] ) );
+    new_item_name = new QTableWidgetItem( QString::fromStdString( 
+      ( Core::SplitString( session_name, " - " ) )[ 1 ] ) );
+
+    if( ( Core::SplitString( session_name, " - " ) )[ 1 ]== "AutoSave" )
+    {
+      QFont font;
+      font.setBold( true );
+      new_item_name->setFont( font );
+      new_item_time->setFont( font );
+    }
+
+    this->private_->ui_.sessions_list_->insertRow( i );
+
+    std::vector< std::string > time_vector = Core::SplitString( 
+      new_item_time->text().toStdString(), "-" );
+
+    if( time_vector.size() == 6 )
+    {
+
+      QString date_stamp = QString::fromStdString( time_vector[ 0 ] + "|" + 
+        time_vector[ 1 ] + "|" + time_vector[ 2 ] );
+
+      QString time_stamp = QString::fromStdString( time_vector[ 3 ] + ":" + 
+        time_vector[ 4 ] + ":" + time_vector[ 5 ] );
+
+      if( date_stamp.toStdString() == this->get_date() )
       {
-        QFont font;
-        font.setBold( true );
-        new_item_name->setFont( font );
-        new_item_time->setFont( font );
+        new_item_time->setText( time_stamp );
       }
-
-      this->private_->ui_.sessions_list_->insertRow( i );
-
-      std::vector< std::string > time_vector = Core::SplitString( 
-        new_item_time->text().toStdString(), "-" );
-      if( time_vector.size() == 6 )
+      else
       {
-        std::string date = time_vector[ 0 ] + "-" + time_vector[ 1 ] + "-" + time_vector[ 2 ];
-        if( date == this->get_date() )
-        {
-          new_item_time->setText( QString::fromStdString( time_vector[ 3 ] + ":" + 
-            time_vector[ 4 ] + ":" + time_vector[ 5 ] ) );
-        }
-        else
-        {
-          new_item_time->setText( QString::fromStdString( date ) );
-        }
+        new_item_time->setText( date_stamp );
       }
 
       // Add a tooltip to display the user who saved the session 
-      new_item_time->setToolTip( QString::fromUtf8( "This session was saved by: " )
-        + QString::fromStdString( ( Core::SplitString( session_name, " - " ) )[ 2 ] ) );
-      new_item_name->setToolTip( QString::fromUtf8( "This session was saved by: " )
-        + QString::fromStdString( ( Core::SplitString( session_name, " - " ) )[ 2 ] ) );
-    
-      std::string test = new_item_time->text().toStdString();
-      this->private_->ui_.sessions_list_->setItem( i, 0, new_item_time );
-      this->private_->ui_.sessions_list_->setItem( i, 1, new_item_name );
-      this->private_->ui_.sessions_list_->verticalHeader()->resizeSection( i, 24 );
+      QString tool_tip = QString::fromUtf8( "This session was saved by: " )
+        + QString::fromStdString( ( Core::SplitString( session_name, " - " ) )[ 2 ] ) 
+        + " on " + date_stamp + " at " + time_stamp;
+
+      new_item_time->setToolTip( tool_tip );
+      new_item_name->setToolTip( tool_tip );
     }
+
+    std::string test = new_item_time->text().toStdString();
+    this->private_->ui_.sessions_list_->setItem( i, 0, new_item_time );
+    this->private_->ui_.sessions_list_->setItem( i, 1, new_item_name );
+    this->private_->ui_.sessions_list_->verticalHeader()->resizeSection( i, 24 );
+    
   }
 
   this->private_->ui_.sessions_list_->verticalHeader()->setUpdatesEnabled( true );
@@ -300,7 +325,6 @@ void ProjectDockWidget::populate_notes_list()
   {
     return;
   }
-
 
   for( int i = num_of_notes - 1; i >= 0; i-- )
   {
@@ -416,7 +440,6 @@ void ProjectDockWidget::set_smart_save_label()
     this->private_->ui_.smart_autosave_status_label_->setText( 
       QString::fromUtf8( "INACTIVE" ) );
   }
-
 }
 
 std::string ProjectDockWidget::get_date()
@@ -428,7 +451,7 @@ std::string ProjectDockWidget::get_date()
   time ( &rawtime );
   timeinfo = localtime ( &rawtime );
 
-  strftime ( time_buffer, 80, "%d-%b-%Y", timeinfo );
+  strftime ( time_buffer, 80, "%d|%b|%Y", timeinfo );
   std::string date = time_buffer;
   return date;
 }

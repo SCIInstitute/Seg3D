@@ -58,6 +58,7 @@ void AutoSave::start()
     connect( boost::bind( &AutoSave::recompute_auto_save, this ) ) );
 
   this->auto_save_thread_ = boost::thread( boost::bind( &AutoSave::run, this ) );
+
 }
 
 void AutoSave::run()

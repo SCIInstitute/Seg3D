@@ -87,21 +87,22 @@ public:
 public:
   // INITIALIZE_FROM_FILE:
   // this file initializes the state values for project from the file at the path specified
-  bool initialize_from_file( boost::filesystem::path project_path, const std::string& project_name );
-  
+/*  bool initialize_from_file( boost::filesystem::path project_path, const std::string& project_name );*/
+  bool initialize_from_file( const std::string& project_name );
+
   // LOAD_SESSION:
   // this function will be called to load a specific session
-  //bool load_session( boost::filesystem::path project_path, int state_index );
-  bool load_session( boost::filesystem::path project_path, const std::string& session_name );
+  bool load_session( const std::string& session_name );
+  //bool load_session( boost::filesystem::path project_path, const std::string& session_name );
   
   // SAVE_SESSION:
   // this function will be called from the project manager to save a session
-  bool save_session( boost::filesystem::path project_path, const std::string& session_name );
+  bool save_session( const std::string& session_name );
+/*  bool save_session( boost::filesystem::path project_path, const std::string& session_name );*/
   
   // DELETE_SESSION:
   // this function will be called by the project manager to delete a session
-//  bool delete_session( boost::filesystem::path project_path, int state_index );
-  bool delete_session( boost::filesystem::path project_path, const std::string& session_name );
+  bool delete_session( const std::string& session_name );
   
   // NAME_IS_SET:
   // this function is set called to set the name_set_ toggle in the project so it knows if the name
@@ -131,6 +132,10 @@ public:
   // CLEAR_DATAMANAGER_LIST:
   // function for clearing out the datamanager list
   void clear_datamanager_list(){ this->data_manager_->clear_data_file_list(); }
+
+  // SET_PROJECT_PATH:
+  // function that lets the project manager set the project path for the project
+  void Project::set_project_path( const boost::filesystem::path& project_path );
   
 protected:
   // PRE_SAVE_STATES:
@@ -144,13 +149,18 @@ protected:
 private:
   // ADD_SESSION_TO_LIST
   // this function adds sessions to the list of sessions that is stored in the projects state
-  void add_session_to_list( boost::filesystem::path project_path, const std::string& session_path_and_name );
-  
+  void add_session_to_list( const std::string& session_path_and_name );
+
+  // CLEANUP_SESSION_LIST:
+  // this function cleans up sessions in the session list that have been deleted by the user
+  void cleanup_session_list();
+
 private:
   SessionHandle current_session_;
   bool name_set_;
   const static size_t VERSION_NUMBER_C;
   DataManagerHandle data_manager_;
+  boost::filesystem::path project_path_;
   
 };
 

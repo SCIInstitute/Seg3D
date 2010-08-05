@@ -71,10 +71,11 @@ private Q_SLOTS:
 
   // SLOTS: These functions connect to the buttons for importing the data as a specific
   // layer type.
-  void set_data();
-  void set_single_mask();
-  void set_bitplane_mask();
-  void set_label_mask();
+  void set_type( int file_type );
+//  void set_data();
+//  void set_single_mask();
+//  void set_bitplane_mask();
+//  void set_label_mask();
 
   // SLOT IMPORT: execute this function when the import button is selected
   void import();
@@ -82,7 +83,7 @@ private Q_SLOTS:
 private:
   // UPDATE_ICONS:
   // Update the icons to reflect active mode
-  void update_icons();
+  //void update_icons();
 
   // SET_MODE:
   // Set the mode of the importer
@@ -117,7 +118,7 @@ private:
   
   // CENTER
   void center_widget_on_screen( QWidget *widget );
-  
+
 };
 
 } //endnamespace Seg3d

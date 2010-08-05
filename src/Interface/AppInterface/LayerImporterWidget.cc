@@ -52,79 +52,75 @@ namespace Seg3D
 class LayerImporterWidgetPrivate
 {
 public:
-  Ui::LayerImportWidget ui_;
+  Ui::LayerImporterWidget ui_;
   
-  QIcon data_icon_;
-  QIcon single_mask_icon_;
-  QIcon bitplane_mask_icon_;
-  QIcon label_mask_icon_;
-
-  QIcon data_off_icon_;
-  QIcon single_mask_off_icon_;
-  QIcon bitplane_mask_off_icon_;
-  QIcon label_mask_off_icon_;
-  
-  LayerImporterWidgetPrivate()
-  {
-    this->data_icon_.addFile( 
-      QString::fromUtf8( ":/Images/DataVolume.png" ),
-      QSize(48,48), QIcon::Normal, QIcon::Off );
-    this->data_off_icon_.addFile( 
-      QString::fromUtf8( ":/Images/DataVolumeOff.png" ),
-      QSize(48,48), QIcon::Normal, QIcon::Off );
-      
-    this->single_mask_icon_.addFile( 
-      QString::fromUtf8( ":/Images/SingleMask.png" ), 
-      QSize(48,48), QIcon::Normal, QIcon::Off );
-    this->single_mask_off_icon_.addFile( 
-      QString::fromUtf8( ":/Images/SingleMaskOff.png" ), 
-      QSize(48,48), QIcon::Normal, QIcon::Off );
-
-    this->bitplane_mask_icon_.addFile( 
-      QString::fromUtf8( ":/Images/BitPlaneMask.png" ), 
-      QSize(48,48), QIcon::Normal, QIcon::Off );
-    this->bitplane_mask_off_icon_.addFile( 
-      QString::fromUtf8( ":/Images/BitPlaneMaskOff.png" ), 
-      QSize(48,48), QIcon::Normal, QIcon::Off );
-
-    this->label_mask_icon_.addFile( 
-      QString::fromUtf8( ":/Images/LabelMask.png" ), 
-      QSize(48,48), QIcon::Normal, QIcon::Off );  
-    this->label_mask_off_icon_.addFile( 
-      QString::fromUtf8( ":/Images/LabelMaskOff.png" ), 
-      QSize(48,48), QIcon::Normal, QIcon::Off );  
-  }
+  QPushButton *data_volume_button;
+  QPushButton *mask_single_button;
+  QPushButton *mask_1234_button;
+  QPushButton *mask_1248_button;
+  QButtonGroup *type_button_group;
 
 };
 
 LayerImporterWidget::LayerImporterWidget( LayerImporterHandle importer, QWidget* parent ) :
   QDialog( parent ),
   importer_(importer),
-  mode_(LayerImporterMode::INVALID_E)
+  mode_(LayerImporterMode::INVALID_E),
+  private_( new LayerImporterWidgetPrivate )
 {
   // Step (1): Ensure it will be the only focus in the pogram
   setWindowModality(  Qt::ApplicationModal );
-  setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred );
-  setMinimumHeight( 100 );
   
   // Step (2): Make a new LayerImporterWidgetPrivateHandle object
-  this->private_ = LayerImporterWidgetPrivateHandle( new LayerImporterWidgetPrivate );
   this->private_->ui_.setupUi( this );
 
-  // Step (3): Hide the parts of the UI that cannot be used yet
-  
-  this->private_->ui_.file_info_->hide();
+  // Step (3): Add the buttons
+  this->private_->type_button_group = new QButtonGroup( this );
+  this->private_->type_button_group->setExclusive( true );
+
+  this->private_->data_volume_button = new QPushButton( this->private_->ui_.data_ );
+  this->private_->data_volume_button->setObjectName( "data_volume_button" );
+  this->private_->data_volume_button->setFlat( true );
+  this->private_->data_volume_button->setCheckable( true );
+  this->private_->data_volume_button->setMinimumSize( this->private_->ui_.data_->size() );
+  this->private_->type_button_group->addButton( this->private_->data_volume_button, 0 );
+
+  this->private_->mask_single_button = new QPushButton( this->private_->ui_.single_mask_ );
+  this->private_->mask_single_button->setObjectName( "mask_single_button" );
+  this->private_->mask_single_button->setFlat( true );
+  this->private_->mask_single_button->setCheckable( true );
+  this->private_->mask_single_button->setMinimumSize( this->private_->ui_.single_mask_->size() );
+  this->private_->type_button_group->addButton( this->private_->mask_single_button, 1 );
+
+  this->private_->mask_1234_button = new QPushButton( this->private_->ui_.bitplane_mask_ );
+  this->private_->mask_1234_button->setObjectName( "mask_1234_button" );
+  this->private_->mask_1234_button->setFlat( true );
+  this->private_->mask_1234_button->setCheckable( true );
+  this->private_->mask_1234_button->setMinimumSize( this->private_->ui_.bitplane_mask_->size() );
+  this->private_->type_button_group->addButton( this->private_->mask_1234_button, 2 );
+
+  this->private_->mask_1248_button = new QPushButton( this->private_->ui_.label_mask_ );
+  this->private_->mask_1248_button->setObjectName( "mask_1248_button" );
+  this->private_->mask_1248_button->setFlat( true );
+  this->private_->mask_1248_button->setCheckable( true );
+  this->private_->mask_1248_button->setMinimumSize( this->private_->ui_.label_mask_->size() );
+  this->private_->type_button_group->addButton( this->private_->mask_1248_button, 3 );
+
+  // Step (4): Hide the parts of the UI that cannot be used yet
   this->private_->ui_.importer_options_->hide();
-  this->private_->ui_.scanning_file_->show();
+  this->private_->ui_.file_name_table_->hide();
+  this->private_->ui_.scanning_file_->hide();
+
+  this->resize( 10, 10 );
+
   this->private_->ui_.import_button_->setEnabled( false );
 
-  adjustSize();
-
-  // Step (4): Activate the cancel button
+  // Step (5): Activate the cancel button
   connect( this->private_->ui_.cancel_button_, SIGNAL( released() ),
     this, SLOT( reject() ) );
 
-  // Step (5): Asynchronously scan file, so UI stays interactive
+  // Step (6): Show Scanning Widget then Asynchronously scan file, so UI stays interactive
+  this->private_->ui_.scanning_file_->show();
   boost::thread( boost::bind( &LayerImporterWidget::ScanFile, 
     qpointer_type( this ), importer_ ) );
 }
@@ -136,103 +132,81 @@ LayerImporterWidget::~LayerImporterWidget()
 void LayerImporterWidget::list_import_options()
 {
   this->setUpdatesEnabled( false );
-  
+
+  // We are done scanning, so we hide the scanning widget
+  this->private_->ui_.scanning_file_->hide();
+
   // Step (1): Switch off options that this importer does not support
   int importer_modes = importer_->get_importer_modes();
 
   if( importer_modes & LayerImporterMode::LABEL_MASK_E )
   {
     this->private_->ui_.label_mask_->show();
-    this->private_->ui_.label_mask_label_->show();
+    this->private_->mask_1234_button->setChecked( true );
     this->mode_ = LayerImporterMode::LABEL_MASK_E;
   }
   else
   {
     this->private_->ui_.label_mask_->hide();
-    this->private_->ui_.label_mask_label_->hide();
   }
 
   if( importer_modes & LayerImporterMode::BITPLANE_MASK_E )
   {
     this->private_->ui_.bitplane_mask_->show();
-    this->private_->ui_.bitplane_mask_label_->show();
+    this->private_->mask_1248_button->setChecked( true );
     this->mode_ = LayerImporterMode::BITPLANE_MASK_E;
   }
   else
   {
     this->private_->ui_.bitplane_mask_->hide();
-    this->private_->ui_.bitplane_mask_label_->hide();
   }
 
   if( importer_modes & LayerImporterMode::SINGLE_MASK_E )
   {
     this->private_->ui_.single_mask_->show();
-    this->private_->ui_.single_mask_label_->show();
+    this->private_->mask_single_button->setChecked( true );
     this->mode_ = LayerImporterMode::SINGLE_MASK_E;
   }
   else
   {
     this->private_->ui_.single_mask_->hide();
-    this->private_->ui_.single_mask_label_->hide();
+    
   }
 
   if( importer_modes &  LayerImporterMode::DATA_E )
   {
     this->private_->ui_.data_->show();
-    this->private_->ui_.data_label_->show();
+    this->private_->data_volume_button->setChecked( true );
     this->mode_ = LayerImporterMode::DATA_E;
   }
   else
   {
     this->private_->ui_.data_->hide();
-    this->private_->ui_.data_label_->hide();
   }
 
-  // Step (2): Switch on the right icons
-  update_icons();
+  this->private_->ui_.file_name_table_->show();
 
-  // Step (3): Add information from file scan to importer
+  // Step (3): Add information from importer to the table
+//  TODO: once we get an importer that can import multiple files, we need to change this to get a
+//  vector of  file names from the importer and add them to the file_name_table_
   boost::filesystem::path full_filename( importer_->get_filename() );
-  this->private_->ui_.filename_->setText( QString::fromStdString( full_filename.filename() ) );
+  QTableWidgetItem *new_item;
+  new_item = new QTableWidgetItem( QString::fromStdString( full_filename.leaf() ) );
   
-  std::string data_type = Core::ExportToString( importer_->get_data_type() );
-  this->private_->ui_.data_type_->setText( QString::fromStdString( data_type ) );
-  
-  Core::GridTransform grid_transform = importer_->get_grid_transform();
-  this->private_->ui_.x_size_->setText( 
-    QString::fromStdString( Core::ExportToString( grid_transform.get_nx() ) ) );
-  this->private_->ui_.y_size_->setText( 
-    QString::fromStdString( Core::ExportToString( grid_transform.get_ny() ) ) );
-  this->private_->ui_.z_size_->setText( 
-    QString::fromStdString( Core::ExportToString( grid_transform.get_nz() ) ) );
+  this->private_->ui_.file_name_table_->insertRow( 0 );
+  this->private_->ui_.file_name_table_->setItem( 0, 0, new_item );
+  this->private_->ui_.file_name_table_->verticalHeader()->resizeSection( 0, 24 );
 
-  this->private_->ui_.x_spacing_->setText( 
-    QString::fromStdString( Core::ExportToString( grid_transform.spacing_x() ) ) );
-  this->private_->ui_.y_spacing_->setText( 
-    QString::fromStdString( Core::ExportToString( grid_transform.spacing_y() ) ) );
-  this->private_->ui_.z_spacing_->setText( 
-    QString::fromStdString( Core::ExportToString( grid_transform.spacing_z() ) ) );
+  // Step (4): connect the buttons
+  connect( this->private_->type_button_group, SIGNAL( buttonClicked( int ) ), 
+    this, SLOT( set_type( int ) ) );
 
-  // Step (4): Add connections for selecting and importing the data
-  connect( this->private_->ui_.data_, SIGNAL( released() ), 
-    this, SLOT( set_data() ) );
-    
-  connect( this->private_->ui_.single_mask_, SIGNAL( released() ), 
-    this, SLOT( set_single_mask() ) );
-    
-  connect( this->private_->ui_.bitplane_mask_, SIGNAL( released() ), 
-    this, SLOT( set_bitplane_mask() ) );
-    
-  connect( this->private_->ui_.label_mask_, SIGNAL( released() ), 
-    this, SLOT( set_label_mask() ) );
-
-  connect( this->private_->ui_.import_button_, SIGNAL( released() ),
+  connect( this->private_->ui_.import_button_, SIGNAL( clicked() ),
     this, SLOT( import() ) );
 
   // Step (5): Swap out visuals to allow the user to select the right option
-  this->private_->ui_.file_info_->show();
+  this->resize( 10, 10 );
   this->private_->ui_.importer_options_->show();
-  this->private_->ui_.scanning_file_->hide();
   
   // Step (6): Make the import button the default option
   this->private_->ui_.import_button_->setEnabled( true );
@@ -256,93 +230,33 @@ void LayerImporterWidget::center_widget_on_screen( QWidget *widget )
 }
   
 
-
-void LayerImporterWidget::update_icons()
+void LayerImporterWidget::set_type( int file_type )
 {
-  setUpdatesEnabled( false );
-  
-  if( mode_ == LayerImporterMode::DATA_E )
+  switch( file_type )
   {
-    this->private_->ui_.data_->setIcon(this->private_->data_icon_ );  
-    this->private_->ui_.data_->setStyleSheet( 
-      StyleSheet::LAYERIMPORTERWIDGET_ACTIVE_BUTTON_C );
-  }
-  else
-  {
-    this->private_->ui_.data_->setIcon(this->private_->data_off_icon_ );
-    this->private_->ui_.data_->setStyleSheet( 
-      StyleSheet::LAYERIMPORTERWIDGET_INACTIVE_BUTTON_C );
-  }
-  
-  if( mode_ == LayerImporterMode::SINGLE_MASK_E )
-  {
-    this->private_->ui_.single_mask_->setIcon(this->private_->single_mask_icon_ );
-    this->private_->ui_.single_mask_->setStyleSheet( 
-      StyleSheet::LAYERIMPORTERWIDGET_ACTIVE_BUTTON_C );
-  }
-  else
-  {
-    this->private_->ui_.single_mask_->setIcon(this->private_->single_mask_off_icon_ );
-    this->private_->ui_.single_mask_->setStyleSheet( 
-      StyleSheet::LAYERIMPORTERWIDGET_INACTIVE_BUTTON_C );
-  }
-  
-  if( mode_ == LayerImporterMode::BITPLANE_MASK_E )
-  {
-    this->private_->ui_.bitplane_mask_->setIcon(this->private_->bitplane_mask_icon_ );
-    this->private_->ui_.bitplane_mask_->setStyleSheet( 
-      StyleSheet::LAYERIMPORTERWIDGET_ACTIVE_BUTTON_C );
-  }
-  else
-  {
-    this->private_->ui_.bitplane_mask_->setIcon(this->private_->bitplane_mask_off_icon_ );
-    this->private_->ui_.bitplane_mask_->setStyleSheet( 
-      StyleSheet::LAYERIMPORTERWIDGET_INACTIVE_BUTTON_C );
-  }
-  
-  if( mode_ == LayerImporterMode::LABEL_MASK_E )
-  {
-    this->private_->ui_.label_mask_->setIcon(this->private_->label_mask_icon_ );
-    this->private_->ui_.label_mask_->setStyleSheet( 
-      StyleSheet::LAYERIMPORTERWIDGET_ACTIVE_BUTTON_C );
-  }
-  else
-  {
-    this->private_->ui_.label_mask_->setIcon(this->private_->label_mask_off_icon_ );
-    this->private_->ui_.label_mask_->setStyleSheet( 
-      StyleSheet::LAYERIMPORTERWIDGET_INACTIVE_BUTTON_C );
-  }
-  
-  setUpdatesEnabled( true );
-  
-  // issue an update onto the Qt event queue
-  update(); 
-}
+  case 0:
+    set_mode( LayerImporterMode::DATA_E );
+    break;
 
-void LayerImporterWidget::set_data() 
-{ 
-  set_mode( LayerImporterMode::DATA_E ); 
-}
+  case 1:
+    set_mode( LayerImporterMode::SINGLE_MASK_E );
+    break;
 
-void LayerImporterWidget::set_single_mask() 
-{ 
-  set_mode( LayerImporterMode::SINGLE_MASK_E );
-}
+  case 2:
+    set_mode( LayerImporterMode::BITPLANE_MASK_E ); 
+    break;
 
-void LayerImporterWidget::set_bitplane_mask() 
-{ 
-  set_mode( LayerImporterMode::BITPLANE_MASK_E ); 
-}
-
-void LayerImporterWidget::set_label_mask() 
-{ 
-  set_mode( LayerImporterMode::LABEL_MASK_E ); 
+  case 3:
+    set_mode( LayerImporterMode::LABEL_MASK_E );
+    break;
+  default:
+    break;
+  }
 }
 
 void LayerImporterWidget::set_mode( LayerImporterMode mode )
 {
   mode_ = mode;
-  update_icons();
 }
 
 void LayerImporterWidget::import()
@@ -353,6 +267,7 @@ void LayerImporterWidget::import()
 
 void LayerImporterWidget::ScanFile( qpointer_type qpointer, LayerImporterHandle importer )
 {
+  
   // Step (1) : Import the file header or in some cases the full file
   bool success = importer->import_header();
   

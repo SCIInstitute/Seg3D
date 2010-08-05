@@ -86,6 +86,8 @@ ProjectManager::ProjectManager() :
     this->load_states( stateio );
   }
   
+  this->cleanup_projects_list();
+
   this->set_initializing( false );
     
   this->current_project_ = ProjectHandle( new Project( "default_project" ) );
@@ -181,10 +183,17 @@ void ProjectManager::rename_project( const std::string& new_name, Core::ActionSo
   if( this->save_project_only() )
   {
     this->add_to_recent_projects( this->current_project_path_state_->get(), new_name );
+    
+    this->current_project_->set_project_path( path / new_name );
+
+    StatusBar::Instance()->set_message( Core::LogMessageType::MESSAGE_E, 
+      "The project name has been successfully changed to: '" + new_name  + "'" );
   }
-  
-  StatusBar::Instance()->set_message( Core::LogMessageType::MESSAGE_E, 
-    "The project name has been successfully changed to: '" + new_name  + "'" );
+  else
+  {
+    StatusBar::Instance()->set_message( Core::LogMessageType::ERROR_E, 
+      "There has been a problem setting the name of the project to: '" + new_name  + "'" );
+  }
   
 }
 
@@ -204,6 +213,7 @@ void ProjectManager::new_project( const std::string& project_name, const std::st
     path = path / project_name;
 
     std::vector< std::string > empty_vector;
+    this->current_project_->set_project_path( path );
     this->current_project_->project_name_state_->set( project_name );
     this->current_project_path_state_->set( project_path );
     this->current_project_->sessions_state_->set( empty_vector );
@@ -223,8 +233,10 @@ void ProjectManager::open_project( const std::string& project_path )
 { 
   this->changing_projects_ = true;
   boost::filesystem::path path = project_path;
+  this->current_project_->set_project_path( path );
   
-  this->current_project_->initialize_from_file( path, path.leaf() );
+  //this->current_project_->initialize_from_file( path, path.leaf() );
+  this->current_project_->initialize_from_file( path.leaf() );
   this->current_project_path_state_->set( path.parent_path().string() );
   this->add_to_recent_projects( path.parent_path().string(), path.leaf() );
 
@@ -296,8 +308,7 @@ bool ProjectManager::save_project_session( bool autosave /*= false */, std::stri
   this->add_to_recent_projects( this->current_project_path_state_->export_to_string(),
     this->current_project_->project_name_state_->get() );
   
-  bool result = this->current_project_->save_session( ( path /
-    this->current_project_->project_name_state_->get() ), session_name );
+  bool result = this->current_project_->save_session( session_name );
 
   if( result )
   {
@@ -314,9 +325,8 @@ bool ProjectManager::load_project_session( const std::string& session_name )
 {
   boost::filesystem::path path = complete( boost::filesystem::path( this->
     current_project_path_state_->get().c_str(), boost::filesystem::native ) );
-  
-  bool result =  this->current_project_->load_session( ( path /
-    this->current_project_->project_name_state_->get() ), session_name );
+
+  bool result =  this->current_project_->load_session( session_name );
   
   if( result )
   {
@@ -331,8 +341,8 @@ bool ProjectManager::delete_project_session( const std::string& session_name )
   boost::filesystem::path path = complete( boost::filesystem::path( this->
     current_project_path_state_->get().c_str(), boost::filesystem::native ) );
   
-  return this->current_project_->delete_session( ( path /
-    this->current_project_->project_name_state_->get() ), session_name );
+  return this->current_project_->delete_session( session_name );
+
 }
   
 void ProjectManager::add_to_recent_projects( const std::string& project_path, 
@@ -363,6 +373,34 @@ void ProjectManager::add_to_recent_projects( const std::string& project_path,
   this->recent_projects_state_->set( temp_projects_vector );
   this->save_projectmanager_state();
 }
+
+void ProjectManager::cleanup_projects_list()
+{
+  std::vector< std::string > projects_vector = this->recent_projects_state_->get();
+  std::vector< std::string > new_projects_vector;
+
+  for( int i = 0; i < static_cast< int >( projects_vector.size() ); ++i )
+  {
+    if( ( projects_vector[ i ] != "" ) && ( projects_vector[ i ] != "]" ) )
+    {
+      std::vector< std::string > single_project_vector = 
+        Core::SplitString( projects_vector[ i ], "|" );
+
+      boost::filesystem::path path = complete( boost::filesystem::path( 
+        single_project_vector[ 0 ].c_str(), boost::filesystem::native ) );
+
+      boost::filesystem::path project_path = path / single_project_vector[ 1 ] 
+        / ( single_project_vector[ 1 ] + ".s3d" );
+
+      if( boost::filesystem::exists( project_path ) )
+      {
+        new_projects_vector.push_back( projects_vector[ i ] );
+      }
+    }
+  }
+  this->recent_projects_state_->set( new_projects_vector );
+}
+
   
 bool ProjectManager::create_project_folders( const std::string& project_name )
 {
