@@ -26,6 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#include <QCoreApplication>
+
 #include <Core/Interface/Interface.h>
 #include <Core/State/Actions/ActionSet.h>
 
@@ -71,7 +73,7 @@ void QtActionGroupConnector::TriggerAction(
     return;
   }
 
-  if ( qpointer.isNull() )
+  if ( qpointer.isNull() || QCoreApplication::closingDown() )
   {
     return;
   }

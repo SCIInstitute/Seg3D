@@ -26,6 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#include <QCoreApplication>
+
 #include <Core/Interface/Interface.h>
 #include <Core/State/Actions/ActionSet.h>
 
@@ -43,14 +45,15 @@ QtAbstractButtonConnector::QtAbstractButtonConnector( QAbstractButton* parent,
   QPointer< QtAbstractButtonConnector > qpointer( this );
   
   parent->setCheckable( true );
+
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
     parent->setChecked( state->get() );
+    this->add_connection( state->value_changed_signal_.connect(
+      boost::bind( &QtAbstractButtonConnector::SetButtonChecked, qpointer, _1, _2 ) ) );
   }
 
   this->connect( parent, SIGNAL( toggled( bool ) ), SLOT( set_state( bool ) ) );
-  this->add_connection( state->value_changed_signal_.connect(
-    boost::bind( &QtAbstractButtonConnector::SetButtonChecked, qpointer, _1, _2 ) ) );
 }
 
 QtAbstractButtonConnector::QtAbstractButtonConnector( QAbstractButton* parent, 
@@ -83,7 +86,7 @@ void QtAbstractButtonConnector::SetButtonChecked(
     return;
   }
 
-  if ( qpointer.isNull() )
+  if ( qpointer.isNull() || QCoreApplication::closingDown() )
   {
     return;
   }

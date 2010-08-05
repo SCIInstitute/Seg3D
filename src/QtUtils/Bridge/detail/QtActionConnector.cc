@@ -26,6 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#include <QCoreApplication>
+
 #include <Core/Interface/Interface.h>
 #include <Core/State/Actions/ActionSet.h>
 
@@ -46,11 +48,11 @@ QtActionConnector::QtActionConnector( QAction* parent,
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
     parent->setChecked( state->get() );
+    this->add_connection( state->value_changed_signal_.connect(
+      boost::bind( &QtActionConnector::SetActionChecked, qpointer, _1, _2 ) ) );
   }
 
   this->connect( parent, SIGNAL( toggled( bool ) ), SLOT( set_state( bool ) ) );
-  this->add_connection( state->value_changed_signal_.connect(
-    boost::bind( &QtActionConnector::SetActionChecked, qpointer, _1, _2 ) ) );
 }
 
 QtActionConnector::QtActionConnector( QAction* parent, 
@@ -83,7 +85,7 @@ void QtActionConnector::SetActionChecked(
     return;
   }
 
-  if ( qpointer.isNull() )
+  if ( qpointer.isNull() || QCoreApplication::closingDown() )
   {
     return;
   }

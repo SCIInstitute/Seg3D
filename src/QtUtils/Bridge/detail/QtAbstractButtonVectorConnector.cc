@@ -26,6 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#include <QCoreApplication>
+
 #include <Core/Interface/Interface.h>
 #include <Core/State/Actions/ActionSet.h>
 
@@ -94,7 +96,7 @@ void QtAbstractButtonVectorConnector::UpdateIndex( QPointer< QtAbstractButtonVec
     return;
   }
 
-  if ( qpointer.isNull() )
+  if ( qpointer.isNull() || QCoreApplication::closingDown() )
   {
     return;
   }
@@ -131,7 +133,7 @@ void QtAbstractButtonVectorConnector::SetActionChecked(
     return;
   }
 
-  if ( qpointer.isNull() )
+  if ( qpointer.isNull() || QCoreApplication::closingDown() )
   {
     return;
   }

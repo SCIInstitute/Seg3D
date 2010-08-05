@@ -26,6 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#include <QCoreApplication>
+
 #include <Core/Interface/Interface.h>
 #include <Core/State/Actions/ActionSet.h>
 
@@ -45,11 +47,11 @@ QtColorButtonConnector::QtColorButtonConnector( QtColorButton* parent,
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
     parent->set_color( state->get() );
+    this->add_connection( state->value_changed_signal_.connect(
+      boost::bind( &QtColorButtonConnector::SetButtonColor, qpointer, _1, _2 ) ) );
   }
 
   this->connect( parent, SIGNAL( color_changed( Core::Color ) ), SLOT( set_state( Core::Color ) ) );
-  this->add_connection( state->value_changed_signal_.connect(
-    boost::bind( &QtColorButtonConnector::SetButtonColor, qpointer, _1, _2 ) ) );
 }
 
 QtColorButtonConnector::~QtColorButtonConnector()
@@ -72,7 +74,7 @@ void QtColorButtonConnector::SetButtonColor( QPointer< QtColorButtonConnector > 
     return;
   }
 
-  if ( qpointer.isNull() )
+  if ( qpointer.isNull() || QCoreApplication::closingDown() )
   {
     return;
   }

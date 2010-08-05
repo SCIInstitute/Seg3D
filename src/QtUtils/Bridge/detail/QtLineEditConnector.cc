@@ -26,6 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#include <QCoreApplication>
+
 #include <Core/Interface/Interface.h>
 #include <Core/State/Actions/ActionSet.h>
 
@@ -45,11 +47,11 @@ QtLineEditConnector::QtLineEditConnector( QLineEdit* parent,
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
     parent->setText( QString( state->get().c_str() ) );
+    this->add_connection( state->value_changed_signal_.connect(
+      boost::bind( &QtLineEditConnector::SetLineEditText, qpointer, _1, _2 ) ) );
   }
 
   this->connect( parent, SIGNAL( editingFinished() ), SLOT( set_state() ) );
-  this->add_connection( state->value_changed_signal_.connect(
-    boost::bind( &QtLineEditConnector::SetLineEditText, qpointer, _1, _2 ) ) );
 }
 
 QtLineEditConnector::QtLineEditConnector( QLineEdit* parent, 
@@ -63,15 +65,15 @@ QtLineEditConnector::QtLineEditConnector( QLineEdit* parent,
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
     parent->setText( QString( state->get().c_str() ) );
+
+    // NOTE: for StateName, always update the QLineEdit no matter what the source
+    // of the change is, because the actual value set in the state may be different from
+    // user input.
+    this->add_connection( state->value_changed_signal_.connect( boost::bind( 
+      &QtLineEditConnector::SetLineEditText, qpointer, _2, Core::ActionSource::NONE_E ) ) );
   }
 
   this->connect( parent, SIGNAL( editingFinished() ), SLOT( set_state() ) );
-
-  // NOTE: for StateName, always update the QLineEdit no matter what the source
-  // of the change is, because the actual value set in the state may be different from
-  // user input.
-  this->add_connection( state->value_changed_signal_.connect( boost::bind( 
-    &QtLineEditConnector::SetLineEditText, qpointer, _2, Core::ActionSource::NONE_E ) ) );
 }
 
 
@@ -95,7 +97,7 @@ void QtLineEditConnector::SetLineEditText( QPointer< QtLineEditConnector > qpoin
     return;
   }
 
-  if ( qpointer.isNull() )
+  if ( qpointer.isNull() || QCoreApplication::closingDown() )
   {
     return;
   }

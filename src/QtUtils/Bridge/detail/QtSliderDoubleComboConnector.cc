@@ -26,6 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#include <QCoreApplication>
+
 #include <Core/Interface/Interface.h>
 #include <Core/State/Actions/ActionSet.h>
 #include <Core/State/Actions/ActionSetRange.h>
@@ -49,14 +51,14 @@ QtSliderDoubleComboConnector::QtSliderDoubleComboConnector( QtSliderDoubleCombo*
     state->get_range( min_val, max_val );
     parent->setRange( min_val, max_val );
     parent->setCurrentValue( state->get() );
+    this->add_connection( state->value_changed_signal_.connect(
+      boost::bind( &QtSliderDoubleComboConnector::SetValue, qpointer, _1, _2 ) ) );
+    this->add_connection( state->range_changed_signal_.connect(
+      boost::bind( &QtSliderDoubleComboConnector::SetRange, qpointer, _1, _2, _3 ) ) );
   }
 
   this->connect( parent, SIGNAL( valueAdjusted( double ) ), SLOT( set_state_value( double ) ) );
   this->connect( parent, SIGNAL( rangeChanged( double, double ) ), SLOT( set_state_range( double, double ) ) );
-  this->add_connection( state->value_changed_signal_.connect(
-    boost::bind( &QtSliderDoubleComboConnector::SetValue, qpointer, _1, _2 ) ) );
-  this->add_connection( state->range_changed_signal_.connect(
-    boost::bind( &QtSliderDoubleComboConnector::SetRange, qpointer, _1, _2, _3 ) ) );
 }
 
 QtSliderDoubleComboConnector::~QtSliderDoubleComboConnector()
@@ -79,7 +81,7 @@ void QtSliderDoubleComboConnector::SetValue( QPointer< QtSliderDoubleComboConnec
     return;
   }
 
-  if ( qpointer.isNull() )
+  if ( qpointer.isNull() || QCoreApplication::closingDown() )
   {
     return;
   }
@@ -104,7 +106,7 @@ void QtSliderDoubleComboConnector::SetRange( QPointer< QtSliderDoubleComboConnec
     return;
   }
 
-  if ( qpointer.isNull() )
+  if ( qpointer.isNull() || QCoreApplication::closingDown() )
   {
     return;
   }

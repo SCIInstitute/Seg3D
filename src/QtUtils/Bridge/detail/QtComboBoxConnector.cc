@@ -26,6 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#include <QCoreApplication>
+
 #include <Core/Interface/Interface.h>
 #include <Core/State/Actions/ActionSet.h>
 #include <Core/State/StateEngine.h>
@@ -62,7 +64,9 @@ QtComboBoxConnector::QtComboBoxConnector( QComboBox* parent,
   state_( state )
 {
   QPointer< QtComboBoxConnector > qpointer( this );
-  
+
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
   // Populate the content of the state variable to the combo box
   UpdateComboBoxItems( qpointer );
 
@@ -105,7 +109,7 @@ void QtComboBoxConnector::SetComboBoxIndexByText(
     return;
   }
 
-  if ( qpointer.isNull() )
+  if ( qpointer.isNull() || QCoreApplication::closingDown() )
   {
     return;
   }
@@ -141,7 +145,7 @@ void QtComboBoxConnector::SetComboBoxIndexByData(
     return;
   }
 
-  if ( qpointer.isNull() )
+  if ( qpointer.isNull() || QCoreApplication::closingDown() )
   {
     return;
   }
@@ -169,7 +173,7 @@ void QtComboBoxConnector::UpdateComboBoxItems( QPointer< QtComboBoxConnector > q
     return;
   }
 
-  if ( qpointer.isNull() )
+  if ( qpointer.isNull() || QCoreApplication::closingDown() )
   {
     return;
   }

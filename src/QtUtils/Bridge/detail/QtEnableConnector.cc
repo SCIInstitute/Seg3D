@@ -27,6 +27,7 @@
  */
 
 // QtUtils includes
+#include <QCoreApplication>
 #include <QPointer>
 #include <QtGui/QWidget>
 
@@ -70,7 +71,7 @@ void QtEnableConnector::EnableWidget( QPointer< QtEnableConnector > qpointer,
     return;
   }
 
-  if ( qpointer.isNull() )
+  if ( qpointer.isNull() || QCoreApplication::closingDown() )
   {
     return;
   }
