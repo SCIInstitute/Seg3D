@@ -26,15 +26,15 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef CORE_RENDERERBASE_RENDERERBASE_H
-#define CORE_RENDERERBASE_RENDERERBASE_H
+#ifndef CORE_RENDERER_RENDERERBASE_H
+#define CORE_RENDERER_RENDERERBASE_H
 
 #if defined (_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
 #endif
 
 #include <Core/EventHandler/EventHandler.h>
-#include <Core/RendererBase/AbstractRenderer.h>
+#include <Core/Renderer/AbstractRenderer.h>
 
 namespace Core
 {

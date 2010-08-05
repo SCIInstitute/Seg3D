@@ -44,4 +44,4 @@ ADD_SUBDIRECTORY(Isosurface)
 # These next three depend on OpenGL and should only be compiled when the renderer is compiled
 ADD_SUBDIRECTORY(Graphics)
 ADD_SUBDIRECTORY(RenderResources)
-ADD_SUBDIRECTORY(RendererBase)
+ADD_SUBDIRECTORY(Renderer)

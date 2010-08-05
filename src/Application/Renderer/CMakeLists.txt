@@ -76,7 +76,7 @@ TARGET_LINK_LIBRARIES(Application_Renderer
             Core_TextRenderer
             Core_Graphics
             Core_RenderResources
-            Core_RendererBase
+            Core_Renderer
                       Application_Viewer
                       ${SCI_GLEW_LIBRARY}
                       ${SCI_BOOST_LIBRARY})

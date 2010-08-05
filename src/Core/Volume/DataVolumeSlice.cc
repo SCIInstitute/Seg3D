@@ -181,6 +181,8 @@ void DataVolumeSlice::upload_texture()
   // Use glFinish here to solve synchronization issue when the slice is used in multiple views
   glFinish();
 
+  CORE_CHECK_OPENGL_ERROR();
+
   this->slice_changed_ = false;
 }
 

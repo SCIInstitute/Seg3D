@@ -35,7 +35,7 @@
 #include <Core/RenderResources/RenderContextBinding.h>
 #include <Core/Utils/Log.h>
 #include <Core/Interface/Interface.h>
-#include <Core/RendererBase/RendererBase.h>
+#include <Core/Renderer/RendererBase.h>
 
 #if defined(_WIN32) || defined(__APPLE__) || defined(X11_THREADSAFE)
 #define MULTITHREADED_RENDERING 1

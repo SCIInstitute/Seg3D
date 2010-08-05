@@ -97,7 +97,7 @@ TARGET_LINK_LIBRARIES(QtUtils_Bridge
                       Core_Utils
                       Core_EventHandler
             Core_Graphics
-            Core_RendererBase
+            Core_Renderer
             Core_Viewer
             QtUtils_Widgets         
                       ${QT_LIBRARIES} 

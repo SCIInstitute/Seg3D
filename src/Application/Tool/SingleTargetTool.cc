@@ -72,7 +72,7 @@ void SingleTargetToolPrivate::handle_active_layer_changed( LayerHandle layer )
 
   this->tool_->target_layer_state_->set( layer->type() & this->target_type_ ? 
     layer->get_layer_id() : Tool::NONE_OPTION_C );
-  this->tool_->valid_target_state_->set( layer->type() & this->target_type_ );
+  this->tool_->valid_target_state_->set( ( layer->type() & this->target_type_ ) != 0 );
 
 }
 

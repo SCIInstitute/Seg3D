@@ -31,15 +31,16 @@
 # Set sources
 ##################################################
 
-SET(CORE_RENDERERBASE_SRCS
+SET(CORE_RENDERER_SRCS
   AbstractRenderer.h
+  DummyRenderer.h
   RendererBase.h
   RendererBase.cc
   )
   
-CORE_ADD_LIBRARY(Core_RendererBase ${CORE_RENDERERBASE_SRCS})
+CORE_ADD_LIBRARY(Core_Renderer ${CORE_RENDERER_SRCS})
             
-TARGET_LINK_LIBRARIES(Core_RendererBase
+TARGET_LINK_LIBRARIES(Core_Renderer
                       Core_Utils
                       Core_EventHandler
             Core_TextRenderer

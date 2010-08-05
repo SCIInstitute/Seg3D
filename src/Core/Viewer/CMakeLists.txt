@@ -46,5 +46,5 @@ CORE_ADD_LIBRARY(Core_Viewer ${CORE_VIEWER_SRCS})
 TARGET_LINK_LIBRARIES(Core_Viewer 
   Core_State
   Core_Utils
-  Core_RendererBase 
+  Core_Renderer 
   ${SCI_BOOST_LIBRARY})

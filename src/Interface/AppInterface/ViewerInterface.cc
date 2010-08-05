@@ -33,6 +33,7 @@
 #include <Core/Utils/Log.h>
 #include <Core/Utils/Exception.h>
 #include <Core/Interface/Interface.h>
+#include <Core/Renderer/DummyRenderer.h>
 #include <Core/RenderResources/RenderResources.h>
 
 // Application
@@ -106,9 +107,14 @@ void ViewerInterfacePrivate::setup_ui( QWidget* parent )
     // Only create renderer if the render resources are valid.
     if ( Core::RenderResources::Instance()->valid_render_resources() )
     {
-      RendererHandle renderer = RendererHandle( new Renderer( j ) );
+      RendererHandle renderer( new Renderer( j ) );
       renderer->initialize();
       viewer->install_renderer( renderer );
+    }
+    else
+    {
+      viewer->install_renderer( Core::AbstractRendererHandle( 
+        new Core::DummyRenderer ) );
     }
     // Step 3: Generate the widget
     this->viewer_[ j ] = new ViewerWidget( viewer, parent );

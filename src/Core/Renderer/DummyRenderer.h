@@ -26,45 +26,45 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_RENDERER_RENDERER_H
-#define APPLICATION_RENDERER_RENDERER_H
+#ifndef CORE_RENDERER_DUMMYRENDERER_H
+#define CORE_RENDERER_DUMMYRENDERER_H
 
 #if defined (_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
 #endif
 
-#include <Core/Utils/ConnectionHandler.h>
-#include <Core/Renderer/RendererBase.h>
+// Core includes
+#include <Core/Renderer/AbstractRenderer.h>
 
-namespace Seg3D
+namespace Core
 {
 
-// Forward declarations
-class Renderer;
-class RendererPrivate;
-typedef boost::shared_ptr< Renderer > RendererHandle;
-typedef boost::shared_ptr< RendererPrivate > RendererPrivateHandle;
-
-// Class definitions
-class Renderer : public Core::RendererBase, private Core::ConnectionHandler
+// CLASS DUMMYRENDERER:
+// A renderer that does nothing.
+class DummyRenderer : public AbstractRenderer
 {
-  friend class RendererPrivate;
-
-  // -- constructor/destructor --
 public:
-  Renderer( size_t viewer_id );
-  virtual ~Renderer();
+  DummyRenderer() {}
+  virtual ~DummyRenderer() {}
 
-protected:
-  virtual void post_initialize();
-  virtual void post_resize();
-  virtual bool render();
-  virtual bool render_overlay();
+public:
 
-private:
-  RendererPrivateHandle private_;
+  virtual void initialize() {}
+
+  virtual void resize( int width, int height ) {}
+
+  virtual void redraw( bool delay_update = false ) {}
+
+  virtual void redraw_overlay( bool delay_update = false ) {}
+
+  virtual void activate() {}
+
+  virtual void deactivate() {}
+
+  virtual bool is_active() { return false; }
+
 };
 
-} // end namespace Seg3D
+} // end namespace Core
 
 #endif

@@ -37,7 +37,7 @@
 #include <boost/smart_ptr.hpp>
 
 // Core includes
-#include <Core/RendererBase/AbstractRenderer.h>
+#include <Core/Renderer/AbstractRenderer.h>
 #include <Core/State/State.h>
 #include <Core/State/StateHandler.h>
 #include <Core/Utils/EnumClass.h>
