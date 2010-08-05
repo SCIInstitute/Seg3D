@@ -135,7 +135,7 @@ public:
 
   // SET_PROJECT_PATH:
   // function that lets the project manager set the project path for the project
-  void Project::set_project_path( const boost::filesystem::path& project_path );
+  void set_project_path( const boost::filesystem::path& project_path );
   
 protected:
   // PRE_SAVE_STATES:

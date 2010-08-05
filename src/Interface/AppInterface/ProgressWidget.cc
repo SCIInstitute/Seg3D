@@ -51,6 +51,9 @@ public:
   QPixmap running_pixmap_[18];
   int running_count_;
   Core::Timer* timer_;
+
+  static void UpdateRunning( ProgressWidget::qpointer_type qpointer );
+
 };
 
 ProgressWidget::ProgressWidget( Core::ActionProgressHandle action_progress, QWidget *parent ) :
@@ -94,8 +97,11 @@ ProgressWidget::ProgressWidget( Core::ActionProgressHandle action_progress, QWid
     this->private_->ui_.line_->hide();
 
     this->private_->timer_ = new Core::Timer( 100 );
+    qpointer_type qpointer( this );
+     
     this->private_->timer_->timeout_signal_.connect( 
-      boost::bind( &ProgressWidget::update_running, this ) );
+        boost::bind( &ProgressWidgetPrivate::UpdateRunning, qpointer ) );
+    
     this->private_->timer_->start();
   }
   else
@@ -119,18 +125,26 @@ ProgressWidget::~ProgressWidget()
 
 void ProgressWidget::update_running()
 {
-  if ( !Core::Interface::IsInterfaceThread() )
-  {
-    Core::Interface::PostEvent( boost::bind( &ProgressWidget::update_running, this ) );
-    return;
-  }
-  
   // Loop through the animation
   this->private_->running_count_++;
   if( this->private_->running_count_ > 17 ) this->private_->running_count_ = 0;
   this->private_->ui_.running_->setPixmap( 
     this->private_->running_pixmap_[ this->private_->running_count_ ] );
   this->repaint();
+}
+
+void ProgressWidgetPrivate::UpdateRunning( ProgressWidget::qpointer_type qpointer )
+{
+  if ( !Core::Interface::IsInterfaceThread() )
+  {
+    Core::Interface::PostEvent( boost::bind( &ProgressWidgetPrivate::UpdateRunning, qpointer ) );
+    return;
+  }
+
+  if ( ! qpointer.isNull() && ! QCoreApplication::closingDown() )
+  {
+    qpointer->update_running();
+  }
 }
 
 void ProgressWidget::update_progress( )

@@ -38,7 +38,10 @@ namespace QtUtils
 template< class QPOINTER >
 void CheckQtPointerImpl( QPOINTER qpointer, boost::function< void() > function )
 {
-  if ( !( qpointer.isNull() ) ) function();
+  if ( !( qpointer.isNull() ) ) 
+  {
+    function();
+  }
 }
 
 template< class QPOINTER >
