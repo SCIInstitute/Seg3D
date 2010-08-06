@@ -1,5 +1,5 @@
 // GLSL vertex shader for rendering a slice
-#version 120
+#version 110
 
 varying vec4 diffuse, ambient_global, ambient; // Light components.
 varying vec3 light_dir; // Light direction

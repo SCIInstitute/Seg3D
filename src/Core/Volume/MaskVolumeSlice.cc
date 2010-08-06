@@ -27,6 +27,8 @@
  */
 
 #include <Core/Volume/MaskVolumeSlice.h>
+#include <Core/RenderResources/RenderResources.h>
+#include <Core/Graphics/PixelBufferObject.h>
 
 namespace Core
 {
@@ -101,6 +103,8 @@ void MaskVolumeSlice::upload_texture()
   if ( !this->slice_changed_ )
     return;
 
+  RenderResources::lock_type rr_lock( RenderResources::GetMutex() );
+
   // Lock the texture
   Texture::lock_type tex_lock( this->texture_->get_mutex() );
   this->texture_->bind();
@@ -109,7 +113,6 @@ void MaskVolumeSlice::upload_texture()
   {
     // Make sure there is no pixel unpack buffer bound
     PixelUnpackBuffer::RestoreDefault();
-
     this->texture_->set_image( static_cast<int>( this->nx_ ), 
       static_cast<int>( this->ny_ ), GL_ALPHA );
     this->size_changed_ = false;
@@ -151,7 +154,10 @@ void MaskVolumeSlice::upload_texture()
     // Step 3. release the pixel unpack buffer
     // NOTE: The texture streaming will still succeed even if the PBO is deleted.
     pixel_buffer->unbind();
+
+    // Use glFinish here to solve synchronization issue when the slice is used in multiple views
     glFinish();
+
   }
 
   this->slice_changed_ = false;

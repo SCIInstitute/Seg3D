@@ -28,6 +28,7 @@
 
 #include <Core/Math/MathFunctions.h>
 #include <Core/Volume/VolumeSlice.h>
+#include <Core/RenderResources/RenderResources.h>
 
 namespace Core
 {
@@ -348,6 +349,7 @@ void VolumeSlice::initialize_texture()
   internal_lock_type lock( this->internal_mutex_ );
   if ( !this->texture_ )
   {
+    RenderResources::lock_type rr_lock( RenderResources::GetMutex() );
     this->texture_ = Texture2DHandle( new Texture2D );
     this->texture_->set_mag_filter( GL_NEAREST );
     this->texture_->set_min_filter( GL_NEAREST );

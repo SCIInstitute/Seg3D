@@ -29,7 +29,6 @@
 #ifndef CORE_VOLUME_MASKVOLUMESLICE_H
 #define CORE_VOLUME_MASKVOLUMESLICE_H
 
-#include <Core/Graphics/PixelBufferObject.h>
 #include <Core/Volume/MaskVolume.h>
 #include <Core/Volume/VolumeSlice.h>
 

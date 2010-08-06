@@ -1,5 +1,5 @@
 // GLSL fragment shader for rendering a slice
-#version 120
+#version 110
 
 uniform sampler2D brush_tex;
 uniform vec3 brush_color; // color of mask

@@ -48,8 +48,8 @@ PixelBufferObject::~PixelBufferObject()
 PixelPackBuffer::PixelPackBuffer() :
   PixelBufferObject()
 {
-  this->target_ = GL_PIXEL_PACK_BUFFER;
-  this->query_target_ = GL_PIXEL_PACK_BUFFER_BINDING;
+  this->target_ = GL_PIXEL_PACK_BUFFER_ARB;
+  this->query_target_ = GL_PIXEL_PACK_BUFFER_BINDING_ARB;
   this->safe_bind();
   this->safe_unbind();
 }
@@ -57,20 +57,20 @@ PixelPackBuffer::PixelPackBuffer() :
 PixelPackBuffer::PixelPackBuffer( const BufferObjectHandle& bo ) :
   PixelBufferObject( bo )
 {
-  this->target_ = GL_PIXEL_PACK_BUFFER;
-  this->query_target_ = GL_PIXEL_PACK_BUFFER_BINDING;
+  this->target_ = GL_PIXEL_PACK_BUFFER_ARB;
+  this->query_target_ = GL_PIXEL_PACK_BUFFER_BINDING_ARB;
 }
 
 void PixelPackBuffer::RestoreDefault()
 {
-  glBindBuffer( GL_PIXEL_PACK_BUFFER, 0 );
+  glBindBuffer( GL_PIXEL_PACK_BUFFER_ARB, 0 );
 }
 
 PixelUnpackBuffer::PixelUnpackBuffer() :
   PixelBufferObject()
 {
-  this->target_ = GL_PIXEL_UNPACK_BUFFER;
-  this->query_target_ = GL_PIXEL_UNPACK_BUFFER_BINDING;
+  this->target_ = GL_PIXEL_UNPACK_BUFFER_ARB;
+  this->query_target_ = GL_PIXEL_UNPACK_BUFFER_BINDING_ARB;
   this->safe_bind();
   this->safe_unbind();
 }
@@ -78,13 +78,13 @@ PixelUnpackBuffer::PixelUnpackBuffer() :
 PixelUnpackBuffer::PixelUnpackBuffer( const BufferObjectHandle& bo ) :
   PixelBufferObject( bo )
 {
-  this->target_ = GL_PIXEL_UNPACK_BUFFER;
-  this->query_target_ = GL_PIXEL_UNPACK_BUFFER_BINDING;
+  this->target_ = GL_PIXEL_UNPACK_BUFFER_ARB;
+  this->query_target_ = GL_PIXEL_UNPACK_BUFFER_BINDING_ARB;
 }
 
 void PixelUnpackBuffer::RestoreDefault()
 {
-  glBindBuffer( GL_PIXEL_UNPACK_BUFFER, 0 );
+  glBindBuffer( GL_PIXEL_UNPACK_BUFFER_ARB, 0 );
 }
 
 } // end namespace Core

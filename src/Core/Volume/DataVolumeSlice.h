@@ -29,7 +29,6 @@
 #ifndef CORE_VOLUME_DATAVOLUMESLICE_H
 #define CORE_VOLUME_DATAVOLUMESLICE_H
 
-#include <Core/Graphics/PixelBufferObject.h>
 #include <Core/Volume/DataVolume.h>
 #include <Core/Volume/VolumeSlice.h>
 

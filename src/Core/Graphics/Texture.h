@@ -36,6 +36,8 @@
 
 #include <GL/glew.h>
 
+#include <Core/Utils/Lockable.h>
+
 namespace Core
 {
 
@@ -51,7 +53,7 @@ typedef boost::shared_ptr< Texture3D > Texture3DHandle;
 // CLASS TEXTURE
 // A wrapper of the OpenGL texture
 
-class Texture : public boost::noncopyable
+class Texture : public RecursiveLockable
 {
 
   // -- Constructor/Destructor --
@@ -80,24 +82,6 @@ public:
   inline unsigned int get_target() const
   {
     return this->target_;
-  }
-
-  typedef boost::recursive_mutex mutex_type;
-  typedef boost::unique_lock< mutex_type > lock_type;
-
-  inline mutex_type& get_mutex()
-  {
-    return this->mutex_;
-  }
-
-  inline void lock()
-  {
-    this->mutex_.lock();
-  }
-
-  inline void unlock()
-  {
-    this->mutex_.unlock();
   }
 
 protected:

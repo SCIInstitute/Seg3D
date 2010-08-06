@@ -30,6 +30,7 @@
 
 #include <Core/RenderResources/RenderResources.h>
 #include <Core/Volume/DataVolumeSlice.h>
+#include <Core/Graphics/PixelBufferObject.h>
 
 namespace Core
 {
@@ -106,6 +107,8 @@ void DataVolumeSlice::upload_texture()
   if ( !this->slice_changed_ )
     return;
 
+  RenderResources::lock_type rr_lock( RenderResources::GetMutex() );
+
   // Lock the texture
   Texture::lock_type tex_lock( this->texture_->get_mutex() );
   this->texture_->bind();
@@ -127,9 +130,6 @@ void DataVolumeSlice::upload_texture()
     NULL, GL_STREAM_DRAW );
   texture_data_type* buffer = reinterpret_cast< texture_data_type* >(
     pixel_buffer->map_buffer( GL_WRITE_ONLY ) );
-
-  //std::vector< texture_data_type > buffer_vector( this->nx_ * this->ny_ );
-  //texture_data_type* buffer = &buffer_vector[0];
 
   // Lock the volume
   shared_lock_type volume_lock( this->get_mutex() );
@@ -169,9 +169,6 @@ void DataVolumeSlice::upload_texture()
   glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
   this->texture_->set_sub_image( 0, 0, static_cast<int>( this->nx_ ), 
     static_cast<int>( this->ny_ ), NULL, GL_LUMINANCE, TEXTURE_DATA_TYPE_C );
-  //PixelUnpackBuffer::RestoreDefault();
-  //this->texture_->set_sub_image( 0, 0, static_cast<int>( this->nx_ ), 
-  //    static_cast<int>( this->ny_ ), buffer, GL_LUMINANCE, TEXTURE_DATA_TYPE_C );
   this->texture_->unbind();
 
   // Step 3. release the pixel unpack buffer

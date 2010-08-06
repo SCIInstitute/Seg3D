@@ -159,7 +159,6 @@ void RendererPrivate::process_slices( LayerSceneHandle& layer_scene, ViewerHandl
 
 void RendererPrivate::viewer_slice_changed( size_t viewer_id )
 {
-  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
   ViewerHandle self_viewer = ViewerManager::Instance()->get_viewer( this->viewer_id_ );
   ViewerHandle updated_viewer = ViewerManager::Instance()->get_viewer( viewer_id );
   if ( self_viewer->view_mode_state_->index() !=
@@ -178,7 +177,6 @@ void RendererPrivate::viewer_slice_changed( size_t viewer_id )
 
 void RendererPrivate::viewer_mode_changed( size_t viewer_id )
 {
-  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
   if ( ViewerManager::Instance()->get_viewer( viewer_id )->viewer_visible_state_->get() )
   {
     if ( ViewerManager::Instance()->get_viewer( this->viewer_id_ )->is_volume_view() )
@@ -595,10 +593,7 @@ bool Renderer::render()
       LayerSceneHandle layer_scene = LayerManager::Instance()->compose_layer_scene( i );
       
       // Copy slices from viewer
-      {
-        Core::RenderResources::lock_type lock( Core::RenderResources::GetMutex() );
-        this->private_->process_slices( layer_scene, other_viewer );
-      }
+      this->private_->process_slices( layer_scene, other_viewer );
 
       if ( layer_scene->size() > 0 )
       {
@@ -643,10 +638,7 @@ bool Renderer::render()
       compose_layer_scene( this->private_->viewer_id_ );
     
     // Copy slices from viewer
-    {
-      Core::RenderResources::lock_type lock( Core::RenderResources::GetMutex() );
-      this->private_->process_slices( layer_scene, viewer );
-    }
+    this->private_->process_slices( layer_scene, viewer );
 
     Core::View2D view2d( static_cast< Core::StateView2D* >( 
       viewer->get_active_view_state().get() )->get() );
