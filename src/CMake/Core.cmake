@@ -62,3 +62,24 @@ FOREACH (it ${ARGN})
   SET(${outfiles} ${${outfiles}} ${outfile})
 ENDFOREACH(it)
 ENDMACRO (CORE_WRAP_XML)
+
+# A macro for importing GLSL shaders
+MACRO (CORE_IMPORT_SHADER outfiles )
+  INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
+
+  FOREACH (it ${ARGN})
+    GET_FILENAME_COMPONENT(it ${it} ABSOLUTE)
+    GET_FILENAME_COMPONENT(outfile ${it} NAME_WE)
+    GET_FILENAME_COMPONENT(ext ${it} EXT)
+    
+    STRING(LENGTH ${ext} ext_len)
+    MATH(EXPR ext_len ${ext_len}-1)
+    STRING(SUBSTRING ${ext} 1 ${ext_len} ext)
+    SET(outfile ${CMAKE_CURRENT_BINARY_DIR}/${outfile}_${ext})
+    ADD_CUSTOM_COMMAND(OUTPUT ${outfile}
+    COMMAND ShaderImporter
+    ARGS ${it} ${outfile}
+    DEPENDS ${it} ShaderImporter)
+    SET(${outfiles} ${${outfiles}} ${outfile})
+  ENDFOREACH(it)
+ENDMACRO (CORE_IMPORT_SHADER)

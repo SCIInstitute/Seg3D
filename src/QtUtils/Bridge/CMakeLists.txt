@@ -95,11 +95,7 @@ CORE_ADD_LIBRARY(QtUtils_Bridge
             
 TARGET_LINK_LIBRARIES(QtUtils_Bridge 
                       Core_Utils
-                      Core_EventHandler
-            Core_Graphics
-            Core_Renderer
-            Core_Viewer
+            Core_Interface
             QtUtils_Widgets         
                       ${QT_LIBRARIES} 
-                      ${SCI_GLEW_LIBRARY}
                       ${SCI_BOOST_LIBRARY})

@@ -93,5 +93,4 @@ TARGET_LINK_LIBRARIES( QtUtils_Widgets
                        Core_Utils
                        Core_Geometry
                        ${QT_LIBRARIES} 
-                       ${SCI_GLEW_LIBRARY}
                        ${SCI_BOOST_LIBRARY} )

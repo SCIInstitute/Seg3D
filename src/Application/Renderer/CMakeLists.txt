@@ -31,18 +31,16 @@
 # Import shaders into source files
 ##################################################
 
-ADD_CUSTOM_COMMAND(
-  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/SliceShaderFrag
-  COMMAND ShaderImporter ${CMAKE_CURRENT_SOURCE_DIR}/SliceShader.frag ${CMAKE_CURRENT_BINARY_DIR}/SliceShaderFrag
-  DEPENDS ShaderImporter ${CMAKE_CURRENT_SOURCE_DIR}/SliceShader.frag
+SET(APPLICATION_RENDERER_SHADER_SRCS
+  Lighting.vert
+  Lighting.frag
+  SliceShader.frag
+  SliceShader.vert
   )
-
-ADD_CUSTOM_COMMAND(
-  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/SliceShaderVert
-  COMMAND ShaderImporter ${CMAKE_CURRENT_SOURCE_DIR}/SliceShader.vert ${CMAKE_CURRENT_BINARY_DIR}/SliceShaderVert
-  DEPENDS ShaderImporter ${CMAKE_CURRENT_SOURCE_DIR}/SliceShader.vert
-  )
-   
+  
+CORE_IMPORT_SHADER(APPLICATION_RENDERER_SHADER_STRING_SRCS
+          ${APPLICATION_RENDERER_SHADER_SRCS})
+          
 ##################################################
 # Set sources
 ##################################################
@@ -54,21 +52,9 @@ SET(APPLICATION_RENDERER_SRCS
   SliceShader.cc
   )
   
-SET(APPLICATION_RENDERER_SHADER_RAW_SRCS
-  SliceShader.vert
-  SliceShader.frag
-  )
-
-SET(APPLICATION_RENDERER_SHADER_SRCS
-  SliceShaderVert
-  SliceShaderFrag
-  )
-
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
-  
 CORE_ADD_LIBRARY(Application_Renderer ${APPLICATION_RENDERER_SRCS}
-      ${APPLICATION_RENDERER_SHADER_RAW_SRCS}
-      ${APPLICATION_RENDERER_SHADER_SRCS})
+      ${APPLICATION_RENDERER_SHADER_SRCS}
+      ${APPLICATION_RENDERER_SHADER_STRING_SRCS})
             
 TARGET_LINK_LIBRARIES(Application_Renderer
                       Core_Utils

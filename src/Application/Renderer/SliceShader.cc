@@ -35,12 +35,14 @@ namespace Seg3D
 
 const char* SliceShader::FRAG_SHADER_SOURCE_C[] =
 {
-#include "SliceShaderFrag"
+#include "SliceShader_frag"
+#include "Lighting_frag"
 };
 
 const char* SliceShader::VERT_SHADER_SOURCE_C[] =
 {
-#include "SliceShaderVert"
+#include "SliceShader_vert"
+#include "Lighting_vert"
 };
 
 SliceShader::SliceShader() :

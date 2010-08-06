@@ -85,7 +85,6 @@ int main( int argc, char** argv )
     }
     ofile << "\\n\",\n";
   }
-  ofile << "\"\\n\"";
 
   return 0;
 }

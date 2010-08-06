@@ -35,7 +35,7 @@ namespace Seg3D
 
 const char* PaintBrushShader::FRAG_SHADER_SOURCE_C[] =
 {
-#include "PaintBrushShaderFrag"
+#include "PaintBrushShader_frag"
 };
 
 PaintBrushShader::PaintBrushShader() :
