@@ -52,6 +52,11 @@ namespace Seg3D
 class LayerImporterWidgetPrivate
 {
 public:
+  LayerImporterWidgetPrivate() : 
+    mode_( LayerImporterMode::INVALID_E )
+  {
+  }
+  
   Ui::LayerImporterWidget ui_;
   
   QPushButton *data_volume_button;
@@ -59,15 +64,20 @@ public:
   QPushButton *mask_1234_button;
   QPushButton *mask_1248_button;
   QButtonGroup *type_button_group;
-
+  
+  // The importer that was chosen in the filedialog
+  LayerImporterHandle importer_;
+  
+  // The current active mode
+  LayerImporterMode mode_;
 };
 
 LayerImporterWidget::LayerImporterWidget( LayerImporterHandle importer, QWidget* parent ) :
   QDialog( parent ),
-  importer_(importer),
-  mode_(LayerImporterMode::INVALID_E),
   private_( new LayerImporterWidgetPrivate )
 {
+  this->private_->importer_ = importer;
+
   // Step (1): Ensure it will be the only focus in the pogram
   setWindowModality(  Qt::ApplicationModal );
   
@@ -122,7 +132,7 @@ LayerImporterWidget::LayerImporterWidget( LayerImporterHandle importer, QWidget*
   // Step (6): Show Scanning Widget then Asynchronously scan file, so UI stays interactive
   this->private_->ui_.scanning_file_->show();
   boost::thread( boost::bind( &LayerImporterWidget::ScanFile, 
-    qpointer_type( this ), importer_ ) );
+    qpointer_type( this ), this->private_->importer_ ) );
 }
 
 LayerImporterWidget::~LayerImporterWidget()
@@ -137,13 +147,13 @@ void LayerImporterWidget::list_import_options()
   this->private_->ui_.scanning_file_->hide();
 
   // Step (1): Switch off options that this importer does not support
-  int importer_modes = importer_->get_importer_modes();
+  int importer_modes = this->private_->importer_->get_importer_modes();
 
   if( importer_modes & LayerImporterMode::LABEL_MASK_E )
   {
     this->private_->ui_.label_mask_->show();
     this->private_->mask_1234_button->setChecked( true );
-    this->mode_ = LayerImporterMode::LABEL_MASK_E;
+    this->private_->mode_ = LayerImporterMode::LABEL_MASK_E;
   }
   else
   {
@@ -154,7 +164,7 @@ void LayerImporterWidget::list_import_options()
   {
     this->private_->ui_.bitplane_mask_->show();
     this->private_->mask_1248_button->setChecked( true );
-    this->mode_ = LayerImporterMode::BITPLANE_MASK_E;
+    this->private_->mode_ = LayerImporterMode::BITPLANE_MASK_E;
   }
   else
   {
@@ -165,7 +175,7 @@ void LayerImporterWidget::list_import_options()
   {
     this->private_->ui_.single_mask_->show();
     this->private_->mask_single_button->setChecked( true );
-    this->mode_ = LayerImporterMode::SINGLE_MASK_E;
+    this->private_->mode_ = LayerImporterMode::SINGLE_MASK_E;
   }
   else
   {
@@ -177,7 +187,7 @@ void LayerImporterWidget::list_import_options()
   {
     this->private_->ui_.data_->show();
     this->private_->data_volume_button->setChecked( true );
-    this->mode_ = LayerImporterMode::DATA_E;
+    this->private_->mode_ = LayerImporterMode::DATA_E;
   }
   else
   {
@@ -189,7 +199,7 @@ void LayerImporterWidget::list_import_options()
   // Step (3): Add information from importer to the table
 //  TODO: once we get an importer that can import multiple files, we need to change this to get a
 //  vector of  file names from the importer and add them to the file_name_table_
-  boost::filesystem::path full_filename( importer_->get_filename() );
+  boost::filesystem::path full_filename( this->private_->importer_->get_filename() );
   QTableWidgetItem *new_item;
   new_item = new QTableWidgetItem( QString::fromStdString( full_filename.leaf() ) );
   
@@ -256,12 +266,13 @@ void LayerImporterWidget::set_type( int file_type )
 
 void LayerImporterWidget::set_mode( LayerImporterMode mode )
 {
-  mode_ = mode;
+  this->private_->mode_ = mode;
 }
 
 void LayerImporterWidget::import()
 {
-  ActionImportLayer::Dispatch( Core::Interface::GetWidgetActionContext(), importer_, mode_ );
+  ActionImportLayer::Dispatch( Core::Interface::GetWidgetActionContext(), 
+                this->private_->importer_, this->private_->mode_ );
   accept();
 }
 

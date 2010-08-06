@@ -94,14 +94,9 @@ private:
   void list_import_options();
   
 private:
-  // The importer that was chosen in the filedialog
-  LayerImporterHandle importer_;
-  
+
   // The private information for rendering the widget
   LayerImporterWidgetPrivateHandle private_;
-
-  // The current active mode
-  LayerImporterMode mode_;
   
 private:  
   // SCANFILE:
