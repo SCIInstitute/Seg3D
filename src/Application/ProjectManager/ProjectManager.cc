@@ -200,11 +200,12 @@ void ProjectManager::rename_project( const std::string& new_name, Core::ActionSo
 void ProjectManager::new_project( const std::string& project_name, const std::string& project_path )
 {
   this->changing_projects_ = true;
+  this->current_project_->project_name_state_->set( project_name );
 
   boost::filesystem::path path = complete( boost::filesystem::path( this->
     current_project_path_state_->get().c_str(), boost::filesystem::native ) );
 
-  if( create_project_folders( path, this->current_project_->project_name_state_->get() ) )
+  if( this->create_project_folders( path, this->current_project_->project_name_state_->get() ) )
   {
     if( project_name.compare( 0, 11, "New Project" ) == 0 )
     {
@@ -217,7 +218,6 @@ void ProjectManager::new_project( const std::string& project_name, const std::st
 
     std::vector< std::string > empty_vector;
     this->current_project_->set_project_path( path );
-    this->current_project_->project_name_state_->set( project_name );
     this->current_project_path_state_->set( project_path );
     this->current_project_->sessions_state_->set( empty_vector );
     this->current_project_->project_notes_state_->set( empty_vector );

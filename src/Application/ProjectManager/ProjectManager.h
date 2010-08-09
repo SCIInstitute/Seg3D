@@ -124,10 +124,9 @@ public:
 
 public:
   Core::StateStringVectorHandle recent_projects_state_;
-  Core::StateStringHandle       current_project_path_state_;
-  Core::StateIntHandle          default_project_name_counter_state_;
-  
-  ProjectHandle current_project_;
+  Core::StateStringHandle     current_project_path_state_;
+  Core::StateIntHandle      default_project_name_counter_state_;
+  ProjectHandle         current_project_;
 
 private:
   
@@ -164,12 +163,12 @@ private:
   void cleanup_projects_list();
 
 private:
-  boost::posix_time::ptime last_saved_session_time_stamp_;
-  std::vector< Core::Color > project_colors_;
-  boost::filesystem::path local_projectmanager_path_;
-  const static size_t VERSION_NUMBER_C;
-  bool session_saving_;
-  bool changing_projects_;
+  boost::posix_time::ptime  last_saved_session_time_stamp_;
+  std::vector< Core::Color >  project_colors_;
+  boost::filesystem::path   local_projectmanager_path_;
+  const static size_t     VERSION_NUMBER_C;
+  bool            session_saving_;
+  bool            changing_projects_;
 
 
 };
