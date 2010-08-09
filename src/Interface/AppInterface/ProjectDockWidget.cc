@@ -42,9 +42,11 @@
 #include <Application/ProjectManager/Actions/ActionSaveSession.h>
 #include <Application/ProjectManager/Actions/ActionLoadSession.h>
 #include <Application/ProjectManager/Actions/ActionDeleteSession.h>
+#include <Application/ProjectManager/Actions/ActionExportProject.h>
 
 // Interface includes
 #include <Interface/AppInterface/ProjectDockWidget.h>
+#include <Interface/AppProjectExportWizard/AppProjectExportWizard.h>
 #include "ui_ProjectDockWidget.h"
 
 namespace Seg3D
@@ -98,9 +100,9 @@ ProjectDockWidget::ProjectDockWidget( QWidget *parent ) :
       value_changed_signal_.connect( boost::bind( 
       &ProjectDockWidget::HandleAutoSaveTimeChanged, project_dock_widget, _1 ) ) );
 
-    add_connection( PreferencesManager::Instance()->smart_save_state_->
-      state_changed_signal_.connect( boost::bind( 
-      &ProjectDockWidget::HandleSmartAutoSaveToggled, project_dock_widget ) ) );
+    add_connection( ProjectManager::Instance()->current_project_->project_file_size_state_->
+      value_changed_signal_.connect( boost::bind(
+      &ProjectDockWidget::HandleFileSizeChanged, project_dock_widget, _1 ) ) );
     
     connect( this->private_->ui_.save_session_button_, SIGNAL( clicked() ), 
       this, SLOT( save_session() ) );
@@ -123,6 +125,12 @@ ProjectDockWidget::ProjectDockWidget( QWidget *parent ) :
     connect( this->private_->ui_.note_edit_, SIGNAL( cursorPositionChanged() ),
       this, SLOT( enable_save_notes_button() ) );
 
+    connect( this->private_->ui_.export_project_button_, SIGNAL( clicked() ),
+      this, SLOT( export_project() ) );
+
+    connect( this->private_->ui_.sessions_list_, SIGNAL( cellClicked ( int, int ) ), 
+      this, SLOT( enable_load_delete_and_export_buttons( int, int ) ) );
+
     
     QStringList headers;
     headers << "Time:" << "Session Name:";
@@ -130,6 +138,9 @@ ProjectDockWidget::ProjectDockWidget( QWidget *parent ) :
     
     this->private_->ui_.session_name_linedit_->setText( QString::fromUtf8( "UnnamedSession" ) );
 
+    this->private_->ui_.horizontalLayout_2->setAlignment( Qt::AlignHCenter );
+
+    this->disable_load_delete_and_export_buttons();
   }
 }
 
@@ -147,7 +158,8 @@ void ProjectDockWidget::save_session()
 
 void ProjectDockWidget::save_note()
 {
-  ProjectManager::Instance()->save_note( this->private_->ui_.note_edit_->toPlainText().toStdString() );
+  ProjectManager::Instance()->save_note( 
+    this->private_->ui_.note_edit_->toPlainText().toStdString() );
   this->private_->ui_.note_edit_->setPlainText( QString::fromUtf8( "" ) );
 }
   
@@ -184,6 +196,7 @@ void ProjectDockWidget::load_session()
       ActionLoadSession::Dispatch( Core::Interface::GetWidgetActionContext(), session_name );
     }
   }
+  this->disable_load_delete_and_export_buttons();
 }
 
 void ProjectDockWidget::delete_session()
@@ -220,6 +233,7 @@ void ProjectDockWidget::delete_session()
   }
 
   this->populate_session_list();
+  this->disable_load_delete_and_export_buttons();
 }
 
 void ProjectDockWidget::populate_session_list()
@@ -349,7 +363,8 @@ void ProjectDockWidget::populate_notes_list()
     
   }
 
-  this->private_->ui_.notes_tree_->expandItem( this->private_->ui_.notes_tree_->topLevelItem( 0 ) );
+  this->private_->ui_.notes_tree_->expandItem( 
+    this->private_->ui_.notes_tree_->topLevelItem( 0 ) );
 }
   
 void ProjectDockWidget::HandleSessionsChanged( qpointer_type qpointer )
@@ -412,15 +427,121 @@ void ProjectDockWidget::HandleAutoSaveTimeChanged( qpointer_type qpointer, int d
 
 }
 
-void ProjectDockWidget::HandleSmartAutoSaveToggled( qpointer_type qpointer )
+void ProjectDockWidget::HandleFileSizeChanged( qpointer_type qpointer, double file_size )
 {
   if( !( Core::Interface::IsInterfaceThread() ) )
   {
     Core::Interface::Instance()->post_event( boost::bind( 
-      &ProjectDockWidget::HandleSmartAutoSaveToggled, qpointer ) );
+      &ProjectDockWidget::HandleFileSizeChanged, qpointer, file_size ) );
     return;
   }
-  if( qpointer.data() ) qpointer->set_smart_save_label();
+  if( qpointer.data() ) qpointer->set_file_size_label( file_size );
+}
+
+
+void ProjectDockWidget::set_file_size_label( double file_size )
+{
+  QString pretty_file_size = QString::number( file_size );
+  int number_length = pretty_file_size.size();
+
+  if( number_length > 12 )
+  {
+    if( number_length == 13 )
+    {
+      pretty_file_size.insert( 1, "." );
+      pretty_file_size.resize( 4 );
+    }
+
+    if( number_length == 14 )
+    {
+      pretty_file_size.insert( 2, "." );
+      pretty_file_size.resize( 5 );
+    }
+
+    if( number_length == 15 )
+    {
+      pretty_file_size.insert( 3, "." );
+      pretty_file_size.resize( 6 );
+    }
+    pretty_file_size = pretty_file_size + " TB";
+  }
+  else if( number_length > 9 )
+  {
+    if( number_length == 10 )
+    {
+      pretty_file_size.insert( 1, "." );
+      pretty_file_size.resize( 4 );
+    }
+
+    if( number_length == 11 )
+    {
+      pretty_file_size.insert( 2, "." );
+      pretty_file_size.resize( 5 );
+    }
+
+    if( number_length == 12 )
+    {
+      pretty_file_size.insert( 3, "." );
+      pretty_file_size.resize( 6 );
+    }
+    pretty_file_size = pretty_file_size + " GB";
+  }
+  else if( number_length > 6 )
+  {
+    if( number_length == 7 )
+    {
+      pretty_file_size.insert( 1, "." );
+      pretty_file_size.resize( 4 );
+    }
+
+    if( number_length == 8 )
+    {
+      pretty_file_size.insert( 2, "." );
+      pretty_file_size.resize( 5 );
+    }
+
+    if( number_length == 9 )
+    {
+      pretty_file_size.insert( 3, "." );
+      pretty_file_size.resize( 6 );
+    }
+    pretty_file_size = pretty_file_size + " MB";
+  }
+  else if( number_length > 3 )
+  {
+    if( number_length == 4 )
+    {
+      pretty_file_size.insert( 1, "." );
+      pretty_file_size.resize( 4 );
+    }
+
+    if( number_length == 5 )
+    {
+      pretty_file_size.insert( 2, "." );
+      pretty_file_size.resize( 5 );
+    }
+
+    if( number_length == 6 )
+    {
+      pretty_file_size.insert( 3, "." );
+      pretty_file_size.resize( 6 );
+    }
+
+    pretty_file_size = pretty_file_size + " KB";
+  }
+  else
+  {
+    pretty_file_size = pretty_file_size + " B";
+  }
+
+
+  if( file_size == 0 )
+  {
+    pretty_file_size = QString::fromUtf8( "No Data Files" );
+  }
+
+
+  this->private_->ui_.file_size_label_->setText( pretty_file_size );
 }
 
 void ProjectDockWidget::set_auto_save_label( int duration )
@@ -428,19 +549,6 @@ void ProjectDockWidget::set_auto_save_label( int duration )
   this->private_->ui_.minutes_label_->setText( QString::number( duration ) );
 }
 
-void ProjectDockWidget::set_smart_save_label()
-{
-  if( PreferencesManager::Instance()->smart_save_state_->get() == true )
-  {
-    this->private_->ui_.smart_autosave_status_label_->setText( 
-      QString::fromUtf8( "ACTIVE" ) );
-  }
-  else
-  {
-    this->private_->ui_.smart_autosave_status_label_->setText( 
-      QString::fromUtf8( "INACTIVE" ) );
-  }
-}
 
 std::string ProjectDockWidget::get_date()
 {
@@ -455,5 +563,53 @@ std::string ProjectDockWidget::get_date()
   std::string date = time_buffer;
   return date;
 }
+
+void ProjectDockWidget::export_project()
+{
+  int row = this->private_->ui_.sessions_list_->currentRow();
+  if( row < 0 )
+  {
+    QMessageBox message_box;
+    message_box.setText( QString::fromUtf8( "You cannot export a project without selecting a "
+      " session to export.") );
+    message_box.setInformativeText( QString::fromUtf8( 
+      "Please choose a session and try again." ) );
+    message_box.setStandardButtons( QMessageBox::Ok );
+    message_box.setDefaultButton( QMessageBox::Ok );
+    message_box.exec();
+    return;
+  }
+  
+  
+  std::vector< std::string > sessions = ProjectManager::Instance()->current_project_->
+    sessions_state_->get();
+  std::string session_name = sessions[ row ];
+
+  QPointer< AppProjectExportWizard > project_export_wizard_ = 
+    new AppProjectExportWizard( session_name, this );
+  project_export_wizard_->show();
+
+  this->disable_load_delete_and_export_buttons();
+}
+
+void ProjectDockWidget::enable_load_delete_and_export_buttons( int row, int column )
+{
+  if( row >= 0 )
+  {
+    this->private_->ui_.export_project_button_->setEnabled( true );
+    this->private_->ui_.load_session_button_->setEnabled( true );
+    this->private_->ui_.delete_session_button_->setEnabled( true );
+  }
+}
+
+void ProjectDockWidget::disable_load_delete_and_export_buttons()
+{
+  this->private_->ui_.export_project_button_->setEnabled( false );
+  this->private_->ui_.load_session_button_->setEnabled( false );
+  this->private_->ui_.delete_session_button_->setEnabled( false );
+}
+
+
+
 
 } // end namespace Seg3D

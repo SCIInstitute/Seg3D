@@ -78,11 +78,9 @@ private:
   // correct thread to the set_auto_save_label function so that it can update the label's text
   static void HandleAutoSaveTimeChanged( qpointer_type qpointer, int duration );
 
-  // HANDLESMARTAUTOSAVETOGGLED:
-  // this function handles signals that smart autosave has been toggled off or on and routes them,
-  // on the correct thread to the set_smart_save_label function to update the gui to refect the 
-  // change
-  static void HandleSmartAutoSaveToggled( qpointer_type qpointer );
+  // HANDLEFILESIZECHANGED:
+  // this function handles the signal that the file size has changed and sets the ui to reflect it
+  static void HandleFileSizeChanged( qpointer_type qpointer, double file_size );
 
 private:
   // SET_AUTO_SAVE_LABEL:
@@ -91,13 +89,21 @@ private:
 
   // SET_SMART_SAVE_LABEL:
   // function that updates the gui to reflect the status of the smart autosave state variable
-  void set_smart_save_label();
+  //void set_smart_save_label();
 
   // GET_DATE:
   // function for getting the current date to check the session names against
   std::string get_date();
+
+  // SET_FILE_SIZE_LABEL:
+  // function that actually sets the label to reflect the file size change
+  void set_file_size_label( double file_size );
   
 private Q_SLOTS:
+  // ENABLE_LOAD_DELETE_AND_EXPORT_BUTTONS:
+  // this function enables the load, export and delete buttons when the user clicks on a session
+  void enable_load_delete_and_export_buttons( int row, int column );
+
   // SAVE_PROJECT:
   // this function calls the Save Project Session action
   void save_session();
@@ -131,6 +137,15 @@ private Q_SLOTS:
   // This is an internal function that enables the button for saving notes when at least 3
   // characters have been entered.
   void enable_save_notes_button();
+
+  // EXPORT_PROJECT:
+  // this function is an internal function that opens the export project wizard
+  void export_project();
+
+  // DISABLE_LOAD_DELETE_AND_EXPORT_BUTTONS:
+  // this function disables the load, export and delete buttons for when a session is not selected
+  void disable_load_delete_and_export_buttons();
+  
 
 private:
   boost::shared_ptr< ProjectDockWidgetPrivate > private_;

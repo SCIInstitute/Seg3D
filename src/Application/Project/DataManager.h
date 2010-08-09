@@ -69,7 +69,7 @@ public:
   
 protected:
   Core::StateStringVectorHandle sessions_and_datafiles_state_;
-  
+
 public:
   // INITIALIZE:
   // this function loads the values for DataManager from file
@@ -84,9 +84,19 @@ public:
   // and removes it from the session datafile list
   void remove_session( const std::string& session_name );
 
+  // GET_SESSION_FILES_VECTOR:
+  // this function, when passed the name of a session, returns by reference, a vector of strings
+  // containing the list of files that that session depends on.  It returns true if the session
+  // exists, and false if the session does not.
+  bool get_session_files_vector( const std::string& session_name, std::vector< std::string >& files );
+
   // CLEAR_DATA_FILE_LIST:
   // funtion clear out the data file list in preperation for starting a new project
   void clear_data_file_list();
+
+  // GET_FILE_SIZE:
+  // function that returns the file size calculated from the data files
+  size_t get_file_size();
   
 private:
   // PREP_FOR_SAVE:
@@ -99,9 +109,10 @@ private:
   typedef Core::StateEngine::mutex_type mutex_type;
   typedef Core::StateEngine::lock_type lock_type;
   mutex_type& get_mutex();
-  
+
 private:
   const static size_t VERSION_NUMBER_C;
+  size_t disk_space_used;
 
 };
 

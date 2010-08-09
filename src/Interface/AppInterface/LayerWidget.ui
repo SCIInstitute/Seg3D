@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>301</width>
-    <height>265</height>
+    <width>304</width>
+    <height>244</height>
    </rect>
   </property>
   <property name="mouseTracking">
@@ -348,6 +348,9 @@ QPushButton#activate_button_{
                </size>
               </property>
               <layout class="QHBoxLayout" name="horizontalLayout_3">
+               <property name="spacing">
+                <number>6</number>
+               </property>
                <property name="leftMargin">
                 <number>0</number>
                </property>
@@ -507,7 +510,7 @@ QPushButton#activate_button_{
                 </widget>
                </item>
                <item>
-                <widget class="QToolButton" name="iso_surface_button_">
+                <widget class="QToolButton" name="fill_border_button_">
                  <property name="minimumSize">
                   <size>
                    <width>16</width>
@@ -521,7 +524,101 @@ QPushButton#activate_button_{
                   </size>
                  </property>
                  <property name="toolTip">
-                  <string>Turn on or off the iso-surface</string>
+                  <string>Open the fill/border menu</string>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="../../Resources/QtResources.qrc">
+                   <normaloff>:/Images/BorderOff.png</normaloff>
+                   <normalon>:/Images/Border.png</normalon>:/Images/BorderOff.png</iconset>
+                 </property>
+                 <property name="checkable">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QToolButton" name="brightness_contrast_button_">
+                 <property name="minimumSize">
+                  <size>
+                   <width>16</width>
+                   <height>16</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>16</width>
+                   <height>16</height>
+                  </size>
+                 </property>
+                 <property name="toolTip">
+                  <string>Open the brightness/contrast menu</string>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="../../Resources/QtResources.qrc">
+                   <normaloff>:/Images/BrightnessOff.png</normaloff>
+                   <normalon>:/Images/Brightness.png</normalon>:/Images/BrightnessOff.png</iconset>
+                 </property>
+                 <property name="checkable">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QToolButton" name="volume_rendered_button_">
+                 <property name="minimumSize">
+                  <size>
+                   <width>16</width>
+                   <height>16</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>16</width>
+                   <height>16</height>
+                  </size>
+                 </property>
+                 <property name="toolTip">
+                  <string>Turn on or off the volume render</string>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="../../Resources/QtResources.qrc">
+                   <normaloff>:/Images/VolumeVisibleOff.png</normaloff>
+                   <normalon>:/Images/VolumeVisible.png</normalon>:/Images/VolumeVisibleOff.png</iconset>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="Line" name="iso_control_separator_line_">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QToolButton" name="show_iso_surface_button_">
+                 <property name="minimumSize">
+                  <size>
+                   <width>16</width>
+                   <height>16</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>16</width>
+                   <height>16</height>
+                  </size>
+                 </property>
+                 <property name="toolTip">
+                  <string>Show or hide the iso-surface</string>
                  </property>
                  <property name="text">
                   <string>I</string>
@@ -562,42 +659,12 @@ QPushButton#activate_button_{
                    <normalon>:/Images/IsosurfaceCompute.png</normalon>:/Images/IsosurfaceComputeOff.png</iconset>
                  </property>
                  <property name="checkable">
-                  <bool>false</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QToolButton" name="fill_border_button_">
-                 <property name="minimumSize">
-                  <size>
-                   <width>16</width>
-                   <height>16</height>
-                  </size>
-                 </property>
-                 <property name="maximumSize">
-                  <size>
-                   <width>16</width>
-                   <height>16</height>
-                  </size>
-                 </property>
-                 <property name="toolTip">
-                  <string>Open the fill/border menu</string>
-                 </property>
-                 <property name="text">
-                  <string/>
-                 </property>
-                 <property name="icon">
-                  <iconset resource="../../Resources/QtResources.qrc">
-                   <normaloff>:/Images/BorderOff.png</normaloff>
-                   <normalon>:/Images/Border.png</normalon>:/Images/BorderOff.png</iconset>
-                 </property>
-                 <property name="checkable">
                   <bool>true</bool>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QToolButton" name="volume_rendered_button_">
+                <widget class="QToolButton" name="delete_iso_surface_button_">
                  <property name="minimumSize">
                   <size>
                    <width>16</width>
@@ -611,45 +678,15 @@ QPushButton#activate_button_{
                   </size>
                  </property>
                  <property name="toolTip">
-                  <string>Turn on or off the volume render</string>
+                  <string>Delete the iso-surface</string>
                  </property>
                  <property name="text">
                   <string/>
                  </property>
                  <property name="icon">
                   <iconset resource="../../Resources/QtResources.qrc">
-                   <normaloff>:/Images/VolumeVisibleOff.png</normaloff>
-                   <normalon>:/Images/VolumeVisible.png</normalon>:/Images/VolumeVisibleOff.png</iconset>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QToolButton" name="brightness_contrast_button_">
-                 <property name="minimumSize">
-                  <size>
-                   <width>16</width>
-                   <height>16</height>
-                  </size>
-                 </property>
-                 <property name="maximumSize">
-                  <size>
-                   <width>16</width>
-                   <height>16</height>
-                  </size>
-                 </property>
-                 <property name="toolTip">
-                  <string>Open the brightness/contrast menu</string>
-                 </property>
-                 <property name="text">
-                  <string/>
-                 </property>
-                 <property name="icon">
-                  <iconset resource="../../Resources/QtResources.qrc">
-                   <normaloff>:/Images/BrightnessOff.png</normaloff>
-                   <normalon>:/Images/Brightness.png</normalon>:/Images/BrightnessOff.png</iconset>
-                 </property>
-                 <property name="checkable">
-                  <bool>true</bool>
+                   <normaloff>:/Images/IsosurfaceDeleteOff.png</normaloff>
+                   <normalon>:/Images/IsosurfaceDelete.png</normalon>:/Images/IsosurfaceDeleteOff.png</iconset>
                  </property>
                 </widget>
                </item>

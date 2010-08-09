@@ -228,8 +228,10 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
           // Hide the buttons that are not needed for this widget
           this->private_->ui_.color_button_->hide();
           this->private_->ui_.compute_iso_surface_button_->hide();
+          this->private_->ui_.delete_iso_surface_button_->hide();
+          this->private_->ui_.show_iso_surface_button_->hide();
+          this->private_->ui_.iso_control_separator_line_->hide();
           this->private_->ui_.fill_border_button_->hide();
-          this->private_->ui_.iso_surface_button_->hide();
           
           // Add the layer specific connections
           DataLayer* data_layer = dynamic_cast< DataLayer* >( layer.get() );
@@ -263,7 +265,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
           MaskLayer* mask_layer = dynamic_cast< MaskLayer* >( layer.get() );  
           if ( mask_layer )
           {
-            QtUtils::QtBridge::Connect( this->private_->ui_.iso_surface_button_, 
+            QtUtils::QtBridge::Connect( this->private_->ui_.show_iso_surface_button_, 
               mask_layer->show_isosurface_state_ );
             QtUtils::QtBridge::Connect( this->private_->ui_.border_selection_combo_, 
               mask_layer->border_state_ );
@@ -313,7 +315,8 @@ void LayerWidget::enable_buttons( bool lock_button, bool other_buttons, bool /*i
   this->private_->ui_.visibility_button_->setEnabled( other_buttons );
   this->private_->ui_.color_button_->setEnabled( other_buttons );
   this->private_->ui_.compute_iso_surface_button_->setEnabled( other_buttons );
-  this->private_->ui_.iso_surface_button_->setEnabled( other_buttons );
+  this->private_->ui_.show_iso_surface_button_->setEnabled( other_buttons );
+  this->private_->ui_.delete_iso_surface_button_->setEnabled( other_buttons );
   this->private_->ui_.fill_border_button_->setEnabled( other_buttons );
   this->private_->ui_.volume_rendered_button_->setEnabled( other_buttons );
   this->private_->ui_.brightness_contrast_button_->setEnabled( other_buttons );

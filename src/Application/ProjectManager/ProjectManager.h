@@ -80,9 +80,11 @@ public:
   // this function saves the values in current_project_ to the current save location
   void save_project( bool autosave = false, std::string session_name = "" );
   
-  // SAVE_PROJECT_AS:
-  // this function saves the valuse in current_project_ to the desired save location
-  void save_project_as();
+  // EXPORT_PROJECT:
+  // this function saves the value in current_project_, and the selected session to the desired
+  // save location 
+  bool export_project( const std::string& export_path, const std::string& project_name, 
+    const std::string& session_name );
   
   // SAVE_PROJECT_MANAGER_STATE:
   // this function calls save_states that writes the state values of ProjectManager to file
@@ -131,11 +133,12 @@ private:
   
   // ADD_TO_RECENT_PROJECTS:
   // this function adds the latest project to the list of recent projects
-  void add_to_recent_projects( const std::string& project_path, const std::string& project_name = "" );
+  void add_to_recent_projects( const std::string& project_path, 
+    const std::string& project_name = "" );
   
   // CREATE_PROJECT_FOLDERS:
   // this will try and create the project folders and if is successfull return true 
-  bool create_project_folders( const std::string& project_name );
+  bool create_project_folders( boost::filesystem::path& path, const std::string& project_name );
   
   // RENAME_PROJECT_FOLDER
   // this function is triggered when a user changes the folder name
@@ -144,7 +147,8 @@ private:
   // SAVE_PROJECT_ONLY:
   // this function saves only the project and is used internally only. It returns if it was 
   // successful.
-  bool save_project_only();
+  bool save_project_only( const std::string& project_path_string, 
+    const std::string& project_name );
 
   // SET_LAST_SAVED_SESSION_TIME_STAMP:
   // this function updates last_saved_session_time_stamp_ to reflect the new last saved session

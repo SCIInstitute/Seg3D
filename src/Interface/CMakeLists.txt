@@ -29,6 +29,7 @@
 ADD_SUBDIRECTORY(AppController)
 ADD_SUBDIRECTORY(AppInterface)
 ADD_SUBDIRECTORY(AppPreferences)
+ADD_SUBDIRECTORY(AppProjectExportWizard)
 ADD_SUBDIRECTORY(AppProjectWizard)
 ADD_SUBDIRECTORY(AppSplash)
 ADD_SUBDIRECTORY(ToolInterface)

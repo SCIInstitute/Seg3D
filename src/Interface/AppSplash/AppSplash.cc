@@ -173,11 +173,23 @@ void AppSplash::populate_recent_projects()
   {
     if( this->recent_project_list_[ i ] != "" )
     {
-      this->private_->ui_.recent_project_listwidget_->addItem( 
-        QString::fromStdString( ( Core::SplitString( 
+      QListWidgetItem *new_item;
+      new_item = new QListWidgetItem( QString::fromStdString( ( Core::SplitString( 
         this->recent_project_list_[ i ], "|" ) )[ 1 ] ) + "  -  " +
         QString::fromStdString( ( Core::SplitString( 
         this->recent_project_list_[ i ], "|" ) )[ 2 ] ) );
+
+      new_item->setToolTip( QString::fromUtf8( "This project is located at: " ) 
+        + QString::fromStdString( ( Core::SplitString( 
+        this->recent_project_list_[ i ], "|" ) )[ 0 ] ) );
+
+      this->private_->ui_.recent_project_listwidget_->addItem( new_item );
+
+//      this->private_->ui_.recent_project_listwidget_->addItem( 
+//        QString::fromStdString( ( Core::SplitString( 
+//        this->recent_project_list_[ i ], "|" ) )[ 1 ] ) + "  -  " +
+//        QString::fromStdString( ( Core::SplitString( 
+//        this->recent_project_list_[ i ], "|" ) )[ 2 ] ) );
       
     }
   }

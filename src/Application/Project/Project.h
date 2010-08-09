@@ -77,7 +77,9 @@ public:
   Core::StateBoolHandle save_custom_colors_state_;
   Core::StateStringVectorHandle sessions_state_;
   Core::StateStringVectorHandle project_notes_state_;
+  Core::StateDoubleHandle project_file_size_state_;
   std::vector< Core::StateColorHandle > color_states_;
+  
   
 public:
   typedef boost::signals2::signal< void( std::string ) > session_deleted_signal_type;
@@ -103,6 +105,10 @@ public:
   // DELETE_SESSION:
   // this function will be called by the project manager to delete a session
   bool delete_session( const std::string& session_name );
+
+  // EXPORT:
+  // this function will export the current project and the passed vector of session names to file
+  bool project_export( boost::filesystem::path path, const std::string& project_name, const std::string& session_name );
   
   // NAME_IS_SET:
   // this function is set called to set the name_set_ toggle in the project so it knows if the name
@@ -136,6 +142,11 @@ public:
   // SET_PROJECT_PATH:
   // function that lets the project manager set the project path for the project
   void set_project_path( const boost::filesystem::path& project_path );
+
+  // SET_SIGNAL_BLOCK:
+  // this function is a public function that enables the project manager to disable the signals 
+  // that the project emits when it's state variables are changed
+  void set_signal_block( bool on_off );
   
 protected:
   // PRE_SAVE_STATES:
@@ -159,8 +170,8 @@ private:
   SessionHandle current_session_;
   bool name_set_;
   const static size_t VERSION_NUMBER_C;
-  DataManagerHandle data_manager_;
   boost::filesystem::path project_path_;
+  DataManagerHandle data_manager_;
   
 };
 

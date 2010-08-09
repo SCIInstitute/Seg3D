@@ -180,7 +180,7 @@ void ProjectManager::rename_project( const std::string& new_name, Core::ActionSo
   }
   this->recent_projects_state_->set( temp_projects_vector );
   
-  if( this->save_project_only() )
+  if( this->save_project_only( this->current_project_path_state_->get(), new_name ) )
   {
     this->add_to_recent_projects( this->current_project_path_state_->get(), new_name );
     
@@ -201,7 +201,10 @@ void ProjectManager::new_project( const std::string& project_name, const std::st
 {
   this->changing_projects_ = true;
 
-  if( create_project_folders( project_name ) )
+  boost::filesystem::path path = complete( boost::filesystem::path( this->
+    current_project_path_state_->get().c_str(), boost::filesystem::native ) );
+
+  if( create_project_folders( path, this->current_project_->project_name_state_->get() ) )
   {
     if( project_name.compare( 0, 11, "New Project" ) == 0 )
     {
@@ -258,7 +261,8 @@ void ProjectManager::save_project( bool autosave /*= false*/, std::string sessio
   this->session_saving_ = true;
   if( this->save_project_session( autosave, session_name ) )
   {
-    this->save_project_only();
+    this->save_project_only( this->current_project_path_state_->get(), 
+      this->current_project_->project_name_state_->get() );
   }
   this->session_saving_ = false;
   
@@ -277,15 +281,22 @@ void ProjectManager::save_project( bool autosave /*= false*/, std::string sessio
 
 }
   
-void ProjectManager::save_project_as()
+bool ProjectManager::export_project( const std::string& export_path, const std::string& project_name, const std::string& session_name )
 {
-    
+  boost::filesystem::path path = complete( boost::filesystem::path( export_path.c_str(), 
+    boost::filesystem::native ) );
+
+  this->create_project_folders( path, project_name );
+  this->save_project_only( export_path, project_name );
+  this->current_project_->project_export( path, project_name, session_name );
+  
+  return true;
+
 }
   
 bool ProjectManager::save_project_session( bool autosave /*= false */, std::string session_name  )
 {
   // Here we check to see if its an autosave and if it is, just save over the previous autosave
-  
   if( session_name == "" )
   {
     session_name = "UnnamedSession";
@@ -402,12 +413,11 @@ void ProjectManager::cleanup_projects_list()
 }
 
   
-bool ProjectManager::create_project_folders( const std::string& project_name )
+bool ProjectManager::create_project_folders( boost::filesystem::path& path, const std::string& project_name )
 {
+  //std::string project_name = this->current_project_->project_name_state_->get();
   try // to create a project folder
   {
-    boost::filesystem::path path = complete( boost::filesystem::path( this->
-      current_project_path_state_->get().c_str(), boost::filesystem::native ) );
     boost::filesystem::create_directory( path / project_name );
   }
   catch ( std::exception& e ) // any errors that we might get thrown
@@ -418,8 +428,6 @@ bool ProjectManager::create_project_folders( const std::string& project_name )
   
   try // to create a project sessions folder
   {
-    boost::filesystem::path path = complete( boost::filesystem::path( this->
-      current_project_path_state_->get().c_str(), boost::filesystem::native ) );
     boost::filesystem::create_directory( path / project_name / "sessions");
   }
   catch ( std::exception& e ) // any errors that we might get thrown
@@ -430,8 +438,6 @@ bool ProjectManager::create_project_folders( const std::string& project_name )
   
   try // to create a project data folder
   {
-    boost::filesystem::path path = complete( boost::filesystem::path( this->
-      current_project_path_state_->get().c_str(), boost::filesystem::native ) );
     boost::filesystem::create_directory( path / project_name / "data");
   }
   catch ( std::exception& e ) // any errors that we might get thrown
@@ -488,14 +494,26 @@ void ProjectManager::save_note( const std::string& note )
     this->current_project_->project_notes_state_, 
     get_timestamp() + " - " + user_name + "|" + note );
 
-  this->save_project_only();
+  this->save_project_only( this->current_project_path_state_->get(), 
+    this->current_project_->project_name_state_->get() );
 }
 
-bool ProjectManager::save_project_only()
+bool ProjectManager::save_project_only( const std::string& project_path_string, const std::string& project_name )
 {
-  boost::filesystem::path project_path( this->current_project_path_state_->get() );
+  // When we are using this function as part of exporting a project, we may be saving it with
+  // a different name, in that case, we need to temporarily change the project's name before
+  // we export it to file and, of course, change it back when we are done.
+  std::string current_project_name = this->current_project_->project_name_state_->get();
+  bool temporarily_changing_name = false;
+  if( project_name != current_project_name )
+  {
+    temporarily_changing_name = true;
+    this->current_project_->set_signal_block( false );
+    this->current_project_->project_name_state_->set( project_name );
+  }
 
-  std::string project_name = this->current_project_->project_name_state_->get();
+  boost::filesystem::path project_path( project_path_string );
+
   project_path = project_path / project_name / ( project_name + ".s3d" );
 
   Core::StateIO stateio;
@@ -503,6 +521,12 @@ bool ProjectManager::save_project_only()
   this->current_project_->save_states( stateio );
   stateio.export_to_file( project_path );
   
+  // now if we changed the name, we change it back
+  if( temporarily_changing_name )
+  {
+    this->current_project_->project_name_state_->set( current_project_name );
+    this->current_project_->set_signal_block( true );
+  }
   return true;
 }
 

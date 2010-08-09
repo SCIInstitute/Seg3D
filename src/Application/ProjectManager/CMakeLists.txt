@@ -47,8 +47,10 @@ SET(APPLICATION_PROJECTMANAGER_ACTIONS_SRCS
     Actions/ActionDeleteSession.cc
     Actions/ActionLoadProject.h
     Actions/ActionLoadProject.cc
-  Actions/ActionNewProject.h
+    Actions/ActionNewProject.h
     Actions/ActionNewProject.cc
+    Actions/ActionExportProject.h
+    Actions/ActionExportProject.cc
 )
 
 

@@ -104,6 +104,10 @@ public:
   // Get the configuration directory on the current system  
   bool get_config_directory( boost::filesystem::path& config_dir );
 
+  // GET_USER_DESKTOP_DIRECTORY:
+  // get the path of the users desktop directory
+  bool get_user_desktop_directory( boost::filesystem::path& user_desktop_dir );
+
   // GET_USER_NAME:
   // Get the current username
   bool get_user_name( std::string& user_name );

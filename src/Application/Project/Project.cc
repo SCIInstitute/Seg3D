@@ -36,6 +36,7 @@
 #include <Core/Application/Application.h>
 #include <Core/State/StateIO.h>
 #include <Core/Utils/StringUtil.h>
+#include <Core/Utils/Log.h>
 
 // Application includes
 #include <Application/Project/Project.h>
@@ -56,12 +57,15 @@ Project::Project( const std::string& project_name ) :
   std::vector< std::string> empty_vector;
   add_state( "sessions", this->sessions_state_, empty_vector );
   add_state( "project_notes", this->project_notes_state_, empty_vector );
+
+  add_state( "project_file_size", this->project_file_size_state_, 0 );
   
   this->color_states_.resize( 12 );
   for ( size_t j = 0; j < 12; j++ )
   {
     std::string stateid = std::string( "color_" ) + Core::ExportToString( j );
-    this->add_state( stateid, this->color_states_[ j ], PreferencesManager::Instance()->get_default_colors()[ j ] );
+    this->add_state( stateid, this->color_states_[ j ], 
+      PreferencesManager::Instance()->get_default_colors()[ j ] );
   }
 
   this->current_session_ = SessionHandle( new Session( "default_session" ) );
@@ -81,7 +85,7 @@ bool Project::initialize_from_file( const std::string& project_name )
   {
     if( this->load_session( this->get_session_name( 0 ) ) )
     {
-      this->data_manager_->initialize( this->project_path_ );
+/*      this->data_manager_->initialize( this->project_path_ );*/
       return true;
     }
   }
@@ -107,7 +111,8 @@ bool Project::save_session( const std::string& session_name )
 
 bool Project::delete_session( const std::string& session_name )
 {
-  boost::filesystem::path session_path = this->project_path_ / "sessions" / ( session_name + ".xml" );
+  boost::filesystem::path session_path = 
+    this->project_path_ / "sessions" / ( session_name + ".xml" );
   
   std::vector< std::string > temp_sessions_vector = this->sessions_state_->get();
   
@@ -166,6 +171,9 @@ void Project::add_session_to_list( const std::string& session_name )
   this->sessions_state_->set( temp_sessions_vector );
 
   this->data_manager_->save_datamanager_state( this->project_path_, session_name );
+
+  this->project_file_size_state_->set( static_cast< double >( 
+    this->data_manager_->get_file_size() ) );
   
 }
 
@@ -190,7 +198,8 @@ bool Project::pre_save_states( Core::StateIO& state_io )
   {
     for ( size_t j = 0; j < 12; j++ )
     {
-      this->color_states_[ j ]->set( PreferencesManager::Instance()->color_states_[ j ]->get() );
+      this->color_states_[ j ]->set( 
+        PreferencesManager::Instance()->color_states_[ j ]->get() );
     }
   }
   return true;
@@ -204,10 +213,12 @@ bool Project::post_load_states( const Core::StateIO& state_io )
   {
     for ( size_t j = 0; j < 12; j++ )
     {
-      PreferencesManager::Instance()->color_states_[ j ]->set( this->color_states_[ j ]->get() );
+      PreferencesManager::Instance()->color_states_[ j ]->set( 
+        this->color_states_[ j ]->get() );
     }
   }
 
+  this->data_manager_->initialize( this->project_path_ );
   // Once we have loaded the state of the sessions_list, we need to validate that the files exist
   this->cleanup_session_list();
 
@@ -247,11 +258,62 @@ void Project::cleanup_session_list()
       {
         new_session_vector.push_back( sessions_vector[ i ] );
       }
+      else
+      {
+        this->data_manager_->remove_session( sessions_vector[ i ] );
+      }
     }
   }
   this->sessions_state_->set( new_session_vector );
 }
 
+bool Project::project_export( boost::filesystem::path path, const std::string& project_name, 
+  const std::string& session_name )
+{
+  this->data_manager_->save_datamanager_state( path, session_name );
+
+  std::vector< std::string > file_vector;
+  if( this->data_manager_->get_session_files_vector( session_name, file_vector ) )
+  {
+    for( int i = 0; i < static_cast< int >( file_vector.size() ); ++i )
+    {
+      if( !boost::filesystem::exists( path / project_name / "data" / file_vector[ i ] ) )
+      {
+        try
+        {
+          boost::filesystem::copy_file( ( project_path_ / "data" / file_vector[ i ] ),
+            ( path / project_name / "data" / file_vector[ i ] ) );
+        }
+        catch ( std::exception& e ) // any errors that we might get thrown
+        {
+          CORE_LOG_ERROR( e.what() );
+          return false;
+        }
+      }
+    }
+  }
+
+  try
+  {
+    boost::filesystem::copy_file( ( project_path_ / "sessions" / ( session_name + ".xml" ) ),
+      ( path / project_name / "sessions" / ( session_name + ".xml" ) ) );
+  }
+  catch ( std::exception& e ) // any errors that we might get thrown
+  {
+    CORE_LOG_ERROR( e.what() );
+    return false;
+  }
+  
+  
+
+  return true;
+
+}
+
+void Project::set_signal_block( bool on_off )
+{
+  this->enable_signals( on_off );
+}
+
 
 } // end namespace Seg3D
-
