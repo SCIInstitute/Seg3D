@@ -36,6 +36,8 @@ SET(APPLICATION_RENDERER_SHADER_SRCS
   Lighting.frag
   SliceShader.frag
   SliceShader.vert
+  IsosurfaceShader.frag
+  IsosurfaceShader.vert
   )
   
 CORE_IMPORT_SHADER(APPLICATION_RENDERER_SHADER_STRING_SRCS
@@ -50,6 +52,8 @@ SET(APPLICATION_RENDERER_SRCS
   Renderer.cc
   SliceShader.h
   SliceShader.cc
+  IsosurfaceShader.h
+  IsosurfaceShader.cc
   )
   
 CORE_ADD_LIBRARY(Application_Renderer ${APPLICATION_RENDERER_SRCS}

@@ -80,7 +80,6 @@ AppInterface::AppInterface()
   this->controller_interface_->hide();
   
   this->splash_interface_ = new AppSplash( this );
-  this->show_window( "splash" );
 
   // Define the main window viewer canvas
   this->viewer_interface_ = new ViewerInterface( this );
@@ -142,6 +141,7 @@ AppInterface::AppInterface()
   }
 
   this->center_seg3d_gui_on_screen( this );
+  this->show_window( "splash" );
 }
 
   

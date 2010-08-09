@@ -79,6 +79,11 @@ public:
   {
     return this->mask_volume_;
   }
+
+  Core::IsosurfaceHandle get_isosurface()
+  {
+    return this->isosurface_;
+  }
   
   // -- state variables --
 public:

@@ -62,7 +62,7 @@ bool SliceShader::initialize()
   if ( !this->glsl_frag_shader_->compile() )
   {
     std::string error_info = this->glsl_frag_shader_->get_info_log();
-    CORE_LOG_ERROR( std::string( "Failed compling SliceShader source: \n" ) + error_info );
+    CORE_LOG_ERROR( std::string( "Failed compiling SliceShader source: \n" ) + error_info );
     this->glsl_frag_shader_.reset();
     return false;
   }
@@ -73,7 +73,7 @@ bool SliceShader::initialize()
   if ( !this->glsl_vert_shader_->compile() )
   {
     std::string error_info = this->glsl_vert_shader_->get_info_log();
-    CORE_LOG_ERROR( std::string( "Failed compling SliceShader source: \n" ) + error_info );
+    CORE_LOG_ERROR( std::string( "Failed compiling SliceShader source: \n" ) + error_info );
     this->glsl_frag_shader_.reset();
     this->glsl_vert_shader_.reset();
     return false;

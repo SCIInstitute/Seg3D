@@ -70,7 +70,7 @@ void IsosurfacePrivate::compute_normals()
 
     // Calculate cross product of edges
     VectorF v0 = p3 - p2;
-    VectorF v1 = p2 - p1;
+    VectorF v1 = p1 - p2;
     VectorF n = Cross(v0, v1);
 
     // Add to normal for each included vertex

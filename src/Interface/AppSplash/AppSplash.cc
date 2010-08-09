@@ -60,8 +60,9 @@ AppSplash::AppSplash( QWidget *parent ) :
   QDialog( parent ),
   private_( new AppSplashPrivate )
 {
-  InitQtResources();
-  setAttribute( Qt::WA_DeleteOnClose );
+  this->setAttribute( Qt::WA_DeleteOnClose );
+  this->setModal( true );
+
   // Set up the private internals of the AppSplash class
   this->private_->ui_.setupUi( this );
   

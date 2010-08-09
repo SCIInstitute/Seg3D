@@ -52,6 +52,7 @@
 #include <Application/ToolManager/ToolManager.h>
 #include <Application/ViewerManager/ViewerManager.h>
 #include <Application/Renderer/SliceShader.h>
+#include <Application/Renderer/IsosurfaceShader.h>
 #include <Application/Viewer/Viewer.h>
 
 
@@ -74,6 +75,18 @@ public:
 };
 
 //////////////////////////////////////////////////////////////////////////
+// Implementation of class IsosurfaceRecord
+//////////////////////////////////////////////////////////////////////////
+class IsosurfaceRecord
+{
+public:
+  Core::Color color_;
+  Core::IsosurfaceHandle isosurface_;
+};
+typedef boost::shared_ptr< IsosurfaceRecord > IsosurfaceRecordHandle;
+typedef std::vector< IsosurfaceRecordHandle > IsosurfaceArray;
+
+//////////////////////////////////////////////////////////////////////////
 // Implementation of class RendererPrivate
 //////////////////////////////////////////////////////////////////////////
 
@@ -91,6 +104,7 @@ static const unsigned char MASK_PATTERNS_C[ PATTERN_SIZE_C ][ PATTERN_SIZE_C ] =
 
 class RendererPrivate
 {
+  // -- Helper functions --
 public:
   void process_slices( LayerSceneHandle& layer_scene, ViewerHandle& viewer );
   void draw_slices_3d( const Core::BBox& bbox, 
@@ -100,6 +114,11 @@ public:
     bool with_lighting );
   void draw_slice( LayerSceneItemHandle layer_item, const Core::Matrix& proj_mat,
     ProxyRectangleHandle rect = ProxyRectangleHandle() );
+  void process_isosurfaces( IsosurfaceArray& isosurfaces );
+  void draw_isosurfaces( const IsosurfaceArray& isosurfaces, bool with_lighting );
+
+  // -- Signals handling --
+public:
   void viewer_slice_changed( size_t viewer_id );
   void viewer_mode_changed( size_t viewer_id );
   void picking_target_changed( size_t viewer_id );
@@ -108,6 +127,7 @@ public:
   Renderer* renderer_;
 
   SliceShaderHandle slice_shader_;
+  IsosurfaceShaderHandle isosurface_shader_;
   Core::Texture2DHandle pattern_texture_;
   Core::TextRendererHandle text_renderer_;
   Core::Texture2DHandle text_texture_;
@@ -461,6 +481,54 @@ void RendererPrivate::enable_rendering( bool enable )
   }
 }
 
+void RendererPrivate::process_isosurfaces( IsosurfaceArray& isosurfaces )
+{
+  std::vector< LayerHandle > layers;
+  LayerManager::Instance()->get_layers( layers );
+  size_t num_of_layers = layers.size();
+  for ( size_t i = 0; i < num_of_layers; ++i )
+  {
+    if ( layers[ i ]->type() == Core::VolumeType::MASK_E )
+    {
+      MaskLayer* mask_layer = static_cast< MaskLayer* >( layers[ i ].get() );
+      if ( mask_layer->show_isosurface_state_->get() )
+      {
+        IsosurfaceRecord* iso_record = new IsosurfaceRecord;
+        iso_record->color_ = PreferencesManager::Instance()->get_color( 
+          mask_layer->color_state_->get() );
+        iso_record->isosurface_ = mask_layer->get_isosurface();
+        isosurfaces.push_back( IsosurfaceRecordHandle( iso_record ) );
+      }
+    }
+  }
+}
+
+void RendererPrivate::draw_isosurfaces( const IsosurfaceArray& isosurfaces, bool with_lighting )
+{
+  size_t num_of_isosurfaces = isosurfaces.size();
+  this->isosurface_shader_->enable();
+  this->isosurface_shader_->set_lighting( with_lighting );
+  glEnableClientState( GL_VERTEX_ARRAY );
+  glEnableClientState( GL_NORMAL_ARRAY );
+  for ( size_t i = 0; i < num_of_isosurfaces; ++i )
+  {
+    Core::IsosurfaceHandle iso = isosurfaces[ i ]->isosurface_;
+    if ( !iso )
+    {
+      continue;
+    }
+    glColor3d( isosurfaces[ i ]->color_.r() / 255.0, isosurfaces[ i ]->color_.g() / 255.0, 
+      isosurfaces[ i ]->color_.b() / 255.0 );
+    glVertexPointer( 3, GL_FLOAT, 0, &( iso->get_points()[ 0 ] ) );
+    glNormalPointer( GL_FLOAT, 0, &( iso->get_normals()[ 0 ] ) );
+    glDrawElements( GL_TRIANGLES, static_cast< GLsizei >( iso->get_faces().size() ), 
+      GL_UNSIGNED_INT, &( iso->get_faces()[ 0 ] ) );
+  }
+  glDisableClientState( GL_VERTEX_ARRAY );
+  glDisableClientState( GL_NORMAL_ARRAY );
+  this->isosurface_shader_->disable();
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Implementation of class Renderer
 //////////////////////////////////////////////////////////////////////////
@@ -473,6 +541,7 @@ Renderer::Renderer( size_t viewer_id ) :
   this->private_->rendering_enabled_ = true;
   this->private_->renderer_ = this;
   this->private_->slice_shader_.reset( new SliceShader );
+  this->private_->isosurface_shader_.reset( new IsosurfaceShader );
   this->private_->text_renderer_.reset( new Core::TextRenderer );
   this->private_->viewer_id_ = viewer_id;
 }
@@ -505,6 +574,7 @@ void Renderer::post_initialize()
     Core::RenderResources::lock_type lock( Core::RenderResources::GetMutex() );
 
     this->private_->slice_shader_->initialize();
+    this->private_->isosurface_shader_->initialize();
     this->private_->pattern_texture_.reset( new Core::Texture2D );
     this->private_->pattern_texture_->set_image( PATTERN_SIZE_C, PATTERN_SIZE_C, 
       GL_ALPHA, MASK_PATTERNS_C, GL_ALPHA, GL_UNSIGNED_BYTE );
@@ -580,8 +650,10 @@ bool Renderer::render()
     std::vector< LayerSceneHandle > layer_scenes;
     std::vector< double > depths;
     std::vector< std::string > view_modes;
+    bool with_lighting = viewer->volume_light_visible_state_->get();
+    bool draw_slices = viewer->volume_slices_visible_state_->get();
     size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
-    for ( size_t i = 0; i < num_of_viewers; i++ )
+    for ( size_t i = 0; i < num_of_viewers && draw_slices; i++ )
     {
       ViewerHandle other_viewer = ViewerManager::Instance()->get_viewer( i );
       if ( !other_viewer->slice_visible_state_->get() || 
@@ -606,8 +678,8 @@ bool Renderer::render()
     }
 
     Core::BBox bbox = LayerManager::Instance()->get_layers_bbox();
-    bool with_lighting = viewer->volume_light_visible_state_->get();
-    bool draw_slices = viewer->volume_slices_visible_state_->get();
+    IsosurfaceArray isosurfaces;
+    this->private_->process_isosurfaces( isosurfaces );
 
     // We have got everything we want from the state engine, unlock before we do any rendering
     state_lock.unlock();
@@ -628,7 +700,7 @@ bool Renderer::render()
     {
       this->private_->draw_slices_3d( bbox, layer_scenes, depths, view_modes, with_lighting );
     }
-
+    this->private_->draw_isosurfaces( isosurfaces, with_lighting );
     glDisable( GL_BLEND );
   }
   else
