@@ -441,7 +441,7 @@ void ProjectDockWidget::HandleFileSizeChanged( qpointer_type qpointer, double fi
 
 void ProjectDockWidget::set_file_size_label( double file_size )
 {
-  QString pretty_file_size = QString::number( file_size );
+  QString pretty_file_size = QString::number( file_size, 'f', 0 );
   int number_length = pretty_file_size.size();
 
   if( number_length > 12 )
