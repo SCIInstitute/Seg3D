@@ -527,9 +527,7 @@ void PaintToolPrivate::handle_data_constraint_changed()
   double min_val = data_layer->get_data_volume()->data_block()->get_min();
   double max_val = data_layer->get_data_volume()->data_block()->get_max();
   this->paint_tool_->lower_threshold_state_->set_range( min_val, max_val );
-  this->paint_tool_->lower_threshold_state_->set( min_val );
   this->paint_tool_->upper_threshold_state_->set_range( min_val, max_val );
-  this->paint_tool_->upper_threshold_state_->set( max_val );
 }
 
 void PaintToolPrivate::update_target_options()
@@ -661,9 +659,9 @@ PaintTool::PaintTool( const std::string& toolid, bool auto_number ) :
   this->add_state( "negative_data_constraint", this->negative_data_constraint_state_, false );
   this->add_state( "negative_mask_constraint", this->negative_mask_constraint_state_, false );
 
-  this->add_state( "brush_radius", this->brush_radius_state_, 3, 0, 250, 1 );
-  this->add_state( "upper_threshold", this->upper_threshold_state_, 255.0, 00.0, 255.0, 0.01 );
-  this->add_state( "lower_threshold", this->lower_threshold_state_, 0.0, 00.0, 255.0, 0.01 );
+  this->add_state( "brush_radius", this->brush_radius_state_, 3, 0, 150, 1 );
+  this->add_state( "upper_threshold", this->upper_threshold_state_, 1000.0, -1000.0, 1000.0, 0.01 );
+  this->add_state( "lower_threshold", this->lower_threshold_state_, -1000.0, -1000.0, 1000.0, 0.01 );
   this->add_state( "erase", this->erase_state_, false );
   
   this->add_connection( this->data_constraint_layer_state_->state_changed_signal_.connect(
