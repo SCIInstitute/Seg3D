@@ -51,7 +51,7 @@ QtApplication::QtApplication() :
 {
 }
 
-bool QtApplication::setup( int argc, char **argv )
+bool QtApplication::setup( int& argc, char **argv )
 {
   CORE_LOG_DEBUG( "Setup QT Application" );
 

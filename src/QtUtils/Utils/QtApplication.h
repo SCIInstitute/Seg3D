@@ -72,7 +72,7 @@ private:
 public:
   // SETUP:
   // Setup the interface context
-  bool setup( int argc, char **argv );
+        bool setup( int& argc, char **argv );
 
   // EXEC:
   // Start the interface execution
