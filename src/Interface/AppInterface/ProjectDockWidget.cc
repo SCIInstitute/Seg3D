@@ -153,7 +153,6 @@ void ProjectDockWidget::save_session()
 {
   std::string session_name = this->private_->ui_.session_name_linedit_->text().toStdString();
   ActionSaveSession::Dispatch( Core::Interface::GetWidgetActionContext(), false, session_name );
-  this->private_->ui_.session_name_linedit_->setText( QString::fromUtf8( "UnnamedSession" ) );
 }
 
 void ProjectDockWidget::save_note()

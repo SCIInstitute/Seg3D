@@ -135,7 +135,7 @@
              <string>Controls for activating and deactivating Smart Autosave are located in the Preferences Manager</string>
             </property>
             <property name="text">
-             <string>No Data Files</string>
+             <string>Not yet computed</string>
             </property>
            </widget>
           </item>

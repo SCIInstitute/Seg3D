@@ -65,6 +65,7 @@ public:
   typedef QPointer< LayerImporterWidget > qpointer_type;
 
   LayerImporterWidget( LayerImporterHandle importer, QWidget *parent = 0 );
+  LayerImporterWidget( std::vector< LayerImporterHandle > importers, QWidget *parent = 0 );
   virtual ~LayerImporterWidget();
     
 private Q_SLOTS:
@@ -72,10 +73,6 @@ private Q_SLOTS:
   // SLOTS: These functions connect to the buttons for importing the data as a specific
   // layer type.
   void set_type( int file_type );
-//  void set_data();
-//  void set_single_mask();
-//  void set_bitplane_mask();
-//  void set_label_mask();
 
   // SLOT IMPORT: execute this function when the import button is selected
   void import();
@@ -83,7 +80,7 @@ private Q_SLOTS:
 private:
   // UPDATE_ICONS:
   // Update the icons to reflect active mode
-  //void update_icons();
+  void setup_ui();
 
   // SET_MODE:
   // Set the mode of the importer
@@ -94,7 +91,6 @@ private:
   void list_import_options();
   
 private:
-
   // The private information for rendering the widget
   LayerImporterWidgetPrivateHandle private_;
   

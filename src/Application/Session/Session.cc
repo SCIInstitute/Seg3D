@@ -73,7 +73,16 @@ bool Session::save( boost::filesystem::path path, const std::string& session_nam
   {
     if ( !boost::filesystem::exists( path ) )
     {
-      boost::filesystem::create_directory( path );
+      try
+      {
+        boost::filesystem::create_directory( path );
+      }
+      catch(  std::exception& e ) 
+      {
+        CORE_LOG_ERROR( e.what() );
+        return false;
+      }
+      
     }
     return state_io.export_to_file( path / ( session_name + ".xml" ) );
   }

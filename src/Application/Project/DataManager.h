@@ -73,11 +73,12 @@ protected:
 public:
   // INITIALIZE:
   // this function loads the values for DataManager from file
-  void initialize( boost::filesystem::path project_path );
+  void initialize( const boost::filesystem::path& project_path );
   
   // SAVE_DATAMANAGER_STATE:
   // this function saves the DataManager's state to file
-  void save_datamanager_state( boost::filesystem::path project_path, const std::string& session_name );
+  void save_datamanager_state( const boost::filesystem::path& project_path, 
+    const std::string& session_name );
 
   // REMOVE_SESSION:
   // this function runs when the project emits a signal saying that a session has been deleted,
@@ -88,7 +89,8 @@ public:
   // this function, when passed the name of a session, returns by reference, a vector of strings
   // containing the list of files that that session depends on.  It returns true if the session
   // exists, and false if the session does not.
-  bool get_session_files_vector( const std::string& session_name, std::vector< std::string >& files );
+  bool get_session_files_vector( const std::string& session_name, 
+    std::vector< std::string >& files );
 
   // CLEAR_DATA_FILE_LIST:
   // funtion clear out the data file list in preperation for starting a new project
@@ -101,7 +103,8 @@ public:
 private:
   // PREP_FOR_SAVE:
   // this function prepares the state variable "essions_and_datafiles_state_" for saving to file
-  void prep_for_save( boost::filesystem::path project_path, const std::string& session_name );
+  void prep_for_save( const boost::filesystem::path& project_path, 
+    const std::string& session_name );
 
   // GET_MUTEX:
   // we need a state engine mutex for when we retrieve the list of layers and list of currently

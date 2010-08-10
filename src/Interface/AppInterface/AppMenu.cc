@@ -139,11 +139,17 @@ void AppMenu::create_edit_menu( QMenu* qmenu )
 void AppMenu::create_layer_menu( QMenu* qmenu )
 {
   QAction* qaction;
-  qaction = qmenu->addAction( tr( "Import Layer... ") );
+  qaction = qmenu->addAction( tr( "Import Layer(s) From File(s)... ") );
   qaction->setShortcut( tr( "Ctrl+Shift+O" ) );
-  qaction->setToolTip( tr( "Import a new layer into the layer manager" ) );
+  qaction->setToolTip( tr( "Import new layer(s) into the layer manager from a file(s)" ) );
   QtUtils::QtBridge::Connect( qaction, 
-    boost::bind( &AppLayerIO::Import,  this->main_window_ ) );
+    boost::bind( &AppLayerIO::ImportFiles,  this->main_window_ ) );
+
+  qaction = qmenu->addAction( tr( "Import Layer(s) From Folder... ") );
+  //qaction->setShortcut( tr( "Ctrl+Shift+O" ) );
+  qaction->setToolTip( tr( "Import new layer(s) into the layer manager from a folder" ) );
+  QtUtils::QtBridge::Connect( qaction, 
+    boost::bind( &AppLayerIO::ImportFolder,  this->main_window_ ) );
 
   qaction = qmenu->addAction( tr( "Export Layer...") );
   qaction->setShortcut( tr( "Ctrl+Shift+S" ) );

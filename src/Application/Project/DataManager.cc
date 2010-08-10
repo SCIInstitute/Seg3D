@@ -35,8 +35,6 @@
 #include <Application/LayerManager/LayerManager.h>
 #include <Core/State/StateIO.h>
 
-
-
 namespace Seg3D
 {
 
@@ -46,14 +44,15 @@ DataManager::DataManager() :
   StateHandler( "datamanager", VERSION_NUMBER_C, false )
 { 
   std::vector< std::string> sessions_and_datafiles;
-  add_state( "sessions_and_datafiles", this->sessions_and_datafiles_state_, sessions_and_datafiles );
+  add_state( "sessions_and_datafiles", this->sessions_and_datafiles_state_, 
+    sessions_and_datafiles );
 }
 
 DataManager::~DataManager()
 {
 }
   
-void DataManager::initialize( boost::filesystem::path project_path )
+void DataManager::initialize( const boost::filesystem::path& project_path )
 {
   Core::StateIO stateio;
   if ( stateio.import_from_file( project_path / "data" / "datamanager.xml" ) )
@@ -62,7 +61,8 @@ void DataManager::initialize( boost::filesystem::path project_path )
   }
 }
 
-void DataManager::save_datamanager_state( boost::filesystem::path project_path, const std::string& session_name )
+void DataManager::save_datamanager_state( const boost::filesystem::path& project_path, 
+  const std::string& session_name )
 {
   this->prep_for_save( project_path, session_name );
   Core::StateIO stateio;
@@ -71,8 +71,10 @@ void DataManager::save_datamanager_state( boost::filesystem::path project_path, 
   stateio.export_to_file( project_path / "data" / "datamanager.xml" );
 }
   
-void DataManager::prep_for_save( boost::filesystem::path project_path, const std::string& session_name )
+void DataManager::prep_for_save( const boost::filesystem::path& project_path, 
+  const std::string& session_name )
 {
+  // first we lock the state engine
   lock_type lock( this->get_mutex() );
 
   this->disk_space_used = 0;
@@ -93,7 +95,8 @@ void DataManager::prep_for_save( boost::filesystem::path project_path, const std
   std::vector< std::string > used_datafiles;
   for( int i = 0; i < static_cast< int >( sessions_and_data.size() ); ++i )
   {
-    std::vector< std::string > session_datafiles = Core::SplitString( sessions_and_data[ i ], "," );
+    std::vector< std::string > session_datafiles = 
+      Core::SplitString( sessions_and_data[ i ], "," );
     if( session_datafiles.size() < 2 ) 
     {
       continue;
@@ -103,12 +106,12 @@ void DataManager::prep_for_save( boost::filesystem::path project_path, const std
       used_datafiles.push_back( session_datafiles[ j ] );
     }
   }
-  project_path = project_path / "data";
+  boost::filesystem::path path = project_path / "data";
 
-  if ( boost::filesystem::exists( project_path ) )
+  if ( boost::filesystem::exists( path ) )
   {
     boost::filesystem::directory_iterator dir_end;
-    for( boost::filesystem::directory_iterator dir_itr( project_path ); 
+    for( boost::filesystem::directory_iterator dir_itr( path ); 
       dir_itr != dir_end; ++dir_itr )
     {
       // in the case that we find the datamanager.xml file, we skip it.
@@ -141,11 +144,10 @@ void DataManager::prep_for_save( boost::filesystem::path project_path, const std
       else
       {
         this->disk_space_used = this->disk_space_used 
-          + static_cast< int >( boost::filesystem::file_size( dir_itr->path() ) );
+          + static_cast< size_t >( boost::filesystem::file_size( dir_itr->path() ) );
       }
     }
   }
-  return;
 }
 
 size_t DataManager::get_file_size()
@@ -199,6 +201,5 @@ bool DataManager::get_session_files_vector( const std::string& session_name, std
   }
   return false;
 }
-
 
 } // end namespace seg3D

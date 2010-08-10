@@ -41,9 +41,13 @@ namespace Seg3D
 class AppLayerIO
 {
 public:
-  // IMPORT:
-  // Import a layer into the LayerManager
-  static void Import( QMainWindow* main_window );
+  // IMPORTSINGLEFILE:
+  // Import a layer into the LayerManager from a single file
+  static void ImportFiles( QMainWindow* main_window );
+
+  // IMPORTFOLDER:
+  // Import a layer into the LayerManager from a single file
+  static void ImportFolder( QMainWindow* main_window );
   
   // EXPORT:
   // Export the current layer to file
