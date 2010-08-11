@@ -86,15 +86,19 @@ public:
 
   //PAINT:
   // Paint on the target layer with the brush centered at (x0, y0).
-  void paint( int xc, int yc, int& paint_count );
+  void paint( const PaintInfo& paint_info, int xc, int yc, int& paint_count );
 
-  void interpolated_paint( int x0, int y0, int x1, int y1, int& paint_count );
-  bool paint_range( int x0, int y0, int x1, int y1 );
+  void interpolated_paint( const PaintInfo& paint_info, int x0, int y0, 
+    int x1, int y1, int& paint_count );
+
+  //bool paint_range( int x0, int y0, int x1, int y1 );
 
   // UPDATE_VIEWERS:
   // Cause viewers with the same view mode as the one that contains the paint brush
   // to redraw overlay to display the current position of the brush.
   void update_viewers();
+
+  void setup_paint_info( PaintInfo& paint_info, int x0, int y0, int x1, int y1 );
 
   bool initialized_;
   bool brush_mask_changed_;
@@ -315,20 +319,16 @@ void PaintToolPrivate::handle_brush_radius_changed()
   this->update_viewers();
 }
 
-void PaintToolPrivate::paint( int xc, int yc, int& paint_count )
+void PaintToolPrivate::paint( const PaintInfo& paint_info, int xc, int yc, int& paint_count )
 { 
-  int brush_size = this->radius_ * 2 + 1;
-  double xpos, ypos;
-  this->viewer_->window_to_world( xc, yc, xpos, ypos );
-  int x0, y0;
-  this->target_slice_->world_to_index( xpos, ypos, x0, y0 );
-  int x_min = x0 - this->radius_;
-  int x_max = x0 + this->radius_;
-  int y_min = y0 - this->radius_;
-  int y_max = y0 + this->radius_;
-  if ( x_min >= static_cast< int >( this->target_slice_->nx() ) ||
+  int brush_size = paint_info.brush_radius_ * 2 + 1;
+  int x_min = xc - paint_info.brush_radius_;
+  int x_max = xc + paint_info.brush_radius_;
+  int y_min = yc - paint_info.brush_radius_;
+  int y_max = yc + paint_info.brush_radius_;
+  if ( x_min >= static_cast< int >( paint_info.target_slice_->nx() ) ||
     x_max < 0 || y_max < 0 ||
-    y_min >= static_cast< int >( this->target_slice_->ny() ) )
+    y_min >= static_cast< int >( paint_info.target_slice_->ny() ) )
   {
     return;
   }
@@ -337,13 +337,15 @@ void PaintToolPrivate::paint( int xc, int yc, int& paint_count )
   // intersects with the mask volume slice.
   size_t x_start = static_cast< size_t >( Core::Max( x_min, 0 ) - x_min );
   size_t x_end = static_cast< size_t >( Core::Min( x_max, static_cast< int >( 
-    this->target_slice_->nx() - 1 ) ) - x_min );
+    paint_info.target_slice_->nx() - 1 ) ) - x_min );
   size_t y_start = static_cast< size_t >( Core::Max( y_min, 0 ) - y_min );
   size_t y_end = static_cast< size_t >( Core::Min( y_max, static_cast< int >( 
-    this->target_slice_->ny() - 1 ) ) - y_min );
+    paint_info.target_slice_->ny() - 1 ) ) - y_min );
 
-  unsigned char* buffer = this->target_slice_->get_cached_data();
-  size_t nx = this->target_slice_->nx();
+  unsigned char* buffer = paint_info.target_slice_->get_cached_data();
+  size_t nx = paint_info.target_slice_->nx();
+  bool has_data_constraint = paint_info.data_constraint_slice_.get() != 0;
+  bool has_mask_constraint = paint_info.mask_constraint_slice_.get() != 0;
   for ( size_t y = y_start; y <= y_end; y++ )
   {
     for ( size_t x = x_start; x <= x_end; x++ )
@@ -352,26 +354,26 @@ void PaintToolPrivate::paint( int xc, int yc, int& paint_count )
       {
         size_t slice_x = x_min + x;
         size_t slice_y = y_min + y;
-        if ( this->has_data_constraint_ )
+        if ( has_data_constraint )
         {
-          double val = this->data_constraint_slice_->get_data_at( slice_x, slice_y );
-          bool in_range = val >= this->min_val_ && val <= this->max_val_;
-          if ( ( in_range && this->negative_data_constraint_ ) ||
-            ( !in_range && !this->negative_data_constraint_ ) )
+          double val = paint_info.data_constraint_slice_->get_data_at( slice_x, slice_y );
+          bool in_range = val >= paint_info.min_val_ && val <= paint_info.max_val_;
+          if ( ( in_range && paint_info.negative_data_constraint_ ) ||
+            ( !in_range && !paint_info.negative_data_constraint_ ) )
           {
             continue;
           }
         }
-        if ( this->has_mask_constraint_ )
+        if ( has_mask_constraint )
         {
-          bool has_mask = this->mask_constraint_slice_->get_mask_at( slice_x, slice_y );
-          if ( ( has_mask && this->negative_mask_constraint_ ) ||
-            ( !has_mask && !this->negative_mask_constraint_ ) )
+          bool has_mask = paint_info.mask_constraint_slice_->get_mask_at( slice_x, slice_y );
+          if ( ( has_mask && paint_info.negative_mask_constraint_ ) ||
+            ( !has_mask && !paint_info.negative_mask_constraint_ ) )
           {
             continue;
           }
         }
-        if ( this->erase_ )
+        if ( paint_info.erase_ )
         {
           buffer[ slice_y * nx + slice_x ] = 0;
         }
@@ -386,52 +388,27 @@ void PaintToolPrivate::paint( int xc, int yc, int& paint_count )
   paint_count++;
 }
 
-void PaintToolPrivate::interpolated_paint( int x0, int y0, int x1, int y1, int& paint_count )
+void PaintToolPrivate::interpolated_paint( const PaintInfo& paint_info, int x0, int y0, 
+                      int x1, int y1, int& paint_count )
 {
   int delta_x = Core::Abs( x1 - x0 );
   int delta_y = Core::Abs( y1 - y0 );
-  // If the distance between the two points are greater than radius, 
-  // we need to interpolate between them
-  if ( ( this->radius_ == 0 && ( delta_x > 1 || delta_y > 1 ) ) ||
-    ( this->radius_ > 0 && ( delta_x > this->radius_ || delta_y > this->radius_ ) ) )
+  if ( delta_x == 0 && delta_y == 0 )
+  {
+    return;
+  }
+  
+  if ( delta_x > 1 || delta_y > 1 )
   {
     int mid_x = Core::Round( ( x0 + x1 ) * 0.5 );
     int mid_y = Core::Round( ( y0 + y1 ) * 0.5 );
-    this->interpolated_paint( x0, y0, mid_x, mid_y, paint_count );
-    this->interpolated_paint( mid_x, mid_y, x1, y1, paint_count );
+    this->interpolated_paint( paint_info, x0, y0, mid_x, mid_y, paint_count );
+    this->interpolated_paint( paint_info, mid_x, mid_y, x1, y1, paint_count );
   }
   else
   {
-    this->paint( x1, y1, paint_count );
+    this->paint( paint_info, x1, y1, paint_count );
   }
-}
-
-bool PaintToolPrivate::paint_range( int x0, int y0, int x1, int y1 )
-{
-  ASSERT_IS_APPLICATION_THREAD();
-
-  PaintToolPrivate::lock_type lock( this->get_mutex() );
-
-  if ( !this->painting_ || !this->viewer_ || !this->target_slice_ )
-  {
-    return false;
-  }
-
-  int paint_count = 0;
-
-  {
-    Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
-    Core::MaskVolumeSlice::cache_lock_type cache_lock( this->target_slice_->get_cache_mutex() );
-    this->interpolated_paint( x0, y0, x1, y1, paint_count );
-  }
-
-  if ( paint_count > 0)
-  {
-    this->target_slice_->cache_updated_signal_();
-    return true;
-  }
-
-  return false;
 }
 
 void PaintToolPrivate::update_viewers()
@@ -627,6 +604,35 @@ void PaintToolPrivate::stop_painting()
   this->mask_constraint_slice_.reset();
   this->data_constraint_slice_.reset();
 }
+
+void PaintToolPrivate::setup_paint_info( PaintInfo& paint_info, int x0, int y0, int x1, int y1 )
+{
+  paint_info.target_layer_id_ = this->paint_tool_->target_layer_state_->get();
+  paint_info.target_slice_ = this->target_slice_;
+  paint_info.data_constraint_layer_id_ = this->paint_tool_->data_constraint_layer_state_->get();
+  paint_info.data_constraint_slice_ = this->data_constraint_slice_;
+  paint_info.min_val_ = this->paint_tool_->lower_threshold_state_->get();
+  paint_info.max_val_ = this->paint_tool_->upper_threshold_state_->get();
+  paint_info.negative_data_constraint_ = this->paint_tool_->negative_data_constraint_state_->get();
+  paint_info.mask_constraint_layer_id_ = this->paint_tool_->mask_constraint_layer_state_->get();
+  paint_info.mask_constraint_slice_ = this->mask_constraint_slice_;
+  paint_info.negative_mask_constraint_ = this->paint_tool_->negative_mask_constraint_state_->get();
+  paint_info.brush_radius_ = this->paint_tool_->brush_radius_state_->get();
+  paint_info.erase_ = this->erase_;
+
+  double xpos, ypos;
+  int slice_x, slice_y;
+  this->viewer_->window_to_world( x0, y0, xpos, ypos );
+  this->target_slice_->world_to_index( xpos, ypos, slice_x, slice_y );
+  paint_info.x0_ = slice_x;
+  paint_info.y0_ = slice_y;
+
+  this->viewer_->window_to_world( x1, y1, xpos, ypos );
+  this->target_slice_->world_to_index( xpos, ypos, slice_x, slice_y );
+  paint_info.x1_ = slice_x;
+  paint_info.y1_ = slice_y;
+}
+
 
 //////////////////////////////////////////////////////////////////////////
 // Implementation of class PaintTool
@@ -896,9 +902,12 @@ bool PaintTool::handle_mouse_move( const Core::MouseHistory& mouse_history,
 
   if ( this->private_->painting_ )
   {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    PaintInfo paint_info;
+    this->private_->setup_paint_info( paint_info, mouse_history.previous_.x_, 
+      mouse_history.previous_.y_, mouse_history.current_.x_, mouse_history.current_.y_ );
     ActionPaint::Dispatch( Core::Interface::GetMouseActionContext(), 
-      this->shared_from_this(), mouse_history.previous_.x_, mouse_history.previous_.y_,
-      mouse_history.current_.x_, mouse_history.current_.y_ );
+      this->shared_from_this(), paint_info );
     return true;
   }
   else if ( modifiers == Core::KeyModifier::NO_MODIFIER_E )
@@ -964,9 +973,12 @@ bool PaintTool::handle_mouse_press( const Core::MouseHistory& mouse_history,
 
       if ( this->private_->start_painting() )
       {
+        Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
+        PaintInfo paint_info;
+        this->private_->setup_paint_info( paint_info, mouse_history.current_.x_, 
+          mouse_history.current_.y_, mouse_history.current_.x_, mouse_history.current_.y_ );
         ActionPaint::Dispatch( Core::Interface::GetMouseActionContext(), 
-          this->shared_from_this(), this->private_->center_x_, this->private_->center_y_,
-          this->private_->center_x_, this->private_->center_y_ );
+          this->shared_from_this(), paint_info );
         return true;
       }
     }
@@ -1052,9 +1064,29 @@ bool PaintTool::has_2d_visual()
   return true;
 }
 
-bool PaintTool::paint( int x0, int y0, int x1, int y1 )
+bool PaintTool::paint( const PaintInfo& paint_info )
 {
-  return this->private_->paint_range( x0, y0, x1, y1 );
+  int paint_count = 0;
+
+  this->brush_radius_state_->set( paint_info.brush_radius_ );
+  {
+    Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
+    Core::MaskVolumeSlice::cache_lock_type cache_lock( paint_info.target_slice_->get_cache_mutex() );
+    if ( paint_info.inclusive_ )
+    {
+      this->private_->paint( paint_info, paint_info.x0_, paint_info.y0_, paint_count );
+    }
+    this->private_->interpolated_paint( paint_info, paint_info.x0_, paint_info.y0_, 
+      paint_info.x1_, paint_info.y1_, paint_count );
+  }
+
+  if ( paint_count > 0)
+  {
+    paint_info.target_slice_->cache_updated_signal_();
+    return true;
+  }
+
+  return false;
 }
 
 } // end namespace Seg3D

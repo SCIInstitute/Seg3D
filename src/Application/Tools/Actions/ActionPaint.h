@@ -35,16 +35,29 @@
 namespace Seg3D
 {
 
+class ActionPaintPrivate;
+typedef boost::shared_ptr< ActionPaintPrivate > ActionPaintPrivateHandle;
+
 class ActionPaint : public Core::Action
 {
   CORE_ACTION
   ( 
     CORE_ACTION_TYPE( "Paint", "Paint with the specified paint tool.")
-    CORE_ACTION_ARGUMENT( "toolid", "The ID of the paint tool." )
-    CORE_ACTION_ARGUMENT( "x0", "X coordinate of the start position." )
-    CORE_ACTION_ARGUMENT( "y0", "Y coordinate of the start position." )
-    CORE_ACTION_ARGUMENT( "x1", "X coordinate of the end position." )
-    CORE_ACTION_ARGUMENT( "y1", "Y coordinate of the end position." )
+    CORE_ACTION_ARGUMENT( "target", "The ID of the target mask layer." )
+    CORE_ACTION_ARGUMENT( "slice_type", "The slicing direction to be painted on." )
+    CORE_ACTION_ARGUMENT( "slice_number", "The slice number to be painted on." )
+    CORE_ACTION_ARGUMENT( "data_constraint", "The ID of data constraint layer." )
+    CORE_ACTION_ARGUMENT( "min_value", "The minimum data constraint value." )
+    CORE_ACTION_ARGUMENT( "max_value", "The maximum data constraint value." )
+    CORE_ACTION_ARGUMENT( "negative_data_constraint", "Whether to negate the data constraint." )
+    CORE_ACTION_ARGUMENT( "mask_constraint", "The ID of mask constraint layer." )
+    CORE_ACTION_ARGUMENT( "negative_mask_constraint", "Whether to negate the mask constraint." )
+    CORE_ACTION_ARGUMENT( "x0", "X coordinate of the start position (in index space)." )
+    CORE_ACTION_ARGUMENT( "y0", "Y coordinate of the start position (in index space)." )
+    CORE_ACTION_ARGUMENT( "x1", "X coordinate of the end position (in index space)." )
+    CORE_ACTION_ARGUMENT( "y1", "Y coordinate of the end position (in index space)." )
+    CORE_ACTION_ARGUMENT( "brush_radius", "Radius of the paint brush." )
+    CORE_ACTION_ARGUMENT( "erase", "Whether to erase instead of painting." )
   )
 
 public:
@@ -55,20 +68,14 @@ public:
   virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
 
 private:
-  Core::ActionParameter< std::string > toolid_;
-  Core::ActionParameter< int > x0_;
-  Core::ActionParameter< int > y0_;
-  Core::ActionParameter< int > x1_;
-  Core::ActionParameter< int > y1_;
-
-  PaintToolWeakHandle paint_tool_weak_handle_;
+  ActionPaintPrivateHandle private_;
 
 public:
   static Core::ActionHandle Create( const PaintToolHandle& paint_tool, 
-    int x0, int y0, int x1, int y1 );
+    const PaintInfo& paint_info );
   
   static void Dispatch( Core::ActionContextHandle context, 
-    const PaintToolHandle& paint_tool, int x0, int y0, int x1, int y1 );
+    const PaintToolHandle& paint_tool, const PaintInfo& paint_info );
 };
 
 } // end namespace Seg3D

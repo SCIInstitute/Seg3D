@@ -30,19 +30,62 @@
 
 #include <Application/ToolManager/ToolManager.h>
 #include <Application/Tools/Actions/ActionPaint.h>
+#include <Application/Layer/MaskLayer.h>
+#include <Application/Layer/DataLayer.h>
+#include <Application/LayerManager/LayerManager.h>
 
 CORE_REGISTER_ACTION( Seg3D, Paint )
 
 namespace Seg3D
 {
 
-ActionPaint::ActionPaint()
+class ActionPaintPrivate
 {
-  this->add_argument( this->toolid_ );
-  this->add_argument( this->x0_ );
-  this->add_argument( this->y0_ );
-  this->add_argument( this->x1_ );
-  this->add_argument( this->y1_ );
+public:
+  Core::ActionParameter< std::string > target_layer_id_;
+  Core::ActionParameter< int > slice_type_;
+  Core::ActionParameter< size_t > slice_number_;
+  Core::ActionParameter< std::string > data_constraint_layer_id_;
+  Core::ActionParameter< double > min_val_;
+  Core::ActionParameter< double > max_val_;
+  Core::ActionParameter< bool > negative_data_constraint_;
+  Core::ActionParameter< std::string > mask_constraint_layer_id_;
+  Core::ActionParameter< bool > negative_mask_constraint_;
+  Core::ActionParameter< int > x0_;
+  Core::ActionParameter< int > y0_;
+  Core::ActionParameter< int > x1_;
+  Core::ActionParameter< int > y1_;
+  Core::ActionParameter< int > brush_radius_;
+  Core::ActionParameter< bool > erase_;
+
+  PaintToolWeakHandle paint_tool_weak_handle_;
+  Core::ActionCachedHandle< Core::MaskVolumeSliceHandle > target_slice_;
+  Core::ActionCachedHandle< Core::DataVolumeSliceHandle > data_constraint_slice_;
+  Core::ActionCachedHandle< Core::MaskVolumeSliceHandle > mask_constraint_slice_;
+};
+
+ActionPaint::ActionPaint() :
+  private_( new ActionPaintPrivate )
+{
+  this->add_argument( this->private_->target_layer_id_ );
+  this->add_argument( this->private_->slice_type_ );
+  this->add_argument( this->private_->slice_number_ );
+  this->add_argument( this->private_->data_constraint_layer_id_ );
+  this->add_argument( this->private_->min_val_ );
+  this->add_argument( this->private_->max_val_ );
+  this->add_argument( this->private_->negative_data_constraint_ );
+  this->add_argument( this->private_->mask_constraint_layer_id_ );
+  this->add_argument( this->private_->negative_mask_constraint_ );
+  this->add_argument( this->private_->x0_ );
+  this->add_argument( this->private_->y0_ );
+  this->add_argument( this->private_->x1_ );
+  this->add_argument( this->private_->y1_ );
+  this->add_argument( this->private_->brush_radius_ );
+  this->add_argument( this->private_->erase_ );
+
+  this->add_cachedhandle( this->private_->target_slice_ );
+  this->add_cachedhandle( this->private_->data_constraint_slice_ );
+  this->add_cachedhandle( this->private_->mask_constraint_slice_ );
 }
 
 ActionPaint::~ActionPaint()
@@ -51,43 +94,159 @@ ActionPaint::~ActionPaint()
 
 bool ActionPaint::validate( Core::ActionContextHandle& context )
 {
-  PaintToolHandle paint_tool( this->paint_tool_weak_handle_.lock() );
-  if ( !paint_tool )
+  if ( this->private_->brush_radius_.value() < 0 )
   {
-    context->report_error( "Paint tool does not exist" );
+    context->report_error( "Invalid brush size " + Core::ExportToString(
+      this->private_->brush_radius_.value() ) );
     return false;
   }
+  
+  if ( !this->private_->target_slice_.handle() )
+  {
+    MaskLayerHandle target_layer = boost::dynamic_pointer_cast< MaskLayer >(
+      LayerManager::Instance()->get_layer_by_id( this->private_->target_layer_id_.value() ) );
+    if ( !target_layer )
+    {
+      context->report_error( "Invalid target layer '" + 
+        this->private_->target_layer_id_.value() + "'" );
+      return false;
+    }
+    if ( this->private_->slice_type_.value() != Core::VolumeSliceType::AXIAL_E &&
+      this->private_->slice_type_.value() != Core::VolumeSliceType::CORONAL_E &&
+      this->private_->slice_type_.value() != Core::VolumeSliceType::SAGITTAL_E )
+    {
+      context->report_error( "Invalid slice type " + Core::ExportToString( 
+        this->private_->slice_type_.value() ) );
+      return false;
+    }
+    this->private_->target_slice_.handle().reset( new Core::MaskVolumeSlice( 
+      target_layer->get_mask_volume(), static_cast< Core::VolumeSliceType::enum_type >(
+      this->private_->slice_type_.value() ) ) );
+    if ( this->private_->slice_number_.value() >= 
+      this->private_->target_slice_.handle()->number_of_slices() )
+    {
+      context->report_error( "Slice number " + Core::ExportToString(
+        this->private_->slice_number_.value() ) + " is out of range" );
+      return false;
+    }
+    this->private_->target_slice_.handle()->set_slice_number( 
+      this->private_->slice_number_.value() );
+  }
+
+  if ( this->private_->target_slice_.handle()->out_of_boundary() )
+  {
+    context->report_error( "The target slice is out of boundary" );
+    return false;
+  }
+  
+  if ( !this->private_->data_constraint_slice_.handle() &&
+    this->private_->data_constraint_layer_id_.value() != Tool::NONE_OPTION_C )
+  {
+    DataLayerHandle data_constraint_layer = boost::dynamic_pointer_cast< DataLayer >(
+      LayerManager::Instance()->get_layer_by_id( 
+      this->private_->data_constraint_layer_id_.value() ) );
+    if ( !data_constraint_layer )
+    {
+      context->report_error( "Invalid data constraint layer '" +
+        this->private_->data_constraint_layer_id_.value() + "'" );
+      return false;
+    }
+    
+    this->private_->data_constraint_slice_.handle().reset( new Core::DataVolumeSlice(
+      data_constraint_layer->get_data_volume(), 
+      this->private_->target_slice_.handle()->get_slice_type(),
+      this->private_->slice_number_.value() ) );
+  }
+
+  if ( !this->private_->mask_constraint_slice_.handle() &&
+    this->private_->mask_constraint_layer_id_.value() != Tool::NONE_OPTION_C )
+  {
+    MaskLayerHandle mask_constraint_layer = boost::dynamic_pointer_cast< MaskLayer >(
+      LayerManager::Instance()->get_layer_by_id( 
+      this->private_->mask_constraint_layer_id_.value() ) );
+    if ( !mask_constraint_layer )
+    {
+      context->report_error( "Invalid mask constraint layer '" +
+        this->private_->mask_constraint_layer_id_.value() + "'" );
+      return false;
+    }
+    this->private_->mask_constraint_slice_.handle().reset( new Core::MaskVolumeSlice(
+      mask_constraint_layer->get_mask_volume(), 
+      this->private_->target_slice_.handle()->get_slice_type(),
+      this->private_->slice_number_.value() ) );
+  }
+  
   return true;
 }
 
 bool ActionPaint::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
-  PaintToolHandle paint_tool( this->paint_tool_weak_handle_.lock() );
-  if ( paint_tool )
+  PaintToolHandle paint_tool( this->private_->paint_tool_weak_handle_.lock() );
+  if ( !paint_tool )
   {
-    return paint_tool->paint( this->x0_.value(), this->y0_.value(),
-      this->x1_.value(), this->y1_.value() );
+    static PaintToolHandle static_paint_tool_s( new PaintTool( "staticpainttool", false ) );
+    paint_tool = static_paint_tool_s;
   }
 
-  return false;
+  PaintInfo paint_info;
+  paint_info.target_slice_ = this->private_->target_slice_.handle();
+  paint_info.data_constraint_slice_ = this->private_->data_constraint_slice_.handle();
+  paint_info.min_val_ = this->private_->min_val_.value();
+  paint_info.max_val_ = this->private_->max_val_.value();
+  paint_info.negative_data_constraint_ = this->private_->negative_data_constraint_.value();
+  paint_info.mask_constraint_slice_ = this->private_->mask_constraint_slice_.handle();
+  paint_info.negative_mask_constraint_ = this->private_->negative_mask_constraint_.value();
+  paint_info.x0_ = this->private_->x0_.value();
+  paint_info.y0_ = this->private_->y0_.value();
+  paint_info.x1_ = this->private_->x1_.value();
+  paint_info.y1_ = this->private_->y1_.value();
+  paint_info.brush_radius_ = this->private_->brush_radius_.value();
+  paint_info.erase_ = this->private_->erase_.value();
+  paint_info.inclusive_ = ( context->source() != Core::ActionSource::INTERFACE_MOUSE_E ||
+    ( paint_info.x0_ == paint_info.x1_ && paint_info.y0_ == paint_info.y1_ ) );
+
+  bool success = paint_tool->paint( paint_info );
+  if ( context->source() != Core::ActionSource::INTERFACE_MOUSE_E )
+  {
+    paint_info.target_slice_->release_cached_data();
+  }
+  
+  return success;
 }
 
-Core::ActionHandle ActionPaint::Create( const PaintToolHandle& paint_tool, int x0, int y0, int x1, int y1 )
+Core::ActionHandle ActionPaint::Create( const PaintToolHandle& paint_tool, 
+                     const PaintInfo& paint_info )
 {
   ActionPaint* action = new ActionPaint;
-  action->paint_tool_weak_handle_ = paint_tool;
-  action->toolid_.set_value( paint_tool->toolid() );
-  action->x0_.set_value( x0 );
-  action->y0_.set_value( y0 );
-  action->x1_.set_value( x1 );
-  action->y1_.set_value( y1 );
+
+  action->private_->target_layer_id_.value() = paint_info.target_layer_id_;
+  action->private_->slice_type_.value() = paint_info.target_slice_->get_slice_type();
+  action->private_->slice_number_.value() = paint_info.target_slice_->get_slice_number();
+  action->private_->data_constraint_layer_id_.value() = paint_info.data_constraint_layer_id_;
+  action->private_->min_val_.value() = paint_info.min_val_;
+  action->private_->max_val_.value() = paint_info.max_val_;
+  action->private_->negative_data_constraint_.value() = paint_info.negative_data_constraint_;
+  action->private_->mask_constraint_layer_id_.value() = paint_info.mask_constraint_layer_id_;
+  action->private_->negative_mask_constraint_.value() = paint_info.negative_mask_constraint_;
+  action->private_->x0_.set_value( paint_info.x0_ );
+  action->private_->y0_.set_value( paint_info.y0_ );
+  action->private_->x1_.set_value( paint_info.x1_ );
+  action->private_->y1_.set_value( paint_info.y1_ );
+  action->private_->brush_radius_.value() = paint_info.brush_radius_;
+  action->private_->erase_.value() = paint_info.erase_;
+
+  action->private_->paint_tool_weak_handle_ = paint_tool;
+  action->private_->target_slice_.handle() = paint_info.target_slice_;
+  action->private_->data_constraint_slice_.handle() = paint_info.data_constraint_slice_;
+  action->private_->mask_constraint_slice_.handle() = paint_info.mask_constraint_slice_;
 
   return Core::ActionHandle( action );
 }
 
-void ActionPaint::Dispatch( Core::ActionContextHandle context, const PaintToolHandle& paint_tool, int x0, int y0, int x1, int y1 )
+void ActionPaint::Dispatch( Core::ActionContextHandle context, 
+               const PaintToolHandle& paint_tool, const PaintInfo& paint_info )
 {
-  Core::ActionDispatcher::PostAction( Create( paint_tool, x0, y0, x1, y1 ), context );
+  Core::ActionDispatcher::PostAction( Create( paint_tool, paint_info ), context );
 }
 
 } // end namespace Seg3D

@@ -87,6 +87,8 @@ public:
 
   void set_slice_type( VolumeSliceType type );
 
+  VolumeSliceType get_slice_type() const;
+
   void set_slice_number( size_t slice_num );
 
   size_t get_slice_number() const

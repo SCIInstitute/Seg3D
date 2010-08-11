@@ -31,6 +31,9 @@
 
 #include <boost/smart_ptr.hpp>
 
+#include <Core/Volume/MaskVolumeSlice.h>
+#include <Core/Volume/DataVolumeSlice.h>
+
 #include <Application/Tool/Tool.h>
 
 namespace Seg3D
@@ -42,6 +45,25 @@ typedef boost::weak_ptr< PaintTool > PaintToolWeakHandle;
 
 class PaintToolPrivate;
 typedef boost::shared_ptr< PaintToolPrivate > PaintToolPrivateHandle;
+
+class PaintInfo
+{
+public:
+  std::string target_layer_id_;
+  Core::MaskVolumeSliceHandle target_slice_;
+  std::string data_constraint_layer_id_;
+  Core::DataVolumeSliceHandle data_constraint_slice_;
+  double min_val_;
+  double max_val_;
+  bool negative_data_constraint_;
+  std::string mask_constraint_layer_id_;
+  Core::MaskVolumeSliceHandle mask_constraint_slice_;
+  bool negative_mask_constraint_;
+  int x0_, y0_, x1_, y1_;
+  int brush_radius_;
+  bool erase_;
+  bool inclusive_;
+};
 
 class PaintTool : public Tool, public boost::enable_shared_from_this< PaintTool >
 {
@@ -90,7 +112,7 @@ protected:
 private:
   friend class ActionPaint;
 
-  bool paint( int x0, int y0, int x1, int y1 );
+  bool paint( const PaintInfo& info );
 
   // -- state --
 public:

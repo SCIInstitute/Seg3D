@@ -86,6 +86,11 @@ void VolumeSlice::set_slice_type( VolumeSliceType type )
   }
 }
 
+VolumeSliceType VolumeSlice::get_slice_type() const
+{
+  return this->slice_type_;
+}
+
 void VolumeSlice::set_slice_number( size_t slice_num )
 {
   slice_num = Min( slice_num, this->number_of_slices_ - 1 );
@@ -355,6 +360,5 @@ void VolumeSlice::initialize_texture()
     this->texture_->set_min_filter( GL_NEAREST );
   }
 }
-
 
 } // end namespace Core
