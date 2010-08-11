@@ -51,6 +51,7 @@ SET(CORE_UTILS_SRCS
   Parallel.cc
   ScopedCounter.h
   Singleton.h
+  StackVector.h
   StringParser.h
   StringParser.cc
   StringUtil.h

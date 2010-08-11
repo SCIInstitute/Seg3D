@@ -47,8 +47,8 @@ const size_t MaskLayer::VERSION_NUMBER_C = 1;
 
 MaskLayer::MaskLayer( const std::string& name, const Core::MaskVolumeHandle& volume ) :
   Layer( name, VERSION_NUMBER_C ), 
-  mask_volume_( volume ),
-  isosurface_( new Core::Isosurface( volume ) ) // Test code 
+  mask_volume_( volume )/*,
+  isosurface_( new Core::Isosurface( volume ) ) // Test code */
 {
   this->initialize_states();
   this->bit_state_->set( static_cast< int >( volume->mask_data_block()->get_mask_bit() ) );
@@ -58,8 +58,8 @@ MaskLayer::MaskLayer( const std::string& name, const Core::MaskVolumeHandle& vol
 
 MaskLayer::MaskLayer( const std::string& name, const Core::GridTransform& grid_transform ) :
     Layer( name, VERSION_NUMBER_C ), 
-  mask_volume_( new Core::MaskVolume( grid_transform ) ),
-  isosurface_( new Core::Isosurface( mask_volume_ ) ) // Test code
+  mask_volume_( new Core::MaskVolume( grid_transform ) )/*,
+  isosurface_( new Core::Isosurface( mask_volume_ ) ) // Test code */
 {
     this->initialize_states();
   this->bit_state_->set( static_cast< int >( this->mask_volume_->

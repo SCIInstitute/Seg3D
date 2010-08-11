@@ -37,12 +37,14 @@ class ParallelPrivate
 {
 public:
   int num_threads_;
-  boost::function< void ( int, int ) > function_;
+  boost::function< void ( int, int, boost::barrier&  ) > function_;
 };
 
-Parallel::Parallel( boost::function< void ( int, int ) > function, int num_threads ) :
+Parallel::Parallel( boost::function< void ( int, int, boost::barrier& ) > function, int num_threads ) :
   private_( new ParallelPrivate )
 {
+  this->private_->function_ = function;
+
   if ( num_threads == -1 )
   {
     this->private_->num_threads_ =  boost::thread::hardware_concurrency();
@@ -60,12 +62,14 @@ Parallel::Parallel( boost::function< void ( int, int ) > function, int num_threa
 
 void Parallel::run()
 {
+  boost::barrier barrier( this->private_->num_threads_ );
+
   std::vector< boost::thread* > threads( this->private_->num_threads_ );
 
   for ( int i = 0; i < this->private_->num_threads_; i++ )
   {
     threads[ i ] = new boost::thread( boost::bind( this->private_->function_, i, 
-      this->private_->num_threads_ ) );
+      this->private_->num_threads_, boost::ref( barrier ) ) );
   }
 
   for ( int i = 0; i < this->private_->num_threads_; i++ )

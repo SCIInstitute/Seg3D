@@ -29,10 +29,11 @@
 #ifndef CORE_UTILS_PARALLEL_H
 #define CORE_UTILS_PARALLEL_H
 
-
+// Boost includes
 #include <boost/utility.hpp>
 #include <boost/smart_ptr.hpp>
 #include <boost/thread.hpp>
+#include <boost/thread/barrier.hpp>
 
 namespace Core
 {
@@ -44,7 +45,8 @@ class Parallel : public boost::noncopyable
 {
 
 public:
-  explicit Parallel( boost::function< void ( int, int ) > function, int num_threads = -1 );
+  explicit Parallel( boost::function< void ( int, int, boost::barrier& ) > function, 
+    int num_threads = -1 );
   
   void run();
 
