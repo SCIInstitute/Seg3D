@@ -659,7 +659,7 @@ QPushButton#activate_button_{
                    <normalon>:/Images/IsosurfaceCompute.png</normalon>:/Images/IsosurfaceComputeOff.png</iconset>
                  </property>
                  <property name="checkable">
-                  <bool>true</bool>
+                  <bool>false</bool>
                  </property>
                 </widget>
                </item>

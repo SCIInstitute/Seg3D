@@ -80,10 +80,11 @@ public:
     return this->mask_volume_;
   }
 
-  Core::IsosurfaceHandle get_isosurface()
-  {
-    return this->isosurface_;
-  }
+  Core::IsosurfaceHandle get_isosurface();
+
+  void compute_isosurface();
+
+  void delete_isosurface();
   
   // -- state variables --
 public:

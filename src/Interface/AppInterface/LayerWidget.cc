@@ -267,6 +267,10 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
           {
             QtUtils::QtBridge::Connect( this->private_->ui_.show_iso_surface_button_, 
               mask_layer->show_isosurface_state_ );
+            QtUtils::QtBridge::Connect( this->private_->ui_.compute_iso_surface_button_,
+              boost::bind( &MaskLayer::compute_isosurface, mask_layer ) );
+            QtUtils::QtBridge::Connect( this->private_->ui_.delete_iso_surface_button_,
+              boost::bind( &MaskLayer::delete_isosurface, mask_layer ) );
             QtUtils::QtBridge::Connect( this->private_->ui_.border_selection_combo_, 
               mask_layer->border_state_ );
             QtUtils::QtBridge::Connect( this->private_->ui_.fill_selection_combo_, 
