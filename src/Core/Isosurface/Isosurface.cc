@@ -311,8 +311,8 @@ public:
   // Setup the algorithm and the buffers
   void setup( int num_threads );
   // Parallelized isosurface computation algorithm 
-  void parallel( int thread, int num_threads, boost::barrier& barrier );
-  void compute_normals();
+  void parallel_compute_faces( int thread, int num_threads, boost::barrier& barrier );
+  void parallel_compute_normals( int thread, int num_threads,  boost::barrier& barrier );
 
   // Input to isosurface computation
   MaskVolumeHandle mask_volume_; 
@@ -399,7 +399,8 @@ Basic ideas:
 - Point of confusion: sometimes "element" is are synonymous with "cube" and sometimes it refers
   to a triangle.
 */
-void IsosurfacePrivate::parallel( int thread, int num_threads, boost::barrier& barrier )
+void IsosurfacePrivate::parallel_compute_faces( int thread, int num_threads, 
+  boost::barrier& barrier )
 {
   // Setup the algorithm and the buffers
   if ( thread == 0 ) // Only need to setup once 
@@ -851,51 +852,78 @@ void IsosurfacePrivate::parallel( int thread, int num_threads, boost::barrier& b
   barrier.wait();
 }
 
-void IsosurfacePrivate::compute_normals()
+void IsosurfacePrivate::parallel_compute_normals( int thread, int num_threads, 
+  boost::barrier& barrier )
 {
-  // TODO Parallelize this algorithm as much as possible
-  
-  // Reset the normals vector
-  this->normals_.clear();
-  this->normals_.resize( this->points_.size(), VectorF( 0, 0, 0 ) );
+  size_t num_vertices = this->points_.size();
 
-  // Keep track of the number of faces per vertex
-  std::vector< int > faces_per_vertex( this->points_.size(), 0 );
+  if ( thread == 0 ) // Only need to setup once 
+  { 
+    // Reset the normals vector
+    this->normals_.clear();
+    this->normals_.resize( num_vertices, VectorF( 0, 0, 0 ) );
+  }
+
+  // All threads have to wait until setup is done before proceeding
+  barrier.wait();
+
+  // In order to parallelize the algorithm, each thread processes a different range of vertex 
+  // indices [vertex_index_start, vertex_index_end)
+  size_t vertex_range_size = static_cast< size_t >( num_vertices / num_threads );
+  if ( vertex_range_size * num_threads < num_vertices ) 
+  {
+    vertex_range_size++;
+  }
+
+  size_t vertex_index_start = thread * vertex_range_size;
+  size_t vertex_index_end = ( thread + 1 ) * vertex_range_size;
+  if ( vertex_index_end > num_vertices ) 
+  {
+    vertex_index_end = num_vertices;
+  }
 
   // For each face
   for( size_t i = 0; i + 2 < this->faces_.size(); i += 3 )
   {
-    int vertex_index1 = this->faces_[ i ];
-    int vertex_index2 = this->faces_[ i + 1 ];
-    int vertex_index3 = this->faces_[ i + 2 ];
+    size_t vertex_index1 = this->faces_[ i ];
+    size_t vertex_index2 = this->faces_[ i + 1 ];
+    size_t vertex_index3 = this->faces_[ i + 2 ];
 
-    // Get vertices of face
-    PointF p1 = this->points_[ vertex_index1 ];
-    PointF p2 = this->points_[ vertex_index2 ];
-    PointF p3 = this->points_[ vertex_index3 ];
+    // If this face has at least one vertex in our range
+    if( ( vertex_index_start <= vertex_index1 && vertex_index1 < vertex_index_end ) ||
+      ( vertex_index_start <= vertex_index2 && vertex_index2 < vertex_index_end ) ||
+      ( vertex_index_start <= vertex_index3 && vertex_index3 < vertex_index_end ) )
+    { 
+      // Get vertices of face
+      PointF p1 = this->points_[ vertex_index1 ];
+      PointF p2 = this->points_[ vertex_index2 ];
+      PointF p3 = this->points_[ vertex_index3 ];
 
-    // Calculate cross product of edges
-    VectorF v0 = p3 - p2;
-    VectorF v1 = p1 - p2;
-    VectorF n = Cross( v0, v1 );
+      // Calculate cross product of edges
+      VectorF v0 = p3 - p2;
+      VectorF v1 = p1 - p2;
+      VectorF n = Cross( v0, v1 );
 
-    // Add to normal for each included vertex
-    this->normals_[ vertex_index1 ] += n;
-    this->normals_[ vertex_index2 ] += n;
-    this->normals_[ vertex_index3 ] += n;
+      // Add to normal for each vertex in our range
+      if( ( vertex_index_start <= vertex_index1 && vertex_index1 < vertex_index_end ) )
+      {
+        this->normals_[ vertex_index1 ] += n;
+      }
+      if( ( vertex_index_start <= vertex_index2 && vertex_index2 < vertex_index_end ) )
+      {
+        this->normals_[ vertex_index2 ] += n;
+      }
+      if( ( vertex_index_start <= vertex_index3 && vertex_index3 < vertex_index_end ) )
+      {
+        this->normals_[ vertex_index3 ] += n;
+      }
+    }
 
-    // Add to count of faces per vertex
-    faces_per_vertex[ vertex_index1 ]++;
-    faces_per_vertex[ vertex_index2 ]++;
-    faces_per_vertex[ vertex_index3 ]++;
   }
 
-  // For each vertex
-  for( size_t i = 0; i < this->normals_.size(); i++ )
+  // For each vertex in our range
+  for( size_t i = vertex_index_start; i < vertex_index_end; i++ )
   {
-    // Average normal (divide by number of faces)
-    this->normals_[ i ] /= static_cast< float >( faces_per_vertex[ i ] );
-
     // Normalize normal
     this->normals_[ i ].normalize();
   }
@@ -915,68 +943,13 @@ void Isosurface::compute()
   this->private_->normals_.clear();
   this->private_->faces_.clear();
 
-  //// Create simple test geometry -- cube
-  //this->private_->points_.push_back( PointF( 0, 0, 0 ) );
-  //this->private_->points_.push_back( PointF( 1, 0, 0 ) );
-  //this->private_->points_.push_back( PointF( 0, 1, 0 ) );
-  //this->private_->points_.push_back( PointF( 1, 1, 0 ) );
-  //this->private_->points_.push_back( PointF( 0, 0, 1 ) );
-  //this->private_->points_.push_back( PointF( 1, 0, 1 ) );
-  //this->private_->points_.push_back( PointF( 0, 1, 1 ) );
-  //this->private_->points_.push_back( PointF( 1, 1, 1 ) );
+  Parallel parallel_faces( boost::bind( &IsosurfacePrivate::parallel_compute_faces, 
+    this->private_, _1, _2, _3 ) );
+    parallel_faces.run();
 
-  //// Front 
-  //this->private_->faces_.push_back( 0 );
-  //this->private_->faces_.push_back( 1 );
-  //this->private_->faces_.push_back( 2 );
-  //this->private_->faces_.push_back( 2 );
-  //this->private_->faces_.push_back( 1 );
-  //this->private_->faces_.push_back( 3 );
-
-  //// Right side
-  //this->private_->faces_.push_back( 1 );
-  //this->private_->faces_.push_back( 5 );
-  //this->private_->faces_.push_back( 3 );
-  //this->private_->faces_.push_back( 3 );
-  //this->private_->faces_.push_back( 5 );
-  //this->private_->faces_.push_back( 7 );
-
-  //// Left side
-  //this->private_->faces_.push_back( 4 );
-  //this->private_->faces_.push_back( 0 );
-  //this->private_->faces_.push_back( 6 );
-  //this->private_->faces_.push_back( 6 );
-  //this->private_->faces_.push_back( 0 );
-  //this->private_->faces_.push_back( 2 );
-
-  //// Back
-  //this->private_->faces_.push_back( 5);
-  //this->private_->faces_.push_back( 4 );
-  //this->private_->faces_.push_back( 7 );
-  //this->private_->faces_.push_back( 7 );
-  //this->private_->faces_.push_back( 4 );
-  //this->private_->faces_.push_back( 6 );
-
-  //// Top
-  //this->private_->faces_.push_back( 2 );
-  //this->private_->faces_.push_back( 3 );
-  //this->private_->faces_.push_back( 6 );
-  //this->private_->faces_.push_back( 6 );
-  //this->private_->faces_.push_back( 3 );
-  //this->private_->faces_.push_back( 7 );
-
-  //// Bottom
-  //this->private_->faces_.push_back( 4 );
-  //this->private_->faces_.push_back( 5 );
-  //this->private_->faces_.push_back( 0 );
-  //this->private_->faces_.push_back( 0 );
-  //this->private_->faces_.push_back( 5 );
-  //this->private_->faces_.push_back( 1 );
-
-  Parallel parallel_algo( boost::bind( &IsosurfacePrivate::parallel, this->private_, _1, _2, _3 ) );
-    parallel_algo.run();
-
-  this->private_->compute_normals();
+  Parallel parallel_normals( boost::bind( &IsosurfacePrivate::parallel_compute_normals, 
+    this->private_, _1, _2, _3 ) );
+  parallel_normals.run();
 }
 
 const std::vector< PointF >& Isosurface::get_points() const
