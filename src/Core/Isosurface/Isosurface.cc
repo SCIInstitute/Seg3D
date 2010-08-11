@@ -306,10 +306,8 @@ const MarchingCubesTableType MARCHING_CUBES_TABLE_C[] = {
 
 class IsosurfacePrivate
 {
-public:
-  
-  // TODO Constructor & Destructor? 
 
+public:
   // Setup the algorithm and the buffers
   void setup( int num_threads );
   // Parallelized isosurface computation algorithm 
@@ -318,7 +316,6 @@ public:
 
   // Input to isosurface computation
   MaskVolumeHandle mask_volume_; 
-  unsigned char mask_value_;
 
   // Output mesh
   std::vector< PointF > points_; 
@@ -354,8 +351,6 @@ void IsosurfacePrivate::setup( int num_threads )
 
   // Mask data is stored in bit-plane (8 masks per data block)
   this->data_ = this->mask_volume_->mask_data_block()->get_mask_data();
-  // Bit where mask bit is stored
-  this->mask_value_ = this->mask_volume_->mask_data_block()->get_mask_value(); 
 
   // Stores index into polgyon configuration table for each element (cube)?
   // Why +1?  Maybe just padding for safety?
@@ -474,7 +469,11 @@ void IsosurfacePrivate::parallel( int thread, int num_threads, boost::barrier& b
 
   StackVector< size_t, 3 > elems( 3 );    
 
-  // TODO Get mask transform from MaskVolume as local variable
+  // Bit where mask bit is stored
+  unsigned char mask_value = this->mask_volume_->mask_data_block()->get_mask_value(); 
+
+  // Get mask transform from MaskVolume 
+  GridTransform grid_transform = this->mask_volume_->get_grid_transform();
 
   // Loop over all the slices
   for ( size_t z = 0;  z < this->elem_nz_; z++ ) 
@@ -521,22 +520,22 @@ void IsosurfacePrivate::parallel( int thread, int num_threads, boost::barrier& b
       for ( size_t x = 0; x < this->nx_; x++ )
       {
         // There are dim - 1 elements (cubes)
-        if ( x < elem_nx_ && y < elem_ny_ )
+        if ( x < this->elem_nx_ && y < this->elem_ny_ )
         {
           // type = index into polygonal configuration table
           unsigned char type = 0;
           size_t q = y * this->nx_ + x; // Index into data
           // An 8 bit index is formed where each bit corresponds to a vertex 
           // Bit on if vertex is inside surface, off otherwise
-          if ( data1[ q ] & this->mask_value_ )         type |= 0x1;
-          if ( data1[ q + 1 ] & this->mask_value_ )       type |= 0x2;
-          if ( data1[ q + this->nx_ + 1 ] & this->mask_value_ ) type |= 0x4;
-          if ( data1[ q + this->nx_ ] & this->mask_value_ )   type |= 0x8;
+          if ( data1[ q ] & mask_value )          type |= 0x1;
+          if ( data1[ q + 1 ] & mask_value )        type |= 0x2;
+          if ( data1[ q + this->nx_ + 1 ] & mask_value )  type |= 0x4;
+          if ( data1[ q + this->nx_ ] & mask_value )    type |= 0x8;
 
-          if ( data2[ q ] & this->mask_value_ )         type |= 0x10;
-          if ( data2[ q + 1 ] & this->mask_value_ )       type |= 0x20;
-          if ( data2[ q + this->nx_ + 1 ] & this->mask_value_ ) type |= 0x40;
-          if ( data2[ q + this->nx_ ] & this->mask_value_ )   type |= 0x80;
+          if ( data2[ q ] & mask_value )          type |= 0x10;
+          if ( data2[ q + 1 ] & mask_value )        type |= 0x20;
+          if ( data2[ q + this->nx_ + 1 ] & mask_value )  type |= 0x40;
+          if ( data2[ q + this->nx_ ] & mask_value )    type |= 0x80;
 
           this->type_buffer_[ q ] = type;
 
@@ -561,7 +560,8 @@ void IsosurfacePrivate::parallel( int thread, int num_threads, boost::barrier& b
                 static_cast< float >( y ),
                 static_cast< float >( z ) );
 
-              // TODO Transform point by mask transform
+              // Transform point by mask transform
+              edge_point = grid_transform.project( edge_point );
 
               points.push_back( edge_point );
               back_edge_x[ q ] = point_cnt;
@@ -576,6 +576,9 @@ void IsosurfacePrivate::parallel( int thread, int num_threads, boost::barrier& b
                 static_cast< float>( y + 1 ),
                 static_cast< float >( z ) );
 
+              // Transform point by mask transform
+              edge_point = grid_transform.project( edge_point );
+
               points.push_back( edge_point );
               back_edge_x[ q + this->nx_ ] = point_cnt;
               point_cnt++;
@@ -588,6 +591,9 @@ void IsosurfacePrivate::parallel( int thread, int num_threads, boost::barrier& b
                 static_cast< float >( y ) + INTERP_EDGE_OFFSET_C,
                 static_cast< float >( z ) );
 
+              // Transform point by mask transform
+              edge_point = grid_transform.project( edge_point );
+
               points.push_back( edge_point );
               back_edge_y[ q ] = point_cnt;
               point_cnt++;
@@ -599,6 +605,9 @@ void IsosurfacePrivate::parallel( int thread, int num_threads, boost::barrier& b
               PointF edge_point = PointF( static_cast< float >( x + 1 ), 
                 static_cast< float >( y ) + INTERP_EDGE_OFFSET_C,
                 static_cast< float >( z ) );
+
+              // Transform point by mask transform
+              edge_point = grid_transform.project( edge_point );
 
               points.push_back( edge_point );
               back_edge_y[ q + 1 ] = point_cnt;
@@ -613,6 +622,9 @@ void IsosurfacePrivate::parallel( int thread, int num_threads, boost::barrier& b
               static_cast< float >( y ),
               static_cast< float >( z + 1 ) );
 
+            // Transform point by mask transform
+            edge_point = grid_transform.project( edge_point );
+
             points.push_back( edge_point );
             front_edge_x[ q ] = point_cnt;
             point_cnt++;
@@ -626,6 +638,9 @@ void IsosurfacePrivate::parallel( int thread, int num_threads, boost::barrier& b
               static_cast< float >( y + 1 ),
               static_cast< float >( z + 1 ) );
 
+            // Transform point by mask transform
+            edge_point = grid_transform.project( edge_point );
+
             points.push_back( edge_point );
             front_edge_x[ q + this->nx_ ] = point_cnt;
             point_cnt++;
@@ -638,6 +653,9 @@ void IsosurfacePrivate::parallel( int thread, int num_threads, boost::barrier& b
               static_cast< float >( y ) + INTERP_EDGE_OFFSET_C,
               static_cast< float >( z + 1 ) );
 
+            // Transform point by mask transform
+            edge_point = grid_transform.project( edge_point );
+
             points.push_back( edge_point );
             front_edge_y[ q ] = point_cnt;
             point_cnt++;
@@ -649,6 +667,9 @@ void IsosurfacePrivate::parallel( int thread, int num_threads, boost::barrier& b
             PointF edge_point = PointF( static_cast< float >( x + 1 ), 
               static_cast< float >( y ) + INTERP_EDGE_OFFSET_C,
               static_cast< float >( z + 1 ) );
+
+            // Transform point by mask transform
+            edge_point = grid_transform.project( edge_point );
 
             points.push_back( edge_point );
             front_edge_y[ q + 1 ] = point_cnt;
@@ -663,6 +684,9 @@ void IsosurfacePrivate::parallel( int thread, int num_threads, boost::barrier& b
               static_cast< float >( y ), 
               static_cast< float >( z ) + INTERP_EDGE_OFFSET_C );
 
+            // Transform point by mask transform
+            edge_point = grid_transform.project( edge_point );
+
             points.push_back( edge_point );
             side_edge[ q ] = point_cnt;
             point_cnt++;              
@@ -675,6 +699,9 @@ void IsosurfacePrivate::parallel( int thread, int num_threads, boost::barrier& b
               static_cast< float >( y ),
               static_cast< float >( z ) + INTERP_EDGE_OFFSET_C );
 
+            // Transform point by mask transform
+            edge_point = grid_transform.project( edge_point );
+
             points.push_back( edge_point );
             side_edge[ q + 1 ] = point_cnt;
             point_cnt++;              
@@ -685,6 +712,9 @@ void IsosurfacePrivate::parallel( int thread, int num_threads, boost::barrier& b
             PointF edge_point = PointF( static_cast< float >( x ), 
               static_cast< float >( y + 1 ), 
               static_cast< float >( z ) + INTERP_EDGE_OFFSET_C );
+
+            // Transform point by mask transform
+            edge_point = grid_transform.project( edge_point );
 
             points.push_back( edge_point );
             side_edge[ q + this->nx_ ] = point_cnt;
@@ -698,7 +728,9 @@ void IsosurfacePrivate::parallel( int thread, int num_threads, boost::barrier& b
               static_cast< float >( y + 1 ), 
               static_cast< float >( z ) + INTERP_EDGE_OFFSET_C );
 
-            // TODO transform edge_point
+            // Transform point by mask transform
+            edge_point = grid_transform.project( edge_point );
+
             points.push_back( edge_point );
             side_edge[ q + this->nx_ + 1 ] = point_cnt;
             point_cnt++;              
@@ -941,7 +973,6 @@ void Isosurface::compute()
   //this->private_->faces_.push_back( 5 );
   //this->private_->faces_.push_back( 1 );
 
-  // TODO Port SCIRun code to here
   Parallel parallel_algo( boost::bind( &IsosurfacePrivate::parallel, this->private_, _1, _2, _3 ) );
     parallel_algo.run();
 
