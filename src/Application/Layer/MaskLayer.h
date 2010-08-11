@@ -85,6 +85,10 @@ public:
   void compute_isosurface();
 
   void delete_isosurface();
+
+  // -- Signals --
+public:
+  boost::signals2::signal< void () > isosurface_updated_signal_;
   
   // -- state variables --
 public:

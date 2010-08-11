@@ -30,6 +30,8 @@
 #include <Core/Isosurface/Isosurface.h>
 #include <Core/Utils/StackVector.h>
 #include <Core/Utils/Parallel.h>
+#include <Core/Utils/Log.h>
+#include <Core/Graphics/VertexBufferObject.h>
 
 namespace Core
 {
@@ -314,6 +316,8 @@ public:
   void parallel_compute_faces( int thread, int num_threads, boost::barrier& barrier );
   void parallel_compute_normals( int thread, int num_threads,  boost::barrier& barrier );
 
+  void upload_to_vertex_buffer();
+
   // Input to isosurface computation
   MaskVolumeHandle mask_volume_; 
 
@@ -336,6 +340,12 @@ public:
   std::vector< size_t > front_offset_;
   std::vector< size_t > back_offset_;
   size_t global_point_cnt_;
+
+  VertexAttribArrayBufferHandle vertex_buffer_;
+  VertexAttribArrayBufferHandle normal_buffer_;
+  ElementArrayBufferHandle faces_buffer_;
+  bool surface_changed_;
+  bool gl_initialized_;
 };
 
 void IsosurfacePrivate::setup( int num_threads )
@@ -929,27 +939,71 @@ void IsosurfacePrivate::parallel_compute_normals( int thread, int num_threads,
   }
 }
 
+void IsosurfacePrivate::upload_to_vertex_buffer()
+{
+  if ( !this->surface_changed_ )
+  {
+    return;
+  }
+
+  if ( !this->gl_initialized_ )
+  {
+    this->vertex_buffer_.reset( new Core::VertexAttribArrayBuffer );
+    this->normal_buffer_.reset( new Core::VertexAttribArrayBuffer );
+    this->faces_buffer_.reset( new Core::ElementArrayBuffer );
+    this->vertex_buffer_->set_array( VertexAttribArrayType::VERTEX_E, 3, GL_FLOAT, 0, 0 );
+    this->normal_buffer_->set_array( VertexAttribArrayType::NORMAL_E, GL_FLOAT, 0, 0 );
+    this->gl_initialized_ = true;
+  }
+
+  ptrdiff_t vertex_size = this->points_.size() * sizeof( PointF );
+  ptrdiff_t normal_size = this->normals_.size() * sizeof( VectorF );
+  ptrdiff_t num_of_faces = this->faces_.size() / 3;
+  ptrdiff_t face_size = this->faces_.size() * sizeof( unsigned int );
+  ptrdiff_t total_size = vertex_size + normal_size + face_size;
+  CORE_LOG_MESSAGE( "Uploading vertex data to GPU: " + 
+    ExportToString( this->points_.size() ) + " vertices, " +
+    ExportToString( num_of_faces ) + " triangles. Total memory: " + 
+    ExportToString( total_size ) );
+  if ( total_size > ( 50 << 20 ) )
+  {
+    CORE_LOG_WARNING( "Isosurface data takes more than 10MB!" );
+  }
+  this->vertex_buffer_->set_buffer_data( vertex_size, &this->points_[ 0 ], GL_STATIC_DRAW );
+  this->normal_buffer_->set_buffer_data( normal_size, &this->normals_[ 0 ], GL_STATIC_DRAW );
+  this->faces_buffer_->set_buffer_data( face_size, &this->faces_[ 0 ], GL_STATIC_DRAW );
+  this->surface_changed_ = false;
+}
+
 Isosurface::Isosurface( const MaskVolumeHandle& mask_volume ) :
   private_( new IsosurfacePrivate )
 {
   this->private_->mask_volume_ = mask_volume;
-
-  this->compute();
+  this->private_->gl_initialized_ = false;
+  this->private_->surface_changed_ = false;
 }
 
 void Isosurface::compute()
 {
+  lock_type lock( this->get_mutex() );
+
   this->private_->points_.clear();
   this->private_->normals_.clear();
   this->private_->faces_.clear();
 
-  Parallel parallel_faces( boost::bind( &IsosurfacePrivate::parallel_compute_faces, 
-    this->private_, _1, _2, _3 ) );
+  {
+    Core::MaskVolume::shared_lock_type vol_lock( this->private_->mask_volume_->get_mutex() );
+
+    Parallel parallel_faces( boost::bind( &IsosurfacePrivate::parallel_compute_faces, 
+      this->private_, _1, _2, _3 ) );
     parallel_faces.run();
+  }
 
   Parallel parallel_normals( boost::bind( &IsosurfacePrivate::parallel_compute_normals, 
     this->private_, _1, _2, _3 ) );
   parallel_normals.run();
+
+  this->private_->surface_changed_ = true;
 }
 
 const std::vector< PointF >& Isosurface::get_points() const
@@ -965,6 +1019,21 @@ const std::vector< VectorF >& Isosurface::get_normals() const
 const std::vector< unsigned int >& Isosurface::get_faces() const
 {
   return this->private_->faces_;
+}
+
+void Isosurface::redraw()
+{
+  lock_type lock( this->get_mutex() );
+  this->private_->upload_to_vertex_buffer();
+  if ( this->private_->gl_initialized_ )
+  {
+    this->private_->vertex_buffer_->enable_arrays();
+    this->private_->normal_buffer_->enable_arrays();
+    this->private_->faces_buffer_->draw_elements( GL_TRIANGLES, 
+      static_cast< GLsizei >( this->private_->faces_.size() ), GL_UNSIGNED_INT );
+    this->private_->normal_buffer_->disable_arrays();
+    this->private_->vertex_buffer_->disable_arrays();
+  }
 }
 
 

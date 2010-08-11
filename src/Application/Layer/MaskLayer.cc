@@ -169,6 +169,12 @@ Core::IsosurfaceHandle MaskLayer::get_isosurface()
 
 void MaskLayer::compute_isosurface()
 {
+  if ( !Core::Application::IsApplicationThread() )
+  {
+    Core::Application::PostEvent( boost::bind( &MaskLayer::compute_isosurface, this ) );
+    return;
+  }
+  
   {
     lock_type lock( Layer::GetMutex() );
     if ( !this->isosurface_ )
@@ -178,12 +184,29 @@ void MaskLayer::compute_isosurface()
   }
 
   this->isosurface_->compute();
+  if ( this->show_isosurface_state_->get() )
+  {
+    this->isosurface_updated_signal_();
+  } 
 }
 
 void MaskLayer::delete_isosurface()
 {
-  lock_type lock( Layer::GetMutex() );
-  this->isosurface_.reset();
+  if ( !Core::Application::IsApplicationThread() )
+  {
+    Core::Application::PostEvent( boost::bind( &MaskLayer::compute_isosurface, this ) );
+    return;
+  }
+
+  {
+    lock_type lock( Layer::GetMutex() );
+    this->isosurface_.reset();
+  }
+
+  if ( this->show_isosurface_state_->get() )
+  {
+    this->isosurface_updated_signal_();
+  } 
 }
 
 } // end namespace Seg3D

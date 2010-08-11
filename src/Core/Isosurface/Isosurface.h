@@ -40,6 +40,7 @@
 #include <Core/Geometry/Point.h>
 #include <Core/Geometry/Vector.h>
 #include <Core/Volume/MaskVolume.h>
+#include <Core/Utils/Lockable.h>
 
 namespace Core
 {
@@ -52,7 +53,7 @@ class IsosurfacePrivate;
 typedef boost::shared_ptr< IsosurfacePrivate > IsosurfacePrivateHandle;
 
 // Isosurface geometry and computation code 
-class Isosurface : public boost::noncopyable
+class Isosurface : public Core::RecursiveLockable
 {
 public:
   Isosurface( const MaskVolumeHandle& mask_volume );  
@@ -65,6 +66,9 @@ public:
   const std::vector< VectorF >&   get_normals() const;
   // Indices into points and normals, 3 per face
   const std::vector< unsigned int >&  get_faces() const;
+
+  // Render the isosurface.
+  void redraw();
 
 private:
   IsosurfacePrivateHandle private_;

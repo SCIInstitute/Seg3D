@@ -296,6 +296,10 @@ void ViewerPrivate::insert_layer( LayerHandle layer )
       this->layer_connection_map_.insert( std::make_pair( layer->get_layer_id(),
         mask_volume_slice->cache_updated_signal_.connect( boost::bind(
         &ViewerPrivate::layer_state_changed, this, ViewModeType::NON_VOLUME_E ) ) ) );
+
+      this->layer_connection_map_.insert( std::make_pair( layer->get_layer_id(),
+        mask_layer->isosurface_updated_signal_.connect(
+        boost::bind( &ViewerPrivate::layer_state_changed, this, ViewModeType::VOLUME_E ) ) ) );
     }
     break;
   default:

@@ -508,8 +508,6 @@ void RendererPrivate::draw_isosurfaces( const IsosurfaceArray& isosurfaces, bool
   size_t num_of_isosurfaces = isosurfaces.size();
   this->isosurface_shader_->enable();
   this->isosurface_shader_->set_lighting( with_lighting );
-  glEnableClientState( GL_VERTEX_ARRAY );
-  glEnableClientState( GL_NORMAL_ARRAY );
   for ( size_t i = 0; i < num_of_isosurfaces; ++i )
   {
     Core::IsosurfaceHandle iso = isosurfaces[ i ]->isosurface_;
@@ -519,13 +517,8 @@ void RendererPrivate::draw_isosurfaces( const IsosurfaceArray& isosurfaces, bool
     }
     glColor3d( isosurfaces[ i ]->color_.r() / 255.0, isosurfaces[ i ]->color_.g() / 255.0, 
       isosurfaces[ i ]->color_.b() / 255.0 );
-    glVertexPointer( 3, GL_FLOAT, 0, &( iso->get_points()[ 0 ] ) );
-    glNormalPointer( GL_FLOAT, 0, &( iso->get_normals()[ 0 ] ) );
-    glDrawElements( GL_TRIANGLES, static_cast< GLsizei >( iso->get_faces().size() ), 
-      GL_UNSIGNED_INT, &( iso->get_faces()[ 0 ] ) );
+    iso->redraw();
   }
-  glDisableClientState( GL_VERTEX_ARRAY );
-  glDisableClientState( GL_NORMAL_ARRAY );
   this->isosurface_shader_->disable();
 }
 
