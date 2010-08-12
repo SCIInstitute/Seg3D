@@ -883,6 +883,11 @@ bool PaintTool::handle_mouse_move( const Core::MouseHistory& mouse_history,
     this->private_->viewer_->update_status_bar( mouse_history.current_.x_,
       mouse_history.current_.y_, data_constraint_layer );
   }
+  else
+  {
+    this->private_->viewer_->update_status_bar( mouse_history.current_.x_,
+      mouse_history.current_.y_ );
+  }
   
   double world_x, world_y;
   this->private_->viewer_->window_to_world( mouse_history.current_.x_, 

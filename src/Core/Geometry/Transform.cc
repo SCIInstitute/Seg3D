@@ -862,7 +862,7 @@ void TransformF::BuildShearMatrix( MatrixF& m, const VectorF& s, const Plane& p 
   // the shear matrix in the new frame
   MatrixF shear = MatrixF::Identity();
   shear( 1, 2 ) = yshear;
-  shear( 1, 3 ) = -yshear * p.distance();
+  shear( 1, 3 ) = -yshear * static_cast< float >( p.distance() );
 
   MatrixF r_inverse_mat;
   MatrixF::Invert( r.mat_, r_inverse_mat );

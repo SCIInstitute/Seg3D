@@ -784,7 +784,7 @@ void IsosurfacePrivate::parallel_compute_faces( int thread, int num_threads,
     {
       for (size_t x=0;x<elem_nx_;x++)
       {
-        int elem_offset = y * this->nx_ + x;
+        size_t elem_offset = y * this->nx_ + x;
         unsigned char type = this->type_buffer_[ elem_offset ];
 
         // All points are inside or outside the cube -- does not contribute to the 
@@ -851,9 +851,9 @@ void IsosurfacePrivate::parallel_compute_faces( int thread, int num_threads,
         for ( size_t p = 0; p < pelements.size(); p++ )
         {
           StackVector< size_t, 3 >& el = pelements[ p ];
-          this->faces_.push_back( el[ 0 ] );
-          this->faces_.push_back( el[ 1 ] );
-          this->faces_.push_back( el[ 2 ] );
+          this->faces_.push_back( static_cast< unsigned int >( el[ 0 ] ) );
+          this->faces_.push_back( static_cast< unsigned int >( el[ 1 ] ) );
+          this->faces_.push_back( static_cast< unsigned int >( el[ 2 ] ) );
         }
       }
       this->back_offset_ = this->front_offset_;
@@ -973,7 +973,7 @@ void IsosurfacePrivate::upload_to_vertex_buffer()
     ExportToString( total_size ) );
   if ( total_size > ( 50 << 20 ) )
   {
-    CORE_LOG_WARNING( "Isosurface data takes more than 10MB!" );
+    CORE_LOG_WARNING( "Isosurface data takes more than 50MB!" );
   }
   this->vertex_buffer_->set_buffer_data( vertex_size, &this->points_[ 0 ], GL_STATIC_DRAW );
   this->normal_buffer_->set_buffer_data( normal_size, &this->normals_[ 0 ], GL_STATIC_DRAW );
