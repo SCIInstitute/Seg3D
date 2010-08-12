@@ -315,8 +315,8 @@ MatrixF MatrixF::operator*( const MatrixF& rhs ) const
 
 MatrixF& MatrixF::operator*=( const MatrixF& rhs )
 {
-  double tmp[16];
-  memcpy( tmp, data_, 16 * sizeof( double ) );
+  float tmp[16];
+  memcpy( tmp, data_, 16 * sizeof( float ) );
   
   for ( size_t j = 0; j < 4; j++ )
   {
