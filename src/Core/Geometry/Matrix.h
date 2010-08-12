@@ -85,14 +85,12 @@ public:
 
   inline double& operator()( size_t i, size_t j )
   {
-    double& tmp = data_[ i + 4*j ];
-    return tmp;
+    return data_[ i + 4*j ];
   }
 
   inline const double& operator()( size_t i, size_t j ) const
   {
-    const double& tmp = data_[ i + 4*j ];
-    return tmp;
+    return data_[ i + 4*j ];
   }
 
   Vector operator*( const Vector& rhs ) const;
@@ -173,14 +171,12 @@ public:
 
   inline float& operator()( size_t i, size_t j )
   {
-    float& tmp = data_[ i + 4*j ];
-    return tmp;
+    return data_[ i + 4*j ];
   }
 
   inline const float& operator()( size_t i, size_t j ) const
   {
-    const float& tmp = data_[ i + 4*j ];
-    return tmp;
+    return data_[ i + 4*j ];
   }
 
   Vector operator*( const Vector& rhs ) const;

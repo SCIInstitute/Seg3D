@@ -30,6 +30,7 @@
 #include <boost/numeric/ublas/matrix_expression.hpp>
 #include <boost/numeric/ublas/lu.hpp>
 
+#include <Core/Utils/Log.h>
 #include <Core/Geometry/Matrix.h>
 #include <Core/Math/MathFunctions.h>
 
@@ -169,7 +170,9 @@ bool Matrix::Invert( const Matrix& mat, Matrix& inverse_mat )
   {
     for ( size_t i = 0; i < 4; i++ )
     {
-      A( i, j ) = mat.data_[ i + 4*j ];
+      A( i, j ) = mat.data_[ i + 4 * j ];
+      if ( i == j ) inverse( i, j ) = 1.0;
+      else inverse( i, j ) = 0.0;
     }
   }
 
@@ -185,15 +188,21 @@ bool Matrix::Invert( const Matrix& mat, Matrix& inverse_mat )
     return false;
   }
 
-   inverse( 0, 0 ) = inverse( 1, 1 ) = inverse( 2, 2 ) = inverse( 3, 3 ) = 1.0;
-
-  boost::numeric::ublas::lu_substitute( A, pm, inverse );
-
+  try
+  {
+    boost::numeric::ublas::lu_substitute( A, pm, inverse );
+  }
+  catch ( ... )
+  {
+    CORE_LOG_ERROR( "Could not invert matrix" );
+    return false;
+  }
+  
   for ( size_t j = 0; j < 4; j++ )
   {
     for ( size_t i = 0; i < 4; i++ )
     {
-       inverse_mat.data_[ i + 4*j ] = inverse( i, j );
+       inverse_mat.data_[ i + 4 * j ] = inverse( i, j );
     }
   }
 
@@ -206,7 +215,7 @@ void Matrix::Transpose( const Matrix& mat, Matrix& trans )
   {
     for ( size_t i = 0;  i < 4 ; i++ ) 
     {
-      trans.data_[ i + 4*j ] = mat.data_[ j + 4*i ];
+      trans.data_[ i + 4 * j ] = mat.data_[ j + 4 * i ];
     }
   }
 }
@@ -349,7 +358,9 @@ bool MatrixF::Invert( const MatrixF& mat, MatrixF& inverse_mat )
   {
     for ( size_t i = 0; i < 4; i++ )
     {
-      A( i, j ) = mat.data_[ i + 4*j ];
+      A( i, j ) = mat.data_[ i + 4 * j ];
+      if ( i == j ) inverse( i, j ) = 1.0f;
+      else inverse( i, j ) = 0.0f;
     }
   }
 
@@ -365,15 +376,13 @@ bool MatrixF::Invert( const MatrixF& mat, MatrixF& inverse_mat )
     return false;
   }
 
-   inverse( 0, 0 ) = inverse( 1, 1 ) = inverse( 2, 2 ) = inverse( 3, 3 ) = 1.0;
-
   boost::numeric::ublas::lu_substitute( A, pm, inverse );
 
   for ( size_t j = 0; j < 4; j++ )
   {
     for ( size_t i = 0; i < 4; i++ )
     {
-       inverse_mat.data_[ i + 4*j ] = inverse( i, j );
+       inverse_mat.data_[ i + 4 * j ] = inverse( i, j );
     }
   }
 
@@ -386,7 +395,7 @@ void MatrixF::Transpose( const MatrixF& mat, MatrixF& trans )
   {
     for ( size_t i = 0;  i < 4 ; i++ ) 
     {
-      trans.data_[ i + 4*j ] = mat.data_[ j + 4*i ];
+      trans.data_[ i + 4 * j ] = mat.data_[ j + 4 * i ];
     }
   }
 }

@@ -82,7 +82,7 @@ bool CurvatureAnisotropicDiffusionFilterAlgo::run( DataLayerHandle target_layer,
     filter->SetTimeStep( steps );
     filter->SetConductanceParameter( conductance );
 
-    // filter->Update();
+    filter->Update();
 
     // this->insert_data_into_layer( filter->GetOutput(), target_layer ); 
   );
