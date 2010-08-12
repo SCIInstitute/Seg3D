@@ -110,6 +110,10 @@ public:
   // open and hides or shows the progress bar
   void show_progress_bar( bool show );
   
+  // UPDATE_PROGRESS_BAR:
+  // Update the progress in the widget
+  void update_progress_bar( double progress );
+  
   // SHOW_SELECTION_CHECKBOX:
   // this function is called when the user opens a group menu so that the layer's selection
   // checkbox can be accessed
@@ -203,6 +207,9 @@ public:
   // Entry point for the state engine to notify state has changed
   static void UpdateState( qpointer_type qpointer );
 
+  // UPDATEPROGRESS:
+  // Update the progress bar 
+  static void UpdateProgress( qpointer_type qpointer, double progress );
 };
 
 } //end namespace Seg3D

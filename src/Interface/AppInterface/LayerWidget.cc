@@ -206,6 +206,9 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
     this->private_->layer_->data_state_->state_changed_signal_.connect(
       boost::bind( &LayerWidget::UpdateState, qpointer ) ); 
   
+    this->private_->layer_->update_progress_signal_.connect(
+      boost::bind( &LayerWidget::UpdateProgress, qpointer, _1 ) );
+  
     QtUtils::QtBridge::Connect( this->private_->activate_button_, 
       boost::bind( static_cast<void (*) ( Core::ActionContextHandle, LayerHandle )>( 
       &ActionActivateLayer::Dispatch ), Core::Interface::GetWidgetActionContext(), layer ) );
@@ -906,6 +909,7 @@ void LayerWidget::show_progress_bar( bool show )
 {
   if ( show )
   {
+    this->private_->ui_.progress_bar_->setValue( 0 );
     this->private_->ui_.progress_bar_bar_->show();
   }
   else 
@@ -913,6 +917,12 @@ void LayerWidget::show_progress_bar( bool show )
     this->private_->ui_.progress_bar_bar_->hide();
   }
 }
+
+void LayerWidget::update_progress_bar( double progress )
+{
+  this->private_->ui_.progress_bar_->setValue( static_cast<int>( progress * 100.0 ) );
+}
+
 
 void LayerWidget::select_visual_lock( bool lock )
 {
@@ -945,12 +955,14 @@ void LayerWidget::prep_for_animation( bool move_time )
 
 void LayerWidget::UpdateState( qpointer_type qpointer )
 {
+  // Hand it off to the right thread
   if( !( Core::Interface::IsInterfaceThread() ) )
   {
     Core::Interface::Instance()->post_event( boost::bind( &LayerWidget::UpdateState, qpointer) );
     return; 
   }
 
+  // When we are finally on the interface thread run this code:
   if ( qpointer.data() )
   {
     qpointer->setUpdatesEnabled( false );
@@ -959,5 +971,24 @@ void LayerWidget::UpdateState( qpointer_type qpointer )
     qpointer->repaint();
   }
 }
-  
+
+void LayerWidget::UpdateProgress( qpointer_type qpointer, double progress )
+{
+  // Hand it off to the right thread
+  if( !( Core::Interface::IsInterfaceThread() ) )
+  {
+    Core::Interface::Instance()->post_event( boost::bind( &LayerWidget::UpdateProgress, 
+      qpointer, progress) );
+    return; 
+  }
+
+  // When we are finally on the interface thread run this code:
+  if ( qpointer.data() )
+  {
+    qpointer->update_progress_bar( progress );
+    qpointer->update();
+  }
+}
+
+
 } //end namespace Seg3D
