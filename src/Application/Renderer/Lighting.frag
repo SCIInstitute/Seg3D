@@ -14,15 +14,19 @@ vec4 compute_lighting()
   vec4 color = ambient_global;
   
   n = normalize( normal );
+  if ( !gl_FrontFacing )
+  {
+    n = -n;
+  }
   
-  n_dot_l = abs( dot ( n, normalize( light_dir ) ) );
+  n_dot_l = max( dot ( n, normalize( light_dir ) ), 0.0 );
 
   if ( n_dot_l > 0.0 ) 
   {
     color += ( diffuse * n_dot_l + ambient );
     
     half_v = normalize(half_vector);
-    n_dot_hv = abs( dot ( n, half_v ) );
+    n_dot_hv = max( dot ( n, half_v ), 0.0 );
     color += gl_FrontMaterial.specular * gl_LightSource[0].specular * 
             pow( n_dot_hv, gl_FrontMaterial.shininess );
   }

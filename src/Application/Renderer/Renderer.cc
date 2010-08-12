@@ -285,7 +285,7 @@ void RendererPrivate::draw_slices_3d( const Core::BBox& bbox,
       rect->right = rect->bottomright[ 0 ];
       rect->bottom = rect->bottomleft[ 2 ];
       rect->top = rect->topleft[ 2 ];
-      rect->normal = Core::Vector( 0.0, 1.0, 0.0 );
+      rect->normal = Core::Vector( 0.0, -1.0, 0.0 );
     }
     else
     {
@@ -506,6 +506,7 @@ void RendererPrivate::process_isosurfaces( IsosurfaceArray& isosurfaces )
 void RendererPrivate::draw_isosurfaces( const IsosurfaceArray& isosurfaces, bool with_lighting )
 {
   size_t num_of_isosurfaces = isosurfaces.size();
+  glEnable( GL_CULL_FACE );
   this->isosurface_shader_->enable();
   this->isosurface_shader_->set_lighting( with_lighting );
   for ( size_t i = 0; i < num_of_isosurfaces; ++i )
@@ -520,6 +521,7 @@ void RendererPrivate::draw_isosurfaces( const IsosurfaceArray& isosurfaces, bool
     iso->redraw();
   }
   this->isosurface_shader_->disable();
+  glDisable( GL_CULL_FACE );
 }
 
 //////////////////////////////////////////////////////////////////////////

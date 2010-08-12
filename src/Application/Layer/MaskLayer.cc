@@ -194,7 +194,7 @@ void MaskLayer::delete_isosurface()
 {
   if ( !Core::Application::IsApplicationThread() )
   {
-    Core::Application::PostEvent( boost::bind( &MaskLayer::compute_isosurface, this ) );
+    Core::Application::PostEvent( boost::bind( &MaskLayer::delete_isosurface, this ) );
     return;
   }
 
