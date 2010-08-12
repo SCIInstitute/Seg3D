@@ -26,6 +26,7 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#include <Core/Application/Application.h>
 #include <Core/Volume/MaskVolumeSlice.h>
 #include <Core/RenderResources/RenderResources.h>
 #include <Core/Graphics/PixelBufferObject.h>
@@ -180,6 +181,8 @@ MaskVolumeSlice::cache_mutex_type& MaskVolumeSlice::get_cache_mutex() const
 
 unsigned char* MaskVolumeSlice::get_cached_data()
 {
+  ASSERT_IS_APPLICATION_THREAD();
+
   cache_lock_type cache_lock( this->get_cache_mutex() );
   if ( !this->private_->using_cache_ )
   {
@@ -234,6 +237,14 @@ static void CopyCachedDataBack( MaskVolumeSlice* slice, const unsigned char* buf
 
 void MaskVolumeSlice::release_cached_data()
 {
+  // Repost the request to the application thread, so getting and releasing the cache
+  // will happen in sync.
+  if ( !Application::IsApplicationThread() )
+  {
+    Application::PostEvent( boost::bind( &MaskVolumeSlice::release_cached_data, this ) );
+    return;
+  }
+  
   cache_lock_type cache_lock( this->get_cache_mutex() );
   if ( !this->private_->using_cache_ )
   {

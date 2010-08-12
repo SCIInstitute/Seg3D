@@ -119,7 +119,8 @@ TARGET_LINK_LIBRARIES(Application_Tools
                       Core_State
                       Application_Tool
                       Application_ToolManager
-                      ${SCI_BOOST_LIBRARY})
+                      ${SCI_BOOST_LIBRARY}
+            ${SCI_ITK_LIBRARIES})
 
 # Register tool classes
 REGISTER_LIBRARY_AND_CLASSES(Application_Tools
