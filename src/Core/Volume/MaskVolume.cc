@@ -76,7 +76,7 @@ MaskVolume::mutex_type& MaskVolume::get_mutex()
   }
 }
 
-MaskDataBlockHandle MaskVolume::mask_data_block() const
+MaskDataBlockHandle MaskVolume::get_mask_data_block() const
 {
   return this->mask_data_block_;
 }
@@ -85,7 +85,7 @@ template< class DATA >
 static bool CreateMaskFromNonZeroDataInternal( const DataVolumeHandle& data, 
   MaskDataBlockHandle& mask )
 {
-  DATA* src   = reinterpret_cast<DATA*>( data->data_block()->get_data() ); 
+  DATA* src   = reinterpret_cast<DATA*>( data->get_data_block()->get_data() ); 
   size_t size = mask->get_size();
 
   unsigned char* mask_data  = mask->get_mask_data();
@@ -153,7 +153,7 @@ static bool CreateMaskFromBitPlaneDataInternal( const DataVolumeHandle& data,
 {
   masks.clear();
 
-  DATA* src   = reinterpret_cast<DATA*>( data->data_block()->get_data() ); 
+  DATA* src   = reinterpret_cast<DATA*>( data->get_data_block()->get_data() ); 
   size_t size = data->get_size();
 
   DATA used_bits(0);
@@ -232,7 +232,7 @@ static bool CreateMaskFromLabelDataInternal( const DataVolumeHandle& data,
 {
   masks.clear();
 
-  DATA* src   = reinterpret_cast<DATA*>( data->data_block()->get_data() ); 
+  DATA* src   = reinterpret_cast<DATA*>( data->get_data_block()->get_data() ); 
   size_t size = data->get_size();
   DATA label( 0 );
   DATA zero_label( 0 );
@@ -300,11 +300,11 @@ bool MaskVolume::CreateMaskFromLabelData( const DataVolumeHandle src_data,
   // NOTE: This function is intended for using on a data block whose data can be reused
   if ( !reuse_data ) 
   {
-    if ( !( DataBlock::Clone( src_data->data_block(), data ) ) ) return false;
+    if ( !( DataBlock::Clone( src_data->get_data_block(), data ) ) ) return false;
   }
   else
   {
-    data = src_data->data_block();
+    data = src_data->get_data_block();
   }
 
   DataVolumeHandle new_data = DataVolumeHandle( new DataVolume( src_data->get_grid_transform(), data ) );
@@ -312,7 +312,7 @@ bool MaskVolume::CreateMaskFromLabelData( const DataVolumeHandle src_data,
   // Lock the source data
   DataBlock::lock_type lock( data->get_mutex( ) );
 
-  switch( data->get_type() )
+  switch( data->get_data_type() )
   {
   case DataType::CHAR_E:
     return CreateMaskFromLabelDataInternal<signed char>( new_data, masks );

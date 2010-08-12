@@ -55,7 +55,11 @@ public:
 
   // DATA_BLOCK:
   // Get the data block that contains the volume data
-  DataBlockHandle data_block() const;
+  DataBlockHandle get_data_block() const;
+
+  // GET_DATA_TYPE:
+  // Get the data type of the data in this volume
+  DataType get_data_type() const;
 
   // GET_MUTEX:
   // Get access to the mutex protecting this DataVolume
@@ -74,16 +78,20 @@ private:
   DataBlockHandle data_block_;
 
   // Mutex for a volume without a data block associated with it
-  // NOTE: This is use to set up a new layer that is still contructing its data
+  // NOTE: This is used to set up a new layer that is still constructing its data
   mutex_type invalid_mutex_;
 
 public:
+  // LOADDATAVOLUME:
+  // Load a DataVolume from a nrrd file
   static bool LoadDataVolume( const boost::filesystem::path& filename, DataVolumeHandle& volume,
     std::string& error );
 
+  // SAVEDATAVOLUME:
+  // Save a DataVolume to a nrrd file
   static bool SaveDataVolume( const boost::filesystem::path& filepath, DataVolumeHandle& volume, 
     std::string& error );
-  
+
 };
 
 } // end namespace Core

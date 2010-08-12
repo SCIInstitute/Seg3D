@@ -212,7 +212,7 @@ void ViewerPrivate::pick_point( int x, int y )
     view_2d->get().compute_clipping_planes( width / height, left, right, bottom, top );
     Core::Matrix proj, inv_proj;
     Core::Transform::BuildOrtho2DMatrix( proj, left, right, bottom, top );
-    Core::Invert( proj, inv_proj );
+    Core::Matrix::Invert( proj, inv_proj );
     Core::Point pos( xpos, ypos, 0 );
     pos = inv_proj * pos;
     volume_slice->get_world_coord( pos.x(), pos.y(), pos );
@@ -1135,6 +1135,7 @@ bool Viewer::key_press_event( int key, int modifiers )
       return true;
     }
 
+    case Core::Key::KEY_0_E:
     case Core::Key::KEY_A_E:
     {
       ActionAutoView::Dispatch( Core::Interface::GetKeyboardActionContext(), 
@@ -1378,7 +1379,7 @@ void Viewer::window_to_world( int x, int y, double& world_x, double& world_y ) c
 
   Core::Matrix proj, inv_proj;
   this->get_projection_matrix( proj );
-  Core::Invert( proj, inv_proj );
+  Core::Matrix::Invert( proj, inv_proj );
   Core::Point pos( xpos, ypos, 0 );
   pos = inv_proj * pos;
 

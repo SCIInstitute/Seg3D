@@ -41,6 +41,7 @@
 #include <Core/Utils/EnumClass.h>
 #include <Core/Viewer/Mouse.h>
 #include <Core/Volume/Volume.h>
+#include <Core/Interface/Interface.h>
 
 // Application includes
 #include <Application/Layer/LayerFWD.h>
@@ -158,6 +159,12 @@ public:
   // Deactivate a tool. A tool is always deactivate before the next one is
   // activated.
   virtual void deactivate();
+
+  // -- execute --
+public:
+  // EXECUTE:
+  // Fire off the action that executes the filter
+  virtual void execute( Core::ActionContextHandle context );
 
 private:
   ToolPrivateHandle private_;

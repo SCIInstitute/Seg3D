@@ -46,7 +46,7 @@ class SingleTargetToolPrivate
 
 public:
   // The type of layer that can be used with this filter
-  int target_type_;
+  Core::VolumeType target_type_;
   
   // Pointer back to the tool.
   // NOTE: This can be a pointer, as the callbacks are deleted when the tool is deleted and all
@@ -60,6 +60,11 @@ public:
   // -- handle updates from state variables --
   void handle_active_layer_changed( LayerHandle layer );
   void handle_target_layer_changed( std::string layer_id );   
+  
+  SingleTargetToolPrivate() :
+    target_type_( Core::VolumeType::DATA_E ),
+    tool_( 0 )
+  {}
 };
 
 
@@ -100,7 +105,7 @@ void SingleTargetToolPrivate::handle_target_layer_changed( std::string layer_id 
       return;
     }
 
-    if ( !active_layer || ( active_layer && !(active_layer->type() & this->target_type_) 
+    if ( !active_layer || ( active_layer && !(active_layer->type() & this->target_type_ ) 
       && layer_id != Tool::NONE_OPTION_C ) )
     {
       this->tool_->target_layer_state_->set( Tool::NONE_OPTION_C );
@@ -118,7 +123,7 @@ void SingleTargetToolPrivate::handle_layers_changed()
 {
   std::vector< LayerIDNamePair > layer_names;
   layer_names.push_back( std::make_pair( Tool::NONE_OPTION_C, Tool::NONE_OPTION_C ) );
-  LayerManager::Instance()->get_layer_names( layer_names, Core::VolumeType::DATA_E );
+  LayerManager::Instance()->get_layer_names( layer_names, this->target_type_ );
   this->tool_->target_layer_state_->set_option_list( layer_names );
 }
 

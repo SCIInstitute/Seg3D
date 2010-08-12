@@ -86,8 +86,17 @@ ToolInfo::ToolInfo( const std::string& definition ) :
     std::string type( parameter_element->Value() );
     if ( type == "tool" )
     {
-      std::string name( parameter_element->Attribute( "name" ) );
-      std::string description( parameter_element->GetText() );
+      std::string name;
+      std::string description;
+      
+      if ( parameter_element->Attribute( "name" ) )
+      {
+        name = std::string( parameter_element->Attribute( "name" ) );
+      }
+      if ( parameter_element->GetText() )
+      {
+        description = std::string( parameter_element->GetText() );
+      }
       
       if ( name.empty() )
       {
@@ -99,17 +108,17 @@ ToolInfo::ToolInfo( const std::string& definition ) :
       this->private_->description_ = description;
       found_tool = true;
     }
-    else if ( type == "menu" )
+    else if ( type == "menu" && parameter_element->GetText() )
     {
       std::string menu( parameter_element->GetText() );           
       this->private_->menu_ = menu;
     }
-    else if ( type == "menulabel" )
+    else if ( type == "menulabel" && parameter_element->GetText()  )
     {
       std::string menulabel( parameter_element->GetText() );            
       this->private_->menu_label_ = menulabel;
     }
-    else if ( type == "shortcutkey" )
+    else if ( type == "shortcutkey" && parameter_element->GetText() )
     {
       std::string shortcut_key( parameter_element->GetText() );           
       this->private_->shortcut_key_ = shortcut_key;

@@ -166,4 +166,8 @@ bool Tool::has_3d_visual()
   return false;
 }
 
+void Tool::execute( Core::ActionContextHandle context )
+{
+}
+
 } // end namespace Seg3D

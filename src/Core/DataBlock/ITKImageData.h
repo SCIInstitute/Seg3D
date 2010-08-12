@@ -62,6 +62,8 @@ typedef boost::shared_ptr< ITKImageData > ITKImageDataHandle;
 // Class definition
 class ITKImageData : public boost::noncopyable
 {
+public:
+  typedef itk::ImageBase<3> image_base_type;
 
   // -- Constructor/destructor --
 public:
@@ -73,6 +75,10 @@ public:
   // GET_DATA:
   // Get the pointer to the data block within the itkImage
   virtual void* get_data() const = 0;
+
+  // GET_BASE_IMAGE:
+  // Get the pointer to the base image class
+  virtual image_base_type::Pointer get_base_image() const = 0;
 
   // GRID_TRANSFORM:
   // Extract the transform from the nrrd
@@ -113,8 +119,10 @@ class ITKImageDataT : public ITKImageData
   // -- Handle support --
 public:
   typedef typename boost::shared_ptr< ITKImageDataT< T > > handle_type;
+  typedef handle_type Handle;
   typedef T value_type;
   typedef itk::Image<T,3> image_type;
+  typedef ITKImageData::image_base_type image_base_type;
 
   // -- Constructor/destructor --
 public:
@@ -132,9 +140,13 @@ private:
 
   // -- Accessors --
 public:
-  // IMAGE:
-  // Return the itkImage class
+  // GET_TYPED_IMAGE:
+  // Return the itkImage class template to the derived class
   typename image_type::Pointer get_image() const;
+
+  // GET_BASE_IMAGE:
+  // Get the pointer to the base image class
+  virtual image_base_type::Pointer get_base_image() const;
 
   // GET_DATA:
   // Get the pointer to the data block within the itkImage
@@ -174,19 +186,13 @@ private:
   // Handle to a data_block that was wrapped in an itk object
   DataBlockHandle data_block_;
 
-  // -- DataIO --
 public:
 
-  // LOADIMAGE:
-  // Load an itk image into the itk data structure
-  static bool LoadImage( const std::string& filename, 
-    typename ITKImageDataT<T>::handle_type& nrrddata, std::string& error );
-
-  // SAVEIMAGE:
-  // Save an itk image to file from itk data structure
-  static bool SaveImage( const std::string& filename, 
-    typename ITKImageDataT<T>::handle_type& nrrddata, std::string& error );
-
+  static bool LoadImage( const std::string& filename, handle_type& image_data, 
+    std::string& error );
+    
+  static bool SaveImage( const std::string& filename, handle_type& nrrddata, 
+    std::string& error );
 };
 
 
@@ -249,7 +255,7 @@ bool ITKImageDataT<T>::initialize( DataBlockHandle data_block, Transform transfo
   // NOTE: This conversion is done on the fly here
   
   DataType image_data_type = GetDataType( reinterpret_cast<T*>(0) );
-  if ( data_block->get_type() != image_data_type )
+  if ( data_block->get_data_type() != image_data_type )
   {
     if ( !( DataBlock::ConvertDataType( data_block, data_block_, image_data_type ) ) )
     {
@@ -269,14 +275,14 @@ bool ITKImageDataT<T>::initialize( DataBlockHandle data_block, Transform transfo
   
   // Step (3) : copy the dimensions of the data block
   typename image_type::RegionType region;
-  region.setSize( 0, data_block->get_nx() );
-  region.setSize( 1, data_block->get_ny() );
-  region.setSize( 2, data_block->get_nz() );
-  itk_image_->setRegions( region );
+  region.SetSize( 0, data_block->get_nx() );
+  region.SetSize( 1, data_block->get_ny() );
+  region.SetSize( 2, data_block->get_nz() );
+  itk_image_->SetRegions( region );
 
   // Step (4) : Wrap our data into an ITK pixel container
   typename image_type::PixelContainerPointer pixel_container = 
-    image_type::PixelContainerPointer::New();
+    image_type::PixelContainer::New();
   
   pixel_container->SetImportPointer( reinterpret_cast<T*>( data_block->get_data() ),
     static_cast<typename image_type::PixelContainer::ElementIdentifier >
@@ -295,6 +301,13 @@ typename ITKImageDataT<T>::image_type::Pointer ITKImageDataT<T>::get_image() con
 {
   return itk_image_;
 }
+
+template<class T>
+ITKImageDataT<T>::image_base_type::Pointer ITKImageDataT<T>::get_base_image() const
+{
+  return static_cast<image_base_type::Pointer>( itk_image_ );
+}
+
 
 template<class T>
 void* ITKImageDataT<T>::get_data() const
@@ -440,7 +453,6 @@ template<class T>
 bool ITKImageDataT<T>::SaveImage( const std::string& filename, 
   typename ITKImageDataT<T>::handle_type& nrrddata, std::string& error )
 {
-
   return false;
 }
 

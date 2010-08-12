@@ -41,7 +41,7 @@ StdDataBlock::StdDataBlock( size_t nx, size_t ny, size_t nz, DataType dtype )
   set_type( dtype );
 
   // Allocate the memory block through C++'s std library
-  switch( get_type() )
+  switch( get_data_type() )
   {
   case DataType::UNKNOWN_E:
     set_nx( 0 );
@@ -80,7 +80,7 @@ StdDataBlock::~StdDataBlock()
 {
   if ( get_data() )
   {
-    switch( get_type() )
+    switch( get_data_type() )
     {
     case DataType::UNKNOWN_E:
       break;

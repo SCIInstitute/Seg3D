@@ -45,10 +45,24 @@ DataVolume::~DataVolume()
 {
 }
 
-DataBlockHandle DataVolume::data_block() const
+DataBlockHandle DataVolume::get_data_block() const
 {
   return this->data_block_;
 }
+
+DataType DataVolume::get_data_type() const
+{
+  if ( this->data_block_ )
+  {
+    return this->data_block_->get_data_type();
+  }
+  else
+  {
+    return DataType::UNKNOWN_E;
+  }
+}
+
+
 
 VolumeType DataVolume::get_type() const
 {

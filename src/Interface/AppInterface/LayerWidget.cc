@@ -542,6 +542,7 @@ void LayerWidget::update_widget_state( bool initialize )
     // Change the color of the widget
     this->update_appearance( visual_lock,  active_layer, initialize );
     
+    // Hide the progress bar
     this->show_progress_bar( false );
   }
   else if ( data_state == Layer::CREATING_C )
@@ -557,7 +558,7 @@ void LayerWidget::update_widget_state( bool initialize )
     // Show the progress bar, since we are computing a new layer
     this->show_progress_bar( true );
   }
-  else
+  else if ( data_state == Layer::PROCESSING_C )
   {
     // PROCESSING_C state
     // Lock buttons if widget is locked
@@ -903,7 +904,7 @@ void LayerWidget::select_color_bar( bool show )
 
 void LayerWidget::show_progress_bar( bool show )
 {
-  if( show )
+  if ( show )
   {
     this->private_->ui_.progress_bar_bar_->show();
   }

@@ -46,10 +46,6 @@ namespace Seg3D
 
 // CLASS MaskLayer
 
-// Forward declarations
-class MaskLayer;
-typedef boost::shared_ptr< MaskLayer > MaskLayerHandle;
-
 // Class definition
 class MaskLayer : public Layer
 {
@@ -68,7 +64,7 @@ public:
 
   // GET_GRID_TRANSFORM:
   // this function returns the grid transform of the mask volume
-  virtual const Core::GridTransform& get_grid_transform() const 
+  virtual const Core::GridTransform get_grid_transform() const 
   { 
     return mask_volume_->get_grid_transform(); 
   }
@@ -89,6 +85,12 @@ public:
   // -- Signals --
 public:
   boost::signals2::signal< void () > isosurface_updated_signal_;
+  
+  void set_mask_volume( Core::MaskVolumeHandle volume )
+  {
+    Layer::lock_type lock( Layer::GetMutex() );   
+    this->mask_volume_ = volume;
+  }
   
   // -- state variables --
 public:

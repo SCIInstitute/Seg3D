@@ -78,21 +78,24 @@ public:
 
   // GET_NX, GET_NY, GET_NZ, GET_SIZE
   // The dimensions of the datablock
-  size_t get_nx() const
+  inline size_t get_nx() const
   {
-    return nx_;
+    return this->nx_;
   }
-  size_t get_ny() const
+  
+  inline size_t get_ny() const
   {
-    return ny_;
+    return this->ny_;
   }
-  size_t get_nz() const
+  
+  inline size_t get_nz() const
   {
-    return nz_;
+    return this->nz_;
   }
-  size_t get_size() const
+  
+  inline size_t get_size() const
   {
-    return nx_ * ny_ * nz_;
+    return this->nx_ * this->ny_ * this->nz_;
   }
 
   inline size_t to_index( size_t x, size_t y, size_t z ) const
@@ -102,35 +105,32 @@ public:
 
   // DATA
   // Pointer to the block of data
-  unsigned char* get_mask_data()
+  inline unsigned char* get_mask_data()
   {
     return  this->data_;
   }
 
   // GET_MASK_BIT:
   // Get the bit that describes the mask
-  unsigned int get_mask_bit()
+  inline unsigned int get_mask_bit()
   {
     return this->mask_bit_;
   }
 
   // GET_MASK_VALUE
   // Get the value at which the mask is stored
-  unsigned char get_mask_value()
+  inline unsigned char get_mask_value()
   {
     return this->mask_value_;
   }
 
-  // DATA_BLOCK
+  // GET_DATA_BLOCK
   // Retrieve the pointer to the data block
   // NOTE: This one is needed for loading the textures onto the
   // graphics card. As masks are shared the Texture will be shared
   // hence access to the datablock is needed to see whether this one
   // has already been uploaded
-  DataBlockHandle get_data_block()
-  {
-    return data_block_;
-  }
+  DataBlockHandle get_data_block();
 
   // GET_GENERATION:
   // Get the current generation number of the data volume.
@@ -140,26 +140,36 @@ public:
   // Increase the generation number to a new unique number.
   void increase_generation();
 
+  // GET_MASK_AT:
+  // Get the mask value at a certain coordinate
   inline bool get_mask_at( size_t x, size_t y, size_t z ) const
   {
     return this->get_mask_at( this->to_index( x, y, z ) );
   }
 
+  // GET_MASK_AT:
+  // Get the mask value at a certain index
   inline bool get_mask_at( size_t index ) const
   {
     return ( this->data_[ index ] & this->mask_value_ ) != 0;
   }
 
+  // SET_MASK_AT:
+  // Set the mask value at a certain coordinate
   inline void set_mask_at( size_t x, size_t y, size_t z )
   {
     this->set_mask_at( this->to_index( x, y, z ) );
   }
 
+  // SET_MASK_AT:
+  // Set the mask value at a certain index
   inline void set_mask_at( size_t index )
   {
     this->data_[ index ] |= this->mask_value_;
   }
 
+  // Clear_MASK_AT:
+  // Clear the mask value at a certain index
   inline void clear_mask_at( size_t x, size_t y, size_t z )
   {
     this->clear_mask_at( this->to_index( x, y, z ) );
@@ -204,6 +214,7 @@ private:
   // The bit that is used for this mask
   const unsigned int mask_bit_;
 
+  // Values that have the maskbit set or all the other bits
   const unsigned char mask_value_;
   const unsigned char not_mask_value_;
 

@@ -26,42 +26,52 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_TOOLINTERFACE_BINARYDILATEERODEFILTERINTERFACE_H
-#define INTERFACE_TOOLINTERFACE_BINARYDILATEERODEFILTERINTERFACE_H
+#ifndef APPLICATION_TOOLS_ANISOTROPICDIFFUSIONFILTER_H
+#define APPLICATION_TOOLS_ANISOTROPICDIFFUSIONFILTER_H
 
-// Core includes
-#include <Core/Utils/Log.h>
-
-// Application includes
-#include <Application/Tool/ToolFactory.h>
-
-// Base class of the tool widget
-#include <Interface/AppInterface/ToolWidget.h>
-
+#include <Application/Tool/SingleTargetTool.h>
 
 namespace Seg3D
 {
 
-class BinaryDilateErodeFilterInterfacePrivate;
-
-class BinaryDilateErodeFilterInterface : public ToolWidget
+class CurvatureAnisotropicDiffusionFilter : public SingleTargetTool
 {
-Q_OBJECT
+SEG3D_TOOL(
+SEG3D_TOOL_NAME( "CurvatureAnisotropicDiffusionFilter", "Filter for smoothing data" )
+SEG3D_TOOL_MENULABEL( "Curvature Aniso. Diffusion" )
+SEG3D_TOOL_MENU( "filter_data_to_data" )
+SEG3D_TOOL_SHORTCUT_KEY( "" )
+SEG3D_TOOL_URL( "http://seg3d.org/" )
+)
 
 public:
-  BinaryDilateErodeFilterInterface();
-  virtual ~BinaryDilateErodeFilterInterface();
-  virtual bool build_widget( QFrame* frame );
+  CurvatureAnisotropicDiffusionFilter( const std::string& toolid, bool auto_number = true );
+  virtual ~CurvatureAnisotropicDiffusionFilter();
+  
+  // -- state --
+public:
+  // Whether the layer needs to be replaced
+  Core::StateBoolHandle replace_state_;
 
-private Q_SLOTS:
-  void execute_filter();
+  // Number of iterations the filter needs to run
+  Core::StateRangedIntHandle iterations_state_;
+
+  // Number of steps needed
+  Core::StateRangedIntHandle steps_state_;
+
+  // The conductance for deciding what is a similar value
+  Core::StateRangedDoubleHandle conductance_state_;
+
+  // -- execute --
+public:
+  // Execute the tool and dispatch the action
+  virtual void execute( Core::ActionContextHandle context );
 
 private:
-    boost::shared_ptr< BinaryDilateErodeFilterInterfacePrivate > private_;
-
+  const static size_t VERSION_NUMBER_C;
 
 };
 
-} // namespace Seg3D
+} // end namespace
 
 #endif

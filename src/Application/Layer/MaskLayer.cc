@@ -50,8 +50,8 @@ MaskLayer::MaskLayer( const std::string& name, const Core::MaskVolumeHandle& vol
   mask_volume_( volume )
 {
   this->initialize_states();
-  this->bit_state_->set( static_cast< int >( volume->mask_data_block()->get_mask_bit() ) );
-  this->add_connection( this->mask_volume_->mask_data_block()->mask_updated_signal_.
+  this->bit_state_->set( static_cast< int >( volume->get_mask_data_block()->get_mask_bit() ) );
+  this->add_connection( this->mask_volume_->get_mask_data_block()->mask_updated_signal_.
     connect( boost::bind( &MaskLayer::handle_mask_data_changed, this ) ) );
 }
 
@@ -61,8 +61,8 @@ MaskLayer::MaskLayer( const std::string& name, const Core::GridTransform& grid_t
 {
     this->initialize_states();
   this->bit_state_->set( static_cast< int >( this->mask_volume_->
-    mask_data_block()->get_mask_bit() ) );
-  this->add_connection( this->mask_volume_->mask_data_block()->mask_updated_signal_.
+    get_mask_data_block()->get_mask_bit() ) );
+  this->add_connection( this->mask_volume_->get_mask_data_block()->mask_updated_signal_.
     connect( boost::bind( &MaskLayer::handle_mask_data_changed, this ) ) );
 }
 
@@ -132,7 +132,7 @@ bool MaskLayer::post_load_states( const Core::StateIO& state_io )
 
     if( Core::DataVolume::LoadDataVolume( volume_path, data_volume, error ) )
     {
-      Core::MaskDataBlockManager::Instance()->register_data_block( data_volume->data_block(),
+      Core::MaskDataBlockManager::Instance()->register_data_block( data_volume->get_data_block(),
         data_volume->get_grid_transform() );
       success = Core::MaskDataBlockManager::Instance()->
         create( generation, bit, grid_transform, mask_data_block );
@@ -143,7 +143,7 @@ bool MaskLayer::post_load_states( const Core::StateIO& state_io )
   {
     this->mask_volume_ = Core::MaskVolumeHandle( new Core::MaskVolume( 
       grid_transform, mask_data_block ) );
-    this->add_connection( this->mask_volume_->mask_data_block()->mask_updated_signal_.
+    this->add_connection( this->mask_volume_->get_mask_data_block()->mask_updated_signal_.
       connect( boost::bind( &MaskLayer::handle_mask_data_changed, this ) ) );
   }
   

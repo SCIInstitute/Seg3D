@@ -88,14 +88,21 @@ public:
     return this->get_generation() != -1;
   }
 
-  // GET_GRID_TRANSFORM
+  // GET_GRID_TRANSFORM:
   // Get the grid location
-  const GridTransform& get_grid_transform() const
+  const GridTransform get_grid_transform() const
   {
     return this->grid_transform_;
   }
+
+  // GET_TRANSFORM:
+  // Get the transform of the data
+  const Transform get_transform() const
+  {
+    return this->grid_transform_.transform();
+  }
   
-  // GET_NX, GET_NY, GET_NZ, GET_SIZE
+  // GET_NX, GET_NY, GET_NZ, GET_SIZE:
   // The volume dimensions
   inline size_t get_nx() const
   {

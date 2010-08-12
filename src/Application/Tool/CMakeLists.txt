@@ -32,6 +32,8 @@
 ##################################################
 
 SET(APPLICATION_TOOL_SRCS
+  ITKFilterAlgo.h
+  ITKFilterAlgo.cc
   SingleTargetTool.h
   SingleTargetTool.cc
   Tool.h
@@ -53,5 +55,6 @@ TARGET_LINK_LIBRARIES(Application_Tool
                       Core_Action
                       Core_State
                       ${SCI_BOOST_LIBRARY}
-            ${SCI_TINYXML_LIBRARY})
+            ${SCI_TINYXML_LIBRARY}
+            ${SCI_ITK_LIBRARY})
                     

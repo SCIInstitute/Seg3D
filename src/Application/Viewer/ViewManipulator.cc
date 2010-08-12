@@ -61,6 +61,8 @@ void ViewManipulator::mouse_press( const Core::MouseHistory& mouse_history, int 
     return;
   }
 
+  if ( modifiers == Core::KeyModifier::ALT_MODIFIER_E ) return;
+
   if ( this->viewer_->is_volume_view() )
   {
     if ( button == Core::MouseButton::LEFT_BUTTON_E )

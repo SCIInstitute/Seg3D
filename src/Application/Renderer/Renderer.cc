@@ -312,7 +312,7 @@ void RendererPrivate::draw_slices_3d( const Core::BBox& bbox,
 
     for ( size_t layer_num = 0; layer_num < layer_scene->size(); layer_num++ )
     {
-      this->draw_slice( ( *layer_scene )[ layer_num ], Core::Matrix::IDENTITY_C, rect );
+      this->draw_slice( ( *layer_scene )[ layer_num ], Core::Matrix::Identity(), rect );
     } // end for
 
   } // end for each viewer

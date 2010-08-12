@@ -323,6 +323,17 @@ LayerHandle LayerManager::get_layer_by_id( const std::string& layer_id )
   return LayerHandle();
 }
 
+DataLayerHandle LayerManager::get_data_layer_by_id( const std::string& layer_id )
+{
+  return boost::dynamic_pointer_cast<DataLayer>( get_layer_by_id( layer_id ) );
+}
+
+MaskLayerHandle LayerManager::get_mask_layer_by_id( const std::string& layer_id )
+{
+  return boost::dynamic_pointer_cast<MaskLayer>( get_layer_by_id( layer_id ) );
+}
+
+
 LayerHandle LayerManager::get_layer_by_name( const std::string& layer_name )
 {
   lock_type lock( this->get_mutex() );

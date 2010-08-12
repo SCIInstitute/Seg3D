@@ -52,7 +52,6 @@ public:
   
     QtUtils::QtSliderIntCombo *erode_;
   QtUtils::QtSliderIntCombo *dilate_;
-  TargetComboBox *target_;
 };
 
 // constructor
@@ -69,7 +68,7 @@ BinaryDilateErodeFilterInterface::~BinaryDilateErodeFilterInterface()
 // build the interface and connect it to the state manager
 bool BinaryDilateErodeFilterInterface::build_widget( QFrame* frame )
 {
-  //Step 1 - build the Qt GUI Widget
+  // Step 1 - build the Qt GUI Widget
   this->private_->ui_.setupUi( frame );
 
   // add sliderspinnercombo's
@@ -79,39 +78,38 @@ bool BinaryDilateErodeFilterInterface::build_widget( QFrame* frame )
   this->private_->dilate_ = new QtUtils::QtSliderIntCombo();
   this->private_->ui_.dialateHLayout_bottom->addWidget( this->private_->dilate_ );
   
-  this->private_->target_ = new TargetComboBox( this );
-  this->private_->ui_.activeHLayout->addWidget( this->private_->target_ );
-
-  //Step 2 - get a pointer to the tool
+  // Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
   BinaryDilateErodeFilter* tool = dynamic_cast< BinaryDilateErodeFilter* > ( base_tool_.get() );
   
-  //Step 3 - connect the gui to the tool through the QtBridge
-  QtUtils::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
-  this->connect( this->private_->target_, SIGNAL( valid( bool ) ), 
-    this, SLOT( enable_run_filter( bool ) ) );
-  QtUtils::QtBridge::Connect( this->private_->erode_, tool->erode_state_ );
-  QtUtils::QtBridge::Connect( this->private_->dilate_, tool->dilate_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
-  
+  // Step 3 - connect the gui to the tool through the QtBridge
+  QtUtils::QtBridge::Connect( this->private_->ui_.target_layer_, 
+    tool->target_layer_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.use_active_layer_, 
+    tool->use_active_layer_state_ );
+  QtUtils::QtBridge::Connect( this->private_->erode_, 
+    tool->erode_state_ );
+  QtUtils::QtBridge::Connect( this->private_->dilate_, 
+    tool->dilate_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.replaceCheckBox, 
+    tool->replace_state_ );
+  QtUtils::QtBridge::Enable( this->private_->ui_.runFilterButton,
+    tool->valid_target_state_ );
+
+  // Step 4 - Qt connections
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    this->private_->ui_.target_layer_->setDisabled( tool->use_active_layer_state_->get() );
+    this->connect( this->private_->ui_.use_active_layer_, SIGNAL( toggled( bool ) ),
+      this->private_->ui_.target_layer_, SLOT( setDisabled( bool ) ) );
+  }
+
   this->connect( this->private_->ui_.runFilterButton, 
     SIGNAL( clicked() ), this, SLOT( execute_filter() ) );
   
-  this->private_->target_->sync_layers();
-
-  //Send a message to the log that we have finised with building the Binary Dialate Erode Filter Interface
-  CORE_LOG_DEBUG("Finished building a Binary Dilate Erode Filter Interface");
-  return ( true );
+  return true;
 
 } // end build_widget
-
-void BinaryDilateErodeFilterInterface::enable_run_filter( bool valid )
-{
-  if( valid )
-    this->private_->ui_.runFilterButton->setEnabled( true );
-  else
-    this->private_->ui_.runFilterButton->setEnabled( false );
-}
 
 void BinaryDilateErodeFilterInterface::execute_filter()
 {

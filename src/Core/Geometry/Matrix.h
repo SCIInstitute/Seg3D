@@ -31,60 +31,69 @@
 
 #include <cstring>
 
-#include <boost/numeric/ublas/matrix.hpp>
-#include <boost/numeric/ublas/matrix_expression.hpp>
-
 #include <Core/Geometry/Point.h>
 #include <Core/Geometry/Vector.h>
 
 namespace Core
 {
 
-class Matrix : public boost::numeric::ublas::matrix< double, boost::numeric::ublas::column_major >
-{
+class Matrix;
+class MatrixF;
 
-  typedef boost::numeric::ublas::matrix< double, boost::numeric::ublas::column_major > base_type;
+class Matrix
+{
+  friend class MatrixF;
 
 public:
-  inline Matrix() :
-    base_type( 4, 4 )
+  inline Matrix() 
   {
+    for ( size_t j = 0;  j < 16 ; j++ ) data_[ j ] = 0.0;
   }
 
-  inline Matrix( const double m[ 4 ][ 4 ] ) :
-    base_type( 4, 4 )
-  {
-    this->data( m );
-  }
+  Matrix( const double mat[ 4 ][ 4 ] );
 
-  inline Matrix( const base_type& m ) :
-    base_type( m )
-  {
-    assert(m.size1() == 4 && m.size2() == 4);
-  }
+  Matrix( const Matrix& mat );
+  Matrix( const MatrixF& mat );
 
   ~Matrix()
   {
   }
 
-  inline Matrix& operator=( const base_type& m )
-  {
-    assert(m.size1() == 4 && m.size2() == 4);
-    assign( m );
-    return ( *this );
-  }
+  Matrix& operator=( const Matrix& mat ); 
+  Matrix& operator=( const MatrixF& mat );
 
   inline double* data()
   {
-    return &( this->operator()( 0, 0 ) );
+    return data_;
   }
 
   inline const double* data() const
   {
-    return &( this->operator()( 0, 0 ) );
+    return data_;
   }
 
-  inline void data( const double m[ 4 ][ 4 ] );
+  inline void data( const double mat[ 4 ][ 4 ] )
+  {
+    for ( size_t i = 0;  i < 4 ; i++ ) 
+    {
+      for ( size_t j = 0;  j < 4 ; j++ )
+      {
+        data_[ i + 4*j ] = mat[ i ][ j ];
+      }
+    }
+  }
+
+  inline double& operator()( size_t i, size_t j )
+  {
+    double& tmp = data_[ i + 4*j ];
+    return tmp;
+  }
+
+  inline const double& operator()( size_t i, size_t j ) const
+  {
+    const double& tmp = data_[ i + 4*j ];
+    return tmp;
+  }
 
   Vector operator*( const Vector& rhs ) const;
   VectorF operator*( const VectorF& rhs ) const;
@@ -98,27 +107,117 @@ public:
   bool operator!=( const Matrix& mat ) const;
 
 private:
+  double data_[16];
 
+  // static funtions
 public:
-  // Identity matrix
-  const static Matrix IDENTITY_C;
+  // INVERT:
+  // Compute the inverse of the input matrix using LU decomposition
+  static bool Invert( const Matrix& mat, Matrix& inverse );
 
-  // Zero matrix
-  const static Matrix ZERO_C;
-
-  // Threshold value of determinant for classifying a matrix as singular
-  const static double EPSILON_C;
+  // TRANSPOSE:
+  // Transpose a matrix
+  static void Transpose( const Matrix& mat, Matrix& trans );
+  
+  // ZERO:
+  // Create a zero matrix
+  static Matrix Zero();
+  
+  // IDENTITY:
+  // Create an identity matrix
+  static Matrix Identity();
 };
 
-inline void Matrix::data( const double m[ 4 ][ 4 ] )
+
+class MatrixF
 {
-  memcpy( this->data(), m, 16 * sizeof(double) );
-}
+  friend class Matrix;
+public:
+  inline MatrixF() 
+  {
+    for ( size_t j = 0;  j < 16 ; j++ ) data_[ j ] = 0.0f;
+  }
 
-// Compute the inverse of the input matrix using LU decomposition
-bool Invert( const Matrix& m, Matrix& inverse );
+  MatrixF( const double mat[ 4 ][ 4 ] );
 
-void Transpose( const Matrix& m, Matrix& trans );
+  MatrixF( const Matrix& mat );
+  MatrixF( const MatrixF& mat );
+
+  ~MatrixF()
+  {
+  }
+
+  MatrixF& operator=( const Matrix& mat );  
+  MatrixF& operator=( const MatrixF& mat );
+  
+  inline float* data()
+  {
+    return data_;
+  }
+
+  inline const float* data() const
+  {
+    return data_;
+  }
+
+  inline void data( const float mat[ 4 ][ 4 ] )
+  {
+    for ( size_t i = 0;  i < 4 ; i++ ) 
+    {
+      for ( size_t j = 0;  j < 4 ; j++ )
+      {
+        data_[ i + 4*j ] = mat[ i ][ j ];
+      }
+    }
+  }
+
+  inline float& operator()( size_t i, size_t j )
+  {
+    float& tmp = data_[ i + 4*j ];
+    return tmp;
+  }
+
+  inline const float& operator()( size_t i, size_t j ) const
+  {
+    const float& tmp = data_[ i + 4*j ];
+    return tmp;
+  }
+
+  Vector operator*( const Vector& rhs ) const;
+  VectorF operator*( const VectorF& rhs ) const;
+  Point operator*( const Point& rhs ) const;
+  PointF operator*( const PointF& rhs ) const;
+
+  MatrixF operator*( const MatrixF& rhs ) const;
+  MatrixF& operator*=( const MatrixF& rhs );
+
+  bool operator==( const MatrixF& mat ) const;
+  bool operator!=( const MatrixF& mat ) const;
+
+private:
+  float data_[16];
+
+  // static funtions
+public:
+
+  // INVERT:
+  // Compute the inverse of the input matrix using LU decomposition
+  static bool Invert( const MatrixF& mat, MatrixF& inverse );
+
+  // TRANSPOSE:
+  // Transpose a matrix
+  static void Transpose( const MatrixF& mat, MatrixF& trans );
+  
+  // ZERO:
+  // Create a zero matrix
+  static MatrixF Zero();
+  
+  // IDENTITY:
+  // Create an identity matrix
+  static MatrixF Identity();
+};
+
+
 
 } // End namespace Core
 

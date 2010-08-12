@@ -72,13 +72,6 @@ public:
   // -- Signals for the User Interface --
   typedef boost::signals2::signal< void( LayerHandle ) > layer_changed_signal_type;
 
-  // CONNECT_LAYER_CHANGED:
-  // Connect to the signal that indicates a layer has changed
-  boost::signals2::connection connect_layer_changed( layer_changed_signal_type::slot_type slot )
-  {
-    return layer_changed_signal_.connect( slot );
-  }
-
   // -- Dispatcher functions for User Interface --
   void dispatch_clonelayer( const std::string& from_layer_name ) const;
   void dispatch_layerfromfile( const std::string& filename ) const;

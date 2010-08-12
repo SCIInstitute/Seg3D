@@ -73,8 +73,10 @@ public:
 
   // CREATE:
   // Create a new mask layer
-  bool create( const GridTransform& grid_transform, MaskDataBlockHandle& mask );
+  bool create( GridTransform grid_transform, MaskDataBlockHandle& mask );
 
+  // CREATE:
+  // Create a new mask layer with a given generation number and bit
   bool create( DataBlock::generation_type generation, unsigned int bit, 
     GridTransform& grid_transform, MaskDataBlockHandle& mask );
 
@@ -97,9 +99,24 @@ protected:
   // released
   void release( DataBlockHandle& datablock, unsigned int mask_bit );
 
+  // -- internals of this class --
 private:
    MaskDataBlockManagerInternalHandle private_;
+   
+   // -- static functions --
+public:
 
+  // CREATE:
+  // Create a new MaskDataBlock with a given GridTransform
+  static bool Create( GridTransform grid_transform, MaskDataBlockHandle& mask );
+   
+  // CONVERT:
+  // Convert a DataBlock into a MaskDataBlock
+  static bool Convert( DataBlockHandle data, GridTransform grid_transform, MaskDataBlockHandle& mask);
+  
+  // CONVERT:
+  // Convert a MaskDataBlock into a DataBlock
+  static bool Convert( MaskDataBlockHandle mask, DataBlockHandle& data ); 
 };
 
 } // end namespace Core

@@ -94,7 +94,7 @@ MaskDataBlockManager::~MaskDataBlockManager()
 {
 }
 
-bool MaskDataBlockManager::create( const GridTransform& grid_transform, MaskDataBlockHandle& mask )
+bool MaskDataBlockManager::create( GridTransform grid_transform, MaskDataBlockHandle& mask )
 {
   lock_type lock( get_mutex() );
 
@@ -146,7 +146,7 @@ bool MaskDataBlockManager::create( const GridTransform& grid_transform, MaskData
   unsigned char* data = mask->get_mask_data();
   unsigned char not_mask_value = ~( mask->get_mask_value() );
   
-  size_t data_size8 = data_size/8;
+  size_t data_size8 = data_size & ~(0x7);
   size_t i = 0;
   for ( ; i< data_size8; i+=8 )
   {
@@ -266,6 +266,110 @@ bool MaskDataBlockManager::save_data_blocks( boost::filesystem::path data_save_p
   return true;
 }
 
+bool MaskDataBlockManager::Create( GridTransform grid_transform, MaskDataBlockHandle& mask )
+{
+  return MaskDataBlockManager::Instance()->create( grid_transform, mask );
+}
+
+template< class T >
+bool ConvertToMaskInternal( DataBlockHandle data, MaskDataBlockHandle& mask )
+{
+  T* data_ptr = reinterpret_cast<T*>( data->get_data() );
+  
+  unsigned char* mask_ptr = mask->get_mask_data();
+  unsigned char mask_value = mask->get_mask_value();
+  unsigned char not_mask_value = ~( mask->get_mask_value() );
+  
+  size_t size = data->get_size();
+  size_t size8 = size & ~(0x7);
+  for ( size_t j = 0; j < size8; j+= 8 )
+  {
+    if ( data_ptr[ j ] ) mask_ptr[ j ] |= mask_value; else mask_ptr[ j ] &= not_mask_value;
+    if ( data_ptr[ j + 1 ] ) mask_ptr[ j + 1 ] |= mask_value; else mask_ptr[ j + 1 ] &= not_mask_value;
+    if ( data_ptr[ j + 2 ] ) mask_ptr[ j + 2 ] |= mask_value; else mask_ptr[ j + 2 ] &= not_mask_value;
+    if ( data_ptr[ j + 3 ] ) mask_ptr[ j + 3 ] |= mask_value; else mask_ptr[ j + 3 ] &= not_mask_value;
+    if ( data_ptr[ j + 4 ] ) mask_ptr[ j + 4 ] |= mask_value; else mask_ptr[ j + 4 ] &= not_mask_value;
+    if ( data_ptr[ j + 5 ] ) mask_ptr[ j + 5 ] |= mask_value; else mask_ptr[ j + 5 ] &= not_mask_value;
+    if ( data_ptr[ j + 6 ] ) mask_ptr[ j + 6 ] |= mask_value; else mask_ptr[ j + 6 ] &= not_mask_value;
+    if ( data_ptr[ j + 7 ] ) mask_ptr[ j + 7 ] |= mask_value; else mask_ptr[ j + 7 ] &= not_mask_value;
+  }
+  for ( size_t j = 0; j < size; j++ )
+  {
+    if ( data_ptr[ j ] ) mask_ptr[ j ] |= mask_value; else mask_ptr[ j ] &= not_mask_value; 
+  }
+  
+  return true;
+}
+
+bool MaskDataBlockManager::Convert( DataBlockHandle data, 
+  GridTransform grid_transform, MaskDataBlockHandle& mask)
+{
+  if ( !( MaskDataBlockManager::Instance()->create( grid_transform, mask ) ) )
+  {
+    return false;
+  }
+
+  assert( mask->get_nx() == data->get_nx() );
+  assert( mask->get_ny() == data->get_ny() );
+  assert( mask->get_nz() == data->get_nz() );
+  
+  DataBlock::lock_type lock( data->get_mutex( ) );
+  
+  switch( data->get_data_type() )
+  {
+    case DataType::CHAR_E:
+      return ConvertToMaskInternal<char>( data, mask );
+    case DataType::UCHAR_E:
+      return ConvertToMaskInternal<unsigned char>( data, mask );
+    case DataType::SHORT_E:
+      return ConvertToMaskInternal<short>( data, mask );
+    case DataType::USHORT_E:
+      return ConvertToMaskInternal<unsigned short>( data, mask );
+    case DataType::INT_E:
+      return ConvertToMaskInternal<int>( data, mask );
+    case DataType::UINT_E:
+      return ConvertToMaskInternal<unsigned int>( data, mask );
+    case DataType::FLOAT_E:
+      return ConvertToMaskInternal<float>( data, mask );
+    case DataType::DOUBLE_E:
+      return ConvertToMaskInternal<double>( data, mask );
+  }
+
+  return false;
+}
+
+
+bool MaskDataBlockManager::Convert( MaskDataBlockHandle mask, DataBlockHandle& data )
+{
+  data = StdDataBlock::New( mask->get_nx(), mask->get_ny(), mask->get_nz(), DataType::UCHAR_E );
+
+  MaskDataBlock::lock_type lock( mask->get_mutex( ) );
+
+  unsigned char* data_ptr = reinterpret_cast< unsigned char* >( data->get_data() );
+
+  unsigned char* mask_ptr = mask->get_mask_data();
+  unsigned char mask_value = mask->get_mask_value();
+  
+  size_t size = data->get_size();
+  size_t size8 = size & ~(0x7);
+  for ( size_t j = 0; j < size8; j+= 8 )
+  {
+    if ( mask_ptr[ j ] & mask_value ) data_ptr[ j ] = 1; else data_ptr[ j ] = 0;
+    if ( mask_ptr[ j + 1 ] & mask_value ) data_ptr[ j + 1 ] = 1; else data_ptr[ j + 1 ] = 0;
+    if ( mask_ptr[ j + 2 ] & mask_value ) data_ptr[ j + 2 ] = 1; else data_ptr[ j + 2 ] = 0;
+    if ( mask_ptr[ j + 3 ] & mask_value ) data_ptr[ j + 3 ] = 1; else data_ptr[ j + 3 ] = 0;
+    if ( mask_ptr[ j + 4 ] & mask_value ) data_ptr[ j + 4 ] = 1; else data_ptr[ j + 4 ] = 0;
+    if ( mask_ptr[ j + 5 ] & mask_value ) data_ptr[ j + 5 ] = 1; else data_ptr[ j + 5 ] = 0;
+    if ( mask_ptr[ j + 6 ] & mask_value ) data_ptr[ j + 6 ] = 1; else data_ptr[ j + 6 ] = 0;
+    if ( mask_ptr[ j + 7 ] & mask_value ) data_ptr[ j + 7 ] = 1; else data_ptr[ j + 7 ] = 0;
+  }
+  for ( size_t j = 0; j < size; j++ )
+  {
+    if ( mask_ptr[ j ] & mask_value ) data_ptr[ j ] = 1; else data_ptr[ j ] = 0;
+  }
+  
+  return true;
+}
 
 
 } // end namespace Core

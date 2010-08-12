@@ -99,7 +99,15 @@ public:
   // GET_LAYER_BY_NAME:
   // this function returns a handle to a layer with the name that is passed
   LayerHandle get_layer_by_name( const std::string& layer_name );
-  
+
+  // GET_DATA_LAYER_BY_ID:
+  // this function returns a handle to the layer with the id that is passed
+  DataLayerHandle get_data_layer_by_id( const std::string& layer_id );
+
+  // GET_MASK_LAYER_BY_ID:
+  // this function returns a handle to the layer with the id that is passed
+  MaskLayerHandle get_mask_layer_by_id( const std::string& layer_id );
+
   // GET_ACTIVE_LAYER:
   // This function returns a handle to the active layer
   LayerHandle get_active_layer();

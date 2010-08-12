@@ -28,32 +28,50 @@
 
 // Application includes
 #include <Application/Tool/ToolFactory.h>
-#include <Application/Tools/BinaryDilateErodeFilter.h>
 #include <Application/Layer/Layer.h>
 #include <Application/LayerManager/LayerManager.h>
 
-// Register the tool into the tool factory
-SCI_REGISTER_TOOL( Seg3D, BinaryDilateErodeFilter )
+// StateEnigne of the tool
+#include <Application/Tools/CurvatureAnisotropicDiffusionFilter.h>
+
+// Action associated with tool
+#include <Application/Tools/Actions/ActionCurvatureAnisotropicDiffusionFilter.h>
+
+SCI_REGISTER_TOOL( Seg3D, CurvatureAnisotropicDiffusionFilter )
 
 namespace Seg3D
 {
 
-const size_t BinaryDilateErodeFilter::VERSION_NUMBER_C = 1;
+const size_t CurvatureAnisotropicDiffusionFilter::VERSION_NUMBER_C = 1;
 
-BinaryDilateErodeFilter::BinaryDilateErodeFilter( const std::string& toolid, bool auto_number ) :
-  SingleTargetTool( Core::VolumeType::MASK_E, toolid, VERSION_NUMBER_C, auto_number )
+// Register the tool into the tool factory
+
+CurvatureAnisotropicDiffusionFilter::CurvatureAnisotropicDiffusionFilter( 
+  const std::string& toolid, bool auto_number ) :
+  SingleTargetTool( Core::VolumeType::DATA_E, toolid, VERSION_NUMBER_C, auto_number )
 {
-  // Need to set ranges and default values for all parameters
-  this->add_state( "dilate", this->dilate_state_, 1, 1, 100, 1 );
-  this->add_state( "erode", this->erode_state_, 1, 1, 100, 1 );
+  // Need to set ranges and default values for all parameters 
+  this->add_state( "iterations", this->iterations_state_, 1, 1, 100, 1 );
+  this->add_state( "steps", this->steps_state_, 1, 1, 100, 1 );
+  this->add_state( "conductance", this->conductance_state_, .10, .10, 10.0, .10 );
   this->add_state( "replace", this->replace_state_, false );
+
 }
 
-BinaryDilateErodeFilter::~BinaryDilateErodeFilter()
+CurvatureAnisotropicDiffusionFilter::~CurvatureAnisotropicDiffusionFilter()
 {
   disconnect_all();
+} 
+
+void CurvatureAnisotropicDiffusionFilter::execute( Core::ActionContextHandle context )
+{ 
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+  ActionCurvatureAnisotropicDiffusionFilter::Dispatch( context,
+    this->target_layer_state_->get(),
+    this->iterations_state_->get(),
+    this->steps_state_->get(),
+    this->conductance_state_->get(),
+    this->replace_state_->get() );
 }
 
 } // end namespace Seg3D
-
-

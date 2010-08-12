@@ -85,18 +85,23 @@ public:
 // -- widget internals --
 public Q_SLOTS:
   // SELECT_OPACITY_BAR:
+  // Callback from Qt widget when opacity button is hit
   void select_opacity_bar( bool show );
 
   // SELECT_BRIGHTNESS_CONTRAST_BAR:
+  // Callback from Qt widget when brightness button is hit
   void select_brightness_contrast_bar( bool show );
 
   // SELECT_BORDER_FILL_BAR:
+  // Callback from Qt widget when border/fill button is hit
   void select_border_fill_bar( bool show );
 
   // SELECT_COLOR_BAR:
+  // Callback from Qt widget when color selection button is hit
   void select_color_bar( bool show );
 
   // SELECT_VISUAL_LOCK:
+  // Callback from Qt widget when lock button is hit
   void select_visual_lock( bool lock );
 
 public:

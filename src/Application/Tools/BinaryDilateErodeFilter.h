@@ -29,12 +29,12 @@
 #ifndef APPLICATION_TOOLS_BINARYDILATEERODEFILTER_H
 #define APPLICATION_TOOLS_BINARYDILATEERODEFILTER_H
 
-#include <Application/Tool/Tool.h>
+#include <Application/Tool/SingleTargetTool.h>
 
 namespace Seg3D
 {
 
-class BinaryDilateErodeFilter : public Tool
+class BinaryDilateErodeFilter : public SingleTargetTool
 {
 
 SEG3D_TOOL(
@@ -48,24 +48,9 @@ SEG3D_TOOL_URL( "http://seg3d.org/" )
 public:
   BinaryDilateErodeFilter( const std::string& toolid, bool auto_number = true );
   virtual ~BinaryDilateErodeFilter();
-  // -- constraint parameters --
-
-  // Constrain viewer to right painting tool when layer is selected
-  void target_constraint( std::string layerid );
-
-  // -- activate/deactivate tool --
-
-  virtual void activate();
-  virtual void deactivate();
-
-private:
-  void handle_layers_changed();
 
   // -- state --
 public:
-  // Layerid of the target layer
-  Core::StateStringHandle target_layer_state_;
-
   Core::StateRangedIntHandle dilate_state_;
 
   Core::StateRangedIntHandle erode_state_;

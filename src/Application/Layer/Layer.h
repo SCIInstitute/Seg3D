@@ -83,7 +83,7 @@ public:
 
   // GRID_TRANSFORM
   // Get the transform of the layer
-  virtual const Core::GridTransform& get_grid_transform() const = 0;
+  virtual const Core::GridTransform get_grid_transform() const = 0;
 
   // -- layer progress signals --
 public:
@@ -159,8 +159,6 @@ public:
   // State that stores the current layer state
   Core::StateOptionHandle data_state_;
 
-/*  Core::StateBoolHandle active_state_;*/
-
 protected:
   // State that stores the generation of its datablock
   Core::StateIntHandle generation_state_;
@@ -187,7 +185,9 @@ public:
   // Get the name of the layer
   std::string get_layer_name() const;
   
-  int get_generation() const;
+  // GET_GENERATION:
+  // Get the generation of the current data block
+  Core::DataBlock::generation_type get_generation() const;
   
 protected:
   virtual bool post_save_states( Core::StateIO& state_io );

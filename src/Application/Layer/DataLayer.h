@@ -42,10 +42,6 @@ namespace Seg3D
 
 // CLASS DataLayer
 
-// Forward declarations
-class DataLayer;
-typedef boost::shared_ptr< DataLayer > DataLayerHandle;
-
 // Class definition
 class DataLayer : public Layer
 {
@@ -63,9 +59,14 @@ public:
 
   // GET_GRID_TRANSFORM:
   // this function returns the grid transform of the data volume
-  virtual const Core::GridTransform& get_grid_transform() const 
+  virtual const Core::GridTransform get_grid_transform() const 
   { 
-    return data_volume_->get_grid_transform(); 
+    return this->data_volume_->get_grid_transform(); 
+  }
+  
+  virtual Core::DataType get_data_type() const
+  {
+    return this->data_volume_->get_data_type();
   }
   
   // GET_DATA_VOLUME:
@@ -79,6 +80,7 @@ public:
   // this function sets the data_volume
   void set_data_volume( Core::DataVolumeHandle data_volume )
   { 
+    Layer::lock_type lock( Layer::GetMutex() );
     this->data_volume_ = data_volume; 
   } 
   

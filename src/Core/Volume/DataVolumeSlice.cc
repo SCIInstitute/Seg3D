@@ -46,7 +46,7 @@ DataVolumeSlice::DataVolumeSlice( const DataVolumeHandle& data_volume,
                  VolumeSliceType type, size_t slice_num ) :
   VolumeSlice( data_volume, type, slice_num )
 {
-  this->data_block_ = data_volume->data_block().get();
+  this->data_block_ = data_volume->get_data_block().get();
   this->add_connection( this->data_block_->data_changed_signal_.connect( 
     boost::bind( &VolumeSlice::handle_volume_updated, this ) ) );
 }
@@ -134,7 +134,7 @@ void DataVolumeSlice::upload_texture()
   // Lock the volume
   shared_lock_type volume_lock( this->get_mutex() );
   
-  switch ( this->data_block_->get_type() )
+  switch ( this->data_block_->get_data_type() )
   {
     case DataType::CHAR_E:
       CopyTypedData< texture_data_type, signed char >( this, buffer );

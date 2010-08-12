@@ -350,9 +350,9 @@ public:
 
 void IsosurfacePrivate::setup( int num_threads )
 {
-  this->nx_ = this->mask_volume_->mask_data_block()->get_nx();
-  this->ny_ = this->mask_volume_->mask_data_block()->get_ny();
-  this->nz_ = this->mask_volume_->mask_data_block()->get_nz();
+  this->nx_ = this->mask_volume_->get_mask_data_block()->get_nx();
+  this->ny_ = this->mask_volume_->get_mask_data_block()->get_ny();
+  this->nz_ = this->mask_volume_->get_mask_data_block()->get_nz();
   
   // Number of elements (cubes) in each dimension
   this->elem_nx_ = this->nx_ - 1;
@@ -360,7 +360,7 @@ void IsosurfacePrivate::setup( int num_threads )
   this->elem_nz_ = this->nz_ - 1;
 
   // Mask data is stored in bit-plane (8 masks per data block)
-  this->data_ = this->mask_volume_->mask_data_block()->get_mask_data();
+  this->data_ = this->mask_volume_->get_mask_data_block()->get_mask_data();
 
   // Stores index into polgyon configuration table for each element (cube)?
   // Why +1?  Maybe just padding for safety?
@@ -481,7 +481,7 @@ void IsosurfacePrivate::parallel_compute_faces( int thread, int num_threads,
   StackVector< size_t, 3 > elems( 3 );    
 
   // Bit where mask bit is stored
-  unsigned char mask_value = this->mask_volume_->mask_data_block()->get_mask_value(); 
+  unsigned char mask_value = this->mask_volume_->get_mask_data_block()->get_mask_value(); 
 
   // Get mask transform from MaskVolume 
   GridTransform grid_transform = this->mask_volume_->get_grid_transform();

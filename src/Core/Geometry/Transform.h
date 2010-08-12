@@ -50,16 +50,21 @@ namespace Core
 
 //Forward declaration
 class Transform;
+class TransformF;
 
 // Class definition
 class Transform
 {
+  friend class TransformF;
 public:
   Transform();
   Transform( const Transform& );
+  Transform( const TransformF& );
+  
   Transform( const Point&, const Vector&, const Vector&, const Vector& );
 
   Transform& operator=( const Transform& copy );
+  Transform& operator=( const TransformF& copy );
 
   void load_identity();
   void load_basis( const Point&, const Vector&, const Vector&, const Vector& );
@@ -107,6 +112,7 @@ public:
 
   bool is_axis_aligned() const;
 
+  // TODO: Need to look at this public definition, most of these are internal versions
 public:
 
   static void BuildPermuteMatrix( Matrix& m, int xmap, int ymap, int zmap, bool pre );
@@ -132,6 +138,88 @@ VectorF operator*( const Transform& t, const VectorF& d );
 
 std::string ExportToString( const Transform& value );
 bool ImportFromString( const std::string& str, Transform& value );
+
+
+// Class definition
+class TransformF
+{
+  friend class Transform;
+
+public:
+  TransformF();
+  TransformF( const TransformF& );
+  TransformF( const Transform& );
+
+  TransformF( const PointF&, const VectorF&, const VectorF&, const VectorF& );
+
+  TransformF& operator=( const TransformF& copy );
+  TransformF& operator=( const Transform& copy );
+
+  void load_identity();
+  void load_basis( const PointF&, const VectorF&, const VectorF&, const VectorF& );
+  void load_frame( const VectorF&, const VectorF&, const VectorF& );
+  void load_matrix( const MatrixF& m );
+
+  TransformF get_inverse();
+
+  void post_transform( const TransformF& );
+  void pre_transform( const TransformF& );
+
+  void post_mult_matrix( const MatrixF& m );
+  void pre_mult_matrix( const MatrixF& m );
+
+  void pre_permute( int xmap, int ymap, int zmap );
+  void post_permute( int xmap, int ymap, int zmap );
+
+  void pre_scale( const VectorF& );
+  void post_scale( const VectorF& );
+
+  void pre_shear( const VectorF&, const Plane& );
+  void post_shear( const VectorF&, const Plane& );
+
+  void pre_rotate( float, const VectorF& axis );
+  void post_rotate( float, const VectorF& axis );
+
+  void pre_translate( const VectorF& );
+  void post_translate( const VectorF& );
+
+  // Returns true if the rotation happened, false otherwise.
+  bool rotate( const VectorF& from, const VectorF& to );
+
+  const MatrixF& get_matrix() const;
+
+  void get( float* data ) const;
+  void set( const float* data );
+
+  Point project( const Point& p ) const;
+  Vector project( const Vector& p ) const;
+  PointF project( const PointF& p ) const;
+  VectorF project( const VectorF& p ) const;
+
+  bool operator==( const TransformF& ) const;
+  bool operator!=( const TransformF& ) const;
+
+  bool is_axis_aligned() const;
+
+public:
+
+  static void BuildPermuteMatrix( MatrixF& m, int xmap, int ymap, int zmap, bool pre );
+  static void BuildRotateMatrix( MatrixF& m, float angle, const VectorF& axis );
+  static void BuildShearMatrix( MatrixF& m, const VectorF& s, const Plane& p );
+  static void BuildScaleMatrix( MatrixF& m, const VectorF& v );
+  static void BuildTranslateMatrix( MatrixF& m, const VectorF& v );
+  static void BuildViewMatrix( MatrixF& m, const PointF& eyep, const PointF& lookat, const VectorF& up );
+  static void BuildPerspectiveMatrix( MatrixF& m, float fovy, float aspect, 
+          float znear, float zfar );
+  static void BuildOrthoMatrix( MatrixF& m, float left, float right, float bottom, 
+          float top, float nearVal, float farVal );
+  static void BuildOrtho2DMatrix( MatrixF& m, float left, float right, float bottom, float top );
+
+protected:
+  MatrixF mat_;
+};
+
+
 
 } // End namespace Core
 

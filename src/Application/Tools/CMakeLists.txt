@@ -85,6 +85,9 @@ SET(APPLICATION_TOOLS_SRCS
   OtsuThresholdFilter.cc
   ThresholdSegmentationLSFilter.h
   ThresholdSegmentationLSFilter.cc
+  
+  CurvatureAnisotropicDiffusionFilter.h
+  CurvatureAnisotropicDiffusionFilter.cc
   )
 
 SET(APPLICATION_TOOLS_NOREGISTER_SRCS
@@ -97,6 +100,8 @@ SET(APPLICATION_TOOLS_NOREGISTER_SRCS
 SET(APPLICATION_TOOLS_ACTIONS_SRCS
   Actions/ActionPaint.h
   Actions/ActionPaint.cc
+  Actions/ActionCurvatureAnisotropicDiffusionFilter.h
+  Actions/ActionCurvatureAnisotropicDiffusionFilter.cc
   )
 
 CORE_ADD_LIBRARY(Application_Tools 

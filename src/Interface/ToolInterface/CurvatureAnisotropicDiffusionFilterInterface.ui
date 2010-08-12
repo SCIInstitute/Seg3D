@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>AnisotropicDiffusionFilterInterface</class>
- <widget class="QWidget" name="AnisotropicDiffusionFilterInterface">
+ <class>CurvatureAnisotropicDiffusionFilterInterface</class>
+ <widget class="QWidget" name="CurvatureAnisotropicDiffusionFilterInterface">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -32,7 +32,7 @@
    <string>Anisotropic Diffusion Filter</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QWidget#AnisotropicDiffusionFilterInterface{
+   <string notr="true">QWidget#CurvatureAnisotropicDiffusionFilterInterface{
   border-radius: 3px;
   border: 1px solid rgb(80, 80,80);
   background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(221, 221, 221, 255), stop:0.155779 rgba(228, 228, 228, 255), stop:1 rgba(202, 204, 204, 255));      

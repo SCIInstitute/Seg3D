@@ -71,7 +71,7 @@ NrrdData::NrrdData( DataBlockHandle data_block ) :
   this->private_->nrrd_ = nrrdNew();
 
   nrrdWrap_va( this->private_->nrrd_, data_block->get_data(), 
-    GetNrrdDataType( data_block->get_type() ), 3,
+    GetNrrdDataType( data_block->get_data_type() ), 3,
     data_block->get_nx(), data_block->get_ny(),
     data_block->get_nz() );
 }
@@ -90,7 +90,7 @@ NrrdData::NrrdData( DataBlockHandle data_block, Transform transform ) :
   this->private_->nrrd_ = nrrdNew();
 
   nrrdWrap_va( this->private_->nrrd_, data_block->get_data(), 
-    GetNrrdDataType( data_block->get_type() ), 3,
+    GetNrrdDataType( data_block->get_data_type() ), 3,
     data_block->get_nx(), data_block->get_ny(),
     data_block->get_nz() );
 

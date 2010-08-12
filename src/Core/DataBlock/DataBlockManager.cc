@@ -33,40 +33,50 @@ namespace Core
 
 CORE_SINGLETON_IMPLEMENTATION( DataBlockManager );
   
-DataBlockManager::DataBlockManager() :
-    generation_( 0 )
+class DataBlockManagerPrivate
 {
+public:
+  typedef std::map< DataBlock::generation_type, DataBlockWeakHandle > generation_map_type;
+  generation_map_type generation_map_;
+  
+  DataBlock::generation_type generation_;
+};
+  
+DataBlockManager::DataBlockManager() :
+  private_( new DataBlockManagerPrivate )
+{
+  this->private_->generation_ = 0;
 }
   
 void DataBlockManager::register_datablock( DataBlockHandle data_block, 
   DataBlock::generation_type generation )
 {
-  lock_type lock( get_mutex() );
+  lock_type lock( this->get_mutex() );
 
   if ( generation == -1 )
   {
-    generation = this->generation_; 
+    generation = this->private_->generation_; 
   }
-  else if ( this->generation_ < generation )
+  else if ( this->private_->generation_ < generation )
   {
-    this->generation_ = generation;
+    this->private_->generation_ = generation;
   }
 
   data_block->set_generation( generation );
-  this->generation_++;
+  this->private_->generation_++;
   
-  assert( this->generation_map_.count( data_block->get_generation() ) == 0 );
-  this->generation_map_[ data_block->get_generation() ] = DataBlockWeakHandle( data_block );
+  assert( this->private_->generation_map_.count( data_block->get_generation() ) == 0 );
+  this->private_->generation_map_[ data_block->get_generation() ] = DataBlockWeakHandle( data_block );
 }
 
 bool DataBlockManager::find_datablock(  DataBlock::generation_type generation, 
   DataBlockHandle& datablock )
 {
-  lock_type lock( get_mutex() );
+  lock_type lock( this->get_mutex() );
 
   datablock.reset();
-  generation_map_type::const_iterator it = this->generation_map_.find( generation );
-  if ( it == this->generation_map_.end() ) return false;
+  DataBlockManagerPrivate::generation_map_type::const_iterator it = this->private_->generation_map_.find( generation );
+  if ( it == this->private_->generation_map_.end() ) return false;
 
   datablock = ( *it ).second.lock();
   
@@ -76,24 +86,24 @@ bool DataBlockManager::find_datablock(  DataBlock::generation_type generation,
 
 void DataBlockManager::unregister_datablock( DataBlock::generation_type generation )
 {
-  lock_type lock( get_mutex() );
-  this->generation_map_.erase( generation );
+  lock_type lock( this->get_mutex() );
+  this->private_->generation_map_.erase( generation );
 }
 
 DataBlock::generation_type DataBlockManager::increment_generation( 
   DataBlock::generation_type old_generation )
 {
-  lock_type lock( get_mutex() );
+  lock_type lock( this->get_mutex() );
 
-  DataBlockHandle data_block = this->generation_map_[ old_generation ].lock();
-  this->generation_map_.erase( old_generation );
+  DataBlockHandle data_block = this->private_->generation_map_[ old_generation ].lock();
+  this->private_->generation_map_.erase( old_generation );
 
-  DataBlock::generation_type new_generation = this->generation_;
-  this->generation_++;
+  DataBlock::generation_type new_generation = this->private_->generation_;
+  this->private_->generation_++;
   
   if ( data_block )
   {
-    this->generation_map_[ new_generation ] = data_block;
+    this->private_->generation_map_[ new_generation ] = data_block;
   }
   
   return new_generation;
@@ -101,17 +111,16 @@ DataBlock::generation_type DataBlockManager::increment_generation(
 
 DataBlock::generation_type DataBlockManager::get_generation_count()
 {
-  lock_type lock( get_mutex() );
+  lock_type lock( this->get_mutex() );
 
-  return generation_;
+  return this->private_->generation_;
 }
 
 void DataBlockManager::set_generation_count( DataBlock::generation_type generation )
 {
-  lock_type lock( get_mutex() );
+  lock_type lock( this->get_mutex() );
 
-  generation_ = generation;
+  this->private_->generation_ = generation;
 }
-
 
 } // end namespace Core

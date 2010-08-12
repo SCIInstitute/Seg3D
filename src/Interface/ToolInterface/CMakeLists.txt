@@ -36,21 +36,22 @@ SET(INTERFACE_TOOLINTERFACE_SRCS
   PolylineToolInterface.cc
   ThresholdToolInterface.cc
   InvertToolInterface.cc
-  MedianFilterInterface.cc
   AnisotropicDiffusionFilterInterface.cc
-  DiscreteGaussianFilterInterface.cc
   ArithmeticFilterInterface.cc
   BinaryDilateErodeFilterInterface.cc
   BooleanFilterInterface.cc
+  CannyEdgeDetectionFilterInterface.cc
   ConfidenceConnectedFilterInterface.cc
-  FillHolesFilterInterface.cc
-  HistogramEqualizationFilterInterface.cc
   ConnectedComponentFilterInterface.cc
-  NeighborhoodConnectedFilterInterface.cc
+  CurvatureAnisotropicDiffusionFilterInterface.cc
+  DiscreteGaussianFilterInterface.cc
+  FillHolesFilterInterface.cc
+  GradientMagnitudeFilterInterface.cc
+  HistogramEqualizationFilterInterface.cc
   IntensityCorrectionFilterInterface.cc
   MaskDataFilterInterface.cc
-  GradientMagnitudeFilterInterface.cc
-  CannyEdgeDetectionFilterInterface.cc
+  MedianFilterInterface.cc
+  NeighborhoodConnectedFilterInterface.cc
   OtsuThresholdFilterInterface.cc
   ThresholdSegmentationLSFilterInterface.cc
 )
@@ -65,21 +66,22 @@ SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
   PolylineToolInterface.h
   ThresholdToolInterface.h
   InvertToolInterface.h
-  MedianFilterInterface.h
   AnisotropicDiffusionFilterInterface.h
-  DiscreteGaussianFilterInterface.h
   ArithmeticFilterInterface.h
   BinaryDilateErodeFilterInterface.h
   BooleanFilterInterface.h
+  CannyEdgeDetectionFilterInterface.h
   ConfidenceConnectedFilterInterface.h
-  FillHolesFilterInterface.h
-  HistogramEqualizationFilterInterface.h
   ConnectedComponentFilterInterface.h
-  NeighborhoodConnectedFilterInterface.h
+  CurvatureAnisotropicDiffusionFilterInterface.h
+  DiscreteGaussianFilterInterface.h
+  FillHolesFilterInterface.h
+  GradientMagnitudeFilterInterface.h
+  HistogramEqualizationFilterInterface.h
   IntensityCorrectionFilterInterface.h
   MaskDataFilterInterface.h
-  GradientMagnitudeFilterInterface.h
-  CannyEdgeDetectionFilterInterface.h
+  MedianFilterInterface.h
+  NeighborhoodConnectedFilterInterface.h
   OtsuThresholdFilterInterface.h
   ThresholdSegmentationLSFilterInterface.h
   
@@ -102,6 +104,7 @@ SET(INTERFACE_TOOLINTERFACE_UI_SRCS
   AnisotropicDiffusionFilterInterface.ui
   DiscreteGaussianFilterInterface.ui
   ArithmeticFilterInterface.ui
+  CurvatureAnisotropicDiffusionFilterInterface.ui
   BinaryDilateErodeFilterInterface.ui
   BooleanFilterInterface.ui
   ConfidenceConnectedFilterInterface.ui

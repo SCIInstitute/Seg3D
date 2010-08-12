@@ -27,47 +27,46 @@
  */
 
 //Qt Gui Includes
-#include <Interface/ToolInterface/AnisotropicDiffusionFilterInterface.h>
-#include "ui_AnisotropicDiffusionFilterInterface.h"
+#include <Interface/ToolInterface/CurvatureAnisotropicDiffusionFilterInterface.h>
+#include "ui_CurvatureAnisotropicDiffusionFilterInterface.h"
 
 // Core includes
 #include <Core/Utils/Log.h>
 
 // Application includes
 #include <Application/Tool/ToolFactory.h>
-#include <Application/Tools/AnisotropicDiffusionFilter.h>
-//#include <Application/Filters/Actions/ActionAnisotropicDiffusion.h>
+#include <Application/Tools/CurvatureAnisotropicDiffusionFilter.h>
 
 //QtUtils Includes
 #include <QtUtils/Bridge/QtBridge.h>
 
-SCI_REGISTER_TOOLINTERFACE( Seg3D, AnisotropicDiffusionFilterInterface )
+SCI_REGISTER_TOOLINTERFACE( Seg3D, CurvatureAnisotropicDiffusionFilterInterface )
 
 namespace Seg3D
 {
 
-class AnisotropicDiffusionFilterInterfacePrivate
+class CurvatureAnisotropicDiffusionFilterInterfacePrivate
 {
 public:
-  Ui::AnisotropicDiffusionFilterInterface ui_;
+  Ui::CurvatureAnisotropicDiffusionFilterInterface ui_;
   QtUtils::QtSliderIntCombo *iterations_;
   QtUtils::QtSliderIntCombo *step_;
   QtUtils::QtSliderDoubleCombo *conductance_;
 };
 
 // constructor
-AnisotropicDiffusionFilterInterface::AnisotropicDiffusionFilterInterface() :
-  private_( new AnisotropicDiffusionFilterInterfacePrivate )
+CurvatureAnisotropicDiffusionFilterInterface::CurvatureAnisotropicDiffusionFilterInterface() :
+  private_( new CurvatureAnisotropicDiffusionFilterInterfacePrivate )
 {
 }
 
 // destructor
-AnisotropicDiffusionFilterInterface::~AnisotropicDiffusionFilterInterface()
+CurvatureAnisotropicDiffusionFilterInterface::~CurvatureAnisotropicDiffusionFilterInterface()
 {
 }
 
 // build the interface and connect it to the state manager
-bool AnisotropicDiffusionFilterInterface::build_widget( QFrame* frame )
+bool CurvatureAnisotropicDiffusionFilterInterface::build_widget( QFrame* frame )
 {
   // Step 1 - build the Qt GUI Widget
   this->private_->ui_.setupUi( frame );
@@ -83,8 +82,8 @@ bool AnisotropicDiffusionFilterInterface::build_widget( QFrame* frame )
 
   // Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
-  AnisotropicDiffusionFilter* tool =
-      dynamic_cast< AnisotropicDiffusionFilter* > ( base_tool_.get() );
+  CurvatureAnisotropicDiffusionFilter* tool =
+      dynamic_cast< CurvatureAnisotropicDiffusionFilter* > ( base_tool_.get() );
   
     // Step 3 - connect the gui to the tool through the QtBridge
   QtUtils::QtBridge::Connect( this->private_->ui_.target_layer_, 
@@ -110,23 +109,16 @@ bool AnisotropicDiffusionFilterInterface::build_widget( QFrame* frame )
       this->private_->ui_.target_layer_, SLOT( setDisabled( bool ) ) );
   }
   
-  this->connect( this->private_->ui_.runFilterButton, 
-    SIGNAL( clicked() ), this, SLOT( execute_filter() ) );
+  this->connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), 
+    this, SLOT( run_filter() ) );
   
   return true;
 }
 
-void AnisotropicDiffusionFilterInterface::execute_filter()
+void CurvatureAnisotropicDiffusionFilterInterface::run_filter()
 {
-  ToolHandle base_tool_ = tool();
-  AnisotropicDiffusionFilter* tool =
-    dynamic_cast< AnisotropicDiffusionFilter* > ( base_tool_.get() );
-
-//  ActionAnisotropicDiffusion::Dispatch( tool->target_layer_state_->export_to_string(), 
-//    tool->iterations_state_->get(), tool->steps_state_->get(),
-//    tool->conductance_state_->get(), tool->replace_state_->get() ); 
+  tool()->execute( Core::Interface::GetWidgetActionContext() );
 }
-
 
 } // end namespace Seg3D
 

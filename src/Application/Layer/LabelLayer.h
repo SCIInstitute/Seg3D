@@ -57,7 +57,7 @@ public:
 
   virtual Core::VolumeType type() const { return Core::VolumeType::LABEL_E; }
   
-  virtual const Core::GridTransform& get_grid_transform() const = 0;
+  virtual const Core::GridTransform get_grid_transform() const = 0;
 
 public:
 

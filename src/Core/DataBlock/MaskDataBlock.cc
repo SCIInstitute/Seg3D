@@ -49,6 +49,11 @@ MaskDataBlock::~MaskDataBlock()
   MaskDataBlockManager::Instance()->release( data_block_, mask_bit_ );
 }
 
+DataBlockHandle MaskDataBlock::get_data_block()
+{
+  return this->data_block_;
+}
+
 DataBlock::generation_type MaskDataBlock::get_generation() const
 {
   return  this->data_block_->get_generation();

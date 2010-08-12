@@ -127,7 +127,7 @@ void ThresholdToolInterface::refresh_histogram( QString layer_name )
 
   Core::Histogram temp_histogram = dynamic_cast< DataLayer* >( LayerManager::Instance()->
     get_layer_by_name( layer_name.toStdString() ).get() )->
-    get_data_volume()->data_block()->get_histogram();
+    get_data_volume()->get_data_block()->get_histogram();
 
   // Now, display histogram!
   this->private_->histogram_->set_histogram( temp_histogram );  

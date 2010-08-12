@@ -53,7 +53,7 @@ public:
   
   // MASK_DATA_BLOCK:
   // Get the datablock that contains the mask
-  MaskDataBlockHandle mask_data_block() const;
+  MaskDataBlockHandle get_mask_data_block() const;
 
   // GET_MUTEX:
   // Get access to the mutex protecting this MaskVolume

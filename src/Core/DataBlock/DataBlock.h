@@ -45,8 +45,6 @@
 #include <Core/DataBlock/DataType.h>
 #include <Core/DataBlock/Histogram.h>
 
-
-
 namespace Core
 {
 
@@ -68,21 +66,26 @@ typedef boost::weak_ptr< DataBlock > DataBlockWeakHandle;
 class DataBlock : public SharedLockable
 {
 public:
-  // index/size types
-#ifdef SCI_64BITS
-  typedef unsigned long long  size_type;
-  typedef long long     index_type;
-#else
-  typedef unsigned int    size_type;
-  typedef int         index_type;
-#endif  
-
+  // Generation number for keeping track of unique data snapshots for session/provenance 
+  // tracking
   typedef long long  generation_type;
 
+#ifdef SCI_64BITS
+  typedef long long index_type;
+#else
+  typedef int index_type;
+#endif
+
   // -- Constructor/destructor --
-public:
+protected:
+  // NOTE: Constructor is protected as only a derived class should be constructed.
+  // As the base class does not registers itself it cannot be called directly
   DataBlock();  
+
+public:
+  // Destructor that unregisters itself from the DataBlockManager
   virtual ~DataBlock();
+
 
   // -- Access properties of data block --
 public:
@@ -91,19 +94,19 @@ public:
   // The dimensions of the datablock
   size_t get_nx() const
   {
-    return nx_;
+    return this->nx_;
   }
   size_t get_ny() const
   {
-    return ny_;
+    return this->ny_;
   }
   size_t get_nz() const
   {
-    return nz_;
+    return this->nz_;
   }
   size_t get_size() const
   {
-    return nx_ * ny_ * nz_;
+    return this->nx_ * this->ny_ * this->nz_;
   }
 
   // TO_INDEX:
@@ -114,14 +117,14 @@ public:
     return z * this->nx_ * this->ny_ + y * this->nx_ + x;
   }
 
-  // TYPE
+  // GET_TYPE:
   // The type of the data
-  DataType get_type() const
+  DataType get_data_type() const
   {
     return this->data_type_;
   }
 
-  // DATA:
+  // GET_DATA:
   // Pointer to the block of data
   void* get_data()
   {
@@ -226,8 +229,8 @@ private:
   // Generation number
   generation_type generation_;
 
+  // -- static functions for managing datablocks -- 
 public:
-
   // CONVERTDATATYPE:
   // Convert the data to a specific format
   static bool ConvertDataType( const DataBlockHandle& src_data_block, 
@@ -247,17 +250,9 @@ public:
     DataBlockHandle& dst_data_block, DataType new_data_type );
 
   // CLONE:
+  // Clone the data in a datablock by generating a new one and copying the data into it.
   static bool Clone( const DataBlockHandle& src_data_block, 
     DataBlockHandle& dst_data_block ); 
-  
-  // SETGENERATIONCOUNT:
-  // Set the counter for the generation number of datablocks to a new value.
-  // NOTE: This function should only be called by the project loader
-  static void SetGenerationCount( generation_type generation_count );
-  
-  // GETGENERATIONCOUNT:
-  // Get the latest generation count
-  static generation_type GetGenerationCount();
   
 };
 

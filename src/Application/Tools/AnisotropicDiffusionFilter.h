@@ -62,6 +62,10 @@ public:
   // The conductance for deciding what is a similar value
   Core::StateRangedDoubleHandle conductance_state_;
 
+  // -- execute --
+public:
+  // Execute the tool and dispatch the action
+  void execute();
 
 private:
   const static size_t VERSION_NUMBER_C;

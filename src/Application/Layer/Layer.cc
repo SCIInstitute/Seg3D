@@ -106,7 +106,7 @@ std::string Layer::get_layer_name() const
   return this->name_state_->get();
 }
   
-int Layer::get_generation() const
+Core::DataBlock::generation_type Layer::get_generation() const
 {
   return this->generation_state_->get();
 }

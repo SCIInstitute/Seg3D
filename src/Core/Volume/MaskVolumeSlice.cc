@@ -44,7 +44,7 @@ public:
 MaskVolumeSlice::MaskVolumeSlice( const MaskVolumeHandle& mask_volume, 
                  VolumeSliceType type, size_t slice_num ) :
   VolumeSlice( mask_volume, type, slice_num ),
-  mask_data_block_( mask_volume->mask_data_block().get() ),
+  mask_data_block_( mask_volume->get_mask_data_block().get() ),
   private_( new MaskVolumeSlicePrivate )
 {
   this->private_->using_cache_ = false;

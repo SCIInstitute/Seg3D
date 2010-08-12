@@ -501,8 +501,8 @@ void PaintToolPrivate::handle_data_constraint_changed()
     CORE_THROW_LOGICERROR( "Data layer '" + layer_id + "' does not exist" );
   }
   DataLayer* data_layer = static_cast< DataLayer* >( layer.get() );
-  double min_val = data_layer->get_data_volume()->data_block()->get_min();
-  double max_val = data_layer->get_data_volume()->data_block()->get_max();
+  double min_val = data_layer->get_data_volume()->get_data_block()->get_min();
+  double max_val = data_layer->get_data_volume()->get_data_block()->get_max();
   this->paint_tool_->lower_threshold_state_->set_range( min_val, max_val );
   this->paint_tool_->upper_threshold_state_->set_range( min_val, max_val );
 }

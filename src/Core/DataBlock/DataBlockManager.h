@@ -45,11 +45,16 @@
 namespace Core 
 {
 
+class DataBlockManagerPrivate;
+typedef boost::shared_ptr< DataBlockManagerPrivate > DataBlockManagerPrivateHandle;
+
 class DataBlockManager : public RecursiveLockable
 {
   CORE_SINGLETON( DataBlockManager );
 
+  // -- constructor --
 private:
+  // NOTE: This one is private, use the singleton Instance() function to access this class
   DataBlockManager();
   
 public:
@@ -89,12 +94,8 @@ private:
   // DataBlock class whenever the data in a datablock is changed.
   DataBlock::generation_type increment_generation( DataBlock::generation_type old_generation );
 
-
 private:
-  typedef std::map< DataBlock::generation_type, DataBlockWeakHandle > generation_map_type;
-  generation_map_type generation_map_;
-  
-  DataBlock::generation_type generation_;
+  DataBlockManagerPrivateHandle private_;
 };
 
 } // end namespace Core
