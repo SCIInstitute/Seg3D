@@ -161,6 +161,11 @@ void MaskLayer::handle_mask_data_changed()
   this->layer_updated_signal_();
 }
 
+void MaskLayer::handle_isosurface_update_progress( double progress )
+{
+  this->update_progress_signal_( progress );
+}
+
 Core::IsosurfaceHandle MaskLayer::get_isosurface()
 {
   lock_type lock( Layer::GetMutex() );
@@ -180,10 +185,18 @@ void MaskLayer::compute_isosurface()
     if ( !this->isosurface_ )
     {
       this->isosurface_.reset( new Core::Isosurface( this->mask_volume_ ) );
+      this->add_connection( this->isosurface_->update_progress_signal_.
+        connect( boost::bind( &MaskLayer::handle_isosurface_update_progress, this, _1 ) ) );
     }
   }
 
+  // Set data state to processing so that progress bar is displayed
+  this->data_state_->set( Layer::PROCESSING_C );
+
   this->isosurface_->compute();
+
+  this->data_state_->set( Layer::AVAILABLE_C );
+
   if ( this->show_isosurface_state_->get() )
   {
     this->isosurface_updated_signal_();

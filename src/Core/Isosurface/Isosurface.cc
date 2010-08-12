@@ -318,6 +318,9 @@ public:
 
   void upload_to_vertex_buffer();
 
+  // Pointer to public Isosurface -- needed to give access to public signals
+  Isosurface* isosurface_;
+
   // Input to isosurface computation
   MaskVolumeHandle mask_volume_; 
 
@@ -857,6 +860,10 @@ void IsosurfacePrivate::parallel_compute_faces( int thread, int num_threads,
     }
 
     barrier.wait();   
+
+    // Update progress based on number of z slices processed
+    this->isosurface_->update_progress_signal_( 
+      static_cast< double >( z + 1 ) / static_cast< double >( this->elem_nz_ ) );
   }   
 
   barrier.wait();
@@ -928,7 +935,6 @@ void IsosurfacePrivate::parallel_compute_normals( int thread, int num_threads,
         this->normals_[ vertex_index3 ] += n;
       }
     }
-
   }
 
   // For each vertex in our range
@@ -978,6 +984,7 @@ void IsosurfacePrivate::upload_to_vertex_buffer()
 Isosurface::Isosurface( const MaskVolumeHandle& mask_volume ) :
   private_( new IsosurfacePrivate )
 {
+  this->private_->isosurface_ = this;
   this->private_->mask_volume_ = mask_volume;
   this->private_->gl_initialized_ = false;
   this->private_->surface_changed_ = false;

@@ -124,6 +124,7 @@ protected:
 private:
   void initialize_states();
   void handle_mask_data_changed();
+  void handle_isosurface_update_progress( double progress );
   
 private:
   
