@@ -647,6 +647,7 @@ bool Renderer::render()
     std::vector< std::string > view_modes;
     bool with_lighting = viewer->volume_light_visible_state_->get();
     bool draw_slices = viewer->volume_slices_visible_state_->get();
+    bool draw_isosurfaces = viewer->volume_isosurfaces_visible_state_->get();
     size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
     for ( size_t i = 0; i < num_of_viewers && draw_slices; i++ )
     {
@@ -674,7 +675,10 @@ bool Renderer::render()
 
     Core::BBox bbox = LayerManager::Instance()->get_layers_bbox();
     IsosurfaceArray isosurfaces;
-    this->private_->process_isosurfaces( isosurfaces );
+    if ( draw_isosurfaces )
+    {
+      this->private_->process_isosurfaces( isosurfaces );
+    }   
 
     // We have got everything we want from the state engine, unlock before we do any rendering
     state_lock.unlock();
@@ -695,7 +699,11 @@ bool Renderer::render()
     {
       this->private_->draw_slices_3d( bbox, layer_scenes, depths, view_modes, with_lighting );
     }
-    this->private_->draw_isosurfaces( isosurfaces, with_lighting );
+    if ( draw_isosurfaces)
+    {
+      this->private_->draw_isosurfaces( isosurfaces, with_lighting );
+    }
+    
     glDisable( GL_BLEND );
   }
   else

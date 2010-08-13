@@ -898,6 +898,8 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
     boost::bind( &Viewer::redraw, this, false ) ) );
   this->add_connection( this->volume_slices_visible_state_->state_changed_signal_.connect(
     boost::bind( &Viewer::redraw, this, false ) ) );
+  this->add_connection( this->volume_isosurfaces_visible_state_->state_changed_signal_.
+    connect( boost::bind( &Viewer::redraw, this, false ) ) );
 
   // Connect state variables that should trigger redraw_overlay
   this->add_connection( this->view_mode_state_->state_changed_signal_.connect(
