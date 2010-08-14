@@ -44,5 +44,6 @@ CORE_ADD_LIBRARY(Core_Isosurface ${CORE_ISOSURFACE_SRCS} )
             
 TARGET_LINK_LIBRARIES(Core_Isosurface 
   Core_Utils
+        Core_Graphics
   ${SCI_BOOST_LIBRARY})
 
