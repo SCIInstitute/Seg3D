@@ -172,8 +172,7 @@ void Project::add_session_to_list( const std::string& session_name )
 
   this->data_manager_->save_datamanager_state( this->project_path_, session_name );
 
-  this->project_file_size_state_->set( static_cast< double >( 
-    this->data_manager_->get_file_size() ) );
+  this->project_file_size_state_->set( this->data_manager_->get_file_size() );
   
 }
 

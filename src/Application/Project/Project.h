@@ -77,7 +77,7 @@ public:
   Core::StateBoolHandle save_custom_colors_state_;
   Core::StateStringVectorHandle sessions_state_;
   Core::StateStringVectorHandle project_notes_state_;
-  Core::StateDoubleHandle project_file_size_state_;
+  Core::StateLongLongHandle project_file_size_state_;
   std::vector< Core::StateColorHandle > color_states_;
   
   

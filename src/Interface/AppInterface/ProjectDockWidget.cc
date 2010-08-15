@@ -426,7 +426,7 @@ void ProjectDockWidget::HandleAutoSaveTimeChanged( qpointer_type qpointer, int d
 
 }
 
-void ProjectDockWidget::HandleFileSizeChanged( qpointer_type qpointer, double file_size )
+void ProjectDockWidget::HandleFileSizeChanged( qpointer_type qpointer, long long file_size )
 {
   if( !( Core::Interface::IsInterfaceThread() ) )
   {
@@ -438,9 +438,11 @@ void ProjectDockWidget::HandleFileSizeChanged( qpointer_type qpointer, double fi
 }
 
 
-void ProjectDockWidget::set_file_size_label( double file_size )
+void ProjectDockWidget::set_file_size_label( long long file_size )
 {
-  QString pretty_file_size = QString::number( file_size, 'f', 0 );
+  // TODO:
+  // Fix this!
+  QString pretty_file_size = QString::number( file_size, 10 );
   int number_length = pretty_file_size.size();
 
   if( number_length > 12 )
