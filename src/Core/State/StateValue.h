@@ -72,7 +72,11 @@ typedef boost::weak_ptr< StateBool > StateBoolWeakHandle;
 typedef StateValue< int > StateInt;
 typedef boost::shared_ptr< StateInt > StateIntHandle;
 typedef boost::weak_ptr< StateInt > StateIntWeakHandle;
-  
+
+typedef StateValue< long long > StateLongLong;
+typedef boost::shared_ptr< StateLongLong > StateLongLongHandle;
+typedef boost::weak_ptr< StateLongLong > StateLongLongWeakHandle;
+
 typedef StateValue< std::string > StateString;
 typedef boost::shared_ptr< StateString > StateStringHandle;
 typedef boost::weak_ptr< StateString > StateStringWeakHandle;
