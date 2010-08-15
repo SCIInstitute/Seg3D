@@ -57,13 +57,14 @@ namespace QtUtils
 
 // Forward declaration
 class QtApplication;
+class QtApplicationPrivate;
 
 // Class definition
 class QtApplication : public boost::noncopyable
 {
   CORE_SINGLETON( QtApplication );
   
-  // -- constuctor --
+  // -- constructor --
 private:
   QtApplication();
 
@@ -72,7 +73,7 @@ private:
 public:
   // SETUP:
   // Setup the interface context
-        bool setup( int& argc, char **argv );
+  bool setup( int& argc, char **argv );
 
   // EXEC:
   // Start the interface execution
@@ -89,13 +90,19 @@ public:
   // Get the handle to the renderresources
   QtRenderResourcesContextHandle qt_renderresources_context();
 
+  // -- Signals --
+public:
+  // ENTER_SIZE_MOVE_SIGNAL:
+  // Triggered when the user starts resizing the application window.
+  boost::signals2::signal< void () > enter_size_move_signal_;
+
+  // EXIT_SIZE_MOVE_SIGNAL:
+  // Triggered when the user stops resizing the application window.
+  boost::signals2::signal< void () > exit_size_move_signal_;
+
 private:
-  // Main QT application class
-  QApplication* qt_application_;
-
-  // Class for managing the opengl rendering resources
-  QtRenderResourcesContextHandle qt_renderresources_context_;
-
+  friend class QtApplicationPrivate;
+  QtApplicationPrivate* private_;
 };
 
 } // end namespace QtUtils

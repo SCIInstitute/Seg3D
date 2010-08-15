@@ -44,11 +44,42 @@
 namespace QtUtils
 {
 
+class QtApplicationPrivate
+{
+public:
+  // Main QT application class
+  QApplication* qt_application_;
+
+  // Class for managing the opengl rendering resources
+  QtRenderResourcesContextHandle qt_renderresources_context_;
+
+public:
+  static bool FilterEvent( void* message, long* result );
+};
+
+bool QtApplicationPrivate::FilterEvent( void* message, long* result )
+{
+#ifdef _WIN32
+  MSG* msg = reinterpret_cast< MSG* >( message );
+  if ( msg->message == WM_ENTERSIZEMOVE )
+  {
+    QtApplication::Instance()->enter_size_move_signal_();
+  }
+  else if ( msg->message == WM_EXITSIZEMOVE )
+  {
+    QtApplication::Instance()->exit_size_move_signal_();
+  }
+#endif
+
+  return false;
+}
+
 CORE_SINGLETON_IMPLEMENTATION( QtApplication );
 
 QtApplication::QtApplication() :
-  qt_application_( 0 )
+  private_( new QtApplicationPrivate )
 {
+  this->private_->qt_application_ = 0;
 }
 
 bool QtApplication::setup( int& argc, char **argv )
@@ -64,12 +95,15 @@ bool QtApplication::setup( int& argc, char **argv )
   {
     // Step 1: Main application class
     CORE_LOG_DEBUG( "Creating QApplication" );
-    qt_application_ = new QApplication( argc, argv );
+    this->private_->qt_application_ = new QApplication( argc, argv );
+
+    // Set the event filter for QApplication
+    this->private_->qt_application_->setEventFilter( &QtApplicationPrivate::FilterEvent );
 
     // Step 2: Create interface class to the main class of the event handler layer
     CORE_LOG_DEBUG( "Creating QtEventHandlerContext" );
     Core::EventHandlerContextHandle qt_eventhandler_context( new QtEventHandlerContext(
-        qt_application_ ) );
+        this->private_->qt_application_ ) );
 
     // Step 3: Insert the event handler into the application layer
     CORE_LOG_DEBUG( "Install the QtEventHandlerContext into the Interface layer" );
@@ -78,11 +112,12 @@ bool QtApplication::setup( int& argc, char **argv )
 
     // Step 4: Create opengl render resources
     CORE_LOG_DEBUG( "Creating QtRenderResourcesContext" );
-    qt_renderresources_context_ = QtRenderResourcesContextHandle( new QtRenderResourcesContext );
+    this->private_->qt_renderresources_context_.reset( new QtRenderResourcesContext );
 
     CORE_LOG_DEBUG( "Install the QtRenderResources into the Interface layer" );
     // Step 5: Insert the render resources class into the application layer
-    Core::RenderResources::Instance()->install_resources_context( qt_renderresources_context_ );
+    Core::RenderResources::Instance()->install_resources_context( 
+      this->private_->qt_renderresources_context_ );
 
   }
   catch ( ... )
@@ -101,14 +136,14 @@ bool QtApplication::exec()
   {
     CORE_LOG_DEBUG( "Starting main QT event loop" );
 
-    if ( !( qt_application_->exec() == 0 ) )
+    if ( !( this->private_->qt_application_->exec() == 0 ) )
     {
       CORE_LOG_DEBUG( "Qt crashed by dropping out of the event loop" );
       success = false;
     }
 
-    delete qt_application_;
-    qt_application_ = 0;
+    delete this->private_->qt_application_;
+    this->private_->qt_application_ = 0;
 
     CORE_LOG_DEBUG( "Exiting main QT event loop" );
   }
@@ -138,12 +173,12 @@ bool QtApplication::exec()
 
 QApplication* QtApplication::qt_application()
 {
-  return qt_application_;
+  return this->private_->qt_application_;
 }
 
 QtRenderResourcesContextHandle QtApplication::qt_renderresources_context()
 {
-  return qt_renderresources_context_;
+  return this->private_->qt_renderresources_context_;
 }
 
 } // end namespace Seg3D

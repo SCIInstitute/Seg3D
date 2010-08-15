@@ -40,33 +40,62 @@
 
 // QtUtils includes
 #include <QtUtils/Utils/QtRenderWidget.h>
+#include <QtUtils/Utils/QtApplication.h>
 
 namespace QtUtils
 {
 
 typedef QPointer< QtRenderWidget > QtRenderWidgetWeakHandle;
 
+//////////////////////////////////////////////////////////////////////////
+// Class QtRenderWidgetPrivate
+//////////////////////////////////////////////////////////////////////////
+
 class QtRenderWidgetPrivate
 {
 public:
+  void enter_size_move();
+  void exit_size_move();
+
   Core::AbstractViewerHandle viewer_;
   Core::MouseHistory mouse_history_;
   QtRenderWidget* render_widget_;
+  bool in_size_move_;
 };
 
+void QtRenderWidgetPrivate::enter_size_move()
+{
+  this->in_size_move_ = true;
+}
 
-QtRenderWidget::QtRenderWidget( const QGLFormat& format, QWidget* parent, QGLWidget* share, 
-    Core::AbstractViewerHandle viewer ) :
+void QtRenderWidgetPrivate::exit_size_move()
+{
+  this->in_size_move_ = false;
+  this->viewer_->resize( this->render_widget_->width(), this->render_widget_->height() );
+}
+
+//////////////////////////////////////////////////////////////////////////
+// Class QtRenderWidget
+//////////////////////////////////////////////////////////////////////////
+
+QtRenderWidget::QtRenderWidget( const QGLFormat& format, QWidget* parent, 
+                 QGLWidget* share, Core::AbstractViewerHandle viewer ) :
   QGLWidget( format, parent, share ),
   private_( new QtRenderWidgetPrivate )
 {
   this->private_->viewer_ = viewer;
   this->private_->render_widget_ = this;
+  this->private_->in_size_move_ = false;
 
   this->setAutoFillBackground( false );
   this->setAttribute( Qt::WA_OpaquePaintEvent );
   this->setMouseTracking( true );
   this->setFocusPolicy( Qt::StrongFocus );
+
+  this->add_connection( QtApplication::Instance()->enter_size_move_signal_.connect(
+    boost::bind( &QtRenderWidgetPrivate::enter_size_move, this->private_ ) ) );
+  this->add_connection( QtApplication::Instance()->exit_size_move_signal_.connect(
+    boost::bind( &QtRenderWidgetPrivate::exit_size_move, this->private_ ) ) );
 }
 
 QtRenderWidget::~QtRenderWidget()
@@ -85,7 +114,6 @@ static void UpdateDisplay( QtRenderWidgetWeakHandle qpointer )
   if ( !qpointer.isNull() )
   {
     qpointer->updateGL();
-    //qpointer->repaint();
   }
 }
 
@@ -176,7 +204,10 @@ void QtRenderWidget::resizeGL( int width, int height )
   glLoadIdentity();
   gluOrtho2D( 0, width, 0, height );
 
-  this->private_->viewer_->resize( width, height );
+  if ( !this->private_->in_size_move_ )
+  {
+    this->private_->viewer_->resize( width, height );
+  }
 }
 
 void QtRenderWidget::mouseMoveEvent( QMouseEvent * event )
