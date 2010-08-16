@@ -38,10 +38,8 @@ SCI_REGISTER_TOOL( Seg3D, BinaryDilateErodeFilter )
 namespace Seg3D
 {
 
-const size_t BinaryDilateErodeFilter::VERSION_NUMBER_C = 1;
-
-BinaryDilateErodeFilter::BinaryDilateErodeFilter( const std::string& toolid, bool auto_number ) :
-  SingleTargetTool( Core::VolumeType::MASK_E, toolid, VERSION_NUMBER_C, auto_number )
+BinaryDilateErodeFilter::BinaryDilateErodeFilter( const std::string& toolid ) :
+  SingleTargetTool( Core::VolumeType::MASK_E, toolid )
 {
   // Need to set ranges and default values for all parameters
   this->add_state( "dilate", this->dilate_state_, 1, 1, 100, 1 );

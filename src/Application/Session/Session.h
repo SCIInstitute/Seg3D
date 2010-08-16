@@ -79,9 +79,6 @@ public:
   // SAVE_CURRENT_STATE:
   // this function will take a snapshot of the current state of the project and save it
   bool save( boost::filesystem::path path, const std::string& session_name );
-  
-private:
-  const static size_t VERSION_NUMBER_C;
 
 };
 

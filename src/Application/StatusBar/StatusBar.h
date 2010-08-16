@@ -89,8 +89,6 @@ public:
 private:
   StatusBarPrivateHandle private_;
 
-private:
-  const static size_t VERSION_NUMBER_C;
 };
 
 } // end namespace Seg3D

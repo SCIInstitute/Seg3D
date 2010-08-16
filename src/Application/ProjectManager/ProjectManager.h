@@ -166,7 +166,7 @@ private:
   boost::posix_time::ptime  last_saved_session_time_stamp_;
   std::vector< Core::Color >  project_colors_;
   boost::filesystem::path   local_projectmanager_path_;
-  const static size_t     VERSION_NUMBER_C;
+
   bool            session_saving_;
   bool            changing_projects_;
 

@@ -38,10 +38,9 @@ SCI_REGISTER_TOOL( Seg3D, ThresholdSegmentationLSFilter )
 namespace Seg3D
 {
 
-const size_t ThresholdSegmentationLSFilter::VERSION_NUMBER_C = 1;
 
-ThresholdSegmentationLSFilter::ThresholdSegmentationLSFilter( const std::string& toolid, bool auto_number ) :
-  Tool( toolid, VERSION_NUMBER_C, auto_number )
+ThresholdSegmentationLSFilter::ThresholdSegmentationLSFilter( const std::string& toolid ) :
+  Tool( toolid )
 {
   // add default values for the the states
   add_state( "target_layer", this->target_layer_state_, "<none>" );

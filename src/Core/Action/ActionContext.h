@@ -41,10 +41,10 @@
 #include <boost/utility.hpp>
 
 // Application includes
-#include <Core/Resource/ResourceLock.h>
-#include <Core/Action/ActionResult.h>
-
 #include <Core/Utils/EnumClass.h>
+#include <Core/Utils/Notifier.h>
+
+#include <Core/Action/ActionResult.h>
 
 namespace Core
 {
@@ -149,7 +149,7 @@ public:
 public:
   virtual void report_status( ActionStatus status );
   virtual void report_result( const ActionResultHandle& result );
-  virtual void report_need_resource( ResourceLockHandle& resource );
+  virtual void report_need_resource( NotifierHandle& notifier );
 
   // -- Report that action was done --
 public:

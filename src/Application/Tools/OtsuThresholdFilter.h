@@ -46,7 +46,7 @@ SEG3D_TOOL_URL( "http://seg3d.org/" )
 )
 
 public:
-  OtsuThresholdFilter( const std::string& toolid, bool auto_number = true );
+  OtsuThresholdFilter( const std::string& toolid );
   virtual ~OtsuThresholdFilter();
 
   // -- constraint parameters --
@@ -69,9 +69,6 @@ public:
   Core::StateStringHandle target_layer_state_;
 
   Core::StateRangedIntHandle order_state_;
-
-private:
-  const static size_t VERSION_NUMBER_C;
 
 };
 

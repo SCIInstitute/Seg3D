@@ -638,10 +638,8 @@ void PaintToolPrivate::setup_paint_info( PaintInfo& paint_info, int x0, int y0, 
 // Implementation of class PaintTool
 //////////////////////////////////////////////////////////////////////////
 
-const size_t PaintTool::VERSION_NUMBER_C = 1;
-
-PaintTool::PaintTool( const std::string& toolid, bool auto_number ) :
-  Tool( toolid, VERSION_NUMBER_C, auto_number ),
+PaintTool::PaintTool( const std::string& toolid ) :
+  Tool( toolid ),
   private_( new PaintToolPrivate )
 {
   this->private_->paint_tool_ = this;

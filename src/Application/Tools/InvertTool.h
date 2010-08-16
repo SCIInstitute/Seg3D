@@ -47,7 +47,7 @@ SEG3D_TOOL_URL( "http://seg3d.org/" )
 
   // -- constructor/destructor --
 public:
-  InvertTool( const std::string& toolid, bool auto_number = true );
+  InvertTool( const std::string& toolid );
   virtual ~InvertTool();
 
 

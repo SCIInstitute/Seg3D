@@ -38,10 +38,8 @@ SCI_REGISTER_TOOL( Seg3D, BooleanFilter )
 namespace Seg3D
 {
 
-const size_t BooleanFilter::VERSION_NUMBER_C = 1;
-
-BooleanFilter::BooleanFilter( const std::string& toolid, bool auto_number ) :
-  Tool( toolid, VERSION_NUMBER_C, auto_number )
+BooleanFilter::BooleanFilter( const std::string& toolid ) :
+  Tool( toolid )
 {
   // add default values for the the states
   add_state( "mask_a", this->mask_a_state_, "<none>" );

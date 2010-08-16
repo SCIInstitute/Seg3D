@@ -43,27 +43,44 @@ namespace Core
 class ActionInfoPrivate 
 {
   public:
+    // Definition of the action in XML
     std::string definition_;
   
+    // The type of the action, i.e. the name with which it should be called
     std::string type_;
+
+    // Description of the action, i.e. what does it do
+    std::string description_;
     
+    // Vector of arguments that need to be passed in
     std::vector<std::string> argument_;
+    // Vector of descriptions per argument
     std::vector<std::string> argument_description_;
     
-    std::vector<std::string> key_;
+    // Vector of keys that can be added
+    std::vector<std::string> key_;    
+    // Vector of default values for each key
     std::vector<std::string> key_default_value_;
+    // Vector of descriptions for each key
     std::vector<std::string> key_description_;
     
-    std::string description_;
+    // Description of how to use the action
     std::string usage_;
+    
+    // Test whether the action described was valid or not
+    // NOTE: If not valid the program will not register the action
+    bool valid_;
 };
 
 
 ActionInfo::ActionInfo( const std::string& definition ) :
   private_( new ActionInfoPrivate )
 {
-  CORE_LOG_DEBUG( std::string( "Registering definition = " ) + definition );
+  this->private_->valid_ = false;
 
+  CORE_LOG_MESSAGE( std::string( "Registering action: " ) + definition );
+
+  // NOTE: We need to add an end line, otherwise tinyXML does not accept the xml string
   this->private_->definition_ = definition + "\n";
 
   // Define a document
@@ -72,8 +89,9 @@ ActionInfo::ActionInfo( const std::string& definition ) :
   // Parse the xml content into the DOM tree
   if ( ! ( doc.Parse( this->private_->definition_.c_str() ) ) )
   {
-    CORE_LOG_DEBUG( "Could not parse the XML definition of an action" );
-    CORE_THROW_INVALIDARGUMENT( "Could not parse the XML definition of an action" );
+    CORE_LOG_ERROR( "Action Registration: Could not parse the XML definition of an action" );
+    CORE_LOG_ERROR( "Action Registration: Skipping registration of this action" );
+    return;
   }
 
   // NOTE: TiXmlHandles are not used for garbage collection
@@ -86,16 +104,32 @@ ActionInfo::ActionInfo( const std::string& definition ) :
   for ( TiXmlElement* parameter_element = hDoc.FirstChildElement().Element()
     ; parameter_element; parameter_element = parameter_element->NextSiblingElement() )  
   {
-    std::string type( parameter_element->Value() );
+    // NOTE: Cannot pass the pointer directly into the string, as the string can be empty.
+    // In that case a zero pointer is returned and STL does not handle that case for us
+    std::string type;
+    if ( parameter_element->Value() )
+    {
+      type = parameter_element->Value();
+    }
+    
     if ( type == "argument" )
     {
-      std::string name( parameter_element->Attribute( "name" ) );
-      std::string description( parameter_element->GetText() );
+      std::string name;
+      if ( parameter_element->Attribute( "name" ) ) 
+      {
+        name = parameter_element->Attribute( "name" );
+      }
+      std::string description;
+      if ( parameter_element->GetText() )
+      {
+        description = parameter_element->GetText();
+      }
       
       if ( name.empty() )
       {
-        CORE_LOG_DEBUG( "Action argument needs to have name" );
-        CORE_THROW_INVALIDARGUMENT( "Action argument needs to have name" );
+        CORE_LOG_ERROR( "Action Registration: Action argument needs to have name." );
+        CORE_LOG_ERROR( "Action Registration: Skipping registration of this action" );
+        return;
       }
       
       this->private_->argument_.push_back( name );
@@ -103,29 +137,53 @@ ActionInfo::ActionInfo( const std::string& definition ) :
     }
     else if ( type == "action" )
     {
-      std::string name( parameter_element->Attribute( "name" ) );
-      std::string description( parameter_element->GetText() );
+      std::string name;
+      if ( parameter_element->Attribute( "name" ) )
+      {
+        name = parameter_element->Attribute( "name" );
+      }
+      std::string description;
+      if ( parameter_element->GetText() )
+      {
+        description = parameter_element->GetText();
+      }
       
       if ( name.empty() )
       {
-          CORE_LOG_DEBUG( "Action needs to have name" );
-        CORE_THROW_INVALIDARGUMENT( "Action needs to have name" );
+        CORE_LOG_ERROR( "Action Registration: Action needs to have name." );
+        CORE_LOG_ERROR( "Action Registration: Skipping registration of this action" );
+        return;
       }
       
       this->private_->type_ = name;
       this->private_->description_ = description;
+      
+      // XML has the passed the minimum definition requirement
       found_action = true;
     }
     else if ( type == "key" )
     {
-      std::string name( parameter_element->Attribute( "name" ) );
-      std::string default_value( parameter_element->Attribute( "default" ) );
-      std::string description( parameter_element->GetText() );
+      std::string name;
+      if ( parameter_element->Attribute( "name" ) )
+      {
+        name = parameter_element->Attribute( "name" );
+      }
+      std::string default_value;
+      if ( parameter_element->Attribute( "default" ) )
+      {
+        default_value = parameter_element->Attribute( "default" );
+      }
+      std::string description;
+      if ( parameter_element->GetText() )
+      {
+        description = parameter_element->GetText();
+      }
       
       if ( name.empty() )
-      {
-        CORE_LOG_DEBUG( "Action key/value pair needs to have name" );
-        CORE_THROW_INVALIDARGUMENT( "Action key/value pair needs to have name" );
+      {       
+        CORE_LOG_ERROR( "Action Registration: Action key/value pair needs to have name." );
+        CORE_LOG_ERROR( "Action Registration: Skipping registration of this action" );
+        return;
       }
       
       this->private_->key_.push_back( name );
@@ -136,7 +194,9 @@ ActionInfo::ActionInfo( const std::string& definition ) :
 
   if ( found_action == false )
   {
-    CORE_THROW_LOGICERROR( "Need an action tag in the definition of an action" );
+    CORE_LOG_ERROR( "Need an action tag in the definition of an action" );
+    CORE_LOG_ERROR( "Action Registration: Skipping registration of this action" );
+    return;
   }
   
   std::string usage = this->private_->type_;
@@ -152,6 +212,9 @@ ActionInfo::ActionInfo( const std::string& definition ) :
   }
 
   this->private_->usage_ = usage;
+  
+  // We parsed everything, so action info is now valid
+  this->private_->valid_ = true;
 }
 
 std::string ActionInfo::get_definition() const
@@ -223,6 +286,12 @@ std::string ActionInfo::get_key_description( size_t index ) const
   return this->private_->key_description_[ index ];
 }
 
+bool ActionInfo::is_valid() const
+{
+  return this->private_->valid_;
+}
+
+// Define a mutex that protects all of the ActionInfo classes
 // Needs to be defined somewhere, so it is unique
 ActionInfo::mutex_type ActionInfo::mutex_;
 

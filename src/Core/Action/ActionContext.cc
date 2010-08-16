@@ -66,7 +66,7 @@ void ActionContext::report_status( ActionStatus status )
   status_ = status;
 }
 
-void ActionContext::report_need_resource( ResourceLockHandle& resource )
+void ActionContext::report_need_resource( NotifierHandle& notifier )
 {
 }
 

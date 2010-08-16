@@ -45,12 +45,10 @@
 namespace Seg3D
 {
 
-const size_t ViewerManager::VERSION_NUMBER_C = 1;
-
 CORE_SINGLETON_IMPLEMENTATION( ViewerManager );
 
 ViewerManager::ViewerManager() :
-  StateHandler( "view", VERSION_NUMBER_C, false ),
+  StateHandler( "view", false ),
   signal_block_count_( 0 )
 {
   // Allow states to be set from outside of the application thread

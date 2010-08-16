@@ -43,7 +43,7 @@ typedef boost::shared_ptr< SeedPointsToolPrivate > SeedPointsToolPrivateHandle;
 class SeedPointsTool : public Tool
 {
 public:
-   SeedPointsTool( const std::string& toolid, size_t version_number, bool auto_number = true );
+   SeedPointsTool( const std::string& toolid );
    virtual ~SeedPointsTool() = 0;
 
 public:

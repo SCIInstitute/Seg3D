@@ -67,6 +67,9 @@ ActionFactory::~ActionFactory()
 
 void ActionFactory::register_action( ActionBuilderHandle builder, ActionInfoHandle info )
 {
+  // Only register valid actions
+  if ( ! info->is_valid() ) return;
+  
   // Make a new entry for this action
   ActionFactoryEntry entry;
   entry.builder_ = builder;
@@ -90,9 +93,6 @@ void ActionFactory::register_action( ActionBuilderHandle builder, ActionInfoHand
 
   // Register the action
   private_->actions_[ name ] = entry;
-  
-  // Add debug information for the registration process
-  CORE_LOG_DEBUG( std::string("Registering action : ") +  name ); 
 }
 
 bool ActionFactory::create_action( const std::string& action_string, ActionHandle& action,

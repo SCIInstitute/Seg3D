@@ -178,7 +178,7 @@ bool ToolFactory::list_tools( ToolInfoList& tool_list )
   return true;
 }
 
-bool ToolFactory::create_tool( const std::string& tool_type, ToolHandle& tool, bool auto_number )
+bool ToolFactory::create_tool( const std::string& tool_type, ToolHandle& tool )
 {
   lock_type lock( get_mutex() );
 
@@ -193,7 +193,7 @@ bool ToolFactory::create_tool( const std::string& tool_type, ToolHandle& tool, b
   if ( it == this->private_->tools_.end() ) return false;
 
   // Step (4): build the tool
-  tool = ( *it ).second.builder_->build( tool_type, auto_number );
+  tool = ( *it ).second.builder_->build( tool_type );
 
   return true;
 }
@@ -217,7 +217,7 @@ bool ToolFactory::create_toolinterface( const std::string& toolinterface_name,
   // Step (3): build the tool
   toolinterface = (*it).second->build();
 
-  return ( true );
+  return true;
 }
 
 } // end namespace seg3D

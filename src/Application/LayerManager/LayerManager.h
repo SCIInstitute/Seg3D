@@ -71,6 +71,10 @@ private:
 public:
   typedef std::list < LayerGroupHandle > group_list_type;
   
+  // -- state manager functions --
+public:
+  virtual int get_session_priority();
+
   // Accessor Functions
 public:
     // Functions for getting a copy of the Layers and Groups with the proper locking
@@ -112,6 +116,9 @@ public:
   // This function returns a handle to the active layer
   LayerHandle get_active_layer();
   
+  
+  // TODO:
+  // These two functions need some redesign
   // GET_LAYER_NAMES:
   // This function returns a vector of layer ID and name pairs of the specified layer type.
   void get_layer_names( std::vector< LayerIDNamePair >& layer_names, 
@@ -121,7 +128,6 @@ public:
   // This function returns a vector of layer ID and name pairs of all layers.
   void get_layer_names( std::vector< LayerIDNamePair >& layer_names );
 
-  virtual int get_session_priority();
 
   // Layer Action Functions
 public:
@@ -187,6 +193,9 @@ public:
   Core::StateStringHandle active_layer_state_;
 
 public:
+  // TODO: There are too many signals in here, we should clean this up
+  // --JS
+
   // -- Signal/Slots --
   typedef boost::signals2::signal< void( LayerHandle ) > layer_signal_type;
   typedef boost::signals2::signal< void( std::string ) > layer_name_signal_type;
@@ -195,6 +204,7 @@ public:
   typedef boost::signals2::signal< void( std::string, int ) > group_at_signal_type;
   typedef boost::signals2::signal< void( std::vector< LayerHandle > ) > layers_signal_type;
   typedef boost::signals2::signal< void() > layers_changed_type;
+  
   // ACTIVE_LAYER_CHANGED_SIGNAL:
   // This signal is triggered after the active layer is changed
   layer_signal_type active_layer_changed_signal_; 
@@ -236,8 +246,8 @@ public:
   // This signal is triggered when a group has been changed
   group_signal_type group_changed_signal_;
   
-  // SOMETHING_CHANGED_SIGNAL:
-  // This gets signaled when we 
+  // LAYERS_CHANGED_SIGNAL:
+  // This gets signaled when the state of any of the layers changed
   layers_changed_type layers_changed_signal_;
 
 protected:
@@ -264,10 +274,6 @@ private:
   
   // currently active layer
   LayerHandle active_layer_;
-
-  // current version number of the LayerManager
-  const static size_t VERSION_NUMBER_C;
-
 };
 
 } // end namespace seg3D

@@ -47,7 +47,7 @@ SEG3D_TOOL_URL( "http://seg3d.org/" )
 
   // -- constructor/destructor --
 public:
-  ThresholdTool( const std::string& toolid, bool auto_number = true );
+  ThresholdTool( const std::string& toolid );
   virtual ~ThresholdTool();
 
   // -- constraint parameters --
@@ -83,8 +83,6 @@ public:
   // Seed Points
   // StateVector<Point>            seed_points_state_;
 
-private:
-  const static size_t VERSION_NUMBER_C;
 };
 
 } // end namespace

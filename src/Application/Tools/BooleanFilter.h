@@ -46,7 +46,7 @@ SEG3D_TOOL_URL( "http://seg3d.org/" )
 )
 
 public:
-  BooleanFilter( const std::string& toolid, bool auto_number = true );
+  BooleanFilter( const std::string& toolid );
   virtual ~BooleanFilter();
 
   // -- constraint parameters --
@@ -77,9 +77,6 @@ public:
   Core::StateOptionHandle example_expressions_state_;
 
   Core::StateBoolHandle replace_state_;
-
-private:
-  const static size_t VERSION_NUMBER_C;
 
 };
 

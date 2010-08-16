@@ -87,6 +87,10 @@ public:
   // GET_URL:
   // Get the help url
   std::string get_url() const;
+  
+  // GET_VERSION:
+  // Get the tool version
+  int get_version() const;
 
 private:
   // Private implementation of this class

@@ -108,6 +108,10 @@ public:
   // The description of key <index>
   std::string get_key_description( size_t index ) const;
   
+  // IS_VALID:
+  //Check the validity of the action description
+  bool is_valid() const;
+  
 private:
   // Private implementation of this class
   ActionInfoPrivateHandle private_;

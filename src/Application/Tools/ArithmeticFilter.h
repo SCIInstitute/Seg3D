@@ -45,7 +45,7 @@ SEG3D_TOOL_URL( "http://seg3d.org/" )
 )
 
 public:
-  ArithmeticFilter( const std::string& toolid, bool auto_number = true );
+  ArithmeticFilter( const std::string& toolid );
   virtual ~ArithmeticFilter();
 
   // -- constraint parameters --

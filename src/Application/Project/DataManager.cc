@@ -38,10 +38,8 @@
 namespace Seg3D
 {
 
-const size_t DataManager::VERSION_NUMBER_C = 1;
-
 DataManager::DataManager() :
-  StateHandler( "datamanager", VERSION_NUMBER_C, false )
+  StateHandler( "datamanager", false )
 { 
   std::vector< std::string> sessions_and_datafiles;
   add_state( "sessions_and_datafiles", this->sessions_and_datafiles_state_, 
@@ -143,14 +141,13 @@ void DataManager::prep_for_save( const boost::filesystem::path& project_path,
       }
       else
       {
-        this->disk_space_used = this->disk_space_used 
-          + static_cast< size_t >( boost::filesystem::file_size( dir_itr->path() ) );
+        this->disk_space_used += static_cast< long long >( boost::filesystem::file_size( dir_itr->path() ) );
       }
     }
   }
 }
 
-size_t DataManager::get_file_size()
+long long DataManager::get_file_size()
 {
   return this->disk_space_used;
 }

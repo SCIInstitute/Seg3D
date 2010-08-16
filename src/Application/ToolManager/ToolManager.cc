@@ -45,8 +45,6 @@
 namespace Seg3D
 {
 
-const size_t ToolManager::VERSION_NUMBER_C = 1;
-
 CORE_SINGLETON_IMPLEMENTATION( ToolManager );
 
 class ToolManagerPrivate
@@ -127,7 +125,7 @@ bool ToolManagerPrivate::handle_wheel( int delta, int x, int y, int buttons, int
 }
 
 ToolManager::ToolManager() :
-  StateHandler( "ToolManager", VERSION_NUMBER_C, false ),
+  StateHandler( "toolmanager", false ),
   private_( new ToolManagerPrivate )
 {
   this->add_state( "active_tool", this->private_->active_tool_state_, Tool::NONE_OPTION_C );
@@ -161,20 +159,19 @@ ToolManager::~ToolManager()
 // Only ActionOpenTool calls this function and this action is only run on the
 // application thread. Hence the function is always executed by the same thread.
 
-bool ToolManager::open_tool( const std::string& tool_type, std::string& new_toolid, 
-  bool create_tool_id /*= true */ )
+bool ToolManager::open_tool( const std::string& tool_type, std::string& new_toolid )
 {
   // Step (1): Make the function thread safe
   lock_type lock( this->get_mutex() );
 
   // Step (2): Add an entry in the debug log
-  CORE_LOG_DEBUG( std::string( "Open tool: " ) + tool_type );
+  CORE_LOG_MESSAGE( std::string( "Open tool: " ) + tool_type );
 
   // Step (4): Build the tool using the factory. This will generate the default
   // settings.
   ToolHandle tool;
 
-  if ( !( ToolFactory::Instance()->create_tool( tool_type, tool, create_tool_id ) ) )
+  if ( !( ToolFactory::Instance()->create_tool( tool_type, tool ) ) )
   {
     CORE_LOG_ERROR( std::string( "Could not create tool of type: '" ) + tool_type + "'" );
     return false;
@@ -204,7 +201,7 @@ void ToolManager::close_tool( const std::string& toolid )
   lock_type lock( this->get_mutex() );
 
   // Step (2): Add an entry in the debug log
-  CORE_LOG_DEBUG( std::string( "Close tool: " ) + toolid );
+  CORE_LOG_MESSAGE( std::string( "Close tool: " ) + toolid );
 
   // Step (3): Find the tool in the list.
   tool_list_type::iterator it = this->private_->tool_list_.find( toolid );
@@ -379,7 +376,7 @@ bool ToolManager::post_load_states( const Core::StateIO& state_io )
   while ( tool_element != 0 )
   {
     std::string toolid( tool_element->Value() );
-    if ( this->open_tool( toolid, toolid, false ) )
+    if ( this->open_tool( toolid, toolid ) )
     {
       ToolHandle tool = this->get_tool( toolid );
       success &= tool->load_states( state_io );

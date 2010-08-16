@@ -45,12 +45,10 @@
 namespace Seg3D
 {
 
-const size_t ProjectManager::VERSION_NUMBER_C = 1;
-
 CORE_SINGLETON_IMPLEMENTATION( ProjectManager );
 
 ProjectManager::ProjectManager() :
-  StateHandler( "projectmanager", VERSION_NUMBER_C, false ),
+  StateHandler( "projectmanager", false ),
   session_saving_( false ),
   changing_projects_( false )
 { 

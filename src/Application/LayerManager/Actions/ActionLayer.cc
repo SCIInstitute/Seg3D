@@ -73,13 +73,6 @@ bool ActionLayer::cache_group_handle( Core::ActionContextHandle& context,
 bool ActionLayer::check_availability( Core::ActionContextHandle& context,
   Core::ActionCachedHandle< LayerHandle >& layer )
 {
-  Core::ResourceLockHandle resource_lock = layer.handle()->get_resource_lock();
-  if ( resource_lock->is_locked() )
-  {
-    context->report_need_resource( resource_lock );
-    return false;
-  }
-  
   return true;
 }
 

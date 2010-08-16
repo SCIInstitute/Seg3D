@@ -46,7 +46,7 @@ SEG3D_TOOL_URL( "http://seg3d.org/" )
 )
 
 public:
-  IntensityCorrectionFilter( const std::string& toolid, bool auto_number = true );
+  IntensityCorrectionFilter( const std::string& toolid );
   virtual ~IntensityCorrectionFilter();
 
   // -- constraint parameters --
@@ -73,9 +73,6 @@ public:
   Core::StateRangedDoubleHandle edge_state_;
 
   Core::StateBoolHandle replace_state_;
-
-private:
-  const static size_t VERSION_NUMBER_C;
 
 };
 

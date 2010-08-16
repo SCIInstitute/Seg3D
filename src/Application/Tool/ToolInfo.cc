@@ -53,6 +53,8 @@ class ToolInfoPrivate
     std::string shortcut_key_;
 
     std::string url_;
+    
+    int version_;
 };
 
 
@@ -91,11 +93,11 @@ ToolInfo::ToolInfo( const std::string& definition ) :
       
       if ( parameter_element->Attribute( "name" ) )
       {
-        name = std::string( parameter_element->Attribute( "name" ) );
+        name = parameter_element->Attribute( "name" );
       }
       if ( parameter_element->GetText() )
       {
-        description = std::string( parameter_element->GetText() );
+        description = parameter_element->GetText();
       }
       
       if ( name.empty() )
@@ -108,26 +110,52 @@ ToolInfo::ToolInfo( const std::string& definition ) :
       this->private_->description_ = description;
       found_tool = true;
     }
-    else if ( type == "menu" && parameter_element->GetText() )
+    else if ( type == "menu" )
     {
-      std::string menu( parameter_element->GetText() );           
+      std::string menu;
+      if ( parameter_element->GetText() )
+      {
+        menu = parameter_element->GetText();
+      }
       this->private_->menu_ = menu;
     }
-    else if ( type == "menulabel" && parameter_element->GetText()  )
+    else if ( type == "menulabel" )
     {
-      std::string menulabel( parameter_element->GetText() );            
+      std::string menulabel;
+      if( parameter_element->GetText() )
+      {
+        menulabel = parameter_element->GetText();
+      }         
       this->private_->menu_label_ = menulabel;
     }
-    else if ( type == "shortcutkey" && parameter_element->GetText() )
+    else if ( type == "shortcutkey" )
     {
-      std::string shortcut_key( parameter_element->GetText() );           
+      std::string shortcut_key;
+      if( parameter_element->GetText() )
+      {
+        shortcut_key = parameter_element->GetText();
+      }
       this->private_->shortcut_key_ = shortcut_key;
     }
     else if ( type == "url" )
     {
-      std::string url( parameter_element->GetText() );            
+      std::string url;
+      if( parameter_element->GetText() )
+      {
+        url = parameter_element->GetText();
+      }         
       this->private_->url_ = url;
     }
+    else if ( type == "version" )
+    {
+      std::string version;
+      if ( parameter_element->GetText() )
+      {
+        version = parameter_element->GetText();
+      }           
+      Core::ImportFromString( version, this->private_->version_ );
+    }
+
   }
 
   if ( found_tool == false )
@@ -169,6 +197,11 @@ std::string ToolInfo::get_shortcut_key() const
 std::string ToolInfo::get_url() const
 {
   return this->private_->url_;
+}
+
+int ToolInfo::get_version() const
+{
+  return this->private_->version_;
 }
 
 // Needs to be defined somewhere, so it is unique

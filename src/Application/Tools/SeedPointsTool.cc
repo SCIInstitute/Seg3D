@@ -131,9 +131,8 @@ bool SeedPointsToolPrivate::find_point( double world_x, double world_y,
 // Implementation of class SeedPointsTool
 //////////////////////////////////////////////////////////////////////////
 
-SeedPointsTool::SeedPointsTool( const std::string& toolid, 
-                 size_t version_number, bool auto_number ) :
-  Tool( toolid, version_number, auto_number ),
+SeedPointsTool::SeedPointsTool( const std::string& toolid ) :
+  Tool( toolid ),
   private_( new SeedPointsToolPrivate )
 {
   this->private_->tool_ = this;

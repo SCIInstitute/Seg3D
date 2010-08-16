@@ -238,21 +238,21 @@ public: \
   static std::string Usage() { return GetActionInfo()->get_usage(); } \
   static Core::ActionInfoHandle GetActionInfo() \
   {\
-    static bool initialized; \
-    static Core::ActionInfoHandle info; \
-    if ( !initialized ) \
+    static bool initialized_; \
+    static Core::ActionInfoHandle info_; \
+    if ( !initialized_ ) \
     {\
       {\
         Core::ActionInfo::lock_type lock( Core::ActionInfo::GetMutex() );\
         std::string definition = std::string( "<?xml version=\"1.0\"?>\n" definition_string "\n" ); \
-        if ( !info ) info = Core::ActionInfoHandle( new Core::ActionInfo( definition ) ); \
+        if ( !info_ ) info_ = Core::ActionInfoHandle( new Core::ActionInfo( definition ) ); \
       }\
       {\
         Core::ActionInfo::lock_type lock( Core::ActionInfo::GetMutex() );\
-        initialized = true;\
+        initialized_ = true;\
       }\
     }\
-    return info;\
+    return info_;\
   } \
   \
   virtual Core::ActionInfoHandle get_action_info() const { return GetActionInfo(); }

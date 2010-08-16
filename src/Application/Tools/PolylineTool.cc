@@ -38,10 +38,8 @@ SCI_REGISTER_TOOL( Seg3D, PolylineTool )
 namespace Seg3D
 {
 
-const size_t PolylineTool::VERSION_NUMBER_C = 1;
-
-PolylineTool::PolylineTool( const std::string& toolid, bool auto_number ) :
-  Tool( toolid, VERSION_NUMBER_C, auto_number )
+PolylineTool::PolylineTool( const std::string& toolid ) :
+  Tool( toolid )
 {
   // Need to set ranges and default values for all parameters
   add_state( "target", this->target_layer_state_, "<none>" );

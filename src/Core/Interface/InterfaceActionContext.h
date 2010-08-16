@@ -70,7 +70,7 @@ public:
 
   // -- Report back status and results --
 public:
-  virtual void report_need_resource( ResourceLockHandle& resource );
+  virtual void report_need_resource( NotifierHandle& resource );
 
   // -- Report that action was done --
 public:

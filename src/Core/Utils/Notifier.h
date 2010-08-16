@@ -26,44 +26,43 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_LAYER_LabelLAYER_H
-#define APPLICATION_LAYER_LabelLAYER_H
+#ifndef CORE_UTILS_NOTIFIER_H
+#define CORE_UTILS_NOTIFIER_H
 
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
-#pragma once
-#endif
+// Boost includes
+#include <boost/utility.hpp>
+#include <boost/smart_ptr.hpp>
 
-// Application includes
-#include <Application/Layer/Layer.h>
-
-namespace Seg3D
+namespace Core
 {
 
-// CLASS LabelLayer
+class Notifier;
+typedef boost::shared_ptr<Notifier> NotifierHandle;
 
-// Forward declarations
-class LabelLayer;
-typedef boost::shared_ptr< LabelLayer > LabelLayerHandle;
-
-// Class definition
-class LabelLayer : public Layer
+class Notifier : public boost::noncopyable
 {
-
-  // -- constructor/destructor --
+  // -- constructor / destructor --
 public:
+  Notifier();
+  virtual ~Notifier();
 
-  LabelLayer( const std::string& name, const Core::VolumeHandle& volume );
-  virtual ~LabelLayer();
-
-  virtual Core::VolumeType type() const { return Core::VolumeType::LABEL_E; }
+public: 
+  // WAIT:
+  // Wait for the event to be triggered. If the event was already triggered this function
+  // returns immediately.
+  virtual void wait() = 0;
   
-  virtual const Core::GridTransform get_grid_transform() const = 0;
+  // WAIT:
+  // Wait for the event to be triggered. If the event was already triggered this function
+  // returns immediately with true. After the timeout the function returns. If a timeout
+  // was triggered it returns false.
+  virtual bool wait( double timeout ) = 0;
 
-public:
-
-  // TODO: Need to generate this class
+  // GET_NAME:
+  // The name of the resource we are waiting for
+  virtual std::string get_name() const = 0;
 };
 
-} // end namespace Seg3D
+} // end namespace Core
 
 #endif

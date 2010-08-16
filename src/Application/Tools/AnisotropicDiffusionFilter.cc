@@ -37,12 +37,10 @@ SCI_REGISTER_TOOL( Seg3D, AnisotropicDiffusionFilter )
 namespace Seg3D
 {
 
-const size_t AnisotropicDiffusionFilter::VERSION_NUMBER_C = 1;
-
 // Register the tool into the tool factory
 
-AnisotropicDiffusionFilter::AnisotropicDiffusionFilter( const std::string& toolid, bool auto_number ) :
-  SingleTargetTool( Core::VolumeType::DATA_E, toolid, VERSION_NUMBER_C, auto_number )
+AnisotropicDiffusionFilter::AnisotropicDiffusionFilter( const std::string& toolid ) :
+  SingleTargetTool( Core::VolumeType::DATA_E, toolid )
 {
   // Need to set ranges and default values for all parameters 
   this->add_state( "iterations", this->iterations_state_, 1, 1, 100, 1 );

@@ -44,12 +44,10 @@
 namespace Seg3D
 {
 
-const size_t PreferencesManager::VERSION_NUMBER_C = 1;
-
 CORE_SINGLETON_IMPLEMENTATION( PreferencesManager );
 
 PreferencesManager::PreferencesManager() :
-  StateHandler( "preferences", VERSION_NUMBER_C, false )
+  StateHandler( "preferences", false )
 { 
   this->set_initializing( true );
 

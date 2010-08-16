@@ -38,10 +38,8 @@ SCI_REGISTER_TOOL( Seg3D, IntensityCorrectionFilter )
 namespace Seg3D
 {
 
-const size_t IntensityCorrectionFilter::VERSION_NUMBER_C = 1;
-
-IntensityCorrectionFilter::IntensityCorrectionFilter( const std::string& toolid, bool auto_number ) :
-  Tool( toolid, VERSION_NUMBER_C, auto_number )
+IntensityCorrectionFilter::IntensityCorrectionFilter( const std::string& toolid ) :
+  Tool( toolid )
 {
   // Need to set ranges and default values for all parameters
   add_state( "target", this->target_layer_state_, "<none>" );

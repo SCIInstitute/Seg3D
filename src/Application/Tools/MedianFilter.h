@@ -46,7 +46,7 @@ SEG3D_TOOL_URL( "http://seg3d.org/" )
 
   // -- constructor/destructor --
 public:
-  MedianFilter( const std::string& toolid, bool auto_number = true );
+  MedianFilter( const std::string& toolid );
   virtual ~MedianFilter();
 
   // -- constraint parameters --
@@ -71,9 +71,6 @@ public:
   Core::StateRangedIntHandle radius_state_;
 
   Core::StateBoolHandle replace_state_;
-
-private:
-  const static size_t VERSION_NUMBER_C;
 
 };
 

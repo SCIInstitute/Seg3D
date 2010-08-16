@@ -45,7 +45,6 @@
 #include <Core/Action/Action.h>
 #include <Core/Application/Application.h>
 #include <Core/Interface/Interface.h>
-#include <Core/Resource/ResourceLock.h>
 #include <Core/State/State.h>
 #include <Core/Volume/Volume.h>
 
@@ -64,9 +63,10 @@ class Layer : public Core::StateHandler
 
   // -- Constructor/destructor --
 protected:
-  // NOTE: Use the specific class to build the layer
-  Layer( const std::string& name, size_t version_number );
-  Layer( const std::string& name, size_t version_number, const std::string& state_id );
+  // NOTE: Use the derived class to build the layer
+  Layer( const std::string& name );
+  Layer( const std::string& name, const std::string& state_id );
+
   virtual ~Layer();
 
 private:
@@ -122,17 +122,6 @@ public:
   
 private:
   bool abort_;
-
-  // -- Layer Locking system --
-public:
-  
-  // GET_RESOURCE_LOCK:
-  // This function returns the resource lock that ensures that an action
-  // cannot be executed on a resource that is being computed.
-  Core::ResourceLockHandle get_resource_lock();
-    
-private:
-  Core::ResourceLockHandle resource_lock_;
   
   // -- State variables --
 public:
@@ -161,7 +150,7 @@ public:
 
 protected:
   // State that stores the generation of its datablock
-  Core::StateIntHandle generation_state_;
+  Core::StateLongLongHandle generation_state_;
   
   // State that stores the last action that was played
   Core::StateStringHandle last_action_state_;

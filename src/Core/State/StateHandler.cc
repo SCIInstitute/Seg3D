@@ -57,9 +57,6 @@ public:
   // The database with the actual states 
   state_map_type state_map_;
 
-  // Version number of this state handler
-  size_t version_number_;
-
   // Check whether this state handler is still valid ( invalidate will unset this )
   bool valid_;
   
@@ -69,10 +66,9 @@ public:
 };
 
 
-StateHandler::StateHandler( const std::string& type_str, size_t version_number, bool auto_id )
+StateHandler::StateHandler( const std::string& type_str, bool auto_id )
 {
   this->private_ = new StateHandlerPrivate;
-  this->private_->version_number_ = version_number;
   this->private_->statehandler_id_ = StateEngine::Instance()->
     register_state_handler( type_str, this, auto_id );
     
@@ -145,6 +141,12 @@ int StateHandler::get_session_priority()
   return -1;
 }
 
+int StateHandler::get_version()
+{
+  // Default version of any state handler
+  return 1;
+}
+
 std::string StateHandler::create_state_id( const std::string& key ) const
 {
   return this->get_statehandler_id() + "::" + key;
@@ -200,7 +202,7 @@ bool StateHandler::load_states( const StateIO& state_io )
   // Query the version number in the loaded XML file.
   // NOTE: If the call fails, loaded_verison will not be changed, and thus is the same
   // as the current version number.
-  int loaded_version = static_cast< int >( this->private_->version_number_ );
+  int loaded_version = static_cast< int >( this->get_version() );
   sh_element->QueryIntAttribute( "version", &loaded_version );
 
   // Build a priority queue of all the states sorted in the descending order of
@@ -222,6 +224,7 @@ bool StateHandler::load_states( const StateIO& state_io )
   std::map< std::string, std::string > state_value_str_map;
   const TiXmlElement* state_element = 
     sh_element->FirstChildElement( STATE_ELEMENT_NAME.c_str() );
+
   bool success = true;
   while ( success && state_element != 0 )
   {
@@ -249,6 +252,11 @@ bool StateHandler::load_states( const StateIO& state_io )
   {
     return false;
   }
+
+  // TODO:
+  // We need a virtual function here, that allows the values in state_value_str_map to be 
+  // translated into the latest version
+  // --JS
 
   // Import the state values in the correct order.
   while ( !state_queue.empty() )
@@ -382,7 +390,7 @@ void StateHandler::save_states( StateIO& state_io )
 {
   TiXmlElement* sh_element = new TiXmlElement( this->get_statehandler_id() );
   state_io.get_current_element()->LinkEndChild( sh_element );
-  sh_element->SetAttribute( "version", static_cast< int >( this->private_->version_number_ ) );
+  sh_element->SetAttribute( "version", this->get_version() );
   
   state_io.push_current_element();
   state_io.set_current_element( sh_element );

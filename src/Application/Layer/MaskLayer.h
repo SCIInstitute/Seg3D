@@ -129,7 +129,6 @@ private:
 private:
   
   Core::StateIntHandle bit_state_;
-  const static size_t VERSION_NUMBER_C;
   Core::MaskVolumeHandle mask_volume_;
   Core::IsosurfaceHandle isosurface_;
   

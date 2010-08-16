@@ -38,10 +38,8 @@ SCI_REGISTER_TOOL( Seg3D, FillHolesFilter )
 namespace Seg3D
 {
 
-const size_t FillHolesFilter::VERSION_NUMBER_C = 1;
-
-FillHolesFilter::FillHolesFilter( const std::string& toolid, bool auto_number ) :
-  Tool( toolid, VERSION_NUMBER_C, auto_number )
+FillHolesFilter::FillHolesFilter( const std::string& toolid ) :
+  Tool( toolid )
 {
   // Need to set ranges and default values for all parameters
   add_state( "target", this->target_layer_state_, "<none>" );

@@ -46,7 +46,7 @@ SEG3D_TOOL_URL( "http://seg3d.org/" )
 )
 
 public:
-  MaskDataFilter( const std::string& toolid, bool auto_number = true );
+  MaskDataFilter( const std::string& toolid );
   virtual ~MaskDataFilter();
 
   // -- constraint parameters --
@@ -74,9 +74,6 @@ public:
   Core::StateOptionHandle replace_with_state_;
 
   Core::StateBoolHandle replace_state_;
-
-private:
-  const static size_t VERSION_NUMBER_C;
 
 };
 

@@ -38,10 +38,8 @@ SCI_REGISTER_TOOL( Seg3D, NeighborhoodConnectedFilter )
 namespace Seg3D
 {
 
-const size_t NeighborhoodConnectedFilter::VERSION_NUMBER_C = 1;
-
-NeighborhoodConnectedFilter::NeighborhoodConnectedFilter( const std::string& toolid, bool auto_number ) :
-  Tool( toolid, VERSION_NUMBER_C, auto_number )
+NeighborhoodConnectedFilter::NeighborhoodConnectedFilter( const std::string& toolid ) :
+  Tool( toolid )
 {
   // Need to set ranges and default values for all parameters
   add_state( "target", this->target_layer_state_, "<none>" );

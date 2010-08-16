@@ -46,7 +46,7 @@ SEG3D_TOOL_URL( "http://seg3d.org/" )
 )
 
 public:
-  GradientMagnitudeFilter( const std::string& toolid, bool auto_number = true );
+  GradientMagnitudeFilter( const std::string& toolid );
   virtual ~GradientMagnitudeFilter();
 
   // -- constraint parameters --
@@ -68,9 +68,6 @@ public:
   // Layerid of the target layer
   Core::StateStringHandle target_layer_state_;
   Core::StateBoolHandle replace_state_;
-
-private:
-  const static size_t VERSION_NUMBER_C;
 
 };
 

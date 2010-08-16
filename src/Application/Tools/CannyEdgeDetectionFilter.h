@@ -46,7 +46,7 @@ SEG3D_TOOL_URL( "http://seg3d.org/" )
 )
 
 public:
-  CannyEdgeDetectionFilter( const std::string& toolid, bool auto_number = true );
+  CannyEdgeDetectionFilter( const std::string& toolid );
   virtual ~CannyEdgeDetectionFilter();
 
   // -- constraint parameters --
@@ -75,9 +75,6 @@ public:
   Core::StateRangedDoubleHandle threshold_state_;
 
   Core::StateBoolHandle replace_state_;
-
-private:
-  const static size_t VERSION_NUMBER_C;
 
 };
 

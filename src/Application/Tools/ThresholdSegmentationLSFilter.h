@@ -47,7 +47,7 @@ SEG3D_TOOL_URL( "http://seg3d.org/" )
 
 
 public:
-  ThresholdSegmentationLSFilter( const std::string& toolid, bool auto_number = true );
+  ThresholdSegmentationLSFilter( const std::string& toolid );
   virtual ~ThresholdSegmentationLSFilter();
 
   // -- constraint parameters --
@@ -84,9 +84,6 @@ public:
   Core::StateRangedDoubleHandle edge_state_;
 
   Core::StateBoolHandle replace_state_;
-
-private:
-  const static size_t VERSION_NUMBER_C;
 
 };
 

@@ -42,18 +42,15 @@ SCI_REGISTER_TOOL( Seg3D, CurvatureAnisotropicDiffusionFilter )
 namespace Seg3D
 {
 
-const size_t CurvatureAnisotropicDiffusionFilter::VERSION_NUMBER_C = 1;
-
 // Register the tool into the tool factory
 
-CurvatureAnisotropicDiffusionFilter::CurvatureAnisotropicDiffusionFilter( 
-  const std::string& toolid, bool auto_number ) :
-  SingleTargetTool( Core::VolumeType::DATA_E, toolid, VERSION_NUMBER_C, auto_number )
+CurvatureAnisotropicDiffusionFilter::CurvatureAnisotropicDiffusionFilter( const std::string& toolid ) :
+  SingleTargetTool( Core::VolumeType::DATA_E, toolid )
 {
   // Need to set ranges and default values for all parameters 
-  this->add_state( "iterations", this->iterations_state_, 1, 1, 100, 1 );
-  this->add_state( "steps", this->steps_state_, 1, 1, 100, 1 );
-  this->add_state( "conductance", this->conductance_state_, .10, .10, 10.0, .10 );
+  this->add_state( "iterations", this->iterations_state_, 5, 1, 100, 1 );
+  this->add_state( "integration_step", this->integration_step_state_, 0.0625, 0.0 , 0.1, 0.005 );
+  this->add_state( "conductance", this->conductance_state_, .10, .10, 10.0, .01 );
   this->add_state( "replace", this->replace_state_, false );
 
 }
@@ -69,7 +66,7 @@ void CurvatureAnisotropicDiffusionFilter::execute( Core::ActionContextHandle con
   ActionCurvatureAnisotropicDiffusionFilter::Dispatch( context,
     this->target_layer_state_->get(),
     this->iterations_state_->get(),
-    this->steps_state_->get(),
+    this->integration_step_state_->get(),
     this->conductance_state_->get(),
     this->replace_state_->get() );
 }

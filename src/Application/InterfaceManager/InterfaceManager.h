@@ -101,7 +101,6 @@ public:
 private:
   boost::mutex windowid_list_mutex_;
   windowid_list_type windowid_list_;
-  const static size_t VERSION_NUMBER_C;
 
 };
 

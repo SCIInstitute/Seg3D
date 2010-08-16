@@ -219,7 +219,7 @@ private:
   
 };
 
-#define FOREACH_DATATYPE( DATATYPE, ... ) \
+#define SWITCH_DATATYPE( DATATYPE, ... ) \
 { \
   typedef itk::Image< float, 3> FLOAT_IMAGE_TYPE; \
   typedef itk::Image< float, 3> UCHAR_IMAGE_TYPE; \

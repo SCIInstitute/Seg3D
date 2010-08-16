@@ -57,9 +57,9 @@ void AppControllerContext::report_message( const std::string& message )
   AppController::PostActionMessage( controller_, message );
 }
 
-void AppControllerContext::report_need_resource( const Core::ResourceLockHandle& resource )
+void AppControllerContext::report_need_resource( const Core::NotifierHandle& notifier )
 {
-  std::string message = std::string( "Resource '" ) + resource->name() + std::string(
+  std::string message = std::string( "'" ) + notifier->get_name() + std::string(
       "' is currently unavailable" );
   AppController::PostActionMessage( controller_, message );
 }

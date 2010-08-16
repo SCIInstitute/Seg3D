@@ -219,8 +219,6 @@ public:
 private:
   ViewerPrivateHandle private_;
 
-  const static size_t VERSION_NUMBER_C;
-
 };
 
 } // end namespace Seg3D

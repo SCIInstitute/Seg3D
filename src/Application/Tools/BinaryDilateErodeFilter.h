@@ -46,7 +46,7 @@ SEG3D_TOOL_URL( "http://seg3d.org/" )
 )
 
 public:
-  BinaryDilateErodeFilter( const std::string& toolid, bool auto_number = true );
+  BinaryDilateErodeFilter( const std::string& toolid );
   virtual ~BinaryDilateErodeFilter();
 
   // -- state --
@@ -56,9 +56,6 @@ public:
   Core::StateRangedIntHandle erode_state_;
 
   Core::StateBoolHandle replace_state_;
-
-private:
-  const static size_t VERSION_NUMBER_C;
 
 };
 

@@ -46,7 +46,7 @@ SEG3D_TOOL_URL( "http://seg3d.org/" )
 )
 
 public:
-  NeighborhoodConnectedFilter( const std::string& toolid, bool auto_number = true );
+  NeighborhoodConnectedFilter( const std::string& toolid );
   virtual ~NeighborhoodConnectedFilter();
 
   // -- constraint parameters --
@@ -67,9 +67,6 @@ private:
 public:
   // Layerid of the target layer
   Core::StateStringHandle target_layer_state_;
-
-private:
-  const static size_t VERSION_NUMBER_C;
 
 };
 

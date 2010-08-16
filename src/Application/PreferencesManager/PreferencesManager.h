@@ -120,9 +120,6 @@ private:
 private:
   std::vector< Core::Color > default_colors_;
   boost::filesystem::path local_config_path_;
-  const static size_t VERSION_NUMBER_C;
-  
-
     
 };
 

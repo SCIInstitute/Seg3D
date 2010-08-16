@@ -56,22 +56,16 @@ const std::string Layer::COLOR_MENU_C( "color" );
 const std::string Layer::CONTRAST_MENU_C( "contrast" );
 const std::string Layer::APPEARANCE_MENU_C( "appearance" );
 
-Layer::Layer( const std::string& name, size_t version_number ) :
-  StateHandler( "layer", version_number, true )
+Layer::Layer( const std::string& name ) :
+  StateHandler( "layer",  true )
 { 
   this->initialize_states( name );
-    
-  // == Resource locking ==
-  resource_lock_ = Core::ResourceLockHandle( new Core::ResourceLock( get_statehandler_id() ) );
 }
 
-Layer::Layer( const std::string& name, size_t version_number, const std::string& state_id ) :
-  StateHandler( state_id, version_number, false )
+Layer::Layer( const std::string& name, const std::string& state_id ) :
+  StateHandler( state_id, false )
 {
   this->initialize_states( name );
-
-  // == Resource locking ==
-  resource_lock_ = Core::ResourceLockHandle( new Core::ResourceLock( get_statehandler_id() ) );
 }
   
 Layer::~Layer()
@@ -84,12 +78,6 @@ LayerGroupHandle Layer::get_layer_group()
 { 
   return this->layer_group_.lock(); 
 }
-
-Core::ResourceLockHandle Layer::get_resource_lock()
-{
-  return this->resource_lock_;
-}
-
   
 void Layer::set_layer_group( LayerGroupWeakHandle layer_group )
 {

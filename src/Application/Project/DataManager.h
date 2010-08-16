@@ -98,7 +98,7 @@ public:
 
   // GET_FILE_SIZE:
   // function that returns the file size calculated from the data files
-  size_t get_file_size();
+  long long get_file_size();
   
 private:
   // PREP_FOR_SAVE:
@@ -114,8 +114,7 @@ private:
   mutex_type& get_mutex();
 
 private:
-  const static size_t VERSION_NUMBER_C;
-  size_t disk_space_used;
+  long long disk_space_used;
 
 };
 

@@ -48,7 +48,7 @@ SEG3D_TOOL_URL( "http://seg3d.org/" )
 )
 
 public:
-  ConnectedComponentFilter( const std::string& toolid, bool auto_number = true );
+  ConnectedComponentFilter( const std::string& toolid );
   virtual ~ConnectedComponentFilter();
 
 
@@ -59,9 +59,6 @@ public:
 private:
   // -- handle updates from layermanager --
   void handle_layers_changed();
-
-private:
-  const static size_t VERSION_NUMBER_C;
 
 };
 

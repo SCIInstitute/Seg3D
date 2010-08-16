@@ -38,10 +38,8 @@ SCI_REGISTER_TOOL( Seg3D, ConfidenceConnectedFilter )
 namespace Seg3D
 {
 
-const size_t ConfidenceConnectedFilter::VERSION_NUMBER_C = 1;
-
-ConfidenceConnectedFilter::ConfidenceConnectedFilter( const std::string& toolid, bool auto_number ) :
-  Tool( toolid, VERSION_NUMBER_C, auto_number )
+ConfidenceConnectedFilter::ConfidenceConnectedFilter( const std::string& toolid ) :
+  Tool( toolid )
 {
   add_state( "target", this->target_layer_state_, "<none>" );
   add_state( "iterations", this->iterations_state_, 1, 1, 100, 1 );

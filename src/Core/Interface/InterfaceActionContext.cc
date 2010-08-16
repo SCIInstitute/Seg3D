@@ -55,9 +55,9 @@ void InterfaceActionContext::report_message( const std::string& message )
   action_message_signal_( Core::LogMessageType::MESSAGE_E, message );
 }
 
-void InterfaceActionContext::report_need_resource( ResourceLockHandle& resource )
+void InterfaceActionContext::report_need_resource( NotifierHandle& notifier )
 {
-  std::string error = std::string( "Resource '" ) + resource->name() + "' is not available";
+  std::string error = std::string( "'" ) + notifier->get_name() + "' is currently not available.";
   action_message_signal_( Core::LogMessageType::ERROR_E, error );
 }
 

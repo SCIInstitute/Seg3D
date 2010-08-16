@@ -42,10 +42,8 @@
 namespace Seg3D
 {
 
-const size_t DataLayer::VERSION_NUMBER_C = 1;
-
 DataLayer::DataLayer( const std::string& name, const Core::DataVolumeHandle& volume ) :
-  Layer( name, VERSION_NUMBER_C ),
+  Layer( name ),
   data_volume_( volume )
 {
   this->initialize_states();
@@ -53,7 +51,7 @@ DataLayer::DataLayer( const std::string& name, const Core::DataVolumeHandle& vol
 }
   
 DataLayer::DataLayer( const std::string& state_id ) :
-  Layer( "not_initialized", VERSION_NUMBER_C, state_id )
+  Layer( "not initialized", state_id )
 {
   this->initialize_states();
 }
@@ -67,8 +65,8 @@ DataLayer::~DataLayer()
 
 void DataLayer::initialize_states()
 {
-
-  // Step (1) : Build the layer specific state variables
+  // NOTE: This function allows setting of state variables outside of application thread
+  this->set_initializing( true ); 
 
   // == The brightness of the layer ==
   add_state( "brightness", brightness_state_, 50.0, 0.0, 100.0, 0.1 );
@@ -78,43 +76,86 @@ void DataLayer::initialize_states()
 
   // == Is this volume rendered through the volume renderer ==
   add_state( "volume_rendered", volume_rendered_state_, false );
+  
+  if ( data_volume_ )
+  {
+    this->generation_state_->set( this->data_volume_->get_generation() );
+  }
+  
+  this->set_initializing( false );  
 
 }
+
+Core::DataType DataLayer::get_data_type() const
+{
+  Layer::lock_type lock( Layer::GetMutex() );
+  if ( this->data_volume_ )
+  {
+    return this->data_volume_->get_data_type();
+  }
+  return Core::DataType::UNKNOWN_E;
+}
+
+Core::DataVolumeHandle DataLayer::get_data_volume()
+{
+  Layer::lock_type lock( Layer::GetMutex() );
+  return this->data_volume_;
+}
+
+void DataLayer::set_data_volume( Core::DataVolumeHandle data_volume )
+{ 
+  Layer::lock_type lock( Layer::GetMutex() );
+  this->data_volume_ = data_volume; 
+
+  if ( this->data_volume_ )
+  {
+    this->generation_state_->set( this->data_volume_->get_generation() );
+  }
+} 
 
   
 bool DataLayer::pre_save_states( Core::StateIO& state_io )
 {
-  this->generation_state_->set( static_cast< int >( this->data_volume_->get_generation() ) );
-  
-  std::string generation = this->generation_state_->export_to_string() + ".nrrd";
-  boost::filesystem::path volume_path = ProjectManager::Instance()->get_project_data_path() /
-  generation;
-  std::string error;
-  
-  if ( Core::DataVolume::SaveDataVolume( volume_path.string(), this->data_volume_ , error ) )
+  if ( data_volume_ )
   {
-    return true;
+    this->generation_state_->set( this->data_volume_->get_generation() );
+    
+    std::string generation = this->generation_state_->export_to_string() + ".nrrd";
+    boost::filesystem::path volume_path = ProjectManager::Instance()->get_project_data_path() /
+    generation;
+    std::string error;
+    
+    if ( Core::DataVolume::SaveDataVolume( volume_path.string(), this->data_volume_ , error ) )
+    {
+      return true;
+    }
+    
+    CORE_LOG_ERROR( error );
+    return false;
   }
   
-  CORE_LOG_ERROR( error );
-  return false;
-  
+  return true;
 }
 
 bool DataLayer::post_load_states( const Core::StateIO& state_io )
 {
-  std::string generation = this->generation_state_->export_to_string() + ".nrrd";
-  boost::filesystem::path volume_path = ProjectManager::Instance()->get_project_data_path() /
-  generation;
-  std::string error;
-  
-  if( Core::DataVolume::LoadDataVolume( volume_path, this->data_volume_, error ) )
+  if ( this->generation_state_->get() > 0 )
   {
-    return true;
+    std::string generation = this->generation_state_->export_to_string() + ".nrrd";
+    boost::filesystem::path volume_path = ProjectManager::Instance()->get_project_data_path() /
+    generation;
+    std::string error;
+    
+    if( Core::DataVolume::LoadDataVolume( volume_path, this->data_volume_, error ) )
+    {
+      return true;
+    }
+    
+    CORE_LOG_ERROR( error );
+    return false;
   }
   
-  CORE_LOG_ERROR( error );
-  return false;
+  return true;
 }
   
 void DataLayer::clean_up()

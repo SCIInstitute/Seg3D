@@ -37,11 +37,9 @@ SCI_REGISTER_TOOL( Seg3D, ConnectedComponentFilter )
 
 namespace Seg3D 
 {
-
-const size_t ConnectedComponentFilter::VERSION_NUMBER_C = 1;
   
-ConnectedComponentFilter::ConnectedComponentFilter( const std::string& toolid, bool auto_number ) :
-  SeedPointsTool( toolid, VERSION_NUMBER_C, auto_number )
+ConnectedComponentFilter::ConnectedComponentFilter( const std::string& toolid ) :
+  SeedPointsTool( toolid )
 {
   std::vector< LayerIDNamePair > empty_names( 1, 
     std::make_pair( Tool::NONE_OPTION_C, Tool::NONE_OPTION_C ) );

@@ -806,14 +806,13 @@ void ViewerPrivate::reset_active_slice()
 // Implementation of class Viewer
 //////////////////////////////////////////////////////////////////////////
 
-const size_t Viewer::VERSION_NUMBER_C = 1;
 const std::string Viewer::AXIAL_C( "axial" );
 const std::string Viewer::CORONAL_C( "coronal" );
 const std::string Viewer::SAGITTAL_C( "sagittal" );
 const std::string Viewer::VOLUME_C( "volume" );
 
 Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
-  Core::AbstractViewer(  viewer_id, VERSION_NUMBER_C ),
+  Core::AbstractViewer(  viewer_id ),
   private_( new ViewerPrivate )
 {
   this->private_->viewer_ = this;

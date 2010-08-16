@@ -61,7 +61,7 @@ bool CurvatureAnisotropicDiffusionFilterAlgo::run( DataLayerHandle target_layer,
   target_layer->data_state_->set( Layer::PROCESSING_C );
 
   // For each datatype implement the filter 
-  FOREACH_DATATYPE( target_layer->get_data_type(),
+  SWITCH_DATATYPE( target_layer->get_data_type(),
   
     typedef itk::CurvatureAnisotropicDiffusionImageFilter< 
       TYPED_IMAGE_TYPE, FLOAT_IMAGE_TYPE > filter_type;
@@ -84,7 +84,7 @@ bool CurvatureAnisotropicDiffusionFilterAlgo::run( DataLayerHandle target_layer,
 
     filter->Update();
 
-    // this->insert_data_into_layer( filter->GetOutput(), target_layer ); 
+    this->insert_data_into_layer( filter->GetOutput(), target_layer );  
   );
     
 
@@ -111,7 +111,7 @@ bool ActionCurvatureAnisotropicDiffusionFilter::validate( Core::ActionContextHan
   }
   
   // If the number of integration steps is smaller than one we cannot run the filter
-  if( this->steps_.value() < 1 )
+  if( this->integration_step_.value() < 0.0 )
   {
     context->report_error( "The integration step needs to be larger than zero." );
     return false;
@@ -137,12 +137,12 @@ bool ActionCurvatureAnisotropicDiffusionFilter::run( Core::ActionContextHandle& 
     LayerManager::Instance()->get_data_layer_by_id( this->layer_id_.value() ),
     this->replace_.value(),
     this->iterations_.value(),
-    this->steps_.value(),
+    this->integration_step_.value(),
     this->conductance_.value() ) );
 }
 
 void ActionCurvatureAnisotropicDiffusionFilter::Dispatch( Core::ActionContextHandle context, 
-  std::string layer_id, int iterations, int steps, double conductance, bool replace )
+  std::string layer_id, int iterations, double integration_step, double conductance, bool replace )
 { 
   // Create a new action
   ActionCurvatureAnisotropicDiffusionFilter* action = 
@@ -151,7 +151,7 @@ void ActionCurvatureAnisotropicDiffusionFilter::Dispatch( Core::ActionContextHan
   // Setup the parameters
   action->layer_id_.value() = layer_id;
   action->iterations_.value() = iterations;
-  action->steps_.value() = steps;
+  action->integration_step_.value() = integration_step;
   action->conductance_.value() = conductance;
   action->replace_.value() = replace;
 

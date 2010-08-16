@@ -45,7 +45,7 @@ SEG3D_TOOL_URL( "http://seg3d.org/" )
 )
 
 public:
-  ConfidenceConnectedFilter( const std::string& toolid, bool auto_number = true );
+  ConfidenceConnectedFilter( const std::string& toolid );
   virtual ~ConfidenceConnectedFilter();
 
   // -- constraint parameters --
@@ -69,11 +69,8 @@ public:
   Core::StateStringHandle target_layer_state_;
   Core::StateRangedIntHandle iterations_state_;
   Core::StateRangedIntHandle threshold_multiplier_state_;
-
-private:
-  const static size_t VERSION_NUMBER_C;
-
 };
+
 } // end namespace
 
 #endif

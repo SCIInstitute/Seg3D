@@ -38,10 +38,8 @@ SCI_REGISTER_TOOL( Seg3D, MaskDataFilter )
 namespace Seg3D
 {
 
-const size_t MaskDataFilter::VERSION_NUMBER_C = 1;
-
-MaskDataFilter::MaskDataFilter( const std::string& toolid, bool auto_number ) :
-  Tool( toolid, VERSION_NUMBER_C, auto_number )
+MaskDataFilter::MaskDataFilter( const std::string& toolid ) :
+  Tool( toolid )
 {
   // add default values for the the states
   add_state( "target_layer", this->target_layer_state_, "<none>" );

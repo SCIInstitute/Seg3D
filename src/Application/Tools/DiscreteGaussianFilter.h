@@ -45,7 +45,7 @@ SEG3D_TOOL_URL( "http://seg3d.org/" )
 )
 
 public:
-  DiscreteGaussianFilter( const std::string& toolid, bool auto_number = true );
+  DiscreteGaussianFilter( const std::string& toolid );
   virtual ~DiscreteGaussianFilter();
 
   // -- constraint parameters --
@@ -73,10 +73,6 @@ public:
   Core::StateRangedDoubleHandle maximum_kernel_width_state_;
 
   Core::StateBoolHandle replace_state_;
-
-private:
-  const static size_t VERSION_NUMBER_C;
-
 };
 
 } // end namespace

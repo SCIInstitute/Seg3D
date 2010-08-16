@@ -45,7 +45,7 @@ SEG3D_TOOL_URL( "http://seg3d.org/" )
 )
 
 public:
-  CurvatureAnisotropicDiffusionFilter( const std::string& toolid, bool auto_number = true );
+  CurvatureAnisotropicDiffusionFilter( const std::string& toolid );
   virtual ~CurvatureAnisotropicDiffusionFilter();
   
   // -- state --
@@ -57,7 +57,7 @@ public:
   Core::StateRangedIntHandle iterations_state_;
 
   // Number of steps needed
-  Core::StateRangedIntHandle steps_state_;
+  Core::StateRangedDoubleHandle integration_step_state_;
 
   // The conductance for deciding what is a similar value
   Core::StateRangedDoubleHandle conductance_state_;

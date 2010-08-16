@@ -45,10 +45,8 @@
 namespace Seg3D
 {
 
-const size_t Project::VERSION_NUMBER_C = 1;
-
 Project::Project( const std::string& project_name ) :
-  StateHandler( "project", VERSION_NUMBER_C, false ),
+  StateHandler( "project", false ),
   name_set_( false )
 { 
   add_state( "project_name", this->project_name_state_, project_name );

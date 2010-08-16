@@ -65,7 +65,7 @@ class Tool : public Core::StateHandler
 
   // -- constructor/destructor --
 public:
-  Tool( const std::string& tool_type, size_t version_number, bool auto_number = true );
+  Tool( const std::string& tool_type );
   virtual ~Tool();
 
   // -- query properties of tool --
@@ -191,14 +191,19 @@ public:
 #define SEG3D_TOOL_SHORTCUT_KEY( key ) \
 "<shortcutkey>" key "</shortcutkey>"
 
+#define SEG3D_TOOL_VERSION( version ) \
+"<version>" version "</version>"
+
+
 #define SEG3D_TOOL( definition_string ) \
 public: \
-    static std::string Name() { return GetToolInfo()->get_name(); } \
+  static std::string Definition() { return GetToolInfo()->get_definition(); }\
     static std::string MenuLabel() { return GetToolInfo()->get_menu_label(); } \
     static std::string Menu() { return GetToolInfo()->get_menu(); } \
+    static std::string Name() { return GetToolInfo()->get_name(); } \
     static std::string ShortcutKey() { return GetToolInfo()->get_shortcut_key(); } \
     static std::string Url() { return GetToolInfo()->get_url(); } \
-  static std::string Definition() { return GetToolInfo()->get_definition(); }\
+    static int Version() { return GetToolInfo()->get_version(); } \
   static Seg3D::ToolInfoHandle GetToolInfo() \
   {\
     static bool initialized; \
@@ -218,7 +223,8 @@ public: \
     return info;\
   } \
   \
-  virtual Seg3D::ToolInfoHandle get_tool_info() const { return GetToolInfo(); }
+  virtual Seg3D::ToolInfoHandle get_tool_info() const { return GetToolInfo(); } \
+  virtual int get_version() { return GetToolInfo()->get_version(); }
 
 } // end namespace Seg3D
 

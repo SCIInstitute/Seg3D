@@ -48,8 +48,7 @@ class SingleTargetTool : public Tool
 
   // -- constructor/destructor --
 public:
-  SingleTargetTool( Core::VolumeType target_volume_type, const std::string& tool_type, 
-    size_t version_number, bool auto_number = true );
+  SingleTargetTool( Core::VolumeType target_volume_type, const std::string& tool_type );
   
   virtual ~SingleTargetTool();
 

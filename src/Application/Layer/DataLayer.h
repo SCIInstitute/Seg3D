@@ -64,25 +64,17 @@ public:
     return this->data_volume_->get_grid_transform(); 
   }
   
-  virtual Core::DataType get_data_type() const
-  {
-    return this->data_volume_->get_data_type();
-  }
+  // GET_DATA_TYPE:
+  // Get the data type of the data volume
+  virtual Core::DataType get_data_type() const;
   
   // GET_DATA_VOLUME:
   // this function returns the data volume
-  Core::DataVolumeHandle get_data_volume()
-  {
-    return this->data_volume_;
-  }
+  Core::DataVolumeHandle get_data_volume();
 
   // SET_DATA_VOLUME:
   // this function sets the data_volume
-  void set_data_volume( Core::DataVolumeHandle data_volume )
-  { 
-    Layer::lock_type lock( Layer::GetMutex() );
-    this->data_volume_ = data_volume; 
-  } 
+  void set_data_volume( Core::DataVolumeHandle data_volume );
   
   // -- state variables --
 public:
@@ -114,7 +106,6 @@ private:
 
 private:
   Core::DataVolumeHandle data_volume_;
-  const static size_t VERSION_NUMBER_C;
 };
 
 } // end namespace Seg3D

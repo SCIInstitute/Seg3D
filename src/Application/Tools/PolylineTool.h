@@ -47,7 +47,7 @@ SEG3D_TOOL_URL( "http://seg3d.org/" )
 
   // -- constructor/destructor --
 public:
-  PolylineTool( const std::string& toolid, bool auto_number = true );
+  PolylineTool( const std::string& toolid );
   virtual ~PolylineTool();
 
   // -- activate/deactivate tool --
@@ -72,9 +72,6 @@ public:
 
   // Polyline data
   // StateVector<Point>              polyline_;
-
-private:
-  const static size_t VERSION_NUMBER_C;
 
 };
 

@@ -45,7 +45,7 @@ SEG3D_TOOL_URL( "http://seg3d.org/" )
 )
 
 public:
-  AnisotropicDiffusionFilter( const std::string& toolid, bool auto_number = true );
+  AnisotropicDiffusionFilter( const std::string& toolid );
   virtual ~AnisotropicDiffusionFilter();
   
   // -- state --

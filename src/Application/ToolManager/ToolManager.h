@@ -85,7 +85,7 @@ protected:
 
   // OPEN_TOOL (accessed through Action):
   // Open a new tool into the current collection of active tools
-  bool open_tool( const std::string& toolid, std::string& new_toolid, bool create_tool_id = true );
+  bool open_tool( const std::string& toolid, std::string& new_toolid );
 
   // CLOSE_TOOL (accessed through Action):
   // Close tool in current collection of active tools
@@ -151,9 +151,6 @@ public:
 
 private:
   ToolManagerPrivateHandle private_;
-
-  const static size_t VERSION_NUMBER_C;
-
 };
 
 } // namespace Seg3D

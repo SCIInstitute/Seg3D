@@ -61,8 +61,7 @@ class StateHandler : protected ConnectionHandler
 
   // -- constructor/destructor --
 public:
-  StateHandler( const std::string& type_str, size_t version_number, 
-    bool auto_id );
+  StateHandler( const std::string& type_str, bool auto_id );
   virtual ~StateHandler();
 
 public:
@@ -223,6 +222,10 @@ public:
   // By default this functions returns -1, which means that the state handler won't be
   // saved/loaded by the state engine.
   virtual int get_session_priority();
+
+  // GET_VERSION:
+  // Get the version number of this class, this one is used for versioning of session files
+  virtual int get_version();
 
 private:
   friend class StateEngine;

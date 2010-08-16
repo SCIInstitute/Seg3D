@@ -128,9 +128,8 @@ void SingleTargetToolPrivate::handle_layers_changed()
 }
 
 
-SingleTargetTool::SingleTargetTool(  Core::VolumeType target_type, 
-  const std::string& tool_type, size_t version_number, bool auto_number ) :
-  Tool( tool_type, version_number, auto_number ),
+SingleTargetTool::SingleTargetTool(  Core::VolumeType target_type, const std::string& tool_type ) :
+  Tool( tool_type ),
   private_( new SingleTargetToolPrivate )
 {
   // The target type that we allow for the input

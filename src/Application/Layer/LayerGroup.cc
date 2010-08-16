@@ -40,7 +40,7 @@ namespace Seg3D
 {
 
 LayerGroup::LayerGroup( Core::GridTransform grid_transform ) :
-  StateHandler( "group", 1, true )
+  StateHandler( "group", true )
 {
   this->grid_transform_ = grid_transform;
 

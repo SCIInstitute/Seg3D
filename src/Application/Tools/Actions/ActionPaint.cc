@@ -184,7 +184,7 @@ bool ActionPaint::run( Core::ActionContextHandle& context, Core::ActionResultHan
   PaintToolHandle paint_tool( this->private_->paint_tool_weak_handle_.lock() );
   if ( !paint_tool )
   {
-    static PaintToolHandle static_paint_tool_s( new PaintTool( "staticpainttool", false ) );
+    static PaintToolHandle static_paint_tool_s( new PaintTool( "staticpainttool" ) );
     paint_tool = static_paint_tool_s;
   }
 

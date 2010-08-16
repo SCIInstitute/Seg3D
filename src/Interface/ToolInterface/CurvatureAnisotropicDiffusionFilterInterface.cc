@@ -50,7 +50,7 @@ class CurvatureAnisotropicDiffusionFilterInterfacePrivate
 public:
   Ui::CurvatureAnisotropicDiffusionFilterInterface ui_;
   QtUtils::QtSliderIntCombo *iterations_;
-  QtUtils::QtSliderIntCombo *step_;
+  QtUtils::QtSliderDoubleCombo *integration_step_;
   QtUtils::QtSliderDoubleCombo *conductance_;
 };
 
@@ -74,8 +74,8 @@ bool CurvatureAnisotropicDiffusionFilterInterface::build_widget( QFrame* frame )
   this->private_->iterations_ = new QtUtils::QtSliderIntCombo();
   this->private_->ui_.iterationsHLayout_bottom->addWidget( this->private_->iterations_ );
 
-  this->private_->step_ = new QtUtils::QtSliderIntCombo();
-  this->private_->ui_.integrationHLayout_bottom->addWidget( this->private_->step_ );
+  this->private_->integration_step_ = new QtUtils::QtSliderDoubleCombo();
+  this->private_->ui_.integrationHLayout_bottom->addWidget( this->private_->integration_step_ );
 
   this->private_->conductance_ = new QtUtils::QtSliderDoubleCombo();
   this->private_->ui_.conductanceHLayout_bottom->addWidget( this->private_->conductance_ );
@@ -92,8 +92,8 @@ bool CurvatureAnisotropicDiffusionFilterInterface::build_widget( QFrame* frame )
     tool->use_active_layer_state_ );
   QtUtils::QtBridge::Connect( this->private_->iterations_, 
     tool->iterations_state_ );
-  QtUtils::QtBridge::Connect( this->private_->step_, 
-    tool->steps_state_ );
+  QtUtils::QtBridge::Connect( this->private_->integration_step_, 
+    tool->integration_step_state_ );
   QtUtils::QtBridge::Connect( this->private_->conductance_, 
     tool->conductance_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.replaceCheckBox, 

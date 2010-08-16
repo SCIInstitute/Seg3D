@@ -79,7 +79,7 @@ SEG3D_TOOL
 
   // -- constructor/destructor --
 public:
-  PaintTool( const std::string& toolid, bool auto_number = true );
+  PaintTool( const std::string& toolid );
 
   virtual ~PaintTool();
 

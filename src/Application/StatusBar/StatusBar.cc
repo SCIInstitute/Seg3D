@@ -187,10 +187,9 @@ void StatusBarPrivate::set_active_tool_by_status_bar( std::string tool_id )
 //////////////////////////////////////////////////////////////////////////
 
 CORE_SINGLETON_IMPLEMENTATION( StatusBar );
-const size_t StatusBar::VERSION_NUMBER_C = 0;
 
 StatusBar::StatusBar() :
-  StateHandler( "statusbar", VERSION_NUMBER_C, false ),
+  StateHandler( "statusbar", false ),
   private_( new StatusBarPrivate )
 {
   this->private_->status_bar_ = this;

@@ -55,12 +55,10 @@
 namespace Seg3D
 {
 
-const size_t LayerManager::VERSION_NUMBER_C = 1;
-
 CORE_SINGLETON_IMPLEMENTATION( LayerManager );
 
 LayerManager::LayerManager() :
-  StateHandler( "layermanager", VERSION_NUMBER_C, false )
+  StateHandler( "layermanager", false )
 { 
   this->add_state( "active_layer", this->active_layer_state_, "" );
 }
@@ -78,7 +76,7 @@ bool LayerManager::insert_layer( LayerHandle layer )
   {
     lock_type lock( this->get_mutex() );
     
-    CORE_LOG_DEBUG( std::string("Insert New Layer: ") + layer->get_layer_id());
+    CORE_LOG_MESSAGE( std::string("Insert New Layer: ") + layer->get_layer_id());
         
     for ( group_list_type::iterator it = group_list_.begin(); 
        it != group_list_.end(); ++it )
