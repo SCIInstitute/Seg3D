@@ -306,6 +306,16 @@ const MarchingCubesTableType MARCHING_CUBES_TABLE_C[] = {
   {{ 0,  8,  3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}, 1},
   {{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}, 0}};
 
+
+class VertexBufferBatch
+{
+public:
+  VertexAttribArrayBufferHandle vertex_buffer_;
+  VertexAttribArrayBufferHandle normal_buffer_;
+  ElementArrayBufferHandle faces_buffer_;
+};
+typedef boost::shared_ptr< VertexBufferBatch > VertexBufferBatchHandle;
+
 class IsosurfacePrivate
 {
 
@@ -355,11 +365,8 @@ public:
   unsigned int prev_point_min_;
   unsigned int prev_point_max_;
 
-  VertexAttribArrayBufferHandle vertex_buffer_;
-  VertexAttribArrayBufferHandle normal_buffer_;
-  ElementArrayBufferHandle faces_buffer_;
+  std::vector< VertexBufferBatchHandle > vbo_batches_;
   bool surface_changed_;
-  bool gl_initialized_;
 };
 
 void IsosurfacePrivate::setup( int num_threads )
@@ -981,32 +988,46 @@ void IsosurfacePrivate::upload_to_vertex_buffer()
     return;
   }
 
-  if ( !this->gl_initialized_ )
+  size_t num_of_parts = this->part_points_.size();
+  this->vbo_batches_.resize( num_of_parts );
+  for ( size_t i = 0; i < num_of_parts; ++i )
   {
-    this->vertex_buffer_.reset( new Core::VertexAttribArrayBuffer );
-    this->normal_buffer_.reset( new Core::VertexAttribArrayBuffer );
-    this->faces_buffer_.reset( new Core::ElementArrayBuffer );
-    this->vertex_buffer_->set_array( VertexAttribArrayType::VERTEX_E, 3, GL_FLOAT, 0, 0 );
-    this->normal_buffer_->set_array( VertexAttribArrayType::NORMAL_E, GL_FLOAT, 0, 0 );
-    this->gl_initialized_ = true;
-  }
+    this->vbo_batches_[ i ].reset( new VertexBufferBatch );
+    this->vbo_batches_[ i ]->vertex_buffer_.reset( new Core::VertexAttribArrayBuffer );
+    this->vbo_batches_[ i ]->normal_buffer_.reset( new Core::VertexAttribArrayBuffer );
+    this->vbo_batches_[ i ]->faces_buffer_.reset( new Core::ElementArrayBuffer );
+    this->vbo_batches_[ i ]->vertex_buffer_->set_array( 
+      VertexAttribArrayType::VERTEX_E, 3, GL_FLOAT, 0, 0 );
+    this->vbo_batches_[ i ]->normal_buffer_->set_array( 
+      VertexAttribArrayType::NORMAL_E, GL_FLOAT, 0, 0 );
 
-  ptrdiff_t vertex_size = this->points_.size() * sizeof( PointF );
-  ptrdiff_t normal_size = this->normals_.size() * sizeof( VectorF );
-  ptrdiff_t num_of_faces = this->faces_.size() / 3;
-  ptrdiff_t face_size = this->faces_.size() * sizeof( unsigned int );
-  ptrdiff_t total_size = vertex_size + normal_size + face_size;
-  CORE_LOG_MESSAGE( "Uploading vertex data to GPU: " + 
-    ExportToString( this->points_.size() ) + " vertices, " +
-    ExportToString( num_of_faces ) + " triangles. Total memory: " + 
-    ExportToString( total_size ) );
-  if ( total_size > ( 50 << 20 ) )
-  {
-    CORE_LOG_WARNING( "Isosurface data takes more than 50MB!" );
+    unsigned int num_pts = this->part_points_[ i ].second - this->part_points_[ i ].first;
+    ptrdiff_t vertex_size = num_pts * sizeof( PointF );
+    ptrdiff_t normal_size = num_pts * sizeof( VectorF );
+    unsigned int num_face_indices = this->part_faces_[ i ].second - this->part_faces_[ i ].first;
+    ptrdiff_t face_size = num_face_indices * sizeof( unsigned int );
+    ptrdiff_t total_size = vertex_size + normal_size + face_size;
+    CORE_LOG_MESSAGE( "Uploading VBO batch to GPU: " + 
+      ExportToString( num_pts ) + " vertices, " +
+      ExportToString( num_face_indices / 3 ) + " triangles. Total memory: " + 
+      ExportToString( total_size ) );
+
+    this->vbo_batches_[ i ]->vertex_buffer_->set_buffer_data( vertex_size, 
+      &this->points_[ this->part_points_[ i ].first ], GL_STATIC_DRAW );
+    this->vbo_batches_[ i ]->normal_buffer_->set_buffer_data( normal_size, 
+      &this->normals_[ this->part_points_[ i ].first ], GL_STATIC_DRAW );
+
+    std::vector< unsigned int > local_indices( num_face_indices );
+    for ( size_t j = 0; j < num_face_indices; ++j )
+    {
+      size_t pt_global_idx = this->part_faces_[ i ].first + j;
+      local_indices[ j ] = this->faces_[ pt_global_idx ] - this->part_points_[ i ].first;
+      assert( local_indices[ j ] >= 0 && local_indices[ j ] < num_pts );
+    }
+    this->vbo_batches_[ i ]->faces_buffer_->set_buffer_data( face_size, 
+      &local_indices[ 0 ], GL_STATIC_DRAW );
   }
-  this->vertex_buffer_->set_buffer_data( vertex_size, &this->points_[ 0 ], GL_STATIC_DRAW );
-  this->normal_buffer_->set_buffer_data( normal_size, &this->normals_[ 0 ], GL_STATIC_DRAW );
-  this->faces_buffer_->set_buffer_data( face_size, &this->faces_[ 0 ], GL_STATIC_DRAW );
+  
   this->surface_changed_ = false;
 }
 
@@ -1015,7 +1036,6 @@ Isosurface::Isosurface( const MaskVolumeHandle& mask_volume ) :
 {
   this->private_->isosurface_ = this;
   this->private_->mask_volume_ = mask_volume;
-  this->private_->gl_initialized_ = false;
   this->private_->surface_changed_ = false;
 }
 
@@ -1063,7 +1083,7 @@ void Isosurface::compute()
     
     num_faces += this->private_->max_face_index_[ j ] - this->private_->min_face_index_[ j ];
     
-    if ( num_faces > 10000 )
+    if ( num_faces > 1000000 )
     {
       this->private_->part_points_.push_back( std::make_pair<unsigned int, unsigned int>(
         min_point_index, this->private_->max_point_index_[ j ] ) );
@@ -1116,15 +1136,17 @@ void Isosurface::redraw()
 {
   lock_type lock( this->get_mutex() );
   this->private_->upload_to_vertex_buffer();
-  if ( this->private_->gl_initialized_ )
+  size_t num_batches = this->private_->vbo_batches_.size();
+  for ( size_t i = 0; i < num_batches; i++ )
   {
-    this->private_->vertex_buffer_->enable_arrays();
-    this->private_->normal_buffer_->enable_arrays();
-    this->private_->faces_buffer_->draw_elements( GL_TRIANGLES, 
-      static_cast< GLsizei >( this->private_->faces_.size() ), GL_UNSIGNED_INT );
-    this->private_->normal_buffer_->disable_arrays();
-    this->private_->vertex_buffer_->disable_arrays();
-  }
+    this->private_->vbo_batches_[ i ]->vertex_buffer_->enable_arrays();
+    this->private_->vbo_batches_[ i ]->normal_buffer_->enable_arrays();
+    this->private_->vbo_batches_[ i ]->faces_buffer_->draw_elements( GL_TRIANGLES, 
+      static_cast< GLsizei >( ( this->private_->part_faces_[ i ].second - 
+      this->private_->part_faces_[ i ].first ) ), GL_UNSIGNED_INT );
+    this->private_->vbo_batches_[ i ]->vertex_buffer_->disable_arrays();
+    this->private_->vbo_batches_[ i ]->normal_buffer_->disable_arrays();
+  } 
 }
 
 

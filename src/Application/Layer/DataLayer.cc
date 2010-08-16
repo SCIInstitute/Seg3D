@@ -139,7 +139,7 @@ bool DataLayer::pre_save_states( Core::StateIO& state_io )
 
 bool DataLayer::post_load_states( const Core::StateIO& state_io )
 {
-  if ( this->generation_state_->get() > 0 )
+  if ( this->generation_state_->get() >= 0 )
   {
     std::string generation = this->generation_state_->export_to_string() + ".nrrd";
     boost::filesystem::path volume_path = ProjectManager::Instance()->get_project_data_path() /
