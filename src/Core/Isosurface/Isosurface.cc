@@ -406,10 +406,10 @@ void IsosurfacePrivate::setup( int num_threads )
   // Total number of isosurface points
   this->global_point_cnt_ = 0;
   
-  this->min_point_index_.resize( this->nz_ );
-  this->max_point_index_.resize( this->nz_ );
-  this->min_face_index_.resize( this->nz_ );
-  this->max_face_index_.resize( this->nz_ );
+  this->min_point_index_.resize( this->elem_nz_ );
+  this->max_point_index_.resize( this->elem_nz_ );
+  this->min_face_index_.resize( this->elem_nz_ );
+  this->max_face_index_.resize( this->elem_nz_ );
   
   this->prev_point_min_ = 0;
   this->prev_point_max_ = 0;
@@ -1083,7 +1083,8 @@ void Isosurface::compute()
     
     num_faces += this->private_->max_face_index_[ j ] - this->private_->min_face_index_[ j ];
     
-    if ( num_faces > 1000000 )
+    if ( num_faces > 1000000 ||
+      j == this->private_->min_point_index_.size() - 1 )
     {
       this->private_->part_points_.push_back( std::make_pair<unsigned int, unsigned int>(
         min_point_index, this->private_->max_point_index_[ j ] ) );
