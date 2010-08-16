@@ -337,12 +337,23 @@ public:
   std::vector<unsigned char> type_buffer_; 
   std::vector<std::vector<unsigned int> > edge_buffer_;  
 
+  std::vector<unsigned int> min_point_index_;
+  std::vector<unsigned int> max_point_index_;
+  std::vector<unsigned int> min_face_index_;
+  std::vector<unsigned int> max_face_index_;
+
+  std::vector< std::pair<unsigned int, unsigned int> > part_points_;
+  std::vector< std::pair<unsigned int, unsigned int> > part_faces_;
+
   std::vector<std::vector< PointF > > new_points_; 
   std::vector<std::vector< StackVector< size_t, 3 > > > new_elems_;
 
   std::vector< size_t > front_offset_;
   std::vector< size_t > back_offset_;
   size_t global_point_cnt_;
+
+  unsigned int prev_point_min_;
+  unsigned int prev_point_max_;
 
   VertexAttribArrayBufferHandle vertex_buffer_;
   VertexAttribArrayBufferHandle normal_buffer_;
@@ -387,6 +398,15 @@ void IsosurfacePrivate::setup( int num_threads )
 
   // Total number of isosurface points
   this->global_point_cnt_ = 0;
+  
+  this->min_point_index_.resize( this->nz_ );
+  this->max_point_index_.resize( this->nz_ );
+  this->min_face_index_.resize( this->nz_ );
+  this->max_face_index_.resize( this->nz_ );
+  
+  this->prev_point_min_ = 0;
+  this->prev_point_max_ = 0;
+
 }
 
 /*
@@ -758,7 +778,7 @@ void IsosurfacePrivate::parallel_compute_faces( int thread, int num_threads,
 
     // Combine points from all threads
     if ( thread == 0 )
-    {
+    {   
       size_t local_size = 0;
       for ( int p = 0; p < num_threads; p++ )
       {            
@@ -775,6 +795,11 @@ void IsosurfacePrivate::parallel_compute_faces( int thread, int num_threads,
         }
       }
       this->global_point_cnt_ += local_size;
+    
+      this->min_point_index_[ z ] = this->prev_point_min_;
+      this->max_point_index_[ z ] = static_cast<unsigned int>( this->points_.size() );
+      this->prev_point_min_ = this->prev_point_max_;
+      this->prev_point_max_ = this->max_point_index_[ z ];
     }
 
     barrier.wait();
@@ -845,6 +870,8 @@ void IsosurfacePrivate::parallel_compute_faces( int thread, int num_threads,
 
     if ( thread == 0 )
     {
+      this->min_face_index_[ z ] = static_cast<unsigned int>( this->faces_.size() );
+
       for ( int w = 0;  w < num_threads; w++ )
       {
         std::vector< StackVector< size_t, 3 > >& pelements = this->new_elems_[ w ];
@@ -857,6 +884,8 @@ void IsosurfacePrivate::parallel_compute_faces( int thread, int num_threads,
         }
       }
       this->back_offset_ = this->front_offset_;
+
+      this->max_face_index_[ z ] = static_cast<unsigned int>( this->faces_.size() );
     }
 
     barrier.wait();   
@@ -1010,6 +1039,45 @@ void Isosurface::compute()
     this->private_, _1, _2, _3 ) );
   parallel_normals.run();
 
+  this->private_->type_buffer_.clear();
+  this->private_->edge_buffer_.clear();
+  this->private_->new_points_.clear();
+  this->private_->new_elems_.clear();
+  this->private_->front_offset_.clear();
+  this->private_->back_offset_.clear();
+  
+  this->private_->part_points_.clear();
+  this->private_->part_faces_.clear();
+  
+  unsigned int num_faces = 0;
+  unsigned int min_point_index = 0;
+  unsigned int min_face_index = 0;
+  
+  for ( size_t j = 0; j < this->private_->min_point_index_.size(); j++ )
+  {
+    if ( num_faces == 0 )
+    {
+      min_point_index = this->private_->min_point_index_[ j ];
+      min_face_index = this->private_->min_face_index_[ j ];
+    }
+    
+    num_faces += this->private_->max_face_index_[ j ] - this->private_->min_face_index_[ j ];
+    
+    if ( num_faces > 10000 )
+    {
+      this->private_->part_points_.push_back( std::make_pair<unsigned int, unsigned int>(
+        min_point_index, this->private_->max_point_index_[ j ] ) );
+      this->private_->part_faces_.push_back( std::make_pair<unsigned int, unsigned int>(
+        min_face_index, this->private_->max_face_index_[ j ] ) );
+      num_faces = 0;
+    }
+  }
+  
+  this->private_->min_point_index_.clear();
+  this->private_->max_point_index_.clear();
+  this->private_->min_face_index_.clear();
+  this->private_->max_face_index_.clear();
+
   this->private_->surface_changed_ = true;
 }
 
@@ -1027,6 +1095,22 @@ const std::vector< unsigned int >& Isosurface::get_faces() const
 {
   return this->private_->faces_;
 }
+
+size_t Isosurface::get_num_parts() const
+{
+  return this->private_->part_points_.size();
+}
+
+void Isosurface::get_part( size_t idx, unsigned int& min_point, unsigned int& max_point,
+  unsigned int& min_face, unsigned int& max_face ) const
+{
+  min_point = this->private_->part_points_[ idx ].first;
+  max_point = this->private_->part_points_[ idx ].second;
+
+  min_face = this->private_->part_faces_[ idx ].first;
+  max_face = this->private_->part_faces_[ idx ].second;
+}
+
 
 void Isosurface::redraw()
 {

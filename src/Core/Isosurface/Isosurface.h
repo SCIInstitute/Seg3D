@@ -67,6 +67,16 @@ public:
   // Indices into points and normals, 3 per face
   const std::vector< unsigned int >&  get_faces() const;
 
+  // GET_NUM_PARTS:
+  // Get the number of parts for rendering the surface in multiple pieces
+  size_t get_num_parts() const;
+  
+  // GET_PART:
+  // Define the region that a part is made from by specifying the first point index and face
+  // index as well as the max point index + 1 and the max face index + 1.
+  void get_part( size_t idx, unsigned int& min_point, unsigned int& max_point,
+    unsigned int& min_face, unsigned int& max_face ) const;
+
   // Render the isosurface.
   void redraw();
 
