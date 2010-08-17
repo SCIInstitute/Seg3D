@@ -95,6 +95,10 @@ public:
   // NOTE: The returned handle should only be used in the scope where this function is
   // being called, because it may become invalid later.
   RenderContextHandle get_current_context();
+  
+  // GET_VRAM_SIZE:
+  // Return the total video memory size on the GPU.
+  int get_vram_size();
 
   // -- thread safe deletion of GL objects --
 private:

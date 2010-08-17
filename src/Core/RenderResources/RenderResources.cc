@@ -27,6 +27,11 @@
  */
 
 #include <GL/glew.h>
+
+#ifdef __APPLE__
+#include <AGL/AGL.h>
+#endif
+
 #include <Core/RenderResources/RenderResources.h>
 
 namespace Core
@@ -37,6 +42,13 @@ CORE_SINGLETON_IMPLEMENTATION( RenderResources );
 class RenderResourcesPrivate
 {
 public:
+  // initialize_gl:
+  // Initialize GLEW and check required OpenGL version and extensions.
+  void initialize_gl();
+  
+  // Query available video memory size.
+  void query_video_memory_size();
+  
   // A Handle to resource that generated the contexts
   RenderResourcesContextHandle resources_context_;
 
@@ -55,7 +67,78 @@ public:
   boost::condition_variable thread_condition_variable_;
 
   bool gl_capable_;
+  int vram_size_;
 };
+  
+void RenderResourcesPrivate::initialize_gl()
+{
+  this->gl_capable_ = true;
+  
+  int err = glewInit();
+  if ( err != GLEW_OK )
+  {
+    this->gl_capable_ = false;
+    CORE_LOG_ERROR( "glewInit failed with error code " + Core::ExportToString( err ) );
+  }
+  
+  // Check OpenGL capabilities
+  if ( !GLEW_VERSION_2_0 )
+  {
+    this->gl_capable_ = false;
+    CORE_LOG_ERROR( "OpenGL 2.0 required but not found." );
+  }
+  if ( !GLEW_EXT_framebuffer_object )
+  {
+    this->gl_capable_ = false;
+    CORE_LOG_ERROR( "GL_EXT_framebuffer_object required but not found." );
+  }
+  if ( !GLEW_ARB_pixel_buffer_object )
+  {
+    this->gl_capable_ = false;
+    CORE_LOG_ERROR( "GL_ARB_pixel_buffer_object required but not found." );
+  }
+}
+  
+void RenderResourcesPrivate::query_video_memory_size()
+{
+  this->vram_size_ = 0;
+  
+#ifdef _WIN32
+  this->vram_size_ = 512 << 20; // TODO: hard-coded value for windows
+#else
+#ifdef __APPLE__
+  AGLRendererInfo head_info = aglQueryRendererInfoForCGDirectDisplayIDs( NULL, 0 );
+  AGLRendererInfo info = head_info;
+  while ( info != NULL ) 
+  {
+    int accelerated;
+    if ( aglDescribeRenderer( info, AGL_ACCELERATED, &accelerated ) &&
+      accelerated != 0 )
+    {
+      int vram_size;
+      if ( aglDescribeRenderer( info, AGL_VIDEO_MEMORY, &vram_size ) ) 
+      {
+        this->vram_size_ = vram_size;
+        break;
+      }
+    }
+    info = aglNextRendererInfo( info );
+  }
+  aglDestroyRendererInfo( head_info );  
+  
+#endif
+#endif
+  
+  if ( this->vram_size_ == 0 ) 
+  {
+    CORE_LOG_ERROR( "Failed to query video memory size" );
+  }
+  else 
+  {
+    CORE_LOG_MESSAGE( "Video Memory Size: " + 
+             ExportToString( this->vram_size_ >> 20 ) + "MB" );
+  }
+}
 
 RenderResources::RenderResources() :
   private_( new RenderResourcesPrivate )
@@ -71,32 +154,8 @@ void RenderResources::initialize_eventhandler()
 {
   boost::unique_lock< boost::mutex > lock( this->private_->thread_mutex_ );
   this->private_->delete_context_->make_current();
-  this->private_->gl_capable_ = true;
-
-  int err = glewInit();
-  if ( err != GLEW_OK )
-  {
-    this->private_->gl_capable_ = false;
-    CORE_LOG_ERROR( "glewInit failed with error code " + Core::ExportToString( err ) );
-  }
-
-  // Check OpenGL capabilities
-  if ( !GLEW_VERSION_2_0 )
-  {
-    this->private_->gl_capable_ = false;
-    CORE_LOG_ERROR( "OpenGL 2.0 required but not found." );
-  }
-  if ( !GLEW_EXT_framebuffer_object )
-  {
-    this->private_->gl_capable_ = false;
-    CORE_LOG_ERROR( "GL_EXT_framebuffer_object required but not found." );
-  }
-  if ( !GLEW_ARB_pixel_buffer_object )
-  {
-    this->private_->gl_capable_ = false;
-    CORE_LOG_ERROR( "GL_ARB_pixel_buffer_object required but not found." );
-  }
-
+  this->private_->initialize_gl();
+  this->private_->query_video_memory_size();
   this->private_->thread_condition_variable_.notify_one();
 }
 
@@ -119,6 +178,11 @@ bool RenderResources::create_render_context( RenderContextHandle& context )
 RenderContextHandle RenderResources::get_current_context()
 {
   return this->private_->resources_context_->get_current_context();
+}
+  
+int RenderResources::get_vram_size()
+{
+  return this->private_->vram_size_;
 }
 
 void RenderResources::install_resources_context( RenderResourcesContextHandle resources_context )
