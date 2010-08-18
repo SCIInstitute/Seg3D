@@ -404,9 +404,9 @@ void LayerGroupWidget::update_widget_state()
   else if ( menu_state == LayerGroup::ISO_MENU_C ) menu_selection = iso_menu;
   else if ( menu_state == LayerGroup::DELETE_MENU_C ) menu_selection = delete_menu;
   
-  this->show_selection_checkboxes( show_checkboxes );
-  
   this->private_->ui_.base_->setUpdatesEnabled( false );
+  
+  this->show_selection_checkboxes( show_checkboxes );
   
   
   // Now we close the menus that are not used and open the one that is
@@ -650,10 +650,10 @@ void LayerGroupWidget::UpdateState( qpointer_type qpointer )
   // When we are finally on the interface thread run this code:
   if ( qpointer.data() )
   {
-    qpointer->setUpdatesEnabled( false );
+//    qpointer->setUpdatesEnabled( false );
     qpointer->update_widget_state();
-    qpointer->setUpdatesEnabled( true );
-    qpointer->repaint();
+//    qpointer->setUpdatesEnabled( true );
+//    qpointer->repaint();
   }
 }
   

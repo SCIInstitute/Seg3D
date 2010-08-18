@@ -281,8 +281,8 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
               mask_layer->color_state_,
               PreferencesManager::Instance()->color_states_ );
             
-            this->private_->ui_.show_iso_surface_button_->setEnabled( false );
-            this->private_->ui_.delete_iso_surface_button_->setEnabled( false );
+            //this->private_->ui_.show_iso_surface_button_->setEnabled( false );
+            //this->private_->ui_.delete_iso_surface_button_->setEnabled( false );
             
             QtUtils::QtBridge::Enable( this->private_->ui_.show_iso_surface_button_, 
               mask_layer->iso_generated_state_ );
@@ -332,13 +332,30 @@ void LayerWidget::enable_buttons( bool lock_button, bool other_buttons, bool /*i
   this->private_->ui_.visibility_button_->setEnabled( other_buttons );
   this->private_->ui_.color_button_->setEnabled( other_buttons );
   this->private_->ui_.compute_iso_surface_button_->setEnabled( other_buttons );
-  //this->private_->ui_.show_iso_surface_button_->setEnabled( other_buttons );
-  //this->private_->ui_.delete_iso_surface_button_->setEnabled( other_buttons );
   this->private_->ui_.fill_border_button_->setEnabled( other_buttons );
   this->private_->ui_.volume_rendered_button_->setEnabled( other_buttons );
   this->private_->ui_.brightness_contrast_button_->setEnabled( other_buttons );
   this->private_->ui_.label_->setEnabled( other_buttons );
   this->private_->ui_.lock_button_->setEnabled( lock_button );
+  
+  // for the iso surface buttons on the mask layer
+  if( this->get_volume_type() == Core::VolumeType::MASK_E )
+  {
+    if( other_buttons )
+    { 
+      MaskLayer* mask_layer = dynamic_cast< MaskLayer* >( this->private_->layer_.get() ); 
+      this->private_->ui_.show_iso_surface_button_->setEnabled( 
+        mask_layer->iso_generated_state_->get() );
+      this->private_->ui_.delete_iso_surface_button_->setEnabled( 
+        mask_layer->iso_generated_state_->get() );
+    }
+    else
+    {
+      this->private_->ui_.show_iso_surface_button_->setEnabled( other_buttons );
+      this->private_->ui_.delete_iso_surface_button_->setEnabled( other_buttons );
+    }
+  }
+
 }
   
 void LayerWidget::uncheck_show_iso_button()
@@ -867,7 +884,6 @@ void LayerWidget::show_selection_checkbox( bool show )
   {
     this->private_->ui_.checkbox_widget_->hide();
   }
-  this->repaint();
 }
 
 void LayerWidget::select_opacity_bar( bool show )
