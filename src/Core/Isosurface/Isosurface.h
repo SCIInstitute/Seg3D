@@ -58,14 +58,20 @@ class Isosurface : public Core::RecursiveLockable
 public:
   Isosurface( const MaskVolumeHandle& mask_volume );  
 
-  void compute();
+  // COMPUTE:
+  void compute( double quality_factor = 1.0 );
 
-  // Vertices, each stored only once
-  const std::vector< PointF >&    get_points() const;
-  // One normal per vertex, interpolated
-  const std::vector< VectorF >&   get_normals() const;
+  // GET_POINTS:
+  // Get vertices, each stored only once
+  const std::vector< PointF >& get_points() const;
+
+  // GET_NORMALS:
+  // Get one normal per vertex, interpolated
+  const std::vector< VectorF >& get_normals() const;
+
+  // GET_FACES:
   // Indices into points and normals, 3 per face
-  const std::vector< unsigned int >&  get_faces() const;
+  const std::vector< unsigned int >& get_faces() const;
 
   // GET_NUM_PARTS:
   // Get the number of parts for rendering the surface in multiple pieces
@@ -77,6 +83,7 @@ public:
   void get_part( size_t idx, unsigned int& min_point, unsigned int& max_point,
     unsigned int& min_face, unsigned int& max_face ) const;
 
+  // REDRAW:
   // Render the isosurface.
   void redraw();
 

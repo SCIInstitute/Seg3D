@@ -27,6 +27,7 @@
  */
 
 // Core includes
+#include <Core/DataBlock/StdDataBlock.h>
 #include <Core/Isosurface/Isosurface.h>
 #include <Core/Utils/StackVector.h>
 #include <Core/Utils/Parallel.h>
@@ -321,19 +322,44 @@ class IsosurfacePrivate
 {
 
 public:
+  void downsample_setup( int num_threads, double quality_factor );
+
+  // PARALLEL_DOWNSAMPLE:
+  // Downsample mask prior to computing the isosurface in order to reduce the mesh to speed up
+  // rendering.
+  void parallel_downsample_mask( int thread, int num_threads, boost::barrier& barrier, 
+    double quality_factor );
+
+  // SETUP:
   // Setup the algorithm and the buffers
-  void setup( int num_threads );
+  void compute_setup( int num_threads );
+
+  // PARALLEL_COMPUTE_FACES:
   // Parallelized isosurface computation algorithm 
   void parallel_compute_faces( int thread, int num_threads, boost::barrier& barrier );
+
+  // PARALLEL_COMPUTE_NORMALS:
+  // Parallelized isosurface normal computation algorithm 
   void parallel_compute_normals( int thread, int num_threads,  boost::barrier& barrier );
 
+  // UPLOAD_TO_VERTEX_BUFFER:
   void upload_to_vertex_buffer();
 
   // Pointer to public Isosurface -- needed to give access to public signals
   Isosurface* isosurface_;
 
-  // Input to isosurface computation
-  MaskVolumeHandle mask_volume_; 
+  // Downsample params
+  MaskVolumeHandle downsample_mask_volume_;
+  int neighborhood_size_;
+  size_t zsize_;
+  size_t total_neighborhoods_;
+
+  // Input to isosurface computation, not downsampled
+  MaskVolumeHandle orig_mask_volume_; 
+  // Mask volume to be used for isosurface computation.  May point to original volume or 
+  // downsampled volume.
+  MaskVolumeHandle compute_mask_volume_; 
+  unsigned char mask_value_; // Same for original volume and downsampled volume
 
   // Output mesh
   std::vector< PointF > points_; 
@@ -372,19 +398,141 @@ public:
   bool surface_changed_;
 };
 
-void IsosurfacePrivate::setup( int num_threads )
+void IsosurfacePrivate::downsample_setup( int num_threads, double quality_factor )
 {
-  this->nx_ = this->mask_volume_->get_mask_data_block()->get_nx();
-  this->ny_ = this->mask_volume_->get_mask_data_block()->get_ny();
-  this->nz_ = this->mask_volume_->get_mask_data_block()->get_nz();
-  
+  this->nx_ = this->orig_mask_volume_->get_mask_data_block()->get_nx();
+  this->ny_ = this->orig_mask_volume_->get_mask_data_block()->get_ny();
+  this->nz_ = this->orig_mask_volume_->get_mask_data_block()->get_nz();
+
+  // Mask data is stored in bit-plane (8 masks per data block)
+  this->data_ = this->orig_mask_volume_->get_mask_data_block()->get_mask_data();
+
+  // Bit where mask bit is stored
+  this->mask_value_ = this->orig_mask_volume_->get_mask_data_block()->get_mask_value();
+
+  // Create downsampled mask to store results
+  this->neighborhood_size_ = static_cast< int >( 1.0 / quality_factor );
+  size_t downsampled_nx = this->nx_ / this->neighborhood_size_;
+  size_t downsampled_ny = this->ny_ / this->neighborhood_size_;
+  size_t downsampled_nz = this->nz_ / this->neighborhood_size_;
+
+  MaskDataBlockHandle mask_data_block  = MaskDataBlockHandle( new MaskDataBlock( 
+    StdDataBlock::New( downsampled_nx, downsampled_ny, downsampled_nz, DataType::UCHAR_E ), 
+    this->orig_mask_volume_->get_mask_data_block()->get_mask_bit() ) );
+
+  GridTransform grid_transform = this->orig_mask_volume_->get_grid_transform();
+  double transform_scale = static_cast< double >( this->neighborhood_size_ );
+  grid_transform.post_scale( Vector( transform_scale, transform_scale, transform_scale ) );
+
+  this->downsample_mask_volume_ = MaskVolumeHandle( new MaskVolume( grid_transform, 
+    mask_data_block ) );
+
+  // Point to downsampled mask rather than original mask
+  this->compute_mask_volume_ = this->downsample_mask_volume_;
+
+  // For parallelization, divide mask into slabs along z.  No synchronization is needed.
+  this->zsize_ = static_cast< size_t >( this->nz_ / num_threads );
+  int remainder = this->zsize_ % this->neighborhood_size_;
+  // Round up to the next neighborhood increment -- leaves least work for last thread
+  if( remainder != 0 )
+  {
+    this->zsize_ += ( this->neighborhood_size_ - remainder );
+  }
+
+  size_t x_neighborhoods = this->nx_ / this->neighborhood_size_;
+  size_t y_neighborhoods = this->ny_ / this->neighborhood_size_;
+  size_t z_neighborhoods = this->zsize_ / this->neighborhood_size_;
+  this->total_neighborhoods_ = x_neighborhoods * y_neighborhoods * z_neighborhoods;
+}
+
+void IsosurfacePrivate::parallel_downsample_mask( int thread, int num_threads, 
+  boost::barrier& barrier, double quality_factor )
+{
+  // Only need to setup once 
+  if( thread == 0 )
+  {
+    this->downsample_setup( num_threads, quality_factor );
+  }
+
+  // All threads must wait for setup to complete
+  barrier.wait();
+
+  // [nzstart, nzend) 
+  size_t nzstart = thread * this->zsize_;
+  size_t nzend = ( thread + 1 ) * this->zsize_;
+  if ( nzend > this->nz_ ) 
+  {
+    nzend = this->nz_;
+  }
+
+  unsigned char* downsampled_data = 
+    this->downsample_mask_volume_->get_mask_data_block()->get_mask_data();
+
+  size_t z_offset = this->nx_ * this->ny_;
+  unsigned char not_mask_value = ~( this->mask_value_ );
+
+  size_t target_index = thread * this->total_neighborhoods_;
+  size_t x_start_end = this->nx_ - this->neighborhood_size_ + 1;
+  size_t y_start_end = this->ny_ - this->neighborhood_size_ + 1;
+  size_t z_start_end = nzend - this->neighborhood_size_ + 1;
+
+  // Loop over neighborhoods, chop off border values
+  for ( size_t z_start = nzstart; z_start < z_start_end; z_start += this->neighborhood_size_ ) 
+  {
+    for ( size_t y_start = 0; y_start < y_start_end; y_start += this->neighborhood_size_ ) 
+    {
+      for ( size_t x_start = 0; x_start < x_start_end; x_start += this->neighborhood_size_ ) 
+      {
+        // Clear entry initially
+        downsampled_data[ target_index ] &= not_mask_value;
+        
+        bool stop = false;
+        size_t x_end = x_start + this->neighborhood_size_;
+        size_t y_end = y_start + this->neighborhood_size_;
+        size_t z_end = z_start + this->neighborhood_size_;
+
+        // Loop over neighbors based on corner index
+        for( size_t z = z_start; z < z_end && !stop; z++ )
+        {
+          for( size_t y = y_start; y < y_end && !stop; y++ )
+          {
+            for( size_t x = x_start; x < x_end && !stop; x++ )
+            {
+              size_t index = ( ( z_offset ) * z ) + ( this->nx_ * y ) + x;  
+
+              // If at least one neighborhood node is "on", result is "on"
+              if ( this->data_[ index ] & this->mask_value_ ) // Node "on"    
+              {
+                // Turn on mask value
+                downsampled_data[ target_index ] |= this->mask_value_;
+                // Short-circuit
+                stop = true;
+              }
+            }
+          }
+        }
+        target_index++;
+      }
+    }
+  }
+}
+
+void IsosurfacePrivate::compute_setup( int num_threads )
+{
+  this->nx_ = this->compute_mask_volume_->get_mask_data_block()->get_nx();
+  this->ny_ = this->compute_mask_volume_->get_mask_data_block()->get_ny();
+  this->nz_ = this->compute_mask_volume_->get_mask_data_block()->get_nz();
+
   // Number of elements (cubes) in each dimension
   this->elem_nx_ = this->nx_ - 1;
   this->elem_ny_ = this->ny_ - 1;
   this->elem_nz_ = this->nz_ - 1;
 
   // Mask data is stored in bit-plane (8 masks per data block)
-  this->data_ = this->mask_volume_->get_mask_data_block()->get_mask_data();
+  this->data_ = this->compute_mask_volume_->get_mask_data_block()->get_mask_data();
+
+  // Bit where mask bit is stored
+  this->mask_value_ = this->compute_mask_volume_->get_mask_data_block()->get_mask_value();
 
   // Stores index into polgyon configuration table for each element (cube)?
   // Why +1?  Maybe just padding for safety?
@@ -408,12 +556,12 @@ void IsosurfacePrivate::setup( int num_threads )
 
   // Total number of isosurface points
   this->global_point_cnt_ = 0;
-  
+
   this->min_point_index_.resize( this->elem_nz_ );
   this->max_point_index_.resize( this->elem_nz_ );
   this->min_face_index_.resize( this->elem_nz_ );
   this->max_face_index_.resize( this->elem_nz_ );
-  
+
   this->prev_point_min_ = 0;
   this->prev_point_max_ = 0;
 
@@ -439,7 +587,7 @@ Basic ideas:
 - At end, swap front and back data (front is now back).
 - One advantage of this approach is that we don't need complex and confusing linked lists; we can
   use tables that directly correspond to elements.
-- Point of confusion: sometimes "element" is are synonymous with "cube" and sometimes it refers
+- Point of confusion: sometimes "element" is synonymous with "cube" and sometimes it refers
   to a triangle.
 */
 void IsosurfacePrivate::parallel_compute_faces( int thread, int num_threads, 
@@ -448,7 +596,7 @@ void IsosurfacePrivate::parallel_compute_faces( int thread, int num_threads,
   // Setup the algorithm and the buffers
   if ( thread == 0 ) // Only need to setup once 
   {
-    this->setup( num_threads ); 
+    this->compute_setup( num_threads ); 
   }
 
   // An object of class barrier is a synchronization primitive used to cause a set of threads 
@@ -513,11 +661,8 @@ void IsosurfacePrivate::parallel_compute_faces( int thread, int num_threads,
 
   StackVector< size_t, 3 > elems( 3 );    
 
-  // Bit where mask bit is stored
-  unsigned char mask_value = this->mask_volume_->get_mask_data_block()->get_mask_value(); 
-
   // Get mask transform from MaskVolume 
-  GridTransform grid_transform = this->mask_volume_->get_grid_transform();
+  GridTransform grid_transform = this->compute_mask_volume_->get_grid_transform();
 
   // Loop over all the slices
   for ( size_t z = 0;  z < this->elem_nz_; z++ ) 
@@ -571,15 +716,15 @@ void IsosurfacePrivate::parallel_compute_faces( int thread, int num_threads,
           size_t q = y * this->nx_ + x; // Index into data
           // An 8 bit index is formed where each bit corresponds to a vertex 
           // Bit on if vertex is inside surface, off otherwise
-          if ( data1[ q ] & mask_value )          type |= 0x1;
-          if ( data1[ q + 1 ] & mask_value )        type |= 0x2;
-          if ( data1[ q + this->nx_ + 1 ] & mask_value )  type |= 0x4;
-          if ( data1[ q + this->nx_ ] & mask_value )    type |= 0x8;
+          if ( data1[ q ] & this->mask_value_ )         type |= 0x1;
+          if ( data1[ q + 1 ] & this->mask_value_ )       type |= 0x2;
+          if ( data1[ q + this->nx_ + 1 ] & this->mask_value_ ) type |= 0x4;
+          if ( data1[ q + this->nx_ ] & this->mask_value_ )   type |= 0x8;
 
-          if ( data2[ q ] & mask_value )          type |= 0x10;
-          if ( data2[ q + 1 ] & mask_value )        type |= 0x20;
-          if ( data2[ q + this->nx_ + 1 ] & mask_value )  type |= 0x40;
-          if ( data2[ q + this->nx_ ] & mask_value )    type |= 0x80;
+          if ( data2[ q ] & this->mask_value_ )         type |= 0x10;
+          if ( data2[ q + 1 ] & this->mask_value_ )       type |= 0x20;
+          if ( data2[ q + this->nx_ + 1 ] & this->mask_value_ ) type |= 0x40;
+          if ( data2[ q + this->nx_ ] & this->mask_value_ )   type |= 0x80;
 
           this->type_buffer_[ q ] = type;
 
@@ -1055,12 +1200,13 @@ Isosurface::Isosurface( const MaskVolumeHandle& mask_volume ) :
   private_( new IsosurfacePrivate )
 {
   this->private_->isosurface_ = this;
-  this->private_->mask_volume_ = mask_volume;
+  this->private_->orig_mask_volume_ = mask_volume;
+  this->private_->compute_mask_volume_ = mask_volume;
   this->private_->surface_changed_ = false;
   this->private_->vbo_available_ = false;
 }
 
-void Isosurface::compute()
+void Isosurface::compute( double quality_factor )
 {
   lock_type lock( this->get_mutex() );
 
@@ -1069,7 +1215,18 @@ void Isosurface::compute()
   this->private_->faces_.clear();
 
   {
-    Core::MaskVolume::shared_lock_type vol_lock( this->private_->mask_volume_->get_mutex() );
+    Core::MaskVolume::shared_lock_type vol_lock( this->private_->orig_mask_volume_->get_mutex() );
+
+    // Initially assume we're computing the isosurface for the original volume (not downsampled)
+    this->private_->compute_mask_volume_ = this->private_->orig_mask_volume_;
+
+    if( quality_factor != 1.0 )
+    {
+      assert( quality_factor == 0.5 || quality_factor == 0.25 || quality_factor == 0.125 );
+      Parallel parallel_downsample( boost::bind( &IsosurfacePrivate::parallel_downsample_mask, 
+        this->private_, _1, _2, _3, quality_factor ) );
+      parallel_downsample.run();
+    }
 
     Parallel parallel_faces( boost::bind( &IsosurfacePrivate::parallel_compute_faces, 
       this->private_, _1, _2, _3 ) );
