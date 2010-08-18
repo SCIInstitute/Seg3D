@@ -343,6 +343,8 @@ void ViewerPrivate::delete_layers( std::vector< LayerHandle > layers )
   {
     LayerHandle layer = layers[ i ];
 
+    if ( !layers[ i ]->is_valid() ) continue;
+
     // Disconnect from the signals of the layer states
     std::pair< connection_map_type::iterator, connection_map_type::iterator > range = 
       this->layer_connection_map_.equal_range( layer->get_layer_id() );

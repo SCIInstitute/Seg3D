@@ -382,8 +382,10 @@ void LayerManager::get_layers( std::vector< LayerHandle > &vector_of_layers )
 
 void LayerManager::delete_layers( LayerGroupHandle group )
 {
-  std::vector< LayerHandle > layer_vector;
   bool active_layer_changed = false;
+  bool group_deleted = false;
+
+  std::vector< LayerHandle > layer_vector;
   
   { // start the lock scope
     lock_type lock( get_mutex() );  
@@ -396,7 +398,7 @@ void LayerManager::delete_layers( LayerGroupHandle group )
     {
       if( ( *it )->selected_state_->get() )
       {   
-        CORE_LOG_DEBUG( std::string("Deleting Layer: ") + ( *it )->get_layer_id() );
+        CORE_LOG_MESSAGE( std::string("Deleting Layer: ") + ( *it )->get_layer_id() );
         layer_vector.push_back( *it );
         group->delete_layer( *it );
         if ( *it == this->active_layer_ )
@@ -409,7 +411,7 @@ void LayerManager::delete_layers( LayerGroupHandle group )
     if( group->is_empty() )
     {   
       group->invalidate();
-      group_list_.remove( group );
+      this->group_list_.remove( group );
     }
 
     if ( active_layer_deleted )
@@ -421,16 +423,19 @@ void LayerManager::delete_layers( LayerGroupHandle group )
         active_layer_changed = true;
       }
     }
+
+    if ( group->is_empty() ) group_deleted = true;
+
   } // Unlocked from here:
 
 // signal the listeners
-  if( group->is_empty() )
+  if( group_deleted )
   {   
       this->group_deleted_signal_( group );
   }
   
-  layers_deleted_signal_( layer_vector );
-  layers_changed_signal_();
+  this->layers_deleted_signal_( layer_vector );
+  this->layers_changed_signal_();
   
   if ( active_layer_changed )
   {
@@ -438,6 +443,60 @@ void LayerManager::delete_layers( LayerGroupHandle group )
   }
   
 } // end delete_layer
+
+void LayerManager::delete_layer( LayerHandle layer )
+{
+  bool active_layer_changed = false;
+  bool group_deleted = false;
+  
+  LayerGroupHandle group;
+  
+  { // start the lock scope
+    lock_type lock( this->get_mutex() );  
+
+    CORE_LOG_MESSAGE( std::string( "Deleting Layer: " ) + layer->get_layer_id() );
+    
+    group = layer->get_layer_group();
+    group->delete_layer( layer );
+    
+    if( group->is_empty() )
+    {   
+      group->invalidate();
+      this->group_list_.remove( group );
+    }
+
+    if ( this->active_layer_ == layer )
+    {
+      this->active_layer_.reset();
+      if ( this->group_list_.size() > 0 )
+      {
+        this->active_layer_ = this->group_list_.front()->layer_list_.back();
+        active_layer_changed = true;
+      }
+    }
+    
+    if ( group->is_empty() ) group_deleted = true;
+  } 
+  
+  // signal the listeners
+  
+  if( group_deleted )
+  {   
+      this->group_deleted_signal_( group );
+  }
+  
+  std::vector<LayerHandle> layer_vector( 1 );
+  layer_vector[ 0 ] = layer;
+  this->layers_deleted_signal_( layer_vector );
+  this->layers_changed_signal_();
+  
+  if ( active_layer_changed )
+  {
+    this->active_layer_changed_signal_( this->active_layer_ );
+  }
+  
+} // end delete_layer
+
 
 bool LayerManager::delete_all()
 {
@@ -1005,6 +1064,19 @@ bool LayerManager::CreateAndLockDataLayer( Core::GridTransform transform, const 
   LayerManager::Instance()->insert_layer( layer );
   
   return true;
+}
+
+void LayerManager::DispatchDeleteLayer( LayerHandle layer )
+{
+  // Move this request to the Application thread
+  if ( !( Core::Application::IsApplicationThread() ) )
+  {
+    Core::Application::PostEvent( boost::bind( &LayerManager::DispatchDeleteLayer, layer) );
+    return;
+  }
+
+  // Insert the layer into the layer manager.
+  LayerManager::Instance()->delete_layer( layer );
 }
 
 void LayerManager::DispatchUnlockLayer( LayerHandle layer )

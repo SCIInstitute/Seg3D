@@ -32,7 +32,7 @@
 namespace Core
 {
 
-MaskDataBlock::MaskDataBlock( DataBlockHandle& data_block, unsigned int mask_bit ) :
+MaskDataBlock::MaskDataBlock( DataBlockHandle data_block, unsigned int mask_bit ) :
   nx_( data_block->get_nx() ),
   ny_( data_block->get_ny() ),
   nz_( data_block->get_nz() ),

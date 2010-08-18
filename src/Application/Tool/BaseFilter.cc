@@ -39,16 +39,24 @@ namespace Seg3D
 class BaseFilterPrivate
 {
 public:
-  // Keep track of which layers were locked
+  // Keep track of which layers were locked.
   std::vector<LayerHandle> locked_layers_;
-
+  
+  // Keep track of which layers were created.
+  std::vector<LayerHandle> created_layers_;
+  
+  // Keep track of abort status
+  bool abort_;
+  
+  // Mutex protecting abort status
+  boost::mutex abort_mutex_;
 };
 
 BaseFilter::BaseFilter() :
   private_( new BaseFilterPrivate )
 {
+  this->private_->abort_ = false;
 }
-
 
 BaseFilter::~BaseFilter()
 {
@@ -56,6 +64,34 @@ BaseFilter::~BaseFilter()
   {
     LayerManager::DispatchUnlockLayer( this->private_->locked_layers_[ j ] );
   }
+
+  boost::mutex::scoped_lock lock( this->private_->abort_mutex_ );
+  if ( this->private_->abort_ )
+  {
+    for ( size_t j = 0; j < this->private_->created_layers_.size(); j++ )
+    {
+      LayerManager::DispatchDeleteLayer( this->private_->created_layers_[ j ] );
+    }
+  }
+  else
+  {
+    for ( size_t j = 0; j < this->private_->created_layers_.size(); j++ )
+    {
+      LayerManager::DispatchUnlockLayer( this->private_->created_layers_[ j ] );
+    }
+  }
+}
+
+void BaseFilter::raise_abort()
+{
+  boost::mutex::scoped_lock lock( this->private_->abort_mutex_ );
+  this->private_->abort_ = true;
+}
+
+bool BaseFilter::check_abort()
+{
+  boost::mutex::scoped_lock lock( this->private_->abort_mutex_ );
+  return this->private_->abort_;
 }
 
 bool BaseFilter::find_layer( const std::string& layer_id, LayerHandle& layer )
@@ -71,7 +107,6 @@ bool BaseFilter::find_layer( const std::string& layer_id, LayerHandle& layer )
   }
 }
 
-  
 bool BaseFilter::lock_for_use( LayerHandle& layer )
 {
   if ( !( LayerManager::LockForUse( layer ) ) ) return false;
@@ -79,7 +114,6 @@ bool BaseFilter::lock_for_use( LayerHandle& layer )
   this->private_->locked_layers_.push_back( layer );
   return true;
 }
-
 
 bool BaseFilter::lock_for_processing( LayerHandle& layer )
 {
@@ -89,7 +123,6 @@ bool BaseFilter::lock_for_processing( LayerHandle& layer )
   return true;
 }
 
-  
 bool BaseFilter::create_and_lock_data_layer_from_layer( LayerHandle src_layer, 
   LayerHandle& dst_layer )
 {
@@ -105,7 +138,7 @@ bool BaseFilter::create_and_lock_data_layer_from_layer( LayerHandle src_layer,
   }
   
   // Record that the layer is locked
-  this->private_->locked_layers_.push_back( dst_layer );
+  this->private_->created_layers_.push_back( dst_layer );
 
   // Success
   return true;
@@ -126,28 +159,70 @@ bool BaseFilter::create_and_lock_mask_layer_from_layer( LayerHandle src_layer, L
   }
   
   // Record that the layer is locked
-  this->private_->locked_layers_.push_back( dst_layer );
+  this->private_->created_layers_.push_back( dst_layer );
 
   // Success
   return true;
 }
 
 
-bool BaseFilter::dispatch_unlock_layer( LayerHandle& layer )
+bool BaseFilter::dispatch_unlock_layer( LayerHandle layer )
 {
+  bool found_layer = false;
   // Check whether the locked layer is still in the list of layers that this filter locked
-  std::vector<LayerHandle>::iterator it = std::find( 
-    this->private_->locked_layers_.begin(), this->private_->locked_layers_.end(), layer );
-
-  // If not return with a false, because we apperently already did send a request to unlock
-  // the layer.
-  if ( it == this->private_->locked_layers_.end() ) return false;
-
-  // Take the layer out of the list
-  this->private_->locked_layers_.erase( it );
+  std::vector<LayerHandle>::iterator it;
   
+  it = std::find( this->private_->locked_layers_.begin(), 
+    this->private_->locked_layers_.end(), layer );
+
+  if ( it != this->private_->locked_layers_.end() )
+  {
+    // Take the layer out of the list
+    this->private_->locked_layers_.erase( it );
+    found_layer = true;
+  }
+  
+  // Check whether the locked layer is still in the list of layers that this filter created
+  it = std::find( this->private_->created_layers_.begin(), 
+    this->private_->created_layers_.end(), layer );
+
+  if ( it != this->private_->created_layers_.end() )
+  {
+    // Take the layer out of the list
+    this->private_->created_layers_.erase( it );
+    found_layer = true;
+  }
+
+  // If we did not find the layer return false, as we did not lock it in the first place.
+  if ( ! found_layer ) return false;
+
   // Send a request to the layer manager to unlock the layer.
   LayerManager::DispatchUnlockLayer( layer );
+
+  // Done
+  return true;
+}
+
+bool BaseFilter::dispatch_delete_layer( LayerHandle layer )
+{
+  bool found_layer = false;
+  
+  // Check whether the locked layer is still in the list of layers that this filter created
+  std::vector<LayerHandle>::iterator it = std::find( 
+    this->private_->created_layers_.begin(), this->private_->created_layers_.end(), layer );
+
+  if ( it != this->private_->created_layers_.end() )
+  {
+    // Take the layer out of the list
+    this->private_->created_layers_.erase( it );
+    found_layer = true;
+  }
+
+  // If we did not find the layer return false, as we did not lock it in the first place.
+  if ( ! found_layer ) return false;
+
+  // Send a request to the layer manager to unlock the layer.
+  LayerManager::DispatchDeleteLayer( layer );
 
   // Done
   return true;

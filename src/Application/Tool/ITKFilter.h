@@ -50,6 +50,11 @@
 namespace Seg3D
 {
 
+class ITKFilter;
+class ITKFilterPrivate;
+typedef boost::shared_ptr<ITKFilterPrivate> ITKFilterPrivateHandle;
+
+
 class ITKFilter : public BaseFilter
 {
 
@@ -247,18 +252,20 @@ protected:
     return false;
   }
 
-
-  // FORWARD_PROGRESS:
-  // Forward the progress an itk filter is making
+  // OBSERVE_ITK_FILTER:
+  // Forward the progress an itk filter is making and check for the abort statud of the layer
   template< class T>
-  void forward_progress( T filter_pointer, const LayerHandle& layer )
+  void observe_itk_filter( T filter_pointer, const LayerHandle& layer )
   {
-    this->forward_progress_internal( itk::ProcessObject::Pointer( filter_pointer ), layer );
+    this->observe_itk_filter_internal( itk::ProcessObject::Pointer( filter_pointer ), layer );
   }
   
 private:  
   // Internal function for setting up itk progress forwarding
-  void forward_progress_internal( itk::ProcessObject::Pointer filter, const LayerHandle& layer );   
+  void observe_itk_filter_internal( itk::ProcessObject::Pointer filter, 
+    const LayerHandle& layer ); 
+    
+  ITKFilterPrivateHandle private_;
 };
 
 #define SWITCH_DATATYPE( DATATYPE, ... ) \

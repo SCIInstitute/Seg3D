@@ -103,31 +103,20 @@ public:
   typedef boost::signals2::signal< void (double) > update_progress_signal_type;
   update_progress_signal_type update_progress_signal_;
 
-
   // UPDATE_VOLUME_SIGNAL:
   // When the data/mask volume is updated this signal is triggered.
   typedef boost::signals2::signal< void () > update_volume_signal_type;
   update_volume_signal_type update_volume_signal_;
 
-  // -- layer updated signal --
-public:
-  typedef boost::signals2::signal< void () > layer_updated_signal_type;
   // LAYER_UPDATED_SIGNAL:
   // Triggered when the layer data has been modified.
+  typedef boost::signals2::signal< void () > layer_updated_signal_type;
   layer_updated_signal_type layer_updated_signal_;
   
-  // -- layer filter abort support --
-public:
-  // RAISE_ABORT:
-  // Abort the filter that is working on this layer
-  void raise_abort();
-  
-  // CHECK_ABORT:
-  // Check whether the abort flag was raised, it was reset by start_progress
-  bool check_abort();
-  
-private:
-  bool abort_;
+  // ABORT_SIGNAL:
+  // Trigger an abort signal for the current filter
+  typedef boost::signals2::signal< void() > abort_signal_type;
+  abort_signal_type abort_signal_;
   
   // -- State variables --
 public:

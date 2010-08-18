@@ -957,7 +957,7 @@ QPushButton#activate_button_{
              <number>0</number>
             </property>
             <item>
-             <widget class="QToolButton" name="progress_cancel_button_">
+             <widget class="QToolButton" name="abort_button_">
               <property name="minimumSize">
                <size>
                 <width>16</width>

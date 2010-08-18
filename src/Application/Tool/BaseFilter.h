@@ -63,6 +63,16 @@ public:
   BaseFilter();
   virtual ~BaseFilter();
     
+  // -- abort handling -- 
+public:   
+  // RAISE_ABORT:
+  // Raise the abort flag
+  void raise_abort();
+    
+  // CHECK_ABORT:
+  // Check the abort flag
+  bool check_abort(); 
+    
   // -- shortcuts into the LayerManager --  
 public:
   // FIND_LAYER:
@@ -99,7 +109,11 @@ public:
   
   // DISPATCH_UNLOCK_LAYER:
   // Schedule a layer to be unlocked.
-  bool dispatch_unlock_layer( LayerHandle& layer );
+  bool dispatch_unlock_layer( LayerHandle layer );
+
+  // DISPATCH_DELETE_LAYER:
+  // Schedule a layer to be deleted
+  bool dispatch_delete_layer(LayerHandle layer );
 
   // TODO:
   // These next two functions need to atomically set the provenance information as well

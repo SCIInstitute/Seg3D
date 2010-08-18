@@ -68,7 +68,8 @@ public:
 public:
   // ENABLE_BUTTONS:
   // Specify which buttons need to be enabled for the user
-  void enable_buttons( bool lock_button, bool other_buttons, bool initialize = false);
+  void enable_buttons( bool lock_button, bool compute_isosurface_button,
+    bool other_buttons, bool initialize = false);
 
   // SET_ACTIVE_MENU:
   // Setup which menu is currently shown
@@ -191,6 +192,7 @@ private:
   
 
 private Q_SLOTS:
+
   // SET_MASK_BACKGROUND_COLOR:
   // this function is for setting the background of the mask to match the active color
   void set_mask_background_color( int color_index );
@@ -204,6 +206,10 @@ private Q_SLOTS:
   // this function unchecks the show iso button if it is on when the iso surface button is clicked
   // and the iso surface is deleted
   void uncheck_show_iso_button();
+
+  // TRIGGER_ABORT:
+  // Trigger the abort signal of the layer
+  void trigger_abort();
 
 protected:
   void resizeEvent( QResizeEvent *event );

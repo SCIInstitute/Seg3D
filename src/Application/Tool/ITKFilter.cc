@@ -26,7 +26,11 @@
  DEALINGS IN THE SOFTWARE.
  */
  
+// ITK includes 
 #include <itkCommand.h>
+ 
+// Boost includes
+#include <boost/signals.hpp> 
  
 // Core includes
 #include <Core/Utils/Exception.h>
@@ -44,26 +48,56 @@
 namespace Seg3D
 {
 
-ITKFilter::ITKFilter()
+class ITKFilterPrivate : public Core::Lockable, public Core::ConnectionHandler
 {
+public:
+  // Pointer to the filter base class
+  ITKFilter* base_;
+
+  // Pointer to the itk filter class
+  itk::ProcessObject::Pointer filter_;
+  
+public:
+  // Function for handling abort
+  void handle_abort();
+};
+
+void ITKFilterPrivate::handle_abort()
+{
+  lock_type lock( this->get_mutex() );
+  
+  if ( this->base_ )
+  {
+    this->filter_->SetAbortGenerateData( true );
+    this->base_->raise_abort();
+  }
+}
+
+ITKFilter::ITKFilter() :
+  private_( new ITKFilterPrivate )
+{
+  this->private_->base_ = this;
+  this->private_->filter_ = 0;
 }
 
 ITKFilter::~ITKFilter()
 {
+  ITKFilterPrivate::lock_type lock( this->private_->get_mutex() );
+  this->private_->disconnect_all();
+  this->private_->filter_ = 0;
+  this->private_->base_ = 0;
 }
 
-
-class ITKProgress : public itk::Command
+class ITKProgressObserver : public itk::Command
 {
-
   // -- constructor /destructor --
 public:
-  ITKProgress( LayerHandle layer ) :
+  ITKProgressObserver( LayerHandle layer ) :
     layer_( layer )
   {}
 
   // NOTE: Virtual destructor is needed for ITK
-  virtual ~ITKProgress()
+  virtual ~ITKProgressObserver()
   {}
   
   // Overloaded ITK function that is called when progress is reported
@@ -99,14 +133,19 @@ private:
   LayerHandle layer_;
 
 };
-    
-void ITKFilter::forward_progress_internal( itk::ProcessObject::Pointer filter, 
+
+void ITKFilter::observe_itk_filter_internal( itk::ProcessObject::Pointer filter, 
   const LayerHandle& layer )
 {
-  // Make a new itk object that observes progress being made in the filter
-  itk::Command::Pointer observer = new ITKProgress( layer );
-  // Add it to the itk filter
-  filter->AddObserver( itk::ProgressEvent() , observer );
+  // Setup progress measuring, by forwarding progress to the filter
+  filter->AddObserver( itk::ProgressEvent() , new ITKProgressObserver( layer ) );
+
+  ITKFilterPrivate::lock_type lock( this->private_->get_mutex() );
+
+  this->private_->disconnect_all();
+  this->private_->filter_ = filter;
+  this->private_->add_connection( layer->abort_signal_.connect( boost::bind(
+    &ITKFilterPrivate::handle_abort, this->private_ ) ) );
 } 
 
 } // end namespace Core

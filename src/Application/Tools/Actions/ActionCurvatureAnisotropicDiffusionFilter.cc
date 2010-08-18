@@ -123,7 +123,7 @@ public:
       this->get_itk_image_from_layer<VALUE_TYPE>( this->src_layer_, input_image );
           
       filter_type::Pointer filter = filter_type::New();
-      this->forward_progress( filter, this->dst_layer_ );
+      this->observe_itk_filter( filter, this->dst_layer_ );
 
       filter->SetInput( input_image->get_image() );
       filter->SetInPlace( false );
@@ -132,8 +132,10 @@ public:
       filter->SetTimeStep( this->integration_step_ );
       filter->SetConductanceParameter( this->conductance_ );
 
-      filter->Update();
+      try { filter->Update(); } catch ( ... ) {}
 
+      if ( this->check_abort() ) return;
+      
       if ( this->maintain_percision_ )
       {
         this->convert_and_insert_itk_image_into_layer( this->dst_layer_, 
@@ -187,11 +189,11 @@ bool ActionCurvatureAnisotropicDiffusionFilter::run( Core::ActionContextHandle& 
     algo->create_and_lock_data_layer_from_layer( algo->src_layer_, algo->dst_layer_ );
   }
 
+  // Return the id of the destination layer.
+  result = Core::ActionResultHandle( new Core::ActionResult( algo->dst_layer_->get_layer_id() ) );
+
   // Start the filter.
   CurvatureAnisotropicDiffusionFilterAlgo::Start( algo );
-
-  // Return the id of the destination layer.
-  result->set_value( algo->dst_layer_->get_layer_id() );
 
   return true;
 }

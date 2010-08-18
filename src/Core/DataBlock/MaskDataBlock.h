@@ -70,7 +70,7 @@ public:
 
   // -- Constructor/destructor --
 public:
-  MaskDataBlock( DataBlockHandle& data_block, unsigned int mask_bit );
+  MaskDataBlock( DataBlockHandle data_block, unsigned int mask_bit );
   virtual ~MaskDataBlock();
 
   // -- Access properties of data block --

@@ -146,7 +146,6 @@ void DataLayer::set_data_volume( Core::DataVolumeHandle data_volume )
   this->update_volume_signal_();
 } 
 
-  
 bool DataLayer::pre_save_states( Core::StateIO& state_io )
 {
   if ( data_volume_ )

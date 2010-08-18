@@ -424,7 +424,7 @@ void IsosurfacePrivate::downsample_setup( int num_threads, double quality_factor
   size_t downsampled_ny = this->ny_ / this->neighborhood_size_;
   size_t downsampled_nz = this->nz_ / this->neighborhood_size_;
 
-  MaskDataBlockHandle mask_data_block  = MaskDataBlockHandle( new MaskDataBlock( 
+  MaskDataBlockHandle mask_data_block( new MaskDataBlock( 
     StdDataBlock::New( downsampled_nx, downsampled_ny, downsampled_nz, DataType::UCHAR_E ), 
     this->orig_mask_volume_->get_mask_data_block()->get_mask_bit() ) );
 

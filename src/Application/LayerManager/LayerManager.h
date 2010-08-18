@@ -120,7 +120,6 @@ public:
   // This function returns a handle to the active layer
   LayerHandle get_active_layer();
   
-  
   // TODO:
   // These two functions need some redesign
   // GET_LAYER_NAMES:
@@ -131,7 +130,6 @@ public:
   // GET_LAYER_NAMES:
   // This function returns a vector of layer ID and name pairs of all layers.
   void get_layer_names( std::vector< LayerIDNamePair >& layer_names );
-
 
   // Layer Action Functions
 public:
@@ -150,6 +148,11 @@ public:
   // DELETE_LAYERS:
   // this function deletes the selected layers in the group that is passed
   void delete_layers( LayerGroupHandle group );
+
+  // DELETE_LAYER:
+  // this function deletes the layer
+  void delete_layer( LayerHandle layer );
+
   
   // SET_ACTIVE_LAYER:
   // this function sets the active layer
@@ -374,6 +377,11 @@ public:
   // Change the layer data_state back to available. This function will relay a call to the 
   // Application thread if needed.
   static void DispatchUnlockLayer( LayerHandle layer );
+
+  // DISPATCHDELETELAYER:
+  // Delete the layer. This function will relay a call to the 
+  // Application thread if needed.
+  static void DispatchDeleteLayer( LayerHandle layer );
   
   // DISPATCHINSERTDATAVOLUMEINTOLAYER:
   // Insert a datavolume into a data layer. This function will relay a call to the 

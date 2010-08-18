@@ -179,21 +179,29 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   this->private_->color_widget_->setObjectName( QString::fromUtf8( "color_widget_" ) );
   
   // connect the GUI signals and slots
-  connect( this->private_->ui_.opacity_button_, 
-      SIGNAL( clicked( bool ) ), this, 
-      SLOT( select_opacity_bar( bool ) ) );
-  connect( this->private_->ui_.brightness_contrast_button_, 
-      SIGNAL( clicked( bool ) ), this, 
-      SLOT( select_brightness_contrast_bar( bool ) ) );
-  connect( this->private_->ui_.fill_border_button_, 
-      SIGNAL( clicked( bool ) ), this, 
-      SLOT( select_border_fill_bar ( bool ) ) );
-  connect( this->private_->ui_.color_button_, 
-      SIGNAL( clicked( bool ) ), this, 
-      SLOT( select_color_bar( bool ) ) );
-  connect( this->private_->ui_.lock_button_, 
-      SIGNAL( toggled( bool )), this, 
-      SLOT( select_visual_lock( bool ) ) );
+  this->connect( this->private_->ui_.opacity_button_, 
+    SIGNAL( clicked( bool ) ), this, 
+    SLOT( select_opacity_bar( bool ) ) );
+    
+  this->connect( this->private_->ui_.brightness_contrast_button_, 
+    SIGNAL( clicked( bool ) ), this, 
+    SLOT( select_brightness_contrast_bar( bool ) ) );
+      
+  this->connect( this->private_->ui_.fill_border_button_, 
+    SIGNAL( clicked( bool ) ), this, 
+    SLOT( select_border_fill_bar ( bool ) ) );
+  
+  this->connect( this->private_->ui_.color_button_, 
+    SIGNAL( clicked( bool ) ), this, 
+    SLOT( select_color_bar( bool ) ) );
+  
+  this->connect( this->private_->ui_.lock_button_, 
+    SIGNAL( toggled( bool ) ), this, 
+    SLOT( select_visual_lock( bool ) ) );
+      
+  this->connect( this->private_->ui_.abort_button_,
+    SIGNAL ( pressed() ), this,
+    SLOT( trigger_abort() ) );
       
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
@@ -206,6 +214,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
     this->private_->layer_->data_state_->state_changed_signal_.connect(
       boost::bind( &LayerWidget::UpdateState, qpointer ) ); 
   
+    // Progress forwarding 
     this->private_->layer_->update_progress_signal_.connect(
       boost::bind( &LayerWidget::UpdateProgress, qpointer, _1 ) );
   
@@ -214,7 +223,8 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
       &ActionActivateLayer::Dispatch ), Core::Interface::GetWidgetActionContext(), layer ) );
     
     // make the default connections, for any layer type, to the state engine
-    QtUtils::QtBridge::Connect( this->private_->ui_.selection_checkbox_, layer->selected_state_ );
+    QtUtils::QtBridge::Connect( this->private_->ui_.selection_checkbox_, 
+      layer->selected_state_ );
     QtUtils::QtBridge::Connect( this->private_->ui_.label_, layer->name_state_ );
     QtUtils::QtBridge::Connect( this->private_->ui_.visibility_button_, layer->visible_state_,
       ViewerManager::Instance()->active_viewer_state_ );
@@ -325,13 +335,14 @@ LayerWidget::~LayerWidget()
 {
 }
 
-void LayerWidget::enable_buttons( bool lock_button, bool other_buttons, bool /*initialize*/ )
+void LayerWidget::enable_buttons( bool lock_button, bool compute_isosurface_button, 
+  bool other_buttons, bool /*initialize*/ )
 {
   this->private_->activate_button_->set_enabled( other_buttons );
   this->private_->ui_.opacity_button_->setEnabled( other_buttons );
   this->private_->ui_.visibility_button_->setEnabled( other_buttons );
   this->private_->ui_.color_button_->setEnabled( other_buttons );
-  this->private_->ui_.compute_iso_surface_button_->setEnabled( other_buttons );
+  this->private_->ui_.compute_iso_surface_button_->setEnabled( compute_isosurface_button );
   this->private_->ui_.fill_border_button_->setEnabled( other_buttons );
   this->private_->ui_.volume_rendered_button_->setEnabled( other_buttons );
   this->private_->ui_.brightness_contrast_button_->setEnabled( other_buttons );
@@ -575,7 +586,7 @@ void LayerWidget::update_widget_state( bool initialize )
   if ( data_state == Layer::AVAILABLE_C )
   {
     // Lock buttons if widget is locked
-    this->enable_buttons( true, !visual_lock, initialize );
+    this->enable_buttons( true, !visual_lock, !visual_lock, initialize );
     // If locked no bars can be opened and adjust the option
     // menu to the actual menu that is open in the state manager
     this->set_active_menu( menu_state, visual_lock, initialize );
@@ -589,7 +600,7 @@ void LayerWidget::update_widget_state( bool initialize )
   else if ( data_state == Layer::CREATING_C )
   {
     // Everything is still locked down
-    enable_buttons( false, false, initialize );
+    enable_buttons( false, false, false, initialize );
     // Menus cannot be opened, so override them and close all of them
     set_active_menu( menu_state, true, initialize );
 
@@ -603,7 +614,7 @@ void LayerWidget::update_widget_state( bool initialize )
   {
     // PROCESSING_C state
     // Lock buttons if widget is locked
-    enable_buttons( true, !visual_lock, initialize );
+    enable_buttons( true, false, !visual_lock, initialize );
     // If locked no bars can be opened and adjust the option
     // menu to the actual menu that is open in the state manager    
     set_active_menu( menu_state, visual_lock, initialize );
@@ -661,6 +672,12 @@ void LayerWidget::set_mask_background_color_from_preference_change( int color_in
   QString::fromUtf8( ");" );
 
   this->private_->ui_.type_->setStyleSheet( style_sheet );
+}
+
+void LayerWidget::trigger_abort()
+{
+  this->private_->ui_.progress_bar_->setEnabled( false );
+  this->private_->layer_->abort_signal_();
 }
 
 void LayerWidget::set_group_menu_status( bool status )
@@ -947,6 +964,7 @@ void LayerWidget::show_progress_bar( bool show )
   if ( show )
   {
     this->private_->ui_.progress_bar_->setValue( 0 );
+    this->private_->ui_.progress_bar_->setEnabled( true );
     this->private_->ui_.progress_bar_bar_->show();
   }
   else 
@@ -959,7 +977,6 @@ void LayerWidget::update_progress_bar( double progress )
 {
   this->private_->ui_.progress_bar_->setValue( static_cast<int>( progress * 100.0 ) );
 }
-
 
 void LayerWidget::select_visual_lock( bool lock )
 {
