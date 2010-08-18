@@ -111,7 +111,7 @@ Core::DataType DataLayer::get_data_type() const
   return Core::DataType::UNKNOWN_E;
 }
 
-Core::DataVolumeHandle DataLayer::get_data_volume()
+Core::DataVolumeHandle DataLayer::get_data_volume() const
 {
   Layer::lock_type lock( Layer::GetMutex() );
 
@@ -130,6 +130,11 @@ bool DataLayer::is_valid() const
   {
     return false;
   }
+}
+
+Core::VolumeHandle DataLayer::get_volume() const
+{
+  return this->get_data_volume();
 }
 
 void DataLayer::set_data_volume( Core::DataVolumeHandle data_volume )
@@ -194,7 +199,6 @@ void DataLayer::clean_up()
 {
   this->data_volume_.reset();
 }
-
 
 } // end namespace Seg3D
 

@@ -49,10 +49,13 @@ MaskVolumeSlice::MaskVolumeSlice( const MaskVolumeHandle& mask_volume,
   private_( new MaskVolumeSlicePrivate )
 {
   this->private_->using_cache_ = false;
-  this->add_connection( this->mask_data_block_->mask_updated_signal_.connect( 
-    boost::bind( &VolumeSlice::handle_volume_updated, this ), boost::signals2::at_front ) );
-  this->add_connection( this->cache_updated_signal_.connect( boost::bind(
-    &VolumeSlice::handle_volume_updated, this ) ) );
+  if ( this->mask_data_block_ )
+  {
+    this->add_connection( this->mask_data_block_->mask_updated_signal_.connect( 
+      boost::bind( &VolumeSlice::handle_volume_updated, this ), boost::signals2::at_front ) );
+    this->add_connection( this->cache_updated_signal_.connect( boost::bind(
+      &VolumeSlice::handle_volume_updated, this ) ) );
+  }
 }
 
 MaskVolumeSlice::MaskVolumeSlice( const MaskVolumeSlice& copy ) :
@@ -96,9 +99,6 @@ static void CopyMaskData( const MaskVolumeSlice* slice, unsigned char* buffer )
 
 void MaskVolumeSlice::upload_texture()
 {
-  if ( !this->slice_changed_ )
-    return;
-
   internal_lock_type lock( this->internal_mutex_ );
 
   if ( !this->slice_changed_ )
@@ -172,6 +172,23 @@ VolumeSliceHandle MaskVolumeSlice::clone()
 MaskDataBlockHandle MaskVolumeSlice::get_mask_data_block() const
 {
   return this->mask_data_block_->shared_from_this();
+}
+
+void MaskVolumeSlice::set_volume( const VolumeHandle& volume )
+{
+  internal_lock_type lock( this->internal_mutex_ );
+
+  VolumeSlice::set_volume( volume );
+  MaskVolume* mask_volume = dynamic_cast< MaskVolume* >( volume.get() );
+  assert( mask_volume != 0 );
+  this->mask_data_block_ = mask_volume->get_mask_data_block().get();
+  if ( this->mask_data_block_ )
+  {
+    this->add_connection( this->mask_data_block_->mask_updated_signal_.connect( 
+      boost::bind( &VolumeSlice::handle_volume_updated, this ), boost::signals2::at_front ) );
+    this->add_connection( this->cache_updated_signal_.connect( boost::bind(
+      &VolumeSlice::handle_volume_updated, this ) ) );
+  }
 }
 
 MaskVolumeSlice::cache_mutex_type& MaskVolumeSlice::get_cache_mutex() const
@@ -254,9 +271,9 @@ void MaskVolumeSlice::release_cached_data()
   {
     lock_type volume_lock( this->get_mutex() );
     CopyCachedDataBack( this, &this->private_->cache_[ 0 ] );
-    this->mask_data_block_->increase_generation();
   }
   
+  this->mask_data_block_->increase_generation();
   this->private_->cache_.resize( 0 );
   this->private_->using_cache_ = false;
   cache_lock.unlock();

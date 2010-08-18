@@ -361,4 +361,11 @@ void VolumeSlice::initialize_texture()
   }
 }
 
+void VolumeSlice::set_volume( const VolumeHandle& volume )
+{
+  this->disconnect_all();
+  this->volume_ = volume;
+  this->slice_changed_ = true;
+}
+
 } // end namespace Core

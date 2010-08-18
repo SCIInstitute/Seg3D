@@ -47,8 +47,11 @@ DataVolumeSlice::DataVolumeSlice( const DataVolumeHandle& data_volume,
   VolumeSlice( data_volume, type, slice_num )
 {
   this->data_block_ = data_volume->get_data_block().get();
-  this->add_connection( this->data_block_->data_changed_signal_.connect( 
-    boost::bind( &VolumeSlice::handle_volume_updated, this ) ) );
+  if ( this->data_block_ )
+  {
+    this->add_connection( this->data_block_->data_changed_signal_.connect( 
+      boost::bind( &VolumeSlice::handle_volume_updated, this ) ) );
+  }
 }
 
 DataVolumeSlice::DataVolumeSlice( const DataVolumeSlice &copy ) :
@@ -99,9 +102,6 @@ void CopyTypedData( DataVolumeSlice* slice, DATA1* buffer )
 
 void DataVolumeSlice::upload_texture()
 {
-  if ( !this->slice_changed_ )
-    return;
-
   internal_lock_type lock( this->internal_mutex_ );
 
   if ( !this->slice_changed_ )
@@ -186,6 +186,21 @@ void DataVolumeSlice::upload_texture()
 VolumeSliceHandle DataVolumeSlice::clone()
 {
   return VolumeSliceHandle( new DataVolumeSlice( *this ) );
+}
+
+void DataVolumeSlice::set_volume( const VolumeHandle& volume )
+{
+  internal_lock_type lock( this->internal_mutex_ );
+
+  VolumeSlice::set_volume( volume );
+  DataVolume* data_volume = dynamic_cast< DataVolume* >( volume.get() );
+  assert( data_volume != 0 );
+  this->data_block_ = data_volume->get_data_block().get();
+  if ( this->data_block_ )
+  {
+    this->add_connection( this->data_block_->data_changed_signal_.connect( 
+      boost::bind( &VolumeSlice::handle_volume_updated, this ) ) );
+  }
 }
 
 } // end namespace Core

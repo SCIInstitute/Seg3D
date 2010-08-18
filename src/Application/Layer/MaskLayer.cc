@@ -107,6 +107,11 @@ bool MaskLayer::is_valid() const
 }
 
 
+Core::VolumeHandle MaskLayer::get_volume() const
+{
+  return this->get_mask_volume();
+}
+
 void MaskLayer::set_mask_volume( Core::MaskVolumeHandle volume )
 {
   Layer::lock_type lock( Layer::GetMutex() );

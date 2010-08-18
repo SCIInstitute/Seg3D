@@ -72,6 +72,10 @@ public:
   // Make a copy of the slice, which will share texture object with the original one.
   virtual VolumeSliceHandle clone();
 
+  // SET_VOLUME:
+  // Set the volume out of which the slice will be taken.
+  virtual void set_volume( const VolumeHandle& volume );
+
 private:
   // Pointer to the data block. The base class keeps a handle of the volume,
   // so it is safe to use a pointer here.

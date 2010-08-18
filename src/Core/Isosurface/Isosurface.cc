@@ -1177,6 +1177,7 @@ void IsosurfacePrivate::upload_to_vertex_buffer()
     return;
   }
   
+  RenderResources::lock_type rr_lock( RenderResources::GetMutex() );
   this->vbo_batches_.resize( num_of_parts );
   for ( size_t i = 0; i < num_of_parts; ++i )
   {
@@ -1375,6 +1376,8 @@ void Isosurface::redraw()
     return;
   }
   
+  RenderResources::lock_type rr_lock( RenderResources::GetMutex() );
+
   // The isosurface couldn't fit in GPU memory, render it piece by piece.
   VertexAttribArrayBufferHandle vertex_buffer( new VertexAttribArrayBuffer );
   vertex_buffer->set_array( VertexAttribArrayType::VERTEX_E, 3, GL_FLOAT, 0, 0 );

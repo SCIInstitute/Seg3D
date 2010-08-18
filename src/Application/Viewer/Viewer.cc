@@ -82,6 +82,7 @@ public:
   void insert_layer( LayerHandle layer );
   void delete_layers( std::vector< LayerHandle > layers );
   void set_active_layer( LayerHandle layer );
+  void handle_layer_volume_updated( std::string layer_id );
 
   // -- Helper functions --
 public:
@@ -146,7 +147,7 @@ public:
 
 void ViewerPrivate::handle_layer_group_inserted( LayerGroupHandle layer_group )
 {
-  Viewer::lock_type lock( this->viewer_->get_mutex() );
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
 
   this->layer_connection_map_.insert( std::make_pair( layer_group->get_group_id(),
     layer_group->visibility_state_->state_changed_signal_.connect(
@@ -155,7 +156,7 @@ void ViewerPrivate::handle_layer_group_inserted( LayerGroupHandle layer_group )
 
 void ViewerPrivate::handle_layer_group_deleted( LayerGroupHandle layer_group )
 {
-  Viewer::lock_type lock( this->viewer_->get_mutex() );
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
 
   std::pair< connection_map_type::iterator, connection_map_type::iterator > 
     range = this->layer_connection_map_.equal_range( layer_group->get_group_id() );
@@ -224,9 +225,7 @@ void ViewerPrivate::pick_point( int x, int y )
 
 void ViewerPrivate::insert_layer( LayerHandle layer )
 {
-  Viewer::lock_type lock( this->viewer_->get_mutex() );
-
-  if ( ! layer->is_valid() ) return;
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
 
   Core::VolumeSliceHandle volume_slice;
 
@@ -251,6 +250,10 @@ void ViewerPrivate::insert_layer( LayerHandle layer )
   this->layer_connection_map_.insert( std::make_pair( layer->get_layer_id(),
     layer->layer_updated_signal_.connect( boost::bind(
     &ViewerPrivate::layer_state_changed, this, ViewModeType::ALL_E ) ) ) );
+
+  this->layer_connection_map_.insert( std::make_pair( layer->get_layer_id(),
+    layer->update_volume_signal_.connect( boost::bind(
+    &ViewerPrivate::handle_layer_volume_updated, this, layer->get_layer_id() ) ) ) );
 
   switch( layer->type() )
   {
@@ -329,7 +332,7 @@ void ViewerPrivate::insert_layer( LayerHandle layer )
     volume_slice->move_slice_to( this->active_layer_slice_->depth() );
   }
 
-  if ( !this->viewer_->is_volume_view() )
+  if ( !this->viewer_->is_volume_view() && layer->is_valid() )
   {
     this->viewer_->redraw( false );
   }
@@ -337,13 +340,11 @@ void ViewerPrivate::insert_layer( LayerHandle layer )
 
 void ViewerPrivate::delete_layers( std::vector< LayerHandle > layers )
 {
-  Viewer::lock_type lock( this->viewer_->get_mutex() );
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
 
   for ( size_t i = 0; i < layers.size(); ++i )
   {
     LayerHandle layer = layers[ i ];
-
-    if ( !layers[ i ]->is_valid() ) continue;
 
     // Disconnect from the signals of the layer states
     std::pair< connection_map_type::iterator, connection_map_type::iterator > range = 
@@ -441,6 +442,15 @@ void ViewerPrivate::set_active_layer( LayerHandle layer )
       }
     }
   }
+}
+
+void ViewerPrivate::handle_layer_volume_updated( std::string layer_id )
+{
+  Core::VolumeSliceHandle volume_slice = this->viewer_->get_volume_slice( layer_id );
+  assert( volume_slice );
+  LayerHandle layer = LayerManager::Instance()->get_layer_by_id( layer_id );
+  volume_slice->set_volume( layer->get_volume() );
+  this->viewer_->redraw();
 }
 
 void ViewerPrivate::change_view_mode( std::string mode, Core::ActionSource source )
@@ -1279,7 +1289,8 @@ Core::StateViewBaseHandle Viewer::get_active_view_state() const
 
 Core::VolumeSliceHandle Viewer::get_volume_slice( const std::string& layer_id )
 {
-  lock_type lock( this->get_mutex() );
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
   ViewerPrivate::volume_slice_map_type::iterator it = 
     this->private_->volume_slices_.find( layer_id );
   if ( it != this->private_->volume_slices_.end() )

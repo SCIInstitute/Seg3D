@@ -69,9 +69,13 @@ public:
   // Get the data type of the data volume
   virtual Core::DataType get_data_type() const;
   
+  // GET_VOLUME:
+  // Get the underlying volume.
+  virtual Core::VolumeHandle get_volume() const;
+
   // GET_DATA_VOLUME:
   // this function returns the data volume
-  Core::DataVolumeHandle get_data_volume();
+  Core::DataVolumeHandle get_data_volume() const;
 
   // SET_DATA_VOLUME:
   // this function sets the data_volume

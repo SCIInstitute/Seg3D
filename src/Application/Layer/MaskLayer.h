@@ -76,6 +76,10 @@ public:
   // Check whether the layer has valid data.
   virtual bool is_valid() const;
   
+  // GET_VOLUME:
+  // Get the underlying volume.
+  virtual Core::VolumeHandle get_volume() const;
+
   // GET_MASK_VOLUME:
   // This function returns the mask volume.
   Core::MaskVolumeHandle get_mask_volume() const;

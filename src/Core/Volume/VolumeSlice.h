@@ -176,6 +176,10 @@ public:
     return this->texture_;
   }
 
+  // SET_VOLUME:
+  // Set the volume out of which the slice will be taken.
+  virtual void set_volume( const VolumeHandle& volume ) = 0;
+
 private:
   // UPDATE_DIMENSION:
   // Update the dimension of the slice.

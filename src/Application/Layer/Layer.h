@@ -92,6 +92,10 @@ public:
   // IS_VALID:
   // Check whether the layer has valid data
   virtual bool is_valid() const = 0;
+
+  // GET_VOLUME:
+  // Get the underlying volume.
+  virtual Core::VolumeHandle get_volume() const = 0;
     
   // -- layer progress signals --
 public:

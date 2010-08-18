@@ -56,7 +56,7 @@ class AbstractViewerPrivate;
 typedef boost::shared_ptr< AbstractViewerPrivate > AbstractViewerPrivateHandle;
 
 // Class definition
-class AbstractViewer : public StateHandler, public RecursiveLockable
+class AbstractViewer : public StateHandler, private Lockable
 {
 
   // -- constructor/destructor --
@@ -155,6 +155,8 @@ protected:
 
   // -- internals of the abstract renderer --
 private:
+  friend class AbstractViewerPrivate;
+
   AbstractViewerPrivateHandle private_;
 
   // -- State information --
