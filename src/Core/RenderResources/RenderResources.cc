@@ -123,7 +123,7 @@ void RenderResourcesPrivate::query_video_memory_size()
       reinterpret_cast< LPBYTE >( &max_object_number ), &buffer_size ) 
       == ERROR_SUCCESS && type == REG_DWORD )
     {
-      for ( DWORD i = 0; i <= max_object_number; ++i )
+      for ( DWORD i = 0; i <= max_object_number && this->vram_size_ == 0; ++i )
       {
         std::string video_device_name = "\\Device\\Video" + ExportToString( i );
         if ( RegQueryValueEx( video_devicemap_key, video_device_name.c_str(), NULL, 
@@ -160,7 +160,6 @@ void RenderResourcesPrivate::query_video_memory_size()
           type == REG_DWORD )
         {
           this->vram_size_ = vram_size;
-          break;
         }
         RegCloseKey( video_device_key );
       } // end for
