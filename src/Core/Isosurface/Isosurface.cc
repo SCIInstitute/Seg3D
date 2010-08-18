@@ -1014,7 +1014,8 @@ void IsosurfacePrivate::upload_to_vertex_buffer()
   CORE_LOG_MESSAGE( "Total memory required for the isosurface: " +
            ExportToString( total_size ) );
   
-  if ( total_size + ( 20 << 20 ) > RenderResources::Instance()->get_vram_size() )
+  if ( total_size + ( 20 << 20 ) > static_cast< ptrdiff_t >( 
+    RenderResources::Instance()->get_vram_size() ) )
   {
     CORE_LOG_WARNING( "Could not fit the isosurface in GPU memory" );
     this->vbo_available_ = false;
