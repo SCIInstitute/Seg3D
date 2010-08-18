@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>298</width>
-    <height>770</height>
+    <width>208</width>
+    <height>409</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -50,10 +50,10 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_4">
       <property name="spacing">
-       <number>4</number>
+       <number>6</number>
       </property>
       <property name="margin">
-       <number>6</number>
+       <number>4</number>
       </property>
       <item>
        <widget class="QComboBox" name="target_mask_"/>
@@ -80,10 +80,10 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_5">
       <property name="spacing">
-       <number>4</number>
+       <number>6</number>
       </property>
       <property name="margin">
-       <number>6</number>
+       <number>4</number>
       </property>
       <item>
        <widget class="QComboBox" name="mask_constraint_"/>
@@ -131,10 +131,10 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <property name="spacing">
-       <number>4</number>
+       <number>6</number>
       </property>
       <property name="margin">
-       <number>6</number>
+       <number>4</number>
       </property>
       <item>
        <widget class="QComboBox" name="data_constraint_"/>

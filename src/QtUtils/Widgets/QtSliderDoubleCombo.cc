@@ -71,6 +71,16 @@ QtSliderDoubleCombo::QtSliderDoubleCombo( QWidget* parent, bool edit_range ) :
     this, SLOT( slider_signal( int )) );
     this->connect( this->private_->ui_.spinBox, SIGNAL( valueChanged( double )), 
     this, SLOT( spinner_signal( double )) );
+  
+#if defined ( __APPLE__ )  
+  QFont font;
+  font.setPointSize( 10 );
+  this->private_->ui_.min_->setFont( font );
+  this->private_->ui_.max_->setFont( font );
+  this->private_->ui_.spinBox->setFont( font );
+#endif
+  
+  
 }
 
 QtSliderDoubleCombo::~QtSliderDoubleCombo()

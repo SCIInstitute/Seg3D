@@ -219,6 +219,8 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
     QtUtils::QtBridge::Connect( this->private_->ui_.visibility_button_, layer->visible_state_,
       ViewerManager::Instance()->active_viewer_state_ );
     QtUtils::QtBridge::Connect( this->private_->opacity_adjuster_, layer->opacity_state_ );
+    
+    
   
     switch( this->get_volume_type() )
     {
@@ -261,10 +263,6 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
           this->connect( this->private_->color_widget_, SIGNAL( color_changed( int ) ), 
             this, SLOT( set_mask_background_color( int ) ) );
             
-          // TODO: Seems odd to add this second connection  
-          //this->connect( this->private_->color_widget_, SIGNAL( color_changed( int ) ),
-          //  this, SLOT( set_mask_background_color_from_preference_change( int ) ) );
-
           MaskLayer* mask_layer = dynamic_cast< MaskLayer* >( layer.get() );  
           if ( mask_layer )
           {
@@ -282,6 +280,18 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
             QtUtils::QtBridge::Connect( this->private_->color_widget_, 
               mask_layer->color_state_,
               PreferencesManager::Instance()->color_states_ );
+            
+            this->private_->ui_.show_iso_surface_button_->setEnabled( false );
+            this->private_->ui_.delete_iso_surface_button_->setEnabled( false );
+            
+            QtUtils::QtBridge::Enable( this->private_->ui_.show_iso_surface_button_, 
+              mask_layer->iso_generated_state_ );
+            
+            QtUtils::QtBridge::Enable( this->private_->ui_.delete_iso_surface_button_, 
+              mask_layer->iso_generated_state_ );
+            
+            connect( this->private_->ui_.delete_iso_surface_button_, 
+              SIGNAL( clicked() ), this, SLOT( uncheck_show_iso_button() ) );
           
             this->set_mask_background_color( mask_layer->color_state_->get() );
           }
@@ -322,13 +332,21 @@ void LayerWidget::enable_buttons( bool lock_button, bool other_buttons, bool /*i
   this->private_->ui_.visibility_button_->setEnabled( other_buttons );
   this->private_->ui_.color_button_->setEnabled( other_buttons );
   this->private_->ui_.compute_iso_surface_button_->setEnabled( other_buttons );
-  this->private_->ui_.show_iso_surface_button_->setEnabled( other_buttons );
-  this->private_->ui_.delete_iso_surface_button_->setEnabled( other_buttons );
+  //this->private_->ui_.show_iso_surface_button_->setEnabled( other_buttons );
+  //this->private_->ui_.delete_iso_surface_button_->setEnabled( other_buttons );
   this->private_->ui_.fill_border_button_->setEnabled( other_buttons );
   this->private_->ui_.volume_rendered_button_->setEnabled( other_buttons );
   this->private_->ui_.brightness_contrast_button_->setEnabled( other_buttons );
   this->private_->ui_.label_->setEnabled( other_buttons );
   this->private_->ui_.lock_button_->setEnabled( lock_button );
+}
+  
+void LayerWidget::uncheck_show_iso_button()
+{
+  if( this->private_->ui_.show_iso_surface_button_->isChecked() )
+  {
+    this->private_->ui_.show_iso_surface_button_->setChecked( false );
+  }
 }
 
 void LayerWidget::set_active_menu( std::string& menu_state, bool override, bool /*initialize*/ )
@@ -346,6 +364,8 @@ void LayerWidget::set_active_menu( std::string& menu_state, bool override, bool 
     else if ( menu_state == Layer::CONTRAST_MENU_C ) contrast_menu = true;
     else if ( menu_state == Layer::APPEARANCE_MENU_C ) appearance_menu = true;
   }
+  
+  this->private_->ui_.base_->setUpdatesEnabled( false );
   
   // Update the state of the opacity menu
   if ( opacity_menu )
@@ -434,6 +454,7 @@ void LayerWidget::set_active_menu( std::string& menu_state, bool override, bool 
       this->private_->ui_.fill_border_button_->blockSignals( false );
     }
   }
+  this->private_->ui_.base_->setUpdatesEnabled( true );
 }
 
 void LayerWidget::update_appearance( bool locked, bool active, bool initialize )

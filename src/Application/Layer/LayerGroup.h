@@ -76,7 +76,7 @@ public:
 
   // This mode records whether the state of the group is being modified
   // and how: NONE, TRANSFORM, CROP, RESAMPLE
-  Core::StateOptionHandle edit_mode_state_;
+  Core::StateOptionHandle menu_state_;
 
   // = Transformation menu state variables =
 
@@ -108,7 +108,6 @@ public:
   Core::StateBoolHandle resample_replace_state_;
 
   // = Group visibility =
-
   Core::StateBoolHandle visibility_state_;
   Core::StateBoolHandle show_layers_state_;
   
@@ -191,10 +190,6 @@ public:
     Core::VolumeType type ) const;
   void get_layer_names( std::vector< LayerIDNamePair >& layer_names, 
     Core::VolumeType type, LayerHandle excluded_layer ) const;
-  
-private:
-
-/*  void destroy_layers();*/
 
 private:
   
@@ -203,6 +198,16 @@ private:
   
   // The list that contains the layers that are stored in this class
   layer_list_type layer_list_;
+  
+public:
+  // Options for the state of the menus that are open
+  const static std::string NO_MENU_C;
+  const static std::string CROP_MENU_C;
+  const static std::string FLIP_ROTATE_MENU_C;
+  const static std::string RESAMPLE_MENU_C;
+  const static std::string TRANSFORM_MENU_C;
+  const static std::string ISO_MENU_C;
+  const static std::string DELETE_MENU_C;
 
 };
 

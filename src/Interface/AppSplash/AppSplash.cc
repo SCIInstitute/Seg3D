@@ -66,6 +66,12 @@ AppSplash::AppSplash( QWidget *parent ) :
   // Set up the private internals of the AppSplash class
   this->private_->ui_.setupUi( this );
   
+#if defined ( __APPLE__ ) 
+  QFont font;
+  font.setPointSize( 10 );
+  QApplication::setFont( font );
+#endif
+  
   // Disable these since they arent being used yet.
   this->private_->ui_.load_recent_button_->setEnabled( false );
   //this->private_->ui_.existing_project_button_->setEnabled( false );

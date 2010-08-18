@@ -101,7 +101,6 @@ void PreferencesManager::initialize_states()
   add_state( "auto_save", auto_save_state_, true );
   add_state( "auto_save_time", auto_save_time_state_, 15, 1, 120, 1 );
   add_state( "smart_save", smart_save_state_, true );
-  //add_state( "compression", compression_state_, "none", "none|low|medium|high" );
 
   
   //Viewer Preferences

@@ -153,6 +153,7 @@ public:
 
   // State that stores the current layer state
   Core::StateOptionHandle data_state_;
+  
 
 protected:
   // State that stores the generation of its datablock

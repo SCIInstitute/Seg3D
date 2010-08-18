@@ -276,18 +276,20 @@ void LayerImporterWidget::import()
   {
     // Prep for scanning again...
     // Step (1): Hide the parts of the UI that cannot be used yet
+    //this->setMaximumHeight( 44 );
+    this->setUpdatesEnabled( false );
+    this->private_->ui_.scanning_file_->show();
     this->private_->ui_.importer_options_->hide();
     this->private_->ui_.file_name_table_->hide();
-    this->private_->ui_.scanning_file_->hide();
-
-    this->resize( 10, 10 );
     this->setMaximumHeight( 80 );
+    this->setUpdatesEnabled( true );
+    
     this->repaint();
 
     this->private_->ui_.import_button_->setEnabled( false );
 
     // Step (2): Show Scanning Widget
-    this->private_->ui_.scanning_file_->show();
+    
     this->center_widget_on_screen( this );
 
     this->repaint();

@@ -66,30 +66,13 @@ public:
   LayerGroupWidget( QWidget* parent, LayerHandle layer );
   virtual ~LayerGroupWidget();
   
+public:
+  typedef QPointer< LayerGroupWidget > qpointer_type;
+  
 public Q_SLOTS:
   // SHOW_LAYERS:
   // function that shows or hides the layers
   void show_layers( bool show );
-
-  // SHOW_RESAMPLE:
-  // function that hides or shows the resample menu
-  void show_resample( bool show );
-  
-  // SHOW_TRANSFORM:
-  // function that hides or shows the transform menu
-  void show_transform( bool show );
-
-  // SHOW_CROP:
-  // function that hides or shows the crop menu
-  void show_crop( bool show );
-
-  // SHOW_FLIP_ROTATE:
-  // function that hides or shows the flip rotate menu
-  void show_flip_rotate( bool show );
-
-  // SHOW_DELETE:
-  // function that hides or shows the delete menu
-  void show_delete( bool show );
 
   // SHOW_SELECTION_CHECKBOXES:
   // function that hides or shows selection checkboxes
@@ -138,6 +121,10 @@ public:
   // SET_PICKED_UP_GROUP_SIZE:
   // function that sets the size of the currently picked up group
   void set_picked_up_group_size( int group_height );
+  
+  // UPDATESTATE:
+  // Entry point for the state engine to notify state has changed
+  static void UpdateState( qpointer_type qpointer );
 
 protected:
   // RESIZEEVENT:
@@ -192,6 +179,59 @@ private Q_SLOTS:
   // HIDE_GROUP:
   // helper function for the show_layers function
   void hide_group();
+  
+  // SELECT_CROP_MENU:
+  // slot that dispatches an action to set the active menu to the crop menu
+  void select_crop_menu( bool show );
+  
+  // SELECT_FLIP_ROTATE_MENU:
+  // slot that dispatches an action to set the active menu to the flip rotate menu
+  void select_flip_rotate_menu( bool show );
+  
+  // SELECT_RESAMPLE_MENU:
+  // slot that dispatches an action to set the active menu to the resample menu
+  void select_resample_menu( bool show );
+  
+  // SELECT_TRANSFORM_MENU:
+  // slot that dispatches an action to set the active menu to the transform menu
+  void select_transform_menu( bool show );
+  
+  // SELECT_ISO_MENU:
+  // slot that dispatches an action to set the active menu to the iso menu
+  void select_iso_menu( bool show );
+  
+  // SELECT_DELETE_MENU:
+  // slot that dispatches an action to set the active menu to the delete menu
+  void select_delete_menu( bool show );
+  
+private:
+  // UPDATE_WIDGET_STATE:
+  // function that updates which menu is shown based on which menu is the active one
+  void update_widget_state();
+  
+  // SET_CROP_VISIBILITY:
+  // function that hides or shows the crop menu
+  void set_crop_visibility( bool show );
+  
+  // SET_FLIP_ROTATE_VISIBILITY:
+  // function that hides or shows the flip rotate menu
+  void set_flip_rotate_visibility( bool show );
+  
+  // SET_RESAMPLE_VISIBILITY:
+  // function that hides or shows the resample menu
+  void set_resample_visibility( bool show );
+  
+  // SET_TRANSFORM_VISIBILITY:
+  // function that hides or shows the transform menu
+  void set_transform_visibility( bool show );
+  
+  // SET_ISO_VISIBILITY:
+  // function that hides or shows the iso menu
+  void set_iso_visibility( bool show );
+  
+  // SET_DELETE_VISIBILITY:
+  // function that hides or shows the delete menu
+  void set_delete_visibility( bool show );
 
   // -- widget internals --
 private:

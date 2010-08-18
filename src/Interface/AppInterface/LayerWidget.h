@@ -160,8 +160,8 @@ public:
 private:
     boost::shared_ptr< LayerWidgetPrivate > private_;
 
+// FUNCTIONS FOR HANDLING DRAG AND DROP
 private:
-  
   // these member variables are for keeping track of the states of the layers so that they can
   // be represented properly in the gui
   bool layer_menus_open_;
@@ -186,6 +186,9 @@ private:
   // DRAGLEAVEEVENT:
   // this function is called when the user drags another layer off of the top of this one
   void dragLeaveEvent( QDragLeaveEvent* event );
+  
+private:
+  
 
 private Q_SLOTS:
   // SET_MASK_BACKGROUND_COLOR:
@@ -196,6 +199,11 @@ private Q_SLOTS:
   // this seperate function is need to change the color of the mask backgroun in the case that
   // the active color for the layer has been changed by the preferences manager
   void set_mask_background_color_from_preference_change( int color_index );
+  
+  // UNCHECK_SHOW_ISO_BUTTON:
+  // this function unchecks the show iso button if it is on when the iso surface button is clicked
+  // and the iso surface is deleted
+  void uncheck_show_iso_button();
 
 protected:
   void resizeEvent( QResizeEvent *event );

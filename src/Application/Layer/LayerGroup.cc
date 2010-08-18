@@ -38,6 +38,13 @@
 
 namespace Seg3D
 {
+  const std::string LayerGroup::NO_MENU_C( "none" );
+  const std::string LayerGroup::CROP_MENU_C( "crop" );
+  const std::string LayerGroup::FLIP_ROTATE_MENU_C( "flip/rotate" );
+  const std::string LayerGroup::RESAMPLE_MENU_C( "resample" );
+  const std::string LayerGroup::TRANSFORM_MENU_C( "transform" );
+  const std::string LayerGroup::ISO_MENU_C( "iso" );
+  const std::string LayerGroup::DELETE_MENU_C( "delete" );
 
 LayerGroup::LayerGroup( Core::GridTransform grid_transform ) :
   StateHandler( "group", true )
@@ -45,7 +52,8 @@ LayerGroup::LayerGroup( Core::GridTransform grid_transform ) :
   this->grid_transform_ = grid_transform;
 
   // Need to set ranges and default values for all parameters
-  add_state( "mode", this->edit_mode_state_, "none", "none|TRANSFORM|COPY|RESAMPLE" );
+  add_state( "menu", this->menu_state_, NO_MENU_C, NO_MENU_C + "|" + CROP_MENU_C + "|" + FLIP_ROTATE_MENU_C + 
+    "|" + RESAMPLE_MENU_C + "|" + TRANSFORM_MENU_C + "|" + ISO_MENU_C + "|" + DELETE_MENU_C );
 
     // = Transformation menu state variables =
   add_state( "transform_origin_x", this->transform_origin_x_state_, 0.0 );

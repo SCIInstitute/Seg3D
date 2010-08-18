@@ -111,6 +111,9 @@ public:
 
   // State that describes whether to show the  isosurface state
   Core::StateBoolHandle show_isosurface_state_;
+  
+  // State that describes whether the iso surface has been generated
+  Core::StateBoolHandle iso_generated_state_;
 
 protected:
   // PRE_SAVE_STATES:

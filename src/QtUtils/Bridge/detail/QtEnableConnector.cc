@@ -49,6 +49,8 @@ QtEnableConnector::QtEnableConnector( QWidget* parent, Core::StateBoolHandle& st
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
     parent->setEnabled( state->get() );
+    
+    //QtEnableConnector::EnableWidget( qpointer, state->get(), Core::ActionSource::NONE_E );
 
     this->add_connection( state->value_changed_signal_.connect(
       boost::bind( &QtEnableConnector::EnableWidget, qpointer, _1, _2 ) ) );
@@ -75,7 +77,7 @@ void QtEnableConnector::EnableWidget( QPointer< QtEnableConnector > qpointer,
   {
     return;
   }
-
+  
   qpointer->parent_->setEnabled( enabled );
 }
 

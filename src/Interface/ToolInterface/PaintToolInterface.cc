@@ -110,6 +110,17 @@ bool PaintToolInterface::build_widget( QFrame* frame )
   this->private_->ui_.target_mask_->setDisabled( tool->use_active_layer_state_->get() );
   this->connect( this->private_->ui_.use_active_layer_, SIGNAL( toggled( bool ) ),
     this->private_->ui_.target_mask_, SLOT( setDisabled( bool ) ) );
+  
+  
+//#if defined ( __APPLE__ )  
+//  QFont font;
+//  font.setPointSize( 11 );
+//  this->setFont( font );
+////  this->private_->ui_.target_mask_->setFont( font );
+////  this->private_->ui_.mask_constraint_->setFont( font );
+////  this->private_->ui_.data_constraint_->setFont( font );
+//#endif
+  
 
   return true;
 } 

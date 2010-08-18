@@ -116,9 +116,15 @@ void ToolBoxWidget::add_tool( QWidget * tool, const QString &label,
   new_page.page_ = new QWidget();
   new_page.tool_ = tool;
   new_page.ui_.setupUi( new_page.page_ );
-
+  
   new_page.ui_.url_->setText( QString::fromStdString( help_url ) );
   new_page.ui_.url_->hide();
+  
+#if defined ( __APPLE__ )
+  QFont font;
+  font.setPointSize( 10 );
+  new_page.ui_.activate_button_->setFont( font );
+#endif
 
   new_page.ui_.activate_button_->setText( label );
 

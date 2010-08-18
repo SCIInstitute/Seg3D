@@ -142,6 +142,8 @@ void Layer::initialize_states( const std::string& name, bool creating )
   // == The layer state indicating whether data is bein processed ==
   this->add_state( "data", this->data_state_,  creating ? CREATING_C : AVAILABLE_C  , 
     AVAILABLE_C + "|" + CREATING_C + "|" + PROCESSING_C + "|" + IN_USE_C );
+  
+  
 }
 
 bool Layer::post_save_states( Core::StateIO& state_io )

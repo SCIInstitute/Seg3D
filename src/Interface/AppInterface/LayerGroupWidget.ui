@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>260</width>
-    <height>757</height>
+    <width>278</width>
+    <height>808</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -160,6 +160,24 @@ QToolButton#group_transform_button_:checked{
   margin: 0 0 0 0;
   padding: 0 0 0 0;
 }
+
+QToolButton#group_iso_button_{
+  background-color: rgba(0, 0, 0, 0);
+  border: 1px solid rgba(0, 0, 0, 50);
+  margin: 0 0 0 0;
+  padding: 0 0 0 0;
+}
+QToolButton#group_iso_button_:hover{
+  background-color: rgba( 0, 0, 0, 30 ); border-radius: 3px;
+}
+QToolButton#group_iso_button_:checked{
+  background-color: rgb(233, 111, 53);
+  border-radius: 3px;
+  border: 1px solid rgb(142, 67, 32);
+  margin: 0 0 0 0;
+  padding: 0 0 0 0;
+}
+
 
 QToolButton#group_visibility_button_{
   background-color: rgba(0, 0, 0, 0);
@@ -622,6 +640,37 @@ QWidget#group_tools_{
                 </widget>
                </item>
                <item>
+                <widget class="QToolButton" name="group_iso_button_">
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>22</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>22</height>
+                  </size>
+                 </property>
+                 <property name="toolTip">
+                  <string>Open the transform menu</string>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="iconSize">
+                  <size>
+                   <width>35</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                 <property name="checkable">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
                 <widget class="QToolButton" name="group_delete_button_">
                  <property name="minimumSize">
                   <size>
@@ -969,7 +1018,7 @@ QWidget#group_tools_{
                   <number>0</number>
                  </property>
                  <property name="elideMode">
-                  <enum>Qt::ElideNone</enum>
+                  <enum>Qt::ElideRight</enum>
                  </property>
                  <widget class="QWidget" name="tab">
                   <property name="minimumSize">
@@ -1243,6 +1292,125 @@ QWidget#group_tools_{
                     </property>
                     <property name="text">
                      <string>Crop</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QWidget" name="iso_quality_" native="true">
+              <layout class="QVBoxLayout" name="verticalLayout_14" stretch="0,0,1">
+               <property name="spacing">
+                <number>2</number>
+               </property>
+               <property name="margin">
+                <number>4</number>
+               </property>
+               <item>
+                <widget class="Line" name="line_6">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QWidget" name="widget_19" native="true">
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>16</height>
+                  </size>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_31">
+                  <property name="spacing">
+                   <number>0</number>
+                  </property>
+                  <property name="leftMargin">
+                   <number>4</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>4</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QLabel" name="label">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>16</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <pointsize>11</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>ISO Quality:</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QWidget" name="widget_18" native="true">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_24">
+                  <property name="spacing">
+                   <number>0</number>
+                  </property>
+                  <property name="margin">
+                   <number>1</number>
+                  </property>
+                  <item>
+                   <widget class="QRadioButton" name="radioButton_1_point_0">
+                    <property name="text">
+                     <string>1</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QRadioButton" name="radioButton_point_5">
+                    <property name="text">
+                     <string>.50</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QRadioButton" name="radioButton_point_25">
+                    <property name="text">
+                     <string>.25</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QRadioButton" name="radioButton_point_125">
+                    <property name="text">
+                     <string>.125</string>
                     </property>
                    </widget>
                   </item>

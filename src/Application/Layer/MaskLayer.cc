@@ -156,7 +156,8 @@ void MaskLayer::initialize_states()
   // == Internal information for keeping track of which bit we are using ==
   this->add_state( "bit", this->bit_state_, 0 );
   
-  // == update the data state ==
+  // == Keep track of whether the iso surface has been generated
+  this->add_state( "iso_generated", iso_generated_state_, false );
 }
 
 bool MaskLayer::pre_save_states( Core::StateIO& state_io )
@@ -195,6 +196,13 @@ bool MaskLayer::post_load_states( const Core::StateIO& state_io )
       grid_transform, mask_data_block ) );
     this->add_connection( this->mask_volume_->get_mask_data_block()->mask_updated_signal_.
       connect( boost::bind( &MaskLayer::handle_mask_data_changed, this ) ) );
+    
+    // Now if the iso was generated in the saved state, we will regenerate it now that we have
+    // finished loading the saved state
+    if( this->iso_generated_state_->get() )
+    {
+      this->compute_isosurface();
+    }
   }
   
   return success;
@@ -251,7 +259,11 @@ void MaskLayer::compute_isosurface()
   if ( this->show_isosurface_state_->get() )
   {
     this->isosurface_updated_signal_();
-  } 
+  }
+  
+  // now that we are done, we are going to set the proper 
+  this->iso_generated_state_->set( true );
+  this->show_isosurface_state_->set( true );
 }
 
 void MaskLayer::delete_isosurface()
@@ -271,6 +283,8 @@ void MaskLayer::delete_isosurface()
   {
     this->isosurface_updated_signal_();
   } 
+  
+  this->iso_generated_state_->set( false );
 }
 
 } // end namespace Seg3D
