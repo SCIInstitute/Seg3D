@@ -98,7 +98,7 @@ public:
   
   // GET_VRAM_SIZE:
   // Return the total video memory size on the GPU.
-  int get_vram_size();
+  unsigned long get_vram_size();
 
   // -- thread safe deletion of GL objects --
 private:

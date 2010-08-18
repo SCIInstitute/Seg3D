@@ -28,6 +28,9 @@
 
 #include <GL/glew.h>
 
+#ifdef _WIN32
+#include <Windows.h>
+#endif
 #ifdef __APPLE__
 #include <AGL/AGL.h>
 #endif
@@ -67,7 +70,7 @@ public:
   boost::condition_variable thread_condition_variable_;
 
   bool gl_capable_;
-  int vram_size_;
+  unsigned long vram_size_;
 };
   
 void RenderResourcesPrivate::initialize_gl()
@@ -103,30 +106,90 @@ void RenderResourcesPrivate::query_video_memory_size()
 {
   this->vram_size_ = 0;
   
-#ifdef _WIN32
-  this->vram_size_ = 512 << 20; // TODO: hard-coded value for windows
-#else
-#ifdef __APPLE__
+#if defined(_WIN32)
+  const char HARDWARE_DEVICEMAP_VIDEO_C[] = "HARDWARE\\DEVICEMAP\\VIDEO";
+  const char MAX_OBJECT_NUMBER_C[] = "MaxObjectNumber";
+  const char SYSTEM_CURRENTCONTROLSET_C[] = "system\\currentcontrolset";
+  const char HARDWAREINFO_MEMSIZE[] = "HardwareInformation.MemorySize";
+
+  HKEY video_devicemap_key;
+  if ( RegOpenKeyEx( HKEY_LOCAL_MACHINE, HARDWARE_DEVICEMAP_VIDEO_C, 0, 
+    KEY_READ, &video_devicemap_key ) == ERROR_SUCCESS )
+  {
+    DWORD type;
+    DWORD max_object_number;
+    DWORD buffer_size = sizeof( DWORD );
+    if ( RegQueryValueEx( video_devicemap_key, MAX_OBJECT_NUMBER_C, NULL, &type, 
+      reinterpret_cast< LPBYTE >( &max_object_number ), &buffer_size ) 
+      == ERROR_SUCCESS && type == REG_DWORD )
+    {
+      for ( DWORD i = 0; i <= max_object_number; ++i )
+      {
+        std::string video_device_name = "\\Device\\Video" + ExportToString( i );
+        if ( RegQueryValueEx( video_devicemap_key, video_device_name.c_str(), NULL, 
+          &type, NULL, &buffer_size ) != ERROR_SUCCESS ||
+          type != REG_SZ )
+        {
+          continue;
+        }
+
+        std::vector< BYTE > buffer( buffer_size );
+        if ( RegQueryValueEx( video_devicemap_key, video_device_name.c_str(), NULL, 
+          NULL, &buffer[ 0 ], &buffer_size ) != ERROR_SUCCESS )
+        {
+          continue;
+        }
+        std::string video_device_key_name( reinterpret_cast< char* >( &buffer[ 0 ] ) );
+        video_device_key_name = StringToLower( video_device_key_name );
+        size_t pos = video_device_key_name.find( SYSTEM_CURRENTCONTROLSET_C );
+        if ( pos == std::string::npos )
+        {
+          continue;
+        }
+        video_device_key_name = video_device_key_name.substr( pos );
+        HKEY video_device_key;
+        if ( RegOpenKeyEx( HKEY_LOCAL_MACHINE, video_device_key_name.c_str(),
+          0, KEY_READ, &video_device_key ) != ERROR_SUCCESS )
+        {
+          continue;
+        }
+        DWORD vram_size;
+        buffer_size = sizeof( DWORD );
+        if ( RegQueryValueEx( video_device_key, HARDWAREINFO_MEMSIZE, NULL, &type, 
+          reinterpret_cast< LPBYTE >( &vram_size ), &buffer_size ) == ERROR_SUCCESS &&
+          type == REG_DWORD )
+        {
+          this->vram_size_ = vram_size;
+          break;
+        }
+        RegCloseKey( video_device_key );
+      } // end for
+      
+    } 
+
+    RegCloseKey( video_devicemap_key );
+  }
+#elif defined(__APPLE__)
   AGLRendererInfo head_info = aglQueryRendererInfoForCGDirectDisplayIDs( NULL, 0 );
   AGLRendererInfo info = head_info;
   while ( info != NULL ) 
   {
     int accelerated;
-    if ( aglDescribeRenderer( info, AGL_ACCELERATED, &accelerated ) &&
-      accelerated != 0 )
+    if ( aglDescribeRenderer( info, AGL_ACCELERATED, &accelerated ) && accelerated )
     {
       int vram_size;
-      if ( aglDescribeRenderer( info, AGL_VIDEO_MEMORY, &vram_size ) ) 
+      if ( aglDescribeRenderer( info, AGL_VIDEO_MEMORY, &vram_size ) &&
+        vram_size > 0 ) 
       {
-        this->vram_size_ = vram_size;
+        this->vram_size_ = static_cast< unsigned long >( vram_size );
         break;
       }
     }
     info = aglNextRendererInfo( info );
   }
-  aglDestroyRendererInfo( head_info );  
-  
-#endif
+  aglDestroyRendererInfo( head_info );
+#else
+  // TODO: Add support for Linux
 #endif
   
   if ( this->vram_size_ == 0 ) 
@@ -180,7 +243,7 @@ RenderContextHandle RenderResources::get_current_context()
   return this->private_->resources_context_->get_current_context();
 }
   
-int RenderResources::get_vram_size()
+unsigned long RenderResources::get_vram_size()
 {
   return this->private_->vram_size_;
 }
