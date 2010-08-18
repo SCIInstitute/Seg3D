@@ -120,4 +120,14 @@ DataBlockHandle StdDataBlock::New( size_t nx, size_t ny, size_t nz, DataType typ
   return data_block;
 }
 
+DataBlockHandle StdDataBlock::New( GridTransform transform, DataType type, 
+    generation_type generation )
+{
+  DataBlockHandle data_block( new StdDataBlock( transform.get_nx(), 
+    transform.get_ny(), transform.get_nz(), type ) );
+    
+  DataBlockManager::Instance()->register_datablock( data_block, generation );
+  return data_block;
+}
+
 } // end namespace Core

@@ -226,6 +226,8 @@ void ViewerPrivate::insert_layer( LayerHandle layer )
 {
   Viewer::lock_type lock( this->viewer_->get_mutex() );
 
+  if ( ! layer->is_valid() ) return;
+
   Core::VolumeSliceHandle volume_slice;
 
   Core::VolumeSliceType slice_type( Core::VolumeSliceType::AXIAL_E );
@@ -241,9 +243,11 @@ void ViewerPrivate::insert_layer( LayerHandle layer )
   this->layer_connection_map_.insert( std::make_pair( layer->get_layer_id(),
     layer->opacity_state_->state_changed_signal_.connect( 
     boost::bind( &ViewerPrivate::layer_state_changed, this, ViewModeType::ALL_E ) ) ) );
+    
   this->layer_connection_map_.insert( std::make_pair( layer->get_layer_id(),
     layer->visible_state_[ this->viewer_->get_viewer_id() ]->state_changed_signal_.connect(
     boost::bind( &ViewerPrivate::layer_state_changed, this, ViewModeType::ALL_E ) ) ) );
+  
   this->layer_connection_map_.insert( std::make_pair( layer->get_layer_id(),
     layer->layer_updated_signal_.connect( boost::bind(
     &ViewerPrivate::layer_state_changed, this, ViewModeType::ALL_E ) ) ) );
@@ -308,6 +312,7 @@ void ViewerPrivate::insert_layer( LayerHandle layer )
   }
 
   this->volume_slices_[ layer->get_layer_id() ] = volume_slice;
+
   lock.unlock();
 
   // Auto adjust the view and depth if it is the first layer inserted

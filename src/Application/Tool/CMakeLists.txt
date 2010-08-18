@@ -32,8 +32,10 @@
 ##################################################
 
 SET(APPLICATION_TOOL_SRCS
-  ITKFilterAlgo.h
-  ITKFilterAlgo.cc
+  BaseFilter.h
+  BaseFilter.cc
+  ITKFilter.h
+  ITKFilter.cc
   SingleTargetTool.h
   SingleTargetTool.cc
   Tool.h

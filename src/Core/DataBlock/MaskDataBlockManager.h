@@ -80,9 +80,15 @@ public:
   bool create( DataBlock::generation_type generation, unsigned int bit, 
     GridTransform& grid_transform, MaskDataBlockHandle& mask );
 
+
+  // TODO:
+  // Do these need to be private ?
+  // --JS
   void register_data_block( DataBlockHandle data_block, const GridTransform& grid_transform );
 
   bool save_data_blocks( boost::filesystem::path data_save_path );
+
+
 
   // COMPACT:
   // Compact the masks into less memory if possible by moving them around
@@ -116,7 +122,7 @@ public:
   
   // CONVERT:
   // Convert a MaskDataBlock into a DataBlock
-  static bool Convert( MaskDataBlockHandle mask, DataBlockHandle& data ); 
+  static bool Convert( MaskDataBlockHandle mask, DataBlockHandle& data, DataType data_type ); 
 };
 
 } // end namespace Core

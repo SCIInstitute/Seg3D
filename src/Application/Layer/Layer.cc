@@ -56,16 +56,16 @@ const std::string Layer::COLOR_MENU_C( "color" );
 const std::string Layer::CONTRAST_MENU_C( "contrast" );
 const std::string Layer::APPEARANCE_MENU_C( "appearance" );
 
-Layer::Layer( const std::string& name ) :
+Layer::Layer( const std::string& name, bool creating ) :
   StateHandler( "layer",  true )
 { 
-  this->initialize_states( name );
+  this->initialize_states( name, creating );
 }
 
-Layer::Layer( const std::string& name, const std::string& state_id ) :
+Layer::Layer( const std::string& name, const std::string& state_id, bool creating ) :
   StateHandler( state_id, false )
 {
-  this->initialize_states( name );
+  this->initialize_states( name, creating );
 }
   
 Layer::~Layer()
@@ -104,7 +104,7 @@ Layer::mutex_type& Layer::GetMutex()
   return Core::StateEngine::GetMutex();
 }
 
-void Layer::initialize_states( const std::string& name )
+void Layer::initialize_states( const std::string& name, bool creating )
 {
   // Step (1) : Build the layer specific state variables
 
@@ -140,7 +140,7 @@ void Layer::initialize_states( const std::string& name )
   this->add_state( "last_action", this->last_action_state_, "" );
   
   // == The layer state indicating whether data is bein processed ==
-  this->add_state( "data", this->data_state_,  AVAILABLE_C , 
+  this->add_state( "data", this->data_state_,  creating ? CREATING_C : AVAILABLE_C  , 
     AVAILABLE_C + "|" + CREATING_C + "|" + PROCESSING_C + "|" + IN_USE_C );
 }
 

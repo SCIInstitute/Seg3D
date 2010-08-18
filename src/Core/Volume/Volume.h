@@ -77,12 +77,16 @@ public:
   // -- accessors --
 public:
 
-  // TYPE
+  // GET_TYPE:
   // Get the type of the data layer
   virtual VolumeType get_type() const = 0;
 
+  // GET_GENERATION:
+  // Get the generation number of the data block the layer is using
   virtual DataBlock::generation_type get_generation() const = 0;
 
+  // IS_VALID:
+  // Check whether the volume has a valid data block
   bool is_valid() const
   {
     return this->get_generation() != -1;
@@ -123,7 +127,6 @@ public:
   {
     return this->nx_ * this->ny_ * this->nz_;
   }
-
 
   // TO_INDEX:
   // Compute the index into the data blcok based on a coordinate in index space

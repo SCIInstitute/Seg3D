@@ -197,24 +197,34 @@ const Histogram& DataBlock::get_histogram() const
   return this->histogram_;
 }
 
+void DataBlock::clear()
+{
+  lock_type lock( this->get_mutex() );
+  memset( this->data_, 0, Core::GetSizeDataType( this->data_type_ ) * this->get_size() );
+  this->generation_ = DataBlockManager::Instance()->increment_generation( this->generation_ );
+}
+
 DataBlock::generation_type DataBlock::get_generation() const
 {
+  lock_type lock( this->get_mutex() );
   return this->generation_;
 }
 
 void DataBlock::set_generation( generation_type generation )
 {
+  lock_type lock( this->get_mutex() );
   this->generation_ = generation;
 }
 
 void DataBlock::increase_generation()
 {
+  lock_type lock( this->get_mutex() );
   this->generation_ = DataBlockManager::Instance()->increment_generation( this->generation_ );
 }
 
 void DataBlock::update_histogram()
 {
-  lock_type lock( get_mutex() );
+  lock_type lock( this->get_mutex() );
 
   switch( this->data_type_ )
   {

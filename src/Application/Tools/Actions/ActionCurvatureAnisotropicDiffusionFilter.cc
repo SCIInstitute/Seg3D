@@ -26,11 +26,12 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// ITK includes
 #include <itkCurvatureAnisotropicDiffusionImageFilter.h>
 
+// Application includes
 #include <Application/LayerManager/LayerManager.h>
-
-#include <Application/Tool/ITKFilterAlgo.h>
+#include <Application/Tool/ITKFilter.h>
 #include <Application/Tools/Actions/ActionCurvatureAnisotropicDiffusionFilter.h>
 
 // REGISTER ACTION:
@@ -42,67 +43,26 @@ CORE_REGISTER_ACTION( Seg3D, CurvatureAnisotropicDiffusionFilter )
 namespace Seg3D
 {
 
-
-// ALGORITHM CLASS
-// This class the actual work and is created by run
-
-class CurvatureAnisotropicDiffusionFilterAlgo : public ITKFilterAlgo
-{
-
-public:
-  bool run( DataLayerHandle target_layer, bool replace, int iterations,
-    double steps, double conductance );
-};
-
-bool CurvatureAnisotropicDiffusionFilterAlgo::run( DataLayerHandle target_layer, bool replace, 
-  int iterations, double steps, double conductance )
-{
-
-  target_layer->data_state_->set( Layer::PROCESSING_C );
-
-  // For each datatype implement the filter 
-  SWITCH_DATATYPE( target_layer->get_data_type(),
-  
-    typedef itk::CurvatureAnisotropicDiffusionImageFilter< 
-      TYPED_IMAGE_TYPE, FLOAT_IMAGE_TYPE > filter_type;
-
-    Core::ITKImageDataT<VALUE_TYPE>::Handle input_image; 
-    Core::ITKImageDataT<float>::Handle output_image;
-
-
-    this->retrieve_typed_itk_image<VALUE_TYPE>( target_layer, input_image );
-        
-    filter_type::Pointer filter = filter_type::New();
-    this->forward_progress( filter, target_layer );
-
-    filter->SetInput( input_image->get_image() );
-    filter->SetInPlace( false );
-
-    filter->SetNumberOfIterations( iterations );
-    filter->SetTimeStep( steps );
-    filter->SetConductanceParameter( conductance );
-
-    filter->Update();
-
-    this->insert_data_into_layer( filter->GetOutput(), target_layer );  
-  );
-    
-
-  target_layer->data_state_->set( Layer::AVAILABLE_C );
-
-  return true;
-}
-
 bool ActionCurvatureAnisotropicDiffusionFilter::validate( Core::ActionContextHandle& context )
 {
-  // Check whether the input layer is a valid layer id
-  if ( ! LayerManager::Instance()->get_data_layer_by_id( this->layer_id_.value() ) )
+  // Check for layer existance and type information
+  std::string error;
+  if ( ! LayerManager::CheckLayerExistanceAndType( this->layer_id_.value(), 
+    Core::VolumeType::DATA_E, error ) )
   {
-    context->report_error( std::string( "LayerID '" ) + this->layer_id_.value() +
-      std::string( "' is not valid." ) );
-    return false;   
+    context->report_error( error );
+    return false;
   }
   
+  // Check for layer availability 
+  Core::NotifierHandle notifier;
+  if ( ! LayerManager::CheckLayerAvailability( this->layer_id_.value(), 
+    this->replace_.value(), notifier ) )
+  {
+    context->report_need_resource( notifier );
+    return false;
+  }
+    
   // If the number of iterations is lower than one, we cannot run the filter
   if( this->iterations_.value() < 1 )
   {
@@ -123,23 +83,104 @@ bool ActionCurvatureAnisotropicDiffusionFilter::validate( Core::ActionContextHan
     context->report_error( "The conductance needs to be larger than zero." );
     return false;
   }
+  
+  // Validation successful
   return true;
 }
+
+// ALGORITHM CLASS
+// This class does the actual work and is run on a separate thread.
+// NOTE: The separation of the algorithm into a private class is for the purpose of running the
+// filter on a separate thread.
+
+class CurvatureAnisotropicDiffusionFilterAlgo : public ITKFilter
+{
+
+public:
+  LayerHandle src_layer_;
+  LayerHandle dst_layer_;
+  
+  int iterations_;
+  double integration_step_;
+  double conductance_;
+
+public:
+  // RUN:
+  // Implemtation of run of the Runnable base class, this function is called when the thread
+  // is run.
+  virtual void run()
+  {
+    // For each datatype implement the filter 
+    // NOTE: This macro duplicates the code for each data type that is supported by Seg3D
+    // The typedefs TYPED_IMAGE_TYPE and VALUE_TYPE are defined by the macro
+    SWITCH_DATATYPE( this->src_layer_->get_data_type(),
+    
+      typedef itk::CurvatureAnisotropicDiffusionImageFilter< 
+        TYPED_IMAGE_TYPE, FLOAT_IMAGE_TYPE > filter_type;
+
+      Core::ITKImageDataT<VALUE_TYPE>::Handle input_image; 
+      this->get_itk_image_from_layer<VALUE_TYPE>( this->src_layer_, input_image );
+          
+      filter_type::Pointer filter = filter_type::New();
+      this->forward_progress( filter, this->dst_layer_ );
+
+      filter->SetInput( input_image->get_image() );
+      filter->SetInPlace( false );
+
+      filter->SetNumberOfIterations( this->iterations_ );
+      filter->SetTimeStep( this->integration_step_ );
+      filter->SetConductanceParameter( this->conductance_ );
+
+      filter->Update();
+
+      this->insert_itk_image_into_layer( this->dst_layer_, filter->GetOutput() ); 
+    );
+  }
+  
+  // GET_FITLER_NAME:
+  // The name of the filter, this information is used for generating new layer labels.
+  virtual std::string get_filter_name() const
+  {
+    return "AnisoDiff";
+  }
+};
+
 
 bool ActionCurvatureAnisotropicDiffusionFilter::run( Core::ActionContextHandle& context, 
   Core::ActionResultHandle& result )
 {
   // Create algorithm
-  CurvatureAnisotropicDiffusionFilterAlgo algo;
-  
-  // Run the algorithm
-  return ( algo.run( 
-    LayerManager::Instance()->get_data_layer_by_id( this->layer_id_.value() ),
-    this->replace_.value(),
-    this->iterations_.value(),
-    this->integration_step_.value(),
-    this->conductance_.value() ) );
+  boost::shared_ptr<CurvatureAnisotropicDiffusionFilterAlgo> algo(
+    new CurvatureAnisotropicDiffusionFilterAlgo );
+
+  // Copy the parameters over to the algorithm that runs the filter
+  algo->iterations_ = this->iterations_.value();
+  algo->integration_step_ = this->integration_step_.value();
+  algo->conductance_ = this->conductance_.value();
+
+  // Find the handle to the layer
+  algo->find_layer( this->layer_id_.value(), algo->src_layer_ );
+
+  if ( this->replace_.value() )
+  {
+    // Copy the handles as destination and source will be the same
+    algo->dst_layer_ = algo->src_layer_;
+    // Mark the layer for processing.
+    algo->lock_for_processing( algo->dst_layer_ );  
+  }
+  else
+  {
+    // Lock the src layer, so it cannot be used else where
+    algo->lock_for_use( algo->src_layer_ );
+    
+    // Create the destination layer, which will show progress
+    algo->create_and_lock_data_layer_from_layer( algo->src_layer_, algo->dst_layer_ );
+  }
+
+  // Start the filter
+  CurvatureAnisotropicDiffusionFilterAlgo::Start( algo );
 }
+
 
 void ActionCurvatureAnisotropicDiffusionFilter::Dispatch( Core::ActionContextHandle context, 
   std::string layer_id, int iterations, double integration_step, double conductance, bool replace )

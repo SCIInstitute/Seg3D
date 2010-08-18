@@ -84,7 +84,7 @@ public:
   size_t number_of_states();
 
 public:
-  // LOAD_SESSION_STATES:
+  // LOAD_STATES:
   // This function finds the StateHandlers that are saved to file by default and then
   // sets their state variables from the values that have been loaded into session_states_
   bool load_states( const StateIO& state_io );

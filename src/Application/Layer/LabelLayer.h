@@ -55,9 +55,20 @@ public:
   LabelLayer( const std::string& name, const Core::VolumeHandle& volume );
   virtual ~LabelLayer();
 
+  // -- Layer properties --
+public:
+
+  // TYPE
+  // Get the type of the layer
   virtual Core::VolumeType type() const { return Core::VolumeType::LABEL_E; }
   
-  virtual const Core::GridTransform get_grid_transform() const = 0;
+  // GET_GRID_TRANSFORM:
+  // Get the transform of the layer
+  virtual Core::GridTransform get_grid_transform() const = 0;
+
+  // IS_VALID:
+  // Check whether the layer has valid data
+  virtual bool is_valid() const = 0;
 
 public:
 

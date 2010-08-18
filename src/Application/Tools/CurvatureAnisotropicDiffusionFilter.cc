@@ -51,7 +51,7 @@ CurvatureAnisotropicDiffusionFilter::CurvatureAnisotropicDiffusionFilter( const 
   this->add_state( "iterations", this->iterations_state_, 5, 1, 100, 1 );
   this->add_state( "integration_step", this->integration_step_state_, 0.0625, 0.0 , 0.1, 0.005 );
   this->add_state( "conductance", this->conductance_state_, .10, .10, 10.0, .01 );
-  this->add_state( "replace", this->replace_state_, false );
+  this->add_state( "replace", this->replace_state_, true );
 
 }
 

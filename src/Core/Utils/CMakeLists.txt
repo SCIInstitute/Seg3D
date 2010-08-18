@@ -47,8 +47,12 @@ SET(CORE_UTILS_SRCS
   Log.cc
   LogHistory.h
   LogHistory.cc
+  Notifier.h
+  Notifier.cc
   Parallel.h
   Parallel.cc
+  Runnable.h
+  Runnable.cc
   ScopedCounter.h
   Singleton.h
   StackVector.h

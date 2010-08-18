@@ -44,22 +44,12 @@ namespace Seg3D
 {
 
 MaskLayer::MaskLayer( const std::string& name, const Core::MaskVolumeHandle& volume ) :
-  Layer( name ), 
+  Layer( name, !( volume->is_valid() ) ), 
   mask_volume_( volume )
 {
   this->initialize_states();
+  
   this->bit_state_->set( static_cast< int >( volume->get_mask_data_block()->get_mask_bit() ) );
-  this->add_connection( this->mask_volume_->get_mask_data_block()->mask_updated_signal_.
-    connect( boost::bind( &MaskLayer::handle_mask_data_changed, this ) ) );
-}
-
-MaskLayer::MaskLayer( const std::string& name, const Core::GridTransform& grid_transform ) :
-    Layer( name ), 
-  mask_volume_( new Core::MaskVolume( grid_transform ) )
-{
-    this->initialize_states();
-  this->bit_state_->set( static_cast< int >( this->mask_volume_->
-    get_mask_data_block()->get_mask_bit() ) );
   this->add_connection( this->mask_volume_->get_mask_data_block()->mask_updated_signal_.
     connect( boost::bind( &MaskLayer::handle_mask_data_changed, this ) ) );
 }
@@ -76,36 +66,98 @@ MaskLayer::~MaskLayer()
   this->disconnect_all();
 }
 
+Core::GridTransform MaskLayer::get_grid_transform() const 
+{ 
+  Layer::lock_type lock( Layer::GetMutex() );
+
+  if ( this->mask_volume_ )
+  {
+    return this->mask_volume_->get_grid_transform(); 
+  }
+  else
+  {
+    return Core::GridTransform();
+  }
+}
+
+Core::DataType MaskLayer::get_data_type() const
+{
+  return Core::DataType::UCHAR_E;
+}
+
+Core::MaskVolumeHandle MaskLayer::get_mask_volume() const
+{
+  Layer::lock_type lock( Layer::GetMutex() );
+
+  return this->mask_volume_;
+}
+
+bool MaskLayer::is_valid() const
+{
+  Layer::lock_type lock( Layer::GetMutex() );
+
+  if ( this->mask_volume_ )
+  {
+    return this->mask_volume_->is_valid();
+  }
+  else
+  {
+    return false;
+  }
+}
+
+
+void MaskLayer::set_mask_volume( Core::MaskVolumeHandle volume )
+{
+  Layer::lock_type lock( Layer::GetMutex() );
+    
+  this->mask_volume_.reset();
+  this->disconnect_all();
+
+  this->mask_volume_ = volume;
+
+  if ( this->mask_volume_ )
+  {
+    this->generation_state_->set( this->mask_volume_->get_generation() );
+    this->bit_state_->set( static_cast< int >( volume->get_mask_data_block()->get_mask_bit() ) );
+    
+    this->add_connection( this->mask_volume_->get_mask_data_block()->mask_updated_signal_.
+      connect( boost::bind( &MaskLayer::handle_mask_data_changed, this ) ) );
+  }
+
+  this->update_volume_signal_();
+}
+
+// counter for generating new colors for each new mask
+static Core::AtomicCounter ColorCount;
+
 void MaskLayer::initialize_states()
 {
-    // Step (1) : Build the layer specific state variables
-
     // == Color of the layer ==
   
-
-    add_state( "color", color_state_, static_cast< int >( color_count_ %  PreferencesManager::Instance()->
+    this->add_state( "color", color_state_, static_cast< int >( ColorCount %  PreferencesManager::Instance()->
     color_states_.size() ) );
 
-  color_count_++;
+  ColorCount++;
 
     // == What border is used ==
-    add_state( "border", border_state_, PreferencesManager::Instance()->
+    this->add_state( "border", border_state_, PreferencesManager::Instance()->
     default_mask_border_state_->export_to_string(), PreferencesManager::Instance()->
     default_mask_border_state_->export_list_to_string() );
 
     // == How is the segmentation filled in ==
-    add_state( "fill", fill_state_, PreferencesManager::Instance()->
+    this->add_state( "fill", fill_state_, PreferencesManager::Instance()->
     default_mask_fill_state_->export_to_string(), PreferencesManager::Instance()->
     default_mask_fill_state_->export_list_to_string() );
 
     // == Whether the isosurface is shown in the volume display ==
-    add_state( "isosurface", show_isosurface_state_, false );
+    this->add_state( "isosurface", show_isosurface_state_, false );
 
-  add_state( "bit", this->bit_state_, 0 );
-
+  // == Internal information for keeping track of which bit we are using ==
+  this->add_state( "bit", this->bit_state_, 0 );
+  
+  // == update the data state ==
 }
-
-Core::AtomicCounter MaskLayer::color_count_;
 
 bool MaskLayer::pre_save_states( Core::StateIO& state_io )
 {
@@ -150,6 +202,7 @@ bool MaskLayer::post_load_states( const Core::StateIO& state_io )
 
 void MaskLayer::clean_up()
 {
+  Layer::lock_type lock( Layer::GetMutex() );   
   this->mask_volume_.reset();
   this->disconnect_all();
 }

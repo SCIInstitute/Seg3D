@@ -43,6 +43,9 @@ namespace Seg3D
 
 bool ActionNewMaskLayer::validate( Core::ActionContextHandle& context )
 {
+  // TODO: 
+  // THis code needs updating, this is not up to standard
+  // --JS
   if ( !this->cache_group_handle( context, this->group_id_, this->group_ ) ) return false;
   
   return true; // validated
@@ -50,9 +53,15 @@ bool ActionNewMaskLayer::validate( Core::ActionContextHandle& context )
 
 bool ActionNewMaskLayer::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 { 
-  LayerHandle new_mask_layer = LayerHandle( new MaskLayer( 
-    "MaskLayer", group_.handle()->get_grid_transform() ) );
+  // Create a new mask volume.
+  Core::MaskVolumeHandle new_mask_volume;
+  Core::MaskVolume::CreateEmptyMask( this->group_.handle()->get_grid_transform(),
+    new_mask_volume );
+  
+  // Create a new container to put it in.
+  LayerHandle new_mask_layer( new MaskLayer( "MaskLayer", new_mask_volume ) );
 
+  // Register the new layer with the LayerManager. This will insert it into the right group.
   LayerManager::Instance()->insert_layer( new_mask_layer );
   
   return true;

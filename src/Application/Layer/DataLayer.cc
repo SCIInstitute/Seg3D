@@ -43,11 +43,10 @@ namespace Seg3D
 {
 
 DataLayer::DataLayer( const std::string& name, const Core::DataVolumeHandle& volume ) :
-  Layer( name ),
+  Layer( name, !( volume->is_valid() ) ),
   data_volume_( volume )
 {
   this->initialize_states();
-  
 }
   
 DataLayer::DataLayer( const std::string& state_id ) :
@@ -86,31 +85,65 @@ void DataLayer::initialize_states()
 
 }
 
+Core::GridTransform DataLayer::get_grid_transform() const 
+{ 
+  Layer::lock_type lock( Layer::GetMutex() );
+
+  if ( this->data_volume_ )
+  {
+    return this->data_volume_->get_grid_transform(); 
+  }
+  else
+  {
+    return Core::GridTransform();
+  }
+}
+
 Core::DataType DataLayer::get_data_type() const
 {
   Layer::lock_type lock( Layer::GetMutex() );
+
   if ( this->data_volume_ )
   {
     return this->data_volume_->get_data_type();
   }
+  
   return Core::DataType::UNKNOWN_E;
 }
 
 Core::DataVolumeHandle DataLayer::get_data_volume()
 {
   Layer::lock_type lock( Layer::GetMutex() );
+
   return this->data_volume_;
+}
+
+bool DataLayer::is_valid() const
+{
+  Layer::lock_type lock( Layer::GetMutex() );
+
+  if ( this->data_volume_ )
+  {
+    return this->data_volume_->is_valid();
+  }
+  else
+  {
+    return false;
+  }
 }
 
 void DataLayer::set_data_volume( Core::DataVolumeHandle data_volume )
 { 
   Layer::lock_type lock( Layer::GetMutex() );
+  
   this->data_volume_ = data_volume; 
 
   if ( this->data_volume_ )
   {
     this->generation_state_->set( this->data_volume_->get_generation() );
   }
+
+  this->update_volume_signal_();
 } 
 
   

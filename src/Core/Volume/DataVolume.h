@@ -81,7 +81,9 @@ private:
   // NOTE: This is used to set up a new layer that is still constructing its data
   mutex_type invalid_mutex_;
 
+  // -- functions for creating DataVolumes --
 public:
+
   // LOADDATAVOLUME:
   // Load a DataVolume from a nrrd file
   static bool LoadDataVolume( const boost::filesystem::path& filename, DataVolumeHandle& volume,
@@ -91,6 +93,15 @@ public:
   // Save a DataVolume to a nrrd file
   static bool SaveDataVolume( const boost::filesystem::path& filepath, DataVolumeHandle& volume, 
     std::string& error );
+
+  // CREATEEMPTYDATA:
+  // Create an empty data volume with given dimensions.
+  static bool CreateEmptyData( GridTransform grid_transform, DataType data_type, 
+    DataVolumeHandle& data );
+
+  // CREATEINVALIDDATA:
+  // Create a data volume with given dimensions, but no data container associated with it.
+  static bool CreateInvalidData( GridTransform grid_transform, DataVolumeHandle& data );
 
 };
 

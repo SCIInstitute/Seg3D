@@ -64,15 +64,15 @@ class Layer : public Core::StateHandler
   // -- Constructor/destructor --
 protected:
   // NOTE: Use the derived class to build the layer
-  Layer( const std::string& name );
-  Layer( const std::string& name, const std::string& state_id );
+  Layer( const std::string& name, bool creating = false );
+  Layer( const std::string& name, const std::string& state_id, bool creating = false );
 
   virtual ~Layer();
 
 private:
   // INITIALIZE_STATES:
   // This function sets the initial states of the layer, and returns true if successful
-  void initialize_states( const std::string& name );
+  void initialize_states( const std::string& name, bool creating );
 
   // -- Layer properties --
 public:
@@ -81,27 +81,33 @@ public:
   // Get the type of the layer
   virtual Core::VolumeType type() const = 0;
 
-  // GRID_TRANSFORM
+  // GET_GRID_TRANSFORM:
   // Get the transform of the layer
-  virtual const Core::GridTransform get_grid_transform() const = 0;
+  virtual Core::GridTransform get_grid_transform() const = 0;
 
+  // GET_DATA_TYPE:
+  // Get the data type of the underlying data
+  virtual Core::DataType get_data_type() const = 0;
+
+  // IS_VALID:
+  // Check whether the layer has valid data
+  virtual bool is_valid() const = 0;
+    
   // -- layer progress signals --
 public:
-  typedef boost::signals2::signal< void ( bool ) > lock_signal_type;
-  
-  typedef boost::signals2::signal< void (double) > update_progress_signal_type;
 
-  // DATA_LOCK_SIGNAL:
-  // This signal is triggered when the data contained in the layer is locked from being
-  // modified (bool = true), or when the data is unlocked (bool = false). This also means 
-  // that the layer cannot be used in any filter.
-  lock_signal_type data_lock_signal_;
-
-  // UPDATE_PROGRESS:
+  // UPDATE_PROGRESS_SIGNAL:
   // When new information on progress is available this signal is triggered. If this signal is 
   // triggered it should end with a value 1.0 indicating that progress reporting has finised.
   // Progress is measured between 0.0 and 1.0.
+  typedef boost::signals2::signal< void (double) > update_progress_signal_type;
   update_progress_signal_type update_progress_signal_;
+
+
+  // UPDATE_VOLUME_SIGNAL:
+  // When the data/mask volume is updated this signal is triggered.
+  typedef boost::signals2::signal< void () > update_volume_signal_type;
+  update_volume_signal_type update_volume_signal_;
 
   // -- layer updated signal --
 public:

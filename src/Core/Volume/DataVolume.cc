@@ -29,6 +29,7 @@
 //Core Includes
 #include <Core/Utils/Log.h>
 #include <Core/DataBlock/NrrdDataBlock.h>
+#include <Core/DataBlock/StdDataBlock.h>
 #include <Core/Volume/DataVolume.h>
 
 namespace Core
@@ -61,8 +62,6 @@ DataType DataVolume::get_data_type() const
     return DataType::UNKNOWN_E;
   }
 }
-
-
 
 VolumeType DataVolume::get_type() const
 {
@@ -139,6 +138,24 @@ bool DataVolume::SaveDataVolume( const boost::filesystem::path& filepath, DataVo
     }
   }
   
+  return true;
+}
+
+bool DataVolume::CreateEmptyData( GridTransform grid_transform, 
+  DataType data_type, DataVolumeHandle& data )
+{
+  DataBlockHandle data_block = StdDataBlock::New( grid_transform, data_type ) ;
+  data_block->clear();
+  
+  data = DataVolumeHandle( new DataVolume( grid_transform, data_block ) );
+  return true;
+}
+
+bool DataVolume::CreateInvalidData( GridTransform grid_transform, DataVolumeHandle& data )
+{
+  DataBlockHandle data_block;
+
+  data = DataVolumeHandle( new DataVolume( grid_transform, data_block ) );
   return true;
 }
 

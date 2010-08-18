@@ -44,7 +44,7 @@
 #include <Application/Layer/MaskLayer.h>
 #include <Application/Layer/DataLayer.h>
 #include <Application/LayerManager/LayerScene.h>
-#include <Application/Session/Session.h>
+#include <Application/LayerManager/LayerAvailabilityNotifier.h>
 
 // Application action includes
 #include <Application/LayerManager/LayerManager.h>
@@ -105,9 +105,13 @@ bool LayerManager::insert_layer( LayerHandle layer )
       
     }
     if( layer->type() == Core::VolumeType::DATA_E )
+    {
       group_handle->insert_layer_front( layer );
+    }
     else 
+    {
       group_handle->insert_layer_back( layer );
+    }
       
     layer->set_layer_group( group_handle );
       
@@ -331,7 +335,6 @@ MaskLayerHandle LayerManager::get_mask_layer_by_id( const std::string& layer_id 
   return boost::dynamic_pointer_cast<MaskLayer>( get_layer_by_id( layer_id ) );
 }
 
-
 LayerHandle LayerManager::get_layer_by_name( const std::string& layer_name )
 {
   lock_type lock( this->get_mutex() );
@@ -361,7 +364,6 @@ void LayerManager::get_groups( std::vector< LayerGroupHandle > &vector_of_groups
     vector_of_groups.push_back( *i );
   } 
 }
-
 
 void LayerManager::get_layers( std::vector< LayerHandle > &vector_of_layers )
 {
@@ -501,8 +503,10 @@ LayerSceneHandle LayerManager::compose_layer_scene( size_t viewer_id )
     {
       LayerHandle layer = *layer_iterator;
       
-      // Skip processing this layer if it's not visible
-      if ( !layer->visible_state_[ viewer_id ]->get() )
+      // Skip processing this layer if it's not visible or that is not valid.
+      // NOTE: Layers that are not valid include the layers that are currently
+      // under construction.
+      if ( !layer->visible_state_[ viewer_id ]->get() || !layer->is_valid() )
       {
         continue;
       }
@@ -714,10 +718,333 @@ bool LayerManager::post_load_states( const Core::StateIO& state_io )
   return success;
 }
 
-int LayerManager::get_session_priority()
+
+// == static functions ==
+
+bool LayerManager::CheckLayerExistance( const std::string& layer_id, std::string& error )
 {
-  return SessionPriority::LAYER_MANAGER_PRIORITY_E;
+  // NOTE: Security check to keep the program logic sane
+  // Only the Application Thread guarantees that nothing is changed in the program
+  if ( !( Core::Application::IsApplicationThread() ) )
+  {
+    CORE_THROW_LOGICERROR( "CheckLayerExistance can only be called from the"
+      " application thread." );
+  }
+  
+  // Clear error string
+  error = "";
+
+  // Check whether layer exists
+  if ( !( LayerManager::Instance()->get_layer_by_id( layer_id ) ) )
+  {
+    error = std::string( "Incorrect layerid: layer '") + layer_id + "' does not exist.";
+    return false;
+  }
+
+  return true;
 }
 
+bool LayerManager::CheckLayerExistanceAndType( const std::string& layer_id, Core::VolumeType type, 
+    std::string& error )
+{
+  // NOTE: Security check to keep the program logic sane
+  // Only the Application Thread guarantees that nothing is changed in the program
+  if ( !( Core::Application::IsApplicationThread() ) )
+  {
+    CORE_THROW_LOGICERROR( "CheckLayerExistanceAndType can only be called from the"
+      " application thread." );
+  }
+
+  // Clear error string
+  error = "";
+  
+  // Check whether layer exists
+  LayerHandle layer = LayerManager::Instance()->get_layer_by_id( layer_id );
+  if ( !layer )
+  {
+    error = std::string( "Incorrect layerid: layer '") + layer_id + "' does not exist.";
+    return false;
+  }
+
+  // Check whether the type of the layer is correct
+  if ( layer->type() != type )
+  {
+    if ( type == Core::VolumeType::DATA_E )
+    {
+      error = std::string( "Layer '") + layer_id + "' is not a data layer.";
+    }
+    else if ( type == Core::VolumeType::MASK_E )
+    {
+      error = std::string( "Layer '") + layer_id + "' is not a mask layer.";
+    }
+    else if ( type == Core::VolumeType::LABEL_E )
+    {
+      error = std::string( "Layer '") + layer_id + "' is not a label layer.";
+    }
+    else
+    {
+      error = std::string( "Layer '") + layer_id + "' is of an incorrect type.";
+    }
+    return false;
+  }
+  
+  return true;
+}
+
+bool LayerManager::CheckLayerSize( const std::string& layer_id1, const std::string& layer_id2,
+    std::string& error )
+{
+  // NOTE: Security check to keep the program logic sane
+  // Only the Application Thread guarantees that nothing is changed in the program
+  if ( !( Core::Application::IsApplicationThread() ) )
+  {
+    CORE_THROW_LOGICERROR( "CheckLayerSize can only be called from the"
+      " application thread." );
+  }
+
+  // Clear error string
+  error = "";
+  
+  // Check whether layer exists
+  LayerHandle layer1 = LayerManager::Instance()->get_layer_by_id( layer_id1 );
+  if ( !layer1 )
+  {
+    error = std::string( "Incorrect layerid: layer '") + layer_id1 + "' does not exist.";
+    return false;
+  }
+
+  LayerHandle layer2 = LayerManager::Instance()->get_layer_by_id( layer_id2 );
+  if ( !layer2 )
+  {
+    error = std::string( "Incorrect layerid: layer '") + layer_id2 + "' does not exist.";
+    return false;
+  }
+  
+  if ( layer1->get_grid_transform() != layer2->get_grid_transform() )
+  {
+    error = std::string( "Layer '" ) + layer_id1 + "' and layer '" + layer_id2 + 
+      "' are not of the same size and origin.";
+    return false;
+  }
+  
+  return true;
+}
+
+bool LayerManager::CheckLayerAvailabilityForProcessing( const std::string& layer_id, 
+    Core::NotifierHandle& notifier )
+{
+  // NOTE: Security check to keep the program logic sane
+  // Only the Application Thread guarantees that nothing is changed in the program
+  if ( !( Core::Application::IsApplicationThread() ) )
+  {
+    CORE_THROW_LOGICERROR( "CheckLayerAvailabilityForProcessing can only be called from the"
+      " application thread." );
+  }
+  
+  LayerHandle layer = LayerManager::Instance()->get_layer_by_id( layer_id );
+  // Check whether layer exists
+  if ( !layer )
+  {
+    CORE_THROW_LOGICERROR( "Layer does not exist, please check existance "
+      "before availability" );
+  }
+
+  std::string layer_state = layer->data_state_->get();
+  if ( layer_state == Layer::AVAILABLE_C )
+  {
+    notifier.reset();
+    return true;
+  }
+  else
+  {
+    // This notifier will inform the calling process when the layer will be available again.
+    notifier = Core::NotifierHandle( new LayerAvailabilityNotifier( layer ) );
+    return false; 
+  }
+}
+
+bool LayerManager::CheckLayerAvailabilityForUse( const std::string& layer_id, 
+    Core::NotifierHandle& notifier )
+{
+  // NOTE: Security check to keep the program logic sane
+  // Only the Application Thread guarantees that nothing is changed in the program
+  if ( !( Core::Application::IsApplicationThread() ) )
+  {
+    CORE_THROW_LOGICERROR( "CheckLayerAvailabilityForUse can only be called from the"
+      " application thread." );
+  }
+  
+  LayerHandle layer = LayerManager::Instance()->get_layer_by_id( layer_id );
+  // Check whether layer exists
+  if ( !layer )
+  {
+    CORE_THROW_LOGICERROR( "Layer does not exist, please check existance "
+      "before availability" );
+  }
+
+  // TODO: Need to implement the case that the layer is IN_USE_E, in which case we
+  // should allow the use of the layer.
+  std::string layer_state = layer->data_state_->get();
+  if ( layer_state == Layer::AVAILABLE_C )
+  {
+    notifier.reset();
+    return true;
+  }
+  else
+  {
+    // This notifier will inform the calling process when the layer will be available again.
+    notifier = Core::NotifierHandle( new LayerAvailabilityNotifier( layer ) );
+    return false; 
+  }
+}
+
+bool LayerManager::CheckLayerAvailability( const std::string& layer_id, bool replace,
+    Core::NotifierHandle& notifier )
+{
+  // NOTE: Security check to keep the program logic sane
+  // Only the Application Thread guarantees that nothing is changed in the program
+  if ( !( Core::Application::IsApplicationThread() ) )
+  {
+    CORE_THROW_LOGICERROR( "CheckLayerAvailability can only be called from the"
+      " application thread." );
+  }
+
+  if ( replace )
+  {
+    return LayerManager::CheckLayerAvailabilityForProcessing( layer_id, notifier );
+  }
+  else
+  {
+    return LayerManager::CheckLayerAvailabilityForUse( layer_id, notifier );  
+  }
+}
+
+bool LayerManager::LockForUse( LayerHandle layer )
+{
+  // NOTE: Security check to keep the program logic sane
+  // Only the Application Thread guarantees that nothing is changed in the program
+  if ( !( Core::Application::IsApplicationThread() ) )
+  {
+    CORE_THROW_LOGICERROR( "LockForUse can only be called from the"
+      " application thread." );
+  }
+  
+  if ( layer->data_state_->get() != Layer::AVAILABLE_C ) return false;
+
+  layer->data_state_->set( Layer::IN_USE_C );
+  return true;
+}
+
+bool LayerManager::LockForProcessing( LayerHandle layer )
+{
+  // NOTE: Security check to keep the program logic sane
+  // Only the Application Thread guarantees that nothing is changed in the program
+  if ( !( Core::Application::IsApplicationThread() ) )
+  {
+    CORE_THROW_LOGICERROR( "LockForProcessing can only be called from the"
+      " application thread." );
+  }
+  
+  if ( layer->data_state_->get() != Layer::AVAILABLE_C ) return false;
+
+  layer->data_state_->set( Layer::PROCESSING_C );
+  return true;
+}
+
+bool LayerManager::CreateAndLockMaskLayer( Core::GridTransform transform, const std::string& name, 
+    LayerHandle& layer )
+{
+  // NOTE: Security check to keep the program logic sane.
+  // Only the Application Thread guarantees that nothing is changed in the program.
+  if ( !( Core::Application::IsApplicationThread() ) )
+  {
+    CORE_THROW_LOGICERROR( "CreateAndLockMaskLayer can only be called from the"
+      " application thread." );
+  }
+
+  // NOTE: We create a mask without data associated with it. Only a skeleton of a 
+  // layer needs to be created.
+  Core::MaskVolumeHandle invalid_mask;
+  if ( ! ( Core::MaskVolume::CreateInvalidMask( transform, invalid_mask ) ) )
+  {
+    return false;
+  }
+
+  // Wrap the Layer structure around the mask data.
+  layer = LayerHandle( new MaskLayer( name, invalid_mask ) );
+  
+  // Insert the layer into the layer manager.
+  LayerManager::Instance()->insert_layer( layer );
+  
+  return true;
+}
+
+bool LayerManager::CreateAndLockDataLayer( Core::GridTransform transform, const std::string& name, 
+    LayerHandle& layer )
+{
+  // NOTE: Security check to keep the program logic sane
+  // Only the Application Thread guarantees that nothing is changed in the program
+  if ( !( Core::Application::IsApplicationThread() ) )
+  {
+    CORE_THROW_LOGICERROR( "CreateAndLockDataLayer can only be called from the"
+      " application thread." );
+  }
+
+  // NOTE: We create a datavolume without data associated with it. Only a skeleton of a 
+  // layer needs to be created.
+  Core::DataVolumeHandle invalid_data;
+  if ( ! ( Core::DataVolume::CreateInvalidData( transform, invalid_data ) ) )
+  {
+    return false;
+  }
+  
+  // Wrap the Layer structure around the volume data.
+  layer = LayerHandle( new DataLayer( name, invalid_data ) );
+  
+  // Insert the layer into the layer manager.
+  LayerManager::Instance()->insert_layer( layer );
+  
+  return true;
+}
+
+void LayerManager::DispatchUnlockLayer( LayerHandle layer )
+{
+  // Move this request to the Application thread
+  if ( !( Core::Application::IsApplicationThread() ) )
+  {
+    Core::Application::PostEvent( boost::bind( &LayerManager::DispatchUnlockLayer, layer) );
+    return;
+  }
+
+  layer->data_state_->set( Layer::AVAILABLE_C );
+}
+
+void LayerManager::DispatchInsertDataVolumeIntoLayer( DataLayerHandle layer, 
+  Core::DataVolumeHandle data )
+{
+  // Move this request to the Application thread
+  if ( !( Core::Application::IsApplicationThread() ) )
+  {
+    Core::Application::PostEvent( boost::bind( 
+      &LayerManager::DispatchInsertDataVolumeIntoLayer, layer, data ) );
+    return;
+  }
+  
+  layer->set_data_volume( data );
+}
+
+void LayerManager::DispatchInsertMaskVolumeIntoLayer( MaskLayerHandle layer, 
+  Core::MaskVolumeHandle mask )
+{
+  // Move this request to the Application thread
+  if ( !( Core::Application::IsApplicationThread() ) )
+  {
+    Core::Application::PostEvent( boost::bind( 
+      &LayerManager::DispatchInsertMaskVolumeIntoLayer, layer, mask ) );
+    return;
+  }
+  
+  layer->set_mask_volume( mask );
+}
 
 } // end namespace seg3D

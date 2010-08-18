@@ -68,6 +68,7 @@ public:
     this->mask_data_block_->clear_mask_at( this->to_index( i, j ) );
   }
 
+  // UPLOAD_TEXTURE:
   // Upload the mask slice to graphics texture.
   // NOTE: This function allocates resources on the GPU, so the caller should
   // acquire a lock on the RenderResources before calling this function. 

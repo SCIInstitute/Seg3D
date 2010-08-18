@@ -41,10 +41,8 @@ MaskVolume::MaskVolume( const GridTransform& grid_transform,
 {
 }
 
-MaskVolume::MaskVolume( const GridTransform& grid_transform ) :
-  Volume( grid_transform )
+MaskVolume::~MaskVolume()
 {
-    MaskDataBlockManager::Instance()->create( grid_transform, this->mask_data_block_ );
 }
 
 VolumeType MaskVolume::get_type() const
@@ -333,6 +331,23 @@ bool MaskVolume::CreateMaskFromLabelData( const DataVolumeHandle src_data,
   default:
     return false;
   }
+}
+
+bool MaskVolume::CreateEmptyMask( GridTransform grid_transform, MaskVolumeHandle& mask )
+{
+  MaskDataBlockHandle mask_data_block;
+    MaskDataBlockManager::Create( grid_transform, mask_data_block );
+  
+  mask = MaskVolumeHandle( new MaskVolume( grid_transform, mask_data_block ) );
+  return true;
+}
+
+bool MaskVolume::CreateInvalidMask( GridTransform grid_transform, MaskVolumeHandle& mask )
+{
+  MaskDataBlockHandle mask_data_block;
+
+  mask = MaskVolumeHandle( new MaskVolume( grid_transform, mask_data_block ) );
+  return true;
 }
 
 } // end namespace Core

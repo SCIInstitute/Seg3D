@@ -26,43 +26,17 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef CORE_UTILS_NOTIFIER_H
-#define CORE_UTILS_NOTIFIER_H
-
-// Boost includes
-#include <boost/utility.hpp>
-#include <boost/smart_ptr.hpp>
+#include <Core/Utils/Notifier.h>
 
 namespace Core
 {
 
-class Notifier;
-typedef boost::shared_ptr<Notifier> NotifierHandle;
-
-class Notifier : public boost::noncopyable
+Notifier::Notifier()
 {
-  // -- constructor / destructor --
-public:
-  Notifier();
-  virtual ~Notifier();
+}
 
-public: 
-  // WAIT:
-  // Wait for the event to be triggered. If the event was already triggered this function
-  // returns immediately.
-  virtual void wait() = 0;
-  
-  // WAIT:
-  // Wait for the event to be triggered. If the event was already triggered this function
-  // returns immediately with true. After the timeout the function returns. If a timeout
-  // was triggered it returns false.
-  virtual bool timed_wait( double timeout ) = 0;
-
-  // GET_NAME:
-  // The name of the resource we are waiting for
-  virtual std::string get_name() const = 0;
-};
+Notifier::~Notifier()
+{
+}
 
 } // end namespace Core
-
-#endif

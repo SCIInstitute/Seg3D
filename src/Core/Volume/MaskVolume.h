@@ -40,13 +40,15 @@ class MaskVolume;
 typedef boost::shared_ptr< MaskVolume > MaskVolumeHandle;
 typedef boost::weak_ptr< MaskVolume > MaskVolumeWeakHandle;
 
+
 class MaskVolume : public Volume
 {
+  // -- constructor / destructor --
 public:
   MaskVolume( const GridTransform& grid_transform, const MaskDataBlockHandle& mask_data_block );
-  MaskVolume( const GridTransform& grid_transform );
-  virtual ~MaskVolume() {}
+  virtual ~MaskVolume();
 
+public:
   // GET_TYPE:
   // Get the type of the data volume
   virtual VolumeType get_type() const;
@@ -63,7 +65,7 @@ public:
   // Get the  generation number of the data volume
   virtual DataBlock::generation_type get_generation() const;
 
-  // -- functions for creating MaskVolumeHandle's --
+  // -- functions for creating MaskVolumes --
 public: 
 
   // CREATEMASKFROMNONZERODATA:
@@ -84,6 +86,10 @@ public:
   // CREATEEMPTYMASK:
   // Create an empty mask with given dimensions.
   static bool CreateEmptyMask( GridTransform grid_transform, MaskVolumeHandle& mask );
+
+  // CREATEINVALIDMASK:
+  // Create a mask with given dimensions, but no data container associated with it.
+  static bool CreateInvalidMask( GridTransform grid_transform, MaskVolumeHandle& mask );
 
 private:
   // Handle to where the mask volume is really stored

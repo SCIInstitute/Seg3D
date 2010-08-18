@@ -33,7 +33,8 @@
 # pragma once
 #endif 
 
-// Boost includes
+// Core includes
+#include <Core/Geometry/GridTransform.h>
 #include <Core/DataBlock/DataBlock.h>
 
 namespace Core
@@ -57,6 +58,8 @@ public:
   static DataBlockHandle New( size_t nx, size_t ny, size_t nz, DataType type, 
     generation_type generation = -1 );
 
+  static DataBlockHandle New( GridTransform transform, DataType type, 
+    generation_type generation = -1 );
 };
 
 } // end namespace Core

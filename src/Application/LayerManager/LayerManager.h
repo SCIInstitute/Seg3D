@@ -40,6 +40,7 @@
 #include <boost/utility.hpp>
 
 // Core includes
+#include <Core/State/StateHandler.h>
 #include <Core/Utils/StringUtil.h>
 #include <Core/Utils/Singleton.h>
 #include <Core/Utils/Log.h>
@@ -48,8 +49,10 @@
 #include <Core/Geometry/BBox.h>
 
 // Application includes
-#include <Application/Layer/LayerFWD.h>
-#include <Core/State/StateHandler.h>
+#include <Application/Layer/Layer.h>
+#include <Application/Layer/DataLayer.h>
+#include <Application/Layer/MaskLayer.h>
+#include <Application/Session/Session.h>
 
 namespace Seg3D
 {
@@ -66,16 +69,17 @@ class LayerManager : public Core::StateHandler
 private:
   LayerManager();
   virtual ~LayerManager();
-
   
+  // -- Set up StateHandler priority --
+public:
+  // TODO: Fix this and put this in a macro definition
+  // --JS
+  virtual int get_session_priority() { return SessionPriority::LAYER_MANAGER_PRIORITY_E; }
+
 public:
   typedef std::list < LayerGroupHandle > group_list_type;
-  
-  // -- state manager functions --
-public:
-  virtual int get_session_priority();
 
-  // Accessor Functions
+  // -- Accessor Functions --
 public:
     // Functions for getting a copy of the Layers and Groups with the proper locking
   // GET_GROUPS:
@@ -274,6 +278,115 @@ private:
   
   // currently active layer
   LayerHandle active_layer_;
+
+  // -- static functions --
+public:
+  
+  // == functions for validation of an action ==
+  
+  // CHECKLAYEREXISTANCE:
+  // Check whether a layer exists.
+  // If it does not exist, the function returns false and an error is string is returned.
+  static bool CheckLayerExistance( const std::string& layer_id, std::string& error );
+  
+  // CHECKLAYEREXISTANCEANDTYPE:
+  // Check whether a layer exists and whether it is of the right type.
+  // If it does not exist or is not of the right type, the function returns false and
+  // an error is string is returned.
+  static bool CheckLayerExistanceAndType( const std::string& layer_id, Core::VolumeType type, 
+    std::string& error );
+
+  // CHECKLAYERSIZE:
+  // Check whether a layer has the right size.
+  // If it does not have the right size, the function returns false and an error is string is 
+  // returned.  
+  static bool CheckLayerSize( const std::string& layer_id1, const std::string& layer_id2,
+    std::string& error );
+      
+  // CHECKLAYERAVAILABILITYFORPROCESSING:
+  // Check whether a layer is available for processing, at the end of the filter the data will
+  // be replaced with new data. Hence this is write acces.
+  // If a layer is not available a notifier is returned that tells can be used to assess when to
+  // check for availability again. Even though the notifier may return another process may have
+  // grabbed it in the mean time. In that case a new notifier will need to be issued by rechecking
+  // availability. Only when the this function OKs the  
+  // NOTE: Availability needs to be tested to ensure that another process is not working on this
+  // this layer. 
+  static bool CheckLayerAvailabilityForProcessing( const std::string& layer_id, 
+    Core::NotifierHandle& notifier );
+
+  // CHECKLAYERAVAILABILITYFORUSE:
+  // Check whether a layer is available for use, i.e. data is not changed but needs to remain
+  // unchanged during the process. Hence this is read access
+  // If a layer is not available a notifier is returned that tells can be used to assess when to
+  // check for availability again. Even though the notifier may return another process may have
+  // grabbed it in the mean time. In that case a new notifier will need to be issued by rechecking
+  // availability. Only when the this function OKs the  
+  // NOTE: Availability needs to be tested to ensure that another process is not working on this
+  // this layer. 
+  static bool CheckLayerAvailabilityForUse( const std::string& layer_id, 
+    Core::NotifierHandle& notifier );
+    
+  // CHECKLAYERAVAILABILITY:
+  // Check whether a layer is available for use. This case processes both of the above cases:
+  // if replace is true, it will check for processing (write) access, if it is not replaced, it 
+  // will look for use (read) access
+  // If a layer is not available a notifier is returned that tells can be used to assess when to
+  // check for availability again. Even though the notifier may return another process may have
+  // grabbed it in the mean time. In that case a new notifier will need to be issued by rechecking
+  // availability. Only when the this function OKs the  
+  // NOTE: Availability needs to be tested to ensure that another process is not working on this
+  // this layer. 
+  static bool CheckLayerAvailability( const std::string& layer_id, bool replace,
+    Core::NotifierHandle& notifier ); 
+    
+  // == functions for creating and locking layers ==
+  
+  // These functions can only be called from the application thread
+  
+  // LOCKFORUSE:
+  // Change the layer data_state to IN_USE_C.
+  // NOTE: This function can *only* be called from the Application thread.
+  static bool LockForUse( LayerHandle layer );
+  
+  // LOCKFORPROCESSING:
+  // Change the layer data_state to PROCESSING_C.
+  // NOTE: This function can *only* be called from the Application thread.
+  static bool LockForProcessing( LayerHandle layer );
+  
+  // CREATEANDLOCKMASKLAYER:
+  // Create a new mask layer and lock it into the CREATING_C mode.
+  // NOTE: This function can *only* be called from the Application thread.
+  static bool CreateAndLockMaskLayer( Core::GridTransform transform, const std::string& name, 
+    LayerHandle& layer );
+  
+  // CREATEANDLOCKDATALAYER:
+  // Create a new data layer and lock it into the CREATING_C mode.
+  // NOTE: This function can *only* be called from the Application thread.
+  static bool CreateAndLockDataLayer( Core::GridTransform, const std::string& name,
+    LayerHandle& layer );
+  
+  // == functions for setting data and unlocking layers ==
+
+  // These functions can be called from the filter thread
+  
+  // DISPATCHUNLOCKLAYER:
+  // Change the layer data_state back to available. This function will relay a call to the 
+  // Application thread if needed.
+  static void DispatchUnlockLayer( LayerHandle layer );
+  
+  // DISPATCHINSERTDATAVOLUMEINTOLAYER:
+  // Insert a datavolume into a data layer. This function will relay a call to the 
+  // Application thread if needed.
+  static void DispatchInsertDataVolumeIntoLayer( DataLayerHandle layer, 
+    Core::DataVolumeHandle data );
+
+  // DISPATCHINSERTMASKVOLUMEINTOLAYER:
+  // Insert a datavolume into a data layer. This function will relay a call to the 
+  // Application thread if needed.
+  static void DispatchInsertMaskVolumeIntoLayer( MaskLayerHandle layer, 
+    Core::MaskVolumeHandle mask );
+  
 };
 
 } // end namespace seg3D

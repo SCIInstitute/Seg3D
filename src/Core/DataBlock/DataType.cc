@@ -160,6 +160,32 @@ int GetNrrdDataType( const DataType& data_type)
   }
 }
 
+
+size_t GetSizeDataType( const DataType& data_type)
+{
+  switch ( data_type )
+  {
+    case DataType::CHAR_E:
+    case DataType::UCHAR_E:
+      return sizeof( char );
+    case DataType::SHORT_E:
+    case DataType::USHORT_E:
+      return sizeof( short );
+    case DataType::INT_E:
+    case DataType::UINT_E:
+      return sizeof( int );
+    case DataType::LONGLONG_E:
+    case DataType::ULONGLONG_E:
+      return sizeof( long long );
+    case DataType::FLOAT_E:
+      return sizeof( float );
+    case DataType::DOUBLE_E:
+      return sizeof( double );
+    default:
+      return 0;
+  }
+}
+
 bool IsInteger( const DataType& data_type )
 {
   return ( data_type == DataType::CHAR_E || data_type == DataType::UCHAR_E ||

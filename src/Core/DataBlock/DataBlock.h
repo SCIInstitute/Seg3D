@@ -90,20 +90,29 @@ public:
   // -- Access properties of data block --
 public:
 
-  // GET_NX, GET_NY, GET_NZ, GET_SIZE
-  // The dimensions of the datablock
+  // GET_NX:
+  // Get the number of samples in the x direction.
   size_t get_nx() const
   {
     return this->nx_;
   }
+  
+  // GET_NY:
+  // Get the number of samples in the y direction.
   size_t get_ny() const
   {
     return this->ny_;
   }
+
+  // GET_NZ:
+  // Get the number of samples in the z direction.
   size_t get_nz() const
   {
     return this->nz_;
   }
+  
+  // GET_SIZE:
+  // Get the total number of samples.
   size_t get_size() const
   {
     return this->nx_ * this->ny_ * this->nz_;
@@ -152,6 +161,10 @@ public:
   // SET_DATA_AT:
   // Set data at a certain index location in the data block
   void set_data_at( size_t index, double value );
+
+  // CLEAR:
+  // Clear the data inside the data block
+  void clear();
 
   // GET_MAX:
   // Get the maximum value of the data
@@ -251,8 +264,7 @@ public:
 
   // CLONE:
   // Clone the data in a datablock by generating a new one and copying the data into it.
-  static bool Clone( const DataBlockHandle& src_data_block, 
-    DataBlockHandle& dst_data_block ); 
+  static bool Clone( const DataBlockHandle& src_data_block, DataBlockHandle& dst_data_block ); 
   
 };
 

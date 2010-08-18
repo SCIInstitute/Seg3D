@@ -39,7 +39,7 @@ class MaskVolumeSlicePrivate
 public:
   bool using_cache_;
   std::vector< unsigned char > cache_;
-  mutable MaskVolumeSlice::cache_mutex_type cache_mutex_;
+  MaskVolumeSlice::cache_mutex_type cache_mutex_;
 };
 
 MaskVolumeSlice::MaskVolumeSlice( const MaskVolumeHandle& mask_volume, 

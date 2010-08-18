@@ -318,7 +318,7 @@ bool MaskDataBlockManager::Convert( DataBlockHandle data,
   switch( data->get_data_type() )
   {
     case DataType::CHAR_E:
-      return ConvertToMaskInternal<char>( data, mask );
+      return ConvertToMaskInternal<signed char>( data, mask );
     case DataType::UCHAR_E:
       return ConvertToMaskInternal<unsigned char>( data, mask );
     case DataType::SHORT_E:
@@ -339,36 +339,65 @@ bool MaskDataBlockManager::Convert( DataBlockHandle data,
 }
 
 
-bool MaskDataBlockManager::Convert( MaskDataBlockHandle mask, DataBlockHandle& data )
+template< class T>
+bool ConvertToDataInternal( MaskDataBlockHandle mask, DataBlockHandle& data )
 {
-  data = StdDataBlock::New( mask->get_nx(), mask->get_ny(), mask->get_nz(), DataType::UCHAR_E );
-
   MaskDataBlock::lock_type lock( mask->get_mutex( ) );
-
-  unsigned char* data_ptr = reinterpret_cast< unsigned char* >( data->get_data() );
 
   unsigned char* mask_ptr = mask->get_mask_data();
   unsigned char mask_value = mask->get_mask_value();
   
+  data = StdDataBlock::New( mask->get_nx(), mask->get_ny(), mask->get_nz(), 
+    GetDataType( reinterpret_cast< T* >( 0 ) ) );
+  T* data_ptr = reinterpret_cast< T* >( data->get_data() );
+  
+  const T on = static_cast<T>( 1 );
+  const T off = static_cast<T>( 0 );
   size_t size = data->get_size();
   size_t size8 = size & ~(0x7);
+
   for ( size_t j = 0; j < size8; j+= 8 )
   {
-    if ( mask_ptr[ j ] & mask_value ) data_ptr[ j ] = 1; else data_ptr[ j ] = 0;
-    if ( mask_ptr[ j + 1 ] & mask_value ) data_ptr[ j + 1 ] = 1; else data_ptr[ j + 1 ] = 0;
-    if ( mask_ptr[ j + 2 ] & mask_value ) data_ptr[ j + 2 ] = 1; else data_ptr[ j + 2 ] = 0;
-    if ( mask_ptr[ j + 3 ] & mask_value ) data_ptr[ j + 3 ] = 1; else data_ptr[ j + 3 ] = 0;
-    if ( mask_ptr[ j + 4 ] & mask_value ) data_ptr[ j + 4 ] = 1; else data_ptr[ j + 4 ] = 0;
-    if ( mask_ptr[ j + 5 ] & mask_value ) data_ptr[ j + 5 ] = 1; else data_ptr[ j + 5 ] = 0;
-    if ( mask_ptr[ j + 6 ] & mask_value ) data_ptr[ j + 6 ] = 1; else data_ptr[ j + 6 ] = 0;
-    if ( mask_ptr[ j + 7 ] & mask_value ) data_ptr[ j + 7 ] = 1; else data_ptr[ j + 7 ] = 0;
+    if ( mask_ptr[ j ] & mask_value ) data_ptr[ j ] = on; else data_ptr[ j ] = off;
+    if ( mask_ptr[ j + 1 ] & mask_value ) data_ptr[ j + 1 ] = on; else data_ptr[ j + 1 ] = off;
+    if ( mask_ptr[ j + 2 ] & mask_value ) data_ptr[ j + 2 ] = on; else data_ptr[ j + 2 ] = off;
+    if ( mask_ptr[ j + 3 ] & mask_value ) data_ptr[ j + 3 ] = on; else data_ptr[ j + 3 ] = off;
+    if ( mask_ptr[ j + 4 ] & mask_value ) data_ptr[ j + 4 ] = on; else data_ptr[ j + 4 ] = off;
+    if ( mask_ptr[ j + 5 ] & mask_value ) data_ptr[ j + 5 ] = on; else data_ptr[ j + 5 ] = off;
+    if ( mask_ptr[ j + 6 ] & mask_value ) data_ptr[ j + 6 ] = on; else data_ptr[ j + 6 ] = off;
+    if ( mask_ptr[ j + 7 ] & mask_value ) data_ptr[ j + 7 ] = on; else data_ptr[ j + 7 ] = off;
   }
   for ( size_t j = 0; j < size; j++ )
   {
-    if ( mask_ptr[ j ] & mask_value ) data_ptr[ j ] = 1; else data_ptr[ j ] = 0;
+    if ( mask_ptr[ j ] & mask_value ) data_ptr[ j ] = on; else data_ptr[ j ] = off;
   }
-  
+
   return true;
+}
+
+bool MaskDataBlockManager::Convert( MaskDataBlockHandle mask, DataBlockHandle& data,
+  DataType data_type )
+{
+  switch( data_type )
+  {
+    case DataType::CHAR_E:
+      return ConvertToDataInternal<signed char>( mask, data );
+    case DataType::UCHAR_E:
+      return ConvertToDataInternal<unsigned char>( mask, data );
+    case DataType::SHORT_E:
+      return ConvertToDataInternal<short>( mask, data );
+    case DataType::USHORT_E:
+      return ConvertToDataInternal<unsigned short>( mask, data );
+    case DataType::INT_E:
+      return ConvertToDataInternal<int>( mask, data );
+    case DataType::UINT_E:
+      return ConvertToDataInternal<unsigned int>( mask, data );
+    case DataType::FLOAT_E:
+      return ConvertToDataInternal<float>( mask, data );
+    case DataType::DOUBLE_E:
+      return ConvertToDataInternal<double>( mask, data );
+  } 
+  return false;
 }
 
 

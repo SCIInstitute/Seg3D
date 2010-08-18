@@ -80,7 +80,11 @@ bool IsReal( const DataType& data_type );
 
 // GETNRRDDATATYPE:
 // Get the type of the data
-int GetNrrdDataType( const DataType& data_type);
+int GetNrrdDataType( const DataType& data_type );
+
+// GETSIZEDATATYPE:
+// Get the number of bytes in this data type
+size_t GetSizeDataType( const DataType& data_type );
 
 // GETDATATYPE:
 // Get the data type from a pointer to the type

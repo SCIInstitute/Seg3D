@@ -25,44 +25,31 @@
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
  */
+ 
 
-#ifndef CORE_UTILS_NOTIFIER_H
-#define CORE_UTILS_NOTIFIER_H
+#ifndef CORE_UTILS_RUNTHREAD_H
+#define CORE_UTILS_RUNTHREAD_H
 
-// Boost includes
-#include <boost/utility.hpp>
 #include <boost/smart_ptr.hpp>
-
+#include <boost/utility.hpp>
+  
 namespace Core
 {
 
-class Notifier;
-typedef boost::shared_ptr<Notifier> NotifierHandle;
+class Runnable;
+typedef boost::shared_ptr<Runnable> RunnableHandle;
 
-class Notifier : public boost::noncopyable
-{
-  // -- constructor / destructor --
+class Runnable : public boost::noncopyable {
+
 public:
-  Notifier();
-  virtual ~Notifier();
-
-public: 
-  // WAIT:
-  // Wait for the event to be triggered. If the event was already triggered this function
-  // returns immediately.
-  virtual void wait() = 0;
+  virtual ~Runnable();
+  virtual void run() = 0;
   
-  // WAIT:
-  // Wait for the event to be triggered. If the event was already triggered this function
-  // returns immediately with true. After the timeout the function returns. If a timeout
-  // was triggered it returns false.
-  virtual bool timed_wait( double timeout ) = 0;
-
-  // GET_NAME:
-  // The name of the resource we are waiting for
-  virtual std::string get_name() const = 0;
+public:
+  
+  static void Start( RunnableHandle runnable );
 };
 
 } // end namespace Core
-
+  
 #endif

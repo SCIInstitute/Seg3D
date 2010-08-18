@@ -54,28 +54,38 @@ class MaskLayer : public Layer
 public:
 
   MaskLayer( const std::string& name, const Core::MaskVolumeHandle& volume );
-  MaskLayer( const std::string& name, const Core::GridTransform& grid_transform );
   MaskLayer( const std::string& state_id );
+
+  // NOTE: This needs to be virtual so it can be deleted from the base class
   virtual ~MaskLayer();
 
+public:
   // TYPE:
-  // this function returns the a Core::VolumeType indicating that this is a MaskLayer
+  // This function returns the a Core::VolumeType indicating that this is a MaskLayer.
   virtual Core::VolumeType type() const { return Core::VolumeType::MASK_E; }
 
   // GET_GRID_TRANSFORM:
-  // this function returns the grid transform of the mask volume
-  virtual const Core::GridTransform get_grid_transform() const 
-  { 
-    return mask_volume_->get_grid_transform(); 
-  }
+  // This function returns the grid transform of the mask volume.
+  virtual Core::GridTransform get_grid_transform() const;
 
+  // GET_DATA_TYPE:
+  // Get the data type of the underlying data
+  virtual Core::DataType get_data_type() const;
+
+  // IS_VALID:
+  // Check whether the layer has valid data.
+  virtual bool is_valid() const;
+  
   // GET_MASK_VOLUME:
-  // this function returns the mask volume
-  Core::MaskVolumeHandle get_mask_volume()
-  {
-    return this->mask_volume_;
-  }
+  // This function returns the mask volume.
+  Core::MaskVolumeHandle get_mask_volume() const;
+  
+  // SET_MASK_VOLUME:
+  // This function set the mask volume to a new mask.
+  void set_mask_volume( Core::MaskVolumeHandle volume );
 
+  // GET_ISOSURFACE:
+  // Get the iso-surface associated with this layer
   Core::IsosurfaceHandle get_isosurface();
 
   void compute_isosurface();
@@ -86,11 +96,6 @@ public:
 public:
   boost::signals2::signal< void () > isosurface_updated_signal_;
   
-  void set_mask_volume( Core::MaskVolumeHandle volume )
-  {
-    Layer::lock_type lock( Layer::GetMutex() );   
-    this->mask_volume_ = volume;
-  }
   
   // -- state variables --
 public:
@@ -121,6 +126,7 @@ protected:
   // this function cleans up the mask volume for when you are deleting the mask and reloading 
   virtual void clean_up();
 
+  // -- internal functions --
 private:
   void initialize_states();
   void handle_mask_data_changed();
@@ -128,12 +134,15 @@ private:
   
 private:
   
-  Core::StateIntHandle bit_state_;
+  // Extra private state information
+  // NOTE: This used for saving the bit that is used in a mask to a session file. As the state
+  // variables are read first, this will allow for reconstructing which data block and which bit
+  // need to be loaded.
+  Core::StateIntHandle   bit_state_;
+  
+  // Information about two components not included in the state manager.
   Core::MaskVolumeHandle mask_volume_;
   Core::IsosurfaceHandle isosurface_;
-  
-  // counter for generating new colors for each new mask
-  static Core::AtomicCounter color_count_;
 };
 
 } // end namespace Seg3D

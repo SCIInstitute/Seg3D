@@ -59,10 +59,11 @@ public:
 
   // GET_GRID_TRANSFORM:
   // this function returns the grid transform of the data volume
-  virtual const Core::GridTransform get_grid_transform() const 
-  { 
-    return this->data_volume_->get_grid_transform(); 
-  }
+  virtual Core::GridTransform get_grid_transform() const;
+  
+  // IS_VALID:
+  // Check whether the layer has valid data.
+  virtual bool is_valid() const;  
   
   // GET_DATA_TYPE:
   // Get the data type of the data volume

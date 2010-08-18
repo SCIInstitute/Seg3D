@@ -38,17 +38,17 @@
 
 // Application includes
 #include <Application/Layer/Layer.h>
-#include <Application/Tool/ITKFilterAlgo.h>
+#include <Application/Tool/ITKFilter.h>
 
  
 namespace Seg3D
 {
 
-ITKFilterAlgo::ITKFilterAlgo()
+ITKFilter::ITKFilter()
 {
 }
 
-ITKFilterAlgo::~ITKFilterAlgo()
+ITKFilter::~ITKFilter()
 {
 }
 
@@ -100,9 +100,12 @@ private:
 
 };
     
-void ITKFilterAlgo::forward_progress_internal( itk::ProcessObject::Pointer filter, LayerHandle layer )
+void ITKFilter::forward_progress_internal( itk::ProcessObject::Pointer filter, 
+  const LayerHandle& layer )
 {
+  // Make a new itk object that observes progress being made in the filter
   itk::Command::Pointer observer = new ITKProgress( layer );
+  // Add it to the itk filter
   filter->AddObserver( itk::ProgressEvent() , observer );
 } 
 
