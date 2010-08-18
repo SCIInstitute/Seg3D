@@ -396,7 +396,15 @@ public:
   std::vector< VertexBufferBatchHandle > vbo_batches_;
   bool vbo_available_;
   bool surface_changed_;
+
+  const static double COMPUTE_PERCENT_PROGRESS_C;
+  const static double NORMAL_PERCENT_PROGRESS_C;
+  const static double PARTITION_PERCENT_PROGRESS_C;
 };
+
+const double IsosurfacePrivate::COMPUTE_PERCENT_PROGRESS_C = 0.8;
+const double IsosurfacePrivate::NORMAL_PERCENT_PROGRESS_C = 0.05;
+const double IsosurfacePrivate::PARTITION_PERCENT_PROGRESS_C = 0.15; 
 
 void IsosurfacePrivate::downsample_setup( int num_threads, double quality_factor )
 {
@@ -1046,8 +1054,10 @@ void IsosurfacePrivate::parallel_compute_faces( int thread, int num_threads,
     barrier.wait();   
 
     // Update progress based on number of z slices processed
-    this->isosurface_->update_progress_signal_( 
-      static_cast< double >( z + 1 ) / static_cast< double >( this->elem_nz_ ) );
+    double compute_progress = 
+      static_cast< double >( z + 1 ) / static_cast< double >( this->elem_nz_ );
+    double total_progress = compute_progress * COMPUTE_PERCENT_PROGRESS_C;
+    this->isosurface_->update_progress_signal_( total_progress );
   }   
 
   barrier.wait();
@@ -1237,6 +1247,9 @@ void Isosurface::compute( double quality_factor )
     this->private_, _1, _2, _3 ) );
   parallel_normals.run();
 
+  this->update_progress_signal_( IsosurfacePrivate::COMPUTE_PERCENT_PROGRESS_C + 
+    IsosurfacePrivate::NORMAL_PERCENT_PROGRESS_C );
+
   this->private_->type_buffer_.clear();
   this->private_->edge_buffer_.clear();
   this->private_->new_points_.clear();
@@ -1271,6 +1284,14 @@ void Isosurface::compute( double quality_factor )
         min_face_index, this->private_->max_face_index_[ j ] ) );
       num_faces = 0;
     }
+
+    // Update progress
+    double partition_progress = 
+      static_cast< double >( j + 1 ) / static_cast< double >( this->private_->min_point_index_.size() ); 
+    double total_progress = IsosurfacePrivate::COMPUTE_PERCENT_PROGRESS_C + 
+      IsosurfacePrivate::NORMAL_PERCENT_PROGRESS_C +
+      ( partition_progress * IsosurfacePrivate::PARTITION_PERCENT_PROGRESS_C );
+    this->update_progress_signal_( total_progress );
   }
   size_t num_batches = this->private_->part_points_.size();
   for ( size_t i = 0; i < num_batches; ++i )
@@ -1296,6 +1317,8 @@ void Isosurface::compute( double quality_factor )
   this->private_->max_face_index_.clear();
 
   this->private_->surface_changed_ = true;
+
+  this->update_progress_signal_( 1.0 );
 }
 
 const std::vector< PointF >& Isosurface::get_points() const
