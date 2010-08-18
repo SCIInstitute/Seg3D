@@ -62,6 +62,9 @@ public:
   // The conductance for deciding what is a similar value
   Core::StateRangedDoubleHandle conductance_state_;
 
+  // Whether the data format needs to be preserved in the filter
+  Core::StateBoolHandle preserve_data_format_;
+
   // -- execute --
 public:
   // Execute the tool and dispatch the action

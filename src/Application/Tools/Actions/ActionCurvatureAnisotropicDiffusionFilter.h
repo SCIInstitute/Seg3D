@@ -46,6 +46,8 @@ CORE_ACTION(
   CORE_ACTION_KEY( "iterations", "5", "Number of iterations to perform." )
   CORE_ACTION_KEY( "integration_step", "0.0625", "Number of divisions for each integration." )
   CORE_ACTION_KEY( "conductance", "0.1", "Weight for specifying how closely connected values are." )
+  CORE_ACTION_KEY( "preserve_data_format", "true", "ITK filters run in floating point percision,"
+  " this option will convert the result back into the original format." )
   CORE_ACTION_KEY( "replace", "true", "Replace the old layer (true), or add an new layer (false)" )
 )
   
@@ -60,6 +62,7 @@ public:
     this->add_key( this->iterations_ );
     this->add_key( this->integration_step_ );
     this->add_key( this->conductance_ );
+    this->add_key( this->preserve_data_format_ );
     this->add_key( this->replace_ );
   }
   
@@ -79,6 +82,7 @@ private:
   Core::ActionParameter< int > iterations_;
   Core::ActionParameter< double > integration_step_;
   Core::ActionParameter< double > conductance_;
+  Core::ActionParameter< bool > preserve_data_format_;
   Core::ActionParameter< bool > replace_;
   
   // -- Dispatch this action from the interface --
@@ -88,7 +92,7 @@ public:
   // Create and dispatch action that inserts the new layer 
   static void Dispatch( Core::ActionContextHandle context, std::string layer_id, 
     int iterations, double integration_step, 
-    double conductance, bool replace );
+    double conductance, bool preserve_data_format, bool replace );
   
 };
   

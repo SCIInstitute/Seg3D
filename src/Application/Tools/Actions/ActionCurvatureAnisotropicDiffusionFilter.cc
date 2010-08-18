@@ -103,7 +103,7 @@ public:
   int iterations_;
   double integration_step_;
   double conductance_;
-  bool maintain_percision_;
+  bool preserve_data_format_;
 
 public:
   // RUN:
@@ -136,7 +136,7 @@ public:
 
       if ( this->check_abort() ) return;
       
-      if ( this->maintain_percision_ )
+      if ( this->preserve_data_format_ )
       {
         this->convert_and_insert_itk_image_into_layer( this->dst_layer_, 
           filter->GetOutput(), this->src_layer_->get_data_type() );       
@@ -168,7 +168,7 @@ bool ActionCurvatureAnisotropicDiffusionFilter::run( Core::ActionContextHandle& 
   algo->iterations_ = this->iterations_.value();
   algo->integration_step_ = this->integration_step_.value();
   algo->conductance_ = this->conductance_.value();
-  algo->maintain_percision_ = true;
+  algo->preserve_data_format_ = true;
 
   // Find the handle to the layer
   algo->find_layer( this->layer_id_.value(), algo->src_layer_ );
@@ -200,7 +200,8 @@ bool ActionCurvatureAnisotropicDiffusionFilter::run( Core::ActionContextHandle& 
 
 
 void ActionCurvatureAnisotropicDiffusionFilter::Dispatch( Core::ActionContextHandle context, 
-  std::string layer_id, int iterations, double integration_step, double conductance, bool replace )
+  std::string layer_id, int iterations, double integration_step, double conductance, 
+  bool preserve_data_format, bool replace )
 { 
   // Create a new action
   ActionCurvatureAnisotropicDiffusionFilter* action = 
@@ -211,6 +212,7 @@ void ActionCurvatureAnisotropicDiffusionFilter::Dispatch( Core::ActionContextHan
   action->iterations_.value() = iterations;
   action->integration_step_.value() = integration_step;
   action->conductance_.value() = conductance;
+  action->preserve_data_format_.value() = preserve_data_format;
   action->replace_.value() = replace;
 
   // Dispatch action to underlying engine

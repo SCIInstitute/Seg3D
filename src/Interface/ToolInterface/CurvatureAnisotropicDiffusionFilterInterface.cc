@@ -68,7 +68,7 @@ CurvatureAnisotropicDiffusionFilterInterface::~CurvatureAnisotropicDiffusionFilt
 // build the interface and connect it to the state manager
 bool CurvatureAnisotropicDiffusionFilterInterface::build_widget( QFrame* frame )
 {
-  // Step 1 - build the Qt GUI Widget
+  // Step 1 - build the custom Qt GUI Widget
   this->private_->ui_.setupUi( frame );
     
   this->private_->iterations_ = new QtUtils::QtSliderIntCombo();
@@ -96,6 +96,8 @@ bool CurvatureAnisotropicDiffusionFilterInterface::build_widget( QFrame* frame )
     tool->integration_step_state_ );
   QtUtils::QtBridge::Connect( this->private_->conductance_, 
     tool->conductance_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.preserve_data_format_,
+    tool->preserve_data_format_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.replaceCheckBox, 
     tool->replace_state_ );
   QtUtils::QtBridge::Enable( this->private_->ui_.runFilterButton,
@@ -104,13 +106,15 @@ bool CurvatureAnisotropicDiffusionFilterInterface::build_widget( QFrame* frame )
   // Step 4 - Qt connections
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() ); 
+    
     this->private_->ui_.target_layer_->setDisabled( tool->use_active_layer_state_->get() );
+    
     this->connect( this->private_->ui_.use_active_layer_, SIGNAL( toggled( bool ) ),
       this->private_->ui_.target_layer_, SLOT( setDisabled( bool ) ) );
+
+    this->connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), 
+      this, SLOT( run_filter() ) );
   }
-  
-  this->connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), 
-    this, SLOT( run_filter() ) );
   
   return true;
 }
