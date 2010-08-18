@@ -103,6 +103,7 @@ public:
   int iterations_;
   double integration_step_;
   double conductance_;
+  bool maintain_percision_;
 
 public:
   // RUN:
@@ -133,7 +134,15 @@ public:
 
       filter->Update();
 
-      this->insert_itk_image_into_layer( this->dst_layer_, filter->GetOutput() ); 
+      if ( this->maintain_percision_ )
+      {
+        this->convert_and_insert_itk_image_into_layer( this->dst_layer_, 
+          filter->GetOutput(), this->src_layer_->get_data_type() );       
+      }
+      else
+      {
+        this->insert_itk_image_into_layer( this->dst_layer_, filter->GetOutput() ); 
+      }
     );
   }
   
@@ -157,6 +166,7 @@ bool ActionCurvatureAnisotropicDiffusionFilter::run( Core::ActionContextHandle& 
   algo->iterations_ = this->iterations_.value();
   algo->integration_step_ = this->integration_step_.value();
   algo->conductance_ = this->conductance_.value();
+  algo->maintain_percision_ = true;
 
   // Find the handle to the layer
   algo->find_layer( this->layer_id_.value(), algo->src_layer_ );
@@ -177,8 +187,13 @@ bool ActionCurvatureAnisotropicDiffusionFilter::run( Core::ActionContextHandle& 
     algo->create_and_lock_data_layer_from_layer( algo->src_layer_, algo->dst_layer_ );
   }
 
-  // Start the filter
+  // Start the filter.
   CurvatureAnisotropicDiffusionFilterAlgo::Start( algo );
+
+  // Return the id of the destination layer.
+  result->set_value( algo->dst_layer_->get_layer_id() );
+
+  return true;
 }
 
 

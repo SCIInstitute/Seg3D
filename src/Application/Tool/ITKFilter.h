@@ -126,11 +126,11 @@ protected:
     return true;
   }
 
-
   // INSERT_ITK_IMAGE_INTO_LAYER:
   // Insert an itk image back into a layer
   template< class T >
-  bool insert_itk_image_into_layer( const LayerHandle& layer, typename itk::Image<T,3>* itk_image )
+  bool insert_itk_image_into_layer( const LayerHandle& layer, 
+    typename itk::Image<T,3>* itk_image )
   {
   
     // If the layer is a data layer
@@ -179,7 +179,74 @@ protected:
       this->dispatch_insert_mask_volume_into_layer( mask_layer, mask_volume, false );
       return true;
     }
+    return false;
   }
+
+
+  // CONVERT_AND_INSERT_ITK_IMAGE_INTO_LAYER:
+  // Insert an itk image back into a layer
+  template< class T >
+  bool convert_and_insert_itk_image_into_layer( const LayerHandle& layer, 
+    typename itk::Image<T,3>* itk_image, Core::DataType data_type )
+  {
+  
+    // If the layer is a data layer
+    if ( layer->type() == Core::VolumeType::DATA_E )
+    {
+      DataLayerHandle data_layer = boost::dynamic_pointer_cast<DataLayer>( layer );
+
+      // Wrap an ITKImageData object around the itk object
+      Core::DataBlockHandle data_block_src = Core::ITKDataBlock::New<T>( 
+          typename itk::Image<T,3>::Pointer( itk_image ) ) ;
+      Core::DataBlockHandle data_block_dst = data_block_src;
+      if ( data_block_src->get_data_type() != data_type )
+      {
+        Core::DataBlock::ConvertDataType( data_block_src, data_block_dst, data_type );
+      }
+      
+      Core::DataVolumeHandle data_volume( new Core::DataVolume( 
+        data_layer->get_grid_transform(), data_block_dst ) );
+        
+      // NOTE: Do not need an update of the generation number as this volume 
+      // was generated from scratch. But it will need a new histogram
+      this->dispatch_insert_data_volume_into_layer( data_layer, data_volume, false, true );
+      return true;
+    }
+    // If the layer is a mask layer
+    else if ( layer->type() == Core::VolumeType::MASK_E )
+    {
+      MaskLayerHandle mask_layer = boost::dynamic_pointer_cast<MaskLayer>( layer );
+          
+      // Need to make an intermediate representation as a datablock of the data
+      // before it can be uploaded into the mask.
+      // NOTE: This only generates a wrapper, no new data is generated
+      Core::DataBlockHandle data_block = Core::ITKDataBlock::New<T>( 
+        typename itk::Image<T,3>::Pointer( itk_image ) );
+      
+      // NOTE: The only reason we need the transform here, is that data blocks are
+      // sorted by grid transform so we can use the nrrd library to save them, the
+      // latter only allows storing one transform per data block, and since 8 masks
+      // share one datablock, they are required for now to have the same transform.
+      Core::MaskDataBlockHandle mask;
+
+      if (!( Core::MaskDataBlockManager::Convert( data_block, 
+        mask_layer->get_grid_transform(), mask ) ) )
+      {
+        return false;
+      }
+      
+      Core::MaskVolumeHandle mask_volume( new Core::MaskVolume( 
+        mask_layer->get_grid_transform(), mask ) );
+        
+      // NOTE:Do not need an update of the generation number as this volume 
+      // was generated from scratch.
+      this->dispatch_insert_mask_volume_into_layer( mask_layer, mask_volume, false );
+      return true;
+    }
+    
+    return false;
+  }
+
 
   // FORWARD_PROGRESS:
   // Forward the progress an itk filter is making
