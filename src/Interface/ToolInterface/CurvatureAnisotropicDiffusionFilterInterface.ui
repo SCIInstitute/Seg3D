@@ -71,7 +71,7 @@
       </font>
      </property>
      <property name="title">
-      <string>Target Mask</string>
+      <string>Target Layer</string>
      </property>
      <property name="flat">
       <bool>false</bool>
@@ -163,10 +163,31 @@
     <layout class="QHBoxLayout" name="conductanceHLayout_bottom"/>
    </item>
    <item>
-    <widget class="QCheckBox" name="preserve_data_format_">
-     <property name="text">
-      <string>Preserve Data Format</string>
-     </property>
+    <widget class="QWidget" name="widget_" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>5</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>5</number>
+      </property>
+      <item>
+       <widget class="QCheckBox" name="preserve_data_format_">
+        <property name="text">
+         <string>Preserve Data Format</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
    <item>
