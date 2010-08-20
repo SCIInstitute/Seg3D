@@ -62,7 +62,12 @@ public:
   int x0_, y0_, x1_, y1_;
   int brush_radius_;
   bool erase_;
+
+  // The following variables are set by ActionPaint when it's executed.
+
   bool inclusive_;
+  std::vector< unsigned char > mask_constraint_mask_;
+  std::vector< unsigned char > data_constraint_mask_;
 };
 
 class PaintTool : public Tool, public boost::enable_shared_from_this< PaintTool >
@@ -125,6 +130,7 @@ public:
   Core::StateBoolHandle use_active_layer_state_;
   Core::StateBoolHandle negative_data_constraint_state_;
   Core::StateBoolHandle negative_mask_constraint_state_;
+  Core::StateBoolHandle show_data_cstr_bound_state_;
   
   // Radius of the brush
   Core::StateRangedIntHandle brush_radius_state_;

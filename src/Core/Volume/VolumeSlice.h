@@ -33,6 +33,7 @@
 
 #include <Core/Utils/ConnectionHandler.h>
 #include <Core/Utils/EnumClass.h>
+#include <Core/Utils/Lockable.h>
 #include <Core/Geometry/Point.h>
 #include <Core/Graphics/Texture.h>
 #include <Core/Volume/Volume.h>
@@ -52,14 +53,13 @@ CORE_ENUM_CLASS
 class VolumeSlice;
 typedef boost::shared_ptr< VolumeSlice > VolumeSliceHandle;
 
+class VolumeSlicePrivate;
+typedef boost::shared_ptr< VolumeSlicePrivate > VolumeSlicePrivateHandle;
+
 // CLASS VolumeSlice
 // A helper class for accessing data in a slice of a volume.
-class VolumeSlice : protected ConnectionHandler
+class VolumeSlice : protected ConnectionHandler, public RecursiveLockable
 {
-public:
-  typedef Volume::mutex_type mutex_type;
-  typedef Volume::lock_type lock_type;
-  typedef Volume::shared_lock_type shared_lock_type;
 
 protected:
   VolumeSlice( const VolumeHandle& volume, VolumeSliceType type, size_t slice_num );
@@ -75,15 +75,9 @@ protected:
 
 public:
 
-  VolumeHandle get_volume() const
-  {
-    return this->volume_;
-  }
+  VolumeHandle get_volume() const;
 
-  VolumeType volume_type() const
-  {
-    return this->volume_->get_type();
-  }
+  VolumeType volume_type() const;
 
   void set_slice_type( VolumeSliceType type );
 
@@ -91,10 +85,7 @@ public:
 
   void set_slice_number( size_t slice_num );
 
-  size_t get_slice_number() const
-  {
-    return this->slice_number_;
-  }
+  size_t get_slice_number() const;
 
   // Get the index of the point in the volume
   void to_index( size_t i, size_t j, Point& index ) const;
@@ -123,42 +114,28 @@ public:
   // Returns true if the slice is moved successfully, otherwise false.
   void move_slice_to( double depth, bool fail_safe = false );
 
-  size_t nx() const { return this->nx_; }
-  size_t ny() const { return this->ny_; }
-  size_t number_of_slices() const { return this->number_of_slices_; }
-  bool out_of_boundary() const { return this->out_of_boundary_; }
+  size_t nx() const;
+  size_t ny() const;
+  size_t number_of_slices() const;
+  bool out_of_boundary() const;
 
-  double left() const { return this->left_; }
-  double right() const { return this->right_; }
-  double bottom() const { return this->bottom_; }
-  double top() const { return this->top_; }
-  double depth() const { return this->depth_; }
+  double left() const;
+  double right() const;
+  double bottom() const;
+  double top() const;
+  double depth() const;
 
-  const Point& bottom_left() const { return this->bottom_left_; }
-  const Point& bottom_right() const { return this->bottom_right_; }
-  const Point& top_left() const { return this->top_left_; }
-  const Point& top_right() const { return this->top_right_; }
+  const Point& bottom_left() const;
+  const Point& bottom_right() const;
+  const Point& top_left() const;
+  const Point& top_right() const;
 
-  void handle_volume_updated()
-  {
-    this->slice_changed_ = true;
-  }
+  void handle_volume_updated();
 
-  Point apply_grid_transform( const Point& pt ) const
-  {
-    return this->volume_->apply_grid_transform( pt );
-  }
+  Point apply_grid_transform( const Point& pt ) const;
 
-  Point apply_inverse_grid_transform( const Point& pt ) const
-  {
-    return this->volume_->apply_inverse_grid_transform( pt );
-  }
+  Point apply_inverse_grid_transform( const Point& pt ) const;
   
-  mutex_type& get_mutex() const
-  {
-    return this->volume_->get_mutex();
-  }
-
   // Create the texture object
   virtual void initialize_texture();
 
@@ -171,57 +148,21 @@ public:
   // Make a copy of the slice, which will share texture object with the original one.
   virtual VolumeSliceHandle clone() = 0;
 
-  TextureHandle get_texture()
-  {
-    return this->texture_;
-  }
+  Texture2DHandle get_texture();
 
   // SET_VOLUME:
   // Set the volume out of which the slice will be taken.
   virtual void set_volume( const VolumeHandle& volume ) = 0;
 
-private:
-  // UPDATE_DIMENSION:
-  // Update the dimension of the slice.
-  void update_dimension();
-
-  // UPDATE_POSITION:
-  // Update the position of the slice.
-  void update_position();
-
 protected:
-
-  bool slice_changed_;
-  bool size_changed_;
-  size_t nx_;
-  size_t ny_;
-  size_t number_of_slices_;
-  bool out_of_boundary_;
-
-  double left_;
-  double right_;
-  double bottom_;
-  double top_;
-  double depth_;
-  Point bottom_left_;
-  Point bottom_right_;
-  Point top_left_;
-  Point top_right_;
-
-  Texture2DHandle texture_;
-
-  // Mutex for thread-safe access on member variables. 
-  // NOTE: Member variables are completely independent of the underlying volume, so it's
-  // better to have a separate mutex.
-  typedef boost::recursive_mutex internal_mutex_type;
-  typedef boost::unique_lock< internal_mutex_type > internal_lock_type;
-  mutable internal_mutex_type internal_mutex_;
+  bool get_slice_changed();
+  void set_slice_changed( bool );
+  bool get_size_changed();
+  void set_size_changed( bool );
 
 private:
-  VolumeHandle volume_;
-  VolumeSliceType slice_type_;
-  size_t slice_number_;
-
+  friend class VolumeSlicePrivate;
+  VolumeSlicePrivateHandle private_;
 };
 
 } // end namespace Core

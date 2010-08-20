@@ -38,6 +38,9 @@ namespace Core
 class DataVolumeSlice;
 typedef boost::shared_ptr< DataVolumeSlice > DataVolumeSliceHandle;
 
+class DataVolumeSlicePrivate;
+typedef boost::shared_ptr< DataVolumeSlicePrivate > DataVolumeSlicePrivateHandle;
+
 class DataVolumeSlice : public VolumeSlice
 {
 public:
@@ -48,20 +51,9 @@ public:
   DataVolumeSlice( const DataVolumeSlice& copy );
   virtual ~DataVolumeSlice();
 
-  inline DataBlock* get_data_block() const
-  {
-    return this->data_block_;
-  }
+  double get_data_at ( size_t i, size_t j ) const;
 
-  inline double get_data_at ( size_t i, size_t j ) const
-  {
-    return this->data_block_->get_data_at( this->to_index( i, j ) );
-  }
-
-  inline void set_data_at( size_t i, size_t j, double value ) 
-  {
-    this->data_block_->set_data_at( this->to_index( i, j ), value );
-  }
+  void set_data_at( size_t i, size_t j, double value );
 
   // Upload the data slice to graphics texture.
   // NOTE: This function allocates resources on the GPU, so the caller should
@@ -76,7 +68,15 @@ public:
   // Set the volume out of which the slice will be taken.
   virtual void set_volume( const VolumeHandle& volume );
 
+  // CREATE_THRESHOLD_MASK:
+  // Create a threshold mask based on the data of current slice and the give min/max 
+  // values. The mask will be inverted if negative_constraint is true.
+  void create_threshold_mask( std::vector< unsigned char >& mask, 
+    double min_val, double max_val, bool negative_constraint ) const;
+
 private:
+  DataVolumeSlicePrivateHandle private_;
+
   // Pointer to the data block. The base class keeps a handle of the volume,
   // so it is safe to use a pointer here.
   DataBlock* data_block_;

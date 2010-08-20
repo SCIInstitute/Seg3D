@@ -53,20 +53,11 @@ public:
 
   virtual ~MaskVolumeSlice();
 
-  inline bool get_mask_at( size_t i, size_t j ) const
-  {
-    return this->mask_data_block_->get_mask_at( this->to_index( i, j ) );
-  }
+  bool get_mask_at( size_t i, size_t j ) const;
 
-  void set_mask_at( size_t i, size_t j )
-  {
-    this->mask_data_block_->set_mask_at( this->to_index( i, j ) );
-  }
+  void set_mask_at( size_t i, size_t j );
 
-  void clear_mask_at( size_t i, size_t j )
-  {
-    this->mask_data_block_->clear_mask_at( this->to_index( i, j ) );
-  }
+  void clear_mask_at( size_t i, size_t j );
 
   // UPLOAD_TEXTURE:
   // Upload the mask slice to graphics texture.
@@ -94,12 +85,9 @@ public:
   // Sync the cached data back to the mask volume and then release the memory.
   void release_cached_data();
 
-  // -- Mutex and lock for protected access to cached data
-public:
-  typedef boost::recursive_mutex cache_mutex_type;
-  typedef boost::unique_lock< cache_mutex_type > cache_lock_type;
-  
-  cache_mutex_type& get_cache_mutex() const;
+  // COPY_SLICE_DATA:
+  // Copy the mask data of current slice into the buffer.
+  void copy_slice_data( std::vector< unsigned char >& buffer ) const;
 
 public:
   // CACHE_UPDATED_SIGNAL:

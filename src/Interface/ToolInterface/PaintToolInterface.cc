@@ -72,7 +72,7 @@ bool PaintToolInterface::build_widget( QFrame* frame )
   this->private_->ui_.setupUi( frame );
 
   //Add the SliderSpinCombos
-  this->private_->brush_radius_ = new QtUtils::QtSliderIntCombo( this, true );
+  this->private_->brush_radius_ = new QtUtils::QtSliderIntCombo( this, false );
   this->private_->ui_.verticalLayout->addWidget( this->private_->brush_radius_ );
 
   this->private_->upper_threshold_ = new QtUtils::QtSliderDoubleCombo( this, false );
@@ -106,6 +106,8 @@ bool PaintToolInterface::build_widget( QFrame* frame )
     tool->lower_threshold_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.eraseCheckBox, 
     tool->erase_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.show_boundary_,
+    tool->show_data_cstr_bound_state_ );
 
   this->private_->ui_.target_mask_->setDisabled( tool->use_active_layer_state_->get() );
   this->connect( this->private_->ui_.use_active_layer_, SIGNAL( toggled( bool ) ),

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>218</width>
+    <width>300</width>
     <height>396</height>
    </rect>
   </property>
@@ -43,7 +43,7 @@ QWidget#threshold_histogram_{
   border: 1px solid gray;
 }</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_4">
+  <layout class="QVBoxLayout" name="verticalLayout_5">
    <property name="spacing">
     <number>2</number>
    </property>
@@ -51,30 +51,29 @@ QWidget#threshold_histogram_{
     <number>4</number>
    </property>
    <item>
-    <widget class="QWidget" name="widget" native="true">
-     <layout class="QHBoxLayout" name="activeHLayout" stretch="1">
+    <widget class="QGroupBox" name="target_groupbox_">
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="title">
+      <string>Target Layer</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_4">
       <property name="spacing">
-       <number>4</number>
+       <number>6</number>
       </property>
       <property name="margin">
-       <number>0</number>
+       <number>4</number>
       </property>
       <item>
-       <widget class="QLabel" name="activeLabel">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>50</width>
-          <height>0</height>
-         </size>
-        </property>
+       <widget class="QComboBox" name="target_layer_"/>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="use_active_layer_">
         <property name="text">
-         <string>Target:</string>
+         <string>Always Use Active Layer</string>
         </property>
        </widget>
       </item>

@@ -39,7 +39,6 @@ class MaskVolumeSlicePrivate
 public:
   bool using_cache_;
   std::vector< unsigned char > cache_;
-  MaskVolumeSlice::cache_mutex_type cache_mutex_;
 };
 
 MaskVolumeSlice::MaskVolumeSlice( const MaskVolumeHandle& mask_volume, 
@@ -99,58 +98,59 @@ static void CopyMaskData( const MaskVolumeSlice* slice, unsigned char* buffer )
 
 void MaskVolumeSlice::upload_texture()
 {
-  internal_lock_type lock( this->internal_mutex_ );
+  lock_type lock( this->get_mutex() );
 
-  if ( !this->slice_changed_ )
+  if ( !this->get_slice_changed() )
     return;
+
+  size_t nx = this->nx();
+  size_t ny = this->ny();
 
   RenderResources::lock_type rr_lock( RenderResources::GetMutex() );
 
   // Lock the texture
-  Texture::lock_type tex_lock( this->texture_->get_mutex() );
-  this->texture_->bind();
+  Texture2DHandle tex = this->get_texture();
+  Texture::lock_type tex_lock( tex->get_mutex() );
+  tex->bind();
 
-  if ( this->size_changed_ )
+  if ( this->get_size_changed() )
   {
     // Make sure there is no pixel unpack buffer bound
     PixelUnpackBuffer::RestoreDefault();
-    this->texture_->set_image( static_cast<int>( this->nx_ ), 
-      static_cast<int>( this->ny_ ), GL_ALPHA );
-    this->size_changed_ = false;
+    tex->set_image( static_cast<int>( nx ), 
+      static_cast<int>( ny ), GL_ALPHA );
+    this->set_size_changed( false );
   }
   
-  cache_lock_type cache_lock( this->get_cache_mutex() );
   if ( this->private_->using_cache_ )
   {
     glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
-    this->texture_->set_sub_image( 0, 0, static_cast<int>( this->nx_ ), 
-      static_cast<int>( this->ny_ ), &this->private_->cache_[ 0 ], GL_ALPHA, GL_UNSIGNED_BYTE );
-    this->texture_->unbind();
-    cache_lock.unlock();
+    tex->set_sub_image( 0, 0, static_cast<int>( nx ), 
+      static_cast<int>( ny ), &this->private_->cache_[ 0 ], GL_ALPHA, GL_UNSIGNED_BYTE );
+    tex->unbind();
   }
   else
   {
-    cache_lock.unlock();
-
     // Step 1. copy the data in the slice to a pixel unpack buffer
     PixelBufferObjectHandle pixel_buffer( new PixelUnpackBuffer );
     pixel_buffer->bind();
-    pixel_buffer->set_buffer_data( sizeof(unsigned char) * this->nx_ * this->ny_,
+    pixel_buffer->set_buffer_data( sizeof(unsigned char) * nx * ny,
       NULL, GL_STREAM_DRAW );
     unsigned char* buffer = reinterpret_cast<unsigned char*>(
       pixel_buffer->map_buffer( GL_WRITE_ONLY ) );
 
     {
-      shared_lock_type volume_lock( this->get_mutex() );
+      MaskDataBlock::shared_lock_type volume_lock( 
+        this->mask_data_block_->get_mutex() );
       CopyMaskData( this, buffer );
     }
     
     // Step 2. copy from the pixel buffer to texture
     pixel_buffer->unmap_buffer();
     glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
-    this->texture_->set_sub_image( 0, 0, static_cast<int>( this->nx_ ), 
-      static_cast<int>( this->ny_ ), NULL, GL_ALPHA, GL_UNSIGNED_BYTE );
-    this->texture_->unbind();
+    tex->set_sub_image( 0, 0, static_cast<int>( nx ), 
+      static_cast<int>( ny ), NULL, GL_ALPHA, GL_UNSIGNED_BYTE );
+    tex->unbind();
 
     // Step 3. release the pixel unpack buffer
     // NOTE: The texture streaming will still succeed even if the PBO is deleted.
@@ -161,22 +161,24 @@ void MaskVolumeSlice::upload_texture()
 
   }
 
-  this->slice_changed_ = false;
+  this->set_slice_changed( false );
 }
 
 VolumeSliceHandle MaskVolumeSlice::clone()
 {
+  lock_type lock( this->get_mutex() );
   return VolumeSliceHandle( new MaskVolumeSlice( *this ) );
 }
 
 MaskDataBlockHandle MaskVolumeSlice::get_mask_data_block() const
 {
+  lock_type lock( this->get_mutex() );
   return this->mask_data_block_->shared_from_this();
 }
 
 void MaskVolumeSlice::set_volume( const VolumeHandle& volume )
 {
-  internal_lock_type lock( this->internal_mutex_ );
+  lock_type lock( this->get_mutex() );
 
   VolumeSlice::set_volume( volume );
   MaskVolume* mask_volume = dynamic_cast< MaskVolume* >( volume.get() );
@@ -191,22 +193,19 @@ void MaskVolumeSlice::set_volume( const VolumeHandle& volume )
   }
 }
 
-MaskVolumeSlice::cache_mutex_type& MaskVolumeSlice::get_cache_mutex() const
-{
-  return this->private_->cache_mutex_;
-}
-
 unsigned char* MaskVolumeSlice::get_cached_data()
 {
   ASSERT_IS_APPLICATION_THREAD();
 
-  cache_lock_type cache_lock( this->get_cache_mutex() );
+  lock_type lock( this->get_mutex() );
+
   if ( !this->private_->using_cache_ )
   {
     this->private_->cache_.resize( this->nx() * this->ny() );
     
     {
-      shared_lock_type volume_lock( this->get_mutex() );
+      MaskDataBlock::shared_lock_type volume_lock( 
+        this->mask_data_block_->get_mutex() );
       CopyMaskData( this, &this->private_->cache_[ 0 ] );
     }
 
@@ -262,23 +261,55 @@ void MaskVolumeSlice::release_cached_data()
     return;
   }
   
-  cache_lock_type cache_lock( this->get_cache_mutex() );
+  lock_type lock( this->get_mutex() );
+
   if ( !this->private_->using_cache_ )
   {
     return;
   }
   
   {
-    lock_type volume_lock( this->get_mutex() );
+    MaskDataBlock::lock_type volume_lock( this->mask_data_block_->get_mutex() );
     CopyCachedDataBack( this, &this->private_->cache_[ 0 ] );
   }
   
   this->mask_data_block_->increase_generation();
   this->private_->cache_.resize( 0 );
   this->private_->using_cache_ = false;
-  cache_lock.unlock();
-  
+
+  lock.unlock();
+
   this->mask_data_block_->mask_updated_signal_();
+}
+
+bool MaskVolumeSlice::get_mask_at( size_t i, size_t j ) const
+{
+  lock_type lock( this->get_mutex() );
+  return this->mask_data_block_->get_mask_at( this->to_index( i, j ) );
+}
+
+void MaskVolumeSlice::set_mask_at( size_t i, size_t j )
+{
+  lock_type lock( this->get_mutex() );
+  this->mask_data_block_->set_mask_at( this->to_index( i, j ) );
+}
+
+void MaskVolumeSlice::clear_mask_at( size_t i, size_t j )
+{
+  lock_type lock( this->get_mutex() );
+  this->mask_data_block_->clear_mask_at( this->to_index( i, j ) );
+}
+
+void MaskVolumeSlice::copy_slice_data( std::vector< unsigned char >& buffer ) const
+{
+  lock_type lock( this->get_mutex() );
+
+  buffer.resize( this->nx() * this->ny() );
+  {
+    MaskDataBlock::shared_lock_type volume_lock( 
+      this->mask_data_block_->get_mutex() );
+    CopyMaskData( this, &buffer[ 0 ] );
+  }
 }
 
 } // end namespace Core

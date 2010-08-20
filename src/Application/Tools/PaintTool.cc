@@ -77,6 +77,8 @@ public:
 
   void handle_layers_changed();
   void handle_data_constraint_changed();
+  void handle_data_cstr_visibility_changed();
+  void handle_data_cstr_range_changed();
 
   void update_target_options();
   void update_constraint_options();
@@ -93,9 +95,13 @@ public:
 
   //bool paint_range( int x0, int y0, int x1, int y1 );
 
-  // UPDATE_VIEWERS:
+  // UPDATE_SAME_MODE_VIEWERS:
   // Cause viewers with the same view mode as the one that contains the paint brush
   // to redraw overlay to display the current position of the brush.
+  void update_same_mode_viewers();
+
+  // UPDATE_VIEWERS:
+  // Cause all the 2D viewers to redraw overlay.
   void update_viewers();
 
   void setup_paint_info( PaintInfo& paint_info, int x0, int y0, int x1, int y1 );
@@ -302,8 +308,8 @@ void PaintToolPrivate::upload_mask_texture()
   int brush_size = this->radius_ * 2 + 1;
   glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
   {
-    Core::RenderResources::lock_type rr_lock( Core::RenderResources::GetMutex() );
     Core::Texture::lock_type tex_lock( this->brush_tex_->get_mutex() );
+    Core::RenderResources::lock_type rr_lock( Core::RenderResources::GetMutex() );
     this->brush_tex_->set_image( brush_size, brush_size, GL_ALPHA, &this->brush_mask_[ 0 ],
       GL_ALPHA, GL_UNSIGNED_BYTE );
   }
@@ -316,7 +322,7 @@ void PaintToolPrivate::handle_brush_radius_changed()
   lock_type lock( this->get_mutex() );
   this->build_brush_mask();
   this->brush_mask_changed_ = true;
-  this->update_viewers();
+  this->update_same_mode_viewers();
 }
 
 void PaintToolPrivate::paint( const PaintInfo& paint_info, int xc, int yc, int& paint_count )
@@ -346,6 +352,7 @@ void PaintToolPrivate::paint( const PaintInfo& paint_info, int xc, int yc, int& 
   size_t nx = paint_info.target_slice_->nx();
   bool has_data_constraint = paint_info.data_constraint_slice_.get() != 0;
   bool has_mask_constraint = paint_info.mask_constraint_slice_.get() != 0;
+
   for ( size_t y = y_start; y <= y_end; y++ )
   {
     for ( size_t x = x_start; x <= x_end; x++ )
@@ -354,19 +361,14 @@ void PaintToolPrivate::paint( const PaintInfo& paint_info, int xc, int yc, int& 
       {
         size_t slice_x = x_min + x;
         size_t slice_y = y_min + y;
-        if ( has_data_constraint )
+        size_t slice_index = slice_y * nx + slice_x;
+        if ( has_data_constraint && !paint_info.data_constraint_mask_[ slice_index ] )
         {
-          double val = paint_info.data_constraint_slice_->get_data_at( slice_x, slice_y );
-          bool in_range = val >= paint_info.min_val_ && val <= paint_info.max_val_;
-          if ( ( in_range && paint_info.negative_data_constraint_ ) ||
-            ( !in_range && !paint_info.negative_data_constraint_ ) )
-          {
             continue;
-          }
         }
         if ( has_mask_constraint )
         {
-          bool has_mask = paint_info.mask_constraint_slice_->get_mask_at( slice_x, slice_y );
+          bool has_mask = paint_info.mask_constraint_mask_[ slice_index ] != 0;
           if ( ( has_mask && paint_info.negative_mask_constraint_ ) ||
             ( !has_mask && !paint_info.negative_mask_constraint_ ) )
           {
@@ -375,11 +377,11 @@ void PaintToolPrivate::paint( const PaintInfo& paint_info, int xc, int yc, int& 
         }
         if ( paint_info.erase_ )
         {
-          buffer[ slice_y * nx + slice_x ] = 0;
+          buffer[ slice_index ] = 0;
         }
         else
         {
-          buffer[ slice_y * nx + slice_x ] = 1;
+          buffer[ slice_index ] = 1;
         }
       }
     }
@@ -411,7 +413,7 @@ void PaintToolPrivate::interpolated_paint( const PaintInfo& paint_info, int x0, 
   }
 }
 
-void PaintToolPrivate::update_viewers()
+void PaintToolPrivate::update_same_mode_viewers()
 {
   if ( !this->viewer_ || this->viewer_->is_volume_view() )
   {
@@ -429,7 +431,21 @@ void PaintToolPrivate::update_viewers()
     }
 
     ViewerHandle viewer = ViewerManager::Instance()->get_viewer( i );
-    if ( viewer->view_mode_state_->get() == view_mode )
+    if ( viewer->view_mode_state_->get() == view_mode &&
+      viewer->viewer_visible_state_->get() )
+    {
+      viewer->redraw_overlay();
+    }
+  }
+}
+
+void PaintToolPrivate::update_viewers()
+{
+  size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
+  for ( size_t i = 0; i < num_of_viewers; i++ )
+  {
+    ViewerHandle viewer = ViewerManager::Instance()->get_viewer( i );
+    if ( !viewer->is_volume_view() && viewer->viewer_visible_state_->get() )
     {
       viewer->redraw_overlay();
     }
@@ -489,6 +505,11 @@ void PaintToolPrivate::handle_layers_changed()
 
 void PaintToolPrivate::handle_data_constraint_changed()
 {
+  if ( this->paint_tool_->show_data_cstr_bound_state_->get() )
+  {
+    this->update_viewers();
+  }
+  
   if ( this->paint_tool_->data_constraint_layer_state_->get() == Tool::NONE_OPTION_C )
   {
     return;
@@ -633,6 +654,21 @@ void PaintToolPrivate::setup_paint_info( PaintInfo& paint_info, int x0, int y0, 
   paint_info.y1_ = slice_y;
 }
 
+void PaintToolPrivate::handle_data_cstr_visibility_changed()
+{
+  this->update_viewers();
+}
+
+void PaintToolPrivate::handle_data_cstr_range_changed()
+{
+  if ( !this->paint_tool_->show_data_cstr_bound_state_->get() ||
+    this->paint_tool_->data_constraint_layer_state_->get() == Tool::NONE_OPTION_C )
+  {
+    return;
+  }
+  
+  this->update_viewers();
+}
 
 //////////////////////////////////////////////////////////////////////////
 // Implementation of class PaintTool
@@ -662,6 +698,7 @@ PaintTool::PaintTool( const std::string& toolid ) :
   this->add_state( "use_active_layer", this->use_active_layer_state_, true );
   this->add_state( "negative_data_constraint", this->negative_data_constraint_state_, false );
   this->add_state( "negative_mask_constraint", this->negative_mask_constraint_state_, false );
+  this->add_state( "show_data_constraint_bound", this->show_data_cstr_bound_state_, false );
 
   this->add_state( "brush_radius", this->brush_radius_state_, 3, 0, 150, 1 );
   this->add_state( "upper_threshold", this->upper_threshold_state_, 1000.0, -1000.0, 1000.0, 0.01 );
@@ -670,6 +707,14 @@ PaintTool::PaintTool( const std::string& toolid ) :
   
   this->add_connection( this->data_constraint_layer_state_->state_changed_signal_.connect(
     boost::bind( &PaintToolPrivate::handle_data_constraint_changed, this->private_.get() ) ) );
+  this->add_connection( this->show_data_cstr_bound_state_->state_changed_signal_.connect(
+    boost::bind( &PaintToolPrivate::handle_data_cstr_visibility_changed, this->private_ ) ) );
+  this->add_connection( this->lower_threshold_state_->state_changed_signal_.connect(
+    boost::bind( &PaintToolPrivate::handle_data_cstr_range_changed, this->private_ ) ) );
+  this->add_connection( this->upper_threshold_state_->state_changed_signal_.connect(
+    boost::bind( &PaintToolPrivate::handle_data_cstr_range_changed, this->private_ ) ) );
+  this->add_connection( this->negative_data_constraint_state_->state_changed_signal_.connect(
+    boost::bind( &PaintToolPrivate::handle_data_cstr_range_changed, this->private_ ) ) );
 
   this->private_->handle_layers_changed();
 
@@ -718,15 +763,10 @@ void PaintTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
   ViewerHandle current_viewer;
   double world_x, world_y;
   int radius;
-
+  bool brush_visible;
   {
     PaintToolPrivate::lock_type private_lock( this->private_->get_mutex() );
-
-    if ( !this->private_->brush_visible_ || !this->private_->viewer_ )
-    {
-      return;
-    }
-
+    brush_visible = this->private_->brush_visible_;
     current_viewer = this->private_->viewer_;
     world_x = this->private_->world_x_;
     world_y = this->private_->world_y_;
@@ -736,12 +776,28 @@ void PaintTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
     radius = this->private_->radius_;
   }
   
-  if ( viewer->view_mode_state_->get() != current_viewer->view_mode_state_->get() )
+  std::string target_layer_id;
+  std::string data_constraint_layer_id;
+  double min_val, max_val;
+  bool negative_data_constraint;
+  std::string current_viewer_mode;
+  std::string redraw_viewer_mode;
+  bool show_data_cstr_bound;
   {
-    return;
+    Core::StateEngine::lock_type se_lock( Core::StateEngine::GetMutex() );
+    if ( current_viewer )
+    {
+      current_viewer_mode = current_viewer->view_mode_state_->get();
+    }
+    redraw_viewer_mode = viewer->view_mode_state_->get();
+    target_layer_id = this->target_layer_state_->get();
+    data_constraint_layer_id = this->data_constraint_layer_state_->get();
+    min_val = this->lower_threshold_state_->get();
+    max_val = this->upper_threshold_state_->get();
+    negative_data_constraint = this->negative_data_constraint_state_->get();
+    show_data_cstr_bound = this->show_data_cstr_bound_state_->get();
   }
 
-  std::string target_layer_id = this->target_layer_state_->get();
   // If no target layer is selected, return
   if ( target_layer_id == Tool::NONE_OPTION_C )
   {
@@ -763,10 +819,6 @@ void PaintTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
   }
   
   float opacity = 1.0f;
-  if ( current_viewer->get_viewer_id() != viewer_id )
-  {
-    opacity = 0.5f;
-  }
 
   // Compute the position of the brush in world space
   // NOTE: The size of the brush needs to be extended by half of the voxel size in each
@@ -777,56 +829,112 @@ void PaintTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
     ( target_slice->nx() - 1 );
   double voxel_height = ( target_slice->top() - target_slice->bottom() ) /
     ( target_slice->ny() - 1 );
-  double left = target_slice->left() + ( i - radius - 0.5 ) * voxel_width;
-  double right = target_slice->left() + ( i + radius + 0.5 ) * voxel_width;
-  double bottom = target_slice->bottom() + ( j - radius - 0.5 ) * voxel_height;
-  double top = target_slice->bottom() + ( j + radius + 0.5 ) * voxel_height;
-
-  // Compute the size of the brush in window space
-  Core::Vector brush_x( right - left, 0.0, 0.0 );
-  brush_x = proj_mat * brush_x;
-  double brush_screen_width = brush_x.x() / 2.0 * viewer->get_width();
-  double brush_screen_height = ( top - bottom ) / ( right - left ) * brush_screen_width;
-
   
   // Lock the shader, because this function can be called from multiple rendering threads
   PaintBrushShader::lock_type shader_lock( this->private_->shader_->get_mutex() );
-  // Lock the brush texture
-  Core::Texture::lock_type tex_lock( this->private_->brush_tex_->get_mutex() );
 
   this->private_->shader_->enable();
   this->private_->shader_->set_opacity( opacity );
-  this->private_->shader_->set_pixel_size( static_cast< float >( 1.0 / brush_screen_width ), 
-    static_cast< float >( 1.0 /brush_screen_height ) );
 
   unsigned int old_tex_unit = Core::Texture::GetActiveTextureUnit();
   Core::Texture::SetActiveTextureUnit( 0 );
-  this->private_->brush_tex_->bind();
-  
-  MaskLayer* target_mask_layer = static_cast< MaskLayer* >( target_layer.get() );
-  Core::Color color = PreferencesManager::Instance()->get_color( 
-    target_mask_layer->color_state_->get() );
-  this->private_->shader_->set_brush_color( static_cast< float >( color.r() / 255 ), 
-    static_cast< float >( color.g() / 255 ), static_cast< float >( color.b() / 255 ) );
-  
   glPushAttrib( GL_TRANSFORM_BIT );
   glMatrixMode( GL_PROJECTION );
   glPushMatrix();
   glLoadIdentity();
   glMultMatrixd( proj_mat.data() );
   
-  glBegin( GL_QUADS );
-    glTexCoord2f( 0.0f, 0.0f );
-    glVertex2d( left, bottom );
-    glTexCoord2f( 1.0f, 0.0f );
-    glVertex2d( right, bottom );
-    glTexCoord2f( 1.0f, 1.0f );
-    glVertex2d( right, top );
-    glTexCoord2f( 0.0f, 1.0f );
-    glVertex2d( left, top );
-  glEnd();
+  MaskLayer* target_mask_layer = static_cast< MaskLayer* >( target_layer.get() );
+  Core::Color color = PreferencesManager::Instance()->get_color( 
+    target_mask_layer->color_state_->get() );
 
-  this->private_->brush_tex_->unbind();
+  if ( data_constraint_layer_id != Tool::NONE_OPTION_C &&
+    show_data_cstr_bound )
+  {
+    Core::DataVolumeSliceHandle data_constraint_slice = boost::dynamic_pointer_cast
+      < Core::DataVolumeSlice >( viewer->get_volume_slice( data_constraint_layer_id ) );
+    std::vector< unsigned char > data_constraint_mask;
+    data_constraint_slice->create_threshold_mask( data_constraint_mask,
+      min_val, max_val, negative_data_constraint );
+    Core::Texture2DHandle data_constraint_tex;
+    {
+      Core::RenderResources::lock_type rr_lock( Core::RenderResources::GetMutex() );
+      data_constraint_tex.reset( new Core::Texture2D );
+      data_constraint_tex->bind();
+      data_constraint_tex->set_min_filter( GL_NEAREST );
+      data_constraint_tex->set_mag_filter( GL_NEAREST );
+      data_constraint_tex->set_image( static_cast< int >( data_constraint_slice->nx() ), 
+        static_cast< int >( data_constraint_slice->ny() ), GL_ALPHA, 
+        &data_constraint_mask[ 0 ], GL_ALPHA, GL_UNSIGNED_BYTE );
+    }
+
+    double left = target_slice->left() - 0.5 * voxel_width;
+    double right = target_slice->right() + 0.5 * voxel_width;
+    double bottom = target_slice->bottom() - 0.5 * voxel_height;
+    double top = target_slice->top() + 0.5 * voxel_height;
+    double slice_width = right - left;
+    double slice_height = top - bottom;
+    Core::Vector slice_x( slice_width, 0.0, 0.0 );
+    slice_x = proj_mat * slice_x;
+    double slice_screen_width = slice_x.x() / 2.0 * viewer->get_width();
+    double slice_screen_height = slice_height / slice_width * slice_screen_width;
+    this->private_->shader_->set_pixel_size( static_cast< float >( 1.0 / slice_screen_width ), 
+      static_cast< float >( 1.0 /slice_screen_height ) );
+    this->private_->shader_->set_brush_color( static_cast< float >( 1.0 - color.r() / 255 ), 
+      static_cast< float >( 1.0 - color.g() / 255 ), static_cast< float >( 1.0 - color.b() / 255 ) );
+    glBegin( GL_QUADS );
+      glTexCoord2f( 0.0f, 0.0f );
+      glVertex2d( left, bottom );
+      glTexCoord2f( 1.0f, 0.0f );
+      glVertex2d( right, bottom );
+      glTexCoord2f( 1.0f, 1.0f );
+      glVertex2d( right, top );
+      glTexCoord2f( 0.0f, 1.0f );
+      glVertex2d( left, top );
+    glEnd();
+    data_constraint_tex->unbind();
+  }
+  
+  if ( current_viewer && brush_visible &&
+    current_viewer_mode == redraw_viewer_mode )
+  {
+    double left = target_slice->left() + ( i - radius - 0.5 ) * voxel_width;
+    double right = target_slice->left() + ( i + radius + 0.5 ) * voxel_width;
+    double bottom = target_slice->bottom() + ( j - radius - 0.5 ) * voxel_height;
+    double top = target_slice->bottom() + ( j + radius + 0.5 ) * voxel_height;
+
+    // Compute the size of the brush in window space
+    Core::Vector brush_x( right - left, 0.0, 0.0 );
+    brush_x = proj_mat * brush_x;
+    double brush_screen_width = brush_x.x() / 2.0 * viewer->get_width();
+    double brush_screen_height = ( top - bottom ) / ( right - left ) * brush_screen_width;
+
+    if ( current_viewer->get_viewer_id() != viewer_id )
+    {
+      this->private_->shader_->set_opacity( 0.5f );
+    }
+    this->private_->shader_->set_pixel_size( static_cast< float >( 1.0 / brush_screen_width ), 
+      static_cast< float >( 1.0 /brush_screen_height ) );
+    this->private_->shader_->set_brush_color( static_cast< float >( color.r() / 255 ), 
+      static_cast< float >( color.g() / 255 ), static_cast< float >( color.b() / 255 ) );
+
+    // Lock the brush texture
+    Core::Texture::lock_type tex_lock( this->private_->brush_tex_->get_mutex() );
+    this->private_->brush_tex_->bind();
+    glBegin( GL_QUADS );
+      glTexCoord2f( 0.0f, 0.0f );
+      glVertex2d( left, bottom );
+      glTexCoord2f( 1.0f, 0.0f );
+      glVertex2d( right, bottom );
+      glTexCoord2f( 1.0f, 1.0f );
+      glVertex2d( right, top );
+      glTexCoord2f( 0.0f, 1.0f );
+      glVertex2d( left, top );
+    glEnd();
+
+    this->private_->brush_tex_->unbind();
+  }
+  
   Core::Texture::SetActiveTextureUnit( old_tex_unit );
   this->private_->shader_->disable();
   glPopMatrix();
@@ -854,7 +962,7 @@ bool PaintTool::handle_mouse_leave( size_t /*viewer_id*/ )
 {
   PaintToolPrivate::lock_type lock( this->private_->get_mutex() );
   this->private_->brush_visible_ = false;
-  this->private_->update_viewers();
+  this->private_->update_same_mode_viewers();
   this->private_->viewer_.reset();
   if ( this->private_->painting_ )
   {
@@ -900,7 +1008,7 @@ bool PaintTool::handle_mouse_move( const Core::MouseHistory& mouse_history,
 
   if ( this->private_->brush_visible_ )
   {
-    this->private_->update_viewers();
+    this->private_->update_same_mode_viewers();
   }
 
   if ( this->private_->painting_ )
@@ -992,7 +1100,7 @@ bool PaintTool::handle_mouse_press( const Core::MouseHistory& mouse_history,
     this->private_->brush_visible_ = this->private_->painting_;
   }
 
-  this->private_->update_viewers();
+  this->private_->update_same_mode_viewers();
   bool accepted = this->private_->painting_;
 
   return accepted;
@@ -1023,7 +1131,7 @@ bool PaintTool::handle_mouse_release( const Core::MouseHistory& mouse_history,
     PaintToolPrivate::lock_type lock( this->private_->get_mutex() );
     this->private_->brush_visible_ = true;
   }
-  this->private_->update_viewers();
+  this->private_->update_same_mode_viewers();
   return false;
 }
 
@@ -1073,8 +1181,7 @@ bool PaintTool::paint( const PaintInfo& paint_info )
 
   this->brush_radius_state_->set( paint_info.brush_radius_ );
   {
-    Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
-    Core::MaskVolumeSlice::cache_lock_type cache_lock( paint_info.target_slice_->get_cache_mutex() );
+    Core::MaskVolumeSlice::lock_type cache_lock( paint_info.target_slice_->get_mutex() );
     if ( paint_info.inclusive_ )
     {
       this->private_->paint( paint_info, paint_info.x0_, paint_info.y0_, paint_count );

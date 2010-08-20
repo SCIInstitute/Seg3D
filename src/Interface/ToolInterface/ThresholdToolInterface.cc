@@ -31,16 +31,12 @@
 #include <QtUtils/Widgets/QtHistogramWidget.h>
 
 //Interface Includes
-#include <Interface/ToolInterface/CustomWidgets/TargetComboBox.h>
-
-//Qt Gui Includes
 #include <Interface/ToolInterface/ThresholdToolInterface.h>
 #include "ui_ThresholdToolInterface.h"
 
 //Application Includes
 #include <Application/Layer/DataLayer.h>
 #include <Application/Tools/ThresholdTool.h>
-//#include <Application/Filters/Actions/ActionThreshold.h>
 #include <Application/LayerManager/LayerManager.h>
 
 SCI_REGISTER_TOOLINTERFACE( Seg3D, ThresholdToolInterface )
@@ -55,7 +51,6 @@ public:
   
   QtUtils::QtSliderDoubleCombo *upper_threshold_;
   QtUtils::QtSliderDoubleCombo *lower_threshold_;
-  TargetComboBox *target_;
   QtUtils::QtHistogramWidget *histogram_;
 };
 
@@ -82,11 +77,7 @@ bool ThresholdToolInterface::build_widget( QFrame* frame )
 
   this->private_->lower_threshold_ = new QtUtils::QtSliderDoubleCombo();
   this->private_->ui_.verticalLayout_3->addWidget( this->private_->lower_threshold_ );
-  
-  // add the TargetComboBox
-  this->private_->target_ = new TargetComboBox( this );
-  this->private_->ui_.activeHLayout->addWidget( this->private_->target_ );
-  
+    
   this->private_->histogram_ = new QtUtils::QtHistogramWidget( this );
   this->private_->ui_.histogramHLayout->addWidget( this->private_->histogram_ );
 
@@ -95,15 +86,12 @@ bool ThresholdToolInterface::build_widget( QFrame* frame )
   ThresholdTool* tool = dynamic_cast< ThresholdTool* > ( base_tool_.get() );
 
   //Step 3 - connect the gui to the tool through the QtBridge
-  QtUtils::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
-  connect( this->private_->target_, SIGNAL( valid( bool ) ), this, SLOT( enable_run_filter( bool ) ) );
-  connect( this->private_->target_, SIGNAL( currentIndexChanged( QString ) ), this, SLOT( refresh_histogram( QString ) ) );
+  QtUtils::QtBridge::Connect( this->private_->ui_.target_layer_, tool->target_layer_state_ );
+  connect( this->private_->ui_.target_layer_, SIGNAL( currentIndexChanged( QString ) ), 
+    this, SLOT( refresh_histogram( QString ) ) );
   QtUtils::QtBridge::Connect( this->private_->upper_threshold_, tool->upper_threshold_state_ );
   QtUtils::QtBridge::Connect( this->private_->lower_threshold_, tool->lower_threshold_state_ );
   
-  //connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), this, SLOT( execute_filter() ) );
-  this->private_->target_->sync_layers();
-
   //Send a message to the log that we have finised with building the Threshold Tool Interface
   CORE_LOG_DEBUG("Finished building a Threshold Tool Interface");
 

@@ -204,7 +204,18 @@ bool ActionPaint::run( Core::ActionContextHandle& context, Core::ActionResultHan
   paint_info.erase_ = this->private_->erase_.value();
   paint_info.inclusive_ = ( context->source() != Core::ActionSource::INTERFACE_MOUSE_E ||
     ( paint_info.x0_ == paint_info.x1_ && paint_info.y0_ == paint_info.y1_ ) );
-
+  
+  if ( paint_info.data_constraint_slice_ )
+  {
+    paint_info.data_constraint_slice_->create_threshold_mask( paint_info.data_constraint_mask_,
+      paint_info.min_val_, paint_info.max_val_, paint_info.negative_data_constraint_ );
+  }
+  
+  if ( paint_info.mask_constraint_slice_ )
+  {
+    paint_info.mask_constraint_slice_->copy_slice_data( paint_info.mask_constraint_mask_ );
+  }
+  
   bool success = paint_tool->paint( paint_info );
   if ( context->source() != Core::ActionSource::INTERFACE_MOUSE_E )
   {

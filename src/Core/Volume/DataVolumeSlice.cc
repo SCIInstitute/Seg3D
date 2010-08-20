@@ -65,14 +65,14 @@ DataVolumeSlice::~DataVolumeSlice()
   this->disconnect_all();
 }
 
-template<class DATA1, class DATA2>
-void CopyTypedData( DataVolumeSlice* slice, DATA1* buffer )
+template<class TYPE1, class TYPE2>
+void CopyTypedData( DataVolumeSlice* slice, TYPE1* buffer, DataBlock* data_block )
 {
-  const DATA1 numeric_min = std::numeric_limits< DATA1 >::min();
-  const DATA1 numeric_max = std::numeric_limits< DATA1 >::max();
-  const DATA1 numeric_range = numeric_max - numeric_min;
-  const double value_min = slice->get_data_block()->get_min();
-  const double value_max = slice->get_data_block()->get_max();
+  const TYPE1 numeric_min = std::numeric_limits< TYPE1 >::min();
+  const TYPE1 numeric_max = std::numeric_limits< TYPE1 >::max();
+  const TYPE1 numeric_range = numeric_max - numeric_min;
+  const double value_min = data_block->get_min();
+  const double value_max = data_block->get_max();
   const double value_range = value_max - value_min;
   const double inv_value_range = 1.0 / value_range;
 
@@ -85,14 +85,14 @@ void CopyTypedData( DataVolumeSlice* slice, DATA1* buffer )
   const size_t nx = slice->nx();
   const size_t ny = slice->ny();
   
-  DATA2* data = static_cast<DATA2*>( slice->get_data_block()->get_data() );
+  TYPE2* data = static_cast<TYPE2*>( data_block->get_data() );
   size_t row_start = current_index;
   for ( size_t j = 0; j < ny; j++ )
   {
     current_index = row_start;
     for ( size_t i = 0; i < nx; i++ )
     {
-      buffer[ j * nx + i ] = static_cast<DATA1>(  ( data[ current_index ] - value_min ) 
+      buffer[ j * nx + i ] = static_cast<TYPE1>(  ( data[ current_index ] - value_min ) 
         * inv_value_range * numeric_range + numeric_min );
       current_index += x_stride;
     }
@@ -102,63 +102,68 @@ void CopyTypedData( DataVolumeSlice* slice, DATA1* buffer )
 
 void DataVolumeSlice::upload_texture()
 {
-  internal_lock_type lock( this->internal_mutex_ );
+  lock_type lock( this->get_mutex() );
 
-  if ( !this->slice_changed_ )
+  if ( !this->get_slice_changed() )
     return;
+
+  size_t nx = this->nx();
+  size_t ny = this->ny();
 
   RenderResources::lock_type rr_lock( RenderResources::GetMutex() );
 
   // Lock the texture
-  Texture::lock_type tex_lock( this->texture_->get_mutex() );
-  this->texture_->bind();
+  Texture2DHandle tex = this->get_texture();
+  Texture::lock_type tex_lock( tex->get_mutex() );
+  tex->bind();
 
-  if ( this->size_changed_ )
+
+  if ( this->get_size_changed() )
   {
     // Make sure there is no pixel unpack buffer bound
     PixelUnpackBuffer::RestoreDefault();
 
-    this->texture_->set_image( static_cast< int >( this->nx_ ), 
-      static_cast< int >( this->ny_ ), TEXTURE_FORMAT_C );
-    this->size_changed_ = false;
+    tex->set_image( static_cast< int >( nx ), 
+      static_cast< int >( ny ), TEXTURE_FORMAT_C );
+    this->set_size_changed( false );
   }
   
   // Step 1. copy the data in the slice to a pixel unpack buffer
   PixelBufferObjectHandle pixel_buffer( new PixelUnpackBuffer );
   pixel_buffer->bind();
-  pixel_buffer->set_buffer_data( sizeof( texture_data_type ) * this->nx_ * this->ny_,
+  pixel_buffer->set_buffer_data( sizeof( texture_data_type ) * nx * ny,
     NULL, GL_STREAM_DRAW );
   texture_data_type* buffer = reinterpret_cast< texture_data_type* >(
     pixel_buffer->map_buffer( GL_WRITE_ONLY ) );
 
   // Lock the volume
-  shared_lock_type volume_lock( this->get_mutex() );
+  DataBlock::shared_lock_type volume_lock( this->data_block_->get_mutex() );
   
   switch ( this->data_block_->get_data_type() )
   {
     case DataType::CHAR_E:
-      CopyTypedData< texture_data_type, signed char >( this, buffer );
+      CopyTypedData< texture_data_type, signed char >( this, buffer, this->data_block_ );
       break;
     case DataType::UCHAR_E:
-      CopyTypedData< texture_data_type, unsigned char >( this, buffer );
+      CopyTypedData< texture_data_type, unsigned char >( this, buffer, this->data_block_ );
       break;
     case DataType::SHORT_E:
-      CopyTypedData< texture_data_type, short >( this, buffer );
+      CopyTypedData< texture_data_type, short >( this, buffer, this->data_block_ );
       break;
     case DataType::USHORT_E:
-      CopyTypedData< texture_data_type, unsigned short >( this, buffer );
+      CopyTypedData< texture_data_type, unsigned short >( this, buffer, this->data_block_ );
       break;
     case DataType::INT_E:
-      CopyTypedData< texture_data_type, int >( this, buffer );
+      CopyTypedData< texture_data_type, int >( this, buffer, this->data_block_ );
       break;
     case DataType::UINT_E:
-      CopyTypedData< texture_data_type, unsigned int >( this, buffer );
+      CopyTypedData< texture_data_type, unsigned int >( this, buffer, this->data_block_ );
       break;
     case DataType::FLOAT_E:
-      CopyTypedData< texture_data_type, float >( this, buffer );
+      CopyTypedData< texture_data_type, float >( this, buffer, this->data_block_ );
       break;
     case DataType::DOUBLE_E:
-      CopyTypedData< texture_data_type, double >( this, buffer );
+      CopyTypedData< texture_data_type, double >( this, buffer, this->data_block_ );
       break;
   }
 
@@ -167,9 +172,9 @@ void DataVolumeSlice::upload_texture()
   // Step 2. copy from the pixel buffer to texture
   pixel_buffer->unmap_buffer();
   glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
-  this->texture_->set_sub_image( 0, 0, static_cast<int>( this->nx_ ), 
-    static_cast<int>( this->ny_ ), NULL, GL_LUMINANCE, TEXTURE_DATA_TYPE_C );
-  this->texture_->unbind();
+  tex->set_sub_image( 0, 0, static_cast<int>( nx ), 
+    static_cast<int>( ny ), NULL, GL_LUMINANCE, TEXTURE_DATA_TYPE_C );
+  tex->unbind();
 
   // Step 3. release the pixel unpack buffer
   // NOTE: The texture streaming will still succeed even if the PBO is deleted.
@@ -180,17 +185,18 @@ void DataVolumeSlice::upload_texture()
 
   CORE_CHECK_OPENGL_ERROR();
 
-  this->slice_changed_ = false;
+  this->set_slice_changed( false );
 }
 
 VolumeSliceHandle DataVolumeSlice::clone()
 {
+  lock_type lock( this->get_mutex() );
   return VolumeSliceHandle( new DataVolumeSlice( *this ) );
 }
 
 void DataVolumeSlice::set_volume( const VolumeHandle& volume )
 {
-  internal_lock_type lock( this->internal_mutex_ );
+  lock_type lock( this->get_mutex() );
 
   VolumeSlice::set_volume( volume );
   DataVolume* data_volume = dynamic_cast< DataVolume* >( volume.get() );
@@ -202,5 +208,92 @@ void DataVolumeSlice::set_volume( const VolumeHandle& volume )
       boost::bind( &VolumeSlice::handle_volume_updated, this ) ) );
   }
 }
+
+double DataVolumeSlice::get_data_at( size_t i, size_t j ) const
+{
+  lock_type lock( this->get_mutex() );
+  return this->data_block_->get_data_at( this->to_index( i, j ) );
+}
+
+void DataVolumeSlice::set_data_at( size_t i, size_t j, double value )
+{
+  lock_type lock( this->get_mutex() );
+  this->data_block_->set_data_at( this->to_index( i, j ), value );
+}
+
+template<class T >
+void ThresholdTypedData( const DataVolumeSlice* slice, DataBlock* data_block,
+  unsigned char* buffer, double min_val, double max_val, bool negative_constraint )
+{
+  size_t current_index = slice->to_index( 0, 0 );
+
+  // Index strides in X and Y direction. Use int instead of size_t because strides might be negative.
+  const int x_stride = static_cast<int>( slice->to_index( 1, 0 ) - current_index );
+  const int y_stride =  static_cast<int>( slice->to_index( 0, 1 ) - current_index );
+
+  const size_t nx = slice->nx();
+  const size_t ny = slice->ny();
+
+  T* data = static_cast< T* >( data_block->get_data() );
+  size_t row_start = current_index;
+  bool in_range;
+  for ( size_t j = 0; j < ny; j++ )
+  {
+    current_index = row_start;
+    for ( size_t i = 0; i < nx; i++ )
+    {
+      in_range = ( data[ current_index ] >= min_val && 
+        data[ current_index ] <= max_val );
+      buffer[ j * nx + i ] = negative_constraint ? !in_range : in_range;
+      current_index += x_stride;
+    }
+    row_start += y_stride;
+  }
+}
+
+void DataVolumeSlice::create_threshold_mask( std::vector< unsigned char >& mask, 
+    double min_val, double max_val, bool negative_constraint ) const
+{
+  lock_type lock( this->get_mutex() );
+
+  mask.resize( this->nx() * this->ny() );
+  DataBlock::shared_lock_type volume_lock( this->data_block_->get_mutex() );
+  switch ( this->data_block_->get_data_type() )
+  {
+  case DataType::CHAR_E:
+    ThresholdTypedData< signed char >( this, this->data_block_, &mask[ 0 ], 
+      min_val, max_val, negative_constraint );
+    break;
+  case DataType::UCHAR_E:
+    ThresholdTypedData< unsigned char >( this, this->data_block_, &mask[ 0 ], 
+      min_val, max_val, negative_constraint );
+    break;
+  case DataType::SHORT_E:
+    ThresholdTypedData< short >( this, this->data_block_, &mask[ 0 ], 
+      min_val, max_val, negative_constraint );
+    break;
+  case DataType::USHORT_E:
+    ThresholdTypedData< unsigned short >( this, this->data_block_, &mask[ 0 ], 
+      min_val, max_val, negative_constraint );
+    break;
+  case DataType::INT_E:
+    ThresholdTypedData< int >( this, this->data_block_, &mask[ 0 ], 
+      min_val, max_val, negative_constraint );
+    break;
+  case DataType::UINT_E:
+    ThresholdTypedData< unsigned int >( this, this->data_block_, &mask[ 0 ], 
+      min_val, max_val, negative_constraint );
+    break;
+  case DataType::FLOAT_E:
+    ThresholdTypedData< float >( this, this->data_block_, &mask[ 0 ], 
+      min_val, max_val, negative_constraint );
+    break;
+  case DataType::DOUBLE_E:
+    ThresholdTypedData< double >( this, this->data_block_, &mask[ 0 ], 
+      min_val, max_val, negative_constraint );
+    break;
+  }
+}
+
 
 } // end namespace Core

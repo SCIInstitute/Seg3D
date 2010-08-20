@@ -33,77 +33,78 @@
 namespace Core
 {
 
-VolumeSlice::VolumeSlice( const VolumeHandle& volume, 
-             VolumeSliceType type, size_t slice_num ) :
-  slice_changed_( true ), 
-  size_changed_( true ),
-  out_of_boundary_( false ),
-  volume_( volume ), 
-  slice_type_( type ), 
-  slice_number_ ( slice_num )
-{
-  this->update_dimension();
-  this->slice_number_ = Min( this->slice_number_, this->number_of_slices_ - 1 );
-  this->update_position();
-}
+//////////////////////////////////////////////////////////////////////////
+// Class VolumeSlicePrivate
+//////////////////////////////////////////////////////////////////////////
 
-VolumeSlice::VolumeSlice( const VolumeSlice& copy ) :
-  slice_changed_( copy.slice_changed_ ),
-  size_changed_( copy.size_changed_ ),
-  nx_( copy.nx_ ),
-  ny_( copy.ny_ ),
-  number_of_slices_( copy.number_of_slices_ ),
-  out_of_boundary_( copy.out_of_boundary_ ),
-  left_( copy.left_ ), right_( copy.right_ ), 
-  bottom_( copy.bottom_ ), top_( copy.top_ ),
-  bottom_left_( copy.bottom_left_ ),
-  bottom_right_( copy.bottom_right_ ),
-  top_left_( copy.top_left_ ),
-  top_right_( copy.top_right_ ),
-  texture_( copy.texture_ ),
-  volume_( copy.volume_ ),
-  slice_type_( copy.slice_type_ ),
-  slice_number_( copy.slice_number_ )
+class VolumeSlicePrivate
 {
-}
-
-VolumeSlice::~VolumeSlice()
-{
-  this->disconnect_all();
-}
-
-void VolumeSlice::set_slice_type( VolumeSliceType type )
-{
-  if ( this->slice_type_ != type )
+public:
+  VolumeSlicePrivate( const VolumeHandle& volume, 
+    VolumeSliceType type, size_t slice_num ) :
+    slice_changed_( true ), 
+    size_changed_( true ),
+    out_of_boundary_( false ),
+    volume_( volume ), 
+    slice_type_( type ), 
+    slice_number_ ( slice_num )
   {
-    this->slice_changed_ = true;
-    this->size_changed_ = true;
-    this->slice_type_ = type;
-
-    this->update_dimension();
-    this->slice_number_ = Min( this->slice_number_, this->number_of_slices_ - 1 );
-    this->update_position();
   }
-}
 
-VolumeSliceType VolumeSlice::get_slice_type() const
-{
-  return this->slice_type_;
-}
-
-void VolumeSlice::set_slice_number( size_t slice_num )
-{
-  slice_num = Min( slice_num, this->number_of_slices_ - 1 );
-  this->out_of_boundary_ = false;
-  if ( this->slice_number_ != slice_num )
+  VolumeSlicePrivate( const VolumeSlicePrivate& copy ) :
+    slice_changed_( copy.slice_changed_ ),
+    size_changed_( copy.size_changed_ ),
+    nx_( copy.nx_ ),
+    ny_( copy.ny_ ),
+    number_of_slices_( copy.number_of_slices_ ),
+    out_of_boundary_( copy.out_of_boundary_ ),
+    left_( copy.left_ ), right_( copy.right_ ), 
+    bottom_( copy.bottom_ ), top_( copy.top_ ),
+    bottom_left_( copy.bottom_left_ ),
+    bottom_right_( copy.bottom_right_ ),
+    top_left_( copy.top_left_ ),
+    top_right_( copy.top_right_ ),
+    texture_( copy.texture_ ),
+    volume_( copy.volume_ ),
+    slice_type_( copy.slice_type_ ),
+    slice_number_( copy.slice_number_ )
   {
-    this->slice_number_ = slice_num;
-    this->slice_changed_ = true;
-    this->update_position();
   }
-}
 
-void VolumeSlice::update_dimension()
+  // UPDATE_DIMENSION:
+  // Update the dimension of the slice.
+  void update_dimension();
+
+  // UPDATE_POSITION:
+  // Update the position of the slice.
+  void update_position();
+
+  bool slice_changed_;
+  bool size_changed_;
+  size_t nx_;
+  size_t ny_;
+  size_t number_of_slices_;
+  bool out_of_boundary_;
+
+  double left_;
+  double right_;
+  double bottom_;
+  double top_;
+  double depth_;
+  Point bottom_left_;
+  Point bottom_right_;
+  Point top_left_;
+  Point top_right_;
+
+  Texture2DHandle texture_;
+
+  VolumeHandle volume_;
+  VolumeSliceType slice_type_;
+  size_t slice_number_;
+  VolumeSlice* slice_;
+};
+
+void VolumeSlicePrivate::update_dimension()
 {
   switch( this->slice_type_ )
   {
@@ -128,21 +129,20 @@ void VolumeSlice::update_dimension()
   }
 }
 
-
-void VolumeSlice::update_position()
+void VolumeSlicePrivate::update_position()
 {
   Point index;
 
   switch( this->slice_type_ )
   {
   case VolumeSliceType::AXIAL_E:
-    this->to_index( 0, 0, index );
+    this->slice_->to_index( 0, 0, index );
     this->bottom_left_ = this->volume_->apply_grid_transform( index );
-    this->to_index( this->nx_ - 1, 0, index );
+    this->slice_->to_index( this->nx_ - 1, 0, index );
     this->bottom_right_ = this->volume_->apply_grid_transform( index );
-    this->to_index( this->nx_ - 1, this->ny_ - 1, index );
+    this->slice_->to_index( this->nx_ - 1, this->ny_ - 1, index );
     this->top_right_ = this->volume_->apply_grid_transform( index );
-    this->to_index( 0, this->ny_ - 1, index );
+    this->slice_->to_index( 0, this->ny_ - 1, index );
     this->top_left_ = this->volume_->apply_grid_transform( index );
     this->left_ = this->bottom_left_.x();
     this->right_ = this->top_right_.x();
@@ -151,13 +151,13 @@ void VolumeSlice::update_position()
     this->depth_ = this->bottom_left_.z();
     break;
   case VolumeSliceType::CORONAL_E:
-    this->to_index( 0, 0, index );
+    this->slice_->to_index( 0, 0, index );
     this->bottom_left_ = this->volume_->apply_grid_transform( index );
-    this->to_index( this->nx_ - 1, 0, index );
+    this->slice_->to_index( this->nx_ - 1, 0, index );
     this->bottom_right_ = this->volume_->apply_grid_transform( index );
-    this->to_index( this->nx_ - 1, this->ny_ - 1, index );
+    this->slice_->to_index( this->nx_ - 1, this->ny_ - 1, index );
     this->top_right_ = this->volume_->apply_grid_transform( index );
-    this->to_index( 0, this->ny_ - 1, index );
+    this->slice_->to_index( 0, this->ny_ - 1, index );
     this->top_left_ = this->volume_->apply_grid_transform( index );
     this->left_ = this->bottom_left_.x();
     this->right_ = this->top_right_.x();
@@ -166,13 +166,13 @@ void VolumeSlice::update_position()
     this->depth_ = this->bottom_left_.y();
     break;
   case VolumeSliceType::SAGITTAL_E:
-    this->to_index( 0, 0, index );
+    this->slice_->to_index( 0, 0, index );
     this->bottom_left_ = this->volume_->apply_grid_transform( index );
-    this->to_index( this->nx_ - 1, 0, index );
+    this->slice_->to_index( this->nx_ - 1, 0, index );
     this->bottom_right_ = this->volume_->apply_grid_transform( index );
-    this->to_index( this->nx_ - 1, this->ny_ - 1, index );
+    this->slice_->to_index( this->nx_ - 1, this->ny_ - 1, index );
     this->top_right_ = this->volume_->apply_grid_transform( index );
-    this->to_index( 0, this->ny_ - 1, index );
+    this->slice_->to_index( 0, this->ny_ - 1, index );
     this->top_left_ = this->volume_->apply_grid_transform( index );
     this->left_ = this->bottom_left_.y();
     this->right_ = this->top_right_.y();
@@ -186,35 +186,98 @@ void VolumeSlice::update_position()
   }
 }
 
+//////////////////////////////////////////////////////////////////////////
+// Class VolumeSlice
+//////////////////////////////////////////////////////////////////////////
+
+VolumeSlice::VolumeSlice( const VolumeHandle& volume, 
+             VolumeSliceType type, size_t slice_num ) :
+  private_( new VolumeSlicePrivate( volume, type, slice_num ) )
+{
+  this->private_->slice_ = this;
+  this->private_->update_dimension();
+  this->private_->slice_number_ = Min( this->private_->slice_number_, 
+    this->private_->number_of_slices_ - 1 );
+  this->private_->update_position();
+}
+
+VolumeSlice::VolumeSlice( const VolumeSlice& copy ) :
+  private_( new VolumeSlicePrivate( *copy.private_ ) )
+{
+  this->private_->slice_ = this;
+}
+
+VolumeSlice::~VolumeSlice()
+{
+  this->disconnect_all();
+}
+
+void VolumeSlice::set_slice_type( VolumeSliceType type )
+{
+  lock_type lock( this->get_mutex() );
+  if ( this->private_->slice_type_ != type )
+  {
+    this->private_->slice_changed_ = true;
+    this->private_->size_changed_ = true;
+    this->private_->slice_type_ = type;
+
+    this->private_->update_dimension();
+    this->private_->slice_number_ = Min( this->private_->slice_number_, 
+      this->private_->number_of_slices_ - 1 );
+    this->private_->update_position();
+  }
+}
+
+VolumeSliceType VolumeSlice::get_slice_type() const
+{
+  lock_type lock( this->get_mutex() );
+  return this->private_->slice_type_;
+}
+
+void VolumeSlice::set_slice_number( size_t slice_num )
+{
+  lock_type lock( this->get_mutex() );
+  slice_num = Min( slice_num, this->private_->number_of_slices_ - 1 );
+  this->private_->out_of_boundary_ = false;
+  if ( this->private_->slice_number_ != slice_num )
+  {
+    this->private_->slice_number_ = slice_num;
+    this->private_->slice_changed_ = true;
+    this->private_->update_position();
+  }
+}
+
 size_t VolumeSlice::to_index( size_t i, size_t j ) const
 {
-  switch ( this->slice_type_ )
+  lock_type lock( this->get_mutex() );
+  switch ( this->private_->slice_type_ )
   {
   case VolumeSliceType::AXIAL_E:
-    return this->volume_->to_index( i, j, this->slice_number_ );
+    return this->private_->volume_->to_index( i, j, this->private_->slice_number_ );
   case VolumeSliceType::CORONAL_E:
-    return this->volume_->to_index( i, this->slice_number_, j );
+    return this->private_->volume_->to_index( i, this->private_->slice_number_, j );
   default:
-    return this->volume_->to_index( this->slice_number_, i, j );
+    return this->private_->volume_->to_index( this->private_->slice_number_, i, j );
   }
 }
 
 void VolumeSlice::to_index( size_t i, size_t j, Point& index ) const
 {
-  switch ( this->slice_type_ )
+  lock_type lock( this->get_mutex() );
+  switch ( this->private_->slice_type_ )
   {
   case VolumeSliceType::AXIAL_E:
     index[ 0 ] = static_cast<double>( i );
     index[ 1 ] = static_cast<double>( j );
-    index[ 2 ] = static_cast<double>( this->slice_number_ );
+    index[ 2 ] = static_cast<double>( this->private_->slice_number_ );
     break;
   case VolumeSliceType::CORONAL_E:
     index[ 0 ] = static_cast<double>( i );
-    index[ 1 ] = static_cast<double>( this->slice_number_ );
+    index[ 1 ] = static_cast<double>( this->private_->slice_number_ );
     index[ 2 ] = static_cast<double>( j );
     break;
   default:
-    index[ 0 ] = static_cast<double>( this->slice_number_ );
+    index[ 0 ] = static_cast<double>( this->private_->slice_number_ );
     index[ 1 ] = static_cast<double>( i );
     index[ 2 ] = static_cast<double>( j );
   }
@@ -222,22 +285,23 @@ void VolumeSlice::to_index( size_t i, size_t j, Point& index ) const
 
 void VolumeSlice::world_to_index( double x_pos, double y_pos, int& i, int& j ) const
 {
-  Point pos;
+  lock_type lock( this->get_mutex() );
 
-  switch ( this->slice_type_ )
+  Point pos;
+  switch ( this->private_->slice_type_ )
   {
   case VolumeSliceType::AXIAL_E:
-    pos = this->volume_->apply_inverse_grid_transform( Point( x_pos, y_pos, 0 ) );
+    pos = this->private_->volume_->apply_inverse_grid_transform( Point( x_pos, y_pos, 0 ) );
     i = Round( pos.x() );
     j = Round( pos.y() );
     break;
   case VolumeSliceType::CORONAL_E:
-    pos = this->volume_->apply_inverse_grid_transform( Point( x_pos, 0, y_pos ) );
+    pos = this->private_->volume_->apply_inverse_grid_transform( Point( x_pos, 0, y_pos ) );
     i = Round( pos.x() );
     j = Round( pos.z() );
     break;
   case VolumeSliceType::SAGITTAL_E:
-    pos = this->volume_->apply_inverse_grid_transform( Point( 0, x_pos, y_pos ) );
+    pos = this->private_->volume_->apply_inverse_grid_transform( Point( 0, x_pos, y_pos ) );
     i = Round( pos.y() );
     j = Round( pos.z() );
     break;
@@ -248,22 +312,23 @@ void VolumeSlice::world_to_index( double x_pos, double y_pos, int& i, int& j ) c
 
 void VolumeSlice::get_world_coord( double i_pos, double j_pos, Point& world_coord ) const
 {
-  switch( this->slice_type_ )
+  lock_type lock( this->get_mutex() );
+  switch( this->private_->slice_type_ )
   {
   case VolumeSliceType::AXIAL_E:
     world_coord[ 0 ] = i_pos;
     world_coord[ 1 ] = j_pos;
-    world_coord[ 2 ] = this->depth_;
+    world_coord[ 2 ] = this->private_->depth_;
     break;
   case VolumeSliceType::CORONAL_E:
     world_coord[ 0 ] = i_pos;
     world_coord[ 2 ] = j_pos;
-    world_coord[ 1 ] = this->depth_;
+    world_coord[ 1 ] = this->private_->depth_;
     break;
   case VolumeSliceType::SAGITTAL_E:
     world_coord[ 1 ] = i_pos;
     world_coord[ 2 ] = j_pos;
-    world_coord[ 0 ] = this->depth_;
+    world_coord[ 0 ] = this->private_->depth_;
     break;
   default:
     assert( false );
@@ -273,7 +338,8 @@ void VolumeSlice::get_world_coord( double i_pos, double j_pos, Point& world_coor
 
 void VolumeSlice::project_onto_slice( const Point& pt, double& i_pos, double& j_pos ) const
 {
-  switch ( this->slice_type_ )
+  lock_type lock( this->get_mutex() );
+  switch ( this->private_->slice_type_ )
   {
   case VolumeSliceType::AXIAL_E:
     i_pos = pt[ 0 ];
@@ -295,25 +361,28 @@ void VolumeSlice::project_onto_slice( const Point& pt, double& i_pos, double& j_
 
 void VolumeSlice::move_slice_to( const Point& pos, bool fail_safe )
 {
-  int slice_num = this->get_closest_slice( pos );
+  lock_type lock( this->get_mutex() );
 
-  if ( ( slice_num < 0 || slice_num >= static_cast< int >( this->number_of_slices_ ) ) && 
+  int slice_num = this->get_closest_slice( pos );
+  if ( ( slice_num < 0 || 
+    slice_num >= static_cast< int >( this->private_->number_of_slices_ ) ) && 
      !fail_safe )
   {
-    this->out_of_boundary_ = true;
+    this->private_->out_of_boundary_ = true;
     return;
   }
 
   slice_num = Max( 0, slice_num );
-  slice_num = Min( slice_num, static_cast< int >( this->number_of_slices_ - 1 ) );
+  slice_num = Min( slice_num, static_cast< int >( this->private_->number_of_slices_ - 1 ) );
 
   this->set_slice_number( static_cast< size_t >( slice_num ) );
 }
 
 void VolumeSlice::move_slice_to( double depth, bool fail_safe )
 {
+  lock_type lock( this->get_mutex() );
   Point pos;
-  switch ( this->slice_type_ )
+  switch ( this->private_->slice_type_ )
   {
   case VolumeSliceType::AXIAL_E:
     pos = Point( 0, 0, depth );
@@ -331,9 +400,10 @@ void VolumeSlice::move_slice_to( double depth, bool fail_safe )
 
 int VolumeSlice::get_closest_slice( const Point& pt ) const
 {
-  Point index = this->volume_->apply_inverse_grid_transform( pt );
+  lock_type lock( this->get_mutex() );
+  Point index = this->private_->volume_->apply_inverse_grid_transform( pt );
   int slice_num = -1;
-  switch ( this->slice_type_ )
+  switch ( this->private_->slice_type_ )
   {
   case VolumeSliceType::AXIAL_E:
     slice_num = Round( index.z() );
@@ -351,21 +421,162 @@ int VolumeSlice::get_closest_slice( const Point& pt ) const
 
 void VolumeSlice::initialize_texture()
 {
-  internal_lock_type lock( this->internal_mutex_ );
-  if ( !this->texture_ )
+  lock_type lock( this->get_mutex() );
+  if ( !this->private_->texture_ )
   {
     RenderResources::lock_type rr_lock( RenderResources::GetMutex() );
-    this->texture_ = Texture2DHandle( new Texture2D );
-    this->texture_->set_mag_filter( GL_NEAREST );
-    this->texture_->set_min_filter( GL_NEAREST );
+    this->private_->texture_.reset( new Texture2D );
+    this->private_->texture_->set_mag_filter( GL_NEAREST );
+    this->private_->texture_->set_min_filter( GL_NEAREST );
   }
 }
 
 void VolumeSlice::set_volume( const VolumeHandle& volume )
 {
+  lock_type lock( this->get_mutex() );
   this->disconnect_all();
-  this->volume_ = volume;
-  this->slice_changed_ = true;
+  this->private_->volume_ = volume;
+  this->private_->slice_changed_ = true;
+}
+
+VolumeHandle VolumeSlice::get_volume() const
+{
+  lock_type lock( this->get_mutex() );
+  return this->private_->volume_;
+}
+
+VolumeType VolumeSlice::volume_type() const
+{
+  lock_type lock( this->get_mutex() );
+  return this->private_->volume_->get_type();
+}
+
+void VolumeSlice::handle_volume_updated()
+{
+  lock_type lock( this->get_mutex() );
+  this->private_->slice_changed_ = true;
+}
+
+Point VolumeSlice::apply_grid_transform( const Point& pt ) const
+{
+  lock_type lock( this->get_mutex() );
+  return this->private_->volume_->apply_grid_transform( pt );
+}
+
+Point VolumeSlice::apply_inverse_grid_transform( const Point& pt ) const
+{
+  lock_type lock( this->get_mutex() );
+  return this->private_->volume_->apply_inverse_grid_transform( pt );
+}
+
+Core::Texture2DHandle VolumeSlice::get_texture()
+{
+  lock_type lock( this->get_mutex() );
+  return this->private_->texture_;
+}
+
+size_t VolumeSlice::get_slice_number() const
+{
+  lock_type lock( this->get_mutex() );
+  return this->private_->slice_number_;
+}
+
+size_t VolumeSlice::nx() const
+{
+  lock_type lock( this->get_mutex() );
+  return this->private_->nx_;
+}
+
+size_t VolumeSlice::ny() const
+{
+  lock_type lock( this->get_mutex() );
+  return this->private_->ny_;
+}
+
+size_t VolumeSlice::number_of_slices() const
+{
+  lock_type lock( this->get_mutex() );
+  return this->private_->number_of_slices_;
+}
+
+bool VolumeSlice::out_of_boundary() const
+{
+  lock_type lock( this->get_mutex() );
+  return this->private_->out_of_boundary_;
+}
+
+double VolumeSlice::left() const
+{
+  lock_type lock( this->get_mutex() );
+  return this->private_->left_;
+}
+
+double VolumeSlice::right() const
+{
+  lock_type lock( this->get_mutex() );
+  return this->private_->right_;
+}
+
+double VolumeSlice::bottom() const
+{
+  lock_type lock( this->get_mutex() );
+  return this->private_->bottom_;
+}
+
+double VolumeSlice::top() const
+{
+  lock_type lock( this->get_mutex() );
+  return this->private_->top_;
+}
+
+double VolumeSlice::depth() const
+{
+  lock_type lock( this->get_mutex() );
+  return this->private_->depth_;
+}
+
+const Point& VolumeSlice::bottom_left() const
+{
+  lock_type lock( this->get_mutex() );
+  return this->private_->bottom_left_;
+}
+
+const Point& VolumeSlice::bottom_right() const
+{
+  lock_type lock( this->get_mutex() );
+  return this->private_->bottom_right_;
+}
+
+const Point& VolumeSlice::top_left() const
+{
+  lock_type lock( this->get_mutex() );
+  return this->private_->top_left_;
+}
+
+const Point& VolumeSlice::top_right() const
+{
+  lock_type lock( this->get_mutex() );
+  return this->private_->top_right_;
+}
+
+bool VolumeSlice::get_slice_changed()
+{
+  return this->private_->slice_changed_;
+}
+
+void VolumeSlice::set_slice_changed( bool changed )
+{
+  this->private_->slice_changed_ = changed;
+}
+
+bool VolumeSlice::get_size_changed()
+{
+  return this->private_->size_changed_;
+}
+
+void VolumeSlice::set_size_changed( bool changed )
+{
+  this->private_->size_changed_ = changed;
 }
 
 } // end namespace Core
