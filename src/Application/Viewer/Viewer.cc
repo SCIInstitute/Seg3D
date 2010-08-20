@@ -884,10 +884,16 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
     boost::bind( &ViewerPrivate::handle_layer_group_inserted, this->private_, _1 ) ) );
   this->add_connection( LayerManager::Instance()->group_deleted_signal_.connect(
     boost::bind( &ViewerPrivate::handle_layer_group_deleted, this->private_, _1 ) ) );
-  this->add_connection( LayerManager::Instance()->layer_inserted_at_signal_.connect(
+  
+  this->add_connection( LayerManager::Instance()->group_internals_changed_signal_.connect(
     boost::bind( &Viewer::redraw, this, false ) ) );
-  this->add_connection( LayerManager::Instance()->group_inserted_at_signal_.connect(
+  this->add_connection( LayerManager::Instance()->groups_changed_signal_.connect(
     boost::bind( &Viewer::redraw, this, false ) ) );
+  
+//  this->add_connection( LayerManager::Instance()->layer_inserted_at_signal_.connect(
+//    boost::bind( &Viewer::redraw, this, false ) ) );
+//  this->add_connection( LayerManager::Instance()->group_inserted_at_signal_.connect(
+//    boost::bind( &Viewer::redraw, this, false ) ) );
 
   this->add_connection( this->view_mode_state_->value_changed_signal_.connect(
     boost::bind( &ViewerPrivate::change_view_mode, this->private_, _1, _2 ) ) );

@@ -81,14 +81,14 @@ public:
   int group_height;
 };
   
-LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
+LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
   QWidget( parent ),
   private_( new LayerGroupWidgetPrivate ),
   group_menus_open_( false ),
   picked_up_( false ),
   drop_group_set_( false )
 { 
-    this->private_->group_ = layer->get_layer_group();
+    this->private_->group_ = group;
 
   this->private_->ui_.setupUi( this );
   
@@ -204,9 +204,6 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerHandle layer ) :
   connect( this->private_->ui_.delete_button_, SIGNAL( clicked () ), this, 
     SLOT( uncheck_delete_confirm() ) );
   
-  // Add the current layer to the new group
-  this->insert_layer( layer, -1 );
-
   
   //Set the defaulf values for the Group UI and make the connections to the state engine
       // --- GENERAL ---
@@ -360,7 +357,6 @@ void LayerGroupWidget::mousePressEvent( QMouseEvent *event )
 
   // Next we hide the LayerWidget that we are going to be dragging.
   this->seethrough( true );
-  this->picked_up_ = true;
 
   Q_EMIT prep_groups_for_drag_and_drop_signal_( true );
   Q_EMIT picked_up_group_size_signal_( this->height() );
@@ -372,270 +368,13 @@ void LayerGroupWidget::mousePressEvent( QMouseEvent *event )
     ActionMoveGroupAbove::Dispatch( Core::Interface::GetWidgetActionContext(), 
       this->get_group_id(), this->drop_group_->get_group_id() );
   }
-  
-  //this->setMinimumHeight( 0 );
+
   this->drop_group_set_ = false;
-  this->seethrough( false );
+  //this->seethrough( false );
   this->private_->overlay_->hide();
   
   Q_EMIT prep_groups_for_drag_and_drop_signal_( false );
-  this->picked_up_ = false;
 }
-  
-void LayerGroupWidget::update_widget_state()
-{
-  std::string menu_state = this->private_->group_->menu_state_->get();
-  
-  int menu_selection = 0;
-  int crop_menu = 1;
-  int flip_rotate_menu = 2;
-  int resample_menu = 3;
-  int transform_menu = 4;
-  int iso_menu = 5;
-  int delete_menu = 6;
-  
-  bool show_checkboxes = true;
-  
-  if ( menu_state == LayerGroup::NO_MENU_C ) { show_checkboxes = false; }
-  else if ( menu_state == LayerGroup::CROP_MENU_C ) menu_selection = crop_menu;
-  else if ( menu_state == LayerGroup::FLIP_ROTATE_MENU_C ) menu_selection = flip_rotate_menu;
-  else if ( menu_state == LayerGroup::RESAMPLE_MENU_C ) menu_selection = resample_menu;
-  else if ( menu_state == LayerGroup::TRANSFORM_MENU_C ) menu_selection = transform_menu;
-  else if ( menu_state == LayerGroup::ISO_MENU_C ) menu_selection = iso_menu;
-  else if ( menu_state == LayerGroup::DELETE_MENU_C ) menu_selection = delete_menu;
-  
-  this->private_->ui_.base_->setUpdatesEnabled( false );
-  
-  this->show_selection_checkboxes( show_checkboxes );
-  
-  
-  // Now we close the menus that are not used and open the one that is
-  // we must do it in a specific order in order to avoid flickering
-  switch ( menu_selection ) 
-  {
-    // CROP_VISIBILITY
-    case 1:
-    {
-      this->set_flip_rotate_visibility( false );
-      this->set_resample_visibility( false );
-      this->set_transform_visibility( false );
-      this->set_iso_visibility( false );
-      this->set_delete_visibility( false );
-      this->set_crop_visibility( true );
-      break;
-    }
-    // FLIP_ROTATE_MENU 
-    case 2:
-    {
-      this->set_crop_visibility( false );
-      this->set_resample_visibility( false );
-      this->set_transform_visibility( false );
-      this->set_iso_visibility( false );
-      this->set_delete_visibility( false );
-      this->set_flip_rotate_visibility( true );
-      break;
-    }
-    // RESAMPLE_MENU
-    case 3:
-    {
-      this->set_crop_visibility( false );
-      this->set_flip_rotate_visibility( false );
-      this->set_transform_visibility( false );
-      this->set_iso_visibility( false );
-      this->set_delete_visibility( false );
-      this->set_resample_visibility( true );
-      break;
-    }
-    // TRANSFORM_MENU
-    case 4:
-    {
-      this->set_crop_visibility( false );
-      this->set_flip_rotate_visibility( false );
-      this->set_resample_visibility( false );
-      this->set_iso_visibility( false );
-      this->set_delete_visibility( false );
-      this->set_transform_visibility( true );
-      break;
-    }
-    // ISO_MENU
-    case 5:
-    {
-      this->set_crop_visibility( false );
-      this->set_flip_rotate_visibility( false );
-      this->set_resample_visibility( false );
-      this->set_transform_visibility( false );
-      this->set_delete_visibility( false );
-      this->set_iso_visibility( true );
-      break;
-    }
-    // DELETE_MENU
-    case 6:
-    {
-      this->set_crop_visibility( false );
-      this->set_flip_rotate_visibility( false );
-      this->set_resample_visibility( false );
-      this->set_transform_visibility( false );
-      this->set_iso_visibility( false );
-      this->set_delete_visibility( true );
-      break;
-    }   
-    // In the case where we are to turn all the menus off
-    default:
-    {
-      this->set_crop_visibility( false );
-      this->set_flip_rotate_visibility( false );
-      this->set_resample_visibility( false );
-      this->set_transform_visibility( false );
-      this->set_iso_visibility( false );
-      this->set_delete_visibility( false );
-      break;
-    }
-  }
-  this->private_->ui_.base_->setUpdatesEnabled( true );
-}
-  
-void LayerGroupWidget::set_crop_visibility( bool show )
-{
-  if( show )
-  {
-    if ( this->private_->ui_.roi_->isHidden() )
-    {
-      this->private_->ui_.roi_->show();
-      this->private_->ui_.group_crop_button_->blockSignals( true );
-      this->private_->ui_.group_crop_button_->setChecked( true );
-      this->private_->ui_.group_crop_button_->blockSignals( false );
-    }
-  }
-  else
-  {
-    if ( this->private_->ui_.roi_->isVisible() ) 
-    {
-      this->private_->ui_.roi_->hide();
-      this->private_->ui_.group_crop_button_->blockSignals( true );
-      this->private_->ui_.group_crop_button_->setChecked( false );
-      this->private_->ui_.group_crop_button_->blockSignals( false );
-    }
-  }
-
-}
-void LayerGroupWidget::set_flip_rotate_visibility( bool show )
-{
-  if( show )
-  {
-    if ( this->private_->ui_.flip_rotate_->isHidden() )
-    {
-      this->private_->ui_.flip_rotate_->show();
-      this->private_->ui_.group_flip_rotate_button_->blockSignals( true );
-      this->private_->ui_.group_flip_rotate_button_->setChecked( true );
-      this->private_->ui_.group_flip_rotate_button_->blockSignals( false );
-    }
-  }
-  else
-  {
-    if ( this->private_->ui_.flip_rotate_->isVisible() ) 
-    {
-      this->private_->ui_.flip_rotate_->hide();
-      this->private_->ui_.group_flip_rotate_button_->blockSignals( true );
-      this->private_->ui_.group_flip_rotate_button_->setChecked( false );
-      this->private_->ui_.group_flip_rotate_button_->blockSignals( false );
-    }
-  }
-
-}
-void LayerGroupWidget::set_resample_visibility( bool show )
-{
-  if( show )
-  {
-    if ( this->private_->ui_.resample_->isHidden() )
-    {
-      this->private_->ui_.resample_->show();
-      this->private_->ui_.group_resample_button_->blockSignals( true );
-      this->private_->ui_.group_resample_button_->setChecked( true );
-      this->private_->ui_.group_resample_button_->blockSignals( false );
-    }
-  }
-  else
-  {
-    if ( this->private_->ui_.resample_->isVisible() ) 
-    {
-      this->private_->ui_.resample_->hide();
-      this->private_->ui_.group_resample_button_->blockSignals( true );
-      this->private_->ui_.group_resample_button_->setChecked( false );
-      this->private_->ui_.group_resample_button_->blockSignals( false );
-    }
-  }
-}
-void LayerGroupWidget::set_transform_visibility( bool show )
-{
-  if( show )
-  {
-    if ( this->private_->ui_.transform_->isHidden() )
-    {
-      this->private_->ui_.transform_->show();
-      this->private_->ui_.group_transform_button_->blockSignals( true );
-      this->private_->ui_.group_transform_button_->setChecked( true );
-      this->private_->ui_.group_transform_button_->blockSignals( false );
-    }
-  }
-  else
-  {
-    if ( this->private_->ui_.transform_->isVisible() ) 
-    {
-      this->private_->ui_.transform_->hide();
-      this->private_->ui_.group_transform_button_->blockSignals( true );
-      this->private_->ui_.group_transform_button_->setChecked( false );
-      this->private_->ui_.group_transform_button_->blockSignals( false );
-    }
-  }
-
-}
-void LayerGroupWidget::set_iso_visibility( bool show )
-{
-  if( show )
-  {
-    if ( this->private_->ui_.iso_quality_->isHidden() )
-    {
-      this->private_->ui_.iso_quality_->show();
-      this->private_->ui_.group_iso_button_->blockSignals( true );
-      this->private_->ui_.group_iso_button_->setChecked( true );
-      this->private_->ui_.group_iso_button_->blockSignals( false );
-    }
-  }
-  else
-  {
-    if ( this->private_->ui_.iso_quality_->isVisible() )
-    {
-      this->private_->ui_.iso_quality_->hide();
-      this->private_->ui_.group_iso_button_->blockSignals( true );
-      this->private_->ui_.group_iso_button_->setChecked( false );
-      this->private_->ui_.group_iso_button_->blockSignals( false );
-    }
-  }
-}
-void LayerGroupWidget::set_delete_visibility( bool show )
-{
-  if( show )
-  {
-    if ( this->private_->ui_.delete_->isHidden() )
-    {
-      this->private_->ui_.delete_->show();
-      this->private_->ui_.group_delete_button_->blockSignals( true );
-      this->private_->ui_.group_delete_button_->setChecked( true );
-      this->private_->ui_.group_delete_button_->blockSignals( false );
-    }
-  }
-  else
-  {
-    if ( this->private_->ui_.delete_->isVisible() ) 
-    {
-      this->private_->ui_.delete_->hide();
-      this->private_->ui_.group_delete_button_->blockSignals( true );
-      this->private_->ui_.group_delete_button_->setChecked( false );
-      this->private_->ui_.group_delete_button_->blockSignals( false );
-    }
-  }
-}
-  
   
 void LayerGroupWidget::UpdateState( qpointer_type qpointer )
 {
@@ -650,13 +389,9 @@ void LayerGroupWidget::UpdateState( qpointer_type qpointer )
   // When we are finally on the interface thread run this code:
   if ( qpointer.data() )
   {
-//    qpointer->setUpdatesEnabled( false );
     qpointer->update_widget_state();
-//    qpointer->setUpdatesEnabled( true );
-//    qpointer->repaint();
   }
 }
-  
   
 void LayerGroupWidget::select_crop_menu( bool show )
 {
@@ -756,18 +491,25 @@ void LayerGroupWidget::dropEvent( QDropEvent* event )
   std::vector<std::string> mime_data = 
     Core::SplitString( event->mimeData()->text().toStdString(), "|" );
   
-  if( mime_data.size() < 2 ) return;
+  if( mime_data.size() < 2 ) 
+  {
+    this->set_drop( false );
+    return;
+  }
 
   if( ( this->get_group_id() == mime_data[ 1 ] ) || ( mime_data[ 0 ] != "group" ) )
   {
+    this->set_drop( false );
     event->ignore();
     return;
   }
 
   if( this->group_menus_open_ )
+  {
+    this->set_drop( false );
     return;
-  
-  this->set_drop( false );
+  }
+
   this->private_->overlay_->hide();
 
   dynamic_cast< LayerGroupWidget* >( event->source() )->set_drop_target( this ); 
@@ -840,58 +582,17 @@ void LayerGroupWidget::set_drop( bool drop )
   this->repaint();
 } 
   
-void LayerGroupWidget::insert_layer( LayerHandle layer, int index )
-{
-  LayerWidgetQHandle new_layer_handle( new LayerWidget(this->private_->ui_.group_frame_, layer ) );
-  
-  if( index == -1 )
-  {
-    // If the layer is a data layer, put it on the bottom.
-    if( new_layer_handle->get_volume_type() == Core::VolumeType::DATA_E )
-      this->private_->ui_.group_frame_layout_->insertWidget( -1, new_layer_handle.data() );
-    else
-      this->private_->ui_.group_frame_layout_->insertWidget( 0, new_layer_handle.data() );
-  }
-  else
-  {
-    this->private_->ui_.group_frame_layout_->insertWidget( index, new_layer_handle.data() );
-  }
-  this->layer_list_.push_back( new_layer_handle );
-  this->repaint();
-  
-  connect( new_layer_handle.data(), SIGNAL( prep_for_drag_and_drop( bool ) ), 
-    this, SLOT( notify_layer_manager_widget( bool ) ) );
-
-}
-
-  
-bool LayerGroupWidget::delete_layer( LayerHandle layer )
-{ 
-  for( QVector< LayerWidgetQHandle >::iterator i = this->layer_list_.begin(); i != 
-    this->layer_list_.end(); ++i)
-  {
-    if( ( *i )->get_layer_id() == layer->get_layer_id() )
-    {
-      ( *i )->deleteLater();
-      this->layer_list_.erase( i );
-      this->repaint();
-      return true;
-    }
-  }
-  return false;  
-}
-  
 LayerWidgetQWeakHandle LayerGroupWidget::set_active_layer( LayerHandle layer )
 {
-  std::string layer_id = layer->get_layer_id();
-    for( int i = 0; i < this->layer_list_.size(); ++i)
+  std::map< std::string, LayerWidgetQHandle >::iterator found_layer_widget = 
+    this->layer_map_.find( layer->get_layer_id() );
+  
+  if( found_layer_widget != this->layer_map_.end() )
   {
-      if( layer_id == this->layer_list_[i]->get_layer_id() )
-      {
-          this->layer_list_[i]->set_active( true );
-      return this->layer_list_[i];
-      }
+    ( *found_layer_widget ).second->set_active( true );
+    return ( *found_layer_widget ).second;
   }
+  
   return LayerWidgetQWeakHandle();
 }
 
@@ -903,12 +604,14 @@ const std::string& LayerGroupWidget::get_group_id()
   
 void LayerGroupWidget::show_selection_checkboxes( bool show )
 {
-  for( int i = 0; i < this->layer_list_.size(); ++i)
+  for( std::map< std::string, LayerWidgetQHandle>::iterator it = this->layer_map_.begin(); 
+    it != this->layer_map_.end(); ++it )
   {
-    this->layer_list_[i]->show_selection_checkbox( show );
-    this->layer_list_[i]->set_group_menu_status( show );
-    this->layer_list_[i]->setAcceptDrops( !show ); 
+    ( *it ).second->show_selection_checkbox( show );
+    ( *it ).second->set_group_menu_status( show );
+    ( *it ).second->setAcceptDrops( !show ); 
   }
+  
   this->group_menus_open_ = show;
 }
 
@@ -990,10 +693,11 @@ void LayerGroupWidget::notify_layer_manager_widget( bool move_time )
 
 void LayerGroupWidget::prep_layers_for_drag_and_drop( bool move_time )
 {
-  for( int i = 0; i < this->layer_list_.size(); ++i)
+  for( std::map< std::string, LayerWidgetQHandle>::iterator it = this->layer_map_.begin(); 
+    it != this->layer_map_.end(); ++it )
   {
-    this->layer_list_[i]->prep_for_animation( move_time );
-  }
+    ( *it ).second->prep_for_animation( move_time );
+  } 
 }
 
 void LayerGroupWidget::prep_for_animation( bool move_time )
@@ -1019,6 +723,293 @@ void LayerGroupWidget::prep_for_animation( bool move_time )
 void LayerGroupWidget::set_picked_up_group_size( int group_height )
 {
   this->picked_up_group_height_ = group_height;
+}
+  
+void LayerGroupWidget::update_widget_state()
+{
+  std::string menu_state = this->private_->group_->menu_state_->get();
+  
+  this->private_->ui_.base_->setUpdatesEnabled( false );
+  
+  bool show_checkboxes = true;
+  
+  // Now we close the menus that are not used and open the one that is
+  // we must do it in a specific order in order to avoid flickering
+  if ( menu_state == LayerGroup::NO_MENU_C )
+  {
+    this->set_crop_visibility( false );
+    this->set_flip_rotate_visibility( false );
+    this->set_resample_visibility( false );
+    this->set_transform_visibility( false );
+    this->set_iso_visibility( false );
+    this->set_delete_visibility( false );
+    show_checkboxes = false;
+  }
+  else if ( menu_state == LayerGroup::CROP_MENU_C )
+  {
+    this->set_flip_rotate_visibility( false );
+    this->set_resample_visibility( false );
+    this->set_transform_visibility( false );
+    this->set_iso_visibility( false );
+    this->set_delete_visibility( false );
+    this->set_crop_visibility( true );
+  }
+  else if ( menu_state == LayerGroup::FLIP_ROTATE_MENU_C )
+  {
+    this->set_crop_visibility( false );
+    this->set_resample_visibility( false );
+    this->set_transform_visibility( false );
+    this->set_iso_visibility( false );
+    this->set_delete_visibility( false );
+    this->set_flip_rotate_visibility( true );
+  }
+  else if ( menu_state == LayerGroup::RESAMPLE_MENU_C )
+  {
+    this->set_crop_visibility( false );
+    this->set_flip_rotate_visibility( false );
+    this->set_transform_visibility( false );
+    this->set_iso_visibility( false );
+    this->set_delete_visibility( false );
+    this->set_resample_visibility( true );
+  }
+  else if ( menu_state == LayerGroup::TRANSFORM_MENU_C )
+  {
+    this->set_crop_visibility( false );
+    this->set_flip_rotate_visibility( false );
+    this->set_resample_visibility( false );
+    this->set_iso_visibility( false );
+    this->set_delete_visibility( false );
+    this->set_transform_visibility( true );
+  }
+  else if ( menu_state == LayerGroup::ISO_MENU_C )
+  {
+    this->set_crop_visibility( false );
+    this->set_flip_rotate_visibility( false );
+    this->set_resample_visibility( false );
+    this->set_transform_visibility( false );
+    this->set_delete_visibility( false );
+    this->set_iso_visibility( true );
+  }
+  else if ( menu_state == LayerGroup::DELETE_MENU_C )
+  {
+    this->set_crop_visibility( false );
+    this->set_flip_rotate_visibility( false );
+    this->set_resample_visibility( false );
+    this->set_transform_visibility( false );
+    this->set_iso_visibility( false );
+    this->set_delete_visibility( true );
+  }
+  this->show_selection_checkboxes( show_checkboxes );
+  this->private_->ui_.base_->setUpdatesEnabled( true );
+}
+
+void LayerGroupWidget::set_crop_visibility( bool show )
+{
+  if( show )
+  {
+    if ( this->private_->ui_.roi_->isHidden() )
+    {
+      this->private_->ui_.roi_->show();
+      this->private_->ui_.group_crop_button_->blockSignals( true );
+      this->private_->ui_.group_crop_button_->setChecked( true );
+      this->private_->ui_.group_crop_button_->blockSignals( false );
+    }
+  }
+  else
+  {
+    if ( this->private_->ui_.roi_->isVisible() ) 
+    {
+      this->private_->ui_.roi_->hide();
+      this->private_->ui_.group_crop_button_->blockSignals( true );
+      this->private_->ui_.group_crop_button_->setChecked( false );
+      this->private_->ui_.group_crop_button_->blockSignals( false );
+    }
+  }
+  
+}
+void LayerGroupWidget::set_flip_rotate_visibility( bool show )
+{
+  if( show )
+  {
+    if ( this->private_->ui_.flip_rotate_->isHidden() )
+    {
+      this->private_->ui_.flip_rotate_->show();
+      this->private_->ui_.group_flip_rotate_button_->blockSignals( true );
+      this->private_->ui_.group_flip_rotate_button_->setChecked( true );
+      this->private_->ui_.group_flip_rotate_button_->blockSignals( false );
+    }
+  }
+  else
+  {
+    if ( this->private_->ui_.flip_rotate_->isVisible() ) 
+    {
+      this->private_->ui_.flip_rotate_->hide();
+      this->private_->ui_.group_flip_rotate_button_->blockSignals( true );
+      this->private_->ui_.group_flip_rotate_button_->setChecked( false );
+      this->private_->ui_.group_flip_rotate_button_->blockSignals( false );
+    }
+  }
+  
+}
+void LayerGroupWidget::set_resample_visibility( bool show )
+{
+  if( show )
+  {
+    if ( this->private_->ui_.resample_->isHidden() )
+    {
+      this->private_->ui_.resample_->show();
+      this->private_->ui_.group_resample_button_->blockSignals( true );
+      this->private_->ui_.group_resample_button_->setChecked( true );
+      this->private_->ui_.group_resample_button_->blockSignals( false );
+    }
+  }
+  else
+  {
+    if ( this->private_->ui_.resample_->isVisible() ) 
+    {
+      this->private_->ui_.resample_->hide();
+      this->private_->ui_.group_resample_button_->blockSignals( true );
+      this->private_->ui_.group_resample_button_->setChecked( false );
+      this->private_->ui_.group_resample_button_->blockSignals( false );
+    }
+  }
+}
+void LayerGroupWidget::set_transform_visibility( bool show )
+{
+  if( show )
+  {
+    if ( this->private_->ui_.transform_->isHidden() )
+    {
+      this->private_->ui_.transform_->show();
+      this->private_->ui_.group_transform_button_->blockSignals( true );
+      this->private_->ui_.group_transform_button_->setChecked( true );
+      this->private_->ui_.group_transform_button_->blockSignals( false );
+    }
+  }
+  else
+  {
+    if ( this->private_->ui_.transform_->isVisible() ) 
+    {
+      this->private_->ui_.transform_->hide();
+      this->private_->ui_.group_transform_button_->blockSignals( true );
+      this->private_->ui_.group_transform_button_->setChecked( false );
+      this->private_->ui_.group_transform_button_->blockSignals( false );
+    }
+  }
+  
+}
+void LayerGroupWidget::set_iso_visibility( bool show )
+{
+  if( show )
+  {
+    if ( this->private_->ui_.iso_quality_->isHidden() )
+    {
+      this->private_->ui_.iso_quality_->show();
+      this->private_->ui_.group_iso_button_->blockSignals( true );
+      this->private_->ui_.group_iso_button_->setChecked( true );
+      this->private_->ui_.group_iso_button_->blockSignals( false );
+    }
+  }
+  else
+  {
+    if ( this->private_->ui_.iso_quality_->isVisible() )
+    {
+      this->private_->ui_.iso_quality_->hide();
+      this->private_->ui_.group_iso_button_->blockSignals( true );
+      this->private_->ui_.group_iso_button_->setChecked( false );
+      this->private_->ui_.group_iso_button_->blockSignals( false );
+    }
+  }
+}
+void LayerGroupWidget::set_delete_visibility( bool show )
+{
+  if( show )
+  {
+    if ( this->private_->ui_.delete_->isHidden() )
+    {
+      this->private_->ui_.delete_->show();
+      this->private_->ui_.group_delete_button_->blockSignals( true );
+      this->private_->ui_.group_delete_button_->setChecked( true );
+      this->private_->ui_.group_delete_button_->blockSignals( false );
+    }
+  }
+  else
+  {
+    if ( this->private_->ui_.delete_->isVisible() ) 
+    {
+      this->private_->ui_.delete_->hide();
+      this->private_->ui_.group_delete_button_->blockSignals( true );
+      this->private_->ui_.group_delete_button_->setChecked( false );
+      this->private_->ui_.group_delete_button_->blockSignals( false );
+    }
+  }
+}
+  
+void LayerGroupWidget::handle_change()
+{
+  layer_list_type layer_list = this->private_->group_->get_layer_list();
+  int index = 0;
+  
+  this->setUpdatesEnabled( false );
+  
+  // First we remove the LayerWidgets that arent needed any more.
+  for( std::map< std::string, LayerWidgetQHandle>::iterator it = this->layer_map_.begin(); 
+    it != this->layer_map_.end(); ++it )
+  {
+    bool found = false;
+    for( layer_list_type::iterator i = layer_list.begin(); i != layer_list.end(); ++i )
+    {
+      if( ( *it ).first == ( *i )->get_layer_id() )
+      {
+        found = true;
+      }
+    }
+    if( !found )
+    {
+      this->private_->ui_.group_frame_layout_->removeWidget( ( *it ).second.data() );
+    }
+  }
+  // then we delete the unused LayerWidgets from the layer_map_
+  this->cleanup_removed_widgets();
+  this->setMinimumHeight( 0 );
+  
+  for( layer_list_type::iterator i = layer_list.begin(); i != layer_list.end(); ++i )
+  {
+    std::map< std::string, LayerWidgetQHandle >::iterator found_layer_widget = this->layer_map_.find( ( *i )->get_layer_id() );
+    if( found_layer_widget != this->layer_map_.end() )
+    {
+      this->private_->ui_.group_frame_layout_->insertWidget( index, ( *found_layer_widget ).second.data() );
+      ( *found_layer_widget ).second->seethrough( false );
+      ( *found_layer_widget ).second->enable_drop_space( false );
+    }
+    else
+    {
+      LayerWidgetQHandle new_layer_handle( new LayerWidget(this->private_->ui_.group_frame_, ( *i ) ) );
+      this->private_->ui_.group_frame_layout_->insertWidget( index, new_layer_handle.data() );
+      this->layer_map_[ ( *i )->get_layer_id() ] = new_layer_handle;
+      
+      connect( new_layer_handle.data(), SIGNAL( prep_for_drag_and_drop( bool ) ), 
+          this, SLOT( notify_layer_manager_widget( bool ) ) );
+    }
+    index++;
+  }
+  
+  this->update_widget_state();
+  
+  this->setUpdatesEnabled( true );
+}
+
+void LayerGroupWidget::cleanup_removed_widgets()
+{
+  for( std::map< std::string, LayerWidgetQHandle>::iterator it = this->layer_map_.begin(); 
+    it != this->layer_map_.end(); ++it )
+  {
+    if( this->private_->ui_.group_frame_layout_->indexOf( ( *it ).second.data() ) == -1 )
+    {
+      ( *it ).second->deleteLater();
+      this->layer_map_.erase( it );
+    }
+  }
 }
   
 }  //end namespace Seg3D

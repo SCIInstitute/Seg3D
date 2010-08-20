@@ -104,14 +104,8 @@ bool LayerManager::insert_layer( LayerHandle layer )
       active_layer_changed = true;
       
     }
-    if( layer->type() == Core::VolumeType::DATA_E )
-    {
-      group_handle->insert_layer_front( layer );
-    }
-    else 
-    {
-      group_handle->insert_layer_back( layer );
-    }
+    
+    group_handle->insert_layer( layer );
       
     layer->set_layer_group( group_handle );
       
@@ -120,13 +114,16 @@ bool LayerManager::insert_layer( LayerHandle layer )
   CORE_LOG_DEBUG( std::string( "Signalling that new layer was inserted" ) );
   CORE_LOG_DEBUG( std::string( "--- triggering signals ---" ) );
   
+  // This is no longer needed by the LayerManager Widget
   if ( new_group )
   {
     this->group_inserted_signal_( group_handle );
   }
 
+  this->group_internals_changed_signal_( group_handle );
+
+  // This is no longer needed by the LayerManager Widget  
   this->layer_inserted_signal_( layer );
-  this->layers_changed_signal_();
   
   if( active_layer_changed )
   {
@@ -148,7 +145,7 @@ bool LayerManager::check_for_same_group( const std::string layer_to_insert_id,
 
 bool LayerManager::move_group_above( std::string group_to_move_id, std::string group_below_id )
 {
-  int index = 0;
+  //int index = 0;
 
   {
     // Get the Lock
@@ -161,36 +158,25 @@ bool LayerManager::move_group_above( std::string group_to_move_id, std::string g
       return false;
 
     this->group_list_.remove( group_above );
-    index = this->insert_group( group_above, group_below );
+    this->insert_group( group_above, group_below );
   }
+  
+  this->groups_changed_signal_();
 
-  group_inserted_at_signal_( group_to_move_id, index );
-    
   return true;
 }
 
-int LayerManager::insert_group( LayerGroupHandle group_above, LayerGroupHandle group_below )
+void LayerManager::insert_group( LayerGroupHandle group_above, LayerGroupHandle group_below )
 {
-  int index = 0;
-
   for( group_list_type::iterator i = this->group_list_.begin(); 
     i != this->group_list_.end(); ++i )
   {
     if( ( *i ) == group_below )
     {
-      // First we get the size of the list before the insert
-      int list_size = static_cast< int >( this->group_list_.size() );
-
-      // Second we insert the layer
-      this->group_list_.insert( ++i, group_above );
-      
-      // Finally we return the proper location for the gui to insert the group
-      return abs( index - list_size ) - 1;
-
+      //we insert the layer
+      this->group_list_.insert( i, group_above );
     }
-    index++;
   }
-  return -1;
 }
 
 bool LayerManager::move_layer_above( LayerHandle layer_to_move, LayerHandle target_layer )
@@ -199,8 +185,10 @@ bool LayerManager::move_layer_above( LayerHandle layer_to_move, LayerHandle targ
   // This keeps track of whether or not we delete the group we are moving from
   bool group_above_has_been_deleted = false;
   
-  // This is the index we will send to tell the GUI where to put the layer
-  int index;
+  bool layer_has_changed_groups = false;
+  
+//  // This is the index we will send to tell the GUI where to put the layer
+//  int index;
   
   // These handles will let us send signals after we make the moves
   LayerGroupHandle group_above;
@@ -220,7 +208,7 @@ bool LayerManager::move_layer_above( LayerHandle layer_to_move, LayerHandle targ
     
     // First we Delete the Layer from its list of layers
     group_above->delete_layer( layer_to_move, false );
-    index = group_below->move_layer_above( layer_to_move, target_layer );
+    group_below->move_layer_above( layer_to_move, target_layer );
     
     // If they are in the same group ---
     if( group_above != group_below )
@@ -231,24 +219,28 @@ bool LayerManager::move_layer_above( LayerHandle layer_to_move, LayerHandle targ
       {   
         group_list_.remove( group_above );
         group_above_has_been_deleted = true;
-        
       }
       // Set the weak handle in the layer we've inserted to the proper group
       layer_to_move->set_layer_group( group_below );
+      layer_has_changed_groups = true;
     }
   
-  
-    if( group_above_has_been_deleted )
+    if( layer_has_changed_groups )
     {
-      group_deleted_signal_( group_above );
-    } 
+      this->group_internals_changed_signal_( group_above );
+      this->group_internals_changed_signal_( group_below );
+    }
     else
     {
-      layer_deleted_signal_( layer_to_move );
+      this->group_internals_changed_signal_( group_above );
     }
-    
-    layer_inserted_at_signal_( layer_to_move, index );
-    layers_changed_signal_();
+
+    // dont need any of this after the update
+      if( group_above_has_been_deleted )
+      {
+        group_deleted_signal_( group_above );
+      } 
+
 
   } // We release the lock  here.
   
@@ -428,14 +420,20 @@ void LayerManager::delete_layers( LayerGroupHandle group )
 
   } // Unlocked from here:
 
-// signal the listeners
+  //signal the listeners
   if( group_deleted )
   {   
       this->group_deleted_signal_( group );
+    this->groups_changed_signal_();
   }
-  
+  else
+  {
+    group->menu_state_->set( LayerGroup::NO_MENU_C );
+    this->group_internals_changed_signal_( group );
+  }
+
   this->layers_deleted_signal_( layer_vector );
-  this->layers_changed_signal_();
+
   
   if ( active_layer_changed )
   {
@@ -479,16 +477,21 @@ void LayerManager::delete_layer( LayerHandle layer )
   } 
   
   // signal the listeners
-  
   if( group_deleted )
   {   
       this->group_deleted_signal_( group );
+    this->groups_changed_signal_();
+  }
+  else
+  {
+    group->menu_state_->set( LayerGroup::NO_MENU_C );
+    this->group_internals_changed_signal_( group );
   }
   
   std::vector<LayerHandle> layer_vector( 1 );
   layer_vector[ 0 ] = layer;
   this->layers_deleted_signal_( layer_vector );
-  this->layers_changed_signal_();
+
   
   if ( active_layer_changed )
   {
@@ -700,10 +703,14 @@ bool LayerManager::post_save_states( Core::StateIO& state_io )
   std::vector< LayerHandle > layers;
   this->get_layers( layers );
 
-  for( size_t i = 0; i < layers.size(); ++i )
+  //for( size_t i = 0; i < layers.size(); ++i )
+  int number_of_layers = static_cast< int >( layers.size() );
+  
+  for( int i = ( number_of_layers - 1 ); i >= 0; i-- )
   {
     layers[ i ]->save_states( state_io );
   }
+  
 
   state_io.pop_current_element();
 

@@ -190,6 +190,26 @@ private:
   
 private:
   
+  // SET_OPACITY_VISIBILITY:
+  // 
+  void set_opacity_visibility( bool show );
+  
+  
+  // SET_COLOR_VISIBILITY:
+  // 
+  void set_color_visibility( bool show );
+  
+  
+  // SET_BRIGHT_CONSTRAST_VISIBILITY:
+  // 
+  void set_bright_contrast_visibility( bool show );
+  
+  
+  // SET_BORDER_VISIBILITY:
+  // 
+  void set_border_visibility( bool show );
+  
+  
 
 private Q_SLOTS:
 

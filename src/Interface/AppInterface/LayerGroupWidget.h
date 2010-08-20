@@ -63,7 +63,7 @@ Q_SIGNALS:
   
   // -- constructor/destructor --
 public:
-  LayerGroupWidget( QWidget* parent, LayerHandle layer );
+  LayerGroupWidget( QWidget* parent, LayerGroupHandle group );
   virtual ~LayerGroupWidget();
   
 public:
@@ -92,14 +92,10 @@ public Q_SLOTS:
   
   
 public:
-  // INSERT_LAYER:
-  // function that creates a new LayerWidget associated with the passed layer
-  // and inserts it at the passed index location
-  void insert_layer( LayerHandle layer, int index );
-
-  // DELETE_LAYER:
-  // function that deletes a LayerWidget that is associated with a specific layer
-  bool delete_layer( LayerHandle layer );
+  // SET_DROP:
+  // this function give the user the impression that a group is available for dropping onto by
+  // opening up a space for dropping
+    void set_drop( bool drop );
 
   // GET_GROUP_ID:
   // function that returns a string containing the groups id
@@ -125,6 +121,8 @@ public:
   // UPDATESTATE:
   // Entry point for the state engine to notify state has changed
   static void UpdateState( qpointer_type qpointer );
+  
+  void handle_change();
 
 protected:
   // RESIZEEVENT:
@@ -145,11 +143,6 @@ private Q_SLOTS:
   // this sets the local member variable picked_up_ to indicate whether the current LayerWidget 
   // has been picked up.  This is useful when we are representing drag and drop visually
     void set_picked_up( bool up ){ this->picked_up_ = up; }
-
-  // SET_DROP:
-  // this function give the user the impression that a group is available for dropping onto by
-  // opening up a space for dropping
-    void set_drop( bool drop );
 
   // SET_DROP_TARGET:
   // this function stores a local copy of the widget that is going to be dropped onto
@@ -232,11 +225,17 @@ private:
   // SET_DELETE_VISIBILITY:
   // function that hides or shows the delete menu
   void set_delete_visibility( bool show );
+  
+  
+  // CLEANUP_REMOVED_WIDGETS:
+  void cleanup_removed_widgets();
+  
 
   // -- widget internals --
 private:
     boost::shared_ptr< LayerGroupWidgetPrivate > private_;
     QVector< LayerWidgetQHandle > layer_list_;
+  std::map< std::string, LayerWidgetQHandle > layer_map_;
     
 private:
   std::string group_id_;

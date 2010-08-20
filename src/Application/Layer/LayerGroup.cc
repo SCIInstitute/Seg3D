@@ -91,45 +91,37 @@ LayerGroup::~LayerGroup()
   disconnect_all();
 }
 
-
-void LayerGroup::create_mask_layer()
+void LayerGroup::insert_layer( LayerHandle new_layer )
 {
-  
+  if( new_layer->type() == Core::VolumeType::MASK_E )
+  { 
+    this->layer_list_.push_front( new_layer );
+    return;
+  }
+    
+  for( layer_list_type::iterator i = this->layer_list_.begin(); 
+    i != this->layer_list_.end(); ++i )
+  {
+    if( ( *i )->type() == Core::VolumeType::DATA_E )
+    {
+      this->layer_list_.insert( ( i ), new_layer );
+      return;
+    }
+  }
+  this->layer_list_.push_back( new_layer );
 }
 
-void LayerGroup::insert_layer_back( LayerHandle new_layer )
-{
-  layer_list_.push_back( new_layer );
-}
 
-void LayerGroup::insert_layer_front( LayerHandle new_layer )
+void LayerGroup::move_layer_above( LayerHandle layer_above, LayerHandle layer_below )
 {
-  layer_list_.push_front( new_layer );
-}
-
-
-int LayerGroup::move_layer_above( LayerHandle layer_above, LayerHandle layer_below )
-{
-  int index = 0;
-  
   for( layer_list_type::iterator i = this->layer_list_.begin(); 
     i != this->layer_list_.end(); ++i )
   {
     if( ( *i ) == layer_below )
     { 
-      // First we get the size of the list before the insert
-      int list_size = static_cast< int >( this->layer_list_.size() );
-      
-      // Second we insert the layer
-      this->layer_list_.insert( ++i, layer_above );
-      
-      // Finally we return the proper location for the gui to insert the layer
-      return abs( index - list_size ) - 1;
+      this->layer_list_.insert( i, layer_above );
     }
-    index++;
   }
-  // if things didnt work out, we return -1
-  return -1 ;
 }
 
 void LayerGroup::delete_layer( LayerHandle layer, bool invalidate_layerid )

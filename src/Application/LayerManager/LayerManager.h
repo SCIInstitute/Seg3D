@@ -183,7 +183,7 @@ public:
 private:
   // INSERT_GROUP:
   // this function handle inserting a group into the list
-  int insert_group( LayerGroupHandle group_above, LayerGroupHandle group_below );
+  void insert_group( LayerGroupHandle group_above, LayerGroupHandle group_below );
 
   // Typedef's for the Mutex
 public: 
@@ -211,6 +211,14 @@ public:
   typedef boost::signals2::signal< void( std::string, int ) > group_at_signal_type;
   typedef boost::signals2::signal< void( std::vector< LayerHandle > ) > layers_signal_type;
   typedef boost::signals2::signal< void() > layers_changed_type;
+  typedef boost::signals2::signal< void() > groups_changed_type;
+  
+  
+  // GROUP_INTERNALS_CHANGED_SIGNAL_:
+  // signal is triggered when any of the contents of a group change
+  group_signal_type group_internals_changed_signal_;
+  
+  groups_changed_type groups_changed_signal_;
   
   // ACTIVE_LAYER_CHANGED_SIGNAL:
   // This signal is triggered after the active layer is changed

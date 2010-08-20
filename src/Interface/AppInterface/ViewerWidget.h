@@ -121,6 +121,10 @@ private:
   // This function adds the proper Icons to the viewer states combobox
   void add_icons_to_combobox();
   
+  // GET_MINIMUM_SIZE;
+  // function returns the minimum size of that viewer widget needs before it needs to split
+  int get_minimum_size();
+  
 private:
   // Internals of the viewer widget, so most dependencies do not need to
   // be included here.

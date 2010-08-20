@@ -116,22 +116,14 @@ protected:
   // NOTE: Only the layer manager groups the layers, this is all done
   // dynamically
   friend class LayerManager;
-  
-  // CREATE_LAYER:
-  // Creates a new layer in the correct position
-  void create_mask_layer();
 
-  // INSERT_NEW_LAYER_BACK:
-  // Inserts a layer in the top most position
-  void insert_layer_back( LayerHandle new_layer );
-  
-  // INSERT_NEW_LAYER_FRONT:
-  // Inserts a layer in the top most position
-  void insert_layer_front( LayerHandle new_layer );
+  // INSERT_LAYER:
+  // Inserts a layer in the correct position
+  void insert_layer( LayerHandle new_layer );
 
   // INSERT_LAYER_ABOVE:
   // Inserts a layer above a certain layer
-    int move_layer_above( LayerHandle layer_above, LayerHandle layer_below );
+    void move_layer_above( LayerHandle layer_above, LayerHandle layer_below );
   
   // DELETE_LAYER:
   // Delete a layer from the list
@@ -153,8 +145,6 @@ protected:
   // Performs a flip or rotate on the selected layers based on which layers were selected
   void flip_layer();
   
-  //TODO add move_layer function();
-
   // -- Group transformation information --
 public:
   // GRID_TRANSFORM
@@ -173,8 +163,6 @@ public:
   {
     return layer_list_;
   }
-
-  
   
   size_t get_list_size() const
   {

@@ -73,6 +73,8 @@ public:
 
   // Handle to the underlying Viewer structure
   ViewerHandle viewer_;
+  
+  QVector< QToolButton* > buttons_;
 };
 
 ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
@@ -101,11 +103,28 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
   this->private_->picking_button_->setMaximumHeight( 20 );
   this->private_->picking_button_->setMaximumWidth( 20 );
   
+  // IF YOU ADD ANOTHER BUTTON TO THE VIEWERWIDGET, PLEASE ADD IT TO THE buttons_ VECTOR.
+  // We make a vector of all the buttons this way we can calculate the minimum size that the 
+  // viewer bar can be
+  this->private_->buttons_.push_back( this->private_->ui_.auto_view_button_ );
+  this->private_->buttons_.push_back( this->private_->ui_.lock_button_ );
+  this->private_->buttons_.push_back( this->private_->ui_.slice_visible_button_ );
+  this->private_->buttons_.push_back( this->private_->ui_.light_visible_button_ );
+  this->private_->buttons_.push_back( this->private_->ui_.grid_button_ );
+  this->private_->buttons_.push_back( this->private_->ui_.flip_horizontal_button_ );
+  this->private_->buttons_.push_back( this->private_->ui_.flip_vertical_button_ );
+  this->private_->buttons_.push_back( this->private_->ui_.isosurfaces_visible_button_ );
+  this->private_->buttons_.push_back( this->private_->ui_.slices_visible_button_ );
+  this->private_->buttons_.push_back( this->private_->ui_.volume_rendering_visible_button_ );
+  this->private_->buttons_.push_back( this->private_->ui_.overlay_visible_button_ );
+  this->private_->buttons_.push_back( this->private_->ui_.picking_lines_visible_button_ );
+  this->private_->buttons_.push_back( this->private_->picking_button_ );
   
   this->private_->ui_.less_common_tools_layout_->insertWidget( 0, this->private_->picking_button_ );
   
-  // Setup the widget so for a small size it can be broken into two
-  this->private_->minimum_toolbar_width_ = 300;
+//  // Setup the widget so for a small size it can be broken into two
+//
+//  this->private_->minimum_toolbar_width_ = 300;
   this->private_->initialized_size_ = false;
   this->private_->ui_.buttonbar_->setMinimumSize( QSize( 170, 0 ) );
   this->private_->ui_.button_layout_->setStretchFactor( this->private_->ui_.common_tools_, 0 );
@@ -202,30 +221,67 @@ ViewerWidget::~ViewerWidget()
 {
   this->disconnect_all();
 }
+  
+int ViewerWidget::get_minimum_size()
+{
+  // We start with padding the minimum width by 1 because of the 1px margin on the left-hand side
+  int minimum_width = 1;
+  
+  // Next we get the width of the viewer mode holder and we pad it by 2 for the left and right 
+  // margins
+  int viewer_mode_width = this->private_->ui_.viewer_mode_->width() + 2;
+  
+  // Now we combine them.
+  minimum_width = minimum_width + viewer_mode_width;
+  
+  // Now we add the sizes of the visible buttons plus a 1px padding for the right hand margin
+  for( int i = 0; i < this->private_->buttons_.size(); ++i )
+  { 
+    if( this->private_->buttons_[ i ]->isVisible() ) 
+    {
+      minimum_width = minimum_width + this->private_->buttons_[ i ]->minimumWidth() + 1;
+    }
+  }
+  
+  // Now we return the final value
+  return minimum_width;
+}
 
 void ViewerWidget::resizeEvent( QResizeEvent * event )
 {
+  // In the case that the widget hasnt been initialized we just use the arbitrary minimum size of
+  // 300px
+  if( !this->private_->initialized_size_ )
+  {
+    this->private_->minimum_toolbar_width_ = 300;
+  }
+  else
+  {
+    this->private_->minimum_toolbar_width_ = this->get_minimum_size();
+  }
+
+  
   int old_width = event->oldSize().width();
   int new_width = event->size().width();
   
   if ( new_width <= this->private_->minimum_toolbar_width_ &&
     ( old_width > this->private_->minimum_toolbar_width_ || 
-    ! this->private_->initialized_size_ ) )
+     ! this->private_->initialized_size_ ) )
   {
     this->private_->ui_.sep_line_->hide();    
     this->private_->ui_.button_layout_->removeWidget( this->private_->ui_.less_common_tools_ );
     this->private_->ui_.toolbar_layout_->addWidget( this->private_->ui_.less_common_tools_, 0 );
-
+    
     this->update();
   }
   else if ( new_width > this->private_->minimum_toolbar_width_ &&
-    ( old_width <= this->private_->minimum_toolbar_width_ || 
-    ! this->private_->initialized_size_ ) )
+       ( old_width <= this->private_->minimum_toolbar_width_ || 
+        ! this->private_->initialized_size_ ) )
   {
     this->private_->ui_.sep_line_->show();  
     this->private_->ui_.toolbar_layout_->removeWidget( this->private_->ui_.less_common_tools_ );
     this->private_->ui_.button_layout_->addWidget( this->private_->ui_.less_common_tools_, 1 );
-
+    
     this->update();
   }
   
@@ -233,7 +289,7 @@ void ViewerWidget::resizeEvent( QResizeEvent * event )
   
   QWidget::resizeEvent( event );
 }
-
+  
 void ViewerWidget::select()
 {
   this->private_->ui_.border_->setStyleSheet( StyleSheet::VIEWERSELECTED_C );
@@ -261,6 +317,8 @@ void ViewerWidget::change_view_type( int index )
   this->private_->ui_.light_visible_button_->setVisible( is_volume_view );
   this->private_->ui_.isosurfaces_visible_button_->setVisible( is_volume_view );
   this->private_->ui_.volume_rendering_visible_button_->setVisible( is_volume_view); 
+  
+  this->resize( this->width(), this->height() );
 }
   
 void ViewerWidget::HandleViewModeChanged( ViewerWidgetHandle viewer_widget )

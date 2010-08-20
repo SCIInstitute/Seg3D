@@ -286,13 +286,9 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
               mask_layer->border_state_ );
             QtUtils::QtBridge::Connect( this->private_->ui_.fill_selection_combo_, 
               mask_layer->fill_state_ );
-
             QtUtils::QtBridge::Connect( this->private_->color_widget_, 
               mask_layer->color_state_,
               PreferencesManager::Instance()->color_states_ );
-            
-            //this->private_->ui_.show_iso_surface_button_->setEnabled( false );
-            //this->private_->ui_.delete_iso_surface_button_->setEnabled( false );
             
             QtUtils::QtBridge::Enable( this->private_->ui_.show_iso_surface_button_, 
               mask_layer->iso_generated_state_ );
@@ -379,24 +375,52 @@ void LayerWidget::uncheck_show_iso_button()
 
 void LayerWidget::set_active_menu( std::string& menu_state, bool override, bool /*initialize*/ )
 {
-  bool opacity_menu = false;
-  bool color_menu = false;
-  bool contrast_menu = false;
-  bool appearance_menu = false;
-
-  if ( !override )
-  {
-    if ( menu_state == Layer::NO_MENU_C ) {}
-    else if ( menu_state == Layer::OPACITY_MENU_C ) opacity_menu = true;
-    else if ( menu_state == Layer::COLOR_MENU_C ) color_menu = true;
-    else if ( menu_state == Layer::CONTRAST_MENU_C ) contrast_menu = true;
-    else if ( menu_state == Layer::APPEARANCE_MENU_C ) appearance_menu = true;
-  }
-  
   this->private_->ui_.base_->setUpdatesEnabled( false );
   
-  // Update the state of the opacity menu
-  if ( opacity_menu )
+  if ( !override )
+  {
+    if ( menu_state == Layer::NO_MENU_C ) 
+    {
+      this->set_opacity_visibility( false );
+      this->set_color_visibility( false );
+      this->set_bright_contrast_visibility( false );
+      this->set_border_visibility( false );
+    }
+    else if ( menu_state == Layer::OPACITY_MENU_C )
+    {
+      this->set_color_visibility( false );
+      this->set_bright_contrast_visibility( false );
+      this->set_border_visibility( false );
+      this->set_opacity_visibility( true );
+    }
+    else if ( menu_state == Layer::COLOR_MENU_C )
+    {
+      this->set_opacity_visibility( false );
+      this->set_bright_contrast_visibility( false );
+      this->set_border_visibility( false );
+      this->set_color_visibility( true );
+    }
+    else if ( menu_state == Layer::CONTRAST_MENU_C )
+    {
+      this->set_opacity_visibility( false );
+      this->set_color_visibility( false );
+      this->set_border_visibility( false );
+      this->set_bright_contrast_visibility( true );
+    }
+    else if ( menu_state == Layer::APPEARANCE_MENU_C )
+    {
+      this->set_opacity_visibility( false );
+      this->set_color_visibility( false );
+      this->set_bright_contrast_visibility( false );
+      this->set_border_visibility( true );
+    }
+  }
+  this->private_->ui_.base_->setUpdatesEnabled( true );
+}
+  
+void LayerWidget::set_opacity_visibility( bool show )
+{
+  if( show )
   {
     if ( this->private_->ui_.opacity_bar_->isHidden() )   
     {
@@ -416,9 +440,11 @@ void LayerWidget::set_active_menu( std::string& menu_state, bool override, bool 
       this->private_->ui_.opacity_button_->blockSignals( false );
     }
   }
+}
 
-  // Update the state of the color menu
-  if ( color_menu )
+void LayerWidget::set_color_visibility( bool show )
+{
+  if ( show )
   {
     if ( this->private_->ui_.color_bar_->isHidden() )   
     {
@@ -438,9 +464,11 @@ void LayerWidget::set_active_menu( std::string& menu_state, bool override, bool 
       this->private_->ui_.color_button_->blockSignals( false );
     }
   }
+}
 
-  // Update the state of the contrast/brightness menu
-  if ( contrast_menu )
+void LayerWidget::set_bright_contrast_visibility( bool show )
+{
+  if ( show )
   {
     if ( this->private_->ui_.bright_contrast_bar_->isHidden() )   
     {
@@ -460,9 +488,11 @@ void LayerWidget::set_active_menu( std::string& menu_state, bool override, bool 
       this->private_->ui_.brightness_contrast_button_->blockSignals( false );
     }
   }
+}
 
-  // Update the state of the contrast/brightness menu
-  if ( appearance_menu )
+void LayerWidget::set_border_visibility( bool show )
+{
+  if( show )
   {
     if ( this->private_->ui_.border_bar_->isHidden() )    
     {
@@ -482,9 +512,8 @@ void LayerWidget::set_active_menu( std::string& menu_state, bool override, bool 
       this->private_->ui_.fill_border_button_->blockSignals( false );
     }
   }
-  this->private_->ui_.base_->setUpdatesEnabled( true );
 }
-
+  
 void LayerWidget::update_appearance( bool locked, bool active, bool initialize )
 {
   if ( locked == this->private_->locked_ && 
@@ -739,18 +768,20 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
   Q_EMIT prep_for_drag_and_drop( true );
   
   // Finally if our drag was aborted then we reset the layers styles to be visible
-  if( ( drag->exec(Qt::MoveAction, Qt::MoveAction) ) != Qt::MoveAction )
-  {
-    this->seethrough( false );
-  }
+//  if( ( drag->exec(Qt::MoveAction, Qt::MoveAction) ) != Qt::MoveAction )
+//  {
+//    //this->seethrough( false );
+//  }
   // Otherwise we dispatch our move function
-  else 
+  if( ( drag->exec(Qt::MoveAction, Qt::MoveAction) ) == Qt::MoveAction ) 
   { 
     ActionMoveLayerAbove::Dispatch( Core::Interface::GetWidgetActionContext(),
       this->get_layer_id(), this->private_->drop_layer_->get_layer_id() );
   }
+  
   Q_EMIT prep_for_drag_and_drop( false );
   
+  //this->seethrough( false );
   this->repaint();
   //this->parentWidget()->setMinimumHeight( 0 );
 }
@@ -764,10 +795,15 @@ void LayerWidget::dropEvent( QDropEvent* event )
 {
   std::vector<std::string> mime_data = 
     Core::SplitString( event->mimeData()->text().toStdString(), "|" );
-  if( mime_data.size() < 2 ) return;
+  if( mime_data.size() < 2 ) 
+  {
+    this->enable_drop_space( false );
+    return;
+  }
 
   if( this->get_layer_id() == mime_data[ 1 ] )
   {
+    this->enable_drop_space( false );
     event->ignore();
     return;
   }
@@ -797,9 +833,7 @@ void LayerWidget::dropEvent( QDropEvent* event )
   {
     good_to_go = true;
   }
-  
-  this->enable_drop_space( false );
-  
+
   if( good_to_go )
   {
     dynamic_cast< LayerWidget* >( event->source() )->set_drop_target( this ); 
@@ -808,6 +842,7 @@ void LayerWidget::dropEvent( QDropEvent* event )
   }
   else
   {
+    this->enable_drop_space( false );
     event->ignore();
   }
 }

@@ -102,8 +102,12 @@ ViewerManager::ViewerManager() :
   }
   
     // NOTE: ViewerManager needs to process these signals last
-  this->add_connection( LayerManager::Instance()->layer_inserted_signal_.connect(
+  
+  this->add_connection( LayerManager::Instance()->group_internals_changed_signal_.connect(
     boost::bind( &ViewerManager::update_volume_viewers, this ) ) );
+  
+//  this->add_connection( LayerManager::Instance()->layer_inserted_signal_.connect(
+//    boost::bind( &ViewerManager::update_volume_viewers, this ) ) );
 
   this->set_initializing( false );
 }

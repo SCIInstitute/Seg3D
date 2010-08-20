@@ -62,40 +62,26 @@ public:
 
   // -- functions that control the layer manager --
 public:
-
-  //Insert Layer 
-  void insert_layer_ui( LayerHandle &layer );
-  
-  //Insert Layer at
-  void insert_layer_at_ui( LayerHandle &layer, int index );
   
   //Set the active layer
   void activate_layer_ui( LayerHandle &layer );
   
-  //Delete a layer
-  void delete_layer_ui( LayerHandle &layer );
+  // GROUPS_CHANGED_UI:
+  // function that handles sending notification to the ui that one of the groups has been changed
+  void groups_changed_ui();
   
-  //Delete a layer
-  void delete_layers_ui( std::vector< LayerHandle > layers );
-  
-  //Delete an empty group
-    void delete_group_ui( LayerGroupHandle &group );
-
-  //Move a group
-  void move_group_ui( std::string &group_id, int index );
+  // GROUP_INTERNALS_CHANGED_UI:
+  // function that handles sending notification to the ui that the contents of one of the groups 
+  // has been changed
+  void group_internals_changed_ui( LayerGroupHandle &group );
 
   // -- static functions for callbacks into this widget --
 public:
   typedef QPointer< LayerManagerDockWidget > qpointer_type;
   
+  static void HandleGroupInternalChanged( qpointer_type qpointer, LayerGroupHandle &group );
+  static void HandleGroupsChanged( qpointer_type qpointer );
   static void HandleActivateLayer( qpointer_type qpointer, LayerHandle &layer );
-  static void HandleInsertLayer( qpointer_type qpointer, LayerHandle &layer );
-  static void HandleInsertLayerAt( qpointer_type qpointer, LayerHandle &layer, int index );
-  static void HandleDeleteLayer( qpointer_type qpointer, LayerHandle &layer );
-  static void HandleDeleteLayers( qpointer_type qpointer, std::vector< LayerHandle > layers );
-  static void HandleGroupDeleted( qpointer_type qpointer, LayerGroupHandle &group );
-  static void HandleGroupMoved( qpointer_type qpointer, std::string &group_id, int index );
-  
   
   
 private:
