@@ -35,6 +35,7 @@
 namespace Seg3D
 {
 
+// Forward declaration
 class CurvatureAnisotropicDiffusionFilterInterfacePrivate;
 
 class CurvatureAnisotropicDiffusionFilterInterface : public ToolWidget
@@ -48,6 +49,8 @@ public:
 
 // -- create interface --
 public:
+  // BUILD_WIDGET:
+  // This function builds the actual GUI
   virtual bool build_widget( QFrame* frame );
 
 // -- run filter --

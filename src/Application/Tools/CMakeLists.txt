@@ -55,8 +55,6 @@ SET(APPLICATION_TOOLS_SRCS
   MedianFilter.cc
   DiscreteGaussianFilter.h
   DiscreteGaussianFilter.cc
-  AnisotropicDiffusionFilter.h
-  AnisotropicDiffusionFilter.cc
   ArithmeticFilter.h
   ArithmeticFilter.cc
   ConfidenceConnectedFilter.h
@@ -102,6 +100,8 @@ SET(APPLICATION_TOOLS_ACTIONS_SRCS
   Actions/ActionPaint.cc
   Actions/ActionCurvatureAnisotropicDiffusionFilter.h
   Actions/ActionCurvatureAnisotropicDiffusionFilter.cc
+  Actions/ActionDiscreteGaussianFilter.h
+  Actions/ActionDiscreteGaussianFilter.cc
   )
 
 CORE_ADD_LIBRARY(Application_Tools 

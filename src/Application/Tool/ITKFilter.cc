@@ -93,7 +93,8 @@ class ITKProgressObserver : public itk::Command
   // -- constructor /destructor --
 public:
   ITKProgressObserver( LayerHandle layer ) :
-    layer_( layer )
+    layer_( layer ),
+    progress_( 0.0f )
   {}
 
   // NOTE: Virtual destructor is needed for ITK
@@ -109,7 +110,12 @@ public:
       std::string event_name = event.GetEventName(); 
       if ( event_name == "ProgressEvent" )
       {
-        layer_->update_progress_signal_( obj->GetProgress() );
+        float progress = obj->GetProgress();
+        if ( progress > ( this->progress_ + 0.01f ) )
+        {
+          this->progress_ = progress;
+          this->layer_->update_progress_signal_( this->progress_ );
+        }
       }
     }
   }
@@ -123,7 +129,12 @@ public:
       std::string event_name = event.GetEventName(); 
       if ( event_name == "ProgressEvent" )
       {
-        layer_->update_progress_signal_( obj->GetProgress() );
+        float progress = obj->GetProgress();
+        if ( progress > ( this->progress_ + 0.01f ) )
+        {
+          this->progress_ = progress;
+          this->layer_->update_progress_signal_( this->progress_ );
+        }
       }
     }   
   }
@@ -131,6 +142,8 @@ public:
 private:
   // Handle to the layer that is displaying progress
   LayerHandle layer_;
+  
+  float progress_;
 
 };
 

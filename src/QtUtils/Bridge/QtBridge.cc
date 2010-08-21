@@ -53,6 +53,7 @@
 #include <QtUtils/Bridge/detail/QtLineEditConnector.h>
 #include <QtUtils/Bridge/detail/QtSpinBoxConnector.h>
 #include <QtUtils/Bridge/detail/QtSliderIntComboConnector.h>
+#include <QtUtils/Bridge/detail/QtLogSliderIntComboConnector.h>
 #include <QtUtils/Bridge/detail/QtSliderDoubleComboConnector.h>
 #include <QtUtils/Bridge/detail/QtEnableConnector.h>
 
@@ -123,6 +124,12 @@ bool QtBridge::Connect( QComboBox* qcombobox, Core::StateStringHandle& state_han
 bool QtBridge::Connect( QtSliderIntCombo* sscombo, Core::StateRangedIntHandle& state )
 {
   new QtSliderIntComboConnector( sscombo, state );
+  return true;
+}
+
+bool QtBridge::Connect( QtLogSliderIntCombo* sscombo, Core::StateRangedIntHandle& state )
+{
+  new QtLogSliderIntComboConnector( sscombo, state );
   return true;
 }
 

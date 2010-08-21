@@ -668,8 +668,14 @@ void LayerManager::get_layer_names( std::vector< LayerIDNamePair >& layer_names 
   size_t num_of_layers = layers.size();
   for ( size_t i = 0; i < num_of_layers; i++ )
   {
-    layer_names.push_back( std::make_pair( layers[ i ]->get_layer_id(), 
-      layers[ i ]->get_layer_name() ) );
+    // NOTE: Only if a layer is valid do we save it in a session. An example of an invalid
+    // layer is for instance a layer that was just created, but hasn't finished processing
+    // its data.
+    if ( layers[ i ]->is_valid() )
+    {
+      layer_names.push_back( std::make_pair( layers[ i ]->get_layer_id(), 
+        layers[ i ]->get_layer_name() ) );
+    }
   }
 }
 

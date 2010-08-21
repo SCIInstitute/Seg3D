@@ -192,6 +192,11 @@ double DataBlock::get_min() const
   return this->histogram_.get_min();
 }
 
+double DataBlock::get_range() const
+{
+  return this->histogram_.get_max() - this->histogram_.get_min();
+}
+
 const Histogram& DataBlock::get_histogram() const
 {
   return this->histogram_;

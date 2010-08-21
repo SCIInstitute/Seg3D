@@ -64,10 +64,6 @@ public Q_SLOTS:
   
 public:
   int get_value() { return value_; }
-//  void block() { blockSignals( true ); }
-//  void unblock() { blockSignals( false ); }
-//  void parent(){ return parentWidget(); }
-  
 
 // -- widget internals -- 
 private:

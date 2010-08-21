@@ -36,7 +36,6 @@ SET(INTERFACE_TOOLINTERFACE_SRCS
   PolylineToolInterface.cc
   ThresholdToolInterface.cc
   InvertToolInterface.cc
-  AnisotropicDiffusionFilterInterface.cc
   ArithmeticFilterInterface.cc
   BinaryDilateErodeFilterInterface.cc
   BooleanFilterInterface.cc
@@ -66,7 +65,6 @@ SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
   PolylineToolInterface.h
   ThresholdToolInterface.h
   InvertToolInterface.h
-  AnisotropicDiffusionFilterInterface.h
   ArithmeticFilterInterface.h
   BinaryDilateErodeFilterInterface.h
   BooleanFilterInterface.h
@@ -101,7 +99,6 @@ SET(INTERFACE_TOOLINTERFACE_UI_SRCS
   ThresholdToolInterface.ui
   InvertToolInterface.ui
   MedianFilterInterface.ui
-  AnisotropicDiffusionFilterInterface.ui
   DiscreteGaussianFilterInterface.ui
   ArithmeticFilterInterface.ui
   CurvatureAnisotropicDiffusionFilterInterface.ui

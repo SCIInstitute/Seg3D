@@ -38,7 +38,7 @@ namespace Seg3D
   
 class ActionDiscreteGaussianFilter : public Core::Action
 {
-CORE_ACTION_XML( 
+CORE_ACTION( 
   CORE_ACTION_TYPE( "DiscreteGaussianFilter", "ITK filter that blurs the data." )
   CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
   CORE_ACTION_KEY( "variance", "1.0", "The amount of blurring." )

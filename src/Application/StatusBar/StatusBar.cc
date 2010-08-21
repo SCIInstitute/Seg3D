@@ -251,4 +251,9 @@ void StatusBar::set_message( int msg_type, std::string message )
   }
 }
 
+void StatusBar::SetMessage( int msg_type, std::string message )
+{
+  StatusBar::Instance()->set_message( msg_type, message );
+}
+
 } // end namespace Seg3D

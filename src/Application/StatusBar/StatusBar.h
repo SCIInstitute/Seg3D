@@ -89,6 +89,9 @@ public:
 private:
   StatusBarPrivateHandle private_;
 
+public:
+  static void SetMessage( int msg_type, std::string message );
+
 };
 
 } // end namespace Seg3D

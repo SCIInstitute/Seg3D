@@ -53,6 +53,14 @@ public:
   // Get the type of the data volume
   virtual VolumeType get_type() const;
 
+  // GET_MIN:
+  // Get the minimum value
+  virtual double get_min() const;
+
+  // GET_MAX:
+  // Get the maximum value
+  virtual double get_max() const;
+
   // DATA_BLOCK:
   // Get the data block that contains the volume data
   DataBlockHandle get_data_block() const;

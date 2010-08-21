@@ -176,6 +176,11 @@ public:
   // NOTE: update_histogram needs to be called to ensure the data is accurate
   double get_min() const;
 
+  // GET_RANGE:
+  // Get the dynamic range of the data
+  // NOTE: update_histogram needs to be called to ensure the data is accurate
+  double get_range() const;
+
   // GET_HISTOGRAM:
   // Get the histogram of the underlying data
   const Histogram& get_histogram() const;

@@ -38,6 +38,7 @@ SET(QTUTILS_WIDGETS_SRCS
   QtHistogramWidget.cc
   QtSliderDoubleCombo.cc
   QtSliderIntCombo.cc
+  QtLogSliderIntCombo.cc
 )
 
 SET(QTUTILS_WIDGETS_MOC_SRCS
@@ -47,6 +48,7 @@ SET(QTUTILS_WIDGETS_MOC_SRCS
   QtHistogramWidget.h
   QtSliderDoubleCombo.h
   QtSliderIntCombo.h
+  QtLogSliderIntCombo.h
 )
 
 SET(QTUTILS_WIDGETS_NO_MOC_SRCS

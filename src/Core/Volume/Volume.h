@@ -85,6 +85,14 @@ public:
   // Get the generation number of the data block the layer is using
   virtual DataBlock::generation_type get_generation() const = 0;
 
+  // GET_MIN:
+  // Get the minimum value
+  virtual double get_min() const = 0;
+
+  // GET_MAX:
+  // Get the maximum value
+  virtual double get_max() const = 0;
+
   // IS_VALID:
   // Check whether the volume has a valid data block
   bool is_valid() const

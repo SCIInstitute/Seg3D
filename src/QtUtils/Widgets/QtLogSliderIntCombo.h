@@ -1,22 +1,22 @@
 /*
  For more information, please see: http://software.sci.utah.edu
- 
+
  The MIT License
- 
+
  Copyright (c) 2009 Scientific Computing and Imaging Institute,
  University of Utah.
- 
- 
+
+
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
  the rights to use, copy, modify, merge, publish, distribute, sublicense,
  and/or sell copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included
  in all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -26,35 +26,61 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-// Application includes
-#include <Application/Tool/ToolFactory.h>
-#include <Application/Tools/AnisotropicDiffusionFilter.h>
-#include <Application/Layer/Layer.h>
-#include <Application/LayerManager/LayerManager.h>
+#ifndef QTUTILS_WIDGETS_QTLOGSLIDERINTCOMBO_H
+#define QTUTILS_WIDGETS_QTLOGSLIDERINTCOMBO_H
 
-SCI_REGISTER_TOOL( Seg3D, AnisotropicDiffusionFilter )
+// QT Includes
+#include <QWidget>
 
-namespace Seg3D
+// Boost includes
+#include <boost/shared_ptr.hpp>
+
+namespace QtUtils 
 {
 
-// Register the tool into the tool factory
+// Forward declaration
+class QtLogSliderIntCombo;
+class QtLogSliderIntComboPrivate;
+typedef boost::shared_ptr< QtLogSliderIntComboPrivate > QtLogSliderIntComboPrivateHandle;
 
-AnisotropicDiffusionFilter::AnisotropicDiffusionFilter( const std::string& toolid ) :
-  SingleTargetTool( Core::VolumeType::DATA_E, toolid )
+// Class definition
+class QtLogSliderIntCombo : public QWidget
 {
-  // Need to set ranges and default values for all parameters 
-  this->add_state( "iterations", this->iterations_state_, 1, 1, 100, 1 );
-  this->add_state( "steps", this->steps_state_, 1, 1, 100, 1 );
-  this->add_state( "conductance", this->conductance_state_, .10, .10, 10.0, .10 );
-  this->add_state( "replace", this->replace_state_, false );
+Q_OBJECT
 
-}
+// -- constructor/destructor --
+public:
+    QtLogSliderIntCombo( QWidget* parent = 0 );
+    virtual ~QtLogSliderIntCombo();
 
-AnisotropicDiffusionFilter::~AnisotropicDiffusionFilter()
-{
-  disconnect_all();
-} 
+Q_SIGNALS:
+  void valueAdjusted( int );
+    void valueChanged( int );
+  
+public Q_SLOTS:
+    void setStep( int );
+  void setRange( int, int );
+  void setCurrentValue( int );
+  
+public:
+  int get_value() { return value_; }
 
-} // end namespace Seg3D
+// -- widget internals -- 
+private:
+    QtLogSliderIntComboPrivateHandle private_;
+    
+private Q_SLOTS:
+    void change_min( int new_min );
+    void change_max( int new_max );
+    void slider_signal( int value );
+    void spinner_signal( int value );
+    
+private:
+  void block_signals( bool block );
+  int value_;
+  
+};
 
+}  // end namespace QtUtils
 
+#endif

@@ -29,12 +29,12 @@
 #ifndef APPLICATION_TOOLS_DISCRETEGAUSSIANFILTER_H
 #define APPLICATION_TOOLS_DISCRETEGAUSSIANFILTER_H
 
-#include <Application/Tool/Tool.h>
+#include <Application/Tool/SingleTargetTool.h>
 
 namespace Seg3D
 {
 
-class DiscreteGaussianFilter : public Tool
+class DiscreteGaussianFilter : public SingleTargetTool
 {
 SEG3D_TOOL(
 SEG3D_TOOL_NAME( "DiscreteGaussianFilter", "Filter for smoothing data" )
@@ -42,21 +42,12 @@ SEG3D_TOOL_MENULABEL( "Discrete Gaussian" )
 SEG3D_TOOL_MENU( "filter_data_to_data" )
 SEG3D_TOOL_SHORTCUT_KEY( "Alt+D" )
 SEG3D_TOOL_URL( "http://seg3d.org/" )
+SEG3D_TOOL_VERSION( "1" )
 )
 
 public:
   DiscreteGaussianFilter( const std::string& toolid );
   virtual ~DiscreteGaussianFilter();
-
-  // -- constraint parameters --
-
-  // Constrain viewer to right painting tool when layer is selected
-  void target_constraint( std::string layerid );
-
-  // -- activate/deactivate tool --
-
-  virtual void activate();
-  virtual void deactivate();
   
 private:
   // -- handle updates from layermanager --
@@ -64,15 +55,20 @@ private:
 
   // -- state --
 public:
-  // Layerid of the target layer
-  Core::StateStringHandle target_layer_state_;
-
-  // Variance
-  Core::StateRangedDoubleHandle variance_state_;
-
-  Core::StateRangedDoubleHandle maximum_kernel_width_state_;
-
+  // Whether the layer needs to be replaced
   Core::StateBoolHandle replace_state_;
+  
+  // Whether the data format needs to be preserved in the filter
+  Core::StateBoolHandle preserve_data_format_;
+
+  // Blurring distance
+  Core::StateRangedDoubleHandle blurring_distance_state_;
+
+  // -- execute --
+public:
+  // Execute the tool and dispatch the action
+  virtual void execute( Core::ActionContextHandle context );
+  
 };
 
 } // end namespace

@@ -50,6 +50,16 @@ VolumeType MaskVolume::get_type() const
   return VolumeType::MASK_E;
 }
 
+double MaskVolume::get_min() const
+{
+  return 0.0;
+}
+
+double MaskVolume::get_max() const
+{
+  return 1.0;
+}
+
 DataBlock::generation_type MaskVolume::get_generation() const
 {
   if ( this->mask_data_block_ )

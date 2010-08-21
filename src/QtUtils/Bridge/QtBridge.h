@@ -39,6 +39,7 @@
 
 // QtUtils includes
 #include <QtUtils/Widgets/QtSliderIntCombo.h>
+#include <QtUtils/Widgets/QtLogSliderIntCombo.h>
 #include <QtUtils/Widgets/QtSliderDoubleCombo.h>
 #include <QtUtils/Widgets/QtColorButton.h>
 #include <QtUtils/Widgets/QtColorBarWidget.h>
@@ -78,6 +79,9 @@ public:
   
   // Connect a SliderIntCombo to a StateRangedIntValue
   static bool Connect( QtSliderIntCombo* sscombo, Core::StateRangedIntHandle& state_handle );
+
+  // Connect a LogSliderIntCombo to a StateRangedIntValue
+  static bool Connect( QtLogSliderIntCombo* sscombo, Core::StateRangedIntHandle& state_handle );
   
   // Connect a SliderDoubleCombo to a StateRangedIntValue
   static bool Connect( QtSliderDoubleCombo* sscombo, Core::StateRangedDoubleHandle& state_handle );

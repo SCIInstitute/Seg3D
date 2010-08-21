@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -19,12 +19,6 @@
   <property name="minimumSize">
    <size>
     <width>213</width>
-    <height>207</height>
-   </size>
-  </property>
-  <property name="maximumSize">
-   <size>
-    <width>16777215</width>
     <height>207</height>
    </size>
   </property>
@@ -52,27 +46,53 @@
     <number>4</number>
    </property>
    <item>
-    <layout class="QHBoxLayout" name="activeHLayout" stretch="1">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Target Layer:</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="activeHLayout" stretch="0">
      <property name="spacing">
       <number>0</number>
      </property>
      <item>
-      <widget class="QLabel" name="activeLabel">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
+      <widget class="QGroupBox" name="target_groupbox_">
+       <property name="font">
+        <font>
+         <pointsize>10</pointsize>
+        </font>
        </property>
-       <property name="minimumSize">
-        <size>
-         <width>50</width>
-         <height>0</height>
-        </size>
+       <property name="title">
+        <string/>
        </property>
-       <property name="text">
-        <string>Target:</string>
-       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <property name="margin">
+         <number>4</number>
+        </property>
+        <item>
+         <widget class="QComboBox" name="target_layer_"/>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="use_active_layer_">
+          <property name="text">
+           <string>Always Use Active Layer</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="preserve_data_format_">
+          <property name="text">
+           <string>Preserve Data Format</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </item>
     </layout>
@@ -81,13 +101,8 @@
     <layout class="QHBoxLayout" name="varianceHLayout_top">
      <item>
       <widget class="QLabel" name="varianceLabel">
-       <property name="font">
-        <font>
-         <pointsize>10</pointsize>
-        </font>
-       </property>
        <property name="text">
-        <string>Variance:</string>
+        <string>Blurring distance (pixels):</string>
        </property>
       </widget>
      </item>
@@ -95,25 +110,6 @@
    </item>
    <item>
     <layout class="QHBoxLayout" name="varianceHLayout_bottom"/>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="kernelHLayout_top">
-     <item>
-      <widget class="QLabel" name="kernelLabel">
-       <property name="font">
-        <font>
-         <pointsize>10</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Maximum Kernel Width:</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="kernelHLayout_bottom"/>
    </item>
    <item>
     <widget class="QWidget" name="replaceRunWidget" native="true">

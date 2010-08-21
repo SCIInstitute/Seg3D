@@ -40,8 +40,9 @@ SEG3D_TOOL(
 SEG3D_TOOL_NAME( "CurvatureAnisotropicDiffusionFilter", "Filter for smoothing data" )
 SEG3D_TOOL_MENULABEL( "Curvature AnisoDiff. Filter" )
 SEG3D_TOOL_MENU( "filter_data_to_data" )
-SEG3D_TOOL_SHORTCUT_KEY( "" )
+SEG3D_TOOL_SHORTCUT_KEY( "Alt+A" )
 SEG3D_TOOL_URL( "http://seg3d.org/" )
+SEG3D_TOOL_VERSION( "1" )
 )
 
 public:
@@ -53,25 +54,19 @@ public:
   // Whether the layer needs to be replaced
   Core::StateBoolHandle replace_state_;
 
+  // Whether the data format needs to be preserved in the filter
+  Core::StateBoolHandle preserve_data_format_;
+  
   // Number of iterations the filter needs to run
   Core::StateRangedIntHandle iterations_state_;
 
-  // Number of steps needed
-  Core::StateRangedDoubleHandle integration_step_state_;
-
-  // The conductance for deciding what is a similar value
-  Core::StateRangedDoubleHandle conductance_state_;
-
-  // Whether the data format needs to be preserved in the filter
-  Core::StateBoolHandle preserve_data_format_;
+  // The sensitivity for deciding what is a similar value
+  Core::StateRangedDoubleHandle sensitivity_state_;
 
   // -- execute --
 public:
   // Execute the tool and dispatch the action
   virtual void execute( Core::ActionContextHandle context );
-
-private:
-  const static size_t VERSION_NUMBER_C;
 
 };
 

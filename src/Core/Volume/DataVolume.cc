@@ -63,6 +63,30 @@ DataType DataVolume::get_data_type() const
   }
 }
 
+double DataVolume::get_min() const
+{
+  if ( this->data_block_ )
+  {
+    return this->data_block_->get_min();
+  }
+  else
+  {
+    return 0.0;
+  }
+}
+
+double DataVolume::get_max() const
+{
+  if ( this->data_block_ )
+  {
+    return this->data_block_->get_max();
+  }
+  else
+  {
+    return 0.0;
+  }
+}
+
 VolumeType DataVolume::get_type() const
 {
   return VolumeType::DATA_E;

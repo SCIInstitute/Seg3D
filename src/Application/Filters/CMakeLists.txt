@@ -35,8 +35,6 @@ SET(APPLICATION_FILTERS_SRCS
 )
 
 SET(APPLICATION_FILTERS_ACTIONS_SRCS
-  Actions/ActionAnisotropicDiffusionFilter.h
-  Actions/ActionAnisotropicDiffusionFilter.cc
   Actions/ActionArithmeticFilter.h
   Actions/ActionArithmeticFilter.cc
   Actions/ActionBinaryDilateErodeFilter.h
@@ -49,8 +47,6 @@ SET(APPLICATION_FILTERS_ACTIONS_SRCS
 #  Actions/ActionConfidenceConnectedFilter.cc
 #  Actions/ActionConnectedComponentFilter.h
 #  Actions/ActionConnectedComponentFilter.cc
-#  Actions/ActionDiscreteGaussianFilter.h
-#  Actions/ActionDiscreteGaussianFilter.cc
 #  Actions/ActionFillHolesFilter.h
 #  Actions/ActionFillHolesFilter.cc
 #  Actions/ActionGradientMagnitudeFilter.h

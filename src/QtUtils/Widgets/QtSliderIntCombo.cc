@@ -60,12 +60,17 @@ QtSliderIntCombo::QtSliderIntCombo( QWidget* parent, bool edit_range ) :
         this->private_->ui_.edit_button_->hide();
     }
     
-    connect( this->private_->ui_.edit_button_, SIGNAL( clicked( bool ) ), this, SLOT( edit_ranges(bool ) ) );
-    connect( this->private_->ui_.decrease_range_button_, SIGNAL( clicked() ), this, SLOT( half_range() ) );
-    connect( this->private_->ui_.increase_range_button_, SIGNAL( clicked()), this, SLOT( double_range() ) );
+    this->connect( this->private_->ui_.edit_button_, SIGNAL( clicked( bool ) ), 
+    this, SLOT( edit_ranges(bool ) ) );
+    this->connect( this->private_->ui_.decrease_range_button_, SIGNAL( clicked() ), 
+    this, SLOT( half_range() ) );
+    this->connect( this->private_->ui_.increase_range_button_, SIGNAL( clicked()), 
+    this, SLOT( double_range() ) );
     
-    connect( this->private_->ui_.horizontalSlider, SIGNAL( valueChanged( int ) ), this, SLOT( slider_signal( int ) ) );
-    connect( this->private_->ui_.spinBox, SIGNAL( valueChanged( int ) ), this, SLOT( spinner_signal( int ) ) );
+    this->connect( this->private_->ui_.horizontalSlider, SIGNAL( valueChanged( int ) ), 
+    this, SLOT( slider_signal( int ) ) );
+    this->connect( this->private_->ui_.spinBox, SIGNAL( valueChanged( int ) ), 
+    this, SLOT( spinner_signal( int ) ) );
   
 #if defined ( __APPLE__ )  
   QFont font;

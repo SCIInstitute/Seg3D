@@ -1,22 +1,22 @@
 /*
  For more information, please see: http://software.sci.utah.edu
- 
+
  The MIT License
- 
+
  Copyright (c) 2009 Scientific Computing and Imaging Institute,
  University of Utah.
- 
- 
+
+
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
  the rights to use, copy, modify, merge, publish, distribute, sublicense,
  and/or sell copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included
  in all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -26,39 +26,47 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_TOOLINTERFACE_ANISOTROPICDIFFUSIONFILTERINTERFACE_H
-#define INTERFACE_TOOLINTERFACE_ANISOTROPICDIFFUSIONFILTERINTERFACE_H
+#ifndef QTUTILS_BRIDGE_DETAIL_QTLOGSLIDERINTCOMBOCONNECTOR_H
+#define QTUTILS_BRIDGE_DETAIL_QTLOGSLIDERINTCOMBOCONNECTOR_H
 
-// Base class of the tool widget
-#include <Interface/AppInterface/ToolWidget.h>
+#include <QPointer>
 
-namespace Seg3D
+#include <Core/State/StateRangedValue.h>
+
+#include <QtUtils/Widgets/QtLogSliderIntCombo.h>
+#include <QtUtils/Bridge/detail/QtConnectorBase.h>
+
+namespace QtUtils
 {
 
-class AnisotropicDiffusionFilterInterfacePrivate;
-
-class AnisotropicDiffusionFilterInterface : public ToolWidget
+class QtLogSliderIntComboConnector : public QtConnectorBase
 {
-Q_OBJECT
+  Q_OBJECT
 
-// -- Constructor/destructor --
 public:
-  AnisotropicDiffusionFilterInterface();
-  virtual ~AnisotropicDiffusionFilterInterface();
+  QtLogSliderIntComboConnector( QtLogSliderIntCombo* parent, 
+    Core::StateRangedIntHandle& state, bool blocking = true );
 
-// -- create interface --
-public:
-  virtual bool build_widget( QFrame* frame );
+  virtual ~QtLogSliderIntComboConnector();
 
-// -- run filter --
-private Q_SLOTS:
-  void execute_filter();
-
-// -- filter internals --
+  // -- slot functions for boost signals --
 private:
-  boost::shared_ptr< AnisotropicDiffusionFilterInterfacePrivate > private_;
+  static void SetValue( QPointer< QtLogSliderIntComboConnector > qpointer,
+    int val, Core::ActionSource source );
+
+  static void SetRange( QPointer< QtLogSliderIntComboConnector > qpointer,
+    int min_val, int max_val, Core::ActionSource source );
+  
+  // -- slot functions for Qt signals --
+private Q_SLOTS:
+  void set_state_value( int val );
+  void set_state_range( int min_val, int max_val );
+
+private:
+  QtLogSliderIntCombo* parent_;
+  Core::StateRangedIntHandle state_;
 };
 
-} // namespace Seg3D
+}
 
 #endif

@@ -28,9 +28,14 @@
 
 // Application includes
 #include <Application/Tool/ToolFactory.h>
-#include <Application/Tools/DiscreteGaussianFilter.h>
 #include <Application/Layer/Layer.h>
 #include <Application/LayerManager/LayerManager.h>
+
+// StateEnigne of the tool
+#include <Application/Tools/DiscreteGaussianFilter.h>
+
+// Action associated with tool
+#include <Application/Tools/Actions/ActionDiscreteGaussianFilter.h>
 
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL( Seg3D, DiscreteGaussianFilter )
@@ -39,24 +44,12 @@ namespace Seg3D
 {
 
 DiscreteGaussianFilter::DiscreteGaussianFilter( const std::string& toolid ) :
-  Tool( toolid )
+  SingleTargetTool( Core::VolumeType::DATA_E, toolid )
 {
   // Need to set ranges and default values for all parameters
-  add_state( "target", this->target_layer_state_, "<none>" );
-  add_state( "variance", this->variance_state_, .10, .10, 10.0, .10 );
-  add_state( "maximum_kernel_width", this->maximum_kernel_width_state_, .10, .10, 10.0, .10 );
-  add_state( "replace", this->replace_state_, false );
-  
-  this->handle_layers_changed();
-
-  // Add constaints, so that when the state changes the right ranges of
-  // parameters are selected
-  this->add_connection ( this->target_layer_state_->value_changed_signal_.connect( boost::bind(
-      &DiscreteGaussianFilter::target_constraint, this, _1 ) ) );
-  
-  this->add_connection( LayerManager::Instance()->layers_changed_signal_.connect(
-    boost::bind( &DiscreteGaussianFilter::handle_layers_changed, this ) ) );
-
+  this->add_state( "replace", this->replace_state_, true );
+  this->add_state( "preserve_data_format", this->preserve_data_format_, true );
+  this->add_state( "blurring_distance", this->blurring_distance_state_, 2.0, 0.0, 10.0, .25 );
 }
 
 DiscreteGaussianFilter::~DiscreteGaussianFilter()
@@ -64,42 +57,13 @@ DiscreteGaussianFilter::~DiscreteGaussianFilter()
   disconnect_all();
 }
 
-void DiscreteGaussianFilter::handle_layers_changed()
-{
-  std::vector< LayerHandle > target_layers;
-  LayerManager::Instance()->get_layers( target_layers );
-  bool target_found = false;
-  
-  for( int i = 0; i < static_cast< int >( target_layers.size() ); ++i )
-  {
-    if( ( this->target_layer_state_->get() == "<none>" ) && ( target_layers[i]->type() == 
-                                 Core::VolumeType::DATA_E ) )
-    {
-      this->target_layer_state_->set( target_layers[i]->get_layer_name(), Core::ActionSource::NONE_E );
-      target_found = true;
-      break;
-    }
-    if( target_layers[i]->get_layer_name() == this->target_layer_state_->get() ) {
-      target_found = true;
-      break;
-    }
-  }
-  
-  if( !target_found )
-    this->target_layer_state_->set( "", Core::ActionSource::NONE_E );
-  
-}
-  
-void DiscreteGaussianFilter::target_constraint( std::string layerid )
-{
-}
-  
-void DiscreteGaussianFilter::activate()
-{
-}
-
-void DiscreteGaussianFilter::deactivate()
-{
+void DiscreteGaussianFilter::execute( Core::ActionContextHandle context )
+{ 
+  ActionDiscreteGaussianFilter::Dispatch( context,
+    this->target_layer_state_->get(),
+    this->replace_state_->get(),
+    this->preserve_data_format_->get(),
+    this->blurring_distance_state_->get() );
 }
 
 } // end namespace Seg3D

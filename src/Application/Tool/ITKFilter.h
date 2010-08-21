@@ -268,63 +268,35 @@ private:
   ITKFilterPrivateHandle private_;
 };
 
-#define SWITCH_DATATYPE( DATATYPE, ... ) \
-{ \
-  typedef itk::Image< float, 3> FLOAT_IMAGE_TYPE; \
-  typedef itk::Image< float, 3> UCHAR_IMAGE_TYPE; \
-  switch ( DATATYPE )\
+#define SCI_BEGIN_TYPED_RUN( DATATYPE ) \
+public:\
+  virtual void run()\
   {\
-    case Core::DataType::CHAR_E:\
+    switch ( DATATYPE )\
     {\
-      typedef signed char VALUE_TYPE; \
-      typedef itk::Image< VALUE_TYPE, 3> TYPED_IMAGE_TYPE; \
-      { __VA_ARGS__ } break; \
-    }\
-    case Core::DataType::UCHAR_E:\
-    {\
-      typedef unsigned char VALUE_TYPE; \
-      typedef itk::Image< VALUE_TYPE, 3> TYPED_IMAGE_TYPE; \
-      { __VA_ARGS__ } break; \
-    }\
-    case Core::DataType::SHORT_E:\
-    {\
-      typedef short VALUE_TYPE; \
-      typedef itk::Image< VALUE_TYPE, 3> TYPED_IMAGE_TYPE; \
-      { __VA_ARGS__ } break; \
-    }\
-    case Core::DataType::USHORT_E:\
-    {\
-      typedef unsigned short VALUE_TYPE; \
-      typedef itk::Image< VALUE_TYPE, 3> TYPED_IMAGE_TYPE; \
-      { __VA_ARGS__ } break; \
-    }\
-    case Core::DataType::INT_E:\
-    {\
-      typedef int VALUE_TYPE; \
-      typedef itk::Image< VALUE_TYPE, 3> TYPED_IMAGE_TYPE; \
-      { __VA_ARGS__ } break; \
-    }\
-    case Core::DataType::UINT_E:\
-    {\
-      typedef unsigned int VALUE_TYPE; \
-      typedef itk::Image< VALUE_TYPE, 3> TYPED_IMAGE_TYPE; \
-      { __VA_ARGS__ } break; \
-    }\
-    case Core::DataType::FLOAT_E:\
-    {\
-      typedef float VALUE_TYPE; \
-      typedef itk::Image< VALUE_TYPE, 3> TYPED_IMAGE_TYPE; \
-      { __VA_ARGS__ } break; \
-    }\
-    case Core::DataType::DOUBLE_E:\
-    {\
-      typedef double VALUE_TYPE; \
-      typedef itk::Image< VALUE_TYPE, 3> TYPED_IMAGE_TYPE; \
-      { __VA_ARGS__ } break; \
-    }\
+      case Core::DataType::CHAR_E: this->typed_run<signed char>(); break;\
+      case Core::DataType::UCHAR_E: this->typed_run<unsigned char>(); break;\
+      case Core::DataType::SHORT_E: this->typed_run<short>(); break;\
+      case Core::DataType::USHORT_E: this->typed_run<unsigned short>(); break;\
+      case Core::DataType::INT_E: this->typed_run<int>(); break;\
+      case Core::DataType::UINT_E: this->typed_run<unsigned int>(); break;\
+      case Core::DataType::FLOAT_E: this->typed_run<float>(); break;\
+      case Core::DataType::DOUBLE_E: this->typed_run<double>(); break;\
+    };\
   }\
-} \
+\
+  template< class VALUE_TYPE>\
+  void typed_run()\
+  {\
+    typedef itk::Image< float, 3> FLOAT_IMAGE_TYPE; \
+    typedef itk::Image< unsigned char, 3> UCHAR_IMAGE_TYPE; \
+    typedef itk::Image< VALUE_TYPE, 3> TYPED_IMAGE_TYPE;
+  
 
+#define SCI_END_TYPED_RUN() \
+  }
+
+  
 } // end namespace Seg3D
 
 #endif

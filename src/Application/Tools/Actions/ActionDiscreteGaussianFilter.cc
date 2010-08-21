@@ -27,27 +27,28 @@
  */
 
 // ITK includes
-#include <itkCurvatureAnisotropicDiffusionImageFilter.h>
+#include <itkDiscreteGaussianImageFilter.h>
 
 // Application includes
 #include <Application/LayerManager/LayerManager.h>
+#include <Application/StatusBar/StatusBar.h>
 #include <Application/Tool/ITKFilter.h>
-#include <Application/Tools/Actions/ActionCurvatureAnisotropicDiffusionFilter.h>
+#include <Application/Tools/Actions/ActionDiscreteGaussianFilter.h>
 
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
 // NOTE: Registration needs to be done outside of any namespace
-CORE_REGISTER_ACTION( Seg3D, CurvatureAnisotropicDiffusionFilter )
+CORE_REGISTER_ACTION( Seg3D, DiscreteGaussianFilter )
 
 namespace Seg3D
 {
 
-bool ActionCurvatureAnisotropicDiffusionFilter::validate( Core::ActionContextHandle& context )
+bool ActionDiscreteGaussianFilter::validate( Core::ActionContextHandle& context )
 {
   // Check for layer existance and type information
   std::string error;
-  if ( ! LayerManager::CheckLayerExistanceAndType( this->layer_id_.value(), 
+  if ( ! LayerManager::CheckLayerExistanceAndType( this->target_layer_.value(), 
     Core::VolumeType::DATA_E, error ) )
   {
     context->report_error( error );
@@ -56,7 +57,7 @@ bool ActionCurvatureAnisotropicDiffusionFilter::validate( Core::ActionContextHan
   
   // Check for layer availability 
   Core::NotifierHandle notifier;
-  if ( ! LayerManager::CheckLayerAvailability( this->layer_id_.value(), 
+  if ( ! LayerManager::CheckLayerAvailability( this->target_layer_.value(), 
     this->replace_.value(), notifier ) )
   {
     context->report_need_resource( notifier );
@@ -64,16 +65,9 @@ bool ActionCurvatureAnisotropicDiffusionFilter::validate( Core::ActionContextHan
   }
     
   // If the number of iterations is lower than one, we cannot run the filter
-  if( this->iterations_.value() < 1 )
+  if( this->blurring_distance_.value() < 0.0 )
   {
-    context->report_error( "The number of iterations needs to be larger than zero." );
-    return false;
-  }
-  
-  // Conductance needs to be a positive number
-  if( this->sensitivity_.value() < 0.0 )
-  {
-    context->report_error( "The sensitivity needs to be larger than zero." );
+    context->report_error( "The blurring distance needs to be larger than zero." );
     return false;
   }
   
@@ -86,16 +80,15 @@ bool ActionCurvatureAnisotropicDiffusionFilter::validate( Core::ActionContextHan
 // NOTE: The separation of the algorithm into a private class is for the purpose of running the
 // filter on a separate thread.
 
-class CurvatureAnisotropicDiffusionFilterAlgo : public ITKFilter
+class DiscreteGaussianFilterAlgo : public ITKFilter
 {
 
 public:
   LayerHandle src_layer_;
   LayerHandle dst_layer_;
-  
-  int iterations_;
-  double sensitivity_;
+
   bool preserve_data_format_;
+  double blurring_distance_;
 
 public:
   // RUN:
@@ -108,7 +101,7 @@ public:
   // a member variable.
   SCI_BEGIN_TYPED_RUN( this->src_layer_->get_data_type() )
   {
-    typedef itk::CurvatureAnisotropicDiffusionImageFilter< 
+    typedef itk::DiscreteGaussianImageFilter< 
       TYPED_IMAGE_TYPE, FLOAT_IMAGE_TYPE > filter_type;
 
     typename Core::ITKImageDataT<VALUE_TYPE>::Handle input_image; 
@@ -118,15 +111,14 @@ public:
     this->observe_itk_filter( filter, this->dst_layer_ );
 
     filter->SetInput( input_image->get_image() );
-    filter->SetInPlace( false );
+    filter->SetUseImageSpacingOff();
+    filter->SetVariance( this->blurring_distance_ );
 
-    filter->SetNumberOfIterations( this->iterations_ );
-    
-    double range = this->src_layer_->get_volume()->get_max() - 
-      this->src_layer_->get_volume()->get_min();
-    filter->SetConductanceParameter( this->sensitivity_ * range );
-
-    try { filter->Update(); } catch ( ... ) {}
+    try { filter->Update(); } 
+    catch ( ... ) 
+    {
+      StatusBar::SetMessage( Core::LogMessageType::ERROR_E,  "DiscreteGaussianFilter failed" );
+    }
 
     if ( this->check_abort() ) return;
     
@@ -146,25 +138,23 @@ public:
   // The name of the filter, this information is used for generating new layer labels.
   virtual std::string get_filter_name() const
   {
-    return "AnisoDiff";
+    return "Gaussian";
   }
 };
 
 
-bool ActionCurvatureAnisotropicDiffusionFilter::run( Core::ActionContextHandle& context, 
+bool ActionDiscreteGaussianFilter::run( Core::ActionContextHandle& context, 
   Core::ActionResultHandle& result )
 {
   // Create algorithm
-  boost::shared_ptr<CurvatureAnisotropicDiffusionFilterAlgo> algo(
-    new CurvatureAnisotropicDiffusionFilterAlgo );
+  boost::shared_ptr<DiscreteGaussianFilterAlgo> algo( new DiscreteGaussianFilterAlgo );
 
   // Copy the parameters over to the algorithm that runs the filter
-  algo->iterations_ = this->iterations_.value();
-  algo->sensitivity_ = this->sensitivity_.value();
   algo->preserve_data_format_ = this->preserve_data_format_.value();
+  algo->blurring_distance_ = this->blurring_distance_.value();
 
   // Find the handle to the layer
-  algo->find_layer( this->layer_id_.value(), algo->src_layer_ );
+  algo->find_layer( this->target_layer_.value(), algo->src_layer_ );
 
   if ( this->replace_.value() )
   {
@@ -186,26 +176,23 @@ bool ActionCurvatureAnisotropicDiffusionFilter::run( Core::ActionContextHandle& 
   result = Core::ActionResultHandle( new Core::ActionResult( algo->dst_layer_->get_layer_id() ) );
 
   // Start the filter.
-  CurvatureAnisotropicDiffusionFilterAlgo::Start( algo );
+  DiscreteGaussianFilterAlgo::Start( algo );
 
   return true;
 }
 
 
-void ActionCurvatureAnisotropicDiffusionFilter::Dispatch( Core::ActionContextHandle context, 
-  std::string layer_id, int iterations, double sensitivity, 
-  bool preserve_data_format, bool replace )
+void ActionDiscreteGaussianFilter::Dispatch( Core::ActionContextHandle context, 
+  std::string target_layer, bool replace, bool preserve_data_format, double blurring_distance )
 { 
   // Create a new action
-  ActionCurvatureAnisotropicDiffusionFilter* action = 
-    new ActionCurvatureAnisotropicDiffusionFilter;
+  ActionDiscreteGaussianFilter* action = new ActionDiscreteGaussianFilter;
 
   // Setup the parameters
-  action->layer_id_.value() = layer_id;
-  action->iterations_.value() = iterations;
-  action->sensitivity_.value() = sensitivity;
-  action->preserve_data_format_.value() = preserve_data_format;
+  action->target_layer_.value() = target_layer;
   action->replace_.value() = replace;
+  action->preserve_data_format_.value() = preserve_data_format;
+  action->blurring_distance_.value() = blurring_distance;
 
   // Dispatch action to underlying engine
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );

@@ -26,21 +26,20 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-//Qt Gui Includes
-#include <Interface/ToolInterface/CurvatureAnisotropicDiffusionFilterInterface.h>
+// QtGui includes
 #include "ui_CurvatureAnisotropicDiffusionFilterInterface.h"
 
-// Core includes
-#include <Core/Utils/Log.h>
-
 // Application includes
-#include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/CurvatureAnisotropicDiffusionFilter.h>
 
-//QtUtils Includes
+//QtUtils includes
 #include <QtUtils/Bridge/QtBridge.h>
 
-SCI_REGISTER_TOOLINTERFACE( Seg3D, CurvatureAnisotropicDiffusionFilterInterface )
+// Interaface includes
+#include <Interface/ToolInterface/CurvatureAnisotropicDiffusionFilterInterface.h>
+
+
+SCI_REGISTER_TOOLINTERFACE( Seg3D, CurvatureAnisotropicDiffusionFilterInterface );
 
 namespace Seg3D
 {
@@ -49,18 +48,15 @@ class CurvatureAnisotropicDiffusionFilterInterfacePrivate
 {
 public:
   Ui::CurvatureAnisotropicDiffusionFilterInterface ui_;
-  QtUtils::QtSliderIntCombo *iterations_;
-  QtUtils::QtSliderDoubleCombo *integration_step_;
-  QtUtils::QtSliderDoubleCombo *conductance_;
+  QtUtils::QtLogSliderIntCombo *iterations_;
+  QtUtils::QtSliderDoubleCombo *sensitivity_;
 };
 
-// constructor
 CurvatureAnisotropicDiffusionFilterInterface::CurvatureAnisotropicDiffusionFilterInterface() :
   private_( new CurvatureAnisotropicDiffusionFilterInterfacePrivate )
 {
 }
 
-// destructor
 CurvatureAnisotropicDiffusionFilterInterface::~CurvatureAnisotropicDiffusionFilterInterface()
 {
 }
@@ -71,33 +67,28 @@ bool CurvatureAnisotropicDiffusionFilterInterface::build_widget( QFrame* frame )
   // Step 1 - build the custom Qt GUI Widget
   this->private_->ui_.setupUi( frame );
     
-  this->private_->iterations_ = new QtUtils::QtSliderIntCombo();
+  this->private_->iterations_ = new QtUtils::QtLogSliderIntCombo();
   this->private_->ui_.iterationsHLayout_bottom->addWidget( this->private_->iterations_ );
 
-  this->private_->integration_step_ = new QtUtils::QtSliderDoubleCombo();
-  this->private_->ui_.integrationHLayout_bottom->addWidget( this->private_->integration_step_ );
-
-  this->private_->conductance_ = new QtUtils::QtSliderDoubleCombo();
-  this->private_->ui_.conductanceHLayout_bottom->addWidget( this->private_->conductance_ );
+  this->private_->sensitivity_ = new QtUtils::QtSliderDoubleCombo();
+  this->private_->ui_.sensitivityHLayout_bottom->addWidget( this->private_->sensitivity_ );
 
   // Step 2 - get a pointer to the tool
-  ToolHandle base_tool_ = tool();
   CurvatureAnisotropicDiffusionFilter* tool =
-      dynamic_cast< CurvatureAnisotropicDiffusionFilter* > ( base_tool_.get() );
+      dynamic_cast< CurvatureAnisotropicDiffusionFilter* > ( this->tool().get() );
   
     // Step 3 - connect the gui to the tool through the QtBridge
   QtUtils::QtBridge::Connect( this->private_->ui_.target_layer_, 
     tool->target_layer_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.use_active_layer_, 
     tool->use_active_layer_state_ );
-  QtUtils::QtBridge::Connect( this->private_->iterations_, 
-    tool->iterations_state_ );
-  QtUtils::QtBridge::Connect( this->private_->integration_step_, 
-    tool->integration_step_state_ );
-  QtUtils::QtBridge::Connect( this->private_->conductance_, 
-    tool->conductance_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.preserve_data_format_,
     tool->preserve_data_format_ );
+
+  QtUtils::QtBridge::Connect( this->private_->iterations_, 
+    tool->iterations_state_ );
+  QtUtils::QtBridge::Connect( this->private_->sensitivity_, 
+    tool->sensitivity_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.replaceCheckBox, 
     tool->replace_state_ );
   QtUtils::QtBridge::Enable( this->private_->ui_.runFilterButton,

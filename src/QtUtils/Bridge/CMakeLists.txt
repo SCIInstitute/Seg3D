@@ -37,6 +37,7 @@ SET(QTUTILS_BRIDGE_SRCS
   detail/QtSpinBoxConnector.cc
   detail/QtLineEditConnector.cc
   detail/QtSliderIntComboConnector.cc
+  detail/QtLogSliderIntComboConnector.cc
   detail/QtSliderDoubleComboConnector.cc
   detail/QtAbstractButtonConnector.cc
   detail/QtAbstractButtonVectorConnector.cc
@@ -54,6 +55,7 @@ SET(QTUTILS_BRIDGE_MOC_SRCS
   detail/QtSpinBoxConnector.h
   detail/QtLineEditConnector.h
   detail/QtSliderIntComboConnector.h
+  detail/QtLogSliderIntComboConnector.h
   detail/QtSliderDoubleComboConnector.h
   detail/QtAbstractButtonConnector.h
   detail/QtAbstractButtonVectorConnector.h
