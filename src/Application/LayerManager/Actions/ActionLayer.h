@@ -52,6 +52,14 @@ protected:
     Core::ActionParameter< std::string >& layer_id, 
     Core::ActionCachedHandle< LayerHandle >& layer );
 
+  // CACHE_MASK_LAYER_HANDLE:
+  // This function caches a mask layer inside the cachedhandle, if it is not already cached.
+  // NOTE: if layer already contains a handle, the function returns immediately and returns
+  // true, if not it will find the layer in the layer manager.
+  bool cache_mask_layer_handle( Core::ActionContextHandle& context,
+    Core::ActionParameter< std::string >& mask_layer_id, 
+    Core::ActionCachedHandle< MaskLayerHandle >& mask_layer );
+
   // CACHE_GROUPLAYER_HANDLE:
   // The same as for Layers but now for the group handles
   bool cache_group_handle( Core::ActionContextHandle& context,

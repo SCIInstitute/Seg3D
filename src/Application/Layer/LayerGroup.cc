@@ -82,7 +82,7 @@ LayerGroup::LayerGroup( Core::GridTransform grid_transform ) :
   add_state( "show_layers", this->show_layers_state_, true );
   add_state( "visibility", this->visibility_state_, true );
   
-  
+  add_state( "isosurface_quality", this->isosurface_quality_state_, "1.0", "1.0|0.5|0.25|0.125" );
 }
 
 LayerGroup::~LayerGroup()

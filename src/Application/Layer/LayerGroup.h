@@ -107,6 +107,9 @@ public:
   Core::StateRangedDoubleHandle resample_factor_state_;
   Core::StateBoolHandle resample_replace_state_;
 
+  // = Isosurface state variables =
+  Core::StateOptionHandle isosurface_quality_state_;
+
   // = Group visibility =
   Core::StateBoolHandle visibility_state_;
   Core::StateBoolHandle show_layers_state_;
@@ -196,7 +199,6 @@ public:
   const static std::string TRANSFORM_MENU_C;
   const static std::string ISO_MENU_C;
   const static std::string DELETE_MENU_C;
-
 };
 
 } // end namespace Seg3D

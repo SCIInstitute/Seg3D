@@ -47,6 +47,7 @@ SET(QTUTILS_BRIDGE_SRCS
   detail/QtColorButtonConnector.cc
   detail/QtColorBarWidgetConnector.cc
   detail/QtEnableConnector.cc
+  detail/QtButtonGroupConnector.cc
 )
 
 SET(QTUTILS_BRIDGE_MOC_SRCS
@@ -65,6 +66,7 @@ SET(QTUTILS_BRIDGE_MOC_SRCS
   detail/QtColorButtonConnector.h
   detail/QtColorBarWidgetConnector.h
   detail/QtEnableConnector.h
+  detail/QtButtonGroupConnector.h
 )
 
 SET(QTUTILS_BRIDGE_NO_MOC_SRCS

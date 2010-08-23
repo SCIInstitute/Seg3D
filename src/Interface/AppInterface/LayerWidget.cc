@@ -49,9 +49,11 @@
 //Application Includes
 #include <Application/ViewerManager/ViewerManager.h>
 #include <Application/Layer/DataLayer.h>
+#include <Application/Layer/LayerGroup.h>
 #include <Application/Layer/MaskLayer.h>
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/LayerManager/Actions/ActionActivateLayer.h>
+#include <Application/LayerManager/Actions/ActionComputeIsosurface.h>
 #include <Application/LayerManager/Actions/ActionMoveLayerAbove.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
 
@@ -278,8 +280,10 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
           {
             QtUtils::QtBridge::Connect( this->private_->ui_.show_iso_surface_button_, 
               mask_layer->show_isosurface_state_ );
-            QtUtils::QtBridge::Connect( this->private_->ui_.compute_iso_surface_button_,
-              boost::bind( &MaskLayer::compute_isosurface, mask_layer ) );
+            
+            connect( this->private_->ui_.compute_iso_surface_button_, 
+              SIGNAL( clicked() ), this, SLOT( compute_isosurface() ) );
+
             QtUtils::QtBridge::Connect( this->private_->ui_.delete_iso_surface_button_,
               boost::bind( &MaskLayer::delete_isosurface, mask_layer ) );
             QtUtils::QtBridge::Connect( this->private_->ui_.border_selection_combo_, 
@@ -371,6 +375,24 @@ void LayerWidget::uncheck_show_iso_button()
   {
     this->private_->ui_.show_iso_surface_button_->setChecked( false );
   }
+}
+
+void LayerWidget::compute_isosurface()
+{
+  // Get isosurface quality factor from LayerGroup that this layer belongs to
+  LayerGroupHandle layer_group = this->private_->layer_->get_layer_group();
+
+  double quality = 1.0;
+
+  {
+    Core::StateEngine::lock_type state_engine_lock( Core::StateEngine::GetMutex() );  
+    Core::ImportFromString( layer_group->isosurface_quality_state_->get(), quality ); 
+  }
+
+  // Dispatch action to compute isosurface
+  MaskLayerHandle mask_layer = boost::dynamic_pointer_cast< MaskLayer >( this->private_->layer_ );
+  ActionComputeIsosurface::Dispatch( Core::Interface::GetWidgetActionContext(), mask_layer, 
+    quality );
 }
 
 void LayerWidget::set_active_menu( std::string& menu_state, bool override, bool /*initialize*/ )
@@ -1078,6 +1100,5 @@ void LayerWidget::UpdateProgress( qpointer_type qpointer, double progress )
     qpointer->update();
   }
 }
-
 
 } //end namespace Seg3D

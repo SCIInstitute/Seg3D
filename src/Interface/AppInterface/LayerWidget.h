@@ -227,6 +227,10 @@ private Q_SLOTS:
   // and the iso surface is deleted
   void uncheck_show_iso_button();
 
+  // COMPUTE_ISOSURFACE
+  // this function computes the isosurface using the quality stored in the state variable
+  void compute_isosurface();
+
   // TRIGGER_ABORT:
   // Trigger the abort signal of the layer
   void trigger_abort();

@@ -92,7 +92,10 @@ public:
   // Get the iso-surface associated with this layer
   Core::IsosurfaceHandle get_isosurface();
 
-  void compute_isosurface();
+  // COMPUTE_ISOSURFACE
+  // Compute the isosurface for this layer using the given quality factor.
+  // Quality factor must be one of: 1.0, 0.5, 0.25, 0.125
+  void compute_isosurface( double quality_factor );
 
   void delete_isosurface();
 

@@ -51,6 +51,24 @@ bool ActionLayer::cache_layer_handle( Core::ActionContextHandle& context,
   return true;
 }
 
+bool ActionLayer::cache_mask_layer_handle( Core::ActionContextHandle& context,
+  Core::ActionParameter< std::string >& mask_layer_id, 
+  Core::ActionCachedHandle< MaskLayerHandle >& mask_layer )
+{
+  if ( ! mask_layer.handle() )
+  {
+    mask_layer.handle() = LayerManager::Instance()->get_mask_layer_by_id( mask_layer_id.value() );
+
+    if ( ! mask_layer.handle() )
+    {
+      context->report_error( std::string( "LayerID: '" ) + mask_layer_id.value() + "' is invalid" );
+      return false;
+    }
+  }
+
+  return true;
+}
+
 bool ActionLayer::cache_group_handle( Core::ActionContextHandle& context,
   Core::ActionParameter< std::string >& group_id, 
   Core::ActionCachedHandle< LayerGroupHandle >& group )

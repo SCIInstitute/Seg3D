@@ -71,7 +71,9 @@ public:
     
   // Connect vector of bools to one button controlled by an index
   static bool Connect(  QAbstractButton* qbutton, 
-    std::vector<Core::StateBoolHandle>& state_handles, Core::StateIntHandle& index_handle );    
+    std::vector<Core::StateBoolHandle>& state_handles, Core::StateIntHandle& index_handle );
+
+  static bool Connect( QButtonGroup* qbuttongroup, Core::StateOptionHandle& state_handle );
     
   // Connect a SliderIntCombo to a StateRangedIntValue
   static bool Connect( QtColorBarWidget* cbwidget, Core::StateIntHandle& state_handle,

@@ -206,7 +206,8 @@ bool MaskLayer::post_load_states( const Core::StateIO& state_io )
     // finished loading the saved state
     if( this->iso_generated_state_->get() )
     {
-      this->compute_isosurface();
+      // TODO Load saved quality factor
+      this->compute_isosurface( 1.0 );
     }
   }
   
@@ -236,11 +237,11 @@ Core::IsosurfaceHandle MaskLayer::get_isosurface()
   return this->isosurface_;
 }
 
-void MaskLayer::compute_isosurface()
+void MaskLayer::compute_isosurface( double quality_factor )
 {
   if ( !Core::Application::IsApplicationThread() )
   {
-    Core::Application::PostEvent( boost::bind( &MaskLayer::compute_isosurface, this ) );
+    Core::Application::PostEvent( boost::bind( &MaskLayer::compute_isosurface, this, quality_factor ) );
     return;
   }
   
@@ -257,7 +258,7 @@ void MaskLayer::compute_isosurface()
   // Set data state to processing so that progress bar is displayed
   this->data_state_->set( Layer::PROCESSING_C );
 
-  this->isosurface_->compute();
+  this->isosurface_->compute( quality_factor );
 
   this->data_state_->set( Layer::AVAILABLE_C );
 

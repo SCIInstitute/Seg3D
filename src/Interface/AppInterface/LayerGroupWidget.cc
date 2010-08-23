@@ -79,6 +79,8 @@ public:
   OverlayWidget* overlay_;
 
   int group_height;
+
+  QButtonGroup* iso_quality_button_group_;
 };
   
 LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
@@ -180,6 +182,15 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
   this->current_height_ = static_cast<int>( this->private_->group_->get_grid_transform().get_ny() );
   this->current_depth_ = static_cast<int>( this->private_->group_->get_grid_transform().get_nz() );
 
+  // Add isosurface quality radio buttons to QButtonGroup so that QtButtonGroupConnector can be
+  // used to connect the buttons directly to a state variable.
+  this->private_->iso_quality_button_group_ = new QButtonGroup( this );
+  this->private_->iso_quality_button_group_->setExclusive( true );
+  this->private_->iso_quality_button_group_->addButton( this->private_->ui_.radioButton_1_point_0 );
+  this->private_->iso_quality_button_group_->addButton( this->private_->ui_.radioButton_point_5 );
+  this->private_->iso_quality_button_group_->addButton( this->private_->ui_.radioButton_point_25 );
+  this->private_->iso_quality_button_group_->addButton( this->private_->ui_.radioButton_point_125 );
+  
   //  connect the gui signals and slots
     connect( this->private_->scale_adjuster_, SIGNAL( valueAdjusted( double ) ), this, 
     SLOT( adjust_new_size_labels( double )) );
@@ -304,6 +315,10 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
         
         QtUtils::QtBridge::Connect( this->private_->ui_.transform_replace_checkBox_, 
       this->private_->group_->transform_replace_state_ );
+
+    // --- ISOSURFACE---
+    QtUtils::QtBridge::Connect( this->private_->iso_quality_button_group_, 
+      this->private_->group_->isosurface_quality_state_ );
 
   this->setMinimumHeight( 0 );
   this->private_->ui_.group_frame_layout_->setAlignment( Qt::AlignTop );

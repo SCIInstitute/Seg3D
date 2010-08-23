@@ -47,6 +47,7 @@
 #include <QtUtils/Bridge/detail/QtActionConnector.h>
 #include <QtUtils/Bridge/detail/QtActionVectorConnector.h>
 #include <QtUtils/Bridge/detail/QtActionGroupConnector.h>
+#include <QtUtils/Bridge/detail/QtButtonGroupConnector.h>
 #include <QtUtils/Bridge/detail/QtColorButtonConnector.h>
 #include <QtUtils/Bridge/detail/QtColorBarWidgetConnector.h>
 #include <QtUtils/Bridge/detail/QtComboBoxConnector.h>
@@ -174,6 +175,12 @@ bool QtBridge::Connect( QAction* qaction, std::vector<Core::StateBoolHandle>& st
 bool QtBridge::Connect( QActionGroup* qactiongroup, Core::StateOptionHandle& state )
 {
   new QtActionGroupConnector( qactiongroup, state );
+  return true;
+}
+
+bool QtBridge::Connect( QButtonGroup* qbuttongroup, Core::StateOptionHandle& state_handle )
+{
+  new QtButtonGroupConnector( qbuttongroup, state_handle );
   return true;
 }
 

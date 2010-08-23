@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>278</width>
-    <height>808</height>
+    <height>809</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -1361,7 +1361,7 @@ QWidget#group_tools_{
                      </font>
                     </property>
                     <property name="text">
-                     <string>ISO Quality:</string>
+                     <string>Isosurface Quality:</string>
                     </property>
                     <property name="alignment">
                      <set>Qt::AlignCenter</set>
