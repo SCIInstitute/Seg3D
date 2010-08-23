@@ -54,6 +54,7 @@
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/LayerManager/Actions/ActionActivateLayer.h>
 #include <Application/LayerManager/Actions/ActionComputeIsosurface.h>
+#include <Application/LayerManager/Actions/ActionDeleteIsosurface.h>
 #include <Application/LayerManager/Actions/ActionMoveLayerAbove.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
 
@@ -278,14 +279,14 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
           MaskLayer* mask_layer = dynamic_cast< MaskLayer* >( layer.get() );  
           if ( mask_layer )
           {
+            // Connect isosurface buttons
             QtUtils::QtBridge::Connect( this->private_->ui_.show_iso_surface_button_, 
               mask_layer->show_isosurface_state_ );
-            
             connect( this->private_->ui_.compute_iso_surface_button_, 
               SIGNAL( clicked() ), this, SLOT( compute_isosurface() ) );
+            connect( this->private_->ui_.delete_iso_surface_button_, 
+              SIGNAL( clicked() ), this, SLOT( delete_isosurface() ) );
 
-            QtUtils::QtBridge::Connect( this->private_->ui_.delete_iso_surface_button_,
-              boost::bind( &MaskLayer::delete_isosurface, mask_layer ) );
             QtUtils::QtBridge::Connect( this->private_->ui_.border_selection_combo_, 
               mask_layer->border_state_ );
             QtUtils::QtBridge::Connect( this->private_->ui_.fill_selection_combo_, 
@@ -393,6 +394,13 @@ void LayerWidget::compute_isosurface()
   MaskLayerHandle mask_layer = boost::dynamic_pointer_cast< MaskLayer >( this->private_->layer_ );
   ActionComputeIsosurface::Dispatch( Core::Interface::GetWidgetActionContext(), mask_layer, 
     quality );
+}
+
+void LayerWidget::delete_isosurface()
+{
+  // Dispatch action to delete isosurface
+  MaskLayerHandle mask_layer = boost::dynamic_pointer_cast< MaskLayer >( this->private_->layer_ );
+  ActionDeleteIsosurface::Dispatch( Core::Interface::GetWidgetActionContext(), mask_layer );
 }
 
 void LayerWidget::set_active_menu( std::string& menu_state, bool override, bool /*initialize*/ )

@@ -46,6 +46,8 @@ SET(APPLICATION_LAYERMANAGER_ACTIONS_SRCS
   Actions/ActionActivateLayer.cc
   Actions/ActionComputeIsosurface.h
   Actions/ActionComputeIsosurface.cc
+  Actions/ActionDeleteIsosurface.h
+  Actions/ActionDeleteIsosurface.cc
   Actions/ActionDeleteLayers.h
   Actions/ActionDeleteLayers.cc
   Actions/ActionImportLayer.h

@@ -231,6 +231,9 @@ private Q_SLOTS:
   // this function computes the isosurface using the quality stored in the state variable
   void compute_isosurface();
 
+  // DELETE_ISOSURFACE
+  void delete_isosurface();
+
   // TRIGGER_ABORT:
   // Trigger the abort signal of the layer
   void trigger_abort();
