@@ -47,9 +47,9 @@ DiscreteGaussianFilter::DiscreteGaussianFilter( const std::string& toolid ) :
   SingleTargetTool( Core::VolumeType::DATA_E, toolid )
 {
   // Need to set ranges and default values for all parameters
-  this->add_state( "replace", this->replace_state_, true );
-  this->add_state( "preserve_data_format", this->preserve_data_format_, true );
-  this->add_state( "blurring_distance", this->blurring_distance_state_, 2.0, 0.0, 10.0, .25 );
+  this->add_state( "replace", this->replace_state_, false );
+  this->add_state( "preserve_data_format", this->preserve_data_format_state_, true );
+  this->add_state( "blurring_distance", this->blurring_distance_state_, 2.0, 0.0, 10.0, 0.10 );
 }
 
 DiscreteGaussianFilter::~DiscreteGaussianFilter()
@@ -62,7 +62,7 @@ void DiscreteGaussianFilter::execute( Core::ActionContextHandle context )
   ActionDiscreteGaussianFilter::Dispatch( context,
     this->target_layer_state_->get(),
     this->replace_state_->get(),
-    this->preserve_data_format_->get(),
+    this->preserve_data_format_state_->get(),
     this->blurring_distance_state_->get() );
 }
 

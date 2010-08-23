@@ -28,9 +28,15 @@
 
 // Application includes
 #include <Application/Tool/ToolFactory.h>
-#include <Application/Tools/CannyEdgeDetectionFilter.h>
 #include <Application/Layer/Layer.h>
 #include <Application/LayerManager/LayerManager.h>
+
+// StateEnigne of the tool
+#include <Application/Tools/CannyEdgeDetectionFilter.h>
+
+// Action associated with tool
+#include <Application/Tools/Actions/ActionCannyEdgeDetectionFilter.h>
+
 
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL( Seg3D, CannyEdgeDetectionFilter )
@@ -39,25 +45,12 @@ namespace Seg3D
 {
 
 CannyEdgeDetectionFilter::CannyEdgeDetectionFilter( const std::string& toolid ) :
-  Tool( toolid )
+  SingleTargetTool( Core::VolumeType::DATA_E, toolid )
 {
   // Need to set ranges and default values for all parameters
-  add_state( "target", this->target_layer_state_, "<none>" );
-  add_state( "variance", this->variance_state_, 0.0, 0.0, 100.0, 1.0 );
-  add_state( "max_error", this->max_error_state_, 0.0, 0.0, 100.0, 1.0 );
-  add_state( "threshold", this->threshold_state_, 0.0, 0.0, 100.0, 1.0 );
-  add_state( "replace", this->replace_state_, false );
+  this->add_state( "blurring_distance", this->blurring_distance_state_, 1.0, 0.0, 10.0, 0.10 );
+  this->add_state( "threshold", this->threshold_state_, 0.0, 0.0, 100.0, 1.0 );
   
-  this->handle_layers_changed();
-
-  // Add constaints, so that when the state changes the right ranges of
-  // parameters are selected
-  this->add_connection ( this->target_layer_state_->value_changed_signal_.connect( boost::bind(
-      &CannyEdgeDetectionFilter::target_constraint, this, _1 ) ) );
-  
-  this->add_connection ( LayerManager::Instance()->layers_changed_signal_.connect(
-    boost::bind( &CannyEdgeDetectionFilter::handle_layers_changed, this ) ) );
-
 }
 
 CannyEdgeDetectionFilter::~CannyEdgeDetectionFilter()
@@ -65,46 +58,12 @@ CannyEdgeDetectionFilter::~CannyEdgeDetectionFilter()
   disconnect_all();
 }
   
-void CannyEdgeDetectionFilter::handle_layers_changed()
+void CannyEdgeDetectionFilter::execute( Core::ActionContextHandle context )
 {
-  std::vector< LayerHandle > target_layers;
-  LayerManager::Instance()->get_layers( target_layers );
-  bool target_found = false;
-  
-  for( int i = 0; i < static_cast< int >( target_layers.size() ); ++i )
-  {
-    if( ( this->target_layer_state_->get() == "<none>" ) && ( target_layers[i]->type() == 
-                                 Core::VolumeType::DATA_E ) )
-    {
-      this->target_layer_state_->set( target_layers[i]->get_layer_name(), Core::ActionSource::NONE_E );
-      target_found = true;
-      break;
-    }
-    
-    if( target_layers[i]->get_layer_name() == this->target_layer_state_->get() ) {
-      target_found = true;
-      break;
-    }
-  }
-  
-  if( !target_found )
-    this->target_layer_state_->set( "", Core::ActionSource::NONE_E );
-  
-}
-  
-void CannyEdgeDetectionFilter::target_constraint( std::string layerid )
-{
-}
-
-
-void CannyEdgeDetectionFilter::activate()
-{
-}
-
-void CannyEdgeDetectionFilter::deactivate()
-{
+  ActionCannyEdgeDetectionFilter::Dispatch( context,
+    this->target_layer_state_->get(),
+    this->blurring_distance_state_->get(),
+    this->threshold_state_->get() );  
 }
 
 } // end namespace Seg3D
-
-

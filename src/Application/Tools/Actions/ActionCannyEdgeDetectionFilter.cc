@@ -27,24 +27,24 @@
  */
 
 // ITK includes
-#include <itkDiscreteGaussianImageFilter.h>
+#include <itkCannyEdgeDetectionImageFilter.h>
 
 // Application includes
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/StatusBar/StatusBar.h>
 #include <Application/Tool/ITKFilter.h>
-#include <Application/Tools/Actions/ActionDiscreteGaussianFilter.h>
+#include <Application/Tools/Actions/ActionCannyEdgeDetectionFilter.h>
 
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
 // NOTE: Registration needs to be done outside of any namespace
-CORE_REGISTER_ACTION( Seg3D, DiscreteGaussianFilter )
+CORE_REGISTER_ACTION( Seg3D, CannyEdgeDetectionFilter )
 
 namespace Seg3D
 {
 
-bool ActionDiscreteGaussianFilter::validate( Core::ActionContextHandle& context )
+bool ActionCannyEdgeDetectionFilter::validate( Core::ActionContextHandle& context )
 {
   // Check for layer existance and type information
   std::string error;
@@ -57,8 +57,8 @@ bool ActionDiscreteGaussianFilter::validate( Core::ActionContextHandle& context 
   
   // Check for layer availability 
   Core::NotifierHandle notifier;
-  if ( ! LayerManager::CheckLayerAvailability( this->target_layer_.value(), 
-    this->replace_.value(), notifier ) )
+  if ( ! LayerManager::CheckLayerAvailabilityForProcessing( this->target_layer_.value(), 
+    notifier ) )
   {
     context->report_need_resource( notifier );
     return false;
@@ -80,44 +80,44 @@ bool ActionDiscreteGaussianFilter::validate( Core::ActionContextHandle& context 
 // NOTE: The separation of the algorithm into a private class is for the purpose of running the
 // filter on a separate thread.
 
-class DiscreteGaussianFilterAlgo : public ITKFilter
+class CannyEdgeDetectionFilterAlgo : public ITKFilter
 {
 
 public:
   LayerHandle src_layer_;
   LayerHandle dst_layer_;
 
-  bool preserve_data_format_;
   double blurring_distance_;
-
+  double threshold_;
+  
 public:
   // RUN:
   // Implemtation of run of the Runnable base class, this function is called when the thread
   // is launched.
-
+  
   // NOTE: The macro needs a data type to select which version to run. This needs to be
   // a member variable of the algorithm class.
-  SCI_BEGIN_TYPED_RUN( this->src_layer_->get_data_type() )
+  SCI_BEGIN_FLOAT_RUN( this->src_layer_->get_data_type() )
   {
     // Define the type of filter that we use.
-    typedef itk::DiscreteGaussianImageFilter< 
-      TYPED_IMAGE_TYPE, FLOAT_IMAGE_TYPE > filter_type;
+    typedef itk::CannyEdgeDetectionImageFilter< 
+      FLOAT_IMAGE_TYPE, FLOAT_IMAGE_TYPE > filter_type;
 
     // Retrieve the image as an itk image from the underlying data structure
     // NOTE: This only does wrapping and does not regenerate the data.
-    typename Core::ITKImageDataT<VALUE_TYPE>::Handle input_image; 
-    this->get_itk_image_from_layer<VALUE_TYPE>( this->src_layer_, input_image );
+    Core::ITKImageDataT<float>::Handle input_image; 
+    this->get_itk_image_from_layer<float>( this->src_layer_, input_image );
         
-    // Create a new ITK filter instantiation. 
-    typename filter_type::Pointer filter = filter_type::New();
+    // Create a new ITK filter instantiation.   
+    filter_type::Pointer filter = filter_type::New();
 
     // Relay abort and progress information to the layer that is executing the filter.
     this->observe_itk_filter( filter, this->dst_layer_ );
 
     // Setup the filter parameters that we do not want to change.
     filter->SetInput( input_image->get_image() );
-    filter->SetUseImageSpacingOff();
     filter->SetVariance( this->blurring_distance_ );
+    filter->SetThreshold( static_cast<float>( this->threshold_ ) );
 
     // Run the actual ITK filter.
     // This needs to be in a try/catch statement as certain filters throw exceptions when they
@@ -129,87 +129,65 @@ public:
     catch ( ... ) 
     {
       StatusBar::SetMessage( Core::LogMessageType::ERROR_E,  
-        "DiscreteGaussianFilter failed." );
+        "CannyEdgeDetectionFilter failed." );
     }
 
     // As ITK filters generate an inconsistent abort behavior, we record our own abort flag
     // This one is set when the abort button is pressed and an abort is sent to ITK.
     if ( this->check_abort() ) return;
     
-    // If we want to preserve the data type we convert the data before inserting it back.
-    // NOTE: Conversion is done on the filter thread and insertion is done on the application
-    // thread.
-    if ( this->preserve_data_format_ )
-    {
-      this->convert_and_insert_itk_image_into_layer( this->dst_layer_, 
-        filter->GetOutput(), this->src_layer_->get_data_type() );       
-    }
-    else
-    {
-      this->insert_itk_image_into_layer( this->dst_layer_, filter->GetOutput() ); 
-    }
+    this->insert_itk_image_into_layer( this->dst_layer_, filter->GetOutput() ); 
   }
-  SCI_END_TYPED_RUN()
+  SCI_END_FLOAT_RUN()
   
   // GET_FITLER_NAME:
   // The name of the filter, this information is used for generating new layer labels.
   virtual std::string get_filter_name() const
   {
-    return "Gaussian";
+    return "CannyEdge";
   }
 };
 
 
-bool ActionDiscreteGaussianFilter::run( Core::ActionContextHandle& context, 
+bool ActionCannyEdgeDetectionFilter::run( Core::ActionContextHandle& context, 
   Core::ActionResultHandle& result )
 {
   // Create algorithm
-  boost::shared_ptr<DiscreteGaussianFilterAlgo> algo( new DiscreteGaussianFilterAlgo );
+  boost::shared_ptr<CannyEdgeDetectionFilterAlgo> algo( new CannyEdgeDetectionFilterAlgo );
 
   // Copy the parameters over to the algorithm that runs the filter
-  algo->preserve_data_format_ = this->preserve_data_format_.value();
   algo->blurring_distance_ = this->blurring_distance_.value();
+  algo->threshold_ = this->threshold_.value();
 
   // Find the handle to the layer
   algo->find_layer( this->target_layer_.value(), algo->src_layer_ );
 
-  if ( this->replace_.value() )
-  {
-    // Copy the handles as destination and source will be the same
-    algo->dst_layer_ = algo->src_layer_;
-    // Mark the layer for processing.
-    algo->lock_for_processing( algo->dst_layer_ );  
-  }
-  else
-  {
-    // Lock the src layer, so it cannot be used else where
-    algo->lock_for_use( algo->src_layer_ );
-    
-    // Create the destination layer, which will show progress
-    algo->create_and_lock_data_layer_from_layer( algo->src_layer_, algo->dst_layer_ );
-  }
+  // Lock the src layer, so it cannot be used else where
+  algo->lock_for_use( algo->src_layer_ );
+  
+  // Create the destination layer, which will show progress
+  algo->create_and_lock_mask_layer_from_layer( algo->src_layer_, algo->dst_layer_ );
 
   // Return the id of the destination layer.
   result = Core::ActionResultHandle( new Core::ActionResult( algo->dst_layer_->get_layer_id() ) );
 
-  // Start the filter.
+  // Start the filter on a separate thread.
   Core::Runnable::Start( algo );
 
   return true;
 }
 
 
-void ActionDiscreteGaussianFilter::Dispatch( Core::ActionContextHandle context, 
-  std::string target_layer, bool replace, bool preserve_data_format, double blurring_distance )
+void ActionCannyEdgeDetectionFilter::Dispatch( Core::ActionContextHandle context, 
+  std::string target_layer, double blurring_distance, double threshold )
 { 
   // Create a new action
-  ActionDiscreteGaussianFilter* action = new ActionDiscreteGaussianFilter;
+  ActionCannyEdgeDetectionFilter* action = new ActionCannyEdgeDetectionFilter;
 
   // Setup the parameters
   action->target_layer_.value() = target_layer;
-  action->replace_.value() = replace;
-  action->preserve_data_format_.value() = preserve_data_format;
   action->blurring_distance_.value() = blurring_distance;
+  action->threshold_.value() = threshold;
 
   // Dispatch action to underlying engine
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );

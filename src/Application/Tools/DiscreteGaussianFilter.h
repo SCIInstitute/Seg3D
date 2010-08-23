@@ -59,7 +59,7 @@ public:
   Core::StateBoolHandle replace_state_;
   
   // Whether the data format needs to be preserved in the filter
-  Core::StateBoolHandle preserve_data_format_;
+  Core::StateBoolHandle preserve_data_format_state_;
 
   // Blurring distance
   Core::StateRangedDoubleHandle blurring_distance_state_;

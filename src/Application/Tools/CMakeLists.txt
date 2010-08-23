@@ -53,39 +53,38 @@ SET(APPLICATION_TOOLS_SRCS
   ThresholdTool.cc
   MedianFilter.h
   MedianFilter.cc
-  DiscreteGaussianFilter.h
-  DiscreteGaussianFilter.cc
   ArithmeticFilter.h
   ArithmeticFilter.cc
-  ConfidenceConnectedFilter.h
-  ConfidenceConnectedFilter.cc
-  FillHolesFilter.h
-  FillHolesFilter.cc
-  HistogramEqualizationFilter.h
-  HistogramEqualizationFilter.cc
-  ConnectedComponentFilter.h
-  ConnectedComponentFilter.cc
   BinaryDilateErodeFilter.h
   BinaryDilateErodeFilter.cc
-  NeighborhoodConnectedFilter.h
-  NeighborhoodConnectedFilter.cc
-  IntensityCorrectionFilter.h
-  IntensityCorrectionFilter.cc
   BooleanFilter.h
   BooleanFilter.cc
-  MaskDataFilter.h
-  MaskDataFilter.cc
-  GradientMagnitudeFilter.h
-  GradientMagnitudeFilter.cc
   CannyEdgeDetectionFilter.h
   CannyEdgeDetectionFilter.cc
+  ConfidenceConnectedFilter.h
+  ConfidenceConnectedFilter.cc
+  ConnectedComponentFilter.h
+  ConnectedComponentFilter.cc
+  CurvatureAnisotropicDiffusionFilter.h
+  CurvatureAnisotropicDiffusionFilter.cc
+  DiscreteGaussianFilter.h
+  DiscreteGaussianFilter.cc  
+  FillHolesFilter.h
+  FillHolesFilter.cc
+  GradientMagnitudeFilter.h
+  GradientMagnitudeFilter.cc
+  HistogramEqualizationFilter.h
+  HistogramEqualizationFilter.cc
+  IntensityCorrectionFilter.h
+  IntensityCorrectionFilter.cc
+  MaskDataFilter.h
+  MaskDataFilter.cc
+  NeighborhoodConnectedFilter.h
+  NeighborhoodConnectedFilter.cc
   OtsuThresholdFilter.h
   OtsuThresholdFilter.cc
   ThresholdSegmentationLSFilter.h
-  ThresholdSegmentationLSFilter.cc
-  
-  CurvatureAnisotropicDiffusionFilter.h
-  CurvatureAnisotropicDiffusionFilter.cc
+  ThresholdSegmentationLSFilter.cc  
   )
 
 SET(APPLICATION_TOOLS_NOREGISTER_SRCS
@@ -98,10 +97,16 @@ SET(APPLICATION_TOOLS_NOREGISTER_SRCS
 SET(APPLICATION_TOOLS_ACTIONS_SRCS
   Actions/ActionPaint.h
   Actions/ActionPaint.cc
+  Actions/ActionCannyEdgeDetectionFilter.h
+  Actions/ActionCannyEdgeDetectionFilter.cc
   Actions/ActionCurvatureAnisotropicDiffusionFilter.h
   Actions/ActionCurvatureAnisotropicDiffusionFilter.cc
   Actions/ActionDiscreteGaussianFilter.h
   Actions/ActionDiscreteGaussianFilter.cc
+  Actions/ActionGradientMagnitudeFilter.h
+  Actions/ActionGradientMagnitudeFilter.cc
+  Actions/ActionMedianFilter.h
+  Actions/ActionMedianFilter.cc
   )
 
 CORE_ADD_LIBRARY(Application_Tools 

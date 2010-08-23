@@ -31,6 +31,7 @@
 
 // Application includes
 #include <Application/LayerManager/LayerManager.h>
+#include <Application/StatusBar/StatusBar.h>
 #include <Application/Tool/ITKFilter.h>
 #include <Application/Tools/Actions/ActionCurvatureAnisotropicDiffusionFilter.h>
 
@@ -100,36 +101,59 @@ public:
 public:
   // RUN:
   // Implemtation of run of the Runnable base class, this function is called when the thread
-  // is run.
-  // NOTE: This macro duplicates the code for each data type that is supported by Seg3D
-  // The typedefs TYPED_IMAGE_TYPE, UCHAR_IMAGE_TYPE, FLOAT_IMAGE_TYPE, and VALUE_TYPE 
-  // are defined by the macro.
+  // is launched.
+
   // NOTE: The macro needs a data type to select which version to run. This needs to be
-  // a member variable.
+  // a member variable of the algorithm class.
   SCI_BEGIN_TYPED_RUN( this->src_layer_->get_data_type() )
   {
+    // Define the type of filter that we use.
     typedef itk::CurvatureAnisotropicDiffusionImageFilter< 
       TYPED_IMAGE_TYPE, FLOAT_IMAGE_TYPE > filter_type;
 
+    // Retrieve the image as an itk image from the underlying data structure
+    // NOTE: This only does wrapping and does not regenerate the data.
     typename Core::ITKImageDataT<VALUE_TYPE>::Handle input_image; 
     this->get_itk_image_from_layer<VALUE_TYPE>( this->src_layer_, input_image );
         
+    // Create a new ITK filter instantiation. 
     typename filter_type::Pointer filter = filter_type::New();
+    
+    // Relay abort and progress information to the layer that is executing the filter.
     this->observe_itk_filter( filter, this->dst_layer_ );
 
+    // Setup the filter parameters that we do not want to change.
     filter->SetInput( input_image->get_image() );
     filter->SetInPlace( false );
-
     filter->SetNumberOfIterations( this->iterations_ );
     
+    // We changed the behavior of this parameter to be more intuitive. It is now relative to
+    // the dynamic range of the data. So a similar setting will behave similarly on a
+    // different data set.
     double range = this->src_layer_->get_volume()->get_max() - 
       this->src_layer_->get_volume()->get_min();
     filter->SetConductanceParameter( this->sensitivity_ * range );
 
-    try { filter->Update(); } catch ( ... ) {}
+    // Run the actual ITK filter.
+    // This needs to be in a try/catch statement as certain filters throw exceptions when they
+    // are aborted. In that case we will relay a message to the status bar for information.
+    try 
+    { 
+      filter->Update(); 
+    } 
+    catch ( ... ) 
+    {
+      StatusBar::SetMessage( Core::LogMessageType::ERROR_E,  
+        "CurvatureAnisotropicDiffusionFilter failed." );
+    }
 
+    // As ITK filters generate an inconsistent abort behavior, we record our own abort flag
+    // This one is set when the abort button is pressed and an abort is sent to ITK.
     if ( this->check_abort() ) return;
     
+    // If we want to preserve the data type we convert the data before inserting it back.
+    // NOTE: Conversion is done on the filter thread and insertion is done on the application
+    // thread.
     if ( this->preserve_data_format_ )
     {
       this->convert_and_insert_itk_image_into_layer( this->dst_layer_, 
@@ -186,7 +210,7 @@ bool ActionCurvatureAnisotropicDiffusionFilter::run( Core::ActionContextHandle& 
   result = Core::ActionResultHandle( new Core::ActionResult( algo->dst_layer_->get_layer_id() ) );
 
   // Start the filter.
-  CurvatureAnisotropicDiffusionFilterAlgo::Start( algo );
+  Core::Runnable::Start( algo );
 
   return true;
 }

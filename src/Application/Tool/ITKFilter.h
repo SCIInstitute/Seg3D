@@ -296,6 +296,16 @@ public:\
 #define SCI_END_TYPED_RUN() \
   }
 
+
+#define SCI_BEGIN_FLOAT_RUN( DATATYPE ) \
+public:\
+  virtual void run()\
+  {\
+    typedef itk::Image< float, 3> FLOAT_IMAGE_TYPE; \
+    typedef itk::Image< unsigned char, 3> UCHAR_IMAGE_TYPE; \
+
+#define SCI_END_FLOAT_RUN() \
+  }
   
 } // end namespace Seg3D
 

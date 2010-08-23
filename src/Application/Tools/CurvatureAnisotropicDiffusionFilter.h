@@ -29,6 +29,7 @@
 #ifndef APPLICATION_TOOLS_ANISOTROPICDIFFUSIONFILTER_H
 #define APPLICATION_TOOLS_ANISOTROPICDIFFUSIONFILTER_H
 
+// Application includes
 #include <Application/Tool/SingleTargetTool.h>
 
 namespace Seg3D
@@ -55,7 +56,7 @@ public:
   Core::StateBoolHandle replace_state_;
 
   // Whether the data format needs to be preserved in the filter
-  Core::StateBoolHandle preserve_data_format_;
+  Core::StateBoolHandle preserve_data_format_state_;
   
   // Number of iterations the filter needs to run
   Core::StateRangedIntHandle iterations_state_;

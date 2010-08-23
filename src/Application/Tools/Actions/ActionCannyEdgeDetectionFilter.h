@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_TOOL_ACTIONS_ACTIONGRADIENTMAGNITUDEFILTER_H
-#define APPLICATION_TOOL_ACTIONS_ACTIONGRADIENTMAGNITUDEFILTER_H
+#ifndef APPLICATION_TOOLS_ACTIONS_ACTIONCANNYEDGEDETECTIONFILTER_H
+#define APPLICATION_TOOLS_ACTIONS_ACTIONCANNYEDGEDETECTIONFILTER_H
 
 #include <Core/Action/Actions.h>
 #include <Core/Interface/Interface.h>
@@ -35,32 +35,31 @@
 
 namespace Seg3D
 {
-  
-class ActionGradientMagnitudeFilter : public Core::Action
+
+class ActionCannyEdgeDetectionFilter : public Core::Action
 {
 
-CORE_ACTION_XML( 
-  CORE_ACTION_TYPE( "GradientMagnitudeFilter", "Extract the magnitude of the local gradient"
-    " from a data layer." )
+CORE_ACTION( 
+  CORE_ACTION_TYPE( "CannyEdgeDetectionFilter", "ITK filter that detects where edges are in a data layer." )
   CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
-  CORE_ACTION_KEY( "replace", "true", "Replace the old layer (true), or add an new layer (false)" )
-  CORE_ACTION_KEY( "preserve_data_format", "true", "ITK filters run in floating point percision,"
-    " this option will convert the result back into the original format." )
+  CORE_ACTION_KEY( "blurring_distance", "2.0", "The distance over which the filter blurs"
+    " before computing the gradient." )
+  CORE_ACTION_KEY( "threshold", "1.0", "Below this threshold the values are replaced with zero." )
 )
   
   // -- Constructor/Destructor --
 public:
-  ActionGradientMagnitudeFilter()
+  ActionCannyEdgeDetectionFilter()
   {
     // Action arguments
     this->add_argument( this->target_layer_ );
     
     // Action options
-    this->add_key( this->replace_ );
-    this->add_key( this->preserve_data_format_ );
+    this->add_key( this->blurring_distance_ );
+    this->add_key( this->threshold_ );
   }
   
-  virtual ~ActionGradientMagnitudeFilter()
+  virtual ~ActionCannyEdgeDetectionFilter()
   {
   }
   
@@ -73,20 +72,19 @@ public:
 private:
 
   Core::ActionParameter< std::string > target_layer_;
-  Core::ActionParameter< bool > replace_;
-  Core::ActionParameter< bool > preserve_data_format_;
-    
+  
+  Core::ActionParameter< double > blurring_distance_;
+  Core::ActionParameter< double > threshold_;
+  
   // -- Dispatch this action from the interface --
 public:
 
-  // CREATE:  
-  // Create the action, but do not dispatch it
-  static Core::ActionHandle Create( std::string layer_id, bool replace );
-    
-  // DISPATCH
+  // DISPATCH:
   // Create and dispatch action that inserts the new layer 
-  static void Dispatch( Core::ActionContextHandle context, std::string layer_id, bool replace );
-  
+  static void Dispatch( Core::ActionContextHandle context, 
+    std::string target_layer, double blurring_distance,
+    double threshold );
+          
 };
   
 } // end namespace Seg3D

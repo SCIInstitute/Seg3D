@@ -31,10 +31,13 @@
 
 #include <Application/Tool/Tool.h>
 
+// Application includes
+#include <Application/Tool/SingleTargetTool.h>
+
 namespace Seg3D
 {
 
-class GradientMagnitudeFilter : public Tool
+class GradientMagnitudeFilter : public SingleTargetTool
 {
 
 SEG3D_TOOL(
@@ -43,32 +46,25 @@ SEG3D_TOOL_MENULABEL( "Gradient Magnitude" )
 SEG3D_TOOL_MENU( "filter_data_to_data" )
 SEG3D_TOOL_SHORTCUT_KEY( "Alt+G" )
 SEG3D_TOOL_URL( "http://seg3d.org/" )
+SEG3D_TOOL_VERSION( "1" )
 )
 
 public:
   GradientMagnitudeFilter( const std::string& toolid );
   virtual ~GradientMagnitudeFilter();
 
-  // -- constraint parameters --
-
-  // Constrain viewer to right painting tool when layer is selected
-  void target_constraint( std::string layerid );
-
-  // -- activate/deactivate tool --
-
-  virtual void activate();
-  virtual void deactivate();
-  
-private:
-  // -- handle updates from layermanager --
-  void handle_layers_changed();
-
   // -- state --
 public:
-  // Layerid of the target layer
-  Core::StateStringHandle target_layer_state_;
+  // Whether the layer needs to be replaced
   Core::StateBoolHandle replace_state_;
 
+  // Whether the data format needs to be preserved in the filter
+  Core::StateBoolHandle preserve_data_format_state_;
+
+  // -- execute --
+public:
+  // Execute the tool and dispatch the action
+  virtual void execute( Core::ActionContextHandle context );
 };
 
 } // end namespace

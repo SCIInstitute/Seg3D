@@ -80,7 +80,7 @@ bool DiscreteGaussianFilterInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Connect( this->private_->ui_.replaceCheckBox, 
     tool->replace_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.preserve_data_format_,
-    tool->preserve_data_format_ );
+    tool->preserve_data_format_state_ );
 
   QtUtils::QtBridge::Connect( this->private_->blurring_distance_, 
     tool->blurring_distance_state_ );

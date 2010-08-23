@@ -27,24 +27,24 @@
  */
 
 // ITK includes
-#include <itkDiscreteGaussianImageFilter.h>
+#include <itkMedianImageFilter.h>
 
 // Application includes
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/StatusBar/StatusBar.h>
 #include <Application/Tool/ITKFilter.h>
-#include <Application/Tools/Actions/ActionDiscreteGaussianFilter.h>
+#include <Application/Tools/Actions/ActionMedianFilter.h>
 
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
 // NOTE: Registration needs to be done outside of any namespace
-CORE_REGISTER_ACTION( Seg3D, DiscreteGaussianFilter )
+CORE_REGISTER_ACTION( Seg3D, MedianFilter )
 
 namespace Seg3D
 {
 
-bool ActionDiscreteGaussianFilter::validate( Core::ActionContextHandle& context )
+bool ActionMedianFilter::validate( Core::ActionContextHandle& context )
 {
   // Check for layer existance and type information
   std::string error;
@@ -65,9 +65,9 @@ bool ActionDiscreteGaussianFilter::validate( Core::ActionContextHandle& context 
   }
     
   // If the number of iterations is lower than one, we cannot run the filter
-  if( this->blurring_distance_.value() < 0.0 )
+  if( this->radius_.value() < 1 )
   {
-    context->report_error( "The blurring distance needs to be larger than zero." );
+    context->report_error( "The radius needs to be larger than or equal to one." );
     return false;
   }
   
@@ -80,7 +80,7 @@ bool ActionDiscreteGaussianFilter::validate( Core::ActionContextHandle& context 
 // NOTE: The separation of the algorithm into a private class is for the purpose of running the
 // filter on a separate thread.
 
-class DiscreteGaussianFilterAlgo : public ITKFilter
+class MedianFilterAlgo : public ITKFilter
 {
 
 public:
@@ -88,7 +88,7 @@ public:
   LayerHandle dst_layer_;
 
   bool preserve_data_format_;
-  double blurring_distance_;
+  int radius_;
 
 public:
   // RUN:
@@ -100,7 +100,7 @@ public:
   SCI_BEGIN_TYPED_RUN( this->src_layer_->get_data_type() )
   {
     // Define the type of filter that we use.
-    typedef itk::DiscreteGaussianImageFilter< 
+    typedef itk::MedianImageFilter< 
       TYPED_IMAGE_TYPE, FLOAT_IMAGE_TYPE > filter_type;
 
     // Retrieve the image as an itk image from the underlying data structure
@@ -116,8 +116,10 @@ public:
 
     // Setup the filter parameters that we do not want to change.
     filter->SetInput( input_image->get_image() );
-    filter->SetUseImageSpacingOff();
-    filter->SetVariance( this->blurring_distance_ );
+    
+    typename filter_type::InputSizeType size;
+    size.Fill( this->radius_ );
+    filter->SetRadius( size );
 
     // Run the actual ITK filter.
     // This needs to be in a try/catch statement as certain filters throw exceptions when they
@@ -129,7 +131,7 @@ public:
     catch ( ... ) 
     {
       StatusBar::SetMessage( Core::LogMessageType::ERROR_E,  
-        "DiscreteGaussianFilter failed." );
+        "MedianFilter failed." );
     }
 
     // As ITK filters generate an inconsistent abort behavior, we record our own abort flag
@@ -155,20 +157,20 @@ public:
   // The name of the filter, this information is used for generating new layer labels.
   virtual std::string get_filter_name() const
   {
-    return "Gaussian";
+    return "Median";
   }
 };
 
 
-bool ActionDiscreteGaussianFilter::run( Core::ActionContextHandle& context, 
+bool ActionMedianFilter::run( Core::ActionContextHandle& context, 
   Core::ActionResultHandle& result )
 {
   // Create algorithm
-  boost::shared_ptr<DiscreteGaussianFilterAlgo> algo( new DiscreteGaussianFilterAlgo );
+  boost::shared_ptr<MedianFilterAlgo> algo( new MedianFilterAlgo );
 
   // Copy the parameters over to the algorithm that runs the filter
   algo->preserve_data_format_ = this->preserve_data_format_.value();
-  algo->blurring_distance_ = this->blurring_distance_.value();
+  algo->radius_ = this->radius_.value();
 
   // Find the handle to the layer
   algo->find_layer( this->target_layer_.value(), algo->src_layer_ );
@@ -198,18 +200,17 @@ bool ActionDiscreteGaussianFilter::run( Core::ActionContextHandle& context,
   return true;
 }
 
-
-void ActionDiscreteGaussianFilter::Dispatch( Core::ActionContextHandle context, 
-  std::string target_layer, bool replace, bool preserve_data_format, double blurring_distance )
+void ActionMedianFilter::Dispatch( Core::ActionContextHandle context, 
+  std::string target_layer, bool replace, bool preserve_data_format, int radius )
 { 
   // Create a new action
-  ActionDiscreteGaussianFilter* action = new ActionDiscreteGaussianFilter;
+  ActionMedianFilter* action = new ActionMedianFilter;
 
   // Setup the parameters
   action->target_layer_.value() = target_layer;
   action->replace_.value() = replace;
   action->preserve_data_format_.value() = preserve_data_format;
-  action->blurring_distance_.value() = blurring_distance;
+  action->radius_.value() = radius;
 
   // Dispatch action to underlying engine
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );

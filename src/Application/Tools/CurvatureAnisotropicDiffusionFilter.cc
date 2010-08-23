@@ -49,8 +49,8 @@ CurvatureAnisotropicDiffusionFilter::CurvatureAnisotropicDiffusionFilter( const 
   SingleTargetTool( Core::VolumeType::DATA_E, toolid )
 {
   // Need to set ranges and default values for all parameters 
-  this->add_state( "replace", this->replace_state_, true );
-  this->add_state( "preserve_data_format", this->preserve_data_format_, true );
+  this->add_state( "replace", this->replace_state_, false );
+  this->add_state( "preserve_data_format", this->preserve_data_format_state_, true );
   this->add_state( "iterations", this->iterations_state_, 5, 1, 100, 1 );
   this->add_state( "sensitivity", this->sensitivity_state_, .1, .01, 1.0, .01 );
 }
@@ -66,7 +66,7 @@ void CurvatureAnisotropicDiffusionFilter::execute( Core::ActionContextHandle con
     this->target_layer_state_->get(),
     this->iterations_state_->get(),
     this->sensitivity_state_->get(),
-    this->preserve_data_format_->get(),
+    this->preserve_data_format_state_->get(),
     this->replace_state_->get() );
 }
 

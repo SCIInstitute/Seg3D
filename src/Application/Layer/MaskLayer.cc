@@ -49,9 +49,12 @@ MaskLayer::MaskLayer( const std::string& name, const Core::MaskVolumeHandle& vol
 {
   this->initialize_states();
   
-  this->bit_state_->set( static_cast< int >( volume->get_mask_data_block()->get_mask_bit() ) );
-  this->add_connection( this->mask_volume_->get_mask_data_block()->mask_updated_signal_.
-    connect( boost::bind( &MaskLayer::handle_mask_data_changed, this ) ) );
+  if (  volume->get_mask_data_block() )
+  {
+    this->bit_state_->set( static_cast< int >( volume->get_mask_data_block()->get_mask_bit() ) );
+    this->add_connection( this->mask_volume_->get_mask_data_block()->mask_updated_signal_.
+      connect( boost::bind( &MaskLayer::handle_mask_data_changed, this ) ) );
+  }
 }
 
 MaskLayer::MaskLayer( const std::string& state_id ) :
