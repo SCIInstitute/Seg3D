@@ -45,7 +45,7 @@ namespace Seg3D
 
 MaskLayer::MaskLayer( const std::string& name, const Core::MaskVolumeHandle& volume ) :
   Layer( name, !( volume->is_valid() ) ), 
-  loading_( true ),
+  loading_( false ),
   mask_volume_( volume )
 {
   this->initialize_states();
@@ -59,7 +59,8 @@ MaskLayer::MaskLayer( const std::string& name, const Core::MaskVolumeHandle& vol
 }
 
 MaskLayer::MaskLayer( const std::string& state_id ) :
-  Layer( "not_initialized", state_id )
+  Layer( "not_initialized", state_id ),
+  loading_( false )
 {
   this->initialize_states();
 }
@@ -210,6 +211,7 @@ bool MaskLayer::post_load_states( const Core::StateIO& state_io )
     // finished loading the saved state
     if( this->iso_generated_state_->get() )
     {
+      this->loading_ = true;
       // TODO Load saved quality factor
       this->compute_isosurface( 1.0 );
       this->loading_ = false;
@@ -250,23 +252,27 @@ void MaskLayer::compute_isosurface( double quality_factor )
     return;
   }
   
+  Core::IsosurfaceHandle iso = this->isosurface_;
+  if ( !iso )
   {
-    lock_type lock( Layer::GetMutex() );
-    if ( !this->isosurface_ )
-    {
-      this->isosurface_.reset( new Core::Isosurface( this->mask_volume_ ) );
-      this->add_connection( this->isosurface_->update_progress_signal_.
-        connect( boost::bind( &MaskLayer::handle_isosurface_update_progress, this, _1 ) ) );
-    }
+    iso.reset( new Core::Isosurface( this->mask_volume_ ) );
+    this->add_connection( iso->update_progress_signal_.connect(
+      boost::bind( &MaskLayer::handle_isosurface_update_progress, this, _1 ) ) );
   }
-
+  
   // Set data state to processing so that progress bar is displayed
   this->data_state_->set( Layer::PROCESSING_C );
 
-  this->isosurface_->compute( quality_factor );
+  iso->compute( quality_factor );
 
   this->data_state_->set( Layer::AVAILABLE_C );
 
+  if ( !this->isosurface_ )
+  {
+    lock_type lock( Layer::GetMutex() );
+    this->isosurface_ = iso;
+  }
+  
   if ( this->show_isosurface_state_->get() )
   {
     this->isosurface_updated_signal_();

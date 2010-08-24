@@ -1028,13 +1028,14 @@ void LayerGroupWidget::handle_change()
 
 void LayerGroupWidget::cleanup_removed_widgets()
 {
-  for( std::map< std::string, LayerWidgetQHandle>::iterator it = this->layer_map_.begin(); 
-    it != this->layer_map_.end(); ++it )
+  std::map< std::string, LayerWidgetQHandle>::iterator it = this->layer_map_.begin();
+  while ( it != this->layer_map_.end() )
   {
-    if( this->private_->ui_.group_frame_layout_->indexOf( ( *it ).second.data() ) == -1 )
+    std::map< std::string, LayerWidgetQHandle>::iterator prev = it++;
+    if( this->private_->ui_.group_frame_layout_->indexOf( ( *prev ).second.data() ) == -1 )
     {
-      ( *it ).second->deleteLater();
-      this->layer_map_.erase( it );
+      ( *prev ).second->deleteLater();
+      this->layer_map_.erase( prev );
     }
   }
 }

@@ -60,6 +60,10 @@ public:
   // The function should only be called by the renderer, which has a valid GL context.
   virtual void redraw( size_t viewer_id, const Core::Matrix& proj_mat );
 
+  // EXECUTE:
+  // Execute the tool and dispatch the action
+  virtual void execute( Core::ActionContextHandle context );
+
   // -- state --
 public:
 

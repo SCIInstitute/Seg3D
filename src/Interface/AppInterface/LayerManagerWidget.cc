@@ -129,13 +129,14 @@ void LayerManagerWidget::handle_groups_changed()
 
 void LayerManagerWidget::cleanup_removed_groups()
 {
-  for( std::map< std::string, LayerGroupWidgetQHandle>::iterator it = this->group_map_.begin(); 
-    it != this->group_map_.end(); ++it )
+  std::map< std::string, LayerGroupWidgetQHandle>::iterator it = this->group_map_.begin();
+  while ( it != this->group_map_.end() )
   {
-    if( this->group_layout_->indexOf( ( *it ).second.data() ) == -1 )
+    std::map< std::string, LayerGroupWidgetQHandle>::iterator prev = it++;
+    if( this->group_layout_->indexOf( ( *prev ).second.data() ) == -1 )
     {
-      ( *it ).second->deleteLater();
-      this->group_map_.erase( it );
+      ( *prev ).second->deleteLater();
+      this->group_map_.erase( prev );
     }
   }
 }

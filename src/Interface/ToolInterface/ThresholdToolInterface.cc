@@ -92,9 +92,12 @@ bool ThresholdToolInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Connect( this->private_->upper_threshold_, tool->upper_threshold_state_ );
   QtUtils::QtBridge::Connect( this->private_->lower_threshold_, tool->lower_threshold_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.use_active_layer_, tool->use_active_layer_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ui_.clearSeedsButton, boost::bind(
+  QtUtils::QtBridge::Connect( this->private_->ui_.clear_seeds_button_, boost::bind(
     &SeedPointsTool::clear, tool, Core::Interface::GetWidgetActionContext() ) );
-  
+  QtUtils::QtBridge::Connect( this->private_->ui_.run_button_, boost::bind(
+    &ThresholdTool::execute, tool, Core::Interface::GetWidgetActionContext() ) );
+  QtUtils::QtBridge::Enable( this->private_->ui_.run_button_, tool->valid_target_state_ );
+
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() ); 
 
@@ -108,14 +111,6 @@ bool ThresholdToolInterface::build_widget( QFrame* frame )
 
   return ( true );
 } 
-  
-void ThresholdToolInterface::enable_run_filter( bool valid )
-{
-  ///if( valid )
-    //this->private_->ui_.runFilterButton->setEnabled( true );
-  //else
-    //this->private_->ui_.runFilterButton->setEnabled( false );
-}
 
 void ThresholdToolInterface::refresh_histogram( QString layer_name )
 {
@@ -134,16 +129,6 @@ void ThresholdToolInterface::refresh_histogram( QString layer_name )
   
   this->private_->histogram_->set_histogram( data_layer->get_data_volume()->
     get_data_block()->get_histogram() );  
-}
-
-void ThresholdToolInterface::execute_filter()
-{
-  ToolHandle base_tool_ = tool();
-  ThresholdTool* tool =
-  dynamic_cast< ThresholdTool* > ( base_tool_.get() );
-  
-//  ActionThreshold::Dispatch( tool->target_layer_state_->export_to_string(), 
-//    tool->upper_threshold_state_->get(), tool->lower_threshold_state_->get() ); 
 }
 
 } // end namespace Seg3D

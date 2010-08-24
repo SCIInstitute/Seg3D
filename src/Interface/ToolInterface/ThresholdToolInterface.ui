@@ -150,7 +150,7 @@ QWidget#threshold_histogram_{
        <number>0</number>
       </property>
       <item>
-       <widget class="QPushButton" name="createThresholdLayerButton">
+       <widget class="QPushButton" name="run_button_">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -187,7 +187,7 @@ QWidget#threshold_histogram_{
        <number>0</number>
       </property>
       <item>
-       <widget class="QPushButton" name="clearSeedsButton">
+       <widget class="QPushButton" name="clear_seeds_button_">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>

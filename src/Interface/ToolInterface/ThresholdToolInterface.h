@@ -54,8 +54,6 @@ public:
   virtual bool build_widget( QFrame* frame );
   
 private Q_SLOTS:
-  void execute_filter();
-  void enable_run_filter( bool valid );
   void refresh_histogram( QString layer_name );
 
 private:

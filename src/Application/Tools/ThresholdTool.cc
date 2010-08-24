@@ -33,6 +33,7 @@
 // Application includes
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/ThresholdTool.h>
+#include <Application/Tools/Actions/ActionThreshold.h>
 #include <Application/Tools/detail/MaskShader.h>
 #include <Application/Layer/Layer.h>
 #include <Application/LayerManager/LayerManager.h>
@@ -313,5 +314,21 @@ void ThresholdTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
   SeedPointsTool::redraw( viewer_id, proj_mat );
 }
 
+void ThresholdTool::execute( Core::ActionContextHandle context )
+{
+  std::string target_layer;
+  double min_val, max_val;
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    target_layer = this->target_layer_state_->get();
+    min_val = this->lower_threshold_state_->get();
+    max_val = this->upper_threshold_state_->get();
+  }
+
+  if ( target_layer != Tool::NONE_OPTION_C )
+  {
+    ActionThreshold::Dispatch( context, target_layer, min_val, max_val );
+  }
+}
 
 } // end namespace Seg3D

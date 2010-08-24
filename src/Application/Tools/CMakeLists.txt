@@ -105,6 +105,8 @@ SET(APPLICATION_TOOLS_ACTIONS_SRCS
   Actions/ActionGradientMagnitudeFilter.cc
   Actions/ActionMedianFilter.h
   Actions/ActionMedianFilter.cc
+  Actions/ActionThreshold.h
+  Actions/ActionThreshold.cc
   )
 
 CORE_ADD_LIBRARY(Application_Tools 

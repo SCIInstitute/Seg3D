@@ -92,7 +92,7 @@ public:
   
 public:
   // RUN:
-  // Implemtation of run of the Runnable base class, this function is called when the thread
+  // Implementation of run of the Runnable base class, this function is called when the thread
   // is launched.
   
   // NOTE: The macro needs a data type to select which version to run. This needs to be
