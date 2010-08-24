@@ -62,26 +62,25 @@ public:
   void compute( double quality_factor = 1.0 );
 
   // GET_POINTS:
-  // Get vertices, each stored only once
+  // Get 3D points for vertices, each stored only once
   const std::vector< PointF >& get_points() const;
 
   // GET_NORMALS:
   // Get one normal per vertex, interpolated
   const std::vector< VectorF >& get_normals() const;
 
-  // GET_FACES:
-  // Indices into points and normals, 3 per face
-  const std::vector< unsigned int >& get_faces() const;
+  // GET_VALUES:
+  // Get values per vertex.  Returns empty vector if use has not set values.
+  const std::vector< float >& get_values() const; 
 
-  // GET_NUM_PARTS:
-  // Get the number of parts for rendering the surface in multiple pieces
-  size_t get_num_parts() const;
-  
-  // GET_PART:
-  // Define the region that a part is made from by specifying the first point index and face
-  // index as well as the max point index + 1 and the max face index + 1.
-  void get_part( size_t idx, unsigned int& min_point, unsigned int& max_point,
-    unsigned int& min_face, unsigned int& max_face ) const;
+  // SET_VALUES:
+  // Set values for all vertices.  Vector must be same size as points and normals vectors 
+  // or empty.  Returns true on success, false on failure.
+  bool set_values( const std::vector< float >& values );
+
+  // GET_FACES:
+  // Indices into vertices, 3 per face
+  const std::vector< unsigned int >& get_faces() const;
 
   // REDRAW:
   // Render the isosurface.

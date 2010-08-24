@@ -365,6 +365,7 @@ public:
   std::vector< PointF > points_; 
   std::vector< VectorF > normals_; 
   std::vector< unsigned int > faces_; // unsigned int because GL expects this
+  std::vector< float > values_; // Should be in range [0, 1]
 
   // Algorithm data & buffers
   unsigned char* data_; // Mask data is stored in bit-plane (8 masks per data block)
@@ -1244,6 +1245,12 @@ void Isosurface::compute( double quality_factor )
     parallel_faces.run();
   }
 
+  // Check for empty isosurface
+  if( this->private_->points_.size() == 0 ) 
+  {
+    return;
+  }
+
   Parallel parallel_normals( boost::bind( &IsosurfacePrivate::parallel_compute_normals, 
     this->private_, _1, _2, _3 ) );
   parallel_normals.run();
@@ -1332,30 +1339,36 @@ const std::vector< VectorF >& Isosurface::get_normals() const
   return this->private_->normals_;
 }
 
+const std::vector< float >& Isosurface::get_values() const
+{
+  return this->private_->values_;
+}
+
+bool Isosurface::set_values( const std::vector< float >& values )
+{
+  if( !( values.size() == this->private_->points_.size() || values.size() == 0 ) )
+  {
+    return false;
+  }
+  this->private_->values_ = values; 
+  return true;
+}
+
+
 const std::vector< unsigned int >& Isosurface::get_faces() const
 {
   return this->private_->faces_;
 }
 
-size_t Isosurface::get_num_parts() const
-{
-  return this->private_->part_points_.size();
-}
-
-void Isosurface::get_part( size_t idx, unsigned int& min_point, unsigned int& max_point,
-  unsigned int& min_face, unsigned int& max_face ) const
-{
-  min_point = this->private_->part_points_[ idx ].first;
-  max_point = this->private_->part_points_[ idx ].second;
-
-  min_face = this->private_->part_faces_[ idx ].first;
-  max_face = this->private_->part_faces_[ idx ].second;
-}
-
-
 void Isosurface::redraw()
 {
   lock_type lock( this->get_mutex() );
+
+  // Check for empty isosurface
+  if( this->private_->points_.size() == 0 ) 
+  {
+    return;
+  }
   
   this->private_->upload_to_vertex_buffer();
   size_t num_batches = this->private_->part_points_.size();
@@ -1416,6 +1429,5 @@ void Isosurface::redraw()
     normal_buffer->disable_arrays();
   } 
 }
-
 
 } // end namespace Core
