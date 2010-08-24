@@ -77,6 +77,8 @@ private Q_SLOTS:
   // this function is called when a user double-clicks on an item in the list. 
   void open_recent();
 
+  // CALL_OPEN_RECENT:
+  // this function is called when someone clicks the open recent button 
   void call_open_recent( QListWidgetItem* item );
   
   // ENABLE_LOAD_RECENT_BUTTON:

@@ -204,9 +204,9 @@ bool Application::get_user_desktop_directory( boost::filesystem::path& user_desk
 
 #else
 
-  if ( getenv( "DESKTOP" ) )
+  if ( getenv( "HOME" ) )
   {
-    user_desktop_dir = boost::filesystem::path( getenv( "DESKTOP" ) );
+    user_desktop_dir = boost::filesystem::path( getenv( "HOME" ) ) / "Desktop" / "";
     return true;
   }
   else

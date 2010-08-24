@@ -324,6 +324,7 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
   this->private_->ui_.group_frame_layout_->setAlignment( Qt::AlignTop );
   this->private_->ui_.verticalLayout_13->setAlignment( Qt::AlignTop );
   this->private_->ui_.verticalLayout_10->setAlignment( Qt::AlignTop );
+  //this->private_->ui_.verticalLayout_12->setAlignment( Qt::AlignBottom );
   
 
   this->private_->overlay_ = new OverlayWidget( this );
@@ -374,7 +375,7 @@ void LayerGroupWidget::mousePressEvent( QMouseEvent *event )
   this->seethrough( true );
 
   Q_EMIT prep_groups_for_drag_and_drop_signal_( true );
-  Q_EMIT picked_up_group_size_signal_( this->height() );
+  Q_EMIT picked_up_group_size_signal_( this->height() - 2 );
   
   // Finally if our drag was aborted then we reset the layers styles to be visible
   if( ( ( drag->exec( Qt::MoveAction, Qt::MoveAction ) ) == Qt::MoveAction ) 
@@ -383,9 +384,12 @@ void LayerGroupWidget::mousePressEvent( QMouseEvent *event )
     ActionMoveGroupAbove::Dispatch( Core::Interface::GetWidgetActionContext(), 
       this->get_group_id(), this->drop_group_->get_group_id() );
   }
+  else
+  {
+    this->seethrough( false );
+  }
 
   this->drop_group_set_ = false;
-  //this->seethrough( false );
   this->private_->overlay_->hide();
   
   Q_EMIT prep_groups_for_drag_and_drop_signal_( false );
@@ -567,14 +571,12 @@ void LayerGroupWidget::seethrough( bool see )
 
   if( see )
   {
-    this->private_->ui_.base_->hide();
+    this->hide();
   }
   else
-  {
-    this->private_->ui_.base_->show();
+  { 
+    this->show();
   }
-  
-  this->repaint();
 }
 
 void LayerGroupWidget::set_drop( bool drop )
@@ -594,7 +596,6 @@ void LayerGroupWidget::set_drop( bool drop )
   {
     this->private_->drop_space_->hide();
   }
-  this->repaint();
 } 
   
 LayerWidgetQWeakHandle LayerGroupWidget::set_active_layer( LayerHandle layer )
@@ -626,7 +627,6 @@ void LayerGroupWidget::show_selection_checkboxes( bool show )
     ( *it ).second->set_group_menu_status( show );
     ( *it ).second->setAcceptDrops( !show ); 
   }
-  
   this->group_menus_open_ = show;
 }
 
@@ -650,7 +650,6 @@ void LayerGroupWidget::uncheck_delete_confirm()
 {
     this->private_->ui_.confirm_delete_checkbox_->setChecked( false );
     this->private_->ui_.delete_button_->setEnabled( false );
-    //show_delete( false );
 }
 
 void LayerGroupWidget::show_layers( bool show )
@@ -725,6 +724,10 @@ void LayerGroupWidget::prep_for_animation( bool move_time )
     this->private_->ui_.group_dummy_->setMinimumHeight( this->private_->ui_.base_->height() );
     this->private_->ui_.group_dummy_->setMinimumWidth( this->private_->ui_.base_->width() );
     this->private_->ui_.group_dummy_->setPixmap( QPixmap::grabWidget( this->private_->ui_.base_ ) );
+    this->private_->ui_.group_dummy_->setStyleSheet( QString::fromUtf8( 
+      "QLabel#group_dummy {"
+      " background-color: yellow; }" ) );
+    
     this->private_->ui_.base_->hide();
     this->private_->ui_.group_dummy_->show();
   }
@@ -964,6 +967,7 @@ void LayerGroupWidget::handle_change()
 {
   layer_list_type layer_list = this->private_->group_->get_layer_list();
   int index = 0;
+  bool layer_widget_deleted = false;
   
   this->setUpdatesEnabled( false );
   
@@ -971,22 +975,33 @@ void LayerGroupWidget::handle_change()
   for( std::map< std::string, LayerWidgetQHandle>::iterator it = this->layer_map_.begin(); 
     it != this->layer_map_.end(); ++it )
   {
+    // we are also going to take the opportunity to turn off all the drag and drop settings
+    ( *it ).second->seethrough( false );
+    ( *it ).second->enable_drop_space( false );
+    
     bool found = false;
     for( layer_list_type::iterator i = layer_list.begin(); i != layer_list.end(); ++i )
     {
       if( ( *it ).first == ( *i )->get_layer_id() )
       {
         found = true;
+        break;
       }
     }
     if( !found )
     {
       this->private_->ui_.group_frame_layout_->removeWidget( ( *it ).second.data() );
+      layer_widget_deleted = true;
     }
   }
-  // then we delete the unused LayerWidgets from the layer_map_
-  this->cleanup_removed_widgets();
-  this->setMinimumHeight( 0 );
+
+  // then we need to, we delete the unused LayerWidgets from the layer_map_
+  if( layer_widget_deleted )
+  {
+    this->cleanup_removed_widgets();
+  }
+  
+  this->private_->ui_.group_frame_->setMinimumHeight( 0 );
   
   for( layer_list_type::iterator i = layer_list.begin(); i != layer_list.end(); ++i )
   {
@@ -994,8 +1009,6 @@ void LayerGroupWidget::handle_change()
     if( found_layer_widget != this->layer_map_.end() )
     {
       this->private_->ui_.group_frame_layout_->insertWidget( index, ( *found_layer_widget ).second.data() );
-      ( *found_layer_widget ).second->seethrough( false );
-      ( *found_layer_widget ).second->enable_drop_space( false );
     }
     else
     {
@@ -1010,7 +1023,6 @@ void LayerGroupWidget::handle_change()
   }
   
   this->update_widget_state();
-  
   this->setUpdatesEnabled( true );
 }
 

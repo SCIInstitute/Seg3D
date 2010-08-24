@@ -236,13 +236,11 @@ bool LayerManager::move_layer_above( LayerHandle layer_to_move, LayerHandle targ
       this->group_internals_changed_signal_( group_above );
     }
 
-    // dont need any of this after the update
     if( group_above_has_been_deleted )
     {
       group_deleted_signal_( group_above );
+      this->groups_changed_signal_();
     } 
-
-
   } // We release the lock  here.
 
   this->layers_changed_signal_();
@@ -364,8 +362,8 @@ void LayerManager::get_layers( std::vector< LayerHandle > &vector_of_layers )
 {
     lock_type lock( this->get_mutex() );
     
-  for( group_list_type::iterator i = group_list_.begin(); 
-    i != group_list_.end(); ++i )
+  for( group_list_type::reverse_iterator i = group_list_.rbegin(); 
+    i != group_list_.rend(); ++i )
   {
       for( layer_list_type::iterator j = ( *i )->layer_list_.begin(); 
     j != ( *i )->layer_list_.end(); ++j )
@@ -529,6 +527,7 @@ bool LayerManager::delete_all()
     }
     group_iterator = it_temp;
   }
+  this->groups_changed_signal_();
   return true;
 }
 

@@ -75,28 +75,9 @@ LayerManagerDockWidget::LayerManagerDockWidget( QWidget *parent ) :
   
   add_connection(LayerManager::Instance()->groups_changed_signal_.connect( boost::bind(
     &LayerManagerDockWidget::HandleGroupsChanged, layer_dock_widget ) ) );
-  
-  //add_connection( LayerManager::Instance()->layer_inserted_signal_.connect( boost::bind(
-//    &LayerManagerDockWidget::HandleInsertLayer, layer_dock_widget, _1 ) ) );
-//          
-//  add_connection( LayerManager::Instance()->layer_inserted_at_signal_.connect( boost::bind(
-//    LayerManagerDockWidget::HandleInsertLayerAt, layer_dock_widget, _1, _2 ) ) );
-//          
-//  add_connection( LayerManager::Instance()->layer_deleted_signal_.connect( boost::bind(
-//    &LayerManagerDockWidget::HandleDeleteLayer, layer_dock_widget, _1 ) ) );
-//          
-//  add_connection( LayerManager::Instance()->layers_deleted_signal_.connect( boost::bind(
-//    &LayerManagerDockWidget::HandleDeleteLayers, layer_dock_widget, _1 ) ) );
-//          
+        
   add_connection( LayerManager::Instance()->active_layer_changed_signal_.connect( boost::bind(
     &LayerManagerDockWidget::HandleActivateLayer, layer_dock_widget, _1 ) ) );
-//  
-//  add_connection( LayerManager::Instance()->group_deleted_signal_.connect( boost::bind(
-//    &LayerManagerDockWidget::HandleGroupDeleted, layer_dock_widget, _1 ) ) );
-//  
-//  add_connection( LayerManager::Instance()->group_inserted_at_signal_.connect( boost::bind(
-//    LayerManagerDockWidget::HandleGroupMoved, layer_dock_widget, _1, _2 ) ) );
-
   
   // Add any layers that may have been added before the GUI was initialized
   std::vector< LayerGroupHandle > temp_groups_vectors;
@@ -114,46 +95,10 @@ LayerManagerDockWidget::~LayerManagerDockWidget()
   this->disconnect_all();
 }
 
-//void LayerManagerDockWidget::insert_layer_ui( LayerHandle &layer )
-//{
-//  this->layer_manager_widget_->handle_group_internals_change( layer->get_layer_group() );
-//  //this->layer_manager_widget_->insert_layer( layer );
-//}
-//  
-//void LayerManagerDockWidget::insert_layer_at_ui( LayerHandle &layer, int index )
-//{
-//  this->layer_manager_widget_->handle_group_internals_change( layer->get_layer_group() );
-//  //this->layer_manager_widget_->insert_layer( layer, index );
-//}
-//
-//void LayerManagerDockWidget::delete_layer_ui( LayerHandle &layer )
-//{
-//  this->layer_manager_widget_->handle_group_internals_change( layer->get_layer_group() );
-//  //this->layer_manager_widget_->delete_layer( layer );
-//}
-//
-//void LayerManagerDockWidget::delete_layers_ui( std::vector< LayerHandle > layers )
-//{
-//  this->layer_manager_widget_->handle_group_internals_change( layers[ 0 ]->get_layer_group() );
-//  //this->layer_manager_widget_->delete_layers( layers );
-//}
-
 void LayerManagerDockWidget::activate_layer_ui( LayerHandle &layer )
 {
     this->layer_manager_widget_->set_active_layer( layer );
 }
-
-//void LayerManagerDockWidget::delete_group_ui( LayerGroupHandle &group )
-//{
-//  this->layer_manager_widget_->handle_groups_changed();
-//  //this->layer_manager_widget_->delete_group( group );
-//}
-//
-//void LayerManagerDockWidget::move_group_ui( std::string &group_id, int index )
-//{
-//  this->layer_manager_widget_->handle_groups_changed();
-//  //this->layer_manager_widget_->move_group( group_id, index );
-//}
            
 void LayerManagerDockWidget::groups_changed_ui()
 {
@@ -165,67 +110,7 @@ void LayerManagerDockWidget::group_internals_changed_ui( LayerGroupHandle &group
   this->layer_manager_widget_->handle_group_internals_change( group );
 }
 
-  
-//void LayerManagerDockWidget::HandleInsertLayer( qpointer_type qpointer, LayerHandle &layer )
-//{
-//  if( !( Core::Interface::IsInterfaceThread() ) )
-//  {
-//    Core::Interface::Instance()->post_event( boost::bind( &LayerManagerDockWidget::HandleInsertLayer,
-//      qpointer, layer ) );
-//    return;
-//  }
-//  
-//  CORE_LOG_DEBUG( "HandleInsertLayer started" );
-//  if( qpointer.data() ) qpointer->insert_layer_ui( layer );
-//  CORE_LOG_DEBUG( "HandleInsertLayer done" );
-//}
-//
-//void LayerManagerDockWidget::HandleInsertLayerAt( qpointer_type qpointer, LayerHandle &layer, int index )
-//{
-//  if( !( Core::Interface::IsInterfaceThread() ) )
-//  {
-//    Core::Interface::Instance()->post_event( boost::bind( &LayerManagerDockWidget::HandleInsertLayerAt,
-//      qpointer, layer, index ) );
-//    return;
-//  }
-//
-//  CORE_LOG_DEBUG( "HandleInsertLayerAt started" );
-//  if( qpointer.data() ) qpointer->insert_layer_at_ui( layer, index );
-//  CORE_LOG_DEBUG( "HandleInsertLayerAt done" );
-//}
-//
-//void LayerManagerDockWidget::HandleDeleteLayer( qpointer_type qpointer, LayerHandle &layer )
-//{
-//  if( !( Core::Interface::IsInterfaceThread() ) )
-//  {
-//    Core::Interface::Instance()->post_event( boost::bind( &LayerManagerDockWidget::HandleDeleteLayer,
-//      qpointer, layer ) );
-//    return;
-//  }
-//  
-//  CORE_LOG_DEBUG( "HandleDeleteLayer started" );
-//  if( qpointer.data() ) qpointer->delete_layer_ui( layer );
-//  CORE_LOG_DEBUG( "HandleDeleteLayer done" );
-//}
-//
-//void LayerManagerDockWidget::HandleDeleteLayers( qpointer_type qpointer, std::vector< LayerHandle > layers)
-//{
-//  if( !( Core::Interface::IsInterfaceThread() ) )
-//  {
-//    Core::Interface::Instance()->post_event( boost::bind( &LayerManagerDockWidget::HandleDeleteLayers,
-//      qpointer, layers ) );
-//    return;
-//  }
-//  
-//  CORE_LOG_DEBUG( "HandleDeleteLayer started" );
-//  if( qpointer.data() ) qpointer->delete_layers_ui( layers );
-//  CORE_LOG_DEBUG( "HandleDeleteLayer done" );
-//
-//}
-
-
-
-void LayerManagerDockWidget::HandleActivateLayer( qpointer_type qpointer, LayerHandle &layer )
+  void LayerManagerDockWidget::HandleActivateLayer( qpointer_type qpointer, LayerHandle &layer )
 {
   if( !( Core::Interface::IsInterfaceThread() ) )
   {
@@ -239,34 +124,6 @@ void LayerManagerDockWidget::HandleActivateLayer( qpointer_type qpointer, LayerH
   CORE_LOG_DEBUG( "HandleActivateLayer done" );
 }
 
-//void LayerManagerDockWidget::HandleGroupDeleted( qpointer_type qpointer, LayerGroupHandle &group )
-//{
-//  if( !( Core::Interface::IsInterfaceThread() ) )
-//  {
-//    Core::Interface::Instance()->post_event( boost::bind( &LayerManagerDockWidget::HandleGroupDeleted,
-//      qpointer, group ) );
-//    return;
-//  }
-//  
-//  CORE_LOG_DEBUG( "HandleGroupDeleted started" );
-//  if( qpointer.data() ) qpointer->delete_group_ui( group );
-//  CORE_LOG_DEBUG( "HandleGroupDeleted done" );
-//}
-//
-//void LayerManagerDockWidget::HandleGroupMoved( qpointer_type qpointer, std::string &group_id, int index )
-//{
-//  if( !( Core::Interface::IsInterfaceThread() ) )
-//  {
-//    Core::Interface::Instance()->post_event( boost::bind( &LayerManagerDockWidget::HandleGroupMoved,
-//      qpointer, group_id, index ) );
-//    return;
-//  }
-//  
-//  CORE_LOG_DEBUG( "HandleGroupMoved started" );
-//  if( qpointer.data() ) qpointer->move_group_ui( group_id, index );
-//  CORE_LOG_DEBUG( "HandleGroupMoved done" );
-//}
-//           
 void LayerManagerDockWidget::HandleGroupInternalChanged( qpointer_type qpointer, LayerGroupHandle &group )
 {
   if( !( Core::Interface::IsInterfaceThread() ) )
@@ -294,8 +151,5 @@ void LayerManagerDockWidget::HandleGroupsChanged( qpointer_type qpointer )
    if( qpointer.data() ) qpointer->groups_changed_ui();
    CORE_LOG_DEBUG( "HandleGroupsChanged done" );
 }
-
-
-
 
 }  // end namespace Seg3D

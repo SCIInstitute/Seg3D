@@ -45,6 +45,7 @@ namespace Seg3D
 
 MaskLayer::MaskLayer( const std::string& name, const Core::MaskVolumeHandle& volume ) :
   Layer( name, !( volume->is_valid() ) ), 
+  loading_( true ),
   mask_volume_( volume )
 {
   this->initialize_states();
@@ -211,6 +212,7 @@ bool MaskLayer::post_load_states( const Core::StateIO& state_io )
     {
       // TODO Load saved quality factor
       this->compute_isosurface( 1.0 );
+      this->loading_ = false;
     }
   }
   
@@ -272,7 +274,10 @@ void MaskLayer::compute_isosurface( double quality_factor )
   
   // now that we are done, we are going to set the proper 
   this->iso_generated_state_->set( true );
-  this->show_isosurface_state_->set( true );
+  if( !this->loading_ )
+  {
+    this->show_isosurface_state_->set( true );
+  }
 }
 
 void MaskLayer::delete_isosurface()

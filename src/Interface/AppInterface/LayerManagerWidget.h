@@ -57,33 +57,10 @@ public:
   virtual ~LayerManagerWidget();
 
 public:
-//  // INSERT_LAYER:
-//  // generic function for inserting a layer into a group
-//  void insert_layer( LayerHandle layer );
-//  
-//  // INSERT_LAYER:
-//  // function for inserting a layer into a group at a specific index
-//  void insert_layer( LayerHandle layer, int index );
-//  
-//  // DELETE_LAYER:
-//  // function for deleting a specific LayerWidget that is associated with the passed LayerHandle
-//  void delete_layer( LayerHandle layer );
-//  
-//  // DELETE_LAYERS:
-//  // function for deleting multiple layers
-//  void delete_layers( std::vector< LayerHandle > layers );
-
   // MAKE_NEW_GROUP:
-  // 
+  // function that creates a new group to put layers into 
   void make_new_group( LayerGroupHandle group );
 
-  // MOVE_GROUP:
-  // 
-  //void move_group( std::string group_id, int new_index );
-  
-  // DELETE_GROUP:
-  // this function deletes the LayerGroupWidget associated with the LayerGroupHandle
-  //void delete_group( LayerGroupHandle group );
   
   // SET_ACTIVE_LAYER:
   // function for setting the local copy of the active layer

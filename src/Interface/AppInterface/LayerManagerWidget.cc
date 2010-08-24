@@ -79,6 +79,7 @@ void LayerManagerWidget::handle_groups_changed()
 {
   std::vector< LayerGroupHandle > group_list;
   LayerManager::Instance()->get_groups( group_list );
+  bool group_widget_deleted = false;
   
   this->setUpdatesEnabled( false );
   
@@ -86,22 +87,32 @@ void LayerManagerWidget::handle_groups_changed()
   for( std::map< std::string, LayerGroupWidgetQHandle>::iterator it = this->group_map_.begin(); 
     it != this->group_map_.end(); ++it )
   {
+    ( *it ).second->set_drop( false );
+    ( *it ).second->seethrough( false );
+    
     bool found = false;
     for( int i = 0; i < static_cast< int >( group_list.size() ); ++i )
     {
       if( ( *it ).first == group_list[ i ]->get_group_id() )
       {
         found = true;
+        break;
       }
     }
     if( !found )
     {
       this->group_layout_->removeWidget( ( *it ).second.data() );
+      group_widget_deleted = true;
     }
+  }
+
+  // then if we need to, we delete the unused LayerGroupWidgets from the group_map_
+  if( group_widget_deleted )
+  {
+    this->cleanup_removed_groups();
   }
   
   this->setMinimumHeight( 0 );
-  //this->cleanup_removed_groups();
   
   for( size_t i = 0; i < group_list.size(); ++i )
   {
@@ -111,8 +122,6 @@ void LayerManagerWidget::handle_groups_changed()
     {
       this->group_layout_->insertWidget( static_cast< int >( i ), 
         ( *found_group_widget ).second.data() );
-      ( *found_group_widget ).second->set_drop( false );
-      ( *found_group_widget ).second->seethrough( false );
     }
   }
   this->setUpdatesEnabled( true );

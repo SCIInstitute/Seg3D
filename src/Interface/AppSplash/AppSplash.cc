@@ -65,17 +65,10 @@ AppSplash::AppSplash( QWidget *parent ) :
 
   // Set up the private internals of the AppSplash class
   this->private_->ui_.setupUi( this );
-  
-#if defined ( __APPLE__ ) 
-  QFont font;
-  font.setPointSize( 10 );
-  QApplication::setFont( font );
-#endif
-  
+
   // Disable these since they arent being used yet.
   this->private_->ui_.load_recent_button_->setEnabled( false );
-  //this->private_->ui_.existing_project_button_->setEnabled( false );
-  
+    
   this->populate_recent_projects();
     
   connect( this->private_->ui_.new_project_button_, SIGNAL( clicked() ), 
@@ -192,12 +185,6 @@ void AppSplash::populate_recent_projects()
 
       this->private_->ui_.recent_project_listwidget_->addItem( new_item );
 
-//      this->private_->ui_.recent_project_listwidget_->addItem( 
-//        QString::fromStdString( ( Core::SplitString( 
-//        this->recent_project_list_[ i ], "|" ) )[ 1 ] ) + "  -  " +
-//        QString::fromStdString( ( Core::SplitString( 
-//        this->recent_project_list_[ i ], "|" ) )[ 2 ] ) );
-      
     }
   }
 }

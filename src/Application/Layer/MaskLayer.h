@@ -143,6 +143,9 @@ private:
   void handle_isosurface_update_progress( double progress );
   
 private:
+  // bool to enable a different behavior when the iso surface is being generated after a session
+  // load.
+  bool loading_;
   
   // Extra private state information
   // NOTE: This used for saving the bit that is used in a mask to a session file. As the state

@@ -144,9 +144,9 @@ AppInterface::AppInterface()
   this->show_window( "splash" );
   
 #if defined ( __APPLE__ ) 
-  QFont font;
-  font.setPointSize( 11 );
-  QApplication::setFont( font );
+//  QFont font;
+//  font.setPointSize( 11 );
+//  QApplication::setFont( font );
 #endif
   
 }

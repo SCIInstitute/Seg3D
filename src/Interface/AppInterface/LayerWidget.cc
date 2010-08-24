@@ -798,22 +798,19 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
   Q_EMIT prep_for_drag_and_drop( true );
   
   // Finally if our drag was aborted then we reset the layers styles to be visible
-//  if( ( drag->exec(Qt::MoveAction, Qt::MoveAction) ) != Qt::MoveAction )
-//  {
-//    //this->seethrough( false );
-//  }
-  // Otherwise we dispatch our move function
   if( ( drag->exec(Qt::MoveAction, Qt::MoveAction) ) == Qt::MoveAction ) 
   { 
     ActionMoveLayerAbove::Dispatch( Core::Interface::GetWidgetActionContext(),
       this->get_layer_id(), this->private_->drop_layer_->get_layer_id() );
   }
-  
+  else
+  {
+    this->seethrough( false );
+  }
+
   Q_EMIT prep_for_drag_and_drop( false );
-  
-  //this->seethrough( false );
+
   this->repaint();
-  //this->parentWidget()->setMinimumHeight( 0 );
 }
 
 void LayerWidget::set_drop_target( LayerWidget* target_layer )
@@ -920,7 +917,7 @@ void LayerWidget::seethrough( bool see )
   {
     this->show();
   }
-  this->repaint();
+  //this->repaint();
 }
 
 void LayerWidget::set_picked_up( bool picked_up )
@@ -946,14 +943,11 @@ void LayerWidget::enable_drop_space( bool drop )
     this->private_->drop_space_->hide();
     this->private_->overlay_->hide();
   }
-  
-  this->repaint();
 } 
 
 void LayerWidget::set_active( bool active )
 {
   this->update_widget_state();
-  this->repaint();
 }
 
 void LayerWidget::show_selection_checkbox( bool show )
