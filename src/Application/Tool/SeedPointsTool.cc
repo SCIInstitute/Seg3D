@@ -35,7 +35,7 @@
 #include <Core/Volume/VolumeSlice.h>
 
 #include <Application/LayerManager/LayerManager.h>
-#include <Application/Tools/SeedPointsTool.h>
+#include <Application/Tool/SeedPointsTool.h>
 #include <Application/Viewer/Viewer.h>
 #include <Application/ViewerManager/ViewerManager.h>
 
@@ -50,7 +50,6 @@ class SeedPointsToolPrivate
 {
 public:
   Core::VolumeSliceHandle get_target_slice( ViewerHandle viewer );
-  void handle_seed_points_changed();
   bool find_point( double world_x, double world_y, 
     Core::VolumeSliceHandle vol_slice, Core::Point& pt );
 
@@ -72,23 +71,6 @@ Core::VolumeSliceHandle SeedPointsToolPrivate::get_target_slice( ViewerHandle vi
   vol_slice = viewer->get_volume_slice( target_layer_id );
   
   return vol_slice;
-}
-
-void SeedPointsToolPrivate::handle_seed_points_changed()
-{
-  size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
-  for ( size_t i = 0; i < num_of_viewers; i++ )
-  {
-    ViewerHandle viewer = ViewerManager::Instance()->get_viewer( i );
-    if ( !viewer->is_volume_view() )
-    {
-      viewer->redraw_overlay();
-    }
-    else
-    {
-      viewer->redraw();
-    }
-  }
 }
 
 bool SeedPointsToolPrivate::find_point( double world_x, double world_y, 
@@ -131,19 +113,13 @@ bool SeedPointsToolPrivate::find_point( double world_x, double world_y,
 // Implementation of class SeedPointsTool
 //////////////////////////////////////////////////////////////////////////
 
-SeedPointsTool::SeedPointsTool( const std::string& toolid ) :
-  Tool( toolid ),
+SeedPointsTool::SeedPointsTool( Core::VolumeType target_volume_type, const std::string& toolid ) :
+  SingleTargetTool( target_volume_type, toolid ),
   private_( new SeedPointsToolPrivate )
 {
   this->private_->tool_ = this;
 
-  std::vector< LayerIDNamePair > empty_names( 1, 
-    std::make_pair( Tool::NONE_OPTION_C, Tool::NONE_OPTION_C ) );
-  this->add_state( "target", this->target_layer_state_, Tool::NONE_OPTION_C, empty_names );
   this->add_state( "seed_points", this->seed_points_state_ );
-
-  this->add_connection( this->seed_points_state_->state_changed_signal_.connect(
-    boost::bind( &SeedPointsToolPrivate::handle_seed_points_changed, this->private_.get() ) ) );
 }
 
 SeedPointsTool::~SeedPointsTool()

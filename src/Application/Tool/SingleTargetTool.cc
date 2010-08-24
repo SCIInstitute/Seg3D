@@ -153,8 +153,6 @@ SingleTargetTool::SingleTargetTool(  Core::VolumeType target_type, const std::st
   // Adding connections to handle updates
   this->add_connection( LayerManager::Instance()->layers_changed_signal_.connect(
     boost::bind( &SingleTargetToolPrivate::handle_layers_changed, this->private_.get() ) ) );
-//  this->add_connection( LayerManager::Instance()->layers_changed_signal_.connect(
-//    boost::bind( &SingleTargetToolPrivate::handle_layers_changed, this->private_.get() ) ) );
     
   this->add_connection( LayerManager::Instance()->active_layer_changed_signal_.connect(
     boost::bind( &SingleTargetToolPrivate::handle_active_layer_changed, 
@@ -165,7 +163,13 @@ SingleTargetTool::SingleTargetTool(  Core::VolumeType target_type, const std::st
     this->private_.get(), _1 ) ) );
     
   this->add_connection( this->target_layer_state_->value_changed_signal_.connect(
-    boost::bind( &SingleTargetToolPrivate::handle_target_layer_changed, this->private_.get(), _2 ) ) );   
+    boost::bind( &SingleTargetToolPrivate::handle_target_layer_changed, this->private_.get(), _2 ) ) );
+
+  LayerHandle active_layer = LayerManager::Instance()->get_active_layer();
+  if ( active_layer )
+  {
+    this->private_->handle_active_layer_changed( active_layer );
+  }
 }
 
 SingleTargetTool::~SingleTargetTool()

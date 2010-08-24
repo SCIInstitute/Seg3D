@@ -884,16 +884,8 @@ Viewer::Viewer( size_t viewer_id, bool visible, const std::string& mode ) :
     boost::bind( &ViewerPrivate::handle_layer_group_inserted, this->private_, _1 ) ) );
   this->add_connection( LayerManager::Instance()->group_deleted_signal_.connect(
     boost::bind( &ViewerPrivate::handle_layer_group_deleted, this->private_, _1 ) ) );
-  
-  this->add_connection( LayerManager::Instance()->group_internals_changed_signal_.connect(
+  this->add_connection( LayerManager::Instance()->layers_reordered_signal_.connect(
     boost::bind( &Viewer::redraw, this, false ) ) );
-  this->add_connection( LayerManager::Instance()->groups_changed_signal_.connect(
-    boost::bind( &Viewer::redraw, this, false ) ) );
-  
-//  this->add_connection( LayerManager::Instance()->layer_inserted_at_signal_.connect(
-//    boost::bind( &Viewer::redraw, this, false ) ) );
-//  this->add_connection( LayerManager::Instance()->group_inserted_at_signal_.connect(
-//    boost::bind( &Viewer::redraw, this, false ) ) );
 
   this->add_connection( this->view_mode_state_->value_changed_signal_.connect(
     boost::bind( &ViewerPrivate::change_view_mode, this->private_, _1, _2 ) ) );
@@ -1318,7 +1310,8 @@ void Viewer::redraw( bool delay_update )
     return;
   }
   
-  if ( this->private_->signals_block_count_ == 0 )
+  if ( this->private_->signals_block_count_ == 0 &&
+    this->viewer_visible_state_->get() )
   {
     this->redraw_signal_( delay_update );
   }
@@ -1332,7 +1325,8 @@ void Viewer::redraw_overlay( bool delay_update )
     return;
   }
 
-  if ( this->private_->signals_block_count_ == 0 )
+  if ( this->private_->signals_block_count_ == 0 &&
+    this->viewer_visible_state_->get() )
   {
     this->redraw_overlay_signal_( delay_update );
   }

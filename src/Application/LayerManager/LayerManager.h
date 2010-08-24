@@ -210,15 +210,15 @@ public:
   typedef boost::signals2::signal< void( LayerGroupHandle ) > group_signal_type;
   typedef boost::signals2::signal< void( std::string, int ) > group_at_signal_type;
   typedef boost::signals2::signal< void( std::vector< LayerHandle > ) > layers_signal_type;
-  typedef boost::signals2::signal< void() > layers_changed_type;
-  typedef boost::signals2::signal< void() > groups_changed_type;
+  typedef boost::signals2::signal< void() > layers_changed_signal_type;
+  typedef boost::signals2::signal< void() > groups_changed_signal_type;
   
   
   // GROUP_INTERNALS_CHANGED_SIGNAL_:
   // signal is triggered when any of the contents of a group change
   group_signal_type group_internals_changed_signal_;
   
-  groups_changed_type groups_changed_signal_;
+  groups_changed_signal_type groups_changed_signal_;
   
   // ACTIVE_LAYER_CHANGED_SIGNAL:
   // This signal is triggered after the active layer is changed
@@ -227,29 +227,12 @@ public:
   // LAYER_INSERTED_SIGNAL:
   // This signal is triggered after a layer has been inserted
   layer_signal_type layer_inserted_signal_;
-  
-  // LAYER_INSERTED_AT_SIGNAL:
-  // This signal is triggered after a layer has been inserted
-  layer_at_signal_type layer_inserted_at_signal_;
-  
-  // LAYER_DELETED_SIGNAL:
-  // This signal is triggered after a layer has been deleted
-  layer_signal_type layer_deleted_signal_;
-  
+
   // LAYERS_DELETED_SIGNAL:
   // This signal is triggered after layers have been deleted and passes a vector of layerhandles
   layers_signal_type layers_deleted_signal_;
   
-  // LAYERS_FINISHED_DELETING_SIGNAL:
-  // This signal is triggered once the layers from a particular group have been deleted
-  // TODO: maybe group_finished_deleting_layers_signal_
-  group_signal_type layers_finished_deleting_signal_;
-  
   // GROUP_INSERTED_SIGNAL:
-  // This signal is triggered when a group has changed its order int the group list
-  group_at_signal_type group_inserted_at_signal_; 
-
-  // GROUP_INSERTED_AT_SIGNAL:
   // This signal is triggered when a group has changed its order int the group list
   group_signal_type group_inserted_signal_; 
   
@@ -257,13 +240,13 @@ public:
   // This signal is triggered when a group has been deleted from the layer manager
   group_signal_type group_deleted_signal_;
   
-  // GROUP_CHANGED_SIGNAL:
-  // This signal is triggered when a group has been changed
-  group_signal_type group_changed_signal_;
-  
   // LAYERS_CHANGED_SIGNAL:
-  // This gets signaled when the state of any of the layers changed
-  layers_changed_type layers_changed_signal_;
+  // This gets signaled when layers are inserted, deleted, or reordered.
+  layers_changed_signal_type layers_changed_signal_;
+
+  // LAYERS_REORDERED_SIGNAL:
+  // Triggered when the order of the layers has been changed.
+  layers_changed_signal_type layers_reordered_signal_;
 
 protected:
   virtual bool pre_save_states( Core::StateIO& state_io );

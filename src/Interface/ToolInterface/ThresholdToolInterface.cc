@@ -86,17 +86,28 @@ bool ThresholdToolInterface::build_widget( QFrame* frame )
   ThresholdTool* tool = dynamic_cast< ThresholdTool* > ( base_tool_.get() );
 
   //Step 3 - connect the gui to the tool through the QtBridge
-  QtUtils::QtBridge::Connect( this->private_->ui_.target_layer_, tool->target_layer_state_ );
   connect( this->private_->ui_.target_layer_, SIGNAL( currentIndexChanged( QString ) ), 
     this, SLOT( refresh_histogram( QString ) ) );
+  QtUtils::QtBridge::Connect( this->private_->ui_.target_layer_, tool->target_layer_state_ );
   QtUtils::QtBridge::Connect( this->private_->upper_threshold_, tool->upper_threshold_state_ );
   QtUtils::QtBridge::Connect( this->private_->lower_threshold_, tool->lower_threshold_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.use_active_layer_, tool->use_active_layer_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.clearSeedsButton, boost::bind(
+    &SeedPointsTool::clear, tool, Core::Interface::GetWidgetActionContext() ) );
   
-  //Send a message to the log that we have finised with building the Threshold Tool Interface
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() ); 
+
+    this->private_->ui_.target_layer_->setDisabled( tool->use_active_layer_state_->get() );
+    this->connect( this->private_->ui_.use_active_layer_, SIGNAL( toggled( bool ) ),
+      this->private_->ui_.target_layer_, SLOT( setDisabled( bool ) ) );
+  }
+
+  //Send a message to the log that we have finished with building the Threshold Tool Interface
   CORE_LOG_DEBUG("Finished building a Threshold Tool Interface");
 
   return ( true );
-} // end build_widget
+} 
   
 void ThresholdToolInterface::enable_run_filter( bool valid )
 {
@@ -108,17 +119,21 @@ void ThresholdToolInterface::enable_run_filter( bool valid )
 
 void ThresholdToolInterface::refresh_histogram( QString layer_name )
 {
-  if( layer_name == "" )
+  if( layer_name == "" || 
+    layer_name == Tool::NONE_OPTION_C.c_str() )
   {
     return;
   }
 
-  Core::Histogram temp_histogram = dynamic_cast< DataLayer* >( LayerManager::Instance()->
-    get_layer_by_name( layer_name.toStdString() ).get() )->
-    get_data_volume()->get_data_block()->get_histogram();
-
-  // Now, display histogram!
-  this->private_->histogram_->set_histogram( temp_histogram );  
+  DataLayerHandle data_layer = boost::dynamic_pointer_cast< DataLayer >(
+    LayerManager::Instance()->get_layer_by_name( layer_name.toStdString() ) );
+  if ( !data_layer )
+  {
+    return;
+  }
+  
+  this->private_->histogram_->set_histogram( data_layer->get_data_volume()->
+    get_data_block()->get_histogram() );  
 }
 
 void ThresholdToolInterface::execute_filter()

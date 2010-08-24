@@ -31,36 +31,47 @@
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/ConnectedComponentFilter.h>
 #include <Application/LayerManager/LayerManager.h>
+#include <Application/Viewer/Viewer.h>
+#include <Application/ViewerManager/ViewerManager.h>
 
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL( Seg3D, ConnectedComponentFilter )
 
 namespace Seg3D 
 {
-  
-ConnectedComponentFilter::ConnectedComponentFilter( const std::string& toolid ) :
-  SeedPointsTool( toolid )
+
+class ConnectedComponentFilterPrivate
 {
-  std::vector< LayerIDNamePair > empty_names( 1, 
-    std::make_pair( Tool::NONE_OPTION_C, Tool::NONE_OPTION_C ) );
-  
-  this->handle_layers_changed();
-      
-  this->add_connection ( LayerManager::Instance()->layers_changed_signal_.connect(
-    boost::bind( &ConnectedComponentFilter::handle_layers_changed, this ) ) );
+public:
+  void handle_seed_points_changed();
+};
+
+void ConnectedComponentFilterPrivate::handle_seed_points_changed()
+{
+  size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
+  for ( size_t i = 0; i < num_of_viewers; i++ )
+  {
+    ViewerHandle viewer = ViewerManager::Instance()->get_viewer( i );
+    if ( !viewer->is_volume_view() && viewer->viewer_visible_state_->get() )
+    {
+      viewer->redraw_overlay();
+    }
+  }
+}
+
+ConnectedComponentFilter::ConnectedComponentFilter( const std::string& toolid ) :
+  SeedPointsTool( Core::VolumeType::DATA_E, toolid ),
+  private_( new ConnectedComponentFilterPrivate )
+{ 
+  this->use_active_layer_state_->set( false );
+
+  this->add_connection( this->seed_points_state_->state_changed_signal_.connect( boost::bind( 
+    &ConnectedComponentFilterPrivate::handle_seed_points_changed, this->private_.get() ) ) );
 }
 
 ConnectedComponentFilter::~ConnectedComponentFilter()
 { 
   this->disconnect_all();
-}
-
-void ConnectedComponentFilter::handle_layers_changed()
-{
-  std::vector< LayerIDNamePair > layer_names( 1, 
-    std::make_pair( Tool::NONE_OPTION_C, Tool::NONE_OPTION_C ) );
-  LayerManager::Instance()->get_layer_names( layer_names, Core::VolumeType::DATA_E );
-  this->target_layer_state_->set_option_list( layer_names );
 }
 
 void ConnectedComponentFilter::activate()

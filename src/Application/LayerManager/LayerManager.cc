@@ -124,6 +124,7 @@ bool LayerManager::insert_layer( LayerHandle layer )
 
   // This is no longer needed by the LayerManager Widget  
   this->layer_inserted_signal_( layer );
+  this->layers_changed_signal_();
   
   if( active_layer_changed )
   {
@@ -145,8 +146,6 @@ bool LayerManager::check_for_same_group( const std::string layer_to_insert_id,
 
 bool LayerManager::move_group_above( std::string group_to_move_id, std::string group_below_id )
 {
-  //int index = 0;
-
   {
     // Get the Lock
     lock_type lock( this->get_mutex() );
@@ -162,6 +161,8 @@ bool LayerManager::move_group_above( std::string group_to_move_id, std::string g
   }
   
   this->groups_changed_signal_();
+  this->layers_changed_signal_();
+  this->layers_reordered_signal_();
 
   return true;
 }
@@ -236,20 +237,22 @@ bool LayerManager::move_layer_above( LayerHandle layer_to_move, LayerHandle targ
     }
 
     // dont need any of this after the update
-      if( group_above_has_been_deleted )
-      {
-        group_deleted_signal_( group_above );
-      } 
+    if( group_above_has_been_deleted )
+    {
+      group_deleted_signal_( group_above );
+    } 
 
 
   } // We release the lock  here.
+
+  this->layers_changed_signal_();
+  this->layers_reordered_signal_();
   
   return true;  
 }
 
 bool LayerManager::move_layer_below( LayerHandle layer_to_move, LayerHandle target_layer )
 {
-
   return true;  
 }
 
@@ -433,7 +436,7 @@ void LayerManager::delete_layers( LayerGroupHandle group )
   }
 
   this->layers_deleted_signal_( layer_vector );
-
+  this->layers_changed_signal_();
   
   if ( active_layer_changed )
   {
@@ -491,7 +494,7 @@ void LayerManager::delete_layer( LayerHandle layer )
   std::vector<LayerHandle> layer_vector( 1 );
   layer_vector[ 0 ] = layer;
   this->layers_deleted_signal_( layer_vector );
-
+  this->layers_changed_signal_();
   
   if ( active_layer_changed )
   {
@@ -549,8 +552,8 @@ LayerSceneHandle LayerManager::compose_layer_scene( size_t viewer_id )
   LayerSceneHandle layer_scene( new LayerScene );
 
   // For each layer group
-  group_list_type::iterator group_iterator = this->group_list_.begin();
-  for ( ; group_iterator != this->group_list_.end(); group_iterator++)
+  group_list_type::reverse_iterator group_iterator = this->group_list_.rbegin();
+  for ( ; group_iterator != this->group_list_.rend(); group_iterator++)
   {
     if ( !( *group_iterator )->visibility_state_->get() )
     {
@@ -559,9 +562,9 @@ LayerSceneHandle LayerManager::compose_layer_scene( size_t viewer_id )
     
     layer_list_type layer_list = ( *group_iterator )->get_layer_list();
 
-    layer_list_type::iterator layer_iterator = layer_list.begin();
+    layer_list_type::reverse_iterator layer_iterator = layer_list.rbegin();
     // For each layer in the group
-    for ( ; layer_iterator != layer_list.end(); layer_iterator++ )
+    for ( ; layer_iterator != layer_list.rend(); layer_iterator++ )
     {
       LayerHandle layer = *layer_iterator;
       

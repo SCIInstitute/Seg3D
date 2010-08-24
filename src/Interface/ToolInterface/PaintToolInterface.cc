@@ -109,9 +109,13 @@ bool PaintToolInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Connect( this->private_->ui_.show_boundary_,
     tool->show_data_cstr_bound_state_ );
 
-  this->private_->ui_.target_mask_->setDisabled( tool->use_active_layer_state_->get() );
-  this->connect( this->private_->ui_.use_active_layer_, SIGNAL( toggled( bool ) ),
-    this->private_->ui_.target_mask_, SLOT( setDisabled( bool ) ) );
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
+    this->private_->ui_.target_mask_->setDisabled( tool->use_active_layer_state_->get() );
+    this->connect( this->private_->ui_.use_active_layer_, SIGNAL( toggled( bool ) ),
+      this->private_->ui_.target_mask_, SLOT( setDisabled( bool ) ) );
+  }
   
   
 //#if defined ( __APPLE__ )  

@@ -32,7 +32,7 @@
 ##################################################
 
 SET(APPLICATION_TOOLS_SHADER_SRCS
-  detail/PaintBrushShader.frag
+  detail/MaskShader.frag
   )
   
 CORE_IMPORT_SHADER(APPLICATION_TOOLS_SHADER_STRING_SRCS
@@ -88,10 +88,8 @@ SET(APPLICATION_TOOLS_SRCS
   )
 
 SET(APPLICATION_TOOLS_NOREGISTER_SRCS
-  SeedPointsTool.h
-  SeedPointsTool.cc
-  detail/PaintBrushShader.h
-  detail/PaintBrushShader.cc
+  detail/MaskShader.h
+  detail/MaskShader.cc
   )
   
 SET(APPLICATION_TOOLS_ACTIONS_SRCS

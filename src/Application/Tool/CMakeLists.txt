@@ -38,6 +38,8 @@ SET(APPLICATION_TOOL_SRCS
   ITKFilter.cc
   SingleTargetTool.h
   SingleTargetTool.cc
+  SeedPointsTool.h
+  SeedPointsTool.cc
   Tool.h
   Tool.cc
   ToolInfo.h
@@ -58,5 +60,5 @@ TARGET_LINK_LIBRARIES(Application_Tool
                       Core_State
                       ${SCI_BOOST_LIBRARY}
             ${SCI_TINYXML_LIBRARY}
-                                          ${SCI_ITK_LIBRARIES})
+                      ${SCI_ITK_LIBRARIES})
                     

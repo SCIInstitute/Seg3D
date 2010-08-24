@@ -29,20 +29,24 @@
 #ifndef APPLICATION_TOOLS_THRESHOLDTOOL_H
 #define APPLICATION_TOOLS_THRESHOLDTOOL_H
 
-#include <Application/Tool/Tool.h>
+#include <Application/Tool/SeedPointsTool.h>
 
 namespace Seg3D
 {
 
-class ThresholdTool : public Tool
+class ThresholdToolPrivate;
+typedef boost::shared_ptr< ThresholdToolPrivate > ThresholdToolPrivateHandle;
+
+class ThresholdTool : public SeedPointsTool
 {
 
-SEG3D_TOOL(
-SEG3D_TOOL_NAME( "ThresholdTool", "Tool for thresholding data" )
-SEG3D_TOOL_MENULABEL( "Threshold" )
-SEG3D_TOOL_MENU( "tools" )
-SEG3D_TOOL_SHORTCUT_KEY( "Alt+T" )
-SEG3D_TOOL_URL( "http://seg3d.org/" )
+SEG3D_TOOL
+(
+  SEG3D_TOOL_NAME( "ThresholdTool", "Tool for thresholding data" )
+  SEG3D_TOOL_MENULABEL( "Threshold" )
+  SEG3D_TOOL_MENU( "tools" )
+  SEG3D_TOOL_SHORTCUT_KEY( "Alt+T" )
+  SEG3D_TOOL_URL( "http://seg3d.org/" )
 )
 
   // -- constructor/destructor --
@@ -50,29 +54,14 @@ public:
   ThresholdTool( const std::string& toolid );
   virtual ~ThresholdTool();
 
-  // -- constraint parameters --
-
-  // Constrain viewer to right painting tool when layer is selected
-  void target_constraint( std::string layerid );
-
-  // -- activate/deactivate tool --
-
-  virtual void activate();
-  virtual void deactivate();
-
-  // -- dispatch functions --
-
-  void dispatch_clear_seed_points() const;
-  void dispatch_create_threshold_layer() const;
-  
-private:
-  // -- handle updates from layermanager --
-  void handle_layers_changed();
+public:
+  // REDRAW:
+  // Draw a preview of the threshold result in the specified viewer.
+  // The function should only be called by the renderer, which has a valid GL context.
+  virtual void redraw( size_t viewer_id, const Core::Matrix& proj_mat );
 
   // -- state --
 public:
-  // Layerid of the target layer
-  Core::StateStringHandle target_layer_state_;
 
   // Upper threshold for painting
   Core::StateRangedDoubleHandle upper_threshold_state_;
@@ -80,8 +69,8 @@ public:
   // Lower threshold for painting
   Core::StateRangedDoubleHandle lower_threshold_state_;
 
-  // Seed Points
-  // StateVector<Point>            seed_points_state_;
+private:
+  ThresholdToolPrivateHandle private_;
 
 };
 

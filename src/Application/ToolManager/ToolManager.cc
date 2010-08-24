@@ -60,6 +60,8 @@ public:
     int button, int buttons, int modifiers );
   bool handle_wheel( int delta, int x, int y, int buttons, int modifiers );
 
+  void update_viewers( bool redraw_2d, bool redraw_3d );
+
   // All the open tools are stored in this hash map
   ToolManager::tool_list_type tool_list_;
   ToolHandle active_tool_;
@@ -122,6 +124,26 @@ bool ToolManagerPrivate::handle_wheel( int delta, int x, int y, int buttons, int
     return this->active_tool_->handle_wheel( delta, x, y, buttons, modifiers );
   }
   return false;
+}
+
+void ToolManagerPrivate::update_viewers( bool redraw_2d, bool redraw_3d )
+{
+  size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
+  for ( size_t i = 0; i < num_of_viewers; i++ )
+  {
+    ViewerHandle viewer = ViewerManager::Instance()->get_viewer( i );
+    if ( viewer->is_volume_view() )
+    {
+      if ( redraw_3d )
+      {
+        viewer->redraw();
+      }
+    }
+    else if ( redraw_2d )
+    {
+      viewer->redraw_overlay();
+    }
+  }
 }
 
 ToolManager::ToolManager() :
@@ -234,13 +256,19 @@ void ToolManager::close_tool( const std::string& toolid )
   // Step (7): Signal that the tool will be closed.
   close_tool_signal_( tool );
 
-  if ( !this->private_->active_tool_ && !this->private_->tool_list_.empty() )
+  if ( !this->private_->active_tool_ )
   {
-    this->private_->active_tool_ = ( *this->private_->tool_list_.begin() ).second;
-    this->private_->active_tool_->activate();
-    this->activate_tool_signal_( this->private_->active_tool_ );
+    if ( !this->private_->tool_list_.empty() )
+    {
+      this->private_->active_tool_ = ( *this->private_->tool_list_.begin() ).second;
+      this->private_->active_tool_->activate();
+      this->activate_tool_signal_( this->private_->active_tool_ );
+    }
+    else if ( tool->has_2d_visual() || tool->has_3d_visual() )
+    {
+      this->private_->update_viewers( tool->has_2d_visual(), tool->has_3d_visual() );
+    }
   }
-  
 }
 
 // THREAD-SAFETY:
@@ -286,22 +314,7 @@ void ToolManager::activate_tool( const std::string& toolid )
 
   if ( redraw_2d || redraw_3d )
   {
-    size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
-    for ( size_t i = 0; i < num_of_viewers; i++ )
-    {
-      ViewerHandle viewer = ViewerManager::Instance()->get_viewer( i );
-      if ( viewer->is_volume_view() )
-      {
-        if ( redraw_3d )
-        {
-          viewer->redraw();
-        }
-      }
-      else if ( redraw_2d )
-      {
-        viewer->redraw_overlay();
-      }
-    }
+    this->private_->update_viewers( redraw_2d, redraw_3d );
   }
   
   // Step (6): signal for interface

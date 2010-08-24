@@ -26,28 +26,28 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <Application/Tools/detail/PaintBrushShader.h>
+#include <Application/Tools/detail/MaskShader.h>
 
 #include <Core/Utils/Log.h>
 
 namespace Seg3D
 {
 
-const char* PaintBrushShader::FRAG_SHADER_SOURCE_C[] =
+const char* MaskShader::FRAG_SHADER_SOURCE_C[] =
 {
-#include "PaintBrushShader_frag"
+#include "MaskShader_frag"
 };
 
-PaintBrushShader::PaintBrushShader() :
+MaskShader::MaskShader() :
   valid_( false )
 {
 }
 
-PaintBrushShader::~PaintBrushShader()
+MaskShader::~MaskShader()
 {
 }
 
-bool PaintBrushShader::initialize()
+bool MaskShader::initialize()
 {
   this->glsl_frag_shader_ = Core::GLSLShaderHandle( new Core::GLSLFragmentShader );
   this->glsl_frag_shader_->set_source( sizeof( FRAG_SHADER_SOURCE_C ) / sizeof( char* ),
@@ -55,7 +55,7 @@ bool PaintBrushShader::initialize()
   if ( !this->glsl_frag_shader_->compile() )
   {
     std::string error_info = this->glsl_frag_shader_->get_info_log();
-    CORE_LOG_ERROR( std::string( "Failed compiling PaintBrushShader source: \n" ) + error_info );
+    CORE_LOG_ERROR( std::string( "Failed compiling MaskShader source: \n" ) + error_info );
     this->glsl_frag_shader_.reset();
     return false;
   }
@@ -65,59 +65,59 @@ bool PaintBrushShader::initialize()
   if ( !this->glsl_prog_->link() )
   {
     std::string error_info = this->glsl_prog_->get_info_log();
-    CORE_LOG_ERROR( std::string( "Failed linking PaintBrushShader program: \n" ) + error_info );
+    CORE_LOG_ERROR( std::string( "Failed linking MaskShader program: \n" ) + error_info );
     this->glsl_frag_shader_.reset();
     this->glsl_prog_.reset();
     return false;
   }
 
   this->glsl_prog_->enable();
-  this->brush_tex_loc_ = this->glsl_prog_->get_uniform_location( "brush_tex" );
+  this->tex_loc_ = this->glsl_prog_->get_uniform_location( "tex" );
   this->opacity_loc_ = this->glsl_prog_->get_uniform_location( "opacity" );
   this->pixel_size_loc_ = this->glsl_prog_->get_uniform_location( "pixel_size" );
   this->border_width_loc_ = this->glsl_prog_->get_uniform_location( "border_width" );
-  this->brush_color_loc_ = this->glsl_prog_->get_uniform_location( "brush_color" );
+  this->color_loc_ = this->glsl_prog_->get_uniform_location( "color" );
   this->glsl_prog_->disable();
 
   this->valid_ = true;
   return true;
 }
 
-void PaintBrushShader::enable()
+void MaskShader::enable()
 {
   assert( this->valid_ );
   this->glsl_prog_->enable();
 }
 
-void PaintBrushShader::disable()
+void MaskShader::disable()
 {
   assert( this->valid_ );
   this->glsl_prog_->disable();
 }
 
-void PaintBrushShader::set_brush_texture( int tex_unit )
+void MaskShader::set_texture( int tex_unit )
 {
-  glUniform1i( this->brush_tex_loc_, tex_unit );
+  glUniform1i( this->tex_loc_, tex_unit );
 }
 
-void PaintBrushShader::set_opacity( float opacity )
+void MaskShader::set_opacity( float opacity )
 {
   glUniform1f( this->opacity_loc_, opacity );
 }
 
-void PaintBrushShader::set_pixel_size( float width, float height )
+void MaskShader::set_pixel_size( float width, float height )
 {
   glUniform2f( this->pixel_size_loc_, width, height );
 }
 
-void PaintBrushShader::set_border_width( int width )
+void MaskShader::set_border_width( int width )
 {
   glUniform1i( this->border_width_loc_, width );
 }
 
-void PaintBrushShader::set_brush_color( float r, float g, float b )
+void MaskShader::set_color( float r, float g, float b )
 {
-  glUniform3f( this->brush_color_loc_, r, g, b );
+  glUniform3f( this->color_loc_, r, g, b );
 }
 
 } // end namespace Seg3D

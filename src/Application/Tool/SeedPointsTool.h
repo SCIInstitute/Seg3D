@@ -26,13 +26,13 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_TOOLS_SEEDPOINTSTOOL_H
-#define APPLICATION_TOOLS_SEEDPOINTSTOOL_H
+#ifndef APPLICATION_TOOL_SEEDPOINTSTOOL_H
+#define APPLICATION_TOOL_SEEDPOINTSTOOL_H
 
 #include <Core/Geometry/Point.h>
 #include <Core/State/StateVector.h>
 
-#include <Application/Tool/Tool.h>
+#include <Application/Tool/SingleTargetTool.h>
 
 namespace Seg3D
 {
@@ -40,10 +40,10 @@ namespace Seg3D
 class SeedPointsToolPrivate;
 typedef boost::shared_ptr< SeedPointsToolPrivate > SeedPointsToolPrivateHandle;
 
-class SeedPointsTool : public Tool
+class SeedPointsTool : public SingleTargetTool
 {
 public:
-   SeedPointsTool( const std::string& toolid );
+   SeedPointsTool( Core::VolumeType target_volume_type, const std::string& toolid );
    virtual ~SeedPointsTool() = 0;
 
 public:
@@ -76,7 +76,6 @@ public:
 
 public:
   Core::StatePointVectorHandle seed_points_state_;
-  Core::StateLabeledOptionHandle target_layer_state_;
 
 private:
   SeedPointsToolPrivateHandle private_;

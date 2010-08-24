@@ -1,8 +1,8 @@
 // GLSL fragment shader for rendering a slice
 #version 110
 
-uniform sampler2D brush_tex;
-uniform vec3 brush_color; // color of mask
+uniform sampler2D tex;
+uniform vec3 color; // color of mask
 uniform float opacity;
 uniform int border_width; // width of the mask border
 uniform vec2 pixel_size; // pixel size in texture space
@@ -21,51 +21,54 @@ bool edge_test()
     return true;
   
   // test the pixel to the left
-  if ( texture2D( brush_tex, vec2( left,  gl_TexCoord[0].t ) ).a == 0.0 )
+  if ( texture2D( tex, vec2( left,  gl_TexCoord[0].t ) ).a == 0.0 )
     return true;
 
   // test the pixel to the right
-  if ( texture2D( brush_tex, vec2( right,  gl_TexCoord[0].t ) ).a == 0.0 )
+  if ( texture2D( tex, vec2( right,  gl_TexCoord[0].t ) ).a == 0.0 )
     return true;
 
   // test the pixel below
-  if ( texture2D( brush_tex, vec2( gl_TexCoord[0].s, bottom ) ).a == 0.0 )
+  if ( texture2D( tex, vec2( gl_TexCoord[0].s, bottom ) ).a == 0.0 )
     return true;
 
   // test the pixel above
-  if ( texture2D( brush_tex, vec2( gl_TexCoord[0].s, top ) ).a == 0.0 )
+  if ( texture2D( tex, vec2( gl_TexCoord[0].s, top ) ).a == 0.0 )
     return true;
 
   // test the pixel on the bottom left corner
-  if ( texture2D( brush_tex, vec2( left, bottom ) ).a == 0.0 )
+  if ( texture2D( tex, vec2( left, bottom ) ).a == 0.0 )
     return true;
 
   // test the pixel on the bottom right corner
-  if ( texture2D( brush_tex, vec2( right, bottom ) ).a == 0.0 )
+  if ( texture2D( tex, vec2( right, bottom ) ).a == 0.0 )
     return true;
 
   // test the pixel on the top right corner
-  if ( texture2D( brush_tex, vec2( right, top ) ).a == 0.0 )
+  if ( texture2D( tex, vec2( right, top ) ).a == 0.0 )
     return true;
 
   // test the pixel on the top left corner
-  if ( texture2D( brush_tex, vec2( left, top ) ).a == 0.0 )
+  if ( texture2D( tex, vec2( left, top ) ).a == 0.0 )
     return true;
 
   return false;
 }
 
-vec4 shade_brush()
+vec4 shade_mask()
 {
-  float mask = texture2D( brush_tex, gl_TexCoord[0].st ).a;
+  float mask = texture2D( tex, gl_TexCoord[0].st ).a;
   if ( mask == 0.0 ) discard;
 
   if ( border_width > 0 )
   {
     if ( edge_test() )
-      return vec4( brush_color, opacity );
+      return vec4( color, opacity );
   }
-  discard;
+  else
+  {
+    return vec4( color, opacity );
+  }
 }
 
 void main()
@@ -73,5 +76,5 @@ void main()
   // Discard the fragment if it's completely transparent
   if ( opacity == 0.0 ) discard;
 
-  gl_FragColor = shade_brush();
+  gl_FragColor = shade_mask();
 }

@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_TOOLS_DETAIL_PAINTBRUSHSHADER_H
-#define APPLICATION_TOOLS_DETAIL_PAINTBRUSHSHADER_H
+#ifndef APPLICATION_TOOLS_DETAIL_MASKSHADER_H
+#define APPLICATION_TOOLS_DETAIL_MASKSHADER_H
 
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
@@ -38,20 +38,20 @@
 namespace Seg3D
 {
 
-class PaintBrushShader;
-typedef boost::shared_ptr< PaintBrushShader > PaintBrushShaderHandle;
+class MaskShader;
+typedef boost::shared_ptr< MaskShader > MaskShaderHandle;
 
-class PaintBrushShader : public Core::Lockable
+class MaskShader : public Core::Lockable
 {
 public:
-  PaintBrushShader();
-  ~PaintBrushShader();
+  MaskShader();
+  ~MaskShader();
 
   bool initialize();
   void enable();
   void disable();
-  void set_brush_texture( int tex_unit );
-  void set_brush_color( float r, float g, float b );
+  void set_texture( int tex_unit );
+  void set_color( float r, float g, float b );
   void set_opacity( float opacity );
   void set_pixel_size( float width, float height );
   void set_border_width( int width );
@@ -63,8 +63,8 @@ private:
   Core::GLSLProgramHandle glsl_prog_;
   Core::GLSLShaderHandle glsl_frag_shader_;
 
-  int brush_tex_loc_;
-  int brush_color_loc_;
+  int tex_loc_;
+  int color_loc_;
   int opacity_loc_;
   int border_width_loc_;
   int pixel_size_loc_;

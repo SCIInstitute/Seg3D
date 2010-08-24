@@ -109,7 +109,8 @@ void LayerManagerWidget::handle_groups_changed()
     this->group_map_.find( group_list[ i ]->get_group_id() );
     if( found_group_widget != this->group_map_.end() )
     {
-      this->group_layout_->insertWidget( i, ( *found_group_widget ).second.data() );
+      this->group_layout_->insertWidget( static_cast< int >( i ), 
+        ( *found_group_widget ).second.data() );
       ( *found_group_widget ).second->set_drop( false );
       ( *found_group_widget ).second->seethrough( false );
     }

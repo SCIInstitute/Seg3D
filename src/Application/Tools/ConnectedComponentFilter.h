@@ -31,10 +31,14 @@
 
 #include <Core/State/StateLabeledOption.h>
 
-#include <Application/Tools/SeedPointsTool.h>
+#include <Application/Tool/SeedPointsTool.h>
 
 namespace Seg3D
 {
+
+class ConnectedComponentFilterPrivate;
+typedef boost::shared_ptr< ConnectedComponentFilterPrivate > 
+  ConnectedComponentFilterPrivateHandle;
 
 class ConnectedComponentFilter : public SeedPointsTool
 {
@@ -51,15 +55,12 @@ public:
   ConnectedComponentFilter( const std::string& toolid );
   virtual ~ConnectedComponentFilter();
 
-
   // -- activate/deactivate tool --
   virtual void activate();
   virtual void deactivate();
-  
-private:
-  // -- handle updates from layermanager --
-  void handle_layers_changed();
 
+private:
+  ConnectedComponentFilterPrivateHandle private_;
 };
 
 } // end namespace

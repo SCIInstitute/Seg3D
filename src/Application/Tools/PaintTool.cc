@@ -43,7 +43,7 @@
 #include <Application/Layer/MaskLayer.h>
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
-#include <Application/Tools/detail/PaintBrushShader.h>
+#include <Application/Tools/detail/MaskShader.h>
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/PaintTool.h>
 #include <Application/Viewer/Viewer.h>
@@ -137,7 +137,7 @@ public:
 
   std::vector< unsigned char > brush_mask_;
   Core::Texture2DHandle brush_tex_;
-  PaintBrushShaderHandle shader_;
+  MaskShaderHandle shader_;
 
   const static int INVALID_VIEWER_C;
 };
@@ -274,7 +274,7 @@ void PaintToolPrivate::initialize()
     {
       Core::RenderResources::lock_type rr_lock( Core::RenderResources::GetMutex() );
       this->brush_tex_ = Core::Texture2DHandle( new Core::Texture2D );
-      this->shader_.reset( new PaintBrushShader );
+      this->shader_.reset( new MaskShader );
       this->shader_->initialize();
     }
 
@@ -283,7 +283,7 @@ void PaintToolPrivate::initialize()
 
     this->shader_->enable();
     this->shader_->set_border_width( 2 );
-    this->shader_->set_brush_texture( 0 );
+    this->shader_->set_texture( 0 );
     this->shader_->disable();
 
     this->initialized_ = true;
@@ -834,7 +834,7 @@ void PaintTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
     ( target_slice->ny() - 1 );
   
   // Lock the shader, because this function can be called from multiple rendering threads
-  PaintBrushShader::lock_type shader_lock( this->private_->shader_->get_mutex() );
+  MaskShader::lock_type shader_lock( this->private_->shader_->get_mutex() );
 
   this->private_->shader_->enable();
   this->private_->shader_->set_opacity( opacity );
@@ -883,7 +883,7 @@ void PaintTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
     double slice_screen_height = slice_height / slice_width * slice_screen_width;
     this->private_->shader_->set_pixel_size( static_cast< float >( 1.0 / slice_screen_width ), 
       static_cast< float >( 1.0 /slice_screen_height ) );
-    this->private_->shader_->set_brush_color( static_cast< float >( 1.0 - color.r() / 255 ), 
+    this->private_->shader_->set_color( static_cast< float >( 1.0 - color.r() / 255 ), 
       static_cast< float >( 1.0 - color.g() / 255 ), static_cast< float >( 1.0 - color.b() / 255 ) );
     glBegin( GL_QUADS );
       glTexCoord2f( 0.0f, 0.0f );
@@ -918,7 +918,7 @@ void PaintTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
     }
     this->private_->shader_->set_pixel_size( static_cast< float >( 1.0 / brush_screen_width ), 
       static_cast< float >( 1.0 /brush_screen_height ) );
-    this->private_->shader_->set_brush_color( static_cast< float >( color.r() / 255 ), 
+    this->private_->shader_->set_color( static_cast< float >( color.r() / 255 ), 
       static_cast< float >( color.g() / 255 ), static_cast< float >( color.b() / 255 ) );
 
     // Lock the brush texture

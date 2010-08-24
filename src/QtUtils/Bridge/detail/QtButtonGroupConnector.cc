@@ -51,8 +51,9 @@ QtButtonGroupConnector::QtButtonGroupConnector( QButtonGroup* parent,
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
     std::vector< std::string > option_list = state->option_list();
-    assert( buttons.size() == option_list.size() );
-    for ( size_t i = 0; i < option_list.size(); ++i )
+    int num_of_options = static_cast< int >( option_list.size() );
+    assert( buttons.size() == num_of_options );
+    for ( int i = 0; i < num_of_options; ++i )
     {
       buttons[ i ]->setCheckable( true );
       parent->setId( buttons[ i ], i );
