@@ -41,7 +41,7 @@ Volume::Volume( const GridTransform& grid_transform ) :
   this->nxy_ = this->nx_ * this->ny_;
 
   // Compute the inverse transform asw well.
-  this->inverse_grid_transform_ = this->grid_transform_.transform().get_inverse();
+  this->inverse_transform_ = this->grid_transform_.transform().get_inverse();
 }
 
 Volume::~Volume()
@@ -55,7 +55,7 @@ Point Volume::apply_grid_transform( const Point& pt ) const
 
 Point Volume::apply_inverse_grid_transform( const Point& pt ) const
 {
-  return this->inverse_grid_transform_ * pt;
+  return this->inverse_transform_ * pt;
 }
 
 } // end namespace Core

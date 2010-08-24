@@ -113,6 +113,11 @@ public:
   {
     return this->grid_transform_.transform();
   }
+
+  const Transform get_inverse_transform() const
+  {
+    return this->inverse_transform_;
+  }
   
   // GET_NX, GET_NY, GET_NZ, GET_SIZE:
   // The volume dimensions
@@ -164,7 +169,7 @@ private:
   GridTransform grid_transform_;
 
   // A precomputed transform in
-  Transform inverse_grid_transform_;
+  Transform inverse_transform_;
 
   // Cached size information of the GridTransform for fast indexing into the volume
   size_t nx_;
