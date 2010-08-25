@@ -106,6 +106,18 @@ public:
   // Triggers enable_rendering_signal_( true ).
   void enable_rendering();
 
+  // UPDATE_VIEWERS:
+  // Cause all the visible viewers in the specified mode to redraw overlay.
+  void update_viewers_overlay( const std::string& view_mode );
+
+  // UPDATE_2D_VIEWERS:
+  // Cause all the visible 2D viewers to redraw overlay.
+  void update_2d_viewers_overlay();
+
+  // UPDATE_VOLUME_VIEWERS:
+  // Cause all the visible volume viewers to redraw.
+  void update_volume_viewers();
+
   // -- State information --
 public:
 
@@ -142,7 +154,6 @@ private:
   void viewer_became_picking_target( size_t viewer_id );
   void viewer_lock_state_changed( size_t viewer_id );
   void update_picking_targets();
-  void update_volume_viewers();
 
 public:
   typedef boost::signals2::signal< void ( size_t ) > picking_target_changed_signal_type;

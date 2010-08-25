@@ -264,6 +264,13 @@ void ViewerManager::viewer_became_picking_target( size_t viewer_id )
 
 void ViewerManager::update_volume_viewers()
 {
+  if ( !Core::Application::IsApplicationThread() )
+  {
+    Core::Application::PostEvent( boost::bind( 
+      &ViewerManager::update_volume_viewers, this ) );
+    return;
+  }
+
   for ( size_t i = 0; i < 6; i++ )
   {
     ViewerHandle viewer = this->viewers_[ i ];
@@ -456,6 +463,44 @@ void ViewerManager::disable_rendering()
 void ViewerManager::enable_rendering()
 {
   this->enable_rendering_signal_( true );
+}
+
+void ViewerManager::update_viewers_overlay( const std::string& view_mode )
+{
+  if ( !Core::Application::IsApplicationThread() )
+  {
+    Core::Application::PostEvent( boost::bind( &ViewerManager::update_viewers_overlay,
+      this, view_mode ) );
+    return;
+  }
+  
+  for ( size_t i = 0; i < this->viewers_.size(); ++i )
+  {
+    if ( this->viewers_[ i ]->viewer_visible_state_->get() &&
+      this->viewers_[ i ]->view_mode_state_->get() == view_mode )
+    {
+      this->viewers_[ i ]->redraw_overlay();
+    }
+  }
+}
+
+void ViewerManager::update_2d_viewers_overlay()
+{
+  if ( !Core::Application::IsApplicationThread() )
+  {
+    Core::Application::PostEvent( boost::bind( 
+      &ViewerManager::update_2d_viewers_overlay, this ) );
+    return;
+  }
+
+  for ( size_t i = 0; i < this->viewers_.size(); ++i )
+  {
+    if ( this->viewers_[ i ]->viewer_visible_state_->get() &&
+      !this->viewers_[ i ]->is_volume_view() )
+    {
+      this->viewers_[ i ]->redraw_overlay();
+    }
+  }
 }
 
 } // end namespace Seg3D

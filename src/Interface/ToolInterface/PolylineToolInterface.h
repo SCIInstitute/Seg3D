@@ -53,9 +53,6 @@ public:
   virtual ~PolylineToolInterface();
   virtual bool build_widget( QFrame* frame );
   
-private Q_SLOTS:
-  void execute_filter();
-
 private:
   boost::shared_ptr< PolylineToolInterfacePrivate > private_;
 

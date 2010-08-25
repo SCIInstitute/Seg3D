@@ -163,6 +163,10 @@ protected:
 private:
   friend class VolumeSlicePrivate;
   VolumeSlicePrivateHandle private_;
+
+public:
+  static void ProjectOntoSlice( VolumeSliceType slice_type, const Point& pt,
+    double& i_pos, double& j_pos );
 };
 
 } // end namespace Core

@@ -279,7 +279,7 @@ bool SeedPointsTool::has_2d_visual()
 
 bool SeedPointsTool::has_3d_visual()
 {
-  return true;
+  return false;
 }
 
 } // end namespace Seg3D

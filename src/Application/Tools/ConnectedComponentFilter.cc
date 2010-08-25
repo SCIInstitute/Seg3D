@@ -48,15 +48,7 @@ public:
 
 void ConnectedComponentFilterPrivate::handle_seed_points_changed()
 {
-  size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
-  for ( size_t i = 0; i < num_of_viewers; i++ )
-  {
-    ViewerHandle viewer = ViewerManager::Instance()->get_viewer( i );
-    if ( !viewer->is_volume_view() && viewer->viewer_visible_state_->get() )
-    {
-      viewer->redraw_overlay();
-    }
-  }
+  ViewerManager::Instance()->update_2d_viewers_overlay();
 }
 
 ConnectedComponentFilter::ConnectedComponentFilter( const std::string& toolid ) :

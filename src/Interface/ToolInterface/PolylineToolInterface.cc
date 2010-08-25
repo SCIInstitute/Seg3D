@@ -48,7 +48,6 @@ class PolylineToolInterfacePrivate
 {
 public:
   Ui::PolylineToolInterface ui_;
-  TargetComboBox *target_;
 };
 
 // constructor
@@ -68,34 +67,27 @@ bool PolylineToolInterface::build_widget( QFrame* frame )
   //Step 1 - build the Qt GUI Widget
   this->private_->ui_.setupUi( frame );
   
-    this->private_->target_ = new TargetComboBox( this );
-    this->private_->ui_.activeHLayout->addWidget( this->private_->target_ );
-
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
   PolylineTool* tool = dynamic_cast< PolylineTool* > ( base_tool_.get() );
 
   //Step 3 - connect the gui to the tool through the QtBridge
-  QtUtils::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
-  
-  //TODO: need to decide how to pass fill vs delete
-  
-  this->private_->target_->sync_layers();
+  QtUtils::QtBridge::Connect( this->private_->ui_.target_mask_, tool->target_layer_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.use_active_layer_, tool->use_active_layer_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.fill_button_, boost::bind(
+    &PolylineTool::fill, tool, Core::Interface::GetWidgetActionContext() ) );
+  QtUtils::QtBridge::Connect( this->private_->ui_.erase_button_, boost::bind(
+    &PolylineTool::erase, tool, Core::Interface::GetWidgetActionContext() ) );
+  QtUtils::QtBridge::Connect( this->private_->ui_.clear_button_, boost::bind(
+    &PolylineTool::reset, tool, Core::Interface::GetWidgetActionContext() ) );
+  QtUtils::QtBridge::Enable( this->private_->ui_.fill_button_, tool->valid_target_state_ );
+  QtUtils::QtBridge::Enable( this->private_->ui_.erase_button_, tool->valid_target_state_ );
 
   //Send a message to the log that we have finised with building the Polyline Tool Interface
   CORE_LOG_MESSAGE("Finished building a Polyline Tool Interface");
 
   return ( true );
 } // end build_widget
-  
-void PolylineToolInterface::execute_filter()
-{
-  ToolHandle base_tool_ = tool();
-  PolylineTool* tool =
-  dynamic_cast< PolylineTool* > ( base_tool_.get() );
-  
-//  ActionPolyline::Dispatch( tool->target_layer_state_->export_to_string() ); 
-}
-  
+
 } // end namespace Seg3D
 

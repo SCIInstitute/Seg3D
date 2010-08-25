@@ -353,24 +353,7 @@ void VolumeSlice::get_world_coord( double i_pos, double j_pos, Point& world_coor
 
 void VolumeSlice::project_onto_slice( const Point& pt, double& i_pos, double& j_pos ) const
 {
-  switch ( this->private_->slice_type_ )
-  {
-  case VolumeSliceType::AXIAL_E:
-    i_pos = pt[ 0 ];
-    j_pos = pt[ 1 ];
-    break;
-  case VolumeSliceType::CORONAL_E:
-    i_pos = pt[ 0 ];
-    j_pos = pt[ 2 ];
-    break;
-  case VolumeSliceType::SAGITTAL_E:
-    i_pos = pt[ 1 ];
-    j_pos = pt[ 2 ];
-    break;
-  default:
-    assert( false );
-    break;
-  } 
+  VolumeSlice::ProjectOntoSlice( this->private_->slice_type_, pt, i_pos, j_pos );
 }
 
 void VolumeSlice::move_slice_to( const Point& pos, bool fail_safe )
@@ -571,6 +554,29 @@ bool VolumeSlice::get_size_changed()
 void VolumeSlice::set_size_changed( bool changed )
 {
   this->private_->size_changed_ = changed;
+}
+
+void VolumeSlice::ProjectOntoSlice( VolumeSliceType slice_type, const Point& pt, 
+                   double& i_pos, double& j_pos )
+{
+  switch ( slice_type )
+  {
+  case VolumeSliceType::AXIAL_E:
+    i_pos = pt[ 0 ];
+    j_pos = pt[ 1 ];
+    break;
+  case VolumeSliceType::CORONAL_E:
+    i_pos = pt[ 0 ];
+    j_pos = pt[ 2 ];
+    break;
+  case VolumeSliceType::SAGITTAL_E:
+    i_pos = pt[ 1 ];
+    j_pos = pt[ 2 ];
+    break;
+  default:
+    assert( false );
+    break;
+  } 
 }
 
 } // end namespace Core

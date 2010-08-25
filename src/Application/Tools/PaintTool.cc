@@ -93,16 +93,10 @@ public:
   void interpolated_paint( const PaintInfo& paint_info, int x0, int y0, 
     int x1, int y1, int& paint_count );
 
-  //bool paint_range( int x0, int y0, int x1, int y1 );
-
   // UPDATE_SAME_MODE_VIEWERS:
   // Cause viewers with the same view mode as the one that contains the paint brush
   // to redraw overlay to display the current position of the brush.
   void update_same_mode_viewers();
-
-  // UPDATE_VIEWERS:
-  // Cause all the 2D viewers to redraw overlay.
-  void update_viewers();
 
   void setup_paint_info( PaintInfo& paint_info, int x0, int y0, int x1, int y1 );
 
@@ -350,31 +344,55 @@ void PaintToolPrivate::paint( const PaintInfo& paint_info, int xc, int yc, int& 
 
   unsigned char* buffer = paint_info.target_slice_->get_cached_data();
   size_t nx = paint_info.target_slice_->nx();
-  bool has_data_constraint = paint_info.data_constraint_slice_.get() != 0;
-  bool has_mask_constraint = paint_info.mask_constraint_slice_.get() != 0;
-
-  for ( size_t y = y_start; y <= y_end; y++ )
+  Core::DataBlockHandle constraint_data_block;
+  Core::MaskDataBlockHandle constraint_mask_block;
+  if ( paint_info.data_constraint_slice_ )
   {
-    for ( size_t x = x_start; x <= x_end; x++ )
+    Core::DataVolumeHandle data_volume = boost::dynamic_pointer_cast
+      < Core::DataVolume >( paint_info.data_constraint_slice_->get_volume() );
+    constraint_data_block = data_volume->get_data_block();
+  }
+  if ( paint_info.mask_constraint_slice_ )
+  {
+    Core::MaskVolumeHandle mask_volume = boost::dynamic_pointer_cast
+      < Core::MaskVolume >( paint_info.mask_constraint_slice_->get_volume() );
+    constraint_mask_block = mask_volume->get_mask_data_block();
+  }
+
+  size_t slice_x, slice_y, slice_index;
+  size_t current_index = paint_info.target_slice_->to_index( 0, 0 );
+  size_t x_stride = paint_info.target_slice_->to_index( 1, 0 ) - current_index;
+  size_t y_stride = paint_info.target_slice_->to_index( 0, 1 ) - current_index;
+  size_t row_start = paint_info.target_slice_->to_index( x_min + x_start, y_min + y_start );
+  for ( size_t y = y_start; y <= y_end; y++, row_start += y_stride )
+  {
+    current_index = row_start;
+    for ( size_t x = x_start; x <= x_end; x++, current_index += x_stride )
     {
       if ( this->brush_mask_[ y * brush_size + x ] != 0 )
       {
-        size_t slice_x = x_min + x;
-        size_t slice_y = y_min + y;
-        size_t slice_index = slice_y * nx + slice_x;
-        if ( has_data_constraint && !paint_info.data_constraint_mask_[ slice_index ] )
+        slice_x = x_min + x;
+        slice_y = y_min + y;
+        slice_index = slice_y * nx + slice_x;
+
+        if ( constraint_data_block )
         {
-            continue;
+          double val = constraint_data_block->get_data_at( current_index );
+          bool in_range = val >= paint_info.min_val_ && val <= paint_info.max_val_;
+          in_range = paint_info.negative_data_constraint_ ? !in_range : in_range;
+          if ( !in_range ) continue;
         }
-        if ( has_mask_constraint )
+
+        if ( constraint_mask_block )
         {
-          bool has_mask = paint_info.mask_constraint_mask_[ slice_index ] != 0;
+          bool has_mask = constraint_mask_block->get_mask_at( current_index );
           if ( ( has_mask && paint_info.negative_mask_constraint_ ) ||
             ( !has_mask && !paint_info.negative_mask_constraint_ ) )
           {
             continue;
           }
         }
+
         if ( paint_info.erase_ )
         {
           buffer[ slice_index ] = 0;
@@ -420,36 +438,8 @@ void PaintToolPrivate::update_same_mode_viewers()
     return;
   }
 
-  this->viewer_->redraw_overlay();
   const std::string& view_mode = this->viewer_->view_mode_state_->get();
-  size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
-  for ( size_t i = 0; i < num_of_viewers; i++ )
-  {
-    if ( i == this->viewer_->get_viewer_id() )
-    {
-      continue;
-    }
-
-    ViewerHandle viewer = ViewerManager::Instance()->get_viewer( i );
-    if ( viewer->view_mode_state_->get() == view_mode &&
-      viewer->viewer_visible_state_->get() )
-    {
-      viewer->redraw_overlay();
-    }
-  }
-}
-
-void PaintToolPrivate::update_viewers()
-{
-  size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
-  for ( size_t i = 0; i < num_of_viewers; i++ )
-  {
-    ViewerHandle viewer = ViewerManager::Instance()->get_viewer( i );
-    if ( !viewer->is_volume_view() && viewer->viewer_visible_state_->get() )
-    {
-      viewer->redraw_overlay();
-    }
-  }
+  ViewerManager::Instance()->update_viewers_overlay( view_mode );
 }
 
 void PaintToolPrivate::handle_active_layer_changed( LayerHandle layer )
@@ -507,7 +497,7 @@ void PaintToolPrivate::handle_data_constraint_changed()
 {
   if ( this->paint_tool_->show_data_cstr_bound_state_->get() )
   {
-    this->update_viewers();
+    ViewerManager::Instance()->update_2d_viewers_overlay();
   }
   
   if ( this->paint_tool_->data_constraint_layer_state_->get() == Tool::NONE_OPTION_C )
@@ -656,7 +646,7 @@ void PaintToolPrivate::setup_paint_info( PaintInfo& paint_info, int x0, int y0, 
 
 void PaintToolPrivate::handle_data_cstr_visibility_changed()
 {
-  this->update_viewers();
+  ViewerManager::Instance()->update_2d_viewers_overlay();
 }
 
 void PaintToolPrivate::handle_data_cstr_range_changed()
@@ -667,7 +657,7 @@ void PaintToolPrivate::handle_data_cstr_range_changed()
     return;
   }
   
-  this->update_viewers();
+  ViewerManager::Instance()->update_2d_viewers_overlay();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -987,15 +977,19 @@ bool PaintTool::handle_mouse_move( const Core::MouseHistory& mouse_history,
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
     data_constraint_layer = this->data_constraint_layer_state_->get();
   }
-  if ( data_constraint_layer != Tool::NONE_OPTION_C )
+
+  if ( !this->private_->painting_ )
   {
-    this->private_->viewer_->update_status_bar( mouse_history.current_.x_,
-      mouse_history.current_.y_, data_constraint_layer );
-  }
-  else
-  {
-    this->private_->viewer_->update_status_bar( mouse_history.current_.x_,
-      mouse_history.current_.y_ );
+    if ( data_constraint_layer != Tool::NONE_OPTION_C )
+    {
+      this->private_->viewer_->update_status_bar( mouse_history.current_.x_,
+        mouse_history.current_.y_, data_constraint_layer );
+    }
+    else
+    {
+      this->private_->viewer_->update_status_bar( mouse_history.current_.x_,
+        mouse_history.current_.y_ );
+    }
   }
   
   double world_x, world_y;

@@ -29,20 +29,24 @@
 #ifndef APPLICATION_TOOLS_POLYLINETOOL_H
 #define APPLICATION_TOOLS_POLYLINETOOL_H
 
-#include <Application/Tool/Tool.h>
+#include <Application/Tool/SingleTargetTool.h>
 
 namespace Seg3D
 {
 
-class PolylineTool : public Tool
+class PolylineToolPrivate;
+typedef boost::shared_ptr< PolylineToolPrivate > PolylineToolPrivateHandle;
+
+class PolylineTool : public SingleTargetTool
 {
 
-SEG3D_TOOL(
-SEG3D_TOOL_NAME( "PolylineTool", "Tool for drawing with polylines" )
-SEG3D_TOOL_MENULABEL( "Polyline" )
-SEG3D_TOOL_MENU( "tools" )
-SEG3D_TOOL_SHORTCUT_KEY( "Alt+Y" )
-SEG3D_TOOL_URL( "http://seg3d.org/" )
+SEG3D_TOOL
+(
+  SEG3D_TOOL_NAME( "PolylineTool", "Tool for drawing with polylines" )
+  SEG3D_TOOL_MENULABEL( "Polyline" )
+  SEG3D_TOOL_MENU( "tools" )
+  SEG3D_TOOL_SHORTCUT_KEY( "Alt+Y" )
+  SEG3D_TOOL_URL( "http://seg3d.org/" )
 )
 
   // -- constructor/destructor --
@@ -50,29 +54,38 @@ public:
   PolylineTool( const std::string& toolid );
   virtual ~PolylineTool();
 
-  // -- activate/deactivate tool --
+public:
+  virtual bool handle_mouse_enter( size_t viewer_id, int x, int y );
+  virtual bool handle_mouse_leave( size_t viewer_id );
+  virtual bool handle_mouse_press( const Core::MouseHistory& mouse_history, 
+    int button, int buttons, int modifiers );
+  virtual bool handle_mouse_release( const Core::MouseHistory& mouse_history, 
+    int button, int buttons, int modifiers );
+  virtual bool handle_mouse_move( const Core::MouseHistory& mouse_history, 
+    int button, int buttons, int modifiers );
 
-  virtual void activate();
-  virtual void deactivate();
+  // REDRAW:
+  // Draw seed points in the specified viewer.
+  // The function should only be called by the renderer, which has a valid GL context.
+  virtual void redraw( size_t viewer_id, const Core::Matrix& proj_mat );
+
+  // HAS_2D_VISUAL:
+  // Returns true if the tool draws itself in the 2D view, otherwise false.
+  // The default implementation returns false.
+  virtual bool has_2d_visual();
 
   // -- dispatch functions --
-
-  void dispatch_fill_within_polyline() const;
-  void dispatch_erase_within_polyline() const;
-  void dispatch_reset_polyline() const;
-  
-private:
-  // -- handle updates from layermanager --
-  void handle_layers_changed();
-
-  // -- state --
 public:
-  // Layerid of the target layer
-  Core::StateStringHandle target_layer_state_;
+  void fill( Core::ActionContextHandle context ) const;
+  void erase( Core::ActionContextHandle context ) const;
+  void reset( Core::ActionContextHandle context ) const;
 
-  // Polyline data
-  // StateVector<Point>              polyline_;
+  // -- State Variables --
+public:
+  Core::StatePointVectorHandle vertices_state_;
 
+private:
+  PolylineToolPrivateHandle private_;
 };
 
 } // end namespace
