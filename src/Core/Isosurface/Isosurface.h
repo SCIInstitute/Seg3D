@@ -39,6 +39,7 @@
 // Core includes
 #include <Core/Geometry/Point.h>
 #include <Core/Geometry/Vector.h>
+#include <Core/Graphics/ColorMap.h>
 #include <Core/Volume/MaskVolume.h>
 #include <Core/Utils/Lockable.h>
 
@@ -93,6 +94,14 @@ public:
   // triggered it should end with a value 1.0 indicating that progress reporting has finised.
   // Progress is measured between 0.0 and 1.0.
   update_progress_signal_type update_progress_signal_;
+
+  // GETCOLORMAP
+  // Get a copy of the color map.  Returns copy in order to avoid threading issues.  
+  static void GetColorMap( ColorMap& color_map );
+
+  // SETCOLORMAP
+  // Set the colormap.  Makes a copy to avoid threading issues.  
+  static void SetColorMap( const ColorMap& color_map );
 
 private:
   IsosurfacePrivateHandle private_;

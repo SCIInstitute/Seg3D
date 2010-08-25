@@ -50,6 +50,8 @@ SET(CORE_GRAPHICS_SRCS
   GLSLShader.cc
   GLSLProgram.h
   GLSLProgram.cc
+  ColorMap.h
+  ColorMap.cc
   )
 
 

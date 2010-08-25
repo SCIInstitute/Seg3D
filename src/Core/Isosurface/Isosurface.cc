@@ -322,6 +322,9 @@ class IsosurfacePrivate
 {
 
 public:
+  typedef boost::shared_mutex mutex_type;
+  typedef boost::unique_lock< mutex_type > lock_type;
+
   void downsample_setup( int num_threads, double quality_factor );
 
   // PARALLEL_DOWNSAMPLE:
@@ -367,6 +370,10 @@ public:
   std::vector< unsigned int > faces_; // unsigned int because GL expects this
   std::vector< float > values_; // Should be in range [0, 1]
 
+  // Single colormap shared by all isosurfaces
+  static ColorMap color_map_;
+  static mutex_type color_map_mutex_;
+
   // Algorithm data & buffers
   unsigned char* data_; // Mask data is stored in bit-plane (8 masks per data block)
   size_t nx_, ny_, nz_; // Mask dimensions
@@ -403,9 +410,12 @@ public:
   const static double PARTITION_PERCENT_PROGRESS_C;
 };
 
+// Initialize static variables
 const double IsosurfacePrivate::COMPUTE_PERCENT_PROGRESS_C = 0.8;
 const double IsosurfacePrivate::NORMAL_PERCENT_PROGRESS_C = 0.05;
 const double IsosurfacePrivate::PARTITION_PERCENT_PROGRESS_C = 0.15; 
+ColorMap IsosurfacePrivate::color_map_;
+IsosurfacePrivate::mutex_type IsosurfacePrivate::color_map_mutex_;
 
 void IsosurfacePrivate::downsample_setup( int num_threads, double quality_factor )
 {
@@ -1225,6 +1235,7 @@ void Isosurface::compute( double quality_factor )
   this->private_->points_.clear();
   this->private_->normals_.clear();
   this->private_->faces_.clear();
+  this->private_->values_.clear();
 
   {
     Core::MaskVolume::shared_lock_type vol_lock( this->private_->orig_mask_volume_->get_mutex() );
@@ -1249,6 +1260,14 @@ void Isosurface::compute( double quality_factor )
   if( this->private_->points_.size() == 0 ) 
   {
     return;
+  }
+
+  // Test code
+  size_t num_points = this->private_->points_.size();
+  for( size_t i = 0; i < num_points; i++ )
+  {
+    float val = static_cast< float >( i ) / static_cast< float >( num_points );
+    this->private_->values_.push_back( val );
   }
 
   Parallel parallel_normals( boost::bind( &IsosurfacePrivate::parallel_compute_normals, 
@@ -1428,6 +1447,18 @@ void Isosurface::redraw()
     vertex_buffer->disable_arrays();
     normal_buffer->disable_arrays();
   } 
+}
+
+void Isosurface::GetColorMap( ColorMap& color_map ) 
+{
+  IsosurfacePrivate::lock_type lock( IsosurfacePrivate::color_map_mutex_ );
+  color_map = IsosurfacePrivate::color_map_;
+}
+
+void Isosurface::SetColorMap( const ColorMap& color_map )
+{
+  IsosurfacePrivate::lock_type lock( IsosurfacePrivate::color_map_mutex_ );
+  IsosurfacePrivate::color_map_ = color_map;
 }
 
 } // end namespace Core
