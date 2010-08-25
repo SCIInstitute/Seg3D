@@ -371,8 +371,7 @@ public:
   std::vector< float > values_; // Should be in range [0, 1]
 
   // Single colormap shared by all isosurfaces
-  static ColorMap color_map_;
-  static mutex_type color_map_mutex_;
+  ColorMapHandle color_map_;
 
   // Algorithm data & buffers
   unsigned char* data_; // Mask data is stored in bit-plane (8 masks per data block)
@@ -414,8 +413,6 @@ public:
 const double IsosurfacePrivate::COMPUTE_PERCENT_PROGRESS_C = 0.8;
 const double IsosurfacePrivate::NORMAL_PERCENT_PROGRESS_C = 0.05;
 const double IsosurfacePrivate::PARTITION_PERCENT_PROGRESS_C = 0.15; 
-ColorMap IsosurfacePrivate::color_map_;
-IsosurfacePrivate::mutex_type IsosurfacePrivate::color_map_mutex_;
 
 void IsosurfacePrivate::downsample_setup( int num_threads, double quality_factor )
 {
@@ -1226,6 +1223,9 @@ Isosurface::Isosurface( const MaskVolumeHandle& mask_volume ) :
   this->private_->compute_mask_volume_ = mask_volume;
   this->private_->surface_changed_ = false;
   this->private_->vbo_available_ = false;
+
+  // Test code -- set default colormap
+  this->set_color_map( ColorMapHandle( new ColorMap() ) );
 }
 
 void Isosurface::compute( double quality_factor )
@@ -1449,16 +1449,16 @@ void Isosurface::redraw()
   } 
 }
 
-void Isosurface::GetColorMap( ColorMap& color_map ) 
+void Isosurface::set_color_map( ColorMapHandle color_map )
 {
-  IsosurfacePrivate::lock_type lock( IsosurfacePrivate::color_map_mutex_ );
-  color_map = IsosurfacePrivate::color_map_;
+  lock_type lock( this->get_mutex() );
+  this->private_->color_map_ = color_map;
 }
 
-void Isosurface::SetColorMap( const ColorMap& color_map )
+Core::ColorMapHandle Isosurface::get_color_map() const
 {
-  IsosurfacePrivate::lock_type lock( IsosurfacePrivate::color_map_mutex_ );
-  IsosurfacePrivate::color_map_ = color_map;
+  lock_type lock( this->get_mutex() );
+  return this->private_->color_map_;
 }
 
 } // end namespace Core
