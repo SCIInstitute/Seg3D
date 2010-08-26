@@ -33,8 +33,8 @@
 #include <vector>
 
 // Boost includes
-#include <boost/utility.hpp> // Needed for noncopyable
 #include <boost/smart_ptr.hpp> // Needed for shared_ptr
+#include <boost/utility.hpp> // Needed for noncopyable
 
 // Core includes
 #include <Core/Geometry/Point.h>

@@ -32,12 +32,13 @@
 // STL includes
 #include <vector>
 
+// Boost includes
+#include <boost/smart_ptr.hpp> // Needed for shared_ptr
+#include <boost/utility.hpp> // Needed for noncopyable
+
 // Core includes
 #include <Core/Geometry/Color.h>
 #include <Core/Graphics/Texture.h>
-
-// Boost includes
-#include <boost/smart_ptr.hpp> // Needed for shared_ptr
 
 namespace Core 
 {
@@ -45,7 +46,7 @@ namespace Core
 class ColorMap;
 typedef boost::shared_ptr< ColorMap > ColorMapHandle;
 
-class ColorMap 
+class ColorMap : public boost::noncopyable 
 {
 public:
   // Creates default rainbow colormap
@@ -53,8 +54,6 @@ public:
 
   // Colors should be in range [0, 1]
   ColorMap( const std::vector< Color >& colors, float lookup_min, float lookup_max );
-
-  // TODO Implement copy constructor 
 
   virtual ~ColorMap();
 
