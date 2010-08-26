@@ -90,15 +90,21 @@ public:
 
   virtual ~StateVectorBase() {}
 
+  virtual size_t size() const = 0;
+
 protected:
   friend class ActionAdd;
   friend class ActionRemove;
   friend class ActionClear;
+  friend class ActionSetAt;
 
   virtual bool add( ActionParameterVariant& variant, 
     ActionSource source = ActionSource::NONE_E ) = 0;
 
   virtual bool remove( ActionParameterVariant& variant, 
+    ActionSource source = ActionSource::NONE_E ) = 0;
+
+  virtual bool set_at( size_t index, ActionParameterVariant& variant,
     ActionSource source = ActionSource::NONE_E ) = 0;
 
   virtual void clear( ActionSource source = ActionSource::NONE_E ) = 0;
@@ -184,6 +190,17 @@ protected:
     return this->add( element_value, source );
   }
 
+  virtual bool set_at( size_t index, ActionParameterVariant& variant,
+    ActionSource source = ActionSource::NONE_E )
+  {
+    T element_value;
+    if ( !variant.get_value( element_value ) )
+    {
+      return false;
+    }
+    return this->set_at( index, element_value, source );
+  }
+
   virtual bool remove( ActionParameterVariant& variant, 
     Core::ActionSource source = Core::ActionSource::NONE_E )
   {
@@ -231,6 +248,13 @@ public:
     return this->values_vector_;
   }
 
+  // SIZE:
+  // Return the number of elements in the vector.
+  virtual size_t size() const
+  {
+    return this->values_vector_.size();
+  }
+
   // SET:
   // Set the value of the state variable
   // NOTE: this function by passes the action mechanism and should only be used
@@ -254,6 +278,31 @@ public:
         this->state_changed_signal_();
       }
     }
+    return true;
+  }
+
+  bool set_at( size_t index, const T& value, ActionSource source = ActionSource::NONE_E )
+  {
+    // NOTE: State variables can only be set from the application thread
+    ASSERT_IS_APPLICATION_THREAD_OR_INITIALIZING();
+
+    if ( index >= this->values_vector_.size() )
+    {
+      return false;
+    }
+    
+    {
+      // Lock the state engine so no other thread will be accessing it
+      StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
+      this->values_vector_[ index ] = value;
+    }
+
+    if ( this->signals_enabled() )
+    {
+      this->value_changed_signal_( this->values_vector_, source );
+      this->state_changed_signal_();
+    }
+    
     return true;
   }
 

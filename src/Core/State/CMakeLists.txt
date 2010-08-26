@@ -83,6 +83,8 @@ SET(CORE_STATE_ACTIONS_SRCS
   Actions/ActionToggle.cc
   Actions/ActionTranslateView.h
   Actions/ActionTranslateView.cc
+  Actions/ActionSetAt.h
+  Actions/ActionSetAt.cc
   )
 
 CORE_ADD_LIBRARY(Core_State 

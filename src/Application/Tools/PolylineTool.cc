@@ -29,6 +29,7 @@
 #include <Core/Volume/VolumeSlice.h>
 #include <Core/State/Actions/ActionAdd.h>
 #include <Core/State/Actions/ActionClear.h>
+#include <Core/State/Actions/ActionSetAt.h>
 
 // Application includes
 #include <Application/Tool/ToolFactory.h>
@@ -201,6 +202,37 @@ bool PolylineTool::handle_mouse_move( const Core::MouseHistory& mouse_history,
 {
   if ( this->private_->moving_vertex_ )
   {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    Core::Point pt = this->vertices_state_->get()[ this->private_->vertex_index_ ];
+    std::string view_mode = this->private_->viewer_->view_mode_state_->get();
+    double world_x, world_y;
+    this->private_->viewer_->window_to_world( mouse_history.current_.x_,
+      mouse_history.current_.y_, world_x, world_y );
+    lock.unlock();
+
+    if ( view_mode == Viewer::AXIAL_C )
+    {
+      pt[ 0 ] = world_x;
+      pt[ 1 ] = world_y;
+    }
+    else if ( view_mode == Viewer::CORONAL_C )
+    {
+      pt[ 0 ] = world_x;
+      pt[ 2 ] = world_y;
+    }
+    else if ( view_mode == Viewer::SAGITTAL_C )
+    {
+      pt[ 1 ] = world_x;
+      pt[ 2 ] = world_y;
+    }
+    else
+    {
+      this->private_->moving_vertex_ = false;
+      return false;
+    }
+
+    Core::ActionSetAt::Dispatch( Core::Interface::GetMouseActionContext(),
+      this->vertices_state_, this->private_->vertex_index_, pt );
     return true;
   }
   
