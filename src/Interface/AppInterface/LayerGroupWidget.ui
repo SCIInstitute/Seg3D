@@ -163,7 +163,7 @@ QToolButton#group_transform_button_:checked{
 
 QToolButton#group_iso_button_{
   background-color: rgba(0, 0, 0, 0);
-  border: 1px solid rgba(0, 0, 0, 50);
+  border: 1px solid rgba(0, 0, 0, 0);
   margin: 0 0 0 0;
   padding: 0 0 0 0;
 }
@@ -659,6 +659,11 @@ QWidget#group_tools_{
                  <property name="text">
                   <string/>
                  </property>
+                 <property name="icon">
+                  <iconset resource="../../Resources/QtResources.qrc">
+                   <normaloff>:/Images/IsosurfaceMenuOff.png</normaloff>
+                   <normalon>:/Images/IsosurfaceMenu.png</normalon>:/Images/IsosurfaceMenuOff.png</iconset>
+                 </property>
                  <property name="iconSize">
                   <size>
                    <width>35</width>
@@ -1018,7 +1023,7 @@ QWidget#group_tools_{
                   <number>0</number>
                  </property>
                  <property name="elideMode">
-                  <enum>Qt::ElideRight</enum>
+                  <enum>Qt::ElideNone</enum>
                  </property>
                  <widget class="QWidget" name="tab">
                   <property name="minimumSize">
@@ -1354,11 +1359,6 @@ QWidget#group_tools_{
                       <width>0</width>
                       <height>16</height>
                      </size>
-                    </property>
-                    <property name="font">
-                     <font>
-                      <pointsize>11</pointsize>
-                     </font>
                     </property>
                     <property name="text">
                      <string>Isosurface Quality:</string>

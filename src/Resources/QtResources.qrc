@@ -1,5 +1,7 @@
 <RCC>
   <qresource prefix="/">
+    <file>Images/IsosurfaceMenu.png</file>
+    <file>Images/IsosurfaceMenuOff.png</file>
     <file>Images/VviewOff.png</file>
     <file>Images/XviewOff.png</file>
     <file>Images/YviewOff.png</file>

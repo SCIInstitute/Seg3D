@@ -67,12 +67,29 @@ protected:
   // the entered data so it can be passed to the next page
   virtual bool validatePage();
 
+private Q_SLOTS:
+  // SET_PATH:
+  // function that sets the path for the segmentation export
+  void set_path();
+
 private:
   QVBoxLayout *main_layout_;
-  QWidget *segmentation_title_widget_;
-  QHBoxLayout *segmentation_name_layout_;
+  QWidget *segmentation_top_widget_;
+  QVBoxLayout *verticalLayout;
+  QWidget *segmentation_name_widget_;
+  QHBoxLayout *horizontalLayout;
   QLabel *segmentation_name_label_;
   QLineEdit *segmentation_name_lineedit_;
+  QWidget *widget_2;
+  QVBoxLayout *verticalLayout_2;
+  QWidget *widget_3;
+  QHBoxLayout *horizontalLayout_2;
+  QLabel *segmentation_path_label_;
+  QLineEdit *segmentation_path_lineedit_;
+  QWidget *widget_4;
+  QHBoxLayout *horizontalLayout_3;
+  QSpacerItem *horizontalSpacer;
+  QPushButton *set_path_button_;
   QTreeWidget *group_with_masks_tree_;
   QLineEdit *mask_list_;
 
@@ -83,7 +100,7 @@ class SegmentationSummaryPage : public QWizardPage
     Q_OBJECT
 
 public:
-    SegmentationSummaryPage(QWidget *parent = 0);
+    SegmentationSummaryPage( QWidget *parent = 0 );
 
 protected:
     void initializePage();
