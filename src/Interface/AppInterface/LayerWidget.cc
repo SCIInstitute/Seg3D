@@ -91,6 +91,7 @@ public:
   // Local copy of state information 
   bool active_;
   bool locked_;
+  bool in_use_;
   bool picked_up_;
 };
 
@@ -544,13 +545,15 @@ void LayerWidget::set_border_visibility( bool show )
   }
 }
   
-void LayerWidget::update_appearance( bool locked, bool active, bool initialize )
+void LayerWidget::update_appearance( bool locked, bool active, bool in_use, bool initialize )
 {
   if ( locked == this->private_->locked_ && 
-     active == this->private_->active_ && initialize == false ) return;
+     active == this->private_->active_ &&
+     in_use == this->private_->in_use_ && initialize == false ) return;
   
   this->private_->locked_ = locked;
   this->private_->active_ = active;
+  this->private_->in_use_ = in_use;
 
   // Update the lock button
   this->private_->ui_.lock_button_->blockSignals( true );
@@ -567,10 +570,6 @@ void LayerWidget::update_appearance( bool locked, bool active, bool initialize )
         this->private_->ui_.type_->setStyleSheet( StyleSheet::LAYER_WIDGET_BACKGROUND_LOCKED_C );
       }
       else if ( active )
-      {
-        this->private_->ui_.type_->setStyleSheet( StyleSheet::DATA_VOLUME_COLOR_C );      
-      }
-      else
       {
         this->private_->ui_.type_->setStyleSheet( StyleSheet::DATA_VOLUME_COLOR_C );
       }
@@ -594,10 +593,6 @@ void LayerWidget::update_appearance( bool locked, bool active, bool initialize )
       {
         this->private_->ui_.type_->setStyleSheet( StyleSheet::LABEL_VOLUME_COLOR_C );
       }
-      else
-      {
-        this->private_->ui_.type_->setStyleSheet( StyleSheet::LABEL_VOLUME_COLOR_C );
-      }
     }
     break;
   }
@@ -607,10 +602,20 @@ void LayerWidget::update_appearance( bool locked, bool active, bool initialize )
     this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_LOCKED_C );
     this->private_->ui_.label_->setStyleSheet( StyleSheet::LAYER_WIDGET_LABEL_LOCKED_C ); 
   }
-  else if( active )
+  else if( active && !in_use )
   {
     this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_ACTIVE_C );  
     this->private_->ui_.label_->setStyleSheet( StyleSheet::LAYER_WIDGET_LABEL_ACTIVE_C );
+  }
+  else if( active && in_use )
+  {
+    this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_ACTIVE_IN_USE_C );  
+    this->private_->ui_.label_->setStyleSheet( StyleSheet::LAYER_WIDGET_LABEL_ACTIVE_IN_USE_C );
+  }
+  else if ( in_use )
+  {
+    this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_IN_USE_C );  
+    this->private_->ui_.label_->setStyleSheet( StyleSheet::LAYER_WIDGET_LABEL_IN_USE_C ); 
   }
   else
   {
@@ -651,7 +656,7 @@ void LayerWidget::update_widget_state( bool initialize )
     this->set_active_menu( menu_state, visual_lock, initialize );
     
     // Change the color of the widget
-    this->update_appearance( visual_lock,  active_layer, initialize );
+    this->update_appearance( visual_lock,  active_layer, false, initialize );
     
     // Hide the progress bar
     this->show_progress_bar( false );
@@ -664,7 +669,7 @@ void LayerWidget::update_widget_state( bool initialize )
     set_active_menu( menu_state, true, initialize );
 
     // Change the color of the widget
-    update_appearance( true,  false, initialize );  
+    update_appearance( true,  false, false, initialize ); 
 
     // Show the progress bar, since we are computing a new layer
     this->show_progress_bar( true );
@@ -679,11 +684,28 @@ void LayerWidget::update_widget_state( bool initialize )
     set_active_menu( menu_state, visual_lock, initialize );
     
     // Change the color of the widget
-    update_appearance( visual_lock,  active_layer, initialize );  
+    update_appearance( visual_lock,  active_layer, true, initialize );  
     
     // Show the progress bar, since we are computing a new layer
     this->show_progress_bar( true );
   }
+  else if ( data_state == Layer::IN_USE_C )
+
+  {
+    // IN_USE_C state
+    // Lock buttons if widget is locked
+    enable_buttons( true, false, !visual_lock, initialize );
+    // If locked no bars can be opened and adjust the option
+    // menu to the actual menu that is open in the state manager    
+    set_active_menu( menu_state, visual_lock, initialize );
+    
+    // Change the color of the widget
+    update_appearance( visual_lock,  active_layer, true, initialize );  
+    
+    // Show the progress bar, since we are computing a new layer
+    this->show_progress_bar( false );
+  }
+
 }
 
 std::string LayerWidget::get_layer_id() const

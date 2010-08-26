@@ -159,11 +159,31 @@ namespace Seg3D
   const QString StyleSheet::LAYER_WIDGET_BASE_ACTIVE_C = QString::fromUtf8(
     "QWidget#base_{"
     " border-radius: 3px;"
-    " border:1px solid rgb(83, 111, 165);"
+    " border:2px solid rgb(33, 33, 255, 255);"
     " background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1,"
     "   stop:0 rgba(193, 215, 255, 255),"
     "   stop:0.353234 rgba(204, 222, 255, 255),"
     "   stop:1 rgba(164, 196, 255, 255));"
+    "}");
+
+  const QString StyleSheet::LAYER_WIDGET_BASE_ACTIVE_IN_USE_C = QString::fromUtf8(
+    "QWidget#base_{"
+    " border-radius: 3px;"
+    " border:2px solid rgb(33, 33, 255, 255);"
+    " background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1,"
+    "   stop:0 rgba(193, 255, 255, 255),"
+    "   stop:0.353234 rgba(204, 255, 255, 255),"
+    "   stop:1 rgba(164, 255, 255, 255));"
+    "}");
+
+  const QString StyleSheet::LAYER_WIDGET_BASE_IN_USE_C = QString::fromUtf8(
+    "QWidget#base_{"
+    " border-radius: 3px;"
+    " border:1px solid rgb(83, 111, 165);"
+    " background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1,"
+    "   stop:0 rgba(193, 255, 215, 255),"
+    "   stop:0.353234 rgba(204, 255, 222, 255),"
+    "   stop:1 rgba(164, 255, 196, 255));"
     "}");
   
   // - INACTIVE - //
@@ -191,6 +211,22 @@ namespace Seg3D
     " margin-right: 3px;"
     " background-color: rgba( 193, 215, 255, 255 );"
     "}");
+
+  const QString StyleSheet::LAYER_WIDGET_LABEL_ACTIVE_IN_USE_C = QString::fromUtf8(
+    "QLineEdit#label_{"
+    " text-align: left;"
+    " color: black;"
+    " margin-right: 3px;"
+    " background-color: rgba( 193, 255, 255, 255 );"
+    "}");
+    
+  const QString StyleSheet::LAYER_WIDGET_LABEL_IN_USE_C = QString::fromUtf8(
+    "QLineEdit#label_{"
+    " text-align: left;"
+    " color: black;"
+    " margin-right: 3px;"
+    " background-color: rgba( 193, 255, 215, 255 );"
+    "}");   
         
   // - DROP - //
   const QString StyleSheet::LAYER_WIDGET_BASE_DROP_C = QString::fromUtf8(
@@ -220,6 +256,7 @@ namespace Seg3D
     " border-radius: 3px;"
     " border: 1px solid rgb(120, 120, 120);"
     "}");   
+    
   const QString StyleSheet::LAYER_WIDGET_BACKGROUND_LOCKED_C = QString::fromUtf8(
     "QWidget#type_{"
     " background-color: gray;"

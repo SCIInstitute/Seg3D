@@ -77,7 +77,7 @@ public:
 
   // UPDATE_APPEARANCE:
   // Update the appearance of the widget to reflect its state
-  void update_appearance( bool locked, bool active, bool initialize = false);
+  void update_appearance( bool locked, bool active, bool in_use, bool initialize = false);
 
   // UPDATE_WIDGET_STATE:
   // Update the button state, the open menus and color of the widget

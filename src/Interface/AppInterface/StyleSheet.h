@@ -76,6 +76,8 @@ public:
     const static QString LABEL_VOLUME_COLOR_C;
     // - ACTIVE - //
     const static QString LAYER_WIDGET_BASE_ACTIVE_C;
+    const static QString LAYER_WIDGET_BASE_ACTIVE_IN_USE_C;
+    const static QString LAYER_WIDGET_BASE_IN_USE_C;
     // - INACTIVE - //
     const static QString LAYER_WIDGET_BASE_INACTIVE_C;
     const static QString LAYER_WIDGET_LABEL_INACTIVE_C;
@@ -87,11 +89,14 @@ public:
     const static QString LAYER_WIDGET_BASE_LOCKED_C;
     const static QString LAYER_WIDGET_BACKGROUND_LOCKED_C;
     const static QString LAYER_WIDGET_LABEL_LOCKED_C;
+
+    const static QString LAYER_WIDGET_LABEL_ACTIVE_C;   
+    const static QString LAYER_WIDGET_LABEL_ACTIVE_IN_USE_C;    
+    const static QString LAYER_WIDGET_LABEL_IN_USE_C; 
   
   // === LayerGroupWidget Styles === //
     // - ACTIVE - //
     const static QString GROUP_WIDGET_BASE_ACTIVE_C;
-    const static QString LAYER_WIDGET_LABEL_ACTIVE_C;   
     const static QString GROUP_WIDGET_BACKGROUND_ACTIVE_C;
     const static QString GROUP_WIDGET_ACTIVATE_BUTTON_ACTIVE_C;
     // - INACTIVE - //
