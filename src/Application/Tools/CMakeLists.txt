@@ -107,6 +107,8 @@ SET(APPLICATION_TOOLS_ACTIONS_SRCS
   Actions/ActionMedianFilter.cc
   Actions/ActionThreshold.h
   Actions/ActionThreshold.cc
+  Actions/ActionPolyline.h
+  Actions/ActionPolyline.cc  
   )
 
 CORE_ADD_LIBRARY(Application_Tools 

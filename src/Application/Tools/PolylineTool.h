@@ -76,9 +76,9 @@ public:
 
   // -- dispatch functions --
 public:
-  void fill( Core::ActionContextHandle context ) const;
-  void erase( Core::ActionContextHandle context ) const;
-  void reset( Core::ActionContextHandle context ) const;
+  void fill( Core::ActionContextHandle context );
+  void erase( Core::ActionContextHandle context );
+  void reset( Core::ActionContextHandle context );
 
   // -- State Variables --
 public:

@@ -27,6 +27,7 @@
  */
 
 #include <Core/Volume/VolumeSlice.h>
+#include <Core/Volume/MaskVolumeSlice.h>
 #include <Core/State/Actions/ActionAdd.h>
 #include <Core/State/Actions/ActionClear.h>
 #include <Core/State/Actions/ActionSetAt.h>
@@ -34,6 +35,7 @@
 // Application includes
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/PolylineTool.h>
+#include <Application/Tools/Actions/ActionPolyline.h>
 #include <Application/Layer/Layer.h>
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/Viewer/Viewer.h>
@@ -50,6 +52,7 @@ class PolylineToolPrivate
 public:
   void handle_vertices_changed();
   bool find_vertex( int x, int y, size_t& index );
+  void execute( Core::ActionContextHandle context, bool erase );
 
   PolylineTool* tool_;
   ViewerHandle viewer_;
@@ -104,6 +107,58 @@ bool PolylineToolPrivate::find_vertex( int x, int y, size_t& index )
   return false;
 }
 
+void PolylineToolPrivate::execute( Core::ActionContextHandle context, bool erase )
+{
+  Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
+
+  if ( !this->tool_->valid_target_state_->get() )
+  {
+    return;
+  }
+  
+  int active_viewer_id = ViewerManager::Instance()->active_viewer_state_->get();
+  if ( active_viewer_id < 0 )
+  {
+    return;
+  }
+  
+  ViewerHandle viewer = ViewerManager::Instance()->get_viewer( 
+    static_cast< size_t >( active_viewer_id ) );
+  if ( !viewer || viewer->is_volume_view() )
+  {
+    return;
+  }
+  
+  Core::MaskVolumeSliceHandle volume_slice = boost::dynamic_pointer_cast
+    < Core::MaskVolumeSlice >( viewer->get_volume_slice( 
+    this->tool_->target_layer_state_->get() ) );
+  if ( !volume_slice )
+  {
+    return;
+  }
+  
+  const std::vector< Core::Point >& vertices = this->tool_->vertices_state_->get();
+  size_t num_of_vertices = vertices.size();
+  if ( num_of_vertices < 3 )
+  {
+    return;
+  }
+  double world_x, world_y;
+  int x, y;
+  std::vector< ActionPolyline::VertexCoord > vertices_2d;
+  for ( size_t i = 0; i < num_of_vertices; ++i )
+  {
+    volume_slice->project_onto_slice( vertices[ i ], world_x, world_y );
+    volume_slice->world_to_index( world_x, world_y, x, y );
+    vertices_2d.push_back( ActionPolyline::VertexCoord( 
+      static_cast< float >( x ), static_cast< float >( y ), 0 ) );
+  }
+  
+  ActionPolyline::Dispatch( context, this->tool_->target_layer_state_->get(),
+    volume_slice->get_slice_type(), volume_slice->get_slice_number(), erase, vertices_2d );
+}
+
+
 
 PolylineTool::PolylineTool( const std::string& toolid ) :
   SingleTargetTool( Core::VolumeType::MASK_E, toolid ),
@@ -123,15 +178,17 @@ PolylineTool::~PolylineTool()
   this->disconnect_all();
 }
 
-void PolylineTool::fill( Core::ActionContextHandle context ) const
+void PolylineTool::fill( Core::ActionContextHandle context )
 {
+  this->private_->execute( context, false );
 }
 
-void PolylineTool::erase( Core::ActionContextHandle context ) const
+void PolylineTool::erase( Core::ActionContextHandle context )
 {
+  this->private_->execute( context, true );
 }
 
-void PolylineTool::reset( Core::ActionContextHandle context ) const
+void PolylineTool::reset( Core::ActionContextHandle context )
 {
   Core::ActionClear::Dispatch( context, this->vertices_state_ );
 }
