@@ -269,8 +269,8 @@ void LayerImporterWidget::import()
 {
   if( this->private_->importer_ )
   {
-    ActionImportLayer::Dispatch( Core::Interface::GetWidgetActionContext(), this->private_->importer_, 
-      this->private_->mode_ );
+    ActionImportLayer::Dispatch( Core::Interface::GetWidgetActionContext(), 
+      this->private_->importer_, this->private_->mode_ );
   }
   else
   {

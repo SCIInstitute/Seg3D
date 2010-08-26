@@ -284,7 +284,7 @@ void ProjectDockWidget::populate_session_list()
       ( Core::SplitString( session_name, " - " ) )[ 1 ] ) );
 
     QFont font;
-    font.setPointSize( 11 );
+    //font.setPointSize( 11 );
     
     if( ( Core::SplitString( session_name, " - " ) )[ 1 ]== "AutoSave" )
     {

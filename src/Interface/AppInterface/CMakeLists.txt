@@ -170,6 +170,7 @@ TARGET_LINK_LIBRARIES(Interface_AppInterface
                       Interface_AppSplash
                       Interface_AppProjectWizard
                       Interface_AppProjectExportWizard
+                      Interface_AppSegmentationExportWizard
                       ${QT_LIBRARIES} 
                       ${SCI_BOOST_LIBRARY})
 

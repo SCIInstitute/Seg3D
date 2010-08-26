@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>285</width>
+    <width>323</width>
     <height>809</height>
    </rect>
   </property>
@@ -86,11 +86,6 @@
           </property>
           <item>
            <widget class="QLabel" name="label_2">
-            <property name="font">
-             <font>
-              <pointsize>11</pointsize>
-             </font>
-            </property>
             <property name="text">
              <string>Project Name:</string>
             </property>
@@ -98,11 +93,6 @@
           </item>
           <item>
            <widget class="QLineEdit" name="project_name_edit_">
-            <property name="font">
-             <font>
-              <pointsize>11</pointsize>
-             </font>
-            </property>
             <property name="focusPolicy">
              <enum>Qt::ClickFocus</enum>
             </property>
@@ -134,11 +124,6 @@
           </property>
           <item>
            <widget class="QCheckBox" name="custom_colors_checkbox_">
-            <property name="font">
-             <font>
-              <pointsize>11</pointsize>
-             </font>
-            </property>
             <property name="text">
              <string>Include Custom Colors</string>
             </property>
@@ -185,11 +170,6 @@
              </property>
              <item>
               <widget class="QCheckBox" name="autosave_checkbox_">
-               <property name="font">
-                <font>
-                 <pointsize>11</pointsize>
-                </font>
-               </property>
                <property name="text">
                 <string>Active</string>
                </property>
@@ -197,11 +177,6 @@
              </item>
              <item>
               <widget class="QLabel" name="label">
-               <property name="font">
-                <font>
-                 <pointsize>11</pointsize>
-                </font>
-               </property>
                <property name="toolTip">
                 <string>Controls for changing the Autosave frequency are located in the Preferences Manager</string>
                </property>
@@ -212,11 +187,6 @@
              </item>
              <item>
               <widget class="QLabel" name="minutes_label_">
-               <property name="font">
-                <font>
-                 <pointsize>11</pointsize>
-                </font>
-               </property>
                <property name="toolTip">
                 <string>Controls for changing the Autosave frequency are located in the Preferences Manager</string>
                </property>
@@ -227,11 +197,6 @@
              </item>
              <item>
               <widget class="QLabel" name="label_6">
-               <property name="font">
-                <font>
-                 <pointsize>11</pointsize>
-                </font>
-               </property>
                <property name="toolTip">
                 <string>Controls for changing the Autosave frequency are located in the Preferences Manager</string>
                </property>
@@ -263,11 +228,6 @@
           </property>
           <item>
            <widget class="QLabel" name="label_3">
-            <property name="font">
-             <font>
-              <pointsize>11</pointsize>
-             </font>
-            </property>
             <property name="toolTip">
              <string>Controls for activating and deactivating Smart Autosave are located in the Preferences Manager</string>
             </property>
@@ -278,11 +238,6 @@
           </item>
           <item>
            <widget class="QLabel" name="file_size_label_">
-            <property name="font">
-             <font>
-              <pointsize>11</pointsize>
-             </font>
-            </property>
             <property name="toolTip">
              <string>Controls for activating and deactivating Smart Autosave are located in the Preferences Manager</string>
             </property>
@@ -305,11 +260,6 @@
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
-      <property name="font">
-       <font>
-        <pointsize>11</pointsize>
-       </font>
-      </property>
       <property name="currentIndex">
        <number>0</number>
       </property>
@@ -323,11 +273,6 @@
         </property>
         <item>
          <widget class="QTableWidget" name="sessions_list_">
-          <property name="font">
-           <font>
-            <pointsize>11</pointsize>
-           </font>
-          </property>
           <property name="horizontalScrollBarPolicy">
            <enum>Qt::ScrollBarAlwaysOff</enum>
           </property>
@@ -447,11 +392,6 @@
               </property>
               <item>
                <widget class="QLabel" name="label_4">
-                <property name="font">
-                 <font>
-                  <pointsize>10</pointsize>
-                 </font>
-                </property>
                 <property name="text">
                  <string>New Session Name:</string>
                 </property>
@@ -672,11 +612,6 @@
        </property>
        <item>
         <widget class="QPushButton" name="export_project_button_">
-         <property name="font">
-          <font>
-           <pointsize>11</pointsize>
-          </font>
-         </property>
          <property name="text">
           <string>Export Project</string>
          </property>

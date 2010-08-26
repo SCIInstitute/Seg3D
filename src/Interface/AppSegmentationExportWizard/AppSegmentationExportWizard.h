@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_APPPROJECTWIZARD_APPPROJECTWIZARD_H
-#define INTERFACE_APPPROJECTWIZARD_APPPROJECTWIZARD_H
+#ifndef INTERFACE_APPPROJECTWIZARD_APPSEGMENTATIONEXPORTWIZARD_H
+#define INTERFACE_APPPROJECTWIZARD_APPSEGMENTATIONEXPORTWIZARD_H
 
 //Qt includes
 #include <QtGui>
@@ -35,13 +35,13 @@
 namespace Seg3D
 {
 
-class AppProjectWizard : public QWizard
+class AppSegmentationExportWizard : public QWizard
 {
 Q_OBJECT
 
 public:
-    AppProjectWizard( QWidget *parent = 0 );
-    virtual ~AppProjectWizard();
+    AppSegmentationExportWizard( QWidget *parent = 0 );
+    virtual ~AppSegmentationExportWizard();
 
 private:
     void accept();
@@ -49,45 +49,57 @@ private:
 
 };
 
-class ProjectInfoPage : public QWizardPage
+class SegmentationSelectionPage : public QWizardPage
 {
 Q_OBJECT
 
 public:
-    ProjectInfoPage( QWidget *parent = 0 );
+    SegmentationSelectionPage( QWidget *parent = 0 );
   
 protected:
-    void initializePage();
+  // INITIALIZEPAGE:
+  // function that is called right before the page is loaded and used to populate
+  // the page with data that we dont have when the constructor is called
+    virtual void initializePage();
+  
+  // VALIDATEPAGE:
+  // function that is called right after the next button is clicked and used to process
+  // the entered data so it can be passed to the next page
+  virtual bool validatePage();
 
 private:
-    QLabel *project_name_label_;
-    QLabel *project_path_label_;
-    QLineEdit *project_name_lineedit_;
-    QLineEdit *project_path_lineedit_;
-    QPushButton *project_path_change_button_;
+  QVBoxLayout *main_layout_;
+  QWidget *segmentation_title_widget_;
+  QHBoxLayout *segmentation_name_layout_;
+  QLabel *segmentation_name_label_;
+  QLineEdit *segmentation_name_lineedit_;
+  QTreeWidget *group_with_masks_tree_;
+  QLineEdit *mask_list_;
 
-private Q_SLOTS:
-    void set_path();
 };
 
-class SummaryPage : public QWizardPage
+class SegmentationSummaryPage : public QWizardPage
 {
     Q_OBJECT
 
 public:
-    SummaryPage(QWidget *parent = 0);
+    SegmentationSummaryPage(QWidget *parent = 0);
 
 protected:
     void initializePage();
 
 private:
   QLabel *description_;
-    QLabel *project_name_;
-    QLabel *project_path_;
+  QVBoxLayout *main_layout_;
+  QScrollArea *mask_scroll_area_;
+  QWidget *scroll_contents_;
+  QVBoxLayout *masks_layout_;
+  QTreeWidget *group_with_masks_tree_;
+
 
 };
 
 
 } // end namespace Seg3D
-#endif // APPPROJECTWIZARD_H
+#endif // APPSEGMENTATIONEXPORTWIZARD_H
 

@@ -505,27 +505,30 @@ void LayerManager::delete_layer( LayerHandle layer )
 bool LayerManager::delete_all()
 {
   lock_type lock( get_mutex() );
-
-  // Cycle through all the groups and delete all the layers
-  group_list_type::iterator group_iterator = this->group_list_.begin();
-  for ( ; group_iterator != this->group_list_.end(); )
   {
-    // set all of the layers to selected so they are deleted.
-    layer_list_type layer_list = ( *group_iterator )->get_layer_list();
-    for( layer_list_type::iterator it = layer_list.begin(); it != layer_list.end(); ++it)
+
+    // Cycle through all the groups and delete all the layers
+    group_list_type::iterator group_iterator = this->group_list_.begin();
+    for ( ; group_iterator != this->group_list_.end(); )
     {
-      ( *it )->selected_state_->set( true );
+      // set all of the layers to selected so they are deleted.
+      layer_list_type layer_list = ( *group_iterator )->get_layer_list();
+      for( layer_list_type::iterator it = layer_list.begin(); it != layer_list.end(); ++it)
+      {
+        ( *it )->selected_state_->set( true );
+      }
+
+      group_list_type::iterator it_temp = group_iterator;
+      ++it_temp;
+
+      this->delete_layers( *group_iterator );
+      if( group_list_.empty() )
+      {
+        break;
+      }
+      group_iterator = it_temp;
     }
 
-    group_list_type::iterator it_temp = group_iterator;
-    ++it_temp;
-
-    this->delete_layers( *group_iterator );
-    if( group_list_.empty() )
-    {
-      break;
-    }
-    group_iterator = it_temp;
   }
   this->groups_changed_signal_();
   return true;

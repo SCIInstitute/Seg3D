@@ -55,6 +55,7 @@
 #include <Interface/AppInterface/AppInterface.h>
 #include <Interface/AppInterface/ViewerInterface.h>
 #include <Interface/AppProjectWizard/AppProjectWizard.h>
+#include <Interface/AppSegmentationExportWizard/AppSegmentationExportWizard.h>
 
 namespace Seg3D
 {
@@ -116,7 +117,7 @@ void AppMenu::create_file_menu( QMenu* qmenu )
     Core::Interface::GetWidgetActionContext(), false, "" ) );
   
   qmenu->addSeparator();
-  
+
   qaction = qmenu->addAction( tr( "&Quit" ) );
   qaction->setShortcut( tr( "Ctrl+Q" ) );
   qaction->setToolTip( tr( "Open a file." ) );
@@ -150,6 +151,13 @@ void AppMenu::create_layer_menu( QMenu* qmenu )
   qaction->setToolTip( tr( "Import new layer(s) into the layer manager from a folder" ) );
   QtUtils::QtBridge::Connect( qaction, 
     boost::bind( &AppLayerIO::ImportFolder,  this->main_window_ ) );
+
+  qmenu->addSeparator();
+
+  qaction = qmenu->addAction( tr( "&Export Segmentation" ) );
+  qaction->setShortcut( tr( "Ctrl+E" ) );
+  qaction->setToolTip( tr( "Export masks as a segmentation." ) );
+  connect( qaction, SIGNAL( triggered() ), this, SLOT( export_segmentation_wizard() ) );
 
   qaction = qmenu->addAction( tr( "Export Layer...") );
   qaction->setShortcut( tr( "Ctrl+Shift+S" ) );
@@ -385,10 +393,19 @@ void AppMenu::open_project_wizard()
   message_box.setDefaultButton( QMessageBox::No );
   if( QMessageBox::Yes == message_box.exec() )
   {
-    QPointer< AppProjectWizard > new_project_wizard_ = new AppProjectWizard( this->main_window_);
+    QPointer< AppProjectWizard > new_project_wizard_ = 
+      new AppProjectWizard( this->main_window_);
     new_project_wizard_->show();
   }
 }
+
+void AppMenu::export_segmentation_wizard()
+{
+  QPointer< AppSegmentationExportWizard > export_segmentation_wizard_ = 
+    new AppSegmentationExportWizard( this->main_window_);
+  export_segmentation_wizard_->show();
+}
+
 
 void AppMenu::open_project_from_file()
 {
