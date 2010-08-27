@@ -110,7 +110,9 @@ SET(APPLICATION_TOOLS_ACTIONS_SRCS
   Actions/ActionThreshold.h
   Actions/ActionThreshold.cc
   Actions/ActionPolyline.h
-  Actions/ActionPolyline.cc  
+  Actions/ActionPolyline.cc
+  Actions/ActionInvert.h
+  Actions/ActionInvert.cc
   )
 
 CORE_ADD_LIBRARY(Application_Tools 

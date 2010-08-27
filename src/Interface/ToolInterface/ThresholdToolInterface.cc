@@ -97,14 +97,8 @@ bool ThresholdToolInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Connect( this->private_->ui_.run_button_, boost::bind(
     &ThresholdTool::execute, tool, Core::Interface::GetWidgetActionContext() ) );
   QtUtils::QtBridge::Enable( this->private_->ui_.run_button_, tool->valid_target_state_ );
-
-  {
-    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() ); 
-
-    this->private_->ui_.target_layer_->setDisabled( tool->use_active_layer_state_->get() );
-    this->connect( this->private_->ui_.use_active_layer_, SIGNAL( toggled( bool ) ),
-      this->private_->ui_.target_layer_, SLOT( setDisabled( bool ) ) );
-  }
+  QtUtils::QtBridge::Enable( this->private_->ui_.target_layer_, 
+    tool->use_active_layer_state_, true ); 
 
   //Send a message to the log that we have finished with building the Threshold Tool Interface
   CORE_LOG_DEBUG("Finished building a Threshold Tool Interface");

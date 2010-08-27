@@ -1103,7 +1103,6 @@ void LayerWidget::UpdateState( qpointer_type qpointer )
     qpointer->setUpdatesEnabled( false );
     qpointer->update_widget_state();
     qpointer->setUpdatesEnabled( true );
-    qpointer->repaint();
   }
 }
 

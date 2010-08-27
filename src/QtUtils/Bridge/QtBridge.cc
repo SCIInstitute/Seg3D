@@ -184,11 +184,10 @@ bool QtBridge::Connect( QButtonGroup* qbuttongroup, Core::StateOptionHandle& sta
   return true;
 }
 
-bool QtBridge::Enable( QWidget* qwidget, Core::StateBoolHandle& state )
+bool QtBridge::Enable( QWidget* qwidget, Core::StateBoolHandle& state, bool opposite_logic )
 {
-  new QtEnableConnector( qwidget, state );
+  new QtEnableConnector( qwidget, state, opposite_logic );
   return true;
 }
-
 
 } // end namespace QtUtils

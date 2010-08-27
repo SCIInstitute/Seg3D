@@ -124,7 +124,7 @@ public:
     // This teem filter should be thread safe
     // TODO: need to check this --JS
     if ( ! ( nrrdHistoEq( output_nrrd->nrrd(), input_nrrd->nrrd(), 0, this->bins_, 
-      this->ignore_bins_, this->amount_ ) ) )
+      this->ignore_bins_, static_cast< float >( this->amount_ ) ) ) )
     {
       StatusBar::SetMessage( Core::LogMessageType::ERROR_E,  
         "HistogramEqualizationFilter failed." );

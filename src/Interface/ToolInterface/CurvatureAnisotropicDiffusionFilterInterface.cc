@@ -95,19 +95,12 @@ bool CurvatureAnisotropicDiffusionFilterInterface::build_widget( QFrame* frame )
     tool->replace_state_ );
   QtUtils::QtBridge::Enable( this->private_->ui_.runFilterButton,
     tool->valid_target_state_ );
-  
-  // Step 4 - Qt connections
-  {
-    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() ); 
-    
-    this->private_->ui_.target_layer_->setDisabled( tool->use_active_layer_state_->get() );
-    
-    this->connect( this->private_->ui_.use_active_layer_, SIGNAL( toggled( bool ) ),
-      this->private_->ui_.target_layer_, SLOT( setDisabled( bool ) ) );
+  QtUtils::QtBridge::Enable( this->private_->ui_.target_layer_, 
+    tool->use_active_layer_state_, true ); 
 
-    this->connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), 
-      this, SLOT( run_filter() ) );
-  }
+  // Step 4 - Qt connections
+  this->connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), 
+    this, SLOT( run_filter() ) );
   
   return true;
 }

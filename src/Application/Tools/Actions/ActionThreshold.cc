@@ -110,19 +110,32 @@ public:
   
 public:
   template< class T >
-  void threshold_data( Core::DataBlockHandle src, Core::DataBlockHandle dst, 
-    double min_val, double max_val )
+  void threshold_data( Core::DataBlockHandle dst, double min_val, double max_val )
   {
-    T* src_data = reinterpret_cast< T* >( src->get_data() );
+    Core::DataBlockHandle src_data_block = this->src_layer_->
+      get_data_volume()->get_data_block();
+    T* src_data = reinterpret_cast< T* >( src_data_block->get_data() );
     unsigned char* dst_data = reinterpret_cast< unsigned char* >( dst->get_data() );
-    size_t data_size = src->get_size();
+    size_t z_plane_size = src_data_block->get_nx() * src_data_block->get_ny();
+    size_t nz = src_data_block->get_nz();
+    size_t tenth_nz = nz / 10;
 
     // Lock the source data block
-    Core::DataBlock::shared_lock_type lock( src->get_mutex() );
-    for ( size_t i = 0; i < data_size; i++ )
+    Core::DataBlock::shared_lock_type lock( src_data_block->get_mutex() );
+    size_t index = 0;
+    for ( size_t z = 0; z < nz; ++z )
     {
-      dst_data[ i ] = ( src_data[ i ] >= min_val && src_data[ i ] <= max_val ) ? 1 : 0;
+      for ( size_t i = 0; i < z_plane_size; ++i, ++index )
+      {
+        dst_data[ index ] = ( src_data[ index ] >= min_val && 
+          src_data[ index ] <= max_val ) ? 1 : 0;
+      }
+      if ( z > 0 && z % tenth_nz == 0 )
+      {
+        this->dst_layer_->update_progress_signal_( ( z * 0.5 ) / nz );
+      }
     }
+    this->dst_layer_->update_progress_signal_( 0.5 );
   }
 
   // RUN:
@@ -130,42 +143,41 @@ public:
   // is launched.
   virtual void run()
   {
-    Core::DataBlockHandle src_data_block = this->src_layer_->get_data_volume()->get_data_block();
     Core::DataBlockHandle threshold_result = Core::StdDataBlock::New( 
       this->src_layer_->get_grid_transform(), 
       Core::DataType::UCHAR_E );
-    switch ( src_data_block->get_data_type() )
+    switch ( this->src_layer_->get_data_type() )
     {
     case Core::DataType::CHAR_E:
-      this->threshold_data< signed char >( src_data_block, threshold_result, 
+      this->threshold_data< signed char >( threshold_result, 
         this->lower_threshold_, this->upper_threshold_ );
       break;
     case Core::DataType::UCHAR_E:
-      this->threshold_data< unsigned char >( src_data_block, threshold_result, 
+      this->threshold_data< unsigned char >( threshold_result, 
         this->lower_threshold_, this->upper_threshold_ );
       break;
     case Core::DataType::SHORT_E:
-      this->threshold_data< short >( src_data_block, threshold_result, 
+      this->threshold_data< short >( threshold_result, 
         this->lower_threshold_, this->upper_threshold_ );
       break;
     case Core::DataType::USHORT_E:
-      this->threshold_data< unsigned short >( src_data_block, threshold_result, 
+      this->threshold_data< unsigned short >( threshold_result, 
         this->lower_threshold_, this->upper_threshold_ );
       break;
     case Core::DataType::INT_E:
-      this->threshold_data< int >( src_data_block, threshold_result, 
+      this->threshold_data< int >( threshold_result, 
         this->lower_threshold_, this->upper_threshold_ );
       break;
     case Core::DataType::UINT_E:
-      this->threshold_data< unsigned int >( src_data_block, threshold_result, 
+      this->threshold_data< unsigned int >( threshold_result, 
         this->lower_threshold_, this->upper_threshold_ );
       break;
     case Core::DataType::FLOAT_E:
-      this->threshold_data< float >( src_data_block, threshold_result, 
+      this->threshold_data< float >( threshold_result, 
         this->lower_threshold_, this->upper_threshold_ );
       break;
     case Core::DataType::DOUBLE_E:
-      this->threshold_data< double >( src_data_block, threshold_result, 
+      this->threshold_data< double >( threshold_result, 
         this->lower_threshold_, this->upper_threshold_ );
       break;
     }
@@ -178,6 +190,8 @@ public:
     Core::MaskDataBlockHandle threshold_mask;
     Core::MaskDataBlockManager::Convert( threshold_result, 
       this->dst_layer_->get_grid_transform(), threshold_mask );
+
+    this->dst_layer_->update_progress_signal_( 1.0 );
 
     this->dispatch_insert_mask_volume_into_layer( this->dst_layer_,
       Core::MaskVolumeHandle( new Core::MaskVolume( 

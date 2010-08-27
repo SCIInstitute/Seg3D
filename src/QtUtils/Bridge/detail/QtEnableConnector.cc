@@ -40,15 +40,17 @@
 namespace QtUtils
 {
 
-QtEnableConnector::QtEnableConnector( QWidget* parent, Core::StateBoolHandle& state ) :
+QtEnableConnector::QtEnableConnector( QWidget* parent, 
+  Core::StateBoolHandle& state, bool opposite_logic ) :
   QObject( static_cast<QObject*>( parent ) ),
-  parent_( parent )
+  parent_( parent ),
+  opposite_logic_( opposite_logic )
 {
   QPointer< QtEnableConnector > qpointer( this );
 
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-    parent->setEnabled( state->get() );
+    parent->setEnabled( state->get() ^ this->opposite_logic_ );
     
     //QtEnableConnector::EnableWidget( qpointer, state->get(), Core::ActionSource::NONE_E );
 
@@ -78,7 +80,7 @@ void QtEnableConnector::EnableWidget( QPointer< QtEnableConnector > qpointer,
     return;
   }
   
-  qpointer->parent_->setEnabled( enabled );
+  qpointer->parent_->setEnabled( enabled ^ qpointer->opposite_logic_ );
 }
 
 } // end namespace QtUtils

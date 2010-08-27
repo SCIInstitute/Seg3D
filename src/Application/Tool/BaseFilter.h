@@ -85,7 +85,7 @@ public:
   // NOTE: This function can only be run from the application thread
   // NOTE: The BaseFilter class records which layers are locked and will schedule an unlock
   // for each layer that was not unlocked by the time this class is destroyed.
-  bool lock_for_use( LayerHandle& layer );
+  bool lock_for_use( LayerHandle layer );
 
   // LOCK_FOR_PROCESSING:
   // Lock a layer for processing, i.e. when we change the data contained in the data/mask of the
@@ -93,7 +93,7 @@ public:
   // NOTE: This function can only be run from the application thread.
   // NOTE: The BaseFilter class records which layers are locked and will schedule an unlock
   // for each layer that was not unlocked by the time this class is destroyed.
-  bool lock_for_processing( LayerHandle& layer );
+  bool lock_for_processing( LayerHandle layer );
   
   // CREATE_AND_LOCK_DATA_LAYER_FROM_LAYER:
   // Create a new data layer with the same dimensions as another layer, the layer is immediately

@@ -1,22 +1,22 @@
 /*
  For more information, please see: http://software.sci.utah.edu
-
+ 
  The MIT License
-
+ 
  Copyright (c) 2009 Scientific Computing and Imaging Institute,
  University of Utah.
-
-
+ 
+ 
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
  the rights to use, copy, modify, merge, publish, distribute, sublicense,
  and/or sell copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following conditions:
-
+ 
  The above copyright notice and this permission notice shall be included
  in all copies or substantial portions of the Software.
-
+ 
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -26,46 +26,52 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-// Application includes
-#include <Application/Tool/ToolFactory.h>
-#include <Application/Tools/InvertTool.h>
-#include <Application/Tools/Actions/ActionInvert.h>
-#include <Application/Layer/Layer.h>
-#include <Application/LayerManager/LayerManager.h>
+#ifndef APPLICATION_TOOL_ACTIONS_ACTIONINVERT_H
+#define APPLICATION_TOOL_ACTIONS_ACTIONINVERT_H
 
-// Register the tool into the tool factory
-SCI_REGISTER_TOOL( Seg3D, InvertTool )
+#include <Core/Action/Actions.h>
 
 namespace Seg3D
 {
-
-InvertTool::InvertTool( const std::string& toolid ) :
-  SingleTargetTool( Core::VolumeType::DATA_E, toolid )
+  
+class ActionInvert : public Core::Action
 {
-  this->add_state( "replace", this->replace_state_, false );
-}
 
-InvertTool::~InvertTool()
-{
-  this->disconnect_all();
-}
-
-void InvertTool::execute( Core::ActionContextHandle context )
-{
-  std::string layer_id;
-  bool replace;
+CORE_ACTION( 
+  CORE_ACTION_TYPE( "Invert", "Invert the values of the data layer" )
+  CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this tool needs to be run." )
+  CORE_ACTION_KEY( "replace", "true", "Replace the old layer (true), or add an new layer (false)" )
+)
+  
+  // -- Constructor/Destructor --
+public:
+  ActionInvert()
   {
-    Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
-    if ( !this->valid_target_state_->get() )
-    {
-      return;
-    }
-    layer_id = this->target_layer_state_->get();
-    replace = this->replace_state_->get();
+    // Action arguments
+    this->add_argument( this->layer_id_ );
+    
+    // Action options
+    this->add_key( this->replace_ );
   }
+  
+  virtual ~ActionInvert() {}
+  
+  // -- Functions that describe action --
+public:
+  virtual bool validate( Core::ActionContextHandle& context );
+  virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
+  
+  // -- Action parameters --
+private:
 
-  ActionInvert::Dispatch( context, layer_id, replace );
-}
-
-
+  Core::ActionParameter< std::string > layer_id_;
+  Core::ActionParameter< bool > replace_;
+  
+public:
+  static void Dispatch( Core::ActionContextHandle context, 
+    std::string layer_id, bool replace );
+};
+  
 } // end namespace Seg3D
+
+#endif

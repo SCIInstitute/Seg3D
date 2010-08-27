@@ -42,7 +42,7 @@ class QtEnableConnector : public QObject, protected Core::ConnectionHandler
 {
   Q_OBJECT
 public:
-  QtEnableConnector( QWidget* parent, Core::StateBoolHandle& state );
+  QtEnableConnector( QWidget* parent, Core::StateBoolHandle& state, bool opposite_logic );
   virtual ~QtEnableConnector();
 
   // -- slot functions for boost signals --
@@ -53,6 +53,7 @@ private:
   // -- internal variables --
 private:
   QWidget* parent_;
+  bool opposite_logic_;
 };
 
 } // end namespace QtUtils

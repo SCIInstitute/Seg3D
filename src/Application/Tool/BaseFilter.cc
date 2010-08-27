@@ -107,7 +107,7 @@ bool BaseFilter::find_layer( const std::string& layer_id, LayerHandle& layer )
   }
 }
 
-bool BaseFilter::lock_for_use( LayerHandle& layer )
+bool BaseFilter::lock_for_use( LayerHandle layer )
 {
   if ( !( LayerManager::LockForUse( layer ) ) ) return false;
   
@@ -115,7 +115,7 @@ bool BaseFilter::lock_for_use( LayerHandle& layer )
   return true;
 }
 
-bool BaseFilter::lock_for_processing( LayerHandle& layer )
+bool BaseFilter::lock_for_processing( LayerHandle layer )
 {
   if ( !( LayerManager::LockForProcessing( layer ) ) ) return false;
   

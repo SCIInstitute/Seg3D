@@ -125,7 +125,7 @@ public:
     Core::StateIntHandle& index_handle );
 
   // Enable / Disable a button from state engine
-  static bool Enable( QWidget* qwidget, Core::StateBoolHandle& state );
+  static bool Enable( QWidget* qwidget, Core::StateBoolHandle& state, bool opposite_logic = false );
 };
 
 } // end namespace QtUtils

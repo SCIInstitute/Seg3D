@@ -211,7 +211,7 @@ void DataBlock::clear()
 
 DataBlock::generation_type DataBlock::get_generation() const
 {
-  lock_type lock( this->get_mutex() );
+  shared_lock_type lock( this->get_mutex() );
   return this->generation_;
 }
 
@@ -458,7 +458,7 @@ bool DataBlock::ConvertDataType( const DataBlockHandle& src_data_block,
   dst_data_block.reset();
   if ( !src_data_block ) return false;
 
-  lock_type lock( src_data_block->get_mutex( ) );
+  shared_lock_type lock( src_data_block->get_mutex( ) );
 
   dst_data_block = StdDataBlock::New( src_data_block->get_nx(),
     src_data_block->get_ny(), src_data_block->get_nz(), new_data_type );
@@ -583,7 +583,7 @@ bool DataBlock::PermuteData( const DataBlockHandle& src_data_block,
   dst_data_block.reset();
   if ( !src_data_block ) return false;
 
-  lock_type lock( src_data_block->get_mutex( ) );
+  shared_lock_type lock( src_data_block->get_mutex( ) );
 
   if ( permutation.size() != 3 )
   {
@@ -758,7 +758,7 @@ bool DataBlock::QuantizeData( const DataBlockHandle& src_data_block,
   dst_data_block.reset();
   if ( !src_data_block ) return false;
   
-  lock_type lock( src_data_block->get_mutex( ) );
+  shared_lock_type lock( src_data_block->get_mutex( ) );
 
   if ( new_data_type != DataType::CHAR_E && new_data_type != DataType::UCHAR_E &&
     new_data_type != DataType::SHORT_E && new_data_type != DataType::USHORT_E &&
@@ -817,7 +817,7 @@ bool DataBlock::Clone( const DataBlockHandle& src_data_block,
   if ( !src_data_block ) return false;
 
   // Step (2) : Lock the source
-  lock_type lock( src_data_block->get_mutex( ) );
+  shared_lock_type lock( src_data_block->get_mutex( ) );
 
   // Step (3): Generate a new data block with the right type
   dst_data_block = StdDataBlock::New( src_data_block->get_nx(),

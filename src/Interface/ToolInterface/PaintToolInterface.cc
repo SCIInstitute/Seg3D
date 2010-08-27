@@ -108,15 +108,8 @@ bool PaintToolInterface::build_widget( QFrame* frame )
     tool->erase_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.show_boundary_,
     tool->show_data_cstr_bound_state_ );
-
-  {
-    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-
-    this->private_->ui_.target_mask_->setDisabled( tool->use_active_layer_state_->get() );
-    this->connect( this->private_->ui_.use_active_layer_, SIGNAL( toggled( bool ) ),
-      this->private_->ui_.target_mask_, SLOT( setDisabled( bool ) ) );
-  }
-  
+  QtUtils::QtBridge::Enable( this->private_->ui_.target_mask_,
+    tool->use_active_layer_state_, true );
   
 //#if defined ( __APPLE__ )  
 //  QFont font;
