@@ -75,10 +75,10 @@ void SingleTargetToolPrivate::handle_active_layer_changed( LayerHandle layer )
     return;
   }
 
-  this->tool_->target_layer_state_->set( layer->type() & this->target_type_ ? 
+  this->tool_->valid_target_state_->set( ( layer->type() & this->target_type_ ) != 0 && 
+    layer->is_valid() );
+  this->tool_->target_layer_state_->set( this->tool_->valid_target_state_->get() ? 
     layer->get_layer_id() : Tool::NONE_OPTION_C );
-  this->tool_->valid_target_state_->set( ( layer->type() & this->target_type_ ) != 0 );
-
 }
 
 void SingleTargetToolPrivate::handle_use_active_layer_changed( bool use_active_layer )
@@ -86,9 +86,10 @@ void SingleTargetToolPrivate::handle_use_active_layer_changed( bool use_active_l
   if ( use_active_layer )
   {
     LayerHandle layer = LayerManager::Instance()->get_active_layer();
-    this->tool_->target_layer_state_->set( ( layer && ( layer->type() & this->target_type_ ) ) ? 
+    this->tool_->valid_target_state_->set( layer && layer->is_valid() &&
+      ( layer->type() & this->target_type_ ) );
+    this->tool_->target_layer_state_->set( this->tool_->valid_target_state_->get() ? 
       layer->get_layer_id() : Tool::NONE_OPTION_C );
-    this->tool_->valid_target_state_->set( layer && ( layer->type() & this->target_type_ ) );
   }
 }
 

@@ -130,6 +130,10 @@ public:
         dst_data[ index ] = ( src_data[ index ] >= min_val && 
           src_data[ index ] <= max_val ) ? 1 : 0;
       }
+      if ( this->check_abort() )
+      {
+        return;
+      }
       if ( z > 0 && z % tenth_nz == 0 )
       {
         this->dst_layer_->update_progress_signal_( ( z * 0.5 ) / nz );
@@ -190,6 +194,11 @@ public:
     Core::MaskDataBlockHandle threshold_mask;
     Core::MaskDataBlockManager::Convert( threshold_result, 
       this->dst_layer_->get_grid_transform(), threshold_mask );
+
+    if ( this->check_abort() )
+    {
+      return;
+    }
 
     this->dst_layer_->update_progress_signal_( 1.0 );
 

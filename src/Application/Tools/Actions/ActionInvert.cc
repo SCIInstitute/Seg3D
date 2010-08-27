@@ -101,6 +101,10 @@ public:
       {
         dst_data[ index ] = bias - src_data[ index ];
       }
+      if ( this->check_abort() )
+      {
+        return;
+      }
       if ( z > 0 && z % tenth_nz == 0 )
       {
         this->dst_layer_->update_progress_signal_( ( z * 1.0 ) / nz );
