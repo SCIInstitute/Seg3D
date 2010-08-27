@@ -69,4 +69,12 @@ void QtHistogramWidget::set_histogram( const Core::Histogram& histogram )
   this->private_->histogram_graph_->repaint();
 }
 
+void QtHistogramWidget::reset_histogram( )
+{
+  this->private_->histogram_graph_->reset_histogram();
+  this->private_->ui_.min->setText( "-" );
+  this->private_->ui_.max->setText( "-" );
+  this->private_->histogram_graph_->repaint();
+}
+
 } // end namespace QtUtils

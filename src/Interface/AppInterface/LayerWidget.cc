@@ -569,7 +569,7 @@ void LayerWidget::update_appearance( bool locked, bool active, bool in_use, bool
       {
         this->private_->ui_.type_->setStyleSheet( StyleSheet::LAYER_WIDGET_BACKGROUND_LOCKED_C );
       }
-      else if ( active )
+      else
       {
         this->private_->ui_.type_->setStyleSheet( StyleSheet::DATA_VOLUME_COLOR_C );
       }
@@ -589,7 +589,7 @@ void LayerWidget::update_appearance( bool locked, bool active, bool in_use, bool
       {
         this->private_->ui_.type_->setStyleSheet( StyleSheet::LAYER_WIDGET_BACKGROUND_LOCKED_C );
       }
-      else if ( active )
+      else
       {
         this->private_->ui_.type_->setStyleSheet( StyleSheet::LABEL_VOLUME_COLOR_C );
       }

@@ -25,60 +25,61 @@
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
  */
-
-#ifndef APPLICATION_TOOL_TOOLINTERFACE_H
-#define APPLICATION_TOOL_TOOLINTERFACE_H
-
-// STL includes
-#include <string>
-
+ 
+#ifndef APPLICATION_TOOL_NRRDFILTER_H 
+#define APPLICATION_TOOL_NRRDFILTER_H 
+ 
 // Boost includes
-#include <boost/utility.hpp>
-
+#include <boost/smart_ptr.hpp> 
+#include <boost/utility.hpp> 
+ 
 // Core includes
-#include <Core/Utils/ConnectionHandler.h>
-
+#include <Core/DataBlock/NrrdData.h>
+#include <Core/DataBlock/NrrdDataBlock.h>
+#include <Core/DataBlock/MaskDataBlockManager.h>
+#include <Core/Utils/Runnable.h>
+#include <Core/Volume/DataVolume.h>
+#include <Core/Volume/MaskVolume.h>
+ 
 // Application includes
-// NOTE: Only need the forward declaration of Tool for defining this class
-#include <Application/Tool/ToolFWD.h> 
-
+#include <Application/Layer/DataLayer.h> 
+#include <Application/Layer/MaskLayer.h> 
+#include <Application/Tool/BaseFilter.h>
+ 
 namespace Seg3D
 {
 
-// CLASS TOOLINTERFACE:
-// Base class of each tool interface. These are not included inside the tool
-// to ensure that the GUI is properly separated from the application.
+class NrrdFilter;
 
-class ToolInterface : public Core::ConnectionHandler
+
+class NrrdFilter : public BaseFilter
 {
 
-  // -- constructor/destructor --
 public:
-  ToolInterface();
-  virtual ~ToolInterface();
-
-  // Store the parent tool this interface is intended for.
-public:
-
-  // SET_TOOL:
-  // Insert the tool into the interface
-  void set_tool( ToolHandle tool );
-
-  // TOOL:
-  // Get the current tool handle stored in this interface class
-  ToolHandle tool() const;
-  
-  // TOOLID:
-  // This is a shortcut function to the toolid this interface is associated
-  // with
-  std::string toolid() const;
-
-  // -- internals of this class --
+  NrrdFilter();
+  virtual ~NrrdFilter();
+    
 protected:
-  // Handle to the underlying tool
-  ToolHandle tool_;
-};
 
-}
+  // GET_NRRD_FROM_LAYER:
+  // Get a nrrd from a data or maskk layer
+  bool get_nrrd_from_layer( const LayerHandle& layer, Core::NrrdDataHandle& nrrd_data );
+
+  // CREATE_NRRD
+  // Short cut for generating nrrds
+  bool create_nrrd( Core::NrrdDataHandle& nrrd_data );
+
+  // INSERT_NRRD_INTO_LAYER:
+  // Insert an nrrd back into a layer
+  bool insert_nrrd_into_layer( const LayerHandle& layer, Core::NrrdDataHandle nrrd_data );
+  
+  // UPDATE_PROGRESS:
+  // Teem does not support updating progress, hence we add a small amount before and a large
+  // amount after the filter was run
+  void update_progress( LayerHandle layer, double amount );
+
+};
+  
+} // end namespace Seg3D
 
 #endif

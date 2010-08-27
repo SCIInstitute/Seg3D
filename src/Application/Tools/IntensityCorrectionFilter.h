@@ -29,12 +29,13 @@
 #ifndef APPLICATION_TOOLS_INTENSITYCORRECTIONFILTER_H
 #define APPLICATION_TOOLS_INTENSITYCORRECTIONFILTER_H
 
-#include <Application/Tool/Tool.h>
+// Application includes
+#include <Application/Tool/SingleTargetTool.h>
 
 namespace Seg3D
 {
 
-class IntensityCorrectionFilter : public Tool
+class IntensityCorrectionFilter : public SingleTargetTool
 {
 
 SEG3D_TOOL(
@@ -43,37 +44,28 @@ SEG3D_TOOL_MENULABEL( "Intensity Correction" )
 SEG3D_TOOL_MENU( "filter_data_to_data" )
 SEG3D_TOOL_SHORTCUT_KEY( "Alt+Shift+I" )
 SEG3D_TOOL_URL( "http://seg3d.org/" )
+SEG3D_TOOL_VERSION( "1" )
 )
 
 public:
   IntensityCorrectionFilter( const std::string& toolid );
   virtual ~IntensityCorrectionFilter();
 
-  // -- constraint parameters --
-
-  // Constrain viewer to right painting tool when layer is selected
-  void target_constraint( std::string layerid );
-
-  // -- activate/deactivate tool --
-
-  virtual void activate();
-  virtual void deactivate();
-  
-private:
-  // -- handle updates from layermanager --
-  void handle_layers_changed();
-
   // -- state --
 public:
-  // Layerid of the target layer
-  Core::StateStringHandle target_layer_state_;
-
-  Core::StateRangedIntHandle order_state_;
-
-  Core::StateRangedDoubleHandle edge_state_;
-
+  // Whether the layer needs to be replaced
   Core::StateBoolHandle replace_state_;
 
+  // The polynomial order to fit
+  Core::StateRangedIntHandle order_state_;
+
+  // The sensitivity to edges
+  Core::StateRangedDoubleHandle edge_state_;
+
+  // -- execute --
+public:
+  // Execute the tool and dispatch the action
+  virtual void execute( Core::ActionContextHandle context );
 };
 
 } // end namespace

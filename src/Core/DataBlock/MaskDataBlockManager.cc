@@ -338,6 +338,85 @@ bool MaskDataBlockManager::Convert( DataBlockHandle data,
   return false;
 }
 
+template< class T >
+bool ConvertLabelToMaskInternal( DataBlockHandle data, MaskDataBlockHandle& mask, double label )
+{
+  T typed_label = static_cast<T>( label );
+  T* data_ptr = reinterpret_cast<T*>( data->get_data() );
+  
+  unsigned char* mask_ptr = mask->get_mask_data();
+  unsigned char mask_value = mask->get_mask_value();
+  unsigned char not_mask_value = ~( mask->get_mask_value() );
+  
+  size_t size = data->get_size();
+  size_t size8 = size & ~(0x7);
+  for ( size_t j = 0; j < size8; j+= 8 )
+  {
+    if ( data_ptr[ j ] == typed_label ) mask_ptr[ j ] |= mask_value; 
+      else mask_ptr[ j ] &= not_mask_value;
+    if ( data_ptr[ j + 1 ] == typed_label ) mask_ptr[ j + 1 ] |= mask_value;
+      else mask_ptr[ j + 1 ] &= not_mask_value;
+    if ( data_ptr[ j + 2 ] == typed_label ) mask_ptr[ j + 2 ] |= mask_value; 
+      else mask_ptr[ j + 2 ] &= not_mask_value;
+    if ( data_ptr[ j + 3 ] == typed_label ) mask_ptr[ j + 3 ] |= mask_value; 
+      else mask_ptr[ j + 3 ] &= not_mask_value;
+    if ( data_ptr[ j + 4 ] == typed_label ) mask_ptr[ j + 4 ] |= mask_value; 
+      else mask_ptr[ j + 4 ] &= not_mask_value;
+    if ( data_ptr[ j + 5 ] == typed_label ) mask_ptr[ j + 5 ] |= mask_value; 
+      else mask_ptr[ j + 5 ] &= not_mask_value;
+    if ( data_ptr[ j + 6 ] == typed_label ) mask_ptr[ j + 6 ] |= mask_value; 
+      else mask_ptr[ j + 6 ] &= not_mask_value;
+    if ( data_ptr[ j + 7 ] == typed_label ) mask_ptr[ j + 7 ] |= mask_value; 
+      else mask_ptr[ j + 7 ] &= not_mask_value;
+  }
+  for ( size_t j = 0; j < size; j++ )
+  {
+    if ( data_ptr[ j ] == typed_label ) mask_ptr[ j ] |= mask_value; 
+      else mask_ptr[ j ] &= not_mask_value; 
+  }
+  
+  return true;
+}
+
+
+
+bool MaskDataBlockManager::ConvertLabel( DataBlockHandle data, 
+  GridTransform grid_transform, MaskDataBlockHandle& mask, double label )
+{
+  if ( !( MaskDataBlockManager::Instance()->create( grid_transform, mask ) ) )
+  {
+    return false;
+  }
+
+  assert( mask->get_nx() == data->get_nx() );
+  assert( mask->get_ny() == data->get_ny() );
+  assert( mask->get_nz() == data->get_nz() );
+  
+  DataBlock::lock_type lock( data->get_mutex( ) );
+  
+  switch( data->get_data_type() )
+  {
+    case DataType::CHAR_E:
+      return ConvertLabelToMaskInternal<signed char>( data, mask, label );
+    case DataType::UCHAR_E:
+      return ConvertLabelToMaskInternal<unsigned char>( data, mask, label );
+    case DataType::SHORT_E:
+      return ConvertLabelToMaskInternal<short>( data, mask, label );
+    case DataType::USHORT_E:
+      return ConvertLabelToMaskInternal<unsigned short>( data, mask, label );
+    case DataType::INT_E:
+      return ConvertLabelToMaskInternal<int>( data, mask, label );
+    case DataType::UINT_E:
+      return ConvertLabelToMaskInternal<unsigned int>( data, mask, label );
+    case DataType::FLOAT_E:
+      return ConvertLabelToMaskInternal<float>( data, mask, label );
+    case DataType::DOUBLE_E:
+      return ConvertLabelToMaskInternal<double>( data, mask, label );
+  }
+
+  return false;
+}
+
 
 template< class T>
 bool ConvertToDataInternal( MaskDataBlockHandle mask, DataBlockHandle& data )

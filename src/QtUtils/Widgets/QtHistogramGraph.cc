@@ -52,11 +52,17 @@ void QtHistogramGraph::set_histogram( const Core::Histogram& histogram )
   this->histogram_ = histogram;
 }
 
+void QtHistogramGraph::reset_histogram( )
+{
+  this->histogram_ = Core::Histogram();
+}
+
 void QtHistogramGraph::paintEvent(QPaintEvent * event )
 {
     QPainter painter( this );
     painter.setRenderHint( QPainter::Antialiasing, true );
 
+  if ( ! this->histogram_.is_valid() ) return;
     double histogram_width = this->width();
     double bins_size = this->histogram_.get_size();
     double percent_of_max = this->height() /

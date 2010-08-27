@@ -28,9 +28,14 @@
 
 // Application includes
 #include <Application/Tool/ToolFactory.h>
-#include <Application/Tools/OtsuThresholdFilter.h>
 #include <Application/Layer/Layer.h>
 #include <Application/LayerManager/LayerManager.h>
+
+// StateEnigne of the tool
+#include <Application/Tools/OtsuThresholdFilter.h>
+
+// Action associated with tool
+// #include <Application/Tools/Actions/ActionOtsuThresholdFilter.h>
 
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL( Seg3D, OtsuThresholdFilter )
@@ -39,22 +44,10 @@ namespace Seg3D
 {
 
 OtsuThresholdFilter::OtsuThresholdFilter( const std::string& toolid ) :
-  Tool( toolid )
+  SingleTargetTool( Core::VolumeType::DATA_E, toolid )
 {
   // Need to set ranges and default values for all parameters
-  add_state( "target", this->target_layer_state_, "<none>" );
-  add_state( "order", this->order_state_, 1, 1, 100, 1 );
-  
-  this->handle_layers_changed();
-
-  // Add constraints, so that when the state changes the right ranges of
-  // parameters are selected
-  this->add_connection ( this->target_layer_state_->value_changed_signal_.connect( boost::bind(
-      &OtsuThresholdFilter::target_constraint, this, _1 ) ) );
-  
-  this->add_connection ( LayerManager::Instance()->layers_changed_signal_.connect(
-    boost::bind( &OtsuThresholdFilter::handle_layers_changed, this ) ) );
-
+  add_state( "amount", this->amount_state_, 1, 1, 10, 1 );
 }
 
 OtsuThresholdFilter::~OtsuThresholdFilter()
@@ -62,44 +55,11 @@ OtsuThresholdFilter::~OtsuThresholdFilter()
   disconnect_all();
 }
 
-void OtsuThresholdFilter::handle_layers_changed()
-{
-  std::vector< LayerHandle > target_layers;
-  LayerManager::Instance()->get_layers( target_layers );
-  bool target_found = false;
-  
-  for( int i = 0; i < static_cast< int >( target_layers.size() ); ++i )
-  {
-    if( ( this->target_layer_state_->get() == "<none>" ) && ( target_layers[i]->type() == 
-                                 Core::VolumeType::DATA_E ) )
-    {
-      this->target_layer_state_->set( target_layers[i]->get_layer_name(), Core::ActionSource::NONE_E );
-      target_found = true;
-      break;
-    }
-    if( target_layers[i]->get_layer_name() == this->target_layer_state_->get() ) {
-      target_found = true;
-      break;
-    }
-  }
-  
-  if( !target_found )
-    this->target_layer_state_->set( "", Core::ActionSource::NONE_E );
-  
-}
-
-void OtsuThresholdFilter::target_constraint( std::string layerid )
-{
+void OtsuThresholdFilter::execute( Core::ActionContextHandle context )
+{ 
+//  ActionOtsuThresholdFilter::Dispatch( context,
+//    this->target_layer_state_->get(),
+//    this->amount_state_->get() );
 }
   
-void OtsuThresholdFilter::activate()
-{
-}
-
-void OtsuThresholdFilter::deactivate()
-{
-}
-
 } // end namespace Seg3D
-
-

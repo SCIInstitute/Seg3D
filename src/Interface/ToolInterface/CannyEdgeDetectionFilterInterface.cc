@@ -29,13 +29,13 @@
 // QtGui includes
 #include "ui_CannyEdgeDetectionFilterInterface.h"
 
-//Application includes
+// Application includes
 #include <Application/Tools/CannyEdgeDetectionFilter.h>
 
-//QtUtils includes
+// QtUtils includes
 #include <QtUtils/Bridge/QtBridge.h>
 
-// Interaface includes
+// Interface includes
 #include <Interface/ToolInterface/CannyEdgeDetectionFilterInterface.h>
 
 SCI_REGISTER_TOOLINTERFACE( Seg3D, CannyEdgeDetectionFilterInterface )

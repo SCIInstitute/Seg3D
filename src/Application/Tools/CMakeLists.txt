@@ -103,6 +103,8 @@ SET(APPLICATION_TOOLS_ACTIONS_SRCS
   Actions/ActionDiscreteGaussianFilter.cc
   Actions/ActionGradientMagnitudeFilter.h
   Actions/ActionGradientMagnitudeFilter.cc
+  Actions/ActionHistogramEqualizationFilter.h
+  Actions/ActionHistogramEqualizationFilter.cc
   Actions/ActionMedianFilter.h
   Actions/ActionMedianFilter.cc
   Actions/ActionThreshold.h

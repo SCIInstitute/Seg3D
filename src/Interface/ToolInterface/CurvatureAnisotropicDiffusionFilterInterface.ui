@@ -46,27 +46,11 @@
     <number>4</number>
    </property>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_4">
-     <item>
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>Target Layer:</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
     <layout class="QHBoxLayout" name="horizontalLayout_6">
      <item>
       <widget class="QGroupBox" name="target_groupbox_">
-       <property name="font">
-        <font>
-         <pointsize>10</pointsize>
-        </font>
-       </property>
        <property name="title">
-        <string/>
+        <string>Target Layer</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_4">
         <property name="margin">
@@ -97,40 +81,40 @@
    <item>
     <layout class="QHBoxLayout" name="iterationsHLayout_top">
      <item>
-      <widget class="QLabel" name="iterationsLabel">
-       <property name="font">
-        <font>
-         <pointsize>13</pointsize>
-        </font>
+      <widget class="QGroupBox" name="groupBox">
+       <property name="title">
+        <string>Number of Iterations</string>
        </property>
-       <property name="text">
-        <string>Number of Iterations:</string>
-       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <property name="margin">
+         <number>4</number>
+        </property>
+        <item>
+         <layout class="QHBoxLayout" name="iterationsHLayout_bottom"/>
+        </item>
+       </layout>
       </widget>
      </item>
     </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="iterationsHLayout_bottom"/>
    </item>
    <item>
     <layout class="QHBoxLayout" name="sensitivityHLayout">
      <item>
-      <widget class="QLabel" name="sensitivityLabel">
-       <property name="font">
-        <font>
-         <pointsize>13</pointsize>
-        </font>
+      <widget class="QGroupBox" name="groupBox_2">
+       <property name="title">
+        <string>Sensitivity Range</string>
        </property>
-       <property name="text">
-        <string>Sensitivity Range:</string>
-       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <property name="margin">
+         <number>4</number>
+        </property>
+        <item>
+         <layout class="QHBoxLayout" name="sensitivityHLayout_bottom"/>
+        </item>
+       </layout>
       </widget>
      </item>
     </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="sensitivityHLayout_bottom"/>
    </item>
    <item>
     <widget class="QWidget" name="replaceRunWidget" native="true">

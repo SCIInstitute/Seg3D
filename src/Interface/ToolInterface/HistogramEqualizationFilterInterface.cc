@@ -26,24 +26,23 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-//QtUtils Includes
-#include <QtUtils/Bridge/QtBridge.h>
-#include <QtUtils/Widgets/QtHistogramWidget.h>
+// Qt includes
+#include <QPointer>
 
-//Interface Includes
-#include <Interface/ToolInterface/CustomWidgets/TargetComboBox.h>
-
-//Qt Gui Includes
-#include <Interface/ToolInterface/HistogramEqualizationFilterInterface.h>
+// QtGui includes
 #include "ui_HistogramEqualizationFilterInterface.h"
 
-//Application Includes
-#include <Application/Layer/DataLayer.h>
-#include <Application/Tools/HistogramEqualizationFilter.h>
-//#include <Application/Filters/Actions/ActionHistogramEqualization.h>
+// Application includes
 #include <Application/LayerManager/LayerManager.h>
+#include <Application/Tools/HistogramEqualizationFilter.h>
 
-//Core includes
+// QtUtils includes
+#include <QtUtils/Bridge/QtBridge.h>
+
+// Interface includes
+#include <Interface/ToolInterface/HistogramEqualizationFilterInterface.h>
+
+// Core includes
 #include <Core/DataBlock/Histogram.h>
 
 SCI_REGISTER_TOOLINTERFACE( Seg3D, HistogramEqualizationFilterInterface )
@@ -56,20 +55,50 @@ class HistogramEqualizationFilterInterfacePrivate
 public:
   Ui::HistogramEqualizationFilterInterface ui_;
     
-    QtUtils::QtSliderDoubleCombo *upper_threshold_;
-  QtUtils::QtSliderDoubleCombo *lower_threshold_;
-  QtUtils::QtSliderIntCombo *alpha_;
-  TargetComboBox *target_;
-  QtUtils::QtHistogramWidget *histogram_;
+  QtUtils::QtSliderDoubleCombo *amount_;
+  QtUtils::QtLogSliderIntCombo *bins_;
+  QtUtils::QtSliderIntCombo    *ignore_bins_;
+  QtUtils::QtHistogramWidget   *histogram_;
+  
+public:
+  static void UpdateHistogram( QPointer<QtUtils::QtHistogramWidget> qpointer,
+    std::string old_layer_name, std::string layer_name, Core::ActionSource source );
 };
 
-// constructor
+void HistogramEqualizationFilterInterfacePrivate::UpdateHistogram( 
+  QPointer<QtUtils::QtHistogramWidget> qpointer, std::string old_layer_name, 
+  std::string layer_name, Core::ActionSource source )
+{
+  if ( ! Core::Interface::IsInterfaceThread() )
+  {
+    Core::Interface::PostEvent( boost::bind( 
+      &HistogramEqualizationFilterInterfacePrivate::UpdateHistogram,
+      qpointer, old_layer_name, layer_name, source ) );
+    return;
+  }
+
+  if ( ! qpointer.isNull() )
+  {
+    DataLayerHandle layer = boost::dynamic_pointer_cast<DataLayer>( LayerManager::Instance()->
+      get_layer_by_id( layer_name ) );
+    
+    if ( layer )
+    {
+      qpointer->set_histogram( layer->get_data_volume()->get_data_block()->get_histogram() );
+    }
+    else
+    {
+      qpointer->reset_histogram();
+    }
+  }
+}
+
+
 HistogramEqualizationFilterInterface::HistogramEqualizationFilterInterface() :
   private_( new HistogramEqualizationFilterInterfacePrivate )
 {
 }
 
-// destructor
 HistogramEqualizationFilterInterface::~HistogramEqualizationFilterInterface()
 {
 }
@@ -80,73 +109,61 @@ bool HistogramEqualizationFilterInterface::build_widget( QFrame* frame )
   //Step 1 - build the Qt GUI Widget
   this->private_->ui_.setupUi( frame );
 
-    //Add the SliderSpinCombos
-    this->private_->upper_threshold_ = new QtUtils::QtSliderDoubleCombo();
-    this->private_->ui_.upperHLayout_bottom->addWidget( this->private_->upper_threshold_ );
+  this->private_->amount_ = new QtUtils::QtSliderDoubleCombo();
+  this->private_->ui_.amountHLayout_bottom->addWidget( this->private_->amount_ );
 
-    this->private_->lower_threshold_ = new QtUtils::QtSliderDoubleCombo();
-    this->private_->ui_.lowerHLayout_bottom->addWidget( this->private_->lower_threshold_ );
+  this->private_->bins_ = new QtUtils::QtLogSliderIntCombo();
+  this->private_->ui_.binsHLayout_bottom->addWidget( this->private_->bins_ );
 
-    this->private_->alpha_ = new QtUtils::QtSliderIntCombo();
-    this->private_->ui_.alphaHLayout_bottom->addWidget( this->private_->alpha_ );
-    
-    this->private_->target_ = new TargetComboBox( this );
-    this->private_->ui_.activeHLayout->addWidget( this->private_->target_ );
-    
-    this->private_->histogram_ = new QtUtils::QtHistogramWidget( this );
-    this->private_->ui_.histogramHLayout->addWidget( this->private_->histogram_ );
+  this->private_->ignore_bins_ = new QtUtils::QtSliderIntCombo();
+  this->private_->ui_.ignore_binsHLayout_bottom->addWidget( this->private_->ignore_bins_ );
+
+  this->private_->histogram_ = new QtUtils::QtHistogramWidget( this );
+  this->private_->ui_.histogramHLayout->addWidget( this->private_->histogram_ );
 
   //Step 2 - get a pointer to the tool
-  ToolHandle base_tool_ = tool();
-  HistogramEqualizationFilter* tool =
-      dynamic_cast< HistogramEqualizationFilter* > ( base_tool_.get() );
+  HistogramEqualizationFilter* tool = dynamic_cast< HistogramEqualizationFilter* >( 
+    this->tool().get() );
 
   //Step 3 - connect the gui to the tool through the QtBridge
-  QtUtils::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
-  this->connect( this->private_->target_, SIGNAL( valid( bool ) ), this, SLOT( enable_run_filter( bool ) ) );
-  this->connect( this->private_->target_, SIGNAL( currentIndexChanged( QString ) ), this, SLOT( refresh_histogram( QString ) ) );
-  QtUtils::QtBridge::Connect( this->private_->upper_threshold_, tool->upper_threshold_state_ );
-  QtUtils::QtBridge::Connect( this->private_->lower_threshold_, tool->lower_threshold_state_ );
-  QtUtils::QtBridge::Connect( this->private_->alpha_, tool->alpha_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
-  
-  this->connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), this, SLOT( execute_filter() ) );
-  this->private_->target_->sync_layers();
+  QtUtils::QtBridge::Connect( this->private_->ui_.target_layer_, 
+    tool->target_layer_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.use_active_layer_, 
+    tool->use_active_layer_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.replaceCheckBox, 
+    tool->replace_state_ );
 
-  //Send a message to the log that we have finised with building the Histogram Equalization Filter Interface
-  CORE_LOG_DEBUG("Finished building a Histogram Equalization Filter Interface");
-  return ( true );
-} // end build_widget
+  QtUtils::QtBridge::Connect( this->private_->amount_, 
+    tool->amount_state_ );
+  QtUtils::QtBridge::Connect( this->private_->bins_, 
+    tool->bins_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ignore_bins_, 
+    tool->ignore_bins_state_ );
+  QtUtils::QtBridge::Enable( this->private_->ui_.runFilterButton,
+    tool->valid_target_state_ );
+    
+  QPointer<QtUtils::QtHistogramWidget> qpointer( this->private_->histogram_ );
+  this->add_connection( tool->target_layer_state_->value_changed_signal_.connect( boost::bind(
+    &HistogramEqualizationFilterInterfacePrivate::UpdateHistogram, qpointer, _1, _2, _3 ) ) );
   
-void HistogramEqualizationFilterInterface::enable_run_filter( bool valid )
-{
-  this->private_->ui_.runFilterButton->setEnabled( valid );
-}
-
-void HistogramEqualizationFilterInterface::refresh_histogram( QString layer_name )
-{
-  if( layer_name == "" )
+  // Step 4 - Qt connections
   {
-    return;
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() ); 
+    this->private_->ui_.target_layer_->setDisabled( tool->use_active_layer_state_->get() );
+    
+    this->connect( this->private_->ui_.use_active_layer_, SIGNAL( toggled( bool ) ),
+      this->private_->ui_.target_layer_, SLOT( setDisabled( bool ) ) );
+
+    this->connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), 
+      this, SLOT( run_filter() ) );
   }
   
-  Core::Histogram temp_histogram = dynamic_cast< DataLayer* >( LayerManager::Instance()->
-    get_layer_by_name( layer_name.toStdString() ).get() )->
-    get_data_volume()->get_data_block()->get_histogram();
-
-  // Now, display histogram!
-  this->private_->histogram_->set_histogram( temp_histogram );  
-}
-
-void HistogramEqualizationFilterInterface::execute_filter()
-{
-  ToolHandle base_tool_ = tool();
-  HistogramEqualizationFilter* tool =
-  dynamic_cast< HistogramEqualizationFilter* > ( base_tool_.get() );
+  return true;
+} // end build_widget
   
-//  ActionHistogramEqualization::Dispatch( tool->target_layer_state_->export_to_string(), 
-//           tool->upper_threshold_state_->get(), tool->lower_threshold_state_->get(),
-//           tool->alpha_state_->get(), tool->replace_state_->get() ); 
+void HistogramEqualizationFilterInterface::run_filter()
+{
+  tool()->execute( Core::Interface::GetWidgetActionContext() );
 }
 
 } // end namespace Seg3D

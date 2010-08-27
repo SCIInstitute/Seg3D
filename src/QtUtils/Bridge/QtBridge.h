@@ -38,6 +38,7 @@
 #include <QtGui/QActionGroup>
 
 // QtUtils includes
+#include <QtUtils/Widgets/QtHistogramWidget.h>
 #include <QtUtils/Widgets/QtSliderIntCombo.h>
 #include <QtUtils/Widgets/QtLogSliderIntCombo.h>
 #include <QtUtils/Widgets/QtSliderDoubleCombo.h>

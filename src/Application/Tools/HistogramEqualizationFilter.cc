@@ -28,9 +28,14 @@
 
 // Application includes
 #include <Application/Tool/ToolFactory.h>
-#include <Application/Tools/HistogramEqualizationFilter.h>
 #include <Application/Layer/Layer.h>
 #include <Application/LayerManager/LayerManager.h>
+
+// StateEnigne of the tool
+#include <Application/Tools/HistogramEqualizationFilter.h>
+
+// Action associated with tool
+#include <Application/Tools/Actions/ActionHistogramEqualizationFilter.h>
 
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL( Seg3D, HistogramEqualizationFilter )
@@ -39,71 +44,28 @@ namespace Seg3D
 {
 
 HistogramEqualizationFilter::HistogramEqualizationFilter( const std::string& toolid ) :
-  Tool( toolid )
+  SingleTargetTool( Core::VolumeType::DATA_E, toolid )
 {
   // Need to set ranges and default values for all parameters
-  add_state( "target", this->target_layer_state_, "<none>" );
-  add_state( "upper_threshold", this->upper_threshold_state_, 1.0, 0.0, 1.0, 0.01 );
-  add_state( "lower_threshold", this->lower_threshold_state_, 0.0, 0.0, 1.0, 0.01 );
-  add_state( "alpha", this->alpha_state_, 0, 0, 255, 1 );
-  add_state( "replace", this->replace_state_, false );
-  
-  this->handle_layers_changed();
-
-  // Add constaints, so that when the state changes the right ranges of
-  // parameters are selected
-  this->add_connection ( this->target_layer_state_->value_changed_signal_.connect( boost::bind(
-      &HistogramEqualizationFilter::target_constraint, this, _1 ) ) );
-  
-  this->add_connection ( LayerManager::Instance()->layers_changed_signal_.connect(
-    boost::bind( &HistogramEqualizationFilter::handle_layers_changed, this ) ) );
-
+  this->add_state( "replace", this->replace_state_, false );
+  this->add_state( "amount", this->amount_state_, 1.0, 0.0, 1.0, 0.01 );
+  this->add_state( "bins", this->bins_state_, 3000, 10, 10000, 1 );
+  this->add_state( "ignore_bins", this->ignore_bins_state_, 1, 0, 10, 1 );
 }
 
 HistogramEqualizationFilter::~HistogramEqualizationFilter()
 {
   disconnect_all();
 }
-  
-void HistogramEqualizationFilter::handle_layers_changed()
-{
-  std::vector< LayerHandle > target_layers;
-  LayerManager::Instance()->get_layers( target_layers );
-  bool target_found = false;
-  
-  for( int i = 0; i < static_cast< int >( target_layers.size() ); ++i )
-  {
-    if( ( this->target_layer_state_->get() == "<none>" ) && ( target_layers[i]->type() == 
-                                 Core::VolumeType::DATA_E ) )
-    {
-      this->target_layer_state_->set( target_layers[i]->get_layer_name(), 
-        Core::ActionSource::NONE_E );
-      target_found = true;
-      break;
-    }
-    if( target_layers[i]->get_layer_name() == this->target_layer_state_->get() ) {
-      target_found = true;
-      break;
-    }
-  }
-  
-  if( !target_found )
-    this->target_layer_state_->set( "", Core::ActionSource::NONE_E );
-} 
-  
-void HistogramEqualizationFilter::target_constraint( std::string layerid )
-{
+
+void HistogramEqualizationFilter::execute( Core::ActionContextHandle context )
+{ 
+  ActionHistogramEqualizationFilter::Dispatch( context,
+    this->target_layer_state_->get(),
+    this->replace_state_->get(),
+    this->amount_state_->get(),
+    this->bins_state_->get(),
+    this->ignore_bins_state_->get() );
 }
-
-
-void HistogramEqualizationFilter::activate()
-{
-}
-
-void HistogramEqualizationFilter::deactivate()
-{
-}
-
+  
 } // end namespace Seg3D
-
-

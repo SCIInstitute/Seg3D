@@ -58,7 +58,13 @@ public:
     virtual ~QtHistogramWidget();
     
 public Q_SLOTS:
+  // SET_HISTOGRAM:
+  // Set the histogram of the graph
   void set_histogram( const Core::Histogram& histogram );
+
+  // RESET_HISTOGRAM:
+  // Invalidate the current histogram
+  void reset_histogram();
 
 private:
   QtHistogramWidgetPrivateHandle private_;

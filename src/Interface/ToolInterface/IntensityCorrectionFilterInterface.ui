@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>213</width>
-    <height>207</height>
+    <width>222</width>
+    <height>362</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -19,12 +19,6 @@
   <property name="minimumSize">
    <size>
     <width>213</width>
-    <height>207</height>
-   </size>
-  </property>
-  <property name="maximumSize">
-   <size>
-    <width>16777215</width>
     <height>207</height>
    </size>
   </property>
@@ -46,27 +40,32 @@
     <number>4</number>
    </property>
    <item>
-    <layout class="QHBoxLayout" name="activeHLayout" stretch="1">
-     <property name="spacing">
-      <number>0</number>
-     </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_6">
      <item>
-      <widget class="QLabel" name="activeLabel">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
+      <widget class="QGroupBox" name="target_groupbox_">
+       <property name="font">
+        <font>
+         <pointsize>10</pointsize>
+        </font>
        </property>
-       <property name="minimumSize">
-        <size>
-         <width>50</width>
-         <height>0</height>
-        </size>
+       <property name="title">
+        <string>Target Layer</string>
        </property>
-       <property name="text">
-        <string>Target:</string>
-       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <property name="margin">
+         <number>4</number>
+        </property>
+        <item>
+         <widget class="QComboBox" name="target_layer_"/>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="use_active_layer_">
+          <property name="text">
+           <string>Always Use Active Layer</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </item>
     </layout>
@@ -74,40 +73,40 @@
    <item>
     <layout class="QHBoxLayout" name="orderHLayout_top">
      <item>
-      <widget class="QLabel" name="orderLabel">
-       <property name="font">
-        <font>
-         <pointsize>10</pointsize>
-        </font>
+      <widget class="QGroupBox" name="groupBox">
+       <property name="title">
+        <string>Polynomial Order</string>
        </property>
-       <property name="text">
-        <string>Order:</string>
-       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <property name="margin">
+         <number>4</number>
+        </property>
+        <item>
+         <layout class="QHBoxLayout" name="orderHLayout_bottom"/>
+        </item>
+       </layout>
       </widget>
      </item>
     </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="orderHLayout_bottom"/>
    </item>
    <item>
     <layout class="QHBoxLayout" name="edgeHLayout_top">
      <item>
-      <widget class="QLabel" name="edgeLabel">
-       <property name="font">
-        <font>
-         <pointsize>10</pointsize>
-        </font>
+      <widget class="QGroupBox" name="groupBox_2">
+       <property name="title">
+        <string>Edge Sensitivity</string>
        </property>
-       <property name="text">
-        <string>Edge:</string>
-       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <property name="margin">
+         <number>4</number>
+        </property>
+        <item>
+         <layout class="QHBoxLayout" name="edgeHLayout_bottom"/>
+        </item>
+       </layout>
       </widget>
      </item>
     </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="edgeHLayout_bottom"/>
    </item>
    <item>
     <widget class="QWidget" name="replaceRunWidget" native="true">

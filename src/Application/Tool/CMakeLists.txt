@@ -36,6 +36,8 @@ SET(APPLICATION_TOOL_SRCS
   BaseFilter.cc
   ITKFilter.h
   ITKFilter.cc
+  NrrdFilter.h
+  NrrdFilter.cc
   SingleTargetTool.h
   SingleTargetTool.cc
   SeedPointsTool.h

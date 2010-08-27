@@ -179,14 +179,49 @@ protected:
       Core::MaskVolumeHandle mask_volume( new Core::MaskVolume( 
         mask_layer->get_grid_transform(), mask ) );
         
-      // NOTE:Do not need an update of the generation number as this volume 
-      // was generated from scratch.
-      this->dispatch_insert_mask_volume_into_layer( mask_layer, mask_volume, false );
+      this->dispatch_insert_mask_volume_into_layer( mask_layer, mask_volume, true );
       return true;
     }
     return false;
   }
 
+
+  // INSERT_ITK_LABEL_INTO_MASK_LAYER:
+  // Insert an itk image back into a layer
+  template< class T >
+  bool insert_itk_label_into_mask_layer( const LayerHandle& layer, 
+    typename itk::Image<T,3>* itk_image, T label )
+  {
+    if ( layer->type() == Core::VolumeType::MASK_E )
+    {
+      MaskLayerHandle mask_layer = boost::dynamic_pointer_cast<MaskLayer>( layer );
+          
+      // Need to make an intermediate representation as a datablock of the data
+      // before it can be uploaded into the mask.
+      // NOTE: This only generates a wrapper, no new data is generated
+      Core::DataBlockHandle data_block = Core::ITKDataBlock::New<T>( 
+        typename itk::Image<T,3>::Pointer( itk_image ) );
+      
+      // NOTE: The only reason we need the transform here, is that data blocks are
+      // sorted by grid transform so we can use the nrrd library to save them, the
+      // latter only allows storing one transform per data block, and since 8 masks
+      // share one datablock, they are required for now to have the same transform.
+      Core::MaskDataBlockHandle mask;
+
+      if (!( Core::MaskDataBlockManager::ConvertLabel( data_block, 
+        mask_layer->get_grid_transform(), mask, static_cast<double>( label ) ) ) )
+      {
+        return false;
+      }
+      
+      Core::MaskVolumeHandle mask_volume( new Core::MaskVolume( 
+        mask_layer->get_grid_transform(), mask ) );
+        
+      this->dispatch_insert_mask_volume_into_layer( mask_layer, mask_volume, true );
+      return true;
+    }
+    return false;
+  }
 
   // CONVERT_AND_INSERT_ITK_IMAGE_INTO_LAYER:
   // Insert an itk image back into a layer
@@ -243,9 +278,7 @@ protected:
       Core::MaskVolumeHandle mask_volume( new Core::MaskVolume( 
         mask_layer->get_grid_transform(), mask ) );
         
-      // NOTE:Do not need an update of the generation number as this volume 
-      // was generated from scratch.
-      this->dispatch_insert_mask_volume_into_layer( mask_layer, mask_volume, false );
+      this->dispatch_insert_mask_volume_into_layer( mask_layer, mask_volume, true );
       return true;
     }
     

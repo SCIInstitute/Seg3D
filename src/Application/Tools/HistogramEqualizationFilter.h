@@ -29,12 +29,13 @@
 #ifndef APPLICATION_TOOLS_HISTOGRAMEQUALIZATIONFILTER_H
 #define APPLICATION_TOOLS_HISTOGRAMEQUALIZATIONFILTER_H
 
-#include <Application/Tool/Tool.h>
+// Application includes
+#include <Application/Tool/SingleTargetTool.h>
 
 namespace Seg3D
 {
 
-class HistogramEqualizationFilter : public Tool
+class HistogramEqualizationFilter : public SingleTargetTool
 {
 SEG3D_TOOL(
 SEG3D_TOOL_NAME( "HistogramEqualizationFilter", "Equalize the histgram" )
@@ -42,38 +43,31 @@ SEG3D_TOOL_MENULABEL( "Histogram Equalization" )
 SEG3D_TOOL_MENU( "filter_data_to_data" )
 SEG3D_TOOL_SHORTCUT_KEY( "Alt+H" )
 SEG3D_TOOL_URL( "http://seg3d.org/" )
+SEG3D_TOOL_VERSION( "1" )
 )
 
 public:
   HistogramEqualizationFilter( const std::string& toolid );
   virtual ~HistogramEqualizationFilter();
 
-  // -- constraint parameters --
-
-  // Constrain viewer to right painting tool when layer is selected
-  void target_constraint( std::string layerid );
-
-  // -- activate/deactivate tool --
-
-  virtual void activate();
-  virtual void deactivate();
-  
-private:
-  // -- handle updates from layermanager --
-  void handle_layers_changed();
-
   // -- state --
 public:
-  // Layerid of the target layer
-  Core::StateStringHandle target_layer_state_;
-
-  Core::StateRangedDoubleHandle upper_threshold_state_;
-
-  Core::StateRangedDoubleHandle lower_threshold_state_;
-
-  Core::StateRangedIntHandle alpha_state_;
-
+  // Whether the layer needs to be replaced
   Core::StateBoolHandle replace_state_;
+
+  // Alpha parameter
+  Core::StateRangedDoubleHandle amount_state_;
+
+  // Number of bins used to calculate histogram
+  Core::StateRangedIntHandle bins_state_;
+
+  // Number of bins ignored in equalization
+  Core::StateRangedIntHandle ignore_bins_state_;
+
+  // -- execute --
+public:
+  // Execute the tool and dispatch the action
+  virtual void execute( Core::ActionContextHandle context );
 };
 
 } // end namespace

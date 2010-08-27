@@ -118,7 +118,13 @@ public:
    
   // CONVERT:
   // Convert a DataBlock into a MaskDataBlock
-  static bool Convert( DataBlockHandle data, GridTransform grid_transform, MaskDataBlockHandle& mask);
+  static bool Convert( DataBlockHandle data, GridTransform grid_transform, 
+    MaskDataBlockHandle& mask);
+
+  // CONVERTLABEL:
+  // Convert a DataBlock into a MaskDataBlock by checking for a certain value
+  static bool ConvertLabel( DataBlockHandle data, GridTransform grid_transform, 
+    MaskDataBlockHandle& mask, double label );
   
   // CONVERT:
   // Convert a MaskDataBlock into a DataBlock

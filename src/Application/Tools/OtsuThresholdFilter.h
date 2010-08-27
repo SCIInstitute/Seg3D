@@ -29,16 +29,18 @@
 #ifndef APPLICATION_TOOLS_OTSUTHRESHOLDFILTER_H
 #define APPLICATION_TOOLS_OTSUTHRESHOLDFILTER_H
 
-#include <Application/Tool/Tool.h>
+// Application includes
+#include <Application/Tool/SingleTargetTool.h>
 
 namespace Seg3D
 {
 
-class OtsuThresholdFilter : public Tool
+class OtsuThresholdFilter : public SingleTargetTool
 {
 
 SEG3D_TOOL(
-SEG3D_TOOL_NAME( "OtsuThresholdFilter", "Separate the data in different regions based on the histogram" )
+SEG3D_TOOL_NAME( "OtsuThresholdFilter", 
+  "Separate the data in different regions based on the histogram." )
 SEG3D_TOOL_MENULABEL( "Otsu Threshold" )
 SEG3D_TOOL_MENU( "filter_data_to_mask" )
 SEG3D_TOOL_SHORTCUT_KEY( "Alt+O" )
@@ -49,27 +51,15 @@ public:
   OtsuThresholdFilter( const std::string& toolid );
   virtual ~OtsuThresholdFilter();
 
-  // -- constraint parameters --
-
-  // Constrain viewer to right painting tool when layer is selected
-  void target_constraint( std::string layerid );
-
-  // -- activate/deactivate tool --
-
-  virtual void activate();
-  virtual void deactivate();
-  
-private:
-  // -- handle updates from layermanager --
-  void handle_layers_changed();
-
   // -- state --
 public:
-  // Layerid of the target layer
-  Core::StateStringHandle target_layer_state_;
+  // The amount of thresholds, each extra threshold generates another mask layer
+  Core::StateRangedIntHandle amount_state_;
 
-  Core::StateRangedIntHandle order_state_;
-
+  // -- execute --
+public:
+  // Execute the tool and dispatch the action
+  virtual void execute( Core::ActionContextHandle context );
 };
 
 } // end namespace
