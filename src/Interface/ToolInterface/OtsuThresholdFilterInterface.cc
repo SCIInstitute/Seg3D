@@ -60,25 +60,25 @@ public:
 
 public:
   static void UpdateHistogram( QPointer<QtUtils::QtHistogramWidget> qpointer,
-    std::string layer_name, std::string old_layer_name, Core::ActionSource source );
+    std::string old_layer_name, std::string layer_name, Core::ActionSource source );
 };
 
 void OtsuThresholdFilterInterfacePrivate::UpdateHistogram( 
-  QPointer<QtUtils::QtHistogramWidget> qpointer, std::string layer_name, 
-  std::string old_layer_name, Core::ActionSource source )
+  QPointer<QtUtils::QtHistogramWidget> qpointer, std::string old_layer_name, 
+  std::string layer_name, Core::ActionSource source )
 {
   if ( ! Core::Interface::IsInterfaceThread() )
   {
     Core::Interface::PostEvent( boost::bind( 
       &OtsuThresholdFilterInterfacePrivate::UpdateHistogram,
-      qpointer, layer_name, old_layer_name, source ) );
+      qpointer, old_layer_name, layer_name, source ) );
     return;
   }
 
   if ( ! qpointer.isNull() )
   {
     DataLayerHandle layer = boost::dynamic_pointer_cast<DataLayer>( LayerManager::Instance()->
-      get_layer_by_name( layer_name ) );
+      get_layer_by_id( layer_name ) );
     
     if ( layer )
     {
@@ -142,6 +142,9 @@ bool OtsuThresholdFilterInterface::build_widget( QFrame* frame )
 
     this->connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), 
       this, SLOT( run_filter() ) );
+
+    OtsuThresholdFilterInterfacePrivate::UpdateHistogram( 
+      qpointer, "", tool->target_layer_state_->get(), Core::ActionSource::COMMANDLINE_E );  
   }
   
   return true;

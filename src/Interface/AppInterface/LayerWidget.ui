@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>300</width>
-    <height>211</height>
+    <height>239</height>
    </rect>
   </property>
   <property name="mouseTracking">
@@ -1013,6 +1013,13 @@ QPushButton#activate_button_{
               </property>
               <property name="textVisible">
                <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="abort_text_">
+              <property name="text">
+               <string>text</string>
               </property>
              </widget>
             </item>

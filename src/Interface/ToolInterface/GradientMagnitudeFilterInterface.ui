@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>213</width>
-    <height>172</height>
+    <height>148</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -46,20 +46,6 @@
     <number>4</number>
    </property>
    <item>
-    <layout class="QHBoxLayout" name="activeHLayout" stretch="0">
-     <property name="spacing">
-      <number>0</number>
-     </property>
-     <item>
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>Target Layer:</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
     <layout class="QHBoxLayout" name="horizontalLayout_6">
      <item>
       <widget class="QGroupBox" name="target_groupbox_">
@@ -69,7 +55,7 @@
         </font>
        </property>
        <property name="title">
-        <string/>
+        <string>Target Layer</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_4">
         <property name="margin">

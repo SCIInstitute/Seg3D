@@ -182,6 +182,9 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   this->private_->ui_.verticalLayout_5->addWidget( this->private_->color_widget_ );
   this->private_->color_widget_->setObjectName( QString::fromUtf8( "color_widget_" ) );
   
+  this->private_->ui_.abort_text_->setText( "Waiting for process to abort ..." );
+  this->private_->ui_.abort_text_->hide();
+  
   // connect the GUI signals and slots
   this->connect( this->private_->ui_.opacity_button_, 
     SIGNAL( clicked( bool ) ), this, 
@@ -757,7 +760,9 @@ void LayerWidget::set_mask_background_color_from_preference_change( int color_in
 
 void LayerWidget::trigger_abort()
 {
-  this->private_->ui_.progress_bar_->setEnabled( false );
+  this->private_->ui_.abort_button_->hide();
+  this->private_->ui_.progress_bar_->hide();
+  this->private_->ui_.abort_text_->show();
   this->private_->layer_->abort_signal_();
 }
 
@@ -1046,6 +1051,9 @@ void LayerWidget::show_progress_bar( bool show )
   {
     this->private_->ui_.progress_bar_->setValue( 0 );
     this->private_->ui_.progress_bar_->setEnabled( true );
+    this->private_->ui_.abort_text_->hide();
+    this->private_->ui_.abort_button_->show();
+    this->private_->ui_.progress_bar_->show();
     this->private_->ui_.progress_bar_bar_->show();
   }
   else 

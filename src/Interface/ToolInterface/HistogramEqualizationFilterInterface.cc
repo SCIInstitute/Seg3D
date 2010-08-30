@@ -156,6 +156,9 @@ bool HistogramEqualizationFilterInterface::build_widget( QFrame* frame )
 
     this->connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), 
       this, SLOT( run_filter() ) );
+      
+    HistogramEqualizationFilterInterfacePrivate::UpdateHistogram( 
+      qpointer, "", tool->target_layer_state_->get(), Core::ActionSource::COMMANDLINE_E );  
   }
   
   return true;
