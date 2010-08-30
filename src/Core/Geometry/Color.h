@@ -48,7 +48,7 @@ public:
   {
   }
 
-  Color( double r, double g, double b ) :
+  Color( float r, float g, float b ) :
     r_( r ), g_( g ), b_( b )
   {
   }
@@ -71,7 +71,7 @@ public:
     return ( *this );
   }
 
-  inline Color operator*( double alpha ) const
+  inline Color operator*( float alpha ) const
   {
     return ( Color( r_ * alpha, g_ * alpha, b_ * alpha ) );
   }
@@ -86,40 +86,40 @@ public:
     return ( ( r_ != color.r_ ) || ( g_ != color.g_ ) || ( b_ != color.b_ ) );
   }
 
-  inline double r() const
+  inline float r() const
   {
     return r_;
   }
-  inline double g() const
+  inline float g() const
   {
     return g_;
   }
-  inline double b() const
+  inline float b() const
   {
     return b_;
   }
 
-  inline void r( const double r )
+  inline void r( const float r )
   {
     r_ = r;
   }
-  inline void g( const double g )
+  inline void g( const float g )
   {
     g_ = g;
   }
-  inline void b( const double b )
+  inline void b( const float b )
   {
     b_ = b;
   }
 
 private:
   // red, green, blue
-  double r_;
-  double g_;
-  double b_;
+  float r_;
+  float g_;
+  float b_;
 };
 
-Color operator*( double alpha, Color color );
+Color operator*( float alpha, Color color );
 
 std::string ExportToString( const Color& value );
 bool ImportFromString( const std::string& str, Color& value );

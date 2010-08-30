@@ -203,9 +203,7 @@ StatusBar::StatusBar() :
   this->add_state( "active_tool", this->active_tool_state_,
     StatusBarPrivate::EMPTY_OPTION_C, empty_names );
 
-//  this->add_connection( LayerManager::Instance()->layers_changed_signal_.connect(
-//    boost::bind( &StatusBarPrivate::update_layer_list, this->private_ ) ) );
-  this->add_connection( LayerManager::Instance()->group_internals_changed_signal_.connect(
+  this->add_connection( LayerManager::Instance()->layers_changed_signal_.connect(
     boost::bind( &StatusBarPrivate::update_layer_list, this->private_ ) ) );
   
   this->add_connection( LayerManager::Instance()->active_layer_changed_signal_.connect(

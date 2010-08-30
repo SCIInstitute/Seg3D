@@ -89,6 +89,7 @@ void VertexAttribArrayBuffer::set_array( VertexAttribArrayType array_type, GLint
 {
   VertexAttribArrayInfoHandle array_info( new VertexAttribArrayInfo );
   array_info->array_type_ = GL_ARRAY_TYPES_C[ array_type ];
+  array_info->generic_ = false;
 
   switch(array_type)
   {
@@ -122,6 +123,7 @@ void VertexAttribArrayBuffer::set_array( VertexAttribArrayType array_type,
 {
   VertexAttribArrayInfoHandle array_info( new VertexAttribArrayInfo );
   array_info->array_type_ = GL_ARRAY_TYPES_C[ array_type ];
+  array_info->generic_ = false;
 
   switch( array_type )
   {
@@ -150,6 +152,7 @@ void VertexAttribArrayBuffer::set_array( VertexAttribArrayType array_type, GLsiz
 {
   VertexAttribArrayInfoHandle array_info( new VertexAttribArrayInfo );
   array_info->array_type_ = GL_ARRAY_TYPES_C[ array_type ];
+  array_info->generic_ = false;
 
   switch( array_type )
   {
@@ -166,6 +169,17 @@ void VertexAttribArrayBuffer::set_array( VertexAttribArrayType array_type, GLsiz
   this->vertex_arrays_.push_back( array_info );
 }
 
+void VertexAttribArrayBuffer::set_generic_array( GLuint index, GLint attrib_size, 
+    GLenum data_type, GLboolean normalized, GLsizei stride, int offset )
+{
+  VertexAttribArrayInfoHandle array_info( new VertexAttribArrayInfo );
+  array_info->array_type_ = index;
+  array_info->generic_ = true;
+  array_info->gl_array_pointer_func_ = boost::bind( glVertexAttribPointer, index, 
+    attrib_size, data_type, normalized, stride, reinterpret_cast< void* >( offset ) );
+  this->vertex_arrays_.push_back( array_info );
+}
+
 void VertexAttribArrayBuffer::enable_arrays()
 {
   size_t num_of_arrays = this->vertex_arrays_.size();
@@ -179,7 +193,14 @@ void VertexAttribArrayBuffer::enable_arrays()
   for (size_t i = 0; i < num_of_arrays; i++)
   {
     this->vertex_arrays_[i]->gl_array_pointer_func_();
-    glEnableClientState( this->vertex_arrays_[i]->array_type_ );
+    if ( this->vertex_arrays_[ i ]->generic_ )
+    {
+      glEnableVertexAttribArray( this->vertex_arrays_[ i ]->array_type_ );
+    }
+    else
+    {
+      glEnableClientState( this->vertex_arrays_[i]->array_type_ );
+    }
   }
   this->safe_unbind();
 }
@@ -194,7 +215,14 @@ void VertexAttribArrayBuffer::disable_arrays()
 
   for (size_t i = 0; i < num_of_arrays; i++)
   {
-    glDisableClientState( this->vertex_arrays_[i]->array_type_ );
+    if ( this->vertex_arrays_[ i ]->generic_ )
+    {
+      glDisableVertexAttribArray( this->vertex_arrays_[i]->array_type_ );
+    }
+    else
+    {
+      glDisableClientState( this->vertex_arrays_[i]->array_type_ );
+    }
   }
 }
 

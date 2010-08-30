@@ -32,7 +32,7 @@
 namespace Core
 {
 
-Color operator*( double alpha, Color color )
+Color operator*( float alpha, Color color )
 {
   return ( color * alpha );
 }
@@ -46,7 +46,7 @@ std::string ExportToString( const Color& value )
 
 bool ImportFromString( const std::string& str, Color& value )
 {
-  std::vector< double > values;
+  std::vector< float > values;
   ImportFromString( str, values );
   if ( values.size() == 3 )
   {

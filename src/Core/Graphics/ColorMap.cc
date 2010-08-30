@@ -28,6 +28,7 @@
 
 // Core includes
 #include <Core/Graphics/ColorMap.h>
+#include <Core/RenderResources/RenderResources.h>
 
 namespace Core 
 {
@@ -35,12 +36,12 @@ namespace Core
 const Color ColorMap::DEFAULT_COLOR_C = Color( 0, 0, 0 );
 
 ColorMap::ColorMap()
-: lookup_min_( 0.0f ),
-  lookup_max_( 1.0f ),
+: lookup_min_( 0 ),
+  lookup_max_( 1 ),
   changed_( true )
 {
   // Default to Rainbow
-  double scale = 1.0 / 255.0;
+  float scale = 1.0f / 255.0f;
   this->colors_.push_back( Color( 0, 0, 255 ) * scale );
   this->colors_.push_back( Color( 0, 52, 255 ) * scale );
   this->colors_.push_back( Color( 1, 80, 255 ) * scale );
@@ -125,8 +126,12 @@ void ColorMap::upload_texture()
 {
   if( this->changed_ )
   {
-    this->texture_->set_image( static_cast< int >( this->get_size() ), GL_UNSIGNED_BYTE, 
-      &( this->colors_[0] ), GL_RGB, GL_DOUBLE );
+    this->texture_.reset( new Texture1D );
+    this->texture_->set_min_filter( GL_LINEAR );
+    this->texture_->set_mag_filter( GL_LINEAR );
+    this->texture_->set_image( static_cast< int >( this->get_size() ), GL_RGB, 
+      &this->colors_[ 0 ], GL_RGB, GL_FLOAT );
+    CORE_CHECK_OPENGL_ERROR();
     this->changed_ = false;
   }
 }

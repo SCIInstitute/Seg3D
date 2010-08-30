@@ -85,7 +85,7 @@ public:
 
   // REDRAW:
   // Render the isosurface.
-  void redraw();
+  void redraw( bool use_colormap );
 
   void set_color_map( ColorMapHandle color_map );
   ColorMapHandle get_color_map() const;

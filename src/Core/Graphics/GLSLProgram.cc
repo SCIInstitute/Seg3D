@@ -100,4 +100,9 @@ void GLSLProgram::disable()
   glUseProgram( 0 );
 }
 
+void GLSLProgram::bind_attrib_location( unsigned int index, const char* name )
+{
+  glBindAttribLocation( this->program_id_, index, name );
+}
+
 } // end namespace Core

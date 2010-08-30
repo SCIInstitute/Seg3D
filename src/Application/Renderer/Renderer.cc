@@ -54,6 +54,7 @@
 #include <Application/Renderer/SliceShader.h>
 #include <Application/Renderer/IsosurfaceShader.h>
 #include <Application/Viewer/Viewer.h>
+#include "Core/Graphics/ColorMap.h"
 
 
 namespace Seg3D
@@ -509,6 +510,7 @@ void RendererPrivate::draw_isosurfaces( const IsosurfaceArray& isosurfaces, bool
   glEnable( GL_CULL_FACE );
   this->isosurface_shader_->enable();
   this->isosurface_shader_->set_lighting( with_lighting );
+  this->isosurface_shader_->set_use_colormap( true );
   for ( size_t i = 0; i < num_of_isosurfaces; ++i )
   {
     Core::IsosurfaceHandle iso = isosurfaces[ i ]->isosurface_;
@@ -518,7 +520,17 @@ void RendererPrivate::draw_isosurfaces( const IsosurfaceArray& isosurfaces, bool
     }
     glColor3d( isosurfaces[ i ]->color_.r() / 255.0, isosurfaces[ i ]->color_.g() / 255.0, 
       isosurfaces[ i ]->color_.b() / 255.0 );
-    iso->redraw();
+    Core::ColorMapHandle colormap = iso->get_color_map();
+    float lookup_min, lookup_max;
+    colormap->get_lookup_range( lookup_min, lookup_max );
+    this->isosurface_shader_->set_min_val( lookup_min );
+    this->isosurface_shader_->set_val_range( lookup_max - lookup_min );
+    Core::Texture1DHandle colormap_tex = colormap->get_texture();
+    Core::Texture::lock_type tex_lock( colormap_tex->get_mutex() );
+    colormap_tex->bind();
+    iso->redraw( true );
+    colormap_tex->unbind();
+    CORE_CHECK_OPENGL_ERROR();
   }
   this->isosurface_shader_->disable();
   glDisable( GL_CULL_FACE );
@@ -581,6 +593,11 @@ void Renderer::post_initialize()
   this->private_->slice_shader_->set_pattern_texture( 1 );
   this->private_->slice_shader_->set_lighting( false );
   this->private_->slice_shader_->disable();
+
+  this->private_->isosurface_shader_->enable();
+  this->private_->isosurface_shader_->set_colormap_texture( 0 );
+  this->private_->isosurface_shader_->disable();
+
   Core::Texture::SetActiveTextureUnit( 1 );
   this->private_->pattern_texture_->bind();
   this->private_->pattern_texture_->set_mag_filter( GL_LINEAR );

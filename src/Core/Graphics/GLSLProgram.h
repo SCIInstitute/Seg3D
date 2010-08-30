@@ -54,6 +54,7 @@ public:
   void detach_shader( GLSLShaderHandle shader );
 
   int get_uniform_location( const char* name );
+  void bind_attrib_location( unsigned int index, const char* name );
 
   // Link the program. Returns true if successful, otherwise false.
   // Additional information can be acquired by calling "get_info_log".

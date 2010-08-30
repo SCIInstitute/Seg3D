@@ -51,6 +51,10 @@ public:
   void enable();
   void disable();
   void set_lighting( bool enabled );
+  void set_use_colormap( bool enable );
+  void set_colormap_texture( int tex_unit );
+  void set_min_val( float min_val );
+  void set_val_range( float val_range );
 
 private:
 
@@ -61,6 +65,10 @@ private:
   Core::GLSLShaderHandle glsl_vert_shader_;
 
   int enable_lighting_loc_;
+  int use_colormap_loc_;
+  int colormap_loc_;
+  int min_val_loc_;
+  int val_range_loc_;
 
   const static char* VERT_SHADER_SOURCE_C[];
   const static char* FRAG_SHADER_SOURCE_C[];

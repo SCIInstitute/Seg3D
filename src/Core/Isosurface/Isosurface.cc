@@ -314,6 +314,7 @@ class VertexBufferBatch
 public:
   VertexAttribArrayBufferHandle vertex_buffer_;
   VertexAttribArrayBufferHandle normal_buffer_;
+  VertexAttribArrayBufferHandle value_buffer_;
   ElementArrayBufferHandle faces_buffer_;
 };
 typedef boost::shared_ptr< VertexBufferBatch > VertexBufferBatchHandle;
@@ -403,6 +404,7 @@ public:
   std::vector< VertexBufferBatchHandle > vbo_batches_;
   bool vbo_available_;
   bool surface_changed_;
+  bool values_changed_;
 
   const static double COMPUTE_PERCENT_PROGRESS_C;
   const static double NORMAL_PERCENT_PROGRESS_C;
@@ -1149,15 +1151,14 @@ void IsosurfacePrivate::parallel_compute_normals( int thread, int num_threads,
 
 void IsosurfacePrivate::upload_to_vertex_buffer()
 {
-  if ( !this->surface_changed_ )
+  if ( !this->surface_changed_ && !this->values_changed_ )
   {
     return;
   }
 
   size_t num_of_parts = this->part_points_.size();
-  this->vbo_batches_.clear();
-  this->surface_changed_ = false;
-  
+  bool has_values = this->values_.size() == this->points_.size();
+
   // Estimate the size of video memory required to upload the isosurface
   ptrdiff_t total_size = 0;
   for ( size_t i = 0; i < num_of_parts; ++i )
@@ -1165,9 +1166,10 @@ void IsosurfacePrivate::upload_to_vertex_buffer()
     unsigned int num_pts = this->part_points_[ i ].second - this->part_points_[ i ].first;
     ptrdiff_t vertex_size = num_pts * sizeof( PointF );
     ptrdiff_t normal_size = num_pts * sizeof( VectorF );
+    ptrdiff_t value_size = has_values ? num_pts * sizeof( float ) : 0;
     unsigned int num_face_indices = this->part_faces_[ i ].second - this->part_faces_[ i ].first;
     ptrdiff_t face_size = num_face_indices * sizeof( unsigned int );
-    ptrdiff_t batch_size = vertex_size + normal_size + face_size;
+    ptrdiff_t batch_size = vertex_size + normal_size + value_size + face_size;
     CORE_LOG_MESSAGE( "Isosurface Batch " + ExportToString( i ) + ": " +
              ExportToString( num_pts ) + " vertices, " +
              ExportToString( num_face_indices / 3 ) + " triangles. Total memory: " + 
@@ -1181,6 +1183,9 @@ void IsosurfacePrivate::upload_to_vertex_buffer()
     RenderResources::Instance()->get_vram_size() ) )
   {
     CORE_LOG_WARNING( "Could not fit the isosurface in GPU memory" );
+    this->vbo_batches_.clear();
+    this->surface_changed_ = false;
+    this->values_changed_ = false;
     this->vbo_available_ = false;
     return;
   }
@@ -1210,8 +1215,18 @@ void IsosurfacePrivate::upload_to_vertex_buffer()
       &this->normals_[ this->part_points_[ i ].first ], GL_STATIC_DRAW );
     this->vbo_batches_[ i ]->faces_buffer_->set_buffer_data( face_size, 
       &this->part_indices_[ i ][ 0 ], GL_STATIC_DRAW );
+    if ( has_values )
+    {
+      this->vbo_batches_[ i ]->value_buffer_.reset( new Core::VertexAttribArrayBuffer );
+      this->vbo_batches_[ i ]->value_buffer_->set_generic_array( 1, 1, GL_FLOAT, 
+        GL_FALSE, 0, 0 );
+      this->vbo_batches_[ i ]->value_buffer_->set_buffer_data( num_pts * sizeof( float ),
+        &this->values_[ this->part_points_[ i ].first ], GL_STATIC_DRAW );
+    }
   }
   
+  this->surface_changed_ = false;
+  this->values_changed_ = false;
   this->vbo_available_ = true;
 }
 
@@ -1222,6 +1237,7 @@ Isosurface::Isosurface( const MaskVolumeHandle& mask_volume ) :
   this->private_->orig_mask_volume_ = mask_volume;
   this->private_->compute_mask_volume_ = mask_volume;
   this->private_->surface_changed_ = false;
+  this->private_->values_changed_ = false;
   this->private_->vbo_available_ = false;
 
   // Test code -- set default colormap
@@ -1236,6 +1252,7 @@ void Isosurface::compute( double quality_factor )
   this->private_->normals_.clear();
   this->private_->faces_.clear();
   this->private_->values_.clear();
+  this->private_->values_changed_ = false;
 
   {
     Core::MaskVolume::shared_lock_type vol_lock( this->private_->orig_mask_volume_->get_mutex() );
@@ -1370,6 +1387,7 @@ bool Isosurface::set_values( const std::vector< float >& values )
     return false;
   }
   this->private_->values_ = values; 
+  this->private_->values_changed_ = true;
   return true;
 }
 
@@ -1379,7 +1397,7 @@ const std::vector< unsigned int >& Isosurface::get_faces() const
   return this->private_->faces_;
 }
 
-void Isosurface::redraw()
+void Isosurface::redraw( bool use_colormap )
 {
   lock_type lock( this->get_mutex() );
 
@@ -1391,6 +1409,7 @@ void Isosurface::redraw()
   
   this->private_->upload_to_vertex_buffer();
   size_t num_batches = this->private_->part_points_.size();
+  bool has_values = this->private_->values_.size() == this->private_->points_.size();
   
   // Use the uploaded VBO for rendering if it's available
   if ( this->private_->vbo_available_ )
@@ -1399,11 +1418,19 @@ void Isosurface::redraw()
     {
       this->private_->vbo_batches_[ i ]->vertex_buffer_->enable_arrays();
       this->private_->vbo_batches_[ i ]->normal_buffer_->enable_arrays();
+      if ( has_values && use_colormap )
+      {
+        this->private_->vbo_batches_[ i ]->value_buffer_->enable_arrays();
+      }
       this->private_->vbo_batches_[ i ]->faces_buffer_->draw_elements( GL_TRIANGLES, 
         static_cast< GLsizei >( ( this->private_->part_faces_[ i ].second - 
         this->private_->part_faces_[ i ].first ) ), GL_UNSIGNED_INT );
       this->private_->vbo_batches_[ i ]->vertex_buffer_->disable_arrays();
       this->private_->vbo_batches_[ i ]->normal_buffer_->disable_arrays();
+      if ( has_values && use_colormap )
+      {
+        this->private_->vbo_batches_[ i ]->value_buffer_->disable_arrays();
+      }
     }
     return;
   }
@@ -1415,12 +1442,19 @@ void Isosurface::redraw()
   vertex_buffer->set_array( VertexAttribArrayType::VERTEX_E, 3, GL_FLOAT, 0, 0 );
   VertexAttribArrayBufferHandle normal_buffer( new VertexAttribArrayBuffer );
   normal_buffer->set_array( VertexAttribArrayType::NORMAL_E, GL_FLOAT, 0, 0 );
+  VertexAttribArrayBufferHandle value_buffer;
+  if ( has_values && use_colormap )
+  {
+    value_buffer.reset( new VertexAttribArrayBuffer );
+    value_buffer->set_generic_array( 1, 1, GL_FLOAT, GL_FALSE, 0, 0 );
+  }
   ElementArrayBufferHandle face_buffer( new ElementArrayBuffer );
   for ( size_t i = 0; i < num_batches; ++i )
   {
     unsigned int num_pts = this->private_->part_points_[ i ].second - this->private_->part_points_[ i ].first;
     ptrdiff_t vertex_size = num_pts * sizeof( PointF );
     ptrdiff_t normal_size = num_pts * sizeof( VectorF );
+    ptrdiff_t value_size = has_values && use_colormap ? num_pts * sizeof( float ) : 0;
     unsigned int num_face_indices = this->private_->part_faces_[ i ].second - this->private_->part_faces_[ i ].first;
     ptrdiff_t face_size = num_face_indices * sizeof( unsigned int );
     
@@ -1434,6 +1468,14 @@ void Isosurface::redraw()
     memcpy( buffer, &this->private_->normals_[ this->private_->part_points_[ i ].first ], normal_size );
     normal_buffer->unmap_buffer();
     
+    if ( has_values && use_colormap )
+    {
+      value_buffer->set_buffer_data( value_size, 0, GL_STREAM_DRAW );
+      buffer = value_buffer->map_buffer( GL_WRITE_ONLY );
+      memcpy( buffer, &this->private_->values_[ this->private_->part_points_[ i ].first ], value_size );
+      value_buffer->unmap_buffer();
+    }
+
     face_buffer->set_buffer_data( face_size, 0, GL_STREAM_DRAW );
     buffer = face_buffer->map_buffer( GL_WRITE_ONLY );
     memcpy( buffer, &this->private_->part_indices_[ i ][ 0 ], face_size );
@@ -1441,11 +1483,19 @@ void Isosurface::redraw()
 
     vertex_buffer->enable_arrays();
     normal_buffer->enable_arrays();
+    if ( has_values && use_colormap )
+    {
+      value_buffer->enable_arrays();
+    }
     face_buffer->draw_elements( GL_TRIANGLES, 
       static_cast< GLsizei >( ( this->private_->part_faces_[ i ].second - 
       this->private_->part_faces_[ i ].first ) ), GL_UNSIGNED_INT );
     vertex_buffer->disable_arrays();
     normal_buffer->disable_arrays();
+    if ( has_values && use_colormap )
+    {
+      value_buffer->disable_arrays();
+    }
   } 
 }
 

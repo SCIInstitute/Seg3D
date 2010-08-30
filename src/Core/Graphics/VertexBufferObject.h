@@ -83,6 +83,7 @@ private:
     ~VertexAttribArrayInfo() {}
 
     GLenum array_type_;
+    bool generic_;
     boost::function< void () > gl_array_pointer_func_;
   };
 
@@ -99,6 +100,8 @@ public:
     GLsizei stride, int offset );
   void set_array( VertexAttribArrayType array_type, GLenum data_type, GLsizei stride, int offset );
   void set_array( VertexAttribArrayType array_type, GLsizei stride, int offset );
+  void set_generic_array( GLuint index, GLint attrib_size, GLenum data_type, 
+    GLboolean normalized, GLsizei stride, int offset );
 
   void enable_arrays();
   void disable_arrays();

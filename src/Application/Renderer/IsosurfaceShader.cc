@@ -94,6 +94,11 @@ bool IsosurfaceShader::initialize()
 
   this->glsl_prog_->enable();
   this->enable_lighting_loc_ = this->glsl_prog_->get_uniform_location( "enable_lighting" );
+  this->use_colormap_loc_ = this->glsl_prog_->get_uniform_location( "use_colormap" );
+  this->colormap_loc_ = this->glsl_prog_->get_uniform_location( "colormap" );
+  this->min_val_loc_ = this->glsl_prog_->get_uniform_location( "min_val" );
+  this->val_range_loc_ = this->glsl_prog_->get_uniform_location( "val_range" );
+  this->glsl_prog_->bind_attrib_location( 1, "value" );
   this->glsl_prog_->disable();
 
   this->valid_ = true;
@@ -115,6 +120,26 @@ void IsosurfaceShader::disable()
 void IsosurfaceShader::set_lighting( bool enabled )
 {
   glUniform1i( this->enable_lighting_loc_, enabled );
+}
+
+void IsosurfaceShader::set_use_colormap( bool enable )
+{
+  glUniform1i( this->use_colormap_loc_, enable );
+}
+
+void IsosurfaceShader::set_min_val( float min_val )
+{
+  glUniform1f( this->min_val_loc_, min_val );
+}
+
+void IsosurfaceShader::set_val_range( float val_range )
+{
+  glUniform1f( this->val_range_loc_, val_range );
+}
+
+void IsosurfaceShader::set_colormap_texture( int tex_unit )
+{
+  glUniform1i( this->colormap_loc_, tex_unit );
 }
 
 } // end namespace Seg3D
