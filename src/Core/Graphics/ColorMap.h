@@ -42,9 +42,12 @@
 
 namespace Core 
 {
-
 class ColorMap;
 typedef boost::shared_ptr< ColorMap > ColorMapHandle;
+
+// Hide header includes, private interface and implementation
+class ColorMapPrivate;
+typedef boost::shared_ptr< ColorMapPrivate > ColorMapPrivateHandle;
 
 class ColorMap : public boost::noncopyable 
 {
@@ -82,22 +85,12 @@ public:
   // Get the min/max range of values that will be used to lookup into the ColorMap
   void get_lookup_range( float& lookup_min, float& lookup_max ) const;
 
-  // UPLOAD_TEXTURE
-  // Upload colormap data to 1D graphics texture.
-  void upload_texture();
-
   // GET_TEXTURE
   // Get 1D graphics texture with colormap data.
   Texture1DHandle get_texture();
 
 private:
-  std::vector< Color > colors_;
-  float lookup_min_;
-  float lookup_max_;
-  Texture1DHandle texture_;
-  bool changed_;
-
-  const static Color DEFAULT_COLOR_C;
+  ColorMapPrivateHandle private_;
 };
 
 } // End namespace Core

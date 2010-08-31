@@ -82,6 +82,9 @@ bool IsosurfaceShader::initialize()
   this->glsl_prog_ = Core::GLSLProgramHandle( new Core::GLSLProgram );
   this->glsl_prog_->attach_shader( this->glsl_vert_shader_ );
   this->glsl_prog_->attach_shader( this->glsl_frag_shader_ );
+
+  this->glsl_prog_->bind_attrib_location( 1, "value" );
+
   if ( !this->glsl_prog_->link() )
   {
     std::string error_info = this->glsl_prog_->get_info_log();
@@ -98,7 +101,6 @@ bool IsosurfaceShader::initialize()
   this->colormap_loc_ = this->glsl_prog_->get_uniform_location( "colormap" );
   this->min_val_loc_ = this->glsl_prog_->get_uniform_location( "min_val" );
   this->val_range_loc_ = this->glsl_prog_->get_uniform_location( "val_range" );
-  this->glsl_prog_->bind_attrib_location( 1, "value" );
   this->glsl_prog_->disable();
 
   this->valid_ = true;

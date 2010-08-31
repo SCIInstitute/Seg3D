@@ -506,11 +506,12 @@ void RendererPrivate::process_isosurfaces( IsosurfaceArray& isosurfaces )
 
 void RendererPrivate::draw_isosurfaces( const IsosurfaceArray& isosurfaces, bool with_lighting )
 {
+  bool use_colormap = true;
   size_t num_of_isosurfaces = isosurfaces.size();
   glEnable( GL_CULL_FACE );
   this->isosurface_shader_->enable();
   this->isosurface_shader_->set_lighting( with_lighting );
-  this->isosurface_shader_->set_use_colormap( true );
+  this->isosurface_shader_->set_use_colormap( use_colormap  );
   for ( size_t i = 0; i < num_of_isosurfaces; ++i )
   {
     Core::IsosurfaceHandle iso = isosurfaces[ i ]->isosurface_;
@@ -528,7 +529,7 @@ void RendererPrivate::draw_isosurfaces( const IsosurfaceArray& isosurfaces, bool
     Core::Texture1DHandle colormap_tex = colormap->get_texture();
     Core::Texture::lock_type tex_lock( colormap_tex->get_mutex() );
     colormap_tex->bind();
-    iso->redraw( true );
+    iso->redraw( use_colormap  );
     colormap_tex->unbind();
     CORE_CHECK_OPENGL_ERROR();
   }
