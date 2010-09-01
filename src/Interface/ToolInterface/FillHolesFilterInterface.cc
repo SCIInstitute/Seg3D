@@ -78,7 +78,7 @@ bool FillHolesFilterInterface::build_widget( QFrame* frame )
   FillHolesFilter* tool = dynamic_cast< FillHolesFilter* > ( base_tool_.get() );
 
   //Step 3 - connect the gui to the tool through the QtBridge
-  QtUtils::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
+  //QtUtils::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
   connect( this->private_->target_, SIGNAL( valid( bool ) ), 
     this, SLOT( enable_run_filter( bool ) ) );
   

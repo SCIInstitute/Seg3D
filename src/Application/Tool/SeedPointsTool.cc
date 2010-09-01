@@ -254,8 +254,8 @@ void SeedPointsTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
     int slice_num = vol_slice->get_closest_slice( seed_points[ i ] );
     bool in_slice = ( !vol_slice->out_of_boundary() && 
       slice_num == static_cast< int >( vol_slice->get_slice_number() ) );
-    Core::Color color = in_slice ? Core::Color( 1.0, 1.0, 0.0 ) : Core::Color( 0.6, 0.6, 0.0 );
-    glColor3d( color.r(), color.g(), color.b() );
+    Core::Color color = in_slice ? Core::Color( 1.0f, 1.0f, 0.0f ) : Core::Color( 0.6f, 0.6f, 0.0f );
+    glColor3f( color.r(), color.g(), color.b() );
     glBegin( GL_LINES );
       glVertex2i( x - 5, y );
       glVertex2i( x + 5, y );

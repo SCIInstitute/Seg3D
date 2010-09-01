@@ -26,8 +26,11 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_TOOL_SINGLETARGETTOOL_H
-#define APPLICATION_TOOL_SINGLETARGETTOOL_H
+#ifndef APPLICATION_TOOL_GROUPTARGETTOOL_H
+#define APPLICATION_TOOL_GROUPTARGETTOOL_H
+
+// Core includes
+#include <Core/State/StateLabeledMultiOption.h>
 
 // Application includes
 #include <Application/Tool/Tool.h>
@@ -36,32 +39,35 @@ namespace Seg3D
 {
 
 // Forward declaration
-class SingleTargetToolPrivate;
-typedef boost::shared_ptr< SingleTargetToolPrivate > SingleTargetToolPrivateHandle;
+class GroupTargetToolPrivate;
+typedef boost::shared_ptr< GroupTargetToolPrivate > GroupTargetToolPrivateHandle;
 
 // Class definition
-class SingleTargetTool : public Tool
+class GroupTargetTool : public Tool
 {
 
   // -- constructor/destructor --
 public:
-  SingleTargetTool( Core::VolumeType target_volume_type, const std::string& tool_type );
+  GroupTargetTool( Core::VolumeType target_volume_type, const std::string& tool_type );
   
-  virtual ~SingleTargetTool();
+  virtual ~GroupTargetTool();
 
   // -- state --
 public:
-  // Layerid of the target layer
-  Core::StateLabeledOptionHandle target_layer_state_;
+  // Group ID of the target group
+  Core::StateLabeledOptionHandle target_group_state_;
+
+  // Selected layers within the target group
+  Core::StateLabeledMultiOptionHandle target_layers_state_;
 
   // Whether to use the active of one from the list
-  Core::StateBoolHandle use_active_layer_state_;
+  Core::StateBoolHandle use_active_group_state_;
 
   // Whether a valid layer has been selected
   Core::StateBoolHandle valid_target_state_;
 
 private:
-  SingleTargetToolPrivateHandle private_;
+  GroupTargetToolPrivateHandle private_;
 
 };
 

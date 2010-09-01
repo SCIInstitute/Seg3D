@@ -84,7 +84,9 @@ SET(APPLICATION_TOOLS_SRCS
   OtsuThresholdFilter.h
   OtsuThresholdFilter.cc
   ThresholdSegmentationLSFilter.h
-  ThresholdSegmentationLSFilter.cc  
+  ThresholdSegmentationLSFilter.cc
+  ResampleTool.h
+  ResampleTool.cc
   )
 
 SET(APPLICATION_TOOLS_NOREGISTER_SRCS

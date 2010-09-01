@@ -88,9 +88,9 @@ bool ArithmeticFilterInterface::build_widget( QFrame* frame )
   ArithmeticFilter* tool = dynamic_cast< ArithmeticFilter* > ( base_tool_.get() );
 
   //Step 3 - connect the gui to the tool through the QtBridge
-  QtUtils::QtBridge::Connect( this->private_->volume_a_, tool->volume_a_state_ );
-  QtUtils::QtBridge::Connect( this->private_->volume_b_, tool->volume_b_state_ );
-  QtUtils::QtBridge::Connect( this->private_->volume_c_, tool->volume_c_state_ );
+  //QtUtils::QtBridge::Connect( this->private_->volume_a_, tool->volume_a_state_ );
+  //QtUtils::QtBridge::Connect( this->private_->volume_b_, tool->volume_b_state_ );
+  //QtUtils::QtBridge::Connect( this->private_->volume_c_, tool->volume_c_state_ );
   this->connect( this->private_->volume_a_, SIGNAL( valid( bool ) ), 
     this, SLOT( enable_run_filter( bool ) ) );
   

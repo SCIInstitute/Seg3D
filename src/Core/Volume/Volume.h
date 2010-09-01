@@ -55,7 +55,8 @@ CORE_ENUM_CLASS
   VolumeType,
   DATA_E = 0x1, 
   MASK_E = 0x2, 
-  LABEL_E = 0x4
+  LABEL_E = 0x4,
+  ALL_E = DATA_E | MASK_E | LABEL_E
 )
 
 // Class definition

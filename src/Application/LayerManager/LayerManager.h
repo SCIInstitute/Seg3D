@@ -121,15 +121,11 @@ public:
   LayerHandle get_active_layer();
   
   // TODO:
-  // These two functions need some redesign
+  // This function need some redesign
   // GET_LAYER_NAMES:
   // This function returns a vector of layer ID and name pairs of the specified layer type.
   void get_layer_names( std::vector< LayerIDNamePair >& layer_names, 
-    Core::VolumeType type );
-
-  // GET_LAYER_NAMES:
-  // This function returns a vector of layer ID and name pairs of all layers.
-  void get_layer_names( std::vector< LayerIDNamePair >& layer_names );
+    Core::VolumeType type = Core::VolumeType::ALL_E );
 
   // Layer Action Functions
 public:

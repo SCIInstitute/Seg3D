@@ -40,6 +40,8 @@ SET(APPLICATION_TOOL_SRCS
   NrrdFilter.cc
   SingleTargetTool.h
   SingleTargetTool.cc
+  GroupTargetTool.h
+  GroupTargetTool.cc
   SeedPointsTool.h
   SeedPointsTool.cc
   Tool.h

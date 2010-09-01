@@ -42,6 +42,8 @@ SET(CORE_STATE_SRCS
   StateIO.cc
   StateLabeledOption.h
   StateLabeledOption.cc
+  StateLabeledMultiOption.h
+  StateLabeledMultiOption.cc
   StateName.h
   StateName.cc
   StateOption.cc

@@ -109,9 +109,9 @@ bool ThresholdSegmentationLSFilterInterface::build_widget( QFrame* frame )
       dynamic_cast< ThresholdSegmentationLSFilter* > ( base_tool_.get() );
       
   //Step 3 - connect the gui to the tool through the QtBridge
-  QtUtils::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
+  //QtUtils::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
   this->connect( this->private_->target_, SIGNAL( valid( bool ) ), this, SLOT( enable_run_filter( bool ) ) );
-  QtUtils::QtBridge::Connect( this->private_->mask_, tool->mask_layer_state_ );
+  //QtUtils::QtBridge::Connect( this->private_->mask_, tool->mask_layer_state_ );
   QtUtils::QtBridge::Connect( this->private_->iterations_, tool->iterations_state_ );
   QtUtils::QtBridge::Connect( this->private_->upper_threshold_, tool->upper_threshold_state_ );
   QtUtils::QtBridge::Connect( this->private_->lower_threshold_, tool->lower_threshold_state_ );

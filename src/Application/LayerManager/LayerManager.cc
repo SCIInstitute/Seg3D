@@ -118,6 +118,7 @@ bool LayerManager::insert_layer( LayerHandle layer )
   if ( new_group )
   {
     this->group_inserted_signal_( group_handle );
+    this->groups_changed_signal_();
   }
 
   this->group_internals_changed_signal_( group_handle );
@@ -656,27 +657,10 @@ void LayerManager::get_layer_names( std::vector< LayerIDNamePair >& layer_names,
   size_t num_of_layers = layers.size();
   for ( size_t i = 0; i < num_of_layers; i++ )
   {
-    if ( layers[ i ]->type() == type )
-    {
-      layer_names.push_back( std::make_pair( layers[ i ]->get_layer_id(), 
-        layers[ i ]->get_layer_name() ) );
-    }
-  }
-}
-
-void LayerManager::get_layer_names( std::vector< LayerIDNamePair >& layer_names )
-{
-  lock_type lock( this->get_mutex() );
-
-  std::vector< LayerHandle > layers;
-  LayerManager::Instance()->get_layers( layers );
-  size_t num_of_layers = layers.size();
-  for ( size_t i = 0; i < num_of_layers; i++ )
-  {
     // NOTE: Only if a layer is valid do we save it in a session. An example of an invalid
     // layer is for instance a layer that was just created, but hasn't finished processing
     // its data.
-    if ( layers[ i ]->is_valid() )
+    if ( layers[ i ]->is_valid() && ( layers[ i ]->type() & type ) )
     {
       layer_names.push_back( std::make_pair( layers[ i ]->get_layer_id(), 
         layers[ i ]->get_layer_name() ) );

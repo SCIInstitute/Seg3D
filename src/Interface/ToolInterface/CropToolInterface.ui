@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>BinaryDilateErodeFilterInterface</class>
- <widget class="QWidget" name="BinaryDilateErodeFilterInterface">
+ <class>CropToolInterface</class>
+ <widget class="QWidget" name="CropToolInterface">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -258,7 +258,7 @@
          <enum>QTabWidget::Rounded</enum>
         </property>
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <property name="elideMode">
          <enum>Qt::ElideNone</enum>

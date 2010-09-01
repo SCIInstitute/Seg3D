@@ -45,6 +45,7 @@ public:
     this->import_options_from_string( option_list );
     size_t num_options = this->option_list_.size();
     bool found = false;
+    this->index_ = -1;
     for ( size_t i = 0; i < num_options; i++ )
     {
       if ( this->option_list_[ i ].first == this->value_ )
@@ -55,7 +56,7 @@ public:
       }
     }
 
-    if ( !found )
+    if ( num_options > 0 && !found )
     {
       CORE_THROW_LOGICERROR( std::string( "Option \"" ) + this->value_ +
         "\" not in the option list" );
@@ -69,6 +70,7 @@ public:
     size_t num_options = labeled_option_list.size();
     this->option_list_.resize( num_options );
     bool found = false;
+    this->index_ = -1;
     for ( size_t i = 0; i < num_options; i++ )
     {
       this->option_list_[ i ].first = Core::StringToLower( labeled_option_list[ i ].first );
@@ -80,7 +82,7 @@ public:
       }
     }
 
-    if ( !found )
+    if ( num_options > 0 && !found )
     {
       CORE_THROW_LOGICERROR( std::string( "Option \"" ) + this->value_ +
         "\" not in the option list" );
@@ -91,6 +93,12 @@ public:
 
   void import_options_from_string( const std::string& option_list )
   {
+    if ( option_list.size() == 0 )
+    {
+      this->option_list_.clear();
+      return;
+    }
+    
     std::vector< std::string > option_label_vec = Core::SplitString( option_list, "|" );
     size_t num_options = option_label_vec.size();
     this->option_list_.resize( num_options );

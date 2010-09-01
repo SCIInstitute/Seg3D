@@ -44,8 +44,6 @@ LayerAvailabilityNotifier::LayerAvailabilityNotifier( LayerHandle layer ) :
   // This signal is triggered when the layer is deleted
   this->add_connection( LayerManager::Instance()->group_internals_changed_signal_.connect(
     boost::bind( &LayerAvailabilityNotifier::trigger, this ) ) );
-//  this->add_connection( LayerManager::Instance()->layers_changed_signal_.connect(
-//    boost::bind( &LayerAvailabilityNotifier::trigger, this ) ) ); 
 }
 
 LayerAvailabilityNotifier::~LayerAvailabilityNotifier()

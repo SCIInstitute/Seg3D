@@ -158,7 +158,7 @@ void LayerGroup::get_layer_names( std::vector< LayerIDNamePair >& layer_names,
   layer_list_type::const_iterator it = this->layer_list_.begin();
   for ( ; it != this->layer_list_.end(); it++ )
   {
-    if ( ( *it )->type() == type )
+    if ( ( *it )->type() & type )
     {
       layer_names.push_back( std::make_pair( ( *it )->get_layer_id(),
         ( *it )->get_layer_name() ) );
@@ -174,7 +174,7 @@ void LayerGroup::get_layer_names( std::vector< LayerIDNamePair >& layer_names,
   layer_list_type::const_iterator it = this->layer_list_.begin();
   for ( ; it != this->layer_list_.end(); it++ )
   {
-    if ( *it != excluded_layer && ( *it )->type() == type )
+    if ( *it != excluded_layer && ( ( *it )->type() & type ) )
     {
       layer_names.push_back( std::make_pair( ( *it )->get_layer_id(),
         ( *it )->get_layer_name() ) );

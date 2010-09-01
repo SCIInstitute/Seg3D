@@ -26,45 +26,49 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_TOOL_SINGLETARGETTOOL_H
-#define APPLICATION_TOOL_SINGLETARGETTOOL_H
+#ifndef APPLICATION_TOOLS_RESAMPLETOOL_H
+#define APPLICATION_TOOLS_RESAMPLETOOL_H
 
-// Application includes
-#include <Application/Tool/Tool.h>
+#include <Application/Tool/GroupTargetTool.h>
 
 namespace Seg3D
 {
 
-// Forward declaration
-class SingleTargetToolPrivate;
-typedef boost::shared_ptr< SingleTargetToolPrivate > SingleTargetToolPrivateHandle;
+class ResampleToolPrivate;
+typedef boost::shared_ptr< ResampleToolPrivate > ResampleToolPrivateHandle;
 
-// Class definition
-class SingleTargetTool : public Tool
+class ResampleTool : public GroupTargetTool
 {
+
+SEG3D_TOOL
+(
+  SEG3D_TOOL_NAME( "ResampleTool", "Tool for resampling data" )
+  SEG3D_TOOL_MENULABEL( "Resample" )
+  SEG3D_TOOL_MENU( "tools" )
+  SEG3D_TOOL_SHORTCUT_KEY( "Alt+T" )
+  SEG3D_TOOL_URL( "http://seg3d.org/" )
+)
 
   // -- constructor/destructor --
 public:
-  SingleTargetTool( Core::VolumeType target_volume_type, const std::string& tool_type );
-  
-  virtual ~SingleTargetTool();
+  ResampleTool( const std::string& toolid );
+  virtual ~ResampleTool();
+
+public:
+
+  // EXECUTE:
+  // Execute the tool and dispatch the action
+  virtual void execute( Core::ActionContextHandle context );
 
   // -- state --
 public:
-  // Layerid of the target layer
-  Core::StateLabeledOptionHandle target_layer_state_;
 
-  // Whether to use the active of one from the list
-  Core::StateBoolHandle use_active_layer_state_;
-
-  // Whether a valid layer has been selected
-  Core::StateBoolHandle valid_target_state_;
 
 private:
-  SingleTargetToolPrivateHandle private_;
+  ResampleToolPrivateHandle private_;
 
 };
 
-} // end namespace Seg3D
+} // end namespace
 
 #endif

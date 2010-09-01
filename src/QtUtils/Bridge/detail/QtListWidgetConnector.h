@@ -26,45 +26,47 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_TOOL_SINGLETARGETTOOL_H
-#define APPLICATION_TOOL_SINGLETARGETTOOL_H
+#ifndef QTUTILS_BRIDGE_DETAIL_QTLISTWIDGETCONNECTOR_H
+#define QTUTILS_BRIDGE_DETAIL_QTLISTWIDGETCONNECTOR_H
 
-// Application includes
-#include <Application/Tool/Tool.h>
+#include <QListWidget>
+#include <QPointer>
 
-namespace Seg3D
+#include <Core/State/StateLabeledMultiOption.h>
+
+#include <QtUtils/Bridge/detail/QtConnectorBase.h>
+
+namespace QtUtils
 {
 
-// Forward declaration
-class SingleTargetToolPrivate;
-typedef boost::shared_ptr< SingleTargetToolPrivate > SingleTargetToolPrivateHandle;
-
-// Class definition
-class SingleTargetTool : public Tool
+class QtListWidgetConnector : public QtConnectorBase
 {
+  Q_OBJECT
 
-  // -- constructor/destructor --
 public:
-  SingleTargetTool( Core::VolumeType target_volume_type, const std::string& tool_type );
-  
-  virtual ~SingleTargetTool();
+  QtListWidgetConnector( QListWidget* parent, Core::StateLabeledMultiOptionHandle& state,
+    bool blocking = true );
 
-  // -- state --
-public:
-  // Layerid of the target layer
-  Core::StateLabeledOptionHandle target_layer_state_;
+  virtual ~QtListWidgetConnector();
 
-  // Whether to use the active of one from the list
-  Core::StateBoolHandle use_active_layer_state_;
+  // -- Slot functions for boost signals --
+  // NOTE: These functions need to be static because they might be called outside the 
+  // main Qt thread, when the Qt object pointed to by qpointer might no longer exist.
+private:  
+  static void SetListWidgetSelectedItems( QPointer< QtListWidgetConnector > qpointer, 
+    std::vector< std::string > selections, Core::ActionSource source );
 
-  // Whether a valid layer has been selected
-  Core::StateBoolHandle valid_target_state_;
+  static void UpdateListWidgetItems( QPointer< QtListWidgetConnector > qpointer );
+
+  // -- Slot functions for Qt signals --
+private Q_SLOTS:
+  void set_state();
 
 private:
-  SingleTargetToolPrivateHandle private_;
-
+  QListWidget* parent_;
+  Core::StateLabeledMultiOptionHandle state_;
 };
 
-} // end namespace Seg3D
+} // end namespace QtUtils
 
 #endif

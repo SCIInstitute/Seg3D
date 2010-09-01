@@ -133,6 +133,30 @@ public:
   }
 
   // ADD_STATE:
+  // Add a local state variable with option list
+  template< class HANDLE >
+  bool add_state( const std::string& key, HANDLE& state, 
+    const std::vector< std::string >& default_options,
+    const std::vector< OptionLabelPair > option_list )
+  {
+    state = HANDLE( new typename HANDLE::element_type( 
+      this->create_state_id( key ), default_options, option_list ) );
+    return this->add_statebase( state );
+  }
+
+  // ADD_STATE:
+  // Add a local state variable with option list
+  template< class HANDLE >
+  bool add_state( const std::string& key, HANDLE& state, 
+    const std::vector< std::string >& default_options,
+    const std::string& option_list )
+  {
+    state = HANDLE( new typename HANDLE::element_type( 
+      this->create_state_id( key ), default_options, option_list ) );
+    return this->add_statebase( state );
+  }
+
+  // ADD_STATE:
   // Add a local state variable without default value
   template< class HANDLE, class T >
   bool add_state( const std::string& key, HANDLE& state, const std::vector< T >& default_value )

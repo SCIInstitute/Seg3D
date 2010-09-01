@@ -95,10 +95,10 @@ bool BooleanFilterInterface::build_widget( QFrame* frame )
   BooleanFilter* tool = dynamic_cast< BooleanFilter* > ( base_tool_.get() );
   
   //Step 3 - connect the gui to the tool through the QtBridge
-  QtUtils::QtBridge::Connect( this->private_->mask_a_, tool->mask_a_state_ );
-  QtUtils::QtBridge::Connect( this->private_->mask_b_, tool->mask_b_state_ );
-  QtUtils::QtBridge::Connect( this->private_->mask_c_, tool->mask_c_state_ );
-  QtUtils::QtBridge::Connect( this->private_->mask_d_, tool->mask_d_state_ );
+  //QtUtils::QtBridge::Connect( this->private_->mask_a_, tool->mask_a_state_ );
+  //QtUtils::QtBridge::Connect( this->private_->mask_b_, tool->mask_b_state_ );
+  //QtUtils::QtBridge::Connect( this->private_->mask_c_, tool->mask_c_state_ );
+  //QtUtils::QtBridge::Connect( this->private_->mask_d_, tool->mask_d_state_ );
   this->connect( this->private_->mask_a_, SIGNAL( valid( bool ) ), 
     this, SLOT( enable_run_filter( bool ) ) );
   
