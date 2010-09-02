@@ -26,57 +26,36 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef QTUTILS_BRIDGE_DETAIL_QTSPINBOXCONNECTOR_H
-#define QTUTILS_BRIDGE_DETAIL_QTSPINBOXCONNECTOR_H
+#ifndef QTUTILS_BRIDGE_DETAIL_QTLABELCONNECTOR_H
+#define QTUTILS_BRIDGE_DETAIL_QTLABELCONNECTOR_H
 
-#include <QSpinBox>
-#include <QDoubleSpinBox>
+#include <QLabel>
 #include <QPointer>
 
-#include <Core/State/StateValue.h>
-#include <Core/State/StateRangedValue.h>
+#include <Core/State/StateBase.h>
 
 #include <QtUtils/Bridge/detail/QtConnectorBase.h>
 
 namespace QtUtils
 {
 
-class QtSpinBoxConnector : public QtConnectorBase
+class QtLabelConnector : public QtConnectorBase
 {
   Q_OBJECT
 
 public:
-  QtSpinBoxConnector( QSpinBox* parent, Core::StateIntHandle& state,
-    bool blocking = true );
-
-  QtSpinBoxConnector( QDoubleSpinBox* parent, Core::StateDoubleHandle& state,
-    bool blocking = true );
-
-  QtSpinBoxConnector( QDoubleSpinBox* parent, Core::StateRangedDoubleHandle& state,
-    bool blocking = true );
-
-  virtual ~QtSpinBoxConnector();
+  QtLabelConnector( QLabel* parent, Core::StateBaseHandle& state );
+  virtual ~QtLabelConnector();
 
   // -- slot functions for boost signals --
 private:
-  static void SetSpinBoxValue( QPointer< QtSpinBoxConnector > qpointer,
-    int val, Core::ActionSource source );
-  static void SetDoubleSpinBoxValue( QPointer< QtSpinBoxConnector > qpointer,
-    double val, Core::ActionSource source );
-  static void SetDoubleSpinBoxRange( QPointer< QtSpinBoxConnector > qpointer,
-    double min_val, double max_val, Core::ActionSource source );
-  
-  // -- slot functions for Qt signals --
-private Q_SLOTS:
-  void set_state( int val );
-  void set_state( double val );
+  static void UpdateLabelText( QPointer< QtLabelConnector > qpointer );
 
 private:
-  QSpinBox* spinbox_;
-  QDoubleSpinBox* double_spinbox_;
+  QLabel* parent_;
   Core::StateBaseHandle state_;
 };
 
-} // end namespace QtUtils
+}
 
 #endif

@@ -58,6 +58,8 @@
 #include <QtUtils/Bridge/detail/QtSliderDoubleComboConnector.h>
 #include <QtUtils/Bridge/detail/QtEnableConnector.h>
 #include <QtUtils/Bridge/detail/QtListWidgetConnector.h>
+#include <QtUtils/Bridge/detail/QtShowConnector.h>
+#include <QtUtils/Bridge/detail/QtLabelConnector.h>
 
 namespace QtUtils
 {
@@ -91,6 +93,11 @@ void QtBridge::Connect( QLineEdit* qlineedit, Core::StateNameHandle& state )
 void QtBridge::Connect( QDoubleSpinBox* qdoublespinbox, Core::StateDoubleHandle& state )
 {
   new QtSpinBoxConnector( qdoublespinbox, state );  
+}
+
+void QtBridge::Connect( QDoubleSpinBox* qdoublespinbox, Core::StateRangedDoubleHandle& state )
+{
+  new QtSpinBoxConnector( qdoublespinbox, state );
 }
 
 void QtBridge::Connect( QSpinBox* qspinbox, Core::StateIntHandle& state )
@@ -166,9 +173,19 @@ void QtBridge::Connect( QListWidget* qlistwidget, Core::StateLabeledMultiOptionH
   new QtListWidgetConnector( qlistwidget, state );
 }
 
+void QtBridge::Connect( QLabel* qlabel, Core::StateBaseHandle state )
+{
+  new QtLabelConnector( qlabel, state );
+}
+
 void QtBridge::Enable( QWidget* qwidget, Core::StateBoolHandle& state, bool opposite_logic )
 {
   new QtEnableConnector( qwidget, state, opposite_logic );
+}
+
+void QtBridge::Show( QWidget* qwidget, Core::StateBoolHandle& state, bool opposite_logic )
+{
+  new QtShowConnector( qwidget, state, opposite_logic );
 }
 
 } // end namespace QtUtils

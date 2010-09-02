@@ -26,55 +26,34 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef QTUTILS_BRIDGE_DETAIL_QTSPINBOXCONNECTOR_H
-#define QTUTILS_BRIDGE_DETAIL_QTSPINBOXCONNECTOR_H
+#ifndef QTUTILS_BRIDGE_DETAIL_QTSHOWCONNECTOR_H
+#define QTUTILS_BRIDGE_DETAIL_QTSHOWCONNECTOR_H
 
-#include <QSpinBox>
-#include <QDoubleSpinBox>
+#include <QObject>
 #include <QPointer>
 
+#include <Core/Utils/ConnectionHandler.h>
 #include <Core/State/StateValue.h>
-#include <Core/State/StateRangedValue.h>
-
-#include <QtUtils/Bridge/detail/QtConnectorBase.h>
 
 namespace QtUtils
 {
 
-class QtSpinBoxConnector : public QtConnectorBase
+class QtShowConnector : public QObject, protected Core::ConnectionHandler
 {
   Q_OBJECT
-
 public:
-  QtSpinBoxConnector( QSpinBox* parent, Core::StateIntHandle& state,
-    bool blocking = true );
-
-  QtSpinBoxConnector( QDoubleSpinBox* parent, Core::StateDoubleHandle& state,
-    bool blocking = true );
-
-  QtSpinBoxConnector( QDoubleSpinBox* parent, Core::StateRangedDoubleHandle& state,
-    bool blocking = true );
-
-  virtual ~QtSpinBoxConnector();
+  QtShowConnector( QWidget* parent, Core::StateBoolHandle& state, bool opposite_logic );
+  virtual ~QtShowConnector();
 
   // -- slot functions for boost signals --
 private:
-  static void SetSpinBoxValue( QPointer< QtSpinBoxConnector > qpointer,
-    int val, Core::ActionSource source );
-  static void SetDoubleSpinBoxValue( QPointer< QtSpinBoxConnector > qpointer,
-    double val, Core::ActionSource source );
-  static void SetDoubleSpinBoxRange( QPointer< QtSpinBoxConnector > qpointer,
-    double min_val, double max_val, Core::ActionSource source );
-  
-  // -- slot functions for Qt signals --
-private Q_SLOTS:
-  void set_state( int val );
-  void set_state( double val );
+  static void ShowWidget( QPointer< QtShowConnector > qpointer,
+    bool visible, Core::ActionSource source );
 
+  // -- internal variables --
 private:
-  QSpinBox* spinbox_;
-  QDoubleSpinBox* double_spinbox_;
-  Core::StateBaseHandle state_;
+  QWidget* parent_;
+  bool opposite_logic_;
 };
 
 } // end namespace QtUtils

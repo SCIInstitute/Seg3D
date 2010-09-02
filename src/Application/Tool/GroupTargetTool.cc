@@ -145,12 +145,21 @@ void GroupTargetToolPrivate::handle_target_group_changed( std::string group_id )
   }
 
   std::vector< LayerIDNamePair > layer_names;
+  std::vector< std::string > selected_layers;
   if ( group_id != "" && group_id != Tool::NONE_OPTION_C )
   {
     LayerGroupHandle group = LayerManager::Instance()->get_layer_group( group_id );
     group->get_layer_names( layer_names, this->target_type_ );
+    if ( this->tool_->use_active_group_state_->get() )
+    {
+      selected_layers.push_back( LayerManager::Instance()->get_active_layer()->get_layer_id() );
+    } 
   }
   this->tool_->target_layers_state_->set_option_list( layer_names );
+  if ( selected_layers.size() > 0 )
+  {
+    this->tool_->target_layers_state_->set( selected_layers );
+  }
 }
 
 void GroupTargetToolPrivate::handle_target_layers_changed()

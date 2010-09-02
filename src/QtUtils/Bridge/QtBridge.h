@@ -30,12 +30,13 @@
 #define QTUTILS_BRIDGE_QTBRIDGE_H
 
 // QT includes
-#include <QtGui/QAbstractButton>
-#include <QtGui/QDoubleSpinBox>
-#include <QtGui/QSpinBox>
-#include <QtGui/QComboBox>
-#include <QtGui/QLineEdit>
-#include <QtGui/QActionGroup>
+#include <QAbstractButton>
+#include <QDoubleSpinBox>
+#include <QSpinBox>
+#include <QComboBox>
+#include <QLineEdit>
+#include <QLabel>
+#include <QActionGroup>
 #include <QListWidget>
 
 // QtUtils includes
@@ -94,6 +95,9 @@ public:
   // Connect a QDoubleSpinBox to a StateDoubleValue
   static void Connect( QDoubleSpinBox* qdoublespinbox, Core::StateDoubleHandle& state_handle );
   
+  // Connect a QDoubleSpinBox to a StateRangedDouble
+  static void Connect( QDoubleSpinBox* qdoublespinbox, Core::StateRangedDoubleHandle& state );
+
   // Connect a QSpinBox to a StateIntValue
   static void Connect( QSpinBox* qspinbox, Core::StateIntHandle& state_handle );
   
@@ -104,10 +108,13 @@ public:
   
   static void Connect( QtColorButton* colorbutton, Core::StateColorHandle& state_handle );
   
-  // Coonect QLineEdits
+  // Connect QLineEdits
   static void Connect( QLineEdit* qlineedit, Core::StateStringHandle& state_handle );
   
   static void Connect( QLineEdit* qlineedit, Core::StateNameHandle& state_handle );
+
+  // Connect QLabel to display the string representation of a state variable
+  static void Connect( QLabel* qlabel, Core::StateBaseHandle state );
   
   // Connect QActionGroup and StateOption
   // NOTE: This requires that each QAction in the QActionGroup has its objectName
@@ -129,6 +136,9 @@ public:
 
   // Enable / Disable a button from state engine
   static void Enable( QWidget* qwidget, Core::StateBoolHandle& state, bool opposite_logic = false );
+
+  // Connect the visibility of the QWidget to a StateBool
+  static void Show( QWidget* qwidget, Core::StateBoolHandle& state, bool opposite_logic = false );
 };
 
 } // end namespace QtUtils

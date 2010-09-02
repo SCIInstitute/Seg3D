@@ -48,6 +48,10 @@ class ResampleToolInterfacePrivate
 {
 public:
   Ui::ResampleToolInterface ui_;
+  QtUtils::QtSliderIntCombo* output_x_;
+  QtUtils::QtSliderIntCombo* output_y_;
+  QtUtils::QtSliderIntCombo* output_z_;
+  QtUtils::QtSliderDoubleCombo* scale_;
 };
 
 // constructor
@@ -67,6 +71,18 @@ bool ResampleToolInterface::build_widget( QFrame* frame )
   //Step 1 - build the Qt GUI Widget
   this->private_->ui_.setupUi( frame );
 
+  this->private_->output_x_ = new QtUtils::QtSliderIntCombo( this );
+  this->private_->ui_.new_nx_layout_->addWidget( this->private_->output_x_ );
+
+  this->private_->output_y_ = new QtUtils::QtSliderIntCombo( this );
+  this->private_->ui_.new_ny_layout_->addWidget( this->private_->output_y_ );
+
+  this->private_->output_z_ = new QtUtils::QtSliderIntCombo( this );
+  this->private_->ui_.new_nz_layout_->addWidget( this->private_->output_z_ );
+
+  this->private_->scale_ = new QtUtils::QtSliderDoubleCombo( this );
+  this->private_->ui_.scale_layout_->addWidget( this->private_->scale_ );
+
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
   ResampleTool* tool = dynamic_cast< ResampleTool* > ( base_tool_.get() );
@@ -75,11 +91,30 @@ bool ResampleToolInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Connect( this->private_->ui_.target_group_, tool->target_group_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.layer_list_, tool->target_layers_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.use_active_group_, tool->use_active_group_state_ );
+
+  QtUtils::QtBridge::Connect( this->private_->ui_.label_nx_, tool->input_dimensions_state_[ 0 ] );
+  QtUtils::QtBridge::Connect( this->private_->ui_.label_ny_, tool->input_dimensions_state_[ 1 ] );
+  QtUtils::QtBridge::Connect( this->private_->ui_.label_nz_, tool->input_dimensions_state_[ 2 ] );
+
+  QtUtils::QtBridge::Connect( this->private_->output_x_, tool->output_dimensions_state_[ 0 ] );
+  QtUtils::QtBridge::Connect( this->private_->output_y_, tool->output_dimensions_state_[ 1 ] );
+  QtUtils::QtBridge::Connect( this->private_->output_z_, tool->output_dimensions_state_[ 2 ] );
+
+  QtUtils::QtBridge::Connect( this->private_->ui_.aspect_checkbox_, tool->constraint_aspect_state_ );
+  QtUtils::QtBridge::Connect( this->private_->scale_, tool->scale_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.kernel_combobox_, tool->kernel_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.sigma_spinbox_, tool->gauss_sigma_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.cutoff_spinbox_, tool->gauss_cutoff_state_ );
+
+  QtUtils::QtBridge::Connect( this->private_->ui_.replace_checkbox_, tool->replace_state_ );
+
   QtUtils::QtBridge::Connect( this->private_->ui_.run_button_, boost::bind(
     &ResampleTool::execute, tool, Core::Interface::GetWidgetActionContext() ) );
+
   QtUtils::QtBridge::Enable( this->private_->ui_.run_button_, tool->valid_target_state_ );
   QtUtils::QtBridge::Enable( this->private_->ui_.target_group_, 
     tool->use_active_group_state_, true ); 
+  QtUtils::QtBridge::Show( this->private_->ui_.param_widget_, tool->has_params_state_ );
 
   CORE_LOG_DEBUG( "Finished building a Resample Tool Interface" );
 

@@ -62,11 +62,29 @@ public:
 
   // -- state --
 public:
+  Core::StateIntHandle input_dimensions_state_[ 3 ];
+  Core::StateRangedIntHandle output_dimensions_state_[ 3 ];
 
+  Core::StateBoolHandle constraint_aspect_state_;
+  Core::StateRangedDoubleHandle scale_state_;
+  
+  Core::StateLabeledOptionHandle kernel_state_;
+  Core::StateRangedDoubleHandle gauss_sigma_state_;
+  Core::StateRangedDoubleHandle gauss_cutoff_state_;
+  Core::StateBoolHandle has_params_state_;
+  
+  Core::StateBoolHandle replace_state_;
 
 private:
   ResampleToolPrivateHandle private_;
 
+public:
+  static const std::string BOX_C;
+  static const std::string TENT_C;
+  static const std::string CUBIC_CR_C;
+  static const std::string CUBIC_BS_C;
+  static const std::string QUARTIC_C;
+  static const std::string GAUSSIAN_C;
 };
 
 } // end namespace

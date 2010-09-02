@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>252</width>
-    <height>339</height>
+    <width>241</width>
+    <height>466</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -26,12 +26,6 @@
    <size>
     <width>16777215</width>
     <height>16777215</height>
-   </size>
-  </property>
-  <property name="baseSize">
-   <size>
-    <width>650</width>
-    <height>0</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -63,12 +57,6 @@
       <size>
        <width>0</width>
        <height>194</height>
-      </size>
-     </property>
-     <property name="baseSize">
-      <size>
-       <width>0</width>
-       <height>80</height>
       </size>
      </property>
      <property name="font">
@@ -142,6 +130,97 @@
        </widget>
       </item>
       <item>
+       <widget class="QWidget" name="widget_2" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>24</height>
+         </size>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="margin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="dimensions_label_current_">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>72</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="layoutDirection">
+            <enum>Qt::LeftToRight</enum>
+           </property>
+           <property name="text">
+            <string>Dimensions:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="x_axis_label_current_">
+           <property name="text">
+            <string>X:</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_nx_">
+           <property name="text">
+            <string>300</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="y_axis_label_current_">
+           <property name="text">
+            <string>Y:</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_ny_">
+           <property name="text">
+            <string>200</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="z_axis_label_current_">
+           <property name="text">
+            <string>Z:</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_nz_">
+           <property name="text">
+            <string>400</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
        <widget class="QGroupBox" name="groupBox">
         <property name="font">
          <font>
@@ -193,8 +272,8 @@
              <height>100</height>
             </size>
            </property>
-           <property name="horizontalScrollBarPolicy">
-            <enum>Qt::ScrollBarAlwaysOff</enum>
+           <property name="selectionMode">
+            <enum>QAbstractItemView::MultiSelection</enum>
            </property>
           </widget>
          </item>
@@ -205,110 +284,52 @@
     </widget>
    </item>
    <item>
-    <widget class="QWidget" name="resample_" native="true">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>120</height>
-      </size>
+    <widget class="QGroupBox" name="size_groupbox_">
+     <property name="title">
+      <string>Resample Size</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_3">
-      <property name="spacing">
+     <layout class="QVBoxLayout" name="verticalLayout_6">
+      <property name="leftMargin">
+       <number>4</number>
+      </property>
+      <property name="topMargin">
        <number>2</number>
       </property>
-      <property name="margin">
+      <property name="rightMargin">
+       <number>4</number>
+      </property>
+      <property name="bottomMargin">
        <number>4</number>
       </property>
       <item>
-       <widget class="QWidget" name="widget_2" native="true">
+       <widget class="QWidget" name="widget_new_nx_" native="true">
         <property name="minimumSize">
          <size>
           <width>0</width>
           <height>24</height>
          </size>
         </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <layout class="QHBoxLayout" name="new_nx_layout_">
          <property name="spacing">
           <number>0</number>
          </property>
-         <property name="margin">
+         <property name="leftMargin">
+          <number>2</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
           <number>0</number>
          </property>
          <item>
-          <widget class="QLabel" name="dimensions_label_current_">
+          <widget class="QLabel" name="label_new_nx_">
            <property name="minimumSize">
             <size>
-             <width>96</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>96</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="layoutDirection">
-            <enum>Qt::LeftToRight</enum>
-           </property>
-           <property name="text">
-            <string>Dimensions:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="x_axis_label_current_">
-           <property name="text">
-            <string>X: 300</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="y_axis_label_current_">
-           <property name="text">
-            <string>Y: 200</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="z_axis_label_current_">
-           <property name="text">
-            <string>Z: 400</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item>
-       <widget class="QWidget" name="widget" native="true">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>24</height>
-         </size>
-        </property>
-        <layout class="QHBoxLayout" name="horizontalLayout">
-         <property name="spacing">
-          <number>0</number>
-         </property>
-         <property name="margin">
-          <number>0</number>
-         </property>
-         <item>
-          <widget class="QLabel" name="dimensions_label_new_">
-           <property name="minimumSize">
-            <size>
-             <width>96</width>
+             <width>35</width>
              <height>0</height>
             </size>
            </property>
@@ -319,55 +340,7 @@
             </size>
            </property>
            <property name="text">
-            <string>New:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="x_axis_label_new_">
-           <property name="font">
-            <font>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="text">
-            <string>X: 300</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="y_axis_label_new_">
-           <property name="font">
-            <font>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="text">
-            <string>Y: 200</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="z_axis_label_new_">
-           <property name="font">
-            <font>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="text">
-            <string>Z: 400</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
+            <string>X:</string>
            </property>
           </widget>
          </item>
@@ -375,19 +348,103 @@
        </widget>
       </item>
       <item>
-       <widget class="QWidget" name="widget_7" native="true">
-        <layout class="QVBoxLayout" name="horizontalLayout_15">
+       <widget class="QWidget" name="widget_new_ny_" native="true">
+        <layout class="QHBoxLayout" name="new_ny_layout_">
          <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
           <number>2</number>
          </property>
-         <property name="margin">
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
           <number>0</number>
          </property>
          <item>
-          <widget class="QLabel" name="x_label_1">
+          <widget class="QLabel" name="label_new_ny_">
            <property name="minimumSize">
             <size>
-             <width>10</width>
+             <width>35</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Y:</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QWidget" name="widget_new_nz_" native="true">
+        <layout class="QHBoxLayout" name="new_nz_layout_">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>2</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="label_new_nz_">
+           <property name="minimumSize">
+            <size>
+             <width>35</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Z:</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="aspect_checkbox_">
+        <property name="text">
+         <string>Constraint Aspect</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QWidget" name="widget" native="true">
+        <layout class="QHBoxLayout" name="scale_layout_">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>2</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="label">
+           <property name="minimumSize">
+            <size>
+             <width>35</width>
              <height>0</height>
             </size>
            </property>
@@ -399,8 +456,101 @@
         </layout>
        </widget>
       </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="kernel_groupbox_">
+     <property name="title">
+      <string>Interpolation Kernel</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <property name="leftMargin">
+       <number>4</number>
+      </property>
+      <property name="topMargin">
+       <number>2</number>
+      </property>
+      <property name="rightMargin">
+       <number>4</number>
+      </property>
+      <property name="bottomMargin">
+       <number>4</number>
+      </property>
       <item>
-       <widget class="QWidget" name="widget_9" native="true">
+       <widget class="QComboBox" name="kernel_combobox_"/>
+      </item>
+      <item>
+       <widget class="QWidget" name="param_widget_" native="true">
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <property name="margin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="label_2">
+           <property name="maximumSize">
+            <size>
+             <width>37</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Sigma:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDoubleSpinBox" name="sigma_spinbox_">
+           <property name="prefix">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_3">
+           <property name="maximumSize">
+            <size>
+             <width>37</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Cutoff:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDoubleSpinBox" name="cutoff_spinbox_"/>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QWidget" name="widget_9" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>32</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>32</height>
+      </size>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_22">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="margin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QCheckBox" name="replace_checkbox_">
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -413,49 +563,25 @@
           <height>32</height>
          </size>
         </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_22">
-         <property name="spacing">
-          <number>0</number>
-         </property>
-         <property name="margin">
-          <number>0</number>
-         </property>
-         <item>
-          <widget class="QCheckBox" name="resample_replace_checkBox_">
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Check this box to replace the current layer with the resampled one</string>
-           </property>
-           <property name="text">
-            <string>Replace</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="run_button_">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Resample</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
+        <property name="toolTip">
+         <string>Check this box to replace the current layer with the resampled one</string>
+        </property>
+        <property name="text">
+         <string>Replace</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="run_button_">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Resample</string>
+        </property>
        </widget>
       </item>
      </layout>

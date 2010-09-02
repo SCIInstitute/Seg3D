@@ -72,6 +72,31 @@ QtSpinBoxConnector::QtSpinBoxConnector( QDoubleSpinBox* parent,
   this->connect( parent, SIGNAL( valueChanged( double ) ), SLOT( set_state( double ) ) );
 }
 
+QtSpinBoxConnector::QtSpinBoxConnector( QDoubleSpinBox* parent, 
+  Core::StateRangedDoubleHandle& state, bool blocking /*= true */ ) :
+  QtConnectorBase( parent, blocking ),
+  double_spinbox_( parent ),
+  state_( state )
+{
+  QPointer< QtSpinBoxConnector > qpointer( this );
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    double min_val, max_val, step;
+    state->get_range( min_val, max_val );
+    state->get_step( step );
+    parent->setMinimum( min_val );
+    parent->setMaximum( max_val );
+    parent->setValue( state->get() );
+    parent->setSingleStep( step );
+    this->add_connection( state->value_changed_signal_.connect(
+      boost::bind( &QtSpinBoxConnector::SetDoubleSpinBoxValue, qpointer, _1, _2 ) ) );
+    this->add_connection( state->range_changed_signal_.connect(
+      boost::bind( &QtSpinBoxConnector::SetDoubleSpinBoxRange, qpointer, _1, _2, _3 ) ) );
+  }
+  this->connect( parent, SIGNAL( valueChanged( double ) ), SLOT( set_state( double ) ) );
+}
+
+
 QtSpinBoxConnector::~QtSpinBoxConnector()
 {
   this->disconnect_all();
@@ -127,6 +152,32 @@ void QtSpinBoxConnector::SetDoubleSpinBoxValue( QPointer< QtSpinBoxConnector > q
   qpointer->unblock();
 }
 
+void QtSpinBoxConnector::SetDoubleSpinBoxRange( QPointer< QtSpinBoxConnector > qpointer, 
+    double min_val, double max_val, Core::ActionSource source )
+{
+  if ( source == Core::ActionSource::INTERFACE_WIDGET_E )
+  {
+    return;
+  }
+
+  if ( !Core::Interface::IsInterfaceThread() )
+  {
+    Core::Interface::PostEvent( boost::bind( &QtSpinBoxConnector::SetDoubleSpinBoxRange,
+      qpointer, min_val, max_val, source ) );
+    return;
+  }
+
+  if ( qpointer.isNull() || QCoreApplication::closingDown() )
+  {
+    return;
+  }
+
+  qpointer->block();
+  qpointer->double_spinbox_->setMinimum( min_val );
+  qpointer->double_spinbox_->setMaximum( max_val );
+  qpointer->unblock();
+}
+
 void QtSpinBoxConnector::set_state( int val )
 {
   if( !this->is_blocked() )
@@ -142,5 +193,5 @@ void QtSpinBoxConnector::set_state( double val )
     Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), this->state_, val );
   }
 }
-  
+
 } // end namespace QtUtils
