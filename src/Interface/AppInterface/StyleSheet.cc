@@ -158,8 +158,8 @@ namespace Seg3D
   // - ACTIVE - //
   const QString StyleSheet::LAYER_WIDGET_BASE_ACTIVE_C = QString::fromUtf8(
     "QWidget#base_{"
-    " border-radius: 3px;"
-    " border:2px solid rgb(33, 33, 255, 255);"
+    " border-radius: 4px;"
+    " border:2px solid rgb(73, 111, 160);"
     " background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1,"
     "   stop:0 rgba(193, 215, 255, 255),"
     "   stop:0.353234 rgba(204, 222, 255, 255),"
@@ -168,8 +168,8 @@ namespace Seg3D
 
   const QString StyleSheet::LAYER_WIDGET_BASE_ACTIVE_IN_USE_C = QString::fromUtf8(
     "QWidget#base_{"
-    " border-radius: 3px;"
-    " border:2px solid rgb(33, 33, 255, 255);"
+    " border-radius:4px;"
+    " border:2px solid rgb(73, 111, 160);"
     " background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1,"
     "   stop:0 rgba(193, 255, 255, 255),"
     "   stop:0.353234 rgba(204, 255, 255, 255),"
@@ -178,8 +178,8 @@ namespace Seg3D
 
   const QString StyleSheet::LAYER_WIDGET_BASE_IN_USE_C = QString::fromUtf8(
     "QWidget#base_{"
-    " border-radius: 3px;"
-    " border:1px solid rgb(83, 111, 165);"
+    " border-radius: 4px;"
+    " border: 2px solid rgb(73, 111, 160);"
     " background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1,"
     "   stop:0 rgba(193, 255, 215, 255),"
     "   stop:0.353234 rgba(204, 255, 222, 255),"

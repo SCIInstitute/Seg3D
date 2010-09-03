@@ -33,6 +33,9 @@
 # pragma once
 #endif 
 
+// Boost includes 
+#include <boost/filesystem.hpp>
+
 // Application includes
 #include <Application/LayerIO/LayerImporter.h>
 #include <Application/LayerIO/LayerIO.h>
@@ -42,15 +45,12 @@ namespace Seg3D
 
 class ITKLayerImporter : public LayerImporter
 {
-  SCI_IMPORTER_TYPE( "ITK Importer", "*", 5)
+  SCI_IMPORTER_TYPE( "ITK Importer", ".dcm;.tiff;.png;.", 5)
 
   // -- Constructor/Destructor --
 public:
   // Construct a new layer file importer
-  ITKLayerImporter(const std::string& filename) :
-    LayerImporter(filename)
-  {
-  }
+  ITKLayerImporter( const std::string& filename );
 
   // Virtual destructor for memory management of derived classes
   virtual ~ITKLayerImporter()
@@ -81,9 +81,92 @@ public:
   // --Import the data as a specific type --  
 public: 
 
-  // IMPORT_LAYER
+  // IMPORT_LAYER:
   // Import the layer from the file
   virtual bool import_layer( LayerImporterMode mode, std::vector<LayerHandle>& layers );
+
+  // SET_FILE_LIST:
+  // we need a list of files to import, this function provides the list, the list must be set 
+  // before import_layer is called.
+  virtual bool set_file_list( const std::vector< std::string >& file_list )
+  {
+    this->file_list_ = file_list;
+    this->set_extension();
+    return true;
+  }
+
+private:
+
+  // Templated function that reads in a series of dicoms and creates the data_block_ and the
+  // image_data_ so that we can create new layers
+  template< typename PixelType >
+  bool import_dicom_series()
+  {
+    const unsigned int Dimension = 3;
+    typedef itk::Image< PixelType, Dimension > ImageType;
+
+    typedef itk::ImageSeriesReader< ImageType > ReaderType;
+    ReaderType::Pointer reader = ReaderType::New();
+
+    typedef itk::GDCMImageIO ImageIOType;
+    ImageIOType::Pointer dicomIO = ImageIOType::New();
+
+    reader->SetImageIO( dicomIO );
+    reader->SetFileNames( this->file_list_ );
+
+    try
+    {
+      reader->Update();
+    }
+    catch ( itk::ExceptionObject &err )
+    {
+      std::string itk_error = err.GetDescription();
+    }
+    catch( gdcm::Exception &error )
+    {
+      std::string format_error = error.getError();
+    }
+
+    this->data_block_ = Core::ITKDataBlock::New< PixelType >( 
+      itk::Image< PixelType, 3 >::Pointer( reader->GetOutput() ) );
+
+    this->image_data_ = Core::ITKImageDataT< PixelType >::Handle( 
+      new Core::ITKImageDataT< PixelType >( reader->GetOutput() ) );
+
+    if( this->image_data_ && this->data_block_ )
+    {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
+
+  // IMPORT_PNG_SERIES:
+  // does nothing yet
+  bool import_png_series();
+
+  // SET_EXTENSION:
+  // we need to know which type of file we are dealing with, this function provides that ability,
+  // the extension must be set before import_layer is called.
+  void set_extension()
+  {
+    this->extension_ = boost::filesystem::path( this->file_list_[ 0 ] ).extension();
+    
+    // now we force it to be lower case, just to be safe.
+    std::transform (this->extension_.begin(), this->extension_.end(), 
+      this->extension_.begin(), std::tolower );
+  }
+
+private:
+  Core::ITKImageDataHandle image_data_;
+  Core::DataBlockHandle data_block_;
+  std::vector< std::string > file_list_;
+  int bits_;
+  bool signed_data_;
+  int pixel_type_;
+  std::string extension_;
 
 };
 

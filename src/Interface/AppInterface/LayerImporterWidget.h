@@ -64,8 +64,7 @@ Q_OBJECT
 public:
   typedef QPointer< LayerImporterWidget > qpointer_type;
 
-  LayerImporterWidget( LayerImporterHandle importer, QWidget *parent = 0 );
-  LayerImporterWidget( std::vector< LayerImporterHandle > importers, QWidget *parent = 0 );
+  LayerImporterWidget( std::vector< LayerImporterHandle > importers, std::vector< std::string > files, QWidget *parent = 0 );
   virtual ~LayerImporterWidget();
     
 private Q_SLOTS:

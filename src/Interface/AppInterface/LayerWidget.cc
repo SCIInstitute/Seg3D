@@ -708,7 +708,6 @@ void LayerWidget::update_widget_state( bool initialize )
     // Show the progress bar, since we are computing a new layer
     this->show_progress_bar( false );
   }
-
 }
 
 std::string LayerWidget::get_layer_id() const

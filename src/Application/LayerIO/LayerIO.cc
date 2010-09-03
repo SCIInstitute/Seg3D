@@ -54,9 +54,9 @@ LayerIO::importer_types_type LayerIO::get_importer_types()
   std::vector<std::string> importer_types;
   importer_types.push_back( "All Importers (*)" );
 
-  for ( size_t j = 0; j<importer_list_.size(); j++ )
+  for ( size_t j = 0; j< this->importer_list_.size(); j++ )
   {
-    importer_types.push_back( importer_list_[j]->file_type_string() );
+    importer_types.push_back( this->importer_list_[j]->file_type_string() );
   }
   
   return importer_types;
@@ -73,6 +73,7 @@ bool LayerIO::create_importer( const std::string& filename,
   boost::filesystem::path full_filename( filename );
   // this includes the dot
   std::string extension = full_filename.extension();
+  std::transform( extension.begin(), extension.end(), extension.begin(), tolower );
 
   // Step (3): determine whether the file exists
   if ( ! ( boost::filesystem::exists( full_filename ) ) ) return false;
@@ -89,16 +90,16 @@ bool LayerIO::create_importer( const std::string& filename,
     unsigned int priority = 0;
     
     // Search the list for an approriate importer
-    for (size_t j = 0; j < importer_list_.size(); j ++ )
+    for (size_t j = 0; j < this->importer_list_.size(); j ++ )
     {
-      if ( importer_list_[j]->converts_file_type( extension ) &&  
-         importer_list_[j]->priority() >= priority )
+      if ( this->importer_list_[j]->converts_file_type( extension ) &&  
+         this->importer_list_[j]->priority() >= priority )
       {
-        LayerImporterHandle new_importer = importer_list_[j]->build( filename );
+        LayerImporterHandle new_importer = this->importer_list_[j]->build( filename );
         if ( new_importer->check_header() )
         {
           importer = new_importer;
-          priority = importer_list_[j]->priority();
+          priority = this->importer_list_[j]->priority();
         }
       }
     }   
@@ -107,19 +108,22 @@ bool LayerIO::create_importer( const std::string& filename,
   // script) or through the file type string ( from the GUI)  
   else
   {
-    for (size_t j = 0; j < importer_list_.size(); j ++ )
+    for (size_t j = 0; j < this->importer_list_.size(); j ++ )
     {
-      if ( ( importer_list_[j]->name() == importername ||
-        importer_list_[j]->file_type_string() == importername ) &&
-        importer_list_[j]->converts_file_type( extension ) )
+      if ( ( this->importer_list_[j]->name() == importername ||
+        this->importer_list_[j]->file_type_string() == importername ) &&
+        this->importer_list_[j]->converts_file_type( extension ) )
       {
-        importer = importer_list_[j]->build( filename );
+        importer = this->importer_list_[j]->build( filename );
         break;
       }
     }
   }
 
-  if ( importer ) return true;
+  if ( importer )
+  {
+    return true;
+  }
   else return false;
 }
 

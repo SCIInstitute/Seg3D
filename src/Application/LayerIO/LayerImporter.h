@@ -85,6 +85,19 @@ CORE_ENUM_CLASS
   LABEL_MASK_E = 0x0008 
 )
 
+CORE_ENUM_CLASS
+(
+  PixelImageType,
+  UNSIGNED_CHAR_E = 0x0001, 
+  SIGNED_CHAR_E = 0x0002, 
+  UNSIGNED_SHORT_E = 0x0003,
+  SIGNED_SHORT_E = 0x0004,
+  UNSIGNED_INT_E = 0x0005,
+  SIGNED_INT_E = 0x0006,
+  FLOAT_E = 0x0007,
+  DOUBLE_E = 0x0008
+)
+
 std::string ExportToString( LayerImporterMode mode );
 bool ImportFromString( const std::string& import_type_string, LayerImporterMode& mode );
 
@@ -199,7 +212,12 @@ public:
   // GET_IMPORTER_MODES
   // Get then supported importer modes
   virtual int get_importer_modes() = 0;
-  
+
+  // SET_FILE_LIST:
+  // In the case where we are importing a series, this sets the list of files for the importer
+  // to import.
+  virtual bool set_file_list( const std::vector< std::string >& file_list ){ return false; }
+
   // -- Import the data as a specific type -- 
 public: 
 

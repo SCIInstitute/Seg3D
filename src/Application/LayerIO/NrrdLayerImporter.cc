@@ -70,7 +70,7 @@ Core::GridTransform NrrdLayerImporter::get_grid_transform()
 
 Core::DataType NrrdLayerImporter::get_data_type()
 {
-  if ( nrrd_data_ ) return nrrd_data_->get_data_type();
+  if ( this->nrrd_data_ ) return this->nrrd_data_->get_data_type();
   else return Core::DataType::UNKNOWN_E;
 }
 

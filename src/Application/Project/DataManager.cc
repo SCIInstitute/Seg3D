@@ -113,7 +113,7 @@ void DataManager::prep_for_save( const boost::filesystem::path& project_path,
       dir_itr != dir_end; ++dir_itr )
     {
       // in the case that we find the datamanager.xml file, we skip it.
-      if( dir_itr->leaf() == "datamanager.xml" )
+      if( dir_itr->filename() == "datamanager.xml" )
       {
         continue;
       }

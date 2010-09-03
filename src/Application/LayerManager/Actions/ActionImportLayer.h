@@ -47,6 +47,7 @@ CORE_ACTION(
   CORE_ACTION_ARGUMENT( "filename", "The name of the file to load." )
   CORE_ACTION_KEY( "mode", "data", "The mode to use: data, single_mask, bitplane_mask, or label_mask.")
   CORE_ACTION_KEY( "importer", "", "Optional name for a specific importer." )
+  CORE_ACTION_KEY( "series", "", "Optional bool to specify whether or not we are inserting a series." )
 )
 
   // -- Constructor/Destructor --
@@ -56,6 +57,7 @@ public:
     add_argument( this->filename_ );
     add_key( this->mode_ );
     add_key( this->importer_ );
+    add_key( this->series_import_ );
   }
   
   virtual ~ActionImportLayer()
@@ -78,6 +80,8 @@ private:
 
   // Which type of importer should we use
   Core::ActionParameter< std::string > importer_;
+
+  Core::ActionParameter< bool > series_import_;
   
   // Short cut to the layer importer that has already loaded the data if the file
   // was read through the GUI
@@ -92,7 +96,8 @@ public:
 
   // CREATE:
   // Create action that imports a layer
-  static Core::ActionHandle Create( const LayerImporterHandle& importer, LayerImporterMode mode );
+  static Core::ActionHandle Create( const LayerImporterHandle& importer, LayerImporterMode mode,
+    bool series_import);
   
   // DISPATCH:
   // Create and dispatch action that moves the layer above 
@@ -103,7 +108,7 @@ public:
   // To avoid reading a file twice, this action has a special option, so it can take an
   // importer that has already loaded the file. This prevents it from being read twice
   static void Dispatch( Core::ActionContextHandle context, const LayerImporterHandle& importer, 
-    LayerImporterMode mode );
+    LayerImporterMode mode, bool series_import = false );
   
 };
   

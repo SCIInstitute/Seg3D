@@ -305,14 +305,14 @@ typename ITKImageDataT<T>::image_type::Pointer ITKImageDataT<T>::get_image() con
 template<class T>
 ITKImageDataT<T>::image_base_type::Pointer ITKImageDataT<T>::get_base_image() const
 {
-  return static_cast<image_base_type::Pointer>( itk_image_ );
+  return static_cast< image_base_type::Pointer >( itk_image_ );
 }
 
 
 template<class T>
 void* ITKImageDataT<T>::get_data() const
 {
-  return reinterpret_cast< void *>( itk_image_->GetBufferPointer() );
+  return reinterpret_cast< void* >( itk_image_->GetBufferPointer() );
 }
 
 template<class T>

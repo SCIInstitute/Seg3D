@@ -161,6 +161,7 @@ TARGET_LINK_LIBRARIES(Interface_AppInterface
                       Application_Tool
                       Application_ToolManager
                       Application_Tools
+                      Application_LayerIO
                       QtUtils_Utils
                       QtUtils_Widgets
                       QtUtils_Bridge

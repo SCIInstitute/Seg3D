@@ -51,8 +51,8 @@ class NrrdLayerImporter : public LayerImporter
   // -- Constructor/Destructor --
 public:
   // Construct a new layer file importer
-  NrrdLayerImporter(const std::string& filename) :
-    LayerImporter(filename)
+  NrrdLayerImporter( const std::string& filename ) :
+    LayerImporter( filename )
   {
   }
 

@@ -40,6 +40,9 @@
 #include <Interface/AppInterface/LayerImporterWidget.h>
 #include <Interface/AppInterface/AppLayerIO.h>
 
+#include "itkGDCMSeriesFileNames.h"
+#include "gdcmException.h"
+
 namespace Seg3D
 {
 
@@ -69,6 +72,7 @@ void AppLayerIO::ImportFiles( QMainWindow* main_window )
   std::string filtername = import_dialog.selectedNameFilter().toStdString();
   
   std::vector< LayerImporterHandle > importers;
+  std::vector< std::string > files;
 
   for( int i = 0; i < file_list.size(); ++i )
   {
@@ -91,15 +95,30 @@ void AppLayerIO::ImportFiles( QMainWindow* main_window )
     else
     {
       importers.push_back( importer );
+
+      boost::filesystem::path full_filename( importer->get_filename() );
+      files.push_back( full_filename.string() );
     }
+  }
+
+  if( importers[ 0 ]->name() == "ITK Importer" )
+  {
+    QMessageBox message_box( main_window );
+    message_box.setWindowTitle( " -- ERROR -- " );
+    message_box.addButton( QMessageBox::Ok );
+    message_box.setIcon( QMessageBox::Critical );
+    message_box.setText( QString::fromUtf8( "To import a file series, please choose "
+      "'Import Volume From Image Series...' from the Layer menu.") );
+    message_box.exec();
+    return;
   }
   
   // Step (5): Open the importer dialog that issues the action to import the data file(s)
-  LayerImporterWidget layer_import_dialog( importers, main_window );
+  LayerImporterWidget layer_import_dialog( importers, files, main_window );
   layer_import_dialog.exec();
 }
 
-void AppLayerIO::ImportFolder( QMainWindow* main_window )
+void AppLayerIO::ImportSeries( QMainWindow* main_window )
 {
   // Step (1): Get the importer list from the LayerIO system
   LayerIO::importer_types_type importer_types = LayerIO::Instance()->get_importer_types();
@@ -111,45 +130,142 @@ void AppLayerIO::ImportFolder( QMainWindow* main_window )
   }
 
   // Step (2): Bring up the file dialog
-  QString dir = QFileDialog::getExistingDirectory( main_window,  "Import Folder of Layers...",
-    "/home", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks );
+  QFileDialog import_dialog( main_window, QString( "Select a file from the series... " ) );
 
-  boost::filesystem::path path = complete( boost::filesystem::path( 
-    dir.toStdString().c_str(), boost::filesystem::native ) );
+  import_dialog.setNameFilters( filters );
+  import_dialog.setAcceptMode( QFileDialog::AcceptOpen );
+  import_dialog.setFileMode( QFileDialog::ExistingFiles );
+  import_dialog.setViewMode( QFileDialog::Detail );
+  import_dialog.exec();
 
-  // Step (3): Get the selected filename and name filter
-  std::string filename = dir.toStdString();
-  std::string filtername = "All Importers (*)";
+  QStringList file_list = import_dialog.selectedFiles();
+  if( file_list.size() == 0) return;
+  std::string filtername = import_dialog.selectedNameFilter().toStdString();
 
   std::vector< LayerImporterHandle > importers;
-  
-  boost::filesystem::directory_iterator dir_end;
-  for( boost::filesystem::directory_iterator dir_itr( path ); dir_itr != dir_end; ++dir_itr )
-  {
-    std::string file_path = ( path / dir_itr->leaf() ).string();
-    LayerImporterHandle importer;
-    if( ! ( LayerIO::Instance()->create_importer( file_path, importer, filtername  ) ) )
-    {
-      std::string error_message = std::string("ERROR: No importer is available for file '") + 
-        filename + std::string("'.");
+  std::vector< std::string > files;
 
-      QMessageBox message_box( main_window );
-      message_box.setWindowTitle( "Import Layer..." );
-      message_box.addButton( QMessageBox::Ok );
-      message_box.setIcon( QMessageBox::Critical );
-      message_box.setText( QString::fromStdString( error_message ) );
-      message_box.exec();
-    }
-    else
+  LayerImporterHandle importer;
+  if( ! ( LayerIO::Instance()->create_importer( file_list.at( 0 ).toStdString(), 
+    importer, filtername ) ) )
+  {
+    // IF we are unable to create an importer we pop up an error message box
+    std::string error_message = std::string("ERROR: No importer is available for file '") + 
+      file_list.at( 0 ).toStdString() + std::string("'.");
+
+    QMessageBox message_box( main_window );
+    message_box.setWindowTitle( "Import Layer..." );
+    message_box.addButton( QMessageBox::Ok );
+    message_box.setIcon( QMessageBox::Critical );
+    message_box.setText( QString::fromStdString( error_message ) );
+    message_box.exec();
+    return;
+  }
+  else
+  {
+    // If we are able to create an importer, we then need to figure out which files are part
+    // of the series.
+    
+    // Step 1: we add the importer to the importers vector, in this case we only have a single
+    // importer in the vector.
+    importers.push_back( importer );
+
+    // Step 2: we get the get a boost::filesystem::path version of the file name so we can 
+    // take advantage of the filesystem functionality
+    boost::filesystem::path full_filename( importer->get_filename() );
+
+    // Step 3: now we want to see if we can figure out the file name pattern.  We will start by
+    // checking to see if the sequence numbers are at the end of the file name.  
+    std::string filename = boost::filesystem::basename( full_filename );
+    std::string numbers( "0123456789" );
+    size_t length =  filename.find_last_not_of( numbers ) + 1;
+
+    // we check to see if we have found a series number at the end. length == 0 if we haven't.
+    if( length == 0 ) return;
+
+    // if length was > 0 then chances are that we found a sequence pattern
+    std::string file_pattern = filename.substr( 0, length ); 
+
+    // Step 4: parse through the directory
+    if( boost::filesystem::exists( full_filename.parent_path() ) )
     {
-      importers.push_back( importer );
+      boost::filesystem::directory_iterator dir_end;
+      for( boost::filesystem::directory_iterator dir_itr( full_filename.parent_path() ); 
+        dir_itr != dir_end; ++dir_itr )
+      {
+        std::string potential_match = dir_itr->filename().substr( 0, length );
+        if( potential_match == file_pattern )
+        {
+          files.push_back( dir_itr->string() );
+        }
+      }
     }
   }
 
-  // Step (5): Open the importer dialog that issues the action to import the data files
-  LayerImporterWidget layer_import_dialog( importers, main_window );
+  importers[ 0 ]->set_file_list( files );
+
+  LayerImporterWidget layer_import_dialog( importers, files, main_window );
   layer_import_dialog.exec();
 }
+
+
+
+//void AppLayerIO::ImportFolder( QMainWindow* main_window )
+//{
+//  // Step (1): Get the importer list from the LayerIO system
+//  LayerIO::importer_types_type importer_types = LayerIO::Instance()->get_importer_types();
+//
+//  QStringList filters;
+//  for ( size_t j = 0; j < importer_types.size(); j++ )
+//  {
+//    filters << QString::fromStdString( importer_types[j] );
+//  }
+//
+//  // Step (2): Bring up the file dialog
+//  QString dir = QFileDialog::getExistingDirectory( main_window,  "Import Folder of Layers...",
+//    "/home", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks );
+//
+//  boost::filesystem::path path = complete( boost::filesystem::path( 
+//    dir.toStdString().c_str(), boost::filesystem::native ) );
+//
+//  // Step (3): Get the selected filename and name filter
+//  std::string filename = dir.toStdString();
+//  std::string filtername = "All Importers (*)";
+//
+//  std::vector< LayerImporterHandle > importers;
+//  std::vector< std::string > files;
+//  
+//  boost::filesystem::directory_iterator dir_end;
+//  for( boost::filesystem::directory_iterator dir_itr( path ); dir_itr != dir_end; ++dir_itr )
+//  {
+//    std::string file_path = ( path / dir_itr->filename() ).string();
+//    LayerImporterHandle importer;
+//    if( ! ( LayerIO::Instance()->create_importer( file_path, importer, filtername  ) ) )
+//    {
+//      std::string error_message = std::string("ERROR: No importer is available for file '") + 
+//        filename + std::string("'.");
+//
+//      QMessageBox message_box( main_window );
+//      message_box.setWindowTitle( "Import Layer..." );
+//      message_box.addButton( QMessageBox::Ok );
+//      message_box.setIcon( QMessageBox::Critical );
+//      message_box.setText( QString::fromStdString( error_message ) );
+//      message_box.exec();
+//    }
+//    else
+//    {
+//      importers.push_back( importer );
+//
+//      boost::filesystem::path full_filename( importer->get_filename() );
+//      files.push_back( full_filename.filename() );
+//
+//    }
+//  }
+//
+//  // Step (5): Open the importer dialog that issues the action to import the data files
+//  LayerImporterWidget layer_import_dialog( importers, files, main_window );
+//  layer_import_dialog.exec();
+//}
   
 void AppLayerIO::Export( QMainWindow* main_window )
 {
@@ -160,6 +276,9 @@ void AppLayerIO::Export( QMainWindow* main_window )
   export_dialog.setAcceptMode( QFileDialog::AcceptSave );
   export_dialog.exec();
 }
+
+
+
 
 
 

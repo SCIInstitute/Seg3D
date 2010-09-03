@@ -83,8 +83,18 @@ bool ActionImportLayer::validate( Core::ActionContextHandle& context )
 
 bool ActionImportLayer::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
-  std::string message = std::string("Importing '") + 
-    this->layer_importer_.handle()->get_filename() + std::string("'");
+  std::string file_or_folder_name;
+  if( this->series_import_.value() == true )
+  {
+    file_or_folder_name = boost::filesystem::path( 
+      this->layer_importer_.handle()->get_filename() ).parent_path().leaf();
+  }
+  else
+  {
+    file_or_folder_name = this->layer_importer_.handle()->get_filename();
+  }
+
+  std::string message = std::string("Importing '") + file_or_folder_name + std::string("'");
     
   Core::ActionProgressHandle progress = 
     Core::ActionProgressHandle( new Core::ActionProgress( message ) );
@@ -117,13 +127,14 @@ Core::ActionHandle ActionImportLayer::Create( const std::string& filename,
   action->filename_.value() = filename;
   action->mode_.value()   = mode;
   action->importer_.value() = importer;
+  action->series_import_.value() = false;
   
   // Post the new action
   return Core::ActionHandle( action );
 }
 
 Core::ActionHandle ActionImportLayer::Create( const LayerImporterHandle& importer, 
-  LayerImporterMode mode )
+  LayerImporterMode mode, bool series_import )
 {
   // Create new action
   ActionImportLayer* action = new ActionImportLayer;
@@ -135,6 +146,7 @@ Core::ActionHandle ActionImportLayer::Create( const LayerImporterHandle& importe
   action->filename_.value() = importer->get_filename();
   action->mode_.value()     = ExportToString(mode);
   action->importer_.value() = importer->name();
+  action->series_import_.value() = series_import;
   
   // Post the new action
   return Core::ActionHandle( action );
@@ -147,9 +159,9 @@ void ActionImportLayer::Dispatch( Core::ActionContextHandle context, const std::
 }
 
 void ActionImportLayer::Dispatch( Core::ActionContextHandle context, 
-  const LayerImporterHandle& importer, LayerImporterMode mode )
+  const LayerImporterHandle& importer, LayerImporterMode mode, bool series_import )
 {
-  Core::ActionDispatcher::PostAction( Create( importer, mode ), context );
+  Core::ActionDispatcher::PostAction( Create( importer, mode, series_import ), context );
 }
   
 } // end namespace Seg3D
