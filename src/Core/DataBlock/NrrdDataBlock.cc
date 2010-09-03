@@ -46,7 +46,7 @@ public:
 
 
 NrrdDataBlock::NrrdDataBlock( NrrdDataHandle nrrd_data ) :
-  private_( new NrrdDataBlockPrivate)
+  private_( new NrrdDataBlockPrivate )
 {
   this->private_->nrrd_data_ = nrrd_data;
 

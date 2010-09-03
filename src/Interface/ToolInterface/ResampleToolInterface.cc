@@ -114,6 +114,7 @@ bool ResampleToolInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Enable( this->private_->ui_.run_button_, tool->valid_target_state_ );
   QtUtils::QtBridge::Enable( this->private_->ui_.target_group_, 
     tool->use_active_group_state_, true ); 
+  QtUtils::QtBridge::Enable( this->private_->scale_, tool->constraint_aspect_state_ );
   QtUtils::QtBridge::Show( this->private_->ui_.param_widget_, tool->has_params_state_ );
 
   CORE_LOG_DEBUG( "Finished building a Resample Tool Interface" );

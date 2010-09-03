@@ -138,7 +138,7 @@ void GroupTargetToolPrivate::handle_target_group_changed( std::string group_id )
       LayerGroupHandle active_group = active_layer->get_layer_group();
       if ( active_group->get_group_id() != group_id )
       {
-        this->tool_->target_group_state_->set( group_id );
+        this->tool_->target_group_state_->set( active_group->get_group_id() );
         return;
       }
     }

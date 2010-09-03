@@ -33,7 +33,7 @@
 // Application includes
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/ResampleTool.h>
-#include <Application/Tools/Actions/ActionThreshold.h>
+#include <Application/Tools/Actions/ActionResample.h>
 #include <Application/Tools/detail/MaskShader.h>
 #include <Application/Layer/Layer.h>
 #include <Application/Layer/LayerGroup.h>
@@ -145,19 +145,12 @@ void ResampleToolPrivate::handle_constraint_aspect_changed( bool constraint )
 
 void ResampleToolPrivate::handle_kernel_changed( std::string kernel_name )
 {
-  this->tool_->has_params_state_->set( kernel_name == ResampleTool::GAUSSIAN_C );
+  this->tool_->has_params_state_->set( kernel_name == ActionResample::GAUSSIAN_C );
 }
 
 //////////////////////////////////////////////////////////////////////////
-// Class Threshold
+// Class ResampleTool
 //////////////////////////////////////////////////////////////////////////
-
-const std::string ResampleTool::BOX_C( "box" );
-const std::string ResampleTool::TENT_C( "tent" );
-const std::string ResampleTool::CUBIC_CR_C( "cubic_cr" );
-const std::string ResampleTool::CUBIC_BS_C( "cubic_bs" );
-const std::string ResampleTool::QUARTIC_C( "quartic" );
-const std::string ResampleTool::GAUSSIAN_C( "gauss" );
 
 ResampleTool::ResampleTool( const std::string& toolid ) :
   GroupTargetTool( Core::VolumeType::ALL_E, toolid ),
@@ -176,13 +169,13 @@ ResampleTool::ResampleTool( const std::string& toolid ) :
   this->add_state( "scale", this->scale_state_, 1.0, 0.01, 2.0, 0.01 );
 
   std::vector< Core::OptionLabelPair > kernels;
-  kernels.push_back( std::make_pair( BOX_C, "Box" ) );
-  kernels.push_back( std::make_pair( TENT_C, "Tent" ) );
-  kernels.push_back( std::make_pair( CUBIC_CR_C, "Cubic (Catmull-Rom)" ) );
-  kernels.push_back( std::make_pair( CUBIC_BS_C, "Cubic (B-spline)" ) );
-  kernels.push_back( std::make_pair( QUARTIC_C, "Quartic" ) );
-  kernels.push_back( std::make_pair( GAUSSIAN_C, "Gaussian" ) );
-  this->add_state( "kernel", this->kernel_state_, BOX_C, kernels );
+  kernels.push_back( std::make_pair( ActionResample::BOX_C, "Box" ) );
+  kernels.push_back( std::make_pair( ActionResample::TENT_C, "Tent" ) );
+  kernels.push_back( std::make_pair( ActionResample::CUBIC_CR_C, "Cubic (Catmull-Rom)" ) );
+  kernels.push_back( std::make_pair( ActionResample::CUBIC_BS_C, "Cubic (B-spline)" ) );
+  kernels.push_back( std::make_pair( ActionResample::QUARTIC_C, "Quartic" ) );
+  kernels.push_back( std::make_pair( ActionResample::GAUSSIAN_C, "Gaussian" ) );
+  this->add_state( "kernel", this->kernel_state_, ActionResample::BOX_C, kernels );
 
   this->add_state( "sigma", this->gauss_sigma_state_, 1.0, 1.0, 100.0, 0.01 );
   this->add_state( "cutoff", this->gauss_cutoff_state_, 1.0, 1.0, 100.0, 0.01 );
@@ -215,6 +208,13 @@ ResampleTool::~ResampleTool()
 
 void ResampleTool::execute( Core::ActionContextHandle context )
 {
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
+  ActionResample::Dispatch( context, this->target_layers_state_->get(), 
+    this->output_dimensions_state_[ 0 ]->get(), this->output_dimensions_state_[ 1 ]->get(),
+    this->output_dimensions_state_[ 2 ]->get(), this->kernel_state_->get(),
+    this->gauss_sigma_state_->get(), this->gauss_cutoff_state_->get(), 
+    this->replace_state_->get() );
 }
 
 } // end namespace Seg3D

@@ -218,6 +218,14 @@ bool BaseFilter::dispatch_delete_layer( LayerHandle layer )
     found_layer = true;
   }
 
+  it = std::find( this->private_->locked_layers_.begin(), 
+    this->private_->locked_layers_.end(), layer );
+  if ( it != this->private_->locked_layers_.end() )
+  {
+    this->private_->locked_layers_.erase( it );
+    found_layer = true;
+  }
+  
   // If we did not find the layer return false, as we did not lock it in the first place.
   if ( ! found_layer ) return false;
 

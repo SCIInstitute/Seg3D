@@ -115,6 +115,8 @@ SET(APPLICATION_TOOLS_ACTIONS_SRCS
   Actions/ActionPolyline.cc
   Actions/ActionInvert.h
   Actions/ActionInvert.cc
+  Actions/ActionResample.h
+  Actions/ActionResample.cc
   )
 
 CORE_ADD_LIBRARY(Application_Tools 

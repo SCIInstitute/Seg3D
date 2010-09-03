@@ -77,14 +77,6 @@ public:
 
 private:
   ResampleToolPrivateHandle private_;
-
-public:
-  static const std::string BOX_C;
-  static const std::string TENT_C;
-  static const std::string CUBIC_CR_C;
-  static const std::string CUBIC_BS_C;
-  static const std::string QUARTIC_C;
-  static const std::string GAUSSIAN_C;
 };
 
 } // end namespace

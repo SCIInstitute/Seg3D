@@ -1073,7 +1073,7 @@ void LayerManager::DispatchDeleteLayer( LayerHandle layer )
   // Move this request to the Application thread
   if ( !( Core::Application::IsApplicationThread() ) )
   {
-    Core::Application::PostEvent( boost::bind( &LayerManager::DispatchDeleteLayer, layer) );
+    Core::Application::PostEvent( boost::bind( &LayerManager::DispatchDeleteLayer, layer ) );
     return;
   }
 
@@ -1119,6 +1119,40 @@ void LayerManager::DispatchInsertMaskVolumeIntoLayer( MaskLayerHandle layer,
   }
   
   layer->set_mask_volume( mask );
+}
+
+void LayerManager::DispatchCreateAndInsertDataLayer( std::string name, 
+  Core::DataVolumeHandle data )
+{
+  // Move this request to the Application thread
+  if ( !( Core::Application::IsApplicationThread() ) )
+  {
+    Core::Application::PostEvent( boost::bind( 
+      &LayerManager::DispatchCreateAndInsertDataLayer, name, data ) );
+    return;
+  }
+
+  // Create the layer.
+  DataLayerHandle data_layer( new DataLayer( name, data ) );
+  // Insert the layer into the layer manager.
+  LayerManager::Instance()->insert_layer( data_layer );
+}
+
+void LayerManager::DispatchCreateAndInsertMaskLayer( std::string name, 
+  Core::MaskVolumeHandle mask )
+{
+  // Move this request to the Application thread
+  if ( !( Core::Application::IsApplicationThread() ) )
+  {
+    Core::Application::PostEvent( boost::bind( 
+      &LayerManager::DispatchCreateAndInsertMaskLayer, name, mask ) );
+    return;
+  }
+
+  // Create the layer.
+  MaskLayerHandle mask_layer( new MaskLayer( name, mask ) );
+  // Insert the layer into the layer manager.
+  LayerManager::Instance()->insert_layer( mask_layer );
 }
 
 } // end namespace seg3D

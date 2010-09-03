@@ -381,7 +381,19 @@ public:
   // Application thread if needed.
   static void DispatchInsertMaskVolumeIntoLayer( MaskLayerHandle layer, 
     Core::MaskVolumeHandle mask );
+
+  // DISPATCHCREATEANDINSERTMASKLAYER:
+  // Create and insert the layer. This function will relay a call to the 
+  // Application thread if needed.
+  static void DispatchCreateAndInsertMaskLayer( std::string name, 
+    Core::MaskVolumeHandle mask );
   
+  // DISPATCHCREATEANDINSERTMASKLAYER:
+  // Create and insert the layer. This function will relay a call to the 
+  // Application thread if needed.
+  static void DispatchCreateAndInsertDataLayer( std::string name, 
+    Core::DataVolumeHandle data );
+
 };
 
 } // end namespace seg3D
