@@ -144,6 +144,25 @@ bool BaseFilter::create_and_lock_data_layer_from_layer( LayerHandle src_layer,
   return true;
 }
 
+bool BaseFilter::create_and_lock_data_layer( const Core::GridTransform& grid_trans, 
+                      LayerHandle src_layer, LayerHandle& dst_layer )
+{
+  // Generate a new name for the filter
+  std::string name = this->get_filter_name() + "_" + src_layer->get_layer_name();
+
+  // Create the layer in creating mode
+  if ( !( LayerManager::CreateAndLockDataLayer( grid_trans, name, dst_layer ) ) )
+  {
+    dst_layer.reset();
+    return false;
+  }
+
+  // Record that the layer is locked
+  this->private_->created_layers_.push_back( dst_layer );
+
+  // Success
+  return true;
+}
 
 bool BaseFilter::create_and_lock_mask_layer_from_layer( LayerHandle src_layer, LayerHandle& dst_layer )
 {
@@ -165,6 +184,25 @@ bool BaseFilter::create_and_lock_mask_layer_from_layer( LayerHandle src_layer, L
   return true;
 }
 
+bool BaseFilter::create_and_lock_mask_layer( const Core::GridTransform& grid_trans, 
+                      LayerHandle src_layer, LayerHandle& dst_layer )
+{
+  // Generate a new name for the filter
+  std::string name = this->get_filter_name() + "_" + src_layer->get_layer_name();
+
+  // Create the layer in creating mode
+  if ( !( LayerManager::CreateAndLockMaskLayer( grid_trans, name, dst_layer ) ) )
+  {
+    dst_layer.reset();
+    return false;
+  }
+
+  // Record that the layer is locked
+  this->private_->created_layers_.push_back( dst_layer );
+
+  // Success
+  return true;
+}
 
 bool BaseFilter::dispatch_unlock_layer( LayerHandle layer )
 {

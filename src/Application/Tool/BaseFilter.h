@@ -101,12 +101,26 @@ public:
   // NOTE: This function can only be run from the application thread
   bool create_and_lock_data_layer_from_layer( LayerHandle src_layer, LayerHandle& dst_layer );
 
+  // CREATE_AND_LOCK_DATA_LAYER:
+  // Create a new data layer with the given grid transform, the layer is immediately
+  // locked as it does not contain any data and will be in the creating state.
+  // NOTE: This function can only be run from the application thread
+  bool create_and_lock_data_layer( const Core::GridTransform& grid_trans, 
+    LayerHandle src_layer, LayerHandle& dst_layer );
+
   // CREATE_AND_LOCK_MASK_LAYER_FROM_LAYER:
   // Create a new mask layer with the same dimensions as another layer, the layer is immediately
   // locked as it does not contain any data and will be in the creating state.
   // NOTE: This function can only be run from the application thread.
   bool create_and_lock_mask_layer_from_layer( LayerHandle src_layer, LayerHandle& dst_layer );  
   
+  // CREATE_AND_LOCK_MASK_LAYER:
+  // Create a new mask layer with the given grid transform, the layer is immediately
+  // locked as it does not contain any data and will be in the creating state.
+  // NOTE: This function can only be run from the application thread
+  bool create_and_lock_mask_layer( const Core::GridTransform& grid_trans, 
+    LayerHandle src_layer, LayerHandle& dst_layer );
+
   // DISPATCH_UNLOCK_LAYER:
   // Schedule a layer to be unlocked.
   bool dispatch_unlock_layer( LayerHandle layer );

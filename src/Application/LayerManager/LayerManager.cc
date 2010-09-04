@@ -100,9 +100,11 @@ bool LayerManager::insert_layer( LayerHandle layer )
       
       CORE_LOG_DEBUG( std::string( "Set Active Layer: " ) + layer->get_layer_id());
 
-      active_layer_ = layer;
-      active_layer_changed = true;
-      
+      if ( layer->is_valid() )
+      {
+        active_layer_ = layer;
+        active_layer_changed = true;
+      } 
     }
     
     group_handle->insert_layer( layer );
