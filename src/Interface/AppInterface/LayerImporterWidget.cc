@@ -91,7 +91,7 @@ LayerImporterWidget::LayerImporterWidget( std::vector< LayerImporterHandle > imp
   this->private_->importer_name_ = this->private_->importers_[ 0 ]->name();
 
   boost::filesystem::path full_filename( this->private_->importers_[ 0 ]->get_filename() );
-  this->private_->ui_.file_name_label_->setText( 
+  this->private_->ui_.file_name_label_->setText( QString::fromUtf8( "Scanning: " ) +
     QString::fromStdString( full_filename.leaf() ) );
 
   boost::thread( boost::bind( &LayerImporterWidget::ScanFile, 
@@ -262,7 +262,7 @@ void LayerImporterWidget::import()
   for( int i = 1; i < static_cast< int >( this->private_->importers_.size() ); ++i )
   {
     boost::filesystem::path full_filename( this->private_->importers_[ i ]->get_filename() );
-    this->private_->ui_.file_name_label_->setText( 
+    this->private_->ui_.file_name_label_->setText( QString::fromUtf8( "Scanning: " ) +
       QString::fromStdString( full_filename.leaf() ) );
     this->repaint();
     this->private_->importers_[ i ]->import_header();
@@ -288,7 +288,17 @@ void LayerImporterWidget::ScanFile( qpointer_type qpointer, LayerImporterHandle 
   // Step (2) : Update the widget if it still exists
   if( success )
   {
-    qpointer->private_->series_ = importer->set_file_list( qpointer->private_->files_ );
+    if( ( qpointer->private_->files_.size() > 1 ) &&
+      ( importer->set_file_list( qpointer->private_->files_ ) ) )
+    {
+      qpointer->private_->series_ = true;
+    }
+    else
+    {
+      qpointer->private_->series_ = false;
+    }
+      
+    importer->set_file_list( qpointer->private_->files_ );
 
     Core::Interface::Instance()->post_event( boost::bind( 
       &LayerImporterWidget::ListImportOptions, qpointer, importer ) ); 
@@ -365,9 +375,6 @@ void LayerImporterWidget::setup_ui()
   this->private_->mask_1248_button->setFlat( true );
   this->private_->mask_1248_button->setCheckable( true );
   this->private_->type_button_group->addButton( this->private_->mask_1248_button, 3 );
-
-  this->private_->ui_.horizontalLayout_13->setAlignment( Qt::AlignRight );
-  this->private_->ui_.horizontalLayout_17->setAlignment( Qt::AlignLeft );
 
   // Step (4): Hide the parts of the UI that cannot be used yet
   this->private_->ui_.importer_options_->hide();

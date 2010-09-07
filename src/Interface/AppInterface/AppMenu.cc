@@ -146,28 +146,11 @@ void AppMenu::create_layer_menu( QMenu* qmenu )
   QtUtils::QtBridge::Connect( qaction, 
     boost::bind( &AppLayerIO::ImportFiles,  this->main_window_ ) );
 
-//  qaction = qmenu->addAction( tr( "Import Layer(s) From Folder... ") );
-//  //qaction->setShortcut( tr( "Ctrl+Shift+O" ) );
-//  qaction->setToolTip( tr( "Import new layer(s) into the layer manager from a folder" ) );
-//  QtUtils::QtBridge::Connect( qaction, 
-//    boost::bind( &AppLayerIO::ImportFolder,  this->main_window_ ) );
-
   qaction = qmenu->addAction( tr( "Import Volume From Image Series... ") );
   qaction->setShortcut( tr( "Ctrl+Shift+I" ) );
   qaction->setToolTip( tr( "Import new data layer into the layer manager from a series" ) );
   QtUtils::QtBridge::Connect( qaction, 
     boost::bind( &AppLayerIO::ImportSeries,  this->main_window_ ) );
-
-//  qaction = qmenu->addAction( tr( "Import DICOM Image Series(s) From Folder... ") );
-//  qaction->setToolTip( tr( "Import new layer(s) into the layer manager from a folder" ) );
-//  QtUtils::QtBridge::Connect( qaction, 
-//    boost::bind( &ITKImageSeriesImporter::processDICOM, 
-//    "C:/Users/wchristiansen/Desktop/dicoms", 
-//    "C:/Users/wchristiansen/Desktop/image.nrrd" ) );
-//  QtUtils::QtBridge::Connect( qaction, 
-//    boost::bind( &ITKDicomImporter::processVFF, 
-//    "C:/Users/wchristiansen/Desktop/5084_N34_VH_062410-p50.vff", 
-//    "C:/Users/wchristiansen/Desktop/image.nrrd" ) );
 
   qmenu->addSeparator();
 

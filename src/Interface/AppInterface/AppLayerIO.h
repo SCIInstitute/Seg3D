@@ -45,10 +45,6 @@ public:
   // Import a layer into the LayerManager from a single file
   static void ImportFiles( QMainWindow* main_window );
 
-  //// IMPORTFOLDER:
-  //// Import a layer into the LayerManager from a single file
-  //static void ImportFolder( QMainWindow* main_window );
-
   // IMPORTSERIES:
   // Import a data volume from a series of files using the ITK importer.
   static void ImportSeries( QMainWindow* main_window );

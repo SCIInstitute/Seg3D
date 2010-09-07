@@ -35,7 +35,11 @@
 
 // Boost includes 
 #include <boost/filesystem.hpp>
-#include <boost/algorithm/string.hpp>
+
+// Core includes
+#include <Core/DataBlock/StdDataBlock.h>
+#include <Core/Geometry/Point.h>
+#include <Core/Geometry/Vector.h>
 
 // Application includes
 #include <Application/LayerIO/LayerImporter.h>
@@ -46,7 +50,7 @@ namespace Seg3D
 
 class ITKLayerImporter : public LayerImporter
 {
-  SCI_IMPORTER_TYPE( "ITK Importer", ".dcm;.tiff;.png;.", 5)
+  SCI_IMPORTER_TYPE( "ITK Importer", ".dcm;.tiff;.png;.vff", 5)
 
   // -- Constructor/Destructor --
 public:
@@ -93,15 +97,87 @@ public:
   {
     this->file_list_ = file_list;
     this->set_extension();
+    if( file_list_.size() > 1 ) this->multifile_ = true;
     return true;
   }
 
 private:
+  // SCAN_DICOM:
+  // this function is called by import_header to scan a single dicom and determine what kind of 
+  // data type to use for the import
+  bool scan_dicom();
 
-  // Templated function that reads in a series of dicoms and creates the data_block_ and the
-  // image_data_ so that we can create new layers
+  // SCAN_VFF:
+  // this function is called by import_header to read the vff header
+  bool scan_vff();
+
+  // SCAN_PNG:
+  // this function is called by import_header to scan a single png and determine what kind of 
+  // data type to use for the import
+  bool scan_png();
+
+  // IMPORT_DICOM_SERIES:
+  // Templated function that reads in a series of dicoms, creates the data_block_ and the
+  // image_data_
   template< class PixelType >
   bool import_dicom_series()
+  {
+    // Step 1: setup the image type
+    const unsigned int Dimension = 3;
+    typedef itk::Image< PixelType, Dimension > ImageType;
+
+    // Step 2: using the image type, create a ITK reader
+    typedef itk::ImageSeriesReader< ImageType > ReaderType;
+    typename ReaderType::Pointer reader = ReaderType::New();
+
+    // Step 3: now because we are importing dicoms we create a GDCM IO object
+    typedef itk::GDCMImageIO ImageIOType;
+    ImageIOType::Pointer dicomIO = ImageIOType::New();
+
+    // Step 4: now we set the io and the file list in the reader
+    reader->SetImageIO( dicomIO );
+    reader->SetFileNames( this->file_list_ );
+
+    // Step 5: now we attempt to actually read in the file and catch potential errors
+    try
+    {
+      reader->Update();
+    }
+    catch ( itk::ExceptionObject &err )
+    {
+      std::string itk_error = err.GetDescription();
+    }
+    catch( gdcm::Exception &error )
+    {
+      std::string format_error = error.getError();
+    }
+
+    // Step 6: here we instantiate a new DataBlock using the output from the reader
+    this->data_block_ = Core::ITKDataBlock::New< PixelType >( 
+      typename itk::Image< PixelType, 3 >::Pointer( reader->GetOutput() ) );
+
+    // Step 6: here we instantiate a new ITKImageData using the output from the reader
+    this->image_data_ = typename Core::ITKImageDataT< PixelType >::Handle( 
+      new typename Core::ITKImageDataT< PixelType >( reader->GetOutput() ) );
+
+    // Step 7: now we check to see if we were successful creating our datablock and image
+    // if we were then we set the grid transform.
+    if( this->image_data_ && this->data_block_ )
+    {
+      this->grid_transform_ = this->image_data_->get_grid_transform();
+      return true;
+    }
+    else
+    {
+      // otherwise we return false
+      return false;
+    }
+  }
+
+  // IMPORT_PNG_SERIES:
+  // Templated function for importing a series of PNG's
+  template< class PixelType >
+  bool import_png_series()
   {
     const unsigned int Dimension = 3;
     typedef itk::Image< PixelType, Dimension > ImageType;
@@ -109,10 +185,7 @@ private:
     typedef itk::ImageSeriesReader< ImageType > ReaderType;
     typename ReaderType::Pointer reader = ReaderType::New();
 
-    typedef itk::GDCMImageIO ImageIOType;
-    ImageIOType::Pointer dicomIO = ImageIOType::New();
-
-    reader->SetImageIO( dicomIO );
+    reader->SetImageIO( itk::PNGImageIO::New() );
     reader->SetFileNames( this->file_list_ );
 
     try
@@ -134,6 +207,8 @@ private:
     this->image_data_ = typename Core::ITKImageDataT< PixelType >::Handle( 
       new typename Core::ITKImageDataT< PixelType >( reader->GetOutput() ) );
 
+    this->grid_transform_ = this->image_data_->get_grid_transform();
+
     if( this->image_data_ && this->data_block_ )
     {
       return true;
@@ -144,9 +219,10 @@ private:
     }
   }
 
-  // IMPORT_PNG_SERIES:
-  // does nothing yet
-  bool import_png_series();
+  // IMPORT_VFF:
+  // a function that takes the information we read from the header and uses it to import an image
+  // from a vff file.
+  bool import_vff();
 
   // SET_EXTENSION:
   // we need to know which type of file we are dealing with, this function provides that ability,
@@ -158,15 +234,20 @@ private:
     // now we force it to be lower case, just to be safe.
     boost::to_lower( this->extension_ );
   }
+  
 
 private:
-  Core::ITKImageDataHandle image_data_;
-  Core::DataBlockHandle data_block_;
-  std::vector< std::string > file_list_;
-  int bits_;
-  bool signed_data_;
-  int pixel_type_;
-  std::string extension_;
+  Core::ITKImageDataHandle        image_data_;
+  Core::DataBlockHandle         data_block_;
+  Core::GridTransform           grid_transform_;
+  std::vector< std::string >        file_list_;
+  int                   bits_;
+  bool                  signed_data_;
+  bool                  multifile_;
+  int                   pixel_type_;
+  std::string               extension_;
+  std::map< std::string, std::string >  vff_values_;
+  size_t                  vff_end_of_header_;
 
 };
 

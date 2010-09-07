@@ -87,7 +87,7 @@ bool ActionImportLayer::run( Core::ActionContextHandle& context, Core::ActionRes
   if( this->series_import_.value() == true )
   {
     file_or_folder_name = boost::filesystem::path( 
-      this->layer_importer_.handle()->get_filename() ).parent_path().leaf();
+      this->layer_importer_.handle()->get_filename() ).parent_path().filename();
   }
   else
   {

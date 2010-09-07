@@ -213,13 +213,14 @@ protected:
   // Set the type of the data
   void set_type( DataType type );
 
-  // SET_DATA
-  // Set the data pointer of the data
-  void set_data( void* data );
-
   // SET_HISTOGRAM:
   // Set the histogram of the dataset
   void set_histogram( const Histogram& histogram );
+
+public:
+  // SET_DATA
+  // Set the data pointer of the data
+  void set_data( void* data );
 
   // -- Signals and slots --
 public:
