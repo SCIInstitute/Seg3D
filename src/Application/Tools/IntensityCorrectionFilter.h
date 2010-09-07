@@ -56,6 +56,9 @@ public:
   // Whether the layer needs to be replaced
   Core::StateBoolHandle replace_state_;
 
+  // Whether the data format needs to be preserved in the filter
+  Core::StateBoolHandle preserve_data_format_state_;
+  
   // The polynomial order to fit
   Core::StateRangedIntHandle order_state_;
 

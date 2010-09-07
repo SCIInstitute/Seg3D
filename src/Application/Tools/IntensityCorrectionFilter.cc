@@ -35,7 +35,7 @@
 #include <Application/Tools/IntensityCorrectionFilter.h>
 
 // Action associated with tool
-// #include <Application/Tools/Actions/ActionIntensityCorrectionFilter.h>
+#include <Application/Tools/Actions/ActionIntensityCorrectionFilter.h>
 
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL( Seg3D, IntensityCorrectionFilter )
@@ -48,8 +48,9 @@ IntensityCorrectionFilter::IntensityCorrectionFilter( const std::string& toolid 
 {
   // Need to set ranges and default values for all parameters
   this->add_state( "replace", this->replace_state_, false );
-  this->add_state( "order", this->order_state_, 1, 1, 3, 1 );
-  this->add_state( "edge", this->edge_state_, 0.1, 0.0, 1.0, 0.01 );
+  this->add_state( "preserve_data_format", this->preserve_data_format_state_, true );
+  this->add_state( "order", this->order_state_, 1, 1, 4, 1 );
+  this->add_state( "edge", this->edge_state_, 0.15, 0.0, 1.0, 0.01 );
 }
 
 IntensityCorrectionFilter::~IntensityCorrectionFilter()
@@ -59,11 +60,12 @@ IntensityCorrectionFilter::~IntensityCorrectionFilter()
 
 void IntensityCorrectionFilter::execute( Core::ActionContextHandle context )
 { 
-//  ActionIntensityCorrectionFilter::Dispatch( context,
-//    this->target_layer_state_->get(),
-//    this->replace_state_->get(),
-//    this->order_state_->get(),
-//    this->edge_state_->get() );
+  ActionIntensityCorrectionFilter::Dispatch( context,
+    this->target_layer_state_->get(),
+    this->preserve_data_format_state_->get(),
+    this->replace_state_->get(),
+    this->order_state_->get(),
+    this->edge_state_->get() );
 }
   
 } // end namespace Seg3D

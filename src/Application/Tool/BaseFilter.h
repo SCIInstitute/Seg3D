@@ -73,6 +73,10 @@ public:
   // Check the abort flag
   bool check_abort(); 
     
+  // CONNECT_ABORT:
+  // Monitor the abort flag of a layer
+  void connect_abort( const LayerHandle& layer ); 
+    
   // -- shortcuts into the LayerManager --  
 public:
   // FIND_LAYER:

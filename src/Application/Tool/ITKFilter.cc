@@ -92,9 +92,11 @@ class ITKProgressObserver : public itk::Command
 {
   // -- constructor /destructor --
 public:
-  ITKProgressObserver( LayerHandle layer ) :
+  ITKProgressObserver( LayerHandle layer, float progress_start, float progress_amount ) :
     layer_( layer ),
-    progress_( 0.0f )
+    progress_( 0.0f ),
+    progress_start_ ( progress_start ),
+    progress_amount_ ( progress_amount )
   {}
 
   // NOTE: Virtual destructor is needed for ITK
@@ -110,7 +112,8 @@ public:
       std::string event_name = event.GetEventName(); 
       if ( event_name == "ProgressEvent" )
       {
-        float progress = obj->GetProgress();
+        float progress = ( obj->GetProgress() * this->progress_amount_ ) + 
+          this->progress_start_;
         if ( progress > ( this->progress_ + 0.01f ) )
         {
           this->progress_ = progress;
@@ -144,14 +147,17 @@ private:
   LayerHandle layer_;
   
   float progress_;
+  float progress_start_;
+  float progress_amount_;
 
 };
 
 void ITKFilter::observe_itk_filter_internal( itk::ProcessObject::Pointer filter, 
-  const LayerHandle& layer )
+  const LayerHandle& layer, float progress_start, float progress_amount )
 {
   // Setup progress measuring, by forwarding progress to the filter
-  filter->AddObserver( itk::ProgressEvent() , new ITKProgressObserver( layer ) );
+  filter->AddObserver( itk::ProgressEvent() , new ITKProgressObserver( layer, progress_start,
+    progress_amount ) );
 
   ITKFilterPrivate::lock_type lock( this->private_->get_mutex() );
 

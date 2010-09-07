@@ -107,6 +107,8 @@ SET(APPLICATION_TOOLS_ACTIONS_SRCS
   Actions/ActionGradientMagnitudeFilter.cc
   Actions/ActionHistogramEqualizationFilter.h
   Actions/ActionHistogramEqualizationFilter.cc
+  Actions/ActionIntensityCorrectionFilter.h
+  Actions/ActionIntensityCorrectionFilter.cc
   Actions/ActionMedianFilter.h
   Actions/ActionMedianFilter.cc
   Actions/ActionThreshold.h

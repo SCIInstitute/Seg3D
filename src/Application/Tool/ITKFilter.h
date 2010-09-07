@@ -137,6 +137,16 @@ protected:
   bool insert_itk_image_into_layer( const LayerHandle& layer, 
     typename itk::Image<T,3>* itk_image )
   {
+    typename itk::Image<T,3>::Pointer pointer = itk_image;
+    return insert_itk_image_pointer_into_layer<T>( layer, pointer );
+  }
+
+  // INSERT_ITK_IMAGE_POINTER_INTO_LAYER:
+  // Insert an itk image back into a layer
+  template< class T >
+  bool insert_itk_image_pointer_into_layer( const LayerHandle& layer, 
+    typename itk::Image<T,3>::Pointer itk_image )
+  {
   
     // If the layer is a data layer
     if ( layer->type() == Core::VolumeType::DATA_E )
@@ -145,8 +155,7 @@ protected:
 
       // Wrap an ITKImageData object around the itk object
       Core::DataVolumeHandle data_volume( new Core::DataVolume( 
-        data_layer->get_grid_transform(), Core::ITKDataBlock::New<T>( 
-          typename itk::Image<T,3>::Pointer( itk_image ) ) ) );
+        data_layer->get_grid_transform(), Core::ITKDataBlock::New<T>( itk_image ) ) );
         
       // NOTE: Do not need an update of the generation number as this volume 
       // was generated from scratch. But it will need a new histogram
@@ -185,12 +194,21 @@ protected:
     return false;
   }
 
-
-  // INSERT_ITK_LABEL_INTO_MASK_LAYER:
+  // INSERT_ITK_IMAGE_INTO_LAYER:
   // Insert an itk image back into a layer
   template< class T >
   bool insert_itk_label_into_mask_layer( const LayerHandle& layer, 
     typename itk::Image<T,3>* itk_image, T label )
+  {
+    typename itk::Image<T,3>::Pointer pointer = itk_image;
+    return insert_itk_label_pointer_into_mask_layer<T>( layer, pointer, label );
+  }
+
+  // INSERT_ITK_LABEL_POINTER_INTO_MASK_LAYER:
+  // Insert an itk image back into a layer
+  template< class T >
+  bool insert_itk_label_pointer_into_mask_layer( const LayerHandle& layer, 
+    typename itk::Image<T,3>::Pointer itk_image, T label )
   {
     if ( layer->type() == Core::VolumeType::MASK_E )
     {
@@ -199,8 +217,7 @@ protected:
       // Need to make an intermediate representation as a datablock of the data
       // before it can be uploaded into the mask.
       // NOTE: This only generates a wrapper, no new data is generated
-      Core::DataBlockHandle data_block = Core::ITKDataBlock::New<T>( 
-        typename itk::Image<T,3>::Pointer( itk_image ) );
+      Core::DataBlockHandle data_block = Core::ITKDataBlock::New<T>( itk_image );
       
       // NOTE: The only reason we need the transform here, is that data blocks are
       // sorted by grid transform so we can use the nrrd library to save them, the
@@ -229,6 +246,17 @@ protected:
   bool convert_and_insert_itk_image_into_layer( const LayerHandle& layer, 
     typename itk::Image<T,3>* itk_image, Core::DataType data_type )
   {
+    typename itk::Image<T,3>::Pointer pointer = itk_image;
+    return convert_and_insert_itk_image_pointer_into_layer<T>( layer, 
+      pointer, data_type );
+  }
+
+  // CONVERT_AND_INSERT_ITK_IMAGE_POINTER_INTO_LAYER:
+  // Insert an itk image back into a layer
+  template< class T >
+  bool convert_and_insert_itk_image_pointer_into_layer( const LayerHandle& layer, 
+    typename itk::Image<T,3>::Pointer itk_image, Core::DataType data_type )
+  {
   
     // If the layer is a data layer
     if ( layer->type() == Core::VolumeType::DATA_E )
@@ -236,8 +264,7 @@ protected:
       DataLayerHandle data_layer = boost::dynamic_pointer_cast<DataLayer>( layer );
 
       // Wrap an ITKImageData object around the itk object
-      Core::DataBlockHandle data_block_src = Core::ITKDataBlock::New<T>( 
-          typename itk::Image<T,3>::Pointer( itk_image ) ) ;
+      Core::DataBlockHandle data_block_src = Core::ITKDataBlock::New<T>( itk_image ) ;
       Core::DataBlockHandle data_block_dst = data_block_src;
       if ( data_block_src->get_data_type() != data_type )
       {
@@ -288,15 +315,17 @@ protected:
   // OBSERVE_ITK_FILTER:
   // Forward the progress an itk filter is making and check for the abort statud of the layer
   template< class T>
-  void observe_itk_filter( T filter_pointer, const LayerHandle& layer )
+  void observe_itk_filter( T filter_pointer, const LayerHandle& layer, 
+    float progress_start = 0.0, float progress_amount = 1.0 )
   {
-    this->observe_itk_filter_internal( itk::ProcessObject::Pointer( filter_pointer ), layer );
+    this->observe_itk_filter_internal( itk::ProcessObject::Pointer( filter_pointer ), layer,
+      progress_start, progress_amount );
   }
   
 private:  
   // Internal function for setting up itk progress forwarding
   void observe_itk_filter_internal( itk::ProcessObject::Pointer filter, 
-    const LayerHandle& layer ); 
+    const LayerHandle& layer, float progress_start, float progress_amount );  
     
   ITKFilterPrivateHandle private_;
 };
@@ -323,7 +352,10 @@ public:\
   {\
     typedef itk::Image< float, 3> FLOAT_IMAGE_TYPE; \
     typedef itk::Image< unsigned char, 3> UCHAR_IMAGE_TYPE; \
-    typedef itk::Image< VALUE_TYPE, 3> TYPED_IMAGE_TYPE;
+    typedef itk::Image< VALUE_TYPE, 3> TYPED_IMAGE_TYPE; \
+    typedef Core::ITKImageDataT<VALUE_TYPE> TYPED_CONTAINER_TYPE; \
+    typedef Core::ITKImageDataT<float> FLOAT_CONTAINER_TYPE; \
+    typedef Core::ITKImageDataT<unsigned char> UCHAR_CONTAINER_TYPE;
   
 
 #define SCI_END_TYPED_RUN() \
@@ -336,6 +368,8 @@ public:\
   {\
     typedef itk::Image< float, 3> FLOAT_IMAGE_TYPE; \
     typedef itk::Image< unsigned char, 3> UCHAR_IMAGE_TYPE; \
+    typedef Core::ITKImageDataT<float> FLOAT_CONTAINER_TYPE; \
+    typedef Core::ITKImageDataT<unsigned char> UCHAR_CONTAINER_TYPE;
 
 #define SCI_END_FLOAT_RUN() \
   }

@@ -36,7 +36,7 @@
 namespace Seg3D
 {
 
-class BaseFilterPrivate
+class BaseFilterPrivate : public Core::ConnectionHandler
 {
 public:
   // Keep track of which layers were locked.
@@ -50,7 +50,16 @@ public:
   
   // Mutex protecting abort status
   boost::mutex abort_mutex_;
+
+  // Function for handling abort
+  void handle_abort();
 };
+
+void BaseFilterPrivate::handle_abort()
+{
+  boost::mutex::scoped_lock lock( abort_mutex_ );
+  abort_ = true;
+}
 
 BaseFilter::BaseFilter() :
   private_( new BaseFilterPrivate )
@@ -92,6 +101,13 @@ bool BaseFilter::check_abort()
 {
   boost::mutex::scoped_lock lock( this->private_->abort_mutex_ );
   return this->private_->abort_;
+}
+
+void BaseFilter::connect_abort( const  LayerHandle& layer )
+{
+  boost::mutex::scoped_lock lock( this->private_->abort_mutex_ );
+  this->private_->add_connection( layer->abort_signal_.connect( boost::bind(
+    &BaseFilterPrivate::handle_abort, this->private_ ) ) );
 }
 
 bool BaseFilter::find_layer( const std::string& layer_id, LayerHandle& layer )

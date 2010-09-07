@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_TOOL_ACTIONS_ACTIONCURVATUREANISOTROPICDIFFUSIONFILTER_H
-#define APPLICATION_TOOL_ACTIONS_ACTIONCURVATUREANISOTROPICDIFFUSIONFILTER_H
+#ifndef APPLICATION_TOOLS_ACTIONS_ACTIONINTENSITYCORRECTIONFILTER_H
+#define APPLICATION_TOOLS_ACTIONS_ACTIONINTENSITYCORRECTIONFILTER_H
 
 #include <Core/Action/Actions.h>
 #include <Core/Interface/Interface.h>
@@ -36,35 +36,36 @@
 namespace Seg3D
 {
 
-  
-class ActionCurvatureAnisotropicDiffusionFilter : public Core::Action
+class ActionIntensityCorrectionFilter : public Core::Action
 {
 
 CORE_ACTION( 
-  CORE_ACTION_TYPE( "CurvatureAnisotropicDiffusionFilter", "Run the ITK Curvature Anisotropic Diffusion Filter." )
+  CORE_ACTION_TYPE( "IntensityCorrection", "Correct for small gradients in intensity, "
+    "due for instance, an inhomogenous sensitivity of image recording systems, such as MRI." )
   CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
   CORE_ACTION_KEY( "preserve_data_format", "true", "ITK filters run in floating point percision,"
   " this option will convert the result back into the original format." )
-  CORE_ACTION_KEY( "replace", "true", "Replace the old layer (true), or add an new layer (false)" )
-  CORE_ACTION_KEY( "iterations", "5", "Number of iterations to perform." )
-  CORE_ACTION_KEY( "sensitivity", "0.1", "Weight for specifying how closely connected values are." )
+  CORE_ACTION_KEY( "replace", "true", "Replace the old layer (true), or add an new layer (false)." )
+  CORE_ACTION_KEY( "order", "2", "Polynomial order that approximates the sensitivity field." )
+  CORE_ACTION_KEY( "edge", "0.1", "The sensitivity to edges.")
 )
   
   // -- Constructor/Destructor --
 public:
-  ActionCurvatureAnisotropicDiffusionFilter()
+  ActionIntensityCorrectionFilter()
   {
     // Action arguments
-    this->add_argument( this->layer_id_ );
+    this->add_argument( this->target_layer_ );
     
     // Action options
     this->add_key( this->preserve_data_format_ );
-    this->add_key( this->replace_ );
-    this->add_key( this->iterations_ );
-    this->add_key( this->sensitivity_ );
+    this->add_key( this->replace_ );  
+      
+    this->add_key( this->order_ );
+    this->add_key( this->edge_ );
   }
   
-  virtual ~ActionCurvatureAnisotropicDiffusionFilter()
+  virtual ~ActionIntensityCorrectionFilter()
   {
   }
   
@@ -76,20 +77,20 @@ public:
   // -- Action parameters --
 private:
 
-  Core::ActionParameter< std::string > layer_id_;
+  Core::ActionParameter< std::string > target_layer_;
   Core::ActionParameter< bool > preserve_data_format_;
-  Core::ActionParameter< bool > replace_;
-  Core::ActionParameter< int > iterations_;
-  Core::ActionParameter< double > sensitivity_;
+  Core::ActionParameter< bool > replace_; 
+  Core::ActionParameter< int > order_;
+  Core::ActionParameter< double > edge_;
   
   // -- Dispatch this action from the interface --
 public:
-        
+
   // DISPATCH:
   // Create and dispatch action that inserts the new layer 
-  static void Dispatch( Core::ActionContextHandle context, std::string layer_id, 
-    int iterations, double sensitivity, bool preserve_data_format, bool replace );
-  
+  static void Dispatch( Core::ActionContextHandle context, 
+    std::string target_layer, bool preserve_data_format, bool replace,
+    int order, double edge );         
 };
   
 } // end namespace Seg3D

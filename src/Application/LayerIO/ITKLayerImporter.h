@@ -35,6 +35,7 @@
 
 // Boost includes 
 #include <boost/filesystem.hpp>
+#include <boost/algorithm/string.hpp>
 
 // Application includes
 #include <Application/LayerIO/LayerImporter.h>
@@ -99,14 +100,14 @@ private:
 
   // Templated function that reads in a series of dicoms and creates the data_block_ and the
   // image_data_ so that we can create new layers
-  template< typename PixelType >
+  template< class PixelType >
   bool import_dicom_series()
   {
     const unsigned int Dimension = 3;
     typedef itk::Image< PixelType, Dimension > ImageType;
 
     typedef itk::ImageSeriesReader< ImageType > ReaderType;
-    ReaderType::Pointer reader = ReaderType::New();
+    typename ReaderType::Pointer reader = ReaderType::New();
 
     typedef itk::GDCMImageIO ImageIOType;
     ImageIOType::Pointer dicomIO = ImageIOType::New();
@@ -128,10 +129,10 @@ private:
     }
 
     this->data_block_ = Core::ITKDataBlock::New< PixelType >( 
-      itk::Image< PixelType, 3 >::Pointer( reader->GetOutput() ) );
+      typename itk::Image< PixelType, 3 >::Pointer( reader->GetOutput() ) );
 
-    this->image_data_ = Core::ITKImageDataT< PixelType >::Handle( 
-      new Core::ITKImageDataT< PixelType >( reader->GetOutput() ) );
+    this->image_data_ = typename Core::ITKImageDataT< PixelType >::Handle( 
+      new typename Core::ITKImageDataT< PixelType >( reader->GetOutput() ) );
 
     if( this->image_data_ && this->data_block_ )
     {
@@ -155,8 +156,7 @@ private:
     this->extension_ = boost::filesystem::path( this->file_list_[ 0 ] ).extension();
     
     // now we force it to be lower case, just to be safe.
-    std::transform (this->extension_.begin(), this->extension_.end(), 
-      this->extension_.begin(), std::tolower );
+    boost::to_lower( this->extension_ );
   }
 
 private:

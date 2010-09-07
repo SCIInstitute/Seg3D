@@ -65,6 +65,13 @@
           </property>
          </widget>
         </item>
+        <item>
+         <widget class="QCheckBox" name="preserve_data_format_">
+          <property name="text">
+           <string>Preserve Data Format</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </widget>
      </item>

@@ -86,6 +86,8 @@ bool IntensityCorrectionFilterInterface::build_widget( QFrame* frame )
     tool->target_layer_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.use_active_layer_, 
     tool->use_active_layer_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.preserve_data_format_,
+    tool->preserve_data_format_state_ );
 
   QtUtils::QtBridge::Connect( this->private_->order_, 
     tool->order_state_ );
