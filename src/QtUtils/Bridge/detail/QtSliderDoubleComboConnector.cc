@@ -47,10 +47,12 @@ QtSliderDoubleComboConnector::QtSliderDoubleComboConnector( QtSliderDoubleCombo*
   
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-    double min_val, max_val;
+    double min_val, max_val, step_size;
     state->get_range( min_val, max_val );
+    state->get_step( step_size );
     parent->setRange( min_val, max_val );
     parent->setCurrentValue( state->get() );
+    parent->setStep( step_size );
     this->add_connection( state->value_changed_signal_.connect(
       boost::bind( &QtSliderDoubleComboConnector::SetValue, qpointer, _1, _2 ) ) );
     this->add_connection( state->range_changed_signal_.connect(

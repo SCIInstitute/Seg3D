@@ -205,7 +205,7 @@ protected:
     variant.get_value( value );
     if ( value < this->min_value_ || value > this->max_value_ )
     {
-      error = "Value " + ExportToString( value ) + "is out of range [" + ExportToString(
+      error = "Value " + ExportToString( value ) + " is out of range [" + ExportToString(
           this->min_value_ ) + "," + ExportToString( this->max_value_ ) + "]";
       return false;
     }

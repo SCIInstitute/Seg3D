@@ -87,6 +87,8 @@ SET(APPLICATION_TOOLS_SRCS
   ThresholdSegmentationLSFilter.cc
   ResampleTool.h
   ResampleTool.cc
+  CropTool.h
+  CropTool.cc
   )
 
 SET(APPLICATION_TOOLS_NOREGISTER_SRCS
@@ -119,6 +121,8 @@ SET(APPLICATION_TOOLS_ACTIONS_SRCS
   Actions/ActionInvert.cc
   Actions/ActionResample.h
   Actions/ActionResample.cc
+  Actions/ActionCrop.h
+  Actions/ActionCrop.cc
   )
 
 CORE_ADD_LIBRARY(Application_Tools 

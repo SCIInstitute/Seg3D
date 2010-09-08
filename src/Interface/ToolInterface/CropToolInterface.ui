@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>252</width>
-    <height>423</height>
+    <height>484</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -38,13 +38,13 @@
    <string>Crop Tool</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QWidget#BinaryDilateErodeFilterInterface{
+   <string notr="true">QWidget#CropToolInterface{
   border-radius: 3px;
   border: 1px solid rgb(80, 80,80);
   background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(221, 221, 221, 255), stop:0.155779 rgba(228, 228, 228, 255), stop:1 rgba(202, 204, 204, 255));      
 }</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_4">
+  <layout class="QVBoxLayout" name="verticalLayout_7">
    <property name="spacing">
     <number>2</number>
    </property>
@@ -65,24 +65,18 @@
        <height>194</height>
       </size>
      </property>
-     <property name="baseSize">
-      <size>
-       <width>0</width>
-       <height>80</height>
-      </size>
-     </property>
      <property name="font">
       <font>
        <pointsize>10</pointsize>
       </font>
      </property>
      <property name="title">
-      <string>Targets:</string>
+      <string>Target Group</string>
      </property>
      <property name="flat">
       <bool>false</bool>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
+     <layout class="QVBoxLayout" name="verticalLayout_4">
       <property name="leftMargin">
        <number>4</number>
       </property>
@@ -96,20 +90,8 @@
        <number>4</number>
       </property>
       <item>
-       <widget class="QWidget" name="widget_3" native="true">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>42</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>42</height>
-         </size>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout">
+       <widget class="QWidget" name="widget_9" native="true">
+        <layout class="QVBoxLayout" name="verticalLayout_5">
          <property name="spacing">
           <number>2</number>
          </property>
@@ -117,26 +99,7 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QLabel" name="label">
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>16</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>16</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>Group:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QWidget" name="widget_4" native="true">
+          <widget class="QWidget" name="widget_10" native="true">
            <property name="minimumSize">
             <size>
              <width>0</width>
@@ -149,7 +112,7 @@
              <height>24</height>
             </size>
            </property>
-           <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <layout class="QHBoxLayout" name="horizontalLayout_6">
             <property name="spacing">
              <number>0</number>
             </property>
@@ -173,86 +136,199 @@
        </widget>
       </item>
       <item>
-       <widget class="QTreeWidget" name="layer_treewidget_">
+       <widget class="QWidget" name="widget_11" native="true">
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>100</height>
+          <height>24</height>
          </size>
         </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>100</height>
-         </size>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="margin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="dimensions_label_current_">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>72</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="layoutDirection">
+            <enum>Qt::LeftToRight</enum>
+           </property>
+           <property name="text">
+            <string>Dimensions:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="x_axis_label_current_">
+           <property name="text">
+            <string>X:</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_nx_">
+           <property name="text">
+            <string>300</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="y_axis_label_current_">
+           <property name="text">
+            <string>Y:</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_ny_">
+           <property name="text">
+            <string>200</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="z_axis_label_current_">
+           <property name="text">
+            <string>Z:</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_nz_">
+           <property name="text">
+            <string>400</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="groupBox">
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
         </property>
-        <property name="horizontalScrollBarPolicy">
-         <enum>Qt::ScrollBarAlwaysOff</enum>
+        <property name="title">
+         <string>Layers</string>
         </property>
-        <property name="indentation">
-         <number>0</number>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
         </property>
-        <property name="headerHidden">
+        <property name="flat">
          <bool>true</bool>
         </property>
-        <column>
-         <property name="text">
-          <string>1</string>
+        <property name="checkable">
+         <bool>false</bool>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_6">
+         <property name="spacing">
+          <number>2</number>
          </property>
-        </column>
-        <item>
-         <property name="text">
-          <string>layer_1</string>
+         <property name="leftMargin">
+          <number>2</number>
          </property>
-         <property name="checkState">
-          <enum>Unchecked</enum>
+         <property name="topMargin">
+          <number>4</number>
          </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>layer_2</string>
+         <property name="rightMargin">
+          <number>2</number>
          </property>
-         <property name="checkState">
-          <enum>Unchecked</enum>
+         <property name="bottomMargin">
+          <number>2</number>
          </property>
-        </item>
+         <item>
+          <widget class="QListWidget" name="layer_list_">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>100</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>100</height>
+            </size>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::StyledPanel</enum>
+           </property>
+           <property name="selectionMode">
+            <enum>QAbstractItemView::MultiSelection</enum>
+           </property>
+           <property name="resizeMode">
+            <enum>QListView::Adjust</enum>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
      </layout>
     </widget>
    </item>
    <item>
-    <widget class="QWidget" name="crop_" native="true">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>205</height>
-      </size>
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>Crop Box</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_23">
-      <property name="spacing">
+     <property name="flat">
+      <bool>false</bool>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="leftMargin">
+       <number>4</number>
+      </property>
+      <property name="topMargin">
        <number>2</number>
       </property>
-      <property name="margin">
+      <property name="rightMargin">
+       <number>4</number>
+      </property>
+      <property name="bottomMargin">
        <number>4</number>
       </property>
       <item>
-       <widget class="Line" name="line_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QTabWidget" name="roi_tab_widget_">
+       <widget class="QTabWidget" name="tab_widget_">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
-        </property>
-        <property name="tabPosition">
-         <enum>QTabWidget::North</enum>
         </property>
         <property name="tabShape">
          <enum>QTabWidget::Rounded</enum>
@@ -271,27 +347,18 @@
           </size>
          </property>
          <attribute name="title">
-          <string>Center</string>
+          <string>Origin</string>
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <property name="spacing">
            <number>2</number>
           </property>
-          <property name="leftMargin">
-           <number>4</number>
-          </property>
-          <property name="topMargin">
-           <number>6</number>
-          </property>
-          <property name="rightMargin">
-           <number>4</number>
-          </property>
-          <property name="bottomMargin">
+          <property name="margin">
            <number>4</number>
           </property>
           <item>
            <widget class="QWidget" name="widget" native="true">
-            <layout class="QVBoxLayout" name="horizontalLayout_11">
+            <layout class="QVBoxLayout" name="start_x_layout_">
              <property name="spacing">
               <number>2</number>
              </property>
@@ -302,8 +369,14 @@
               <widget class="QLabel" name="x_label_">
                <property name="minimumSize">
                 <size>
-                 <width>10</width>
+                 <width>36</width>
                  <height>0</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>36</width>
+                 <height>16777215</height>
                 </size>
                </property>
                <property name="text">
@@ -316,7 +389,7 @@
           </item>
           <item>
            <widget class="QWidget" name="widget_2" native="true">
-            <layout class="QVBoxLayout" name="horizontalLayout_12">
+            <layout class="QVBoxLayout" name="start_y_layout_">
              <property name="spacing">
               <number>2</number>
              </property>
@@ -327,8 +400,14 @@
               <widget class="QLabel" name="y_label_">
                <property name="minimumSize">
                 <size>
-                 <width>10</width>
+                 <width>36</width>
                  <height>0</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>36</width>
+                 <height>16777215</height>
                 </size>
                </property>
                <property name="text">
@@ -341,7 +420,7 @@
           </item>
           <item>
            <widget class="QWidget" name="widget_5" native="true">
-            <layout class="QVBoxLayout" name="horizontalLayout_14">
+            <layout class="QVBoxLayout" name="start_z_layout_">
              <property name="spacing">
               <number>2</number>
              </property>
@@ -352,8 +431,14 @@
               <widget class="QLabel" name="z_label_">
                <property name="minimumSize">
                 <size>
-                 <width>10</width>
+                 <width>36</width>
                  <height>0</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>36</width>
+                 <height>16777215</height>
                 </size>
                </property>
                <property name="text">
@@ -380,21 +465,12 @@
           <property name="spacing">
            <number>2</number>
           </property>
-          <property name="leftMargin">
-           <number>4</number>
-          </property>
-          <property name="topMargin">
-           <number>6</number>
-          </property>
-          <property name="rightMargin">
-           <number>4</number>
-          </property>
-          <property name="bottomMargin">
+          <property name="margin">
            <number>4</number>
           </property>
           <item>
            <widget class="QWidget" name="widget_6" native="true">
-            <layout class="QVBoxLayout" name="horizontalLayout_9">
+            <layout class="QVBoxLayout" name="size_x_layout_">
              <property name="spacing">
               <number>2</number>
              </property>
@@ -409,6 +485,12 @@
                  <height>0</height>
                 </size>
                </property>
+               <property name="maximumSize">
+                <size>
+                 <width>36</width>
+                 <height>16777215</height>
+                </size>
+               </property>
                <property name="text">
                 <string>Width:</string>
                </property>
@@ -419,7 +501,7 @@
           </item>
           <item>
            <widget class="QWidget" name="widget_7" native="true">
-            <layout class="QVBoxLayout" name="horizontalLayout_7">
+            <layout class="QVBoxLayout" name="size_y_layout_">
              <property name="spacing">
               <number>2</number>
              </property>
@@ -434,6 +516,12 @@
                  <height>0</height>
                 </size>
                </property>
+               <property name="maximumSize">
+                <size>
+                 <width>36</width>
+                 <height>16777215</height>
+                </size>
+               </property>
                <property name="text">
                 <string>Height:</string>
                </property>
@@ -444,7 +532,7 @@
           </item>
           <item>
            <widget class="QWidget" name="widget_8" native="true">
-            <layout class="QVBoxLayout" name="horizontalLayout_10">
+            <layout class="QVBoxLayout" name="size_z_layout_">
              <property name="spacing">
               <number>2</number>
              </property>
@@ -459,6 +547,12 @@
                  <height>0</height>
                 </size>
                </property>
+               <property name="maximumSize">
+                <size>
+                 <width>36</width>
+                 <height>16777215</height>
+                </size>
+               </property>
                <property name="text">
                 <string>Depth:</string>
                </property>
@@ -471,8 +565,38 @@
         </widget>
        </widget>
       </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QWidget" name="widget_14" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>32</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>32</height>
+      </size>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="1,1">
+      <property name="spacing">
+       <number>4</number>
+      </property>
+      <property name="margin">
+       <number>0</number>
+      </property>
       <item>
-       <widget class="QWidget" name="widget_14" native="true">
+       <widget class="QCheckBox" name="replace_checkbox_">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -485,60 +609,30 @@
           <height>32</height>
          </size>
         </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="1,1">
-         <property name="spacing">
-          <number>4</number>
-         </property>
-         <property name="margin">
-          <number>0</number>
-         </property>
-         <item>
-          <widget class="QCheckBox" name="crop_replace_checkBox_">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="font">
-            <font>
-             <pointsize>10</pointsize>
-            </font>
-           </property>
-           <property name="toolTip">
-            <string>Check this box to replace the current layer with the cropped one</string>
-           </property>
-           <property name="text">
-            <string>Replace</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="roi_crop_button_">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Crop</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
+        <property name="font">
+         <font>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="toolTip">
+         <string>Check this box to replace the current layer with the cropped one</string>
+        </property>
+        <property name="text">
+         <string>Replace</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="crop_button_">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Crop</string>
+        </property>
        </widget>
       </item>
      </layout>

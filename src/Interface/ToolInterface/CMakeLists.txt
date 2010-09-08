@@ -54,6 +54,7 @@ SET(INTERFACE_TOOLINTERFACE_SRCS
   OtsuThresholdFilterInterface.cc
   ThresholdSegmentationLSFilterInterface.cc
   ResampleToolInterface.cc
+  CropToolInterface.cc
 )
 
 SET(INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_SRCS
@@ -84,6 +85,7 @@ SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
   OtsuThresholdFilterInterface.h
   ThresholdSegmentationLSFilterInterface.h
   ResampleToolInterface.h
+  CropToolInterface.h
 )
 
 SET(INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_MOC_SRCS

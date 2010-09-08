@@ -27,18 +27,14 @@
  */
 
 #include <Core/Utils/ScopedCounter.h>
-#include <Core/Volume/DataVolumeSlice.h>
-#include <Core/RenderResources/RenderResources.h>
 
 // Application includes
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/ResampleTool.h>
 #include <Application/Tools/Actions/ActionResample.h>
-#include <Application/Tools/detail/MaskShader.h>
 #include <Application/Layer/Layer.h>
 #include <Application/Layer/LayerGroup.h>
 #include <Application/LayerManager/LayerManager.h>
-#include <Application/ViewerManager/ViewerManager.h>
 
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL( Seg3D, ResampleTool )

@@ -320,6 +320,9 @@ bool ResampleAlgo::nrrd_resmaple( Nrrd* nin, Nrrd* nout, NrrdKernelSpec* unuk )
 
 void ResampleAlgo::resmaple_data_layer( DataLayerHandle input, DataLayerHandle output )
 {
+  Core::DataBlock::shared_lock_type data_lock( input->get_data_volume()->
+    get_data_block()->get_mutex() );
+
   Core::NrrdDataHandle nrrd_in( new Core::NrrdData( 
     input->get_data_volume()->get_data_block(),
     input->get_grid_transform().transform() ) );
@@ -439,7 +442,7 @@ ActionResample::ActionResample() :
 
 bool ActionResample::validate( Core::ActionContextHandle& context )
 {
-  const std::vector< std::string > layer_ids = this->private_->layer_ids_.value();
+  const std::vector< std::string >& layer_ids = this->private_->layer_ids_.value();
   if ( layer_ids.size() == 0 )
   {
     context->report_error( "No input layers specified" );
@@ -503,7 +506,7 @@ bool ActionResample::run( Core::ActionContextHandle& context,
   algo->dimesions_[ 2 ] = static_cast< unsigned int >( this->private_->z_.value() );
 
   // Set up input and output layers
-  const std::vector< std::string > layer_ids = this->private_->layer_ids_.value();
+  const std::vector< std::string >& layer_ids = this->private_->layer_ids_.value();
   Core::GridTransform output_transform;
   algo->compute_output_grid_transform( layer_ids[ 0 ], output_transform );
   size_t num_of_layers = layer_ids.size();
