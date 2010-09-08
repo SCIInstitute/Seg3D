@@ -35,7 +35,7 @@
 #include <Application/Tools/OtsuThresholdFilter.h>
 
 // Action associated with tool
-// #include <Application/Tools/Actions/ActionOtsuThresholdFilter.h>
+#include <Application/Tools/Actions/ActionOtsuThresholdFilter.h>
 
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL( Seg3D, OtsuThresholdFilter )
@@ -57,9 +57,9 @@ OtsuThresholdFilter::~OtsuThresholdFilter()
 
 void OtsuThresholdFilter::execute( Core::ActionContextHandle context )
 { 
-//  ActionOtsuThresholdFilter::Dispatch( context,
-//    this->target_layer_state_->get(),
-//    this->amount_state_->get() );
+  ActionOtsuThresholdFilter::Dispatch( context,
+    this->target_layer_state_->get(),
+    this->amount_state_->get() );
 }
   
 } // end namespace Seg3D

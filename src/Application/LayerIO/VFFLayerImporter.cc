@@ -26,6 +26,9 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// STL includes
+#include <fstream>
+
 // Boost Includes
 #include <boost/lexical_cast.hpp>
 
