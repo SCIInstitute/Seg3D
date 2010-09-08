@@ -110,14 +110,31 @@ public:
 
   // -- mouse and keyboard event handlers --
 public:
+  // HANDLE_MOUSE_ENTER:
+  // Called when the mouse has entered a viewer.
   virtual bool handle_mouse_enter( size_t viewer_id, int x, int y );
+
+  // HANDLE_MOUSE_LEAVE:
+  // Called when the mouse has left a viewer.
   virtual bool handle_mouse_leave( size_t viewer_id );
+
+  // HANDLE_MOUSE_MOVE:
+  // Called when the mouse moves in a viewer.
   virtual bool handle_mouse_move( const Core::MouseHistory& mouse_history, 
     int button, int buttons, int modifiers );
+
+  // HANDLE_MOUSE_PRESS:
+  // Called when a mouse button has been pressed.
   virtual bool handle_mouse_press( const Core::MouseHistory& mouse_history, 
     int button, int buttons, int modifiers );
+
+  // HANDLE_MOUSE_RELEASE:
+  // Called when a mouse button has been released.
   virtual bool handle_mouse_release( const Core::MouseHistory& mouse_history, 
     int button, int buttons, int modifiers );
+
+  // HANDLE_WHEEL:
+  // Called when the mouse wheel has been rotated.
   virtual bool handle_wheel( int delta, int x, int y, int buttons, int modifiers );
 
 public:

@@ -35,6 +35,7 @@ SET(CORE_VIEWER_SRCS
   AbstractViewer.h
   AbstractViewer.cc
   Mouse.h
+  Cursor.h
 )
 
 ##################################################

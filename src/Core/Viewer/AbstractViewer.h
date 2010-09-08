@@ -42,6 +42,7 @@
 #include <Core/State/StateHandler.h>
 #include <Core/Utils/EnumClass.h>
 #include <Core/Utils/Lockable.h>
+#include <Core/Viewer/Cursor.h>
 #include <Core/Viewer/Mouse.h>
 
 namespace Core
@@ -114,7 +115,7 @@ public:
   // -- Signals and Slots --
 public:
   // UPDATE_DISPLAY_SIGNAL_:
-  // Triggered when new texture is received.
+  // Triggered when new texture is received, or a different cursor shape is set.
   typedef boost::signals2::signal< void () > update_display_signal_type;
   update_display_signal_type update_display_signal_;
 
@@ -140,13 +141,13 @@ public:
   // Get the height of the viewer
   int get_height() const;
 
-  // SET_CURSOR_VISIBLE:
-  // Set the visibility of cursor in the viewer.
-  void set_cursor_visible( bool visible = true );
+  // SET_CURSOR:
+  // Set the shape of the cursor in the viewer.
+  void set_cursor( CursorShape cursor );
 
-  // GET_CURSOR_VISIBLE:
-  // Get the visibility of cursor in the viewer.
-  bool get_cursor_visible() const;
+  // GET_CURSOR:
+  // Get the shape of the cursor in the viewer.
+  CursorShape get_cursor() const;
 
 protected:
   // GET_RENDERER:

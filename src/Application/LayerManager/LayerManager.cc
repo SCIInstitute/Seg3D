@@ -96,7 +96,7 @@ bool LayerManager::insert_layer( LayerHandle layer )
     {
       new_group = true;
       group_handle = LayerGroupHandle( new LayerGroup(  layer->get_grid_transform() ) );
-      group_list_.push_back( group_handle );
+      group_list_.push_front( group_handle );
       
       CORE_LOG_DEBUG( std::string( "Set Active Layer: " ) + layer->get_layer_id());
 

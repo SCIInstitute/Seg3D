@@ -152,6 +152,10 @@ void QtRenderWidget::paintGL()
     return;
   }
 
+  Qt::CursorShape cursor = static_cast< Qt::CursorShape >(
+    int( this->private_->viewer_->get_cursor() ) );
+  this->setCursor( cursor );
+
   // draw a window size quad and map the render texture onto it
   QSize view_size = QWidget::size();
   int width = view_size.width();
