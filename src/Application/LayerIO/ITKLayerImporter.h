@@ -38,8 +38,6 @@
 
 // Core includes
 #include <Core/DataBlock/StdDataBlock.h>
-#include <Core/Geometry/Point.h>
-#include <Core/Geometry/Vector.h>
 
 // Application includes
 #include <Application/LayerIO/LayerImporter.h>
@@ -50,7 +48,7 @@ namespace Seg3D
 
 class ITKLayerImporter : public LayerImporter
 {
-  SCI_IMPORTER_TYPE( "ITK Importer", ".dcm;.tiff;.png;.vff", 5)
+  SCI_IMPORTER_TYPE( "ITK Importer", ".dcm;.tiff;.png", 5)
 
   // -- Constructor/Destructor --
 public:
@@ -97,7 +95,6 @@ public:
   {
     this->file_list_ = file_list;
     this->set_extension();
-    if( file_list_.size() > 1 ) this->multifile_ = true;
     return true;
   }
 
@@ -107,14 +104,15 @@ private:
   // data type to use for the import
   bool scan_dicom();
 
-  // SCAN_VFF:
-  // this function is called by import_header to read the vff header
-  bool scan_vff();
-
   // SCAN_PNG:
   // this function is called by import_header to scan a single png and determine what kind of 
   // data type to use for the import
   bool scan_png();
+
+  // SCAN_TIFF:
+  //  this function is called by import_header to scan a single tiff and determine what kind of 
+  // data type to use for the import
+  bool scan_tiff();
 
   // IMPORT_DICOM_SERIES:
   // Templated function that reads in a series of dicoms, creates the data_block_ and the
@@ -164,7 +162,6 @@ private:
     // if we were then we set the grid transform.
     if( this->image_data_ && this->data_block_ )
     {
-      this->grid_transform_ = this->image_data_->get_grid_transform();
       return true;
     }
     else
@@ -207,8 +204,6 @@ private:
     this->image_data_ = typename Core::ITKImageDataT< PixelType >::Handle( 
       new typename Core::ITKImageDataT< PixelType >( reader->GetOutput() ) );
 
-    this->grid_transform_ = this->image_data_->get_grid_transform();
-
     if( this->image_data_ && this->data_block_ )
     {
       return true;
@@ -239,16 +234,11 @@ private:
 private:
   Core::ITKImageDataHandle        image_data_;
   Core::DataBlockHandle         data_block_;
-  Core::GridTransform           grid_transform_;
   std::vector< std::string >        file_list_;
-  int                   bits_;
+  size_t                  bits_;
   bool                  signed_data_;
-  bool                  multifile_;
-  int                   pixel_type_;
+  Core::DataType              pixel_type_;
   std::string               extension_;
-  std::map< std::string, std::string >  vff_values_;
-  size_t                  vff_end_of_header_;
-
 };
 
 } // end namespace seg3D

@@ -50,6 +50,8 @@ SET(APPLICATION_LAYERIO_IMPORTERS_SRCS
   MatlabLayerImporter.cc
   NrrdLayerImporter.h
   NrrdLayerImporter.cc
+  VFFLayerImporter.h
+  VFFLayerImporter.cc
 )
 
 CORE_ADD_LIBRARY(Application_LayerIO ${APPLICATION_LAYERIO_SRCS}
