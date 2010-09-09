@@ -33,18 +33,14 @@
 namespace Core 
 {
 
-class ColorMapPrivate
+class ColorMapPrivate : public Lockable
 {
 public:
-  typedef boost::shared_mutex mutex_type;
-  typedef boost::unique_lock< mutex_type > lock_type;
-
   std::vector< Color > colors_;
   float lookup_min_;
   float lookup_max_;
   Texture1DHandle texture_;
   bool changed_;
-  mutex_type mutex_;
 
   const static Color DEFAULT_COLOR_C;
 };
@@ -143,7 +139,7 @@ void ColorMap::get_lookup_range( float& lookup_min, float& lookup_max ) const
 
 Texture1DHandle ColorMap::get_texture()
 {
-  ColorMapPrivate::lock_type lock( this->private_->mutex_ );
+  ColorMapPrivate::lock_type lock( this->private_->get_mutex() );
 
   if( this->private_->changed_ )
   {
