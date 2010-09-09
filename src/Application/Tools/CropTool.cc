@@ -26,6 +26,7 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#include <Core/State/Actions/ActionOffset.h>
 #include <Core/Utils/ScopedCounter.h>
 #include <Core/Volume/VolumeSlice.h>
 #include <Core/RenderResources/RenderResources.h>
@@ -70,7 +71,7 @@ public:
   CropToolPrivate() : hit_pos_( HitPosition::NONE_E ) {}
 
   void handle_target_group_changed();
-  void handle_cropbox_origin_changed( int index, double value );
+  void handle_cropbox_origin_changed( int index, double value, Core::ActionSource source );
   void handle_cropbox_changed( Core::ActionSource source );
 
   void hit_test( int x, int y );
@@ -138,7 +139,8 @@ void CropToolPrivate::handle_cropbox_changed(  Core::ActionSource source )
   }
 }
 
-void CropToolPrivate::handle_cropbox_origin_changed( int index, double value )
+void CropToolPrivate::handle_cropbox_origin_changed( int index, double value,
+                          Core::ActionSource source )
 {
   if ( this->signal_block_count_ > 0 )
   {
@@ -156,7 +158,10 @@ void CropToolPrivate::handle_cropbox_origin_changed( int index, double value )
   this->tool_->cropbox_size_state_[ index ]->get_range( min_size, max_size );
   size = this->tool_->cropbox_size_state_[ index ]->get();
   this->tool_->cropbox_size_state_[ index ]->set_range( 0, max_val - value );
-  this->tool_->cropbox_size_state_[ index ]->set( size + max_val - value - max_size );  
+  if ( source != Core::ActionSource::INTERFACE_MOUSE_E )
+  {
+    this->tool_->cropbox_size_state_[ index ]->set( size + max_val - value - max_size );  
+  }
 }
 
 void CropToolPrivate::hit_test( int x, int y )
@@ -277,6 +282,7 @@ void CropToolPrivate::resize( int x0, int y0, int x1, int y1 )
   double dx = world_x1 - world_x0;
   double dy = world_y1 - world_y0;
   bool size_changed = false;
+  const double epsilon = 1e-6;
 
   if ( this->hit_pos_ & HitPosition::LEFT_E )
   {
@@ -285,10 +291,13 @@ void CropToolPrivate::resize( int x0, int y0, int x1, int y1 )
     this->tool_->cropbox_origin_state_[ this->hor_index_ ]->get_range( min_x, max_x );
     double origin_hor = old_origin_hor + dx;
     origin_hor = Core::Clamp( origin_hor, min_x, max_x );
-    if ( old_origin_hor != origin_hor )
+    double offset = origin_hor - old_origin_hor;
+    if ( Core::Abs( offset ) > epsilon )
     {
-      Core::ActionSet::Dispatch( Core::Interface::GetMouseActionContext(),
-        this->tool_->cropbox_origin_state_[ this->hor_index_ ], origin_hor );
+      Core::ActionOffset::Dispatch( Core::Interface::GetMouseActionContext(),
+        this->tool_->cropbox_origin_state_[ this->hor_index_ ], offset );
+      Core::ActionOffset::Dispatch( Core::Interface::GetMouseActionContext(),
+        this->tool_->cropbox_size_state_[ this->hor_index_ ], -offset );
       size_changed = true;
     }
   }
@@ -300,10 +309,13 @@ void CropToolPrivate::resize( int x0, int y0, int x1, int y1 )
     this->tool_->cropbox_origin_state_[ this->ver_index_ ]->get_range( min_y, max_y );
     double origin_ver = old_origin_ver + dy;
     origin_ver = Core::Clamp( origin_ver, min_y, max_y );
-    if ( old_origin_ver != origin_ver )
+    double offset = origin_ver - old_origin_ver;
+    if ( Core::Abs( offset ) > epsilon )
     {
-      Core::ActionSet::Dispatch( Core::Interface::GetMouseActionContext(),
-        this->tool_->cropbox_origin_state_[ this->ver_index_ ], origin_ver );
+      Core::ActionOffset::Dispatch( Core::Interface::GetMouseActionContext(),
+        this->tool_->cropbox_origin_state_[ this->ver_index_ ], offset );
+      Core::ActionOffset::Dispatch( Core::Interface::GetMouseActionContext(),
+        this->tool_->cropbox_size_state_[ this->ver_index_ ], -offset );
       size_changed = true;
     }
   }
@@ -315,10 +327,11 @@ void CropToolPrivate::resize( int x0, int y0, int x1, int y1 )
     old_size = this->tool_->cropbox_size_state_[ this->hor_index_ ]->get();
     double size = old_size + dx;
     size = Core::Clamp( size, min_size, max_size );
-    if ( size != old_size )
+    double offset = size - old_size;
+    if ( Core::Abs( offset ) > epsilon )
     {
-      Core::ActionSet::Dispatch( Core::Interface::GetMouseActionContext(),
-        this->tool_->cropbox_size_state_[ this->hor_index_ ], size );
+      Core::ActionOffset::Dispatch( Core::Interface::GetMouseActionContext(),
+        this->tool_->cropbox_size_state_[ this->hor_index_ ], offset );
       size_changed = true;
     }
   }
@@ -330,10 +343,11 @@ void CropToolPrivate::resize( int x0, int y0, int x1, int y1 )
     old_size = this->tool_->cropbox_size_state_[ this->ver_index_ ]->get();
     double size = old_size + dy;
     size = Core::Clamp( size, min_size, max_size );
-    if ( size != old_size )
+    double offset = size - old_size;
+    if ( Core::Abs( offset ) > epsilon )
     {
-      Core::ActionSet::Dispatch( Core::Interface::GetMouseActionContext(),
-        this->tool_->cropbox_size_state_[ this->ver_index_ ], size );
+      Core::ActionOffset::Dispatch( Core::Interface::GetMouseActionContext(),
+        this->tool_->cropbox_size_state_[ this->ver_index_ ], offset );
       size_changed = true;
     }
   }
@@ -349,20 +363,18 @@ void CropToolPrivate::resize( int x0, int y0, int x1, int y1 )
     double old_origin_hor = this->tool_->cropbox_origin_state_[ this->hor_index_ ]->get();
     double origin_ver = Core::Clamp( old_origin_ver + dy, min_ver, max_ver - size_ver );
     double origin_hor = Core::Clamp( old_origin_hor + dx, min_hor, max_hor - size_hor );
-    if ( old_origin_hor != origin_hor )
+    double hor_offset = origin_hor - old_origin_hor;
+    double ver_offset = origin_ver - old_origin_ver;
+    if ( Core::Abs( hor_offset ) > epsilon )
     {
-      Core::ActionSet::Dispatch( Core::Interface::GetMouseActionContext(),
-        this->tool_->cropbox_origin_state_[ this->hor_index_ ], origin_hor );
-      Core::ActionSet::Dispatch( Core::Interface::GetMouseActionContext(),
-        this->tool_->cropbox_size_state_[ this->hor_index_ ], size_hor );
+      Core::ActionOffset::Dispatch( Core::Interface::GetMouseActionContext(),
+        this->tool_->cropbox_origin_state_[ this->hor_index_ ], hor_offset );
       size_changed = true;
     }
-    if ( old_origin_ver != origin_ver )
+    if ( Core::Abs( ver_offset ) > epsilon )
     {
-      Core::ActionSet::Dispatch( Core::Interface::GetMouseActionContext(),
-        this->tool_->cropbox_origin_state_[ this->ver_index_ ], origin_ver );
-      Core::ActionSet::Dispatch( Core::Interface::GetMouseActionContext(),
-        this->tool_->cropbox_size_state_[ this->ver_index_ ], size_ver );
+      Core::ActionOffset::Dispatch( Core::Interface::GetMouseActionContext(),
+        this->tool_->cropbox_origin_state_[ this->ver_index_ ], ver_offset );
       size_changed = true;
     } 
   }
@@ -433,7 +445,7 @@ CropTool::CropTool( const std::string& toolid ) :
   for ( int i = 0; i < 3; ++i )
   {
     this->add_connection( this->cropbox_origin_state_[ i ]->value_changed_signal_.connect(
-      boost::bind( &CropToolPrivate::handle_cropbox_origin_changed, this->private_, i, _1 ) ) );
+      boost::bind( &CropToolPrivate::handle_cropbox_origin_changed, this->private_, i, _1, _2 ) ) );
     this->add_connection( this->cropbox_origin_state_[ i ]->value_changed_signal_.connect(
       boost::bind( &CropToolPrivate::handle_cropbox_changed, this->private_, _2 ) ) );
     this->add_connection( this->cropbox_size_state_[ i ]->value_changed_signal_.connect(
@@ -496,16 +508,24 @@ void CropTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
   Core::VolumeSlice::ProjectOntoSlice( slice_type, crop_origin, start_x, start_y );
   Core::VolumeSlice::ProjectOntoSlice( slice_type, crop_end, end_x, end_y );
 
-  glPushAttrib( GL_LINE_BIT | GL_TRANSFORM_BIT );
+  glPushAttrib( GL_LINE_BIT | GL_POINT_BIT | GL_TRANSFORM_BIT );
   glMatrixMode( GL_PROJECTION );
   glPushMatrix();
   glLoadIdentity();
   glMultMatrixd( proj_mat.data() );
 
   glLineWidth( 2.0f );
+  glPointSize( 2.0f );
   glColor3f( 1.0f, 0.0f, 0.0f );
 
   glBegin( GL_LINE_LOOP );
+  glVertex2d( start_x, start_y );
+  glVertex2d( end_x, start_y );
+  glVertex2d( end_x, end_y );
+  glVertex2d( start_x, end_y );
+  glEnd();
+
+  glBegin( GL_POINTS );
   glVertex2d( start_x, start_y );
   glVertex2d( end_x, start_y );
   glVertex2d( end_x, end_y );
