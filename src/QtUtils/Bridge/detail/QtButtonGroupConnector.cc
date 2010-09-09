@@ -42,7 +42,7 @@ QtButtonGroupConnector::QtButtonGroupConnector( QButtonGroup* parent,
           Core::StateOptionHandle& state, bool blocking ) :
   QtConnectorBase( parent, blocking ),
   parent_( parent ),
-  state_( state )
+  option_state_( state )
 {
   QPointer< QtButtonGroupConnector > qpointer( this );
   QList< QAbstractButton* > buttons = parent->buttons();
@@ -65,9 +65,43 @@ QtButtonGroupConnector::QtButtonGroupConnector( QButtonGroup* parent,
     }
 
     this->add_connection( state->value_changed_signal_.connect( boost::bind(
-      &QtButtonGroupConnector::SetCheckedButton, qpointer, _1, _2 ) ) );
+      &QtButtonGroupConnector::SetCheckedButton, qpointer, _2 ) ) );
   }
   
+  this->connect( parent, SIGNAL( buttonClicked ( QAbstractButton* ) ),
+    SLOT( set_state( QAbstractButton* ) ) );
+}
+
+QtButtonGroupConnector::QtButtonGroupConnector( QButtonGroup* parent, 
+      Core::StateLabeledOptionHandle& state, bool blocking /*= true */ ) :
+  QtConnectorBase( parent, blocking ),
+  parent_( parent ),
+  labeled_option_state_( state )
+{
+  QPointer< QtButtonGroupConnector > qpointer( this );
+  QList< QAbstractButton* > buttons = parent->buttons();
+  parent->setExclusive( true );
+
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    std::vector< Core::OptionLabelPair > option_list = state->get_option_list();
+    int num_of_options = static_cast< int >( option_list.size() );
+    assert( buttons.size() == num_of_options );
+    for ( int i = 0; i < num_of_options; ++i )
+    {
+      buttons[ i ]->setCheckable( true );
+      parent->setId( buttons[ i ], i );
+      buttons[ i ]->setText( QString::fromStdString( option_list[ i ].second ) );
+      if ( i == state->index() )
+      {
+        buttons[ i ]->setChecked( true );
+      }
+    }
+
+    this->add_connection( state->value_changed_signal_.connect( boost::bind(
+      &QtButtonGroupConnector::SetCheckedButton, qpointer, _3 ) ) );
+  }
+
   this->connect( parent, SIGNAL( buttonClicked ( QAbstractButton* ) ),
     SLOT( set_state( QAbstractButton* ) ) );
 }
@@ -81,14 +115,22 @@ void QtButtonGroupConnector::set_state( QAbstractButton* button )
 {
   if ( !this->is_blocked() )
   {
-    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), this->state_, 
-      button->text().toStdString() );
+    if ( this->option_state_ )
+    {
+      Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
+        this->option_state_, button->text().toStdString() );
+    }
+    else
+    {
+      Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
+        this->labeled_option_state_, button->text().toStdString() );
+    }
   }
 }
 
 void QtButtonGroupConnector::SetCheckedButton( 
   QPointer< QtButtonGroupConnector > qpointer,
-  std::string text, Core::ActionSource source )
+  Core::ActionSource source )
 {
   if ( source == Core::ActionSource::INTERFACE_WIDGET_E )
   {
@@ -98,7 +140,7 @@ void QtButtonGroupConnector::SetCheckedButton(
   if ( !Core::Interface::IsInterfaceThread() )
   {
     Core::Interface::PostEvent( boost::bind( &QtButtonGroupConnector::SetCheckedButton,
-      qpointer, text, source ) );
+      qpointer, source ) );
     return;
   }
 
@@ -110,7 +152,14 @@ void QtButtonGroupConnector::SetCheckedButton(
   // block signals back to the application thread
   qpointer->block();
 
-  qpointer->parent_->button( qpointer->state_->index() )->setChecked( true );
+  if ( qpointer->option_state_ )
+  {
+    qpointer->parent_->button( qpointer->option_state_->index() )->setChecked( true );
+  }
+  else
+  {
+    qpointer->parent_->button( qpointer->labeled_option_state_->index() )->setChecked( true );
+  }
   
   // unblock signals
   qpointer->unblock();

@@ -33,6 +33,7 @@
 #include <QPointer>
 
 #include <Core/State/StateOption.h>
+#include <Core/State/StateLabeledOption.h>
 
 #include <QtUtils/Bridge/detail/QtConnectorBase.h>
 
@@ -47,6 +48,9 @@ public:
   QtButtonGroupConnector( QButtonGroup* parent, Core::StateOptionHandle& state, 
     bool blocking = true );
 
+  QtButtonGroupConnector( QButtonGroup* parent, 
+    Core::StateLabeledOptionHandle& state, bool blocking = true );
+
   virtual ~QtButtonGroupConnector();
 
   // -- Slot functions for boost signals --
@@ -54,7 +58,7 @@ public:
   // main Qt thread, when the Qt object pointed to by qpointer might no longer exist.
 private:
   static void SetCheckedButton( QPointer< QtButtonGroupConnector > qpointer, 
-    std::string text, Core::ActionSource source );
+    Core::ActionSource source );
 
   // -- Slot functions for Qt signals --
 private Q_SLOTS:
@@ -62,7 +66,8 @@ private Q_SLOTS:
 
 private:
   QButtonGroup* parent_;
-  Core::StateOptionHandle state_;
+  Core::StateOptionHandle option_state_;
+  Core::StateLabeledOptionHandle labeled_option_state_;
 };
 
 } // end namespace QtUtils

@@ -71,7 +71,16 @@ public:
     const std::vector< std::string >& layer_ids, int x, int y, int z, 
     const std::string& kernel, double param1, double param2, bool replace );
 
+  static void Dispatch( Core::ActionContextHandle context,
+    const std::vector< std::string >& layer_ids, 
+    const Core::GridTransform& grid_trans, const std::string& padding, 
+    const std::string& kernel, double param1, double param2, bool replace );
+
 public:
+  static const std::string ZERO_C;
+  static const std::string MIN_C;
+  static const std::string MAX_C;
+
   static const std::string BOX_C;
   static const std::string TENT_C;
   static const std::string CUBIC_CR_C;

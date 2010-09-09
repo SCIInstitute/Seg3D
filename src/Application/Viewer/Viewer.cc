@@ -437,6 +437,7 @@ void ViewerPrivate::set_active_layer( LayerHandle layer )
       }
     }
 
+    this->viewer_->redraw_overlay( needs_redraw );
     if ( needs_redraw )
     {
       this->viewer_->redraw( false );

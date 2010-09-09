@@ -78,7 +78,9 @@ public:
     std::vector<Core::StateBoolHandle>& state_handles, Core::StateIntHandle& index_handle );
 
   static void Connect( QButtonGroup* qbuttongroup, Core::StateOptionHandle& state_handle );
-    
+
+  static void Connect( QButtonGroup* qbuttongroup, Core::StateLabeledOptionHandle& state );
+
   // Connect a SliderIntCombo to a StateRangedIntValue
   static void Connect( QtColorBarWidget* cbwidget, Core::StateIntHandle& state_handle,
     std::vector< Core::StateColorHandle >& colors );
@@ -136,6 +138,8 @@ public:
 
   // Enable / Disable a button from state engine
   static void Enable( QWidget* qwidget, Core::StateBoolHandle& state, bool opposite_logic = false );
+
+  static void Enable( QWidget* qwidget, std::vector< Core::StateBoolHandle >& states );
 
   // Connect the visibility of the QWidget to a StateBool
   static void Show( QWidget* qwidget, Core::StateBoolHandle& state, bool opposite_logic = false );

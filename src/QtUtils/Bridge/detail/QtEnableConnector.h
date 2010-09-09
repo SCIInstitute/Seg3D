@@ -43,16 +43,18 @@ class QtEnableConnector : public QObject, protected Core::ConnectionHandler
   Q_OBJECT
 public:
   QtEnableConnector( QWidget* parent, Core::StateBoolHandle& state, bool opposite_logic );
+  QtEnableConnector( QWidget* parent, std::vector< Core::StateBoolHandle >& states );
   virtual ~QtEnableConnector();
 
   // -- slot functions for boost signals --
 private:
-  static void EnableWidget( QPointer< QtEnableConnector > qpointer,
-    bool enabled, Core::ActionSource source );
+  static void EnableWidget( QPointer< QtEnableConnector > qpointer, bool enabled );
+  static void EnableWidget( QPointer< QtEnableConnector > qpointer );
 
   // -- internal variables --
 private:
   QWidget* parent_;
+  std::vector< Core::StateBoolHandle > bool_states_;
   bool opposite_logic_;
 };
 

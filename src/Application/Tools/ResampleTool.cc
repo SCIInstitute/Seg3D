@@ -46,6 +46,8 @@ class ResampleToolPrivate
 {
 public:
   void handle_target_group_changed();
+  void handle_size_scheme_changed( std::string size_scheme );
+  void handle_dst_group_changed( std::string group_id );
   void handle_output_dimension_changed( int index, int size );
   void handle_scale_changed( double scale );
   void handle_constraint_aspect_changed( bool constraint );
@@ -58,8 +60,10 @@ public:
 void ResampleToolPrivate::handle_target_group_changed()
 {
   const std::string& group_id = this->tool_->target_group_state_->get();
+  std::vector< Core::OptionLabelPair > dst_groups;
   if ( group_id == "" || group_id == Tool::NONE_OPTION_C )
   {
+    this->tool_->dst_group_state_->set_option_list( dst_groups );
     return;
   }
 
@@ -85,6 +89,22 @@ void ResampleToolPrivate::handle_target_group_changed()
   this->tool_->output_dimensions_state_[ 1 ]->set( Core::Round( ny * scale ) );
   this->tool_->output_dimensions_state_[ 2 ]->set_range( 1, nz * 2 );
   this->tool_->output_dimensions_state_[ 2 ]->set( Core::Round( nz * scale ) );
+
+  std::vector< LayerGroupHandle > layer_groups;
+  LayerManager::Instance()->get_groups( layer_groups );
+  for ( size_t i = 0; i < layer_groups.size(); ++i )
+  {
+    if ( layer_groups[ i ] == layer_group )
+    {
+      continue;
+    }
+    const Core::GridTransform& grid_trans = layer_groups[ i ]->get_grid_transform();
+    std::string group_name = Core::ExportToString( grid_trans.get_nx() ) + " x " +
+      Core::ExportToString( grid_trans.get_ny() ) + " x " + 
+      Core::ExportToString( grid_trans.get_nz() );
+    dst_groups.push_back( std::make_pair( layer_groups[ i ]->get_group_id(), group_name ) );
+  }
+  this->tool_->dst_group_state_->set_option_list( dst_groups );
 }
 
 void ResampleToolPrivate::handle_output_dimension_changed( int index, int size )
@@ -144,9 +164,34 @@ void ResampleToolPrivate::handle_kernel_changed( std::string kernel_name )
   this->tool_->has_params_state_->set( kernel_name == ActionResample::GAUSSIAN_C );
 }
 
+void ResampleToolPrivate::handle_size_scheme_changed( std::string size_scheme )
+{
+  if ( size_scheme == ResampleTool::SIZE_OTHER_GROUP_C )
+  {
+    this->tool_->manual_size_state_->set( false );
+    this->tool_->valid_size_state_->set( this->tool_->dst_group_state_->get() != "" );
+  }
+  else
+  {
+    this->tool_->manual_size_state_->set( true );
+    this->tool_->valid_size_state_->set( true );
+  }
+}
+
+void ResampleToolPrivate::handle_dst_group_changed( std::string group_id )
+{
+  if ( this->tool_->size_scheme_state_->get() == ResampleTool::SIZE_OTHER_GROUP_C )
+  {
+    this->tool_->valid_size_state_->set( group_id != "" );
+  }
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Class ResampleTool
 //////////////////////////////////////////////////////////////////////////
+
+const std::string ResampleTool::SIZE_OTHER_GROUP_C( "other_group" );
+const std::string ResampleTool::SIZE_MANUAL_C( "manual" );
 
 ResampleTool::ResampleTool( const std::string& toolid ) :
   GroupTargetTool( Core::VolumeType::ALL_E, toolid ),
@@ -158,6 +203,21 @@ ResampleTool::ResampleTool( const std::string& toolid ) :
   this->add_state( "input_x", this->input_dimensions_state_[ 0 ], 0 );
   this->add_state( "input_y", this->input_dimensions_state_[ 1 ], 0 );
   this->add_state( "input_z", this->input_dimensions_state_[ 2 ], 0 );
+
+  this->add_state( "size_scheme", this->size_scheme_state_, SIZE_MANUAL_C, 
+    SIZE_OTHER_GROUP_C + "=Resample to Match Another Group|" +
+    SIZE_MANUAL_C + "=Set Dimensions Manually" );
+  this->add_state( "manual_size", this->manual_size_state_, true );
+
+  this->add_state( "dst_group", this->dst_group_state_, "", "" );
+
+  std::vector< Core::OptionLabelPair > padding_values;
+  padding_values.push_back( std::make_pair( ActionResample::ZERO_C, "0" ) );
+  padding_values.push_back( std::make_pair( ActionResample::MIN_C, "Minimum Value" ) );
+  padding_values.push_back( std::make_pair( ActionResample::MAX_C, "Maximum Value" ) );
+  this->add_state( "pad_value", this->padding_value_state_, ActionResample::ZERO_C, 
+    padding_values );
+
   this->add_state( "output_x", this->output_dimensions_state_[ 0 ], 1, 1, 500, 1 );
   this->add_state( "output_y", this->output_dimensions_state_[ 1 ], 1, 1, 500, 1 );
   this->add_state( "output_z", this->output_dimensions_state_[ 2 ], 1, 1, 500, 1 );
@@ -177,10 +237,15 @@ ResampleTool::ResampleTool( const std::string& toolid ) :
   this->add_state( "cutoff", this->gauss_cutoff_state_, 1.0, 1.0, 100.0, 0.01 );
   this->add_state( "has_params", this->has_params_state_, false );
 
+  this->add_state( "valid_size", this->valid_size_state_, true );
   this->add_state( "replace", this->replace_state_, false );
 
   this->add_connection( this->target_group_state_->state_changed_signal_.connect(
     boost::bind( &ResampleToolPrivate::handle_target_group_changed, this->private_ ) ) );
+  this->add_connection( this->size_scheme_state_->value_changed_signal_.connect(
+    boost::bind( &ResampleToolPrivate::handle_size_scheme_changed, this->private_, _2 ) ) );
+  this->add_connection( this->dst_group_state_->value_changed_signal_.connect(
+    boost::bind( &ResampleToolPrivate::handle_dst_group_changed, this->private_, _2 ) ) );
   this->add_connection( this->constraint_aspect_state_->value_changed_signal_.connect(
     boost::bind( &ResampleToolPrivate::handle_constraint_aspect_changed, this->private_, _1 ) ) );
   this->add_connection( this->scale_state_->value_changed_signal_.connect(
@@ -206,11 +271,26 @@ void ResampleTool::execute( Core::ActionContextHandle context )
 {
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
 
-  ActionResample::Dispatch( context, this->target_layers_state_->get(), 
-    this->output_dimensions_state_[ 0 ]->get(), this->output_dimensions_state_[ 1 ]->get(),
-    this->output_dimensions_state_[ 2 ]->get(), this->kernel_state_->get(),
-    this->gauss_sigma_state_->get(), this->gauss_cutoff_state_->get(), 
-    this->replace_state_->get() );
+  if ( this->manual_size_state_->get() )
+  {
+    ActionResample::Dispatch( context, this->target_layers_state_->get(), 
+      this->output_dimensions_state_[ 0 ]->get(), this->output_dimensions_state_[ 1 ]->get(),
+      this->output_dimensions_state_[ 2 ]->get(), this->kernel_state_->get(),
+      this->gauss_sigma_state_->get(), this->gauss_cutoff_state_->get(), 
+      this->replace_state_->get() );
+  }
+  else
+  {
+    LayerGroupHandle dst_group = LayerManager::Instance()->get_layer_group(
+      this->dst_group_state_->get() );
+    if ( dst_group )
+    {
+      ActionResample::Dispatch( context, this->target_layers_state_->get(),
+        dst_group->get_grid_transform(), this->padding_value_state_->get(),
+        this->kernel_state_->get(), this->gauss_sigma_state_->get(),
+        this->gauss_cutoff_state_->get(), this->replace_state_->get() );
+    }
+  }
 }
 
 } // end namespace Seg3D

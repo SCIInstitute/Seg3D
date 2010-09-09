@@ -52,13 +52,35 @@ QtEnableConnector::QtEnableConnector( QWidget* parent,
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
     parent->setEnabled( state->get() ^ this->opposite_logic_ );
     
-    //QtEnableConnector::EnableWidget( qpointer, state->get(), Core::ActionSource::NONE_E );
-
     this->add_connection( state->value_changed_signal_.connect(
-      boost::bind( &QtEnableConnector::EnableWidget, qpointer, _1, _2 ) ) );
+      boost::bind( &QtEnableConnector::EnableWidget, qpointer, _1 ) ) );
   }
 
 }
+
+QtEnableConnector::QtEnableConnector( QWidget* parent, 
+  std::vector< Core::StateBoolHandle >& states ) :
+  QObject( parent ),
+  parent_( parent ),
+  bool_states_( states )
+{
+  assert( states.size() > 0 );
+  QPointer< QtEnableConnector > qpointer( this );
+
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
+    bool enabled = true;
+    for ( size_t i = 0; i < states.size(); ++i )
+    {
+      enabled = enabled && states[ i ]->get();
+      this->add_connection( states[ i ]->value_changed_signal_.connect(
+        boost::bind( &QtEnableConnector::EnableWidget, qpointer ) ) );
+    }
+    parent->setEnabled( enabled );
+  }
+}
+
 
 QtEnableConnector::~QtEnableConnector()
 {
@@ -66,12 +88,12 @@ QtEnableConnector::~QtEnableConnector()
 }
 
 void QtEnableConnector::EnableWidget( QPointer< QtEnableConnector > qpointer,
-    bool enabled, Core::ActionSource source )
+    bool enabled )
 {
   if ( !Core::Interface::IsInterfaceThread() )
   {
     Core::Interface::PostEvent( boost::bind( &QtEnableConnector::EnableWidget,
-      qpointer, enabled, source ) );
+      qpointer, enabled ) );
     return;
   }
 
@@ -82,5 +104,29 @@ void QtEnableConnector::EnableWidget( QPointer< QtEnableConnector > qpointer,
   
   qpointer->parent_->setEnabled( enabled ^ qpointer->opposite_logic_ );
 }
+
+void QtEnableConnector::EnableWidget( QPointer< QtEnableConnector > qpointer )
+{
+  if ( !Core::Interface::IsInterfaceThread() )
+  {
+    Core::Interface::PostEvent( boost::bind( &QtEnableConnector::EnableWidget,
+      qpointer ) );
+    return;
+  }
+
+  if ( qpointer.isNull() || QCoreApplication::closingDown() )
+  {
+    return;
+  }
+
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+  bool enabled = true;
+  for ( size_t i = 0; i < qpointer->bool_states_.size() && enabled; ++i )
+  {
+    enabled = enabled && qpointer->bool_states_[ i ]->get();
+  }
+  qpointer->parent_->setEnabled( enabled );
+}
+
 
 } // end namespace QtUtils

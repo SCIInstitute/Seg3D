@@ -83,6 +83,10 @@ bool ResampleToolInterface::build_widget( QFrame* frame )
   this->private_->scale_ = new QtUtils::QtSliderDoubleCombo( this );
   this->private_->ui_.scale_layout_->addWidget( this->private_->scale_ );
 
+  QButtonGroup* button_group = new QButtonGroup( this );
+  button_group->addButton( this->private_->ui_.rb_another_group_ );
+  button_group->addButton( this->private_->ui_.rb_manual_ );
+
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
   ResampleTool* tool = dynamic_cast< ResampleTool* > ( base_tool_.get() );
@@ -95,6 +99,10 @@ bool ResampleToolInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Connect( this->private_->ui_.label_nx_, tool->input_dimensions_state_[ 0 ] );
   QtUtils::QtBridge::Connect( this->private_->ui_.label_ny_, tool->input_dimensions_state_[ 1 ] );
   QtUtils::QtBridge::Connect( this->private_->ui_.label_nz_, tool->input_dimensions_state_[ 2 ] );
+
+  QtUtils::QtBridge::Connect( button_group, tool->size_scheme_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.dst_group_combobox_, tool->dst_group_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.padding_combobox_, tool->padding_value_state_ );
 
   QtUtils::QtBridge::Connect( this->private_->output_x_, tool->output_dimensions_state_[ 0 ] );
   QtUtils::QtBridge::Connect( this->private_->output_y_, tool->output_dimensions_state_[ 1 ] );
@@ -111,11 +119,19 @@ bool ResampleToolInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Connect( this->private_->ui_.run_button_, boost::bind(
     &ResampleTool::execute, tool, Core::Interface::GetWidgetActionContext() ) );
 
-  QtUtils::QtBridge::Enable( this->private_->ui_.run_button_, tool->valid_target_state_ );
+  std::vector< Core::StateBoolHandle > bool_states( 2 );
+  bool_states[ 0 ] = tool->valid_target_state_;
+  bool_states[ 1 ] = tool->valid_size_state_;
+  QtUtils::QtBridge::Enable( this->private_->ui_.run_button_, bool_states );
+
   QtUtils::QtBridge::Enable( this->private_->ui_.target_group_, 
     tool->use_active_group_state_, true ); 
   QtUtils::QtBridge::Enable( this->private_->scale_, tool->constraint_aspect_state_ );
+
   QtUtils::QtBridge::Show( this->private_->ui_.param_widget_, tool->has_params_state_ );
+  QtUtils::QtBridge::Show( this->private_->ui_.widget_new_size_, tool->manual_size_state_ );
+  QtUtils::QtBridge::Show( this->private_->ui_.widget_another_group_, 
+    tool->manual_size_state_, true );
 
   CORE_LOG_DEBUG( "Finished building a Resample Tool Interface" );
 

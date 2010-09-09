@@ -63,8 +63,14 @@ public:
   // -- state --
 public:
   Core::StateIntHandle input_dimensions_state_[ 3 ];
-  Core::StateRangedIntHandle output_dimensions_state_[ 3 ];
 
+  Core::StateLabeledOptionHandle size_scheme_state_;
+  Core::StateBoolHandle manual_size_state_;
+
+  Core::StateLabeledOptionHandle dst_group_state_;
+  Core::StateLabeledOptionHandle padding_value_state_;
+
+  Core::StateRangedIntHandle output_dimensions_state_[ 3 ];
   Core::StateBoolHandle constraint_aspect_state_;
   Core::StateRangedDoubleHandle scale_state_;
   
@@ -73,10 +79,15 @@ public:
   Core::StateRangedDoubleHandle gauss_cutoff_state_;
   Core::StateBoolHandle has_params_state_;
   
+  Core::StateBoolHandle valid_size_state_;
   Core::StateBoolHandle replace_state_;
 
 private:
   ResampleToolPrivateHandle private_;
+
+public:
+  static const std::string SIZE_OTHER_GROUP_C;
+  static const std::string SIZE_MANUAL_C;
 };
 
 } // end namespace

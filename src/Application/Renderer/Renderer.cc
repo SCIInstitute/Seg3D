@@ -506,7 +506,7 @@ void RendererPrivate::process_isosurfaces( IsosurfaceArray& isosurfaces )
 
 void RendererPrivate::draw_isosurfaces( const IsosurfaceArray& isosurfaces, bool with_lighting )
 {
-  bool use_colormap = true;
+  bool use_colormap = false;
   size_t num_of_isosurfaces = isosurfaces.size();
   glEnable( GL_CULL_FACE );
   this->isosurface_shader_->enable();

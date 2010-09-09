@@ -168,6 +168,11 @@ void QtBridge::Connect( QButtonGroup* qbuttongroup, Core::StateOptionHandle& sta
   new QtButtonGroupConnector( qbuttongroup, state_handle );
 }
 
+void QtBridge::Connect( QButtonGroup* qbuttongroup, Core::StateLabeledOptionHandle& state )
+{
+  new QtButtonGroupConnector( qbuttongroup, state );
+}
+
 void QtBridge::Connect( QListWidget* qlistwidget, Core::StateLabeledMultiOptionHandle& state )
 {
   new QtListWidgetConnector( qlistwidget, state );
@@ -181,6 +186,11 @@ void QtBridge::Connect( QLabel* qlabel, Core::StateBaseHandle state )
 void QtBridge::Enable( QWidget* qwidget, Core::StateBoolHandle& state, bool opposite_logic )
 {
   new QtEnableConnector( qwidget, state, opposite_logic );
+}
+
+void QtBridge::Enable( QWidget* qwidget, std::vector< Core::StateBoolHandle >& states )
+{
+  new QtEnableConnector( qwidget, states );
 }
 
 void QtBridge::Show( QWidget* qwidget, Core::StateBoolHandle& state, bool opposite_logic )

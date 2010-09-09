@@ -74,6 +74,10 @@ public:
   Core::ActionParameter< double > param1_;
   Core::ActionParameter< double > param2_;
   Core::ActionParameter< bool > replace_;
+
+  Core::GridTransform grid_transform_;
+  bool resample_to_grid_;
+  std::string padding_;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -91,6 +95,10 @@ public:
   std::vector< LayerHandle > dst_layers_;
   bool replace_;
   unsigned int dimesions_[ 3 ];
+  double range_min_[ 3 ];
+  double range_max_[ 3 ];
+  bool resample_to_grid_;
+  std::string padding_;
 
   NrrdKernelSpec* mask_kernel_;
   NrrdKernelSpec* data_kernel_;
@@ -123,6 +131,9 @@ public:
 ResampleAlgo::ResampleAlgo( const std::string& kernel, double param1, double param2 )
 {
   this->rsmc_ = nrrdResampleContextNew();
+  this->rsmc_->verbose = 0;
+  nrrdResampleBoundarySet( this->rsmc_, nrrdBoundaryPad );
+  nrrdResampleDefaultCenterSet( this->rsmc_, nrrdCenterCell );
   this->data_kernel_ = nrrdKernelSpecNew();
   this->mask_kernel_ = nrrdKernelSpecNew();
 
@@ -308,7 +319,15 @@ bool ResampleAlgo::nrrd_resmaple( Nrrd* nin, Nrrd* nout, NrrdKernelSpec* unuk )
   {
     error |= nrrdResampleKernelSet( this->rsmc_, axis, unuk->kernel, unuk->parm );
     error |= nrrdResampleSamplesSet( this->rsmc_, axis, this->dimesions_[ axis ] );
-    error |= nrrdResampleRangeFullSet( this->rsmc_, axis );
+    if ( this->resample_to_grid_ )
+    {
+      error |= nrrdResampleRangeSet( this->rsmc_, axis, this->range_min_[ axis ], 
+        this->range_max_[ axis ] );
+    }
+    else
+    {
+      error |= nrrdResampleRangeFullSet( this->rsmc_, axis );
+    }
   }
   if ( !error )
   {
@@ -327,6 +346,23 @@ void ResampleAlgo::resmaple_data_layer( DataLayerHandle input, DataLayerHandle o
     input->get_data_volume()->get_data_block(),
     input->get_grid_transform().transform() ) );
   Nrrd* nrrd_out = nrrdNew();
+  if ( this->resample_to_grid_ )
+  {
+    if ( this->padding_ == ActionResample::ZERO_C )
+    {
+      nrrdResamplePadValueSet( this->rsmc_, 0.0 );
+    }
+    else if ( this->padding_ == ActionResample::MIN_C )
+    {
+      nrrdResamplePadValueSet( this->rsmc_, input->get_data_volume()->
+        get_data_block()->get_min() );
+    }
+    else
+    {
+      nrrdResamplePadValueSet( this->rsmc_, input->get_data_volume()->
+        get_data_block()->get_max() );
+    }
+  }
   if ( !nrrd_resmaple( nrrd_in->nrrd(), nrrd_out, this->data_kernel_ ) )
   {
     nrrdNuke( nrrd_out );
@@ -360,6 +396,11 @@ void ResampleAlgo::resample_mask_layer( MaskLayerHandle input, MaskLayerHandle o
   Core::NrrdDataHandle nrrd_in( new Core::NrrdData( input_data_block,
     input->get_grid_transform().transform() ) );
   Nrrd* nrrd_out = nrrdNew();
+  if ( this->resample_to_grid_ )
+  {
+    // Pad the mask layer with 0
+    nrrdResamplePadValueSet( this->rsmc_, 0.0 );
+  }
   if ( !nrrd_resmaple( nrrd_in->nrrd(), nrrd_out, this->mask_kernel_ ) )
   {
     nrrdNuke( nrrd_out );
@@ -390,9 +431,6 @@ void ResampleAlgo::resample_mask_layer( MaskLayerHandle input, MaskLayerHandle o
 
 void ResampleAlgo::run()
 {
-  this->rsmc_ = nrrdResampleContextNew();
-  this->rsmc_->verbose = 0;
-
   for ( size_t i = 0; i < this->src_layers_.size(); ++i )
   {
     switch ( this->src_layers_[ i ]->type() )
@@ -417,6 +455,10 @@ void ResampleAlgo::run()
 // Class ActionResample
 //////////////////////////////////////////////////////////////////////////
 
+const std::string ActionResample::ZERO_C( "0" );
+const std::string ActionResample::MIN_C( "min" );
+const std::string ActionResample::MAX_C( "max" );
+
 const std::string ActionResample::BOX_C( "box" );
 const std::string ActionResample::TENT_C( "tent" );
 const std::string ActionResample::CUBIC_CR_C( "cubic_cr" );
@@ -438,6 +480,8 @@ ActionResample::ActionResample() :
   this->add_key( this->private_->param1_ );
   this->add_key( this->private_->param2_ );
   this->add_key( this->private_->replace_ );
+
+  this->private_->resample_to_grid_ = false;
 }
 
 bool ActionResample::validate( Core::ActionContextHandle& context )
@@ -469,12 +513,25 @@ bool ActionResample::validate( Core::ActionContextHandle& context )
     }
   }
   
-  if ( this->private_->x_.value() < 1 ||
-    this->private_->y_.value() < 1 ||
-    this->private_->z_.value() < 1 )
+  if ( this->private_->resample_to_grid_ )
   {
-    context->report_error( "Invalid resample size" );
-    return false;
+    if ( this->private_->padding_ != ZERO_C &&
+      this->private_->padding_ != MIN_C &&
+      this->private_->padding_ != MAX_C )
+    {
+      context->report_error( "Unknown padding option" );
+      return false;
+    }
+  }
+  else
+  {
+    if ( this->private_->x_.value() < 1 ||
+      this->private_->y_.value() < 1 ||
+      this->private_->z_.value() < 1 )
+    {
+      context->report_error( "Invalid resample size" );
+      return false;
+    }
   }
   
   if ( this->private_->kernel_.value() != BOX_C &&
@@ -484,7 +541,7 @@ bool ActionResample::validate( Core::ActionContextHandle& context )
     this->private_->kernel_.value() != QUARTIC_C &&
     this->private_->kernel_.value() != GAUSSIAN_C )
   {
-    context->report_error( "Unkown kernel type" );
+    context->report_error( "Unknown kernel type" );
     return false;
   }
   
@@ -504,11 +561,22 @@ bool ActionResample::run( Core::ActionContextHandle& context,
   algo->dimesions_[ 0 ] = static_cast< unsigned int >( this->private_->x_.value() );
   algo->dimesions_[ 1 ] = static_cast< unsigned int >( this->private_->y_.value() );
   algo->dimesions_[ 2 ] = static_cast< unsigned int >( this->private_->z_.value() );
+  algo->resample_to_grid_ = this->private_->resample_to_grid_;
+  algo->padding_ = this->private_->padding_;
 
-  // Set up input and output layers
+  // Compute grid transform for the output layers
   const std::vector< std::string >& layer_ids = this->private_->layer_ids_.value();
   Core::GridTransform output_transform;
-  algo->compute_output_grid_transform( layer_ids[ 0 ], output_transform );
+  if ( this->private_->resample_to_grid_ )
+  {
+    output_transform = this->private_->grid_transform_;
+  }
+  else
+  {
+    algo->compute_output_grid_transform( layer_ids[ 0 ], output_transform );
+  }
+
+  // Set up input and output layers
   size_t num_of_layers = layer_ids.size();
   algo->src_layers_.resize( num_of_layers );
   algo->dst_layers_.resize( num_of_layers );
@@ -540,7 +608,31 @@ bool ActionResample::run( Core::ActionContextHandle& context,
     }
     dst_layer_ids[ i ] = algo->dst_layers_[ i ]->get_layer_id();
   }
-  
+
+  // Compute resample ranges if resampling to a given grid
+  if ( this->private_->resample_to_grid_ )
+  {
+    Core::Transform inverse_src_trans = algo->src_layers_[ 0 ]->
+      get_grid_transform().get_inverse();
+    // Compute the range of the destination grid in world space
+    // NOTE: Since we assume cell centering, the actual range of the grid should be
+    // extended by half a voxel in each direction
+    Core::Point start( -0.5, -0.5, -0.5 );
+    Core::Point end( algo->dimesions_[ 0 ] - 0.5, algo->dimesions_[ 1 ] - 0.5, 
+      algo->dimesions_[ 2 ] - 0.5 );
+    start = this->private_->grid_transform_ * start;
+    end = this->private_->grid_transform_ * end;
+
+    // Compute the resample range relative to the input in index space
+    start = inverse_src_trans * start;
+    end = inverse_src_trans * end;
+    for ( int i = 0; i < 3; ++i )
+    {
+      algo->range_min_[ i ] = start[ i ];
+      algo->range_max_[ i ] = end[ i ];
+    }
+  }
+
   // Return the ids of the destination layer.
   result = Core::ActionResultHandle( new Core::ActionResult( dst_layer_ids ) );
 
@@ -560,6 +652,33 @@ void ActionResample::Dispatch( Core::ActionContextHandle context,
   action->private_->x_.set_value( x );
   action->private_->y_.set_value( y );
   action->private_->z_.set_value( z );
+  action->private_->kernel_.set_value( kernel );
+  action->private_->param1_.set_value( param1 );
+  action->private_->param2_.set_value( param2 );
+  action->private_->replace_.set_value( replace );
+
+  Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
+}
+
+void ActionResample::Dispatch( Core::ActionContextHandle context, 
+                const std::vector< std::string >& layer_ids, 
+                const Core::GridTransform& grid_trans, 
+                const std::string& padding, const std::string& kernel, 
+                double param1, double param2, bool replace )
+{
+  ActionResample* action = new ActionResample;
+  action->private_->layer_ids_.set_value( layer_ids );
+  action->private_->grid_transform_ = grid_trans;
+  action->private_->resample_to_grid_ = true;
+  action->private_->padding_ = padding;
+  
+  int nx = static_cast< int >( grid_trans.get_nx() );
+  int ny = static_cast< int >( grid_trans.get_ny() );
+  int nz = static_cast< int >( grid_trans.get_nz() );
+  action->private_->x_.set_value( nx );
+  action->private_->y_.set_value( ny );
+  action->private_->z_.set_value( nz );
+
   action->private_->kernel_.set_value( kernel );
   action->private_->param1_.set_value( param1 );
   action->private_->param2_.set_value( param2 );

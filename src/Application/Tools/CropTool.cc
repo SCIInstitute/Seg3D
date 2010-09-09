@@ -130,7 +130,7 @@ void CropToolPrivate::handle_target_group_changed()
   ViewerManager::Instance()->update_2d_viewers_overlay();
 }
 
-void CropToolPrivate::handle_cropbox_changed(  Core::ActionSource source )
+void CropToolPrivate::handle_cropbox_changed( Core::ActionSource source )
 {
   if ( source != Core::ActionSource::INTERFACE_MOUSE_E &&
     this->signal_block_count_ == 0 )
