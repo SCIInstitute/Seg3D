@@ -99,32 +99,8 @@ SET(APPLICATION_TOOLS_NOREGISTER_SRCS
 SET(APPLICATION_TOOLS_ACTIONS_SRCS
   Actions/ActionPaint.h
   Actions/ActionPaint.cc
-  Actions/ActionCannyEdgeDetectionFilter.h
-  Actions/ActionCannyEdgeDetectionFilter.cc
-  Actions/ActionCurvatureAnisotropicDiffusionFilter.h
-  Actions/ActionCurvatureAnisotropicDiffusionFilter.cc
-  Actions/ActionDiscreteGaussianFilter.h
-  Actions/ActionDiscreteGaussianFilter.cc
-  Actions/ActionGradientMagnitudeFilter.h
-  Actions/ActionGradientMagnitudeFilter.cc
-  Actions/ActionHistogramEqualizationFilter.h
-  Actions/ActionHistogramEqualizationFilter.cc
-  Actions/ActionIntensityCorrectionFilter.h
-  Actions/ActionIntensityCorrectionFilter.cc
-  Actions/ActionMedianFilter.h
-  Actions/ActionMedianFilter.cc
-  Actions/ActionOtsuThresholdFilter.h
-  Actions/ActionOtsuThresholdFilter.cc
-  Actions/ActionThreshold.h
-  Actions/ActionThreshold.cc
   Actions/ActionPolyline.h
   Actions/ActionPolyline.cc
-  Actions/ActionInvert.h
-  Actions/ActionInvert.cc
-  Actions/ActionResample.h
-  Actions/ActionResample.cc
-  Actions/ActionCrop.h
-  Actions/ActionCrop.cc
   )
 
 CORE_ADD_LIBRARY(Application_Tools 
@@ -140,6 +116,7 @@ TARGET_LINK_LIBRARIES(Application_Tools
                       Core_Interface
                       Core_Action
                       Core_State
+            Application_Filters
                       Application_Tool
                       Application_ToolManager
                       ${SCI_BOOST_LIBRARY}

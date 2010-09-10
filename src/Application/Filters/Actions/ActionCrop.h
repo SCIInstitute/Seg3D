@@ -26,70 +26,46 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_FILTERS_ACTIONS_ACTIONMEDIANFILTER_H
-#define APPLICATION_FILTERS_ACTIONS_ACTIONMEDIANFILTER_H
+#ifndef APPLICATION_FILTERS_ACTIONS_ACTIONCROP_H
+#define APPLICATION_FILTERS_ACTIONS_ACTIONCROP_H
 
 #include <Core/Action/Actions.h>
-#include <Core/Interface/Interface.h>
-#include <Application/Layer/Layer.h>
 
 namespace Seg3D
 {
+  
+class ActionCropPrivate;
+typedef boost::shared_ptr< ActionCropPrivate > ActionCropPrivateHandle;
 
-class ActionMedianFilter : public Core::Action
+class ActionCrop : public Core::Action
 {
 
 CORE_ACTION( 
-  CORE_ACTION_TYPE( "MedianFilter", "ITK filter that calculates the median from a volume with"
-    " a certain radius." )
-  CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
-  CORE_ACTION_KEY( "replace", "true", "Replace the old layer (true), or add an new layer (false)" )
-  CORE_ACTION_KEY( "preserve_data_format", "true", "ITK filters run in floating point percision,"
-    " this option will convert the result back into the original format." )
-  CORE_ACTION_KEY( "radius", "2", "The distance over which the filter computes the median." )
+  CORE_ACTION_TYPE( "Crop", "Crop the input layers to the specified region" )
+  CORE_ACTION_ARGUMENT( "layerids", "The layerids on which this tool needs to be run." )
+  CORE_ACTION_ARGUMENT( "origin", "The origin of the crop box" )
+  CORE_ACTION_ARGUMENT( "size",  "The size of the crop box" )
+  CORE_ACTION_KEY( "replace", "false", "Whether to delete the input layers when done" )
 )
   
   // -- Constructor/Destructor --
 public:
-  ActionMedianFilter()
-  {
-    // Action arguments
-    this->add_argument( this->target_layer_ );
-    
-    // Action options
-    this->add_key( this->replace_ );
-    this->add_key( this->preserve_data_format_ );
-    
-    this->add_key( this->radius_ );
-  }
+  ActionCrop();
   
-  virtual ~ActionMedianFilter()
-  {
-  }
+  virtual ~ActionCrop() {}
   
   // -- Functions that describe action --
 public:
   virtual bool validate( Core::ActionContextHandle& context );
   virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
   
-  // -- Action parameters --
 private:
-
-  Core::ActionParameter< std::string > target_layer_;
-  Core::ActionParameter< bool > replace_;
-  Core::ActionParameter< bool > preserve_data_format_;
+  ActionCropPrivateHandle private_;
   
-  Core::ActionParameter<  int > radius_;
-  
-  // -- Dispatch this action from the interface --
 public:
-
-  // DISPATCH:
-  // Create and dispatch action that inserts the new layer 
   static void Dispatch( Core::ActionContextHandle context, 
-    std::string target_layer, bool replace,
-    bool preserve_data_format, int radius );
-          
+    const std::vector< std::string >& layer_ids, const Core::Point& origin, 
+    const Core::Vector& size, bool replace );
 };
   
 } // end namespace Seg3D

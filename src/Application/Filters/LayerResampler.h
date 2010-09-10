@@ -1,22 +1,22 @@
 /*
  For more information, please see: http://software.sci.utah.edu
- 
+
  The MIT License
- 
+
  Copyright (c) 2009 Scientific Computing and Imaging Institute,
  University of Utah.
- 
- 
+
+
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
  the rights to use, copy, modify, merge, publish, distribute, sublicense,
  and/or sell copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included
  in all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -26,44 +26,48 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-// Application includes
-#include <Application/Tool/ToolFactory.h>
-#include <Application/Layer/Layer.h>
-#include <Application/LayerManager/LayerManager.h>
+#ifndef APPLICATION_FILTERS_LAYERRESAMPLER_H
+#define APPLICATION_FILTERS_LAYERRESAMPLER_H
 
-// StateEnigne of the tool
-#include <Application/Tools/CannyEdgeDetectionFilter.h>
+#include <Core/State/StateHandler.h>
 
-// Action associated with tool
-#include <Application/Filters/Actions/ActionCannyEdgeDetectionFilter.h>
-
-
-// Register the tool into the tool factory
-SCI_REGISTER_TOOL( Seg3D, CannyEdgeDetectionFilter )
+#include <Application/Layer/LayerFWD.h>
 
 namespace Seg3D
 {
 
-CannyEdgeDetectionFilter::CannyEdgeDetectionFilter( const std::string& toolid ) :
-  SingleTargetTool( Core::VolumeType::DATA_E, toolid )
-{
-  // Need to set ranges and default values for all parameters
-  this->add_state( "blurring_distance", this->blurring_distance_state_, 1.0, 0.0, 10.0, 0.10 );
-  this->add_state( "threshold", this->threshold_state_, 0.0, 0.0, 100.0, 1.0 );
-  
-}
+class LayerResampler;
+typedef boost::shared_ptr< LayerResampler > LayerResamplerHandle;
 
-CannyEdgeDetectionFilter::~CannyEdgeDetectionFilter()
-{
-  disconnect_all();
-}
-  
-void CannyEdgeDetectionFilter::execute( Core::ActionContextHandle context )
-{
-  ActionCannyEdgeDetectionFilter::Dispatch( context,
-    this->target_layer_state_->get(),
-    this->blurring_distance_state_->get(),
-    this->threshold_state_->get() );  
-}
+class LayerResamplerPrivate;
+typedef boost::shared_ptr< LayerResamplerPrivate > LayerResamplerPrivateHandle;
 
-} // end namespace Seg3D
+class LayerResampler : public Core::StateHandler
+{
+  // -- constructor/destructor --
+public:
+  LayerResampler( LayerHandle src_layer, LayerGroupHandle dst_group );
+  virtual ~LayerResampler();
+
+public:
+
+  // EXECUTE:
+  // Execute the tool and dispatch the action
+  void execute( Core::ActionContextHandle context );
+
+  // -- state --
+public:
+  Core::StateLabeledOptionHandle padding_value_state_;
+  Core::StateLabeledOptionHandle kernel_state_;
+  Core::StateRangedDoubleHandle gauss_sigma_state_;
+  Core::StateRangedDoubleHandle gauss_cutoff_state_;
+  Core::StateBoolHandle has_params_state_;
+
+private:
+  LayerResamplerPrivateHandle private_;
+
+};
+
+} // end namespace
+
+#endif

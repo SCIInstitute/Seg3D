@@ -33,7 +33,7 @@
 // Application includes
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/ThresholdTool.h>
-#include <Application/Tools/Actions/ActionThreshold.h>
+#include <Application/Filters/Actions/ActionThreshold.h>
 #include <Application/Tools/detail/MaskShader.h>
 #include <Application/Layer/Layer.h>
 #include <Application/LayerManager/LayerManager.h>

@@ -34,7 +34,7 @@
 // Application includes
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/CropTool.h>
-#include <Application/Tools/Actions/ActionCrop.h>
+#include <Application/Filters/Actions/ActionCrop.h>
 #include <Application/Layer/Layer.h>
 #include <Application/Layer/LayerGroup.h>
 #include <Application/LayerManager/LayerManager.h>

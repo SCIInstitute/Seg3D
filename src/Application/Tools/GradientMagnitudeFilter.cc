@@ -35,7 +35,7 @@
 #include <Application/Tools/GradientMagnitudeFilter.h>
 
 // Action associated with tool
-#include <Application/Tools/Actions/ActionGradientMagnitudeFilter.h>
+#include <Application/Filters/Actions/ActionGradientMagnitudeFilter.h>
 
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL( Seg3D, GradientMagnitudeFilter )

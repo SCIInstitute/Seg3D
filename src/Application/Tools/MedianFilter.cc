@@ -35,7 +35,7 @@
 #include <Application/Tools/MedianFilter.h>
 
 // Action associated with tool
-#include <Application/Tools/Actions/ActionMedianFilter.h>
+#include <Application/Filters/Actions/ActionMedianFilter.h>
 
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL( Seg3D, MedianFilter )

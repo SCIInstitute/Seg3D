@@ -56,6 +56,7 @@ SET(INTERFACE_APPINTERFACE_SRCS
   DropSpaceWidget.cc
   OverlayWidget.cc
   SingleShotToolButton.cc
+  LayerResamplerDialog.cc
 )
 
 SET(INTERFACE_APPINTERFACE_MOC_SRCS
@@ -82,6 +83,7 @@ SET(INTERFACE_APPINTERFACE_MOC_SRCS
   DropSpaceWidget.h
   OverlayWidget.h
   SingleShotToolButton.h
+  LayerResamplerDialog.h
 )
 
 
@@ -104,6 +106,7 @@ SET(INTERFACE_APPINTERFACE_UI_SRCS
   ViewerInterface.ui
   ViewerWidget.ui
   StatusBar.ui
+  LayerResamplerDialog.ui
 )
 
 SET(INTERFACE_APPINTERFACE_RCC_SRCS

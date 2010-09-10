@@ -35,7 +35,7 @@
 #include <Application/Tools/HistogramEqualizationFilter.h>
 
 // Action associated with tool
-#include <Application/Tools/Actions/ActionHistogramEqualizationFilter.h>
+#include <Application/Filters/Actions/ActionHistogramEqualizationFilter.h>
 
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL( Seg3D, HistogramEqualizationFilter )

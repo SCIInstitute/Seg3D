@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_TOOL_ACTIONS_ACTIONOTSUTHRESHOLD_H
-#define APPLICATION_TOOL_ACTIONS_ACTIONOTSUTHRESHOLD_H
+#ifndef APPLICATION_FILTERS_ACTIONS_ACTIONOTSUTHRESHOLDFILTER_H
+#define APPLICATION_FILTERS_ACTIONS_ACTIONOTSUTHRESHOLDFILTER_H
 
 #include <Core/Action/Actions.h>
 #include <Core/Interface/Interface.h>
@@ -35,18 +35,28 @@
 
 namespace Seg3D
 {
-  
-class ActionOtsuThreshold : public Core::Action
+
+class ActionOtsuThresholdFilter : public Core::Action
 {
-CORE_ACTION( "OtsuThreshold", "Run Otsu Threshold Filter on: <name>" );
+
+CORE_ACTION( 
+  CORE_ACTION_TYPE( "OtsuThresholdFilter", "Divide the image in different sections based on the histogram." )
+  CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
+  CORE_ACTION_KEY( "amount", "2", "The amount of divisions to divide the image into" )
+)
   
   // -- Constructor/Destructor --
 public:
-  ActionOtsuThreshold()
+  ActionOtsuThresholdFilter()
   {
+    // Action arguments
+    this->add_argument( this->target_layer_ );
+    
+    // Action options
+    this->add_key( this->amount_ );
   }
   
-  virtual ~ActionOtsuThreshold()
+  virtual ~ActionOtsuThresholdFilter()
   {
   }
   
@@ -57,17 +67,17 @@ public:
   
   // -- Action parameters --
 private:
-  // Layer_handle that is requested
-  std::string layer_alias_;
-  int order_;
+
+  Core::ActionParameter< std::string > target_layer_;
+  Core::ActionParameter< int > amount_;
   
   // -- Dispatch this action from the interface --
 public:
-    
-  // DISPATCH
+
+  // DISPATCH:
   // Create and dispatch action that inserts the new layer 
-  static void Dispatch( std::string layer_alias, int order );
-  
+  static void Dispatch( Core::ActionContextHandle context, 
+    std::string target_layer, int amount );
 };
   
 } // end namespace Seg3D

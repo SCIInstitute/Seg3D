@@ -29,7 +29,7 @@
 // Application includes
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/InvertTool.h>
-#include <Application/Tools/Actions/ActionInvert.h>
+#include <Application/Filters/Actions/ActionInvert.h>
 #include <Application/Layer/Layer.h>
 #include <Application/LayerManager/LayerManager.h>
 

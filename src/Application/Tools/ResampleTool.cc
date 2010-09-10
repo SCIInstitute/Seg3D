@@ -31,7 +31,7 @@
 // Application includes
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/ResampleTool.h>
-#include <Application/Tools/Actions/ActionResample.h>
+#include <Application/Filters/Actions/ActionResample.h>
 #include <Application/Layer/Layer.h>
 #include <Application/Layer/LayerGroup.h>
 #include <Application/LayerManager/LayerManager.h>

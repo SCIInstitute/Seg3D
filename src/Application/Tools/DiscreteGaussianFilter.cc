@@ -35,7 +35,7 @@
 #include <Application/Tools/DiscreteGaussianFilter.h>
 
 // Action associated with tool
-#include <Application/Tools/Actions/ActionDiscreteGaussianFilter.h>
+#include <Application/Filters/Actions/ActionDiscreteGaussianFilter.h>
 
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL( Seg3D, DiscreteGaussianFilter )

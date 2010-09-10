@@ -32,12 +32,6 @@
 ##################################################
 
 SET(APPLICATION_TOOL_SRCS
-  BaseFilter.h
-  BaseFilter.cc
-  ITKFilter.h
-  ITKFilter.cc
-  NrrdFilter.h
-  NrrdFilter.cc
   SingleTargetTool.h
   SingleTargetTool.cc
   GroupTargetTool.h

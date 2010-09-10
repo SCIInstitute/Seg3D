@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_TOOL_ACTIONS_ACTIONHISTOGRAMEQUALIZATION_H
-#define APPLICATION_TOOL_ACTIONS_ACTIONHISTOGRAMEQUALIZATION_H
+#ifndef APPLICATION_FILTERS_ACTIONS_ACTIONHISTOGRAMEQUALIZATIONFILTER_H
+#define APPLICATION_FILTERS_ACTIONS_ACTIONHISTOGRAMEQUALIZATIONFILTER_H
 
 #include <Core/Action/Actions.h>
 #include <Core/Interface/Interface.h>
@@ -35,18 +35,34 @@
 
 namespace Seg3D
 {
-  
-class ActionHistogramEqualization : public Core::Action
+
+class ActionHistogramEqualizationFilter : public Core::Action
 {
-CORE_ACTION( "HistogramEqualization", "Run Histogram Equalization Filter on: <name>" );
+
+CORE_ACTION( 
+  CORE_ACTION_TYPE( "HistogramEqualization", "Teem filter equalizes the histogram of the data." )
+  CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
+  CORE_ACTION_KEY( "replace", "true", "Replace the old layer (true), or add an new layer (false)" )
+  CORE_ACTION_KEY( "amount", "1.0", "Amount of equalization (between 0.0 and 1.0)." )
+  CORE_ACTION_KEY( "bins", "3000", "Number of bins to use for histogram equalization.")
+  CORE_ACTION_KEY( "ignore", "1", "Number of bins to ignore for histogram equalization.")
+)
   
   // -- Constructor/Destructor --
 public:
-  ActionHistogramEqualization()
+  ActionHistogramEqualizationFilter()
   {
+    // Action arguments
+    this->add_argument( this->target_layer_ );
+    
+    // Action options
+    this->add_key( this->replace_ );    
+    this->add_key( this->amount_ );
+    this->add_key( this->bins_ );
+    this->add_key( this->ignore_bins_ );
   }
   
-  virtual ~ActionHistogramEqualization()
+  virtual ~ActionHistogramEqualizationFilter()
   {
   }
   
@@ -57,20 +73,23 @@ public:
   
   // -- Action parameters --
 private:
-  // Layer_handle that is requested
-  std::string layer_alias_;
-  double upper_threshold_;
-  double lower_threshold_;
-  int alpha_;
-  bool replace_;
+
+  Core::ActionParameter< std::string > target_layer_;
+
+  Core::ActionParameter< bool > replace_; 
+  Core::ActionParameter< double > amount_;
+  Core::ActionParameter< int > bins_;
+  Core::ActionParameter< int > ignore_bins_;
   
   // -- Dispatch this action from the interface --
 public:
-    
-  // DISPATCH
+
+  // DISPATCH:
   // Create and dispatch action that inserts the new layer 
-  static void Dispatch( std::string layer_alias, double upper_threshold, double lower_threshold, 
-    int alpha, bool replace );
+  static void Dispatch( Core::ActionContextHandle context, 
+    std::string target_layer, bool replace,
+    double alpha, int bins, int ignore_bins );
+          
 };
   
 } // end namespace Seg3D

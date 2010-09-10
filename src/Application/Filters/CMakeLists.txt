@@ -32,47 +32,41 @@
 ##################################################
 
 SET(APPLICATION_FILTERS_SRCS
+  BaseFilter.h
+  BaseFilter.cc
+  ITKFilter.h
+  ITKFilter.cc
+  NrrdFilter.h
+  NrrdFilter.cc
+  LayerResampler.h
+  LayerResampler.cc
 )
 
 SET(APPLICATION_FILTERS_ACTIONS_SRCS
-  Actions/ActionArithmeticFilter.h
-  Actions/ActionArithmeticFilter.cc
-  Actions/ActionBinaryDilateErodeFilter.h
-  Actions/ActionBinaryDilateErodeFilter.cc
-  Actions/ActionBooleanFilter.h
-  Actions/ActionBooleanFilter.cc
-#  Actions/ActionCannyEdgeDetectionFilter.h
-#  Actions/ActionCannyEdgeDetectionFilter.cc
-#  Actions/ActionConfidenceConnectedFilter.h
-#  Actions/ActionConfidenceConnectedFilter.cc
-#  Actions/ActionConnectedComponentFilter.h
-#  Actions/ActionConnectedComponentFilter.cc
-#  Actions/ActionFillHolesFilter.h
-#  Actions/ActionFillHolesFilter.cc
-#  Actions/ActionGradientMagnitudeFilter.h
-#  Actions/ActionGradientMagnitudeFilter.cc
-#  Actions/ActionHistogramEqualizationFilter.h
-#  Actions/ActionHistogramEqualizationFilter.cc
-#  Actions/ActionIntensityCorrectionFilter.h
-#  Actions/ActionIntensityCorrectionFilter.cc
-#  Actions/ActionInvertTool.h
-#  Actions/ActionInvertTool.cc
-#  Actions/ActionMaskDataFilter.h
-#  Actions/ActionMaskDataFilter.cc
-#  Actions/ActionMedianFilter.h
-#  Actions/ActionMedianFilter.cc
-#  Actions/ActionNeighborhoodConnectedFilter.h
-#  Actions/ActionNeighborhoodConnectedFilter.cc
-#  Actions/ActionOtsuThresholdFilter.h
-#  Actions/ActionOtsuThresholdFilter.cc
-#  Actions/ActionPaintTool.h
-#  Actions/ActionPaintTool.cc
-#  Actions/ActionPolylineTool.h
-#  Actions/ActionPolylineTool.cc
-#  Actions/ActionThresholdSegmentationLSFilter.h
-#  Actions/ActionThresholdSegmentationLSFilter.cc
-#  Actions/ActionThresholdTool.h
-#  Actions/ActionThresholdTool.cc
+  Actions/ActionResample.h
+  Actions/ActionResample.cc
+  Actions/ActionCannyEdgeDetectionFilter.h
+  Actions/ActionCannyEdgeDetectionFilter.cc
+  Actions/ActionCurvatureAnisotropicDiffusionFilter.h
+  Actions/ActionCurvatureAnisotropicDiffusionFilter.cc
+  Actions/ActionDiscreteGaussianFilter.h
+  Actions/ActionDiscreteGaussianFilter.cc
+  Actions/ActionGradientMagnitudeFilter.h
+  Actions/ActionGradientMagnitudeFilter.cc
+  Actions/ActionHistogramEqualizationFilter.h
+  Actions/ActionHistogramEqualizationFilter.cc
+  Actions/ActionIntensityCorrectionFilter.h
+  Actions/ActionIntensityCorrectionFilter.cc
+  Actions/ActionMedianFilter.h
+  Actions/ActionMedianFilter.cc
+  Actions/ActionOtsuThresholdFilter.h
+  Actions/ActionOtsuThresholdFilter.cc
+  Actions/ActionThreshold.h
+  Actions/ActionThreshold.cc
+  Actions/ActionInvert.h
+  Actions/ActionInvert.cc
+  Actions/ActionCrop.h
+  Actions/ActionCrop.cc
   )
 
 CORE_ADD_LIBRARY(Application_Filters ${APPLICATION_FILTERS_SRCS}
@@ -80,9 +74,6 @@ CORE_ADD_LIBRARY(Application_Filters ${APPLICATION_FILTERS_SRCS}
             
 TARGET_LINK_LIBRARIES(Application_Filters
                       Core_Utils
-                      Core_EventHandler
-                      Core_Application
-                      Core_Interface
                       Core_Action
                       Core_State
                       Application_Layer

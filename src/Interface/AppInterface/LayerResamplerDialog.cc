@@ -26,44 +26,39 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-// Application includes
-#include <Application/Tool/ToolFactory.h>
-#include <Application/Layer/Layer.h>
-#include <Application/LayerManager/LayerManager.h>
+#include <QtUtils/Bridge/QtBridge.h>
 
-// StateEnigne of the tool
-#include <Application/Tools/CannyEdgeDetectionFilter.h>
+#include <Interface/AppInterface/LayerResamplerDialog.h>
 
-// Action associated with tool
-#include <Application/Filters/Actions/ActionCannyEdgeDetectionFilter.h>
-
-
-// Register the tool into the tool factory
-SCI_REGISTER_TOOL( Seg3D, CannyEdgeDetectionFilter )
+#include "ui_LayerResamplerDialog.h"
 
 namespace Seg3D
 {
 
-CannyEdgeDetectionFilter::CannyEdgeDetectionFilter( const std::string& toolid ) :
-  SingleTargetTool( Core::VolumeType::DATA_E, toolid )
+class LayerResamplerDialogPrivate
 {
-  // Need to set ranges and default values for all parameters
-  this->add_state( "blurring_distance", this->blurring_distance_state_, 1.0, 0.0, 10.0, 0.10 );
-  this->add_state( "threshold", this->threshold_state_, 0.0, 0.0, 100.0, 1.0 );
-  
-}
+public:
+  Ui::LayerResamplerDialog ui_;
+};
 
-CannyEdgeDetectionFilter::~CannyEdgeDetectionFilter()
+LayerResamplerDialog::LayerResamplerDialog( 
+  const LayerResamplerHandle& layer_resampler, 
+  QWidget* parent ) :
+  QDialog( parent ),
+  private_( new LayerResamplerDialogPrivate )
 {
-  disconnect_all();
-}
-  
-void CannyEdgeDetectionFilter::execute( Core::ActionContextHandle context )
-{
-  ActionCannyEdgeDetectionFilter::Dispatch( context,
-    this->target_layer_state_->get(),
-    this->blurring_distance_state_->get(),
-    this->threshold_state_->get() );  
+  this->private_->ui_.setupUi( this );
+
+  QtUtils::QtBridge::Connect( this->private_->ui_.padding_combobox_, 
+    layer_resampler->padding_value_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.kernel_combobox_,
+    layer_resampler->kernel_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.sigma_spinbox_,
+    layer_resampler->gauss_sigma_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.cutoff_spinbox_,
+    layer_resampler->gauss_cutoff_state_ );
+  QtUtils::QtBridge::Show( this->private_->ui_.param_widget_,
+    layer_resampler->has_params_state_ );
 }
 
 } // end namespace Seg3D

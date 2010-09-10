@@ -35,7 +35,7 @@
 #include <Application/Tools/OtsuThresholdFilter.h>
 
 // Action associated with tool
-#include <Application/Tools/Actions/ActionOtsuThresholdFilter.h>
+#include <Application/Filters/Actions/ActionOtsuThresholdFilter.h>
 
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL( Seg3D, OtsuThresholdFilter )

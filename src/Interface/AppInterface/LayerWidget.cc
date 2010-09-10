@@ -36,16 +36,6 @@
 #include <QtUtils/Bridge/QtBridge.h>
 #include <QtUtils/Widgets/QtColorBarWidget.h>
 
-//Interface Includes
-#include <Interface/AppInterface/LayerWidget.h>
-#include <Interface/AppInterface/StyleSheet.h>
-#include <Interface/AppInterface/PushDragButton.h>
-#include <Interface/AppInterface/DropSpaceWidget.h>
-#include <Interface/AppInterface/OverlayWidget.h>
-
-//UI Includes
-#include "ui_LayerWidget.h"
-
 //Application Includes
 #include <Application/ViewerManager/ViewerManager.h>
 #include <Application/Layer/DataLayer.h>
@@ -57,6 +47,19 @@
 #include <Application/LayerManager/Actions/ActionDeleteIsosurface.h>
 #include <Application/LayerManager/Actions/ActionMoveLayerAbove.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
+#include <Application/Filters/LayerResampler.h>
+
+//Interface Includes
+#include <Interface/AppInterface/LayerWidget.h>
+#include <Interface/AppInterface/StyleSheet.h>
+#include <Interface/AppInterface/PushDragButton.h>
+#include <Interface/AppInterface/DropSpaceWidget.h>
+#include <Interface/AppInterface/OverlayWidget.h>
+#include <Interface/AppInterface/LayerResamplerDialog.h>
+
+//UI Includes
+#include "ui_LayerWidget.h"
+
 
 
 namespace Seg3D
@@ -826,8 +829,29 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
   // Finally if our drag was aborted then we reset the layers styles to be visible
   if( ( drag->exec(Qt::MoveAction, Qt::MoveAction) ) == Qt::MoveAction ) 
   { 
-    ActionMoveLayerAbove::Dispatch( Core::Interface::GetWidgetActionContext(),
-      this->get_layer_id(), this->private_->drop_layer_->get_layer_id() );
+    LayerGroupHandle dst_group = this->private_->drop_layer_->
+      private_->layer_->get_layer_group();
+    if ( this->private_->layer_->get_layer_group() != dst_group )
+    {
+      this->seethrough( false );
+      LayerResamplerHandle layer_resampler( new LayerResampler(
+        this->private_->layer_, dst_group ) );
+      LayerResamplerDialog* dialog = new LayerResamplerDialog( layer_resampler, this );
+      if ( dialog->exec() == QDialog::Accepted )
+      {
+        layer_resampler->execute( Core::Interface::GetWidgetActionContext() );
+      }
+      else
+      {
+        this->private_->drop_layer_->enable_drop_space( false );
+      }
+      dialog->deleteLater();
+    }
+    else
+    {
+      ActionMoveLayerAbove::Dispatch( Core::Interface::GetWidgetActionContext(),
+        this->get_layer_id(), this->private_->drop_layer_->get_layer_id() );
+    }
   }
   else
   {
@@ -861,43 +885,9 @@ void LayerWidget::dropEvent( QDropEvent* event )
     return;
   }
   
-  bool good_to_go = false;
-  
-  if( !LayerManager::Instance()->check_for_same_group(
-    mime_data[ 1 ], this->get_layer_id() ) )
-  {
-    QMessageBox message_box;
-    message_box.setText( QString::fromUtf8( "This move will modify the layer.  "
-        "The new size of the layer will be: " )
-        + QString::number( this->private_->layer_->get_grid_transform().get_nx() ) 
-        + QString::fromUtf8( " x " )
-        + QString::number( this->private_->layer_->get_grid_transform().get_ny() ) 
-        + QString::fromUtf8( " x " ) 
-        + QString::number( this->private_->layer_->get_grid_transform().get_nz() ) );
-    message_box.setInformativeText( QString::fromUtf8( "Are you sure you want to do this?" ) );
-    message_box.setStandardButtons( QMessageBox::Yes | QMessageBox::No );
-    message_box.setDefaultButton( QMessageBox::No );
-    if( QMessageBox::Yes == message_box.exec() )
-    {
-      good_to_go = true;
-    }
-  }
-  else
-  {
-    good_to_go = true;
-  }
-
-  if( good_to_go )
-  {
-    dynamic_cast< LayerWidget* >( event->source() )->set_drop_target( this ); 
-    event->setDropAction(Qt::MoveAction);
-    event->accept();
-  }
-  else
-  {
-    this->enable_drop_space( false );
-    event->ignore();
-  }
+  dynamic_cast< LayerWidget* >( event->source() )->set_drop_target( this ); 
+  event->setDropAction( Qt::MoveAction );
+  event->accept();
 }
 
 void LayerWidget::dragEnterEvent( QDragEnterEvent* event)

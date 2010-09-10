@@ -26,44 +26,32 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-// Application includes
-#include <Application/Tool/ToolFactory.h>
-#include <Application/Layer/Layer.h>
-#include <Application/LayerManager/LayerManager.h>
+#ifndef INTERFACE_APPINTERFACE_LAYERRESAMPLERDIALOG_H
+#define INTERFACE_APPINTERFACE_LAYERRESAMPLERDIALOG_H
 
-// StateEnigne of the tool
-#include <Application/Tools/CannyEdgeDetectionFilter.h>
+#include <QDialog>
 
-// Action associated with tool
-#include <Application/Filters/Actions/ActionCannyEdgeDetectionFilter.h>
-
-
-// Register the tool into the tool factory
-SCI_REGISTER_TOOL( Seg3D, CannyEdgeDetectionFilter )
+#include <Application/Filters/LayerResampler.h>
 
 namespace Seg3D
 {
 
-CannyEdgeDetectionFilter::CannyEdgeDetectionFilter( const std::string& toolid ) :
-  SingleTargetTool( Core::VolumeType::DATA_E, toolid )
-{
-  // Need to set ranges and default values for all parameters
-  this->add_state( "blurring_distance", this->blurring_distance_state_, 1.0, 0.0, 10.0, 0.10 );
-  this->add_state( "threshold", this->threshold_state_, 0.0, 0.0, 100.0, 1.0 );
-  
-}
+class LayerResamplerDialogPrivate;
+typedef boost::shared_ptr< LayerResamplerDialogPrivate > LayerResamplerDialogPrivateHandle;
 
-CannyEdgeDetectionFilter::~CannyEdgeDetectionFilter()
+class LayerResamplerDialog : public QDialog
 {
-  disconnect_all();
-}
-  
-void CannyEdgeDetectionFilter::execute( Core::ActionContextHandle context )
-{
-  ActionCannyEdgeDetectionFilter::Dispatch( context,
-    this->target_layer_state_->get(),
-    this->blurring_distance_state_->get(),
-    this->threshold_state_->get() );  
-}
+  Q_OBJECT
+
+public:
+  LayerResamplerDialog( const LayerResamplerHandle& layer_resampler,
+    QWidget* parent );
+  ~LayerResamplerDialog() {}
+
+private:
+  LayerResamplerDialogPrivateHandle private_;
+};
 
 } // end namespace Seg3D
+
+#endif

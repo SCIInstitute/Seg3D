@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_TOOL_ACTIONS_ACTIONGRADIENTMAGNITUDEFILTER_H
-#define APPLICATION_TOOL_ACTIONS_ACTIONGRADIENTMAGNITUDEFILTER_H
+#ifndef APPLICATION_FILTERS_ACTIONS_ACTIONGRADIENTMAGNITUDEFILTER_H
+#define APPLICATION_FILTERS_ACTIONS_ACTIONGRADIENTMAGNITUDEFILTER_H
 
 #include <Core/Action/Actions.h>
 #include <Core/Interface/Interface.h>
@@ -39,7 +39,7 @@ namespace Seg3D
 class ActionGradientMagnitudeFilter : public Core::Action
 {
 
-CORE_ACTION_XML( 
+CORE_ACTION( 
   CORE_ACTION_TYPE( "GradientMagnitudeFilter", "Extract the magnitude of the local gradient"
     " from a data layer." )
   CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
@@ -85,7 +85,8 @@ public:
     
   // DISPATCH
   // Create and dispatch action that inserts the new layer 
-  static void Dispatch( Core::ActionContextHandle context, std::string layer_id, bool replace );
+  static void Dispatch( Core::ActionContextHandle context, std::string target_layer,
+    bool replace, bool preserve_data_format );
   
 };
   

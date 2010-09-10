@@ -35,7 +35,7 @@
 #include <Application/Tools/CurvatureAnisotropicDiffusionFilter.h>
 
 // Action associated with tool
-#include <Application/Tools/Actions/ActionCurvatureAnisotropicDiffusionFilter.h>
+#include <Application/Filters/Actions/ActionCurvatureAnisotropicDiffusionFilter.h>
 
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL( Seg3D, CurvatureAnisotropicDiffusionFilter )

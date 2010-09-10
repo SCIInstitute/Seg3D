@@ -27,28 +27,28 @@
  */
 
 // ITK includes
-#include <itkOtsuMultipleThresholdsImageFilter.h>
+#include <itkCurvatureAnisotropicDiffusionImageFilter.h>
 
 // Application includes
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/StatusBar/StatusBar.h>
 #include <Application/Filters/ITKFilter.h>
-#include <Application/Filters/Actions/ActionOtsuThresholdFilter.h>
+#include <Application/Filters/Actions/ActionCurvatureAnisotropicDiffusionFilter.h>
 
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
 // NOTE: Registration needs to be done outside of any namespace
-CORE_REGISTER_ACTION( Seg3D, OtsuThresholdFilter )
+CORE_REGISTER_ACTION( Seg3D, CurvatureAnisotropicDiffusionFilter )
 
 namespace Seg3D
 {
 
-bool ActionOtsuThresholdFilter::validate( Core::ActionContextHandle& context )
+bool ActionCurvatureAnisotropicDiffusionFilter::validate( Core::ActionContextHandle& context )
 {
   // Check for layer existance and type information
   std::string error;
-  if ( ! LayerManager::CheckLayerExistanceAndType( this->target_layer_.value(), 
+  if ( ! LayerManager::CheckLayerExistanceAndType( this->layer_id_.value(), 
     Core::VolumeType::DATA_E, error ) )
   {
     context->report_error( error );
@@ -57,17 +57,24 @@ bool ActionOtsuThresholdFilter::validate( Core::ActionContextHandle& context )
   
   // Check for layer availability 
   Core::NotifierHandle notifier;
-  if ( ! LayerManager::CheckLayerAvailabilityForProcessing( this->target_layer_.value(), 
-    notifier ) )
+  if ( ! LayerManager::CheckLayerAvailability( this->layer_id_.value(), 
+    this->replace_.value(), notifier ) )
   {
     context->report_need_resource( notifier );
     return false;
   }
     
   // If the number of iterations is lower than one, we cannot run the filter
-  if( this->amount_.value() < 1 )
+  if( this->iterations_.value() < 1 )
   {
-    context->report_error( "The number of thresholds needs to be at least one." );
+    context->report_error( "The number of iterations needs to be larger than zero." );
+    return false;
+  }
+  
+  // Conductance needs to be a positive number
+  if( this->sensitivity_.value() < 0.0 )
+  {
+    context->report_error( "The sensitivity needs to be larger than zero." );
     return false;
   }
   
@@ -80,47 +87,52 @@ bool ActionOtsuThresholdFilter::validate( Core::ActionContextHandle& context )
 // NOTE: The separation of the algorithm into a private class is for the purpose of running the
 // filter on a separate thread.
 
-class OtsuThresholdFilterAlgo : public ITKFilter
+class CurvatureAnisotropicDiffusionFilterAlgo : public ITKFilter
 {
 
 public:
   LayerHandle src_layer_;
-  std::vector<LayerHandle> dst_layer_;
-
-  double amount_;
+  LayerHandle dst_layer_;
   
+  int iterations_;
+  double sensitivity_;
+  bool preserve_data_format_;
+
 public:
   // RUN:
-  // Implementation of run of the Runnable base class, this function is called when the thread
+  // Implemtation of run of the Runnable base class, this function is called when the thread
   // is launched.
-  
+
   // NOTE: The macro needs a data type to select which version to run. This needs to be
   // a member variable of the algorithm class.
   SCI_BEGIN_TYPED_RUN( this->src_layer_->get_data_type() )
   {
     // Define the type of filter that we use.
-    typedef itk::OtsuMultipleThresholdsImageFilter< 
-      TYPED_IMAGE_TYPE, UCHAR_IMAGE_TYPE > filter_type;
+    typedef itk::CurvatureAnisotropicDiffusionImageFilter< 
+      TYPED_IMAGE_TYPE, FLOAT_IMAGE_TYPE > filter_type;
 
     // Retrieve the image as an itk image from the underlying data structure
     // NOTE: This only does wrapping and does not regenerate the data.
     typename Core::ITKImageDataT<VALUE_TYPE>::Handle input_image; 
     this->get_itk_image_from_layer<VALUE_TYPE>( this->src_layer_, input_image );
         
-    // Create a new ITK filter instantiation.   
+    // Create a new ITK filter instantiation. 
     typename filter_type::Pointer filter = filter_type::New();
-
-    // Relay abort and progress information to the layer that is executing the filter.
-
-    for ( size_t j = 0; j < static_cast<size_t>( this->amount_ + 1 );  j++ )
-    {
-      this->observe_itk_filter( filter, this->dst_layer_[ j ] );
-    }
     
+    // Relay abort and progress information to the layer that is executing the filter.
+    this->observe_itk_filter( filter, this->dst_layer_ );
+
     // Setup the filter parameters that we do not want to change.
     filter->SetInput( input_image->get_image() );
-      filter->SetLabelOffset( 0 );
-    filter->SetNumberOfThresholds( this->amount_ );
+    filter->SetInPlace( false );
+    filter->SetNumberOfIterations( this->iterations_ );
+    
+    // We changed the behavior of this parameter to be more intuitive. It is now relative to
+    // the dynamic range of the data. So a similar setting will behave similarly on a
+    // different data set.
+    double range = this->src_layer_->get_volume()->get_max() - 
+      this->src_layer_->get_volume()->get_min();
+    filter->SetConductanceParameter( this->sensitivity_ * range );
 
     // Run the actual ITK filter.
     // This needs to be in a try/catch statement as certain filters throw exceptions when they
@@ -132,17 +144,24 @@ public:
     catch ( ... ) 
     {
       StatusBar::SetMessage( Core::LogMessageType::ERROR_E,  
-        "OtsuThresholdFilter failed." );
+        "CurvatureAnisotropicDiffusionFilter failed." );
     }
 
     // As ITK filters generate an inconsistent abort behavior, we record our own abort flag
     // This one is set when the abort button is pressed and an abort is sent to ITK.
     if ( this->check_abort() ) return;
     
-    for ( size_t j = 0; j < static_cast<size_t>( this->amount_ + 1 );  j++ )
-    {   
-      this->insert_itk_label_into_mask_layer( this->dst_layer_[ j ], filter->GetOutput(), 
-        static_cast<unsigned char>( j ) );  
+    // If we want to preserve the data type we convert the data before inserting it back.
+    // NOTE: Conversion is done on the filter thread and insertion is done on the application
+    // thread.
+    if ( this->preserve_data_format_ )
+    {
+      this->convert_and_insert_itk_image_into_layer( this->dst_layer_, 
+        filter->GetOutput(), this->src_layer_->get_data_type() );       
+    }
+    else
+    {
+      this->insert_itk_image_into_layer( this->dst_layer_, filter->GetOutput() ); 
     }
   }
   SCI_END_TYPED_RUN()
@@ -151,55 +170,66 @@ public:
   // The name of the filter, this information is used for generating new layer labels.
   virtual std::string get_filter_name() const
   {
-    return "OtsuThreshold";
+    return "AnisoDiff";
   }
 };
 
 
-bool ActionOtsuThresholdFilter::run( Core::ActionContextHandle& context, 
+bool ActionCurvatureAnisotropicDiffusionFilter::run( Core::ActionContextHandle& context, 
   Core::ActionResultHandle& result )
 {
   // Create algorithm
-  boost::shared_ptr<OtsuThresholdFilterAlgo> algo( new OtsuThresholdFilterAlgo );
+  boost::shared_ptr<CurvatureAnisotropicDiffusionFilterAlgo> algo(
+    new CurvatureAnisotropicDiffusionFilterAlgo );
 
   // Copy the parameters over to the algorithm that runs the filter
-  algo->amount_ = this->amount_.value();
+  algo->iterations_ = this->iterations_.value();
+  algo->sensitivity_ = this->sensitivity_.value();
+  algo->preserve_data_format_ = this->preserve_data_format_.value();
 
   // Find the handle to the layer
-  algo->find_layer( this->target_layer_.value(), algo->src_layer_ );
+  algo->find_layer( this->layer_id_.value(), algo->src_layer_ );
 
-  algo->dst_layer_.resize( algo->amount_ + 1 );
-
-  // Lock the src layer, so it cannot be used else where
-  algo->lock_for_use( algo->src_layer_ );
-  
-  // Create the destination layer, which will show progress
-  for ( size_t j = 0; j < static_cast<size_t>( algo->amount_ + 1 );  j++ )
+  if ( this->replace_.value() )
   {
-    algo->create_and_lock_mask_layer_from_layer( algo->src_layer_, algo->dst_layer_[ j ] );
+    // Copy the handles as destination and source will be the same
+    algo->dst_layer_ = algo->src_layer_;
+    // Mark the layer for processing.
+    algo->lock_for_processing( algo->dst_layer_ );  
   }
-  
+  else
+  {
+    // Lock the src layer, so it cannot be used else where
+    algo->lock_for_use( algo->src_layer_ );
+    
+    // Create the destination layer, which will show progress
+    algo->create_and_lock_data_layer_from_layer( algo->src_layer_, algo->dst_layer_ );
+  }
+
   // Return the id of the destination layer.
-  if ( algo->dst_layer_.size() )
-  {
-    result = Core::ActionResultHandle( new Core::ActionResult( algo->dst_layer_[ 0 ]->get_layer_id() ) );
-  }
-  
-  // Start the filter on a separate thread.
+  result = Core::ActionResultHandle( new Core::ActionResult( algo->dst_layer_->get_layer_id() ) );
+
+  // Start the filter.
   Core::Runnable::Start( algo );
 
   return true;
 }
 
-void ActionOtsuThresholdFilter::Dispatch( Core::ActionContextHandle context, 
-  std::string target_layer, int amount )
+
+void ActionCurvatureAnisotropicDiffusionFilter::Dispatch( Core::ActionContextHandle context, 
+  std::string layer_id, int iterations, double sensitivity, 
+  bool preserve_data_format, bool replace )
 { 
   // Create a new action
-  ActionOtsuThresholdFilter* action = new ActionOtsuThresholdFilter;
+  ActionCurvatureAnisotropicDiffusionFilter* action = 
+    new ActionCurvatureAnisotropicDiffusionFilter;
 
   // Setup the parameters
-  action->target_layer_.value() = target_layer;
-  action->amount_.value() = amount;
+  action->layer_id_.value() = layer_id;
+  action->iterations_.value() = iterations;
+  action->sensitivity_.value() = sensitivity;
+  action->preserve_data_format_.value() = preserve_data_format;
+  action->replace_.value() = replace;
 
   // Dispatch action to underlying engine
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );

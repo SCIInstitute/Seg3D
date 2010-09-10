@@ -35,7 +35,7 @@
 #include <Application/Tools/IntensityCorrectionFilter.h>
 
 // Action associated with tool
-#include <Application/Tools/Actions/ActionIntensityCorrectionFilter.h>
+#include <Application/Filters/Actions/ActionIntensityCorrectionFilter.h>
 
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL( Seg3D, IntensityCorrectionFilter )

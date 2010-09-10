@@ -26,46 +26,29 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_FILTERS_ACTIONS_ACTIONMEDIANFILTER_H
-#define APPLICATION_FILTERS_ACTIONS_ACTIONMEDIANFILTER_H
+#ifndef APPLICATION_FILTERS_ACTIONS_ACTIONTHRESHOLD_H
+#define APPLICATION_FILTERS_ACTIONS_ACTIONTHRESHOLD_H
 
 #include <Core/Action/Actions.h>
-#include <Core/Interface/Interface.h>
-#include <Application/Layer/Layer.h>
 
 namespace Seg3D
 {
 
-class ActionMedianFilter : public Core::Action
+class ActionThreshold : public Core::Action
 {
 
 CORE_ACTION( 
-  CORE_ACTION_TYPE( "MedianFilter", "ITK filter that calculates the median from a volume with"
-    " a certain radius." )
-  CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
-  CORE_ACTION_KEY( "replace", "true", "Replace the old layer (true), or add an new layer (false)" )
-  CORE_ACTION_KEY( "preserve_data_format", "true", "ITK filters run in floating point percision,"
-    " this option will convert the result back into the original format." )
-  CORE_ACTION_KEY( "radius", "2", "The distance over which the filter computes the median." )
+  CORE_ACTION_TYPE( "ThresholdTool", "Build a mask layer by thresholding a data layer." )
+  CORE_ACTION_ARGUMENT( "layerid", "The ID of the data layer on which to run the tool." )
+  CORE_ACTION_ARGUMENT( "lower_threshold", "The minimum value of the threshold range." )
+  CORE_ACTION_ARGUMENT( "upper_threshold", "The maximum value of the threshold range." )
 )
   
   // -- Constructor/Destructor --
 public:
-  ActionMedianFilter()
-  {
-    // Action arguments
-    this->add_argument( this->target_layer_ );
-    
-    // Action options
-    this->add_key( this->replace_ );
-    this->add_key( this->preserve_data_format_ );
-    
-    this->add_key( this->radius_ );
-  }
+  ActionThreshold();
   
-  virtual ~ActionMedianFilter()
-  {
-  }
+  virtual ~ActionThreshold() {}
   
   // -- Functions that describe action --
 public:
@@ -76,10 +59,9 @@ public:
 private:
 
   Core::ActionParameter< std::string > target_layer_;
-  Core::ActionParameter< bool > replace_;
-  Core::ActionParameter< bool > preserve_data_format_;
   
-  Core::ActionParameter<  int > radius_;
+  Core::ActionParameter< double > upper_threshold_;
+  Core::ActionParameter< double > lower_threshold_;
   
   // -- Dispatch this action from the interface --
 public:
@@ -87,8 +69,8 @@ public:
   // DISPATCH:
   // Create and dispatch action that inserts the new layer 
   static void Dispatch( Core::ActionContextHandle context, 
-    std::string target_layer, bool replace,
-    bool preserve_data_format, int radius );
+    std::string target_layer, double lower_threshold,
+    double upper_threshold );
           
 };
   
