@@ -59,7 +59,7 @@ public:
 public:
   // MAKE_NEW_GROUP:
   // function that creates a new group to put layers into 
-  void make_new_group( LayerGroupHandle group );
+  LayerGroupWidget* make_new_group( LayerGroupHandle group );
 
   
   // SET_ACTIVE_LAYER:
@@ -70,9 +70,7 @@ public:
   void handle_group_internals_change( LayerGroupHandle group );
   
   void handle_groups_changed();
-  
-  void cleanup_removed_groups();
-  
+    
 private Q_SLOTS:
   // PREP_LAYERS_FOR_DRAG_AND_DROP:
   // this function tells the groups to prepare their layers for drag and drop
@@ -95,7 +93,10 @@ private:
 
 private:
   QList< LayerGroupWidgetQHandle > group_list_;
-  std::map< std::string, LayerGroupWidgetQHandle > group_map_;
+
+  typedef std::map< std::string, LayerGroupWidgetQHandle > 
+    group_widget_map_type;
+  group_widget_map_type group_map_;
 };
 
 } //endnamespace Seg3d

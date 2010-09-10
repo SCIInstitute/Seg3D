@@ -115,15 +115,16 @@ bool LayerManager::insert_layer( LayerHandle layer )
 
   CORE_LOG_DEBUG( std::string( "Signalling that new layer was inserted" ) );
   CORE_LOG_DEBUG( std::string( "--- triggering signals ---" ) );
-  
-  // This is no longer needed by the LayerManager Widget
+
   if ( new_group )
   {
     this->group_inserted_signal_( group_handle );
     this->groups_changed_signal_();
   }
-
-  this->group_internals_changed_signal_( group_handle );
+  else
+  {
+    this->group_internals_changed_signal_( group_handle );
+  }
 
   // This is no longer needed by the LayerManager Widget  
   this->layer_inserted_signal_( layer );

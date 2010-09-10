@@ -40,10 +40,6 @@
 //Interface Includes
 #include <Interface/AppInterface/LayerManagerWidget.h>
 
-
-
-
-
 namespace Seg3D
 {
 
@@ -83,95 +79,86 @@ void LayerManagerWidget::handle_groups_changed()
   
   this->setUpdatesEnabled( false );
   
-  // First we remove the LayerGroupWidgets that arent needed any more.
-  for( std::map< std::string, LayerGroupWidgetQHandle>::iterator it = this->group_map_.begin(); 
-    it != this->group_map_.end(); ++it )
+  // Remove unused group widgets from layout
+  group_widget_map_type::iterator it = this->group_map_.begin();
+  while ( it != this->group_map_.end() )
   {
     ( *it ).second->set_drop( false );
     ( *it ).second->seethrough( false );
-    
+
     bool found = false;
-    for( int i = 0; i < static_cast< int >( group_list.size() ); ++i )
+    for ( size_t i = 0; i < group_list.size(); ++i )
     {
-      if( ( *it ).first == group_list[ i ]->get_group_id() )
+      if ( group_list[ i ]->get_group_id() == ( *it ).first )
       {
         found = true;
         break;
       }
     }
-    if( !found )
+    group_widget_map_type::iterator prev = it++;
+    if ( !found )
     {
-      this->group_layout_->removeWidget( ( *it ).second.data() );
-      group_widget_deleted = true;
-    }
-  }
-
-  // then if we need to, we delete the unused LayerGroupWidgets from the group_map_
-  if( group_widget_deleted )
-  {
-    this->cleanup_removed_groups();
-  }
-  
-  this->setMinimumHeight( 0 );
-  
-  for( size_t i = 0; i < group_list.size(); ++i )
-  {
-    std::map< std::string, LayerGroupWidgetQHandle >::iterator found_group_widget = 
-    this->group_map_.find( group_list[ i ]->get_group_id() );
-    if( found_group_widget != this->group_map_.end() )
-    {
-      this->group_layout_->insertWidget( static_cast< int >( i ), 
-        ( *found_group_widget ).second.data() );
-    }
-  }
-  this->setUpdatesEnabled( true );
-}
-
-void LayerManagerWidget::cleanup_removed_groups()
-{
-  std::map< std::string, LayerGroupWidgetQHandle>::iterator it = this->group_map_.begin();
-  while ( it != this->group_map_.end() )
-  {
-    std::map< std::string, LayerGroupWidgetQHandle>::iterator prev = it++;
-    if( this->group_layout_->indexOf( ( *prev ).second.data() ) == -1 )
-    {
-      ( *prev ).second->deleteLater();
+      LayerGroupWidget* group_widget = ( *prev ).second.data();
+      this->group_layout_->removeWidget( group_widget );
+      group_widget->deleteLater();
       this->group_map_.erase( prev );
     }
   }
+
+  this->setMinimumHeight( 0 );
+
+  // Add the group widgets in order
+  for ( size_t i = 0; i < group_list.size(); ++i )
+  {
+    LayerGroupWidget* group_widget;
+    group_widget_map_type::iterator it = this->group_map_.find( 
+      group_list[ i ]->get_group_id() );
+    if ( it == this->group_map_.end() )
+    {
+      group_widget = this->make_new_group( group_list[ i ] );
+      group_widget->handle_change();
+      group_widget->show();
+      this->group_map_[ group_list[ i ]->get_group_id() ] =
+        LayerGroupWidgetQHandle( group_widget );
+    }
+    else
+    {
+      group_widget = ( *it ).second.data();
+    }
+
+    this->group_layout_->insertWidget( static_cast< int >( i ), group_widget );
+  }
+
+  this->setUpdatesEnabled( true );
 }
 
 void LayerManagerWidget::handle_group_internals_change( LayerGroupHandle group )
 {
-  std::map< std::string, LayerGroupWidgetQHandle >::iterator found_group_widget = 
-  this->group_map_.find( group->get_group_id() );
-  if( found_group_widget != this->group_map_.end() )
+  group_widget_map_type::iterator it = this->group_map_.find( group->get_group_id() );
+  if( it != this->group_map_.end() )
   {
-    ( *found_group_widget ).second->handle_change();
+    ( *it ).second->handle_change();
   }
   else
   {
-    this->make_new_group( group );
-    this->handle_group_internals_change( group );
+    CORE_THROW_LOGICERROR( "Group hasn't been created yet" );
   }
 }
 
-void LayerManagerWidget::make_new_group( LayerGroupHandle group )
+LayerGroupWidget* LayerManagerWidget::make_new_group( LayerGroupHandle group )
 {
-  LayerGroupWidgetQHandle new_group_handle( new LayerGroupWidget( this, group ) );
-  this->group_layout_->addWidget( new_group_handle.data() );
-  new_group_handle->show();
-  this->group_map_[ group->get_group_id() ] = new_group_handle;
+  LayerGroupWidget* new_group = new LayerGroupWidget( this, group );
   
-  connect( new_group_handle.data(), SIGNAL( prep_layers_for_drag_and_drop_signal_( bool ) ), 
+  connect( new_group, SIGNAL( prep_layers_for_drag_and_drop_signal_( bool ) ), 
       this, SLOT( prep_layers_for_drag_and_drop( bool ) ) );
   
-  connect( new_group_handle.data(), SIGNAL( prep_groups_for_drag_and_drop_signal_( bool ) ), 
+  connect( new_group, SIGNAL( prep_groups_for_drag_and_drop_signal_( bool ) ), 
       this, SLOT( prep_groups_for_drag_and_drop( bool ) ) );
   
-  connect( new_group_handle.data(), SIGNAL( picked_up_group_size_signal_( int ) ), 
+  connect( new_group, SIGNAL( picked_up_group_size_signal_( int ) ), 
       this, SLOT( notify_picked_up_group_size( int ) ) );
   
+  return new_group;
 }
 
 void  LayerManagerWidget::set_active_layer( LayerHandle layer )
@@ -179,7 +166,7 @@ void  LayerManagerWidget::set_active_layer( LayerHandle layer )
   if( this->active_layer_ )
     this->active_layer_.toStrongRef()->set_active( false );
   
-  for( std::map< std::string, LayerGroupWidgetQHandle>::iterator it = this->group_map_.begin(); 
+  for( group_widget_map_type::iterator it = this->group_map_.begin(); 
     it != this->group_map_.end(); ++it )
   {
     LayerWidgetQWeakHandle temp_layer = ( *it ).second->set_active_layer( layer );
@@ -189,13 +176,12 @@ void  LayerManagerWidget::set_active_layer( LayerHandle layer )
       break;
     }
   }
-  
 }
 
 // Drag and Drop Functions  
 void LayerManagerWidget::prep_layers_for_drag_and_drop( bool move_time )
 {
-  for( std::map< std::string, LayerGroupWidgetQHandle>::iterator it = this->group_map_.begin(); 
+  for( group_widget_map_type::iterator it = this->group_map_.begin(); 
     it != this->group_map_.end(); ++it )
   {
     ( *it ).second->prep_layers_for_drag_and_drop( move_time );
@@ -205,7 +191,7 @@ void LayerManagerWidget::prep_layers_for_drag_and_drop( bool move_time )
 
 void LayerManagerWidget::prep_groups_for_drag_and_drop( bool move_time )
 {
-  for( std::map< std::string, LayerGroupWidgetQHandle>::iterator it = this->group_map_.begin(); 
+  for( group_widget_map_type::iterator it = this->group_map_.begin(); 
     it != this->group_map_.end(); ++it )
   {
     ( *it ).second->prep_for_animation( move_time );
@@ -215,7 +201,7 @@ void LayerManagerWidget::prep_groups_for_drag_and_drop( bool move_time )
   
 void LayerManagerWidget::notify_picked_up_group_size( int group_size )
 {
-  for( std::map< std::string, LayerGroupWidgetQHandle>::iterator it = this->group_map_.begin(); 
+  for( group_widget_map_type::iterator it = this->group_map_.begin(); 
     it != this->group_map_.end(); ++it )
   {
     ( *it ).second->set_picked_up_group_size( group_size );
