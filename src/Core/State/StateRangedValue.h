@@ -33,6 +33,7 @@
 # pragma once
 #endif
 
+#include <Core/Math/MathFunctions.h>
 #include <Core/State/StateBase.h>
 #include <Core/State/StateEngine.h>
 
@@ -342,18 +343,14 @@ public:
     {
       // Lock the state engine so no other thread will be accessing it
       StateEngine::lock_type lock( StateEngine::Instance()->get_mutex() );
-      new_value = this->value_ + offset_value;
-
-      if ( new_value < this->min_value_ )
-      {
-        new_value = this->min_value_;
-        source = ActionSource::NONE_E;
-      }
-      if ( new_value > this->max_value_ )
-      {
-        new_value = this->max_value_;
-        source = ActionSource::NONE_E;
-      }
+      
+      // Clamp the new value to the current range
+      // NOTE: The offset value will never come from a GUI widget, so it's not
+      // necessary to alter the ActionSource if the value is out of range. On the 
+      // other hand, it's desirable to preserve the source information because
+      // certain signal handlers might need it.
+      new_value = Clamp( this->value_ + offset_value, 
+        this->min_value_, this->max_value_ );
 
       if ( this->value_ != new_value )
       {

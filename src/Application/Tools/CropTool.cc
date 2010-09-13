@@ -158,7 +158,7 @@ void CropToolPrivate::handle_cropbox_origin_changed( int index, double value,
   this->tool_->cropbox_size_state_[ index ]->get_range( min_size, max_size );
   size = this->tool_->cropbox_size_state_[ index ]->get();
   this->tool_->cropbox_size_state_[ index ]->set_range( 0, max_val - value );
-  if ( source != Core::ActionSource::INTERFACE_MOUSE_E )
+  if ( source == Core::ActionSource::INTERFACE_MOUSE_E )
   {
     this->tool_->cropbox_size_state_[ index ]->set( size + max_val - value - max_size );  
   }
@@ -274,112 +274,63 @@ void CropToolPrivate::hit_test( int x, int y )
 
 void CropToolPrivate::resize( int x0, int y0, int x1, int y1 )
 {
-  Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
-
   double world_x0, world_y0, world_x1, world_y1;
-  this->viewer_->window_to_world( x0, y0, world_x0, world_y0 );
-  this->viewer_->window_to_world( x1, y1, world_x1, world_y1 );
+  {
+    Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
+    this->viewer_->window_to_world( x0, y0, world_x0, world_y0 );
+    this->viewer_->window_to_world( x1, y1, world_x1, world_y1 );
+  }
   double dx = world_x1 - world_x0;
   double dy = world_y1 - world_y0;
   bool size_changed = false;
   const double epsilon = 1e-6;
 
-  if ( this->hit_pos_ & HitPosition::LEFT_E )
+  if ( ( this->hit_pos_ & HitPosition::LEFT_E ) && Core::Abs( dx ) > epsilon )
   {
-    double min_x, max_x;
-    double old_origin_hor = this->tool_->cropbox_origin_state_[ this->hor_index_ ]->get();
-    this->tool_->cropbox_origin_state_[ this->hor_index_ ]->get_range( min_x, max_x );
-    double origin_hor = old_origin_hor + dx;
-    origin_hor = Core::Clamp( origin_hor, min_x, max_x );
-    double offset = origin_hor - old_origin_hor;
-    if ( Core::Abs( offset ) > epsilon )
-    {
-      Core::ActionOffset::Dispatch( Core::Interface::GetMouseActionContext(),
-        this->tool_->cropbox_origin_state_[ this->hor_index_ ], offset );
-      Core::ActionOffset::Dispatch( Core::Interface::GetMouseActionContext(),
-        this->tool_->cropbox_size_state_[ this->hor_index_ ], -offset );
-      size_changed = true;
-    }
+    Core::ActionOffset::Dispatch( Core::Interface::GetMouseActionContext(),
+      this->tool_->cropbox_origin_state_[ this->hor_index_ ], dx );
+    size_changed = true;
   }
   
-  if ( this->hit_pos_ & HitPosition::BOTTOM_E )
+  if ( ( this->hit_pos_ & HitPosition::BOTTOM_E ) && Core::Abs( dy ) > epsilon )
   {
-    double min_y, max_y;
-    double old_origin_ver = this->tool_->cropbox_origin_state_[ this->ver_index_ ]->get();
-    this->tool_->cropbox_origin_state_[ this->ver_index_ ]->get_range( min_y, max_y );
-    double origin_ver = old_origin_ver + dy;
-    origin_ver = Core::Clamp( origin_ver, min_y, max_y );
-    double offset = origin_ver - old_origin_ver;
-    if ( Core::Abs( offset ) > epsilon )
-    {
-      Core::ActionOffset::Dispatch( Core::Interface::GetMouseActionContext(),
-        this->tool_->cropbox_origin_state_[ this->ver_index_ ], offset );
-      Core::ActionOffset::Dispatch( Core::Interface::GetMouseActionContext(),
-        this->tool_->cropbox_size_state_[ this->ver_index_ ], -offset );
-      size_changed = true;
-    }
+    Core::ActionOffset::Dispatch( Core::Interface::GetMouseActionContext(),
+      this->tool_->cropbox_origin_state_[ this->ver_index_ ], dy );
+    size_changed = true;
   }
   
-  if ( this->hit_pos_ & HitPosition::RIGHT_E )
+  if ( ( this->hit_pos_ & HitPosition::RIGHT_E ) && Core::Abs( dx ) > epsilon )
   {
-    double min_size, max_size, old_size;
-    this->tool_->cropbox_size_state_[ this->hor_index_ ]->get_range( min_size, max_size );
-    old_size = this->tool_->cropbox_size_state_[ this->hor_index_ ]->get();
-    double size = old_size + dx;
-    size = Core::Clamp( size, min_size, max_size );
-    double offset = size - old_size;
-    if ( Core::Abs( offset ) > epsilon )
-    {
-      Core::ActionOffset::Dispatch( Core::Interface::GetMouseActionContext(),
-        this->tool_->cropbox_size_state_[ this->hor_index_ ], offset );
-      size_changed = true;
-    }
+    Core::ActionOffset::Dispatch( Core::Interface::GetMouseActionContext(),
+      this->tool_->cropbox_size_state_[ this->hor_index_ ], dx );
+    size_changed = true;
   }
   
-  if ( this->hit_pos_ & HitPosition::TOP_E )
+  if ( ( this->hit_pos_ & HitPosition::TOP_E ) && Core::Abs( dy ) > epsilon )
   {
-    double min_size, max_size, old_size;
-    this->tool_->cropbox_size_state_[ this->ver_index_ ]->get_range( min_size, max_size );
-    old_size = this->tool_->cropbox_size_state_[ this->ver_index_ ]->get();
-    double size = old_size + dy;
-    size = Core::Clamp( size, min_size, max_size );
-    double offset = size - old_size;
-    if ( Core::Abs( offset ) > epsilon )
-    {
-      Core::ActionOffset::Dispatch( Core::Interface::GetMouseActionContext(),
-        this->tool_->cropbox_size_state_[ this->ver_index_ ], offset );
-      size_changed = true;
-    }
+    Core::ActionOffset::Dispatch( Core::Interface::GetMouseActionContext(),
+      this->tool_->cropbox_size_state_[ this->ver_index_ ], dy );
+    size_changed = true;
   }
 
   if ( this->hit_pos_ == HitPosition::INSIDE_E )
   {
-    double size_ver = this->tool_->cropbox_size_state_[ this->ver_index_ ]->get();
-    double size_hor = this->tool_->cropbox_size_state_[ this->hor_index_ ]->get();
-    double min_ver, max_ver, min_hor, max_hor;
-    this->tool_->cropbox_origin_state_[ this->ver_index_ ]->get_range( min_ver, max_ver );
-    this->tool_->cropbox_origin_state_[ this->hor_index_ ]->get_range( min_hor, max_hor );
-    double old_origin_ver = this->tool_->cropbox_origin_state_[ this->ver_index_ ]->get();
-    double old_origin_hor = this->tool_->cropbox_origin_state_[ this->hor_index_ ]->get();
-    double origin_ver = Core::Clamp( old_origin_ver + dy, min_ver, max_ver - size_ver );
-    double origin_hor = Core::Clamp( old_origin_hor + dx, min_hor, max_hor - size_hor );
-    double hor_offset = origin_hor - old_origin_hor;
-    double ver_offset = origin_ver - old_origin_ver;
-    if ( Core::Abs( hor_offset ) > epsilon )
+    // NOTE: Here it uses keyboard action context instead of the actual mouse action
+    // context so that the change of origin won't cause the size to change
+    if ( Core::Abs( dx ) > epsilon )
     {
-      Core::ActionOffset::Dispatch( Core::Interface::GetMouseActionContext(),
-        this->tool_->cropbox_origin_state_[ this->hor_index_ ], hor_offset );
+      Core::ActionOffset::Dispatch( Core::Interface::GetKeyboardActionContext(),
+        this->tool_->cropbox_origin_state_[ this->hor_index_ ], dx );
       size_changed = true;
     }
-    if ( Core::Abs( ver_offset ) > epsilon )
+    if ( Core::Abs( dy ) > epsilon )
     {
-      Core::ActionOffset::Dispatch( Core::Interface::GetMouseActionContext(),
-        this->tool_->cropbox_origin_state_[ this->ver_index_ ], ver_offset );
+      Core::ActionOffset::Dispatch( Core::Interface::GetKeyboardActionContext(),
+        this->tool_->cropbox_origin_state_[ this->ver_index_ ], dy );
       size_changed = true;
-    } 
+    }
   }
 
-  state_lock.unlock();
   if ( size_changed )
   {
     ViewerManager::Instance()->update_2d_viewers_overlay();
