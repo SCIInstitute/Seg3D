@@ -34,6 +34,24 @@
 SET(CORE_PARSER_SRCS
   Parser.h
   Parser.cc
+  ParserEnums.h
+  ParserFunction.h
+  ParserFunction.cc
+  ParserFunctionCatalog.h
+  ParserFunctionCatalog.cc
+  ParserFWD.h
+  ParserNode.h
+  ParserNode.cc
+  ParserProgram.h
+  ParserProgram.cc
+  ParserScriptFunction.h
+  ParserScriptFunction.cc
+  ParserScriptVariable.h
+  ParserScriptVariable.cc
+  ParserTree.h
+  ParserTree.cc
+  ParserVariable.h
+  ParserVariable.cc
   )
 
 ##################################################
