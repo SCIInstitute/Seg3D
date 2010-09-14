@@ -35,14 +35,11 @@
 // Boost includes
 #include <boost/smart_ptr.hpp> // Needed for shared_ptr
 
-// Local includes
-#include <Core/Parser/ParserNode.h>
+// Core includes
+#include <Core/Parser/ParserFWD.h>
 
 namespace Core
 {
-
-class ParserTree;
-typedef boost::shared_ptr< ParserTree > ParserTreeHandle;
 
 // ParserTree : This class is the toplevel class of an expression. It binds
 //              the output variable with the tree of nodes that describe

@@ -37,15 +37,12 @@
 //#include <boost/thread/mutex.hpp>
 #include <boost/smart_ptr.hpp> // Needed for shared_ptr
 
-// Local includes
-#include <Core/Parser/ParserFunction.h>
+// Core includes
+#include <Core/Parser/ParserFWD.h>
 #include <Core/Utils/Lockable.h>
 
 namespace Core
 {
-
-class ParserFunctionCatalog;
-typedef boost::shared_ptr< ParserFunctionCatalog > ParserFunctionCatalogHandle;
 
 // The list of functions
 typedef std::map< std::string, ParserFunction* > ParserFunctionList;

@@ -31,6 +31,7 @@
 
 // Core includes
 #include <Core/Parser/ParserEnums.h>
+#include <Core/Parser/ParserFunction.h>
 #include <Core/Parser/ParserScriptFunction.h>
 #include <Core/Parser/ParserScriptVariable.h>
 

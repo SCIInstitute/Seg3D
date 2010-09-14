@@ -38,9 +38,6 @@
 namespace Core
 {
 
-class ParserVariable;
-typedef boost::shared_ptr< ParserVariable > ParserVariableHandle;
-
 // Render human readable output
 std::string ParserVariableType( std::string type );
 

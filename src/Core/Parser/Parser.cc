@@ -34,7 +34,14 @@
 #include <Core/Math/MathFunctions.h>
 #include <Core/Parser/Parser.h> 
 #include <Core/Parser/ParserEnums.h>
+#include <Core/Parser/ParserFunction.h>
+#include <Core/Parser/ParserFunctionCatalog.h>
+#include <Core/Parser/ParserNode.h>
+#include <Core/Parser/ParserProgram.h>
 #include <Core/Parser/ParserScriptFunction.h>
+#include <Core/Parser/ParserScriptVariable.h>
+#include <Core/Parser/ParserTree.h>
+#include <Core/Parser/ParserVariable.h>
 #include <Core/Utils/StringUtil.h>
 
 namespace Core

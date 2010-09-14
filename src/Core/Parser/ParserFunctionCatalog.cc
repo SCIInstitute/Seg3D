@@ -30,6 +30,7 @@
 #include <iostream>
 
 // Core includes
+#include <Core/Parser/ParserFunction.h>
 #include <Core/Parser/ParserFunctionCatalog.h> 
 
 namespace Core

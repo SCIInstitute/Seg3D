@@ -31,24 +31,16 @@
 
 // STL includes
 #include <string>
+#include <vector>
 
 // Boost includes
 #include <boost/smart_ptr.hpp> // Needed for shared_ptr
 
-// Local includes
-#include <Core/Parser/ParserFunctionCatalog.h>
+// Core includes
 #include <Core/Parser/ParserFWD.h>
-#include <Core/Parser/ParserScriptVariable.h>
-#include <Core/Parser/ParserTree.h>
-#include <Core/Parser/ParserVariable.h>
 
 namespace Core
 {
-
-class ParserProgram;
-typedef boost::shared_ptr< ParserProgram > ParserProgramHandle;
-
-typedef std::map< std::string, ParserVariableHandle > ParserVariableList;
 
 // ParserProgram: This class simply binds a series of expressions together.
 class ParserProgram

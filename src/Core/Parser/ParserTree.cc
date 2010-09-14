@@ -30,6 +30,7 @@
 #include <iostream>
 
 // Core includes
+#include <Core/Parser/ParserNode.h>
 #include <Core/Parser/ParserTree.h>
 #include <Core/Parser/ParserVariable.h>
 

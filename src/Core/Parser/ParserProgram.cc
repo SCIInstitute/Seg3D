@@ -32,6 +32,9 @@
 // Core includes
 #include <Core/Parser/ParserProgram.h> 
 #include <Core/Parser/ParserScriptFunction.h>
+#include <Core/Parser/ParserScriptVariable.h>
+#include <Core/Parser/ParserTree.h>
+#include <Core/Parser/ParserVariable.h>
 
 namespace Core
 {

@@ -29,17 +29,40 @@
 #ifndef CORE_PARSER_PARSERFWD_H 
 #define CORE_PARSER_PARSERFWD_H 
 
+// STL includes
+#include <map>
+
 // Boost includes 
 #include <boost/shared_ptr.hpp>
 
 namespace Core
 {
   // Forward declarations 
-  class ParserScriptVariable;
-  typedef boost::shared_ptr< ParserScriptVariable > ParserScriptVariableHandle;
+
+  class ParserFunction;
+
+  class ParserFunctionCatalog;
+  typedef boost::shared_ptr< ParserFunctionCatalog > ParserFunctionCatalogHandle;
+
+  class ParserNode;
+  typedef boost::shared_ptr< ParserNode > ParserNodeHandle;
+
+  class ParserProgram;
+  typedef boost::shared_ptr< ParserProgram > ParserProgramHandle;
 
   class ParserScriptFunction;
   typedef boost::shared_ptr< ParserScriptFunction > ParserScriptFunctionHandle;
+
+  class ParserScriptVariable;
+  typedef boost::shared_ptr< ParserScriptVariable > ParserScriptVariableHandle;
+
+  class ParserTree;
+  typedef boost::shared_ptr< ParserTree > ParserTreeHandle;
+
+  class ParserVariable;
+  typedef boost::shared_ptr< ParserVariable > ParserVariableHandle;
+
+  typedef std::map< std::string, ParserVariableHandle > ParserVariableList;
 }
 
 #endif

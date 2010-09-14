@@ -39,12 +39,8 @@
 #include <boost/smart_ptr.hpp> // Needed for shared_ptr
 #include <boost/thread.hpp>
 
-// Local includes -- these could be moved to a ParserFWD.h if needed 
-#include <Core/Parser/ParserFunction.h>
-#include <Core/Parser/ParserNode.h>
-#include <Core/Parser/ParserProgram.h>
-#include <Core/Parser/ParserTree.h>
-#include <Core/Parser/ParserVariable.h>
+// Core includes 
+#include <Core/Parser/ParserFWD.h>
 
 namespace Core
 {
