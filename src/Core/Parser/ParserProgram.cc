@@ -135,19 +135,19 @@ void ParserProgram::print()
 
 void ParserProgram::add_const_var( ParserScriptVariableHandle& handle )
 {
-  handle->set_var_number( this->const_variables_.size() );
+  handle->set_var_number( static_cast< int >( this->const_variables_.size() ) );
   this->const_variables_.push_back( handle );
 }
 
 void ParserProgram::add_single_var( ParserScriptVariableHandle& handle )
 {
-  handle->set_var_number( this->single_variables_.size() );
+  handle->set_var_number( static_cast< int >( this->single_variables_.size() ) );
   this->single_variables_.push_back( handle );
 }
 
 void ParserProgram::add_sequential_var( ParserScriptVariableHandle& handle )
 {
-  handle->set_var_number( this->sequential_variables_.size() );
+  handle->set_var_number( static_cast< int >( this->sequential_variables_.size() ) );
   this->sequential_variables_.push_back( handle );
 }
 

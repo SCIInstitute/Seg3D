@@ -1989,7 +1989,7 @@ bool Parser::validate( ParserProgramHandle& program, ParserFunctionCatalogHandle
   {
     std::string expression;
     ParserTreeHandle handle;
-    program->get_expression( j, expression, handle );
+    program->get_expression( static_cast< int >( j ), expression, handle );
 
     if ( handle.get() == 0 )
     {
@@ -2210,8 +2210,10 @@ bool Parser::optimize( ParserProgramHandle& program, std::string& error )
 
   while ( it != it_end )
   {
-    name = ( *it ).first;
+    // The ordering of the following two lines is important in order to avoid an internal
+    // compiler error on 64-bit Windows
     uname_num = ExportToString( cnt );
+    name = ( *it ).first;
     cnt++;
     uname = "$I" + uname_num;
 
@@ -2245,7 +2247,7 @@ bool Parser::optimize( ParserProgramHandle& program, std::string& error )
   for ( size_t j = 0; j < num_expressions; j++ )
   {
     // Get the tree
-    program->get_expression( j, thandle );
+    program->get_expression( static_cast< int >( j ), thandle );
 
     std::string type = thandle->get_type();
 
