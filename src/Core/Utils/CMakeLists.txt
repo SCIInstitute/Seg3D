@@ -55,6 +55,7 @@ SET(CORE_UTILS_SRCS
   Runnable.cc
   ScopedCounter.h
   Singleton.h
+  StackBasedVector.h
   StackVector.h
   StringParser.h
   StringParser.cc

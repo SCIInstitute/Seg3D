@@ -26,7 +26,6 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-
 #ifndef CORE_UTILS_STACKVECTOR_H
 #define CORE_UTILS_STACKVECTOR_H
 
@@ -34,11 +33,12 @@
 #include <assert.h>
 #include <vector>
 
-namespace Core {
+namespace Core 
+{
 
 // This implements a subclass of the std::vector class, except that
 // the vector is statically allocated on the stack for performance.
-template <class T, int CAPACITY>
+template < class T, int CAPACITY >
 class StackVector 
 {
 
