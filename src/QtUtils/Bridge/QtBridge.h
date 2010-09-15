@@ -38,6 +38,7 @@
 #include <QLabel>
 #include <QActionGroup>
 #include <QListWidget>
+#include <QPlainTextEdit>
 
 // QtUtils includes
 #include <QtUtils/Widgets/QtHistogramWidget.h>
@@ -115,6 +116,8 @@ public:
   
   static void Connect( QLineEdit* qlineedit, Core::StateNameHandle& state_handle );
 
+  static void Connect( QPlainTextEdit* qwidget, Core::StateStringHandle& state );
+
   // Connect QLabel to display the string representation of a state variable
   static void Connect( QLabel* qlabel, Core::StateBaseHandle state );
   
@@ -135,6 +138,8 @@ public:
 
   // Connect QListWidget and StateLabeledMultiOption
   static void Connect( QListWidget* qlistwidget, Core::StateLabeledMultiOptionHandle& state );
+
+  static void Connect( QListWidget* qwidget, Core::StateStringVectorHandle& state );
 
   // Enable / Disable a button from state engine
   static void Enable( QWidget* qwidget, Core::StateBoolHandle& state, bool opposite_logic = false );

@@ -38,7 +38,6 @@ SET(INTERFACE_TOOLINTERFACE_SRCS
   InvertToolInterface.cc
   ArithmeticFilterInterface.cc
   BinaryDilateErodeFilterInterface.cc
-  BooleanFilterInterface.cc
   CannyEdgeDetectionFilterInterface.cc
   ConfidenceConnectedFilterInterface.cc
   ConnectedComponentFilterInterface.cc
@@ -69,7 +68,6 @@ SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
   InvertToolInterface.h
   ArithmeticFilterInterface.h
   BinaryDilateErodeFilterInterface.h
-  BooleanFilterInterface.h
   CannyEdgeDetectionFilterInterface.h
   ConfidenceConnectedFilterInterface.h
   ConnectedComponentFilterInterface.h
@@ -106,7 +104,6 @@ SET(INTERFACE_TOOLINTERFACE_UI_SRCS
   ArithmeticFilterInterface.ui
   CurvatureAnisotropicDiffusionFilterInterface.ui
   BinaryDilateErodeFilterInterface.ui
-  BooleanFilterInterface.ui
   ConfidenceConnectedFilterInterface.ui
   FillHolesFilterInterface.ui
   HistogramEqualizationFilterInterface.ui

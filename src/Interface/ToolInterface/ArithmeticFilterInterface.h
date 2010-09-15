@@ -29,11 +29,7 @@
 #ifndef INTERFACE_TOOLINTERFACE_ARITHMETICFILTERINTERFACE_H
 #define INTERFACE_TOOLINTERFACE_ARITHMETICFILTERINTERFACE_H
 
-// Core includes
-#include <Core/Utils/Log.h>
-
-// Application includes
-#include <Application/Tool/ToolFactory.h>
+#include <QListWidgetItem>
 
 // Base class of the tool widget
 #include <Interface/AppInterface/ToolWidget.h>
@@ -54,8 +50,7 @@ public:
   virtual bool build_widget( QFrame* frame );
   
 private Q_SLOTS:
-  void execute_filter();
-  void enable_run_filter( bool valid );
+  void set_expressions_text( QListWidgetItem* item );
 
 private:
   boost::shared_ptr< ArithmeticFilterInterfacePrivate > private_;

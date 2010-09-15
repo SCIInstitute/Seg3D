@@ -29,9 +29,6 @@
 //QtUtils Includes
 #include <QtUtils/Bridge/QtBridge.h>
 
-//Interface Includes
-#include <Interface/ToolInterface/CustomWidgets/TargetComboBox.h>
-
 //Qt Gui Includes
 #include <Interface/ToolInterface/ArithmeticFilterInterface.h>
 #include "ui_ArithmeticFilterInterface.h"
@@ -49,9 +46,6 @@ class ArithmeticFilterInterfacePrivate
 {
 public:
   Ui::ArithmeticFilterInterface ui_;
-  TargetComboBox *volume_a_;
-  TargetComboBox *volume_b_;
-  TargetComboBox *volume_c_;
 };
 
 // constructor
@@ -71,62 +65,42 @@ bool ArithmeticFilterInterface::build_widget( QFrame* frame )
   //Step 1 - build the Qt GUI Widget
   this->private_->ui_.setupUi( frame );
   
-  this->private_->volume_a_ = new TargetComboBox( this );
-  this->private_->volume_a_->setMinimumHeight( 26 );
-  this->private_->ui_.volumeALayout->addWidget( this->private_->volume_a_ );
-  
-  this->private_->volume_b_ = new TargetComboBox( this );
-  this->private_->volume_b_->setMinimumHeight( 26 );
-  this->private_->ui_.volumeBLayout->addWidget( this->private_->volume_b_ );
-
-  this->private_->volume_c_ = new TargetComboBox( this );
-  this->private_->volume_c_->setMinimumHeight( 26 );
-  this->private_->ui_.volumeCLayout->addWidget( this->private_->volume_c_ );
-
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
   ArithmeticFilter* tool = dynamic_cast< ArithmeticFilter* > ( base_tool_.get() );
 
   //Step 3 - connect the gui to the tool through the QtBridge
-  //QtUtils::QtBridge::Connect( this->private_->volume_a_, tool->volume_a_state_ );
-  //QtUtils::QtBridge::Connect( this->private_->volume_b_, tool->volume_b_state_ );
-  //QtUtils::QtBridge::Connect( this->private_->volume_c_, tool->volume_c_state_ );
-  this->connect( this->private_->volume_a_, SIGNAL( valid( bool ) ), 
-    this, SLOT( enable_run_filter( bool ) ) );
-  
-  QtUtils::QtBridge::Connect( this->private_->ui_.exampleExpComboBox, tool->example_expressions_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
-  
-  this->connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), 
-    this, SLOT( execute_filter() ) );
-  
-  this->private_->volume_a_->sync_layers();
-  this->private_->volume_b_->sync_layers();
-  this->private_->volume_c_->sync_layers();
+  QtUtils::QtBridge::Connect( this->private_->ui_.target_group_, 
+    tool->target_group_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.use_active_group_, 
+    tool->use_active_group_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.input_a_, tool->input_layers_state_[ 0 ] );
+  QtUtils::QtBridge::Connect( this->private_->ui_.input_b_, tool->input_layers_state_[ 1 ] );
+  QtUtils::QtBridge::Connect( this->private_->ui_.input_c_, tool->input_layers_state_[ 2 ] );
+  QtUtils::QtBridge::Connect( this->private_->ui_.input_d_, tool->input_layers_state_[ 3 ] );
+  QtUtils::QtBridge::Connect( this->private_->ui_.expressions_, tool->expressions_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.predefined_expressions_,
+    tool->predefined_expressions_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.output_type_, tool->output_type_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.replace_, tool->replace_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.execute_button_, boost::bind(
+    &ArithmeticFilter::execute, tool, Core::Interface::GetWidgetActionContext() ) );
+  QtUtils::QtBridge::Enable( this->private_->ui_.target_group_, tool->use_active_group_state_, true );
+  QtUtils::QtBridge::Enable( this->private_->ui_.input_a_, tool->use_active_group_state_, true );
+  QtUtils::QtBridge::Enable( this->private_->ui_.output_type_, tool->replace_state_, true );
 
-  //Send a message to the log that we have finised with building the Arithmetic Filter
+  connect( this->private_->ui_.predefined_expressions_, SIGNAL( itemDoubleClicked( 
+    QListWidgetItem* ) ), SLOT( set_expressions_text( QListWidgetItem* ) ) );
+
+  //Send a message to the log that we have finished with building the Arithmetic Filter
   CORE_LOG_DEBUG("Finished building an Arithmetic Filter Interface");
 
-  return ( true );
+  return true;
 } // end build_widget
 
-void ArithmeticFilterInterface::enable_run_filter( bool valid )
+void ArithmeticFilterInterface::set_expressions_text( QListWidgetItem* item )
 {
-  if( valid )
-    this->private_->ui_.runFilterButton->setEnabled( true );
-  else
-    this->private_->ui_.runFilterButton->setEnabled( false );
-}
-
-void ArithmeticFilterInterface::execute_filter()
-{
-  ToolHandle base_tool_ = tool();
-  ArithmeticFilter* tool =
-    dynamic_cast< ArithmeticFilter* > ( base_tool_.get() );
-
-//  ActionArithmetic::Dispatch( tool->volume_a_state_->export_to_string(), 
-//    tool->volume_b_state_->export_to_string(), tool->volume_c_state_->export_to_string(),
-//    tool->example_expressions_state_->get(), tool->replace_state_->get() ); 
+  this->private_->ui_.expressions_->setPlainText( item->text() + ";" );
 }
 
 } //end seg3d

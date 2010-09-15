@@ -60,6 +60,7 @@
 #include <QtUtils/Bridge/detail/QtListWidgetConnector.h>
 #include <QtUtils/Bridge/detail/QtShowConnector.h>
 #include <QtUtils/Bridge/detail/QtLabelConnector.h>
+#include <QtUtils/Bridge/detail/QtPlainTextEditConnector.h>
 
 namespace QtUtils
 {
@@ -178,9 +179,19 @@ void QtBridge::Connect( QListWidget* qlistwidget, Core::StateLabeledMultiOptionH
   new QtListWidgetConnector( qlistwidget, state );
 }
 
+void QtBridge::Connect( QListWidget* qwidget, Core::StateStringVectorHandle& state )
+{
+  new QtListWidgetConnector( qwidget, state );
+}
+
 void QtBridge::Connect( QLabel* qlabel, Core::StateBaseHandle state )
 {
   new QtLabelConnector( qlabel, state );
+}
+
+void QtBridge::Connect( QPlainTextEdit* qwidget, Core::StateStringHandle& state )
+{
+  new QtPlainTextEditConnector( qwidget, state );
 }
 
 void QtBridge::Enable( QWidget* qwidget, Core::StateBoolHandle& state, bool opposite_logic )

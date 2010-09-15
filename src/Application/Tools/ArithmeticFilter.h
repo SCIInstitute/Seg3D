@@ -34,6 +34,9 @@
 namespace Seg3D
 {
 
+class ArithmeticFilterPrivate;
+typedef boost::shared_ptr< ArithmeticFilterPrivate > ArithmeticFilterPrivateHandle;
+
 class ArithmeticFilter : public Tool
 {
 SEG3D_TOOL(
@@ -48,36 +51,30 @@ public:
   ArithmeticFilter( const std::string& toolid );
   virtual ~ArithmeticFilter();
 
-  // -- constraint parameters --
-
-  // Constrain viewer to right painting tool when layer is selected
-  void target_constraint( std::string layerid );
-
-  // -- activate/deactivate tool --
-
-  virtual void activate();
-  virtual void deactivate();
-  
-private:
-  // -- handle updates from layermanager --
-  void handle_layers_changed();
+public:
+  virtual void execute( Core::ActionContextHandle context );
 
   // -- state --
 public:
-  // Layerid of the target layer
-  Core::StateStringHandle volume_a_state_;
+  Core::StateLabeledOptionHandle target_group_state_;
+  Core::StateBoolHandle use_active_group_state_;
+  Core::StateLabeledOptionHandle input_layers_state_[ 4 ];
 
-  Core::StateStringHandle volume_b_state_;
-
-  Core::StateStringHandle volume_c_state_;
-
-  Core::StateOptionHandle example_expressions_state_;
-
+  Core::StateStringHandle expressions_state_;
+  Core::StateStringVectorHandle predefined_expressions_state_;
+  
+  Core::StateLabeledOptionHandle output_type_state_;
   Core::StateBoolHandle replace_state_;
 
 private:
-  const static size_t VERSION_NUMBER_C;
+  ArithmeticFilterPrivateHandle private_;
 
+public:
+  const static int NUMBER_OF_INPUTS_C;
+
+  const static std::string SAME_AS_INPUT_C;
+  const static std::string BOOLEAN_C;
+  const static std::string FLOAT_C;
 };
 
 } // end namespace

@@ -1108,6 +1108,7 @@ void LayerManager::DispatchInsertDataVolumeIntoLayer( DataLayerHandle layer,
   }
   
   layer->set_data_volume( data );
+  LayerManager::Instance()->layers_changed_signal_();
 }
 
 void LayerManager::DispatchInsertMaskVolumeIntoLayer( MaskLayerHandle layer, 
@@ -1122,6 +1123,7 @@ void LayerManager::DispatchInsertMaskVolumeIntoLayer( MaskLayerHandle layer,
   }
   
   layer->set_mask_volume( mask );
+  LayerManager::Instance()->layers_changed_signal_();
 }
 
 void LayerManager::DispatchCreateAndInsertDataLayer( std::string name, 

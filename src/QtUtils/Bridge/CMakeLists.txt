@@ -51,6 +51,7 @@ SET(QTUTILS_BRIDGE_SRCS
   detail/QtListWidgetConnector.cc
   detail/QtLabelConnector.cc
   detail/QtShowConnector.cc
+  detail/QtPlainTextEditConnector.cc
 )
 
 SET(QTUTILS_BRIDGE_MOC_SRCS
@@ -73,6 +74,7 @@ SET(QTUTILS_BRIDGE_MOC_SRCS
   detail/QtListWidgetConnector.h
   detail/QtLabelConnector.h
   detail/QtShowConnector.h
+  detail/QtPlainTextEditConnector.h
 )
 
 SET(QTUTILS_BRIDGE_NO_MOC_SRCS

@@ -33,6 +33,7 @@
 #include <QPointer>
 
 #include <Core/State/StateLabeledMultiOption.h>
+#include <Core/State/StateVector.h>
 
 #include <QtUtils/Bridge/detail/QtConnectorBase.h>
 
@@ -46,6 +47,7 @@ class QtListWidgetConnector : public QtConnectorBase
 public:
   QtListWidgetConnector( QListWidget* parent, Core::StateLabeledMultiOptionHandle& state,
     bool blocking = true );
+  QtListWidgetConnector( QListWidget* parent, Core::StateStringVectorHandle& state ); 
 
   virtual ~QtListWidgetConnector();
 
@@ -56,7 +58,8 @@ private:
   static void SetListWidgetSelectedItems( QPointer< QtListWidgetConnector > qpointer, 
     std::vector< std::string > selections, Core::ActionSource source );
 
-  static void UpdateListWidgetItems( QPointer< QtListWidgetConnector > qpointer );
+  static void UpdateListWidgetOptionItems( QPointer< QtListWidgetConnector > qpointer );
+  static void UpdateListWidgetStringItems( QPointer< QtListWidgetConnector > qpointer );
 
   // -- Slot functions for Qt signals --
 private Q_SLOTS:
@@ -64,7 +67,8 @@ private Q_SLOTS:
 
 private:
   QListWidget* parent_;
-  Core::StateLabeledMultiOptionHandle state_;
+  Core::StateLabeledMultiOptionHandle option_state_;
+  Core::StateStringVectorHandle string_vector_state_;
 };
 
 } // end namespace QtUtils

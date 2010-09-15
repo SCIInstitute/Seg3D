@@ -41,7 +41,7 @@ QtListWidgetConnector::QtListWidgetConnector( QListWidget* parent,
   Core::StateLabeledMultiOptionHandle& state, bool blocking /*= true */ ) :
   QtConnectorBase( parent, blocking ),
   parent_( parent ),
-  state_( state )
+  option_state_( state )
 {
   QPointer< QtListWidgetConnector > qpointer( this );
   parent->setSelectionMode( QAbstractItemView::MultiSelection );
@@ -49,16 +49,30 @@ QtListWidgetConnector::QtListWidgetConnector( QListWidget* parent,
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
 
   // Populate the content of the state variable to the combo box
-  UpdateListWidgetItems( qpointer );
+  UpdateListWidgetOptionItems( qpointer );
 
   this->connect( parent, SIGNAL( itemSelectionChanged() ), SLOT( set_state() ) );
 
   this->add_connection( state->value_changed_signal_.connect( boost::bind(
     &QtListWidgetConnector::SetListWidgetSelectedItems, qpointer, _1, _2 ) ) );
   this->add_connection( state->optionlist_changed_signal_.connect( boost::bind(
-    &QtListWidgetConnector::UpdateListWidgetItems, qpointer ) ) );
+    &QtListWidgetConnector::UpdateListWidgetOptionItems, qpointer ) ) );
 }
 
+QtListWidgetConnector::QtListWidgetConnector( QListWidget* parent, 
+                       Core::StateStringVectorHandle& state ) :
+  QtConnectorBase( parent, true ),
+  parent_( parent ),
+  string_vector_state_( state )
+{
+  QPointer< QtListWidgetConnector > qpointer( this );
+  parent->setSelectionMode( QAbstractItemView::SingleSelection );
+
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+  UpdateListWidgetStringItems( qpointer );
+  this->add_connection( state->state_changed_signal_.connect( boost::bind(
+    &QtListWidgetConnector::UpdateListWidgetStringItems, qpointer ) ) );
+}
 
 QtListWidgetConnector::~QtListWidgetConnector()
 {
@@ -88,7 +102,7 @@ void QtListWidgetConnector::set_state()
     }
   }
   
-  Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), this->state_, 
+  Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), this->option_state_, 
     selections );
 }
 
@@ -145,12 +159,13 @@ void QtListWidgetConnector::SetListWidgetSelectedItems(
   qpointer->unblock();
 }
 
-void QtListWidgetConnector::UpdateListWidgetItems( QPointer< QtListWidgetConnector > qpointer )
+void QtListWidgetConnector::UpdateListWidgetOptionItems( 
+  QPointer< QtListWidgetConnector > qpointer )
 {
   if ( !Core::Interface::IsInterfaceThread() )
   {
     Core::Interface::PostEvent( boost::bind( 
-      &QtListWidgetConnector::UpdateListWidgetItems, qpointer ) );
+      &QtListWidgetConnector::UpdateListWidgetOptionItems, qpointer ) );
     return;
   }
 
@@ -168,7 +183,7 @@ void QtListWidgetConnector::UpdateListWidgetItems( QPointer< QtListWidgetConnect
   // lock the state engine
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
 
-  std::vector< Core::OptionLabelPair > option_list = qpointer->state_->get_option_list();
+  std::vector< Core::OptionLabelPair > option_list = qpointer->option_state_->get_option_list();
   int num_items = static_cast< int >( option_list.size() );
   for ( int i = 0; i < num_items; ++i )
   {
@@ -177,10 +192,37 @@ void QtListWidgetConnector::UpdateListWidgetItems( QPointer< QtListWidgetConnect
     item->setData( Qt::UserRole, QVariant( option_list[ i ].first.c_str() ) );
     item->setFlags( Qt::ItemIsEnabled | Qt::ItemIsSelectable );
   }
-  SetSelectedItemsInternal( listwidget, qpointer->state_->get() );
+  SetSelectedItemsInternal( listwidget, qpointer->option_state_->get() );
   
   // unblock signals
   qpointer->unblock();
+}
+
+void QtListWidgetConnector::UpdateListWidgetStringItems( 
+  QPointer< QtListWidgetConnector > qpointer )
+{
+  if ( !Core::Interface::IsInterfaceThread() )
+  {
+    Core::Interface::PostEvent( boost::bind( 
+      &QtListWidgetConnector::UpdateListWidgetStringItems, qpointer ) );
+    return;
+  }
+
+  if ( qpointer.isNull() || QCoreApplication::closingDown() )
+  {
+    return;
+  }
+
+  QListWidget* listwidget = qpointer->parent_;
+  listwidget->clear();
+
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+  const std::vector< std::string >& strs = qpointer->string_vector_state_->get();
+  lock.unlock();
+  for ( size_t i = 0; i < strs.size(); ++i )
+  {
+    listwidget->addItem( QString::fromStdString( strs[ i ] ) );
+  }
 }
 
 } // end namespace QtUtils

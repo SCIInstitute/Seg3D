@@ -57,8 +57,6 @@ SET(APPLICATION_TOOLS_SRCS
   ArithmeticFilter.cc
   BinaryDilateErodeFilter.h
   BinaryDilateErodeFilter.cc
-  BooleanFilter.h
-  BooleanFilter.cc
   CannyEdgeDetectionFilter.h
   CannyEdgeDetectionFilter.cc
   ConfidenceConnectedFilter.h
