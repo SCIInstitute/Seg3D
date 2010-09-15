@@ -29,9 +29,6 @@
 //QtUtils Includes
 #include <QtUtils/Bridge/QtBridge.h>
 
-//Interface Includes
-#include <Interface/ToolInterface/CustomWidgets/TargetComboBox.h>
-
 //Qt Gui Includes
 #include <Interface/ToolInterface/ConfidenceConnectedFilterInterface.h>
 #include "ui_ConfidenceConnectedFilterInterface.h"
@@ -50,8 +47,7 @@ class ConfidenceConnectedFilterInterfacePrivate
 public:
   Ui::ConfidenceConnectedFilterInterface ui_;
     QtUtils::QtSliderIntCombo *iterations_;
-  QtUtils::QtSliderIntCombo *multiplier_;
-  TargetComboBox *target_;
+  QtUtils::QtSliderDoubleCombo *multiplier_;
 };
 
 // constructor
@@ -71,55 +67,35 @@ bool ConfidenceConnectedFilterInterface::build_widget( QFrame* frame )
   //Step 1 - build the Qt GUI Widget
   this->private_->ui_.setupUi( frame );
 
-    //Add the SliderSpinCombos
-    this->private_->iterations_ = new QtUtils::QtSliderIntCombo();
-    this->private_->ui_.iterationsHLayout_bottom->addWidget( this->private_->iterations_ );
+  //Add the SliderSpinCombos
+  this->private_->iterations_ = new QtUtils::QtSliderIntCombo();
+  this->private_->ui_.iterations_layout_->addWidget( this->private_->iterations_ );
 
-    this->private_->multiplier_ = new QtUtils::QtSliderIntCombo();
-    this->private_->ui_.multiplierHLayout_bottom->addWidget( this->private_->multiplier_ );
-    
-    this->private_->target_ = new TargetComboBox( this );
-    this->private_->ui_.activeHLayout->addWidget( this->private_->target_ );
+  this->private_->multiplier_ = new QtUtils::QtSliderDoubleCombo();
+  this->private_->ui_.multiplier_layout_->addWidget( this->private_->multiplier_ );
   
-
   //Step 2 - get a pointer to the tool
-  ToolHandle base_tool_ = tool();
+  ToolHandle base_tool = tool();
   ConfidenceConnectedFilter* tool =
-      dynamic_cast< ConfidenceConnectedFilter* > ( base_tool_.get() );
+      dynamic_cast< ConfidenceConnectedFilter* > ( base_tool.get() );
       
   //Step 3 - connect the gui to the tool through the QtBridge
-  //QtUtils::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
-  this->connect( this->private_->target_, SIGNAL( valid( bool ) ), this, SLOT( enable_run_filter( bool ) ) );
+  QtUtils::QtBridge::Connect( this->private_->ui_.target_layer_, tool->target_layer_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.use_active_layer_, tool->use_active_layer_state_ );
   QtUtils::QtBridge::Connect( this->private_->iterations_, tool->iterations_state_ );
-  QtUtils::QtBridge::Connect( this->private_->multiplier_, tool->threshold_multiplier_state_ );
-
-  this->connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), this, SLOT( execute_filter() ) );
+  QtUtils::QtBridge::Connect( this->private_->multiplier_, tool->multiplier_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.clear_seeds_button_, boost::bind(
+    &SeedPointsTool::clear, tool, Core::Interface::GetWidgetActionContext() ) );
+  QtUtils::QtBridge::Connect( this->private_->ui_.run_button_, boost::bind(
+    &Tool::execute, tool, Core::Interface::GetWidgetActionContext() ) );
+  QtUtils::QtBridge::Enable( this->private_->ui_.target_layer_, tool->use_active_layer_state_, true );
+  QtUtils::QtBridge::Enable( this->private_->ui_.run_button_, tool->valid_target_state_ );
   
-  this->private_->target_->sync_layers();
-  
-  //Send a message to the log that we have finised with building the Confidence Connected Filter Interface
+  //Send a message to the log that we have finished with building the Confidence Connected Filter Interface
   CORE_LOG_DEBUG("Finished building a Confidence Connected Filter Interface");
-  return ( true );
+  
+  return true;
 
 } // end build_widget
-  
-void ConfidenceConnectedFilterInterface::enable_run_filter( bool valid )
-{
-  if( valid )
-    this->private_->ui_.runFilterButton->setEnabled( true );
-  else
-    this->private_->ui_.runFilterButton->setEnabled( false );
-}
-
-void ConfidenceConnectedFilterInterface::execute_filter()
-{
-  ToolHandle base_tool_ = tool();
-  ConfidenceConnectedFilter* tool =
-  dynamic_cast< ConfidenceConnectedFilter* > ( base_tool_.get() );
-  
-//  ActionConfidenceConnected::Dispatch( tool->target_layer_state_->export_to_string(), 
-//            tool->iterations_state_->get(), tool->threshold_multiplier_state_->get() ); 
-}
-
 
 } // end namespace Seg3D

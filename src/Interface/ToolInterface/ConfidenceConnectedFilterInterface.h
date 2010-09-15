@@ -29,12 +29,6 @@
 #ifndef INTERFACE_TOOLINTERFACE_CONFIDENCECONNECTEDFILTERINTERFACE_H
 #define INTERFACE_TOOLINTERFACE_CONFIDENCECONNECTEDFILTERINTERFACE_H
 
-// Core includes
-#include <Core/Utils/Log.h>
-
-// Application includes
-#include <Application/Tool/ToolFactory.h>
-
 // Base class of the tool widget
 #include <Interface/AppInterface/ToolWidget.h>
 
@@ -45,20 +39,15 @@ class ConfidenceConnectedFilterInterfacePrivate;
 
 class ConfidenceConnectedFilterInterface : public ToolWidget
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   ConfidenceConnectedFilterInterface();
   virtual ~ConfidenceConnectedFilterInterface();
   virtual bool build_widget( QFrame* frame );
   
-private Q_SLOTS:
-  void execute_filter();
-  void enable_run_filter( bool valid );
-
 private:
   boost::shared_ptr< ConfidenceConnectedFilterInterfacePrivate > private_;
-
 
 };
 

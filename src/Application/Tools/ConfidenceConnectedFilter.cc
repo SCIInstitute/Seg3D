@@ -27,10 +27,10 @@
  */
 
 // Application includes
+#include <Application/Filters/Actions/ActionConfidenceConnectedFilter.h>
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/ConfidenceConnectedFilter.h>
-#include <Application/Layer/Layer.h>
-#include <Application/LayerManager/LayerManager.h>
+#include  <Application/ViewerManager/ViewerManager.h>
 
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL( Seg3D, ConfidenceConnectedFilter )
@@ -38,68 +38,41 @@ SCI_REGISTER_TOOL( Seg3D, ConfidenceConnectedFilter )
 namespace Seg3D
 {
 
-ConfidenceConnectedFilter::ConfidenceConnectedFilter( const std::string& toolid ) :
-  Tool( toolid )
+class ConfidenceConnectedFilterPrivate
 {
-  add_state( "target", this->target_layer_state_, "<none>" );
-  add_state( "iterations", this->iterations_state_, 1, 1, 100, 1 );
-  add_state( "threshold_multiplier", this->threshold_multiplier_state_, 1, 1, 100, 1 );
+public:
+  void handle_seed_points_changed();
+};
 
-  this->handle_layers_changed();
-  
-  // Add constaints, so that when the state changes the right ranges of
-  // parameters are selected
-  this->add_connection ( this->target_layer_state_->value_changed_signal_.connect( boost::bind(
-      &ConfidenceConnectedFilter::target_constraint, this, _1 ) ) );
-  
-  this->add_connection ( LayerManager::Instance()->layers_changed_signal_.connect(
-    boost::bind( &ConfidenceConnectedFilter::handle_layers_changed, this ) ) );
+void ConfidenceConnectedFilterPrivate::handle_seed_points_changed()
+{
+  ViewerManager::Instance()->update_2d_viewers_overlay();
+}
 
+ConfidenceConnectedFilter::ConfidenceConnectedFilter( const std::string& toolid ) :
+  SeedPointsTool( Core::VolumeType::DATA_E, toolid ),
+  private_( new ConfidenceConnectedFilterPrivate )
+{
+  this->add_state( "iterations", this->iterations_state_, 3, 1, 100, 1 );
+  this->add_state( "multiplier", this->multiplier_state_, 2.0, 0.1, 100.0, 0.1 );
+
+  this->add_connection( this->seed_points_state_->state_changed_signal_.connect( boost::bind( 
+    &ConfidenceConnectedFilterPrivate::handle_seed_points_changed, this->private_ ) ) );
 }
 
 ConfidenceConnectedFilter::~ConfidenceConnectedFilter()
 {
-  disconnect_all();
-}
-  
-void ConfidenceConnectedFilter::handle_layers_changed()
-{
-  std::vector< LayerHandle > target_layers;
-  LayerManager::Instance()->get_layers( target_layers );
-  bool target_found = false;
-  
-  for( int i = 0; i < static_cast< int >( target_layers.size() ); ++i )
-  {
-    if( ( this->target_layer_state_->get() == "<none>" ) && ( target_layers[i]->type() == 
-                                 Core::VolumeType::DATA_E ) )
-    {
-      this->target_layer_state_->set( target_layers[i]->get_layer_name(), Core::ActionSource::NONE_E );
-      target_found = true;
-      break;
-    }
-    if( target_layers[i]->get_layer_name() == this->target_layer_state_->get() ) 
-    { 
-      target_found = true;
-      break;
-    }
-  }
-  
-  if( !target_found )
-    this->target_layer_state_->set( "", Core::ActionSource::NONE_E );
-  
-}
-  
-
-void ConfidenceConnectedFilter::target_constraint( std::string layerid )
-{
+  this->disconnect_all();
 }
 
-void ConfidenceConnectedFilter::activate()
+void ConfidenceConnectedFilter::execute( Core::ActionContextHandle context )
 {
-}
-
-void ConfidenceConnectedFilter::deactivate()
-{
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+  ActionConfidenceConnectedFilter::Dispatch( 
+    context, this->target_layer_state_->get(),
+    this->seed_points_state_->get(), 
+    static_cast< unsigned int >( this->iterations_state_->get() ), 
+    this->multiplier_state_->get() );
 }
 
 } // end namespace Seg3D

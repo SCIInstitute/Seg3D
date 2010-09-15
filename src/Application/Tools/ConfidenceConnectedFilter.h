@@ -29,46 +29,41 @@
 #ifndef APPLICATION_TOOLS_CONFIDENCECONNECTEDFILTER_H
 #define APPLICATION_TOOLS_CONFIDENCECONNECTEDFILTER_H
 
-#include <Application/Tool/Tool.h>
+#include <Application/Tool/SeedPointsTool.h>
 
 namespace Seg3D
 {
 
-class ConfidenceConnectedFilter : public Tool
+class ConfidenceConnectedFilterPrivate;
+typedef boost::shared_ptr< ConfidenceConnectedFilterPrivate > 
+  ConfidenceConnectedFilterPrivateHandle;
+
+class ConfidenceConnectedFilter : public SeedPointsTool
 {
+
 SEG3D_TOOL(
-SEG3D_TOOL_NAME( "ConfidenceConnectedFilter", "Mask out statistically connected data" )
-SEG3D_TOOL_MENULABEL( "Confidence Connected" )
-SEG3D_TOOL_MENU( "filter_data_to_mask" )
-SEG3D_TOOL_SHORTCUT_KEY( "Alt+Shift+C" )
-SEG3D_TOOL_URL( "http://seg3d.org/" )
+  SEG3D_TOOL_NAME( "ConfidenceConnectedFilter", "Mask out statistically connected data" )
+  SEG3D_TOOL_MENULABEL( "Confidence Connected" )
+  SEG3D_TOOL_MENU( "filter_data_to_mask" )
+  SEG3D_TOOL_SHORTCUT_KEY( "Alt+Shift+C" )
+  SEG3D_TOOL_URL( "http://seg3d.org/" )
 )
 
 public:
   ConfidenceConnectedFilter( const std::string& toolid );
   virtual ~ConfidenceConnectedFilter();
-
-  // -- constraint parameters --
-
-  // Constrain viewer to right painting tool when layer is selected
-  void target_constraint( std::string layerid );
-
-  // -- activate/deactivate tool --
-
-  virtual void activate();
-  virtual void deactivate();
   
-private:
-  // -- handle updates from layermanager --
-  void handle_layers_changed();
+  // EXECUTE:
+  // Fire off the action that executes the filter
+  virtual void execute( Core::ActionContextHandle context );
 
   // -- state --
 public:
-
-  // Layerid of the target layer
-  Core::StateStringHandle target_layer_state_;
   Core::StateRangedIntHandle iterations_state_;
-  Core::StateRangedIntHandle threshold_multiplier_state_;
+  Core::StateRangedDoubleHandle multiplier_state_;
+
+private:
+  ConfidenceConnectedFilterPrivateHandle private_;
 };
 
 } // end namespace

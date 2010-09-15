@@ -47,6 +47,8 @@ SET(APPLICATION_FILTERS_ACTIONS_SRCS
   Actions/ActionResample.cc
   Actions/ActionCannyEdgeDetectionFilter.h
   Actions/ActionCannyEdgeDetectionFilter.cc
+  Actions/ActionConfidenceConnectedFilter.h
+  Actions/ActionConfidenceConnectedFilter.cc
   Actions/ActionCurvatureAnisotropicDiffusionFilter.h
   Actions/ActionCurvatureAnisotropicDiffusionFilter.cc
   Actions/ActionDiscreteGaussianFilter.h
