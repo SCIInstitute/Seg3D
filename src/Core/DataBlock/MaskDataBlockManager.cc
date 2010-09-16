@@ -177,7 +177,6 @@ bool MaskDataBlockManager::create( DataBlock::generation_type generation, unsign
   lock_type lock( this->get_mutex() );
 
   DataBlockHandle data_block;
-  //size_t mask_entry_index = 0;
 
   MaskDataBlockManagerInternal::mask_list_type& mask_list = private_->mask_list_;
 
@@ -293,7 +292,7 @@ bool ConvertToMaskInternal( DataBlockHandle data, MaskDataBlockHandle& mask )
     if ( data_ptr[ j + 6 ] ) mask_ptr[ j + 6 ] |= mask_value; else mask_ptr[ j + 6 ] &= not_mask_value;
     if ( data_ptr[ j + 7 ] ) mask_ptr[ j + 7 ] |= mask_value; else mask_ptr[ j + 7 ] &= not_mask_value;
   }
-  for ( size_t j = 0; j < size; j++ )
+  for ( size_t j = size8; j < size; j++ )
   {
     if ( data_ptr[ j ] ) mask_ptr[ j ] |= mask_value; else mask_ptr[ j ] &= not_mask_value; 
   }
@@ -369,7 +368,7 @@ bool ConvertLabelToMaskInternal( DataBlockHandle data, MaskDataBlockHandle& mask
     if ( data_ptr[ j + 7 ] == typed_label ) mask_ptr[ j + 7 ] |= mask_value; 
       else mask_ptr[ j + 7 ] &= not_mask_value;
   }
-  for ( size_t j = 0; j < size; j++ )
+  for ( size_t j = size8; j < size; j++ )
   {
     if ( data_ptr[ j ] == typed_label ) mask_ptr[ j ] |= mask_value; 
       else mask_ptr[ j ] &= not_mask_value; 
@@ -446,7 +445,7 @@ bool ConvertToDataInternal( MaskDataBlockHandle mask, DataBlockHandle& data )
     if ( mask_ptr[ j + 6 ] & mask_value ) data_ptr[ j + 6 ] = on; else data_ptr[ j + 6 ] = off;
     if ( mask_ptr[ j + 7 ] & mask_value ) data_ptr[ j + 7 ] = on; else data_ptr[ j + 7 ] = off;
   }
-  for ( size_t j = 0; j < size; j++ )
+  for ( size_t j = size8; j < size; j++ )
   {
     if ( mask_ptr[ j ] & mask_value ) data_ptr[ j ] = on; else data_ptr[ j ] = off;
   }

@@ -75,6 +75,10 @@ protected:
 
 public:
 
+  // IS_VALID:
+  // Returns true if the underlying volume is valid and the slice is not out of boundary.
+  bool is_valid() const;
+
   VolumeHandle get_volume() const;
 
   VolumeType volume_type() const;

@@ -1246,7 +1246,7 @@ void Viewer::update_status_bar( int x, int y, const std::string& layer_id )
   }
 
   if ( !this->is_volume_view() && volume_slice &&
-    !volume_slice->out_of_boundary() )
+    volume_slice->is_valid() )
   {
     double xpos, ypos;
     this->window_to_world( x, y, xpos, ypos );

@@ -171,9 +171,7 @@ static bool CreateMaskFromBitPlaneDataInternal( const DataVolumeHandle& data,
     used_bits |= src[ j ];
   }
 
-  std::bitset< sizeof( DATA ) > bits( used_bits );
-
-  masks.resize( bits.count() );
+  std::bitset< sizeof( DATA ) * 8 > bits( used_bits );
 
   for ( size_t k = 0; k < bits.size(); k++ )
   {
@@ -197,6 +195,8 @@ static bool CreateMaskFromBitPlaneDataInternal( const DataVolumeHandle& data,
         if ( src[ j ] & test_value ) mask_data[ j ] |= mask_value;
         else mask_data[ j ] &= not_mask_value;
       }
+
+      masks.push_back( mask );
     }
   }
 

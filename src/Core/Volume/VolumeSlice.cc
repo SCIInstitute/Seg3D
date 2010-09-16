@@ -579,4 +579,13 @@ void VolumeSlice::ProjectOntoSlice( VolumeSliceType slice_type, const Point& pt,
   } 
 }
 
+bool VolumeSlice::is_valid() const
+{
+  lock_type lock( this->get_mutex() );
+  return ( !this->private_->out_of_boundary_ && 
+        this->private_->volume_ && 
+        this->private_->volume_->is_valid() );
+}
+
+
 } // end namespace Core
