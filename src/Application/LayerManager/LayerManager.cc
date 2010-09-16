@@ -274,7 +274,7 @@ void LayerManager::set_active_layer( LayerHandle layer )
     lock_type lock( this->get_mutex() );    
     
     // Do nothing if this layer is already the active one
-    if ( this->active_layer_ == layer )
+    if ( this->active_layer_ == layer || !layer->is_valid() )
     {
       return;
     }

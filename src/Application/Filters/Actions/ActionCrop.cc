@@ -233,6 +233,7 @@ void CropAlgo::crop_mask_layer( MaskLayerHandle input, MaskLayerHandle output )
   size_t current_z = input_mask->to_index( this->start_x_, this->start_y_, this->start_z_ );
   size_t current_y;
   size_t dst_index = 0;
+  size_t total_z_slice = this->end_z_ - this->start_z_ + 1;
   for ( size_t z = this->start_z_; z <= this->end_z_; ++z, current_z += stride_z )
   {
     current_y = current_z;
@@ -244,6 +245,7 @@ void CropAlgo::crop_mask_layer( MaskLayerHandle input, MaskLayerHandle output )
         dst_data[ dst_index++ ] = ( src_data[ current_index ] & mask_value );
       }
     }
+    output->update_progress_signal_( ( z - this->start_z_ + 1.0 ) / total_z_slice * 0.8 );
   }
 
   data_lock.unlock();
@@ -409,6 +411,7 @@ bool ActionCrop::run( Core::ActionContextHandle& context,
     if ( algo->replace_ )
     {
       algo->lock_for_processing( algo->src_layers_[ i ] );
+      algo->connect_abort( algo->src_layers_[ i ] );
     }
     else
     {
@@ -428,6 +431,7 @@ bool ActionCrop::run( Core::ActionContextHandle& context,
     default:
       assert( false );
     }
+    algo->connect_abort( algo->dst_layers_[ i ] );
     dst_layer_ids[ i ] = algo->dst_layers_[ i ]->get_layer_id();
   }
   

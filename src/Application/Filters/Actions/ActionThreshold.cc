@@ -238,6 +238,7 @@ bool ActionThreshold::run( Core::ActionContextHandle& context,
   LayerHandle dst_layer;
   algo->create_and_lock_mask_layer_from_layer( algo->src_layer_, dst_layer );
   algo->dst_layer_ = boost::dynamic_pointer_cast< MaskLayer >( dst_layer );
+  algo->connect_abort( algo->dst_layer_ );
 
   // Return the id of the destination layer.
   result = Core::ActionResultHandle( new Core::ActionResult( algo->dst_layer_->get_layer_id() ) );

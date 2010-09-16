@@ -196,6 +196,8 @@ bool ActionInvert::run( Core::ActionContextHandle& context,
     algo->dst_layer_ = boost::dynamic_pointer_cast< DataLayer >( dst_layer );
   }
 
+  algo->connect_abort( algo->dst_layer_ );
+
   // Return the id of the destination layer.
   result = Core::ActionResultHandle( new Core::ActionResult( 
     algo->dst_layer_->get_layer_id() ) );

@@ -589,6 +589,7 @@ bool ActionResample::run( Core::ActionContextHandle& context,
     if ( algo->replace_ )
     {
       algo->lock_for_processing( algo->src_layers_[ i ] );
+      algo->connect_abort( algo->src_layers_[ i ] );
     }
     else
     {
@@ -608,6 +609,7 @@ bool ActionResample::run( Core::ActionContextHandle& context,
     default:
       assert( false );
     }
+    algo->connect_abort( algo->dst_layers_[ i ] );
     dst_layer_ids[ i ] = algo->dst_layers_[ i ]->get_layer_id();
   }
 
