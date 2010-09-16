@@ -50,11 +50,10 @@ class SeedPointsToolPrivate
 {
 public:
   Core::VolumeSliceHandle get_target_slice( ViewerHandle viewer );
-  bool find_point( double world_x, double world_y, 
+  bool find_point( ViewerHandle viewer, double world_x, double world_y, 
     Core::VolumeSliceHandle vol_slice, Core::Point& pt );
 
   SeedPointsTool* tool_;
-  ViewerHandle viewer_;
 };
 
 Core::VolumeSliceHandle SeedPointsToolPrivate::get_target_slice( ViewerHandle viewer )
@@ -73,13 +72,13 @@ Core::VolumeSliceHandle SeedPointsToolPrivate::get_target_slice( ViewerHandle vi
   return vol_slice;
 }
 
-bool SeedPointsToolPrivate::find_point( double world_x, double world_y, 
+bool SeedPointsToolPrivate::find_point( ViewerHandle viewer, double world_x, double world_y,
                      Core::VolumeSliceHandle vol_slice, Core::Point& pt )
 {
   // Step 1. Compute the size of a pixel in world space
   double x0, y0, x1, y1;
-  this->viewer_->window_to_world( 0, 0, x0, y0 );
-  this->viewer_->window_to_world( 1, 1, x1, y1 );
+  viewer->window_to_world( 0, 0, x0, y0 );
+  viewer->window_to_world( 1, 1, x1, y1 );
   double pixel_width = Core::Abs( x1 - x0 );
   double pixel_height = Core::Abs( y1 - y0 );
 
@@ -127,19 +126,8 @@ SeedPointsTool::~SeedPointsTool()
   this->disconnect_all();
 }
 
-bool SeedPointsTool::handle_mouse_enter( size_t viewer_id, int x, int y )
-{
-  this->private_->viewer_ = ViewerManager::Instance()->get_viewer( viewer_id );
-  return true;
-}
-
-bool SeedPointsTool::handle_mouse_leave( size_t viewer_id )
-{
-  this->private_->viewer_.reset();
-  return true;
-}
-
-bool SeedPointsTool::handle_mouse_press( const Core::MouseHistory& mouse_history, 
+bool SeedPointsTool::handle_mouse_press( ViewerHandle viewer, 
+                    const Core::MouseHistory& mouse_history, 
                     int button, int buttons, int modifiers )
 {
   Core::VolumeSliceHandle target_slice;
@@ -148,18 +136,18 @@ bool SeedPointsTool::handle_mouse_press( const Core::MouseHistory& mouse_history
   {
     Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
 
-    if ( !this->private_->viewer_ || this->private_->viewer_->is_volume_view() )
+    if ( viewer->is_volume_view() )
     {
       return false;
     }
     
-    target_slice = this->private_->get_target_slice( this->private_->viewer_ );
+    target_slice = this->private_->get_target_slice( viewer );
     if ( !target_slice || target_slice->out_of_boundary() )
     {
       return false;
     }
 
-    this->private_->viewer_->window_to_world( mouse_history.current_.x_, 
+    viewer->window_to_world( mouse_history.current_.x_, 
       mouse_history.current_.y_, world_x, world_y );
   }
 
@@ -183,7 +171,7 @@ bool SeedPointsTool::handle_mouse_press( const Core::MouseHistory& mouse_history
     button == Core::MouseButton::RIGHT_BUTTON_E )
   {
     Core::Point pt;
-    if ( this->private_->find_point( world_x, world_y, target_slice, pt ) )
+    if ( this->private_->find_point( viewer, world_x, world_y, target_slice, pt ) )
     {
       Core::ActionRemove::Dispatch( Core::Interface::GetMouseActionContext(),
         this->seed_points_state_, pt );
@@ -194,7 +182,8 @@ bool SeedPointsTool::handle_mouse_press( const Core::MouseHistory& mouse_history
   return false;
 }
 
-bool SeedPointsTool::handle_mouse_move( const Core::MouseHistory& mouse_history, 
+bool SeedPointsTool::handle_mouse_move( ViewerHandle viewer, 
+                     const Core::MouseHistory& mouse_history, 
                      int button, int buttons, int modifiers )
 {
   if ( modifiers == Core::KeyModifier::NO_MODIFIER_E &&
@@ -207,7 +196,7 @@ bool SeedPointsTool::handle_mouse_move( const Core::MouseHistory& mouse_history,
     }
     if ( target_id != Tool::NONE_OPTION_C )
     {
-      this->private_->viewer_->update_status_bar( mouse_history.current_.x_,
+      viewer->update_status_bar( mouse_history.current_.x_,
         mouse_history.current_.y_, target_id );
       return true;
     }

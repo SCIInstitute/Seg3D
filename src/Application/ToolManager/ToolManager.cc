@@ -50,78 +50,104 @@ CORE_SINGLETON_IMPLEMENTATION( ToolManager );
 class ToolManagerPrivate
 {
 public:
-  bool handle_mouse_enter( size_t viewer_id, int x, int y );
-  bool handle_mouse_leave( size_t viewer_id );
-  bool handle_mouse_move( const Core::MouseHistory& mouse_history, 
+  bool handle_mouse_enter( ViewerHandle viewer, int x, int y );
+  bool handle_mouse_leave( ViewerHandle viewer );
+  bool handle_mouse_move( ViewerHandle viewer, const Core::MouseHistory& mouse_history, 
     int button, int buttons, int modifiers );
-  bool handle_mouse_press( const Core::MouseHistory& mouse_history, 
+  bool handle_mouse_press( ViewerHandle viewer, const Core::MouseHistory& mouse_history, 
     int button, int buttons, int modifiers );
-  bool handle_mouse_release( const Core::MouseHistory& mouse_history, 
+  bool handle_mouse_release( ViewerHandle viewer, const Core::MouseHistory& mouse_history,
     int button, int buttons, int modifiers );
-  bool handle_wheel( int delta, int x, int y, int buttons, int modifiers );
+  bool handle_wheel( ViewerHandle viewer, int delta, int x, int y, int buttons, int modifiers );
 
   void update_viewers( bool redraw_2d, bool redraw_3d );
 
   // All the open tools are stored in this hash map
   ToolManager::tool_list_type tool_list_;
   ToolHandle active_tool_;
+  ViewerHandle focus_viewer_;
 
   Core::StateStringHandle active_tool_state_;
 };
 
-bool ToolManagerPrivate::handle_mouse_enter( size_t viewer_id, int x, int y )
+bool ToolManagerPrivate::handle_mouse_enter( ViewerHandle viewer, int x, int y )
 {
+  this->focus_viewer_ = viewer;
   if ( this->active_tool_ )
   {
-    return this->active_tool_->handle_mouse_enter( viewer_id, x, y );
+    return this->active_tool_->handle_mouse_enter( viewer, x, y );
   }
   return false;
 }
 
-bool ToolManagerPrivate::handle_mouse_leave( size_t viewer_id )
+bool ToolManagerPrivate::handle_mouse_leave( ViewerHandle viewer )
 {
+  assert( this->focus_viewer_ == viewer );
+  this->focus_viewer_.reset();
   if ( this->active_tool_ )
   {
-    return this->active_tool_->handle_mouse_leave( viewer_id );
+    return this->active_tool_->handle_mouse_leave( viewer );
   }
   return false;
 }
 
-bool ToolManagerPrivate::handle_mouse_move( const Core::MouseHistory& mouse_history, 
-  int button, int buttons, int modifiers )
+bool ToolManagerPrivate::handle_mouse_move( ViewerHandle viewer, 
+                       const Core::MouseHistory& mouse_history, 
+                       int button, int buttons, int modifiers )
 {
+  // If there is no focus viewer, simulate a mouse enter event.
+  // NOTE: It is not safe to pass this mouse move event to the active tool, because
+  // the mouse history information might not be correct.
+  if ( !this->focus_viewer_ )
+  {
+    return this->handle_mouse_enter( viewer, mouse_history.current_.x_, 
+      mouse_history.current_.y_ );
+  }
+  
   if ( this->active_tool_ )
   {
-    return this->active_tool_->handle_mouse_move( mouse_history, button, buttons, modifiers );
+    return this->active_tool_->handle_mouse_move( viewer, mouse_history, 
+      button, buttons, modifiers );
   }
   return false;
 }
 
-bool ToolManagerPrivate::handle_mouse_press( const Core::MouseHistory& mouse_history, 
-  int button, int buttons, int modifiers )
+bool ToolManagerPrivate::handle_mouse_press( ViewerHandle viewer, 
+                      const Core::MouseHistory& mouse_history, 
+                      int button, int buttons, int modifiers )
 {
+  this->focus_viewer_ = viewer;
+
   if ( this->active_tool_ )
   {
-    return this->active_tool_->handle_mouse_press( mouse_history, button, buttons, modifiers );
+    return this->active_tool_->handle_mouse_press( viewer, mouse_history, 
+      button, buttons, modifiers );
   }
   return false;
 }
 
-bool ToolManagerPrivate::handle_mouse_release( const Core::MouseHistory& mouse_history, 
-  int button, int buttons, int modifiers )
+bool ToolManagerPrivate::handle_mouse_release( ViewerHandle viewer,
+                        const Core::MouseHistory& mouse_history, 
+                        int button, int buttons, int modifiers )
 {
+  this->focus_viewer_ = viewer;
+
   if ( this->active_tool_ )
   {
-    return this->active_tool_->handle_mouse_release( mouse_history, button, buttons, modifiers );
+    return this->active_tool_->handle_mouse_release( viewer, mouse_history, 
+      button, buttons, modifiers );
   }
   return false;
 }
 
-bool ToolManagerPrivate::handle_wheel( int delta, int x, int y, int buttons, int modifiers )
+bool ToolManagerPrivate::handle_wheel( ViewerHandle viewer, int delta, 
+                    int x, int y, int buttons, int modifiers )
 {
+  this->focus_viewer_ = viewer;
+
   if ( this->active_tool_ )
   {
-    return this->active_tool_->handle_wheel( delta, x, y, buttons, modifiers );
+    return this->active_tool_->handle_wheel( viewer, delta, x, y, buttons, modifiers );
   }
   return false;
 }
@@ -162,13 +188,13 @@ ToolManager::ToolManager() :
     viewer->set_mouse_leave_handler( boost::bind( &ToolManagerPrivate::handle_mouse_leave,
       this->private_, _1 ) );
     viewer->set_mouse_move_handler( boost::bind( &ToolManagerPrivate::handle_mouse_move,
-      this->private_, _1, _2, _3, _4 ) );
-    viewer->set_mouse_press_handler( boost::bind( &ToolManagerPrivate::handle_mouse_press,
-      this->private_, _1, _2, _3, _4 ) );
-    viewer->set_mouse_release_handler( boost::bind( &ToolManagerPrivate::handle_mouse_release,
-      this->private_, _1, _2, _3, _4 ) );
-    viewer->set_wheel_event_handler( boost::bind( &ToolManagerPrivate::handle_wheel,
       this->private_, _1, _2, _3, _4, _5 ) );
+    viewer->set_mouse_press_handler( boost::bind( &ToolManagerPrivate::handle_mouse_press,
+      this->private_, _1, _2, _3, _4, _5 ) );
+    viewer->set_mouse_release_handler( boost::bind( &ToolManagerPrivate::handle_mouse_release,
+      this->private_, _1, _2, _3, _4, _5 ) );
+    viewer->set_wheel_event_handler( boost::bind( &ToolManagerPrivate::handle_wheel,
+      this->private_, _1, _2, _3, _4, _5, _6 ) );
   }
 }
 

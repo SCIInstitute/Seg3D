@@ -47,11 +47,11 @@ public:
    virtual ~SeedPointsTool() = 0;
 
 public:
-  virtual bool handle_mouse_enter( size_t viewer_id, int x, int y );
-  virtual bool handle_mouse_leave( size_t viewer_id );
-  virtual bool handle_mouse_press( const Core::MouseHistory& mouse_history, 
+  virtual bool handle_mouse_press( ViewerHandle viewer, 
+    const Core::MouseHistory& mouse_history, 
     int button, int buttons, int modifiers );
-  virtual bool handle_mouse_move( const Core::MouseHistory& mouse_history, 
+  virtual bool handle_mouse_move( ViewerHandle viewer, 
+    const Core::MouseHistory& mouse_history, 
     int button, int buttons, int modifiers );
 
   // REDRAW:

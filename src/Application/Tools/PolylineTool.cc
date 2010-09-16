@@ -51,11 +51,10 @@ class PolylineToolPrivate
 {
 public:
   void handle_vertices_changed();
-  bool find_vertex( int x, int y, size_t& index );
+  bool find_vertex( ViewerHandle viewer, int x, int y, size_t& index );
   void execute( Core::ActionContextHandle context, bool erase );
 
   PolylineTool* tool_;
-  ViewerHandle viewer_;
   bool moving_vertex_;
   size_t vertex_index_;
 };
@@ -65,29 +64,29 @@ void PolylineToolPrivate::handle_vertices_changed()
   ViewerManager::Instance()->update_2d_viewers_overlay();
 }
 
-bool PolylineToolPrivate::find_vertex( int x, int y, size_t& index )
+bool PolylineToolPrivate::find_vertex( ViewerHandle viewer, int x, int y, size_t& index )
 {
   // Step 1. Compute the size of a pixel in world space
   double x0, y0, x1, y1;
-  this->viewer_->window_to_world( 0, 0, x0, y0 );
-  this->viewer_->window_to_world( 1, 1, x1, y1 );
+  viewer->window_to_world( 0, 0, x0, y0 );
+  viewer->window_to_world( 1, 1, x1, y1 );
   double pixel_width = Core::Abs( x1 - x0 );
   double pixel_height = Core::Abs( y1 - y0 );
 
   // Step 2. Compute the mouse position in world space
   double world_x, world_y;
-  this->viewer_->window_to_world( x, y, world_x, world_y );
+  viewer->window_to_world( x, y, world_x, world_y );
 
   // Step 3. Search for the first vertex that's within 2 pixels of current mouse position
   double range_x = pixel_width * 2;
   double range_y = pixel_height * 2;
   std::vector< Core::Point > vertices = this->tool_->vertices_state_->get();
   Core::VolumeSliceType slice_type( Core::VolumeSliceType::AXIAL_E );
-  if ( this->viewer_->view_mode_state_->get() == Viewer::CORONAL_C )
+  if ( viewer->view_mode_state_->get() == Viewer::CORONAL_C )
   {
     slice_type = Core::VolumeSliceType::CORONAL_E;
   }
-  else if ( this->viewer_->view_mode_state_->get() == Viewer::SAGITTAL_C )
+  else if ( viewer->view_mode_state_->get() == Viewer::SAGITTAL_C )
   {
     slice_type = Core::VolumeSliceType::SAGITTAL_E;
   }
@@ -193,23 +192,12 @@ void PolylineTool::reset( Core::ActionContextHandle context )
   Core::ActionClear::Dispatch( context, this->vertices_state_ );
 }
 
-bool PolylineTool::handle_mouse_enter( size_t viewer_id, int x, int y )
-{
-  this->private_->viewer_ = ViewerManager::Instance()->get_viewer( viewer_id );
-  return true;
-}
-
-bool PolylineTool::handle_mouse_leave( size_t viewer_id )
-{
-  this->private_->viewer_.reset();
-  return true;
-}
-
-bool PolylineTool::handle_mouse_press( const Core::MouseHistory& mouse_history, 
+bool PolylineTool::handle_mouse_press( ViewerHandle viewer, 
+                    const Core::MouseHistory& mouse_history, 
                     int button, int buttons, int modifiers )
 {
   Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
-  if ( this->private_->viewer_->is_volume_view() )
+  if ( viewer->is_volume_view() )
   {
     return false;
   }
@@ -217,11 +205,11 @@ bool PolylineTool::handle_mouse_press( const Core::MouseHistory& mouse_history,
   if ( modifiers == Core::KeyModifier::NO_MODIFIER_E &&
     button == Core::MouseButton::LEFT_BUTTON_E )
   {
-    Core::VolumeSliceHandle active_slice = this->private_->viewer_->get_active_volume_slice();
+    Core::VolumeSliceHandle active_slice = viewer->get_active_volume_slice();
     if ( active_slice && !active_slice->out_of_boundary() )
     {
       double world_x, world_y;
-      this->private_->viewer_->window_to_world( mouse_history.current_.x_, 
+      viewer->window_to_world( mouse_history.current_.x_, 
         mouse_history.current_.y_, world_x, world_y );
       Core::Point pt;
       active_slice->get_world_coord( world_x, world_y,  pt );
@@ -234,15 +222,17 @@ bool PolylineTool::handle_mouse_press( const Core::MouseHistory& mouse_history,
   else if ( modifiers == Core::KeyModifier::NO_MODIFIER_E &&
     button == Core::MouseButton::RIGHT_BUTTON_E )
   {
-    this->private_->moving_vertex_ = this->private_->find_vertex( mouse_history.current_.x_, 
-      mouse_history.current_.y_, this->private_->vertex_index_ );
+    this->private_->moving_vertex_ = this->private_->find_vertex( viewer, 
+      mouse_history.current_.x_, mouse_history.current_.y_, 
+      this->private_->vertex_index_ );
     return this->private_->moving_vertex_;
   }
   
   return false;
 }
 
-bool PolylineTool::handle_mouse_release( const Core::MouseHistory& mouse_history, 
+bool PolylineTool::handle_mouse_release( ViewerHandle viewer, 
+                    const Core::MouseHistory& mouse_history, 
                     int button, int buttons, int modifiers )
 {
   if ( this->private_->moving_vertex_ && button == Core::MouseButton::RIGHT_BUTTON_E )
@@ -254,16 +244,17 @@ bool PolylineTool::handle_mouse_release( const Core::MouseHistory& mouse_history
   return false;
 }
 
-bool PolylineTool::handle_mouse_move( const Core::MouseHistory& mouse_history, 
+bool PolylineTool::handle_mouse_move( ViewerHandle viewer, 
+                   const Core::MouseHistory& mouse_history, 
                    int button, int buttons, int modifiers )
 {
   if ( this->private_->moving_vertex_ )
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
     Core::Point pt = this->vertices_state_->get()[ this->private_->vertex_index_ ];
-    std::string view_mode = this->private_->viewer_->view_mode_state_->get();
+    std::string view_mode = viewer->view_mode_state_->get();
     double world_x, world_y;
-    this->private_->viewer_->window_to_world( mouse_history.current_.x_,
+    viewer->window_to_world( mouse_history.current_.x_,
       mouse_history.current_.y_, world_x, world_y );
     lock.unlock();
 

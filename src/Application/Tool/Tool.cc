@@ -116,37 +116,44 @@ std::string Tool::tool_name() const
   return this->get_menu_label() + " " + tool_id.substr( tool_id.find( '_' ) + 1 );
 }
 
-bool Tool::handle_mouse_enter( size_t viewer_id, int x, int y )
+bool Tool::handle_mouse_enter( ViewerHandle viewer, int x, int y )
 {
   // Default implementation doesn't handle this event
   return false;
 }
 
-bool Tool::handle_mouse_leave( size_t viewer_id )
+bool Tool::handle_mouse_leave( ViewerHandle viewer )
 {
   // Default implementation doesn't handle this event
   return false;
 }
 
-bool Tool::handle_mouse_move( const Core::MouseHistory& mouse_history, int button, int buttons, int modifiers )
+bool Tool::handle_mouse_move( ViewerHandle viewer, 
+               const Core::MouseHistory& mouse_history, 
+               int button, int buttons, int modifiers )
 {
   // Default implementation doesn't handle this event
   return false;
 }
 
-bool Tool::handle_mouse_press( const Core::MouseHistory& mouse_history, int button, int buttons, int modifiers )
+bool Tool::handle_mouse_press( ViewerHandle viewer, 
+                const Core::MouseHistory& mouse_history, 
+                int button, int buttons, int modifiers )
 {
   // Default implementation doesn't handle this event
   return false;
 }
 
-bool Tool::handle_mouse_release( const Core::MouseHistory& mouse_history, int button, int buttons, int modifiers )
+bool Tool::handle_mouse_release( ViewerHandle viewer, 
+                const Core::MouseHistory& mouse_history, 
+                int button, int buttons, int modifiers )
 {
   // Default implementation doesn't handle this event
   return false;
 }
 
-bool Tool::handle_wheel( int delta, int x, int y, int buttons, int modifiers )
+bool Tool::handle_wheel( ViewerHandle viewer, int delta, 
+            int x, int y, int buttons, int modifiers )
 {
   // Default implementation doesn't handle this event
   return false;

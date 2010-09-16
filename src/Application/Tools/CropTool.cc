@@ -74,13 +74,12 @@ public:
   void handle_cropbox_origin_changed( int index, double value, Core::ActionSource source );
   void handle_cropbox_changed( Core::ActionSource source );
 
-  void hit_test( int x, int y );
-  void update_cursor();
-  void resize( int x0, int y0, int x1, int y1 );
+  void hit_test( ViewerHandle viewer, int x, int y );
+  void update_cursor( ViewerHandle viewer );
+  void resize( ViewerHandle viewer, int x0, int y0, int x1, int y1 );
 
   size_t signal_block_count_;
   CropTool* tool_;
-  ViewerHandle viewer_;
   int hit_pos_;
   int ver_index_; // Index of the vertical position state
   int hor_index_; // Index of the horizontal position state
@@ -164,12 +163,12 @@ void CropToolPrivate::handle_cropbox_origin_changed( int index, double value,
   }
 }
 
-void CropToolPrivate::hit_test( int x, int y )
+void CropToolPrivate::hit_test( ViewerHandle viewer, int x, int y )
 {
   this->hit_pos_ = HitPosition::NONE_E;
 
   Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
-  if ( this->viewer_->is_volume_view() ||
+  if ( viewer->is_volume_view() ||
     this->tool_->target_group_state_->get() == "" )
   {
     return;
@@ -177,25 +176,25 @@ void CropToolPrivate::hit_test( int x, int y )
   
   // Compute the size of a pixel in world space
   double x0, y0, x1, y1;
-  this->viewer_->window_to_world( 0, 0, x0, y0 );
-  this->viewer_->window_to_world( 1, 1, x1, y1 );
+  viewer->window_to_world( 0, 0, x0, y0 );
+  viewer->window_to_world( 1, 1, x1, y1 );
   double pixel_width = Core::Abs( x1 - x0 );
   double pixel_height = Core::Abs( y1 - y0 );
 
   // Compute the mouse position in world space
   double world_x, world_y;
-  this->viewer_->window_to_world( x, y, world_x, world_y );
+  viewer->window_to_world( x, y, world_x, world_y );
 
   Core::VolumeSliceType slice_type( Core::VolumeSliceType::AXIAL_E );
   this->hor_index_ = 0;
   this->ver_index_ = 1;
-  if ( this->viewer_->view_mode_state_->get() == Viewer::CORONAL_C )
+  if ( viewer->view_mode_state_->get() == Viewer::CORONAL_C )
   {
     slice_type = Core::VolumeSliceType::CORONAL_E;
     this->hor_index_ = 0;
     this->ver_index_ = 2;
   }
-  else if ( this->viewer_->view_mode_state_->get() == Viewer::SAGITTAL_C )
+  else if ( viewer->view_mode_state_->get() == Viewer::SAGITTAL_C )
   {
     slice_type = Core::VolumeSliceType::SAGITTAL_E;
     this->hor_index_ = 1;
@@ -272,13 +271,13 @@ void CropToolPrivate::hit_test( int x, int y )
   }
 }
 
-void CropToolPrivate::resize( int x0, int y0, int x1, int y1 )
+void CropToolPrivate::resize( ViewerHandle viewer, int x0, int y0, int x1, int y1 )
 {
   double world_x0, world_y0, world_x1, world_y1;
   {
     Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
-    this->viewer_->window_to_world( x0, y0, world_x0, world_y0 );
-    this->viewer_->window_to_world( x1, y1, world_x1, world_y1 );
+    viewer->window_to_world( x0, y0, world_x0, world_y0 );
+    viewer->window_to_world( x1, y1, world_x1, world_y1 );
   }
   double dx = world_x1 - world_x0;
   double dy = world_y1 - world_y0;
@@ -337,31 +336,31 @@ void CropToolPrivate::resize( int x0, int y0, int x1, int y1 )
   }
 }
 
-void CropToolPrivate::update_cursor()
+void CropToolPrivate::update_cursor( ViewerHandle viewer )
 {
   switch ( this->hit_pos_ )
   {
   case HitPosition::INSIDE_E:
-    this->viewer_->set_cursor( Core::CursorShape::SIZE_ALL_E );
+    viewer->set_cursor( Core::CursorShape::SIZE_ALL_E );
     break;
   case HitPosition::TOP_LEFT_E:
   case HitPosition::BOTTOM_RIGHT_E:
-    this->viewer_->set_cursor( Core::CursorShape::SIZE_FDIAG_E );
+    viewer->set_cursor( Core::CursorShape::SIZE_FDIAG_E );
     break;
   case HitPosition::BOTTOM_LEFT_E:
   case HitPosition::TOP_RIGHT_E:
-    this->viewer_->set_cursor( Core::CursorShape::SIZE_BDIAG_E );
+    viewer->set_cursor( Core::CursorShape::SIZE_BDIAG_E );
     break;
   case HitPosition::LEFT_E:
   case HitPosition::RIGHT_E:
-    this->viewer_->set_cursor( Core::CursorShape::SIZE_HOR_E );
+    viewer->set_cursor( Core::CursorShape::SIZE_HOR_E );
     break;
   case HitPosition::BOTTOM_E:
   case HitPosition::TOP_E:
-    this->viewer_->set_cursor( Core::CursorShape::SIZE_VER_E );
+    viewer->set_cursor( Core::CursorShape::SIZE_VER_E );
     break;
   default:
-    this->viewer_->set_cursor( Core::CursorShape::ARROW_E );
+    viewer->set_cursor( Core::CursorShape::ARROW_E );
     break;
   }
 }
@@ -492,33 +491,27 @@ bool CropTool::has_2d_visual()
   return true;
 }
 
-bool CropTool::handle_mouse_enter( size_t viewer_id, int x, int y )
-{
-  this->private_->viewer_ = ViewerManager::Instance()->get_viewer( viewer_id );
-  return true;
-}
-
-bool CropTool::handle_mouse_leave( size_t viewer_id )
+bool CropTool::handle_mouse_leave( ViewerHandle viewer )
 {
   this->private_->resizing_ = false;
-  this->private_->viewer_.reset();
   return true;
 }
 
-bool CropTool::handle_mouse_move( const Core::MouseHistory& mouse_history, 
+bool CropTool::handle_mouse_move( ViewerHandle viewer, 
+                 const Core::MouseHistory& mouse_history, 
                  int button, int buttons, int modifiers )
 { 
   if ( buttons == Core::MouseButton::NO_BUTTON_E &&
     modifiers == Core::KeyModifier::NO_MODIFIER_E )
   {
-    this->private_->hit_test( mouse_history.current_.x_, mouse_history.current_.y_ );
-    this->private_->update_cursor();
+    this->private_->hit_test( viewer, mouse_history.current_.x_, mouse_history.current_.y_ );
+    this->private_->update_cursor( viewer );
     return true;
   }
   
   if ( this->private_->resizing_ )
   {
-    this->private_->resize( mouse_history.previous_.x_, mouse_history.previous_.y_,
+    this->private_->resize( viewer, mouse_history.previous_.x_, mouse_history.previous_.y_,
       mouse_history.current_.x_, mouse_history.current_.y_ );
     return true;
   }
@@ -526,7 +519,8 @@ bool CropTool::handle_mouse_move( const Core::MouseHistory& mouse_history,
   return false;
 }
 
-bool CropTool::handle_mouse_press( const Core::MouseHistory& mouse_history, 
+bool CropTool::handle_mouse_press( ViewerHandle viewer, 
+                  const Core::MouseHistory& mouse_history, 
                   int button, int buttons, int modifiers )
 {
   if ( modifiers == Core::KeyModifier::NO_MODIFIER_E &&
@@ -540,15 +534,16 @@ bool CropTool::handle_mouse_press( const Core::MouseHistory& mouse_history,
   return false;
 }
 
-bool CropTool::handle_mouse_release( const Core::MouseHistory& mouse_history, 
+bool CropTool::handle_mouse_release( ViewerHandle viewer, 
+                  const Core::MouseHistory& mouse_history, 
                   int button, int buttons, int modifiers )
 {
   if ( button == Core::MouseButton::LEFT_BUTTON_E &&
     this->private_->resizing_ )
   {
     this->private_->resizing_ = false;
-    this->private_->hit_test( mouse_history.current_.x_, mouse_history.current_.y_ );
-    this->private_->update_cursor();
+    this->private_->hit_test( viewer, mouse_history.current_.x_, mouse_history.current_.y_ );
+    this->private_->update_cursor( viewer );
     return true;
   }
   

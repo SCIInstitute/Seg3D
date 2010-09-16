@@ -73,11 +73,11 @@ public:
   // -- Mouse and keyboard events handling --
 public:
 
-  typedef boost::function< bool( const Core::MouseHistory&, int, int, int ) > 
+  typedef boost::function< bool( ViewerHandle, const Core::MouseHistory&, int, int, int ) > 
     mouse_event_handler_type;
-  typedef boost::function< bool( size_t, int, int ) > enter_event_handler_type;
-  typedef boost::function< bool( size_t ) > leave_event_handler_type;
-  typedef boost::function< bool( int, int, int, int, int ) >  wheel_event_handler_type;
+  typedef boost::function< bool( ViewerHandle, int, int ) > enter_event_handler_type;
+  typedef boost::function< bool( ViewerHandle ) > leave_event_handler_type;
+  typedef boost::function< bool( ViewerHandle, int, int, int, int, int ) >  wheel_event_handler_type;
 
   virtual void mouse_move_event( const Core::MouseHistory& mouse_history, 
     int button, int buttons, int modifiers );

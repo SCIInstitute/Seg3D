@@ -47,6 +47,7 @@
 #include <Application/Layer/LayerFWD.h>
 #include <Application/Tool/ToolFWD.h>
 #include <Application/Tool/ToolInfo.h>
+#include <Application/Viewer/Viewer.h>
 
 namespace Seg3D
 {
@@ -112,30 +113,34 @@ public:
 public:
   // HANDLE_MOUSE_ENTER:
   // Called when the mouse has entered a viewer.
-  virtual bool handle_mouse_enter( size_t viewer_id, int x, int y );
+  virtual bool handle_mouse_enter( ViewerHandle viewer, int x, int y );
 
   // HANDLE_MOUSE_LEAVE:
   // Called when the mouse has left a viewer.
-  virtual bool handle_mouse_leave( size_t viewer_id );
+  virtual bool handle_mouse_leave( ViewerHandle viewer );
 
   // HANDLE_MOUSE_MOVE:
   // Called when the mouse moves in a viewer.
-  virtual bool handle_mouse_move( const Core::MouseHistory& mouse_history, 
+  virtual bool handle_mouse_move( ViewerHandle viewer, 
+    const Core::MouseHistory& mouse_history, 
     int button, int buttons, int modifiers );
 
   // HANDLE_MOUSE_PRESS:
   // Called when a mouse button has been pressed.
-  virtual bool handle_mouse_press( const Core::MouseHistory& mouse_history, 
+  virtual bool handle_mouse_press( ViewerHandle viewer, 
+    const Core::MouseHistory& mouse_history, 
     int button, int buttons, int modifiers );
 
   // HANDLE_MOUSE_RELEASE:
   // Called when a mouse button has been released.
-  virtual bool handle_mouse_release( const Core::MouseHistory& mouse_history, 
+  virtual bool handle_mouse_release( ViewerHandle viewer, 
+    const Core::MouseHistory& mouse_history, 
     int button, int buttons, int modifiers );
 
   // HANDLE_WHEEL:
   // Called when the mouse wheel has been rotated.
-  virtual bool handle_wheel( int delta, int x, int y, int buttons, int modifiers );
+  virtual bool handle_wheel( ViewerHandle viewer, int delta, 
+    int x, int y, int buttons, int modifiers );
 
 public:
   // REDRAW:

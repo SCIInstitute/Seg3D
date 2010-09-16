@@ -957,7 +957,8 @@ void Viewer::mouse_move_event( const Core::MouseHistory& mouse_history, int butt
   if ( !this->private_->mouse_move_handler_.empty() )
   {
     // if the registered handler handled the event, no further process needed
-    if ( this->private_->mouse_move_handler_( mouse_history, button, buttons, modifiers ) )
+    if ( this->private_->mouse_move_handler_( this->shared_from_this(), mouse_history, 
+      button, buttons, modifiers ) )
     {
       return;
     }
@@ -982,7 +983,8 @@ void Viewer::mouse_press_event( const Core::MouseHistory& mouse_history, int but
   if ( !this->private_->mouse_press_handler_.empty() )
   {
     // if the registered handler handled the event, no further process needed
-    if ( this->private_->mouse_press_handler_( mouse_history, button, buttons, modifiers ) )
+    if ( this->private_->mouse_press_handler_( this->shared_from_this(), mouse_history, 
+      button, buttons, modifiers ) )
     {
       return;
     }
@@ -1016,7 +1018,8 @@ void Viewer::mouse_release_event( const Core::MouseHistory& mouse_history, int b
   if ( !this->private_->mouse_release_handler_.empty() )
   {
     // if the registered handler handled the event, no further process needed
-    if ( this->private_->mouse_release_handler_( mouse_history, button, buttons, modifiers ) )
+    if ( this->private_->mouse_release_handler_( this->shared_from_this(), mouse_history, 
+      button, buttons, modifiers ) )
     {
       return;
     }
@@ -1035,7 +1038,7 @@ void Viewer::mouse_enter_event( int x, int y )
 {
   if ( this->private_->mouse_enter_handler_ )
   {
-    this->private_->mouse_enter_handler_( this->get_viewer_id(), x, y );
+    this->private_->mouse_enter_handler_( this->shared_from_this(), x, y );
   }
 }
 
@@ -1043,7 +1046,7 @@ void Viewer::mouse_leave_event()
 {
   if ( this->private_->mouse_leave_handler_ )
   {
-    this->private_->mouse_leave_handler_( this->get_viewer_id() );
+    this->private_->mouse_leave_handler_( this->shared_from_this() );
   }
 }
 
@@ -1051,7 +1054,8 @@ bool Viewer::wheel_event( int delta, int x, int y, int buttons, int modifiers )
 {
   if ( !this->private_->wheel_event_handler_.empty() )
   {
-    if ( this->private_->wheel_event_handler_( delta, x, y, buttons, modifiers ) )
+    if ( this->private_->wheel_event_handler_( this->shared_from_this(), 
+      delta, x, y, buttons, modifiers ) )
     {
       return true;
     }

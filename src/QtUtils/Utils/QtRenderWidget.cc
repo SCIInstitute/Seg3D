@@ -111,7 +111,7 @@ static void UpdateDisplay( QtRenderWidgetWeakHandle qpointer )
     return;
   }
 
-  if ( !qpointer.isNull() )
+  if ( !qpointer.isNull() && !QCoreApplication::closingDown() )
   {
     qpointer->updateGL();
   }
@@ -314,6 +314,9 @@ void QtRenderWidget::enterEvent( QEvent* event )
   event->accept();
   setFocus();
   QPoint cursor_pos = this->mapFromGlobal( QCursor::pos() );
+  this->private_->mouse_history_.current_.x_ = cursor_pos.x();
+  this->private_->mouse_history_.current_.y_ = cursor_pos.y();
+  this->private_->mouse_history_.previous_ = this->private_->mouse_history_.current_;
   this->private_->viewer_->mouse_enter_event( cursor_pos.x(), cursor_pos.y() );
 }
 

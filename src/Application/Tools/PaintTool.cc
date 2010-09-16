@@ -773,6 +773,9 @@ void PaintTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
   std::string current_viewer_mode;
   std::string redraw_viewer_mode;
   bool show_data_cstr_bound;
+  LayerHandle target_layer;
+  bool layer_visible = false;
+
   {
     Core::StateEngine::lock_type se_lock( Core::StateEngine::GetMutex() );
     if ( current_viewer )
@@ -781,6 +784,25 @@ void PaintTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
     }
     redraw_viewer_mode = viewer->view_mode_state_->get();
     target_layer_id = this->target_layer_state_->get();
+
+    // If no target layer is selected, return
+    if ( target_layer_id == Tool::NONE_OPTION_C )
+    {
+      return;
+    }
+    target_layer = LayerManager::Instance()->get_layer_by_id( target_layer_id );
+    if ( !target_layer )
+    {
+      CORE_THROW_LOGICERROR( "Layer with ID '" + this->target_layer_state_->get() +
+        "' does not exist" );
+    }
+
+    if ( current_viewer )
+    {
+      layer_visible = target_layer->visible_state_[ current_viewer->get_viewer_id() ]->get() &&
+        target_layer->get_layer_group()->visibility_state_->get();
+    }
+    
     data_constraint_layer_id = this->data_constraint_layer_state_->get();
     min_val = this->lower_threshold_state_->get();
     max_val = this->upper_threshold_state_->get();
@@ -788,18 +810,6 @@ void PaintTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
     show_data_cstr_bound = this->show_data_cstr_bound_state_->get();
   }
 
-  // If no target layer is selected, return
-  if ( target_layer_id == Tool::NONE_OPTION_C )
-  {
-    return;
-  }
-
-  LayerHandle target_layer = LayerManager::Instance()->get_layer_by_id( target_layer_id );
-  if ( !target_layer )
-  {
-    CORE_THROW_LOGICERROR( "Layer with ID '" + this->target_layer_state_->get() +
-      "' does not exist" );
-  }
 
   Core::MaskVolumeSliceHandle target_slice = boost::dynamic_pointer_cast
     < Core::MaskVolumeSlice >( viewer->get_volume_slice( target_layer_id ) );
@@ -885,7 +895,7 @@ void PaintTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
     data_constraint_tex->unbind();
   }
   
-  if ( current_viewer && brush_visible &&
+  if ( current_viewer && brush_visible && layer_visible &&
     current_viewer_mode == redraw_viewer_mode )
   {
     double left = target_slice->left() + ( i - radius - 0.5 ) * voxel_width;
@@ -932,10 +942,10 @@ void PaintTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
   glFinish();
 }
 
-bool PaintTool::handle_mouse_enter( size_t viewer_id, int x, int y )
+bool PaintTool::handle_mouse_enter( ViewerHandle viewer, int x, int y )
 {
   PaintToolPrivate::lock_type lock( this->private_->get_mutex() );
-  this->private_->viewer_ = ViewerManager::Instance()->get_viewer( viewer_id );
+  this->private_->viewer_ = viewer;
   if ( !this->private_->viewer_->is_volume_view() )
   {
     this->private_->brush_visible_ = true;
@@ -948,7 +958,7 @@ bool PaintTool::handle_mouse_enter( size_t viewer_id, int x, int y )
   return true;
 }
 
-bool PaintTool::handle_mouse_leave( size_t /*viewer_id*/ )
+bool PaintTool::handle_mouse_leave( ViewerHandle viewer )
 {
   PaintToolPrivate::lock_type lock( this->private_->get_mutex() );
   this->private_->brush_visible_ = false;
@@ -961,10 +971,16 @@ bool PaintTool::handle_mouse_leave( size_t /*viewer_id*/ )
   return true;
 }
 
-bool PaintTool::handle_mouse_move( const Core::MouseHistory& mouse_history, 
+bool PaintTool::handle_mouse_move( ViewerHandle viewer, 
+                  const Core::MouseHistory& mouse_history, 
                   int button, int buttons, int modifiers )
 {
-  if ( !this->private_->viewer_ || this->private_->viewer_->is_volume_view() )
+  {
+    PaintToolPrivate::lock_type lock( this->private_->get_mutex() );
+    this->private_->viewer_ = viewer;
+  }
+
+  if ( this->private_->viewer_->is_volume_view() )
   {
     return false;
   }
@@ -1023,10 +1039,16 @@ bool PaintTool::handle_mouse_move( const Core::MouseHistory& mouse_history,
   return false;
 }
 
-bool PaintTool::handle_mouse_press( const Core::MouseHistory& mouse_history, 
+bool PaintTool::handle_mouse_press( ViewerHandle viewer, 
+                   const Core::MouseHistory& mouse_history, 
                    int button, int buttons, int modifiers )
 {
-  if ( !this->private_->viewer_ || this->private_->viewer_->is_volume_view() )
+  {
+    PaintToolPrivate::lock_type lock( this->private_->get_mutex() );
+    this->private_->viewer_ = viewer;
+  }
+
+  if ( this->private_->viewer_->is_volume_view() )
   {
     return false;
   }
@@ -1100,10 +1122,16 @@ bool PaintTool::handle_mouse_press( const Core::MouseHistory& mouse_history,
   return accepted;
 }
 
-bool PaintTool::handle_mouse_release( const Core::MouseHistory& mouse_history, 
+bool PaintTool::handle_mouse_release( ViewerHandle viewer,
+                   const Core::MouseHistory& mouse_history, 
                    int button, int buttons, int modifiers )
 {
-  if ( !this->private_->viewer_ || this->private_->viewer_->is_volume_view() )
+  {
+    PaintToolPrivate::lock_type lock( this->private_->get_mutex() );
+    this->private_->viewer_ = viewer;
+  }
+
+  if ( this->private_->viewer_->is_volume_view() )
   {
     return false;
   }
@@ -1129,9 +1157,15 @@ bool PaintTool::handle_mouse_release( const Core::MouseHistory& mouse_history,
   return false;
 }
 
-bool PaintTool::handle_wheel( int delta, int x, int y, int buttons, int modifiers )
+bool PaintTool::handle_wheel( ViewerHandle viewer, int delta, 
+               int x, int y, int buttons, int modifiers )
 {
-  if ( !this->private_->viewer_ || this->private_->viewer_->is_volume_view() )
+  {
+    PaintToolPrivate::lock_type lock( this->private_->get_mutex() );
+    this->private_->viewer_ = viewer;
+  }
+
+  if ( this->private_->viewer_->is_volume_view() )
   {
     return false;
   }
