@@ -67,7 +67,7 @@ public:
   void set_value( std::string& value );
 
   // Get a pointer to one of the arguments of a function
-  ParserNode* get_arg( size_t j );
+  ParserNodeHandle get_arg( size_t j );
 
   // Set the argument to a sub tree
   void set_arg( size_t j, ParserNodeHandle& handle );

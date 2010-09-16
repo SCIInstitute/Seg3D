@@ -1102,7 +1102,6 @@ ArrayMathProgramCode::ArrayMathProgramCode( bool ( *function )( ArrayMathProgram
   index_(0), 
   size_(1)
 {
-
 }
 
 ArrayMathProgramCode::ArrayMathProgramCode() :
@@ -1110,27 +1109,22 @@ ArrayMathProgramCode::ArrayMathProgramCode() :
   index_(0), 
   size_(1)
 {
-
 }
-
 
 double* ArrayMathProgramVariable::get_data()
 {
   return this->data_;
 }
 
-
 void ArrayMathProgramSource::set_bool_array( std::vector< bool >* array )
 {
   this->bool_array_ = array;
 }
 
-
 std::vector< bool >* ArrayMathProgramSource::get_bool_array()
 {
   return this->bool_array_;
 }
-
 
 bool ArrayMathProgramSource::is_bool_array()
 {
@@ -1143,12 +1137,10 @@ void ArrayMathProgramSource::set_double_array( std::vector< double >* array )
   this->double_array_ = array;
 }
 
-
 std::vector< double >* ArrayMathProgramSource::get_double_array()
 {
   return this->double_array_;
 }
-
 
 bool ArrayMathProgramSource::is_double_array()
 {

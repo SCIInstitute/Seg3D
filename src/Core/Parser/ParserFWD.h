@@ -37,7 +37,18 @@
 
 namespace Core
 {
+#ifdef SCI_64BITS
+  typedef long long       index_type;
+  typedef long long       size_type;
+#else
+  typedef int             index_type;
+  typedef int             size_type;
+#endif
+
   // Forward declarations 
+
+  class ArrayMathFunctionCatalog;
+  typedef boost::shared_ptr< ArrayMathFunctionCatalog > ArrayMathFunctionCatalogHandle;
 
   class ParserFunction;
 

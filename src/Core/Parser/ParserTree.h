@@ -54,7 +54,7 @@ public:
   std::string get_varname();
 
   // Retrieve the tree for computing the expression
-  ParserNode* get_expression_tree();
+  ParserNodeHandle get_expression_tree();
 
   // Set expression tree
   void set_expression_tree( ParserNodeHandle& handle );

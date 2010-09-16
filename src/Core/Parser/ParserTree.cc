@@ -58,9 +58,9 @@ std::string ParserTree::get_varname()
   return this->varname_;
 }
 
-ParserNode* ParserTree::get_expression_tree()
+ParserNodeHandle ParserTree::get_expression_tree()
 {
-  return this->expression_.get();
+  return this->expression_;
 }
 
 void ParserTree::set_expression_tree( ParserNodeHandle& handle )

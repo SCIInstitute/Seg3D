@@ -32,6 +32,13 @@
 ##################################################
 
 SET(CORE_PARSER_SRCS
+  ArrayMathEngine.h
+  ArrayMathEngine.cc
+  ArrayMathFunctionBasic.cc
+  ArrayMathFunctionCatalog.h
+  ArrayMathFunctionCatalog.cc
+  ArrayMathFunctionScalar.cc
+  ArrayMathFunctionSourceSink.cc
   ArrayMathInterpreter.h
   ArrayMathInterpreter.cc
   Parser.h
@@ -65,5 +72,5 @@ CORE_ADD_LIBRARY(Core_Parser ${CORE_PARSER_SRCS} )
 TARGET_LINK_LIBRARIES(Core_Parser 
   ${SCI_BOOST_LIBRARY})
 
-#ADD_EXECUTABLE(TestParser TestParser.cc)
-#TARGET_LINK_LIBRARIES(TestParser Core_Parser Core_Utils) 
+ADD_EXECUTABLE(TestParser TestParser.cc)
+TARGET_LINK_LIBRARIES(TestParser Core_Parser Core_Utils) 

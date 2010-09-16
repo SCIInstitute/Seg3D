@@ -108,9 +108,9 @@ void ParserNode::set_value( std::string& value )
   this->value_ = value;
 }
 
-ParserNode* ParserNode::get_arg( size_t j )
+Core::ParserNodeHandle ParserNode::get_arg( size_t j )
 {
-  return this->args_[ j ].get();
+  return this->args_[ j ];
 }
 
 void ParserNode::set_arg( size_t j, ParserNodeHandle& handle )

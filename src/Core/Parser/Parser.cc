@@ -2004,7 +2004,7 @@ bool Parser::validate( ParserProgramHandle& program, ParserFunctionCatalogHandle
       return false;
     }
 
-    ParserNodeHandle nhandle( handle->get_expression_tree() );
+    ParserNodeHandle nhandle = handle->get_expression_tree();
     if ( nhandle.get() == 0 )
     {
       error = "INTERNAL ERROR: Encountered incomplete expression '" + expression + "'.";
@@ -2115,7 +2115,7 @@ bool Parser::recursive_validate( ParserNodeHandle& handle, ParserFunctionCatalog
       std::vector < std::string > arg_types( num_args );
       for ( size_t j = 0; j < num_args; j++ )
       {
-        ParserNodeHandle chandle( handle->get_arg( j ) );
+        ParserNodeHandle chandle = handle->get_arg( j );
         // This one should return the error to the user
         if ( !( recursive_validate( chandle, fhandle, var_list, error, expression ) ) ) 
         {
@@ -2142,8 +2142,8 @@ bool Parser::recursive_validate( ParserNodeHandle& handle, ParserFunctionCatalog
           {
             if ( function->get_flags() & PARSER_SYMMETRIC_FUNCTION_E )
             {
-              ParserNodeHandle temp1( handle->get_arg( 0 ) );
-              ParserNodeHandle temp2( handle->get_arg( 1 ) );
+              ParserNodeHandle temp1 = handle->get_arg( 0 );
+              ParserNodeHandle temp2 = handle->get_arg( 1 );
               handle->set_arg( 0, temp2 );
               handle->set_arg( 1, temp1 );
               found_it = true;
@@ -2263,7 +2263,7 @@ bool Parser::optimize( ParserProgramHandle& program, std::string& error )
     // We later convert this one into an output variable
     // if needed
 
-    ParserNodeHandle nhandle( thandle->get_expression_tree() );
+    ParserNodeHandle nhandle = thandle->get_expression_tree();
 
     switch( nhandle->get_kind() )
     {
@@ -2942,7 +2942,7 @@ bool Parser::optimize_process_node( ParserNodeHandle& nhandle, std::list<
   for ( size_t j = 0; j < num_args; j++ )
   {
     ParserScriptVariableHandle iohandle;
-    ParserNodeHandle ihandle( nhandle->get_arg( j ) );
+    ParserNodeHandle ihandle = nhandle->get_arg( j );
     int ikind = ihandle->get_kind();
 
     switch( ikind )

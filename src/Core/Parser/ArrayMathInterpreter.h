@@ -60,15 +60,6 @@ typedef boost::shared_ptr< ArrayMathProgram > ArrayMathProgramHandle;
 // Depending on whether SCIRun is 64bits, the indices into the fields are
 // altered to make sure we can address really large memory chunks.
 
-// TODO How to handle this?
-//#ifdef SCI_64BITS
-//typedef long long       index_type;
-//typedef long long       size_type;
-//#else
-typedef int             index_type;
-typedef int             size_type;
-//#endif
-
 //-----------------------------------------------------------------------------
 // Functions for databasing the function calls that make up the program
 
