@@ -89,7 +89,8 @@ public:
 public:
 
   template< class T >
-  void crop_typed_data( Core::DataBlockHandle src, Core::DataBlockHandle dst );
+  void crop_typed_data( Core::DataBlockHandle src, Core::DataBlockHandle dst, 
+    LayerHandle dst_layer );
 
   void crop_data_layer( DataLayerHandle input, DataLayerHandle output );
   void crop_mask_layer( MaskLayerHandle input, MaskLayerHandle output );
@@ -108,7 +109,8 @@ public:
 };
 
 template< class T >
-void CropAlgo::crop_typed_data( Core::DataBlockHandle src, Core::DataBlockHandle dst )
+void CropAlgo::crop_typed_data( Core::DataBlockHandle src, Core::DataBlockHandle dst,
+                 LayerHandle dst_layer )
 {
   T* src_data = reinterpret_cast< T* >( src->get_data() );
   T* dst_data = reinterpret_cast< T* >( dst->get_data() );
@@ -119,6 +121,7 @@ void CropAlgo::crop_typed_data( Core::DataBlockHandle src, Core::DataBlockHandle
   size_t current_z = src->to_index( this->start_x_, this->start_y_, this->start_z_ );
   size_t current_y;
   size_t dst_index = 0;
+  size_t total_z_slice = this->end_z_ - this->start_z_ + 1;
   for ( size_t z = this->start_z_; z <= this->end_z_; ++z, current_z += stride_z )
   {
     current_y = current_z;
@@ -130,6 +133,7 @@ void CropAlgo::crop_typed_data( Core::DataBlockHandle src, Core::DataBlockHandle
         dst_data[ dst_index++ ] = src_data[ current_index ];
       }
     }
+    dst_layer->update_progress_signal_( ( z - this->start_z_ + 1.0 ) / total_z_slice * 0.8 );
   }
 }
 
@@ -168,28 +172,28 @@ void CropAlgo::crop_data_layer( DataLayerHandle input, DataLayerHandle output )
   switch ( input_datablock->get_data_type() )
   {
   case Core::DataType::CHAR_E:
-    this->crop_typed_data< signed char >( input_datablock, output_datablock );
+    this->crop_typed_data< signed char >( input_datablock, output_datablock, output );
     break;
   case Core::DataType::UCHAR_E:
-    this->crop_typed_data< unsigned char >( input_datablock, output_datablock );
+    this->crop_typed_data< unsigned char >( input_datablock, output_datablock, output );
     break;
   case Core::DataType::SHORT_E:
-    this->crop_typed_data< short >( input_datablock, output_datablock );
+    this->crop_typed_data< short >( input_datablock, output_datablock, output );
     break;
   case Core::DataType::USHORT_E:
-    this->crop_typed_data< unsigned short >( input_datablock, output_datablock );
+    this->crop_typed_data< unsigned short >( input_datablock, output_datablock, output );
     break;
   case Core::DataType::INT_E:
-    this->crop_typed_data< int >( input_datablock, output_datablock );
+    this->crop_typed_data< int >( input_datablock, output_datablock, output );
     break;
   case Core::DataType::UINT_E:
-    this->crop_typed_data< unsigned int >( input_datablock, output_datablock );
+    this->crop_typed_data< unsigned int >( input_datablock, output_datablock, output );
     break;
   case Core::DataType::FLOAT_E:
-    this->crop_typed_data< float >( input_datablock, output_datablock );
+    this->crop_typed_data< float >( input_datablock, output_datablock, output );
     break;
   case Core::DataType::DOUBLE_E:
-    this->crop_typed_data< double >( input_datablock, output_datablock );
+    this->crop_typed_data< double >( input_datablock, output_datablock, output );
     break;
   default:
     assert( false );
