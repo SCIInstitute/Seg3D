@@ -119,6 +119,9 @@ SeedPointsTool::SeedPointsTool( Core::VolumeType target_volume_type, const std::
   this->private_->tool_ = this;
 
   this->add_state( "seed_points", this->seed_points_state_ );
+
+  this->add_connection( this->seed_points_state_->state_changed_signal_.connect( 
+    boost::bind( &SeedPointsTool::handle_seed_points_changed, this ) ) );
 }
 
 SeedPointsTool::~SeedPointsTool()
@@ -269,6 +272,11 @@ bool SeedPointsTool::has_2d_visual()
 bool SeedPointsTool::has_3d_visual()
 {
   return false;
+}
+
+void SeedPointsTool::handle_seed_points_changed()
+{
+  ViewerManager::Instance()->update_2d_viewers_overlay();
 }
 
 } // end namespace Seg3D

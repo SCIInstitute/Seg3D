@@ -61,6 +61,8 @@ SET(APPLICATION_FILTERS_ACTIONS_SRCS
   Actions/ActionIntensityCorrectionFilter.cc
   Actions/ActionMedianFilter.h
   Actions/ActionMedianFilter.cc
+  Actions/ActionNeighborhoodConnectedFilter.h
+  Actions/ActionNeighborhoodConnectedFilter.cc
   Actions/ActionOtsuThresholdFilter.h
   Actions/ActionOtsuThresholdFilter.cc
   Actions/ActionThreshold.h

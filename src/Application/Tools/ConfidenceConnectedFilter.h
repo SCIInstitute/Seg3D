@@ -34,10 +34,6 @@
 namespace Seg3D
 {
 
-class ConfidenceConnectedFilterPrivate;
-typedef boost::shared_ptr< ConfidenceConnectedFilterPrivate > 
-  ConfidenceConnectedFilterPrivateHandle;
-
 class ConfidenceConnectedFilter : public SeedPointsTool
 {
 
@@ -61,9 +57,6 @@ public:
 public:
   Core::StateRangedIntHandle iterations_state_;
   Core::StateRangedDoubleHandle multiplier_state_;
-
-private:
-  ConfidenceConnectedFilterPrivateHandle private_;
 };
 
 } // end namespace

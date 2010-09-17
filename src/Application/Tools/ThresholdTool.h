@@ -64,6 +64,10 @@ public:
   // Execute the tool and dispatch the action
   virtual void execute( Core::ActionContextHandle context );
 
+  // HANDLE_SEED_POINTS_CHANGED:
+  // Called when the seed points have changed.
+  virtual void handle_seed_points_changed();
+
   // -- state --
 public:
 

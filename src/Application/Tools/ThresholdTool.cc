@@ -50,7 +50,6 @@ class ThresholdToolPrivate : public Core::Lockable
 public:
   void handle_threshold_changed();
   void handle_target_layer_changed();
-  void handle_seed_points_changed();
 
   void update_viewers();
   void initialize_gl();
@@ -87,58 +86,10 @@ void ThresholdToolPrivate::handle_target_layer_changed()
 
     if ( this->tool_->seed_points_state_->get().size() > 0 )
     {
-      this->handle_seed_points_changed();
+      this->tool_->handle_seed_points_changed();
     }
   }
   
-  this->update_viewers();
-}
-
-void ThresholdToolPrivate::handle_seed_points_changed()
-{
-  std::string target_layer_id = this->tool_->target_layer_state_->get();
-  if ( target_layer_id == Tool::NONE_OPTION_C )
-  {
-    return;
-  }
-  
-  const Core::StatePointVector::value_type& seed_points = 
-    this->tool_->seed_points_state_->get();
-  if ( seed_points.size() == 0 )
-  {
-    this->update_viewers();
-    return;
-  }
-  
-  DataLayerHandle data_layer = boost::dynamic_pointer_cast< DataLayer >(
-    LayerManager::Instance()->get_layer_by_id( target_layer_id ) );
-  Core::DataVolumeHandle data_volume = data_layer->get_data_volume();
-  Core::DataBlockHandle data_block = data_volume->get_data_block();
-  double min_val = std::numeric_limits< double >::max(); 
-  double max_val = std::numeric_limits< double >::min();
-  for ( size_t i = 0; i < seed_points.size(); ++i )
-  {
-    Core::Point pt = data_volume->apply_inverse_grid_transform( seed_points[ i ] );
-    int x = Core::Round( pt[ 0 ] );
-    int y = Core::Round( pt[ 1 ] );
-    int z = Core::Round( pt[ 2 ] );
-    if ( x >= 0 && x < static_cast< int >( data_block->get_nx() ) &&
-      y >= 0 && y < static_cast< int >( data_block->get_ny() ) &&
-      z >= 0 && z < static_cast< int >( data_block->get_nz() ) )
-    {
-      double val = data_block->get_data_at( static_cast< size_t >( x ),
-        static_cast< size_t >( y ), static_cast< size_t >( z ) );
-      min_val = Core::Min( min_val, val );
-      max_val = Core::Max( max_val, val );
-    }
-  }
-  
-  {
-    Core::ScopedCounter signal_block( this->signal_block_count_ );
-    this->tool_->upper_threshold_state_->set( max_val );
-    this->tool_->lower_threshold_state_->set( min_val );
-  }
-
   this->update_viewers();
 }
 
@@ -198,8 +149,6 @@ ThresholdTool::ThresholdTool( const std::string& toolid ) :
     boost::bind( &ThresholdToolPrivate::handle_threshold_changed, this->private_ ) ) );
   this->add_connection( this->target_layer_state_->state_changed_signal_.connect(
     boost::bind( &ThresholdToolPrivate::handle_target_layer_changed, this->private_ ) ) );
-  this->add_connection( this->seed_points_state_->state_changed_signal_.connect(
-    boost::bind( &ThresholdToolPrivate::handle_seed_points_changed, this->private_ ) ) );
 }
 
 ThresholdTool::~ThresholdTool()
@@ -321,6 +270,54 @@ void ThresholdTool::execute( Core::ActionContextHandle context )
   {
     ActionThreshold::Dispatch( context, target_layer, min_val, max_val );
   }
+}
+
+void ThresholdTool::handle_seed_points_changed()
+{
+  std::string target_layer_id = this->target_layer_state_->get();
+  if ( target_layer_id == Tool::NONE_OPTION_C )
+  {
+    return;
+  }
+
+  const Core::StatePointVector::value_type& seed_points = 
+    this->seed_points_state_->get();
+  if ( seed_points.size() == 0 )
+  {
+    this->private_->update_viewers();
+    return;
+  }
+
+  DataLayerHandle data_layer = boost::dynamic_pointer_cast< DataLayer >(
+    LayerManager::Instance()->get_layer_by_id( target_layer_id ) );
+  Core::DataVolumeHandle data_volume = data_layer->get_data_volume();
+  Core::DataBlockHandle data_block = data_volume->get_data_block();
+  double min_val = std::numeric_limits< double >::max(); 
+  double max_val = std::numeric_limits< double >::min();
+  for ( size_t i = 0; i < seed_points.size(); ++i )
+  {
+    Core::Point pt = data_volume->apply_inverse_grid_transform( seed_points[ i ] );
+    int x = Core::Round( pt[ 0 ] );
+    int y = Core::Round( pt[ 1 ] );
+    int z = Core::Round( pt[ 2 ] );
+    if ( x >= 0 && x < static_cast< int >( data_block->get_nx() ) &&
+      y >= 0 && y < static_cast< int >( data_block->get_ny() ) &&
+      z >= 0 && z < static_cast< int >( data_block->get_nz() ) )
+    {
+      double val = data_block->get_data_at( static_cast< size_t >( x ),
+        static_cast< size_t >( y ), static_cast< size_t >( z ) );
+      min_val = Core::Min( min_val, val );
+      max_val = Core::Max( max_val, val );
+    }
+  }
+
+  {
+    Core::ScopedCounter signal_block( this->private_->signal_block_count_ );
+    this->upper_threshold_state_->set( max_val );
+    this->lower_threshold_state_->set( min_val );
+  }
+
+  this->private_->update_viewers();
 }
 
 } // end namespace Seg3D

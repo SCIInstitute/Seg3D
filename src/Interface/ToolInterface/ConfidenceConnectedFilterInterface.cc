@@ -35,7 +35,6 @@
 
 //Application Includes
 #include <Application/Tools/ConfidenceConnectedFilter.h>
-//#include <Application/Filters/Actions/ActionConfidenceConnected.h>
 
 SCI_REGISTER_TOOLINTERFACE( Seg3D, ConfidenceConnectedFilterInterface )
 

@@ -38,26 +38,11 @@ SCI_REGISTER_TOOL( Seg3D, ConfidenceConnectedFilter )
 namespace Seg3D
 {
 
-class ConfidenceConnectedFilterPrivate
-{
-public:
-  void handle_seed_points_changed();
-};
-
-void ConfidenceConnectedFilterPrivate::handle_seed_points_changed()
-{
-  ViewerManager::Instance()->update_2d_viewers_overlay();
-}
-
 ConfidenceConnectedFilter::ConfidenceConnectedFilter( const std::string& toolid ) :
-  SeedPointsTool( Core::VolumeType::DATA_E, toolid ),
-  private_( new ConfidenceConnectedFilterPrivate )
+  SeedPointsTool( Core::VolumeType::DATA_E, toolid )
 {
   this->add_state( "iterations", this->iterations_state_, 3, 1, 100, 1 );
   this->add_state( "multiplier", this->multiplier_state_, 2.0, 0.1, 100.0, 0.1 );
-
-  this->add_connection( this->seed_points_state_->state_changed_signal_.connect( boost::bind( 
-    &ConfidenceConnectedFilterPrivate::handle_seed_points_changed, this->private_ ) ) );
 }
 
 ConfidenceConnectedFilter::~ConfidenceConnectedFilter()

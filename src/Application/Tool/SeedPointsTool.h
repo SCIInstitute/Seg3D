@@ -47,9 +47,14 @@ public:
    virtual ~SeedPointsTool() = 0;
 
 public:
+  // HANDLE_MOUSE_PRESS:
+  // Called when a mouse button has been pressed.
   virtual bool handle_mouse_press( ViewerHandle viewer, 
     const Core::MouseHistory& mouse_history, 
     int button, int buttons, int modifiers );
+
+  // HANDLE_MOUSE_MOVE:
+  // Called when the mouse moves in a viewer.
   virtual bool handle_mouse_move( ViewerHandle viewer, 
     const Core::MouseHistory& mouse_history, 
     int button, int buttons, int modifiers );
@@ -68,6 +73,11 @@ public:
   // Returns true if the tool draws itself in the volume view, otherwise false.
   // The default implementation returns false.
   virtual bool has_3d_visual();
+
+  // HANDLE_SEED_POINTS_CHANGED:
+  // Called when the seed points have changed.
+  // The default implementation will cause all the 2D viewers to redraw overlay.
+  virtual void handle_seed_points_changed();
 
 public:
   // CLEAR:

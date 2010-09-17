@@ -27,6 +27,7 @@
  */
 
 // Application includes
+#include <Application/Filters/Actions/ActionNeighborhoodConnectedFilter.h>
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/NeighborhoodConnectedFilter.h>
 #include <Application/Layer/Layer.h>
@@ -39,64 +40,21 @@ namespace Seg3D
 {
 
 NeighborhoodConnectedFilter::NeighborhoodConnectedFilter( const std::string& toolid ) :
-  Tool( toolid )
+  SeedPointsTool( Core::VolumeType::DATA_E, toolid )
 {
-  // Need to set ranges and default values for all parameters
-  add_state( "target", this->target_layer_state_, "<none>" );
-  
-  this->handle_layers_changed();
-
-  // Add constaints, so that when the state changes the right ranges of
-  // parameters are selected
-  this->add_connection ( this->target_layer_state_->value_changed_signal_.connect( boost::bind(
-      &NeighborhoodConnectedFilter::target_constraint, this, _1 ) ) );
-  
-  this->add_connection ( LayerManager::Instance()->layers_changed_signal_.connect(
-    boost::bind( &NeighborhoodConnectedFilter::handle_layers_changed, this ) ) );
-
 }
 
 NeighborhoodConnectedFilter::~NeighborhoodConnectedFilter()
 {
-  disconnect_all();
-}
-  
-void NeighborhoodConnectedFilter::handle_layers_changed()
-{
-  std::vector< LayerHandle > target_layers;
-  LayerManager::Instance()->get_layers( target_layers );
-  bool target_found = false;
-  
-  for( int i = 0; i < static_cast< int >( target_layers.size() ); ++i )
-  {
-    if( ( this->target_layer_state_->get() == "<none>" ) && ( target_layers[i]->type() == 
-                                 Core::VolumeType::DATA_E ) )
-    {
-      this->target_layer_state_->set( target_layers[i]->get_layer_name(), Core::ActionSource::NONE_E );
-      target_found = true;
-      break;
-    }
-    if( target_layers[i]->get_layer_name() == this->target_layer_state_->get() ) {
-      target_found = true;
-      break;
-    }
-  }
-  
-  if( !target_found )
-    this->target_layer_state_->set( "", Core::ActionSource::NONE_E );
-  
+  this->disconnect_all();
 }
 
-void NeighborhoodConnectedFilter::target_constraint( std::string layerid )
+void NeighborhoodConnectedFilter::execute( Core::ActionContextHandle context )
 {
-}
-
-void NeighborhoodConnectedFilter::activate()
-{
-}
-
-void NeighborhoodConnectedFilter::deactivate()
-{
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+  ActionNeighborhoodConnectedFilter::Dispatch( 
+    context, this->target_layer_state_->get(),
+    this->seed_points_state_->get() );
 }
 
 } // end namespace Seg3D

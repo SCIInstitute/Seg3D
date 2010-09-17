@@ -272,7 +272,7 @@ void Transform::load_identity()
   mat_ = Matrix::Identity();
 }
 
-Transform Transform::get_inverse()
+Transform Transform::get_inverse() const
 {
   Transform inv_transform;
   Matrix::Invert( this->mat_, inv_transform.mat_ );

@@ -71,7 +71,7 @@ public:
   void load_frame( const Vector&, const Vector&, const Vector& );
   void load_matrix( const Matrix& m );
 
-  Transform get_inverse();
+  Transform get_inverse() const;
 
   void post_transform( const Transform& );
   void pre_transform( const Transform& );
