@@ -214,6 +214,48 @@ private:
     }
   }
 
+  // IMPORT_PNG_SERIES: // HASNT BEEN TESTED! NEED PNG's
+  // Templated function for importing a series of PNG's
+  template< class PixelType >
+  bool import_tiff_series()
+  {
+    const unsigned int Dimension = 3;
+    typedef itk::Image< PixelType, Dimension > ImageType;
+
+    typedef itk::ImageSeriesReader< ImageType > ReaderType;
+    typename ReaderType::Pointer reader = ReaderType::New();
+
+    reader->SetFileNames( this->file_list_ );
+
+    try
+    {
+      reader->Update();
+    }
+    catch ( itk::ExceptionObject &err )
+    {
+      std::string itk_error = err.GetDescription();
+    }
+    catch( gdcm::Exception &error )
+    {
+      std::string format_error = error.getError();
+    }
+
+    this->data_block_ = Core::ITKDataBlock::New< PixelType >( 
+      typename itk::Image< PixelType, 3 >::Pointer( reader->GetOutput() ) );
+
+    this->image_data_ = typename Core::ITKImageDataT< PixelType >::Handle( 
+      new typename Core::ITKImageDataT< PixelType >( reader->GetOutput() ) );
+
+    if( this->image_data_ && this->data_block_ )
+    {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
+
   // IMPORT_VFF:
   // a function that takes the information we read from the header and uses it to import an image
   // from a vff file.

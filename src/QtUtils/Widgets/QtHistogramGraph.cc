@@ -86,6 +86,24 @@ void QtHistogramGraph::paintEvent(QPaintEvent * event )
     painter.setBrush( linearGradient );
         painter.drawRect( rect_left, rect_top, rect_width, rect_height );
     }
+  
 }
+
+void QtHistogramGraph::mousePressEvent( QMouseEvent* e )
+{
+  if( e->button() == Qt::LeftButton )
+  {
+    Q_EMIT upper_position( e->pos().x() );
+  }
+  else if( e->button() == Qt::RightButton )
+  {
+    Q_EMIT lower_position( e->pos().x() );
+  }
+}
+
+
+
+
+
 
 } // end namespace QtUtils

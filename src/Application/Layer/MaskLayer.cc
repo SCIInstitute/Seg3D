@@ -129,7 +129,8 @@ void MaskLayer::set_mask_volume( Core::MaskVolumeHandle volume )
   if ( this->mask_volume_ )
   {
     this->generation_state_->set( this->mask_volume_->get_generation() );
-    this->bit_state_->set( static_cast< int >( volume->get_mask_data_block()->get_mask_bit() ) );
+    this->bit_state_->set( static_cast< int >( 
+      volume->get_mask_data_block()->get_mask_bit() ) );
     
     this->add_connection( this->mask_volume_->get_mask_data_block()->mask_updated_signal_.
       connect( boost::bind( &MaskLayer::handle_mask_data_changed, this ) ) );
@@ -145,8 +146,8 @@ void MaskLayer::initialize_states()
 {
     // == Color of the layer ==
   
-    this->add_state( "color", color_state_, static_cast< int >( ColorCount %  PreferencesManager::Instance()->
-    color_states_.size() ) );
+    this->add_state( "color", color_state_, static_cast< int >( ColorCount % 
+    PreferencesManager::Instance()->color_states_.size() ) );
 
   ColorCount++;
 
@@ -193,8 +194,8 @@ bool MaskLayer::post_load_states( const Core::StateIO& state_io )
 
     if( Core::DataVolume::LoadDataVolume( volume_path, data_volume, error ) )
     {
-      Core::MaskDataBlockManager::Instance()->register_data_block( data_volume->get_data_block(),
-        data_volume->get_grid_transform() );
+      Core::MaskDataBlockManager::Instance()->register_data_block( 
+        data_volume->get_data_block(), data_volume->get_grid_transform() );
       success = Core::MaskDataBlockManager::Instance()->
         create( generation, bit, grid_transform, mask_data_block );
     }
@@ -248,7 +249,8 @@ void MaskLayer::compute_isosurface( double quality_factor )
 {
   if ( !Core::Application::IsApplicationThread() )
   {
-    Core::Application::PostEvent( boost::bind( &MaskLayer::compute_isosurface, this, quality_factor ) );
+    Core::Application::PostEvent( boost::bind( &MaskLayer::compute_isosurface, 
+      this, quality_factor ) );
     return;
   }
   

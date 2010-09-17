@@ -51,7 +51,9 @@ public:
   
   // EXPORT:
   // Export the current layer to file
-  static void Export( QMainWindow* main_window );
+  static void ExportLayer( QMainWindow* main_window );
+  
+  static void ExportSegmentation( QMainWindow* main_window );
 };
 
 } // end namespace Seg3D

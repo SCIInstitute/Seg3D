@@ -48,6 +48,9 @@
 #include <Core/DataBlock/DataBlock.h>
 #include <Core/DataBlock/MaskDataBlock.h>
 
+// Application includes
+#include <Application/Layer/LayerFWD.h>
+
 namespace Core
 {
 
@@ -87,9 +90,7 @@ public:
   void register_data_block( DataBlockHandle data_block, const GridTransform& grid_transform );
 
   bool save_data_blocks( boost::filesystem::path data_save_path );
-
-
-
+  
   // COMPACT:
   // Compact the masks into less memory if possible by moving them around
   // to compact the space required.

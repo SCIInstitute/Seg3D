@@ -34,7 +34,6 @@
 #include <Core/Utils/Log.h>
 
 // Application includes
-/*#include <Application/LayerIO/ITKLayerImporter.h>*/
 #include <Application/LayerManager/Actions/ActionImportLayer.h>
 
 // QtUtils Includes

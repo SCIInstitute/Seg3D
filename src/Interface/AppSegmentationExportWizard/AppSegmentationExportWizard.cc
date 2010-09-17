@@ -32,11 +32,14 @@
 // Interface includes
 #include <Interface/AppSegmentationExportWizard/AppSegmentationExportWizard.h>
 
+
+
 // Application includes
 #include <Application/Layer/LayerGroup.h>
 #include <Application/ProjectManager/ProjectManager.h>
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/LayerManager/Actions/ActionExportSegmentation.h>
+
 
 namespace Seg3D
 {
@@ -44,9 +47,9 @@ namespace Seg3D
 AppSegmentationExportWizard::AppSegmentationExportWizard( QWidget *parent ) :
     QWizard( parent )
 {
-    this->addPage( new SegmentationSelectionPage );
-    this->addPage( new SegmentationSummaryPage );
-  
+  this->addPage( new SegmentationSelectionPage( this ) );
+    this->addPage( new SegmentationSummaryPage( this ) );
+    
   this->setPixmap( QWizard::BackgroundPixmap, QPixmap( QString::fromUtf8( 
     ":/Images/Symbol.png" ) ) );
   
@@ -59,10 +62,6 @@ AppSegmentationExportWizard::~AppSegmentationExportWizard()
 
 void AppSegmentationExportWizard::accept()
 {
-  ActionExportSegmentation::Dispatch( Core::Interface::GetWidgetActionContext(),
-    field( "segmentationName" ).toString().toStdString(), 
-    field( "maskList" ).toString().toStdString(),
-    field( "segmentationPath" ).toString().toStdString() );
     QDialog::accept();
 }
 
@@ -71,112 +70,15 @@ SegmentationSelectionPage::SegmentationSelectionPage( QWidget *parent )
 {
     this->setSubTitle( "Choose the layers that you would like to export as a segmentation." );
 
-  QString default_name = QString::fromStdString( ProjectManager::Instance()->
-    current_project_->project_name_state_->get() );
-
-  boost::filesystem::path desktop_path;
-  Core::Application::Instance()->get_user_desktop_directory( desktop_path );
-
+  file_name_lineedit_ = new QLineEdit( this );
+  file_name_lineedit_->hide();
+  
   this->mask_list_ = new QLineEdit( this );
   this->mask_list_->hide();
 
   this->main_layout_ = new QVBoxLayout( this );
   this->main_layout_->setContentsMargins(6, 6, 26, 6);
   this->main_layout_->setObjectName( QString::fromUtf8( "main_layout_" ) );
-  this->segmentation_top_widget_ = new QWidget( this );
-  this->segmentation_top_widget_->setObjectName( QString::fromUtf8( 
-    "segmentation_top_widget_" ) );
-  this->segmentation_top_widget_->setMinimumSize( QSize( 0, 96 ) );
-
-  this->segmentation_top_widget_->setStyleSheet( QString::fromUtf8( 
-    "QWidget#segmentation_top_widget_{ "
-    //" margin-right: 14px;"
-    " background-color: white;"
-    "}" ) ); 
-
-  this->verticalLayout = new QVBoxLayout( this->segmentation_top_widget_ );
-  this->verticalLayout->setContentsMargins(0, 0, 0, 0);
-  this->verticalLayout->setObjectName( QString::fromUtf8( "verticalLayout" ) );
-  this->verticalLayout->setSpacing( 0 );
-  this->segmentation_name_widget_ = new QWidget( this->segmentation_top_widget_ );
-  this->segmentation_name_widget_->setObjectName( QString::fromUtf8( "segmentation_name_widget_" ) );
-  this->segmentation_name_widget_->setMinimumSize( QSize(0, 32 ) );
-  this->horizontalLayout = new QHBoxLayout( this->segmentation_name_widget_ );
-  this->horizontalLayout->setSpacing(0);
-  this->horizontalLayout->setContentsMargins(0, 0, 0, 0);
-  this->horizontalLayout->setObjectName( QString::fromUtf8( "horizontalLayout" ) );
-  this->segmentation_name_label_ = new QLabel( this->segmentation_name_widget_ );
-  this->segmentation_name_label_->setObjectName( QString::fromUtf8( "segmentation_name_label_" ) );
-  this->segmentation_name_label_->setText( QString::fromUtf8( "Segmentation name:" ) );
-
-  this->horizontalLayout->addWidget( this->segmentation_name_label_ );
-
-  this->segmentation_name_lineedit_ = new QLineEdit( this->segmentation_name_widget_ );
-  this->segmentation_name_lineedit_->setObjectName( QString::fromUtf8( "segmentation_name_lineedit_" ) );
-  this->segmentation_name_lineedit_->setText( default_name );
-
-  this->horizontalLayout->addWidget( this->segmentation_name_lineedit_ );
-
-  this->horizontalLayout->setStretch( 0, 1 );
-  this->horizontalLayout->setStretch( 1, 2 );
-
-  this->verticalLayout->addWidget( this->segmentation_name_widget_ );
-
-  this->widget_2 = new QWidget( this->segmentation_top_widget_ );
-  this->widget_2->setObjectName( QString::fromUtf8( "widget_2" ) );
-  this->widget_2->setMinimumSize( QSize( 0, 64 ) );
-  this->verticalLayout_2 = new QVBoxLayout( this->widget_2 );
-  this->verticalLayout_2->setSpacing(0);
-  this->verticalLayout_2->setContentsMargins(0, 0, 0, 0);
-  this->verticalLayout_2->setObjectName( QString::fromUtf8( "verticalLayout_2" ) );
-  this->widget_3 = new QWidget( this->widget_2 );
-  this->widget_3->setObjectName( QString::fromUtf8( "widget_3" ) );
-  this->widget_3->setMinimumSize( QSize( 0, 32 ) );
-  this->horizontalLayout_2 = new QHBoxLayout( this->widget_3 );
-  this->horizontalLayout_2->setSpacing( 0 );
-  this->horizontalLayout_2->setContentsMargins( 0, 0, 0, 0 );
-  this->horizontalLayout_2->setObjectName( QString::fromUtf8( "horizontalLayout_2" ) );
-  this->segmentation_path_label_ = new QLabel( this->widget_3 );
-  this->segmentation_path_label_->setObjectName( QString::fromUtf8( "segmentation_path_label_" ) );
-  this->segmentation_path_label_->setText( QString::fromUtf8( "Path:" ) );
-
-  this->horizontalLayout_2->addWidget( this->segmentation_path_label_ );
-
-  this->segmentation_path_lineedit_ = new QLineEdit( this->widget_3 );
-  this->segmentation_path_lineedit_->setObjectName( QString::fromUtf8( "segmentation_path_lineedit_" ) );
-  this->segmentation_path_lineedit_->setText( QString::fromStdString( desktop_path.string() ) );
-
-  this->horizontalLayout_2->addWidget( this->segmentation_path_lineedit_ );
-
-  this->horizontalLayout_2->setStretch( 0, 1 );
-  this->horizontalLayout_2->setStretch( 1, 2 );
-
-  this->verticalLayout_2->addWidget( widget_3 );
-
-  this->widget_4 = new QWidget( this->widget_2 );
-  this->widget_4->setObjectName( QString::fromUtf8( "widget_4" ) );
-  this->widget_4->setMinimumSize( QSize( 0, 32 ) );
-  this->horizontalLayout_3 = new QHBoxLayout( this->widget_4 );
-  this->horizontalLayout_3->setSpacing( 0 );
-  this->horizontalLayout_3->setContentsMargins( 0, 0, 0, 0 );
-  this->horizontalLayout_3->setObjectName( QString::fromUtf8( "horizontalLayout_3" ) );
-  this->horizontalSpacer = new QSpacerItem(277, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-
-  this->horizontalLayout_3->addItem( this->horizontalSpacer );
-
-  this->set_path_button_ = new QPushButton( this->widget_4 );
-  this->set_path_button_->setObjectName( QString::fromUtf8( "set_path_button_" ) );
-  this->set_path_button_->setMinimumSize( QSize( 100, 0 ) );
-  this->set_path_button_->setMaximumSize( QSize( 100, 16777215 ) );
-  this->set_path_button_->setText( QString::fromUtf8( "Change Path" ) );
-
-  connect( this->set_path_button_, SIGNAL( clicked() ), this, SLOT( set_path() ) );
-
-  this->horizontalLayout_3->addWidget( this->set_path_button_ );
-  this->verticalLayout_2->addWidget( this->widget_4 );
-  this->verticalLayout->addWidget( this->widget_2 );
-
-  main_layout_->addWidget( this->segmentation_top_widget_ );
 
   this->group_with_masks_tree_ = new QTreeWidget( this );
   this->group_with_masks_tree_->setObjectName( QString::fromUtf8( "group_with_masks_tree_" ) );
@@ -187,11 +89,59 @@ SegmentationSelectionPage::SegmentationSelectionPage( QWidget *parent )
   this->group_with_masks_tree_->setItemsExpandable( true );
   this->group_with_masks_tree_->setHeaderHidden( true );
 
-  main_layout_->addWidget( group_with_masks_tree_ );
+  this->main_layout_->addWidget( group_with_masks_tree_ );
+  
+  this->single_or_multiple_files_widget_ = new QWidget( this );
+  this->single_or_multiple_files_widget_->setObjectName( 
+    QString::fromUtf8( "single_or_multiple_files_widget_" ) );
+
+  this->radio_button_group_ = new QButtonGroup( this );
+  this->radio_button_group_->setExclusive( true );
+
+  this->single_or_multiple_files_widget_->setMinimumSize( QSize( 0, 32 ) );
+  this->single_or_multiple_files_widget_->setMaximumSize( QSize( 16777215, 32) );
+  this->horizontalLayout_1 = new QHBoxLayout( this->single_or_multiple_files_widget_ );
+  this->horizontalLayout_1->setSpacing( 0 );
+  this->horizontalLayout_1->setContentsMargins( 0, 0, 0, 0 );
+  this->horizontalLayout_1->setObjectName( QString::fromUtf8( "horizontalLayout" ) );
+  this->single_file_widget_ = new QWidget( this->single_or_multiple_files_widget_ );
+  this->single_file_widget_->setObjectName( QString::fromUtf8( "single_file_widget_" ) );
+  this->horizontalLayout_4 = new QHBoxLayout( this->single_file_widget_ );
+  this->horizontalLayout_4->setSpacing( 0 );
+  this->horizontalLayout_4->setContentsMargins( 4, 4, 4, 4 );
+  this->horizontalLayout_4->setObjectName( QString::fromUtf8( "horizontalLayout_2" ) );
+  this->single_file_radio_button_ = new QRadioButton( this->single_file_widget_ );
+  this->single_file_radio_button_->setObjectName( QString::fromUtf8( "single_file_radio_button_" ) );
+  this->single_file_radio_button_->setText( QString::fromUtf8( "Save masks as a single file" ) );
+  this->single_file_radio_button_->setChecked( true );
+  this->radio_button_group_->addButton( this->single_file_radio_button_, 0 );
+
+  this->horizontalLayout_4->addWidget( this->single_file_radio_button_ );
+  this->horizontalLayout_1->addWidget( this->single_file_widget_ );
+
+  this->multiple_files_widget_ = new QWidget( this->single_or_multiple_files_widget_ );
+  this->multiple_files_widget_->setObjectName( QString::fromUtf8( "multiple_files_widget_" ) );
+
+  this->horizontalLayout_5 = new QHBoxLayout( this->multiple_files_widget_ );
+  this->horizontalLayout_5->setSpacing( 0);
+  this->horizontalLayout_5->setContentsMargins( 4, 4, 4, 4 );
+  this->horizontalLayout_5->setObjectName( QString::fromUtf8( "horizontalLayout_3" ) );
+  this->individual_files_radio_button_ = new QRadioButton( this->multiple_files_widget_ );
+  this->individual_files_radio_button_->setObjectName( 
+    QString::fromUtf8( "individual_files_radio_button_" ) );
+  this->individual_files_radio_button_->setText( 
+    QString::fromUtf8( "Save masks as individual files" ) );
+  this->radio_button_group_->addButton( this->individual_files_radio_button_, 1 );
+
+  this->horizontalLayout_5->addWidget( this->individual_files_radio_button_ );
+  this->horizontalLayout_1->addWidget( this->multiple_files_widget_ );
+
+  this->main_layout_->addWidget( this->single_or_multiple_files_widget_ );
+  
 
   registerField( "maskList", this->mask_list_ );
-  registerField( "segmentationName", this->segmentation_name_lineedit_ );
-  registerField( "segmentationPath", this->segmentation_path_lineedit_ );
+  registerField( "segmentationPath", this->file_name_lineedit_ );
+  registerField( "singleFile", this->single_file_radio_button_ );
 
 }
   
@@ -202,6 +152,8 @@ void SegmentationSelectionPage::initializePage()
 
   QStringList masks;
   
+  int group_with_active_layer = -1;
+  
   for( int i = 0; i < static_cast< int >( groups.size() ); ++i )
   {
     bool mask_found = false;
@@ -209,6 +161,7 @@ void SegmentationSelectionPage::initializePage()
     QTreeWidgetItem *group = new QTreeWidgetItem( this->group_with_masks_tree_ );
     group->setFlags( Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsTristate );
     group->setCheckState( 0, Qt::Checked );
+    group->setCheckState( 0, Qt::Unchecked );
       
     std::string group_name = Core::ExportToString( 
     groups[ i ]->get_grid_transform().get_nx() ) + " x " +
@@ -226,7 +179,12 @@ void SegmentationSelectionPage::initializePage()
         QTreeWidgetItem *mask = new QTreeWidgetItem( group );
         mask->setFlags( Qt::ItemIsUserCheckable | Qt::ItemIsEnabled );
         mask->setCheckState( 0, Qt::Checked );
+        mask->setCheckState( 0, Qt::Unchecked );
         mask->setText( 0, QString::fromStdString( ( *it )->name_state_->get() ) );
+        if( ( *it ) == LayerManager::Instance()->get_active_layer() )
+        {
+          group_with_active_layer = i;
+        }
         mask_found = true;
       }
       ++it;
@@ -238,6 +196,9 @@ void SegmentationSelectionPage::initializePage()
       group->setDisabled( true );
     }
   }
+  
+  this->group_with_masks_tree_->topLevelItem( group_with_active_layer )->setCheckState( 0, Qt::Checked );
+  
 }
 
 bool SegmentationSelectionPage::validatePage()
@@ -262,23 +223,31 @@ bool SegmentationSelectionPage::validatePage()
       }
     }
   }
-  setField( "maskList", selected_masks );
-  setField( "segmentationName", this->segmentation_name_lineedit_->text() );
-  return true;
-}
-
-void SegmentationSelectionPage::set_path()
-{
-  QDir path_directory_;
-  QString path = QFileDialog::getExistingDirectory ( this, "Directory",
-    this->segmentation_path_lineedit_->text() );
-
-  if ( path.isNull() == false )
+  
+  boost::filesystem::path desktop_path;
+  Core::Application::Instance()->get_user_desktop_directory( desktop_path );
+  
+  QString filename;
+  
+  if( this->single_file_radio_button_->isChecked() )
   {
-    path_directory_.setPath( path );
+    filename = QFileDialog::getSaveFileName( this, "Export Segmentation... ",
+      QString::fromStdString( desktop_path.string() ),"NRRD files (*.nrrd)" );
   }
-  this->segmentation_path_lineedit_->setText( path_directory_.canonicalPath() );
-  setField( "segmentationPath", this->segmentation_path_lineedit_->text() );
+  else
+  {
+    filename = QFileDialog::getExistingDirectory( this, tr( "Choose Directory for Export..." ),
+      QString::fromStdString( desktop_path.string() ),
+      QFileDialog::ShowDirsOnly
+      | QFileDialog::DontResolveSymlinks );
+  }
+  
+  this->file_name_lineedit_->setText( filename );
+  
+  setField( "maskList", selected_masks );
+  setField( "segmentationPath", this->file_name_lineedit_->text() );
+  setField( "singleFile", this->single_file_radio_button_->isChecked() );
+  return true;
 }
 
 SegmentationSummaryPage::SegmentationSummaryPage( QWidget *parent )
@@ -286,6 +255,7 @@ SegmentationSummaryPage::SegmentationSummaryPage( QWidget *parent )
 {
     this->setTitle( "Export to Segmentation Summary" );
 
+  this->setFinalPage( true );
   this->main_layout_ = new QVBoxLayout( this );
   this->main_layout_->setContentsMargins( 6, 6, 26, 6 );
   this->main_layout_->setSpacing( 6 );
@@ -301,53 +271,123 @@ SegmentationSummaryPage::SegmentationSummaryPage( QWidget *parent )
   this->mask_scroll_area_->setAlignment( Qt::AlignLeading | Qt::AlignLeft | Qt::AlignTop );
   this->mask_scroll_area_->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOn );
   this->mask_scroll_area_->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-
-  this->scroll_contents_ = new QWidget();
-  this->scroll_contents_->setObjectName( QString::fromUtf8( "scroll_contents_" ) );
-  this->masks_layout_ = new QVBoxLayout( this->scroll_contents_ );
+  
+  this->layers_ = new QWidget();
+  this->layers_->setObjectName( QString::fromUtf8( "layers_" ) );
+  this->layers_->setStyleSheet( QString::fromUtf8( "background-color: white;" ) );
+  this->masks_layout_ = new QVBoxLayout( this->layers_ );
   this->masks_layout_->setObjectName( QString::fromUtf8( "masks_layout_" ) );
-  this->masks_layout_->setAlignment( Qt::AlignTop );
-  this->mask_scroll_area_->setWidget( scroll_contents_ );
+  this->mask_scroll_area_->setWidget( this->layers_ );
 
   this->main_layout_->addWidget( this->mask_scroll_area_ );
-  this->setLayout( main_layout_ );
 
+  this->setLayout( this->main_layout_ );
+
+  
 }
 
 void SegmentationSummaryPage::initializePage()
 {
     QString finishText = wizard()->buttonText(QWizard::FinishButton);
     finishText.remove('&');
+    
+    this->layers_->deleteLater();
   
   QString masks = field( "maskList" ).toString();
   std::vector< std::string > selected_masks_vector = 
     Core::SplitString( masks.toStdString(), "|" );
-
-  this->scroll_contents_->deleteLater();
-
-  this->scroll_contents_ = new QWidget();
-  this->scroll_contents_->setObjectName( QString::fromUtf8( "scroll_contents_" ) );
-  this->masks_layout_ = new QVBoxLayout( this->scroll_contents_ );
+    
+  this->layers_ = new QWidget();
+  this->layers_->setObjectName( QString::fromUtf8( "layers_" ) );
+  this->layers_->setStyleSheet( QString::fromUtf8( "background-color: white;" ) );
+    
+  this->masks_layout_ = new QVBoxLayout( this->layers_ );
   this->masks_layout_->setObjectName( QString::fromUtf8( "masks_layout_" ) );
+  this->masks_layout_->setContentsMargins( 0, 0, 0, 0 );
+  this->masks_layout_->setSpacing( 0 );
   this->masks_layout_->setAlignment( Qt::AlignTop );
-  this->mask_scroll_area_->setWidget( scroll_contents_ );
-
+  this->mask_scroll_area_->setWidget( this->layers_ );
+  
+  bool single_file = ( field( "singleFile" ).toString().toStdString() == "true" );
+  
+  // insert the background layer settings
+  if( single_file )
+  {
+    QtLayerListWidget* new_mask = new QtLayerListWidget( this->layers_ );
+    new_mask->set_mask_name( "Background" );
+    new_mask->set_mask_index( 0 );
+    this->masks_layout_->addWidget( new_mask );
+    this->masks_.push_back( new_mask );
+    
+    connect( new_mask, SIGNAL( index_changed_signal() ), this, SIGNAL( completeChanged() ) ); 
+  }
+  
   for( int i = 0; i < static_cast< int >( selected_masks_vector.size() ); ++i )
   {
-    QLabel* mask_label = new QLabel( this->scroll_contents_ );
-    mask_label->setText( QString::fromStdString( selected_masks_vector[ i ] ) );
-    mask_label->setMinimumSize( QSize(0, 16 ) );
-    mask_label->setMaximumSize( QSize(16777215, 16 ) );
-    this->masks_layout_->addWidget( mask_label );
+    QtLayerListWidget* new_mask = new QtLayerListWidget( this->layers_ );
+    new_mask->set_mask_name( selected_masks_vector[ i ] );
+    new_mask->set_mask_index( i + 1 );
+    new_mask->hide_counter( !single_file );
+    this->masks_layout_->addWidget( new_mask );
+    this->masks_.push_back( new_mask );
+    connect( new_mask, SIGNAL( index_changed_signal() ), this, SIGNAL( completeChanged() ) ); 
   }
 
   this->description_->setText(  QString::fromUtf8( "Please verify that you want to export the following "
-    "mask layers as a segmentation with the name: '" ) + field( "segmentationName" ).toString() 
-    + QString::fromUtf8( "'" ) );
+    "mask layers as a segmentation " ) );
+    
+}
 
-    //this->segmentation_name_->setText( QString::fromUtf8( "Project Name: " ) + field( "projectName" ).toString() );
-   
+bool SegmentationSummaryPage::validatePage()
+{
+  QString selected_masks = "";
+  for( int i = 0; i < this->masks_.size(); ++i )
+  {
+    if( selected_masks == "" )
+    {
+      selected_masks = this->masks_[ i ]->get_label() + QString::fromUtf8( "," ) + 
+        QString::number( this->masks_[ i ]->get_value() );
+    }
+    else
+    {
+      selected_masks = selected_masks + QString::fromUtf8( "|" ) + 
+        this->masks_[ i ]->get_label() + QString::fromUtf8( "," ) + 
+        QString::number( this->masks_[ i ]->get_value() );
+    }
+  }
   
+  bool single_file = ( field( "singleFile" ).toString().toStdString() == "true" ); 
+  boost::filesystem::path file_name_and_path = field( "segmentationPath" ).toString().toStdString();
+  
+  ActionExportSegmentation::Dispatch( Core::Interface::GetWidgetActionContext(),
+    selected_masks.toStdString(), file_name_and_path.string(), single_file );
+    
+  return true;
+}
+
+bool SegmentationSummaryPage::isComplete() const
+{
+  bool valid = true;
+  for( int i = 0; i < this->masks_.size(); ++i )
+  {
+    bool found = false;
+    for( int j = 0; j < this->masks_.size(); ++j )
+    {
+      if( i == j ) continue;
+      if( this->masks_[ i ]->get_value() == this->masks_[ j ]->get_value() )
+      {
+        found = true;
+        break;
+      }
+    }
+    if( found ) 
+    {
+      this->masks_[ i ]->set_validity( false );
+      valid = false;
+    }
+    else this->masks_[ i ]->set_validity( true );
+  }
+  return valid;
 }
 
 } // end namespace Seg3D

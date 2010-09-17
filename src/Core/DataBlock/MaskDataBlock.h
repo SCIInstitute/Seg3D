@@ -160,14 +160,14 @@ public:
   {
     this->set_mask_at( this->to_index( x, y, z ) );
   }
-
+  
   // SET_MASK_AT:
   // Set the mask value at a certain index
   inline void set_mask_at( size_t index )
   {
     this->data_[ index ] |= this->mask_value_;
   }
-
+  
   // Clear_MASK_AT:
   // Clear the mask value at a certain index
   inline void clear_mask_at( size_t x, size_t y, size_t z )

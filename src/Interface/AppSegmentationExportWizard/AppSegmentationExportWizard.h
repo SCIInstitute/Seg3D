@@ -32,6 +32,10 @@
 //Qt includes
 #include <QtGui>
 
+#include <Interface/AppSegmentationExportWizard/QtLayerListWidget.h>
+
+
+
 namespace Seg3D
 {
 
@@ -40,12 +44,11 @@ class AppSegmentationExportWizard : public QWizard
 Q_OBJECT
 
 public:
-    AppSegmentationExportWizard( QWidget *parent = 0 );
+  AppSegmentationExportWizard( QWidget *parent = 0 );
     virtual ~AppSegmentationExportWizard();
-
+    
 private:
     void accept();
-
 
 };
 
@@ -54,7 +57,7 @@ class SegmentationSelectionPage : public QWizardPage
 Q_OBJECT
 
 public:
-    SegmentationSelectionPage( QWidget *parent = 0 );
+  SegmentationSelectionPage( QWidget *parent = 0 );
   
 protected:
   // INITIALIZEPAGE:
@@ -67,11 +70,6 @@ protected:
   // the entered data so it can be passed to the next page
   virtual bool validatePage();
 
-private Q_SLOTS:
-  // SET_PATH:
-  // function that sets the path for the segmentation export
-  void set_path();
-
 private:
   QVBoxLayout *main_layout_;
   QWidget *segmentation_top_widget_;
@@ -79,19 +77,19 @@ private:
   QWidget *segmentation_name_widget_;
   QHBoxLayout *horizontalLayout;
   QLabel *segmentation_name_label_;
-  QLineEdit *segmentation_name_lineedit_;
-  QWidget *widget_2;
-  QVBoxLayout *verticalLayout_2;
-  QWidget *widget_3;
-  QHBoxLayout *horizontalLayout_2;
-  QLabel *segmentation_path_label_;
-  QLineEdit *segmentation_path_lineedit_;
-  QWidget *widget_4;
-  QHBoxLayout *horizontalLayout_3;
-  QSpacerItem *horizontalSpacer;
-  QPushButton *set_path_button_;
   QTreeWidget *group_with_masks_tree_;
   QLineEdit *mask_list_;
+  QLineEdit *file_name_lineedit_;
+  
+  QWidget *single_or_multiple_files_widget_;
+  QHBoxLayout *horizontalLayout_1;
+  QWidget *single_file_widget_;
+  QHBoxLayout *horizontalLayout_4;
+  QRadioButton *single_file_radio_button_;
+  QWidget *multiple_files_widget_;
+  QHBoxLayout *horizontalLayout_5;
+  QRadioButton *individual_files_radio_button_;
+  QButtonGroup *radio_button_group_;
 
 };
 
@@ -103,15 +101,20 @@ public:
     SegmentationSummaryPage( QWidget *parent = 0 );
 
 protected:
-    void initializePage();
-
+    virtual void initializePage();
+  virtual bool isComplete() const;
+  virtual bool validatePage();
+  
 private:
   QLabel *description_;
   QVBoxLayout *main_layout_;
   QScrollArea *mask_scroll_area_;
-  QWidget *scroll_contents_;
+  QWidget *layers_;
   QVBoxLayout *masks_layout_;
   QTreeWidget *group_with_masks_tree_;
+  QVector< QtLayerListWidget* > masks_;
+  
+
 
 
 };

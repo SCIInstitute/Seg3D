@@ -78,9 +78,10 @@ bool ThresholdToolInterface::build_widget( QFrame* frame )
   this->private_->lower_threshold_ = new QtUtils::QtSliderDoubleCombo();
   this->private_->ui_.verticalLayout_3->addWidget( this->private_->lower_threshold_ );
     
-  this->private_->histogram_ = new QtUtils::QtHistogramWidget( this );
+  this->private_->histogram_ = new QtUtils::QtHistogramWidget( this, 
+    this->private_->upper_threshold_, this->private_->lower_threshold_ );
   this->private_->ui_.histogramHLayout->addWidget( this->private_->histogram_ );
-
+  
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
   ThresholdTool* tool = dynamic_cast< ThresholdTool* > ( base_tool_.get() );

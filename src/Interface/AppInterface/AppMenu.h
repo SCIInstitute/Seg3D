@@ -67,7 +67,6 @@ private:
   
 private Q_SLOTS:
   void open_project_wizard();
-  void export_segmentation_wizard();
   void open_project_from_file();
   void open_project_folder();
 };

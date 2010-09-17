@@ -58,7 +58,7 @@ SET(QTUTILS_WIDGETS_UI_SRCS
   QtColorBarWidget.ui
   QtHistogramWidget.ui
   QtSliderDoubleCombo.ui
-  QtSliderIntCombo.ui 
+  QtSliderIntCombo.ui
 )
 
 ##################################################

@@ -33,27 +33,35 @@
 
 SET(INTERFACE_APPSEGMENTATIONEXPORTWIZARD_SRCS
   AppSegmentationExportWizard.cc
+  QtLayerListWidget.cc
 )
 
 SET(INTERFACE_APPSEGMENTATIONEXPORTWIZARD_MOC_SRCS
   AppSegmentationExportWizard.h
+  QtLayerListWidget.h
 )
 
-SET(INTERFACE_APPSEGMENTATIONEXPORTWIZARD_NO_MOC_SRCS
-)
+#SET(INTERFACE_APPSEGMENTATIONEXPORTWIZARD_NO_MOC_SRCS
+#)
 
 SET(INTERFACE_APPSEGMENTATIONEXPORTWIZARD_UI_SRCS
+  QtLayerListWidget.ui
 )
 
-SET(INTERFACE_APPSEGMENTATIONEXPORTWIZARD_RCC_SRCS
-)
+#SET(INTERFACE_APPSEGMENTATIONEXPORTWIZARD_RCC_SRCS
+#)
 
+##################################################
+# Generate header out of UI code
+##################################################
+
+QT4_WRAP_UI(INTERFACE_APPSEGMENTATIONEXPORTWIZARD_QT_UI_SRCS ${INTERFACE_APPSEGMENTATIONEXPORTWIZARD_UI_SRCS})
 
 ##################################################
 # Get Icon files
 ##################################################
 
-QT4_ADD_RESOURCES(INTERFACE_APPSEGMENTATIONEXPORTWIZARD_QT_RCC_SRCS ${INTERFACE_APPSEGMENTATIONEXPORTWIZARD_RCC_SRCS})
+#QT4_ADD_RESOURCES(INTERFACE_APPSEGMENTATIONEXPORTWIZARD_QT_RCC_SRCS ${INTERFACE_APPSEGMENTATIONEXPORTWIZARD_RCC_SRCS})
 
 ##################################################
 # Wrap QT code to expand all the moc code
@@ -74,9 +82,10 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 
 CORE_ADD_LIBRARY(Interface_AppSegmentationExportWizard 
             ${INTERFACE_APPSEGMENTATIONEXPORTWIZARD_SRCS} 
-            ${INTERFACE_APPSEGMENTATIONEXPORTWIZARD_QT_RCC_SRCS}
+            ${INTERFACE_APPSEGMENTATIONEXPORTWIZARD_QT_UI_SRCS}
+            #${INTERFACE_APPSEGMENTATIONEXPORTWIZARD_QT_RCC_SRCS}
             ${INTERFACE_APPSEGMENTATIONEXPORTWIZARD_QT_MOC_SRCS}
-            ${INTERFACE_APPSEGMENTATIONEXPORTWIZARD_NO_MOC_SRCS} 
+            #${INTERFACE_APPSEGMENTATIONEXPORTWIZARD_NO_MOC_SRCS} 
             ${INTERFACE_APPSEGMENTATIONEXPORTWIZARD_MOC_SRCS})
 
             
@@ -87,8 +96,9 @@ TARGET_LINK_LIBRARIES(Interface_AppSegmentationExportWizard
                       Core_Action
                       Core_Interface
                       Core_ActionManager
+                      Interface_AppInterface
                       Application_ProjectManager
-                      Application_LayerManager
+                  Application_LayerManager
                       ${QT_LIBRARIES} 
                       ${SCI_BOOST_LIBRARY})
 

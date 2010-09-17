@@ -89,16 +89,6 @@ public:
   // Import the layer from the file
   virtual bool import_layer( LayerImporterMode mode, std::vector<LayerHandle>& layers );
 
-  // SET_FILE_LIST:
-  // we need a list of files to import, this function provides the list, the list must be set 
-  // before import_layer is called.
-//  virtual bool set_file_list( const std::vector< std::string >& file_list )
-//  {
-//    this->file_list_ = file_list;
-//    this->set_extension();
-//    return true;
-//  }
-
 private:
   // SCAN_VFF:
   // this function is called by import_header to read the vff header

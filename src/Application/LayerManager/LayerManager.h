@@ -149,10 +149,32 @@ public:
   // this function deletes the layer
   void delete_layer( LayerHandle layer );
 
-  
   // SET_ACTIVE_LAYER:
   // this function sets the active layer
   void set_active_layer( LayerHandle layer );
+
+  // EXPORT_SEGMENTATION:
+  // Based on whether it get a true or false for the single file parameter it calls either
+  // export_segmentation or export_multiple_segmentations and returns their success or failure
+  bool export_segmentation( const std::vector< std::string >& layer_names, 
+    const std::string& path, const std::string& name, bool single_file );
+  
+  // EXPORT_SINGLE_SEGMENTATION:
+  // Exports the list of MaskLayer(names) it receives as a single data file and returns its 
+  // success or failure
+  bool export_single_segmentation( const std::vector< std::string >& layer_names, 
+    const std::string& path, const std::string& name );
+    
+  // EXPORT_MULITPLE_SEGMENTATIONS:
+  // Exports the list of MaskLayer(names) it receives as individual files and returns its 
+  // success or failure
+  bool export_multiple_segmentations( const std::vector< std::string >& layer_names, 
+    const std::string& path );
+    
+  // EXPORT_LAYER:
+  // Will export a the active layer to file. -- DOES NOTHING --
+  bool export_layer( const std::string& layer_name, const std::string& path );
+
 
   // DELETE_ALL:
   bool delete_all();

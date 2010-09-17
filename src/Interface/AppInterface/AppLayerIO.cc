@@ -32,6 +32,7 @@
 // Qt includes
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QPointer>
 
 // Application includes
 #include <Application/LayerIO/LayerIO.h>
@@ -39,6 +40,7 @@
 // Interface includes
 #include <Interface/AppInterface/LayerImporterWidget.h>
 #include <Interface/AppInterface/AppLayerIO.h>
+#include <Interface/AppSegmentationExportWizard/AppSegmentationExportWizard.h>
 
 #include "itkGDCMSeriesFileNames.h"
 #include "gdcmException.h"
@@ -198,16 +200,28 @@ void AppLayerIO::ImportSeries( QMainWindow* main_window )
   layer_import_dialog.exec();
 }
   
-void AppLayerIO::Export( QMainWindow* main_window )
+void AppLayerIO::ExportLayer( QMainWindow* main_window )
 {
-  QFileDialog export_dialog( main_window, QString( "Export Layer ... " ) );
+  QStringList filters;
+  filters << "DICOM files (*.dcm)"
+      << "NRRD files (*.nrrd)";
 
-  export_dialog.setFileMode( QFileDialog::AnyFile );
+  QFileDialog export_dialog( main_window, QString( "Export Layer ... " ) );
+  export_dialog.setNameFilters( filters );
   export_dialog.setViewMode( QFileDialog::Detail );
   export_dialog.setAcceptMode( QFileDialog::AcceptSave );
-  export_dialog.exec();
+  if( export_dialog.exec() )
+  {
+    //DO STUFF
+  }
 }
 
+void AppLayerIO::ExportSegmentation( QMainWindow* main_window )
+{
+  QPointer< AppSegmentationExportWizard > export_segmentation_wizard_ = 
+    new AppSegmentationExportWizard( main_window );
+  export_segmentation_wizard_->show();
+}
 
 
 

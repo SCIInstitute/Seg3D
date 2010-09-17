@@ -131,10 +131,6 @@ protected:
   void resizeEvent( QResizeEvent *event );
   
 private Q_SLOTS:
-  // ADJUST_NEW_SIZE_LABELS:
-  // this function adjusts the size of the labels based on the scale
-/*    void adjust_new_size_labels( double scale_factor );*/
-
   // UNCHECK_DELETE_CONFIRM:
   // this is a simple helper function that unchecks the delete confirmation checkbox
     void uncheck_delete_confirm();
@@ -173,22 +169,6 @@ private Q_SLOTS:
   // helper function for the show_layers function
   void hide_group();
   
-  // SELECT_CROP_MENU:
-  // slot that dispatches an action to set the active menu to the crop menu
-/*  void select_crop_menu( bool show );*/
-  
-  // SELECT_FLIP_ROTATE_MENU:
-  // slot that dispatches an action to set the active menu to the flip rotate menu
-/*  void select_flip_rotate_menu( bool show );*/
-  
-  // SELECT_RESAMPLE_MENU:
-  // slot that dispatches an action to set the active menu to the resample menu
-/*  void select_resample_menu( bool show );*/
-  
-  // SELECT_TRANSFORM_MENU:
-  // slot that dispatches an action to set the active menu to the transform menu
-/*  void select_transform_menu( bool show );*/
-  
   // SELECT_ISO_MENU:
   // slot that dispatches an action to set the active menu to the iso menu
   void select_iso_menu( bool show );
@@ -201,22 +181,6 @@ private:
   // UPDATE_WIDGET_STATE:
   // function that updates which menu is shown based on which menu is the active one
   void update_widget_state();
-  
-  // SET_CROP_VISIBILITY:
-  // function that hides or shows the crop menu
-/*  void set_crop_visibility( bool show );*/
-  
-  // SET_FLIP_ROTATE_VISIBILITY:
-  // function that hides or shows the flip rotate menu
-/*  void set_flip_rotate_visibility( bool show );*/
-  
-  // SET_RESAMPLE_VISIBILITY:
-  // function that hides or shows the resample menu
-/*  void set_resample_visibility( bool show );*/
-  
-  // SET_TRANSFORM_VISIBILITY:
-  // function that hides or shows the transform menu
-/*  void set_transform_visibility( bool show );*/
   
   // SET_ISO_VISIBILITY:
   // function that hides or shows the iso menu

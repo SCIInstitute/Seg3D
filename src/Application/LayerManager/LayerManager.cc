@@ -32,12 +32,18 @@
 // Boost includes 
 #include <boost/lexical_cast.hpp>
 
-// Core includes
+// ITK includes
+#include "itkImageFileWriter.h"
 
+// Core includes
+#include <Core/DataBlock/ITKImageData.h>
+#include <Core/DataBlock/ITKDataBlock.h>
 #include <Core/Application/Application.h>
 #include <Core/Interface/Interface.h>
 #include <Core/Volume/Volume.h>
 #include <Core/DataBlock/MaskDataBlockManager.h>
+#include <Core/DataBlock/NrrdData.h>
+#include <Core/DataBlock/StdDataBlock.h>
 
 // Application includes
 #include <Application/Layer/LayerGroup.h>
@@ -1159,5 +1165,142 @@ void LayerManager::DispatchCreateAndInsertMaskLayer( std::string name,
   // Insert the layer into the layer manager.
   LayerManager::Instance()->insert_layer( mask_layer );
 }
+
+bool LayerManager::export_segmentation( const std::vector< std::string >& layer_names, 
+  const std::string& path, const std::string& name, bool single_file )
+{
+  if( single_file )
+  {
+    return this->export_single_segmentation( layer_names, path, name );
+  }
+  else
+  {
+    return this->export_multiple_segmentations( layer_names, path );
+  }
+
+  return false;
+}
+
+bool LayerManager::export_layer( const std::string& layer_name, const std::string& path )
+{
+  return false;
+}
+
+bool LayerManager::export_single_segmentation( const std::vector< std::string >& layer_names, 
+  const std::string& path, const std::string& name )
+{
+  // Step 1: We get a pointer to one of the MaskLayers so we can get its MaskDataBlock
+  std::vector < std::string > first_mask_name_and_number;
+  first_mask_name_and_number =  Core::SplitString( layer_names[ 1 ], "," );
+  MaskLayer* temp_handle = dynamic_cast< MaskLayer* >( this->get_layer_by_name( 
+    first_mask_name_and_number[ 0 ] ).get() );
+  
+  // Step 2: Get a handle to its MaskDataBlock and use that to build a new DataBlockHandle of the 
+  // same size and type.
+  Core::MaskDataBlockHandle mask_block = temp_handle->get_mask_volume()->get_mask_data_block();
+  Core::DataBlockHandle new_data_block = Core::StdDataBlock::New( mask_block->get_nx(),
+    mask_block->get_ny(), mask_block->get_nz(), Core::DataType::UCHAR_E );
+    
+  // Step 3: Get the value the user set for the background and preset the contents of our new
+  // datablock to that value
+  double background_value = boost::lexical_cast< double >( 
+    ( Core::SplitString( layer_names[ 0 ], "," ) )[ 1 ] );
+  for( size_t i = 0; i < mask_block->get_size(); ++i )
+  {
+    new_data_block->set_data_at( i, background_value  );
+  }
+  
+  // Step 4: Loop through all the MaskLayers and insert their values into our new DataBlock
+  std::vector< MaskLayer* >  mask_layers;
+  for( int i = 1; i < static_cast< int >( layer_names.size() ); ++i )
+  {
+    std::vector< std::string > mask_name = Core::SplitString( layer_names[ i ], "," );
+    temp_handle = dynamic_cast< MaskLayer* >( 
+      this->get_layer_by_name( mask_name[ 0 ] ).get() );
+      
+    double mask_value = boost::lexical_cast< double >( mask_name[ 1 ] );
+    
+    mask_block = temp_handle->get_mask_volume()->get_mask_data_block();
+    for( size_t i = 0; i < mask_block->get_size(); ++i )
+    {
+      if( mask_block->get_mask_at( i ) )
+      {
+        new_data_block->set_data_at( i, mask_value );
+      }
+    } 
+  }
+  
+  // Step 5: Make a new nrrd using our new DataBlock
+  Core::NrrdDataHandle nrrd = Core::NrrdDataHandle( new Core::NrrdData( 
+    new_data_block, temp_handle->get_grid_transform() ) );
+
+  std::string error;
+  boost::filesystem::path mask_path = boost::filesystem::path( path ) / name;
+
+  // Step 6: Attempt to save the nrrd to the path that was passed and we return false if we can't
+  if ( !( Core::NrrdData::SaveNrrd( mask_path.string(), nrrd, error ) ) ) 
+  {
+    CORE_LOG_ERROR( error );
+    return false;
+  }
+
+  return true;
+}
+
+bool LayerManager::export_multiple_segmentations( const std::vector< std::string >& layer_names, 
+  const std::string& path )
+{
+  // We process all of the layers individually in this loop
+  for( int i = 0; i < static_cast< int >( layer_names.size() ); ++i )
+  {
+    // Step 1: Get a pointer to the mask so that we can get at it's MaskDataBlock
+    std::vector< std::string > mask_name = Core::SplitString( layer_names[ i ], "," );
+    MaskLayer* temp_handle = dynamic_cast< MaskLayer* >( 
+      this->get_layer_by_name( mask_name[ 0 ] ).get() );
+
+    // Step 2: Get a pointer to the mask's MaskDataBlock
+    Core::MaskDataBlockHandle mask_block = temp_handle->get_mask_volume()->get_mask_data_block();
+
+    // Step 3: Using the size and type information from our mask's MaskDataBlock, we create a 
+    // new empty DataBlock
+    Core::DataBlockHandle new_data_block = Core::StdDataBlock::New( mask_block->get_nx(),
+      mask_block->get_ny(), mask_block->get_nz(), Core::DataType::UCHAR_E );
+
+    // Step 4: Using the data in our mask's MaskDataBlock we set the values in our new DataBlock
+    for( size_t i = 0; i < mask_block->get_size(); ++i )
+    {
+      if( mask_block->get_mask_at( i ) )
+      {
+        new_data_block->set_data_at( i, 1 );
+      }
+      else
+      { 
+        new_data_block->set_data_at( i, 0 );
+      }
+    }
+
+    // Step 5: Make a new nrrd using our new DataBlock
+    Core::NrrdDataHandle nrrd = Core::NrrdDataHandle( new Core::NrrdData( 
+      new_data_block, temp_handle->get_grid_transform() ) );
+
+    std::string error;
+    boost::filesystem::path mask_path = boost::filesystem::path( path ) / 
+      ( temp_handle->get_layer_name() + ".nrrd" );
+
+    // Step 6: Attempt to save the nrrd to the path that was passed and we return false if we 
+    // can't
+    if ( !( Core::NrrdData::SaveNrrd( mask_path.string(), nrrd, error ) ) ) 
+    {
+      CORE_LOG_ERROR( error );
+      return false;
+    }
+      
+  }
+  return true;
+}
+
+
+
+
 
 } // end namespace seg3D

@@ -65,16 +65,7 @@ public:
   
   Ui::LayerGroupWidget ui_;
   
-//  QtUtils::QtSliderDoubleCombo* center_x_adjuster_crop_;
-//  QtUtils::QtSliderDoubleCombo* center_y_adjuster_crop_;
-//  QtUtils::QtSliderDoubleCombo* center_z_adjuster_crop_;
-//  
-//  QtUtils::QtSliderDoubleCombo* size_width_adjuster_crop_;
-//  QtUtils::QtSliderDoubleCombo* size_height_adjuster_crop_;
-//  QtUtils::QtSliderDoubleCombo* size_depth_adjuster_crop_;
-  
   PushDragButton* activate_button_;
-/*    QtUtils::QtSliderDoubleCombo* scale_adjuster_;*/
   DropSpaceWidget* drop_space_;
   OverlayWidget* overlay_;
 
@@ -100,10 +91,6 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
   this->setAcceptDrops( true );
 
   // hide the tool bars 
-//  this->private_->ui_.roi_->hide();
-//  this->private_->ui_.resample_->hide();
-//  this->private_->ui_.flip_rotate_->hide();
-//  this->private_->ui_.transform_->hide();
   this->private_->ui_.iso_quality_->hide();
   this->private_->ui_.delete_->hide();
   this->private_->ui_.delete_button_->setEnabled( false );
@@ -128,60 +115,11 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
     Core::ExportToString( this->private_->group_->get_grid_transform().get_nz() );
   this->private_->activate_button_->setText( QString::fromStdString( group_name ) );
 
-
-  // add the slider spinner combo's for the crop
-//  this->private_->center_x_adjuster_crop_ = new QtUtils::QtSliderDoubleCombo( 
-//    this->private_->ui_.widget );
-//  this->private_->ui_.horizontalLayout_11->addWidget( this->private_->center_x_adjuster_crop_ );
-//  this->private_->center_x_adjuster_crop_->setObjectName( 
-//    QString::fromUtf8( "center_x_adjuster_crop_" ) );
-//  
-//  this->private_->center_y_adjuster_crop_ = new QtUtils::QtSliderDoubleCombo( 
-//    this->private_->ui_.widget_2 );
-//  this->private_->ui_.horizontalLayout_12->addWidget( this->private_->center_y_adjuster_crop_ );
-//  this->private_->center_y_adjuster_crop_->setObjectName( 
-//    QString::fromUtf8( "center_y_adjuster_crop_" ) );
-//  
-//  this->private_->center_z_adjuster_crop_ = new QtUtils::QtSliderDoubleCombo( 
-//    this->private_->ui_.widget_3 );
-//  this->private_->ui_.horizontalLayout_14->addWidget( this->private_->center_z_adjuster_crop_ );
-//  this->private_->center_z_adjuster_crop_->setObjectName( 
-//    QString::fromUtf8( "center_z_adjuster_crop_" ) );
-//  
-//  this->private_->size_height_adjuster_crop_ = new QtUtils::QtSliderDoubleCombo( 
-//    this->private_->ui_.widget_4 );
-//  this->private_->ui_.horizontalLayout_7->addWidget( this->private_->size_height_adjuster_crop_ );
-//  this->private_->size_height_adjuster_crop_->setObjectName( 
-//    QString::fromUtf8( "size_height_adjuster_crop_" ) );
-//  
-//  this->private_->size_width_adjuster_crop_ = new QtUtils::QtSliderDoubleCombo( 
-//    this->private_->ui_.widget_5 );
-//  this->private_->ui_.horizontalLayout_9->addWidget( this->private_->size_width_adjuster_crop_ );
-//  this->private_->size_width_adjuster_crop_->setObjectName( 
-//    QString::fromUtf8( "size_width_adjuster_crop_" ) );
-//  
-//  this->private_->size_depth_adjuster_crop_ = new QtUtils::QtSliderDoubleCombo( 
-//    this->private_->ui_.widget_6 );
-//  this->private_->ui_.horizontalLayout_10->addWidget( this->private_->size_depth_adjuster_crop_ );
-//  this->private_->size_depth_adjuster_crop_->setObjectName( 
-//    QString::fromUtf8( "size_depth_adjuster_crop_" ) );
-//  
-//  this->private_->scale_adjuster_ = new QtUtils::QtSliderDoubleCombo( 
-//    this->private_->ui_.widget_7 );
-//  this->private_->ui_.horizontalLayout_15->addWidget( this->private_->scale_adjuster_ );
-//  this->private_->scale_adjuster_->setObjectName( 
-//    QString::fromUtf8( "scale_adjuster_" ) );
-  
   this->private_->drop_space_ = new DropSpaceWidget( this, 105 );
   this->private_->ui_.verticalLayout_12->insertWidget( 0, this->private_->drop_space_ );
   
   this->private_->drop_space_->hide();
   
-  // set some local values for the current size
-//  this->current_width_ = static_cast<int>( this->private_->group_->get_grid_transform().get_nx() );
-//  this->current_height_ = static_cast<int>( this->private_->group_->get_grid_transform().get_ny() );
-//  this->current_depth_ = static_cast<int>( this->private_->group_->get_grid_transform().get_nz() );
-
   // Add isosurface quality radio buttons to QButtonGroup so that QtButtonGroupConnector can be
   // used to connect the buttons directly to a state variable.
   this->private_->iso_quality_button_group_ = new QButtonGroup( this );
@@ -192,19 +130,8 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
   this->private_->iso_quality_button_group_->addButton( this->private_->ui_.radioButton_point_125 );
   
   //  connect the gui signals and slots
-//     connect( this->private_->scale_adjuster_, SIGNAL( valueAdjusted( double ) ), this, 
-//    SLOT( adjust_new_size_labels( double )) );
   connect( this->private_->ui_.open_button_, SIGNAL( toggled( bool ) ), this, 
     SLOT( show_layers( bool )) );
-  
-//  connect( this->private_->ui_.group_resample_button_, SIGNAL( clicked( bool ) ), this, 
-//    SLOT( select_resample_menu( bool )) );
-//  connect( this->private_->ui_.group_crop_button_, SIGNAL( clicked( bool ) ), this, 
-//    SLOT( select_crop_menu( bool )) );
-//  connect( this->private_->ui_.group_transform_button_, SIGNAL( clicked( bool ) ), this, 
-//    SLOT( select_transform_menu( bool )) );
-//  connect( this->private_->ui_.group_flip_rotate_button_, SIGNAL( clicked ( bool ) ), this, 
-//    SLOT( select_flip_rotate_menu( bool )) );
   connect( this->private_->ui_.group_iso_button_, SIGNAL( clicked ( bool ) ), this, 
     SLOT( select_iso_menu( bool )) );
   connect( this->private_->ui_.group_delete_button_, SIGNAL( clicked ( bool ) ), this, 
@@ -234,88 +161,6 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
     this->private_->group_->menu_state_->state_changed_signal_.connect(
       boost::bind( &LayerGroupWidget::UpdateState, qpointer ) );
   
-      // --- RESAMPLE ---
-      // = set the default values
-//      this->private_->ui_.x_axis_label_current_->setText( QString::fromUtf8("X: ") + 
-//      QString::number( this->private_->group_->get_grid_transform().get_nx()) );
-//      this->private_->ui_.y_axis_label_current_->setText( QString::fromUtf8("Y: ") + 
-//      QString::number( this->private_->group_->get_grid_transform().get_ny()) );
-//      this->private_->ui_.z_axis_label_current_->setText( QString::fromUtf8("Z: ") + 
-//      QString::number( this->private_->group_->get_grid_transform().get_nz()) );
-//      
-//      this->private_->ui_.x_axis_label_new_->setText( QString::fromUtf8("X: ") + 
-//      QString::number( this->private_->group_->get_grid_transform().get_nx()) );
-//      this->private_->ui_.y_axis_label_new_->setText( QString::fromUtf8("Y: ") + 
-//      QString::number( this->private_->group_->get_grid_transform().get_ny()) );
-//      this->private_->ui_.z_axis_label_new_->setText( QString::fromUtf8("Z: ") + 
-//      QString::number( this->private_->group_->get_grid_transform().get_nz()) );
-//      
-//      QFont font;
-//         font.setPointSize( 10 );
-//         this->private_->ui_.x_axis_label_current_->setFont( font );
-//         this->private_->ui_.y_axis_label_current_->setFont( font );
-//         this->private_->ui_.z_axis_label_current_->setFont( font );
-//         
-//         font.setBold( true );
-//         this->private_->ui_.x_axis_label_new_->setFont( font );
-//         this->private_->ui_.y_axis_label_new_->setFont( font );
-//         this->private_->ui_.z_axis_label_new_->setFont( font );
-        
-        
-        // = make the connections
-//         QtUtils::QtBridge::Connect( this->private_->scale_adjuster_, 
-//      this->private_->group_->resample_factor_state_ );
-//      QtUtils::QtBridge::Connect( this->private_->ui_.resample_replace_checkBox_, 
-//      this->private_->group_->resample_replace_state_ );
-        
-
-        // --- CROP ---
-        // = set the default values
-//         this->private_->size_width_adjuster_crop_->setRange( 0, 
-//      this->private_->group_->get_grid_transform().get_nx() );
-//         this->private_->size_height_adjuster_crop_->setRange( 0, 
-//      this->private_->group_->get_grid_transform().get_ny() );
-//         this->private_->size_depth_adjuster_crop_->setRange( 0, 
-//      this->private_->group_->get_grid_transform().get_nz() );
-        
-        // = make the connections
-//         QtUtils::QtBridge::Connect( this->private_->size_width_adjuster_crop_, 
-//      this->private_->group_->crop_size_width_state_ );
-//         QtUtils::QtBridge::Connect( this->private_->size_height_adjuster_crop_, 
-//      this->private_->group_->crop_size_height_state_ );
-//         QtUtils::QtBridge::Connect( this->private_->size_depth_adjuster_crop_, 
-//            this->private_->group_->crop_size_depth_state_ );
-//         
-//         QtUtils::QtBridge::Connect( this->private_->center_x_adjuster_crop_, 
-//      this->private_->group_->crop_center_x_state_ );
-//         QtUtils::QtBridge::Connect( this->private_->center_y_adjuster_crop_, 
-//      this->private_->group_->crop_center_y_state_ );
-//         QtUtils::QtBridge::Connect( this->private_->center_z_adjuster_crop_, 
-//      this->private_->group_->crop_center_z_state_ );
-//         
-//         QtUtils::QtBridge::Connect( this->private_->ui_.crop_replace_checkBox_, 
-//      this->private_->group_->crop_replace_state_ );
-        
-        
-        // --- TRANSFORM ---
-        // = make the connections
-//      QtUtils::QtBridge::Connect( this->private_->ui_.origin_x_spinbox_, 
-//      this->private_->group_->transform_origin_x_state_ );
-//      QtUtils::QtBridge::Connect( this->private_->ui_.origin_y_spinbox_, 
-//      this->private_->group_->transform_origin_y_state_ );
-//      QtUtils::QtBridge::Connect( this->private_->ui_.origin_z_spinbox_, 
-//      this->private_->group_->transform_origin_z_state_ );
-//      
-//      QtUtils::QtBridge::Connect( this->private_->ui_.spacing_x_spinbox_, 
-//      this->private_->group_->transform_spacing_x_state_ );
-//      QtUtils::QtBridge::Connect( this->private_->ui_.spacing_y_spinbox_, 
-//      this->private_->group_->transform_spacing_y_state_ );
-//      QtUtils::QtBridge::Connect( this->private_->ui_.spacing_z_spinbox_, 
-//      this->private_->group_->transform_spacing_z_state_ );
-//         
-//         QtUtils::QtBridge::Connect( this->private_->ui_.transform_replace_checkBox_, 
-//      this->private_->group_->transform_replace_state_ );
-
     // --- ISOSURFACE---
     QtUtils::QtBridge::Connect( this->private_->iso_quality_button_group_, 
       this->private_->group_->isosurface_quality_state_ );
@@ -324,8 +169,6 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
   this->private_->ui_.group_frame_layout_->setAlignment( Qt::AlignTop );
   this->private_->ui_.verticalLayout_13->setAlignment( Qt::AlignTop );
   this->private_->ui_.verticalLayout_10->setAlignment( Qt::AlignTop );
-  //this->private_->ui_.verticalLayout_12->setAlignment( Qt::AlignBottom );
-  
 
   this->private_->overlay_ = new OverlayWidget( this );
   this->private_->overlay_->setStyleSheet( 
@@ -411,62 +254,7 @@ void LayerGroupWidget::UpdateState( qpointer_type qpointer )
     qpointer->update_widget_state();
   }
 }
-  
-// void LayerGroupWidget::select_crop_menu( bool show )
-// {
-//  if( show )
-//  {
-//    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
-//      this->private_->group_->menu_state_, LayerGroup::CROP_MENU_C );
-//  }
-//  else
-//  {
-//    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
-//      this->private_->group_->menu_state_, LayerGroup::NO_MENU_C );
-//  }
-// }
-//  
-// void LayerGroupWidget::select_flip_rotate_menu( bool show )
-// {
-//  if( show )
-//  {
-//    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
-//      this->private_->group_->menu_state_, LayerGroup::FLIP_ROTATE_MENU_C );
-//  }
-//  else
-//  {
-//    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
-//      this->private_->group_->menu_state_, LayerGroup::NO_MENU_C );
-//  }
-// }
-// 
-// void LayerGroupWidget::select_resample_menu( bool show )
-// {
-//  if( show )
-//  {
-//    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
-//      this->private_->group_->menu_state_, LayerGroup::RESAMPLE_MENU_C );
-//  }
-//  else
-//  {
-//    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
-//      this->private_->group_->menu_state_, LayerGroup::NO_MENU_C );
-//  }
-// }
 
-// void LayerGroupWidget::select_transform_menu( bool show )
-// {
-//  if( show )
-//  {
-//    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
-//      this->private_->group_->menu_state_, LayerGroup::TRANSFORM_MENU_C );
-//  }
-//  else
-//  {
-//    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
-//      this->private_->group_->menu_state_, LayerGroup::NO_MENU_C );
-//  }
-// }
   
 void LayerGroupWidget::select_iso_menu( bool show )
 {
@@ -630,17 +418,6 @@ void LayerGroupWidget::show_selection_checkboxes( bool show )
   this->group_menus_open_ = show;
 }
 
-// void LayerGroupWidget::adjust_new_size_labels( double scale_factor )
-// {
-//     this->private_->ui_.x_axis_label_new_->setText( QString::fromUtf8("X: ") + 
-//    QString::number( this->current_width_ * scale_factor ) );
-//  this->private_->ui_.y_axis_label_new_->setText( QString::fromUtf8("Y: ") + 
-//    QString::number( this->current_height_ * scale_factor ) );
-//  this->private_->ui_.z_axis_label_new_->setText( QString::fromUtf8("Z: ") + 
-//    QString::number( this->current_depth_ * scale_factor ) );
-// }
-  
-  
 void LayerGroupWidget::enable_delete_button( bool enable )
 {
   this->private_->ui_.delete_button_->setEnabled( enable );
@@ -755,65 +532,17 @@ void LayerGroupWidget::update_widget_state()
   // we must do it in a specific order in order to avoid flickering
   if ( menu_state == LayerGroup::NO_MENU_C )
   {
-//    this->set_crop_visibility( false );
-//    this->set_flip_rotate_visibility( false );
-//    this->set_resample_visibility( false );
-//    this->set_transform_visibility( false );
     this->set_iso_visibility( false );
     this->set_delete_visibility( false );
     show_checkboxes = false;
   }
-  else if ( menu_state == LayerGroup::CROP_MENU_C )
-  {
-//    this->set_flip_rotate_visibility( false );
-//    this->set_resample_visibility( false );
-//    this->set_transform_visibility( false );
-    this->set_iso_visibility( false );
-    this->set_delete_visibility( false );
-/*    this->set_crop_visibility( true );*/
-  }
-  else if ( menu_state == LayerGroup::FLIP_ROTATE_MENU_C )
-  {
-//    this->set_crop_visibility( false );
-//    this->set_resample_visibility( false );
-//    this->set_transform_visibility( false );
-    this->set_iso_visibility( false );
-    this->set_delete_visibility( false );
-/*    this->set_flip_rotate_visibility( true );*/
-  }
-  else if ( menu_state == LayerGroup::RESAMPLE_MENU_C )
-  {
-//    this->set_crop_visibility( false );
-//    this->set_flip_rotate_visibility( false );
-//    this->set_transform_visibility( false );
-//    this->set_iso_visibility( false );
-    this->set_delete_visibility( false );
-/*    this->set_resample_visibility( true );*/
-  }
-  else if ( menu_state == LayerGroup::TRANSFORM_MENU_C )
-  {
-//    this->set_crop_visibility( false );
-//    this->set_flip_rotate_visibility( false );
-//    this->set_resample_visibility( false );
-    this->set_iso_visibility( false );
-    this->set_delete_visibility( false );
-/*    this->set_transform_visibility( true );*/
-  }
   else if ( menu_state == LayerGroup::ISO_MENU_C )
   {
-//    this->set_crop_visibility( false );
-//    this->set_flip_rotate_visibility( false );
-//    this->set_resample_visibility( false );
-//    this->set_transform_visibility( false );
     this->set_delete_visibility( false );
     this->set_iso_visibility( true );
   }
   else if ( menu_state == LayerGroup::DELETE_MENU_C )
   {
-//    this->set_crop_visibility( false );
-//    this->set_flip_rotate_visibility( false );
-//    this->set_resample_visibility( false );
-//    this->set_transform_visibility( false );
     this->set_iso_visibility( false );
     this->set_delete_visibility( true );
   }
@@ -821,101 +550,7 @@ void LayerGroupWidget::update_widget_state()
   this->private_->ui_.base_->setUpdatesEnabled( true );
 }
 
-// void LayerGroupWidget::set_crop_visibility( bool show )
-// {
-//  if( show )
-//  {
-//    if ( this->private_->ui_.roi_->isHidden() )
-//    {
-//      this->private_->ui_.roi_->show();
-//      this->private_->ui_.group_crop_button_->blockSignals( true );
-//      this->private_->ui_.group_crop_button_->setChecked( true );
-//      this->private_->ui_.group_crop_button_->blockSignals( false );
-//    }
-//  }
-//  else
-//  {
-//    if ( this->private_->ui_.roi_->isVisible() ) 
-//    {
-//      this->private_->ui_.roi_->hide();
-//      this->private_->ui_.group_crop_button_->blockSignals( true );
-//      this->private_->ui_.group_crop_button_->setChecked( false );
-//      this->private_->ui_.group_crop_button_->blockSignals( false );
-//    }
-//  }
-//  
-// }
-// void LayerGroupWidget::set_flip_rotate_visibility( bool show )
-// {
-//  if( show )
-//  {
-//    if ( this->private_->ui_.flip_rotate_->isHidden() )
-//    {
-//      this->private_->ui_.flip_rotate_->show();
-//      this->private_->ui_.group_flip_rotate_button_->blockSignals( true );
-//      this->private_->ui_.group_flip_rotate_button_->setChecked( true );
-//      this->private_->ui_.group_flip_rotate_button_->blockSignals( false );
-//    }
-//  }
-//  else
-//  {
-//    if ( this->private_->ui_.flip_rotate_->isVisible() ) 
-//    {
-//      this->private_->ui_.flip_rotate_->hide();
-//      this->private_->ui_.group_flip_rotate_button_->blockSignals( true );
-//      this->private_->ui_.group_flip_rotate_button_->setChecked( false );
-//      this->private_->ui_.group_flip_rotate_button_->blockSignals( false );
-//    }
-//  }
-//  
-// }
-// void LayerGroupWidget::set_resample_visibility( bool show )
-// {
-//  if( show )
-//  {
-//    if ( this->private_->ui_.resample_->isHidden() )
-//    {
-//      this->private_->ui_.resample_->show();
-//      this->private_->ui_.group_resample_button_->blockSignals( true );
-//      this->private_->ui_.group_resample_button_->setChecked( true );
-//      this->private_->ui_.group_resample_button_->blockSignals( false );
-//    }
-//  }
-//  else
-//  {
-//    if ( this->private_->ui_.resample_->isVisible() ) 
-//    {
-//      this->private_->ui_.resample_->hide();
-//      this->private_->ui_.group_resample_button_->blockSignals( true );
-//      this->private_->ui_.group_resample_button_->setChecked( false );
-//      this->private_->ui_.group_resample_button_->blockSignals( false );
-//    }
-//  }
-// }
-// void LayerGroupWidget::set_transform_visibility( bool show )
-// {
-//  if( show )
-//  {
-//    if ( this->private_->ui_.transform_->isHidden() )
-//    {
-//      this->private_->ui_.transform_->show();
-//      this->private_->ui_.group_transform_button_->blockSignals( true );
-//      this->private_->ui_.group_transform_button_->setChecked( true );
-//      this->private_->ui_.group_transform_button_->blockSignals( false );
-//    }
-//  }
-//  else
-//  {
-//    if ( this->private_->ui_.transform_->isVisible() ) 
-//    {
-//      this->private_->ui_.transform_->hide();
-//      this->private_->ui_.group_transform_button_->blockSignals( true );
-//      this->private_->ui_.group_transform_button_->setChecked( false );
-//      this->private_->ui_.group_transform_button_->blockSignals( false );
-//    }
-//  }
-//  
-// }
+
 void LayerGroupWidget::set_iso_visibility( bool show )
 {
   if( show )

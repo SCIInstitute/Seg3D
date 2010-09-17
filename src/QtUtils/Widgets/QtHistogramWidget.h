@@ -38,6 +38,9 @@
 //Qt includes
 #include <QWidget>
 
+// QtUtils includes
+#include <QtUtils/Widgets/QtSliderDoubleCombo.h>
+
 // Core includes
 #include <Core/DataBlock/Histogram.h>
 
@@ -52,22 +55,41 @@ typedef boost::shared_ptr< QtHistogramWidgetPrivate > QtHistogramWidgetPrivateHa
 class QtHistogramWidget : public QWidget
 {
     Q_OBJECT
+    
+Q_SIGNALS:
+  void lower_changed_signal( double );
+  void upper_changed_signal( double );
 
 public:
-    QtHistogramWidget( QWidget *parent = 0 );
+    QtHistogramWidget( QWidget *parent, QtSliderDoubleCombo* upper_threshold = 0, 
+    QtSliderDoubleCombo* lower_threshold = 0 );
     virtual ~QtHistogramWidget();
     
 public Q_SLOTS:
   // SET_HISTOGRAM:
   // Set the histogram of the graph
   void set_histogram( const Core::Histogram& histogram );
+  
+  void set_min( double );
+  void set_max( double );
+  
+  double get_histogram_min();
+  double get_histogram_max();
 
   // RESET_HISTOGRAM:
   // Invalidate the current histogram
   void reset_histogram();
+  
+private Q_SLOTS:
+  void handle_right_button_click( int );
+  void handle_left_button_click( int ); 
 
 private:
   QtHistogramWidgetPrivateHandle private_;
+  QtUtils::QtSliderDoubleCombo *upper_threshold_;
+  QtUtils::QtSliderDoubleCombo *lower_threshold_;
+  QWidget* min_bar_;
+  QWidget* max_bar_;
 };
 
 } // end namespace Seg3D

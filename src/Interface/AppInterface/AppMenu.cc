@@ -55,7 +55,7 @@
 #include <Interface/AppInterface/AppInterface.h>
 #include <Interface/AppInterface/ViewerInterface.h>
 #include <Interface/AppProjectWizard/AppProjectWizard.h>
-#include <Interface/AppSegmentationExportWizard/AppSegmentationExportWizard.h>
+
 
 namespace Seg3D
 {
@@ -154,16 +154,17 @@ void AppMenu::create_layer_menu( QMenu* qmenu )
 
   qmenu->addSeparator();
 
-  qaction = qmenu->addAction( tr( "&Export Segmentation" ) );
+  qaction = qmenu->addAction( tr( "&Export Segmentation..." ) );
   qaction->setShortcut( tr( "Ctrl+E" ) );
   qaction->setToolTip( tr( "Export masks as a segmentation." ) );
-  connect( qaction, SIGNAL( triggered() ), this, SLOT( export_segmentation_wizard() ) );
+  QtUtils::QtBridge::Connect( qaction, 
+    boost::bind( &AppLayerIO::ExportSegmentation, this->main_window_ ) );
 
   qaction = qmenu->addAction( tr( "Export Layer...") );
   qaction->setShortcut( tr( "Ctrl+Shift+S" ) );
   qaction->setToolTip( tr( "Export the active layer" ) );
   QtUtils::QtBridge::Connect( qaction, 
-    boost::bind( &AppLayerIO::Export, this->main_window_ ) );
+    boost::bind( &AppLayerIO::ExportLayer, this->main_window_ ) );
 }
 
 
@@ -398,14 +399,6 @@ void AppMenu::open_project_wizard()
     new_project_wizard_->show();
   }
 }
-
-void AppMenu::export_segmentation_wizard()
-{
-  QPointer< AppSegmentationExportWizard > export_segmentation_wizard_ = 
-    new AppSegmentationExportWizard( this->main_window_);
-  export_segmentation_wizard_->show();
-}
-
 
 void AppMenu::open_project_from_file()
 {

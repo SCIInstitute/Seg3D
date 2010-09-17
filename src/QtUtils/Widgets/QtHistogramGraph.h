@@ -34,6 +34,8 @@
 
 // Qt includes
 #include <QWidget>
+#include <QMouseEvent>
+#include <QPoint>
 
 // Core includes
 #include <Core/DataBlock/Histogram.h>
@@ -44,6 +46,10 @@ namespace QtUtils
 class QtHistogramGraph : public QWidget
 {
     Q_OBJECT
+    
+Q_SIGNALS:
+  void lower_position( int );
+  void upper_position( int );
 
 public:
     QtHistogramGraph( QWidget *parent = 0 );
@@ -53,7 +59,7 @@ public:
   // SET_HISTOGRAM:
   // Set the histogram of the graph
   void set_histogram( const Core::Histogram& histogram );
-  
+    
   // RESET_HISTOGRAM:
   // Invalidate the current histogram
   void reset_histogram();
@@ -61,10 +67,13 @@ public:
 protected:
   // PAINTEVENT:
   // Overloaded call that redraws the histogram plot
-    void paintEvent( QPaintEvent *event );
+    virtual void paintEvent( QPaintEvent *event );
+    
+    virtual void mousePressEvent( QMouseEvent* e );
 
 private:
   Core::Histogram histogram_;
+  
 };
 
 } // end namespace QtUtils

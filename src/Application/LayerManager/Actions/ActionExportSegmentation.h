@@ -46,7 +46,8 @@ CORE_ACTION(
   CORE_ACTION_TYPE( "ExportSegmentation", "This action imports a layer into the layer manager.")
   CORE_ACTION_ARGUMENT( "segmentationname", "The name to be used for the segmentation." )
   CORE_ACTION_ARGUMENT( "masks", "A comma delimited list of layers to export as a segmentation." )
-  CORE_ACTION_ARGUMENT( "path", "A path where the segmentation should be exported to." )
+  CORE_ACTION_ARGUMENT( "file_path", "A path where the segmentation should be exported to." )
+  CORE_ACTION_ARGUMENT( "single_file", "A bool describing whether or not the masks should be saved as a single file" )
 )
 
   // -- Constructor/Destructor --
@@ -55,7 +56,8 @@ public:
   {
     add_argument( this->segmentation_name_ );
     add_argument( this->masks_ );
-    add_argument( this->path_ );
+    add_argument( this->file_path_ );
+    add_argument( this->single_file_ );
   }
   
   virtual ~ActionExportSegmentation()
@@ -77,20 +79,22 @@ private:
   Core::ActionParameter< std::string > masks_;
 
   // Where the segmentation should be saved
-  Core::ActionParameter< std::string > path_;
+  Core::ActionParameter< std::string > file_path_;
+  
+  Core::ActionParameter< bool > single_file_;
 
   // -- Dispatch this action from the interface --
 public:
   // CREATE:
   // Create action that exports a segmentation
-  static Core::ActionHandle Create( const std::string& segmentation_name, 
-    const std::string& masks, const std::string& path );
+  static Core::ActionHandle Create( const std::string& masks, const std::string& file_path, 
+    bool single_file );
 
   // DISPATCH:
   // To avoid reading a file twice, this action has a special option, so it can take an
   // importer that has already loaded the file. This prevents it from being read twice
-  static void Dispatch( Core::ActionContextHandle context, const std::string& segmentation_name, 
-    const std::string& masks, const std::string& path );
+  static void Dispatch( Core::ActionContextHandle context, const std::string& masks, 
+    const std::string& file_path, bool single_file );
   
 };
   
