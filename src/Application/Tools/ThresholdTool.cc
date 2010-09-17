@@ -50,6 +50,7 @@ class ThresholdToolPrivate : public Core::Lockable
 public:
   void handle_threshold_changed();
   void handle_target_layer_changed();
+  void handle_preview_visibility_changed( bool visible );
 
   void update_viewers();
   void initialize_gl();
@@ -67,7 +68,10 @@ void ThresholdToolPrivate::handle_threshold_changed()
     return;
   }
   
-  this->update_viewers();
+  if ( this->tool_->show_preview_state_->get() )
+  {
+    this->update_viewers();
+  }
 }
 
 void ThresholdToolPrivate::handle_target_layer_changed()
@@ -126,6 +130,15 @@ void ThresholdToolPrivate::initialize_gl()
   this->initialized_ = true;
 }
 
+void ThresholdToolPrivate::handle_preview_visibility_changed( bool visible )
+{
+  if ( this->tool_->valid_target_state_->get() )
+  {
+    this->update_viewers();
+  }
+}
+
+
 //////////////////////////////////////////////////////////////////////////
 // Class Threshold
 //////////////////////////////////////////////////////////////////////////
@@ -140,6 +153,7 @@ ThresholdTool::ThresholdTool( const std::string& toolid ) :
 
   this->add_state( "upper_threshold", this->upper_threshold_state_, 5000.0, -5000.0, 5000.0, .01 );
   this->add_state( "lower_threshold", this->lower_threshold_state_, -5000.0, -5000.0, 5000.0, .01 );
+  this->add_state( "show_preview", this->show_preview_state_, true );
 
   this->private_->handle_target_layer_changed();
 
@@ -149,6 +163,9 @@ ThresholdTool::ThresholdTool( const std::string& toolid ) :
     boost::bind( &ThresholdToolPrivate::handle_threshold_changed, this->private_ ) ) );
   this->add_connection( this->target_layer_state_->state_changed_signal_.connect(
     boost::bind( &ThresholdToolPrivate::handle_target_layer_changed, this->private_ ) ) );
+  this->add_connection( this->show_preview_state_->value_changed_signal_.connect( 
+    boost::bind( &ThresholdToolPrivate::handle_preview_visibility_changed, 
+    this->private_, _1 ) ) );
 }
 
 ThresholdTool::~ThresholdTool()
@@ -161,12 +178,13 @@ void ThresholdTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
   ViewerHandle viewer = ViewerManager::Instance()->get_viewer( viewer_id );
   std::string target_layer_id;
   double min_val, max_val;
-
+  bool show_preview;
   {
     Core::StateEngine::lock_type se_lock( Core::StateEngine::GetMutex() );
     target_layer_id = this->target_layer_state_->get();
     min_val = this->lower_threshold_state_->get();
     max_val = this->upper_threshold_state_->get();
+    show_preview = this->show_preview_state_->get();
   }
 
   if ( target_layer_id == Tool::NONE_OPTION_C )
@@ -188,51 +206,53 @@ void ThresholdTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
     return;
   }
   
-  this->private_->initialize_gl();
-
-  unsigned int old_tex_unit = Core::Texture::GetActiveTextureUnit();
-  Core::Texture::SetActiveTextureUnit( 0 );
-  glPushAttrib( GL_TRANSFORM_BIT );
-  glMatrixMode( GL_PROJECTION );
-  glPushMatrix();
-  glLoadIdentity();
-  glMultMatrixd( proj_mat.data() );
-
-  std::vector< unsigned char > threshold_mask;
-  target_slice->create_threshold_mask( threshold_mask, min_val, max_val, false );
-  Core::Texture2DHandle threshold_tex;
+  if ( show_preview )
   {
-    Core::RenderResources::lock_type rr_lock( Core::RenderResources::GetMutex() );
-    threshold_tex.reset( new Core::Texture2D );
-    threshold_tex->bind();
-    threshold_tex->set_min_filter( GL_NEAREST );
-    threshold_tex->set_mag_filter( GL_NEAREST );
-    threshold_tex->set_image( static_cast< int >( target_slice->nx() ),
-      static_cast< int >( target_slice->ny() ), GL_ALPHA, &threshold_mask[ 0 ],
-      GL_ALPHA, GL_UNSIGNED_BYTE );
-  }
+    this->private_->initialize_gl();
 
-  double voxel_width = ( target_slice->right() - target_slice->left() ) / 
-    ( target_slice->nx() - 1 );
-  double voxel_height = ( target_slice->top() - target_slice->bottom() ) /
-    ( target_slice->ny() - 1 );
-  double left = target_slice->left() - 0.5 * voxel_width;
-  double right = target_slice->right() + 0.5 * voxel_width;
-  double bottom = target_slice->bottom() - 0.5 * voxel_height;
-  double top = target_slice->top() + 0.5 * voxel_height;
-  double slice_width = right - left;
-  double slice_height = top - bottom;
-  Core::Vector slice_x( slice_width, 0.0, 0.0 );
-  slice_x = proj_mat * slice_x;
-  double slice_screen_width = slice_x.x() / 2.0 * viewer->get_width();
-  double slice_screen_height = slice_height / slice_width * slice_screen_width;
+    unsigned int old_tex_unit = Core::Texture::GetActiveTextureUnit();
+    Core::Texture::SetActiveTextureUnit( 0 );
+    glPushAttrib( GL_TRANSFORM_BIT );
+    glMatrixMode( GL_PROJECTION );
+    glPushMatrix();
+    glLoadIdentity();
+    glMultMatrixd( proj_mat.data() );
 
-  MaskShader::lock_type shader_lock( this->private_->shader_->get_mutex() );
-  this->private_->shader_->enable();
-  this->private_->shader_->set_pixel_size( static_cast< float >( 1.0 / slice_screen_width ), 
-    static_cast< float >( 1.0 /slice_screen_height ) );
-  this->private_->shader_->set_color( 1.0f, 1.0f, 0.0f );
-  glBegin( GL_QUADS );
+    std::vector< unsigned char > threshold_mask;
+    target_slice->create_threshold_mask( threshold_mask, min_val, max_val, false );
+    Core::Texture2DHandle threshold_tex;
+    {
+      Core::RenderResources::lock_type rr_lock( Core::RenderResources::GetMutex() );
+      threshold_tex.reset( new Core::Texture2D );
+      threshold_tex->bind();
+      threshold_tex->set_min_filter( GL_NEAREST );
+      threshold_tex->set_mag_filter( GL_NEAREST );
+      threshold_tex->set_image( static_cast< int >( target_slice->nx() ),
+        static_cast< int >( target_slice->ny() ), GL_ALPHA, &threshold_mask[ 0 ],
+        GL_ALPHA, GL_UNSIGNED_BYTE );
+    }
+
+    double voxel_width = ( target_slice->right() - target_slice->left() ) / 
+      ( target_slice->nx() - 1 );
+    double voxel_height = ( target_slice->top() - target_slice->bottom() ) /
+      ( target_slice->ny() - 1 );
+    double left = target_slice->left() - 0.5 * voxel_width;
+    double right = target_slice->right() + 0.5 * voxel_width;
+    double bottom = target_slice->bottom() - 0.5 * voxel_height;
+    double top = target_slice->top() + 0.5 * voxel_height;
+    double slice_width = right - left;
+    double slice_height = top - bottom;
+    Core::Vector slice_x( slice_width, 0.0, 0.0 );
+    slice_x = proj_mat * slice_x;
+    double slice_screen_width = slice_x.x() / 2.0 * viewer->get_width();
+    double slice_screen_height = slice_height / slice_width * slice_screen_width;
+
+    MaskShader::lock_type shader_lock( this->private_->shader_->get_mutex() );
+    this->private_->shader_->enable();
+    this->private_->shader_->set_pixel_size( static_cast< float >( 1.0 / slice_screen_width ), 
+      static_cast< float >( 1.0 /slice_screen_height ) );
+    this->private_->shader_->set_color( 1.0f, 1.0f, 0.0f );
+    glBegin( GL_QUADS );
     glTexCoord2f( 0.0f, 0.0f );
     glVertex2d( left, bottom );
     glTexCoord2f( 1.0f, 0.0f );
@@ -241,16 +261,17 @@ void ThresholdTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
     glVertex2d( right, top );
     glTexCoord2f( 0.0f, 1.0f );
     glVertex2d( left, top );
-  glEnd();
+    glEnd();
 
-  threshold_tex->unbind();
-  glFinish();
-  this->private_->shader_->disable();
-  shader_lock.unlock();
+    threshold_tex->unbind();
+    glFinish();
+    this->private_->shader_->disable();
+    shader_lock.unlock();
 
-  Core::Texture::SetActiveTextureUnit( old_tex_unit );
-  glPopMatrix();
-  glPopAttrib();
+    Core::Texture::SetActiveTextureUnit( old_tex_unit );
+    glPopMatrix();
+    glPopAttrib();
+  }
 
   SeedPointsTool::redraw( viewer_id, proj_mat );
 }

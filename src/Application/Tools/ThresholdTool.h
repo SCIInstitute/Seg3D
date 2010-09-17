@@ -77,6 +77,9 @@ public:
   // Lower threshold for painting
   Core::StateRangedDoubleHandle lower_threshold_state_;
 
+  // Whether to show the preview
+  Core::StateBoolHandle show_preview_state_;
+
 private:
   ThresholdToolPrivateHandle private_;
 

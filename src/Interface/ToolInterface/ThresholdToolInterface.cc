@@ -93,6 +93,8 @@ bool ThresholdToolInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Connect( this->private_->upper_threshold_, tool->upper_threshold_state_ );
   QtUtils::QtBridge::Connect( this->private_->lower_threshold_, tool->lower_threshold_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.use_active_layer_, tool->use_active_layer_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.show_preview_checkbox_, 
+    tool->show_preview_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.clear_seeds_button_, boost::bind(
     &SeedPointsTool::clear, tool, Core::Interface::GetWidgetActionContext() ) );
   QtUtils::QtBridge::Connect( this->private_->ui_.run_button_, boost::bind(

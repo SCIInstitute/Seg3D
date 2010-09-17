@@ -357,6 +357,10 @@ public:
 
     {
       StateEngine::lock_type lock( StateEngine::GetMutex() );
+      if ( this->values_vector_.size() == 0 )
+      {
+        return;
+      }
       this->values_vector_.clear();
     }
 
