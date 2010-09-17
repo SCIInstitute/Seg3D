@@ -231,7 +231,7 @@ bool SegmentationSelectionPage::validatePage()
   
   if( this->single_file_radio_button_->isChecked() )
   {
-    filename = QFileDialog::getSaveFileName( this, "Export Segmentation... ",
+    filename = QFileDialog::getSaveFileName( this, "Export Segmentation As... ",
       QString::fromStdString( desktop_path.string() ),"NRRD files (*.nrrd)" );
   }
   else
