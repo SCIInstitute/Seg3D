@@ -203,6 +203,11 @@ private:
   // this function handle inserting a group into the list
   void insert_group( LayerGroupHandle group_above, LayerGroupHandle group_below );
 
+  // HANDLE_LAYER_NAME_CHANGED:
+  // This function is connected to the value_changed_signal_ of all the layers and relays
+  // it to the layer_name_changed_signal_ of LayerManager.
+  void handle_layer_name_changed( std::string layer_id, std::string name );
+
   // Typedef's for the Mutex
 public: 
   typedef Core::StateEngine::mutex_type mutex_type;
@@ -265,6 +270,11 @@ public:
   // LAYERS_REORDERED_SIGNAL:
   // Triggered when the order of the layers has been changed.
   layers_changed_signal_type layers_reordered_signal_;
+
+  // LAYER_NAME_CHANGED_SIGNAL:
+  // Triggered when the name of a layer has changed.
+  // The first parameter is the layer ID, the second is the new name for that layer.
+  boost::signals2::signal< void ( std::string, std::string ) > layer_name_changed_signal_;
 
 protected:
   virtual bool pre_save_states( Core::StateIO& state_io );

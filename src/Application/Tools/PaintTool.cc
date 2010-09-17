@@ -70,12 +70,14 @@ public:
 
   void initialize();
   void upload_mask_texture();
-  void handle_brush_radius_changed();
-  void handle_active_layer_changed( LayerHandle layer );
-  void handle_use_active_layer_changed( bool use_active_layer );
-  void handle_target_layer_changed( std::string layer_id );
 
   void handle_layers_changed();
+  void handle_active_layer_changed( LayerHandle layer );
+  void handle_layer_name_changed( std::string layer_id );
+
+  void handle_brush_radius_changed();
+  void handle_use_active_layer_changed( bool use_active_layer );
+  void handle_target_layer_changed( std::string layer_id );
   void handle_data_constraint_changed();
   void handle_data_cstr_visibility_changed();
   void handle_data_cstr_range_changed();
@@ -660,6 +662,16 @@ void PaintToolPrivate::handle_data_cstr_range_changed()
   ViewerManager::Instance()->update_2d_viewers_overlay();
 }
 
+void PaintToolPrivate::handle_layer_name_changed( std::string layer_id )
+{
+  LayerHandle layer = LayerManager::Instance()->get_layer_by_id( layer_id );
+  if ( layer->type() == Core::VolumeType::MASK_E )
+  {
+    this->handle_layers_changed();
+  }
+}
+
+
 //////////////////////////////////////////////////////////////////////////
 // Implementation of class PaintTool
 //////////////////////////////////////////////////////////////////////////
@@ -715,6 +727,8 @@ PaintTool::PaintTool( const std::string& toolid ) :
     boost::bind( &PaintToolPrivate::handle_layers_changed, this->private_.get() ) ) );
   this->add_connection( LayerManager::Instance()->active_layer_changed_signal_.connect(
     boost::bind( &PaintToolPrivate::handle_active_layer_changed, this->private_.get(), _1 ) ) );
+  this->add_connection( LayerManager::Instance()->layer_name_changed_signal_.connect(
+    boost::bind( &PaintToolPrivate::handle_layer_name_changed, this->private_.get(), _1 ) ) );
   this->add_connection( this->use_active_layer_state_->value_changed_signal_.connect(
     boost::bind( &PaintToolPrivate::handle_use_active_layer_changed, this->private_.get(), _1 ) ) );
 

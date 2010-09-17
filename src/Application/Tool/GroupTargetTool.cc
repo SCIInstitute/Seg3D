@@ -62,6 +62,7 @@ public:
   void handle_groups_changed();
   void handle_layers_changed( LayerGroupHandle group );
   void handle_active_layer_changed( LayerHandle layer );
+  void handle_layer_name_changed( std::string layer_id );
   
   // -- handle updates from state variables --
   void handle_use_active_group_changed( bool use_active_group );
@@ -167,6 +168,18 @@ void GroupTargetToolPrivate::handle_target_layers_changed()
   this->tool_->valid_target_state_->set( this->tool_->target_layers_state_->get().size() > 0 );
 }
 
+void GroupTargetToolPrivate::handle_layer_name_changed( std::string layer_id )
+{
+  LayerHandle layer = LayerManager::Instance()->get_layer_by_id( layer_id );
+  LayerGroupHandle layer_group = layer->get_layer_group();
+  if ( layer_group->get_group_id() == this->tool_->target_group_state_->get() &&
+    ( layer->type() & this->target_type_ ) )
+  {
+    this->handle_layers_changed( layer_group );
+  } 
+}
+
+
 //////////////////////////////////////////////////////////////////////////
 // Class GroupTargetTool
 //////////////////////////////////////////////////////////////////////////
@@ -194,6 +207,8 @@ GroupTargetTool::GroupTargetTool(  Core::VolumeType target_type, const std::stri
     boost::bind( &GroupTargetToolPrivate::handle_layers_changed, this->private_, _1 ) ) );
   this->add_connection( LayerManager::Instance()->active_layer_changed_signal_.connect(
     boost::bind( &GroupTargetToolPrivate::handle_active_layer_changed, this->private_, _1 ) ) );
+  this->add_connection( LayerManager::Instance()->layer_name_changed_signal_.connect(
+    boost::bind( &GroupTargetToolPrivate::handle_layer_name_changed, this->private_, _1 ) ) );
 
   this->add_connection( this->use_active_group_state_->value_changed_signal_.connect(
     boost::bind( &GroupTargetToolPrivate::handle_use_active_group_changed, 

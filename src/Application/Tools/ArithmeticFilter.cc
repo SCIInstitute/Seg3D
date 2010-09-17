@@ -51,6 +51,7 @@ public:
   void handle_groups_changed();
   void handle_group_layers_changed( LayerGroupHandle group );
   void handle_active_layer_changed( LayerHandle layer );
+  void handle_layer_name_changed( std::string layer_id );
 
   void handle_use_active_group_changed( bool use_active_group );
   void handle_target_group_changed( std::string group_id );
@@ -225,6 +226,14 @@ void ArithmeticFilterPrivate::handle_output_type_changed( std::string type )
   }
 }
 
+void ArithmeticFilterPrivate::handle_layer_name_changed( std::string layer_id )
+{
+  LayerHandle layer = LayerManager::Instance()->get_layer_by_id( layer_id );
+  LayerGroupHandle layer_group = layer->get_layer_group();
+  this->handle_group_layers_changed( layer_group );
+}
+
+
 //////////////////////////////////////////////////////////////////////////
 // Class ArithmeticFilter
 //////////////////////////////////////////////////////////////////////////
@@ -271,6 +280,8 @@ ArithmeticFilter::ArithmeticFilter( const std::string& toolid ) :
     boost::bind( &ArithmeticFilterPrivate::handle_group_layers_changed, this->private_, _1 ) ) );
   this->add_connection( LayerManager::Instance()->active_layer_changed_signal_.connect(
     boost::bind( &ArithmeticFilterPrivate::handle_active_layer_changed, this->private_, _1 ) ) );
+  this->add_connection( LayerManager::Instance()->layer_name_changed_signal_.connect(
+    boost::bind( &ArithmeticFilterPrivate::handle_layer_name_changed, this->private_, _1 ) ) );
 
   this->add_connection( this->use_active_group_state_->value_changed_signal_.connect(
     boost::bind( &ArithmeticFilterPrivate::handle_use_active_group_changed, 

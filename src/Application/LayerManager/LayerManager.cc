@@ -116,6 +116,11 @@ bool LayerManager::insert_layer( LayerHandle layer )
     group_handle->insert_layer( layer );
       
     layer->set_layer_group( group_handle );
+
+    // Connect to the value_changed_signal of layer name
+    // NOTE: LayerManager will always out-live layers, so it's safe to not disconnect.
+    layer->name_state_->value_changed_signal_.connect( boost::bind(
+      &LayerManager::handle_layer_name_changed, this, layer->get_layer_id(), _2 ) );
       
   } // unlocked from here
 
@@ -1299,8 +1304,9 @@ bool LayerManager::export_multiple_segmentations( const std::vector< std::string
   return true;
 }
 
-
-
-
+void LayerManager::handle_layer_name_changed( std::string layer_id, std::string name )
+{
+  this->layer_name_changed_signal_( layer_id, name );
+}
 
 } // end namespace seg3D

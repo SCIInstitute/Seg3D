@@ -41,6 +41,10 @@
 namespace Seg3D
 {
 
+//////////////////////////////////////////////////////////////////////////
+// Class SingleTargetToolPrivate
+//////////////////////////////////////////////////////////////////////////
+
 class SingleTargetToolPrivate
 {
 
@@ -56,6 +60,7 @@ public:
   // -- handle updates from layermanager --
   void handle_layers_changed();
   void handle_use_active_layer_changed( bool use_active_layer );
+  void handle_layer_name_changed( std::string layer_id );
   
   // -- handle updates from state variables --
   void handle_active_layer_changed( LayerHandle layer );
@@ -128,6 +133,18 @@ void SingleTargetToolPrivate::handle_layers_changed()
   this->tool_->target_layer_state_->set_option_list( layer_names );
 }
 
+void SingleTargetToolPrivate::handle_layer_name_changed( std::string layer_id )
+{
+  LayerHandle layer = LayerManager::Instance()->get_layer_by_id( layer_id );
+  if ( layer->type() & this->target_type_ )
+  {
+    this->handle_layers_changed();
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////
+// Class SingleTargetTool
+//////////////////////////////////////////////////////////////////////////
 
 SingleTargetTool::SingleTargetTool(  Core::VolumeType target_type, const std::string& tool_type ) :
   Tool( tool_type ),
@@ -157,6 +174,10 @@ SingleTargetTool::SingleTargetTool(  Core::VolumeType target_type, const std::st
     
   this->add_connection( LayerManager::Instance()->active_layer_changed_signal_.connect(
     boost::bind( &SingleTargetToolPrivate::handle_active_layer_changed, 
+    this->private_.get(), _1 ) ) );
+
+  this->add_connection( LayerManager::Instance()->layer_name_changed_signal_.connect(
+    boost::bind( &SingleTargetToolPrivate::handle_layer_name_changed, 
     this->private_.get(), _1 ) ) );
     
   this->add_connection( this->use_active_layer_state_->value_changed_signal_.connect(
