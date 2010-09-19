@@ -718,7 +718,7 @@ static bool QuantizeDataInternal( double min, double max, DATA* src, DataBlockHa
 
       double offset = 0.5 -  static_cast<double>( 0x80000000 );
       double multiplier = 0.0;
-      if ( max > min ) multiplier = static_cast<double>( 0x100000000ul ) / (max - min);
+      if ( max > min ) multiplier = static_cast<double>( 0x100000000ull ) / (max - min);
       
       for ( size_t j = 0 ; j < size; j++ )
       {
@@ -734,7 +734,7 @@ static bool QuantizeDataInternal( double min, double max, DATA* src, DataBlockHa
 
       double offset = 0.5;
       double multiplier = 0.0;
-      if ( max > min ) multiplier = static_cast<double>( 0x100000000ul ) / (max - min);
+      if ( max > min ) multiplier = static_cast<double>( 0x100000000ull ) / (max - min);
       
       for ( size_t j = 0 ; j < size; j++ )
       {
