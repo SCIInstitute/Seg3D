@@ -115,14 +115,15 @@ void PolylineToolPrivate::execute( Core::ActionContextHandle context, bool erase
     return;
   }
   
-  int active_viewer_id = ViewerManager::Instance()->active_viewer_state_->get();
-  if ( active_viewer_id < 0 )
+  const std::set< int >& active_viewers = ViewerManager::Instance()->
+    active_viewer_state_->get();
+  if ( active_viewers.size() == 0 )
   {
     return;
   }
   
   ViewerHandle viewer = ViewerManager::Instance()->get_viewer( 
-    static_cast< size_t >( active_viewer_id ) );
+    static_cast< size_t >( *active_viewers.begin() ) );
   if ( !viewer || viewer->is_volume_view() )
   {
     return;

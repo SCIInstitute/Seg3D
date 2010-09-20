@@ -31,6 +31,7 @@
 
 #include <Core/Action/Actions.h>
 #include <Core/Action/ActionDispatcher.h>
+#include <Core/State/StateSet.h>
 #include <Core/State/StateVector.h>
 
 namespace Core
@@ -40,9 +41,9 @@ class ActionAdd : public Action
 {
 
 CORE_ACTION( 
-  CORE_ACTION_TYPE( "Add", "Add an item to a vector state.")
-  CORE_ACTION_ARGUMENT( "stateid", "The stateid of the vector state")
-  CORE_ACTION_ARGUMENT( "value", "The value that needs to be added to the vector." )
+  CORE_ACTION_TYPE( "Add", "Add an item to a vector or set state.")
+  CORE_ACTION_ARGUMENT( "stateid", "The stateid of the state")
+  CORE_ACTION_ARGUMENT( "value", "The value that needs to be added." )
 )
 
 public:
@@ -60,21 +61,23 @@ private:
   ActionParameter< std::string > stateid_;
   ActionParameterVariant value_;
 
-  StateVectorBaseWeakHandle state_weak_handle_;
+  StateBaseWeakHandle state_weak_handle_;
 
 public:
-  template< class T >
-  static ActionHandle Create( const typename StateVector< T >::handle_type& state,
-    const T& value );
+  template< class HANDLE, class T >
+  static ActionHandle Create( const HANDLE& state, const T& value );
 
   template< class T >
   static void Dispatch( ActionContextHandle context,
-    const typename StateVector< T >::handle_type& state, const T& value );
+    StateVectorBaseHandle state, const T& value );
+
+  template< class T >
+  static void Dispatch( ActionContextHandle context,
+    StateSetBaseHandle state, const T& value );
 };
 
-template< class T >
-ActionHandle ActionAdd::Create( const typename 
-                 StateVector< T >::handle_type& state, const T& value )
+template< class HANDLE, class T >
+ActionHandle ActionAdd::Create( const HANDLE& state, const T& value )
 {
   ActionAdd* action = new ActionAdd;
   action->stateid_.set_value( state->get_stateid() );
@@ -86,7 +89,14 @@ ActionHandle ActionAdd::Create( const typename
 
 template< class T >
 void ActionAdd::Dispatch( ActionContextHandle context, 
-    const typename StateVector< T >::handle_type& state, const T& value )
+    StateVectorBaseHandle state, const T& value )
+{
+  ActionDispatcher::PostAction( Create( state, value ), context );
+}
+
+template< class T >
+void ActionAdd::Dispatch( ActionContextHandle context, 
+    StateSetBaseHandle state, const T& value )
 {
   ActionDispatcher::PostAction( Create( state, value ), context );
 }

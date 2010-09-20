@@ -131,10 +131,12 @@ void AppMenu::create_edit_menu( QMenu* qmenu )
   qaction = qmenu->addAction( tr( "Select All") );
   qaction->setShortcut( tr( "Ctrl+A" ) );
   qaction->setToolTip( tr( "Select all viewers" ) );
+  int viewers[] = { 0, 1, 2, 3, 4, 5 }; 
+  std::set< int > all_viewers( viewers, viewers + 6 );
   QtUtils::QtBridge::Connect( qaction, 
-    boost::bind( &Core::ActionSet::DispatchState< Core::StateValue<int> >,
+    boost::bind( &Core::ActionSet::DispatchState< Core::StateIntSet >,
       Core::Interface::GetWidgetActionContext(),
-      ViewerManager::Instance()->active_viewer_state_, -1 ) );
+      ViewerManager::Instance()->active_viewer_state_, all_viewers ) );
 }
 
 void AppMenu::create_layer_menu( QMenu* qmenu )

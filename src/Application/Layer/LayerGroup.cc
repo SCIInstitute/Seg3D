@@ -54,30 +54,7 @@ LayerGroup::LayerGroup( Core::GridTransform grid_transform ) :
   // Need to set ranges and default values for all parameters
   add_state( "menu", this->menu_state_, NO_MENU_C, NO_MENU_C + "|" + CROP_MENU_C + "|" + FLIP_ROTATE_MENU_C + 
     "|" + RESAMPLE_MENU_C + "|" + TRANSFORM_MENU_C + "|" + ISO_MENU_C + "|" + DELETE_MENU_C );
-
-    // = Transformation menu state variables =
-  add_state( "transform_origin_x", this->transform_origin_x_state_, 0.0 );
-  add_state( "transform_origin_y", this->transform_origin_y_state_ , 0.0 );
-  add_state( "transform_origin_z", this->transform_origin_z_state_ , 0.0 );
-  add_state( "transform_spacing_x", this->transform_spacing_x_state_, 1.0 );
-  add_state( "transform_spacing_y", this->transform_spacing_y_state_, 1.0 );
-  add_state( "transform_spacing_z", this->transform_spacing_z_state_, 1.0 );
-  add_state( "transform_replace", this->transform_replace_state_, false );
-  
-      // = Set Crop menu state variables =
-  add_state( "crop_center_x", this->crop_center_x_state_, 0.0, 00.0, 1000.0, 1.0 );
-  add_state( "crop_center_y", this->crop_center_y_state_, 0.0, 00.0, 1000.0, 1.0 );
-  add_state( "crop_center_z", this->crop_center_z_state_, 0.0, 00.0, 1000.0, 1.0 );
-  add_state( "crop_size_x", this->crop_size_width_state_, 0.0, 00.0, 1000.0, 1.0 );
-  add_state( "crop_size_y", this->crop_size_height_state_, 0.0, 00.0, 1000.0, 1.0 );
-  add_state( "crop_size_z", this->crop_size_depth_state_, 0.0, 00.0, 1000.0, 1.0 );
-  add_state( "crop_replace", this->crop_replace_state_, false );
-  
-  
-  // = Set Resample state variables =
-  add_state( "resample_factor", this->resample_factor_state_, 1.0, 0.10, 5.0, .10 );
-  add_state( "resample_replace", this->resample_replace_state_, false );
-  
+    
   // = General state settings
   add_state( "show_layers", this->show_layers_state_, true );
   add_state( "visibility", this->visibility_state_, true );

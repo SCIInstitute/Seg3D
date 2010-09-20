@@ -31,6 +31,7 @@
 
 #include <Core/Action/Actions.h>
 #include <Core/Action/ActionDispatcher.h>
+#include <Core/State/StateSet.h>
 #include <Core/State/StateVector.h>
 
 namespace Core
@@ -39,7 +40,7 @@ namespace Core
 class ActionRemove : public Action
 {
 CORE_ACTION( 
-  CORE_ACTION_TYPE( "Remove", "Remove an item from a vector state." )
+  CORE_ACTION_TYPE( "Remove", "Remove an item from a vector or set state." )
   CORE_ACTION_ARGUMENT( "stateid", "The stateid of the state variable from which the item needs to be removed" )
   CORE_ACTION_ARGUMENT( "value", "The value that needs to be removed" ) 
 )
@@ -60,21 +61,23 @@ private:
   ActionParameter< std::string > stateid_;
   ActionParameterVariant value_;
 
-  StateVectorBaseWeakHandle state_weak_handle_;
+  StateBaseWeakHandle state_weak_handle_;
 
 public:
-  template< class T >
-  static ActionHandle Create( const typename StateVector< T >::handle_type& state,
-    const T& value );
+  template< class HANDLE, class T >
+  static ActionHandle Create( const HANDLE& state, const T& value );
 
   template< class T >
   static void Dispatch( ActionContextHandle context,
-    const typename StateVector< T >::handle_type& state, const T& value );
+    StateVectorBaseHandle state, const T& value );
+
+  template< class T >
+  static void Dispatch( ActionContextHandle context,
+    StateSetBaseHandle state, const T& value );
 };
 
-template< class T >
-ActionHandle ActionRemove::Create( const typename 
-                 StateVector< T >::handle_type& state, const T& value )
+template< class HANDLE, class T >
+ActionHandle ActionRemove::Create( const HANDLE& state, const T& value )
 {
   ActionRemove* action = new ActionRemove;
   action->stateid_.set_value( state->get_stateid() );
@@ -86,7 +89,14 @@ ActionHandle ActionRemove::Create( const typename
 
 template< class T >
 void ActionRemove::Dispatch( ActionContextHandle context, 
-    const typename StateVector< T >::handle_type& state, const T& value )
+    StateVectorBaseHandle state, const T& value )
+{
+  ActionDispatcher::PostAction( Create( state, value ), context );
+}
+
+template< class T >
+void ActionRemove::Dispatch( ActionContextHandle context, 
+    StateSetBaseHandle state, const T& value )
 {
   ActionDispatcher::PostAction( Create( state, value ), context );
 }

@@ -32,6 +32,7 @@
 #include <QAbstractButton>
 #include <QPointer>
 
+#include <Core/State/StateSet.h>
 #include <Core/State/StateValue.h>
 
 #include <QtUtils/Bridge/detail/QtConnectorBase.h>
@@ -44,18 +45,19 @@ class QtAbstractButtonVectorConnector : public QtConnectorBase
   Q_OBJECT
 
 public:
-  QtAbstractButtonVectorConnector( QAbstractButton* parent, std::vector<Core::StateBoolHandle>& state,
-    Core::StateIntHandle index, bool blocking = true );
+  QtAbstractButtonVectorConnector( QAbstractButton* parent, 
+    std::vector<Core::StateBoolHandle>& state,
+    Core::StateIntSetHandle indices, bool blocking = true );
 
   virtual ~QtAbstractButtonVectorConnector();
 
   // -- slot functions for boost signals --
 private:
-  static void SetActionChecked( QPointer< QtAbstractButtonVectorConnector > qpointer, int index,
-    bool checked, Core::ActionSource source );
+  static void SetActionChecked( QPointer< QtAbstractButtonVectorConnector > qpointer, 
+    int index, bool checked, Core::ActionSource source );
 
   static void UpdateIndex( QPointer< QtAbstractButtonVectorConnector > qpointer,
-    int index, Core::ActionSource source );
+    std::set< int > indices, Core::ActionSource source );
     
   // -- slot functions for Qt signals --
 private Q_SLOTS:
@@ -64,7 +66,7 @@ private Q_SLOTS:
 private:
   QAbstractButton* parent_;
   std::vector<Core::StateBoolHandle> state_;
-  Core::StateIntHandle index_;
+  Core::StateIntSetHandle indices_;
 };
 
 }

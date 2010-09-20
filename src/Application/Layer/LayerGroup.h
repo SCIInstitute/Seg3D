@@ -78,35 +78,6 @@ public:
   // and how: NONE, TRANSFORM, CROP, RESAMPLE
   Core::StateOptionHandle menu_state_;
 
-  // = Transformation menu state variables =
-
-  // Origin where the center of the dataset should
-  Core::StateDoubleHandle transform_origin_x_state_;
-  Core::StateDoubleHandle transform_origin_y_state_;
-  Core::StateDoubleHandle transform_origin_z_state_;
-
-  // The new Size information
-  Core::StateDoubleHandle transform_spacing_x_state_;
-  Core::StateDoubleHandle transform_spacing_y_state_;
-  Core::StateDoubleHandle transform_spacing_z_state_;
-
-  Core::StateBoolHandle transform_replace_state_;
-
-  // = Crop menu state variables =
-  Core::StateRangedDoubleHandle crop_center_x_state_;
-  Core::StateRangedDoubleHandle crop_center_y_state_;
-  Core::StateRangedDoubleHandle crop_center_z_state_;
-  
-  Core::StateRangedDoubleHandle crop_size_width_state_;
-  Core::StateRangedDoubleHandle crop_size_height_state_;
-  Core::StateRangedDoubleHandle crop_size_depth_state_;
-
-  Core::StateBoolHandle crop_replace_state_;
-
-  // = Resample state variables =
-  Core::StateRangedDoubleHandle resample_factor_state_;
-  Core::StateBoolHandle resample_replace_state_;
-
   // = Isosurface state variables =
   Core::StateOptionHandle isosurface_quality_state_;
 

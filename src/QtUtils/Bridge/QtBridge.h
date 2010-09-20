@@ -56,6 +56,7 @@
 #include <Core/State/StateOption.h>
 #include <Core/State/StateVector.h>
 #include <Core/State/StateRangedValue.h>
+#include <Core/State/StateSet.h>
 
 namespace QtUtils
 {
@@ -76,7 +77,8 @@ public:
     
   // Connect vector of bools to one button controlled by an index
   static void Connect(  QAbstractButton* qbutton, 
-    std::vector<Core::StateBoolHandle>& state_handles, Core::StateIntHandle& index_handle );
+    std::vector<Core::StateBoolHandle>& state_handles, 
+    Core::StateIntSetHandle& index_handle );
 
   static void Connect( QButtonGroup* qbuttongroup, Core::StateOptionHandle& state_handle );
 

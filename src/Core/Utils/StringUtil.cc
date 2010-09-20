@@ -542,6 +542,26 @@ std::string ExportToString( const std::vector< double >& value, int percision )
   return result;
 }
 
+std::string ExportToString( const std::set< int >& value )
+{
+  std::string result( 1, '[' );
+  std::set< int >::const_iterator it = value.begin();
+  while ( it != value.end() )
+  {
+    result += ToString( *it ) + ' ';
+    ++it;
+  }
+  if ( result.size() > 1 )
+  {
+    result[ result.size() - 1 ] = ']';
+  }
+  else
+  {
+    result += "]";
+  }
+  return result;
+}
+
 bool ImportFromString( const std::string& str, bool& value )
 {
   std::string tmpstr( str );
@@ -750,6 +770,19 @@ bool ImportFromString( const std::string& str, std::string& value )
   
   return true;
 }
+
+bool ImportFromString( const std::string& str, std::set< int >& value )
+{
+  value.clear();
+  std::vector< int > tmp;
+  if ( MultipleFromString( str, tmp ) )
+  {
+    value.insert( tmp.begin(), tmp.end() );
+    return true;
+  }
+  return false;
+}
+
 
 } // End namespace Core
 

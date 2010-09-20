@@ -60,7 +60,10 @@ ViewerManager::ViewerManager() :
     default_viewer_mode_state_->export_to_string(), PreferencesManager::Instance()->
     default_viewer_mode_state_->export_list_to_string() );
   this->layout_state_->set_session_priority( Core::StateBase::DEFAULT_LOAD_E + 1 );
-  this->add_state( "active_viewer", this->active_viewer_state_, 0 );
+
+  std::set< int > active_viewer;
+  active_viewer.insert( 0 );
+  this->add_state( "active_viewer", this->active_viewer_state_, active_viewer );
 
   // No viewer will be the active viewer for picking
   // NOTE: The interface will set this up

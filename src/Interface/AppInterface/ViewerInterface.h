@@ -34,6 +34,7 @@
 #include <QtCore/QPointer>
 
 // STL includes
+#include <set>
 #include <string>
 
 // Boost includes
@@ -68,7 +69,7 @@ public:
   void set_layout( const std::string& layout );
 
 public Q_SLOTS:
-  void set_active_viewer(int);
+  void set_active_viewer( std::set< int > );
 
   // -- Slots --    
 public:
@@ -77,7 +78,7 @@ public:
   static void SetViewerLayout( qpointer_type qpointer, std::string layout );
 
   // SetActiveViewer: (Thread safe slot)
-  static void SetActiveViewer( qpointer_type qpointer, int active_viewer );
+  static void SetActiveViewer( qpointer_type qpointer, std::set< int > active_viewers );
 };
 
 } // end namespaceSeg3D

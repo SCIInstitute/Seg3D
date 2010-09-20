@@ -45,17 +45,18 @@ public:
   Core::ActionParameter< std::string > target_layer_id_;
   Core::ActionParameter< int > slice_type_;
   Core::ActionParameter< size_t > slice_number_;
+  Core::ActionParameter< int > x0_;
+  Core::ActionParameter< int > y0_;
+  Core::ActionParameter< int > x1_;
+  Core::ActionParameter< int > y1_;
+  Core::ActionParameter< int > brush_radius_;
+
   Core::ActionParameter< std::string > data_constraint_layer_id_;
   Core::ActionParameter< double > min_val_;
   Core::ActionParameter< double > max_val_;
   Core::ActionParameter< bool > negative_data_constraint_;
   Core::ActionParameter< std::string > mask_constraint_layer_id_;
   Core::ActionParameter< bool > negative_mask_constraint_;
-  Core::ActionParameter< int > x0_;
-  Core::ActionParameter< int > y0_;
-  Core::ActionParameter< int > x1_;
-  Core::ActionParameter< int > y1_;
-  Core::ActionParameter< int > brush_radius_;
   Core::ActionParameter< bool > erase_;
 
   PaintToolWeakHandle paint_tool_weak_handle_;
@@ -70,18 +71,19 @@ ActionPaint::ActionPaint() :
   this->add_argument( this->private_->target_layer_id_ );
   this->add_argument( this->private_->slice_type_ );
   this->add_argument( this->private_->slice_number_ );
-  this->add_argument( this->private_->data_constraint_layer_id_ );
-  this->add_argument( this->private_->min_val_ );
-  this->add_argument( this->private_->max_val_ );
-  this->add_argument( this->private_->negative_data_constraint_ );
-  this->add_argument( this->private_->mask_constraint_layer_id_ );
-  this->add_argument( this->private_->negative_mask_constraint_ );
   this->add_argument( this->private_->x0_ );
   this->add_argument( this->private_->y0_ );
   this->add_argument( this->private_->x1_ );
   this->add_argument( this->private_->y1_ );
   this->add_argument( this->private_->brush_radius_ );
-  this->add_argument( this->private_->erase_ );
+
+  this->add_key( this->private_->data_constraint_layer_id_ );
+  this->add_key( this->private_->min_val_ );
+  this->add_key( this->private_->max_val_ );
+  this->add_key( this->private_->negative_data_constraint_ );
+  this->add_key( this->private_->mask_constraint_layer_id_ );
+  this->add_key( this->private_->negative_mask_constraint_ );
+  this->add_key( this->private_->erase_ );
 
   this->add_cachedhandle( this->private_->target_slice_ );
   this->add_cachedhandle( this->private_->data_constraint_slice_ );

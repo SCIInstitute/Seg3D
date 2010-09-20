@@ -49,6 +49,7 @@ SET(CORE_STATE_SRCS
   StateOption.cc
   StateOption.h
   StateRangedValue.h
+  StateSet.h
   StateValue.h
   StateViewBase.h
   StateViewBase.cc

@@ -45,33 +45,52 @@ bool ActionRemove::validate( ActionContextHandle& context )
       context->report_error( std::string( "Unknown state variable '" ) + stateid_.value() + "'" );
       return false;
     }
-    StateVectorBaseHandle vector_state = 
-      boost::dynamic_pointer_cast< StateVectorBase >( state );
-    if ( !vector_state )
+    this->state_weak_handle_ = state;
+  }
+
+  StateVectorBase* vector_state = dynamic_cast< StateVectorBase* >( state.get() );
+  if ( vector_state != 0 )
+  {
+    std::string error;
+    if ( !vector_state->validate_element_variant( this->value_, error ) )
     {
-      context->report_error( std::string( "State variable '") + this->stateid_.value() +
-        "' doesn't support ActionRemove" );
+      context->report_error( error );
       return false;
     }
-    this->state_weak_handle_ = vector_state;
+    return true;
   }
-  
-  std::string error;
-  if ( !this->state_weak_handle_.lock()->validate_element_variant( this->value_, error ) )
+
+  StateSetBase* set_state = dynamic_cast< StateSetBase* >( state.get() );
+  if ( set_state != 0 )
   {
-    context->report_error( error );
-    return false;
+    std::string error;
+    if ( !set_state->validate_element_variant( this->value_, error ) )
+    {
+      context->report_error( error );
+      return false;
+    }
+    return true;
   }
-  
-  return true;
+
+  context->report_error( std::string( "State variable '") + this->stateid_.value() +
+    "' doesn't support ActionRemove" );
+  return false;
 }
 
 bool ActionRemove::run( ActionContextHandle& context, ActionResultHandle& result )
 {
-  StateVectorBaseHandle vector_state( this->state_weak_handle_.lock() );
-  if ( vector_state )
+  StateBaseHandle state( this->state_weak_handle_.lock() );
+
+  StateVectorBase* vector_state = dynamic_cast< StateVectorBase* >( state.get() );
+  if ( vector_state != 0 )
   {
     return vector_state->remove( this->value_, context->source() );
+  }
+
+  StateSetBase* set_state = dynamic_cast< StateSetBase* >( state.get() );
+  if ( set_state != 0 )
+  {
+    return set_state->remove( this->value_, context->source() );
   }
 
   return false;

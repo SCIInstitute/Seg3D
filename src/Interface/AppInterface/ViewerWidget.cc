@@ -30,6 +30,7 @@
 // Core includes
 #include <Core/Utils/Log.h>
 #include <Core/Interface/Interface.h>
+#include <Core/State/Actions/ActionAdd.h>
 #include <Core/State/Actions/ActionFlip.h>
 #include <Core/State/Actions/ActionSet.h>
 
@@ -61,6 +62,8 @@ namespace Seg3D
 class ViewerWidgetPrivate
 {
 public:
+  void handle_widget_activated();
+
   Ui::ViewerWidget ui_;
   QtUtils::QtRenderWidget* render_widget_;
 
@@ -76,6 +79,23 @@ public:
   
   QVector< QToolButton* > buttons_;
 };
+
+void ViewerWidgetPrivate::handle_widget_activated()
+{
+  if ( QApplication::keyboardModifiers() == Qt::ControlModifier )
+  {
+    Core::ActionAdd::Dispatch( Core::Interface::GetWidgetActionContext(),
+      ViewerManager::Instance()->active_viewer_state_, 
+      static_cast< int >( this->viewer_->get_viewer_id() ) );
+  }
+  else
+  {
+    std::set< int > active_viewer;
+    active_viewer.insert( static_cast< int >( this->viewer_->get_viewer_id() ) );
+    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
+      ViewerManager::Instance()->active_viewer_state_, active_viewer );
+  }
+}
 
 ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
   QWidget( parent ),
@@ -191,10 +211,7 @@ ViewerWidget::ViewerWidget( ViewerHandle viewer, QWidget *parent ) :
     this->add_icons_to_combobox();
     
     this->private_->render_widget_->activate_signal_.connect(
-      boost::bind( &Core::ActionSet::Dispatch<Core::StateIntHandle,int>, 
-        Core::Interface::GetWidgetActionContext(),
-        ViewerManager::Instance()->active_viewer_state_, 
-        static_cast< int >( this->private_->viewer_->get_viewer_id() ) ) );
+      boost::bind( &ViewerWidgetPrivate::handle_widget_activated, this->private_  ) );
   }
 }
   

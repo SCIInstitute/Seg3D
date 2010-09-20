@@ -41,6 +41,7 @@
 
 
 // STL includes
+#include <set>
 #include <string>
 #include <vector>
 
@@ -96,7 +97,8 @@ std::string ExportToString( const std::vector< double >& value );
 std::string ExportToString( const std::vector< float >& value, int percision );
 std::string ExportToString( const std::vector< double >& value, int percision );
   
-  
+std::string ExportToString( const std::set< int >& value );
+
 
 // Import functions from strings
 bool ImportFromString( const std::string& str, bool& value );
@@ -140,6 +142,8 @@ bool ImportFromString( const std::string& str, std::vector< unsigned long long>&
 
 bool ImportFromString( const std::string& str, std::vector< float >& value );
 bool ImportFromString( const std::string& str, std::vector< double >& value );
+
+bool ImportFromString( const std::string& str, std::set< int >& value );
 
 // Convert string to upper or lower case 
 std::string StringToUpper( std::string );

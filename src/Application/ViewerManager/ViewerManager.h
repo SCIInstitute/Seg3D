@@ -50,6 +50,7 @@
 // Core includes
 #include <Core/Utils/Singleton.h>
 #include <Core/State/State.h>
+#include <Core/State/StateSet.h>
 
 namespace Seg3D
 {
@@ -125,7 +126,7 @@ public:
   Core::StateOptionHandle layout_state_;
   
   // Number of the viewer that is the active viewer
-  Core::StateIntHandle active_viewer_state_;
+  Core::StateIntSetHandle active_viewer_state_;
   
   // Size of the grid
   Core::StateIntHandle grid_size_state_;

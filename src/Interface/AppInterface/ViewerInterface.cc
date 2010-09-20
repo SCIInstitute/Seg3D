@@ -171,28 +171,18 @@ ViewerInterface::~ViewerInterface()
 {
 }
 
-void ViewerInterface::set_active_viewer( int active_viewer )
+void ViewerInterface::set_active_viewer( std::set< int > active_viewers )
 {
-  // -1 means select all
-  if ( active_viewer == -1 )
+  for ( size_t j = 0; j < private_->viewer_.size(); j++ )
   {
-    for ( size_t j = 0; j < private_->viewer_.size(); j++ )
-    {
-      private_->viewer_[ j ]->select();
-    } 
+    this->private_->viewer_[ j ]->deselect();
   }
-  else
-  // select individual viewer
-  {
-    for ( size_t j = 0; j < private_->viewer_.size(); j++ )
-    {
-      if( static_cast< int > ( j ) != active_viewer ) private_->viewer_[ j ]->deselect();
-    }
 
-    if( active_viewer >= 0 && active_viewer < static_cast< int > ( private_->viewer_.size() ) )
-    {
-      private_->viewer_[ active_viewer ]->select();
-    }
+  std::set< int >::iterator it = active_viewers.begin();
+  while ( it != active_viewers.end() )
+  {
+    this->private_->viewer_[ *it ]->select();
+    ++it;
   }
 }
 
@@ -365,16 +355,16 @@ void ViewerInterface::SetViewerLayout( qpointer_type qpointer, std::string layou
   if( qpointer.data() ) qpointer->set_layout( layout );
 }
 
-void ViewerInterface::SetActiveViewer( qpointer_type qpointer, int active_viewer )
+void ViewerInterface::SetActiveViewer( qpointer_type qpointer, std::set< int > active_viewers )
 {
   if( !( Core::Interface::IsInterfaceThread() ) )
   {
     Core::Interface::Instance()->post_event( boost::bind( &ViewerInterface::SetActiveViewer,
-        qpointer, active_viewer ) );
+        qpointer, active_viewers ) );
     return;
   }
 
-  if( qpointer.data() ) qpointer->set_active_viewer( active_viewer );
+  if( qpointer.data() ) qpointer->set_active_viewer( active_viewers );
 }
 
 } // end namespace Seg3D
