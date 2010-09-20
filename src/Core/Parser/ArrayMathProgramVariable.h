@@ -26,54 +26,34 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef CORE_PARSER_PARSERTREE_H 
-#define CORE_PARSER_PARSERTREE_H 
-
-// STL includes
-#include <string>
+#ifndef CORE_PARSER_ARRAYMATHPROGRAMVARIABLE_H 
+#define CORE_PARSER_ARRAYMATHPROGRAMVARIABLE_H 
 
 // Core includes
-#include <Core/Parser/ParserFWD.h>
+#include <Core/Utils/Lockable.h>
 
 namespace Core
 {
 
-// ParserTree : This class is the toplevel class of an expression. It binds
-//              the output variable with the tree of nodes that describe
-//              how a variable is computed.
-class ParserTree
+class ArrayMathProgramVariable : public Lockable
 {
+
 public:
-  // Constructor
-  ParserTree( std::string varname, ParserNodeHandle expression );
+  // Constructor of the variable
+  ArrayMathProgramVariable( std::string name, double* data ) :
+    name_(name), 
+    data_(data) {}
 
-  // Retrieve the name of the variable that needs to be assigned
-  std::string get_varname();
-
-  // Retrieve the tree for computing the expression
-  ParserNodeHandle get_expression_tree();
-
-  // Set expression tree
-  void set_expression_tree( ParserNodeHandle& handle );
-
-  // Set the final output type of the expression
-  void set_type( std::string type );
-
-  // Retrieve final output type
-  std::string get_type();
-
-  // For debugging
-  void print();
+  // Retrieve the data pointer from the central temporal
+  // storage
+  double* get_data();
 
 private:
-  // The name of the variable that needs to be assigned
-  std::string varname_;
+  // Name of variable
+  std::string name_;
 
-  // The tree of functions that need to be called to compute this variable
-  ParserNodeHandle expression_;
-
-  // Return type of the expression
-  std::string type_;
+  // Where the data needs to be store
+  double* data_;
 };
 
 }

@@ -33,10 +33,6 @@
 #include <string>
 #include <map>
 
-// Boost includes
-//#include <boost/thread/mutex.hpp>
-#include <boost/smart_ptr.hpp> // Needed for shared_ptr
-
 // Core includes
 #include <Core/Parser/ParserFWD.h>
 #include <Core/Utils/Lockable.h>

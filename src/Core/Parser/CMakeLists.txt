@@ -34,6 +34,8 @@
 SET(CORE_PARSER_SRCS
   ArrayMathEngine.h
   ArrayMathEngine.cc
+  ArrayMathFunction.h
+  ArrayMathFunction.cc
   ArrayMathFunctionBasic.cc
   ArrayMathFunctionCatalog.h
   ArrayMathFunctionCatalog.cc
@@ -41,6 +43,14 @@ SET(CORE_PARSER_SRCS
   ArrayMathFunctionSourceSink.cc
   ArrayMathInterpreter.h
   ArrayMathInterpreter.cc
+  ArrayMathProgram.h
+  ArrayMathProgram.cc
+  ArrayMathProgramCode.h
+  ArrayMathProgramCode.cc
+  ArrayMathProgramSource.h
+  ArrayMathProgramSource.cc
+  ArrayMathProgramVariable.h
+  ArrayMathProgramVariable.cc
   Parser.h
   Parser.cc
   ParserEnums.h

@@ -47,8 +47,17 @@ namespace Core
 
   // Forward declarations 
 
+  // Handles for a few of the classes. These are helper classes that are located elsewhere in 
+  // memory.
+
   class ArrayMathFunctionCatalog;
   typedef boost::shared_ptr< ArrayMathFunctionCatalog > ArrayMathFunctionCatalogHandle;
+
+  class ArrayMathProgram;
+  typedef boost::shared_ptr< ArrayMathProgram > ArrayMathProgramHandle;
+
+  class ArrayMathProgramVariable;
+  typedef boost::shared_ptr< ArrayMathProgramVariable > ArrayMathProgramVariableHandle;
 
   class ParserFunction;
 

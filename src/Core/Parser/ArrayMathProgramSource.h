@@ -26,54 +26,34 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef CORE_PARSER_PARSERTREE_H 
-#define CORE_PARSER_PARSERTREE_H 
+#ifndef CORE_PARSER_ARRAYMATHPROGRAMSOURCE_H 
+#define CORE_PARSER_ARRAYMATHPROGRAMSOURCE_H 
 
 // STL includes
-#include <string>
-
-// Core includes
-#include <Core/Parser/ParserFWD.h>
+#include <vector>
 
 namespace Core
 {
 
-// ParserTree : This class is the toplevel class of an expression. It binds
-//              the output variable with the tree of nodes that describe
-//              how a variable is computed.
-class ParserTree
+class ArrayMathProgramSource
 {
+
 public:
-  // Constructor
-  ParserTree( std::string varname, ParserNodeHandle expression );
+  ArrayMathProgramSource() :
+    bool_array_(0), 
+    double_array_(0) {}
 
-  // Retrieve the name of the variable that needs to be assigned
-  std::string get_varname();
+  void set_bool_array( std::vector< bool >* array );
+  std::vector< bool >* get_bool_array();
+  bool is_bool_array();
 
-  // Retrieve the tree for computing the expression
-  ParserNodeHandle get_expression_tree();
-
-  // Set expression tree
-  void set_expression_tree( ParserNodeHandle& handle );
-
-  // Set the final output type of the expression
-  void set_type( std::string type );
-
-  // Retrieve final output type
-  std::string get_type();
-
-  // For debugging
-  void print();
+  void set_double_array( std::vector< double >* array );
+  std::vector< double >* get_double_array();
+  bool is_double_array();
 
 private:
-  // The name of the variable that needs to be assigned
-  std::string varname_;
-
-  // The tree of functions that need to be called to compute this variable
-  ParserNodeHandle expression_;
-
-  // Return type of the expression
-  std::string type_;
+  std::vector< bool >* bool_array_;
+  std::vector< double >* double_array_;
 };
 
 }

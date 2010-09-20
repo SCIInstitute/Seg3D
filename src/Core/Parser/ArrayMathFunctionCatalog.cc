@@ -30,6 +30,7 @@
 #include <boost/thread/mutex.hpp>
 
 // Core includes
+#include <Core/Parser/ArrayMathFunction.h>
 #include <Core/Parser/ArrayMathFunctionCatalog.h>
 #include <Core/Parser/ParserEnums.h>
 

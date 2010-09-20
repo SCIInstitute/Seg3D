@@ -27,8 +27,6 @@
  */
 
 // Core includes
-#include <Core/Math/MathFunctions.h>
-#include <Core/Parser/ArrayMathInterpreter.h>
 #include <Core/Parser/ArrayMathFunctionCatalog.h>
 
 namespace ArrayMathFunctions

@@ -27,9 +27,7 @@
  */
 
 // Core includes
-#include <Core/Parser/ParserEnums.h>
 #include <Core/Parser/ParserFunction.h>
-#include <Core/Parser/ParserVariable.h> 
 
 namespace Core
 {

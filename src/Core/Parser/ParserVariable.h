@@ -32,9 +32,6 @@
 // STL includes
 #include <string>
 
-// Boost includes
-#include <boost/smart_ptr.hpp> // Needed for shared_ptr
-
 namespace Core
 {
 

@@ -33,9 +33,6 @@
 #include <string>
 #include <vector>
 
-// Boost includes
-#include <boost/smart_ptr.hpp> // Needed for shared_ptr
-
 // Core includes
 #include <Core/Parser/ParserFWD.h>
 

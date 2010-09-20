@@ -32,7 +32,7 @@
 // Core includes
 #include <Core/Parser/ParserFunctionCatalog.h>
 #include <Core/Parser/ParserFWD.h>
-#include <Core/Parser/ArrayMathInterpreter.h>
+#include <Core/Parser/ArrayMathProgramCode.h>
 
 namespace Core
 {
