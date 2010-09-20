@@ -37,18 +37,8 @@ std::string ParserVariableType( std::string type )
 {
   if ( type == "U" ) return std::string( "Unknown" );
   if ( type == "S" ) return std::string( "Scalar" );
-  if ( type == "V" ) return std::string( "Vector" );
-  if ( type == "T" ) return std::string( "Tensor" );
-  if ( type == "M" ) return std::string( "Matrix" );
-  if ( type == "A" ) return std::string( "String" );
-  if ( type == "L" ) return std::string( "List" );
-  if ( type == "FD" ) return std::string( "FieldData" );
-  if ( type == "FM" ) return std::string( "FieldMesh" );
-  if ( type == "FN" ) return std::string( "FieldNode" );
-  if ( type == "FE" ) return std::string( "FieldElement" );
   if ( type == "AB" ) return std::string( "Boolean Vector" );
   if ( type == "AD" ) return std::string( "Double Vector" );
-  if ( type == "AI" ) return std::string( "Integer Vector" );
   return std::string( "Unknown" );
 }
 

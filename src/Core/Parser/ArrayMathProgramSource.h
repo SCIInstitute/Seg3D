@@ -40,8 +40,8 @@ class ArrayMathProgramSource
 
 public:
   ArrayMathProgramSource() :
-    bool_array_(0), 
-    double_array_(0) {}
+    bool_array_( 0 ), 
+    double_array_( 0 ) {}
 
   void set_bool_array( std::vector< bool >* array );
   std::vector< bool >* get_bool_array();

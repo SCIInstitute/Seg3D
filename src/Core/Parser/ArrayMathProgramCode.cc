@@ -46,15 +46,15 @@ void ArrayMathProgramCode::print()
 
 ArrayMathProgramCode::ArrayMathProgramCode( bool ( *function )( ArrayMathProgramCode& pc ) ) :
 function_(function), 
-  index_(0), 
-  size_(1)
+  index_( 0 ), 
+  size_( 1 )
 {
 }
 
 ArrayMathProgramCode::ArrayMathProgramCode() :
-function_(0), 
-  index_(0), 
-  size_(1)
+  function_( 0 ), 
+  index_( 0 ), 
+  size_( 1 )
 {
 }
 

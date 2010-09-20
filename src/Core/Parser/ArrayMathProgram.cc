@@ -213,7 +213,7 @@ size_type ArrayMathProgram::get_buffer_size()
   return this->buffer_size_;
 }
 
-int ArrayMathProgram::get_num_proc()
+int ArrayMathProgram::get_num_threads()
 {
   return this->num_threads_;
 }

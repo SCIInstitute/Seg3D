@@ -55,8 +55,8 @@ public:
   // Get the number of entries that are processed at once
   size_type get_buffer_size();
 
-  // Get the number of processors
-  int get_num_proc();
+  // Get the number of threads
+  int get_num_threads();
 
   // Set the size of the array to process
   size_type get_array_size();

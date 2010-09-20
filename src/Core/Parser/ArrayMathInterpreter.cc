@@ -115,10 +115,6 @@ bool ArrayMathInterpreter::translate( ParserProgramHandle& pprogram,
     {
       buffer_mem += 1;
     }
-    else if ( type == "AB" || type == "AD" )
-    {
-      buffer_mem += 0;
-    }
     else
     {
       error
@@ -151,9 +147,9 @@ bool ArrayMathInterpreter::translate( ParserProgramHandle& pprogram,
 
   // Determine how many space we need to reserve for sequential variables
   int buffer_size = mprogram->get_buffer_size();
-  int num_proc = mprogram->get_num_proc();
+  int num_threads = mprogram->get_num_threads();
 
-  for ( int np = 0; np < num_proc; np++ )
+  for ( int nt = 0; nt < num_threads; nt++ )
   {
     for ( size_t j = 0; j < num_sequential_variables; j++ )
     {
@@ -161,7 +157,7 @@ bool ArrayMathInterpreter::translate( ParserProgramHandle& pprogram,
       std::string type = vhandle->get_type();
       flags = vhandle->get_flags();
 
-      if ( ( flags & SCRIPT_CONST_VAR_E ) && ( np > 0 ) )
+      if ( ( flags & SCRIPT_CONST_VAR_E ) && ( nt > 0 ) )
       {
         continue;
       }
@@ -262,7 +258,7 @@ bool ArrayMathInterpreter::translate( ParserProgramHandle& pprogram,
     mprogram->set_single_variable( j, pvhandle );
   }
 
-  for ( int np = 0; np < num_proc; np++ )
+  for ( int nt = 0; nt < num_threads; nt++ )
   {
     for ( size_t j = 0; j < num_sequential_variables; j++ )
     {
@@ -279,7 +275,7 @@ bool ArrayMathInterpreter::translate( ParserProgramHandle& pprogram,
       kind = vhandle->get_kind();
 
       flags = vhandle->get_flags();
-      if ( ( flags & SCRIPT_CONST_VAR_E ) && ( np > 0 ) ) 
+      if ( ( flags & SCRIPT_CONST_VAR_E ) && ( nt > 0 ) ) 
       {
         continue;
       }
@@ -302,14 +298,14 @@ bool ArrayMathInterpreter::translate( ParserProgramHandle& pprogram,
       // Add this variable to the code 
       if ( flags & SCRIPT_CONST_VAR_E )
       {
-        for ( int p = 0; p < num_proc; p++ )
+        for ( int p = 0; p < num_threads; p++ )
         {
           mprogram->set_sequential_variable( j, p, pvhandle );
         }
       }
       else
       {
-        mprogram->set_sequential_variable( j, np, pvhandle );
+        mprogram->set_sequential_variable( j, nt, pvhandle );
       }
     }
   }
@@ -348,34 +344,6 @@ bool ArrayMathInterpreter::translate( ParserProgramHandle& pprogram,
       else if ( flags & SCRIPT_CONST_VAR_E )
       {
         pc.set_variable( 0, mprogram->get_const_variable( onum )->get_data() );
-      }
-    }
-    else if ( type == "AB" )
-    {
-      mprogram->find_sink( name, ps );
-      if ( ps.is_bool_array() )
-      {
-        pc.set_bool_array( 0, ps.get_bool_array() );
-      }
-      else
-      {
-        error
-            = "INTERNAL ERROR - Variable is of Mesh type, but given source is not a bool array.";
-        return false;
-      }
-    }
-    else if ( type == "AD" )
-    {
-      mprogram->find_sink( name, ps );
-      if ( ps.is_double_array() )
-      {
-        pc.set_double_array( 0, ps.get_double_array() );
-      }
-      else
-      {
-        error
-            = "INTERNAL ERROR - Variable is of Mesh type, but given source is not a double array.";
-        return false;
       }
     }
     else
@@ -579,7 +547,7 @@ bool ArrayMathInterpreter::translate( ParserProgramHandle& pprogram,
   }
 
   // Process sequential list
-  for ( int np = 0; np < num_proc; np++ )
+  for ( int nt = 0; nt < num_threads; nt++ )
   {
     for ( size_t j = 0; j < num_sequential_functions; j++ )
     {
@@ -596,7 +564,7 @@ bool ArrayMathInterpreter::translate( ParserProgramHandle& pprogram,
 
       if ( type == "S" )
       {
-        pc.set_variable( 0, mprogram->get_sequential_variable( onum, np )->get_data() );
+        pc.set_variable( 0, mprogram->get_sequential_variable( onum, nt )->get_data() );
       }
       else if ( type == "AB" )
       {
@@ -648,7 +616,7 @@ bool ArrayMathInterpreter::translate( ParserProgramHandle& pprogram,
             if ( flags & SCRIPT_CONST_VAR_E ) pc.set_variable( i + 1,
                 mprogram->get_sequential_variable( inum, 0 )->get_data() );
             else pc.set_variable( i + 1,
-                mprogram->get_sequential_variable( inum, np )->get_data() );
+                mprogram->get_sequential_variable( inum, nt )->get_data() );
           }
 
           else if ( flags & SCRIPT_SINGLE_VAR_E )
@@ -694,7 +662,7 @@ bool ArrayMathInterpreter::translate( ParserProgramHandle& pprogram,
           return false;
         }
       }
-      mprogram->set_sequential_program_code( j, np, pc );
+      mprogram->set_sequential_program_code( j, nt, pc );
     }
   }
 
