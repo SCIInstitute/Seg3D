@@ -64,6 +64,8 @@ vec4 shade_mask()
   {
     if ( edge_test() )
       return vec4( color, opacity );
+    else
+      discard;
   }
   else
   {
