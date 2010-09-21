@@ -150,8 +150,17 @@ void ViewerPrivate::handle_layer_group_inserted( LayerGroupHandle layer_group )
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
 
   this->layer_connection_map_.insert( std::make_pair( layer_group->get_group_id(),
-    layer_group->visibility_state_->state_changed_signal_.connect(
-    boost::bind( &ViewerPrivate::layer_state_changed, this, ViewModeType::ALL_E ) ) ) );
+    layer_group->visibility_state_[ this->viewer_->get_viewer_id() ]->state_changed_signal_.
+    connect( boost::bind( &ViewerPrivate::layer_state_changed, this, 
+    ViewModeType::NON_VOLUME_E ) ) ) );
+
+  size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
+  for ( size_t i = 0; i < num_of_viewers; ++i )
+  {
+    this->layer_connection_map_.insert( std::make_pair( layer_group->get_group_id(),
+      layer_group->visibility_state_[ i ]->state_changed_signal_.connect( boost::bind(
+      &ViewerPrivate::layer_state_changed, this, ViewModeType::VOLUME_E ) ) ) );
+  }
 }
 
 void ViewerPrivate::handle_layer_group_deleted( LayerGroupHandle layer_group )
@@ -245,7 +254,16 @@ void ViewerPrivate::insert_layer( LayerHandle layer )
     
   this->layer_connection_map_.insert( std::make_pair( layer->get_layer_id(),
     layer->visible_state_[ this->viewer_->get_viewer_id() ]->state_changed_signal_.connect(
-    boost::bind( &ViewerPrivate::layer_state_changed, this, ViewModeType::ALL_E ) ) ) );
+    boost::bind( &ViewerPrivate::layer_state_changed, this, 
+    ViewModeType::NON_VOLUME_E ) ) ) );
+
+  size_t num_of_viewers = ViewerManager::Instance()->number_of_viewers();
+  for ( size_t i = 0; i < num_of_viewers; ++i )
+  {
+    this->layer_connection_map_.insert( std::make_pair( layer->get_layer_id(),
+      layer->visible_state_[ i ]->state_changed_signal_.connect( boost::bind(
+      &ViewerPrivate::layer_state_changed, this, ViewModeType::VOLUME_E ) ) ) );
+  }
   
   this->layer_connection_map_.insert( std::make_pair( layer->get_layer_id(),
     layer->layer_updated_signal_.connect( boost::bind(

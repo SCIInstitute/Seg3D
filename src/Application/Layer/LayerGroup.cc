@@ -32,8 +32,8 @@
 // Application includes
 #include <Application/Layer/DataLayer.h>
 #include <Application/Layer/MaskLayer.h>
-//#include <Application/Layer/Layer.h>
 #include <Application/Layer/LayerGroup.h>
+#include <Application/ViewerManager/ViewerManager.h>
 
 
 namespace Seg3D
@@ -57,7 +57,12 @@ LayerGroup::LayerGroup( Core::GridTransform grid_transform ) :
     
   // = General state settings
   add_state( "show_layers", this->show_layers_state_, true );
-  add_state( "visibility", this->visibility_state_, true );
+
+  this->visibility_state_.resize( ViewerManager::Instance()->number_of_viewers() );
+  for ( size_t i = 0; i < this->visibility_state_.size(); ++i )
+  {
+    this->add_state( "visible" + Core::ExportToString( i ), this->visibility_state_[ i ], true );
+  }
   
   add_state( "isosurface_quality", this->isosurface_quality_state_, "1.0", "1.0|0.5|0.25|0.125" );
 }

@@ -283,9 +283,11 @@ void QtRenderWidget::wheelEvent( QWheelEvent* event )
 
 void QtRenderWidget::keyPressEvent( QKeyEvent* event )
 {
-  this->activate_signal_();
-
-  if ( ! ( this->private_->viewer_->key_press_event( event->key(), event->modifiers() ) ) )
+  if ( this->private_->viewer_->key_press_event( event->key(), event->modifiers() ) )
+  {
+    this->activate_signal_();
+  }
+  else
   {
     QWidget::keyPressEvent( event );
   }

@@ -52,6 +52,7 @@
 #include <Application/LayerManager/Actions/ActionDeleteLayers.h>
 #include <Application/LayerManager/Actions/ActionNewMaskLayer.h>
 #include <Application/LayerManager/Actions/ActionMoveGroupAbove.h>
+#include <Application/ViewerManager/ViewerManager.h>
 
 
 namespace Seg3D
@@ -143,19 +144,20 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
     SLOT( uncheck_delete_confirm() ) );
   
   
-  //Set the defaulf values for the Group UI and make the connections to the state engine
+  //Set the default values for the Group UI and make the connections to the state engine
       // --- GENERAL ---
     
       QtUtils::QtBridge::Connect( this->private_->ui_.open_button_, 
       this->private_->group_->show_layers_state_ );
       QtUtils::QtBridge::Connect( this->private_->ui_.group_visibility_button_, 
-      this->private_->group_->visibility_state_ );
+      this->private_->group_->visibility_state_, 
+      ViewerManager::Instance()->active_viewer_state_ );
       QtUtils::QtBridge::Connect( this->private_->ui_.delete_button_, 
       boost::bind( &ActionDeleteLayers::Dispatch, 
-        Core::Interface::GetWidgetActionContext(), this->private_->group_ ) );
+      Core::Interface::GetWidgetActionContext(), this->private_->group_ ) );
     QtUtils::QtBridge::Connect( this->private_->ui_.group_new_button_, 
       boost::bind( &ActionNewMaskLayer::Dispatch, 
-        Core::Interface::GetWidgetActionContext(), this->private_->group_ ) );
+      Core::Interface::GetWidgetActionContext(), this->private_->group_ ) );
   
     qpointer_type qpointer( this );
     this->private_->group_->menu_state_->state_changed_signal_.connect(

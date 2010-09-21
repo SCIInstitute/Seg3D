@@ -82,7 +82,7 @@ public:
   Core::StateOptionHandle isosurface_quality_state_;
 
   // = Group visibility =
-  Core::StateBoolHandle visibility_state_;
+  std::vector< Core::StateBoolHandle > visibility_state_;
   Core::StateBoolHandle show_layers_state_;
   
   // -- Layers contained within group --

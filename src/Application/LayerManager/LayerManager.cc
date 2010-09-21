@@ -572,7 +572,7 @@ LayerSceneHandle LayerManager::compose_layer_scene( size_t viewer_id )
   group_list_type::reverse_iterator group_iterator = this->group_list_.rbegin();
   for ( ; group_iterator != this->group_list_.rend(); group_iterator++)
   {
-    if ( !( *group_iterator )->visibility_state_->get() )
+    if ( !( *group_iterator )->visibility_state_[ viewer_id ]->get() )
     {
       continue;
     }
