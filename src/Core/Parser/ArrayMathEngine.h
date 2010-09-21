@@ -31,6 +31,7 @@
 
 // Core includes
 #include <Core/DataBlock/DataBlock.h>
+#include <Core/DataBlock/MaskDataBlock.h>
 #include <Core/Parser/ArrayMathInterpreter.h>
 #include <Core/Parser/Parser.h>
 #include <Core/Parser/ParserFWD.h>
@@ -65,6 +66,14 @@ public:
     DataBlockHandle data_block_;
   };
 
+  class OutputMaskDataBlock
+  {
+  public:
+    std::string array_name_;
+    std::string mask_data_block_name_; 
+    MaskDataBlockHandle mask_data_block_;
+  };
+
 public:
   // CALLS TO THIS CLASS SHOULD BE MADE IN THE ORDER
   // THAT THE FUNCTIONS ARE GIVEN HERE
@@ -76,6 +85,7 @@ public:
   bool add_input_bool_array( std::string name, std::vector< bool >* array );
   bool add_input_double_array( std::string name, std::vector< double >* array );
   bool add_input_data_block( std::string name, DataBlockHandle data_block );
+  bool add_input_mask_data_block( std::string name, MaskDataBlockHandle mask_data_block );
 
   // TODO Do we need these?
   bool add_index( std::string name );
@@ -84,6 +94,7 @@ public:
   bool add_output_bool_array( std::string name, std::vector< bool >* array );
   bool add_output_double_array( std::string name, std::vector< double >* array );
   bool add_output_data_block( std::string name, DataBlockHandle input_data_block ); 
+  bool add_output_mask_data_block( std::string name, MaskDataBlockHandle input_mask_data_block ); 
 
   // Setup the expression                        
   bool add_expressions( std::string& expressions );
@@ -93,6 +104,7 @@ public:
 
   // Extract handles to the results
   bool get_data_block( std::string name, DataBlockHandle& data_block );
+  bool get_mask_data_block( std::string name, MaskDataBlockHandle& mask_data_block );
 
   // Clean up the engine
   void clear();
@@ -125,6 +137,7 @@ private:
   std::vector< OutputBoolArray > bool_array_data_;
   std::vector< OutputDoubleArray > double_array_data_;
   std::vector< OutputDataBlock > data_block_data_;
+  std::vector< OutputMaskDataBlock > mask_data_block_data_;
 };
 
 }

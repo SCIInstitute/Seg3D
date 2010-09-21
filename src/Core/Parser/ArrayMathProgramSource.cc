@@ -77,4 +77,22 @@ bool ArrayMathProgramSource::is_data_block()
   return this->data_block_ != 0;
 }
 
+void ArrayMathProgramSource::set_mask_data_block( MaskDataBlock* mask_data_block )
+{
+  this->mask_data_block_ = mask_data_block;
+}
+
+MaskDataBlock* ArrayMathProgramSource::get_mask_data_block()
+{
+  return this->mask_data_block_;
+}
+
+bool ArrayMathProgramSource::is_mask_data_block()
+{
+  return this->mask_data_block_ != 0;
+}
+
+
+
+
 } // end namespace

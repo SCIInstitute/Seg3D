@@ -34,6 +34,7 @@
 
 // Core includes
 #include <Core/DataBlock/DataBlock.h>
+#include <Core/DataBlock/MaskDataBlock.h>
 
 namespace Core
 {
@@ -59,10 +60,15 @@ public:
   DataBlock* get_data_block();
   bool is_data_block();
 
+  void set_mask_data_block( MaskDataBlock* mask_data_block );
+  MaskDataBlock* get_mask_data_block();
+  bool is_mask_data_block();
+
 private:
   std::vector< bool >* bool_array_;
   std::vector< double >* double_array_;
   DataBlock* data_block_;
+  MaskDataBlock* mask_data_block_;
 };
 
 }

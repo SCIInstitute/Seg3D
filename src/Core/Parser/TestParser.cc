@@ -3,6 +3,7 @@
 
 // Core includes
 #include <Core/DataBlock/DataBlock.h>
+#include <Core/DataBlock/MaskDataBlock.h>
 #include <Core/DataBlock/StdDataBlock.h>
 #include <Core/Parser/ArrayMathEngine.h>
 #include <Core/Parser/ArrayMathFunctionCatalog.h>
@@ -120,6 +121,88 @@ void test_data_block()
   print_data_block( output_data_block );
 }
 
+void print_mask_data_block( Core::MaskDataBlockHandle mask_data_block )
+{
+  size_t nx = mask_data_block->get_nx();
+  size_t ny = mask_data_block->get_ny();
+  size_t nz = mask_data_block->get_nz();
+  for( size_t k = 0; k < nz; k++ )
+  {
+    for( size_t j = 0; j < ny; j++ )
+    {
+      for( size_t i = 0; i < nx; i++ )
+      {
+        //double value = mask_data_block->get_data_at( i, j, k );
+        //std::cout << value << std::endl;  
+        if( mask_data_block->get_mask_at( i, j, k ) )
+        {
+          std::cout << "1" << std::endl;
+        }
+        else
+        {
+          std::cout << "0" << std::endl;
+        }
+      }
+    }
+  }
+  std::cout << std::endl;  
+}
+
+void test_mask_data_block()
+{
+  Core::ArrayMathEngine engine;
+
+  // Create the DATA object for the function
+  size_t nx, ny, nz;
+  nx = ny = nz = 2;
+  unsigned int mask_bit = 0;
+  Core::MaskDataBlockHandle input_mask_data_block( new Core::MaskDataBlock( 
+    Core::StdDataBlock::New( nx, ny, nz, Core::DataType::UCHAR_E ), mask_bit ) );
+  size_t index = 0;
+  for( size_t k = 0; k < nz; k++ )
+  {
+    for( size_t j = 0; j < ny; j++ )
+    {
+      for( size_t i = 0; i < nx; i++ )
+      {
+        if( index % 2 == 0 )
+        {
+          input_mask_data_block->set_mask_at( i, j, k );
+        }
+        else
+        {
+          input_mask_data_block->clear_mask_at( i, j, k );
+        }
+        index++;
+      }
+    }
+  }
+
+  std::cout << "Input mask data block" << std::endl;
+  print_mask_data_block( input_mask_data_block );
+
+  if( !( engine.add_input_mask_data_block( "A", input_mask_data_block ) ) ) return;
+
+  std::string function = "RESULT = !A;"; // Test expression
+  if ( !( function.find( "RESULT" ) != std::string::npos ) ) return;
+
+  if( !( engine.add_output_mask_data_block( "RESULT", input_mask_data_block ) ) ) return;
+
+  if( !( engine.add_expressions( function ) ) ) return;
+
+  // Actual engine call, which does the dynamic compilation, the creation of the
+  // code for all the objects, as well as inserting the function and looping 
+  // over every data point
+
+  if ( !( engine.run() ) ) return;
+
+  Core::MaskDataBlockHandle output_mask_data_block;
+  if( !engine.get_mask_data_block( "RESULT", output_mask_data_block ) ) return;
+
+  std::cout << "Output mask data block" << std::endl;
+  print_mask_data_block( output_mask_data_block );
+}
+
 // Test only parsing -- print parse tree
 void test_parser()
 {
@@ -142,7 +225,8 @@ int main()
 {
   //test_parser();
   //test_double_array();
-  test_data_block();
+  //test_data_block();
+  test_mask_data_block();
 
   std::cout << "Hello world" << std::endl;
 }

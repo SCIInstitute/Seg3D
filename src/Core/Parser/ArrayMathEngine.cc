@@ -220,6 +220,62 @@ bool ArrayMathEngine::add_input_data_block( std::string name, DataBlockHandle da
 }
 
 
+bool ArrayMathEngine::add_input_mask_data_block( std::string name, MaskDataBlockHandle mask_data_block )
+{
+  std::string error_str;
+  if ( mask_data_block->get_size() == 0 )
+  {
+    error_str = "Input mask data block '" + name + "' is empty.";
+    CORE_LOG_ERROR( error_str );
+    return false;
+  }
+
+  size_type size = mask_data_block->get_size();
+
+  // Check whether size is OK
+  if ( size > 1 )
+  {
+    if ( this->array_size_ == 1 ) 
+    {
+      this->array_size_ = size;
+    }
+    if ( this->array_size_ != size )
+    {
+      error_str = "The number of array elements in '" + name
+        + "' does not match the size of the other objects.";
+      CORE_LOG_ERROR( error_str );
+      return false;
+    }
+  }
+
+  // Add __NAME as an additional variable that extracts the field data
+  // from the field
+
+  std::string tname = "__" + name;
+
+  this->pre_expression_ += name + "=get_scalar(" + tname + ");";
+
+  int flags = 0;
+  if ( size > 1 ) 
+  {
+    flags = SCRIPT_SEQUENTIAL_VAR_E;
+  }
+
+  // Add the variable to the interpreter
+  if ( !( this->add_mask_data_block_source( this->mprogram_, tname, mask_data_block, error_str ) ) )
+  {
+    CORE_LOG_ERROR( error_str );
+    return false;
+  }
+  // Add the variable to the parser
+  if ( !( this->add_input_variable( this->pprogram_, tname, "MASK", flags ) ) )
+  {
+    CORE_LOG_ERROR( error_str );
+    return false;
+  }
+  return true;
+}
+
 bool ArrayMathEngine::add_index( std::string name )
 {
   this->pre_expression_ += name + "=index();";
@@ -301,7 +357,6 @@ bool ArrayMathEngine::add_output_data_block( std::string name, DataBlockHandle i
 {
   std::string error_str;
 
-
   if ( this->array_size_ != input_data_block->get_size() && input_data_block->get_size() != 1 && 
     input_data_block->get_size() != 0 )
   {
@@ -355,6 +410,68 @@ bool ArrayMathEngine::add_output_data_block( std::string name, DataBlockHandle i
 
   return true;
 }
+
+// TODO Have Jeroen review this function
+bool ArrayMathEngine::add_output_mask_data_block( std::string name, 
+  MaskDataBlockHandle input_mask_data_block )
+{
+  std::string error_str;
+
+  if ( this->array_size_ != input_mask_data_block->get_size() && 
+    input_mask_data_block->get_size() != 1 && input_mask_data_block->get_size() != 0 )
+  {
+    error_str = "The output field '" + name + 
+      "' does not have the same number of elements as the other objects.";
+    CORE_LOG_ERROR( error_str );
+    return false;  
+  }
+  size_type size = input_mask_data_block->get_size();
+
+  std::string tname = "__" + name;
+
+  if ( size == 0 )
+  {
+    // TODO How to handle size == 0?
+  }
+
+  int flags = 0;
+  if ( size > 1 ) 
+  {
+    flags = SCRIPT_SEQUENTIAL_VAR_E;  
+  }
+
+  this->post_expression_ += tname + "=to_mask_data_block(" + name + ");";
+
+  // TODO Why add scalar variable?
+  // Add the variable to the parser
+  if ( !( add_output_variable( this->pprogram_, name, "S", flags ) ) )
+  {
+    CORE_LOG_ERROR( error_str );
+    return false;
+  }
+  if ( !( add_output_variable( this->pprogram_, tname, "MASK", flags ) ) )
+  {
+    CORE_LOG_ERROR( error_str );
+    return false;
+  }
+
+  // Create new output data block based on input data block
+  Core::MaskDataBlockHandle output_mask_data_block( new Core::MaskDataBlock( 
+    Core::StdDataBlock::New( input_mask_data_block->get_nx(), input_mask_data_block->get_ny(), 
+    input_mask_data_block->get_nz(), DataType::UCHAR_E ), 
+    input_mask_data_block->get_mask_bit() ) );
+
+  // Store information for processing after parsing has succeeded
+  OutputMaskDataBlock m;
+  m.array_name_ = name;
+  m.mask_data_block_name_ = tname;
+  m.mask_data_block_ = output_mask_data_block;
+
+  this->mask_data_block_data_.push_back( m );
+
+  return true;
+}
+
 
 bool ArrayMathEngine::add_expressions( std::string& expressions )
 {
@@ -441,6 +558,20 @@ bool ArrayMathEngine::run()
     }
   }
 
+  for ( size_t j = 0; j < this->mask_data_block_data_.size(); j++ )
+  {
+    if ( this->mask_data_block_data_[ j ].mask_data_block_.get() )
+    {
+      std::string arrayname = this->mask_data_block_data_[ j ].mask_data_block_name_;
+      if ( !( this->add_mask_data_block_sink( this->mprogram_, arrayname,
+        this->mask_data_block_data_[ j ].mask_data_block_, error_str ) ) )
+      {
+        CORE_LOG_ERROR( error_str );
+        return false;
+      }
+    }
+  }
+
   // Translate the code
   if ( !( this->translate( this->pprogram_, this->mprogram_, error_str ) ) )
   {
@@ -476,6 +607,19 @@ bool ArrayMathEngine::get_data_block( std::string name, DataBlockHandle& data_bl
   return false;
 }
 
+bool ArrayMathEngine::get_mask_data_block( std::string name, MaskDataBlockHandle& mask_data_block )
+{
+  for ( size_t j = 0; j < this->mask_data_block_data_.size(); j++ )
+  {
+    if ( this->mask_data_block_data_[ j ].array_name_ == name )
+    {
+      mask_data_block = this->mask_data_block_data_[ j ].mask_data_block_;
+      return true;
+    }
+  }
+
+  return false;
+}
 
 } // end namespace
 

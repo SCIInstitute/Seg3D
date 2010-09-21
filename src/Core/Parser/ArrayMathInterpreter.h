@@ -35,6 +35,7 @@
 // Core includes
 // As Program is stored in a large array we do not need a handle for that one.
 #include <Core/DataBlock/DataBlock.h>
+#include <Core/DataBlock/MaskDataBlock.h>
 #include <Core/Parser/ParserFWD.h>
 
 namespace Core
@@ -63,6 +64,9 @@ public:
   bool add_data_block_source( ArrayMathProgramHandle& pprogram, 
     std::string& name, DataBlockHandle data_block, std::string& error );
 
+  bool add_mask_data_block_source( ArrayMathProgramHandle& pprogram, 
+    std::string& name, MaskDataBlockHandle mask_data_block, std::string& error );
+
   // Data sinks  
   bool add_bool_array_sink( ArrayMathProgramHandle& pprogram,
     std::string& name, std::vector< bool >* array, std::string& error );
@@ -72,6 +76,9 @@ public:
 
   bool add_data_block_sink( ArrayMathProgramHandle& pprogram, 
     std::string& name, DataBlockHandle data_block, std::string& error );
+
+  bool add_mask_data_block_sink( ArrayMathProgramHandle& pprogram, 
+    std::string& name, MaskDataBlockHandle mask_data_block, std::string& error );
 
   //------------------------------------------------------------------------
   // Step 2: translate code and generate executable code
