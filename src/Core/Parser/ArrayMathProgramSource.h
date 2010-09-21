@@ -32,6 +32,9 @@
 // STL includes
 #include <vector>
 
+// Core includes
+#include <Core/DataBlock/DataBlock.h>
+
 namespace Core
 {
 
@@ -41,7 +44,8 @@ class ArrayMathProgramSource
 public:
   ArrayMathProgramSource() :
     bool_array_( 0 ), 
-    double_array_( 0 ) {}
+    double_array_( 0 ),
+    data_block_( 0 ) {}
 
   void set_bool_array( std::vector< bool >* array );
   std::vector< bool >* get_bool_array();
@@ -51,9 +55,14 @@ public:
   std::vector< double >* get_double_array();
   bool is_double_array();
 
+  void set_data_block( DataBlock* data_block );
+  DataBlock* get_data_block();
+  bool is_data_block();
+
 private:
   std::vector< bool >* bool_array_;
   std::vector< double >* double_array_;
+  DataBlock* data_block_;
 };
 
 }

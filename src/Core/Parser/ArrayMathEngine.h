@@ -30,6 +30,7 @@
 #define CORE_PARSER_ARRAYMATHENGINE_H 
 
 // Core includes
+#include <Core/DataBlock/DataBlock.h>
 #include <Core/Parser/ArrayMathInterpreter.h>
 #include <Core/Parser/Parser.h>
 #include <Core/Parser/ParserFWD.h>
@@ -56,6 +57,14 @@ public:
     std::vector< double >* double_array_;
   };
 
+  class OutputDataBlock
+  {
+  public:
+    std::string array_name_;
+    std::string data_block_name_; 
+    DataBlockHandle data_block_;
+  };
+
 public:
   // CALLS TO THIS CLASS SHOULD BE MADE IN THE ORDER
   // THAT THE FUNCTIONS ARE GIVEN HERE
@@ -66,6 +75,7 @@ public:
   // Generate input arrays
   bool add_input_bool_array( std::string name, std::vector< bool >* array );
   bool add_input_double_array( std::string name, std::vector< double >* array );
+  bool add_input_data_block( std::string name, DataBlockHandle data_block );
 
   // TODO Do we need these?
   bool add_index( std::string name );
@@ -73,12 +83,16 @@ public:
 
   bool add_output_bool_array( std::string name, std::vector< bool >* array );
   bool add_output_double_array( std::string name, std::vector< double >* array );
+  bool add_output_data_block( std::string name, DataBlockHandle input_data_block ); 
 
   // Setup the expression                        
   bool add_expressions( std::string& expressions );
 
   // Run the expressions in parallel
   bool run();
+
+  // Extract handles to the results
+  bool get_data_block( std::string name, DataBlockHandle& data_block );
 
   // Clean up the engine
   void clear();
@@ -110,7 +124,7 @@ private:
   // the expression tree
   std::vector< OutputBoolArray > bool_array_data_;
   std::vector< OutputDoubleArray > double_array_data_;
-
+  std::vector< OutputDataBlock > data_block_data_;
 };
 
 }

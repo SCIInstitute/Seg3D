@@ -243,19 +243,19 @@ bool ParserProgram::get_sequential_function( size_t j, ParserScriptFunctionHandl
 
 void ParserProgram::add_expression( std::string& expression_string, ParserTreeHandle expression_tree )
 {
-  std::pair<std::string,ParserTreeHandle> expression(expression_string,expression_tree);
-  this->expressions_.push_back(expression);
+  std::pair<std::string,ParserTreeHandle> expression( expression_string, expression_tree );
+  this->expressions_.push_back( expression );
 }
 
 void ParserProgram::get_expression( int expression_num, std::string& expression_string, ParserTreeHandle& expression_handle )
 {
-  expression_string = this->expressions_[expression_num].first;
-  expression_handle = this->expressions_[expression_num].second;
+  expression_string = this->expressions_[ expression_num ].first;
+  expression_handle = this->expressions_[ expression_num ].second;
 }
 
 void ParserProgram::get_expression( int expression_num, ParserTreeHandle& expression_handle )
 {
-  expression_handle = expressions_[expression_num].second;
+  expression_handle = this->expressions_[ expression_num ].second;
 }
 
 size_t ParserProgram::num_expressions()
@@ -265,12 +265,12 @@ size_t ParserProgram::num_expressions()
 
 void ParserProgram::add_input_variable( std::string name, std::string type /*= "U"*/, int flags /*= 0*/ )
 {
-  this->input_variables_[name] = ParserVariableHandle( new ParserVariable(name,type,flags) );
+  this->input_variables_[ name ] = ParserVariableHandle( new ParserVariable( name, type, flags ) );
 }
 
 void ParserProgram::add_output_variable( std::string name, std::string type /*= "U"*/, int flags /*= 0*/ )
 {
-  this->output_variables_[name] = ParserVariableHandle( new ParserVariable(name,type,flags) );
+  this->output_variables_[ name ] = ParserVariableHandle( new ParserVariable( name, type, flags ) );
 }
 
 void ParserProgram::get_input_variables( ParserVariableList& var_list )

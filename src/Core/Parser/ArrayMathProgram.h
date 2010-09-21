@@ -64,9 +64,11 @@ public:
 
   bool add_source( std::string& name, std::vector< bool >* array );
   bool add_source( std::string& name, std::vector< double >* array );
+  bool add_source( std::string& name, DataBlock* data_block );
 
   bool add_sink( std::string& name, std::vector< bool >* array );
   bool add_sink( std::string& name, std::vector< double >* array );
+  bool add_sink( std::string& name, DataBlock* data_block );
 
   void resize_const_variables( size_t sz );
   void resize_single_variables( size_t sz );

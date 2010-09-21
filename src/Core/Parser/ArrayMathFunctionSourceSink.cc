@@ -27,6 +27,7 @@
  */
 
 // Core includes
+#include <Core/DataBlock/DataBlock.h>
 #include <Core/Parser/ArrayMathFunctionCatalog.h>
 
 namespace ArrayMathFunctions
@@ -78,6 +79,31 @@ bool get_scalar_ad( Core::ArrayMathProgramCode& pc )
   return true;
 }
 
+bool get_scalar_data( Core::ArrayMathProgramCode& pc )
+{
+  // Destination 
+  double* data0 = pc.get_variable( 0 );
+
+  // Source
+  Core::DataBlock& data1( *( pc.get_data_block( 1 ) ) );
+  // One virtual call to get the data
+
+  double* data0_end = data0 + pc.get_size();
+  Core::index_type idx = pc.get_index();
+
+  double val;
+  while( data0 != data0_end ) 
+  {
+    val = data1.get_data_at( idx );
+    idx++;
+
+    *data0 = val; 
+    data0++;
+  }
+
+  return true;
+}
+
 //--------------------------------------------------------------------------
 // Sink functions
 
@@ -119,6 +145,26 @@ bool to_double_array_s( Core::ArrayMathProgramCode& pc )
   return true;
 }
 
+bool to_data_block_s( Core::ArrayMathProgramCode& pc )
+{
+  // Get the pointer to the DataBlock object where we need to store the data
+  Core::DataBlock& data0( *( pc.get_data_block( 0 ) ) );
+  double* data1 = pc.get_variable( 1 );
+
+  double* data1_end = data1 + ( pc.get_size() );
+  Core::index_type idx = pc.get_index();
+
+  while ( data1 != data1_end ) 
+  {
+    data0.set_data_at( idx, *data1 ); 
+    idx++; 
+    data1++;
+  }
+
+  return true;
+}
+
+
 } //end namespace
 
 namespace Core
@@ -129,10 +175,12 @@ void InsertSourceSinkArrayMathFunctionCatalog( ArrayMathFunctionCatalogHandle& c
   // Source functions
   catalog->add_function( ArrayMathFunctions::get_scalar_ad, "get_scalar$AD", "S" );
   catalog->add_function( ArrayMathFunctions::get_scalar_ab, "get_scalar$AB", "S" );
+  catalog->add_function( ArrayMathFunctions::get_scalar_data, "get_scalar$DATA", "S" );
 
   // Sink functions
   catalog->add_function( ArrayMathFunctions::to_bool_array_s, "to_bool_array$S", "AB" );
   catalog->add_function( ArrayMathFunctions::to_double_array_s, "to_double_array$S", "AD" );
+  catalog->add_function( ArrayMathFunctions::to_data_block_s, "to_data_block$S", "DATA" );
 }
 
 } // end namespace

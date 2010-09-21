@@ -33,6 +33,7 @@
 #include <vector>
 
 // Core includes
+#include <Core/DataBlock/DataBlock.h>
 #include <Core/Parser/ParserFWD.h> // Needed for index_type
 #include <Core/Utils/StackBasedVector.h>
 
@@ -87,6 +88,12 @@ public:
     this->variables_[ j ] = array;
   }
 
+  inline void set_data_block( size_t j, DataBlock* data_block )
+  {
+    if ( j >= this->variables_.size() ) this->variables_.resize( j + 1 );
+    this->variables_[ j ] = reinterpret_cast< void* >( data_block ); 
+  }
+
   // Set the index, we keep this in the list so the program knows which
   // element we need to process.
   inline void set_index( index_type index )
@@ -120,6 +127,11 @@ public:
   inline std::vector< double >* get_double_array( size_t j )
   { 
     return reinterpret_cast< std::vector< double >* >( this->variables_[ j ] );
+  }
+
+  inline DataBlock* get_data_block( size_t j )
+  { 
+    return reinterpret_cast< DataBlock* >( this->variables_[ j ] );
   }
 
   // Get the current index

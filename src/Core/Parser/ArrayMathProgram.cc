@@ -49,6 +49,14 @@ bool ArrayMathProgram::add_source( std::string& name, std::vector< double >* arr
   return true;
 }
 
+bool ArrayMathProgram::add_source( std::string& name, DataBlock* data_block )
+{
+  ArrayMathProgramSource ps;
+  ps.set_data_block( data_block );
+  this->input_sources_[ name ] = ps;
+  return true;
+}
+
 bool ArrayMathProgram::add_sink( std::string& name, std::vector< bool >* array )
 {
   ArrayMathProgramSource ps;
@@ -61,6 +69,14 @@ bool ArrayMathProgram::add_sink( std::string& name, std::vector< double >* array
 {
   ArrayMathProgramSource ps;
   ps.set_double_array( array );
+  this->output_sinks_[ name ] = ps;
+  return true;
+}
+
+bool ArrayMathProgram::add_sink( std::string& name, DataBlock* data_block )
+{
+  ArrayMathProgramSource ps;
+  ps.set_data_block( data_block );
   this->output_sinks_[ name ] = ps;
   return true;
 }

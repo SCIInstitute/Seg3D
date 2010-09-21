@@ -133,7 +133,7 @@ bool ArrayMathInterpreter::translate( ParserProgramHandle& pprogram,
     {
       buffer_mem += 1;
     }
-    else if ( type == "AB" || type == "AD" )
+    else if ( type == "AB" || type == "AD" || type == "DATA" ) 
     {
       buffer_mem += 0;
     }
@@ -165,7 +165,7 @@ bool ArrayMathInterpreter::translate( ParserProgramHandle& pprogram,
       {
         buffer_mem += 1 * buffer_size;
       }
-      else if ( type == "AB" || type == "AD" )
+      else if ( type == "AB" || type == "AD" || type == "DATA" )
       {
         buffer_mem += 0;
       }
@@ -405,6 +405,20 @@ bool ArrayMathInterpreter::translate( ParserProgramHandle& pprogram,
           return false;
         }
       }
+      else if ( type == "DATA" )
+      {
+        mprogram->find_source( name, ps );
+        if ( ps.is_data_block() )
+        {
+          pc.set_data_block( i + 1, ps.get_data_block() );
+        }
+        else
+        {
+          error
+            = "INTERNAL ERROR - Variable is of DataBlock type, but given source is not a DataBlock.";
+          return false;
+        }
+      }
       else
       {
         error = "INTERNAL ERROR - Encountered unknown type.";
@@ -460,7 +474,7 @@ bool ArrayMathInterpreter::translate( ParserProgramHandle& pprogram,
       else
       {
         error
-            = "INTERNAL ERROR - Variable is of Mesh type, but given source is not a bool array.";
+            = "INTERNAL ERROR - Variable is of Mesh type, but given sink is not a bool array.";
         return false;
       }
     }
@@ -474,7 +488,21 @@ bool ArrayMathInterpreter::translate( ParserProgramHandle& pprogram,
       else
       {
         error
-            = "INTERNAL ERROR - Variable is of Mesh type, but given source is not a double array.";
+            = "INTERNAL ERROR - Variable is of Mesh type, but given sink is not a double array.";
+        return false;
+      }
+    }
+    else if ( type == "DATA" )
+    {
+      mprogram->find_sink( name, ps );
+      if ( ps.is_data_block() )
+      {
+        pc.set_data_block( 0, ps.get_data_block() );
+      }
+      else
+      {
+        error
+          = "INTERNAL ERROR - Variable is of DataBlock type, but given sink is not a DataBlock.";
         return false;
       }
     }
@@ -594,6 +622,20 @@ bool ArrayMathInterpreter::translate( ParserProgramHandle& pprogram,
           return false;
         }
       }
+      else if ( type == "DATA" )
+      {
+        mprogram->find_sink( name, ps );
+        if ( ps.is_data_block() )
+        {
+          pc.set_data_block( 0, ps.get_data_block() );
+        }
+        else
+        {
+          error
+            = "INTERNAL ERROR - Variable is of DataBlock type, but given source is not a DataBlock.";
+          return false;
+        }
+      }
       else
       {
         error = "INTERNAL ERROR - Encountered unknown type.";
@@ -653,6 +695,20 @@ bool ArrayMathInterpreter::translate( ParserProgramHandle& pprogram,
           {
             error
                 = "INTERNAL ERROR - Variable is of Mesh type, but given source is not a double array.";
+            return false;
+          }
+        }
+        else if ( type == "DATA" )
+        {
+          mprogram->find_source( name, ps );
+          if ( ps.is_data_block() )
+          {
+            pc.set_data_block( i + 1, ps.get_data_block() );
+          }
+          else
+          {
+            error
+              = "INTERNAL ERROR - Variable is of DataBlock type, but given source is not a DataBlock.";
             return false;
           }
         }
@@ -728,6 +784,16 @@ bool ArrayMathInterpreter::add_double_array_source( ArrayMathProgramHandle& ppro
   return pprogram->add_source( name, array );
 }
 
+bool ArrayMathInterpreter::add_data_block_source( ArrayMathProgramHandle& pprogram, 
+  std::string& name, DataBlockHandle data_block, std::string& error )
+{
+  if ( !( create_program( pprogram, error ) ) ) 
+  {
+    return false;
+  }
+  return pprogram->add_source( name, data_block.get() );
+}
+
 bool ArrayMathInterpreter::add_bool_array_sink( ArrayMathProgramHandle& pprogram,
     std::string& name, std::vector< bool >* array, std::string& error )
 {
@@ -746,6 +812,16 @@ bool ArrayMathInterpreter::add_double_array_sink( ArrayMathProgramHandle& pprogr
     return false;
   }
   return pprogram->add_sink( name, array );
+}
+
+bool ArrayMathInterpreter::add_data_block_sink( ArrayMathProgramHandle& pprogram, 
+  std::string& name, DataBlockHandle data_block, std::string& error )
+{
+  if ( !( create_program( pprogram, error ) ) )
+  {
+    return false;
+  }
+  return pprogram->add_sink( name, data_block.get() );
 }
 
 bool ArrayMathInterpreter::set_array_size( ArrayMathProgramHandle& pprogram, size_type array_size )

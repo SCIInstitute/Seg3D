@@ -47,7 +47,6 @@ bool ArrayMathProgramSource::is_bool_array()
   return this->bool_array_ != 0;
 }
 
-
 void ArrayMathProgramSource::set_double_array( std::vector< double >* array )
 {
   this->double_array_ = array;
@@ -61,6 +60,21 @@ std::vector< double >* ArrayMathProgramSource::get_double_array()
 bool ArrayMathProgramSource::is_double_array()
 {
   return this->double_array_ != 0;
+}
+
+void ArrayMathProgramSource::set_data_block( DataBlock* data_block )
+{
+  this->data_block_ = data_block;
+}
+
+DataBlock* ArrayMathProgramSource::get_data_block()
+{
+  return this->data_block_;
+}
+
+bool ArrayMathProgramSource::is_data_block()
+{
+  return this->data_block_ != 0;
 }
 
 } // end namespace
