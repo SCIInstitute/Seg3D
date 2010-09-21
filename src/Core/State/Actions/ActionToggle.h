@@ -26,8 +26,8 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef CORE_STATE_ACTIONS_ACTIONSET_H
-#define CORE_STATE_ACTIONS_ACTIONSET_H
+#ifndef CORE_STATE_ACTIONS_ACTIONTOGGLE_H
+#define CORE_STATE_ACTIONS_ACTIONTOGGLE_H
 
 #include <Core/Action/Action.h>
 #include <Core/Interface/Interface.h>

@@ -274,13 +274,24 @@ bool MaskDataBlockManager::Create( GridTransform grid_transform, MaskDataBlockHa
 }
 
 template< class T >
-bool ConvertToMaskInternal( DataBlockHandle data, MaskDataBlockHandle& mask )
+bool ConvertToMaskInternal( DataBlockHandle data, MaskDataBlockHandle& mask, bool invert )
 {
   T* data_ptr = reinterpret_cast<T*>( data->get_data() );
   
   unsigned char* mask_ptr = mask->get_mask_data();
-  unsigned char mask_value = mask->get_mask_value();
-  unsigned char not_mask_value = ~( mask->get_mask_value() );
+  unsigned char mask_value;
+  unsigned char not_mask_value;
+
+  if ( invert )
+  {
+    not_mask_value = mask->get_mask_value();
+    mask_value = ~( mask->get_mask_value() );
+  }
+  else
+  {
+    mask_value = mask->get_mask_value();
+    not_mask_value = ~( mask->get_mask_value() );
+  }
   
   size_t size = data->get_size();
   size_t size8 = size & ~(0x7);
@@ -304,7 +315,7 @@ bool ConvertToMaskInternal( DataBlockHandle data, MaskDataBlockHandle& mask )
 }
 
 bool MaskDataBlockManager::Convert( DataBlockHandle data, 
-  GridTransform grid_transform, MaskDataBlockHandle& mask)
+  GridTransform grid_transform, MaskDataBlockHandle& mask, bool invert )
 {
   if ( !( MaskDataBlockManager::Instance()->create( grid_transform, mask ) ) )
   {
@@ -320,21 +331,21 @@ bool MaskDataBlockManager::Convert( DataBlockHandle data,
   switch( data->get_data_type() )
   {
     case DataType::CHAR_E:
-      return ConvertToMaskInternal<signed char>( data, mask );
+      return ConvertToMaskInternal<signed char>( data, mask, invert );
     case DataType::UCHAR_E:
-      return ConvertToMaskInternal<unsigned char>( data, mask );
+      return ConvertToMaskInternal<unsigned char>( data, mask, invert );
     case DataType::SHORT_E:
-      return ConvertToMaskInternal<short>( data, mask );
+      return ConvertToMaskInternal<short>( data, mask, invert );
     case DataType::USHORT_E:
-      return ConvertToMaskInternal<unsigned short>( data, mask );
+      return ConvertToMaskInternal<unsigned short>( data, mask, invert );
     case DataType::INT_E:
-      return ConvertToMaskInternal<int>( data, mask );
+      return ConvertToMaskInternal<int>( data, mask, invert );
     case DataType::UINT_E:
-      return ConvertToMaskInternal<unsigned int>( data, mask );
+      return ConvertToMaskInternal<unsigned int>( data, mask, invert );
     case DataType::FLOAT_E:
-      return ConvertToMaskInternal<float>( data, mask );
+      return ConvertToMaskInternal<float>( data, mask, invert );
     case DataType::DOUBLE_E:
-      return ConvertToMaskInternal<double>( data, mask );
+      return ConvertToMaskInternal<double>( data, mask, invert );
   }
 
   return false;
@@ -421,7 +432,7 @@ bool MaskDataBlockManager::ConvertLabel( DataBlockHandle data,
 
 
 template< class T>
-bool ConvertToDataInternal( MaskDataBlockHandle mask, DataBlockHandle& data )
+bool ConvertToDataInternal( MaskDataBlockHandle mask, DataBlockHandle& data, bool invert )
 {
   MaskDataBlock::lock_type lock( mask->get_mutex( ) );
 
@@ -432,8 +443,8 @@ bool ConvertToDataInternal( MaskDataBlockHandle mask, DataBlockHandle& data )
     GetDataType( reinterpret_cast< T* >( 0 ) ) );
   T* data_ptr = reinterpret_cast< T* >( data->get_data() );
   
-  const T on = static_cast<T>( 1 );
-  const T off = static_cast<T>( 0 );
+  const T on = static_cast<T>( invert?0:1 );
+  const T off = static_cast<T>( invert?1:0 );
   size_t size = data->get_size();
   size_t size8 = size & ~(0x7);
 
@@ -457,26 +468,26 @@ bool ConvertToDataInternal( MaskDataBlockHandle mask, DataBlockHandle& data )
 }
 
 bool MaskDataBlockManager::Convert( MaskDataBlockHandle mask, DataBlockHandle& data,
-  DataType data_type )
+  DataType data_type, bool invert )
 {
   switch( data_type )
   {
     case DataType::CHAR_E:
-      return ConvertToDataInternal<signed char>( mask, data );
+      return ConvertToDataInternal<signed char>( mask, data, invert );
     case DataType::UCHAR_E:
-      return ConvertToDataInternal<unsigned char>( mask, data );
+      return ConvertToDataInternal<unsigned char>( mask, data, invert );
     case DataType::SHORT_E:
-      return ConvertToDataInternal<short>( mask, data );
+      return ConvertToDataInternal<short>( mask, data, invert );
     case DataType::USHORT_E:
-      return ConvertToDataInternal<unsigned short>( mask, data );
+      return ConvertToDataInternal<unsigned short>( mask, data, invert );
     case DataType::INT_E:
-      return ConvertToDataInternal<int>( mask, data );
+      return ConvertToDataInternal<int>( mask, data, invert );
     case DataType::UINT_E:
-      return ConvertToDataInternal<unsigned int>( mask, data );
+      return ConvertToDataInternal<unsigned int>( mask, data, invert );
     case DataType::FLOAT_E:
-      return ConvertToDataInternal<float>( mask, data );
+      return ConvertToDataInternal<float>( mask, data, invert );
     case DataType::DOUBLE_E:
-      return ConvertToDataInternal<double>( mask, data );
+      return ConvertToDataInternal<double>( mask, data, invert );
   } 
   return false;
 }

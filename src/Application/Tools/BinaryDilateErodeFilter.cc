@@ -31,6 +31,9 @@
 #include <Application/Tools/BinaryDilateErodeFilter.h>
 #include <Application/Layer/Layer.h>
 #include <Application/LayerManager/LayerManager.h>
+#include <Application/Filters/Actions/ActionDilateFilter.h>
+#include <Application/Filters/Actions/ActionErodeFilter.h>
+#include <Application/Filters/Actions/ActionDilateErodeFilter.h>
 
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL( Seg3D, BinaryDilateErodeFilter )
@@ -42,14 +45,39 @@ BinaryDilateErodeFilter::BinaryDilateErodeFilter( const std::string& toolid ) :
   SingleTargetTool( Core::VolumeType::MASK_E, toolid )
 {
   // Need to set ranges and default values for all parameters
-  this->add_state( "dilate", this->dilate_state_, 1, 1, 100, 1 );
-  this->add_state( "erode", this->erode_state_, 1, 1, 100, 1 );
+  this->add_state( "dilate", this->dilate_state_, 1, 1, 20, 1 );
+  this->add_state( "erode", this->erode_state_, 1, 1, 20, 1 );
   this->add_state( "replace", this->replace_state_, false );
 }
 
 BinaryDilateErodeFilter::~BinaryDilateErodeFilter()
 {
   disconnect_all();
+}
+
+void BinaryDilateErodeFilter::execute_dilateerode( Core::ActionContextHandle context )
+{
+  ActionDilateErodeFilter::Dispatch( context,
+    this->target_layer_state_->get(),
+    this->replace_state_->get(),
+    this->dilate_state_->get(),
+    this->erode_state_->get() );
+}
+
+void BinaryDilateErodeFilter::execute_dilate( Core::ActionContextHandle context )
+{
+  ActionDilateFilter::Dispatch( context,
+    this->target_layer_state_->get(),
+    this->replace_state_->get(),
+    this->dilate_state_->get() );
+}
+
+void BinaryDilateErodeFilter::execute_erode( Core::ActionContextHandle context )
+{
+  ActionErodeFilter::Dispatch( context,
+    this->target_layer_state_->get(),
+    this->replace_state_->get(),
+    this->erode_state_->get() );
 }
 
 } // end namespace Seg3D

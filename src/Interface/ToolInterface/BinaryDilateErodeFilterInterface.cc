@@ -79,8 +79,7 @@ bool BinaryDilateErodeFilterInterface::build_widget( QFrame* frame )
   this->private_->ui_.dialateHLayout_bottom->addWidget( this->private_->dilate_ );
   
   // Step 2 - get a pointer to the tool
-  ToolHandle base_tool_ = tool();
-  BinaryDilateErodeFilter* tool = dynamic_cast< BinaryDilateErodeFilter* > ( base_tool_.get() );
+  BinaryDilateErodeFilter* tool = dynamic_cast< BinaryDilateErodeFilter* > ( this->tool().get() );
   
   // Step 3 - connect the gui to the tool through the QtBridge
   QtUtils::QtBridge::Connect( this->private_->ui_.target_layer_, 
@@ -93,7 +92,11 @@ bool BinaryDilateErodeFilterInterface::build_widget( QFrame* frame )
     tool->dilate_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.replaceCheckBox, 
     tool->replace_state_ );
-  QtUtils::QtBridge::Enable( this->private_->ui_.runFilterButton,
+  QtUtils::QtBridge::Enable( this->private_->ui_.dilateButton,
+    tool->valid_target_state_ );
+  QtUtils::QtBridge::Enable( this->private_->ui_.erodeButton,
+    tool->valid_target_state_ );
+  QtUtils::QtBridge::Enable( this->private_->ui_.dilateerodeButton,
     tool->valid_target_state_ );
 
   // Step 4 - Qt connections
@@ -104,21 +107,35 @@ bool BinaryDilateErodeFilterInterface::build_widget( QFrame* frame )
       this->private_->ui_.target_layer_, SLOT( setDisabled( bool ) ) );
   }
 
-  this->connect( this->private_->ui_.runFilterButton, 
-    SIGNAL( clicked() ), this, SLOT( execute_filter() ) );
+  this->connect( this->private_->ui_.dilateerodeButton, 
+    SIGNAL( clicked() ), this, SLOT( dilateerode_filter() ) );
+
+  this->connect( this->private_->ui_.dilateButton, 
+    SIGNAL( clicked() ), this, SLOT( dilate_filter() ) );
+
+  this->connect( this->private_->ui_.erodeButton, 
+    SIGNAL( clicked() ), this, SLOT( erode_filter() ) );
   
   return true;
 
 } // end build_widget
 
-void BinaryDilateErodeFilterInterface::execute_filter()
+void BinaryDilateErodeFilterInterface::dilateerode_filter()
 {
-  ToolHandle base_tool_ = tool();
-  BinaryDilateErodeFilter* tool =
-    dynamic_cast< BinaryDilateErodeFilter* > ( base_tool_.get() );
+  BinaryDilateErodeFilter* typed_tool = dynamic_cast< BinaryDilateErodeFilter* > ( tool().get() );
+  typed_tool->execute_dilateerode( Core::Interface::GetWidgetActionContext() );
+}
 
-//  ActionBinaryDilateErode::Dispatch( tool->target_layer_state_->export_to_string(), 
-//    tool->dilate_state_->get(), tool->erode_state_->get(), tool->replace_state_->get() ); 
+void BinaryDilateErodeFilterInterface::dilate_filter()
+{
+  BinaryDilateErodeFilter* typed_tool = dynamic_cast< BinaryDilateErodeFilter* > ( tool().get() );
+  typed_tool->execute_dilate( Core::Interface::GetWidgetActionContext() );
+}
+
+void BinaryDilateErodeFilterInterface::erode_filter()
+{
+  BinaryDilateErodeFilter* typed_tool = dynamic_cast< BinaryDilateErodeFilter* > ( tool().get() );
+  typed_tool->execute_erode( Core::Interface::GetWidgetActionContext() );
 }
 
 } // end namespace Seg3D

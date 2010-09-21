@@ -108,7 +108,14 @@
              <number>0</number>
             </property>
             <item>
-             <widget class="QComboBox" name="target_group_"/>
+             <widget class="QComboBox" name="target_group_">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
             </item>
            </layout>
           </widget>

@@ -48,17 +48,26 @@ class BinaryDilateErodeFilterInterface : public ToolWidget
 {
 Q_OBJECT
 
+// -- Constructor/destructor --
 public:
   BinaryDilateErodeFilterInterface();
   virtual ~BinaryDilateErodeFilterInterface();
+
+// -- create interface --
+public:
+  // BUILD_WIDGET:
+  // This function builds the actual GUI
   virtual bool build_widget( QFrame* frame );
 
+// -- run filter --
 private Q_SLOTS:
-  void execute_filter();
+  void dilateerode_filter();
+  void dilate_filter();
+  void erode_filter();
 
+// -- filter internals --
 private:
     boost::shared_ptr< BinaryDilateErodeFilterInterfacePrivate > private_;
-
 
 };
 

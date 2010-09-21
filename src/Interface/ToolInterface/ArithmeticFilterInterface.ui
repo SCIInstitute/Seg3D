@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>253</width>
-    <height>491</height>
+    <height>493</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -425,6 +425,12 @@
     <layout class="QVBoxLayout" name="verticalLayout_5">
      <item>
       <widget class="QPushButton" name="execute_button_">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="text">
         <string>Execute</string>
        </property>

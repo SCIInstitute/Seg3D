@@ -51,8 +51,14 @@ SET(APPLICATION_FILTERS_ACTIONS_SRCS
   Actions/ActionConfidenceConnectedFilter.cc
   Actions/ActionCurvatureAnisotropicDiffusionFilter.h
   Actions/ActionCurvatureAnisotropicDiffusionFilter.cc
+  Actions/ActionDilateFilter.h
+  Actions/ActionDilateFilter.cc
+  Actions/ActionDilateErodeFilter.h
+  Actions/ActionDilateErodeFilter.cc
   Actions/ActionDiscreteGaussianFilter.h
   Actions/ActionDiscreteGaussianFilter.cc
+  Actions/ActionErodeFilter.h
+  Actions/ActionErodeFilter.cc
   Actions/ActionGradientMagnitudeFilter.h
   Actions/ActionGradientMagnitudeFilter.cc
   Actions/ActionHistogramEqualizationFilter.h

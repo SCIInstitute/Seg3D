@@ -1199,6 +1199,35 @@ bool Viewer::key_press_event( int key, int modifiers )
       }
       return true;
     }
+
+    case Core::Key::KEY_V_E:
+    {
+      Core::ActionSet::Dispatch( Core::Interface::GetKeyboardActionContext(), 
+        this->view_mode_state_, Viewer::VOLUME_C ); 
+      return true;
+    }
+
+    case Core::Key::KEY_X_E:
+    {
+      Core::ActionSet::Dispatch( Core::Interface::GetKeyboardActionContext(), 
+        this->view_mode_state_, Viewer::SAGITTAL_C ); 
+      return true;
+    }
+
+    case Core::Key::KEY_Y_E:
+    {
+      Core::ActionSet::Dispatch( Core::Interface::GetKeyboardActionContext(), 
+        this->view_mode_state_, Viewer::CORONAL_C );  
+      return true;
+    }     
+
+    case Core::Key::KEY_Z_E:
+    {
+      Core::ActionSet::Dispatch( Core::Interface::GetKeyboardActionContext(), 
+        this->view_mode_state_, Viewer::AXIAL_C );  
+      return true;
+    }     
+
   }
   // function wasn't handled, hence return false.
   return false;

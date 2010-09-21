@@ -39,7 +39,7 @@ class BinaryDilateErodeFilter : public SingleTargetTool
 
 SEG3D_TOOL(
 SEG3D_TOOL_NAME( "BinaryDilateErodeFilter", "Grow and Shrink segmentations" )
-SEG3D_TOOL_MENULABEL( "Binary Dialate -> Erode" )
+SEG3D_TOOL_MENULABEL( "Binary Dilate -> Erode" )
 SEG3D_TOOL_MENU( "filter_mask_to_mask" )
 SEG3D_TOOL_SHORTCUT_KEY( "Alt+Shift+E" )
 SEG3D_TOOL_URL( "http://seg3d.org/" )
@@ -51,12 +51,25 @@ public:
 
   // -- state --
 public:
+  // How many iterations for dilating 
   Core::StateRangedIntHandle dilate_state_;
 
+  // How many iterations for eroding 
   Core::StateRangedIntHandle erode_state_;
 
+  // Whether to replace the input layer with the output layer
   Core::StateBoolHandle replace_state_;
+  
+public:
 
+  // Execute the dilate -> erode action
+  void execute_dilateerode( Core::ActionContextHandle context );
+  
+  // Execute the dilate action 
+  void execute_dilate( Core::ActionContextHandle context );
+  
+  // Execute the erode action
+  void execute_erode( Core::ActionContextHandle context );
 };
 
 } // end namespace

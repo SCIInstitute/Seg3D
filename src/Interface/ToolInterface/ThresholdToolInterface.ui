@@ -61,14 +61,18 @@ QWidget#threshold_histogram_{
       <string>Target Layer</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_4">
-      <property name="spacing">
-       <number>6</number>
-      </property>
       <property name="margin">
        <number>4</number>
       </property>
       <item>
-       <widget class="QComboBox" name="target_layer_"/>
+       <widget class="QComboBox" name="target_layer_">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QCheckBox" name="use_active_layer_">
@@ -91,9 +95,6 @@ QWidget#threshold_histogram_{
       <string>Upper Threshold</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
-      <property name="spacing">
-       <number>6</number>
-      </property>
       <property name="margin">
        <number>4</number>
       </property>
@@ -111,9 +112,6 @@ QWidget#threshold_histogram_{
       <string>Lower Threshold</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
-      <property name="spacing">
-       <number>6</number>
-      </property>
       <property name="margin">
        <number>4</number>
       </property>

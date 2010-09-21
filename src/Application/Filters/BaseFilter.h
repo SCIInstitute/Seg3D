@@ -37,7 +37,8 @@
 #include <Core/Utils/Runnable.h>
 #include <Core/Volume/DataVolume.h>
 #include <Core/Volume/MaskVolume.h>
- 
+#include <Core/DataBlock/MaskDataBlockManager.h> 
+
 // Application includes
 #include <Application/Layer/DataLayer.h> 
 #include <Application/Layer/MaskLayer.h> 
