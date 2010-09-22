@@ -30,92 +30,78 @@
 #include <boost/filesystem.hpp>
 
 // Application includes
-#include <Application/LayerManager/Actions/ActionExportSegmentation.h>
+#include <Application/LayerManager/Actions/ActionExportLayer.h>
 #include <Application/LayerIO/LayerIO.h>
 #include <Application/LayerManager/LayerManager.h>
 
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
-CORE_REGISTER_ACTION( Seg3D, ExportSegmentation )
+CORE_REGISTER_ACTION( Seg3D, ExportLayer )
 
 namespace Seg3D
 {
 
-bool ActionExportSegmentation::validate( Core::ActionContextHandle& context )
+bool ActionExportLayer::validate( Core::ActionContextHandle& context )
 {
   // first we validate the path for saving the segmentation
   boost::filesystem::path segmentation_path( this->file_path_.value() );
-  if ( !( boost::filesystem::exists ( segmentation_path ) ) )
+  if ( !( boost::filesystem::exists ( segmentation_path.parent_path() ) ) )
   {
     context->report_error( std::string( "The path '" ) + this->file_path_.value() +
       "' does not exist." );
     return false;
   }
-  
-  // next we validate the layers
-  std::vector< std::string > masks_vector = Core::SplitString( this->masks_.value(), "|" );
-  for( int i = 1; i < static_cast< int >( masks_vector.size() ); ++i )
-  {
-    std::vector< std::string > mask_name = Core::SplitString( masks_vector[ i ], "," );
-    if( !( LayerManager::Instance()->get_layer_by_name( mask_name[ 0 ] ) ) )
-    {
-      context->report_error( std::string( "The mask '" ) + mask_name[ 0 ] +
-        "' does not exist." );
-      return false;
-    }
-  }
 
   return true; // validated
 }
 
-bool ActionExportSegmentation::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
+bool ActionExportLayer::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
-  std::string message = std::string( "Exporting your segmentation..." );
+  LayerExporterMode mode = LayerExporterMode::INVALID_E;
+  ImportFromString( this->mode_.value(), mode );
+
+
+  std::string message = std::string( "Exporting your selected layers." );
     
   Core::ActionProgressHandle progress = 
     Core::ActionProgressHandle( new Core::ActionProgress( message ) );
 
   progress->begin_progress_reporting();
+    
+  boost::filesystem::path filename_and_path = boost::filesystem::path( this->file_path_.value() );
+  std::string filename_without_extension = filename_and_path.filename();
+  filename_without_extension = filename_without_extension.substr( 0, 
+    filename_without_extension.find_last_of( "." ) );
 
-  std::vector< std::string > masks_vector = Core::SplitString( this->masks_.value(), "|" );
+  this->layer_exporter_.handle()->export_layer( mode, 
+    filename_and_path.parent_path().string(), filename_without_extension );
   
-  LayerManager::Instance()->export_segmentation( masks_vector, this->file_path_.value(), 
-    this->segmentation_name_.value(), this->single_file_.value() );
+  //LayerManager::Instance()->export_layer( this->file_path_.value() );
 
   progress->end_progress_reporting();
 
   return true;
 }
 
-Core::ActionHandle ActionExportSegmentation::Create( const std::string& masks, 
-  const std::string& file_path, bool single_file  )
+Core::ActionHandle ActionExportLayer::Create( const LayerExporterHandle& exporter, 
+  LayerExporterMode mode, const std::string& file_path  )
 {
   // Create new action
-  ActionExportSegmentation* action = new ActionExportSegmentation;
+  ActionExportLayer* action = new ActionExportLayer;
   
-  if( single_file )
-  {
-    action->file_path_.value() = boost::filesystem::path( file_path ).parent_path().string();
-    action->segmentation_name_.value() = boost::filesystem::path( file_path ).filename();
-  }
-  else
-  {
-    action->file_path_.value() = file_path;
-    action->segmentation_name_.value() = "unused";
-  }
-  
-  action->masks_.value() = masks;
-  action->single_file_.value() = single_file;
+  action->layer_exporter_.handle() = exporter;
+  action->mode_.value()     = ExportToString(mode);
+  action->file_path_.value() = file_path;
   
   // Post the new action
   return Core::ActionHandle( action );
 }
 
-void ActionExportSegmentation::Dispatch( Core::ActionContextHandle context, 
-  const std::string& masks, const std::string& file_path, bool single_file )
+void ActionExportLayer::Dispatch( Core::ActionContextHandle context, 
+  const LayerExporterHandle& exporter, LayerExporterMode mode, const std::string& file_path )
 {
-  Core::ActionDispatcher::PostAction( Create( masks, file_path, single_file ), context );
+  Core::ActionDispatcher::PostAction( Create( exporter, mode, file_path ), context );
 }
   
 } // end namespace Seg3D

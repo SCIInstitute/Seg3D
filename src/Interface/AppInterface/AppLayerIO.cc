@@ -36,6 +36,8 @@
 
 // Application includes
 #include <Application/LayerIO/LayerIO.h>
+#include <Application/LayerManager/LayerManager.h>
+#include <Application/LayerManager/Actions/ActionExportLayer.h>
 
 // Interface includes
 #include <Interface/AppInterface/LayerImporterWidget.h>
@@ -146,7 +148,7 @@ void AppLayerIO::ImportSeries( QMainWindow* main_window )
       file_list.at( 0 ).toStdString() + std::string("'.");
 
     QMessageBox message_box( main_window );
-    message_box.setWindowTitle( "Import Layer..." );
+    message_box.setWindowTitle( "Import Layer Error." );
     message_box.addButton( QMessageBox::Ok );
     message_box.setIcon( QMessageBox::Critical );
     message_box.setText( QString::fromStdString( error_message ) );
@@ -202,18 +204,54 @@ void AppLayerIO::ImportSeries( QMainWindow* main_window )
   
 void AppLayerIO::ExportLayer( QMainWindow* main_window )
 {
-  QStringList filters;
-  filters << "DICOM files (*.dcm)"
-      << "NRRD files (*.nrrd)";
+  std::vector< LayerHandle > layer_handles;
+  layer_handles.push_back( LayerManager::Instance()->get_active_layer() );
+  if( !layer_handles[ 0 ] ) return;
 
-  QFileDialog export_dialog( main_window, QString( "Export Layer ... " ) );
-  export_dialog.setNameFilters( filters );
-  export_dialog.setViewMode( QFileDialog::Detail );
-  export_dialog.setAcceptMode( QFileDialog::AcceptSave );
-  if( export_dialog.exec() )
+  if( layer_handles[ 0 ]->type() != Core::VolumeType::DATA_E )
   {
-    //DO STUFF
+    std::string error_message = 
+      std::string( "ERROR: A Data layer is not set as the active layer" );
+
+    QMessageBox message_box( main_window );
+    message_box.setWindowTitle( "Export Layer Error." );
+    message_box.addButton( QMessageBox::Ok );
+    message_box.setIcon( QMessageBox::Critical );
+    message_box.setText( QString::fromStdString( error_message ) );
+    message_box.exec();
+    return;
   }
+
+  boost::filesystem::path desktop_path;
+  Core::Application::Instance()->get_user_desktop_directory( desktop_path );
+  
+  QString filename = QFileDialog::getSaveFileName( main_window, "Export Data Layer As... ",
+    QString::fromStdString( desktop_path.string() ),"NRRD files (*.nrrd);;DICOM files (*.dcm)" );
+    
+  std::string extension = boost::filesystem::path( filename.toStdString() ).extension(); 
+  std::string importername;
+  
+  if( extension == ".nrrd" ) importername = "NRRD Exporter";
+  else if( extension == ".dcm" ) importername = "ITK Exporter";
+  else return;
+    
+  LayerExporterHandle exporter;
+  if( ! ( LayerIO::Instance()->create_exporter( exporter, layer_handles, importername, extension ) ) )
+  {
+    std::string error_message = std::string("ERROR: No exporter is available for file '") + 
+      filename.toStdString() + std::string("'.");
+
+    QMessageBox message_box( main_window );
+    message_box.setWindowTitle( "Import Layer..." );
+    message_box.addButton( QMessageBox::Ok );
+    message_box.setIcon( QMessageBox::Critical );
+    message_box.setText( QString::fromStdString( error_message ) );
+    message_box.exec();
+    return;
+  }
+    
+  ActionExportLayer::Dispatch( Core::Interface::GetWidgetActionContext(), exporter,
+    LayerExporterMode::DATA_E, filename.toStdString() );
 }
 
 void AppLayerIO::ExportSegmentation( QMainWindow* main_window )

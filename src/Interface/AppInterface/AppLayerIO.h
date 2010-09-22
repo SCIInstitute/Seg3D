@@ -49,10 +49,12 @@ public:
   // Import a data volume from a series of files using the ITK importer.
   static void ImportSeries( QMainWindow* main_window );
   
-  // EXPORT:
+  // EXPORTLAYER:
   // Export the current layer to file
   static void ExportLayer( QMainWindow* main_window );
   
+  // EXPORTSEGMENTATION:
+  // Export selected mask layers to file
   static void ExportSegmentation( QMainWindow* main_window );
 };
 

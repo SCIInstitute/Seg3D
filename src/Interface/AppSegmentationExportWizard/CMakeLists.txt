@@ -98,6 +98,7 @@ TARGET_LINK_LIBRARIES(Interface_AppSegmentationExportWizard
                       Core_ActionManager
                       Interface_AppInterface
                       Application_ProjectManager
+                      Application_LayerIO
                   Application_LayerManager
                       ${QT_LIBRARIES} 
                       ${SCI_BOOST_LIBRARY})

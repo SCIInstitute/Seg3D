@@ -26,13 +26,13 @@
  DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef APPLICATION_LAYERIO_LAYERIMPORTERINFO_H
-#define APPLICATION_LAYERIO_LAYERIMPORTERINFO_H
+#ifndef APPLICATION_LAYERIO_LAYEREXPORTERINFO_H
+#define APPLICATION_LAYERIO_LAYEREXPORTERINFO_H
 
 
 // Application includes
 #include <Application/Layer/Layer.h>
-#include <Application/LayerIO/LayerImporter.h>
+#include <Application/LayerIO/LayerExporter.h>
 
 
 namespace Seg3D
@@ -40,90 +40,85 @@ namespace Seg3D
 
 // ---- Auxilary Classes -----
 
-class LayerImporterBuilderBase;
-typedef boost::shared_ptr<LayerImporterBuilderBase> LayerImporterBuilderBaseHandle;
+class LayerExporterBuilderBase;
+typedef boost::shared_ptr<LayerExporterBuilderBase> LayerExporterBuilderBaseHandle;
 
-class LayerImporterBuilderBase
+class LayerExporterBuilderBase
 {
 public:
   // ensure we can delete the builder correctly
-  virtual ~LayerImporterBuilderBase()
+  virtual ~LayerExporterBuilderBase()
   {
   }
   
   // the function call to build the object
-  virtual LayerImporterHandle build( const std::string& filename ) = 0;
+  virtual LayerExporterHandle build( std::vector< LayerHandle >& layers ) = 0;
 };
 
 
-// LAYERIMPORTERBUILDER:
-// Auxillary class to build the layer importer class
+// LAYEREXPORTERBUILDER:
+// Auxiliary class to build the layer exporter class
 
-template < class LAYERIMPORTER >
-class LayerImporterBuilder: public LayerImporterBuilderBase
+template < class LAYEREXPORTER >
+class LayerExporterBuilder: public LayerExporterBuilderBase
 {
 public:
   // ensure we can delete the builder correctly
-  virtual ~LayerImporterBuilder< LAYERIMPORTER >()
+  virtual ~LayerExporterBuilder< LAYEREXPORTER >()
   {
   }
 
   // The actual builder call
-  virtual LayerImporterHandle build( const std::string& filename )
+  virtual LayerExporterHandle build( std::vector< LayerHandle >& layers )
   { 
-    return LayerImporterHandle( new LAYERIMPORTER( filename ));
+    return LayerExporterHandle( new LAYEREXPORTER( layers ));
   }
 };
 
 // -------------------------------------------------
-// LAYERIMPORTERINFO
-// Class that records the information of the different importers that are available and auxillary
-// functions that allow in the decision which importer to use.
+// LAYEREXPORTERINFO
+// Class that records the information of the different exporters that are available and auxiliary
+// functions that allow in the decision which exporter to use.
 
 // Class declaration
-class LayerImporterInfo;
-typedef boost::shared_ptr<LayerImporterInfo> LayerImporterInfoHandle;
+class LayerExporterInfo;
+typedef boost::shared_ptr<LayerExporterInfo> LayerExporterInfoHandle;
 
 // Class definition
-class LayerImporterInfo 
+class LayerExporterInfo 
 {
   // -- constructor/destructor --
 public:
-  LayerImporterInfo( LayerImporterBuilderBaseHandle builder,
+  LayerExporterInfo( LayerExporterBuilderBaseHandle builder,
     const std::string name, 
-    const std::string file_type_string,
-    const unsigned int priority );
+    const std::string file_type_string );
   
-  ~LayerImporterInfo();
+  ~LayerExporterInfo();
 
   // BUILD:
-  // Build the importer
-  LayerImporterHandle build( const std::string& filename ) const;
+  // Build the exporter
+  LayerExporterHandle build( std::vector< LayerHandle >& layers ) const;
 
   // NAME:
-  // Get the name of the importer
+  // Get the name of the exporter
   std::string name() const;
 
   // CONVERTS_FILE_TYPE:
-  // Check whether this importer deals with a specific file type
+  // Check whether this exporter deals with a specific file type
   bool converts_file_type( const std::string& file_type ) const;
   
   // FILE_TYPES:
   // Get the string that defines the allowed file types
   std::string file_type_string() const;
   
-  // PRIORITY:
-  // Get the priority of the importer
-  unsigned int priority() const;
-
 private:
-  // Object that knows how to build the importer
-  LayerImporterBuilderBaseHandle builder_;
+  // Object that knows how to build the exporter
+  LayerExporterBuilderBaseHandle builder_;
   
-  // Name of the importer
+  // Name of the exporter
   std::string name_;
   
-  // The file types the importer will handle
+  // The file types the exporter will handle
   std::vector<std::string> file_types_; 
   
   // String with name and file types, to be used as a filter in a file selector
@@ -132,10 +127,8 @@ private:
   // Any file type, e.g. dicom readers tend to use no extension
   bool any_type_;
   
-  // The priority of thid importer
-  unsigned int priority_;
 };
 
 } // end namespace seg3D
 
-#endif
+#endif //APPLICATION_LAYERIO_LAYEREXPORTERINFO_H

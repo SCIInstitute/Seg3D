@@ -35,7 +35,9 @@
 // Application includes
 #include <Application/Layer/Layer.h>
 #include <Application/LayerIO/LayerImporter.h>
+#include <Application/LayerIO/LayerExporter.h>
 #include <Application/LayerIO/LayerImporterInfo.h>
+#include <Application/LayerIO/LayerExporterInfo.h>
 
 namespace Seg3D
 {
@@ -55,8 +57,9 @@ class LayerIO
   // -- typedefs --
 public:
   typedef boost::mutex mutex_type;
-  typedef boost::unique_lock<mutex_type> lock_type;
-  typedef std::vector<std::string> importer_types_type;
+  typedef boost::unique_lock< mutex_type > lock_type;
+  typedef std::vector< std::string > importer_types_type;
+  typedef std::vector< std::string > exporter_types_type;
 
 
   // -- constructor / destructor --
@@ -70,7 +73,7 @@ public:
 
   // REGISTER_IMPORTER:
   // Register an importer that abstracts importing a file in a certain file format
-  template <class IMPORTER>
+  template < class IMPORTER >
   void register_importer()
   {
     // Lock the factory
@@ -78,11 +81,28 @@ public:
 
     // Generate a new information class
     LayerImporterInfoHandle info( new LayerImporterInfo( 
-      LayerImporterBuilderBaseHandle( new LayerImporterBuilder<IMPORTER> ),
+      LayerImporterBuilderBaseHandle( new LayerImporterBuilder< IMPORTER > ),
       IMPORTER::Name(), IMPORTER::FileTypes(), IMPORTER::Priority() ) );
 
     // Insert the information block into the importer list
     importer_list_.push_back( info );
+  }
+  
+  // REGISTER_EXPORTER:
+  // Register an importer that abstracts importing a file in a certain file format
+  template < class EXPORTER >
+  void register_exporter()
+  {
+    // Lock the factory
+    lock_type lock( mutex_ );
+
+    // Generate a new information class
+    LayerExporterInfoHandle info( new LayerExporterInfo( 
+      LayerExporterBuilderBaseHandle( new LayerExporterBuilder< EXPORTER > ),
+      EXPORTER::Name(), EXPORTER::FileTypes() ) );
+
+    // Insert the information block into the exporter list
+    exporter_list_.push_back( info );
   }
 
 
@@ -91,11 +111,16 @@ public:
   // GET_IMPORTER_TYPES:
   // Get the names of all the importers that are available
   importer_types_type get_importer_types();
+  exporter_types_type get_exporter_types();
 
 private:
   // The internal list of importers
-  typedef std::vector<LayerImporterInfoHandle> importer_list_type;
+  typedef std::vector< LayerImporterInfoHandle > importer_list_type;
   importer_list_type importer_list_;
+  
+  // The internal list of exporters
+  typedef std::vector< LayerExporterInfoHandle > exporter_list_type;
+  exporter_list_type exporter_list_;
 
 
   // -- Locking interface --
@@ -113,15 +138,23 @@ private:
 public: 
   // CREATE_IMPORTER:
   // This function creates a new importer by checking the file extension and it will return
-  // the approriate importer. If an importer name is given as well, it will restrain the 
+  // the appropriate importer. If an importer name is given as well, it will restrain the 
   // search to that specific name of importer
   bool create_importer( const std::string& filename, LayerImporterHandle& importer,
-              const std::string importername = "");
+    const std::string importername = "");
+    
+  // CREATE_EXPORTER:
+  // This function creates a new exporter by checking the file extension and it will return
+  // the appropriate exporter. If an exporter name is given as well, it will restrain the 
+  // search to that specific name of exporter           
+  bool create_exporter( LayerExporterHandle& exporter, std::vector< LayerHandle >& layers, 
+    const std::string importername = "", const std::string extension = "" );
 
 
   // -- Signals for indicating when a file is imported or exported --
 public:
   typedef boost::signals2::signal< void( LayerImporterHandle ) > layerimporter_signal_type;
+  typedef boost::signals2::signal< void( LayerExporterHandle ) > layerexporter_signal_type;
 
   // LAYER_IMPORT_START_SIGNAL:
   // Indicates that a layer import will start
@@ -130,6 +163,14 @@ public:
   // LAYER_IMPORT_END_SIGNAL:
   // Indicates that a layer import has ended
   layerimporter_signal_type layer_import_end_signal_;
+  
+  // LAYER_EXPORT_START_SIGNAL:
+  // Indicates that a layer export will start
+  layerexporter_signal_type layer_export_start_signal_;
+
+  // LAYER_EXPORT_END_SIGNAL:
+  // Indicates that a layer export has ended
+  layerexporter_signal_type layer_export_end_signal_;
   
 };
 
@@ -145,6 +186,19 @@ namespace Core\
   {\
     LayerIO::Instance()->register_importer<name>();\
   }\
+}
+
+// Macro for adding function that registers a new exporter
+// Note these functions will be called in the init call of the program.
+
+#define SCI_REGISTER_EXPORTER(namesp, name)\
+  namespace Core\
+{\
+  using namespace namesp;\
+  void register_##name()\
+{\
+  LayerIO::Instance()->register_exporter<name>();\
+}\
 }
 
 } // end namespace seg3D

@@ -32,8 +32,12 @@
 ##################################################
 
 SET(APPLICATION_LAYERIO_SRCS
+  LayerExporter.h
+  LayerExporter.cc
   LayerImporter.h
   LayerImporter.cc
+  LayerExporterInfo.h
+  LayerExporterInfo.cc
   LayerImporterInfo.h
   LayerImporterInfo.cc
   LayerIO.h
@@ -53,10 +57,17 @@ SET(APPLICATION_LAYERIO_IMPORTERS_SRCS
   VFFLayerImporter.h
   VFFLayerImporter.cc
 )
+SET(APPLICATION_LAYERIO_EXPORTERS_SRCS
+  ITKLayerExporter.h
+  ITKLayerExporter.cc
+  NrrdLayerExporter.h
+  NrrdLayerExporter.cc
+)
 
 CORE_ADD_LIBRARY(Application_LayerIO ${APPLICATION_LAYERIO_SRCS}
       ${APPLICATION_LAYERIO_IMPORTERS_SRCS}
-            ${APPLICATION_LAYERIO_ACTIONS_SRCS} )
+      ${APPLICATION_LAYERIO_EXPORTERS_SRCS}
+      ${APPLICATION_LAYERIO_ACTIONS_SRCS} )
             
 TARGET_LINK_LIBRARIES(Application_LayerIO
           Core_Utils
@@ -73,5 +84,6 @@ TARGET_LINK_LIBRARIES(Application_LayerIO
 
 # Register actions and importers
 REGISTER_LIBRARY_AND_CLASSES(Application_LayerIO 
-  ${APPLICATION_LAYERIO_ACTIONS_SRCS}
-  ${APPLICATION_LAYERIO_IMPORTERS_SRCS})
+      ${APPLICATION_LAYERIO_ACTIONS_SRCS}
+      ${APPLICATION_LAYERIO_IMPORTERS_SRCS}
+      ${APPLICATION_LAYERIO_EXPORTERS_SRCS})

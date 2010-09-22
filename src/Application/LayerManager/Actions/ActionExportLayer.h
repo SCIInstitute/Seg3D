@@ -26,41 +26,38 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_LAYERMANAGER_ACTIONS_ACTIONEXPORTSEGMENTATION_H
-#define APPLICATION_LAYERMANAGER_ACTIONS_ACTIONEXPORTSEGMENTATION_H
+#ifndef APPLICATION_LAYERMANAGER_ACTIONS_ACTIONEXPORTLAYER_H
+#define APPLICATION_LAYERMANAGER_ACTIONS_ACTIONEXPORTLAYER_H
 
 // Core includes
 #include <Core/Action/Actions.h>
 #include <Core/Interface/Interface.h>
 
-// Application includes
-#include <Application/LayerIO/LayerImporter.h>
+#include <Application/LayerIO/LayerExporter.h>
 
 namespace Seg3D
 {
   
-class ActionExportSegmentation : public Core::Action
+class ActionExportLayer : public Core::Action
 {
 
 CORE_ACTION( 
-  CORE_ACTION_TYPE( "ExportSegmentation", "This action imports a layer into the layer manager.")
-  CORE_ACTION_ARGUMENT( "segmentationname", "The name to be used for the segmentation." )
-  CORE_ACTION_ARGUMENT( "masks", "A comma delimited list of layers to export as a segmentation." )
-  CORE_ACTION_ARGUMENT( "file_path", "A path where the segmentation should be exported to." )
-  CORE_ACTION_ARGUMENT( "single_file", "A bool describing whether or not the masks should be saved as a single file" )
+  CORE_ACTION_TYPE( "ExportLayer", "This action exports a layer to file.")
+  CORE_ACTION_ARGUMENT( "file_path", "A path, including the name of the file where the layer should be exported to." )
+  CORE_ACTION_KEY( "mode", "data", "The mode to use: data, single_mask, bitplane_mask, or label_mask.")
+  CORE_ACTION_KEY( "exporter", "", "Optional name for a specific exporter." )
 )
 
   // -- Constructor/Destructor --
 public:
-  ActionExportSegmentation()
+  ActionExportLayer()
   {
-    add_argument( this->segmentation_name_ );
-    add_argument( this->masks_ );
     add_argument( this->file_path_ );
-    add_argument( this->single_file_ );
+    add_key( this->mode_ );
+    add_key( this->exporter_ );
   }
   
-  virtual ~ActionExportSegmentation()
+  virtual ~ActionExportLayer()
   {
   }
   
@@ -71,30 +68,31 @@ public:
   
   // -- Action parameters --
 private:
-
-  // The name for the segmentation
-  Core::ActionParameter< std::string > segmentation_name_;
-
-  // A comma delimited list of mask names to export
-  Core::ActionParameter< std::string > masks_;
-
-  // Where the segmentation should be saved
+  // Where the layer should be exported
   Core::ActionParameter< std::string > file_path_;
   
-  Core::ActionParameter< bool > single_file_;
-
+  // How should the file be exported
+  Core::ActionParameter< std::string > mode_;
+  
+  // Which type of exporter should we use
+  Core::ActionParameter< std::string > exporter_;
+  
+  // Short cut to the layer exporter that has already loaded the data if the file
+  // was read through the GUI
+  Core::ActionCachedHandle<LayerExporterHandle> layer_exporter_;
+  
   // -- Dispatch this action from the interface --
 public:
   // CREATE:
   // Create action that exports a segmentation
-  static Core::ActionHandle Create( const std::string& masks, const std::string& file_path, 
-    bool single_file );
+  static Core::ActionHandle Create( const LayerExporterHandle& exporter, LayerExporterMode mode,
+    const std::string& file_path );
 
   // DISPATCH:
   // To avoid reading a file twice, this action has a special option, so it can take an
   // importer that has already loaded the file. This prevents it from being read twice
-  static void Dispatch( Core::ActionContextHandle context, const std::string& masks, 
-    const std::string& file_path, bool single_file );
+  static void Dispatch( Core::ActionContextHandle context, const LayerExporterHandle& exporter, 
+    LayerExporterMode mode, const std::string& file_path );
   
 };
   

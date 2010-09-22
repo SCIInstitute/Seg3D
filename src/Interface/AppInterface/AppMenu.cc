@@ -70,7 +70,6 @@ AppMenu::AppMenu( QMainWindow* parent ) :
   // menus
   QMenu* file_menu = menubar->addMenu( tr( "&File" ) );
   QMenu* edit_menu = menubar->addMenu( tr( "&Edit" ) );
-  QMenu* layer_menu = menubar->addMenu( tr( "&Layer" ) );
   QMenu* view_menu = menubar->addMenu( "View" );
   QMenu* tool_menu = menubar->addMenu( "Tools" );
   QMenu* filter_menu = menubar->addMenu( "Filters" );
@@ -78,7 +77,6 @@ AppMenu::AppMenu( QMainWindow* parent ) :
 
   create_file_menu( file_menu );
   create_edit_menu( edit_menu );
-  create_layer_menu( layer_menu );
   create_view_menu( view_menu );
   create_tool_menu( tool_menu );
   create_filter_menu( filter_menu );
@@ -115,6 +113,34 @@ void AppMenu::create_file_menu( QMenu* qmenu )
   QtUtils::QtBridge::Connect( qaction, 
     boost::bind( &ActionSaveSession::Dispatch, 
     Core::Interface::GetWidgetActionContext(), false, "" ) );
+    
+  qmenu->addSeparator();
+    
+  qaction = qmenu->addAction( tr( "Import Layer(s) From File(s)... ") );
+  qaction->setShortcut( tr( "Ctrl+Shift+O" ) );
+  qaction->setToolTip( tr( "Import new layer(s) into the layer manager from a file(s)." ) );
+  QtUtils::QtBridge::Connect( qaction, 
+    boost::bind( &AppLayerIO::ImportFiles,  this->main_window_ ) );
+
+  qaction = qmenu->addAction( tr( "Import Volume From Image Series... ") );
+  qaction->setShortcut( tr( "Ctrl+Shift+I" ) );
+  qaction->setToolTip( tr( "Import new data layer into the layer manager from a series." ) );
+  QtUtils::QtBridge::Connect( qaction, 
+    boost::bind( &AppLayerIO::ImportSeries,  this->main_window_ ) );
+
+  qmenu->addSeparator();
+
+  qaction = qmenu->addAction( tr( "&Export Segmentation..." ) );
+  qaction->setShortcut( tr( "Ctrl+E" ) );
+  qaction->setToolTip( tr( "Export masks as a segmentation." ) );
+  QtUtils::QtBridge::Connect( qaction, 
+    boost::bind( &AppLayerIO::ExportSegmentation, this->main_window_ ) );
+
+  qaction = qmenu->addAction( tr( "Export Active Data Layer...") );
+  qaction->setShortcut( tr( "Ctrl+Shift+S" ) );
+  qaction->setToolTip( tr( "Export the active data layer to file." ) );
+  QtUtils::QtBridge::Connect( qaction, 
+    boost::bind( &AppLayerIO::ExportLayer, this->main_window_ ) );
   
   qmenu->addSeparator();
 
@@ -138,37 +164,6 @@ void AppMenu::create_edit_menu( QMenu* qmenu )
       Core::Interface::GetWidgetActionContext(),
       ViewerManager::Instance()->active_viewer_state_, all_viewers ) );
 }
-
-void AppMenu::create_layer_menu( QMenu* qmenu )
-{
-  QAction* qaction;
-  qaction = qmenu->addAction( tr( "Import Layer(s) From File(s)... ") );
-  qaction->setShortcut( tr( "Ctrl+Shift+O" ) );
-  qaction->setToolTip( tr( "Import new layer(s) into the layer manager from a file(s)" ) );
-  QtUtils::QtBridge::Connect( qaction, 
-    boost::bind( &AppLayerIO::ImportFiles,  this->main_window_ ) );
-
-  qaction = qmenu->addAction( tr( "Import Volume From Image Series... ") );
-  qaction->setShortcut( tr( "Ctrl+Shift+I" ) );
-  qaction->setToolTip( tr( "Import new data layer into the layer manager from a series" ) );
-  QtUtils::QtBridge::Connect( qaction, 
-    boost::bind( &AppLayerIO::ImportSeries,  this->main_window_ ) );
-
-  qmenu->addSeparator();
-
-  qaction = qmenu->addAction( tr( "&Export Segmentation..." ) );
-  qaction->setShortcut( tr( "Ctrl+E" ) );
-  qaction->setToolTip( tr( "Export masks as a segmentation." ) );
-  QtUtils::QtBridge::Connect( qaction, 
-    boost::bind( &AppLayerIO::ExportSegmentation, this->main_window_ ) );
-
-  qaction = qmenu->addAction( tr( "Export Layer...") );
-  qaction->setShortcut( tr( "Ctrl+Shift+S" ) );
-  qaction->setToolTip( tr( "Export the active layer" ) );
-  QtUtils::QtBridge::Connect( qaction, 
-    boost::bind( &AppLayerIO::ExportLayer, this->main_window_ ) );
-}
-
 
 void AppMenu::create_view_menu( QMenu* qmenu )
 {

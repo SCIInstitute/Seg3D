@@ -50,8 +50,8 @@ SET(APPLICATION_LAYERMANAGER_ACTIONS_SRCS
   Actions/ActionDeleteIsosurface.cc
   Actions/ActionDeleteLayers.h
   Actions/ActionDeleteLayers.cc
-  Actions/ActionExportSegmentation.h
-  Actions/ActionExportSegmentation.cc
+  Actions/ActionExportLayer.h
+  Actions/ActionExportLayer.cc
   Actions/ActionImportLayer.h
   Actions/ActionImportLayer.cc
   Actions/ActionMoveGroupAbove.h

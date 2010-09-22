@@ -48,7 +48,7 @@ namespace Seg3D
 
 class ITKLayerImporter : public LayerImporter
 {
-  SCI_IMPORTER_TYPE( "ITK Importer", ".dcm;.tiff;.png", 5)
+  SCI_IMPORTER_TYPE("ITK Importer", ".dcm;.tiff;.png", 5)
 
   // -- Constructor/Destructor --
 public:

@@ -253,7 +253,7 @@ INCLUDE(CMake/RegisterClass.cmake)
 #  Interface - Seg3D interface
 #  Main - Main function of the application
 #
-# Auxillart layers:
+# Auxillary layers:
 #  QtUtils - binding QtWidgets and abstract
 #            class around Qt implementations
 #  Resources - Icons, images, etc.

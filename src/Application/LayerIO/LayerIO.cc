@@ -62,6 +62,20 @@ LayerIO::importer_types_type LayerIO::get_importer_types()
   return importer_types;
 }
 
+LayerIO::importer_types_type LayerIO::get_exporter_types()
+{
+  lock_type lock( mutex_ ); 
+  std::vector<std::string> exporter_types;
+  exporter_types.push_back( "All Importers (*)" );
+
+  for ( size_t j = 0; j< this->exporter_list_.size(); j++ )
+  {
+    exporter_types.push_back( this->exporter_list_[j]->file_type_string() );
+  }
+
+  return exporter_types;
+}
+
 bool LayerIO::create_importer( const std::string& filename, 
   LayerImporterHandle& importer,
   const std::string importername )
@@ -76,7 +90,7 @@ bool LayerIO::create_importer( const std::string& filename,
   std::transform( extension.begin(), extension.end(), extension.begin(), tolower );
 
   // Step (3): determine whether the file exists
-  if ( ! ( boost::filesystem::exists( full_filename ) ) ) return false;
+  if ( ! ( boost::filesystem::exists( full_filename.parent_path() ) ) ) return false;
   
   // Step (4): Get the right importer
   // Lock the factory
@@ -126,5 +140,23 @@ bool LayerIO::create_importer( const std::string& filename,
   }
   else return false;
 }
+
+
+bool LayerIO::create_exporter( LayerExporterHandle& exporter, std::vector< LayerHandle >& layers, 
+  const std::string importername /*= ""*/, const std::string extension /*= "" */ )
+{
+  for (size_t j = 0; j < this->exporter_list_.size(); j ++ )
+  {
+    if ( ( this->exporter_list_[j]->name() == importername ||
+      this->exporter_list_[j]->file_type_string() == importername ) &&
+      this->exporter_list_[j]->converts_file_type( extension ) )
+    {
+      exporter = this->exporter_list_[j]->build( layers );
+      return true;
+    }
+  }
+  return false;
+}
+
 
 } // end namespace seg3D

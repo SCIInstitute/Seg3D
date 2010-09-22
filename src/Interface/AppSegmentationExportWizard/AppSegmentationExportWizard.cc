@@ -35,10 +35,10 @@
 
 
 // Application includes
+#include <Application/LayerIO/LayerIO.h>
 #include <Application/Layer/LayerGroup.h>
-#include <Application/ProjectManager/ProjectManager.h>
 #include <Application/LayerManager/LayerManager.h>
-#include <Application/LayerManager/Actions/ActionExportSegmentation.h>
+#include <Application/LayerManager/Actions/ActionExportLayer.h>
 
 
 namespace Seg3D
@@ -49,7 +49,6 @@ AppSegmentationExportWizard::AppSegmentationExportWizard( QWidget *parent ) :
 {
   this->addPage( new SegmentationSelectionPage( this ) );
     this->addPage( new SegmentationSummaryPage( this ) );
-    
   this->setPixmap( QWizard::BackgroundPixmap, QPixmap( QString::fromUtf8( 
     ":/Images/Symbol.png" ) ) );
   
@@ -242,6 +241,11 @@ bool SegmentationSelectionPage::validatePage()
       | QFileDialog::DontResolveSymlinks );
   }
   
+  if( !boost::filesystem::exists( boost::filesystem::path( filename.toStdString() ) ) )
+  {
+    return false;
+  }
+  
   this->file_name_lineedit_->setText( filename );
   
   setField( "maskList", selected_masks );
@@ -357,10 +361,45 @@ bool SegmentationSummaryPage::validatePage()
   }
   
   bool single_file = ( field( "singleFile" ).toString().toStdString() == "true" ); 
+  
   boost::filesystem::path file_name_and_path = field( "segmentationPath" ).toString().toStdString();
   
-  ActionExportSegmentation::Dispatch( Core::Interface::GetWidgetActionContext(),
-    selected_masks.toStdString(), file_name_and_path.string(), single_file );
+  std::vector< LayerHandle > layers;
+  std::vector< double > values;
+  for( int i = 0; i < this->masks_.size(); ++i )
+  {
+    layers.push_back( LayerManager::Instance()->get_layer_by_name( 
+      this->masks_[ i ]->get_label().toStdString() ) );
+    values.push_back( this->masks_[ i ]->get_value() );
+  }
+  
+  LayerExporterHandle exporter;
+  if( ! ( LayerIO::Instance()->create_exporter( exporter, layers, "NRRD Exporter", ".nrrd" ) ) )
+  {
+    std::string error_message = std::string("ERROR: No importer is available for file '") + 
+      file_name_and_path.string() + std::string("'.");
+
+    QMessageBox message_box( this );
+    message_box.setWindowTitle( "Import Layer..." );
+    message_box.addButton( QMessageBox::Ok );
+    message_box.setIcon( QMessageBox::Critical );
+    message_box.setText( QString::fromStdString( error_message ) );
+    message_box.exec();
+    return false;
+  
+  }
+
+  if( single_file )
+  { 
+    exporter->set_label_layer_values( values );
+    ActionExportLayer::Dispatch( Core::Interface::GetWidgetActionContext(), exporter,
+      LayerExporterMode::LABEL_MASK_E, file_name_and_path.string() );
+  }
+  else
+  {
+    ActionExportLayer::Dispatch( Core::Interface::GetWidgetActionContext(), exporter,
+      LayerExporterMode::SINGLE_MASK_E, file_name_and_path.string() );
+  }
     
   return true;
 }

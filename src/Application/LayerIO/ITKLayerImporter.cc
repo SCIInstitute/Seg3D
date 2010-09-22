@@ -33,7 +33,6 @@
 #include "itkGDCMSeriesFileNames.h"
 #include "itkImageSeriesReader.h"
 #include "gdcmException.h"
-#include "itkVTKImageIO.h"
 
 // Boost Includes
 #include <boost/lexical_cast.hpp>
@@ -45,8 +44,6 @@
 
 // Application includes
 #include <Application/LayerIO/ITKLayerImporter.h>
-
-// Application includes
 #include <Application/Layer/DataLayer.h> 
 #include <Application/LayerManager/LayerManager.h>
 
