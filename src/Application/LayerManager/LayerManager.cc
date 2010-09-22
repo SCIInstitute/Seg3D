@@ -388,6 +388,19 @@ void LayerManager::get_layers( std::vector< LayerHandle > &vector_of_layers )
   }
 }
 
+void LayerManager::get_layers_in_group( LayerGroupHandle group ,
+  std::vector< LayerHandle > &vector_of_layers )
+{
+    lock_type lock( this->get_mutex() );
+    
+  for( layer_list_type::iterator j =  group->layer_list_.begin(); 
+    j != group->layer_list_.end(); ++j )
+  {
+    vector_of_layers.push_back( ( *j ) );
+  }
+}
+
+
 void LayerManager::delete_layers( LayerGroupHandle group )
 {
   bool active_layer_changed = false;
@@ -681,6 +694,29 @@ void LayerManager::get_layer_names( std::vector< LayerIDNamePair >& layer_names,
     }
   }
 }
+
+
+void LayerManager::get_layer_names_from_group( LayerGroupHandle group,
+  std::vector< LayerIDNamePair >& layer_names, Core::VolumeType type )
+{
+  lock_type lock( this->get_mutex() );
+
+  std::vector< LayerHandle > layers;
+  LayerManager::Instance()->get_layers_in_group( group, layers );
+  size_t num_of_layers = layers.size();
+  for ( size_t i = 0; i < num_of_layers; i++ )
+  {
+    // NOTE: Only if a layer is valid do we save it in a session. An example of an invalid
+    // layer is for instance a layer that was just created, but hasn't finished processing
+    // its data.
+    if ( layers[ i ]->is_valid() && ( layers[ i ]->type() & type ) )
+    {
+      layer_names.push_back( std::make_pair( layers[ i ]->get_layer_id(), 
+        layers[ i ]->get_layer_name() ) );
+    }
+  }
+}
+
 
 bool LayerManager::pre_save_states( Core::StateIO& state_io )
 {

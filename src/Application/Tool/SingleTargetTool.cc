@@ -57,10 +57,15 @@ public:
   // the tool components run on the same thread.
   SingleTargetTool* tool_;
   
+  std::vector<Core::StateLabeledOptionHandle> dependent_layer_states_;
+  std::vector<Core::VolumeType> dependent_layer_types_;
+  
   // -- handle updates from layermanager --
   void handle_layers_changed();
   void handle_use_active_layer_changed( bool use_active_layer );
   void handle_layer_name_changed( std::string layer_id );
+  
+  void update_dependent_layers();
   
   // -- handle updates from state variables --
   void handle_active_layer_changed( LayerHandle layer );
@@ -72,6 +77,40 @@ public:
   {}
 };
 
+void SingleTargetToolPrivate::update_dependent_layers()
+{
+  if ( this->tool_->valid_target_state_->get()  )
+  {
+    // Fill in the new list and reset the option to the first one, if none of the options
+    // match the current one 
+    
+    for ( size_t j = 0;  j < this->dependent_layer_states_.size(); j++ )
+    {
+      // Create a list with the new options
+      std::vector< LayerIDNamePair > layer_names( 1, 
+        std::make_pair( Tool::NONE_OPTION_C, Tool::NONE_OPTION_C ) );
+      LayerHandle layer = LayerManager::Instance()->get_layer_by_id( 
+        this->tool_->target_layer_state_->get() );
+      if ( layer )
+      {
+        LayerManager::Instance()->get_layer_names_from_group( layer->get_layer_group(),
+          layer_names, this->dependent_layer_types_[ j ] );
+      }
+      // Insert this list
+      this->dependent_layer_states_[ j ]->set_option_list( layer_names );
+    }
+  }
+  else
+  {
+    // Reset the dependent layers to <none> as there is no valid option to choose
+    std::vector< LayerIDNamePair > layer_names( 1, 
+      std::make_pair( Tool::NONE_OPTION_C, Tool::NONE_OPTION_C ) );
+    for ( size_t j = 0;  j < this->dependent_layer_states_.size(); j++ )
+    {
+      this->dependent_layer_states_[ j ]->set_option_list( layer_names );
+    }   
+  }
+}
 
 void SingleTargetToolPrivate::handle_active_layer_changed( LayerHandle layer )
 {
@@ -80,10 +119,22 @@ void SingleTargetToolPrivate::handle_active_layer_changed( LayerHandle layer )
     return;
   }
 
-  this->tool_->valid_target_state_->set( ( layer->type() & this->target_type_ ) != 0 && 
-    layer->is_valid() );
-  this->tool_->target_layer_state_->set( this->tool_->valid_target_state_->get() ? 
-    layer->get_layer_id() : Tool::NONE_OPTION_C );
+  if ( ! layer )
+  {
+    // No active layer was returned: set the target layer to <none>
+    this->tool_->valid_target_state_->set( false );
+    this->tool_->target_layer_state_->set( Tool::NONE_OPTION_C );   
+    this->update_dependent_layers();
+  }
+  else
+  {
+    this->tool_->valid_target_state_->set( ( layer->type() & this->target_type_ ) != 0 && 
+      layer->is_valid() );
+    this->tool_->target_layer_state_->set( this->tool_->valid_target_state_->get() ? 
+      layer->get_layer_id() : Tool::NONE_OPTION_C );
+      
+    this->update_dependent_layers();
+  }
 }
 
 void SingleTargetToolPrivate::handle_use_active_layer_changed( bool use_active_layer )
@@ -95,6 +146,7 @@ void SingleTargetToolPrivate::handle_use_active_layer_changed( bool use_active_l
       ( layer->type() & this->target_type_ ) );
     this->tool_->target_layer_state_->set( this->tool_->valid_target_state_->get() ? 
       layer->get_layer_id() : Tool::NONE_OPTION_C );
+    this->update_dependent_layers();
   }
 }
 
@@ -108,6 +160,7 @@ void SingleTargetToolPrivate::handle_target_layer_changed( std::string layer_id 
     {
       this->tool_->target_layer_state_->set( active_layer->get_layer_id() );
       this->tool_->valid_target_state_->set( true );
+      this->update_dependent_layers();
       return;
     }
 
@@ -116,12 +169,14 @@ void SingleTargetToolPrivate::handle_target_layer_changed( std::string layer_id 
     {
       this->tool_->target_layer_state_->set( Tool::NONE_OPTION_C );
       this->tool_->valid_target_state_->set( false );
+      this->update_dependent_layers();
       return;
     }
   }
   else
   {
     this->tool_->valid_target_state_->set( layer_id != Tool::NONE_OPTION_C );
+    this->update_dependent_layers();
   }
 }
 
@@ -131,6 +186,7 @@ void SingleTargetToolPrivate::handle_layers_changed()
   layer_names.push_back( std::make_pair( Tool::NONE_OPTION_C, Tool::NONE_OPTION_C ) );
   LayerManager::Instance()->get_layer_names( layer_names, this->target_type_ );
   this->tool_->target_layer_state_->set_option_list( layer_names );
+  this->update_dependent_layers();
 }
 
 void SingleTargetToolPrivate::handle_layer_name_changed( std::string layer_id )
@@ -139,6 +195,16 @@ void SingleTargetToolPrivate::handle_layer_name_changed( std::string layer_id )
   if ( layer->type() & this->target_type_ )
   {
     this->handle_layers_changed();
+    return;
+  }
+  
+  for ( size_t j = 0; j < this->dependent_layer_types_.size(); j++ )
+  {
+    if ( layer->type() & this->dependent_layer_types_[ j ] )
+    {
+      this->handle_layers_changed();
+      return;
+    }   
   }
 }
 
@@ -197,5 +263,16 @@ SingleTargetTool::SingleTargetTool(  Core::VolumeType target_type, const std::st
 SingleTargetTool::~SingleTargetTool()
 {
 }
+
+void SingleTargetTool::add_dependent_layer_input( 
+  Core::StateLabeledOptionHandle dependent_layer_state, 
+  Core::VolumeType dependent_layer_type )
+{
+  this->private_->dependent_layer_states_.push_back( dependent_layer_state );
+  this->private_->dependent_layer_types_.push_back( dependent_layer_type );
+  
+  this->private_->update_dependent_layers();
+}
+
 
 } // end namespace Seg3D

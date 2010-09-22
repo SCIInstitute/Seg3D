@@ -44,20 +44,32 @@ class ConnectedComponentFilter : public SeedPointsTool
 {
 
 SEG3D_TOOL(
-SEG3D_TOOL_NAME( "ConnectedComponentFilter", "Find everything conndected to the seed points" )
+SEG3D_TOOL_NAME( "ConnectedComponentFilter", "Select all components connected to the seed points." )
 SEG3D_TOOL_MENULABEL( "Connected Component" )
 SEG3D_TOOL_MENU( "filter_mask_to_mask" )
 SEG3D_TOOL_SHORTCUT_KEY( "Alt+C" )
 SEG3D_TOOL_URL( "http://seg3d.org/" )
+SEG3D_TOOL_VERSION( "1" )
 )
 
+  // -- constructor/destructor --
 public:
   ConnectedComponentFilter( const std::string& toolid );
   virtual ~ConnectedComponentFilter();
 
-  // -- activate/deactivate tool --
-  virtual void activate();
-  virtual void deactivate();
+  // -- state --
+public:
+  // Whether the layer needs to be replaced
+  Core::StateBoolHandle replace_state_;
+  
+  // Whether to ue the seed points
+  Core::StateBoolHandle use_seeds_state_;
+  
+  // Layerid of the mask layer
+  Core::StateLabeledOptionHandle mask_state_;
+    
+  // Whether mask should be inverted in thois filter
+  Core::StateBoolHandle mask_invert_state_;
 
 private:
   ConnectedComponentFilterPrivateHandle private_;

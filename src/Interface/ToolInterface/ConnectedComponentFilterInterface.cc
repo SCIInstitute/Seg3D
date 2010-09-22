@@ -26,17 +26,18 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#include <Core/Interface/Interface.h>
+// QtGui includes
+#include "ui_ConnectedComponentFilterInterface.h"
 
-//Application Includes
+// Application includes
 #include <Application/Tools/ConnectedComponentFilter.h>
 
-//QtUtils Includes
+// QtUtils includes
 #include <QtUtils/Bridge/QtBridge.h>
 
-//Qt Gui Includes
+// Interaface includes
 #include <Interface/ToolInterface/ConnectedComponentFilterInterface.h>
-#include "ui_ConnectedComponentFilterInterface.h"
+
 
 SCI_REGISTER_TOOLINTERFACE( Seg3D, ConnectedComponentFilterInterface )
 
@@ -67,39 +68,41 @@ bool ConnectedComponentFilterInterface::build_widget( QFrame* frame )
   this->private_->ui_.setupUi( frame );
   
   //Step 2 - get a pointer to the tool
-  ToolHandle base_tool = tool();
-  ConnectedComponentFilter* tool = dynamic_cast< ConnectedComponentFilter* > ( base_tool.get() );
+  ConnectedComponentFilter* tool = 
+    dynamic_cast< ConnectedComponentFilter* > ( this->tool().get() );
 
     //Step 3 - connect the gui to the tool through the QtBridge
-  QtUtils::QtBridge::Connect( this->private_->ui_.target_, tool->target_layer_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.target_layer_, 
+    tool->target_layer_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.use_active_layer_, 
+    tool->use_active_layer_state_ );
+
   QtUtils::QtBridge::Connect( this->private_->ui_.clearSeedsButton, boost::bind( 
     &ConnectedComponentFilter::clear, tool, Core::Interface::GetWidgetActionContext() ) );
+  QtUtils::QtBridge::Connect( this->private_->ui_.use_seeds_, tool->use_seeds_state_ );
   
-  connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), this, SLOT( execute_filter() ) );
+  QtUtils::QtBridge::Connect( this->private_->ui_.mask_, tool->mask_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.invert_mask_, 
+    tool->mask_invert_state_ );
   
+  // Step 4 - Qt connections
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() ); 
+    this->private_->ui_.target_layer_->setDisabled( tool->use_active_layer_state_->get() );
+  
+    this->connect( this->private_->ui_.use_active_layer_, SIGNAL( toggled( bool ) ),
+      this->private_->ui_.target_layer_, SLOT( setDisabled( bool ) ) );
 
-  //Send a message to the log that we have finished with building the Connected Component Filter Interface
-  CORE_LOG_DEBUG("Finished building a Connected Component Filter Interface");
-  return ( true );
+    this->connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), 
+      this, SLOT( run_filter() ) );
+  } 
 
-} // end build_widget
-  
-void ConnectedComponentFilterInterface::enable_run_filter( bool valid )
-{
-  if( valid )
-    this->private_->ui_.runFilterButton->setEnabled( true );
-  else
-    this->private_->ui_.runFilterButton->setEnabled( false );
-}
-
-void ConnectedComponentFilterInterface::execute_filter()
-{
-  ToolHandle base_tool_ = tool();
-  ConnectedComponentFilter* tool =
-  dynamic_cast< ConnectedComponentFilter* > ( base_tool_.get() );
-  
-//  ActionConnectedComponent::Dispatch( tool->target_layer_state_->export_to_string() ); 
+  return true;
 }
   
+void ConnectedComponentFilterInterface::run_filter()
+{
+  tool()->execute( Core::Interface::GetWidgetActionContext() );
+}
 
 } // namespace Seg3D

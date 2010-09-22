@@ -37,7 +37,7 @@ namespace Seg3D
 class MedianFilter : public SingleTargetTool
 {
 SEG3D_TOOL(
-SEG3D_TOOL_NAME( "MedianFilter", "Filter for smoothing data" )
+SEG3D_TOOL_NAME( "MedianFilter", "Filter for smoothing data." )
 SEG3D_TOOL_MENULABEL( "Median" )
 SEG3D_TOOL_MENU( "filter_data_to_data" )
 SEG3D_TOOL_SHORTCUT_KEY( "Alt+M" )

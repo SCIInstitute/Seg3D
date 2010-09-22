@@ -90,6 +90,10 @@ public:
   // this function copies the layers into the vector that is passed
   void get_layers( std::vector< LayerHandle >& vector_of_layers );
   
+  // GET_LAYERS_IN_GROUP:
+  // this function copies the layers into the vector that is passed
+  void get_layers_in_group( LayerGroupHandle group, std::vector< LayerHandle > &vector_of_layers);
+  
   // CHECK_FOR_SAME_GROUP:
   // this function returns true if the layer id's that are passed are from layer's in the same
   // group
@@ -120,11 +124,15 @@ public:
   // This function returns a handle to the active layer
   LayerHandle get_active_layer();
   
-  // TODO:
-  // This function need some redesign
   // GET_LAYER_NAMES:
   // This function returns a vector of layer ID and name pairs of the specified layer type.
   void get_layer_names( std::vector< LayerIDNamePair >& layer_names, 
+    Core::VolumeType type = Core::VolumeType::ALL_E );
+
+  // GET_LAYER_NAMES:
+  // This function returns a vector of layer ID and name pairs of the specified layer type.
+  void get_layer_names_from_group( LayerGroupHandle group,
+    std::vector< LayerIDNamePair >& layer_names, 
     Core::VolumeType type = Core::VolumeType::ALL_E );
 
   // Layer Action Functions

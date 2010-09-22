@@ -107,6 +107,13 @@ int main( int argc, char **argv )
   // -- Setup the QT Interface Layer --
   if ( !( QtUtils::QtApplication::Instance()->setup( argc, argv ) ) ) return ( -1 );
 
+  // -- Warn user about being an alpha version --
+  
+  QMessageBox::information( 0, "Seg3D 2.0 ALPHA 1", 
+    "Seg3D 2.0 ALPHA 1\n\n"
+    "NOTE: This version of Seg3D is for Testing and Evaluation Only! "
+    "Compatibility with future releases of Seg3D 2.0 is NOT guaranteed."  );
+
   // -- Setup Application Interface Window --
   AppInterface* app_interface = new AppInterface;
 

@@ -52,13 +52,29 @@ void ConnectedComponentFilterPrivate::handle_seed_points_changed()
 }
 
 ConnectedComponentFilter::ConnectedComponentFilter( const std::string& toolid ) :
-  SeedPointsTool( Core::VolumeType::DATA_E, toolid ),
+  SeedPointsTool( Core::VolumeType::MASK_E, toolid ),
   private_( new ConnectedComponentFilterPrivate )
 { 
-  this->use_active_layer_state_->set( false );
-
+  // TODO: Can we move this to the SeedPointsTool
   this->add_connection( this->seed_points_state_->state_changed_signal_.connect( boost::bind( 
     &ConnectedComponentFilterPrivate::handle_seed_points_changed, this->private_.get() ) ) );
+
+  // Create an empty list of label options
+  std::vector< LayerIDNamePair > empty_list( 1, 
+    std::make_pair( Tool::NONE_OPTION_C, Tool::NONE_OPTION_C ) );
+
+  // Need to set ranges and default values for all parameters
+  this->add_state( "replace", this->replace_state_, false );
+
+  // Whether we use the seed points or not
+  this->add_state( "use_seeds", this->use_seeds_state_, true );
+
+  // Whether we use a mask to find which components to use
+  this->add_state( "mask", this->mask_state_, Tool::NONE_OPTION_C, empty_list );
+  this->add_dependent_layer_input( this->mask_state_, Core::VolumeType::MASK_E );
+  
+  // Whether that mask should be inverted
+  this->add_state( "invert_mask", this->mask_invert_state_, false );  
 }
 
 ConnectedComponentFilter::~ConnectedComponentFilter()
@@ -66,13 +82,6 @@ ConnectedComponentFilter::~ConnectedComponentFilter()
   this->disconnect_all();
 }
 
-void ConnectedComponentFilter::activate()
-{
-}
-
-void ConnectedComponentFilter::deactivate()
-{
-}
   
 } // end namespace Seg3D
 

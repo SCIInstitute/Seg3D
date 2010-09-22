@@ -60,6 +60,10 @@ public:
   // Whether a valid layer has been selected
   Core::StateBoolHandle valid_target_state_;
 
+  // Add a state whose input is linked to the target and needs to be of the same type
+  void add_dependent_layer_input( Core::StateLabeledOptionHandle dependent_layer_state, 
+    Core::VolumeType dependent_layer_type );
+
 private:
   SingleTargetToolPrivateHandle private_;
 

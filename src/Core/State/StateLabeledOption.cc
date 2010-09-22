@@ -223,6 +223,7 @@ void StateLabeledOption::set_option_list(  const std::vector< OptionLabelPair >&
   std::string old_value = this->private_->value_;
   size_t num_options = option_list.size();
   this->private_->option_list_.resize( num_options );
+
   bool found = false;
   for ( size_t i = 0; i < num_options; i++ )
   {
