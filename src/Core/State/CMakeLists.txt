@@ -59,6 +59,8 @@ SET(CORE_STATE_SRCS
   StateView3D.h
   StateVector.h
   State.h
+  BooleanStateGroup.h
+  BooleanStateGroup.cc
   )
 
 SET(CORE_STATE_ACTIONS_SRCS

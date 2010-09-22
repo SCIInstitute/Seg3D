@@ -84,6 +84,10 @@ public:
   // = Group visibility =
   std::vector< Core::StateBoolHandle > visibility_state_;
   Core::StateBoolHandle show_layers_state_;
+
+  Core::StatePointHandle dimensions_state_;
+  Core::StatePointHandle origin_state_;
+  Core::StatePointHandle spacing_state_;
   
   // -- Layers contained within group --
 protected:
@@ -164,10 +168,6 @@ private:
 public:
   // Options for the state of the menus that are open
   const static std::string NO_MENU_C;
-  const static std::string CROP_MENU_C;
-  const static std::string FLIP_ROTATE_MENU_C;
-  const static std::string RESAMPLE_MENU_C;
-  const static std::string TRANSFORM_MENU_C;
   const static std::string ISO_MENU_C;
   const static std::string DELETE_MENU_C;
 };

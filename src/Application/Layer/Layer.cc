@@ -52,9 +52,9 @@ const std::string Layer::IN_USE_C( "inuse" );
 
 const std::string Layer::NO_MENU_C( "none" );
 const std::string Layer::OPACITY_MENU_C( "opacity" );
-const std::string Layer::COLOR_MENU_C( "color" );
 const std::string Layer::CONTRAST_MENU_C( "contrast" );
 const std::string Layer::APPEARANCE_MENU_C( "appearance" );
+const std::string Layer::INFO_MENU_C( "information" );
 
 Layer::Layer( const std::string& name, bool creating ) :
   StateHandler( "layer",  true )
@@ -130,8 +130,9 @@ void Layer::initialize_states( const std::string& name, bool creating )
   this->add_state( "selected", selected_state_, false );
 
   // == Which of the sub-menus is being edited ==
-  this->add_state( "menu", menu_state_, NO_MENU_C, NO_MENU_C + "|" + OPACITY_MENU_C + 
-    "|" + COLOR_MENU_C + "|" + CONTRAST_MENU_C + "|" + APPEARANCE_MENU_C );
+  this->add_state( "menu", menu_state_, NO_MENU_C, NO_MENU_C + "|" + 
+    OPACITY_MENU_C + "|" + CONTRAST_MENU_C + 
+    "|" + APPEARANCE_MENU_C + "|" + INFO_MENU_C );
 
   // == The generation number of the data, or -1 if there is no data =
   this->add_state( "generation", this->generation_state_, -1 );

@@ -211,9 +211,9 @@ public:
   // Options for the state of the menus that are open in the layer manager
   const static std::string NO_MENU_C;
   const static std::string OPACITY_MENU_C;
-  const static std::string COLOR_MENU_C;
   const static std::string CONTRAST_MENU_C;
   const static std::string APPEARANCE_MENU_C;
+  const static std::string INFO_MENU_C;
 };
 
 } // end namespace Seg3D

@@ -38,13 +38,10 @@
 
 namespace Seg3D
 {
-  const std::string LayerGroup::NO_MENU_C( "none" );
-  const std::string LayerGroup::CROP_MENU_C( "crop" );
-  const std::string LayerGroup::FLIP_ROTATE_MENU_C( "flip/rotate" );
-  const std::string LayerGroup::RESAMPLE_MENU_C( "resample" );
-  const std::string LayerGroup::TRANSFORM_MENU_C( "transform" );
-  const std::string LayerGroup::ISO_MENU_C( "iso" );
-  const std::string LayerGroup::DELETE_MENU_C( "delete" );
+
+const std::string LayerGroup::NO_MENU_C( "none" );
+const std::string LayerGroup::ISO_MENU_C( "iso" );
+const std::string LayerGroup::DELETE_MENU_C( "delete" );
 
 LayerGroup::LayerGroup( Core::GridTransform grid_transform ) :
   StateHandler( "group", true )
@@ -52,11 +49,11 @@ LayerGroup::LayerGroup( Core::GridTransform grid_transform ) :
   this->grid_transform_ = grid_transform;
 
   // Need to set ranges and default values for all parameters
-  add_state( "menu", this->menu_state_, NO_MENU_C, NO_MENU_C + "|" + CROP_MENU_C + "|" + FLIP_ROTATE_MENU_C + 
-    "|" + RESAMPLE_MENU_C + "|" + TRANSFORM_MENU_C + "|" + ISO_MENU_C + "|" + DELETE_MENU_C );
+  this->add_state( "menu", this->menu_state_, NO_MENU_C, NO_MENU_C + "|" + 
+    ISO_MENU_C + "|" + DELETE_MENU_C );
     
   // = General state settings
-  add_state( "show_layers", this->show_layers_state_, true );
+  this->add_state( "show_layers", this->show_layers_state_, true );
 
   this->visibility_state_.resize( ViewerManager::Instance()->number_of_viewers() );
   for ( size_t i = 0; i < this->visibility_state_.size(); ++i )
@@ -64,7 +61,19 @@ LayerGroup::LayerGroup( Core::GridTransform grid_transform ) :
     this->add_state( "visible" + Core::ExportToString( i ), this->visibility_state_[ i ], true );
   }
   
-  add_state( "isosurface_quality", this->isosurface_quality_state_, "1.0", "1.0|0.5|0.25|0.125" );
+  this->add_state( "isosurface_quality", this->isosurface_quality_state_, 
+    "1.0", "1.0|0.5|0.25|0.125" );
+
+  Core::Point dimensions( static_cast< double>( grid_transform.get_nx() ), 
+    static_cast< double>( grid_transform.get_ny() ), 
+    static_cast< double>( grid_transform.get_nz() ) );
+  this->add_state( "dimensions", this->dimensions_state_, dimensions );
+
+  this->add_state( "origin", this->origin_state_, grid_transform * Core::Point( 0, 0, 0 ) );
+
+  Core::Vector spacing( 1, 1, 1 );
+  spacing = grid_transform * spacing;
+  this->add_state( "spacing", this->spacing_state_, Core::Point( spacing ) );
 }
 
 LayerGroup::~LayerGroup()

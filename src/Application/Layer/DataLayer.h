@@ -40,11 +40,15 @@
 namespace Seg3D
 {
 
+class DataLayerPrivate;
+typedef boost::shared_ptr< DataLayerPrivate > DataLayerPrivateHandle;
+
 // CLASS DataLayer
 
 // Class definition
 class DataLayer : public Layer
 {
+  friend class DataLayerPrivate;
 
   // -- constructor/destructor --
 public:
@@ -93,6 +97,10 @@ public:
   // State describing whether volume is volume rendered
   Core::StateBoolHandle volume_rendered_state_;
 
+  Core::StateStringHandle data_type_state_;
+  Core::StateDoubleHandle min_value_state_;
+  Core::StateDoubleHandle max_value_state_;
+
 protected:
   // PRE_SAVE_STATES:
   // this function synchronize the generation number for the session saving
@@ -111,6 +119,7 @@ private:
 
 private:
   Core::DataVolumeHandle data_volume_;
+  DataLayerPrivateHandle private_;
 };
 
 } // end namespace Seg3D

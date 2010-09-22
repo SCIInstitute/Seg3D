@@ -26,37 +26,42 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef QTUTILS_BRIDGE_DETAIL_QTLABELCONNECTOR_H
-#define QTUTILS_BRIDGE_DETAIL_QTLABELCONNECTOR_H
+#ifndef CORE_STATE_BOOLEANSTATEGROUP_H
+#define CORE_STATE_BOOLEANSTATEGROUP_H
 
-#include <QLabel>
-#include <QPointer>
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+# pragma once
+#endif
 
-#include <Core/State/StateBase.h>
+#include <Core/State/StateValue.h>
 
-#include <QtUtils/Bridge/detail/QtConnectorBase.h>
-
-namespace QtUtils
+namespace Core
 {
 
-class QtLabelConnector : public QtConnectorBase
+// BOOLEANSTATEGROUP:
+// An exclusive group of StateBool variables. There will be at most one state variable set
+// to true at any given time.
+
+class BooleanStateGroup;
+typedef boost::shared_ptr< BooleanStateGroup > BooleanStateGroupHandle;
+
+class BooleanStateGroupPrivate;
+typedef boost::shared_ptr< BooleanStateGroupPrivate > BooleanStateGroupPrivateHandle;
+
+class BooleanStateGroup : public boost::noncopyable
 {
-  Q_OBJECT
+public:
+  BooleanStateGroup();
+  ~BooleanStateGroup();
 
 public:
-  QtLabelConnector( QLabel* parent, Core::StateBaseHandle& state );
-  virtual ~QtLabelConnector();
-
-  // -- slot functions for boost signals --
-private:
-  static void UpdateLabelText( QPointer< QtLabelConnector > qpointer );
+  void add_boolean_state( StateBoolHandle state );
+  void clear_selection();
 
 private:
-  QLabel* parent_;
-  Core::StateBaseHandle state_;
-  bool is_string_state_;
+  BooleanStateGroupPrivateHandle private_;
 };
 
-}
+} // end namespace Core
 
 #endif

@@ -30,6 +30,7 @@
 
 #include <Core/Interface/Interface.h>
 #include <Core/State/StateEngine.h>
+#include <Core/State/StateValue.h>
 #include <Core/State/Actions/ActionSet.h>
 
 #include <QtUtils/Bridge/detail/QtLabelConnector.h>
@@ -45,9 +46,11 @@ QtLabelConnector::QtLabelConnector( QLabel* parent,
 {
   QPointer< QtLabelConnector > qpointer( this );
 
+  this->is_string_state_ = ( dynamic_cast< Core::StateString* >( state.get() ) != 0 );
+
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-    parent->setText( QString::fromStdString( state->export_to_string() ) );
+    UpdateLabelText( qpointer );
     this->add_connection( state->state_changed_signal_.connect(
       boost::bind( &QtLabelConnector::UpdateLabelText, qpointer ) ) );
   }
@@ -71,7 +74,20 @@ void QtLabelConnector::UpdateLabelText( QPointer< QtLabelConnector > qpointer )
     return;
   }
 
-  qpointer->parent_->setText( QString::fromStdString( qpointer->state_->export_to_string() ) );
+  std::string state_str = qpointer->state_->export_to_string();
+  if ( qpointer->is_string_state_ )
+  {
+    if ( state_str.size() > 0 && state_str[ 0 ] == '[' )
+    {
+      state_str = state_str.substr( 1 );
+    }
+    if ( state_str.size() > 0 && state_str[ state_str.size() - 1 ] == ']' )
+    {
+      state_str = state_str.substr( 0, state_str.size() - 1 );
+    }
+  }
+  
+  qpointer->parent_->setText( QString::fromStdString( state_str ) );
 }
 
 } // end namespace QtUtils

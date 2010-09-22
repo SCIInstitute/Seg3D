@@ -95,15 +95,15 @@ public Q_SLOTS:
 
   // SELECT_BORDER_FILL_BAR:
   // Callback from Qt widget when border/fill button is hit
-  void select_border_fill_bar( bool show );
-
-  // SELECT_COLOR_BAR:
-  // Callback from Qt widget when color selection button is hit
-  void select_color_bar( bool show );
+  void select_mask_property_bar( bool show );
 
   // SELECT_VISUAL_LOCK:
   // Callback from Qt widget when lock button is hit
   void select_visual_lock( bool lock );
+
+  // SELECT_INFO_BAR:
+  // Callback from Qt widget when info button is clicked.
+  void select_info_bar( bool show );
 
 public:
   // SHOW_PROGRESS_BAR:
@@ -193,23 +193,16 @@ private:
   // SET_OPACITY_VISIBILITY:
   // 
   void set_opacity_visibility( bool show );
-  
-  
-  // SET_COLOR_VISIBILITY:
-  // 
-  void set_color_visibility( bool show );
-  
-  
+    
   // SET_BRIGHT_CONSTRAST_VISIBILITY:
   // 
   void set_bright_contrast_visibility( bool show );
   
-  
   // SET_BORDER_VISIBILITY:
   // 
-  void set_border_visibility( bool show );
+  void set_mask_property_visibility( bool show );
   
-  
+  void set_info_visibility( bool show );
 
 private Q_SLOTS:
 
