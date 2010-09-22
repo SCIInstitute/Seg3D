@@ -34,6 +34,7 @@
 #include <Application/Layer/Layer.h>
 #include <Application/Layer/LayerGroup.h>
 #include <Application/LayerManager/LayerManager.h>
+#include <Application/Filters/Actions/ActionArithmeticFilter.h>
 
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL( Seg3D, ArithmeticFilter )
@@ -212,18 +213,10 @@ void ArithmeticFilterPrivate::update_input_options(
 
 void ArithmeticFilterPrivate::handle_replace_changed( bool replace )
 {
-  if ( replace )
-  {
-    this->tool_->output_type_state_->set( ArithmeticFilter::SAME_AS_INPUT_C );
-  }
 }
 
 void ArithmeticFilterPrivate::handle_output_type_changed( std::string type )
 {
-  if ( this->tool_->replace_state_->get() && type != ArithmeticFilter::SAME_AS_INPUT_C )
-  {
-    this->tool_->output_type_state_->set( ArithmeticFilter::SAME_AS_INPUT_C );
-  }
 }
 
 void ArithmeticFilterPrivate::handle_layer_name_changed( std::string layer_id )
@@ -239,9 +232,6 @@ void ArithmeticFilterPrivate::handle_layer_name_changed( std::string layer_id )
 //////////////////////////////////////////////////////////////////////////
 
 const int ArithmeticFilter::NUMBER_OF_INPUTS_C = 4;
-const std::string ArithmeticFilter::SAME_AS_INPUT_C( "same_as_input" );
-const std::string ArithmeticFilter::BOOLEAN_C( "boolean" );
-const std::string ArithmeticFilter::FLOAT_C( "float" );
 
 // Constructor, set default values
 ArithmeticFilter::ArithmeticFilter( const std::string& toolid ) :
@@ -267,11 +257,12 @@ ArithmeticFilter::ArithmeticFilter( const std::string& toolid ) :
   this->add_state( "predefined_expressions", this->predefined_expressions_state_, 
     predefined_expressions );
 
-  this->add_state( "output_type", this->output_type_state_, SAME_AS_INPUT_C, 
-    SAME_AS_INPUT_C + "=Same As First Input|" + BOOLEAN_C + "=Boolean|" +
-    FLOAT_C + "=Float" );
+  this->add_state( "output_type", this->output_type_state_, ActionArithmeticFilter::DATA_C, 
+    ActionArithmeticFilter::DATA_C + "=Data Layer|" + ActionArithmeticFilter::MASK_C + 
+    "=Mask Layer" );
 
   this->add_state( "replace", this->replace_state_, false );
+  this->add_state( "preserve_data_format", this->preserve_data_format_state_, false );
 
   // Adding connections to handle updates
   this->add_connection( LayerManager::Instance()->groups_changed_signal_.connect(
@@ -309,7 +300,22 @@ ArithmeticFilter::~ArithmeticFilter()
 
 void ArithmeticFilter::execute( Core::ActionContextHandle context )
 {
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
 
+  // Get action inputs from state engine
+  std::vector< std::string > layer_ids;
+  for( int i = 0; i < 4; i++ )
+  {
+    std::string layer_id = this->input_layers_state_[ i ]->get();
+    if( layer_id != "" )
+    {
+      layer_ids.push_back( layer_id );
+    }
+  }
+
+  ActionArithmeticFilter::Dispatch( context, layer_ids, this->expressions_state_->get(),
+    this->output_type_state_->get(), this->replace_state_->get(), 
+    this->preserve_data_format_state_->get() );
 }
 
 

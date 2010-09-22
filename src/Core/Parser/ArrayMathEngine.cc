@@ -352,19 +352,26 @@ bool ArrayMathEngine::add_output_double_array( std::string name, std::vector< do
   return true;
 }
 
-bool ArrayMathEngine::add_output_data_block( std::string name, DataBlockHandle input_data_block )
+bool ArrayMathEngine::add_output_data_block( std::string name, DataBlockHandle template_data_block )
+{
+  return this->add_output_data_block( name, template_data_block->get_nx(),
+    template_data_block->get_ny(), template_data_block->get_nz(), 
+    template_data_block->get_data_type() );
+}
+
+bool ArrayMathEngine::add_output_data_block( std::string name, size_t nx, size_t ny, 
+                      size_t nz, Core::DataType type )
 {
   std::string error_str;
 
-  if ( this->array_size_ != input_data_block->get_size() && input_data_block->get_size() != 1 && 
-    input_data_block->get_size() != 0 )
+  size_t size = nx * ny * nz;
+  if ( this->array_size_ != size )
   {
     error_str = "The output field '" + name + 
       "' does not have the same number of elements as the other objects.";
     CORE_LOG_ERROR( error_str );
     return false;  
   }
-  size_type size = input_data_block->get_size();
 
   std::string tname = "__" + name;
 
@@ -396,9 +403,7 @@ bool ArrayMathEngine::add_output_data_block( std::string name, DataBlockHandle i
   }
 
   // Create new output data block based on input data block
-  Core::DataBlockHandle output_data_block( 
-    Core::StdDataBlock::New( input_data_block->get_nx(), input_data_block->get_ny(), 
-    input_data_block->get_nz(), input_data_block->get_data_type() ) );
+  Core::DataBlockHandle output_data_block( Core::StdDataBlock::New( nx, ny, nz, type ) );
 
   // Store information for processing after parsing has succeeded
   OutputDataBlock m;
@@ -411,20 +416,27 @@ bool ArrayMathEngine::add_output_data_block( std::string name, DataBlockHandle i
   return true;
 }
 
+
 bool ArrayMathEngine::add_output_mask_data_block( std::string name, 
-  MaskDataBlockHandle input_mask_data_block )
+  MaskDataBlockHandle template_mask_data_block )
+{
+  return this->add_output_mask_data_block( name, template_mask_data_block->get_nx(),
+    template_mask_data_block->get_ny(), template_mask_data_block->get_nz() );
+}
+
+bool ArrayMathEngine::add_output_mask_data_block( std::string name, size_t nx, size_t ny, size_t nz )
 {
   std::string error_str;
 
-  if ( this->array_size_ != input_mask_data_block->get_size() && 
-    input_mask_data_block->get_size() != 1 && input_mask_data_block->get_size() != 0 )
+  size_t size = nx * ny * nz;
+
+  if ( this->array_size_ != size )
   {
     error_str = "The output field '" + name + 
       "' does not have the same number of elements as the other objects.";
     CORE_LOG_ERROR( error_str );
     return false;  
   }
-  size_type size = input_mask_data_block->get_size();
 
   std::string tname = "__" + name;
 
@@ -457,9 +469,7 @@ bool ArrayMathEngine::add_output_mask_data_block( std::string name,
 
   // Create new output data block based on input data block
   Core::MaskDataBlockHandle output_mask_data_block( new Core::MaskDataBlock( 
-    Core::StdDataBlock::New( input_mask_data_block->get_nx(), input_mask_data_block->get_ny(), 
-    input_mask_data_block->get_nz(), DataType::UCHAR_E ), 
-    input_mask_data_block->get_mask_bit() ) );
+    Core::StdDataBlock::New( nx, ny, nz, DataType::UCHAR_E ), 0 ) );
 
   // Store information for processing after parsing has succeeded
   OutputMaskDataBlock m;
@@ -471,6 +481,7 @@ bool ArrayMathEngine::add_output_mask_data_block( std::string name,
 
   return true;
 }
+
 
 
 bool ArrayMathEngine::add_expressions( std::string& expressions )

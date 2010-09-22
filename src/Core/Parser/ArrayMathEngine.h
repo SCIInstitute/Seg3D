@@ -92,8 +92,11 @@ public:
 
   bool add_output_bool_array( std::string name, std::vector< bool >* array );
   bool add_output_double_array( std::string name, std::vector< double >* array );
-  bool add_output_data_block( std::string name, DataBlockHandle input_data_block ); 
-  bool add_output_mask_data_block( std::string name, MaskDataBlockHandle input_mask_data_block ); 
+  bool add_output_data_block( std::string name, size_t nx, size_t ny, 
+    size_t nz, Core::DataType type );
+  bool add_output_data_block( std::string name, DataBlockHandle template_data_block );  
+  bool add_output_mask_data_block( std::string name, size_t nx, size_t ny, size_t nz );
+  bool add_output_mask_data_block( std::string name, MaskDataBlockHandle template_mask_data_block );
 
   // Setup the expression                        
   bool add_expressions( std::string& expressions );

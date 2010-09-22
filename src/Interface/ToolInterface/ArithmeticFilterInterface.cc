@@ -83,6 +83,8 @@ bool ArithmeticFilterInterface::build_widget( QFrame* frame )
     tool->predefined_expressions_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.output_type_, tool->output_type_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.replace_, tool->replace_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.preserve_checkbox_, 
+    tool->preserve_data_format_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.execute_button_, boost::bind(
     &ArithmeticFilter::execute, tool, Core::Interface::GetWidgetActionContext() ) );
   QtUtils::QtBridge::Enable( this->private_->ui_.target_group_, tool->use_active_group_state_, true );
@@ -100,7 +102,7 @@ bool ArithmeticFilterInterface::build_widget( QFrame* frame )
 
 void ArithmeticFilterInterface::set_expressions_text( QListWidgetItem* item )
 {
-  this->private_->ui_.expressions_->setPlainText( item->text() + ";" );
+  this->private_->ui_.expressions_->setPlainText( "RESULT=" + item->text() + ";" );
 }
 
 } //end seg3d

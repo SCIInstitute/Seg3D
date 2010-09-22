@@ -77,6 +77,8 @@ SET(APPLICATION_FILTERS_ACTIONS_SRCS
   Actions/ActionInvert.cc
   Actions/ActionCrop.h
   Actions/ActionCrop.cc
+  Actions/ActionArithmeticFilter.h
+  Actions/ActionArithmeticFilter.cc
   )
 
 CORE_ADD_LIBRARY(Application_Filters ${APPLICATION_FILTERS_SRCS}
@@ -86,6 +88,7 @@ TARGET_LINK_LIBRARIES(Application_Filters
                       Core_Utils
                       Core_Action
                       Core_State
+                      Core_Parser
                       Application_Layer
                       Application_LayerManager
                       ${SCI_BOOST_LIBRARY})

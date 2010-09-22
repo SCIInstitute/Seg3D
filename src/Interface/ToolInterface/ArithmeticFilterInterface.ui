@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>253</width>
-    <height>493</height>
+    <height>543</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -415,6 +415,13 @@
        <widget class="QCheckBox" name="replace_">
         <property name="text">
          <string>Replace First Input</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="preserve_checkbox_">
+        <property name="text">
+         <string>Preserve Data Format</string>
         </property>
        </widget>
       </item>

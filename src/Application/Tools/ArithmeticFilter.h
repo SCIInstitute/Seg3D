@@ -65,6 +65,7 @@ public:
   
   Core::StateLabeledOptionHandle output_type_state_;
   Core::StateBoolHandle replace_state_;
+  Core::StateBoolHandle preserve_data_format_state_;
 
 private:
   ArithmeticFilterPrivateHandle private_;
@@ -72,9 +73,6 @@ private:
 public:
   const static int NUMBER_OF_INPUTS_C;
 
-  const static std::string SAME_AS_INPUT_C;
-  const static std::string BOOLEAN_C;
-  const static std::string FLOAT_C;
 };
 
 } // end namespace
