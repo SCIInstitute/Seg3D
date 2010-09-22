@@ -56,9 +56,6 @@ ParserFunctionCatalogHandle ArrayMathFunctionCatalog::get_catalog()
   }
   lock_.unlock();
 
-  //ParserFunctionCatalogHandle handle = ParserFunctionCatalogHandle( catalog_.get() );
-  //return handle;
-  // TODO Should this be a singleton?
   return catalog_;
 }
 

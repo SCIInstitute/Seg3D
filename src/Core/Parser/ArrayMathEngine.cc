@@ -276,7 +276,7 @@ bool ArrayMathEngine::add_input_mask_data_block( std::string name, MaskDataBlock
   return true;
 }
 
-bool ArrayMathEngine::add_index( std::string name )
+/*bool ArrayMathEngine::add_index( std::string name )
 {
   this->pre_expression_ += name + "=index();";
   return true;
@@ -286,7 +286,7 @@ bool ArrayMathEngine::add_size( std::string name )
 {
   this->pre_expression_ += name + "=" + ExportToString( this->array_size_ ) + ";";
   return true;
-}
+}*/
 
 bool ArrayMathEngine::add_output_bool_array( std::string name, std::vector< bool >* array )
 {
@@ -352,7 +352,6 @@ bool ArrayMathEngine::add_output_double_array( std::string name, std::vector< do
   return true;
 }
 
-// TODO Have Jeroen review this function
 bool ArrayMathEngine::add_output_data_block( std::string name, DataBlockHandle input_data_block )
 {
   std::string error_str;
@@ -371,7 +370,7 @@ bool ArrayMathEngine::add_output_data_block( std::string name, DataBlockHandle i
 
   if ( size == 0 )
   {
-    // TODO How to handle size == 0?
+    return false;
   }
 
   int flags = 0;
@@ -382,13 +381,14 @@ bool ArrayMathEngine::add_output_data_block( std::string name, DataBlockHandle i
 
   this->post_expression_ += tname + "=to_data_block(" + name + ");";
 
-  // TODO Why add scalar variable?
   // Add the variable to the parser
+  // Temporary buffer
   if ( !( add_output_variable( this->pprogram_, name, "S", flags ) ) )
   {
     CORE_LOG_ERROR( error_str );
     return false;
   }
+  // Final buffer
   if ( !( add_output_variable( this->pprogram_, tname, "DATA", flags ) ) )
   {
     CORE_LOG_ERROR( error_str );
@@ -411,7 +411,6 @@ bool ArrayMathEngine::add_output_data_block( std::string name, DataBlockHandle i
   return true;
 }
 
-// TODO Have Jeroen review this function
 bool ArrayMathEngine::add_output_mask_data_block( std::string name, 
   MaskDataBlockHandle input_mask_data_block )
 {
@@ -431,7 +430,7 @@ bool ArrayMathEngine::add_output_mask_data_block( std::string name,
 
   if ( size == 0 )
   {
-    // TODO How to handle size == 0?
+    return false;
   }
 
   int flags = 0;
@@ -442,13 +441,14 @@ bool ArrayMathEngine::add_output_mask_data_block( std::string name,
 
   this->post_expression_ += tname + "=to_mask_data_block(" + name + ");";
 
-  // TODO Why add scalar variable?
   // Add the variable to the parser
+  // Temporary buffer
   if ( !( add_output_variable( this->pprogram_, name, "S", flags ) ) )
   {
     CORE_LOG_ERROR( error_str );
     return false;
   }
+  // Final buffer
   if ( !( add_output_variable( this->pprogram_, tname, "MASK", flags ) ) )
   {
     CORE_LOG_ERROR( error_str );
