@@ -64,6 +64,9 @@ public:
   typedef std::map< std::string, ToolInterfaceBuilderBase* > toolinterface_map_type;
   // List with builders that can be called to generate a new object
   toolinterface_map_type toolinterfaces_;
+  
+  typedef std::set< std::string > tool_menus_type;
+  tool_menus_type tool_menus_;
 
 };
 
@@ -97,6 +100,9 @@ void ToolFactory::register_tool( ToolBuilderBase* builder, ToolInfoHandle info )
   entry.builder_ = builder;
   entry.info_ = info;
   this->private_->tools_[ info->get_name() ] = entry;
+
+  this->private_->tool_menus_.insert( info->get_menu() )
+  
   CORE_LOG_DEBUG( std::string( "Registering tool : " ) + info->get_name() );
 }
 
@@ -152,7 +158,7 @@ bool LessToolList( ToolInfoList::value_type val1, ToolInfoList::value_type val2 
 }
 
 
-bool ToolFactory::list_tools( ToolInfoList& tool_list )
+bool ToolFactory::list_tools( ToolInfoList& tool_list, std::string menu )
 {
   lock_type lock( this->get_mutex() );
 
@@ -167,7 +173,10 @@ bool ToolFactory::list_tools( ToolInfoList& tool_list )
     if ( this->private_->toolinterfaces_.find( ( *it ).first ) != 
       this->private_->toolinterfaces_.end() )
     {
-      tool_list.push_back( ( *it ).second.info_ );
+      if ( menu.size() == 0 || ( *it ).second.info_->get_menu() == menu )
+      {
+        tool_list.push_back( ( *it ).second.info_ );
+      }
     }
     ++it;
   }
@@ -175,6 +184,23 @@ bool ToolFactory::list_tools( ToolInfoList& tool_list )
   if ( tool_list.size() == 0 ) return false;
   std::sort( tool_list.begin(), tool_list.end(), LessToolList );
 
+  return true;
+}
+
+bool ToolFactory::list_menus( ToolMenuList& menu_list )
+{
+  menu_list.clear();
+  ToolFactoryPrivate::tool_menus_type::const_iterator it = this->private_->tool_menus_.begin();
+  ToolFactoryPrivate::tool_menus_type::const_iterator it_end = this->private_->tool_menus_.end();
+  while ( it != it_end )
+  {
+    menu_list.push_back( *it );
+    ++it;
+  }
+  
+  if ( menu_list.size() == 0 ) return false;
+  std::sort( menu_list.begin(), menu_list.end() );
+  
   return true;
 }
 

@@ -40,7 +40,7 @@ class ConfidenceConnectedFilter : public SeedPointsTool
 SEG3D_TOOL(
   SEG3D_TOOL_NAME( "ConfidenceConnectedFilter", "Mask out statistically connected data" )
   SEG3D_TOOL_MENULABEL( "Confidence Connected" )
-  SEG3D_TOOL_MENU( "filter_data_to_mask" )
+  SEG3D_TOOL_MENU( "Filters" )
   SEG3D_TOOL_SHORTCUT_KEY( "Alt+Shift+C" )
   SEG3D_TOOL_URL( "http://seg3d.org/" )
 )

@@ -45,6 +45,8 @@
 #include <Core/DataBlock/ITKDataBlock.h>
 
 // Application includes
+#include <Application/Layer/MaskLayer.h>
+#include <Application/Layer/DataLayer.h>
 #include <Application/LayerIO/LayerExporter.h>
 #include <Application/LayerIO/LayerIO.h>
 
@@ -105,9 +107,9 @@ private:
     typedef itk::Image< PixelType, 3 > ImageType;
     typedef itk::Image< signed short, 2 > OutputImageType;
     typedef itk::ImageSeriesWriter< ImageType, OutputImageType > WriterType;
-    WriterType::Pointer writer = WriterType::New();
+    typename WriterType::Pointer writer = WriterType::New();
 
-    Core::ITKImageDataHandle image_data = Core::ITKImageDataT< PixelType >::Handle( 
+    Core::ITKImageDataHandle image_data = typename Core::ITKImageDataT< PixelType >::Handle( 
       new Core::ITKImageDataT< PixelType >( temp_handle->get_data_volume()->get_data_block(), 
       temp_handle->get_grid_transform() ) );
 
@@ -118,9 +120,9 @@ private:
 //    DictionaryType & dictionary = itk_image->GetMetaDataDictionary();
 
 
-    ImageType::RegionType region = itk_image->GetLargestPossibleRegion();
-    ImageType::IndexType start = region.GetIndex();
-    ImageType::SizeType size = region.GetSize();
+    typename ImageType::RegionType region = itk_image->GetLargestPossibleRegion();
+    typename ImageType::IndexType start = region.GetIndex();
+    typename ImageType::SizeType size = region.GetSize();
 
     unsigned int firstSlice = start[ 2 ];
     unsigned int lastSlice = start[ 2 ] + size[ 2 ] - 1;

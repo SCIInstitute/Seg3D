@@ -40,7 +40,7 @@ class ThresholdSegmentationLSFilter : public Tool
 SEG3D_TOOL(
 SEG3D_TOOL_NAME( "ThresholdSegmentationLSFilter", "Grow a mask region outwards based on the data, geometry and local edges" )
 SEG3D_TOOL_MENULABEL( "Segmentation Level Set" )
-SEG3D_TOOL_MENU( "filter_data_to_mask" )
+SEG3D_TOOL_MENU( "Filters" )
 SEG3D_TOOL_SHORTCUT_KEY( "Alt+L" )
 SEG3D_TOOL_URL( "http://seg3d.org/" )
 )

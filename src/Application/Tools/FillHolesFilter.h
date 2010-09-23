@@ -29,44 +29,39 @@
 #ifndef APPLICATION_TOOLS_FILLHOLESFILTER_H
 #define APPLICATION_TOOLS_FILLHOLESFILTER_H
 
-#include <Application/Tool/Tool.h>
+#include <Core/State/StateLabeledOption.h>
+
+#include <Application/Tool/SeedPointsTool.h>
 
 namespace Seg3D
 {
 
-class FillHolesFilter : public Tool
+class FillHolesFilterPrivate;
+typedef boost::shared_ptr< FillHolesFilterPrivate > FillHolesFilterPrivateHandle;
+
+class FillHolesFilter : public SeedPointsTool
 {
+
 SEG3D_TOOL(
 SEG3D_TOOL_NAME( "FillHolesFilter", "Fill all the holes not marked with a seed point" )
 SEG3D_TOOL_MENULABEL( "Fill Holes" )
-SEG3D_TOOL_MENU( "filter_mask_to_mask" )
+SEG3D_TOOL_MENU( "Filters" )
 SEG3D_TOOL_SHORTCUT_KEY( "Alt+Shift+F" )
 SEG3D_TOOL_URL( "http://seg3d.org/" )
 )
 
+  // -- constructor/destructor --
 public:
   FillHolesFilter( const std::string& toolid );
   virtual ~FillHolesFilter();
 
-  // -- constraint parameters --
-
-  // Constrain viewer to right painting tool when layer is selected
-  void target_constraint( std::string layerid );
-
-  // -- activate/deactivate tool --
-
-  virtual void activate();
-  virtual void deactivate();
-  
-private:
-  // -- handle updates from layermanager --
-  void handle_layers_changed();
-
   // -- state --
 public:
-  // Layerid of the target layer
-  Core::StateStringHandle target_layer_state_;
-
+  // Whether the layer needs to be replaced
+  Core::StateBoolHandle replace_state_;
+    
+private:
+  FillHolesFilterPrivateHandle private_;
 };
 
 } // end namespace

@@ -56,11 +56,9 @@ public:
 private:
   void create_file_menu( QMenu* menu );
   void create_edit_menu( QMenu* menu );
-  void create_layer_menu( QMenu* menu );
   void create_view_menu( QMenu* menu );
-  void create_tool_menu( QMenu* menu );
-  void create_filter_menu( QMenu* menu );
   void create_window_menu( QMenu* menu );
+  void create_tool_menus( QMenuBar* menubar );
   
   // Keep a pointer to the main window
   QMainWindow*  main_window_;

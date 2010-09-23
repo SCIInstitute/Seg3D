@@ -40,7 +40,7 @@ class MaskDataFilter : public Tool
 SEG3D_TOOL(
 SEG3D_TOOL_NAME( "MaskDataFilter", "Cut a masked region out of a data layer" )
 SEG3D_TOOL_MENULABEL( "Mask Data" )
-SEG3D_TOOL_MENU( "filter_data_to_data" )
+SEG3D_TOOL_MENU( "Filters" )
 SEG3D_TOOL_SHORTCUT_KEY( "Alt+Shift+M" )
 SEG3D_TOOL_URL( "http://seg3d.org/" )
 )

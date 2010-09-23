@@ -37,8 +37,7 @@ namespace Seg3D
 {
 
 class ConnectedComponentFilterPrivate;
-typedef boost::shared_ptr< ConnectedComponentFilterPrivate > 
-  ConnectedComponentFilterPrivateHandle;
+typedef boost::shared_ptr< ConnectedComponentFilterPrivate > ConnectedComponentFilterPrivateHandle;
 
 class ConnectedComponentFilter : public SeedPointsTool
 {
@@ -46,7 +45,7 @@ class ConnectedComponentFilter : public SeedPointsTool
 SEG3D_TOOL(
 SEG3D_TOOL_NAME( "ConnectedComponentFilter", "Select all components connected to the seed points." )
 SEG3D_TOOL_MENULABEL( "Connected Component" )
-SEG3D_TOOL_MENU( "filter_mask_to_mask" )
+SEG3D_TOOL_MENU( "Filters" )
 SEG3D_TOOL_SHORTCUT_KEY( "Alt+C" )
 SEG3D_TOOL_URL( "http://seg3d.org/" )
 SEG3D_TOOL_VERSION( "1" )

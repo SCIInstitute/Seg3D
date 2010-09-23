@@ -82,9 +82,9 @@ bool ConnectedComponentFilterInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Connect( this->private_->ui_.use_seeds_, tool->use_seeds_state_ );
   
   QtUtils::QtBridge::Connect( this->private_->ui_.mask_, tool->mask_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ui_.invert_mask_, 
-    tool->mask_invert_state_ );
-  
+  QtUtils::QtBridge::Connect( this->private_->ui_.invert_mask_, tool->mask_invert_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );  
+
   // Step 4 - Qt connections
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() ); 

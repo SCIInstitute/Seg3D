@@ -40,7 +40,7 @@ class CannyEdgeDetectionFilter : public SingleTargetTool
 SEG3D_TOOL(
 SEG3D_TOOL_NAME( "CannyEdgeDetectionFilter", "Compute the locations of edges inside data" )
 SEG3D_TOOL_MENULABEL( "Canny Edge Detection" )
-SEG3D_TOOL_MENU( "filter_data_to_mask" )
+SEG3D_TOOL_MENU( "Filters" )
 SEG3D_TOOL_SHORTCUT_KEY( "Alt+E" )
 SEG3D_TOOL_URL( "http://seg3d.org/" )
 SEG3D_TOOL_VERSION( "1" )

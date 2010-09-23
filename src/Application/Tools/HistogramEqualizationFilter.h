@@ -40,7 +40,7 @@ class HistogramEqualizationFilter : public SingleTargetTool
 SEG3D_TOOL(
 SEG3D_TOOL_NAME( "HistogramEqualizationFilter", "Equalize the histgram" )
 SEG3D_TOOL_MENULABEL( "Histogram Equalization" )
-SEG3D_TOOL_MENU( "filter_data_to_data" )
+SEG3D_TOOL_MENU( "Filters" )
 SEG3D_TOOL_SHORTCUT_KEY( "Alt+H" )
 SEG3D_TOOL_URL( "http://seg3d.org/" )
 SEG3D_TOOL_VERSION( "1" )

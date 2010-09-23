@@ -44,7 +44,7 @@ SEG3D_TOOL
 (
   SEG3D_TOOL_NAME( "ThresholdTool", "Tool for thresholding data" )
   SEG3D_TOOL_MENULABEL( "Threshold" )
-  SEG3D_TOOL_MENU( "tools" )
+  SEG3D_TOOL_MENU( "Tools" )
   SEG3D_TOOL_SHORTCUT_KEY( "Alt+T" )
   SEG3D_TOOL_URL( "http://seg3d.org/" )
 )

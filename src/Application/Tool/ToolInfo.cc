@@ -176,7 +176,7 @@ std::string ToolInfo::get_name() const
 
 std::string ToolInfo::get_menu() const
 {
-  return Core::StringToLower( this->private_->menu_ );
+  return this->private_->menu_;
 }
 
 std::string ToolInfo::get_menu_label() const

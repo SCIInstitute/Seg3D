@@ -128,6 +128,7 @@ public:
 };
 
 typedef std::vector<ToolInfoHandle> ToolInfoList;
+typedef std::vector<std::string> ToolMenuList;
 
 // ------------------------------
 
@@ -184,9 +185,13 @@ public:
   bool is_tool_type( const std::string& tool_type );
 
   // LIST_TOOL_TYPES:
-  // List the tools of a certain group
-  bool list_tools( ToolInfoList& tool_list );
-
+  // List the tools
+  bool list_tools( ToolInfoList& tool_list, std::string menu = "" );
+  
+  // LIST_MENUS:
+  // List the menus
+  bool list_menus( ToolMenuList& menu_list );
+  
   // -- internals of ToolFactory --
 private:
   ToolFactoryPrivateHandle private_;
