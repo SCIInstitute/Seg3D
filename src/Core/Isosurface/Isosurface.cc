@@ -319,13 +319,10 @@ public:
 };
 typedef boost::shared_ptr< VertexBufferBatch > VertexBufferBatchHandle;
 
-class IsosurfacePrivate
+class IsosurfacePrivate 
 {
 
 public:
-  typedef boost::shared_mutex mutex_type;
-  typedef boost::unique_lock< mutex_type > lock_type;
-
   void downsample_setup( int num_threads, double quality_factor );
 
   // PARALLEL_DOWNSAMPLE:
@@ -416,6 +413,11 @@ const double IsosurfacePrivate::COMPUTE_PERCENT_PROGRESS_C = 0.8;
 const double IsosurfacePrivate::NORMAL_PERCENT_PROGRESS_C = 0.05;
 const double IsosurfacePrivate::PARTITION_PERCENT_PROGRESS_C = 0.15; 
 
+/*
+Allow downsampling by only half, quarter, and eighth.  When downsampling by half, a 2x2x2 
+neighborhood of nodes is downsampled to a single node.  If at least one neighborhood node is "on", 
+result is "on".  This method was chosen to prevent holes in the downsampled data.
+*/
 void IsosurfacePrivate::downsample_setup( int num_threads, double quality_factor )
 {
   this->nx_ = this->orig_mask_volume_->get_mask_data_block()->get_nx();
@@ -428,16 +430,21 @@ void IsosurfacePrivate::downsample_setup( int num_threads, double quality_factor
   // Bit where mask bit is stored
   this->mask_value_ = this->orig_mask_volume_->get_mask_data_block()->get_mask_value();
 
-  // Create downsampled mask to store results
+  // Create downsampled mask to store results 
   this->neighborhood_size_ = static_cast< int >( 1.0 / quality_factor );
   size_t downsampled_nx = this->nx_ / this->neighborhood_size_;
   size_t downsampled_ny = this->ny_ / this->neighborhood_size_;
   size_t downsampled_nz = this->nz_ / this->neighborhood_size_;
 
+  // Normally MaskDataBlocks should be registered with the MathDataBlockManager, but in this
+  // case we are only using this as a temporary object and do not want to share the mask with
+  // other masks since we would then have to carefully lock/unlock it during use.
   MaskDataBlockHandle mask_data_block( new MaskDataBlock( 
     StdDataBlock::New( downsampled_nx, downsampled_ny, downsampled_nz, DataType::UCHAR_E ), 
     this->orig_mask_volume_->get_mask_data_block()->get_mask_bit() ) );
 
+  // Downsampled mask needs to be scaled up to fill the same geometric space as the original
+  // mask.
   GridTransform grid_transform = this->orig_mask_volume_->get_grid_transform();
   double transform_scale = static_cast< double >( this->neighborhood_size_ );
   grid_transform.post_scale( Vector( transform_scale, transform_scale, transform_scale ) );
