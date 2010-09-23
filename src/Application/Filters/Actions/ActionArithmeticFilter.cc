@@ -258,7 +258,11 @@ bool ActionArithmeticFilter::run( Core::ActionContextHandle& context,
   algo->engine_.add_expressions( this->private_->expressions_.value() );
   
   algo->connect_abort( algo->dst_layer_ );
-  
+
+  // Connect ArrayMathEngine progress signal to output layer progress signal
+  algo->engine_.update_progress_signal_.connect(
+    boost::bind( &Layer::update_progress, algo->dst_layer_, _1, 0.0, 1.0 ) );
+
   // Return the ids of the destination layer.
   result = Core::ActionResultHandle( new Core::ActionResult( algo->dst_layer_->get_layer_id() ) );
 

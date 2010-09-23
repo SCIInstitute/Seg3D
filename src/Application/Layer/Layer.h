@@ -104,8 +104,8 @@ public:
     
   // UPDATE_PROGRESS:
   // Update the progress bar associated with this layer
-  void update_progress( float amount, float progress_start = 0.0f, float progress_amount = 1.0f );  
-    
+  void update_progress( double amount, double progress_start = 0.0f, double progress_amount = 1.0f );
+  
   // -- layer progress signals --
 public:
 

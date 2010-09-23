@@ -225,11 +225,10 @@ bool Layer::post_save_states( Core::StateIO& state_io )
   return true;
 }
 
-void Layer::update_progress( float amount, float progress_start, float progress_amount )
+void Layer::update_progress( double amount, double progress_start /*= 0.0f*/, double progress_amount /*= 1.0f */ )
 {
   this->update_progress_signal_( progress_start + amount * progress_amount );
 }
-
 
 } // end namespace Seg3D
 

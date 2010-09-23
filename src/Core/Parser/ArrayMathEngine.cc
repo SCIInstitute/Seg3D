@@ -305,12 +305,15 @@ bool ArrayMathEngine::run()
     CORE_LOG_ERROR( error_str );
     return false;
   }
+
   // Run the program
   if ( !( ArrayMathInterpreter::run( this->mprogram_, error_str ) ) )
   {
     CORE_LOG_ERROR( error_str );
     return false;
   }
+
+  this->update_progress_signal_( 1.0 );
   return true;
 }
 
