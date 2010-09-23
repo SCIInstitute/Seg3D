@@ -37,8 +37,6 @@ std::string ParserVariableType( std::string type )
 {
   if ( type == "U" ) return std::string( "Unknown" );
   if ( type == "S" ) return std::string( "Scalar" );
-  if ( type == "AB" ) return std::string( "Boolean Vector" );
-  if ( type == "AD" ) return std::string( "Double Vector" );
   if ( type == "DATA" ) return std::string( "Data Block" );
   if ( type == "MASK" ) return std::string( "Mask Data Block" );
   return std::string( "Unknown" );

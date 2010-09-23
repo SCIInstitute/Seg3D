@@ -77,18 +77,6 @@ public:
     this->variables_[ j ] = reinterpret_cast< void* >( variable );
   }
 
-  inline void set_bool_array( size_t j, std::vector< bool >* array )
-  {
-    if ( j >= this->variables_.size() ) this->variables_.resize( j + 1 );
-    this->variables_[ j ] = array;
-  }
-
-  inline void set_double_array( size_t j, std::vector< double >* array )
-  {
-    if ( j >= this->variables_.size() ) this->variables_.resize( j + 1 );
-    this->variables_[ j ] = array;
-  }
-
   inline void set_data_block( size_t j, DataBlock* data_block )
   {
     if ( j >= this->variables_.size() ) this->variables_.resize( j + 1 );
@@ -124,16 +112,6 @@ public:
   inline double* get_variable( size_t j )
   { 
     return reinterpret_cast< double* >( this->variables_[ j ] );
-  }
-
-  inline std::vector< bool >* get_bool_array( size_t j )
-  { 
-    return reinterpret_cast< std::vector< bool >* >( this->variables_[ j ] );
-  }
-
-  inline std::vector< double >* get_double_array( size_t j )
-  { 
-    return reinterpret_cast< std::vector< double >* >( this->variables_[ j ] );
   }
 
   inline DataBlock* get_data_block( size_t j )

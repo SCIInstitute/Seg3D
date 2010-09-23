@@ -62,13 +62,9 @@ public:
   size_type get_array_size();
   void set_array_size( size_type array_size );
 
-  bool add_source( std::string& name, std::vector< bool >* array );
-  bool add_source( std::string& name, std::vector< double >* array );
   bool add_source( std::string& name, DataBlock* data_block );
   bool add_source( std::string& name, MaskDataBlock* mask_data_block );
 
-  bool add_sink( std::string& name, std::vector< bool >* array );
-  bool add_sink( std::string& name, std::vector< double >* array );
   bool add_sink( std::string& name, DataBlock* data_block );
   bool add_sink( std::string& name, MaskDataBlock* mask_data_block );
 

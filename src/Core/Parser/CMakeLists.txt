@@ -83,6 +83,3 @@ TARGET_LINK_LIBRARIES(Core_Parser
   ${SCI_BOOST_LIBRARY}
   Core_Utils 
   Core_DataBlock)
-
-ADD_EXECUTABLE(TestParser TestParser.cc)
-TARGET_LINK_LIBRARIES(TestParser Core_Parser) 

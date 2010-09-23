@@ -55,12 +55,6 @@ public:
 
   //------------------------------------------------------------------------
   // Step 1: add sources and sinks
-  bool add_bool_array_source( ArrayMathProgramHandle& pprogram,
-    std::string& name, std::vector< bool >* array, std::string& error );
-
-  bool add_double_array_source( ArrayMathProgramHandle& pprogram,
-    std::string& name, std::vector< double >* array, std::string& error );
-
   bool add_data_block_source( ArrayMathProgramHandle& pprogram, 
     std::string& name, DataBlockHandle data_block, std::string& error );
 
@@ -68,12 +62,6 @@ public:
     std::string& name, MaskDataBlockHandle mask_data_block, std::string& error );
 
   // Data sinks  
-  bool add_bool_array_sink( ArrayMathProgramHandle& pprogram,
-    std::string& name, std::vector< bool >* array, std::string& error );
-
-  bool add_double_array_sink( ArrayMathProgramHandle& pprogram,
-    std::string& name, std::vector< double >* array, std::string& error );
-
   bool add_data_block_sink( ArrayMathProgramHandle& pprogram, 
     std::string& name, DataBlockHandle data_block, std::string& error );
 

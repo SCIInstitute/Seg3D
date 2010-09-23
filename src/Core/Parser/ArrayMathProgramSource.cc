@@ -32,36 +32,6 @@
 namespace Core
 {
 
-void ArrayMathProgramSource::set_bool_array( std::vector< bool >* array )
-{
-  this->bool_array_ = array;
-}
-
-std::vector< bool >* ArrayMathProgramSource::get_bool_array()
-{
-  return this->bool_array_;
-}
-
-bool ArrayMathProgramSource::is_bool_array()
-{
-  return this->bool_array_ != 0;
-}
-
-void ArrayMathProgramSource::set_double_array( std::vector< double >* array )
-{
-  this->double_array_ = array;
-}
-
-std::vector< double >* ArrayMathProgramSource::get_double_array()
-{
-  return this->double_array_;
-}
-
-bool ArrayMathProgramSource::is_double_array()
-{
-  return this->double_array_ != 0;
-}
-
 void ArrayMathProgramSource::set_data_block( DataBlock* data_block )
 {
   this->data_block_ = data_block;
@@ -91,8 +61,5 @@ bool ArrayMathProgramSource::is_mask_data_block()
 {
   return this->mask_data_block_ != 0;
 }
-
-
-
 
 } // end namespace

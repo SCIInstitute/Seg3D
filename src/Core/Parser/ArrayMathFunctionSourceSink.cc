@@ -37,49 +37,6 @@ namespace ArrayMathFunctions
 //--------------------------------------------------------------------------
 // Source functions
 
-
-bool get_scalar_ab( Core::ArrayMathProgramCode& pc )
-{
-  double* data0 = pc.get_variable( 0 );
-
-  // We store the matrix pointer so we can get other properties as well
-  std::vector< bool >& array( *( pc.get_bool_array( 1 ) ) );
-  // One virtual call to get the data
-
-  double* data0_end = data0 + pc.get_size();
-  Core::index_type idx = pc.get_index();
-
-  while ( data0 != data0_end )
-  {
-    *data0 = static_cast< double > ( array[ idx ] );
-    data0++;
-    idx++;
-  }
-
-  return true;
-}
-
-bool get_scalar_ad( Core::ArrayMathProgramCode& pc )
-{
-  double* data0 = pc.get_variable( 0 );
-
-  // We store the matrix pointer so we can get other properties as well
-  std::vector< double >& array( *( pc.get_double_array( 1 ) ) );
-  // One virtual call to get the data
-
-  double* data0_end = data0 + pc.get_size();
-  Core::index_type idx = pc.get_index();
-
-  while ( data0 != data0_end )
-  {
-    *data0 = static_cast< double > ( array[ idx ] );
-    data0++;
-    idx++;
-  }
-
-  return true;
-}
-
 bool get_scalar_data( Core::ArrayMathProgramCode& pc )
 {
   // Destination 
@@ -133,44 +90,6 @@ bool get_scalar_mask( Core::ArrayMathProgramCode& pc )
 
 //--------------------------------------------------------------------------
 // Sink functions
-
-bool to_bool_array_s( Core::ArrayMathProgramCode& pc )
-{
-  // Get the pointer to the matrix object where we need to store the data
-  std::vector< bool >& array( *( pc.get_bool_array( 0 ) ) );
-  double* data1 = pc.get_variable( 1 );
-
-  double* data1_end = data1 + ( pc.get_size() );
-  Core::index_type idx = pc.get_index();
-
-  while ( data1 != data1_end )
-  {
-    array[ idx ] = ( *data1 != 0 );
-    idx++;
-    data1++;
-  }
-
-  return true;
-}
-
-bool to_double_array_s( Core::ArrayMathProgramCode& pc )
-{
-  // Get the pointer to the matrix object where we need to store the data
-  std::vector< double >& array( *( pc.get_double_array( 0 ) ) );
-  double* data1 = pc.get_variable( 1 );
-
-  double* data1_end = data1 + ( pc.get_size() );
-  Core::index_type idx = pc.get_index();
-
-  while ( data1 != data1_end )
-  {
-    array[ idx ] = *data1;
-    idx++;
-    data1++;
-  }
-
-  return true;
-}
 
 bool to_data_block_s( Core::ArrayMathProgramCode& pc )
 {
@@ -226,14 +145,10 @@ namespace Core
 void InsertSourceSinkArrayMathFunctionCatalog( ArrayMathFunctionCatalogHandle& catalog )
 {
   // Source functions
-  catalog->add_function( ArrayMathFunctions::get_scalar_ad, "get_scalar$AD", "S" );
-  catalog->add_function( ArrayMathFunctions::get_scalar_ab, "get_scalar$AB", "S" );
   catalog->add_function( ArrayMathFunctions::get_scalar_data, "get_scalar$DATA", "S" );
   catalog->add_function( ArrayMathFunctions::get_scalar_mask, "get_scalar$MASK", "S" );
 
   // Sink functions
-  catalog->add_function( ArrayMathFunctions::to_bool_array_s, "to_bool_array$S", "AB" );
-  catalog->add_function( ArrayMathFunctions::to_double_array_s, "to_double_array$S", "AD" );
   catalog->add_function( ArrayMathFunctions::to_data_block_s, "to_data_block$S", "DATA" );
   catalog->add_function( ArrayMathFunctions::to_mask_data_block_s, "to_mask_data_block$S", "MASK" );
 }

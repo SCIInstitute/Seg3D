@@ -133,7 +133,7 @@ bool ArrayMathInterpreter::translate( ParserProgramHandle& pprogram,
     {
       buffer_mem += 1;
     }
-    else if ( type == "AB" || type == "AD" || type == "DATA" || type == "MASK" ) 
+    else if ( type == "DATA" || type == "MASK" ) 
     {
       buffer_mem += 0;
     }
@@ -165,7 +165,7 @@ bool ArrayMathInterpreter::translate( ParserProgramHandle& pprogram,
       {
         buffer_mem += 1 * buffer_size;
       }
-      else if ( type == "AB" || type == "AD" || type == "DATA" || type == "MASK" )
+      else if ( type == "DATA" || type == "MASK" )
       {
         buffer_mem += 0;
       }
@@ -377,34 +377,6 @@ bool ArrayMathInterpreter::translate( ParserProgramHandle& pprogram,
         }
 
       }
-      else if ( type == "AB" )
-      {
-        mprogram->find_source( name, ps );
-        if ( ps.is_bool_array() )
-        {
-          pc.set_bool_array( i + 1, ps.get_bool_array() );
-        }
-        else
-        {
-          error
-              = "INTERNAL ERROR - Variable is of Mesh type, but given source is not a bool array.";
-          return false;
-        }
-      }
-      else if ( type == "AD" )
-      {
-        mprogram->find_source( name, ps );
-        if ( ps.is_double_array() )
-        {
-          pc.set_double_array( i + 1, ps.get_double_array() );
-        }
-        else
-        {
-          error
-              = "INTERNAL ERROR - Variable is of Mesh type, but given source is not a double array.";
-          return false;
-        }
-      }
       else if ( type == "DATA" )
       {
         mprogram->find_source( name, ps );
@@ -478,34 +450,6 @@ bool ArrayMathInterpreter::translate( ParserProgramHandle& pprogram,
       }
 
     }
-    else if ( type == "AB" )
-    {
-      mprogram->find_sink( name, ps );
-      if ( ps.is_bool_array() )
-      {
-        pc.set_bool_array( 0, ps.get_bool_array() );
-      }
-      else
-      {
-        error
-            = "INTERNAL ERROR - Variable is of Mesh type, but given sink is not a bool array.";
-        return false;
-      }
-    }
-    else if ( type == "AD" )
-    {
-      mprogram->find_sink( name, ps );
-      if ( ps.is_double_array() )
-      {
-        pc.set_double_array( 0, ps.get_double_array() );
-      }
-      else
-      {
-        error
-            = "INTERNAL ERROR - Variable is of Mesh type, but given sink is not a double array.";
-        return false;
-      }
-    }
     else if ( type == "DATA" )
     {
       mprogram->find_sink( name, ps );
@@ -564,34 +508,6 @@ bool ArrayMathInterpreter::translate( ParserProgramHandle& pprogram,
           pc.set_variable( i + 1, mprogram->get_const_variable( inum )->get_data() );
         }
       }
-      else if ( type == "AB" )
-      {
-        mprogram->find_source( name, ps );
-        if ( ps.is_bool_array() )
-        {
-          pc.set_bool_array( i + 1, ps.get_bool_array() );
-        }
-        else
-        {
-          error
-              = "INTERNAL ERROR - Variable is of Mesh type, but given source is not a bool array.";
-          return false;
-        }
-      }
-      else if ( type == "AD" )
-      {
-        mprogram->find_source( name, ps );
-        if ( ps.is_double_array() )
-        {
-          pc.set_double_array( i + 1, ps.get_double_array() );
-        }
-        else
-        {
-          error
-              = "INTERNAL ERROR - Variable is of Mesh type, but given source is not a double array.";
-          return false;
-        }
-      }
       else
       {
         error = "INTERNAL ERROR - Encountered unknown type.";
@@ -621,34 +537,6 @@ bool ArrayMathInterpreter::translate( ParserProgramHandle& pprogram,
       if ( type == "S" )
       {
         pc.set_variable( 0, mprogram->get_sequential_variable( onum, nt )->get_data() );
-      }
-      else if ( type == "AB" )
-      {
-        mprogram->find_sink( name, ps );
-        if ( ps.is_bool_array() )
-        {
-          pc.set_bool_array( 0, ps.get_bool_array() );
-        }
-        else
-        {
-          error
-              = "INTERNAL ERROR - Variable is of Mesh type, but given source is not a bool array.";
-          return false;
-        }
-      }
-      else if ( type == "AD" )
-      {
-        mprogram->find_sink( name, ps );
-        if ( ps.is_double_array() )
-        {
-          pc.set_double_array( 0, ps.get_double_array() );
-        }
-        else
-        {
-          error
-              = "INTERNAL ERROR - Variable is of Mesh type, but given source is not a double array.";
-          return false;
-        }
       }
       else if ( type == "DATA" )
       {
@@ -710,34 +598,6 @@ bool ArrayMathInterpreter::translate( ParserProgramHandle& pprogram,
           else if ( flags & SCRIPT_CONST_VAR_E )
           {
             pc.set_variable( i + 1, mprogram->get_const_variable( inum )->get_data() );
-          }
-        }
-        else if ( type == "AB" )
-        {
-          mprogram->find_source( name, ps );
-          if ( ps.is_bool_array() )
-          {
-            pc.set_bool_array( i + 1, ps.get_bool_array() );
-          }
-          else
-          {
-            error
-                = "INTERNAL ERROR - Variable is of Mesh type, but given source is not a bool array.";
-            return false;
-          }
-        }
-        else if ( type == "AD" )
-        {
-          mprogram->find_source( name, ps );
-          if ( ps.is_double_array() )
-          {
-            pc.set_double_array( i + 1, ps.get_double_array() );
-          }
-          else
-          {
-            error
-                = "INTERNAL ERROR - Variable is of Mesh type, but given source is not a double array.";
-            return false;
           }
         }
         else if ( type == "DATA" )
@@ -820,26 +680,6 @@ bool ArrayMathInterpreter::run( ArrayMathProgramHandle& mprogram, std::string& e
   return true;
 }
 
-bool ArrayMathInterpreter::add_bool_array_source( ArrayMathProgramHandle& pprogram,
-    std::string& name, std::vector< bool >* array, std::string& error )
-{
-  if ( !( create_program( pprogram, error ) ) ) 
-  {
-    return false;
-  }
-  return pprogram->add_source( name, array );
-}
-
-bool ArrayMathInterpreter::add_double_array_source( ArrayMathProgramHandle& pprogram,
-    std::string& name, std::vector< double >* array, std::string& error )
-{
-  if ( !( create_program( pprogram, error ) ) ) 
-  {
-    return false;
-  }
-  return pprogram->add_source( name, array );
-}
-
 bool ArrayMathInterpreter::add_data_block_source( ArrayMathProgramHandle& pprogram, 
   std::string& name, DataBlockHandle data_block, std::string& error )
 {
@@ -858,26 +698,6 @@ bool ArrayMathInterpreter::add_mask_data_block_source( ArrayMathProgramHandle& p
     return false;
   }
   return pprogram->add_source( name, mask_data_block.get() );
-}
-
-bool ArrayMathInterpreter::add_bool_array_sink( ArrayMathProgramHandle& pprogram,
-    std::string& name, std::vector< bool >* array, std::string& error )
-{
-  if ( !( create_program( pprogram, error ) ) ) 
-  {
-    return false;
-  }
-  return pprogram->add_sink( name, array );
-}
-
-bool ArrayMathInterpreter::add_double_array_sink( ArrayMathProgramHandle& pprogram,
-    std::string& name, std::vector< double >* array, std::string& error )
-{
-  if ( !( create_program( pprogram, error ) ) )
-  {
-    return false;
-  }
-  return pprogram->add_sink( name, array );
 }
 
 bool ArrayMathInterpreter::add_data_block_sink( ArrayMathProgramHandle& pprogram, 
