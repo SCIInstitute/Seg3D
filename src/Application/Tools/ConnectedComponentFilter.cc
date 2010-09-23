@@ -27,12 +27,17 @@
  */
 
 // Application includes
-#include <Application/Layer/LayerFWD.h>
 #include <Application/Tool/ToolFactory.h>
-#include <Application/Tools/ConnectedComponentFilter.h>
+#include <Application/Layer/Layer.h>
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/Viewer/Viewer.h>
 #include <Application/ViewerManager/ViewerManager.h>
+
+// StateEngine of the tool
+#include <Application/Tools/ConnectedComponentFilter.h>
+
+// Action associated with tool
+#include <Application/Filters/Actions/ActionConnectedComponentFilter.h>
 
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL( Seg3D, ConnectedComponentFilter )
@@ -80,6 +85,20 @@ ConnectedComponentFilter::ConnectedComponentFilter( const std::string& toolid ) 
 ConnectedComponentFilter::~ConnectedComponentFilter()
 { 
   this->disconnect_all();
+}
+
+void ConnectedComponentFilter::execute( Core::ActionContextHandle context )
+{
+  std::vector< Core::Point > seeds = this->seed_points_state_->get();
+  if ( ! this->use_seeds_state_->get() ) seeds.clear();
+  
+  ActionConnectedComponentFilter::Dispatch( context,
+    this->target_layer_state_->get(),
+    seeds,
+    this->replace_state_->get(),
+    this->mask_state_->get(),
+    this->mask_invert_state_->get()
+  );    
 }
 
   

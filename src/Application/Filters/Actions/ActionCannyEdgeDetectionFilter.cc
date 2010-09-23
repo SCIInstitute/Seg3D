@@ -97,7 +97,7 @@ public:
   
   // NOTE: The macro needs a data type to select which version to run. This needs to be
   // a member variable of the algorithm class.
-  SCI_BEGIN_FLOAT_RUN( this->src_layer_->get_data_type() )
+  SCI_BEGIN_RUN()
   {
     // Define the type of filter that we use.
     typedef itk::CannyEdgeDetectionImageFilter< 
@@ -138,7 +138,7 @@ public:
     
     this->insert_itk_image_into_layer( this->dst_layer_, filter->GetOutput() ); 
   }
-  SCI_END_FLOAT_RUN()
+  SCI_END_RUN()
   
   // GET_FITLER_NAME:
   // The name of the filter, this information is used for generating new layer labels.

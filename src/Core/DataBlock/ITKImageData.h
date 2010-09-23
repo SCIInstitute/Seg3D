@@ -152,6 +152,10 @@ public:
   // Get the pointer to the data block within the itkImage
   virtual void* get_data() const;
 
+  // GET_TYPED_DATA:
+  // Get the pointer to the data block within the itkImage
+  T* get_typed_data() const;
+
   // GRID_TRANSFORM:
   // Extract the transform from the nrrd
   virtual GridTransform get_grid_transform() const;
@@ -313,6 +317,12 @@ template<class T>
 void* ITKImageDataT<T>::get_data() const
 {
   return reinterpret_cast< void* >( itk_image_->GetBufferPointer() );
+}
+
+template<class T>
+T* ITKImageDataT<T>::get_typed_data() const
+{
+  return reinterpret_cast< T* >( itk_image_->GetBufferPointer() );
 }
 
 template<class T>

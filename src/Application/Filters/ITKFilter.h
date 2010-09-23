@@ -68,7 +68,7 @@ protected:
   // Retrieve an itk image from a data or mask layer
   template <class T>
   bool get_itk_image_from_layer( const LayerHandle& layer, 
-    typename Core::ITKImageDataT<T>::Handle& image )
+    typename Core::ITKImageDataT<T>::Handle& image, bool invert = false )
   {
     // Clear the handle
     image.reset();
@@ -110,7 +110,7 @@ protected:
       // We always need to convert the data, ITK does not support the compressed way of
       // dealing with bitplanes
       if ( ! ( Core::MaskDataBlockManager::Convert( volume->get_mask_data_block(), 
-        data_block, Core::GetDataType( reinterpret_cast<T*>( 0 ) ) ) ) )
+        data_block, Core::GetDataType( reinterpret_cast<T*>( 0 ) ), invert ) ) )
       {
         return false;
       }   
@@ -350,9 +350,13 @@ public:\
   template< class VALUE_TYPE>\
   void typed_run()\
   {\
+    typedef itk::Image< unsigned short, 3> USHORT_IMAGE_TYPE; \
+    typedef itk::Image< unsigned int, 3> UINT_IMAGE_TYPE; \
     typedef itk::Image< float, 3> FLOAT_IMAGE_TYPE; \
     typedef itk::Image< unsigned char, 3> UCHAR_IMAGE_TYPE; \
     typedef itk::Image< VALUE_TYPE, 3> TYPED_IMAGE_TYPE; \
+    typedef Core::ITKImageDataT<unsigned int> UINT_CONTAINER_TYPE; \
+    typedef Core::ITKImageDataT<unsigned short> USHORT_CONTAINER_TYPE; \
     typedef Core::ITKImageDataT<VALUE_TYPE> TYPED_CONTAINER_TYPE; \
     typedef Core::ITKImageDataT<float> FLOAT_CONTAINER_TYPE; \
     typedef Core::ITKImageDataT<unsigned char> UCHAR_CONTAINER_TYPE;
@@ -362,16 +366,20 @@ public:\
   }
 
 
-#define SCI_BEGIN_FLOAT_RUN( DATATYPE ) \
+#define SCI_BEGIN_RUN( ) \
 public:\
   virtual void run()\
   {\
+    typedef itk::Image< unsigned short, 3> USHORT_IMAGE_TYPE; \
+    typedef itk::Image< unsigned int, 3> UINT_IMAGE_TYPE; \
     typedef itk::Image< float, 3> FLOAT_IMAGE_TYPE; \
     typedef itk::Image< unsigned char, 3> UCHAR_IMAGE_TYPE; \
     typedef Core::ITKImageDataT<float> FLOAT_CONTAINER_TYPE; \
+    typedef Core::ITKImageDataT<unsigned int> UINT_CONTAINER_TYPE; \
+    typedef Core::ITKImageDataT<unsigned short> USHORT_CONTAINER_TYPE; \
     typedef Core::ITKImageDataT<unsigned char> UCHAR_CONTAINER_TYPE;
 
-#define SCI_END_FLOAT_RUN() \
+#define SCI_END_RUN() \
   }
   
 } // end namespace Seg3D

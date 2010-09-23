@@ -49,6 +49,8 @@ SET(APPLICATION_FILTERS_ACTIONS_SRCS
   Actions/ActionCannyEdgeDetectionFilter.cc
   Actions/ActionConfidenceConnectedFilter.h
   Actions/ActionConfidenceConnectedFilter.cc
+  Actions/ActionConnectedComponentFilter.h
+  Actions/ActionConnectedComponentFilter.cc
   Actions/ActionCurvatureAnisotropicDiffusionFilter.h
   Actions/ActionCurvatureAnisotropicDiffusionFilter.cc
   Actions/ActionDilateFilter.h
@@ -61,6 +63,8 @@ SET(APPLICATION_FILTERS_ACTIONS_SRCS
   Actions/ActionErodeFilter.cc
   Actions/ActionGradientMagnitudeFilter.h
   Actions/ActionGradientMagnitudeFilter.cc
+  Actions/ActionFillHolesFilter.h
+  Actions/ActionFillHolesFilter.cc
   Actions/ActionHistogramEqualizationFilter.h
   Actions/ActionHistogramEqualizationFilter.cc
   Actions/ActionIntensityCorrectionFilter.h

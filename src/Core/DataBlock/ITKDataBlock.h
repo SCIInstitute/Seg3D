@@ -72,6 +72,20 @@ public:
     // Use the wrapper class to generate the data block.
     return New( itk_data, generation );
   }
+
+  // NEW:
+  // Constructor of a new data block using an itk image pointer.
+  template< class T >
+  static DataBlockHandle New( typename itk::Image<T,3>* itk_image, generation_type generation = -1 )
+  {
+    // Create a wrapper class.
+    typename ITKImageDataT<T>::Handle itk_data = 
+      typename ITKImageDataT<T>::Handle( 
+        new ITKImageDataT<T>( 
+          typename itk::Image<T,3>::Pointer( itk_image) ) );
+    // Use the wrapper class to generate the data block.
+    return New( itk_data, generation );
+  }
 };
 
 } // end namespace Core

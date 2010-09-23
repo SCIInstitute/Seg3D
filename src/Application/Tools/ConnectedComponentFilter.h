@@ -67,8 +67,13 @@ public:
   // Layerid of the mask layer
   Core::StateLabeledOptionHandle mask_state_;
     
-  // Whether mask should be inverted in thois filter
+  // Whether mask should be inverted in this filter
   Core::StateBoolHandle mask_invert_state_;
+
+  // -- execute --
+public:
+  // Execute the tool and dispatch the action
+  virtual void execute( Core::ActionContextHandle context );
 
 private:
   ConnectedComponentFilterPrivateHandle private_;

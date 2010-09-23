@@ -326,7 +326,8 @@ bool MaskDataBlockManager::Convert( DataBlockHandle data,
   assert( mask->get_ny() == data->get_ny() );
   assert( mask->get_nz() == data->get_nz() );
   
-  DataBlock::lock_type lock( data->get_mutex( ) );
+  DataBlock::shared_lock_type lock( data->get_mutex( ) );
+  DataBlock::lock_type mask_lock( mask->get_mutex( ) );
   
   switch( data->get_data_type() )
   {
@@ -405,7 +406,8 @@ bool MaskDataBlockManager::ConvertLabel( DataBlockHandle data,
   assert( mask->get_ny() == data->get_ny() );
   assert( mask->get_nz() == data->get_nz() );
   
-  DataBlock::lock_type lock( data->get_mutex( ) );
+  DataBlock::shared_lock_type lock( data->get_mutex( ) );
+  DataBlock::lock_type mask_lock( mask->get_mutex( ) );
   
   switch( data->get_data_type() )
   {
@@ -434,7 +436,7 @@ bool MaskDataBlockManager::ConvertLabel( DataBlockHandle data,
 template< class T>
 bool ConvertToDataInternal( MaskDataBlockHandle mask, DataBlockHandle& data, bool invert )
 {
-  MaskDataBlock::lock_type lock( mask->get_mutex( ) );
+  MaskDataBlock::shared_lock_type lock( mask->get_mutex( ) );
 
   unsigned char* mask_ptr = mask->get_mask_data();
   unsigned char mask_value = mask->get_mask_value();

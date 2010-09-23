@@ -28,10 +28,15 @@
 
 // Application includes
 #include <Application/Tool/ToolFactory.h>
-#include <Application/Tools/FillHolesFilter.h>
 #include <Application/Layer/Layer.h>
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/ViewerManager/ViewerManager.h>
+
+// StateEngine of the tool
+#include <Application/Tools/FillHolesFilter.h>
+
+// Action associated with tool
+#include <Application/Filters/Actions/ActionFillHolesFilter.h>
 
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL( Seg3D, FillHolesFilter )
@@ -65,6 +70,14 @@ FillHolesFilter::FillHolesFilter( const std::string& toolid ) :
 FillHolesFilter::~FillHolesFilter()
 {
   disconnect_all();
+}
+
+void FillHolesFilter::execute( Core::ActionContextHandle context )
+{
+  ActionFillHolesFilter::Dispatch( context,
+    this->target_layer_state_->get(),
+    this->seed_points_state_->get(),
+    this->replace_state_->get() );
 }
 
 } // end namespace Seg3D

@@ -59,7 +59,12 @@ public:
 public:
   // Whether the layer needs to be replaced
   Core::StateBoolHandle replace_state_;
-    
+
+  // -- execute --
+public:
+  // Execute the tool and dispatch the action
+  virtual void execute( Core::ActionContextHandle context );
+
 private:
   FillHolesFilterPrivateHandle private_;
 };
