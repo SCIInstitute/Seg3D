@@ -65,9 +65,6 @@ public:
   bool add_data_block_sink( ArrayMathProgramHandle& pprogram, 
     std::string& name, DataBlockHandle data_block, std::string& error );
 
-  bool add_mask_data_block_sink( ArrayMathProgramHandle& pprogram, 
-    std::string& name, MaskDataBlockHandle mask_data_block, std::string& error );
-
   //------------------------------------------------------------------------
   // Step 2: translate code and generate executable code
 

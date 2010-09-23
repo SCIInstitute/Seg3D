@@ -57,14 +57,6 @@ bool ArrayMathProgram::add_sink( std::string& name, DataBlock* data_block )
   return true;
 }
 
-bool ArrayMathProgram::add_sink( std::string& name, MaskDataBlock* mask_data_block )
-{
-  ArrayMathProgramSource ps;
-  ps.set_mask_data_block( mask_data_block );
-  this->output_sinks_[ name ] = ps;
-  return true;
-}
-
 bool ArrayMathProgram::find_source( std::string& name, ArrayMathProgramSource& ps )
 {
   std::map< std::string, ArrayMathProgramSource >::iterator it = this->input_sources_.find( name );

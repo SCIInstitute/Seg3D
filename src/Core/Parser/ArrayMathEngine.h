@@ -50,13 +50,9 @@ public:
     DataBlockHandle data_block_;
   };
 
-  class OutputMaskDataBlock
-  {
-  public:
-    std::string array_name_;
-    std::string mask_data_block_name_; 
-    MaskDataBlockHandle mask_data_block_;
-  };
+  // We don't support outputting a MaskDataBlock because it would have to be registered with the
+  // MaskDataBlockManager and locked to prevent conflicts with other masks.  Also, we can avoid 
+  // bit operations when copying back the parser result.
 
 public:
   // CALLS TO THIS CLASS SHOULD BE MADE IN THE ORDER
@@ -74,8 +70,7 @@ public:
 
   bool add_output_data_block( std::string name, size_t nx, size_t ny, 
     size_t nz, Core::DataType type );
-  bool add_output_mask_data_block( std::string name, size_t nx, size_t ny, size_t nz );
-
+  
   // Setup the expression                        
   bool add_expressions( std::string& expressions );
 
@@ -84,7 +79,6 @@ public:
 
   // Extract handles to the results
   bool get_data_block( std::string name, DataBlockHandle& data_block );
-  bool get_mask_data_block( std::string name, MaskDataBlockHandle& mask_data_block );
 
   // Clean up the engine
   void clear();
@@ -115,7 +109,6 @@ private:
   // away, but the type is only know when the parser has validated and optimized
   // the expression tree
   std::vector< OutputDataBlock > data_block_data_;
-  std::vector< OutputMaskDataBlock > mask_data_block_data_;
 };
 
 }

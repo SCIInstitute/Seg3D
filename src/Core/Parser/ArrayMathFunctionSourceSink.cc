@@ -110,33 +110,6 @@ bool to_data_block_s( Core::ArrayMathProgramCode& pc )
   return true;
 }
 
-bool to_mask_data_block_s( Core::ArrayMathProgramCode& pc )
-{
-  // Get the pointer to the DataBlock object where we need to store the data
-  Core::MaskDataBlock& data0( *( pc.get_mask_data_block( 0 ) ) );
-  double* data1 = pc.get_variable( 1 );
-
-  double* data1_end = data1 + ( pc.get_size() );
-  Core::index_type idx = pc.get_index();
-
-  // Copy result to mask
-  while ( data1 != data1_end ) 
-  {
-    if( *data1 )
-    {
-      data0.set_mask_at( idx );
-    }
-    else
-    {
-      data0.clear_mask_at( idx );
-    }
-    idx++; 
-    data1++;
-  }
-
-  return true;
-}
-
 } //end namespace
 
 namespace Core
@@ -150,7 +123,6 @@ void InsertSourceSinkArrayMathFunctionCatalog( ArrayMathFunctionCatalogHandle& c
 
   // Sink functions
   catalog->add_function( ArrayMathFunctions::to_data_block_s, "to_data_block$S", "DATA" );
-  catalog->add_function( ArrayMathFunctions::to_mask_data_block_s, "to_mask_data_block$S", "MASK" );
 }
 
 } // end namespace

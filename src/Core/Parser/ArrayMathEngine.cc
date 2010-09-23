@@ -236,64 +236,6 @@ bool ArrayMathEngine::add_output_data_block( std::string name, size_t nx, size_t
   return true;
 }
 
-bool ArrayMathEngine::add_output_mask_data_block( std::string name, size_t nx, size_t ny, size_t nz )
-{
-  std::string error_str;
-
-  size_t size = nx * ny * nz;
-
-  if ( this->array_size_ != size )
-  {
-    error_str = "The output field '" + name + 
-      "' does not have the same number of elements as the other objects.";
-    CORE_LOG_ERROR( error_str );
-    return false;  
-  }
-
-  std::string tname = "__" + name;
-
-  if ( size == 0 )
-  {
-    return false;
-  }
-
-  int flags = 0;
-  if ( size > 1 ) 
-  {
-    flags = SCRIPT_SEQUENTIAL_VAR_E;  
-  }
-
-  this->post_expression_ += tname + "=to_mask_data_block(" + name + ");";
-
-  // Add the variable to the parser
-  // Temporary buffer
-  if ( !( add_output_variable( this->pprogram_, name, "S", flags ) ) )
-  {
-    CORE_LOG_ERROR( error_str );
-    return false;
-  }
-  // Final buffer
-  if ( !( add_output_variable( this->pprogram_, tname, "MASK", flags ) ) )
-  {
-    CORE_LOG_ERROR( error_str );
-    return false;
-  }
-
-  // Create new output data block based on input data block
-  Core::MaskDataBlockHandle output_mask_data_block( new Core::MaskDataBlock( 
-    Core::StdDataBlock::New( nx, ny, nz, DataType::UCHAR_E ), 0 ) );
-
-  // Store information for processing after parsing has succeeded
-  OutputMaskDataBlock m;
-  m.array_name_ = name;
-  m.mask_data_block_name_ = tname;
-  m.mask_data_block_ = output_mask_data_block;
-
-  this->mask_data_block_data_.push_back( m );
-
-  return true;
-}
-
 bool ArrayMathEngine::add_expressions( std::string& expressions )
 {
   this->expression_ += expressions;
@@ -351,20 +293,6 @@ bool ArrayMathEngine::run()
     }
   }
 
-  for ( size_t j = 0; j < this->mask_data_block_data_.size(); j++ )
-  {
-    if ( this->mask_data_block_data_[ j ].mask_data_block_.get() )
-    {
-      std::string arrayname = this->mask_data_block_data_[ j ].mask_data_block_name_;
-      if ( !( this->add_mask_data_block_sink( this->mprogram_, arrayname,
-        this->mask_data_block_data_[ j ].mask_data_block_, error_str ) ) )
-      {
-        CORE_LOG_ERROR( error_str );
-        return false;
-      }
-    }
-  }
-
   // Translate the code
   if ( !( this->translate( this->pprogram_, this->mprogram_, error_str ) ) )
   {
@@ -393,20 +321,6 @@ bool ArrayMathEngine::get_data_block( std::string name, DataBlockHandle& data_bl
     if ( this->data_block_data_[ j ].array_name_ == name )
     {
       data_block = this->data_block_data_[ j ].data_block_;
-      return true;
-    }
-  }
-
-  return false;
-}
-
-bool ArrayMathEngine::get_mask_data_block( std::string name, MaskDataBlockHandle& mask_data_block )
-{
-  for ( size_t j = 0; j < this->mask_data_block_data_.size(); j++ )
-  {
-    if ( this->mask_data_block_data_[ j ].array_name_ == name )
-    {
-      mask_data_block = this->mask_data_block_data_[ j ].mask_data_block_;
       return true;
     }
   }

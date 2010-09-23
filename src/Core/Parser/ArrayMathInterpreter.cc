@@ -464,20 +464,6 @@ bool ArrayMathInterpreter::translate( ParserProgramHandle& pprogram,
         return false;
       }
     }
-    else if ( type == "MASK" )
-    {
-      mprogram->find_sink( name, ps );
-      if ( ps.is_mask_data_block() )
-      {
-        pc.set_mask_data_block( 0, ps.get_mask_data_block() );
-      }
-      else
-      {
-        error
-          = "INTERNAL ERROR - Variable is of MaskDataBlock type, but given sink is not a MaskDataBlock.";
-        return false;
-      }
-    }
     else
     {
       error = "INTERNAL ERROR - Encountered unknown type.";
@@ -549,20 +535,6 @@ bool ArrayMathInterpreter::translate( ParserProgramHandle& pprogram,
         {
           error
             = "INTERNAL ERROR - Variable is of DataBlock type, but given source is not a DataBlock.";
-          return false;
-        }
-      }
-      else if ( type == "MASK" )
-      {
-        mprogram->find_sink( name, ps );
-        if ( ps.is_mask_data_block() )
-        {
-          pc.set_mask_data_block( 0, ps.get_mask_data_block() );
-        }
-        else
-        {
-          error
-            = "INTERNAL ERROR - Variable is of MaskDataBlock type, but given source is not a MaskDataBlock.";
           return false;
         }
       }
@@ -709,17 +681,6 @@ bool ArrayMathInterpreter::add_data_block_sink( ArrayMathProgramHandle& pprogram
   }
   return pprogram->add_sink( name, data_block.get() );
 }
-
-bool ArrayMathInterpreter::add_mask_data_block_sink( ArrayMathProgramHandle& pprogram, 
-  std::string& name, MaskDataBlockHandle mask_data_block, std::string& error )
-{
-  if ( !( create_program( pprogram, error ) ) )
-  {
-    return false;
-  }
-  return pprogram->add_sink( name, mask_data_block.get() );
-}
-
 
 bool ArrayMathInterpreter::set_array_size( ArrayMathProgramHandle& pprogram, size_type array_size )
 {
