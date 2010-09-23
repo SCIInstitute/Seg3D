@@ -43,21 +43,19 @@ class ArrayMathProgramSource
 {
 
 public:
-  ArrayMathProgramSource() :
-    data_block_( 0 ),
-    mask_data_block_( 0 ) {}
+  ArrayMathProgramSource() {}
 
-  void set_data_block( DataBlock* data_block );
+  void set_data_block( DataBlockHandle data_block );
   DataBlock* get_data_block();
   bool is_data_block();
 
-  void set_mask_data_block( MaskDataBlock* mask_data_block );
+  void set_mask_data_block( MaskDataBlockHandle mask_data_block );
   MaskDataBlock* get_mask_data_block();
   bool is_mask_data_block();
 
 private:
-  DataBlock* data_block_;
-  MaskDataBlock* mask_data_block_;
+  DataBlockHandle data_block_;
+  MaskDataBlockHandle mask_data_block_;
 };
 
 }

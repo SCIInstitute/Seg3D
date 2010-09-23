@@ -33,7 +33,7 @@
 namespace Core
 {
 
-bool ArrayMathProgram::add_source( std::string& name, DataBlock* data_block )
+bool ArrayMathProgram::add_source( std::string& name, DataBlockHandle data_block )
 {
   ArrayMathProgramSource ps;
   ps.set_data_block( data_block );
@@ -41,7 +41,7 @@ bool ArrayMathProgram::add_source( std::string& name, DataBlock* data_block )
   return true;
 }
 
-bool ArrayMathProgram::add_source( std::string& name, MaskDataBlock* mask_data_block )
+bool ArrayMathProgram::add_source( std::string& name, MaskDataBlockHandle mask_data_block )
 {
   ArrayMathProgramSource ps;
   ps.set_mask_data_block( mask_data_block );
@@ -49,7 +49,7 @@ bool ArrayMathProgram::add_source( std::string& name, MaskDataBlock* mask_data_b
   return true;
 }
 
-bool ArrayMathProgram::add_sink( std::string& name, DataBlock* data_block )
+bool ArrayMathProgram::add_sink( std::string& name, DataBlockHandle data_block )
 {
   ArrayMathProgramSource ps;
   ps.set_data_block( data_block );

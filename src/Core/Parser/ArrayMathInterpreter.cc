@@ -659,7 +659,7 @@ bool ArrayMathInterpreter::add_data_block_source( ArrayMathProgramHandle& pprogr
   {
     return false;
   }
-  return pprogram->add_source( name, data_block.get() );
+  return pprogram->add_source( name, data_block );
 }
 
 bool ArrayMathInterpreter::add_mask_data_block_source( ArrayMathProgramHandle& pprogram, 
@@ -669,7 +669,7 @@ bool ArrayMathInterpreter::add_mask_data_block_source( ArrayMathProgramHandle& p
   {
     return false;
   }
-  return pprogram->add_source( name, mask_data_block.get() );
+  return pprogram->add_source( name, mask_data_block );
 }
 
 bool ArrayMathInterpreter::add_data_block_sink( ArrayMathProgramHandle& pprogram, 
@@ -679,7 +679,7 @@ bool ArrayMathInterpreter::add_data_block_sink( ArrayMathProgramHandle& pprogram
   {
     return false;
   }
-  return pprogram->add_sink( name, data_block.get() );
+  return pprogram->add_sink( name, data_block );
 }
 
 bool ArrayMathInterpreter::set_array_size( ArrayMathProgramHandle& pprogram, size_type array_size )

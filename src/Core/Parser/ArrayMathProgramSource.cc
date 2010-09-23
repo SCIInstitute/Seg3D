@@ -32,34 +32,34 @@
 namespace Core
 {
 
-void ArrayMathProgramSource::set_data_block( DataBlock* data_block )
+void ArrayMathProgramSource::set_data_block( DataBlockHandle data_block )
 {
   this->data_block_ = data_block;
 }
 
 DataBlock* ArrayMathProgramSource::get_data_block()
 {
-  return this->data_block_;
+  return this->data_block_.get();
 }
 
 bool ArrayMathProgramSource::is_data_block()
 {
-  return this->data_block_ != 0;
+  return this->data_block_.get() != 0;
 }
 
-void ArrayMathProgramSource::set_mask_data_block( MaskDataBlock* mask_data_block )
+void ArrayMathProgramSource::set_mask_data_block( MaskDataBlockHandle mask_data_block )
 {
   this->mask_data_block_ = mask_data_block;
 }
 
 MaskDataBlock* ArrayMathProgramSource::get_mask_data_block()
 {
-  return this->mask_data_block_;
+  return this->mask_data_block_.get();
 }
 
 bool ArrayMathProgramSource::is_mask_data_block()
 {
-  return this->mask_data_block_ != 0;
+  return this->mask_data_block_.get() != 0;
 }
 
 } // end namespace
