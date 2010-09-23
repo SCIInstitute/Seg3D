@@ -66,10 +66,6 @@ public:
 
 // -- update functions --
 public:
-  // ENABLE_BUTTONS:
-  // Specify which buttons need to be enabled for the user
-  void enable_buttons( bool lock_button, bool compute_isosurface_button,
-    bool other_buttons, bool initialize = false);
 
   // UPDATE_APPEARANCE:
   // Update the appearance of the widget to reflect its state
@@ -168,11 +164,6 @@ private Q_SLOTS:
   // this seperate function is need to change the color of the mask backgroun in the case that
   // the active color for the layer has been changed by the preferences manager
   void set_mask_background_color_from_preference_change( int color_index );
-  
-  // UNCHECK_SHOW_ISO_BUTTON:
-  // this function unchecks the show iso button if it is on when the iso surface button is clicked
-  // and the iso surface is deleted
-  void uncheck_show_iso_button();
 
   // COMPUTE_ISOSURFACE
   // this function computes the isosurface using the quality stored in the state variable

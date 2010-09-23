@@ -33,7 +33,7 @@
 #include <QPointer>
 
 #include <Core/Utils/ConnectionHandler.h>
-#include <Core/State/StateValue.h>
+#include <Core/State/State.h>
 
 namespace QtUtils
 {
@@ -43,7 +43,10 @@ class QtEnableConnector : public QObject, protected Core::ConnectionHandler
   Q_OBJECT
 public:
   QtEnableConnector( QWidget* parent, Core::StateBoolHandle& state, bool opposite_logic );
-  QtEnableConnector( QWidget* parent, std::vector< Core::StateBoolHandle >& states );
+  QtEnableConnector( QWidget* parent, Core::StateBaseHandle state,
+    boost::function< bool () > condition );
+  QtEnableConnector( QWidget* parent, std::vector< Core::StateBaseHandle >& states,
+    boost::function< bool () > condition );
   virtual ~QtEnableConnector();
 
   // -- slot functions for boost signals --
@@ -54,8 +57,8 @@ private:
   // -- internal variables --
 private:
   QWidget* parent_;
-  std::vector< Core::StateBoolHandle > bool_states_;
   bool opposite_logic_;
+  boost::function< bool () > condition_;
 };
 
 } // end namespace QtUtils

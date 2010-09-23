@@ -59,10 +59,11 @@ QtEnableConnector::QtEnableConnector( QWidget* parent,
 }
 
 QtEnableConnector::QtEnableConnector( QWidget* parent, 
-  std::vector< Core::StateBoolHandle >& states ) :
+                   std::vector< Core::StateBaseHandle >& states, 
+                   boost::function< bool () > condition ) :
   QObject( parent ),
   parent_( parent ),
-  bool_states_( states )
+  condition_( condition )
 {
   assert( states.size() > 0 );
   QPointer< QtEnableConnector > qpointer( this );
@@ -70,17 +71,29 @@ QtEnableConnector::QtEnableConnector( QWidget* parent,
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
 
-    bool enabled = true;
     for ( size_t i = 0; i < states.size(); ++i )
     {
-      enabled = enabled && states[ i ]->get();
-      this->add_connection( states[ i ]->value_changed_signal_.connect(
+      this->add_connection( states[ i ]->state_changed_signal_.connect(
         boost::bind( &QtEnableConnector::EnableWidget, qpointer ) ) );
     }
-    parent->setEnabled( enabled );
+    parent->setEnabled( condition() );
   }
 }
 
+QtEnableConnector::QtEnableConnector( QWidget* parent, 
+                   Core::StateBaseHandle state, 
+                   boost::function< bool () > condition ) :
+  QObject( parent ),
+  parent_( parent ),
+  condition_( condition )
+{
+  QPointer< QtEnableConnector > qpointer( this );
+
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+  this->add_connection( state->state_changed_signal_.connect(
+    boost::bind( &QtEnableConnector::EnableWidget, qpointer ) ) );
+  parent->setEnabled( condition() );
+}
 
 QtEnableConnector::~QtEnableConnector()
 {
@@ -120,12 +133,7 @@ void QtEnableConnector::EnableWidget( QPointer< QtEnableConnector > qpointer )
   }
 
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-  bool enabled = true;
-  for ( size_t i = 0; i < qpointer->bool_states_.size() && enabled; ++i )
-  {
-    enabled = enabled && qpointer->bool_states_[ i ]->get();
-  }
-  qpointer->parent_->setEnabled( enabled );
+  qpointer->parent_->setEnabled( qpointer->condition_() );
 }
 
 

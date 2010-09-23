@@ -146,10 +146,20 @@ public:
   // Enable / Disable a button from state engine
   static void Enable( QWidget* qwidget, Core::StateBoolHandle& state, bool opposite_logic = false );
 
-  static void Enable( QWidget* qwidget, std::vector< Core::StateBoolHandle >& states );
+  static void Enable( QWidget* qwidget, Core::StateBaseHandle state,
+    boost::function< bool () > condition );
+
+  static void Enable( QWidget* qwidget, std::vector< Core::StateBaseHandle >& states,
+    boost::function< bool () > condition );
 
   // Connect the visibility of the QWidget to a StateBool
   static void Show( QWidget* qwidget, Core::StateBoolHandle& state, bool opposite_logic = false );
+
+  static void Show( QWidget* qwidget, Core::StateBaseHandle state,
+    boost::function< bool () > condition );
+
+  static void Show( QWidget* qwidget, std::vector< Core::StateBaseHandle >& states,
+    boost::function< bool () > condition );
 };
 
 } // end namespace QtUtils

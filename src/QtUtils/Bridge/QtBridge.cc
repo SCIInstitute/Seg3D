@@ -200,14 +200,35 @@ void QtBridge::Enable( QWidget* qwidget, Core::StateBoolHandle& state, bool oppo
   new QtEnableConnector( qwidget, state, opposite_logic );
 }
 
-void QtBridge::Enable( QWidget* qwidget, std::vector< Core::StateBoolHandle >& states )
+void QtBridge::Enable( QWidget* qwidget, std::vector< Core::StateBaseHandle >& states,
+            boost::function< bool () > condition )
 {
-  new QtEnableConnector( qwidget, states );
+  new QtEnableConnector( qwidget, states, condition );
+}
+
+void QtBridge::Enable( QWidget* qwidget, Core::StateBaseHandle state, 
+            boost::function< bool () > condition )
+{
+  new QtEnableConnector( qwidget, state, condition );
 }
 
 void QtBridge::Show( QWidget* qwidget, Core::StateBoolHandle& state, bool opposite_logic )
 {
   new QtShowConnector( qwidget, state, opposite_logic );
 }
+
+void QtBridge::Show( QWidget* qwidget, std::vector< Core::StateBaseHandle >& states, 
+          boost::function< bool () > condition )
+{
+  new QtShowConnector( qwidget, states, condition );
+}
+
+void QtBridge::Show( QWidget* qwidget, Core::StateBaseHandle state, 
+          boost::function< bool () > condition )
+{
+  new QtShowConnector( qwidget, state, condition );
+}
+
+
 
 } // end namespace QtUtils

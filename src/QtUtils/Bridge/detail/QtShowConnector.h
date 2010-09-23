@@ -43,17 +43,22 @@ class QtShowConnector : public QObject, protected Core::ConnectionHandler
   Q_OBJECT
 public:
   QtShowConnector( QWidget* parent, Core::StateBoolHandle& state, bool opposite_logic );
+  QtShowConnector( QWidget* parent, Core::StateBaseHandle state, 
+    boost::function< bool () > condition );
+  QtShowConnector( QWidget* parent, std::vector< Core::StateBaseHandle >& states,
+    boost::function< bool () > condition );
   virtual ~QtShowConnector();
 
   // -- slot functions for boost signals --
 private:
-  static void ShowWidget( QPointer< QtShowConnector > qpointer,
-    bool visible, Core::ActionSource source );
+  static void ShowWidget( QPointer< QtShowConnector > qpointer, bool visible );
+  static void ShowWidget( QPointer< QtShowConnector > qpointer );
 
   // -- internal variables --
 private:
   QWidget* parent_;
   bool opposite_logic_;
+  boost::function< bool () > condition_;
 };
 
 } // end namespace QtUtils

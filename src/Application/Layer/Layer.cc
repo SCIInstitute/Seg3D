@@ -49,7 +49,7 @@ namespace Seg3D
 // Class LayerPrivate
 //////////////////////////////////////////////////////////////////////////
 
-class LayerPrivate
+class LayerPrivate : public Core::ConnectionHandler
 {
 public:
   void handle_locked_state_changed( bool locked );
@@ -60,7 +60,7 @@ public:
 
 void LayerPrivate::handle_locked_state_changed( bool locked )
 {
-  if ( locked )
+  if ( locked && !this->layer_->show_information_state_->get() )
   {
     this->layer_->gui_state_group_->clear_selection();
   }
@@ -111,6 +111,7 @@ Layer::Layer( const std::string& name, const std::string& state_id, bool creatin
   
 Layer::~Layer()
 {
+  this->private_->disconnect_all();
   // Disconnect all current connections
   this->disconnect_all();
 }
@@ -190,10 +191,12 @@ void Layer::initialize_states( const std::string& name, bool creating )
   this->add_state( "show_progress", this->show_progress_bar_state_, creating );
   this->add_state( "show_abort", this->show_abort_message_state_, false );
 
-  this->add_connection( this->locked_state_->value_changed_signal_.connect(
+  // NOTE: Use the private class to keep track of the connections so they won't
+  // be accidentally deleted by subclasses.
+  this->private_->add_connection( this->locked_state_->value_changed_signal_.connect(
     boost::bind( &LayerPrivate::handle_locked_state_changed, this->private_, _1 ) ) );
-  this->add_connection( this->data_state_->value_changed_signal_.connect( boost::bind(
-    &LayerPrivate::handle_data_state_changed, this->private_, _1 ) ) );
+  this->private_->add_connection( this->data_state_->value_changed_signal_.connect( 
+    boost::bind( &LayerPrivate::handle_data_state_changed, this->private_, _1 ) ) );
 
   this->gui_state_group_.reset( new Core::BooleanStateGroup );
   this->gui_state_group_->add_boolean_state( this->show_information_state_ );

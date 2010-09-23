@@ -27,6 +27,8 @@
  */
 
 //Boost Includes
+#include <boost/lambda/lambda.hpp>
+#include <boost/lambda/bind.hpp>
 #include <boost/lexical_cast.hpp>
 
 //Core Includes - for logging
@@ -189,8 +191,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   this->private_->ui_.abort_text_->setText( "Waiting for process to abort ..." );
         
   this->connect( this->private_->ui_.abort_button_,
-    SIGNAL ( pressed() ), this,
-    SLOT( trigger_abort() ) );
+    SIGNAL ( pressed() ), this, SLOT( trigger_abort() ) );
       
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
@@ -236,6 +237,35 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
     QtUtils::QtBridge::Show( this->private_->ui_.progress_bar_bar_, 
       layer->show_progress_bar_state_ );
     QtUtils::QtBridge::Show( this->private_->ui_.abort_bar_, layer->show_abort_message_state_ );
+
+    std::vector< Core::StateBaseHandle > enable_states( 2 );
+    enable_states[ 0 ] = layer->locked_state_;
+    enable_states[ 1 ] = layer->data_state_;
+    boost::function< bool () > condition = !boost::lambda::bind( &Core::StateBool::get, 
+      layer->locked_state_.get() ) && boost::lambda::bind( &Core::StateOption::get,
+      layer->data_state_.get() ) != Layer::CREATING_C;
+
+    // The following buttons are enabled when the layer is not locked and not being created
+    QtUtils::QtBridge::Enable( this->private_->activate_button_, enable_states, condition );
+    QtUtils::QtBridge::Enable( this->private_->ui_.opacity_button_, enable_states, condition );
+    QtUtils::QtBridge::Enable( this->private_->ui_.mask_property_button_, enable_states, condition );
+    QtUtils::QtBridge::Enable( this->private_->ui_.volume_rendered_button_, enable_states, condition );
+    QtUtils::QtBridge::Enable( this->private_->ui_.brightness_contrast_button_, enable_states, condition );
+    QtUtils::QtBridge::Enable( this->private_->ui_.label_, enable_states, condition );
+    
+    // The following buttons are enabled when the layer is not being created
+    condition = boost::lambda::bind( &Core::StateOption::get, layer->data_state_.get() ) != 
+      Layer::CREATING_C;
+    QtUtils::QtBridge::Enable( this->private_->ui_.info_button_, layer->data_state_, condition );
+    QtUtils::QtBridge::Enable( this->private_->ui_.visibility_button_, layer->data_state_, condition );
+    QtUtils::QtBridge::Enable( this->private_->ui_.lock_button_, layer->data_state_, condition );
+
+    // Compute isosurface button is enabled when the layer is not locked and is available
+    QtUtils::QtBridge::Enable( this->private_->ui_.compute_iso_surface_button_, enable_states,
+      !boost::lambda::bind( &Core::StateBool::get, layer->locked_state_.get() ) && 
+      boost::lambda::bind( &Core::StateOption::get, layer->data_state_.get() ) == 
+      Layer::AVAILABLE_C );
+
 
     switch( this->get_volume_type() )
     {
@@ -310,7 +340,6 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
             
             QtUtils::QtBridge::Enable( this->private_->ui_.show_iso_surface_button_, 
               mask_layer->iso_generated_state_ );
-            
             QtUtils::QtBridge::Enable( this->private_->ui_.delete_iso_surface_button_, 
               mask_layer->iso_generated_state_ );
 
@@ -318,9 +347,6 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
               mask_layer->show_mask_property_state_ );
             QtUtils::QtBridge::Show( this->private_->ui_.mask_property_bar_,
               mask_layer->show_mask_property_state_ );
-            
-            connect( this->private_->ui_.delete_iso_surface_button_, 
-              SIGNAL( clicked() ), this, SLOT( uncheck_show_iso_button() ) );
           
             this->set_mask_background_color( mask_layer->color_state_->get() );
           }
@@ -352,48 +378,6 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   
 LayerWidget::~LayerWidget()
 {
-}
-
-void LayerWidget::enable_buttons( bool lock_button, bool compute_isosurface_button, 
-  bool other_buttons, bool /*initialize*/ )
-{
-  this->private_->activate_button_->set_enabled( other_buttons );
-  this->private_->ui_.opacity_button_->setEnabled( other_buttons );
-  this->private_->ui_.visibility_button_->setEnabled( other_buttons );
-  this->private_->ui_.mask_property_button_->setEnabled( other_buttons );
-  this->private_->ui_.compute_iso_surface_button_->setEnabled( compute_isosurface_button );
-  this->private_->ui_.volume_rendered_button_->setEnabled( other_buttons );
-  this->private_->ui_.brightness_contrast_button_->setEnabled( other_buttons );
-  this->private_->ui_.info_button_->setEnabled( other_buttons );
-  this->private_->ui_.label_->setEnabled( other_buttons );
-  this->private_->ui_.lock_button_->setEnabled( lock_button );
-  
-  // for the iso surface buttons on the mask layer
-  if( this->get_volume_type() == Core::VolumeType::MASK_E )
-  {
-    if( other_buttons )
-    { 
-      MaskLayer* mask_layer = dynamic_cast< MaskLayer* >( this->private_->layer_.get() ); 
-      this->private_->ui_.show_iso_surface_button_->setEnabled( 
-        mask_layer->iso_generated_state_->get() );
-      this->private_->ui_.delete_iso_surface_button_->setEnabled( 
-        mask_layer->iso_generated_state_->get() );
-    }
-    else
-    {
-      this->private_->ui_.show_iso_surface_button_->setEnabled( other_buttons );
-      this->private_->ui_.delete_iso_surface_button_->setEnabled( other_buttons );
-    }
-  }
-
-}
-  
-void LayerWidget::uncheck_show_iso_button()
-{
-  if( this->private_->ui_.show_iso_surface_button_->isChecked() )
-  {
-    this->private_->ui_.show_iso_surface_button_->setChecked( false );
-  }
 }
 
 void LayerWidget::compute_isosurface()
@@ -517,36 +501,21 @@ void LayerWidget::update_widget_state( bool initialize )
   
   if ( data_state == Layer::AVAILABLE_C )
   {
-    // Lock buttons if widget is locked
-    this->enable_buttons( true, !visual_lock, !visual_lock, initialize );
-    
     // Change the color of the widget
     this->update_appearance( visual_lock,  active_layer, false, initialize );
   }
   else if ( data_state == Layer::CREATING_C )
   {
-    // Everything is still locked down
-    enable_buttons( false, false, false, initialize );
-
     // Change the color of the widget
     update_appearance( true,  false, false, initialize ); 
   }
   else if ( data_state == Layer::PROCESSING_C )
   {
-    // PROCESSING_C state
-    // Lock buttons if widget is locked
-    enable_buttons( true, false, !visual_lock, initialize );
-    
     // Change the color of the widget
     update_appearance( visual_lock,  active_layer, true, initialize );  
   }
   else if ( data_state == Layer::IN_USE_C )
-
   {
-    // IN_USE_C state
-    // Lock buttons if widget is locked
-    enable_buttons( true, false, !visual_lock, initialize );
-    
     // Change the color of the widget
     update_appearance( visual_lock,  active_layer, true, initialize );    
   }

@@ -26,6 +26,10 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// boost includes
+#include <boost/lambda/lambda.hpp>
+#include <boost/lambda/bind.hpp>
+
 //QtUtils Includes
 #include <QtUtils/Bridge/QtBridge.h>
 #include <QtUtils/Widgets/QtHistogramWidget.h>
@@ -119,10 +123,12 @@ bool ResampleToolInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Connect( this->private_->ui_.run_button_, boost::bind(
     &ResampleTool::execute, tool, Core::Interface::GetWidgetActionContext() ) );
 
-  std::vector< Core::StateBoolHandle > bool_states( 2 );
-  bool_states[ 0 ] = tool->valid_target_state_;
-  bool_states[ 1 ] = tool->valid_size_state_;
-  QtUtils::QtBridge::Enable( this->private_->ui_.run_button_, bool_states );
+  std::vector< Core::StateBaseHandle > execution_related_states( 2 );
+  execution_related_states[ 0 ] = tool->valid_target_state_;
+  execution_related_states[ 1 ] = tool->valid_size_state_;
+  QtUtils::QtBridge::Enable( this->private_->ui_.run_button_, execution_related_states,
+    boost::lambda::bind( &Core::StateBool::get, tool->valid_target_state_.get() ) &&
+    boost::lambda::bind( &Core::StateBool::get, tool->valid_size_state_.get() ) );
 
   QtUtils::QtBridge::Enable( this->private_->ui_.target_group_, 
     tool->use_active_group_state_, true ); 

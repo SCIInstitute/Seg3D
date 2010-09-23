@@ -52,7 +52,44 @@ QtShowConnector::QtShowConnector( QWidget* parent,
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
     parent->setVisible( state->get() ^ this->opposite_logic_ );
     this->add_connection( state->value_changed_signal_.connect(
-      boost::bind( &QtShowConnector::ShowWidget, qpointer, _1, _2 ) ) );
+      boost::bind( &QtShowConnector::ShowWidget, qpointer, _1 ) ) );
+  }
+}
+
+QtShowConnector::QtShowConnector( QWidget* parent, 
+                 Core::StateBaseHandle state, 
+                 boost::function< bool () > condition ) :
+  QObject( parent ),
+  parent_( parent ),
+  condition_( condition )
+{
+  QPointer< QtShowConnector > qpointer( this );
+
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+  this->add_connection( state->state_changed_signal_.connect(
+    boost::bind( &QtShowConnector::ShowWidget, qpointer ) ) );
+  parent->setVisible( condition() );
+}
+
+QtShowConnector::QtShowConnector( QWidget* parent, 
+                 std::vector< Core::StateBaseHandle >& states, 
+                 boost::function< bool () > condition ) :
+  QObject( parent ),
+  parent_( parent ),
+  condition_( condition )
+{
+  assert( states.size() > 0 );
+  QPointer< QtShowConnector > qpointer( this );
+
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
+    for ( size_t i = 0; i < states.size(); ++i )
+    {
+      this->add_connection( states[ i ]->state_changed_signal_.connect(
+        boost::bind( &QtShowConnector::ShowWidget, qpointer ) ) );
+    }
+    parent->setVisible( condition() );
   }
 }
 
@@ -61,13 +98,11 @@ QtShowConnector::~QtShowConnector()
   this->disconnect_all();
 }
 
-void QtShowConnector::ShowWidget( QPointer< QtShowConnector > qpointer,
-    bool visible, Core::ActionSource source )
+void QtShowConnector::ShowWidget( QPointer< QtShowConnector > qpointer, bool visible )
 {
   if ( !Core::Interface::IsInterfaceThread() )
   {
-    Core::Interface::PostEvent( boost::bind( &QtShowConnector::ShowWidget,
-      qpointer, visible, source ) );
+    Core::Interface::PostEvent( boost::bind( &QtShowConnector::ShowWidget, qpointer, visible ) );
     return;
   }
 
@@ -78,5 +113,23 @@ void QtShowConnector::ShowWidget( QPointer< QtShowConnector > qpointer,
   
   qpointer->parent_->setVisible( visible ^ qpointer->opposite_logic_ );
 }
+
+void QtShowConnector::ShowWidget( QPointer< QtShowConnector > qpointer )
+{
+  if ( !Core::Interface::IsInterfaceThread() )
+  {
+    Core::Interface::PostEvent( boost::bind( &QtShowConnector::ShowWidget, qpointer ) );
+    return;
+  }
+
+  if ( qpointer.isNull() || QCoreApplication::closingDown() )
+  {
+    return;
+  }
+
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+  qpointer->parent_->setVisible( qpointer->condition_() );
+}
+
 
 } // end namespace QtUtils
