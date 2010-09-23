@@ -46,6 +46,7 @@
 #include <Core/Application/Application.h>
 #include <Core/Interface/Interface.h>
 #include <Core/State/State.h>
+#include <Core/State/BooleanStateGroup.h>
 #include <Core/Volume/Volume.h>
 
 // Application includes
@@ -54,12 +55,16 @@
 namespace Seg3D
 {
 
+class LayerPrivate;
+typedef boost::shared_ptr< LayerPrivate > LayerPrivateHandle;
+
 // CLASS Layer
 // This is the main class for collecting state information on a layer
 
 // Class definition
 class Layer : public Core::StateHandler
 {
+  friend class LayerPrivate;
 
   // -- Constructor/destructor --
 protected:
@@ -136,13 +141,12 @@ public:
   std::vector< Core::StateBoolHandle > visible_state_;
 
   // State indicating whether the layer is locked
-  Core::StateBoolHandle visual_lock_state_;
+  Core::StateBoolHandle locked_state_;
 
   // State that describes the opacity with which the layer is displayed
   Core::StateRangedDoubleHandle opacity_state_;
 
-  // State of the checkbox that records which layer needs to be processed in
-  // the group
+  // State indicating whether the layer is selected for further processing
   Core::StateBoolHandle selected_state_;
 
   // State that describes which menu is currently shown
@@ -158,6 +162,24 @@ protected:
   
   // State that stores the last action that was played
   Core::StateStringHandle last_action_state_;
+
+  // -- GUI related states --
+public:
+  // Whether to show the layer information
+  Core::StateBoolHandle show_information_state_;
+
+  // Whether to show the opacity control
+  Core::StateBoolHandle show_opacity_state_;
+
+  // Whether to show the progress bar
+  Core::StateBoolHandle show_progress_bar_state_;
+
+  // Whether to show the abort message
+  Core::StateBoolHandle show_abort_message_state_;
+
+protected:
+  // An exclusive group of boolean states that control the visibility of different parts
+  Core::BooleanStateGroupHandle gui_state_group_;
 
   // -- Accessors --
 public:
@@ -189,6 +211,8 @@ private:
   // Handle to the layer group (this one needs to be weak to ensure objects are not persistent
   // due to a circular dependency)
   LayerGroupWeakHandle layer_group_;
+
+  LayerPrivateHandle private_;
 
   // -- Locking system --
 public:

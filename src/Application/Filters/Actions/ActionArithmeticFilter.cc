@@ -199,7 +199,7 @@ bool ActionArithmeticFilter::run( Core::ActionContextHandle& context,
   std::string name( "A" );
   for ( size_t i = 0; i < layer_ids.size(); ++i )
   {
-    name[ 0 ] = 'A' + i;
+    name[ 0 ] = static_cast< char >( 'A' + i );
     algo->find_layer( layer_ids[ i ], layers[ i ] );
     Core::DataBlockHandle input_data_block;
     switch ( layers[ i ]->type() )

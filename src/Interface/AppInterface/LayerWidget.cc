@@ -147,6 +147,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   this->private_->ui_.progress_bar_bar_->hide();
   this->private_->ui_.mask_property_bar_->hide();
   this->private_->ui_.info_bar_->hide();
+  this->private_->ui_.abort_bar_->hide();
 
   this->private_->ui_.horizontalLayout_2->setAlignment( Qt::AlignHCenter );
   
@@ -186,28 +187,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   this->private_->color_widget_->setObjectName( QString::fromUtf8( "color_widget_" ) );
   
   this->private_->ui_.abort_text_->setText( "Waiting for process to abort ..." );
-  this->private_->ui_.abort_text_->hide();
-  
-  // connect the GUI signals and slots
-  this->connect( this->private_->ui_.opacity_button_, 
-    SIGNAL( clicked( bool ) ), this, 
-    SLOT( select_opacity_bar( bool ) ) );
-    
-  this->connect( this->private_->ui_.brightness_contrast_button_, 
-    SIGNAL( clicked( bool ) ), this, 
-    SLOT( select_brightness_contrast_bar( bool ) ) );
-      
-  this->connect( this->private_->ui_.mask_property_button_, 
-    SIGNAL( clicked( bool ) ), this, 
-    SLOT( select_mask_property_bar( bool ) ) );
-  
-  this->connect( this->private_->ui_.lock_button_, 
-    SIGNAL( toggled( bool ) ), this, 
-    SLOT( select_visual_lock( bool ) ) );
-
-  this->connect( this->private_->ui_.info_button_, SIGNAL( toggled( bool ) ),
-    SLOT( select_info_bar( bool ) ) );
-      
+        
   this->connect( this->private_->ui_.abort_button_,
     SIGNAL ( pressed() ), this,
     SLOT( trigger_abort() ) );
@@ -216,9 +196,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
   
     qpointer_type qpointer( this );
-    this->private_->layer_->visual_lock_state_->state_changed_signal_.connect(
-      boost::bind( &LayerWidget::UpdateState, qpointer ) );
-    this->private_->layer_->menu_state_->state_changed_signal_.connect(
+    this->private_->layer_->locked_state_->state_changed_signal_.connect(
       boost::bind( &LayerWidget::UpdateState, qpointer ) );
     this->private_->layer_->data_state_->state_changed_signal_.connect(
       boost::bind( &LayerWidget::UpdateState, qpointer ) ); 
@@ -238,6 +216,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
     QtUtils::QtBridge::Connect( this->private_->ui_.visibility_button_, layer->visible_state_,
       ViewerManager::Instance()->active_viewer_state_ );
     QtUtils::QtBridge::Connect( this->private_->opacity_adjuster_, layer->opacity_state_ );
+    QtUtils::QtBridge::Connect( this->private_->ui_.lock_button_, layer->locked_state_ );
     
     LayerGroupHandle layer_group = layer->get_layer_group();
     QtUtils::QtBridge::Connect( this->private_->ui_.dimensions_label_,
@@ -246,7 +225,18 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
       layer_group->origin_state_ );
     QtUtils::QtBridge::Connect( this->private_->ui_.spacing_label_,
       layer_group->spacing_state_ );
+
+    QtUtils::QtBridge::Connect( this->private_->ui_.info_button_, 
+      layer->show_information_state_ );
+    QtUtils::QtBridge::Connect( this->private_->ui_.opacity_button_,
+      layer->show_opacity_state_ );
+    QtUtils::QtBridge::Show( this->private_->ui_.info_bar_, layer->show_information_state_ );
+    QtUtils::QtBridge::Show( this->private_->ui_.opacity_bar_, layer->show_opacity_state_ );
   
+    QtUtils::QtBridge::Show( this->private_->ui_.progress_bar_bar_, 
+      layer->show_progress_bar_state_ );
+    QtUtils::QtBridge::Show( this->private_->ui_.abort_bar_, layer->show_abort_message_state_ );
+
     switch( this->get_volume_type() )
     {
       // This if for the Data Layers
@@ -276,6 +266,11 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
               data_layer->min_value_state_ );
             QtUtils::QtBridge::Connect( this->private_->ui_.max_label_,
               data_layer->max_value_state_ );
+
+            QtUtils::QtBridge::Connect( this->private_->ui_.brightness_contrast_button_,
+              data_layer->show_contrast_brightness_state_ );
+            QtUtils::QtBridge::Show( this->private_->ui_.bright_contrast_bar_,
+              data_layer->show_contrast_brightness_state_ );
           }
         }
         break;
@@ -318,6 +313,11 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
             
             QtUtils::QtBridge::Enable( this->private_->ui_.delete_iso_surface_button_, 
               mask_layer->iso_generated_state_ );
+
+            QtUtils::QtBridge::Connect( this->private_->ui_.mask_property_button_,
+              mask_layer->show_mask_property_state_ );
+            QtUtils::QtBridge::Show( this->private_->ui_.mask_property_bar_,
+              mask_layer->show_mask_property_state_ );
             
             connect( this->private_->ui_.delete_iso_surface_button_, 
               SIGNAL( clicked() ), this, SLOT( uncheck_show_iso_button() ) );
@@ -420,152 +420,6 @@ void LayerWidget::delete_isosurface()
   MaskLayerHandle mask_layer = boost::dynamic_pointer_cast< MaskLayer >( this->private_->layer_ );
   ActionDeleteIsosurface::Dispatch( Core::Interface::GetWidgetActionContext(), mask_layer );
 }
-
-void LayerWidget::set_active_menu( std::string& menu_state, bool override, bool /*initialize*/ )
-{
-  this->private_->ui_.base_->setUpdatesEnabled( false );
-  
-  if ( !override )
-  {
-    if ( menu_state == Layer::NO_MENU_C ) 
-    {
-      this->set_opacity_visibility( false );
-      this->set_mask_property_visibility( false );
-      this->set_bright_contrast_visibility( false );
-      this->set_mask_property_visibility( false );
-      this->set_info_visibility( false );
-    }
-    else if ( menu_state == Layer::OPACITY_MENU_C )
-    {
-      this->set_mask_property_visibility( false );
-      this->set_bright_contrast_visibility( false );
-      this->set_mask_property_visibility( false );
-      this->set_info_visibility( false );
-      this->set_opacity_visibility( true );
-    }
-    else if ( menu_state == Layer::CONTRAST_MENU_C )
-    {
-      this->set_opacity_visibility( false );
-      this->set_mask_property_visibility( false );
-      this->set_mask_property_visibility( false );
-      this->set_info_visibility( false );
-      this->set_bright_contrast_visibility( true );
-    }
-    else if ( menu_state == Layer::APPEARANCE_MENU_C )
-    {
-      this->set_opacity_visibility( false );
-      this->set_mask_property_visibility( false );
-      this->set_bright_contrast_visibility( false );
-      this->set_info_visibility( false );
-      this->set_mask_property_visibility( true );
-    }
-    else if ( menu_state == Layer::INFO_MENU_C )
-    {
-      this->set_opacity_visibility( false );
-      this->set_mask_property_visibility( false );
-      this->set_bright_contrast_visibility( false );
-      this->set_mask_property_visibility( false );
-      this->set_info_visibility( true );
-    }
-  }
-  this->private_->ui_.base_->setUpdatesEnabled( true );
-}
-  
-void LayerWidget::set_opacity_visibility( bool show )
-{
-  if( show )
-  {
-    if ( this->private_->ui_.opacity_bar_->isHidden() )   
-    {
-      this->private_->ui_.opacity_bar_->show();
-      this->private_->ui_.opacity_button_->blockSignals( true );
-      this->private_->ui_.opacity_button_->setChecked( true );
-      this->private_->ui_.opacity_button_->blockSignals( false );
-    }
-  }
-  else
-  {
-    if ( this->private_->ui_.opacity_bar_->isVisible() )    
-    {
-      this->private_->ui_.opacity_bar_->hide();
-      this->private_->ui_.opacity_button_->blockSignals( true );
-      this->private_->ui_.opacity_button_->setChecked( false );
-      this->private_->ui_.opacity_button_->blockSignals( false );
-    }
-  }
-}
-
-void LayerWidget::set_bright_contrast_visibility( bool show )
-{
-  if ( show )
-  {
-    if ( this->private_->ui_.bright_contrast_bar_->isHidden() )   
-    {
-      this->private_->ui_.bright_contrast_bar_->show();
-      this->private_->ui_.brightness_contrast_button_->blockSignals( true );
-      this->private_->ui_.brightness_contrast_button_->setChecked( true );
-      this->private_->ui_.brightness_contrast_button_->blockSignals( false );
-    }
-  }
-  else
-  {
-    if ( this->private_->ui_.bright_contrast_bar_->isVisible() )    
-    {
-      this->private_->ui_.bright_contrast_bar_->hide();
-      this->private_->ui_.brightness_contrast_button_->blockSignals( true );
-      this->private_->ui_.brightness_contrast_button_->setChecked( false );
-      this->private_->ui_.brightness_contrast_button_->blockSignals( false );
-    }
-  }
-}
-
-void LayerWidget::set_mask_property_visibility( bool show )
-{
-  if( show )
-  {
-    if ( this->private_->ui_.mask_property_bar_->isHidden() )   
-    {
-      this->private_->ui_.mask_property_bar_->show();
-      this->private_->ui_.mask_property_button_->blockSignals( true );
-      this->private_->ui_.mask_property_button_->setChecked( true );
-      this->private_->ui_.mask_property_button_->blockSignals( false );
-    }
-  }
-  else
-  {
-    if ( this->private_->ui_.mask_property_bar_->isVisible() )    
-    {
-      this->private_->ui_.mask_property_bar_->hide();
-      this->private_->ui_.mask_property_button_->blockSignals( true );
-      this->private_->ui_.mask_property_button_->setChecked( false );
-      this->private_->ui_.mask_property_button_->blockSignals( false );
-    }
-  }
-}
-
-void LayerWidget::set_info_visibility( bool show )
-{
-  if( show )
-  {
-    if ( this->private_->ui_.info_bar_->isHidden() )    
-    {
-      this->private_->ui_.info_bar_->show();
-      this->private_->ui_.info_button_->blockSignals( true );
-      this->private_->ui_.info_button_->setChecked( true );
-      this->private_->ui_.info_button_->blockSignals( false );
-    }
-  }
-  else
-  {
-    if ( this->private_->ui_.info_bar_->isVisible() )   
-    {
-      this->private_->ui_.info_bar_->hide();
-      this->private_->ui_.info_button_->blockSignals( true );
-      this->private_->ui_.info_button_->setChecked( false );
-      this->private_->ui_.info_button_->blockSignals( false );
-    }
-  }
-}
   
 void LayerWidget::update_appearance( bool locked, bool active, bool in_use, bool initialize )
 {
@@ -576,11 +430,6 @@ void LayerWidget::update_appearance( bool locked, bool active, bool in_use, bool
   this->private_->locked_ = locked;
   this->private_->active_ = active;
   this->private_->in_use_ = in_use;
-
-  // Update the lock button
-  this->private_->ui_.lock_button_->blockSignals( true );
-  this->private_->ui_.lock_button_->setChecked( locked );
-  this->private_->ui_.lock_button_->blockSignals( false );
 
   // Update the background color inside the icon
   switch( this->get_volume_type() )
@@ -650,7 +499,6 @@ void LayerWidget::update_widget_state( bool initialize )
 {
   // Step 1 : retrieve the state of the layer
   std::string data_state;
-  std::string menu_state;
   bool visual_lock = false;
   bool active_layer = false;
   
@@ -661,55 +509,36 @@ void LayerWidget::update_widget_state( bool initialize )
     // to be made into the state manager.
     Layer::lock_type lock( Layer::GetMutex() );
     data_state = this->private_->layer_->data_state_->get();
-    menu_state = this->private_->layer_->menu_state_->get();
-    visual_lock = this->private_->layer_->visual_lock_state_->get();
+    visual_lock = this->private_->layer_->locked_state_->get();
     active_layer = ( LayerManager::Instance()->get_active_layer() == this->private_->layer_ );
   }
   
-  CORE_LOG_DEBUG( std::string(" menu state = ") + menu_state );
   CORE_LOG_DEBUG( std::string(" data state = ") + data_state );
   
   if ( data_state == Layer::AVAILABLE_C )
   {
     // Lock buttons if widget is locked
     this->enable_buttons( true, !visual_lock, !visual_lock, initialize );
-    // If locked no bars can be opened and adjust the option
-    // menu to the actual menu that is open in the state manager
-    this->set_active_menu( menu_state, visual_lock, initialize );
     
     // Change the color of the widget
     this->update_appearance( visual_lock,  active_layer, false, initialize );
-    
-    // Hide the progress bar
-    this->show_progress_bar( false );
   }
   else if ( data_state == Layer::CREATING_C )
   {
     // Everything is still locked down
     enable_buttons( false, false, false, initialize );
-    // Menus cannot be opened, so override them and close all of them
-    set_active_menu( menu_state, true, initialize );
 
     // Change the color of the widget
     update_appearance( true,  false, false, initialize ); 
-
-    // Show the progress bar, since we are computing a new layer
-    this->show_progress_bar( true );
   }
   else if ( data_state == Layer::PROCESSING_C )
   {
     // PROCESSING_C state
     // Lock buttons if widget is locked
     enable_buttons( true, false, !visual_lock, initialize );
-    // If locked no bars can be opened and adjust the option
-    // menu to the actual menu that is open in the state manager    
-    set_active_menu( menu_state, visual_lock, initialize );
     
     // Change the color of the widget
     update_appearance( visual_lock,  active_layer, true, initialize );  
-    
-    // Show the progress bar, since we are computing a new layer
-    this->show_progress_bar( true );
   }
   else if ( data_state == Layer::IN_USE_C )
 
@@ -717,15 +546,9 @@ void LayerWidget::update_widget_state( bool initialize )
     // IN_USE_C state
     // Lock buttons if widget is locked
     enable_buttons( true, false, !visual_lock, initialize );
-    // If locked no bars can be opened and adjust the option
-    // menu to the actual menu that is open in the state manager    
-    set_active_menu( menu_state, visual_lock, initialize );
     
     // Change the color of the widget
-    update_appearance( visual_lock,  active_layer, true, initialize );  
-    
-    // Show the progress bar, since we are computing a new layer
-    this->show_progress_bar( false );
+    update_appearance( visual_lock,  active_layer, true, initialize );    
   }
 }
 
@@ -778,9 +601,11 @@ void LayerWidget::set_mask_background_color_from_preference_change( int color_in
 
 void LayerWidget::trigger_abort()
 {
-  this->private_->ui_.abort_button_->hide();
-  this->private_->ui_.progress_bar_->hide();
-  this->private_->ui_.abort_text_->show();
+  Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
+    this->private_->layer_->show_progress_bar_state_, false );
+  Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
+    this->private_->layer_->show_abort_message_state_, true );
+
   this->private_->layer_->abort_signal_();
 }
 
@@ -791,7 +616,7 @@ void LayerWidget::set_group_menu_status( bool status )
   
 void LayerWidget::mousePressEvent( QMouseEvent *event )
 {
-  // Exit immediately if they are no longer holding the button the press event isnt valid
+  // Exit immediately if they are no longer holding the button the press event isn't valid
   if( event->button() != Qt::LeftButton )
   { 
     return;
@@ -994,81 +819,9 @@ void LayerWidget::show_selection_checkbox( bool show )
   }
 }
 
-void LayerWidget::select_opacity_bar( bool show )
-{
-  if ( show )
-  {
-    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
-      this->private_->layer_->menu_state_, Layer::OPACITY_MENU_C );
-  }
-  else
-  {
-    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
-      this->private_->layer_->menu_state_, Layer::NO_MENU_C );
-  }
-}
-
-void LayerWidget::select_brightness_contrast_bar( bool show )
-{
-  if ( show )
-  {
-    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
-      this->private_->layer_->menu_state_, Layer::CONTRAST_MENU_C );
-  }
-  else
-  {
-    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
-      this->private_->layer_->menu_state_, Layer::NO_MENU_C );
-  }
-}
-
-void LayerWidget::select_mask_property_bar( bool show )
-{
-  if ( show )
-  {
-    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
-      this->private_->layer_->menu_state_, Layer::APPEARANCE_MENU_C );
-  }
-  else
-  {
-    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
-      this->private_->layer_->menu_state_, Layer::NO_MENU_C );
-  }
-}
-
-void LayerWidget::select_info_bar( bool show )
-{
-  Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
-    this->private_->layer_->menu_state_, 
-    show ? Layer::INFO_MENU_C : Layer::NO_MENU_C );
-}
-
-void LayerWidget::show_progress_bar( bool show )
-{
-  if ( show )
-  {
-    this->private_->ui_.progress_bar_->setValue( 0 );
-    this->private_->ui_.progress_bar_->setEnabled( true );
-    this->private_->ui_.abort_text_->hide();
-    this->private_->ui_.abort_button_->show();
-    this->private_->ui_.progress_bar_->show();
-    this->private_->ui_.progress_bar_bar_->show();
-  }
-  else 
-  {
-    this->private_->ui_.progress_bar_bar_->hide();
-  }
-}
-
 void LayerWidget::update_progress_bar( double progress )
 {
   this->private_->ui_.progress_bar_->setValue( static_cast<int>( progress * 100.0 ) );
-}
-
-void LayerWidget::select_visual_lock( bool lock )
-{
-  Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
-    this->private_->layer_->visual_lock_state_, lock );
 }
 
 void LayerWidget::resizeEvent( QResizeEvent *event )

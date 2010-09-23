@@ -45,6 +45,43 @@
 namespace Seg3D
 {
 
+//////////////////////////////////////////////////////////////////////////
+// Class LayerPrivate
+//////////////////////////////////////////////////////////////////////////
+
+class LayerPrivate
+{
+public:
+  void handle_locked_state_changed( bool locked );
+  void handle_data_state_changed( std::string data_state );
+
+  Layer* layer_;
+};
+
+void LayerPrivate::handle_locked_state_changed( bool locked )
+{
+  if ( locked )
+  {
+    this->layer_->gui_state_group_->clear_selection();
+  }
+}
+
+void LayerPrivate::handle_data_state_changed( std::string data_state )
+{
+  bool show_progress = ( data_state == Layer::CREATING_C ||
+    data_state == Layer::PROCESSING_C );
+  this->layer_->show_progress_bar_state_->set( show_progress );
+  if ( show_progress )
+  {
+    this->layer_->update_progress_signal_( 0.0 );
+  }
+  this->layer_->show_abort_message_state_->set( false );
+}
+
+//////////////////////////////////////////////////////////////////////////
+// Class Layer
+//////////////////////////////////////////////////////////////////////////
+
 const std::string Layer::CREATING_C( "creating" );
 const std::string Layer::PROCESSING_C( "processing" );
 const std::string Layer::AVAILABLE_C( "available" );
@@ -57,14 +94,18 @@ const std::string Layer::APPEARANCE_MENU_C( "appearance" );
 const std::string Layer::INFO_MENU_C( "information" );
 
 Layer::Layer( const std::string& name, bool creating ) :
-  StateHandler( "layer",  true )
+  StateHandler( "layer",  true ),
+  private_( new LayerPrivate )
 { 
+  this->private_->layer_ = this;
   this->initialize_states( name, creating );
 }
 
 Layer::Layer( const std::string& name, const std::string& state_id, bool creating ) :
-  StateHandler( state_id, false )
+  StateHandler( state_id, false ),
+  private_( new LayerPrivate )
 {
+  this->private_->layer_ = this;
   this->initialize_states( name, creating );
 }
   
@@ -120,7 +161,7 @@ void Layer::initialize_states( const std::string& name, bool creating )
   }
 
   // == The state of the lock ==
-  this->add_state( "visual_lock", visual_lock_state_, false );
+  this->add_state( "visual_lock", locked_state_, false );
 
   // == The opacity of the layer ==
   this->add_state( "opacity", opacity_state_, 
@@ -144,7 +185,19 @@ void Layer::initialize_states( const std::string& name, bool creating )
   this->add_state( "data", this->data_state_,  creating ? CREATING_C : AVAILABLE_C  , 
     AVAILABLE_C + "|" + CREATING_C + "|" + PROCESSING_C + "|" + IN_USE_C );
   
-  
+  this->add_state( "show_info", this->show_information_state_, false );
+  this->add_state( "show_opacity", this->show_opacity_state_, false );
+  this->add_state( "show_progress", this->show_progress_bar_state_, creating );
+  this->add_state( "show_abort", this->show_abort_message_state_, false );
+
+  this->add_connection( this->locked_state_->value_changed_signal_.connect(
+    boost::bind( &LayerPrivate::handle_locked_state_changed, this->private_, _1 ) ) );
+  this->add_connection( this->data_state_->value_changed_signal_.connect( boost::bind(
+    &LayerPrivate::handle_data_state_changed, this->private_, _1 ) ) );
+
+  this->gui_state_group_.reset( new Core::BooleanStateGroup );
+  this->gui_state_group_->add_boolean_state( this->show_information_state_ );
+  this->gui_state_group_->add_boolean_state( this->show_opacity_state_ );
 }
 
 bool Layer::post_save_states( Core::StateIO& state_io )

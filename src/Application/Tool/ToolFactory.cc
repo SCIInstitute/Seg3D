@@ -101,7 +101,7 @@ void ToolFactory::register_tool( ToolBuilderBase* builder, ToolInfoHandle info )
   entry.info_ = info;
   this->private_->tools_[ info->get_name() ] = entry;
 
-  this->private_->tool_menus_.insert( info->get_menu() )
+  this->private_->tool_menus_.insert( info->get_menu() );
   
   CORE_LOG_DEBUG( std::string( "Registering tool : " ) + info->get_name() );
 }

@@ -71,10 +71,6 @@ public:
   void enable_buttons( bool lock_button, bool compute_isosurface_button,
     bool other_buttons, bool initialize = false);
 
-  // SET_ACTIVE_MENU:
-  // Setup which menu is currently shown
-  void set_active_menu( std::string& menu_state, bool override, bool initialize = false );
-
   // UPDATE_APPEARANCE:
   // Update the appearance of the widget to reflect its state
   void update_appearance( bool locked, bool active, bool in_use, bool initialize = false);
@@ -82,34 +78,8 @@ public:
   // UPDATE_WIDGET_STATE:
   // Update the button state, the open menus and color of the widget
   void update_widget_state( bool initialize = false );
-    
-// -- widget internals --
-public Q_SLOTS:
-  // SELECT_OPACITY_BAR:
-  // Callback from Qt widget when opacity button is hit
-  void select_opacity_bar( bool show );
-
-  // SELECT_BRIGHTNESS_CONTRAST_BAR:
-  // Callback from Qt widget when brightness button is hit
-  void select_brightness_contrast_bar( bool show );
-
-  // SELECT_BORDER_FILL_BAR:
-  // Callback from Qt widget when border/fill button is hit
-  void select_mask_property_bar( bool show );
-
-  // SELECT_VISUAL_LOCK:
-  // Callback from Qt widget when lock button is hit
-  void select_visual_lock( bool lock );
-
-  // SELECT_INFO_BAR:
-  // Callback from Qt widget when info button is clicked.
-  void select_info_bar( bool show );
 
 public:
-  // SHOW_PROGRESS_BAR:
-  // this function is called when work is being done on the layer, it hides any bars that might be
-  // open and hides or shows the progress bar
-  void show_progress_bar( bool show );
   
   // UPDATE_PROGRESS_BAR:
   // Update the progress in the widget
@@ -187,23 +157,7 @@ private:
   // DRAGLEAVEEVENT:
   // this function is called when the user drags another layer off of the top of this one
   void dragLeaveEvent( QDragLeaveEvent* event );
-  
-private:
-  
-  // SET_OPACITY_VISIBILITY:
-  // 
-  void set_opacity_visibility( bool show );
     
-  // SET_BRIGHT_CONSTRAST_VISIBILITY:
-  // 
-  void set_bright_contrast_visibility( bool show );
-  
-  // SET_BORDER_VISIBILITY:
-  // 
-  void set_mask_property_visibility( bool show );
-  
-  void set_info_visibility( bool show );
-
 private Q_SLOTS:
 
   // SET_MASK_BACKGROUND_COLOR:

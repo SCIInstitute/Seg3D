@@ -169,6 +169,9 @@ void MaskLayer::initialize_states()
   
   // == Keep track of whether the iso surface has been generated
   this->add_state( "iso_generated", iso_generated_state_, false );
+
+  this->add_state( "show_mask_property", this->show_mask_property_state_, false );
+  this->gui_state_group_->add_boolean_state( this->show_mask_property_state_ );
 }
 
 bool MaskLayer::pre_save_states( Core::StateIO& state_io )

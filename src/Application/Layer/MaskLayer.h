@@ -122,6 +122,11 @@ public:
   // State that describes whether the iso surface has been generated
   Core::StateBoolHandle iso_generated_state_;
 
+  // -- GUI related states --
+public:
+  // Whether to display mask visual property control
+  Core::StateBoolHandle show_mask_property_state_;
+
 protected:
   // PRE_SAVE_STATES:
   // this function synchronize the generation number for the session saving

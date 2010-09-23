@@ -146,7 +146,7 @@ bool ArrayMathInterpreter::translate( ParserProgramHandle& pprogram,
   }
 
   // Determine how many space we need to reserve for sequential variables
-  int buffer_size = mprogram->get_buffer_size();
+  size_type buffer_size = mprogram->get_buffer_size();
   int num_threads = mprogram->get_num_threads();
 
   for ( int nt = 0; nt < num_threads; nt++ )
