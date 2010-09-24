@@ -133,11 +133,6 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
   //  connect the gui signals and slots
   connect( this->private_->ui_.open_button_, SIGNAL( toggled( bool ) ), this, 
     SLOT( show_layers( bool )) );
-  connect( this->private_->ui_.group_iso_button_, SIGNAL( clicked ( bool ) ), this, 
-    SLOT( select_iso_menu( bool )) );
-  connect( this->private_->ui_.group_delete_button_, SIGNAL( clicked ( bool ) ), this, 
-    SLOT( select_delete_menu( bool )) );
-  
   connect( this->private_->ui_.confirm_delete_checkbox_, SIGNAL( clicked ( bool ) ), this, 
     SLOT( enable_delete_button( bool )) );
   connect( this->private_->ui_.delete_button_, SIGNAL( clicked () ), this, 
@@ -146,26 +141,27 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
   
   //Set the default values for the Group UI and make the connections to the state engine
       // --- GENERAL ---
-    
-      QtUtils::QtBridge::Connect( this->private_->ui_.open_button_, 
-      this->private_->group_->show_layers_state_ );
-      QtUtils::QtBridge::Connect( this->private_->ui_.group_visibility_button_, 
-      this->private_->group_->visibility_state_, 
-      ViewerManager::Instance()->active_viewer_state_ );
-      QtUtils::QtBridge::Connect( this->private_->ui_.delete_button_, 
-      boost::bind( &ActionDeleteLayers::Dispatch, 
-      Core::Interface::GetWidgetActionContext(), this->private_->group_ ) );
-    QtUtils::QtBridge::Connect( this->private_->ui_.group_new_button_, 
-      boost::bind( &ActionNewMaskLayer::Dispatch, 
-      Core::Interface::GetWidgetActionContext(), this->private_->group_ ) );
+  QtUtils::QtBridge::Connect( this->private_->ui_.group_iso_button_, 
+    group->show_iso_menu_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.group_delete_button_, 
+    group->show_delete_menu_state_ );
+
+  QtUtils::QtBridge::Show( this->private_->ui_.iso_quality_, group->show_iso_menu_state_ ); 
+  QtUtils::QtBridge::Show( this->private_->ui_.delete_, group->show_delete_menu_state_ );
   
-    qpointer_type qpointer( this );
-    this->private_->group_->menu_state_->state_changed_signal_.connect(
-      boost::bind( &LayerGroupWidget::UpdateState, qpointer ) );
-  
-    // --- ISOSURFACE---
-    QtUtils::QtBridge::Connect( this->private_->iso_quality_button_group_, 
-      this->private_->group_->isosurface_quality_state_ );
+    QtUtils::QtBridge::Connect( this->private_->ui_.group_visibility_button_, 
+    this->private_->group_->visibility_state_, 
+    ViewerManager::Instance()->active_viewer_state_ );
+    QtUtils::QtBridge::Connect( this->private_->ui_.delete_button_, 
+    boost::bind( &ActionDeleteLayers::Dispatch, 
+    Core::Interface::GetWidgetActionContext(), this->private_->group_ ) );
+  QtUtils::QtBridge::Connect( this->private_->ui_.group_new_button_, 
+    boost::bind( &ActionNewMaskLayer::Dispatch, 
+    Core::Interface::GetWidgetActionContext(), this->private_->group_ ) );
+
+  // --- ISOSURFACE---
+  QtUtils::QtBridge::Connect( this->private_->iso_quality_button_group_, 
+    this->private_->group_->isosurface_quality_state_ );
 
   this->setMinimumHeight( 0 );
   this->private_->ui_.group_frame_layout_->setAlignment( Qt::AlignTop );
@@ -183,8 +179,6 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
   this->private_->ui_.group_dummy_->hide();
 
   this->private_->group_height = this->private_->ui_.tools_and_layers_widget_->height();
-  this->update_widget_state();
-  
 }
 
 LayerGroupWidget::~LayerGroupWidget()
@@ -239,61 +233,12 @@ void LayerGroupWidget::mousePressEvent( QMouseEvent *event )
   
   Q_EMIT prep_groups_for_drag_and_drop_signal_( false );
 }
-  
-void LayerGroupWidget::UpdateState( qpointer_type qpointer )
-{
-  // Hand it off to the right thread
-  if( !( Core::Interface::IsInterfaceThread() ) )
-  {
-    Core::Interface::Instance()->post_event( 
-      boost::bind( &LayerGroupWidget::UpdateState, qpointer) );
-    return; 
-  }
-  
-  // When we are finally on the interface thread run this code:
-  if ( qpointer.data() )
-  {
-    qpointer->update_widget_state();
-  }
-}
-
-  
-void LayerGroupWidget::select_iso_menu( bool show )
-{
-  if( show )
-  {
-    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
-      this->private_->group_->menu_state_, LayerGroup::ISO_MENU_C );
-  }
-  else
-  {
-    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
-      this->private_->group_->menu_state_, LayerGroup::NO_MENU_C );
-  }
-}
-  
-
-void LayerGroupWidget::select_delete_menu( bool show )
-{
-  if( show )
-  {
-    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
-      this->private_->group_->menu_state_, LayerGroup::DELETE_MENU_C );
-  }
-  else
-  {
-    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
-      this->private_->group_->menu_state_, LayerGroup::NO_MENU_C );
-  }
-}
-  
 
 void LayerGroupWidget::set_drop_target( LayerGroupWidget* target_group)
 {
   this->drop_group_ = target_group;
   this->drop_group_set_ = true;
 }
-
 
 void LayerGroupWidget::dropEvent( QDropEvent* event )
 {
@@ -407,19 +352,6 @@ const std::string& LayerGroupWidget::get_group_id()
   return this->group_id_;
 }
 
-  
-void LayerGroupWidget::show_selection_checkboxes( bool show )
-{
-  for( std::map< std::string, LayerWidgetQHandle>::iterator it = this->layer_map_.begin(); 
-    it != this->layer_map_.end(); ++it )
-  {
-    ( *it ).second->show_selection_checkbox( show );
-    ( *it ).second->set_group_menu_status( show );
-    ( *it ).second->setAcceptDrops( !show ); 
-  }
-  this->group_menus_open_ = show;
-}
-
 void LayerGroupWidget::enable_delete_button( bool enable )
 {
   this->private_->ui_.delete_button_->setEnabled( enable );
@@ -471,7 +403,6 @@ void LayerGroupWidget::hide_group()
 {
   this->private_->ui_.fake_widget_->hide();
 }
-
   
 void LayerGroupWidget::resizeEvent( QResizeEvent *event )
 {
@@ -520,84 +451,6 @@ void LayerGroupWidget::prep_for_animation( bool move_time )
 void LayerGroupWidget::set_picked_up_group_size( int group_height )
 {
   this->picked_up_group_height_ = group_height;
-}
-  
-void LayerGroupWidget::update_widget_state()
-{
-  std::string menu_state = this->private_->group_->menu_state_->get();
-  
-  this->private_->ui_.base_->setUpdatesEnabled( false );
-  
-  bool show_checkboxes = true;
-  
-  // Now we close the menus that are not used and open the one that is
-  // we must do it in a specific order in order to avoid flickering
-  if ( menu_state == LayerGroup::NO_MENU_C )
-  {
-    this->set_iso_visibility( false );
-    this->set_delete_visibility( false );
-    show_checkboxes = false;
-  }
-  else if ( menu_state == LayerGroup::ISO_MENU_C )
-  {
-    this->set_delete_visibility( false );
-    this->set_iso_visibility( true );
-  }
-  else if ( menu_state == LayerGroup::DELETE_MENU_C )
-  {
-    this->set_iso_visibility( false );
-    this->set_delete_visibility( true );
-  }
-  this->show_selection_checkboxes( show_checkboxes );
-  this->private_->ui_.base_->setUpdatesEnabled( true );
-}
-
-
-void LayerGroupWidget::set_iso_visibility( bool show )
-{
-  if( show )
-  {
-    if ( this->private_->ui_.iso_quality_->isHidden() )
-    {
-      this->private_->ui_.iso_quality_->show();
-      this->private_->ui_.group_iso_button_->blockSignals( true );
-      this->private_->ui_.group_iso_button_->setChecked( true );
-      this->private_->ui_.group_iso_button_->blockSignals( false );
-    }
-  }
-  else
-  {
-    if ( this->private_->ui_.iso_quality_->isVisible() )
-    {
-      this->private_->ui_.iso_quality_->hide();
-      this->private_->ui_.group_iso_button_->blockSignals( true );
-      this->private_->ui_.group_iso_button_->setChecked( false );
-      this->private_->ui_.group_iso_button_->blockSignals( false );
-    }
-  }
-}
-void LayerGroupWidget::set_delete_visibility( bool show )
-{
-  if( show )
-  {
-    if ( this->private_->ui_.delete_->isHidden() )
-    {
-      this->private_->ui_.delete_->show();
-      this->private_->ui_.group_delete_button_->blockSignals( true );
-      this->private_->ui_.group_delete_button_->setChecked( true );
-      this->private_->ui_.group_delete_button_->blockSignals( false );
-    }
-  }
-  else
-  {
-    if ( this->private_->ui_.delete_->isVisible() ) 
-    {
-      this->private_->ui_.delete_->hide();
-      this->private_->ui_.group_delete_button_->blockSignals( true );
-      this->private_->ui_.group_delete_button_->setChecked( false );
-      this->private_->ui_.group_delete_button_->blockSignals( false );
-    }
-  }
 }
   
 void LayerGroupWidget::handle_change()
@@ -659,7 +512,6 @@ void LayerGroupWidget::handle_change()
     index++;
   }
   
-  this->update_widget_state();
   this->setUpdatesEnabled( true );
 }
 

@@ -39,21 +39,10 @@
 namespace Seg3D
 {
 
-const std::string LayerGroup::NO_MENU_C( "none" );
-const std::string LayerGroup::ISO_MENU_C( "iso" );
-const std::string LayerGroup::DELETE_MENU_C( "delete" );
-
 LayerGroup::LayerGroup( Core::GridTransform grid_transform ) :
   StateHandler( "group", true )
 {
   this->grid_transform_ = grid_transform;
-
-  // Need to set ranges and default values for all parameters
-  this->add_state( "menu", this->menu_state_, NO_MENU_C, NO_MENU_C + "|" + 
-    ISO_MENU_C + "|" + DELETE_MENU_C );
-    
-  // = General state settings
-  this->add_state( "show_layers", this->show_layers_state_, true );
 
   this->visibility_state_.resize( ViewerManager::Instance()->number_of_viewers() );
   for ( size_t i = 0; i < this->visibility_state_.size(); ++i )
@@ -74,12 +63,19 @@ LayerGroup::LayerGroup( Core::GridTransform grid_transform ) :
   Core::Vector spacing( 1, 1, 1 );
   spacing = grid_transform * spacing;
   this->add_state( "spacing", this->spacing_state_, Core::Point( spacing ) );
+
+  this->add_state( "show_iso_menu", this->show_iso_menu_state_, false );
+  this->add_state( "show_delete_menu", this->show_delete_menu_state_, false );
+
+  this->gui_state_group_.reset( new Core::BooleanStateGroup );
+  this->gui_state_group_->add_boolean_state( this->show_delete_menu_state_ );
+  this->gui_state_group_->add_boolean_state( this->show_iso_menu_state_ );
 }
 
 LayerGroup::~LayerGroup()
 {
   // Disconnect all current connections
-  disconnect_all();
+  this->disconnect_all();
 }
 
 void LayerGroup::insert_layer( LayerHandle new_layer )

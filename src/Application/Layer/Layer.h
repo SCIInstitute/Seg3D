@@ -149,9 +149,6 @@ public:
   // State indicating whether the layer is selected for further processing
   Core::StateBoolHandle selected_state_;
 
-  // State that describes which menu is currently shown
-  Core::StateOptionHandle menu_state_;
-
   // State that stores the current layer state
   Core::StateOptionHandle data_state_;
   
@@ -231,13 +228,6 @@ public:
   const static std::string PROCESSING_C;
   const static std::string AVAILABLE_C;
   const static std::string IN_USE_C;
-  
-  // Options for the state of the menus that are open in the layer manager
-  const static std::string NO_MENU_C;
-  const static std::string OPACITY_MENU_C;
-  const static std::string CONTRAST_MENU_C;
-  const static std::string APPEARANCE_MENU_C;
-  const static std::string INFO_MENU_C;
 };
 
 } // end namespace Seg3D

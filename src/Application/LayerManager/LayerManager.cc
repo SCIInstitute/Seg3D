@@ -460,7 +460,7 @@ void LayerManager::delete_layers( LayerGroupHandle group )
   }
   else
   {
-    group->menu_state_->set( LayerGroup::NO_MENU_C );
+    group->gui_state_group_->clear_selection();
     this->group_internals_changed_signal_( group );
   }
 
@@ -516,7 +516,7 @@ void LayerManager::delete_layer( LayerHandle layer )
   }
   else
   {
-    group->menu_state_->set( LayerGroup::NO_MENU_C );
+    group->gui_state_group_->clear_selection();
     this->group_internals_changed_signal_( group );
   }
   

@@ -74,10 +74,6 @@ public Q_SLOTS:
   // function that shows or hides the layers
   void show_layers( bool show );
 
-  // SHOW_SELECTION_CHECKBOXES:
-  // function that hides or shows selection checkboxes
-  void show_selection_checkboxes( bool show );
-
   // ENABLE_DELETE_BUTTON:
   // function that enables the delete button
   void enable_delete_button( bool enable );
@@ -117,11 +113,7 @@ public:
   // SET_PICKED_UP_GROUP_SIZE:
   // function that sets the size of the currently picked up group
   void set_picked_up_group_size( int group_height );
-  
-  // UPDATESTATE:
-  // Entry point for the state engine to notify state has changed
-  static void UpdateState( qpointer_type qpointer );
-  
+    
   void handle_change();
 
 protected:
@@ -169,28 +161,7 @@ private Q_SLOTS:
   // helper function for the show_layers function
   void hide_group();
   
-  // SELECT_ISO_MENU:
-  // slot that dispatches an action to set the active menu to the iso menu
-  void select_iso_menu( bool show );
-  
-  // SELECT_DELETE_MENU:
-  // slot that dispatches an action to set the active menu to the delete menu
-  void select_delete_menu( bool show );
-  
 private:
-  // UPDATE_WIDGET_STATE:
-  // function that updates which menu is shown based on which menu is the active one
-  void update_widget_state();
-  
-  // SET_ISO_VISIBILITY:
-  // function that hides or shows the iso menu
-  void set_iso_visibility( bool show );
-  
-  // SET_DELETE_VISIBILITY:
-  // function that hides or shows the delete menu
-  void set_delete_visibility( bool show );
-  
-  
   // CLEANUP_REMOVED_WIDGETS:
   void cleanup_removed_widgets();
   

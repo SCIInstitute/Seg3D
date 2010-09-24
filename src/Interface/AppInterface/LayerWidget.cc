@@ -266,6 +266,12 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
       boost::lambda::bind( &Core::StateOption::get, layer->data_state_.get() ) == 
       Layer::AVAILABLE_C );
 
+    // The selection check box is visible when the group delete layers menu is open
+    // and the layer is not locked
+    enable_states[ 1 ] = layer_group->show_delete_menu_state_;
+    QtUtils::QtBridge::Show( this->private_->ui_.checkbox_widget_, enable_states,
+      !boost::lambda::bind( &Core::StateBool::get, layer->locked_state_.get() ) &&
+      boost::lambda::bind( &Core::StateBool::get, layer_group->show_delete_menu_state_.get() ) );
 
     switch( this->get_volume_type() )
     {

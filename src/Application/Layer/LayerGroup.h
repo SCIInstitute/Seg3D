@@ -48,6 +48,7 @@
 #include <Core/Interface/Interface.h>
 #include <Core/Action/Action.h>
 #include <Core/State/State.h>
+#include <Core/State/BooleanStateGroup.h>
 
 // Application includes
 #include <Application/Layer/Layer.h>
@@ -74,20 +75,23 @@ public:
   // -- state variables --
 public:
 
-  // This mode records whether the state of the group is being modified
-  // and how: NONE, TRANSFORM, CROP, RESAMPLE
-  Core::StateOptionHandle menu_state_;
-
   // = Isosurface state variables =
   Core::StateOptionHandle isosurface_quality_state_;
 
   // = Group visibility =
   std::vector< Core::StateBoolHandle > visibility_state_;
-  Core::StateBoolHandle show_layers_state_;
 
   Core::StatePointHandle dimensions_state_;
   Core::StatePointHandle origin_state_;
   Core::StatePointHandle spacing_state_;
+
+  // -- GUI related states --
+public:
+  // Whether to show the isosurface menu
+  Core::StateBoolHandle show_iso_menu_state_;
+
+  // Whether to show the delete layers menu
+  Core::StateBoolHandle show_delete_menu_state_;
   
   // -- Layers contained within group --
 protected:
@@ -164,12 +168,9 @@ private:
   
   // The list that contains the layers that are stored in this class
   layer_list_type layer_list_;
-  
-public:
-  // Options for the state of the menus that are open
-  const static std::string NO_MENU_C;
-  const static std::string ISO_MENU_C;
-  const static std::string DELETE_MENU_C;
+
+  // An exclusive group of boolean states that control the visibility of different parts
+  Core::BooleanStateGroupHandle gui_state_group_;
 };
 
 } // end namespace Seg3D
