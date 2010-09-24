@@ -281,12 +281,35 @@ Transform Transform::get_inverse() const
 
 bool Transform::operator==( const Transform& transform ) const
 {
-  return ( transform.mat_ == mat_ );
+  Vector ex( 1.0, 0.0, 0.0 );
+  Vector ey( 0.0, 1.0, 0.0 );
+  Vector ez( 0.0, 0.0, 1.0 );
+  Point origin( 0.0, 0.0, 0.0 );
+
+  const double epsilon = 1e-4;
+
+  if ( Abs( Dot( project( ex ), transform.project( ex ) ) - 1.0 ) > epsilon ) return false;
+  if ( Abs( Dot( project( ey ), transform.project( ey ) ) - 1.0 ) > epsilon ) return false;
+  if ( Abs( Dot( project( ez ), transform.project( ez ) ) - 1.0 ) > epsilon ) return false;
+  if ( Abs( Dot( project( origin ), transform.project( origin ) ) - 1.0 ) > epsilon ) return false;
+  
+  return true;
 }
 
 bool Transform::operator!=( const Transform& transform ) const
 {
-  return ( transform.mat_ != mat_ );
+  Vector ex( 1.0, 0.0, 0.0 );
+  Vector ey( 0.0, 1.0, 0.0 );
+  Vector ez( 0.0, 0.0, 1.0 );
+  Point origin( 0.0, 0.0, 0.0 );
+
+  const double epsilon = 1e-4;
+  if ( Abs( Dot( project( ex ), transform.project( ex ) ) - 1.0 ) > epsilon ) return true;
+  if ( Abs( Dot( project( ey ), transform.project( ey ) ) - 1.0 ) > epsilon ) return true;
+  if ( Abs( Dot( project( ez ), transform.project( ez ) ) - 1.0 ) > epsilon ) return true;
+  if ( Abs( Dot( project( origin ), transform.project( origin ) ) - 1.0 ) > epsilon ) return true;
+  
+  return false;
 }
 
 bool Transform::is_axis_aligned() const

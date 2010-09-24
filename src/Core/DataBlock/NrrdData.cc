@@ -155,15 +155,15 @@ Transform NrrdData::get_transform() const
       min[ p ] = 0.0;
     }
 
-    if ( IsFinite( this->private_->nrrd_->axis[ p ].max ) )
+    if ( IsFinite( this->private_->nrrd_->axis[ p ].spacing ) )
     {
-      max[ p ] = this->private_->nrrd_->axis[ p ].max;
+      max[ p ] = this->private_->nrrd_->axis[ p ].spacing * size[ p ];
     }
     else
     {
-      if ( IsFinite( this->private_->nrrd_->axis[ p ].spacing ) )
+      if ( IsFinite( this->private_->nrrd_->axis[ p ].max ) )
       {
-        max[ p ] = this->private_->nrrd_->axis[ p ].spacing * size[ p ];
+        max[ p ] = this->private_->nrrd_->axis[ p ].max;
       }
       else
       {

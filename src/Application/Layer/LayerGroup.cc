@@ -117,26 +117,6 @@ void LayerGroup::delete_layer( LayerHandle layer, bool invalidate_layerid )
   layer_list_.remove( layer );
 }
 
-void LayerGroup::crop_layer()
-{
-  
-}
-
-void LayerGroup::transform_layer()
-{
-  
-}
-
-void LayerGroup::resample_layer()
-{
-  
-}
-
-void LayerGroup::flip_layer()
-{
-  
-}
-
 void LayerGroup::get_layer_names( std::vector< LayerIDNamePair >& layer_names, 
   Core::VolumeType type ) const
 {
