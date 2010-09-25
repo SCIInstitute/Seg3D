@@ -103,19 +103,19 @@ public:
 
   // GET_GRID_TRANSFORM:
   // Get the grid location
-  const GridTransform get_grid_transform() const
+  const GridTransform& get_grid_transform() const
   {
     return this->grid_transform_;
   }
 
   // GET_TRANSFORM:
   // Get the transform of the data
-  const Transform get_transform() const
+  Transform get_transform() const
   {
     return this->grid_transform_.transform();
   }
 
-  const Transform get_inverse_transform() const
+  const Transform& get_inverse_transform() const
   {
     return this->inverse_transform_;
   }

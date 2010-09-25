@@ -84,10 +84,6 @@ public:
   // --Import the data as a specific type --  
 public: 
 
-  // IMPORT_LAYER:
-  // Import the layer from the file
-  virtual bool import_layer( LayerImporterMode mode, std::vector<LayerHandle>& layers );
-
   // SET_FILE_LIST:
   // we need a list of files to import, this function provides the list, the list must be set 
   // before import_layer is called.
@@ -272,6 +268,16 @@ private:
     boost::to_lower( this->extension_ );
   }
   
+protected:
+  // LOAD_DATA:
+  // Load the data from the file(s).
+  // NOTE: This function is called by import_layer internally.
+  virtual bool load_data( Core::DataBlockHandle& data_block, 
+    Core::GridTransform& grid_trans );
+
+  // GET_LAYER_NAME:
+  // Return the string that will be used to name the layers.
+  virtual std::string get_layer_name();
 
 private:
   Core::ITKImageDataHandle        image_data_;

@@ -76,71 +76,6 @@ bool ITKLayerImporter::import_header()
   return false; 
 }
 
-bool ITKLayerImporter::import_layer( LayerImporterMode mode, std::vector<LayerHandle>& layers )
-{
-
-  if( this->extension_ == ".dcm" )
-  { 
-    switch( this->pixel_type_ )
-    {
-      case Core::DataType::UCHAR_E:
-        if( !this->import_dicom_series< unsigned char >() ) return false;
-        break;
-      case Core::DataType::CHAR_E:
-        if( !this->import_dicom_series< signed char >() ) return false;
-        break;
-      case Core::DataType::USHORT_E:
-        if( !this->import_dicom_series< unsigned short >() ) return false;
-        break;
-      case Core::DataType::SHORT_E:
-        if( !this->import_dicom_series< signed short >() ) return false;
-        break;
-      case Core::DataType::UINT_E:
-        if( !this->import_dicom_series< signed int >() ) return false;
-        break;
-      case Core::DataType::INT_E:
-        if( !this->import_dicom_series< unsigned int >() ) return false;
-        break;
-      default:
-        break;
-    }
-  }
-  else if( this->extension_ == ".png" )
-  {
-    if( !this->import_png_series< float >() ) return false; 
-    return false;
-  }
-  else if( this->extension_ == ".tiff" )
-  {
-    return false;
-  }
-  else
-  {
-    return false;
-  }
-
-  if( ( !this->data_block_ ) || ( !this->image_data_ ) ) return false;
-
-  Core::DataVolumeHandle data_volume( 
-    new Core::DataVolume( this->image_data_->get_grid_transform(), this->data_block_ ) );
-  data_volume->get_data_block()->update_histogram();
-
-  layers.resize( 1 );
-  layers[ 0 ] = LayerHandle( new DataLayer( boost::filesystem::path( 
-    this->get_filename() ).parent_path().filename(),
-    data_volume ) );
-
-
-  // If the layer wasn't successfully created, we exit.
-  if( !layers[ 0 ] )
-  {
-    return false;
-  }
-
-  CORE_LOG_DEBUG( std::string("Successfully imported: ") + get_base_filename() );
-  return true;
-}
-
 Core::GridTransform ITKLayerImporter::get_grid_transform()
 {
   if( this->image_data_ ) return this->image_data_->get_grid_transform();
@@ -253,6 +188,60 @@ bool ITKLayerImporter::scan_tiff()
   return false;
 }
 
+bool ITKLayerImporter::load_data( Core::DataBlockHandle& data_block, 
+                 Core::GridTransform& grid_trans )
+{
+  if( this->extension_ == ".dcm" )
+  { 
+    switch( this->pixel_type_ )
+    {
+    case Core::DataType::UCHAR_E:
+      if( !this->import_dicom_series< unsigned char >() ) return false;
+      break;
+    case Core::DataType::CHAR_E:
+      if( !this->import_dicom_series< signed char >() ) return false;
+      break;
+    case Core::DataType::USHORT_E:
+      if( !this->import_dicom_series< unsigned short >() ) return false;
+      break;
+    case Core::DataType::SHORT_E:
+      if( !this->import_dicom_series< signed short >() ) return false;
+      break;
+    case Core::DataType::UINT_E:
+      if( !this->import_dicom_series< signed int >() ) return false;
+      break;
+    case Core::DataType::INT_E:
+      if( !this->import_dicom_series< unsigned int >() ) return false;
+      break;
+    default:
+      break;
+    }
+  }
+  else if( this->extension_ == ".png" )
+  {
+    if( !this->import_png_series< float >() ) return false; 
+    return false;
+  }
+  else if( this->extension_ == ".tiff" )
+  {
+    return false;
+  }
+  else
+  {
+    return false;
+  }
 
+  if( ( !this->data_block_ ) || ( !this->image_data_ ) ) return false;
+
+  data_block = this->data_block_;
+  grid_trans = this->image_data_->get_grid_transform();
+
+  return true;
+}
+
+std::string ITKLayerImporter::get_layer_name()
+{
+  return boost::filesystem::path( this->get_filename() ).parent_path().filename();
+}
 
 } // end namespace seg3D

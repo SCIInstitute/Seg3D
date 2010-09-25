@@ -208,10 +208,20 @@ public:
 
   // -- Import the data as a specific type -- 
 public: 
-
   // IMPORT_LAYER
   // Import the layer from the file
-  virtual bool import_layer( LayerImporterMode mode, std::vector< LayerHandle >& layers ) = 0;
+  bool import_layer( LayerImporterMode mode, std::vector< LayerHandle >& layers );
+
+protected:
+  // LOAD_DATA:
+  // Load the data from the file(s).
+  // NOTE: This function is called by import_layer internally.
+  virtual bool load_data( Core::DataBlockHandle& data_block, 
+    Core::GridTransform& grid_trans ) = 0;
+
+  // GET_LAYER_NAME:
+  // Return the string that will be used to name the layers.
+  virtual std::string get_layer_name();
 };
 
 

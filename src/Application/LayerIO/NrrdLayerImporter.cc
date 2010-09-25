@@ -94,116 +94,15 @@ int NrrdLayerImporter::get_importer_modes()
   return importer_modes;
 }
 
-
-bool NrrdLayerImporter::import_layer( LayerImporterMode mode, std::vector<LayerHandle>& layers )
+bool NrrdLayerImporter::load_data( Core::DataBlockHandle& data_block, 
+                  Core::GridTransform& grid_trans )
 {
-  layers.clear();
-  
-  // ensure that the data has been read
-  if ( ! nrrd_data_ ) import_header();
-  
-  switch (mode)
-  {
-    case LayerImporterMode::DATA_E:
-    {
-      CORE_LOG_DEBUG( std::string("Importing data layer: ") + get_base_filename() );
-          
-      Core::DataBlockHandle datablock( Core::NrrdDataBlock::New( nrrd_data_ ) );
-      datablock->update_histogram();
-      
-      Core::DataVolumeHandle datavolume( new Core::DataVolume( 
-        nrrd_data_->get_grid_transform(), datablock ) );
+  if ( !this->nrrd_data_ ) import_header();
 
-      layers.resize( 1 );
-      layers[0] = LayerHandle( new DataLayer( get_base_filename(), datavolume ) );
+  data_block = Core::NrrdDataBlock::New( this->nrrd_data_ );
+  grid_trans = this->nrrd_data_->get_grid_transform();
 
-      CORE_LOG_DEBUG( std::string("Successfully imported: ") + get_base_filename() );
-      return true;
-    }
-    case LayerImporterMode::SINGLE_MASK_E:
-    {
-      CORE_LOG_DEBUG( std::string("Importing mask layer: ") + get_base_filename() );
-
-      Core::DataBlockHandle datablock( Core::NrrdDataBlock::New( nrrd_data_ ) );
-      Core::DataVolumeHandle datavolume( new Core::DataVolume( 
-        nrrd_data_->get_grid_transform(), datablock ) );
-    
-      Core::MaskDataBlockHandle maskdatablock;
-      
-      if ( !( Core::MaskVolume::CreateMaskFromNonZeroData( 
-        datavolume, maskdatablock ) ) ) 
-      {
-        return false;
-      }
-      
-      Core::MaskVolumeHandle maskvolume( new Core::MaskVolume( 
-        nrrd_data_->get_grid_transform(), maskdatablock ) );
-
-      layers.resize( 1 );
-      layers[0] = LayerHandle( new MaskLayer( get_base_filename(), maskvolume ) );
-
-      CORE_LOG_DEBUG( std::string("Successfully imported: ") + get_base_filename() );
-      return true;
-    }
-    
-    case LayerImporterMode::BITPLANE_MASK_E:
-    {
-      CORE_LOG_DEBUG( std::string("Importing mask layer: ") + get_base_filename() );
-
-
-      Core::DataBlockHandle datablock( Core::NrrdDataBlock::New( nrrd_data_ ) );
-      Core::DataVolumeHandle datavolume( new Core::DataVolume( 
-        nrrd_data_->get_grid_transform(), datablock ) );
-      std::vector<Core::MaskDataBlockHandle> maskdatablocks;
-      
-      if ( !( Core::MaskVolume::CreateMaskFromBitPlaneData( 
-        datavolume, maskdatablocks ) ) ) 
-      {
-        return false;
-      }
-
-      layers.resize( maskdatablocks.size() );
-
-      for ( size_t j = 0; j < layers.size(); j++ )
-      {
-        Core::MaskVolumeHandle maskvolume( new Core::MaskVolume( 
-          nrrd_data_->get_grid_transform(), maskdatablocks[j] ) );
-        layers[j] = LayerHandle( new MaskLayer( get_base_filename(), maskvolume ) );
-      }
-      
-      CORE_LOG_DEBUG( std::string("Successfully imported: ") + get_base_filename() );
-      return true;
-    }
-    case LayerImporterMode::LABEL_MASK_E:
-    {
-      CORE_LOG_DEBUG( std::string("Importing mask layer: ") + get_base_filename() );
-
-
-      Core::DataBlockHandle datablock( Core::NrrdDataBlock::New( nrrd_data_ ) );
-      Core::DataVolumeHandle datavolume( new Core::DataVolume( 
-        nrrd_data_->get_grid_transform(), datablock ) );
-      std::vector<Core::MaskDataBlockHandle> maskdatablocks;
-            
-      if ( !( Core::MaskVolume::CreateMaskFromLabelData( 
-        datavolume, maskdatablocks ) ) ) 
-      {
-        return false;
-      }
-
-      layers.resize( maskdatablocks.size() );
-
-      for ( size_t j = 0; j < layers.size(); j++ )
-      {
-        Core::MaskVolumeHandle maskvolume( new Core::MaskVolume( 
-          nrrd_data_->get_grid_transform(), maskdatablocks[j] ) );
-        layers[j] = LayerHandle( new MaskLayer( get_base_filename(), maskvolume ) );
-      }
-      
-      CORE_LOG_DEBUG( std::string("Successfully imported: ") + get_base_filename() );
-      return true;
-    }   default:
-      return false;
-  }
+  return true;
 }
 
 } // end namespace seg3D

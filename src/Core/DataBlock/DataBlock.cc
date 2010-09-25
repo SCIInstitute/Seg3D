@@ -552,30 +552,33 @@ static bool PermuteDataInternal( const DataBlockHandle& src_data_block,
     }
   }
   
-  index_type dz = start[ 2 ];
-  index_type dz_stride = stride[ 2 ];
-  for ( index_type sz = 0 ; sz < nz ; sz += nxy )
+  index_type dnx = static_cast<index_type>( dst_data_block->get_nx() );
+  index_type dny = static_cast<index_type>( dst_data_block->get_ny() );
+  index_type dnz = static_cast<index_type>( dst_data_block->get_nz() );
+  index_type dnxy = dnx * dny;
+  index_type dnxyz = dnx * dny * dnz;
+  index_type sz = start[ 2 ];
+  index_type sz_stride = stride[ 2 ];
+  for ( index_type dz = 0; dz < dnxyz; dz += dnxy )
   {
-    index_type dy = start[ 1 ];
-    index_type dy_stride = stride[ 1 ];
-
-    for ( index_type sy = 0 ; sy < ny ; sy += nx )
+    index_type sy = start[ 1 ];
+    index_type sy_stride = stride[ 1 ];
+    for ( index_type dy = 0; dy < dnxy; dy += dnx )
     {
-      index_type dx = start[ 0 ];
-      index_type dx_stride = stride[ 0 ];
-      for ( index_type sx = 0 ; sx < nx ; sx++ )
+      index_type sx = start[ 0 ];
+      index_type sx_stride = stride[ 0 ];
+      for ( index_type dx = 0; dx < dnx; dx++ )
       {
-        dst [ dx + dy + dz ] = src [ sx + sy + sz ]; 
-        dx += dx_stride;
+        dst[ dx + dy + dz ] = src[ sx + sy + sz ];
+        sx += sx_stride;
       }
-      dy += dy_stride;
+      sy += sy_stride;
     }
-    dz += dz_stride;
+    sz += sz_stride;
   }
   
   return true;
 }
-
 
 bool DataBlock::PermuteData( const DataBlockHandle& src_data_block, 
   DataBlockHandle& dst_data_block, std::vector<int> permutation )

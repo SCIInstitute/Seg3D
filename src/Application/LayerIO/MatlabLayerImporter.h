@@ -78,12 +78,12 @@ public:
   // Get then supported importer modes
   virtual int get_importer_modes();
     
-  // --Import the data as a specific type --  
-public: 
-
-  // IMPORT_LAYER
-  // Import the layer from the file
-  virtual bool import_layer( LayerImporterMode mode, std::vector<LayerHandle>& layers );
+protected:
+  // LOAD_DATA:
+  // Load the data from the file(s).
+  // NOTE: This function is called by import_layer internally.
+  virtual bool load_data( Core::DataBlockHandle& data_block, 
+    Core::GridTransform& grid_trans );
 
 };
 

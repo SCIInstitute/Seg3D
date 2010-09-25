@@ -183,4 +183,27 @@ bool DataVolume::CreateInvalidData( GridTransform grid_transform, DataVolumeHand
   return true;
 }
 
+void DataVolume::ConvertToCanonicalVolume( const DataVolumeHandle& src_volume, 
+                      DataVolumeHandle& dst_volume )
+{
+  const GridTransform& src_transform = src_volume->get_grid_transform();
+  std::vector< int > permutation;
+  GridTransform dst_transform;
+  GridTransform::AlignToCanonicalCoordinates( src_transform, permutation, dst_transform );
+  DataBlockHandle src_data_block = src_volume->get_data_block();
+  DataBlockHandle dst_data_block;
+  assert( permutation.size() == 3 );
+  if ( permutation[ 0 ] != 1 || permutation[ 1 ] != 2 || permutation[ 2 ] != 3)
+  {
+    DataBlock::PermuteData( src_data_block, dst_data_block, permutation );
+  }
+  else
+  {
+    dst_data_block = src_data_block;
+  }
+
+  dst_volume.reset( new DataVolume( dst_transform, dst_data_block ) );
+}
+
+
 } // end namespace Core

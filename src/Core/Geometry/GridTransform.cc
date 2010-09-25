@@ -87,6 +87,77 @@ bool GridTransform::operator!=( const GridTransform& gt ) const
   return ( nx_ != gt.nx_ || ny_ != gt.ny_ || nz_ != gt.nz_ || mat_ != gt.mat_ );
 }
 
+void GridTransform::AlignToCanonicalCoordinates( const GridTransform& src_transform, 
+                        std::vector< int >& permutation, GridTransform& dst_transform )
+{
+  // Step 1. Align the transformation frame to axes
+  Vector axes[ 3 ];
+  std::vector< Vector > canonical_axes( 3 );
+  canonical_axes[ 0 ] = Vector( 1.0, 0.0, 0.0 );
+  canonical_axes[ 1 ] = Vector( 0.0, 1.0, 0.0 );
+  canonical_axes[ 2 ] = Vector( 0.0, 0.0, 1.0 );
+  axes[ 0 ] = src_transform.project( canonical_axes[ 0 ] );
+  axes[ 1 ] = src_transform.project( canonical_axes[ 1 ] );
+  axes[ 2 ] = src_transform.project( canonical_axes[ 2 ] );
+
+  // Find the closest axis to each vector
+  for ( int i = 0; i < 3; ++i )
+  {
+    double proj_len = 0;
+    size_t index = 0;
+    for ( size_t j = 0; j < canonical_axes.size(); ++j )
+    {
+      double dot_prod = Dot( axes[ i ], canonical_axes[ j ] );
+      if ( Abs( dot_prod ) > Abs( proj_len ) )
+      {
+        index = j;
+        proj_len = dot_prod;
+      }
+    }
+    axes[ i ] = canonical_axes[ index ] * ( Sign( proj_len ) * axes[ i ].length() );
+    canonical_axes.erase( canonical_axes.begin() + index );
+  }
+  
+  Point src_origin = src_transform.project( Point( 0, 0, 0 ) );
+  std::vector< size_t > src_size( 3 );
+  src_size[ 0 ] = src_transform.get_nx();
+  src_size[ 1 ] = src_transform.get_ny();
+  src_size[ 2 ] = src_transform.get_nz();
+  Vector spacing;
+  std::vector< size_t > dst_size( 3 );
+  Point dst_origin;
+  // Step 2. Get the permutation transformation from the source to canonical coordinates
+  permutation.resize( 3 );
+  for ( int i = 0; i < 3; ++i )
+  {
+    for ( int j = 0; j < 3; ++j )
+    {
+      if ( axes[ j ][ i ] != 0 )
+      {
+        permutation[ i ] = Sign( axes[ j ][ i ] ) * ( j + 1 );
+        spacing[ i ] = Abs( axes[ j ][ i ] );
+        dst_size[ i ] = src_size[ j ];
+        if ( axes[ i ][ j ] > 0 )
+        {
+          dst_origin[ i ] = src_origin[ j ];
+        }
+        else
+        {
+          dst_origin[ i ] = src_origin[ j ] + axes[ j ][ i ] * 
+            ( static_cast< int >( src_size[ j ] ) - 1 );
+        }
+        break;
+      }     
+    }
+  }
+  
+  dst_transform.load_basis( dst_origin, Vector( spacing[ 0 ], 0.0, 0.0 ),
+    Vector( 0.0, spacing[ 1 ], 0.0 ), Vector( 0.0, 0.0, spacing[ 2 ] ) );
+  dst_transform.set_nx( dst_size[ 0 ] );
+  dst_transform.set_ny( dst_size[ 1 ] );
+  dst_transform.set_nz( dst_size[ 2 ] );
+}
+
 Point operator*( const GridTransform& gt, const Point& d )
 {
   return gt.project( d );

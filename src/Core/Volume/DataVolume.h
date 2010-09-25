@@ -111,6 +111,11 @@ public:
   // Create a data volume with given dimensions, but no data container associated with it.
   static bool CreateInvalidData( GridTransform grid_transform, DataVolumeHandle& data );
 
+  // CONVERTTOCANONICALVOLUME:
+  // Convert the source volume to a canonical-axis-aligned volume.
+  // Returns true if conversion is done, otherwise false.
+  static void ConvertToCanonicalVolume( const DataVolumeHandle& src_volume, 
+    DataVolumeHandle& dst_volume );
 };
 
 } // end namespace Core

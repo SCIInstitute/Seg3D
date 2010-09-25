@@ -54,9 +54,11 @@ int MatlabLayerImporter::get_importer_modes()
   return 0;
 }
 
-bool MatlabLayerImporter::import_layer( LayerImporterMode mode, std::vector<LayerHandle>& layers )
+bool MatlabLayerImporter::load_data( Core::DataBlockHandle& data_block, 
+                  Core::GridTransform& grid_trans )
 {
   return false;
 }
+
 
 } // end namespace seg3D

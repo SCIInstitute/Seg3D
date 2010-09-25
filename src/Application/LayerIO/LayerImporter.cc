@@ -26,7 +26,13 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// Core includes
+#include <Core/Volume/DataVolume.h>
+#include <Core/Volume/MaskVolume.h>
+
 // Application includes
+#include <Application/Layer/DataLayer.h>
+#include <Application/Layer/MaskLayer.h>
 #include <Application/LayerIO/LayerImporter.h>
 
 namespace Seg3D
@@ -100,6 +106,114 @@ std::string LayerImporter::get_base_filename()
 bool LayerImporter::check_header()
 {
   return true; 
+}
+
+bool LayerImporter::import_layer( LayerImporterMode mode, std::vector< LayerHandle >& layers )
+{
+  layers.clear();
+
+  Core::DataBlockHandle data_block;
+  Core::GridTransform grid_transform;
+  if ( !this->load_data( data_block, grid_transform ) )
+  {
+    return false;
+  }
+  
+  Core::DataVolumeHandle src_volume( new Core::DataVolume( grid_transform, data_block ) );
+  Core::DataVolumeHandle canonical_vol;
+  Core::DataVolume::ConvertToCanonicalVolume( src_volume, canonical_vol );
+
+  switch ( mode )
+  {
+  case LayerImporterMode::DATA_E:
+    {
+      CORE_LOG_DEBUG( std::string( "Importing data layer: " ) + this->get_base_filename() );
+
+      canonical_vol->get_data_block()->update_histogram();
+
+      layers.resize( 1 );
+      layers[0] = LayerHandle( new DataLayer( this->get_layer_name(), canonical_vol ) );
+
+      CORE_LOG_DEBUG( std::string( "Successfully imported: " ) + this->get_base_filename() );
+      return true;
+    }
+  case LayerImporterMode::SINGLE_MASK_E:
+    {
+      CORE_LOG_DEBUG( std::string( "Importing mask layer: " ) + this->get_base_filename() );
+
+      Core::MaskDataBlockHandle maskdatablock;
+
+      if ( !( Core::MaskVolume::CreateMaskFromNonZeroData( 
+        canonical_vol, maskdatablock ) ) ) 
+      {
+        return false;
+      }
+
+      Core::MaskVolumeHandle maskvolume( new Core::MaskVolume( 
+        canonical_vol->get_grid_transform(), maskdatablock ) );
+
+      layers.resize( 1 );
+      layers[0] = LayerHandle( new MaskLayer( this->get_base_filename(), maskvolume ) );
+
+      CORE_LOG_DEBUG( std::string( "Successfully imported: " ) + this->get_base_filename() );
+      return true;
+    }
+  case LayerImporterMode::BITPLANE_MASK_E:
+    {
+      CORE_LOG_DEBUG( std::string( "Importing mask layer: " ) + this->get_base_filename() );
+
+      std::vector<Core::MaskDataBlockHandle> maskdatablocks;
+
+      if ( !( Core::MaskVolume::CreateMaskFromBitPlaneData( 
+        canonical_vol, maskdatablocks ) ) ) 
+      {
+        return false;
+      }
+
+      layers.resize( maskdatablocks.size() );
+
+      for ( size_t j = 0; j < layers.size(); j++ )
+      {
+        Core::MaskVolumeHandle maskvolume( new Core::MaskVolume( 
+          canonical_vol->get_grid_transform(), maskdatablocks[ j ] ) );
+        layers[ j ] = LayerHandle( new MaskLayer( this->get_base_filename(), maskvolume ) );
+      }
+
+      CORE_LOG_DEBUG( std::string( "Successfully imported: " ) + this->get_base_filename() );
+      return true;
+    }
+  case LayerImporterMode::LABEL_MASK_E:
+    {
+      CORE_LOG_DEBUG( std::string( "Importing mask layer: " ) + this->get_base_filename() );
+
+      std::vector<Core::MaskDataBlockHandle> maskdatablocks;
+
+      if ( !( Core::MaskVolume::CreateMaskFromLabelData( 
+        canonical_vol, maskdatablocks ) ) ) 
+      {
+        return false;
+      }
+
+      layers.resize( maskdatablocks.size() );
+
+      for ( size_t j = 0; j < layers.size(); j++ )
+      {
+        Core::MaskVolumeHandle maskvolume( new Core::MaskVolume( 
+          canonical_vol->get_grid_transform(), maskdatablocks[ j ] ) );
+        layers[ j ] = LayerHandle( new MaskLayer( get_base_filename(), maskvolume ) );
+      }
+
+      CORE_LOG_DEBUG( std::string( "Successfully imported: " ) + get_base_filename() );
+      return true;
+    }
+  default:
+    return false;
+  }
+}
+
+std::string LayerImporter::get_layer_name()
+{
+  return this->get_filename();
 }
 
 } // end namespace seg3D

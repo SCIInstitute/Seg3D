@@ -131,6 +131,10 @@ private:
   size_t nx_;
   size_t ny_;
   size_t nz_;
+
+public:
+  static void AlignToCanonicalCoordinates( const GridTransform& src_transform,
+    std::vector< int >& permutation, GridTransform& dst_transform );
 };
 
 Point operator*( const GridTransform& gt, const Point& d );

@@ -68,35 +68,6 @@ bool VFFLayerImporter::import_header()
   return false; 
 }
 
-bool VFFLayerImporter::import_layer( LayerImporterMode mode, std::vector<LayerHandle>& layers )
-{
-
-  if( this->extension_ == ".vff" )
-  {
-    if( !this->import_vff() ) return false;
-  }
-
-  if( !this->data_block_ ) return false;
-
-  Core::DataVolumeHandle data_volume( 
-    new Core::DataVolume( this->grid_transform_, this->data_block_ ) );
-  data_volume->get_data_block()->update_histogram();
-
-  layers.resize( 1 );
-  layers[ 0 ] = LayerHandle( new DataLayer( boost::filesystem::path( 
-      this->get_filename() ).filename(),
-      data_volume ) );
-
-  // If the layer wasn't successfully created, we exit.
-  if( !layers[ 0 ] )
-  {
-    return false;
-  }
-
-  CORE_LOG_DEBUG( std::string("Successfully imported: ") + get_base_filename() );
-  return true;
-}
-
 Core::GridTransform VFFLayerImporter::get_grid_transform()
 {
   return this->grid_transform_;
@@ -224,6 +195,22 @@ bool VFFLayerImporter::import_vff()
 
   // Step 5: now we set our grid transform.
   this->grid_transform_ = Core::GridTransform( nx, ny, nz, transform );
+  return true;
+}
+
+bool VFFLayerImporter::load_data( Core::DataBlockHandle& data_block, 
+                 Core::GridTransform& grid_trans )
+{
+  if( this->extension_ == ".vff" )
+  {
+    if( !this->import_vff() ) return false;
+  }
+
+  if( !this->data_block_ ) return false;
+
+  data_block = this->data_block_;
+  grid_trans = this->grid_transform_;
+
   return true;
 }
 
