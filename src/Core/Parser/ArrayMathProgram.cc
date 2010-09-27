@@ -152,7 +152,7 @@ void ArrayMathProgram::parallel_run( int thread, int num_threads, boost::barrier
       // Report progress here -- only at 1% intervals
       this->update_progress_signal_( (
         static_cast< double >( offset ) / static_cast< double >( end ) ) );
-      progress_count = 0;
+      progress_count -= one_percent_count;
     }
 
     sz = this->buffer_size_;
@@ -177,6 +177,12 @@ void ArrayMathProgram::parallel_run( int thread, int num_threads, boost::barrier
     }
     offset += sz;
     progress_count += sz;
+  }
+
+  if( thread == 0 )
+  {
+    // Make sure we hit 100%
+    this->update_progress_signal_( 1.0 ); 
   }
 
   barrier.wait();

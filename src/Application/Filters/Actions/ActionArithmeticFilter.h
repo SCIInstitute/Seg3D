@@ -73,7 +73,6 @@ public:
   const static std::string MASK_C;
   const static std::string DATA_C;
   const static std::string RESULT_C;
-  const static double ENGINE_PERCENT_PROGRESS_C;
 };
   
 } // end namespace Seg3D
