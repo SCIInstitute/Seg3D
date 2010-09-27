@@ -117,6 +117,8 @@ void ArithmeticFilterAlgo::run()
         false, true );
     }
   }
+
+  this->dst_layer_->update_progress( 1.0 );
 }
 
 
@@ -127,6 +129,7 @@ void ArithmeticFilterAlgo::run()
 const std::string ActionArithmeticFilter::DATA_C( "data" );
 const std::string ActionArithmeticFilter::MASK_C( "mask" );
 const std::string ActionArithmeticFilter::RESULT_C( "RESULT" );
+const double ActionArithmeticFilter::ENGINE_PERCENT_PROGRESS_C = 0.35;
 
 ActionArithmeticFilter::ActionArithmeticFilter() :
   private_( new ActionArithmeticFilterPrivate )
@@ -261,7 +264,8 @@ bool ActionArithmeticFilter::run( Core::ActionContextHandle& context,
 
   // Connect ArrayMathEngine progress signal to output layer progress signal
   algo->engine_.update_progress_signal_.connect(
-    boost::bind( &Layer::update_progress, algo->dst_layer_, _1, 0.0, 1.0 ) );
+    boost::bind( &Layer::update_progress, algo->dst_layer_, _1, 0.0, 
+    ENGINE_PERCENT_PROGRESS_C ) );
 
   // Return the ids of the destination layer.
   result = Core::ActionResultHandle( new Core::ActionResult( algo->dst_layer_->get_layer_id() ) );

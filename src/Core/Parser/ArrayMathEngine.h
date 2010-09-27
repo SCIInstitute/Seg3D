@@ -92,6 +92,8 @@ public:
   update_progress_signal_type update_progress_signal_;
 
 private:
+  void update_progress( double amount );
+
   // Parser program : the structure of the expressions and simple reduction
   // of the expressions to simple function calls
   ParserProgramHandle pprogram_;

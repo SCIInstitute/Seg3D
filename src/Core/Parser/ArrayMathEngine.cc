@@ -30,6 +30,7 @@
 #include <Core/DataBlock/StdDataBlock.h>
 #include <Core/Parser/ArrayMathEngine.h>
 #include <Core/Parser/ArrayMathFunctionCatalog.h>
+#include <Core/Parser/ArrayMathProgram.h>
 #include <Core/Parser/ParserEnums.h>
 #include <Core/Utils/Log.h>
 #include <Core/Utils/StringUtil.h>
@@ -306,14 +307,16 @@ bool ArrayMathEngine::run()
     return false;
   }
 
+  // Connect the ArrayMathProgram update progress signal to the engine update progress signal
+  this->mprogram_->update_progress_signal_.connect( 
+    boost::bind( &ArrayMathEngine::update_progress, this, _1 ) );
+
   // Run the program
   if ( !( ArrayMathInterpreter::run( this->mprogram_, error_str ) ) )
   {
     CORE_LOG_ERROR( error_str );
     return false;
   }
-
-  this->update_progress_signal_( 1.0 );
   return true;
 }
 
@@ -330,6 +333,12 @@ bool ArrayMathEngine::get_data_block( std::string name, DataBlockHandle& data_bl
 
   return false;
 }
+
+void ArrayMathEngine::update_progress( double amount )
+{
+  this->update_progress_signal_( amount );
+}
+
 
 } // end namespace
 

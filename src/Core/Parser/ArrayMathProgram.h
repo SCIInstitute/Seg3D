@@ -104,6 +104,14 @@ public:
   void set_parser_program( ParserProgramHandle handle );
   ParserProgramHandle get_parser_program();
 
+  typedef boost::signals2::signal< void (double) > update_progress_signal_type;
+
+  // UPDATE_PROGRESS:
+  // When new information on progress is available this signal is triggered. If this signal is 
+  // triggered it should end with a value 1.0 indicating that progress reporting has finised.
+  // Progress is measured between 0.0 and 1.0.
+  update_progress_signal_type update_progress_signal_;
+
 private:
 
   // General parameters that determine how many values are computed at
