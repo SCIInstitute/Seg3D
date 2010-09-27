@@ -191,7 +191,7 @@ bool ITKLayerImporter::scan_tiff()
 bool ITKLayerImporter::load_data( Core::DataBlockHandle& data_block, 
                  Core::GridTransform& grid_trans )
 {
-  if( this->extension_ == ".dcm" )
+  if( ( this->extension_ == ".dcm" ) || ( this->extension_ == "" ) )
   { 
     switch( this->pixel_type_ )
     {
@@ -219,12 +219,11 @@ bool ITKLayerImporter::load_data( Core::DataBlockHandle& data_block,
   }
   else if( this->extension_ == ".png" )
   {
-    if( !this->import_png_series< float >() ) return false; 
-    return false;
+    if( !this->import_png_series< unsigned char >() ) return false; 
   }
-  else if( this->extension_ == ".tiff" )
+  else if( ( this->extension_ == ".tiff" ) || ( this->extension_ == ".tif" ) )
   {
-    return false;
+    if( !this->import_tiff_series< signed short >() ) return false;
   }
   else
   {

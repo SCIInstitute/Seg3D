@@ -82,7 +82,7 @@ bool ToolManagerPrivate::handle_mouse_enter( ViewerHandle viewer, int x, int y )
 
 bool ToolManagerPrivate::handle_mouse_leave( ViewerHandle viewer )
 {
-  assert( this->focus_viewer_ == viewer );
+  //assert( this->focus_viewer_ == viewer );
   this->focus_viewer_.reset();
   if ( this->active_tool_ )
   {
