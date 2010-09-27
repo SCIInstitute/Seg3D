@@ -110,7 +110,8 @@ SegmentationSelectionPage::SegmentationSelectionPage( QWidget *parent )
   this->horizontalLayout_4->setContentsMargins( 4, 4, 4, 4 );
   this->horizontalLayout_4->setObjectName( QString::fromUtf8( "horizontalLayout_2" ) );
   this->single_file_radio_button_ = new QRadioButton( this->single_file_widget_ );
-  this->single_file_radio_button_->setObjectName( QString::fromUtf8( "single_file_radio_button_" ) );
+  this->single_file_radio_button_->setObjectName( 
+    QString::fromUtf8( "single_file_radio_button_" ) );
   this->single_file_radio_button_->setText( QString::fromUtf8( "Save masks as a single file" ) );
   this->single_file_radio_button_->setChecked( true );
   this->radio_button_group_->addButton( this->single_file_radio_button_, 0 );
@@ -166,13 +167,18 @@ void SegmentationSelectionPage::initializePage()
     groups[ i ]->get_grid_transform().get_nx() ) + " x " +
     Core::ExportToString( groups[ i ]->get_grid_transform().get_ny() ) + " x " +
     Core::ExportToString( groups[ i ]->get_grid_transform().get_nz() );
-    group->setText( 0,  QString::fromUtf8( "Group - " ) + QString::fromStdString( group_name ) );
+    group->setText( 0,  QString::fromUtf8( "Group - " ) + 
+      QString::fromStdString( group_name ) );
     group->setExpanded( true );
 
     layer_list_type layers = groups[ i ]->get_layer_list();
     layer_list_type::iterator it = layers.begin();
     while( it != layers.end() )
     {
+      if( ( *it ) == LayerManager::Instance()->get_active_layer() )
+      {
+        group_with_active_layer = i;
+      }
       if( ( *it )->type() == Core::VolumeType::MASK_E )
       {
         QTreeWidgetItem *mask = new QTreeWidgetItem( group );
@@ -180,10 +186,7 @@ void SegmentationSelectionPage::initializePage()
         mask->setCheckState( 0, Qt::Checked );
         mask->setCheckState( 0, Qt::Unchecked );
         mask->setText( 0, QString::fromStdString( ( *it )->name_state_->get() ) );
-        if( ( *it ) == LayerManager::Instance()->get_active_layer() )
-        {
-          group_with_active_layer = i;
-        }
+
         mask_found = true;
       }
       ++it;
@@ -196,7 +199,8 @@ void SegmentationSelectionPage::initializePage()
     }
   }
   
-  this->group_with_masks_tree_->topLevelItem( group_with_active_layer )->setCheckState( 0, Qt::Checked );
+  this->group_with_masks_tree_->topLevelItem( group_with_active_layer )->
+    setCheckState( 0, Qt::Checked );
   
 }
 
@@ -241,7 +245,7 @@ bool SegmentationSelectionPage::validatePage()
       | QFileDialog::DontResolveSymlinks );
   }
   
-  if( !boost::filesystem::exists( boost::filesystem::path( filename.toStdString() ) ) )
+  if( !boost::filesystem::exists( boost::filesystem::path( filename.toStdString() ).parent_path() ) )
   {
     return false;
   }
@@ -337,8 +341,8 @@ void SegmentationSummaryPage::initializePage()
     connect( new_mask, SIGNAL( index_changed_signal() ), this, SIGNAL( completeChanged() ) ); 
   }
 
-  this->description_->setText(  QString::fromUtf8( "Please verify that you want to export the following "
-    "mask layers as a segmentation " ) );
+  this->description_->setText(  QString::fromUtf8( "Please verify that you want to export the "
+    "following mask layers as a segmentation " ) );
     
 }
 
@@ -362,7 +366,8 @@ bool SegmentationSummaryPage::validatePage()
   
   bool single_file = ( field( "singleFile" ).toString().toStdString() == "true" ); 
   
-  boost::filesystem::path file_name_and_path = field( "segmentationPath" ).toString().toStdString();
+  boost::filesystem::path file_name_and_path = 
+    field( "segmentationPath" ).toString().toStdString();
   
   std::vector< LayerHandle > layers;
   std::vector< double > values;

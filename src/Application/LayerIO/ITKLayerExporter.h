@@ -92,7 +92,7 @@ public:
 private:
   // EXPORT_DICOM_SERIES:
   // Export the data as a series of DICOMS
-  template< class PixelType >
+  template< class InputPixelType, class OutputPixelType >
   bool export_dicom_series( const std::string& file_path, const std::string& file_name )
   {
     DataLayer* temp_handle = dynamic_cast< DataLayer* >( 
@@ -101,31 +101,27 @@ private:
     typedef itk::GDCMImageIO ImageIOType;
     typedef itk::NumericSeriesFileNames NamesGeneratorType;
 
-    ImageIOType::Pointer dicomIO = ImageIOType::New();
-    NamesGeneratorType::Pointer namesGenerator = NamesGeneratorType::New();
+    ImageIOType::Pointer dicom_io = ImageIOType::New();
+    NamesGeneratorType::Pointer names_generator = NamesGeneratorType::New();
 
-    typedef itk::Image< PixelType, 3 > ImageType;
-    typedef itk::Image< signed short, 2 > OutputImageType;
+    typedef itk::Image< InputPixelType, 3 > ImageType;
+    typedef itk::Image< OutputPixelType, 2 > OutputImageType;
     typedef itk::ImageSeriesWriter< ImageType, OutputImageType > WriterType;
     typename WriterType::Pointer writer = WriterType::New();
 
-    Core::ITKImageDataHandle image_data = typename Core::ITKImageDataT< PixelType >::Handle( 
-      new Core::ITKImageDataT< PixelType >( temp_handle->get_data_volume()->get_data_block(), 
+    Core::ITKImageDataHandle image_data = typename Core::ITKImageDataT< InputPixelType >::Handle( 
+      new Core::ITKImageDataT< InputPixelType >( temp_handle->get_data_volume()->get_data_block(), 
       temp_handle->get_grid_transform() ) );
 
     ImageType* itk_image = dynamic_cast< ImageType* >( 
       image_data->get_base_image().GetPointer() );
 
-//    typedef itk::MetaDataDictionary DictionaryType;
-//    DictionaryType & dictionary = itk_image->GetMetaDataDictionary();
-
-
     typename ImageType::RegionType region = itk_image->GetLargestPossibleRegion();
     typename ImageType::IndexType start = region.GetIndex();
     typename ImageType::SizeType size = region.GetSize();
 
-    unsigned int firstSlice = start[ 2 ];
-    unsigned int lastSlice = start[ 2 ] + size[ 2 ] - 1;
+    unsigned int first_slice = start[ 2 ];
+    unsigned int last_slice = start[ 2 ] + size[ 2 ] - 1;
     
     boost::filesystem::path path = boost::filesystem::path( file_path );
 
@@ -136,29 +132,28 @@ private:
 
     if( size[ 2 ] < 100 )
     {
-      namesGenerator->SetSeriesFormat( filename_path.string() + "-%02d.dcm" );
+      names_generator->SetSeriesFormat( filename_path.string() + "-%02d.dcm" );
     }
     else if ( size[ 2 ] < 1000 )
     {
-      namesGenerator->SetSeriesFormat( filename_path.string() + "-%03d.dcm" );
+      names_generator->SetSeriesFormat( filename_path.string() + "-%03d.dcm" );
     }
     else if ( size[ 2 ] < 10000 )
     {
-      namesGenerator->SetSeriesFormat( filename_path.string() + "-%04d.dcm" );
+      names_generator->SetSeriesFormat( filename_path.string() + "-%04d.dcm" );
     }
     else
     {
-      namesGenerator->SetSeriesFormat( filename_path.string() + "-%10d.dcm" );
+      names_generator->SetSeriesFormat( filename_path.string() + "-%10d.dcm" );
     }
     
-    namesGenerator->SetStartIndex( firstSlice );
-    namesGenerator->SetEndIndex( lastSlice );
-    namesGenerator->SetIncrementIndex( 1 );
+    names_generator->SetStartIndex( first_slice );
+    names_generator->SetEndIndex( last_slice );
+    names_generator->SetIncrementIndex( 1 );
 
     writer->SetInput( itk_image );
-    writer->SetImageIO( dicomIO );
-/*    writer->SetMetaDataDictionary( dictionary );*/
-    writer->SetFileNames( namesGenerator->GetFileNames() );
+    writer->SetImageIO( dicom_io );
+    writer->SetFileNames( names_generator->GetFileNames() );
 
     try
     {

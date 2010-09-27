@@ -79,7 +79,10 @@ public:
   virtual bool export_layer( LayerExporterMode mode, const std::string& file_path, 
     const std::string& name );
     
-  virtual void set_label_layer_values( std::vector< double > values ){ this->label_values_ = values; }
+  virtual void set_label_layer_values( std::vector< double > values )
+  { 
+    this->label_values_ = values;
+  }
     
 private:
   bool export_nrrd( const std::string& file_path );
@@ -88,7 +91,6 @@ private:
   
 private:
   std::vector< double > label_values_;
-
 };
 
 } // end namespace seg3D

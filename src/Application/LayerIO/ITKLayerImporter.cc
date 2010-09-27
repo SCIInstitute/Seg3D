@@ -60,7 +60,7 @@ ITKLayerImporter::ITKLayerImporter( const std::string& filename ) :
 
 bool ITKLayerImporter::import_header()
 {
-  if( this->extension_ == ".dcm" )
+  if( ( this->extension_ == ".dcm" ) || ( this->extension_ == "" ) )
   {
     return this->scan_dicom();
   }
@@ -68,9 +68,9 @@ bool ITKLayerImporter::import_header()
   {
     return this->scan_png();
   }
-  else if( this->extension_ == ".tiff" )
+  else if( ( this->extension_ == ".tiff" ) || ( this->extension_ == ".tif" ) )
   {
-    return false;
+    return true;
   }
 
   return false; 

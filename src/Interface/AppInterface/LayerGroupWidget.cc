@@ -410,11 +410,6 @@ void LayerGroupWidget::resizeEvent( QResizeEvent *event )
   event->accept();
 }
   
-void LayerGroupWidget::notify_layer_manager_widget( bool move_time )
-{
-  Q_EMIT prep_layers_for_drag_and_drop_signal_( move_time );
-}
-
 void LayerGroupWidget::prep_layers_for_drag_and_drop( bool move_time )
 {
   for( std::map< std::string, LayerWidgetQHandle>::iterator it = this->layer_map_.begin(); 
@@ -507,7 +502,8 @@ void LayerGroupWidget::handle_change()
       this->layer_map_[ ( *i )->get_layer_id() ] = new_layer_handle;
       
       connect( new_layer_handle.data(), SIGNAL( prep_for_drag_and_drop( bool ) ), 
-          this, SLOT( notify_layer_manager_widget( bool ) ) );
+        this, SIGNAL( prep_layers_for_drag_and_drop_signal_( bool ) ) );
+      
     }
     index++;
   }

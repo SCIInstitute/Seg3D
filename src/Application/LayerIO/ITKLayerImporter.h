@@ -33,6 +33,9 @@
 # pragma once
 #endif 
 
+#include "itkRGBPixel.h"
+#include "itkTIFFImageIO.h"
+
 // Boost includes 
 #include <boost/filesystem.hpp>
 
@@ -48,7 +51,7 @@ namespace Seg3D
 
 class ITKLayerImporter : public LayerImporter
 {
-  SCI_IMPORTER_TYPE("ITK Importer", ".dcm;.tiff;.png", 5)
+  SCI_IMPORTER_TYPE("ITK Importer", ".dcm;.tiff;.tif;.png;", 5)
 
   // -- Constructor/Destructor --
 public:
@@ -117,8 +120,8 @@ private:
   bool import_dicom_series()
   {
     // Step 1: setup the image type
-    const unsigned int Dimension = 3;
-    typedef itk::Image< PixelType, Dimension > ImageType;
+    const unsigned int dimension = 3;
+    typedef itk::Image< PixelType, dimension > ImageType;
 
     // Step 2: using the image type, create a ITK reader
     typedef itk::ImageSeriesReader< ImageType > ReaderType;
@@ -126,10 +129,10 @@ private:
 
     // Step 3: now because we are importing dicoms we create a GDCM IO object
     typedef itk::GDCMImageIO ImageIOType;
-    ImageIOType::Pointer dicomIO = ImageIOType::New();
+    ImageIOType::Pointer dicom_io = ImageIOType::New();
 
     // Step 4: now we set the io and the file list in the reader
-    reader->SetImageIO( dicomIO );
+    reader->SetImageIO( dicom_io );
     reader->SetFileNames( this->file_list_ );
 
     // Step 5: now we attempt to actually read in the file and catch potential errors
@@ -172,15 +175,17 @@ private:
   template< class PixelType >
   bool import_png_series()
   {
-    const unsigned int Dimension = 3;
-    typedef itk::Image< PixelType, Dimension > ImageType;
-
+    //typedef itk::RGBPixel< PixelType > RGBPixelType;
+    const unsigned int dimension = 3;
+    
+    typedef itk::Image< PixelType, dimension > ImageType;
+ 
     typedef itk::ImageSeriesReader< ImageType > ReaderType;
     typename ReaderType::Pointer reader = ReaderType::New();
-
+ 
     reader->SetImageIO( itk::PNGImageIO::New() );
     reader->SetFileNames( this->file_list_ );
-
+ 
     try
     {
       reader->Update();
@@ -193,13 +198,13 @@ private:
     {
       std::string format_error = error.getError();
     }
-
+ 
     this->data_block_ = Core::ITKDataBlock::New< PixelType >( 
       typename itk::Image< PixelType, 3 >::Pointer( reader->GetOutput() ) );
-
+ 
     this->image_data_ = typename Core::ITKImageDataT< PixelType >::Handle( 
       new typename Core::ITKImageDataT< PixelType >( reader->GetOutput() ) );
-
+ 
     if( this->image_data_ && this->data_block_ )
     {
       return true;
@@ -215,12 +220,13 @@ private:
   template< class PixelType >
   bool import_tiff_series()
   {
-    const unsigned int Dimension = 3;
-    typedef itk::Image< PixelType, Dimension > ImageType;
+    const unsigned int dimension = 3;
+    typedef itk::Image< PixelType, dimension > ImageType;
 
     typedef itk::ImageSeriesReader< ImageType > ReaderType;
     typename ReaderType::Pointer reader = ReaderType::New();
 
+    reader->SetImageIO( itk::TIFFImageIO::New() );
     reader->SetFileNames( this->file_list_ );
 
     try
@@ -251,11 +257,6 @@ private:
       return false;
     }
   }
-
-  // IMPORT_VFF:
-  // a function that takes the information we read from the header and uses it to import an image
-  // from a vff file.
-  bool import_vff();
 
   // SET_EXTENSION:
   // we need to know which type of file we are dealing with, this function provides that ability,

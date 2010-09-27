@@ -120,7 +120,10 @@ bool NrrdLayerExporter::export_single_masks( const std::string& path )
     MaskLayer* temp_handle = dynamic_cast< MaskLayer* >( this->layers_[ i ].get() );
 
     // Step 2: Get a pointer to the mask's MaskDataBlock
-    Core::MaskDataBlockHandle mask_block = temp_handle->get_mask_volume()->get_mask_data_block();
+    Core::MaskDataBlockHandle mask_block = temp_handle->get_mask_volume()->
+      get_mask_data_block();
+      
+    Core::DataBlock::shared_lock_type lock( mask_block->get_mutex() );    
 
     // Step 3: Using the size and type information from our mask's MaskDataBlock, we create a 
     // new empty DataBlock
@@ -140,6 +143,8 @@ bool NrrdLayerExporter::export_single_masks( const std::string& path )
       }
     }
 
+    lock.unlock();
+    
     // Step 5: Make a new nrrd using our new DataBlock
     Core::NrrdDataHandle nrrd = Core::NrrdDataHandle( new Core::NrrdData( 
       new_data_block, temp_handle->get_grid_transform() ) );
@@ -177,13 +182,16 @@ bool NrrdLayerExporter::export_mask_label( const std::string& file_path )
   {
     new_data_block->set_data_at( i, this->label_values_[ 0 ]  );
   }
-
+  
   // Step 4: Loop through all the MaskLayers and insert their values into our new DataBlock
   std::vector< MaskLayer* >  mask_layers;
   for( int i = 1; i < static_cast< int >( this->layers_.size() ); ++i )
   {
     temp_handle = dynamic_cast< MaskLayer* >( this->layers_[ i ].get() );
     mask_block = temp_handle->get_mask_volume()->get_mask_data_block();
+    
+    Core::DataBlock::shared_lock_type lock( mask_block->get_mutex() );
+    
     for( size_t j = 0; j < mask_block->get_size(); ++j )
     {
       if( mask_block->get_mask_at( j ) )
@@ -191,6 +199,8 @@ bool NrrdLayerExporter::export_mask_label( const std::string& file_path )
         new_data_block->set_data_at( j, this->label_values_[ i ] );
       }
     } 
+    
+    lock.unlock();
   }
 
   // Step 5: Make a new nrrd using our new DataBlock

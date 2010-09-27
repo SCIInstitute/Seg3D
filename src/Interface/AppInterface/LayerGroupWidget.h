@@ -78,10 +78,6 @@ public Q_SLOTS:
   // function that enables the delete button
   void enable_delete_button( bool enable );
   
-  // NOTIFY_LAYER_MANAGER_WIDGET:
-  // this function triggers the prep_groups_for_drag_and_drop signal.
-  void notify_layer_manager_widget( bool move_time );
-  
   // PREP_FOR_ANIMATION:
   // this function replaces the widget with a screenshot of the widget for speed
   void prep_for_animation( bool move_time );

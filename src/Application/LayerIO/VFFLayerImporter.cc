@@ -107,7 +107,7 @@ bool VFFLayerImporter::scan_vff()
     }
     std::getline( file_data, line );
     if ( line[ 0 ] == '#' ) continue; // here we skip comments
-    if ( line.find_first_of( "=" ) == std::string::npos ) continue; // here we skip invalid lines
+    if ( line.find_first_of( "=" ) == std::string::npos ) continue; // we skip invalid lines
     line.erase( line.find( ";" ) ); // we clean out the semicolon's from the lines
     
     // now we split each line using '=' as the delimiter and store the pair in our map
@@ -139,7 +139,8 @@ bool VFFLayerImporter::import_vff()
   // Step 2: we check to see if the header contained the origin, if so we use it, otherwise
   // we return false
   if( this->vff_values_.find( "origin" ) == this->vff_values_.end() ) return false;
-  std::vector< std::string > origin_vector = Core::SplitString( this->vff_values_[ "origin" ], " " );
+  std::vector< std::string > origin_vector = 
+    Core::SplitString( this->vff_values_[ "origin" ], " " );
   Core::Point point = Core::Point( 
     boost::lexical_cast< double >( origin_vector[ 0 ] ), 
     boost::lexical_cast< double >( origin_vector[ 1 ] ), 
@@ -148,7 +149,8 @@ bool VFFLayerImporter::import_vff()
   // Step 3: we check to see if the header contained the spacing, if so we use them, otherwise
   // we return false
   if( this->vff_values_.find( "spacing" ) == this->vff_values_.end() ) return false;
-  std::vector< std::string > spacing_vector = Core::SplitString( this->vff_values_[ "spacing" ], " " );
+  std::vector< std::string > spacing_vector = 
+    Core::SplitString( this->vff_values_[ "spacing" ], " " );
   Core::Transform transform = Core::Transform( point, 
     Core::Vector( boost::lexical_cast< double >( spacing_vector[ 0 ] ), 0.0 , 0.0 ), 
     Core::Vector( 0.0, boost::lexical_cast< double >( spacing_vector[ 1 ] ), 0.0 ), 
@@ -186,7 +188,7 @@ bool VFFLayerImporter::import_vff()
   char* data;
   data = new char[ length ];
   data_file.seekg( 0, std::ios::beg );
-  data_file.seekg( this->vff_end_of_header_ + 1 );// we add one so that we begin at the right place 
+  data_file.seekg( this->vff_end_of_header_ + 1 );// add one so that we begin at the right place 
 
   // Step 4d: finally, we do the actual reading and then save the data to the data block.
   data_file.read( data, length );

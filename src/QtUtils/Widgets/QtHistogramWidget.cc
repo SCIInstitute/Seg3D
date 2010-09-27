@@ -121,6 +121,7 @@ void QtHistogramWidget::reset_histogram( )
 void QtHistogramWidget::set_min( double min )
 {
   if( this->min_bar_->isHidden() ) this->min_bar_->show();
+  if( this->max_bar_->isHidden() ) this->max_bar_->show();
   if( this->get_histogram_min() < 0 )
   {
     min = min + Core::Abs( this->get_histogram_min() );
@@ -136,6 +137,7 @@ void QtHistogramWidget::set_min( double min )
 void QtHistogramWidget::set_max( double max )
 {
   if( this->max_bar_->isHidden() ) this->max_bar_->show();
+  if( this->min_bar_->isHidden() ) this->min_bar_->show();
   if( this->get_histogram_min() < 0 )
   {
     max = max + Core::Abs( this->get_histogram_min() );
@@ -151,7 +153,8 @@ void QtHistogramWidget::set_max( double max )
 void QtHistogramWidget::handle_left_button_click( int lower_location )
 {
   if( this->lower_threshold_ == 0 ) return;
-  this->min_bar_->show();
+  if( this->max_bar_->isHidden() ) this->max_bar_->show();
+  if( this->min_bar_->isHidden() ) this->min_bar_->show();
   this->min_bar_->setGeometry( lower_location + 4, 4, 4, this->private_->histogram_graph_->height() );
   double percent_of_width = lower_location / double ( this->private_->histogram_graph_->width( ) );
   double current_value = ( this->get_histogram_max() - this->get_histogram_min() ) * percent_of_width;
@@ -163,7 +166,8 @@ void QtHistogramWidget::handle_left_button_click( int lower_location )
 void QtHistogramWidget::handle_right_button_click( int upper_location )
 {
   if( this->upper_threshold_ == 0 ) return;
-  this->max_bar_->show();
+  if( this->max_bar_->isHidden() ) this->max_bar_->show();
+  if( this->min_bar_->isHidden() ) this->min_bar_->show();
   this->max_bar_->setGeometry( ( upper_location ), 4, 4, this->private_->histogram_graph_->height() );
   double percent_of_width = upper_location / double ( this->private_->histogram_graph_->width() );
   double current_value = ( this->get_histogram_max() - this->get_histogram_min() ) * percent_of_width;

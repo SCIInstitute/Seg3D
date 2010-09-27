@@ -43,7 +43,6 @@ ITKLayerExporter::ITKLayerExporter( std::vector< LayerHandle >& layers ) :
   pixel_type_( Core::DataType::UCHAR_E )
 {
   if( !layers[ 0 ] ) return;
-  
   this->pixel_type_ = layers[ 0 ]->get_data_type();
 }
 
@@ -65,7 +64,6 @@ int ITKLayerExporter::get_exporter_modes()
 {
   int exporter_modes = 0;
   exporter_modes |= LayerExporterMode::DATA_E;
-  
   return exporter_modes;
 }
 
@@ -76,25 +74,28 @@ bool ITKLayerExporter::export_layer( LayerExporterMode mode, const std::string& 
   switch( this->layers_[ 0 ]->get_data_type() )
   {
     case Core::DataType::UCHAR_E:
-      return this->export_dicom_series< unsigned char >( file_path, name );
+      return this->export_dicom_series< unsigned char, unsigned char >( file_path, name );
       break;
     case Core::DataType::CHAR_E:
-      return this->export_dicom_series< signed char >( file_path, name );
+      return this->export_dicom_series< signed char, signed char >( file_path, name );
       break;
     case Core::DataType::USHORT_E:
-      return this->export_dicom_series< unsigned short >( file_path, name );
+      return this->export_dicom_series< unsigned short, unsigned short >( file_path, name );
       break;
     case Core::DataType::SHORT_E:
-      return this->export_dicom_series< signed short >( file_path, name );
+      return this->export_dicom_series< signed short, signed short >( file_path, name );
       break;
     case Core::DataType::UINT_E:
-      return this->export_dicom_series< signed int >( file_path, name );
+      return this->export_dicom_series< signed int, signed int >( file_path, name );
       break;
     case Core::DataType::INT_E:
-      return this->export_dicom_series< unsigned int >( file_path, name );
+      return this->export_dicom_series< unsigned int, unsigned int >( file_path, name );
+      break;
+    case Core::DataType::FLOAT_E:
+      return this->export_dicom_series< float, signed short >( file_path, name );
       break;
     case Core::DataType::DOUBLE_E:
-      return this->export_dicom_series< double >( file_path, name );
+      return this->export_dicom_series< double, signed short >( file_path, name );
       break;
     default:
       return false;
