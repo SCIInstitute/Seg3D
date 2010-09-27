@@ -41,17 +41,11 @@ PushDragButton::~PushDragButton()
 {
 }
 
-void PushDragButton::set_enabled( bool enabled )
-{
-  this->enabled_ = enabled;
-}
-
 void PushDragButton::mousePressEvent( QMouseEvent *event )
 {
   if( ( event->modifiers() == Qt::ControlModifier ) || ( event->modifiers() == Qt::ShiftModifier ) )
     event->ignore();
   else
-    //if ( this->enabled_ ) 
     Q_EMIT clicked();
 }
 
