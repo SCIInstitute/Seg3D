@@ -243,18 +243,16 @@ bool ArrayMathEngine::add_expressions( std::string& expressions )
   return true;
 }
 
-bool ArrayMathEngine::run()
+bool ArrayMathEngine::run( std::string& error )
 {
-  std::string error_str;
-
   // Link everything together
   std::string full_expression = this->pre_expression_ + ";" + this->expression_ + ";" + 
     this->post_expression_;
 
   // Parse the full expression
-  if ( !( this->parse( this->pprogram_, full_expression, error_str ) ) )
+  if ( !( this->parse( this->pprogram_, full_expression, error ) ) )
   {
-    CORE_LOG_ERROR( error_str );
+    CORE_LOG_ERROR( error );
     return false;
   }
 
@@ -262,16 +260,16 @@ bool ArrayMathEngine::run()
   ParserFunctionCatalogHandle catalog = ArrayMathFunctionCatalog::get_catalog();
 
   // Validate the expressions
-  if ( !( this->validate( this->pprogram_, catalog, error_str ) ) )
+  if ( !( this->validate( this->pprogram_, catalog, error ) ) )
   {
-    CORE_LOG_ERROR( error_str );
+    CORE_LOG_ERROR( error );
     return false;
   }
 
   // Optimize the expressions
-  if ( !( this->optimize( this->pprogram_, error_str ) ) )
+  if ( !( this->optimize( this->pprogram_, error ) ) )
   {
-    CORE_LOG_ERROR( error_str );
+    CORE_LOG_ERROR( error );
     return false;
   }
 
@@ -286,24 +284,24 @@ bool ArrayMathEngine::run()
     {
       std::string arrayname = this->data_block_data_[ j ].data_block_name_;
       if ( !( this->add_data_block_sink( this->mprogram_, arrayname,
-        this->data_block_data_[ j ].data_block_, error_str ) ) )
+        this->data_block_data_[ j ].data_block_, error ) ) )
       {
-        CORE_LOG_ERROR( error_str );
+        CORE_LOG_ERROR( error );
         return false;
       }
     }
   }
 
   // Translate the code
-  if ( !( this->translate( this->pprogram_, this->mprogram_, error_str ) ) )
+  if ( !( this->translate( this->pprogram_, this->mprogram_, error ) ) )
   {
-    CORE_LOG_ERROR( error_str );
+    CORE_LOG_ERROR( error );
     return false;
   }
   // Set the final array size
   if ( !( this->set_array_size( this->mprogram_, this->array_size_ ) ) )
   {
-    CORE_LOG_ERROR( error_str );
+    CORE_LOG_ERROR( error );
     return false;
   }
 
@@ -312,9 +310,9 @@ bool ArrayMathEngine::run()
     boost::bind( &ArrayMathEngine::update_progress, this, _1 ) );
 
   // Run the program
-  if ( !( ArrayMathInterpreter::run( this->mprogram_, error_str ) ) )
+  if ( !( ArrayMathInterpreter::run( this->mprogram_, error ) ) )
   {
-    CORE_LOG_ERROR( error_str );
+    CORE_LOG_ERROR( error );
     return false;
   }
   return true;

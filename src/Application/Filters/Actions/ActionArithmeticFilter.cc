@@ -91,9 +91,10 @@ public:
 
 void ArithmeticFilterAlgo::run()
 {
-  if ( !this->engine_.run() )
+  std::string error;
+  if ( !this->engine_.run( error ) )
   {
-    StatusBar::SetMessage( Core::LogMessageType::ERROR_E, "Arithmetic filter failed to run" );
+    StatusBar::SetMessage( Core::LogMessageType::ERROR_E, error );
     return;
   }
 

@@ -75,7 +75,7 @@ public:
   bool add_expressions( std::string& expressions );
 
   // Run the expressions in parallel
-  bool run();
+  bool run( std::string& error );
 
   // Extract handles to the results
   bool get_data_block( std::string name, DataBlockHandle& data_block );
