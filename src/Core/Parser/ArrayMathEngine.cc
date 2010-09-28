@@ -55,13 +55,11 @@ void ArrayMathEngine::clear()
   this->array_size_ = 1;
 }
 
-bool ArrayMathEngine::add_input_data_block( std::string name, DataBlockHandle data_block )
+bool ArrayMathEngine::add_input_data_block( std::string name, DataBlockHandle data_block, std::string& error )
 {
-  std::string error_str;
   if ( data_block->get_size() == 0 )
   {
-    error_str = "Input data block '" + name + "' is empty.";
-    CORE_LOG_ERROR( error_str );
+    error = "Input data block '" + name + "' is empty.";
     return false;
   }
 
@@ -76,9 +74,8 @@ bool ArrayMathEngine::add_input_data_block( std::string name, DataBlockHandle da
     }
     if ( this->array_size_ != size )
     {
-      error_str = "The number of array elements in '" + name
+      error = "The number of array elements in '" + name
         + "' does not match the size of the other objects.";
-      CORE_LOG_ERROR( error_str );
       return false;
     }
   }
@@ -97,28 +94,25 @@ bool ArrayMathEngine::add_input_data_block( std::string name, DataBlockHandle da
   }
 
   // Add the variable to the interpreter
-  if ( !( this->add_data_block_source( this->mprogram_, tname, data_block, error_str ) ) )
+  if ( !( this->add_data_block_source( this->mprogram_, tname, data_block, error ) ) )
   {
-    CORE_LOG_ERROR( error_str );
     return false;
   }
   // Add the variable to the parser
   if ( !( this->add_input_variable( this->pprogram_, tname, "DATA", flags ) ) )
   {
-    CORE_LOG_ERROR( error_str );
     return false;
   }
   return true;
 }
 
 
-bool ArrayMathEngine::add_input_mask_data_block( std::string name, MaskDataBlockHandle mask_data_block )
+bool ArrayMathEngine::add_input_mask_data_block( std::string name, 
+  MaskDataBlockHandle mask_data_block, std::string& error )
 {
-  std::string error_str;
   if ( mask_data_block->get_size() == 0 )
   {
-    error_str = "Input mask data block '" + name + "' is empty.";
-    CORE_LOG_ERROR( error_str );
+    error = "Input mask data block '" + name + "' is empty.";
     return false;
   }
 
@@ -133,9 +127,8 @@ bool ArrayMathEngine::add_input_mask_data_block( std::string name, MaskDataBlock
     }
     if ( this->array_size_ != size )
     {
-      error_str = "The number of array elements in '" + name
+      error = "The number of array elements in '" + name
         + "' does not match the size of the other objects.";
-      CORE_LOG_ERROR( error_str );
       return false;
     }
   }
@@ -154,15 +147,13 @@ bool ArrayMathEngine::add_input_mask_data_block( std::string name, MaskDataBlock
   }
 
   // Add the variable to the interpreter
-  if ( !( this->add_mask_data_block_source( this->mprogram_, tname, mask_data_block, error_str ) ) )
+  if ( !( this->add_mask_data_block_source( this->mprogram_, tname, mask_data_block, error ) ) )
   {
-    CORE_LOG_ERROR( error_str );
     return false;
   }
   // Add the variable to the parser
   if ( !( this->add_input_variable( this->pprogram_, tname, "MASK", flags ) ) )
   {
-    CORE_LOG_ERROR( error_str );
     return false;
   }
   return true;
@@ -180,17 +171,14 @@ bool ArrayMathEngine::add_size( std::string name )
   return true;
 }*/
 
-bool ArrayMathEngine::add_output_data_block( std::string name, size_t nx, size_t ny, 
-                      size_t nz, Core::DataType type )
+bool ArrayMathEngine::add_output_data_block( std::string name, size_t nx, size_t ny, size_t nz, 
+  Core::DataType type, std::string& error )
 {
-  std::string error_str;
-
   size_t size = nx * ny * nz;
   if ( this->array_size_ != size )
   {
-    error_str = "The output field '" + name + 
+    error = "The output field '" + name + 
       "' does not have the same number of elements as the other objects.";
-    CORE_LOG_ERROR( error_str );
     return false;  
   }
 

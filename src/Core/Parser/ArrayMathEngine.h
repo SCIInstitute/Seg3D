@@ -62,14 +62,15 @@ public:
   ArrayMathEngine();
 
   // Generate input arrays
-  bool add_input_data_block( std::string name, DataBlockHandle data_block );
-  bool add_input_mask_data_block( std::string name, MaskDataBlockHandle mask_data_block );
+  bool add_input_data_block( std::string name, DataBlockHandle data_block, std::string& error );
+  bool add_input_mask_data_block( std::string name, MaskDataBlockHandle mask_data_block, 
+    std::string& error );
 
   //bool add_index( std::string name );
   //bool add_size( std::string name );
 
-  bool add_output_data_block( std::string name, size_t nx, size_t ny, 
-    size_t nz, Core::DataType type );
+  bool add_output_data_block( std::string name, size_t nx, size_t ny, size_t nz, 
+    Core::DataType type, std::string& error );
   
   // Setup the expression                        
   bool add_expressions( std::string& expressions );

@@ -156,9 +156,10 @@ bool ActionArithmeticFilterPrivate::validate_parser( Core::ActionContextHandle& 
       break;
     }
 
-    if ( !this->algo_->engine_.add_input_data_block( name, input_data_block ) )
+    std::string error;
+    if ( !this->algo_->engine_.add_input_data_block( name, input_data_block, error ) )
     {
-      context->report_error( "Failed to add input layer " + layer_ids[ i ] );
+      context->report_error( error );
       return false;
     }
 
@@ -186,20 +187,29 @@ bool ActionArithmeticFilterPrivate::validate_parser( Core::ActionContextHandle& 
   }
 
   const Core::GridTransform& grid_trans = layers[ 0 ]->get_grid_transform();
+  std::string error;
   if ( this->algo_->dst_layer_->type() == Core::VolumeType::MASK_E )
   {
-    this->algo_->engine_.add_output_data_block( ActionArithmeticFilter::RESULT_C, grid_trans.get_nx(), grid_trans.get_ny(),
-      grid_trans.get_nz(), Core::DataType::UCHAR_E );
+    if( !this->algo_->engine_.add_output_data_block( ActionArithmeticFilter::RESULT_C, 
+      grid_trans.get_nx(), grid_trans.get_ny(), grid_trans.get_nz(), 
+      Core::DataType::UCHAR_E, error ) )
+    {
+      context->report_error( error );
+    }
   }
   else
   {
-    this->algo_->engine_.add_output_data_block( ActionArithmeticFilter::RESULT_C, grid_trans.get_nx(), grid_trans.get_ny(),
-      grid_trans.get_nz(), Core::DataType::FLOAT_E );
+    if( !this->algo_->engine_.add_output_data_block( ActionArithmeticFilter::RESULT_C, 
+      grid_trans.get_nx(), grid_trans.get_ny(), grid_trans.get_nz(), 
+      Core::DataType::FLOAT_E, error ) )
+    {
+      context->report_error( error );
+    }
   }
 
   this->algo_->engine_.add_expressions( this->expressions_.value() );
 
-  std::string error;
+  
   if( !this->algo_->engine_.parse_and_validate( error ) )
   {
     context->report_error( error );
@@ -293,7 +303,8 @@ bool ActionArithmeticFilter::run( Core::ActionContextHandle& context,
     boost::bind( &Layer::update_progress, this->private_->algo_->dst_layer_, _1, 0.0, 1.0 ) );
 
   // Return the ids of the destination layer.
-  result = Core::ActionResultHandle( new Core::ActionResult( this->private_->algo_->dst_layer_->get_layer_id() ) );
+  result = Core::ActionResultHandle( 
+    new Core::ActionResult( this->private_->algo_->dst_layer_->get_layer_id() ) );
 
   // Start the filter.
   Core::Runnable::Start( this->private_->algo_ );
