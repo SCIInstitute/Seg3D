@@ -219,8 +219,8 @@ private:
 
   //------------------------------------------------------------
   // General functions for parsing text    
-  // Remove a parentices pair at the start and end of the string
-  bool remove_global_parentices( std::string& expression );
+  // Remove a parentheses pair at the start and end of the string
+  bool remove_global_parentheses( std::string& expression );
 
   // Remove // and /* comments from the expression
   void remove_comments( std::string& expression );

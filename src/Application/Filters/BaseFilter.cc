@@ -86,7 +86,7 @@ BaseFilter::~BaseFilter()
   {
     for ( size_t j = 0; j < this->private_->created_layers_.size(); j++ )
     {
-      LayerManager::DispatchUnlockLayer( this->private_->created_layers_[ j ] );
+      LayerManager::DispatchUnlockOrDeleteLayer( this->private_->created_layers_[ j ] );
     }
   }
 }

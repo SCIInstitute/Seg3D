@@ -1146,6 +1146,18 @@ void LayerManager::DispatchUnlockLayer( LayerHandle layer )
   layer->data_state_->set( Layer::AVAILABLE_C );
 }
 
+void LayerManager::DispatchUnlockOrDeleteLayer( LayerHandle layer )
+{
+  if( layer->is_valid() )
+  {
+    DispatchUnlockLayer( layer );
+  }
+  else
+  {
+    DispatchDeleteLayer( layer );
+  }
+}
+
 void LayerManager::DispatchInsertDataVolumeIntoLayer( DataLayerHandle layer, 
   Core::DataVolumeHandle data )
 {

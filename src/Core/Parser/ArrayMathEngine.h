@@ -74,6 +74,8 @@ public:
   // Setup the expression                        
   bool add_expressions( std::string& expressions );
 
+  bool parse_and_validate( std::string& error );
+
   // Run the expressions in parallel
   bool run( std::string& error );
 

@@ -387,6 +387,11 @@ public:
   // Application thread if needed.
   static void DispatchDeleteLayer( LayerHandle layer );
   
+  // DISPATCHUNLOCKORDELETELAYER:
+  // Unlock layer if valid, delete otherwise. This function will relay a call to the 
+  // Application thread if needed.
+  static void DispatchUnlockOrDeleteLayer( LayerHandle layer );
+
   // DISPATCHINSERTDATAVOLUMEINTOLAYER:
   // Insert a datavolume into a data layer. This function will relay a call to the 
   // Application thread if needed.

@@ -361,7 +361,7 @@ bool Parser::parse_expression_tree( std::string expression, ParserNodeHandle& ha
   // Clear handle so what was in it is cleared
   handle.reset();
 
-  // Extra check to make sure parentices levels match and
+  // Extra check to make sure parentheses levels match and
   // to check whether strings are properly marked
   // This function will return a syntax error if there is one
   if ( !( check_syntax( expression, error ) ) )
@@ -372,9 +372,9 @@ bool Parser::parse_expression_tree( std::string expression, ParserNodeHandle& ha
   // Strip any spaces at the start or and of the end of the expression
   StripSurroundingSpaces( expression );
 
-  // Remove any parentices that open at the start and close at the end
+  // Remove any parentheses that open at the start and close at the end
   // These are not strictly needed and hence should be removed
-  while ( remove_global_parentices( expression ) )
+  while ( remove_global_parentheses( expression ) )
   {
     // remove all spaces at the start of the expression
     StripSurroundingSpaces( expression );
@@ -383,7 +383,7 @@ bool Parser::parse_expression_tree( std::string expression, ParserNodeHandle& ha
   // Remainder is the remainder of the text that needs to be scanned
   std::string remainder = expression;
 
-  // After removing the parentices spaces can be left in the front
+  // After removing the parentheses, spaces can be left in the front
   StripSurroundingSpaces( remainder );
 
   // Component is an expression, a variable name, a function or a constant
@@ -1050,7 +1050,7 @@ bool Parser::scan_function( std::string& expression, std::string& function )
   return false;
 }
 
-// Scan for any sub expression between parentices
+// Scan for any sub expression between parentheses
 // This code will strip that part out of the string
 
 bool Parser::scan_sub_expression( std::string& expression, std::string& subexpression )
@@ -1089,7 +1089,7 @@ bool Parser::scan_sub_expression( std::string& expression, std::string& subexpre
             }
           }
         }
-        // Do parentices counting
+        // Do parentheses counting
         else if ( expression[ idx ] == '(' ) 
         {
           paren_cnt++;
@@ -1151,7 +1151,7 @@ bool Parser::scan_subs_expression( std::string& expression, std::string& subexpr
             else idx++;
           }
         }
-        // Do parentices counting
+        // Do parentheses counting
         else if ( expression[ idx ] == '[' ) brac_cnt++;
         else if ( expression[ idx ] == ']' )
         {
@@ -1219,7 +1219,7 @@ bool Parser::check_syntax( std::string& expression, std::string& error )
 
   if ( paren_cnt != 0 )
   {
-    error = "SYNTAX ERROR - Missing parentices in expression '" + expression + "'";
+    error = "SYNTAX ERROR - Missing parenthesis in expression '" + expression + "'";
     return false;
   }
 
@@ -1540,7 +1540,7 @@ void Parser::split_function( std::string& expression, std::string& fun_name, std
 
     // Variables for finding start and end of arguments
     size_t start, end;
-    // Check whether it is a function, it should have a parentices open
+    // Check whether it is a function, it should have a parenthesis open
     if ( expression[ idx ] == '(' )
     {
       int paren_cnt = 1;
@@ -1562,7 +1562,7 @@ void Parser::split_function( std::string& expression, std::string& fun_name, std
             else idx++;
           }
         }
-        // Do parentices counting
+        // Do parentheses counting
         else if ( expression[ idx ] == '(' || expression[ idx ] == '[' ) paren_cnt++;
         else if ( expression[ idx ] == ')' || expression[ idx ] == ']' )
         {
@@ -1649,7 +1649,7 @@ void Parser::split_subs( std::string& expression, std::vector< std::string >& st
           else idx++;
         }
       }
-      // Do parentices counting
+      // Do parentheses counting
       else if ( expression[ idx ] == '[' ) brac_cnt++;
       else if ( expression[ idx ] == ']' )
       {
@@ -1760,8 +1760,8 @@ void Parser::split_subs( std::string& expression, std::vector< std::string >& st
 
 }
 
-// Remove a pair of parentices and return whether there were parentices
-bool Parser::remove_global_parentices( std::string& expression )
+// Remove a pair of parentheses and return whether there were parentheses
+bool Parser::remove_global_parentheses( std::string& expression )
 {
   // Make sure the expression contains a string
   if ( expression.size() > 0 )
@@ -1797,7 +1797,7 @@ bool Parser::remove_global_parentices( std::string& expression )
         idx++;
       }
       if ( paren_cnt == 0 ) return false;
-      // Remove parentices and return true
+      // Remove parentheses and return true
       expression = expression.substr( 1, expression.size() - 2 );
       return true;
     }

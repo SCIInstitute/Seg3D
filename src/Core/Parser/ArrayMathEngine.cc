@@ -213,13 +213,11 @@ bool ArrayMathEngine::add_output_data_block( std::string name, size_t nx, size_t
   // Temporary buffer
   if ( !( add_output_variable( this->pprogram_, name, "S", flags ) ) )
   {
-    CORE_LOG_ERROR( error_str );
     return false;
   }
   // Final buffer
   if ( !( add_output_variable( this->pprogram_, tname, "DATA", flags ) ) )
   {
-    CORE_LOG_ERROR( error_str );
     return false;
   }
 
@@ -243,7 +241,7 @@ bool ArrayMathEngine::add_expressions( std::string& expressions )
   return true;
 }
 
-bool ArrayMathEngine::run( std::string& error )
+bool ArrayMathEngine::parse_and_validate( std::string& error )
 {
   // Link everything together
   std::string full_expression = this->pre_expression_ + ";" + this->expression_ + ";" + 
@@ -252,7 +250,6 @@ bool ArrayMathEngine::run( std::string& error )
   // Parse the full expression
   if ( !( this->parse( this->pprogram_, full_expression, error ) ) )
   {
-    CORE_LOG_ERROR( error );
     return false;
   }
 
@@ -262,14 +259,16 @@ bool ArrayMathEngine::run( std::string& error )
   // Validate the expressions
   if ( !( this->validate( this->pprogram_, catalog, error ) ) )
   {
-    CORE_LOG_ERROR( error );
     return false;
   }
+  return true;
+}
 
+bool ArrayMathEngine::run( std::string& error )
+{
   // Optimize the expressions
   if ( !( this->optimize( this->pprogram_, error ) ) )
   {
-    CORE_LOG_ERROR( error );
     return false;
   }
 
@@ -286,7 +285,6 @@ bool ArrayMathEngine::run( std::string& error )
       if ( !( this->add_data_block_sink( this->mprogram_, arrayname,
         this->data_block_data_[ j ].data_block_, error ) ) )
       {
-        CORE_LOG_ERROR( error );
         return false;
       }
     }
@@ -295,13 +293,11 @@ bool ArrayMathEngine::run( std::string& error )
   // Translate the code
   if ( !( this->translate( this->pprogram_, this->mprogram_, error ) ) )
   {
-    CORE_LOG_ERROR( error );
     return false;
   }
   // Set the final array size
   if ( !( this->set_array_size( this->mprogram_, this->array_size_ ) ) )
   {
-    CORE_LOG_ERROR( error );
     return false;
   }
 
@@ -312,7 +308,6 @@ bool ArrayMathEngine::run( std::string& error )
   // Run the program
   if ( !( ArrayMathInterpreter::run( this->mprogram_, error ) ) )
   {
-    CORE_LOG_ERROR( error );
     return false;
   }
   return true;
@@ -336,7 +331,6 @@ void ArrayMathEngine::update_progress( double amount )
 {
   this->update_progress_signal_( amount );
 }
-
 
 } // end namespace
 

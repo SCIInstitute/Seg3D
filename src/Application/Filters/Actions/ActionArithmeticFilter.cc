@@ -47,20 +47,6 @@ namespace Seg3D
 {
 
 //////////////////////////////////////////////////////////////////////////
-// Class ActionArithmeticFilterPrivate
-//////////////////////////////////////////////////////////////////////////
-
-class ActionArithmeticFilterPrivate
-{
-public:
-  Core::ActionParameter< std::vector< std::string > > layer_ids_;
-  Core::ActionParameter< std::string > expressions_;
-  Core::ActionParameter< std::string > output_type_;
-  Core::ActionParameter< bool > replace_;
-  Core::ActionParameter< bool > preserve_data_format_;
-};
-
-//////////////////////////////////////////////////////////////////////////
 // ALGORITHM CLASS
 // This class does the actual work and is run on a separate thread.
 // NOTE: The separation of the algorithm into a private class is for the purpose of running the
@@ -88,6 +74,7 @@ public:
     return "Arithmetic";
   }
 };
+
 
 void ArithmeticFilterAlgo::run()
 {
@@ -122,6 +109,106 @@ void ArithmeticFilterAlgo::run()
   this->dst_layer_->update_progress( 1.0 );
 }
 
+//////////////////////////////////////////////////////////////////////////
+// Class ActionArithmeticFilterPrivate
+//////////////////////////////////////////////////////////////////////////
+
+class ActionArithmeticFilterPrivate
+{
+public:
+  // VALIDATE:
+  // Validate the filter inputs, outputs and expression prior to running filter.
+  bool validate_parser( Core::ActionContextHandle& context );
+
+  Core::ActionParameter< std::vector< std::string > > layer_ids_;
+  Core::ActionParameter< std::string > expressions_;
+  Core::ActionParameter< std::string > output_type_;
+  Core::ActionParameter< bool > replace_;
+  Core::ActionParameter< bool > preserve_data_format_;
+  boost::shared_ptr< ArithmeticFilterAlgo > algo_;
+};
+
+bool ActionArithmeticFilterPrivate::validate_parser( Core::ActionContextHandle& context )
+{
+  // Validate algorithm
+  // Create algorithm
+  this->algo_ = boost::shared_ptr< ArithmeticFilterAlgo >( new ArithmeticFilterAlgo );
+
+  bool replace = this->replace_.value();
+
+  const std::vector< std::string >& layer_ids = this->layer_ids_.value();
+  std::vector< LayerHandle > layers( layer_ids.size() );
+  std::string name( "A" );
+  for ( size_t i = 0; i < layer_ids.size(); ++i )
+  {
+    name[ 0 ] = static_cast< char >( 'A' + i );
+    this->algo_->find_layer( layer_ids[ i ], layers[ i ] );
+    Core::DataBlockHandle input_data_block;
+    switch ( layers[ i ]->type() )
+    {
+    case Core::VolumeType::MASK_E:
+      Core::MaskDataBlockManager::Convert( dynamic_cast< MaskLayer* >( layers[ i ].get() )->
+        get_mask_volume()->get_mask_data_block(), input_data_block, Core::DataType::UCHAR_E );
+      break;
+    case Core::VolumeType::DATA_E:
+      input_data_block = dynamic_cast< DataLayer* >( layers[ i ].get() )->
+        get_data_volume()->get_data_block();
+      break;
+    }
+
+    if ( !this->algo_->engine_.add_input_data_block( name, input_data_block ) )
+    {
+      context->report_error( "Failed to add input layer " + layer_ids[ i ] );
+      return false;
+    }
+
+    if ( i == 0 && replace )
+    {
+      this->algo_->lock_for_processing( layers[ i ] );
+    }
+    else
+    {
+      this->algo_->lock_for_use( layers[ i ] );
+    }
+  }
+
+  if ( replace )
+  {
+    this->algo_->dst_layer_ = layers[ 0 ];
+  }
+  else if ( this->output_type_.value() == ActionArithmeticFilter::DATA_C )
+  {
+    this->algo_->create_and_lock_data_layer_from_layer( layers[ 0 ], this->algo_->dst_layer_ );
+  }
+  else
+  {
+    this->algo_->create_and_lock_mask_layer_from_layer( layers[ 0 ], this->algo_->dst_layer_ );
+  }
+
+  const Core::GridTransform& grid_trans = layers[ 0 ]->get_grid_transform();
+  if ( this->algo_->dst_layer_->type() == Core::VolumeType::MASK_E )
+  {
+    this->algo_->engine_.add_output_data_block( ActionArithmeticFilter::RESULT_C, grid_trans.get_nx(), grid_trans.get_ny(),
+      grid_trans.get_nz(), Core::DataType::UCHAR_E );
+  }
+  else
+  {
+    this->algo_->engine_.add_output_data_block( ActionArithmeticFilter::RESULT_C, grid_trans.get_nx(), grid_trans.get_ny(),
+      grid_trans.get_nz(), Core::DataType::FLOAT_E );
+  }
+
+  this->algo_->engine_.add_expressions( this->expressions_.value() );
+
+  std::string error;
+  if( !this->algo_->engine_.parse_and_validate( error ) )
+  {
+    context->report_error( error );
+    // We need algo to go out of scope so that layers are unlocked
+    this->algo_.reset();
+    return false;
+  }
+  return true;
+}
 
 //////////////////////////////////////////////////////////////////////////
 // Class ActionArithmeticFilter
@@ -153,6 +240,7 @@ bool ActionArithmeticFilter::validate( Core::ActionContextHandle& context )
     return false;
   }
   
+  // Validate layers
   LayerGroupHandle layer_group;
   for ( size_t i = 0; i < layer_ids.size(); ++i )
   {
@@ -184,6 +272,12 @@ bool ActionArithmeticFilter::validate( Core::ActionContextHandle& context )
       return false;
     }
   }
+
+  // Validate parser inputs, outputs, and expression
+  if( !this->private_->validate_parser( context ) )
+  {
+    return false;
+  }
   
   // Validation successful
   return true;
@@ -192,85 +286,20 @@ bool ActionArithmeticFilter::validate( Core::ActionContextHandle& context )
 bool ActionArithmeticFilter::run( Core::ActionContextHandle& context, 
   Core::ActionResultHandle& result )
 {
-  // Create algorithm
-  boost::shared_ptr< ArithmeticFilterAlgo > algo( new ArithmeticFilterAlgo );
-
-  bool replace = this->private_->replace_.value();
-
-  const std::vector< std::string >& layer_ids = this->private_->layer_ids_.value();
-  std::vector< LayerHandle > layers( layer_ids.size() );
-  std::string name( "A" );
-  for ( size_t i = 0; i < layer_ids.size(); ++i )
-  {
-    name[ 0 ] = static_cast< char >( 'A' + i );
-    algo->find_layer( layer_ids[ i ], layers[ i ] );
-    Core::DataBlockHandle input_data_block;
-    switch ( layers[ i ]->type() )
-    {
-    case Core::VolumeType::MASK_E:
-      Core::MaskDataBlockManager::Convert( dynamic_cast< MaskLayer* >( layers[ i ].get() )->
-        get_mask_volume()->get_mask_data_block(), input_data_block, Core::DataType::UCHAR_E );
-      break;
-    case Core::VolumeType::DATA_E:
-      input_data_block = dynamic_cast< DataLayer* >( layers[ i ].get() )->
-        get_data_volume()->get_data_block();
-      break;
-    }
-        
-    if ( !algo->engine_.add_input_data_block( name, input_data_block ) )
-    {
-      context->report_error( "Failed to add input layer " + layer_ids[ i ] );
-      return false;
-    }
-
-    if ( i == 0 && replace )
-    {
-      algo->lock_for_processing( layers[ i ] );
-    }
-    else
-    {
-      algo->lock_for_use( layers[ i ] );
-    }
-  }
-
-  if ( replace )
-  {
-    algo->dst_layer_ = layers[ 0 ];
-  }
-  else if ( this->private_->output_type_.value() == DATA_C )
-  {
-    algo->create_and_lock_data_layer_from_layer( layers[ 0 ], algo->dst_layer_ );
-  }
-  else
-  {
-    algo->create_and_lock_mask_layer_from_layer( layers[ 0 ], algo->dst_layer_ );
-  }
-
-  const Core::GridTransform& grid_trans = layers[ 0 ]->get_grid_transform();
-  if ( algo->dst_layer_->type() == Core::VolumeType::MASK_E )
-  {
-    algo->engine_.add_output_data_block( RESULT_C, grid_trans.get_nx(), grid_trans.get_ny(),
-      grid_trans.get_nz(), Core::DataType::UCHAR_E );
-  }
-  else
-  {
-    algo->engine_.add_output_data_block( RESULT_C, grid_trans.get_nx(), grid_trans.get_ny(),
-      grid_trans.get_nz(), Core::DataType::FLOAT_E );
-  }
-
-  algo->engine_.add_expressions( this->private_->expressions_.value() );
-  
-  algo->connect_abort( algo->dst_layer_ );
+  this->private_->algo_->connect_abort( this->private_->algo_->dst_layer_ );
 
   // Connect ArrayMathEngine progress signal to output layer progress signal
-  algo->engine_.update_progress_signal_.connect(
-    boost::bind( &Layer::update_progress, algo->dst_layer_, _1, 0.0, 1.0 ) );
+  this->private_->algo_->engine_.update_progress_signal_.connect(
+    boost::bind( &Layer::update_progress, this->private_->algo_->dst_layer_, _1, 0.0, 1.0 ) );
 
   // Return the ids of the destination layer.
-  result = Core::ActionResultHandle( new Core::ActionResult( algo->dst_layer_->get_layer_id() ) );
+  result = Core::ActionResultHandle( new Core::ActionResult( this->private_->algo_->dst_layer_->get_layer_id() ) );
 
   // Start the filter.
-  Core::Runnable::Start( algo );
+  Core::Runnable::Start( this->private_->algo_ );
+
+  // We need algo to go out of scope once it finishes so that layers are unlocked
+  this->private_->algo_.reset();
 
   return true;
 }
