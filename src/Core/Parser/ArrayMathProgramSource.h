@@ -29,12 +29,8 @@
 #ifndef CORE_PARSER_ARRAYMATHPROGRAMSOURCE_H 
 #define CORE_PARSER_ARRAYMATHPROGRAMSOURCE_H 
 
-// STL includes
-#include <vector>
-
 // Core includes
-#include <Core/DataBlock/DataBlock.h>
-#include <Core/DataBlock/MaskDataBlock.h>
+#include <Core/Parser/ParserFWD.h>
 
 namespace Core
 {

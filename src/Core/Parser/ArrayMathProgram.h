@@ -38,6 +38,10 @@
 namespace Core
 {
 
+// Hide header includes, private interface and implementation
+class ArrayMathProgramPrivate;
+typedef boost::shared_ptr< ArrayMathProgramPrivate > ArrayMathProgramPrivateHandle;
+
 class ArrayMathProgram : public Lockable
 {
 
@@ -47,7 +51,7 @@ public:
   ArrayMathProgram();
 
   // Constructor that allows overloading the default optimization parameters
-  ArrayMathProgram( size_type array_size, size_type buffer_size, int num_proc = -1 );
+  ArrayMathProgram( size_type array_size, size_type buffer_size, int num_threads = -1 );
 
   // Get the optimization parameters, these can only be set when creating the
   // object as it depends on allocated buffer sizes and those are hard to change
@@ -113,41 +117,9 @@ public:
   update_progress_signal_type update_progress_signal_;
 
 private:
+  void update_progress( double amount );
 
-  // General parameters that determine how many values are computed at
-  // the same time and how many processors to use
-  size_type buffer_size_;
-  int num_threads_;
-
-  // The size of the array we are using
-  size_type array_size_;
-
-  // Memory buffer
-  std::vector< double > buffer_;
-
-  // Source and Sink information
-  std::map< std::string, ArrayMathProgramSource > input_sources_;
-  std::map< std::string, ArrayMathProgramSource > output_sinks_;
-
-  // Variable lists
-  std::vector< ArrayMathProgramVariableHandle > const_variables_;
-  std::vector< ArrayMathProgramVariableHandle > single_variables_;
-  std::vector< std::vector< ArrayMathProgramVariableHandle > > sequential_variables_;
-
-  // Program code
-  std::vector< ArrayMathProgramCode > const_functions_;
-  std::vector< ArrayMathProgramCode > single_functions_;
-  std::vector< std::vector< ArrayMathProgramCode > > sequential_functions_;
-
-  ParserProgramHandle pprogram_;
-
-  // For parallel code
-private:
-  void parallel_run( int thread, int num_threads, boost::barrier& barrier );
-
-  // Error reporting parallel code
-  std::vector< size_type > error_line_;
-  std::vector< bool > success_;
+  ArrayMathProgramPrivateHandle private_;
 };
 
 }

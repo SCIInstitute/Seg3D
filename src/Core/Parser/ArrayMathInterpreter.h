@@ -29,13 +29,7 @@
 #ifndef CORE_PARSER_ARRAYMATHINTERPRETER_H 
 #define CORE_PARSER_ARRAYMATHINTERPRETER_H 
 
-// STL includes
-#include <vector>
-
 // Core includes
-// As Program is stored in a large array we do not need a handle for that one.
-#include <Core/DataBlock/DataBlock.h>
-#include <Core/DataBlock/MaskDataBlock.h>
 #include <Core/Parser/ParserFWD.h>
 
 namespace Core
@@ -47,7 +41,6 @@ class ArrayMathInterpreter
 public:
   // The interpreter Creates executable code from the parsed code
   // The first step is setting the data sources and sinks
-
 
   //------------------------------------------------------------------------
   // Step 0 : create program variable

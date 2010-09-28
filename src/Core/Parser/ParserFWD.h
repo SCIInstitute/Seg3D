@@ -47,6 +47,12 @@ namespace Core
 
   // Forward declarations 
 
+  class DataBlock;
+  typedef boost::shared_ptr< DataBlock > DataBlockHandle;
+
+  class MaskDataBlock;
+  typedef boost::shared_ptr< MaskDataBlock > MaskDataBlockHandle;
+
   // Handles for a few of the classes. These are helper classes that are located elsewhere in 
   // memory.
 

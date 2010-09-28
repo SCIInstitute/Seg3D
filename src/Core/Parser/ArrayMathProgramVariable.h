@@ -41,8 +41,8 @@ class ArrayMathProgramVariable : public Lockable
 public:
   // Constructor of the variable
   ArrayMathProgramVariable( std::string name, double* data ) :
-    name_(name), 
-    data_(data) {}
+    name_( name ), 
+    data_( data ) {}
 
   // Retrieve the data pointer from the central temporal
   // storage

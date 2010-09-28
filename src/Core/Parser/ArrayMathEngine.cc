@@ -27,32 +27,77 @@
  */
 
 // Core includes
+#include <Core/DataBlock/DataBlock.h>
+#include <Core/DataBlock/MaskDataBlock.h>
 #include <Core/DataBlock/StdDataBlock.h>
 #include <Core/Parser/ArrayMathEngine.h>
 #include <Core/Parser/ArrayMathFunctionCatalog.h>
 #include <Core/Parser/ArrayMathProgram.h>
 #include <Core/Parser/ParserEnums.h>
-#include <Core/Utils/Log.h>
 #include <Core/Utils/StringUtil.h>
 
 namespace Core
 {
 
-ArrayMathEngine::ArrayMathEngine()
+class ArrayMathEnginePrivate
 {
-  clear();
+public:
+
+  class OutputDataBlock
+  {
+  public:
+    std::string array_name_;
+    std::string data_block_name_; 
+    DataBlockHandle data_block_;
+  };
+
+  // We don't support outputting a MaskDataBlock because it would have to be registered with the
+  // MaskDataBlockManager and locked to prevent conflicts with other masks.  Also, we can avoid 
+  // bit operations when copying back the parser result.
+
+  // Parser program : the structure of the expressions and simple reduction
+  // of the expressions to simple function calls
+  ParserProgramHandle pprogram_;
+  // Wrapper around the function calls, this piece actually executes the code
+  ArrayMathProgramHandle mprogram_;
+
+  // Expression to evaluate before the main expression
+  // This one is to extract the variables from the data sources
+  // This reduces the amount of actual functions we need to implement
+  std::string pre_expression_;
+  // The user defined expression
+  std::string expression_;
+  // Expression to get the data back into the data sinks
+  std::string post_expression_;
+
+  // The size of the array engine, the first call that add an array that is
+  // bigger than 1, will set this variable
+  // Any subsequent array that does not match the size will cause an error
+  size_type array_size_;
+
+  // Data that needs to be stored as it is needed before and after the parser is
+  // done. An output needs to be set before the parser, otherwise it is optimized
+  // away, but the type is only know when the parser has validated and optimized
+  // the expression tree
+  std::vector< OutputDataBlock > data_block_data_;
+};
+
+ArrayMathEngine::ArrayMathEngine() :
+  private_( new ArrayMathEnginePrivate )
+{
+  this->clear();
 }
 
 void ArrayMathEngine::clear()
 {
   // Reset all values
-  this->pprogram_.reset();
-  this->mprogram_.reset();
+  this->private_->pprogram_.reset();
+  this->private_->mprogram_.reset();
 
-  this->pre_expression_.clear();
-  this->expression_.clear();
-  this->post_expression_.clear();
-  this->array_size_ = 1;
+  this->private_->pre_expression_.clear();
+  this->private_->expression_.clear();
+  this->private_->post_expression_.clear();
+  this->private_->array_size_ = 1;
 }
 
 bool ArrayMathEngine::add_input_data_block( std::string name, DataBlockHandle data_block, std::string& error )
@@ -68,11 +113,11 @@ bool ArrayMathEngine::add_input_data_block( std::string name, DataBlockHandle da
   // Check whether size is OK
   if ( size > 1 )
   {
-    if ( this->array_size_ == 1 ) 
+    if ( this->private_->array_size_ == 1 ) 
     {
-      this->array_size_ = size;
+      this->private_->array_size_ = size;
     }
-    if ( this->array_size_ != size )
+    if ( this->private_->array_size_ != size )
     {
       error = "The number of array elements in '" + name
         + "' does not match the size of the other objects.";
@@ -85,7 +130,7 @@ bool ArrayMathEngine::add_input_data_block( std::string name, DataBlockHandle da
 
   std::string tname = "__" + name;
 
-  this->pre_expression_ += name + "=get_scalar(" + tname + ");";
+  this->private_->pre_expression_ += name + "=get_scalar(" + tname + ");";
 
   int flags = 0;
   if ( size > 1 ) 
@@ -94,12 +139,12 @@ bool ArrayMathEngine::add_input_data_block( std::string name, DataBlockHandle da
   }
 
   // Add the variable to the interpreter
-  if ( !( this->add_data_block_source( this->mprogram_, tname, data_block, error ) ) )
+  if ( !( this->add_data_block_source( this->private_->mprogram_, tname, data_block, error ) ) )
   {
     return false;
   }
   // Add the variable to the parser
-  if ( !( this->add_input_variable( this->pprogram_, tname, "DATA", flags ) ) )
+  if ( !( this->add_input_variable( this->private_->pprogram_, tname, "DATA", flags ) ) )
   {
     return false;
   }
@@ -121,11 +166,11 @@ bool ArrayMathEngine::add_input_mask_data_block( std::string name,
   // Check whether size is OK
   if ( size > 1 )
   {
-    if ( this->array_size_ == 1 ) 
+    if ( this->private_->array_size_ == 1 ) 
     {
-      this->array_size_ = size;
+      this->private_->array_size_ = size;
     }
-    if ( this->array_size_ != size )
+    if ( this->private_->array_size_ != size )
     {
       error = "The number of array elements in '" + name
         + "' does not match the size of the other objects.";
@@ -138,7 +183,7 @@ bool ArrayMathEngine::add_input_mask_data_block( std::string name,
 
   std::string tname = "__" + name;
 
-  this->pre_expression_ += name + "=get_scalar(" + tname + ");";
+  this->private_->pre_expression_ += name + "=get_scalar(" + tname + ");";
 
   int flags = 0;
   if ( size > 1 ) 
@@ -147,12 +192,12 @@ bool ArrayMathEngine::add_input_mask_data_block( std::string name,
   }
 
   // Add the variable to the interpreter
-  if ( !( this->add_mask_data_block_source( this->mprogram_, tname, mask_data_block, error ) ) )
+  if ( !( this->add_mask_data_block_source( this->private_->mprogram_, tname, mask_data_block, error ) ) )
   {
     return false;
   }
   // Add the variable to the parser
-  if ( !( this->add_input_variable( this->pprogram_, tname, "MASK", flags ) ) )
+  if ( !( this->add_input_variable( this->private_->pprogram_, tname, "MASK", flags ) ) )
   {
     return false;
   }
@@ -175,7 +220,7 @@ bool ArrayMathEngine::add_output_data_block( std::string name, size_t nx, size_t
   Core::DataType type, std::string& error )
 {
   size_t size = nx * ny * nz;
-  if ( this->array_size_ != size )
+  if ( this->private_->array_size_ != size )
   {
     error = "The output field '" + name + 
       "' does not have the same number of elements as the other objects.";
@@ -195,16 +240,16 @@ bool ArrayMathEngine::add_output_data_block( std::string name, size_t nx, size_t
     flags = SCRIPT_SEQUENTIAL_VAR_E;  
   }
 
-  this->post_expression_ += tname + "=to_data_block(" + name + ");";
+  this->private_->post_expression_ += tname + "=to_data_block(" + name + ");";
 
   // Add the variable to the parser
   // Temporary buffer
-  if ( !( add_output_variable( this->pprogram_, name, "S", flags ) ) )
+  if ( !( add_output_variable( this->private_->pprogram_, name, "S", flags ) ) )
   {
     return false;
   }
   // Final buffer
-  if ( !( add_output_variable( this->pprogram_, tname, "DATA", flags ) ) )
+  if ( !( add_output_variable( this->private_->pprogram_, tname, "DATA", flags ) ) )
   {
     return false;
   }
@@ -213,30 +258,30 @@ bool ArrayMathEngine::add_output_data_block( std::string name, size_t nx, size_t
   Core::DataBlockHandle output_data_block( Core::StdDataBlock::New( nx, ny, nz, type ) );
 
   // Store information for processing after parsing has succeeded
-  OutputDataBlock m;
+  ArrayMathEnginePrivate::OutputDataBlock m;
   m.array_name_ = name;
   m.data_block_name_ = tname;
   m.data_block_ = output_data_block;
 
-  this->data_block_data_.push_back( m );
+  this->private_->data_block_data_.push_back( m );
 
   return true;
 }
 
 bool ArrayMathEngine::add_expressions( std::string& expressions )
 {
-  this->expression_ += expressions;
+  this->private_->expression_ += expressions;
   return true;
 }
 
 bool ArrayMathEngine::parse_and_validate( std::string& error )
 {
   // Link everything together
-  std::string full_expression = this->pre_expression_ + ";" + this->expression_ + ";" + 
-    this->post_expression_;
+  std::string full_expression = this->private_->pre_expression_ + ";" + this->private_->expression_ + ";" + 
+    this->private_->post_expression_;
 
   // Parse the full expression
-  if ( !( this->parse( this->pprogram_, full_expression, error ) ) )
+  if ( !( this->parse( this->private_->pprogram_, full_expression, error ) ) )
   {
     return false;
   }
@@ -245,7 +290,7 @@ bool ArrayMathEngine::parse_and_validate( std::string& error )
   ParserFunctionCatalogHandle catalog = ArrayMathFunctionCatalog::get_catalog();
 
   // Validate the expressions
-  if ( !( this->validate( this->pprogram_, catalog, error ) ) )
+  if ( !( this->validate( this->private_->pprogram_, catalog, error ) ) )
   {
     return false;
   }
@@ -255,23 +300,23 @@ bool ArrayMathEngine::parse_and_validate( std::string& error )
 bool ArrayMathEngine::run( std::string& error )
 {
   // Optimize the expressions
-  if ( !( this->optimize( this->pprogram_, error ) ) )
+  if ( !( this->optimize( this->private_->pprogram_, error ) ) )
   {
     return false;
   }
 
   // DEBUG CALL
 #ifdef DEBUG
-  this->pprogram_->print();
+  this->private_->pprogram_->print();
 #endif
 
-  for ( size_t j = 0; j < this->data_block_data_.size(); j++ )
+  for ( size_t j = 0; j < this->private_->data_block_data_.size(); j++ )
   {
-    if ( this->data_block_data_[ j ].data_block_.get() )
+    if ( this->private_->data_block_data_[ j ].data_block_.get() )
     {
-      std::string arrayname = this->data_block_data_[ j ].data_block_name_;
-      if ( !( this->add_data_block_sink( this->mprogram_, arrayname,
-        this->data_block_data_[ j ].data_block_, error ) ) )
+      std::string arrayname = this->private_->data_block_data_[ j ].data_block_name_;
+      if ( !( this->add_data_block_sink( this->private_->mprogram_, arrayname,
+        this->private_->data_block_data_[ j ].data_block_, error ) ) )
       {
         return false;
       }
@@ -279,22 +324,22 @@ bool ArrayMathEngine::run( std::string& error )
   }
 
   // Translate the code
-  if ( !( this->translate( this->pprogram_, this->mprogram_, error ) ) )
+  if ( !( this->translate( this->private_->pprogram_, this->private_->mprogram_, error ) ) )
   {
     return false;
   }
   // Set the final array size
-  if ( !( this->set_array_size( this->mprogram_, this->array_size_ ) ) )
+  if ( !( this->set_array_size( this->private_->mprogram_, this->private_->array_size_ ) ) )
   {
     return false;
   }
 
   // Connect the ArrayMathProgram update progress signal to the engine update progress signal
-  this->mprogram_->update_progress_signal_.connect( 
+  this->private_->mprogram_->update_progress_signal_.connect( 
     boost::bind( &ArrayMathEngine::update_progress, this, _1 ) );
 
   // Run the program
-  if ( !( ArrayMathInterpreter::run( this->mprogram_, error ) ) )
+  if ( !( ArrayMathInterpreter::run( this->private_->mprogram_, error ) ) )
   {
     return false;
   }
@@ -303,11 +348,11 @@ bool ArrayMathEngine::run( std::string& error )
 
 bool ArrayMathEngine::get_data_block( std::string name, DataBlockHandle& data_block )
 {
-  for ( size_t j = 0; j < this->data_block_data_.size(); j++ )
+  for ( size_t j = 0; j < this->private_->data_block_data_.size(); j++ )
   {
-    if ( this->data_block_data_[ j ].array_name_ == name )
+    if ( this->private_->data_block_data_[ j ].array_name_ == name )
     {
-      data_block = this->data_block_data_[ j ].data_block_;
+      data_block = this->private_->data_block_data_[ j ].data_block_;
       return true;
     }
   }
