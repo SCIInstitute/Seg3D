@@ -26,57 +26,46 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_TOOLS_MASKDATAFILTER_H
-#define APPLICATION_TOOLS_MASKDATAFILTER_H
+#ifndef INTERFACE_TOOLINTERFACE_MEANFILTERINTERFACE_H
+#define INTERFACE_TOOLINTERFACE_MEANFILTERINTERFACE_H
 
-#include <Application/Tool/Tool.h>
+// Core includes
+#include <Core/Utils/Log.h>
+
+// Application includes
+#include <Application/Tool/ToolFactory.h>
+
+// Base class of the tool widget
+#include <Interface/AppInterface/ToolWidget.h>
 
 namespace Seg3D
 {
 
-class MaskDataFilter : public Tool
+class MeanFilterInterfacePrivate;
+
+class MeanFilterInterface : public ToolWidget
 {
+Q_OBJECT
 
-SEG3D_TOOL(
-SEG3D_TOOL_NAME( "MaskDataFilter", "Cut a masked region out of a data layer" )
-SEG3D_TOOL_MENULABEL( "Mask Data" )
-SEG3D_TOOL_MENU( "Filters" )
-SEG3D_TOOL_SHORTCUT_KEY( "Alt+J" )
-SEG3D_TOOL_URL( "http://seg3d.org/" )
-)
-
+// -- Constructor/destructor --
 public:
-  MaskDataFilter( const std::string& toolid );
-  virtual ~MaskDataFilter();
-
-  // -- constraint parameters --
-
-  // Constrain viewer to right painting tool when layer is selected
-  void target_constraint( std::string layerid );
-
-  // -- activate/deactivate tool --
-
-  virtual void activate();
-  virtual void deactivate();
+  MeanFilterInterface();
+  virtual ~MeanFilterInterface();
   
-private:
-  // -- handle updates from layermanager --
-  void handle_layers_changed();
-
-  // -- state --
+// -- create interface --
 public:
+  // BUILD_WIDGET:
+  // This function builds the actual GUI
+  virtual bool build_widget( QFrame* frame );
+  
+// -- run filter --
+private Q_SLOTS:
+  void run_filter();
 
-  // Layerid of the target layer
-  Core::StateStringHandle target_layer_state_;
-
-  Core::StateStringHandle mask_layer_state_;
-
-  Core::StateOptionHandle replace_with_state_;
-
-  Core::StateBoolHandle replace_state_;
-
+private:
+  boost::shared_ptr< MeanFilterInterfacePrivate > private_;
 };
 
-} // end namespace
+} // namespace Seg3D
 
 #endif

@@ -51,8 +51,6 @@ SET(APPLICATION_TOOLS_SRCS
   PolylineTool.cc
   ThresholdTool.h
   ThresholdTool.cc
-  MedianFilter.h
-  MedianFilter.cc
   ArithmeticFilter.h
   ArithmeticFilter.cc
   BinaryDilateErodeFilter.h
@@ -79,6 +77,10 @@ SET(APPLICATION_TOOLS_SRCS
   IntensityCorrectionFilter.cc
   MaskDataFilter.h
   MaskDataFilter.cc
+  MedianFilter.h
+  MedianFilter.cc
+  MeanFilter.h
+  MeanFilter.cc
   NeighborhoodConnectedFilter.h
   NeighborhoodConnectedFilter.cc
   OtsuThresholdFilter.h

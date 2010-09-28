@@ -52,6 +52,7 @@ SET(INTERFACE_TOOLINTERFACE_SRCS
   IntensityCorrectionFilterInterface.cc
   MaskDataFilterInterface.cc
   MedianFilterInterface.cc
+  MeanFilterInterface.cc
   NeighborhoodConnectedFilterInterface.cc
   OtsuThresholdFilterInterface.cc
   ThresholdSegmentationLSFilterInterface.cc
@@ -83,6 +84,7 @@ SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
   IntensityCorrectionFilterInterface.h
   MaskDataFilterInterface.h
   MedianFilterInterface.h
+  MeanFilterInterface.h
   NeighborhoodConnectedFilterInterface.h
   OtsuThresholdFilterInterface.h
   ThresholdSegmentationLSFilterInterface.h
@@ -117,6 +119,7 @@ SET(INTERFACE_TOOLINTERFACE_UI_SRCS
   IntensityCorrectionFilterInterface.ui
   MaskDataFilterInterface.ui
   MedianFilterInterface.ui
+  MeanFilterInterface.ui
   NeighborhoodConnectedFilterInterface.ui
   OtsuThresholdFilterInterface.ui
   ThresholdSegmentationLSFilterInterface.ui

@@ -26,57 +26,44 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_TOOLS_MASKDATAFILTER_H
-#define APPLICATION_TOOLS_MASKDATAFILTER_H
+// Application includes
+#include <Application/Tool/ToolFactory.h>
+#include <Application/Layer/Layer.h>
+#include <Application/LayerManager/LayerManager.h>
 
-#include <Application/Tool/Tool.h>
+// StateEnigne of the tool
+#include <Application/Tools/MeanFilter.h>
+
+// Action associated with tool
+#include <Application/Filters/Actions/ActionMeanFilter.h>
+
+// Register the tool into the tool factory
+SCI_REGISTER_TOOL( Seg3D, MeanFilter )
 
 namespace Seg3D
 {
 
-class MaskDataFilter : public Tool
+MeanFilter::MeanFilter( const std::string& toolid ) :
+  SingleTargetTool( Core::VolumeType::DATA_E, toolid )
 {
+  // Need to set ranges and default values for all parameters
+  this->add_state( "replace", this->replace_state_, false );
+  this->add_state( "preserve_data_format", this->preserve_data_format_state_, true );
+  this->add_state( "radius", this->radius_state_, 1, 1, 10, 1 );
+}
 
-SEG3D_TOOL(
-SEG3D_TOOL_NAME( "MaskDataFilter", "Cut a masked region out of a data layer" )
-SEG3D_TOOL_MENULABEL( "Mask Data" )
-SEG3D_TOOL_MENU( "Filters" )
-SEG3D_TOOL_SHORTCUT_KEY( "Alt+J" )
-SEG3D_TOOL_URL( "http://seg3d.org/" )
-)
-
-public:
-  MaskDataFilter( const std::string& toolid );
-  virtual ~MaskDataFilter();
-
-  // -- constraint parameters --
-
-  // Constrain viewer to right painting tool when layer is selected
-  void target_constraint( std::string layerid );
-
-  // -- activate/deactivate tool --
-
-  virtual void activate();
-  virtual void deactivate();
+MeanFilter::~MeanFilter()
+{
+  disconnect_all();
+}
   
-private:
-  // -- handle updates from layermanager --
-  void handle_layers_changed();
+void MeanFilter::execute( Core::ActionContextHandle context )
+{
+  ActionMeanFilter::Dispatch( context,
+    this->target_layer_state_->get(),
+    this->replace_state_->get(),
+    this->preserve_data_format_state_->get(),
+    this->radius_state_->get() );
+}
 
-  // -- state --
-public:
-
-  // Layerid of the target layer
-  Core::StateStringHandle target_layer_state_;
-
-  Core::StateStringHandle mask_layer_state_;
-
-  Core::StateOptionHandle replace_with_state_;
-
-  Core::StateBoolHandle replace_state_;
-
-};
-
-} // end namespace
-
-#endif
+} // end namespace Seg3D
