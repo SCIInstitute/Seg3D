@@ -63,6 +63,8 @@ SET(APPLICATION_TOOLS_SRCS
   ConfidenceConnectedFilter.cc
   ConnectedComponentFilter.h
   ConnectedComponentFilter.cc
+  ConnectedComponentSizeFilter.h
+  ConnectedComponentSizeFilter.cc
   CurvatureAnisotropicDiffusionFilter.h
   CurvatureAnisotropicDiffusionFilter.cc
   DiscreteGaussianFilter.h

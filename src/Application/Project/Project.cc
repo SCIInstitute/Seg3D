@@ -47,7 +47,8 @@ namespace Seg3D
 
 Project::Project( const std::string& project_name ) :
   StateHandler( "project", false ),
-  name_set_( false )
+  name_set_( false ),
+  changed_( false )
 { 
   add_state( "project_name", this->project_name_state_, project_name );
   add_state( "save_custom_colors", this->save_custom_colors_state_, false );
@@ -55,9 +56,9 @@ Project::Project( const std::string& project_name ) :
   std::vector< std::string> empty_vector;
   add_state( "sessions", this->sessions_state_, empty_vector );
   add_state( "project_notes", this->project_notes_state_, empty_vector );
-
   add_state( "project_file_size", this->project_file_size_state_, 0 );
-  
+  add_state( "current_session_name", this->current_session_name_state_, "UnnamedSession" );
+    
   this->color_states_.resize( 12 );
   for ( size_t j = 0; j < 12; j++ )
   {
@@ -68,11 +69,33 @@ Project::Project( const std::string& project_name ) :
 
   this->current_session_ = SessionHandle( new Session( "default_session" ) );
   this->data_manager_ = DataManagerHandle( new DataManager() );
+
+  this->add_connection( Core::ActionDispatcher::Instance()->post_action_signal_.connect( 
+    boost::bind( &Project::set_changed, this, _1, _2 ) ) );
 }
   
 Project::~Project()
 {
+  this->disconnect_all();
+}
 
+void Project::set_changed( Core::ActionHandle action, Core::ActionResultHandle result )
+{
+  if ( action->get_type() !=  "SaveSession")
+  {
+    if (   changed_ == true ) return;
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    changed_ = true;
+    return;
+  }
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+  changed_ = false;
+}
+
+bool Project::check_changed()
+{
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+  return changed_;
 }
 
 bool Project::initialize_from_file( const std::string& project_name )

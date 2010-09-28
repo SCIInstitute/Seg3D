@@ -27,7 +27,7 @@ QWidget#header_{
 
 QWidget#base_{
   background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(211, 211, 211, 255), stop:0.155779 rgba(225, 225, 225, 255), stop:1 rgba(194, 194, 194, 255));
-  border-radius: 3px;
+  border-radius: 1px;
   border: 1px solid rgb(90, 90, 90);
 }
 
@@ -128,7 +128,7 @@ QPushButton#activate_button_{
           <number>0</number>
          </property>
          <property name="margin">
-          <number>3</number>
+          <number>1</number>
          </property>
          <item>
           <widget class="QWidget" name="checkbox_widget_" native="true">
@@ -355,7 +355,7 @@ QPushButton#activate_button_{
                 <number>0</number>
                </property>
                <property name="topMargin">
-                <number>2</number>
+                <number>1</number>
                </property>
                <property name="rightMargin">
                 <number>0</number>
@@ -1089,39 +1089,6 @@ QPushButton#activate_button_{
               </property>
              </widget>
             </item>
-           </layout>
-          </widget>
-         </item>
-         <item>
-          <widget class="QWidget" name="widget_9" native="true">
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>32</height>
-            </size>
-           </property>
-           <layout class="QHBoxLayout" name="horizontalLayout_8">
-            <property name="spacing">
-             <number>4</number>
-            </property>
-            <property name="leftMargin">
-             <number>9</number>
-            </property>
-            <property name="topMargin">
-             <number>0</number>
-            </property>
-            <property name="rightMargin">
-             <number>0</number>
-            </property>
-            <property name="bottomMargin">
-             <number>0</number>
-            </property>
             <item>
              <widget class="QLabel" name="label_2">
               <property name="minimumSize">
@@ -1166,19 +1133,19 @@ QPushButton#activate_button_{
        <widget class="QWidget" name="info_bar_" native="true">
         <layout class="QVBoxLayout" name="verticalLayout_6">
          <property name="spacing">
-          <number>2</number>
+          <number>0</number>
          </property>
          <property name="leftMargin">
           <number>9</number>
          </property>
          <property name="topMargin">
-          <number>2</number>
+          <number>0</number>
          </property>
          <property name="rightMargin">
-          <number>4</number>
+          <number>9</number>
          </property>
          <property name="bottomMargin">
-          <number>4</number>
+          <number>0</number>
          </property>
          <item>
           <widget class="Line" name="line_4">
@@ -1190,7 +1157,7 @@ QPushButton#activate_button_{
          <item>
           <layout class="QHBoxLayout" name="dimensions_layout_">
            <item>
-            <widget class="QLabel" name="label_3">
+            <widget class="QLabel" name="dimensions_label_">
              <property name="minimumSize">
               <size>
                <width>0</width>
@@ -1214,7 +1181,7 @@ QPushButton#activate_button_{
             </widget>
            </item>
            <item>
-            <widget class="QLabel" name="dimensions_label_">
+            <widget class="QLabel" name="dimensions_">
              <property name="font">
               <font>
                <pointsize>11</pointsize>
@@ -1311,7 +1278,7 @@ QPushButton#activate_button_{
           <widget class="QWidget" name="datainfo_widget_" native="true">
            <layout class="QVBoxLayout" name="verticalLayout_11">
             <property name="spacing">
-             <number>2</number>
+             <number>0</number>
             </property>
             <property name="margin">
              <number>0</number>
@@ -1394,10 +1361,6 @@ QPushButton#activate_button_{
                 </property>
                </widget>
               </item>
-             </layout>
-            </item>
-            <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_13">
               <item>
                <widget class="QLabel" name="label_12">
                 <property name="minimumSize">

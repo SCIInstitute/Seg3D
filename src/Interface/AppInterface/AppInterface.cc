@@ -38,6 +38,8 @@
 
 // Application includes
 #include <Application/PreferencesManager/PreferencesManager.h>
+#include <Application/ProjectManager/ProjectManager.h>
+#include <Application/ProjectManager/Actions/ActionSaveSession.h>
 
 // QtUtils includes
 #include <QtUtils/Utils/QtPointer.h>
@@ -159,6 +161,30 @@ AppInterface::~AppInterface()
 
 void AppInterface::closeEvent( QCloseEvent* event )
 {
+  if ( ProjectManager::Instance()->current_project_ && 
+    ProjectManager::Instance()->current_project_->check_changed() )
+  {
+
+    // Check whether the users wants to save and whether the user wants to quit
+    int ret = QMessageBox::warning( this, "Save Session ?",
+      "Your current session has not been saved.\n"
+      "Do you want to save your changes?",
+      QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel );
+    
+    if ( ret == QMessageBox::Cancel )
+    {
+      event->ignore();
+      return;
+    }
+    
+    if ( ret == QMessageBox::Save )
+    {
+      Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+      ActionSaveSession::Dispatch( Core::Interface::GetWidgetActionContext(), false, 
+        ProjectManager::Instance()->current_project_->current_session_name_state_->get() );   
+    }
+  }
+  
   this->disconnect_all();
 
   if( this->viewer_interface_ )
@@ -235,41 +261,6 @@ void AppInterface::set_full_screen( bool full_screen )
 {
   if( full_screen ) showFullScreen();
   else showNormal();
-}
-
-ViewerInterface* AppInterface::viewer_interface()
-{
-  return this->viewer_interface_.data();
-}
-
-HistoryDockWidget*
-AppInterface::history_dock_widget()
-{
-  return this->history_dock_window_.data();
-}
-
-ProjectDockWidget*
-AppInterface::project_dock_widget()
-{
-  return this->project_dock_window_.data();
-}
-
-ToolsDockWidget*
-AppInterface::tools_dock_widget()
-{
-  return this->tools_dock_window_.data();
-}
-
-LayerManagerDockWidget*
-AppInterface::layer_manager_dock_widget()
-{
-  return this->layer_manager_dock_window_.data();
-}
-
-MeasurementDockWidget*
-AppInterface::measurement_dock_widget()
-{
-  return this->measurement_dock_window_.data();
 }
 
 void AppInterface::add_windowids()

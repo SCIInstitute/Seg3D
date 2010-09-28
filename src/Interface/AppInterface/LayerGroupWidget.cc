@@ -165,6 +165,7 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
 
   this->setMinimumHeight( 0 );
   this->private_->ui_.group_frame_layout_->setAlignment( Qt::AlignTop );
+  this->private_->ui_.group_frame_layout_->setSpacing( 1 );
   this->private_->ui_.verticalLayout_13->setAlignment( Qt::AlignTop );
   this->private_->ui_.verticalLayout_10->setAlignment( Qt::AlignTop );
 

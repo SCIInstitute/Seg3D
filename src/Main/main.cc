@@ -130,6 +130,9 @@ int main( int argc, char **argv )
   // -- Run QT event loop --
   if ( !( QtUtils::QtApplication::Instance()->exec() ) ) return ( -1 );
 
+  // Finish the remainder of the actions that are still on the application thread.
+  Core::Application::Instance()->finish();
+
   // Indicate a successful finish of the program
   Core::Application::Instance()->log_finish();
   return ( 0 );

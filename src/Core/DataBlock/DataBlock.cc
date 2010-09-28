@@ -260,6 +260,10 @@ void DataBlock::update_histogram()
   }
 }
 
+void DataBlock::update_data_type( DataType type )
+{
+  this->data_type_ = type;
+}
 
 template<class DATA>
 static bool ConvertDataTypeInternal( DATA* src, DataBlockHandle& dst_data_block )

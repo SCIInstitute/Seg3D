@@ -37,18 +37,18 @@
 #include <Application/LayerManager/LayerManager.h>
 #include <Application/StatusBar/StatusBar.h>
 #include <Application/Filters/ITKFilter.h>
-#include <Application/Filters/Actions/ActionFillHolesFilter.h>
+#include <Application/Filters/Actions/ActionConnectedComponentSizeFilter.h>
 
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
 // NOTE: Registration needs to be done outside of any namespace
-CORE_REGISTER_ACTION( Seg3D, FillHolesFilter )
+CORE_REGISTER_ACTION( Seg3D, ConnectedComponentSizeFilter )
 
 namespace Seg3D
 {
 
-bool ActionFillHolesFilter::validate( Core::ActionContextHandle& context )
+bool ActionConnectedComponentSizeFilter::validate( Core::ActionContextHandle& context )
 {
   // Check for layer existence and type information
   std::string error;
@@ -78,15 +78,15 @@ bool ActionFillHolesFilter::validate( Core::ActionContextHandle& context )
 // NOTE: The separation of the algorithm into a private class is for the purpose of running the
 // filter on a separate thread.
 
-class FillHolesFilterAlgo : public ITKFilter
+class ConnectedComponentSizeFilterAlgo : public ITKFilter
 {
 
 public:
   LayerHandle src_layer_;
   LayerHandle dst_layer_;
-
-  std::vector< Core::Point > seeds_;
   
+  bool log_scale_;
+
 public:
   // NOTE: The macro needs a data type to select which version to run. This needs to be
   // a member variable of the algorithm class.
@@ -99,8 +99,7 @@ public:
     // Retrieve the image as an itk image from the underlying data structure
     // NOTE: This only does wrapping and does not regenerate the data.
     Core::ITKImageDataT<unsigned char>::Handle input_image; 
-    // NOTE: Get the invertedd version f the mask
-    this->get_itk_image_from_layer<unsigned char>( this->src_layer_, input_image, true );
+    this->get_itk_image_from_layer<unsigned char>( this->src_layer_, input_image );
         
     // Create a new ITK filter instantiation. 
     filter_type::Pointer filter = filter_type::New();
@@ -121,90 +120,54 @@ public:
     catch ( ... ) 
     {
       StatusBar::SetMessage( Core::LogMessageType::ERROR_E,  
-        "FillHolesFilter failed." );
+        "ConnectedComponentSizeFilter failed." );
     }
 
     // As ITK filters generate an inconsistent abort behavior, we record our own abort flag
     // This one is set when the abort button is pressed and an abort is sent to ITK.
     if ( this->check_abort() ) return;
 
-    Core::DataBlockHandle output_datablock = Core::ITKDataBlock::New(
-      filter->GetOutput() );
+    Core::DataBlockHandle output_datablock = Core::ITKDataBlock::New( filter->GetOutput() );
     
     unsigned int max_label = filter->GetObjectCount();
-    std::vector<unsigned int> lut( max_label + 1, 1 );
+    std::vector<unsigned int> hist( max_label + 1, 0 );
     
-    Core::GridTransform grid = input_image->get_grid_transform();
-    Core::Transform trans = grid.get_inverse();
-    int nx = static_cast<int>( grid.get_nx() ); 
-    int ny = static_cast<int>( grid.get_ny() ); 
-    int nz = static_cast<int>( grid.get_nz() ); 
-    
-    unsigned int* data = reinterpret_cast<unsigned int*>( output_datablock->get_data() );
-    unsigned int val;
-    for ( size_t i = 0; i < this->seeds_.size(); ++i )
-    {   
-      Core::Point location = trans * seeds_[ i ];
-      int x = static_cast<int>( Core::Round( location.x() ) );
-      int y = static_cast<int>( Core::Round( location.y() ) );
-      int z = static_cast<int>( Core::Round( location.z() ) );
-      
-      if ( x >= 0 && y >= 0 && z >= 0 && x < nx && y < ny && z < nz )
-      {
-        val = data[ output_datablock->to_index( static_cast<size_t>( x ), 
-          static_cast<size_t>( y ), static_cast<size_t>( z ) ) ];
-        if ( val ) lut[ val ] = 0;
-      }
-    }
-
-    // Ensure that anything connected to the corners is not removed
-    val = data[ output_datablock->to_index( 0, 0, 0 ) ]; 
-    if ( val ) lut[ val ] = 0;
-    val = data[ output_datablock->to_index( static_cast<size_t>( nx -1 ), 0, 0 ) ];
-    if ( val ) lut[ val ] = 0;
-    val = data[ output_datablock->to_index( 0, static_cast<size_t>( ny -1 ), 0 ) ]; 
-    if ( val ) lut[ val ] = 0;
-    val = data[ output_datablock->to_index( static_cast<size_t>( nx -1 ), 
-      static_cast<size_t>( ny -1 ), 0 ) ];
-    if ( val ) lut[ val ] = 0;
-    val = data[ output_datablock->to_index( 0, 0, static_cast<size_t>( nz -1 ) ) ]; 
-    if ( val ) lut[ val ] = 0;
-    val = data[ output_datablock->to_index( static_cast<size_t>( nx -1 ), 0, 
-      static_cast<size_t>( nz -1 ) ) ];
-    if ( val ) lut[ val ] = 0;
-    val = data[ output_datablock->to_index( 0, static_cast<size_t>( ny -1 ), 
-      static_cast<size_t>( nz -1 ) ) ]; 
-    if ( val ) lut[ val ] = 0;
-    val = data[ output_datablock->to_index( static_cast<size_t>( nx -1 ), 
-      static_cast<size_t>( ny -1 ), static_cast<size_t>( nz -1 ) ) ];
-    if ( val ) lut[ val ] = 0;
-    
-    this->dst_layer_->update_progress_signal_( 0.80 );
-    if ( this->check_abort() )
-    {
-      return;
-    }
-
     size_t size = output_datablock->get_size();
+    unsigned int* data = reinterpret_cast<unsigned int*>( output_datablock->get_data() );
+  
     for ( size_t j = 0; j < size; j++ )
     {
-      data[ j ] = lut[ data[ j ] ];
+      hist[ data[ j ] ]++;
     }
+  
+    hist[ 0 ] = 0;
+  
+    this->dst_layer_->update_progress_signal_( 0.85 );
+    if ( this->check_abort() ) return;
 
-    this->dst_layer_->update_progress_signal_( .90 );
-    if ( this->check_abort() )
+    if ( log_scale_ )
     {
-      return;
+      float* ldata = reinterpret_cast<float*>( output_datablock->get_data() );
+      for ( size_t j = 0; j < size; j++ )
+      {
+        ldata[ j ] = log( static_cast<float>( hist[ data[ j ] ] + 1) );
+      }
+      output_datablock->update_data_type( Core::DataType::FLOAT_E );
+    }
+    else
+    {
+      for ( size_t j = 0; j < size; j++ )
+      {
+        data[ j ] = hist[ data[ j ] ];
+      }   
     }
     
-    Core::MaskDataBlockHandle mask_datablock;
-    Core::MaskDataBlockManager::Convert( output_datablock, 
-      this->dst_layer_->get_grid_transform(), mask_datablock );
-    this->dst_layer_->update_progress_signal_( 1.0 );
-    
-    this->dispatch_insert_mask_volume_into_layer( this->dst_layer_,
-      Core::MaskVolumeHandle( new Core::MaskVolume(
-      this->dst_layer_->get_grid_transform(), mask_datablock ) ), true );
+    this->dst_layer_->update_progress_signal_( 0.95 );
+    if ( this->check_abort() ) return;
+        
+    this->dispatch_insert_data_volume_into_layer( this->dst_layer_,
+      Core::DataVolumeHandle( new Core::DataVolume(
+      this->dst_layer_->get_grid_transform(), output_datablock ) ), true, true );
   }
   SCI_END_RUN()
 
@@ -212,37 +175,28 @@ public:
   // The name of the filter, this information is used for generating new layer labels.
   virtual std::string get_filter_name() const
   {
-    return "HolesFill";
+    return "ComponentSize";
   }
 };
 
 
-bool ActionFillHolesFilter::run( Core::ActionContextHandle& context, 
+bool ActionConnectedComponentSizeFilter::run( Core::ActionContextHandle& context, 
   Core::ActionResultHandle& result )
 {
   // Create algorithm
-  boost::shared_ptr<FillHolesFilterAlgo> algo( new FillHolesFilterAlgo );
+  boost::shared_ptr<ConnectedComponentSizeFilterAlgo> algo( new ConnectedComponentSizeFilterAlgo );
 
   // Find the handle to the layer
   algo->find_layer( this->target_layer_.value(), algo->src_layer_ );
   
-  algo->seeds_ = this->seeds_.value();
+  // Lock the src layer, so it cannot be used else where
+  algo->lock_for_use( algo->src_layer_ );
   
-  if ( this->replace_.value() )
-  {
-    // Copy the handles as destination and source will be the same
-    algo->dst_layer_ = algo->src_layer_;
-    // Mark the layer for processing.
-    algo->lock_for_processing( algo->dst_layer_ );  
-  }
-  else
-  {
-    // Lock the src layer, so it cannot be used else where
-    algo->lock_for_use( algo->src_layer_ );
-    
-    // Create the destination layer, which will show progress
-    algo->create_and_lock_mask_layer_from_layer( algo->src_layer_, algo->dst_layer_ );
-  }
+  // Create the destination layer, which will show progress
+  algo->create_and_lock_data_layer_from_layer( algo->src_layer_, algo->dst_layer_ );
+
+  // Copy the parameters
+  algo->log_scale_ = this->log_scale_.value();
 
   // Return the id of the destination layer.
   result = Core::ActionResultHandle( new Core::ActionResult( algo->dst_layer_->get_layer_id() ) );
@@ -253,16 +207,15 @@ bool ActionFillHolesFilter::run( Core::ActionContextHandle& context,
   return true;
 }
 
-void ActionFillHolesFilter::Dispatch( Core::ActionContextHandle context, 
-    std::string target_layer, const std::vector< Core::Point >& seeds, bool replace )
+void ActionConnectedComponentSizeFilter::Dispatch( Core::ActionContextHandle context, 
+    std::string target_layer, bool log_scale )
 { 
   // Create a new action
-  ActionFillHolesFilter* action = new ActionFillHolesFilter;
+  ActionConnectedComponentSizeFilter* action = new ActionConnectedComponentSizeFilter;
 
   // Setup the parameters
   action->target_layer_.value() = target_layer;
-  action->seeds_.value() = seeds;
-  action->replace_.value() = replace;
+  action->log_scale_.value() = log_scale;
 
   // Dispatch action to underlying engine
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );

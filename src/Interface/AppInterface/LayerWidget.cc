@@ -141,8 +141,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   this->private_->ui_.label_->setValidator( new QRegExpValidator( 
     QRegExp( QString::fromStdString( Core::StateName::REGEX_VALIDATOR_C ) ), this ) );
 
-  // hide the toolbars and the selection check box
-  // hide the tool bars and the selection checkbox
+  // Hide the tool bars and the selection checkbox
   this->private_->ui_.bright_contrast_bar_->hide();
   this->private_->ui_.checkbox_widget_->hide();
   this->private_->ui_.opacity_bar_->hide();
@@ -150,16 +149,14 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   this->private_->ui_.mask_property_bar_->hide();
   this->private_->ui_.info_bar_->hide();
   this->private_->ui_.abort_bar_->hide();
-
-  this->private_->ui_.horizontalLayout_2->setAlignment( Qt::AlignHCenter );
-  
+    
   // add the PushDragButton
   this->private_->activate_button_ = new PushDragButton( this->private_->ui_.typeGradient_ );
   this->private_->activate_button_->setObjectName( QString::fromUtf8( "activate_button_" ) );
   this->private_->activate_button_->setStyleSheet( StyleSheet::LAYER_PUSHDRAGBUTTON_C );
-  this->private_->activate_button_->setMinimumHeight( 42 );
+  this->private_->activate_button_->setMinimumHeight( 44 );
   this->private_->activate_button_->setMinimumWidth( 31 );
-  this->private_->activate_button_->setIconSize( QSize( 25, 25 ) );
+  this->private_->activate_button_->setIconSize( QSize( 27, 27 ) );
   this->private_->ui_.horizontalLayout_9->addWidget( this->private_->activate_button_ );
   this->private_->activate_button_->setAcceptDrops( false );
   
@@ -188,6 +185,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   this->private_->ui_.color_widget_layout_->addWidget( this->private_->color_widget_ );
   this->private_->color_widget_->setObjectName( QString::fromUtf8( "color_widget_" ) );
   
+  // Text for when the abort button has been pressed
   this->private_->ui_.abort_text_->setText( "Waiting for process to abort ..." );
         
   this->connect( this->private_->ui_.abort_button_,
@@ -220,7 +218,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
     QtUtils::QtBridge::Connect( this->private_->ui_.lock_button_, layer->locked_state_ );
     
     LayerGroupHandle layer_group = layer->get_layer_group();
-    QtUtils::QtBridge::Connect( this->private_->ui_.dimensions_label_,
+    QtUtils::QtBridge::Connect( this->private_->ui_.dimensions_,
       layer_group->dimensions_state_ );
     QtUtils::QtBridge::Connect( this->private_->ui_.origin_label_,
       layer_group->origin_state_ );

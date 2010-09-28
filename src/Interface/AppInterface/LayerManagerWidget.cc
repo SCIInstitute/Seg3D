@@ -56,7 +56,7 @@ LayerManagerWidget::LayerManagerWidget( QWidget* parent ) :
   setWidget( this->main_ );
   
   this->group_layout_ = new QVBoxLayout;
-  this->group_layout_->setSpacing( 2 );
+  this->group_layout_->setSpacing( 1 );
   this->group_layout_->setContentsMargins( 1, 1, 1, 1 );
   this->group_layout_->setAlignment( Qt::AlignTop );
   

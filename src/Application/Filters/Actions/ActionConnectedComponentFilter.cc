@@ -269,9 +269,6 @@ bool ActionConnectedComponentFilter::run( Core::ActionContextHandle& context,
   // Find the handle to the layer
   algo->find_layer( this->target_layer_.value(), algo->src_layer_ );
   
-  // Lock the src layer, so it cannot be used else where
-  algo->lock_for_use( algo->src_layer_ );
-  
   if ( this->mask_.value().size() > 0 && this->mask_.value() != "<none>" )
   {
     algo->find_layer( this->mask_.value(), algo->mask_layer_ );

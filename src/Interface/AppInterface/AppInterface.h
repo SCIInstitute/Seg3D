@@ -88,15 +88,6 @@ public:
   // virtual constructor needed by Qt to destroy this object
   virtual ~AppInterface();
 
-public:
-
-  ViewerInterface* viewer_interface();
-  HistoryDockWidget* history_dock_widget();
-  ProjectDockWidget* project_dock_widget();
-  ToolsDockWidget* tools_dock_widget();
-  LayerManagerDockWidget* layer_manager_dock_widget();
-  MeasurementDockWidget* measurement_dock_widget();
-
   // -- functions to handle the properties of the interface --
 public:
   void set_full_screen( bool full_screen );
@@ -115,8 +106,6 @@ private:
   // on top of each other
   void addDockWidget( Qt::DockWidgetArea area, QDockWidget* dock_widget );
   
-  
-
 protected:
   virtual void closeEvent ( QCloseEvent* event );
 

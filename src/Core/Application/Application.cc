@@ -289,6 +289,12 @@ void Application::log_finish()
   CORE_LOG_MESSAGE( std::string( "-- Finished --" ) );
 }
 
+void Application::finish()
+{
+  Instance()->terminate_eventhandler();
+}
+
+
 bool Application::IsApplicationThread()
 {
   return ( Instance()->is_eventhandler_thread() );

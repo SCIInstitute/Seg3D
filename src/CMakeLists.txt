@@ -34,6 +34,8 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 PROJECT(Seg3D)
 
+MESSAGE( STATUS "${CMAKE_ROOT}")
+
 ###########################################
 # WHERE TO COMPILE EXECUTABLES
 ###########################################

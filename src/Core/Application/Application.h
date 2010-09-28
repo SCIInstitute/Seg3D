@@ -62,6 +62,14 @@ private:
   Application();
   virtual ~Application();
 
+  // -- finish application --
+public:
+  // FINISH:
+  // Execute the remainder of the actions and terminate the application thread
+  // NOTE: This function should be called by main at the end of the program to ensure
+  // that actions like saving the last session are properly executed.
+  void finish();
+
   // -- Command line parser --
 public:
   // IS_COMMAND_LINE_PARAMETERS:

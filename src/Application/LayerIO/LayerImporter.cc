@@ -153,7 +153,7 @@ bool LayerImporter::import_layer( LayerImporterMode mode, std::vector< LayerHand
         canonical_vol->get_grid_transform(), maskdatablock ) );
 
       layers.resize( 1 );
-      layers[0] = LayerHandle( new MaskLayer( this->get_base_filename(), maskvolume ) );
+      layers[0] = LayerHandle( new MaskLayer( this->get_layer_name(), maskvolume ) );
 
       CORE_LOG_DEBUG( std::string( "Successfully imported: " ) + this->get_base_filename() );
       return true;
@@ -176,7 +176,7 @@ bool LayerImporter::import_layer( LayerImporterMode mode, std::vector< LayerHand
       {
         Core::MaskVolumeHandle maskvolume( new Core::MaskVolume( 
           canonical_vol->get_grid_transform(), maskdatablocks[ j ] ) );
-        layers[ j ] = LayerHandle( new MaskLayer( this->get_base_filename(), maskvolume ) );
+        layers[ j ] = LayerHandle( new MaskLayer( this->get_layer_name(), maskvolume ) );
       }
 
       CORE_LOG_DEBUG( std::string( "Successfully imported: " ) + this->get_base_filename() );
@@ -200,7 +200,7 @@ bool LayerImporter::import_layer( LayerImporterMode mode, std::vector< LayerHand
       {
         Core::MaskVolumeHandle maskvolume( new Core::MaskVolume( 
           canonical_vol->get_grid_transform(), maskdatablocks[ j ] ) );
-        layers[ j ] = LayerHandle( new MaskLayer( get_base_filename(), maskvolume ) );
+        layers[ j ] = LayerHandle( new MaskLayer( get_layer_name(), maskvolume ) );
       }
 
       CORE_LOG_DEBUG( std::string( "Successfully imported: " ) + get_base_filename() );
@@ -213,7 +213,7 @@ bool LayerImporter::import_layer( LayerImporterMode mode, std::vector< LayerHand
 
 std::string LayerImporter::get_layer_name()
 {
-  return this->get_filename();
+  return this->get_base_filename();
 }
 
 } // end namespace seg3D

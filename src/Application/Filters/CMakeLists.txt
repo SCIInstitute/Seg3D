@@ -51,6 +51,8 @@ SET(APPLICATION_FILTERS_ACTIONS_SRCS
   Actions/ActionConfidenceConnectedFilter.cc
   Actions/ActionConnectedComponentFilter.h
   Actions/ActionConnectedComponentFilter.cc
+  Actions/ActionConnectedComponentSizeFilter.h
+  Actions/ActionConnectedComponentSizeFilter.cc
   Actions/ActionCurvatureAnisotropicDiffusionFilter.h
   Actions/ActionCurvatureAnisotropicDiffusionFilter.cc
   Actions/ActionDilateFilter.h

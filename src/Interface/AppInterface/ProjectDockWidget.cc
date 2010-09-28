@@ -87,7 +87,10 @@ ProjectDockWidget::ProjectDockWidget( QWidget *parent ) :
     
     QtUtils::QtBridge::Connect( this->private_->ui_.custom_colors_checkbox_, 
       ProjectManager::Instance()->current_project_->save_custom_colors_state_ );
-    
+
+    QtUtils::QtBridge::Connect( this->private_->ui_.session_name_linedit_, 
+      ProjectManager::Instance()->current_project_->current_session_name_state_ );
+
     add_connection( ProjectManager::Instance()->current_project_->sessions_state_->
       state_changed_signal_.connect( boost::bind( &ProjectDockWidget::HandleSessionsChanged, 
       project_dock_widget ) ) );
@@ -136,8 +139,6 @@ ProjectDockWidget::ProjectDockWidget( QWidget *parent ) :
     headers << "Time:" << "Session Name:";
     this->private_->ui_.sessions_list_->setHorizontalHeaderLabels( headers );
     
-    this->private_->ui_.session_name_linedit_->setText( QString::fromUtf8( "UnnamedSession" ) );
-
     this->private_->ui_.horizontalLayout_2->setAlignment( Qt::AlignHCenter );
 
     this->disable_load_delete_and_export_buttons();

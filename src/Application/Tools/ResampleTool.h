@@ -45,7 +45,7 @@ SEG3D_TOOL
   SEG3D_TOOL_NAME( "ResampleTool", "Tool for resampling data" )
   SEG3D_TOOL_MENULABEL( "Resample" )
   SEG3D_TOOL_MENU( "Tools" )
-  SEG3D_TOOL_SHORTCUT_KEY( "Alt+T" )
+  SEG3D_TOOL_SHORTCUT_KEY( "Alt+R" )
   SEG3D_TOOL_URL( "http://seg3d.org/" )
 )
 

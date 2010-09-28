@@ -113,8 +113,6 @@ protected:
   // processing events
   virtual void initialize_eventhandler();
 
-private:
-
   friend void TerminateEventHandlerThread( EventHandlerHandle handle );
 
   // TERMINATE_EVENTHANDLER:

@@ -49,14 +49,18 @@
       <string>Target Mask</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_4">
-      <property name="spacing">
-       <number>6</number>
-      </property>
       <property name="margin">
        <number>4</number>
       </property>
       <item>
-       <widget class="QComboBox" name="target_mask_"/>
+       <widget class="QComboBox" name="target_mask_">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QCheckBox" name="use_active_layer_">
@@ -79,14 +83,18 @@
       <string>Mask Constraint</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_5">
-      <property name="spacing">
-       <number>6</number>
-      </property>
       <property name="margin">
        <number>4</number>
       </property>
       <item>
-       <widget class="QComboBox" name="mask_constraint_"/>
+       <widget class="QComboBox" name="mask_constraint_">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QCheckBox" name="negative_mask_constraint_">
@@ -130,14 +138,18 @@
       <bool>false</bool>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
-      <property name="spacing">
-       <number>6</number>
-      </property>
       <property name="margin">
        <number>4</number>
       </property>
       <item>
-       <widget class="QComboBox" name="data_constraint_"/>
+       <widget class="QComboBox" name="data_constraint_">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QCheckBox" name="negative_data_constraint_">

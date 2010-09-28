@@ -269,7 +269,15 @@ void QtRenderWidget::wheelEvent( QWheelEvent* event )
 {
   this->activate_signal_();
 
-  int delta = Core::RoundUp( event->delta() / 120.0 );
+  int delta = 0;
+  if ( event->delta() < 0 )
+  {
+    delta = -Core::RoundUp( -event->delta() / 120.0 );
+  } 
+  else
+  {
+    delta = Core::RoundUp( event->delta() / 120.0 );
+  }
   if ( this->private_->viewer_->wheel_event( delta, event->x(), event->y(), 
     event->buttons(), event->modifiers() ) )
   {

@@ -189,6 +189,11 @@ public:
   // Recompute the histogram. This needs to be triggered each time the data is updated
   void update_histogram();
   
+  // UPDATE_DATA_TYPE:
+  // Reset the data type
+  // NOTE: this does not do any conversion of the data, hence use this function with care
+  void update_data_type( DataType type );
+  
   // GET_GENERATION:
   // Get the current generation number of the data volume.
   generation_type get_generation() const;

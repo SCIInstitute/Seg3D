@@ -158,23 +158,23 @@ TARGET_LINK_LIBRARIES(Interface_AppInterface
                       Core_Interface
                       Core_ActionManager
                       Core_State
-                      Application_Project
-                      Application_ProjectManager
-                      Application_Renderer
+            Application_Project
+            Application_ProjectManager
+                  Application_Renderer
                       Application_Tool
                       Application_ToolManager
                       Application_Tools
                       Application_LayerIO
                       QtUtils_Utils
                       QtUtils_Widgets
-                      QtUtils_Bridge
-                      Resources_QtResources
+            QtUtils_Bridge
+            Resources_QtResources
                       Interface_AppController
-                      Interface_AppPreferences
-                      Interface_AppSplash
-                      Interface_AppProjectWizard
-                      Interface_AppProjectExportWizard
-                      Interface_AppSegmentationExportWizard
+            Interface_AppPreferences
+                  Interface_AppSplash
+                  Interface_AppProjectWizard
+                  Interface_AppProjectExportWizard
+                  Interface_AppSegmentationExportWizard
                       ${QT_LIBRARIES} 
                       ${SCI_BOOST_LIBRARY})
 

@@ -32,15 +32,18 @@
 ##################################################
 
 SET(INTERFACE_TOOLINTERFACE_SRCS
+  CropToolInterface.cc
   PaintToolInterface.cc
   PolylineToolInterface.cc
-  ThresholdToolInterface.cc
   InvertToolInterface.cc
+  ResampleToolInterface.cc
+  ThresholdToolInterface.cc
   ArithmeticFilterInterface.cc
   BinaryDilateErodeFilterInterface.cc
   CannyEdgeDetectionFilterInterface.cc
   ConfidenceConnectedFilterInterface.cc
   ConnectedComponentFilterInterface.cc
+  ConnectedComponentSizeFilterInterface.cc
   CurvatureAnisotropicDiffusionFilterInterface.cc
   DiscreteGaussianFilterInterface.cc
   FillHolesFilterInterface.cc
@@ -52,8 +55,6 @@ SET(INTERFACE_TOOLINTERFACE_SRCS
   NeighborhoodConnectedFilterInterface.cc
   OtsuThresholdFilterInterface.cc
   ThresholdSegmentationLSFilterInterface.cc
-  ResampleToolInterface.cc
-  CropToolInterface.cc
 )
 
 SET(INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_SRCS
@@ -62,15 +63,18 @@ SET(INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_SRCS
 )
 
 SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
+  CropToolInterface.h
+  InvertToolInterface.h
   PaintToolInterface.h
   PolylineToolInterface.h
+  ResampleToolInterface.h
   ThresholdToolInterface.h
-  InvertToolInterface.h
   ArithmeticFilterInterface.h
   BinaryDilateErodeFilterInterface.h
   CannyEdgeDetectionFilterInterface.h
   ConfidenceConnectedFilterInterface.h
   ConnectedComponentFilterInterface.h
+  ConnectedComponentSizeFilterInterface.h
   CurvatureAnisotropicDiffusionFilterInterface.h
   DiscreteGaussianFilterInterface.h
   FillHolesFilterInterface.h
@@ -82,8 +86,6 @@ SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
   NeighborhoodConnectedFilterInterface.h
   OtsuThresholdFilterInterface.h
   ThresholdSegmentationLSFilterInterface.h
-  ResampleToolInterface.h
-  CropToolInterface.h
 )
 
 SET(INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_MOC_SRCS
@@ -95,28 +97,29 @@ SET(INTERFACE_TOOLINTERFACE_NO_MOC_SRCS
 )
 
 SET(INTERFACE_TOOLINTERFACE_UI_SRCS
+  CropToolInterface.ui
+  InvertToolInterface.ui
   PaintToolInterface.ui
   PolylineToolInterface.ui
   ThresholdToolInterface.ui
-  InvertToolInterface.ui
-  MedianFilterInterface.ui
-  DiscreteGaussianFilterInterface.ui
+  ResampleToolInterface.ui  
   ArithmeticFilterInterface.ui
-  CurvatureAnisotropicDiffusionFilterInterface.ui
   BinaryDilateErodeFilterInterface.ui
+  CannyEdgeDetectionFilterInterface.ui  
   ConfidenceConnectedFilterInterface.ui
-  FillHolesFilterInterface.ui
-  HistogramEqualizationFilterInterface.ui
   ConnectedComponentFilterInterface.ui
-  NeighborhoodConnectedFilterInterface.ui
+  ConnectedComponentSizeFilterInterface.ui
+  CurvatureAnisotropicDiffusionFilterInterface.ui
+  DiscreteGaussianFilterInterface.ui
+  FillHolesFilterInterface.ui
+  GradientMagnitudeFilterInterface.ui
+  HistogramEqualizationFilterInterface.ui
   IntensityCorrectionFilterInterface.ui
   MaskDataFilterInterface.ui
-  GradientMagnitudeFilterInterface.ui
-  CannyEdgeDetectionFilterInterface.ui
+  MedianFilterInterface.ui
+  NeighborhoodConnectedFilterInterface.ui
   OtsuThresholdFilterInterface.ui
   ThresholdSegmentationLSFilterInterface.ui
-  ResampleToolInterface.ui
-  CropToolInterface.ui
 )
 
 SET(INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_UI_SRCS

@@ -47,7 +47,7 @@
 #include <Application/Project/DataManager.h>
 
 
-// Volume includes
+// Core includes
 #include <Core/Action/Action.h>
 #include <Core/Application/Application.h>
 #include <Core/Interface/Interface.h>
@@ -78,6 +78,7 @@ public:
   Core::StateStringVectorHandle sessions_state_;
   Core::StateStringVectorHandle project_notes_state_;
   Core::StateLongLongHandle project_file_size_state_;
+  Core::StateStringHandle current_session_name_state_;
   std::vector< Core::StateColorHandle > color_states_;
   
   
@@ -85,22 +86,18 @@ public:
   typedef boost::signals2::signal< void( std::string ) > session_deleted_signal_type;
   session_deleted_signal_type session_deleted_signal_;
   
-  
 public:
   // INITIALIZE_FROM_FILE:
   // this file initializes the state values for project from the file at the path specified
-/*  bool initialize_from_file( boost::filesystem::path project_path, const std::string& project_name );*/
   bool initialize_from_file( const std::string& project_name );
 
   // LOAD_SESSION:
   // this function will be called to load a specific session
   bool load_session( const std::string& session_name );
-  //bool load_session( boost::filesystem::path project_path, const std::string& session_name );
   
   // SAVE_SESSION:
   // this function will be called from the project manager to save a session
   bool save_session( const std::string& session_name );
-/*  bool save_session( boost::filesystem::path project_path, const std::string& session_name );*/
   
   // DELETE_SESSION:
   // this function will be called by the project manager to delete a session
@@ -113,13 +110,19 @@ public:
   // NAME_IS_SET:
   // this function is set called to set the name_set_ toggle in the project so it knows if the name
   // has actually been set.
-  void name_is_set( bool set ){ this->name_set_ = set; }
+  void name_is_set( bool set )
+  { 
+    this->name_set_ = set; 
+  }
   
   // NAME_STATUS:
   // this function is called to check the status of the project name.  This is because we get a 
   // signal that the project name has changed the first time it gets set.  This is a temporary 
   // stopgap until we can implement signal blocking
-  bool name_status(){ return this->name_set_; }
+  bool name_status()
+  {
+    return this->name_set_; 
+  }
 
   // GET_SESSION_NAME:
   // this function gets the name of a session at an index of the projects session list, this is 
@@ -148,6 +151,10 @@ public:
   // that the project emits when it's state variables are changed
   void set_signal_block( bool on_off );
   
+  // CHECK_CHANGED:
+  // Check whether the project was changed
+  bool check_changed();
+  
 protected:
   // PRE_SAVE_STATES:
   // this function synchronizes the colors if they are set to be saved with the project
@@ -166,12 +173,25 @@ private:
   // this function cleans up sessions in the session list that have been deleted by the user
   void cleanup_session_list();
 
+  // SET_CHANGED:
+  // Set that the session has been modified
+  void set_changed( Core::ActionHandle action, Core::ActionResultHandle result );
+
 private:
+  // Session current using
   SessionHandle current_session_;
+
+  // whether a name has been assigned
   bool name_set_;
-  const static size_t VERSION_NUMBER_C;
+  
+  // Where to save the project
   boost::filesystem::path project_path_;
+
+  // Where the data is being managed
   DataManagerHandle data_manager_;
+  
+  // Whether the project has changed
+  bool changed_;
   
 };
 

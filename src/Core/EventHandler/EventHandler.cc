@@ -58,8 +58,7 @@ void EventHandler::run_eventhandler()
   
   try
   {
-    while ( !( wait_and_process_events() ) )
-      ;
+    while ( !( wait_and_process_events() ) );
   }
   catch ( Exception& e )
   {
