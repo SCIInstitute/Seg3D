@@ -51,26 +51,26 @@ public:
   ArrayMathFunctionCatalog()  {}
 
   // Add a function to the general database
-  void add_function( bool( *function )( ArrayMathProgramCode& pc ), std::string function_id,
+  void add_function( ArrayMathFunctionObject function, std::string function_id,
       std::string return_type );
 
   // Add a function whose input variables can be in any particular order,
   // e.g. addition, this will allow the optimizer to recognize that two pieces
   // of the parser tree are equal e.g A+B equals B+A
-  void add_sym_function( bool( *function )( ArrayMathProgramCode& pc ), std::string function_id,
+  void add_sym_function( ArrayMathFunctionObject function, std::string function_id,
       std::string return_type );
 
   // Add a function that independently of the input will output a sequence
   // e.g. the rand function, will always generate a sequence
-  void add_seq_function( bool( *function )( ArrayMathProgramCode& pc ), std::string function_id,
+  void add_seq_function( ArrayMathFunctionObject function, std::string function_id,
       std::string return_type );
 
   // Add a function that wil always output a single
-  void add_sgl_function( bool( *function )( ArrayMathProgramCode& pc ), std::string function_id,
+  void add_sgl_function( ArrayMathFunctionObject function, std::string function_id,
       std::string return_type );
 
   // Add a function that is always a constant
-  void add_cst_function( bool( *function )( ArrayMathProgramCode& pc ), std::string function_id,
+  void add_cst_function( ArrayMathFunctionObject function, std::string function_id,
     std::string return_type );
 
   static ParserFunctionCatalogHandle get_catalog();

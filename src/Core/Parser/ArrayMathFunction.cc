@@ -32,7 +32,7 @@
 namespace Core
 {
 
-ArrayMathFunction::ArrayMathFunction( bool( *function )( ArrayMathProgramCode& pc ),
+ArrayMathFunction::ArrayMathFunction( ArrayMathFunctionObject function,
     std::string function_id, std::string function_type, int function_flags ) :
   ParserFunction( function_id, function_type, function_flags )
 {

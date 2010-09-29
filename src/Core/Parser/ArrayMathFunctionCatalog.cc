@@ -65,7 +65,7 @@ ParserFunctionCatalogHandle ArrayMathFunctionCatalog::get_catalog()
 // Adding a function to a collection class will cause it to be inserted into
 // the main catalog. This way we can distribute the function definitions
 // into different classes
-void ArrayMathFunctionCatalog::add_function( bool( *function )( ArrayMathProgramCode& pc ),
+void ArrayMathFunctionCatalog::add_function( ArrayMathFunctionObject function,
     std::string function_id, std::string return_type )
 {
   // Adding function to catalog
@@ -78,7 +78,7 @@ void ArrayMathFunctionCatalog::add_function( bool( *function )( ArrayMathProgram
 // arguments can be swapped to optimize code by removing duplicate functio
 // calls
 
-void ArrayMathFunctionCatalog::add_sym_function( bool( *function )( ArrayMathProgramCode& pc ),
+void ArrayMathFunctionCatalog::add_sym_function( ArrayMathFunctionObject function,
     std::string function_id, std::string return_type )
 {
   // Adding function to catalog
@@ -86,7 +86,7 @@ void ArrayMathFunctionCatalog::add_sym_function( bool( *function )( ArrayMathPro
       PARSER_SYMMETRIC_FUNCTION_E ) );
 }
 
-void ArrayMathFunctionCatalog::add_seq_function( bool( *function )( ArrayMathProgramCode& pc ),
+void ArrayMathFunctionCatalog::add_seq_function( ArrayMathFunctionObject function,
     std::string function_id, std::string return_type )
 {
   // Adding function to catalog
@@ -94,7 +94,7 @@ void ArrayMathFunctionCatalog::add_seq_function( bool( *function )( ArrayMathPro
       PARSER_SEQUENTIAL_FUNCTION_E ) );
 }
 
-void ArrayMathFunctionCatalog::add_sgl_function( bool( *function )( ArrayMathProgramCode& pc ),
+void ArrayMathFunctionCatalog::add_sgl_function( ArrayMathFunctionObject function,
     std::string function_id, std::string return_type )
 {
   // Adding function to catalog
@@ -102,7 +102,7 @@ void ArrayMathFunctionCatalog::add_sgl_function( bool( *function )( ArrayMathPro
       PARSER_SINGLE_FUNCTION_E ) );
 }
 
-void ArrayMathFunctionCatalog::add_cst_function( bool( *function )( ArrayMathProgramCode& pc ),
+void ArrayMathFunctionCatalog::add_cst_function( ArrayMathFunctionObject function,
     std::string function_id, std::string return_type )
 {
   // Adding function to catalog

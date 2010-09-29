@@ -49,21 +49,26 @@ class ArrayMathFunction : public ParserFunction
 public:
   // Build a new function
   ArrayMathFunction(
-    bool ( *function )( ArrayMathProgramCode& pc ),
+    ArrayMathFunctionObject function,
     std::string function_id, std::string function_type, int function_flags );
 
   // Virtual destructor so I can do dynamic casts on this class 
   virtual ~ArrayMathFunction() {}
 
   // Get the pointer to the function
-  bool ( *get_function() )( ArrayMathProgramCode& pc ) 
+  /*bool ( *get_function() )( ArrayMathProgramCode& pc ) 
   { 
     return this->function_; 
-  } 
+  } */
+
+  ArrayMathFunctionObject get_function()
+  {
+    return this->function_;
+  }
 
 private:
   // The function to call that needs to be called on the data
-  bool ( *function_ )( ArrayMathProgramCode& pc );
+  ArrayMathFunctionObject function_;
 
 };
 

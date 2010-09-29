@@ -32,6 +32,9 @@
 // STL includes
 #include <vector>
 
+// Boost includes 
+#include <boost/function.hpp>
+
 // Core includes
 #include <Core/DataBlock/DataBlock.h>
 #include <Core/DataBlock/MaskDataBlock.h>
@@ -40,6 +43,9 @@
 
 namespace Core
 {
+
+class ArrayMathProgramCode;
+typedef boost::function< bool( ArrayMathProgramCode& pc ) > ArrayMathFunctionObject;
 
 //-----------------------------------------------------------------------------
 // Code segment class, all the function calls are based on this class
@@ -51,20 +57,20 @@ namespace Core
 class ArrayMathProgramCode
 {
 public:
-
+  
   // Constructor
-  ArrayMathProgramCode( bool ( *function )( ArrayMathProgramCode& pc ) );
+  ArrayMathProgramCode( ArrayMathFunctionObject function );
 
   ArrayMathProgramCode();
 
   // Set the function pointer
-  inline void set_function( bool ( *function )( ArrayMathProgramCode& pc ) )
+  inline void set_function( ArrayMathFunctionObject function )
   {
     this->function_ = function;
   }
 
   // Get the function pointer
-  inline bool ( *get_function() )( ArrayMathProgramCode& pc )
+  inline ArrayMathFunctionObject get_function()
   {
     return this->function_;
   }
@@ -147,7 +153,7 @@ private:
   // grouped together so they fit in a few pages of the memory manager
 
   // Function call to evaluate this piece of the code
-  bool ( *function_ )( ArrayMathProgramCode& pc );
+  ArrayMathFunctionObject function_;
 
   // Location of where the data is stored
   StackBasedVector < void*, 3 > variables_;

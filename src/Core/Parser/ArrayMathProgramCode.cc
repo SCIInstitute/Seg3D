@@ -44,8 +44,8 @@ void ArrayMathProgramCode::print()
   }
 }
 
-ArrayMathProgramCode::ArrayMathProgramCode( bool ( *function )( ArrayMathProgramCode& pc ) ) :
-function_(function), 
+ArrayMathProgramCode::ArrayMathProgramCode( ArrayMathFunctionObject function ) :
+  function_(function), 
   index_( 0 ), 
   size_( 1 )
 {
