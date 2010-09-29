@@ -38,6 +38,10 @@
 namespace Core
 {
 
+// Hide header includes, private interface and implementation
+class ParserScriptVariablePrivate;
+typedef boost::shared_ptr< ParserScriptVariablePrivate > ParserScriptVariablePrivateHandle;
+
 class ParserScriptVariable
 {
 
@@ -103,31 +107,7 @@ public:
   void print();
 
 private:
-  // The function that created this variable
-  ParserScriptFunctionHandle parent_;
-
-  // The kind of variable
-  int kind_;
-
-  // The type of the variable
-  std::string type_;
-
-  // The flags for sequential/single/constant
-  int flags_;
-
-  // Name of the variable for input and output variables
-  std::string name_;
-
-  // Unique name of the variable
-  std::string uname_;
-
-  std::string dependence_;
-
-  // For const scalar/string variables
-  double scalar_value_;
-  std::string string_value_;
-
-  int var_number_;
+  ParserScriptVariablePrivateHandle private_;
 };
 
 }

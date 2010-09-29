@@ -32,8 +32,15 @@
 // STL includes
 #include <string>
 
+// Boost includes 
+#include <boost/shared_ptr.hpp>
+
 namespace Core
 {
+
+// Hide header includes, private interface and implementation
+class ParserFunctionPrivate;
+typedef boost::shared_ptr< ParserFunctionPrivate > ParserFunctionPrivateHandle;
 
 class ParserFunction
 {
@@ -57,14 +64,7 @@ public:
   int get_flags();
 
 private:
-  // The ID of the function, which is the name plut arguments in one string
-  std::string function_id_;
-
-  // The return type of the function
-  std::string function_type_;
-
-  // Flags define properties of this function
-  int function_flags_;
+  ParserFunctionPrivateHandle private_;
 };
 
 }

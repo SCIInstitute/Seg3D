@@ -31,13 +31,16 @@
 
 // STL includes
 #include <string>
-#include <vector>
 
 // Core includes
 #include <Core/Parser/ParserFWD.h>
 
 namespace Core
 {
+
+// Hide header includes, private interface and implementation
+class ParserScriptFunctionPrivate;
+typedef boost::shared_ptr< ParserScriptFunctionPrivate > ParserScriptFunctionPrivateHandle;
 
 class ParserScriptFunction
 {
@@ -69,20 +72,7 @@ public:
   void print();
 
 private:
-  // The name of the function
-  std::string name_;
-
-  // Flags that describe whether this is a single or sequential call
-  int flags_;
-
-  // Pointer to the function information block
-  ParserFunction* function_;
-
-  // Input variables in the function depends on
-  std::vector< ParserScriptVariableHandle > input_variables_;
-
-  // Output variable
-  ParserScriptVariableHandle output_variable_;
+  ParserScriptFunctionPrivateHandle private_;
 };
 
 }

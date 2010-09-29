@@ -38,6 +38,10 @@
 namespace Core
 {
 
+// Hide header includes, private interface and implementation
+class ParserTreePrivate;
+typedef boost::shared_ptr< ParserTreePrivate > ParserTreePrivateHandle;
+
 // ParserTree : This class is the toplevel class of an expression. It binds
 //              the output variable with the tree of nodes that describe
 //              how a variable is computed.
@@ -66,14 +70,7 @@ public:
   void print();
 
 private:
-  // The name of the variable that needs to be assigned
-  std::string varname_;
-
-  // The tree of functions that need to be called to compute this variable
-  ParserNodeHandle expression_;
-
-  // Return type of the expression
-  std::string type_;
+  ParserTreePrivateHandle private_;
 };
 
 }

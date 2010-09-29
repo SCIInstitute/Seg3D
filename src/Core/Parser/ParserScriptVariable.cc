@@ -38,226 +38,260 @@
 namespace Core
 {
 
+class ParserScriptVariablePrivate
+{
+public:
+  // The function that created this variable
+  ParserScriptFunctionHandle parent_;
+
+  // The kind of variable
+  int kind_;
+
+  // The type of the variable
+  std::string type_;
+
+  // The flags for sequential/single/constant
+  int flags_;
+
+  // Name of the variable for input and output variables
+  std::string name_;
+
+  // Unique name of the variable
+  std::string uname_;
+
+  std::string dependence_;
+
+  // For const scalar/string variables
+  double scalar_value_;
+  std::string string_value_;
+
+  int var_number_;
+};
+
+ParserScriptVariable::ParserScriptVariable( std::string name, std::string uname, std::string type, 
+  int flags ) :
+  private_( new ParserScriptVariablePrivate )
+{
+  this->private_->kind_ = SCRIPT_INPUT_E;
+  this->private_->type_ = type;
+  this->private_->flags_ = flags;
+  this->private_->name_ = name;
+  this->private_->uname_ = uname;
+  this->private_->scalar_value_ = 0.0;
+  this->private_->var_number_ = 0;
+}
+
+ParserScriptVariable::ParserScriptVariable( std::string uname, std::string type, int flags ) :
+  private_( new ParserScriptVariablePrivate )
+{
+  this->private_->kind_ = SCRIPT_VARIABLE_E;
+  this->private_->type_ = type;
+  this->private_->flags_ = flags;
+  this->private_->uname_ = uname;
+  this->private_->scalar_value_ = 0.0;
+  this->private_->var_number_ = 0;
+}
+
+ParserScriptVariable::ParserScriptVariable( std::string uname, double value ) :
+  private_( new ParserScriptVariablePrivate )
+{
+  this->private_->kind_ = SCRIPT_CONSTANT_SCALAR_E;
+  this->private_->type_ = "S";
+  this->private_->flags_ = SCRIPT_CONST_VAR_E;
+  this->private_->uname_ = uname;
+  this->private_->scalar_value_ = value;
+  this->private_->var_number_ = 0;
+}
+
+ParserScriptVariable::ParserScriptVariable( std::string uname, std::string value ) :  
+  private_( new ParserScriptVariablePrivate )
+{
+  this->private_->kind_ = SCRIPT_CONSTANT_STRING_E;
+  this->private_->type_ = "A";
+  this->private_->flags_ = SCRIPT_CONST_VAR_E;
+  this->private_->uname_ = uname;
+  this->private_->scalar_value_ = 0.0;
+  this->private_->string_value_ = value;
+  this->private_->var_number_ = 0;
+}
+
 void ParserScriptVariable::print()
 {
-  std::cout << "  " << this->uname_ << "(" << this->name_ << ")" << " type=" << this->type_ 
-    << ", flags=" << this->flags_;
-  if ( this->kind_ == SCRIPT_CONSTANT_SCALAR_E ) 
+  std::cout << "  " << this->private_->uname_ << "(" << this->private_->name_ << ")" << " type=" << this->private_->type_ 
+    << ", flags=" << this->private_->flags_;
+  if ( this->private_->kind_ == SCRIPT_CONSTANT_SCALAR_E ) 
   {
-    std::cout << ", value=" << this->scalar_value_;
+    std::cout << ", value=" << this->private_->scalar_value_;
   }
-  else if ( this->kind_ == SCRIPT_CONSTANT_STRING_E ) 
+  else if ( this->private_->kind_ == SCRIPT_CONSTANT_STRING_E ) 
   {
-    std::cout << ", value=" << this->string_value_;
+    std::cout << ", value=" << this->private_->string_value_;
   }
   std::cout << "\n";
 }
 
 void ParserScriptVariable::compute_dependence()
 {
-  if ( this->parent_.get() )
+  if ( this->private_->parent_.get() )
   {
-    this->dependence_ = this->parent_->get_name() + "(";
-    size_t num_input_vars = this->parent_->num_input_vars();
-    if ( ( num_input_vars == 2 ) && ( this->parent_->get_function()->get_flags()
+    this->private_->dependence_ = this->private_->parent_->get_name() + "(";
+    size_t num_input_vars = this->private_->parent_->num_input_vars();
+    if ( ( num_input_vars == 2 ) && ( this->private_->parent_->get_function()->get_flags()
       & PARSER_SYMMETRIC_FUNCTION_E ) )
     {
-      std::string uname1 = this->parent_->get_input_var( 0 )->get_uname();
-      std::string uname2 = this->parent_->get_input_var( 1 )->get_uname();
+      std::string uname1 = this->private_->parent_->get_input_var( 0 )->get_uname();
+      std::string uname2 = this->private_->parent_->get_input_var( 1 )->get_uname();
       if ( uname1.compare( uname2 ) < 0 ) 
       {
-        this->dependence_ += uname1 + "," + uname2 + ")";
+        this->private_->dependence_ += uname1 + "," + uname2 + ")";
       }
       else 
       {
-        this->dependence_ += uname2 + "," + uname1 + ")";
+        this->private_->dependence_ += uname2 + "," + uname1 + ")";
       }
     }
     else
     {
       for ( size_t j = 0; j < num_input_vars; j++ )
       {
-        this->dependence_ += this->parent_->get_input_var( j )->get_uname();
+        this->private_->dependence_ += this->private_->parent_->get_input_var( j )->get_uname();
         if ( j < ( num_input_vars - 1 ) ) 
         {
-          this->dependence_ += ",";
+          this->private_->dependence_ += ",";
         }
       }
-      this->dependence_ += ")";
+      this->private_->dependence_ += ")";
     }
   }
   else
   {
-    this->dependence_ = this->uname_;
+    this->private_->dependence_ = this->private_->uname_;
   }
-}
-
-ParserScriptVariable::ParserScriptVariable( std::string name, std::string uname, std::string type, 
-  int flags ) :
-kind_( SCRIPT_INPUT_E ), 
-  type_( type ), 
-  flags_( flags ), 
-  name_( name ),
-  uname_( uname ), 
-  scalar_value_( 0.0 ), 
-  var_number_( 0 )
-{
-}
-
-ParserScriptVariable::ParserScriptVariable( std::string uname, std::string type, int flags ) :
-kind_( SCRIPT_VARIABLE_E ), 
-  type_( type ), 
-  flags_( flags ), 
-  uname_( uname ),
-  scalar_value_( 0.0 ), 
-  var_number_( 0 )
-{
-}
-
-ParserScriptVariable::ParserScriptVariable( std::string uname, double value ) :
-kind_( SCRIPT_CONSTANT_SCALAR_E ), 
-  type_( "S" ),
-  flags_( SCRIPT_CONST_VAR_E ), 
-  uname_( uname ), 
-  scalar_value_( value ), 
-  var_number_( 0 )
-{
-}
-
-ParserScriptVariable::ParserScriptVariable( std::string uname, std::string value ) :
-kind_( SCRIPT_CONSTANT_STRING_E ), 
-  type_( "A" ),
-  flags_( SCRIPT_CONST_VAR_E ), 
-  uname_( uname ), 
-  scalar_value_( 0.0 ), 
-  string_value_( value ), 
-  var_number_( 0 )
-{
 }
 
 void ParserScriptVariable::set_parent( ParserScriptFunctionHandle& handle )
 {
-  this->parent_ = handle;
+  this->private_->parent_ = handle;
 }
 
 Core::ParserScriptFunctionHandle ParserScriptVariable::get_parent()
 {
-  return this->parent_;
+  return this->private_->parent_;
 }
 
 int ParserScriptVariable::get_kind()
 {
-  return this->kind_;
+  return this->private_->kind_;
 }
 
 void ParserScriptVariable::set_kind( int kind )
 {
-  this->kind_ = kind;
+  this->private_->kind_ = kind;
 }
 
 std::string ParserScriptVariable::get_type()
 {
-  return this->type_;
+  return this->private_->type_;
 }
 
 void ParserScriptVariable::set_type( std::string type )
 {
-  this->type_ = type;
+  this->private_->type_ = type;
 }
 
 int ParserScriptVariable::get_flags()
 {
-  return this->flags_;
+  return this->private_->flags_;
 }
 
 void ParserScriptVariable::set_flags( int flags )
 {
-  this->flags_ |= flags;
+  this->private_->flags_ |= flags;
 }
 
 void ParserScriptVariable::clear_flags()
 {
-  this->flags_ = 0;
+  this->private_->flags_ = 0;
 }
 
 void ParserScriptVariable::set_const_var()
 {
-  this->flags_ |= SCRIPT_CONST_VAR_E;
+  this->private_->flags_ |= SCRIPT_CONST_VAR_E;
 }
 
 void ParserScriptVariable::set_single_var()
 {
-  this->flags_ |= SCRIPT_SINGLE_VAR_E;
+  this->private_->flags_ |= SCRIPT_SINGLE_VAR_E;
 }
 
 void ParserScriptVariable::set_sequential_var()
 {
-  this->flags_ |= SCRIPT_SEQUENTIAL_VAR_E;
+  this->private_->flags_ |= SCRIPT_SEQUENTIAL_VAR_E;
 }
 
 bool ParserScriptVariable::is_const_var()
 {
-  return ( this->flags_ & SCRIPT_CONST_VAR_E ) != 0;
+  return ( this->private_->flags_ & SCRIPT_CONST_VAR_E ) != 0;
 }
 
 bool ParserScriptVariable::is_single_var()
 {
-  return ( this->flags_ & SCRIPT_SINGLE_VAR_E ) != 0;
+  return ( this->private_->flags_ & SCRIPT_SINGLE_VAR_E ) != 0;
 }
 
 bool ParserScriptVariable::is_sequential_var()
 {
-  return ( this->flags_ & SCRIPT_SEQUENTIAL_VAR_E ) != 0;
+  return ( this->private_->flags_ & SCRIPT_SEQUENTIAL_VAR_E ) != 0;
 }
 
 std::string ParserScriptVariable::get_name()
 {
-  return this->name_;
+  return this->private_->name_;
 }
 
 void ParserScriptVariable::set_name( std::string name )
 {
-  this->name_ = name;
+  this->private_->name_ = name;
 }
 
 std::string ParserScriptVariable::get_uname()
 {
-  return this->uname_;
+  return this->private_->uname_;
 }
 
 void ParserScriptVariable::set_uname( std::string uname )
 {
-  this->uname_ = uname;
+  this->private_->uname_ = uname;
 }
 
 double ParserScriptVariable::get_scalar_value()
 {
-  return this->scalar_value_;
+  return this->private_->scalar_value_;
 }
 
 std::string ParserScriptVariable::get_string_value()
 {
-  return this->string_value_;
+  return this->private_->string_value_;
 }
 
 std::string ParserScriptVariable::get_dependence()
 {
-  return this->dependence_;
+  return this->private_->dependence_;
 }
 
 void ParserScriptVariable::clear_dependence()
 {
-  this->dependence_.clear();
+  this->private_->dependence_.clear();
 }
 
 int ParserScriptVariable::get_var_number()
 {
-  return this->var_number_;
+  return this->private_->var_number_;
 }
 
 void ParserScriptVariable::set_var_number( int var_number )
 {
-  this->var_number_ = var_number;
+  this->private_->var_number_ = var_number;
 }
 
 }

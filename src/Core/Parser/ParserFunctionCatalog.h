@@ -31,24 +31,23 @@
 
 // STL includes
 #include <string>
-#include <map>
 
 // Core includes
 #include <Core/Parser/ParserFWD.h>
-#include <Core/Utils/Lockable.h>
 
 namespace Core
 {
 
-// The list of functions
-typedef std::map< std::string, ParserFunction* > ParserFunctionList;
+// Hide header includes, private interface and implementation
+class ParserFunctionCatalogPrivate;
+typedef boost::shared_ptr< ParserFunctionCatalogPrivate > ParserFunctionCatalogPrivateHandle;
 
 // ParserFunctionCatalog: This class contains a list of functions that are
 //              available, and hence is used for validating the program
 // The ParserFunctionCatalog serves two purposes:
 //  - Tell the parser which functions are valid
 //  - Tell the parser what the return type is of each function call
-class ParserFunctionCatalog : public Lockable
+class ParserFunctionCatalog 
 {
 public:
 
@@ -65,12 +64,9 @@ public:
   // For debugging
   void print();
 
-  mutex_type mutex_;
-
 private:
 
-  // List of functions and their return type
-  ParserFunctionList functions_;
+  ParserFunctionCatalogPrivateHandle private_;
 };
 
 }

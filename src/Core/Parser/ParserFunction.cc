@@ -32,32 +32,47 @@
 namespace Core
 {
 
-ParserFunction::ParserFunction( std::string function_id, std::string type ) :
-function_id_(function_id),
-function_type_(type)
+class ParserFunctionPrivate
 {
+public:
+  // The ID of the function, which is the name plus arguments in one string
+  std::string function_id_;
+
+  // The return type of the function
+  std::string function_type_;
+
+  // Flags define properties of this function
+  int function_flags_;
+};
+
+ParserFunction::ParserFunction( std::string function_id, std::string type ) :
+  private_( new ParserFunctionPrivate )
+{
+  this->private_->function_id_ = function_id;
+  this->private_->function_type_ = type;
 }
 
-ParserFunction::ParserFunction( std::string function_id,std::string type, int fflags ) :
-function_id_(function_id),
-function_type_(type),
-function_flags_(fflags)
+ParserFunction::ParserFunction( std::string function_id, std::string type, int fflags ) :
+  private_( new ParserFunctionPrivate )
 {
+  this->private_->function_id_ = function_id;
+  this->private_->function_type_ = type;
+  this->private_->function_flags_ = fflags;
 }
 
 std::string ParserFunction::get_function_id()
 {
-  return this->function_id_;
+  return this->private_->function_id_;
 }
 
 std::string ParserFunction::get_return_type()
 {
-  return this->function_type_;
+  return this->private_->function_type_;
 }
 
 int ParserFunction::get_flags()
 {
-  return this->function_flags_;
+  return this->private_->function_flags_;
 }
 
 }

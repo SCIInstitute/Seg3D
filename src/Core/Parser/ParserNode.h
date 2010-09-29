@@ -31,13 +31,16 @@
 
 // STL includes
 #include <string>
-#include <vector>
 
 // Core includes
 #include <Core/Parser/ParserFWD.h>
 
 namespace Core
 {
+
+// Hide header includes, private interface and implementation
+class ParserNodePrivate;
+typedef boost::shared_ptr< ParserNodePrivate > ParserNodePrivateHandle;
 
 // ParserNode : This class is a piece of an expression. The ParserNode
 //              class marks: functions, variables, constants, and string
@@ -88,24 +91,7 @@ public:
   void print( int level );
 
 private:
-  // Define the kind of the node, this can be a constant, a variable, or
-  // a function.
-  int kind_;
-
-  // The return type of this node, this is used in the second pass
-  // where expressions are validated
-  std::string type_;
-
-  // The name of the variable or the function, the constant scalar value,
-  // or the contents of a parsed string
-  std::string value_;
-
-  // Pieces for functions
-  // Argument trees of the function arguments
-  std::vector< ParserNodeHandle > args_;
-
-  // Pointer to where the function is
-  ParserFunction* function_;
+  ParserNodePrivateHandle private_;
 };
 
 }

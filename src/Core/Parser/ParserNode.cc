@@ -28,6 +28,7 @@
 
 // STL includes
 #include <iostream>
+#include <vector>
 
 // Core includes
 #include <Core/Parser/ParserEnums.h>
@@ -36,6 +37,47 @@
 
 namespace Core
 {
+
+class ParserNodePrivate
+{
+public:
+  // Define the kind of the node, this can be a constant, a variable, or
+  // a function.
+  int kind_;
+
+  // The return type of this node, this is used in the second pass
+  // where expressions are validated
+  std::string type_;
+
+  // The name of the variable or the function, the constant scalar value,
+  // or the contents of a parsed string
+  std::string value_;
+
+  // Pieces for functions
+  // Argument trees of the function arguments
+  std::vector< ParserNodeHandle > args_;
+
+  // Pointer to where the function is
+  ParserFunction* function_;
+};
+
+ParserNode::ParserNode( int kind, std::string value ) :
+  private_( new ParserNodePrivate )
+{
+  this->private_->kind_ = kind;
+  this->private_->type_ = "U";
+  this->private_->value_ = value;
+  this->private_->function_ = 0;
+}
+
+ParserNode::ParserNode( int kind, std::string value, std::string type ) :
+  private_( new ParserNodePrivate )
+{
+  this->private_->kind_ = kind;
+  this->private_->type_ = type;
+  this->private_->value_ = value;
+  this->private_->function_ = 0;
+}
 
 // Print function for debugging
 void ParserNode::print( int level )
@@ -47,108 +89,92 @@ void ParserNode::print( int level )
   }
 
   // The four currently support constructs
-  switch( this->kind_ )
+  switch( this->private_->kind_ )
   {
   case PARSER_CONSTANT_SCALAR_E:
-    std::cout << "SCALAR_CONSTANT (" << ParserVariableType( this->type_ ) << "): " 
-      << this->value_ << "\n";
+    std::cout << "SCALAR_CONSTANT (" << ParserVariableType( this->private_->type_ ) << "): " 
+      << this->private_->value_ << "\n";
     break;
   case PARSER_CONSTANT_STRING_E:
-    std::cout << "STRING_CONSTANT (" << ParserVariableType( this->type_ ) << "): " 
-      << this->value_ << "\n";
+    std::cout << "STRING_CONSTANT (" << ParserVariableType( this->private_->type_ ) << "): " 
+      << this->private_->value_ << "\n";
     break;
   case PARSER_VARIABLE_E:
-    std::cout << "VARIABLE (" << ParserVariableType( this->type_ ) << "): " 
-      << this->value_ << "\n";
+    std::cout << "VARIABLE (" << ParserVariableType( this->private_->type_ ) << "): " 
+      << this->private_->value_ << "\n";
     break;
   case PARSER_FUNCTION_E:
-    std::cout << "FUNCTION (" << ParserVariableType( this->type_ ) << "): " 
-      << this->value_ << "\n";
-    for ( size_t j = 0; j < this->args_.size(); j++ )
+    std::cout << "FUNCTION (" << ParserVariableType( this->private_->type_ ) << "): " 
+      << this->private_->value_ << "\n";
+    for ( size_t j = 0; j < this->private_->args_.size(); j++ )
     {
-      this->args_[ j ]->print( level + 1 );
+      this->private_->args_[ j ]->print( level + 1 );
     }
     break;
   }
 }
 
-ParserNode::ParserNode( int kind, std::string value ) :
-kind_( kind ), 
-  type_( "U" ), 
-  value_( value ), 
-  function_( 0 )
-{
-}
-
-ParserNode::ParserNode( int kind, std::string value, std::string type ) :
-kind_( kind ), 
-  type_( type ), 
-  value_( value ), 
-  function_( 0 )
-{
-}
-
 int ParserNode::get_kind()
 {
-  return this->kind_;
+  return this->private_->kind_;
 }
 
 std::string ParserNode::get_type()
 {
-  return this->type_;
+  return this->private_->type_;
 }
 
 std::string ParserNode::get_value()
 {
-  return this->value_;
+  return this->private_->value_;
 }
 
 void ParserNode::set_value( std::string& value )
 {
-  this->value_ = value;
+  this->private_->value_ = value;
 }
 
 Core::ParserNodeHandle ParserNode::get_arg( size_t j )
 {
-  return this->args_[ j ];
+  return this->private_->args_[ j ];
 }
 
 void ParserNode::set_arg( size_t j, ParserNodeHandle& handle )
 {
-  if ( j >= this->args_.size() )
+  if ( j >= this->private_->args_.size() )
   {
-    this->args_.resize( j + 1 );
+    this->private_->args_.resize( j + 1 );
   }
-  this->args_[ j ] = handle;
+  this->private_->args_[ j ] = handle;
 }
 
 void ParserNode::set_arg( size_t j, ParserNode* ptr )
 {
-  if ( j >= this->args_.size() ) 
+  if ( j >= this->private_->args_.size() ) 
   {
-    this->args_.resize( j + 1 );
+    this->private_->args_.resize( j + 1 );
   }
-  this->args_[ j ] = ParserNodeHandle( ptr );
+  this->private_->args_[ j ] = ParserNodeHandle( ptr );
 }
 
 void ParserNode::set_function( ParserFunction* func )
 {
-  this->function_ = func;
+  this->private_->function_ = func;
 }
 
 ParserFunction* ParserNode::get_function()
 {
-  return this->function_;
+  return this->private_->function_;
 }
 
 void ParserNode::set_type( std::string type )
 {
-  this->type_ = type;
+  this->private_->type_ = type;
 }
 
 size_t ParserNode::num_args()
 {
-  return this->args_.size();
+  return this->private_->args_.size();
 }
 
 }

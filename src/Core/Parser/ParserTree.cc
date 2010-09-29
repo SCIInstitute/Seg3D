@@ -37,45 +37,59 @@
 namespace Core
 {
 
+class ParserTreePrivate
+{
+public:
+  // The name of the variable that needs to be assigned
+  std::string varname_;
+
+  // The tree of functions that need to be called to compute this variable
+  ParserNodeHandle expression_;
+
+  // Return type of the expression
+  std::string type_;
+};
+
+ParserTree::ParserTree( std::string varname, ParserNodeHandle expression ) :
+  private_( new ParserTreePrivate )
+{
+  this->private_->varname_ = varname;
+  this->private_->expression_ = expression;
+  this->private_->type_ = "U";
+}
+
 // Print function for debugging
 void ParserTree::print()
 {
-  std::cout << "NEW VARIABLE NAME (" << ParserVariableType( this->type_ ) << "):" 
-    << this->varname_ << "\n";
+  std::cout << "NEW VARIABLE NAME (" << ParserVariableType( this->private_->type_ ) << "):" 
+    << this->private_->varname_ << "\n";
   // Print the contents of the tree
-  this->expression_->print( 1 );
-}
-
-ParserTree::ParserTree( std::string varname, ParserNodeHandle expression ) :
-varname_( varname ),
-  expression_( expression ),
-  type_( "U" )
-{
+  this->private_->expression_->print( 1 );
 }
 
 std::string ParserTree::get_varname()
 {
-  return this->varname_;
+  return this->private_->varname_;
 }
 
 ParserNodeHandle ParserTree::get_expression_tree()
 {
-  return this->expression_;
+  return this->private_->expression_;
 }
 
 void ParserTree::set_expression_tree( ParserNodeHandle& handle )
 {
-  this->expression_ = handle;
+  this->private_->expression_ = handle;
 }
 
 void ParserTree::set_type( std::string type )
 {
-  this->type_ = type;
+  this->private_->type_ = type;
 }
 
 std::string ParserTree::get_type()
 {
-  return this->type_;
+  return this->private_->type_;
 }
 
 }

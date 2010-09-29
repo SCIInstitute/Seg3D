@@ -33,6 +33,19 @@
 namespace Core
 {
 
+class ParserVariablePrivate
+{
+public:
+  // The name of the variable
+  std::string name_;
+
+  // The type of the variable
+  std::string type_;
+
+  // Flags that guide the parser
+  int flags_;
+};
+
 std::string ParserVariableType( std::string type )
 {
   if ( type == "U" ) return std::string( "Unknown" );
@@ -43,43 +56,46 @@ std::string ParserVariableType( std::string type )
 }
 
 ParserVariable::ParserVariable( std::string name, std::string type ) :
-  name_( name ), 
-  type_( type ), 
-  flags_( SCRIPT_SINGLE_VAR_E )
+  private_( new ParserVariablePrivate )
 {
+  this->private_->name_ = name;
+  this->private_->type_ = type;
+  this->private_->flags_ = SCRIPT_SINGLE_VAR_E;
 }
 
 ParserVariable::ParserVariable( std::string name, std::string type, int flags ) :
-  name_( name ), 
-  type_( type ), 
-  flags_( flags )
+  private_( new ParserVariablePrivate )
 {
+  this->private_->name_ = name;
+  this->private_->type_ = type;
+  this->private_->flags_ = flags;
+
   // Default is a single variable
   // Currently one can choose between a sequence or a single
   if ( flags == 0 )
   {
-    this->flags_ = SCRIPT_SINGLE_VAR_E;
+    this->private_->flags_ = SCRIPT_SINGLE_VAR_E;
   }
 }
 
 std::string ParserVariable::get_type()
 {
-  return this->type_;
+  return this->private_->type_;
 }
 
 void ParserVariable::set_type( std::string type )
 {
-  this->type_ = type;
+  this->private_->type_ = type;
 }
 
 int ParserVariable::get_flags()
 {
-  return this->flags_;
+  return this->private_->flags_;
 }
 
 std::string ParserVariable::get_name()
 {
-  return this->name_;
+  return this->private_->name_;
 }
 
 }

@@ -32,10 +32,26 @@
 namespace Core
 {
 
-double* ArrayMathProgramVariable::get_data()
+class ArrayMathProgramVariablePrivate
 {
-  return this->data_;
+public:
+  // Name of variable
+  std::string name_;
+
+  // Where the data needs to be store
+  double* data_;
+};
+
+ArrayMathProgramVariable::ArrayMathProgramVariable( std::string name, double* data ) :  
+  private_( new ArrayMathProgramVariablePrivate )
+{
+  this->private_->name_ = name;
+  this->private_->data_ = data;
 }
 
+double* ArrayMathProgramVariable::get_data()
+{
+  return this->private_->data_;
+}
 
 } // end namespace

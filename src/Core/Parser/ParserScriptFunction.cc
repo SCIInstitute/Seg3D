@@ -28,6 +28,7 @@
 
 // STL includes
 #include <iostream>
+#include <vector>
 
 // Core includes
 #include <Core/Parser/ParserScriptFunction.h>
@@ -36,83 +37,103 @@
 namespace Core
 {
 
+class ParserScriptFunctionPrivate
+{
+public:
+  // The name of the function
+  std::string name_;
+
+  // Flags that describe whether this is a single or sequential call
+  int flags_;
+
+  // Pointer to the function information block
+  ParserFunction* function_;
+
+  // Input variables in the function depends on
+  std::vector< ParserScriptVariableHandle > input_variables_;
+
+  // Output variable
+  ParserScriptVariableHandle output_variable_;
+};
+
+ParserScriptFunction::ParserScriptFunction( std::string name, ParserFunction* function ) :
+  private_( new ParserScriptFunctionPrivate )
+{
+  this->private_->name_ = name;
+  this->private_->flags_ = 0;
+  this->private_->function_ = function;
+}
+
 void ParserScriptFunction::print()
 {
-  std::cout << "  " << this->output_variable_->get_uname() << " = " << this->name_ << "(";
-  for ( size_t j = 0; j < this->input_variables_.size(); j++ )
+  std::cout << "  " << this->private_->output_variable_->get_uname() << " = " << this->private_->name_ << "(";
+  for ( size_t j = 0; j < this->private_->input_variables_.size(); j++ )
   {
-    std::cout << this->input_variables_[ j ]->get_uname();
-    if ( j < ( this->input_variables_.size() - 1 ) )
+    std::cout << this->private_->input_variables_[ j ]->get_uname();
+    if ( j < ( this->private_->input_variables_.size() - 1 ) )
     {
       std::cout << ",";
     }
   }
-  std::cout << ")  flags=" << this->flags_ << " \n";
-}
-
-ParserScriptFunction::ParserScriptFunction( std::string name, ParserFunction* function ) :
-name_( name ), 
-  flags_( 0 ), 
-  function_( function )
-{
+  std::cout << ")  flags=" << this->private_->flags_ << " \n";
 }
 
 std::string ParserScriptFunction::get_name()
 {
-  return this->name_;
+  return this->private_->name_;
 }
 
 size_t ParserScriptFunction::num_input_vars()
 {
-  return this->input_variables_.size();
+  return this->private_->input_variables_.size();
 }
 
 Core::ParserScriptVariableHandle ParserScriptFunction::get_input_var( size_t j )
 {
-  if ( j < this->input_variables_.size() )
+  if ( j < this->private_->input_variables_.size() )
   {
-    return this->input_variables_[ j ];
+    return this->private_->input_variables_[ j ];
   }
   return ParserScriptVariableHandle();
 }
 
 void ParserScriptFunction::set_input_var( size_t j, ParserScriptVariableHandle& handle )
 {
-  if ( j >= this->input_variables_.size() ) 
+  if ( j >= this->private_->input_variables_.size() ) 
   {
-    this->input_variables_.resize( j + 1 );
+    this->private_->input_variables_.resize( j + 1 );
   }
-  this->input_variables_[ j ] = handle;
+  this->private_->input_variables_[ j ] = handle;
 }
 
 Core::ParserScriptVariableHandle ParserScriptFunction::get_output_var()
 {
-  return this->output_variable_;
+  return this->private_->output_variable_;
 }
 
 void ParserScriptFunction::set_output_var( ParserScriptVariableHandle& handle )
 {
-  this->output_variable_ = handle;
+  this->private_->output_variable_ = handle;
 }
 
 ParserFunction* ParserScriptFunction::get_function()
 {
-  return this->function_;
+  return this->private_->function_;
 }
 
 int ParserScriptFunction::get_flags()
 {
-  return this->flags_;
+  return this->private_->flags_;
 }
 
 void ParserScriptFunction::set_flags( int flags )
 {
-  this->flags_ |= flags;
+  this->private_->flags_ |= flags;
 }
 
 void ParserScriptFunction::clear_flags()
 {
-  this->flags_ = 0;
+  this->private_->flags_ = 0;
 }
 
 }

@@ -32,8 +32,15 @@
 // STL includes
 #include <string>
 
+// Boost includes 
+#include <boost/shared_ptr.hpp>
+
 namespace Core
 {
+
+// Hide header includes, private interface and implementation
+class ParserVariablePrivate;
+typedef boost::shared_ptr< ParserVariablePrivate > ParserVariablePrivateHandle;
 
 // Render human readable output
 std::string ParserVariableType( std::string type );
@@ -60,14 +67,7 @@ public:
   std::string get_name();
 
 private:
-  // The name of the variable
-  std::string name_;
-
-  // The type of the variable
-  std::string type_;
-
-  // Flags that guide the parser
-  int flags_;
+  ParserVariablePrivateHandle private_;
 };
 
 }

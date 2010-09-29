@@ -30,8 +30,6 @@
 #define CORE_PARSER_PARSER_H 
 
 // STL includes
-#include <list>
-#include <map>
 #include <string>
 #include <vector>
 
@@ -55,6 +53,10 @@ namespace Core
 // ParserFunctionCatalog: This class contains a list of functions that are
 //              available, and hence is used for validating the program
 
+// Hide header includes, private interface and implementation
+class ParserPrivate;
+typedef boost::shared_ptr< ParserPrivate > ParserPrivateHandle;
+
 std::string ParserFunctionID( std::string name );
 std::string ParserFunctionID( std::string name, int arg1 );
 std::string ParserFunctionID( std::string name, int arg1, int arg2 );
@@ -67,23 +69,6 @@ std::string ParserFunctionID( std::string name, std::vector< int > args );
 // hierarchical order.
 class Parser
 {
-
-  // Classes for storing the operator information
-  class BinaryOperator
-  {
-  public:
-    std::string operator_;
-    std::string funname_;
-    int priority_;
-  };
-
-  class UnaryOperator
-  {
-  public:
-    std::string operator_;
-    std::string funname_;
-  };
-
 public:
   // Constructor
   Parser();
@@ -132,125 +117,7 @@ public:
   void add_numerical_constant( std::string name, double val );
 
 private:
-  // Get an expression from the program code. Expressions are read sequentially
-  // and this function will modify the input and remove the first expression.
-  bool scan_expression( std::string& expressions, std::string& expression );
-
-  // This function breaks down an expression into two components
-  // The part to the left of the equal sign
-  // The part to the right of the equal sign
-  // The variable name is checked to see whether it is valid
-  // The expression part is not parsed by this function that is done separately
-  bool split_expression( std::string expression, std::string& varname, std::string& vartree );
-
-  // Parse the parts on the right hand side of the equal sign of the expression
-  bool parse_expression_tree( std::string expression, ParserNodeHandle& ehandle,
-    std::string& error );
-
-  // Scan whether the string starts with a sub expression, i.e. '( ..... )'
-  bool scan_sub_expression( std::string& expression, std::string& subexpression );
-
-  // Scan whether the string starts with a subs assignment expression, i.e. '[ ..... ]'
-  bool scan_subs_expression( std::string& expression, std::string& subexpression );
-
-  // Scan for a numeric constant at the start of the string
-  // A numeric constant must start with a number
-  // Numbers like 0x12 077 1.23E-8 etc should all be detected by this
-  // function. It strips out the number and returns that piece of the string
-  bool scan_constant_value( std::string& expression, std::string& value );
-
-  // Scan for a variable name at the start of the string
-  // A variable name should start with a-zA-Z or _ and can have
-  // numbers for the second character and further.
-  // It should not contain any spaces.
-  // This function checks as well if the name is followed by spaces and '('
-  // If so it is not a variable name, but a function name
-  // This function strips out the variable name out of expression and
-  // returns in var_name
-  bool scan_variable_name( std::string& expression, std::string& var_name );
-
-  // Scan for a string. A srting is a piece of code between quotes e.g. "foo"
-  // This function should recognize most escape characters in the string and
-  // will translate them as well
-  bool scan_constant_string( std::string& expression, std::string& str );
-
-  // Scan for a function. A function starts with a variable name, but is
-  // followed by optional spaces and then (...,....,...), which is the 
-  // argument list. This function should scan for those argument lists
-  bool scan_function( std::string& expression, std::string& function );
-
-  // Scan for the equal sign, this is used to parse expressions
-  // Each expression should contain one
-  bool scan_equal_sign( std::string& expression );
-
-  // Split a string with code for a function into the function name and into
-  // its arguments
-  void split_function( std::string& expression, std::string& fun_name,
-    std::vector< std::string >& fun_args );
-
-  // Split a string with code for a subs function into its arguments
-  void split_subs( std::string& expression, std::vector< std::string >& start_args,
-    std::vector< std::string >& step_args, std::vector< std::string >& end_args,
-    std::string& varname );
-
-  // Check for syntax errors in the code
-  bool check_syntax( std::string& expression, std::string& error );
-
-  // Scan whether the expression starts with a binary operator
-  bool scan_binary_operator( std::string& expression, std::string& binary_operator );
-
-  // Scan whether the expression starts with an unary operator
-  bool scan_pre_unary_operator( std::string& expression, std::string& unary_operator );
-
-  // Scan whether the expression starts with an unary operator
-  bool scan_post_unary_operator( std::string& expression, std::string& unary_operator );
-
-  // Get the functionname of the unary operator
-  // The name that should be in the FunctionCatalog
-  bool get_unary_function_name( std::string& unary_operator, std::string& fun_name );
-
-  // Get the functionname of the binary operator
-  // The name that should be in the FunctionCatalog
-  bool get_binary_function_name( std::string& binary_operator, std::string& fun_name );
-
-  // Binary operators need a priority in which they are evaluated
-  // This one returns the priority of each operator
-  bool get_binary_priority( std::string& binary_operator, int& priority );
-
-  //------------------------------------------------------------
-  // General functions for parsing text    
-  // Remove a parentheses pair at the start and end of the string
-  bool remove_global_parentheses( std::string& expression );
-
-  // Remove // and /* comments from the expression
-  void remove_comments( std::string& expression );
-
-  //------------------------------------------------------------
-  // Sub functions for validation
-  bool recursive_validate( ParserNodeHandle& handle, ParserFunctionCatalogHandle& fhandle,
-    ParserVariableList& var_list, std::string& error, std::string& expression );
-
-  //------------------------------------------------------------
-  // Sub functions for optimization
-  void optimize_mark_used( ParserScriptFunctionHandle& fhandle );
-
-  bool optimize_process_node( ParserNodeHandle& nhandle,
-    std::list< ParserScriptVariableHandle >& variables,
-    std::map< std::string, ParserScriptVariableHandle >& named_variables,
-    std::list< ParserScriptFunctionHandle >& functions,
-    ParserScriptVariableHandle& ohandle, int& cnt, std::string& error );
-
-private:
-  // List of supported binary operators e.g. + - * /
-  std::map< std::string, BinaryOperator > binary_operators_;
-  // List of pre unary opertors e.g. + - ! ~
-  std::map< std::string, UnaryOperator > unary_pre_operators_;
-  // List of post unary opertors e.g. '
-  std::map< std::string, UnaryOperator > unary_post_operators_;
-
-  // List of numerical constants, e.g. nan, inf, false, true etc.
-  std::map< std::string, double > numerical_constants_;
-
+  ParserPrivateHandle private_;
 };
 
 }

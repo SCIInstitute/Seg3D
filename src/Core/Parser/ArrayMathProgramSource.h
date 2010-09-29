@@ -35,11 +35,15 @@
 namespace Core
 {
 
+// Hide header includes, private interface and implementation
+class ArrayMathProgramSourcePrivate;
+typedef boost::shared_ptr< ArrayMathProgramSourcePrivate > ArrayMathProgramSourcePrivateHandle;
+
 class ArrayMathProgramSource
 {
 
 public:
-  ArrayMathProgramSource() {}
+  ArrayMathProgramSource();
 
   void set_data_block( DataBlockHandle data_block );
   DataBlock* get_data_block();
@@ -50,8 +54,7 @@ public:
   bool is_mask_data_block();
 
 private:
-  DataBlockHandle data_block_;
-  MaskDataBlockHandle mask_data_block_;
+  ArrayMathProgramSourcePrivateHandle private_;
 };
 
 }

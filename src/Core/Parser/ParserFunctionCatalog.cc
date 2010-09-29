@@ -28,19 +28,36 @@
 
 // STL includes
 #include <iostream>
+#include <map>
 
 // Core includes
 #include <Core/Parser/ParserFunction.h>
 #include <Core/Parser/ParserFunctionCatalog.h> 
+#include <Core/Utils/Lockable.h>
 
 namespace Core
 {
 
+// The list of functions
+typedef std::map< std::string, ParserFunction* > ParserFunctionList;
+
+class ParserFunctionCatalogPrivate : public Lockable
+{
+public:
+  // List of functions and their return type
+  ParserFunctionList functions_;
+};
+
+ParserFunctionCatalog::ParserFunctionCatalog() :
+  private_( new ParserFunctionCatalogPrivate )
+{
+}
+
 void ParserFunctionCatalog::print()
 {
   ParserFunctionList::iterator it, it_end;
-  it = this->functions_.begin();
-  it_end = this->functions_.end();
+  it = this->private_->functions_.begin();
+  it_end = this->private_->functions_.end();
 
   std::cout << "FUNCTION CATALOG:\n";
   while ( it != it_end )
@@ -52,22 +69,18 @@ void ParserFunctionCatalog::print()
 
 void ParserFunctionCatalog::add_function( ParserFunction* function )
 {
-  ParserFunctionCatalog::lock_type lock( this->get_mutex() );
+  ParserFunctionCatalogPrivate::lock_type lock( this->private_->get_mutex() );
   std::string funid = function->get_function_id();
-  this->functions_[ funid ] = function;
+  this->private_->functions_[ funid ] = function;
 }
 
 bool ParserFunctionCatalog::find_function( std::string fid, ParserFunction*& function )
 {
-  ParserFunctionList::iterator it = this->functions_.find( fid );
-  if ( it == this->functions_.end() ) return false;
+  ParserFunctionList::iterator it = this->private_->functions_.find( fid );
+  if ( it == this->private_->functions_.end() ) return false;
 
   function = ( *it ).second;
   return true;
-}
-
-ParserFunctionCatalog::ParserFunctionCatalog() 
-{
 }
 
 }

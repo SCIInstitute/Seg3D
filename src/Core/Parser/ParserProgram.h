@@ -31,7 +31,6 @@
 
 // STL includes
 #include <string>
-#include <vector>
 
 // Core includes
 #include <Core/Parser/ParserFWD.h>
@@ -39,11 +38,15 @@
 namespace Core
 {
 
+// Hide header includes, private interface and implementation
+class ParserProgramPrivate;
+typedef boost::shared_ptr< ParserProgramPrivate > ParserProgramPrivateHandle;
+
 // ParserProgram: This class simply binds a series of expressions together.
 class ParserProgram
 {
 public:
-  ParserProgram() {}
+  ParserProgram();
 
   // Add an expression to a program: this is a combination of the raw 
   // unparsed program code and the expression tree
@@ -102,35 +105,7 @@ public:
   void print();
 
 private:
-  // Short cut to the parser function catalog
-  ParserFunctionCatalogHandle catalog_;
-
-  // The list of expressions, we store both the raw expression as well as the
-  // parsed version in order to effectively report back to user which expression
-  // is faulty. As the parsed version is harder to read, the raw version is kept.
-  std::vector< std::pair< std::string, ParserTreeHandle > > expressions_;
-
-  // List of variables that exist when the program starts. This contains the
-  // list of variables the program can use, without them being defined in one
-  // of the expressions
-  ParserVariableList input_variables_;
-
-  // List of output variables that need to be generated as they are required
-  // by the rest of the program. These variables need to be defined at the
-  // end of the program
-  ParserVariableList output_variables_;
-
-  // The next series of variables represent the next stage of the parser
-  // In this stage everything is a variable or a function, and we have two
-  // lists of constants one for double constants and one for string constants
-
-  std::vector< ParserScriptVariableHandle > const_variables_;
-  std::vector< ParserScriptVariableHandle > single_variables_;
-  std::vector< ParserScriptVariableHandle > sequential_variables_;
-
-  std::vector< ParserScriptFunctionHandle > const_functions_;
-  std::vector< ParserScriptFunctionHandle > single_functions_;
-  std::vector< ParserScriptFunctionHandle > sequential_functions_;
+  ParserProgramPrivateHandle private_;
 };
 
 }
