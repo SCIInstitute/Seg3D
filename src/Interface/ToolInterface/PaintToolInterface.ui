@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>208</width>
-    <height>409</height>
+    <height>364</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -64,6 +64,12 @@
       </item>
       <item>
        <widget class="QCheckBox" name="use_active_layer_">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="text">
          <string>Always Use Active Layer</string>
         </property>
@@ -98,6 +104,12 @@
       </item>
       <item>
        <widget class="QCheckBox" name="negative_mask_constraint_">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="text">
          <string>Negative Constraint</string>
         </property>
@@ -109,7 +121,7 @@
    <item>
     <widget class="QGroupBox" name="data_constraint_groupbox_">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -138,7 +150,16 @@
       <bool>false</bool>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
-      <property name="margin">
+      <property name="leftMargin">
+       <number>4</number>
+      </property>
+      <property name="topMargin">
+       <number>4</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
        <number>4</number>
       </property>
       <item>
@@ -199,7 +220,7 @@
          <number>4</number>
         </property>
         <property name="rightMargin">
-         <number>4</number>
+         <number>0</number>
         </property>
        </layout>
       </item>
@@ -237,7 +258,7 @@
          <number>4</number>
         </property>
         <property name="rightMargin">
-         <number>4</number>
+         <number>0</number>
         </property>
        </layout>
       </item>

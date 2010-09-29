@@ -46,8 +46,6 @@ public:
 private:
     void accept();
   QString session_name_;
-
-
 };
 
 class ExportInfoPage : public QWizardPage
@@ -61,6 +59,8 @@ public:
   QString session_name_;
   
 protected:
+  // INITIALIZEPAGE:
+  // function for preloading the page information for the info page
     void initializePage();
 
 private:
@@ -72,6 +72,8 @@ private:
     QCheckBox *automatically_consolidate_checkbox_;
 
 private Q_SLOTS:
+  // SETPATH:
+  // helper function for setting the path for project export
     void set_path();
 };
 
@@ -83,6 +85,8 @@ public:
     ExportSummaryPage(QWidget *parent = 0);
 
 protected:
+  // INITIALIZEPAGE:
+  // function for preloading the page information for the summary page
     void initializePage();
 
 private:
@@ -90,9 +94,7 @@ private:
     QLabel *project_name_;
     QLabel *project_path_;
   QLabel *consolidate_;
-
 };
-
 
 } // end namespace Seg3D
 #endif // APPPROJECTWIZARD_H

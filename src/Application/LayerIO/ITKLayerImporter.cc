@@ -34,6 +34,8 @@
 #include "itkImageSeriesReader.h"
 #include "gdcmException.h"
 
+#include <teem/nrrd.h>
+
 // Boost Includes
 #include <boost/lexical_cast.hpp>
 

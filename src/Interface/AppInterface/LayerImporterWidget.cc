@@ -95,6 +95,9 @@ LayerImporterWidget::LayerImporterWidget( std::vector< LayerImporterHandle > imp
 
   boost::thread( boost::bind( &LayerImporterWidget::ScanFile, 
     qpointer_type( this ), this->private_->importers_[ 0 ] ) );
+  
+  this->private_->ui_.horizontalLayout_20->setAlignment( Qt::AlignCenter );
+  this->private_->ui_.swap_x_y_spacing_widget_->hide();
 }
 
 
@@ -155,6 +158,11 @@ void LayerImporterWidget::list_import_options()
     this->private_->data_volume_button->setMinimumSize( this->private_->ui_.data_->size() );
     this->private_->data_volume_button->setChecked( true );
     this->private_->mode_ = LayerImporterMode::DATA_E;
+    std::string extension = boost::filesystem::path( this->private_->files_[ 0 ] ).extension();
+    if( ( extension == ".dcm" ) || ( extension == "" ) )
+    {
+      this->private_->ui_.swap_x_y_spacing_widget_->show();
+    }
   }
   else
   {
@@ -244,6 +252,7 @@ void LayerImporterWidget::import()
   this->private_->ui_.scanning_file_->show();
   this->private_->ui_.importer_options_->hide();
   this->private_->ui_.file_name_table_->hide();
+  this->private_->ui_.swap_x_y_spacing_widget_->hide();
   this->setMaximumHeight( 80 );
   this->setUpdatesEnabled( true );
   
@@ -265,10 +274,13 @@ void LayerImporterWidget::import()
       QString::fromStdString( full_filename.leaf() ) );
     this->repaint();
     this->private_->importers_[ i ]->import_header();
+    
   }
   
   for( int i = 0; i < static_cast< int >( this->private_->importers_.size() ); ++i )
   {
+    this->private_->importers_[ i ]->set_swap_xy_spacing( 
+      this->private_->ui_.swap_spacing_checkbox_->isChecked() );
     ActionImportLayer::Dispatch( Core::Interface::GetWidgetActionContext(), 
       this->private_->importers_[ i ], this->private_->mode_, this->private_->series_ );
   }

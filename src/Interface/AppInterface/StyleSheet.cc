@@ -164,6 +164,9 @@ namespace Seg3D
     "   stop:0 rgba(193, 215, 255, 255),"
     "   stop:0.353234 rgba(204, 222, 255, 255),"
     "   stop:1 rgba(164, 196, 255, 255));"
+    "}"                                  
+    "QWidget#header_{"
+    " border-bottom: 1px solid rgb(73, 111, 160);"
     "}");
 
   const QString StyleSheet::LAYER_WIDGET_BASE_ACTIVE_IN_USE_C = QString::fromUtf8(
@@ -174,6 +177,9 @@ namespace Seg3D
     "   stop:0 rgba(193, 255, 255, 255),"
     "   stop:0.353234 rgba(204, 255, 255, 255),"
     "   stop:1 rgba(164, 255, 255, 255));"
+    "}"                                  
+    "QWidget#header_{"
+    " border-bottom: 1px solid rgb(73, 111, 160);"
     "}");
 
   const QString StyleSheet::LAYER_WIDGET_BASE_IN_USE_C = QString::fromUtf8(
@@ -184,7 +190,10 @@ namespace Seg3D
     "   stop:0 rgba(193, 255, 215, 255),"
     "   stop:0.353234 rgba(204, 255, 222, 255),"
     "   stop:1 rgba(164, 255, 196, 255));"
-    "}");
+    "}"                                  
+      "QWidget#header_{"
+      " border-bottom: 1px solid rgb(73, 111, 160);"
+      "}");
   
   // - INACTIVE - //
   const QString StyleSheet::LAYER_WIDGET_BASE_INACTIVE_C = QString::fromUtf8(
@@ -195,7 +204,11 @@ namespace Seg3D
     "   stop:1 rgba(194, 194, 194, 255));"
     " border-radius: 3px;"
     " border: 1px solid rgb(80, 80, 80);"
-    "}");
+    "}"
+      "QWidget#header_{"
+      " border-bottom: 1px solid rgb(80, 80, 80);"
+      "}");
+  
   const QString StyleSheet::LAYER_WIDGET_LABEL_INACTIVE_C = QString::fromUtf8(
     "QLineEdit#label_{"
     " text-align: left;"

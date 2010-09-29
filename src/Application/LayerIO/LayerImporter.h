@@ -150,19 +150,16 @@ public:
   // Get the filename without path and without extension
   std::string get_base_filename();
   
+  // -- Error handling --
+  // GET_ERROR:
+  // Get the last error recorded in the importer
+  std::string get_error() const { return error_; }
+  
   // -- internals of the importer -- 
 private:
   // FILENAME:
   std::string filename_;
   
-  // -- Error handling --
-public:
-  // GET_ERROR:
-  // Get the last error recorded in the importer
-  std::string get_error() const 
-  { 
-    return error_; 
-  }
 
 protected:
   // SET_ERROR:
@@ -188,6 +185,9 @@ public:
   // necessarily read the whole file. NOTE: Some external packages do not support reading a header
   // and hence these importers should read the full file here.
   virtual bool import_header() = 0;
+  
+  // SET_SWAP_XY_SPACING:
+  virtual void set_swap_xy_spacing( bool swap ){}
   
   // GET_GRID_TRANSFORM:
   // Get the grid transform of the grid that we are importing
@@ -222,6 +222,7 @@ protected:
   // GET_LAYER_NAME:
   // Return the string that will be used to name the layers.
   virtual std::string get_layer_name();
+  
 };
 
 

@@ -74,8 +74,17 @@ bool ActionExportLayer::run( Core::ActionContextHandle& context, Core::ActionRes
   filename_without_extension = filename_without_extension.substr( 0, 
     filename_without_extension.find_last_of( "." ) );
 
-  this->layer_exporter_.handle()->export_layer( mode, 
-    filename_and_path.parent_path().string(), filename_without_extension );
+  if( mode == LayerExporterMode::SINGLE_MASK_E )
+  {
+    this->layer_exporter_.handle()->export_layer( mode, 
+      filename_and_path.string(), "unused" );
+  }
+  else
+  {
+    this->layer_exporter_.handle()->export_layer( mode, 
+      filename_and_path.parent_path().string(), filename_without_extension );
+  }
+
   
   //LayerManager::Instance()->export_layer( this->file_path_.value() );
 

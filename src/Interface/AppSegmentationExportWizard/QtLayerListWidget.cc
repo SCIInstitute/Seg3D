@@ -56,11 +56,21 @@ QtLayerListWidget::~QtLayerListWidget()
 {
 }
 
-int QtLayerListWidget::get_value()
+int QtLayerListWidget::get_value() const
 {
   return this->private_->ui_.layer_spinbox_->value();
 }
 
+QString QtLayerListWidget::get_label() const
+{
+  return this->private_->ui_.layer_name_label_->text();
+}
+
+bool QtLayerListWidget::counter_hidden() const
+{
+  return this->private_->ui_.layer_spinbox_->isHidden();
+}
+  
 void QtLayerListWidget::set_validity( bool valid )
 {
   if( valid )
@@ -96,15 +106,9 @@ void QtLayerListWidget::hide_counter( bool hide )
   }
 }
 
-bool QtLayerListWidget::counter_hidden()
-{
-  return this->private_->ui_.layer_spinbox_->isHidden();
-}
 
-QString QtLayerListWidget::get_label() const
-{
-  return this->private_->ui_.layer_name_label_->text();
-}
+
+
 
 
 

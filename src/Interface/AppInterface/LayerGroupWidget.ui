@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>205</width>
-    <height>179</height>
+    <height>182</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -365,7 +365,7 @@ QWidget#group_tools_{
                <bool>true</bool>
               </property>
               <property name="checked">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
              </widget>
             </item>

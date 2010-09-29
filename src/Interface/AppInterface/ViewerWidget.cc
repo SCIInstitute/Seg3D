@@ -333,7 +333,11 @@ void ViewerWidget::change_view_type( int index )
   this->private_->ui_.slices_visible_button_->setVisible( is_volume_view );
   this->private_->ui_.light_visible_button_->setVisible( is_volume_view );
   this->private_->ui_.isosurfaces_visible_button_->setVisible( is_volume_view );
-  this->private_->ui_.volume_rendering_visible_button_->setVisible( is_volume_view); 
+  this->private_->ui_.volume_rendering_visible_button_->setVisible( is_volume_view);
+  
+  // disable buttons that we dont use yet.
+  this->private_->ui_.volume_rendering_visible_button_->setEnabled( false );
+  this->private_->ui_.overlay_visible_button_->setEnabled( !is_volume_view );
   
   this->resize( this->width(), this->height() );
 }

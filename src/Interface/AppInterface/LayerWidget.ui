@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>300</width>
-    <height>411</height>
+    <height>313</height>
    </rect>
   </property>
   <property name="mouseTracking">
@@ -17,19 +17,17 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QWidget#LayerWidget{
-  background-color: rgba(255,255,255,0);
-  border-radius: 3px;
-}
-QWidget#header_{
-  background-color: rgba(255,255,255,0);
-}
-
+   <string notr="true">
 QWidget#base_{
   background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.960227, stop:0 rgba(211, 211, 211, 255), stop:0.155779 rgba(225, 225, 225, 255), stop:1 rgba(194, 194, 194, 255));
-  border-radius: 1px;
-  border: 1px solid rgb(90, 90, 90);
+border: 1px solid gray;
+border-top-left-radius: 4px;
+border-top-right-radius:4px;
+border-bottom-right-radius: 4px;
+border-bottom-left-radius: 4px;
 }
+
+
 
 QLineEdit#label_{
   text-align: left;
@@ -295,7 +293,7 @@ QPushButton#activate_button_{
             <item>
              <widget class="QLineEdit" name="label_">
               <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
@@ -737,13 +735,6 @@ QPushButton#activate_button_{
           <number>4</number>
          </property>
          <item>
-          <widget class="Line" name="line_2">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-          </widget>
-         </item>
-         <item>
           <widget class="QWidget" name="widget_4" native="true">
            <layout class="QVBoxLayout" name="brightness_h_layout_">
             <property name="spacing">
@@ -849,19 +840,6 @@ QPushButton#activate_button_{
           <number>4</number>
          </property>
          <item>
-          <widget class="Line" name="opacity_bar_line_">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-          </widget>
-         </item>
-         <item>
           <widget class="QWidget" name="widget_3" native="true">
            <layout class="QVBoxLayout" name="verticalLayout_2">
             <property name="spacing">
@@ -912,19 +890,6 @@ QPushButton#activate_button_{
          <property name="bottomMargin">
           <number>4</number>
          </property>
-         <item>
-          <widget class="Line" name="progress_line_">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-          </widget>
-         </item>
          <item>
           <widget class="QWidget" name="widget_7" native="true">
            <layout class="QHBoxLayout" name="horizontalLayout_6">
@@ -1018,19 +983,6 @@ QPushButton#activate_button_{
          <property name="bottomMargin">
           <number>4</number>
          </property>
-         <item>
-          <widget class="Line" name="border_line_">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-          </widget>
-         </item>
          <item>
           <layout class="QVBoxLayout" name="color_widget_layout_"/>
          </item>
@@ -1156,13 +1108,6 @@ QPushButton#activate_button_{
          <property name="bottomMargin">
           <number>0</number>
          </property>
-         <item>
-          <widget class="Line" name="line_4">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-          </widget>
-         </item>
          <item>
           <layout class="QHBoxLayout" name="dimensions_layout_">
            <item>
@@ -1432,13 +1377,6 @@ QPushButton#activate_button_{
          <property name="bottomMargin">
           <number>4</number>
          </property>
-         <item>
-          <widget class="Line" name="line_3">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-          </widget>
-         </item>
          <item>
           <widget class="QLabel" name="abort_text_">
            <property name="font">

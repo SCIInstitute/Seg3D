@@ -299,6 +299,7 @@ void SegmentationSummaryPage::initializePage()
     QString finishText = wizard()->buttonText(QWizard::FinishButton);
     finishText.remove('&');
     
+  this->masks_.clear();
     this->layers_->deleteLater();
   
   QString masks = field( "maskList" ).toString();
