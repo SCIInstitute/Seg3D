@@ -40,19 +40,19 @@ namespace ArrayMathFunctions
 bool get_scalar_data( Core::ArrayMathProgramCode& pc )
 {
   // Destination 
-  double* data0 = pc.get_variable( 0 );
+  float* data0 = pc.get_variable( 0 );
 
   // Source
   Core::DataBlock& data1( *( pc.get_data_block( 1 ) ) );
   // One virtual call to get the data
 
-  double* data0_end = data0 + pc.get_size();
+  float* data0_end = data0 + pc.get_size();
   Core::index_type idx = pc.get_index();
 
-  double val;
+  float val;
   while( data0 != data0_end ) 
   {
-    val = data1.get_data_at( idx );
+    val = static_cast< float >( data1.get_data_at( idx ) );
     idx++;
 
     *data0 = val; 
@@ -65,20 +65,20 @@ bool get_scalar_data( Core::ArrayMathProgramCode& pc )
 bool get_scalar_mask( Core::ArrayMathProgramCode& pc )
 {
   // Destination 
-  double* data0 = pc.get_variable( 0 );
+  float* data0 = pc.get_variable( 0 );
 
   // Source
   Core::MaskDataBlock& data1( *( pc.get_mask_data_block( 1 ) ) );
   // One virtual call to get the data
 
-  double* data0_end = data0 + pc.get_size();
+  float* data0_end = data0 + pc.get_size();
   Core::index_type idx = pc.get_index();
 
   // Get value (on/off) from mask
-  double val;
+  float val;
   while( data0 != data0_end ) 
   {
-    val = data1.get_mask_at( idx ) ? 1 : 0;
+    val = data1.get_mask_at( idx ) ? 1.0f : 0.0f;
     idx++;
 
     *data0 = val; 
@@ -95,9 +95,9 @@ bool to_data_block_s( Core::ArrayMathProgramCode& pc )
 {
   // Get the pointer to the DataBlock object where we need to store the data
   Core::DataBlock& data0( *( pc.get_data_block( 0 ) ) );
-  double* data1 = pc.get_variable( 1 );
+  float* data1 = pc.get_variable( 1 );
 
-  double* data1_end = data1 + ( pc.get_size() );
+  float* data1_end = data1 + ( pc.get_size() );
   Core::index_type idx = pc.get_index();
 
   while ( data1 != data1_end ) 

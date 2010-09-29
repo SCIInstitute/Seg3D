@@ -39,17 +39,17 @@ public:
   std::string name_;
 
   // Where the data needs to be store
-  double* data_;
+  float* data_;
 };
 
-ArrayMathProgramVariable::ArrayMathProgramVariable( std::string name, double* data ) :  
+ArrayMathProgramVariable::ArrayMathProgramVariable( std::string name, float* data ) : 
   private_( new ArrayMathProgramVariablePrivate )
 {
   this->private_->name_ = name;
   this->private_->data_ = data;
 }
 
-double* ArrayMathProgramVariable::get_data()
+float* ArrayMathProgramVariable::get_data()
 {
   return this->private_->data_;
 }

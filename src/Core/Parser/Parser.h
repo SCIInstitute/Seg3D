@@ -114,7 +114,7 @@ public:
   void add_unary_post_operator( std::string op, std::string funname );
 
   // Mark special variable names as constants
-  void add_numerical_constant( std::string name, double val );
+  void add_numerical_constant( std::string name, float val );
 
 private:
   ParserPrivateHandle private_;

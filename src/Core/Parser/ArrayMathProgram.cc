@@ -49,7 +49,7 @@ public:
   size_type array_size_;
 
   // Memory buffer
-  std::vector< double > buffer_;
+  std::vector< float > buffer_;
 
   // Source and Sink information
   std::map< std::string, ArrayMathProgramSource > input_sources_;
@@ -330,7 +330,7 @@ void ArrayMathProgram::resize_sequential_functions( size_t sz )
   }
 }
 
-double* ArrayMathProgram::create_buffer( size_t size )
+float* ArrayMathProgram::create_buffer( size_t size )
 {
   this->private_->buffer_.resize( size ); 
   return &( this->private_->buffer_[ 0 ] );

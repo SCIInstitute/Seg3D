@@ -217,7 +217,7 @@ public:
   std::map< std::string, UnaryOperator > unary_post_operators_;
 
   // List of numerical constants, e.g. nan, inf, false, true etc.
-  std::map< std::string, double > numerical_constants_;
+  std::map< std::string, float > numerical_constants_;
 };
 
 // Strip of an expression. An expressions is a string ending with a semi-colon.
@@ -509,7 +509,7 @@ bool ParserPrivate::parse_expression_tree( std::string expression, ParserNodeHan
 
     if ( this->scan_variable_name( component, str ) )
     {
-      std::map< std::string, double >::iterator cit, cit_end;
+      std::map< std::string, float >::iterator cit, cit_end;
       cit = this->numerical_constants_.begin();
       cit_end = this->numerical_constants_.end();
 
@@ -972,7 +972,7 @@ bool ParserPrivate::scan_function( std::string& expression, std::string& functio
 
     std::string var_name = expression.substr( 0, idx );
 
-    std::map< std::string, double >::iterator cit, cit_end;
+    std::map< std::string, float >::iterator cit, cit_end;
     cit = this->numerical_constants_.begin();
     cit_end = this->numerical_constants_.end();
 
@@ -2067,10 +2067,10 @@ bool ParserPrivate::optimize_process_node( ParserNodeHandle& nhandle, std::list<
       {
         // Get the value of the constant
         std::string value = ihandle->get_value();
-        std::map< std::string, double >::iterator cit, cit_end;
+        std::map< std::string, float >::iterator cit, cit_end;
         cit = this->numerical_constants_.begin();
         cit_end = this->numerical_constants_.end();
-        double val;
+        float val;
 
         while ( cit != cit_end )
         {
@@ -2157,12 +2157,12 @@ bool ParserPrivate::optimize_process_node( ParserNodeHandle& nhandle, std::list<
 typedef union
 {
   unsigned long long i;
-  double d;
-} ullong_double_type;
+  float f;
+} ullong_float_type;
 
-const ullong_double_type nan_value_d =
+const ullong_float_type nan_value_f =
 { 0x7fffffffffffffffull };
-const ullong_double_type inf_value_d =
+const ullong_float_type inf_value_f =
 { 0x7ff0000000000000ull };
 
 // Constructor
@@ -2198,28 +2198,28 @@ Parser::Parser() :
 
   add_unary_post_operator( "'", "transpose" );
 
-  add_numerical_constant( "true", 1.0 );
-  add_numerical_constant( "false", 0.0 );
-  add_numerical_constant( "True", 1.0 );
-  add_numerical_constant( "False", 0.0 );
-  add_numerical_constant( "TRUE", 1.0 );
-  add_numerical_constant( "FALSE", 0.0 );
+  add_numerical_constant( "true", 1.0f );
+  add_numerical_constant( "false", 0.0f );
+  add_numerical_constant( "True", 1.0f );
+  add_numerical_constant( "False", 0.0f );
+  add_numerical_constant( "TRUE", 1.0f );
+  add_numerical_constant( "FALSE", 0.0f );
 
   // C++ does not have a default symbol for NaN
-  add_numerical_constant( "nan", nan_value_d.d );
-  add_numerical_constant( "NaN", nan_value_d.d );
-  add_numerical_constant( "Nan", nan_value_d.d );
-  add_numerical_constant( "NAN", nan_value_d.d );
+  add_numerical_constant( "nan", nan_value_f.f );
+  add_numerical_constant( "NaN", nan_value_f.f );
+  add_numerical_constant( "Nan", nan_value_f.f );
+  add_numerical_constant( "NAN", nan_value_f.f );
 
   // C++ does not have a default symbol for Inf
-  add_numerical_constant( "inf", inf_value_d.d );
-  add_numerical_constant( "Inf", inf_value_d.d );
-  add_numerical_constant( "INF", inf_value_d.d );
+  add_numerical_constant( "inf", inf_value_f.f );
+  add_numerical_constant( "Inf", inf_value_f.f );
+  add_numerical_constant( "INF", inf_value_f.f );
 
-  add_numerical_constant( "pi", Pi() );
-  add_numerical_constant( "Pi", Pi() );
-  add_numerical_constant( "PI", Pi() );
-  add_numerical_constant( "M_PI", Pi() );
+  add_numerical_constant( "pi", Pif() );
+  add_numerical_constant( "Pi", Pif() );
+  add_numerical_constant( "PI", Pif() );
+  add_numerical_constant( "M_PI", Pif() );
 }
 
 // The main function for parsing strings into code
@@ -2325,7 +2325,7 @@ void Parser::add_unary_post_operator( std::string op, std::string funname )
   this->private_->unary_post_operators_[ op ] = unop;
 }
 
-void Parser::add_numerical_constant( std::string name, double val )
+void Parser::add_numerical_constant( std::string name, float val )
 {
   this->private_->numerical_constants_[ name ] = val;
 }
@@ -2577,7 +2577,7 @@ bool Parser::optimize( ParserProgramHandle& program, std::string& error )
 
   // Phase 2: run throught the full tree and setup intermediate variables
   //  for each phase of the computation and translate constant strings and
-  //  doubles as well into variables.
+  //  floats as well into variables.
 
   size_t num_expressions = program->num_expressions();
   ParserTreeHandle thandle;
@@ -2633,10 +2633,10 @@ bool Parser::optimize( ParserProgramHandle& program, std::string& error )
         // Get the value of the constant
         std::string value = nhandle->get_value();
 
-        std::map< std::string, double >::iterator cit, cit_end;
+        std::map< std::string, float >::iterator cit, cit_end;
         cit = this->private_->numerical_constants_.begin();
         cit_end = this->private_->numerical_constants_.end();
-        double val;
+        float val;
 
         while ( cit != cit_end )
         {

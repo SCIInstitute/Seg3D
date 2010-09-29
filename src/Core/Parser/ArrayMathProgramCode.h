@@ -77,7 +77,7 @@ public:
 
   // Tell the progam where to temporary space has been allocated
   // for this part of the program
-  inline void set_variable( size_t j, double* variable )
+  inline void set_variable( size_t j, float* variable )
   {
     if ( j >= this->variables_.size() ) this->variables_.resize( j + 1 );
     this->variables_[ j ] = reinterpret_cast< void* >( variable );
@@ -115,9 +115,9 @@ public:
 
   // These functions are called by the actual code segments
   // For Scalar, Vector and Tensor buffers
-  inline double* get_variable( size_t j )
+  inline float* get_variable( size_t j )
   { 
-    return reinterpret_cast< double* >( this->variables_[ j ] );
+    return reinterpret_cast< float* >( this->variables_[ j ] );
   }
 
   inline DataBlock* get_data_block( size_t j )

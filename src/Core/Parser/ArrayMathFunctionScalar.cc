@@ -42,9 +42,9 @@ namespace ArrayMathFunctions
 
 bool isnan_s( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
@@ -59,9 +59,9 @@ bool isnan_s( Core::ArrayMathProgramCode& pc )
 
 bool isfinite_s( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
@@ -76,9 +76,9 @@ bool isfinite_s( Core::ArrayMathProgramCode& pc )
 
 bool isinfinite_s( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
@@ -93,9 +93,9 @@ bool isinfinite_s( Core::ArrayMathProgramCode& pc )
 
 bool sign_s( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
@@ -111,16 +111,16 @@ bool sign_s( Core::ArrayMathProgramCode& pc )
 
 bool ramp_sss( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data2 = pc.get_variable( 2 );
-  double* data3 = pc.get_variable( 3 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data2 = pc.get_variable( 2 );
+  float* data3 = pc.get_variable( 3 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
-    double start = *data2;
-    double end = *data3;
+    float start = *data2;
+    float end = *data3;
     if ( end > start )
     {
       if ( *data1 <= start ) *data0 = 0.0;
@@ -144,16 +144,16 @@ bool ramp_sss( Core::ArrayMathProgramCode& pc )
 
 bool rect_sss( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data2 = pc.get_variable( 2 );
-  double* data3 = pc.get_variable( 3 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data2 = pc.get_variable( 2 );
+  float* data3 = pc.get_variable( 3 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
-    double start = *data2;
-    double end = *data3;
+    float start = *data2;
+    float end = *data3;
     if ( *data1 >= start && *data1 <= end ) *data0 = 1.0;
     else *data0 = 0.0;
     data0++;
@@ -167,14 +167,14 @@ bool rect_sss( Core::ArrayMathProgramCode& pc )
 
 bool step_ss( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data2 = pc.get_variable( 2 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data2 = pc.get_variable( 2 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
-    double step = *data2;
+    float step = *data2;
     if ( *data1 >= step ) *data0 = 1.0;
     else *data0 = 0.0;
     data0++;
@@ -187,9 +187,9 @@ bool step_ss( Core::ArrayMathProgramCode& pc )
 
 bool not_s( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
@@ -204,13 +204,13 @@ bool not_s( Core::ArrayMathProgramCode& pc )
 
 bool inv_s( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
-    *data0 = 1.0 / ( *data1 );
+    *data0 = 1.0f / ( *data1 );
     data0++;
     data1++;
   }
@@ -220,9 +220,9 @@ bool inv_s( Core::ArrayMathProgramCode& pc )
 
 bool boolean_s( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
@@ -237,9 +237,9 @@ bool boolean_s( Core::ArrayMathProgramCode& pc )
 
 bool abs_s( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
@@ -254,9 +254,9 @@ bool abs_s( Core::ArrayMathProgramCode& pc )
 
 bool norm_s( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
@@ -271,13 +271,13 @@ bool norm_s( Core::ArrayMathProgramCode& pc )
 
 bool round_s( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
-    *data0 = static_cast< double > ( static_cast< int > ( *data1 + 0.5 ) );
+    *data0 = static_cast< float > ( static_cast< int > ( *data1 + 0.5 ) );
     data0++;
     data1++;
   }
@@ -287,9 +287,9 @@ bool round_s( Core::ArrayMathProgramCode& pc )
 
 bool floor_s( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
@@ -303,9 +303,9 @@ bool floor_s( Core::ArrayMathProgramCode& pc )
 
 bool ceil_s( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
@@ -319,9 +319,9 @@ bool ceil_s( Core::ArrayMathProgramCode& pc )
 
 bool exp_s( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
@@ -335,10 +335,10 @@ bool exp_s( Core::ArrayMathProgramCode& pc )
 
 bool pow_ss( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data2 = pc.get_variable( 2 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data2 = pc.get_variable( 2 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
@@ -353,9 +353,9 @@ bool pow_ss( Core::ArrayMathProgramCode& pc )
 
 bool sqrt_s( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
@@ -369,9 +369,9 @@ bool sqrt_s( Core::ArrayMathProgramCode& pc )
 
 bool log_s( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
@@ -385,9 +385,9 @@ bool log_s( Core::ArrayMathProgramCode& pc )
 
 bool ln_s( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
@@ -401,11 +401,11 @@ bool ln_s( Core::ArrayMathProgramCode& pc )
 
 bool log2_s( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data0_end = data0 + pc.get_size();
 
-  double s = 1.0 / log( 2.0 );
+  float s = 1.0f / log( 2.0f );
   while ( data0 != data0_end )
   {
     *data0 = ::log( *data1 ) * s;
@@ -418,11 +418,11 @@ bool log2_s( Core::ArrayMathProgramCode& pc )
 
 bool log10_s( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data0_end = data0 + pc.get_size();
 
-  double s = 1.0 / log( 10.0 );
+  float s = 1.0f / log( 10.0f );
   while ( data0 != data0_end )
   {
     *data0 = ::log( *data1 ) * s;
@@ -435,13 +435,13 @@ bool log10_s( Core::ArrayMathProgramCode& pc )
 
 bool cbrt_s( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
-    *data0 = ::pow( *data1, 1.0 / 3.0 );
+    *data0 = ::pow( *data1, 1.0f / 3.0f );
     data0++;
     data1++;
   }
@@ -451,9 +451,9 @@ bool cbrt_s( Core::ArrayMathProgramCode& pc )
 
 bool sin_s( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
@@ -467,9 +467,9 @@ bool sin_s( Core::ArrayMathProgramCode& pc )
 
 bool cos_s( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
@@ -483,9 +483,9 @@ bool cos_s( Core::ArrayMathProgramCode& pc )
 
 bool tan_s( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
@@ -499,9 +499,9 @@ bool tan_s( Core::ArrayMathProgramCode& pc )
 
 bool sinh_s( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
@@ -515,9 +515,9 @@ bool sinh_s( Core::ArrayMathProgramCode& pc )
 
 bool cosh_s( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
@@ -531,9 +531,9 @@ bool cosh_s( Core::ArrayMathProgramCode& pc )
 
 bool asin_s( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
@@ -547,9 +547,9 @@ bool asin_s( Core::ArrayMathProgramCode& pc )
 
 bool acos_s( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
@@ -563,9 +563,9 @@ bool acos_s( Core::ArrayMathProgramCode& pc )
 
 bool atan_s( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
@@ -579,10 +579,10 @@ bool atan_s( Core::ArrayMathProgramCode& pc )
 
 bool atan2_ss( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data2 = pc.get_variable( 2 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data2 = pc.get_variable( 2 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
@@ -597,13 +597,13 @@ bool atan2_ss( Core::ArrayMathProgramCode& pc )
 
 bool asinh_s( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
-    double d = *data1;
+    float d = *data1;
     *data0 = ( d == 0 ? 0 : ( d > 0 ? 1 : -1 ) ) * ::log( ( d < 0 ? -d : d ) + ::sqrt( 1 + d
         * d ) );
     data0++;
@@ -615,13 +615,13 @@ bool asinh_s( Core::ArrayMathProgramCode& pc )
 
 bool acosh_s( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
-    double d = *data1;
+    float d = *data1;
     *data0 = ::log( d + ::sqrt( d * d - 1 ) );
     data0++;
     data1++;
@@ -632,10 +632,10 @@ bool acosh_s( Core::ArrayMathProgramCode& pc )
 
 bool or_ss( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data2 = pc.get_variable( 2 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data2 = pc.get_variable( 2 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
@@ -650,10 +650,10 @@ bool or_ss( Core::ArrayMathProgramCode& pc )
 
 bool and_ss( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data2 = pc.get_variable( 2 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data2 = pc.get_variable( 2 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
@@ -668,10 +668,10 @@ bool and_ss( Core::ArrayMathProgramCode& pc )
 
 bool eq_ss( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data2 = pc.get_variable( 2 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data2 = pc.get_variable( 2 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
@@ -687,10 +687,10 @@ bool eq_ss( Core::ArrayMathProgramCode& pc )
 
 bool neq_ss( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data2 = pc.get_variable( 2 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data2 = pc.get_variable( 2 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
@@ -706,10 +706,10 @@ bool neq_ss( Core::ArrayMathProgramCode& pc )
 
 bool le_ss( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data2 = pc.get_variable( 2 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data2 = pc.get_variable( 2 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
@@ -725,10 +725,10 @@ bool le_ss( Core::ArrayMathProgramCode& pc )
 
 bool ge_ss( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data2 = pc.get_variable( 2 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data2 = pc.get_variable( 2 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
@@ -744,10 +744,10 @@ bool ge_ss( Core::ArrayMathProgramCode& pc )
 
 bool ls_ss( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data2 = pc.get_variable( 2 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data2 = pc.get_variable( 2 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
@@ -763,10 +763,10 @@ bool ls_ss( Core::ArrayMathProgramCode& pc )
 
 bool gt_ss( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data2 = pc.get_variable( 2 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data2 = pc.get_variable( 2 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
@@ -782,10 +782,10 @@ bool gt_ss( Core::ArrayMathProgramCode& pc )
 
 bool max_ss( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data2 = pc.get_variable( 2 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data2 = pc.get_variable( 2 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
@@ -801,11 +801,11 @@ bool max_ss( Core::ArrayMathProgramCode& pc )
 
 bool median_sss( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data2 = pc.get_variable( 2 );
-  double* data3 = pc.get_variable( 3 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data2 = pc.get_variable( 2 );
+  float* data3 = pc.get_variable( 3 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
@@ -844,10 +844,10 @@ bool median_sss( Core::ArrayMathProgramCode& pc )
 
 bool min_ss( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data2 = pc.get_variable( 2 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data2 = pc.get_variable( 2 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
@@ -865,8 +865,8 @@ boost::mutex RandomMutex;
 
 bool random_value_( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data0_end = data0 + pc.get_size();
 
   // Random is not thread safe
   RandomMutex.lock();
@@ -875,9 +875,9 @@ bool random_value_( Core::ArrayMathProgramCode& pc )
     // Note: _WIN32 is always defined for applications for Win32 and Win64 (see http://msdn.microsoft.com/en-us/library/b0084kay.aspx).
 #ifdef _WIN32
     // random() not available in Windows stdlib
-    *data0 = static_cast< double >( rand() ) / static_cast< double >( RAND_MAX + 1 );
+    *data0 = static_cast< float >( rand() ) / static_cast< float >( RAND_MAX + 1 );
 #else
-    *data0 = static_cast< double > ( random() ) / static_cast< double > ( 0x7FFFFFFF );
+    *data0 = static_cast< float > ( random() ) / static_cast< float > ( 0x7FFFFFFF );
 #endif
     data0++;
   }

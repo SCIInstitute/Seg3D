@@ -80,7 +80,7 @@ public:
   void resize_sequential_functions( size_t sz );
 
   // Central buffer for all parameters
-  double* create_buffer( size_t size );
+  float* create_buffer( size_t size );
 
   // Set variables which we use as temporal information structures
   // TODO: need to remove them at some point

@@ -54,7 +54,7 @@ public:
   ParserScriptVariable( std::string uname, std::string type, int flags );
 
   // Create scalar const variable
-  ParserScriptVariable( std::string uname, double value );
+  ParserScriptVariable( std::string uname, float value );
 
   // Create string const variable
   ParserScriptVariable( std::string uname, std::string value );
@@ -91,7 +91,7 @@ public:
   void set_uname( std::string uname );
 
   // Get the constant values
-  double get_scalar_value();
+  float get_scalar_value();
   std::string get_string_value();
 
   // Dependence of this variable

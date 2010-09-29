@@ -38,10 +38,10 @@ namespace ArrayMathFunctions
 // Add scalar + scalar
 bool add_ss( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data2 = pc.get_variable( 2 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data2 = pc.get_variable( 2 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
@@ -60,10 +60,10 @@ bool add_ss( Core::ArrayMathProgramCode& pc )
 // Sub scalar - scalar
 bool sub_ss( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data2 = pc.get_variable( 2 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data2 = pc.get_variable( 2 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
@@ -82,9 +82,9 @@ bool sub_ss( Core::ArrayMathProgramCode& pc )
 // Negate scalar
 bool neg_s( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data1_end = data1 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data1_end = data1 + pc.get_size();
 
   while ( data1 != data1_end )
   {
@@ -102,10 +102,10 @@ bool neg_s( Core::ArrayMathProgramCode& pc )
 // Mult scalar * scalar
 bool mult_ss( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data2 = pc.get_variable( 2 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data2 = pc.get_variable( 2 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
@@ -124,10 +124,10 @@ bool mult_ss( Core::ArrayMathProgramCode& pc )
 // Div scalar / scalar
 bool div_ss( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data2 = pc.get_variable( 2 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data2 = pc.get_variable( 2 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
@@ -146,10 +146,10 @@ bool div_ss( Core::ArrayMathProgramCode& pc )
 // Rem scalar / scalar
 bool rem_ss( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data2 = pc.get_variable( 2 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data2 = pc.get_variable( 2 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
@@ -168,11 +168,11 @@ bool rem_ss( Core::ArrayMathProgramCode& pc )
 // Sequence scalar
 bool seq_s( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data0_end = data0 + pc.get_size();
 
-  double val = data1[ 0 ];
+  float val = data1[ 0 ];
   while ( data0 != data0_end )
   {
     *data0 = val;
@@ -187,11 +187,11 @@ bool seq_s( Core::ArrayMathProgramCode& pc )
 
 bool assign_sss( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data2 = pc.get_variable( 2 );
-  double* data3 = pc.get_variable( 3 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data2 = pc.get_variable( 2 );
+  float* data3 = pc.get_variable( 3 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
@@ -213,10 +213,10 @@ bool assign_sss( Core::ArrayMathProgramCode& pc )
 // Subs scalar scalar
 bool subs_ss( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data2 = pc.get_variable( 2 );
-  double* data0_end = data0 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data2 = pc.get_variable( 2 );
+  float* data0_end = data0 + pc.get_size();
 
   while ( data0 != data0_end )
   {
@@ -234,11 +234,11 @@ bool subs_ss( Core::ArrayMathProgramCode& pc )
 // Select functions
 bool select_sss( Core::ArrayMathProgramCode& pc )
 {
-  double* data0 = pc.get_variable( 0 );
-  double* data1 = pc.get_variable( 1 );
-  double* data2 = pc.get_variable( 2 );
-  double* data3 = pc.get_variable( 3 );
-  double* data1_end = data1 + pc.get_size();
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data2 = pc.get_variable( 2 );
+  float* data3 = pc.get_variable( 3 );
+  float* data1_end = data1 + pc.get_size();
 
   while ( data1 != data1_end )
   {

@@ -183,7 +183,7 @@ bool ArrayMathInterpreter::translate( ParserProgramHandle& pprogram,
   // Get all the constants in one piece of memory
   // All memory management is inside the ArrayMathProgram
   // We only get the pointer to actually insert all the pieces
-  double* buffer = mprogram->create_buffer( buffer_mem );
+  float* buffer = mprogram->create_buffer( buffer_mem );
 
   for ( size_t j = 0; j < num_const_variables; j++ )
   {
@@ -207,7 +207,7 @@ bool ArrayMathInterpreter::translate( ParserProgramHandle& pprogram,
       // able to store it right away
       if ( kind == SCRIPT_CONSTANT_SCALAR_E )
       {
-        double val = vhandle->get_scalar_value();
+        float val = vhandle->get_scalar_value();
         buffer[ 0 ] = val;
       }
 

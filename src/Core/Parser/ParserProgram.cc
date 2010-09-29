@@ -63,7 +63,7 @@ public:
 
   // The next series of variables represent the next stage of the parser
   // In this stage everything is a variable or a function, and we have two
-  // lists of constants one for double constants and one for string constants
+  // lists of constants one for float constants and one for string constants
 
   std::vector< ParserScriptVariableHandle > const_variables_;
   std::vector< ParserScriptVariableHandle > single_variables_;

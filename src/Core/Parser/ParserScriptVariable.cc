@@ -62,7 +62,7 @@ public:
   std::string dependence_;
 
   // For const scalar/string variables
-  double scalar_value_;
+  float scalar_value_;
   std::string string_value_;
 
   int var_number_;
@@ -92,7 +92,7 @@ ParserScriptVariable::ParserScriptVariable( std::string uname, std::string type,
   this->private_->var_number_ = 0;
 }
 
-ParserScriptVariable::ParserScriptVariable( std::string uname, double value ) :
+ParserScriptVariable::ParserScriptVariable( std::string uname, float value ) :
   private_( new ParserScriptVariablePrivate )
 {
   this->private_->kind_ = SCRIPT_CONSTANT_SCALAR_E;
@@ -264,7 +264,7 @@ void ParserScriptVariable::set_uname( std::string uname )
   this->private_->uname_ = uname;
 }
 
-double ParserScriptVariable::get_scalar_value()
+float ParserScriptVariable::get_scalar_value()
 {
   return this->private_->scalar_value_;
 }
