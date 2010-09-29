@@ -47,14 +47,20 @@ class MaskDataFilterInterface : public ToolWidget
 {
 Q_OBJECT
 
+// -- Constructor/destructor --
 public:
   MaskDataFilterInterface();
   virtual ~MaskDataFilterInterface();
+
+// -- create interface --
+public:
+  // BUILD_WIDGET:
+  // This function builds the actual GUI
   virtual bool build_widget( QFrame* frame );
   
+// -- run filter --
 private Q_SLOTS:
-  void execute_filter();
-  void enable_run_filter( bool valid );
+  void run_filter();
 
 private:
   boost::shared_ptr< MaskDataFilterInterfacePrivate > private_;

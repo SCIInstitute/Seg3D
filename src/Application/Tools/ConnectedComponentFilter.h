@@ -29,8 +29,10 @@
 #ifndef APPLICATION_TOOLS_CONNECTEDCOMPONENTFILTER_H
 #define APPLICATION_TOOLS_CONNECTEDCOMPONENTFILTER_H
 
+// Core includes
 #include <Core/State/StateLabeledOption.h>
 
+// Application includes
 #include <Application/Tool/SeedPointsTool.h>
 
 namespace Seg3D

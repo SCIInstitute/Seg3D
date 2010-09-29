@@ -26,20 +26,18 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-//QtUtils Includes
-#include <QtUtils/Bridge/QtBridge.h>
-
-//Interface Includes
-#include <Interface/ToolInterface/CustomWidgets/TargetComboBox.h>
-#include <Interface/ToolInterface/CustomWidgets/MaskComboBox.h>
-
-//Qt Gui Includes
-#include <Interface/ToolInterface/MaskDataFilterInterface.h>
+// QtGui includes
 #include "ui_MaskDataFilterInterface.h"
 
 //Application Includes
 #include <Application/Tools/MaskDataFilter.h>
-//#include <Application/Filters/Actions/ActionMaskData.h>
+
+// QtUtils includes
+#include <QtUtils/Bridge/QtBridge.h>
+
+// Interaface includes
+#include <Interface/ToolInterface/MaskDataFilterInterface.h>
+
 
 SCI_REGISTER_TOOLINTERFACE( Seg3D, MaskDataFilterInterface )
 
@@ -50,8 +48,6 @@ class MaskDataFilterInterfacePrivate
 {
 public:
   Ui::MaskDataFilterInterface ui_;
-  TargetComboBox *target_;
-  MaskComboBox *mask_;
 };
 
 // constructor
@@ -70,53 +66,41 @@ bool MaskDataFilterInterface::build_widget( QFrame* frame )
 {
   //Step 1 - build the Qt GUI Widget
   this->private_->ui_.setupUi( frame );
-  
-  // Add the combo boxes
-  this->private_->target_ = new TargetComboBox( this );
-  this->private_->ui_.targetHLayout->addWidget( this->private_->target_ );
-    
-  this->private_->mask_ = new MaskComboBox( this );
-  this->private_->ui_.maskHLayout->addWidget( this->private_->mask_ );
 
   //Step 2 - get a pointer to the tool
-  ToolHandle base_tool_ = tool();
-  MaskDataFilter* tool = dynamic_cast< MaskDataFilter* > ( base_tool_.get() );
+  MaskDataFilter* tool = dynamic_cast< MaskDataFilter* > ( this->tool().get() );
   
-  //Step 3 - connect the gui to the tool through the QtBridge
-  //QtUtils::QtBridge::Connect( this->private_->target_, tool->target_layer_state_ );
-  this->connect( this->private_->target_, SIGNAL( valid( bool ) ), this, SLOT( enable_run_filter( bool ) ) );
-  //QtUtils::QtBridge::Connect( this->private_->mask_, tool->mask_layer_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ui_.replaceComboBox, tool->replace_with_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );
+    //Step 3 - connect the gui to the tool through the QtBridge
+  QtUtils::QtBridge::Connect( this->private_->ui_.target_layer_, 
+    tool->target_layer_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.use_active_layer_, 
+    tool->use_active_layer_state_ );
+
+  QtUtils::QtBridge::Connect( this->private_->ui_.mask_, tool->mask_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.invert_mask_, tool->mask_invert_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.replaceCheckBox, tool->replace_state_ );  
+  QtUtils::QtBridge::Connect( this->private_->ui_.replace_with_, tool->replace_with_state_ );
   
-  this->connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), this, SLOT( execute_filter() ) );
+  // Step 4 - Qt connections
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() ); 
+    this->private_->ui_.target_layer_->setDisabled( tool->use_active_layer_state_->get() );
   
-  this->private_->target_->sync_layers();
-  this->private_->mask_->sync_layers();
+    this->connect( this->private_->ui_.use_active_layer_, SIGNAL( toggled( bool ) ),
+      this->private_->ui_.target_layer_, SLOT( setDisabled( bool ) ) );
+
+    this->connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), 
+      this, SLOT( run_filter() ) );
+  } 
+
+  return true;      
+}
   
-  //Send a message to the log that we have finised with building the Mask Data Filter Interface
-  CORE_LOG_DEBUG("Finished building a Mask Data Filter Interface");
-  return ( true );
-} // end build_widget
-  
-void MaskDataFilterInterface::enable_run_filter( bool valid )
+void MaskDataFilterInterface::run_filter()
 {
-  if( valid )
-    this->private_->ui_.runFilterButton->setEnabled( true );
-  else
-    this->private_->ui_.runFilterButton->setEnabled( false );
+  tool()->execute( Core::Interface::GetWidgetActionContext() );
 }
 
-void MaskDataFilterInterface::execute_filter()
-{
-  ToolHandle base_tool_ = tool();
-  MaskDataFilter* tool =
-  dynamic_cast< MaskDataFilter* > ( base_tool_.get() );
-  
-//  ActionMaskData::Dispatch( tool->target_layer_state_->export_to_string(), 
-//    tool->mask_layer_state_->export_to_string(), tool->replace_with_state_->get(),
-//    tool->replace_state_->get() ); 
-}
 
 } // end namespace Seg3D
 
