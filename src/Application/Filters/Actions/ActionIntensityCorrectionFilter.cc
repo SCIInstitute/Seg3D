@@ -111,7 +111,7 @@ public:
 
   // NOTE: The macro needs a data type to select which version to run. This needs to be
   // a member variable of the algorithm class.
-  SCI_BEGIN_TYPED_RUN( this->src_layer_->get_data_type() )
+  SCI_BEGIN_TYPED_ITK_RUN( this->src_layer_->get_data_type() )
   {
     this->connect_abort( this->src_layer_ );
   
@@ -443,7 +443,7 @@ public:
       this->insert_itk_image_pointer_into_layer<float>( this->dst_layer_, dg_image->get_image() );  
     }
   }
-  SCI_END_TYPED_RUN()
+  SCI_END_TYPED_ITK_RUN()
   
   // GET_FITLER_NAME:
   // The name of the filter, this information is used for generating new layer labels.

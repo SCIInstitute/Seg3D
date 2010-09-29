@@ -35,7 +35,7 @@
 #include <Application/Tools/MaskDataFilter.h>
 
 // Action associated with tool
-//#include <Application/Filters/Actions/ActionMaskDataFilter.h>
+#include <Application/Filters/Actions/ActionMaskDataFilter.h>
 
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL( Seg3D, MaskDataFilter )
@@ -62,7 +62,7 @@ MaskDataFilter::MaskDataFilter( const std::string& toolid ) :
   
   // What the outside should be filled in with
   this->add_state( "replace_with", this->replace_with_state_, "zero", 
-  "max value|min value|new max value|new min value|zero" );
+    "max_value|min_value|new_max_value|new_min_value|zero" );
 }
   
 MaskDataFilter::~MaskDataFilter()
@@ -72,13 +72,13 @@ MaskDataFilter::~MaskDataFilter()
 
 void MaskDataFilter::execute( Core::ActionContextHandle context )
 {
-//  ActionConnectedComponentFilter::Dispatch( context,
-//    this->target_layer_state_->get(),
-//    this->replace_state_->get(),
-//    this->mask_state_->get(),
-//    this->mask_invert_state_->get(),
-//    this->replace_with_state_->get()
-//  );    
+  ActionMaskDataFilter::Dispatch( context,
+    this->target_layer_state_->get(),
+    this->mask_state_->get(),
+    this->replace_state_->get(),
+    this->mask_invert_state_->get(),
+    this->replace_with_state_->get()
+  );    
 }
 
 } // end namespace Seg3D

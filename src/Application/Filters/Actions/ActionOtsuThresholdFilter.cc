@@ -96,7 +96,7 @@ public:
   
   // NOTE: The macro needs a data type to select which version to run. This needs to be
   // a member variable of the algorithm class.
-  SCI_BEGIN_TYPED_RUN( this->src_layer_->get_data_type() )
+  SCI_BEGIN_TYPED_ITK_RUN( this->src_layer_->get_data_type() )
   {
     // Define the type of filter that we use.
     typedef itk::OtsuMultipleThresholdsImageFilter< 
@@ -145,7 +145,7 @@ public:
         static_cast<unsigned char>( j ) );  
     }
   }
-  SCI_END_TYPED_RUN()
+  SCI_END_TYPED_ITK_RUN()
   
   // GET_FITLER_NAME:
   // The name of the filter, this information is used for generating new layer labels.

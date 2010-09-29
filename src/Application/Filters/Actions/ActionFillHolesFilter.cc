@@ -90,7 +90,7 @@ public:
 public:
   // NOTE: The macro needs a data type to select which version to run. This needs to be
   // a member variable of the algorithm class.
-  SCI_BEGIN_RUN()
+  SCI_BEGIN_ITK_RUN()
   {
     // Define the type of filter that we use.
     typedef itk::ConnectedComponentImageFilter< 
@@ -206,7 +206,7 @@ public:
       Core::MaskVolumeHandle( new Core::MaskVolume(
       this->dst_layer_->get_grid_transform(), mask_datablock ) ), true );
   }
-  SCI_END_RUN()
+  SCI_END_ITK_RUN()
 
   // GET_FITLER_NAME:
   // The name of the filter, this information is used for generating new layer labels.

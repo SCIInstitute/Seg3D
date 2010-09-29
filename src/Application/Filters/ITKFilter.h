@@ -330,7 +330,7 @@ private:
   ITKFilterPrivateHandle private_;
 };
 
-#define SCI_BEGIN_TYPED_RUN( DATATYPE ) \
+#define SCI_BEGIN_TYPED_ITK_RUN( DATATYPE ) \
 public:\
   virtual void run()\
   {\
@@ -362,11 +362,11 @@ public:\
     typedef Core::ITKImageDataT<unsigned char> UCHAR_CONTAINER_TYPE;
   
 
-#define SCI_END_TYPED_RUN() \
+#define SCI_END_TYPED_ITK_RUN() \
   }
 
 
-#define SCI_BEGIN_RUN( ) \
+#define SCI_BEGIN_ITK_RUN( ) \
 public:\
   virtual void run()\
   {\
@@ -379,7 +379,7 @@ public:\
     typedef Core::ITKImageDataT<unsigned short> USHORT_CONTAINER_TYPE; \
     typedef Core::ITKImageDataT<unsigned char> UCHAR_CONTAINER_TYPE;
 
-#define SCI_END_RUN() \
+#define SCI_END_ITK_RUN() \
   }
   
 } // end namespace Seg3D

@@ -164,4 +164,39 @@ private:
 
 } // end namespace Seg3D
 
+
+#define SCI_BEGIN_TYPED_RUN( DATATYPE ) \
+public:\
+  virtual void run()\
+  {\
+    switch ( DATATYPE )\
+    {\
+      case Core::DataType::CHAR_E: this->typed_run<signed char>(); break;\
+      case Core::DataType::UCHAR_E: this->typed_run<unsigned char>(); break;\
+      case Core::DataType::SHORT_E: this->typed_run<short>(); break;\
+      case Core::DataType::USHORT_E: this->typed_run<unsigned short>(); break;\
+      case Core::DataType::INT_E: this->typed_run<int>(); break;\
+      case Core::DataType::UINT_E: this->typed_run<unsigned int>(); break;\
+      case Core::DataType::FLOAT_E: this->typed_run<float>(); break;\
+      case Core::DataType::DOUBLE_E: this->typed_run<double>(); break;\
+    };\
+  }\
+\
+  template< class VALUE_TYPE>\
+  void typed_run()\
+  {\
+  
+#define SCI_END_TYPED_RUN() \
+  }
+
+
+#define SCI_BEGIN_RUN( ) \
+public:\
+  virtual void run()\
+  {\
+
+#define SCI_END_RUN() \
+  }
+  
+
 #endif

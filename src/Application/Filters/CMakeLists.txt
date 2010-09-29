@@ -73,6 +73,8 @@ SET(APPLICATION_FILTERS_ACTIONS_SRCS
   Actions/ActionHistogramEqualizationFilter.cc
   Actions/ActionIntensityCorrectionFilter.h
   Actions/ActionIntensityCorrectionFilter.cc
+  Actions/ActionMaskDataFilter.h
+  Actions/ActionMaskDataFilter.cc
   Actions/ActionMedianFilter.h
   Actions/ActionMedianFilter.cc
   Actions/ActionMeanFilter.h
