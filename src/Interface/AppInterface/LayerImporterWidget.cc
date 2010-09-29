@@ -267,7 +267,7 @@ void LayerImporterWidget::import()
   this->repaint();
 
 
-  for( int i = 1; i < static_cast< int >( this->private_->importers_.size() ); ++i )
+  for( size_t i = 1; i < this->private_->importers_.size(); ++i )
   {
     boost::filesystem::path full_filename( this->private_->importers_[ i ]->get_filename() );
     this->private_->ui_.file_name_label_->setText( QString::fromUtf8( "Scanning: " ) +
@@ -277,7 +277,7 @@ void LayerImporterWidget::import()
     
   }
   
-  for( int i = 0; i < static_cast< int >( this->private_->importers_.size() ); ++i )
+  for( size_t i = 0; i < this->private_->importers_.size(); ++i )
   {
     this->private_->importers_[ i ]->set_swap_xy_spacing( 
       this->private_->ui_.swap_spacing_checkbox_->isChecked() );

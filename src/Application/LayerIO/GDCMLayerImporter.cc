@@ -65,6 +65,7 @@ public:
   double get_slice_thickness( const gdcm::DataSet& ds );
   bool read_image( const std::string& filename, char* buffer );
 
+  GDCMLayerImporter* importer_;
   std::vector< std::string > file_list_;
   bool file_series_;
   double rescale_slope_;
@@ -75,10 +76,11 @@ public:
   Core::DataType pixel_type_;
   Core::GridTransform grid_transform_;
 
-  // Whether to swap the X/Y spacing provided by GDCM.
-  // NOTE: The DICOM standard says that pixel spacing is in Y/X order, but
-  // some scanners put it in X/Y order. 
-  bool swap_xy_spacing_;
+  Core::Point origin_;
+  Core::Vector row_direction_;
+  Core::Vector col_direction_;
+  Core::Vector slice_direction_;
+  double x_spacing_, y_spacing_, z_spacing_;
 };
 
 double GDCMLayerImporterPrivate::get_slice_thickness( const gdcm::DataSet& ds )
@@ -110,14 +112,14 @@ bool GDCMLayerImporterPrivate::read_image( const std::string& filename, char* bu
   reader.SetFileName( filename.c_str() );
   if ( !reader.Read() )
   {
-    CORE_LOG_ERROR( "Failed to read file '" + filename + "'" );
+    this->importer_->set_error( "Failed to read file '" + filename + "'" );
     return false;
   }
   
   gdcm::Image& image = reader.GetImage();
   if ( this->buffer_length_ != image.GetBufferLength() )
   {
-    CORE_LOG_ERROR( "Images in the series have different sizes" );
+    this->importer_->set_error( "Images in the series have different sizes" );
     return false;
   }
   
@@ -127,7 +129,7 @@ bool GDCMLayerImporterPrivate::read_image( const std::string& filename, char* bu
   {
     if ( this->rescale_slope_ != 1.0 || this->rescale_intercept_ != 0.0 )
     {
-      CORE_LOG_ERROR( "Unsupported data format" );
+      this->importer_->set_error( "Unsupported data format" );
       return false;
     }
     
@@ -135,7 +137,7 @@ bool GDCMLayerImporterPrivate::read_image( const std::string& filename, char* bu
     memcpy( &copy[ 0 ], buffer, this->buffer_length_ );
     if ( !gdcm::Unpacker12Bits::Unpack( buffer, &copy[ 0 ], this->buffer_length_ ) )
     {
-      CORE_LOG_ERROR( "Failed to unpack 12bit data" );
+      this->importer_->set_error( "Failed to unpack 12bit data" );
       return false;
     }
     assert( this->buffer_length_ * 16 / 12 == this->slice_data_size_ );
@@ -167,7 +169,7 @@ GDCMLayerImporter::GDCMLayerImporter( const std::string& filename ) :
   LayerImporter( filename ),
   private_( new GDCMLayerImporterPrivate )
 {
-  this->private_->swap_xy_spacing_ = true;
+  this->private_->importer_ = this;
 }
 
 bool GDCMLayerImporter::import_header()
@@ -176,7 +178,7 @@ bool GDCMLayerImporter::import_header()
   reader.SetFileName( this->private_->file_list_[ 0 ].c_str() );
   if ( !reader.Read() )
   {
-    CORE_LOG_ERROR( "Can't read file " + this->private_->file_list_[ 0 ] );
+    this->set_error( "Can't read file " + this->private_->file_list_[ 0 ] );
     return false;
   }
   
@@ -189,14 +191,14 @@ bool GDCMLayerImporter::import_header()
 
   if ( pixeltype.GetSamplesPerPixel() != 1 )
   {
-    CORE_LOG_ERROR( "Unsupported pixel format" );
+    this->set_error( "Unsupported pixel format" );
     return false;
   }
 
   unsigned int num_of_dimensions = image.GetNumberOfDimensions(); 
   if ( num_of_dimensions != 2 && num_of_dimensions != 3 )
   {
-    CORE_LOG_ERROR( "Unsupported number of dimensions" );
+    this->set_error( "Unsupported number of dimensions" );
     return false;
   }
   this->private_->grid_transform_.set_nx( dims[ 0 ] );
@@ -267,7 +269,7 @@ bool GDCMLayerImporter::import_header()
     pixel_size = sizeof( double );
     break;
   default:
-    CORE_LOG_ERROR( "Unknown data type" );
+    this->set_error( "Unknown data type" );
     return false; 
   }
 
@@ -276,37 +278,28 @@ bool GDCMLayerImporter::import_header()
   // Compute the grid transform
   const double* spacing = image.GetSpacing();
   const double* origin = image.GetOrigin();
-  Core::Point origin_pt( origin[ 0 ], origin[ 1 ], origin[ 2 ] );
-  double x_spacing, y_spacing, z_spacing;
-  if ( this->private_->swap_xy_spacing_ )
-  {
-    x_spacing = spacing[ 1 ];
-    y_spacing = spacing[ 0 ];
-  }
-  else
-  {
-    x_spacing = spacing[ 0 ];
-    y_spacing = spacing[ 1 ];
-  }
+
+  this->private_->origin_[ 0 ] = origin[ 0 ];
+  this->private_->origin_[ 1 ] = origin[ 1 ];
+  this->private_->origin_[ 2 ] = origin[ 2 ];
+
+  this->private_->x_spacing_ = spacing[ 0 ];
+  this->private_->y_spacing_ = spacing[ 1 ];
   
   if ( spacing[ 2 ] == 1.0 )
   {
-    z_spacing = this->private_->get_slice_thickness( ds );
+    this->private_->z_spacing_ = this->private_->get_slice_thickness( ds );
   }
   else
   {
-    z_spacing = spacing[ 2 ];
+    this->private_->z_spacing_ = spacing[ 2 ];
   }
 
   const double* dircos = image.GetDirectionCosines();
-  Core::Vector row_direction( dircos[ 0 ], dircos[ 1 ], dircos[ 2 ] );
-  Core::Vector col_direction( dircos[ 3 ], dircos[ 4 ], dircos[ 5 ] );
-  Core::Vector slice_direction = Core::Cross( row_direction, col_direction );
-  row_direction *= x_spacing;
-  col_direction *= y_spacing;
-  slice_direction *= z_spacing;
-  this->private_->grid_transform_.load_basis( origin_pt, row_direction,
-    col_direction, slice_direction );
+  this->private_->row_direction_ = Core::Vector( dircos[ 0 ], dircos[ 1 ], dircos[ 2 ] );
+  this->private_->col_direction_ = Core::Vector( dircos[ 3 ], dircos[ 4 ], dircos[ 5 ] );
+  this->private_->slice_direction_ = Core::Cross( this->private_->row_direction_, 
+    this->private_->col_direction_ );
 
   return true;
 }
@@ -329,6 +322,17 @@ int GDCMLayerImporter::get_importer_modes()
 bool GDCMLayerImporter::load_data( Core::DataBlockHandle& data_block, 
                  Core::GridTransform& grid_trans )
 {
+  if ( this->get_swap_xy_spacing() )
+  {
+    std::swap( this->private_->x_spacing_, this->private_->y_spacing_ );
+  }
+  this->private_->row_direction_ *= this->private_->x_spacing_;
+  this->private_->col_direction_ *= this->private_->y_spacing_;
+  this->private_->slice_direction_ *= this->private_->z_spacing_;
+  this->private_->grid_transform_.load_basis( this->private_->origin_, 
+    this->private_->row_direction_, this->private_->col_direction_, 
+    this->private_->slice_direction_ );
+
   data_block = Core::StdDataBlock::New( this->private_->grid_transform_,
     this->private_->pixel_type_ );
   grid_trans = this->private_->grid_transform_;

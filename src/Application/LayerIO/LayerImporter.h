@@ -115,6 +115,9 @@ class LayerImporter;
 typedef boost::shared_ptr< LayerImporter > LayerImporterHandle;
 typedef boost::weak_ptr< LayerImporter > LayerImporterWeakHandle;
 
+class LayerImporterPrivate;
+typedef boost::shared_ptr< LayerImporterPrivate > LayerImporterPrivateHandle;
+
 // class definition
 class LayerImporter : public boost::noncopyable
 {
@@ -153,25 +156,12 @@ public:
   // -- Error handling --
   // GET_ERROR:
   // Get the last error recorded in the importer
-  std::string get_error() const { return error_; }
+  std::string get_error() const;
   
-  // -- internals of the importer -- 
-private:
-  // FILENAME:
-  std::string filename_;
-  
-
 protected:
   // SET_ERROR:
   // Set the error message
-  void set_error( const std::string& error )
-  {
-    error_ = error;
-  }
-
-private:
-  std::string error_; 
-  
+  void set_error( const std::string& error );
   
   // -- Import a header information --
 public:
@@ -185,10 +175,7 @@ public:
   // necessarily read the whole file. NOTE: Some external packages do not support reading a header
   // and hence these importers should read the full file here.
   virtual bool import_header() = 0;
-  
-  // SET_SWAP_XY_SPACING:
-  virtual void set_swap_xy_spacing( bool swap ){}
-  
+    
   // GET_GRID_TRANSFORM:
   // Get the grid transform of the grid that we are importing
   virtual Core::GridTransform get_grid_transform() = 0;
@@ -212,6 +199,17 @@ public:
   // Import the layer from the file
   bool import_layer( LayerImporterMode mode, std::vector< LayerHandle >& layers );
 
+  // SET_SWAP_XY_SPACING:
+  // Set whether to swap the X/Y spacing.
+  // NOTE: This only affects the behavior when loading DICOM files.
+  // The DICOM standard says that pixel spacing is in Y/X order, 
+  // but some scanners put it in X/Y order. 
+  void set_swap_xy_spacing( bool swap );
+
+  // GET_SWAP_XY_SPACING:
+  // Get whether to swap the X/Y spacing.
+  bool get_swap_xy_spacing() const;
+
 protected:
   // LOAD_DATA:
   // Load the data from the file(s).
@@ -223,6 +221,9 @@ protected:
   // Return the string that will be used to name the layers.
   virtual std::string get_layer_name();
   
+  // -- Internals of the importer --
+private:
+  LayerImporterPrivateHandle private_;
 };
 
 

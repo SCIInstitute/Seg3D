@@ -46,6 +46,8 @@ class GDCMLayerImporter : public LayerImporter
 {
   SCI_IMPORTER_TYPE("GDCM Importer", ".dcm;", 6)
 
+  friend class GDCMLayerImporterPrivate;
+
   // -- Constructor/Destructor --
 public:
   // Construct a new layer file importer

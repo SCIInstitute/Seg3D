@@ -82,10 +82,27 @@ bool ImportFromString( const std::string& import_type_string, LayerImporterMode&
   }
 }
 
+//////////////////////////////////////////////////////////////////////////
+// Class LayerImporterPrivate
+//////////////////////////////////////////////////////////////////////////
+
+class LayerImporterPrivate
+{
+public:
+  std::string error_; 
+  std::string filename_;
+  bool swap_xy_spacing_;
+};
+
+//////////////////////////////////////////////////////////////////////////
+// Class LayerImporter
+//////////////////////////////////////////////////////////////////////////
 
 LayerImporter::LayerImporter( const std::string& filename ) :
-  filename_( filename )
+  private_( new LayerImporterPrivate )
 {
+  this->private_->filename_ = filename;
+  this->private_->swap_xy_spacing_ = false;
 }
 
 LayerImporter::~LayerImporter()
@@ -94,12 +111,12 @@ LayerImporter::~LayerImporter()
 
 std::string LayerImporter::get_filename() 
 { 
-  return filename_; 
+  return this->private_->filename_; 
 }
 
 std::string LayerImporter::get_base_filename() 
 { 
-  boost::filesystem::path full_filename(filename_);
+  boost::filesystem::path full_filename( this->private_->filename_ );
   return full_filename.stem() ; 
 }
 
@@ -214,6 +231,26 @@ bool LayerImporter::import_layer( LayerImporterMode mode, std::vector< LayerHand
 std::string LayerImporter::get_layer_name()
 {
   return this->get_base_filename();
+}
+
+void LayerImporter::set_error( const std::string& error )
+{
+  this->private_->error_ = error;
+}
+
+std::string LayerImporter::get_error() const
+{
+  return this->private_->error_;
+}
+
+void LayerImporter::set_swap_xy_spacing( bool swap )
+{
+  this->private_->swap_xy_spacing_ = swap;
+}
+
+bool LayerImporter::get_swap_xy_spacing() const
+{
+  return this->private_->swap_xy_spacing_;
 }
 
 } // end namespace seg3D

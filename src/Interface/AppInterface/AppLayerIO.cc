@@ -44,9 +44,6 @@
 #include <Interface/AppInterface/AppLayerIO.h>
 #include <Interface/AppSegmentationExportWizard/AppSegmentationExportWizard.h>
 
-#include "itkGDCMSeriesFileNames.h"
-#include "gdcmException.h"
-
 namespace Seg3D
 {
 
@@ -260,11 +257,6 @@ void AppLayerIO::ExportSegmentation( QMainWindow* main_window )
     new AppSegmentationExportWizard( main_window );
   export_segmentation_wizard_->show();
 }
-
-
-
-
-
 
 } // end namespace Seg3D
 

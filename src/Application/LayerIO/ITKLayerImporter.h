@@ -98,9 +98,6 @@ public:
     return true;
   }
   
-  // SET_SWAP_XY_SPACING:
-  virtual void set_swap_xy_spacing( bool swap ){ this->swap_xy_spacing_ = swap; }
-
 private:
   // SCAN_DICOM:
   // this function is called by import_header to scan a single dicom and determine what kind of 
@@ -270,8 +267,6 @@ protected:
   // GET_LAYER_NAME:
   // Return the string that will be used to name the layers.
   virtual std::string get_layer_name();
-  
-  
 
 private:
   Core::ITKImageDataHandle        image_data_;
@@ -281,7 +276,6 @@ private:
   bool                  signed_data_;
   Core::DataType              pixel_type_;
   std::string               extension_;
-  bool                  swap_xy_spacing_; 
 };
 
 } // end namespace seg3D
