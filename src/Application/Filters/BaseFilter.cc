@@ -69,6 +69,8 @@ BaseFilter::BaseFilter() :
 
 BaseFilter::~BaseFilter()
 {
+  this->private_->disconnect_all();
+
   for ( size_t j = 0; j < this->private_->locked_layers_.size(); j++ )
   {
     LayerManager::DispatchUnlockLayer( this->private_->locked_layers_[ j ] );

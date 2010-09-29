@@ -26,35 +26,48 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INTERFACE_TOOLINTERFACE_FLIPTOOLINTERFACE_H
-#define INTERFACE_TOOLINTERFACE_FLIPTOOLINTERFACE_H
+#ifndef APPLICATION_FILTERS_ACTIONS_ACTIONPERMUTE_H
+#define APPLICATION_FILTERS_ACTIONS_ACTIONPERMUTE_H
 
-// Application includes
-#include <Application/Tool/ToolFactory.h>
-
-// Base class of the tool widget include
-#include <Interface/AppInterface/ToolWidget.h>
+#include <Core/Action/Actions.h>
 
 namespace Seg3D
 {
+  
+class ActionPermutePrivate;
+typedef boost::shared_ptr< ActionPermutePrivate > ActionPermutePrivateHandle;
 
-class FlipToolInterfacePrivate;
-
-class FlipToolInterface : public ToolWidget
+class ActionPermute : public Core::Action
 {
-  Q_OBJECT
 
+CORE_ACTION( 
+  CORE_ACTION_TYPE( "Permute", "Permute the input layers" )
+  CORE_ACTION_ARGUMENT( "layerids", "The layerids on which this tool needs to be run." )
+  CORE_ACTION_ARGUMENT( "permutation", "The permutation array." )
+  CORE_ACTION_KEY( "replace", "false", "Whether to delete the input layers afterwards." )
+)
+  
+  // -- Constructor/Destructor --
 public:
-  FlipToolInterface();
-  virtual ~FlipToolInterface();
-
-  virtual bool build_widget( QFrame* frame );
-
+  ActionPermute();
+  
+  virtual ~ActionPermute() {}
+  
+  // -- Functions that describe action --
+public:
+  virtual bool validate( Core::ActionContextHandle& context );
+  virtual bool run( Core::ActionContextHandle& context, Core::ActionResultHandle& result );
+  
 private:
-  FlipToolInterfacePrivate* private_;
-
+  ActionPermutePrivateHandle private_;
+  
+public:
+  static void Dispatch( Core::ActionContextHandle context, 
+    const std::vector< std::string >& layer_ids, 
+    const std::vector< int >& permutation,
+    bool replace );
 };
-
+  
 } // end namespace Seg3D
 
 #endif

@@ -91,6 +91,8 @@ SET(APPLICATION_FILTERS_ACTIONS_SRCS
   Actions/ActionCrop.cc
   Actions/ActionArithmeticFilter.h
   Actions/ActionArithmeticFilter.cc
+  Actions/ActionPermute.h
+  Actions/ActionPermute.cc
   )
 
 CORE_ADD_LIBRARY(Application_Filters ${APPLICATION_FILTERS_SRCS}

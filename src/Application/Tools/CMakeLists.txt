@@ -93,6 +93,8 @@ SET(APPLICATION_TOOLS_SRCS
   ResampleTool.cc
   CropTool.h
   CropTool.cc
+  FlipTool.h
+  FlipTool.cc
   )
 
 SET(APPLICATION_TOOLS_NOREGISTER_SRCS

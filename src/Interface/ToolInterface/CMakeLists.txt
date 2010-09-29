@@ -57,6 +57,7 @@ SET(INTERFACE_TOOLINTERFACE_SRCS
   NeighborhoodConnectedFilterInterface.cc
   OtsuThresholdFilterInterface.cc
   ThresholdSegmentationLSFilterInterface.cc
+  FlipToolInterface.cc
 )
 
 SET(INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_SRCS
@@ -90,6 +91,7 @@ SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
   NeighborhoodConnectedFilterInterface.h
   OtsuThresholdFilterInterface.h
   ThresholdSegmentationLSFilterInterface.h
+  FlipToolInterface.h
 )
 
 SET(INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_MOC_SRCS
@@ -126,6 +128,7 @@ SET(INTERFACE_TOOLINTERFACE_UI_SRCS
   NeighborhoodConnectedFilterInterface.ui
   OtsuThresholdFilterInterface.ui
   ThresholdSegmentationLSFilterInterface.ui
+  FlipToolInterface.ui
 )
 
 SET(INTERFACE_TOOLINTERFACE_CUSTOMWIDGETS_UI_SRCS

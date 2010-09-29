@@ -26,15 +26,16 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-//Interface Includes
-#include <Interface/QtUtils/QtBridge.h>
-
-//Qt Gui Includes
-#include <Interface/ToolInterface/FlipToolInterface.h>
-#include "ui_FlipToolInterface.h"
+//QtUtils Includes
+#include <QtUtils/Bridge/QtBridge.h>
 
 //Application Includes
 #include <Application/Tools/FlipTool.h>
+
+//Interface Includes
+#include <Interface/ToolInterface/FlipToolInterface.h>
+#include "ui_FlipToolInterface.h"
+
 
 SCI_REGISTER_TOOLINTERFACE( Seg3D, FlipToolInterface )
 
@@ -67,12 +68,46 @@ bool FlipToolInterface::build_widget( QFrame* frame )
   FlipTool* tool = dynamic_cast< FlipTool* > ( base_tool_.get() );
 
   //Step 3 - connect the gui to the tool through the QtBridge
-  QtBridge::connect( private_->ui_.targetComboBox, tool->target_layer_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.target_group_, tool->target_group_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.layer_list_, tool->target_layers_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.use_active_group_, tool->use_active_group_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.replace_checkbox_, tool->replace_state_ );
 
-  //Send a message to the log that we have finised with building the Flip Tool Interface
-  SCI_LOG_DEBUG("Finished building a Flip Tool Interface");
+  QtUtils::QtBridge::Connect( this->private_->ui_.flip_x_button_, boost::bind(
+    &FlipTool::dispatch_flip, tool, Core::Interface::GetWidgetActionContext(), 0 ) );
+  QtUtils::QtBridge::Connect( this->private_->ui_.flip_y_button_, boost::bind(
+    &FlipTool::dispatch_flip, tool, Core::Interface::GetWidgetActionContext(), 1 ) );
+  QtUtils::QtBridge::Connect( this->private_->ui_.flip_z_button_, boost::bind(
+    &FlipTool::dispatch_flip, tool, Core::Interface::GetWidgetActionContext(), 2 ) );
+  QtUtils::QtBridge::Connect( this->private_->ui_.rotate_axial_ccw_button_, boost::bind(
+    &FlipTool::dispatch_rotate, tool, Core::Interface::GetWidgetActionContext(), 2, true ) );
+  QtUtils::QtBridge::Connect( this->private_->ui_.rotate_axial_cw_button_, boost::bind(
+    &FlipTool::dispatch_rotate, tool, Core::Interface::GetWidgetActionContext(), 2, false ) );
+  QtUtils::QtBridge::Connect( this->private_->ui_.rotate_coronal_ccw_button_, boost::bind(
+    &FlipTool::dispatch_rotate, tool, Core::Interface::GetWidgetActionContext(), 1, true ) );
+  QtUtils::QtBridge::Connect( this->private_->ui_.rotate_coronal_cw_button_, boost::bind(
+    &FlipTool::dispatch_rotate, tool, Core::Interface::GetWidgetActionContext(), 1, false ) );
+  QtUtils::QtBridge::Connect( this->private_->ui_.rotate_sagittal_ccw_button_, boost::bind(
+    &FlipTool::dispatch_rotate, tool, Core::Interface::GetWidgetActionContext(), 0, true ) );
+  QtUtils::QtBridge::Connect( this->private_->ui_.rotate_sagittal_cw_button_, boost::bind(
+    &FlipTool::dispatch_rotate, tool, Core::Interface::GetWidgetActionContext(), 0, false ) );
 
-  return ( true );
+  QtUtils::QtBridge::Enable( this->private_->ui_.target_group_, 
+    tool->use_active_group_state_, true ); 
+  QtUtils::QtBridge::Enable( this->private_->ui_.flip_x_button_, tool->valid_target_state_ );
+  QtUtils::QtBridge::Enable( this->private_->ui_.flip_y_button_, tool->valid_target_state_ );
+  QtUtils::QtBridge::Enable( this->private_->ui_.flip_z_button_, tool->valid_target_state_ );
+  QtUtils::QtBridge::Enable( this->private_->ui_.rotate_axial_ccw_button_, tool->valid_target_state_ );
+  QtUtils::QtBridge::Enable( this->private_->ui_.rotate_axial_cw_button_, tool->valid_target_state_ );
+  QtUtils::QtBridge::Enable( this->private_->ui_.rotate_coronal_ccw_button_, tool->valid_target_state_ );
+  QtUtils::QtBridge::Enable( this->private_->ui_.rotate_coronal_cw_button_, tool->valid_target_state_ );
+  QtUtils::QtBridge::Enable( this->private_->ui_.rotate_sagittal_ccw_button_, tool->valid_target_state_ );
+  QtUtils::QtBridge::Enable( this->private_->ui_.rotate_sagittal_cw_button_, tool->valid_target_state_ );
+
+  //Send a message to the log that we have finished with building the Flip Tool Interface
+  CORE_LOG_DEBUG( "Finished building a Flip Tool Interface" );
+
+  return true;
 } // end build_widget
 
 

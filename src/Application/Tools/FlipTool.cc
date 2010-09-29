@@ -26,9 +26,9 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#include <Application/Filters/Actions/ActionPermute.h>
 #include <Application/Tool/ToolFactory.h>
 #include <Application/Tools/FlipTool.h>
-// #include <Application/LayerManager/LayerManager.h>
 
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL( Seg3D, FlipTool)
@@ -37,64 +37,56 @@ namespace Seg3D
 {
 
 FlipTool::FlipTool( const std::string& toolid ) :
-  Tool( toolid )
+  GroupTargetTool( Core::VolumeType::ALL_E, toolid )
 {
-  // Need to set ranges and default values for all parameters
-  add_state( "target", target_layer_state_, "<none>" );
-
+  this->add_state( "replace", this->replace_state_, false );
 }
 
 FlipTool::~FlipTool()
 {
-  disconnect_all();
+  this->disconnect_all();
 }
 
-void FlipTool::handle_layers_changed()
+void FlipTool::dispatch_flip( Core::ActionContextHandle context, int index )
 {
+  std::vector< int > permutation( 3 );
+  for ( int i = 0; i < 3; ++i )
+  {
+    permutation[ i ] = i + 1;
+  }
+  permutation[ index ] *= -1;
+
+  this->dispatch( context, permutation );
 }
 
-void FlipTool::activate()
+void FlipTool::dispatch_rotate( Core::ActionContextHandle context, int axis, bool ccw )
 {
+  std::vector< int > permutation( 3 );
+  permutation[ axis ] = axis + 1;
+  
+  // NOTE: Since coronal view is already rotated, the definition of counterclockwise
+  // needs to be inverted.
+  if ( axis == 1 )
+  {
+    ccw = !ccw;
+  }
+  
+  int sign1 = ccw ? -1 : 1;
+  int sign2 = ccw ? 1 : -1;
+
+  permutation[ ( axis + 1 ) % 3 ] = sign1 * ( ( axis + 2 ) % 3 + 1 );
+  permutation[ ( axis + 2 ) % 3 ] = sign2 * ( ( axis + 1 ) % 3 + 1 );
+
+  this->dispatch( context, permutation );
 }
 
-void FlipTool::deactivate()
+void FlipTool::dispatch( Core::ActionContextHandle context, const std::vector< int >& permutation )
 {
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
+  ActionPermute::Dispatch( context, this->target_layers_state_->get(), permutation,
+    this->replace_state_->get() );
 }
 
-void FlipTool::dispatch_flip_coronal() const
-{
-}
-
-void FlipTool::dispatch_flip_sagittal() const
-{
-}
-
-void FlipTool::dispatch_flip_axial() const
-{
-}
-
-void FlipTool::dispatch_rotate90_coronal() const
-{
-}
-
-void FlipTool::dispatch_rotate90_sagittal() const
-{
-}
-
-void FlipTool::dispatch_rotate90_axial() const
-{
-}
-
-void FlipTool::dispatch_negative_rotate90_coronal() const
-{
-}
-
-void FlipTool::dispatch_negative_rotate90_sagittal() const
-{
-}
-
-void FlipTool::dispatch_negative_rotate90_axial() const
-{
-}
 
 } // end namespace Seg3D

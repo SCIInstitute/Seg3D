@@ -29,21 +29,22 @@
 #ifndef APPLICATION_TOOLS_FLIPTOOL_H
 #define APPLICATION_TOOLS_FLIPTOOL_H
 
-#include <Application/Tool/Tool.h>
+#include <Application/Tool/GroupTargetTool.h>
 
 namespace Seg3D
 {
 
-class FlipTool : public Tool
+class FlipTool : public GroupTargetTool
 {
 
-SEG3D_TOOL(
-SEG3D_TOOL_NAME( "FlipTool", "Flip or Rotate a dataset" )
-SEG3D_TOOL_MENULABEL( "Flip/Rotate" )
-SEG3D_TOOL_MENU( "Tools" )
-SEG3D_TOOL_SHORTCUT_KEY( "Alt+F" )
-SEG3D_TOOL_URL( "http://seg3d.org/" )
-SEG3D_TOOL_VERSION( "1" )
+SEG3D_TOOL
+(
+  SEG3D_TOOL_NAME( "FlipTool", "Flip or Rotate a dataset" )
+  SEG3D_TOOL_MENULABEL( "Flip/Rotate" )
+  SEG3D_TOOL_MENU( "Tools" )
+  SEG3D_TOOL_SHORTCUT_KEY( "Alt+F" )
+  SEG3D_TOOL_URL( "http://seg3d.org/" )
+  SEG3D_TOOL_VERSION( "1" )
 )
 
   // -- constructor/destructor --
@@ -51,35 +52,14 @@ public:
   FlipTool( const std::string& toolid );
   virtual ~FlipTool();
 
-  // -- constraint parameters --
+  void dispatch_flip( Core::ActionContextHandle context, int index );
+  void dispatch_rotate( Core::ActionContextHandle context, int axis, bool ccw );
 
-  // -- handle updates from layermanager --
-  void handle_layers_changed();
+private:
+  void dispatch( Core::ActionContextHandle context, const std::vector< int >& permutation );
 
-  // -- activate/deactivate tool --
-  virtual void activate();
-  virtual void deactivate();
-
-  // -- dispatch functions --
-
-  void dispatch_flip_coronal() const;
-  void dispatch_flip_sagittal() const;
-  void dispatch_flip_axial() const;
-
-  void dispatch_rotate90_coronal() const;
-  void dispatch_rotate90_sagittal() const;
-  void dispatch_rotate90_axial() const;
-
-  void dispatch_negative_rotate90_coronal() const;
-  void dispatch_negative_rotate90_sagittal() const;
-  void dispatch_negative_rotate90_axial() const;
-
-  // -- state --
 public:
-
-  // Layerid of the target layer
-  StateStringHandle target_layer_state_;
-
+  Core::StateBoolHandle replace_state_;
 };
 
 } // end namespace
