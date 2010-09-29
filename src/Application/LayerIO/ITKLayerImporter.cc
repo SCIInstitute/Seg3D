@@ -107,14 +107,8 @@ bool ITKLayerImporter::scan_dicom()
   {
     reader->Update();
   }
-  catch ( itk::ExceptionObject &err )
+  catch( ... )
   {
-    std::string itk_error = err.GetDescription();
-    return false;
-  }
-  catch( gdcm::Exception &error )
-  {
-    std::string format_error = error.getError();
     return false;
   }
 

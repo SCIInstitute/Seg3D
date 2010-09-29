@@ -105,7 +105,7 @@ bool ActionImportLayer::run( Core::ActionContextHandle& context, Core::ActionRes
   ImportFromString( this->mode_.value(), mode );
 
   std::vector<LayerHandle> layers;
-  this->layer_importer_.handle()->import_layer( mode, layers );
+  bool succeed = this->layer_importer_.handle()->import_layer( mode, layers );
     
   for (size_t j = 0; j < layers.size(); j++)
   {
@@ -114,7 +114,7 @@ bool ActionImportLayer::run( Core::ActionContextHandle& context, Core::ActionRes
 
   progress->end_progress_reporting();
 
-  return true;
+  return succeed;
 }
 
 Core::ActionHandle ActionImportLayer::Create( const std::string& filename, 

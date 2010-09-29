@@ -69,16 +69,6 @@ public:
   ViewerWidget( ViewerHandle viewer, QWidget *parent = 0 );
   virtual ~ViewerWidget();
 
-Q_SIGNALS:
-  // SELECTED:
-  // This signal is triggered when the widget is selected
-  void selected( int );
-  
-  // CHANGED_VIEWER_TYPE:
-  // This signal is triggered when the viewer type ( axial, sagittal, coronal, or volume)
-  // is changed
-  void changed_viewer_type( int );
-  
 public Q_SLOTS:
 
   // SELECT:

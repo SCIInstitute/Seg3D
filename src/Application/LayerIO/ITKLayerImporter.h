@@ -140,13 +140,9 @@ private:
     {
       reader->Update();
     }
-    catch ( itk::ExceptionObject &err )
+    catch( ... )
     {
-      std::string itk_error = err.GetDescription();
-    }
-    catch( gdcm::Exception &error )
-    {
-      std::string format_error = error.getError();
+      return false;
     }
 
     // Step 6: here we instantiate a new DataBlock using the output from the reader
@@ -190,13 +186,9 @@ private:
     {
       reader->Update();
     }
-    catch ( itk::ExceptionObject &err )
+    catch( ... )
     {
-      std::string itk_error = err.GetDescription();
-    }
-    catch( gdcm::Exception &error )
-    {
-      std::string format_error = error.getError();
+      return false;
     }
  
     this->data_block_ = Core::ITKDataBlock::New< PixelType >( 
@@ -233,13 +225,9 @@ private:
     {
       reader->Update();
     }
-    catch ( itk::ExceptionObject &err )
+    catch( ... )
     {
-      std::string itk_error = err.GetDescription();
-    }
-    catch( gdcm::Exception &error )
-    {
-      std::string format_error = error.getError();
+      return false;
     }
 
     this->data_block_ = Core::ITKDataBlock::New< PixelType >( 

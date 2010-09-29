@@ -54,10 +54,11 @@ CORE_ACTION(
 public:
   ActionImportLayer()
   {
-    add_argument( this->filename_ );
-    add_key( this->mode_ );
-    add_key( this->importer_ );
-    add_key( this->series_import_ );
+    this->add_argument( this->filename_ );
+    this->add_key( this->mode_ );
+    this->add_key( this->importer_ );
+    this->add_key( this->series_import_ );
+    this->add_cachedhandle( this->layer_importer_ );
   }
   
   virtual ~ActionImportLayer()

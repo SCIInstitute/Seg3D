@@ -56,6 +56,8 @@ SET(APPLICATION_LAYERIO_IMPORTERS_SRCS
   NrrdLayerImporter.cc
   VFFLayerImporter.h
   VFFLayerImporter.cc
+  GDCMLayerImporter.h
+  GDCMLayerImporter.cc
 )
 SET(APPLICATION_LAYERIO_EXPORTERS_SRCS
   ITKLayerExporter.h
@@ -80,7 +82,8 @@ TARGET_LINK_LIBRARIES(Application_LayerIO
           Core_State
           Application_InterfaceManager
           Application_Layer
-          ${SCI_BOOST_LIBRARY})
+          ${SCI_BOOST_LIBRARY}
+          ${SCI_GDCM_LIBRARY})
 
 # Register actions and importers
 REGISTER_LIBRARY_AND_CLASSES(Application_LayerIO 

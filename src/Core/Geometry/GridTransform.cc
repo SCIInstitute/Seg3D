@@ -125,7 +125,9 @@ void GridTransform::AlignToCanonicalCoordinates( const GridTransform& src_transf
   src_size[ 2 ] = src_transform.get_nz();
   Vector spacing;
   std::vector< size_t > dst_size( 3 );
-  Point dst_origin;
+  // NOTE: The origin should remain the same, as the value is already in world coordinates
+  Point dst_origin = src_origin;
+
   // Step 2. Get the permutation transformation from the source to canonical coordinates
   permutation.resize( 3 );
   for ( int i = 0; i < 3; ++i )
@@ -137,15 +139,6 @@ void GridTransform::AlignToCanonicalCoordinates( const GridTransform& src_transf
         permutation[ i ] = Sign( axes[ j ][ i ] ) * ( j + 1 );
         spacing[ i ] = Abs( axes[ j ][ i ] );
         dst_size[ i ] = src_size[ j ];
-        if ( axes[ i ][ j ] > 0 )
-        {
-          dst_origin[ i ] = src_origin[ j ];
-        }
-        else
-        {
-          dst_origin[ i ] = src_origin[ j ] + axes[ j ][ i ] * 
-            ( static_cast< int >( src_size[ j ] ) - 1 );
-        }
         break;
       }     
     }

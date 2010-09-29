@@ -133,11 +133,6 @@ void ViewerInterfacePrivate::setup_ui( QWidget* parent )
   this->layout_->addWidget( this->horiz_splitter_ );
   parent->setLayout( layout_ );
 
-  for ( size_t j = 0; j < 6; j++ )
-  {
-    parent->connect( this->viewer_[ j ], SIGNAL( selected( int ) ), 
-      SLOT( set_active_viewer( int ) ) );
-  }
 }
 
 ViewerInterface::ViewerInterface( QWidget *parent ) :
