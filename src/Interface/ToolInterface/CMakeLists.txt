@@ -46,6 +46,7 @@ SET(INTERFACE_TOOLINTERFACE_SRCS
   ConnectedComponentSizeFilterInterface.cc
   CurvatureAnisotropicDiffusionFilterInterface.cc
   DiscreteGaussianFilterInterface.cc
+  DistanceFilterInterface.cc
   FillHolesFilterInterface.cc
   GradientMagnitudeFilterInterface.cc
   HistogramEqualizationFilterInterface.cc
@@ -78,6 +79,7 @@ SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
   ConnectedComponentSizeFilterInterface.h
   CurvatureAnisotropicDiffusionFilterInterface.h
   DiscreteGaussianFilterInterface.h
+  DistanceFilterInterface.h
   FillHolesFilterInterface.h
   GradientMagnitudeFilterInterface.h
   HistogramEqualizationFilterInterface.h
@@ -113,6 +115,7 @@ SET(INTERFACE_TOOLINTERFACE_UI_SRCS
   ConnectedComponentSizeFilterInterface.ui
   CurvatureAnisotropicDiffusionFilterInterface.ui
   DiscreteGaussianFilterInterface.ui
+  DistanceFilterInterface.ui
   FillHolesFilterInterface.ui
   GradientMagnitudeFilterInterface.ui
   HistogramEqualizationFilterInterface.ui

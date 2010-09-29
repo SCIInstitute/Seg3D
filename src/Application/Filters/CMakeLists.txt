@@ -61,6 +61,8 @@ SET(APPLICATION_FILTERS_ACTIONS_SRCS
   Actions/ActionDilateErodeFilter.cc
   Actions/ActionDiscreteGaussianFilter.h
   Actions/ActionDiscreteGaussianFilter.cc
+  Actions/ActionDistanceFilter.h
+  Actions/ActionDistanceFilter.cc
   Actions/ActionErodeFilter.h
   Actions/ActionErodeFilter.cc
   Actions/ActionGradientMagnitudeFilter.h

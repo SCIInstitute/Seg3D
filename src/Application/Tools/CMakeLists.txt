@@ -67,6 +67,8 @@ SET(APPLICATION_TOOLS_SRCS
   CurvatureAnisotropicDiffusionFilter.cc
   DiscreteGaussianFilter.h
   DiscreteGaussianFilter.cc  
+  DistanceFilter.h
+  DistanceFilter.cc
   FillHolesFilter.h
   FillHolesFilter.cc
   GradientMagnitudeFilter.h

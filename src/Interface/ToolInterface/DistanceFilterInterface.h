@@ -26,40 +26,48 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#ifndef INTERFACE_TOOLINTERFACE_DISTANCEFILTERINTERFACE_H
+#define INTERFACE_TOOLINTERFACE_DISTANCEFILTERINTERFACE_H
+
+// Core includes
+#include <Core/Utils/Log.h>
+
 // Application includes
 #include <Application/Tool/ToolFactory.h>
-#include <Application/Layer/Layer.h>
-#include <Application/LayerManager/LayerManager.h>
 
-// StateEnigne of the tool
-#include <Application/Tools/OtsuThresholdFilter.h>
-
-// Action associated with tool
-#include <Application/Filters/Actions/ActionOtsuThresholdFilter.h>
-
-// Register the tool into the tool factory
-SCI_REGISTER_TOOL( Seg3D, OtsuThresholdFilter )
+// Base class of the tool widget
+#include <Interface/AppInterface/ToolWidget.h>
 
 namespace Seg3D
 {
 
-OtsuThresholdFilter::OtsuThresholdFilter( const std::string& toolid ) :
-  SingleTargetTool( Core::VolumeType::DATA_E, toolid )
-{
-  // Need to set ranges and default values for all parameters
-  add_state( "amount", this->amount_state_, 1, 1, 6, 1 );
-}
+class DistanceFilterInterfacePrivate;
 
-OtsuThresholdFilter::~OtsuThresholdFilter()
+class DistanceFilterInterface : public ToolWidget
 {
-  disconnect_all();
-}
+Q_OBJECT
 
-void OtsuThresholdFilter::execute( Core::ActionContextHandle context )
-{ 
-  ActionOtsuThresholdFilter::Dispatch( context,
-    this->target_layer_state_->get(),
-    this->amount_state_->get() );
-}
+// -- Constructor/destructor --
+public:
+  DistanceFilterInterface();
+  virtual ~DistanceFilterInterface();
+
+// -- create interface --
+public:
+  // BUILD_WIDGET:
+  // This function builds the actual GUI
+  virtual bool build_widget( QFrame* frame );
   
+// -- run filter --
+private Q_SLOTS:
+  void run_filter();
+
+// -- filter internals --
+private:
+    boost::shared_ptr< DistanceFilterInterfacePrivate > private_;
+
+};
+
 } // end namespace Seg3D
+
+#endif

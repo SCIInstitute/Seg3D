@@ -32,34 +32,40 @@
 #include <Application/LayerManager/LayerManager.h>
 
 // StateEnigne of the tool
-#include <Application/Tools/OtsuThresholdFilter.h>
+#include <Application/Tools/DistanceFilter.h>
 
 // Action associated with tool
-#include <Application/Filters/Actions/ActionOtsuThresholdFilter.h>
+#include <Application/Filters/Actions/ActionDistanceFilter.h>
 
 // Register the tool into the tool factory
-SCI_REGISTER_TOOL( Seg3D, OtsuThresholdFilter )
+SCI_REGISTER_TOOL( Seg3D, DistanceFilter )
 
 namespace Seg3D
 {
 
-OtsuThresholdFilter::OtsuThresholdFilter( const std::string& toolid ) :
-  SingleTargetTool( Core::VolumeType::DATA_E, toolid )
+DistanceFilter::DistanceFilter( const std::string& toolid ) :
+  SingleTargetTool( Core::VolumeType::MASK_E, toolid )
 {
   // Need to set ranges and default values for all parameters
-  add_state( "amount", this->amount_state_, 1, 1, 6, 1 );
+  this->add_state( "replace", this->replace_state_, false );
+  this->add_state( "use_index_space", this->use_index_space_state_, false );
+  this->add_state( "inside_positive", this->inside_positive_state_, false );
 }
-
-OtsuThresholdFilter::~OtsuThresholdFilter()
+  
+DistanceFilter::~DistanceFilter()
 {
   disconnect_all();
 }
 
-void OtsuThresholdFilter::execute( Core::ActionContextHandle context )
-{ 
-  ActionOtsuThresholdFilter::Dispatch( context,
+void DistanceFilter::execute( Core::ActionContextHandle context )
+{
+  ActionDistanceFilter::Dispatch( context,
     this->target_layer_state_->get(),
-    this->amount_state_->get() );
+    this->replace_state_->get(),
+    this->use_index_space_state_->get(),
+    this->inside_positive_state_->get() );
 }
-  
+
 } // end namespace Seg3D
+
+

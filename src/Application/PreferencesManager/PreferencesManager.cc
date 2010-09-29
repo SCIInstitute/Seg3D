@@ -137,20 +137,20 @@ void PreferencesManager::initialize_states()
 
 bool PreferencesManager::initialize_default_colors()
 {
-  this->default_colors_.push_back( Core::Color( 106, 22, 102 ) );
-  this->default_colors_.push_back( Core::Color( 198, 0, 34 ) );
-  this->default_colors_.push_back( Core::Color( 210, 70, 38 ) );
-  this->default_colors_.push_back( Core::Color( 221, 120, 47 ) );
+  this->default_colors_.push_back( Core::Color( 255, 175, 78 ) );
+  this->default_colors_.push_back( Core::Color( 116, 255, 122 ) );
+  this->default_colors_.push_back( Core::Color( 143, 214, 255 ) );
+  this->default_colors_.push_back( Core::Color( 255, 0, 0 ) );
   
-  this->default_colors_.push_back( Core::Color( 237, 177, 53 ) );
-  this->default_colors_.push_back( Core::Color( 241, 235, 69 ) );
+  this->default_colors_.push_back( Core::Color( 255, 233, 0 ) );
+  this->default_colors_.push_back( Core::Color( 0, 0, 255 ) );
   this->default_colors_.push_back( Core::Color( 112, 181, 66 ) );
-  this->default_colors_.push_back( Core::Color( 21, 143, 67 ) );
+  this->default_colors_.push_back( Core::Color( 255, 94, 122 ) );
   
-  this->default_colors_.push_back( Core::Color( 33, 131, 130 ) );
-  this->default_colors_.push_back( Core::Color( 41, 93, 153 ) );
-  this->default_colors_.push_back( Core::Color( 28, 60, 116 ) );
-  this->default_colors_.push_back( Core::Color( 35, 31, 98 ) );
+  this->default_colors_.push_back( Core::Color( 255, 255, 165 ) );
+  this->default_colors_.push_back( Core::Color( 108, 0, 212 ) );
+  this->default_colors_.push_back( Core::Color( 194, 118, 0 ) );
+  this->default_colors_.push_back( Core::Color( 159, 143, 255 ) );
   
   return true;
 }

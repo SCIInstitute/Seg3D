@@ -436,8 +436,7 @@ void LayerWidget::update_appearance( bool locked, bool active, bool in_use, bool
     break;
     case Core::VolumeType::MASK_E:
     {
-      int color_index =  dynamic_cast< MaskLayer* >( ( LayerManager::Instance()->
-        get_layer_by_id( this->get_layer_id() ) ).get() )->color_state_->get();
+      int color_index =  dynamic_cast< MaskLayer* >( this->private_->layer_.get() )->color_state_->get();
       
       this->set_mask_background_color( color_index );
     }

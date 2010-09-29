@@ -1148,13 +1148,23 @@ void LayerManager::DispatchUnlockLayer( LayerHandle layer )
 
 void LayerManager::DispatchUnlockOrDeleteLayer( LayerHandle layer )
 {
+  // Move this request to the Application thread
+  if ( !( Core::Application::IsApplicationThread() ) )
+  {
+    Core::Application::PostEvent( boost::bind( &LayerManager::DispatchUnlockOrDeleteLayer, layer) );
+    return;
+  }
+
+  // NOTE: We can only determine whether the layer is valid on the application thread.
+  // Other instructions to insert data into the layer may still be in the application thread
+  // queue, hence we need to process this at the end of the queue.
   if( layer->is_valid() )
   {
-    DispatchUnlockLayer( layer );
+    layer->data_state_->set( Layer::AVAILABLE_C );
   }
   else
   {
-    DispatchDeleteLayer( layer );
+    LayerManager::Instance()->delete_layer( layer );
   }
 }
 

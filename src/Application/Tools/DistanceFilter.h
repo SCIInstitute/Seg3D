@@ -26,40 +26,50 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+#ifndef APPLICATION_TOOLS_DISTANCEFILTER_H
+#define APPLICATION_TOOLS_DISTANCEFILTER_H
+
+#include <Application/Tool/Tool.h>
+
 // Application includes
-#include <Application/Tool/ToolFactory.h>
-#include <Application/Layer/Layer.h>
-#include <Application/LayerManager/LayerManager.h>
-
-// StateEnigne of the tool
-#include <Application/Tools/OtsuThresholdFilter.h>
-
-// Action associated with tool
-#include <Application/Filters/Actions/ActionOtsuThresholdFilter.h>
-
-// Register the tool into the tool factory
-SCI_REGISTER_TOOL( Seg3D, OtsuThresholdFilter )
+#include <Application/Tool/SingleTargetTool.h>
 
 namespace Seg3D
 {
 
-OtsuThresholdFilter::OtsuThresholdFilter( const std::string& toolid ) :
-  SingleTargetTool( Core::VolumeType::DATA_E, toolid )
+class DistanceFilter : public SingleTargetTool
 {
-  // Need to set ranges and default values for all parameters
-  add_state( "amount", this->amount_state_, 1, 1, 6, 1 );
-}
 
-OtsuThresholdFilter::~OtsuThresholdFilter()
-{
-  disconnect_all();
-}
+SEG3D_TOOL(
+SEG3D_TOOL_NAME( "DistanceFilter", "Compute the distance to the mask" )
+SEG3D_TOOL_MENULABEL( "DistanceMap" )
+SEG3D_TOOL_MENU( "Filters" )
+SEG3D_TOOL_SHORTCUT_KEY( "Alt+Shift+D" )
+SEG3D_TOOL_URL( "http://seg3d.org/" )
+SEG3D_TOOL_VERSION( "1" )
+)
 
-void OtsuThresholdFilter::execute( Core::ActionContextHandle context )
-{ 
-  ActionOtsuThresholdFilter::Dispatch( context,
-    this->target_layer_state_->get(),
-    this->amount_state_->get() );
-}
-  
-} // end namespace Seg3D
+public:
+  DistanceFilter( const std::string& toolid );
+  virtual ~DistanceFilter();
+
+  // -- state --
+public:
+  // Whether the layer needs to be replaced
+  Core::StateBoolHandle replace_state_;
+
+  // Whether to use index space for the computation
+  Core::StateBoolHandle use_index_space_state_;
+
+  // Whether to assign positive values on the inside
+  Core::StateBoolHandle inside_positive_state_;
+
+  // -- execute --
+public:
+  // Execute the tool and dispatch the action
+  virtual void execute( Core::ActionContextHandle context );
+};
+
+} // end namespace
+
+#endif
