@@ -677,8 +677,7 @@ Core::BBox LayerManager::get_layers_bbox()
   return bbox;
 }
 
-void LayerManager::get_layer_names( std::vector< LayerIDNamePair >& layer_names, 
-    Core::VolumeType type )
+void LayerManager::get_layer_names( std::vector< LayerIDNamePair >& layer_names, int type )
 {
   lock_type lock( this->get_mutex() );
 
@@ -700,7 +699,7 @@ void LayerManager::get_layer_names( std::vector< LayerIDNamePair >& layer_names,
 
 
 void LayerManager::get_layer_names_from_group( LayerGroupHandle group,
-  std::vector< LayerIDNamePair >& layer_names, Core::VolumeType type )
+  std::vector< LayerIDNamePair >& layer_names, int type )
 {
   lock_type lock( this->get_mutex() );
 

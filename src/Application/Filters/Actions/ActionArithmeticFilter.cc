@@ -142,34 +142,36 @@ bool ActionArithmeticFilterPrivate::validate_parser( Core::ActionContextHandle& 
   for ( size_t i = 0; i < layer_ids.size(); ++i )
   {
     name[ 0 ] = static_cast< char >( 'A' + i );
-    this->algo_->find_layer( layer_ids[ i ], layers[ i ] );
-    Core::DataBlockHandle input_data_block;
-    switch ( layers[ i ]->type() )
+    if ( this->algo_->find_layer( layer_ids[ i ], layers[ i ] ) )
     {
-    case Core::VolumeType::MASK_E:
-      Core::MaskDataBlockManager::Convert( dynamic_cast< MaskLayer* >( layers[ i ].get() )->
-        get_mask_volume()->get_mask_data_block(), input_data_block, Core::DataType::UCHAR_E );
-      break;
-    case Core::VolumeType::DATA_E:
-      input_data_block = dynamic_cast< DataLayer* >( layers[ i ].get() )->
-        get_data_volume()->get_data_block();
-      break;
-    }
+      Core::DataBlockHandle input_data_block;
+      switch ( layers[ i ]->type() )
+      {
+      case Core::VolumeType::MASK_E:
+        Core::MaskDataBlockManager::Convert( dynamic_cast< MaskLayer* >( layers[ i ].get() )->
+          get_mask_volume()->get_mask_data_block(), input_data_block, Core::DataType::UCHAR_E );
+        break;
+      case Core::VolumeType::DATA_E:
+        input_data_block = dynamic_cast< DataLayer* >( layers[ i ].get() )->
+          get_data_volume()->get_data_block();
+        break;
+      }
 
-    std::string error;
-    if ( !this->algo_->engine_.add_input_data_block( name, input_data_block, error ) )
-    {
-      context->report_error( error );
-      return false;
-    }
+      std::string error;
+      if ( !this->algo_->engine_.add_input_data_block( name, input_data_block, error ) )
+      {
+        context->report_error( error );
+        return false;
+      }
 
-    if ( i == 0 && replace )
-    {
-      this->algo_->lock_for_processing( layers[ i ] );
-    }
-    else
-    {
-      this->algo_->lock_for_use( layers[ i ] );
+      if ( i == 0 && replace )
+      {
+        this->algo_->lock_for_processing( layers[ i ] );
+      }
+      else
+      {
+        this->algo_->lock_for_use( layers[ i ] );
+      }
     }
   }
 
@@ -254,6 +256,7 @@ bool ActionArithmeticFilter::validate( Core::ActionContextHandle& context )
   LayerGroupHandle layer_group;
   for ( size_t i = 0; i < layer_ids.size(); ++i )
   {
+    if ( layer_ids[ i ] == "<none>" || layer_ids[ i ] == "" ) continue;
     // Check for layer existence
     LayerHandle layer = LayerManager::Instance()->get_layer_by_id( layer_ids[ i ] );
     if ( !layer )

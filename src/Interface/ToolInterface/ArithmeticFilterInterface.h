@@ -50,11 +50,11 @@ public:
   virtual bool build_widget( QFrame* frame );
   
 private Q_SLOTS:
-  void set_expressions_text( QListWidgetItem* item );
+  void set_predefined_text( int index );
+  void run_filter();
 
 private:
   boost::shared_ptr< ArithmeticFilterInterfacePrivate > private_;
-
 };
 
 } // namespace Seg3D

@@ -46,6 +46,7 @@ typedef boost::shared_ptr< StateLabeledOption > StateLabeledOptionHandle;
 typedef boost::shared_ptr< StateLabeledOptionPrivate > StateLabeledOptionPrivateHandle;
 
 typedef std::pair< std::string, std::string > OptionLabelPair;
+typedef std::vector< OptionLabelPair > OptionLabelPairVector;
 
 class StateLabeledOption : public StateBase
 {

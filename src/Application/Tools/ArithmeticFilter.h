@@ -29,15 +29,12 @@
 #ifndef APPLICATION_TOOLS_ARITHMETICFILTER_H
 #define APPLICATION_TOOLS_ARITHMETICFILTER_H
 
-#include <Application/Tool/Tool.h>
+#include <Application/Tool/SingleTargetTool.h>
 
 namespace Seg3D
 {
 
-class ArithmeticFilterPrivate;
-typedef boost::shared_ptr< ArithmeticFilterPrivate > ArithmeticFilterPrivateHandle;
-
-class ArithmeticFilter : public Tool
+class ArithmeticFilter : public SingleTargetTool
 {
 SEG3D_TOOL(
 SEG3D_TOOL_NAME( "ArithmeticFilter", "Filter for evaluating an expression on data" )
@@ -54,24 +51,20 @@ public:
 public:
   virtual void execute( Core::ActionContextHandle context );
 
+private:
+  void update_output_type();
+
   // -- state --
 public:
-  Core::StateLabeledOptionHandle target_group_state_;
-  Core::StateBoolHandle use_active_group_state_;
-  Core::StateLabeledOptionHandle input_layers_state_[ 4 ];
+  Core::StateLabeledOptionHandle input_b_state_;
+  Core::StateLabeledOptionHandle input_c_state_;
+  Core::StateLabeledOptionHandle input_d_state_;
 
-  Core::StateStringHandle expressions_state_;
-  Core::StateStringVectorHandle predefined_expressions_state_;
-  
+  Core::StateStringHandle expressions_state_; 
   Core::StateLabeledOptionHandle output_type_state_;
+
   Core::StateBoolHandle replace_state_;
   Core::StateBoolHandle preserve_data_format_state_;
-
-private:
-  ArithmeticFilterPrivateHandle private_;
-
-public:
-  const static int NUMBER_OF_INPUTS_C;
 
 };
 

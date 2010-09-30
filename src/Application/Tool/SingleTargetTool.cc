@@ -50,7 +50,7 @@ class SingleTargetToolPrivate
 
 public:
   // The type of layer that can be used with this filter
-  Core::VolumeType target_type_;
+  int target_type_;
   
   // Pointer back to the tool.
   // NOTE: This can be a pointer, as the callbacks are deleted when the tool is deleted and all
@@ -58,7 +58,7 @@ public:
   SingleTargetTool* tool_;
   
   std::vector<Core::StateLabeledOptionHandle> dependent_layer_states_;
-  std::vector<Core::VolumeType> dependent_layer_types_;
+  std::vector<int> dependent_layer_types_;
   
   // -- handle updates from layermanager --
   void handle_layers_changed();
@@ -212,7 +212,7 @@ void SingleTargetToolPrivate::handle_layer_name_changed( std::string layer_id )
 // Class SingleTargetTool
 //////////////////////////////////////////////////////////////////////////
 
-SingleTargetTool::SingleTargetTool(  Core::VolumeType target_type, const std::string& tool_type ) :
+SingleTargetTool::SingleTargetTool(  int target_type, const std::string& tool_type ) :
   Tool( tool_type ),
   private_( new SingleTargetToolPrivate )
 {
@@ -266,7 +266,7 @@ SingleTargetTool::~SingleTargetTool()
 
 void SingleTargetTool::add_dependent_layer_input( 
   Core::StateLabeledOptionHandle dependent_layer_state, 
-  Core::VolumeType dependent_layer_type )
+  int dependent_layer_type )
 {
   this->private_->dependent_layer_states_.push_back( dependent_layer_state );
   this->private_->dependent_layer_types_.push_back( dependent_layer_type );

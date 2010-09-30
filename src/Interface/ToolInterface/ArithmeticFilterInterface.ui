@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>253</width>
-    <height>543</height>
+    <width>262</width>
+    <height>533</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -30,7 +30,7 @@
    <item>
     <widget class="QGroupBox" name="input_groupbox_">
      <property name="title">
-      <string>Inputs</string>
+      <string>Input layers</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <property name="spacing">
@@ -49,35 +49,40 @@
        <number>4</number>
       </property>
       <item>
-       <widget class="QWidget" name="widget" native="true">
-        <layout class="QHBoxLayout" name="horizontalLayout">
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>2</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
-          <number>2</number>
-         </property>
-         <item>
-          <widget class="QLabel" name="label">
-           <property name="text">
-            <string>Target Group:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="target_group_"/>
-         </item>
-        </layout>
-       </widget>
+       <layout class="QHBoxLayout" name="horizontalLayout_7">
+        <item>
+         <widget class="QLabel" name="label_8">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>32</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>A:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="input_a_">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
-       <widget class="QCheckBox" name="use_active_group_">
+       <widget class="QCheckBox" name="use_active_layer_">
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -85,7 +90,7 @@
          </size>
         </property>
         <property name="text">
-         <string>Always Use Active Group</string>
+         <string>Always Use Active Layer</string>
         </property>
        </widget>
       </item>
@@ -93,19 +98,6 @@
        <widget class="Line" name="line">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="label_5">
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>28</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Layers:</string>
         </property>
        </widget>
       </item>
@@ -130,39 +122,6 @@
          <property name="bottomMargin">
           <number>2</number>
          </property>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_7">
-           <item>
-            <widget class="QLabel" name="label_8">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>32</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>A:</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QComboBox" name="input_a_">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_5">
            <item>
@@ -283,9 +242,9 @@
       </size>
      </property>
      <property name="title">
-      <string>Expressions</string>
+      <string>Expression</string>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <layout class="QVBoxLayout" name="verticalLayout_7">
       <property name="leftMargin">
        <number>4</number>
       </property>
@@ -299,16 +258,6 @@
        <number>4</number>
       </property>
       <item>
-       <widget class="QPlainTextEdit" name="expressions_">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Ignored" vsizetype="Expanding">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QWidget" name="widget_3" native="true">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -320,47 +269,34 @@
          <property name="margin">
           <number>0</number>
          </property>
-         <item>
-          <widget class="QLabel" name="label_2">
-           <property name="text">
-            <string>Predefined:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QListWidget" name="predefined_expressions_">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>65</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>65</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <item>
-            <property name="text">
-             <string>A&amp;&amp;B</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>A||B</string>
-            </property>
-           </item>
-          </widget>
-         </item>
         </layout>
        </widget>
+      </item>
+      <item>
+       <widget class="QPlainTextEdit" name="expressions_">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Ignored" vsizetype="MinimumExpanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>80</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Predefined:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="predefined_expressions_"/>
       </item>
      </layout>
     </widget>
@@ -431,7 +367,7 @@
    <item>
     <layout class="QVBoxLayout" name="verticalLayout_5">
      <item>
-      <widget class="QPushButton" name="execute_button_">
+      <widget class="QPushButton" name="runFilterButton">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
          <horstretch>0</horstretch>
@@ -439,7 +375,7 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>Execute</string>
+        <string>Run Filter</string>
        </property>
       </widget>
      </item>

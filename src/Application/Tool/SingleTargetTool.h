@@ -45,7 +45,7 @@ class SingleTargetTool : public Tool
 
   // -- constructor/destructor --
 public:
-  SingleTargetTool( Core::VolumeType target_volume_type, const std::string& tool_type );
+  SingleTargetTool( int target_volume_type, const std::string& tool_type );
   
   virtual ~SingleTargetTool();
 
@@ -62,7 +62,7 @@ public:
 
   // Add a state whose input is linked to the target and needs to be of the same type
   void add_dependent_layer_input( Core::StateLabeledOptionHandle dependent_layer_state, 
-    Core::VolumeType dependent_layer_type );
+    int dependent_layer_type );
 
 private:
   SingleTargetToolPrivateHandle private_;

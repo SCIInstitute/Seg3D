@@ -48,8 +48,8 @@ bool isnan_s( Core::ArrayMathProgramCode& pc )
 
   while ( data0 != data0_end )
   {
-    if ( Core::IsNan( *data1 ) ) *data0 = 1.0;
-    else *data0 = 0.0;
+    if ( Core::IsNan( *data1 ) ) *data0 = 1.0f;
+    else *data0 = 0.0f;
     data0++;
     data1++;
   }
@@ -65,8 +65,8 @@ bool isfinite_s( Core::ArrayMathProgramCode& pc )
 
   while ( data0 != data0_end )
   {
-    if ( Core::IsFinite( *data1 ) ) *data0 = 1.0;
-    else *data0 = 0.0;
+    if ( Core::IsFinite( *data1 ) ) *data0 = 1.0f;
+    else *data0 = 0.0f;
     data0++;
     data1++;
   }
@@ -82,8 +82,8 @@ bool isinfinite_s( Core::ArrayMathProgramCode& pc )
 
   while ( data0 != data0_end )
   {
-    if ( Core::IsInfinite( *data1 ) ) *data0 = 1.0;
-    else *data0 = 0.0;
+    if ( Core::IsInfinite( *data1 ) ) *data0 = 1.0f;
+    else *data0 = 0.0f;
     data0++;
     data1++;
   }
@@ -99,9 +99,9 @@ bool sign_s( Core::ArrayMathProgramCode& pc )
 
   while ( data0 != data0_end )
   {
-    if ( *data1 > 0.0 ) *data0 = 1.0;
-    else if ( *data1 < 0.0 ) *data0 = -1.0;
-    else *data0 = 0.0;
+    if ( *data1 > 0.0f ) *data0 = 1.0f;
+    else if ( *data1 < 0.0f ) *data0 = -1.0f;
+    else *data0 = 0.0f;
     data0++;
     data1++;
   }
@@ -123,14 +123,14 @@ bool ramp_sss( Core::ArrayMathProgramCode& pc )
     float end = *data3;
     if ( end > start )
     {
-      if ( *data1 <= start ) *data0 = 0.0;
-      else if ( *data1 >= end ) *data0 = 1.0;
+      if ( *data1 <= start ) *data0 = 0.0f;
+      else if ( *data1 >= end ) *data0 = 1.0f;
       else *data0 = ( ( *data1 - start ) / ( end - start ) );
     }
     else
     {
-      if ( ( *data1 ) >= start ) *data0 = 0.0;
-      else if ( ( *data1 ) <= end ) *data0 = 1.0;
+      if ( ( *data1 ) >= start ) *data0 = 0.0f;
+      else if ( ( *data1 ) <= end ) *data0 = 1.0f;
       else *data0 = ( ( start - *data1 ) / ( start - end ) );
     }
     data0++;
@@ -154,8 +154,8 @@ bool rect_sss( Core::ArrayMathProgramCode& pc )
   {
     float start = *data2;
     float end = *data3;
-    if ( *data1 >= start && *data1 <= end ) *data0 = 1.0;
-    else *data0 = 0.0;
+    if ( *data1 >= start && *data1 <= end ) *data0 = 1.0f;
+    else *data0 = 0.0f;
     data0++;
     data1++;
     data2++;
@@ -175,8 +175,8 @@ bool step_ss( Core::ArrayMathProgramCode& pc )
   while ( data0 != data0_end )
   {
     float step = *data2;
-    if ( *data1 >= step ) *data0 = 1.0;
-    else *data0 = 0.0;
+    if ( *data1 >= step ) *data0 = 1.0f;
+    else *data0 = 0.0f;
     data0++;
     data1++;
     data2++;
@@ -193,8 +193,8 @@ bool not_s( Core::ArrayMathProgramCode& pc )
 
   while ( data0 != data0_end )
   {
-    if ( *data1 ) *data0 = 0.0;
-    else *data0 = 1.0;
+    if ( *data1 ) *data0 = 0.0f;
+    else *data0 = 1.0f;
     data0++;
     data1++;
   }
@@ -226,8 +226,8 @@ bool boolean_s( Core::ArrayMathProgramCode& pc )
 
   while ( data0 != data0_end )
   {
-    if ( *data1 ) *data0 = 1.0;
-    else *data0 = 0.0;
+    if ( *data1 ) *data0 = 1.0f;
+    else *data0 = 0.0f;
     data0++;
     data1++;
   }
@@ -243,7 +243,7 @@ bool abs_s( Core::ArrayMathProgramCode& pc )
 
   while ( data0 != data0_end )
   {
-    if ( *data1 < 0 ) *data0 = -( *data1 );
+    if ( *data1 < 0.0f ) *data0 = -( *data1 );
     else *data0 = *data1;
     data0++;
     data1++;
@@ -260,7 +260,7 @@ bool norm_s( Core::ArrayMathProgramCode& pc )
 
   while ( data0 != data0_end )
   {
-    if ( *data1 < 0 ) *data0 = -( *data1 );
+    if ( *data1 < 0.0f ) *data0 = -( *data1 );
     else *data0 = *data1;
     data0++;
     data1++;
@@ -277,7 +277,7 @@ bool round_s( Core::ArrayMathProgramCode& pc )
 
   while ( data0 != data0_end )
   {
-    *data0 = static_cast< float > ( static_cast< int > ( *data1 + 0.5 ) );
+    *data0 = static_cast< float > ( static_cast< int > ( *data1 + 0.5f ) );
     data0++;
     data1++;
   }
@@ -293,7 +293,7 @@ bool floor_s( Core::ArrayMathProgramCode& pc )
 
   while ( data0 != data0_end )
   {
-    *data0 = ::floor( *data1 );
+    *data0 = ::floorf( *data1 );
     data0++;
     data1++;
   }
@@ -309,7 +309,7 @@ bool ceil_s( Core::ArrayMathProgramCode& pc )
 
   while ( data0 != data0_end )
   {
-    *data0 = ::ceil( *data1 );
+    *data0 = ::ceilf( *data1 );
     data0++;
     data1++;
   }
@@ -325,7 +325,7 @@ bool exp_s( Core::ArrayMathProgramCode& pc )
 
   while ( data0 != data0_end )
   {
-    *data0 = ::exp( *data1 );
+    *data0 = ::expf( *data1 );
     data0++;
     data1++;
   }
@@ -342,7 +342,7 @@ bool pow_ss( Core::ArrayMathProgramCode& pc )
 
   while ( data0 != data0_end )
   {
-    *data0 = ::pow( *data1, *data2 );
+    *data0 = ::powf( *data1, *data2 );
     data0++;
     data1++;
     data2++;
@@ -359,7 +359,7 @@ bool sqrt_s( Core::ArrayMathProgramCode& pc )
 
   while ( data0 != data0_end )
   {
-    *data0 = ::sqrt( *data1 );
+    *data0 = ::sqrtf( *data1 );
     data0++;
     data1++;
   }
@@ -375,7 +375,7 @@ bool log_s( Core::ArrayMathProgramCode& pc )
 
   while ( data0 != data0_end )
   {
-    *data0 = ::log( *data1 );
+    *data0 = ::logf( *data1 );
     data0++;
     data1++;
   }
@@ -391,7 +391,7 @@ bool ln_s( Core::ArrayMathProgramCode& pc )
 
   while ( data0 != data0_end )
   {
-    *data0 = ::log( *data1 );
+    *data0 = ::logf( *data1 );
     data0++;
     data1++;
   }
@@ -405,10 +405,10 @@ bool log2_s( Core::ArrayMathProgramCode& pc )
   float* data1 = pc.get_variable( 1 );
   float* data0_end = data0 + pc.get_size();
 
-  float s = 1.0f / log( 2.0f );
+  float s = 1.0f / ::logf( 2.0f );
   while ( data0 != data0_end )
   {
-    *data0 = ::log( *data1 ) * s;
+    *data0 = ::logf( *data1 ) * s;
     data0++;
     data1++;
   }
@@ -422,10 +422,10 @@ bool log10_s( Core::ArrayMathProgramCode& pc )
   float* data1 = pc.get_variable( 1 );
   float* data0_end = data0 + pc.get_size();
 
-  float s = 1.0f / log( 10.0f );
+  float s = 1.0f / logf( 10.0f );
   while ( data0 != data0_end )
   {
-    *data0 = ::log( *data1 ) * s;
+    *data0 = ::logf( *data1 ) * s;
     data0++;
     data1++;
   }
@@ -441,7 +441,7 @@ bool cbrt_s( Core::ArrayMathProgramCode& pc )
 
   while ( data0 != data0_end )
   {
-    *data0 = ::pow( *data1, 1.0f / 3.0f );
+    *data0 = ::powf( *data1, 1.0f / 3.0f );
     data0++;
     data1++;
   }
@@ -457,7 +457,7 @@ bool sin_s( Core::ArrayMathProgramCode& pc )
 
   while ( data0 != data0_end )
   {
-    *data0 = ::sin( *data1 );
+    *data0 = ::sinf( *data1 );
     data0++;
     data1++;
   }
@@ -473,7 +473,7 @@ bool cos_s( Core::ArrayMathProgramCode& pc )
 
   while ( data0 != data0_end )
   {
-    *data0 = ::cos( *data1 );
+    *data0 = ::cosf( *data1 );
     data0++;
     data1++;
   }
@@ -489,7 +489,7 @@ bool tan_s( Core::ArrayMathProgramCode& pc )
 
   while ( data0 != data0_end )
   {
-    *data0 = ::tan( *data1 );
+    *data0 = ::tanf( *data1 );
     data0++;
     data1++;
   }
@@ -505,7 +505,7 @@ bool sinh_s( Core::ArrayMathProgramCode& pc )
 
   while ( data0 != data0_end )
   {
-    *data0 = ::sinh( *data1 );
+    *data0 = ::sinhf( *data1 );
     data0++;
     data1++;
   }
@@ -521,7 +521,7 @@ bool cosh_s( Core::ArrayMathProgramCode& pc )
 
   while ( data0 != data0_end )
   {
-    *data0 = ::cosh( *data1 );
+    *data0 = ::coshf( *data1 );
     data0++;
     data1++;
   }
@@ -537,7 +537,7 @@ bool asin_s( Core::ArrayMathProgramCode& pc )
 
   while ( data0 != data0_end )
   {
-    *data0 = ::asin( *data1 );
+    *data0 = ::asinf( *data1 );
     data0++;
     data1++;
   }
@@ -553,7 +553,7 @@ bool acos_s( Core::ArrayMathProgramCode& pc )
 
   while ( data0 != data0_end )
   {
-    *data0 = ::acos( *data1 );
+    *data0 = ::acosf( *data1 );
     data0++;
     data1++;
   }
@@ -569,7 +569,7 @@ bool atan_s( Core::ArrayMathProgramCode& pc )
 
   while ( data0 != data0_end )
   {
-    *data0 = ::atan( *data1 );
+    *data0 = ::atanf( *data1 );
     data0++;
     data1++;
   }
@@ -586,7 +586,7 @@ bool atan2_ss( Core::ArrayMathProgramCode& pc )
 
   while ( data0 != data0_end )
   {
-    *data0 = ::atan2( *data1, *data2 );
+    *data0 = ::atan2f( *data1, *data2 );
     data0++;
     data1++;
     data2++;
@@ -604,8 +604,8 @@ bool asinh_s( Core::ArrayMathProgramCode& pc )
   while ( data0 != data0_end )
   {
     float d = *data1;
-    *data0 = ( d == 0 ? 0 : ( d > 0 ? 1 : -1 ) ) * ::log( ( d < 0 ? -d : d ) + ::sqrt( 1 + d
-        * d ) );
+    *data0 = ( d == 0.0f ? 0.0f : ( d > 0.0f ? 1.0f : -1.0f ) ) * ::logf( ( d < 0.0f ? -d : d ) 
+      + ::sqrtf( 1.f + d * d ) );
     data0++;
     data1++;
   }
@@ -622,7 +622,7 @@ bool acosh_s( Core::ArrayMathProgramCode& pc )
   while ( data0 != data0_end )
   {
     float d = *data1;
-    *data0 = ::log( d + ::sqrt( d * d - 1 ) );
+    *data0 = ::log( d + ::sqrtf( d * d - 1.0f ) );
     data0++;
     data1++;
   }
@@ -666,6 +666,25 @@ bool and_ss( Core::ArrayMathProgramCode& pc )
   return true;
 }
 
+bool xor_ss( Core::ArrayMathProgramCode& pc )
+{
+  float* data0 = pc.get_variable( 0 );
+  float* data1 = pc.get_variable( 1 );
+  float* data2 = pc.get_variable( 2 );
+  float* data0_end = data0 + pc.get_size();
+
+  while ( data0 != data0_end )
+  {
+    *data0 = ( *data1 && ( *data2 == 0.0f ) ) ||
+         ( *data2 && ( *data1 == 0.0f ) );
+    data0++;
+    data1++;
+    data2++;
+  }
+
+  return true;
+}
+
 bool eq_ss( Core::ArrayMathProgramCode& pc )
 {
   float* data0 = pc.get_variable( 0 );
@@ -675,8 +694,8 @@ bool eq_ss( Core::ArrayMathProgramCode& pc )
 
   while ( data0 != data0_end )
   {
-    if ( *data1 == *data2 ) *data0 = 1.0;
-    else *data0 = 0.0;
+    if ( *data1 == *data2 ) *data0 = 1.0f;
+    else *data0 = 0.0f;
     data0++;
     data1++;
     data2++;
@@ -694,8 +713,8 @@ bool neq_ss( Core::ArrayMathProgramCode& pc )
 
   while ( data0 != data0_end )
   {
-    if ( *data1 != *data2 ) *data0 = 1.0;
-    else *data0 = 0.0;
+    if ( *data1 != *data2 ) *data0 = 1.0f;
+    else *data0 = 0.0f;
     data0++;
     data1++;
     data2++;
@@ -713,8 +732,8 @@ bool le_ss( Core::ArrayMathProgramCode& pc )
 
   while ( data0 != data0_end )
   {
-    if ( *data1 <= *data2 ) *data0 = 1.0;
-    else *data0 = 0.0;
+    if ( *data1 <= *data2 ) *data0 = 1.0f;
+    else *data0 = 0.0f;
     data0++;
     data1++;
     data2++;
@@ -732,8 +751,8 @@ bool ge_ss( Core::ArrayMathProgramCode& pc )
 
   while ( data0 != data0_end )
   {
-    if ( *data1 >= *data2 ) *data0 = 1.0;
-    else *data0 = 0.0;
+    if ( *data1 >= *data2 ) *data0 = 1.0f;
+    else *data0 = 0.0f;
     data0++;
     data1++;
     data2++;
@@ -751,8 +770,8 @@ bool ls_ss( Core::ArrayMathProgramCode& pc )
 
   while ( data0 != data0_end )
   {
-    if ( *data1 < *data2 ) *data0 = 1.0;
-    else *data0 = 0.0;
+    if ( *data1 < *data2 ) *data0 = 1.0f;
+    else *data0 = 0.0f;
     data0++;
     data1++;
     data2++;
@@ -770,8 +789,8 @@ bool gt_ss( Core::ArrayMathProgramCode& pc )
 
   while ( data0 != data0_end )
   {
-    if ( *data1 > *data2 ) *data0 = 1.0;
-    else *data0 = 0.0;
+    if ( *data1 > *data2 ) *data0 = 1.0f;
+    else *data0 = 0.0f;
     data0++;
     data1++;
     data2++;
@@ -872,7 +891,8 @@ bool random_value_( Core::ArrayMathProgramCode& pc )
   RandomMutex.lock();
   while ( data0 != data0_end )
   {
-    // Note: _WIN32 is always defined for applications for Win32 and Win64 (see http://msdn.microsoft.com/en-us/library/b0084kay.aspx).
+    // Note: _WIN32 is always defined for applications for Win32 and Win64 
+    // (see http://msdn.microsoft.com/en-us/library/b0084kay.aspx).
 #ifdef _WIN32
     // random() not available in Windows stdlib
     *data0 = static_cast< float >( rand() ) / static_cast< float >( RAND_MAX + 1 );
@@ -933,6 +953,7 @@ void InsertScalarArrayMathFunctionCatalog( ArrayMathFunctionCatalogHandle& catal
 
   catalog->add_sym_function( ArrayMathFunctions::and_ss, "and$S:S", "S" );
   catalog->add_sym_function( ArrayMathFunctions::and_ss, "bitand$S:S", "S" );
+  catalog->add_sym_function( ArrayMathFunctions::xor_ss, "xor$S:S", "S" );
   catalog->add_sym_function( ArrayMathFunctions::or_ss, "or$S:S", "S" );
   catalog->add_sym_function( ArrayMathFunctions::or_ss, "bitor$S:S", "S" );
   catalog->add_sym_function( ArrayMathFunctions::eq_ss, "eq$S:S", "S" );

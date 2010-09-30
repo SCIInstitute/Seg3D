@@ -46,12 +46,32 @@ class ArithmeticFilterInterfacePrivate
 {
 public:
   Ui::ArithmeticFilterInterface ui_;
+  
+  std::vector< std::pair< std::string, std::string > > predefined_;
 };
 
 // constructor
 ArithmeticFilterInterface::ArithmeticFilterInterface() :
   private_( new ArithmeticFilterInterfacePrivate )
 {
+  this->private_->predefined_.push_back( std::pair< std::string, std::string >(
+    "Boolean AND Filter", " RESULT = A && B;") );
+  this->private_->predefined_.push_back( std::pair< std::string, std::string >(
+    "Boolean AND Filter (3 way)", " RESULT = A && B && C;") );
+  this->private_->predefined_.push_back( std::pair< std::string, std::string >(
+    "Boolean AND Filter (4 way)", " RESULT = A && B && C && D;") );
+  this->private_->predefined_.push_back( std::pair< std::string, std::string >(
+    "Boolean OR Filter", " RESULT = A || B;") );
+  this->private_->predefined_.push_back( std::pair< std::string, std::string >(
+    "Boolean OR Filter (3 way)", " RESULT = A || B || C;") );
+  this->private_->predefined_.push_back( std::pair< std::string, std::string >(
+    "Boolean OR Filter (4 way)", " RESULT = A || B || C || D;") );
+  this->private_->predefined_.push_back( std::pair< std::string, std::string >(
+    "Boolean NOT Filter", " RESULT = ! A;") );
+  this->private_->predefined_.push_back( std::pair< std::string, std::string >(
+    "Boolean XOR Filter", " RESULT = xor( A, B );") );
+  this->private_->predefined_.push_back( std::pair< std::string, std::string >(
+    "Mask Data", " RESULT = A * B;") );
 }
 
 // destructor
@@ -70,39 +90,52 @@ bool ArithmeticFilterInterface::build_widget( QFrame* frame )
   ArithmeticFilter* tool = dynamic_cast< ArithmeticFilter* > ( base_tool_.get() );
 
   //Step 3 - connect the gui to the tool through the QtBridge
-  QtUtils::QtBridge::Connect( this->private_->ui_.target_group_, 
-    tool->target_group_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ui_.use_active_group_, 
-    tool->use_active_group_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ui_.input_a_, tool->input_layers_state_[ 0 ] );
-  QtUtils::QtBridge::Connect( this->private_->ui_.input_b_, tool->input_layers_state_[ 1 ] );
-  QtUtils::QtBridge::Connect( this->private_->ui_.input_c_, tool->input_layers_state_[ 2 ] );
-  QtUtils::QtBridge::Connect( this->private_->ui_.input_d_, tool->input_layers_state_[ 3 ] );
+  QtUtils::QtBridge::Connect( this->private_->ui_.input_a_, tool->target_layer_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.use_active_layer_, 
+    tool->use_active_layer_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.input_b_, tool->input_b_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.input_c_, tool->input_c_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.input_d_, tool->input_d_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.expressions_, tool->expressions_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ui_.predefined_expressions_,
-    tool->predefined_expressions_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.output_type_, tool->output_type_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.replace_, tool->replace_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.preserve_checkbox_, 
     tool->preserve_data_format_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ui_.execute_button_, boost::bind(
-    &ArithmeticFilter::execute, tool, Core::Interface::GetWidgetActionContext() ) );
-  QtUtils::QtBridge::Enable( this->private_->ui_.target_group_, tool->use_active_group_state_, true );
-  QtUtils::QtBridge::Enable( this->private_->ui_.input_a_, tool->use_active_group_state_, true );
-  QtUtils::QtBridge::Enable( this->private_->ui_.output_type_, tool->replace_state_, true );
 
-  connect( this->private_->ui_.predefined_expressions_, SIGNAL( itemDoubleClicked( 
-    QListWidgetItem* ) ), SLOT( set_expressions_text( QListWidgetItem* ) ) );
+  for ( size_t j = 0; j < this->private_->predefined_.size(); j++ )
+  {
+    this->private_->ui_.predefined_expressions_->addItem( QString::fromStdString( 
+      this->private_->predefined_[ j ].first ) );
+  }
+  
+  connect( this->private_->ui_.predefined_expressions_, SIGNAL( activated( 
+    int ) ), SLOT( set_predefined_text( int ) ) );
 
-  //Send a message to the log that we have finished with building the Arithmetic Filter
-  CORE_LOG_DEBUG("Finished building an Arithmetic Filter Interface");
+  // Step 4 - Qt connections
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() ); 
+    this->private_->ui_.input_a_->setDisabled( tool->use_active_layer_state_->get() );
+  
+    this->connect( this->private_->ui_.use_active_layer_, SIGNAL( toggled( bool ) ),
+      this->private_->ui_.input_a_, SLOT( setDisabled( bool ) ) );
+
+    this->connect( this->private_->ui_.runFilterButton, SIGNAL( clicked() ), 
+      this, SLOT( run_filter() ) );
+  } 
 
   return true;
+  
 } // end build_widget
 
-void ArithmeticFilterInterface::set_expressions_text( QListWidgetItem* item )
+void ArithmeticFilterInterface::set_predefined_text( int index )
 {
-  this->private_->ui_.expressions_->setPlainText( "RESULT=" + item->text() + ";" );
+  this->private_->ui_.expressions_->setPlainText( 
+    QString::fromStdString( this->private_->predefined_[ index ].second ) );
+}
+
+void ArithmeticFilterInterface::run_filter()
+{
+  tool()->execute( Core::Interface::GetWidgetActionContext() );
 }
 
 } //end seg3d
