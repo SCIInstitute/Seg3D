@@ -32,36 +32,30 @@
 // Application includes
 #include <Application/Layer/LayerGroup.h>
 #include <Application/LayerManager/LayerManager.h>
-#include <Application/Filters/Actions/ActionCrop.h>
+#include <Application/Filters/Actions/ActionTransform.h>
 #include <Application/Filters/BaseFilter.h>
 
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
 // NOTE: Registration needs to be done outside of any namespace
-CORE_REGISTER_ACTION( Seg3D, Crop )
+CORE_REGISTER_ACTION( Seg3D, Transform )
 
 namespace Seg3D
 {
 
 //////////////////////////////////////////////////////////////////////////
-// Class ActionCropPrivate
+// Class ActionTransformPrivate
 //////////////////////////////////////////////////////////////////////////
 
-class ActionCropPrivate
+class ActionTransformPrivate
 {
 public:
   Core::ActionParameter< std::vector< std::string > > layer_ids_;
   Core::ActionParameter< Core::Point > origin_;
-  Core::ActionParameter< Core::Vector > size_;
+  Core::ActionParameter< Core::Vector > spacing_;
   Core::ActionParameter< bool > replace_;
 
-  int start_x_;
-  int start_y_;
-  int start_z_;
-  int end_x_;
-  int end_y_;
-  int end_z_;
   Core::GridTransform output_grid_trans_;
 };
 
@@ -72,28 +66,19 @@ public:
 // filter on a separate thread.
 //////////////////////////////////////////////////////////////////////////
 
-class CropAlgo : public BaseFilter
+class TransformAlgo : public BaseFilter
 {
 
 public:
   std::vector< LayerHandle > src_layers_;
   std::vector< LayerHandle > dst_layers_;
+
   bool replace_;
-  size_t start_x_;
-  size_t start_y_;
-  size_t start_z_;
-  size_t end_x_;
-  size_t end_y_;
-  size_t end_z_;
 
 public:
 
-  template< class T >
-  void crop_typed_data( Core::DataBlockHandle src, Core::DataBlockHandle dst, 
-    LayerHandle dst_layer );
-
-  void crop_data_layer( DataLayerHandle input, DataLayerHandle output );
-  void crop_mask_layer( MaskLayerHandle input, MaskLayerHandle output );
+  void transform_data_layer( DataLayerHandle input, DataLayerHandle output );
+  void transform_mask_layer( MaskLayerHandle input, MaskLayerHandle output );
 
   // RUN:
   // Implementation of run of the Runnable base class, this function is called 
@@ -104,52 +89,23 @@ public:
   // The name of the filter, this information is used for generating new layer labels.
   virtual std::string get_filter_name() const
   {
-    return "Crop";
+    return "Transform";
   }
 };
 
-template< class T >
-void CropAlgo::crop_typed_data( Core::DataBlockHandle src, Core::DataBlockHandle dst,
-                 LayerHandle dst_layer )
-{
-  T* src_data = reinterpret_cast< T* >( src->get_data() );
-  T* dst_data = reinterpret_cast< T* >( dst->get_data() );
-  size_t current_index = src->to_index( 0, 0, 0 );
-  size_t stride_x = src->to_index( 1, 0, 0 ) - current_index;
-  size_t stride_y = src->to_index( 0, 1, 0 ) - current_index;
-  size_t stride_z = src->to_index( 0, 0, 1 ) - current_index;
-  size_t current_z = src->to_index( this->start_x_, this->start_y_, this->start_z_ );
-  size_t current_y;
-  size_t dst_index = 0;
-  size_t total_z_slice = this->end_z_ - this->start_z_ + 1;
-  for ( size_t z = this->start_z_; z <= this->end_z_; ++z, current_z += stride_z )
-  {
-    current_y = current_z;
-    for ( size_t y = this->start_y_; y <= this->end_y_; ++y, current_y += stride_y )
-    {
-      current_index = current_y;
-      for ( size_t x = this->start_x_; x <= this->end_x_; ++x, current_index += stride_x )
-      {
-        dst_data[ dst_index++ ] = src_data[ current_index ];
-      }
-    }
-    dst_layer->update_progress_signal_( ( z - this->start_z_ + 1.0 ) / total_z_slice * 0.8 );
-  }
-}
-
-void CropAlgo::run()
+void TransformAlgo::run()
 {
   for ( size_t i = 0; i < this->src_layers_.size(); ++i )
   {
     switch ( this->src_layers_[ i ]->type() )
     {
     case Core::VolumeType::DATA_E:
-      this->crop_data_layer(
+      this->transform_data_layer(
         boost::dynamic_pointer_cast< DataLayer >( this->src_layers_[ i ] ),
         boost::dynamic_pointer_cast< DataLayer >( this->dst_layers_[ i ] ) );
       break;
     case Core::VolumeType::MASK_E:
-      this->crop_mask_layer(
+      this->transform_mask_layer(
         boost::dynamic_pointer_cast< MaskLayer >( this->src_layers_[ i ] ),
         boost::dynamic_pointer_cast< MaskLayer >( this->dst_layers_[ i ] ) );
       break;
@@ -162,42 +118,42 @@ void CropAlgo::run()
   }
 }
 
-void CropAlgo::crop_data_layer( DataLayerHandle input, DataLayerHandle output )
+void TransformAlgo::transform_data_layer( DataLayerHandle input, DataLayerHandle output )
 {
   Core::DataBlockHandle input_datablock = input->get_data_volume()->get_data_block();
   Core::DataBlockHandle output_datablock = Core::StdDataBlock::New( 
     output->get_grid_transform(), input_datablock->get_data_type() );
 
+  const void* src_data = input_datablock->get_data();
+  void* dst_data = output_datablock->get_data();
+
+  size_t data_size = 0;
   Core::DataBlock::shared_lock_type data_lock( input_datablock->get_mutex() );
   switch ( input_datablock->get_data_type() )
   {
   case Core::DataType::CHAR_E:
-    this->crop_typed_data< signed char >( input_datablock, output_datablock, output );
-    break;
   case Core::DataType::UCHAR_E:
-    this->crop_typed_data< unsigned char >( input_datablock, output_datablock, output );
+    data_size = sizeof( char );
     break;
   case Core::DataType::SHORT_E:
-    this->crop_typed_data< short >( input_datablock, output_datablock, output );
-    break;
   case Core::DataType::USHORT_E:
-    this->crop_typed_data< unsigned short >( input_datablock, output_datablock, output );
+    data_size = sizeof( short );
     break;
   case Core::DataType::INT_E:
-    this->crop_typed_data< int >( input_datablock, output_datablock, output );
-    break;
   case Core::DataType::UINT_E:
-    this->crop_typed_data< unsigned int >( input_datablock, output_datablock, output );
+    data_size = sizeof( int );
     break;
   case Core::DataType::FLOAT_E:
-    this->crop_typed_data< float >( input_datablock, output_datablock, output );
+    data_size = sizeof( float );
     break;
   case Core::DataType::DOUBLE_E:
-    this->crop_typed_data< double >( input_datablock, output_datablock, output );
+    data_size = sizeof( double );
     break;
   default:
     assert( false );
   }
+
+  memcpy( dst_data, src_data, input_datablock->get_size() * data_size );
 
   data_lock.unlock();
 
@@ -219,44 +175,29 @@ void CropAlgo::crop_data_layer( DataLayerHandle input, DataLayerHandle output )
   }
 }
 
-void CropAlgo::crop_mask_layer( MaskLayerHandle input, MaskLayerHandle output )
+void TransformAlgo::transform_mask_layer( MaskLayerHandle input, MaskLayerHandle output )
 {
   Core::MaskDataBlockHandle input_mask = input->get_mask_volume()->get_mask_data_block();
-  Core::DataBlockHandle output_mask = Core::StdDataBlock::New(
+  Core::DataBlockHandle output_datablock = Core::StdDataBlock::New(
     output->get_grid_transform(), Core::DataType::UCHAR_E );
 
-  Core::MaskDataBlock::shared_lock_type data_lock( input_mask->get_mutex() );
   const unsigned char* src_data = input_mask->get_mask_data();
-  unsigned char* dst_data = reinterpret_cast< unsigned char* >( output_mask->get_data() );
-  unsigned char mask_value = input_mask->get_mask_value();
+  unsigned char src_mask_value = input_mask->get_mask_value();
+  unsigned char* dst_data = reinterpret_cast< unsigned char* >( output_datablock->get_data() );
 
-  size_t current_index = input_mask->to_index( 0, 0, 0 );
-  size_t stride_x = input_mask->to_index( 1, 0, 0 ) - current_index;
-  size_t stride_y = input_mask->to_index( 0, 1, 0 ) - current_index;
-  size_t stride_z = input_mask->to_index( 0, 0, 1 ) - current_index;
-  size_t current_z = input_mask->to_index( this->start_x_, this->start_y_, this->start_z_ );
-  size_t current_y;
-  size_t dst_index = 0;
-  size_t total_z_slice = this->end_z_ - this->start_z_ + 1;
-  for ( size_t z = this->start_z_; z <= this->end_z_; ++z, current_z += stride_z )
   {
-    current_y = current_z;
-    for ( size_t y = this->start_y_; y <= this->end_y_; ++y, current_y += stride_y )
+    Core::MaskDataBlock::shared_lock_type data_lock( input_mask->get_mutex() );
+    size_t total_voxels = input_mask->get_size();
+    for ( size_t i = 0; i < total_voxels; ++i )
     {
-      current_index = current_y;
-      for ( size_t x = this->start_x_; x <= this->end_x_; ++x, current_index += stride_x )
-      {
-        dst_data[ dst_index++ ] = ( src_data[ current_index ] & mask_value );
-      }
+      dst_data[ i ] = src_data[ i ] & src_mask_value;
     }
-    output->update_progress_signal_( ( z - this->start_z_ + 1.0 ) / total_z_slice * 0.8 );
   }
 
-  data_lock.unlock();
   if ( !this->check_abort() )
   {
     Core::MaskDataBlockHandle dst_mask_data_block;
-    Core::MaskDataBlockManager::Convert( output_mask, output->get_grid_transform(),
+    Core::MaskDataBlockManager::Convert( output_datablock, output->get_grid_transform(),
       dst_mask_data_block );
     Core::MaskVolumeHandle mask_volume( new Core::MaskVolume(
       output->get_grid_transform(), dst_mask_data_block ) );
@@ -275,22 +216,21 @@ void CropAlgo::crop_mask_layer( MaskLayerHandle input, MaskLayerHandle output )
 }
 
 //////////////////////////////////////////////////////////////////////////
-// Class ActionCrop
+// Class ActionTransform
 //////////////////////////////////////////////////////////////////////////
 
-ActionCrop::ActionCrop() :
-  private_( new ActionCropPrivate )
+ActionTransform::ActionTransform() :
+  private_( new ActionTransformPrivate )
 {
   // Action arguments
   this->add_argument( this->private_->layer_ids_ );
   this->add_argument( this->private_->origin_ );
-  this->add_argument( this->private_->size_ );
+  this->add_argument( this->private_->spacing_ );
 
-  // Action options
   this->add_key( this->private_->replace_ );
 }
 
-bool ActionCrop::validate( Core::ActionContextHandle& context )
+bool ActionTransform::validate( Core::ActionContextHandle& context )
 {
   const std::vector< std::string >& layer_ids = this->private_->layer_ids_.value();
   if ( layer_ids.size() == 0 )
@@ -331,77 +271,34 @@ bool ActionCrop::validate( Core::ActionContextHandle& context )
     }
   }
   
-  const Core::Point& origin = this->private_->origin_.value();
-  const Core::Vector& size = this->private_->size_.value();
-
-  if ( size[ 0 ] < 0 || size[ 1 ] < 0 || size[ 2 ] < 0 )
+  const Core::Vector& spacing = this->private_->spacing_.value();
+  if ( spacing[ 0 ] <= 0 || spacing[ 1 ] <= 0 || spacing[ 2 ] <= 0 )
   {
-    context->report_error( "Crop size can not be negative" );
+    context->report_error( "Spacing must be greater than 0" );
     return false;
   }
 
-  // Convert the crop box to index space and clamp to layer boundary
-  Core::Point end = origin + size;
-  const Core::GridTransform& grid_trans = layer_group->get_grid_transform();
-  int nx = static_cast< int >( grid_trans.get_nx() );
-  int ny = static_cast< int >( grid_trans.get_ny() );
-  int nz = static_cast< int >( grid_trans.get_nz() );
-  Core::Matrix trans = grid_trans.transform().get_matrix();
-  Core::Matrix inverse_trans;
-  Core::Matrix::Invert( trans, inverse_trans );
-  Core::Point origin_index = inverse_trans * origin;
-  Core::Point end_index = inverse_trans * end;
-  this->private_->start_x_ = Core::Max( Core::Round( origin_index[ 0 ] ), 0 );
-  this->private_->start_y_ = Core::Max( Core::Round( origin_index[ 1 ] ), 0 );
-  this->private_->start_z_ = Core::Max( Core::Round( origin_index[ 2 ] ), 0 );
-  this->private_->end_x_ = Core::Min( Core::Round( end_index[ 0 ] ), nx - 1 );
-  this->private_->end_y_ = Core::Min( Core::Round( end_index[ 1 ] ), ny - 1 );
-  this->private_->end_z_ = Core::Min( Core::Round( end_index[ 2 ] ), nz - 1 );
-
-  if ( this->private_->start_x_ >= nx ||
-    this->private_->start_y_ >= ny ||
-    this->private_->start_z_ >= nz ||
-    this->private_->end_x_ < 0 ||
-    this->private_->end_y_ < 0 ||
-    this->private_->end_z_ < 0 )
-  {
-    context->report_error( "Crop box doesn't overlap the layers" );
-    return false;
-  }
-
-  // Compute the cropped grid transform 
-  Core::Point clamped_origin( this->private_->start_x_, 
-    this->private_->start_y_, this->private_->start_z_ );
-  clamped_origin = trans * clamped_origin;
-  trans( 0, 3 ) = clamped_origin[ 0 ];
-  trans( 1, 3 ) = clamped_origin[ 1 ];
-  trans( 2, 3 ) = clamped_origin[ 2 ];
-  this->private_->output_grid_trans_.load_matrix( trans );
-  this->private_->output_grid_trans_.set_nx( static_cast< size_t >( 
-    this->private_->end_x_ - this->private_->start_x_ + 1 ) );
-  this->private_->output_grid_trans_.set_ny( static_cast< size_t >( 
-    this->private_->end_y_ - this->private_->start_y_ + 1 ) );
-  this->private_->output_grid_trans_.set_nz( static_cast< size_t >( 
-    this->private_->end_z_ - this->private_->start_z_ + 1 ) );
+  // Compute the output grid transform
+  const Core::GridTransform& src_grid_trans = layer_group->get_grid_transform();
+  this->private_->output_grid_trans_.set_nx( src_grid_trans.get_nx() );
+  this->private_->output_grid_trans_.set_ny( src_grid_trans.get_ny() );
+  this->private_->output_grid_trans_.set_nz( src_grid_trans.get_nz() );
+  this->private_->output_grid_trans_.load_basis( this->private_->origin_.value(), 
+    Core::Vector( spacing[ 0 ], 0, 0 ), Core::Vector( 0, spacing[ 1 ], 0 ), 
+    Core::Vector( 0, 0, spacing[ 2 ] ) );
 
   // Validation successful
   return true;
 }
 
-bool ActionCrop::run( Core::ActionContextHandle& context, 
+bool ActionTransform::run( Core::ActionContextHandle& context, 
   Core::ActionResultHandle& result )
 {
   // Create algorithm
-  boost::shared_ptr< CropAlgo > algo( new CropAlgo );
+  boost::shared_ptr< TransformAlgo > algo( new TransformAlgo );
 
   // Set up parameters
   algo->replace_ = this->private_->replace_.value();
-  algo->start_x_ = this->private_->start_x_;
-  algo->start_y_ = this->private_->start_y_;
-  algo->start_z_ = this->private_->start_z_;
-  algo->end_x_ = this->private_->end_x_;
-  algo->end_y_ = this->private_->end_y_;
-  algo->end_z_ = this->private_->end_z_;
 
   // Set up input and output layers
   const std::vector< std::string >& layer_ids = this->private_->layer_ids_.value();
@@ -448,15 +345,15 @@ bool ActionCrop::run( Core::ActionContextHandle& context,
   return true;
 }
 
-void ActionCrop::Dispatch( Core::ActionContextHandle context, 
+void ActionTransform::Dispatch( Core::ActionContextHandle context, 
                 const std::vector< std::string >& layer_ids, 
-                const Core::Point& origin, 
-                const Core::Vector& size, bool replace )
+                const Core::Point& origin, const Core::Vector& spacing,
+                bool replace )
 {
-  ActionCrop* action = new ActionCrop;
+  ActionTransform* action = new ActionTransform;
   action->private_->layer_ids_.set_value( layer_ids );
   action->private_->origin_.set_value( origin );
-  action->private_->size_.set_value( size );
+  action->private_->spacing_.set_value( spacing );
   action->private_->replace_.set_value( replace );
 
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );

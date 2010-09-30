@@ -26,33 +26,33 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef APPLICATION_TOOLS_CROPTOOL_H
-#define APPLICATION_TOOLS_CROPTOOL_H
+#ifndef APPLICATION_TOOLS_TRANSFORMTOOL_H
+#define APPLICATION_TOOLS_TRANSFORMTOOL_H
 
 #include <Application/Tool/GroupTargetTool.h>
 
 namespace Seg3D
 {
 
-class CropToolPrivate;
-typedef boost::shared_ptr< CropToolPrivate > CropToolPrivateHandle;
+class TransformToolPrivate;
+typedef boost::shared_ptr< TransformToolPrivate > TransformToolPrivateHandle;
 
-class CropTool : public GroupTargetTool
+class TransformTool : public GroupTargetTool
 {
 
 SEG3D_TOOL
 (
-  SEG3D_TOOL_NAME( "CropTool", "Tool for cropping data" )
-  SEG3D_TOOL_MENULABEL( "Crop" )
+  SEG3D_TOOL_NAME( "TransformTool", "Tool for transforming data" )
+  SEG3D_TOOL_MENULABEL( "Transform" )
   SEG3D_TOOL_MENU( "Tools" )
-  SEG3D_TOOL_SHORTCUT_KEY( "Alt+C" )
+  SEG3D_TOOL_SHORTCUT_KEY( "Alt+T" )
   SEG3D_TOOL_URL( "http://seg3d.org/" )
 )
 
   // -- constructor/destructor --
 public:
-  CropTool( const std::string& toolid );
-  virtual ~CropTool();
+  TransformTool( const std::string& toolid );
+  virtual ~TransformTool();
 
 public:
 
@@ -94,13 +94,16 @@ public:
 
   // -- state --
 public:
-  Core::StateIntHandle input_dimensions_state_[ 3 ];
-  Core::StateRangedDoubleHandle cropbox_origin_state_[ 3 ];
-  Core::StateRangedDoubleHandle cropbox_size_state_[ 3 ];
+  Core::StateRangedDoubleHandle origin_state_[ 3 ];
+  Core::StateRangedDoubleHandle spacing_state_[ 3 ];
+  Core::StateBoolHandle keep_aspect_ratio_state_;
+  Core::StateLabeledOptionHandle preview_layer_state_;
+  Core::StateBoolHandle show_border_state_;
+
   Core::StateBoolHandle replace_state_;
 
 private:
-  CropToolPrivateHandle private_;
+  TransformToolPrivateHandle private_;
 };
 
 } // end namespace

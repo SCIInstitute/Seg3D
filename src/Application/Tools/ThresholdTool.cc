@@ -151,8 +151,9 @@ ThresholdTool::ThresholdTool( const std::string& toolid ) :
   this->private_->initialized_ = false;
   this->private_->signal_block_count_ = 0;
 
-  this->add_state( "upper_threshold", this->upper_threshold_state_, 5000.0, -5000.0, 5000.0, .01 );
-  this->add_state( "lower_threshold", this->lower_threshold_state_, -5000.0, -5000.0, 5000.0, .01 );
+  double inf = std::numeric_limits< double >::infinity();
+  this->add_state( "upper_threshold", this->upper_threshold_state_, inf, -inf, inf, .01 );
+  this->add_state( "lower_threshold", this->lower_threshold_state_, -inf, -inf, inf, .01 );
   this->add_state( "show_preview", this->show_preview_state_, true );
 
   this->private_->handle_target_layer_changed();

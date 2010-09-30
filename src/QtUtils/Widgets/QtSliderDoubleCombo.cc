@@ -120,7 +120,7 @@ void QtSliderDoubleCombo::setStep( double step )
     this->block_signals( false );
 }
 
-void QtSliderDoubleCombo::setRange( double min, double max)
+void QtSliderDoubleCombo::setRange( double min, double max )
 {
     this->block_signals( true );
   this->private_->min_ = min;

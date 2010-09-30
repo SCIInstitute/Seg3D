@@ -703,8 +703,9 @@ PaintTool::PaintTool( const std::string& toolid ) :
   this->add_state( "show_data_constraint_bound", this->show_data_cstr_bound_state_, false );
 
   this->add_state( "brush_radius", this->brush_radius_state_, 3, 0, 150, 1 );
-  this->add_state( "upper_threshold", this->upper_threshold_state_, 1000.0, -1000.0, 1000.0, 0.01 );
-  this->add_state( "lower_threshold", this->lower_threshold_state_, -1000.0, -1000.0, 1000.0, 0.01 );
+  double inf = std::numeric_limits< double >::infinity();
+  this->add_state( "upper_threshold", this->upper_threshold_state_, inf, -inf, inf, 0.01 );
+  this->add_state( "lower_threshold", this->lower_threshold_state_, -inf, -inf, inf, 0.01 );
   this->add_state( "erase", this->erase_state_, false );
   
   this->add_connection( this->data_constraint_layer_state_->state_changed_signal_.connect(
