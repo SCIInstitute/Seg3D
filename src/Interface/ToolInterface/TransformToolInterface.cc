@@ -85,6 +85,8 @@ bool TransformToolInterface::build_widget( QFrame* frame )
     tool->preview_layer_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.show_border_checkbox_, 
     tool->show_border_state_ );
+  QtUtils::QtBridge::Connect( this->private_->ui_.show_preview_checkbox_,
+    tool->show_preview_state_ );
 
   QtUtils::QtBridge::Connect( this->private_->ui_.execute_button_, boost::bind(
     &TransformTool::execute, tool, Core::Interface::GetWidgetActionContext() ) );

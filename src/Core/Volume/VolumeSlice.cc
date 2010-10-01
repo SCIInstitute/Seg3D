@@ -556,36 +556,44 @@ void VolumeSlice::set_size_changed( bool changed )
   this->private_->size_changed_ = changed;
 }
 
+bool VolumeSlice::is_valid() const
+{
+  lock_type lock( this->get_mutex() );
+  return ( !this->private_->out_of_boundary_ && 
+    this->private_->volume_ && 
+    this->private_->volume_->is_valid() );
+}
+
 void VolumeSlice::ProjectOntoSlice( VolumeSliceType slice_type, const Point& pt, 
                    double& i_pos, double& j_pos )
+{
+  double depth;
+  ProjectOntoSlice( slice_type, pt, i_pos, j_pos, depth );
+}
+
+void VolumeSlice::ProjectOntoSlice( VolumeSliceType slice_type, const Point& pt, 
+                   double& i_pos, double& j_pos, double& depth )
 {
   switch ( slice_type )
   {
   case VolumeSliceType::AXIAL_E:
     i_pos = pt[ 0 ];
     j_pos = pt[ 1 ];
+    depth = pt[ 2 ];
     break;
   case VolumeSliceType::CORONAL_E:
     i_pos = pt[ 0 ];
     j_pos = pt[ 2 ];
+    depth = pt[ 1 ];
     break;
   case VolumeSliceType::SAGITTAL_E:
     i_pos = pt[ 1 ];
     j_pos = pt[ 2 ];
+    depth = pt[ 0 ];
     break;
   default:
     assert( false );
-    break;
-  } 
+  }
 }
-
-bool VolumeSlice::is_valid() const
-{
-  lock_type lock( this->get_mutex() );
-  return ( !this->private_->out_of_boundary_ && 
-        this->private_->volume_ && 
-        this->private_->volume_->is_valid() );
-}
-
 
 } // end namespace Core

@@ -114,7 +114,7 @@ public:
 public:
   void set_option_list( const std::vector< OptionLabelPair >& option_list );
 
-  std::vector< OptionLabelPair > get_option_list() const;
+  const std::vector< OptionLabelPair >& get_option_list() const;
 
   // -- access value --
 public:

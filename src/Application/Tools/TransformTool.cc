@@ -26,9 +26,15 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// boost includes
+#include <boost/lambda/bind.hpp>
+#include <boost/lambda/lambda.hpp>
+
 #include <Core/State/Actions/ActionOffset.h>
 #include <Core/Utils/ScopedCounter.h>
 #include <Core/Volume/VolumeSlice.h>
+#include <Core/Volume/MaskVolumeSlice.h>
+#include <Core/Volume/DataVolumeSlice.h>
 #include <Core/RenderResources/RenderResources.h>
 
 // Application includes
@@ -52,26 +58,41 @@ namespace Seg3D
 // Class TransformToolPrivate
 //////////////////////////////////////////////////////////////////////////
 
-class TransformToolPrivate : Core::Lockable
+class TransformToolPrivate : public Core::Lockable
 {
 public:
 
   void handle_target_group_changed( std::string group_id );
-  void handle_layers_changed();
+  void handle_target_layers_changed();
 
   void handle_preview_layer_changed();
   void handle_origin_changed();
   void handle_spacing_changed( int index );
   void handle_keep_aspect_ratio_changed( bool keep );
   void handle_show_border_changed( bool show );
+  void handle_show_preview_changed( bool show );
+
+  void hit_test( ViewerHandle viewer, int x, int y );
+  void update_cursor( ViewerHandle viewer );
+  void resize( ViewerHandle viewer, int x0, int y0, int x1, int y1 );
 
   void initialize_gl();
+  void update_grid_transform();
 
   size_t signal_block_count_;
-  TransformTool* tool_;
-  int nx_, ny_, nz_;
+
+  Core::GridTransform grid_transform_;
   Core::Vector src_spacing_;
+  int size_[ 3 ];
+  Core::Point world_min_, world_max_;
+  
   MaskShaderHandle shader_;
+  TransformTool* tool_;
+
+  int hit_pos_;
+  int ver_index_; // Index of the vertical position state
+  int hor_index_; // Index of the horizontal position state
+  bool resizing_;
 };
 
 void TransformToolPrivate::handle_target_group_changed( std::string group_id )
@@ -81,32 +102,49 @@ void TransformToolPrivate::handle_target_group_changed( std::string group_id )
     return;
   }
 
-  // NOTE: Lock the state engine because the following changes need to be atomic
-  Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
+  LayerGroupHandle layer_group = LayerManager::Instance()->get_layer_group( group_id );
+  const Core::GridTransform& grid_trans = layer_group->get_grid_transform();
+  Core::Point origin = grid_trans * Core::Point( 0, 0, 0 );
+  this->src_spacing_ = grid_trans * Core::Vector( 1, 1, 1 );
 
   {
     Core::ScopedCounter signal_block( this->signal_block_count_ );
-
-    LayerGroupHandle layer_group = LayerManager::Instance()->get_layer_group( group_id );
-    const Core::GridTransform& grid_trans = layer_group->get_grid_transform();
-    this->nx_ = static_cast< int >( grid_trans.get_nx() );
-    this->ny_ = static_cast< int >( grid_trans.get_ny() );
-    this->nz_ = static_cast< int >( grid_trans.get_nz() );
-
-    Core::Point origin = grid_trans * Core::Point( 0, 0, 0 );
-    this->src_spacing_ = grid_trans * Core::Vector( 1, 1, 1 );
     for ( int i = 0; i < 3; ++i )
     {
       this->tool_->origin_state_[ i ]->set( origin[ i ] );
       this->tool_->spacing_state_[ i ]->set( this->src_spacing_[ i ] );
     }
   }
+
+  {
+    TransformToolPrivate::lock_type private_lock( this->get_mutex() );
+    this->grid_transform_ = grid_trans;
+    this->size_[ 0 ] = static_cast< int >( grid_trans.get_nx() );
+    this->size_[ 1 ] = static_cast< int >( grid_trans.get_ny() );
+    this->size_[ 2 ] = static_cast< int >( grid_trans.get_nz() );
+    this->world_min_ = this->grid_transform_ * Core::Point( -0.5, -0.5, -0.5 );
+    this->world_max_ = this->grid_transform_ * Core::Point( this->size_[ 0 ] - 0.5, 
+      this->size_[ 1 ] - 0.5, this->size_[ 2 ] - 0.5 );
+  }
 }
 
-void TransformToolPrivate::handle_layers_changed()
+void TransformToolPrivate::handle_target_layers_changed()
 {
-  this->tool_->preview_layer_state_->set_option_list(   this->tool_->
-    target_layers_state_->get_option_list() );
+  const std::vector< std::string >& target_layers = this->tool_->target_layers_state_->get();
+  const std::vector< Core::OptionLabelPair >& option_list = this->tool_->
+    target_layers_state_->get_option_list();
+  std::vector< Core::OptionLabelPair > preview_layers_list;
+  for ( size_t i = 0; i < target_layers.size(); ++i )
+  {
+    std::string layer_id = target_layers[ i ];
+    Core::OptionLabelPairVector::const_iterator it = std::find_if( option_list.begin(),
+      option_list.end(), boost::lambda::bind( &Core::OptionLabelPair::first, 
+      boost::lambda::_1 ) == layer_id );
+    assert( it != option_list.end() );
+    preview_layers_list.push_back( *it );
+  }
+  
+  this->tool_->preview_layer_state_->set_option_list(   preview_layers_list );
 }
 
 void TransformToolPrivate::handle_preview_layer_changed()
@@ -122,6 +160,7 @@ void TransformToolPrivate::handle_origin_changed()
   if ( this->signal_block_count_ == 0 &&
     this->tool_->preview_layer_state_->get() != "" )
   {
+    this->update_grid_transform();
     ViewerManager::Instance()->update_2d_viewers_overlay();
   } 
 }
@@ -144,6 +183,7 @@ void TransformToolPrivate::handle_spacing_changed( int index )
       this->src_spacing_[ ( index + 2 ) % 3 ] * scale );
   }
   
+  this->update_grid_transform();
   ViewerManager::Instance()->update_2d_viewers_overlay();
 }
 
@@ -156,6 +196,14 @@ void TransformToolPrivate::handle_keep_aspect_ratio_changed( bool keep )
 }
 
 void TransformToolPrivate::handle_show_border_changed( bool show )
+{
+  if ( this->tool_->preview_layer_state_->get() != "" )
+  {
+    ViewerManager::Instance()->update_2d_viewers_overlay();
+  }
+}
+
+void TransformToolPrivate::handle_show_preview_changed( bool show )
 {
   if ( this->tool_->preview_layer_state_->get() != "" )
   {
@@ -184,6 +232,154 @@ void TransformToolPrivate::initialize_gl()
   this->shader_->disable();
 }
 
+void TransformToolPrivate::update_grid_transform()
+{
+  ASSERT_IS_APPLICATION_THREAD();
+
+  lock_type lock( this->get_mutex() );
+  Core::Point origin( this->tool_->origin_state_[ 0 ]->get(), 
+    this->tool_->origin_state_[ 1 ]->get(),
+    this->tool_->origin_state_[ 2 ]->get() );
+  this->grid_transform_.load_basis( origin, 
+    Core::Vector( this->tool_->spacing_state_[ 0 ]->get(), 0, 0 ),
+    Core::Vector( 0, this->tool_->spacing_state_[ 1 ]->get(), 0 ),
+    Core::Vector( 0, 0, this->tool_->spacing_state_[ 2 ]->get() ) );
+  this->world_min_ = this->grid_transform_ * Core::Point( -0.5, -0.5, -0.5 );
+  this->world_max_ = this->grid_transform_ * Core::Point( this->size_[ 0 ] - 0.5, 
+    this->size_[ 1 ] - 0.5, this->size_[ 2 ] - 0.5 );
+}
+
+void TransformToolPrivate::hit_test( ViewerHandle viewer, int x, int y )
+{
+  this->hit_pos_ = Core::HitPosition::NONE_E;
+
+  Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
+  if ( viewer->is_volume_view() ||
+    this->tool_->target_group_state_->get() == "" )
+  {
+    return;
+  }
+
+  // Compute the size of a pixel in world space
+  double x0, y0, x1, y1;
+  viewer->window_to_world( 0, 0, x0, y0 );
+  viewer->window_to_world( 1, 1, x1, y1 );
+  double pixel_width = Core::Abs( x1 - x0 );
+  double pixel_height = Core::Abs( y1 - y0 );
+
+  // Compute the mouse position in world space
+  double world_x, world_y;
+  viewer->window_to_world( x, y, world_x, world_y );
+
+  Core::VolumeSliceType slice_type( Core::VolumeSliceType::AXIAL_E );
+  this->hor_index_ = 0;
+  this->ver_index_ = 1;
+  if ( viewer->view_mode_state_->get() == Viewer::CORONAL_C )
+  {
+    slice_type = Core::VolumeSliceType::CORONAL_E;
+    this->hor_index_ = 0;
+    this->ver_index_ = 2;
+  }
+  else if ( viewer->view_mode_state_->get() == Viewer::SAGITTAL_C )
+  {
+    slice_type = Core::VolumeSliceType::SAGITTAL_E;
+    this->hor_index_ = 1;
+    this->ver_index_ = 2;
+  }
+
+  // Compute the boundary of the crop box in 2D space
+  double left, right, bottom, top;
+  Core::VolumeSlice::ProjectOntoSlice( slice_type, this->world_min_, left, bottom );
+  Core::VolumeSlice::ProjectOntoSlice( slice_type, this->world_max_, right, top );
+
+  // Test where the mouse hits the crop box boundary
+  // The threshold is 2 pixels.
+  double range_x = pixel_width * 2;
+  double range_y = pixel_height * 2;
+
+  // Test top boundary
+  if ( Core::Abs( world_y - top ) <= range_y &&
+    world_x + range_x >= left && 
+    world_x - range_x <= right )
+  {
+    this->hit_pos_ |= Core::HitPosition::TOP_E;
+    return;
+  }
+
+  // Test right boundary
+  if ( Core::Abs( world_x - right ) <= range_x &&
+    world_y + range_y >= bottom && 
+    world_y - range_y <= top )
+  {
+    this->hit_pos_ |= Core::HitPosition::RIGHT_E;
+    return;
+  }
+
+  if ( world_x > left && world_x < right &&
+    world_y > bottom && world_y < top )
+  {
+    this->hit_pos_ = Core::HitPosition::INSIDE_E;
+  }
+}
+
+void TransformToolPrivate::update_cursor( ViewerHandle viewer )
+{
+  switch ( this->hit_pos_ )
+  {
+  case Core::HitPosition::INSIDE_E:
+    viewer->set_cursor( Core::CursorShape::SIZE_ALL_E );
+    break;
+  case Core::HitPosition::RIGHT_E:
+    viewer->set_cursor( Core::CursorShape::SIZE_HOR_E );
+    break;
+  case Core::HitPosition::TOP_E:
+    viewer->set_cursor( Core::CursorShape::SIZE_VER_E );
+    break;
+  default:
+    viewer->set_cursor( Core::CursorShape::ARROW_E );
+    break;
+  }
+}
+
+void TransformToolPrivate::resize( ViewerHandle viewer, int x0, int y0, int x1, int y1 )
+{
+  double world_x0, world_y0, world_x1, world_y1;
+  {
+    Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
+    viewer->window_to_world( x0, y0, world_x0, world_y0 );
+    viewer->window_to_world( x1, y1, world_x1, world_y1 );
+  }
+  double dx = world_x1 - world_x0;
+  double dy = world_y1 - world_y0;
+  const double epsilon = 1e-6;
+
+  if ( ( this->hit_pos_ & Core::HitPosition::RIGHT_E ) && Core::Abs( dx ) > epsilon )
+  {
+    Core::ActionOffset::Dispatch( Core::Interface::GetMouseActionContext(),
+      this->tool_->spacing_state_[ this->hor_index_ ], dx / this->size_[ this->hor_index_ ] );
+  }
+
+  if ( ( this->hit_pos_ & Core::HitPosition::TOP_E ) && Core::Abs( dy ) > epsilon )
+  {
+    Core::ActionOffset::Dispatch( Core::Interface::GetMouseActionContext(),
+      this->tool_->spacing_state_[ this->ver_index_ ], dy / this->size_[ this->ver_index_ ] );
+  }
+
+  if ( this->hit_pos_ == Core::HitPosition::INSIDE_E )
+  {
+    if ( Core::Abs( dx ) > epsilon )
+    {
+      Core::ActionOffset::Dispatch( Core::Interface::GetMouseActionContext(),
+        this->tool_->origin_state_[ this->hor_index_ ], dx );
+    }
+    if ( Core::Abs( dy ) > epsilon )
+    {
+      Core::ActionOffset::Dispatch( Core::Interface::GetMouseActionContext(),
+        this->tool_->origin_state_[ this->ver_index_ ], dy );
+    }
+  }
+}
+
 
 //////////////////////////////////////////////////////////////////////////
 // Class TransformTool
@@ -208,14 +404,15 @@ TransformTool::TransformTool( const std::string& toolid ) :
   this->add_state( "keep_aspect_ratio", this->keep_aspect_ratio_state_, true );
   this->add_state( "preview_layer", this->preview_layer_state_, "", "" );
   this->add_state( "show_border", this->show_border_state_, true );
+  this->add_state( "show_preview", this->show_preview_state_, true );
 
   this->add_state( "replace", this->replace_state_, false );
 
   this->add_connection( this->target_group_state_->value_changed_signal_.connect(
     boost::bind( &TransformToolPrivate::handle_target_group_changed, this->private_, _2 ),
     boost::signals2::at_front ) );
-  this->add_connection( this->target_layers_state_->optionlist_changed_signal_.connect(
-    boost::bind( &TransformToolPrivate::handle_layers_changed, this->private_ ) ) );
+  this->add_connection( this->target_layers_state_->state_changed_signal_.connect(
+    boost::bind( &TransformToolPrivate::handle_target_layers_changed, this->private_ ) ) );
 
   for ( int i = 0; i < 3; ++i )
   {
@@ -231,11 +428,13 @@ TransformTool::TransformTool( const std::string& toolid ) :
     boost::bind( &TransformToolPrivate::handle_preview_layer_changed, this->private_ ) ) );
   this->add_connection( this->show_border_state_->value_changed_signal_.connect(
     boost::bind( &TransformToolPrivate::handle_show_border_changed, this->private_, _1 ) ) );
+  this->add_connection( this->show_preview_state_->value_changed_signal_.connect(
+    boost::bind( &TransformToolPrivate::handle_show_preview_changed, this->private_, _1 ) ) );
 
   {
     Core::ScopedCounter signal_block( this->private_->signal_block_count_ );
     this->private_->handle_target_group_changed( this->target_group_state_->get() );
-    this->private_->handle_layers_changed();
+    this->private_->handle_target_layers_changed();
   }
 }
 
@@ -262,10 +461,20 @@ void TransformTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
 
   Core::VolumeSliceType slice_type( Core::VolumeSliceType::AXIAL_E );
   bool show_border;
-  Core::Point world_min, world_max;
+  bool show_preview;
   Core::VolumeSliceHandle vol_slice;
   Core::Color color;
+  double depth;
+  Core::GridTransform grid_trans;
+  Core::Point world_min, world_max;
 
+  {
+    TransformToolPrivate::lock_type private_lock( this->private_->get_mutex() );
+    grid_trans = this->private_->grid_transform_;
+    world_min = this->private_->world_min_;
+    world_max = this->private_->world_max_;
+  }
+  
   {
     Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
     std::string target_group_id = this->target_group_state_->get();
@@ -276,11 +485,9 @@ void TransformTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
       return;
     }
 
-    LayerGroupHandle layer_group = LayerManager::Instance()->get_layer_group( target_group_id );
-    const Core::GridTransform& grid_trans = layer_group->get_grid_transform();
-    int nx = static_cast< int >( grid_trans.get_nx() );
-    int ny = static_cast< int >( grid_trans.get_ny() );
-    int nz = static_cast< int >( grid_trans.get_nz() );
+    Core::StateView2D* state_view2d = static_cast< Core::StateView2D* >( 
+      viewer->get_active_view_state().get() );
+    depth = state_view2d->get().center().z();
 
     if ( viewer->view_mode_state_->get() == Viewer::SAGITTAL_C )
     {
@@ -291,51 +498,50 @@ void TransformTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
       slice_type = Core::VolumeSliceType::CORONAL_E;
     }
 
-    Core::Point origin;
-    Core::Vector spacing;
-    for ( int i = 0; i < 3; ++i )
-    {
-      origin[ i ] = this->origin_state_[ i ]->get();
-      spacing[ i ] = this->spacing_state_[ i ]->get();
-    }
-
-    Core::Transform transform;
-    transform.load_basis( origin, Core::Vector( spacing[ 0 ], 0, 0 ), 
-      Core::Vector( 0, spacing[ 1 ], 0 ), Core::Vector( 0, 0, spacing[ 2 ] ) );
-    world_min = transform * Core::Point( -0.5, -0.5, -0.5 );
-    world_max = transform * Core::Point( nx - 0.5, ny - 0.5, nz - 0.5 );
-
     show_border = this->show_border_state_->get();
     std::string preview_layer = this->preview_layer_state_->get();
+    show_preview = this->show_preview_state_->get() && preview_layer != "";
 
-    vol_slice = viewer->get_volume_slice( preview_layer );
-    if ( vol_slice->is_valid() )
+    if ( show_preview )
     {
-      vol_slice->initialize_texture();
-      vol_slice->upload_texture();
-      vol_slice = vol_slice->clone();
-    }
-    else
-    {
-      vol_slice.reset();
-    }
+      LayerHandle layer = LayerManager::Instance()->get_layer_by_id( preview_layer );
+      switch ( layer->type() )
+      {
+      case Core::VolumeType::MASK_E:
+        {
+          MaskLayer* mask_layer = dynamic_cast< MaskLayer* >( layer.get() );
+          color = PreferencesManager::Instance()->get_color( 
+            mask_layer->color_state_->get() );
+          Core::MaskVolumeHandle dummy_vol( new Core::MaskVolume( grid_trans,
+            mask_layer->get_mask_volume()->get_mask_data_block() ) );
+          vol_slice.reset( new Core::MaskVolumeSlice( dummy_vol, slice_type ) );
+        }
+        break;
+      case Core::VolumeType::DATA_E:
+        {
+          DataLayer* data_layer = dynamic_cast< DataLayer* >( layer.get() );
+          Core::DataVolumeHandle dummy_vol( new Core::DataVolume( grid_trans,
+            data_layer->get_data_volume()->get_data_block() ) );
+          vol_slice.reset( new Core::DataVolumeSlice( dummy_vol, slice_type ) );
+        }
+        break;
+      default:
+        assert( false );
+      }
 
-    LayerHandle layer = LayerManager::Instance()->get_layer_by_id( preview_layer );
-    MaskLayer* mask_layer = dynamic_cast< MaskLayer* >( layer.get() );
-    if ( mask_layer != 0 )
-    {
-      color = PreferencesManager::Instance()->get_color( 
-        mask_layer->color_state_->get() );
-    }   
+      vol_slice->move_slice_to( depth );
+    }
   }
 
   this->private_->initialize_gl();
 
-  double start_x, start_y, end_x, end_y;
-  Core::VolumeSlice::ProjectOntoSlice( slice_type, world_min, start_x, start_y );
-  Core::VolumeSlice::ProjectOntoSlice( slice_type, world_max, end_x, end_y );
+  double start_x, start_y, end_x, end_y, depth_min, depth_max;
+  Core::VolumeSlice::ProjectOntoSlice( slice_type, world_min, start_x, start_y, depth_min );
+  Core::VolumeSlice::ProjectOntoSlice( slice_type, world_max, end_x, end_y, depth_max );
 
-  glPushAttrib( GL_LINE_BIT | GL_POINT_BIT | GL_TRANSFORM_BIT | GL_TEXTURE_BIT );
+  bool in_range = depth >= depth_min && depth <= depth_max;
+
+  glPushAttrib( GL_LINE_BIT | GL_TRANSFORM_BIT | GL_TEXTURE_BIT );
   
   Core::Texture::SetActiveTextureUnit( 0 );
   glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
@@ -345,16 +551,17 @@ void TransformTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
   glLoadIdentity();
   glMultMatrixd( proj_mat.data() );
 
-  glLineWidth( 2.0f );
-  glPointSize( 2.0f );
+  glLineWidth( 1.0f );
 
   // Render the preview if the volume slice is available
-  if ( vol_slice )
+  if ( show_preview && in_range && vol_slice->is_valid() )
   {
+    vol_slice->initialize_texture();
+    vol_slice->upload_texture();
+
     MaskShader::lock_type shader_lock( this->private_->shader_->get_mutex() );
     Core::Texture2DHandle slice_tex = vol_slice->get_texture();
     Core::Texture::lock_type tex_lock( slice_tex->get_mutex() );
-
 
     if ( vol_slice->get_volume()->get_type() == Core::VolumeType::MASK_E )
     {
@@ -383,21 +590,13 @@ void TransformTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
     {
       this->private_->shader_->disable();
     }
-
   }
   
   if ( show_border )
   {
-    glColor3f( 1.0f, 0.0f, 0.0f );
+    glColor4f( 1.0f, 0.0f, 0.0f, in_range ? 1.0f : 0.5f );
 
     glBegin( GL_LINE_LOOP );
-    glVertex2d( start_x, start_y );
-    glVertex2d( end_x, start_y );
-    glVertex2d( end_x, end_y );
-    glVertex2d( start_x, end_y );
-    glEnd();
-
-    glBegin( GL_POINTS );
     glVertex2d( start_x, start_y );
     glVertex2d( end_x, start_y );
     glVertex2d( end_x, end_y );
@@ -407,6 +606,7 @@ void TransformTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat )
   
   glPopMatrix();
   glPopAttrib();
+  glFinish();
 }
 
 bool TransformTool::has_2d_visual()
@@ -416,13 +616,29 @@ bool TransformTool::has_2d_visual()
 
 bool TransformTool::handle_mouse_leave( ViewerHandle viewer )
 {
-  return false;
+  this->private_->resizing_ = false;
+  return true;
 }
 
 bool TransformTool::handle_mouse_move( ViewerHandle viewer, 
                  const Core::MouseHistory& mouse_history, 
                  int button, int buttons, int modifiers )
 { 
+  if ( buttons == Core::MouseButton::NO_BUTTON_E &&
+    modifiers == Core::KeyModifier::NO_MODIFIER_E )
+  {
+    this->private_->hit_test( viewer, mouse_history.current_.x_, mouse_history.current_.y_ );
+    this->private_->update_cursor( viewer );
+    return true;
+  }
+
+  if ( this->private_->resizing_ )
+  {
+    this->private_->resize( viewer, mouse_history.previous_.x_, mouse_history.previous_.y_,
+      mouse_history.current_.x_, mouse_history.current_.y_ );
+    return true;
+  }
+
   return false;
 }
 
@@ -430,6 +646,14 @@ bool TransformTool::handle_mouse_press( ViewerHandle viewer,
                   const Core::MouseHistory& mouse_history, 
                   int button, int buttons, int modifiers )
 {
+  if ( modifiers == Core::KeyModifier::NO_MODIFIER_E &&
+    button == Core::MouseButton::LEFT_BUTTON_E &&
+    this->private_->hit_pos_ != Core::HitPosition::NONE_E )
+  {
+    this->private_->resizing_ = true;
+    return true;
+  }
+
   return false;
 }
 
@@ -437,6 +661,15 @@ bool TransformTool::handle_mouse_release( ViewerHandle viewer,
                   const Core::MouseHistory& mouse_history, 
                   int button, int buttons, int modifiers )
 {
+  if ( button == Core::MouseButton::LEFT_BUTTON_E &&
+    this->private_->resizing_ )
+  {
+    this->private_->resizing_ = false;
+    this->private_->hit_test( viewer, mouse_history.current_.x_, mouse_history.current_.y_ );
+    this->private_->update_cursor( viewer );
+    return true;
+  }
+
   return false;
 }
 

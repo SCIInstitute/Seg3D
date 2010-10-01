@@ -46,21 +46,6 @@ SCI_REGISTER_TOOL( Seg3D, CropTool )
 namespace Seg3D
 {
 
-CORE_ENUM_CLASS
-(
-  HitPosition,
-  NONE_E = 0x00,
-  LEFT_E = 0x01,
-  RIGHT_E = 0x02,
-  BOTTOM_E = 0x04,
-  TOP_E = 0x08,
-  INSIDE_E = 0x10,
-  BOTTOM_LEFT_E = LEFT_E | BOTTOM_E,
-  BOTTOM_RIGHT_E = RIGHT_E | BOTTOM_E,
-  TOP_LEFT_E = LEFT_E | TOP_E,
-  TOP_RIGHT_E = RIGHT_E | TOP_E
-)
-
 //////////////////////////////////////////////////////////////////////////
 // Class CropToolPrivate
 //////////////////////////////////////////////////////////////////////////
@@ -68,7 +53,7 @@ CORE_ENUM_CLASS
 class CropToolPrivate
 {
 public:
-  CropToolPrivate() : hit_pos_( HitPosition::NONE_E ) {}
+  CropToolPrivate() : hit_pos_( Core::HitPosition::NONE_E ) {}
 
   void handle_target_group_changed();
   void handle_cropbox_origin_changed( int index, double value, Core::ActionSource source );
@@ -165,7 +150,7 @@ void CropToolPrivate::handle_cropbox_origin_changed( int index, double value,
 
 void CropToolPrivate::hit_test( ViewerHandle viewer, int x, int y )
 {
-  this->hit_pos_ = HitPosition::NONE_E;
+  this->hit_pos_ = Core::HitPosition::NONE_E;
 
   Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
   if ( viewer->is_volume_view() ||
@@ -223,7 +208,7 @@ void CropToolPrivate::hit_test( ViewerHandle viewer, int x, int y )
     world_y + range_y >= bottom && 
     world_y - range_y <= top )
   {
-    this->hit_pos_ |= HitPosition::LEFT_E;
+    this->hit_pos_ |= Core::HitPosition::LEFT_E;
   }
 
   // Test bottom boundary
@@ -231,43 +216,43 @@ void CropToolPrivate::hit_test( ViewerHandle viewer, int x, int y )
     world_x + range_x >= left && 
     world_x - range_x <= right )
   {
-    this->hit_pos_ |= HitPosition::BOTTOM_E;
+    this->hit_pos_ |= Core::HitPosition::BOTTOM_E;
   }
 
   // If the mouse hits a corner, no further test is needed
-  if ( this->hit_pos_ == HitPosition::BOTTOM_LEFT_E )
+  if ( this->hit_pos_ == Core::HitPosition::BOTTOM_LEFT_E )
   {
     return;
   }
   
   // Test top boundary
-  if ( !( this->hit_pos_ & HitPosition::BOTTOM_E ) &&
+  if ( !( this->hit_pos_ & Core::HitPosition::BOTTOM_E ) &&
     Core::Abs( world_y - top ) <= range_y &&
     world_x + range_x >= left && 
     world_x - range_x <= right )
   {
-    this->hit_pos_ |= HitPosition::TOP_E;
+    this->hit_pos_ |= Core::HitPosition::TOP_E;
   }
   
-  if ( this->hit_pos_ == HitPosition::TOP_LEFT_E )
+  if ( this->hit_pos_ == Core::HitPosition::TOP_LEFT_E )
   {
     return;
   }
   
   // Test right boundary
-  if ( !( this->hit_pos_ & HitPosition::LEFT_E ) &&
+  if ( !( this->hit_pos_ & Core::HitPosition::LEFT_E ) &&
     Core::Abs( world_x - right ) <= range_x &&
     world_y + range_y >= bottom && 
     world_y - range_y <= top )
   {
-    this->hit_pos_ |= HitPosition::RIGHT_E;
+    this->hit_pos_ |= Core::HitPosition::RIGHT_E;
   }
 
-  if ( this->hit_pos_ == HitPosition::NONE_E &&
+  if ( this->hit_pos_ == Core::HitPosition::NONE_E &&
     world_x > left && world_x < right &&
     world_y > bottom && world_y < top )
   {
-    this->hit_pos_ = HitPosition::INSIDE_E;
+    this->hit_pos_ = Core::HitPosition::INSIDE_E;
   }
 }
 
@@ -284,35 +269,35 @@ void CropToolPrivate::resize( ViewerHandle viewer, int x0, int y0, int x1, int y
   bool size_changed = false;
   const double epsilon = 1e-6;
 
-  if ( ( this->hit_pos_ & HitPosition::LEFT_E ) && Core::Abs( dx ) > epsilon )
+  if ( ( this->hit_pos_ & Core::HitPosition::LEFT_E ) && Core::Abs( dx ) > epsilon )
   {
     Core::ActionOffset::Dispatch( Core::Interface::GetMouseActionContext(),
       this->tool_->cropbox_origin_state_[ this->hor_index_ ], dx );
     size_changed = true;
   }
   
-  if ( ( this->hit_pos_ & HitPosition::BOTTOM_E ) && Core::Abs( dy ) > epsilon )
+  if ( ( this->hit_pos_ & Core::HitPosition::BOTTOM_E ) && Core::Abs( dy ) > epsilon )
   {
     Core::ActionOffset::Dispatch( Core::Interface::GetMouseActionContext(),
       this->tool_->cropbox_origin_state_[ this->ver_index_ ], dy );
     size_changed = true;
   }
   
-  if ( ( this->hit_pos_ & HitPosition::RIGHT_E ) && Core::Abs( dx ) > epsilon )
+  if ( ( this->hit_pos_ & Core::HitPosition::RIGHT_E ) && Core::Abs( dx ) > epsilon )
   {
     Core::ActionOffset::Dispatch( Core::Interface::GetMouseActionContext(),
       this->tool_->cropbox_size_state_[ this->hor_index_ ], dx );
     size_changed = true;
   }
   
-  if ( ( this->hit_pos_ & HitPosition::TOP_E ) && Core::Abs( dy ) > epsilon )
+  if ( ( this->hit_pos_ & Core::HitPosition::TOP_E ) && Core::Abs( dy ) > epsilon )
   {
     Core::ActionOffset::Dispatch( Core::Interface::GetMouseActionContext(),
       this->tool_->cropbox_size_state_[ this->ver_index_ ], dy );
     size_changed = true;
   }
 
-  if ( this->hit_pos_ == HitPosition::INSIDE_E )
+  if ( this->hit_pos_ == Core::HitPosition::INSIDE_E )
   {
     // NOTE: Here it uses keyboard action context instead of the actual mouse action
     // context so that the change of origin won't cause the size to change
@@ -340,23 +325,23 @@ void CropToolPrivate::update_cursor( ViewerHandle viewer )
 {
   switch ( this->hit_pos_ )
   {
-  case HitPosition::INSIDE_E:
+  case Core::HitPosition::INSIDE_E:
     viewer->set_cursor( Core::CursorShape::SIZE_ALL_E );
     break;
-  case HitPosition::TOP_LEFT_E:
-  case HitPosition::BOTTOM_RIGHT_E:
+  case Core::HitPosition::TOP_LEFT_E:
+  case Core::HitPosition::BOTTOM_RIGHT_E:
     viewer->set_cursor( Core::CursorShape::SIZE_FDIAG_E );
     break;
-  case HitPosition::BOTTOM_LEFT_E:
-  case HitPosition::TOP_RIGHT_E:
+  case Core::HitPosition::BOTTOM_LEFT_E:
+  case Core::HitPosition::TOP_RIGHT_E:
     viewer->set_cursor( Core::CursorShape::SIZE_BDIAG_E );
     break;
-  case HitPosition::LEFT_E:
-  case HitPosition::RIGHT_E:
+  case Core::HitPosition::LEFT_E:
+  case Core::HitPosition::RIGHT_E:
     viewer->set_cursor( Core::CursorShape::SIZE_HOR_E );
     break;
-  case HitPosition::BOTTOM_E:
-  case HitPosition::TOP_E:
+  case Core::HitPosition::BOTTOM_E:
+  case Core::HitPosition::TOP_E:
     viewer->set_cursor( Core::CursorShape::SIZE_VER_E );
     break;
   default:
@@ -525,7 +510,7 @@ bool CropTool::handle_mouse_press( ViewerHandle viewer,
 {
   if ( modifiers == Core::KeyModifier::NO_MODIFIER_E &&
     button == Core::MouseButton::LEFT_BUTTON_E &&
-    this->private_->hit_pos_ != HitPosition::NONE_E )
+    this->private_->hit_pos_ != Core::HitPosition::NONE_E )
   {
     this->private_->resizing_ = true;
     return true;

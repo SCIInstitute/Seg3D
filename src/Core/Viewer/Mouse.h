@@ -135,6 +135,23 @@ CORE_ENUM_CLASS
   KEY_Z_E = 0x5a
 )
 
+// CLASS HitPosition:
+// Classifies which part of a rectangle region the mouse cursor is on.
+CORE_ENUM_CLASS
+(
+   HitPosition,
+   NONE_E = 0x00,
+   LEFT_E = 0x01,
+   RIGHT_E = 0x02,
+   BOTTOM_E = 0x04,
+   TOP_E = 0x08,
+   INSIDE_E = 0x10,
+   BOTTOM_LEFT_E = LEFT_E | BOTTOM_E,
+   BOTTOM_RIGHT_E = RIGHT_E | BOTTOM_E,
+   TOP_LEFT_E = LEFT_E | TOP_E,
+   TOP_RIGHT_E = RIGHT_E | TOP_E
+ )
+
 // CLASS MousePosition:
 // Class for recording the location of the mouse
 

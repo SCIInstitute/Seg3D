@@ -266,7 +266,7 @@ void StateLabeledMultiOption::set_option_list(  const std::vector< OptionLabelPa
   }
 }
 
-std::vector< OptionLabelPair > StateLabeledMultiOption::get_option_list() const
+const std::vector< OptionLabelPair >& StateLabeledMultiOption::get_option_list() const
 {
   return this->private_->option_list_;
 }

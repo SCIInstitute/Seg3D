@@ -171,6 +171,9 @@ private:
 public:
   static void ProjectOntoSlice( VolumeSliceType slice_type, const Point& pt,
     double& i_pos, double& j_pos );
+
+  static void ProjectOntoSlice( VolumeSliceType slice_type, const Point& pt,
+    double& i_pos, double& j_pos, double& depth );
 };
 
 } // end namespace Core

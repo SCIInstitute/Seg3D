@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>279</width>
-    <height>602</height>
+    <height>623</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -496,6 +496,13 @@
          </widget>
         </item>
        </layout>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="show_preview_checkbox_">
+        <property name="text">
+         <string>Show Preview</string>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QCheckBox" name="show_border_checkbox_">

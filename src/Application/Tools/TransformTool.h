@@ -99,6 +99,7 @@ public:
   Core::StateBoolHandle keep_aspect_ratio_state_;
   Core::StateLabeledOptionHandle preview_layer_state_;
   Core::StateBoolHandle show_border_state_;
+  Core::StateBoolHandle show_preview_state_;
 
   Core::StateBoolHandle replace_state_;
 
