@@ -100,5 +100,11 @@ void DropSpaceWidget::change_size()
   }
 }
 
+void DropSpaceWidget::instant_hide()
+{
+  this->setVisible( false );
+}
+
+
   
 } // end namespace Seg3D

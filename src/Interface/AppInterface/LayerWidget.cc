@@ -98,6 +98,7 @@ public:
   bool locked_;
   bool in_use_;
   bool picked_up_;
+  int picked_up_layer_size_;
 };
 
 LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
@@ -174,7 +175,8 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   this->private_->brightness_adjuster_ = new QtUtils::QtSliderDoubleCombo( 
     this->private_->ui_.bright_contrast_bar_ );
   this->private_->ui_.brightness_h_layout_->addWidget( this->private_->brightness_adjuster_ );
-  this->private_->brightness_adjuster_->setObjectName( QString::fromUtf8( "brightness_adjuster_" ) );
+  this->private_->brightness_adjuster_->setObjectName( 
+    QString::fromUtf8( "brightness_adjuster_" ) );
   
   this->private_->contrast_adjuster_ = new QtUtils::QtSliderDoubleCombo( 
     this->private_->ui_.bright_contrast_bar_ );
@@ -246,17 +248,23 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
     // The following buttons are enabled when the layer is not locked and not being created
     QtUtils::QtBridge::Enable( this->private_->activate_button_, enable_states, condition );
     QtUtils::QtBridge::Enable( this->private_->ui_.opacity_button_, enable_states, condition );
-    QtUtils::QtBridge::Enable( this->private_->ui_.mask_property_button_, enable_states, condition );
-    QtUtils::QtBridge::Enable( this->private_->ui_.volume_rendered_button_, enable_states, condition );
-    QtUtils::QtBridge::Enable( this->private_->ui_.brightness_contrast_button_, enable_states, condition );
+    QtUtils::QtBridge::Enable( this->private_->ui_.mask_property_button_, enable_states, 
+      condition );
+    QtUtils::QtBridge::Enable( this->private_->ui_.volume_rendered_button_, enable_states, 
+      condition );
+    QtUtils::QtBridge::Enable( this->private_->ui_.brightness_contrast_button_, enable_states, 
+      condition );
     QtUtils::QtBridge::Enable( this->private_->ui_.label_, enable_states, condition );
     
     // The following buttons are enabled when the layer is not being created
     condition = boost::lambda::bind( &Core::StateOption::get, layer->data_state_.get() ) != 
       Layer::CREATING_C;
-    QtUtils::QtBridge::Enable( this->private_->ui_.info_button_, layer->data_state_, condition );
-    QtUtils::QtBridge::Enable( this->private_->ui_.visibility_button_, layer->data_state_, condition );
-    QtUtils::QtBridge::Enable( this->private_->ui_.lock_button_, layer->data_state_, condition );
+    QtUtils::QtBridge::Enable( this->private_->ui_.info_button_, layer->data_state_, 
+      condition );
+    QtUtils::QtBridge::Enable( this->private_->ui_.visibility_button_, layer->data_state_, 
+      condition );
+    QtUtils::QtBridge::Enable( this->private_->ui_.lock_button_, layer->data_state_, 
+      condition );
 
     // Compute isosurface button is enabled when the layer is not locked and is available
     QtUtils::QtBridge::Enable( this->private_->ui_.compute_iso_surface_button_, enable_states,
@@ -269,7 +277,8 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
     enable_states[ 1 ] = layer_group->show_delete_menu_state_;
     QtUtils::QtBridge::Show( this->private_->ui_.checkbox_widget_, enable_states,
       !boost::lambda::bind( &Core::StateBool::get, layer->locked_state_.get() ) &&
-      boost::lambda::bind( &Core::StateBool::get, layer_group->show_delete_menu_state_.get() ) );
+      boost::lambda::bind( &Core::StateBool::get, 
+      layer_group->show_delete_menu_state_.get() ) );
 
     switch( this->get_volume_type() )
     {
@@ -373,7 +382,8 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   // Set up the overlay widgets
   this->private_->overlay_ = new OverlayWidget( this );
   this->private_->overlay_->hide(); 
-  this->private_->ui_.dummy_widget_->hide();
+  this->private_->ui_.facade_widget_->hide();
+  this->private_->ui_.verticalLayout_3->setAlignment( Qt::AlignBottom );
   
   this->update_widget_state( true );
   this->setUpdatesEnabled( true );
@@ -426,7 +436,8 @@ void LayerWidget::update_appearance( bool locked, bool active, bool in_use, bool
     {
       if ( locked )
       {
-        this->private_->ui_.type_->setStyleSheet( StyleSheet::LAYER_WIDGET_BACKGROUND_LOCKED_C );
+        this->private_->ui_.type_->setStyleSheet( 
+          StyleSheet::LAYER_WIDGET_BACKGROUND_LOCKED_C );
       }
       else
       {
@@ -436,7 +447,8 @@ void LayerWidget::update_appearance( bool locked, bool active, bool in_use, bool
     break;
     case Core::VolumeType::MASK_E:
     {
-      int color_index =  dynamic_cast< MaskLayer* >( this->private_->layer_.get() )->color_state_->get();
+      int color_index =  dynamic_cast< MaskLayer* >( 
+        this->private_->layer_.get() )->color_state_->get();
       
       this->set_mask_background_color( color_index );
     }
@@ -445,7 +457,8 @@ void LayerWidget::update_appearance( bool locked, bool active, bool in_use, bool
     {
       if ( locked )
       {
-        this->private_->ui_.type_->setStyleSheet( StyleSheet::LAYER_WIDGET_BACKGROUND_LOCKED_C );
+        this->private_->ui_.type_->setStyleSheet( 
+          StyleSheet::LAYER_WIDGET_BACKGROUND_LOCKED_C );
       }
       else
       {
@@ -638,6 +651,7 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
   this->seethrough( true );
 
   Q_EMIT prep_for_drag_and_drop( true );
+  Q_EMIT layer_size_signal_( this->height() - 2 );
   
   // Finally if our drag was aborted then we reset the layers styles to be visible
   if( ( drag->exec(Qt::MoveAction, Qt::MoveAction) ) == Qt::MoveAction ) 
@@ -757,11 +771,14 @@ void LayerWidget::set_picked_up( bool picked_up )
 void LayerWidget::enable_drop_space( bool drop )
 {
   // First we check to see if it is picked up if so, we set change the way it looks
+  
+  this->private_->drop_space_->set_height( this->private_->picked_up_layer_size_ + 4 );
+  
+  
   if( this->private_->picked_up_ )
   {
     this->private_->ui_.base_->setStyleSheet( StyleSheet::LAYER_WIDGET_BASE_PICKED_UP_C );  
   }
-  // If its not picked up, we set its color to indicate whether or not its a potential drop site
   else if( drop )
   {
     this->private_->overlay_->show();
@@ -806,15 +823,15 @@ void LayerWidget::prep_for_animation( bool move_time )
 {
   if( move_time )
   {
-    this->private_->ui_.dummy_widget_->setMinimumHeight( this->private_->ui_.base_->height() );
-    this->private_->ui_.dummy_widget_->setMinimumWidth( this->private_->ui_.base_->width() );
-    this->private_->ui_.dummy_widget_->setPixmap( QPixmap::grabWidget( this->private_->ui_.base_ ) );
+    this->private_->ui_.facade_widget_->setMinimumHeight( this->private_->ui_.base_->height() );
+    this->private_->ui_.facade_widget_->setMinimumWidth( this->private_->ui_.base_->width() );
+    this->private_->ui_.facade_widget_->setPixmap( QPixmap::grabWidget( this->private_->ui_.base_ ) );
     this->private_->ui_.base_->hide();
-    this->private_->ui_.dummy_widget_->show();
+    this->private_->ui_.facade_widget_->show();
   }
   else
   {
-    this->private_->ui_.dummy_widget_->hide();
+    this->private_->ui_.facade_widget_->hide();
     this->private_->ui_.base_->show();
   } 
 }
@@ -854,5 +871,29 @@ void LayerWidget::UpdateProgress( qpointer_type qpointer, double progress )
     qpointer->update();
   }
 }
+
+void LayerWidget::instant_hide_drop_space()
+{
+  this->private_->drop_space_->instant_hide();
+}
+
+void LayerWidget::hide_overlay()
+{
+  this->private_->overlay_->hide();
+}
+
+void LayerWidget::set_picked_up_layer_size( int size )
+{
+  this->private_->picked_up_layer_size_ = size;
+}
+
+void LayerWidget::set_check_selected( bool selected )
+{
+  this->private_->ui_.selection_checkbox_->setChecked( selected );
+}
+
+
+
+
 
 } //end namespace Seg3D

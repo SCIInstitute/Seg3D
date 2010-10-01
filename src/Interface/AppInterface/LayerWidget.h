@@ -58,6 +58,11 @@ Q_SIGNALS:
   // PREP_FOR_DRAG_AND_DROP:
   // this signal tells the group that it is time to prep the layers for drag and drop
   void prep_for_drag_and_drop( bool );
+  
+  // LAYER_SIZE_SIGNAL:
+  // this function lets the LayerManagerWidget know what size the picked up layer is so that it
+  // can notify the layers
+  void layer_size_signal_( int );
 
 // -- constructor/destructor --
 public:
@@ -96,6 +101,15 @@ public:
   // or show on the dropspace to make it look like there is a space for the user to drop the
   // dragged layer
   void enable_drop_space( bool drop );
+  
+  // INSTANT_HIDE_DROP_SPACE:
+  // this funtion instantly hides the drop space for when a move has been made
+  void instant_hide_drop_space();
+  
+  // HIDE_OVERLAY:
+  // this hides the invsible overlay that we put over the widget when dragging and dropping so
+  // that we dont have multiple enter and exit events
+  void hide_overlay();
 
   // SEETHROUGH:
   // this function is called when the user clicks on a layer to drag it.  It sets the stylesheet
@@ -114,6 +128,16 @@ public:
   // this function hides the actual widgets and substitutes them for images to make drag and drop
   // faster
   void prep_for_animation( bool move_time );
+  
+  // SET_PICKED_UP_LAYER_SIZE:
+  // this function sets the picked up layer size on all the layers so that the drop space widget
+  // knows how big to become when it opens
+  void set_picked_up_layer_size( int size );
+  
+  // SET_CHECK_SELECTED:
+  // funtion that sets whether all the layer checkboxes are selected or not when you press the 
+  // select all button
+  void set_check_selected( bool selected );
 
 public:
   // GET_VOLUME_TYPE:

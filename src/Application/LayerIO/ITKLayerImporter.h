@@ -52,6 +52,8 @@ namespace Seg3D
 
 class ITKLayerImporter : public LayerImporter
 {
+  // The ITKLayerImporter is capable of importing DICOMS, tiffs, and pngs.  It assumes that
+  // when a file name does not include an extension that it is a DICOM
   SCI_IMPORTER_TYPE("ITK Importer", ".dcm;.tiff;.tif;.png;", 5)
 
   // -- Constructor/Destructor --

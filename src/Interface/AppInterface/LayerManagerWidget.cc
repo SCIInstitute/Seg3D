@@ -83,8 +83,8 @@ void LayerManagerWidget::handle_groups_changed()
   group_widget_map_type::iterator it = this->group_map_.begin();
   while ( it != this->group_map_.end() )
   {
-    ( *it ).second->set_drop( false );
     ( *it ).second->seethrough( false );
+    ( *it ).second->instant_hide_drop_space();
 
     bool found = false;
     for ( size_t i = 0; i < group_list.size(); ++i )
@@ -157,6 +157,9 @@ LayerGroupWidget* LayerManagerWidget::make_new_group( LayerGroupHandle group )
   
   connect( new_group, SIGNAL( picked_up_group_size_signal_( int ) ), 
       this, SLOT( notify_picked_up_group_size( int ) ) );
+      
+  connect( new_group, SIGNAL( picked_up_layer_size_signal_( int ) ), 
+    this, SLOT( notify_groups_of_picked_up_layer_size( int ) ) );
   
   return new_group;
 }
@@ -205,6 +208,15 @@ void LayerManagerWidget::notify_picked_up_group_size( int group_size )
     it != this->group_map_.end(); ++it )
   {
     ( *it ).second->set_picked_up_group_size( group_size );
+  }
+}
+
+void LayerManagerWidget::notify_groups_of_picked_up_layer_size( int layer_size )
+{
+  for( group_widget_map_type::iterator it = this->group_map_.begin(); 
+    it != this->group_map_.end(); ++it )
+  {
+    ( *it ).second->notify_picked_up_layer_size( layer_size );
   }
 }
 

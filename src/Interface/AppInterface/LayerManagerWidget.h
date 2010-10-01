@@ -84,6 +84,8 @@ private Q_SLOTS:
   // this function will notify all the groups of what size the currently picked up group is
   void notify_picked_up_group_size( int group_size );
   
+  void notify_groups_of_picked_up_layer_size( int layer_size );
+  
 private:
   // private Qt GUI Components for the LayerManagerWidget
   QWidget* main_;

@@ -61,6 +61,11 @@ Q_SIGNALS:
   // group is so that the proper size slot is opened up
   void picked_up_group_size_signal_( int );
   
+  // PICKED_UP_LAYER_SIZE_SIGNAL_:
+  // this signal is sent to the LayerManagerWidget to notify the other layers what size this
+  // layer is so that the proper size slot is opened up
+  void picked_up_layer_size_signal_( int );
+  
   // -- constructor/destructor --
 public:
   LayerGroupWidget( QWidget* parent, LayerGroupHandle group );
@@ -74,20 +79,20 @@ public Q_SLOTS:
   // function that shows or hides the layers
   void show_layers( bool show );
 
-  // ENABLE_DELETE_BUTTON:
-  // function that enables the delete button
-  void enable_delete_button( bool enable );
-  
   // PREP_FOR_ANIMATION:
   // this function replaces the widget with a screenshot of the widget for speed
   void prep_for_animation( bool move_time );
   
   
 public:
-  // SET_DROP:
+  // ENABLE_DROP_SPACE:
   // this function give the user the impression that a group is available for dropping onto by
   // opening up a space for dropping
-    void set_drop( bool drop );
+    void enable_drop_space( bool drop );
+    
+    // INSTANT_HIDE_DROP_SPACE:
+    // this funtion instantly hides the drop space for when a move has been made
+    void instant_hide_drop_space();
 
   // GET_GROUP_ID:
   // function that returns a string containing the groups id
@@ -110,7 +115,13 @@ public:
   // function that sets the size of the currently picked up group
   void set_picked_up_group_size( int group_height );
     
+  // HANDLE_CHANGE:
+  // this function handles changes from the layer manager.
   void handle_change();
+  
+  // NOTIFY_PICKED_UP_LAYER_SIZE:
+  // this function sets the layer size of all
+  void notify_picked_up_layer_size( int layer_size );
 
 protected:
   // RESIZEEVENT:
@@ -121,7 +132,7 @@ protected:
 private Q_SLOTS:
   // UNCHECK_DELETE_CONFIRM:
   // this is a simple helper function that unchecks the delete confirmation checkbox
-    void uncheck_delete_confirm();
+    void verify_delete();
 
   // SET_PICKED_UP:
   // this sets the local member variable picked_up_ to indicate whether the current LayerWidget 
@@ -157,9 +168,15 @@ private Q_SLOTS:
   // helper function for the show_layers function
   void hide_group();
   
+  void hide_show_checkboxes();
+  
+  
+  
 private:
   // CLEANUP_REMOVED_WIDGETS:
   void cleanup_removed_widgets();
+  
+  
   
 
   // -- widget internals --

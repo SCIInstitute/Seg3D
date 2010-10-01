@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>300</width>
+    <width>304</width>
     <height>313</height>
    </rect>
   </property>
@@ -765,7 +765,7 @@ QPushButton#activate_button_{
               </property>
               <property name="font">
                <font>
-                <pointsize>11</pointsize>
+                <pointsize>8</pointsize>
                </font>
               </property>
               <property name="text">
@@ -807,7 +807,7 @@ QPushButton#activate_button_{
               </property>
               <property name="font">
                <font>
-                <pointsize>11</pointsize>
+                <pointsize>8</pointsize>
                </font>
               </property>
               <property name="text">
@@ -858,7 +858,7 @@ QPushButton#activate_button_{
               </property>
               <property name="font">
                <font>
-                <pointsize>11</pointsize>
+                <pointsize>8</pointsize>
                </font>
               </property>
               <property name="text">
@@ -1032,7 +1032,7 @@ QPushButton#activate_button_{
               </property>
               <property name="font">
                <font>
-                <pointsize>10</pointsize>
+                <pointsize>8</pointsize>
                </font>
               </property>
               <property name="text">
@@ -1066,7 +1066,7 @@ QPushButton#activate_button_{
               </property>
               <property name="font">
                <font>
-                <pointsize>10</pointsize>
+                <pointsize>8</pointsize>
                </font>
               </property>
               <property name="text">
@@ -1126,7 +1126,7 @@ QPushButton#activate_button_{
              </property>
              <property name="font">
               <font>
-               <pointsize>11</pointsize>
+               <pointsize>8</pointsize>
               </font>
              </property>
              <property name="text">
@@ -1138,7 +1138,7 @@ QPushButton#activate_button_{
             <widget class="QLabel" name="dimensions_">
              <property name="font">
               <font>
-               <pointsize>11</pointsize>
+               <pointsize>8</pointsize>
               </font>
              </property>
              <property name="text">
@@ -1166,7 +1166,7 @@ QPushButton#activate_button_{
              </property>
              <property name="font">
               <font>
-               <pointsize>11</pointsize>
+               <pointsize>8</pointsize>
               </font>
              </property>
              <property name="text">
@@ -1178,7 +1178,7 @@ QPushButton#activate_button_{
             <widget class="QLabel" name="origin_label_">
              <property name="font">
               <font>
-               <pointsize>11</pointsize>
+               <pointsize>8</pointsize>
               </font>
              </property>
              <property name="text">
@@ -1206,7 +1206,7 @@ QPushButton#activate_button_{
              </property>
              <property name="font">
               <font>
-               <pointsize>11</pointsize>
+               <pointsize>8</pointsize>
               </font>
              </property>
              <property name="text">
@@ -1218,7 +1218,7 @@ QPushButton#activate_button_{
             <widget class="QLabel" name="spacing_label_">
              <property name="font">
               <font>
-               <pointsize>11</pointsize>
+               <pointsize>8</pointsize>
               </font>
              </property>
              <property name="text">
@@ -1255,7 +1255,7 @@ QPushButton#activate_button_{
                 </property>
                 <property name="font">
                  <font>
-                  <pointsize>11</pointsize>
+                  <pointsize>8</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -1267,7 +1267,7 @@ QPushButton#activate_button_{
                <widget class="QLabel" name="datatype_label_">
                 <property name="font">
                  <font>
-                  <pointsize>11</pointsize>
+                  <pointsize>8</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -1295,7 +1295,7 @@ QPushButton#activate_button_{
                 </property>
                 <property name="font">
                  <font>
-                  <pointsize>11</pointsize>
+                  <pointsize>8</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -1307,7 +1307,7 @@ QPushButton#activate_button_{
                <widget class="QLabel" name="min_label_">
                 <property name="font">
                  <font>
-                  <pointsize>11</pointsize>
+                  <pointsize>8</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -1331,7 +1331,7 @@ QPushButton#activate_button_{
                 </property>
                 <property name="font">
                  <font>
-                  <pointsize>11</pointsize>
+                  <pointsize>8</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -1343,7 +1343,7 @@ QPushButton#activate_button_{
                <widget class="QLabel" name="max_label_">
                 <property name="font">
                  <font>
-                  <pointsize>11</pointsize>
+                  <pointsize>8</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -1381,7 +1381,7 @@ QPushButton#activate_button_{
           <widget class="QLabel" name="abort_text_">
            <property name="font">
             <font>
-             <pointsize>11</pointsize>
+             <pointsize>8</pointsize>
             </font>
            </property>
            <property name="text">

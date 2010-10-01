@@ -94,7 +94,6 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
   // hide the tool bars 
   this->private_->ui_.iso_quality_->hide();
   this->private_->ui_.delete_->hide();
-  this->private_->ui_.delete_button_->setEnabled( false );
 
   //add the PushDragButton
   this->private_->activate_button_ = new PushDragButton( this->private_->ui_.group_header_ );
@@ -107,7 +106,7 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
     this->private_->activate_button_->setMinimumSize( QSize( 152, 21 ) );
     this->private_->activate_button_->setCheckable( false );
     this->private_->activate_button_->setFlat( true );
-  this->private_->ui_.horizontalLayout->insertWidget( 1, this->private_->activate_button_ );
+  this->private_->ui_.horizontalLayout->insertWidget( 2, this->private_->activate_button_ );
 
   // set some values of the GUI
   std::string group_name = Core::ExportToString( 
@@ -133,10 +132,10 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
   //  connect the gui signals and slots
   connect( this->private_->ui_.open_button_, SIGNAL( toggled( bool ) ), this, 
     SLOT( show_layers( bool )) );
-  connect( this->private_->ui_.confirm_delete_checkbox_, SIGNAL( clicked ( bool ) ), this, 
-    SLOT( enable_delete_button( bool )) );
-  connect( this->private_->ui_.delete_button_, SIGNAL( clicked () ), this, 
-    SLOT( uncheck_delete_confirm() ) );
+  connect( this->private_->ui_.delete_button_, SIGNAL( clicked() ), this, 
+    SLOT( verify_delete() ) );
+  connect( this->private_->ui_.select_all_button_, SIGNAL( released() ), this, 
+    SLOT( hide_show_checkboxes() ) );
   
   
   //Set the default values for the Group UI and make the connections to the state engine
@@ -152,9 +151,6 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
     QtUtils::QtBridge::Connect( this->private_->ui_.group_visibility_button_, 
     this->private_->group_->visibility_state_, 
     ViewerManager::Instance()->active_viewer_state_ );
-    QtUtils::QtBridge::Connect( this->private_->ui_.delete_button_, 
-    boost::bind( &ActionDeleteLayers::Dispatch, 
-    Core::Interface::GetWidgetActionContext(), this->private_->group_ ) );
   QtUtils::QtBridge::Connect( this->private_->ui_.group_new_button_, 
     boost::bind( &ActionNewMaskLayer::Dispatch, 
     Core::Interface::GetWidgetActionContext(), this->private_->group_ ) );
@@ -248,20 +244,20 @@ void LayerGroupWidget::dropEvent( QDropEvent* event )
   
   if( mime_data.size() < 2 ) 
   {
-    this->set_drop( false );
+    this->enable_drop_space( false );
     return;
   }
 
   if( ( this->get_group_id() == mime_data[ 1 ] ) || ( mime_data[ 0 ] != "group" ) )
   {
-    this->set_drop( false );
+    this->enable_drop_space( false );
     event->ignore();
     return;
   }
 
   if( this->group_menus_open_ )
   {
-    this->set_drop( false );
+    this->enable_drop_space( false );
     return;
   }
 
@@ -283,13 +279,13 @@ void LayerGroupWidget::dragEnterEvent( QDragEnterEvent* event)
 
   if( ( this->get_group_id() != mime_data[ 0 ] ) && ( mime_data[ 0 ] == "group" ) )
   {
-    this->set_drop( true );
+    this->enable_drop_space( true );
     event->setDropAction(Qt::MoveAction);
     event->accept();
   }
   else
   {
-    this->set_drop( false );
+    this->enable_drop_space( false );
     this->private_->overlay_->hide();
     event->ignore();
   }
@@ -297,7 +293,7 @@ void LayerGroupWidget::dragEnterEvent( QDragEnterEvent* event)
 
 void LayerGroupWidget::dragLeaveEvent( QDragLeaveEvent* event )
 {
-  this->set_drop( false );
+  this->enable_drop_space( false );
   this->private_->overlay_->hide();
 }
 
@@ -315,7 +311,7 @@ void LayerGroupWidget::seethrough( bool see )
   }
 }
 
-void LayerGroupWidget::set_drop( bool drop )
+void LayerGroupWidget::enable_drop_space( bool drop )
 {
   this->private_->drop_space_->set_height( this->picked_up_group_height_ + 4 );
   
@@ -353,15 +349,19 @@ const std::string& LayerGroupWidget::get_group_id()
   return this->group_id_;
 }
 
-void LayerGroupWidget::enable_delete_button( bool enable )
+void LayerGroupWidget::verify_delete()
 {
-  this->private_->ui_.delete_button_->setEnabled( enable );
-}
-
-void LayerGroupWidget::uncheck_delete_confirm()
-{
-    this->private_->ui_.confirm_delete_checkbox_->setChecked( false );
-    this->private_->ui_.delete_button_->setEnabled( false );
+  QMessageBox message_box;
+  message_box.setText( QString::fromUtf8( "WARNING!") );
+  message_box.setInformativeText( QString::fromUtf8( "Are you sure you want to do this?" ) );
+  message_box.setStandardButtons( QMessageBox::Yes | QMessageBox::No );
+  message_box.setDefaultButton( QMessageBox::No );
+  if( QMessageBox::Yes == message_box.exec() )
+  {
+    ActionDeleteLayers::Dispatch( Core::Interface::GetWidgetActionContext(), 
+      this->private_->group_ );
+    this->private_->ui_.group_delete_button_->setChecked( false );
+  }
 }
 
 void LayerGroupWidget::show_layers( bool show )
@@ -430,10 +430,6 @@ void LayerGroupWidget::prep_for_animation( bool move_time )
     this->private_->ui_.group_dummy_->setMinimumHeight( this->private_->ui_.base_->height() );
     this->private_->ui_.group_dummy_->setMinimumWidth( this->private_->ui_.base_->width() );
     this->private_->ui_.group_dummy_->setPixmap( QPixmap::grabWidget( this->private_->ui_.base_ ) );
-    this->private_->ui_.group_dummy_->setStyleSheet( QString::fromUtf8( 
-      "QLabel#group_dummy {"
-      " background-color: yellow; }" ) );
-    
     this->private_->ui_.base_->hide();
     this->private_->ui_.group_dummy_->show();
   }
@@ -463,7 +459,8 @@ void LayerGroupWidget::handle_change()
   {
     // we are also going to take the opportunity to turn off all the drag and drop settings
     ( *it ).second->seethrough( false );
-    ( *it ).second->enable_drop_space( false );
+    ( *it ).second->instant_hide_drop_space();
+    ( *it ).second->hide_overlay();
     
     bool found = false;
     for( layer_list_type::iterator i = layer_list.begin(); i != layer_list.end(); ++i )
@@ -504,6 +501,9 @@ void LayerGroupWidget::handle_change()
       
       connect( new_layer_handle.data(), SIGNAL( prep_for_drag_and_drop( bool ) ), 
         this, SIGNAL( prep_layers_for_drag_and_drop_signal_( bool ) ) );
+        
+      connect( new_layer_handle.data(), SIGNAL( layer_size_signal_( int ) ), 
+        this, SIGNAL( picked_up_layer_size_signal_( int ) ) );
       
     }
     index++;
@@ -525,5 +525,31 @@ void LayerGroupWidget::cleanup_removed_widgets()
     }
   }
 }
-  
+
+void LayerGroupWidget::instant_hide_drop_space()
+{
+  this->private_->drop_space_->instant_hide();
+}
+
+void LayerGroupWidget::notify_picked_up_layer_size( int layer_size )
+{
+  for( std::map< std::string, LayerWidgetQHandle >::iterator it = this->layer_map_.begin(); 
+    it != this->layer_map_.end(); ++it )
+  {
+    ( *it ).second->set_picked_up_layer_size( layer_size );
+  }
+}
+
+void LayerGroupWidget::hide_show_checkboxes()
+{
+  for( std::map< std::string, LayerWidgetQHandle >::iterator it = this->layer_map_.begin(); 
+    it != this->layer_map_.end(); ++it )
+  {
+    ( *it ).second->set_check_selected( this->private_->ui_.select_all_button_->isChecked() );
+  }
+}
+
+
+
+
 }  //end namespace Seg3D

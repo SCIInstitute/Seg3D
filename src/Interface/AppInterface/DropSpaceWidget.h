@@ -49,6 +49,7 @@ public:
   // HIDE:
   // This overloaded function adds some animation to the hide function for this widget
   void hide();
+  void instant_hide();
 
   // SHOW:
   // This overloaded function adds some animation to the show function for this widget

@@ -68,11 +68,13 @@ bool ITKLayerImporter::import_header()
   }
   else if( this->extension_ == ".png" )
   {
+    // This currently does nothing but return true;
     return this->scan_png();
   }
   else if( ( this->extension_ == ".tiff" ) || ( this->extension_ == ".tif" ) )
   {
-    return true;
+    // This currently does nothing but return true;
+    return this->scan_tiff();
   }
 
   return false; 
@@ -181,7 +183,7 @@ bool ITKLayerImporter::scan_png()
 
 bool ITKLayerImporter::scan_tiff()
 {
-  return false;
+  return true;
 }
 
 bool ITKLayerImporter::load_data( Core::DataBlockHandle& data_block, 

@@ -33,11 +33,15 @@
 # pragma once
 #endif 
 
+// GDCM includes
+#include "gdcmImageHelper.h"
+
 // ITK includes
 #include "itkImageSeriesWriter.h"
 #include "itkGDCMImageIO.h"
 #include "itkNumericSeriesFileNames.h"
 
+// Boost includes
 #include <boost/filesystem.hpp>
 
 // Core includes
@@ -154,6 +158,7 @@ private:
     writer->SetInput( itk_image );
     writer->SetImageIO( dicom_io );
     writer->SetFileNames( names_generator->GetFileNames() );
+    gdcm::ImageHelper::SetForcePixelSpacing( true );
 
     try
     {
