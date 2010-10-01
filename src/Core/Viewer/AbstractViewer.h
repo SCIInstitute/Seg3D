@@ -162,7 +162,6 @@ private:
 
   // -- State information --
 public:
-
   // State variable that keeps track of whether this viewer is visible and hence needs
   // data to be rendered.
   StateBoolHandle viewer_visible_state_;

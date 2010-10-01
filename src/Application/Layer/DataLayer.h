@@ -101,11 +101,6 @@ public:
   Core::StateDoubleHandle min_value_state_;
   Core::StateDoubleHandle max_value_state_;
 
-  // -- GUI related states --
-public:
-  // Whether to display contrast/brightness control
-  Core::StateBoolHandle show_contrast_brightness_state_;
-
 protected:
   // PRE_SAVE_STATES:
   // this function synchronize the generation number for the session saving

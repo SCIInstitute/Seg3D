@@ -39,6 +39,7 @@
 #include <QtUtils/Widgets/QtColorBarWidget.h>
 
 //Application Includes
+#include <Application/InterfaceManager/InterfaceManager.h>
 #include <Application/ViewerManager/ViewerManager.h>
 #include <Application/Layer/DataLayer.h>
 #include <Application/Layer/LayerGroup.h>
@@ -99,6 +100,9 @@ public:
   bool in_use_;
   bool picked_up_;
   int picked_up_layer_size_;
+  
+  QButtonGroup* viewer_button_group_;
+  
 };
 
 LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
@@ -143,13 +147,14 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
     QRegExp( QString::fromStdString( Core::StateName::REGEX_VALIDATOR_C ) ), this ) );
 
   // Hide the tool bars and the selection checkbox
-  this->private_->ui_.bright_contrast_bar_->hide();
   this->private_->ui_.checkbox_widget_->hide();
-  this->private_->ui_.opacity_bar_->hide();
   this->private_->ui_.progress_bar_bar_->hide();
-  this->private_->ui_.mask_property_bar_->hide();
+  this->private_->ui_.appearance_bar_->hide();
   this->private_->ui_.info_bar_->hide();
   this->private_->ui_.abort_bar_->hide();
+  this->private_->ui_.opacity_bar_->hide();
+  this->private_->ui_.volume_rendered_button_->hide();
+  
     
   // add the PushDragButton
   this->private_->activate_button_ = new PushDragButton( this->private_->ui_.typeGradient_ );
@@ -173,18 +178,18 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   this->private_->opacity_adjuster_->setObjectName( QString::fromUtf8( "opacity_adjuster_" ) );
   
   this->private_->brightness_adjuster_ = new QtUtils::QtSliderDoubleCombo( 
-    this->private_->ui_.bright_contrast_bar_ );
+    this->private_->ui_.bright_contrast_ );
   this->private_->ui_.brightness_h_layout_->addWidget( this->private_->brightness_adjuster_ );
   this->private_->brightness_adjuster_->setObjectName( 
     QString::fromUtf8( "brightness_adjuster_" ) );
   
   this->private_->contrast_adjuster_ = new QtUtils::QtSliderDoubleCombo( 
-    this->private_->ui_.bright_contrast_bar_ );
+    this->private_->ui_.bright_contrast_ );
   this->private_->ui_.contrast_h_layout_->addWidget( this->private_->contrast_adjuster_ );
   this->private_->contrast_adjuster_->setObjectName( QString::fromUtf8( "contrast_adjuster_" ) );
   
   this->private_->color_widget_ = new QtUtils::QtColorBarWidget( this );
-  this->private_->ui_.color_widget_layout_->addWidget( this->private_->color_widget_ );
+  this->private_->ui_.horizontalLayout_14->addWidget( this->private_->color_widget_ );
   this->private_->color_widget_->setObjectName( QString::fromUtf8( "color_widget_" ) );
   
   // Text for when the abort button has been pressed
@@ -200,7 +205,9 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
     this->private_->layer_->locked_state_->state_changed_signal_.connect(
       boost::bind( &LayerWidget::UpdateState, qpointer ) );
     this->private_->layer_->data_state_->state_changed_signal_.connect(
-      boost::bind( &LayerWidget::UpdateState, qpointer ) ); 
+      boost::bind( &LayerWidget::UpdateState, qpointer ) );
+    ViewerManager::Instance()->layout_state_->value_changed_signal_.connect(
+      boost::bind( &LayerWidget::UpdateViewerButtons, qpointer, _1 ) );
   
     // Progress forwarding 
     this->private_->layer_->update_progress_signal_.connect(
@@ -229,14 +236,35 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
 
     QtUtils::QtBridge::Connect( this->private_->ui_.info_button_, 
       layer->show_information_state_ );
-    QtUtils::QtBridge::Connect( this->private_->ui_.opacity_button_,
-      layer->show_opacity_state_ );
     QtUtils::QtBridge::Show( this->private_->ui_.info_bar_, layer->show_information_state_ );
-    QtUtils::QtBridge::Show( this->private_->ui_.opacity_bar_, layer->show_opacity_state_ );
+
   
     QtUtils::QtBridge::Show( this->private_->ui_.progress_bar_bar_, 
       layer->show_progress_bar_state_ );
     QtUtils::QtBridge::Show( this->private_->ui_.abort_bar_, layer->show_abort_message_state_ );
+    
+    //viewer_button_group = new Q
+    
+    // Connect all the buttons to the viewers
+    QtUtils::QtBridge::Show( this->private_->ui_.viewer_0_button_, 
+      ViewerManager::Instance()->get_viewer( 0 )->viewer_visible_state_ );
+      
+    QtUtils::QtBridge::Show( this->private_->ui_.viewer_1_button_, 
+      ViewerManager::Instance()->get_viewer( 1 )->viewer_visible_state_ );
+      
+    QtUtils::QtBridge::Show( this->private_->ui_.viewer_2_button_, 
+      ViewerManager::Instance()->get_viewer( 2 )->viewer_visible_state_ );
+      
+    QtUtils::QtBridge::Show( this->private_->ui_.viewer_3_button_, 
+      ViewerManager::Instance()->get_viewer( 3 )->viewer_visible_state_ );
+      
+    QtUtils::QtBridge::Show( this->private_->ui_.viewer_4_button_, 
+      ViewerManager::Instance()->get_viewer( 4 )->viewer_visible_state_ );
+      
+    QtUtils::QtBridge::Show( this->private_->ui_.viewer_5_button_, 
+      ViewerManager::Instance()->get_viewer( 5 )->viewer_visible_state_ );
+    
+    
 
     std::vector< Core::StateBaseHandle > enable_states( 2 );
     enable_states[ 0 ] = layer->locked_state_;
@@ -247,12 +275,10 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
 
     // The following buttons are enabled when the layer is not locked and not being created
     QtUtils::QtBridge::Enable( this->private_->activate_button_, enable_states, condition );
-    QtUtils::QtBridge::Enable( this->private_->ui_.opacity_button_, enable_states, condition );
-    QtUtils::QtBridge::Enable( this->private_->ui_.mask_property_button_, enable_states, 
+
+    QtUtils::QtBridge::Enable( this->private_->ui_.appearance_button_, enable_states, 
       condition );
     QtUtils::QtBridge::Enable( this->private_->ui_.volume_rendered_button_, enable_states, 
-      condition );
-    QtUtils::QtBridge::Enable( this->private_->ui_.brightness_contrast_button_, enable_states, 
       condition );
     QtUtils::QtBridge::Enable( this->private_->ui_.label_, enable_states, condition );
     
@@ -261,10 +287,23 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
       Layer::CREATING_C;
     QtUtils::QtBridge::Enable( this->private_->ui_.info_button_, layer->data_state_, 
       condition );
-    QtUtils::QtBridge::Enable( this->private_->ui_.visibility_button_, layer->data_state_, 
-      condition );
     QtUtils::QtBridge::Enable( this->private_->ui_.lock_button_, layer->data_state_, 
       condition );
+      
+    QtUtils::QtBridge::Connect( this->private_->ui_.appearance_button_,
+      layer->show_appearance_state_ );
+    QtUtils::QtBridge::Show( this->private_->ui_.appearance_bar_,
+      layer->show_appearance_state_ );
+      
+    QtUtils::QtBridge::Connect( this->private_->ui_.advanced_visibility_button_,
+      layer->show_advanced_visibility_state_ );
+    QtUtils::QtBridge::Show( this->private_->ui_.advanced_visibility_bar_,
+      layer->show_advanced_visibility_state_ );
+    
+    QtUtils::QtBridge::Connect( this->private_->ui_.opacity_button_,
+      layer->show_opacity_state_ );
+    QtUtils::QtBridge::Show( this->private_->ui_.opacity_bar_,
+      layer->show_opacity_state_ );
 
     // Compute isosurface button is enabled when the layer is not locked and is available
     QtUtils::QtBridge::Enable( this->private_->ui_.compute_iso_surface_button_, enable_states,
@@ -293,7 +332,8 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
           this->private_->ui_.delete_iso_surface_button_->hide();
           this->private_->ui_.show_iso_surface_button_->hide();
           this->private_->ui_.iso_control_separator_line_->hide();
-          this->private_->ui_.mask_property_button_->hide();
+          this->private_->ui_.border_fill_->hide();
+          this->private_->color_widget_->hide();
           
           // Add the layer specific connections
           DataLayer* data_layer = dynamic_cast< DataLayer* >( layer.get() );
@@ -309,11 +349,6 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
               data_layer->min_value_state_ );
             QtUtils::QtBridge::Connect( this->private_->ui_.max_label_,
               data_layer->max_value_state_ );
-
-            QtUtils::QtBridge::Connect( this->private_->ui_.brightness_contrast_button_,
-              data_layer->show_contrast_brightness_state_ );
-            QtUtils::QtBridge::Show( this->private_->ui_.bright_contrast_bar_,
-              data_layer->show_contrast_brightness_state_ );
           }
         }
         break;
@@ -325,8 +360,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
           this->private_->activate_button_->setIcon( this->private_->mask_layer_icon_ );
 
           // Hide the buttons that are not needed for this widget
-          this->private_->ui_.brightness_contrast_button_->hide();
-          this->private_->ui_.volume_rendered_button_->hide();
+          this->private_->ui_.bright_contrast_->hide();
           this->private_->ui_.datainfo_widget_->hide();
           
           this->connect( this->private_->color_widget_, SIGNAL( color_changed( int ) ), 
@@ -356,10 +390,6 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
             QtUtils::QtBridge::Enable( this->private_->ui_.delete_iso_surface_button_, 
               mask_layer->iso_generated_state_ );
 
-            QtUtils::QtBridge::Connect( this->private_->ui_.mask_property_button_,
-              mask_layer->show_mask_property_state_ );
-            QtUtils::QtBridge::Show( this->private_->ui_.mask_property_bar_,
-              mask_layer->show_mask_property_state_ );
           
             this->set_mask_background_color( mask_layer->color_state_->get() );
           }
@@ -378,6 +408,11 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
         break;
     }   
   }
+  
+//  this->private_->ui_.viewer_2_button_->hide();
+//  this->private_->ui_.viewer_3_button_->hide();
+//  this->private_->ui_.left_viewers_widget_->setMinimumWidth( 105 );
+  
   
   // Set up the overlay widgets
   this->private_->overlay_ = new OverlayWidget( this );
@@ -684,9 +719,9 @@ void LayerWidget::mousePressEvent( QMouseEvent *event )
   {
     this->seethrough( false );
   }
-
+  
   Q_EMIT prep_for_drag_and_drop( false );
-
+  this->parentWidget()->setMinimumHeight( 0 );
   this->repaint();
 }
 
@@ -891,6 +926,41 @@ void LayerWidget::set_check_selected( bool selected )
 {
   this->private_->ui_.selection_checkbox_->setChecked( selected );
 }
+
+void LayerWidget::UpdateViewerButtons( qpointer_type qpointer, std::string layout )
+{
+  if( !( Core::Interface::IsInterfaceThread() ) )
+  {
+    Core::Interface::Instance()->post_event( boost::bind( &LayerWidget::UpdateViewerButtons, 
+      qpointer, layout ) );
+    return; 
+  }
+
+  if ( !qpointer.data() ) return;
+  
+  if( layout == "single" )
+  {
+    qpointer->private_->ui_.left_viewers_widget_->setMinimumWidth( 150 );
+    qpointer->private_->ui_.left_viewers_widget_->setMaximumWidth( 150 );
+  }
+  else if( layout == "1and2" )
+  {
+    qpointer->private_->ui_.left_viewers_widget_->setMinimumWidth( 90 );
+    qpointer->private_->ui_.left_viewers_widget_->setMaximumWidth( 90 );
+  }
+  else if( layout == "1and3" )
+  {
+    qpointer->private_->ui_.left_viewers_widget_->setMinimumWidth( 105 );
+    qpointer->private_->ui_.left_viewers_widget_->setMaximumWidth( 105 );
+  }
+  else
+  {
+    qpointer->private_->ui_.left_viewers_widget_->setMinimumWidth( 75 );
+    qpointer->private_->ui_.left_viewers_widget_->setMaximumWidth( 75 );
+  }
+
+}
+
 
 
 

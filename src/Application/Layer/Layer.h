@@ -164,6 +164,12 @@ protected:
 public:
   // Whether to show the layer information
   Core::StateBoolHandle show_information_state_;
+  
+  // Whether to show the layer information
+  Core::StateBoolHandle show_appearance_state_;
+  
+  // Whether to show the layer information
+  Core::StateBoolHandle show_advanced_visibility_state_;
 
   // Whether to show the opacity control
   Core::StateBoolHandle show_opacity_state_;

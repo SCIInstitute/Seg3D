@@ -176,7 +176,9 @@ void Layer::initialize_states( const std::string& name, bool creating )
     AVAILABLE_C + "|" + CREATING_C + "|" + PROCESSING_C + "|" + IN_USE_C );
   
   this->add_state( "show_info", this->show_information_state_, false );
+  this->add_state( "show_advanced_visibility", this->show_advanced_visibility_state_, false );
   this->add_state( "show_opacity", this->show_opacity_state_, false );
+  this->add_state( "show_appearance", this->show_appearance_state_, false );
   this->add_state( "show_progress", this->show_progress_bar_state_, creating );
   this->add_state( "show_abort", this->show_abort_message_state_, false );
 
@@ -189,7 +191,9 @@ void Layer::initialize_states( const std::string& name, bool creating )
 
   this->gui_state_group_.reset( new Core::BooleanStateGroup );
   this->gui_state_group_->add_boolean_state( this->show_information_state_ );
+  this->gui_state_group_->add_boolean_state( this->show_advanced_visibility_state_ );
   this->gui_state_group_->add_boolean_state( this->show_opacity_state_ );
+  this->gui_state_group_->add_boolean_state( this->show_appearance_state_ );
 }
 
 bool Layer::post_save_states( Core::StateIO& state_io )

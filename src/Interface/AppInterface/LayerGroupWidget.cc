@@ -159,7 +159,7 @@ LayerGroupWidget::LayerGroupWidget( QWidget* parent, LayerGroupHandle group ) :
   QtUtils::QtBridge::Connect( this->private_->iso_quality_button_group_, 
     this->private_->group_->isosurface_quality_state_ );
 
-  this->setMinimumHeight( 0 );
+/*  this->setMinimumHeight( 0 );*/
   this->private_->ui_.group_frame_layout_->setAlignment( Qt::AlignTop );
   this->private_->ui_.group_frame_layout_->setSpacing( 1 );
   this->private_->ui_.verticalLayout_13->setAlignment( Qt::AlignTop );

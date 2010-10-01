@@ -34,13 +34,9 @@
      <property name="styleSheet">
       <string notr="true">QWidget#base_
 {
-/*
-  border: 1px solid rgba(220, 220, 220, 255); 
-  background-color: qlineargradient(spread:pad, x1:0.505751, y1:0, x2:0.516, y2:1, stop:0 rgba(232, 232, 232, 255), stop:0.261364 rgba(250, 250, 250, 255), stop:1 rgba(240, 240, 240, 255));
-*/
   border-radius: 3px;
   border: 1px solid rgba(0,0,0,30);
-  background-color: qlineargradient(spread:pad, x1:0.475, y1:0, x2:0.486, y2:1, stop:0 rgba(0, 0, 0, 20), stop:0.276836 rgba(255, 255, 255, 0), stop:1 rgba(0, 0, 0,40));
+  background-color: qlineargradient(spread:pad, x1:0.475, y1:0, x2:0.486, y2:1, stop:0 rgba(0, 0, 0, 10), stop:0.276836 rgba(255, 255, 255, 0), stop:1 rgba(0, 0, 0,20));
 }
 
 QSlider#horizontalSlider

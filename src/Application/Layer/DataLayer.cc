@@ -144,9 +144,6 @@ void DataLayer::initialize_states()
 
   this->private_->update_data_info();
 
-  this->add_state( "show_contrast_brightness", this->show_contrast_brightness_state_, false );
-  this->gui_state_group_->add_boolean_state( this->show_contrast_brightness_state_ );
-
   this->set_initializing( false );
 }
 

@@ -209,6 +209,10 @@ public:
   // UPDATESTATE:
   // Entry point for the state engine to notify state has changed
   static void UpdateState( qpointer_type qpointer );
+  
+  // UPDATEVIEWERBUTTONS:
+  // update the layout of the viewer buttons
+  static void UpdateViewerButtons( qpointer_type qpointer, std::string layout );
 
   // UPDATEPROGRESS:
   // Update the progress bar 
