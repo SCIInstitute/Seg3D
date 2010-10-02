@@ -26,6 +26,10 @@
  DEALINGS IN THE SOFTWARE.
  */
 
+// boost includes
+#include <boost/lambda/lambda.hpp>
+#include <boost/lambda/bind.hpp>
+
 //QtUtils Includes
 #include <QtUtils/Bridge/QtBridge.h>
 #include <QtUtils/Widgets/QtHistogramWidget.h>
@@ -102,6 +106,13 @@ bool ThresholdToolInterface::build_widget( QFrame* frame )
   QtUtils::QtBridge::Enable( this->private_->ui_.run_button_, tool->valid_target_state_ );
   QtUtils::QtBridge::Enable( this->private_->ui_.target_layer_, 
     tool->use_active_layer_state_, true ); 
+
+  boost::function< bool () > condition = boost::lambda::bind( &Core::StateLabeledOption::get, 
+    tool->target_layer_state_.get() ) != Tool::NONE_OPTION_C;
+  QtUtils::QtBridge::Enable( this->private_->upper_threshold_, 
+    tool->target_layer_state_, condition );
+  QtUtils::QtBridge::Enable( this->private_->lower_threshold_,
+    tool->target_layer_state_, condition );
 
   //Send a message to the log that we have finished with building the Threshold Tool Interface
   CORE_LOG_DEBUG("Finished building a Threshold Tool Interface");
